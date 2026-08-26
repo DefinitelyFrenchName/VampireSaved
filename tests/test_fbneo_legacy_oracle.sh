@@ -54,7 +54,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
-BUILD="${1:-build/don_m11}"  # re-pointed 14z-105
+BUILD="${1:-build/don_m12}"  # re-pointed 14z-110
 [ $# -gt 0 ] && shift
 REPLAYS="${*:-01_attract_long 06_test_mode 21_don_mash 26_don_arcade_mash}"
 FB="$REPO/emu/fbneo/fbneo"

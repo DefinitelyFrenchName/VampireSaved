@@ -21,7 +21,7 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
-BUILD="${1:-build/m3b_merged13}"
+BUILD="${1:-build/m3b_merged14}"  # re-pointed 14z-110
 INV="build/manifest/fsm_census.toml"
 VS2="$ROMDIR/vsav2.zip"
 [ -f "$BUILD/verify_data.bin" ] || { echo "SKIP: no verify_data.bin in $BUILD"; exit 0; }

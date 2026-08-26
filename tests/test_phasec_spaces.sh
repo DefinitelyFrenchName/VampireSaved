@@ -51,7 +51,7 @@ cd "$REPO"
 # profile-gated (the stock track carries donovan's regions and gets the
 # arcade-death-stall fix too). Ratified byte movement, not a refactor —
 # the "do NOT re-freeze to pass" warning above targets inert refactors.
-EXPECT="${1:-883e7d17405baf462c9763eccde4e35bf93adecb}"
+EXPECT="${1:-cf4557602d82c6dbb1ccb76b5377825effdd5526}"  # re-frozen 14z-110: the #99 d2 window is NOT profile-gated (the stock track carries the same six 0x51 nodes), so the stock image moves
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0

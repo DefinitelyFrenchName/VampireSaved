@@ -33,7 +33,7 @@ cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged13}"
+BUILD="${BUILD:-build/m3b_merged14}"  # re-pointed 14z-110
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 RPL="$REPO/tests/replays/judge/02_throw.rpl"

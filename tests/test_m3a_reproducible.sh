@@ -62,13 +62,13 @@ trap 'rm -rf "$WORK"' EXIT
 # EXPECT_WIDE="d038553dec5b8a7759e96f46b2fa0964c652a21b"  # git tag freeze/donovan-m8
 # EXPECT_WIDE="428fc0c9421cb5ba96db040bae0fc4935a3f5228"  # git tag freeze/donovan-m9
 # EXPECT_WIDE="c6a02cb01b0eb7c80cdd22cba8796030677ae706"  # git tag freeze/donovan-m10
-EXPECT_WIDE="1de9a027d86c5a87dccb36c8ad3fbaa03fe17126"   # 14z-105 window (oboro hook + version string)
+EXPECT_WIDE="60b55a12a9b241b15242c3fedafd524788c6b988"   # 14z-110 (#99 d2 window)
 # EXPECT_STOCK="a054de5c0cfe868cb0aa9722abebdffd9dfcdb0d"  # unchanged 14z-86..14z-96
 # 14z-99: THE STOCK TWIN MOVED for the first time since 14z-91 — #103's
 # pcrel_escape_fix rows are not profile-gated (the stock track gets the
 # stall fix too, by design). #104/#105 rows are variant-gated: no effect.
 # EXPECT_STOCK="16da59b6b29f4082b69c06d3e662843af4d00cc3"  # git tag freeze/donovan-m9
-EXPECT_STOCK="883e7d17405baf462c9763eccde4e35bf93adecb"  # 14z-102 (#107 moves stock too)
+EXPECT_STOCK="cf4557602d82c6dbb1ccb76b5377825effdd5526"  # 14z-110 (the d2 window moves stock too — not profile-gated)
 # huitzil-m3 (14z-79, maintainer-ratified). Supersedes huitzil-m2
 # (9deda0808e87601b10e2171405805d4669ba2624), which can no longer be
 # produced from the tree: huitzil.toml gained the (b') index-window thunk

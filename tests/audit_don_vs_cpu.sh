@@ -35,7 +35,7 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
-BUILD="${BUILD:-build/m3b_merged13}"
+BUILD="${BUILD:-build/m3b_merged14}"  # re-pointed 14z-110
 FRAMES="${FRAMES:-40700}"
 LEGS="${LEGS:-phobos bishamon}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"

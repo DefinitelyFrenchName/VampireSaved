@@ -14,8 +14,12 @@
 # allocated per tenant iteration ahead of the region placements, so
 # every huitzil placement moved +0x10 and every pyron one +0x30:
 # phobos 0x4595a0 -> 0x4595b0, pyron 0x4ac8dc -> 0x4ac90c; donovan
-# held; legacy rows byte-identical again). Rows below are merged-m6
-# (build/m3b_merged13, 64426955).
+# held; legacy rows byte-identical again). Rows was merged-m6.
+# RE-DERIVED 14z-110 (the #99 d2-window freeze): the reaction_hook
+# thunk grew 50->82 bytes and its d2 tables took the old slot, so the
+# hole allocations shifted (phobos 0x4595b0 -> 0x4595c0, pyron
+# 0x4ac90c -> 0x4ac96c; donovan held; legacy rows byte-identical
+# again). Rows below are merged-m7 (build/m3b_merged14, 761fd35a).
 # RE-DERIVE the three tenant
 # rows at every freeze — 8 lines of python in audit_continue_switch.sh
 # do it from prg/vm3j.04d @ 0x3D97A (LE-word swapped, 32 .l entries),
@@ -36,6 +40,6 @@
 0x0E	lilith	0x000ae9d4
 0x0F	jedah	0x000b0d2e
 0x18	oboro	0x000b3450
-0x10	phobos	0x004595b0
-0x11	pyron	0x004ac90c
+0x10	phobos	0x004595c0
+0x11	pyron	0x004ac96c
 0x13	donovan	0x003fa9d0

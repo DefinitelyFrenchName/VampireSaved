@@ -49,7 +49,7 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD="${MAP_FIT_BUILD:-build/m3b_merged13}"
+BUILD="${MAP_FIT_BUILD:-build/m3b_merged14}"  # re-pointed 14z-110
 [ -f "$BUILD/rompath/vsavjw.zip" ] || {
     echo "SKIP: no WIDE romset at $BUILD/rompath/vsavjw.zip"; exit 0; }
 [ -f "$BUILD/patch/effect_map.json" ] || {

@@ -66,7 +66,7 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD="${MRA_MAP_BUILD:-build/m3b_merged13}"
+BUILD="${MRA_MAP_BUILD:-build/m3b_merged14}"  # re-pointed 14z-110
 
 [ -f "emu/jtcores/.gitmodules" ] || { echo "SKIP: emu/jtcores not initialised (tools/setup_jtcores.sh)"; exit 0; }
 [ -n "${ROMDIR:-}" ] || { echo "SKIP: ROMDIR not set"; exit 0; }
