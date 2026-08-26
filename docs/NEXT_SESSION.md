@@ -60,6 +60,45 @@
 > ## that have already left the tree.
 > ##
 
+> ## **14z-109: A VIDEO-DETERMINING SURFACE FINALLY AGREES ACROSS
+> ## IMPLEMENTATIONS — THE OBJ LIST.** 14z-108 ruled VRAM out as an oracle
+> ## (two implementations legitimately differ there, the palette by HALF,
+> ## and the legacy control reproduced it on stock `vsavj`) and named three
+> ## candidate successors. The OBJ list is one of them; it was tried and it
+> ## WORKS, because it is what the 68k BUILDS rather than something each
+> ## implementation stages its own way.
+> ## **THE RESULT, at the frozen tenant anchor (MAME 2886 / sim 3546):
+> ## the PROMOTED subset is 31 entries on BOTH legs, ORDERED AND
+> ## FIELD-FOR-FIELD IDENTICAL, and the 19-bit tile addresses slice D3
+> ## computes are the SAME SET, `0x4b0c4-0x4ecda`.** The promote, the
+> ## group-C redirect and the 3-bit bank are now confirmed against an
+> ## unrelated codebase at the sprite-list level. **STILL NOT PIXELS** —
+> ## this is the LIST, not the rendered frame.
+> ## **THE TRAP THAT NEARLY PRODUCED A FALSE FINDING, and it is worth more
+> ## than the result:** the raw lists do NOT match — 40 entries vs 129 —
+> ## and the first reading of that was "the core draws a third of the
+> ## sprites". **WRONG. A 1P replay's CPU opponent is the SOUND-STATE-FED
+> ## LOTTERY** (`atlas/ram.md:99`; `test_mister_tenant_oracle` already
+> ## excludes the P2 fields BY NAME for this reason), so the two legs fight
+> ## DIFFERENT opponents and most of the list is their sprites. **An OBJ
+> ## list cannot be filtered "by P2" the way a field table can — sprites
+> ## carry no owner.** What rescues it is that OUR content IS labelled:
+> ## y bit 12, the CPS-2 Turbo promote, is set on exactly the group-C
+> ## sprites this port adds and on nothing vanilla can emit. Compare that
+> ## subset and it is exact; the remainder is REPORTED, never asserted.
+> ## **A LEGACY CONTROL WAS RUN AND IS ALSO CONFOUNDED** — `05_timeout_idle`
+> ## is a 1P arcade replay, so it draws different opponents too (counts
+> ## agree 52/57 vs 61, codes barely overlap). **Do not read that run as
+> ## evidence either way; the lottery is in both.** A clean whole-list
+> ## comparison needs a PINNED OPPONENT, which needs P2 scripting in
+> ## `SimInputs` — still the deferred COVERAGE item.
+> ## **Instruments: `tools/oram_obj_records.py` (calibrated byte-for-byte,
+> ## 1153/1153 lines, against `tests/lua/obj_records_dump.lua` BEFORE any
+> ## core data was read), gates `tests/test_obj_records.sh` (~2 min, MAME
+> ## only) and `tests/test_mister_obj_oracle.sh` (~65 min, `--sim-dir/
+> ## --mame-log` re-analyses finished runs).**
+> ##
+
 > ## **START HERE. THE ARC IS MiSTer. A TENANT HAS FOUGHT ON THE CORE,
 > ## AND THE CORE FITS A CYCLONE V — BUT DOES NOT RELIABLY CLOSE TIMING.**
 > ## Download -> boot -> select -> the extended wheel -> a tenant picked ->
