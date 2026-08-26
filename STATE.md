@@ -1,5 +1,61 @@
 # STATE — living progress log
 
+## Session 14z-110b — **THE RESIDUAL #99 ROOT-CAUSED AND THE REMAP RULED-BY-
+## CONDITION: the STORED state 0x51 over-runs a SECOND 80-vs-84 dispatcher
+## (PRG:0x2384E) the 14z-43 audit also missed; the fix is 0x51 -> 0x44 on the
+## six deity nodes + ONE ported immediate — measured equivalent at every
+## consumer both engines have.** Maintainer GO: "if the semantics are the
+## same, let's go with (1) without doubt" — the condition was then met.
+
+**The field falsified the first fix's completeness** (M7 wheel confirmed =
+the d2 window WAS loaded): the crash persisted (Phobos as 3rd fight — venue
+variance, the trigger follows whoever walks Donovan's node), plus a NEW
+surface: Victor KO'd -> NEUTRAL POSE, no reel, no sound, resolution proceeds.
+Both are ONE mechanism: the d2 window's copy handler now STORES 0x51 into
+(0x54,a1) — in vs2 a real state; on vsavj out of range for the stored-state
+consumers. The poison predates the fix (d1 case_a2 and the 14z-43 thunk
+always stored it); pre-fix the node walk crashed first.
+
+### THE MEASUREMENTS (in ask-order, each requested by the maintainer's doubt)
+
+1. **The (0x54,aN) consumer map, both engines** (97 vs 98 sites, structurally
+   parallel): ONE index consumer — `0x2384E` (vs2 `0x2237A`): `move.b
+   (0x54,a6),d0; add; move.w (6,pc,d0),d1; jmp` — vsavj table `0x2385C` = 80
+   entries, vs2 `0x22388` = 84. vsavj [0x51] = misaligned `jmp 0x2399C` (the
+   crash/neutral-pose site); vs2 [0x51] handler = byte-identical to vsavj's
+   OWN [0x0A]==[0x44]==[0x4C] handler.
+2. **Full handler bodies** (not prefixes): identical instruction streams
+   except vs2's extra `cmpi #$51 beq` — which GROUPS 0x51 with {0x4C,0x44}
+   into the same branch. vs2's own code declares the family.
+3. **The per-state lookup inside the handler** is the property table read
+   An-indexed = DATA view (the 14z-79 access-mode rule; an opcode-view read
+   en route was discarded as the wrong view): vsavj[0x44]=0x19 ==
+   vs2[0x51]=0x19. The ES-freeze family preserved. (0x19/0x4E remaps fail
+   this or the d3 dispatcher — why 14z-35/the first ruling were wrong.)
+4. **Ported-code literal knowledge of 0x51** (the maintainer's PoC worry,
+   measured): the widened scan closed at FIVE sites — two in `x022400`
+   (one = the ported handler's dead-after-remap grouping test; one REAL
+   divergence at +0x15E8: `cmpi #$51,(0x54,a6); bne; move.b #1,(0x117,a6)` —
+   a vs2 state-0x51-ONLY action), plus our own thunks (es_type51, index
+   window, and a variant-id chain whose #$51 is PYRON'S VARIANT SLOT id —
+   character id, unrelated). First scan was CONTAMINATED (backticks in an
+   unquoted heredoc — the documented class) and re-run clean.
+5. **Store-constant inventory**: NEITHER engine ever stores #$44/#$4C to
+   (0x54,An); no Donovan node natively carries 0x44/0x4C/0x0A -> the site-2
+   companion edit (#$51 -> #$44) is collision-free, and post-remap state 0x44
+   arises exactly and only where vs2 had 0x51.
+
+### THE FIX AS LANDED (manifest e6b130e)
+
+Seven `region_fix` bytes: the six deity node bytes (`hitbox` +0x10E9..0x1189,
+`51 -> 44` — the 14z-35 offsets, correct value this time) + the ported
+immediate (`x022400` +0x15EB, `51 -> 44`). The d2 window STAYS as the guard;
+`es_type51_dispatch` and reaction_hook `case_a2` go DEAD-BUT-EQUIVALENT
+(vanilla [0x44] is the same copy handler) — deprecation candidates, noted in
+the manifest. Census gates rewritten for the EMPTY inventory (synthetic
+MISSING control). Builds/freeze round 2 in progress at the time of writing.
+
+
 ## Session 14z-110 (4) — CLOSE. **THE RULED ORDER IS COMPLETE: FIX -> AUDIT ->
 ## RE-FREEZE, all green.** donovan-m12 / merged-m7 frozen and tagged; the
 ## acceptance full suite is GREEN (65 PASS / 18 SKIP / 0 FAIL, zero

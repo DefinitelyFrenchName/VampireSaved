@@ -1,5 +1,35 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-110b — the 0x51 -> 0x44 state remap: byte detail
+
+Seven bytes, all `region_fix` (old-verified against the extracted vs2
+source), maintainer-conditioned GO 2026-08-26.
+
+```
+region hitbox   (dst 0x3FA790, src vsav2 0x0C8BB8):
+  +0x10E9  51 -> 44     ; deity node 1 next-state   (ROM 0x3FB879)
+  +0x1109  51 -> 44     ; deity node 2 (the #99 field-crash node 0x3FB899)
+  +0x1129  51 -> 44     ; deity node 3
+  +0x1149  51 -> 44     ; deity node 4
+  +0x1169  51 -> 44     ; deity node 5
+  +0x1189  51 -> 44     ; deity node 6
+region x022400  (dst 0x41AA20-era base, src vsav2 0x022400):
+  +0x15EB  51 -> 44     ; cmpi.b #$51,(0x54,a6) -> #$44 at the ported
+                        ; state machine (vs2 0x239E8+3): the ONE vs2
+                        ; state-0x51-only action (move.b #1,(0x117,a6))
+                        ; transplanted onto the renamed state
+```
+
+Why 0x44 (and not 0x19 or 0x4E, both previously tried): equivalence measured
+at every consumer — the three node dispatchers (copy handler both engines),
+the stored-state dispatcher 0x2384E (vsavj [0x44] handler byte-identical to
+vs2's [0x51]; vs2's own code groups 0x51 with {0x4C,0x44}), the property
+lookup (DATA view, 0x19 == 0x19), and the store/constant inventory (neither
+engine produces state 0x44 any other way; no collision). Verified against
+LIVE field behavior: pre-remap the stored 0x51 over-ran 0x2384E (the
+residual board crash + the Victor KO-neutral); the remap makes every store
+in-range.
+
 ## 14z-110 — the #99 fix: the reaction_hook D2 WINDOW, byte detail
 
 Maintainer-ruled 2026-08-26 (order FIX -> AUDIT -> RE-FREEZE); shape and
