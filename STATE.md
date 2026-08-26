@@ -1,5 +1,36 @@
 # STATE — living progress log
 
+## Session 14z-110 (3) — **THE AUDIT PHASE: green across the board; the two
+## static reds are the frozen generation itself, resolved by the freeze.**
+## (Guard corpus + H/P reproduction checks in flight at the time of writing.)
+
+**Audits on the fix builds (don_m12 `60b55a12` / m3b_merged14 `761fd35a` /
+m5_stock7 `cf455760`):**
+
+| audit | verdict |
+|---|---|
+| FBNeo legacy oracle (don_m12) | **PASS** — frozen phase-class offset inventories held |
+| test_dualtrack (stock7 vs don_m12) | **PASS** — onsets 890/4267 held; divergence DATA-only, same writer sets |
+| audit_merged_legacy (merged14) | **PASS** — leg a on the ratified legacy classes: **the frozen flicker/window inventories HELD with the d2 compares on the hit-stun path** (the ruling's stop-and-escalate cost gate: it did not move); leg b guard-clean, its vs-old-solo rows REPORT-classified as designed |
+| audit_don_vs_cpu (merged14) | **PASS** — Phobos (venue 0x02) + Bishamon (0x10) legs, liveness + guard-clean |
+| audit_continue_switch (merged14) | **PASS x2, frame-identical** — re-measured schedule (loss at match 4 ~f31620, re-select f31940-32500, blanket pokes f31960-32520); **assertion 5 now DETERMINISTIC via the venue steer** (post-continue first draw = Phobos); bonus: match 3 is naturally Phobos-vs-CPU-Donovan |
+| test_fsm_census / test_reaction_hook_d2 | **PASS** on all three new builds |
+| run_battery_m2 (stock7) | **DEFERRED TO THE FREEZE by design** — m2a_common targets the CURRENT FROZEN GENERATION (#96 ruling); an unregistered fingerprint stops it. Pre-registry gates green. Re-run post-registration |
+| run_all_static --strict | PASS 108 / SKIP 0 / **FAIL 2** — `test_phasec_spaces` (stock rebuild = `cf455760` = stock7, expected the frozen `883e7d17`) and `test_m3a_reproducible` (WIDE rebuild = `60b55a12` = don_m12, expected the frozen `1de9a027`). **Both are the fix itself: the tree now produces the NEXT generation.** The sanctioned resolution is step 3 of the ruled order — the freeze updates these expectations deliberately. No other gate moved |
+
+**The re-select poke lesson (measured twice):** pokes at f32040-32220 alone
+did NOT land the switch (the re-select's class read sits elsewhere in the
+window than the initial select's commit era); blanketing the whole measured
+window (f31960-32520, every 40) lands it deterministically. The audit's
+schedule comment carries this.
+
+**Freeze-naming note (pending the reproduction check):** hui47/pyron31's
+manifests are untouched by the fix; if they rebuild bit-exact, their
+registrations (huitzil-m20 / pyron-m14) STAY and the batch is
+donovan-m12 + merged-m7 + the stock update only — bit-identity needs no new
+set names, against NEXT_SESSION's pre-named huitzil-m21/pyron-m15.
+
+
 ## Session 14z-110 (2) — **THE #99 FIX IS BUILT AND MECHANISM-PROVEN
 ## (A/B, register-forced): old build vec3s at the exact field signature,
 ## new build runs vs2's copy handler.** Builds: don_m12 + m3b_merged14
