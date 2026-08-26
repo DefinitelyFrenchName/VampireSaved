@@ -1289,6 +1289,15 @@ def main():
         elif kind == "data_ptr":
             v = int.from_bytes(raw_s, "big")
             region = t["region"]
+            if region == "auto":
+                # 14z-111 (#99): the pointer's host is whichever extracted
+                # region contains it — for tables whose per-tenant blocks
+                # are separate extra roots (the AI script pool: x100000 /
+                # x100e3c / x101aca), a single region name cannot fit all
+                # three manifests. Same rule the patch generator's repoint
+                # already applies (region_of).
+                region = next((n for n, rr in regions.items()
+                               if rr["src"] <= v < rr["src"] + rr["len"]), "auto")
             r = regions.get(region)
             inside = r and r["src"] <= v < r["src"] + r["len"]
             values.append({"table": name, "kind": kind, "ptr": f"{v:#x}",

@@ -8,7 +8,8 @@
 #   MODE=defect (default until the fix ships): asserts the crash fires EXACTLY
 #         as captured — vec11 (line-F) at PRG:0x422BAC, frame 4806 (+-2) —
 #         so the capture itself cannot rot silently.
-#   MODE=clean: asserts NO exception fires for the whole recording (the
+#   MODE=clean: asserts NO exception fires through frame 6000 (the recording
+#         ends ~4900; MAX_FRAMES overrides) (the
 #         fix's acceptance; flip the default in the same commit as the fix).
 # Usage: ROMDIR=... [MODE=defect|clean] [BUILD=build/m3b_merged15] tests/test_inp_crash_m10.sh
 # Emulator tier (MAME, ~1 min). NOT ci_static.
@@ -23,7 +24,7 @@ export HOME_INP="$W/inp"; mkdir -p "$W/inp"; cp -R tests/inp/crash_m10 "$W/inp/"
 HOME="$W" INP_HOME="$W" sh -c '
   mkdir -p "$HOME/.cache/vampire-saved" && ln -s "$HOME/inp" "$HOME/.cache/vampire-saved/inp"
   MAME_BIN="${MAME_BIN:-'"$HOME"'/.cache/vampire-saved/mame/cps2}" \
-  STOP_AFTER=5 tools/run_inp_guarded.sh "'"$BUILD"'" crash_m10 "'"$W"'/out"' > "$W/run.txt" 2>&1 || true
+  STOP_AFTER=5 MAX_FRAMES="${MAX_FRAMES:-6000}" tools/run_inp_guarded.sh "'"$BUILD"'" crash_m10 "'"$W"'/out"' > "$W/run.txt" 2>&1 || true
 grep -E "^(CRASH|END)" "$W/run.txt" || { echo "FAIL: no guard output"; tail -5 "$W/run.txt"; exit 1; }
 CR="$(grep -m1 "^CRASH" "$W/run.txt" || true)"
 case "$MODE" in

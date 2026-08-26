@@ -482,8 +482,52 @@ vsavj = 0x0BF61A
 kind = "code_ptr"
 stride = 0x80
 
-# Still parked: 0x0BF01A-0x0BF19A (per-char DATA rows into engine-anim
-# space — Donovan's vs2 rows point OUTSIDE his regions; unfired),
+# UNPARKED 14z-111 (#99 ROOT CAUSE): 0x0BF01A/09A/11A/19A are the CPU AI
+# ACTION-SCRIPT tables (consumers 0x02CCB6/0x02CCF2/0x02CD40/0x02CD9C:
+# row = +0x382 << 2 -> script channel starts +0x210(+0x224)/+0x214/+0x218/
+# +0x21C; 09A/11A/19A pick among 32 entries with the RNG 0x14E8A). They are
+# 16 classes + THE SAME 16 REPEATED, so a tenant class read Demitri's
+# (0x10) / class 1's (0x11) / class 3's (0x13) AI scripts; Demitri's jump
+# command writes sub-state 0x0E, which Phobos's private vs2 jump handler
+# (5 sub-states) indexes off its table into data -> line-F (the field
+# crash, captured on the maintainer's .inp, tests/test_inp_crash_m10.sh).
+# The rows point into the vs2 AI script pool 0x100000-0x102B98 (one
+# contiguous block per tenant, vhunt2 twin at shift 0), extracted as DATA
+# extra roots per tenant (tools/build_donovan.sh) — region = "auto" picks
+# the tenant's own block. Zero code: the two engines' script interpreters
+# are structurally identical (15 command tables, same entry counts; 117
+# differing bytes = absolute operands + ONE engine-level guard drift on
+# command 17, measured 14z-111).
+[[table]]
+name = "ai_script_0"
+vsavj = 0x0BF01A
+kind = "data_ptr"
+stride = 0x80
+region = "auto"
+
+[[table]]
+name = "ai_script_1"
+vsavj = 0x0BF09A
+kind = "data_ptr"
+stride = 0x80
+region = "auto"
+
+[[table]]
+name = "ai_script_2"
+vsavj = 0x0BF11A
+kind = "data_ptr"
+stride = 0x80
+region = "auto"
+
+[[table]]
+name = "ai_script_3"
+vsavj = 0x0BF19A
+kind = "data_ptr"
+stride = 0x80
+region = "auto"
+
+# Still parked (the rest of the original note): 0x0BF01A-0x0BF19A WERE
+# listed here as per-char DATA rows into engine-anim space — unparked above;
 # 0x0BF59A (per-char ENGINE routine rows — vs2 0x25402 needs an R1
 # equivalent; unfired), 0x0BF51A (all-zero), 0x0BF69A (sentinel-like).
 # Triage WITH A CONSUMER TRACE if a soak fires there.

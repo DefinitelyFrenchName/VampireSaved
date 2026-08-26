@@ -171,7 +171,7 @@ echo "== 1: one tenant per run — the frozen op counts =="
 # 15 capture_kf slot_rows blobs + 17 table pokes, declared by every
 # manifest) + 2 (#105's colors 8->10 grows each win_pal sparse block by
 # the two AUTO sets). Donovan's #103 pcrel relocations move ops, net 0.
-FROZEN_1="donovan:327 huitzil:365 pyron:298"  # RE-FROZEN 14z-105 (was 323/363/296): +2 EVERY tenant = the profile-gated oboro_select_hook site_thunk (body + site); version_text adds 0 ops (it grows the wheel record/coord DATA ops). 14z-102: hui 361->363 = the #109 row-31 fix
+FROZEN_1="donovan:332 huitzil:366 pyron:303"  # RE-FROZEN 14z-111 (was 327/365/298): +5 every tenant = the #99 AI-script unpark, see the note below.  # RE-FROZEN 14z-105 (was 323/363/296): +2 EVERY tenant = the profile-gated oboro_select_hook site_thunk (body + site); version_text adds 0 ops (it grows the wheel record/coord DATA ops). 14z-102: hui 361->363 = the #109 row-31 fix
 for row in $FROZEN_1; do
     who="${row%%:*}"; want="${row##*:}"
     case "$who" in donovan) ex="$D_EX" ;; huitzil) ex="$H_EX" ;; *) ex="$P_EX" ;; esac
@@ -264,8 +264,18 @@ check_n() {  # check_n <label> <dir> <want ops> <sum of 1-tenant counts>
 # AND +2 declared); huitzil/pyron solos and their pair untouched. The thunk
 # op itself grows 50->82 bytes (hex growth, not an op), the site op is
 # unchanged. Ruling + shape: STATE 14z-110, patch_index "14z-110 additions".
-check_n "2 tenants" "$WORK/two"   602 654
-check_n "3 tenants" "$WORK/three" 808 909
+# RE-FROZEN 14z-111 (was don 327 / hui 365 / pyr 298, 602/654 and 808/909):
+# the #99 ROOT-CAUSE fix — the four CPU AI action-script tables unparked
+# (bank_map ai_script_0..3, data_ptr, region "auto") + one DATA extra root
+# per tenant (his vs2 AI script block): +5 per tenant everywhere (1 region
+# op + 4 alias-half row pokes at 0xBF01A/09A/11A/19A + slot*4), per-tenant
+# addresses so NOTHING dedupes (+10/+10 at N=2, +15/+15 at N=3); MINUS 4
+# for huitzil (366 / 608 / 819): four tripwires in his jump handler x02592a
+# resolved by reconciliation_huitzil rows (0x2cbde/0x2ce0a/0x2ce3e/0x364a —
+# reachable only by his own AI). Mechanism + capture: STATE 14z-111,
+# tests/test_inp_crash_m10.sh.
+check_n "2 tenants" "$WORK/two"   608 660
+check_n "3 tenants" "$WORK/three" 819 920
 
 # ── 3: every tenant's own content is present ────────────────────────────
 # An op count alone cannot tell "both tenants ran" from "tenant 0 ran twice".

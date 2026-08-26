@@ -119,6 +119,11 @@ DEFAULT_ROOTS="$DEFAULT_ROOTS,0x65952:0x2d0:t0x65986,0x65c22:0x238:t0x65c56,0x65
 # The "59-62 only" assumption is measured-wrong for 63; handler ported
 # with the standard +0x34 twin. 64-75 remain tripwired (still unseen).
 DEFAULT_ROOTS="$DEFAULT_ROOTS,0x6717c:0x154:t0x671b0"
+# 14z-111 (#99 ROOT CAUSE): Donovan's CPU AI action scripts — the vs2 pool
+# block his four ai_script_* rows (bank_map) point into, vhunt2 twin at
+# shift 0. DATA (word-offset streams, 0 pointer fields). Bounds = his four
+# seeds to the next class's first pointer, no foreign pointer inside.
+DEFAULT_ROOTS="$DEFAULT_ROOTS,0x101aca:0x10ce:t0x101aca:d"
 # DEFAULT_ROOTS is DONOVAN'S measured root census — it applies only to his
 # char. Another tenant's census accumulates here as its R1 loop finds
 # roots (EXTRA_ROOTS overrides for census experiments).
@@ -261,6 +266,8 @@ case "$TENANT_CHAR" in
         # `lea.l #table,An; rts` helper — the existing jsr+nop rewrite needs
         # 8 contiguous bytes and the reader is 0x3E away).
         DEFAULT_ROOTS="$DEFAULT_ROOTS,0x22400:0x1600:t0x2242e,0x6cac0:0xebc:t0x6cc34:f0xca8"
+        # 14z-111 (#99 ROOT CAUSE): Phobos's CPU AI action scripts (bank_map ai_script_*), vhunt2 twin shift 0, DATA
+        DEFAULT_ROOTS="$DEFAULT_ROOTS,0x100000:0xe3c:t0x100000:d"
         ;;
     0x11)
         # Pyron census (14z-67, moveset arc open). Measured from his
@@ -287,7 +294,9 @@ case "$TENANT_CHAR" in
         # 12 regions H's census ports — SHARED engine-side handlers,
         # proven by P's first satellite spawn tripping obj_hook type 64
         # -> unresolved 0x672d0). Bounds/twins = the measured H rows.
-        DEFAULT_ROOTS="$DEFAULT_ROOTS,0x672d0:0x280:t0x67304,0x67550:0x2f6:t0x67584,0x67846:0x1ba:t0x6787a,0x67a00:0x60c:t0x67a34,0x6800c:0x44c:t0x68040,0x68458:0x310:t0x6848c,0x68768:0x264:t0x6879c,0x689cc:0x2ac:t0x68a00,0x68c78:0x3ce:t0x68cac,0x69046:0x2b0:t0x6907a,0x692f6:0x368:t0x6932a,0x6965e:0x400:t0x69692" ;;
+        DEFAULT_ROOTS="$DEFAULT_ROOTS,0x672d0:0x280:t0x67304,0x67550:0x2f6:t0x67584,0x67846:0x1ba:t0x6787a,0x67a00:0x60c:t0x67a34,0x6800c:0x44c:t0x68040,0x68458:0x310:t0x6848c,0x68768:0x264:t0x6879c,0x689cc:0x2ac:t0x68a00,0x68c78:0x3ce:t0x68cac,0x69046:0x2b0:t0x6907a,0x692f6:0x368:t0x6932a,0x6965e:0x400:t0x69692"
+        # 14z-111 (#99 ROOT CAUSE): Pyron's CPU AI action scripts (bank_map ai_script_*), vhunt2 twin shift 0, DATA
+        DEFAULT_ROOTS="$DEFAULT_ROOTS,0x100e3c:0xc8e:t0x100e3c:d" ;;
     *)  DEFAULT_ROOTS="" ;;
 esac
 python3 tools/extract_char.py "$ROMDIR/vsav2.zip" "$OUTBASE/extract" \
