@@ -206,7 +206,8 @@ done
 # MANI_WIDE="3a67825670ebd764cdf104f8f23293ffbe2b9732 42"  # 14z-102 window
 # MANI_WIDE="6b746e17cc8421bd308c5fad6862760209b58093 42"  # 14z-105 window
 # MANI_WIDE="fc816b5aa1e88ca184f7ac38ff7fd8cc210ecc0a 42"   # 14z-110 (delta: vm3j.03d/04d/10b + vsw.41 PROGRAM — the #99 ...  # 14z-110
-MANI_WIDE="f6abea514715b965ddfed2aab87e5df9c31bef03 42 42"   # 14z-110b (delta: vm3j.10b — the six remap bytes; nothing else moved)
+# MANI_WIDE="f6abea514715b965ddfed2aab87e5df9c31bef03 42 42"   # 14z-110b (delta: vm3j.10b — the six remap bytes; nothing else moved)
+MANI_WIDE="c26b7e6a6d0efed10c19e31585236ee8280d9b95 42 42"   # 14z-111 (delta: vm3j.03d/04d/10b + vsw.41 PROGRAM — the 4 AI-script alias-half rows, x101aca at the ext head and the +0x10D0 shift of the ext regions behind it; vm3j.07b = 16 bytes of EXISTING poke32 repoints whose targets shifted; vsw.33m/37m GROUP C = the M8 glyphs)
 # MANI_STOCK="08aac0881648185a9487230a3ac5fe19b78408d3 30"  # 14z-99 window (#103)
 # MANI_STOCK="23314532b00a77adaed4bda4b9e52155ad209252 30"  # 14z-102
 # MANI_STOCK="9985bf46a62732b32cbe143850b65a05038093f1 30"   # 14z-110 (delta: vm3j.03d/04d/10b PROGRAM only — the d2 wind...  # 14z-110
@@ -218,7 +219,8 @@ MANI_STOCK="af4f5e986c2fb1ad6ae90f71869cfbf4e103c80c 30 30"   # 14z-110b (delta:
 # MANI_HUI="b496dec55439b11f3fe78eadc40a98e039a8bb80 42"  # 14z-99 window
 # MANI_HUI="7552d03cefe69ae48d7a0c1da540643d0f44e02a 42"  # 14z-102 window
 # MANI_HUI="548af9ffb25ef6732bc468b1d168b1f7d975f328 42"  # 14z-105 window
-MANI_HUI="4a4c1ef74e2200113fe7e6ecab82cba46964402f 42"   # 14z-110 (delta: vsw.33m/37m GROUP C ONLY — the M7 glyphs; program bit-exact 24a27940, the d2 fix is Donovan-owned)
+# MANI_HUI="4a4c1ef74e2200113fe7e6ecab82cba46964402f 42"   # 14z-110 (delta: vsw.33m/37m GROUP C ONLY — the M7 glyphs; program bit-exact 24a27940, the d2 fix is Donovan-owned)
+MANI_HUI="781a1a0731bf6c8f0c3cea719d2ff0b451024233 42"   # 14z-111 (delta: vm3j.03d/04d/10b + vsw.41 PROGRAM — AI rows, x100000, the 4 recon rows; vsw.33m/37m GROUP C = the M8 glyphs)
 # 14z-94 (#92 only — he takes no reconciliation row). Exactly ONE member
 # moved: vm3j.03d, which carries table B at PRG:0x00BB68. Huitzil moved four
 # because #91's row also relocated code; Pyron's four bytes are a pure data
@@ -226,7 +228,8 @@ MANI_HUI="4a4c1ef74e2200113fe7e6ecab82cba46964402f 42"   # 14z-110 (delta: vsw.3
 # MANI_PYR="0bcffc87f6d3b43fdabb76a39810bb94a54e57a8 42"  # 14z-99 window
 # MANI_PYR="673038986c05d4dca0b0e9451bc1608df6d59a18 42"  # 14z-102 window
 # MANI_PYR="8e8329cf7756834f2359d067ce1e7a18f87002b6 42"  # 14z-105 window
-MANI_PYR="9862d502c5609f0d6125084d1d30e45a46484d4b 42"   # 14z-110 (delta: vsw.33m/37m GROUP C ONLY — the M7 glyphs; program bit-exact 6bf265ab)
+# MANI_PYR="9862d502c5609f0d6125084d1d30e45a46484d4b 42"   # 14z-110 (delta: vsw.33m/37m GROUP C ONLY — the M7 glyphs; program bit-exact 6bf265ab)
+MANI_PYR="afc4e657a58f6207f8cdabb0487b0ed3978fd85d 42"   # 14z-111 (delta: vm3j.03d/04d/10b PROGRAM — AI rows + x100e3c; vsw.33m/37m GROUP C = the M8 glyphs)
 
 m3a_manifest() {   # m3a_manifest <label> <rompath> <"digest count">
     _got="$(python3 tools/artifact_manifest.py "$2")" || {
@@ -288,7 +291,8 @@ EXPECT_MERGED="32007911f19a82619da6108132bff70329ac2c33"   # 14z-111 merged-m9 (
 # MANI_MERGED="22092b65fd9db2f5b79f211afb51625a542cd45c 42"  # 14z-102 window
 # MANI_MERGED="efea5e9d0bd9590383eb614016eed1c388bf9c2b 42"  # 14z-105 window
 # MANI_MERGED="75a253eab6b47f5fb8772a719f4f6d59c173e96a 42"   # 14z-110 (delta: vm3j.03d/04d/07b/10b + vsw.41/42 PROGRAM —...  # 14z-110
-MANI_MERGED="cd39a81c5e2692eb9726269f4b81c74ff2b1a402 42 42"   # 14z-110b (delta: vm3j.10b — the six remap bytes; nothing else moved)
+# MANI_MERGED="cd39a81c5e2692eb9726269f4b81c74ff2b1a402 42 42"   # 14z-110b (delta: vm3j.10b — the six remap bytes; nothing else moved)
+MANI_MERGED="46ba85ace543bd1eab5ae3e2741a721a6602849f 42 42"   # 14z-111 (delta: vm3j.03d/04d/07b/10b + vsw.41/42 PROGRAM — the three tenants' AI rows + blocks at the ext head, every ext region behind them +0x10D0/+0x1ED0/+0x2B60, 07b = 16 bytes of existing repoints; vsw.33m/37m GROUP C = the M8 glyphs). STOCK UNCHANGED af4f5e98 (the port is WIDE-only; the M8 mark is profile-gated)
 
 MERGED_NEEDS="build/m5_wide/extract build/hui32/extract build/pyron21/extract
 build/wide0/rompath/vsavjw.zip"
