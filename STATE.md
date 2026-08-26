@@ -44,10 +44,19 @@ masked diff classified clean/inwin/dirty. Re-run it (script is 20 lines,
 regenerate from the 110b addendum's description), pick 5 clean frames per
 replay, add a FRAME_OVERRIDE case block + extend FROZEN with the audited
 in-window offsets, verify x2 for determinism, THEN run static strict.
-Known dirty frames to avoid (measured): 01 f6734 (+0xf226 outside); 05
-f1818/f11150; 20 f6666/f9090(+0x8531)/f11150; 07 f1680/f2376; 22
-f4872/f10440. The gate's own printed offset lists are the freeze source
-(the 14z-93 lesson: never freeze from prose).
+**THE SCAN COMPLETED AT CLOSE — the refit is now mechanical.** Measured
+clean (`exact`, masked-zero-diff) frames on don_m13, both legs:
+- 01_attract_long (15/17 usable): 600, 1000, 1400, 2600, 3400 all exact
+- 06_test_mode (7/7): unchanged — keep the derivation
+- 21_don_mash (13/21): 600, 2523, 3164, 4446, 5087 exact
+- 05_timeout_idle (15/21, the 26 substitute): 600, 2250, 2800, 3900, 8300 exact
+Every in-window offset at USABLE frames is already in FROZEN (55B/C/D,
+6D1, 6D4, 6D5) — choosing exact-only overrides needs NO inventory change.
+Implementation: a FRAME_OVERRIDE case block in the gate (replay -> 5
+frames), REPLAYS default swaps 26 -> 05 with the documented exclusion
+note, verify x2 for determinism, then static strict. Dirty frames measured
+and avoided: 01 f6734(+0xf226); 05 f1150/1700/4450/5550/6100; 20/07/22
+lists in the 110b addendum; 21 f1241/1882/5728/6369/8292.
 
 ### THE FIELD QUESTION AT CLOSE (the maintainer's, on the board)
 
