@@ -80,6 +80,7 @@ OURS_BY_BUILD = {
     # window's fixes — same deliberate-silence id.
     "m3b_merged11": [None, "02a2", None, None, None],
     "m3b_merged13": [None, "02a2", None, None, None],   # 14z-105 (kernel rows untouched by the window)
+    "m3b_merged15": [None, "02a2", None, None, None],   # 14z-111 (d2 window + remap are Donovan-owned; kernel rows untouched)
 }
 if ours_a2:
     ours = [None, ours_a2, None, None, None]

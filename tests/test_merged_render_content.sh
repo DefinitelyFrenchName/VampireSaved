@@ -48,7 +48,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 
-MERGED="${1:-$REPO/build/m3b_merged13/rompath}"
+MERGED="${1:-$REPO/build/m3b_merged15/rompath}"  # re-pointed 14z-111
 MAME_WIDE_BIN="${MAME_WIDE_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 # THE SOLO REFERENCES MUST BE BUILDS THAT STILL BOOT ON THE CURRENT
 # EMULATOR BINARY, and that is not automatic (14z-92). WIDE v1.1 (14z-86)
@@ -63,7 +63,7 @@ MAME_WIDE_BIN="${MAME_WIDE_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 # WHEN A TENANT IS RE-FROZEN, RE-POINT ITS ROW HERE. D and P still name
 # older builds (donovan-m3a / pyron-m3); those boot and pass today, but
 # they are one profile bump away from the same failure.
-D_RP="$REPO/build/don_m11/rompath"   # re-pointed 14z-105 (window freeze)
+D_RP="$REPO/build/don_m13/rompath"   # re-pointed 14z-111 (remap freeze)
 H_RP="$REPO/build/hui47/rompath"    # re-pointed 14z-105 (window freeze)
 P_RP="$REPO/build/pyron31/rompath"  # re-pointed 14z-105 (window freeze)
 
@@ -152,7 +152,7 @@ chk() {  # chk <label> <got> <want>
         echo "  FAIL: $1 — merged $2 != solo $3"; fail=1
     fi
 }
-chk "D band  0x4AD8F == don_m11"  "$m_d" "$s_d"
+chk "D band  0x4AD8F == don_m13"  "$m_d" "$s_d"
 chk "H band  0x40AF6 == hui47"    "$m_h" "$s_h"
 chk "P band  0x45000 == pyron31"  "$m_p" "$s_p"
 chk "strip   0x486A0 == hui47 (the S3 relocation, live)" "$m_s" "$s_s"

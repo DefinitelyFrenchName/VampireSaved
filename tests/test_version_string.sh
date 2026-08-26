@@ -32,7 +32,7 @@
 #      a corrupted glyph tile must be refused by section 1.
 #
 # Usage: ROMDIR=... tests/test_version_string.sh [outbase]
-#   default build/m3b_merged13. Reads the knobs from the manifest the build
+#   default build/m3b_merged15. Reads the knobs from the manifest the build
 #   names (donovan.toml — identical in all three tenant manifests, asserted).
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"

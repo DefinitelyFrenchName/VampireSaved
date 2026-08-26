@@ -36,7 +36,7 @@ cd "$REPO"
 # it reported PASS about three builds nobody ships. Section 5 adds the CURRENT
 # trio. Both are true at once; neither replaces the other.
 HIST_BUILDS="build/m5_wide build/hui30 build/pyron21"
-CUR_BUILDS="build/don_m11 build/hui47 build/pyron31"
+CUR_BUILDS="build/don_m13 build/hui47 build/pyron31"  # re-pointed 14z-111
 BUILDS="${*:-$HIST_BUILDS}"
 
 # Presence is two-tier. An UNBUILT tree (no build dir has placements.json at
@@ -162,7 +162,7 @@ echo "  (sections 1-4 are the FROZEN 14z-77 measurement on $BUILDS)"
 # one tenant" 13 -> 14 — the new huitzil-only #109 row-31 root region.
 # Only run when the caller did not name its own trio.
 if [ $# -eq 0 ]; then
-    echo "== 5: the CURRENT trio — don_m11 / hui47 / pyron31 =="
+    echo "== 5: the CURRENT trio — don_m13 / hui47 / pyron31 =="
     for b in $CUR_BUILDS; do
         [ -f "$b/patch/placements.json" ] || {
             echo "FAIL: current build $b has no patch/placements.json"; exit 1; }

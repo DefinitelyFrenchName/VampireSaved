@@ -33,7 +33,7 @@
 # produced the CHARACTER, not just a byte.
 #
 # Usage: ROMDIR=... tests/test_oboro_select.sh [wide_rompath] [stock_rompath]
-#   defaults: build/m3b_merged13/rompath, build/m5_stock6/rompath
+#   defaults: build/m3b_merged15/rompath, build/m5_stock8/rompath
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

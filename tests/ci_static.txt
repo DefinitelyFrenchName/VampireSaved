@@ -117,7 +117,7 @@ test_release_roundtrip
 # 14z-107 (4): the MiSTer SDRAM placement map fits the 64 MB tier by
 # 0.125 MB as placed (0.708 MB retracted 14z-107 (9) by the census),
 # and the three content extents + the PRG pin it depends on are frozen. Reads
-# the built WIDE romset + manifests (build/m3b_merged13 by default,
+# the built WIDE romset + manifests (build/m3b_merged15 by default,
 # MAP_FIT_BUILD to override), no emulator. docs/project/mister_map.md
 audit_mister_map_fit
 

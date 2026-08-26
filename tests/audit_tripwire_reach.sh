@@ -57,7 +57,7 @@ RPL="${TRIPWIRE_REPLAY:-26_don_arcade_mash}"
 # artifacts, so the 113 tripwires in the shipping merged build had ZERO
 # reachability measurement — the exact staleness class this audit was
 # built to catch (#91). RE-POINT AT EVERY FREEZE.
-BUILDS="${TRIPWIRE_BUILDS:-build/hui47:10 build/pyron31:11 build/don_m11:13 build/m3b_merged13:10 build/m3b_merged13:11 build/m3b_merged13:13}"  # re-pointed 14z-105
+BUILDS="${TRIPWIRE_BUILDS:-build/hui47:10 build/pyron31:11 build/don_m13:13 build/m3b_merged15:10 build/m3b_merged15:11 build/m3b_merged15:13}"  # re-pointed 14z-111
 
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary at $MAME_BIN"; exit 0; }
 [ -f "tests/replays/$RPL.rpl" ] || { echo "FAIL: no replay $RPL"; exit 1; }

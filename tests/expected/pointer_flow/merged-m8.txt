@@ -1,0 +1,16 @@
+# pointer-flow baseline for merged-m8 (build/m3b_merged15), frozen 14z-111 — the 14z-110 freeze's
+# skipped re-freeze (the pairs still pointed at merged13 through two freezes; delta MEASURED IDENTICAL on
+# merged14 and merged15, so it is the 14z-110 d2 window, not the 110b remap).
+# The two merged STRONG lines are the 14z-100-reviewed win_pal sparse-block biased bases, re-placed
+# by the window's +0x60 allocation shift (the reaction_hook thunk grew 50->82 bytes; site AND target
+# both +0x60 from merged-m6, pool content byte-identical).
+# WEAK-COUNT code:move_imm 3 is NEW BY CLASSIFICATION, not by bytes: `move.l #$4C223B,d0` at
+# x05c800+0x5e6 (all three tenant copies) is byte-identical since merged13; the value cannot be a vs2
+# pointer (vs2 program space ends 0x3FFFFF) — a constant whose target happened to sit inside the
+# palette pool at 0x4c21f0-0x4c2290 in merged13, which moved +0x60 and left 0x4c223b as fill.
+# STRONG lines are REVIEWED findings (see hardening_register.md);
+# WEAK-COUNT lines freeze the noise volume — growth = investigate.
+STRONG	code:movea_imm	0x4d0df0+0x16	0x4c4370	WIDE-HOLE
+STRONG	code:movea_imm	0x4d0df0+0x24	0x4ca310	WIDE-HOLE
+WEAK-COUNT	data:long	1131
+WEAK-COUNT	code:move_imm	3

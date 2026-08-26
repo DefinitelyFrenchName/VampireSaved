@@ -58,7 +58,7 @@
 #
 # Cost: five `jtframe mra` runs, ~30 s. Needs the emu/jtcores submodule, `go`
 # and $ROMDIR; the `.rom` checks additionally need a built WIDE romset
-# (build/m3b_merged13 by default, MRA_MAP_BUILD to override). Everything is
+# (build/m3b_merged15 by default, MRA_MAP_BUILD to override). Everything is
 # written to a temp dir OUTSIDE the repo — `.rom` files are ROM content
 # (CLAUDE.md rule 7).
 #
