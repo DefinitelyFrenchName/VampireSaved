@@ -39,7 +39,11 @@
 # commit). Tenant space test: base >= 0x300000 (wide_ext-relocated blocks;
 # every legacy base is < 0x100000).
 #
-# FROZEN-ONSET CAVEAT: the switch-poke window (f16100-16280) is frozen to
+# the switch-poke window (f32040-32220; RE-MEASURED 14z-110 on merged14 by
+#   the phase-1 recipe: forced Phobos WINS 3 — match 3 is naturally
+#   Phobos-vs-CPU-DONOVAN — loses match 4 to Bishamon ~f31860; the
+#   re-select opens ~f31940-32500, next match f32580. The old merged11
+#   schedule was f16100-16280, loss at match 2) is frozen to THIS build's measured loss
 # THIS build's measured loss trajectory (Phobos loses match 2 ~f15540, the
 # re-select opens f16100). A future freeze can move the mash lottery; if
 # assertion 3 then fails, RE-MEASURE the loss/re-select frames with the
@@ -64,7 +68,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
-BUILD="${BUILD:-build/m3b_merged13}"
+BUILD="${BUILD:-build/m3b_merged14}"  # re-pointed 14z-110: the schedule below is keyed to THIS build's measured trajectory
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no build at $BUILD"; exit 0; }
 [ -f "$BUILD/prg/vm3j.04d" ] || { echo "SKIP: no prg/vm3j.04d in $BUILD (need the decoded member for the base table)"; exit 0; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
@@ -90,7 +94,11 @@ PY
 # Pokes: force PHOBOS (0x10) at the initial select; force DONOVAN (0x13)
 # at the measured post-loss re-select window. No HP pokes.
 PK="1704:ff8782:10;1760:ff8782:10;1900:ff8782:10;2100:ff8782:10;2400:ff8782:10"
-PK="$PK;16100:ff8782:13;16160:ff8782:13;16220:ff8782:13;16280:ff8782:13"
+PK="$PK;32040:ff8782:13;32100:ff8782:13;32160:ff8782:13;32220:ff8782:13"
+# 14z-110: the post-continue first draw is VENUE-STEERED to Phobos (venue
+# 0x02 on Donovan's row; EVEN values only — game/gotchas.md), so assertion 5
+# no longer depends on the lottery the 14z-100 freeze got lucky with.
+PK="$PK;$(python3 -c "print(';'.join(f'{fr}:ff8121:02' for fr in range(32300,32560,40)))")"
 DF="$(python3 -c "print(';'.join(f'{f}:ff8000-ff8180;{f}:ff8400-ff8470;{f}:ff8800-ff8870' for f in range(2500,40600,80)))")"
 
 echo "== guarded marathon (Phobos -> loss -> continue -> switch to Donovan)"
