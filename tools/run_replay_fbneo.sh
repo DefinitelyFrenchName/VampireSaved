@@ -51,6 +51,12 @@ rm -f "$OUT" "$OUT".tap "$OUT".dump_*.bin "$OUT".gfx_*.bin
 WORK="${SANDBOX:-$(mktemp -d)}"
 mkdir -p "$WORK"
 if [ -n "${FBNEO_ROMPATH:-}" ]; then
+    # 14z-110: ABSOLUTE-IZE the overlay dir first. The symlinks below are
+    # created from the caller's cwd but resolved from INSIDE the sandbox
+    # (the emulator cds there), so a relative FBNEO_ROMPATH produced broken
+    # links and a bare "DrvInit failed" with every member present — measured:
+    # a relative invocation of test_dualtrack failed its first leg this way.
+    FBNEO_ROMPATH="$(cd "$FBNEO_ROMPATH" && pwd)"
     # per-zip overlay: reference zips first, overlay zips win
     # 14z-90 (#38): NO trailing slash on the rm — `rm -rf "$WORK/roms/"`
     # follows a symlink and would empty $ROMDIR. On the non-overlay branch
