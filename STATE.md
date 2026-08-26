@@ -92,8 +92,10 @@ state got set OUT OF RANGE**, and vanilla's dispatcher faulted on it.
 - Its full behaviour incl. VOICE runs in the 1P/arcade path and is absent in
   2P (maintainer heard exactly this) -> crash is 1P-only, and "2P clean" is
   NOT a coincidence: the triggering event doesn't fire in 2P at all.
-- "Phobos's attacks crash, Donovan's never" -> it is Phobos's object, not the
-  matchup symmetric.
+- The hits observed near crashes were Phobos's, never Donovan's — **a strong
+  hint, NOT a certainty (maintainer-corrected 2026-08-26): the trigger may not
+  be an attack at all.** Consistent either way with it being Phobos's OBJECT —
+  a periodic sidekick event needs no attack to fire.
 - Immediate reboot, no corruption -> a control-flow fault, which this is.
 
 **LEAD (for measurement, not arbitrage): what writes `+0x54` out of range on
@@ -157,8 +159,10 @@ but with inputs (`0x20`/`0x30`/`0x40`) the borrow can never actually produce.
 Probe J is therefore the right MECHANISM with the wrong INPUT SOURCE.
 
 **THE SHARPENED LEAD, and it fits the field data better: a specific PHOBOS
-MOVE.** The maintainer's own refinement — "Phobos's attacks crash, Donovan's
-never do", "5+MP or 6+MP", "at some point" — plus the crash signature (immediate
+MOVE.** The maintainer's own refinement — hits near crashes were Phobos's
+(possibly 5+MP/6+MP), never Donovan's, "at some point" — **[LATER
+maintainer-corrected: a strong hint, NOT a certainty; the trigger may not be an
+attack]** — plus the crash signature (immediate
 black screen -> the GAME reboots to its RAM test, NO prior graphical/sound
 corruption = a clean jump through a bad pointer, not data rot) points at a
 Phobos move whose execution dereferences a bad pointer. The CPU AI uses
