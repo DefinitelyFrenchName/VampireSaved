@@ -47,9 +47,15 @@ always stored it); pre-fix the node walk crashed first.
 
 ### THE FIX AS LANDED (manifest e6b130e)
 
-Seven `region_fix` bytes: the six deity node bytes (`hitbox` +0x10E9..0x1189,
-`51 -> 44` — the 14z-35 offsets, correct value this time) + the ported
-immediate (`x022400` +0x15EB, `51 -> 44`). The d2 window STAYS as the guard;
+SIX `region_fix` bytes: the deity node bytes (`hitbox` +0x10E9..0x1189,
+`51 -> 44` — the 14z-35 offsets, correct value this time). **The seventh (a
+companion edit at ported `x022400`+0x15EB) was landed and RETRACTED within
+the session:** the region is HUITZIL's (a donovan-row silently never fires —
+measured on the built image) and its invoking thunks are PARKED, so the
+ported copy is dead code; vanilla has NO twin of vs2's conditional
+`0x117` store there. The 0x117 flag is LIVE engine-wide (22 tst / 11 clr /
+27 stores) — the residual timing delta for deity states is recorded in the
+manifest comment; arbiters are the deity-family gates and the field. The d2 window STAYS as the guard;
 `es_type51_dispatch` and reaction_hook `case_a2` go DEAD-BUT-EQUIVALENT
 (vanilla [0x44] is the same copy handler) — deprecation candidates, noted in
 the manifest. Census gates rewritten for the EMPTY inventory (synthetic

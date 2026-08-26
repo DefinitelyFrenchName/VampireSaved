@@ -1370,9 +1370,17 @@ thunk_hex = "b8fc84006706b8fc880066100c2c00TT03826608197c0004005c4e75197c000b005
 # the per-state property lookup (data view) 0x19 == 0x19; NEITHER engine ever
 # stores #$44/#$4C to (0x54,An) (full constant inventory) and no Donovan node
 # carries 0x44/0x4C/0x0A natively -> zero collision. The ONE true vs2
-# divergence: at ported x022400+0x15E8 (vs2 0x239E8), state 0x51 ALONE gets
-# `move.b #1,(0x117,a6)` — the companion row below renames that test to 0x44,
-# transplanting the exact semantics. Post-remap the es_type51_dispatch thunk
+# divergence: vs2's shared tail (vs2 0x239E8, in the x022400 neighborhood)
+# gives state 0x51 ALONE a `move.b #1,(0x117,a6)`. MEASURED FURTHER 14z-110b:
+# a companion edit is NOT taken — (i) vanilla vsavj has NO twin of that
+# conditional store (its native 0x44 flow manages the live 0x117 flag its own
+# way — 22 tst/11 clr/27 store sites engine-wide); (ii) the ported x022400
+# copy carrying vs2's test is HUITZIL's region and its invoking thunks are
+# PARKED (dead code in shipped builds); a row here targeting his region
+# would never fire (region_fix rows are per-tenant — measured: it didn't).
+# THE RESIDUAL DELTA, recorded not hidden: vs2 flags 0x117 for deity states
+# at that tail; vsavj's native-0x44 flow may time it differently. Arbiters:
+# the deity-family gates (48/50/53/54/56, test_don_* battery) and the field. Post-remap the es_type51_dispatch thunk
 # and reaction_hook case_a2 go DEAD-BUT-EQUIVALENT (vanilla [0x44] is the same
 # handler) — kept as guards, deprecation candidates. Full trail: STATE 14z-110b.
 [[region_fix]]
@@ -1422,14 +1430,6 @@ off = 0x1189
 old_hex = "51"
 new_hex = "44"
 note = "deity node next-state vs2 0x51 -> 0x44 (the 14z-110b five-consumer equivalence; 14z-35 tried 0x4E and 14z-43 retired it — 0x44 preserves property 0x19 AND the 0x2384E handler family)"
-
-[[region_fix]]
-stage = 6
-region = "x022400"
-off = 0x15eb
-old_hex = "51"
-new_hex = "44"
-note = "ported state-machine site (vs2 0x239E8+3): cmpi.b #$51,(0x54,a6) -> #$44 — the one vs2 state-0x51-only action (0x117 flag) transplanted onto the renamed state; collision-free (nothing else produces state 0x44)"
 
 [[site_thunk]]
 stage = 6

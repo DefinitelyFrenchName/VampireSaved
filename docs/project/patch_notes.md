@@ -2,8 +2,13 @@
 
 ## 14z-110b — the 0x51 -> 0x44 state remap: byte detail
 
-Seven bytes, all `region_fix` (old-verified against the extracted vs2
-source), maintainer-conditioned GO 2026-08-26.
+Six bytes, all `region_fix` (old-verified against the extracted vs2
+source), maintainer-conditioned GO 2026-08-26. (A seventh — a companion
+edit to the ported x022400 state-machine copy — was landed and RETRACTED
+the same session: the region is Huitzil's and its invoking thunks are
+parked, so the row never fired and the copy is dead code; vanilla has no
+twin of that conditional store. The 0x117 residual is recorded in the
+manifest comment.)
 
 ```
 region hitbox   (dst 0x3FA790, src vsav2 0x0C8BB8):
@@ -13,11 +18,6 @@ region hitbox   (dst 0x3FA790, src vsav2 0x0C8BB8):
   +0x1149  51 -> 44     ; deity node 4
   +0x1169  51 -> 44     ; deity node 5
   +0x1189  51 -> 44     ; deity node 6
-region x022400  (dst 0x41AA20-era base, src vsav2 0x022400):
-  +0x15EB  51 -> 44     ; cmpi.b #$51,(0x54,a6) -> #$44 at the ported
-                        ; state machine (vs2 0x239E8+3): the ONE vs2
-                        ; state-0x51-only action (move.b #1,(0x117,a6))
-                        ; transplanted onto the renamed state
 ```
 
 Why 0x44 (and not 0x19 or 0x4E, both previously tried): equivalence measured
