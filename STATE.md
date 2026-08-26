@@ -70,6 +70,42 @@ tree (CLAUDE.md §4 has wanted "vs each of the 18, both sides"), P1 Donovan vs
 P2 Phobos via the extended wheel, made possible by tonight's P2 scripting.
 Verified P1=Donovan `0x3FA9D0` / P2=Phobos `0x4595B0` load on MAME.
 
+### THE CRASH SIGNATURE IS DECODED — it is a CPU EXCEPTION, and my vec3 repros are the SAME EVENT
+
+**Maintainer refined the signature: the reset goes STRAIGHT TO THE GAME NAME
+SCREEN (plain white name on black), NOT through the gold-text RAM test.** That
+is decisive. A cold/watchdog reset always re-runs the RAM test (it is exactly
+what the pre-D5 boot loop did). Skipping it means a SOFTWARE restart from a
+point after the RAM test.
+
+**Decoded the 68k exception vectors + handlers (verify_op/verify_data):** every
+exception (bus `vec2`, address `vec3`, illegal `vec4`, …) runs a handler that
+does `move.w #code,($FF0000)` — storing the exception TYPE (0 bus / 1 addr / 2
+illegal / …) — then `movem` all regs, resets SP (`lea ($FF0054),sp`) and
+branches to a common restart routine (`0x608`), which reboots to the name
+screen. **So "name screen, no RAM test" IS the game's designed response to any
+CPU exception.**
+
+**CONSEQUENCE — this softens the "no clean repro" pessimism.** A CPU exception
+is exactly what the crash guard trips on, and I HAVE reproduced vec3/vec4
+exceptions in-context: probe H `vec3 PC 0x01850e` (a `jmp (2,pc,d1.w)` jump
+table, i.e. a bad-pointer jump), probe J `vec3/vec4` on forced classes. **These
+are the SAME EVENT CLASS the maintainer sees on hardware** — the guard reports
+the vector, hardware runs the handler to the name screen. So the field crash is
+confirmed to be a bad-pointer jump / bad access / illegal instruction, NOT data
+corruption (which the no-prior-corruption observation already argued).
+
+**NEW INSTRUMENT: `$FF0000` holds the exception code.** Any repro can read it to
+know bus vs address vs illegal without guessing from a PC. probe H's is an
+ADDRESS error (odd-address jump-table target).
+
+**REMAINING: pin which natural path triggers it.** probe H is the closest
+(Donovan arcade context, real vec3) but has select-time pokes; the next step is
+a poke-free trajectory that reaches the same `0x01850e` fault, then trace what
+value indexes that jump table out of range. The `0x01850e` jump table —
+`move.w (6,pc,d0.w),d1; jmp (2,pc,d1.w)` indexed by d0 — is a TYPE/STATE
+dispatch, which fits "a specific Phobos move drives a state value out of range".
+
 ### CORRECTION + SHARPENED LEAD (same session, after the candidate-row check)
 
 **THE ARCADE-BORROW THEORY IS WEAKENED — stated plainly because it was the
