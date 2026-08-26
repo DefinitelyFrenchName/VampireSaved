@@ -70,6 +70,47 @@ tree (CLAUDE.md §4 has wanted "vs each of the 18, both sides"), P1 Donovan vs
 P2 Phobos via the extended wheel, made possible by tonight's P2 scripting.
 Verified P1=Donovan `0x3FA9D0` / P2=Phobos `0x4595B0` load on MAME.
 
+### ROOT CAUSE CAPTURED — a vs2-numbered type byte in DONOVAN'S ported data
+
+The extended guard probe (`GUARD_PROBE=1850c`, cond `(d1&1)==1`, PROBE line now
+carrying A1/A3) caught the fatal iteration live:
+
+```
+PROBE 13918 D0=000000a2 D1=00000001 A0=ffff8400 A1=00ff8800 A3=003fb882
+      A6=00ff8400 RET 00ff02dc MEM[A3+17=3fb899]=51
+```
+
+- **A1 = `$FF8800`: the P2 PLAYER object — Phobos himself**, not a sidekick
+  sub-object. (The sidekick lead was the right NEIGHBORHOOD — a Phobos-side
+  1P-only event — but the wrong object.)
+- **A3 = `0x3FB882`: a node INSIDE DONOVAN'S relocated data block**
+  (base `0x3FA9D0`, node at +0xEB2). Phobos's object walks DONOVAN'S ported
+  node — the cross-fighter interaction shape (cf. 14z-73 grab-victim).
+- **`(0x17,A3)` = `0x51`** — the fatal index. `D0 = 0x51*2 = 0xA2` runs past
+  the state jump table at `0x018510` (valid states end ~`0x25`), fetches the
+  word `0x0001`, and `jmp (2,pc,d1.w)` lands on odd `0x18511` -> vec3 ->
+  the soft-restart handler -> name screen. Every field observation is downstream
+  of this.
+- **`0x51` IS THE KNOWN FAMILY:** 14z-35 "type-0x51 cluster — the engines
+  RENUMBERED the copy-class record family"; 14z-33 "record-type dispatch
+  aliases". A vs2-numbered type byte in ported data, indexing a vsav dispatch
+  that numbers the family differently. The 14z-33/35 fixes covered the members
+  then known; **this node (`ROM 0x3FB899`, in Donovan's block) is a missed
+  member.**
+
+**REMAINING to fix it (build-pipeline, maintainer-facing):** identify WHICH
+record family `0x3FB882` belongs to in the extraction (the manifests map
+Donovan's block), what vs2's `0x51` MEANS there, and its correct vsavj
+renumbering — then the fix is the same shape as 14z-33/35 (a remap rule in the
+extraction, not a hand-poke). Also: verify the FIELD path (natural 1P arcade)
+funnels through this same node — probe H's trajectory is poke-contaminated,
+so the node identification transfers but the path should be confirmed on a
+clean repro or on the maintainer's video.
+
+**INSTRUMENT CHANGE, recorded:** `tests/lua/replay_guard.lua`'s PROBE line now
+prints A1 and A3 (additive; existing fields unchanged). This is what made the
+capture possible.
+
 ### THE PROBE-H AUTOPSY REFINES IT: an ODD dispatch index, not merely out-of-range
 
 Probe H's crash is DETERMINISTIC (f13918 every run, vec3, PC 0x01850e, fault
