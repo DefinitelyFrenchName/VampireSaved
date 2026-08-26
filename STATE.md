@@ -1,5 +1,118 @@
 # STATE — living progress log
 
+## Session 14z-109 (2026-08-25/26) — **THE FIELD TEST GAINED A NEGATIVE
+## CONTROL IT DID NOT HAVE, AND THE OBJ LIST BECAME THE FIRST WORKING
+## CROSS-IMPLEMENTATION VIDEO ORACLE.** Opened while the maintainer's
+## hardware test was pending, so everything here is work that does not need
+## the board. **IN FLIGHT AT THE TIME OF WRITING: the field test itself.**
+
+**The session in one line:** it started as housekeeping during a wait, found
+that the field test was about to be run WITHOUT a control, and ended by
+making a video-determining surface agree across two unrelated codebases for
+the first time.
+
+### WHAT WAS ESTABLISHED
+
+| | result |
+|---|---|
+| the field-test bundle | had **ONE MRA and no control**; now carries a STOCK CONTROL leg |
+| MRA part resolution | **WIDE 31/31 resolve, STOCK 22/22** after the pristine swap — measured, not assumed |
+| the bundle README | item 5 was **STALE**, corrected later in 14z-108 than the README was written |
+| the fork README | brought to D0-D5 (was "slice D1", 5 files against the tree's 13) |
+| the OBJ list as an oracle | **WORKS** — promoted subset 31 vs 31, field-for-field IDENTICAL |
+| the walker | calibrated **1153/1153 lines** against the live-machine one BEFORE use |
+
+### THE RESULT THAT MATTERS
+
+At the frozen tenant anchor (`36_pick_tenant_cell`, MAME 2886 / sim 3546) the
+**PROMOTED** subset of the OBJ list is **31 entries on BOTH legs, ORDERED AND
+FIELD-FOR-FIELD IDENTICAL**, and the 19-bit tile addresses slice D3 computes
+are the same set, **`0x4b0c4-0x4ecda`**. The promote, the group-C redirect and
+the 3-bit bank are confirmed against an unrelated codebase at the sprite-list
+level. **First cross-implementation agreement this project has on a
+video-determining surface, and it is on the content the port exists to add.**
+**STILL NOT PIXELS** — this is the LIST, not the rendered frame.
+
+### THE CORRECTION, WHICH IS WORTH MORE THAN THE RESULT
+
+The raw lists do NOT match: **40 entries vs 129**. I reported that mid-run as
+"a real difference — the core genuinely holds a shorter list". **THAT WAS
+WRONG.** A 1P replay's CPU opponent is the SOUND-STATE-FED LOTTERY
+(`atlas/ram.md:99`) and genuinely differs between the legs —
+`test_mister_tenant_oracle` **already excludes the P2 fields BY NAME for this
+exact reason**, and I had that fact in front of me before I ran anything.
+Most of the list is the opponent's sprites.
+
+What rescues the surface: an OBJ list cannot be filtered "by P2" the way a
+field table can — **sprites carry no owner** — but OUR content IS labelled.
+**y bit 12, the CPS-2 Turbo promote, is set on exactly the group-C sprites
+this port adds and on nothing vanilla can emit.** So the promoted subset is
+ours, is lottery-free, and must agree exactly; the remainder is REPORTED,
+never asserted.
+
+**THE LEGACY CONTROL WAS RUN AND IS ALSO CONFOUNDED — recorded so it is never
+read as evidence.** `05_timeout_idle` is 1P arcade too, so it draws different
+opponents as well (counts agree 52/57 vs 61, codes barely overlap). **A clean
+WHOLE-list comparison needs a PINNED OPPONENT, which needs P2 scripting in
+`SimInputs` — still the deferred COVERAGE item, and now with a concrete
+reason to want it.**
+
+### THE FIELD TEST HAD NO CONTROL
+
+The bundle shipped one MRA, so any failure — black screen, boot loop, wrong
+art — would have been indistinguishable between "our profile is wrong" and
+"the bitstream, the card, the SDRAM module or the video chain is wrong".
+By this project's own standard that is not a measurement. Added (outside the
+repo, rule 7): the **STOCK CONTROL MRA** (vanilla `vsavj` on the SAME `.rbf`
+with the profile bit at the `0xFF` fill — verified, the file names
+`<rbf>jtcps2w` and contains no `0xFE`), `games/mame/vsavj.zip`, and
+`FIELD_TRIAGE.txt` (nine symptoms, each with meaning and next action).
+**Measured on the way: pointed at the bundle as shipped the control MRA loses
+8 of its 22 parts** — four patched art members AND four program members — and
+jtframe `0xFF`-FILLS an unresolved part rather than refusing, so it would have
+"run" and shown nonsense.
+**The pre-D5 boot loop converted to something usable at a board: ~26.5 s** at
+the real 59.6374 Hz (`8 MHz / (512*262)`, MAME `cps1.h:39-45`).
+
+### RETRACTION DISCIPLINE — THE SWEEP HAS TO LEAVE THE TREE
+
+The bundle README's item 5 called the identical 128 KB "scroll tilemap", said
+the layer-enable registers were undocumented, and invited treating a
+wrong-looking background as "the first hard evidence either way". All three
+were corrected LATER in 14z-108 than the README was written. **The bundle
+lives OUTSIDE the repo, so the CLAUDE.md §5 grep over `docs tests` could never
+have found it.** When a claim is corrected, the sweep must reach artifacts
+that have already left the tree.
+
+### NEW INSTRUMENTS, all with must-fire controls
+
+- `tools/check_mra_parts.py` + `tests/test_mra_parts.sh` (ci_portable, ROM-free)
+- `tools/oram_obj_records.py` + `tests/test_obj_records.sh` (~2 min, MAME only)
+- `tests/test_mister_obj_oracle.sh` (~65 min; `--sim-dir/--mame-log` re-analyse
+  finished runs). **Its page selection does NOT hard-code a buffer:** CPS-2
+  ORAM is double-buffered with a runtime page select
+  (`main_addr_x[13] = main_ram_addr[15] ^ obank`), so it walks both and lets
+  the comparison choose. Hard-coding a page is how a phase difference gets
+  reported as a content difference.
+
+### PUSH STATE
+
+`origin/main` holds **`613db08`** (verified with `git ls-remote`, not a
+tracking ref). The fork README commit `c97e3d14` was **deliberately NOT
+pushed** at the maintainer's instruction, and the main-repo commit that bumps
+the `emu/jtcores` pin to it is therefore held back too — publishing it would
+point public `origin/main` at a fork commit the fork remote does not carry.
+**Push the FORK first, then that commit — never that commit alone.** The two
+commits were reordered (disjoint by file) so everything else could ship; the
+resulting tree hash was verified byte-identical before each push.
+
+### VERIFICATION
+
+`tests/run_all_static.sh --strict` GREEN at the session open (PASS 107) and
+after the changes (**PASS 108**, SKIP 0, FAIL 0, MISSING 0), with the tree
+clean under the run — the 14z-108 discipline (commit first, then run, then do
+not type) followed this time.
+
 ## Session 14z-108 CLOSE — ritual complete. **THE FUNCTIONAL CHAIN IS
 ## COMPLETE IN SIMULATION AND THE CORE FITS A CYCLONE V — BUT IT DOES NOT
 ## RELIABLY CLOSE TIMING.** A tenant FIGHTS on the core and fights
