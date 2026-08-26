@@ -36,7 +36,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 BUILD="${BUILD:-build/m3b_merged13}"
 FRAMES="${FRAMES:-40700}"
-LEGS="${LEGS:-phobos bishamon pyron}"
+LEGS="${LEGS:-phobos bishamon}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no build at $BUILD"; exit 0; }
 [ -f "$BUILD/prg/vm3j.04d" ] || { echo "SKIP: no prg/vm3j.04d in $BUILD"; exit 0; }
@@ -44,12 +44,21 @@ MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -f "tests/replays/110_don_arcade_mash.rpl" ] || { echo "SKIP: no replay 110"; exit 0; }
 export MAME_BIN
 
-# leg -> venue byte (Donovan row 0x13 first-draw), for the report/assert
+# leg -> venue byte (Donovan row 0x13 first-draw), for the report/assert.
+# THE VENUE BYTE MUST BE EVEN (measured 14z-110): poking an ODD venue crashes
+# the ladder pick itself — vec3 at PC 0x00AF46, fault ADDR 0x0000B72D, before
+# any match exists. The 14z-109 sweep measured the twelve EVEN values only;
+# vanilla writes only even venues. Donovan's row: 0x02 -> Phobos (his paired
+# stage), 0x10 -> Bishamon-then-Phobos — exactly the two FIELD crash contexts.
+# NO even venue on his row first-draws PYRON (0x11 sits at odd offsets only),
+# so that pairing is NOT steerable here; it is covered by
+# tests/replays/109_2p_don_vs_phobos.rpl's 2P family and the guard corpus'
+# forced legs instead — stated, not hidden.
 venue_of() { case "$1" in
-    phobos) echo 02;; bishamon) echo 03;; pyron) echo 05;;
+    phobos) echo 02;; bishamon) echo 10;;
     *) echo "";; esac; }
 # expected opponent character id (rowA[venue]) for the liveness assert
-id_of() { case "$1" in phobos) echo 0x10;; bishamon) echo 0x08;; pyron) echo 0x11;; esac; }
+id_of() { case "$1" in phobos) echo 0x10;; bishamon) echo 0x08;; esac; }
 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
