@@ -70,6 +70,45 @@ tree (CLAUDE.md §4 has wanted "vs each of the 18, both sides"), P1 Donovan vs
 P2 Phobos via the extended wheel, made possible by tonight's P2 scripting.
 Verified P1=Donovan `0x3FA9D0` / P2=Phobos `0x4595B0` load on MAME.
 
+### SYNTHESIS: A PHOBOS OBJECT (LIKELY THE SIDEKICK) DRIVEN TO AN OUT-OF-RANGE STATE
+
+**Maintainer's strongest clue yet:** 1P vs COM crashes reliably "if the fight
+is LONG ENOUGH"; 2P versus NEVER crashes despite everything; and in 2P **the
+Phobos SIDEKICK had NO voice/SFX** (incl. the "get up, don't give up" lose
+animation, which normally speaks) — while in 1P that sidekick voice DOES play.
+
+**Traced the reproduced crash site `0x01850e`:** it is a VANILLA object
+state-machine dispatch — `move.w (6,pc,D0.w),d1; jmp (2,pc,D1.w)` — where D0 is
+the object's STATE field `(0x54,a1)`. Handlers (0x018694-0x01877c) set next
+states including `0x25`(37); a state value beyond the offset table reads a
+garbage offset and jumps to an odd address -> `vec3` address error -> the
+soft-restart handler -> name screen. So the crash is: **an object's `+0x54`
+state got set OUT OF RANGE**, and vanilla's dispatcher faulted on it.
+
+**THE COHERENT PICTURE, every field observation accounted for:**
+- Phobos's SIDEKICK is an assist object with its own state machine + voice.
+- It acts PERIODICALLY through a match -> "crashes if the fight is long enough"
+  (more sidekick events = more chances to hit the bad state).
+- Its full behaviour incl. VOICE runs in the 1P/arcade path and is absent in
+  2P (maintainer heard exactly this) -> crash is 1P-only, and "2P clean" is
+  NOT a coincidence: the triggering event doesn't fire in 2P at all.
+- "Phobos's attacks crash, Donovan's never" -> it is Phobos's object, not the
+  matchup symmetric.
+- Immediate reboot, no corruption -> a control-flow fault, which this is.
+
+**LEAD (for measurement, not arbitrage): what writes `+0x54` out of range on
+a Phobos object in 1P.** Candidates: a ported Phobos sidekick anim node whose
+state byte is wrong; the mid-match `+0x382` voice reassignment feeding a
+sidekick voice/state path; or a lost/mis-ported sidekick spawner (cf. the
+14z-41 lost-spawner and the effect-flow work). The `$FF0000` exception code
+and the `+0x54` state value at fault are the two things to capture in a
+poke-free 1P Phobos repro.
+
+**DISCRIMINATING, on hardware:** does making Phobos's SIDEKICK active (his
+assist/summon moves) bring the crash on FASTER? Does the sidekick look/behave
+normally in the frames before a crash? A "yes, faster with sidekick activity"
+nails the sidekick object.
+
 ### THE CRASH SIGNATURE IS DECODED — it is a CPU EXCEPTION, and my vec3 repros are the SAME EVENT
 
 **Maintainer refined the signature: the reset goes STRAIGHT TO THE GAME NAME
