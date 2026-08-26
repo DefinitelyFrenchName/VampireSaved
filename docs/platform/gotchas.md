@@ -1830,3 +1830,37 @@ the green-build trap above: two different claims that look like one.
 (`build_id.v` reads `260825`), slack +0.066 ns, jtframe gate PASS. Rebuild
 with `jtcore cps2w -mister --nodbg --seed 18269`; expect the timing to match
 and the hash not to, unless it is the same calendar day.
+
+## An ARMED DEBUGGER BREAKPOINT skews the Lua harness's input application —
+## deterministic INPUT-VIOLATIONs that look like host input (14z-110)
+
+Any MAME `-debug` breakpoint stop delays `emu.register_frame_done`'s input
+application by a beat when the stop lands inside the frame the replay layer
+was about to write — the input-integrity check then reads the PREVIOUS
+chord and flags INPUT-VIOLATION. The tell that it is NOT host input: the
+violation frame is DETERMINISTIC (two parallel legs flagged the SAME frame
+2874, byte-identical live value). The eager first version of `GUARD_FORCE`
+paid for this: its breakpoint idled armed from boot, and a 14k-frame run
+collected 75 violations. THE RULE: a forcing/probing breakpoint is armed
+LAZILY (just before the window it serves) and cleared the moment it has
+served (parse the bp number from the debugger console and `bpclear` it).
+After the fix the same run shows ZERO violations. Crash-handler
+breakpoints are exempt in practice — they only stop when the run is
+already over.
+
+## A RELATIVE `FBNEO_ROMPATH` builds an overlay of BROKEN SYMLINKS — and
+## the only symptom is a bare "DrvInit failed" (14z-110)
+
+`tools/run_replay_fbneo.sh` builds its per-zip overlay with `ln -sf` from
+the CALLER's cwd, but the emulator resolves the links from INSIDE the
+sandbox (`cd "$WORK"`), so a relative `FBNEO_ROMPATH` produced links whose
+targets resolve to nothing — every member "present", every load "(not
+found)", and the surface error is just "DrvInit failed for the requested
+set" in the SANDBOX log (hidden unless you cat it). Measured: invoking
+`test_dualtrack.sh build/... build/...` (relative, where the documented
+default is `$REPO/build/...`) failed its first leg this way on a
+known-good build — the control that caught it. The runner now
+absolutizes `FBNEO_ROMPATH` on entry, so the class is dead; the lesson
+stands for every overlay-by-symlink mechanism: absolutize before linking,
+and suspect the instrument when a KNOWN-GOOD input fails the same way as
+the thing under test.

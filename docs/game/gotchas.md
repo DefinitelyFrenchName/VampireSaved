@@ -636,3 +636,18 @@ leaves that block stale (measured: all zeros under the crash guard; read
 registers live via GUARD_PROBE instead) — and the reboot wipes the crash
 cleanly enough that the screen shows NO corruption first, which is itself
 the tell that it was a control-flow fault rather than data rot.
+
+## The ladder pick faults on an ODD venue byte — steer `$FF8121` with EVEN
+## values only (14z-110)
+
+The venue byte `$FF8121` is a plain byte offset into the ladder row
+(`pool = rowA[venue..venue+7]`, atlas ram.md), and poking any EVEN value
+`0x00-0x16` steers the draw deterministically (12/12, 14z-109). An ODD
+value crashes the PICK CODE itself: vec3 at `PC 0x00AF46`, fault
+`ADDR 0x0000B72D` (a misaligned read against table A's row), before any
+match exists — measured 14z-110 when a venue-steered rig picked venues by
+first-draw byte position without checking parity. Vanilla only ever
+writes even venues, so this is a RIG hazard, not a game defect — but any
+tool that steers the ladder must keep the byte EVEN, and a wanted
+opponent that sits only at odd offsets of a row (e.g. Pyron on Donovan's
+row) is simply NOT steerable this way.
