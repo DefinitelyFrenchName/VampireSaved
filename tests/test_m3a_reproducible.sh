@@ -277,7 +277,8 @@ m3a_manifest pyron       "$WORK/pyron/rompath"     "$MANI_PYR"
 EXPECT_MERGED="761fd35af754d791e5a7863ca670673e85588c22"   # 14z-110 merged-m7 (the #99 d2 window + the M7 mark)
 # MANI_MERGED="59f3b42e7f0022f509c3cc912abc54f159183688 42"  # 14z-99 window
 # MANI_MERGED="22092b65fd9db2f5b79f211afb51625a542cd45c 42"  # 14z-102 window
-MANI_MERGED="efea5e9d0bd9590383eb614016eed1c388bf9c2b 42"   # 14z-105 (delta: vm3j.03d/04d/07b/10b + vsw.41/42 PROGRAM + vsw.31m/33m/35m/37m GROUP C — the version glyphs; no QSound member moved)
+# MANI_MERGED="efea5e9d0bd9590383eb614016eed1c388bf9c2b 42"  # 14z-105 window
+MANI_MERGED="75a253eab6b47f5fb8772a719f4f6d59c173e96a 42"   # 14z-110 (delta: vm3j.03d/04d/07b/10b + vsw.41/42 PROGRAM — the #99 d2 window + relocations in the merged layout; vsw.33m/37m GROUP C — the M7 glyphs; no QSound member moved. Measured twice: artifact_manifest on build/m3b_merged14 AND the gate's own scratch rebuild, identical)
 
 MERGED_NEEDS="build/m5_wide/extract build/hui32/extract build/pyron21/extract
 build/wide0/rompath/vsavjw.zip"
