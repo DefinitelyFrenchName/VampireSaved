@@ -25,6 +25,12 @@ code   0x0cb910 ILLEGAL  TRIPWIRE for unresolved 0x42cee
 code   0x0cb920 ILLEGAL  TRIPWIRE for unresolved 0x448d4
 # code+0x3092: unresolved 0x448d4 -> tripwire 0xcb920
 code_file 0x0bf6a0 +0x3200  donovan code (from vsav2 0x059490)
+# hitbox+0x10e9: region_fix 51 -> 44 (deity node next-state vs2 0x51 -> 0x44 (the 14z-110b five-consumer equivalence; 14z-35 tried 0x4E and 14z-43 retired it — 0x44 preserves property 0x19 AND the 0x2384E handler family))
+# hitbox+0x1109: region_fix 51 -> 44 (deity node next-state vs2 0x51 -> 0x44 (the 14z-110b five-consumer equivalence; 14z-35 tried 0x4E and 14z-43 retired it — 0x44 preserves property 0x19 AND the 0x2384E handler family))
+# hitbox+0x1129: region_fix 51 -> 44 (deity node next-state vs2 0x51 -> 0x44 (the 14z-110b five-consumer equivalence; 14z-35 tried 0x4E and 14z-43 retired it — 0x44 preserves property 0x19 AND the 0x2384E handler family))
+# hitbox+0x1149: region_fix 51 -> 44 (deity node next-state vs2 0x51 -> 0x44 (the 14z-110b five-consumer equivalence; 14z-35 tried 0x4E and 14z-43 retired it — 0x44 preserves property 0x19 AND the 0x2384E handler family))
+# hitbox+0x1169: region_fix 51 -> 44 (deity node next-state vs2 0x51 -> 0x44 (the 14z-110b five-consumer equivalence; 14z-35 tried 0x4E and 14z-43 retired it — 0x44 preserves property 0x19 AND the 0x2384E handler family))
+# hitbox+0x1189: region_fix 51 -> 44 (deity node next-state vs2 0x51 -> 0x44 (the 14z-110b five-consumer equivalence; 14z-35 tried 0x4E and 14z-43 retired it — 0x44 preserves property 0x19 AND the 0x2384E handler family))
 # hitbox+0x11a9: region_fix 4e -> 06 (sworded deity hit 1/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric))
 # hitbox+0x11c9: region_fix 4e -> 06 (sworded deity hit 2/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric))
 # hitbox+0x11e9: region_fix 4e -> 06 (sworded deity hit 3/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric))
@@ -255,9 +261,9 @@ code   21 caller operand(s) of jsr 0x5e52a -> 0x3ff9b0 (0x0053f6, 0x005410, 0x00
 data   0x0cf1b0 +0x180  state_hook palette-seq records (ids 0x2cd-0x2d8)
 code   0x0cc030 state_hook private seq entry (records base 0x0cf1b0 - 0x2cd*32 -> engine 0x2ad9a)
 code   0x02a7c8 ENGINE HOOK: +0x14e state dispatch -> thunk 0x0fff40 (vanilla ids ghost-clean via jmp-back; ids 0xb2-0xc8 -> 12 synthesized stubs at 0x3ffbd0, ext table 0x0cf330)
-code   0x018458 ENGINE HOOK: hit-reaction dispatch -> thunk 0x0fff80 (vanilla ids jmp back to untouched 0x18460; ids 0xa0-0xa6 -> 4 verbatim vs2 cases at 0x0cc040)
-code   0x3ffd50 init shim (pool latch A5+0x7966, seeder 0x16c64; flavor (A6+0x3c2) donovan<-0x01/held 0x00 [Start bitmask 0xff8060, bit=player]) -> handler 0x0c1030
-poke32 0x0bd146 <- 0x003ffd50  dispatch_00[0x13] donovan handler via seed shim
+code   0x018458 ENGINE HOOK: hit-reaction dispatch -> thunk 0x3ffd50 (vanilla ids jmp back to untouched 0x18460; ids 0xa0-0xa6 -> 4 verbatim vs2 cases at 0x0cc040; d2 window -> untouched 0x18508, vs2 d2-twin cases at 0x0fff80)
+code   0x3ffdb0 init shim (pool latch A5+0x7966, seeder 0x16c64; flavor (A6+0x3c2) donovan<-0x01/held 0x00 [Start bitmask 0xff8060, bit=player]) -> handler 0x0c1030
+poke32 0x0bd146 <- 0x003ffdb0  dispatch_00[0x13] donovan handler via seed shim
 poke32 0x0bd1c6 <- 0x000bf6aa  dispatch_01[0x13] donovan handler
 poke32 0x0bd246 <- 0x000bff64  dispatch_02[0x13] donovan handler
 poke32 0x0bd2c6 <- 0x000bff64  dispatch_03[0x13] donovan handler
@@ -350,7 +356,7 @@ poke32 0x0be2b6 <- 0x410d50  data_port capture_kf_jedah ptr-table 0xbe27a row 0x
 data   0x412a40 +0x160  sound_table don_sfx_records <- vsav2 0x0cb01a (44 entries; kept ['0x110@1', '0x111@2', '0x112@3', '0x058@4', '0x059@5', '0x05a@6', '0x05b@7', '0x05c@8', '0x05d@9', '0x05e@10', '0x05f@11', '0x060@12', '0x061@13', '0x062@14', '0x063@15', '0x064@16', '0x065@17', '0x066@18', '0x067@19', '0x152@21', '0x119@22', '0x068@23', '0x069@24', '0x06a@25', '0x06b@26', '0x06c@27', '0x06d@28', '0x06e@29', '0x06f@30', '0x070@31', '0x071@32', '0x072@33', '0x073@34', '0x074@35', '0x075@36', '0x076@37', '0x077@38', '0x078@39', '0x079@40', '0x07a@41', '0x07b@42']; zeroed 2 unplayable ids; remapped [(4, '0x700', '0x58'), (5, '0x701', '0x59'), (6, '0x702', '0x5a'), (7, '0x703', '0x5b'), (8, '0x704', '0x5c'), (9, '0x705', '0x5d'), (10, '0x706', '0x5e'), (11, '0x707', '0x5f'), (12, '0x708', '0x60'), (13, '0x709', '0x61'), (14, '0x70a', '0x62'), (15, '0x70b', '0x63'), (16, '0x70c', '0x64'), (17, '0x70d', '0x65'), (18, '0x70e', '0x66'), (19, '0x70f', '0x67'), (23, '0x710', '0x68'), (24, '0x711', '0x69'), (25, '0x712', '0x6a'), (26, '0x713', '0x6b'), (27, '0x714', '0x6c'), (28, '0x715', '0x6d'), (29, '0x716', '0x6e'), (30, '0x717', '0x6f'), (31, '0x718', '0x70'), (32, '0x719', '0x71'), (33, '0x71a', '0x72'), (34, '0x71b', '0x73'), (35, '0x71c', '0x74'), (36, '0x71d', '0x75'), (37, '0x71e', '0x76'), (38, '0x71f', '0x77'), (39, '0x750', '0x78'), (40, '0x751', '0x79'), (41, '0x752', '0x7a'), (42, '0x753', '0x7b')])
 poke32 0x0bf466 <- 0x412a40  sound_table don_sfx_records per-char ptr row 0x13 (was 0x9a630)
 data   0x0211e4        select_wheel roster21: TABLE B in place, 28 bytes over 3 new rows + 5 inbound edges
-# select_wheel roster21: version_text 'M6' -> 2 glyph entries at screen (340,202), pal row 0x19, codes 0x1fe40+ (authored tiles via wheel_bank5.json)
+# select_wheel roster21: version_text 'M7' -> 2 glyph entries at screen (340,202), pal row 0x19, codes 0x1fe40+ (authored tiles via wheel_bank5.json)
 data   0x412ba0 +0x5c  select_wheel roster21 coord list (18 vanilla + 3 new + 2 version glyphs)
 data   0x412c00 +0x66  select_wheel roster21 record (count 17->22, budget 0x55 CARRIED OVER, cptr -> 0x412ba0)
 poke32 0x2689fe <- 0x412c00  select_wheel roster21 record ptr (was 0x272a68; the record's ONLY referrer — vanilla record and list are untouched)
@@ -372,7 +378,7 @@ data   0x3a3b20 +0x20  select_wheel roster21: medallion pal row 0x19 (cell 0x10)
 data   0x3a3b40 +0x20  select_wheel roster21: medallion pal row 0x1a (cell 0x11) <- vs2 0x3bb15c; entry attr re-palmed
 data   0x3a3ac0 +0x20  select_wheel roster21: medallion pal row 0x16 (cell 0x13) <- vs2 0x3bafdc; entry attr re-palmed
 code   0x0fffc0 +0x28  select_wheel roster21: march mid-row retarget 0x16/0x19 -> 0x02 (dest computation 0x2b598 jsr-routed)
-code   0x3ffda0 +0x28  select_wheel roster21: march mid-row retarget 0x16/0x19 -> 0x02 (dest computation 0x2b7d8 jsr-routed)
+code   0x3ffe00 +0x28  select_wheel roster21: march mid-row retarget 0x16/0x19 -> 0x02 (dest computation 0x2b7d8 jsr-routed)
 data   0x412c70 +0x1c  select_records portrait/p1 coord list (7 pairs, vs2 0x3036f8)
 data   0x412c90 +0x26  select_records portrait/p1 record (vs2 0x2a63f0, 7 entries, budget 0x5b = vs2's own)
 poke32 0x267476 <- 0x412c90  select_records portrait/p1 array row 0x13 (was 0x2719da, the base-half alias)
@@ -399,27 +405,27 @@ poke32 0x268ace <- 0x2726ce  select_records highlight/p2 array row 0x13 = the HO
 # select_records: 0 bank-1 tile placements -> select_tiles.json (only the composed records' art; the slot-0x0F splash/win-quote families are NOT placed, so that Jedah art stays vanilla)
 # select_records: 271 native bank-1 tiles -> select_bank5.json (copied vs2 -> group C bank 5 by build_gfx; the drawer's bank is thunk-gated per hover)
 data   0x412f10 +0x6040  win_pal_variant don_win_pal: sparse block, 10 sets of 0xa0 at stride 0xaa0 (vs2 0x3c365c stride 0xb40)
-code   0x3ffdd0 +0x16  win_pal_variant thunk, 1-way: don_win_pal d6==0x13 -> a0=0x412330; else vanilla pool 0x3ad700
-code   0x05f1b6 +6     win_pal_variant: movea.l #pool -> jsr 0x3ffdd0
-code   0x3ffdf0 +0x18  site_thunk select_companion_tbl_a; site 0x0845ec jsr-routed
-code   0x3ffe10 +0x18  site_thunk select_companion_tbl_b; site 0x0845f8 jsr-routed
-code   0x3ffe30 +0x22  site_thunk select_companion_resolve_s1; site 0x084602 jsr-routed
-code   0x3ffe60 +0x22  site_thunk select_companion_resolve_s2; site 0x084624 jsr-routed
-code   0x3ffe90 +0x3c  site_thunk accent_color_aware_0; site 0x02ad82 jsr-routed
-code   0x3ffed0 +0x3c  site_thunk accent_color_aware_1; site 0x02ad94 jsr-routed
-code   0x3fff10 +0x3c  site_thunk accent_color_aware_2; site 0x02b342 jsr-routed
-code   0x3fff50 +0x3c  site_thunk accent_color_aware_3; site 0x02b7e8 jsr-routed
-code   0x3fff90 +0x2a  site_thunk ls_freeze_vs2_victim; site 0x023ad8 jsr-routed
-code   0x3fffc0 +0x24  site_thunk ls_freeze_vs2_attacker; site 0x023ade jsr-routed
-code   0x418f50 +0x16  site_thunk es_type51_dispatch; site 0x0185ca jsr-routed
-code   0x418f70 +0x1e  site_thunk name_bank_variant_id; site 0x05fce0 jsr-routed
-code   0x418f90 +0x1e  site_thunk splash_bank_variant_id; site 0x06c0e0 jsr-routed
-code   0x418fb0 +0x16  site_thunk winquote_bank_variant_id; site 0x05f328 jsr-routed
-code   0x418fd0 +0x7e  site_thunk select_sword_pal_variant_id; site 0x05f9d0 jsr-routed
-data   0x419050 +0x140  site_thunk select_pal_variant_id data block <- vsav2 0x3c2a3c
-code   0x419190 +0x38  site_thunk select_pal_variant_id; site 0x05f146 jsr-routed
-code   0x4191d0 +0x22  site_thunk voice_borrow_keep_tenant; site 0x00aef2 jsr-routed
-code   0x419200 +0x1e  site_thunk oboro_select_hook; site 0x020b9c jsr-routed
+code   0x3ffe30 +0x16  win_pal_variant thunk, 1-way: don_win_pal d6==0x13 -> a0=0x412330; else vanilla pool 0x3ad700
+code   0x05f1b6 +6     win_pal_variant: movea.l #pool -> jsr 0x3ffe30
+code   0x3ffe50 +0x18  site_thunk select_companion_tbl_a; site 0x0845ec jsr-routed
+code   0x3ffe70 +0x18  site_thunk select_companion_tbl_b; site 0x0845f8 jsr-routed
+code   0x3ffe90 +0x22  site_thunk select_companion_resolve_s1; site 0x084602 jsr-routed
+code   0x3ffec0 +0x22  site_thunk select_companion_resolve_s2; site 0x084624 jsr-routed
+code   0x3ffef0 +0x3c  site_thunk accent_color_aware_0; site 0x02ad82 jsr-routed
+code   0x3fff30 +0x3c  site_thunk accent_color_aware_1; site 0x02ad94 jsr-routed
+code   0x3fff70 +0x3c  site_thunk accent_color_aware_2; site 0x02b342 jsr-routed
+code   0x3fffb0 +0x3c  site_thunk accent_color_aware_3; site 0x02b7e8 jsr-routed
+code   0x418f50 +0x2a  site_thunk ls_freeze_vs2_victim; site 0x023ad8 jsr-routed
+code   0x418f80 +0x24  site_thunk ls_freeze_vs2_attacker; site 0x023ade jsr-routed
+code   0x418fb0 +0x16  site_thunk es_type51_dispatch; site 0x0185ca jsr-routed
+code   0x418fd0 +0x1e  site_thunk name_bank_variant_id; site 0x05fce0 jsr-routed
+code   0x418ff0 +0x1e  site_thunk splash_bank_variant_id; site 0x06c0e0 jsr-routed
+code   0x419010 +0x16  site_thunk winquote_bank_variant_id; site 0x05f328 jsr-routed
+code   0x419030 +0x7e  site_thunk select_sword_pal_variant_id; site 0x05f9d0 jsr-routed
+data   0x4190b0 +0x140  site_thunk select_pal_variant_id data block <- vsav2 0x3c2a3c
+code   0x4191f0 +0x38  site_thunk select_pal_variant_id; site 0x05f146 jsr-routed
+code   0x419230 +0x22  site_thunk voice_borrow_keep_tenant; site 0x00aef2 jsr-routed
+code   0x419260 +0x1e  site_thunk oboro_select_hook; site 0x020b9c jsr-routed
 code   0x08459c +0x2  code_word select_companion_entry_0f (slot entry -> 0046)
 code   0x0282fa +0x2  code_word obj_bank_word_slot (slot entry -> 1000)
 code   0x05f24c +0x2  code_word win_pos_x_slot (slot entry -> 00f0)

@@ -20,9 +20,9 @@ select bank-5: 271 native tiles copied to group C upper bank
 wheel bank-5: 85 host tiles (byte-identical vsav group A) + 18 vs2 medallion tiles + 2 authored version glyphs copied to group C upper bank
 verified: 15498 tiles placed at codes 0xAD8F-0xEA3F (bank 4); all other tiles byte-identical
   wrote vsw.31m sha1 03ebc9567196d5983417f7ceb51ddbd6d26fc802
-  wrote vsw.33m sha1 a8939c5f9a3952c2ba044dc0501cda1dcfd1d9e0
+  wrote vsw.33m sha1 d77715f4a2c871364e477f93b3ed5320d7408030
   wrote vsw.35m sha1 71d72c897cf0a55545fa6632afda4e6b093bc442
-  wrote vsw.37m sha1 802483dd9fa7dcb78f5dfd6c480ea7c9d3a866e2
+  wrote vsw.37m sha1 e9bb76e53c5c78372592a2f19be7659193926427
 group C mode: vsav group B NOT written — the host band stays pristine
   read vs2.13m sha1 528ce7fc9a0451e2e2d221dbf5e4a5796584e053
   read vs2.15m sha1 e873ad3e0fc8a06a5029113faf991f5c1b765316

@@ -7,11 +7,11 @@ inventory: 14225 tiles, all placed at native codes (delta-0 tenant)
   read vs2.16m sha1 a924d53ab39f4d85173bdb92a197dde2db0dc3f7
   read vs2.18m sha1 8d0cd1c387b4b6ac7f92bb2e5a25983856328cdc
   read vs2.20m sha1 99bc27557741527ca678d7b6307164bc04ebedc6
-  chain build/m3b_merged13/gfx_huitzil/gfx_written.json sha1 c4f298d8613306807c56d8a4cd3a50d40f1e851a
+  chain build/m3b_merged15/gfx_huitzil/gfx_written.json sha1 c4f298d8613306807c56d8a4cd3a50d40f1e851a
   chain vsw.31m sha1 1d418f025fd075fcc05c913e7c3bebcd36ee2c0a
-  chain vsw.33m sha1 5ef084a3ca173ae2957aa976c12a0eb5e8f02c39
+  chain vsw.33m sha1 352a311ec91b1cfc3071b526016e5419e6d6e06d
   chain vsw.35m sha1 0e8286e165236a2a87ee086012c38f280b6a705d
-  chain vsw.37m sha1 619703d44d9c9eb0de102e945418429b0c67a369
+  chain vsw.37m sha1 dc6ca5b8b50b02e9310d6ac8a945e2543d1a640c
   read vs2.13m sha1 528ce7fc9a0451e2e2d221dbf5e4a5796584e053
   read vs2.15m sha1 e873ad3e0fc8a06a5029113faf991f5c1b765316
   read vs2.17m sha1 da94f1529da82a6bf2129f51548412e1ab2b001a
@@ -20,9 +20,9 @@ effect-c5: 5714 native bank-1 tiles copied to group C upper bank
 select bank-5: 287 native tiles copied to group C upper bank
 verified: 14225 tiles placed at codes 0x003F-0xA42C (bank 4); all other tiles byte-identical
   wrote vsw.31m sha1 8ca73214181d3b1c5c294fe5cdf4b6db43abc310
-  wrote vsw.33m sha1 a8762ab8d5050c8d6d3ec0f7f585fa671adf1d9c
+  wrote vsw.33m sha1 6c768bd6bfb8ae2fd0d9216fa75e5cc867d31243
   wrote vsw.35m sha1 af04b0c7434d827ee89a1d9cd1263e660871eb41
-  wrote vsw.37m sha1 876476c379c394ef25a239880c8bc27d84f3eed3
+  wrote vsw.37m sha1 1f2fa03e3ced5187a686cf28365339938d59f9f2
 group C mode: vsav group B NOT written — the host band stays pristine
   chain: prior link's group-A members carried forward
   read vs2.13m sha1 528ce7fc9a0451e2e2d221dbf5e4a5796584e053

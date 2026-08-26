@@ -25,6 +25,12 @@ code   0x0cb910 ILLEGAL  TRIPWIRE for unresolved 0x42cee
 code   0x0cb920 ILLEGAL  TRIPWIRE for unresolved 0x448d4
 # code+0x3092: unresolved 0x448d4 -> tripwire 0xcb920
 code_file 0x0bf6a0 +0x3200  donovan code (from vsav2 0x059490)
+# hitbox+0x10e9: region_fix 51 -> 44 (deity node next-state vs2 0x51 -> 0x44 (the 14z-110b five-consumer equivalence; 14z-35 tried 0x4E and 14z-43 retired it — 0x44 preserves property 0x19 AND the 0x2384E handler family))
+# hitbox+0x1109: region_fix 51 -> 44 (deity node next-state vs2 0x51 -> 0x44 (the 14z-110b five-consumer equivalence; 14z-35 tried 0x4E and 14z-43 retired it — 0x44 preserves property 0x19 AND the 0x2384E handler family))
+# hitbox+0x1129: region_fix 51 -> 44 (deity node next-state vs2 0x51 -> 0x44 (the 14z-110b five-consumer equivalence; 14z-35 tried 0x4E and 14z-43 retired it — 0x44 preserves property 0x19 AND the 0x2384E handler family))
+# hitbox+0x1149: region_fix 51 -> 44 (deity node next-state vs2 0x51 -> 0x44 (the 14z-110b five-consumer equivalence; 14z-35 tried 0x4E and 14z-43 retired it — 0x44 preserves property 0x19 AND the 0x2384E handler family))
+# hitbox+0x1169: region_fix 51 -> 44 (deity node next-state vs2 0x51 -> 0x44 (the 14z-110b five-consumer equivalence; 14z-35 tried 0x4E and 14z-43 retired it — 0x44 preserves property 0x19 AND the 0x2384E handler family))
+# hitbox+0x1189: region_fix 51 -> 44 (deity node next-state vs2 0x51 -> 0x44 (the 14z-110b five-consumer equivalence; 14z-35 tried 0x4E and 14z-43 retired it — 0x44 preserves property 0x19 AND the 0x2384E handler family))
 # hitbox+0x11a9: region_fix 4e -> 06 (sworded deity hit 1/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric))
 # hitbox+0x11c9: region_fix 4e -> 06 (sworded deity hit 2/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric))
 # hitbox+0x11e9: region_fix 4e -> 06 (sworded deity hit 3/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric))
@@ -270,10 +276,10 @@ code   21 caller operand(s) of jsr 0x5e52a -> 0x3ff9b0 (0x0053f6, 0x005410, 0x00
 data   0x0cf1b0 +0x180  state_hook palette-seq records (ids 0x2cd-0x2d8)
 code   0x0cbf50 state_hook private seq entry (records base 0x0cf1b0 - 0x2cd*32 -> engine 0x2ad9a)
 code   0x02a7c8 ENGINE HOOK: +0x14e state dispatch -> thunk 0x0cbf90 (vanilla ids ghost-clean via jmp-back; ids 0xb2-0xc8 -> 12 synthesized stubs at 0x3ffbd0, ext table 0x0cbf60)
-code   0x018458 ENGINE HOOK: hit-reaction dispatch -> thunk 0x0cc010 (vanilla ids jmp back to untouched 0x18460; ids 0xa0-0xa6 -> 4 verbatim vs2 cases at 0x0cbfd0)
-code   0x0fff40 init shim (pool latch A5+0x7966, seeder 0x16c64; flavor (A6+0x3c2) donovan<-0x01/held 0x00 [Start bitmask 0xff8060, bit=player]) -> handler 0x0c1030
-poke32 0x0bd136 <- 0x000fff40  dispatch_00[0xf] donovan handler via seed shim
-poke32 0x0bd176 <- 0x000fff40  dispatch_00[0x1f] variant mirror
+code   0x018458 ENGINE HOOK: hit-reaction dispatch -> thunk 0x0fff40 (vanilla ids jmp back to untouched 0x18460; ids 0xa0-0xa6 -> 4 verbatim vs2 cases at 0x0cbfd0; d2 window -> untouched 0x18508, vs2 d2-twin cases at 0x0cc010)
+code   0x0fffa0 init shim (pool latch A5+0x7966, seeder 0x16c64; flavor (A6+0x3c2) donovan<-0x01/held 0x00 [Start bitmask 0xff8060, bit=player]) -> handler 0x0c1030
+poke32 0x0bd136 <- 0x000fffa0  dispatch_00[0xf] donovan handler via seed shim
+poke32 0x0bd176 <- 0x000fffa0  dispatch_00[0x1f] variant mirror
 poke32 0x0bd1b6 <- 0x000bf6aa  dispatch_01[0xf] donovan handler
 poke32 0x0bd1f6 <- 0x000bf6aa  dispatch_01[0x1f] variant mirror
 poke32 0x0bd236 <- 0x000bff64  dispatch_02[0xf] donovan handler
@@ -366,14 +372,14 @@ data   0x3a3a80 +0x20  data_port med_pal_row14_a <- vsav2 0x3bafdc (0 fixes)
 # data_port capture_kf_jedah: SKIPPED (host-slot content; tenant is at variant id 0x0f)
 code   0x0cc050 +0x18  site_thunk select_companion_tbl_a; site 0x0845ec jsr-routed
 code   0x0cf330 +0x18  site_thunk select_companion_tbl_b; site 0x0845f8 jsr-routed
-code   0x0fff90 +0x22  site_thunk select_companion_resolve_s1; site 0x084602 jsr-routed
-code   0x0fffc0 +0x22  site_thunk select_companion_resolve_s2; site 0x084624 jsr-routed
-code   0x3ffd50 +0x3c  site_thunk accent_color_aware_0; site 0x02ad82 jsr-routed
-code   0x3ffd90 +0x3c  site_thunk accent_color_aware_1; site 0x02ad94 jsr-routed
-code   0x3ffdd0 +0x3c  site_thunk accent_color_aware_2; site 0x02b342 jsr-routed
-code   0x3ffe10 +0x3c  site_thunk accent_color_aware_3; site 0x02b7e8 jsr-routed
-code   0x3ffe50 +0x2a  site_thunk ls_freeze_vs2_victim; site 0x023ad8 jsr-routed
-code   0x3ffe80 +0x24  site_thunk ls_freeze_vs2_attacker; site 0x023ade jsr-routed
+code   0x3ffd50 +0x22  site_thunk select_companion_resolve_s1; site 0x084602 jsr-routed
+code   0x3ffd80 +0x22  site_thunk select_companion_resolve_s2; site 0x084624 jsr-routed
+code   0x3ffdb0 +0x3c  site_thunk accent_color_aware_0; site 0x02ad82 jsr-routed
+code   0x3ffdf0 +0x3c  site_thunk accent_color_aware_1; site 0x02ad94 jsr-routed
+code   0x3ffe30 +0x3c  site_thunk accent_color_aware_2; site 0x02b342 jsr-routed
+code   0x3ffe70 +0x3c  site_thunk accent_color_aware_3; site 0x02b7e8 jsr-routed
+code   0x3ffeb0 +0x2a  site_thunk ls_freeze_vs2_victim; site 0x023ad8 jsr-routed
+code   0x3ffee0 +0x24  site_thunk ls_freeze_vs2_attacker; site 0x023ade jsr-routed
 code   0x0cf350 +0x16  site_thunk es_type51_dispatch; site 0x0185ca jsr-routed
 # site_thunk name_bank_variant_id: SKIPPED (variant-id-only; tenant is at 0x0f)
 # site_thunk splash_bank_variant_id: SKIPPED (variant-id-only; tenant is at 0x0f)

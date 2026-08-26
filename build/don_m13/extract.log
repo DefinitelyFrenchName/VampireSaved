@@ -1,4 +1,4 @@
-source set /Users/koneko/Developer/Vampire_Saved/ROMS/vsav2.zip:
+source set /Users/koneko/Developer/Vampire_Saved/VampireSaved/../ROMS/vsav2.zip:
   vsav2.zip/vs2j.03  sha1 a52f40618d7f12f1df5862ad8e15fea60bef22a2
   vsav2.zip/vs2j.04  sha1 bf5c2e4339e1a66b3c819900cc9b723a537adf6b
   vsav2.zip/vs2j.05  sha1 4d5625a9a06926c1a42c8f6e3a4c943f17750ec2
@@ -7,7 +7,7 @@ source set /Users/koneko/Developer/Vampire_Saved/ROMS/vsav2.zip:
   vsav2.zip/vs2j.08  sha1 de1184ab771c6f075cdefa744a28b09f78d91643
   vsav2.zip/vs2j.09  sha1 0e9dd54e401e6d7c4fe81107ffd27e42ca810fcb
   vsav2.zip/vs2j.10  sha1 bf0416df66a33c7a4678ab4a047de334dfd3b31e
-oracle set /Users/koneko/Developer/Vampire_Saved/ROMS/vhunt2.zip:
+oracle set /Users/koneko/Developer/Vampire_Saved/VampireSaved/../ROMS/vhunt2.zip:
   vhunt2.zip/vh2j.03a  sha1 f4e3a1b6ae823737d3b18561469f206921b48587
   vhunt2.zip/vh2j.04a  sha1 78c53f8e984b00245486b751515248879df77437
   vhunt2.zip/vh2j.05  sha1 60bbbd1765e76839b01c38765da2368c5188ec61

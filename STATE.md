@@ -37,6 +37,42 @@ survive in the session scratchpad (`refit/`, ~22 frames × 4 replays).
 - STATE.md holds four groups (108 / 109 / 110 / 110b); the ledger ends at
   14z-107. 14z-108 is due to roll to STATE_HISTORY at this close.
 
+### THE #99 CRASH IS NOT FIXED — and it reproduces on MAME by hand (2026-08-26, maintainer)
+
+**Two emulator-derived fixes, both falsified by the board and now by MAME
+itself.** The 14z-109 "root cause captured" (`0x3FB899 = 0x51` walked by
+Phobos's object) came from probe H, which the record marks POKE-CONTAMINATED,
+with "verify the field path funnels through this same node" listed as
+remaining work — NEVER DONE. 14z-110 (d2 window) and 14z-110b (remap) were
+validated against THAT mechanism on rigs; every natural-path rig
+(`audit_don_vs_cpu`, both contexts) ran clean before AND after — the rigs
+never reproduced the field crash, and the maintainer's hands do, on merged15,
+first try. **So the mechanism the board and MAME hit is a DIFFERENT one, or
+the captured node is walked by a path the rigs never take.** Retracted in
+place: HANDOFF's 110b row "field surfaces closed" and patch_index's 110b
+"Field surfaces closed" (this session's own overclaims).
+
+**Next (in flight):** the maintainer records the crash as a MAME `.inp`
+(`WIDE_RECORD=crash_m8 tools/run_wide.sh build/m3b_merged15 mame`, the
+HANDOFF:487 protocol); `tools/run_inp_guarded.sh` + `tests/lua/inp_guard.lua`
+(new this session) play it back in CHEAP mode (no -debug, so the playback
+stays faithful) and read the game's OWN exception record — `$FF0000.w` code,
+`$FF0018-$FF0053` D0-A6, `$FF0054.l` saved SP, the 68k frame at that SP (PC,
+fault address) — the moment it appears, plus a work-RAM dump. First natural-
+path capture of the crash, ever. Everything else (the M8 mark bump, another
+fix) waits on what it says.
+
+### BUILD-DIR POLICY APPLIED (maintainer-conditioned: "IF AND ONLY IF we know we can rebuild")
+
+Rebuildability PROVEN first: `test_m3a_reproducible` PASS (donovan/H/P/stock
+program images + whole-artifact manifests), and `tools/build_merged.sh` into
+scratch reproduced merged15's fingerprint `73690f21` with both zips
+member-content-identical (only zip timestamps differ). Then: m13 generation
+(`don_m13`, `m3b_merged15`, `m5_stock8`) TRACKED; m11 generation (`don_m11`,
+`m3b_merged13`, `m5_stock6`) DELETED (git sees 77 renames — the generations
+are mostly byte-identical); m12 generation stays on disk untracked as the one
+back. `run_all_static --strict` on the resulting tree: PASS 110/0/0.
+
 ### THE 110b CLOSE ORDER, EXECUTED (this session, "go ahead")
 
 | step | result |
@@ -46,7 +82,7 @@ survive in the session scratchpad (`refit/`, ~22 frames × 4 replays).
 | (3) FBNeo oracle reduced refit | **LANDED (86f9cb2)**: FRAME_OVERRIDE 01/21/05 from the measured scan, 06 derived, 26 dropped for 05 (documented in the gate header + CLAUDE.md §4 + HANDOFF); overrides checked against the ratified MAME regions (unsafe = FAIL); FROZEN inventory unchanged. **PASS x2, every frame masked-EXACT** (no phase line at all — the chosen instants are cleaner than the old derived ones ever were) |
 | (4) `run_all_static.sh --strict` | **PASS 110 / SKIP 0 / FAIL 0 / MISSING 0**, no tracked file changed during the run |
 | (4) tags freeze/donovan-m13 + freeze/merged-m8 | **CUT (local, annotated, at the post-refit tree) — NOT pushed; push is the maintainer's call, along with the 12 older unpushed tags** |
-| (1) field verdict on merged-m8 | still the maintainer's — not reported yet |
+| (1) field verdict on merged-m8 | **RED (maintainer, 2026-08-26 evening): the 20:17 bundle (all three files, CRC chain zip->MRA->merged15 VERIFIED `156fd6a8`) STILL CRASHES on the board — same protocol (Donovan 1P, win vs Bishamon, then Phobos), every time, within the match (not necessarily at fight start). AND THE SAME PROTOCOL CRASHES ON MAME ON merged15 BY HAND.** The remap (110b) and the d2 window (110) did not touch the crash. Wheel still M7 (the mark was not bumped for 110b — the tell was useless; bump it next freeze). See "THE #99 CRASH IS NOT FIXED" below. |
 
 
 

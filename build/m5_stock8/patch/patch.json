@@ -763,27 +763,37 @@
   {
    "op": "code",
    "addr": "0xcc010",
-   "hex": "4a29003867064ef9000185080c4000a0651a0c4000a864143200044100a0d241207c000cc000207010004ed04ef900018460"
+   "hex": "137c000f00544e75136b001700544e75137c000700544e75137c00010117137c000500544e75"
   },
   {
-   "op": "code",
-   "addr": "0x18458",
-   "hex": "4ef9000cc010"
+   "op": "data",
+   "addr": "0xcc040",
+   "hex": "000cc010000cc018000cc020000cc028"
   },
   {
    "op": "code",
    "addr": "0xfff40",
+   "hex": "4a29003867260c4000a0651a0c4000a864143200044100a0d241207c000cc040207010004ed04ef9000185080c4000a0651a0c4000a864143200044100a0d241207c000cc000207010004ed04ef900018460"
+  },
+  {
+   "op": "code",
+   "addr": "0x18458",
+   "hex": "4ef9000fff40"
+  },
+  {
+   "op": "code",
+   "addr": "0xfffa0",
    "hex": "2f0d4bf900ff80004aad796666064eb900016c642a5f1d7c000103c2bdfc00ff8400660a0839000000ff806060080839000100ff806067061d7c000003c24ef9000c1030"
   },
   {
    "op": "poke32",
    "addr": "0xbd136",
-   "val": "0x000fff40"
+   "val": "0x000fffa0"
   },
   {
    "op": "poke32",
    "addr": "0xbd176",
-   "val": "0x000fff40"
+   "val": "0x000fffa0"
   },
   {
    "op": "poke32",
@@ -1082,83 +1092,83 @@
   },
   {
    "op": "code",
-   "addr": "0xfff90",
+   "addr": "0x3ffd50",
    "hex": "0c2e000f000a67064ef900015084326e0030137c0008003c303c010b4ef900015088"
   },
   {
    "op": "code",
    "addr": "0x84602",
-   "hex": "4eb9000fff90"
+   "hex": "4eb9003ffd50"
   },
   {
    "op": "code",
-   "addr": "0xfffc0",
+   "addr": "0x3ffd80",
    "hex": "0c2e000f000a67064ef900015084326e0030137c0008003c303c010b4ef900015088"
   },
   {
    "op": "code",
    "addr": "0x84624",
-   "hex": "4eb9000fffc0"
+   "hex": "4eb9003ffd80"
   },
   {
    "op": "code",
-   "addr": "0x3ffd50",
+   "addr": "0x3ffdb0",
    "hex": "0c2e000f0382660c202e03a46726204070024e75306e00300c28000f038266147000102803aeef4820790038c1d4d0c070024e75207c0039a9004e75"
   },
   {
    "op": "code",
    "addr": "0x2ad82",
-   "hex": "4eb9003ffd50"
+   "hex": "4eb9003ffdb0"
   },
   {
    "op": "code",
-   "addr": "0x3ffd90",
+   "addr": "0x3ffdf0",
    "hex": "0c2e000f0382660c202e03a46726204070024e75306e00300c28000f038266147000102803aeef4820790038c1d4d0c070024e75207c0039a9004e75"
   },
   {
    "op": "code",
    "addr": "0x2ad94",
-   "hex": "4eb9003ffd90"
+   "hex": "4eb9003ffdf0"
   },
   {
    "op": "code",
-   "addr": "0x3ffdd0",
+   "addr": "0x3ffe30",
    "hex": "0c2e000f0382660c202e03a46726204070024e75306e00300c28000f038266147000102803aeef4820790038c1d4d0c070024e75207c0039a9004e75"
   },
   {
    "op": "code",
    "addr": "0x2b342",
-   "hex": "4eb9003ffdd0"
+   "hex": "4eb9003ffe30"
   },
   {
    "op": "code",
-   "addr": "0x3ffe10",
+   "addr": "0x3ffe70",
    "hex": "0c2e000f0382660c202e03a46726204070024e75306e00300c28000f038266147000102803aeef4820790038c1d4d0c070024e75207c0039a9004e75"
   },
   {
    "op": "code",
    "addr": "0x2b7e8",
-   "hex": "4eb9003ffe10"
+   "hex": "4eb9003ffe70"
   },
   {
    "op": "code",
-   "addr": "0x3ffe50",
+   "addr": "0x3ffeb0",
    "hex": "b8fc84006706b8fc880066160c2c000f0382660e1d7c000c005c1d7c000c01474e751d7c0018005c4e75"
   },
   {
    "op": "code",
    "addr": "0x23ad8",
-   "hex": "4eb9003ffe50"
+   "hex": "4eb9003ffeb0"
   },
   {
    "op": "code",
-   "addr": "0x3ffe80",
+   "addr": "0x3ffee0",
    "hex": "b8fc84006706b8fc880066100c2c000f03826608197c0004005c4e75197c000b005c4e75"
   },
   {
    "op": "code",
    "addr": "0x23ade",
-   "hex": "4eb9003ffe80"
+   "hex": "4eb9003ffee0"
   },
   {
    "op": "code",
