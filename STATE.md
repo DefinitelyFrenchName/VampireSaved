@@ -70,6 +70,41 @@ tree (CLAUDE.md §4 has wanted "vs each of the 18, both sides"), P1 Donovan vs
 P2 Phobos via the extended wheel, made possible by tonight's P2 scripting.
 Verified P1=Donovan `0x3FA9D0` / P2=Phobos `0x4595B0` load on MAME.
 
+### CORRECTION + SHARPENED LEAD (same session, after the candidate-row check)
+
+**THE ARCADE-BORROW THEORY IS WEAKENED — stated plainly because it was the
+banner above.** I checked Donovan/Phobos/Pyron candidate rows (table A) against
+the dispatcher's handler table read from the RIGHT source (member 04d, not the
+mis-byte-ordered data view): **every candidate value is `0x00-0x18`, and every
+one of those has a valid dispatcher handler.** So the borrow cannot write a
+crash-inducing class into `+0x382`. Probe J proved the dispatcher is UNBOUNDED,
+but with inputs (`0x20`/`0x30`/`0x40`) the borrow can never actually produce.
+Probe J is therefore the right MECHANISM with the wrong INPUT SOURCE.
+
+**THE SHARPENED LEAD, and it fits the field data better: a specific PHOBOS
+MOVE.** The maintainer's own refinement — "Phobos's attacks crash, Donovan's
+never do", "5+MP or 6+MP", "at some point" — plus the crash signature (immediate
+black screen -> the GAME reboots to its RAM test, NO prior graphical/sound
+corruption = a clean jump through a bad pointer, not data rot) points at a
+Phobos move whose execution dereferences a bad pointer. The CPU AI uses
+Phobos's full moveset; a human in 2P may simply never have thrown the exact
+move — which makes "2P clean" most likely a COINCIDENCE, exactly as the
+maintainer cautioned, not a property of the 1P path.
+
+**This is the 14z-73 grab-victim SHAPE** (a move indexing a per-victim
+keyframe/effect table that, for one victim, reads a bad row), possibly UNIFIED
+with the unbounded per-node sfx dispatcher (an anim node carrying an
+out-of-range sfx class in its `+0x16` trigger -> `0x27F16` jumps through
+`table[badclass]`). Both are "a specific move -> a bad pointer jump" and both
+fit every observation.
+
+**THE DISCRIMINATING TEST (maintainer, on hardware): 2P, HUMAN Phobos vs human
+Donovan, deliberately spam Phobos's suspected move (5MP/6MP).** If it crashes,
+the arcade path is IRRELEVANT and the bug is in Phobos's moveset vs a tenant
+victim — chase Phobos's move/effect/keyframe data. If Phobos genuinely cannot
+crash it in 2P no matter the move, the 1P-arcade path really is special and the
+borrow/AI path comes back. Either answer halves the search.
+
 ### NEXT (measurement, not arbitrage — per the maintainer's standing ask)
 
 Reach the pairing NATURALLY and TRACE the borrow's actual write to `+0x382`
