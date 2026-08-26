@@ -73,6 +73,16 @@ import argparse, hashlib, re, sys
 DIRS = {"U": 1 << 7, "D": 1 << 6, "L": 1 << 5, "R": 1 << 4}
 BTNS = {"1": 1 << 8, "2": 1 << 9, "3": 1 << 10}
 SYS = {"C1": 1 << 0, "C2": 1 << 1, "S1": 1 << 2, "S2": 1 << 3}
+
+# P2 (14z-109). Bits 12+ were UNUSED, which is the whole reason P2 goes
+# there: every sim_inputs.hex written before this change is BYTE-IDENTICAL
+# under it, so the frozen expectations and every measured anchor are
+# provably unmovable rather than merely believed to be. A replay that
+# scripts no p2 token emits exactly the bytes it always did.
+# Same MSB-first nibble order as P1 -- mirrored deliberately, so there is
+# one direction convention in this file and not two.
+P2DIRS = {"U": 1 << 15, "D": 1 << 14, "L": 1 << 13, "R": 1 << 12}
+P2BTNS = {"1": 1 << 16, "2": 1 << 17, "3": 1 << 18}
 TOK = re.compile(r"^(\d+)(?:-(\d+))?\s+(.*)$")
 
 
@@ -106,8 +116,14 @@ def parse(text):
                     else:
                         raise SystemExit(f"line {ln}: unknown p1 token {t!r}")
             elif who == "p2":
-                raise SystemExit(f"line {ln}: p2 input is not expressible in jtframe v1.7.3 "
-                                 "sim_inputs.hex (P1 only) — refusing")
+                for t in toks:
+                    if t in P2DIRS: bits |= P2DIRS[t]
+                    elif t in P2BTNS: bits |= P2BTNS[t]
+                    elif t in "456":
+                        raise SystemExit(f"line {ln}: p2 button {t} is not expressible "
+                                         "(buttons 1-3 only, mirroring p1) — refusing")
+                    else:
+                        raise SystemExit(f"line {ln}: unknown p2 token {t!r}")
             elif who == "sys":
                 for t in re.findall(r"S1|S2|C1|C2|SV|TS", toks):
                     if t in SYS: bits |= SYS[t]

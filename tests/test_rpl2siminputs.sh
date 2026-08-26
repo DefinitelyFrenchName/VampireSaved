@@ -67,7 +67,7 @@ h="$(shasum "$T/c.hex" | cut -c1-40)"
 [ "$h" = "eb3e1d04e58b3a2b7bf713d40c4d6ac4796e550c" ] && ok "3 05_timeout_idle frozen $h" || bad "3 05_timeout_idle moved: $h"
 
 # 4 refusals MUST fire
-for case in "1 p2=U" "1 p1=4" "1 p1=6" "1 sys=TS"; do
+for case in "1 p2=4" "1 p1=4" "1 p1=6" "1 sys=TS"; do
     printf '%s\n' "$case" > "$T/r.rpl"
     if $P "$T/r.rpl" "$T/r.hex" >/dev/null 2>&1; then bad "4 refusal did not fire for '$case'"; else ok "4 refused '$case'"; fi
 done
@@ -128,6 +128,43 @@ printf '080\n000\n010\n' > "$T/f.hex"
 n="$(dirbits_in "$T/f.hex")"
 [ "$n" = "2" ] && ok "6b control fired: the direction-bit counter counts (2 of 3)" \
                 || bad "6b CONTROL DID NOT FIRE: counter returned $n on a file with 2 direction lines"
+
+# 7 PLAYER 2 IS SCRIPTABLE (14z-109), AND IT DID NOT MOVE PLAYER 1.
+# The COVERAGE half deferred since 14z-107 (8). P2 went into file bits 12+
+# because everything at and below bit 11 was already spoken for and bits 12+
+# were UNUSED -- which is what makes the change provably backward compatible
+# rather than believed to be. Check 3 above is the proof: the frozen
+# 05_timeout_idle sha1 is asserted AFTER this change and is the same value.
+p2bits_in(){   # count lines with any P2 bit (12..18) set
+    python3 -c 'import sys; print(sum(1 for l in open(sys.argv[1]) if int(l,16) & 0x7f000))' "$1"
+}
+printf '1 p2=U\n2 p2=D\n3 p2=L\n4 p2=R\n5 p2=1\n6 p2=2\n7 p2=3\n' > "$T/p2.rpl"
+if $P "$T/p2.rpl" "$T/p2.hex" --frames 7 >/dev/null 2>&1; then
+    ok "7a p2 tokens are accepted (the 14z-107 (8) COVERAGE gap is closed)"
+else
+    bad "7a p2 tokens are still refused"
+fi
+if [ -s "$T/p2.hex" ]; then
+    got="$(awk '{printf "%s ", $1}' "$T/p2.hex")"
+    # minimal-width hex, NOT zero-padded: padding would rewrite every
+    # existing sim_inputs.hex and move check 3's frozen sha1.
+    exp="8000 4000 2000 1000 10000 20000 40000 "
+    [ "$got" = "$exp" ] \
+        && ok "7b p2 bit map frozen (U=8000 D=4000 L=2000 R=1000; buttons 10000/20000/40000)" \
+        || bad "7b p2 bit map is [$got], expected [$exp]"
+else
+    bad "7b no p2 output produced"
+fi
+# 7c BACKWARD COMPATIBILITY asserted directly, not inferred from check 3:
+# a replay scripting no p2 must set no P2 bit at all.
+$P "$REPO/tests/replays/05_timeout_idle.rpl" "$T/nop2.hex" >/dev/null
+n2="$(p2bits_in "$T/nop2.hex")"
+[ "$n2" = "0" ] && ok "7c a replay scripting no p2 sets ZERO P2 bits — old files are byte-identical" \
+                || bad "7c 05_timeout_idle sets a P2 bit on $n2 lines — backward compatibility is broken"
+# 7d MUST-FIRE CONTROL: 7c has to be able to fail.
+n3="$(p2bits_in "$T/p2.hex")"
+[ "$n3" = "0" ] && bad "7d CONTROL DID NOT FIRE: the P2-bit counter reads 0 on a replay that scripts P2" \
+                || ok "7d control fired: the P2-bit counter counts ($n3 of 7)"
 
 rm -rf "$T"
 [ $fail = 0 ] && echo "PASS test_rpl2siminputs" || { echo "FAIL test_rpl2siminputs"; exit 1; }
