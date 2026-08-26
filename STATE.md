@@ -42,10 +42,10 @@ survive in the session scratchpad (`refit/`, ~22 frames × 4 replays).
 | step | result |
 |---|---|
 | (2) full-suite acceptance verify on don_m13 (MAME) | **SUITE GREEN** — 65 PASS, 0 FAIL; SKIPs = the vsav2-target ground-truth halves only; no tracked file changed |
-| (2) audit_guard_corpus on merged15 (JOBS=2) | running at the time of writing (see below for the verdict) |
+| (2) audit_guard_corpus on merged15 (JOBS=2) | **PASS 332/332 guarded runs, zero vectors** (`build/guard_corpus/m3b_merged15.1787771888.tsv`, tracked) |
 | (3) FBNeo oracle reduced refit | **LANDED (86f9cb2)**: FRAME_OVERRIDE 01/21/05 from the measured scan, 06 derived, 26 dropped for 05 (documented in the gate header + CLAUDE.md §4 + HANDOFF); overrides checked against the ratified MAME regions (unsafe = FAIL); FROZEN inventory unchanged. **PASS x2, every frame masked-EXACT** (no phase line at all — the chosen instants are cleaner than the old derived ones ever were) |
 | (4) `run_all_static.sh --strict` | **PASS 110 / SKIP 0 / FAIL 0 / MISSING 0**, no tracked file changed during the run |
-| (4) tags freeze/donovan-m13 + freeze/merged-m8 | cut AFTER the guard corpus is green (local; push is the maintainer's) |
+| (4) tags freeze/donovan-m13 + freeze/merged-m8 | **CUT (local, annotated, at the post-refit tree) — NOT pushed; push is the maintainer's call, along with the 12 older unpushed tags** |
 | (1) field verdict on merged-m8 | still the maintainer's — not reported yet |
 
 
