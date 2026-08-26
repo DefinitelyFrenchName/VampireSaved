@@ -25,7 +25,7 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-RP="${1:-build/m3b_merged14/rompath}"  # re-pointed 14z-110
+RP="${1:-build/m3b_merged15/rompath}"  # re-pointed 14z-110b
 NAME="${2:-merged-m6}"
 [ -d "$RP" ] || { echo "SKIP: $RP missing"; exit 77; }
 command -v xdelta3 >/dev/null || { echo "SKIP: xdelta3 not installed"; exit 77; }

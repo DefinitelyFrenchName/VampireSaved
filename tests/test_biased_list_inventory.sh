@@ -38,7 +38,7 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD_D="${BUILD_D:-build/don_m12}"  # re-pointed 14z-110
+BUILD_D="${BUILD_D:-build/don_m13}"  # re-pointed 14z-110b
 BUILD_H="${BUILD_H:-build/hui46}"   # re-pointed 14z-102 (the freeze)
 BUILD_P="${BUILD_P:-build/pyron31}"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT

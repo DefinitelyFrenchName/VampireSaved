@@ -40,7 +40,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 # pyron17 (test_pyron_blink); see docs/project/gotchas.md "A frozen build
 # stops being a usable REFERENCE". RE-POINT THIS ON THE NEXT DONOVAN
 # RE-FREEZE.
-BUILD="${1:-build/don_m12}"  # re-pointed 14z-110
+BUILD="${1:-build/don_m13}"  # re-pointed 14z-110b
 [ -f "$BUILD/patch/patch.json" ] || { echo "SKIP: no $BUILD/patch/patch.json"; exit 0; }
 [ -f build/out/vsavj_opcodes.bin ] || { echo "SKIP: no build/out/vsavj_opcodes.bin"; exit 0; }
 

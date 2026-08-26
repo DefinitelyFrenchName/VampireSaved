@@ -40,7 +40,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 fail=0; ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }
 
 RPL="$REPO/tests/replays/108_tenant_voice.rpl"
-BUILD="${BUILD:-build/m3b_merged14}"  # re-pointed 14z-110
+BUILD="${BUILD:-build/m3b_merged15}"  # re-pointed 14z-110b
 FRAMES="${FRAMES:-4400}"
 OUTDIR=""; POSLOG=""; NEGLOG=""
 while [ $# -gt 0 ]; do

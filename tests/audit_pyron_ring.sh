@@ -41,7 +41,7 @@ cd "$REPO"
 # after which a mash rig is playing two different fights, so the whole-run
 # id-SET comparison was invalid rather than failing. The comparison is now
 # event-stream-with-a-frozen-onset; see the block below for the measurements.
-MERGED="${1:-build/m3b_merged14}"  # re-pointed 14z-110
+MERGED="${1:-build/m3b_merged15}"  # re-pointed 14z-110b
 SOLO="${2:-build/pyron31}"    # pyron-m14 (14z-105; was pyron-m13, the shipping solo (carries
                               # pyr_sfx_records, as pyron-m4 did at 14z-85b)
 [ -f "$MERGED/rompath/vsavjw.zip" ] || { echo "SKIP: no $MERGED"; exit 0; }

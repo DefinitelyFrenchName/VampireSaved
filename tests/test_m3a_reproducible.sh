@@ -62,13 +62,15 @@ trap 'rm -rf "$WORK"' EXIT
 # EXPECT_WIDE="d038553dec5b8a7759e96f46b2fa0964c652a21b"  # git tag freeze/donovan-m8
 # EXPECT_WIDE="428fc0c9421cb5ba96db040bae0fc4935a3f5228"  # git tag freeze/donovan-m9
 # EXPECT_WIDE="c6a02cb01b0eb7c80cdd22cba8796030677ae706"  # git tag freeze/donovan-m10
-EXPECT_WIDE="60b55a12a9b241b15242c3fedafd524788c6b988"   # 14z-110 (#99 d2 window)
+# EXPECT_WIDE="60b55a12a9b241b15242c3fedafd524788c6b988"  # 14z-110 d2 window
+EXPECT_WIDE="ec86330ff1c5e1c8945973b55f434991801f5ead"   # 14z-110b (the 0x51->0x44 remap)
 # EXPECT_STOCK="a054de5c0cfe868cb0aa9722abebdffd9dfcdb0d"  # unchanged 14z-86..14z-96
 # 14z-99: THE STOCK TWIN MOVED for the first time since 14z-91 — #103's
 # pcrel_escape_fix rows are not profile-gated (the stock track gets the
 # stall fix too, by design). #104/#105 rows are variant-gated: no effect.
 # EXPECT_STOCK="16da59b6b29f4082b69c06d3e662843af4d00cc3"  # git tag freeze/donovan-m9
-EXPECT_STOCK="cf4557602d82c6dbb1ccb76b5377825effdd5526"  # 14z-110 (the d2 window moves stock too — not profile-gated)
+# EXPECT_STOCK="cf4557602d82c6dbb1ccb76b5377825effdd5526"  # 14z-110
+EXPECT_STOCK="d29fd0620f67dcd70939be8712e9f86cff558ca3"  # 14z-110b (the remap rides stock too)
 # huitzil-m3 (14z-79, maintainer-ratified). Supersedes huitzil-m2
 # (9deda0808e87601b10e2171405805d4669ba2624), which can no longer be
 # produced from the tree: huitzil.toml gained the (b') index-window thunk
@@ -200,10 +202,12 @@ done
 # MANI_WIDE="53b7a65fb27039d6ef6e80f6450bb78933691096 42"  # 14z-99 window
 # MANI_WIDE="3a67825670ebd764cdf104f8f23293ffbe2b9732 42"  # 14z-102 window
 # MANI_WIDE="6b746e17cc8421bd308c5fad6862760209b58093 42"  # 14z-105 window
-MANI_WIDE="fc816b5aa1e88ca184f7ac38ff7fd8cc210ecc0a 42"   # 14z-110 (delta: vm3j.03d/04d/10b + vsw.41 PROGRAM — the #99 reaction_hook d2 window + its +0x60 relocations; vsw.33m/37m GROUP C — the M7 version glyphs; no QSound member moved)
+# MANI_WIDE="fc816b5aa1e88ca184f7ac38ff7fd8cc210ecc0a 42"   # 14z-110 (delta: vm3j.03d/04d/10b + vsw.41 PROGRAM — the #99 ...  # 14z-110
+MANI_WIDE="f6abea514715b965ddfed2aab87e5df9c31bef03 42 42"   # 14z-110b (delta: vm3j.10b — the six remap bytes; nothing else moved)
 # MANI_STOCK="08aac0881648185a9487230a3ac5fe19b78408d3 30"  # 14z-99 window (#103)
 # MANI_STOCK="23314532b00a77adaed4bda4b9e52155ad209252 30"  # 14z-102
-MANI_STOCK="9985bf46a62732b32cbe143850b65a05038093f1 30"   # 14z-110 (delta: vm3j.03d/04d/10b PROGRAM only — the d2 window is NOT profile-gated so stock carries it; NO gfx member moved, the M7 mark IS profile-gated — the member-level proof both ways)
+# MANI_STOCK="9985bf46a62732b32cbe143850b65a05038093f1 30"   # 14z-110 (delta: vm3j.03d/04d/10b PROGRAM only — the d2 wind...  # 14z-110
+MANI_STOCK="af4f5e986c2fb1ad6ae90f71869cfbf4e103c80c 30 30"   # 14z-110b (delta: vm3j.10b — the six remap bytes; nothing else moved)
 # 14z-94 (#91 + #92). Attributed per member before re-pinning: exactly FOUR
 # members moved — vm3j.03d, vm3j.04d, vm3j.10b and vsw.41, all PROGRAM
 # members. No gfx member and no QSound member changed, which is what a
@@ -274,11 +278,13 @@ m3a_manifest pyron       "$WORK/pyron/rompath"     "$MANI_PYR"
 # EXPECT_MERGED="2343607a4c5b0f0451bbfc6bcb3d9969eb2343c5"  # merged-m4, git tag freeze/merged-m4
 # EXPECT_MERGED="393f92a5e2ab2dfd3ed3d4a9d50acfc06c8fe19f"  # merged-m5, git tag freeze/merged-m5
 # EXPECT_MERGED="64426955bf7877908a1014f134040c9672bddf5a"   # merged-m6, 14z-105 window — == the rehearsed merged_probe_w6, bit-for-bit (probe dir attic'd 14z-106; the pin is the fingerprint, not the dir)  # merged-m6 (14z-105)
-EXPECT_MERGED="761fd35af754d791e5a7863ca670673e85588c22"   # 14z-110 merged-m7 (the #99 d2 window + the M7 mark)
+# EXPECT_MERGED="761fd35af754d791e5a7863ca670673e85588c22"  # 14z-110 merged-m7
+EXPECT_MERGED="73690f21ebf1b83d31aad647f2b145169b175bf2"   # 14z-110b merged-m8 (the remap)
 # MANI_MERGED="59f3b42e7f0022f509c3cc912abc54f159183688 42"  # 14z-99 window
 # MANI_MERGED="22092b65fd9db2f5b79f211afb51625a542cd45c 42"  # 14z-102 window
 # MANI_MERGED="efea5e9d0bd9590383eb614016eed1c388bf9c2b 42"  # 14z-105 window
-MANI_MERGED="75a253eab6b47f5fb8772a719f4f6d59c173e96a 42"   # 14z-110 (delta: vm3j.03d/04d/07b/10b + vsw.41/42 PROGRAM — the #99 d2 window + relocations in the merged layout; vsw.33m/37m GROUP C — the M7 glyphs; no QSound member moved. Measured twice: artifact_manifest on build/m3b_merged14 AND the gate's own scratch rebuild, identical)
+# MANI_MERGED="75a253eab6b47f5fb8772a719f4f6d59c173e96a 42"   # 14z-110 (delta: vm3j.03d/04d/07b/10b + vsw.41/42 PROGRAM —...  # 14z-110
+MANI_MERGED="cd39a81c5e2692eb9726269f4b81c74ff2b1a402 42 42"   # 14z-110b (delta: vm3j.10b — the six remap bytes; nothing else moved)
 
 MERGED_NEEDS="build/m5_wide/extract build/hui32/extract build/pyron21/extract
 build/wide0/rompath/vsavjw.zip"

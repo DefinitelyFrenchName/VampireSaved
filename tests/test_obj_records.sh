@@ -31,7 +31,7 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD="${1:-build/m3b_merged14}"  # re-pointed 14z-110
+BUILD="${1:-build/m3b_merged15}"  # re-pointed 14z-110b
 RPL="$REPO/tests/replays/36_pick_tenant_cell.rpl"
 FRAME=2886                     # the frozen tenant-oracle MAME anchor
 TOOL="$REPO/tools/oram_obj_records.py"
