@@ -94,7 +94,12 @@ PY
 # Pokes: force PHOBOS (0x10) at the initial select; force DONOVAN (0x13)
 # at the measured post-loss re-select window. No HP pokes.
 PK="1704:ff8782:10;1760:ff8782:10;1900:ff8782:10;2100:ff8782:10;2400:ff8782:10"
-PK="$PK;32040:ff8782:13;32100:ff8782:13;32160:ff8782:13;32220:ff8782:13"
+# 14z-110 second measurement: pokes only at f32040-32220 did NOT land (P1
+# came out Bulleta) — the re-select's class read sits elsewhere in the
+# window than the initial select's. Blanket the WHOLE measured re-select
+# window instead (open ~f31940, match f32580): every 40 frames, last write
+# closest to load wins.
+PK="$PK;$(python3 -c "print(';'.join(f'{fr}:ff8782:13' for fr in range(31960,32560,40)))")"
 # 14z-110: the post-continue first draw is VENUE-STEERED to Phobos (venue
 # 0x02 on Donovan's row; EVEN values only — game/gotchas.md), so assertion 5
 # no longer depends on the lottery the 14z-100 freeze got lucky with.
