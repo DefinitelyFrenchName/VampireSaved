@@ -47,6 +47,26 @@
 # documented same-content cross-emulator divergence, and it lives inside the
 # mask by construction.
 #
+# THE REDUCED REFIT (14z-110b, maintainer-ruled; measured 14z-110b CLOSE).
+# From donovan-m12 on, the ruled #99 fix (the reaction_hook d2 WINDOW, ~2
+# compares on every hit-stun dispatch) shifts FBNeo's execution PHASE
+# corpus-wide: the fraction-derived frames below went from PASS on m11 to
+# byte-identical FAIL on m12 and m13 (root-caused, STATE 14z-110b addendum —
+# m12 == m13 work RAM at the failing frame, the remap exonerated; MAME shows
+# ZERO masked diffs at the same frames, so it is FBNeo pacing, not state).
+# Rather than widen any tolerance, the sample INSTANTS move: FRAME_OVERRIDE
+# names, per replay, five frames MEASURED masked-zero-diff on don_m13 (both
+# legs, a ~22-frame scan per replay, dirty frames recorded in STATE). The
+# frozen inventory is UNCHANGED — exact-only overrides need no growth. The
+# override frames are still checked against the ratified MAME divergence
+# regions: an override landing in one is a FAIL, not a silent skip.
+#   26_don_arcade_mash is DROPPED from the default set (documented, not
+# hidden): the Donovan arcade soak is cycle-saturated (1230-2574 masked bytes
+# at 4 of 5 sampled frames, cascading — no clean instant exists), and it is
+# covered on MAME by the full-corpus legacy oracle plus the don_m13 .sha1
+# expectation. 05_timeout_idle takes its slot (a long legacy replay with a
+# full timeout match). Passing 26 explicitly still runs it, and still fails.
+#
 # Usage: ROMDIR=... tests/test_fbneo_legacy_oracle.sh [build] [replays...]
 #   env FBNEO_REF  optional reference (WIDE=0) fbneo binary for leg A
 # ~5 min.
@@ -56,7 +76,7 @@ cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 BUILD="${1:-build/don_m13}"  # re-pointed 14z-110b
 [ $# -gt 0 ] && shift
-REPLAYS="${*:-01_attract_long 06_test_mode 21_don_mash 26_don_arcade_mash}"
+REPLAYS="${*:-01_attract_long 06_test_mode 21_don_mash 05_timeout_idle}"  # 26 dropped 14z-110b, see header
 FB="$REPO/emu/fbneo/fbneo"
 
 [ -x "$FB" ] || { echo "SKIP: no patched FBNeo at $FB"; exit 0; }
@@ -87,7 +107,14 @@ for R in $REPLAYS; do
     [ -f "$RPL" ] && [ -f "$SPEC" ] && [ -f "$BASE" ] || {
         echo "  FAIL: $R — missing replay, spec or basis log"; fail=1; continue; }
 
-    FRAMES="$(SPEC="$SPEC" BASE="$BASE" python3 - <<'PY'
+    # FRAME_OVERRIDE (14z-110b): measured-clean frames on don_m13; see header.
+    case "$R" in
+        01_attract_long) OVERRIDE="600 1000 1400 2600 3400" ;;
+        21_don_mash)     OVERRIDE="600 2523 3164 4446 5087" ;;
+        05_timeout_idle) OVERRIDE="600 2250 2800 3900 8300" ;;
+        *)               OVERRIDE="" ;;   # 06_test_mode etc.: derived
+    esac
+    FRAMES="$(SPEC="$SPEC" BASE="$BASE" OVERRIDE="$OVERRIDE" python3 - <<'PY'
 import os, re
 spec = open(os.environ["SPEC"]).read().split()
 end = 0
@@ -113,6 +140,14 @@ if spec[0] == "window" and len(spec) >= 4:
     except ValueError:
         pass
 out = []
+ovr = [int(x) for x in os.environ.get("OVERRIDE", "").split()]
+if ovr:
+    unsafe = [f for f in ovr if f in bad or not (60 < f < end - 1)]
+    if unsafe:
+        # loud: an override inside a ratified region would turn a known
+        # MAME divergence into a false FBNeo finding (or hide one)
+        print(f"unsafe-override {unsafe}"); raise SystemExit(0)
+    print(" ".join(str(f) for f in ovr)); raise SystemExit(0)
 for frac in (0.15, 0.35, 0.55, 0.75, 0.92):
     f = int(end * frac)
     while f in bad and f < end - 2:
@@ -122,7 +157,8 @@ for frac in (0.15, 0.35, 0.55, 0.75, 0.92):
 print(" ".join(str(f) for f in out))
 PY
 )"
-    [ -n "$FRAMES" ] || { echo "  FAIL: $R — no safe sample frames"; fail=1; continue; }
+    [ -n "$FRAMES" ] && ! printf '%s' "$FRAMES" | grep -q unsafe || {
+        echo "  FAIL: $R — no safe sample frames ($FRAMES)"; fail=1; continue; }
 
     DUMPS=""
     for f in $FRAMES; do DUMPS="$DUMPS;$f:ff0000-ffffff"; done

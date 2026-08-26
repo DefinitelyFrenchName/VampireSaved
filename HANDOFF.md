@@ -2832,7 +2832,12 @@ tests/test_fbneo_legacy_oracle.sh     # 14z-92 (GitHub #78 PARTIAL): the
                                       # inertness, and the hacked-build
                                       # legacy comparison lived on MAME —
                                       # never their product. 4 replays x 5
-                                      # frames; SAMPLE FRAMES ARE DERIVED
+                                      # frames (14z-110b: 26_don_arcade_mash
+                                      # DROPPED for 05_timeout_idle, frames
+                                      # are measured-clean OVERRIDES — the
+                                      # d2-window cycles moved FBNeo's phase;
+                                      # gate header); otherwise SAMPLE FRAMES
+                                      # ARE DERIVED
                                       # from each replay's frozen MAME spec
                                       # and pushed clear of every ratified
                                       # flicker/window, so a mismatch is

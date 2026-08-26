@@ -121,7 +121,11 @@ legacy behavior is a failed change.
   runner executed** — see GitHub #30), and since 14z-92 a
   **sampled** hacked-build-vs-vanilla legacy check
   (`test_fbneo_legacy_oracle.sh` — 4 replays × 5 frames, chosen clear of every
-  ratified divergence). The **full** FBNeo legacy track is
+  ratified divergence; **since 14z-110b (maintainer-ruled) the frames are
+  MEASURED-CLEAN OVERRIDES per replay and 26_don_arcade_mash is dropped
+  for 05_timeout_idle** — the ruled d2-window cycles shift FBNeo's phase
+  corpus-wide, the soak has no clean instant, and it stays MAME-covered;
+  the inventory did not grow — see the gate header). The **full** FBNeo legacy track is
   ACCEPTED-AND-DEFERRED: FBNeo has no frozen expectation corpus by design
   (every FBNeo gate is a live A/B, which is what makes them
   machine-independent), so building it means either freezing an FBNeo basis or
