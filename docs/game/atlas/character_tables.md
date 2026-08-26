@@ -394,3 +394,29 @@ facts established in the process:
   `0x0D609E`/`0x0D8398` — below/above bank[0], mapping to vsavj by the bank
   delta rule if the neighborhood layout matches (verify at patch
   generation).
+
+## The CPU AI action-script tables `PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A` (14z-111, #99)
+
+Four per-class tables of script-start pointers, **32 longs each: 16 classes
+then the SAME 16 repeated** (Capcom's aliasing guard — an id with bit 4 set
+silently plays class `id & 0x0F`; Oboro Bishamon 0x18 legitimately aliases
+0x08). vs2 twins by bank-origin arithmetic (`vsavj - 0xBD0FA + 0xD7298`):
+`0xD91B8 / 0xD9238 / 0xD92B8 / 0xD9338`, which carry REAL rows for 0x10/0x11/
+0x13 into vs2's script pool `0x100000-0x102B98` (per-class contiguous blocks:
+Phobos `0x100000+0xE3C`, Pyron `0x100E3C+0xC8E`, Donovan `0x101ACA+0x10CE`;
+vhunt2 byte-identical at shift 0 over `0x100000-0x10350A`).
+
+| table | consumer (vsavj) | index | writes | note |
+|---|---|---|---|---|
+| `0xBF01A` (`ai_script_0`) | `0x2CCB6` | `+0x382<<2`, then `+0x205` word offset | `+0x210`, `+0x224` | the main per-class script pool |
+| `0xBF09A` (`ai_script_1`) | `0x2CCF2` | `+0x382<<2`, then RNG `0x14E8A & 0x1F + (0x20A,a6)` | `+0x214` | random pick among 32 starts |
+| `0xBF11A` (`ai_script_2`) | `0x2CD40` | same | `+0x218` | |
+| `0xBF19A` (`ai_script_3`) | `0x2CD9C` | same | `+0x21C` | |
+
+All four are CPU-side only (14z-98 trace: never read in 2P). Until 14z-111
+the port left them PARKED (bank_map), so tenant classes read the alias half:
+Phobos ran DEMITRI's AI — the #99 crash (engine_internals "The CPU AI
+action-script system"). bank_map rows `ai_script_0..3` (data_ptr, `region =
+"auto"`) + one DATA extra root per tenant now provision the alias-half slots
+`table + class*4` with the tenant's own relocated block.
+
