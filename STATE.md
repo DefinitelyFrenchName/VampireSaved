@@ -70,6 +70,35 @@ tree (CLAUDE.md §4 has wanted "vs each of the 18, both sides"), P1 Donovan vs
 P2 Phobos via the extended wheel, made possible by tonight's P2 scripting.
 Verified P1=Donovan `0x3FA9D0` / P2=Phobos `0x4595B0` load on MAME.
 
+### FIELD CONFIRMATION x2: Donovan-vs-BISHAMON crash + the video
+
+**(1) The maintainer reproduced the crash in Donovan vs BISHAMON.** This is
+the root cause's own prediction landing: the bad node is in DONOVAN'S data
+block and is walked by his OPPONENT — whoever that is. Phobos was never
+special; the ladder just funnels there. Kills every remaining Phobos-specific
+theory (and further de-weights the sidekick reading).
+
+**(2) The crash video (`../videos/donovan_phobos-2nd_fight_crash.mp4`, 21 s,
+CRT @ 60fps) — read frame by frame:**
+- Sequence: Bishamon win quote -> Donovan victory art -> VS screen **Donovan
+  vs Phobos, CONCRETE CAVE** (the decoded table pairing, on screen) -> intro
+  with the shell + kids -> fight.
+- ~1 s before the cut: an effect-heavy CONNECTING exchange — Phobos lands an
+  arm-thrust (consistent with the earlier 5+MP/6+MP suspicion).
+- **The last gameplay frame is NEUTRAL** — both fighters standing apart. The
+  crash follows the exchange by ~0.5-1 s, matching "not necessarily during a
+  hit": the bad node is walked in the post-exchange anim chain, not in the
+  hit event itself.
+- The reset shows a BRIEF white-on-black check list ("WORK RAM OK / CPS0..2
+  RAM OK / OBJECT RAM OK / Q SOUND RAM OK") drawing progressively, then the
+  name screen — the soft-reset path's abbreviated check, exactly what the
+  decoded exception handler predicts (and distinct from the gold full test).
+
+Every observable in the video is downstream of the captured mechanism. The
+remaining work is unchanged: identify the record family of `0x3FB882` in the
+extraction and the vsavj renumbering of vs2's `0x51` — maintainer-facing,
+fix as a remap rule per the 14z-33/35 shape.
+
 ### ROOT CAUSE CAPTURED — a vs2-numbered type byte in DONOVAN'S ported data
 
 The extended guard probe (`GUARD_PROBE=1850c`, cond `(d1&1)==1`, PROBE line now
