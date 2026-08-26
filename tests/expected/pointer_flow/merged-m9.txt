@@ -1,7 +1,11 @@
-# pointer-flow baseline for merged-m8 (build/m3b_merged15), frozen 14z-111 — the 14z-110 freeze's
-# skipped re-freeze (the pairs still pointed at merged13 through two freezes; delta MEASURED IDENTICAL on
-# merged14 and merged15, so it is the 14z-110 d2 window, not the 110b remap).
-# The two merged STRONG lines are the 14z-100-reviewed win_pal sparse-block biased bases, re-placed
+# pointer-flow baseline for merged-m9 (build/m3b_merged16), frozen 14z-111 — the #99 root-cause fix.
+# vs merged-m8: the three tenant AI-script DATA blocks (x101aca 0x10CE at the wide_ext HEAD via
+# region_space, x100000@huitzil 0xE3C, x100e3c@pyron 0xC8E) shift every later ext region uniformly
+# (huitzil +0x10D0, pyron +0x1ED0, pools +0x2B60): the two STRONG win_pal biased bases move site AND
+# target by +0x2B60, content unchanged. WEAK data:long 1131 -> 1183: the new word-offset script
+# streams contain 52 4-byte windows that read as longs into WIDE holes (measured, not reviewed as
+# pointers — the extractor's segmented oracle found 0 pointer fields in all three blocks).
+STRONG lines are the 14z-100-reviewed win_pal sparse-block biased bases, re-placed
 # by the window's +0x60 allocation shift (the reaction_hook thunk grew 50->82 bytes; site AND target
 # both +0x60 from merged-m6, pool content byte-identical).
 # WEAK-COUNT code:move_imm 3 is NEW BY CLASSIFICATION, not by bytes: `move.l #$4C223B,d0` at
@@ -10,7 +14,7 @@
 # palette pool at 0x4c21f0-0x4c2290 in merged13, which moved +0x60 and left 0x4c223b as fill.
 # STRONG lines are REVIEWED findings (see hardening_register.md);
 # WEAK-COUNT lines freeze the noise volume — growth = investigate.
-STRONG	code:movea_imm	0x4d0df0+0x16	0x4c4370	WIDE-HOLE
-STRONG	code:movea_imm	0x4d0df0+0x24	0x4ca310	WIDE-HOLE
-WEAK-COUNT	data:long	1131
+STRONG	code:movea_imm	0x4d3950+0x16	0x4c6ed0	WIDE-HOLE
+STRONG	code:movea_imm	0x4d3950+0x24	0x4cce70	WIDE-HOLE
+WEAK-COUNT	data:long	1183
 WEAK-COUNT	code:move_imm	3

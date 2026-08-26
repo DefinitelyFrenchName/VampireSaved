@@ -63,7 +63,8 @@ trap 'rm -rf "$WORK"' EXIT
 # EXPECT_WIDE="428fc0c9421cb5ba96db040bae0fc4935a3f5228"  # git tag freeze/donovan-m9
 # EXPECT_WIDE="c6a02cb01b0eb7c80cdd22cba8796030677ae706"  # git tag freeze/donovan-m10
 # EXPECT_WIDE="60b55a12a9b241b15242c3fedafd524788c6b988"  # 14z-110 d2 window
-EXPECT_WIDE="ec86330ff1c5e1c8945973b55f434991801f5ead"   # 14z-110b (the 0x51->0x44 remap)
+# EXPECT_WIDE="ec86330ff1c5e1c8945973b55f434991801f5ead"   # 14z-110b (the 0x51->0x44 remap)
+EXPECT_WIDE="772d80521715ca484eeecb877dacef50bc233901"   # 14z-111 donovan-m14 (the #99 root-cause fix: AI script rows + x101aca at the wide_ext head via region_space; M8 mark is gfx-only)
 # EXPECT_STOCK="a054de5c0cfe868cb0aa9722abebdffd9dfcdb0d"  # unchanged 14z-86..14z-96
 # 14z-99: THE STOCK TWIN MOVED for the first time since 14z-91 — #103's
 # pcrel_escape_fix rows are not profile-gated (the stock track gets the
@@ -108,7 +109,8 @@ EXPECT_STOCK="d29fd0620f67dcd70939be8712e9f86cff558ca3"  # 14z-110b (the remap r
 # EXPECT_HUI="bfd819a012218b9e8022be17b0747319a76f3140"  # git tag freeze/huitzil-m17
 # EXPECT_HUI="c4bbb3752cc93494455bfebb83fff801051c7fec"  # git tag freeze/huitzil-m18
 # EXPECT_HUI="1a7249d68d1ce8472c5a25ab6bd05ef099c2ff29"  # git tag freeze/huitzil-m19
-EXPECT_HUI="24a27940656c160c909de3a690e74da8aa7e9432"   # 14z-105 window (oboro hook + version string; placements +0x10)
+# EXPECT_HUI="24a27940656c160c909de3a690e74da8aa7e9432"   # 14z-105 window (oboro hook + version string; placements +0x10)
+EXPECT_HUI="cd362ca4509ffa05d388ab8ec54321d4bc8b8b45"   # 14z-111 huitzil-m21 (AI script rows + x100000 + the 4 recon rows)
 # pyron-m3 (14z-82c: + the ADOPTED hitclass_map_extend thunk — the f7997 fix)
 # EXPECT_PYR="6c7f7322da793c12b3681dd3ef5a76b3792ae5d0"  # git tag freeze/pyron-m3
 # pyron-m4 (14z-85b, maintainer-ruled: + pyr_sfx_records — kills the merged
@@ -127,7 +129,8 @@ EXPECT_HUI="24a27940656c160c909de3a690e74da8aa7e9432"   # 14z-105 window (oboro 
 # EXPECT_PYR="738bcfc2c06b008d7d4cef61f31faf74df784206"  # git tag freeze/pyron-m11
 # EXPECT_PYR="4c3c072bfe7a7b422d27194c986b27f53238f554"  # git tag freeze/pyron-m12
 # EXPECT_PYR="dbce705b0cf92f93103da73da35b55a75f05b666"  # git tag freeze/pyron-m13
-EXPECT_PYR="6bf265abc5b8e0980f7f8b29fd39b64814af8a86"   # 14z-105 window (oboro hook + version string; placements +0x30)
+# EXPECT_PYR="6bf265abc5b8e0980f7f8b29fd39b64814af8a86"   # 14z-105 window (oboro hook + version string; placements +0x30)
+EXPECT_PYR="c403a283f5f3d14aee7165f8b153a015fccd718f"   # 14z-111 pyron-m15 (AI script rows + x100e3c)
 
 # The WIDE overlay romset (deterministic from the audited reference sets;
 # built into scratch so the canonical build/wide0 is never clobbered).
@@ -279,7 +282,8 @@ m3a_manifest pyron       "$WORK/pyron/rompath"     "$MANI_PYR"
 # EXPECT_MERGED="393f92a5e2ab2dfd3ed3d4a9d50acfc06c8fe19f"  # merged-m5, git tag freeze/merged-m5
 # EXPECT_MERGED="64426955bf7877908a1014f134040c9672bddf5a"   # merged-m6, 14z-105 window — == the rehearsed merged_probe_w6, bit-for-bit (probe dir attic'd 14z-106; the pin is the fingerprint, not the dir)  # merged-m6 (14z-105)
 # EXPECT_MERGED="761fd35af754d791e5a7863ca670673e85588c22"  # 14z-110 merged-m7
-EXPECT_MERGED="73690f21ebf1b83d31aad647f2b145169b175bf2"   # 14z-110b merged-m9 (the remap)
+# EXPECT_MERGED="73690f21ebf1b83d31aad647f2b145169b175bf2"   # 14z-110b merged-m9 (the remap)
+EXPECT_MERGED="32007911f19a82619da6108132bff70329ac2c33"   # 14z-111 merged-m9 (the #99 root-cause fix)
 # MANI_MERGED="59f3b42e7f0022f509c3cc912abc54f159183688 42"  # 14z-99 window
 # MANI_MERGED="22092b65fd9db2f5b79f211afb51625a542cd45c 42"  # 14z-102 window
 # MANI_MERGED="efea5e9d0bd9590383eb614016eed1c388bf9c2b 42"  # 14z-105 window

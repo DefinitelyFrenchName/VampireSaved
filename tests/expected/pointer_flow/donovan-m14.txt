@@ -1,4 +1,4 @@
-# pointer-flow baseline for donovan-m13 (build/don_m13), frozen 14z-111 — IDENTICAL to donovan-m11 (measured: the d2 window + remap add no pointer-flow finding on the solo); the m11 header follows.
+# pointer-flow baseline for donovan-m14 (build/don_m14), frozen 14z-111 — IDENTICAL to donovan-m13 (the AI-script rows/x101aca add no pointer-flow finding on the solo; measured).
 # the two merged STRONG lines are the 14z-100-reviewed win_pal sparse-block biased bases,
 # re-placed by the window's allocation shift; WEAK volume re-counted).
 # STRONG lines are REVIEWED findings (see hardening_register.md);

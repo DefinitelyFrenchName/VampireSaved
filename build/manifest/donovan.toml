@@ -42,6 +42,9 @@ gfx_bank = 2
 alloc_wrap = "0x15702,0x1572e"
 near_map = "x0905ae=x088512"
 hole_b_regions = "aux0_4,hitbox"
+# 14z-111: his CPU AI script block (a WIDE-only DATA root) lives in the extension — placing it in hole_a
+# cascaded x2b7ef4 (0xB20C) out of hole_a and reshuffled 56 regions of the merged layout (measured).
+region_space = "x101aca=wide_ext"
 # M3a IN PROGRESS — the de-substituted id is NOT declared here yet, on
 # purpose. The moment this manifest maps the WIDE profile to 0x13, the
 # frozen reference `donovan-m5w` (9bac6ee3) stops being reproducible from
@@ -65,6 +68,9 @@ mirror_variant = true
 alloc_wrap = "0x15702,0x1572e"
 near_map = "x0905ae=x088512"
 hole_b_regions = "aux0_4,hitbox"
+# 14z-111: his CPU AI script block (a WIDE-only DATA root) lives in the extension — placing it in hole_a
+# cascaded x2b7ef4 (0xB20C) out of hole_a and reshuffled 56 regions of the merged layout (measured).
+region_space = "x101aca=wide_ext"
 
 # free-space holes (verified 0xFF fill, tools/extract free-space scan)
 [hole_a]
