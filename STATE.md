@@ -1,5 +1,65 @@
 # STATE — living progress log
 
+## Session 14z-110 (4) — CLOSE. **THE RULED ORDER IS COMPLETE: FIX -> AUDIT ->
+## RE-FREEZE, all green.** donovan-m12 / merged-m7 frozen and tagged; the
+## acceptance full suite is GREEN (65 PASS / 18 SKIP / 0 FAIL, zero
+## nondeterministic) and the static tier is GREEN (PASS 110 / 0 / 0). The #99
+## fix ships in every track; the FIELD pass on the new bundle is the final
+## verification (MAME cannot reproduce the crash).
+
+### THE FREEZE, as ratified
+
+| | value |
+|---|---|
+| donovan-m12 | `60b55a12`, 327 ops; set carried from m11, .sha1s MEASURED IDENTICAL; +16870 flicker ratified (below) |
+| merged-m7 | program `761fd35a`, 808 ops; `build/m3b_merged14`; release/merged-m7 packaged (round-trip PASS) |
+| stock twin | `cf455760` (`build/m5_stock7`) — MOVED this window (the fix is not profile-gated) |
+| huitzil-m20 / pyron-m14 | CARRIED — program bit-exact, whole-artifact delta = the two M7 glyph members only |
+| m3a pins | all SIX re-frozen with per-member attribution (incl. MANI_MERGED `75a253ea`, measured twice) |
+| MiSTer | fork `fc04a8ec` (2 catalogue commits, PUSHED), pin bumped, patches 0021+0022, twin+mra gates PASS |
+| version mark | M7 (gfx-only; program fingerprints held; test_version_string pixel-exact) |
+
+### TWO MAINTAINER RATIFICATIONS THIS CLOSE
+
+1. **24_don_winmash flicker inventory +16870** (solo set only): the ruled d2
+   compares' ~18 cycles tip the documented win-screen-fade VBL-edge frame
+   (the 14z-89/91 site, this exact replay). Measured before the ask:
+   deterministic; NINE bytes, all the OBJ-builder secondary stack
+   `$FF06D7-E1` (the ratified execution-position class, ram.md:62); adjacent
+   frames zero-diff; 1650 identical after; the SAME fix on the merged image
+   HOLDS its inventory — per-image cycle budget, the maintainer's own 14z-89
+   framing. Checker still demands exact inventory match.
+2. **The M7 mark** (convention: the shipped build's naked-eye tell) — gfx-only
+   by measurement.
+
+### THE NO-EXPECTATION DEBT, surfaced and paid for donovan-m12
+
+The first full verify since 14z-108 surfaced four arc-added replays with no
+expectations (107/108/109/110) — run_suite counts NO-EXPECTATION as RED by
+design. Frozen after review (tenant-determinism .sha1 class). **STILL OPEN,
+flagged not fixed: huitzil-m20 / pyron-m14 / merged sets carry the same four
+gaps** — their full verifies were not rerun this window (their images did
+not move); the gaps predate this window. Freeze them at the next window that
+touches those sets.
+
+### INSTRUMENT NOTES (beyond the (2) entry's)
+
+- run_suite reads specs per-replay at comparison time — a spec landed
+  mid-run applies to replays not yet reached (measured: the ratified 24 line
+  turned a mid-flight run's 24 row green).
+- My dump legs collided writing `dump_*` next to a shared log dir —
+  contaminated per RH-4, discarded, re-run into separate dirs. Two parallel
+  legs of the same replay need separate output dirs.
+
+### WHAT REMAINS (the next session's opener)
+
+The FIELD TEST of merged-m7: fresh board bundle at `../mister_fieldtest_14z110/`
+(regenerated this close; carries the 14z-109 durable extras), the .rbf
+unchanged (seed 18269, sha256 `46fc74af…` — the romset moved, the BITSTREAM
+did not). The field pass verifies #99 dead on the CRT; #111's remaining
+items (33 U,U,R replays triage; H/P/merged NO-EXPECTATION gaps) follow.
+
+
 ## Session 14z-110 (3) — **THE AUDIT PHASE: green across the board; the two
 ## static reds are the frozen generation itself, resolved by the freeze.**
 ## (Guard corpus + H/P reproduction checks in flight at the time of writing.)

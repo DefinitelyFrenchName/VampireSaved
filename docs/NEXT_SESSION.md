@@ -1,58 +1,53 @@
 # NEXT SESSION — orientation (rewritten at the 14z-110 CLOSE, 2026-08-26)
 
-> ## **START HERE. THE FIX SHAPE IS RULED (maintainer, 2026-08-26, late
-> ## 14z-110): the REACTION_HOOK D2-WINDOW extension is APPROVED, in the
-> ## binding order FIX -> AUDIT -> RE-FREEZE. The opener is the FIX BUILD.**
-> ## Full shape + scope: STATE "Decisions pending" #99 (RE-RULED) and
-> ## patch_index "14z-110 additions" — thunk BODY only (engine footprint
-> ## unchanged), second ext table from vs2 `0x016DE4` verbatim, data stays
-> ## native `0x51`, DATA-triggered not id-gated, owned by donovan.toml's
-> ## singleton. Then AUDIT ON THE FIX BUILD: flicker inventory (the gate —
-> ## if it moves, stop and escalate), `test_fsm_census` still 6/6,
-> ## `audit_don_vs_cpu`, guard soaks, `audit_continue_switch` re-measure.
-> ## Then the RE-FREEZE + MiSTer CRC tail. Field pass = the #99 verification.**
+> ## **START HERE. THE #99 FIX IS BUILT, AUDITED AND FROZEN — the opener is
+> ## the FIELD TEST of merged-m7 on the board.** The ruled order (FIX ->
+> ## AUDIT -> RE-FREEZE) completed in one session: acceptance suite GREEN
+> ## (65/18/0, zero nondet), static GREEN (110/0/0), everything pushed.
 > ##
-> ## **WHAT 14z-110 FOUND (measure-first, no shipped byte moved):** the ruled
-> ## data remap `0x51 -> 0x19` is UNSAFE. The node byte feeds THREE dispatchers
-> ## (`0x018460`/`0x018508`/`0x0185D2`, 80-entry each; vs2 twins 84 -> gap
-> ## `0x50-0x53`); the 14z-43 audit named 1+3 and missed **2 (`0x018508`)**,
-> ## where #99 crashes. `0x51->0x19` diverges on dispatcher 3 and fails the
-> ## `es_type51` thunk's `cmpi #0x51`; any copy-aliased value (`0x4E/0x4F`)
-> ## changes `property[class]` (the 14z-44 ES-freeze family). No safe DATA
-> ## value exists. Full trail: STATE 14z-110; GitHub #99 (current).
+> ## **THE FIX (patch_index "14z-110 additions", patch_notes 14z-110):** the
+> ## reaction_hook thunk's bne-arm — the ONLY entry into dispatcher 2 at
+> ## `PRG:0x018508` — carries the 0x50-0x53 window via a SECOND ext table to
+> ## vs2's dispatcher-2 twin (`0x016DE4`) handlers VERBATIM. Data stays
+> ## native 0x51; the vanilla dispatcher is byte-untouched (asserted against
+> ## vsavj's own decrypted dump). RH-43 A/B: pre-fix FORCE->vec3 PC 01850E
+> ## ADDR 18511 (the exact field signature, first deterministic MAME repro);
+> ## post-fix the copy handler runs, clean. Gate: test_reaction_hook_d2.
 > ##
-> ## **THE CENSUS IS CLEAN:** `tools/audit_fsm_census.py` (static, family-aware
-> ## node-record signature + vs2 oracle) finds EXACTLY the six known `0x51`
-> ## nodes in Donovan's hitbox — Huitzil/Pyron ZERO, no `0x50/0x52/0x53`
-> ## clusters. Dynamic corpus (`tests/lua/fsm_census.lua`, 8 replays): zero
-> ## `idx>=0x50` dispatched. So the escalation clause has nothing to escalate.
-> ## Frozen inventory `build/manifest/fsm_census.toml`; gate `test_fsm_census`
-> ## (ci_static, two negative controls). #99 does NOT reproduce on MAME from a
-> ## P1-mash (venue-`0x02` marathon clean to END 40620) — the honest gap.
+> ## **THE FREEZE:** donovan-m12 (`60b55a12`, set carried from m11 — .sha1s
+> ## MEASURED IDENTICAL, the fix is RAM-invisible on select/2P content) /
+> ## merged-m7 (`761fd35a`, build/m3b_merged14, release/merged-m7 packaged) /
+> ## stock twin `cf455760` (MOVED — not profile-gated, the substituted track
+> ## carries the same six 0x51 nodes) / hui-m20+pyron-m14 CARRIED (bit-exact).
+> ## Version mark M7 (gfx-only). Tags freeze/donovan-m12 + freeze/merged-m7.
+> ## TWO ratifications: the 24_don_winmash flicker inventory +16870 (the
+> ## known win-screen-fade VBL edge, OBJ-stack phase bytes only, re-converges;
+> ## merged HOLDS its inventory — per-image cycle budget) and the M7 mark.
 > ##
-> ## **THE RECOMMENDED FIX (maintainer's to ratify):** code-side on dispatcher
-> ## 2's arm, inside the `reaction_hook` that already owns the only entry to it
-> ## (`bne 0x018508` in the site prefix `0x018458`) — give that arm the same
-> ## `0x50-0x53` window the reaction_hook runs for dispatcher 1, from vs2's
-> ## twin `0x016DE4` verbatim; data stays native `0x51`. Cost ~2 compares on a
-> ## legacy path — **measure against the frozen flicker inventory before it
-> ## ships.** NOT a "port the handler" import (reuses handlers already present).
+> ## **THE FIELD TEST:** fresh bundle `../mister_fieldtest_14z110/` (WIDE MRA
+> ## + the M7 romset + the 14z-109 durable extras: STOCK CONTROL MRA,
+> ## games/mame/vsavj.zip, FIELD_TRIAGE.txt). **The .rbf is UNCHANGED** —
+> ## seed 18269, sha256 `46fc74af…` (the ROMSET moved, the BITSTREAM did
+> ## not; verify before flashing as always; the control MRA still needs the
+> ## maintainer's PRISTINE vsav.zip swapped in). What the field pass answers:
+> ## Donovan 1P vs Bishamon -> WIN -> vs Phobos plays through with NO
+> ## name-screen reset — #99 dead on the CRT (MAME cannot reproduce the
+> ## walk; the emulator side is coverage, the board is the verification).
+> ## The naked-eye tell: the select wheel shows **M7**.
 > ##
-> ## **#111 (coverage) — CORE GAP CLOSED:** `tests/audit_don_vs_cpu.sh` reaches
-> ## Donovan-vs-CPU-{Phobos,Bishamon,Pyron} deterministically via venue
-> ## `$FF8121` (0x02/0x03/0x05); replay `110_don_arcade_mash` (26's mash body,
-> ## WIDE L,L,D,D prologue; 26 untouched). STILL OPEN on #111: 33 replays share
-> ## 26's stock-track `U,U,R` prologue (triage), and `audit_continue_switch` is
-> ## still frozen to merged11 (re-measure with the re-freeze).
+> ## **STILL OPEN (#111 + debt, none blocks the field test):** the 33
+> ## U,U,R-prologue replays triage; the NO-EXPECTATION gaps for replays
+> ## 107-110 on the huitzil-m20 / pyron-m14 / merged sets (frozen for
+> ## donovan-m12 only this window — the others' images did not move);
+> ## audit_don_vs_cpu covers Phobos+Bishamon (Pyron is not venue-steerable
+> ## on Donovan's row — odd offsets only; the venue byte must stay EVEN,
+> ## game/gotchas.md).
 > ##
-> ## **THEN, AFTER THE RULING + FIX:** the flicker-inventory cost measurement,
-> ## the re-freeze (donovan-m12 / huitzil-m21 / pyron-m15 / merged-m7) and its
-> ## MiSTer CRC tail (`gen_vsavjw_xml.py --check` -> fork catalogue commit ->
-> ## `mister_mra.sh --wide` bundle). Budget it; the field crash is the reason.
-> ##
-> ## **PUSH STATE:** the 14z-110 work is COMMITTED to local `main` (700bb97),
-> ## NOT pushed (maintainer's call). `emu/fbneo` shows a pre-existing submodule
-> ## `m` not from this session. Check `git ls-remote`, not prose.
+> ## **PUSH STATE at the close: main + tags + fork all pushed** — verify
+> ## `git ls-remote`, not prose. Fork at `fc04a8ec` (22 patches).
+> ## **Scratch:** `../mister_fieldtest_14z108/` is SUPERSEDED by _14z110;
+> ## `build/don_m12_s4` kept (the registered stage-4 target); session
+> ## scratchpad ephemeral — every conclusion is in STATE/docs/#99/#111.
 
 # HISTORY BELOW — the 14z-109 orientation and older; kept for the census
 # anchors, eliminations and traps, superseded as the opener.
