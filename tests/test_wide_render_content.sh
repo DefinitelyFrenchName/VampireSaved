@@ -46,11 +46,11 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 
-STOCK="${1:-$REPO/build/m5_stock8/rompath}"
+STOCK="${1:-$REPO/build/m5_stock9/rompath}"
 WIDE="${2:-$REPO/build/m5_wide/rompath}"
 MAME_WIDE_BIN="${MAME_WIDE_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 
-[ -f "$STOCK/vsavj.zip" ]  || { echo "no stock build at $STOCK (tools/build_donovan.sh 6 build/m5_stock8)"; exit 1; }
+[ -f "$STOCK/vsavj.zip" ]  || { echo "no stock build at $STOCK (tools/build_donovan.sh 6 build/m5_stock9)"; exit 1; }
 [ -f "$WIDE/vsavjw.zip" ] || { echo "no WIDE build at $WIDE (GEN_FLAGS=... --profile cps2-wide-v1)"; exit 1; }
 [ -x "$MAME_WIDE_BIN" ]   || { echo "no WIDE-patched MAME at $MAME_WIDE_BIN (tools/setup_mame.sh)"; exit 1; }
 "$MAME_WIDE_BIN" -listfull vsavjw >/dev/null 2>&1 || {

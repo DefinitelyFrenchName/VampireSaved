@@ -37,7 +37,7 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD="${BUILD:-build/m3b_merged15}"  # re-pointed 14z-110b
+BUILD="${BUILD:-build/m3b_merged16}"  # re-pointed 14z-110b
 RPL="$REPO/tests/replays/36_pick_tenant_cell.rpl"
 EXP_AM=2886            # frozen MAME anchor  (test_mister_tenant_oracle)
 EXP_AS=3546            # frozen sim anchor, ABSOLUTE

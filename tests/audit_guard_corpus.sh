@@ -49,7 +49,7 @@ cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged15}"  # re-pointed 14z-110b
+BUILD="${BUILD:-build/m3b_merged16}"  # re-pointed 14z-110b
 JOBS="${JOBS:-2}"
 LEGS="${LEGS:-none 10 11 13}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary at $MAME_BIN"; exit 0; }

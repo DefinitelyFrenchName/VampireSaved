@@ -1,0 +1,10 @@
+LEGACY by loaded ids, but self-frozen is correct: this rig is replay 61
+(the 61_tenant_2pwin exemption's mechanism, verbatim) plus the AUTO mode
+lines - it navigates to select cell 0x13, which does not exist on
+vanilla's 16-cell wheel and is not backed on this set, so the cursor walk
+and the resulting pick differ from vanilla's by construction and there is
+no vanilla oracle for the run. Measured 14z-103: divergence 889-9620,
+never re-converging; at f5000 the fighter records are still unpopulated
+(+0x60 == 0 both sides, committed id 0x13 unbacked). On donovan-m10
+(which DOES back 0x13) the same rig measures TENANT (P1 +0x60 = 0x3fa9d0,
+the ported record) and stays correctly self-frozen there.

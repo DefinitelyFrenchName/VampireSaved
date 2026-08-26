@@ -1,0 +1,7 @@
+# pointer-flow baseline for pyron-m14 (build/pyron31), frozen 14z-105 (the Oboro+version window;
+# the two merged STRONG lines are the 14z-100-reviewed win_pal sparse-block biased bases,
+# re-placed by the window's allocation shift; WEAK volume re-counted).
+# STRONG lines are REVIEWED findings (see hardening_register.md);
+# WEAK-COUNT lines freeze the noise volume — growth = investigate.
+WEAK-COUNT	code:move_imm	1
+WEAK-COUNT	data:long	776

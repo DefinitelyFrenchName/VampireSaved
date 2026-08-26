@@ -38,7 +38,7 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-OUT="${1:-build/m3b_merged15}"  # re-pointed 14z-110b
+OUT="${1:-build/m3b_merged16}"  # re-pointed 14z-110b
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
 [ -d "$OUT/rompath" ] || { echo "SKIP: $OUT/rompath missing"; exit 77; }

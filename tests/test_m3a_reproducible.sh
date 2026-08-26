@@ -279,7 +279,7 @@ m3a_manifest pyron       "$WORK/pyron/rompath"     "$MANI_PYR"
 # EXPECT_MERGED="393f92a5e2ab2dfd3ed3d4a9d50acfc06c8fe19f"  # merged-m5, git tag freeze/merged-m5
 # EXPECT_MERGED="64426955bf7877908a1014f134040c9672bddf5a"   # merged-m6, 14z-105 window — == the rehearsed merged_probe_w6, bit-for-bit (probe dir attic'd 14z-106; the pin is the fingerprint, not the dir)  # merged-m6 (14z-105)
 # EXPECT_MERGED="761fd35af754d791e5a7863ca670673e85588c22"  # 14z-110 merged-m7
-EXPECT_MERGED="73690f21ebf1b83d31aad647f2b145169b175bf2"   # 14z-110b merged-m8 (the remap)
+EXPECT_MERGED="73690f21ebf1b83d31aad647f2b145169b175bf2"   # 14z-110b merged-m9 (the remap)
 # MANI_MERGED="59f3b42e7f0022f509c3cc912abc54f159183688 42"  # 14z-99 window
 # MANI_MERGED="22092b65fd9db2f5b79f211afb51625a542cd45c 42"  # 14z-102 window
 # MANI_MERGED="efea5e9d0bd9590383eb614016eed1c388bf9c2b 42"  # 14z-105 window

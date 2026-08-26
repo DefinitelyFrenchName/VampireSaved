@@ -37,7 +37,7 @@
 # KNOWN GAP, recorded: the MERGED image is outside this freeze entirely
 # (no build/m3b_merged11/extract; verify_pcrel_data needs an external
 # extract + merged placements to cover it). See hardening_register.md.
-[hui47]
+[hui48]
 unresolved = 69
 resolved = 0
 escapes = [
@@ -112,7 +112,7 @@ escapes = [
   "x028122 0x028c98 -> 0x029034",
 ]
 
-[pyron31]
+[pyron32]
 unresolved = 10
 resolved = 0
 escapes = [
@@ -128,10 +128,10 @@ escapes = [
   "x088512 0x08c038 -> 0x08c0a2",
 ]
 
-# [don_m13] CARRIED from [don_m11] at 14z-111: measured IDENTICAL on don_m12 and don_m13 (10/10, the
+# [don_m14] CARRIED from [don_m11] at 14z-111: measured IDENTICAL on don_m12 and don_m13 (10/10, the
 # same lea->table pairs — the d2 window + the remap touch neither region). The section is keyed by
 # build dir, so a re-point with no re-key reads as "10 NEW" (paid for 14z-111).
-[don_m13]
+[don_m14]
 unresolved = 10
 resolved = 0
 escapes = [
@@ -161,19 +161,19 @@ escapes = [
 # both together (the #94 reference-rot class).
 
 [merged_don]
-build = "m3b_merged15"
-extract = "build/don_m13/extract"
+build = "m3b_merged16"
+extract = "build/don_m14/extract"
 placement_suffix = ""
-same_as = "don_m13"
+same_as = "don_m14"
 
 [merged_hui]
-build = "m3b_merged15"
-extract = "build/hui47/extract"
+build = "m3b_merged16"
+extract = "build/hui48/extract"
 placement_suffix = "@huitzil"
-same_as = "hui47"
+same_as = "hui48"
 
 [merged_pyr]
-build = "m3b_merged15"
-extract = "build/pyron31/extract"
+build = "m3b_merged16"
+extract = "build/pyron32/extract"
 placement_suffix = "@pyron"
-same_as = "pyron31"
+same_as = "pyron32"

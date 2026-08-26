@@ -16,7 +16,7 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
-BUILD="${BUILD:-build/m3b_merged15}"   # re-point at every merged freeze
+BUILD="${BUILD:-build/m3b_merged16}"   # re-point at every merged freeze
 MODE="${MODE:-defect}"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 # stage the tracked recording where run_inp_guarded.sh expects it, isolated
