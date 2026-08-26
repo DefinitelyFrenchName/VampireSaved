@@ -1509,6 +1509,24 @@ tests/test_shared_writes.sh           # 14z-79b: THE FROZEN SHARED-SURFACE WRITE
                                       # an entry frozen without checking stays
                                       # wrong and green. tools/
                                       # audit_shared_writes.py. Static, seconds
+tests/test_fsm_census.sh [bd]        # 14z-110 (#99): the STATIC object-script
+                                      # node-state census gate. Every ported
+                                      # node whose +0x17 state byte >= vsavj's
+                                      # 80-entry FSM table is enumerated
+                                      # (tools/audit_fsm_census.py, family-aware
+                                      # node-record signature + vs2 classify
+                                      # oracle) and locked to
+                                      # build/manifest/fsm_census.toml. TWO
+                                      # negative controls. Needs ROMDIR (vs2
+                                      # oracle). ci_static, seconds.
+tests/audit_don_vs_cpu.sh            # 14z-110 (#111): deterministic
+                                      # Donovan-vs-CPU-{Phobos,Bishamon,Pyron}
+                                      # via the venue byte $FF8121 (0x02/03/05),
+                                      # liveness-asserted, guard-clean. Closes
+                                      # the coverage gap #99 fell through.
+                                      # Emulator, ~18 min/leg. NOTE #99 does not
+                                      # reproduce here on MAME (P1-mash) — the
+                                      # gate is COVERAGE, not a crash lock.
 tests/test_index_window_thunk.sh [bd] # 14z-79: the (b') index-window thunk at
                                       # engine site 0x018460. RECONSTRUCTS all
                                       # 470 body bytes from the two reference

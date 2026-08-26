@@ -1,5 +1,76 @@
 # STATE — living progress log
 
+## Session 14z-110 — **THE #99 FIX WINDOW, RE-SCOPED TO MEASURE-FIRST: the
+## ruled data-remap is UNSAFE, the census is CLEAN, the #111 coverage gap is
+## CLOSED with a deterministic gate.** No shipped byte moved; the fix shape is
+## back with the maintainer (see "Decisions pending — #99").
+
+**The session in one line:** planning to implement the ruled `0x51 -> 0x19`
+remap found it re-breaks the 14z-43 ES port, so the maintainer said HOLD —
+measure first; the measurement produced a consumer-complete census (exactly
+the six known 0x51 nodes, no others), a deterministic Donovan-vs-CPU gate, and
+a re-ask with a code-side recommendation.
+
+### THE DECISIVE FINDINGS (all measured this session)
+
+| | result |
+|---|---|
+| the FSM tables | **80 entries** (valid 0x00-0x4F), NOT "~0x28" — corrected in engine_internals/NEXT_SESSION/STATE. vs2 twins 84 -> gap **0x50-0x53** |
+| the node byte feeds | **THREE** dispatchers (0x018460/0x018508/0x0185D2). The 14z-43 audit named 1+3, missed **2 (0x018508)** — where #99 crashes |
+| data remap 0x51->0x19 | **UNSAFE**: diverges on dispatcher 3 (0x19->0x18694, not copy) AND fails the es_type51 thunk's `cmpi #0x51` |
+| any copy-aliased remap (0x4E/0x4F) | dispatcher-exact on all three BUT changes `property[class]` (0x51->0x19 vs 0x4E->0x0F, the ES-freeze family). No safe data value exists |
+| the census (static, family-aware) | **exactly SIX out-of-range nodes across all three tenants — the known 0x51 cluster in Donovan's hitbox. Huitzil/Pyron: ZERO.** No escalation members |
+| the census (dynamic, 8 combat replays) | **zero idx>=0x50 dispatched anywhere.** Tenant nodes A3 0x3fb462-0x3fbd62 ARE walked (bracketing the #99 cluster 0x3fb862-902) but the six crash nodes are NOT — the honest gap, precisely |
+| the #99 crash on MAME | does NOT reproduce from a P1-mash (full venue-0x02 Donovan-vs-Phobos marathon clean to END 40620) — needs the CORE's cross-fighter walk |
+
+### THE RECOMMENDED FIX (maintainer's to ratify — Decisions pending #99)
+
+Code-side on dispatcher 2's arm, INSIDE the `reaction_hook` that already owns
+the only entry to it (`bne 0x018508` lives in the site prefix 0x018458): give
+its bne-arm the same 0x50-0x53 window the reaction_hook already runs for
+dispatcher 1, using vs2's dispatcher-2 twin `0x016DE4` handlers verbatim. Data
+stays native 0x51 (dispatcher 3 + property untouched). Cost: ~2 compares on a
+legacy path — **must be measured against the frozen flicker inventory before
+it ships.** Not a "port the handler" import; it reuses handlers already
+present. The fix waits on the ruling (the maintainer said measure first).
+
+### ARTIFACTS (committed, the persistent-suite doctrine)
+
+- **`tools/audit_fsm_census.py`** — static family-aware census (node-record
+  signature, vs2 classification oracle). **`build/manifest/fsm_census.toml`**
+  frozen inventory (6 nodes). **`tests/test_fsm_census.sh`** — gate + TWO
+  negative controls (perturbed +0x17 -> ADDED; cleared -> MISSING), green;
+  registered in `ci_static.txt`. The build-time guard #99 asked for.
+- **`tests/lua/fsm_census.lua`** — dynamic census instrument (per-site divisor,
+  OOR + tenant-node A3 capture, POKES for venue steering).
+- **`tests/replays/110_don_arcade_mash.rpl`** — 26's mash body verbatim, WIDE
+  L,L,D,D prologue to Donovan 0x13 (26's U,U,R lands on Jedah). 26 untouched.
+- **`tests/audit_don_vs_cpu.sh`** — deterministic Donovan-vs-CPU-{Phobos,
+  Bishamon,Pyron} via the venue-byte steer ($FF8121: 0x02/0x03/0x05), liveness
+  asserted, guard-clean. Closes #111's core gap. Phobos leg smoke-tested green.
+
+### DOCS / RETRACTION (CLAUDE.md §5)
+
+- "~0x28 states" -> "80 entries" in engine_internals (authoritative),
+  NEXT_SESSION (live), STATE 14z-109 (marked in place). engine_internals
+  dispatcher section rewritten (three dispatchers, 84-vs-80 gap).
+- `docs/project/gotchas.md`: the renumbered-family rule sharpened — "enumerate
+  EVERY dispatcher a byte reaches" + the property-dependency caveat.
+- `docs/project/patch_index.md`: the missing `region_fix` mechanism row added.
+
+### #111 (coverage rot) — PARTIAL, tracked
+
+`audit_don_vs_cpu` + replay 110 close the "no Donovan-vs-CPU-Phobos gate" gap.
+STILL OPEN (filed on #111): 33 replays share 26's U,U,R stock-track prologue
+(triage list); `audit_continue_switch` still frozen to merged11's trajectory
+(re-measure per its header deferred with the re-freeze).
+
+### NOT DONE THIS WINDOW (waits on the ruling / is the next window)
+
+The fix itself; the flicker-inventory cost measurement; the re-freeze
+(donovan-m12/huitzil-m21/pyron-m15/merged-m7) + its MiSTer CRC tail.
+
+
 ## Session 14z-109 (4) — **THE #99 CRASH INVESTIGATED ON EMULATOR: a
 ## confirmed mechanism CLASS, real eliminations, and an HONEST GAP — no
 ## clean natural repro of the exact field crash yet.** Also surfaced: the
@@ -116,7 +187,9 @@ PROBE 13918 D0=000000a2 D1=00000001 A0=ffff8400 A1=00ff8800 A3=003fb882
   (base `0x3FA9D0`, node at +0xEB2). Phobos's object walks DONOVAN'S ported
   node — the cross-fighter interaction shape (cf. 14z-73 grab-victim).
 - **`(0x17,A3)` = `0x51`** — the fatal index. `D0 = 0x51*2 = 0xA2` runs past
-  the state jump table at `0x018510` (valid states end ~`0x25`), fetches the
+  the state jump table at `0x018510` (80 entries, valid `0x00-0x4F` —
+  **CORRECTED 14z-110: was "valid states end ~0x25"; the table is 80-entry,
+  vs2's twin 84, gap 0x50-0x53**), fetches the
   word `0x0001`, and `jmp (2,pc,d1.w)` lands on odd `0x18511` -> vec3 ->
   the soft-restart handler -> name screen. Every field observation is downstream
   of this.
@@ -1610,12 +1683,65 @@ entries moved VERBATIM to `DECISIONS_HISTORY.md` — grep there by topic.
 Lifecycle: rulings are still marked DECIDED in place here first; they move to
 the archive once they stop shaping active work.)*
 
-- **~~#99 — THE TYPE-0x51 REMAP~~ RULED (maintainer, 2026-08-26): (a)+(b)+(c)
-  ALL APPROVED.** (a) fix shape A — data-side extraction remap, never the
-  dispatcher; (b) `0x51 -> 0x19` on the handler-equivalence proof; (c) the
-  census with the escalation clause — default-alias hits auto-remap by the
-  same proof, **anything else comes back to the maintainer as its own
-  decision**.
+- **#99 — THE TYPE-0x51 REMAP: RE-OPENED FOR THE MAINTAINER (14z-110), because
+  the measure-first pass found ruling (b) is UNSAFE AS RULED.** The census is
+  DONE and the fix shape needs a fresh decision. Do not implement (b).
+  **WHAT THE CENSUS FOUND (measured 14z-110, `tools/audit_fsm_census.py` with
+  the vs2 oracle + `tests/lua/fsm_census.lua` corpus):**
+  1. **There is only ONE out-of-range family, and it is the KNOWN one.** The
+     static family-aware census (node-record signature: 0x20-stride, monotonic
+     +0x10 counter, +0x17 a valid state) finds exactly SIX out-of-vsavj-range
+     node-state bytes across ALL THREE tenants — the six `0x51` records in
+     Donovan's hitbox (`0x3FB862`-`0x3FB902`, +0x17 at blob offsets
+     `0x10E9..0x1189`), which ARE the 14z-35 cluster. **Huitzil and Pyron have
+     ZERO.** No `0x50/0x52/0x53` node clusters exist. **So the escalation
+     clause resolves cleanly: there are no OTHER members to classify.** (Bound:
+     signature-based; the dynamic corpus census found no idx >= 0x50 dispatched
+     on any leg, mapping the reachable tenant node regions — a coverage bound,
+     stated, not a universal proof.)
+  2. **The node byte feeds THREE dispatchers, not one, and they are 80-entry
+     not "~0x28".** `0x018460`/`0x018508`/`0x0185D2` (vs2 twins `0x016D34`/
+     `0x016DE4`/`0x016EB6`, 84 entries -> gap `0x50-0x53`). The 14z-43
+     `es_type51_dispatch` thunk's consumer audit named dispatchers 1+3 and
+     MISSED dispatcher 2 (`0x018508`) — that is where #99 crashes. The records
+     were left native `0x51` on purpose (dispatcher 3 + the property lookup
+     need it).
+  3. **A DATA remap breaks things:** `0x51 -> 0x19` diverges on dispatcher 3
+     (there `0x19` -> handler `0x18694`, NOT the copy handler) AND fails the
+     `es_type51_dispatch` thunk's `cmpi #0x51`. `0x51 -> 0x4E/0x4F` is
+     copy-aliased on all three dispatchers, BUT the copy handler STORES the
+     class and a downstream property lookup keys on it
+     (`property[0x51]=0x19` vs `property[0x4E]=0x0F`, the 14z-44 ES-freeze
+     family) — so it changes gameplay. **No data value is both
+     dispatcher-exact on all three AND property-preserving.** Ruling (b) as
+     written ("`0x51 -> 0x19`, zero gameplay surface") is therefore wrong on
+     both counts.
+  **RECOMMENDATION (measure-first order, port-the-handler caveat honored):**
+  the clean fix is **CODE-SIDE on dispatcher 2's arm, inside a hook that
+  already owns the only entry to it** — the `reaction_hook` site prefix
+  (`0x018458`) already re-creates `tst.b (0x38,a1); bne 0x018508`, so its
+  bne-arm gains the same `0x50-0x53` window the reaction_hook already runs for
+  dispatcher 1, using vs2's dispatcher-2 twin `0x016DE4` handlers verbatim.
+  Data stays native `0x51` (dispatcher 3 + property untouched). Cost: ~2
+  compares on a path legacy executes when `+0x38` is set — **must be measured
+  against the frozen flicker inventory before it ships** (that is the only open
+  cost; if it moves the inventory, stop and root-cause). This is NOT a "port
+  the handler" import — it reuses handlers already present; it adds a window
+  test, not a foreign routine. **Delivered this window regardless of the
+  ruling:** the census tool + gate (`test_fsm_census`, negative controls
+  green), the deterministic Donovan-vs-CPU-Phobos coverage gate
+  (`audit_don_vs_cpu`, closes #111's core gap), replay 110. The fix itself
+  waits on this ruling.
+  **HONEST GAP unchanged:** #99 does NOT reproduce on MAME from a P1-mash
+  (full venue-0x02 Donovan-vs-Phobos marathon ran clean to END 40620) — the
+  bad node needs the specific cross-fighter walk the maintainer sees 100% on
+  the CORE. So no MAME regression lock is possible; the fix is verified by the
+  census (node no longer >= table size on dispatcher 2's reachable path) + a
+  field pass.
+  **~~ORIGINAL RULING (maintainer, 2026-08-26), SUPERSEDED BY THE ABOVE~~:**
+  (a)+(b)+(c) — (a) data-side extraction remap, never the dispatcher; (b)
+  `0x51 -> 0x19`; (c) census + escalation. (a) and (c) stand in spirit; (b) is
+  the part the measurement overturns. Kept for the trail.**
   **THE MAINTAINER'S STANDING CAVEAT ON (c), recorded verbatim in spirit:**
   for escalated hits, "port the handler" LOOKS like the best default (no
   error states + vs2-consistent tenant behavior) — **but it is NOT free: not

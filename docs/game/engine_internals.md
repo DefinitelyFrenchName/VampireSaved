@@ -3646,13 +3646,23 @@ A per-object script walker whose per-node state transition is:
 01850C  jmp    (2,PC,D1.w)       ; -> 0x018510 + offset
 ```
 
-The offset table holds ~0x26 states (handlers `0x018694-0x01877c`;
-several handlers write follow-up states into `(0x54,A1)` of the object).
-**There is NO bounds check on the node byte.** An index past the table
-reads whatever words follow; the first odd fetched "offset" faults the
-`jmp` with a vec3 address error, which the exception path above converts
-into a clean name-screen reboot — i.e. a data-side bad byte presents as a
-"flaky reset" with zero corruption beforehand.
+The offset table holds **80 entries** (`0x018510 + 80*2 = 0x0185B0`; valid
+indices `0x00-0x4F`), aliasing onto ~0x17 distinct handlers
+(`0x018694-0x01877c`; several write follow-up states into `(0x54,A1)`).
+**CORRECTED 14z-110: this section originally said "~0x26 states", conflating
+the ~0x26 distinct HANDLERS with the 80-entry TABLE. The crash is a TABLE
+overrun, so the table size is what matters.** This is one of THREE sibling
+dispatchers that read `(0x17,A3)` — see "The SUB-STATE DISPATCHER FAMILY at
+0x018460": `0x018460`/`0x018508`/`0x0185D2`, all 80-entry, reached by
+guard-chain fall-through. **vs2's twin tables (`0x016D34`/`0x016DE4`/
+`0x016EB6`) have 84 entries** — so the RENUMBER GAP is exactly `0x50-0x53`:
+valid in vs2, out of range in vsavj. **There is NO bounds check on the node
+byte.** An index past the table reads whatever words follow; the first odd
+fetched "offset" faults the `jmp` with a vec3 address error, which the
+exception path above converts into a clean name-screen reboot — i.e. a
+data-side bad byte presents as a "flaky reset" with zero corruption
+beforehand. (#99 = node `0x3FB899` in Donovan's block carries vs2 state
+`0x51`; census tool `tools/audit_fsm_census.py`.)
 
 Interaction shape worth knowing: the walker runs with A1 = one fighter's
 OBJECT and A3 = a node that can live in the OPPONENT'S data block

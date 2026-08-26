@@ -3046,6 +3046,25 @@ says otherwise, so "it worked for sixteen sessions" only means the bad
 node had not been WALKED yet: this one needed a specific opponent
 interaction in 1P arcade, which no gate and no 2P test reached.
 
+**THE SHARPER RULE (14z-110): "enumerate the consuming dispatch" means
+EVERY dispatcher the byte reaches, not the one you found first.** The
+`(0x17,A3)` node byte feeds THREE sibling dispatchers (`0x018460`/
+`0x018508`/`0x0185D2`, all 80-entry; vs2's twins 84 — the gap is exactly
+`0x50-0x53`). The 14z-43 `es_type51_dispatch` thunk that retired the
+14z-35 remap enumerated its own consumer audit — `0x1843A/0x18460`,
+`0x185CA-D8`, `0x18B30` — and MISSED `0x018508`. So the 0x51 records stayed
+native (correct for dispatcher 3, which the thunk handles) and #99 is the
+SAME six records crashing on dispatcher 2, which nothing handles. A remap
+would have re-broken dispatcher 3; the fix is code-side on dispatcher 2's
+arm. And "default-alias so a data remap is safe" is NOT sufficient on its
+own: the copy handler `0x01868C` STORES the class into `(0x54,A1)`, and a
+downstream property lookup keys on it (`property[0x51]=0x19`, the ES-freeze
+family) — so a dispatcher-exact remap can still change gameplay. The
+build-time guard is `tools/audit_fsm_census.py` (static, family-aware:
+node-record signature, never a blanket byte scan — a blanket `0x50-0x53`
+scan yields hundreds of coincidences in coordinate/palette data) with the
+dynamic complement `tests/lua/fsm_census.lua`.
+
 ## Root-causing a stochastic hardware crash: make ANY repro deterministic
 ## first, then interrogate the corpse (14z-109 method note)
 

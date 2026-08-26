@@ -11,7 +11,7 @@
 > ## 100%-reproducible crash, which was ROOT-CAUSED the same day: **#99 =
 > ## vs2 type byte `0x51` at node `ROM 0x3FB899` inside DONOVAN'S ported
 > ## block**, walked by Donovan's OPPONENT (any — Phobos AND Bishamon both
-> ## crashed it in the field), indexing past vsavj's ~0x28-state FSM jump
+> ## crashed it in the field), indexing past vsavj's 80-entry FSM jump
 > ## table at `PRG:0x018510` -> word `0x0001` -> odd jump -> vec3 -> the
 > ## game's own exception handler soft-boots to the NAME SCREEN. Every
 > ## field observation is downstream of this. Full trail: STATE 14z-109
@@ -48,7 +48,9 @@
 > ## byte replace would corrupt nodes whose +0x17 is not a state.** Anchor
 > ## facts for the walker: our node `0x3FB882` = vs2 `0x0C9CAA` (verbatim,
 > ## unique content hit); Donovan base `0x3FA9D0`; the vs2 FSM table is
-> ## `0x016D34` (0x54 states), ours `0x018510` (~0x28).
+> ## `0x016D34` (0x54=84 entries), ours `0x018510` (80 entries; valid
+> ## 0x00-0x4F — vs2's 84 make 0x50-0x53 the renumber gap). CORRECTED
+> ## 14z-110: was "~0x28".
 > ##
 > ## **#111 LANDS IN THE SAME WINDOW:** re-point `26_don_arcade_mash`'s
 > ## navigation (U,U,R lands on JEDAH on the 21-cell wheel; L,L,D,D

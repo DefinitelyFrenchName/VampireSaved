@@ -1,0 +1,39 @@
+# fsm_census — frozen inventory of ported node-state bytes >= 0x50
+# (14z-110, GitHub #99). Regenerate: tools/audit_fsm_census.py <build> --freeze <this>
+
+[[node]]
+addr = 0x3FB862
+idx = 0x51
+klass = "DEFAULT-ALIAS"
+region = "donovan hitbox (vsav2 0x0C8BB8)"
+
+[[node]]
+addr = 0x3FB882
+idx = 0x51
+klass = "DEFAULT-ALIAS"
+region = "donovan hitbox (vsav2 0x0C8BB8)"
+
+[[node]]
+addr = 0x3FB8A2
+idx = 0x51
+klass = "DEFAULT-ALIAS"
+region = "donovan hitbox (vsav2 0x0C8BB8)"
+
+[[node]]
+addr = 0x3FB8C2
+idx = 0x51
+klass = "DEFAULT-ALIAS"
+region = "donovan hitbox (vsav2 0x0C8BB8)"
+
+[[node]]
+addr = 0x3FB8E2
+idx = 0x51
+klass = "DEFAULT-ALIAS"
+region = "donovan hitbox (vsav2 0x0C8BB8)"
+
+[[node]]
+addr = 0x3FB902
+idx = 0x51
+klass = "DEFAULT-ALIAS"
+region = "donovan hitbox (vsav2 0x0C8BB8)"
+

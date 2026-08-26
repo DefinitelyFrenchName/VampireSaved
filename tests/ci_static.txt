@@ -47,6 +47,7 @@ test_frozen_rompath_guard
 test_gfx_chain
 test_gfx_layout3
 test_gfx_menus_guard
+test_fsm_census
 test_gfx_tiles
 test_hitclass_map_thunk
 test_hui_winscreen
