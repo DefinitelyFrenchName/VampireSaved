@@ -3084,3 +3084,22 @@ the bad byte (`MEM[A3+17]=51`) in one hit. Total: three guarded runs from
 determinism first, vector+address second, history third, conditional
 register probe last — and extend the instrument (PROBE gained A1/A3) the
 moment it cannot name what you need, rather than inferring around it.
+
+## `BUILD=... tests/<gate>.sh` is SILENTLY IGNORED by positional-arg gates —
+## and you measure the DEFAULT build with full confidence (14z-110b)
+
+Half the suite reads `BUILD="${BUILD:-default}"` (env-overridable) and half
+reads `BUILD="${1:-default}"` (positional ONLY — the assignment OVERWRITES
+any exported BUILD). Passing the env form to a positional gate runs the
+DEFAULT build and every printed number is for the wrong artifact. Paid for
+twice in one session: `BUILD=build/don_m12 test_fbneo_legacy_oracle.sh`
+measured don_m11 (the then-default) and produced a "PASS on the fix build"
+that was nothing of the kind; the same invocation later measured don_m13
+(the re-pointed default) and produced a "FAIL on don_m12" that was don_m13
+both times — two builds "differing by six unread bytes" showed identical
+failures because they were THE SAME BUILD. The tell that finally broke it:
+byte-identical FAIL frames across supposedly different builds. THE RULE:
+before quoting any per-build gate result, confirm HOW the gate takes its
+build (grep its BUILD= line) — and when a differential comes out
+identical, check you actually varied the variable (RH-23) before theorizing
+about the mechanism.
