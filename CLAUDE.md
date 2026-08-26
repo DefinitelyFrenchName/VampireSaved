@@ -322,11 +322,13 @@ legacy behavior is a failed change.
   and a corrected effect-family finding survived in five other places
   including a registry row written *after* the correction started.
   The procedure, in order:
-  1. `grep -rn "<the old claim>" docs HANDOFF.md STATE.md STATE_HISTORY.md tests build/manifest`
+  1. `grep -rn "<the old claim>" docs HANDOFF.md STATE.md STATE_HISTORY.md DECISIONS_HISTORY.md tests build/manifest`
      — search the assertion's WORDING, and its paraphrases, across the repo.
-     STATE_HISTORY.md is in the list on purpose: archived entries are not
-     rewritten, but a claim that ONLY survives there must still be found so
-     its live carriers can be traced.
+     STATE_HISTORY.md and DECISIONS_HISTORY.md are in the list on purpose:
+     archived entries are not rewritten, but a claim that ONLY survives
+     there must still be found so its live carriers can be traced.
+     (DECISIONS_HISTORY.md added 14z-109: resolved decisions move there
+     verbatim from STATE.md once they stop shaping active work.)
   2. Fix the **HEADER and the summary line** first. A skimmer reads those;
      an appended "actually, it turned out…" subsection does not reach them.
   3. Re-grep afterwards and show the empty result. The pass is not done

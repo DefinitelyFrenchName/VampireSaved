@@ -2830,7 +2830,9 @@ construction because the call site is our own code — routing the
 tenant's ids to privately placed copies of the vs2 rows (0x80 bytes
 here) and leaving every other id on the original path.
 
-**Fix shape (gameplay decision — STATE "Decisions pending"):** the
+**Fix shape — [STALE REFERENCE CORRECTED 14z-109: this decision was made
+and IMPLEMENTED long ago (the gate is `tests/test_hui_df_style.sh`); the
+paragraph below is the pre-fix design discussion, kept as analysis]:** the
 tenant's seq-0x16 row must not run vs2's DF-form machine under vsav's
 DF. Candidates: leave `dispatch_16` row 0x10 alone (careful: vanilla
 row 0x10 is an ALIAS of row 0x00, i.e. Bulleta's handler, not a null),
