@@ -273,7 +273,8 @@ m3a_manifest pyron       "$WORK/pyron/rompath"     "$MANI_PYR"
 # whole gate as skipped.
 # EXPECT_MERGED="2343607a4c5b0f0451bbfc6bcb3d9969eb2343c5"  # merged-m4, git tag freeze/merged-m4
 # EXPECT_MERGED="393f92a5e2ab2dfd3ed3d4a9d50acfc06c8fe19f"  # merged-m5, git tag freeze/merged-m5
-EXPECT_MERGED="64426955bf7877908a1014f134040c9672bddf5a"   # merged-m6, 14z-105 window — == the rehearsed merged_probe_w6, bit-for-bit (probe dir attic'd 14z-106; the pin is the fingerprint, not the dir)
+# EXPECT_MERGED="64426955bf7877908a1014f134040c9672bddf5a"   # merged-m6, 14z-105 window — == the rehearsed merged_probe_w6, bit-for-bit (probe dir attic'd 14z-106; the pin is the fingerprint, not the dir)  # merged-m6 (14z-105)
+EXPECT_MERGED="761fd35af754d791e5a7863ca670673e85588c22"   # 14z-110 merged-m7 (the #99 d2 window + the M7 mark)
 # MANI_MERGED="59f3b42e7f0022f509c3cc912abc54f159183688 42"  # 14z-99 window
 # MANI_MERGED="22092b65fd9db2f5b79f211afb51625a542cd45c 42"  # 14z-102 window
 MANI_MERGED="efea5e9d0bd9590383eb614016eed1c388bf9c2b 42"   # 14z-105 (delta: vm3j.03d/04d/07b/10b + vsw.41/42 PROGRAM + vsw.31m/33m/35m/37m GROUP C — the version glyphs; no QSound member moved)
