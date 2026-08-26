@@ -51,6 +51,23 @@ touches those sets.
   contaminated per RH-4, discarded, re-run into separate dirs. Two parallel
   legs of the same replay need separate output dirs.
 
+### POST-CLOSE ADDENDA (same session, during the maintainer's field pass)
+
+- **The dynamic FSM census is now CORPUS-WIDE:** all 83 replays on merged-m7
+  (unpoked legs, fsm_census.lua, all three dispatchers) — **ZERO indices
+  >= 0x50 dispatched anywhere.** The bound the static census stated is now
+  measured across the whole corpus on the shipped image.
+- **donovan-m12-stock registry row + carried stock/stage4 expectation sets**
+  (the battery's targets — missed in the main batch; the -stock row
+  convention was donovan-m8/m9/m10's). Stage-4 fingerprint CORRECTED same
+  session: the gate builds stage 4 with ITS OWN recipe (99e92afc), and my
+  scratch build's 653e315c used the WIDE-profile flags — a build includes
+  its defaults (RH-49).
+- **#111 U,U,R triage posted** (33 replays: keep all as frozen legacy
+  coverage — the Donovan intent died at 14z-64 and their expectations were
+  re-frozen since against the actual content; headers NOT edited in-file,
+  replay file sha1s are frozen in sim gates).
+
 ### WHAT REMAINS (the next session's opener)
 
 The FIELD TEST of merged-m7: fresh board bundle at `../mister_fieldtest_14z110/`
