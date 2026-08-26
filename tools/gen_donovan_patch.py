@@ -4112,34 +4112,76 @@ def main():
             n_ext = _int(rh["n_ext"])
             cases = [bytes.fromhex(rh[f"case_{first_ext + 2*k:x}"])
                      for k in range(n_ext)]
+            # 14z-110 (#99, maintainer-ruled): the D2 WINDOW. When the config
+            # carries d2_case_* keys, the thunk's bne-arm (the ONLY entry into
+            # dispatcher 2 at bne_target) gains the SAME window block the d1
+            # arm runs, dispatching ids [first_ext, first_ext+2*n_ext) via a
+            # SECOND ext table to vs2's dispatcher-2 twin handlers (verbatim
+            # hex in the config — d2 differs from d1 at 0x52/0x53). All other
+            # indices `jmp bne_target` exactly as before; without d2 keys the
+            # 50-byte thunk is emitted BYTE-IDENTICAL to the pre-14z-110 shape
+            # (the probe manifests keep it).
+            d2_keys = [f"d2_case_{first_ext + 2*k:x}" for k in range(n_ext)]
+            d2 = any(k in rh for k in d2_keys)
+            if d2 and not all(k in rh for k in d2_keys):
+                fail.append(f"reaction_hook: partial d2_case_* set — need all of {d2_keys}")
+                d2 = False
+            cases2 = [bytes.fromhex(rh[k]) for k in d2_keys] if d2 else []
+
+            def _rh_window(ext_addr, fallthrough):
+                """The 38-byte window block: cmpi/bcs, cmpi/bcc -> jmp
+                fallthrough; in-window -> d1 := (d0-first)*? doubled offset,
+                jmp through ext_addr's long table. Byte-for-byte the shipped
+                d1 shape (bcs.s +0x1A / bcc.s +0x14 both land on the final
+                jmp)."""
+                return (bytes([0x0C, 0x40]) + first_ext.to_bytes(2, "big")
+                        + bytes([0x65, 0x1A])
+                        + bytes([0x0C, 0x40]) + (first_ext + 2 * n_ext).to_bytes(2, "big")
+                        + bytes([0x64, 0x14])
+                        + bytes([0x32, 0x00])
+                        + bytes([0x04, 0x41]) + first_ext.to_bytes(2, "big")
+                        + bytes([0xD2, 0x41])
+                        + bytes([0x20, 0x7C]) + ext_addr.to_bytes(4, "big")
+                        + bytes([0x20, 0x70, 0x10, 0x00])
+                        + bytes([0x4E, 0xD0])
+                        + bytes([0x4E, 0xF9]) + fallthrough.to_bytes(4, "big"))
+
             blob = b"".join(cases)
             cb = alloc("a", len(blob), "reaction_hook cases")
             et = alloc("a", 4 * n_ext, "reaction_hook ext table")
-            th = alloc("a", 50, "reaction_hook thunk")
-            if None not in (cb, et, th):
+            cb2 = et2 = 0
+            if d2:
+                blob2 = b"".join(cases2)
+                cb2 = alloc("a", len(blob2), "reaction_hook d2 cases")
+                et2 = alloc("a", 4 * n_ext, "reaction_hook d2 ext table")
+            th_len = 82 if d2 else 50
+            th = alloc("a", th_len, "reaction_hook thunk")
+            if None not in (cb, et, th, cb2, et2):
+                def _ext_table(base, cs):
+                    offs, o = [], 0
+                    for c in cs:
+                        offs.append(base + o)
+                        o += len(c)
+                    return b"".join(a.to_bytes(4, "big") for a in offs)
+
                 ops.append({"op": "code", "addr": f"{cb:#x}", "hex": blob.hex()})
-                offs = []
-                o = 0
-                for c in cases:
-                    offs.append(cb + o)
-                    o += len(c)
-                ext = b"".join(a.to_bytes(4, "big") for a in offs)
-                ops.append({"op": "data", "addr": f"{et:#x}", "hex": ext.hex()})
-                tk = (bytes([0x4A, 0x29]) + _int(rh["tst_disp"]).to_bytes(2, "big")
-                      + bytes([0x67, 0x06])
-                      + bytes([0x4E, 0xF9]) + _int(rh["bne_target"]).to_bytes(4, "big")
-                      + bytes([0x0C, 0x40]) + first_ext.to_bytes(2, "big")
-                      + bytes([0x65, 0x1A])
-                      + bytes([0x0C, 0x40]) + (first_ext + 2 * n_ext).to_bytes(2, "big")
-                      + bytes([0x64, 0x14])
-                      + bytes([0x32, 0x00])
-                      + bytes([0x04, 0x41]) + first_ext.to_bytes(2, "big")
-                      + bytes([0xD2, 0x41])
-                      + bytes([0x20, 0x7C]) + et.to_bytes(4, "big")
-                      + bytes([0x20, 0x70, 0x10, 0x00])
-                      + bytes([0x4E, 0xD0])
-                      + bytes([0x4E, 0xF9]) + _int(rh["dispatch"]).to_bytes(4, "big"))
-                assert len(tk) == 50, len(tk)
+                ops.append({"op": "data", "addr": f"{et:#x}",
+                            "hex": _ext_table(cb, cases).hex()})
+                if d2:
+                    ops.append({"op": "code", "addr": f"{cb2:#x}", "hex": blob2.hex()})
+                    ops.append({"op": "data", "addr": f"{et2:#x}",
+                                "hex": _ext_table(cb2, cases2).hex()})
+                head = bytes([0x4A, 0x29]) + _int(rh["tst_disp"]).to_bytes(2, "big")
+                if d2:
+                    # tst; beq.s +0x26 (over the 38-byte d2 window) -> d1 path
+                    tk = (head + bytes([0x67, 0x26])
+                          + _rh_window(et2, _int(rh["bne_target"]))
+                          + _rh_window(et, _int(rh["dispatch"])))
+                else:
+                    tk = (head + bytes([0x67, 0x06])
+                          + bytes([0x4E, 0xF9]) + _int(rh["bne_target"]).to_bytes(4, "big")
+                          + _rh_window(et, _int(rh["dispatch"])))
+                assert len(tk) == th_len, len(tk)
                 ops.append({"op": "code", "addr": f"{th:#x}", "hex": tk.hex()})
                 ops.append({"op": "code", "addr": f"{sp:#x}",
                             "hex": (b"\x4e\xf9" + th.to_bytes(4, "big")).hex()})
@@ -4147,10 +4189,16 @@ def main():
                              f"dispatch -> thunk {th:#08x} (vanilla ids jmp back "
                              f"to untouched {_int(rh['dispatch']):#x}; ids "
                              f"{first_ext:#x}-{first_ext + 2*n_ext - 2:#x} -> "
-                             f"{n_ext} verbatim vs2 cases at {cb:#08x})")
+                             f"{n_ext} verbatim vs2 cases at {cb:#08x}"
+                             + (f"; d2 window -> untouched "
+                                f"{_int(rh['bne_target']):#x}, vs2 d2-twin cases "
+                                f"at {cb2:#08x}" if d2 else "") + ")")
                 fragments.append((cb, len(blob), "VS2", "reaction_hook cases"))
                 fragments.append((et, 4 * n_ext, "GEN", "reaction_hook ext table"))
-                fragments.append((th, 50, "GEN", "reaction_hook thunk"))
+                if d2:
+                    fragments.append((cb2, len(blob2), "VS2", "reaction_hook d2 cases"))
+                    fragments.append((et2, 4 * n_ext, "GEN", "reaction_hook d2 ext table"))
+                fragments.append((th, th_len, "GEN", "reaction_hook thunk"))
                 fragments.append((sp, 6, "GEN", "reaction_hook engine site"))
 
         if args.stage >= 4:

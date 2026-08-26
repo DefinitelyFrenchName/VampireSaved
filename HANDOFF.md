@@ -1519,6 +1519,16 @@ tests/test_fsm_census.sh [bd]        # 14z-110 (#99): the STATIC object-script
                                       # build/manifest/fsm_census.toml. TWO
                                       # negative controls. Needs ROMDIR (vs2
                                       # oracle). ci_static, seconds.
+tests/test_reaction_hook_d2.sh [bd]  # 14z-110 (#99 FIX): the reaction_hook
+                                      # D2-WINDOW gate. RECONSTRUCTS the
+                                      # 82-byte thunk from first principles,
+                                      # re-derives the four d2 cases from
+                                      # vsav2.zip (table 0x016DE4, entries
+                                      # 0x50-0x53), asserts dispatcher 2
+                                      # byte-identical to vsavj's own decrypted
+                                      # dump (ruling (a)), and the census 6/6
+                                      # native-0x51. THREE verdict controls.
+                                      # ci_static, seconds.
 tests/audit_don_vs_cpu.sh            # 14z-110 (#111): deterministic
                                       # Donovan-vs-CPU-{Phobos,Bishamon,Pyron}
                                       # via the venue byte $FF8121 (0x02/03/05),

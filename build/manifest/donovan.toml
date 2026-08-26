@@ -227,6 +227,37 @@ case_a0 = "137c000f00544e75"
 case_a2 = "136b001700544e75"
 case_a4 = "137c005200544e75"
 case_a6 = "42290121137c000100544e75"
+# 14z-110 (#99, maintainer-ruled 2026-08-26): THE D2 WINDOW — the same
+# 0x50-0x53 extension for DISPATCHER 2 (0x018508), whose only entry is the
+# bne.w at 0x01845C inside this hook's own site prefix. The 14z-43
+# es_type51_dispatch consumer audit named dispatchers 1+3 and missed this
+# one; Donovan's six native-0x51 nodes (hitbox 0x10E9..0x1189, the 14z-35
+# cluster) therefore over-indexed the 80-entry table 0x018510 -> word
+# 0x0001 -> odd jmp -> vec3 -> name-screen reboot, walked by Donovan's
+# OPPONENT (the field crash, Phobos AND Bishamon). Fix shape: the thunk's
+# bne-arm gains the SAME window block it runs for dispatcher 1, dispatching
+# ids 0xA0-0xA6 via a SECOND ext table to vs2's DISPATCHER-2 twin (table
+# 0x016DE4) handlers VERBATIM — d2 differs from d1 at 0x52 (move.b #7 vs
+# #0x52) and 0x53 (a two-write case), which is why these are their own keys
+# and not the d1 bytes. Every other index takes `jmp 0x018508` exactly as
+# before; the vanilla dispatcher is byte-untouched (#99 ruling (a)); the
+# node DATA stays native 0x51 (dispatcher 3 + property[0x51]=0x19 need it —
+# a data remap re-breaks 14z-43/44, measured 14z-110). DATA-TRIGGERED, not
+# tenant-id-gated: 0x50-0x53 node bytes exist only in vs2-numbered ported
+# data (vanilla reaching d2 with one crashes today — legacy-safe by
+# impossibility, the index_window_018468 precedent), and the walking object
+# can be a LEGACY character's (field: Bishamon). Cost: two cmpi.w on the
+# hit-stun path (+0x38 set) for every character — gated by the frozen
+# flicker inventory (stop-and-escalate if it moves). CCR from the cmpis is
+# dead (0x018508's move.w sets it first); no register is written on the
+# pass-through path; D1 is scratch only inside the window (dead on handler
+# entry — the shipped d1 ext path's own precedent). Census basis:
+# build/manifest/fsm_census.toml (exactly six 0x51 nodes, all Donovan;
+# H/P zero). Gate: tests/test_reaction_hook_d2.sh. STATE 14z-110; GitHub #99.
+d2_case_a0 = "137c000f00544e75"
+d2_case_a2 = "136b001700544e75"
+d2_case_a4 = "137c000700544e75"
+d2_case_a6 = "137c00010117137c000500544e75"
 
 # Pool-seeding init shim (stage 4+): vanilla vsav never seeds the
 # secondary-object pools during a normal match, vsav2 always does (its

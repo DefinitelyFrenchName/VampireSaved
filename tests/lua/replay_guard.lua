@@ -329,6 +329,29 @@ do
     end
 end
 local probe_cond = os.getenv("GUARD_PROBE_COND")
+-- GUARD_FORCE="<hexaddr>:<minframe>:REG=hexval[,REG=hexval...]" (14z-110):
+-- ONE-SHOT register forcing at a breakpoint — the deterministic rig for
+-- data-path fixes (#99: force D0/A1/A3 at the dispatch site so a scratch
+-- node in the dead-stack window drives the dispatcher, on ANY build).
+-- On the first stop at <hexaddr> with frame >= <minframe>: set the named
+-- registers, write "FORCE <frame> <reglist>" to the log, resume; later
+-- stops at the address resume without acting. Composes with POKES (which
+-- pre-write the scratch bytes) and with the crash detection — a forced
+-- dispatch that faults still reports CRASH normally.
+local force_addr, force_minframe, force_regs, force_done = nil, 0, {}, false
+do
+    local fspec = os.getenv("GUARD_FORCE")
+    if fspec and #fspec > 0 then
+        local a2, mf, rl = fspec:match("^(%x+):(%d+):(.+)$")
+        assert(a2, "GUARD_FORCE must be hexaddr:minframe:REG=hex,...")
+        force_addr = tonumber(a2, 16)
+        force_minframe = tonumber(mf)
+        for r, v in rl:gmatch("(%a%d)=(%x+)") do
+            force_regs[#force_regs + 1] = { r:upper(), tonumber(v, 16) }
+        end
+        assert(#force_regs > 0, "GUARD_FORCE: no REG=hex pairs parsed")
+    end
+end
 local probe_hits = 0
 local PROBE_MAX = tonumber(os.getenv("GUARD_PROBE_MAX") or "") or 400
 -- GUARD_PROBE_HIST=N (14z-81): on each probe hit, append the debugger's
@@ -355,6 +378,13 @@ if debugger and probe_addr then
         debugger:command(string.format("bpset 0x%x", probe_addr))
     end
 end
+-- GUARD_FORCE arms LAZILY at minframe and clears after firing (14z-110):
+-- a debugger stop delays the frame_done input application by a beat, so a
+-- breakpoint that idles armed outside the needed window turns a clean replay
+-- into INPUT-VIOLATIONs (measured: two parallel legs flagged the SAME frame
+-- 2874 — deterministic bp-stop skew, not host input). Armed once, cleared
+-- once; the bp number is parsed from the debugger console.
+local force_armed, force_bpnum = false, nil
 
 if debugger then
     emu.register_periodic(function()
@@ -364,6 +394,21 @@ if debugger then
             local vec = handler_vec[pc]
             if vec then
                 on_crash(vec)
+            elseif force_addr and pc == force_addr then
+                if not force_done and frame >= force_minframe then
+                    local parts = {}
+                    for _, rv in ipairs(force_regs) do
+                        cpu.state[rv[1]].value = rv[2]
+                        parts[#parts + 1] = string.format("%s=%x", rv[1], rv[2])
+                    end
+                    force_done = true
+                    if force_bpnum then
+                        debugger:command("bpclear " .. force_bpnum)
+                    end
+                    f:write(string.format("FORCE %d %s\n", frame,
+                                          table.concat(parts, ",")))
+                end
+                debugger.execution_state = "run"
             elseif probe_addr and pc == probe_addr then
                 local st = cpu.state
                 local sp = (st["A7"] or st["SP"]).value
@@ -508,6 +553,14 @@ emu.register_frame_done(function()
         end
     end
 
+    if force_addr and not force_armed and not force_done
+       and frame >= force_minframe - 1 and debugger then
+        debugger:command(string.format("bpset 0x%x", force_addr))
+        local cl = debugger.consolelog
+        local last = tostring(cl[#cl] or "")
+        force_bpnum = last:match("Breakpoint (%d+) set")
+        force_armed = true
+    end
     f:write(string.format("%d %016x\n", frame, fnv1a64(program:read_range(0xff0000, 0xffffff, 8))))
     if snap_at[frame] then machine.video:snapshot() end
     for _, range in ipairs(dump_at[frame] or {}) do

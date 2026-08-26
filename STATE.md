@@ -1,5 +1,61 @@
 # STATE — living progress log
 
+## Session 14z-110 (2) — **THE #99 FIX IS BUILT AND MECHANISM-PROVEN
+## (A/B, register-forced): old build vec3s at the exact field signature,
+## new build runs vs2's copy handler.** Builds: don_m12 + m3b_merged14
+## (UNREGISTERED — the freeze is step 3). Audit phase begins.
+
+**The fix, as ruled** (patch_index "14z-110 additions"): `[reaction_hook]`
+gains `d2_case_a0/a2/a4/a6` (vs2 dispatcher-2 twin `0x016DE4` handlers,
+verbatim — d2 differs from d1 at 0x52/0x53); the emitter
+(`gen_donovan_patch.py`) emits an 82-byte thunk whose bne-arm carries the
+same `0x50-0x53` window as the d1 arm via a SECOND ext table, falling
+through to `jmp 0x018508` for every other index. Without d2 keys the
+50-byte thunk is emitted byte-identical (probe manifests unchanged).
+Vanilla dispatcher byte-untouched — asserted against vsavj's OWN decrypted
+dump, not a build artifact.
+
+**THE RH-43 A/B (GUARD_FORCE rig, `tests/replays/21_don_mash` + Donovan
+picked, scratch node in the dead-stack window `$FF7F00/$FF7F80`,
+`(0x17,A3)=0x51`, D0/A1/A3 forced at the site 0x018458):**
+- don_m11 (old): `FORCE 3462` -> `CRASH 3463 vec3 PC 01850E ADDR 00018511`
+  — the EXACT #99 signature, on demand, first time on MAME.
+- don_m12 (new): `FORCE 3223` -> END 14120 clean, scratch `+0x54 = 0x51`
+  (the copy handler ran — vs2's semantics exactly). **0 INPUT-VIOLATIONS**
+  after the instrument fix below.
+
+**INSTRUMENT: `GUARD_FORCE` added to `replay_guard.lua`**
+(`hexaddr:minframe:REG=hex,...`, one-shot register forcing) — first version
+armed its breakpoint eagerly and every pre-window debugger stop skewed the
+frame_done input application by a beat: BOTH parallel legs flagged the SAME
+frame 2874 as INPUT-VIOLATION (deterministic bp-stop skew, not host input).
+Now lazy-arms at minframe-1 and bpclears after firing; the clean leg shows
+zero violations. Filed under "suspect the instrument" — count now NINE.
+
+**Gate: `tests/test_reaction_hook_d2.sh`** (ci_static) — manifest hex
+re-derived from vsav2.zip, thunk reconstructed from first principles, the
+vanilla dispatcher compared against vsavj's decrypted dump, census 6/6,
+three verdict controls; PASS on don_m12 AND m3b_merged14. Its own first
+version had wrong ext-table offsets and FAILED the good build — fixed and
+the controls now prove it can fail for the right reasons.
+
+**Op-count pins re-frozen with attribution** (`test_tenant_loop`: don
+325->327, N=2 600/652->602/654, N=3 806/907->808/909 — +2 = the d2 cases
+blob + its ext table, Donovan-declared, nothing dedupes; the thunk grows
+50->82 bytes of hex, not an op). Placements: the 82-byte thunk moved to
+`0x3FFD50` and six downstream 0x3FFDxx allocs shifted +0x60 (site-operand
+carried; pcrel/pointer_flow re-derive at the freeze, the 14z-105 class).
+
+**NOTE FOR THE FREEZE: the STOCK TWIN MOVES THIS TIME.** The reaction_hook
+is not profile-gated (the substituted track carries the same six 0x51
+nodes and needs the same fix), so m5_stock7 will fingerprint differently —
+unlike 14z-105's profile-gated window. Budget the stock re-freeze.
+
+**AUDIT (step 2 of the ruled order) — in flight:** fbneo legacy oracle,
+audit_don_vs_cpu + guard corpus on merged14, audit_merged_legacy (the
+flicker-inventory gate); results land below before any freeze.
+
+
 ## Session 14z-110 — **THE #99 FIX WINDOW, RE-SCOPED TO MEASURE-FIRST: the
 ## ruled data-remap is UNSAFE, the census is CLEAN, the #111 coverage gap is
 ## CLOSED with a deterministic gate.** No shipped byte moved; the fix shape is

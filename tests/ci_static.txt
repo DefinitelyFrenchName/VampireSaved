@@ -17,6 +17,7 @@
 #     already ROM-free and lives in ci_portable ---
 test_m3a_reproducible
 test_patch_overlap
+test_reaction_hook_d2
 test_region_overlap
 test_region_overlap_control
 test_romset_identity
