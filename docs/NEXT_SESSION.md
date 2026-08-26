@@ -60,6 +60,30 @@
 > ## that have already left the tree.
 > ##
 
+> ## **14z-109 (2): THE SELECT SCREEN CONFIRMS THE PROMOTE-BIT SPLIT IS
+> ## THE RIGHT CUT, NOT A CONVENIENCE.** At select NO CPU OPPONENT HAS BEEN
+> ## DRAWN, so the lottery that limits the match-anchor comparison is
+> ## ABSENT — which makes it an independent test of the split itself.
+> ## **Measured over 81 core frames vs 111 MAME frames, both NON-CONSTANT
+> ## (21 and 31 distinct lists, so agreement is not cheap):**
+> ## **the PROMOTED subset has an exact MAME twin on ALL 81 frames (100%),
+> ## with 67-72 promoted entries — more than twice the match anchor's 31.**
+> ## The WHOLE list matches on 55 of 81 (68%), **and every shortfall is in
+> ## the UNPROMOTED (vanilla) part** — so our content agrees everywhere and
+> ## the vanilla remainder carries some phase noise. **THAT REMAINDER IS AN
+> ## OPEN QUESTION, NOT A DEFECT CLAIM: it is not the lottery (no opponent
+> ## exists here), most likely a sub-frame sampling phase, and it has not
+> ## been root-caused.** It is REPORTED, never asserted.
+> ## **AND THE AUTHORED "M6" VERSION MARK IS IDENTICAL ACROSS
+> ## IMPLEMENTATIONS** — codes `fe40`/`fe41` (the authored glyph tiles),
+> ## palette row 0x19, same coordinates on both. The naked-eye A/B tell is
+> ## now a MEASURED agreement rather than a picture.
+> ## Gate: `tests/test_mister_obj_oracle.sh` section 3
+> ## (`--select-sim-dir/--select-mame-log`), helper
+> ## `tools/obj_select_compare.py`. Its 3z check FAILS if the select list
+> ## is constant — a static screen would make agreement meaningless.
+> ##
+
 > ## **14z-109: A VIDEO-DETERMINING SURFACE FINALLY AGREES ACROSS
 > ## IMPLEMENTATIONS — THE OBJ LIST.** 14z-108 ruled VRAM out as an oracle
 > ## (two implementations legitimately differ there, the palette by HALF,

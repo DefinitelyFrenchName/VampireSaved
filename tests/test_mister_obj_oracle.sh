@@ -44,11 +44,13 @@ EXP_AS=3546            # frozen sim anchor, ABSOLUTE
 EXP_PROMOTED=31        # frozen 14z-109
 EXP_A19_LO=0x4b0c4
 EXP_A19_HI=0x4ecda
-SIMDIR=""; MAMELOG=""
+SIMDIR=""; MAMELOG=""; SELSIM=""; SELMAME=""
 while [ $# -gt 0 ]; do
     case "$1" in
         --sim-dir)  shift; SIMDIR="$1" ;;
         --mame-log) shift; MAMELOG="$1" ;;
+        --select-sim-dir)  shift; SELSIM="$1" ;;
+        --select-mame-log) shift; SELMAME="$1" ;;
         *) echo "unknown arg $1" >&2; exit 2 ;;
     esac
     shift
@@ -193,6 +195,30 @@ PY
 grep -q "^PROMOTED_IDENTICAL NO" "$W/bad.txt" \
     && ok "2a control fired: a one-bit change in a promoted tile code is caught" \
     || bad "2a a perturbed promoted entry still compared EQUAL — the gate is blind"
+
+if [ -n "$SELSIM" ] && [ -n "$SELMAME" ]; then
+echo "== 3 THE SELECT SCREEN — no CPU opponent has been drawn, so no lottery =="
+# This is the STRONGER leg: with no opponent the confound that limits section 1
+# to the promoted subset is absent, so the WHOLE list becomes comparable. It
+# also covers content section 1 never sees — the wheel medallions and the
+# authored version mark.
+python3 "$REPO/tools/obj_select_compare.py" "$SELSIM" "$SELMAME" > "$W/sel.txt" 2>&1
+sed 's/^/    /' "$W/sel.txt"
+SN=$(awk '/^FRAMES/{print $2}' "$W/sel.txt")
+SP=$(awk '/^PROMOTED/{print $2}' "$W/sel.txt")
+SW=$(awk '/^WHOLE/{print $2}' "$W/sel.txt")
+CD=$(awk '/^DISTINCT/{print $2}' "$W/sel.txt")
+[ "${CD:-1}" -gt 1 ] 2>/dev/null \
+    && ok "3z the select list is NON-CONSTANT ($CD distinct core lists) — agreement is not cheap" \
+    || bad "3z the core select list is CONSTANT across the window; agreement would be meaningless"
+[ -n "$SP" ] && [ "$SP" = "$SN" ] \
+    && ok "3a the PROMOTED subset has an exact MAME twin on ALL $SN select frames" \
+    || bad "3a promoted subset matched on only ${SP:-?} of ${SN:-?} select frames"
+ok "3b whole-list agreement is $SW of $SN — the shortfall sits in the UNPROMOTED part and is REPORTED, never asserted"
+grep -q "^VERSIONMARK [1-9][0-9]* MATCH" "$W/sel.txt" \
+    && ok "3c the authored M6 version mark (palette row 0x19) is IDENTICAL across implementations" \
+    || bad "3c the version mark is absent or differs"
+fi
 
 echo
 [ "$fail" -eq 0 ] && echo "PASS test_mister_obj_oracle" || echo "FAIL test_mister_obj_oracle"
