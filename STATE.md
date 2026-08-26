@@ -68,6 +68,13 @@ touches those sets.
   re-frozen since against the actual content; headers NOT edited in-file,
   replay file sha1s are frozen in sim gates).
 
+- **The deferred-to-freeze validations are done:** stage-4 gate PASS on the
+  corrected target (all replays masked-exact — no cycle question on that
+  track); M2 battery on stock7 23/23 passed with its one skip (the
+  wide-render gate) covered by a direct run — PASS (member identity + band
+  equivalence + de-substitution invariant + control + liveness). The last
+  re-point miss (the gate's m5_stock6 default) fixed on the way.
+
 ### WHAT REMAINS (the next session's opener)
 
 The FIELD TEST of merged-m7: fresh board bundle at `../mister_fieldtest_14z110/`
