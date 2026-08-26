@@ -1,0 +1,31 @@
+# 109: 2P VERSUS, P1 Donovan vs P2 Phobos — the crash-discriminator replay
+# (14z-109, the MiSTer field crash). No arcade ladder, no lottery, no
+# borrow: the two tenants' asset streams collide with none of the arcade
+# draw machinery involved. BUILD-ONLY (extended wheel + tenants at
+# 0x10/0x13).
+# P1 path from default 0x01 Demitri: L->05 L->0A D->09 D->13 (36's path).
+# P2 path from default 0x05 Morrigan: R->01 D->06 D->08(Bishamon) D->10
+# (the roster21 inbound edge 08+D->10; wheel_layout_proposed.json).
+300-305 sys=C1
+360-365 sys=C2
+800-803 sys=S1
+860-863 sys=S2
+1000-1002 p1=L
+1040-1042 p1=L
+1080-1082 p1=D
+1120-1122 p1=D
+1010-1012 p2=R
+1050-1052 p2=D
+1090-1092 p2=D
+1130-1132 p2=D
+1700-1702 p1=1
+1740-1742 p2=1
+2600-2602 p1=1
+2700-2702 p2=2
+2800-2802 p1=3
+2900-2902 p2=1
+3000-3002 p1=2
+3100-3102 p2=3
+3300-3302 p1=1
+3500-3502 p2=1
+7000 wait

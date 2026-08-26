@@ -1,5 +1,134 @@
 # STATE — living progress log
 
+## Session 14z-109 (4) — **THE #99 CRASH INVESTIGATED ON EMULATOR: a
+## confirmed mechanism CLASS, real eliminations, and an HONEST GAP — no
+## clean natural repro of the exact field crash yet.** Also surfaced: the
+## standing crash-soak coverage has rotted, which is why nothing caught it.
+
+**Maintainer's refined field data (2026-08-26):** 1P-vs-COM ARCADE ONLY,
+Donovan P1 vs Phobos, crashes at SOME point in the match (not necessarily a
+hit, not necessarily the start); **2P versus Donovan-vs-Phobos does NOT
+crash**; first-fight Phobos crashed ~1/2, the ladder second-fight (after
+beating Bishamon) is the 100% path.
+
+### CONFIRMED BY DISASSEMBLY — the per-class sfx dispatcher is UNBOUNDED
+
+`PRG:0x27F16`: `move.b (0x382,a6),d1` -> `lsl.w #2,d1` -> `lea 0x0BF41A,a0`
+-> `movea.l (0,a0,d1.l),a0` -> jumps through `a0`. **No bounds check.** The
+table has valid handler pointers for classes `0x00-0x27` (legacy + arcade +
+the three tenants at `0x10`/`0x11`/`0x13` -> WIDE ext); beyond that it reads
+non-pointer bytes. **Forcing an out-of-range class into `+0x382` crashes
+exactly there** — probe J: class `0x20`/`0x30`/`0x40` -> `vec3` address
+error at `~0x02adXX`; `0x12`/`0x14`/`0x18`/`0x28` safe.
+
+### THE FIELD PATTERN FITS THIS, AND 2P-CLEAN IS THE KEY
+
+The voice-class borrow (`PRG:0x0AEF2`, thunked to our `0x3FFC60`) runs in the
+ARCADE path and writes `+0x382` from the opponent-candidate list; its value
+is sound-fed (`$FF8110`), hence STOCHASTIC. 2P has no borrow, so `+0x382`
+stays the char id (`0x13`/`0x10`, both valid) -> never crashes. A bad class
+armed at match start FIRES on the next sfx event, which can be any time ->
+"crashes at some point, not necessarily a hit". Every field observation is
+consistent with a bad `+0x382` reaching the unbounded dispatcher.
+
+### ELIMINATED: the #92 stage-`0x18` mechanism
+
+The 14z-94 #92 crash was table-B stage `0x18` (vs2's 13th stage) indexing the
+banner family past its end. **Measured: tenant table-B rows `0x10`/`0x11`/
+`0x13` contain NO `0x18`** — the fix covered Donovan too. This is a DIFFERENT
+bug in the same subsystem, NOT a #92 regression.
+
+### THE HONEST GAP — no clean natural emulator repro
+
+- probe J crashes but on a FORCED class (artificial).
+- probe H crashed (`0x01850e`, a different PC — a state jump-table, not the
+  sfx dispatcher) but had in-match class pokes; not trustworthy.
+- first-fight-Phobos: 8 sound-state seeds, active Donovan, ZERO crashes.
+- the committed `audit_continue_switch.sh` DRIFTED on merged13 — it ran clean
+  but never reached the Donovan-vs-Phobos pairing (its trajectory is frozen
+  to merged11), so its "clean" is vacuous here. **This also weakens the
+  original #99 closure, which the 14z-100 note already flagged as "weak
+  evidence".**
+- **POSSIBILITY TO HOLD: the crash may be more readily reproducible on the
+  CORE than on MAME** (user 100% vs my ~0% natural). Either a stochastic
+  state my rigs missed, or a core-specific amplifier. 2P-clean on the core
+  argues against a pure asset-streaming collision.
+
+### WHY NOTHING CAUGHT IT — coverage rot (the recurring class)
+
+- `26_don_arcade_mash` (the "Donovan arcade mash" soak) navigates U,U,R,
+  which on the EXTENDED wheel lands on **Jedah `0x0F`**, not Donovan — the
+  soak lost its nominal subject.
+- `audit_continue_switch.sh`'s frozen trajectory no longer reaches the
+  pairing. **No current gate exercises Donovan-vs-CPU-Phobos.** Same
+  "check that stopped checking" class as 14z-94/95.
+
+### ARTIFACT
+
+`tests/replays/109_2p_don_vs_phobos.rpl` — the first 2P versus replay in the
+tree (CLAUDE.md §4 has wanted "vs each of the 18, both sides"), P1 Donovan vs
+P2 Phobos via the extended wheel, made possible by tonight's P2 scripting.
+Verified P1=Donovan `0x3FA9D0` / P2=Phobos `0x4595B0` load on MAME.
+
+### NEXT (measurement, not arbitrage — per the maintainer's standing ask)
+
+Reach the pairing NATURALLY and TRACE the borrow's actual write to `+0x382`
+for a Phobos opponent: re-measure the continue-switch trajectory for
+merged13 (its header documents how) OR a fresh venue-steered marathon, then
+tap `$FF8782`/`$FF8B82` through the Donovan-vs-Phobos match. If a class
+whose `table[class]` is a bad pointer appears, that is the root cause and
+the fix is either bounding the dispatcher or fixing what the borrow writes
+for a tenant opponent. The 2P sim (core) is a cross-check, not the hunt.
+
+## Session 14z-109 (3) — **THE FIELD TEST RAN, AND THE ARC'S QUESTION IS
+## ANSWERED: THE CORE WORKS ON HARDWARE.** Tenants selectable and playable,
+## TENANT VOICES PLAY (the one thing simulation could never answer), select
+## screen emulator-identical. **AND ONE 100%-REPRODUCIBLE CRASH — which is
+## #99 BACK FROM THE DEAD, now with a deterministic repro path it never had.**
+
+**The maintainer's field report (MiSTer, DE10-Nano, 2026-08-26), verbatim in
+substance — the primary artifact:**
+
+- Boots; 1P vs COM plays well, general feel BETTER than emulator (likely
+  input-lag/handling, the maintainer suggests).
+- **Sound plays, INCLUDING THE NEW TENANTS' — all seems good.** ["Fetched is
+  not heard" is retired: the QSound extension is now HEARD on hardware.]
+- Select screen emulator-identical, usage-wise perfect (parked cosmetics
+  aside, out of scope).
+- All 3 tenants selectable, playable, no graphical or other issues before,
+  during or after matches — with ONE exception:
+- **A 100%-reproducible crash-reset: pick DONOVAN 1P in normal mode, first
+  fight BISHAMON, WIN it -> second fight is ALWAYS PHOBOS (stage may vary,
+  opponent never) -> crash-reset at the end of the character intro or just
+  as the fight begins, regardless of input.** Not tried on emulator yet.
+  Does NOT happen picking Phobos or Pyron as P1.
+- 2P versus not yet tried; confidence high.
+
+### THE CRASH IS #99, AND ITS CLOSURE DID NOT HOLD
+
+Archaeology (CLAUDE.md §5, done BEFORE touching anything):
+- **14z-94 (#99):** the SAME signature — Donovan vs CPU-Phobos, "crashed
+  right after the character's intro at fight start" — on **MAME**, build
+  merged9, reached via continue+switch to match 5. So the crash class is
+  NOT MiSTer-specific.
+- **14z-100:** `tests/audit_continue_switch.sh` reached the literal
+  Donovan-vs-CPU-Phobos pairing at **match 4** on merged11 and ran clean —
+  the basis for closing #99, with the caveat recorded at the time: "the
+  clean pass is weak evidence" that #103's fix removed the trigger.
+- **The field path is DIFFERENT and NEVER TESTED: match 2, reached by
+  WINNING match 1 (vs Bishamon), no continue.** The 14z-100 rig cannot have
+  exercised it.
+- Also on the books: the 14z-94 LEAD, explicitly unmeasured then — the
+  voice-class borrow (`ram.md:87`) writes a class from the OPPONENT'S
+  candidate row into `+0x382` at match start; a tenant opponent makes that
+  a tenant class; and the crash timing (right after the intro) is when the
+  dispatcher first fires.
+
+**In flight: an emulator repro attempt** on merged13/MAME under the crash
+guard — if it reproduces, the full instrument set (write taps with PC
+attribution, per-frame dumps) applies; if it does not, the difference
+between implementations is itself the lead.
+
 ## Session 14z-109 (2026-08-25/26) — **THE FIELD TEST GAINED A NEGATIVE
 ## CONTROL IT DID NOT HAVE, AND THE OBJ LIST BECAME THE FIRST WORKING
 ## CROSS-IMPLEMENTATION VIDEO ORACLE.** Opened while the maintainer's
