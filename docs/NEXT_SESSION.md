@@ -1,4 +1,55 @@
-# NEXT SESSION — orientation (rewritten at the 14z-109 CLOSE, 2026-08-26)
+# NEXT SESSION — orientation (rewritten at the 14z-110 CLOSE, 2026-08-26)
+
+> ## **START HERE. #99 IS RE-OPENED FOR THE MAINTAINER — the fix is BLOCKED on
+> ## a ruling, not on work. The census is DONE and clean; the coverage gap is
+> ## closed. Read GitHub #99's newest comment first, then decide the fix shape.**
+> ##
+> ## **WHAT 14z-110 FOUND (measure-first, no shipped byte moved):** the ruled
+> ## data remap `0x51 -> 0x19` is UNSAFE. The node byte feeds THREE dispatchers
+> ## (`0x018460`/`0x018508`/`0x0185D2`, 80-entry each; vs2 twins 84 -> gap
+> ## `0x50-0x53`); the 14z-43 audit named 1+3 and missed **2 (`0x018508`)**,
+> ## where #99 crashes. `0x51->0x19` diverges on dispatcher 3 and fails the
+> ## `es_type51` thunk's `cmpi #0x51`; any copy-aliased value (`0x4E/0x4F`)
+> ## changes `property[class]` (the 14z-44 ES-freeze family). No safe DATA
+> ## value exists. Full trail: STATE 14z-110; GitHub #99 (current).
+> ##
+> ## **THE CENSUS IS CLEAN:** `tools/audit_fsm_census.py` (static, family-aware
+> ## node-record signature + vs2 oracle) finds EXACTLY the six known `0x51`
+> ## nodes in Donovan's hitbox — Huitzil/Pyron ZERO, no `0x50/0x52/0x53`
+> ## clusters. Dynamic corpus (`tests/lua/fsm_census.lua`, 8 replays): zero
+> ## `idx>=0x50` dispatched. So the escalation clause has nothing to escalate.
+> ## Frozen inventory `build/manifest/fsm_census.toml`; gate `test_fsm_census`
+> ## (ci_static, two negative controls). #99 does NOT reproduce on MAME from a
+> ## P1-mash (venue-`0x02` marathon clean to END 40620) — the honest gap.
+> ##
+> ## **THE RECOMMENDED FIX (maintainer's to ratify):** code-side on dispatcher
+> ## 2's arm, inside the `reaction_hook` that already owns the only entry to it
+> ## (`bne 0x018508` in the site prefix `0x018458`) — give that arm the same
+> ## `0x50-0x53` window the reaction_hook runs for dispatcher 1, from vs2's
+> ## twin `0x016DE4` verbatim; data stays native `0x51`. Cost ~2 compares on a
+> ## legacy path — **measure against the frozen flicker inventory before it
+> ## ships.** NOT a "port the handler" import (reuses handlers already present).
+> ##
+> ## **#111 (coverage) — CORE GAP CLOSED:** `tests/audit_don_vs_cpu.sh` reaches
+> ## Donovan-vs-CPU-{Phobos,Bishamon,Pyron} deterministically via venue
+> ## `$FF8121` (0x02/0x03/0x05); replay `110_don_arcade_mash` (26's mash body,
+> ## WIDE L,L,D,D prologue; 26 untouched). STILL OPEN on #111: 33 replays share
+> ## 26's stock-track `U,U,R` prologue (triage), and `audit_continue_switch` is
+> ## still frozen to merged11 (re-measure with the re-freeze).
+> ##
+> ## **THEN, AFTER THE RULING + FIX:** the flicker-inventory cost measurement,
+> ## the re-freeze (donovan-m12 / huitzil-m21 / pyron-m15 / merged-m7) and its
+> ## MiSTer CRC tail (`gen_vsavjw_xml.py --check` -> fork catalogue commit ->
+> ## `mister_mra.sh --wide` bundle). Budget it; the field crash is the reason.
+> ##
+> ## **PUSH STATE:** the 14z-110 work is COMMITTED to local `main` (700bb97),
+> ## NOT pushed (maintainer's call). `emu/fbneo` shows a pre-existing submodule
+> ## `m` not from this session. Check `git ls-remote`, not prose.
+
+# HISTORY BELOW — the 14z-109 orientation and older; kept for the census
+# anchors, eliminations and traps, superseded as the opener.
+
+## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-109 CLOSE, 2026-08-26)
 
 > ## **START HERE. THE OPENER IS THE #99 FIX WINDOW — census, remap rule,
 > ## the #111 coverage repairs, then the re-freeze. Everything is ruled;
@@ -98,8 +149,7 @@
 > ## is DURABLE but goes STALE at the re-freeze; `../dumps/` is the
 > ## maintainer's, safe to delete wholesale per its README.
 
-# HISTORY BELOW — the 14z-108 orientation and older; kept for the
-# eliminations and traps, superseded as the opener.
+
 
 ## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-108 CLOSE, 2026-08-25)
 
