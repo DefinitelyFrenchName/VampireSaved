@@ -364,10 +364,12 @@ upstream bug, not a profile change, and it would be a clean upstream report.
 `tests/test_sim_wram_contract.sh` check 12 holds the pinned `test.cpp` to it
 with a must-fire control.
 
-**WHAT IT IS NOT.** It does not add P2 or button 5/6 SCRIPTING —
-`tools/rpl2siminputs.py` still refuses `p2=` and `p1=4/5/6` loudly, and
-`02_demitri_vs_cpu` / `04_select_fuzz` still do not translate. The
-maintainer ruled that COVERAGE half "later" (STATE "Decisions pending"); the
+**WHAT IT IS NOT.** It does not add P2 or button 5/6 SCRIPTING — that was
+the COVERAGE half, ruled "later" at the time. **[DONE for P2 at 14z-109:
+fork commit `4dfc3734` + `rpl2siminputs.py` emit P2 directions/buttons 1-3
+into previously-unused file bits 12+, provably byte-identical for every
+older replay (the frozen `eb3e1d04…` sha1 asserted unchanged). Buttons
+4/5/6 remain refused. First real use: `109_2p_don_vs_phobos.rpl`.]** The
 FIDELITY half is what shipped here, because it is a bug and it was making
 the oracle's two legs run different inputs.
 
@@ -1925,12 +1927,13 @@ any core.
 - Input coverage: the v1.7.3 harness is P1-only with 4 buttons, so
   `02_demitri_vs_cpu` and `04_select_fuzz` still refuse. Extending
   `test.cpp`'s `SimInputs` (P2, buttons 5/6) is a further fork commit —
-  **DECIDED (maintainer, 2026-08-23): later.**
-  **THE FIDELITY HALF IS DONE (14z-107 (8), fork commit 10)** — buttons 5
-  and 6 were not absent, they were stuck ON, and so were P2's; that was a
-  BUG, it made the oracle's two legs run different inputs, and it is fixed
-  and re-frozen. What remains deferred is the COVERAGE half: making them
-  SCRIPTABLE so a 2P replay can pin the arcade-draw opponent.
+  **DECIDED (maintainer, 2026-08-23): later — and "later" ARRIVED at
+  14z-109 (maintainer-ruled during the #99 crash hunt): P2 IS SCRIPTABLE**
+  (fork `4dfc3734`, file bits 12+, backward compatibility proven by the
+  unchanged frozen sha1). Buttons 4/5/6 remain unexpressible/refused.
+  **THE FIDELITY HALF was already done (14z-107 (8), fork commit 10)** —
+  buttons 5 and 6 were not absent, they were stuck ON, and so were P2's;
+  that was a BUG, fixed and re-frozen.
 - ~~The width surgery itself (SDRAMW 23 -> 24 and the bank/prog/ioctl bit)
   waits on the profile-shape ruling in STATE "Decisions pending".~~
   **SUPERSEDED 14z-107 (2).** The PROFILE ruling landed (WIDE v1 verbatim,

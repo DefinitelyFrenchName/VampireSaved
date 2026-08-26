@@ -39,11 +39,13 @@ fix would have left half the defect in place. Derive an input map from the
 bit ORDER and confirm it against the game's own mirror; never from a macro
 name (docs/platform/gotchas.md, THE INSTRUMENT PROTOCOL).
 
-P2 and buttons 5/6 are NOT EXPRESSIBLE in that harness: a replay that uses
-them is refused LOUDLY rather than silently truncated (the 14z-102 gotcha:
-identify moves by measured effects, never by what the script was meant
-to say). Extending the harness is fork work and a separate change —
-maintainer-ruled "later" (STATE, Decisions pending).
+P2 IS SCRIPTABLE SINCE 14z-109 (fork commit 4dfc3734 + the P2DIRS/P2BTNS
+tables below): p2 directions and buttons 1-3 emit into file bits 12+,
+which were unused — so every pre-14z-109 sim_inputs.hex is byte-identical
+and the frozen sha1s/anchors could not move (gate section 7). Buttons
+4/5/6 (either player) remain NOT EXPRESSIBLE and are refused LOUDLY
+rather than silently truncated (the 14z-102 gotcha: identify moves by
+measured effects, never by what the script was meant to say).
 
 NOT EXPRESSIBLE IS NOT THE SAME AS NOT PRESSED, and at v1.7.3 they were
 PRESSED: `test.cpp` masked the joystick word with `&0xf0` and seeded

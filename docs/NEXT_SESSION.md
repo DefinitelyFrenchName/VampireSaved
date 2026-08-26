@@ -1,4 +1,105 @@
-# NEXT SESSION — orientation (rewritten at the 14z-108 CLOSE, 2026-08-25)
+# NEXT SESSION — orientation (rewritten at the 14z-109 CLOSE, 2026-08-26)
+
+> ## **START HERE. THE OPENER IS THE #99 FIX WINDOW — census, remap rule,
+> ## the #111 coverage repairs, then the re-freeze. Everything is ruled;
+> ## nothing is open except the work.**
+> ##
+> ## **WHAT HAPPENED IN 14z-109, one breath:** the FIELD TEST PASSED — the
+> ## core boots on a real DE10-Nano, tenants selectable and playable,
+> ## TENANT VOICES PLAY ("fetched is not heard" is retired), select screen
+> ## emulator-identical, feel better than emulator — with ONE
+> ## 100%-reproducible crash, which was ROOT-CAUSED the same day: **#99 =
+> ## vs2 type byte `0x51` at node `ROM 0x3FB899` inside DONOVAN'S ported
+> ## block**, walked by Donovan's OPPONENT (any — Phobos AND Bishamon both
+> ## crashed it in the field), indexing past vsavj's ~0x28-state FSM jump
+> ## table at `PRG:0x018510` -> word `0x0001` -> odd jump -> vec3 -> the
+> ## game's own exception handler soft-boots to the NAME SCREEN. Every
+> ## field observation is downstream of this. Full trail: STATE 14z-109
+> ## (3)-(8); mechanism docs: engine_internals "CPU exceptions" + "The
+> ## object-script state dispatcher"; GitHub #99 is current.
+> ##
+> ## **THE RULING IS TAKEN (maintainer, 2026-08-26) — (a)+(b)+(c):**
+> ## (a) fix shape A: DATA-SIDE EXTRACTION REMAP — the dispatcher (vanilla
+> ## code on the legacy path) is NEVER patched. (b) `0x51 -> 0x19`:
+> ## vs2's `0x51` aliases vs2's DEFAULT handler (`move.b (0x17,a3),
+> ## (0x54,a1); rts`) and vsavj's default at table offset `0x17C` (handler
+> ## `0x01868C`, aliased by `0x19-0x1C`/`0x20-0x23`/`0x27`) is
+> ## BYTE-IDENTICAL — the remap is instruction-level exact, zero gameplay
+> ## surface. (c) THE CENSUS with the ESCALATION CLAUSE: scan ALL THREE
+> ## tenants' node streams (0x18-byte nodes, next-state byte at +0x17) for
+> ## values `>= 0x28`; default-alias hits auto-remap by the same
+> ## handler-equivalence proof; **anything else returns to the maintainer
+> ## as its own decision.**
+> ## **THE STANDING CAVEAT ON ESCALATED HITS (maintainer's own
+> ## instruction, also a persistent memory):** "port the handler" LOOKS
+> ## best but is NOT FREE — memory, cycles, side-effects. Order: measure
+> ## what the state DOES and how often content reaches it -> consider
+> ## neutralize-to-default -> port ONLY if feel demonstrably needs it.
+> ## **Raise this point if the maintainer seems too eager to approve a
+> ## port.**
+> ##
+> ## **HOW THE FIX LANDS (the mechanism already exists):** the extraction's
+> ## `data_port` rows carry a `fixes = "off:old:new"` field — the #92 stage
+> ## bytes shipped exactly this way (`voice_borrow_voicenums_b`,
+> ## patch_notes 14z-94). The census names the offsets; the remap becomes
+> ## `fixes` entries (or a dedicated family-aware rule if the hits are
+> ## many) on the ops that port each tenant's block. **The census must be
+> ## FAMILY-AWARE — walk the node streams the way the FSM does; a blanket
+> ## byte replace would corrupt nodes whose +0x17 is not a state.** Anchor
+> ## facts for the walker: our node `0x3FB882` = vs2 `0x0C9CAA` (verbatim,
+> ## unique content hit); Donovan base `0x3FA9D0`; the vs2 FSM table is
+> ## `0x016D34` (0x54 states), ours `0x018510` (~0x28).
+> ##
+> ## **#111 LANDS IN THE SAME WINDOW:** re-point `26_don_arcade_mash`'s
+> ## navigation (U,U,R lands on JEDAH on the 21-cell wheel; L,L,D,D
+> ## reaches Donovan — measured), re-measure `audit_continue_switch.sh`'s
+> ## trajectory per its own header, and ADD the missing gate: Donovan vs
+> ## CPU-Phobos (and ideally each tenant vs each tenant CPU). **The venue
+> ## byte `$FF8121` makes that DETERMINISTIC: the draw pool is
+> ## `row[venue..venue+7]` (measured 12/12) — venue `0x02` = Phobos first
+> ## on his paired stage, venue `0x10` = Bishamon-then-Phobos, the two
+> ## field contexts.** A 2P replay exists too: `109_2p_don_vs_phobos.rpl`
+> ## (P2 scripting landed this session — fork `4dfc3734`, bits 12+,
+> ## frozen sha1s provably unmoved).
+> ##
+> ## **THEN THE RE-FREEZE (donovan-m12 / huitzil-m21 / pyron-m15 /
+> ## merged-m7), and its MiSTer TAIL:** a romset rebuild moves CRCs ->
+> ## `tools/gen_vsavjw_xml.py --check` goes red -> the fork's catalogue
+> ## entry needs a NEW COMMIT and the MRA/bundle for the board must be
+> ## REGENERATED (`../mister_fieldtest_14z108/` becomes stale the moment
+> ## the freeze lands). Budget it; the field crash is the whole reason for
+> ## the window, so the maintainer will want the new bundle on the SD card.
+> ##
+> ## **CRASH-TRIAGE KIT, if anything else ever "flaky-resets":**
+> ## name-screen reboot = CPU exception (code at `$FF0000`, regs at
+> ## `$FF0018-53` — but ONLY if the handler runs; under the guard read
+> ## regs via `GUARD_PROBE`, the RAM block stays stale); gold full test =
+> ## cold/watchdog. Method: deterministic lab rat -> vector+ADDR ->
+> ## `GUARD_PROBE_HIST` -> conditional register probe (PROBE prints
+> ## A1/A3 since 14z-109). Three guarded runs took #99 from "flaky" to a
+> ## named byte.
+> ##
+> ## **ALSO NEW THIS SESSION, so it is not re-derived:** the OBJ-LIST
+> ## ORACLE — first cross-implementation video-determining agreement
+> ## (promoted subset field-identical at match anchor AND select screen;
+> ## M6 mark identical; `test_mister_obj_oracle.sh` + `test_obj_records.sh`,
+> ## HANDOFF rows); the DECISIONS CLEANUP — resolved rulings live in
+> ## `DECISIONS_HISTORY.md` (topic-greppable, retraction grep covers it),
+> ## STATE keeps only live items; the repo-root dump litter moved to
+> ## `../dumps/` (README inside; all regenerable).
+> ##
+> ## **PUSH STATE: everything is pushed** — `origin/main` current at the
+> ## close commit, fork at `4dfc3734` (20 commits, public). Check
+> ## `git ls-remote`, not prose. **Scratch:** the jtsim clone
+> ## `/tmp/vampire-saved-jtsim-14z108` was SWEPT at this close (field test
+> ## reported; rebuild is one `setup` command); `../mister_fieldtest_14z108/`
+> ## is DURABLE but goes STALE at the re-freeze; `../dumps/` is the
+> ## maintainer's, safe to delete wholesale per its README.
+
+# HISTORY BELOW — the 14z-108 orientation and older; kept for the
+# eliminations and traps, superseded as the opener.
+
+## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-108 CLOSE, 2026-08-25)
 
 > ## **THE OPENER IS THE FIELD TEST, AND IT IS THE MAINTAINER'S.**
 > ## Simulation is EXHAUSTED for this arc. A tenant fights on the core and
@@ -553,7 +654,8 @@
 > ## **`audit_sdram_bank_load`'s phase boundaries are keyed to the anchor
 > ## and therefore did NOT move** (2608 / 2614); re-deriving the table from
 > ## `build/sdram_bank_load_14z107.log` reproduces it exactly.
-> ## **STILL DEFERRED (maintainer): the COVERAGE half** — making buttons 5/6
+> ## **~~STILL DEFERRED (maintainer): the COVERAGE half~~ [P2 DONE 14z-109;
+> ## buttons 4/5/6 still refused]** — making buttons 5/6
 > ## and P2 SCRIPTABLE. `tools/rpl2siminputs.py` still refuses them loudly.
 > ## **NEXT: slice D2** (bank-0 repack, the group-C GFX redirect, the QSound
 > ## bank split on `qsnd_addr[23]`, `jtframe_ram1_7slots`, the two new GFX

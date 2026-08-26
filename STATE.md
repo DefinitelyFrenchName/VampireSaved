@@ -295,6 +295,74 @@ whose `table[class]` is a bad pointer appears, that is the root cause and
 the fix is either bounding the dispatcher or fixing what the borrow writes
 for a tenant opponent. The 2P sim (core) is a cross-check, not the hunt.
 
+## Session 14z-109 CLOSE — ritual complete. **THE ARC'S QUESTION IS
+## ANSWERED AND THE ONE DEFECT IT SURFACED IS ROOT-CAUSED AND RULED.** The
+## core WORKS ON HARDWARE — tenants fight, TENANT VOICES PLAY, select
+## emulator-identical. The one crash is #99 = vs2 type byte `0x51` in
+## Donovan's ported node stream, remap ruled `0x51 -> 0x19` with the census
+## + escalation clause. **The next session is the FIX WINDOW.**
+
+**The session in one line:** it opened waiting for a field test, and by
+close the field test had passed, its single crash had gone from "flaky
+reset on a CRT" to a named byte at a named ROM address with an
+instruction-level-exact fix ruled — with the maintainer's live observations
+(2P-clean, the sidekick's silence, "long enough", the reset style, the
+Bishamon crash) cutting the search space at every step.
+
+### WHAT THE SESSION ESTABLISHED
+
+| | result |
+|---|---|
+| the FIELD TEST | boots, plays, tenants fight on real silicon; VOICES PLAY; select emulator-identical |
+| #99 root cause | node `0x3FB899` (Donovan block) carries vs2 state `0x51`; vsavj table ends ~`0x28`; unbounded dispatch at `0x018508` -> vec3 -> soft reboot |
+| the ruling | (a) data-side remap only (b) `0x51 -> 0x19` (byte-identical default handlers) (c) census + escalate non-equivalents; port-the-handler caveat STANDING |
+| the OBJ-list oracle | promoted subset field-identical across implementations at match anchor AND select; M6 mark identical |
+| P2 scripting | fork `4dfc3734`, file bits 12+, frozen sha1s provably unmoved; first 2P replay in the tree |
+| the exception decoder | name-screen reboot = CPU exception, code at `$FF0000`, regs at `$FF0018-53`; gold test = cold/watchdog |
+| venue steering | draw pool = `row[venue..venue+7]`, 12/12 measured — deterministic opponent pinning exists now |
+| decisions hygiene | `DECISIONS_HISTORY.md` born; STATE pending section: 5 live entries |
+
+### THE CORRECTIONS, because they transfer
+
+Four intermediate theories died by my own measurement and are marked in
+place: the arcade voice-class borrow (candidate rows only carry valid
+classes); the sidekick OBJECT (right neighborhood — a Phobos-side 1P event —
+wrong object: A1 was P2's player block); "Phobos-specific" (Bishamon
+crashed it too — the node is DONOVAN'S); and my mis-ID of probes C/D's
+opponents from an assumed id map (0x0f = Jedah, not Bishamon — the
+authoritative slot map is character_tables.md, assume nothing).
+
+### RITUAL
+
+- **STATE**: this entry; the (3)-(8) sub-entries stand; no rollover needed
+  (two session groups live, file ~120 KB).
+- **`docs/NEXT_SESSION.md`**: rewritten — the opener is the #99 FIX WINDOW
+  (census -> remap `fixes` rows -> #111 coverage -> re-freeze -> the MiSTer
+  CRC tail: catalogue fork commit + fresh board bundle).
+- **`HANDOFF.md`**: `test_obj_records` + `test_mister_obj_oracle` rows
+  registered.
+- **Retraction sweep**: "P2 is not expressible" corrected in
+  `rpl2siminputs.py`, `docs/platform/mister.md` (x2), NEXT_SESSION history
+  marker; the DF-style stale reference in engine_internals fixed in
+  passing during the decisions cleanup.
+- **GOTCHAS**: three filed and indexed (name-screen exception discriminator;
+  the renumbered-family porting rule; the deterministic-lab-rat triage
+  method).
+- **Memories**: `port-the-handler-is-not-free` (maintainer's standing
+  instruction); `decided-items-leave-pending` extended with the
+  DECISIONS_HISTORY lifecycle.
+- **GitHub**: #99 reopened + root cause + ruling (current); #111 filed
+  (coverage rot). Both self-contained.
+- **SCRATCH**: `/tmp/vampire-saved-jtsim-14z108` (1.3 GB) SWEPT — the
+  14z-108 close kept it for the field test, the field test has reported;
+  rebuild is one `tools/setup_jtcores.sh` + `run_sim` away.
+  `../mister_fieldtest_14z108/` DURABLE but STALE AT THE RE-FREEZE (CRCs
+  move). `../dumps/` is the maintainer's dump folder (root litter swept
+  there, README inside, all regenerable). Session scratchpad ephemeral;
+  every conclusion is in STATE/docs/#99.
+- **PUSH**: everything pushed through the close commit; fork public at
+  `4dfc3734`. Verified `git ls-remote`, not prose.
+
 ## Session 14z-109 (3) — **THE FIELD TEST RAN, AND THE ARC'S QUESTION IS
 ## ANSWERED: THE CORE WORKS ON HARDWARE.** Tenants selectable and playable,
 ## TENANT VOICES PLAY (the one thing simulation could never answer), select
