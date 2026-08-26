@@ -8,11 +8,12 @@
 # HOW IT IS DETERMINISTIC. The arcade ladder's opponent draw is a
 # sound-state-fed LOTTERY (atlas/ram.md, $FF8110) UNLESS the venue byte
 # $FF8121 is pinned: the draw pool is rowA[venue..venue+7], so poking $FF8121
-# before match 1's draw selects the opponent exactly (measured 14z-109, 12/12;
-# re-confirmed 14z-110: venue 0x02 loads P2=Phobos 0x4595B0 at match start).
-# Donovan's ladder row (class 0x13): venue 0x02 -> Phobos, 0x03 -> Bishamon
-# (the two FIELD crash contexts), 0x05 -> Pyron (tenant-vs-tenant). P1 Donovan
-# is reached by 110_don_arcade_mash's L,L,D,D wheel path, not 26's U,U,R.
+# before match 1's draw selects the opponent exactly (measured 14z-109, 12/12
+# EVEN values; re-confirmed 14z-110: venue 0x02 loads P2=Phobos 0x4595B0 at
+# match start). Donovan's ladder row (class 0x13): venue 0x02 -> Phobos,
+# 0x10 -> Bishamon — the two FIELD crash contexts. See the EVEN-ONLY rule at
+# venue_of below; Pyron is not steerable on this row. P1 Donovan is reached
+# by 110_don_arcade_mash's L,L,D,D wheel path, not 26's U,U,R.
 #
 # WHAT IT ASSERTS: rig LIVENESS (P2's hitbox base at match start == the
 # venue-selected opponent's base, from the BUILD's own table PRG:0x0BD97A — a
