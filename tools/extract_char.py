@@ -1302,7 +1302,14 @@ def main():
             inside = r and r["src"] <= v < r["src"] + r["len"]
             values.append({"table": name, "kind": kind, "ptr": f"{v:#x}",
                            "region": region, "inside_region": bool(inside)})
-            if not inside:
+            if not inside and t.get("optional"):
+                # 14z-111: a WIDE-only port row (the AI script block has no
+                # room on the STOCK track). Reported, not fatal; the patch
+                # generator leaves the vanilla (aliased) row in place.
+                values[-1]["skipped"] = True
+                report.append(f"  {name}[{char:#x}] = {v:#x}: OPTIONAL row, "
+                              f"no extracted region hosts it — left vanilla")
+            elif not inside:
                 fail.append(f"{name}[{char:#x}] = {v:#x} outside extracted "
                             f"region '{region}'")
         elif kind == "code_ptr":

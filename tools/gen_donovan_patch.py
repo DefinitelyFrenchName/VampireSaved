@@ -3515,6 +3515,11 @@ def main():
                         continue
                     ptr = _int(v["ptr"])
                     host = region_of(ptr)
+                    if host is None and (v.get("skipped") or t.get("optional")):
+                        notes.append(f"# {v['table']}: OPTIONAL row, region not "
+                                     f"extracted on this track — vanilla (aliased) "
+                                     f"row kept (14z-111, WIDE-only AI script port)")
+                        continue
                     if host is None:
                         fail.append(f"{v['table']}: ptr {ptr:#x} outside all regions")
                     elif host in placed:

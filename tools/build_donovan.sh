@@ -123,7 +123,10 @@ DEFAULT_ROOTS="$DEFAULT_ROOTS,0x6717c:0x154:t0x671b0"
 # block his four ai_script_* rows (bank_map) point into, vhunt2 twin at
 # shift 0. DATA (word-offset streams, 0 pointer fields). Bounds = his four
 # seeds to the next class's first pointer, no foreign pointer inside.
-DEFAULT_ROOTS="$DEFAULT_ROOTS,0x101aca:0x10ce:t0x101aca:d"
+case "${GEN_FLAGS:-}" in
+    *cps2-wide-v1*) DEFAULT_ROOTS="$DEFAULT_ROOTS,0x101aca:0x10ce:t0x101aca:d" ;;
+    *) : ;;   # STOCK (4 MB): no hole for it (x2b7ef4 0xB20C would no longer fit) — row stays aliased, no crash class there (Donovan has no private jump handler)
+esac
 # DEFAULT_ROOTS is DONOVAN'S measured root census — it applies only to his
 # char. Another tenant's census accumulates here as its R1 loop finds
 # roots (EXTRA_ROOTS overrides for census experiments).

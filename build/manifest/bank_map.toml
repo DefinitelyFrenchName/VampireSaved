@@ -504,6 +504,7 @@ vsavj = 0x0BF01A
 kind = "data_ptr"
 stride = 0x80
 region = "auto"
+optional = true   # STOCK (4 MB) has no room for the script block: the row is left aliased there (WIDE-only port, 14z-111)
 
 [[table]]
 name = "ai_script_1"
@@ -511,6 +512,7 @@ vsavj = 0x0BF09A
 kind = "data_ptr"
 stride = 0x80
 region = "auto"
+optional = true   # STOCK (4 MB) has no room for the script block: the row is left aliased there (WIDE-only port, 14z-111)
 
 [[table]]
 name = "ai_script_2"
@@ -518,6 +520,7 @@ vsavj = 0x0BF11A
 kind = "data_ptr"
 stride = 0x80
 region = "auto"
+optional = true   # STOCK (4 MB) has no room for the script block: the row is left aliased there (WIDE-only port, 14z-111)
 
 [[table]]
 name = "ai_script_3"
@@ -525,6 +528,7 @@ vsavj = 0x0BF19A
 kind = "data_ptr"
 stride = 0x80
 region = "auto"
+optional = true   # STOCK (4 MB) has no room for the script block: the row is left aliased there (WIDE-only port, 14z-111)
 
 # Still parked (the rest of the original note): 0x0BF01A-0x0BF19A WERE
 # listed here as per-char DATA rows into engine-anim space — unparked above;
