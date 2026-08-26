@@ -3600,3 +3600,60 @@ superset invariant), rig `tests/replays/judge/03_down_attack.rpl`:
 
 Gate: `tests/audit_pursuit_leap.sh` (leap fires per tenant both
 directions + the no-knockdown discriminator).
+
+## CPU exceptions and the soft-reset path (14z-109)
+
+**Atlas rows this section depends on:** `ram.md` `$FF0000.w` (exception
+code), `$FF0018-$FF0053` (saved registers), `$FF0054.l` (saved SP).
+
+The game installs REAL handlers on every 68k exception vector (`vec2` bus
+error through `vec11` line-F; handler ladder at `PRG:0xC0-0x14E`). Each
+handler:
+
+1. writes its identity to `RAM:$FF0000.w` (`move.w #vector-2, $FF0000.l` —
+   0 bus, 1 address, 2 illegal, ...),
+2. pops the group-0 extra frame words where present, saves SP to
+   `$FF0054`, re-points SP at `$FF0054` and pushes `movem.l d0-a6` (so
+   D0..A6 land ASCENDING at `$FF0018-$FF0053`),
+3. branches to a common restart that reboots the GAME — the abbreviated
+   white-on-black check list ("WORK RAM OK / CPS0..2 RAM OK / OBJECT RAM
+   OK / Q SOUND RAM OK") and then the name screen. NOT the gold full RAM
+   test: that is the cold/watchdog path.
+
+**Why it matters for diagnosis:** on hardware with no debugger, the reboot
+STYLE is the first instrument — *name screen = the game caught a CPU
+exception; gold full test = cold/watchdog reset* (the pre-D5 decryption
+boot loop was the second kind; the 14z-109 Donovan crash was the first,
+confirmed by the field video). And `$FF0000` plus the register block are a
+free post-mortem — with the caveat recorded in the atlas that a frozen
+(guarded/debugged) machine never runs the handler, so under the crash
+guard the registers must be read live (`GUARD_PROBE`), not from RAM.
+
+## The object-script state dispatcher at `PRG:0x018508` (14z-109)
+
+**Atlas rows this section depends on:** `ram.md` `$FF8400`/`$FF8800`
+(player blocks); `character_tables.md` (per-character data blocks).
+
+A per-object script walker whose per-node state transition is:
+
+```
+01843A  move.b (0x17,A3),D0      ; A3 = the current DATA NODE; its +0x17
+01843E  add.w  D0,D0             ;   byte is the next-state INDEX, doubled
+...
+018508  move.w (6,PC,D0.w),D1    ; offset table at 0x018510
+01850C  jmp    (2,PC,D1.w)       ; -> 0x018510 + offset
+```
+
+The offset table holds ~0x26 states (handlers `0x018694-0x01877c`;
+several handlers write follow-up states into `(0x54,A1)` of the object).
+**There is NO bounds check on the node byte.** An index past the table
+reads whatever words follow; the first odd fetched "offset" faults the
+`jmp` with a vec3 address error, which the exception path above converts
+into a clean name-screen reboot — i.e. a data-side bad byte presents as a
+"flaky reset" with zero corruption beforehand.
+
+Interaction shape worth knowing: the walker runs with A1 = one fighter's
+OBJECT and A3 = a node that can live in the OPPONENT'S data block
+(measured: P2-Phobos's object walking a node inside Donovan's block — the
+same cross-fighter shape as the 14z-73 grab-victim keyframes). So a bad
+node in character X's data is triggered by X's OPPONENT, whoever that is.

@@ -618,3 +618,21 @@ mine and both corrected by the maintainer:
 Also: in the replay-61 skeleton the 2P mode menu is up at ~f1950 (the
 "~f2800" the 14z-98 (8) notes carried is an IN-MATCH frame of this
 skeleton, not the menu).
+
+## A "flaky reset" that reboots to the NAME SCREEN is a CPU EXCEPTION —
+## and the game names the vector for you (14z-109)
+
+vsav installs real handlers on every 68k exception vector: each writes its
+identity to `RAM:$FF0000.w` (0 bus / 1 address / 2 illegal / ...), saves
+D0-A6 ascending at `$FF0018-$FF0053` plus SP at `$FF0054`, then SOFT-boots
+the game — the abbreviated white check list and the name screen, NOT the
+gold full RAM test (that is the cold/watchdog path). So on bare hardware
+the reboot STYLE already discriminates "the code jumped through a bad
+pointer" from "the machine genuinely reset", and the exception code plus
+full register file are sitting in work RAM afterwards for anything that
+can read them. Two traps inside the gift: the registers are written only
+if the HANDLER runs — a debugger/guard that freezes AT the exception
+leaves that block stale (measured: all zeros under the crash guard; read
+registers live via GUARD_PROBE instead) — and the reboot wipes the crash
+cleanly enough that the screen shows NO corruption first, which is itself
+the tell that it was a control-flow fault rather than data rot.

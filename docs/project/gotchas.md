@@ -3022,3 +3022,46 @@ check that cannot fail, which is worse than no check.
 3. This is THE INSTRUMENT PROTOCOL's "prove it FAILS before its first real
    use", in its cheapest possible form. The protocol paid for itself the same
    session it was applied.
+
+## Every TYPE/CLASS byte in a ported record indexes some engine dispatch —
+## and the engines RENUMBERED families between games (14z-109, the #99 crash)
+
+The vs2 engine and the vsavj engine number at least one record-type family
+differently (first paid for in 14z-33/35, "record-type dispatch aliases" /
+"the type-0x51 cluster"; paid for again in 14z-109). A record ported
+byte-for-byte carries vs2's number; the vsavj dispatcher indexes its OWN
+table with it, unbounded — `move.b (0x17,A3),D0; add.w D0,D0;
+move.w (6,PC,D0.w),D1; jmp (2,PC,D1.w)` at `PRG:0x018508` has no bounds
+check, so a vs2 value past vsavj's table jumps through garbage and
+soft-resets the game. The 14z-109 instance: node `ROM 0x3FB899` in
+Donovan's relocated block, type byte `0x51`, walked by Donovan's OPPONENT
+(cross-fighter, so the crash presented as "Phobos crashes me" and then
+"Bishamon crashes me" before the common thread was seen). THE RULE: when a
+ported record family carries type/selector bytes, enumerate the CONSUMING
+dispatch's bounds on vsavj and validate every ported byte against them at
+BUILD time — the 14z-33/35 remap covered the members known then, and
+nothing guarded against the next member. A WIDE-style port that relocates
+whole blocks preserves vs2 numbering by construction unless a remap rule
+says otherwise, so "it worked for sixteen sessions" only means the bad
+node had not been WALKED yet: this one needed a specific opponent
+interaction in 1P arcade, which no gate and no 2P test reached.
+
+## Root-causing a stochastic hardware crash: make ANY repro deterministic
+## first, then interrogate the corpse (14z-109 method note)
+
+The field crash was 100%-on-hardware but stochastic per-path on emulator.
+What worked, in order: (1) a poke-contaminated trajectory that crashed AT
+ALL was kept as a DETERMINISTIC LAB RAT (same frame, same fault, every
+run) — contamination matters for conclusions about the PATH, not for
+identifying the MECHANISM; (2) the guard's crash line names the vector and
+fault address — from `vec3 ADDR 0x18511` alone, the odd address pinned the
+faulting instruction family before any instrumentation; (3)
+`GUARD_PROBE_HIST` (crash-time instruction history) produced the exact
+stream into the fault; (4) a conditional probe ON THE FAULTING REGISTER
+VALUE (`GUARD_PROBE=1850c`, `(d1&1)==1`) fired exactly once, on the fatal
+iteration, and its register line named the object (A1), the node (A3) and
+the bad byte (`MEM[A3+17]=51`) in one hit. Total: three guarded runs from
+"flaky reset" to a named byte at a named ROM address. The general shape:
+determinism first, vector+address second, history third, conditional
+register probe last — and extend the instrument (PROBE gained A1/A3) the
+moment it cannot name what you need, rather than inferring around it.

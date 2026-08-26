@@ -1641,6 +1641,24 @@ Original write-up kept below.
 
 ## Decisions pending (human)
 
+- **#99 (REOPENED 14z-109) — THE TYPE-0x51 REMAP: which family, and what
+  value.** Root cause is on the issue: node `ROM 0x3FB899` in Donovan's
+  relocated block carries vs2 type byte `0x51`; vsavj's dispatcher at
+  `PRG:0x018508` has no row for it and no bounds check. The fix wants THREE
+  answers before any byte moves: (1) which record family `0x3FB882` belongs
+  to in the extraction; (2) what vs2's `0x51` MEANS there (its handler in
+  vs2's own table); (3) the correct vsavj renumbering — then a REMAP RULE in
+  the extraction per the 14z-33/35 shape, never a hand-poke. Gameplay
+  surface possible (the node does something in vs2 that vsavj may express
+  differently), hence maintainer-ruled. **#111 (coverage rot) should land in
+  the same window**: re-point or replace `26_don_arcade_mash`, re-measure
+  `audit_continue_switch`, and add the missing Donovan-vs-CPU-Phobos gate
+  (the venue-byte steer makes a deterministic one possible). The build-time
+  guard — validate every ported type/selector byte against the consuming
+  dispatch's bounds — is what keeps the NEXT missed family member off a CRT.
+
+
+
 - **~~THE TIMING-MARGIN RESPONSE~~ DECIDED (maintainer, 2026-08-25).**
   `cps2w` fails 4 of 12 fitter seeds (14z-108). Options were laid out A-E.
   **RULED: A + B, with C IN RESERVE. D is ACCEPTABLE. E is OPPOSED unless
