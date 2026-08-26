@@ -1,7 +1,7 @@
-# pointer-flow baseline for donovan-m14 (build/don_m14), frozen 14z-111 — IDENTICAL to donovan-m13 (the AI-script rows/x101aca add no pointer-flow finding on the solo; measured).
+# pointer-flow baseline for donovan-m14 (build/don_m14), frozen 14z-111 — vs donovan-m13: WEAK data:long 1127 -> 1263 — the x101aca AI-script block (0x10CE of word-offset streams, 0 pointer fields per the segmented oracle) contributes 136 4-byte windows that read as longs into WIDE holes (more of the ext is unwritten on a solo than on the merged image, whose growth is +52 for three blocks). No STRONG change.
 # the two merged STRONG lines are the 14z-100-reviewed win_pal sparse-block biased bases,
 # re-placed by the window's allocation shift; WEAK volume re-counted).
 # STRONG lines are REVIEWED findings (see hardening_register.md);
 # WEAK-COUNT lines freeze the noise volume — growth = investigate.
 WEAK-COUNT	code:move_imm	1
-WEAK-COUNT	data:long	1127
+WEAK-COUNT	data:long	1263
