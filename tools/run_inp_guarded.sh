@@ -23,11 +23,18 @@ mkdir -p "$SB/cfg" "$SB/diff" "$SB/snap" "$SB/sta"
 echo "== playback $D/$NAME.inp on $BUILD -> $OUT/inp_guard.log"
 : "${SDL_VIDEODRIVER:=dummy}"; export SDL_VIDEODRIVER
 cd "$OUT"
-CHECKSUM_OUT="$OUT/inp_guard.log" "$BIN" vsavjw -rompath "$RP;$ROMDIR" \
+DBG=""
+if [ -n "${INP_DEBUG:-}" ]; then
+    # debugger mode: -debug halts at the first instruction; the debugscript
+    # resumes it (tools/run_replay_guarded.sh pattern). Timeslicing differs
+    # from cheap mode — compare crash frames before trusting a trace.
+    printf 'go\n' > "$SB/go.dbg"; DBG="-debug -debugger none -debugscript $SB/go.dbg"
+fi
+CHECKSUM_OUT="$OUT/inp_guard.log" "$BIN" vsavjw -rompath "$RP;$ROMDIR" $DBG \
     -playback "$NAME.inp" -input_directory "$D" -nvram_directory "$SB/nvram" \
     -keyboardprovider none -mouseprovider none -joystickprovider none -lightgunprovider none \
     -video none -sound none -nothrottle -skip_gameinfo \
     -cfg_directory "$SB/cfg" -diff_directory "$SB/diff" -snapshot_directory "$SB/snap" \
     -state_directory "$SB/sta" -homepath "$SB" \
     -autoboot_script "$REPO/tests/lua/inp_guard.lua" > "$OUT/mame.out" 2>&1 || true
-grep -E "^(CRASH|REGS|STACK|DUMP|SELFTEST|END)" "$OUT/inp_guard.log" || { echo "NO GUARD OUTPUT — see $OUT/mame.out"; tail -5 "$OUT/mame.out"; exit 1; }
+grep -E "^(CRASH|REGS|STACK|DUMP|SELFTEST|TRACE|W |END)" "$OUT/inp_guard.log" || { echo "NO GUARD OUTPUT — see $OUT/mame.out"; tail -5 "$OUT/mame.out"; exit 1; }

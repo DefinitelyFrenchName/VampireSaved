@@ -28,6 +28,21 @@ local arm = tonumber(os.getenv("ARM_FRAME") or "") or 300
 local max_frames = tonumber(os.getenv("MAX_FRAMES") or "") or 200000
 local stop_after = tonumber(os.getenv("STOP_AFTER") or "") or 600
 local selftest = tonumber(os.getenv("SELFTEST_FRAME") or "")
+-- env TRACE_FROM   (needs -debug -debugger none): start a 68k instruction
+--                  trace at this frame, stop at the first crash. The trace is
+--                  the path INTO a computed jump; cheap mode cannot see it
+--                  (opcode fetches are blind to taps, RH-15). NOTE -debug
+--                  perturbs timeslicing (GOTCHAS) — confirm the crash frame
+--                  matches the cheap-mode capture before trusting the trace.
+local trace_from = tonumber(os.getenv("TRACE_FROM") or "")
+-- env WATCH  "lo-hi[,lo-hi]" hex work-RAM ranges: every WRITE is logged with
+--            the writing PC into a ring (last WATCH_KEEP, default 60), flushed
+--            to the log at each crash as "W <frame> PC <pc> <addr> <data>".
+local watch_keep = tonumber(os.getenv("WATCH_KEEP") or "") or 60
+local ring, ring_n = {}, 0
+local trace_path = os.getenv("TRACE_OUT") or "inp_guard.trace"
+local debugger = manager.machine.debugger
+local tracing = false
 
 local cpu = manager.machine.devices[":maincpu"]
 local program = cpu.spaces["program"]
@@ -72,6 +87,10 @@ local function on_store(code)
             if shown >= 16 then break end
         end
     end
+    if ring_n > 0 then
+        local first = math.max(1, ring_n - watch_keep + 1)
+        for i = first, ring_n do f:write(ring[i]) end
+    end
     local dn = string.format("crash_%d_ff0000.bin", frame)
     local d = assert(io.open(dn, "wb"))
     local buf = {}
@@ -80,6 +99,10 @@ local function on_store(code)
     end
     d:write(table.concat(buf)); d:close()
     f:write(string.format("DUMP %d %s\n", frame, dn))
+    if tracing then
+        debugger:command("trace off"); tracing = false
+        f:write(string.format("TRACE %d off -> %s\n", frame, trace_path))
+    end
     f:flush()
     crashes = crashes + 1
     if not stop_at then stop_at = frame + stop_after end
@@ -97,12 +120,28 @@ local function on_write(offset, data, mask)
     end
     on_store(code)
 end
+local wtaps = {}
 local function install()
     tap = program:install_write_tap(0xFF0000, 0xFF0001, "inp_guard", on_write)
+    for lo, hi in (os.getenv("WATCH") or ""):gmatch("(%x+)%-(%x+)") do
+        lo, hi = tonumber(lo, 16), tonumber(hi, 16)
+        wtaps[#wtaps + 1] = program:install_write_tap(lo, hi, "inp_watch_" .. lo, function(offset, data, mask)
+            local ok, pc = pcall(function() return cpu.state["CURPC"].value & 0xFFFFFF end)
+            ring_n = ring_n + 1
+            ring[ring_n] = string.format("W %d PC %06x %06x %08x mask %08x\n", frame, ok and pc or 0, offset, data, mask)
+            if ring_n > watch_keep * 2 then
+                local keep = {}
+                for i = ring_n - watch_keep + 1, ring_n do keep[#keep + 1] = ring[i] end
+                ring, ring_n = keep, #keep
+            end
+        end)
+    end
 end
 install()
 program:add_change_notifier(function()
     if tap then tap:remove() end
+    for _, t in ipairs(wtaps) do t:remove() end
+    wtaps = {}
     install()
 end)
 
@@ -111,6 +150,11 @@ emu.register_frame_done(function()
     if selftest and frame == selftest then
         f:write(string.format("SELFTEST %d writing 1 to $FF0000.w\n", frame))
         program:write_u16(0xFF0000, 1)
+    end
+    if trace_from and debugger and frame == trace_from then
+        debugger:command("trace " .. trace_path .. ",0")
+        tracing = true
+        f:write(string.format("TRACE %d on -> %s\n", frame, trace_path))
     end
     if frame % 600 == 0 then
         f:write(string.format("ALIVE %d match=%08x p1=%02x p2=%02x\n", frame,

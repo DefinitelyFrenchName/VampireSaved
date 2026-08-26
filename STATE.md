@@ -37,6 +37,49 @@ survive in the session scratchpad (`refit/`, ~22 frames × 4 replays).
 - STATE.md holds four groups (108 / 109 / 110 / 110b); the ledger ends at
   14z-107. 14z-108 is due to roll to STATE_HISTORY at this close.
 
+### #99 ROOT CAUSE — CAPTURED ON THE NATURAL PATH (maintainer's .inp `crash_m10`, 14z-111)
+
+**The crash:** frame 4806, **vec11 (line-F)** at `PRG:0x422BAC` = inside
+`x05c800@huitzil` DATA (a per-class (dx,dy) table right after an `rts`),
+reached by `jmp (2,pc,d1.w)` at `0x41C1A8` in Phobos's PORTED jump handler
+(vs2 `0x2592A`, region `x02592a@huitzil`) indexing its sub-state table by
+Phobos's `+0x07 = 0x0E`. **vs2's table has 5 entries (`+0x07` 0x00-0x08);
+vsavj's own jump handler (`0x22A24`) has 10 (0x00-0x12).** Sub-state 7 is a
+vsavj-only phase. Same PC/frame on merged14 — the 110/110b fixes never
+touched this path.
+
+**Who writes 0x0E:** vanilla `PRG:0x2BD72` (`move.l #$0200060E,(4,a6)`) — the
+JUMP COMMAND of the CPU AI SCRIPT INTERPRETER (`0x2BD54` family), executing
+a script whose channel pointers were `0x100036/0x10036A/0x100BA0`: VANILLA
+scripts. **The four per-class AI action-script tables `PRG:0xBF01A/09A/11A/
+19A` (consumers `0x2CCB6` family, `bank_map.toml` "still parked") are 32
+entries = 16 classes + THE SAME 16 REPEATED (Capcom's aliasing guard). Class
+0x10 (Phobos) -> entry 16 = DEMITRI's AI scripts; 0x11 -> class 1's; 0x13 ->
+class 3's.** CPU-Phobos plays Demitri's AI; Demitri's jump command asks for
+sub-state 7; Phobos's private vs2 jump handler dies on it.
+
+Why every field fact fits: **only Phobos** has a private jump handler (vs2
+`0x213F2` adds `cmpi #$10 -> 0x2592A`; Donovan/Pyron fall through to
+vanilla's 10-entry handler and digest the borrowed scripts); **CPU only**
+(the tables are CPU-side, 14z-98 trace — 2P never touches them); **takes
+time** (the AI must randomly pick the script carrying that command; the
+maintainer's keep-away rig gives it time); **every platform** (same code).
+
+**vs2's twins:** tables `0xD91B8/0xD92B8/0xD9338` (3 starters, `0x2C492/51C/578`)
+carry real rows for 0x10/0x11/0x13 -> vs2 `0x100000-0x102Bxx`; per-tenant
+script volume ~0xE3C (H) / ~0xC8E (P) / ~0x10B8 (D) bytes. The two
+interpreters are STRUCTURALLY IDENTICAL (15 command tables, same sizes) —
+the bytecode numbering carries; command BODIES can differ (the jump body
+does: vsavj writes sub 0x0E, vs2's twin does not — measured below).
+Fix shapes are the maintainer's call — see the reply/Decisions pending.
+
+**Instrument that got it:** `tools/run_inp_guarded.sh` + `tests/lua/inp_guard.lua`
+(cheap-mode write tap on the game's exception-code store; `INP_DEBUG=1
+TRACE_FROM=` for the instruction trace, `WATCH=` write ring). The .inp is
+`~/.cache/vampire-saved/inp/crash_m10/` (hand it into tests/ — persistent
+suite doctrine — before close). NOTE the soft-reset RAM test writes 0..9 to
+`$FF0000` too (CRASH lines with SP=0 after the real one): filter pending.
+
 ### THE #99 CRASH IS NOT FIXED — and it reproduces on MAME by hand (2026-08-26, maintainer)
 
 **Two emulator-derived fixes, both falsified by the board and now by MAME
