@@ -1336,7 +1336,7 @@ thunk_hex = "b8fc84006706b8fc880066100c2c00TT03826608197c0004005c4e75197c000b005
 # (wrong freeze family, hence the count/mash drift). Proper fix,
 # vs2-dispatch-proven (its entry 0x51 -> the dedicated copy handler
 # just past its table): the six region_fix rows above are RETIRED
-# (staged 99, records carry native 0x51) and the dispatch site
+# (staged 99, records carried native 0x51 UNTIL 14z-110b — they now carry 0x44, see the remap block below; this thunk is dead-but-equivalent) and the dispatch site
 # 0x185D0 (`add.w d0,d0; move.w $185DA(pc,d0.w),d0`) is thunked:
 # type 0x51 -> pop the site return + jmp the copy handler 0x1868C
 # (class := 0x51 -> property[0x51] = 0x19 via hit_class_props_ext_hi,
@@ -1357,6 +1357,80 @@ thunk_hex = "b8fc84006706b8fc880066100c2c00TT03826608197c0004005c4e75197c000b005
 # THROUGH the two dispatches, and both route 0x51 to the copy
 # handler exactly as vs2 does -> never sees 0x51 (same
 # unreachability as native).
+
+# 14z-110b (#99 residual, maintainer-conditioned GO 2026-08-26): THE 0x51 ->
+# 0x44 STATE REMAP — the six deity nodes' next-state byte, plus ONE ported-code
+# immediate. WHY 0x44 and not 0x19/0x4E (both tried and retracted): the stored
+# state feeds a SECOND 80-vs-84 dispatcher at PRG:0x2384E (vs2 0x2237A) that
+# the 14z-43 consumer audit also missed; vsavj [0x51] over-runs it (misaligned
+# jmp 0x2399C = the residual FIELD crash + the Victor KO-neutral). MEASURED
+# EQUIVALENT AT EVERY CONSUMER: d1/d2/d3 node dispatchers [0x44] = the copy
+# handler both engines (byte-identical bodies); 0x2384E [0x44] = vs2's [0x51]
+# handler (identical stream; vs2's own #$51 test GROUPS 0x51 with 0x44/0x4C);
+# the per-state property lookup (data view) 0x19 == 0x19; NEITHER engine ever
+# stores #$44/#$4C to (0x54,An) (full constant inventory) and no Donovan node
+# carries 0x44/0x4C/0x0A natively -> zero collision. The ONE true vs2
+# divergence: at ported x022400+0x15E8 (vs2 0x239E8), state 0x51 ALONE gets
+# `move.b #1,(0x117,a6)` — the companion row below renames that test to 0x44,
+# transplanting the exact semantics. Post-remap the es_type51_dispatch thunk
+# and reaction_hook case_a2 go DEAD-BUT-EQUIVALENT (vanilla [0x44] is the same
+# handler) — kept as guards, deprecation candidates. Full trail: STATE 14z-110b.
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x10e9
+old_hex = "51"
+new_hex = "44"
+note = "deity node next-state vs2 0x51 -> 0x44 (the 14z-110b five-consumer equivalence; 14z-35 tried 0x4E and 14z-43 retired it — 0x44 preserves property 0x19 AND the 0x2384E handler family)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x1109
+old_hex = "51"
+new_hex = "44"
+note = "deity node next-state vs2 0x51 -> 0x44 (the 14z-110b five-consumer equivalence; 14z-35 tried 0x4E and 14z-43 retired it — 0x44 preserves property 0x19 AND the 0x2384E handler family)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x1129
+old_hex = "51"
+new_hex = "44"
+note = "deity node next-state vs2 0x51 -> 0x44 (the 14z-110b five-consumer equivalence; 14z-35 tried 0x4E and 14z-43 retired it — 0x44 preserves property 0x19 AND the 0x2384E handler family)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x1149
+old_hex = "51"
+new_hex = "44"
+note = "deity node next-state vs2 0x51 -> 0x44 (the 14z-110b five-consumer equivalence; 14z-35 tried 0x4E and 14z-43 retired it — 0x44 preserves property 0x19 AND the 0x2384E handler family)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x1169
+old_hex = "51"
+new_hex = "44"
+note = "deity node next-state vs2 0x51 -> 0x44 (the 14z-110b five-consumer equivalence; 14z-35 tried 0x4E and 14z-43 retired it — 0x44 preserves property 0x19 AND the 0x2384E handler family)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x1189
+old_hex = "51"
+new_hex = "44"
+note = "deity node next-state vs2 0x51 -> 0x44 (the 14z-110b five-consumer equivalence; 14z-35 tried 0x4E and 14z-43 retired it — 0x44 preserves property 0x19 AND the 0x2384E handler family)"
+
+[[region_fix]]
+stage = 6
+region = "x022400"
+off = 0x15eb
+old_hex = "51"
+new_hex = "44"
+note = "ported state-machine site (vs2 0x239E8+3): cmpi.b #$51,(0x54,a6) -> #$44 — the one vs2 state-0x51-only action (0x117 flag) transplanted onto the renamed state; collision-free (nothing else produces state 0x44)"
+
 [[site_thunk]]
 stage = 6
 name = "es_type51_dispatch"
@@ -2168,7 +2242,7 @@ march_retarget_mid = true
 # same-source-or-fail names any future collision). Screen position =
 # the empty bottom-right corner (measured on merged-m5 snapshots, 14z-105).
 # THE TEXT NAMES THE FREEZE GENERATION — change it at every freeze.
-version_text = "M6"
+version_text = "M7"
 version_font = "build/manifest/version_font.json"
 version_x = 340
 version_y = 202
