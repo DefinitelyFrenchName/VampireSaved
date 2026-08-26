@@ -13,7 +13,8 @@
 #   1. perturb a node's +0x17 from 0x51 to a fresh out-of-range value in a
 #      COPY of verify_data.bin -> --check must FAIL (ADDED/idx change).
 #   2. clear a node's +0x17 to an in-range value -> --check must FAIL (MISSING).
-#   3. the pristine build -> --check must PASS.
+#   3. the pristine build -> --check must PASS (EMPTY inventory since the
+#      14z-110b remap: the six deity nodes carry 0x44).
 #
 # Needs ROMDIR (the vs2 classification oracle) + a build with verify_{data,op}.bin.
 # No emulator, seconds.
@@ -44,34 +45,32 @@ mkdir -p "$W/b/patch"
 cp "$BUILD/verify_op.bin" "$W/b/"
 cp "$BUILD/patch/atlas_fragment.md" "$W/b/patch/"
 
-echo "== 1: a fresh out-of-range +0x17 must be caught as ADDED/changed"
+echo "== 1: a fresh out-of-range +0x17 must be caught as ADDED"
 python3 - "$BUILD/verify_data.bin" "$W/b/verify_data.bin" <<'PY'
 import sys
 d = bytearray(open(sys.argv[1], "rb").read())
-# 0x3FB862 is a frozen 0x51 node; make it 0x53 (still out of range, different idx)
-assert d[0x3FB862 + 0x17] == 0x51, d[0x3FB862 + 0x17]
+# 14z-110b: the deity nodes carry 0x44 (the ratified remap; inventory EMPTY).
+# Poison one out of range — the census must report it as ADDED.
+assert d[0x3FB862 + 0x17] == 0x44, hex(d[0x3FB862 + 0x17])
 d[0x3FB862 + 0x17] = 0x53
 open(sys.argv[2], "wb").write(d)
 PY
 if python3 tools/audit_fsm_census.py "$W/b" --vs2 "$VS2" --check "$INV" >"$W/perturb.log" 2>&1; then
-    bad "checker PASSED on a perturbed +0x17 (0x51->0x53) — it cannot fail"
+    bad "checker PASSED on a perturbed +0x17 (0x44->0x53) — it cannot fail"
 else
     grep -q "FAIL: census differs" "$W/perturb.log" && ok "perturbed +0x17 caught" \
         || { bad "checker failed for the wrong reason"; cat "$W/perturb.log"; }
 fi
 
-echo "== 2: clearing a node to in-range must be caught as MISSING"
-python3 - "$BUILD/verify_data.bin" "$W/b/verify_data.bin" <<'PY'
-import sys
-d = bytearray(open(sys.argv[1], "rb").read())
-d[0x3FB882 + 0x17] = 0x19          # in range -> node drops out of the census
-open(sys.argv[2], "wb").write(d)
-PY
-if python3 tools/audit_fsm_census.py "$W/b" --vs2 "$VS2" --check "$INV" >"$W/miss.log" 2>&1; then
-    bad "checker PASSED with a node removed — MISSING not detected"
+echo "== 2: a fabricated inventory entry must be caught as MISSING"
+# the real inventory is EMPTY (14z-110b), so MISSING is proven synthetically.
+printf '[[node]]\naddr = 0x3FB862\nidx = 0x51\nklass = "DEFAULT-ALIAS"\nregion = "synthetic"\n' > "$W/fake.toml"
+cp "$BUILD/verify_data.bin" "$W/b/verify_data.bin"
+if python3 tools/audit_fsm_census.py "$W/b" --vs2 "$VS2" --check "$W/fake.toml" >"$W/miss.log" 2>&1; then
+    bad "checker PASSED against a fabricated inventory — MISSING not detected"
 else
-    grep -q "MISSING" "$W/miss.log" && ok "removed node caught as MISSING" \
-        || { bad "removal failed for the wrong reason"; cat "$W/miss.log"; }
+    grep -q "MISSING" "$W/miss.log" && ok "fabricated entry caught as MISSING" \
+        || { bad "MISSING control failed for the wrong reason"; cat "$W/miss.log"; }
 fi
 
 [ "$fail" = 0 ] && echo "PASS: test_fsm_census" || echo "FAIL: test_fsm_census"

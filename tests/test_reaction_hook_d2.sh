@@ -21,9 +21,9 @@
 #      vanilla dispatcher 0x018508-0x0185B0 (dispatch + 80-entry table) is
 #      byte-identical to vsavj's OWN decrypted bytes (ruling (a)) — the
 #      oracle is the reference dump, not a build artifact.
-#   3. the node DATA is untouched: tools/audit_fsm_census.py --check still
-#      reports the six native-0x51 nodes (the fix is code-side by ruling —
-#      a data remap re-breaks 14z-43/44).
+#   3. the node DATA matches the frozen census inventory — EMPTY since the
+#      14z-110b remap (0x51 -> 0x44, five-consumer equivalence, maintainer GO;
+#      'a data remap re-breaks 14z-43/44' was true of 0x19/0x4E, not 0x44).
 #   4. VERDICT CONTROLS: a perturbed built case byte, a perturbed et2 long
 #      and a perturbed window bound must each FAIL (a checker that cannot
 #      fail is not evidence).
@@ -160,7 +160,7 @@ else:
 sys.exit(fail)
 PY
 
-echo "== 3: node data untouched (census 6/6 native 0x51)"
+echo "== 3: node data on the frozen census inventory (EMPTY since 14z-110b)"
 if python3 tools/audit_fsm_census.py "$BUILD" --vs2 "$ROMDIR/vsav2.zip" --check build/manifest/fsm_census.toml >/dev/null 2>&1; then
     echo "  ok: fsm census matches the frozen inventory"
 else
