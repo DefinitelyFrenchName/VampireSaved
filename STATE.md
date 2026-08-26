@@ -70,6 +70,37 @@ tree (CLAUDE.md §4 has wanted "vs each of the 18, both sides"), P1 Donovan vs
 P2 Phobos via the extended wheel, made possible by tonight's P2 scripting.
 Verified P1=Donovan `0x3FA9D0` / P2=Phobos `0x4595B0` load on MAME.
 
+### THE PROBE-H AUTOPSY REFINES IT: an ODD dispatch index, not merely out-of-range
+
+Probe H's crash is DETERMINISTIC (f13918 every run, vec3, PC 0x01850e, fault
+ADDR 0x18511) — a reusable lab rat even though its trajectory is
+poke-contaminated. Dense-dump autopsy findings:
+
+- **Fault ADDR 0x18511 => D0 = 1, an ODD index.** The normal state path
+  doubles the state (word table), which can only make EVEN indexes. So this is
+  NOT a plain too-big state: either the dispatcher was ENTERED from a path
+  that did not double the index, or D0 was loaded from the wrong field. An
+  odd D0 faults on the table read itself — instantly, cleanly, no corruption
+  first — which matches the field signature perfectly.
+- **Player-slot `+0x54` states all benign** ($FF8400..$FF9800 at 0x400 stride,
+  values 0-5) up to f13910 — the corrupt write either targets an object
+  outside that window or lands in the last 8 frames.
+
+**NEXT (deterministic, cheap):** re-run probe H dumping EVERY frame
+13910-13918 over a wider window, and capture the guard's stack for the
+caller; then PC-attribute the write/entry that produces D0=1. Separately,
+the ACCUMULATOR hypothesis stands (first-fight crashes "if long enough";
+second-fight crashes at the intro 100% => something counts up across the RUN,
+plausibly sidekick voice events — which also explains 2P immunity if the
+sidekick path is silent there, as the maintainer heard).
+
+**HARDWARE PROTOCOL AGREED:** the maintainer records 1P crashes on video (CRT,
+60fps — the value is the LAST ~10 SECONDS before death: what Phobos and the
+sidekick were doing), plus passive observation of sidekick activity before
+each crash. No RAM peeking needed on the DE10 — the emulator side owns
+instrumentation. Playing Phobos as P2 is LOW-VALUE by our own model (2P
+suppresses the sidekick behaviour), noted so it is not over-invested in.
+
 ### SYNTHESIS: A PHOBOS OBJECT (LIKELY THE SIDEKICK) DRIVEN TO AN OUT-OF-RANGE STATE
 
 **Maintainer's strongest clue yet:** 1P vs COM crashes reliably "if the fight
