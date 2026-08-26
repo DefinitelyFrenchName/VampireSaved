@@ -1,5 +1,70 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-110 — the #99 fix: the reaction_hook D2 WINDOW, byte detail
+
+Maintainer-ruled 2026-08-26 (order FIX -> AUDIT -> RE-FREEZE); shape and
+scope in patch_index "14z-110 additions"; measured basis in STATE 14z-110.
+
+### A. `[reaction_hook]` d2 extension (donovan.toml; singleton, merged inherits)
+
+Four new keys, each the VERBATIM vs2 dispatcher-2 twin handler (table
+`0x016DE4`, dispatcher `0x016DDC`), re-derived from vsav2.zip by the gate on
+every run:
+
+```
+d2_case_a0 = 137c000f00544e75              ; move.b #$0F,($54,a1); rts
+d2_case_a2 = 136b001700544e75              ; move.b ($17,a3),($54,a1); rts  (the copy handler)
+d2_case_a4 = 137c000700544e75              ; move.b #$07,($54,a1); rts   [d1's case_a4 writes #$52 — the twins DIFFER]
+d2_case_a6 = 137c00010117137c000500544e75  ; move.b #1,($117,a1); move.b #5,($54,a1); rts
+```
+
+### B. The 82-byte thunk (emitter `gen_donovan_patch.py`; replaces the 50-byte shape on d2-carrying manifests)
+
+```
+4a29 0038      tst.b ($38,a1)          ; the vanilla site prefix's own test
+67 26          beq.s +$26              ; hit-stun clear -> the d1 arm (unchanged)
+; ---- d2 arm (NEW): the only entry into dispatcher 2 ----
+0c40 00a0      cmpi.w #$A0,d0          ; ids below the window ->
+65 1a          bcs.s  -> jmp $018508   ;   vanilla dispatcher 2, untouched
+0c40 00a8      cmpi.w #$A8,d0
+64 14          bcc.s  -> jmp $018508
+3200           move.w d0,d1            ; in-window: d1 := (d0-$A0), doubled
+0441 00a0      subi.w #$A0,d1
+d241           add.w  d1,d1
+207c <et2>     movea.l #et2,a0         ; SECOND ext table (4 longs)
+2070 1000      movea.l (0,a0,d1.w),a0
+4ed0           jmp    (a0)             ; -> verbatim vs2 d2 case
+4ef9 00018508  jmp    $018508
+; ---- d1 arm: byte-identical to the shipped 50-byte thunk's window ----
+0c40 00a0 / 65 1a / 0c40 00a8 / 64 14 / 3200 / 0441 00a0 / d241
+207c <et> / 2070 1000 / 4ed0 / 4ef9 00018460
+```
+
+CCR from the cmpis is dead ($018508's move.w sets it before the jmp uses
+D1); the pass-through path writes NO register; D1 is scratch only inside
+the window (dead on handler entry — the shipped d1 ext path's precedent).
+Without d2 keys the emitter produces the old 50-byte thunk BYTE-IDENTICAL
+(probe manifests unchanged, RH-48).
+
+### C. Why the bytes and not a data remap
+
+`0x51 -> 0x19` diverges on dispatcher 3 (`0x0185DA[0x19] = 0x18694`, not the
+copy handler) and fails the 14z-43 `es_type51_dispatch` `cmpi.b #$51`;
+`0x51 -> 0x4E/0x4F` is copy-aliased on all three dispatchers but swaps
+`property[0x51]=0x19` for `property[0x4E]=0x0F` (the 14z-44 ES-freeze
+family). No data value is dispatcher-exact AND property-preserving —
+measured 14z-110 from the three vsavj tables + both vs2 twins.
+
+### D. Verified against LIVE crashes (RH-43 A/B, register-forced)
+
+don_m11 (pre-fix): FORCE at $018458 (D0=$A2, scratch node `(0x17)=0x51`) ->
+`CRASH vec3 PC 01850E ADDR 00018511` — the exact field signature.
+don_m12 (post-fix): same force -> the copy handler runs (scratch
+`+$54 = $51`), run completes, zero input violations (GUARD_FORCE
+lazy-armed). Gate: `tests/test_reaction_hook_d2.sh` (reconstruction + three
+verdict controls), PASS on don_m12 and m3b_merged14.
+
+
 ## 14z-102 — #109 THE CLONE-BEAM FIX (row 31) — FROZEN as huitzil-m19/merged-m5 (bit-for-bit the probes), field-confirmed, #109 CLOSED
 
 **`tools/build_donovan.sh`** — huitzil census root added:
