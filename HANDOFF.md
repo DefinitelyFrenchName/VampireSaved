@@ -269,7 +269,7 @@ decrypted, which D5 proved false of this core). **THE PIN IS `7b9a0d2d`.**
 held to a declared 25 paths (2f), and the THIRTEEN files in `cores/cps2w/hdl`
 are enumerated with a frozen line-by-line delta (`test_mister_wide_gate` 1).
 **Fork pushes are STANDING-AUTHORISED by the maintainer (2026-08-24); the
-MAIN repo's push state is NOT a standing 'never' — RE-CHECKED 14z-109: `origin/main` holds `cc4508f` (the 14z-109 field-test control), confirmed by `git ls-remote`. **EXACTLY ONE COMMIT IS LOCAL, `f84683d`, and it is held back ON PURPOSE**: it bumps the `emu/jtcores` pin to `c97e3d14`, a fork commit the fork remote does not carry (the maintainer asked for the README not to be pushed), so publishing it would break a fresh clone's `git submodule update`. Push the FORK first, then that commit — never that commit alone. Check the remote, not this sentence; pushing remains the maintainer's call.**
+MAIN repo's push state is NOT a standing 'never' — RE-CHECKED 14z-109 AFTER PUSHING: `origin/main` holds `10cf9ce` and NOTHING is local, confirmed by `git ls-remote`. The fork is at `c97e3d14` (the README brought to D0-D5). **The earlier 14z-109 state where one commit was held back because it bumped the pin to an unpushed fork commit is RESOLVED** — the fork was pushed first, then the pin bump. Keep the ORDER in mind if it ever recurs: pushing a pin bump ahead of the fork commit it names breaks a fresh clone's `git submodule update`. Check the remote, not this sentence; pushing remains the maintainer's call.**
 The RTL benches live in **`tests/rtl/*.v`** (this repo, not the fork) and the
 frozen override delta in **`tests/expect/cps2w_rtl_delta.txt`**;
 `tests/test_mister_wide_gate.sh` compiles the benches against the fork's real

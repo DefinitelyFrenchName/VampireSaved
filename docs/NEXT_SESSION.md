@@ -376,25 +376,22 @@
 > ## `0x600000` on `cps2`, **`0x648000` on `cps2w`**):
 > ## `tools/run_sim_jtcps2.sh <rpl> <outdir> --frames N --wram A B` and
 > ## `tools/mister_mra.sh --core cps2w --wide build/m3b_merged13 --out <dir OUTSIDE the repo>`.
-> ## **THE FORK: `DefinitelyFrenchName/jtcores@vampire-saved`, remote
-> ## still at `7b9a0d2d`, EIGHTEEN commits public.** **LOCAL FORK HEAD IS
-> ## AHEAD: `c97e3d14`** (14z-109, the README brought to D0-D5) — docs
-> ## only, no RTL, and **DELIBERATELY NOT PUSHED** at the maintainer's
-> ## instruction. Fork pushes are otherwise standing-authorised.
-> ## **THE MAIN REPO'S PUSH STATE — RE-CHECKED AGAINST THE REMOTE
-> ## 14z-109, and it MOVED AGAIN:** `origin/main` now holds **`cc4508f`**
-> ## (the 14z-109 field-test control + triage card + part checker).
-> ## `git ls-remote` confirms it. **EXACTLY ONE COMMIT IS LOCAL —
-> ## `f84683d`, the fork README and the submodule PIN BUMP to
-> ## `c97e3d14`.** It is held back ON PURPOSE and the two facts are one
-> ## fact: pushing it would point public `origin/main` at a fork commit
-> ## the fork remote does not have, and a fresh clone's
-> ## `git submodule update` would fail. **So push the FORK first, then
-> ## that commit — never that commit alone.**
+> ## **THE FORK: `DefinitelyFrenchName/jtcores@vampire-saved`, remote at
+> ## `c97e3d14`, NINETEEN commits, PUBLIC AND CURRENT** — the 14z-109
+> ## README update is pushed (maintainer-authorised 2026-08-26, with the
+> ## note that the README and the rest of this test build can be
+> ## removed or updated later if needed). Fork pushes are
+> ## standing-authorised.
+> ## **THE MAIN REPO: `origin/main` holds `10cf9ce` and NOTHING IS LOCAL**
+> ## — re-checked with `git ls-remote` at the 14z-109 push, not read off a
+> ## tracking ref. **The "one commit held back / push the fork first"
+> ## situation earlier in 14z-109 is RESOLVED and no longer applies**: the
+> ## fork went up first, then the pin bump, in that order, and the
+> ## stranded state is gone.
 > ## The 14z-107 close recorded "the main repo is NEVER pushed", which was
-> ## true WHEN WRITTEN and has now been false twice over. Do not repeat a
-> ## push figure from prose — **CHECK `git ls-remote`**: a tracking ref is
-> ## a claim about the last fetch, and prose is a claim about the day it
+> ## true WHEN WRITTEN and has since been false three times. Do not repeat
+> ## a push figure from prose — **CHECK `git ls-remote`**: a tracking ref
+> ## is a claim about the last fetch, and prose is a claim about the day it
 > ## was written. This paragraph is prose too.
 
 

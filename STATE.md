@@ -102,7 +102,12 @@ tracking ref). The fork README commit `c97e3d14` was **deliberately NOT
 pushed** at the maintainer's instruction, and the main-repo commit that bumps
 the `emu/jtcores` pin to it is therefore held back too — publishing it would
 point public `origin/main` at a fork commit the fork remote does not carry.
-**Push the FORK first, then that commit — never that commit alone.** The two
+**Push the FORK first, then that commit — never that commit alone.**
+**[RESOLVED 2026-08-26: the maintainer authorised the fork push. Done in
+that order — fork `c97e3d14` first, then the pin bump. `origin/main` now
+holds `10cf9ce` and NOTHING is local. The ordering rule above is kept
+because it is the general lesson, not because anything is still stranded.]**
+The two
 commits were reordered (disjoint by file) so everything else could ship; the
 resulting tree hash was verified byte-identical before each push.
 
