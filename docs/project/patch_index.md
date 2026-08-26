@@ -124,6 +124,12 @@ block; the program fingerprint changes but no legacy path is touched
 (masked-v2 EXACT). It is the twin of `throw_victim_keyframes` on a
 different tenant and shares the same `slot_ptr_table` mechanism.
 
+## 14z-110 additions
+
+| item | status | depends on | exclusivity | notes |
+|---|---|---|---|---|
+| **reaction_hook d2-window extension** (the #99 fix — `[reaction_hook]` thunk body, donovan.toml) | **RULED 2026-08-26 (maintainer, 14z-110), NOT YET BUILT** — lands in the next window in the binding order FIX -> AUDIT -> RE-FREEZE | the existing `reaction_hook` thunk (site `0x018458`, singleton, merged inherits); vs2 dispatcher-2 twin table `0x016DE4` as the verbatim handler source | supersedes ruling (b) of the original #99 remap (`0x51 -> 0x19` — measured UNSAFE: diverges on dispatcher 3 at `0x0185DA[0x19]=0x18694` and breaks the `es_type51_dispatch` `cmpi #0x51`; any copy-aliased value changes `property[class]`, the 14z-44 ES-freeze family) | The thunk's bne-arm — the ONLY entry into dispatcher 2 (`0x018508`), measured: sole `bne.w` at `0x01845C`, inside the hook's site prefix — gains the same `0x50-0x53` window it already runs for dispatcher 1, via a SECOND ext table to vs2 `0x016DE4` handlers verbatim; all other indices `jmp 0x018508` as today. Vanilla dispatcher byte-untouched (#99 ruling (a)); data stays native `0x51` (dispatcher 3 + property path untouched). **DATA-TRIGGERED, not tenant-id-gated** — `0x50-0x53` node bytes exist only in vs2-numbered ported data (vanilla crashes on them today: legacy-safe by impossibility, the `index_window_018468` precedent), and the walking object can be a LEGACY character's (field: Bishamon), so an id-gate would be wrong. Global cost = ~2 compares on the hit-stun path (`+0x38` set), all characters — **the flicker-inventory measurement gates shipping; if it moves, stop-and-escalate**. Gate plan: reconstruct-from-ROMs like `test_index_window_thunk`; `test_fsm_census` stays 6/6 native-`0x51`. Census basis + measurements: STATE 14z-110, GitHub #99. |
+
 ## 14z-94 additions
 
 | item | status | depends on | exclusivity | notes |

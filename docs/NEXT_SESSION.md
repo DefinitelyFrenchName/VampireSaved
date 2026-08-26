@@ -1,8 +1,16 @@
 # NEXT SESSION — orientation (rewritten at the 14z-110 CLOSE, 2026-08-26)
 
-> ## **START HERE. #99 IS RE-OPENED FOR THE MAINTAINER — the fix is BLOCKED on
-> ## a ruling, not on work. The census is DONE and clean; the coverage gap is
-> ## closed. Read GitHub #99's newest comment first, then decide the fix shape.**
+> ## **START HERE. THE FIX SHAPE IS RULED (maintainer, 2026-08-26, late
+> ## 14z-110): the REACTION_HOOK D2-WINDOW extension is APPROVED, in the
+> ## binding order FIX -> AUDIT -> RE-FREEZE. The opener is the FIX BUILD.**
+> ## Full shape + scope: STATE "Decisions pending" #99 (RE-RULED) and
+> ## patch_index "14z-110 additions" — thunk BODY only (engine footprint
+> ## unchanged), second ext table from vs2 `0x016DE4` verbatim, data stays
+> ## native `0x51`, DATA-triggered not id-gated, owned by donovan.toml's
+> ## singleton. Then AUDIT ON THE FIX BUILD: flicker inventory (the gate —
+> ## if it moves, stop and escalate), `test_fsm_census` still 6/6,
+> ## `audit_don_vs_cpu`, guard soaks, `audit_continue_switch` re-measure.
+> ## Then the RE-FREEZE + MiSTer CRC tail. Field pass = the #99 verification.**
 > ##
 > ## **WHAT 14z-110 FOUND (measure-first, no shipped byte moved):** the ruled
 > ## data remap `0x51 -> 0x19` is UNSAFE. The node byte feeds THREE dispatchers

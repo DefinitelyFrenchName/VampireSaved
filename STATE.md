@@ -1683,9 +1683,45 @@ entries moved VERBATIM to `DECISIONS_HISTORY.md` — grep there by topic.
 Lifecycle: rulings are still marked DECIDED in place here first; they move to
 the archive once they stop shaping active work.)*
 
-- **#99 — THE TYPE-0x51 REMAP: RE-OPENED FOR THE MAINTAINER (14z-110), because
-  the measure-first pass found ruling (b) is UNSAFE AS RULED.** The census is
-  DONE and the fix shape needs a fresh decision. Do not implement (b).
+- **~~#99 — THE TYPE-0x51 REMAP~~ RE-RULED (maintainer, 2026-08-26, 14z-110):
+  THE REACTION_HOOK D2-WINDOW SHAPE IS APPROVED, in the explicit order
+  FIX -> AUDIT -> RE-FREEZE.** "Very well, I agree with all the proposal."
+  What is approved, precisely:
+  * **Shape: the reaction_hook THUNK BODY is extended — never the vanilla
+    dispatcher.** The engine's patched footprint does not grow (still the one
+    6-byte `jmp` at `0x018458`); the thunk's bne-arm (the only entry into
+    dispatcher 2 at `0x018508`) gains the same `0x50-0x53` window test it
+    already runs for dispatcher 1, dispatching via a SECOND ext table to vs2's
+    dispatcher-2 twin (`0x016DE4`) handlers VERBATIM; every other index takes
+    `jmp 0x018508` exactly as today. Data stays native `0x51` — dispatcher 3,
+    the `es_type51_dispatch` thunk and the `property[0x51]=0x19` lookup are
+    untouched.
+  * **Scope: DATA-TRIGGERED, deliberately NOT tenant-id-gated.** The branch
+    keys on the node byte's VALUE (`0x50-0x53`), which only vs2-numbered
+    ported data can carry — vanilla data reaching dispatcher 2 with such a
+    byte crashes today, so no legacy behavior can depend on the added branch
+    (legacy-safe by IMPOSSIBILITY, the index_window_018468 precedent). An
+    id-gate would be WRONG: the field proved the walking object can be a
+    LEGACY character's (Bishamon) — the trigger is whose DATA the node lives
+    in, not whose object walks it.
+  * **Ownership: `donovan.toml`'s `[reaction_hook]` singleton** (merged
+    inherits; solo Huitzil/Pyron don't declare it and the census measured
+    them at ZERO out-of-range nodes, so they don't need it).
+  * **The one global cost is CYCLES** — every object on the hit-stun path
+    (`+0x38` set) executes the ~2 added compares, all characters. The
+    flicker-inventory measurement (step 2 of the order) is the gate: if the
+    frozen inventory moves, STOP and return to the maintainer — never widen.
+  * **Order is binding: FIX (manifest + emitter) -> AUDIT on the fix build
+    (flicker inventory, test_fsm_census still 6/6 native, audit_don_vs_cpu,
+    guard soaks, audit_continue_switch re-measure) -> RE-FREEZE
+    (donovan-m12/huitzil-m21/pyron-m15/merged-m7) + the MiSTer CRC tail.**
+    Field pass on the new bundle is the actual #99 verification (MAME cannot
+    reproduce the crash).
+  This supersedes the 2026-08-26 (a)+(b)+(c) ruling's part (b); (a) — vanilla
+  dispatcher never patched — is honored by construction, and (c)'s census came
+  back EMPTY of further members. The measured basis below stands as the trail.
+  **Original re-ask (14z-110), kept for the trail:** The census is
+  DONE and the fix shape needed a fresh decision; (b) was not implemented.
   **WHAT THE CENSUS FOUND (measured 14z-110, `tools/audit_fsm_census.py` with
   the vs2 oracle + `tests/lua/fsm_census.lua` corpus):**
   1. **There is only ONE out-of-range family, and it is the KNOWN one.** The
