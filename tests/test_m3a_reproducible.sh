@@ -199,23 +199,27 @@ done
 # untouched.
 # MANI_WIDE="53b7a65fb27039d6ef6e80f6450bb78933691096 42"  # 14z-99 window
 # MANI_WIDE="3a67825670ebd764cdf104f8f23293ffbe2b9732 42"  # 14z-102 window
-MANI_WIDE="6b746e17cc8421bd308c5fad6862760209b58093 42"   # 14z-105 (delta: vm3j.03d/07b/10b + vsw.41 PROGRAM + vsw.31m/33m/35m/37m GROUP C — the version glyphs; no QSound member moved)
+# MANI_WIDE="6b746e17cc8421bd308c5fad6862760209b58093 42"  # 14z-105 window
+MANI_WIDE="fc816b5aa1e88ca184f7ac38ff7fd8cc210ecc0a 42"   # 14z-110 (delta: vm3j.03d/04d/10b + vsw.41 PROGRAM — the #99 reaction_hook d2 window + its +0x60 relocations; vsw.33m/37m GROUP C — the M7 version glyphs; no QSound member moved)
 # MANI_STOCK="08aac0881648185a9487230a3ac5fe19b78408d3 30"  # 14z-99 window (#103)
-MANI_STOCK="23314532b00a77adaed4bda4b9e52155ad209252 30"   # 14z-102 (delta: vm3j.04d only — #107 rides the shared map on stock too)
+# MANI_STOCK="23314532b00a77adaed4bda4b9e52155ad209252 30"  # 14z-102
+MANI_STOCK="9985bf46a62732b32cbe143850b65a05038093f1 30"   # 14z-110 (delta: vm3j.03d/04d/10b PROGRAM only — the d2 window is NOT profile-gated so stock carries it; NO gfx member moved, the M7 mark IS profile-gated — the member-level proof both ways)
 # 14z-94 (#91 + #92). Attributed per member before re-pinning: exactly FOUR
 # members moved — vm3j.03d, vm3j.04d, vm3j.10b and vsw.41, all PROGRAM
 # members. No gfx member and no QSound member changed, which is what a
 # program-image edit must look like. (m15 was 7f4d52a330abf73df298b638dbca099ce3135541.)
 # MANI_HUI="b496dec55439b11f3fe78eadc40a98e039a8bb80 42"  # 14z-99 window
 # MANI_HUI="7552d03cefe69ae48d7a0c1da540643d0f44e02a 42"  # 14z-102 window
-MANI_HUI="548af9ffb25ef6732bc468b1d168b1f7d975f328 42"   # 14z-105 (delta: vm3j.03d/04d/07b + vsw.41 PROGRAM + vsw.31m/33m/35m/37m GROUP C — the two AUTHORED version-glyph tiles at 0x1FE40/41; no QSound member moved)
+# MANI_HUI="548af9ffb25ef6732bc468b1d168b1f7d975f328 42"  # 14z-105 window
+MANI_HUI="4a4c1ef74e2200113fe7e6ecab82cba46964402f 42"   # 14z-110 (delta: vsw.33m/37m GROUP C ONLY — the M7 glyphs; program bit-exact 24a27940, the d2 fix is Donovan-owned)
 # 14z-94 (#92 only — he takes no reconciliation row). Exactly ONE member
 # moved: vm3j.03d, which carries table B at PRG:0x00BB68. Huitzil moved four
 # because #91's row also relocated code; Pyron's four bytes are a pure data
 # edit inside one member. (m9 was d12d0c6a86bce271d6b7f59ccf6e0c3d98bc9393.)
 # MANI_PYR="0bcffc87f6d3b43fdabb76a39810bb94a54e57a8 42"  # 14z-99 window
 # MANI_PYR="673038986c05d4dca0b0e9451bc1608df6d59a18 42"  # 14z-102 window
-MANI_PYR="8e8329cf7756834f2359d067ce1e7a18f87002b6 42"   # 14z-105 (delta: vm3j.03d/04d/07b + vsw.41 PROGRAM + vsw.31m/33m/35m/37m GROUP C — the version glyphs; no QSound member moved)
+# MANI_PYR="8e8329cf7756834f2359d067ce1e7a18f87002b6 42"  # 14z-105 window
+MANI_PYR="9862d502c5609f0d6125084d1d30e45a46484d4b 42"   # 14z-110 (delta: vsw.33m/37m GROUP C ONLY — the M7 glyphs; program bit-exact 6bf265ab)
 
 m3a_manifest() {   # m3a_manifest <label> <rompath> <"digest count">
     _got="$(python3 tools/artifact_manifest.py "$2")" || {
