@@ -1542,8 +1542,27 @@ entries moved VERBATIM to `DECISIONS_HISTORY.md` — grep there by topic.
 Lifecycle: rulings are still marked DECIDED in place here first; they move to
 the archive once they stop shaping active work.)*
 
-- **#99 (REOPENED 14z-109) — THE TYPE-0x51 REMAP: measured, RULING NOW
-  ASKABLE.** Step 1 done (14z-109 (7)), all three answers:
+- **~~#99 — THE TYPE-0x51 REMAP~~ RULED (maintainer, 2026-08-26): (a)+(b)+(c)
+  ALL APPROVED.** (a) fix shape A — data-side extraction remap, never the
+  dispatcher; (b) `0x51 -> 0x19` on the handler-equivalence proof; (c) the
+  census with the escalation clause — default-alias hits auto-remap by the
+  same proof, **anything else comes back to the maintainer as its own
+  decision**.
+  **THE MAINTAINER'S STANDING CAVEAT ON (c), recorded verbatim in spirit:**
+  for escalated hits, "port the handler" LOOKS like the best default (no
+  error states + vs2-consistent tenant behavior) — **but it is NOT free: not
+  in memory, not in cycles, and not in side-effects. Measure first. And if
+  the maintainer seems too eager to say yes to a port, RAISE THIS POINT** —
+  their own instruction. The project's evidence agrees: a ported handler
+  imports code that may touch fields vsav lays out differently, may call vs2
+  helpers at vs2 addresses (thunk/relocation work), costs bytes and
+  per-frame cycles, needs its own gates — and "consistent with vs2" can
+  still be WRONG under vsav's engine (the DF-frameworks-differ-BY-DESIGN
+  lesson, 14z-101; the effect-class root that pulled cascading dependencies,
+  14z-102). Default order for an escalated hit: measure what the state DOES
+  and how often our content reaches it -> consider neutralize-to-default ->
+  port ONLY when the behavior demonstrably matters to feel.
+  **Original measured entry:** Step 1 done (14z-109 (7)), all three answers:
   1. **Family**: the object-script FSM node stream — 0x18-byte nodes whose
      `+0x17` byte is the NEXT-STATE index — inside Donovan's ported
      character block. Our node `0x3FB882` = vs2 `0x0C9CAA`, ported
