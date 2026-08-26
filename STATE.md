@@ -1,5 +1,46 @@
 # STATE — living progress log
 
+## Session 14z-111 (2026-08-26) — **OPENED WITH A CLOSE-RITUAL AUDIT of
+## 14z-110b (the maintainer's call: the close was clean but unchecked).**
+## Findings, then the mechanical fixes applied; the judgment calls left
+## for the maintainer below.
+
+**Measured against the tree (git, not prose):** main == origin/main (pushed);
+no stash; no leftover emulator/suite processes; `emu/fbneo` dirty = exactly
+the two applied patches (8 files = 3 + 5, expected); the refit scan dumps
+survive in the session scratchpad (`refit/`, ~22 frames × 4 replays).
+
+**STALE AND FIXED THIS SESSION:**
+1. **`huitzil.toml` / `pyron.toml` `version_text` M6 -> M7 were UNCOMMITTED
+   since 14z-110** — while `test_m3a_reproducible.sh`'s MANI_HUI/MANI_PYR
+   pins (committed 49e00ed) were re-frozen on the M7 glyph members. A clean
+   checkout would have rebuilt H/P with "M6" and failed the pins: a rule-3
+   reproducibility gap. Committed now.
+2. **HANDOFF had NO registry row for 14z-110b** (donovan-m13 / merged-m8 /
+   stock8) and the playtest default still named merged14. Row added,
+   default -> merged15.
+3. **patch_index still said "NOT YET BUILT" for the 14z-110 d2 window**
+   (shipped two freezes ago) and had no 14z-110b remap entry. Both fixed.
+
+**STALE, LEFT FOR THE MAINTAINER (not mine to decide):**
+- **Build-dir policy skipped at BOTH 14z-110 and 14z-110b:** `don_m12/13`,
+  `m3b_merged14/15`, `m5_stock7/8` and `guard_corpus/m3b_merged14.*.tsv`
+  are UNTRACKED (14z-105 tracked its generation), and the N-2 deletion
+  (`build_dir_triage.md`: keep current + one back) never fired — `don_m11`,
+  `m3b_merged13`, `m5_stock6` (305 MB tracked) and the m12/merged14/stock7
+  generation (305 MB) are both still present. Suggest: track m13/merged15/
+  stock8 + the TSV, delete m11/merged13/stock6 AND m12/merged14/stock7 at
+  the next freeze (or now).
+- **12 local freeze tags are unpushed** (donovan-m8/m9, huitzil-m16..18,
+  pyron-m10..12, merged-m1..m4) — long predating 110b. Push is the
+  maintainer's call by standing rule.
+- STATE.md holds four groups (108 / 109 / 110 / 110b); the ledger ends at
+  14z-107. 14z-108 is due to roll to STATE_HISTORY at this close.
+
+**Everything the 110b CLOSE listed as "re-run first" is still open** — see
+the section directly below; nothing there has been started.
+
+
 ## Session 14z-110b CLOSE — **the 0x51->0x44 remap is BUILT, FROZEN and
 ## MAME-VALIDATED; the board bundle carries merged-m8; the FBNeo partial
 ## oracle's reduced refit is RULED and IN PROGRESS (continuation recipe
