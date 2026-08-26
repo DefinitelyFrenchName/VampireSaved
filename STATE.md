@@ -37,6 +37,27 @@ survive in the session scratchpad (`refit/`, ~22 frames × 4 replays).
 - STATE.md holds four groups (108 / 109 / 110 / 110b); the ledger ends at
   14z-107. 14z-108 is due to roll to STATE_HISTORY at this close.
 
+### #99 FIX — OPTION A AUTHORED AND PROBE-VALIDATED (maintainer chose A; 14z-111, 2026-08-27)
+
+**Landed (8596b9d, NOT frozen):** bank_map `ai_script_0..3` (data_ptr, the
+new `region = "auto"`), one DATA extra root per tenant for his vs2 AI block,
+four `reconciliation_huitzil` rows for the tripwires Phobos's own AI reaches
+(`0x2cbde/0x2ce0a/0x2ce3e/0x364a` — the R1 loop's first fire, twins
+measured), `test_tenant_loop` re-frozen (+5/tenant, -4 hui tripwires).
+**ACCEPTANCE: `test_inp_crash_m10 MODE=clean` PASS on the merged probe
+`0df398ff`** — the maintainer's recording plays through with zero
+exceptions (defect mode on merged15 still PASSes = the capture is stable).
+Interpreter equivalence measured (patch_notes 14z-111). Docs landed:
+patch_notes / patch_index / engine_internals "CPU AI action-script system" /
+gotchas. **In flight (niced chain, scratchpad `val_*.log`):**
+`audit_don_vs_cpu` (three CPU legs on the tenants' OWN AI) ->
+`audit_merged_legacy` (the superset proof for the alias-half rows) ->
+`audit_guard_corpus` (332). Then the freeze ritual (donovan-m14 / huitzil-m21
+/ pyron-m15 / merged-m9, **M8 mark**, stock twin moves — the rows are data),
+flip the gate to MODE=clean default with BUILD re-pointed, MiSTer CRC tail.
+The maintainer is meanwhile provoking OTHER crashes on MAME with recording
+armed (a Donovan-vs-CPU-Bishamon crash would be a different mechanism).
+
 ### #99 ROOT CAUSE — CAPTURED ON THE NATURAL PATH (maintainer's .inp `crash_m10`, 14z-111)
 
 **The crash:** frame 4806, **vec11 (line-F)** at `PRG:0x422BAC` = inside

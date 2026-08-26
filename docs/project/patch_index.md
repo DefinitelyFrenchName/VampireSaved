@@ -124,6 +124,13 @@ block; the program fingerprint changes but no legacy path is touched
 (masked-v2 EXACT). It is the twin of `throw_victim_keyframes` on a
 different tenant and shares the same `slot_ptr_table` mechanism.
 
+## 14z-111 additions
+
+| item | status | depends on | exclusivity | notes |
+|---|---|---|---|---|
+| **CPU AI action-script tables unparked** — bank_map `ai_script_0..3` (`0xBF01A/09A/11A/19A`, data_ptr, `region = "auto"`) + one DATA extra root per tenant (`0x100000:0xE3C` H / `0x100E3C:0xC8E` P / `0x101ACA:0x10CE` D) | **AUTHORED + PROBE-VALIDATED 14z-111 (maintainer chose option A); NOT YET FROZEN** — acceptance `test_inp_crash_m10 MODE=clean` PASS on the merged probe; validation chain (don_vs_cpu / merged_legacy / guard corpus) in flight | the bank_map data_ptr pipeline; extractor `region = "auto"` (new); the recon rows below | supersedes NOTHING — the 14z-110 d2 window and 14z-110b remap stay (equivalence-correct; they were never this crash's fix) | THE #99 ROOT CAUSE: the tables are 16 classes + the same 16 repeated, so tenant classes aliased Demitri/class-1/class-3 AI; CPU tenants now run their own vs2 AI. **Gameplay-bearing (1P CPU behaviour) — maintainer-ruled.** Byte detail patch_notes 14z-111; mechanism STATE 14z-111; GitHub #99. |
+| **reconciliation_huitzil rows** `0x2CBDE->0x2D3F2`, `0x2CE0A->0x2D5B2`, `0x2CE3E->0x2D5E6`, `0x364A->0x364A` (engine_sub, verified) | AUTHORED 14z-111 (with the row above) | Phobos's jump handler `x02592a` | — | The R1 loop's first fire on the probe: four engine calls tripwired because only his own AI reaches them. Twins measured (byte-identical / identical-modulo-attributed-operands / same-address kernel entry). |
+
 ## 14z-110b additions
 
 | item | status | depends on | exclusivity | notes |

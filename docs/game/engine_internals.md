@@ -1384,6 +1384,43 @@ tile fetch: a build with 15 rows remapped diverges in work RAM at frame
 890 under MAME, which has no extended-bank support at all (14z-56
 measurement, GOTCHAS). Treat the row as behaviour-bearing.
 
+
+## The CPU AI action-script system (14z-111, measured on the #99 capture)
+
+**Atlas rows this section depends on:** `ram.md` fighter `+0x205` (script
+index), `+0x210/+0x214/+0x218/+0x21C` (channel cursors; `+0x224` mirrors
+channel 0's start), `+0x241` (current command byte), `+0x242/+0x244/+0x246`
+(the three stream words each command pulls), `+0x382` (class);
+`character_tables.md` `ai_script_0..3` (`PRG:0xBF01A/09A/11A/19A`).
+
+- **Tables.** Four per-class tables of script-start pointers, 32 longs each:
+  entries 0-15 = the 16 classes, **entries 16-31 = the same 16 repeated**
+  (Capcom's aliasing guard for ids with bit 4 set — Oboro Bishamon 0x18
+  legitimately aliases Bishamon 0x08). Consumers: `0x2CCB6` (table 0,
+  indexed by `+0x205`, writes `+0x210` and `+0x224`), `0x2CCF2` / `0x2CD40` /
+  `0x2CD9C` (tables 1-3: `+0x382<<2` row, then `jsr 0x14E8A` (RNG) `andi #$1F`
+  `+ (0x20A,a6)` picks one of 32 starts inside the row's block; write
+  `+0x214/+0x218/+0x21C`). CPU-side only (14z-98 trace); 2P never reads them.
+- **Scripts.** Word-offset streams (position-independent): the start block
+  is a table of word offsets to the actual script; each command pulls three
+  words into `+0x242/+0x244/+0x246`, the command byte lands in `+0x241`.
+- **Interpreter.** `0x2B96A`-`0x2C7D0`: 15 nested `move.b (0x241,a6),d0;
+  move.w (6,pc,d0.w),d1; jmp (2,pc,d1.w)` dispatchers. vs2's twin
+  (`0x2B144`-`0x2BFAA`) is structurally identical (same table count and
+  entry counts); the bodies differ in absolute operands plus one guard
+  (table 1 command 17). The **jump command** (`0x2BD72` / vs2 `0x2B54E`,
+  byte-identical) writes `move.l #$0200060E,(4,a6)`: class 02, seq 6, sub-
+  state 0x0E — vsavj's generic jump handler (`0x22A24`, 10 sub-states) takes
+  it; **Phobos's private vs2 jump handler (`0x2592A`, 5 sub-states) does not**,
+  and vs2's own Phobos scripts never issue it.
+- **The #99 crash (RESOLVED 14z-111):** a tenant class read the aliased row
+  (Phobos 0x10 -> Demitri's scripts), Demitri's jump command reached Phobos's
+  5-entry table at index 7, the displacement read from code landed in
+  `x05c800` data, line-F at `PRG:0x422BAC`. CPU-only, Phobos-only (the only
+  tenant with a private jump handler), time-dependent (the RNG must pick the
+  script). The port now provisions rows 0x10/0x11/0x13 in the alias half
+  from vs2's own tables (`0xD91B8/238/2B8/338` by bank-origin arithmetic).
+
 ## The class-02 sequence system, per-char jump handlers, and the air
 ## system (session 14z-66, measured on the Huitzil port)
 

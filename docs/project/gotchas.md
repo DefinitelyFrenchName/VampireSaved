@@ -3103,3 +3103,27 @@ before quoting any per-build gate result, confirm HOW the gate takes its
 build (grep its BUILD= line) — and when a differential comes out
 identical, check you actually varied the variable (RH-23) before theorizing
 about the mechanism.
+
+## 14z-111 — "16 + the same 16 repeated": an aliasing guard is a silent tenant trap; and a rig that wins fast cannot see a time-dependent AI crash
+
+**The fact.** Several per-class tables in vsavj are 32 entries with the
+second half a COPY of the first (`0xBF01A/09A/11A/19A`, the CPU AI action
+scripts). Vanilla never faults on an id with bit 4 set — it silently plays
+class `id & 0x0F`. For a tenant at 0x10/0x11/0x13 that means the table
+"works": no tripwire, no crash at the read, just another character's data
+flowing into the tenant's object. `bank_map.toml` had these rows PARKED
+("Donovan's vs2 rows point outside his regions; unfired") for months. The
+symptom surfaced 2 characters and 3 dispatch levels away (a sub-state the
+tenant's private handler lacks), on CPU-controlled tenants only, after
+enough match time for the RNG to pick the offending script.
+
+**How to apply.** (1) A bank-family table whose upper half duplicates the
+lower is NOT free for tenants by accident — it is free ON PURPOSE only if
+the port fills the tenant rows; audit every `stride 0x80` table for
+"parked" status when a tenant misbehaves ONLY under CPU control. (2) Rigs:
+`audit_don_vs_cpu` mashed and won fast, so the AI never reached the script;
+the maintainer's rig (win fast, then KEEP AWAY and give the CPU time)
+crashed every time. A CPU-behaviour soak must give the opponent TIME, not
+hits. (3) Capture with the game's own exception record (`$FF0000` write
+tap, `tools/run_inp_guarded.sh`) on a hand-played `.inp` — the first natural-
+path capture beat two fixes derived from a poke-contaminated one.

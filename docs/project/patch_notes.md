@@ -1,5 +1,56 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail
+
+**Mechanism (captured on the maintainer's natural-path `.inp`, `tests/inp/crash_m10`):**
+the four per-class CPU AI action-script tables `PRG:0xBF01A / 0xBF09A /
+0xBF11A / 0xBF19A` (consumers `0x2CCB6 / 0x2CCF2 / 0x2CD40 / 0x2CD9C` —
+row = `+0x382 << 2`; channel starts `+0x210(+0x224) / +0x214 / +0x218 /
++0x21C`; 09A/11A/19A pick one of 32 script starts with the RNG `0x14E8A`)
+are 32 longs each: **16 classes then the same 16 repeated**. A tenant class
+read the aliased row — Phobos 0x10 = Demitri's AI. Demitri's script issues
+the interpreter's jump command (`0x2BD72`, `move.l #$0200060E,(4,a6)`),
+sub-state 0x0E; Phobos's private vs2 jump handler (`x02592a`, 5 sub-states)
+indexes past its table into `x05c800` data -> line-F.
+
+**Rows (all three manifests, via bank_map `ai_script_0..3`, kind data_ptr,
+`region = "auto"`):** per tenant four `poke32` at `table + class*4`, i.e. the
+ALIAS-HALF slots reachable by no legacy class (`id_space.md`; Oboro 0x18 untouched):
+```
+huitzil (0x10): 0xBF05A 0xBF0DA 0xBF15A 0xBF1DA -> x100000 placed + (ptr - 0x100000)
+pyron   (0x11): 0xBF05E 0xBF0DE 0xBF15E 0xBF1DE -> x100e3c placed + (ptr - 0x100E3C)
+donovan (0x13): 0xBF066 0xBF0E6 0xBF166 0xBF1E6 -> x101aca placed + (ptr - 0x101ACA)
+```
+**Regions (DATA extra roots, `tools/build_donovan.sh`):** vs2 `0x100000:0xE3C`
+(H), `0x100E3C:0xC8E` (P), `0x101ACA:0x10CE` (D) — the vs2 AI script pool,
+per-class contiguous blocks bounded by the next class's first pointer, no
+foreign pointer inside; vhunt2 twin at shift 0 (byte-identical over
+`0x100000-0x10350A`); segmented oracle: 0 pointer fields, 1 segment each —
+pure word-offset streams. Emitted unencrypted (DATA reads via `(a0)+`).
+
+**Interpreter equivalence (the owed measurement):** vsavj `0x2B96A..` and
+vs2 `0x2B144..` are structurally identical — 15 command tables with the same
+entry counts (19/8/6/2/1/1/3/2/2/4/1/1/1/1/3); 117 differing bytes across 26
+bodies = branch displacements + absolute operands (RNG, kernel calls), plus
+ONE engine-level guard drift on the first table's command 17 (vsavj `tst.b
++0x109 / tst.b +0x111` vs vs2 `cmpi.b #2,+0x109 / tst.b +0x1C3`) — the same
+class of difference every ported character already lives with. The jump
+command body is byte-identical (both write `0x0200060E`): vs2's own Phobos
+scripts never issue it, which is why porting them is correct by construction.
+
+**R1 loop, first fire:** with Phobos on his own AI his jump handler reached
+four tripwired engine calls; resolved in `reconciliation_huitzil.toml`:
+`0x2CBDE -> 0x2D3F2` (0x46 B byte-identical), `0x2CE0A -> 0x2D5B2` and
+`0x2CE3E -> 0x2D5E6` (identical modulo RNG/bank-table/engine-twin operands;
+the two sub-bank tables `0xBC680` bit-mask ladder and `0xBCD20` +0x238-keyed
+offset list are NOT class-indexed), `0x364A -> 0x364A` (kernel band,
+same-address entry, callee is vsavj's own).
+
+**Op deltas:** +5 per tenant (1 region op + 4 pokes), -4 huitzil tripwires:
+solos 332/366/303, N=2 608/660, N=3 819/920 (`test_tenant_loop`).
+**Acceptance:** `tests/test_inp_crash_m10.sh MODE=clean` PASS on the merged
+probe `0df398ff`. Stock twin MOVES (data rows, not profile-gated).
+
 ## 14z-110b — the 0x51 -> 0x44 state remap: byte detail
 
 Six bytes, all `region_fix` (old-verified against the extracted vs2
