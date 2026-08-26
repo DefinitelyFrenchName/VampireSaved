@@ -71,7 +71,36 @@ script volume ~0xE3C (H) / ~0xC8E (P) / ~0x10B8 (D) bytes. The two
 interpreters are STRUCTURALLY IDENTICAL (15 command tables, same sizes) —
 the bytecode numbering carries; command BODIES can differ (the jump body
 does: vsavj writes sub 0x0E, vs2's twin does not — measured below).
-Fix shapes are the maintainer's call — see the reply/Decisions pending.
+Fix shapes — **DECISION PENDING (maintainer; gameplay-bearing: CPU-tenant
+behaviour is 1P content):**
+- **(A) UNPARK the four AI tables** — add `bank_map.toml` `data_ptr` rows for
+  `0xBF01A/09A/11A/19A` (twins `0xD91B8/238/2B8/338`, origin arithmetic
+  verified) so the extractor seeds vs2's tenant AI scripts (one contiguous
+  vs2 block `0x100000-0x102Bxx`, ~11 KB, word-offset streams) as regions,
+  relocates them into WIDE ext and repoints rows 0x10/0x11/0x13 (the alias
+  half — reachable by no legacy class, `id_space.md`; 0x18 Oboro untouched).
+  ZERO code. CPU Phobos/Pyron/Donovan then play THEIR OWN vs2 AI — correct
+  by construction (vs2's Phobos scripts were written against his 5-sub-
+  state handler). Pre-ship measurement owed: the two interpreters are
+  structurally identical (15 command tables, same sizes, jump body byte-
+  identical) but bodies drift by bytes — verify per command like 110b's
+  consumer proof; script-internal absolute pointers via the extractor
+  oracle. RECOMMENDED.
+- **(B) band-aid** — guard Phobos's private jump handler (`x02592a`) for
+  sub-states beyond its table (route to vanilla's generic handler). Code in
+  a ported region, no crash, but CPU tenants keep playing BORROWED vanilla
+  AI (Phobos attempting Demitri's script) — nonsense behaviour, no crash.
+- **(C) both** — (A) for behaviour, (B) as the guard against any other
+  vsavj-side writer of a foreign sub-state (8 static `move.b #$0e,(7,a6)`
+  sites exist in vanilla; whether any can reach a seq-6 Phobos is
+  unmeasured — the 2P field runs say not in practice).
+Also: bump the version mark to **M8** at the fix freeze — the 110b freeze
+shipped the same "M7" as its predecessor, so the field could not tell the
+builds apart by eye (paid for tonight).
+
+**Gate:** `tests/test_inp_crash_m10.sh` (MODE=defect PASS on merged15 —
+CRASH 4806 vec11 PC 422bac frozen; flip to MODE=clean with the fix). The
+recording is tracked at `tests/inp/crash_m10/` (40 KB + nvram).
 
 **Instrument that got it:** `tools/run_inp_guarded.sh` + `tests/lua/inp_guard.lua`
 (cheap-mode write tap on the game's exception-code store; `INP_DEBUG=1

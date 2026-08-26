@@ -114,7 +114,11 @@ local tap
 local function on_write(offset, data, mask)
     -- a .w store to $FF0000 arrives as one 16-bit access; the code is 0..9
     local code = data & 0xFFFF
-    if frame < arm or code > 9 then
+    -- the SOFT-RESET path's abbreviated RAM test also writes 0..9 here with
+    -- SP outside work RAM (measured crash_m10: SP=0 at frames 4809-4872);
+    -- a real handler store has the exception frame on the work-RAM stack.
+    local sp = (cpu.state["SP"] or cpu.state["A7"]).value
+    if frame < arm or code > 9 or sp < 0xFF0000 or sp > 0xFFFFFF then
         filtered = filtered + 1
         return
     end
