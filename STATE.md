@@ -1,5 +1,38 @@
 # STATE — living progress log
 
+## Session 14z-110b addendum — **THE FBNEO ORACLE RED IS ROOT-CAUSED TO THE
+## RULED d2-WINDOW CYCLES (110), NOT THE REMAP (110b) — and the hunt cost a
+## paid-for instrument trap.** Resolution pending maintainer (the FBNeo
+## analogue of the ratified MAME 24-tip).
+
+**The measured chain:** oracle PASS on don_m11 (0 fails) -> FAIL on don_m12
+and don_m13 with BYTE-IDENTICAL rows (5 fails: 01_attract f6734 4 bytes —
+3 at sound-area-class-adjacent offsets + 1 at +0xf226; 26_don_arcade_mash
+wholesale at 4 of 5 sampled frames, 1230-2574 masked bytes). m12 vs m13
+work RAM at the failing frame: ZERO bytes (the six remap bytes are unread
+in this replay — full-image diff = exactly six bytes, RH-46). Pairings,
+ladder, and in-use mask IDENTICAL van/m12/m13 through f15000 (probe) —
+the divergence is a cycle-slip WITHIN the same fights (the 14z-89 class),
+FBNeo-side, cascading through the mash. ROMDIR audited pristine en route.
+
+**The instrument trap that manufactured the earlier contradiction:** the
+oracle takes its build POSITIONALLY; `BUILD=env` is silently overwritten —
+the "m12 PASS" measured don_m11 (the then-default) and both later "m12/m13"
+runs measured don_m13 (the re-pointed default). Filed in project/gotchas
+("identical results across different builds = check you varied the
+variable").
+
+**Resolution PENDING (maintainer):** the oracle's own rule — FBNeo-only
+deviation beyond the two ratified phase classes = GROWTH, sign-off
+required. The mechanism is the ruled cost (accepted with "if it moves,
+stop and escalate"); zero-cycle hooking is impossible at the site
+(documented law). Options to be asked once MAME's cross-view lands
+(acceptance verify + merged_legacy in flight): swap the two cycle-saturated
+replays out of the oracle's sample set (keeps it strict; MAME retains full
+coverage of both) vs a third FBNeo phase class (the never-reconverging
+licence the maintainer refused in 14z-89) vs engineering a leaner arm
+(relocates the tipping point, their own words).
+
 ## Session 14z-110b — **THE RESIDUAL #99 ROOT-CAUSED AND THE REMAP RULED-BY-
 ## CONDITION: the STORED state 0x51 over-runs a SECOND 80-vs-84 dispatcher
 ## (PRG:0x2384E) the 14z-43 audit also missed; the fix is 0x51 -> 0x44 on the
