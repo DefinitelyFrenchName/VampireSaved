@@ -1,53 +1,32 @@
-# NEXT SESSION — orientation (rewritten at the 14z-110 CLOSE, 2026-08-26)
+# NEXT SESSION — orientation (rewritten at the 14z-110b CLOSE, 2026-08-26)
 
-> ## **START HERE. THE #99 FIX IS BUILT, AUDITED AND FROZEN — the opener is
-> ## the FIELD TEST of merged-m7 on the board.** The ruled order (FIX ->
-> ## AUDIT -> RE-FREEZE) completed in one session: acceptance suite GREEN
-> ## (65/18/0, zero nondet), static GREEN (110/0/0), everything pushed.
+> ## **START HERE. THE 0x51->0x44 REMAP SHIPPED (merged-m8, bundle refreshed)
+> ## and the session closed at the context ceiling with THREE validations
+> ## in flight — RE-RUN THEM FIRST, then finish the ruled oracle refit,
+> ## then tag.** Everything is recorded in STATE 14z-110b (+ CLOSE).
 > ##
-> ## **THE FIX (patch_index "14z-110 additions", patch_notes 14z-110):** the
-> ## reaction_hook thunk's bne-arm — the ONLY entry into dispatcher 2 at
-> ## `PRG:0x018508` — carries the 0x50-0x53 window via a SECOND ext table to
-> ## vs2's dispatcher-2 twin (`0x016DE4`) handlers VERBATIM. Data stays
-> ## native 0x51; the vanilla dispatcher is byte-untouched (asserted against
-> ## vsavj's own decrypted dump). RH-43 A/B: pre-fix FORCE->vec3 PC 01850E
-> ## ADDR 18511 (the exact field signature, first deterministic MAME repro);
-> ## post-fix the copy handler runs, clean. Gate: test_reaction_hook_d2.
+> ## **IN ORDER:** (1) the field verdict on merged-m8 (the maintainer's:
+> ## Donovan 1P -> Bishamon -> next tenant match, no reset; Victor KO reel
+> ## plays). (2) Re-run: the don_m13 full-suite acceptance verify + the
+> ## merged15 guard corpus (both interrupted, commands in STATE CLOSE).
+> ## (3) The FBNeo oracle REDUCED REFIT (maintainer-ruled): frame overrides
+> ## + inventory re-freeze, drop 26 documented — full recipe + measured
+> ## dirty-frame list in STATE CLOSE. (4) run_all_static --strict green ->
+> ## tags freeze/donovan-m13 + freeze/merged-m8 -> push tags.
 > ##
-> ## **THE FREEZE:** donovan-m12 (`60b55a12`, set carried from m11 — .sha1s
-> ## MEASURED IDENTICAL, the fix is RAM-invisible on select/2P content) /
-> ## merged-m7 (`761fd35a`, build/m3b_merged14, release/merged-m7 packaged) /
-> ## stock twin `cf455760` (MOVED — not profile-gated, the substituted track
-> ## carries the same six 0x51 nodes) / hui-m20+pyron-m14 CARRIED (bit-exact).
-> ## Version mark M7 (gfx-only). Tags freeze/donovan-m12 + freeze/merged-m7.
-> ## TWO ratifications: the 24_don_winmash flicker inventory +16870 (the
-> ## known win-screen-fade VBL edge, OBJ-stack phase bytes only, re-converges;
-> ## merged HOLDS its inventory — per-image cycle budget) and the M7 mark.
+> ## **THE FIX, in one breath:** the residual #99 was the STORED state 0x51
+> ## over-running a SECOND 80-vs-84 dispatcher (PRG:0x2384E) the 14z-43
+> ## audit missed; the remap renames the six deity node bytes to 0x44 —
+> ## measured byte-equivalent at every consumer both engines have (the
+> ## five-consumer proof, patch_notes 14z-110b). The d2 window stays as a
+> ## dead-but-equivalent guard. vs2's 0x117-flag residual is recorded in
+> ## donovan.toml's comment; arbiters = deity-family gates + the field.
 > ##
-> ## **THE FIELD TEST:** fresh bundle `../mister_fieldtest_14z110/` (WIDE MRA
-> ## + the M7 romset + the 14z-109 durable extras: STOCK CONTROL MRA,
-> ## games/mame/vsavj.zip, FIELD_TRIAGE.txt). **The .rbf is UNCHANGED** —
-> ## seed 18269, sha256 `46fc74af…` (the ROMSET moved, the BITSTREAM did
-> ## not; verify before flashing as always; the control MRA still needs the
-> ## maintainer's PRISTINE vsav.zip swapped in). What the field pass answers:
-> ## Donovan 1P vs Bishamon -> WIN -> vs Phobos plays through with NO
-> ## name-screen reset — #99 dead on the CRT (MAME cannot reproduce the
-> ## walk; the emulator side is coverage, the board is the verification).
-> ## The naked-eye tell: the select wheel shows **M7**.
-> ##
-> ## **STILL OPEN (#111 + debt, none blocks the field test):** the 33
-> ## U,U,R-prologue replays triage; the NO-EXPECTATION gaps for replays
-> ## 107-110 on the huitzil-m20 / pyron-m14 / merged sets (frozen for
-> ## donovan-m12 only this window — the others' images did not move);
-> ## audit_don_vs_cpu covers Phobos+Bishamon (Pyron is not venue-steerable
-> ## on Donovan's row — odd offsets only; the venue byte must stay EVEN,
-> ## game/gotchas.md).
-> ##
-> ## **PUSH STATE at the close: main + tags + fork all pushed** — verify
-> ## `git ls-remote`, not prose. Fork at `fc04a8ec` (22 patches).
-> ## **Scratch:** `../mister_fieldtest_14z108/` is SUPERSEDED by _14z110;
-> ## `build/don_m12_s4` kept (the registered stage-4 target); session
-> ## scratchpad ephemeral — every conclusion is in STATE/docs/#99/#111.
+> ## **PUSH STATE at close: main + fork pushed** (`git ls-remote`, not
+> ## prose; fork `f5a3391a`, 23 patches). 110b tags NOT yet cut (wait for
+> ## the re-run validations). Bundle: `../mister_fieldtest_14z110/` =
+> ## merged-m8, WIDE 31/31 verified; .rbf unchanged (seed 18269,
+> ## `46fc74af…`).
 
 # HISTORY BELOW — the 14z-109 orientation and older; kept for the census
 # anchors, eliminations and traps, superseded as the opener.

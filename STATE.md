@@ -1,5 +1,62 @@
 # STATE — living progress log
 
+## Session 14z-110b CLOSE — **the 0x51->0x44 remap is BUILT, FROZEN and
+## MAME-VALIDATED; the board bundle carries merged-m8; the FBNeo partial
+## oracle's reduced refit is RULED and IN PROGRESS (continuation recipe
+## below).** Closed at the maintainer's call (context ceiling) — three
+## background validations were in flight at close and MUST RE-RUN.
+
+### GREEN AT CLOSE (measured this session)
+
+| | |
+|---|---|
+| the remap | six bytes (vm3j.10b alone, all three tracks), five-consumer equivalence, poison-rig A/B: stored 0x44 PERSISTS (vs pre-remap flail) |
+| builds | don_m13 `ec86330f` / stock8 `d29fd062` / merged15 `73690f21` (program fingerprints; whole-artifact digests re-frozen + attributed) |
+| registry/pins | donovan-m13 + -stock rows; m3a SIX pins green ("merged image: CHECKED"); phasec re-pinned; ~51 defaults re-pointed |
+| suite | don_m13 .sha1s: 12 of 13 IDENTICAL, only 110_don_arcade_mash moved (the remap's footprint) — SUITE GREEN (filtered) |
+| MAME cross-view | **merged_legacy on merged15: PASS, zero fails (47 replays on ratified classes)**; stage-4 gate PASS (stage-4 image legitimately unchanged — the rows are stage 6) |
+| audits | continue_switch PASS (all 5, incl. the deterministic literal pairing); don_vs_cpu PASS (both field contexts); dualtrack PASS; census EMPTY + gates PASS ×3 builds |
+| MiSTer | fork `f5a3391a` (catalogue #3, pushed), pin bumped, patch 0023, twin+mra gates PASS; **bundle `../mister_fieldtest_14z110/` refreshed to merged-m8** (WIDE 31/31; README updated; .rbf unchanged) |
+| release | release/merged-m8 packaged, round-trip PASS |
+
+### LOST AT CLOSE — RE-RUN FIRST NEXT SESSION (rule 2: these are the freeze's
+### formal acceptance, interrupted not failed)
+
+1. **The full-suite acceptance verify on don_m13** (`MAME_BIN=~/.cache/...
+   MAME_ROMPATH="build/don_m13/rompath;$ROMDIR" tests/run_suite.sh vsavjw`).
+2. **audit_guard_corpus on merged15** (BUILD=build/m3b_merged15, JOBS=2).
+3. `tests/run_all_static.sh --strict` once the oracle refit lands (see below).
+NO TAGS were cut for 110b (donovan-m13/merged-m8) — tag AFTER 1+2 are green.
+
+### THE FBNEO ORACLE — reduced refit RULED (maintainer, this session),
+### continuation recipe
+
+Root cause (measured, trail in the 110b addendum): the RULED d2-window
+cycles shift FBNeo's execution phase corpus-wide — oracle PASS on m11,
+byte-identical FAIL on m12/m13; the remap is exonerated (m12==m13 RAM at the
+failing frame, full-image diff = exactly six bytes). MAME holds everywhere.
+The plan: per-replay FRAME OVERRIDES (chosen from measurement) + re-frozen
+in-window inventory; **drop 26_don_arcade_mash alone** (cycle-saturated,
+cascading, MAME-covered — document in the gate header). A clean-frame SCAN
+for 01/06/21 + 05 (the 26-substitute) was running at close:
+`$SCRATCH/refit/plan.sh` shape — dumps at ~22 frames/replay, both legs,
+masked diff classified clean/inwin/dirty. Re-run it (script is 20 lines,
+regenerate from the 110b addendum's description), pick 5 clean frames per
+replay, add a FRAME_OVERRIDE case block + extend FROZEN with the audited
+in-window offsets, verify x2 for determinism, THEN run static strict.
+Known dirty frames to avoid (measured): 01 f6734 (+0xf226 outside); 05
+f1818/f11150; 20 f6666/f9090(+0x8531)/f11150; 07 f1680/f2376; 22
+f4872/f10440. The gate's own printed offset lists are the freeze source
+(the 14z-93 lesson: never freeze from prose).
+
+### THE FIELD QUESTION AT CLOSE (the maintainer's, on the board)
+
+merged-m8 on the SD card: Donovan 1P -> Bishamon -> the next tenant match
+plays through with NO name-screen reset, and the Victor KO plays its REEL
+(the neutral-pose bug was the same poison's mild surface). The wheel still
+says M7 (the mark did not bump for 110b — gfx unchanged).
+
+
 ## Session 14z-110b addendum — **THE FBNEO ORACLE RED IS ROOT-CAUSED TO THE
 ## RULED d2-WINDOW CYCLES (110), NOT THE REMAP (110b) — and the hunt cost a
 ## paid-for instrument trap.** Resolution pending maintainer (the FBNeo
