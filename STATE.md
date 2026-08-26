@@ -1542,8 +1542,28 @@ entries moved VERBATIM to `DECISIONS_HISTORY.md` — grep there by topic.
 Lifecycle: rulings are still marked DECIDED in place here first; they move to
 the archive once they stop shaping active work.)*
 
-- **#99 (REOPENED 14z-109) — THE TYPE-0x51 REMAP: which family, and what
-  value.** Root cause is on the issue: node `ROM 0x3FB899` in Donovan's
+- **#99 (REOPENED 14z-109) — THE TYPE-0x51 REMAP: measured, RULING NOW
+  ASKABLE.** Step 1 done (14z-109 (7)), all three answers:
+  1. **Family**: the object-script FSM node stream — 0x18-byte nodes whose
+     `+0x17` byte is the NEXT-STATE index — inside Donovan's ported
+     character block. Our node `0x3FB882` = vs2 `0x0C9CAA`, ported
+     byte-verbatim (single content-search hit, 0x28-byte window).
+  2. **What vs2's `0x51` means**: vs2's FSM table (dispatcher `0x016D2C`,
+     table `0x016D34`) has **0x54 states**; entry `0x51` (offset `0x023C`)
+     is vs2's MOST-ALIASED **DEFAULT handler** — `move.b (0x17,a3),(0x54,a1);
+     rts`, the plain "advance to the node's next state". ~20 vs2 states
+     alias it.
+  3. **The vsavj equivalent**: vsavj's default at table offset `0x017C`
+     (handler `0x01868C`, aliased by `0x19-0x1C`/`0x20-0x23`/`0x27`) is
+     **BYTE-IDENTICAL** to vs2's `0x51` handler.
+  **PROPOSED RULING: remap node-state `0x51 -> 0x19`** (the lowest vsavj
+  default-alias) — semantically exact, both engines run identical
+  instructions, zero gameplay surface. **Plus the census before the fix
+  window**: scan ALL THREE tenants' ported node streams for `+0x17` values
+  `>= 0x28` (vsavj's table size) and remap each by the same
+  handler-equivalence method — one missed member is how THIS one shipped.
+  Fix = extraction remap rule (14z-33/35 shape), landing with #111's
+  coverage work in one window. Original entry:** Root cause is on the issue: node `ROM 0x3FB899` in Donovan's
   relocated block carries vs2 type byte `0x51`; vsavj's dispatcher at
   `PRG:0x018508` has no row for it and no bounds check. The fix wants THREE
   answers before any byte moves: (1) which record family `0x3FB882` belongs
