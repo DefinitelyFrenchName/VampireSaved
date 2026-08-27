@@ -14,6 +14,29 @@
 > ## frame at every down (and intro/start), identical on stock vsavj —
 > ## `tests/test_down_flash_vanilla.sh` PASS; decision pending (close vs
 > ## opt-in softening), STATE "Decisions pending — #113". NEXT: #112 —
+> ## **THE ONE PIECE OF AUTHORING WORK QUEUED (maintainer, 2026-08-27):
+> ## PRODUCE THE MiSTer DOCUMENTATION/SKILL *SCOPE DOCUMENT* — and ONLY the
+> ## scope document, not the skills.** Deliverable: what skills should exist,
+> ## where each boundary falls, which existing docs feed which, and what is
+> ## known-stale. The split is already agreed and matches `docs/README.md`'s
+> ## own liftability test ("would this still be true if we abandoned the
+> ## roster hack tomorrow?"): **(1) the CPS-II / WIDE CORE level** — the
+> ## profile, the runtime profile bit (MRA header byte 41), the SDRAM map,
+> ## the simulation lane; all game-independent — and **(2) the VS-SPECIFIC
+> ## level** — this romset's placement, catalogue/MRA generation, the field
+> ## bundle.
+> ## **READ THE SOURCES, DO NOT WRITE FROM MEMORY.** ~4,000 lines:
+> ## `docs/platform/mister.md` (2063), `docs/project/mister_map.md` (1062),
+> ## `docs/project/cps2_wide.md` (635), `docs/project/mister_fit.md` (262).
+> ## Summarising from session memory is how a plausible sentence replaces a
+> ## measured one — 14z-112 produced TWO retractions from exactly that.
+> ## **EXPECT STALENESS AND HUNT IT:** `mister_mra.sh`'s header asserted "the
+> ## two legs need DIFFERENT vsav.zip files" and was true when written and
+> ## wrong by 14z-112; the scope doc should name what else is in that class.
+> ## Sits alongside the wider skill-distillation and living-documentation
+> ## directions in STATE "Decisions pending" — those remain UNSCHEDULED; this
+> ## scope document is the agreed first step.
+> ##
 > ## **STOCK VAMPIRE SAVIOR AND THE WIDE PROFILE NOW COEXIST ON ONE SD CARD
 > ## (14z-112).** Builds no longer pack a patched `vsav.zip`; the four patched
 > ## group-A members live inside `vsavjw.zip`. Bundle

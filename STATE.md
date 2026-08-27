@@ -1795,7 +1795,14 @@ the archive once they stop shaping active work.)*
   both follow MiSTer.
 
 - **MiSTer DOCUMENTATION + SKILL DISTILLATION, AT TWO LEVELS (maintainer
-  direction, 2026-08-27).** Recorded as FUTURE work alongside the existing
+  direction, 2026-08-27). FIRST STEP AGREED 2026-08-27: produce the SCOPE
+  DOCUMENT ONLY — queued in `docs/NEXT_SESSION.md`.** The scope document
+  names what skills should exist, where each boundary falls, which existing
+  docs feed which, and what is known-stale; the skills themselves wait on it.
+  Rationale for splitting it out: the sources run ~4,000 lines and must be
+  READ, and the state is not settled (merged17 unfrozen, two field checks
+  outstanding), so writing reference material now would bake in claims that
+  are still moving. Recorded as FUTURE work alongside the existing
   skill-distillation and living-documentation items, not scheduled. The
   maintainer's scoping: document (and possibly distil into skills) the MiSTer
   implementation **at each level** — (1) the **WIDE CPS-II core** level (the
