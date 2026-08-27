@@ -14,6 +14,16 @@
 > ## frame at every down (and intro/start), identical on stock vsavj —
 > ## `tests/test_down_flash_vanilla.sh` PASS; decision pending (close vs
 > ## opt-in softening), STATE "Decisions pending — #113". NEXT: #112 —
+> ## **STOCK VAMPIRE SAVIOR AND THE WIDE PROFILE NOW COEXIST ON ONE SD CARD
+> ## (14z-112).** Builds no longer pack a patched `vsav.zip`; the four patched
+> ## group-A members live inside `vsavjw.zip`. Bundle
+> ## `../mister_fieldtest_14z112/` — .rbf UNCHANGED, wheel still M8, program
+> ## fingerprint `32007911` unchanged (packaging, not content). AWAITING the
+> ## maintainer's board check: (1) WIDE still boots and says M8, (2) STOCK
+> ## vsav/vsavj now renders CORRECT art on any stock MRA, (3) the STOCK
+> ## CONTROL still boots. The rebuilt set is `build/m3b_merged17` — NOT
+> ## registered/frozen; a freeze is a separate decision.**
+> ##
 > ## **A COSMETIC BACKLOG NOW EXISTS (STATE "THE COSMETIC BACKLOG"), ruled a
 > ## single later pass: win-quote TEXT for ALL THREE tenants (each still shows
 > ## its SHELL's quote — art is already native), arcade ladder MAP NAMES and
