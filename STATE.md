@@ -41,6 +41,25 @@ vsav2 share much effect art). That is the live hypothesis, and it is NOT yet
 proven — proving it means showing the lift record is reached by tenant
 animation data that the effect-map step never covered.
 
+**THE FULL CAUSAL CHAIN IS VANILLA — WRITER INCLUDED (14z-112).** A write tap
+(with the re-install-on-map-change notifier `inp_guard` uses — without it a tap
+is silently dropped and reports zero forever, measured here) caught the two
+corrupt blocks being emitted on frame 7360 by a SINGLE instruction, **`PC
+0x01B2BE`**, which is **byte-identical to stock** (`vm3j.03d` carries 148
+modified runs elsewhere, none covering it). So the chain is, end to end:
+vanilla OBJ-builder instruction -> vanilla record `0x287D7C` -> vanilla
+animation sequence -> vanilla art tiles `0xe7xx`. **Not one byte this port
+wrote participates in drawing the black frame.** The port's only influence is
+upstream: what makes the tenant's object select this animation. (Tap-dedup
+gotcha, also paid for: keying on `(pc, addr)` hides every later write to the
+same slot — the one that decides what is drawn; key on `(pc, addr, data)`.)
+**THE DECISIVE EXPERIMENT NOT YET RUN:** play this same animation on STOCK
+`vsavj` and look. Identical code + identical data + identical art must give
+identical pixels, so if stock renders it black too, the black is VANILLA
+rendering of a borrowed effect and the port question becomes "should a tenant
+borrow this effect at all" (a gameplay/asset decision, maintainer's call) — not
+a byte to fix.
+
 **THE PATH IS 100% VANILLA — measured this session, and it bounds the search.**
 Beyond the tiles and the record: the descent record `0x287D0C` and the lift
 record `0x287D7C` are **consecutive frames of ONE vanilla vsavj animation

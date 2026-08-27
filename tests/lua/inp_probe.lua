@@ -139,6 +139,50 @@ for spec in (os.getenv("POKES") or ""):gmatch("[^;]+") do
     if fr then pokes[#pokes + 1] = { tonumber(fr), tonumber(addr, 16), hexs } end
 end
 local frame, snaps = 0, 0
+-- WRITETAP (14z-112): "lo-hi" program-space range + WRITETAP_FRAMES "a-b".
+-- Logs each distinct (PC, address) WRITE in the window as
+-- "W <frame> PC <pc> <addr> <data>". Write taps DO fire on this driver
+-- (read taps never do — docs/platform/gotchas.md), so this is the way to
+-- attribute an OBJ record to the code that emitted it.
+-- THE TAP MUST BE RE-INSTALLED ON EVERY MEMORY-MAP CHANGE (inp_guard.lua's
+-- pattern): a tap installed once at autoboot is silently dropped when the
+-- space is rebuilt, and then reports zero writes forever — measured 14z-112,
+-- the control found nothing until this notifier was added.
+local wt = os.getenv("WRITETAP")
+local wtaps = {}
+if wt then
+    local lo, hi = wt:match("^(%x+)-(%x+)$")
+    lo, hi = tonumber(lo, 16), tonumber(hi, 16)
+    local wa, wb = (os.getenv("WRITETAP_FRAMES") or "0-999999"):match("^(%d+)-(%d+)$")
+    wa, wb = tonumber(wa), tonumber(wb)
+    local wseen = {}
+    local function on_w(offset, data, mask)
+        if frame >= wa and frame <= wb then
+            local ok, pc = pcall(function()
+                return machine.devices[":maincpu"].state["CURPC"].value & 0xFFFFFF end)
+            -- dedup on (pc, addr, DATA): keying on (pc, addr) alone hides
+            -- every later write to the same slot, which is exactly the one
+            -- that decides what is drawn (measured 14z-112).
+            local k = string.format("%06x@%06x=%04x", ok and pc or 0, offset, data & 0xFFFF)
+            if not wseen[k] then
+                wseen[k] = true
+                f:write(string.format("W %d PC %06x %06x %04x\n",
+                    frame, ok and pc or 0, offset, data & 0xFFFF))
+            end
+        end
+        return data
+    end
+    local function install_w()
+        wtaps[#wtaps + 1] = space:install_write_tap(lo, hi, "inp_writetap", on_w)
+    end
+    install_w()
+    space:add_change_notifier(function()
+        for _, t in ipairs(wtaps) do t:remove() end
+        wtaps = {}
+        install_w()
+    end)
+end
+
 emu.register_frame_done(function()
     frame = frame + 1
     for _, pk in ipairs(pokes) do
@@ -205,6 +249,30 @@ emu.register_frame_done(function()
         else
             f:write("G no :gfx region\n")
         end
+    end
+    if d and os.getenv("FINDBYTES") then
+        -- scan work RAM for a byte pattern (hex), print every hit. Used to
+        -- locate where an OBJ record is STAGED before it reaches OBJ RAM:
+        -- write taps DO fire on work RAM, so a hit here is tappable (whereas
+        -- read taps never fire at all on this driver — platform gotcha).
+        local hex = os.getenv("FINDBYTES")
+        local want = {}
+        for b in hex:gmatch("%x%x") do want[#want+1] = tonumber(b, 16) end
+        local lo = tonumber(os.getenv("FIND_LO") or "ff0000", 16)
+        local hi = tonumber(os.getenv("FIND_HI") or "ffffff", 16)
+        local hits = 0
+        for a = lo, hi - #want do
+            local ok = true
+            for k = 1, #want do
+                if space:read_u8(a + k - 1) ~= want[k] then ok = false; break end
+            end
+            if ok then
+                hits = hits + 1
+                f:write(string.format("FIND F%d %06x\n", frame, a))
+                if hits >= 32 then break end
+            end
+        end
+        f:write(string.format("FINDSUMMARY F%d pattern=%s hits=%d\n", frame, hex, hits))
     end
     if snap[frame] then machine.video:snapshot(); f:write(string.format("SNAP %d %04d\n", frame, snaps)); snaps = snaps + 1 end
     if frame >= max_frames then
