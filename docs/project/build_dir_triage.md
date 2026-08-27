@@ -322,3 +322,59 @@ Nothing has been moved or deleted; this is the decision input only.
   frames, abort), `smoketest` (14z-9x, unreferenced) deleted; `crash_m10`
   renamed to `crash-merged-m8-01` and its cache copy deleted.
 
+## BEFORE DELETING A BUILD DIR, GREP FOUR PLACES — NOT TWO (14z-112, paid for)
+
+The N-2 sweep of 14z-112 deleted 27 generations and broke one gate, because
+the reference scan covered `tests/` and `tools/` only. The complete list:
+
+1. `tests/` and `tools/` — **excluding comment lines**. A first pass that
+   counted `#` mentions made almost every dir look load-bearing (31 of 62)
+   and hid the 2.5 GB that was actually free. Filtering comments is what made
+   the sweep possible at all.
+2. **`build/manifest/`** — this is the one that bit. `shared_writes.toml`
+   carries `build = "build/don_m7"` rows that `tests/test_shared_writes.sh`
+   consumes, so deleting `don_m7` turned that gate into a SKIP — and under
+   `--strict` a SKIP is a failure, because a skipped gate asserts nothing.
+   The gate did not fail loudly; it quietly stopped testing.
+3. `docs/` — but READ the hit before acting: `gfx_layout3.toml`'s
+   `build/hui43` and `build/pyron27` are provenance notes ("measured on"),
+   not inputs, and those dirs were correctly deleted.
+4. The freeze policy itself: keep CURRENT + ONE BACK per track
+   (`don_*`, `hui*`, `pyron*`, `m3b_merged*`, `m5_stock*`), whatever the
+   grep says.
+
+**And run `tests/run_all_static.sh --strict` BEFORE committing the deletion.**
+It is the only instrument that catches a gate degrading to SKIP. Deleting is
+cheap to redo — `git checkout HEAD -- build/<dir>` restores a tracked one in
+seconds — so the sweep is safe as long as the suite gates the commit.
+
+### THE DEEPER FLAW THE SWEEP EXPOSED: "tracked" build dirs are only PARTLY tracked
+
+`build/don_m7` is a TRACKED build dir — 18 files — but
+`tests/test_shared_writes.sh` needs the 23 generator outputs
+(`patch/fixed_*.bin`, `effect_lists.bin`, …) that are NOT tracked. Deleting
+the dir therefore removed a gate fixture that git could not restore:
+`git checkout HEAD -- build/don_m7` brought back the 18 and the gate went
+from SKIP (14z-112's first strict run) to FAIL (its second).
+
+**It was recoverable, and the recovery is the recipe if it happens again:**
+
+    git worktree add --detach <tmp> 05ce63a          # the commit that froze don_m7
+    cp -R build/wide0 <tmp>/build/                   # the WIDE overlay it merges
+    cd <tmp> && ROMDIR=... KEY_SET=vsavj \
+      GEN_FLAGS="--allow-plausible --tripwire-open --profile cps2-wide-v1" \
+      tools/build_donovan.sh 6 build/don_m7_rb
+    # -> fingerprint c90b60c3 = donovan-m7 exactly; copy the missing
+    #    patch/* into build/don_m7/patch/, tracked files untouched.
+
+The frozen inventory matching afterwards is what PROVES the rebuild was
+right — the gate validated its own fixture.
+
+**The standing lesson:** a gate whose fixture is an old build dir depends on
+UNTRACKED bytes, and no policy in this repo protects those. Before deleting
+any tracked build dir, either confirm no gate consumes it or accept that
+restoring it means a historical rebuild. The cheap alternative — re-pointing
+the gate at a current build — was measured and REFUSED here: `don_m14` shows
+103 shared-surface writes against the frozen row's reviewed set, so
+re-freezing would have laundered an unreviewed inventory into the very gate
+that exists to prevent exactly that.

@@ -517,14 +517,28 @@ PYEOF
         # rompath is NOT a member-identity instrument (MAME may hash-match
         # a pristine copy elsewhere in the path — exactly how the stale-
         # member bug stayed invisible to every MAME-side measurement).
-        if ! python3 - "$OUTBASE/rompath/vsav.zip" "$ROMDIR/vsav.zip" <<'PY'
-import sys, zipfile
-b, p = (zipfile.ZipFile(a) for a in sys.argv[1:3])
-bad = [n for n in ("vm3.14m", "vm3.16m", "vm3.18m", "vm3.20m")
-       if b.getinfo(n).CRC != p.getinfo(n).CRC]
-if bad:
-    print("group B members differ from pristine:", bad)
-    sys.exit(1)
+        # 14z-112: a WIDE build packs NO vsav.zip, so the assertion moved
+        # into vsavjw.zip — group B must simply not be there. (Before this,
+        # the check opened a parent that no longer exists and every WIDE
+        # build died "group B not pristine": caught by run_all_static
+        # --strict, four gates, the same hour it was introduced.)
+        if ! python3 - "$OUTBASE/rompath" "$ROMDIR/vsav.zip" <<'PY'
+import os, sys, zipfile
+rp, pristine = sys.argv[1], sys.argv[2]
+GB = ("vm3.14m", "vm3.16m", "vm3.18m", "vm3.20m")
+parent = os.path.join(rp, "vsav.zip")
+if os.path.exists(parent):                       # stock/substituted track
+    b, p = zipfile.ZipFile(parent), zipfile.ZipFile(pristine)
+    bad = [n for n in GB if b.getinfo(n).CRC != p.getinfo(n).CRC]
+    if bad:
+        print("group B members differ from pristine:", bad)
+        sys.exit(1)
+else:                                            # WIDE track: no parent packed
+    z = zipfile.ZipFile(os.path.join(rp, "vsavjw.zip"))
+    bad = [n for n in GB if n in z.namelist()]
+    if bad:
+        print("group B members must not ship in vsavjw.zip:", bad)
+        sys.exit(1)
 print("  verified: group B members pristine in the packed vsav.zip")
 PY
         then

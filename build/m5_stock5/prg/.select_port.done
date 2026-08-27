@@ -1,2 +1,0 @@
-select_port ran in place here; see GitHub #46.
-A second in-place run is refused (use --out or --force).
