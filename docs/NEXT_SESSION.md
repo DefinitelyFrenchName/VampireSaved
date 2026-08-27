@@ -1,32 +1,41 @@
-# NEXT SESSION — orientation (rewritten at the 14z-110b CLOSE, 2026-08-26)
+# NEXT SESSION — orientation (rewritten at the 14z-111 close, 2026-08-27)
 
-> ## **START HERE. THE 0x51->0x44 REMAP SHIPPED (merged-m8, bundle refreshed)
-> ## and the session closed at the context ceiling with THREE validations
-> ## in flight — RE-RUN THEM FIRST, then finish the ruled oracle refit,
-> ## then tag.** Everything is recorded in STATE 14z-110b (+ CLOSE).
+> ## **START HERE. #99 IS ROOT-CAUSED AND FIXED (14z-111): CPU-Phobos was
+> ## playing DEMITRI's AI. Frozen as donovan-m14 / huitzil-m21 / pyron-m15 /
+> ## merged-m9, mark M8; board bundle `../mister_fieldtest_14z111/`.**
 > ##
-> ## **IN ORDER:** (1) the field verdict on merged-m8 (the maintainer's:
-> ## Donovan 1P -> Bishamon -> next tenant match, no reset; Victor KO reel
-> ## plays). (2) Re-run: the don_m13 full-suite acceptance verify + the
-> ## merged15 guard corpus (both interrupted, commands in STATE CLOSE).
-> ## (3) The FBNeo oracle REDUCED REFIT (maintainer-ruled): frame overrides
-> ## + inventory re-freeze, drop 26 documented — full recipe + measured
-> ## dirty-frame list in STATE CLOSE. (4) run_all_static --strict green ->
-> ## tags freeze/donovan-m13 + freeze/merged-m8 -> push tags.
+> ## **IN ORDER:** (1) the field verdict on the board (bundle 14z111; the
+> ## wheel MUST say M8 — M7 means the old romset). (2) Replay any `.inp` the
+> ## maintainer left under `~/.cache/vampire-saved/inp/<name>/` on BOTH
+> ## merged15 and merged16 with `tools/run_inp_guarded.sh` (a Donovan-vs-CPU-
+> ## Bishamon crash would be a DIFFERENT mechanism). (3) Anything still red
+> ## in STATE 14z-111's freeze table (pyron-m15 suite / verify passes were in
+> ## flight at close — check `git status tests/expected/`).
 > ##
-> ## **THE FIX, in one breath:** the residual #99 was the STORED state 0x51
-> ## over-running a SECOND 80-vs-84 dispatcher (PRG:0x2384E) the 14z-43
-> ## audit missed; the remap renames the six deity node bytes to 0x44 —
-> ## measured byte-equivalent at every consumer both engines have (the
-> ## five-consumer proof, patch_notes 14z-110b). The d2 window stays as a
-> ## dead-but-equivalent guard. vs2's 0x117-flag residual is recorded in
-> ## donovan.toml's comment; arbiters = deity-family gates + the field.
+> ## **THE MECHANISM, in one breath:** the four per-class CPU AI action-
+> ## script tables `PRG:0xBF01A/09A/11A/19A` are 16 classes + THE SAME 16
+> ## REPEATED (Capcom's aliasing guard); a tenant class read the aliased
+> ## row, so CPU-Phobos ran Demitri's scripts; Demitri's jump command writes
+> ## sub-state 0x0E; Phobos's private vs2 jump handler has 5 sub-states and
+> ## indexed off its table into data -> line-F at PRG:0x422BAC. CPU-only,
+> ## Phobos-only (the only tenant with a private jump handler), time-
+> ## dependent (the RNG must pick the script). Captured on the maintainer's
+> ## own MAME recording (`tests/inp/crash_m10`, gate `test_inp_crash_m10`)
+> ## with `tools/run_inp_guarded.sh` — a write tap on the game's exception-
+> ## code store at $FF0000, no debugger. The 110/110b fixes had been aimed
+> ## at a poke-contaminated capture never confirmed on the natural path.
+> ## The fix (option A, maintainer-chosen): bank_map `ai_script_0..3`
+> ## unparked + one DATA root per tenant = the tenants' OWN vs2 AI. Zero
+> ## code. WIDE-only (the stock twin has no hole; `optional = true` rows).
 > ##
-> ## **PUSH STATE at close: main + fork pushed** (`git ls-remote`, not
-> ## prose; fork `f5a3391a`, 23 patches). 110b tags NOT yet cut (wait for
-> ## the re-run validations). Bundle: `../mister_fieldtest_14z110/` =
-> ## merged-m8, WIDE 31/31 verified; .rbf unchanged (seed 18269,
-> ## `46fc74af…`).
+> ## **RULES PAID FOR:** a rig that wins fast cannot see a time-dependent
+> ## AI crash (keep-away, give the CPU time); "16 + the same 16" tables
+> ## alias tenants SILENTLY (audit every parked stride-0x80 row when a
+> ## tenant misbehaves only under CPU control); capture with the game's own
+> ## exception record on a HAND-PLAYED recording before theorising.
+> ##
+> ## **PUSH STATE at close:** see STATE 14z-111 CLOSE (`git ls-remote`).
+> ## The 14z-108 group rolls to STATE_HISTORY at close.
 
 # HISTORY BELOW — the 14z-109 orientation and older; kept for the census
 # anchors, eliminations and traps, superseded as the opener.
