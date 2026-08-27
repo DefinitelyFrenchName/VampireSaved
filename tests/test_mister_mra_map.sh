@@ -343,11 +343,20 @@ if ROMRUNS:
 
         rp = os.path.join(REPO, BUILD, "rompath")
         zw = zipfile.ZipFile(os.path.join(rp, "vsavjw.zip"))
-        zp = zipfile.ZipFile(os.path.join(rp, "vsav.zip"))
+        # THE PARENT IS THE PRISTINE DUMP SINCE 14z-112. Builds used to pack a
+        # PATCHED vsav.zip beside vsavjw.zip, which is what stopped one MiSTer
+        # SD card from carrying this profile and stock Vampire Savior at once;
+        # the patched group-A members now live INSIDE vsavjw.zip. A build that
+        # still ships its own parent is pre-14z-112 and is still read from
+        # there, so this gate covers both packagings.
+        pp = os.path.join(rp, "vsav.zip")
+        if not os.path.exists(pp):
+            pp = os.path.join(os.environ["ROMDIR"], "vsav.zip")
+        zp = zipfile.ZipFile(pp)
         zq = zipfile.ZipFile(os.path.join(os.environ["ROMDIR"], "qsound_hle.zip"))
-        for z, n in ((zw, "vsavjw.zip"), (zp, "vsav.zip")):
-            print("  read %s sha1 %s" % (n, hashlib.sha1(
-                open(os.path.join(rp, n), "rb").read()).hexdigest()))
+        for pth, n in ((os.path.join(rp, "vsavjw.zip"), "vsavjw.zip"), (pp, os.path.basename(pp))):
+            print("  read %s sha1 %s" % (pth, hashlib.sha1(
+                open(pth, "rb").read()).hexdigest()))
 
         def rd(n):
             try:

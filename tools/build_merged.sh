@@ -177,29 +177,38 @@ echo "== 3: pack (program + LAST link's members) =="
 KEY_SET=vsavj ROMDIR="$ROMDIR" tools/pack_build.sh "$OUT/prg" "$OUT/rompath" \
     --set vsavjw --merge "$WIDE_ZIP" > "$OUT/pack.log" 2>&1 || {
         echo "FAIL: pack"; tail -10 "$OUT/pack.log"; exit 1; }
-GFXSTAGE="$(mktemp -d)"
-unzip -q -o "$ROMDIR/vsav.zip" -d "$GFXSTAGE"
-cp "$CHAIN"/vm3.*m "$GFXSTAGE"/
-( cd "$GFXSTAGE" && rm -f vsav.zip && zip -q -X vsav.zip * )
-cp "$GFXSTAGE/vsav.zip" "$OUT/rompath/vsav.zip"
-rm -rf "$GFXSTAGE"
 RPZIP="$(cd "$OUT/rompath" && pwd)/vsavjw.zip"
-( cd "$CHAIN" && zip -q -X "$RPZIP" vsw.*m )
-echo "  ok: group-A members + group-C simms from the last link ($CHAIN)"
+# THE PATCHED GROUP-A MEMBERS GO INSIDE vsavjw.zip, AND NO vsav.zip IS
+# WRITTEN (14z-112). Until now the build packed a PATCHED vsav.zip into the
+# rompath, which is why a MiSTer SD card could not hold both this profile and
+# stock Vampire Savior: `games/mame/vsav.zip` can only be one file, and a
+# stock MRA pointed at the patched one gets wrong art SILENTLY (the bundle
+# README had to warn about it). Since jtframe's .rom builder matches members
+# by CRC32 ALONE (gen_vsavjw_xml.py header) and FBNeo/MAME search the set's
+# own zip first, the patched members resolve from vsavjw.zip on every
+# implementation, and the pristine vsav.zip serves stock and our group-B
+# needs alike. Measured 14z-112: MAME takes the patched member from
+# vsavjw.zip (verifyroms FOUND crc = the patched one) and a full replay of
+# tests/inp/run-merged-m9-05 is IDENTICAL frame-for-frame, 7490/7490.
+( cd "$CHAIN" && zip -q -X "$RPZIP" vsw.*m vm3.*m )
+echo "  ok: group-A members + group-C simms into vsavjw.zip ($CHAIN); no vsav.zip packed"
 # WIDE v1.1 (14z-86): authored Z80 songs (M5) into vsw.z01/z02 — same
 # uniform injection as build_donovan.sh's WIDE branch.
 if [ -f build/manifest/qs_songs.toml ]; then
     python3 tools/build_qs_songs.py "$RPZIP" "$ROMDIR/vsav2.zip" --vsav "$ROMDIR/vsav.zip" || {
         echo "FAIL: qs song injection"; exit 1; }
 fi
-# group B must stay PRISTINE in the packed vsav.zip (de-substitution)
-python3 - "$OUT/rompath/vsav.zip" "$ROMDIR/vsav.zip" <<'PY'
+# group B must never be shipped at all (de-substitution): the set carries no
+# vsav.zip now, so the check is that vsavjw.zip contains no group-B member —
+# if one ever appeared it would front the pristine parent copy.
+python3 - "$OUT/rompath/vsavjw.zip" <<'PY'
 import sys, zipfile
-b, p = (zipfile.ZipFile(a) for a in sys.argv[1:3])
-bad = [n for n in ("vm3.14m", "vm3.16m", "vm3.18m", "vm3.20m")
-       if b.getinfo(n).CRC != p.getinfo(n).CRC]
-assert not bad, f"group B members differ from pristine: {bad}"
-print("  ok: group B pristine in the packed vsav.zip")
+z = zipfile.ZipFile(sys.argv[1])
+bad = [n for n in ("vm3.14m", "vm3.16m", "vm3.18m", "vm3.20m") if n in z.namelist()]
+assert not bad, f"group B members must not ship in vsavjw.zip: {bad}"
+assert "vsav.zip" not in __import__("os").listdir(__import__("os").path.dirname(sys.argv[1])), \
+    "no vsav.zip may be packed: stock Vampire Savior must keep the pristine one"
+print("  ok: no group-B members shipped, and no vsav.zip packed")
 PY
 python3 tools/audit_romset_identity.py "$OUT/rompath" || {
     echo "FAIL: member-identity audit — do not run anything from this set"

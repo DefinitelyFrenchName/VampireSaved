@@ -185,8 +185,17 @@ def main():
 
     repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     template = a.template or os.path.join(repo, "emu", "jtcores", "doc", "mame.xml")
+    # THE PARENT: the build's own vsav.zip if it packs one (pre-14z-112
+    # packaging), otherwise the PRISTINE dump from $ROMDIR. Since 14z-112 a
+    # WIDE build packs NO vsav.zip — the patched group-A members live inside
+    # vsavjw.zip — so that one SD card can carry this profile and stock
+    # Vampire Savior at once. Group B and the QSound members still come from
+    # the parent, and with no fallback this exits "member vm3.14m is not in
+    # the romset" on a perfectly good build.
     parent = a.parent or os.path.join(os.path.dirname(os.path.abspath(a.zip)),
                                       "vsav.zip")
+    if not os.path.exists(parent) and os.environ.get("ROMDIR"):
+        parent = os.path.join(os.environ["ROMDIR"], "vsav.zip")
     zips = [a.zip] + ([parent] if os.path.exists(parent) else [])
     facts = member_facts(zips)
     with open(template, encoding="utf-8", errors="replace") as f:

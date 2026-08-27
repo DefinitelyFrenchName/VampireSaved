@@ -8,14 +8,17 @@
 # which makes the tool's output a function of the invoking user's home
 # directory. Two consequences this script exists to remove:
 #
-#   1. THE STOCK LEG AND THE WIDE LEG NEED DIFFERENT `vsav.zip` FILES. The
-#      WIDE romset is a CLONE set: `vsavjw.zip` carries the program, the Z80,
-#      group C and the QSound extension, and everything else comes from its
-#      PARENT — which for the WIDE build is the build's own `vsav.zip`, not
-#      the pristine dump (the merged build patches vanilla GFX members
-#      `vm3.13m/15m/17m/19m`; run_wide.sh overlays them the same way). The
-#      stock `vsavj` reference leg needs the PRISTINE parent. One `$HOME`
-#      cannot be both, so this script stages a PRIVATE one per invocation.
+#   1. THE TWO LEGS NEED DIFFERENT ZIP SETS. The WIDE romset is a CLONE set:
+#      `vsavjw.zip` carries the program, the Z80, group C, the QSound
+#      extension AND (since 14z-112) the patched group-A members
+#      `vm3.13m/15m/17m/19m`; everything else comes from the PRISTINE parent.
+#      **CORRECTED 14z-112: this used to say the legs need DIFFERENT
+#      `vsav.zip` FILES, because the build packed a PATCHED parent.** That is
+#      precisely what stopped a MiSTer SD card from carrying this profile and
+#      stock Vampire Savior together — `games/mame/vsav.zip` can only be one
+#      file, and a stock MRA pointed at the patched one got wrong art
+#      SILENTLY. Both legs now share the pristine dump. The private `$HOME`
+#      staging stays, because jtframe still hard-codes its lookup path.
 #   2. Writing into the real `~/.mame/roms` is global mutable state shared
 #      with every other tool on the machine. Nothing here does that.
 #
@@ -115,7 +118,18 @@ if [ "$NOROM" = 0 ]; then
         [ -f "$RP/vsavjw.zip" ] || {
             echo "no $RP/vsavjw.zip — that build has no WIDE romset" >&2; exit 1; }
         link vsavjw.zip "$(CDPATH= cd "$RP" && pwd)/vsavjw.zip"
-        link vsav.zip   "$(CDPATH= cd "$RP" && pwd)/vsav.zip"
+        # PRISTINE parent since 14z-112: the patched group-A members moved
+        # INSIDE vsavjw.zip, so both legs share one vsav.zip and a MiSTer SD
+        # card can carry this profile and stock Vampire Savior at once. A
+        # build that still packs its own vsav.zip is pre-14z-112 — use it,
+        # but say so, because its MRA cannot coexist with a stock one.
+        if [ -f "$RP/vsav.zip" ]; then
+            echo "  NOTE: $RP/vsav.zip exists (pre-14z-112 packaging) — using it;" >&2
+            echo "        this bundle's vsav.zip will BREAK stock Vampire Savior." >&2
+            link vsav.zip "$(CDPATH= cd "$RP" && pwd)/vsav.zip"
+        else
+            link vsav.zip "$ROMDIR/vsav.zip"
+        fi
         link vsavj.zip  "$ROMDIR/vsavj.zip"
     else
         link vsav.zip  "$ROMDIR/vsav.zip"

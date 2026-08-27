@@ -485,21 +485,34 @@ PYEOF
         $( [ -f "build/manifest/strip_tiles/${TENANT_CHAR}.json" ] && \
            echo "--strip-tiles build/manifest/strip_tiles/${TENANT_CHAR}.json" ) \
         --tenant "$OUTBASE/patch/tenant.json" | tail -10
-    GFXSTAGE="$(mktemp -d)"
-    unzip -q -o "$ROMDIR/vsav.zip" -d "$GFXSTAGE"
-    cp "$OUTBASE/gfx"/vm3.*m "$GFXSTAGE"/
-    ( cd "$GFXSTAGE" && rm -f vsav.zip && zip -q -X vsav.zip * )
-    cp "$GFXSTAGE/vsav.zip" "$OUTBASE/rompath/vsav.zip"
-    rm -rf "$GFXSTAGE"
-    echo "gfx: patched vsav.zip in rompath (ROMDIR untouched)"
+    # WIDE (group-C) builds put the patched group-A members INSIDE
+    # vsavjw.zip and pack NO vsav.zip (14z-112): one MiSTer SD card cannot
+    # hold both a patched and a pristine `games/mame/vsav.zip`, so a shipped
+    # patched parent is what stopped stock Vampire Savior from running
+    # alongside this profile. jtframe's .rom builder matches by CRC32 alone
+    # and FBNeo/MAME search the set's own zip first, so the members resolve
+    # from vsavjw.zip everywhere. The STOCK/substituted track has no
+    # vsavjw.zip to put them in and keeps the patched parent, which is fine:
+    # it is never the set a card ships as `vsav.zip`.
+    if ls "$OUTBASE/gfx"/vsw.*m > /dev/null 2>&1; then
+        echo "gfx: WIDE build — group-A members go into vsavjw.zip, no vsav.zip packed"
+    else
+        GFXSTAGE="$(mktemp -d)"
+        unzip -q -o "$ROMDIR/vsav.zip" -d "$GFXSTAGE"
+        cp "$OUTBASE/gfx"/vm3.*m "$GFXSTAGE"/
+        ( cd "$GFXSTAGE" && rm -f vsav.zip && zip -q -X vsav.zip * )
+        cp "$GFXSTAGE/vsav.zip" "$OUTBASE/rompath/vsav.zip"
+        rm -rf "$GFXSTAGE"
+        echo "gfx: patched vsav.zip in rompath (ROMDIR untouched) — stock track"
+    fi
     # Group C mode (variant-id tenant): the band+shelf tiles were written
     # as vsw simms; replace the zero-fill members inside the packed
     # vsavjw.zip. The host's group B stays pristine (build_gfx_donovan did
     # not write it), which is the visual half of de-substitution.
     if ls "$OUTBASE/gfx"/vsw.*m > /dev/null 2>&1; then
         RPZIP="$(cd "$OUTBASE/rompath" && pwd)/vsavjw.zip"
-        ( cd "$OUTBASE/gfx" && zip -q -X "$RPZIP" vsw.*m )
-        echo "gfx: group C members injected into vsavjw.zip (host group B pristine)"
+        ( cd "$OUTBASE/gfx" && zip -q -X "$RPZIP" vsw.*m vm3.*m )
+        echo "gfx: group C + patched group-A members injected into vsavjw.zip (host group B pristine)"
         # ...and ASSERT it, in the zip itself. An emulator over a chained
         # rompath is NOT a member-identity instrument (MAME may hash-match
         # a pristine copy elsewhere in the path — exactly how the stale-
