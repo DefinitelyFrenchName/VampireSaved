@@ -2367,7 +2367,10 @@ at four events and nowhere else, measured over a full 1P match on stock
   merged 6074 -> 6153, 7757 -> 7853, 17215 -> 17272). The offset is the fall
   animation's length; the frame after it already carries the next FIGHT
   banner — the white-out IS the refill transition;
-- the match END (merged 10536/10539; no vanilla replay measured it).
+- the match END (merged 10536/10539; vs2 6528/6531).
+**vsav2 has the SAME inventory** (native Donovan vs Victor, `37_victor_ko_vsav2`,
+reference MAME): intro 2307/2309, start 2546 = HP-set 2363 + 183, down 4088 ->
+4176 (+88), end pair. Vanilla in both games; a shared engine behaviour.
 It was reported as "the screen flashes at the first down" (GitHub #113) and
 on a CRT as "background stays, sprites vanish" — one white frame on
 phosphor. Not a port defect. The MECHANISM (palette RAM blanked vs a CPS-B

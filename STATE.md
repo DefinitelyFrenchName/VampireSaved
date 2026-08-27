@@ -1392,6 +1392,10 @@ the archive once they stop shaping active work.)*
   register at the white frame — not yet measured) and a gate; not free.
   The CRT "background stays, sprites vanish" is consistent with one white
   frame on phosphor (interpretation, not measured).
+  **Maintainer's rule (2026-08-27): vanilla in VS with VS characters =>
+  close regardless of vs2; measured BOTH — vsavj (104: +96) AND vsav2
+  (37_victor_ko_vsav2, native Donovan: +88) show it. Awaiting the
+  maintainer's own hand check on stock vsavj, then CLOSE.**
 - **~~#99 — THE TYPE-0x51 REMAP~~ RE-RULED (maintainer, 2026-08-26, 14z-110):
   THE REACTION_HOOK D2-WINDOW SHAPE IS APPROVED, in the explicit order
   FIX -> AUDIT -> RE-FREEZE.** "Very well, I agree with all the proposal."
