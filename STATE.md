@@ -1,5 +1,19 @@
 # STATE — living progress log
 
+## Session 14z-112 (2026-08-27) — **FIELD VERDICT GREEN on merged-m9 (M8):
+## #99 CLOSED by the maintainer. Four maintainer recordings tracked, all
+## guard-clean. #113 re-read as a sprite-dropout frame.**
+
+| | |
+|---|---|
+| board | the maintainer's MiSTer on bundle `../mister_fieldtest_14z111/` (wheel = M8) does NOT crash on the Bishamon > Phobos route that crashed 100% on M6 and M7, "despite all my efforts" |
+| MAME recordings (all replayed with `tools/run_inp_guarded.sh` on merged16, `crashes=0`, tracked under `tests/inp/`) | `play-merged-m9-01` (14z-111: first match vs CPU Phobos dragged near time-over) · `run-merged-m9-02` (full arcade run as Donovan to the ENDING — the shell character's, as expected; first evidence a tenant run completes) · `run-merged-m9-03` (Anakaris > Victor > Phobos, the reliable M6/M7 route; Phobos dragged through most of the moveset, lost, retried on continue — no poisoned second fight) · `run-merged-m9-04` (Bishamon > Phobos, long fight) |
+| #112 evidence grew | Press of Death palette flips with ANY kick AND MID-ANIMATION (white/blue foot turns black/blue partway) — rules out a per-strength palette row; it is a time-varying palette write (fade/flash family or a row collision). Issue comment posted |
+| #113 re-read (CRT) | not a palette flash: on the CRT the BACKGROUND STAYS while the sprites (Phobos especially) are not drawn or sit on an invisible plane for at least one frame — an OBJ-list / draw issue. Cosmetic, still the photosensitivity item; investigate via per-frame OBJ dumps vanilla-vs-merged at the first down, not the palette. Issue comment posted |
+| gate note | `tests/test_inp_corpus.sh` plays each recording only to `MAX_FRAMES=6000` (100 s) by default; the `.inp` files are complete and `MAX_FRAMES=200000` covers them fully (~1 h for run-02). The instrument is capped, not the recordings |
+| push | main pushed at each tracking commit; no tags cut (no freeze) |
+
+
 ## Session 14z-111 CLOSE — ritual complete. **#99 ROOT-CAUSED (CPU-Phobos ran
 ## DEMITRI's AI — the aliased upper half of the AI script tables) AND FIXED
 ## (option A: the tenants' own vs2 AI, zero code); frozen donovan-m14 /

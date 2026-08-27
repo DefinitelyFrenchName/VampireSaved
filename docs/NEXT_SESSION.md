@@ -4,7 +4,22 @@
 > ## playing DEMITRI's AI. Frozen as donovan-m14 / huitzil-m21 / pyron-m15 /
 > ## merged-m9, mark M8; board bundle `../mister_fieldtest_14z111/`.**
 > ##
-> ## **IN ORDER:** (1) the field verdict on the board (bundle 14z111; the
+> ## **UPDATE 14z-112 (2026-08-27): (1) and (2) are DONE — FIELD VERDICT
+> ## GREEN. The board on bundle 14z111 (M8) does not crash on the Bishamon >
+> ## Phobos route that was 100% on M6/M7; four MAME recordings agree
+> ## (`tests/inp/play-merged-m9-01`, `run-merged-m9-02..04`, all guard-clean:
+> ## first-match, Anakaris>Victor>Phobos, Bishamon>Phobos, a full arcade run
+> ## to the ending, a lost-then-continued Phobos fight). #99 is CLOSED
+> ## (maintainer, 2026-08-27). NEXT: (3) nothing red in the freeze table. (4) the
+> ## two cosmetics, #113 FIRST — re-read on the CRT as a SPRITE-DROPOUT
+> ## frame (background stays, sprites — Phobos especially — not drawn or on
+> ## an invisible plane for >=1 frame), NOT a palette flash: start from the
+> ## OBJ list at the down, not the palette; compare vanilla vs merged
+> ## per-frame OBJ dumps (`test_obj_records.sh` tooling). #112's palette
+> ## flips with ANY kick and MID-ANIMATION (a time-varying palette write,
+> ## not a per-strength row).
+> ##
+> ## **(HISTORY, 14z-111 order):** (1) the field verdict on the board (bundle 14z111; the
 > ## wheel MUST say M8 — M7 means the old romset). (2) Replay any `.inp` the
 > ## maintainer left under `~/.cache/vampire-saved/inp/<name>/` on BOTH
 > ## merged15 and merged16 with `tools/run_inp_guarded.sh` (a Donovan-vs-CPU-
