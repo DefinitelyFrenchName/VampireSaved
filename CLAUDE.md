@@ -252,6 +252,26 @@ legacy behavior is a failed change.
   (simultaneous presses, frame-1 actions, corner interactions, KO-frame
   events). The SMS experience: bugs live at state transitions, not in the
   middle of matches.
+- **FIELD REPORTS ARE RECORDINGS (maintainer-ruled 2026-08-27, 14z-111).**
+  Every reproducible crash or misbehaviour a human can produce — on the
+  board or on MAME — is captured FIRST as a hand-played MAME recording
+  (`WIDE_RECORD=<name> tools/run_wide.sh <build> mame`), BEFORE any
+  mechanism theory, and tracked under `tests/inp/<name>/` (force-added,
+  with a one-line `NOTE`). `tools/run_inp_guarded.sh` plays it back with a
+  write tap on the game's OWN exception-code store (`RAM:$FF0000`) — no
+  debugger, faithful playback — and yields the vector, fault PC, registers
+  and stack at the instruction; `INP_DEBUG=1 TRACE_FROM=` adds the
+  instruction trace, `WATCH=` write taps. **`tests/test_inp_corpus.sh`
+  replays EVERY tracked recording on the current merged build at every
+  freeze and fails on the first exception** (a captured-but-unfixed defect
+  is declared by a `DEFECT` file naming the expected crash, so the capture
+  cannot rot). The cost that made this law: the tooling existed since
+  14z-9x and HANDOFF called a recorded report "a replay protocol", but no
+  gate consumed recordings and no crash report was ever captured as one —
+  14z-109..111 spent three sessions and TWO shipped fixes on a rig-derived,
+  poke-contaminated mechanism that was never the field crash; the first
+  recording found the real one (#99) in an evening. Scripted rigs that win
+  fast never give a CPU opponent's AI the time to reach its rarer scripts.
 - **THE PERSISTENT SUITE DOCTRINE (SMS lesson, promoted to law):** every
   in-emulator test executed during development — measurement, probe, or
   verification — is captured as a scripted, rerunnable case in `tests/` before

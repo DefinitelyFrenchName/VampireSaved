@@ -3126,4 +3126,8 @@ the maintainer's rig (win fast, then KEEP AWAY and give the CPU time)
 crashed every time. A CPU-behaviour soak must give the opponent TIME, not
 hits. (3) Capture with the game's own exception record (`$FF0000` write
 tap, `tools/run_inp_guarded.sh`) on a hand-played `.inp` — the first natural-
-path capture beat two fixes derived from a poke-contaminated one.
+path capture beat two fixes derived from a poke-contaminated one. **(4) The
+tooling was never the gap — its SYSTEMATIC use was:** WIDE_RECORD existed
+since 14z-9x, HANDOFF called a recorded report "a replay protocol", and no
+gate consumed one until `tests/test_inp_corpus.sh` (14z-111). Now law in
+CLAUDE.md §4 ("FIELD REPORTS ARE RECORDINGS").

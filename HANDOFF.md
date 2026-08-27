@@ -484,7 +484,7 @@ see `docs/platform/gotchas.md` "`jtsim -verilator -stats` reports nothing".
 ## Running a CPS-2 WIDE build (playtest)
 
 **RECORD YOUR SESSION (14z-99, maintainer-requested):** on the MAME leg,
-`WIDE_RECORD=<name> tools/run_wide.sh <build> mame` records the whole
+**MANDATORY FOR CRASH REPORTS since 14z-111 (CLAUDE.md §4 "FIELD REPORTS ARE RECORDINGS"): record first, theorise after; track under `tests/inp/<name>/`; `tests/test_inp_corpus.sh` replays the corpus at every freeze.** `WIDE_RECORD=<name> tools/run_wide.sh <build> mame` records the whole
 session as a MAME `.inp` with a FRESH named nvram start state under
 `~/.cache/vampire-saved/inp/<name>/` — hand off that directory + the
 build name and the session reproduces frame-exact on the same pinned
@@ -1018,6 +1018,7 @@ tests/run_all_static.sh                    # portable tier: ROM-free, ~1 min
 ROMDIR=... tests/run_all_static.sh         # + the static tier, ~8 min
 ROMDIR=... tests/run_all_static.sh --strict   # SKIP counts as failure too
 tests/run_all_static.sh --list             # what is registered
+ROMDIR=... tests/test_inp_corpus.sh        # EMULATOR tier: every tracked hand-played recording, no exception (14z-111)
 ```
 
 **One command, every gate that does not need an emulator.** Until 14z-94 there
