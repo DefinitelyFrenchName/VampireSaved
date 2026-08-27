@@ -1530,6 +1530,24 @@ entries moved VERBATIM to `DECISIONS_HISTORY.md` — grep there by topic.
 Lifecycle: rulings are still marked DECIDED in place here first; they move to
 the archive once they stop shaping active work.)*
 
+- **#112 — PRESS OF DEATH BLACK FOOT: ACCEPTED AS COSMETIC. DECIDED
+  (maintainer, 2026-08-27): option (c) — accept for now; option (a) (give
+  tenants their own effect animation) is PARKED for a later pass over the
+  port's remaining purely-cosmetic items.** Option (b) (trim the borrowed
+  sequence) is refused outright: the sequence is vanilla vsavj data, so
+  editing it breaks the superset invariant regardless of what it does to the
+  move. Rationale for (c): the defect is purely visual on a single-player
+  surface, the project already carries small cosmetic imprecisions, and the
+  mechanism is not understood well enough to patch safely — the whole draw
+  path measured VANILLA (writer `PC 0x01B2BE` byte-identical to stock,
+  vanilla record `0x287D7C`, vanilla sequence, vanilla art, tile window
+  byte-identical to stock), and WHY a tenant runs that sequence is still
+  unknown. GitHub #112 stays OPEN as the parked record; do not re-derive the
+  eliminations, they are listed in the 14z-112 group above. **When the
+  cosmetic pass happens, the entry point is a DISASSEMBLY-based trace of the
+  effect spawn — not a byte scan** (two instruction-boundary false positives
+  were paid for here: `e768 7105` and `0028394E`).
+
 - **#113 — THE ONE-FRAME WHITE-OUT AT A DOWN IS VANILLA (measured 14z-112,
   `tests/test_down_flash_vanilla.sh` PASS on stock vsavj / reference MAME).**
   Stock Vampire Savior draws ONE all-white frame (fnv `eab1fb569cb99b25`,

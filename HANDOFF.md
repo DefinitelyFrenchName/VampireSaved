@@ -1021,6 +1021,7 @@ tests/run_all_static.sh --list             # what is registered
 ROMDIR=... tests/test_inp_corpus.sh        # EMULATOR tier: every tracked hand-played recording, no exception (14z-111)
 ROMDIR=... tests/test_down_flash_vanilla.sh  # EMULATOR tier: the one-frame white-out at a down is VANILLA (#113 ground truth, 14z-112)
 ROMDIR=... [SNAP_FRAMES=a,b DUMP_FRAMES=..] tools/run_inp_probe.sh <build> <inp>   # per-frame video hash + HP/death/OBJ counts, snapshots, OBJ dumps (also REPLAY= driven)
+python3 tools/audit_effect_rects.py --ours <hashes> --stock <hashes> --donor n=<hashes> --blocks <log>  # multi-tile OBJ blocks vs the donor rectangle (14z-112). INSTRUMENT, NOT A GATE — read its header first; hash maps come from run_inp_probe's GFXRANGE, block lists from RECT_AUDIT
 ```
 
 **One command, every gate that does not need an emulator.** Until 14z-94 there

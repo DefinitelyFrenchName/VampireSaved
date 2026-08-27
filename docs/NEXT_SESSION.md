@@ -14,7 +14,16 @@
 > ## frame at every down (and intro/start), identical on stock vsavj —
 > ## `tests/test_down_flash_vanilla.sh` PASS; decision pending (close vs
 > ## opt-in softening), STATE "Decisions pending — #113". NEXT: #112 —
-> ## 14z-112 PROGRESS: Press of Death = Donovan's EX 41236+K (METER-GATED —
+> ## **#112 IS DECIDED (maintainer, 2026-08-27): ACCEPT AS COSMETIC (option
+> ## c). Giving tenants their own effect animation (a) is PARKED for a later
+> ## pass over the port's remaining cosmetic items; trimming the vanilla
+> ## sequence (b) is REFUSED — it is vanilla data, so editing it breaks the
+> ## superset invariant. The issue stays OPEN as the parked record. Do NOT
+> ## re-derive the eliminations (STATE 14z-112) and do NOT scan for pointers
+> ## when it is picked up again — DISASSEMBLE (two instruction-boundary false
+> ## positives were paid for: `e768 7105`, `0028394E`).**
+> ##
+> ## (history) 14z-112 PROGRESS: Press of Death = Donovan's EX 41236+K (METER-GATED —
 > ## `POKES ff8509` to fire in a rig). Rigs reproduce the giant white/blue
 > ## foot on merged AND vsav2 (`tests/replays/112_don_pod_*.rpl`); the foot
 > ## is WHITE/correct in ~16 instances (Victor + Phobos, all strengths) —
