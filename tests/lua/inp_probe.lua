@@ -176,7 +176,11 @@ emu.register_frame_done(function()
                     if b ~= 0 then nz = nz + 1 end
                     sum = (sum * 33 + b) & 0xFFFFFFFF
                 end
-                f:write(string.format("G F%d tile=%05x nonzero=%d/128 hash=%08x\n", frame, t, nz, sum))
+                local hex = {}
+                if os.getenv("GFXHEX") then
+                    for i = 0, 0x7F do hex[#hex+1] = string.format("%02x", rg:read_u8(base + i)) end
+                end
+                f:write(string.format("G F%d tile=%05x nonzero=%d/128 hash=%08x %s\n", frame, t, nz, sum, table.concat(hex)))
             end
         else
             f:write("G no :gfx region\n")
