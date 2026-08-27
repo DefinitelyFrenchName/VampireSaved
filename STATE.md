@@ -1873,9 +1873,30 @@ wrong is *safe and loud* over designs that are merely well-measured.
 - ~~Minor win-screen palette issues~~ **FIXED 14z-68m** (build/hui11):
   the palette source is the OPCODE-view remap table, and the portrait
   position row needed vs2's own values. Gate: `tests/test_hui_winscreen.sh`.
-- **OPEN (cosmetic):** Huitzil's win QUOTE text — root-caused, not built.
-  The consumer's `lea -4(a0,d0.w)` bias means it reads index 0x60+id-1.
+- **OPEN (cosmetic):** win QUOTE TEXT — **all THREE tenants still show their
+  SHELL's quote** (corrected 2026-08-27 by the maintainer; this entry used to
+  say "Huitzil's", which understated the scope). Root-caused, not built: the
+  consumer's `lea -4(a0,d0.w)` bias means it reads index `0x60+id-1`. NOTE the
+  win-quote ART is already native and complete (14z-62e/62j, group C bank 5) —
+  what remains is the TEXT. See the cosmetic backlog below.
 - **OPEN:** FG pacing — untouched.
+
+### THE COSMETIC BACKLOG (parked, 2026-08-27 — the maintainer's own list)
+
+Ruled a single later pass over "the purely cosmetic things that remain related
+to the port", opened when #112 was accepted as cosmetic. Nothing here is
+scheduled, and none of it is competitive-2P surface (see the standing
+"cosmetic is optional" scope: cosmetic + single-player-only surfaces are
+nice-to-have). Collected so the pass does not start from a blank page:
+
+| item | status | what is known |
+|---|---|---|
+| **Win-quote TEXT for all three tenants** (each still shows its shell's quote) | root-caused, not built | consumer bias `lea -4(a0,d0.w)` -> reads index `0x60+id-1`. Art side already native (14z-62e/62j) |
+| **Arcade ladder MAP NAMES and PICTURES** | not investigated | the map screen is the one that follows the win screen (a documented rig trap, STATE_HISTORY 14z-99); stage banners decode via `tools/decode_stage_banners.py`, venue byte `$FF8100` |
+| **Character SELECT WHEEL polish** | not investigated | the wheel is functionally correct and emulator-identical; this is look-and-feel only. Layout facts in `docs/game/atlas/select_screen.md`, the 21-cell roster and its inbound edges |
+| **#112 Press of Death black foot** | DECIDED cosmetic, parked | whole draw path measured VANILLA; why a tenant runs that vanilla sequence is unknown. Entry point when resumed: DISASSEMBLE the effect spawn, never scan |
+| (#113 first-down white-out) | **not ours** — vanilla in vsavj AND vsav2 | pending only the maintainer's MiSTer double-check, then it closes |
+
 
 ## Findings log
 

@@ -14,6 +14,12 @@
 > ## frame at every down (and intro/start), identical on stock vsavj —
 > ## `tests/test_down_flash_vanilla.sh` PASS; decision pending (close vs
 > ## opt-in softening), STATE "Decisions pending — #113". NEXT: #112 —
+> ## **A COSMETIC BACKLOG NOW EXISTS (STATE "THE COSMETIC BACKLOG"), ruled a
+> ## single later pass: win-quote TEXT for ALL THREE tenants (each still shows
+> ## its SHELL's quote — art is already native), arcade ladder MAP NAMES and
+> ## PICTURES, character SELECT WHEEL polish, and #112. None scheduled; none
+> ## is competitive-2P surface.**
+> ##
 > ## **#112 IS DECIDED (maintainer, 2026-08-27): ACCEPT AS COSMETIC (option
 > ## c). Giving tenants their own effect animation (a) is PARKED for a later
 > ## pass over the port's remaining cosmetic items; trimming the vanilla
