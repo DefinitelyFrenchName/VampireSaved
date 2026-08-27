@@ -1,0 +1,37 @@
+# 112 (merged/WIDE side): Press of Death palette rig (GitHub #112, 14z-112).
+# Donovan on the 21-cell wheel = L,L,D,D from default 0x01 Demitri (109's P1
+# path; U,U,R lands on JEDAH — the pre-de-substitution gotcha). Motion is
+# 59_don_blizzard_hcf's proven 41236 cadence with the button changed from 3
+# (HP -> Blizzard Sword) to a KICK -> Press of Death, repeated LK/MK/HK.
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p1=L
+1160-1162 p1=L
+1220-1222 p1=D
+1280-1282 p1=D
+1104-1106 p2=R
+1164-1166 p2=R
+1400-1402 p1=1
+1460-1462 p2=1
+2760-2800 p1=R
+2850-2852 p1=L
+2854-2856 p1=DL
+2858-2860 p1=D
+2862-2864 p1=DR
+2866-2870 p1=R
+2868-2872 p1=4
+3150-3152 p1=L
+3154-3156 p1=DL
+3158-3160 p1=D
+3162-3164 p1=DR
+3166-3170 p1=R
+3168-3172 p1=5
+3450-3452 p1=L
+3454-3456 p1=DL
+3458-3460 p1=D
+3462-3464 p1=DR
+3466-3470 p1=R
+3468-3472 p1=6
+3800 wait

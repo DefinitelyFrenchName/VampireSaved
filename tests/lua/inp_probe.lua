@@ -5,13 +5,15 @@
 -- blind to it; a human eye cannot name the frame. This names it.
 --
 -- Per frame, one line:
---   V <frame> <fnv1a64(framebuffer)> hp1=<h> w1=<w> d1=<death> hp2= w2= d2= rd=<$FF810E> t=<$FF8109> obj=<n0>/<n1>
+--   V <frame> <fnv1a64(framebuffer)> hp1=<h> w1=<w> d1=<death> hp2= w2= d2= rd=<$FF810E> t=<$FF8109> obj=<n0>/<n1> in=<IN0>,<IN1>,<IN2>
+--   (in = raw input-port words, active-low — the recording's own inputs)
 --   (hp/w = fighter +0x50/+0x52 signed words, d = +0x11F, obj = live OBJ
 --    entries walked hardware-style in each CPS-2 buffer at 708000/710000)
 -- At SNAP_FRAMES: machine.video:snapshot() (MAME numbering, "SNAP <frame> <k>").
 -- At DUMP_FRAMES: the full OBJ record list, obj_records_dump.lua grammar.
 -- END <frames>.  env CHECKSUM_OUT, MAX_FRAMES (default 200000), OBJ_BASE,
 -- REPLAY (optional: drive a replay.lua script instead of a -playback .inp).
+-- POKES  (optional: replay.lua-grammar scheduled writes; e.g. meter bank).
 local out_path = os.getenv("CHECKSUM_OUT") or "inp_probe.log"
 local max_frames = tonumber(os.getenv("MAX_FRAMES") or "") or 200000
 local obj_base = tonumber(os.getenv("OBJ_BASE") or "708000", 16)
@@ -95,20 +97,34 @@ if replay_path then
     end
 end
 local prev = {}
+local in_ports = { machine.ioport.ports[":IN0"], machine.ioport.ports[":IN1"], machine.ioport.ports[":IN2"] }
+local pokes = {}
+for spec in (os.getenv("POKES") or ""):gmatch("[^;]+") do
+    local fr, addr, hexs = spec:match("^(%d+):(%x+):(%x+)$")
+    if fr then pokes[#pokes + 1] = { tonumber(fr), tonumber(addr, 16), hexs } end
+end
 local frame, snaps = 0, 0
 emu.register_frame_done(function()
     frame = frame + 1
+    for _, pk in ipairs(pokes) do
+        if pk[1] == frame then
+            local a = pk[2]
+            for b in pk[3]:gmatch("%x%x") do space:write_u8(a, tonumber(b, 16)); a = a + 1 end
+        end
+    end
     for _, fo in ipairs(prev) do fo:set_value(0) end
     prev = held[frame + 1] or {}
     for _, fo in ipairs(prev) do fo:set_value(1) end
     local d = dump[frame]
     local n0 = walk(obj_base, d, frame, 0)
     local n1 = walk(obj_base + 0x8000, d, frame, 1)
-    f:write(string.format("V %d %016x hp1=%d w1=%d d1=%02x hp2=%d w2=%d d2=%02x rd=%d t=%02x obj=%d/%d\n",
+    f:write(string.format("V %d %016x hp1=%d w1=%d d1=%02x hp2=%d w2=%d d2=%02x rd=%d t=%02x c1=%03x c2=%03x obj=%d/%d in=%04x,%04x,%04x\n",
         frame, fnv1a64(screen:pixels()),
         s16(0xFF8450), s16(0xFF8452), space:read_u8(0xFF851F),
         s16(0xFF8850), s16(0xFF8852), space:read_u8(0xFF891F),
-        space:read_u8(0xFF810E), space:read_u8(0xFF8109), n0, n1))
+        space:read_u8(0xFF810E), space:read_u8(0xFF8109),
+        space:read_u16(0xFF8782), space:read_u16(0xFF8B82), n0, n1,
+        in_ports[1]:read(), in_ports[2]:read(), in_ports[3]:read()))
     if snap[frame] then machine.video:snapshot(); f:write(string.format("SNAP %d %04d\n", frame, snaps)); snaps = snaps + 1 end
     if frame >= max_frames then f:write(string.format("END %d\n", frame)); f:close(); machine:exit() end
 end)

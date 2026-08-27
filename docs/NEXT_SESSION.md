@@ -14,11 +14,17 @@
 > ## frame at every down (and intro/start), identical on stock vsavj —
 > ## `tests/test_down_flash_vanilla.sh` PASS; decision pending (close vs
 > ## opt-in softening), STATE "Decisions pending — #113". NEXT: #112 —
-> ## FIRST capture Press of Death on vsav2 ITSELF (maintainer: slim chance
-> ## the blue/black palette exists in the donor); the palette flips with ANY
-> ## kick and MID-ANIMATION (a time-varying palette write, not a per-
-> ## strength row). Instrument: `tools/run_inp_probe.sh` (per-frame video
-> ## hash + HP/death/OBJ counts, snapshots, OBJ dumps; `.inp` or REPLAY=).
+> ## 14z-112 PROGRESS: Press of Death = Donovan's EX 41236+K (METER-GATED —
+> ## `POKES ff8509` to fire in a rig). Rigs reproduce the giant white/blue
+> ## foot on merged AND vsav2 (`tests/replays/112_don_pod_*.rpl`); the foot
+> ## is WHITE/correct in ~16 instances (Victor + Phobos, all strengths) —
+> ## the blue/BLACK did NOT reproduce, so it is NOT per-invocation RNG.
+> ## HYPOTHESIS: the foot's palette row is shared/unreserved and overwritten
+> ## mid-move under allocator pressure (busier scene/Dark Force/deeper
+> ## match). BLOCKED on the maintainer's trigger context (asked on #112:
+> ## Dark Force? hit during the move? which round/meter?). Then pin the
+> ## foot pal row (OBJ dump gives 05/0b) and compare its palette-RAM
+> ## contents white-vs-black, and merged-vs-vsav2 (the donor question).
 > ##
 > ## **(HISTORY, 14z-111 order):** (1) the field verdict on the board (bundle 14z111; the
 > ## wheel MUST say M8 — M7 means the old romset). (2) Replay any `.inp` the
