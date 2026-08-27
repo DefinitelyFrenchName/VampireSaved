@@ -41,7 +41,26 @@ vsav2 share much effect art). That is the live hypothesis, and it is NOT yet
 proven — proving it means showing the lift record is reached by tenant
 animation data that the effect-map step never covered.
 
-**IT IS A BORROWED VANILLA EFFECT SEQUENCE (14z-112, the answer to "why").**
+**~~IT IS A BORROWED VANILLA EFFECT SEQUENCE~~ RETRACTED WITHIN THE HOUR — THE
+"POINTERS" WERE AN INSTRUCTION-BOUNDARY FALSE POSITIVE (14z-112).** The four
+"tenant pointers to `0x28394E`" (`0x42D024`, `0x42D062` in `x088512@huitzil`;
+`0x4855C4`, `0x485602` in `@pyron`) are NOT pointers. Disassembled, every one
+reads `move.l #$02208000,($0028,A4)` (or `#$80008000`) followed by `394E` =
+`move.w A6,($0030,A4)`: the long-scan matched the DISPLACEMENT word `0028` of
+one instruction against the OPCODE `394E` of the next. **`0x0028394E` is never
+stored anywhere.** RH-35 exactly — scanning a whole binary for a value that is
+also a common encoding returns noise — and I had already paid for this once
+this session with the `e768 7105` hit in base territory. **So there is NO
+evidence the port points any tenant at that sequence, and no precedent of
+"giving Huitzil/Pyron their own effect" either: those sites are ordinary
+authored spawn code (`jsr $16FD0` = the vsavj pool-3 allocator, `$FFC8xx`,
+reconciliation-mapped) and say nothing about which animation is installed.**
+What remains true and measured: the whole draw path is vanilla (writer
+`PC 0x01B2BE` byte-identical to stock, vanilla record, vanilla sequence,
+vanilla art), and **why a tenant object runs that vanilla sequence is
+UNKNOWN.** Any pointer archaeology here must disassemble, not scan.
+
+**(SUPERSEDED) IT IS A BORROWED VANILLA EFFECT SEQUENCE (14z-112, the answer to "why").**
 The vanilla animation sequence at **`PRG:0x28394E`** contains BOTH records as
 consecutive frames — descent `0x287D0C` (renders correctly) then lift
 `0x287D7C` (renders as foreign art) — and `0x28394E` is **exactly the address
