@@ -41,6 +41,25 @@ vsav2 share much effect art). That is the live hypothesis, and it is NOT yet
 proven — proving it means showing the lift record is reached by tenant
 animation data that the effect-map step never covered.
 
+**IT IS A BORROWED VANILLA EFFECT SEQUENCE (14z-112, the answer to "why").**
+The vanilla animation sequence at **`PRG:0x28394E`** contains BOTH records as
+consecutive frames — descent `0x287D0C` (renders correctly) then lift
+`0x287D7C` (renders as foreign art) — and `0x28394E` is **exactly the address
+the port's own tenant data points at**: two pointers from `x088512@huitzil`
+(`0x42D024`, `0x42D062`) and two from `x088512@pyron` (`0x4855C4`,
+`0x485602`). So the port deliberately BORROWS this vanilla effect sequence for
+tenants. Every byte drawn is Capcom's, but **the decision to point a tenant at
+this sequence is ours** — and its later frames draw art that is not the
+tenant's, which is the #112 black. Donovan's own regions contain no such
+pointer (searched `0x283940-0x2839A0` across every member), so he reaches the
+sequence through vanilla dispatch rather than a stored pointer — the one link
+still unproven.
+**A DEAD END, recorded so it is not retried blind:** decoding the tiles to LOOK
+at them failed — the MAME `cps_layout16x16` plane/offset layout I applied
+produced stripes for the KNOWN-GOOD foot tile (`0xe715`), so the decode is
+wrong and nothing was concluded from the rendered images. Getting a real
+picture needs the layout established against a positive control first.
+
 **THE FULL CAUSAL CHAIN IS VANILLA — WRITER INCLUDED (14z-112).** A write tap
 (with the re-install-on-map-change notifier `inp_guard` uses — without it a tap
 is silently dropped and reports zero forever, measured here) caught the two
