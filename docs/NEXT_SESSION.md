@@ -9,8 +9,12 @@
 > ## maintainer left under `~/.cache/vampire-saved/inp/<name>/` on BOTH
 > ## merged15 and merged16 with `tools/run_inp_guarded.sh` (a Donovan-vs-CPU-
 > ## Bishamon crash would be a DIFFERENT mechanism). (3) Anything still red
-> ## in STATE 14z-111's freeze table (pyron-m15 suite / verify passes were in
-> ## flight at close — check `git status tests/expected/`).
+> ## in STATE 14z-111's freeze table. (4) Two cosmetics filed at close with
+> ## `tests/inp/play-merged-m9-01` as evidence: Press of Death blue/black
+> ## palette (GitHub #112) and the whole-screen flash at the first down
+> ## (GitHub #113) — the flash is a photosensitivity concern, take it before
+> ## the palette. First MAME verdict on merged-m9: the #99 protocol did NOT
+> ## crash (dragged near time-over, button spam).
 > ##
 > ## **THE MECHANISM, in one breath:** the four per-class CPU AI action-
 > ## script tables `PRG:0xBF01A/09A/11A/19A` are 16 classes + THE SAME 16
