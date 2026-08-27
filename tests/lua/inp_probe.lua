@@ -165,6 +165,23 @@ emu.register_frame_done(function()
         for a = 0x800100, 0x80013F, 2 do w[#w+1] = string.format("%04x", space:read_u16(a)) end
         f:write(string.format("R F%d 800100: %s\n", frame, table.concat(w, " ")))
     end
+    if d and os.getenv("GFXTILES") then
+        local rg = machine.memory.regions[":gfx"]
+        if rg then
+            for tok in os.getenv("GFXTILES"):gmatch("[^,%s]+") do
+                local t = tonumber(tok, 16)
+                local base, nz, sum = t * 0x80, 0, 0
+                for i = 0, 0x7F do
+                    local b = rg:read_u8(base + i)
+                    if b ~= 0 then nz = nz + 1 end
+                    sum = (sum * 33 + b) & 0xFFFFFFFF
+                end
+                f:write(string.format("G F%d tile=%05x nonzero=%d/128 hash=%08x\n", frame, t, nz, sum))
+            end
+        else
+            f:write("G no :gfx region\n")
+        end
+    end
     if snap[frame] then machine.video:snapshot(); f:write(string.format("SNAP %d %04d\n", frame, snaps)); snaps = snaps + 1 end
     if frame >= max_frames then f:write(string.format("END %d\n", frame)); f:close(); machine:exit() end
 end)
