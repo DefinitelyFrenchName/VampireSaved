@@ -14,7 +14,9 @@
 -- END <frames>.  env CHECKSUM_OUT, MAX_FRAMES (default 200000), OBJ_BASE,
 -- REPLAY (optional: drive a replay.lua script instead of a -playback .inp).
 -- POKES  (optional: replay.lua-grammar scheduled writes; e.g. meter bank).
--- PAL_ROWS/PAL_BASE (optional: at DUMP_FRAMES, log palette rows 'NN,NN' from
+-- PAL_ROWS also auto-logs whenever the #112 foot (pal 05, tile 0x0e7xx) is
+-- on screen, so one whole-recording pass captures every Press of Death.
+-- PAL_ROWS/PAL_BASE (optional: at DUMP_FRAMES/on foot, log palette rows 'NN,NN' from
 --   PAL_BASE (default 90c000, row=base+idx*0x20) as 16 u16 colours + a
 --   'dark=' luma sum, for the #112 white-vs-black foot diff).
 local out_path = os.getenv("CHECKSUM_OUT") or "inp_probe.log"
@@ -41,6 +43,7 @@ local function fnv1a64(s)
     return h
 end
 local function s16(a) local v = space:read_u16(a); if v >= 0x8000 then v = v - 0x10000 end; return v end
+local foot_seen = false
 local function walk(base, emit, frame, bi)
     local n = 0
     for i = 0, 0x3FF do
@@ -50,6 +53,11 @@ local function walk(base, emit, frame, bi)
         local attr = space:read_u16(off + 6)
         if attr >= 0xFF00 then break end
         n = n + 1
+        do
+            local code = space:read_u16(off + 4)
+            local a18 = code | ((y & 0x6000) << 3)
+            if (attr & 0x1F) == 0x05 and a18 >= 0x0e700 and a18 <= 0x0e7ff then foot_seen = true end
+        end
         if emit then
             local x, code = space:read_u16(off), space:read_u16(off + 4)
             local a18 = code | ((y & 0x6000) << 3)
@@ -122,17 +130,18 @@ emu.register_frame_done(function()
     for _, fo in ipairs(prev) do fo:set_value(0) end
     prev = held[frame + 1] or {}
     for _, fo in ipairs(prev) do fo:set_value(1) end
+    foot_seen = false
     local d = dump[frame]
     local n0 = walk(obj_base, d, frame, 0)
     local n1 = walk(obj_base + 0x8000, d, frame, 1)
-    f:write(string.format("V %d %016x hp1=%d w1=%d d1=%02x hp2=%d w2=%d d2=%02x rd=%d t=%02x c1=%03x c2=%03x obj=%d/%d in=%04x,%04x,%04x\n",
+    f:write(string.format("V %d %016x hp1=%d w1=%d d1=%02x hp2=%d w2=%d d2=%02x rd=%d t=%02x c1=%03x c2=%03x obj=%d/%d foot=%d in=%04x,%04x,%04x\n",
         frame, fnv1a64(screen:pixels()),
         s16(0xFF8450), s16(0xFF8452), space:read_u8(0xFF851F),
         s16(0xFF8850), s16(0xFF8852), space:read_u8(0xFF891F),
         space:read_u8(0xFF810E), space:read_u8(0xFF8109),
-        space:read_u16(0xFF8782), space:read_u16(0xFF8B82), n0, n1,
+        space:read_u16(0xFF8782), space:read_u16(0xFF8B82), n0, n1, foot_seen and 1 or 0,
         in_ports[1]:read(), in_ports[2]:read(), in_ports[3]:read()))
-    if (d or pal_every) and #pal_rows > 0 then
+    if (d or pal_every or foot_seen) and #pal_rows > 0 then
         for _, r in ipairs(pal_rows) do
             local o = pal_base + r * 0x20
             local cols, dark = {}, 0
@@ -143,6 +152,11 @@ emu.register_frame_done(function()
             end
             f:write(string.format("P F%d row=%02x dark=%d %s\n", frame, r, dark, table.concat(cols, " ")))
         end
+    end
+    if d and os.getenv("CPSREGS") then
+        local w = {}
+        for a = 0x800100, 0x80013F, 2 do w[#w+1] = string.format("%04x", space:read_u16(a)) end
+        f:write(string.format("R F%d 800100: %s\n", frame, table.concat(w, " ")))
     end
     if snap[frame] then machine.video:snapshot(); f:write(string.format("SNAP %d %04d\n", frame, snaps)); snaps = snaps + 1 end
     if frame >= max_frames then f:write(string.format("END %d\n", frame)); f:close(); machine:exit() end
