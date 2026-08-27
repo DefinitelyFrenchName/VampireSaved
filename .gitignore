@@ -141,3 +141,4 @@ replay_checksums.txt
 # generator tools/mk_mister_page.py, because a hand-copied artifact goes
 # stale silently and this one draws a memory map whose slack is 0.2%.
 docs/project/mister_core.html
+build/gfx_hashes/

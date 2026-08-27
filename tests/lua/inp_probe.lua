@@ -43,6 +43,15 @@ local function fnv1a64(s)
     return h
 end
 local function s16(a) local v = space:read_u16(a); if v >= 0x8000 then v = v - 0x10000 end; return v end
+-- RECT_AUDIT (14z-112, GitHub #112): accumulate every DISTINCT multi-tile OBJ
+-- block whose tile code falls in the tenant placement window, over the whole
+-- run, and emit them at END as "BLK <code> <w> <h> <attr> <seen>". Feeds
+-- tools/audit_effect_rects.py, which checks each block's destination
+-- rectangle against the donor's own rectangle (the shelf-pack defect).
+local rect_audit = os.getenv("RECT_AUDIT") ~= nil
+local rect_lo = tonumber(os.getenv("RECT_LO") or "ad80", 16)
+local rect_hi = tonumber(os.getenv("RECT_HI") or "eebb", 16)
+local blocks = {}
 local foot_seen = false
 local function walk(base, emit, frame, bi)
     local n = 0
@@ -57,6 +66,17 @@ local function walk(base, emit, frame, bi)
             local code = space:read_u16(off + 4)
             local a18 = code | ((y & 0x6000) << 3)
             if (attr & 0x1F) == 0x05 and a18 >= 0x0e700 and a18 <= 0x0e7ff then foot_seen = true end
+            if rect_audit and code >= rect_lo and code <= rect_hi then
+                local w = ((attr >> 8) & 15) + 1
+                local h = ((attr >> 12) & 15) + 1
+                if w * h > 1 then
+                    local k = string.format("%04x %d %d %04x", code, w, h, attr)
+                    if not blocks[k] then
+                        blocks[k] = true
+                        f:write(string.format("BLK %s %d\n", k, frame))
+                    end
+                end
+            end
         end
         if emit then
             local x, code = space:read_u16(off), space:read_u16(off + 4)
@@ -194,5 +214,7 @@ emu.register_frame_done(function()
         end
     end
     if snap[frame] then machine.video:snapshot(); f:write(string.format("SNAP %d %04d\n", frame, snaps)); snaps = snaps + 1 end
-    if frame >= max_frames then f:write(string.format("END %d\n", frame)); f:close(); machine:exit() end
+    if frame >= max_frames then
+        f:write(string.format("END %d\n", frame)); f:close(); machine:exit()
+    end
 end)

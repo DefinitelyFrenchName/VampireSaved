@@ -12,9 +12,36 @@
 | #113 re-read (CRT) | not a palette flash: on the CRT the BACKGROUND STAYS while the sprites (Phobos especially) are not drawn or sit on an invisible plane for at least one frame — an OBJ-list / draw issue. Cosmetic, still the photosensitivity item; investigate via per-frame OBJ dumps vanilla-vs-merged at the first down, not the palette. Issue comment posted |
 | #112 REPRODUCED (14z-112) | The maintainer's `tests/inp/run-merged-m9-05` carries a clean A/B on ONE build: match 1 vs Victor = white Press of Death (f5685-5693); match 2 vs **Q-Bee** (opponent 0x0c from f6215) = the LAST instance, **f7357-7370, descends white and lifts BLACK** (sole/toes/stripes black, outline cyan). Real playback = **7490 frames** (MAME's own count) — later "instances" are the attract demo, a trap that cost one 200000-frame pass. RULED OUT by measurement: palette-row overwrite (row 05 byte-identical white vs black), the WIDE 19-bit promote (`a18 == a19` on every foot record), a tile-inventory hole (all 27 codes resolve through delta 0x2750 into placed sources), and any dark row being in use. **LIVE LEAD:** vsav2 draws native Donovan on palette row **0x10**; our port draws the foot on row **05** — the port remaps rows, so a phase whose records carry a row inconsistent with the remap renders correct art in wrong colours. **14z-112 continued — four more eliminations, all measured on the capture:** (a) the foot's tiles are NOT blank — every white AND black tile reads 128/128 non-zero bytes in MAME's decoded `:gfx` (probe env `GFXTILES`); (b) no placement collision — the black dsts appear in NO select/overlay/wheel/exception dst list; (c) the foot is EFFECT art, not band art — ALL 27 foot sources are in `tile_exceptions.json:skip_band_src`, i.e. skipped by the band sweep and delivered by `effect_map` pairs (`build_gfx_donovan.py:392-413`), and this is true of the WHITE tiles too, so it does not discriminate; (d) **DISCARDED as invalid:** a cross-game hash of our dst tiles vs vsav2's source tiles (`0x10000+src`) matched NOTHING — including the WHITE tiles that demonstrably render correctly — so the two `:gfx` regions are not comparable by linear tile index and nothing may be concluded from it (RH-18). **THE SOLID RESULT (measured, assumption-free):** within the SAME move, the foot's records switch tile sets mid-animation — descent `0xe706-0xe740`, lift `0xe768-0xe796` — while the palette row is `05` for BOTH and its contents never change. The Victor (white) instance's foot uses a THIRD set, `0xe7d7-0xe7f8`, also on row 05. So the black is neither a palette rewrite nor a row swap: **the lift-phase tiles simply carry dark art in this build.** That also explains "about half the time": the move only reaches the lift phase on some outcomes.
 **THREE MEASUREMENTS DISCARDED AS INVALID this session — do not resurrect them:** (i) cross-game tile hashing (our dst vs vsav2 `0x10000+src`) — mismatched even for the KNOWN-GOOD white tiles, so the two `:gfx` regions are not comparable by linear index; (ii) nibble histograms of tile bytes as "pixel indices" — CPS-2 tiles are PLANAR, nibbles are not indices; (iii) every conclusion drawn from inverting the band delta (`src = dst - 0x2750`), because under it BOTH the black AND the white codes "mismatch" their `effect_map` placement — which falsifies the inversion, not the tiles. **The delta inversion is UNPROVEN and must be established before any placement argument is made again** (the foot's sources are all in `skip_band_src`, so they arrive via `effect_map` at dsts `0xeaa7-0xee71`, nowhere near the observed `0xe7xx` — meaning the observed codes are reached by a path not yet identified).
-### #112 ROOT-CAUSED (14z-112) — THE EFFECT SHELF-PACK BREAKS MULTI-TILE RECTANGLES
+### #112 (14z-112) — ~~ROOT-CAUSED: THE EFFECT SHELF-PACK BREAKS MULTI-TILE RECTANGLES~~ **RETRACTED THE SAME SESSION, by the audit the claim asked for.** CORRECTED: THE LIFT-PHASE RECORDS DRAW *UNTOUCHED EFFECT CODES* — THE PORT'S OWN DOCUMENTED "render garbled" DEFERRAL
 
-**The mechanism, measured end to end on `tests/inp/run-merged-m9-05`.** The
+**RETRACTION (same session, 14z-112).** The shelf-pack claim below was
+falsified by the very audit it motivated: the audit's first real run reported
+1623 of 2777 blocks "corrupt" — implausible — and the check that explains it
+is decisive: **every tile in the window `0xa000-0xffff` of the merged build is
+BYTE-IDENTICAL to stock vsavj (24576/24576), including all four foot tiles.**
+Our build does not place ANY art there, so no shelf-pack error can live there,
+and the rectangle-vs-donor test was measuring the LAYOUT DIFFERENCE BETWEEN
+vsavj AND vsav2 (shared engine art, laid out differently in each game), not a
+defect. The three "corrupt" blocks and the 28/28 "correct" one are the same
+phenomenon seen from two sides. **The verdict LOGIC is sound** — ground-truthed
+5/5 against the hand measurements — **its PREMISE was wrong for stock-art
+blocks.**
+
+**WHAT SURVIVES, and the corrected reading.** Records AND art on this path are
+both vanilla: the record at `PRG:0x287D80` is byte-identical to stock
+(`vm3j.08a`: 0 of 524288 bytes differ) and so are the tiles it references. So
+our build renders those records exactly as stock vsavj would — the divergence
+is not in any byte we wrote, it is in **which records the ported animation
+selects**. And the port DOCUMENTS this failure mode in the builder itself
+(`gen_donovan_patch.py:2951`): *"Effect/low codes stay untouched (per-record
+effect map is a later step; **they render garbled**, never crash — tile codes
+cannot fault)"*. The lift phase draws such untouched effect codes; the descent
+phase happens to draw codes whose stock content is the right art (vsav and
+vsav2 share much effect art). That is the live hypothesis, and it is NOT yet
+proven — proving it means showing the lift record is reached by tenant
+animation data that the effect-map step never covered.
+
+**(SUPERSEDED) The mechanism, measured end to end on `tests/inp/run-merged-m9-05`.** The
 records driving Donovan's Press of Death are **STOCK vsavj data, byte-identical
 to the reference** (`vm3j.08a` differs from stock in 0 of 524288 bytes; the
 record sits at `PRG:0x287D80`, entries are 4-byte `(tile, attr)` pairs). The
@@ -42,7 +69,7 @@ descent phase uses the intact blocks, the lift phase uses the corrupt ones:
 **"comes down white, goes back up black", exactly as reported**, and it only
 appears when the move reaches the lift phase — the "about half the time".
 
-**Where the defect lives:** the effect shelf-pack that assigns rectangle
+**(SUPERSEDED — see the retraction above) Where the defect lives:** the effect shelf-pack that assigns rectangle
 targets for non-band (shared-effect) codes — `gen_donovan_patch.py` (the
 `gfx_remap` pass emitting `effect_map.json`) + `build_gfx_donovan.py`'s
 `effects` placement. It lays small rectangles correctly and breaks on larger

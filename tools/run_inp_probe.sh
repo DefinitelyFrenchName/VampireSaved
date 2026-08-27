@@ -8,6 +8,7 @@
 # Usage: ROMDIR=... tools/run_inp_probe.sh <build_dir> <inp_name> [out_dir]
 #   <inp_name> is the WIDE_RECORD name (dir under ~/.cache/vampire-saved/inp).
 #   env MAME_BIN, MAX_FRAMES, SNAP_FRAMES, DUMP_FRAMES pass through.
+#   RECT_AUDIT=1 streams a BLK line per distinct tenant block on first sighting.
 #   Stops AT THE END OF THE RECORDING by default (-exit_after_playback), so the
 #   attract demo can never be read as play; INP_RUN_PAST_END=1 to keep going.
 # Output: <out_dir>/inp_probe.log (+ crash_<frame>_ff0000.bin dumps).
