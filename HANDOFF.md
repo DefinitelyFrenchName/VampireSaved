@@ -335,9 +335,13 @@ tools/mister_mra.sh --core cps2w --out /tmp/mra107stock   # the stock leg
 tools/mister_mra.sh --core cps2w --no-rom --out /tmp/mraonly   # MRAs only
 ```
 
-`--wide` is not cosmetic: the WIDE romset is a CLONE set whose parent is the
-BUILD's `vsav.zip` (the merged build patches `vm3.13m/15m/17m/19m`), while
-the stock leg needs the pristine dump — and `jtframe mra` reads a hard-coded
+`--wide` is not cosmetic: the WIDE romset is a CLONE set. **CORRECTED
+14z-112: its parent is now the PRISTINE dump, not the build's own
+`vsav.zip`.** Builds no longer pack a parent at all — the four patched
+members `vm3.13m/15m/17m/19m` live INSIDE `vsavjw.zip`, so both legs share
+one `vsav.zip` and a MiSTer SD card can carry this profile AND stock
+Vampire Savior (before, `games/mame/vsav.zip` could only be one file and a
+stock MRA got wrong art SILENTLY). `jtframe mra` still reads a hard-coded
 `$HOME/.mame/roms/<name>.zip`, so the tool stages a PRIVATE `$HOME` per run.
 `.rom` files are ROM content: `--out` inside the repo is refused (rule 7).
 **And the MiSTer MRA is pinned to ONE romset build's CRCs** — jtframe
@@ -403,7 +407,8 @@ python3 tools/mister_sdram_census.py /tmp/census/sdram \
 ```
 
 `--wide BUILD` delegates the `.rom` to `tools/mister_mra.sh` (the WIDE set is
-a clone whose parent is the BUILD's `vsav.zip`) and **always generates the
+a clone whose parent is the PRISTINE `vsav.zip` since 14z-112 — see above)
+and **always generates the
 image with `cps2w` whatever `--core` says** — the reference core parses
 `sourcefile=["cps2.cpp"]` and cannot see the WIDE machine entry at all, which
 is slice D0's profile gate working; `--post-frames N` counts from the END of

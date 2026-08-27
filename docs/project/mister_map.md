@@ -360,10 +360,13 @@ re-checks all of it.
    must move the fork's catalogue entry and the `parts=` row with it.
    `tools/gen_vsavjw_xml.py` regenerates the entry from a zip and
    `tests/test_mister_mra_map.sh` fails if it is stale.
-2. **The WIDE set's PARENT is the BUILD's `vsav.zip`, not the pristine
-   dump.** `build/m3b_merged13/rompath/vsav.zip` differs from `$ROMDIR`'s in
-   `vm3.13m/15m/17m/19m` (the option-B tenant art inside vanilla's own
-   32 MB), and `run_wide.sh` overlays it the same way for FBNeo and MAME.
+2. **~~The WIDE set's PARENT is the BUILD's `vsav.zip`~~ CORRECTED 14z-112:
+   the parent is the PRISTINE dump.** The four patched members
+   `vm3.13m/15m/17m/19m` (tenant art inside vanilla's own 32 MB) now live
+   INSIDE `vsavjw.zip`; builds pack no parent at all, so stock Vampire
+   Savior and this profile can share one `games/mame/vsav.zip`. Historically
+   a build's own patched parent carried them, and `run_wide.sh` overlaid it
+   the same way for FBNeo and MAME.
    Since `jtframe mra` reads a HARD-CODED `$HOME/.mame/roms/<name>.zip`
    (`mrazip.go:23`), the stock leg and the WIDE leg cannot share one `$HOME`
    — `tools/mister_mra.sh` stages a PRIVATE one per run rather than writing

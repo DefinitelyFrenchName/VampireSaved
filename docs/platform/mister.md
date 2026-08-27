@@ -766,8 +766,8 @@ blocked only by bank PLACEMENT — is worked out in
    tools/mister_mra.sh --core cps2w [--wide build/m3b_merged13] --out <dir
    outside the repo>` does the clone, the private `$HOME` staging and the
    run, and prints the size + sha1 of every `.rom` it makes. `--wide` is
-   what selects the BUILD's `vsav.zip` as the parent instead of the pristine
-   one; without it you get the stock reference leg.
+   what selects the WIDE leg's zips; without it you get the stock reference
+   leg. **CORRECTED 14z-112: builds no longer pack a parent — the four patched members live INSIDE `vsavjw.zip` and BOTH legs use the PRISTINE dump, so one SD card can carry this profile and stock Vampire Savior.**
 6. First run, from `cores/cps2/ver/game`:
    `jtsim -verilator -sysname cps2 -setname vsavj -load -video 3` —
    Verilator builds the core and the ROM download runs in simulated time
@@ -1590,8 +1590,8 @@ away.
   is what makes a full 67 MB byte-exact census a few seconds of pure Python
   with no numpy dependency.
 - **`tools/mister_mra.sh` is what makes a WIDE leg possible at all.** The
-  WIDE set is a CLONE whose parent is the BUILD's `vsav.zip` while the stock
-  leg needs the pristine one, and `jtframe mra` reads a hard-coded
+  WIDE set is a CLONE set and `jtframe mra` reads a hard-coded **CORRECTED 14z-112: builds no longer pack a parent — the four patched members live INSIDE `vsavjw.zip` and BOTH legs use the PRISTINE dump, so one SD card can carry this profile and stock Vampire Savior.**
+  Historically the parent was the build's own patched `vsav.zip`;
   `$HOME/.mame/roms`. `run_sim_jtcps2.sh --wide <build>` delegates to that
   script, which stages a private `$HOME` per run.
 
@@ -1875,10 +1875,10 @@ any core.
   (`mrazip.go:23`), so the tool's output is a function of the invoking
   user's home directory and there is no flag for it. `tools/mister_mra.sh`
   stages a PRIVATE `$HOME` per run instead of writing into the user's — and
-  it has to, because the stock leg and the WIDE leg need DIFFERENT
-  `vsav.zip` files: the WIDE romset is a clone set whose parent is the
-  BUILD's `vsav.zip` (the merged build patches `vm3.13m/15m/17m/19m`), while
-  the stock `vsavj` reference leg needs the pristine dump.
+  it had to, because the stock leg and the WIDE leg then needed DIFFERENT
+  `vsav.zip` files (the merged build patched `vm3.13m/15m/17m/19m` into its
+  own parent). **CORRECTED 14z-112: builds no longer pack a parent — the four patched members live INSIDE `vsavjw.zip` and BOTH legs use the PRISTINE dump, so one SD card can carry this profile and stock Vampire Savior.** The private `$HOME` staging stays: `jtframe`
+  still hard-codes its lookup path.
 - **`jtframe mra -n` skips ROM generation entirely** — no zips are opened,
   `md5="None"`, and the MRA XML becomes a pure function of `doc/mame.xml`
   plus the core's TOML. That is the ROM-free mode a structural gate wants.

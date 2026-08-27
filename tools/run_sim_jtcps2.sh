@@ -374,7 +374,9 @@ GAME="$CORES/$CORE/ver/game"
 # that is not what cores/cps2 emits). The stamp costs one `jtframe mra` run
 # (~15 s) per core change and nothing at all on a repeat run.
 # THE WIDE LEG GOES THROUGH tools/mister_mra.sh, and it has to: `vsavjw` is a
-# CLONE set whose parent is the BUILD's vsav.zip, while the stock leg needs the
+# CLONE set. CORRECTED 14z-112: its parent is the PRISTINE dump (the patched
+# members moved inside vsavjw.zip); historically it was the BUILD's vsav.zip,
+# while the stock leg needs the
 # PRISTINE one, and `jtframe mra` reads a HARD-CODED $HOME/.mame/roms. One
 # $HOME cannot be both, so that script stages a private one per run.
 STAMP="${WIDEBUILD:+cps2w}${WIDEBUILD:-$CORE}:$SETNAME${WIDEBUILD:+:$WIDEBUILD}"

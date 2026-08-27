@@ -1,115 +1,63 @@
-# NEXT SESSION — orientation (rewritten at the 14z-111 close, 2026-08-27)
+# NEXT SESSION — orientation (rewritten at the 14z-112 close, 2026-08-27)
 
-> ## **START HERE. #99 IS ROOT-CAUSED AND FIXED (14z-111): CPU-Phobos was
-> ## playing DEMITRI's AI. Frozen as donovan-m14 / huitzil-m21 / pyron-m15 /
-> ## merged-m9, mark M8; board bundle `../mister_fieldtest_14z111/`.**
+> ## **START HERE. NOTHING IS RED. #99 IS CLOSED. The tree is green
+> ## (`run_all_static --strict` PASS 110/0/0) and everything is pushed.**
 > ##
-> ## **UPDATE 14z-112 (2026-08-27): (1) and (2) are DONE — FIELD VERDICT
-> ## GREEN. The board on bundle 14z111 (M8) does not crash on the Bishamon >
-> ## Phobos route that was 100% on M6/M7; four MAME recordings agree
-> ## (`tests/inp/play-merged-m9-01`, `run-merged-m9-02..04`, all guard-clean:
-> ## first-match, Anakaris>Victor>Phobos, Bishamon>Phobos, a full arcade run
-> ## to the ending, a lost-then-continued Phobos fight). #99 is CLOSED
-> ## (maintainer, 2026-08-27). #113 IS MEASURED AND VANILLA: one all-white
-> ## frame at every down (and intro/start), identical on stock vsavj —
-> ## `tests/test_down_flash_vanilla.sh` PASS; decision pending (close vs
-> ## opt-in softening), STATE "Decisions pending — #113". NEXT: #112 —
-> ## **THE ONE PIECE OF AUTHORING WORK QUEUED (maintainer, 2026-08-27):
-> ## PRODUCE THE MiSTer DOCUMENTATION/SKILL *SCOPE DOCUMENT* — and ONLY the
-> ## scope document, not the skills.** Deliverable: what skills should exist,
-> ## where each boundary falls, which existing docs feed which, and what is
-> ## known-stale. The split is already agreed and matches `docs/README.md`'s
-> ## own liftability test ("would this still be true if we abandoned the
-> ## roster hack tomorrow?"): **(1) the CPS-II / WIDE CORE level** — the
-> ## profile, the runtime profile bit (MRA header byte 41), the SDRAM map,
-> ## the simulation lane; all game-independent — and **(2) the VS-SPECIFIC
-> ## level** — this romset's placement, catalogue/MRA generation, the field
-> ## bundle.
-> ## **READ THE SOURCES, DO NOT WRITE FROM MEMORY.** ~4,000 lines:
+> ## **TWO THINGS ARE WAITING ON THE MAINTAINER'S HARDWARE — do not
+> ## re-derive them, just read the answer when it comes:**
+> ## **(1) #113** — the one-frame white-out at a down is MEASURED VANILLA
+> ## (identical on stock `vsavj` AND `vsav2`; gate
+> ## `tests/test_down_flash_vanilla.sh`). His MiSTer double-check closes it.
+> ## **(2) BUNDLE `../mister_fieldtest_14z112/`** — WIDE builds no longer
+> ## pack a patched `vsav.zip` (the four group-A members moved INSIDE
+> ## `vsavjw.zip`), so one SD card can hold this profile AND stock Vampire
+> ## Savior. `.rbf` UNCHANGED, wheel still M8, program fingerprint
+> ## `32007911` unchanged — packaging, not content. The question to answer
+> ## is whether STOCK vsav/vsavj now renders CORRECT art.
+> ##
+> ## **THE ONE PIECE OF AUTHORING WORK QUEUED: the MiSTer SCOPE DOCUMENT**
+> ## — scope only, NOT the skills. What skills should exist, where each
+> ## boundary falls, which docs feed which, what is known-stale. Split
+> ## agreed: **(1) CPS-II / WIDE CORE** (profile, the runtime profile bit =
+> ## MRA header byte 41, SDRAM map, simulation lane — game-independent) and
+> ## **(2) VS-SPECIFIC** (placement, catalogue/MRA generation, field
+> ## bundle). **READ THE ~4,000 LINES, DO NOT WRITE FROM MEMORY:**
 > ## `docs/platform/mister.md` (2063), `docs/project/mister_map.md` (1062),
 > ## `docs/project/cps2_wide.md` (635), `docs/project/mister_fit.md` (262).
-> ## Summarising from session memory is how a plausible sentence replaces a
-> ## measured one — 14z-112 produced TWO retractions from exactly that.
-> ## **EXPECT STALENESS AND HUNT IT:** `mister_mra.sh`'s header asserted "the
-> ## two legs need DIFFERENT vsav.zip files" and was true when written and
-> ## wrong by 14z-112; the scope doc should name what else is in that class.
-> ## Sits alongside the wider skill-distillation and living-documentation
-> ## directions in STATE "Decisions pending" — those remain UNSCHEDULED; this
-> ## scope document is the agreed first step.
+> ## HUNT STALENESS: `mister_mra.sh`'s header asserted "the two legs need
+> ## DIFFERENT vsav.zip files" — true when written, wrong by 14z-112.
 > ##
-> ## **STOCK VAMPIRE SAVIOR AND THE WIDE PROFILE NOW COEXIST ON ONE SD CARD
-> ## (14z-112).** Builds no longer pack a patched `vsav.zip`; the four patched
-> ## group-A members live inside `vsavjw.zip`. Bundle
-> ## `../mister_fieldtest_14z112/` — .rbf UNCHANGED, wheel still M8, program
-> ## fingerprint `32007911` unchanged (packaging, not content). AWAITING the
-> ## maintainer's board check: (1) WIDE still boots and says M8, (2) STOCK
-> ## vsav/vsavj now renders CORRECT art on any stock MRA, (3) the STOCK
-> ## CONTROL still boots. The rebuilt set is `build/m3b_merged17` — NOT
-> ## registered/frozen; a freeze is a separate decision.**
+> ## **THE COSMETIC BACKLOG (STATE, parked as ONE later pass):** win-quote
+> ## TEXT for ALL THREE tenants (each still shows its SHELL's quote; art is
+> ## already native), arcade ladder MAP NAMES + PICTURES, SELECT WHEEL
+> ## polish, and **#112** (Press of Death black foot — DECIDED cosmetic).
+> ## None is competitive-2P surface.
 > ##
-> ## **A COSMETIC BACKLOG NOW EXISTS (STATE "THE COSMETIC BACKLOG"), ruled a
-> ## single later pass: win-quote TEXT for ALL THREE tenants (each still shows
-> ## its SHELL's quote — art is already native), arcade ladder MAP NAMES and
-> ## PICTURES, character SELECT WHEEL polish, and #112. None scheduled; none
-> ## is competitive-2P surface.**
+> ## **IF YOU TOUCH #112 AGAIN, THE METHOD IS THE FINDING: DISASSEMBLE,
+> ## NEVER SCAN.** 14z-112 produced TWO retractions, both from byte scans
+> ## matching across instruction boundaries (`e768 7105` in base territory;
+> ## `0028394E` = a displacement word plus the next opcode). What IS
+> ## measured: the entire draw path is VANILLA down to the writer
+> ## instruction `PC 0x01B2BE` (byte-identical to stock), and WHY a tenant
+> ## runs that vanilla sequence is UNKNOWN. Do not re-derive the
+> ## eliminations — they are listed in STATE 14z-112.
 > ##
-> ## **#112 IS DECIDED (maintainer, 2026-08-27): ACCEPT AS COSMETIC (option
-> ## c). Giving tenants their own effect animation (a) is PARKED for a later
-> ## pass over the port's remaining cosmetic items; trimming the vanilla
-> ## sequence (b) is REFUSED — it is vanilla data, so editing it breaks the
-> ## superset invariant. The issue stays OPEN as the parked record. Do NOT
-> ## re-derive the eliminations (STATE 14z-112) and do NOT scan for pointers
-> ## when it is picked up again — DISASSEMBLE (two instruction-boundary false
-> ## positives were paid for: `e768 7105`, `0028394E`).**
+> ## **STATE OF THE BUILDS:** `build/m3b_merged17` is the repackaged set —
+> ## NOT registered, NOT frozen; freezing is a separate decision once the
+> ## board confirms. `build/` was swept to 2.9 GB (current + one back per
+> ## track). **Before deleting any build dir, grep FOUR places** — `tests/`,
+> ## `tools/`, **`build/manifest/`** and `docs/` — excluding comment lines,
+> ## and run `--strict` BEFORE committing: a fixture loss shows up as a
+> ## gate degrading to SKIP, not as a failure
+> ## (`docs/project/build_dir_triage.md`).
 > ##
-> ## (history) 14z-112 PROGRESS: Press of Death = Donovan's EX 41236+K (METER-GATED —
-> ## `POKES ff8509` to fire in a rig). Rigs reproduce the giant white/blue
-> ## foot on merged AND vsav2 (`tests/replays/112_don_pod_*.rpl`); the foot
-> ## is WHITE/correct in ~16 instances (Victor + Phobos, all strengths) —
-> ## the blue/BLACK did NOT reproduce, so it is NOT per-invocation RNG.
-> ## HYPOTHESIS: the foot's palette row is shared/unreserved and overwritten
-> ## mid-move under allocator pressure (busier scene/Dark Force/deeper
-> ## match). BLOCKED on the maintainer's trigger context (asked on #112:
-> ## Dark Force? hit during the move? which round/meter?). Then pin the
-> ## foot pal row (OBJ dump gives 05/0b) and compare its palette-RAM
-> ## contents white-vs-black, and merged-vs-vsav2 (the donor question).
-> ##
-> ## **(HISTORY, 14z-111 order):** (1) the field verdict on the board (bundle 14z111; the
-> ## wheel MUST say M8 — M7 means the old romset). (2) Replay any `.inp` the
-> ## maintainer left under `~/.cache/vampire-saved/inp/<name>/` on BOTH
-> ## merged15 and merged16 with `tools/run_inp_guarded.sh` (a Donovan-vs-CPU-
-> ## Bishamon crash would be a DIFFERENT mechanism). (3) Anything still red
-> ## in STATE 14z-111's freeze table. (4) Two cosmetics filed at close with
-> ## `tests/inp/play-merged-m9-01` as evidence: Press of Death blue/black
-> ## palette (GitHub #112) and the whole-screen flash at the first down
-> ## (GitHub #113) — the flash is a photosensitivity concern, take it before
-> ## the palette. First MAME verdict on merged-m9: the #99 protocol did NOT
-> ## crash (dragged near time-over, button spam).
-> ##
-> ## **THE MECHANISM, in one breath:** the four per-class CPU AI action-
-> ## script tables `PRG:0xBF01A/09A/11A/19A` are 16 classes + THE SAME 16
-> ## REPEATED (Capcom's aliasing guard); a tenant class read the aliased
-> ## row, so CPU-Phobos ran Demitri's scripts; Demitri's jump command writes
-> ## sub-state 0x0E; Phobos's private vs2 jump handler has 5 sub-states and
-> ## indexed off its table into data -> line-F at PRG:0x422BAC. CPU-only,
-> ## Phobos-only (the only tenant with a private jump handler), time-
-> ## dependent (the RNG must pick the script). Captured on the maintainer's
-> ## own MAME recording (`tests/inp/crash-merged-m8-01`, gate `test_inp_crash_merged_m8_01`)
-> ## with `tools/run_inp_guarded.sh` — a write tap on the game's exception-
-> ## code store at $FF0000, no debugger. The 110/110b fixes had been aimed
-> ## at a poke-contaminated capture never confirmed on the natural path.
-> ## The fix (option A, maintainer-chosen): bank_map `ai_script_0..3`
-> ## unparked + one DATA root per tenant = the tenants' OWN vs2 AI. Zero
-> ## code. WIDE-only (the stock twin has no hole; `optional = true` rows).
-> ##
-> ## **RULES PAID FOR:** a rig that wins fast cannot see a time-dependent
-> ## AI crash (keep-away, give the CPU time); "16 + the same 16" tables
-> ## alias tenants SILENTLY (audit every parked stride-0x80 row when a
-> ## tenant misbehaves only under CPU control); capture with the game's own
-> ## exception record on a HAND-PLAYED recording before theorising.
-> ##
-> ## **PUSH STATE at close:** see STATE 14z-111 CLOSE (`git ls-remote`).
-> ## The 14z-108 group rolls to STATE_HISTORY at close.
+> ## **RECORDINGS ARE INFRASTRUCTURE NOW:** playback stops at the end of
+> ## HUMAN input (`-exit_after_playback`, `PLAYBACK <n>` in every log), so
+> ## the attract demo can no longer be scored as play. Instruments:
+> ## `tools/run_inp_probe.sh` (video hash, HP/death, OBJ counts, snapshots,
+> ## OBJ dumps, `GFXRANGE`, `RECT_AUDIT`, `WRITETAP`, `FINDBYTES`),
+> ## `tools/run_inp_guarded.sh` (crash capture), `tools/audit_effect_rects.py`
+> ## (an INSTRUMENT, not a gate — read its header).
 
 # HISTORY BELOW — the 14z-109 orientation and older; kept for the census
 # anchors, eliminations and traps, superseded as the opener.
