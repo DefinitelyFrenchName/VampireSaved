@@ -1148,6 +1148,29 @@ after the changes (**PASS 108**, SKIP 0, FAIL 0, MISSING 0), with the tree
 clean under the run — the 14z-108 discipline (commit first, then run, then do
 not type) followed this time.
 
+**SPLIT 2026-08-20 (14z-99 post-freeze close, maintainer-approved): this
+file holds the RECENT session groups + THE LEDGER; the full detail of every
+older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
+- **Lookup**: "STATE 14z-XX" references resolve here first, then in
+  STATE_HISTORY.md — section names are preserved verbatim in the archive.
+  A reference to `STATE "Decisions pending"` for an entry no longer here
+  resolves in `DECISIONS_HISTORY.md` (entries move there verbatim once
+  ruled and no longer shaping work — 14z-109 cleanup).
+- **Claim-greps MUST include STATE_HISTORY.md** (the CLAUDE.md §5
+  retraction-discipline command names it).
+- **ROLLOVER RULE (part of the session-close ritual)**: after writing the
+  close entry, move session groups beyond the newest THREE to the TOP of
+  STATE_HISTORY.md's body (below its header) and append their one-line
+  entries to THE LEDGER below, composed from the group's own banner
+  headers. If this file still exceeds ~150 KB, roll the oldest kept group
+  early. Standing sections at the bottom of this file (decisions pending,
+  the deadness register, open bugs, findings log) are CURRENT STATE — they
+  never roll to STATE_HISTORY; entries within them are marked DECIDED/FIXED
+  in place, as always. **DECISIONS have their own archive since 14z-109:
+  once a ruled decision stops shaping active work, its entry moves
+  VERBATIM to `DECISIONS_HISTORY.md`** (grep there by topic; the §5
+  retraction grep covers it).
+
 # THE LEDGER — archived sessions, one line each (newest first)
 
 Full detail for every line: `STATE_HISTORY.md` (verbatim; grep the session
