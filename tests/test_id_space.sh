@@ -62,7 +62,7 @@ done
 
 echo "== vsavj: every id has storage, and the folding set is known =="
 want "no variant row is out-of-range" "$WORK/vsavj.txt" \
-     "40 tables x 16 variant ids: 619 alias, 21 distinct, 0 out-of-range"
+     "44 tables x 16 variant ids: 679 alias, 25 distinct, 0 out-of-range"   # 14z-111: +4 tables (bank_map ai_script_0..3, the CPU AI script tables) = +60 alias / +4 distinct variant rows in VANILLA (measured; was 40 tables / 619 / 21)
 want "the 5 register-path folding sites" "$WORK/vsavj.txt" \
      "mask #\$0f: 003E40 004082 00A43E 0409EC 04FAC4"
 want "the 2 direct-to-memory folds (id cycling)" "$WORK/vsavj.txt" \

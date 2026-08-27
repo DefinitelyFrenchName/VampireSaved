@@ -26,6 +26,11 @@
 #       wrong-art draw at vanilla bank-1 0x13890 (type 4 is a valid vanilla
 #       list type — no over-index, no crash surface). Re-open trigger: any
 #       type-4 dispatch with the list address inside a placed x2b7ef4 copy.
+#   x101aca 0x102436 (don, 14z-111)   FP — inside Donovan's CPU AI SCRIPT
+#       block (bank_map ai_script_*): word-offset command streams, 0 pointer
+#       fields by the segmented oracle (vhunt2 twin shift 0); a 4-entry
+#       window of stream words reads as list heads. Not a sprite list; the
+#       block is DATA the script interpreter walks with (a0)+.
 #   Everything else biased in the placed set is covered-child (the type-6
 #       takeover's own strip code serves those — the clone-beam lines among
 #       them since the row-31 fix) or orphan-12 noise (the tool's upper
@@ -90,6 +95,7 @@ check() { # tenant builddir manifest expected...
 
 echo "== #109-B biased-list inventory (filtered; verdicts in header) =="
 check donovan "$BUILD_D" build/manifest/donovan.toml \
+    "0x102436 x101aca 4" \
     "0x28a300 anim 4" \
     "0x2bc09a x2b7ef4 4" \
     "0x2bc0f8 x2b7ef4 4"

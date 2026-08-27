@@ -79,7 +79,7 @@ d = run([])
 print("== 1: the three span classes are frozen ==")
 eq("shared spans", len(d["shared"]), 17)
 eq("name collisions", len(d["name_clash"]), 8)
-eq("unique to one tenant", len(d["unique"]), 13)
+eq("unique to one tenant", len(d["unique"]), 15)   # 14z-111: +2 in this section's view = x100e3c (pyron) + x101aca (donovan), the CPU AI script blocks (x100000 shows in the second run's list)
 # The name collisions are TWO kinds wanting opposite treatment.
 clash = {e["name"]: e["spans"] for e in d["name_clash"]}
 generic = sorted(n for n, sp in clash.items()
@@ -90,7 +90,7 @@ eq("generic per-tenant names (need NAMESPACING)", generic,
    ["anim", "aux0_0", "aux0_1", "aux0_2", "code", "hitbox", "hitbox_proj"])
 eq("same start, different EXTENT", extent, ["x088512"])
 if not bad:
-    print("  ok: 17 shared / 8 collisions (7 generic + x088512's extent) / 13 unique")
+    print("  ok: 17 shared / 8 collisions (7 generic + x088512's extent) / 15 unique")
 
 print("== 2: shared spans CONFLICT — they cannot be placed once by dedup ==")
 FROZEN = {"x026142": (68, 54), "x028122": (45, 50),
@@ -162,7 +162,15 @@ echo "  (sections 1-4 are the FROZEN 14z-77 measurement on $BUILDS)"
 # one tenant" 13 -> 14 — the new huitzil-only #109 row-31 root region.
 # Only run when the caller did not name its own trio.
 if [ $# -eq 0 ]; then
-    echo "== 5: the CURRENT trio — don_m14 / hui48 / pyron32 =="
+    # RE-FROZEN 14z-111 (was 14 unique / 2033 conflicting / 7624 un-normalised;
+# x026142 (53,54) x028122 (39,50) x05c800 (461,368) x2b7ef4 (1063,1561)):
+# the #99 fix adds three UNIQUE regions (the tenants' CPU AI script blocks
+# x100000 / x100e3c / x101aca -> 17) and places Donovan's at the wide_ext
+# HEAD, shifting every huitzil/pyron ext region uniformly (+0x10D0 / +0x1ED0)
+# — the shared regions' tenant copies differ in placement-dependent bytes,
+# so the 1-differs counts and the totals move (2089 / 7604). The control's
+# superseded trio still measures 2000 and is still rejected.
+echo "== 5: the CURRENT trio — don_m14 / hui48 / pyron32 =="
     for b in $CUR_BUILDS; do
         [ -f "$b/patch/placements.json" ] || {
             echo "FAIL: current build $b has no patch/placements.json"; exit 1; }
@@ -184,24 +192,24 @@ def eq(what, got, want):
 d = run([])
 eq("shared spans", len(d["shared"]), 17)
 eq("name collisions", len(d["name_clash"]), 8)
-eq("unique to one tenant", len(d["unique"]), 14)
+eq("unique to one tenant", len(d["unique"]), 17)
 # The span figures MOVED from the 14z-77 trio, and that movement is the point:
 # 2000 -> 2033 at 14z-103 (2012 at 14z-90), spans shifting. A gate frozen only
 # on the old trio could not see this.
-FROZEN_CUR = {"x026142": (53, 54), "x028122": (39, 50),
-              "x05c800": (461, 368), "x2b7ef4": (1063, 1561)}
+FROZEN_CUR = {"x026142": (38, 69), "x028122": (36, 53),
+              "x05c800": (444, 385), "x2b7ef4": (1042, 1582)}
 for n, (solo, conf) in FROZEN_CUR.items():
     v = d["blobs"].get(n, {})
     eq("%s (1-differs, conflict)" % n, (v.get("solo"), v.get("conflict")),
        (solo, conf))
-eq("total conflicting bytes", d["total_conflict"], 2033)
+eq("total conflicting bytes", d["total_conflict"], 2089)
 und = sorted(n for n, v in d["blobs"].items() if v.get("undecidable"))
 eq("two-tenant spans reported undecidable", len(und), 13)
 
 # Same normalisation control as section 4: without it the figure is an
 # artefact of three independent allocators, not a fact about the content.
 raw = run(["--no-normalise"])
-eq("un-normalised total", raw["total_conflict"], 7624)
+eq("un-normalised total", raw["total_conflict"], 7604)
 if raw["total_conflict"] <= d["total_conflict"]:
     bad.append("normalisation did not reduce the count on the current trio")
 
@@ -209,7 +217,7 @@ if bad:
     print("  FAIL (current trio):")
     for b in bad: print("    " + b)
 else:
-    print("  ok: 2033 conflicting bytes over the same 4 spans (7624 raw);")
+    print("  ok: 2089 conflicting bytes over the same 4 spans (7604 raw);")
     print("      17 shared / 8 collisions / 14 unique / 13 undecidable —")
     print("      the SHAPE is unchanged from 14z-77, the figures moved")
 sys.exit(1 if bad else 0)
@@ -217,6 +225,6 @@ PY
 fi
 
 echo "PASS: region overlap frozen — 17 shared spans; 2000 conflicting bytes on"
-echo "      the 14z-77 trio and 2033 on the shipped trio, both asserted; the"
+echo "      the 14z-77 trio and 2089 on the shipped trio, both asserted; the"
 echo "      space demand per-tenant copies would create; and the normalisation"
 echo "      control that makes those numbers real"
