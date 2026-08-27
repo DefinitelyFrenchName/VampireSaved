@@ -14,10 +14,17 @@
 -- END <frames>.  env CHECKSUM_OUT, MAX_FRAMES (default 200000), OBJ_BASE,
 -- REPLAY (optional: drive a replay.lua script instead of a -playback .inp).
 -- POKES  (optional: replay.lua-grammar scheduled writes; e.g. meter bank).
+-- PAL_ROWS/PAL_BASE (optional: at DUMP_FRAMES, log palette rows 'NN,NN' from
+--   PAL_BASE (default 90c000, row=base+idx*0x20) as 16 u16 colours + a
+--   'dark=' luma sum, for the #112 white-vs-black foot diff).
 local out_path = os.getenv("CHECKSUM_OUT") or "inp_probe.log"
 local max_frames = tonumber(os.getenv("MAX_FRAMES") or "") or 200000
 local obj_base = tonumber(os.getenv("OBJ_BASE") or "708000", 16)
 local snap, dump = {}, {}
+local pal_base = tonumber(os.getenv("PAL_BASE") or "90c000", 16)
+local pal_rows = {}
+for tok in (os.getenv("PAL_ROWS") or ""):gmatch("[^,%s]+") do pal_rows[#pal_rows+1] = tonumber(tok, 16) end
+local pal_every = os.getenv("PAL_EVERY") ~= nil
 for tok in (os.getenv("SNAP_FRAMES") or ""):gmatch("[^,%s]+") do snap[tonumber(tok)] = true end
 for tok in (os.getenv("DUMP_FRAMES") or ""):gmatch("[^,%s]+") do dump[tonumber(tok)] = true end
 
@@ -125,6 +132,18 @@ emu.register_frame_done(function()
         space:read_u8(0xFF810E), space:read_u8(0xFF8109),
         space:read_u16(0xFF8782), space:read_u16(0xFF8B82), n0, n1,
         in_ports[1]:read(), in_ports[2]:read(), in_ports[3]:read()))
+    if (d or pal_every) and #pal_rows > 0 then
+        for _, r in ipairs(pal_rows) do
+            local o = pal_base + r * 0x20
+            local cols, dark = {}, 0
+            for i = 0, 15 do
+                local c = space:read_u16(o + i*2); cols[#cols+1] = string.format("%04x", c)
+                local R=(c>>8)&0xf; local G=(c>>4)&0xf; local B=c&0xf
+                dark = dark + R + G + B  -- CPS2 0xF_RGB; sum over the 16 colours = row brightness
+            end
+            f:write(string.format("P F%d row=%02x dark=%d %s\n", frame, r, dark, table.concat(cols, " ")))
+        end
+    end
     if snap[frame] then machine.video:snapshot(); f:write(string.format("SNAP %d %04d\n", frame, snaps)); snaps = snaps + 1 end
     if frame >= max_frames then f:write(string.format("END %d\n", frame)); f:close(); machine:exit() end
 end)
