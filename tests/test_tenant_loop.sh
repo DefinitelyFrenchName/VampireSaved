@@ -273,7 +273,7 @@ check_n() {  # check_n <label> <dir> <want ops> <sum of 1-tenant counts>
 # for huitzil (366 / 608 / 819): four tripwires in his jump handler x02592a
 # resolved by reconciliation_huitzil rows (0x2cbde/0x2ce0a/0x2ce3e/0x364a —
 # reachable only by his own AI). Mechanism + capture: STATE 14z-111,
-# tests/test_inp_crash_m10.sh.
+# tests/test_inp_crash_merged_m8_01.sh.
 check_n "2 tenants" "$WORK/two"   608 660
 check_n "3 tenants" "$WORK/three" 819 920
 

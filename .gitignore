@@ -27,6 +27,9 @@ cfg/
 nvram/
 diff/
 inp/
+# ...but the TRACKED recording corpus is the exception (14z-111, CLAUDE.md §4 "FIELD REPORTS ARE RECORDINGS")
+!tests/inp/
+!tests/inp/**
 snap/
 sta/
 mame.ini

@@ -567,7 +567,7 @@ note = "per-char effect-handler pointer table (id-indexed longs, zero = skip; PE
 # calls four engine routines that were TRIPWIRED (open rows) because no CPU
 # Phobos ever ran HIS OWN AI scripts before — the aliased tables handed him
 # Demitri's. With his vs2 scripts unparked (bank_map ai_script_*), the
-# first fire was vs2 0x2cbde (natural-path .inp crash_m10 played on the
+# first fire was vs2 0x2cbde (natural-path .inp crash-merged-m8-01 played on the
 # probe: vec4 at the tripwire, trace = 0x25a96's jsr via the +0x3b4
 # branch). All four resolved in one pass, twins measured 14z-111:
 [[map]]
@@ -575,7 +575,7 @@ vsav2 = 0x02cbde
 vsavj = 0x02d3f2
 kind = "engine_sub"
 status = "verified"
-note = "14z-111: seq/command helper (+0x243 sub-dispatch, +0x208 countdown); 0x46 bytes BYTE-IDENTICAL to the rts, pc-rel table included. Fired on crash_m10 vs the AI-script probe."
+note = "14z-111: seq/command helper (+0x243 sub-dispatch, +0x208 countdown); 0x46 bytes BYTE-IDENTICAL to the rts, pc-rel table included. Fired on crash-merged-m8-01 vs the AI-script probe."
 
 [[map]]
 vsav2 = 0x02ce0a

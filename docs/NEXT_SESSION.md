@@ -20,7 +20,7 @@
 > ## indexed off its table into data -> line-F at PRG:0x422BAC. CPU-only,
 > ## Phobos-only (the only tenant with a private jump handler), time-
 > ## dependent (the RNG must pick the script). Captured on the maintainer's
-> ## own MAME recording (`tests/inp/crash_m10`, gate `test_inp_crash_m10`)
+> ## own MAME recording (`tests/inp/crash-merged-m8-01`, gate `test_inp_crash_merged_m8_01`)
 > ## with `tools/run_inp_guarded.sh` — a write tap on the game's exception-
 > ## code store at $FF0000, no debugger. The 110/110b fixes had been aimed
 > ## at a poke-contaminated capture never confirmed on the natural path.

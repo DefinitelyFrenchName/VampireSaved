@@ -308,3 +308,17 @@ Nothing has been moved or deleted; this is the decision input only.
 3. Delete `build/_attic` after a soak period of your choosing.
 
 **Standing guard afterwards:** `test_build_ref_rot.sh` already reports default-currency; if the attic pass turns up a gate that depended on a dir nobody named, that gate gets a re-point and the register a row — the #94 class, caught deliberately instead of by rot.
+
+## Recordings (`tests/inp/`, `~/.cache/vampire-saved/inp/`) — 14z-111, maintainer-ruled
+
+- A hand-played MAME recording is tracked under `tests/inp/<what>-<freeze set>-NN/`
+  (the freeze it was played on; `NOTE` says what it exercises) the moment it
+  has a consumer (`tests/test_inp_corpus.sh` replays all of them at every
+  freeze). The `~/.cache/.../inp/<name>/` original is deleted once tracked.
+- A recording with no consumer — a plain-play attempt, an aborted take, a
+  smoke run nothing names — is deleted after `grep -rn <name> tests tools
+  docs HANDOFF.md STATE.md CLAUDE.md` comes back empty. Applied at close
+  14z-111: `crash_m8` (82 KB, plays clean on merged-m8), `crash_m9` (~500
+  frames, abort), `smoketest` (14z-9x, unreferenced) deleted; `crash_m10`
+  renamed to `crash-merged-m8-01` and its cache copy deleted.
+

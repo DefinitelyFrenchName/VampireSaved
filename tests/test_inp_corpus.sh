@@ -8,12 +8,16 @@
 # no crash report was ever captured as one. Three sessions and two shipped
 # fixes (14z-110, 14z-110b) were spent on a rig-derived, poke-contaminated
 # mechanism that was never the field crash; the maintainer's FIRST recording
-# (tests/inp/crash_m10) found the real one in an evening. The tooling was
+# (tests/inp/crash-merged-m8-01) found the real one in an evening. The tooling was
 # never the gap — its systematic use was. So:
 #   * every reproducible field/playtest crash is captured as a WIDE_RECORD
 #     .inp BEFORE any theory (CLAUDE.md §4, "FIELD REPORTS ARE RECORDINGS");
 #   * every recording is tracked under tests/inp/<name>/ (force-added, like
-#     savestates) with a one-line NOTE file saying what it exercises;
+#     savestates) with a one-line NOTE file saying what it exercises, NAMED
+#     <what>-<freeze set>-NN after the freeze it was PLAYED on
+#     (crash-merged-m8-01), never the mark or the session;
+#   * the ~/.cache copy is deleted once tracked; untracked, unreferenced
+#     recordings are deleted after a grep (CLAUDE.md §4);
 #   * this gate replays ALL of them under tests/lua/inp_guard.lua at every
 #     freeze and fails on the first exception anywhere.
 # A recording that still crashes on purpose (a captured-but-unfixed defect)

@@ -2,7 +2,7 @@
 
 ## 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail
 
-**Mechanism (captured on the maintainer's natural-path `.inp`, `tests/inp/crash_m10`):**
+**Mechanism (captured on the maintainer's natural-path `.inp`, `tests/inp/crash-merged-m8-01`):**
 the four per-class CPU AI action-script tables `PRG:0xBF01A / 0xBF09A /
 0xBF11A / 0xBF19A` (consumers `0x2CCB6 / 0x2CCF2 / 0x2CD40 / 0x2CD9C` —
 row = `+0x382 << 2`; channel starts `+0x210(+0x224) / +0x214 / +0x218 /
@@ -48,7 +48,7 @@ same-address entry, callee is vsavj's own).
 
 **Op deltas:** +5 per tenant (1 region op + 4 pokes), -4 huitzil tripwires:
 solos 332/366/303, N=2 608/660, N=3 819/920 (`test_tenant_loop`).
-**Acceptance:** `tests/test_inp_crash_m10.sh MODE=clean` PASS on the merged
+**Acceptance:** `tests/test_inp_crash_merged_m8_01.sh MODE=clean` PASS on the merged
 probe `0df398ff`. Stock twin MOVES (data rows, not profile-gated).
 
 ## 14z-110b — the 0x51 -> 0x44 state remap: byte detail

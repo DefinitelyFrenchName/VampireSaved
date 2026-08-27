@@ -490,7 +490,7 @@ stride = 0x80
 # (0x10) / class 1's (0x11) / class 3's (0x13) AI scripts; Demitri's jump
 # command writes sub-state 0x0E, which Phobos's private vs2 jump handler
 # (5 sub-states) indexes off its table into data -> line-F (the field
-# crash, captured on the maintainer's .inp, tests/test_inp_crash_m10.sh).
+# crash, captured on the maintainer's .inp, tests/test_inp_crash_merged_m8_01.sh).
 # The rows point into the vs2 AI script pool 0x100000-0x102B98 (one
 # contiguous block per tenant, vhunt2 twin at shift 0), extracted as DATA
 # extra roots per tenant (tools/build_donovan.sh) — region = "auto" picks

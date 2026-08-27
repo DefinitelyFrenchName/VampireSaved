@@ -257,7 +257,14 @@ legacy behavior is a failed change.
   board or on MAME — is captured FIRST as a hand-played MAME recording
   (`WIDE_RECORD=<name> tools/run_wide.sh <build> mame`), BEFORE any
   mechanism theory, and tracked under `tests/inp/<name>/` (force-added,
-  with a one-line `NOTE`). `tools/run_inp_guarded.sh` plays it back with a
+  with a one-line `NOTE`). **NAMING: `<what>-<freeze set>-NN`** — the
+  freeze the recording was PLAYED on, never the mark or the session
+  (`crash-merged-m8-01`: 110b shipped merged-m8 under the same M7 mark as
+  merged-m7, and "14z-110" is two freezes) — so a replay is always tied to
+  the exact image it was made on. **CLEANUP (maintainer-ruled 14z-111):
+  the `~/.cache/vampire-saved/inp/<name>/` copy is deleted once tracked; a
+  recording that is neither tracked nor named by any gate/doc (grep first)
+  is deleted, not kept "just in case" — a plain-play attempt has no value.** `tools/run_inp_guarded.sh` plays it back with a
   write tap on the game's OWN exception-code store (`RAM:$FF0000`) — no
   debugger, faithful playback — and yields the vector, fault PC, registers
   and stack at the instruction; `INP_DEBUG=1 TRACE_FROM=` adds the

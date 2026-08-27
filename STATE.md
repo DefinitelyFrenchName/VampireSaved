@@ -8,9 +8,10 @@
 | | |
 |---|---|
 | opened with | the 14z-110b close-ritual audit: 3 stale items fixed (uncommitted H/P M7 bumps behind committed pins; no 110b HANDOFF row; patch_index "NOT YET BUILT"), 110b acceptance re-runs GREEN, FBNeo oracle refit landed, tags cut, the re-point sweep + build-dir policy applied |
-| the turn | the maintainer's board AND hand-played MAME both still crashed on merged-m8 -> the maintainer recorded it (`tests/inp/crash_m10`) -> `tools/run_inp_guarded.sh` (write tap on the game's own `$FF0000` exception store) captured vec11 at `PRG:0x422BAC` on the natural path -> trace + write taps -> the four CPU AI script tables, 16 classes + the same 16 repeated |
+| the turn | the maintainer's board AND hand-played MAME both still crashed on merged-m8 -> the maintainer recorded it (`tests/inp/crash-merged-m8-01`) -> `tools/run_inp_guarded.sh` (write tap on the game's own `$FF0000` exception store) captured vec11 at `PRG:0x422BAC` on the natural path -> trace + write taps -> the four CPU AI script tables, 16 classes + the same 16 repeated |
 | the fix | bank_map `ai_script_0..3` (data_ptr, `region = "auto"`, `optional = true`) + one DATA root per tenant + `region_space x101aca=wide_ext` + 4 `reconciliation_huitzil` rows (Phobos's own AI reached tripwires) + M8 mark; WIDE-only (stock twin unchanged). The pinned merged extract inputs (`build/{m5_wide,hui32,pyron21}/extract`) REGENERATED deliberately (old kept as `extract.pre-14z111`, untracked); `build/merged1` (the legacy-only instrument) rebuilt by audit_merged_legacy — both committed |
-| green at close | test_inp_crash_m10 MODE=clean (default) PASS · don_vs_cpu · merged_legacy 47/47 · guard corpus 332/332 on merged16 · stage-4 · m3a (all pins + whole-artifact re-attributed) · tenant_loop · pointer_flow / pcrel / escape_triage / region_overlap(+control) / id_space / biased-list re-frozen with attribution · suites GREEN x3 under --freeze AND x3 verify (tenant .sha1s moved only by `$FF06CC/CD`, state identical; H/P gained the 107-110 expectations they never had) · MiSTer twin + mra-map · bundle WIDE 31/31 · `run_all_static --strict` FINAL: **PASS 110 / SKIP 0 / FAIL 0 / MISSING 0** (after the biased-list hui46 pin and a hollowed jtsim scratch clone — platform gotcha) |
+| green at close | test_inp_crash_merged_m8_01 MODE=clean (default) PASS · don_vs_cpu · merged_legacy 47/47 · guard corpus 332/332 on merged16 · stage-4 · m3a (all pins + whole-artifact re-attributed) · tenant_loop · pointer_flow / pcrel / escape_triage / region_overlap(+control) / id_space / biased-list re-frozen with attribution · suites GREEN x3 under --freeze AND x3 verify (tenant .sha1s moved only by `$FF06CC/CD`, state identical; H/P gained the 107-110 expectations they never had) · MiSTer twin + mra-map · bundle WIDE 31/31 · `run_all_static --strict` FINAL: **PASS 110 / SKIP 0 / FAIL 0 / MISSING 0** (after the biased-list hui46 pin and a hollowed jtsim scratch clone — platform gotcha) |
+| naming/cleanup | recordings are `<what>-<freeze set>-NN` (`crash_m10` -> `crash-merged-m8-01`, gate `test_inp_crash_merged_m8_01`); unreferenced cache recordings deleted (crash_m8 plain-play, crash_m9 abort, smoketest) — rule in CLAUDE.md §4 + build_dir_triage.md |
 | the law | **FIELD REPORTS ARE RECORDINGS** (maintainer-ruled at close): CLAUDE.md §4 clause + `tests/test_inp_corpus.sh` (every tracked `.inp` replayed at every freeze, PASS 1/1 on merged16) + HANDOFF/gotcha — the tooling had existed since 14z-9x; its use was not systematic, and 14z-109..111 paid for that with two shipped non-fixes |
 | not done | the field verdict (the maintainer's board, bundle 14z111, tell = M8); the maintainer's other-crash provocations (replay any new `.inp` on both builds); the probe capture dir `build/inp_guard/` kept untracked as evidence |
 | push | main + fork pushed (`git ls-remote`, not prose); tags `freeze/{donovan-m14,huitzil-m21,pyron-m15,merged-m9}` cut and pushed at close |
@@ -64,7 +65,7 @@ survive in the session scratchpad (`refit/`, ~22 frames × 4 replays).
 |---|---|
 | builds | don_m14 `772d8052` / hui48 `cd362ca4` / pyron32 `c403a283` / merged16 `32007911` / stock9 = `d29fd062` (donovan-m13-stock, program identical: WIDE-only port, gfx-only mark) |
 | layout | Donovan's `x101aca` at the wide_ext HEAD (`region_space`, after a hole_a placement cascaded 56 regions — measured); every ext region behind it +0x10D0 (hui) / +0x1ED0 (pyr) / +0x2B60 (pools) — uniform, verdicts unchanged |
-| acceptance | `test_inp_crash_m10` MODE=clean PASS on merged16 (default flipped); defect mode still reproduces on merged15 |
+| acceptance | `test_inp_crash_merged_m8_01` MODE=clean PASS on merged16 (default flipped); defect mode still reproduces on merged15 |
 | validations on merged16 | don_vs_cpu PASS (3 CPU legs, own AI) · merged_legacy PASS 47/47 · guard corpus 332/332 · stage-4 PASS (target unchanged) · m3a PASS (all pins + whole-artifact manifests, per-member attributed; 07b = 16 bytes of existing repoints whose targets shifted) · tenant_loop 332/366/303, 608/660, 819/920 · pointer_flow / pcrel / escape_triage re-frozen with attribution · MiSTer twin + mra-map PASS |
 | suites | donovan-m14 GREEN (12 tenant .sha1s moved: ONLY `$FF06CC/CD`, an execution-position return-address word one slot below the ratified secondary-stack window, at select entry f890 and match-start windows; state byte-identical — measured at 9 frames) · huitzil-m21 GREEN · pyron-m15 (in flight at the time of writing) · verify passes in flight |
 | release / MiSTer | `release/merged-m9` (M8) · fork `63496069` pushed, pin bumped, patch 0024 · bundle `../mister_fieldtest_14z111/` = merged-m9, WIDE 31/31, .rbf unchanged, **tell = M8** |
@@ -79,7 +80,7 @@ new `region = "auto"`), one DATA extra root per tenant for his vs2 AI block,
 four `reconciliation_huitzil` rows for the tripwires Phobos's own AI reaches
 (`0x2cbde/0x2ce0a/0x2ce3e/0x364a` — the R1 loop's first fire, twins
 measured), `test_tenant_loop` re-frozen (+5/tenant, -4 hui tripwires).
-**ACCEPTANCE: `test_inp_crash_m10 MODE=clean` PASS on the merged probe
+**ACCEPTANCE: `test_inp_crash_merged_m8_01 MODE=clean` PASS on the merged probe
 `0df398ff`** — the maintainer's recording plays through with zero
 exceptions (defect mode on merged15 still PASSes = the capture is stable).
 Interpreter equivalence measured (patch_notes 14z-111). Docs landed:
@@ -93,7 +94,7 @@ flip the gate to MODE=clean default with BUILD re-pointed, MiSTer CRC tail.
 The maintainer is meanwhile provoking OTHER crashes on MAME with recording
 armed (a Donovan-vs-CPU-Bishamon crash would be a different mechanism).
 
-### #99 ROOT CAUSE — CAPTURED ON THE NATURAL PATH (maintainer's .inp `crash_m10`, 14z-111)
+### #99 ROOT CAUSE — CAPTURED ON THE NATURAL PATH (maintainer's .inp `crash-merged-m8-01`, 14z-111)
 
 **The crash:** frame 4806, **vec11 (line-F)** at `PRG:0x422BAC` = inside
 `x05c800@huitzil` DATA (a per-class (dx,dy) table right after an `rts`),
@@ -154,14 +155,14 @@ Also: bump the version mark to **M8** at the fix freeze — the 110b freeze
 shipped the same "M7" as its predecessor, so the field could not tell the
 builds apart by eye (paid for tonight).
 
-**Gate:** `tests/test_inp_crash_m10.sh` (MODE=defect PASS on merged15 —
+**Gate:** `tests/test_inp_crash_merged_m8_01.sh` (MODE=defect PASS on merged15 —
 CRASH 4806 vec11 PC 422bac frozen; flip to MODE=clean with the fix). The
-recording is tracked at `tests/inp/crash_m10/` (40 KB + nvram).
+recording is tracked at `tests/inp/crash-merged-m8-01/` (40 KB + nvram).
 
 **Instrument that got it:** `tools/run_inp_guarded.sh` + `tests/lua/inp_guard.lua`
 (cheap-mode write tap on the game's exception-code store; `INP_DEBUG=1
 TRACE_FROM=` for the instruction trace, `WATCH=` write ring). The .inp is
-`~/.cache/vampire-saved/inp/crash_m10/` (hand it into tests/ — persistent
+`~/.cache/vampire-saved/inp/crash-merged-m8-01/` (hand it into tests/ — persistent
 suite doctrine — before close). NOTE the soft-reset RAM test writes 0..9 to
 `$FF0000` too (CRASH lines with SP=0 after the real one): filter pending.
 
