@@ -1,4 +1,4 @@
-source set /Users/koneko/Developer/Vampire_Saved/ROMS/vsav2.zip:
+source set /Users/koneko/Developer/Vampire_Saved/VampireSaved/../ROMS/vsav2.zip:
   vsav2.zip/vs2j.03  sha1 a52f40618d7f12f1df5862ad8e15fea60bef22a2
   vsav2.zip/vs2j.04  sha1 bf5c2e4339e1a66b3c819900cc9b723a537adf6b
   vsav2.zip/vs2j.05  sha1 4d5625a9a06926c1a42c8f6e3a4c943f17750ec2
@@ -7,7 +7,7 @@ source set /Users/koneko/Developer/Vampire_Saved/ROMS/vsav2.zip:
   vsav2.zip/vs2j.08  sha1 de1184ab771c6f075cdefa744a28b09f78d91643
   vsav2.zip/vs2j.09  sha1 0e9dd54e401e6d7c4fe81107ffd27e42ca810fcb
   vsav2.zip/vs2j.10  sha1 bf0416df66a33c7a4678ab4a047de334dfd3b31e
-oracle set /Users/koneko/Developer/Vampire_Saved/ROMS/vhunt2.zip:
+oracle set /Users/koneko/Developer/Vampire_Saved/VampireSaved/../ROMS/vhunt2.zip:
   vhunt2.zip/vh2j.03a  sha1 f4e3a1b6ae823737d3b18561469f206921b48587
   vhunt2.zip/vh2j.04a  sha1 78c53f8e984b00245486b751515248879df77437
   vhunt2.zip/vh2j.05  sha1 60bbbd1765e76839b01c38765da2368c5188ec61
@@ -48,6 +48,7 @@ extra region x022400: twin 0x02242E (shift +0x2e), len 0x1600
   x06cac0: raw DATA tail from +0xca8 (0x214 bytes emitted unencrypted for runtime DATA reads)
   x06cac0: forced tail +0xc00..+0xebc (0x2bc bytes) marked dead — unvalidated, copied verbatim (`:f`)
 extra region x06cac0: twin 0x06CC34 (shift +0x174), len 0xEBC
+extra region x100000: DATA (segmented oracle), twin 0x100000, len 0xE3C, 0 pointer fields, 1 segments, 0 dead zones (0x0 bytes unaligned)
 region hitbox: vsav2 0x0C4250+0x32B2 (data, shift bank)
 region hitbox_proj: vsav2 0x0D05C0+0x3C6 (data, shift bank)
 region anim: vsav2 0x245872+0xC900 (data, shift anim)
@@ -76,6 +77,7 @@ region x0926e4: vsav2 0x0926E4+0x100 (code, shift x0926e4)
 region x02592a: vsav2 0x02592A+0x456 (code, shift x02592a)
 region x022400: vsav2 0x022400+0x1600 (code, shift x022400)
 region x06cac0: vsav2 0x06CAC0+0xEBC (code, shift x06cac0)
+region x100000: vsav2 0x100000+0xE3C (data, shift x100000)
   anim: grown to +0x1E800 to close 2479 forward refs
   DISCOVERED shift aux0 (-0x2002c): 3000 referencing fields, 2 cluster regions
   hitbox: 0 pointer fields, 4 variant-site bytes (0.03%)
@@ -129,6 +131,7 @@ region x06cac0: vsav2 0x06CAC0+0xEBC (code, shift x06cac0)
   x022400: non-internal refs {'engine': 17, 'bank_ref': 4}
   x06cac0: 72 pointer fields, 0 variant-site bytes (0.00%)
   x06cac0: non-internal refs {'engine': 65, 'bank_ref': 2}
+  x100000: 0 pointer fields, 0 variant-site bytes (0.00%)
   aux0_0: 0 pointer fields, 0 variant-site bytes (0.00%)
   aux0_1: 0 pointer fields, 0 variant-site bytes (0.00%)
   code: 2 same-value engine refs merged from the scanner (sibling-coincident operands)
@@ -140,7 +143,7 @@ region x06cac0: vsav2 0x06CAC0+0xEBC (code, shift x06cac0)
   x026142: 3 char-id 0x10 immediates (rewritten to the dst slot at generation)
   x028122: 2 same-value engine refs merged from the scanner (sibling-coincident operands)
   x028122: 5 char-id 0x10 immediates (rewritten to the dst slot at generation)
-  x088512: 333 scanner-derived refs (source-only region); bare longs: 0 sibling-confirmed, 36 vetoed (operand bytes), 1 rejected (conflicting evidence), 11 rejected (divergent zone, unlabeled)
+  x088512: 333 scanner-derived refs (source-only region); bare longs: 0 sibling-confirmed, 145 vetoed (operand bytes), 3 rejected (conflicting evidence), 11 rejected (divergent zone, unlabeled)
   x0692f6: 1 same-value engine refs merged from the scanner (sibling-coincident operands)
   x02592a: 3 same-value engine refs merged from the scanner (sibling-coincident operands)
   x022400: 11 same-value engine refs merged from the scanner (sibling-coincident operands)
@@ -148,5 +151,5 @@ region x06cac0: vsav2 0x06CAC0+0xEBC (code, shift x06cac0)
   x06cac0: 7 same-value engine refs merged from the scanner (sibling-coincident operands)
   code scan: 1153 candidates, 1151 engine/ROM refs (R1 surface), 0 char-id 0x10 immediates
 
-values: 24 rows; engine dispatch entries: 1; auto tables: 21 (0 UNRESOLVED)
+values: 28 rows; engine dispatch entries: 1; auto tables: 21 (0 UNRESOLVED)
 EXTRACTION OK (oracle-validated)

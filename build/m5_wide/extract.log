@@ -1,4 +1,4 @@
-source set /Users/koneko/Developer/Vampire_Saved/ROMS/vsav2.zip:
+source set /Users/koneko/Developer/Vampire_Saved/VampireSaved/../ROMS/vsav2.zip:
   vsav2.zip/vs2j.03  sha1 a52f40618d7f12f1df5862ad8e15fea60bef22a2
   vsav2.zip/vs2j.04  sha1 bf5c2e4339e1a66b3c819900cc9b723a537adf6b
   vsav2.zip/vs2j.05  sha1 4d5625a9a06926c1a42c8f6e3a4c943f17750ec2
@@ -7,7 +7,7 @@ source set /Users/koneko/Developer/Vampire_Saved/ROMS/vsav2.zip:
   vsav2.zip/vs2j.08  sha1 de1184ab771c6f075cdefa744a28b09f78d91643
   vsav2.zip/vs2j.09  sha1 0e9dd54e401e6d7c4fe81107ffd27e42ca810fcb
   vsav2.zip/vs2j.10  sha1 bf0416df66a33c7a4678ab4a047de334dfd3b31e
-oracle set /Users/koneko/Developer/Vampire_Saved/ROMS/vhunt2.zip:
+oracle set /Users/koneko/Developer/Vampire_Saved/VampireSaved/../ROMS/vhunt2.zip:
   vhunt2.zip/vh2j.03a  sha1 f4e3a1b6ae823737d3b18561469f206921b48587
   vhunt2.zip/vh2j.04a  sha1 78c53f8e984b00245486b751515248879df77437
   vhunt2.zip/vh2j.05  sha1 60bbbd1765e76839b01c38765da2368c5188ec61
@@ -28,6 +28,7 @@ extra region x065c22: twin 0x065C56 (shift +0x34), len 0x100
 extra region x065e5a: twin 0x065E8E (shift +0x34), len 0x106A
 extra region x066ec4: twin 0x066EF8 (shift +0x34), len 0x2B8
 extra region x06717c: twin 0x0671B0 (shift +0x34), len 0x154
+extra region x101aca: DATA (segmented oracle), twin 0x101ACA, len 0x10CE, 0 pointer fields, 1 segments, 0 dead zones (0x0 bytes unaligned)
 region hitbox: vsav2 0x0C8BB8+0x25C2 (data, shift bank)
 region hitbox_proj: vsav2 0x0D0CA8+0x1000 (data, shift bank)
 region anim: vsav2 0x27F548+0xFA00 (data, shift anim)
@@ -43,6 +44,7 @@ region x065c22: vsav2 0x065C22+0x100 (code, shift x065c22)
 region x065e5a: vsav2 0x065E5A+0x106A (code, shift x065e5a)
 region x066ec4: vsav2 0x066EC4+0x2B8 (code, shift x066ec4)
 region x06717c: vsav2 0x06717C+0x154 (code, shift x06717c)
+region x101aca: vsav2 0x101ACA+0x10CE (data, shift x101aca)
   anim: grown to +0x20F00 to close 2710 forward refs
   DISCOVERED shift aux0 (-0x2002c): 2535 referencing fields, 5 cluster regions
   hitbox: 0 pointer fields, 24 variant-site bytes (0.25%)
@@ -70,6 +72,7 @@ region x06717c: vsav2 0x06717C+0x154 (code, shift x06717c)
   x066ec4: non-internal refs {'engine': 11}
   x06717c: 13 pointer fields, 0 variant-site bytes (0.00%)
   x06717c: non-internal refs {'engine': 10}
+  x101aca: 0 pointer fields, 0 variant-site bytes (0.00%)
   aux0_0: 0 pointer fields, 0 variant-site bytes (0.00%)
   aux0_1: 0 pointer fields, 0 variant-site bytes (0.00%)
   aux0_2: 0 pointer fields, 0 variant-site bytes (0.00%)
@@ -80,10 +83,10 @@ region x06717c: vsav2 0x06717C+0x154 (code, shift x06717c)
   x028122: 2 same-value engine refs merged from the scanner (sibling-coincident operands)
   x088512: 1 char-id 0x13 immediates (rewritten to the dst slot at generation)
   x088512: 9 PC-rel escape entries (9 distinct targets) — rewritten per placement, unresolved -> tripwire
-  x088512: 251 scanner-derived refs (source-only region); bare longs: 0 sibling-confirmed, 43 vetoed (operand bytes), 1 rejected (conflicting evidence), 1 rejected (divergent zone, unlabeled)
+  x088512: 251 scanner-derived refs (source-only region); bare longs: 0 sibling-confirmed, 47 vetoed (operand bytes), 1 rejected (conflicting evidence), 1 rejected (divergent zone, unlabeled)
   x0905ae: 2 PC-rel escape entries (1 distinct targets) — rewritten per placement, unresolved -> tripwire
   x0905ae: 10 scanner-derived refs (source-only region); bare longs: 0 sibling-confirmed, 3 vetoed (operand bytes), 0 rejected (conflicting evidence), 0 rejected (divergent zone, unlabeled)
   code scan: 1293 candidates, 1292 engine/ROM refs (R1 surface), 0 char-id 0x13 immediates
 
-values: 23 rows; engine dispatch entries: 0; auto tables: 21 (0 UNRESOLVED)
+values: 28 rows; engine dispatch entries: 0; auto tables: 21 (0 UNRESOLVED)
 EXTRACTION OK (oracle-validated)

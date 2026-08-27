@@ -34,7 +34,6 @@
   "x069046": 52,
   "x0692f6": 52,
   "x06965e": 52,
-  "x100e3c": 0,
   "aux0": -131116
  },
  "regions": {
@@ -52258,17 +52257,6 @@
    "charid_sites": [],
    "sha1": "3483340bb663b54f905d9f3adea3dd4d8f763d08"
   },
-  "x100e3c": {
-   "src": 1052220,
-   "orc": 1052220,
-   "len": 3214,
-   "kind": "data",
-   "shift": "x100e3c",
-   "pre_classified": true,
-   "refs": [],
-   "variant_sites": [],
-   "sha1": "483a5c39fa2200e61bfca5f05543683a268c42af"
-  },
   "aux0_0": {
    "src": 3359088,
    "orc": 3227972,
@@ -67092,34 +67080,6 @@
    "kind": "data_ptr",
    "ptr": "0xc8b18",
    "region": "hitbox",
-   "inside_region": true
-  },
-  {
-   "table": "ai_script_0",
-   "kind": "data_ptr",
-   "ptr": "0x100e3c",
-   "region": "x100e3c",
-   "inside_region": true
-  },
-  {
-   "table": "ai_script_1",
-   "kind": "data_ptr",
-   "ptr": "0x100f28",
-   "region": "x100e3c",
-   "inside_region": true
-  },
-  {
-   "table": "ai_script_2",
-   "kind": "data_ptr",
-   "ptr": "0x101814",
-   "region": "x100e3c",
-   "inside_region": true
-  },
-  {
-   "table": "ai_script_3",
-   "kind": "data_ptr",
-   "ptr": "0x101ab4",
-   "region": "x100e3c",
    "inside_region": true
   }
  ],

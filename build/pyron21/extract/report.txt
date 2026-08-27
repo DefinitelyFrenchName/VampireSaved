@@ -18,6 +18,7 @@ extra region x068c78: twin 0x068CAC (shift +0x34), len 0x3CE
 extra region x069046: twin 0x06907A (shift +0x34), len 0x2B0
 extra region x0692f6: twin 0x06932A (shift +0x34), len 0x368
 extra region x06965e: twin 0x069692 (shift +0x34), len 0x100
+extra region x100e3c: DATA (segmented oracle), twin 0x100E3C, len 0xC8E, 0 pointer fields, 1 segments, 0 dead zones (0x0 bytes unaligned)
 region hitbox: vsav2 0x0C7502+0x16B6 (data, shift bank)
 region hitbox_proj: vsav2 0x0D0986+0x322 (data, shift bank)
 region anim: vsav2 0x264086+0xAD00 (data, shift anim)
@@ -40,6 +41,7 @@ region x068c78: vsav2 0x068C78+0x3CE (code, shift x068c78)
 region x069046: vsav2 0x069046+0x2B0 (code, shift x069046)
 region x0692f6: vsav2 0x0692F6+0x368 (code, shift x0692f6)
 region x06965e: vsav2 0x06965E+0x100 (code, shift x06965e)
+region x100e3c: vsav2 0x100E3C+0xC8E (data, shift x100e3c)
   anim: grown to +0x1B500 to close 1805 forward refs
   DISCOVERED shift aux0 (-0x2002c): 1614 referencing fields, 3 cluster regions
   hitbox: 0 pointer fields, 0 variant-site bytes (0.00%)
@@ -81,6 +83,7 @@ region x06965e: vsav2 0x06965E+0x100 (code, shift x06965e)
   x0692f6: non-internal refs {'engine': 18}
   x06965e: 8 pointer fields, 0 variant-site bytes (0.00%)
   x06965e: non-internal refs {'engine': 6}
+  x100e3c: 0 pointer fields, 0 variant-site bytes (0.00%)
   aux0_0: 0 pointer fields, 0 variant-site bytes (0.00%)
   aux0_1: 0 pointer fields, 0 variant-site bytes (0.00%)
   aux0_2: 0 pointer fields, 0 variant-site bytes (0.00%)
@@ -88,6 +91,6 @@ region x06965e: vsav2 0x06965E+0x100 (code, shift x06965e)
   x05c800: 27 same-value engine refs merged from the scanner (sibling-coincident operands)
   x026142: 4 same-value engine refs merged from the scanner (sibling-coincident operands)
   x028122: 2 same-value engine refs merged from the scanner (sibling-coincident operands)
-  x088512: 333 scanner-derived refs (source-only region); bare longs: 0 sibling-confirmed, 58 vetoed (operand bytes), 1 rejected (conflicting evidence), 8 rejected (divergent zone, unlabeled)
+  x088512: 333 scanner-derived refs (source-only region); bare longs: 0 sibling-confirmed, 60 vetoed (operand bytes), 1 rejected (conflicting evidence), 8 rejected (divergent zone, unlabeled)
   x0692f6: 1 same-value engine refs merged from the scanner (sibling-coincident operands)
   code scan: 2078 candidates, 2076 engine/ROM refs (R1 surface), 0 char-id 0x11 immediates

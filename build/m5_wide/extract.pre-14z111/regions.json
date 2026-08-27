@@ -26,7 +26,6 @@
   "x065e5a": 52,
   "x066ec4": 52,
   "x06717c": 52,
-  "x101aca": 0,
   "aux0": -131116
  },
  "regions": {
@@ -28043,8 +28042,6 @@
    "grow": 32768,
    "kind": "code",
    "shift": "code",
-   "dead": [],
-   "ins": [],
    "refs": [
     {
      "off": 0,
@@ -58045,17 +58042,6 @@
    "charid_sites": [],
    "sha1": "0ff846f89a3df20042945130270ecae9a5a25408"
   },
-  "x101aca": {
-   "src": 1055434,
-   "orc": 1055434,
-   "len": 4302,
-   "kind": "data",
-   "shift": "x101aca",
-   "pre_classified": true,
-   "refs": [],
-   "variant_sites": [],
-   "sha1": "a34b061531e2452699d34e2ee35afca837f6036e"
-  },
   "aux0_0": {
    "src": 3361664,
    "orc": 3230548,
@@ -67305,11 +67291,6 @@
    "value": "00030000fffd6000"
   },
   {
-   "table": "jump_params",
-   "kind": "rec8",
-   "value": "00000000000000000007c000ffffa00000040000fffffb000007e000ffffa000fffbc0000000050000080000ffffa000"
-  },
-  {
    "table": "hitbox_base",
    "kind": "data_ptr",
    "ptr": "0xc8df8",
@@ -67402,34 +67383,6 @@
    "kind": "data_ptr",
    "ptr": "0xcb01a",
    "region": "hitbox",
-   "inside_region": true
-  },
-  {
-   "table": "ai_script_0",
-   "kind": "data_ptr",
-   "ptr": "0x101aca",
-   "region": "x101aca",
-   "inside_region": true
-  },
-  {
-   "table": "ai_script_1",
-   "kind": "data_ptr",
-   "ptr": "0x101bc8",
-   "region": "x101aca",
-   "inside_region": true
-  },
-  {
-   "table": "ai_script_2",
-   "kind": "data_ptr",
-   "ptr": "0x102674",
-   "region": "x101aca",
-   "inside_region": true
-  },
-  {
-   "table": "ai_script_3",
-   "kind": "data_ptr",
-   "ptr": "0x102b82",
-   "region": "x101aca",
    "inside_region": true
   }
  ],
