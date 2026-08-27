@@ -1877,3 +1877,16 @@ files missing (`cores/cps2/cfg/macros.def` this time). Symptom:
 dir; the tool re-clones at the pin. `tools/setup_jtcores.sh` does NOT
 touch the scratch.
 
+## MAME Lua: WRITE taps fire, READ taps do not (14z-112, measured)
+
+`space:install_write_tap()` works and is what `tests/lua/inp_guard.lua` relies
+on (the #99 capture taps the game's own `$FF0000` exception store).
+**`space:install_read_tap()` never fires on this driver** — not for ROM and
+not for work RAM. Measured 14z-112 with a positive control: a tap on
+`RAM:$FF8400-$FF840F`, read every frame by the fighter code, produced ZERO
+events over a 3-frame window, exactly like a tap on a program-ROM record.
+Direct-mapped memory reads bypass taps; only handler-backed accesses would
+surface. So "nobody reads this address" is NEVER a conclusion a read tap can
+support here — use the debugger trace (`INP_DEBUG=1 TRACE_FROM=`) or static
+pointer archaeology instead. The knob was written for #112 and removed the
+same session rather than left documented-and-dead.

@@ -139,13 +139,6 @@ for spec in (os.getenv("POKES") or ""):gmatch("[^;]+") do
     if fr then pokes[#pokes + 1] = { tonumber(fr), tonumber(addr, 16), hexs } end
 end
 local frame, snaps = 0, 0
--- EXIT-AT-PLAYBACK-END (14z-112): the runners pass -exit_after_playback, so
--- MAME stops the moment the .inp runs out and the attract demo can never be
--- mistaken for play (the trap that cost a 200000-frame pass; MAME's own
--- "Total playback frames" is the real end of human input, and Esc is a UI
--- key that is NOT recorded in the file). MAME 0.288 has neither
--- emu.register_stop nor emu.add_machine_stop_notifier, so the END line is
--- appended BY THE RUNNER after MAME exits, together with a PLAYBACK line.
 emu.register_frame_done(function()
     frame = frame + 1
     for _, pk in ipairs(pokes) do

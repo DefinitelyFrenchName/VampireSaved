@@ -41,6 +41,28 @@ vsav2 share much effect art). That is the live hypothesis, and it is NOT yet
 proven — proving it means showing the lift record is reached by tenant
 animation data that the effect-map step never covered.
 
+**THE PATH IS 100% VANILLA — measured this session, and it bounds the search.**
+Beyond the tiles and the record: the descent record `0x287D0C` and the lift
+record `0x287D7C` are **consecutive frames of ONE vanilla vsavj animation
+sequence** (8-byte entries = record pointer + duration, at `0x283968+` and
+`0x2859CC+`), and the only pointers to the lift record (`0x283980`,
+`0x2859E4`) are themselves in untouched base territory. `vm3j.08a` — which
+holds the records, the sequence AND the pointers — differs from stock in 0 of
+524288 bytes. So every byte on this draw path is Capcom's; **nothing we wrote
+is being rendered**, and the question is only what makes Donovan's object run
+this vanilla sequence. One lead, unresolved: the ONLY ported pointers into
+that sequence area come from `x088512@huitzil` and `x088512@pyron` (both
+`-> 0x28394E`) — **none from Donovan's regions**.
+**A dead instrument, recorded so it is not rebuilt:** a Lua READ tap on the
+record found nothing, and its positive control (a tap on `RAM:$FF8400`, read
+every frame) ALSO found nothing — **MAME read taps do not fire for
+direct-mapped memory on this driver, though WRITE taps do** (which is why
+`inp_guard` works). Zero reads is therefore not evidence. The knob was removed
+rather than left documented-and-dead (RH-54); gotcha filed in
+`docs/platform/gotchas.md`. Next: the debugger trace (`INP_DEBUG=1
+TRACE_FROM=`) around the lift frames, which is the one instrument that can
+answer "who fetched this".
+
 **(SUPERSEDED) The mechanism, measured end to end on `tests/inp/run-merged-m9-05`.** The
 records driving Donovan's Press of Death are **STOCK vsavj data, byte-identical
 to the reference** (`vm3j.08a` differs from stock in 0 of 524288 bytes; the
