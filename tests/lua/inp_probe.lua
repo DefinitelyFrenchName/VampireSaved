@@ -165,11 +165,18 @@ emu.register_frame_done(function()
         for a = 0x800100, 0x80013F, 2 do w[#w+1] = string.format("%04x", space:read_u16(a)) end
         f:write(string.format("R F%d 800100: %s\n", frame, table.concat(w, " ")))
     end
-    if d and os.getenv("GFXTILES") then
+    if d and (os.getenv("GFXTILES") or os.getenv("GFXRANGE")) then
         local rg = machine.memory.regions[":gfx"]
         if rg then
-            for tok in os.getenv("GFXTILES"):gmatch("[^,%s]+") do
-                local t = tonumber(tok, 16)
+            local list = {}
+            local rspec = os.getenv("GFXRANGE")          -- "startHex:count" content-scan
+            if rspec then
+                local st, n = rspec:match("^(%x+):(%d+)$")
+                for i = 0, tonumber(n) - 1 do list[#list+1] = tonumber(st, 16) + i end
+            else
+                for tok in os.getenv("GFXTILES"):gmatch("[^,%s]+") do list[#list+1] = tonumber(tok, 16) end
+            end
+            for _, t in ipairs(list) do
                 local base, nz, sum = t * 0x80, 0, 0
                 for i = 0, 0x7F do
                     local b = rg:read_u8(base + i)
