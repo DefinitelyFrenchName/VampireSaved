@@ -1864,3 +1864,16 @@ absolutizes `FBNEO_ROMPATH` on entry, so the class is dead; the lesson
 stands for every overlay-by-symlink mechanism: absolutize before linking,
 and suspect the instrument when a KNOWN-GOOD input fails the same way as
 the thing under test.
+
+## 14z-111 — the macOS tmp reaper hollows out the jtsim scratch clone
+
+`tools/mister_mra.sh` / `run_sim_jtcps2.sh` keep a clone of the jtcores
+fork under `${TMPDIR}/vampire-saved-jtsim` and only RE-CLONE when `.git`
+is absent. macOS purges files older than a few days from `$TMPDIR`
+piecemeal, so the clone survives with `.git` intact and random tracked
+files missing (`cores/cps2/cfg/macros.def` this time). Symptom:
+`test_mister_mra_map` fails in 0 s at "generating MRAs" with `Cannot open
+.../macros.def` — nothing in the tree changed. Fix: `rm -rf` the scratch
+dir; the tool re-clones at the pin. `tools/setup_jtcores.sh` does NOT
+touch the scratch.
+
