@@ -37,6 +37,20 @@ survive in the session scratchpad (`refit/`, ~22 frames × 4 replays).
 - STATE.md holds four groups (108 / 109 / 110 / 110b); the ledger ends at
   14z-107. 14z-108 is due to roll to STATE_HISTORY at this close.
 
+### THE 14z-111 FREEZE — donovan-m14 / huitzil-m21 / pyron-m15 / merged-m9 (M8), stock twin UNCHANGED
+
+| | |
+|---|---|
+| builds | don_m14 `772d8052` / hui48 `cd362ca4` / pyron32 `c403a283` / merged16 `32007911` / stock9 = `d29fd062` (donovan-m13-stock, program identical: WIDE-only port, gfx-only mark) |
+| layout | Donovan's `x101aca` at the wide_ext HEAD (`region_space`, after a hole_a placement cascaded 56 regions — measured); every ext region behind it +0x10D0 (hui) / +0x1ED0 (pyr) / +0x2B60 (pools) — uniform, verdicts unchanged |
+| acceptance | `test_inp_crash_m10` MODE=clean PASS on merged16 (default flipped); defect mode still reproduces on merged15 |
+| validations on merged16 | don_vs_cpu PASS (3 CPU legs, own AI) · merged_legacy PASS 47/47 · guard corpus 332/332 · stage-4 PASS (target unchanged) · m3a PASS (all pins + whole-artifact manifests, per-member attributed; 07b = 16 bytes of existing repoints whose targets shifted) · tenant_loop 332/366/303, 608/660, 819/920 · pointer_flow / pcrel / escape_triage re-frozen with attribution · MiSTer twin + mra-map PASS |
+| suites | donovan-m14 GREEN (12 tenant .sha1s moved: ONLY `$FF06CC/CD`, an execution-position return-address word one slot below the ratified secondary-stack window, at select entry f890 and match-start windows; state byte-identical — measured at 9 frames) · huitzil-m21 GREEN · pyron-m15 (in flight at the time of writing) · verify passes in flight |
+| release / MiSTer | `release/merged-m9` (M8) · fork `63496069` pushed, pin bumped, patch 0024 · bundle `../mister_fieldtest_14z111/` = merged-m9, WIDE 31/31, .rbf unchanged, **tell = M8** |
+| open | field verdict on the board; the maintainer's other-crash provocations (any `.inp` under a new name replays on both builds) |
+
+**Why the tenant .sha1s moved without any state change (recorded, mechanism attributed not proven):** the AI channel starters read the tenant's rows at select entry and match-start phases; the data they now read (his own block in the ext) differs from Demitri's, so the interpreter's per-frame work costs different cycles at the sample instant — the OBJ-builder bsr chain sits one word apart. Nothing else in 64 KiB moves. `$FF06CC` is 4 bytes below the ram.md `$FF06D0-$FF06EF` row: the class's window is one slot deeper on this content (note added to ram.md).
+
 ### #99 FIX — OPTION A AUTHORED AND PROBE-VALIDATED (maintainer chose A; 14z-111, 2026-08-27)
 
 **Landed (8596b9d, NOT frozen):** bank_map `ai_script_0..3` (data_ptr, the
