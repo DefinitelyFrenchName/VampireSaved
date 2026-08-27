@@ -2351,6 +2351,28 @@ deliberate vsavj approximation; the values and the would-be change
 recipe live in docs/project/tables/defense_rows.md. (Pyron's rows are
 identical between the games — unaffected either way.)
 
+## The down-transition WHITE FRAME (14z-112, measured on stock vsavj)
+
+Depends on atlas rows: fighter `+0x11F` (death flag), `+0x50/+0x52`.
+
+Vampire Savior draws exactly ONE all-white frame (the whole 384x224
+framebuffer; fnv1a64 `eab1fb569cb99b25` under `tests/lua/inp_probe.lua`)
+at four events and nowhere else, measured over a full 1P match on stock
+`vsavj` / reference MAME (`tests/test_down_flash_vanilla.sh`) and over
+20000 frames of a merged-m9 hand-played recording:
+- the match INTRO: two white frames, 2 apart (vanilla 1909/1911);
+- MATCH START: one frame, HP-set + 183 (vanilla 1965 -> 2148; merged 920 ->
+  1103 — the same +183);
+- every DOWN: one frame 57..96 after `+0x11F` rises (vanilla 6550 -> 6646;
+  merged 6074 -> 6153, 7757 -> 7853, 17215 -> 17272). The offset is the fall
+  animation's length; the frame after it already carries the next FIGHT
+  banner — the white-out IS the refill transition;
+- the match END (merged 10536/10539; no vanilla replay measured it).
+It was reported as "the screen flashes at the first down" (GitHub #113) and
+on a CRT as "background stays, sprites vanish" — one white frame on
+phosphor. Not a port defect. The MECHANISM (palette RAM blanked vs a CPS-B
+layer/priority register) is NOT measured; only the framebuffer is.
+
 ## THE ROUND JUDGE: death is the SIGN OF WHITE HP, and the phase
 ## machine that consumes it (14z-98, measured end to end on #103)
 

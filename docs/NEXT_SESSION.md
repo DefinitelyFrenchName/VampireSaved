@@ -10,14 +10,15 @@
 > ## (`tests/inp/play-merged-m9-01`, `run-merged-m9-02..04`, all guard-clean:
 > ## first-match, Anakaris>Victor>Phobos, Bishamon>Phobos, a full arcade run
 > ## to the ending, a lost-then-continued Phobos fight). #99 is CLOSED
-> ## (maintainer, 2026-08-27). NEXT: (3) nothing red in the freeze table. (4) the
-> ## two cosmetics, #113 FIRST — re-read on the CRT as a SPRITE-DROPOUT
-> ## frame (background stays, sprites — Phobos especially — not drawn or on
-> ## an invisible plane for >=1 frame), NOT a palette flash: start from the
-> ## OBJ list at the down, not the palette; compare vanilla vs merged
-> ## per-frame OBJ dumps (`test_obj_records.sh` tooling). #112's palette
-> ## flips with ANY kick and MID-ANIMATION (a time-varying palette write,
-> ## not a per-strength row).
+> ## (maintainer, 2026-08-27). #113 IS MEASURED AND VANILLA: one all-white
+> ## frame at every down (and intro/start), identical on stock vsavj —
+> ## `tests/test_down_flash_vanilla.sh` PASS; decision pending (close vs
+> ## opt-in softening), STATE "Decisions pending — #113". NEXT: #112 —
+> ## FIRST capture Press of Death on vsav2 ITSELF (maintainer: slim chance
+> ## the blue/black palette exists in the donor); the palette flips with ANY
+> ## kick and MID-ANIMATION (a time-varying palette write, not a per-
+> ## strength row). Instrument: `tools/run_inp_probe.sh` (per-frame video
+> ## hash + HP/death/OBJ counts, snapshots, OBJ dumps; `.inp` or REPLAY=).
 > ##
 > ## **(HISTORY, 14z-111 order):** (1) the field verdict on the board (bundle 14z111; the
 > ## wheel MUST say M8 — M7 means the old romset). (2) Replay any `.inp` the

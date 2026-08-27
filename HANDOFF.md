@@ -1019,6 +1019,8 @@ ROMDIR=... tests/run_all_static.sh         # + the static tier, ~8 min
 ROMDIR=... tests/run_all_static.sh --strict   # SKIP counts as failure too
 tests/run_all_static.sh --list             # what is registered
 ROMDIR=... tests/test_inp_corpus.sh        # EMULATOR tier: every tracked hand-played recording, no exception (14z-111)
+ROMDIR=... tests/test_down_flash_vanilla.sh  # EMULATOR tier: the one-frame white-out at a down is VANILLA (#113 ground truth, 14z-112)
+ROMDIR=... [SNAP_FRAMES=a,b DUMP_FRAMES=..] tools/run_inp_probe.sh <build> <inp>   # per-frame video hash + HP/death/OBJ counts, snapshots, OBJ dumps (also REPLAY= driven)
 ```
 
 **One command, every gate that does not need an emulator.** Until 14z-94 there
