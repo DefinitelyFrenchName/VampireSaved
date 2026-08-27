@@ -44,7 +44,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 BUILD_D="${BUILD_D:-build/don_m14}"  # re-pointed 14z-110b
-BUILD_H="${BUILD_H:-build/hui46}"   # re-pointed 14z-102 (the freeze)
+BUILD_H="${BUILD_H:-build/hui48}"   # re-pointed 14z-111 (was hui46 since 14z-102 — the sweeps never carried it; the N-2 deletion surfaced it as a SKIP)
 BUILD_P="${BUILD_P:-build/pyron32}"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 
