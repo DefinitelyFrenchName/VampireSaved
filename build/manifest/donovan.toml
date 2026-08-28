@@ -1954,15 +1954,32 @@ thunk_hex = "207c002672aa0c0000tu66083d7c300000184e754e75"
 # (PRG:0x5F9D0) and, on the tenant's hover, ALSO copies block+0x40 (the
 # color-correct steady accent row, per-color via the cached block+color
 # ptr at $40(a6)) into base+2's row with the copier's F000 alpha OR —
-# P1 -> 0x90C2E0, P2 -> 0x90C340 ($381(a4) selects). Registers saved;
-# flags dead (tst.b follows the site).
+# P1 -> 0x90C2E0 (row 0x17). Registers saved; flags dead (tst.b follows
+# the site).
+# **THE P2 BRANCH NO LONGER WRITES (14z-116, maintainer-chosen).** It used
+# to add 0x60 -> 0x90C340 = ROW 0x1A, which is ALSO Pyron's medallion row
+# (wheel_layout cells.11 pal_row), so a P2 tenant hover turned that
+# medallion into shades of white, sticky until screen re-entry — the
+# residual the 14z-64 FINAL ALLOCATION documented as a trade and that was
+# re-reported from the board every few sessions. WRITE-TAP ATTRIBUTED to
+# THIS thunk (16 word writes, PCs 0x3FFC60-0x3FFCA6 = the copy loop below),
+# NOT to Donovan's P2-hover portrait as 14z-87b supposed. `tst.b $381(a4)`
+# is now followed by `bne` to the pop/rts (disp 0x54 -> body offset 120)
+# and two NOPs where `adda.w #$60,a1` was — SAME BYTE COUNT, no allocation
+# ripple. Accepted trade: P2's select-figure sword shows the vanilla grey
+# ramp while P2 hovers a tenant. Measured: P1's accent byte-for-byte
+# unchanged, and 38_victor_p1_vsavj / 05_timeout_idle / 63_idle_select are
+# BIT-IDENTICAL to merged18 — the changed path only runs on a P2 tenant
+# hover, which no legacy replay does. Gate:
+# tests/test_pyron_medallion_2p.sh. Do NOT "simplify" this by dropping the
+# whole thunk: P1's accent (row 0x17) still needs it.
 [[site_thunk]]
 stage = 6
 name = "select_sword_pal_variant_id"
 only_variant_slot = true
 site = 0x05F9D0
 old_hex = "43f90090c2a0"
-thunk_hex = "43f90090c2a00c2e00tt000a666e2f082f09206e0040d0fc0040d2fc00404a2c03816704d2fc006020180080f000f00022c020180080f000f00022c020180080f000f00022c020180080f000f00022c020180080f000f00022c020180080f000f00022c020180080f000f00022c020180080f000f00022c0225f205f4e75"
+thunk_hex = "43f90090c2a00c2e00tt000a666e2f082f09206e0040d0fc0040d2fc00404a2c038166544e714e7120180080f000f00022c020180080f000f00022c020180080f000f00022c020180080f000f00022c020180080f000f00022c020180080f000f00022c020180080f000f00022c020180080f000f00022c0225f205f4e75"
 
 # ── 14z-62e: SELECT-PORTRAIT PALETTES at a variant id ──────────────────────
 # The uploader (PRG:0x5F136 family) computes grid row (variant*16 + id)

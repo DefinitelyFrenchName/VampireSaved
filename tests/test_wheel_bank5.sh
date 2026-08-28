@@ -168,9 +168,14 @@ PY
     # row 0x02 at the two select-side dest computations (0x2B598/
     # 0x2B7D8, select-gated on $FFB818==0x3000; 0x2AD44 is the
     # in-match funnel and must NEVER be thunked — the $FF8094 parity
-    # lesson). KNOWN RESIDUAL: 0x1A is also the P2 sword-accent row —
-    # a 2P Donovan-hover recolors Pyron's placeholder medallion until
-    # screen re-entry (documented trade).
+    # lesson). THE KNOWN RESIDUAL IS FIXED (14z-116): 0x1A was also the
+    # P2 sword-accent row, so a 2P Donovan-hover recolored Pyron's
+    # medallion until screen re-entry; the 62k thunk's P2 branch no
+    # longer writes. NOTE THIS SECTION COULD NEVER HAVE SEEN IT — both
+    # protocols here (replays 63/64) are SINGLE-PLAYER select stress and
+    # neither hovers a tenant with P2, which is why it stayed green
+    # through every freeze. The P2 half is
+    # tests/test_pyron_medallion_2p.sh; run both.
     run_stab() {  # run_stab <tag> <replay> <dumpspec> <frames>
         mkdir -p "$WORK/$1"
         DUMPS="$3" CHECKSUM_OUT="$WORK/$1/cks.log" FRAMES="$4" \
