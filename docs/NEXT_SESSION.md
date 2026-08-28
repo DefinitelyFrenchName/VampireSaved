@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-112 close, 2026-08-27)
+# NEXT SESSION — orientation (rewritten at the 14z-112 close, 2026-08-27; scope-document paragraph updated 14z-113, 2026-08-28)
 
 > ## **START HERE. NOTHING IS RED. #99 IS CLOSED. The tree is green
 > ## (`run_all_static --strict` PASS 110/0/0) and everything is pushed.**
@@ -15,17 +15,20 @@
 > ## `32007911` unchanged — packaging, not content. The question to answer
 > ## is whether STOCK vsav/vsavj now renders CORRECT art.
 > ##
-> ## **THE ONE PIECE OF AUTHORING WORK QUEUED: the MiSTer SCOPE DOCUMENT**
-> ## — scope only, NOT the skills. What skills should exist, where each
-> ## boundary falls, which docs feed which, what is known-stale. Split
-> ## agreed: **(1) CPS-II / WIDE CORE** (profile, the runtime profile bit =
-> ## MRA header byte 41, SDRAM map, simulation lane — game-independent) and
-> ## **(2) VS-SPECIFIC** (placement, catalogue/MRA generation, field
-> ## bundle). **READ THE ~4,000 LINES, DO NOT WRITE FROM MEMORY:**
-> ## `docs/platform/mister.md` (2063), `docs/project/mister_map.md` (1062),
-> ## `docs/project/cps2_wide.md` (635), `docs/project/mister_fit.md` (262).
-> ## HUNT STALENESS: `mister_mra.sh`'s header asserted "the two legs need
-> ## DIFFERENT vsav.zip files" — true when written, wrong by 14z-112.
+> ## **THE MiSTer SCOPE DOCUMENT IS DONE (14z-113):
+> ## `docs/project/mister_scope.md`** — the two-level split with each
+> ## skill's boundary/sources/gates, the doc dependency map, and the
+> ## **known-stale inventory S1-S20** (file:line). All ~5,000 lines were
+> ## read; NOTHING was corrected (scope only). **THREE DECISIONS SIT IN
+> ## STATE "Decisions pending"**: confirm the split; run the staleness pass
+> ## BEFORE the skills (recommended — `mister_core.md` still says "hardware:
+> ## never" and `patch_index.md` registers 7 of 24 fork patches); and where
+> ## the `.rbf` lives (cited by three docs, tracked by none). The
+> ## `mister_mra.sh` HEADER correction 14z-112 asked about IS in place.
+> ## **If the pass is approved, it is the next session's work: one commit,
+> ## retraction discipline, headers and summary lines first.** Note S20:
+> ## every HANDOFF MiSTer example still names `build/m3b_merged13`, which
+> ## the 14z-112 sweep DELETED — those commands are non-runnable as written.
 > ##
 > ## **THE COSMETIC BACKLOG (STATE, parked as ONE later pass):** win-quote
 > ## TEXT for ALL THREE tenants (each still shows its SHELL's quote; art is

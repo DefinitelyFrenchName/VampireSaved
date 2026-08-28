@@ -1,5 +1,19 @@
 # STATE — living progress log
 
+## Session 14z-113 (2026-08-28) — **THE MiSTer SCOPE DOCUMENT IS WRITTEN
+## (`docs/project/mister_scope.md`) — scope only, not the skills, as agreed.**
+
+| | |
+|---|---|
+| opened with | the 14z-112 orientation: nothing red, two hardware answers pending (#113 hand check, bundle 14z112), the scope document queued. main == origin/main at `1a0d7bb` (`git ls-remote`) |
+| the deliverable | `docs/project/mister_scope.md` — the two-level split (**level 1 CPS-II/WIDE core**: separate-core mechanism, the runtime profile bit, SDRAM tiers/slots/placement RULES, the five format caps + the nine gated sites, the simulation lane + instruments, synthesis/release, MRA mechanics; **level 2 VS-specific**: the roster's demand, the placement NUMBERS, catalogue/MRA/bundle generation incl. the freeze's MiSTer tail, the WIDE oracles, field test + triage), each with boundary / sources by section / gates; the doc dependency map; five places the boundary is not clean; the **known-stale inventory S1-S20** with file:line and the session that moved each |
+| method | all ~5,000 lines of the MiSTer sources READ (`platform/mister.md`, `mister_map.md`, `mister_core.md`, `cps2_wide.md`, `mister_fit.md`, the HANDOFF section, the tool headers, the 14z112 bundle README) — none summarised from memory; every "true now" checked against git/tree, not prose |
+| the staleness that matters | (S1/S3/S12) `mister_core.md` still says pin `dd242a65` + fifteen commits, romset merged13, and "HARDWARE: never"; `mister_map.md`'s header still says no tenant ever fought and nothing ran on hardware; (S15) `patch_index.md` registers 7 of 24 jtcores patches, one marked "LOCAL-ONLY (not pushed)"; (S8) a 14z-112 correction was spliced mid-sentence in `mister.md:1593`; (S18) `release/mister/jtcps2w.rbf` is cited by three docs and tracked by none; (S20) every HANDOFF MiSTer example names `build/m3b_merged13`, which the 14z-112 sweep DELETED. The `mister_mra.sh` HEADER correction NEXT_SESSION asked to verify IS in place (S16 is its usage text only). **All numbers agree across synthesis and logs; every disagreement is STATUS** |
+| verified clean | the nine gated sites (three copies agree), the placement offsets (three copies), the anchors, the `.rom` arithmetic, the release policy; `audit_mister_map_fit.sh` re-derives the extents from `m3b_merged16` every run, so `mister_fit.md`'s ceilings hold on the current freeze (only its `0x4D10F3` high-water mark is un-frozen and merged-m6's) |
+| not done, by design | NO stale claim was corrected — the ask was scope only. The retraction pass over S1-S20 is decision 2 below |
+| decisions pending | see "Decisions pending": (1) confirm the split, (2) run the staleness pass BEFORE the skills (recommended), (3) the `.rbf`'s home |
+| green | `run_all_static --strict` after the docs change: **PASS 110 / SKIP 0 / FAIL 0 / MISSING 0**; ROM audit 76/76 |
+
 ## Session 14z-112 CLOSE — ritual complete. **#99 CLOSED ON A GREEN FIELD
 ## VERDICT; #112 REPRODUCED, RULED COSMETIC AND PARKED; #113 MEASURED VANILLA;
 ## AND THE WIDE PROFILE STOPPED BREAKING STOCK VAMPIRE SAVIOR.**
@@ -785,6 +799,20 @@ entries moved VERBATIM to `DECISIONS_HISTORY.md` — grep there by topic.
 Lifecycle: rulings are still marked DECIDED in place here first; they move to
 the archive once they stop shaping active work.)*
 
+- **THE MiSTer SCOPE DOCUMENT — three decisions (14z-113,
+  `docs/project/mister_scope.md` §8).** (1) **Confirm the two-level split**
+  (six core skills + one shared MRA-mechanics skill; five VS-specific) or
+  move rows — the one judgment call flagged is filing MRA generator
+  mechanics at level 1 with the VS catalogue skill citing it. (2) **Run the
+  staleness pass (S1-S20) BEFORE writing any skill — RECOMMENDED**: a skill
+  distilled from `mister_core.md` and `patch_index.md` as they stand would
+  say the core never ran on hardware and that seven fork patches exist. One
+  session, one commit, retraction discipline (grep the claim, fix headers
+  first, re-grep). (3) **The `.rbf`'s home**: track `jtcps2w.rbf` (3.1 MB,
+  GPL output, not ROM content) or state in the docs that it is out-of-tree
+  and reproducible only by seed + build date. No gameplay surface in any of
+  the three; (1) and (3) are the maintainer's, (2) is a recommendation.
+
 - **#112 — PRESS OF DEATH BLACK FOOT: ACCEPTED AS COSMETIC. DECIDED
   (maintainer, 2026-08-27): option (c) — accept for now; option (a) (give
   tenants their own effect animation) is PARKED for a later pass over the
@@ -1050,7 +1078,9 @@ the archive once they stop shaping active work.)*
 
 - **MiSTer DOCUMENTATION + SKILL DISTILLATION, AT TWO LEVELS (maintainer
   direction, 2026-08-27). FIRST STEP AGREED 2026-08-27: produce the SCOPE
-  DOCUMENT ONLY — queued in `docs/NEXT_SESSION.md`.** The scope document
+  DOCUMENT ONLY — ~~queued in `docs/NEXT_SESSION.md`~~ DONE 14z-113:
+  `docs/project/mister_scope.md`; its three follow-on decisions are the
+  entry "THE MiSTer SCOPE DOCUMENT — three decisions" above.** The scope document
   names what skills should exist, where each boundary falls, which existing
   docs feed which, and what is known-stale; the skills themselves wait on it.
   Rationale for splitting it out: the sources run ~4,000 lines and must be
