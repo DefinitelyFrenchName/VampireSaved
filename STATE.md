@@ -1,5 +1,24 @@
 # STATE — living progress log
 
+## Session 14z-114 CLOSE — ritual complete. **ALL SIX SKILLS DISTILLED AND
+## LOCKED TO THE DOCS in one session: the MiSTer pair, the CPS-2 pair, the game
+## skill and the port skill — 425 rules, every one anchored in the paragraph it
+## distils, every number in a log; four staleness passes run first, each its
+## own commit.**
+
+| | |
+|---|---|
+| opened with | the 14z-113 orientation; nothing red; main == origin/main at `09e4961` |
+| delivered | the retraction (merged-m10 registry row) -> the MiSTer pair + checker (`bb8ecde`, PUSHED at the maintainer's word) -> the plan `skills_scope.md` -> A+B staleness (`6acfeb6`) -> `cps2-hardware` + `cps2-emulation` -> C staleness (`0291fbf`) -> `vampire-savior-engine` -> D staleness (`7c688cf`) -> `vampire-saved-port` (`4cc4af7`). Six skills: `[MSC-1..73]`, `[MSV-1..36]`, `[CPH-1..30]`, `[CPE-1..42]`, `[VSE-1..83]`, `[VSP-1..161]` |
+| green at close | `tests/test_checkskills.sh` PASS (425 rules, eight controls fire); `run_all_static --tier portable` **54/0/0/0**; `ROMDIR=... run_all_static --strict` **PASS 111 / SKIP 0 / FAIL 0 / MISSING 0** on the tree as committed at `4cc4af7` (the run's tree-dirtiness note names this close's own uncommitted rollover edit to STATE_HISTORY, nothing else) |
+| push | **NOT PUSHED past `bb8ecde`** — six commits local (`6c7ccb6` plan, `6acfeb6`, `276c010`, `0291fbf`, `7c688cf`, `4cc4af7`) plus this close; push at the maintainer's word (standing rule) |
+| not done, by ruling or by absence | **#113 stays OPEN** (camera evidence in progress — nothing re-derived, nothing closed). Two D staleness items left flagged UNVERIFIED rather than edited (skills_scope §4 row D). The five skill decisions remain OPEN TO VETO. The re-filing candidates (fourteen emulator-fact entries in `project/gotchas.md`, the 14z-90 onset entry in `game/gotchas.md`) are the maintainer's call. Housekeeping still deferred from 14z-113 (`build/m3b_merged15` defect-mode reference; STOCK CONTROL once-per-`.rbf`; the cosmetic backlog) |
+| next | nothing scheduled by this session. The opener is whatever the maintainer brings: #113's camera verdict, a veto on a skill decision, or the deferred housekeeping. **Every future session loads the relevant skill before the work** — that is what they are for |
+
+**Ledger rollover:** the 14z-111 group (two records) moved verbatim to
+STATE_HISTORY.md; STATE holds 14z-112 / 14z-113 / 14z-114.
+
+
 ## Session 14z-114 (2026-08-28) — **THE MiSTer SKILLS DISTILLED, WITH THEIR
 ## CHECKER: two skill packages (level 1 `[MSC-1..73]`, level 2 `[MSV-1..36]`),
 ## every rule ID-anchored in the doc paragraph it distils; the log gained the
@@ -265,222 +284,6 @@ measurement (see the eliminations below).
 | push | main pushed at each tracking commit; no tags cut (no freeze) |
 
 
-## Session 14z-111 CLOSE — ritual complete. **#99 ROOT-CAUSED (CPU-Phobos ran
-## DEMITRI's AI — the aliased upper half of the AI script tables) AND FIXED
-## (option A: the tenants' own vs2 AI, zero code); frozen donovan-m14 /
-## huitzil-m21 / pyron-m15 / merged-m9, mark M8; board bundle 14z111 ready.**
-
-| | |
-|---|---|
-| opened with | the 14z-110b close-ritual audit: 3 stale items fixed (uncommitted H/P M7 bumps behind committed pins; no 110b HANDOFF row; patch_index "NOT YET BUILT"), 110b acceptance re-runs GREEN, FBNeo oracle refit landed, tags cut, the re-point sweep + build-dir policy applied |
-| the turn | the maintainer's board AND hand-played MAME both still crashed on merged-m8 -> the maintainer recorded it (`tests/inp/crash-merged-m8-01`) -> `tools/run_inp_guarded.sh` (write tap on the game's own `$FF0000` exception store) captured vec11 at `PRG:0x422BAC` on the natural path -> trace + write taps -> the four CPU AI script tables, 16 classes + the same 16 repeated |
-| the fix | bank_map `ai_script_0..3` (data_ptr, `region = "auto"`, `optional = true`) + one DATA root per tenant + `region_space x101aca=wide_ext` + 4 `reconciliation_huitzil` rows (Phobos's own AI reached tripwires) + M8 mark; WIDE-only (stock twin unchanged). The pinned merged extract inputs (`build/{m5_wide,hui32,pyron21}/extract`) REGENERATED deliberately (old kept as `extract.pre-14z111`, untracked); `build/merged1` (the legacy-only instrument) rebuilt by audit_merged_legacy — both committed |
-| green at close | test_inp_crash_merged_m8_01 MODE=clean (default) PASS · don_vs_cpu · merged_legacy 47/47 · guard corpus 332/332 on merged16 · stage-4 · m3a (all pins + whole-artifact re-attributed) · tenant_loop · pointer_flow / pcrel / escape_triage / region_overlap(+control) / id_space / biased-list re-frozen with attribution · suites GREEN x3 under --freeze AND x3 verify (tenant .sha1s moved only by `$FF06CC/CD`, state identical; H/P gained the 107-110 expectations they never had) · MiSTer twin + mra-map · bundle WIDE 31/31 · `run_all_static --strict` FINAL: **PASS 110 / SKIP 0 / FAIL 0 / MISSING 0** (after the biased-list hui46 pin and a hollowed jtsim scratch clone — platform gotcha) |
-| naming/cleanup | recordings are `<what>-<freeze set>-NN` (`crash_m10` -> `crash-merged-m8-01`, gate `test_inp_crash_merged_m8_01`); unreferenced cache recordings deleted (crash_m8 plain-play, crash_m9 abort, smoketest) — rule in CLAUDE.md §4 + build_dir_triage.md |
-| the law | **FIELD REPORTS ARE RECORDINGS** (maintainer-ruled at close): CLAUDE.md §4 clause + `tests/test_inp_corpus.sh` (every tracked `.inp` replayed at every freeze, PASS 1/1 on merged16) + HANDOFF/gotcha — the tooling had existed since 14z-9x; its use was not systematic, and 14z-109..111 paid for that with two shipped non-fixes |
-| first MAME verdict | **1P Donovan vs CPU Phobos, dragged near time-over with button spam: NO CRASH** (maintainer, 2026-08-27; `tests/inp/play-merged-m9-01`, 20000 frames guard-clean) — not a proof, but the #99 protocol no longer reproduces. TWO COSMETICS observed and filed with the recording as evidence, neither investigated: Press of Death (41236+K) blue/BLACK palette ~half the time (GitHub #112) and the whole-screen flash at the first down — photosensitivity (GitHub #113) |
-| not done | the field verdict (the maintainer's board, bundle 14z111, tell = M8); the maintainer's other-crash provocations (replay any new `.inp` on both builds); the probe capture dir `build/inp_guard/` kept untracked as evidence |
-| push | main + fork pushed (`git ls-remote`, not prose); tags `freeze/{donovan-m14,huitzil-m21,pyron-m15,merged-m9}` cut and pushed at close |
-
-**Ledger rollover:** the 14z-108 group moved verbatim to STATE_HISTORY.md;
-STATE holds 14z-109 / 14z-110(+b) / 14z-111. (Commit a3ca058's message
-claimed this a commit early — its script had aborted before writing.)
-
-
-
-## Session 14z-111 (2026-08-26) — **OPENED WITH A CLOSE-RITUAL AUDIT of
-## 14z-110b (the maintainer's call: the close was clean but unchecked).**
-## Findings, then the mechanical fixes applied; the judgment calls left
-## for the maintainer below.
-
-**Measured against the tree (git, not prose):** main == origin/main (pushed);
-no stash; no leftover emulator/suite processes; `emu/fbneo` dirty = exactly
-the two applied patches (8 files = 3 + 5, expected); the refit scan dumps
-survive in the session scratchpad (`refit/`, ~22 frames × 4 replays).
-
-**STALE AND FIXED THIS SESSION:**
-1. **`huitzil.toml` / `pyron.toml` `version_text` M6 -> M7 were UNCOMMITTED
-   since 14z-110** — while `test_m3a_reproducible.sh`'s MANI_HUI/MANI_PYR
-   pins (committed 49e00ed) were re-frozen on the M7 glyph members. A clean
-   checkout would have rebuilt H/P with "M6" and failed the pins: a rule-3
-   reproducibility gap. Committed now.
-2. **HANDOFF had NO registry row for 14z-110b** (donovan-m13 / merged-m8 /
-   stock8) and the playtest default still named merged14. Row added,
-   default -> merged15.
-3. **patch_index still said "NOT YET BUILT" for the 14z-110 d2 window**
-   (shipped two freezes ago) and had no 14z-110b remap entry. Both fixed.
-
-**STALE, LEFT FOR THE MAINTAINER (not mine to decide):**
-- **Build-dir policy skipped at BOTH 14z-110 and 14z-110b:** `don_m12/13`,
-  `m3b_merged14/15`, `m5_stock7/8` and `guard_corpus/m3b_merged14.*.tsv`
-  are UNTRACKED (14z-105 tracked its generation), and the N-2 deletion
-  (`build_dir_triage.md`: keep current + one back) never fired — `don_m11`,
-  `m3b_merged13`, `m5_stock6` (305 MB tracked) and the m12/merged14/stock7
-  generation (305 MB) are both still present. Suggest: track m13/merged15/
-  stock8 + the TSV, delete m11/merged13/stock6 AND m12/merged14/stock7 at
-  the next freeze (or now).
-- **12 local freeze tags are unpushed** (donovan-m8/m9, huitzil-m16..18,
-  pyron-m10..12, merged-m1..m4) — long predating 110b. Push is the
-  maintainer's call by standing rule.
-- STATE.md holds four groups (108 / 109 / 110 / 110b); the ledger ends at
-  14z-107. 14z-108 is due to roll to STATE_HISTORY at this close.
-
-### THE 14z-111 FREEZE — donovan-m14 / huitzil-m21 / pyron-m15 / merged-m9 (M8), stock twin UNCHANGED
-
-| | |
-|---|---|
-| builds | don_m14 `772d8052` / hui48 `cd362ca4` / pyron32 `c403a283` / merged16 `32007911` / stock9 = `d29fd062` (donovan-m13-stock, program identical: WIDE-only port, gfx-only mark) |
-| layout | Donovan's `x101aca` at the wide_ext HEAD (`region_space`, after a hole_a placement cascaded 56 regions — measured); every ext region behind it +0x10D0 (hui) / +0x1ED0 (pyr) / +0x2B60 (pools) — uniform, verdicts unchanged |
-| acceptance | `test_inp_crash_merged_m8_01` MODE=clean PASS on merged16 (default flipped); defect mode still reproduces on merged15 |
-| validations on merged16 | don_vs_cpu PASS (3 CPU legs, own AI) · merged_legacy PASS 47/47 · guard corpus 332/332 · stage-4 PASS (target unchanged) · m3a PASS (all pins + whole-artifact manifests, per-member attributed; 07b = 16 bytes of existing repoints whose targets shifted) · tenant_loop 332/366/303, 608/660, 819/920 · pointer_flow / pcrel / escape_triage re-frozen with attribution · MiSTer twin + mra-map PASS |
-| suites | donovan-m14 GREEN (12 tenant .sha1s moved: ONLY `$FF06CC/CD`, an execution-position return-address word one slot below the ratified secondary-stack window, at select entry f890 and match-start windows; state byte-identical — measured at 9 frames) · huitzil-m21 GREEN · pyron-m15 (in flight at the time of writing) · verify passes in flight |
-| release / MiSTer | `release/merged-m9` (M8) · fork `63496069` pushed, pin bumped, patch 0024 · bundle `../mister_fieldtest_14z111/` = merged-m9, WIDE 31/31, .rbf unchanged, **tell = M8** |
-| open | field verdict on the board; the maintainer's other-crash provocations (any `.inp` under a new name replays on both builds) |
-
-**Why the tenant .sha1s moved without any state change (recorded, mechanism attributed not proven):** the AI channel starters read the tenant's rows at select entry and match-start phases; the data they now read (his own block in the ext) differs from Demitri's, so the interpreter's per-frame work costs different cycles at the sample instant — the OBJ-builder bsr chain sits one word apart. Nothing else in 64 KiB moves. `$FF06CC` is 4 bytes below the ram.md `$FF06D0-$FF06EF` row: the class's window is one slot deeper on this content (note added to ram.md).
-
-### #99 FIX — OPTION A AUTHORED AND PROBE-VALIDATED (maintainer chose A; 14z-111, 2026-08-27)
-
-**Landed (8596b9d, NOT frozen):** bank_map `ai_script_0..3` (data_ptr, the
-new `region = "auto"`), one DATA extra root per tenant for his vs2 AI block,
-four `reconciliation_huitzil` rows for the tripwires Phobos's own AI reaches
-(`0x2cbde/0x2ce0a/0x2ce3e/0x364a` — the R1 loop's first fire, twins
-measured), `test_tenant_loop` re-frozen (+5/tenant, -4 hui tripwires).
-**ACCEPTANCE: `test_inp_crash_merged_m8_01 MODE=clean` PASS on the merged probe
-`0df398ff`** — the maintainer's recording plays through with zero
-exceptions (defect mode on merged15 still PASSes = the capture is stable).
-Interpreter equivalence measured (patch_notes 14z-111). Docs landed:
-patch_notes / patch_index / engine_internals "CPU AI action-script system" /
-gotchas. **In flight (niced chain, scratchpad `val_*.log`):**
-`audit_don_vs_cpu` (three CPU legs on the tenants' OWN AI) ->
-`audit_merged_legacy` (the superset proof for the alias-half rows) ->
-`audit_guard_corpus` (332). Then the freeze ritual (donovan-m14 / huitzil-m21
-/ pyron-m15 / merged-m9, **M8 mark**, stock twin moves — the rows are data),
-flip the gate to MODE=clean default with BUILD re-pointed, MiSTer CRC tail.
-The maintainer is meanwhile provoking OTHER crashes on MAME with recording
-armed (a Donovan-vs-CPU-Bishamon crash would be a different mechanism).
-
-### #99 ROOT CAUSE — CAPTURED ON THE NATURAL PATH (maintainer's .inp `crash-merged-m8-01`, 14z-111)
-
-**The crash:** frame 4806, **vec11 (line-F)** at `PRG:0x422BAC` = inside
-`x05c800@huitzil` DATA (a per-class (dx,dy) table right after an `rts`),
-reached by `jmp (2,pc,d1.w)` at `0x41C1A8` in Phobos's PORTED jump handler
-(vs2 `0x2592A`, region `x02592a@huitzil`) indexing its sub-state table by
-Phobos's `+0x07 = 0x0E`. **vs2's table has 5 entries (`+0x07` 0x00-0x08);
-vsavj's own jump handler (`0x22A24`) has 10 (0x00-0x12).** Sub-state 7 is a
-vsavj-only phase. Same PC/frame on merged14 — the 110/110b fixes never
-touched this path.
-
-**Who writes 0x0E:** vanilla `PRG:0x2BD72` (`move.l #$0200060E,(4,a6)`) — the
-JUMP COMMAND of the CPU AI SCRIPT INTERPRETER (`0x2BD54` family), executing
-a script whose channel pointers were `0x100036/0x10036A/0x100BA0`: VANILLA
-scripts. **The four per-class AI action-script tables `PRG:0xBF01A/09A/11A/
-19A` (consumers `0x2CCB6` family, `bank_map.toml` "still parked") are 32
-entries = 16 classes + THE SAME 16 REPEATED (Capcom's aliasing guard). Class
-0x10 (Phobos) -> entry 16 = DEMITRI's AI scripts; 0x11 -> class 1's; 0x13 ->
-class 3's.** CPU-Phobos plays Demitri's AI; Demitri's jump command asks for
-sub-state 7; Phobos's private vs2 jump handler dies on it.
-
-Why every field fact fits: **only Phobos** has a private jump handler (vs2
-`0x213F2` adds `cmpi #$10 -> 0x2592A`; Donovan/Pyron fall through to
-vanilla's 10-entry handler and digest the borrowed scripts); **CPU only**
-(the tables are CPU-side, 14z-98 trace — 2P never touches them); **takes
-time** (the AI must randomly pick the script carrying that command; the
-maintainer's keep-away rig gives it time); **every platform** (same code).
-
-**vs2's twins:** tables `0xD91B8/0xD92B8/0xD9338` (3 starters, `0x2C492/51C/578`)
-carry real rows for 0x10/0x11/0x13 -> vs2 `0x100000-0x102Bxx`; per-tenant
-script volume ~0xE3C (H) / ~0xC8E (P) / ~0x10B8 (D) bytes. The two
-interpreters are STRUCTURALLY IDENTICAL (15 command tables, same sizes) —
-the bytecode numbering carries; command BODIES can differ (the jump body
-does: vsavj writes sub 0x0E, vs2's twin does not — measured below).
-Fix shapes — **DECISION PENDING (maintainer; gameplay-bearing: CPU-tenant
-behaviour is 1P content):**
-- **(A) UNPARK the four AI tables** — add `bank_map.toml` `data_ptr` rows for
-  `0xBF01A/09A/11A/19A` (twins `0xD91B8/238/2B8/338`, origin arithmetic
-  verified) so the extractor seeds vs2's tenant AI scripts (one contiguous
-  vs2 block `0x100000-0x102Bxx`, ~11 KB, word-offset streams) as regions,
-  relocates them into WIDE ext and repoints rows 0x10/0x11/0x13 (the alias
-  half — reachable by no legacy class, `id_space.md`; 0x18 Oboro untouched).
-  ZERO code. CPU Phobos/Pyron/Donovan then play THEIR OWN vs2 AI — correct
-  by construction (vs2's Phobos scripts were written against his 5-sub-
-  state handler). Pre-ship measurement owed: the two interpreters are
-  structurally identical (15 command tables, same sizes, jump body byte-
-  identical) but bodies drift by bytes — verify per command like 110b's
-  consumer proof; script-internal absolute pointers via the extractor
-  oracle. RECOMMENDED.
-- **(B) band-aid** — guard Phobos's private jump handler (`x02592a`) for
-  sub-states beyond its table (route to vanilla's generic handler). Code in
-  a ported region, no crash, but CPU tenants keep playing BORROWED vanilla
-  AI (Phobos attempting Demitri's script) — nonsense behaviour, no crash.
-- **(C) both** — (A) for behaviour, (B) as the guard against any other
-  vsavj-side writer of a foreign sub-state (8 static `move.b #$0e,(7,a6)`
-  sites exist in vanilla; whether any can reach a seq-6 Phobos is
-  unmeasured — the 2P field runs say not in practice).
-Also: bump the version mark to **M8** at the fix freeze — the 110b freeze
-shipped the same "M7" as its predecessor, so the field could not tell the
-builds apart by eye (paid for tonight).
-
-**Gate:** `tests/test_inp_crash_merged_m8_01.sh` (MODE=defect PASS on merged15 —
-CRASH 4806 vec11 PC 422bac frozen; flip to MODE=clean with the fix). The
-recording is tracked at `tests/inp/crash-merged-m8-01/` (40 KB + nvram).
-
-**Instrument that got it:** `tools/run_inp_guarded.sh` + `tests/lua/inp_guard.lua`
-(cheap-mode write tap on the game's exception-code store; `INP_DEBUG=1
-TRACE_FROM=` for the instruction trace, `WATCH=` write ring). The .inp is
-`~/.cache/vampire-saved/inp/crash-merged-m8-01/` (hand it into tests/ — persistent
-suite doctrine — before close). NOTE the soft-reset RAM test writes 0..9 to
-`$FF0000` too (CRASH lines with SP=0 after the real one): filter pending.
-
-### THE #99 CRASH IS NOT FIXED — and it reproduces on MAME by hand (2026-08-26, maintainer)
-
-**Two emulator-derived fixes, both falsified by the board and now by MAME
-itself.** The 14z-109 "root cause captured" (`0x3FB899 = 0x51` walked by
-Phobos's object) came from probe H, which the record marks POKE-CONTAMINATED,
-with "verify the field path funnels through this same node" listed as
-remaining work — NEVER DONE. 14z-110 (d2 window) and 14z-110b (remap) were
-validated against THAT mechanism on rigs; every natural-path rig
-(`audit_don_vs_cpu`, both contexts) ran clean before AND after — the rigs
-never reproduced the field crash, and the maintainer's hands do, on merged15,
-first try. **So the mechanism the board and MAME hit is a DIFFERENT one, or
-the captured node is walked by a path the rigs never take.** Retracted in
-place: HANDOFF's 110b row "field surfaces closed" and patch_index's 110b
-"Field surfaces closed" (this session's own overclaims).
-
-**Next (in flight):** the maintainer records the crash as a MAME `.inp`
-(`WIDE_RECORD=crash_m8 tools/run_wide.sh build/m3b_merged15 mame`, the
-HANDOFF:487 protocol); `tools/run_inp_guarded.sh` + `tests/lua/inp_guard.lua`
-(new this session) play it back in CHEAP mode (no -debug, so the playback
-stays faithful) and read the game's OWN exception record — `$FF0000.w` code,
-`$FF0018-$FF0053` D0-A6, `$FF0054.l` saved SP, the 68k frame at that SP (PC,
-fault address) — the moment it appears, plus a work-RAM dump. First natural-
-path capture of the crash, ever. Everything else (the M8 mark bump, another
-fix) waits on what it says.
-
-### BUILD-DIR POLICY APPLIED (maintainer-conditioned: "IF AND ONLY IF we know we can rebuild")
-
-Rebuildability PROVEN first: `test_m3a_reproducible` PASS (donovan/H/P/stock
-program images + whole-artifact manifests), and `tools/build_merged.sh` into
-scratch reproduced merged15's fingerprint `73690f21` with both zips
-member-content-identical (only zip timestamps differ). Then: m13 generation
-(`don_m13`, `m3b_merged15`, `m5_stock8`) TRACKED; m11 generation (`don_m11`,
-`m3b_merged13`, `m5_stock6`) DELETED (git sees 77 renames — the generations
-are mostly byte-identical); m12 generation stays on disk untracked as the one
-back. `run_all_static --strict` on the resulting tree: PASS 110/0/0.
-
-### THE 110b CLOSE ORDER, EXECUTED (this session, "go ahead")
-
-| step | result |
-|---|---|
-| (2) full-suite acceptance verify on don_m13 (MAME) | **SUITE GREEN** — 65 PASS, 0 FAIL; SKIPs = the vsav2-target ground-truth halves only; no tracked file changed |
-| (2) audit_guard_corpus on merged15 (JOBS=2) | **PASS 332/332 guarded runs, zero vectors** (`build/guard_corpus/m3b_merged15.1787771888.tsv`, tracked) |
-| (3) FBNeo oracle reduced refit | **LANDED (86f9cb2)**: FRAME_OVERRIDE 01/21/05 from the measured scan, 06 derived, 26 dropped for 05 (documented in the gate header + CLAUDE.md §4 + HANDOFF); overrides checked against the ratified MAME regions (unsafe = FAIL); FROZEN inventory unchanged. **PASS x2, every frame masked-EXACT** (no phase line at all — the chosen instants are cleaner than the old derived ones ever were) |
-| (4) `run_all_static.sh --strict` | **PASS 110 / SKIP 0 / FAIL 0 / MISSING 0**, no tracked file changed during the run |
-| (4) tags freeze/donovan-m13 + freeze/merged-m8 | **CUT (local, annotated, at the post-refit tree) — NOT pushed; push is the maintainer's call, along with the 12 older unpushed tags** |
-| (1) field verdict on merged-m8 | **RED (maintainer, 2026-08-26 evening): the 20:17 bundle (all three files, CRC chain zip->MRA->merged15 VERIFIED `156fd6a8`) STILL CRASHES on the board — same protocol (Donovan 1P, win vs Bishamon, then Phobos), every time, within the match (not necessarily at fight start). AND THE SAME PROTOCOL CRASHES ON MAME ON merged15 BY HAND.** The remap (110b) and the d2 window (110) did not touch the crash. Wheel still M7 (the mark was not bumped for 110b — the tell was useless; bump it next freeze). See "THE #99 CRASH IS NOT FIXED" below. |
-
-
-
 **SPLIT 2026-08-20 (14z-99 post-freeze close, maintainer-approved): this
 file holds the RECENT session groups + THE LEDGER; the full detail of every
 older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
@@ -510,6 +313,8 @@ Full detail for every line: `STATE_HISTORY.md` (verbatim; grep the session
 tag or any phrase below). `[+N more entries]` = the group has N further
 session records in the archive beyond the headline shown.
 
+- Session 14z-111 CLOSE — #99 ROOT-CAUSED (CPU-Phobos ran DEMITRI's AI: the four per-class AI action-script tables `PRG:0xBF01A/09A/11A/19A` are 16 classes + the same 16 repeated, so tenant classes read the aliased row) AND FIXED by option A (the tenants' own vs2 AI script blocks as data roots, zero code); frozen donovan-m14 / huitzil-m21 / pyron-m15 / merged-m9, mark M8; board bundle 14z111 ready; FIELD REPORTS ARE RECORDINGS promoted to CLAUDE.md §4 law with `tests/test_inp_corpus.sh` (moved to STATE_HISTORY 14z-114)
+- Session 14z-111 — OPENED WITH A CLOSE-RITUAL AUDIT of 14z-110b (clean but unchecked): the three in-flight validations re-run and accepted; then the field verdict RED on merged-m8 (the board STILL crashes on Bishamon > Phobos, MAME by hand too) -> the maintainer's hand-played `.inp` captured under the new `tools/run_inp_guarded.sh` found the real mechanism the two poke-derived fixes never touched (moved to STATE_HISTORY 14z-114)
 - Session 14z-110b CLOSE — the 0x51->0x44 remap BUILT, FROZEN (donovan-m13 / merged-m8, M7 mark carried) and MAME-VALIDATED; the board bundle carries merged-m8; the FBNeo partial oracle's reduced refit RULED and in progress; closed at the maintainer's call (context ceiling) with three validations in flight — re-run and accepted at the 14z-111 opening audit
 - Session 14z-110b addendum — THE FBNEO ORACLE RED ROOT-CAUSED TO THE RULED d2-WINDOW CYCLES (110), NOT THE REMAP (110b): m12 == m13 RAM at the failing frame; the hunt cost a paid-for instrument trap; resolution = per-replay measured-clean frame overrides, 26_don_arcade_mash dropped for 05_timeout_idle (maintainer-ruled)
 - Session 14z-110b — THE RESIDUAL #99 ROOT-CAUSED AND THE REMAP RULED-BY-CONDITION: the STORED state 0x51 over-runs a SECOND 80-vs-84 dispatcher (PRG:0x2384E) the 14z-43 audit also missed; fix = 0x51 -> 0x44 on the six deity nodes + one ported immediate, measured equivalent at every consumer both engines have. (Field: STILL CRASHED — the real #99 was the AI script-table alias, found 14z-111 from the maintainer's recording.)

@@ -1,5 +1,55 @@
 # NEXT SESSION — orientation (rewritten at the 14z-114 close, 2026-08-28)
 
+> ## **START HERE. NOTHING IS RED. SIX SKILLS EXIST AND ARE LOCKED TO THE
+> ## DOCS — load the relevant one BEFORE the work, every session.**
+> ##
+> ## **WHAT EXISTS NOW (`.claude/skills/<name>/SKILL.md`):**
+> ## `mister-cps2-wide-core` (`[MSC-1..73]`, level 1) and `mister-vampire-saved`
+> ## (`[MSV-1..36]`) for the FPGA lane; `cps2-hardware` (`[CPH-1..30]`) and
+> ## `cps2-emulation` (`[CPE-1..42]`) for the board and the two emulators as
+> ## instruments; `vampire-savior-engine` (`[VSE-1..83]`, the game's laws, NO
+> ## ROM addresses); `vampire-saved-port` (`[VSP-1..161]`, THIS port's
+> ## discipline — CLAUDE.md by citation, the oracle classes, the pipeline law,
+> ## freezes/releases/the suite, every rig and how it lied). 425 rules. Each
+> ## rule is anchored `**[PFX-N]**` at the doc paragraph it distils and
+> ## `tools/checkskills.py` (`tests/test_checkskills.sh`, ci_portable, eight
+> ## must-fire controls) locks both directions, lints level 1 for game words,
+> ## refuses any number not in a LOG, resolves cross-references, and refuses
+> ## a VSP anchor anywhere in STATE.md outside "STANDING PRINCIPLE" / "THE
+> ## DEADNESS REGISTER" (the file rolls). Plan and boundaries — now the
+> ## record — `docs/project/skills_scope.md`; five decisions OPEN TO VETO in
+> ## STATE "Decisions pending".
+> ##
+> ## **THE ONE RULE THIS ADDS TO EDITING DOCS:** an anchored paragraph carries
+> ## its marker — rewrite the fact and keep the marker with it, or move the
+> ## rule; delete the paragraph and the gate goes red, on purpose. Four
+> ## staleness passes (MiSTer S1-S20 in 14z-113; A+B, C, D in 14z-114) ran
+> ## BEFORE distilling, each its own commit; the docs the skills cite are the
+> ## corrected ones.
+> ##
+> ## **NOT PUSHED:** everything after `bb8ecde` (the MiSTer skills) is local —
+> ## six commits + the close. Push only at the maintainer's word; check
+> ## `git status -sb`, not this line.
+> ##
+> ## **OPEN, unchanged:** #113 stays OPEN (camera evidence in progress — do
+> ## not close, do not re-derive); two D staleness items flagged UNVERIFIED
+> ## (skills_scope §4 row D); re-filing candidates for the maintainer
+> ## (fourteen emulator-fact entries in `project/gotchas.md`, the 14z-90
+> ## onset entry in `game/gotchas.md`); housekeeping deferred
+> ## (`build/m3b_merged15` referenced by `test_inp_crash_merged_m8_01` defect
+> ## mode; STOCK CONTROL once-per-`.rbf`, unruled; the cosmetic backlog —
+> ## DISASSEMBLE, NEVER SCAN).
+> ##
+> ## **STATE OF THE BUILDS:** merged-m10 = `build/m3b_merged17` (M8 mark;
+> ## `tools/run_wide.sh build/m3b_merged17 fbneo`); solos `don_m14` /
+> ## `hui48` / `pyron32`, stock twin `m5_stock9`; bitstream seed 18269 at
+> ## `release/bitstreams/CURRENT`. Strict static at close: 111/0/0/0.
+
+# HISTORY BELOW — the mid-14z-114 and 14z-113 orientations and older; kept for
+# the census anchors, eliminations and traps, superseded as the opener.
+
+## (HISTORY) NEXT SESSION orientation (written mid-14z-114 after C, 2026-08-28 — superseded by the close opener above)
+
 > ## **START HERE. NOTHING IS RED. THE MiSTer SKILLS EXIST AND ARE LOCKED
 > ## TO THE DOCS — load them before any MiSTer work.**
 > ##
@@ -50,8 +100,6 @@
 > ## `release/bitstreams/CURRENT`; everything pushed once this session's
 > ## commit lands (check `git ls-remote`, not this line).
 
-# HISTORY BELOW — the 14z-113 orientation and older; kept for the census
-# anchors, eliminations and traps, superseded as the opener.
 
 ## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-113 close, 2026-08-28)
 
