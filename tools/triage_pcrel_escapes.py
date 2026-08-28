@@ -27,7 +27,7 @@ UNCOVERED = {
     "huitzil": ["x028122", "code", "x068c78"],
     "pyron":   ["x028122", "x068c78"],
 }
-SOLO = {"donovan": "don_m14", "huitzil": "hui48", "pyron": "pyron32"}  # re-pointed 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
+SOLO = {"donovan": "don_m15", "huitzil": "hui49", "pyron": "pyron33"}  # re-pointed 14z-115 (select-wheel freeze; bare names, which the path sweep missed) <- 14z-113
 
 mp = json.load(open("build/m3b_merged18/patch/placements.json"))["regions"]
 
