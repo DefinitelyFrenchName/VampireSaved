@@ -1,4 +1,12 @@
-# GOTCHAS (game)
+# GOTCHAS (game) — traps in VAMPIRE SAVIOR itself
+
+Things about the GAME that will mislead you: engine behaviour, data
+layout, and modes that fail quietly. True of `vsav`/`vsav2`/`vhunt2`
+whatever you are building — if you are reading these to fix a bug in
+this romhack, read `../platform/gotchas.md` and `../project/gotchas.md`
+too.
+
+Append the moment one is paid for. Read before touching the related area.
 
 ## Moving a frozen ONSET frame can silently cross a verification-class boundary (paid: 14z-90, GitHub issue #4)
 
@@ -16,19 +24,17 @@ Whether >=60 binds across a flicker->window boundary at all is a
 class-definition question (two mechanisms, separately attributed), and
 it is open with the maintainer. The lesson is the general one: an onset
 or tolerance constant is not a private number — check what OTHER frozen
-rule sits within a few frames of it before moving it. — traps in VAMPIRE SAVIOR itself
+rule sits within a few frames of it before moving it.
 
-Things about the GAME that will mislead you: engine behaviour, data
-layout, and modes that fail quietly. True of `vsav`/`vsav2`/`vhunt2`
-whatever you are building — if you are reading these to fix a bug in
-this romhack, read `../platform/gotchas.md` and `../project/gotchas.md`
-too.
-
-Append the moment one is paid for. Read before touching the related area.
+*(Filing note 14z-114: this entry was spliced INTO the file's title line at
+14z-90 — the title read "# GOTCHAS (game)" + the entry + "— traps in
+VAMPIRE SAVIOR itself". Restored. It is a VERIFICATION-CLASS fact and a
+re-filing candidate for `../project/gotchas.md`; listed in
+`docs/project/skills_scope.md` §4.)*
 
 ## OBJ record formats differ in ENTRY STRIDE, not just header meaning
 
-Format 2 records: (tile.w, attr.w) 4-byte entries, count at +4. Format 0
+**[VSE-31]** Format 2 records: (tile.w, attr.w) 4-byte entries, count at +4. Format 0
 records: tile-only 2-BYTE entries, count at +2, a single attr in the
 header. A unified 4-byte walk "works" — the validation happens to pass —
 but remaps only every other tile of format-0 records. Symptom: sprites
@@ -55,7 +61,7 @@ output-side re-parse that must reproduce the source-side counts.
 
 ## "Slot-indexed cell" does not mean "slot-exclusive data" — three surgery traps
 
-The select/splash record surgery tripped the masked legacy gate three
+**[VSE-54]** The select/splash record surgery tripped the masked legacy gate three
 times, each root-caused to the byte (session 14g):
 1. CELL POKES are RAM-visible: menu objects store chain anchors in work
    RAM; repointing a cell can change stored pointer values on any
@@ -75,7 +81,7 @@ times, each root-caused to the byte (session 14g):
 
 ## The sibling-coincidence gotcha, third strike: the global coordinate pool
 
-The companion-effect records' coordinate-list pointers aim at vs2's
+**[VSE-3]** The companion-effect records' coordinate-list pointers aim at vs2's
 GLOBAL X/Y pool (0x30xxxx) — same-value in vs2 and vhunt2, so the
 sibling diff never flagged them, and the region ported with raw
 vs2-space cptrs. Latent since M2a: those effects read coordinates from
@@ -88,7 +94,7 @@ row or a content-match, never a pass-through.
 
 ## Same-value class #4: A5-relative work-var displacements
 
-The engines' A5 work-variable layouts differ (vsavj damage vars at
+**[VSE-4]** The engines' A5 work-variable layouts differ (vsavj damage vars at
 -0x4BBE/BC/BA vs vs2 at -0x4B6C/6A/68 — a uniform -0x52 family shift).
 Ported code writing engine work vars by displacement writes DEAD MEMORY
 on vsavj — no crash, no diff visibility (vs2/vhunt2 share the layout),
@@ -114,7 +120,7 @@ Jedah's per-char region (superset traps 1-3 above all apply).
 
 ## The attract INTRO CUTSCENE is Jedah — per-char display sites are legacy surface
 
-VSAV's attract opening is Jedah's resurrection cutscene: his per-char
+**[VSE-56]** VSAV's attract opening is Jedah's resurrection cutscene: his per-char
 display code (the strip-table `movea.l #T,a0` sites) executes on every
 legacy replay ~frame 888, long before the frozen-4278 demo divergence.
 A static repoint of those sites is therefore a legacy break even though
@@ -131,7 +137,7 @@ ported tables.
 
 ## The per-char strip zone interleaves the SHARED MUSIC POOL
 
-Placing ported data into apparent "gaps" of Jedah's strip/stream area
+**[VSE-55]** Placing ported data into apparent "gaps" of Jedah's strip/stream area
 (0x267112-0x271CE8) broke legacy replays with sound-driver RAM deltas
 (02_demitri masked diverged at 891/1726; $FF00xx/$FF04xx/$FF06xx state,
 a fabricated stub materializing at $FF001A): the area interleaves the
@@ -146,7 +152,7 @@ attributed via vanilla-demo cursor sampling) — placement there was
 
 ## Per-char table entries are PAIRS more often than you think
 
-param32_a/b (movement velocities) span 0x80 per 32 apparent slots and
+**[VSE-16]** param32_a/b (movement velocities) span 0x80 per 32 apparent slots and
 were registered as 4-byte rows; they are 16-char tables of 8-byte
 (forward, back) PAIRS. "Slot 0x0F × 4 bytes" = char 7's second long =
 FELICIA'S WALK-BACK — corrupted by Donovan's port since the table
@@ -157,7 +163,7 @@ table: alternating sign longs (+,-,+,-) are a pair signature; a
 The 29_felicia_walljump oracle caught it the day it was frozen.
 
 ## In the engine hit-spark spawner, a1 is the VICTIM, a6 the attacker
-The shared spark spawner (vsavj 0x18EFC, vs2 0x178C2 twin) reads the
+**[VSE-43]** The shared spark spawner (vsavj 0x18EFC, vs2 0x178C2 twin) reads the
 attack record via a3 and checks `$54(a1)`/`$382(a1)` — but a1 is the
 DEFENDER (reaction-side remaps; vs2's char specials 6/0x10/0x11 there are
 victim-specific spark handling). The attacker is a6. A thunk gating "is
@@ -166,7 +172,7 @@ never fires (cost a build-and-measure round; measured live: a1=ff8800
 victim, a6=ff8400 attacker, bp at the spawn-mark thunk).
 
 ## Anim numbers: facing adds 0x300; set-anim QUEUES, display resolves
-`jsr $4CE2`-family set-anim helpers add 0x300 to the anim number when the
+**[VSE-26]** `jsr $4CE2`-family set-anim helpers add 0x300 to the anim number when the
 facing bit ($70) is set, then queue (number, params) into the command
 ring at a5-0x71F2 (writer 0x31DA). The number→record-strip resolution
 happens LATER in the display processor via per-char strip tables (the
@@ -178,7 +184,7 @@ selectors.
 
 ## OBJ-RAM diffing: entries move every frame, stale tails linger, dumps
 ## and taps CAN legitimately disagree
-Three traps from the Victor-shock investigation (session 14z-6):
+**[VSE-36]** Three traps from the Victor-shock investigation (session 14z-6):
 (1) sprite-list entries relocate between frames — "who writes offset X"
 is only meaningful frame-by-frame, and content seen at X may have been
 written there thousands of frames ago (the c625 curtain column was an
@@ -206,7 +212,7 @@ buckets at the sampled frame).
 
 ## "This char's band is free once the char is replaced" — NO: bands hold
 ## SYSTEM-REFERENCED tiles too
-The session-14 tile placement assumed Jedah's OBJ band (0xAD80-0xEEBB)
+**[VSE-35]** The session-14 tile placement assumed Jedah's OBJ band (0xAD80-0xEEBB)
 was writable once Donovan replaced him. FALSE: vanilla system content
 references tiles inside per-char bands — measured: the VS-fade curtain
 columns draw code 0xC625 (soft smoke art in vanilla, Donovan body
@@ -219,7 +225,7 @@ the vanilla CONTROL RUN — always run the vanilla control FIRST when a
 visual differs; it would have ended this in one session.
 
 ## Record walks that follow POINTERS miss offset-computed records
-The electrocute X-ray overlays (and by implication other aux-chain
+**[VSE-32]** The electrocute X-ray overlays (and by implication other aux-chain
 display records) are located by arithmetic (aux table + index*4), not
 by any in-region pointer — a pointer-following walk never visits them,
 so they silently ship with UNREMAPPED tile words and UNCOPIED art. The
@@ -235,7 +241,7 @@ reruns are the only trustworthy probe results.
 
 ## Palette rows 0x10+ belong to the P2 CHARACTER — attribute rows with a
 ## roster-varied control, not a same-roster control
-The 14z-18 "statue rows 0x10/0x11" attribution was wrong twice over:
+**[VSE-53]** The 14z-18 "statue rows 0x10/0x11" attribution was wrong twice over:
 every probe match used P2=Victor, so rows 0x10/0x11 "matching native
 vs2" proved only that both games upload VICTOR identically — and the
 "statue accent family" 0x39B040 was Victor's own glow data. The
@@ -252,7 +258,7 @@ pattern).
 
 ## Hit-freeze constants are ENGINE-GENERATION tuning, not ported data —
 ## sibling-verified structure can still drift behaviorally
-The vsavj and vs2 victim-reaction handlers are structural twins
+**[VSE-6]** The vsavj and vs2 victim-reaction handlers are structural twins
 (field-for-field), but the freeze constants inside them differ
 (attacker +0x5C: 0x0B vsavj vs 0x04 vs2; victim 0x18 vs 0x0C): vs2
 retuned the shared engine for its rapid multi-hits. Any ported move
@@ -264,7 +270,7 @@ drift WAS both maintainer symptoms — hit count and animation speed.)
 
 ## Venue-asset numerology: palette index ≠ character id; identify
 ## cells by MEASURING the cursor, not by suggestive constants
-The select wheel's big 3x3 cell uses pal row 07, and Jedah's vsavj
+**[VSE-51]** The select wheel's big 3x3 cell uses pal row 07, and Jedah's vsavj
 char id is 0x07 — so it "obviously" was Jedah's medallion. It's
 GALLON's (pal indices in the wheel record are display rows; vs2's
 appended trio proves the point — Donovan's icon rides vs2 pal row
@@ -280,7 +286,7 @@ one render; do them BEFORE writing any manifest row that targets a
 the character's design settles it instantly.)
 
 ## The per-char OBJ bank word is NOT a display-only attribute
-The per-character OBJ bank table (`PRG:0x282D4`, opcode/decrypted view,
+**[VSE-34]** The per-character OBJ bank table (`PRG:0x282D4`, opcode/decrypted view,
 0x18 word rows of 0x0000/0x2000/0x4000/0x6000) looks like a pure
 "which gfx bank do this character's tiles live in" display attribute. It
 is not: changing a row perturbs GAME STATE. Measured — the same modified
@@ -307,7 +313,7 @@ from outside the structure.
 
 ## An 0xFF inside a LIVE select-wheel row is committed as character id 0xFF
 (caught before shipping, 2026-08-05, 14z-60o)
-The navigation routine reads TABLE B and stores the byte with **no validity
+**[VSE-48]** The navigation routine reads TABLE B and stores the byte with **no validity
 check**:
 
     020A78  move.b  (a0,d1.w),d0     ; new cell = row[direction]
@@ -336,7 +342,7 @@ generator intended to produce.
 
 ## There is no such thing as a free palette row on a venue screen (14z-63)
 
-Three progressively-wrong "free row" proofs, each paid for:
+**[VSE-52]** Three progressively-wrong "free row" proofs, each paid for:
 1. "No OBJ references it" (sweeps over 3 replays) — missed that the
    select VENUE PHASES write rows on a ~15 s timer: the accent march
    claims the figure-family rows {0x15,0x16,0x17} (and P2's
@@ -363,7 +369,7 @@ Rules:
 
 ## A WATCHDOG REBOOT masquerades as a clean "nothing happened" (14z-65)
 
-The forced-boot probe at id 0x10 on the stage-4 ladder build reported:
+**[VSE-78]** The forced-boot probe at id 0x10 on the stage-4 ladder build reported:
 guard clean, no tripwire, P1 struct zeroed at f3600 — reading like the
 char-load path politely declining. The SNAPSHOTS say otherwise: f2200
 select screen, f2900 black garbled transition, f3400 THE QSOUND BOOT
@@ -381,7 +387,7 @@ Rules:
 
 ## The content-twin trap: vsavj keeps byte-identical copies of engine
 ## code inside per-char families — hook the LIVE one, found by tracing
-Searching vsavj for the byte-for-byte twin of vs2's generic jump-seq
+**[VSE-5]** Searching vsavj for the byte-for-byte twin of vs2's generic jump-seq
 head found 0x26A58 — which hooked cleanly and did NOTHING (0 probe
 hits): it is ANAKARIS's private copy of the handler, id-routed at
 0x22A0E (`cmpi.b #6` at the head). The LIVE generic handler is reached
@@ -393,7 +399,7 @@ duplicates handler code per character and the copies diff identical.
 ## Sampling a STATE-gated effect at the wrong moment reads as "not
 ## reproduced" (14z-68u)
 
-The Dark Force afterimage/recolour was written up as "not reproduced
+**[VSE-77]** The Dark Force afterimage/recolour was written up as "not reproduced
 on the current build" after measuring sprite counts and palette RAM
 across replay 82 at f3050-3250 — with DF verifiably ACTIVE (seq 0x0A
 confirmed). The effect is gated on the character MOVING, and that
@@ -408,7 +414,7 @@ are worth asking for BEFORE measuring, not after a negative result.
 ## A MODE-gated symptom needs the MODE PROVEN ENTERED — pressing the
 ## input is not entering it (14z-69, cost this session twice)
 
-Dark Force costs one banked stock. With an empty meter the P+K pair is
+**[VSE-68]** Dark Force costs one banked stock. With an empty meter the P+K pair is
 DOWNGRADED to a single button and the match continues normally: the
 tells are `+0x109` (banked stock) staying 0 and `+0x107` reading
 0xFF/0xFE. **`seq 0x0A` is that downgrade.** Every DF measurement from
@@ -434,7 +440,7 @@ mode, after expiry — and keep only bytes that are off/off/on/on/off
 with identical values on both games. 18 bytes qualified; `$FF802E` is
 the one now used, and the checker refuses to judge without it.
 
-Rules that fall out of this, in the order they would have saved time:
+**[VSE-76]** Rules that fall out of this, in the order they would have saved time:
 1. **Assert the state, not the input.** A rig that presses the button
    proves nothing; a rig that measures the mode flag and the resource
    it consumed cannot silently drift out of the state under test.
@@ -489,7 +495,7 @@ Rules:
 ## A VARIANT ALIAS ROW holds a value vanilla uses — that does not make the
 ## SLOT used, and reading it that way deferred a fix for two sessions (14z-76)
 
-Every 32-row per-character table in vsav aliases rows `0x10-0x1F` onto
+**[VSE-12]** Every 32-row per-character table in vsav aliases rows `0x10-0x1F` onto
 `0x00-0x0F`. So a tenant's row *always* contains a pointer vanilla also uses
 somewhere — that is the definition of an alias, and it is precisely the
 property that makes repointing the row superset-safe.
@@ -570,7 +576,7 @@ entry-only measurement is not grounds to override a whole-effect rule.
 
 ## +0x382 is the char id only at SELECT — in match it is the VOICE-FLAVOR CLASS, and the engine reassigns it (14z-87)
 
-The forced-pick pokes write the char id there, the TCRF cheat writes 0x18
+**[VSE-62]** The forced-pick pokes write the char id there, the TCRF cheat writes 0x18
 there, and audit_id_writers censuses it — all correct for select/commit.
 But mid-match the engine's voice-class borrow (match-sequencer event →
 `jsr $AE7C`, write at `PRG:0x0AEF6`) overwrites it with an allocated
@@ -589,7 +595,7 @@ mechanism gate: tests/audit_voice_borrow.sh.
 
 Two facts about the game that cost a session-arc of wrong rigs (#105):
 
-**AUTO does not play the character.** The mode menu's AUTO row arms
+**[VSE-47]** **AUTO does not play the character.** The mode menu's AUTO row arms
 auto-blocking; the human still supplies every attack. Measured: an idle
 AUTO character auto-guards and deals ZERO hits over 8,000+ frames while
 the CPU chips it down (and auto-guard does not stop throws, so an idle
@@ -598,7 +604,7 @@ LOSING rig, not an autoplay rig. Prove the selection with a menu
 snapshot (the cursor lands on the gold AUTO row) before concluding
 anything about "AUTO behavior".
 
-**The victory portrait screen shows after match wins in BOTH 1P-vs-COM
+**[VSE-80]** **The victory portrait screen shows after match wins in BOTH 1P-vs-COM
 and 2P** (field-confirmed by the maintainer and rig-reproduced 14z-99;
 the corner carries PRESS START in the 1P flavor and the loser's
 CONTINUE countdown in 2P). TWO RIG TRAPS hid it for a whole arc, both

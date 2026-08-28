@@ -38,7 +38,7 @@ them (`../../platform/gotchas.md`).
 
 ### The table length is SELF-ENCODING
 
-Handler code begins immediately after the last entry, so **entry 0's own
+**[VSE-27]** Handler code begins immediately after the last entry, so **entry 0's own
 offset is the table size**:
 
 | set | entry 0 | table bytes | types |
@@ -88,7 +88,7 @@ bcs    <skip>        ; not enough left -> the WHOLE list is skipped
 sub.w  d5,d7
 ```
 
-Skipping is all-or-nothing per list, so budget pressure makes whole pieces
+**[VSE-30]** Skipping is all-or-nothing per list, so budget pressure makes whole pieces
 of an effect vanish rather than degrade. `docs/game/gotchas.md` records the
 coupling between this budget word and a one-byte work-RAM divergence.
 
@@ -145,7 +145,7 @@ Children may be any type, including another composite.
 
 ## 4. THE GAME-SPECIFIC CONSTANTS (the trap)
 
-vsav and vsav2 do **not** interpret the same list data identically. Every
+**[VSE-28]** vsav and vsav2 do **not** interpret the same list data identically. Every
 emitted tile code is biased by a constant, and the constant differs:
 
 | type | vsavj | vsav2 | encoding |
@@ -171,7 +171,7 @@ A sprite's `attr` carries its size: width−1 in bits 8-11, height−1 in bits
 tile = base + row*0x10 + ((base + col) & 0x0F)
 ```
 
-— the column index **wraps within the base's row of 16**. Two consequences:
+**[VSE-33]** — the column index **wraps within the base's row of 16**. Two consequences:
 any tile-inventory work must expand `w×h` from the base (a base-only census
 is how the 214+P ground explosion kept drawing a solid block), and any
 relocation of such art must be **16-aligned** or the wrap breaks.

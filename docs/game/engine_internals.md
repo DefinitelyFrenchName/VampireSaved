@@ -6,7 +6,13 @@ subsystems (object system, anim, sound farm, dispatch banks) are still
 scattered across docs/game/atlas/character_tables.md, docs/project/tables/
 reconciliation.md and patch_notes — fold them in as they get touched.
 
-## NOT YET SYNTHESISED — the standing backlog (audited 14z-68m)
+## THE SYNTHESIS BACKLOG — CLEARED 14z-68n, re-swept 14z-71; the table is kept as the FORM
+
+*(Header corrected 14z-114: it still read "NOT YET SYNTHESISED — the standing
+backlog (audited 14z-68m)" three status paragraphs after its own
+"CLEARED". The intro's "other subsystems are still scattered across the
+atlas / reconciliation.md / patch_notes — fold them in as they get touched"
+is likewise the session-14 state; every subsystem below has a section now.)*
 
 **This document is thin relative to the analysis that exists.** Measured
 at 14z-68m: engine_internals 810 lines vs STATE.md 8417 lines. Most
@@ -50,7 +56,7 @@ duplicated: `docs/project/cps2_wide.md` (the WIDE profile), `docs/game/atlas/`
 ## THE DEAD-ROW CLASS — vsav ships table rows as STUBS or ALIASES where
 ## vs2/vh2 fill them (named 14z-74; SIX instances and counting)
 
-**The single most common defect shape in this port.** vsav and vs2 share an
+**[VSE-2]** **The single most common defect shape in this port.** vsav and vs2 share an
 engine, and their per-character / per-state dispatch and data tables are
 index-aligned — but **vsav leaves rows the newcomers need either as a STUB
 (pointing at an `rts`, or at a displacement inside the table itself) or as an
@@ -176,6 +182,9 @@ bank 4 at DELTA 0 (native codes, no record remap at all), disjoint from
 Donovan's frozen +0x2750 band+shelf by interval (max H∪P code 0xA42C <
 his SAFE_LO 0xAD80). Layout ledger: build/manifest/gfx_layout3.toml.
 
+**HISTORY — the M2b (slot-0x0F substitution) placement, superseded by WIDE
+group C at M3a / 14z-67 (the paragraph above); kept for the inventory
+figures and the exclusivity method (status marked 14z-114).**
 **M2b consequence: DONOVAN FITS IN JEDAH'S MAIN BAND** (extent 0x3CB1 <=
 0x417F, 15,171 <= 16,658) — no gfx ROM expansion needed for him. Port
 shape: (1) re-encode Donovan's tile data into vsav gfx members at
@@ -273,10 +282,13 @@ All green on stage-6 fingerprint 71601263:
   single slot (replay.lua clobbers it — use add_machine_frame_notifier)
   and add_machine_*_notifier subscriptions must be pinned in globals.
 
-Remaining before an M2b freeze: select-screen portrait/name art (+their
+~~Remaining before an M2b freeze: select-screen portrait/name art (+their
 palettes, vsavj 0x3B5988/0x3BAEA8 family), the attract palette path
 (0xB0AC/0x3A3CA0), and the x2b7ef4 engine-effect tail (385 non-same-idx
-tiles — minor effect artifacts if any).
+tiles — minor effect artifacts if any).~~ *(M2b-era list; the select art
+and palettes shipped 14z-62/63 (`atlas/select_screen.md`), the effect
+family closed 14z-71. The attract-palette writer note above is UNVERIFIED
+status — nobody has re-measured it since M2b. Marked 14z-114.)*
 
 ## The ARCADE LADDER: who you fight next, and where (14z-94, measured on
 ## the #92 crash; decoded end to end and confirmed on screen)
@@ -286,7 +298,7 @@ Depends on `atlas/ram.md` rows: `$FF8100` (stage index), `$FF1E48`/`$FF1E50`
 `$FF8121` (venue byte), `$FF8138` (scan bound), `$FF8782`/`+0x382` (voice
 class).
 
-**Two parallel 36-row tables drive it.** `PRG:0x00B268` (table A) holds
+**[VSE-59]** **Two parallel 36-row tables drive it.** `PRG:0x00B268` (table A) holds
 candidate CLASSES; `PRG:0x00BB68` (table B) holds the STAGE for each. Each
 row is 8 groups of 8 bytes; a row is one character's ladder and a group is
 one rung.
@@ -317,7 +329,7 @@ Confirmed on screen: poking `$FF8100` after the selector runs changes both
 the banner on the arcade map screen and the venue the following match is
 fought in — same rig, same frame, same matchup, different stage.
 
-**The banner family is a run of fmt-4 glyph records**, addressed from an
+**[VSE-60]** **The banner family is a run of fmt-4 glyph records**, addressed from an
 ANCHOR that is the family's first row, not the pointer table's base:
 
     vsavj  anchor 0x26775a = table 0x26771e row 0x0f   12 stages, v = 0x00..0x16
@@ -424,9 +436,12 @@ Phase-1 attempt (session 14d) — measured corrections to the map:
 tools/select_port.py holds the phase-1 machinery (zone extraction,
 structure-walked relocation, prg-dir chaining) — NOT wired into the
 build until the real per-char handles are proven by differential dumps
-(hover-moment, two chars). Next session: dump $FFB980's [0x1C] at the
+(hover-moment, two chars). ~~Next session: dump $FFB980's [0x1C] at the
 HOVER frame for two different picks; diff the group spans; patch the
-inline pointers in place (32-bit, slot-0x0F rows only).
+inline pointers in place (32-bit, slot-0x0F rows only).~~ *(DONE — phase 2
+below; and the whole in-place approach was retired at 14z-62 when the
+tenants moved to variant ids: `atlas/select_screen.md` "The RECORD-POINTER
+array". Marked 14z-114.)*
 
 ### Select-screen phase 2 (session 14e): the real handles, empirically
 
@@ -483,7 +498,10 @@ deliberately NOT replaced: its vs2 coordinates assume vsav2's wheel
 geometry — replacing it drew a displaced label. Remaining select
 cosmetics: wheel face (background scroll art), highlight ring, VS
 splash bust + win screens (the 0x0B76C0 in-match family), attract
-palette.
+palette. *(Status 14z-114: the ring shipped 14z-63 ("Ring reuse"), the win
+screen 14z-68m/73 below, the medallions 14z-63 (bank-5 move); what is
+still open is the cosmetic backlog in STATE — win-quote TEXT, ladder
+names/pictures, wheel polish.)*
 
 GATE ANOMALY (recorded per the CLAUDE.md §4 standing watch): one gate
 invocation showed 02 masked-diverged + 10 with 84 divergent frames from
@@ -524,7 +542,7 @@ The per-object anim interpreter ("walker") both engines share
 the vs2 block sits at PRG:0x0CD390, so ported-object node writes show
 PC 0xCE38A = vs2 0x2713C + port offset):
 
-- **Node format (0x18 bytes):** +0 duration byte — loaded into
+**[VSE-25]** - **Node format (0x18 bytes):** +0 duration byte — loaded into
   obj+0x20 as a countdown (`move.l (a0),$20(a6)` on node set;
   decrement at vs2 0x271C4 `subq.b #1,$20(a6)`, ours 0xCE412); +1
   flags (bit7 = follow the LINK at +0x18 instead of advancing
@@ -594,7 +612,7 @@ vsavj and vs2; addresses vs2 / vsavj-twin):
   0x2A128/0x2A1B4/0x2A2EA/0x2A42E) — motion vs charge vs
   button-sequence families. The state machines of corresponding
   kinds are proper twins ACROSS engines; only the TABLES differ.
-- **Engine-generation retune (the 14z-48 trap):** VS2 changed some
+**[VSE-46]** - **Engine-generation retune (the 14z-48 trap):** VS2 changed some
   motion TABLE definitions vs vsavj — e.g. 63214: vsavj
   [1,5,4,16] (final step dir+flag fused) vs vs2 [1,5,4,6,12]
   (final step split; extra required entry) — an input-leniency
@@ -803,7 +821,7 @@ that stood for a whole session (STATE 14z-74/75 retraction).
 
 Architecture (all measured live, both games):
 
-- **68k side is id-only.** Game code queues `{id.l, d2.l, d3.l, pad}`
+**[VSE-61]** - **68k side is id-only.** Game code queues `{id.l, d2.l, d3.l, pad}`
   16-byte entries into a ring at `RAM:$FF0E0E` (0x100 entries), write
   index word at `RAM:$FF1E0E` (enqueue routine PRG:0x31EA, a5=FF8000
   with negative displacements). A per-frame pump transmits pending ids
@@ -830,7 +848,7 @@ Architecture (all measured live, both games):
 
 ### The 14z-51 id-space result (docs/project/m5/keyons_*.json)
 
-Sweeping ids 0x000-0x7FF on both games (2048 pokes each): 1613 vsavj /
+**[VSE-67]** Sweeping ids 0x000-0x7FF on both games (2048 pokes each): 1613 vsavj /
 1370 vs2 ids key voices. **For the shared sfx library the two games
 use IDENTICAL ids** — vs2 0x136/0x137/0x13d/0x142/0x146/0x112/0x156/
 0x157/0x158/0x15a/0x18b/0x18d/0x299/0x2d4 all exist on vsavj as the
@@ -838,14 +856,18 @@ SAME id keying the SAME sample content (relocated in the image;
 content-verified). The session-5 "same-id means music in vsavj" theory
 is dead — the 214P/214K music bug's real mechanism must be re-diagnosed
 (suspect: the per-char dispatcher table indirection `(6,a0,d2.w)` or
-corrupted id flow through the farm path) BEFORE unstubbing.
+corrupted id flow through the farm path) BEFORE unstubbing. **ROOT-CAUSED
+14z-52 (STATE_HISTORY "M5 phase 1: music bug root-caused"); this sentence
+stood as an open item until 14z-114.**
 vs2-ONLY samples (absent from vsav's 8MB — Donovan voice/new sfx):
 ids 0x71d, 0x73e, 0x753, 0x754, 0x755, 0x756 (+0x14a and 0x173 are
 same-id-different-content — vsavj reuses those ids for other sounds).
 0x747 keys nothing in either probe so far (needs params or longer
 window). Sample ROMs are FULL (no blank 64K blocks) — porting voice
 samples means growing the QSound region (descriptor change) or
-sacrificing content; maintainer decision material.
+sacrificing content; maintainer decision material. **DECIDED and SHIPPED:
+the WIDE profile's 16 MB QSound region (`../project/cps2_wide.md`) and the
+M5 voice batch (14z-86, "The QSound Z80 driver" below). Marked 14z-114.**
 
 ### The per-node sfx dispatcher and per-char record arrays (14z-52)
 
@@ -936,7 +958,7 @@ with bank b == flat `CPU + b*0x4000`. Bank register $D003 =
 `qsound_banksw_w`: `data & 0x0f`, overflow → bank 0), so only the low
 18 bits of an address reach ROM.
 
-**The Z80 is NOT encrypted** (RETRACTS 14z-85d "KABUKI-encrypted").
+**[VSE-65]** **The Z80 is NOT encrypted** (RETRACTS 14z-85d "KABUKI-encrypted").
 Proven three ways: file bytes at PC 0x1E82 and 0x0271 equal the traced
 instructions verbatim, and MAME's cps2 config maps AS_OPCODES only for
 the 68k. KABUKI is the CPS1-QSound generation. Static disassembly of
@@ -1021,7 +1043,7 @@ across the games.
 ### Z80 driver, second pass (14z-86, the voice batch) — dispatch table,
 ### note-table array semantics, the dead type-C song class, the alias bit
 
-- **The real command dispatch**: the fetch loop at 0x1166 reads a
+**[VSE-66]** - **The real command dispatch**: the fetch loop at 0x1166 reads a
   byte; ≥0x20 RETURNS to the tick path (a WAIT/sustain event); <0x20
   dispatches via the pointer table at **0x1186** (32 × 2B). Operand counts (both games, byte-identical
   interpreters): 00-03 zero-op flag toggles (ix+$04 bits), 04/05 two
@@ -1056,7 +1078,7 @@ across the games.
   Related: the note-on resolver at 0x0D0A treats ix+$2F bit7 as a
   dual-mode switch (set = (table,entry) indirection, clear = RAW
   sample number).
-- **The +0x300 id alias is the FACING bit** (`btst #0,$70(a6)` — the
+**[VSE-64]** - **The +0x300 id alias is the FACING bit** (`btst #0,$70(a6)` — the
   same helper idiom id_space.md documents as facing) and natively
   selects a per-facing TWIN SONG: measured over the 81 scoped voice
   pairs, 74 differ ONLY in the channel-slot word, 6 are identical, 1
@@ -1178,7 +1200,7 @@ $FF8110 mask, fighter +0x382), `bank_map.toml` `tail_data_ptr`
 this family is the id_space "rows 0x10-0x1F are copies" shape, not an
 `andi` fold).
 
-Distinct from BOTH per-node record dispatch (0x0BF41A) and the voice
+**[VSE-63]** Distinct from BOTH per-node record dispatch (0x0BF41A) and the voice
 borrow: the sound KERNEL (the low-PRG region around the enqueue
 `0x31EE` / save-restore `$330E/$3306` / helper `$4CE2`) carries **four
 per-class voice-id word tables**, one per voice EVENT, each as a
@@ -1292,7 +1314,7 @@ dismissing it cost most of a session.
 
 ### Where the BANK comes from — and why it differs per list type
 
-The gfx bank lives in the OBJ y-word (bits 13-14, plus WIDE's bit 12). Two
+**[VSE-29]** The gfx bank lives in the OBJ y-word (bits 13-14, plus WIDE's bit 12). Two
 handlers source it two different ways, and this decides whether a
 tenant's art can be relocated at all:
 
@@ -1393,7 +1415,7 @@ channel 0's start), `+0x241` (current command byte), `+0x242/+0x244/+0x246`
 (the three stream words each command pulls), `+0x382` (class);
 `character_tables.md` `ai_script_0..3` (`PRG:0xBF01A/09A/11A/19A`).
 
-- **Tables.** Four per-class tables of script-start pointers, 32 longs each:
+**[VSE-75]** - **Tables.** Four per-class tables of script-start pointers, 32 longs each:
   entries 0-15 = the 16 classes, **entries 16-31 = the same 16 repeated**
   (Capcom's aliasing guard for ids with bit 4 set — Oboro Bishamon 0x18
   legitimately aliases Bishamon 0x08). Consumers: `0x2CCB6` (table 0,
@@ -1482,7 +1504,7 @@ channel 0's start), `+0x241` (current command byte), `+0x242/+0x244/+0x246`
     them for every new grappler/thrower.** NOTE for measurement: compare
     `dx = p2x − p1x` (relative), never absolute victim-x — the ~21px
     cross-emulator camera shift cancels only in the relative measure (an
-    absolute-x comparison stalled 14z-72 for a session). And a ported
+    absolute-x comparison stalled 14z-72 for a session). **[VSE-24]** And a ported
     tenant reaches this positioner through a CLONE of it (H's is `0xc9eb0`,
     because `0x27282` fell inside region x026142), not the vanilla copy at
     `0x2802e` — breakpoint the tenant's clone, not the engine twin.
@@ -1566,7 +1588,9 @@ a legacy 2P winner skips it" — is RETRACTED: it came from two rig traps,
 AFTER the win screen, and (b) mash inputs running past the KO pressing
 through it (game gotchas, 14z-99). Rigs for this screen must end their
 inputs at the KO and sample densely between the settle and the map.
-**KNOWN-OPEN ON IT (GitHub #105):** with AUTO (= auto-guard, a handicap
+**#105 — FIXED 14z-99 (`win_pal colors 8 -> 10`, all three builds — the
+AUTO sets; gate `tests/audit_win_pal_auto.sh`; this line read KNOWN-OPEN
+until 14z-114). The symptom as reported:** with AUTO (= auto-guard, a handicap
 mode — the human still plays) selected by the WINNER, a TENANT winner's
 portrait renders WHITE on the merged build: the `0x90C2A0` win-pal
 window holds all-0xFFFF during the screen and the real colors arrive
@@ -1650,7 +1674,7 @@ is not the lever for either.
 
 ### The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76)
 
-Three sessions attempted this by repointing per-character POINTER arrays.
+**[VSE-58]** Three sessions attempted this by repointing per-character POINTER arrays.
 None of them could ever have worked: **the quote system contains no absolute
 pointers to repoint.** It is a 2D winner-x-loser lookup built entirely from
 16-bit relative offsets and pc-relative byte tables.
@@ -1759,7 +1783,7 @@ simple data port or needs the bank relocated.
 ## Object TYPE dispatch and the pool walker (decoded 14z-65, fully
 ## measured 14z-68d on the Huitzil effect arc)
 
-Every secondary object — companions, pods, effect pieces, the victory
+**[VSE-18]** Every secondary object — companions, pods, effect pieces, the victory
 portrait drawer — is ticked from a per-frame walker that dispatches on
 a TYPE byte. This is the single most load-bearing shared mechanism for
 a ported character, and the one most likely to route a tenant's object
@@ -1842,7 +1866,7 @@ Two things a repeat of this work will get wrong:
   allowed to follow its fallback chain — which is safe, because `code` is
   the correct op kind in raw space too.
 
-**Why not repoint tenant types onto "never dispatched" table entries?**
+**[VSE-19]** **Why not repoint tenant types onto "never dispatched" table entries?**
 Because the free lists are not free. `build/manifest/dispatch_census.toml`
 records 50 and 83 indices never observed across the legacy corpus, but a
 pool-attributed STATIC sweep (scanning forward from every call site of
@@ -1854,7 +1878,7 @@ about 40x larger — and it would have traded a guarantee (a vanilla object
 CANNOT carry a type >= the vanilla entry count) for an inference.
 
 ### The shared-type trap, and `[[obj_hook_extra]]`
-Row 8 of the big table is the COMPANION machine — vsavj `0x606AC`,
+**[VSE-20]** Row 8 of the big table is the COMPANION machine — vsavj `0x606AC`,
 vs2 `0x6CAC0` — and **vs2 rewrote its own row 8**. So a tenant's
 companion/effect object, which carries type 0x08 on both games, is
 ticked by vsavj's machine and resolves vsavj's records. Symptom
@@ -1895,7 +1919,7 @@ immediates in its copies are rewritten — no runtime read at all.
 
 The mechanism rests on a FROZEN census, `build/manifest/type_stamps.toml`
 (tools/audit_type_stamps.py; gate tests/test_type_stamp_census.sh):
-* **Stamp forms are TWO, not one**: `move.l #$01xxTTss,(A4)` header
+**[VSE-21]** * **Stamp forms are TWO, not one**: `move.l #$01xxTTss,(A4)` header
   stamps AND `move.b #type,(2,A4)` byte stamps — the spawn idiom is
   `beq.s <alloc-fail>; move.b #1,(A4); type at +2; owner/sub at +3`.
   The 14z-81b ad-hoc scan knew only the move.l form and was blind to
@@ -1978,7 +2002,7 @@ has 59 rows), 59-63 divergent (vs2 gives Donovan's 61/62 classes
 ported type >= 64 in the $FF94xx pool that lands a hit over-indexes
 vsavj's map** — map[64] = the following rts opcode's 0x4E — and takes a
 wild jump: the f7997 vec3, latent in frozen pyron-m2 (satellite type 64)
-and shared by Huitzil (68/72 in the same pool). Third instance of the
+and shared by Huitzil (68/72 in the same pool). **[VSE-7]** Third instance of the
 "vs2 widened an index consumer" class (14z-26 property table, 14z-35
 dispatch table, 14z-79's 0x018460 window is the same family).
 
@@ -2049,7 +2073,7 @@ Atlas rows this depends on: the $FF9400 projectile-pool row and the
 
 ## Allocator wrappers and slot recycling (14z-65)
 
-vs2's allocators `0x15702` / `0x1572E` are wrapped (`alloc_wrap` in the
+**[VSE-23]** vs2's allocators `0x15702` / `0x1572E` are wrapped (`alloc_wrap` in the
 tenant manifest) with an 0x80-byte clear: vs2's allocator semantics
 differ from vsavj's, and without the wrapper a RECYCLED slot keeps
 stale bytes under the new object's init — which surfaces as a
@@ -2057,7 +2081,7 @@ round-2-only bug, after the pool has been through one cycle.
 
 ## Pool seeding and the `[[init_shim]]` (14z-65 — the watchdog class)
 
-**Vanilla vsavj never seeds the secondary-object pools during a normal
+**[VSE-22]** **Vanilla vsavj never seeds the secondary-object pools during a normal
 match; vs2 always does.** Every newcomer's ecosystem allocates from
 those pools, so an unseeded pool means the allocator spins on an empty
 free list — and it **hangs without an exception**: no crash, no
@@ -2159,7 +2183,7 @@ instructions at `PRG:0x02802E`:
 02809E  move.w (a0),d0 ; bra.w $27fa0      ; and the victim's RECORD INDEX
 ```
 
-So **the first 32 words of every attacker's keyframe block are a
+**[VSE-44]** So **the first 32 words of every attacker's keyframe block are a
 per-victim offset table, indexed by the victim's char id UNMASKED** — and
 in vsavj **all sixteen blocks alias their variant half onto the base half**:
 fourteen by OFFSET (rows `0x10-0x1F` are word-copies of `0x00-0x0F`) and
@@ -2191,6 +2215,10 @@ stride, but their variant-half sub-blocks measure as BYTE-COPIES of the
 base sub-blocks, 15/16 rows with `0x1F` the exception — the SAME defect
 stored as materialized content, not populated tenant data.)
 
+**SHIPPED 14z-99 — the 15 `capture_kf` slot_rows data_ports
+(`../project/patch_notes.md` "14z-99 — the window", gate
+`tests/test_capture_pose_sources.sh`); this heading still read "MEASURED
+FEASIBLE" until 14z-114.** The design record as it was written:
 **THE FIX IS MEASURED FEASIBLE AND ITS SHAPE IS SETTLED (14z-99;
 maintainer-ruled option (a) — full — conditioned on these measurements,
 which came back clean; every premise below is frozen in
@@ -2236,7 +2264,7 @@ row = table2[ map1[ 2*subidx + d0 ] * 16 ]
 and the row writes the victim's **xv +0x40, yv +0x44, xacc +0x48,
 gravity +0x4C** (all 16.16 fixed point on the fighter struct).
 
-**vs2's `map1` carries FIVE entries past vsavj's end** (indexes
+**[VSE-45]** **vs2's `map1` carries FIVE entries past vsavj's end** (indexes
 0x4A-0x53 -> rows 0x32-0x36; the 63214 command-grab arcs are rows
 0x33/0x34, yv 16.0 and 20.0). On vsavj a newcomer's index reads PAST
 map1 into table2's bytes and lands on a regular-arc row — symptom:
@@ -2261,7 +2289,7 @@ for in-match identity),
 `+0x32` attacker/owner link), the A5 work-var families below, and
 docs/game/gotchas.md "Same-value class #4".
 
-**Two parallel damage APPLIERS feed one staging protocol** (all
+**[VSE-40]** **Two parallel damage APPLIERS feed one staging protocol** (all
 addresses vsavj; vs2 twins in parentheses, verified instruction-
 parallel):
 
@@ -2318,7 +2346,7 @@ attacker/victim-registration and state-byte family
 (`-0x4B74/-0x4B72/-0x4B3D`) is consumed by PORTED readers and must
 stay at vs2 offsets. Gate: `tests/audit_fg_parity.sh`.
 
-**The victim-side REACTION CLASS dispatch (14z-85g(2), measured):**
+**[VSE-42]** **The victim-side REACTION CLASS dispatch (14z-85g(2), measured):**
 after the appliers, the victim's reaction is chosen at `PRG:0x2384E`:
 `move.b (0x54,a6),d0; add.w d0,d0; move.w (0x2385C,pc,d0.w),d1;
 jmp (pc,d1)` — the class byte (copied from the hit record, byte +0x1D
@@ -2407,7 +2435,7 @@ the same offsets — NOT an engine-generation drift. The timeout path is
 the `$10A/$109` chain above it; `0x9880` resolves winner/loser structs
 and folds ids via `0x9996` (0x0B->0x04, 0x1B->0x14 — the Oboro fold).
 
-**Why testing white alone is sound (the invariant):** both appliers
+**[VSE-41]** **Why testing white alone is sound (the invariant):** both appliers
 subtract the staged damage from BOTH words (`0x18AB0`: real from
 `$FF3442`, white gets real + the `$FF3444` extra), and white sits AT
 OR BELOW hp, so white crosses zero first. The death decision runs on
@@ -2437,7 +2465,7 @@ ported x026142 pc-rel escape did (a pool-object durability init
 
 ## Shadow / reflection servants (14z-66; premise CORRECTED 14z-68f)
 
-Per-player shadow servants (class-0x0C trio, vanilla spawner
+**[VSE-71]** Per-player shadow servants (class-0x0C trio, vanilla spawner
 `0x489DE`+) mirror their owner's animation by reading each anim NODE's
 `+0xC` word (low 13 bits = a seq id) into SHARED tables:
 - installer vsavj `0x823E2` / `0x823F2` -> table `0x2083BC` or
@@ -2517,7 +2545,7 @@ constants — `0x1E 0x26 0x44 0x6F 0xAA 0x264 0x29C` (e.g. `0640 001e` at
 measured owner and Anakaris is the one character not measured**, so `0xAA-0xAD`
 is very probably his. Treat it as OCCUPIED until someone reaches his DF.
 
-**WHY THIS CANNOT BE DERIVED FROM TABLE `0x02A8A4`.** The obvious model — row
+**[VSE-70]** **WHY THIS CANNOT BE DERIVED FROM TABLE `0x02A8A4`.** The obvious model — row
 per character, each pointing at a routine with one hardcoded base — is WRONG.
 Rows `0x02-0x07`, `0x09`, `0x0D-0x0F` all hold `0x0040` and reach the SAME
 routine at `0x02a8e4`, yet `0x04` requests `0x44-0x47` and `0x02/0x03/0x05/0x07`
@@ -2583,9 +2611,14 @@ vsavj's table has 80 entries where vs2's twin (`0x016D34`, dispatcher
 (`build/manifest/huitzil.toml`, `index_window_018468`).
 
 ## Dark Force (14z-66/67 mechanics UNPROVEN; style measured 14z-69;
-## the 14z-69p PALETTE FIX WAS WITHDRAWN 14z-79 — it broke Bulleta)
+## the 14z-69p PALETTE FIX WAS WITHDRAWN 14z-79 — it broke Bulleta;
+## THE PALETTE THEN FIXED 14z-84 — `df_gold_variant_id`, huitzil-m6, "THE
+## TENANT ANSWER" below; the DF-FORM seq-0x16 fix SHIPPED, gate
+## `tests/test_hui_df_style.sh` — header brought current 14z-114)
 
-> Status: the DF palette is **OPEN**, and his DF is purple on purpose.
+> Status **as written 14z-79 — SUPERSEDED 14z-84 ("THE TENANT ANSWER", the
+> gold block in wide_ext reached through the per-character palette-routine
+> row, shipped in huitzil-m6)**: the DF palette is **OPEN**, and his DF is purple on purpose.
 > The 14z-69p `[[data_port]]` row that rewrote palette-seq rows
 > 0x1E-0x21 is WITHDRAWN: those ids are **Bulleta's Dark Force block**
 > (236 resolver calls in one vanilla DF, measured), so the row rendered a
@@ -2767,7 +2800,7 @@ base rows, and decode both views before trusting a row.
 
 ### 14z-69c: THE MECHANISM, traced end to end
 
-The two engines run DIFFERENT Dark Force systems, and the tenant is
+**[VSE-69]** The two engines run DIFFERENT Dark Force systems, and the tenant is
 caught between them.
 
 | | vsavj (host engine) | vsav2 (native) |
@@ -2991,7 +3024,7 @@ native leg — the poke flow reaches him on vsav2 unchanged.
 ### 14z-70: the explosion's tiles LOCATED — vs2 common-bank art that was
 ### never ported, drawn against vsav's unrelated art at the same indices
 
-**READ THIS FIRST — replay 83 is NOT cross-leg comparable.** It is a
+**[VSE-79]** **READ THIS FIRST — replay 83 is NOT cross-leg comparable.** It is a
 1P-vs-CPU script (`sys=C1`, `sys=S1`, no C2/S2), and the two games pick a
 DIFFERENT CPU opponent and a DIFFERENT stage: at f3436 native is on the
 village stage against one character and ours is on a different stage
@@ -3274,7 +3307,7 @@ transfer), and each machine's extent.
 ### THE ANCHOR METHOD — how to attribute any "this effect does not draw"
 ### (14z-70, maintainer-endorsed; use this FIRST)
 
-Do not start from object layout, pool slots, or which region the machine
+**[VSE-38]** Do not start from object layout, pool slots, or which region the machine
 lives in. Start from the **data the effect is forced to read**, and let
 the registers hand you the object:
 
@@ -3344,21 +3377,23 @@ projectile never travels. It characterised sprites that were not the
 explosion. The original maintainer report (ping #7, the fuchsia class)
 predates the 14z-67 effect work and was most likely fixed there.
 
-**Status: the 214+P explosion is believed CORRECT and needs a playtest to
-close.** Residuals, both unexplained and neither necessarily a defect:
+**Status as written 14z-70e — SUPERSEDED 14z-70f (the section header): it
+was NOT correct; 569 uncopied tiles, found by the rig this triage
+mis-aimed. "Believed CORRECT" is retracted with the triage.** (Was: the
+214+P explosion is believed CORRECT and needs a playtest to close.) Residuals, both unexplained and neither necessarily a defect:
 the ~10-frame phase lag, and 8 ours-only / 12 native-only contents (part
 of which is sampling — the dump is every 2 frames). If the maintainer
 confirms, remove it from the effect-family worklist; the BEAM remains
 genuinely open and is a separate defect (never walks its anim nodes).
 
-**Method, promoted:** to identify what an effect draws, diff the OBJ list
+**[VSE-37]** **Method, promoted:** to identify what an effect draws, diff the OBJ list
 before vs during, then join the two legs by TILE CONTENT — never by tile
 index, and never per-frame across legs that can drift in phase.
 
 ## The beam / effect family — CLOSED 14z-71, all four members
 ## (history kept below)
 
-> **All four are closed, and NO TWO SHARED A CAUSE.** The family was
+**[VSE-39]** > **All four are closed, and NO TWO SHARED A CAUSE.** The family was
 > grouped in 14z-69 as "one root — one port covers it". That was RIGHT for
 > three of the four, and the exception is the interesting part:
 > the **214 explosion** was an uncopied tile inventory; the **beam** and
@@ -3558,7 +3593,7 @@ the window. This compares a fixed RAM ADDRESS across legs, which is the
 documented slot-order trap above — the object must be identified by
 TYPE before this counts. Do not promote it without that.
 
-**Method note, paid for this session: a PC logged on one leg does not
+**[VSE-8]** **Method note, paid for this session: a PC logged on one leg does not
 name the same routine on the other — and SOME of them coincide anyway,
 which is what makes it dangerous.** The native leg is vsav2 and ours is
 vsavj-based: two different builds of the engine, which is the whole
@@ -3632,7 +3667,7 @@ row scoped to a region you are pulling in, BEFORE the first probe run.
 
 ## THE LEAPING PURSUIT ATTACK (measured 14z-104, maintainer-confirmed mechanic)
 
-vsav retains Night Warriors' pursuit: with the opponent knocked down,
+**[VSE-72]** vsav retains Night Warriors' pursuit: with the opponent knocked down,
 U + any single P/K leaps onto them (ES variant on two buttons, meter).
 Measured on the merged build's legacy pairings (= vanilla by the
 superset invariant), rig `tests/replays/judge/03_down_attack.rpl`:
@@ -3648,7 +3683,7 @@ superset invariant), rig `tests/replays/judge/03_down_attack.rpl`:
   position when the command registered, not at landing (measured with
   a mid-flight victim-position poke: the arc still aimed at the
   pre-poke spot).
-- **Per-character arcs** (tenants run their PORTED vs2 content):
+**[VSE-81]** - **Per-character arcs** (tenants run their PORTED vs2 content):
   Demitri 33-34f to y=100; Donovan 27f to y=102; Phobos 42f to y=88;
   Pyron 39f to y=88.
 - **Corner behavior:** a pursuit at a cornered victim peaks directly
@@ -3670,7 +3705,7 @@ directions + the no-knockdown discriminator).
 **Atlas rows this section depends on:** `ram.md` `$FF0000.w` (exception
 code), `$FF0018-$FF0053` (saved registers), `$FF0054.l` (saved SP).
 
-The game installs REAL handlers on every 68k exception vector (`vec2` bus
+**[VSE-73]** The game installs REAL handlers on every 68k exception vector (`vec2` bus
 error through `vec11` line-F; handler ladder at `PRG:0xC0-0x14E`). Each
 handler:
 
@@ -3708,7 +3743,7 @@ A per-object script walker whose per-node state transition is:
 01850C  jmp    (2,PC,D1.w)       ; -> 0x018510 + offset
 ```
 
-The offset table holds **80 entries** (`0x018510 + 80*2 = 0x0185B0`; valid
+**[VSE-74]** The offset table holds **80 entries** (`0x018510 + 80*2 = 0x0185B0`; valid
 indices `0x00-0x4F`), aliasing onto ~0x17 distinct handlers
 (`0x018694-0x01877c`; several write follow-up states into `(0x54,A1)`).
 **CORRECTED 14z-110: this section originally said "~0x26 states", conflating

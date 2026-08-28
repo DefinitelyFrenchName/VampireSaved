@@ -26,13 +26,16 @@
 > ## `docs/project/skills_scope.md` plans four more skills (five decisions
 > ## under stated assumptions, OPEN TO VETO in STATE); `cps2-hardware`
 > ## (`[CPH-1..30]`) and `cps2-emulation` (`[CPE-1..42]`) are distilled and
-> ## locked (181 rules / 4 skills, `checkskills` ALL PASS). **NEXT: C, the
-> ## game skill `vampire-savior-engine`** — its staleness pass FIRST (the
-> ## `engine_internals.md` "NOT YET SYNTHESISED" backlog audited 14z-68m and
-> ## never since; Dark Force "UNPROVEN"; the atlas README "Known so far
-> ## (M0)"; `id_space.md`/`select_screen.md` pre-21-cell passages), then
-> ## ~70 LAWS quoting no addresses (decision 2); then D, the port skill,
-> ## which anchors into CLAUDE.md and never restates it (decision 3).
+> ## locked; **then C shipped too**: `vampire-savior-engine` (`[VSE-1..83]`,
+> ## no ROM addresses) after the game staleness pass S-C1..S-C12 (the DF
+> ## "palette OPEN", the capture-pose "feasible" and win-screen "#105 open"
+> ## headers were all years-of-sessions stale; the game gotchas' title line
+> ## had an entry spliced into it). **264 rules / 5 skills, `checkskills`
+> ## ALL PASS, seven controls. NEXT: D, the port skill `vampire-saved-port`**
+> ## — its staleness pass first (`project/gotchas.md` 179 entries with
+> ## RESOLVED cross-refs, `hardening_register.md` and `build_dir_triage.md`
+> ## dated to the 14z-102/103 sweeps, HANDOFF playtest defaults), then rules
+> ## that ANCHOR INTO CLAUDE.md and never restate it (decision 3).
 > ##
 > ## **OPEN, unchanged:** #113 stays OPEN (camera evidence in progress — do
 > ## not close, do not re-derive); housekeeping deferred (`build/m3b_merged15`

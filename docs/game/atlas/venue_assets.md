@@ -5,7 +5,7 @@ to id `0x13`. The question: which per-character *presentation* assets follow
 a tenant to a variant id, and which silently fall back to the base
 character's?
 
-**Summary: the in-match sprite palettes are clean; the select/VS-screen
+**[VSE-57]** **Summary: the in-match sprite palettes are clean; the select/VS-screen
 palettes are not.** The first is a 32-row pointer table with an unmasked
 consumer — repoint one row and done. The second is folded to 4 bits, so a
 tenant at `0x13` shows Victor's colours there until it is widened. That is

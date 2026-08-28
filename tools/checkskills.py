@@ -59,7 +59,16 @@ _PLATFORM_DOCS = ["docs/platform/gotchas.md", "docs/project/gotchas.md",
                   "docs/project/cps2_wide.md", "HANDOFF.md", "docs/game/atlas/ram.md"]
 _PLATFORM_LOGS = ["docs/platform/gotchas.md", "docs/project/gotchas.md",
                   "docs/project/cps2_wide.md", "HANDOFF.md", "docs/checksums.txt"]
+_GAME_DOCS = ["docs/game/engine_internals.md", "docs/game/gotchas.md",
+              "docs/game/atlas/README.md", "docs/game/atlas/ram.md",
+              "docs/game/atlas/character_tables.md", "docs/game/atlas/id_space.md",
+              "docs/game/atlas/select_screen.md", "docs/game/atlas/sprite_lists.md",
+              "docs/game/atlas/venue_assets.md"]
 SKILLS = {
+    "VSE": dict(path=".claude/skills/vampire-savior-engine/SKILL.md",
+                docs=_GAME_DOCS, logs=_GAME_DOCS,   # decision 5: engine_internals counts as a log
+                forbid=["tenant", "build/", "merged", "m3b_", "wide_ext", "gen_donovan",
+                        "gen_huitzil", "gen_pyron", ".toml", "x101aca", "x088512", "32007911"]),
     "MSC": dict(path=".claude/skills/mister-cps2-wide-core/SKILL.md",
                 docs=_MISTER_DOCS, logs=_MISTER_LOGS,
                 forbid=GAME_TOKENS + BUILD_TOKENS),

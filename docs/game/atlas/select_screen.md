@@ -177,7 +177,7 @@ reproduces at best **100 of 128 transitions (78%)** — with horizontal wrap
 at x=336) , no vertical wrap, and ±65° sectors. Every simpler variant does
 worse; plain nearest-in-sector with no wrap manages 67%.
 
-So ~22% of Capcom's entries are deliberate hand choices that no simple rule
+**[VSE-49]** So ~22% of Capcom's entries are deliberate hand choices that no simple rule
 predicts. **Adding cells means AUTHORING their rows and the neighbouring
 edits, then verifying** — `tools/select_wheel.py` checks the result
 (targets live, graph connected, nothing orphaned) and
@@ -232,7 +232,7 @@ Measured alongside: across `03`/`04`/`09` neither `0x020CB8` nor
 `0x020CFE` ever fires — no replay holds a button on the select screen long
 enough — so the mechanism is present but unexercised by the corpus.
 
-> **Caution: `$42-$45` on the player struct are SHARED SCRATCH.** The same
+**[VSE-82]** > **Caution: `$42-$45` on the player struct are SHARED SCRATCH.** The same
 > bytes are reused by in-match code for unrelated purposes — `0x0273E6`
 > writes a stepped ramp (`00 08 10 … F8`), `0x02F6D4` writes `0x28`,
 > `0x031132`/`0x03113E` write `0x80`/`0xFB`. A value of `0x28` in `$45`
@@ -360,7 +360,9 @@ needed; this is just which coordinate each id gets.
 | Donovan | (271, 182) | ±10 |
 | `?` (PS1 slot) | (238, 189) | ±10 |
 
-**Do not build from these yet.** Held-out validation exposes the problem:
+**Do not build from these yet** *(SUPERSEDED — "The measured extension"
+below settled the cells from the video capture; kept for the method; marked
+14z-114)*. Held-out validation exposes the problem:
 cells excluded from the fit (`0x08`, `0x06`) predict ~11 arcade px off,
 because in the dense interior the medallions touch and a centroid read
 drifts toward a brighter neighbour. The perimeter fit is trustworthy; the
@@ -506,7 +508,7 @@ stride and index. A 2P replay pins the player offset: P2's object
 (`$FFBB80`) fetches `0x271E48`, which is P2 row `0x05` — P2's default cell,
 mirrored from P1's `0x01` — i.e. `+0x80`, agreeing with `d1` in the code.
 
-**This corrects an earlier reading.** `docs/game/engine_internals.md` recorded
+**[VSE-50]** **This corrects an earlier reading.** `docs/game/engine_internals.md` recorded
 the P2 arrays as "+0x40 copies pointing at the same records", from a
 differential cursor dump. `+0x40` is the **variant half** (16 rows × 4
 bytes), which aliases the base half and therefore looks identical from a P2

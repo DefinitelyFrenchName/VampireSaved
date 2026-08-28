@@ -1,7 +1,12 @@
 # atlas — the verified ROM/RAM map (project bible)
 
-One file per romset (`vsavj.md`, `vsav2.md`, `vhunt2.md`) plus `ram.md` for
-work-RAM maps. Every byte range in the output set is provenance-tagged:
+Files (the "one file per romset" plan of M0 never materialised — the atlas
+grew by SUBJECT, all three sets side by side; corrected 14z-114):
+`ram.md` (work RAM), `character_tables.md` (the per-character bank, all
+three sets), `id_space.md` (the 5-bit id and its folding sites),
+`select_screen.md` (the wheel, cell↔id, the record arrays),
+`sprite_lists.md` (the drawer and list formats), `venue_assets.md`
+(per-slot presentation assets). Every byte range in the output set is provenance-tagged:
 `VSAV` (untouched), `VS2`, `VH2`, `GEN` (generated), `NEW` (authored).
 Entries are added only with evidence (diff, trace, or disassembly reference),
 in the same commit as the change that affects them.
@@ -9,7 +14,7 @@ in the same commit as the change that affects them.
 Address notation (CLAUDE.md §5): `PRG:0x0F1234` / `CPU:$0F1234` /
 `GFX:tile 0x1A2B3` / `RAM:$FF8000`.
 
-## Known so far (M0)
+## The three sets (measured M0; every figure still current)
 
 All three sets: 4MB program ROM; opcode-encrypted region is
 `PRG:0x000000-0x0FFFFF` only; data reads always bypass encryption;

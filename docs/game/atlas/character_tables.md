@@ -55,7 +55,7 @@ Variant half (0x10-0x1F) aliases the base half except:
 
 ## The full per-character table BANK — layout identical in all three sets
 
-A contiguous bank of 32-entry tables, stride 0x80 between neighbors. Bank
+**[VSE-1]** A contiguous bank of 32-entry tables, stride 0x80 between neighbors. Bank
 origin (= first dispatch table) per set — **all internal deltas are
 preserved across sets**, so any table found in vsavj is `origin + same
 delta` in the others (verified for bank[0], hitbox pair, +0x132 word
@@ -67,7 +67,7 @@ table):
 | vsav2 | `PRG:0x0D7298` | `PRG:0x0D7B18` |
 | vhunt2 | `PRG:0x0D6B2A` | `PRG:0x0D73AA` |
 
-Semantic skeleton (from disassembly of every vsavj consumer site):
+**[VSE-9]** Semantic skeleton (from disassembly of every vsavj consumer site):
 
 - **bank +0x000..+0x700 (0xBD0FA-0xBD7FA, 14 tables): per-character CODE
   dispatch** — `movea.l (a0,d0.w),a0; jmp/jsr (a0)`. Each table = one
@@ -301,7 +301,7 @@ vhunt2 (hitbox tables verified); pointers differ by a constant-ish shift.
 
 ### The other two variant datasets: two Oboro-class Bishamons
 
-Match-init ID normalization (vsav2 `PRG:0x01F5A0`, mirrored in vhunt2;
+**[VSE-17]** Match-init ID normalization (vsav2 `PRG:0x01F5A0`, mirrored in vhunt2;
 vsavj has the 0x18 case only): IDs `0x18` AND `0x19` both remap to slot-8
 (Bishamon) *code* while keeping their own *data* rows — so VS2/VH2 carry
 two distinct Oboro-class datasets (0x18 ≈ vsavj's Oboro; 0x19 = a second

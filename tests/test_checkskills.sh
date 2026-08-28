@@ -17,7 +17,7 @@
 #
 # MUST-FIRE CONTROLS ON THE REAL TREE (RH-9: a negative control is wrong
 # until it has failed on purpose): a copy of the relevant files is perturbed
-# six ways (14z-114: + an unanchored CPH rule, + a dangling cross-reference) — an unanchored rule appended, one anchor stripped from a doc,
+# seven ways (14z-114: + an unanchored CPH rule, + a dangling cross-reference, + a port token in the game skill) — an unanchored rule appended, one anchor stripped from a doc,
 # a game name inserted into the level-1 skill — and each copy must FAIL.
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -37,6 +37,10 @@ rm -f /tmp/checkskills.$$.log
 # --- must-fire controls on a perturbed copy -------------------------------
 FILES=".claude/skills/mister-cps2-wide-core/SKILL.md .claude/skills/mister-vampire-saved/SKILL.md
 .claude/skills/cps2-hardware/SKILL.md .claude/skills/cps2-emulation/SKILL.md
+.claude/skills/vampire-savior-engine/SKILL.md
+docs/game/engine_internals.md docs/game/gotchas.md docs/game/atlas/README.md docs/game/atlas/ram.md
+docs/game/atlas/character_tables.md docs/game/atlas/id_space.md docs/game/atlas/select_screen.md
+docs/game/atlas/sprite_lists.md docs/game/atlas/venue_assets.md
 docs/checksums.txt docs/platform/mister.md docs/project/mister_core.md docs/project/mister_map.md docs/project/mister_fit.md
 docs/project/mister_field.md docs/project/cps2_wide.md docs/project/release_format.md
 docs/platform/gotchas.md docs/project/gotchas.md HANDOFF.md CLAUDE.md release/bitstreams/18269/BITSTREAM.txt
@@ -73,5 +77,8 @@ control "unanchored CPH rule" "$W/e" "ANCHORED NOWHERE: CPH-999"
 
 mkcopy "$W/f"; printf -- '- [CPE-999] a rule with a dangling reference to [CPH-998]\n' >> "$W/f/.claude/skills/cps2-emulation/SKILL.md"
 control "dangling cross-reference" "$W/f" "cross-reference \[CPH-998\]"
+
+mkcopy "$W/g"; printf -- '\nA line about the tenant build/m3b_merged17.\n' >> "$W/g/.claude/skills/vampire-savior-engine/SKILL.md"
+control "port token in the game skill" "$W/g" "level-1 skill names 'tenant'"
 
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

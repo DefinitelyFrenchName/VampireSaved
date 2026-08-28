@@ -6,7 +6,7 @@ verified where noted), [D] differential dump experiment, [T] write-trace,
 
 ## Attract-mode demo roster (superset-invariant note)
 
-The attract sequence includes CPU demo matches that feature real characters.
+**[VSE-83]** The attract sequence includes CPU demo matches that feature real characters.
 Verified: `01_attract_long` (7200-frame attract, zero input) runs a **Jedah
 (id 0x0F) vs Victor** demo starting at **frame ~4278**. Consequence for
 patched builds: any change to a character that appears in an attract demo
@@ -53,8 +53,9 @@ the two sides must share the mask; `tools/freeze_masked_basis.sh`):
   medallion move 0x1A→0x1D, WITHDRAWN the same day when the move was
   reverted — the row's palette content cost a legacy pairing one
   main-loop frame at the select→VS fade); `tests/expected/vsavj/masked-v3/`
-  kept on disk. The current WIDE sets (donovan-m5 / huitzil-m13 /
-  pyron-m7) are on V2 via their `tests/expected/<set>/mask` file.
+  kept on disk. Every WIDE set since donovan-m5 is on V2 via its
+  `tests/expected/<set>/mask` file — donovan-m14 / huitzil-m21 / pyron-m15
+  at 14z-114 (this line named the 14z-8x sets until then).
 Mechanism and measurements: docs/GOTCHAS.md "Engine hooks on hot paths"
 and the staging-area section below. Additions to this list require a
 measured mechanism + maintainer sign-off.

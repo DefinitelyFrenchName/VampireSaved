@@ -3,7 +3,7 @@
 Measured 2026-08-04 (session 14z-60). Gate: `tests/test_id_space.sh`.
 Tool: `tools/audit_id_space.py`. Companion: `docs/game/atlas/select_screen.md`.
 
-**THE ANSWER: conventional.** The id is a 5-bit value everywhere it is
+**[VSE-10]** **THE ANSWER: conventional.** The id is a 5-bit value everywhere it is
 stored and in every layout-verified table; vsavj simply fills the upper 16
 rows with copies. The only architectural narrowing is a small, enumerable
 set of *consumer sites* that mask the id to 4 bits — and vsav2, which ships
@@ -100,7 +100,7 @@ instruction in both games, one nibble apart: Capcom widening this exact
 site is what let their cycling selector reach characters in the variant
 half.
 
-Both walkers missed it because both keyed on *register* dataflow, and these
+**[VSE-11]** Both walkers missed it because both keyed on *register* dataflow, and these
 instructions read-modify-write memory with no destination register. Found
 by disassembling the selector by hand. The lesson generalises: **a dataflow
 walk over registers cannot see a mask applied straight to a memory field**,
@@ -197,7 +197,7 @@ carrying its `END` summary line:
 | `PRG:0x009008` | `01` | P1 init |
 | `0x000D34` `0x000D3A` `0x000DD8` `0x016E4C` `0x016E4E` | `00`, `FF` | boot RAM clear |
 
-Union of ids written by any gameplay path:
+**[VSE-14]** Union of ids written by any gameplay path:
 `00 01 02 03 05 06 08 0A 0C 0E 0F` — **not one value in `0x10-0x1F`.**
 
 **Why this matters.** If no legacy gameplay path can produce a variant-half
@@ -240,7 +240,7 @@ artifact that decides).
 
 ## The arcade-opponent path (a fourth roster work item)
 
-"Selectable" is not "fightable". Tapping the **P2** id field `RAM:$FF8B82`
+**[VSE-15]** "Selectable" is not "fightable". Tapping the **P2** id field `RAM:$FF8B82`
 found three gameplay writers the P1 tap never sees:
 
 | writer | what it is |
@@ -318,7 +318,7 @@ write `#$08`, which is the match-init id normalisation the atlas already
 places at `PRG:0x01F5A0`. Two independent records agreeing is why this scan
 is trusted.
 
-**Consequence for the roster.** The free-id set is smaller than "everything
+**[VSE-13]** **Consequence for the roster.** The free-id set is smaller than "everything
 above `0x0F`":
 
 - **taken:** `0x00-0x0F` (the wheel), `0x12` (Gallon variant), `0x18`
