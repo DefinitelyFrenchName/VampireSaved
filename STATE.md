@@ -932,7 +932,8 @@ nice-to-have). Collected so the pass does not start from a blank page:
 | **Win-quote TEXT for all three tenants** (each still shows its shell's quote) | **FORGONE FOR NOW (maintainer 14z-116); parked WITH A CONSTRAINT — if ever done, the CLEAN way only, vanilla untouched** | the first-level table aliases the variant half; a data-only fix is IMPOSSIBLE (zero free bytes at either hop, re-derived by `tools/scan_quote_window.py`), the bank relocation perturbs `RAM:$FFF230` on legacy win screens, and ~330 glyph tiles must travel. Art side already native (14z-62e/62j) |
 | **Arcade ladder MAP NAMES and PICTURES** | not investigated | the map screen is the one that follows the win screen (a documented rig trap, STATE_HISTORY 14z-99); stage banners decode via `tools/decode_stage_banners.py`, venue byte `$FF8100` |
 | **Character SELECT WHEEL polish** | not investigated | the wheel is functionally correct and emulator-identical; this is look-and-feel only. Layout facts in `docs/game/atlas/select_screen.md`, the 21-cell roster and its inbound edges |
-| **#112 Press of Death black foot** | DECIDED cosmetic, parked | whole draw path measured VANILLA; why a tenant runs that vanilla sequence is unknown. Entry point when resumed: DISASSEMBLE the effect spawn, never scan |
+| **PYRON'S MEDALLION WHITENS on the select screen** (shades of white, depending on 2P wheel activity) — **RE-LISTED HERE 14z-116**: it was root-caused and parked long ago but lived ONLY in STATE_HISTORY, so the live backlog did not carry it while the maintainer was field-testing the wheel | root-caused, PARKED, fix designs REJECTED on legacy grounds | the ACCENT MARCH claims the figure-family palette rows in a late select venue phase (the trigger is the select TIMER, ~15 s), and the row Pyron's medallion uses is in that family (row-0x1A family). Repro is deterministic: on merged7 it fired exactly when **P2 moves their ring onto DONOVAN's cell** — a select-palette row steal. Donovan was moved to a bulletproof row (round 11); Pyron is the residual. **Three fix designs were measured and REJECTED**: a per-frame re-assert diverges the fade step counters (`$FF0E94` family — fades READ BACK palette RAM), and two writer-retarget shapes are bypassed (the store tail has ~30 enumerated entry points) — GOTCHAS "no free palette row". The correct fix is the marcher's JOB-DATA origin (the 14z-15 venue script family) and it should relocate row 0x19 (Phobos) at the same time, same latent 2P risk. Select-scoped, resets on re-entry. **Maintainer 2026-08-28: ruled too risky for a small cosmetic gain — stays parked** |
+| **#112 Press of Death black foot** (Donovan's EX foot super) | DECIDED cosmetic, parked; **maintainer 2026-08-28: too risky for a small cosmetic gain** | whole draw path measured VANILLA; why a tenant runs that vanilla sequence is unknown. Entry point when resumed: DISASSEMBLE the effect spawn, never scan |
 | **RANDOM SELECT should include the three tenants** — ADDED TO THE LIST by the maintainer 2026-08-28 | measured 14z-116, not built | the "?" cell walks a FIXED 15-entry table at `PRG:0x020C88` (`04 07 02 0C 05 0F 0A 00 0E 03 08 01 0D 09 06` = the base-half roster minus `0x0B`), 3-frame cursor, wrap `cmpi.b #$f`. Both bounds hard -> a tenant can never come up. **The siblings are the precedent**: vsav2's twin table (`PRG:0x01F8B4`) lists `10 11 13`, vhunt2's too — including the newcomers is what the source games do. FIX SHAPE: 18-entry relocated table + bound `#$f` -> `#$12`; it cannot grow in place (15 bytes + 1 pad, then code at `0x020C98`) and the table is read PC-relative, so it is a `site_thunk` on `PRG:0x020C80` + a `code` op, not a data poke. COST TO WATCH: the added cycles land on the select screen, whose legacy replays are already the bounded-window class — measure the onset before and after |
 | **MARIONETTE — a vs2 character, PARKED UNTIL FURTHER NOTICE (maintainer, 2026-08-28)** | not ported, not planned | **Assets live in VS2, not in VS.** She is not in Vampire Savior at all, so nothing in our romset is missing or broken by her absence. The maintainer's framing, and it is the right one: **Marionette and Shadow are both just MIRROR-MATCH MECHANISMS** — the shared machinery at `PRG:0x009BB2` copies the opponent's id and palette, so "playing as" either is playing the opponent's character. That makes porting her a low-value item: it adds a second route to a mirror match, not a character. **Not before everything else.** If it is ever revisited, note that vs2's arming counter is the SAME single `#$5` check as vsavj's (`PRG:0x01F8D6`), so whatever arms her in vs2 is a different mechanism and has not been located |
 | **Oboro's intro eats into the round** | **DECLINED by the maintainer 2026-08-28 — do NOT delay round start or cut the intro** | recorded so it is not revived: it would be a match-state TIMING change on a shared path for a cosmetic reason, which is the trade the superset invariant exists to refuse. The maintainer will instead check whether vsavj's Oboro has an alternate SHORT intro |
@@ -978,8 +979,14 @@ alternate anywhere). Status of each on our build, all measured 14z-116:
   sticks, P1 does the Shadow code. That is exactly what the emulator rig
   does (`tests/replays/113_shadow_vs_tenant.rpl`), and it is the only route
   either implementation has to that matchup.
-- **A BIGGER GAP THE SAME SCAN EXPOSED, for the maintainer to rule on: NO
-  LEGACY CHARACTER EVER MEETS A TENANT IN 1P ARCADE.** Rows `0x00-0x0F`
+  **-> DONE, AND GREEN (maintainer, MiSTer, 2026-08-28): "Shadow works
+  perfectly even with the VS2 tenants in 2P vs, so that's a win."** The
+  board agrees with the emulator leg on the one case that mattered, so the
+  Shadow-vs-tenant question is CLOSED on both implementations.
+- **NO LEGACY CHARACTER EVER MEETS A TENANT IN 1P ARCADE — RULED NOT A
+  PROBLEM (maintainer, 2026-08-28): "not a problem since we're way focused
+  on 2p vs". CLOSED, no work planned.** Kept as a measured fact because it
+  explains field observations rather than because it needs fixing.** Rows `0x00-0x0F`
   contain no reachable tenant candidate at all, so a 1P run as Morrigan (or
   anyone vanilla) can never be scheduled against Donovan, Phobos or Pyron.
   The port authored the tenants' OWN rows (what they fight) and never added
@@ -989,6 +996,23 @@ alternate anywhere). Status of each on our build, all measured 14z-116:
   scoped, no recommendation without a ruling**, and it is a GAMEPLAY-FEEL
   change (who you fight, and the ladder is already a lottery), so it is the
   maintainer's call per CLAUDE.md 5.
+- **TENANT CPU AI LOOKS "LACKLUSTER" — maintainer observation (2026-08-28),
+  UNPROVEN, DEPRIORITISED.** Verbatim: *"when I do fight against any of the
+  VS2 tenants it seems their AI is lackluster to say the least and I'm
+  pretty sure that's a side effect of the port although I can't prove it...
+  but once again, we're 2P vs focused."* Recorded rather than investigated,
+  with the archaeology a future session would start from so it is not
+  re-derived: the four per-class AI action-script tables
+  (`PRG:0x0BF01A/09A/11A/19A`) are **16 classes THEN THE SAME 16 REPEATED**
+  (Capcom's aliasing guard), which is what made CPU-Phobos play DEMITRI's
+  AI and was the root cause of #99; 14z-111 fixed it by making each
+  tenant's OWN vs2 AI script block a data root (option A, zero code). So
+  the tenants do have their own scripts now — but whether those scripts are
+  as *deep* as a legacy character's on this engine has never been measured,
+  and "feels weaker" is not a measurement. **If it is ever picked up, the
+  first question is whether the ported script blocks are COMPLETE** (a
+  truncated block would present exactly like this), not whether the tables
+  are aliased. CPU-side only — 2P versus never reads them ([VSE-75]).
 - **SHADOW vs A TENANT — MEASURED AND GREEN (14z-116).** The maintainer's
   question ("the big problem is not selecting him, it's knowing whether the
   game breaks", INCLUDING "does Shadow take the SHELL character instead of
