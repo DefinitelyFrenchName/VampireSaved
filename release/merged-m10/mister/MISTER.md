@@ -2,11 +2,12 @@
 
 This directory is self-sufficient for MiSTer: the romset patch set
 (`patches/`, `manifest.json`, `apply_release.py`, `README.md`), the `.mra`
-files, and the bitstream record `BITSTREAM.txt`.
+files, the bitstream `jtcps2w.rbf` and its record `BITSTREAM.txt` (seed, slack,
+sha256 — verified against the file when this directory was packaged).
 
 ## On the SD card
     _Arcade/<the .mra files here>
-    _Arcade/cores/jtcps2w.rbf        <- NOT in this directory: see BITSTREAM.txt for the sha256 to verify against
+    _Arcade/cores/jtcps2w.rbf        <- in this directory (verify the sha256 in BITSTREAM.txt after copying)
     games/mame/vsavjw.zip            <- from apply_release.py
     games/mame/vsav.zip              <- your PRISTINE dump (the WIDE set is a clone of it)
     games/mame/vsavj.zip             <- your PRISTINE dump (the STOCK CONTROL MRA)

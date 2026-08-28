@@ -14,6 +14,21 @@
 | not done, by ruling or by absence | **#113 OPEN** — the maintainer is producing CAMERA evidence that hardware may disagree with the emulator finding; nothing re-derived, nothing closed. **The `.rbf` is not in the tree** — it was never on this machine; its home is `release/merged-m10/mister/jtcps2w.rbf` (hash in `BITSTREAM.txt`), the maintainer will drop it in. `build/m3b_merged15` NOT deleted (referenced by `test_inp_crash_merged_m8_01` defect mode). STOCK CONTROL: kept, re-scoped to once-per-new-`.rbf` (recommendation; the maintainer asked, did not rule) |
 | next | **THE MiSTer SKILLS** — distilled in a FRESH session from the corrected docs per `mister_scope.md` (six core + one shared + five VS-specific), each shipping with its checker (the SMS `checkskills.py` pattern) |
 
+**Post-close addendum (same day, 2026-08-28) — THE BITSTREAM IS IN THE TREE,
+AS A BUILD RESOURCE.** The maintainer dropped `jtcps2w.rbf` in; sha256
+verified `46fc74af…f66f` (3,111,944 B) against the record. Then the
+maintainer's design point, adopted: the bitstream is a COMMON BUILD RESOURCE
+(rebuildable with the right environment) that every release includes, never
+copied from a previous release. So it lives once at
+**`release/bitstreams/18269/{jtcps2w.rbf, BITSTREAM.txt}`** with
+`release/bitstreams/CURRENT` = `18269`; `tools/package_release_platforms.py`
+resolves CURRENT (or `--bitstream DIR`), verifies the file against the
+record's sha256 and REFUSES on mismatch (exercised: a tampered record is
+refused), then copies both into `mister/`. `release/merged-m10/mister/` was
+regenerated from it (28 files; gate §4 now also checks the `.rbf` is present,
+its hash equals the record, and the record is byte-identical to the
+canonical one). `docs/project/release_format.md` carries the resource.
+
 **Ledger rollover:** the 14z-110b group (three records) moved verbatim to
 STATE_HISTORY.md; STATE holds 14z-111 / 14z-112 / 14z-113.
 
@@ -713,10 +728,12 @@ the archive once they stop shaping active work.)*
   shared dir + per-platform zips); FBNeo/MAME carry the driver PATCH + build
   recipe, not binaries. Spec `docs/project/release_format.md`; producer
   `tools/package_release_platforms.py`; gate `test_release_roundtrip.sh`
-  §4; first instance `release/merged-m10/{fbneo,mame,mister}/` (7.7 MB;
-  manifests byte-identical; the `.rbf` is still on the synthesis box and
-  `BITSTREAM.txt` says so — the record with the sha256 is what ties the
-  release to it). The recommendation as it was put:
+  §4; first instance `release/merged-m10/{fbneo,mame,mister}/` (manifests
+  byte-identical). **Refined the same day (maintainer): the bitstream is a
+  BUILD RESOURCE, canonical at `release/bitstreams/<seed>/` with `CURRENT`,
+  hash-verified into every release, never copied from another release** —
+  the `.rbf` (seed 18269, sha256 `46fc74af…`) is in the tree there and in
+  `merged-m10/mister/`. The recommendation as it was put:
   *What ships.* `jtcps2w.rbf` (3.1 MB; GPL-3.0 output of a public fork, not
   ROM content — rule 7 is not engaged), the two MRAs (WIDE + the
   `[STOCK CONTROL]` reference leg — XML metadata: names, CRCs, offsets), and

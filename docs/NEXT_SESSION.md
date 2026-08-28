@@ -39,11 +39,12 @@
 > ## hide (pixels and audio never MEASURED, timing a seed lottery, bank 1
 > ## on one replay, silicon's decryption window inferred).
 > ##
-> ## **TWO SMALL THINGS MAY LAND FIRST, EITHER ORDER:**
-> ## **(1) the `.rbf`** — the maintainer is copying it to
-> ## `release/merged-m10/mister/jtcps2w.rbf`; verify sha256 `46fc74af…`
-> ## against `BITSTREAM.txt`, flip its "NOT IN THIS DIRECTORY YET"
-> ## paragraph to present, commit. **(2) #113** — OPEN by the maintainer's
+> ## **THE `.rbf` IS IN THE TREE (post-close, same day):** canonical at
+> ## `release/bitstreams/18269/` (+ `CURRENT`), hash-verified into every
+> ## release's `mister/` by the packager, never copied release-to-release;
+> ## `merged-m10/mister/` regenerated from it. A NEW bitstream = a new seed
+> ## dir + a `CURRENT` bump, never an overwrite.
+> ## **ONE SMALL THING MAY LAND FIRST: #113** — OPEN by the maintainer's
 > ## instruction: camera evidence in progress that hardware may DISAGREE
 > ## with the emulator finding. Do not close it, do not re-derive the
 > ## emulator measurement; if the board shows something the emulators do

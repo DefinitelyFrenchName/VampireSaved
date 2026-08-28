@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """package_release_platforms.py <build_rompath> <release_root> --romdir ROMDIR
                                 --name NAME --version TEXT
-                                [--mister-src DIR] [--platforms fbneo,mame,mister]
+                                [--mister-src DIR] [--bitstream DIR]
+                                [--platforms fbneo,mame,mister]
 
 THE PER-PLATFORM RELEASE (maintainer-ruled 2026-08-28, 14z-113; the format
 is docs/project/release_format.md).  One release = release/<NAME>/ with ONE
@@ -14,8 +15,13 @@ only one of them changed:
               emulator/0002-cps2-wide-v1.patch + EMULATOR.md (pin + recipe)
     mame/     the romset patch set + emulator/0002-cps2-wide-v1.patch +
               EMULATOR.md (pin + recipe)
-    mister/   the romset patch set + the .mra files + BITSTREAM.txt (+ the
-              jtcps2w.rbf itself whenever it is present in --mister-src)
+    mister/   the romset patch set + the .mra files + jtcps2w.rbf +
+              BITSTREAM.txt — the bitstream and its record come from the
+              CANONICAL build resource release/bitstreams/<seed>/ (the seed
+              named by release/bitstreams/CURRENT, or --bitstream DIR), and
+              the .rbf is VERIFIED against the record's sha256 before it is
+              copied. A release never copies a bitstream from another
+              release (maintainer, 2026-08-28).
 
 The romset patch set is COPIED into each platform directory rather than
 shared (ruled: self-sufficiency beats de-duplication; ~2.5 MB x 3).  It is
@@ -28,9 +34,9 @@ The emulator side ships the driver PATCH and a build recipe, never a binary
 (ruled: the patch is the reviewable trust surface; binaries are host-specific
 and MAME's is a SOURCES-filtered build).  The MiSTer side ships the MRAs the
 release was verified with (from the field bundle or tools/mister_mra.sh
---no-rom — deterministic XML, no ROM content) and the bitstream RECORD; the
-.rbf is copied when --mister-src holds one, and its absence is stated in
-BITSTREAM.txt rather than hidden.
+--no-rom — deterministic XML, no ROM content); the bitstream and its RECORD
+are pulled from release/bitstreams/ and hash-verified, so a stale CURRENT or a
+tampered file is a hard error, never a silently wrong release.
 
 Rule 7: nothing here reads a reference ROM except through package_release.py
 (which reads them only to compute deltas), and nothing ROM-derived is written.
@@ -133,29 +139,57 @@ unmodified members from it.
     open(os.path.join(dest, "EMULATOR.md"), "w").write(text)
 
 
-def mister_side(dest, src, name):
+def resolve_bitstream(arg):
+    """release/bitstreams/CURRENT names the seed dir unless --bitstream overrides."""
+    if arg:
+        return arg
+    root = os.path.join(REPO, "release", "bitstreams")
+    cur = os.path.join(root, "CURRENT")
+    if not os.path.exists(cur):
+        sys.exit(f"{cur} missing — no canonical bitstream to package (see docs/project/release_format.md)")
+    return os.path.join(root, open(cur).read().strip())
+
+
+def bitstream_side(dest, bdir):
+    rec = os.path.join(bdir, "BITSTREAM.txt")
+    rbfs = [f for f in os.listdir(bdir) if f.endswith(".rbf")]
+    if not os.path.exists(rec) or len(rbfs) != 1:
+        sys.exit(f"{bdir} must hold exactly one .rbf and a BITSTREAM.txt (found {rbfs})")
+    import hashlib, re
+    want = re.search(r"sha256\s+([0-9a-f]{64})", open(rec).read())
+    if not want:
+        sys.exit(f"{rec} carries no 'sha256 <64 hex>' line")
+    rbf = os.path.join(bdir, rbfs[0])
+    got = hashlib.sha256(open(rbf, "rb").read()).hexdigest()
+    if got != want.group(1):
+        sys.exit(f"REFUSING: {rbf} sha256 {got[:12]}… != the record's {want.group(1)[:12]}… — "
+                 "a timing-failing seed emits an indistinguishable .rbf; fix the resource, not the release")
+    shutil.copy(rbf, os.path.join(dest, rbfs[0]))
+    shutil.copy(rec, os.path.join(dest, "BITSTREAM.txt"))
+    print(f"  bitstream {rbfs[0]} from {bdir}: sha256 verified {got[:12]}…")
+
+
+def mister_side(dest, src, name, bdir):
     if not src:
-        print("  mister: no --mister-src given; MRAs/BITSTREAM not copied", file=sys.stderr)
-        return
+        sys.exit("mister: --mister-src DIR (holding the .mra files) is required for the mister platform")
     copied = []
     for f in sorted(os.listdir(src)):
-        if f.endswith(".mra") or f == "BITSTREAM.txt" or f.endswith(".rbf"):
+        if f.endswith(".mra"):
             shutil.copy(os.path.join(src, f), os.path.join(dest, f))
             copied.append(f)
-    if not any(f.endswith(".mra") for f in copied):
+    if not copied:
         sys.exit(f"--mister-src {src} holds no .mra file")
-    if "BITSTREAM.txt" not in copied:
-        sys.exit(f"--mister-src {src} holds no BITSTREAM.txt (seed / slack / sha256 record)")
-    has_rbf = any(f.endswith(".rbf") for f in copied)
+    bitstream_side(dest, bdir)
     text = f"""# {name} — MiSTer side
 
 This directory is self-sufficient for MiSTer: the romset patch set
 (`patches/`, `manifest.json`, `apply_release.py`, `README.md`), the `.mra`
-files, and the bitstream record `BITSTREAM.txt`{' plus the bitstream itself' if has_rbf else ''}.
+files, the bitstream `jtcps2w.rbf` and its record `BITSTREAM.txt` (seed, slack,
+sha256 — verified against the file when this directory was packaged).
 
 ## On the SD card
     _Arcade/<the .mra files here>
-    _Arcade/cores/jtcps2w.rbf        {'<- in this directory' if has_rbf else '<- NOT in this directory: see BITSTREAM.txt for the sha256 to verify against'}
+    _Arcade/cores/jtcps2w.rbf        <- in this directory (verify the sha256 in BITSTREAM.txt after copying)
     games/mame/vsavjw.zip            <- from apply_release.py
     games/mame/vsav.zip              <- your PRISTINE dump (the WIDE set is a clone of it)
     games/mame/vsavj.zip             <- your PRISTINE dump (the STOCK CONTROL MRA)
@@ -181,7 +215,8 @@ def main():
     ap.add_argument("--romdir", required=True)
     ap.add_argument("--name", required=True)
     ap.add_argument("--version", required=True, help="the in-game mark, e.g. M8")
-    ap.add_argument("--mister-src", default="", help="dir holding the .mra files, BITSTREAM.txt and (optionally) the .rbf")
+    ap.add_argument("--mister-src", default="", help="dir holding the .mra files (the field bundle's _Arcade/, or mister_mra.sh --no-rom output)")
+    ap.add_argument("--bitstream", default="", help="bitstream dir (an .rbf + BITSTREAM.txt); default: release/bitstreams/<CURRENT>")
     ap.add_argument("--platforms", default=",".join(PLATFORMS))
     a = ap.parse_args()
     plats = [p for p in a.platforms.split(",") if p]
@@ -196,7 +231,7 @@ def main():
         if p in EMU:
             emulator_side(p, dest, a.name)
         else:
-            mister_side(dest, a.mister_src, a.name)
+            mister_side(dest, a.mister_src, a.name, resolve_bitstream(a.bitstream))
         n = sum(len(f) for _, _, f in os.walk(dest))
         print(f"  {p}: {n} files -> {dest}")
     print(f"packaged {a.name} for {', '.join(plats)} -> {root}")

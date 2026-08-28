@@ -175,11 +175,16 @@ DIRECTORY PER PLATFORM, EACH SELF-SUFFICIENT** — `release/<name>/{fbneo,
 mame,mister}/`, the patch set above COPIED into each (produced by the same
 `package_release.py`, manifests asserted identical), `emulator/0002-*.patch`
 + `EMULATOR.md` (pin + recipe, never a binary) on the emulator side, the
-`.mra` files + `BITSTREAM.txt` (+ `jtcps2w.rbf` when present) + `MISTER.md`
-on the MiSTer side; every version releases every platform even if only one
-changed. Producer: `ROMDIR=... python3 tools/package_release_platforms.py
-build/<dir>/rompath release --name <name> --version <mark> --mister-src
-<dir>`. Spec: `docs/project/release_format.md`. Gate: section 4 of
+`.mra` files + `jtcps2w.rbf` + `BITSTREAM.txt` + `MISTER.md` on the MiSTer
+side; every version releases every platform even if only one changed.
+**The bitstream is a BUILD RESOURCE: canonical at
+`release/bitstreams/<seed>/{jtcps2w.rbf, BITSTREAM.txt}`, `CURRENT` names
+the seed (18269 today), the packager hash-verifies it into every release
+and refuses a mismatch — a new bitstream is a new seed dir + a `CURRENT`
+bump, never an overwrite and never a copy from another release.** Producer:
+`ROMDIR=... python3 tools/package_release_platforms.py build/<dir>/rompath
+release --name <name> --version <mark> --mister-src <dir with the .mra
+files> [--bitstream release/bitstreams/<seed>]`. Spec: `docs/project/release_format.md`. Gate: section 4 of
 `test_release_roundtrip.sh` (layout + no cross-platform leakage + a
 must-fire control). `release/merged-m6..m9/` keep the old single-package
 layout as history.

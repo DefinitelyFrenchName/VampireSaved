@@ -22,8 +22,11 @@
 #      the tree's release/<name>/ has fbneo/ mame/ mister/, each with the
 #      patch set (manifests byte-identical), the emulator dirs carry the
 #      tree's driver patch + EMULATOR.md, mister/ carries MRAs +
-#      BITSTREAM.txt + MISTER.md, no cross-platform leakage; must-fire:
-#      a copy missing mame/emulator/ is rejected.
+#      BITSTREAM.txt + MISTER.md + the .rbf whose sha256 EQUALS the
+#      record's, the record byte-identical to the canonical
+#      release/bitstreams/<CURRENT>/ one (the build resource every release
+#      packages from); no cross-platform leakage; must-fire: a copy missing
+#      mame/emulator/ is rejected.
 #
 # Usage: ROMDIR=... tests/test_release_roundtrip.sh [build_rompath] [name]
 #   defaults build/m3b_merged17/rompath, merged-m10. Needs xdelta3.
@@ -169,6 +172,16 @@ else
         || { echo "FAIL: $REL/mister/ lacks an .mra, BITSTREAM.txt or MISTER.md"; fail=1; }
     grep -q 'sha256' "$REL/mister/BITSTREAM.txt" \
         || { echo "FAIL: BITSTREAM.txt carries no sha256 line"; fail=1; }
+    # the bitstream itself is present and IS the one the record names (14z-113, maintainer: a build resource,
+    # canonical under release/bitstreams/<seed>/, hash-verified into every release, never copied from another release)
+    rbf="$(ls "$REL/mister/"*.rbf 2>/dev/null | head -1)"
+    want="$(grep -oE 'sha256 +[0-9a-f]{64}' "$REL/mister/BITSTREAM.txt" | grep -oE '[0-9a-f]{64}')"
+    if [ -z "$rbf" ]; then echo "FAIL: $REL/mister/ holds no .rbf"; fail=1
+    elif [ "$(shasum -a 256 "$rbf" | cut -c1-64)" != "$want" ]; then echo "FAIL: $rbf sha256 != BITSTREAM.txt's"; fail=1
+    else echo "  ok: $(basename "$rbf") present, sha256 ${want%${want#????????}}… matches its record"; fi
+    cur="release/bitstreams/$(cat release/bitstreams/CURRENT 2>/dev/null)"
+    [ -f "$cur/BITSTREAM.txt" ] && cmp -s "$cur/BITSTREAM.txt" "$REL/mister/BITSTREAM.txt" \
+        || { echo "FAIL: $REL/mister/BITSTREAM.txt is not the canonical $cur/BITSTREAM.txt (stale CURRENT, or copied from another release?)"; fail=1; }
     # cross-platform leakage: a platform dir must hold NOTHING of another platform's
     ls "$REL/fbneo/"*.mra "$REL/mame/"*.mra "$REL/fbneo/"*.rbf "$REL/mame/"*.rbf >/dev/null 2>&1 \
         && { echo "FAIL: MiSTer files inside an emulator platform dir"; fail=1; }
