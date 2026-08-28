@@ -291,11 +291,16 @@ path commits id `0x0B` as a character.** Two facts nonetheless say the slot
 is real rather than a UI stub: its row in the per-character record table
 `PRG:0x0BD97A` is a genuine pointer (`0x0AB60A`, not an alias of a
 neighbour), and it is one of only TWO ids — with Zabel `0x04` — whose
-capture-keyframe block is MATERIALIZED rather than offset-aliased. **The
-"Shadow/Marionette machinery" reading remains a hypothesis: no code
-anywhere in vsavj compares a character id against `0x0B` or `0x1B`** (the
-only two sites that mention those values are the win-quote index mapper
-`PRG:0x009996`, which folds them to `0x04`/`0x14`). Its ladder row is the
+capture-keyframe block is MATERIALIZED rather than offset-aliased. **The "Shadow/Marionette machinery" reading is now SUPPORTED, but the
+mechanism is an INPUT, not an id.** It is still true that no code anywhere
+compares a character id against `0x0B` or `0x1B` (the only sites naming
+those values are the win-quote index mapper `PRG:0x009996`, which folds
+them to `0x04`/`0x14`) — the copy character is reached by arming `$3BC` on
+the "?" cell with START presses, and match init at `PRG:0x009BB2` then
+overwrites the player's id and palette with the OPPONENT's
+(`select_screen.md` "The confirm-path id override"). So slot `0x0B`'s own
+record is never loaded by that path, and what the 1898 bytes are for
+remains unestablished. Its ladder row is the
 all-`0xFF` empty marker, so the CPU can neither schedule it nor be
 scheduled against it. Reopening it starts at `$3C1(a6)`, which is written
 at `PRG:0x020AA0` and read NOWHERE this project has located.

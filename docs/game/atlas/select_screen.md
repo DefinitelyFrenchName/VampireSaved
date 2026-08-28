@@ -236,8 +236,13 @@ and that entry path remains unlocated. **(14z-105: vanilla's route stays
 unlocated; the PORT now reaches `0x18` through its own hook — see "The
 Oboro select hook" below.)**
 
-**WHAT THE OVERRIDE ACTUALLY IS (decoded 14z-116): the HIDDEN PICK.** The
-confirm path completes it:
+**WHAT THE OVERRIDE ACTUALLY IS (decoded 14z-116): THE COPY-THE-OPPONENT
+SELECT — i.e. the Shadow/Marionette entry.** *(This paragraph replaces a
+first reading, published earlier the same session, that called it a "hidden
+pick" which commits the remembered character while merely LOOKING random.
+That was wrong: `$3BC` is not a cosmetic flag, and `$42` counts BUTTON
+PRESSES, not frames — see both corrections below.)* The confirm path
+completes it:
 
 ```
 020A94  clr.b   $3c1(a6)
@@ -249,12 +254,52 @@ confirm path completes it:
 020ABE  move.b  d0,$382(a6)      ;   -> and commit the REMEMBERED id
 ```
 
-So holding on `0x0B` for 5 frames after hovering a real cell for 3 commits
-**that character while flagging the pick as random** — the opponent sees
-"?" and the game still treats it as a random pick. `$3bc` is the same flag
-the WIN-QUOTE selector tests at `PRG:0x00C89C` to force winner row `0x20`,
-which is why row `0x20` is the *random-pick* quote row and has exactly one
-line (`engine_internals.md` "The WIN-QUOTE TEXT SYSTEM" §8).
+**`$42` AND `$44` COUNT START PRESSES, NOT FRAMES.** Both helpers are gated
+on `btst #$f,d3` (`PRG:0x020CA6` and `0x020CD2`), and `d3` is the
+EDGE-TRIGGERED newly-pressed word built at `PRG:0x020A3E-0x020A4A`
+(`d0 = $394 & ~$396`; `move.w d0,d3`). Bit 15 is START. So the arming
+condition is **5 presses of START while on the "?" cell**, after **3
+presses on a character cell** latched `$45` — not a hold of any duration.
+START is not a confirm here: the confirm mask at `PRG:0x020A52` is
+`andi.w #$7700` (the six attack buttons), so START can be tapped freely
+without committing. This is why no replay in the corpus has ever fired
+either site: none of them *presses START* on the select screen.
+
+**AND `$3BC` IS THE COPY FLAG — THIS IS WHERE THE SECRET CHARACTER LIVES.**
+It has exactly ONE writer in the whole ROM, `PRG:0x020AB4` above, and its
+consumer is match init at **`PRG:0x009BB2`**:
+
+```
+009BA4  movea.w $13a(a5),a0 / movea.w $13c(a5),a1   ; the two players
+009BAC  tst.b   $3b4(a0) / bne  .skip
+009BB2  tst.b   $3bc(a0) / beq  .skip               ; armed on the "?" cell?
+009BB8  move.b  $382(a1),d0                         ; the OPPONENT's char id
+009BBC  move.b  d0,$382(a0)                         ;   -> BECOME THEM
+009BC0  move.b  d0,$3e0(a0)
+009BC4  move.b  d0,$158(a5)                         ;   incl. the win-quote index
+009BC8  move.b  $3ae(a1),d0                         ; and their palette/flavor byte
+009BCC  move.b  d0,$3ae(a0) / move.b d0,$3e1(a0)
+```
+
+So the sequence is: latch a cell into `$45` with 3 START presses, arm with 5
+more on "?", confirm — and at match start **the player is overwritten with
+the opponent's character and colour**. That is the copy character
+(Shadow/Marionette) the atlas had only ever guessed at, and it is reached
+by an input, not by an id: **nothing anywhere compares a character id
+against `0x0B` or `0x1B`.**
+
+**THE COPY IS AN UNMASKED BYTE MOVE, WHICH IS THE WHOLE ANSWER FOR THIS
+PORT.** `move.b $382(a1),$382(a0)` applies no mask, no bound and no fold,
+and every table the copied id then indexes is 32 rows with this port's
+tenant rows populated (`character_tables.md`, `id_space.md`). **So copying
+a TENANT is structurally expected to work** — and it has never been run.
+`$3B4`, tested first and skipping the copy, has two writers only
+(`PRG:0x0090B2`, `PRG:0x008A5C`, the init/challenger paths).
+
+`$3BC` is ALSO what the WIN-QUOTE selector tests at `PRG:0x00C89C` to force
+winner row `0x20` — so row `0x20` is the copy-character's quote row, which
+is why it has exactly one line (`engine_internals.md` "The WIN-QUOTE TEXT
+SYSTEM" §8).
 
 Measured alongside: across `03`/`04`/`09` neither `0x020CB8` nor
 `0x020CFE` ever fires — no replay holds a button on the select screen long
