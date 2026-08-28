@@ -221,16 +221,89 @@ Both inputs are produced on the select screen, and both are now decoded:
 ```
 
 **`$45` can only ever hold `$ff` or a copy of the current cursor cell**, and
-TABLE B constrains that to `0x00-0x0F`. So this override — the one dynamic
-id-rewrite in the select code — **cannot introduce a variant-half id**. It
-is therefore *not* the route by which vanilla reaches `0x18` (Oboro
-Bishamon), and that entry path remains unlocated. **(14z-105: vanilla's
-route stays unlocated; the PORT now reaches `0x18` through its own hook —
-see "The Oboro select hook" below.)**
+~~TABLE B constrains that to `0x00-0x0F`. So this override — the one dynamic
+id-rewrite in the select code — **cannot introduce a variant-half id**.~~
+**CORRECTED 14z-116: that second sentence is TRUE OF VANILLA AND FALSE OF
+THIS PORT, and the change is ours.** TABLE B constrains `$45` to whatever
+cells are LIVE, and the WIDE wheel authors live rows at `0x10`, `0x11` and
+`0x13` — so on a WIDE build `$45` can hold a tenant id and this override
+*can* commit one. The claim was never re-qualified when the wheel grew.
+Consequence, and it is a feature rather than a defect: **the hidden-pick
+path below reaches the tenants, while the random CYCLE cannot** (next
+section). Neither is gated or exercised by any replay. It remains true that
+this is *not* the route by which vanilla reaches `0x18` (Oboro Bishamon),
+and that entry path remains unlocated. **(14z-105: vanilla's route stays
+unlocated; the PORT now reaches `0x18` through its own hook — see "The
+Oboro select hook" below.)**
+
+**WHAT THE OVERRIDE ACTUALLY IS (decoded 14z-116): the HIDDEN PICK.** The
+confirm path completes it:
+
+```
+020A94  clr.b   $3c1(a6)
+020A98  cmpi.b  #$b,$3(a6)       ; confirmed ON the "?" cell
+020AA0  move.b  #$1,$3c1(a6)     ;   -> mark "this player chose random"
+020AAE  tst.b   $43(a6)          ; hidden-pick armed?
+020AB4  st.b    $3bc(a6)         ;   -> SET THE RANDOM FLAG anyway
+020AB8  move.b  $45(a6),d0
+020ABE  move.b  d0,$382(a6)      ;   -> and commit the REMEMBERED id
+```
+
+So holding on `0x0B` for 5 frames after hovering a real cell for 3 commits
+**that character while flagging the pick as random** — the opponent sees
+"?" and the game still treats it as a random pick. `$3bc` is the same flag
+the WIN-QUOTE selector tests at `PRG:0x00C89C` to force winner row `0x20`,
+which is why row `0x20` is the *random-pick* quote row and has exactly one
+line (`engine_internals.md` "The WIN-QUOTE TEXT SYSTEM" §8).
 
 Measured alongside: across `03`/`04`/`09` neither `0x020CB8` nor
 `0x020CFE` ever fires — no replay holds a button on the select screen long
 enough — so the mechanism is present but unexercised by the corpus.
+
+## THE RANDOM CELL `0x0B` — the cycling draw, decoded (14z-116)
+
+**The "?" cell does not commit `0x0B`.** While it is hovered, a 3-frame
+timer walks a cursor through a fixed 15-entry table and writes the id it
+lands on straight into the player struct, so whatever is showing when you
+confirm is what you get:
+
+```
+020C58  cmpi.b #$b,$3(a6)          ; hovering the "?" cell
+020C62  move.b $40(a6),d0          ; the cursor (seeded PRNG&0x0F at 0x0209B6)
+020C66  subq.b #$1,$41(a6) / bpl   ; every 3rd frame:
+020C72  addq.b #$1,d0
+020C74  cmpi.b #$f,d0 / bcs        ;   wrap at 15
+020C7A  moveq  #$0,d0
+020C7C  move.b d0,$40(a6)
+020C80  move.b $20C88(pc,d0.w),$382(a6)     ; <- THE DRAW TABLE
+```
+
+**The table, `PRG:0x020C88`, 15 bytes** (`04 07 02 0C 05 0F 0A 00 0E 03 08
+01 0D 09 06`) is the base-half roster minus `0x0B` itself, in a fixed
+shuffled order — a CYCLE, not a fresh roll; only its starting point is
+random. Both bounds are hard: the table is 15 entries and the wrap compare
+is `#$f`.
+
+**CONSEQUENCE FOR THIS PORT: random select can never pick a tenant.** The
+table holds no variant-half id and the cursor cannot exceed 14, so
+`0x10`/`0x11`/`0x13` are unreachable through the "?" cell. Measured on the
+pristine dumps; `build/m3b_merged18` emits NO op anywhere in
+`PRG:0x020900-0x020E00` except the Oboro hook at `0x020B9C`, so the draw is
+vanilla on every shipping build.
+
+**THE SIBLINGS SHOW THIS IS ROSTER CONTENT, NOT A LIMIT.** Both keep 15
+entries and the same `#$f` bound and simply list their own rosters —
+vsav2 `PRG:0x01F8B4` = `01 07 10 04 05 0F 11 00 0E 03 08 0C 0D 13 06`
+(its three newcomers ARE in the draw; Gallon/Aulbath/Sasquatch are not),
+vhunt2 `PRG:0x01F8A4` = `04 07 02 10 05 11 0A 13 10 03 08 01 0D 09 06`.
+So including the tenants is what the source games themselves do.
+
+**IF IT IS EVER WANTED** (nice-to-have, no competitive surface): the table
+needs 18 entries and the bound `#$f` -> `#$12`. It cannot grow in place —
+one pad byte at `0x020C97` and then code at `0x020C98` — so it is a
+`site_thunk` displacing `0x020C80` plus a relocated table, and the added
+cycles land on the select screen, whose legacy expectations are already the
+bounded-window class. Not built; not scoped.
 
 **[VSE-82]** > **Caution: `$42-$45` on the player struct are SHARED SCRATCH.** The same
 > bytes are reused by in-match code for unrelated purposes — `0x0273E6`

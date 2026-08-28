@@ -239,8 +239,25 @@ Facts: `../game/atlas/sprite_lists.md`.
 
 ## DEFERRED BY MAINTAINER DECISION (14z-76) — the win-quote bank relocation
 
-**STATUS 14z-116: MEASURED, NOT BUILT — AND THE PLAN BELOW IS SUPERSEDED IN
-THREE PLACES. A DECISION IS OPEN (STATE "Decisions pending").** The section
+**STATUS 14z-116: FORGONE FOR NOW BY MAINTAINER DECISION (2026-08-28) —
+PARKED WITH A CONSTRAINT, AND THE PLAN BELOW IS SUPERSEDED IN THREE PLACES.**
+The ruling: forgo for now, document everything, **and if it is ever done, do
+it the CLEAN way — not touching vanilla.** That rules the whole-bank
+relocation below OUT as an implementation, permanently, rather than merely
+ranking it second: it repoints a shared root and moves `RAM:$FFF230` on
+legacy win screens. **The sanctioned shape for any future attempt** is the
+tenant-only one: the three vs2 blocks + a generated first-level table in
+`wide_ext`, ~330 glyph tiles authored into group C **bank 5's** font window
+(in-group `0x13800-0x147FF`, measured 4096/4096 BLANK on `m3b_merged18`),
+the shipping `winquote_bank_variant_id` gate (14z-62j) already routing the
+tenant win-quote drawer to bank 5, and ONE `site_thunk` on the selector for
+winner `>= 0x10` — with the vanilla bank, the four-entry region root, tables
+A/B and `$FFF230`'s vanilla value all byte-identical. **The one measurement
+still owed before that can be scoped:** whether the TEXT object (set up at
+`PRG:0x00C840-0x00C862`, fed by `$30(a4)`) takes its bank from the same
+field the `0x5F328` gate writes — a different chain — or needs the thunk to
+write it. Everything else is measured and in the tree.
+ The section
 below is kept as written because its eliminations stand; read this header
 first. `tools/scan_quote_window.py` RE-DERIVED its central claim and it
 HOLDS (zero runs of `0x20`+ free bytes at either hop, so appending in reach

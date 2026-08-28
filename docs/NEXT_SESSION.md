@@ -40,18 +40,27 @@
 > ## **EMULATION VERDICT GREEN (maintainer, after the push): MAME + FBNeo,
 > ## no regression, "a big visual update already". MiSTer next.**
 > ##
-> ## **THE NEXT TASK THE MAINTAINER NAMED: the tenants' WIN QUOTES** —
-> ## today Phobos shows a Bulleta line, Pyron Demitri's, Donovan Victor's
-> ## (the 32-row quote offset table aliases the variant half); target = the
-> ## vs2 quotes. BUG ARCHAEOLOGY IS ALREADY DONE — read it before measuring:
-> ## `patch_index.md` "DEFERRED BY MAINTAINER DECISION (14z-76) — the
-> ## win-quote bank relocation" (the 16-bit SIGNED offsets pin the bank to
-> ## `0x32D28A ± 0x8000`, scanned: ZERO free bytes, so appending is
-> ## impossible and RELOCATING THE WHOLE BANK is the only path; it was
-> ## deferred "until the merged build is certified" — which it now is) and
-> ## `engine_internals.md` "THE WIN-QUOTE TEXT SYSTEM" (mechanism decoded).
-> ## Plan and scope first, show the extent, then bytes; cosmetic, no
-> ## gameplay surface. Fresh session.
+> ## **THE WIN QUOTES ARE MEASURED AND FORGONE — DO NOT RE-OPEN THEM AS
+> ## "the next task" (that line is 14z-115's and is now stale).** 14z-116 ran
+> ## the whole Phase 0 and the maintainer ruled: *forgo for now, document
+> ## everything, and if we ever do it, do it the CLEAN way, not touching
+> ## vanilla.* **PARKED WITH A CONSTRAINT — the whole-bank relocation of
+> ## 14z-76 is RULED OUT, not merely second-best.** What was measured, so it
+> ## is never re-derived: a data-only fix is impossible (zero free bytes at
+> ## BOTH hops, `tools/scan_quote_window.py`); the root is a FOUR-entry
+> ## REGION array whose other three banks are the ENGLISH text; the bank is
+> ## `0x4104` bytes not `0x40DC`; lines run to 17 codes and the real bound is
+> ## the renderer's 66-word buffer; the installed pointer `RAM:$FFF230` is
+> ## work-RAM visible on VANILLA win screens (so a relocation is a superset
+> ## hit by construction); and the true cost is ~330 GLYPH TILES — 326 of 327
+> ## codes draw a different character in vsavj, the glyphs live in gfx bank 1
+> ## out of code reach, and the bank-0 font window is 4096/4096 full. The
+> ## sanctioned future shape (group C bank 5's blank font window + the
+> ## shipping `winquote_bank_variant_id` gate + one tenant-only thunk) and
+> ## the ONE measurement still owed are in `patch_index.md`'s header and
+> ## STATE "Decisions pending". Tools: `decode_win_quotes.py` (dump/resolve/
+> ## audit), `audit_quote_font.py`, `scan_quote_window.py`; gate
+> ## `tests/test_win_quote_decode.sh` (ci_static).
 > ##
 > ## **OPEN, unchanged:** #113 parked (maintainer's camera evidence); the
 > ## `m3b_merged15` defect-mode reference; STOCK CONTROL once-per-`.rbf`;

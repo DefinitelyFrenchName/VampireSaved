@@ -354,8 +354,22 @@ entries moved VERBATIM to `DECISIONS_HISTORY.md` — grep there by topic.
 Lifecycle: rulings are still marked DECIDED in place here first; they move to
 the archive once they stop shaping active work.)*
 
-- **THE TENANTS' WIN QUOTES — PHASE 0 MEASURED (14z-116), GO / FORGO IS
-  YOURS.** The maintainer's framing for this task: cosmetic, no 2P surface,
+- **THE TENANTS' WIN QUOTES — FORGONE FOR NOW (maintainer, 2026-08-28,
+  14z-116). DECIDED.** The ruling, verbatim in substance: *"Let's forgo for
+  now but document everything so that, should we want to do it in the
+  future. And should we ever do it, we'd do it the clean way, not touching
+  vanilla."* So this is PARKED, not closed, and it is parked WITH A
+  CONSTRAINT ON ANY FUTURE ATTEMPT: **the clean way only — the vanilla bank,
+  the four-entry region root, tables A/B and `RAM:$FFF230`'s vanilla value
+  all stay byte-identical. The 14z-76 whole-bank relocation is RULED OUT by
+  this decision, not merely un-preferred.** The buildable shape is the one
+  measured below (group C bank 5's blank font window + the shipping
+  `winquote_bank_variant_id` gate + one tenant-only selector thunk), and the
+  single open measurement before it could be scoped is named there. Nothing
+  in the tree needs undoing: Phase 0 shipped only tools, a gate and
+  corrections. Everything below is the measurement record.
+
+  PHASE 0 AS MEASURED (14z-116): The maintainer's framing for this task: cosmetic, no 2P surface,
   so equip the suite against a silent state poison — and **forgo it outright
   if the implementation carries structural risk or costs compatibility**.
   Phase 0 was run before any shipped byte. What it found:
@@ -398,15 +412,13 @@ the archive once they stop shaping active work.)*
     fed by `$30(a4)`) takes its bank from the same field that gate writes —
     the gate patches the drawer object at `0x5F328`, which is a different
     chain. If it does not, the thunk writes the bank itself.
-  **RECOMMENDATION: your call, and FORGO is a perfectly good answer.** The
-  route above is buildable and keeps the vanilla path bit-identical, but the
-  honest price is ~330 authored glyph tiles + a thunk on a legacy-reachable
-  site + a new win-quote render gate (pixels: no RAM gate can see text), for
-  a single-player cosmetic surface that your own "cosmetic is optional"
-  scope calls nice-to-have. If you want it, say GO and Phase 1 starts with
-  the one open measurement above; if you want it parked, everything measured
-  here is now in the docs and the next session starts from facts instead of
-  the 14z-76 prose.
+  **THE PRICE THAT DECIDED IT:** ~330 authored glyph tiles + a thunk on a
+  legacy-reachable site + a new win-quote RENDER gate (pixels — no RAM gate
+  can ever see text), for a single-player cosmetic surface the standing
+  "cosmetic is optional" scope calls nice-to-have. **RESUMING IT LATER
+  COSTS NOTHING EXTRA**: the decoder, the font audit, the reach scan and the
+  structure gate are all in the tree and green, so a future session starts
+  at Phase 1 with the one open measurement, not at archaeology.
 
 - **THE MiSTer SCOPE DOCUMENT — three decisions, ALL DECIDED (maintainer,
   2026-08-28, 14z-113; `docs/project/mister_scope.md` §8).**
@@ -917,7 +929,7 @@ nice-to-have). Collected so the pass does not start from a blank page:
 
 | item | status | what is known |
 |---|---|---|
-| **Win-quote TEXT for all three tenants** (each still shows its shell's quote) | MEASURED 14z-116, not built; a DECISION is open | the first-level table aliases the variant half; a data-only fix is IMPOSSIBLE (zero free bytes at either hop, re-derived by `tools/scan_quote_window.py`), the bank relocation perturbs `RAM:$FFF230` on legacy win screens, and ~330 glyph tiles must travel. Art side already native (14z-62e/62j) |
+| **Win-quote TEXT for all three tenants** (each still shows its shell's quote) | **FORGONE FOR NOW (maintainer 14z-116); parked WITH A CONSTRAINT — if ever done, the CLEAN way only, vanilla untouched** | the first-level table aliases the variant half; a data-only fix is IMPOSSIBLE (zero free bytes at either hop, re-derived by `tools/scan_quote_window.py`), the bank relocation perturbs `RAM:$FFF230` on legacy win screens, and ~330 glyph tiles must travel. Art side already native (14z-62e/62j) |
 | **Arcade ladder MAP NAMES and PICTURES** | not investigated | the map screen is the one that follows the win screen (a documented rig trap, STATE_HISTORY 14z-99); stage banners decode via `tools/decode_stage_banners.py`, venue byte `$FF8100` |
 | **Character SELECT WHEEL polish** | not investigated | the wheel is functionally correct and emulator-identical; this is look-and-feel only. Layout facts in `docs/game/atlas/select_screen.md`, the 21-cell roster and its inbound edges |
 | **#112 Press of Death black foot** | DECIDED cosmetic, parked | whole draw path measured VANILLA; why a tenant runs that vanilla sequence is unknown. Entry point when resumed: DISASSEMBLE the effect spawn, never scan |

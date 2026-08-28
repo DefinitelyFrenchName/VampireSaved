@@ -269,7 +269,7 @@ when tenants coexist.
 | 0x00 | Bulleta (B.B. Hood) | | 0x08 | Bishamon (0x18 = Oboro Bishamon) |
 | 0x01 | Demitri | | 0x09 | Aulbath (Rikuo) |
 | 0x02 | Gallon (J. Talbain) | | 0x0A | Sasquatch |
-| 0x03 | Victor | | 0x0B | special: 1898 B, byte-identical in all three sets (Shadow/Marionette machinery?) |
+| 0x03 | Victor | | 0x0B | special: 1898 B, byte-identical in all three sets — **the "?" RANDOM cell**; the "(Shadow/Marionette machinery?)" guess is UNCONFIRMED, see below |
 | 0x04 | Zabel (L. Raptor) | | 0x0C | Q-Bee |
 | 0x05 | Morrigan | | 0x0D | Lei-Lei (Hsien-Ko) |
 | 0x06 | Anakaris | | 0x0E | Lilith |
@@ -279,6 +279,26 @@ Every entry pinned by a scripted pick: cursor path → select-screen name
 snapshot + in-match `RAM:$FF8460` pointer readback against the table
 (tools/pick_probe.sh). Aulbath closed via path L,L,D (pointer 0x0A7EFA →
 slot 9, name verified).
+
+**SLOT `0x0B`, measured 14z-116 — what it is, and what is still a guess.**
+It is the wheel's **"?" RANDOM cell** (`select_screen.md` "THE RANDOM CELL
+`0x0B`"), and every mechanism around it is now decoded: hovering it cycles
+a 15-entry draw table at `PRG:0x020C88` (which does NOT contain `0x0B`),
+confirming it sets `$3C1(a6)`, and the hidden-pick override commits a
+REMEMBERED cell id — whose recorder is explicitly guarded `cmpi.b
+#$b,$3(a6); bne` so `0x0B` can never be recorded either. **So no measured
+path commits id `0x0B` as a character.** Two facts nonetheless say the slot
+is real rather than a UI stub: its row in the per-character record table
+`PRG:0x0BD97A` is a genuine pointer (`0x0AB60A`, not an alias of a
+neighbour), and it is one of only TWO ids — with Zabel `0x04` — whose
+capture-keyframe block is MATERIALIZED rather than offset-aliased. **The
+"Shadow/Marionette machinery" reading remains a hypothesis: no code
+anywhere in vsavj compares a character id against `0x0B` or `0x1B`** (the
+only two sites that mention those values are the win-quote index mapper
+`PRG:0x009996`, which folds them to `0x04`/`0x14`). Its ladder row is the
+all-`0xFF` empty marker, so the CPU can neither schedule it nor be
+scheduled against it. Reopening it starts at `$3C1(a6)`, which is written
+at `PRG:0x020AA0` and read NOWHERE this project has located.
 
 ## THE PORTED THREE — located (2026-07-25, pick-verified on vsav2 AND vhunt2)
 
