@@ -22,6 +22,18 @@
 > ## its marker — rewrite the fact and keep the marker with it, or move the
 > ## rule; delete the paragraph and the gate goes red, on purpose.
 > ##
+> ## **SAME SESSION, LATER — THE PLAN FOR THE REST AND PAIR A+B SHIPPED:**
+> ## `docs/project/skills_scope.md` plans four more skills (five decisions
+> ## under stated assumptions, OPEN TO VETO in STATE); `cps2-hardware`
+> ## (`[CPH-1..30]`) and `cps2-emulation` (`[CPE-1..42]`) are distilled and
+> ## locked (181 rules / 4 skills, `checkskills` ALL PASS). **NEXT: C, the
+> ## game skill `vampire-savior-engine`** — its staleness pass FIRST (the
+> ## `engine_internals.md` "NOT YET SYNTHESISED" backlog audited 14z-68m and
+> ## never since; Dark Force "UNPROVEN"; the atlas README "Known so far
+> ## (M0)"; `id_space.md`/`select_screen.md` pre-21-cell passages), then
+> ## ~70 LAWS quoting no addresses (decision 2); then D, the port skill,
+> ## which anchors into CLAUDE.md and never restates it (decision 3).
+> ##
 > ## **OPEN, unchanged:** #113 stays OPEN (camera evidence in progress — do
 > ## not close, do not re-derive); housekeeping deferred (`build/m3b_merged15`
 > ## referenced by `test_inp_crash_merged_m8_01` defect mode; STOCK CONTROL

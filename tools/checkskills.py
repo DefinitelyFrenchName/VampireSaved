@@ -38,44 +38,43 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 
-# --- the two skills -----------------------------------------------------
+# --- the skills, one row per prefix ------------------------------------
+# path, the docs its anchors may live in, the LOGS its numbers must appear
+# in (never the synthesis alone), and the tokens its liftability level
+# forbids (case-insensitive substring; empty = level 2, nothing forbidden).
+GAME_TOKENS = ["vsav", "vampire", "donovan", "huitzil", "phobos", "pyron", "tenant",
+               "roster", "demitri", "jedah", "victor", "bishamon", "anita", "oboro"]
+BUILD_TOKENS = ["0xEE73", "0xFFDB", "0x8E57F0", "0x5FFF1E", "32007911",
+                "build/", "merged", "m3b_"]
+_MISTER_DOCS = ["docs/platform/mister.md", "docs/project/mister_core.md",
+                "docs/project/mister_map.md", "docs/project/mister_fit.md",
+                "docs/project/mister_field.md", "docs/project/cps2_wide.md",
+                "docs/project/release_format.md", "docs/platform/gotchas.md",
+                "docs/project/gotchas.md", "HANDOFF.md", "CLAUDE.md"]
+_MISTER_LOGS = ["docs/platform/mister.md", "docs/project/mister_map.md",
+                "docs/project/mister_fit.md", "docs/project/mister_field.md",
+                "docs/project/release_format.md", "docs/platform/gotchas.md",
+                "docs/project/gotchas.md", "release/bitstreams/18269/BITSTREAM.txt"]
+_PLATFORM_DOCS = ["docs/platform/gotchas.md", "docs/project/gotchas.md",
+                  "docs/project/cps2_wide.md", "HANDOFF.md", "docs/game/atlas/ram.md"]
+_PLATFORM_LOGS = ["docs/platform/gotchas.md", "docs/project/gotchas.md",
+                  "docs/project/cps2_wide.md", "HANDOFF.md", "docs/checksums.txt"]
 SKILLS = {
-    "MSC": ".claude/skills/mister-cps2-wide-core/SKILL.md",
-    "MSV": ".claude/skills/mister-vampire-saved/SKILL.md",
+    "MSC": dict(path=".claude/skills/mister-cps2-wide-core/SKILL.md",
+                docs=_MISTER_DOCS, logs=_MISTER_LOGS,
+                forbid=GAME_TOKENS + BUILD_TOKENS),
+    "MSV": dict(path=".claude/skills/mister-vampire-saved/SKILL.md",
+                docs=_MISTER_DOCS, logs=_MISTER_LOGS, forbid=[]),
+    "CPH": dict(path=".claude/skills/cps2-hardware/SKILL.md",
+                docs=_PLATFORM_DOCS, logs=_PLATFORM_LOGS,
+                forbid=GAME_TOKENS + BUILD_TOKENS + ["manifest/", ".toml", "setup_mame", "setup_fbneo"]),
+    "CPE": dict(path=".claude/skills/cps2-emulation/SKILL.md",
+                docs=_PLATFORM_DOCS, logs=_PLATFORM_LOGS,
+                forbid=GAME_TOKENS + BUILD_TOKENS + ["manifest/", ".toml"]),
 }
-# Where anchors may live (same set for both prefixes; the prefix decides
-# which skill a marker belongs to).
-ANCHOR_DOCS = [
-    "docs/platform/mister.md",
-    "docs/project/mister_core.md",
-    "docs/project/mister_map.md",
-    "docs/project/mister_fit.md",
-    "docs/project/mister_field.md",
-    "docs/project/cps2_wide.md",
-    "docs/project/release_format.md",
-    "docs/platform/gotchas.md",
-    "docs/project/gotchas.md",
-    "HANDOFF.md",
-    "CLAUDE.md",
-]
-# The LOGS a quoted number must appear in. NOT mister_core.md, on purpose.
-LOG_DOCS = [
-    "docs/platform/mister.md",
-    "docs/project/mister_map.md",
-    "docs/project/mister_fit.md",
-    "docs/project/mister_field.md",
-    "docs/project/release_format.md",
-    "docs/platform/gotchas.md",
-    "docs/project/gotchas.md",
-    "release/bitstreams/18269/BITSTREAM.txt",
-]
-# Level-1 must not name any of these (case-insensitive substring match).
-LEVEL1_FORBIDDEN = [
-    "vsav", "vampire", "donovan", "huitzil", "phobos", "pyron", "tenant",
-    "roster", "demitri", "jedah", "victor", "bishamon",
-    "0xEE73", "0xFFDB", "0x8E57F0", "0x5FFF1E", "32007911",
-    "build/", "merged", "m3b_",
-]
+# Cross-references `[PFX-N]` (plain, not bold, not opening a bullet) must
+# resolve to a DEFINED rule of that prefix. RH lives outside the repo.
+XREF_PREFIXES = set(SKILLS)
 
 ID = r"\[([A-Z]+-\d+)\]"
 DEF_SKILL = re.compile(rf"^- {ID}", re.M)        # `- [MSC-3] ...`
@@ -115,41 +114,36 @@ def numbers(text):
             if not (t.isdigit() and any(t != u and t in u for u in found))}
 
 
+XREF = re.compile(r"(?<!\*)\[([A-Z]+-\d+)\](?!\*)")
+
+
 def check(root, verbose=False):
     root = Path(root)
     fails = []
-    docs = {}
-    for rel in ANCHOR_DOCS:
-        p = root / rel
-        if p.exists():
-            docs[rel] = p.read_text(encoding="utf-8")
-        else:
-            fails.append(f"anchor doc missing: {rel}")
-    log_text = ""
-    for rel in LOG_DOCS:
-        p = root / rel
-        if p.exists():
-            log_text += "\n" + p.read_text(encoding="utf-8")
-        else:
-            fails.append(f"log missing: {rel}")
+    cache = {}
 
-    # all anchors across the doc set, with where each one lives
-    anchors = {}
-    for rel, text in docs.items():
-        for i in doc_anchors(text):
-            anchors.setdefault(i, []).append(rel)
+    def read(rel):
+        if rel not in cache:
+            p = root / rel
+            cache[rel] = p.read_text(encoding="utf-8") if p.exists() else None
+        return cache[rel]
 
-    for prefix, rel in SKILLS.items():
-        p = root / rel
-        if not p.exists():
-            fails.append(f"{prefix}: skill {rel} does not exist")
+    # pass 1: every skill's definitions (for cross-reference resolution)
+    defined = {}
+    for prefix, cfg in SKILLS.items():
+        text = read(cfg["path"])
+        defined[prefix] = set(skill_defs(text)) if text else set()
+
+    for prefix, cfg in SKILLS.items():
+        text = read(cfg["path"])
+        if text is None:
+            fails.append(f"{prefix}: skill {cfg['path']} does not exist")
             continue
-        text = p.read_text(encoding="utf-8")
         if not re.match(r"^---\nname: [a-z0-9-]+\ndescription: .+\n---\n", text):
-            fails.append(f"{prefix}: {rel} lacks the name/description frontmatter")
+            fails.append(f"{prefix}: {cfg['path']} lacks the name/description frontmatter")
         defs = skill_defs(text)
         if verbose:
-            print(f"  {prefix}: {len(defs)} rules defined in {rel}")
+            print(f"  {prefix}: {len(defs)} rules defined in {cfg['path']}")
         if not defs:
             fails.append(f"{prefix}: the skill defines NO rules — has the syntax changed?")
         dupes = sorted({i for i in defs if defs.count(i) > 1})
@@ -159,34 +153,53 @@ def check(root, verbose=False):
         if foreign:
             fails.append(f"{prefix}: DEFINES foreign-prefix rule(s) {', '.join(foreign)}")
 
-        # 1. ID-lock
-        mine = {i: locs for i, locs in anchors.items() if i.startswith(prefix + "-")}
+        # 1. ID-lock against this skill's anchor docs
+        anchors = {}
+        for rel in cfg["docs"]:
+            t = read(rel)
+            if t is None:
+                fails.append(f"{prefix}: anchor doc missing: {rel}")
+                continue
+            for i in doc_anchors(t):
+                if i.startswith(prefix + "-"):
+                    anchors.setdefault(i, []).append(rel)
         key = lambda i: int(i.split("-")[1])
-        only_skill = sorted(set(defs) - set(mine), key=key)
-        only_docs = sorted(set(mine) - set(defs), key=key)
+        only_skill = sorted(set(defs) - set(anchors), key=key)
+        only_docs = sorted(set(anchors) - set(defs), key=key)
         if only_skill:
             fails.append(f"{prefix}: defined in the skill, ANCHORED NOWHERE: {', '.join(only_skill)}")
         if only_docs:
             fails.append(f"{prefix}: anchored in the docs, NOT DEFINED in the skill: {', '.join(only_docs)}")
-        multi = sorted((i for i, locs in mine.items() if len(locs) > 1), key=key)
-        for i in multi:
-            fails.append(f"{prefix}: {i} anchored in more than one place: {', '.join(mine[i])}")
+        for i in sorted((i for i, locs in anchors.items() if len(locs) > 1), key=key):
+            fails.append(f"{prefix}: {i} anchored in more than one place: {', '.join(anchors[i])}")
 
-        # 2. liftability
-        if prefix == "MSC":
-            body = text.split("\n---\n", 1)[-1]  # the frontmatter names the sibling skill
-            for tok in LEVEL1_FORBIDDEN:
-                for n, line in enumerate(body.splitlines(), 1):
-                    if tok.lower() in line.lower():
-                        fails.append(f"MSC: level-1 skill names '{tok}' at line {n} — that is level 2")
-                        break
+        # 2. liftability (the frontmatter names sibling skills; lint the body)
+        body = text.split("\n---\n", 1)[-1]
+        for tok in cfg["forbid"]:
+            for n, line in enumerate(body.splitlines(), 1):
+                if tok.lower() in line.lower():
+                    fails.append(f"{prefix}: level-1 skill names '{tok}' at line {n} — that is level 2")
+                    break
 
         # 3. numbers cite the log
+        log_text = ""
+        for rel in cfg["logs"]:
+            t = read(rel)
+            if t is None:
+                fails.append(f"{prefix}: log missing: {rel}")
+            else:
+                log_text += "\n" + t
         missing = sorted(t for t in numbers(text) if t not in log_text)
         if verbose:
             print(f"  {prefix}: {len(numbers(text))} numeric tokens quoted")
         if missing:
             fails.append(f"{prefix}: number(s) quoted but in NO log: {', '.join(missing)}")
+
+        # 4. cross-references resolve
+        for ref in sorted(set(XREF.findall(body))):
+            rp = ref.split("-")[0]
+            if rp in XREF_PREFIXES and rp != prefix and ref not in defined.get(rp, set()):
+                fails.append(f"{prefix}: cross-reference [{ref}] names a rule {rp} does not define")
     return fails
 
 
@@ -204,19 +217,15 @@ def selftests():
         bad.append("doc extractor no longer matches the anchor syntax (or counts a plain ref)")
     if "YY-9" in skill_defs(SYN_SKILL):
         bad.append("a cross-reference was read as a definition")
-    if numbers("see 0x600000, 2609, 66,265,152, 0.125, $FF8058, 46fc74af, 12 MB, 2026") != \
-            {"0x600000", "2609", "66,265,152", "0.125", "$FF8058", "46fc74af"}:
-        bad.append(f"number extractor drifted: {numbers('see 0x600000, 2609, 66,265,152, 0.125, $FF8058, 46fc74af, 12 MB, 2026')}")
+    probe = "see 0x600000, 2609, 66,265,152, 0.125, $FF8058, 46fc74af, 12 MB, 2026"
+    if numbers(probe) != {"0x600000", "2609", "66,265,152", "0.125", "$FF8058", "46fc74af"}:
+        bad.append(f"number extractor drifted: {numbers(probe)}")
 
-    # Build a synthetic tree and run the real check() on it, with the module's
-    # tables swapped to the synthetic pair.
-    global SKILLS, ANCHOR_DOCS, LOG_DOCS, LEVEL1_FORBIDDEN
-    saved = (SKILLS, ANCHOR_DOCS, LOG_DOCS, LEVEL1_FORBIDDEN)
+    global SKILLS, XREF_PREFIXES
+    saved = (SKILLS, XREF_PREFIXES)
     try:
-        SKILLS = {"XX": "skill.md"}
-        ANCHOR_DOCS = ["doc.md"]
-        LOG_DOCS = ["log.md"]
-        LEVEL1_FORBIDDEN = ["vsav"]
+        SKILLS = {"XX": dict(path="skill.md", docs=["doc.md"], logs=["log.md"], forbid=["vsav"])}
+        XREF_PREFIXES = {"XX", "YY"}
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
 
@@ -226,8 +235,17 @@ def selftests():
                 (root / "log.md").write_text(log)
 
             write()
+            # YY-9 is a cross-ref to a prefix with no skill: must not fail on its own
+            SKILLS["YY"] = dict(path="yy.md", docs=["doc.md"], logs=["log.md"], forbid=[])
+            (root / "yy.md").write_text("---\nname: y\ndescription: y\n---\n- [YY-9] nine\n")
+            (root / "doc.md").write_text(SYN_DOC + "**[YY-9]** y anchor\n")
             if check(root):
                 bad.append(f"a matched synthetic tree FAILS — the checks are wrong: {check(root)}")
+            (root / "yy.md").write_text("---\nname: y\ndescription: y\n---\n- [YY-8] eight\n")
+            (root / "doc.md").write_text(SYN_DOC + "**[YY-8]** y anchor\n")
+            if not any("cross-reference [YY-9]" in f for f in check(root)):
+                bad.append("a dangling cross-reference was not caught")
+            del SKILLS["YY"]
             write(skill=SYN_SKILL + "- [XX-3] unanchored\n")
             if not any("ANCHORED NOWHERE" in f for f in check(root)):
                 bad.append("an unanchored rule was not caught")
@@ -243,19 +261,14 @@ def selftests():
             write(skill=SYN_SKILL + "- [ZZ-1] wrong tier\n")
             if not any("foreign-prefix" in f for f in check(root)):
                 bad.append("a foreign-prefix definition was not caught")
-            write(skill=SYN_SKILL + "- [XX-2] x\n")  # reset below
-            write(skill=SYN_SKILL.replace("rule two", "rule two about vsav"))
-            SKILLS = {"MSC": "skill.md"}
-            write(skill=SYN_SKILL.replace("XX-", "MSC-").replace("rule two", "rule two about VSAV"),
-                  doc=SYN_DOC.replace("XX-", "MSC-"))
+            write(skill=SYN_SKILL.replace("rule two", "rule two about VSAV"))
             if not any("level-1 skill names" in f for f in check(root)):
-                bad.append("a game-specific token in the level-1 skill was not caught")
-            SKILLS = {"XX": "skill.md"}
+                bad.append("a forbidden token in a level-1 skill was not caught")
             write(skill=SYN_SKILL.replace("rule two", "rule two quotes 0x123456"))
             if not any("in NO log" in f for f in check(root)):
                 bad.append("a number missing from every log was not caught")
     finally:
-        SKILLS, ANCHOR_DOCS, LOG_DOCS, LEVEL1_FORBIDDEN = saved
+        SKILLS, XREF_PREFIXES = saved
     return bad
 
 
@@ -274,7 +287,7 @@ def main():
             print(f"  FAIL  {line}")
         print(f"\n{len(fails)} problem(s) between the skills and the docs")
         sys.exit(1)
-    n = sum(len(skill_defs((Path(args.root) / rel).read_text())) for rel in SKILLS.values())
+    n = sum(len(skill_defs((Path(args.root) / c["path"]).read_text())) for c in SKILLS.values())
     print(f"ALL PASS ({n} rules across {len(SKILLS)} skills: every rule anchored once, "
           "every anchor defined, level 1 game-free, every number in a log)")
 

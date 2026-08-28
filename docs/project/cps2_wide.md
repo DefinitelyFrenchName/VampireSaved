@@ -2,7 +2,7 @@
 
 Vampire Savior with all 18 characters does not fit a stock CPS-2. One
 character costs ~338 KiB of program ROM and ~16-18K tiles; the stock free
-space is ~1 KiB of PRG and ~370 tiles. WIDE is the named, versioned
+space is ~1 KiB of PRG and ~370 tiles. **[CPH-24]** WIDE is the named, versioned
 hardware profile that makes the roster physically possible, implemented
 identically by every emulator target.
 
@@ -25,7 +25,7 @@ CPS-2 WIDE v1
                    reserved, never allocate: $400000-$40000F (CpsFrg regs)
   GFX    : 48 MB   12 uniform 4 MB members (3 groups of 4)
                    19-bit tile address via the CPS-2 Turbo rule (see below)
-  QSOUND : 16 MB   4 uniform 4 MB members; since v1.2 (14z-86) the two
+**[CPH-13]**   QSOUND : 16 MB   4 uniform 4 MB members; since v1.2 (14z-86) the two
            EXTENSION members vsw.21m/22m are CONTENT members (sentinel
            CRCs 0xdec0de3a/3b — the old shared zero-fill CRC would
            hash-shadow a content-bearing 21m onto the still-zero 22m).
@@ -43,7 +43,7 @@ CPS-2 WIDE v1
   Everything else: bit-identical stock CPS-2
 ```
 
-Rules that are not negotiable, because the loaders depend on them:
+**[CPH-23]** Rules that are not negotiable, because the loaders depend on them:
 - GFX members come in groups of **4** and must all be the **same size**
   (`cps.cpp` consumes 4 at a time; `nGfxMaxSize` mis-sizes otherwise).
 - QSound length must stay a **power of two** (`rom_mask = nCpsQSamLen - 1`).
@@ -62,7 +62,7 @@ Rules that are not negotiable, because the loaders depend on them:
 
 ## Phase A measurements (2026-08-03, vanilla vsavj, full legacy corpus)
 
-Instrument: `tests/audit_wide_phase_a.sh` (rerunnable; ground-truths itself
+**[CPH-27]** Instrument: `tests/audit_wide_phase_a.sh` (rerunnable; ground-truths itself
 before trusting any null result).
 
 | # | Question | Result | Consequence |
@@ -83,7 +83,7 @@ broken sprite rendering outright:
 
 Setting it on a sprite ends the list, dropping every later sprite.
 
-Capcom hit the same wall on CPS-2 Turbo and solved it by **promoting bit
+**[CPH-15]** Capcom hit the same wall on CPS-2 Turbo and solved it by **promoting bit
 12** into the address after the terminator check:
 
 ```c
@@ -123,7 +123,7 @@ structurally blind to the entire video path. A rendering change — exactly
 what the 19-bit tile address is — produces byte-identical RAM logs whether
 it works perfectly or draws garbage. Enable with `FBNEO_HVIDEO=<path>`.
 
-**Inertness is not functionality.** B2 proves the 19-bit path is HARMLESS
+**[CPH-28]** **Inertness is not functionality.** B2 proves the 19-bit path is HARMLESS
 (vanilla never sets bit 12, so nothing changes). Proving it actually
 REACHES the new banks is B4's job, and B4 must include that positive
 control — a build where a legacy tile is moved into group C with bit 12
@@ -174,7 +174,7 @@ patched — and runs inside `tools/build_donovan.sh`.
 | 19-bit tile address (bit-12 promote) | one condition widened at `cps_obj.cpp:429-434` + flag definition/extern/init/reset, gated on `Cps2Wide` (**B2 verified**) | **core, profile-gated** |
 | New driver entry carrying the profile | new `BurnRomInfo` + `BurnDriver` beside `VsavjRomDesc[]` | descriptor |
 
-So the entire profile costs **two gated blocks** in emulation logic, both in
+**[CPH-30]** So the entire profile costs **two gated blocks** in emulation logic, both in
 `Cps2ObjDraw`, and everything else is table data. CORRECTED 14z-90 (GitHub
 issue #35): this line said "one gated conditional". The second block is the
 `CPS2_WIDE_CANARY` positive control, which `docs/project/patch_index.md`
@@ -186,7 +186,7 @@ the same `Cps2Wide` flag.
 
 ## Governance (Rule 1 v2)
 
-Emulator changes are permitted only inside this profile, and each must be:
+**[CPH-29]** Emulator changes are permitted only inside this profile, and each must be:
 bounded and declarative; **profile-gated** (a driver flag set by a new
 driver entry, so stock vsavj and every other CPS-2 game are untouched by
 construction); subject to the **emulator superset invariant** — the
@@ -313,7 +313,7 @@ every implementation — nothing had ever EXECUTED from above 4 MB on a core
 that decrypts by address. See `docs/platform/mister.md` "CAN THE 68k READ
 ABOVE 4 MB?".
 
-Note for authors: everything above `PRG:0x0FFFFF` is outside the
+**[CPH-26]** Note for authors: everything above `PRG:0x0FFFFF` is outside the
 encryption window, so extension content is written RAW (no re-encryption)
 — but it must still be laid out in FILE byte order, i.e. converted with
 `cps2_decrypt.words_to_file_bytes(words_from_logical_bytes(...))`, and
@@ -487,7 +487,7 @@ into another game: MAME builds a fresh driver object per run.
    being profile-gated). **WIDE v1's QSound size is therefore a hard
    ceiling, not a chosen number**, and any future voice-bank pressure has
    to be solved by exclusivity/banking rather than by growing the region.
-2. **`$400000-$40000F` behaves differently in the two emulators.** FBNeo's
+2. **[CPH-25]** **`$400000-$40000F` behaves differently in the two emulators.** FBNeo's
    `SekMapMemory(CpsRom, 0, nCpsRomLen-1)` read-shadows the CPS2 output
    registers with ROM (writes still reach the handler); MAME keeps them
    readable, because its base map re-declares them after the ROM range.

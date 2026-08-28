@@ -338,7 +338,8 @@ legacy behavior is a failed change.
     patch change.
   - `.claude/skills/<name>/SKILL.md` — the DISTILLED DISCIPLINE, loaded
     before the work (since 14z-114: `mister-cps2-wide-core`, `mister-vampire-
-    saved`). Skill = the laws and traps; docs = the facts. Every rule is
+    saved`, `cps2-hardware`, `cps2-emulation`; the game and port skills are
+    planned in `docs/project/skills_scope.md`). Skill = the laws and traps; docs = the facts. Every rule is
     anchored `**[PFX-N]**` in the doc paragraph it distils and
     `tools/checkskills.py` locks the two so they cannot drift; a skill that
     quotes a number cites a LOG, never the synthesis. Editing an anchored

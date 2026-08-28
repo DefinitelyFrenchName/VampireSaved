@@ -8,7 +8,7 @@ Append the moment one is paid for. Read before touching the related area.
 
 ## CPS-2 ROM file byte order is NOT 68k logical order (paid: 2026-07-25, ~1h)
 
-The 16-bit words in the dumped program ROM files are stored **low-byte-first**.
+**[CPH-1]** The 16-bit words in the dumped program ROM files are stored **low-byte-first**.
 MAME's `cps2_decrypt` operates on the `uint16` values you get from reading the
 file little-endian (that's what the region layout gives it on a little-endian
 host), NOT on big-endian words. Interpreting the files big-endian and
@@ -28,14 +28,14 @@ Project conventions locked in after this (see tools/cps2_decrypt.py header):
 
 ## MAME `logerror` output needs `-log`, not `-verbose` (paid: 2026-07-25)
 
-`-verbose` only shows OSD chatter. Driver `logerror()` lines (e.g. cps2's
+**[CPE-1]** `-verbose` only shows OSD chatter. Driver `logerror()` lines (e.g. cps2's
 `cps2 decrypt <key0>,<key1>,<lower>,<upper>`) go to `error.log` in the
 working directory only when `-log` is passed. That line is the fastest way to
 get the authoritative key/range for a set.
 
 ## FBNeo fresh builds need `SKIPDEPEND=1` (paid: 2026-07-25)
 
-`make sdl2` on a fresh clone dies with `No rule to make target 'driverlist.h',
+**[CPE-26]** `make sdl2` on a fresh clone dies with `No rule to make target 'driverlist.h',
 needed by 'burn.d'` — the depend-generation path (DEPEND=1 default) wants the
 generated `driverlist.h` via a bare-name prerequisite that vpath can't resolve
 before the file exists. FBNeo's own CI never builds that path: every workflow
@@ -45,7 +45,7 @@ the affected .cpp files.)
 
 ## FBNeo shared EEPROM breaks run-to-run determinism (paid: 2026-07-25, ~45min)
 
-Symptom: consecutive scripted FBNeo runs of vsavj diverged from frame ~75 by
+**[CPE-27]** Symptom: consecutive scripted FBNeo runs of vsavj diverged from frame ~75 by
 exactly ONE work-RAM byte (`RAM:$FF0CC9`) whose value differed by 1 — the
 game's EEPROM bootup counter. Cause chain: (a) `$HOME` overrides do NOT
 sandbox FBNeo on macOS — the user config ini (loaded from the real
@@ -60,7 +60,7 @@ full work-RAM dumps from two runs, diffed → first divergent frame + address
 
 ## MAME `-debug` perturbs multi-CPU timing — never compare its checksums to non-debug runs (paid: 2026-07-25, ~1.5h)
 
-A vsavj replay run under `-debug -debugger none` produces a checksum log that
+**[CPE-2]** A vsavj replay run under `-debug -debugger none` produces a checksum log that
 diverges from the identical non-debug run at frame 12: `RAM:$FF1CF0.l` (a
 latch toggling 0x00000000/0xFFFFFFFF) is phase-shifted by one frame, with
 ±1 knock-on counters later ($FF8080, $FFE420...). It is fully deterministic
@@ -105,7 +105,7 @@ Port rules that follow:
 - When reading engine tables for analysis, pick the view by how the ENGINE
   addresses them, not by where they live.
 
-INSTANCE, 14z-79 — RELOCATING a pc-relative dispatcher, not just its table.
+**[CPH-6]** INSTANCE, 14z-79 — RELOCATING a pc-relative dispatcher, not just its table.
 The (b') thunk had to reproduce vsavj's `move.w (6,PC,D0.w),D1 / jmp
 (2,PC,D1.w)` at `0x018460` from a thunk in hole_a, ~0xE4A48 away — far past
 the +/-127 an 8-bit pc-displacement reaches. The design of record (STATE
@@ -127,7 +127,7 @@ that shape whenever the mover is a thunk rather than a whole ported region.
 
 ## CPS-2 gfx simms are not tile-contiguous — naive slicing silently "works" on siblings only
 
-A 16x16 tile's 32 bytes within a simm are 16 two-byte PAIRS at stride 4
+**[CPH-9]** A 16x16 tile's 32 bytes within a simm are 16 two-byte PAIRS at stride 4
 (even/odd word streams of each 0x80000 block feed decoded chunks 1MB
 apart — see tools/gfx_tiles.py header for the exact mapping, derived
 from FBNeo Cps2LoadOne). Slicing contiguous 32-byte runs mixes bytes of
@@ -143,7 +143,7 @@ understanding gets a fact-lock test (tests/test_gfx_tiles.sh).
 
 ## MAME breakpoint logging is a SAMPLER, not an inventory
 
-The Lua breakpoint pump (periodic callback resuming `debugger.
+**[CPE-4]** The Lua breakpoint pump (periodic callback resuming `debugger.
 execution_state`) drops hits: with six handler breakpoints live during
 frames 2596-2600, four record draws were logged while a write-watch
 proved at least five occurred (obj $FFBC00's draw never appeared).
@@ -156,7 +156,7 @@ member.
 
 ## Debugger stops DESYNC replay frame counting
 
-While a Lua breakpoint/watchpoint holds the CPU, MAME keeps emitting
+**[CPE-5]** While a Lua breakpoint/watchpoint holds the CPU, MAME keeps emitting
 video frames: `emu.register_frame_done` fires, the script's frame
 counter inflates past emulated time, and replay INPUT PLAYBACK (keyed
 by that counter) drifts — so every high-frequency breakpoint trace
@@ -170,7 +170,7 @@ events; for anything frame-accurate or complete, use replay.lua DUMPS
 fields survive at frame-done even when the live flag is clear.
 
 ## CPS-2 program zips store CODE encrypted — static byte reads of code are noise
-Paid for in session 14z-2 (an hour of "why does the ported region disassemble
+**[CPH-2]** Paid for in session 14z-2 (an hour of "why does the ported region disassemble
 to garbage"). The romset zips (+ .key) hold ENCRYPTED opcodes; only DATA
 reads bypass the crypt. Any static analysis of code regions — diffing a
 build against vanilla, disassembling a ported routine, searching for an
@@ -182,7 +182,7 @@ patch_prg re-encrypts; that's why plaintext jsr bytes are never found in
 the members.
 
 ## MAME Lua write taps are silently dropped on handler re-install
-`space:install_write_tap` dies (no error) whenever anything re-installs
+**[CPE-12]** `space:install_write_tap` dies (no error) whenever anything re-installs
 handlers over the space — CPS-2 does this right after boot. Symptom: tap
 logs boot writes only, reads as "nobody writes this field," which is a
 WRONG conclusion. `tests/lua/tap_writes.lua` carries the fix (re-install
@@ -192,7 +192,7 @@ watchpoint stops would desync the replay.
 
 ## OBJ RAM dumps span BOTH pages — filter by code range and you will
 ## blame the wrong drawer
-A 4KB dump at 0x708000 contains multiple drawers' output (main walker,
+**[CPH-16]** A 4KB dump at 0x708000 contains multiple drawers' output (main walker,
 doubling/fade drawer, second page). Filtering entries to the expected
 code band showed a byte-perfect match while the SCREEN showed garbage:
 the garbage came from OTHER entries (raw unremapped codes) outside the
@@ -202,7 +202,7 @@ record subset in minutes once unfiltered).
 
 ## PC-relative reads are PROGRAM-space; (An)-based reads are DATA-space —
 ## absolutizing a pc-relative table read on CPS-2 reads CIPHERTEXT
-The 68000 classes `(d16,PC)`/`(d8,PC,Xn)` operand fetches as program
+**[CPH-3]** The 68000 classes `(d16,PC)`/`(d8,PC,Xn)` operand fetches as program
 references; CPS-2 decrypts program-space accesses in 0x000000-0x100000.
 A site_thunk that faithfully "reproduced" `move.w $185DA(pc,d0),d0` as
 `lea $185DA,a0; move.w (a0,d0),d0` read the encrypted bytes instead
@@ -227,7 +227,7 @@ WIDTH before concluding the code path is dead — and log a few raw
 (addr, data) pairs unfiltered first.
 
 ## OBJ y-word bit 15 is the sprite-list TERMINATOR, not a spare bit
-The plan for a 19th tile-address bit was "widen the OBJ mask 0x6000 ->
+**[CPH-14]** The plan for a 19th tile-address bit was "widen the OBJ mask 0x6000 ->
 0xE000", i.e. use y-word bit 15. That bit ends the sprite list
 (`CpsObjGet`: `if (ps[1] & 0x8000) break;`), so setting it on a sprite
 would silently drop every sprite after it. Capcom's own CPS-2 Turbo hits
@@ -259,7 +259,7 @@ grown region that measures exactly like the stock one.
 
 ## FBNeo harness: no video means the sprite path never runs, and stdout
 ## is captured to the sandbox log
-Two ways to waste an hour while instrumenting FBNeo. (1) The harness only
+**[CPE-30]** Two ways to waste an hour while instrumenting FBNeo. (1) The harness only
 renders when `FBNEO_HVIDEO` is set; without it `pBurnDraw` is NULL and
 `Cps2ObjDraw` is never called, so a printf in the sprite path produces
 NOTHING — which reads exactly like "my feature flag is not being set".
@@ -271,7 +271,7 @@ confirm a descriptor change actually took effect.
 
 ## FBNeo matches zip members by CRC — a mismatch loads 0xFF FILL and
 ## still prints "(OK)"
-This is the single nastiest trap found in the WIDE work, and it
+**[CPE-28]** This is the single nastiest trap found in the WIDE work, and it
 CONTRADICTS an earlier note in this repo ("FBNeo verified to load
 CRC-changed patched zips (no descriptor change needed)"). That note is
 true only in the narrow sense that FBNeo does not refuse to RUN. What it
@@ -307,7 +307,7 @@ Rules that follow:
 
 ## MAME's build system cannot handle a SPACE anywhere in the source path
 (paid: 2026-08-03, B5 — ~30 min)
-This repository lives under `.../Vampire Saved/...`. MAME's GENie build
+**[CPE-22]** This repository lives under `.../Vampire Saved/...`. MAME's GENie build
 dies on that. `scripts/genie.lua:18` carries the escaping line
 **commented out upstream**, and `SOURCES=` builds shell out to
 `makedep.py` with `MAME_DIR` unquoted, so genie reports the useless
@@ -335,7 +335,7 @@ found. Anchor mirror excludes: `--exclude '/build/'`.
 
 ## MAME 0.288's OSD is SDL3 and it is found ONLY through pkg-config
 (paid: same session, ~8 min of wasted compile)
-`scripts/src/osd/sdl3.lua` decides between framework and library linkage
+**[CPE-23]** `scripts/src/osd/sdl3.lua` decides between framework and library linkage
 by asking pkg-config. With pkg-config absent it silently picks framework
 linkage, and the build then dies **several minutes in** with
 `fatal error: 'SDL3/SDL.h' file not found`. Having the sdl3 library
@@ -364,7 +364,7 @@ docs/project/patch_index.md instead.
 ## host keystrokes are injected into the EMULATED controls
 (mechanism supplied by the maintainer, 2026-08-03; implicated in the two
 unexplained 14z-59 divergences)
-MAME has no true headless mode the way some emulators do. Even with
+**[CPE-15]** MAME has no true headless mode the way some emulators do. Even with
 `-video none` it creates a window, and that window can steal focus. Any
 key pressed while it has focus goes to MAME's default keyboard map, which
 covers **P1 directions, buttons 1-6, coins and start**. The harness runs on
@@ -405,7 +405,7 @@ so a truncated log fails rather than being compared.
 
 ## The CPS-2 encrypted range is INCLUSIVE of its upper word — 0x100001, not
 ## 0x100000 (measured 14z-59k)
-The project quotes vsavj's encrypted range as `PRG:0x000000-0x100000`
+**[CPH-7]** The project quotes vsavj's encrypted range as `PRG:0x000000-0x100000`
 ("first 1MB only"). The limit test is `<=` on the WORD address, in both our
 `Cipher.crypt_words_at` (`lo <= a <= hi`) and MAME's `cps2crypt.cpp`
 (`a >= lower_limit && a <= upper_limit`). So the word at byte `0x100000` is
@@ -420,7 +420,7 @@ and the new test was wrong — which is the argument for writing the test
 before trusting the behaviour, not after.
 
 ## Ported CODE above the encryption window is stored RAW, automatically
-`patch_prg.py` re-encrypts every `code`/`code_file` op unconditionally, so
+**[CPH-8]** `patch_prg.py` re-encrypts every `code`/`code_file` op unconditionally, so
 it looks like code placed above 1MB would be corrupted. It is not:
 `Cipher.crypt_words_at` is RANGE-AWARE and returns out-of-range words
 unchanged, matching how the CPU fetches them. That is what makes the CPS-2
@@ -434,7 +434,7 @@ ever fails, ported code above 1MB becomes executable garbage rather than a
 loud failure — so it fails the build rather than warning.
 
 ## MAME write taps must be WORD-ALIGNED
-`install_write_tap` on `ff8403,1` dies with "start address has low bits
+**[CPE-13]** `install_write_tap` on `ff8403,1` dies with "start address has low bits
 set, did you mean ff8402?" — and it is a hard error that kills the script
 after a full boot. Tap the containing word (`ff8402,2`) and filter on the
 logged mask/offset. Byte writes arrive with the value replicated across
@@ -442,7 +442,7 @@ the word (`data 00000303` for a byte `0x03`), so mask the low byte.
 
 ## FBNeo's SDL frontend has NO `-rompath` — the flag is silently ignored
 (paid: 2026-08-05, 14z-60m — cost the maintainer several failed launches)
-`tools/run_wide.sh` launched FBNeo as
+**[CPE-29]** `tools/run_wide.sh` launched FBNeo as
 `fbneo vsavjw -rompath "<build>;$ROMDIR"`. MAME supports `-rompath`; **FBNeo
 does not**. Rom paths live in `szAppRomPaths[]`, defaulting to
 `/usr/local/share/roms/` and **`roms/` relative to the CWD**
@@ -500,7 +500,7 @@ if (ri.nCrc) {                      // Search by crc first
 for (int nAka = 0; ...) {           // Failing that, search for possible names
 ```
 
-So the name is the FALLBACK in both emulators, not the identity. A member's
+**[CPH-12]** So the name is the FALLBACK in both emulators, not the identity. A member's
 identity in a set is its HASH, and two files with the same bytes are the
 same member as far as the loader is concerned.
 
@@ -522,7 +522,7 @@ Rules:
 
 ## Dump a tile band WITH its bank bits, or you will exonerate the guilty
 (paid: 2026-08-05, 14z-60y/60z — one session spent on the wrong hypothesis)
-The sprite record's code word for Donovan's select portrait is `0xAD8F`,
+**[CPH-10]** The sprite record's code word for Donovan's select portrait is `0xAD8F`,
 but its y-word selects bank 2, so the tile the hardware fetches is
 
     tile = code | ((y & 0x6000) << 3)   =   0x2AD8F        (byte 0x156C780)
@@ -549,7 +549,7 @@ Rules:
 
 ## MAME cross-driver VIDEO_OUT checksums are NOT comparable (14z-62d)
 
-Comparing replay.lua VIDEO_OUT streams between the `vsav`/`vsavj` machine
+**[CPE-17]** Comparing replay.lua VIDEO_OUT streams between the `vsav`/`vsavj` machine
 and the `vsavjw` (cps2wide) machine flags THOUSANDS of "divergent" frames
 whose actual bitmaps are pixel-identical — verified by decoding
 `video:snapshot()` PNGs at four frames inside "divergent" runs (raw
@@ -566,7 +566,7 @@ config perturbs (timing/sampling nuance), not the final picture. Rules:
 
 ## A chained rompath makes MAME a LIAR about member identity (14z-62h)
 
-The same bug was invisible to every MAME-side measurement: with
+**[CPE-18]** The same bug was invisible to every MAME-side measurement: with
 `MAME_ROMPATH="<build>;$ROMDIR"`, MAME resolved the stale (CRC-mismatched)
 group-B members by HASH to the PRISTINE copies in ROMDIR's vsav.zip and
 rendered Jedah perfectly — while FBNeo (name-resolution inside its overlay,
@@ -584,7 +584,7 @@ Rules:
 ## Unconditioned breakpoints DESYNC replay input — the trace measures a
 ## screen the replay never left (14z-63)
 
-`obj_record_full_trace.lua` with breakpoints on the hot OBJ format
+**[CPE-6]** `obj_record_full_trace.lua` with breakpoints on the hot OBJ format
 handlers (thousands of stops per second) produced a trace whose frame
 counter said "select screen" while the machine was still in ATTRACT: the
 frame counter advances on `frame_done`, which keeps firing for UI frames
@@ -608,7 +608,7 @@ Rules:
 ## byte/data tables through the DATA view — both live inside the
 ## encrypted range (14z-68)
 
-The effect byte map (vs2 0x27FD8) reads correctly ONLY from the data
+**[CPH-5]** The effect byte map (vs2 0x27FD8) reads correctly ONLY from the data
 view (the standing GOTCHA). The seq-0x0E state-dispatch word table
 (vs2 0x5556C, `move.w (pc,d0.w)` consumed) reads correctly ONLY from
 the OPCODE view — its data-view bytes decode to garbage targets.
@@ -622,7 +622,7 @@ session down a false trail.
 ## A `wpset` watchpoint is SILENTLY BLIND to every pc-relative read on
 ## CPS-2 — jump/handler tables need the OPCODES space (14z-71)
 
-MAME's m68k serves pc-relative reads through `m68k_read_pcrelative_*`
+**[CPE-8]** MAME's m68k serves pc-relative reads through `m68k_read_pcrelative_*`
 -> `m_readimm16` -> **AS_OPCODES**, not the program space. So a plain
 `wpset` on any table the engine indexes with `move.w (d16,pc,Dn),Dm` or
 `movea.l (d16,pc,Dn),An` — which is *most* dispatch tables in this
@@ -647,7 +647,7 @@ Rules:
 ## MAME parses a watchpoint LENGTH as HEX — and a length the harness
 ## regex rejects kills the run and prints a clean-looking zero (14z-71)
 
-`wpset addr,len,type` takes `len` in HEX, so `10` is sixteen bytes and
+**[CPE-9]** `wpset addr,len,type` takes `len` in HEX, so `10` is sixteen bytes and
 ten bytes is `a`. `tests/lua/trace_writes.lua` matched the WATCH length
 with `%d+`, so any hex-lettered length failed the pattern, the `assert`
 killed the run **before the replay started**, and the trace file came out
@@ -671,7 +671,7 @@ Rules:
 ## The boot RAM test writes EVERY byte of work RAM — a bare write-count
 ## on any address reports phantom hits (14z-71)
 
-vsav's POST walks all of work RAM (frames ~5-72, PCs `0x000D34`-`0x000DDC`,
+**[CPE-10]** vsav's POST walks all of work RAM (frames ~5-72, PCs `0x000D34`-`0x000DDC`,
 plus per-venue clears out to ~f824). So a watchpoint on any RAM address
 returns a non-zero write count on a perfectly clean run.
 
@@ -693,7 +693,7 @@ Rules:
 ## A MAME watchpoint logs REGISTERS, not the VALUE WRITTEN — reading the
 ## value off a register snapshot attributed a write to the wrong caller (14z-76)
 
-`tests/lua/trace_writes.lua` logs `frame PC D0 D1 A0..A6` at each hit. It does
+**[CPE-11]** `tests/lua/trace_writes.lua` logs `frame PC D0 D1 A0..A6` at each hit. It does
 **not** log the datum. On a `move.l a1,$30(a4)` it is tempting to read A1 as
 "the value written" — and that is right only if the sample came from the call
 you care about. In 14z-76 the win-quote installer was sampled on a *different*
@@ -724,7 +724,7 @@ keep MAME's for "which code ran".
 
 ## FBNeo/MAME frame indices and object slots do not transfer — a slot-keyed tap chases a different object (14z-81)
 
-The merged Huitzil crash is deterministic on MAME at frame 2886, object
+**[CPE-34]** The merged Huitzil crash is deterministic on MAME at frame 2886, object
 `$FFB800`. An `FBNEO_HTAP` on that slot showed healthy writes on BOTH builds
 — and the merged build survived the whole 11,017-frame replay on FBNeo. Not
 a contradiction: the emulators traverse the same states on different frame
@@ -755,7 +755,7 @@ made before 14z-85.
 
 ## A member's REGION layout is not its FILE layout — and the Z80 driver's own address space is a THIRD thing (14z-86)
 
-MAME loads CPS2's `vm3.01` split (`ROM_LOAD` 0x8000 at region 0, then
+**[CPH-18]** MAME loads CPS2's `vm3.01` split (`ROM_LOAD` 0x8000 at region 0, then
 `ROM_CONTINUE` at region 0x10000; `vm3.02` at region 0x28000). A session of
 Z80-driver RE (14z-85d) assumed region==file above the fixed window and read
 every table at region-derived offsets: the id table "at FILE 0x11006", entry
@@ -782,7 +782,7 @@ The rules this paid for:
 
 ## QSound sample windows must live in ONE HALF of their 64K bank — the DSP compares pointers SIGNED (14z-86)
 
-The M5 voice packer placed sample windows first-fit avoiding only 0x10000
+**[CPH-19]** The M5 voice packer placed sample windows first-fit avoiding only 0x10000
 crossings. Four restored voices came out attack-then-silence: their windows
 straddled bank offset 0x8000, and the DL-1425 program compares the playback
 pointer against END in SIGNED 16-bit — start positive, end "negative" →
@@ -804,7 +804,7 @@ option wins.)
 
 ## QSound packing law #2: the destination offset must keep the SOURCE offset's BYTE PARITY (14z-86)
 
-The voice batch still sounded "like PC-speaker synthesis in a DOS game"
+**[CPH-20]** The voice batch still sounded "like PC-speaker synthesis in a DOS game"
 (maintainer, on BOTH emulators) after the half-bank fix. The mechanism:
 the QSound members are stored PRE-SWAPPED and both emulators byteswap
 16-bit pairs at load — so the audio stream a sample yields depends on the
@@ -829,7 +829,7 @@ not read taps on device ROM spaces.
 
 ## A state-dependent value may not be correlated ACROSS runs — serialize read and write in ONE run (14z-87)
 
-The sword-plant "ding" hunt spent most of a session on a phantom
+**[CPE-37]** The sword-plant "ding" hunt spent most of a session on a phantom
 "invisible write": a write tap on `$FF8782` said the last mid-match write
 was 0x06, a debugger bp said the dispatcher later READ 0x0C from that
 byte, both instruments were provably live — and no mechanism on either
@@ -860,7 +860,7 @@ evidence — it is the phantom-generator.
 
 ## A QSound "pure synthetic beep" is a TIGHT-LOOP sample — and a raw-window render can never reproduce it (14z-87b)
 
-The hardware plays samples only; a clean pitched tone is a sample record
+**[CPH-22]** The hardware plays samples only; a clean pitched tone is a sample record
 whose loop region is a few dozen samples (vsavj record #0x3E: loop
 0xFFF4-0xFFFF = 11 saturated bytes → ~1.17kHz pure tone at the driver
 rate). Two paid-for corollaries: (1) rendering a record's raw window
@@ -876,7 +876,7 @@ global diff showed audio removed at exactly the enqueue frame.
 
 ## QSound packing law #3: the record's `end` offset PLAYS — copy the inclusive window (14z-87b)
 
-The sword-plant "beep" (maintainer ear-confirmed against a byte-synthesized
+**[CPH-21]** The sword-plant "beep" (maintainer ear-confirmed against a byte-synthesized
 prediction): a sample record's `end` field is played/looped INCLUSIVE —
 proven by field width, since native windows end at 0xFFFF, which an
 exclusive bound could not express — but the voice-batch packer copied
@@ -917,7 +917,7 @@ outside the crypt window":
   unchanged, "matching how the CPU would fetch them"
   (`tools/cps2_decrypt.py:325-330`).
 
-So the choice is decided by HOW THE BYTES ARE READ, not by where they
+**[CPH-4]** So the choice is decided by HOW THE BYTES ARE READ, not by where they
 land. Anything the 68000 fetches through AS_OPCODES — instructions, and
 every pc-relative table read (`movea.l (d8,PC,Dn.w)`, `move.w (d8,PC,Dn.w)`)
 — must be a `code` op wherever it goes. `data` is right for An-relative
@@ -938,7 +938,7 @@ every 3-tenant merge fail to generate, because hole_a is full.
 
 ## MAME `-aviwrite` is headless-capable but uncompressed (14z-94)
 
-Recording from inside MAME is the right instrument for dating a visual
+**[CPE-16]** Recording from inside MAME is the right instrument for dating a visual
 event — the captured frames are EMULATED frames, so window frame k is
 replay frame START+k by construction, and the file is reproducible run to
 run. A host screen recorder gives neither.
@@ -964,7 +964,7 @@ blanks frames still produces a file that plays.
 ## 14z-94: TWO BUILDS CAN SHARE A PROGRAM FINGERPRINT — the merged build and
 ## its legacy-only instrument do, deliberately
 
-The maintainer asked to confirm which merged build to playtest, fearing they
+**[CPE-42]** The maintainer asked to confirm which merged build to playtest, fearing they
 had tested the wrong one. They were right to ask, and the fingerprint would
 NOT have settled it:
 
@@ -1010,7 +1010,7 @@ different question and, for these two, has the same answer.
 
 ## `gfx_tiles.decode` had every 8-pixel half MIRRORED, and nothing noticed for 14 sessions (14z-105)
 
-Within each 8-pixel half of a CPS-2 OBJ tile row, plane bit `i` is pixel
+**[CPH-11]** Within each 8-pixel half of a CPS-2 OBJ tile row, plane bit `i` is pixel
 `7-i`. `decode()` mapped bit `i` to pixel `i` from the day it was written,
 and its inverse (`encode`, new 14z-105) inherited that — the first tiles
 this project ever AUTHORED (the select-screen version glyphs) drew each
@@ -1841,7 +1841,7 @@ and the hash not to, unless it is the same calendar day.
 ## An ARMED DEBUGGER BREAKPOINT skews the Lua harness's input application —
 ## deterministic INPUT-VIOLATIONs that look like host input (14z-110)
 
-Any MAME `-debug` breakpoint stop delays `emu.register_frame_done`'s input
+**[CPE-7]** Any MAME `-debug` breakpoint stop delays `emu.register_frame_done`'s input
 application by a beat when the stop lands inside the frame the replay layer
 was about to write — the input-integrity check then reads the PREVIOUS
 chord and flags INPUT-VIOLATION. The tell that it is NOT host input: the
@@ -1886,7 +1886,7 @@ touch the scratch.
 
 ## MAME Lua: WRITE taps fire, READ taps do not (14z-112, measured)
 
-`space:install_write_tap()` works and is what `tests/lua/inp_guard.lua` relies
+**[CPE-14]** `space:install_write_tap()` works and is what `tests/lua/inp_guard.lua` relies
 on (the #99 capture taps the game's own `$FF0000` exception store).
 **`space:install_read_tap()` never fires on this driver** — not for ROM and
 not for work RAM. Measured 14z-112 with a positive control: a tap on

@@ -146,6 +146,13 @@ rule.
 
 ## 5. Sequencing, and what one session can carry
 
+> **STATUS 14z-114: A + B SHIPPED** — `cps2-hardware` (`[CPH-1..30]`, sections
+> A.1-A.5) and `cps2-emulation` (`[CPE-1..42]`, B.1-B.4), 72 anchors in
+> `platform/gotchas.md`, `project/gotchas.md`, `cps2_wide.md` and HANDOFF;
+> `tools/checkskills.py` now table-driven per prefix with cross-reference
+> resolution; the gate carries six controls. Yield 72 rules from ~1,700
+> lines against the §5 estimate of 80. C and D remain.
+
 1. **A + B first** — smallest, lowest staleness risk, and they are what the
    other two cite (`[CPH-*]` for the OBJ format, `[CPE-*]` for every probe
    caveat). One session: pass + both skills + checker extension + gate.

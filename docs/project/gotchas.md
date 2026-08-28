@@ -140,7 +140,7 @@ Rules now enforced:
 
 ## Pre-seeded from the ROM-audit round (2026-07-25, before repo existed)
 
-- **MAME audits the whole board, not just the game:** FBNeo has decryption
+**[CPE-20]** - **MAME audits the whole board, not just the game:** FBNeo has decryption
   keys compiled in and synthesizes QSound (HLE) without the DSP dump; modern
   MAME requires per-set `.key` files AND the shared device romset
   `qsound_hle.zip` (`dl-1425.bin` — one copy in the rompath serves every
@@ -158,7 +158,7 @@ Rules now enforced:
 
 ## Cross-emulator replays: same inputs ≠ same content (paid: 2026-07-25, ~2h)
 
-The MAME↔FBNeo frame offset (a few frames at boot) does more than shift
+**[CPE-33]** The MAME↔FBNeo frame offset (a few frames at boot) does more than shift
 frame indices — near any screen transition it changes WHICH content runs.
 Three measured mechanisms, all found while validating `tools/compare_fields.py`:
 
@@ -642,7 +642,7 @@ blind reruns this session). Symptom to recognize: rc=3 +
 FileNotFoundError on the first expected dump.
 
 ## Sound is invisible to every RAM and pixel gate — it needs its own
-The masked legacy gate, the field oracles and the pixel menu gates were
+**[CPE-36]** The masked legacy gate, the field oracles and the pixel menu gates were
 ALL green while Donovan was completely silent, and equally green when a
 sound path was wired to vsavj's music-track id range (the round-2
 "214P plays music" bug). Sound state lives in a ring the gates mask as
@@ -654,7 +654,7 @@ anything sent to another processor tomorrow) needs a dedicated
 detector — "the battery is green" says nothing about it.
 
 ## Censusing a structure without knowing its terminator counts garbage
-The first y-word census scanned all of OBJ RAM and reported 841 sprites
+**[CPH-17]** The first y-word census scanned all of OBJ RAM and reported 841 sprites
 with bit 15 set — "vanilla uses the bit, plan dead". Every one of them
 was stale data PAST the list terminator, never drawn. The same trap in
 the scroll3 tilemap: raw `maxcode` is always 0xFFFF because unused cells
@@ -665,7 +665,7 @@ and separate sentinels from real values, or the measurement will confi-
 dently answer a question you did not ask.
 
 ## The FBNeo gate never rendered a pixel — RAM checksums are blind to video
-The FBNeo harness ran every frame with `pBurnDraw = NULL`. That is correct
+**[CPE-35]** The FBNeo harness ran every frame with `pBurnDraw = NULL`. That is correct
 for speed and for a work-RAM oracle, but it means the emulator-side gate
 could not see the video path AT ALL: a change to sprite/tile rendering
 produces byte-identical RAM logs whether it works or draws garbage. This
@@ -688,7 +688,7 @@ variable. A reference that drifts is worse than no reference, because its
 failures look like real findings.
 
 ## A canary must change exactly ONE thing, or it cannot answer anything
-The first CPS-2 WIDE B4 canary tried to prove the new 19-bit gfx banks
+**[CPE-38]** The first CPS-2 WIDE B4 canary tried to prove the new 19-bit gfx banks
 were reachable by remapping 15 characters' bank-table rows to the new
 banks and requiring pixel-identical output. It failed — and the failure
 was uninterpretable, because the same edit ALSO changed game logic (see
@@ -703,7 +703,7 @@ under a test-only flag over changing the ROM when the ROM change has
 side effects.
 
 ## A relocation test with no negative control proves nothing
-The CPS-2 WIDE PRG canary relocated one character's sound table into the
+**[CPE-39]** The CPS-2 WIDE PRG canary relocated one character's sound table into the
 extension and came back RAM-identical — apparently proving the 68k could
 read above 4MB. It proved nothing: pointing the same table at ZERO FILL
 was *also* RAM-identical, because that row is never read in those
@@ -725,7 +725,7 @@ RAM log stays bit-identical to the frozen expectation with it enabled.
 
 ## `git apply` SILENTLY SKIPS the patch when the target is inside another
 ## repo's working tree — and exits 0 (paid: 2026-08-03, B5)
-`tools/setup_mame.sh` builds from a mirror under `~/.cache/vampire-saved/`.
+**[CPE-25]** `tools/setup_mame.sh` builds from a mirror under `~/.cache/vampire-saved/`.
 On this machine **`$HOME` is itself a git repository**, so the mirror sits
 at prefix `.cache/vampire-saved/mame/` inside it. `git -C <mirror> apply
 0002-cps2-wide-v1.patch` therefore read the diff's paths
@@ -756,7 +756,7 @@ The sequence
     git -C emu/mame fetch --depth 1 origin tag mame0288
     git -C emu/mame checkout mame0288          # working tree only!
 
-leaves the SUPERPROJECT INDEX pointing at the default branch head — the
+**[CPE-21]** leaves the SUPERPROJECT INDEX pointing at the default branch head — the
 `add` staged it before the checkout, and the checkout never re-staged.
 Everything looks right (`git -C emu/mame log -1` shows the tag's commit)
 until something runs `git submodule update`, which dutifully restores the
@@ -799,7 +799,7 @@ shipped silent-but-wrong in the other direction, it would have been worse.
 ## SKIPPED applying the profile patch, never reverted it
 (paid: 2026-08-03, B5b — the FBNeo emulator superset invariant may never
 have actually been tested)
-`setup_fbneo.sh` applies the CPS-2 WIDE patch to the submodule WORKING TREE
+**[CPE-31]** `setup_fbneo.sh` applies the CPS-2 WIDE patch to the submodule WORKING TREE
 and leaves it there. On the next invocation with `WIDE=0` the script took
 the "skip" branch, printed **"WIDE=0: harness-only build (reference binary
 for the superset invariant)"** — and built a binary that still **carried the
@@ -2610,7 +2610,7 @@ for SOME moves, so a motion that "does nothing" should try the overlap
 shape before concluding anything about the game. [game-adjacent; filed
 here because the trap is the REPLAY GRAMMAR, not the engine]
 
-## 14z-98: two traps from the #103 close — both are -debug INSTRUMENT
+**[CPE-3]** ## 14z-98: two traps from the #103 close — both are -debug INSTRUMENT
 ## grammar, and both misread a measurement for a full round each
 
 **Every -debug watch configuration is its own TIMELINE, not just
@@ -2791,7 +2791,7 @@ present in quiet frames is scenery, whatever its codes suggest. (Same
 family as "the observation window bounds the claim", RH-19 — here the
 window was only ever placed ON the event.)
 
-## MAME palette RAM ($90C000) takes Lua pokes for READBACK but not for RENDERING (14z-102)
+**[CPE-19]** ## MAME palette RAM ($90C000) takes Lua pokes for READBACK but not for RENDERING (14z-102)
 Poking palette rows from a frame_done hook (POKES or space:write) lands
 in the bytes — a later DUMPS readback shows the poked values sticking —
 but the rendered frame never changes; only the GAME's own writes
