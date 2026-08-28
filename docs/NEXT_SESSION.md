@@ -84,7 +84,8 @@
 > ## and fingerprint `32007911` UNCHANGED, tag `freeze/merged-m10`,
 > ## `release/merged-m10/` with the first in-tree `mister/` layer (MRAs +
 > ## BITSTREAM.txt; the `.rbf` itself is not in the tree yet — the RELEASE
-> ## FORMAT is the open item). Play with
+> ## FORMAT is the open item *[HISTORY — both done post-close 14z-113, see the
+> ## live opener above]*). Play with
 > ## `tools/run_wide.sh build/m3b_merged17 fbneo`.**
 > ## **#113 stays OPEN: the maintainer is gathering camera evidence that
 > ## original hardware/MiSTer may DISAGREE with the emulation finding —
