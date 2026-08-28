@@ -40,12 +40,20 @@ loose `*.rom` files and the `mra/` tree beside them are jtframe BY-PRODUCTS
 of generating those (the download images and the upstream MRA tree); nothing
 on the card reads them. **And a sibling directory suffixed `_stock` is the
 STOCK LEG of the same run** — `tools/mister_mra.sh --core cps2w` *without*
-`--wide` — carrying only the stock `.rom` images and `mra/`: no `_Arcade/`,
-no `games/`, nothing of this port's. **It is not a card bundle and there is
-nothing in it to field-test**; its shared `.rom` files are byte-identical to
-the WIDE bundle's. Safe to delete; one command regenerates it. (Do not
-confuse it with the `[STOCK CONTROL]` MRA, which IS shipped, lives in the
-WIDE bundle's `_Arcade/`, and is the superset invariant on silicon.)
+`--wide`. **Measured 14z-116: it is a STRICT SUBSET of the WIDE bundle** —
+every file in it exists there too, byte-identical, except one MRA where the
+WIDE bundle's copy is strictly better (it carries the assembled `.rom`'s
+`asm_md5`). So it holds nothing the real bundle does not, and there is
+nothing in it to field-test. Safe to delete; one command regenerates it.
+**Two things it is NOT, both easy to assume:** it is not "Jotego's core"
+(its MRAs carry `<rbf>jtcps2w</rbf>` — OURS; the stock CPS-2 core `jtcps2`
+appears nowhere in either directory), and it is not how you check stock
+behaviour — that is the `[STOCK CONTROL]` MRA in the WIDE bundle's
+`_Arcade/`, which runs stock `vsavj` on OUR bitstream and is the superset
+invariant on silicon. `_stock` ships no `games/` zips, so on its own it
+runs nothing at all. The only thing its `mra/` tree adds over `_Arcade/` is
+the full REGION catalogue on our core (Euro/USA/Asia/Brazil/Hispanic/Japan/
+Phoenix); no gate covers it and it would need the zips beside it.
 
 **CHECK A BUNDLE'S CURRENCY BY HASH, NOT BY ITS NAME.** A bundle is current
 iff its `games/mame/vsavjw.zip` matches the freeze's
