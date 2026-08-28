@@ -288,6 +288,33 @@ the opponent's character and colour**. That is the copy character
 by an input, not by an id: **nothing anywhere compares a character id
 against `0x0B` or `0x1B`.**
 
+**THE COUNT IS EXACTLY 5 — AND THAT IS SHADOW (maintainer-confirmed
+2026-08-28).** `$42(a6)` has exactly four accesses in the whole image:
+cleared at select entry (`PRG:0x0209C4`) and at `PRG:0x020CBE`,
+incremented at `0x020CAC`, compared at `0x020CB0` — and the compare is
+`#$5`, with `bne` falling into `clr.b $43` + `clr.b $3bc`, so the arm is
+set on press 5 and CLEARED AGAIN on press 6. The counter is never
+preserved or re-read, so it cannot discriminate a second character.
+`cmpi.b #$<n>,$42(a6)` appears exactly once per game and is always `#$5`:
+vsavj `0x020CB0`, vsav2 `0x01F8D6`, vhunt2 `0x01F8CE`.
+
+This matches the community code for **Shadow** ("highlight random, press
+START 5 times, then any punch or kick") instruction for instruction, and
+the maintainer has confirmed the rest: **there is NO Marionette in Vampire
+Savior — she is a Vampire Savior 2 character**, and the "7 presses" code
+belongs to that game. Worth recording for anyone who goes looking: vsav2's
+twin routine (`PRG:0x01F8F2`, disassembled 14z-116) is structurally
+IDENTICAL to vsavj's and also carries only a `#$5`, so whatever arms
+Marionette in vs2 is NOT this counter and has not been located. It is out
+of scope for this port either way — nothing here ports her.
+
+**The copy character is a first-class entity with its own assets**, which is
+why it is not merely "the opponent again": `$3BC` is read at
+`PRG:0x00AF1C` (its own arcade-ladder row base — `$3bd(a0) << 3 + 0x800`,
+where `$3BD` holds the id committed BEFORE the copy, stored at
+`PRG:0x020AC8`), at `PRG:0x05F17A` (a different VS-screen figure state),
+and at `PRG:0x084648` (its own sprite record at `PRG:0x283690`, bank 2).
+
 **THE COPY IS AN UNMASKED BYTE MOVE, WHICH IS THE WHOLE ANSWER FOR THIS
 PORT.** `move.b $382(a1),$382(a0)` applies no mask, no bound and no fold,
 and every table the copied id then indexes is 32 rows with this port's
