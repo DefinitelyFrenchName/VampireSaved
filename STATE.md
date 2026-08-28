@@ -1,5 +1,23 @@
 # STATE — living progress log
 
+## Session 14z-113 CLOSE — ritual complete. **THE MiSTer SCOPE DOCUMENT
+## WRITTEN AND ITS THREE DECISIONS RULED; THE S1-S20 STALENESS PASS RUN;
+## BUNDLE 14z112 FIELD-VERIFIED; merged-m10 FROZEN; THE RELEASE FORMAT RULED
+## AND SHIPPED (one self-sufficient directory per platform).**
+
+| | |
+|---|---|
+| opened with | the 14z-112 orientation; nothing red; main == origin/main at `1a0d7bb` |
+| delivered | `docs/project/mister_scope.md` (split, boundaries, doc map, S1-S20) -> rulings (split confirmed; pass mandatory, after the board; `.rbf` + MRAs in-tree) -> board results ("excellent, no regression", stock coexists, STOCK CONTROL boots) -> the S1-S20 pass (one commit, re-grep empty, 110/0/0) -> **freeze merged-m10** (`build/m3b_merged17`, M8 + fingerprint `32007911` unchanged, tag pushed, 54 defaults re-pointed, MiSTer tail empty by construction) -> **the release format ruled** (self-sufficient per platform; patch set copied into each; driver patch + recipe, no binaries; every version releases every platform) and **shipped as `release/merged-m10/{fbneo,mame,mister}/`** with `tools/package_release_platforms.py`, `docs/project/release_format.md` and `test_release_roundtrip.sh` §4 (layout + no cross-platform leakage + must-fire) |
+| green at close | `run_all_static --strict` **PASS 110 / SKIP 0 / FAIL 0 / MISSING 0** (run four times this session, last on the tree as committed); inp corpus 6/6, version string, render-content on merged17; ROM audit 76/76 |
+| push | main == origin/main; `freeze/merged-m10` on origin; no local-only tags; fork current at `63496069` (`git ls-remote`, all three) |
+| not done, by ruling or by absence | **#113 OPEN** — the maintainer is producing CAMERA evidence that hardware may disagree with the emulator finding; nothing re-derived, nothing closed. **The `.rbf` is not in the tree** — it was never on this machine; its home is `release/merged-m10/mister/jtcps2w.rbf` (hash in `BITSTREAM.txt`), the maintainer will drop it in. `build/m3b_merged15` NOT deleted (referenced by `test_inp_crash_merged_m8_01` defect mode). STOCK CONTROL: kept, re-scoped to once-per-new-`.rbf` (recommendation; the maintainer asked, did not rule) |
+| next | **THE MiSTer SKILLS** — distilled in a FRESH session from the corrected docs per `mister_scope.md` (six core + one shared + five VS-specific), each shipping with its checker (the SMS `checkskills.py` pattern) |
+
+**Ledger rollover:** the 14z-110b group (three records) moved verbatim to
+STATE_HISTORY.md; STATE holds 14z-111 / 14z-112 / 14z-113.
+
+
 ## Session 14z-113 (2026-08-28) — **THE MiSTer SCOPE DOCUMENT IS WRITTEN
 ## (`docs/project/mister_scope.md`) — scope only, not the skills, as agreed.**
 
@@ -427,167 +445,6 @@ back. `run_all_static --strict` on the resulting tree: PASS 110/0/0.
 
 
 
-## Session 14z-110b CLOSE — **the 0x51->0x44 remap is BUILT, FROZEN and
-## MAME-VALIDATED; the board bundle carries merged-m8; the FBNeo partial
-## oracle's reduced refit is RULED and IN PROGRESS (continuation recipe
-## below).** Closed at the maintainer's call (context ceiling) — three
-## background validations were in flight at close and MUST RE-RUN.
-
-### GREEN AT CLOSE (measured this session)
-
-| | |
-|---|---|
-| the remap | six bytes (vm3j.10b alone, all three tracks), five-consumer equivalence, poison-rig A/B: stored 0x44 PERSISTS (vs pre-remap flail) |
-| builds | don_m13 `ec86330f` / stock8 `d29fd062` / merged15 `73690f21` (program fingerprints; whole-artifact digests re-frozen + attributed) |
-| registry/pins | donovan-m13 + -stock rows; m3a SIX pins green ("merged image: CHECKED"); phasec re-pinned; ~51 defaults re-pointed |
-| suite | don_m13 .sha1s: 12 of 13 IDENTICAL, only 110_don_arcade_mash moved (the remap's footprint) — SUITE GREEN (filtered) |
-| MAME cross-view | **merged_legacy on merged15: PASS, zero fails (47 replays on ratified classes)**; stage-4 gate PASS (stage-4 image legitimately unchanged — the rows are stage 6) |
-| audits | continue_switch PASS (all 5, incl. the deterministic literal pairing); don_vs_cpu PASS (both field contexts); dualtrack PASS; census EMPTY + gates PASS ×3 builds |
-| MiSTer | fork `f5a3391a` (catalogue #3, pushed), pin bumped, patch 0023, twin+mra gates PASS; **bundle `../mister_fieldtest_14z110/` refreshed to merged-m8** (WIDE 31/31; README updated; .rbf unchanged) |
-| release | release/merged-m8 packaged, round-trip PASS |
-
-### LOST AT CLOSE — RE-RUN FIRST NEXT SESSION (rule 2: these are the freeze's
-### formal acceptance, interrupted not failed)
-
-1. **The full-suite acceptance verify on don_m13** (`MAME_BIN=~/.cache/...
-   MAME_ROMPATH="build/don_m13/rompath;$ROMDIR" tests/run_suite.sh vsavjw`).
-2. **audit_guard_corpus on merged15** (BUILD=build/m3b_merged15, JOBS=2).
-3. `tests/run_all_static.sh --strict` once the oracle refit lands (see below).
-NO TAGS were cut for 110b (donovan-m13/merged-m8) — tag AFTER 1+2 are green.
-
-### THE FBNEO ORACLE — reduced refit RULED (maintainer, this session),
-### continuation recipe
-
-Root cause (measured, trail in the 110b addendum): the RULED d2-window
-cycles shift FBNeo's execution phase corpus-wide — oracle PASS on m11,
-byte-identical FAIL on m12/m13; the remap is exonerated (m12==m13 RAM at the
-failing frame, full-image diff = exactly six bytes). MAME holds everywhere.
-The plan: per-replay FRAME OVERRIDES (chosen from measurement) + re-frozen
-in-window inventory; **drop 26_don_arcade_mash alone** (cycle-saturated,
-cascading, MAME-covered — document in the gate header). A clean-frame SCAN
-for 01/06/21 + 05 (the 26-substitute) was running at close:
-`$SCRATCH/refit/plan.sh` shape — dumps at ~22 frames/replay, both legs,
-masked diff classified clean/inwin/dirty. Re-run it (script is 20 lines,
-regenerate from the 110b addendum's description), pick 5 clean frames per
-replay, add a FRAME_OVERRIDE case block + extend FROZEN with the audited
-in-window offsets, verify x2 for determinism, THEN run static strict.
-**THE SCAN COMPLETED AT CLOSE — the refit is now mechanical.** Measured
-clean (`exact`, masked-zero-diff) frames on don_m13, both legs:
-- 01_attract_long (15/17 usable): 600, 1000, 1400, 2600, 3400 all exact
-- 06_test_mode (7/7): unchanged — keep the derivation
-- 21_don_mash (13/21): 600, 2523, 3164, 4446, 5087 exact
-- 05_timeout_idle (15/21, the 26 substitute): 600, 2250, 2800, 3900, 8300 exact
-Every in-window offset at USABLE frames is already in FROZEN (55B/C/D,
-6D1, 6D4, 6D5) — choosing exact-only overrides needs NO inventory change.
-Implementation: a FRAME_OVERRIDE case block in the gate (replay -> 5
-frames), REPLAYS default swaps 26 -> 05 with the documented exclusion
-note, verify x2 for determinism, then static strict. Dirty frames measured
-and avoided: 01 f6734(+0xf226); 05 f1150/1700/4450/5550/6100; 20/07/22
-lists in the 110b addendum; 21 f1241/1882/5728/6369/8292.
-
-### THE FIELD QUESTION AT CLOSE (the maintainer's, on the board)
-
-merged-m8 on the SD card: Donovan 1P -> Bishamon -> the next tenant match
-plays through with NO name-screen reset, and the Victor KO plays its REEL
-(the neutral-pose bug was the same poison's mild surface). The wheel still
-says M7 (the mark did not bump for 110b — gfx unchanged).
-
-
-## Session 14z-110b addendum — **THE FBNEO ORACLE RED IS ROOT-CAUSED TO THE
-## RULED d2-WINDOW CYCLES (110), NOT THE REMAP (110b) — and the hunt cost a
-## paid-for instrument trap.** Resolution pending maintainer (the FBNeo
-## analogue of the ratified MAME 24-tip).
-
-**The measured chain:** oracle PASS on don_m11 (0 fails) -> FAIL on don_m12
-and don_m13 with BYTE-IDENTICAL rows (5 fails: 01_attract f6734 4 bytes —
-3 at sound-area-class-adjacent offsets + 1 at +0xf226; 26_don_arcade_mash
-wholesale at 4 of 5 sampled frames, 1230-2574 masked bytes). m12 vs m13
-work RAM at the failing frame: ZERO bytes (the six remap bytes are unread
-in this replay — full-image diff = exactly six bytes, RH-46). Pairings,
-ladder, and in-use mask IDENTICAL van/m12/m13 through f15000 (probe) —
-the divergence is a cycle-slip WITHIN the same fights (the 14z-89 class),
-FBNeo-side, cascading through the mash. ROMDIR audited pristine en route.
-
-**The instrument trap that manufactured the earlier contradiction:** the
-oracle takes its build POSITIONALLY; `BUILD=env` is silently overwritten —
-the "m12 PASS" measured don_m11 (the then-default) and both later "m12/m13"
-runs measured don_m13 (the re-pointed default). Filed in project/gotchas
-("identical results across different builds = check you varied the
-variable").
-
-**Resolution PENDING (maintainer):** the oracle's own rule — FBNeo-only
-deviation beyond the two ratified phase classes = GROWTH, sign-off
-required. The mechanism is the ruled cost (accepted with "if it moves,
-stop and escalate"); zero-cycle hooking is impossible at the site
-(documented law). Options to be asked once MAME's cross-view lands
-(acceptance verify + merged_legacy in flight): swap the two cycle-saturated
-replays out of the oracle's sample set (keeps it strict; MAME retains full
-coverage of both) vs a third FBNeo phase class (the never-reconverging
-licence the maintainer refused in 14z-89) vs engineering a leaner arm
-(relocates the tipping point, their own words).
-
-## Session 14z-110b — **THE RESIDUAL #99 ROOT-CAUSED AND THE REMAP RULED-BY-
-## CONDITION: the STORED state 0x51 over-runs a SECOND 80-vs-84 dispatcher
-## (PRG:0x2384E) the 14z-43 audit also missed; the fix is 0x51 -> 0x44 on the
-## six deity nodes + ONE ported immediate — measured equivalent at every
-## consumer both engines have.** Maintainer GO: "if the semantics are the
-## same, let's go with (1) without doubt" — the condition was then met.
-
-**The field falsified the first fix's completeness** (M7 wheel confirmed =
-the d2 window WAS loaded): the crash persisted (Phobos as 3rd fight — venue
-variance, the trigger follows whoever walks Donovan's node), plus a NEW
-surface: Victor KO'd -> NEUTRAL POSE, no reel, no sound, resolution proceeds.
-Both are ONE mechanism: the d2 window's copy handler now STORES 0x51 into
-(0x54,a1) — in vs2 a real state; on vsavj out of range for the stored-state
-consumers. The poison predates the fix (d1 case_a2 and the 14z-43 thunk
-always stored it); pre-fix the node walk crashed first.
-
-### THE MEASUREMENTS (in ask-order, each requested by the maintainer's doubt)
-
-1. **The (0x54,aN) consumer map, both engines** (97 vs 98 sites, structurally
-   parallel): ONE index consumer — `0x2384E` (vs2 `0x2237A`): `move.b
-   (0x54,a6),d0; add; move.w (6,pc,d0),d1; jmp` — vsavj table `0x2385C` = 80
-   entries, vs2 `0x22388` = 84. vsavj [0x51] = misaligned `jmp 0x2399C` (the
-   crash/neutral-pose site); vs2 [0x51] handler = byte-identical to vsavj's
-   OWN [0x0A]==[0x44]==[0x4C] handler.
-2. **Full handler bodies** (not prefixes): identical instruction streams
-   except vs2's extra `cmpi #$51 beq` — which GROUPS 0x51 with {0x4C,0x44}
-   into the same branch. vs2's own code declares the family.
-3. **The per-state lookup inside the handler** is the property table read
-   An-indexed = DATA view (the 14z-79 access-mode rule; an opcode-view read
-   en route was discarded as the wrong view): vsavj[0x44]=0x19 ==
-   vs2[0x51]=0x19. The ES-freeze family preserved. (0x19/0x4E remaps fail
-   this or the d3 dispatcher — why 14z-35/the first ruling were wrong.)
-4. **Ported-code literal knowledge of 0x51** (the maintainer's PoC worry,
-   measured): the widened scan closed at FIVE sites — two in `x022400`
-   (one = the ported handler's dead-after-remap grouping test; one REAL
-   divergence at +0x15E8: `cmpi #$51,(0x54,a6); bne; move.b #1,(0x117,a6)` —
-   a vs2 state-0x51-ONLY action), plus our own thunks (es_type51, index
-   window, and a variant-id chain whose #$51 is PYRON'S VARIANT SLOT id —
-   character id, unrelated). First scan was CONTAMINATED (backticks in an
-   unquoted heredoc — the documented class) and re-run clean.
-5. **Store-constant inventory**: NEITHER engine ever stores #$44/#$4C to
-   (0x54,An); no Donovan node natively carries 0x44/0x4C/0x0A -> the site-2
-   companion edit (#$51 -> #$44) is collision-free, and post-remap state 0x44
-   arises exactly and only where vs2 had 0x51.
-
-### THE FIX AS LANDED (manifest e6b130e)
-
-SIX `region_fix` bytes: the deity node bytes (`hitbox` +0x10E9..0x1189,
-`51 -> 44` — the 14z-35 offsets, correct value this time). **The seventh (a
-companion edit at ported `x022400`+0x15EB) was landed and RETRACTED within
-the session:** the region is HUITZIL's (a donovan-row silently never fires —
-measured on the built image) and its invoking thunks are PARKED, so the
-ported copy is dead code; vanilla has NO twin of vs2's conditional
-`0x117` store there. The 0x117 flag is LIVE engine-wide (22 tst / 11 clr /
-27 stores) — the residual timing delta for deity states is recorded in the
-manifest comment; arbiters are the deity-family gates and the field. The d2 window STAYS as the guard;
-`es_type51_dispatch` and reaction_hook `case_a2` go DEAD-BUT-EQUIVALENT
-(vanilla [0x44] is the same copy handler) — deprecation candidates, noted in
-the manifest. Census gates rewritten for the EMPTY inventory (synthetic
-MISSING control). Builds/freeze round 2 in progress at the time of writing.
-
-
 **SPLIT 2026-08-20 (14z-99 post-freeze close, maintainer-approved): this
 file holds the RECENT session groups + THE LEDGER; the full detail of every
 older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
@@ -617,6 +474,9 @@ Full detail for every line: `STATE_HISTORY.md` (verbatim; grep the session
 tag or any phrase below). `[+N more entries]` = the group has N further
 session records in the archive beyond the headline shown.
 
+- Session 14z-110b CLOSE — the 0x51->0x44 remap BUILT, FROZEN (donovan-m13 / merged-m8, M7 mark carried) and MAME-VALIDATED; the board bundle carries merged-m8; the FBNeo partial oracle's reduced refit RULED and in progress; closed at the maintainer's call (context ceiling) with three validations in flight — re-run and accepted at the 14z-111 opening audit
+- Session 14z-110b addendum — THE FBNEO ORACLE RED ROOT-CAUSED TO THE RULED d2-WINDOW CYCLES (110), NOT THE REMAP (110b): m12 == m13 RAM at the failing frame; the hunt cost a paid-for instrument trap; resolution = per-replay measured-clean frame overrides, 26_don_arcade_mash dropped for 05_timeout_idle (maintainer-ruled)
+- Session 14z-110b — THE RESIDUAL #99 ROOT-CAUSED AND THE REMAP RULED-BY-CONDITION: the STORED state 0x51 over-runs a SECOND 80-vs-84 dispatcher (PRG:0x2384E) the 14z-43 audit also missed; fix = 0x51 -> 0x44 on the six deity nodes + one ported immediate, measured equivalent at every consumer both engines have. (Field: STILL CRASHED — the real #99 was the AI script-table alias, found 14z-111 from the maintainer's recording.)
 - Session 14z-110 (4) — CLOSE. THE RULED ORDER IS COMPLETE: FIX -> AUDIT -> RE-FREEZE. The #99 d2-window fix built, audited and frozen (donovan-m12 / merged-m7, mark M7), with the MiSTer CRC tail and a field bundle. Its verdict came later and was RED: the crash survived, and 14z-111 root-caused the real mechanism.  [+3 more entries]  [rolled 14z-112 close]
 - Session 14z-109 (4) — THE #99 CRASH INVESTIGATED ON EMULATOR after the FIELD TEST PASSED on a real DE10-Nano (tenants selectable, playable, voices heard, feel better than emulator) with one 100%-reproducible crash. Root-caused the same day to vs2 type byte 0x51 in Donovan's ported block — a conclusion 14z-111 later RETRACTED as poke-contaminated. Also: the OBJ-list oracle, the DECISIONS_HISTORY split.  [+3 more entries]  [rolled 14z-112 close]
 - Session 14z-108 CLOSE — ritual complete. THE FUNCTIONAL CHAIN IS COMPLETE IN SIMULATION AND THE CORE FITS A CYCLONE V — BUT IT DOES NOT RELIABLY CLOSE TIMING. A tenant FIGHTS on the core and fights CORRECTLY against MAME; the QSound extension is FETCHED; bank 1 under load is GO; scroll is structurally cleared; the CPS-2 video registers are documented for the first time. AND THE SESSION'S OWN HEADLINE IS THAT FOUR OF ITS FINDINGS WERE CORRECTIONS OF THINGS PUBLISHED EARLIER THE SAME DAY — three of them mine. 22 commits, ALL LOCAL.  [rolled 14z-111 close]

@@ -1,4 +1,71 @@
-# NEXT SESSION — orientation (rewritten at the 14z-112 close, 2026-08-27; scope-document paragraph updated 14z-113, 2026-08-28)
+# NEXT SESSION — orientation (rewritten at the 14z-113 close, 2026-08-28)
+
+> ## **START HERE. NOTHING IS RED. EVERYTHING IS PUSHED. THE OPENER IS THE
+> ## MiSTer SKILLS — and the reason this is a fresh session is the method:
+> ## the skills are distilled from the docs AS THEY NOW READ, not from any
+> ## session's memory of them.**
+> ##
+> ## **WHAT 14z-113 SETTLED, one breath:** the scope document
+> ## (`docs/project/mister_scope.md`) and its three rulings; the S1-S20
+> ## staleness pass (every MiSTer doc's STATUS line is current — pin
+> ## `63496069`, 24 fork patches registered, "hardware: never" retired,
+> ## `cps2_wide.md` says RATIFIED); bundle 14z112 field-verified ("no
+> ## regression", stock coexists, STOCK CONTROL boots); **merged-m10
+> ## FROZEN** (`build/m3b_merged17`, M8 + fingerprint `32007911` unchanged,
+> ## packaging only, tag pushed, MiSTer tail empty); **the RELEASE FORMAT
+> ## ruled and shipped** — `release/merged-m10/{fbneo,mame,mister}/`, each
+> ## self-sufficient, every version releases every platform
+> ## (`docs/project/release_format.md`, `tools/package_release_platforms.py`,
+> ## `test_release_roundtrip.sh` §4).
+> ##
+> ## **THE WORK: THE MiSTer SKILLS, per `mister_scope.md` §2-§3** — level 1
+> ## CPS-II/WIDE core (1.1 separate-core mechanism, 1.2 the runtime profile
+> ## bit, 1.3 SDRAM tiers/slots/placement RULES, 1.4 the format caps + the
+> ## nine gated sites, 1.5 the simulation lane + instruments, 1.6
+> ## synthesis/release, 1.7 MRA/`.rom` mechanics) and level 2 VS-specific
+> ## (2.1 the roster's demand, 2.2 the placement NUMBERS, 2.3 catalogue/
+> ## MRA/bundle generation — now `release_format.md`, 2.4 the WIDE oracles,
+> ## 2.5 field test + triage). Each row names its sources BY SECTION and its
+> ## gates: **read those sections, not this file.** The liftability test
+> ## decides every placement: if it names `vsav`, a tenant, `0xEE73`/
+> ## `0xFFDB`, a fingerprint or a build dir, it is level 2.
+> ## **A SKILL SHIPS WITH ITS CHECKER** (STATE "Decisions pending", the SMS
+> ## `checkskills.py` pattern): ID-lock each skill to the doc sections it
+> ## distils so the two cannot drift; a skill that quotes a number cites the
+> ## LOG (`mister.md` / `mister_map.md` / `mister_fit.md`), never the
+> ## synthesis — that is `mister_core.md`'s own staleness rule. Decide the
+> ## checker's shape FIRST; it is the design question of the session.
+> ## `mister_scope.md` §7 lists the holes a skill must state rather than
+> ## hide (pixels and audio never MEASURED, timing a seed lottery, bank 1
+> ## on one replay, silicon's decryption window inferred).
+> ##
+> ## **TWO SMALL THINGS MAY LAND FIRST, EITHER ORDER:**
+> ## **(1) the `.rbf`** — the maintainer is copying it to
+> ## `release/merged-m10/mister/jtcps2w.rbf`; verify sha256 `46fc74af…`
+> ## against `BITSTREAM.txt`, flip its "NOT IN THIS DIRECTORY YET"
+> ## paragraph to present, commit. **(2) #113** — OPEN by the maintainer's
+> ## instruction: camera evidence in progress that hardware may DISAGREE
+> ## with the emulator finding. Do not close it, do not re-derive the
+> ## emulator measurement; if the board shows something the emulators do
+> ## not, that is a rendering finding (palette / CPS-B layer register at the
+> ## white frame — never measured), not a game-data one.
+> ##
+> ## **HOUSEKEEPING, deferred:** `build/m3b_merged15` (N-2) still referenced
+> ## by `test_inp_crash_merged_m8_01` defect mode — re-point or keep, the
+> ## maintainer's call; the STOCK CONTROL MRA kept, re-scoped to
+> ## once-per-new-`.rbf` (recommendation, unruled); the cosmetic backlog
+> ## (win-quote text for the three tenants, ladder names/pictures, wheel
+> ## polish, #112 — DISASSEMBLE, NEVER SCAN) parked as one later pass.
+> ##
+> ## **STATE OF THE BUILDS:** merged-m10 = `build/m3b_merged17` (play:
+> ## `tools/run_wide.sh build/m3b_merged17 fbneo`); the field bundle
+> ## `../mister_fieldtest_14z112/` IS this set. `run_all_static --strict`
+> ## PASS 110/0/0/0 at close.
+
+# HISTORY BELOW — the 14z-112 orientation and older; kept for the census
+# anchors, eliminations and traps, superseded as the opener.
+
+## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-112 close, 2026-08-27; updated during 14z-113)
 
 > ## **START HERE. NOTHING IS RED. #99 IS CLOSED. The tree is green
 > ## (`run_all_static --strict` PASS 110/0/0) and everything is pushed.**
@@ -73,8 +140,7 @@
 > ## `tools/run_inp_guarded.sh` (crash capture), `tools/audit_effect_rects.py`
 > ## (an INSTRUMENT, not a gate — read its header).
 
-# HISTORY BELOW — the 14z-109 orientation and older; kept for the census
-# anchors, eliminations and traps, superseded as the opener.
+
 
 ## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-109 CLOSE, 2026-08-26)
 
