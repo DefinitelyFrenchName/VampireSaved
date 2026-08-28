@@ -19,6 +19,201 @@ Rules of this file:
 - References of the form "STATE 14z-XX": look in STATE.md first, then here
   — section names are preserved verbatim, so the reference always resolves.
 
+## Session 14z-112 CLOSE — ritual complete. **#99 CLOSED ON A GREEN FIELD
+## VERDICT; #112 REPRODUCED, RULED COSMETIC AND PARKED; #113 MEASURED VANILLA;
+## AND THE WIDE PROFILE STOPPED BREAKING STOCK VAMPIRE SAVIOR.**
+
+| | |
+|---|---|
+| opened with | the 14z-111 orientation: field verdict pending, one unreplayed maintainer recording |
+| #99 | **CLOSED (maintainer).** Board GREEN on bundle 14z111 (M8) over the Bishamon > Phobos route that was 100% on M6/M7, plus four hand-played MAME recordings replayed guard-clean (`play-merged-m9-01`, `run-merged-m9-02..04`) covering both crash routes, a full arcade run to the ending, and a lost-then-continued Phobos fight. All tracked under `tests/inp/` |
+| #113 | **MEASURED VANILLA and awaiting only the maintainer's MiSTer check.** The "flash" is ONE all-white frame at every down — identical hash, identical event inventory, on stock `vsavj` AND on `vsav2`. Gate `tests/test_down_flash_vanilla.sh`; mechanism section in engine_internals |
+| #112 | **REPRODUCED deterministically** (`run-merged-m9-05`: Victor white f5685-5693 vs Q-Bee black f7357-7370) and **RULED COSMETIC (option c), option (a) PARKED** to a later cosmetic pass, option (b) refused (the sequence is vanilla data — editing it breaks the superset invariant). Whole draw path measured VANILLA down to the writer instruction; WHY a tenant runs that sequence is still unknown |
+| **TWO RETRACTIONS, both mine, both same-session** | (1) "the effect shelf-pack breaks multi-tile rectangles" — falsified by the audit it motivated: the tile window is byte-identical to stock, so the rectangle test was measuring vsavj-vs-vsav2 layout, not a defect. (2) "the port borrows vanilla sequence 0x28394E" — the four "pointers" were a displacement word followed by the next opcode. **Both were byte SCANS. The standing lesson recorded for the cosmetic pass: DISASSEMBLE, never scan** |
+| the MiSTer fix | **WIDE builds no longer pack a patched `vsav.zip`** — the four patched group-A members moved INSIDE `vsavjw.zip`, so one SD card can carry this profile AND stock Vampire Savior. The core was never at fault (already gated on MRA header byte 41). Rebuilt as `build/m3b_merged17`, SAME fingerprint `32007911` — packaging, not content. Bundle `../mister_fieldtest_14z112/`, .rbf unchanged. Awaiting the board |
+| recordings became infrastructure | `.inp` playback now stops at the END OF HUMAN INPUT (`-exit_after_playback` + a `PLAYBACK <n>` line). The old runs scored ATTRACT DEMO as play: frame figures corrected in every NOTE (real play is 5181 / ~10000 / ~43600 / ~21500 / ~16200 / 7490, not "200000") |
+| new instruments | `tools/run_inp_probe.sh` + `tests/lua/inp_probe.lua` (per-frame video hash, HP/death flags, OBJ counts, snapshots, OBJ dumps, `GFXRANGE` tile hashes, `RECT_AUDIT`, `WRITETAP`, `FINDBYTES`, POKES, char-ids), `tools/audit_effect_rects.py` (INSTRUMENT, not a gate), `tests/test_down_flash_vanilla.sh` |
+| gotchas paid for | MAME **read** taps never fire (write taps do) — a dead knob, removed not documented; a tap installed once at autoboot is silently dropped unless re-installed on the map-change notifier; tap dedup on `(pc,addr)` hides the write that decides the frame; build-dir deletion must grep FOUR places incl. `build/manifest/`; "tracked" build dirs are only partly tracked |
+| build-dir sweep | 26 generations deleted, **4.9 GB -> 2.9 GB**, keeping current + one back. It broke `test_shared_writes` (its fixture `don_m7` had 23 UNTRACKED outputs); recovered by rebuilding at the freezing commit — fingerprint `c90b60c3` reproduced exactly. The cheap alternative (re-point + re-freeze) was MEASURED and REFUSED: it would have laundered 103 unreviewed shared-surface writes |
+| green at close | `run_all_static --strict` **PASS 110 / SKIP 0 / FAIL 0** (the 14z-111 baseline) · inp corpus 6/6 on merged17 · MiSTer MRA map · romset identity · WIDE render-content · m3a reproducible (four WIDE manifests re-frozen for one-zip packaging, 42 -> 25; **MANI_STOCK unchanged** = the control that the stock track is untouched) |
+| queued | the MiSTer **scope document** (the agreed first step of the documentation/skill-distillation effort — scope only, not the skills); THE COSMETIC BACKLOG (win-quote text for all three tenants, ladder map names/pictures, select-wheel polish, #112) |
+| not done | the maintainer's MiSTer check on #113; ~~the board test of bundle 14z112~~ **DONE 14z-113: field-verified, no regression, stock coexists** (see the 14z-113 group); `merged17` is NOT registered or frozen — that stays a separate decision, now unblocked |
+| push | main == origin/main at close (`git ls-remote`); no tags cut (no freeze) |
+
+**Ledger rollover:** the 14z-110 and 14z-109 groups moved verbatim to
+STATE_HISTORY.md; STATE holds 14z-110b / 14z-111 / 14z-112.
+
+
+
+## Session 14z-112 (2026-08-27) — **FIELD VERDICT GREEN on merged-m9 (M8):
+## #99 CLOSED by the maintainer. Four maintainer recordings tracked, all
+## guard-clean. #113 re-read as a sprite-dropout frame.**
+
+| | |
+|---|---|
+| board | the maintainer's MiSTer on bundle `../mister_fieldtest_14z111/` (wheel = M8) does NOT crash on the Bishamon > Phobos route that crashed 100% on M6 and M7, "despite all my efforts" |
+| MAME recordings (all replayed with `tools/run_inp_guarded.sh` on merged16, `crashes=0`, tracked under `tests/inp/`) | `play-merged-m9-01` (14z-111: first match vs CPU Phobos dragged near time-over) · `run-merged-m9-02` (full arcade run as Donovan to the ENDING — the shell character's, as expected; first evidence a tenant run completes) · `run-merged-m9-03` (Anakaris > Victor > Phobos, the reliable M6/M7 route; Phobos dragged through most of the moveset, lost, retried on continue — no poisoned second fight) · `run-merged-m9-04` (Bishamon > Phobos, long fight) |
+| #112 evidence grew | Press of Death palette flips with ANY kick AND MID-ANIMATION (white/blue foot turns black/blue partway) — rules out a per-strength palette row; it is a time-varying palette write (fade/flash family or a row collision). Issue comment posted |
+| #113 re-read (CRT) | not a palette flash: on the CRT the BACKGROUND STAYS while the sprites (Phobos especially) are not drawn or sit on an invisible plane for at least one frame — an OBJ-list / draw issue. Cosmetic, still the photosensitivity item; investigate via per-frame OBJ dumps vanilla-vs-merged at the first down, not the palette. Issue comment posted |
+| #112 REPRODUCED (14z-112) | The maintainer's `tests/inp/run-merged-m9-05` carries a clean A/B on ONE build: match 1 vs Victor = white Press of Death (f5685-5693); match 2 vs **Q-Bee** (opponent 0x0c from f6215) = the LAST instance, **f7357-7370, descends white and lifts BLACK** (sole/toes/stripes black, outline cyan). Real playback = **7490 frames** (MAME's own count) — later "instances" are the attract demo, a trap that cost one 200000-frame pass. RULED OUT by measurement: palette-row overwrite (row 05 byte-identical white vs black), the WIDE 19-bit promote (`a18 == a19` on every foot record), a tile-inventory hole (all 27 codes resolve through delta 0x2750 into placed sources), and any dark row being in use. **LIVE LEAD:** vsav2 draws native Donovan on palette row **0x10**; our port draws the foot on row **05** — the port remaps rows, so a phase whose records carry a row inconsistent with the remap renders correct art in wrong colours. **14z-112 continued — four more eliminations, all measured on the capture:** (a) the foot's tiles are NOT blank — every white AND black tile reads 128/128 non-zero bytes in MAME's decoded `:gfx` (probe env `GFXTILES`); (b) no placement collision — the black dsts appear in NO select/overlay/wheel/exception dst list; (c) the foot is EFFECT art, not band art — ALL 27 foot sources are in `tile_exceptions.json:skip_band_src`, i.e. skipped by the band sweep and delivered by `effect_map` pairs (`build_gfx_donovan.py:392-413`), and this is true of the WHITE tiles too, so it does not discriminate; (d) **DISCARDED as invalid:** a cross-game hash of our dst tiles vs vsav2's source tiles (`0x10000+src`) matched NOTHING — including the WHITE tiles that demonstrably render correctly — so the two `:gfx` regions are not comparable by linear tile index and nothing may be concluded from it (RH-18). **THE SOLID RESULT (measured, assumption-free):** within the SAME move, the foot's records switch tile sets mid-animation — descent `0xe706-0xe740`, lift `0xe768-0xe796` — while the palette row is `05` for BOTH and its contents never change. The Victor (white) instance's foot uses a THIRD set, `0xe7d7-0xe7f8`, also on row 05. So the black is neither a palette rewrite nor a row swap: **the lift-phase tiles simply carry dark art in this build.** That also explains "about half the time": the move only reaches the lift phase on some outcomes.
+**THREE MEASUREMENTS DISCARDED AS INVALID this session — do not resurrect them:** (i) cross-game tile hashing (our dst vs vsav2 `0x10000+src`) — mismatched even for the KNOWN-GOOD white tiles, so the two `:gfx` regions are not comparable by linear index; (ii) nibble histograms of tile bytes as "pixel indices" — CPS-2 tiles are PLANAR, nibbles are not indices; (iii) every conclusion drawn from inverting the band delta (`src = dst - 0x2750`), because under it BOTH the black AND the white codes "mismatch" their `effect_map` placement — which falsifies the inversion, not the tiles. **The delta inversion is UNPROVEN and must be established before any placement argument is made again** (the foot's sources are all in `skip_band_src`, so they arrive via `effect_map` at dsts `0xeaa7-0xee71`, nowhere near the observed `0xe7xx` — meaning the observed codes are reached by a path not yet identified).
+### #112 (14z-112) — ~~ROOT-CAUSED: THE EFFECT SHELF-PACK BREAKS MULTI-TILE RECTANGLES~~ **RETRACTED THE SAME SESSION, by the audit the claim asked for.** CORRECTED: THE LIFT-PHASE RECORDS DRAW *UNTOUCHED EFFECT CODES* — THE PORT'S OWN DOCUMENTED "render garbled" DEFERRAL
+
+**RETRACTION (same session, 14z-112).** The shelf-pack claim below was
+falsified by the very audit it motivated: the audit's first real run reported
+1623 of 2777 blocks "corrupt" — implausible — and the check that explains it
+is decisive: **every tile in the window `0xa000-0xffff` of the merged build is
+BYTE-IDENTICAL to stock vsavj (24576/24576), including all four foot tiles.**
+Our build does not place ANY art there, so no shelf-pack error can live there,
+and the rectangle-vs-donor test was measuring the LAYOUT DIFFERENCE BETWEEN
+vsavj AND vsav2 (shared engine art, laid out differently in each game), not a
+defect. The three "corrupt" blocks and the 28/28 "correct" one are the same
+phenomenon seen from two sides. **The verdict LOGIC is sound** — ground-truthed
+5/5 against the hand measurements — **its PREMISE was wrong for stock-art
+blocks.**
+
+**WHAT SURVIVES, and the corrected reading.** Records AND art on this path are
+both vanilla: the record at `PRG:0x287D80` is byte-identical to stock
+(`vm3j.08a`: 0 of 524288 bytes differ) and so are the tiles it references. So
+our build renders those records exactly as stock vsavj would — the divergence
+is not in any byte we wrote, it is in **which records the ported animation
+selects**. And the port DOCUMENTS this failure mode in the builder itself
+(`gen_donovan_patch.py:2951`): *"Effect/low codes stay untouched (per-record
+effect map is a later step; **they render garbled**, never crash — tile codes
+cannot fault)"*. The lift phase draws such untouched effect codes; the descent
+phase happens to draw codes whose stock content is the right art (vsav and
+vsav2 share much effect art). That is the live hypothesis, and it is NOT yet
+proven — proving it means showing the lift record is reached by tenant
+animation data that the effect-map step never covered.
+
+**~~IT IS A BORROWED VANILLA EFFECT SEQUENCE~~ RETRACTED WITHIN THE HOUR — THE
+"POINTERS" WERE AN INSTRUCTION-BOUNDARY FALSE POSITIVE (14z-112).** The four
+"tenant pointers to `0x28394E`" (`0x42D024`, `0x42D062` in `x088512@huitzil`;
+`0x4855C4`, `0x485602` in `@pyron`) are NOT pointers. Disassembled, every one
+reads `move.l #$02208000,($0028,A4)` (or `#$80008000`) followed by `394E` =
+`move.w A6,($0030,A4)`: the long-scan matched the DISPLACEMENT word `0028` of
+one instruction against the OPCODE `394E` of the next. **`0x0028394E` is never
+stored anywhere.** RH-35 exactly — scanning a whole binary for a value that is
+also a common encoding returns noise — and I had already paid for this once
+this session with the `e768 7105` hit in base territory. **So there is NO
+evidence the port points any tenant at that sequence, and no precedent of
+"giving Huitzil/Pyron their own effect" either: those sites are ordinary
+authored spawn code (`jsr $16FD0` = the vsavj pool-3 allocator, `$FFC8xx`,
+reconciliation-mapped) and say nothing about which animation is installed.**
+What remains true and measured: the whole draw path is vanilla (writer
+`PC 0x01B2BE` byte-identical to stock, vanilla record, vanilla sequence,
+vanilla art), and **why a tenant object runs that vanilla sequence is
+UNKNOWN.** Any pointer archaeology here must disassemble, not scan.
+
+**(SUPERSEDED) IT IS A BORROWED VANILLA EFFECT SEQUENCE (14z-112, the answer to "why").**
+The vanilla animation sequence at **`PRG:0x28394E`** contains BOTH records as
+consecutive frames — descent `0x287D0C` (renders correctly) then lift
+`0x287D7C` (renders as foreign art) — and `0x28394E` is **exactly the address
+the port's own tenant data points at**: two pointers from `x088512@huitzil`
+(`0x42D024`, `0x42D062`) and two from `x088512@pyron` (`0x4855C4`,
+`0x485602`). So the port deliberately BORROWS this vanilla effect sequence for
+tenants. Every byte drawn is Capcom's, but **the decision to point a tenant at
+this sequence is ours** — and its later frames draw art that is not the
+tenant's, which is the #112 black. Donovan's own regions contain no such
+pointer (searched `0x283940-0x2839A0` across every member), so he reaches the
+sequence through vanilla dispatch rather than a stored pointer — the one link
+still unproven.
+**A DEAD END, recorded so it is not retried blind:** decoding the tiles to LOOK
+at them failed — the MAME `cps_layout16x16` plane/offset layout I applied
+produced stripes for the KNOWN-GOOD foot tile (`0xe715`), so the decode is
+wrong and nothing was concluded from the rendered images. Getting a real
+picture needs the layout established against a positive control first.
+
+**THE FULL CAUSAL CHAIN IS VANILLA — WRITER INCLUDED (14z-112).** A write tap
+(with the re-install-on-map-change notifier `inp_guard` uses — without it a tap
+is silently dropped and reports zero forever, measured here) caught the two
+corrupt blocks being emitted on frame 7360 by a SINGLE instruction, **`PC
+0x01B2BE`**, which is **byte-identical to stock** (`vm3j.03d` carries 148
+modified runs elsewhere, none covering it). So the chain is, end to end:
+vanilla OBJ-builder instruction -> vanilla record `0x287D7C` -> vanilla
+animation sequence -> vanilla art tiles `0xe7xx`. **Not one byte this port
+wrote participates in drawing the black frame.** The port's only influence is
+upstream: what makes the tenant's object select this animation. (Tap-dedup
+gotcha, also paid for: keying on `(pc, addr)` hides every later write to the
+same slot — the one that decides what is drawn; key on `(pc, addr, data)`.)
+**THE DECISIVE EXPERIMENT NOT YET RUN:** play this same animation on STOCK
+`vsavj` and look. Identical code + identical data + identical art must give
+identical pixels, so if stock renders it black too, the black is VANILLA
+rendering of a borrowed effect and the port question becomes "should a tenant
+borrow this effect at all" (a gameplay/asset decision, maintainer's call) — not
+a byte to fix.
+
+**THE PATH IS 100% VANILLA — measured this session, and it bounds the search.**
+Beyond the tiles and the record: the descent record `0x287D0C` and the lift
+record `0x287D7C` are **consecutive frames of ONE vanilla vsavj animation
+sequence** (8-byte entries = record pointer + duration, at `0x283968+` and
+`0x2859CC+`), and the only pointers to the lift record (`0x283980`,
+`0x2859E4`) are themselves in untouched base territory. `vm3j.08a` — which
+holds the records, the sequence AND the pointers — differs from stock in 0 of
+524288 bytes. So every byte on this draw path is Capcom's; **nothing we wrote
+is being rendered**, and the question is only what makes Donovan's object run
+this vanilla sequence. One lead, unresolved: the ONLY ported pointers into
+that sequence area come from `x088512@huitzil` and `x088512@pyron` (both
+`-> 0x28394E`) — **none from Donovan's regions**.
+**A dead instrument, recorded so it is not rebuilt:** a Lua READ tap on the
+record found nothing, and its positive control (a tap on `RAM:$FF8400`, read
+every frame) ALSO found nothing — **MAME read taps do not fire for
+direct-mapped memory on this driver, though WRITE taps do** (which is why
+`inp_guard` works). Zero reads is therefore not evidence. The knob was removed
+rather than left documented-and-dead (RH-54); gotcha filed in
+`docs/platform/gotchas.md`. Next: the debugger trace (`INP_DEBUG=1
+TRACE_FROM=`) around the lift frames, which is the one instrument that can
+answer "who fetched this".
+
+**(SUPERSEDED) The mechanism, measured end to end on `tests/inp/run-merged-m9-05`.** The
+records driving Donovan's Press of Death are **STOCK vsavj data, byte-identical
+to the reference** (`vm3j.08a` differs from stock in 0 of 524288 bytes; the
+record sits at `PRG:0x287D80`, entries are 4-byte `(tile, attr)` pairs). The
+port does not rewrite them — it places Donovan's art AT the tile codes those
+host records already reference (the freed Jedah band). A CPS-2 block of `w x h`
+draws `code + r*0x10 + c`, so a multi-tile block needs the donor's rectangle
+laid into the destination rectangle. **Measured, block by block, against the
+donor's own rectangle (content-addressed via `GFXRANGE` hashes, not
+arithmetic):**
+
+| block | size | tiles correct |
+|---|---|---|
+| `0xe715` (descent, renders CORRECTLY) | 7x4 | **28/28** |
+| `0xe775` | 3x2 | 6/6 |
+| eight 1x1 / 1x2 / 2x1 / 1x3 blocks | small | all exact |
+| **`0xe76e`** | 1x6 | **5/6** |
+| **`0xe768`** | 2x8 | **1/16** — only the base tile is right |
+| **`0xe78a`** | 4x3 | **2/12** |
+
+So 11 of 14 blocks are placed perfectly and **3 are mis-packed**; every corrupt
+slot holds a real but WRONG donor tile (e.g. `0xe769` should hold donor
+`0x30266`, holds `0x3023e`), which is why the foot draws as recognisable
+shapes filled with foreign art — the "blue/BLACK" the maintainer sees. The
+descent phase uses the intact blocks, the lift phase uses the corrupt ones:
+**"comes down white, goes back up black", exactly as reported**, and it only
+appears when the move reaches the lift phase — the "about half the time".
+
+**(SUPERSEDED — see the retraction above) Where the defect lives:** the effect shelf-pack that assigns rectangle
+targets for non-band (shared-effect) codes — `gen_donovan_patch.py` (the
+`gfx_remap` pass emitting `effect_map.json`) + `build_gfx_donovan.py`'s
+`effects` placement. It lays small rectangles correctly and breaks on larger
+ones. **NOT yet determined: the exact packing rule that fails** (1x6 and 4x3
+break while 3x2 and 1x3 are intact, so it is not area alone), and **how many
+OTHER records are affected** — a whole-inventory audit of every multi-tile
+block against its donor rectangle is the obvious gate and is NOT yet written.
+Palette, tile content, records and the WIDE promote are all exonerated by
+measurement (see the eliminations below).
+
+**THE NARROWING (14z-112, content-addressed — the arithmetic route was abandoned):** matched our foot tiles to vsav2's BY CONTENT via a new `GFXRANGE` scan of MAME's decoded `:gfx` (positive control first: our `0x0e715` == vs2 `0x301e6`, byte-identical, both 7x4 pal=05). Result: **ALL six sampled foot tiles — descent AND lift — are byte-identical to vsav2's** (`0e706`=`301d8`, `0e715`=`301e6`, `0e740`=`3021f`, `0e768`=`30265`, `0e78a`=`3024a`, `0e796`=`30273`), **vsav2 DRAWS the lift tiles too, and with the SAME palette row 05 — whose 16 words are byte-identical between the games.** Art and palette are therefore BOTH exonerated on both sides; the divergence is in the OBJ RECORDS. And the records agree where they correspond (`attr=3605` 7x4, `0005` 1x1, `1005` 1x2 — identical words in both games). **THE ANOMALY: block HEIGHT.** Over its whole Press of Death vsav2 emits pal-05 blocks of height 1/2/3/4/5 only (max 5); our lift window `f7357-7371` additionally emits **height 6 (`0e76e`, 1x6) and height 8 (`0e768`, 2x8, attr `0x7105`)** — shapes the donor never produces. A tall block sweeps a RUN of consecutive tiles, so those strips pull in neighbours that are not part of the sprite and render dark through row 05. **CAVEAT, stated: the vsav2 capture is ONE instance of the move; the height histogram is strong evidence, not proof that the donor never emits h>=6 here.** NEXT: (a) confirm the donor's height ceiling over more vs2 instances/phases; (b) find where the two tall records come from in the ported per-phase record data and what their vs2 twins are — that is the fix site. **NOTE the earlier arithmetic path is abandoned:** the band-delta inversion was falsified, and the effect shelf packs non-contiguously (our `0e715`->vs2 `301e6` is +0x21AD1 while `0e740`->`3021f` is +0x21ADF), so ONLY content matching is admissible here.
+**(superseded plan) NEXT, in order:** (0) ESTABLISH the record->gfx-address path for ONE known-good white tile (e.g. `0xe715`) — content-match its bytes against candidate sources with the project's canonical decoder rather than by arithmetic; only then is any placement claim admissible. (1) DECODE and RENDER the 128 bytes of a black tile and a white tile (4bpp, row 05) and LOOK — right art through wrong colours, or wrong art?; (2) diff the OBJ record stream of the white instance (f5685-5693, Victor) against the black one (f7357-7370, Q-Bee) step by step — if the two ask for different codes at the same animation step, the divergence is upstream in the record/anim data, and the opponent-dependence is the clue. Instrument: `inp_probe.lua` (foot detection, foot-gated palette rows, `GFXTILES`, `CPSREGS` — the last is DEAD, CPS-A regs read back 0) |
+| (superseded) #112 EARLIER PROGRESS — move identified, black not yet reproduced | Press of Death = Donovan's **EX 41236+K** (meter-gated — that is why meterless kicks whiff; banked via `POKES ff8509`, replay 56's ES trick). Rigs `tests/replays/112_don_pod_{merged,vsav2}.rpl` reproduce the giant white/blue foot on merged (Donovan L,L,D,D; c1=0x13 asserted) AND vsav2 (native, R,R). `inp_probe.lua` gained char-id (`c1/c2` = `$FF8782/8B82`), raw input ports (`in=`), and POKES. **Foot is WHITE/blue (correct) in ~16 instances** across two opponents (Victor + Phobos on his own stage, c2=0x10), all three strengths, varied RNG — the blue/BLACK the maintainer sees "about half the time" did NOT reproduce, so it is NOT per-invocation RNG. Hypothesis (unproven): the foot's palette row is shared/unreserved and gets overwritten mid-animation under palette-allocator pressure (busier scene / Dark Force / deeper match) — matches the maintainer's "turned black MID-move" note. Maintainer clue: white DOWN, BLACK on the way back UP (mid-move), no Dark Force, no being-hit, "might not have hit". Tested BOTH branches — CONNECT (2-hit, vs Victor) and WHIFF (fired at range, empty ground): foot stays WHITE through descent AND lift in both. ~20 instances total, all white. So it is a state condition the scripted round-1 rig misses; it IS on MAME (#112 body) so an .inp will carry it. **Maintainer offered an .inp of the black run + video/timestamp — accepted (field-reports-are-recordings); replay under inp_probe, freeze white-vs-black frames, diff the foot's OBJ record + palette-RAM row, then vs vsav2 for the donor question.** Foot pal index not yet pinned (candidates 05/0b from OBJ dump) |
+| #113 MEASURED — VANILLA | `tests/lua/inp_probe.lua` + `tools/run_inp_probe.sh` (per-frame framebuffer hash + HP/death flags/OBJ counts on an `.inp` OR a replay) located the first down in play-merged-m9-01 at f6074 (Phobos `+0x11F`=01, t=0x2B) and the "flash" at **f6153: one ALL-WHITE frame** (mean 255; the OBJ list never collapses — the sprite-dropout reading was the CRT's rendering of a white frame). Stock vsavj on the reference MAME shows the SAME hash at the same events (`104`: down 6550 -> white 6646; intro pair 1909/1911; start 2148 = HP-set+183, merged +183 too) and nowhere else. Gate `tests/test_down_flash_vanilla.sh` PASS (inventory == attributable events, negative control on strays). Decision pending: close as vanilla (recommended) vs opt-in softening |
+| **WIDE NO LONGER BREAKS STOCK VAMPIRE SAVIOR (14z-112)** | The build packed a PATCHED `vsav.zip` (4 group-A members `vm3.13m/15m/17m/19m`) and the field bundle shipped it as `games/mame/vsav.zip` — one file, so a card could hold this profile OR stock, never both, and a stock MRA got wrong art SILENTLY. **The core was never at fault: the profile is already runtime-gated on MRA header byte 41.** FIX: the patched members go INSIDE `vsavjw.zip` and no `vsav.zip` is packed — jtframe matches by CRC32 alone and FBNeo/MAME search the set's own zip first, so both legs share the pristine dump. Rebuilt as `build/m3b_merged17`, **same program fingerprint `32007911`** — packaging, not content. Evidence: MAME takes the patched member from `vsavjw.zip` (verifyroms FOUND = patched CRC) · identity audit PASS · a full replay of `run-merged-m9-05` IDENTICAL 7490/7490 · corpus 6/6 · `test_mister_mra_map` PASS (the fork catalogue needed NO regeneration — members are keyed by name+CRC, not container) · romset-identity + WIDE render-content PASS · every MRA part resolves by CRC (WIDE 31/31, stock 22/22 against PRISTINE dumps alone). Bundle `../mister_fieldtest_14z112/` (.rbf UNCHANGED, wheel still M8). Also fixed for the new packaging: `build_donovan.sh` WIDE path, `mister_mra.sh` (its header had asserted the two legs NEED different `vsav.zip` files — corrected in place), `gen_vsavjw_xml.py` (pristine-parent fallback), `test_mister_mra_map.sh` (covers both packagings) |
+| PLAYBACK LENGTH IS NOW MEASURED (14z-112) | A recording ENDS where the human stopped playing; MAME then runs the ATTRACT DEMO, and the guard was scoring that as play. **Esc is a UI key and is NOT in the `.inp`** (header checked: magic + basetime + sysname, no frame count), so no end-of-input signal is needed from the maintainer — MAME's own `-exit_after_playback` stops at the last recorded frame. Both `tools/run_inp_{guarded,probe}.sh` now pass it and append `PLAYBACK <n>` (MAME's authoritative count) + `END <n>`; the terminator is written ONLY when MAME reports a playback, so `test_inp_corpus.sh`'s dead-run check can still fail (RH-25) — negative-controlled this session. **Frame figures CORRECTED in the NOTEs: real play is 5181 (crash-m8-01), ~10000 (play-01), ~43600 (run-02), ~21500 (run-03), ~16200 (run-04), 7490 (run-05) — the old "200000 frames guard-clean" counted demo.** The verdicts stand (the play was covered); the numbers did not. Gates after the change: corpus PASS 6/6, `test_inp_crash_merged_m8_01` PASS |
+| gate note | `tests/test_inp_corpus.sh` plays each recording only to `MAX_FRAMES=6000` (100 s) by default; the `.inp` files are complete and `MAX_FRAMES=200000` covers them fully (~1 h for run-02). The instrument is capped, not the recordings |
+| push | main pushed at each tracking commit; no tags cut (no freeze) |
+
+
 ## Session 14z-111 CLOSE — ritual complete. **#99 ROOT-CAUSED (CPU-Phobos ran
 ## DEMITRI's AI — the aliased upper half of the AI script tables) AND FIXED
 ## (option A: the tenants' own vs2 AI, zero code); frozen donovan-m14 /

@@ -28,9 +28,8 @@
 > ## `112_don_pod_*` got their expectations; the MiSTer tail is real this
 > ## time (fork `202fc3e6`, patch 0025, pin bumped, bundle
 > ## `../mister_fieldtest_14z115/`, release `release/merged-m11/`) — fork
-> ## and main NOT pushed, tags cut locally. **Still in flight at close:
-> ## `audit_legacy_pairings` (re-run) and `audit_guard_corpus` on merged18
-> ## — read `$SCRATCH/wheel/{legacy_pairings2,guard_corpus}.log` or re-run.**
+> ## and main NOT pushed, tags cut locally at `b30611a`. Strict at close
+> ## **111/0/0/0**; guard corpus 340/340; legacy + roster pairings PASS.
 > ##
 > ## **OPEN — INSTRUMENT (read STATE 14z-115 "OPEN INSTRUMENT QUESTION"):**
 > ## FBNeo vanilla runs fell into two bit-identical families diverging from
