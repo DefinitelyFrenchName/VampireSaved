@@ -799,19 +799,57 @@ entries moved VERBATIM to `DECISIONS_HISTORY.md` — grep there by topic.
 Lifecycle: rulings are still marked DECIDED in place here first; they move to
 the archive once they stop shaping active work.)*
 
-- **THE MiSTer SCOPE DOCUMENT — three decisions (14z-113,
-  `docs/project/mister_scope.md` §8).** (1) **Confirm the two-level split**
-  (six core skills + one shared MRA-mechanics skill; five VS-specific) or
-  move rows — the one judgment call flagged is filing MRA generator
-  mechanics at level 1 with the VS catalogue skill citing it. (2) **Run the
-  staleness pass (S1-S20) BEFORE writing any skill — RECOMMENDED**: a skill
-  distilled from `mister_core.md` and `patch_index.md` as they stand would
-  say the core never ran on hardware and that seven fork patches exist. One
-  session, one commit, retraction discipline (grep the claim, fix headers
-  first, re-grep). (3) **The `.rbf`'s home**: track `jtcps2w.rbf` (3.1 MB,
-  GPL output, not ROM content) or state in the docs that it is out-of-tree
-  and reproducible only by seed + build date. No gameplay surface in any of
-  the three; (1) and (3) are the maintainer's, (2) is a recommendation.
+- **THE MiSTer SCOPE DOCUMENT — three decisions, ALL DECIDED (maintainer,
+  2026-08-28, 14z-113; `docs/project/mister_scope.md` §8).**
+  (1) **The split stands as written** ("in line with what I would do";
+  the maintainer defers on the CPS-II-vs-VS specifics and follows the
+  recommendation, MRA mechanics at level 1 included).
+  (2) **The staleness pass (S1-S20) is MANDATORY before any distillation
+  — but WAITS for the board results the maintainer is producing in
+  parallel right now** (the #113 hand check and bundle 14z112's stock
+  coexistence), so the pass lands on a settled state and does not have to
+  be re-done. **Sequencing: board results -> record them -> the S1-S20
+  pass (one commit) -> only then the skills.**
+  (3) **The `.rbf` AND the MRAs are TRACKED IN-TREE** — the maintainer's
+  ruling: they belong with any BPS/xdelta used to patch vanilla ROMs, i.e.
+  under `release/`. **This opens a NEW item, the MiSTer RELEASE FORMAT**
+  (below): what a `release/<name>/` carries for MiSTer, how and where it is
+  generated, and its provenance record.
+
+- **THE MiSTer RELEASE FORMAT — OPEN (opened 14z-113 by ruling (3) above;
+  the details "have never been fixed").** What has to be decided, with a
+  recommendation so it can be ruled in one line:
+  *What ships.* `jtcps2w.rbf` (3.1 MB; GPL-3.0 output of a public fork, not
+  ROM content — rule 7 is not engaged), the two MRAs (WIDE + the
+  `[STOCK CONTROL]` reference leg — XML metadata: names, CRCs, offsets), and
+  a provenance record: fork pin, **seed, reported slack, sha256, build
+  datestamp** (the hash identifies the artefact, the seed the result —
+  `mister.md` "REPRODUCING THE SHIPPING BITSTREAM"). NOT the `.rom`
+  (ROM-derived, rule 7) and NOT any zip.
+  *Where.* Recommendation: **inside the same `release/<name>/` as the
+  xdelta package**, e.g. `release/merged-m9/mister/{jtcps2w.rbf, *.mra,
+  BITSTREAM.txt}` — one release = one directory for all three
+  implementations, which is what `package_release.py` already promised
+  ("MiSTer later adds a DISTRIBUTION layer over the SAME members", HANDOFF).
+  Alternative: a separate `release/mister/` keyed by bitstream, since the
+  `.rbf` changes on a DIFFERENT cadence from the romset (it did not move
+  from 14z-108 to 14z-112 while the romset moved three times). The two can
+  coexist: the bitstream lives once under `release/mister/<seed>/` and each
+  romset release's `mister/` holds the MRAs plus a pointer to the bitstream
+  it was verified with.
+  *How generated.* The MRAs already come from `tools/mister_mra.sh --no-rom`
+  (ROM-free, deterministic); the bundle assembly is by hand today
+  (`../mister_fieldtest_14z11x/` + README + FIELD_TRIAGE). The natural home
+  is a `--mister` mode of `tools/package_release.py` (or a sibling
+  `package_mister.py`) that copies the MRAs, verifies the `.rbf` against the
+  recorded sha256 and refuses on mismatch, writes the provenance record,
+  and runs `check_mra_parts.py` against the release's own members. Gate:
+  `test_release_roundtrip.sh` gains a MiSTer leg (MRA parts resolve, hash
+  matches record).
+  *What it retires.* The out-of-tree field bundles as the only carrier, and
+  S18 of the scope document (the untracked `.rbf` path).
+  **Not started; waits behind the board results and the staleness pass by
+  the maintainer's own sequencing.** No gameplay surface.
 
 - **#112 — PRESS OF DEATH BLACK FOOT: ACCEPTED AS COSMETIC. DECIDED
   (maintainer, 2026-08-27): option (c) — accept for now; option (a) (give
