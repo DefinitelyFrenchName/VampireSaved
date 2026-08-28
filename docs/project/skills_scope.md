@@ -156,7 +156,19 @@ rule.
 > sections C.1-C.9, NO ROM addresses per decision 2), 83 anchors across
 > `engine_internals.md`, `game/gotchas.md` and six atlas files, after the
 > C staleness pass (S-C1..S-C12); seven gate controls. Yield 83 from ~6,500
-> lines against the estimate of 70. **D remains.**
+> lines against the estimate of 70.
+> **D SHIPPED the same session** — `vampire-saved-port` (`[VSP-1..161]`,
+> sections D.1-D.6 + D.3b: the law by citation, oracles and frozen classes,
+> extraction/reconciliation/generation, sprite lists, freezes/registry/build
+> dirs/releases/suite, rigs and probes, attribution), after the D staleness
+> pass (S-D1..S-D6, its own commit); 161 anchors across CLAUDE.md (33),
+> STATE's two standing sections (3), HANDOFF, both gotchas, the two porting
+> docs, `tenant_manifest`, `build_dir_triage`, `hardening_register`,
+> `patch_index`; the checker gained the STATE-section restriction of §3 and
+> the gate its eighth control. Yield 161 from ~9,000 lines against the
+> estimate of 90 — the gotchas distilled one rule per CLASS entry as
+> planned, and the 14z-9x digests were already classes. **NOTHING REMAINS
+> of this plan; it is now the record.**
 
 1. **A + B first** — smallest, lowest staleness risk, and they are what the
    other two cite (`[CPH-*]` for the OBJ format, `[CPE-*]` for every probe

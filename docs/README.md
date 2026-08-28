@@ -27,6 +27,7 @@ than guessing a filename):
 | **the MiSTer discipline, before touching the core, the lane, the MRAs or a board report** | the two SKILLS — `.claude/skills/mister-cps2-wide-core/SKILL.md` (level 1, game-independent, `[MSC-NN]`) and `.claude/skills/mister-vampire-saved/SKILL.md` (level 2, this romset, `[MSV-NN]`) — each rule anchored `**[MSC-NN]**` in the paragraph it distils and locked by `tools/checkskills.py` (`tests/test_checkskills.sh`); the scope is [`project/mister_scope.md`](project/mister_scope.md) |
 | **the game's LAWS before reading, tracing or reasoning about any Vampire Savior subsystem** | the skill `.claude/skills/vampire-savior-engine/SKILL.md` (`[VSE-NN]`: the three-sibling method and the dead-row class, the per-character bank and the id space, pools and type dispatch, the drawer, damage/judge/capture, the select screen and venue assets, sound, Dark Force, exceptions, the rig traps the game sets) — it quotes NO addresses; each rule names the `engine_internals.md` section or atlas row that carries them |
 | **the CPS-2 board's laws and the emulators' behaviour as instruments, before any probe, dump or build** | the skills `.claude/skills/cps2-hardware/SKILL.md` (`[CPH-NN]`: byte order, the encryption window and views, gfx interleave, the OBJ format, QSound packing laws, the WIDE profile as an artifact) and `.claude/skills/cps2-emulation/SKILL.md` (`[CPE-NN]`: what MAME/FBNeo probes see and miss, the pinned builds, the two-implementation protocol) — anchored in [`platform/gotchas.md`](platform/gotchas.md), `project/cps2_wide.md`, `project/gotchas.md` and HANDOFF; plan and boundaries in [`project/skills_scope.md`](project/skills_scope.md) |
+| **the port's own discipline before touching a manifest, a tool, a gate, a freeze, a release or a field report** | the skill `.claude/skills/vampire-saved-port/SKILL.md` (`[VSP-NN]`, 161 rules: CLAUDE.md by citation, the oracle classes and what may never loosen them, the extraction/reconciliation/generation law, freezes and build-dir policy, the pre-commit suite, every rig and probe and how each has lied) — anchored in CLAUDE.md, HANDOFF, `project/gotchas.md`, `game/gotchas.md`, the two porting method docs, `tenant_manifest.md`, `build_dir_triage.md`, `hardening_register.md`, `patch_index.md` and the two standing STATE sections |
 | what the extended hardware profile is and what rule 1 v2 permits | [`project/cps2_wide.md`](project/cps2_wide.md) |
 | what a change did, byte by byte | `project/patch_notes.md`; the registry is `project/patch_index.md` |
 | why something that "should work" does not | [`GOTCHAS.md`](GOTCHAS.md) — always check before re-deriving |
@@ -95,7 +96,8 @@ Entry points at this level, deliberately not in a bucket:
   ~5,000 lines of the MiSTer sources — read it before quoting any MiSTer
   document's STATUS line
 - [`skills_scope.md`](project/skills_scope.md) — **the PLAN for the
-  remaining skill distillations** (14z-114): four skills (`cps2-hardware`,
+  remaining skill distillations — ALL FOUR SHIPPED 14z-114** (kept as the
+  record of boundaries, decisions and the staleness passes): four skills (`cps2-hardware`,
   `cps2-emulation`, `vampire-savior-engine`, `vampire-saved-port`), each
   row's boundary/sources/gates, the checker extension, the staleness pass
   each needs, the sequencing, and the five decisions taken under stated

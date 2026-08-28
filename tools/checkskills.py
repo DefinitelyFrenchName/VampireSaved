@@ -64,7 +64,20 @@ _GAME_DOCS = ["docs/game/engine_internals.md", "docs/game/gotchas.md",
               "docs/game/atlas/character_tables.md", "docs/game/atlas/id_space.md",
               "docs/game/atlas/select_screen.md", "docs/game/atlas/sprite_lists.md",
               "docs/game/atlas/venue_assets.md"]
+_PORT_DOCS = ["CLAUDE.md", "HANDOFF.md", "STATE.md", "docs/project/gotchas.md",
+              "docs/game/gotchas.md", "docs/project/porting_code_regions.md",
+              "docs/project/porting_sprite_lists.md", "docs/project/tenant_manifest.md",
+              "docs/project/build_dir_triage.md", "docs/project/hardening_register.md",
+              "docs/project/patch_index.md", "docs/project/cps2_wide.md"]
+_PORT_LOGS = ["docs/project/gotchas.md", "docs/project/patch_notes.md",
+              "docs/project/patch_index.md", "HANDOFF.md", "CLAUDE.md",
+              "STATE.md", "STATE_HISTORY.md"]
 SKILLS = {
+    "VSP": dict(path=".claude/skills/vampire-saved-port/SKILL.md",
+                docs=_PORT_DOCS, logs=_PORT_LOGS, forbid=[],
+                # STATE.md rolls over; a VSP anchor may sit only in the two
+                # sections that never roll (skills_scope.md §3).
+                sections={"STATE.md": ["## STANDING PRINCIPLE", "## THE DEADNESS REGISTER"]}),
     "VSE": dict(path=".claude/skills/vampire-savior-engine/SKILL.md",
                 docs=_GAME_DOCS, logs=_GAME_DOCS,   # decision 5: engine_internals counts as a log
                 forbid=["tenant", "build/", "merged", "m3b_", "wide_ext", "gen_donovan",
@@ -172,6 +185,21 @@ def check(root, verbose=False):
             for i in doc_anchors(t):
                 if i.startswith(prefix + "-"):
                     anchors.setdefault(i, []).append(rel)
+            # anchors confined to named sections of a rolling file
+            for hdr_list in [cfg.get("sections", {}).get(rel)] if cfg.get("sections", {}).get(rel) else []:
+                spans = []
+                for hdr in hdr_list:
+                    s = t.find("\n" + hdr)
+                    if s < 0:
+                        fails.append(f"{prefix}: {rel} has no section '{hdr}'")
+                        continue
+                    e = t.find("\n## ", s + 1)
+                    spans.append((s, len(t) if e < 0 else e))
+                for m in ANCHOR_DOC.finditer(t):
+                    i = m.group(1)
+                    if i.startswith(prefix + "-") and not any(s <= m.start() < e for s, e in spans):
+                        fails.append(f"{prefix}: {i} anchored in {rel} OUTSIDE the standing sections "
+                                     f"({', '.join(hdr_list)}) — that file rolls over")
         key = lambda i: int(i.split("-")[1])
         only_skill = sorted(set(defs) - set(anchors), key=key)
         only_docs = sorted(set(anchors) - set(defs), key=key)

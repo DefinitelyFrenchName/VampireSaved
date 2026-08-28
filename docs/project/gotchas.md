@@ -1,6 +1,6 @@
 # GOTCHAS (project) — traps in OUR pipeline and method
 
-## A comparator's own ground-truth test can RATIFY a deviation from the governing spec (paid: 14z-95, GitHub #52)
+## **[VSP-37]** A comparator's own ground-truth test can RATIFY a deviation from the governing spec (paid: 14z-95, GitHub #52)
 
 `tools/compare_flicker.py` exempted the LAST divergent stretch from the
 `>=60` re-convergence requirement entirely. CLAUDE.md §4 v2 has no
@@ -35,7 +35,7 @@ after the last frozen flicker frame is a `wc -l` away. Smallest live tail:
 **1325 frames**. Scope the population to the instrument before concluding
 a question is unanswerable.
 
-## Half the Lua instruments stage inputs one frame off replay.lua — a frame number from one is not a frame number from the other (paid: 14z-90, GitHub issue #10)
+## **[VSP-149]** Half the Lua instruments stage inputs one frame off replay.lua — a frame number from one is not a frame number from the other (paid: 14z-90, GitHub issue #10)
 
 `tests/lua/replay.lua` writes its checksum for frame N and THEN stages
 inputs for N+1 (`held[frame + 1]`), so "the set in effect during frame N
@@ -104,7 +104,7 @@ than the game's. Dies with the project; the other two files do not.
 
 Append the moment one is paid for. Read before touching the related area.
 
-## Sibling-coincident engine refs are INVISIBLE to the diff oracle — and the coincident vsavj address is usually a WRONG routine (paid: 2026-07-27 sessions 11c-12, ~a full session across three playtest rounds)
+## **[VSP-45]** Sibling-coincident engine refs are INVISIBLE to the diff oracle — and the coincident vsavj address is usually a WRONG routine (paid: 2026-07-27 sessions 11c-12, ~a full session across three playtest rounds)
 
 vs2 and vhunt2 are sibling builds: large engine bands (the sound farm,
 kernel services) have IDENTICAL layout across them. An engine operand in
@@ -187,7 +187,7 @@ cursor moves short (3 frames, no autorepeat ambiguity) on long-stable
 screens; input-neutral after the picks. Within-emulator oracles are
 unaffected (whole-RAM frame-exact remains the standard there).
 
-## Bare-long "pointers" in code are usually operand pairs — sibling-veto them (paid: 2026-07-25 session 7, ~3h incl. diagnosis)
+## **[VSP-46]** Bare-long "pointers" in code are usually operand pairs — sibling-veto them (paid: 2026-07-25 session 7, ~3h incl. diagnosis)
 
 The bare-long relocation heuristic (any ROM-plausible 32-bit value inside a
 ported code region whose target lands in another ported region) is wrong far
@@ -217,7 +217,7 @@ Rules now enforced in `tools/extract_char.py` (source-only regions):
   sibling sites; one spurious shift-consistent hit must not outvote the
   true twin.
 
-## Engine hooks on hot paths break whole-RAM legacy comparison — by construction (paid: 2026-07-25 session 7, ~2h)
+## **[VSP-41]** Engine hooks on hot paths break whole-RAM legacy comparison — by construction (paid: 2026-07-25 session 7, ~2h)
 
 Any hook on a path vanilla executes (the secondary-object dispatch runs for
 every object every frame) adds CPU cycles. Two measured consequences on
@@ -249,7 +249,7 @@ cycle-exactly. RESOLVED 2026-07-25 (maintainer-approved CLAUDE.md §4
 amendment): hooked-build legacy comparison is live-RAM with exactly these
 two windows masked (docs/game/atlas/ram.md); frozen masked vanilla expectations
 live in tests/expected/vsavj/masked/, gate helper `m2a_legacy_gate_masked`.
-**Addendum (14z-88, paid: one red battery + a triage session): a masked
+**[VSP-34]** **Addendum (14z-88, paid: one red battery + a triage session): a masked
 window is a BASIS, not a flag.** `replay.lua` SKIPS masked bytes from the
 checksummed stream, so adding a window changes every frame's checksum on
 the build side — the vanilla masked logs must be REGENERATED under the same
@@ -262,7 +262,7 @@ medallion 0x1A -> 0x1D) is ALSO a STAGING-SLOT move ($FF3F02 + row*0x20).
 "The palette path never transits work RAM" is true of the palette write
 and false of the staging copy — the 14z-87b registry note said the work-RAM
 streams were unchanged, and the suites said otherwise the same evening.
-**And the second half of the lesson (14z-88, paid: the row move itself):
+**[VSP-35]** **And the second half of the lesson (14z-88, paid: the row move itself):
 palette CONTENT in a fade's row set is CYCLE-relevant.** The select→VS
 fade does data-dependent per-color work on a frame that already runs at
 the VBL edge (vanilla's per-iteration counter shows 2 frames/iteration
@@ -280,7 +280,7 @@ keeps it that way. The same sweep found the class ALREADY PRESENT on the
 reverted builds (replay 38 on donovan-m5, replay 24 on all three), so
 this is not only a rule for future row moves.**
 
-## PC-relative word tables are DATA — never let a pointer heuristic rewrite them (paid: 2026-07-25, ~1h)
+## **[VSP-47]** PC-relative word tables are DATA — never let a pointer heuristic rewrite them (paid: 2026-07-25, ~1h)
 
 68k brief-format dispatch (`jsr/jmp (d8,PC,Dn.w)`) reads a table of 16-bit
 self-relative displacements sitting *inline in the code stream*. Two
@@ -301,7 +301,7 @@ Rules now enforced in `tools/extract_char.py`:
 - Regions whose tables reference each other must keep source-relative
   spacing: `[[layout_group]]` / `near_map` in build/manifest/donovan.toml.
 
-## Early-session generic rows can masquerade over later-understood structures
+## **[VSP-51]** Early-session generic rows can masquerade over later-understood structures
 
 The session-5 bare-long pass resolved refs by unique byte match and
 labeled everything it placed `engine_data`. Two of those rows were
@@ -314,7 +314,7 @@ class gets understood (farm, dispatch bank, …), re-audit ALL earlier
 generic rows whose vs2 address falls in the structure's range — match
 mechanism, not row kind, decides what a row really is.
 
-## Per-record BANK attribution: the effect-tail triage has no bank column
+## **[VSP-81]** Per-record BANK attribution: the effect-tail triage has no bank column
 
 The x2b7ef4 gfx triage (same-index / +0x47 reloc / tail-place) is a
 BANK-1 model. Records drawn by #$4000-bank sub-objects (Anita's feet
@@ -330,7 +330,7 @@ set STRUCTURALLY from the sub-object's own record stream (obj+0x1C
 cursor), never from a global scan. Fix data lives in
 effect_tail.json bank2_recs/bank2_place (tools/gen_anita_bank2.py).
 
-## Blind long-relocation over ported data blobs corrupts streams
+## **[VSP-48]** Blind long-relocation over ported data blobs corrupts streams
 
 Relocating every even-aligned long that "looks like" an in-window
 pointer (the overlay slice: 293 rebased longs, 2811 tile words in 163
@@ -345,7 +345,7 @@ STRUCTURAL CLOSURE walk (tables -> strips -> streams -> records),
 never from a flat scan. The closure requires decoding the stream node
 language first — that is the stage-7 blocker, not the architecture.
 
-## GFX and coordinate data are INVISIBLE to every RAM-basis gate
+## **[VSP-42]** GFX and coordinate data are INVISIBLE to every RAM-basis gate
 
 Playtest round 16: the overlay build's tile placements corrupted the
 title screen, select screen and speed menus — and the full masked
@@ -376,7 +376,7 @@ test_m2b_stage6.sh):
    The pixel gate is the detector for class 3; the masked gate for
    class 4 — it takes BOTH to make pool surgery safe.
 
-## Mid-frame transients and perturbing probes (win-palette post-mortem)
+## **[VSP-140]** Mid-frame transients and perturbing probes (win-palette post-mortem)
 
 Two diagnosis traps from session 14t, each of which produced a round of
 false conclusions before the mechanism emerged:
@@ -395,7 +395,7 @@ false conclusions before the mechanism emerged:
    set. (This also likely explains the session-14 standing-watch gate
    anomaly: mixed-mask runs are not comparable.)
 
-## Never write an unverified gap (the Felicia wall-jump lesson)
+## **[VSP-49]** Never write an unverified gap (the Felicia wall-jump lesson)
 
 The generator's auto_tables "gap" heuristic treated untyped gaps
 between per-char tables as more per-char rows and wrote slot-0x0F
@@ -419,7 +419,7 @@ tables only surface when that char uses that move. Rules earned:
    TABLE (the bank table has 0x18 rows with 0x10-0x17 dark forms;
    these physics tables are not char-indexed at all).
 
-## Disabling a heuristic CLASS wholesale can revert load-bearing writes
+## **[VSP-50]** Disabling a heuristic CLASS wholesale can revert load-bearing writes
 Session 14w disabled the gap auto-table class to fix Felicia's jump
 physics — collateral: the class had ALSO been covering the throw
 victim-keyframe pointer table (gap_be27a), so the throw cinematic broke in
@@ -435,7 +435,7 @@ than a replay trace — the round-21 "throw restored" confirmation sampled
 clean-looking throws on a build where the replay shows 21 teleport-scale
 jumps.
 
-## The RAM gate cannot see NEW-CHAR visual wrongness — pixel A/B is the tool
+## **[VSP-43]** The RAM gate cannot see NEW-CHAR visual wrongness — pixel A/B is the tool
 Round-25 lesson, twice in one change: (1) spark_bank_swap drew garbled
 tile blocks (bank 0x4000 under vanilla strips) and (2) spark_spawn_mark
 made ANITA vanish while a marked spark was live (+0x9A carries display
@@ -449,7 +449,7 @@ on a replay that exercises it (replay 17 hit frames 3477-3481 is the
 ready-made spark probe). Also: never assume an object field is dead
 because one path leaves it stale — prove it by pixel A/B, not by RAM.
 
-## Sibling twins can differ by ONE hoisted instruction — codebyte-matching lies
+## **[VSP-52]** Sibling twins can differ by ONE hoisted instruction — codebyte-matching lies
 The round-26 sword root cause: vs2 refactored the set-anim-by-number
 resolver into TWO entries — 0x5C77A applies `andi.w #$ff,d0` and falls
 through; 0x5C77E skips it (so Savior-2 extended anim numbers 0x100+ can
@@ -467,7 +467,7 @@ behavior probes (the sword gate) catch the regression class. Fix
 mechanism: reconciliation kind `patched_clone` (vanilla bytes minus the
 divergent instruction, ported refs only).
 
-## "Run once at match start" is a TIMING TRAP — use a match-active countdown
+## **[VSP-90]** "Run once at match start" is a TIMING TRAP — use a match-active countdown
 Three failed single-shot placements for the OBJ-tail clear (14z-7, all
 measured): char-init fires DURING the VS screen (which redraws the
 polluted buckets every frame until ~30 frames before round start); the
@@ -479,7 +479,7 @@ match-active, act at zero (~0x50 frames) — replay-timing independent,
 and doing the action in the object-UPDATE phase means the same frame's
 list rebuild hides it (no visible blank).
 
-## Phantom fixes: validate against the USER'S repro, at the RIGHT frames
+## **[VSP-138]** Phantom fixes: validate against the USER'S repro, at the RIGHT frames
 14z-7 shipped a fix validated by (a) a probe move that only resembled
 the reported one and (b) snapshots taken only at zap frames, where the
 flash silhouette hides the victim's body. The fix cleared buckets the
@@ -490,7 +490,7 @@ phase of a cyclic effect (zap AND between-zap); and before shipping a
 visual fix, A/B the fix-on/fix-off builds on the reproducing replay —
 "the metric improved" (buckets zeroed) is not "the pixels changed".
 
-## Cross-game A/B pixel comparison: align by DISPLAYED RECORD, not frame
+## **[VSP-136]** Cross-game A/B pixel comparison: align by DISPLAYED RECORD, not frame
 Two false "garble" verdicts in one session (14z-9): the engines skew
 1-2 frames, so same-frame snapshots can compare DIFFERENT anim records
 — a mid-flail pose against a settle pose reads as scattered garbage.
@@ -501,7 +501,7 @@ commands hold poses in the opposite order from vsavj-Victor) — a
 divergence in what the two games DISPLAY is not automatically a port
 bug; check who commands the difference before blaming the port.
 
-## Pipe a build tool through tail and a crash packs STALE artifacts
+## **[VSP-105]** Pipe a build tool through tail and a crash packs STALE artifacts
 build_donovan.sh piped build_gfx through `| tail -10` without pipefail:
 when the readback assert crashed build_gfx mid-run, the pipeline kept
 going and re-zipped the PREVIOUS build's tiles — two consecutive "fix"
@@ -531,7 +531,7 @@ the rompath exists before measuring it. Ground truth:
 `tests/test_build_gate_status.sh`, which fails on the pre-fix tree via
 `GATE_SRC=`.
 
-## A0-at-write is post-increment — SECOND payment (14z-18 tail row)
+## **[VSP-145]** A0-at-write is post-increment — SECOND payment (14z-18 tail row)
 The "accent super-cycle phase 2 reads 0x39FC00-0x39FC3F" conclusion
 derived a 0x40-byte window from two logged A0 values without
 subtracting the movem batch size: the real march reads exactly T0
@@ -541,7 +541,7 @@ dead ground and left the visible bug alive through a playtest round.
 When deriving a read WINDOW from tap A0 values: subtract batch size
 from EVERY logged value first, then take min/max.
 
-## Hole "a" is inside the CPS-2 crypt range — thunks with EMBEDDED DATA
+## **[VSP-72]** Hole "a" is inside the CPS-2 crypt range — thunks with EMBEDDED DATA
 ## must go to hole "b"
 Placed code is stored re-encrypted wherever the address falls inside
 the crypt range, so opcode fetches decrypt correctly — but DATA READS
@@ -554,7 +554,7 @@ storage, data-readable, still executable. site_thunk rows now take
 hole = "b"; use it for ANY thunk whose body is read as data. The tell:
 placed bytes plaintext in-zip = outside crypt range; garbled = inside.
 
-## A same-slot "vanilla control" controls nothing — vary the dimension
+## **[VSP-146]** A same-slot "vanilla control" controls nothing — vary the dimension
 ## under test
 The first vanilla control for the shock-aura tap picked vanilla Jedah
 — the SAME slot 0x0F as ported Donovan — so identical tap sources
@@ -563,7 +563,7 @@ was a different victim (default-cursor char): identical sources there
 = engine-global. When testing "is X per-char?", the control must vary
 the char, not just the build.
 
-## The tile-placement pool is block-aware first-fit — carving cells out
+## **[VSP-78]** The tile-placement pool is block-aware first-fit — carving cells out
 ## CASCADES the whole allocation
 Reserving 4 cells (free.discard) for a fixed-position need moved 267
 effect-shelf placements: the allocator fits RECTANGLES into runs, and
@@ -574,7 +574,7 @@ mismatches. Fixed-position tile needs must allocate at the pool TAIL
 or ride the existing exception flow. (14z-22; the change was reverted
 — the "missing" tiles turned out unreferenced anyway.)
 
-## A cited address in a session log is a CLAIM, not a fact — re-verify
+## **[VSP-143]** A cited address in a session log is a CLAIM, not a fact — re-verify
 ## against the manifest/built image before planning on it
 Session 14z-41 read the reconciliation row's vsavj target as 0x73376,
 disassembled THAT address, found an instruction-fragment tail falling
@@ -586,7 +586,7 @@ names an address as "the mapped target", grep the manifest row AND
 xxd the built image at the call site before building any theory on
 it. (14z-42; the misread survived two session summaries unchallenged.)
 
-## A no-crash soak can silently lose the behavior it was written to
+## **[VSP-137]** A no-crash soak can silently lose the behavior it was written to
 ## exercise — assert the behavior, not just survival
 Replay 19's ES DP pairs demonstrably produced ES moves when written
 (session 11: the ES crash was MEASURED from them). On current builds
@@ -600,7 +600,7 @@ node family in a dump), or its coverage can quietly evaporate.
 (14z-43b; when the scripted-accept divergence is root-caused, note it
 here.)
 
-## Sampled uniformity is not uniformity — extract the FULL set before
+## **[VSP-89]** Sampled uniformity is not uniformity — extract the FULL set before
 ## synthesizing engine cases
 The state_hook synthesis (session 8) sampled vs2's extension-state
 cases, saw three consecutive seq ids (0x2CD/2CE/2CF) and uniform stub
@@ -616,7 +616,7 @@ ALL N and diff them against each other first — and add a build-time
 assertion against the source engine's own table (the seq_ids
 verification pattern) so config drift fails the build.
 
-## Fuzzy code-similarity reconciliation collapses near-identical
+## **[VSP-53]** Fuzzy code-similarity reconciliation collapses near-identical
 ## helpers — content-verify PARAMETER TABLES, not just code shape
 The motion-helper family (`lea <table>(pc),a3; bra <dispatcher>`) is
 30+ near-identical 8-byte routines differing ONLY in table address
@@ -632,7 +632,7 @@ farm_port kind (port table + stub) is the correct fallback, and it
 already existed for two hand-done rows. Content-match census script
 in the 14z-48 session log.
 
-## replay.lua DUMPS separator is ';' — commas die silently late
+## **[VSP-128]** replay.lua DUMPS separator is ';' — commas die silently late
 `DUMPS="a:r1,b:r2"` exits rc=3 after a full emulator boot with no
 dump artifacts and no error text (the lua parser takes the whole
 comma-joined string as one malformed spec). Multiple windows —
@@ -827,7 +827,7 @@ skipping (exit 0) and the MAME submodule gitlink drifting to 0.289: **the
 tool reports success while the artifact is not what was asked for.** Assert
 on the artifact.
 
-## A build-fingerprint call without `--set` silently fingerprints the
+## **[VSP-106]** A build-fingerprint call without `--set` silently fingerprints the
 ## PRISTINE reference ROM (paid: 2026-08-04, 14z-59i)
 `tools/build_donovan.sh` ended with
 `build_fingerprint.py "$OUTBASE/rompath;$ROMDIR" --sha-only` — no `--set`,
@@ -851,7 +851,7 @@ Rules:
 - If a fingerprint ever equals a known reference row, treat that as a bug
   until proven otherwise — a patched build cannot hash to the pristine ROM.
 
-## `_PRG_RE` did not match the WIDE extension members, so extension content
+## **[VSP-118]** `_PRG_RE` did not match the WIDE extension members, so extension content
 ## was invisible to the build fingerprint
 `\.(0[3-9]|10)[a-z]?$` matches the stock program chips but not `vsw.41-.44`.
 Two WIDE builds differing ONLY in extension content therefore hashed
@@ -861,7 +861,7 @@ after `int("10")`, which is the load order. Verified the alternation does
 not accidentally catch gfx/QSound names (`.11m`, `.14m`, `.21m`, `.31m` all
 still excluded).
 
-## The sfx helper and the record array must be impossible to enable separately
+## **[VSP-44]** The sfx helper and the record array must be impossible to enable separately
 Un-stubbing the per-node sfx helper (vs2 `0x5122` -> vsavj `0x4CE2`) while
 slot 0x0F's pointer row still resolves to JEDAH's array means reading PAST
 that array (~40 entries) with indices up to 43 — enqueuing whatever follows,
@@ -900,7 +900,7 @@ whether a binary carries the profile — it gave a false negative on FBNeo
 here. Use `strings -a | grep`, or ask the emulator (`-listfull vsavjw` for
 MAME).
 
-## A worktree branched from a STALE `origin/main` silently changes the
+## **[VSP-113]** A worktree branched from a STALE `origin/main` silently changes the
 ## instrument (paid: 2026-08-04, 14z-60)
 `EnterWorktree` (and `git worktree add` with a `fresh` base ref) branches
 from **`origin/<default-branch>`**, not from local `main`. On this machine
@@ -924,7 +924,7 @@ Rules:
   came from, the same way analysis scripts print the SHA-1 of the ROM they
   read.
 
-## capstone m68k mnemonics carry a SIZE SUFFIX — equality tests match
+## **[VSP-148]** capstone m68k mnemonics carry a SIZE SUFFIX — equality tests match
 ## nothing and report a confident null (paid: 2026-08-04, 14z-60)
 `i.mnemonic` is `andi.w`, `move.b`, `add.w` — never bare `andi`/`move`. A
 classifier written as `if i.mnemonic in ("andi", "and")` therefore matches
@@ -968,7 +968,7 @@ as `imm < 0x10` miscounted vsav2's `andi.b #$01,$382(a4)`, which is a
 folds the variant half only if it keeps the low nibble whole and clears bit
 4 — i.e. exactly `#$0f`.
 
-## A slot id baked into hand-authored MACHINE CODE is invisible to a
+## **[VSP-73]** A slot id baked into hand-authored MACHINE CODE is invisible to a
 ## source-level audit — and fails silently, not loudly
 (paid: 2026-08-05, 14z-60w, while preparing the tenant move)
 Auditing "what still assumes slot 0x0F" by grepping `tools/` for `0x0f` and
@@ -1042,7 +1042,7 @@ Rules:
   the move (`tools/build_wide_romset.py "$ROMDIR" <dir> ...`) and suspect
   this first when a set that used to load stops loading.
 
-## "Inside the placed band window" is NOT "overwritten" (14z-62)
+## **[VSP-79]** "Inside the placed band window" is NOT "overwritten" (14z-62)
 
 `remap_spec.json`'s `placed` is a `[min, max]` BOUND of the tenant's tile
 placement, and the placement inside it is SPARSE (per-record tiles from the
@@ -1058,7 +1058,7 @@ the pixels (`test_wide_render_content.sh`-style). The window is a bound,
 useful only for a fast "cannot be affected" exoneration when the
 intersection is EMPTY.
 
-## Dotted TOML table names parse DIFFERENTLY per host (14z-62c)
+## **[VSP-74]** Dotted TOML table names parse DIFFERENTLY per host (14z-62c)
 
 `_minitoml` delegates to `tomllib` when the host python has it (>= 3.11)
 and falls back to a subset parser otherwise. The subset parser treats
@@ -1076,7 +1076,7 @@ Rules:
 - Nested structure in a minitoml manifest must be encoded FLAT (the
   `fixes = "off:old:new,..."` shape).
 
-## "The substitution landed for free" — invisible slot dependencies (14z-62c)
+## **[VSP-80]** "The substitution landed for free" — invisible slot dependencies (14z-62c)
 
 The slot-0x0F port never poked the engine's OBJ bank-word table
 (`PRG:0x282D4`, PC-relative, unmasked id) because Jedah's row was ALREADY
@@ -1094,7 +1094,7 @@ the slot converts each one into a defect. The de-substitution acceptance
 4) is the behavioral net for the class; the RAM-diff-at-frame method
 names each culprit's subsystem in one measurement.
 
-## Descriptor CRCs for variable-content members: use SENTINELS (14z-62d)
+## **[VSP-75]** Descriptor CRCs for variable-content members: use SENTINELS (14z-62d)
 
 Group C carries per-build content, so its descriptor CRC can never match.
 Two wrong answers were paid for before the right one:
@@ -1111,7 +1111,7 @@ name-fallback demonstrably loads CRC-mismatched members on both emulators
 (every patched vm3 member ships that way). -verifyroms reports them bad;
 that is the cost, and it is honest.
 
-## Stale build-output members get re-packed (14z-62h, maintainer-caught)
+## **[VSP-76]** Stale build-output members get re-packed (14z-62h, maintainer-caught)
 
 `build_gfx_donovan` writes only the members the current MODE produces, but
 `build_donovan.sh` packs by GLOBBING the output dir — so when group-C mode
@@ -1124,7 +1124,7 @@ different modes populate differently must be cleaned per build — "the file
 exists" says nothing about WHICH build wrote it (the pipefail lesson's
 sibling).
 
-## A hook on a hot shared path can flip a frame-boundary parity
+## **[VSP-39]** A hook on a hot shared path can flip a frame-boundary parity
 ## PERMANENTLY — flicker's evil twin (14z-64)
 
 The mid-row retarget thunk was placed on the uploader dest computation
@@ -1147,7 +1147,7 @@ Rules:
 - A one-frame flicker in the frozen inventory marks a MARGINAL
   boundary; treat its frame as a tripwire when adding cycles anywhere.
 
-## Two generator sections silently owned one table row — last-write-wins
+## **[VSP-77]** Two generator sections silently owned one table row — last-write-wins
 ## decided the shipped bytes (14z-65)
 
 `patch_prg.py` applied ops in order with NO overlap detection. The 14z-65
@@ -1175,7 +1175,7 @@ Rules:
   is the real consumer. When a measured section contradicts a triage
   tag, the measured section owns the row.
 
-## A single-shift sibling scan dies at the newcomer window's hidden
+## **[VSP-55]** A single-shift sibling scan dies at the newcomer window's hidden
 ## structure — and junk filler decodes as pointers (14z-65)
 
 The vs2→vh2 shift over the appended newcomer code window is PIECEWISE
@@ -1198,7 +1198,7 @@ Consequences that cost time:
 Full mechanism + frozen shapes: docs/game/atlas/character_tables.md "The
 appended window's sibling shift is PIECEWISE".
 
-## The vanilla-alias assumption fails where per-char rows hide in engine
+## **[VSP-56]** The vanilla-alias assumption fails where per-char rows hide in engine
 ## space — and a window constant is a census, not a fact (14z-65)
 
 Two traps from the Huitzil specials hunt, both silent-by-nature:
@@ -1219,7 +1219,7 @@ the same probe on native vs2 and the port (predicate consultations
 matched 401=401 exactly; the state-byte tap showed native writing
 states the port never writes).
 
-## An odd-offset "engine ref" ate a jsr opcode — and a pool-head latch
+## **[VSP-57]** An odd-offset "engine ref" ate a jsr opcode — and a pool-head latch
 ## re-seeds live pools at round 2 (14z-65)
 
 - The sibling-diff classifier accepted a 32-bit engine-ref window at an
@@ -1241,7 +1241,7 @@ states the port never writes).
   manifest-opt-in, because Donovan's frozen build carries the old shim
   bytes.
 
-## Three lessons from the day Huitzil came alive (14z-65)
+## **[VSP-58]** Three lessons from the day Huitzil came alive (14z-65)
 
 - A SET-NAME MISMATCH IS A FALSE GREEN, silently: when a build's first
   wide_ext allocation flips the pack to vsavjw, every probe still run
@@ -1265,7 +1265,7 @@ states the port never writes).
   (build/manifest/reconciliation_huitzil.toml; manifest key
   recon_overlay) until the Phase 2 merge scopes rows properly.
 
-## PC-relative escapes in engine-style regions are INVISIBLE to the
+## **[VSP-59]** PC-relative escapes in engine-style regions are INVISIBLE to the
 ## sibling oracle — and unrewritable in place
 A cloned engine region's bra/bsr/Bcc.w branches out of the region keep
 their displacements through extraction: both sibling games preserve
@@ -1279,7 +1279,7 @@ pad and rewrites each escape to a `jmp <twin>.l` bounce. Run its
 census on EVERY engine-style region (clones, shared zones); newcomer
 authored code is mostly immune (it calls engine subs via jsr abs.l).
 
-## 2P forced-pick pokes must end by ~frame 1500 — later pokes leak
+## **[VSP-120]** 2P forced-pick pokes must end by ~frame 1500 — later pokes leak
 ## into the SECOND player's load
 Holding the P1 commit poke ($FF8782) through frames 1700-2400 works in
 the 1P flow but in the 2P flow turns P2 into the poked id (measured:
@@ -1296,7 +1296,7 @@ pins absolute frames around a physics-dependent event, re-derive the
 frames after any physics change — or anchor on the event, not the
 clock.
 
-## Forced-pick pokes do NOT populate the HUD index field — HUD
+## **[VSP-121]** Forced-pick pokes do NOT populate the HUD index field — HUD
 ## verification needs a REAL wheel pick (14z-67)
 
 The forced-pick rig (poking the commit field $FF8782) loads the tenant
@@ -1310,7 +1310,7 @@ codes read an alias row. Instrument, not mechanism — verify HUD rows
 with the real-pick replays (36 = cell 0x13, 37 = cell 0x10), never
 with the poke rig.
 
-## A gate that is not in the battery can sit FAILING for sessions —
+## **[VSP-103]** A gate that is not in the battery can sit FAILING for sessions —
 ## sweep gates when a design changes (14z-67, paid twice in one day)
 
 Two gates were discovered stale-red in the 14z-67 sweep, both outside
@@ -1330,7 +1330,7 @@ gate then reads as "regression" to whoever finally runs it. When a
 freeze changes design semantics, grep tests/ for every gate touching
 the changed surface and run them BEFORE closing the session.
 
-## A tenant porting SHARED regions inherits every region-scoped
+## **[VSP-60]** A tenant porting SHARED regions inherits every region-scoped
 ## mechanism row those regions carry — copy them ALL, up front (14z-67)
 
 Pyron's first mash soak crashed three ways, and every fix was a row H
@@ -1347,7 +1347,7 @@ BEFORE the first probe run — the crashes are pre-paid knowledge, not
 new information. (The Phase-2 merge dedups these by span; until then
 the duplication is the mechanism.)
 
-## Per-char dispatch on a COMMON seq state needs the target flow's
+## **[VSP-87]** Per-char dispatch on a COMMON seq state needs the target flow's
 ## FULL closure first; and "cold" sites can be legacy-hot (14z-67)
 
 Two paid lessons from the effect-entry arc:
@@ -1366,7 +1366,7 @@ Two paid lessons from the effect-entry arc:
    actually changed the file (a silently-missed replace left the
    thunk live and burned a bisect round on a false premise).
 
-## Twin-site identification by BYTE PATTERN alone can land on the
+## **[VSP-54]** Twin-site identification by BYTE PATTERN alone can land on the
 ## wrong subsystem — derive the pair through the DISPATCH TABLE
 ## (14z-68, refutes half of the 14z-67 entry theory)
 
@@ -1389,7 +1389,7 @@ repointed on the built image — the 12b/13 dispatch_1x bank_map rows
 had silently solved the whole fighter-side entry problem, and the
 "missing dispatch" being chased did not exist.
 
-## An "owner-gated" thunk on a shared engine routine is NOT scoped by
+## **[VSP-86]** An "owner-gated" thunk on a shared engine routine is NOT scoped by
 ## owner alone — sibling effect families share subtypes (14z-68)
 
 The fleet_record_base thunk gated on "tenant context + the ray's
@@ -1406,7 +1406,7 @@ tenant's OWN content that reaches the site, not just every
 character — "only my tenant gets here" is a weaker claim than it
 sounds, and the crash appears in an unrelated move.
 
-## Verify a fix at the RENDER layer before believing the RAM layer
+## **[VSP-139]** Verify a fix at the RENDER layer before believing the RAM layer
 ## (14z-68, the beam that never was)
 
 Two successive thunks measured perfectly at the RAM/tap layer — the
@@ -1444,7 +1444,7 @@ delta carries) made the base relocate to the placed copy, with
 static proof: exactly one occurrence of the placed base in the
 region blob.
 
-## Routing a tenant's objects to a ported machine: the discriminator
+## **[VSP-85]** Routing a tenant's objects to a ported machine: the discriminator
 ## must be PER-EFFECT, not per-hit (14z-68)
 
 Giving the tenant's effect object its own union type (so a SHARED
@@ -1462,7 +1462,7 @@ Corollary for gating: `test_hui_pairs` (Reflect Wall + Dark Force)
 is the gate that catches this class — run it on any change that
 routes objects, not just the gates for the move you are fixing.
 
-## A ported region's pc-relative DATA POINTERS are copied VERBATIM —
+## **[VSP-65]** A ported region's pc-relative DATA POINTERS are copied VERBATIM —
 ## if the table is outside the region, the pointer lands on garbage
 ## (14z-69; this is the real root of the parked effect family)
 
@@ -1546,7 +1546,7 @@ Two related traps, paid together on vs2's row-8 machine:
    opcode `b8020919f5c7…` vs data `0001005800000000…`). Only
    relocating the table as data fixes it.
 
-## A ported region whose consumers index NEGATIVELY needs headroom
+## **[VSP-83]** A ported region whose consumers index NEGATIVELY needs headroom
 ## below its base — never allocate it at the start of wide_ext (14z-68)
 
 vs2's companion machine indexes its record table with signed offsets
@@ -1589,7 +1589,7 @@ because the comparison target itself was the wrong character's row.
 Prefer a check that is self-labelling (the 5*row palette marker) over
 a check that only proves internal consistency.
 
-## A symptom grouping is a HYPOTHESIS — test it member by member, cheapest
+## **[VSP-153]** A symptom grouping is a HYPOTHESIS — test it member by member, cheapest
 ## first (14z-71, the effect family — three sessions of not doing that)
 
 Four Huitzil defects were grouped in 14z-69 as "the effect family (beam /
@@ -1658,7 +1658,7 @@ Rules:
   premise sat untested for three sessions and was then argued against
   twice, on evidence that turned out to be measuring the wrong effect.
 
-## Cross-build A/B is the cheapest attribution we have, and it is
+## **[VSP-154]** Cross-build A/B is the cheapest attribution we have, and it is
 ## routinely skipped in favour of analysis (14z-71)
 
 Every build from hui6 onward is kept with an intact rompath, and
@@ -1702,7 +1702,7 @@ Measured twice in one session:
 Both were found by grepping the assertion's wording across the repo, in
 one pass. Neither was found by re-reading the documents.
 
-## Cross-emulator position A/B: compare RELATIVE offset, not absolute x
+## **[VSP-135]** Cross-emulator position A/B: compare RELATIVE offset, not absolute x
 ## (14z-72 lost a session to this; 14z-73)
 
 Our new-character A/B runs native `vsav2` against our `vsavjw` — two
@@ -1732,7 +1732,7 @@ Rules:
   the event) is a free same-instrument positive control — if it does NOT
   agree pre-event, THEN suspect the rig.
 
-## Never chain a legacy measurement onto a build in one step (14z-74)
+## **[VSP-40]** Never chain a legacy measurement onto a build in one step (14z-74)
 ## — it produced a WRONG COMMIT
 
 Running a rebuild and then the legacy check inside ONE command block gave a
@@ -1752,7 +1752,7 @@ Rules:
 - I committed the false claim while the contradicting output was on screen.
   If the text you are writing disagrees with the last tool output, stop.
 
-## A dead-filler classifier that compares the OPCODE view is blind to DATA
+## **[VSP-66]** A dead-filler classifier that compares the OPCODE view is blind to DATA
 ## (14z-74, cost the air-214+P bug)
 
 `extract_char.py` labelled 12 bytes at Pyron's `code+0x234` "1 dead filler
@@ -1773,7 +1773,7 @@ Related blind spot in the same family: `census_regions.py` bails in
 register, where the pointer plainly survives. That single test is why
 Pyron's manifest carried a wrong "0 data_in_code" census line.
 
-## `placements.json`'s dst/src is a LINEAR map, but the extractor
+## **[VSP-67]** `placements.json`'s dst/src is a LINEAR map, but the extractor
 ## auto-discovers SUB-REGION shifts — comparing through it fabricates
 ## "the ported data is corrupt" (14z-75)
 
@@ -1801,7 +1801,7 @@ pointer positions is what "correctly ported" looks like; do not read a
 sub-90% figure as corruption until the alignment has been *found* rather
 than assumed.
 
-## "Entry N" past the end of a jump table is the NEXT routine's OPERAND
+## **[VSP-70]** "Entry N" past the end of a jump table is the NEXT routine's OPERAND
 ## (14z-75, cost a shipped legacy regression and a blocked freeze)
 
 14z-74 fixed Pyron's Cosmo Disruption crash by repointing "entry 81 of the
@@ -1901,7 +1901,7 @@ stated rather than assumed — opcode-anchored and word-aligned, so a raw
 longword in embedded data is still out of scope (an unanchored scan reads
 operand pairs as addresses and is pure noise).
 
-## The pushed group-0 exception PC is mid-instruction — probing it reads a clean zero (14z-81)
+## **[VSP-126]** The pushed group-0 exception PC is mid-instruction — probing it reads a clean zero (14z-81)
 
 The merged-legacy audit's Huitzil crash reported `CRASH 2886 vec3 PC 015098`.
 A `GUARD_PROBE=15098` breakpoint produced ZERO probe lines on the crashing
@@ -1919,7 +1919,7 @@ rig-liveness control before believing any zero: `tests/audit_merged_vec3.sh`
 hard-fails when its healthy-reference probe reads no hits, which is what
 turns this trap into a named error instead of a wrong conclusion.
 
-## A pre-armed attribution is a hypothesis, not a finding — print the measured mechanism (14z-81)
+## **[VSP-116]** A pre-armed attribution is a hypothesis, not a finding — print the measured mechanism (14z-81)
 
 `audit_merged_legacy.sh` was written with F2 (the merged shim serving only
 tenant 0 → unseeded pools) as the pre-armed attribution for any Huitzil
@@ -1932,7 +1932,7 @@ someone reads a failure without re-measuring. Pre-arm attributions in
 comments and headers as PREDICTIONS; make the printed verdict carry only
 what was measured, or point at the probe that measures it.
 
-## Dispatch-time owner reads are transient at spawn instants — two measured counterexamples (14z-81c)
+## **[VSP-84]** Dispatch-time owner reads are transient at spawn instants — two measured counterexamples (14z-81c)
 
 The withdrawn multi-owner obj_hook stub design read the dispatching
 object's owner at runtime (+0x30/+0x32 walks to a player struct, then
@@ -1946,7 +1946,7 @@ and spawn instants are exactly when a per-tenant machine needs routing.
 Route on facts baked at BUILD time (spawn-time tags, per-tenant type
 numbers), not on runtime state near a spawn.
 
-## Forced-pick pokes hold through SELECT only — a vs-CPU P2 carries the CPU's REAL pick at match time (14z-81c)
+## **[VSP-122]** Forced-pick pokes hold through SELECT only — a vs-CPU P2 carries the CPU's REAL pick at match time (14z-81c)
 
 `(0x382,$FF8800)` read 0x06 (the CPU's actual character) at f2886 on
 `12_donovan_vs_cpu` despite the rig poking `$FF8B82 = 0x13` at frames
@@ -1966,7 +1966,7 @@ ways: a gate born against a live defect has never exercised PASS, so its
 first green is not routine — read the printed values, not just the
 verdict word.
 
-## A stamp census must enumerate WRITE FORMS, not just the known immediate shape (14z-82)
+## **[VSP-88]** A stamp census must enumerate WRITE FORMS, not just the known immediate shape (14z-82)
 
 The 14z-81b type-stamp scan matched `move.l #$01xxTTss,(An)` and concluded
 "types 114/115/118/120 are stamped elsewhere or computed". Productizing the
@@ -1984,7 +1984,7 @@ merged build (zero original-range dispatches on later tenants' replays).
 Also: d16 matters — `move.b #$73,(2,A4)` is a type stamp, `(3,A4)` is the
 owner/sub-state byte; a d16-blind match conflates two different fields.
 
-## A two-leg A/B that bails on leg 1 leaves leg 2's health an ASSUMPTION — and the assumption was false (14z-82b)
+## **[VSP-115]** A two-leg A/B that bails on leg 1 leaves leg 2's health an ASSUMPTION — and the assumption was false (14z-82b)
 
 `audit_merged_legacy`'s leg-b ran the MERGED build first and returned on
 its crash, so "the single-tenant reference is clean" was never a
@@ -2011,7 +2011,7 @@ occurred. For dispatch-guarded paths, pair the soak with a FIRE CENSUS
 (probe the dispatcher, count entries and input values) so "never fired"
 and "fired and survived" stop looking identical.
 
-## -debug fire counts do not transfer to checksum timelines on vs-CPU/chaos content — attribute divergences with DUMPS, not debug probes (14z-82c)
+## **[VSP-130]** -debug fire counts do not transfer to checksum timelines on vs-CPU/chaos content — attribute divergences with DUMPS, not debug probes (14z-82c)
 
 The three moved don-mash `.sha1` baselines were first "attributed" by
 probing the new thunk under the guard (-debug): two replays showed ZERO
@@ -2029,7 +2029,7 @@ ratified hook-cycle class, re-freeze licensed. Also paid for twice in
 one day: DUMPS writes land next to CHECKSUM_OUT, so two runs into one
 directory silently clobber the first dump — separate out dirs per leg.
 
-## Cross-build A/B dumps must run PROBE-FREE — debugger overhead lands differently on two different builds (14z-84)
+## **[VSP-129]** Cross-build A/B dumps must run PROBE-FREE — debugger overhead lands differently on two different builds (14z-84)
 
 The Bulleta-DF A/B's first run compared vanilla-vs-merged palette RAM
 dumps taken under `GUARD_PROBE=2ad82` (hundreds of logging-breakpoint
@@ -2047,7 +2047,7 @@ taps (tap_writes.lua) or plain DUMPS only — never under GUARD_PROBE /
 -debug; if a probe is needed to find an address, find it first, then
 re-run the A/B clean.
 
-## A pool measurement is a claim about ONE pool — decode the walker first (14z-85)
+## **[VSP-144]** A pool measurement is a claim about ONE pool — decode the walker first (14z-85)
 
 The 14z-84 owner-tag census measured $FFB800 (0x80-stride) and its
 conclusion was carried into the ruling brief as "the tag byte" — but
@@ -2064,7 +2064,7 @@ the right pool the byte WAS free — the mechanism survived, but only by
 luck, and the $FFB800 result turned out doubly wrong (see the platform
 byte-lane entry).
 
-## A port_patch on a shared engine-family region fixes ONE tenant's copy (14z-85f)
+## **[VSP-61]** A port_patch on a shared engine-family region fixes ONE tenant's copy (14z-85f)
 
 Every tenant carries his OWN copy of the ported engine-family regions
 (x028122 = the vs2 object-hit damage applier + reaction handlers; the
@@ -2086,7 +2086,7 @@ rolled-back families (the grab-pointer/state rows are stage-99 parked
 in donovan.toml because ported READERS consume those vars at vs2
 offsets).
 
-## A 0x7xx sfx id's faithfulness is a property of its CONTENT, not its number (14z-85g)
+## **[VSP-91]** A 0x7xx sfx id's faithfulness is a property of its CONTENT, not its number (14z-85g)
 
 The 14z-65 silencing sweep classed every vs2 sound-farm stub playing a
 0x7xx id as "newcomer voice-bank range, keep silent pending M5" — a
@@ -2110,7 +2110,7 @@ CALL PATH before attributing the record: the trap detonation goes
 through the 0x4EE0-0x4F60 farm-stub band, not the per-node record its
 array happens to also carry.
 
-## A self-frozen `.sha1` cannot see a legacy regression — and a replay's FILENAME does not tell you what it loads (14z-88 paid it, 14z-89 measured the extent)
+## **[VSP-36]** A self-frozen `.sha1` cannot see a legacy regression — and a replay's FILENAME does not tell you what it loads (14z-88 paid it, 14z-89 measured the extent)
 
 `run_suite.sh`'s default expectation kind is `.sha1`: the whole-log
 checksum of the build's OWN earlier run. It answers "did this build
@@ -2155,7 +2155,7 @@ Rules now:
   vanilla's character — measured LEGACY, promoted. Assumption would have
   left it in the hole.
 
-## The masked-basis canary corrupted the basis it verified (14z-91)
+## **[VSP-117]** The masked-basis canary corrupted the basis it verified (14z-91)
 
 `tools/freeze_masked_basis.sh`'s `freeze_one()` derived its MAME sandbox
 paths from the replay NAME alone (`$WORK/sb_${_n}_$_i`), and
@@ -2187,7 +2187,7 @@ Rules now:
 - **"The instrument control passed" is not "nothing moved".** Check
   `git status` on the artifact after running anything that can write it.
 
-## awk compares hex fields as NUMBERS when they happen to look numeric (14z-91)
+## **[VSP-111]** awk compares hex fields as NUMBERS when they happen to look numeric (14z-91)
 
 A gate parsing `SP %06x hits %d` lines with `awk '$2 == s'` reported the
 correct count for site `54476` and a confident **0** for its twin
@@ -2219,7 +2219,7 @@ Rules now:
 - Extending `_minitoml` is not free: it must then match `tomllib`
   exactly, or the two hosts disagree about what a manifest means.
 
-## A pointer-shaped heuristic is placement-dependent — merged5 passed by luck (14z-92)
+## **[VSP-68]** A pointer-shaped heuristic is placement-dependent — merged5 passed by luck (14z-92)
 
 `verify_gfx_build.py` compares a walk of the SOURCE anim region against a
 walk of the BUILT image. Both of `obj_records.walk`'s passes decide what
@@ -2277,7 +2277,7 @@ Rules now:
   known-red gate before you build a session around it, and say so when
   the fix turns out not to be what unblocked the work.
 
-## A frozen build stops being a usable REFERENCE when the profile bumps (14z-92)
+## **[VSP-95]** A frozen build stops being a usable REFERENCE when the profile bumps (14z-92)
 
 `test_merged_render_content.sh` — H and P's only render gate — compared the
 merged build against `build/hui31`. WIDE v1.1 (14z-86) made the Z80 driver
@@ -2331,7 +2331,7 @@ Rules now:
   so the profile bump cannot reach them (both measured green, 14z-92).
   When triaging this class, sort the references by "does it run?" first.
 
-## A PASS line that hard-codes its control's conclusion (paid: 14z-93, caught by reading a red log)
+## **[VSP-114]** A PASS line that hard-codes its control's conclusion (paid: 14z-93, caught by reading a red log)
 
 `audit_hitclass_map_cost.sh` section 0 printed, unconditionally:
 
@@ -2384,7 +2384,7 @@ one leg's evidence to another.
 failure would have been a plausible-looking table with attributed values,
 which is the worst kind.
 
-## A `|| fallback` after a pipeline reads the LAST command's status, not the failing one (paid: 14z-93, GitHub #84's residue)
+## **[VSP-112]** A `|| fallback` after a pipeline reads the LAST command's status, not the failing one (paid: 14z-93, GitHub #84's residue)
 
 `tools/force_pick_probe.sh` reported a machine that died at frame 3020 as a
 loaded character:
@@ -2421,7 +2421,7 @@ probe's own defect and the crash it was hiding surfaced in the same run.
 
 ---
 
-## 14z-94: five shell/tooling traps, each paid for in this session
+## **[VSP-110]** 14z-94: five shell/tooling traps, each paid for in this session
 
 Grouped because they share a shape: **a construct that fails SILENTLY and
 leaves a plausible result behind.** None produced an error message.
@@ -2501,7 +2501,7 @@ The real scenario it guards — a host key physically held before the run — IS
 in that read, because MAME samples host input ahead of the frame. Reachable
 in the field, not from the harness.
 
-## 14z-97b: five traps from the #103 hunt — four are RIG grammar, one is a
+## **[VSP-124]** 14z-97b: five traps from the #103 hunt — four are RIG grammar, one is a
 ## classifier lying by omission
 
 **A blanket opponent-class poke window that overlaps a LIVE match kills the
@@ -2546,7 +2546,7 @@ ladder-mask movement under continuous HP pokes — the strong signal
 (+0x1C record pointer + HP-reset) reversed it. A verdict is only as
 strong as the weakest signal it was read from.
 
-## 14z-97: two ways a tool measures the wrong thing and says nothing
+## **[VSP-108]** 14z-97: two ways a tool measures the wrong thing and says nothing
 
 **A path argument must be CANONICALISED before anything uses it — the
 "correct only when called one way" trap, and this is its THIRD instance in
@@ -2578,7 +2578,7 @@ exit STATUS as a verdict must distinguish "rejected" from "died" — and the
 cheap proof that a control is live is to make the fixture GOOD and watch the
 control complain (done here; it does).
 
-## 14z-96: three instrument traps, each paid for in this session
+## **[VSP-109]** 14z-96: three instrument traps, each paid for in this session
 
 **A gate must not depend on the CALLER'S environment — measured twice in
 one session.** (1) `ROMDIR=../ROMS` (relative) failed two gates that
@@ -2611,7 +2611,7 @@ for SOME moves, so a motion that "does nothing" should try the overlap
 shape before concluding anything about the game. [game-adjacent; filed
 here because the trap is the REPLAY GRAMMAR, not the engine]
 
-**[CPE-3]** ## 14z-98: two traps from the #103 close — both are -debug INSTRUMENT
+## **[CPE-3]** **[VSP-125]** 14z-98: two traps from the #103 close — both are -debug INSTRUMENT
 ## grammar, and both misread a measurement for a full round each
 
 **Every -debug watch configuration is its own TIMELINE, not just
@@ -2650,7 +2650,7 @@ paid: the 14z-97 (7) continue rig's "HP set to 1" pokes (byte-width not
 committed) mean "#103 instance 2" (Phobos x Bishamon) is UNVERIFIED —
 possibly the rig's own poke. Kill pokes write BOTH words, always.
 
-## 14z-99: two traps from the #104 re-measurement — both produced a
+## **[VSP-142]** 14z-99: two traps from the #104 re-measurement — both produced a
 ## CONFIDENT WRONG ANSWER from a working instrument
 
 **A placement lookup that hardcodes ONE region name is wrong on a MERGED
@@ -2684,7 +2684,7 @@ poked run gives 904 hits at `0x27FA0`. The forced Donovan/Victor pick
 simply never requests a palette sequence. Test the scary instrument claim
 before writing it down.
 
-## 14z-99 (2): three traps from the #105 fix arc
+## **[VSP-141]** 14z-99 (2): three traps from the #105 fix arc
 
 **A RENDER verdict from a gfx-free build is void — and it fails by
 looking like a new defect.** The merged1-style pack (program image over
@@ -2726,7 +2726,7 @@ The same session's second instance: the hitclass-map probe only became
 meaningful after the Demitri-vs-Demitri control proved 468 fires — a
 probe with no must-fire control is not an instrument.
 
-## Rig iterations must NOT share a dump directory (14z-100)
+## **[VSP-127]** Rig iterations must NOT share a dump directory (14z-100)
 `DUMPS` files are named `dump_<frame>_<lo>.bin` — a second iteration with
 overlapping frames silently OVERWRITES the first's evidence. v3 of the
 contact rig destroyed v2's satellite-bearing frames and cost a re-run.
@@ -2737,7 +2737,7 @@ One directory per iteration, always.
 second line and every `[ "$n" = 0 ]` comparison fails. Use
 `n="$(grep -c ... )" || true`. Cost the clash audit its first verdict run.
 
-## The -debug write-trace and non-debug dumps can DISAGREE about one write (14z-100; RESOLVED 14z-101 — they never disagreed)
+## **[VSP-147]** The -debug write-trace and non-debug dumps can DISAGREE about one write (14z-100; RESOLVED 14z-101 — they never disagreed)
 On the SAME build and replay, `trace_writes.lua` (-debug) recorded the
 fighter's `+0x18` receiving table[0x11]=0x6000 from the vanilla init,
 while non-debug dumps read 0x1000 at the same phase. **RESOLVED
@@ -2761,7 +2761,7 @@ non-debug tap (FBNEO_HTAP) — here it settled the question in one run.
 expands as "path of command word". Quote it or avoid `=`-leading args in
 generated command lines.
 
-## A scripted motion input is NOT the move you named — the buffer FOLDS leading directions, so identify by effects, never by the script (14z-101)
+## **[VSP-131]** A scripted motion input is NOT the move you named — the buffer FOLDS leading directions, so identify by effects, never by the script (14z-101)
 The #109 native-reference hunt scripted "6236+2P" and confidently called
 the result the clone-mode EX; it was the ES — vs2's buffer reader kept
 the identified pattern 236+2P and IGNORED the leading 6 (the maintainer
@@ -2777,7 +2777,7 @@ moves this session. Related trap, same family: the 87 rig's scripted-LK
 "crashes where the real LK does not" (scripted strengths are not
 authoritative either).
 
-## An "attack-only" entry-set A/B needs a QUIET-FRAME presence profile, or a constant fixture becomes your defect (14z-102)
+## **[VSP-134]** An "attack-only" entry-set A/B needs a QUIET-FRAME presence profile, or a constant fixture becomes your defect (14z-102)
 The 14z-101 (8) #109 A/B compared per-clone OBJ entry sets "at the
 attack" on both legs and read the cycling `0x4302/0A/0C` vs
 `0x4D00-0x4D0C` pieces as the beam segments 0xA00 low. They were the two
@@ -2792,7 +2792,7 @@ present in quiet frames is scenery, whatever its codes suggest. (Same
 family as "the observation window bounds the claim", RH-19 — here the
 window was only ever placed ON the event.)
 
-**[CPE-19]** ## MAME palette RAM ($90C000) takes Lua pokes for READBACK but not for RENDERING (14z-102)
+## **[CPE-19]** MAME palette RAM ($90C000) takes Lua pokes for READBACK but not for RENDERING (14z-102)
 Poking palette rows from a frame_done hook (POKES or space:write) lands
 in the bytes — a later DUMPS readback shows the poked values sticking —
 but the rendered frame never changes; only the GAME's own writes
@@ -2804,7 +2804,7 @@ BUILD (or poke the game's staging buffer, once its per-frame copy source
 is measured), and treat any poke-based "no visual change" as
 unmeasured.
 
-## A self-test that drives a gate through DELIBERATE failures litters the gate's evidence directory (14z-103)
+## **[VSP-104]** A self-test that drives a gate through DELIBERATE failures litters the gate's evidence directory (14z-103)
 `test_m2a_flicker_gate.sh` (portable tier, so it runs on every
 `run_all_static` pass) stubs the emulator and feeds
 `m2a_legacy_gate_masked` logs that MUST fail — and the gate's failure
@@ -2824,7 +2824,7 @@ self-test points it at its own workdir. When auditing
 `tests/expected/vsavj/masked-v2/logs/03_two_player_vs.log` or carrying
 `ffffffffffffffff` lines was flicker-gate litter (removed 14z-103).
 
-## A 1P-arcade rig is silently pinned to the ARCADE DRAW — any timing change re-rolls its opponent and stage (14z-103, GitHub #110)
+## **[VSP-132]** A 1P-arcade rig is silently pinned to the ARCADE DRAW — any timing change re-rolls its opponent and stage (14z-103, GitHub #110)
 `audit_fg_damage`'s frozen 10/10 and `audit_pool_free_byte`'s pcosmo
 formation window were measured on 1P rigs whose opponent came from the
 arcade CPU draw. The 14z-87 batch (voice-borrow + beep sound members)
@@ -2844,7 +2844,7 @@ is measuring before checking how the fight went. Re-derived rigs:
 hui/74, hui/75 (2P dummy, bit-identical across generations), pcosmo ->
 106_pyron_cosmo_clash.
 
-## A fixed-frame rig verified on ONE character whiffs on another — reach, knockdown arcs, down windows and wake timing are ALL per-character, on BOTH sides (14z-104)
+## **[VSP-133]** A fixed-frame rig verified on ONE character whiffs on another — reach, knockdown arcs, down windows and wake timing are ALL per-character, on BOTH sides (14z-104)
 Three instances in one session, each first misread as a build finding:
 Phobos' standing LP WHIFFS at the spacing where Demitri's connects (the
 downwin audit's first red); heavies cannot be mashed into a down window
@@ -2924,7 +2924,7 @@ green one.
 Strong candidate for the skill distillation recorded under STATE "Decisions
 pending", since it is discipline rather than reference data.
 
-## A REPLAY'S NAME IS A CLAIM ABOUT THE BUILD (paid: 2026-08-24, 14z-107)
+## **[VSP-156]** A REPLAY'S NAME IS A CLAIM ABOUT THE BUILD (paid: 2026-08-24, 14z-107)
 
 `tests/replays/11_pick_donovan.rpl` **does not pick Donovan** on any build
 after 14z-64's M3a de-substitution. It walks to wheel slot `0x0F`, which was
@@ -3024,7 +3024,7 @@ check that cannot fail, which is worse than no check.
    use", in its cheapest possible form. The protocol paid for itself the same
    session it was applied.
 
-## Every TYPE/CLASS byte in a ported record indexes some engine dispatch —
+## **[VSP-69]** Every TYPE/CLASS byte in a ported record indexes some engine dispatch —
 ## and the engines RENUMBERED families between games (14z-109, the #99 crash)
 
 The vs2 engine and the vsavj engine number at least one record-type family
@@ -3066,7 +3066,7 @@ node-record signature, never a blanket byte scan — a blanket `0x50-0x53`
 scan yields hundreds of coincidences in coordinate/palette data) with the
 dynamic complement `tests/lua/fsm_census.lua`.
 
-## Root-causing a stochastic hardware crash: make ANY repro deterministic
+## **[VSP-157]** Root-causing a stochastic hardware crash: make ANY repro deterministic
 ## first, then interrogate the corpse (14z-109 method note)
 
 The field crash was 100%-on-hardware but stochastic per-path on emulator.
@@ -3086,7 +3086,7 @@ determinism first, vector+address second, history third, conditional
 register probe last — and extend the instrument (PROBE gained A1/A3) the
 moment it cannot name what you need, rather than inferring around it.
 
-## `BUILD=... tests/<gate>.sh` is SILENTLY IGNORED by positional-arg gates —
+## **[VSP-107]** `BUILD=... tests/<gate>.sh` is SILENTLY IGNORED by positional-arg gates —
 ## and you measure the DEFAULT build with full confidence (14z-110b)
 
 Half the suite reads `BUILD="${BUILD:-default}"` (env-overridable) and half
@@ -3105,7 +3105,7 @@ build (grep its BUILD= line) — and when a differential comes out
 identical, check you actually varied the variable (RH-23) before theorizing
 about the mechanism.
 
-## 14z-111 — "16 + the same 16 repeated": an aliasing guard is a silent tenant trap; and a rig that wins fast cannot see a time-dependent AI crash
+## **[VSP-71]** 14z-111 — "16 + the same 16 repeated": an aliasing guard is a silent tenant trap; and a rig that wins fast cannot see a time-dependent AI crash
 
 **The fact.** Several per-class tables in vsavj are 32 entries with the
 second half a COPY of the first (`0xBF01A/09A/11A/19A`, the CPU AI action
@@ -3118,7 +3118,7 @@ symptom surfaced 2 characters and 3 dispatch levels away (a sub-state the
 tenant's private handler lacks), on CPU-controlled tenants only, after
 enough match time for the RNG to pick the offending script.
 
-**How to apply.** (1) A bank-family table whose upper half duplicates the
+**[VSP-158]** **How to apply.** (1) A bank-family table whose upper half duplicates the
 lower is NOT free for tenants by accident — it is free ON PURPOSE only if
 the port fills the tenant rows; audit every `stride 0x80` table for
 "parked" status when a tenant misbehaves ONLY under CPU control. (2) Rigs:

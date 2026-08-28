@@ -12,7 +12,7 @@ Vampire Savior plus Donovan, Huitzil/Phobos, and Pyron ported from `vsav2` /
 `vhunt2`) are selectable, while vanilla Vampire Savior behavior remains
 **bit-identical** for all original content.
 
-**THE SUPERSET INVARIANT (never violate, never weaken):**
+**[VSP-1]** **THE SUPERSET INVARIANT (never violate, never weaken):**
 Any match, menu path, or attract sequence that does not involve the three new
 characters MUST produce frame-identical RAM state to vanilla `vsav` under
 identical inputs. This is not a quality goal; it is the definition of the
@@ -29,7 +29,7 @@ legacy behavior is a failed change.
    changes must remain a small, human-reviewable set of declarative mapping
    lines.
 
-   **THE ONE BOUNDED EXCEPTION**, ratified round 66 and specified in
+   **[VSP-2]** **THE ONE BOUNDED EXCEPTION**, ratified round 66 and specified in
    `docs/project/cps2_wide.md` "Governance (Rule 1 v2)": the CPS-2 WIDE
    profile carries two gated blocks in `Cps2ObjDraw` (the 19-bit tile
    promote, plus the `CPS2_WIDE_CANARY` positive control). Every such change
@@ -44,26 +44,26 @@ legacy behavior is a failed change.
    stop-and-escalate. (Corrected 14z-91, GitHub #35: this rule named sprite
    code as stop-and-escalate while the tree had modified `cps_obj.cpp` under
    a ratification this file never mentioned.)
-2. **No untested change survives a session.** Every patch, however trivial, is
+2. **[VSP-3]** **No untested change survives a session.** Every patch, however trivial, is
    validated through the headless harness before being committed. "It should
    be equivalent" is not a test result. This standard is inherited from the
    Sailor Moon S project, where systematic in-emulator verification was the
    difference between working and *shipping*.
-3. **No hand-edited binaries.** All ROM modifications are produced by the build
+3. **[VSP-4]** **No hand-edited binaries.** All ROM modifications are produced by the build
    pipeline from source manifests (`build/manifest/*.toml` + assembly sources +
    extracted data tables). The repo must be able to reproduce the output set
    from pristine inputs at any commit.
-4. **Provenance is tracked per region.** Every byte range in the output set is
+4. **[VSP-5]** **Provenance is tracked per region.** Every byte range in the output set is
    tagged with its origin: `VSAV` (untouched), `VS2`, `VH2`, `GEN` (generated),
    or `NEW` (authored). The provenance atlas (`docs/game/atlas/`) is updated in the
    same commit as the change that affects it.
-5. **Behavioral values live in documented tables, not in code.** Any tunable
+5. **[VSP-6]** **Behavioral values live in documented tables, not in code.** Any tunable
    that defines how the ported characters play (damage, timings, meter rules,
    variant selection) must be extracted into the data-table format of
    `docs/project/tables/` so the community can review and adjust without re-engineering.
-6. **Failing regression halts forward work.** If the replay-checksum suite
+6. **[VSP-7]** **Failing regression halts forward work.** If the replay-checksum suite
    diverges, fixing that divergence becomes the only task until green.
-7. **No copyrighted ROM content in the repo or in any distributed artifact.**
+7. **[VSP-8]** **No copyrighted ROM content in the repo or in any distributed artifact.**
    The repo holds tools, patches (xdelta/BPS against named reference dumps),
    documentation, and authored assets only. Reference romsets live outside the
    tree in `ROMDIR` (env var) and are never committed, quoted at length, or
@@ -82,7 +82,7 @@ legacy behavior is a failed change.
 
 ## 3. Environment
 
-- Reference sets (decrypted): `vsavj` (**Japan 970519 — DECIDED**, the
+- **[VSP-9]** Reference sets (decrypted): `vsavj` (**Japan 970519 — DECIDED**, the
   competitive-standard region; do not reopen), `vsav2`, `vhunt2`,
   located in `$ROMDIR`. Verify SHA-1 against `docs/checksums.txt` before any
   session that reads them. If checksums mismatch, stop.
@@ -103,13 +103,13 @@ legacy behavior is a failed change.
   match for the full script length. First divergent frame + RAM diff is the
   standard bug report format.
 
-  **WHICH EMULATOR ACTUALLY RUNS THIS, corrected 2026-08-16 (GitHub #78) —
+  **[VSP-24]** **WHICH EMULATOR ACTUALLY RUNS THIS, corrected 2026-08-16 (GitHub #78) —
   this clause said "vanilla FBNeo … patched FBNeo" and described an oracle the
   suite did not run.** The per-frame whole-corpus legacy oracle is **MAME**
   (`tests/lib/m2a_common.sh`, the frozen `.masked` classes below). FBNeo
   carries: the **emulator superset invariant** on pristine `vsavj`
   (`test_wide_profile.sh`, reference vs patched binary), **dual-track**
-  inertness on one binary (`test_dualtrack.sh` — **SCOPE CORRECTED 14z-94,
+  inertness on one binary (`test_dualtrack.sh` — **[VSP-25]** **SCOPE CORRECTED 14z-94,
   maintainer-ratified 2026-08-17, GitHub #95: "inertness" here means
   bit-identical UP TO SELECT ENTRY, not for the whole replay.** The stock
   and WIDE builds carry DIFFERENT ROSTERS by construction — a stock-size
@@ -132,7 +132,7 @@ legacy behavior is a failed change.
   a live vanilla leg across all 46 legacy replays. Revisit at MiSTer — a third
   implementation is where MAME-specific behaviour would surface.
 
-  **THE TWO FBNeo-ONLY PHASE CLASSES — RATIFIED 2026-08-16 (maintainer,
+  **[VSP-26]** **THE TWO FBNeo-ONLY PHASE CLASSES — RATIFIED 2026-08-16 (maintainer,
   GitHub #78).** Two windows may differ on FBNeo where MAME shows ZERO
   difference at the same frames: the sound-driver work area
   `$FF0500-$FF05FF` (`atlas/ram.md:74`, already recorded as differing
@@ -150,7 +150,7 @@ legacy behavior is a failed change.
   GROWTH. The standing watch applies verbatim — growth means stop and
   root-cause, not widen. `FBNEO_ORACLE_EXPECT=exact` requires bit-identity
   for anyone who wants it.
-- **Hooked-build legacy comparison (amended 2026-07-25 v1, refined to v2
+- **[VSP-27]** **Hooked-build legacy comparison (amended 2026-07-25 v1, refined to v2
   2026-07-27, both maintainer-approved):** for builds carrying engine
   hooks (code the vanilla game executes routed through added
   instructions), the legacy oracle compares **live RAM**: all work RAM
@@ -164,7 +164,7 @@ legacy behavior is a failed change.
   ground-truth tested — the input-accept/spawn-boundary phase artifact);
   **frozen first-divergence constant** where a masked byte's phase
   provably propagates into live state on a path with no gameplay surface
-  (test mode reading the sound latch); and, **added v3 2026-08-05
+  (test mode reading the sound latch); and, **[VSP-28]** **added v3 2026-08-05
   (maintainer-approved), bounded re-convergent window** — for a screen the
   roster work deliberately alters. A replay may sit in this class only when
   all four hold, each frozen per replay: a single CONTIGUOUS divergent run;
@@ -178,7 +178,7 @@ legacy behavior is a failed change.
   Note this class is STRICTER than the frozen first-divergence constant
   above, which never re-converges at all — it is a narrower licence for one
   screen, not a loosening. Checker `tools/compare_window.py`, ground-truthed
-  by `tests/test_compare_window.sh`. **Added v4 2026-08-06
+  by `tests/test_compare_window.sh`. **[VSP-29]** **Added v4 2026-08-06
   (maintainer-ratified): composite** — the strict CONJUNCTION of
   flicker-tolerated and bounded re-convergent window, for replays that
   exhibit both. It adds NO tolerance: every divergent run must be accounted
@@ -196,7 +196,7 @@ legacy behavior is a failed change.
   3190 rather than 890 (it starts mid-attract). Checker
   `tools/compare_composite.py`, ground-truthed by
   `tests/test_compare_composite.sh` (seven cases plus a no-loophole check).
-  **Added v5 2026-08-16 (maintainer-ruled), THE >=60 RULE IS
+  **[VSP-30]** **Added v5 2026-08-16 (maintainer-ruled), THE >=60 RULE IS
   INTRA-MECHANISM.** The 60-frame non-propagation figure is a
   single-mechanism proof: it governs the RE-CONVERGENCE TAIL after the
   last divergence, and it does NOT bind across the gap between two
@@ -222,7 +222,7 @@ legacy behavior is a failed change.
   Every non-exact class must be
   mechanism-attributed and its expectation frozen; a replay may not be
   reclassified to a looser class without a new measured mechanism and
-  maintainer sign-off. **Standing watch (maintainer, 2026-07-27): if
+  maintainer sign-off. **[VSP-31]** **Standing watch (maintainer, 2026-07-27): if
   flickers grow beyond the frozen inventory or divergences turn
   systematic, stop and root-cause — that pattern would indicate a deeper
   issue, not tolerance noise.** Rationale (measured, session 7,
@@ -231,7 +231,7 @@ legacy behavior is a failed change.
   is impossible on this engine. Whole-RAM frame-exact remains the
   standard for vanilla oracles, run-to-run determinism, and hook-free
   builds.
-- **Dual-emulator agreement (amended 2026-07-25, maintainer-approved):** for
+- **[VSP-32]** **Dual-emulator agreement (amended 2026-07-25, maintainer-approved):** for
   new-character content (no vanilla oracle exists), the same replay is run on
   patched FBNeo and patched MAME and the two must agree on **mapped gameplay
   state compared at sync anchors** (match start, round transitions):
@@ -248,11 +248,11 @@ legacy behavior is a failed change.
   for a ported character: vs each of the 18 (both sides), each stage, Dark
   Force activation/expiry, life-marker transition, timeout, throw/tech
   situations, pursuit attacks, Shadow/Marionette interaction once enabled.
-- **Edge-case bias:** when writing replays, prefer pathological inputs
+- **[VSP-33]** **Edge-case bias:** when writing replays, prefer pathological inputs
   (simultaneous presses, frame-1 actions, corner interactions, KO-frame
   events). The SMS experience: bugs live at state transitions, not in the
   middle of matches.
-- **FIELD REPORTS ARE RECORDINGS (maintainer-ruled 2026-08-27, 14z-111).**
+- **[VSP-20]** **FIELD REPORTS ARE RECORDINGS (maintainer-ruled 2026-08-27, 14z-111).**
   Every reproducible crash or misbehaviour a human can produce — on the
   board or on MAME — is captured FIRST as a hand-played MAME recording
   (`WIDE_RECORD=<name> tools/run_wide.sh <build> mame`), BEFORE any
@@ -279,7 +279,7 @@ legacy behavior is a failed change.
   poke-contaminated mechanism that was never the field crash; the first
   recording found the real one (#99) in an evening. Scripted rigs that win
   fast never give a CPU opponent's AI the time to reach its rarer scripts.
-- **THE PERSISTENT SUITE DOCTRINE (SMS lesson, promoted to law):** every
+- **[VSP-18]** **THE PERSISTENT SUITE DOCTRINE (SMS lesson, promoted to law):** every
   in-emulator test executed during development — measurement, probe, or
   verification — is captured as a scripted, rerunnable case in `tests/` before
   the session ends. No throwaway manual checks. These behavioral tests are the
@@ -290,7 +290,7 @@ legacy behavior is a failed change.
   expectations accordingly, so one command validates any build variant
   (SMS `test_regression.lua` pattern). Engine-invariant "rule locks" for
   vanilla behavior run on every build.
-- **Verdict logic is itself tested.** A test's classification code
+- **[VSP-19]** **Verdict logic is itself tested.** A test's classification code
   (HIT/BLOCK/TECH/etc.) must be validated against known ground-truth
   scenarios before its verdicts are trusted — SMS shipped a wrong conclusion
   ("blockable frame trap") from a verdict bug, not a game bug. Never again.
@@ -300,7 +300,7 @@ legacy behavior is a failed change.
 
 ## 5. Working style
 
-- Sessions begin by reading `STATE.md` (current milestone, open bugs, decisions
+- **[VSP-17]** Sessions begin by reading `STATE.md` (current milestone, open bugs, decisions
   pending) and end by updating it. STATE.md is the single source of truth for
   progress; do not rely on chat memory. **SPLIT 2026-08-20
   (maintainer-approved): STATE.md holds the newest ~3 session groups, THE
@@ -311,10 +311,10 @@ legacy behavior is a failed change.
   first, then STATE_HISTORY.md — section names are preserved in the
   archive, and archived entries are never rewritten (corrections are
   marked in place, as always).
-- Address notation: 68k addresses as `PRG:0x0F1234` (program ROM offset) or
+- **[VSP-11]** Address notation: 68k addresses as `PRG:0x0F1234` (program ROM offset) or
   `CPU:$0F1234` (address-space); tiles as `GFX:tile 0x1A2B3`; RAM as
   `RAM:$FF8000`. Never bare hex without a namespace.
-- **Documentation taxonomy (SMS-proven; respect the splits, don't merge).**
+- **[VSP-12]** **Documentation taxonomy (SMS-proven; respect the splits, don't merge).**
   `docs/` is divided by ONE question — **would this still be true if we
   abandoned the roster hack tomorrow?** — into `docs/game/` (Vampire
   Savior itself), `docs/platform/` (CPS-2, MAME, FBNeo) and
@@ -338,8 +338,9 @@ legacy behavior is a failed change.
     patch change.
   - `.claude/skills/<name>/SKILL.md` — the DISTILLED DISCIPLINE, loaded
     before the work (since 14z-114: `mister-cps2-wide-core`, `mister-vampire-
-    saved`, `cps2-hardware`, `cps2-emulation`, `vampire-savior-engine`; the port
-    skill is planned in `docs/project/skills_scope.md`). Skill = the laws and traps; docs = the facts. Every rule is
+    saved`, `cps2-hardware`, `cps2-emulation`, `vampire-savior-engine`,
+    `vampire-saved-port` — the last one cites THIS file by section and never
+    restates it; plan and boundaries in `docs/project/skills_scope.md`). Skill = the laws and traps; docs = the facts. Every rule is
     anchored `**[PFX-N]**` in the doc paragraph it distils and
     `tools/checkskills.py` locks the two so they cannot drift; a skill that
     quotes a number cites a LOG, never the synthesis. Editing an anchored
@@ -349,7 +350,7 @@ legacy behavior is a failed change.
     the moment one is paid for, to the bucket its FACT belongs to.
   Findings land in the right document *at discovery time*, not at milestone
   end. An undocumented discovery is a discovery we will pay for twice.
-- **RETRACTION DISCIPLINE (standing order, 14z-71): when a claim changes,
+- **[VSP-13]** **RETRACTION DISCIPLINE (standing order, 14z-71): when a claim changes,
   GREP FOR THE CLAIM — not for the files you remember writing it in.**
   A finding does not live in one place. It propagates into section
   HEADERS, summary lines, registry rows, gate comments, the GOTCHAS index
@@ -380,7 +381,7 @@ legacy behavior is a failed change.
   header is worse than no documentation: it is confidently wrong, and it
   is what a future session will act on.
 
-- **BUG ARCHAEOLOGY FIRST (standing order, 14z-75): before fixing a bug,
+- **[VSP-14]** **BUG ARCHAEOLOGY FIRST (standing order, 14z-75): before fixing a bug,
   check whether it has already been fixed once — and if you are unsure, ASK
   THE MAINTAINER.** They were there and will usually remember.
   1. `git log --oneline --grep="<symptom>"`, `git log -S "<manifest row>"`,
@@ -402,21 +403,21 @@ legacy behavior is a failed change.
   two commands; the wrong conclusion took hours and produced a build with the
   crash reintroduced.
 
-- **Anti-hyperfocus checkpoint (standing order):** deep-dive focus is the
+- **[VSP-15]** **Anti-hyperfocus checkpoint (standing order):** deep-dive focus is the
   project's engine but also its failure mode. At natural boundaries — a
   finding confirmed, a test suite green, ~20 tool iterations on one problem —
   stop and do the meta-pass unprompted: update the docs above, capture the
   scratch tests into the suite, reassess whether the current approach is
   still the right one, and check STATE.md for drift. The human should never
   have to be the one to say "step back and document."
-- **Build conventions (SMS-proven):** builders are Python, take `(src, out)`
+- **[VSP-16]** **Build conventions (SMS-proven):** builders are Python, take `(src, out)`
   positionals so they chain onto any input ROM, and every tunable is a
   builder flag — never a hex edit. Bundles are built by chaining builders
   then diffing ONCE against clean; never by chaining standalone binary
   patches (the SMS bank-collision trap). Shipped builds carry a visible
   in-game version string as the naked-eye A/B tell for playtesters, and
   every build's SHA-1 goes in the registry.
-- When a decision has gameplay consequences (anything a player could feel),
+- **[VSP-10]** When a decision has gameplay consequences (anything a player could feel),
   it is not Claude's to make: record it in `STATE.md` under "Decisions
   pending" with options and a recommendation, and continue on unblocked work.
 - Prefer diff-driven reverse engineering: the three romsets are three official

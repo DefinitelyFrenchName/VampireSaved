@@ -33,7 +33,7 @@ The second is the clearest statement of the hazard: the region was
 
 ---
 
-## The four checks, before you build
+## **[VSP-62]** The four checks, before you build
 
 Run all four on any new root. The `x093460` root (14z-71, the beam
 handler) is the worked clean case: it passed all four, and it built and
@@ -90,7 +90,7 @@ own operands, not just against where the disassembly "looks finished".
 
 ---
 
-## Crypt placement: opcode vs data views
+## **[VSP-63]** Crypt placement: opcode vs data views
 
 A region placed in the crypt hole (`hole_a`, below `PRG:0x100000`) is
 stored **re-encrypted**, so opcode fetches decrypt correctly and **runtime
@@ -126,7 +126,7 @@ in crypt-placed code, read as data, returning 0xFF where native reads
 
 ---
 
-## The habit that would have saved all four sessions
+## **[VSP-64]** The habit that would have saved all four sessions
 
 **Put an execution breakpoint on code before attributing a symptom to it.**
 `x088512` had genuinely broken tables *and* was the region the explosion's

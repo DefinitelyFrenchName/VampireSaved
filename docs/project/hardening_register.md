@@ -249,7 +249,7 @@ Re-point the `[merged_*]` sections at every merged freeze.
 - `build_merged.sh` README template made generation-neutral (it stamped
   "753-op / NOT REGISTERED" into every build dir forever).
 
-Maintenance rule: this register is updated in the same commit as any
+**[VSP-93]** Maintenance rule: this register is updated in the same commit as any
 change to the classes above (a new tripwire, a resolved row, a rig that
 covers a listed surface). A register that lags its classes is the
 reference-rot disease this program exists to cure.

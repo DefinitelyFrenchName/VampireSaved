@@ -8,7 +8,7 @@ too.
 
 Append the moment one is paid for. Read before touching the related area.
 
-## Moving a frozen ONSET frame can silently cross a verification-class boundary (paid: 14z-90, GitHub issue #4)
+## **[VSP-38]** Moving a frozen ONSET frame can silently cross a verification-class boundary (paid: 14z-90, GitHub issue #4)
 
 The §4 v3 `window` class freezes an onset frame; the §4 v2 `flicker`
 class requires >=60 identical frames of re-convergence. On the current
@@ -92,7 +92,7 @@ invisible to the diff for the same reason. Rule stands: same-value !=
 same-meaning; any pointer INTO shared engine data needs a reconciliation
 row or a content-match, never a pass-through.
 
-## Same-value class #4: A5-relative work-var displacements
+## **[VSP-82]** Same-value class #4: A5-relative work-var displacements
 
 **[VSE-4]** The engines' A5 work-variable layouts differ (vsavj damage vars at
 -0x4BBE/BC/BA vs vs2 at -0x4B6C/6A/68 — a uniform -0x52 family shift).

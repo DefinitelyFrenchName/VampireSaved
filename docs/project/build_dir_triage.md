@@ -311,7 +311,7 @@ Nothing has been moved or deleted; this is the decision input only.
 
 **Standing guard afterwards:** `test_build_ref_rot.sh` already reports default-currency; if the attic pass turns up a gate that depended on a dir nobody named, that gate gets a re-point and the register a row — the #94 class, caught deliberately instead of by rot.
 
-## Recordings (`tests/inp/`, `~/.cache/vampire-saved/inp/`) — 14z-111, maintainer-ruled
+## **[VSP-98]** Recordings (`tests/inp/`, `~/.cache/vampire-saved/inp/`) — 14z-111, maintainer-ruled
 
 - A hand-played MAME recording is tracked under `tests/inp/<what>-<freeze set>-NN/`
   (the freeze it was played on; `NOTE` says what it exercises) the moment it
@@ -324,7 +324,7 @@ Nothing has been moved or deleted; this is the decision input only.
   frames, abort), `smoketest` (14z-9x, unreferenced) deleted; `crash_m10`
   renamed to `crash-merged-m8-01` and its cache copy deleted.
 
-## BEFORE DELETING A BUILD DIR, GREP FOUR PLACES — NOT TWO (14z-112, paid for)
+## **[VSP-96]** BEFORE DELETING A BUILD DIR, GREP FOUR PLACES — NOT TWO (14z-112, paid for)
 
 The N-2 sweep of 14z-112 deleted 27 generations and broke one gate, because
 the reference scan covered `tests/` and `tools/` only. The complete list:
@@ -350,7 +350,7 @@ It is the only instrument that catches a gate degrading to SKIP. Deleting is
 cheap to redo — `git checkout HEAD -- build/<dir>` restores a tracked one in
 seconds — so the sweep is safe as long as the suite gates the commit.
 
-### THE DEEPER FLAW THE SWEEP EXPOSED: "tracked" build dirs are only PARTLY tracked
+### **[VSP-97]** THE DEEPER FLAW THE SWEEP EXPOSED: "tracked" build dirs are only PARTLY tracked
 
 `build/don_m7` is a TRACKED build dir — 18 files — but
 `tests/test_shared_writes.sh` needs the 23 generator outputs

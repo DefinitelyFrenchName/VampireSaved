@@ -162,7 +162,7 @@ cursors visit Jedah's cell and legacy code reads his records.
 That is the strongest argument for the move, and it is exactly why it must
 be measured rather than assumed before step 2 is attempted.
 
-## The slot-row vocabulary (14z-62c — how a row states its tenant behavior)
+## **[VSP-92]** The slot-row vocabulary (14z-62c — how a row states its tenant behavior)
 
 Step 2 (the move to `0x13`) surfaced a class the schema had no words for:
 manifest rows carrying the SLOT baked into an address, a table row index,

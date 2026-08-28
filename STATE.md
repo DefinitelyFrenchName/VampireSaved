@@ -18,6 +18,7 @@
 | green | `tests/test_checkskills.sh` PASS (109 rules, four controls fire); `run_all_static --tier portable` **PASS 54 / SKIP 0 / FAIL 0 / MISSING 0**; `ROMDIR=... run_all_static --strict` **PASS 111 / SKIP 0 / FAIL 0 / MISSING 0** (110 + `test_checkskills`) on the tree as committed |
 | **then, the same session: THE PLAN AND PAIR A+B** | `docs/project/skills_scope.md` (four remaining skills, the checker extension, the staleness pass each needs, sequencing A+B -> C -> D, five decisions under stated assumptions) -> **the A+B staleness pass** (six status claims in `cps2_wide.md`/HANDOFF/the `-video none` gotcha fixed in place, 14 re-filing candidates listed) -> **`cps2-hardware` `[CPH-1..30]` and `cps2-emulation` `[CPE-1..42]`** distilled from every non-MiSTer platform source (platform gotchas 9-1027 + 1834-1892, all of `cps2_wide.md`, HANDOFF B5/migration/troubleshooting, the emulator-fact project gotchas), 72 anchors (72/72 needles unique first pass); the checker made TABLE-DRIVEN per prefix (path, anchor docs, log set, forbidden tokens) with **cross-reference resolution** (a `[PFX-N]` naming an undefined rule fails); gate: six controls. `checkskills` **ALL PASS 181 rules / 4 skills**; portable tier PASS 54/0/0/0 after the pair |
 | **then C, THE GAME SKILL** | every game source read in full (`engine_internals.md` 3,733 lines, `game/gotchas.md`, all seven atlas files) -> **the C staleness pass, S-C1..S-C12** (the "NOT YET SYNTHESISED" header above its own CLEARED note; the M2b slot-0x0F placement and its "remaining" lists; the select-screen "next session" plan; the 214P music bug "must be re-diagnosed" (root-caused 14z-52) and "maintainer decision material" (WIDE QSound + M5); the Dark Force header/status "palette OPEN" (fixed 14z-84 `df_gold_variant_id` — verified in `huitzil.toml`); capture-pose "MEASURED FEASIBLE" and win-screen "KNOWN-OPEN #105" (both shipped 14z-99, verified in patch_notes); 14z-70e "explosion believed CORRECT" (retracted by 70f); the atlas README's phantom per-romset files; `ram.md`'s three-freezes-old set names; the PS1 "do not build from these yet"; and `game/gotchas.md`'s TITLE LINE with a whole entry spliced into it) -> **`vampire-savior-engine` `[VSE-1..83]`** (C.1 the three-sibling method, C.2 the bank and id space, C.3 pools/dispatch, C.4 anim/drawer/gfx, C.5 combat, C.6 select/venue, C.7 sound, C.8 modes/exceptions, C.9 the rigs the game sabotages), **no ROM addresses** (decision 2), 83 anchors (83/83 unique after one needle repoint), checker row + a seventh control (a port token in the game skill). `checkskills` **ALL PASS 264 rules / 5 skills**; portable tier PASS 54/0/0/0. Two items left flagged UNVERIFIED rather than edited (the M2b sprite-palette writer note; the attract-demo roster TODO) |
+| **then D, THE PORT SKILL** | **the D staleness pass first, its own commit `7c688cf` (S-D1..S-D6):** HANDOFF's playtest block and "Current WIDE builds" header had stopped at the 14z-105 batch (merged-m6, "M6", don_m11/hui47/pyron31) while four freezes sat in the registry -> merged-m10 / M8 / don_m14-hui48-pyron32; `patch_index.md`'s four romset rows CURRENT at the 14z-102 generation (re-registered: stock twin `d29fd062`, donovan-m14 `772d8052`, huitzil-m21 `cd362ca4`, pyron-m15 `c403a283`; the hui9 gfx-rung row asserting a pinned `hui6` deleted two sweeps ago -> HISTORY) and the FBNeo 0002 row's "ONE widened condition" (two gated blocks); `hardening_register.md` #107/#109 both still "-> the next window" (SHIPPED 14z-102) and guard currency at hui45/pyron29/don_m9; `build_dir_triage.md` "must join the re-point sweep" (done every freeze since); `project/gotchas.md` "the GENERATOR side is still open" (post-increment reader relocated since 14z-69); `tenant_manifest.md` "refused until M3 Phase 3" (Phase 3 is `build_merged.sh`). Two left flagged UNVERIFIED (skills_scope §4 row D). **Then the skill**: `.claude/skills/vampire-saved-port/SKILL.md`, 161 rules, D.1 the law BY CITATION (CLAUDE.md §1-§5 + the two standing STATE sections, 33+3 anchors — decision 3 held: nothing restated), D.2 oracles and frozen classes, D.3 extraction/reconciliation/generation, D.3b sprite lists, D.4 freezes/registry/build dirs/releases/suite, D.5 rigs and probes, D.6 attribution. 161 needles asserted unique before insertion (161/161 first pass). **Checker**: VSP row with the §3 STATE-section restriction (a `**[VSP-N]**` anywhere in STATE.md outside "STANDING PRINCIPLE" / "THE DEADNESS REGISTER" fails, named); gate gains the eighth control and nine files. **Found on the way and fixed:** the `**[CPE-3]**` and `**[CPE-19]**` anchors had been inserted BEFORE their `## ` headers in `project/gotchas.md`, breaking both headings — moved inside. Routing: README row + plan entry, CLAUDE.md skills bullet, HANDOFF gate row, plan STATUS. `checkskills` **ALL PASS 425 rules / 6 skills**; gate PASS eight controls; portable **54/0/0/0**. |
 | push | committed to main; pushed at the maintainer's word (standing rule) |
 
 ## Session 14z-113 CLOSE — ritual complete. **THE MiSTer SCOPE DOCUMENT
@@ -659,7 +660,7 @@ session records in the archive beyond the headline shown.
 # STANDING SECTIONS (current state — never archived)
 ## STANDING PRINCIPLE (maintainer, 2026-08-05): vanilla wins ties
 
-"vsav vanilla is always better when we can." **When a console port and
+**[VSP-21]** "vsav vanilla is always better when we can." **When a console port and
 arcade vsav differ and both would work, take vanilla.** A console port's
 choice is not evidence that vanilla is wrong; it is evidence of what that
 port's designers preferred.
@@ -1021,8 +1022,8 @@ the archive once they stop shaping active work.)*
   change touching the hash-shadowing class that cost two sessions in
   14z-60z/61, and it must not sit between the maintainer and a field test.
 
-- **THE REMAINING SKILLS — PLANNED 14z-114 (`docs/project/skills_scope.md`),
-  five decisions taken under stated assumptions, OPEN TO VETO:** (1) FOUR
+- **THE REMAINING SKILLS — PLANNED AND ALL FOUR SHIPPED 14z-114 (`docs/project/skills_scope.md`,
+  now the record); the five decisions were taken under stated assumptions and remain OPEN TO VETO — a veto means re-cutting a shipped skill, which the checker makes mechanical:** (1) FOUR
   skills — `cps2-hardware`, `cps2-emulation` (split per "MiSTer separate
   from emulation"), `vampire-savior-engine`, `vampire-saved-port`; (2) the
   game skill quotes NO ROM addresses (laws + the atlas row it names); (3)
@@ -1031,14 +1032,16 @@ the archive once they stop shaping active work.)*
   as its own commit (the MiSTer ruling generalised); (5)
   `engine_internals.md` counts as a LOG for the game skill's number-citation
   check. Sequencing A+B (platform) -> C (game) -> D (port). Distillation of
-  A+B began the same session.
+  A+B began the same session — and all four landed in it: `[CPH-1..30]`, `[CPE-1..42]`, `[VSE-1..83]`, `[VSP-1..161]`; 425 rules across six skills, `checkskills` ALL PASS.
 - **DISTILL AI SKILLS FROM THE PROJECT'S LEARNINGS (maintainer direction,
   2026-08-24).** ~~Recorded as FUTURE, UNPLANNED work — nothing scheduled.~~
-  **THE MiSTer PAIR IS DONE 14z-114** (`mister-cps2-wide-core`,
-  `mister-vampire-saved`, checker `tools/checkskills.py`; STATE 14z-114). The
-  CPS-II-emulation and VS/VS2/VH2 skills remain future, unscheduled; the
-  checker shape (docs as the human rendition, anchored IDs, numbers cite the
-  log) is the pattern they should reuse.
+  **ALL SIX SKILLS ARE DONE 14z-114** (`mister-cps2-wide-core`,
+  `mister-vampire-saved`, `cps2-hardware`, `cps2-emulation`,
+  `vampire-savior-engine`, `vampire-saved-port`; checker `tools/checkskills.py`;
+  STATE 14z-114). The maintainer's sketch — a CPS-II skill separate from a
+  VS/VS2/VH2 skill — is met by the `cps2-*` pair and `vampire-savior-engine`;
+  the checker shape (docs as the human rendition, anchored IDs, numbers cite
+  the log) is the pattern any future skill reuses.
   As was done for Sailor Moon S, distil the project's learnings into agent
   SKILLS, **scoped by subject rather than by task**. The maintainer's sketch:
   at least a **CPS-II** skill separate from a **VS / VS2 / VH2** skill, and
@@ -1142,7 +1145,7 @@ the archive once they stop shaping active work.)*
 
 ## THE DEADNESS REGISTER (opened 14z-71, maintainer's standing instruction)
 
-Every claim of the form **"legacy never reaches this, so we may reuse
+**[VSP-23]** Every claim of the form **"legacy never reaches this, so we may reuse
 it"**. Each is measured by ABSENCE, which is the weakest kind of evidence
 we accept, so each is listed here with its guard. **These are the FIRST
 PLACES TO CHECK for any unexplained regression in vanilla assets, engine
@@ -1154,7 +1157,7 @@ behaviour or rendering** — before anything else is suspected.
 | effect-class row 16 (`0x080AEC`) | vanilla never dispatches class 16 | `tests/audit_effect_class_rows.sh` §1, 0 reads vs a 1760-hit control | none needed: the row was a stub (`rts`), so a wrong claim costs at most the old no-op |
 | ~~drawer list-type 6 (`0x01B6AA`)~~ **CLAIM FALSE (measured 14z-89) — LEGACY LISTS DO REACH TYPE 6** | vanilla has no type-6 sprite lists | `audit_effect_class_rows.sh` §1/§4 + `tests/test_beam_list_type6.sh` | **THE FALLBACK HELD — this is what a safe-and-loud design buys.** 14z-89 measured the tripwire ARMED on legacy content on huitzil-m13: `21_don_mash` 387 times and `26_don_arcade_mash` 948 times, PC-attributed to inside the thunk body (0x0FD060). Rendering stayed correct throughout (the fallback runs vsav's own type-6 code, reproduced instruction-for-instruction), so nothing rendered wrong and no playtest ever saw it — exactly the outcome the register's "prefer designs where being wrong is safe and loud" rule was written for. WHY IT WAS MISSED: the deadness measurement was sound but its COVERAGE was four replays (`02/07/09/30`), and the gate has always run on that default set; the two replays that arm it are long mash/arcade rigs nobody pointed it at. COST TODAY: `$FF010C/$FF010D` is a live work-RAM counter vanilla does not keep, so both replays diverge permanently from the vanilla masked basis — they are `.pending` on huitzil-m13 pending the maintainer's ruling. OPEN: does the fallback need to stop counting (make the tripwire diagnostic-only / move it out of work RAM), or is the counter acceptable? See "Decisions pending — 14z-89" |
 
-Rules for adding a row: the claim must be measured with a POSITIVE CONTROL
+**[VSP-22]** Rules for adding a row: the claim must be measured with a POSITIVE CONTROL
 on the same instrument and leg (a blind instrument and a real zero look
 identical — paid for three times in 14z-71); it must name its guard; and
 it must say what happens if the claim is wrong. Prefer designs where being

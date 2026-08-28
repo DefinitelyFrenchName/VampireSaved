@@ -1,6 +1,6 @@
 # patch_index — one-page registry of every patch
 
-Updated in the same commit as any patch change. This page is the
+**[VSP-99]** Updated in the same commit as any patch change. This page is the
 REGISTRY — status, dependencies, exclusivity, deprecation — not the
 detail. Byte detail: docs/project/patch_notes.md (newest first) + each build's
 generated `patch/patch_notes_fragment.md`. Mechanism rationale: the

@@ -14,7 +14,7 @@ effect that exercised every one of these.
 
 ---
 
-## The four questions to ask of any ported effect
+## **[VSP-159]** The four questions to ask of any ported effect
 
 Ask them in this order. Each one has cost a session at least once.
 
@@ -117,7 +117,7 @@ readback verification. Rules:
   but it is measured **160-of-240 occupied** at Huitzil's codes. Writing
   there overwrites host art.
 
-### Inventories are SPANS, not samples
+### **[VSP-160]** Inventories are SPANS, not samples
 
 Sampling what the game draws gives a partial answer, twice over:
 
@@ -132,7 +132,7 @@ lesson, re-paid at full price.
 
 ---
 
-## Order of work, and the checks at each step
+## **[VSP-161]** Order of work, and the checks at each step
 
 | step | do | check |
 |---|---|---|
