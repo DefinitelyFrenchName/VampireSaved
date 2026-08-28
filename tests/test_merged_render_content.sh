@@ -48,7 +48,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 
-MERGED="${1:-$REPO/build/m3b_merged16/rompath}"  # re-pointed 14z-111
+MERGED="${1:-$REPO/build/m3b_merged17/rompath}"  # re-pointed 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
 MAME_WIDE_BIN="${MAME_WIDE_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 # THE SOLO REFERENCES MUST BE BUILDS THAT STILL BOOT ON THE CURRENT
 # EMULATOR BINARY, and that is not automatic (14z-92). WIDE v1.1 (14z-86)

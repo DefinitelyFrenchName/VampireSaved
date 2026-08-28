@@ -35,7 +35,7 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD="${1:-build/m3b_merged16}"  # re-pointed 14z-110b
+BUILD="${1:-build/m3b_merged17}"  # re-pointed 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: no vsavjw.zip in $BUILD"; exit 1; }
 EXPECT_LINES="${EXPECT_LINES:-1}"  # default flipped 14z-102: the row-31 fix is the shipped state

@@ -218,7 +218,7 @@ Carried from `mister_core.md` §12 and re-checked against 14z-109..112:
 
 ## 8. What this document asked the maintainer to decide — ALL RULED 2026-08-28 (STATE 14z-113 "Decisions pending")
 
-**Rulings:** (1) split confirmed as written; (2) the staleness pass is MANDATORY before distillation and WAITS for the board results being produced in parallel; (3) the `.rbf` and the MRAs are tracked in-tree under `release/`, which opens the MiSTer RELEASE FORMAT item in STATE. The questions as put:
+**Rulings:** (1) split confirmed as written; (2) the staleness pass is MANDATORY before distillation and WAITS for the board results being produced in parallel — **both happened the same day, the pass ran (§6)**; (3) the `.rbf` and the MRAs are tracked in-tree under `release/`, which opened the RELEASE FORMAT item — **ruled the same day: one self-sufficient directory per platform, every version releases every platform; `docs/project/release_format.md`, first instance `release/merged-m10/`**. Skill 2.3 (catalogue/MRA/bundle generation) should therefore cite `release_format.md` and `tools/package_release_platforms.py` as the bundle's home; §5.4 and S18 are resolved by it. The questions as put:
 
 1. **Confirm the split** (§2 six + one shared, §3 five) or move rows.
    The one judgment call worth a second look: 1.7 (MRA mechanics) filed at

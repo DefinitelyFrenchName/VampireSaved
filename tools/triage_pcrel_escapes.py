@@ -27,9 +27,9 @@ UNCOVERED = {
     "huitzil": ["x028122", "code", "x068c78"],
     "pyron":   ["x028122", "x068c78"],
 }
-SOLO = {"donovan": "don_m14", "huitzil": "hui48", "pyron": "pyron32"}  # re-pointed 14z-111
+SOLO = {"donovan": "don_m14", "huitzil": "hui48", "pyron": "pyron32"}  # re-pointed 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
 
-mp = json.load(open("build/m3b_merged16/patch/placements.json"))["regions"]
+mp = json.load(open("build/m3b_merged17/patch/placements.json"))["regions"]
 
 def merged_key(tenant, region):
     return region if tenant == "donovan" else f"{region}@{tenant}"

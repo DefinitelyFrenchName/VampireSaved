@@ -13,6 +13,7 @@
 | ~~not done, by design~~ **THE S1-S20 PASS RAN (same session, after the board results, per ruling (2))** | Fixed in place with the correcting session named at each site: `mister_core.md` ground truth (pin `63496069`, 24 commits, merged-m9), file counts, §12 HARDWARE / HEARD / DRAWN rows, the `.rbf` path; `mister.md` distribution status, the fork-commit row extended to 24, the spliced 14z-112 sentence re-flowed, D2-era counts qualified, the input-coverage bullet's lead rewritten, the Recipe re-pointed to `m3b_merged16`; `mister_map.md` pin note + a current STATUS paragraph above the 14z-107 header; `mister_fit.md` provenance note (`0x4D10F3` is merged-m6's, the gate-frozen ceilings are not); `cps2_wide.md` header DRAFT -> RATIFIED; `docs/README.md` map row D0-D5; `patch_index.md` rows 0008-0024 added, 0007's "LOCAL-ONLY" retired; `mister_mra.sh` usage text; HANDOFF's four operational `merged13` commands -> `merged16`. Measurement RECORDS naming `merged13` left as written (logs of runs on that image). Re-grep of every retracted wording: empty outside this row. Scope doc §6 header carries the status |
 | decisions pending | see "Decisions pending": (1) confirm the split, (2) run the staleness pass BEFORE the skills (recommended), (3) the `.rbf`'s home |
 | green | `run_all_static --strict` after the docs change: **PASS 110 / SKIP 0 / FAIL 0 / MISSING 0**; ROM audit 76/76 |
+| **THE FREEZE — merged-m10 (maintainer, 2026-08-28: "you can do the freeze, all the more so since the pass was green")** | `build/m3b_merged17` frozen as **merged-m10**: the one-zip repackaging of merged-m9, **M8 mark unchanged, program fingerprint `32007911` unchanged, every member CRC unchanged** — the zip sha1 moved (`eee7e4b1` -> `5aeefbec`) because `vsavjw.zip` gained the four patched group-A members and the parent is now the pristine dump. Tag `freeze/merged-m10`; HANDOFF registry row; `release/merged-m10/{fbneo,mame,mister}/` — **the first release in the per-platform format ruled the same day** (round-trip PASS, 20 patched + 5 pristine, manifests identical across the three) — `mister/` holding (the WIDE + `[STOCK CONTROL]` MRAs, 31/31 and 22/22 parts resolving, and `BITSTREAM.txt` — seed/slack/sha256; the `.rbf` file itself is still on the synthesis box, its home is the open RELEASE FORMAT item). Re-point sweep: 54 gate defaults `m3b_merged16` -> `m3b_merged17`, `test_pointer_flow` pair -> `merged-m10` (expectation copied from `merged-m9.txt`, identical program), `audit_hui_grunt` gains the merged17 key, `mk_mister_page.py` reads merged17. **The MiSTer tail of this freeze is EMPTY by construction** (`gen_vsavjw_xml.py --check` ok on merged17; catalogue keyed by name+CRC; `.rbf` unchanged) — the field bundle 14z112 IS this set. No tenant/stock build dir moved; build-dir policy: merged16 stays as "one back", merged15 is still referenced by `test_inp_crash_merged_m8_01` defect mode and is NOT deleted. **Gates at freeze, on merged17:** `test_inp_corpus` 6/6 no exception · `test_version_string` PASS · `test_merged_render_content` PASS · `test_release_roundtrip` PASS incl. the new §4 layout check · `gen_vsavjw_xml.py --check` ok · `check_mra_parts` WIDE 31/31, STOCK 22/22 · `run_all_static --strict` **PASS 110 / SKIP 0 / FAIL 0 / MISSING 0** on the tree as committed (gate §4 + the sweep included) |
 | **BUNDLE 14z112 FIELD-VERIFIED (maintainer, 2026-08-28)** | "excellent: no regression" — **stock Vampire Savior renders correctly on Jotego's own JT core from the shared pristine `vsav.zip`, WIDE runs on our core, and the STOCK CONTROL MRA boots on our `.rbf` too.** So the one-zip packaging is CONFIRMED on hardware: one SD card carries this profile AND stock, which is what 14z-112's fix set out to do. The repackaged set `build/m3b_merged17` is therefore field-proven — registering/freezing it is now UNBLOCKED (still the maintainer's call; content unchanged, fingerprint `32007911`, only the zip layout moved). The maintainer asks whether the STOCK CONTROL still has a use — answered under "Decisions pending" (recommendation: keep it, as the per-BITSTREAM superset leg, run once per new `.rbf`, not per romset release). #113's hand check was not mentioned in this report and is NOT assumed closed |
 
 ## Session 14z-112 CLOSE — ritual complete. **#99 CLOSED ON A GREEN FIELD
@@ -840,9 +841,22 @@ the archive once they stop shaping active work.)*
   checklist. Dropping it outright is also defensible — the maintainer's
   call; no gameplay surface.
 
-- **THE MiSTer RELEASE FORMAT — OPEN (opened 14z-113 by ruling (3) above;
-  the details "have never been fixed").** What has to be decided, with a
-  recommendation so it can be ruled in one line:
+- **THE RELEASE FORMAT — DECIDED (maintainer, 2026-08-28, 14z-113) AND
+  IMPLEMENTED FOR merged-m10.** The ruling, verbatim in substance: the
+  `release/<name>/` recommendation below is accepted WITH the caveat that
+  **each platform is self-sufficient per format — not every file at the
+  same level; each platform directory holds everything that platform needs
+  and only that** (FBNeo needs nothing MiSTer and vice-versa; platform
+  drivers packaged with their platform), and **every version releases all
+  platforms even when the change touched one.** Two details I asked and the
+  maintainer chose: the patch set is COPIED into each platform dir (not one
+  shared dir + per-platform zips); FBNeo/MAME carry the driver PATCH + build
+  recipe, not binaries. Spec `docs/project/release_format.md`; producer
+  `tools/package_release_platforms.py`; gate `test_release_roundtrip.sh`
+  §4; first instance `release/merged-m10/{fbneo,mame,mister}/` (7.7 MB;
+  manifests byte-identical; the `.rbf` is still on the synthesis box and
+  `BITSTREAM.txt` says so — the record with the sha256 is what ties the
+  release to it). The recommendation as it was put:
   *What ships.* `jtcps2w.rbf` (3.1 MB; GPL-3.0 output of a public fork, not
   ROM content — rule 7 is not engaged), the two MRAs (WIDE + the
   `[STOCK CONTROL]` reference leg — XML metadata: names, CRCs, offsets), and
@@ -912,6 +926,15 @@ the archive once they stop shaping active work.)*
   close regardless of vs2; measured BOTH — vsavj (104: +96) AND vsav2
   (37_victor_ko_vsav2, native Donovan: +88) show it. Awaiting the
   maintainer's own hand check on stock vsavj, then CLOSE.**
+  **UPDATE 2026-08-28 (maintainer): NOT closed, and not to be closed yet.
+  The maintainer is gathering CAMERA evidence because original
+  hardware/MiSTer may DISAGREE with the emulation finding, and wants
+  bulletproof evidence before the topic is reopened. Until that arrives:
+  the emulator measurement stands as measured, nothing is re-derived, and
+  #113 stays OPEN. If the board does show something the emulators do not,
+  that is a cross-implementation finding about the white frame's
+  rendering (palette/CPS-B layer register at that frame — never measured,
+  see (b) above), not about the game data.**
 - **~~#99 — THE TYPE-0x51 REMAP~~ RE-RULED (maintainer, 2026-08-26, 14z-110):
   THE REACTION_HOOK D2-WINDOW SHAPE IS APPROVED, in the explicit order
   FIX -> AUDIT -> RE-FREEZE.** "Very well, I agree with all the proposal."

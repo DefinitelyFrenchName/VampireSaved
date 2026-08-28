@@ -18,15 +18,21 @@
 #      packager disables xdelta3's secondary compression so this scan
 #      sees the real payload. Must-fire control: a patch file with one
 #      reference chunk appended IS caught.
+#   4  THE PER-PLATFORM LAYOUT (14z-113, docs/project/release_format.md) —
+#      the tree's release/<name>/ has fbneo/ mame/ mister/, each with the
+#      patch set (manifests byte-identical), the emulator dirs carry the
+#      tree's driver patch + EMULATOR.md, mister/ carries MRAs +
+#      BITSTREAM.txt + MISTER.md, no cross-platform leakage; must-fire:
+#      a copy missing mame/emulator/ is rejected.
 #
 # Usage: ROMDIR=... tests/test_release_roundtrip.sh [build_rompath] [name]
-#   defaults build/m3b_merged15/rompath, merged-m8. Needs xdelta3.
+#   defaults build/m3b_merged17/rompath, merged-m10. Needs xdelta3.
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-RP="${1:-build/m3b_merged16/rompath}"  # re-pointed 14z-110b
-NAME="${2:-merged-m9}"
+RP="${1:-build/m3b_merged17/rompath}"  # re-pointed 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
+NAME="${2:-merged-m10}"  # re-pointed 14z-113
 [ -d "$RP" ] || { echo "SKIP: $RP missing"; exit 77; }
 command -v xdelta3 >/dev/null || { echo "SKIP: xdelta3 not installed"; exit 77; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
@@ -137,6 +143,45 @@ if not hits:
     print("FAIL: the rule-7 scan did not fire on a planted reference chunk"); sys.exit(1)
 print(f"  ok: must-fire control — planted reference chunk caught ({hits} hits)")
 PY
+
+echo "== 4. the per-platform layout of the tree's release/$NAME (14z-113, docs/project/release_format.md) =="
+REL="release/$NAME"
+if [ ! -d "$REL" ]; then
+    echo "  (no $REL in the tree — layout check not applicable)"
+else
+    for p in fbneo mame mister; do
+        for f in manifest.json apply_release.py README.md patches; do
+            [ -e "$REL/$p/$f" ] || { echo "FAIL: $REL/$p/$f missing"; fail=1; }
+        done
+    done
+    m0="$(shasum "$REL/fbneo/manifest.json" | cut -c1-40)"
+    for p in mame mister; do
+        [ "$(shasum "$REL/$p/manifest.json" | cut -c1-40)" = "$m0" ] \
+            || { echo "FAIL: $REL/$p/manifest.json differs from fbneo's"; fail=1; }
+    done
+    [ "$fail" = 0 ] && echo "  ok: three platform dirs, each with the patch set; manifests byte-identical ($(echo "$m0" | cut -c1-8))"
+    for p in fbneo mame; do
+        cmp -s "$REL/$p/emulator/0002-cps2-wide-v1.patch" "emu/$p-patches/0002-cps2-wide-v1.patch" \
+            && [ -f "$REL/$p/EMULATOR.md" ] \
+            || { echo "FAIL: $REL/$p/emulator/ patch missing or not the tree's emu/$p-patches/0002"; fail=1; }
+    done
+    ls "$REL/mister/"*.mra >/dev/null 2>&1 && [ -f "$REL/mister/BITSTREAM.txt" ] && [ -f "$REL/mister/MISTER.md" ] \
+        || { echo "FAIL: $REL/mister/ lacks an .mra, BITSTREAM.txt or MISTER.md"; fail=1; }
+    grep -q 'sha256' "$REL/mister/BITSTREAM.txt" \
+        || { echo "FAIL: BITSTREAM.txt carries no sha256 line"; fail=1; }
+    # cross-platform leakage: a platform dir must hold NOTHING of another platform's
+    ls "$REL/fbneo/"*.mra "$REL/mame/"*.mra "$REL/fbneo/"*.rbf "$REL/mame/"*.rbf >/dev/null 2>&1 \
+        && { echo "FAIL: MiSTer files inside an emulator platform dir"; fail=1; }
+    [ -e "$REL/mister/emulator" ] && { echo "FAIL: emulator patch inside mister/"; fail=1; }
+    [ "$fail" = 0 ] && echo "  ok: emulator dirs carry the tree's driver patch + EMULATOR.md; mister/ carries MRAs + BITSTREAM.txt + MISTER.md; no cross-platform leakage"
+    # must-fire control: the same checks on a copy with mame/emulator/ removed must FAIL
+    cp -r "$REL" "$W/layout_bad"; rm -rf "$W/layout_bad/mame/emulator"
+    if cmp -s "$W/layout_bad/mame/emulator/0002-cps2-wide-v1.patch" "emu/mame-patches/0002-cps2-wide-v1.patch" 2>/dev/null; then
+        echo "FAIL: layout control — a release missing mame/emulator/ was accepted"; fail=1
+    else
+        echo "  ok: must-fire control — a release missing mame/emulator/ is rejected"
+    fi
+fi
 
 if [ "$fail" = 0 ]; then
     echo "PASS: release package — round-trips byte-identical from pristine dumps,"

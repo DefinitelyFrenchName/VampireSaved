@@ -1,0 +1,27 @@
+jtcps2w.rbf — the CPS-2 WIDE MiSTer core this release's MRAs were verified with
+================================================================================
+sha256   46fc74afb6a6c5c6143db64d9c9f5d2e298cdd5c79449bb0370fbe9c2b3df66f
+size     3,111,944 B
+seed     18269            (jtcore cps2w -mister --nodbg --seed 18269)
+slack    +0.066 ns        (SDRAM 96 MHz domain, slow corner; jtframe timing gate PASS)
+built    2026-08-25 (build_id datestamp 260825), Quartus 20.1.1 Lite, jotego/jtcore20x
+fork     DefinitelyFrenchName/jtcores @ 7b9a0d2d (branch vampire-saved; RTL unchanged
+         through the current pin 63496069 — commits after 7b9a0d2d touch only the
+         Verilator harness, the README and doc/mame.xml)
+field    PASSED 14z-109 (bundle 14z108), 14z-112 (bundle 14z111), 2026-08-28 (bundle
+         14z112: WIDE on this core, stock on Jotego's own core, STOCK CONTROL on this core)
+
+THE FILE ITSELF IS NOT IN THIS DIRECTORY YET. It lives on the synthesis box
+(the jtcores build tree's release/mister/) and on the maintainer's SD cards.
+The maintainer ruled 2026-08-28 that it is to be tracked in-tree; the release
+format that decides WHERE (this directory, or one bitstream directory shared
+by every romset release) is open in STATE "Decisions pending". Until it lands,
+verify any copy against the sha256 above BEFORE flashing — a timing-FAILING
+seed emits an .rbf indistinguishable from a passing one (docs/platform/mister.md
+"REPRODUCING THE SHIPPING BITSTREAM"). The same seed rebuilds the same
+placement and timing but a DIFFERENT hash on a different day (datestamp).
+
+The two .mra files beside this record are byte-identical to the ones in the
+field bundle ../mister_fieldtest_14z112/ and resolve every CRC-identified part
+against merged-m10's vsavjw.zip plus the PRISTINE vsav/vsavj/qsound dumps:
+WIDE 31/31, STOCK CONTROL 22/22 (tools/check_mra_parts.py, 14z-113).

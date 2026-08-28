@@ -11,8 +11,16 @@
 > ## **(2) BUNDLE `../mister_fieldtest_14z112/` — ANSWERED 14z-113
 > ## (maintainer, 2026-08-28): NO REGRESSION.** Stock renders correctly on
 > ## Jotego's own core from the shared pristine `vsav.zip`, WIDE runs on
-> ## ours, the STOCK CONTROL boots too. One-zip packaging is field-proven;
-> ## freezing `build/m3b_merged17` is now unblocked (maintainer's call).
+> ## ours, the STOCK CONTROL boots too. One-zip packaging is field-proven
+> ## and **FROZEN as merged-m10 (14z-113): `build/m3b_merged17`, M8 mark
+> ## and fingerprint `32007911` UNCHANGED, tag `freeze/merged-m10`,
+> ## `release/merged-m10/` with the first in-tree `mister/` layer (MRAs +
+> ## BITSTREAM.txt; the `.rbf` itself is not in the tree yet — the RELEASE
+> ## FORMAT is the open item). Play with
+> ## `tools/run_wide.sh build/m3b_merged17 fbneo`.**
+> ## **#113 stays OPEN: the maintainer is gathering camera evidence that
+> ## original hardware/MiSTer may DISAGREE with the emulation finding —
+> ## do not close it, do not re-derive the emulator measurement.**
 > ## The STOCK CONTROL's remaining use is the superset invariant ON SILICON
 > ## — run it once per new `.rbf`, not per release (STATE "Decisions
 > ## pending"). **Next by the maintainer's own sequencing: the S1-S20
