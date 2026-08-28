@@ -348,6 +348,28 @@ between the games that does not exist.
 and `0xff` fills rows `0x0b` and `0x1b` entirely, an empty-ladder marker.
 Class `0x0b` correspondingly never appears as anyone's candidate.
 
+**WHO CAN BE DRAWN AGAINST WHOM — measured on the merged build 14z-116,
+after a field session spent hunting a matchup that cannot occur.** Scanning
+table A's REACHABLE candidates (indices 0-5 of each group; the scan bound
+`$FF8138` is 6) for the ported ids `0x10`/`0x11`/`0x13` returns **rows 16,
+17 and 19 and nothing else** — the tenants' own class rows. Consequences,
+all structural rather than probabilistic:
+
+- a tenant is scheduled as a CPU opponent **only when the player is a
+  tenant** (the shape of the #99 field crash: Donovan 1P -> CPU Phobos);
+- **no legacy class `0x00-0x0F` can ever draw one**, so a vanilla 1P arcade
+  run never meets the new characters;
+- **Shadow's pool is rows 32-34** (`($3BD << 3) + 0x800`, `PRG:0x00AF1C`)
+  **and holds no tenant in any group**, so the Shadow-vs-tenant matchup is
+  unreachable from the ladder in either implementation — 2P versus is its
+  only route.
+
+None of this is a defect: the port authored the tenants' own rows and never
+edited anyone else's, which is the conservative choice. It is recorded
+because "I played for two hours and never saw it" is otherwise indis-
+tinguishable from bad luck, and because changing it is a gameplay-feel
+decision (STATE "Decisions pending").
+
 **Legacy rows never reference a tenant class** (0 occurrences over classes
 `0x00-0x0F`), so in arcade mode the fifteen original characters never
 schedule Donovan, Phobos or Pyron. Extending that is a content decision

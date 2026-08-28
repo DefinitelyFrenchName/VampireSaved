@@ -951,6 +951,44 @@ our three tenants plus two Oboros; there is no Lilith/Victor/Aulbath
 alternate anywhere). Status of each on our build, all measured 14z-116:
 - **Oboro `0x18`** — shipping, ours, gated (`test_oboro_select.sh`), field-confirmed 14z-105. **CAUTION for the maintainer's floated idea of removing the hold-START hook "since Oboro and Dark Gallon were already in VS" (2026-08-28): that is true of DARK GALLON and NOT of OBORO.** Measured 14z-116: the only immediate writes of a character id in vsavj are `0x02`, `0x04`, `0x0B` and `0x12` — **no vanilla path anywhere writes `0x18` to `$382`.** vsavj ships Oboro's DATA complete (record `0x0B3450`, own palette block, 20 distinct bank rows) but no player-facing select path, which is precisely why 14z-105 added one. Removing the hook would make Oboro UNREACHABLE again; Dark Gallon would survive untouched, since that path is vanilla's own.
 - **Dark Gallon `0x12`** — vanilla's own path (Gallon + START + 2-3 punches *or* 2-3 kicks, `PRG:0x020B9C`); our Oboro hook displaces that block's first instruction and re-executes it, so it is preserved BY CONSTRUCTION. Statically certain, **never played** — the maintainer is field-testing it.
+- **FIELD VERDICT ON M9 (maintainer, MiSTer, 2026-08-28): "everything seems
+  right... the new character wheel already looks almost perfect on CRT,
+  Shadow works as intended, Dark Gallon is properly selectable with hold
+  start + 3 punches at the same time. All seems perfectly fine."** So the
+  E2 wheel is CRT-confirmed, Shadow is confirmed working on silicon, and
+  **DARK GALLON IS CONFIRMED PLAYABLE** — which also validates the 14z-116
+  static decode of `PRG:0x020C18` (the trigger accepts `0x300`/`0x500`/
+  `0x600`/`0x700`, i.e. two OR three punches; the board used three).
+  **TWO THINGS HE COULD NOT TEST IN ~2 HOURS OF TRYING, AND BOTH ARE
+  STRUCTURALLY IMPOSSIBLE — the time was spent on things that cannot
+  happen. Measured, so nobody spends another two hours:**
+  1. **A tenant from RANDOM SELECT.** Already measured this session: the
+     "?" draw is a fixed 15-entry table (`PRG:0x020C88`) holding no
+     variant-half id, bound `cmpi.b #$f`. It is not luck, it cannot occur.
+  2. **SHADOW vs a tenant, in 1P arcade.** NEW measurement: scanning ladder
+     table A (`PRG:0x00B268`, 36 rows x 8 groups, reachable indices 0-5 —
+     the scan bound `$FF8138` is 6) for a tenant candidate returns **rows
+     16, 17 and 19 ONLY — i.e. classes `0x10`/`0x11`/`0x13`, the tenants'
+     own rows.** A tenant appears as a CPU opponent *only when the player is
+     a tenant* (which is exactly the shape of the #99 field crash: Donovan
+     1P -> CPU Phobos). **Shadow's own pool is rows 32-34** (`0x800 +
+     $3BD*8`) **and contains no tenant in any group.** So Shadow can never
+     draw one from the ladder, however long you play.
+  **HOW TO TEST IT ON THE BOARD:** 2P VERSUS — P2 picks the tenant with the
+  sticks, P1 does the Shadow code. That is exactly what the emulator rig
+  does (`tests/replays/113_shadow_vs_tenant.rpl`), and it is the only route
+  either implementation has to that matchup.
+- **A BIGGER GAP THE SAME SCAN EXPOSED, for the maintainer to rule on: NO
+  LEGACY CHARACTER EVER MEETS A TENANT IN 1P ARCADE.** Rows `0x00-0x0F`
+  contain no reachable tenant candidate at all, so a 1P run as Morrigan (or
+  anyone vanilla) can never be scheduled against Donovan, Phobos or Pyron.
+  The port authored the tenants' OWN rows (what they fight) and never added
+  them to anyone else's. This is the same family as the random-select item
+  and arguably more noticeable in play — a player's whole arcade experience
+  never shows the new characters unless they pick one. **Not built, not
+  scoped, no recommendation without a ruling**, and it is a GAMEPLAY-FEEL
+  change (who you fight, and the ladder is already a lottery), so it is the
+  maintainer's call per CLAUDE.md 5.
 - **SHADOW vs A TENANT — MEASURED AND GREEN (14z-116).** The maintainer's
   question ("the big problem is not selecting him, it's knowing whether the
   game breaks", INCLUDING "does Shadow take the SHELL character instead of
