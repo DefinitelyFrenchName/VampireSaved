@@ -4,6 +4,16 @@ Measured 14z-106 (2026-08-22) on `build/m3b_merged13` (merged-m6,
 fingerprint `64426955`) and the pristine `vsav.zip` in `$ROMDIR`. Every
 figure names its instrument; re-run them before quoting. The platform
 facts (bus widths, tiers) are in `docs/platform/mister.md`.
+**Provenance note, 14z-113:** the current freeze is merged-m9
+(`build/m3b_merged16`, fingerprint `32007911`) and `build/m3b_merged13` was
+deleted in the 14z-112 build-dir sweep. The ceilings this document feeds
+into the placement — group-C `0xEE73` / `0xFFDB`, QSound live `0x8E57F0`,
+PRG live `0x5FFF1E` — are RE-DERIVED from the current build on every run of
+`tests/audit_mister_map_fit.sh` (`MAP_FIT_BUILD`, default `m3b_merged16`)
+and have not moved. §1's wide_ext HIGH-WATER MARK `0x4D10F3` is NOT
+gate-frozen and is merged-m6's: merged-m9 shifted the extension by
++0x10D0/+0x1ED0/+0x2B60 (STATE 14z-111), so quote that figure with its
+freeze.
 
 > **This file measures DEMAND — what the roster needs, region by region.**
 > What that demand implies, in causal order, is

@@ -1,4 +1,4 @@
-# CPS-2 WIDE — extended hardware profile (v1 DRAFT, awaiting ratification)
+# CPS-2 WIDE — extended hardware profile (v1, RATIFIED — implemented in three emulators/cores)
 
 Vampire Savior with all 18 characters does not fit a stock CPS-2. One
 character costs ~338 KiB of program ROM and ~16-18K tiles; the stock free
@@ -6,9 +6,16 @@ space is ~1 KiB of PRG and ~370 tiles. WIDE is the named, versioned
 hardware profile that makes the roster physically possible, implemented
 identically by every emulator target.
 
-**Status: DRAFT.** Sizes below are the maintainer-approved intent
-(round 66); Phase A measurements are complete and recorded. Ratification
-happens after Phase B proves the profile inert.
+**Status: RATIFIED (header updated 14z-113; it had read "DRAFT, awaiting
+ratification" since 2026-08-03).** Sizes below are the maintainer-approved
+intent (round 66); Phase A measured, Phase B0-B5 PASSED (the profile inert
+on FBNeo and MAME, the extension proven USED with negative controls), and
+the profile is governed by CLAUDE.md rule 1 v2 as the ONE bounded exception
+to the no-core-changes rule. Three implementations ship it: FBNeo
+(`emu/fbneo-patches/0002`), MAME (`emu/mame-patches/0002`) and the MiSTer
+core `jtcps2w` (slices D0-D5, "THE MiSTer EDITION" below), the last
+field-tested on hardware at 14z-109/14z-112. Profile version v1.2 (the
+14z-86 content-member changes noted in the block below).
 
 ## The profile
 

@@ -89,11 +89,13 @@ Entry points at this level, deliberately not in a bucket:
 - [`mister_map.md`](project/mister_map.md) — the MiSTer SDRAM PLACEMENT MAP:
   which region lands in which bank at which offset and why it fits, the
   `.rom` layout against the 26-bit `ioctl_addr`, the QSound split, the 6 MB
-  PRG decode proposal, and the RTL slice plan D0-D4 (**D0, D1 and D2 done —
-  14z-107 (5)/(6)/(9)**: the MRA trim with §3's proposed TOML row corrected
-  in place, the runtime profile gate + QSound width, and the placement
-  itself, whose whole-image census corrected this document's own slack
-  figure from 0.708 MB to 0.125 MB. **D3, the obj promote, is next.**)
+  PRG decode proposal, and the RTL slice plan (**D0-D5 ALL DONE, 14z-107
+  (5)-(11)** — the MRA trim, the runtime profile gate + QSound width, the
+  placement whose whole-image census corrected this document's own slack
+  figure from 0.708 MB to 0.125 MB, the obj promote, the 6 MB program
+  window and the decryption range; **field-tested on hardware 14z-109 and
+  14z-112**. The document is the DERIVATION and keeps its retraction
+  history; its STATUS paragraph at the top is current as of 14z-113)
 - `tenant_manifest.md`, `tables/` — port config; community-reviewable
   behavioural tables
 - `M1_acceptance.md`, `M2_feasibility.md`, `M3b_plan.md` — milestones

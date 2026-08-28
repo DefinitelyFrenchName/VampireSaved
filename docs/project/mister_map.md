@@ -2,8 +2,11 @@
 
 Design + measurement, 14z-107 (4). **No RTL was written for this document.**
 Every figure names its instrument; every RTL claim names `file:line` in the
-pinned submodule `emu/jtcores` (jotego/jtcores `v1.7.3` + our fork commits,
-pin `74ed17d`). Platform facts live in `docs/platform/mister.md`; the
+pinned submodule `emu/jtcores` (jotego/jtcores `v1.7.3` + our fork commits;
+the pin was `74ed17d` when this was designed and is `63496069` at 14z-113 —
+read it from `tools/setup_jtcores.sh`, the `file:line` references below
+were taken at the design pin and the shared files they name are
+byte-untouched since, `test_jtcores_twin` 2e). Platform facts live in `docs/platform/mister.md`; the
 region-by-region content measurements live in `docs/project/mister_fit.md`;
 the profile itself is `docs/project/cps2_wide.md`.
 
@@ -31,6 +34,17 @@ more tenant tile inside the existing 16 MB costs nothing) and a worse one for
 headroom (the group-C romset region cannot grow past 16 MB at all). §5's
 tables carry the correction in place.
 
+**STATUS AT 14z-113 (this header's own claims below were 14z-107 (12)'s
+and are superseded in place): D0-D5 ARE IN THE RTL; THE WIDE ROMSET BOOTS
+ON THE CORE; BOTH GROUP-C OBJ BANKS ARE FETCHED (wheel 14z-107 (11), FIGHTER
+14z-108: 1,735 codes in obj bank 4, 843 frames after match start); A TENANT
+HAS BEEN SELECTED AND HAS FOUGHT ON THE CORE (14z-108, `test_mister_tenant_oracle`
+agreeing on every mapped field); THE QSOUND EXTENSION IS FETCHED (14z-108);
+AND ALL OF IT HAS RUN ON HARDWARE — field test PASSED 14z-109, re-confirmed
+on bundle 14z112 (2026-08-28) with stock Vampire Savior coexisting on the
+same card. `docs/project/mister_core.md` §12 is the ledger of what is STILL
+never done (pixels and audio never MEASURED; timing a seed lottery).**
+
 **SLICES D3, D4 AND D5 ARE IN THE RTL, THE WIDE ROMSET BOOTS ON THE CORE,
 AND TENANT ART HAS BEEN FETCHED — obj bank 5 only (14z-107 (11)+(12)).**
 The CPS-2 Turbo object promote
@@ -49,8 +63,10 @@ art — has never been fetched, and the reason is the HARNESS.** The simulator's
 direction bits were **REVERSED end for end** (measured on all four against the
 game's own `$FF8058` mirror, 14z-108: Up arrived as Right, Down as Left, Left
 as Down, Right as Up), so the tenant-picking replay put the cursor on a legacy
-character. **FIXED 14z-108** in `tools/rpl2siminputs.py`. **No tenant has ever been in a match on the core, no frame has been
-compared programmatically against MAME's, and nothing has run on hardware.**
+character. **FIXED 14z-108** in `tools/rpl2siminputs.py`. ~~**No tenant has ever been in a match on the core, no frame has been
+compared programmatically against MAME's, and nothing has run on hardware.**~~
+**All three superseded — see the STATUS paragraph at the top of this file
+(14z-113); what remains never done is a MEASURED frame or audio comparison.**
 `docs/project/mister_core.md` §12 is the ledger of what has never been tried.
 **[SUPERSEDED, kept because its ELIMINATIONS stand — the state before D5:**
 "What has NOT happened is the end-to-end demonstration: the WIDE romset does

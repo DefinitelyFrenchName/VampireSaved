@@ -145,11 +145,19 @@ staleness rule).
 
 ---
 
-## 6. Known-stale inventory (measured 14z-113; nothing below is corrected here)
+## 6. Known-stale inventory (measured 14z-113) — **THE PASS RAN 14z-113, same session, after the maintainer's board results (ruling (2))**
 
-Each item names the file:line, what it says, what is true now, and the
-session that moved it. **These are candidates for one retraction-discipline
-pass (grep the CLAIM, fix header and summary first, re-grep).**
+Each item names the file:line, what it said, what is true now, and the
+session that moved it. **Status after the pass: S1-S12, S14-S17, S19, S20
+FIXED IN PLACE** (header/summary first, history kept and marked, the
+correcting session named at each site); **S13** was never a defect;
+**S18** is RE-STATED at each site (the `.rbf` is a build-tree path, to be
+tracked in-tree per the 2026-08-28 ruling — the tracking itself is the
+open RELEASE FORMAT item, not a doc fix). Line numbers below are as
+measured BEFORE the pass. The measurement records inside `mister.md`
+that name `build/m3b_merged13` (§ "It is not the romset", the bank-load
+runs) were left as written — they are logs of runs on that image; only
+the OPERATIONAL commands (HANDOFF, the Recipe) were re-pointed.
 
 | # | where | says | true now | moved at |
 |---|---|---|---|---|

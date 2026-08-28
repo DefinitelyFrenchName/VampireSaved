@@ -35,9 +35,12 @@
 # Usage:
 #   tools/mister_mra.sh --core cps2w [options]
 #     --core NAME          cps2 | cps2w              (default cps2w)
-#     --wide BUILD_DIR     stage BUILD_DIR/rompath/{vsavjw,vsav}.zip, i.e.
-#                          build the WIDE leg. Without it the pristine
-#                          $ROMDIR sets are staged (the stock leg).
+#     --wide BUILD_DIR     stage BUILD_DIR/rompath/vsavjw.zip beside the
+#                          PRISTINE $ROMDIR/vsav.zip, i.e. build the WIDE
+#                          leg (since 14z-112 a build packs no vsav.zip of
+#                          its own; a pre-14z-112 build that still has one
+#                          is used with a loud NOTE). Without --wide the
+#                          pristine $ROMDIR sets are staged (the stock leg).
 #     --no-rom             pass `jtframe mra -n`: MRAs only, no .rom, no zip
 #                          reads at all. This is the ROM-FREE mode — the MRA
 #                          XML is then a pure function of doc/mame.xml plus

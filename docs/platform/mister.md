@@ -21,7 +21,12 @@ an FPGA re-implementation of the MAME emulation. jtcores and jtframe are
 the fork is public and FOSS by obligation. Simulation is the gate;
 hardware (MiSTer, 128 MB SDRAM, Jammix card → CRT at native timing) is the
 field test. Distribution = MRA + RBF over the same release members as
-`release/<name>/`, plus a stock-`vsav` reference-leg MRA.
+`release/<name>/`, plus a stock-`vsav` reference-leg MRA. **(Status,
+updated 14z-113: the field test has run — PASSED 14z-109 on a DE10-Nano,
+re-confirmed on bundle 14z112 on 2026-08-28 with stock Vampire Savior
+coexisting on the same card; the `[STOCK CONTROL]` reference-leg MRA ships
+since 14z-109; the `.rbf` + MRAs are to be tracked in-tree under
+`release/` by the maintainer's ruling of 2026-08-28 — format open in STATE.)**
 
 ## Where things are
 
@@ -29,7 +34,7 @@ field test. Distribution = MRA + RBF over the same release members as
 |---|---|
 | the fork | https://github.com/DefinitelyFrenchName/jtcores, branch `vampire-saved`, from upstream tag `v1.7.3` = `63688ce5` |
 | pinned here | submodule `emu/jtcores` (branch `vampire-saved`); `tools/setup_jtcores.sh` checks the pin, inits the five modules the cps2 yaml chain pulls, and regenerates `emu/jtcores-patches/` as a PATCH SERIES, one file per fork commit (`modules/jtframe/target/pocket` is a PRIVATE ssh submodule — never init it) |
-| the fork's commits | `b9d0565` `cores/cps2w` scaffold (14z-106) · `553dd56` sim work-RAM dumps · `6c32be8` sim SDRAM top address bit · `4f25cc7` sim model clock · `74ed17d` sim SDRAM stats · `38acc638` the WIDE machine entry + the MANDATORY QSound trim in the MRA (14z-107 (5), slice D0) · `4840df8a` **THE FIRST RTL COMMIT — the QSound sample-bank width, RUNTIME-GATED** (14z-107 (6), slice D1) · `692ba4d6` + `7cf1eedb` the frame writer made optional and its child made `_exit` (14z-107 (7)) · `519aff8b` the joystick top bits (14z-107 (8)) · `0df6f000` **THE SDRAM PLACEMENT** (14z-107 (9), slice D2). Commits 1-6 touched no RTL. The mirrored series is `emu/jtcores-patches/0001`-`0011` |
+| the fork's commits (**24 at the 14z-113 pin `63496069`**; this row had stopped at D2 until 14z-113) | `b9d0565` `cores/cps2w` scaffold (14z-106) · `553dd56` sim work-RAM dumps · `6c32be8` sim SDRAM top address bit · `4f25cc7` sim model clock · `74ed17d` sim SDRAM stats · `38acc638` the WIDE machine entry + the MANDATORY QSound trim in the MRA (14z-107 (5), slice D0) · `4840df8a` **THE FIRST RTL COMMIT — the QSound sample-bank width, RUNTIME-GATED** (14z-107 (6), slice D1) · `692ba4d6` + `7cf1eedb` the frame writer made optional and its child made `_exit` (14z-107 (7)) · `519aff8b` the joystick top bits (14z-107 (8)) · `0df6f000` **THE SDRAM PLACEMENT** (14z-107 (9), slice D2) · `17a5dc2b` the SDRAM READ PROBE · `b9899fa8` **THE OBJECT PROMOTE** (slice D3) · `fd454393` the frame writer's frame window · `dd242a65` **THE 6 MB PROGRAM WINDOW** (slice D4) · `72738d51` the sim-only 68k program-ROM read probe · `c00d7ce7` **THE DECRYPTION RANGE** (slice D5, 14z-107 (11)) · `7b9a0d2d` the D4 comment retraction · `c97e3d14` README brought to D0-D5 (14z-109) · `4dfc3734` **P2 SCRIPTABLE** in `sim_inputs.hex` (14z-109) · `68448ec5` / `fc04a8ec` / `f5a3391a` / `63496069` the `vsavjw` catalogue CRCs for the 14z-110 / M7 / 14z-110b / 14z-111 freezes (the MiSTer TAIL of each re-freeze). Commits 1-6 touched no RTL; the catalogue commits touch only `doc/mame.xml`. The mirrored series is `emu/jtcores-patches/0001`-`0024`, one file per commit |
 | the new core | `cores/cps2w/` in the fork → RBF `jtcps2w.rbf` (jtframe names the RBF `"jt" + <core dir>`; `CORENAME=JTCPS2W` is what the MRA's `<rbf>` is matched against, upper-cased) |
 | the reference core | `cores/cps2/` — untouched, by design |
 | jtframe | `modules/jtframe` is VENDORED in the jtcores tree at v1.7.3 (not a submodule); its Go tool builds with `cd modules/jtframe/src/jtframe && go build -o jtframe .` (Go ≥ 1.2x; `brew install go`). The `bin/jtframe` wrapper uses GNU `date -d` / `stat -c` and needs coreutils on macOS — call the built binary directly instead |
@@ -57,8 +62,10 @@ DROPS those four from the reference cores' lists, because `jtframe files`
 deduplicates by full path and would otherwise compile both copies of the
 same module (measured: `jtframe files sim cps2w` lists ours and NONE of the
 four originals; `... cps2` lists the originals and none of ours; the two
-lists differ in exactly **eleven** entries — 4 out, and 6 overrides plus
-1 new jtframe module in). `cores/cps1`, `cores/cps2` and `cores/cps15` are
+lists differed in exactly **eleven** entries at D2 — 4 out, and 6 overrides plus
+1 new jtframe module in — **and in 22 since D5 (fourteen files in
+`cores/cps2w/hdl`: thirteen `.v` plus `pal_lut.hex`; the D2 figures in
+this paragraph are that slice's record, updated 14z-113)**. `cores/cps1`, `cores/cps2` and `cores/cps15` are
 BYTE-UNTOUCHED against upstream `v1.7.3` — `tests/test_jtcores_twin.sh` 2e
 asserts it with `git diff`, 2f holds the fork's WHOLE-TREE delta to a
 declared 18 paths, and `tests/test_mister_wide_gate.sh` freezes the override
@@ -71,7 +78,8 @@ would compile. D1 paid this once — `cores/cps15/cfg/qsound.yaml` had to be
 INLINED into cps2w's `game.yaml` minus `jtcps15_sound.v`. D2 paid it again
 and larger: `jtcps1_sdram.v` and `jtcps1_prom_we.v` come from
 `cores/cps1/cfg/common.yaml`, so that yaml is now inlined too, minus those
-two. cps2w's `game.yaml` is consequently 68 lines different from cps2's and
+two. cps2w's `game.yaml` is consequently 68 lines different from cps2's at
+D2 (**73 since D3-D5**, updated 14z-113) and
 is frozen in `tests/expect/cps2w_game_yaml_delta.txt` rather than in a shell
 string. **The rule to carry forward: overriding one shared file costs you
 the whole yaml that pulled it, and the two copies then have to be kept in
@@ -763,8 +771,10 @@ blocked only by bank PLACEMENT — is worked out in
    MRAs in `release/mra/` AND `rom/vsavj.rom` (46,407,744 bytes, sha1
    `f9dc2987…`) — the `.rom` is ROM content: scratch only. **Since
    14z-107 (5) do not do this by hand either:** `ROMDIR=...
-   tools/mister_mra.sh --core cps2w [--wide build/m3b_merged13] --out <dir
-   outside the repo>` does the clone, the private `$HOME` staging and the
+   tools/mister_mra.sh --core cps2w [--wide build/m3b_merged16] --out <dir
+   outside the repo>` (the current freeze's build — `m3b_merged13`, which
+   the measurements further down this file name, was deleted in the
+   14z-112 sweep; those records stay as written) does the clone, the private `$HOME` staging and the
    run, and prints the size + sha1 of every `.rom` it makes. `--wide` is
    what selects the WIDE leg's zips; without it you get the stock reference
    leg. **CORRECTED 14z-112: builds no longer pack a parent — the four patched members live INSIDE `vsavjw.zip` and BOTH legs use the PRISTINE dump, so one SD card can carry this profile and stock Vampire Savior.**
@@ -1590,10 +1600,15 @@ away.
   is what makes a full 67 MB byte-exact census a few seconds of pure Python
   with no numpy dependency.
 - **`tools/mister_mra.sh` is what makes a WIDE leg possible at all.** The
-  WIDE set is a CLONE set and `jtframe mra` reads a hard-coded **CORRECTED 14z-112: builds no longer pack a parent — the four patched members live INSIDE `vsavjw.zip` and BOTH legs use the PRISTINE dump, so one SD card can carry this profile and stock Vampire Savior.**
-  Historically the parent was the build's own patched `vsav.zip`;
-  `$HOME/.mame/roms`. `run_sim_jtcps2.sh --wide <build>` delegates to that
-  script, which stages a private `$HOME` per run.
+  WIDE set is a CLONE set and `jtframe mra` reads its parent from a
+  hard-coded `$HOME/.mame/roms`. Historically the parent was the build's
+  own PATCHED `vsav.zip`; **CORRECTED 14z-112: builds no longer pack a
+  parent — the four patched members live INSIDE `vsavjw.zip` and BOTH legs
+  use the PRISTINE dump, so one SD card can carry this profile and stock
+  Vampire Savior** (field-confirmed 2026-08-28). `run_sim_jtcps2.sh --wide
+  <build>` delegates to that script, which stages a private `$HOME` per
+  run. (This bullet had the 14z-112 correction spliced mid-sentence until
+  14z-113 re-flowed it.)
 
 ## The per-bank SDRAM traffic profile (measured 14z-107 (3))
 
@@ -1831,7 +1846,8 @@ and diffs them.
 The MRA twin above is unchanged and still exact. What changed is the CORE
 DIR: cps2w carries RTL, so "identical modulo CORENAME" became "identical
 modulo an ENUMERATED delta" — **six** files in `cores/cps2w/hdl` since slice
-D2 (it was four at D1), a frozen line-by-line diff for the FOUR that override
+D2 (it was four at D1; **fourteen since D5** — thirteen `.v` plus
+`pal_lut.hex`, whole-tree delta 25 paths, updated 14z-113), a frozen line-by-line diff for the FOUR that override
 shared files (`tests/test_mister_wide_gate.sh` check 1), `git diff` proving
 `cores/cps1`, `cores/cps2`, `cores/cps15` never moved
 (`tests/test_jtcores_twin.sh` 2e), and — added at D2, because D2 puts a file
@@ -1924,9 +1940,12 @@ any core.
   select-reaching 2,600-frame run is ~45 min and the 12,120-frame
   `05_timeout_idle` is ~3.5-4 h. Fine for a gate that dumps at a few §4
   anchors; not a per-frame sweep of the 46-replay corpus.
-- Input coverage: the v1.7.3 harness is P1-only with 4 buttons, so
-  `02_demitri_vs_cpu` and `04_select_fuzz` still refuse. Extending
-  `test.cpp`'s `SimInputs` (P2, buttons 5/6) is a further fork commit —
+- Input coverage — **CURRENT STATE (14z-113 rewrite of the lead): P1 AND
+  P2, directions + buttons 1-3 each; buttons 4/5/6 REFUSED by
+  `rpl2siminputs.py`** (button 4's bit doubles as `dip_test`), so
+  `02_demitri_vs_cpu` and `04_select_fuzz` still refuse. History: the
+  v1.7.3 harness was P1-only with 4 buttons; extending
+  `test.cpp`'s `SimInputs` (P2, buttons 5/6) was a further fork commit —
   **DECIDED (maintainer, 2026-08-23): later — and "later" ARRIVED at
   14z-109 (maintainer-ruled during the #99 crash hunt): P2 IS SCRIPTABLE**
   (fork `4dfc3734`, file bits 12+, backward compatibility proven by the
