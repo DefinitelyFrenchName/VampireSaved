@@ -33,6 +33,28 @@ MRA, `jtcps2w.rbf` (hash-verified against `BITSTREAM.txt` by the packager),
 `MISTER.md`. Field bundles before 14z-113 were assembled by hand outside the
 tree.
 
+**WHAT IS AND IS NOT A CARD BUNDLE (14z-116 — the maintainer asked, so it is
+written down).** A hand-assembled bundle directory holds only two things the
+SD card wants — `_Arcade/` (the two MRAs) and `games/mame/` (the zips). The
+loose `*.rom` files and the `mra/` tree beside them are jtframe BY-PRODUCTS
+of generating those (the download images and the upstream MRA tree); nothing
+on the card reads them. **And a sibling directory suffixed `_stock` is the
+STOCK LEG of the same run** — `tools/mister_mra.sh --core cps2w` *without*
+`--wide` — carrying only the stock `.rom` images and `mra/`: no `_Arcade/`,
+no `games/`, nothing of this port's. **It is not a card bundle and there is
+nothing in it to field-test**; its shared `.rom` files are byte-identical to
+the WIDE bundle's. Safe to delete; one command regenerates it. (Do not
+confuse it with the `[STOCK CONTROL]` MRA, which IS shipped, lives in the
+WIDE bundle's `_Arcade/`, and is the superset invariant on silicon.)
+
+**CHECK A BUNDLE'S CURRENCY BY HASH, NOT BY ITS NAME.** A bundle is current
+iff its `games/mame/vsavjw.zip` matches the freeze's
+`build/<dir>/rompath/vsavjw.zip`; the other three zips are the pristine
+parents from `$ROMDIR`. `../mister_fieldtest_14z115/` was verified current
+against `build/m3b_merged18` this way at 14z-116. **Its README was missing**
+— every earlier bundle had one — and was written at 14z-116; if a bundle is
+assembled by hand again, the README is part of it.
+
 1. **Verify the `.rbf` hash before flashing** — a timing-failing seed emits an
    indistinguishable bitstream (`platform/gotchas.md`). The record is
    `BITSTREAM.txt`: seed 18269, sha256 `46fc74af…`, 3,111,944 B.
