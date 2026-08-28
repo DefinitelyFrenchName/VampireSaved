@@ -363,14 +363,33 @@ sized:
   (high-entropy data continuing beyond `0x0C6A8`), so the read is in
   bounds; **what those particular VALUES mean is not established.**
 
-**RESIDUALS — what static analysis cannot settle, and what would.** (1) Does
-Shadow's fighter draw the tenant's art, which lives in group C banks 4/5
-under the WIDE profile, when `0x084648` forces bank 2 (`0x4000`) for its own
-record? (2) Does Shadow's silhouette palette compose correctly over a
-tenant's palette rows? Both are RENDER questions, and no RAM gate can see
-them ([VSP-43]). The rig that would settle them is a replay that navigates
-to `0x0B`, presses START 5x, confirms, and fights a tenant — cheap to
-script now that the arming condition is known to be START PRESSES.
+**MEASURED 14z-116 — AND ONE CORRECTION TO THE PARAGRAPHS ABOVE.** The rig
+was built and run (`tests/replays/113_shadow_vs_tenant.rpl`, gate
+`tests/test_shadow_tenant.sh`, on `build/m3b_merged18`):
+
+- **`PRG:0x009BB2` IS NOT MATCH INIT.** This section first called it that.
+  It is the ROUND/MATCH-END path — `a0`/`a1` come from `$13A(a5)`/`$13C(a5)`,
+  the WINNER and LOSER pointers the same sequencer sets at `PRG:0x0098BC`.
+  Measured: with the flag set, P1's id did NOT change at match start; it
+  changed at the instant P2's HP went negative. **So Shadow does not pick a
+  character at select and keep it — he TAKES THE CHARACTER HE JUST BEAT,
+  round by round.** Arming alone leaves you playing whatever the roulette
+  landed on (measured: Bulleta, rendering normally, no silhouette).
+- **AND HE TAKES THE TENANT, NOT THE SHELL.** P1 beat Donovan and flipped
+  `0x00 -> 0x13` with the loader installing **`0x003FA9D0`, Donovan's own
+  record** — not `0x0009769E`, Victor's, which is the shell `0x13` aliases
+  and the failure this test was written to catch. The HUD reads "Donovan"
+  and the art is his (snapshot at f8400). The run stayed guard-clean for
+  **END 21120** across several further morphs.
+- The four-press control does not arm, does not set `$3BC`, and does not
+  morph — so the armed leg is measuring the flag and not the scenario.
+
+**RESIDUALS — what static analysis cannot settle, and what would.** The
+group-C render question is ANSWERED for the morph case (the tenant's art
+draws correctly, snapshot above). Still open: what the black-silhouette
+presentation actually requires, since arming `$3BC` alone did not produce
+one on this Japan set, and what the `PRG:0x00C668` values selected by
+`$3BD + 0x20` mean. Neither blocks anything.
 
 **THE COPY IS AN UNMASKED BYTE MOVE, WHICH IS THE WHOLE ANSWER FOR THIS
 PORT.** `move.b $382(a1),$382(a0)` applies no mask, no bound and no fold,

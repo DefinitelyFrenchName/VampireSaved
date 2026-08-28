@@ -951,7 +951,25 @@ our three tenants plus two Oboros; there is no Lilith/Victor/Aulbath
 alternate anywhere). Status of each on our build, all measured 14z-116:
 - **Oboro `0x18`** — shipping, ours, gated (`test_oboro_select.sh`), field-confirmed 14z-105. **CAUTION for the maintainer's floated idea of removing the hold-START hook "since Oboro and Dark Gallon were already in VS" (2026-08-28): that is true of DARK GALLON and NOT of OBORO.** Measured 14z-116: the only immediate writes of a character id in vsavj are `0x02`, `0x04`, `0x0B` and `0x12` — **no vanilla path anywhere writes `0x18` to `$382`.** vsavj ships Oboro's DATA complete (record `0x0B3450`, own palette block, 20 distinct bank rows) but no player-facing select path, which is precisely why 14z-105 added one. Removing the hook would make Oboro UNREACHABLE again; Dark Gallon would survive untouched, since that path is vanilla's own.
 - **Dark Gallon `0x12`** — vanilla's own path (Gallon + START + 2-3 punches *or* 2-3 kicks, `PRG:0x020B9C`); our Oboro hook displaces that block's first instruction and re-executes it, so it is preserved BY CONSTRUCTION. Statically certain, **never played** — the maintainer is field-testing it.
-- **SHADOW vs A TENANT — the maintainer's actual question (2026-08-28): "the big problem is not selecting him, it's knowing whether the game breaks", INCLUDING the quiet failure "does Shadow take the SHELL character instead of the tenant".** STATIC PASS DONE 14z-116 (all eleven `$3BC` consumers disassembled and classified, `select_screen.md` "SHADOW vs A TENANT"): **on identity the mechanism is decisive — Shadow becomes the TENANT, not the shell.** The copy is `move.b $382(a1),$382(a0)`, no mask/fold/bound, and char-init then runs the same 32-row unmasked loader a normal tenant pick runs. Every presentation surface is FORCED to Shadow's own row `0x20` (win quote, name) rather than indexing the tenant. The two sites that see a tenant id — the ladder base `($3BD << 3) + 0x800` and the `PRG:0x00C668` byte table at `$3BD + 0x20` — were BOUNDS-CHECKED and both stay in range (ladder table A is exactly 36 rows of `0x40`; tenant ids land in row 34, in bounds). **RESIDUAL, and it needs a RUN, not more disassembly:** whether Shadow's fighter draws the tenant's group-C art when `PRG:0x084648` forces bank 2 for Shadow's own record, and whether the silhouette palette composes over a tenant's rows. Both are RENDER questions no RAM gate can see. **The rig is cheap now that the arming is known to be START PRESSES**: navigate to `0x0B`, 5x START, confirm, fight a tenant — not built, offered.
+- **SHADOW vs A TENANT — MEASURED AND GREEN (14z-116).** The maintainer's
+  question ("the big problem is not selecting him, it's knowing whether the
+  game breaks", INCLUDING "does Shadow take the SHELL character instead of
+  the tenant") was answered by a RUN, not by disassembly. Rig:
+  `tests/replays/113_shadow_vs_tenant.rpl`, gate `tests/test_shadow_tenant.sh`
+  (emulator tier, ~6 min, two runs, must-fire control). **RESULT: Shadow
+  takes the TENANT.** P1 armed the code (5 START presses on "?"), beat P2
+  Donovan, and at the round end flipped `0x00 -> 0x13` with the loader
+  installing **Donovan's own record `0x003FA9D0`** — not Victor's
+  `0x0009769E`, the shell `0x13` aliases, which is exactly the quiet failure
+  the gate is written to catch. HUD reads "Donovan", art is his, and the run
+  is **guard-clean END 21120** across several further morphs.
+  **TWO CORRECTIONS TO MY OWN EARLIER STATIC PASS, both from this run:**
+  (1) `PRG:0x009BB2` is NOT match init — it is the ROUND/MATCH-END path
+  (`$13A`/`$13C` are the winner/loser pointers), so **Shadow does not keep a
+  pick, he takes the character he just beat, round by round**; (2) arming
+  alone leaves you playing the roulette's pick rendering NORMALLY (measured:
+  Bulleta, no silhouette), so what produces the black-silhouette
+  presentation on this Japan set is still unestablished — it blocks nothing.
 - **Shadow** — present and vanilla: exactly 5 START presses on the "?" cell then any attack button (`select_screen.md`), which matches the community code instruction for instruction. The mechanism copies the OPPONENT's id and palette **UNMASKED** at `PRG:0x009BB2`, and every table the copied id then indexes is 32 rows with our tenant rows populated, **so Shadow-copying a TENANT is structurally expected to work**. Never run — this is the `coverage_matrix` "morphing INTO a tenant" cell, and it now has a mechanism attached rather than an unknown.
 
 

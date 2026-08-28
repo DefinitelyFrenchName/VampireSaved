@@ -3167,6 +3167,24 @@ tests/test_oboro_select.sh [wide stock] # 14z-105 (W1, ~4 min, 5 MAME runs): THE
                                       # pokes — the pick is made with the
                                       # sticks. Verdict control. Defaults
                                       # build/m3b_merged13 + build/m5_stock6
+tests/test_shadow_tenant.sh [wide]   # 14z-116 (~6 min, 2 MAME runs): SHADOW
+                                      # MORPHING INTO A TENANT. The "?" cell
+                                      # + FIVE START PRESSES arms $43
+                                      # (PRG:0x020CB0 — presses, not a hold);
+                                      # confirm sets $3BC; at the ROUND END
+                                      # PRG:0x009BB2 gives the flagged winner
+                                      # the LOSER's id, UNMASKED. Asserts P1
+                                      # beats tenant Donovan and becomes
+                                      # id 0x13 with DONOVAN'S OWN record
+                                      # 0x003FA9D0 — the point is that it is
+                                      # NOT Victor's 0x0009769E, the shell
+                                      # 0x13 aliases (the quiet failure the
+                                      # maintainer named). Must-fire control:
+                                      # the same replay with FOUR presses
+                                      # must not arm, not set $3BC and not
+                                      # morph. Replay 113; only the FIRST
+                                      # morph is deterministic (the arcade
+                                      # draw is a lottery past ~8500).
 tests/test_version_string.sh [outbase] # 14z-105 (W2, ~2 min, 2 MAME runs): the
                                       # select-screen VERSION STRING — the
                                       # wheel record's last N entries are the
