@@ -277,7 +277,7 @@ and the romset is untouched.**
    **16-bit** header word (`corerom.go:174-183`,
    `jtcps1_prom_we.v:73-76`). Max representable start is 65,535 KiB.
 
-**So the WIDE romset cannot be downloaded to MiSTer as a straight
+**[MSV-8]** **So the WIDE romset cannot be downloaded to MiSTer as a straight
 concatenation, on any SDRAM tier. The MRA has to trim.**
 
 ### As mapped (the proposal)
@@ -335,7 +335,7 @@ finger — 0xF0000 bytes of the wrong file, no error. (The one in-tree user of
 `parts=`, Pang!3 at `cores/cps1/cfg/mame2mra.toml:165-173`, has four
 DISJOINT maps, which is why the limitation had never been hit.)
 
-**What shipped instead: the extension gets its OWN REGION.** The stock 8 MB
+**[MSV-17]** **What shipped instead: the extension gets its OWN REGION.** The stock 8 MB
 stays on the generic path, where it is emitted exactly as `cores/cps2` emits
 it, and the trimmed member sits alone in a region where a single-part
 `parts=` is correct:
@@ -376,7 +376,7 @@ re-checks all of it.
    must move the fork's catalogue entry and the `parts=` row with it.
    `tools/gen_vsavjw_xml.py` regenerates the entry from a zip and
    `tests/test_mister_mra_map.sh` fails if it is stale.
-2. **~~The WIDE set's PARENT is the BUILD's `vsav.zip`~~ CORRECTED 14z-112:
+2. **[MSV-18]** **~~The WIDE set's PARENT is the BUILD's `vsav.zip`~~ CORRECTED 14z-112:
    the parent is the PRISTINE dump.** The four patched members
    `vm3.13m/15m/17m/19m` (tenant art inside vanilla's own 32 MB) now live
    INSIDE `vsavjw.zip`; builds pack no parent at all, so stock Vampire
@@ -387,7 +387,7 @@ re-checks all of it.
    (`mrazip.go:23`), the stock leg and the WIDE leg cannot share one `$HOME`
    — `tools/mister_mra.sh` stages a PRIVATE one per run rather than writing
    into the user's.
-3. **`jtframe mra` needs the set to exist in `doc/mame.xml`**, which is
+3. **[MSV-15]** **`jtframe mra` needs the set to exist in `doc/mame.xml`**, which is
    jtframe's own reduced machine catalogue, not a MAME dump. The `vsavjw`
    entry added to the fork is `vsavj`'s verbatim except for the ROM map, the
    description and `sourcefile="capcom/cps2w.cpp"` — and that tag is the
@@ -448,7 +448,7 @@ redirect condition mis-fired, and its condition is `gfx_addr[25]`, which is
 
 ## 5. THE MAP
 
-Offsets in the RTL are 23-bit **word** constants (`jtcps1_sdram.v:158-164`
+**[MSC-20]** Offsets in the RTL are 23-bit **word** constants (`jtcps1_sdram.v:158-164`
 for bank 0's family, per-slot `SLOTn_OFFSET` for the read side); the tables
 below give bytes and the word constant. jtframe applies offsets as an ADD,
 not an OR — `jtframe_romrq_bcache.v:74`
@@ -468,7 +468,7 @@ arbitrary at word granularity, with no power-of-two alignment requirement.
 | `0x7E0000` | **GFX group C, obj bank 5** | `0x800000` (8 MB, of which `0x7FEE00` carries art) | NEW `GFXC5_OFFSET = 23'h3F0000` |
 | `0xFE0000` | free | **131,072 B (0.125 MB)** | |
 
-Bank 0 is used to byte `0xFE0000` of `0x1000000`: **131,072 B free.**
+**[MSV-5]** Bank 0 is used to byte `0xFE0000` of `0x1000000`: **131,072 B free.**
 **CORRECTED 14z-107 (9) by the census** — this table used to end obj bank 5
 at `0xFDEE00` and claim a 135,680 B tail, because it sized the region by the
 art's live footprint. The download writes the whole 8 MB region, art or no
@@ -532,7 +532,7 @@ would need its own measurement. Unmeasured, and not needed today.
 
 ### The two moves that make it fit, stated plainly
 
-1. **The QSound region is SPLIT across two SDRAM banks on `pcm_addr[23]`.**
+1. **[MSV-6]** **The QSound region is SPLIT across two SDRAM banks on `pcm_addr[23]`.**
    *(D0 note, 14z-107 (5): the shipped MRA splits the region in TWO for the
    generator's sake — `qsound` then `qsoundw` — but they are adjacent and
    only `qsound`'s start goes in the header, so the RTL sees ONE region of
@@ -552,7 +552,7 @@ would need its own measurement. Unmeasured, and not needed today.
    the margin against it is now larger.) The split bit is exactly the
    stock/WIDE boundary, which is a nice property to have on the superset
    invariant.
-2. **Group C is split one obj bank per SDRAM bank**, keyed on
+2. **[MSV-7]** **Group C is split one obj bank per SDRAM bank**, keyed on
    `gfx_addr[23]` at download time and `rom0_bank[0]` at read time. Obj bank
    **4** — the three fighter bands, i.e. the in-match traffic — goes to
    **bank 1**, the bank whose headroom `tests/audit_sdram_bank_load.sh`
@@ -578,7 +578,7 @@ Two ways out, both honest:
   `jtframe_rom_3slots` — zero new jtframe files, but bank 1 then carries
   three streams, which is beyond what was measured.
 
-**WHERE OPTION A PUT THE FILE, and why it is an addition rather than a
+**[MSV-9]** **WHERE OPTION A PUT THE FILE, and why it is an addition rather than a
 change.** `modules/jtframe/hdl/sdram/jtframe_ram1_7slots.v` — with the
 family, so a reviewer can diff it against `jtframe_ram1_5slots.v` and see
 that it is that file plus two `jtframe_romrq` instances and nothing else.
@@ -641,7 +641,7 @@ st3_bank <= promoted_bank;
 
 Four things about that, in the order they matter.
 
-1. **The order is the rule, not the bit.** `table_y[15]` is the sprite-list
+1. **[MSC-28]** **The order is the rule, not the bit.** `table_y[15]` is the sprite-list
    terminator and the test above is byte-identical to `cores/cps2`'s. Inside
    the `else` arm bit 15 is known to be 0, so promoting bit 12 into it and
    reading bits 15:13 reduces to `{ y[12], y[14:13] }`. Reading bit 15
@@ -794,7 +794,7 @@ WIDE v1 needs `CPU:$000000-$5FFFFF`, i.e. one more megabyte-pair.
 | `:185` | `pre_ram_cs` | `$FF0000-$FFFFFF` | no |
 | — | (nothing) | `$500000-$5FFFFF` | window is entirely undecoded |
 
-**The objcfg port decodes a whole megabyte, not sixteen bytes** — the RTL is
+**[MSC-31]** **The objcfg port decodes a whole megabyte, not sixteen bytes** — the RTL is
 looser than the hardware here — but because it is qualified with `!RnW`, a
 *read* anywhere in `$400000-$4FFFFF` asserts nothing today and would assert
 only `rom_cs` after the change. So there is no read collision at all, and a
@@ -846,7 +846,7 @@ did not say and the slice had to settle:
 
 ### Is the reserved 16 bytes enough? — yes, and it is now load-bearing three times
 
-`cps2_wide.md` reserves `$400000-$40000F` and forbids allocation there. With
+**[MSV-13]** `cps2_wide.md` reserves `$400000-$40000F` and forbids allocation there. With
 the change, a read at those addresses returns **ROM** on jtcps2w. FBNeo
 read-shadows them with ROM already; MAME keeps them readable as CPS2 output
 registers. That is now a **three-way** divergence, unobservable only because
@@ -978,10 +978,10 @@ slice as the decode.
      above `0xEE73` or `0xFFDB` no longer overflows anything. The silent
      months-later bring-up failure this question was written about cannot
      happen by that route.
-   * **The group-C ROMSET REGION cannot grow at all.** A fifth group-C
+   * **[MSV-11]** **The group-C ROMSET REGION cannot grow at all.** A fifth group-C
      member, or widening it past 16 MB, overflows immediately and there is
      nowhere to put the excess: bank 1 has zero free and bank 0 has 131,072 B.
-   * The four extents stay frozen in `tests/audit_mister_map_fit.sh` because
+   * **[MSV-4]** The four extents stay frozen in `tests/audit_mister_map_fit.sh` because
      they bound the content and are what a group-C MRA trim would work from;
      they are no longer what decides the fit. That gate now models the banks
      from the PLACED offsets and lengths, with an overlap check, and its

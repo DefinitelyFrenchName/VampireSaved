@@ -33,7 +33,7 @@ since 14z-109; the `.rbf` + MRAs are to be tracked in-tree under
 | thing | where |
 |---|---|
 | the fork | https://github.com/DefinitelyFrenchName/jtcores, branch `vampire-saved`, from upstream tag `v1.7.3` = `63688ce5` |
-| pinned here | submodule `emu/jtcores` (branch `vampire-saved`); `tools/setup_jtcores.sh` checks the pin, inits the five modules the cps2 yaml chain pulls, and regenerates `emu/jtcores-patches/` as a PATCH SERIES, one file per fork commit (`modules/jtframe/target/pocket` is a PRIVATE ssh submodule — never init it) |
+| pinned here | **[MSC-4]** submodule `emu/jtcores` (branch `vampire-saved`); `tools/setup_jtcores.sh` checks the pin, inits the five modules the cps2 yaml chain pulls, and regenerates `emu/jtcores-patches/` as a PATCH SERIES, one file per fork commit (`modules/jtframe/target/pocket` is a PRIVATE ssh submodule — never init it) |
 | the fork's commits (**24 at the 14z-113 pin `63496069`**; this row had stopped at D2 until 14z-113) | `b9d0565` `cores/cps2w` scaffold (14z-106) · `553dd56` sim work-RAM dumps · `6c32be8` sim SDRAM top address bit · `4f25cc7` sim model clock · `74ed17d` sim SDRAM stats · `38acc638` the WIDE machine entry + the MANDATORY QSound trim in the MRA (14z-107 (5), slice D0) · `4840df8a` **THE FIRST RTL COMMIT — the QSound sample-bank width, RUNTIME-GATED** (14z-107 (6), slice D1) · `692ba4d6` + `7cf1eedb` the frame writer made optional and its child made `_exit` (14z-107 (7)) · `519aff8b` the joystick top bits (14z-107 (8)) · `0df6f000` **THE SDRAM PLACEMENT** (14z-107 (9), slice D2) · `17a5dc2b` the SDRAM READ PROBE · `b9899fa8` **THE OBJECT PROMOTE** (slice D3) · `fd454393` the frame writer's frame window · `dd242a65` **THE 6 MB PROGRAM WINDOW** (slice D4) · `72738d51` the sim-only 68k program-ROM read probe · `c00d7ce7` **THE DECRYPTION RANGE** (slice D5, 14z-107 (11)) · `7b9a0d2d` the D4 comment retraction · `c97e3d14` README brought to D0-D5 (14z-109) · `4dfc3734` **P2 SCRIPTABLE** in `sim_inputs.hex` (14z-109) · `68448ec5` / `fc04a8ec` / `f5a3391a` / `63496069` the `vsavjw` catalogue CRCs for the 14z-110 / M7 / 14z-110b / 14z-111 freezes (the MiSTer TAIL of each re-freeze). Commits 1-6 touched no RTL; the catalogue commits touch only `doc/mame.xml`. The mirrored series is `emu/jtcores-patches/0001`-`0024`, one file per commit |
 | the new core | `cores/cps2w/` in the fork → RBF `jtcps2w.rbf` (jtframe names the RBF `"jt" + <core dir>`; `CORENAME=JTCPS2W` is what the MRA's `<rbf>` is matched against, upper-cased) |
 | the reference core | `cores/cps2/` — untouched, by design |
@@ -99,33 +99,33 @@ from `jtframe files sim cps2`. Gate: `test_mister_wide_gate` 5b/7n.
 `GAMETOP=jtcps2_game`, `CORENAME=JTCPS2`, `JTFRAME_SDRAM_LARGE`,
 `JTFRAME_HEADER=44`, `JTFRAME_IOCTL_RD=128`, `JTFRAME_DIPBASE=16`,
 `JTFRAME_DIAL`, `CPS1_NOOBJ`, `JTFRAME_OSD_TEST`, MiSTer: `JTFRAME_MR_DDRLOAD`.
-cps2w's `macros.def` differs by `CORENAME=JTCPS2W` only — and it stays that
+**[MSC-5]** cps2w's `macros.def` differs by `CORENAME=JTCPS2W` only — and it stays that
 way ON PURPOSE: **the WIDE profile is NOT a macro.** See "The runtime profile
 gate" below.
 
 ## The runtime profile gate: MRA header byte 41 (slice D1, 14z-107 (6))
 
-Maintainer ruling, 2026-08-23: the profile is selected at RUNTIME from a
+**[MSC-8]** Maintainer ruling, 2026-08-23: the profile is selected at RUNTIME from a
 spare MRA header bit, not by an `ifdef`. The consequence is the point —
 **stock `vsavj` on `jtcps2w.rbf` runs with the widened behaviour CLEAR**, so
 CLAUDE.md rule 1 v2's "profile-gated so stock `vsavj` is untouched BY
 CONSTRUCTION" is a fact on FPGA rather than an inertness argument.
 
-- **Which byte, and why it is free.** `jtcps1_prom_we.v` consumes header
+- **[MSC-9]** **Which byte, and why it is free.** `jtcps1_prom_we.v` consumes header
   bytes 0-7 (the four region start words), 8-39 (`is_cps`, the CPS config
   registers, `REGSIZE=24` + `START_HEADER=16`) and 40 (`JOY_BYTE = 6'h28`);
   44-63 are the CPS-2 key (`CPS2_KEYS = 26'd44`). Bytes **41-43 fall through
   every branch of its decoder and are ignored**, which is what the file's own
   comment at `:52-54` ("6 are actually used and 10 are reserved") is
   describing. `JTFRAME_HEADER=44`, so byte 41 exists in every CPS-2 `.rom`.
-- **ACTIVE LOW, and that is forced rather than chosen.**
+- **[MSC-10]** **ACTIVE LOW, and that is forced rather than chosen.**
   `cores/cps2/cfg/mame2mra.toml` declares `[header] fill=0xff`, so an
   unwritten header byte is `0xFF`; the stock `vsavj` MRA emitted by cps2w has
   to stay byte-identical to cps2's. Only a polarity in which the FILL means
   "profile off" can do that. jtframe's own `JOY_BYTE` has exactly this shape
   (0xFF = joystick mode 3; the games that want mode 0 write `fc`).
   So: **byte 41 bit 0 CLEAR = CPS-2 WIDE**, and the WIDE MRA writes `fe`.
-- **How the row is scoped.** `RawData` embeds `Selectable`
+- **[MSC-11]** **How the row is scoped.** `RawData` embeds `Selectable`
   (`src/jtframe/mra/types.go`), so `{ setname="vsavjw", offset=41, data="fe" }`
   scores 3 for that set and 0 for everything else — no other MRA gains a byte.
   Measured end to end: the stock `.rom` byte 41 is `0xFF` and the WIDE
@@ -156,7 +156,7 @@ CONSTRUCTION" is a fact on FPGA rather than an inertness argument.
   cross-IMPLEMENTATION oracle and `tests/test_mister_wide_inert.sh` (cps2 vs
   cps2w, bit-identical work RAM frame by frame) is the inertness
   instrument.
-- **Clock domains, so it is not asked later.** The decoder runs on the game
+- **[MSC-12]** **Clock domains, so it is not asked later.** The decoder runs on the game
   port's `clk`, which jtframe documents as "always matched to the SDRAM
   clock" (`jtframe_common_ports.inc:5`) and which on a `JTFRAME_CLK96` core
   like CPS-2 is the same 96 MHz net the QSound block's `clk96` is. Even if it
@@ -426,7 +426,7 @@ the oracle's two legs run different inputs.
 
 ## The QSound bank bit IS `dsp_ab[7]` — validated 14z-107 (6)
 
-The width fix rests on this and `jtcps15_sound.v:416-417` shows the original
+**[MSC-30]** The width fix rests on this and `jtcps15_sound.v:416-417` shows the original
 author was unsure: it carries a commented-out alternative
 `{ dsp_ab[2:0], dsp_ab[4], dsp_ab[5], dsp_ab[6], dsp_ab[7] }`, a 7-bit
 permutation that drops `ab[3]` entirely. MAME's low-level QSound device
@@ -458,7 +458,7 @@ comparison to settle later, not a D1 edit.
 
 ## The SDRAM ceiling at our pin: 64 MB is PHYSICAL (measured 14z-107)
 
-At `v1.7.3` the 64 MB tier is not a default with a wider one behind it — it
+**[MSC-16]** At `v1.7.3` the 64 MB tier is not a default with a wider one behind it — it
 is the largest map the pin can address, and every link in the chain says so.
 
 - **jtframe's own table stops there.**
@@ -494,7 +494,7 @@ is the largest map the pin can address, and every link in the chain says so.
   | PIN_AH27 | `VGA_EN` (`:43`)    | `SDRAM2_DQ[15]` (`:13`) |
   | PIN_AG25 | `BTN_OSD` (`:66`)   | `SDRAM2_DQ[13]` (`:15`) |
 
-  **Consequence worth stating plainly: on a DE10-Nano the dual-CHIP SDRAM
+  **[MSC-18]** **Consequence worth stating plainly: on a DE10-Nano the dual-CHIP SDRAM
   path and the ANALOG I/O board are mutually exclusive.** That is not
   academic here — the field test in the ruling at the top of this file is
   Jammix -> CRT, i.e. analog video. Any 128 MB route that needs two
@@ -755,7 +755,7 @@ blocked only by bank PLACEMENT — is worked out in
    ImageMagick `convert`).
 2. `tools/setup_jtcores.sh` — pins `emu/jtcores`, inits the modules the
    cps2 yaml chain pulls (`fx68k jt12 jt51 jteeprom jtdsp16`; never the
-   private `pocket` target), builds the Go tool. **Simulate in a SCRATCH
+   private `pocket` target), builds the Go tool. **[MSC-37]** **Simulate in a SCRATCH
    CLONE of the fork, never inside `emu/jtcores`** — jtsim writes
    `obj_dir/`, `sdram_bank?.bin`, `frames/`, `rom.bin` into
    `cores/<core>/ver/game/`, which would dirty the pinned submodule.
@@ -769,7 +769,7 @@ blocked only by bank PLACEMENT — is worked out in
    and `PATH=<gnubin dirs>:$PATH:.:$JTFRAME/bin`.
 5. `jtframe mra cps2w` (binary at `$JTFRAME/src/jtframe/jtframe`) → the
    MRAs in `release/mra/` AND `rom/vsavj.rom` (46,407,744 bytes, sha1
-   `f9dc2987…`) — the `.rom` is ROM content: scratch only. **Since
+   `f9dc2987…`) — the `.rom` is ROM content: scratch only. **[MSV-19]** **Since
    14z-107 (5) do not do this by hand either:** `ROMDIR=...
    tools/mister_mra.sh --core cps2w [--wide build/m3b_merged16] --out <dir
    outside the repo>` (the current freeze's build — `m3b_merged13`, which
@@ -913,7 +913,7 @@ running core.** `jtcps1_sdram.v:158-164` `WRAM_OFFSET = 23'h30_0000` in 16-bit
 WORDS; `jtcps2_main.v:127,185` `pre_ram_cs = &A[23:16]` (i.e. `$FFxxxx`) and
 `addr = ram_cs ? {2'b0,A[15:1]} : A[17:1]`; `jtframe_ram_rq.v:94` composes
 `sdram_addr = addr + offset`. So **on the REFERENCE core `RAM:$FF0000-$FFFFFF`
-= SDRAM bank 0 byte offset `0x600000`, 64 KB**. **QUALIFIED 14z-107 (9): THAT
+= SDRAM bank 0 byte offset `0x600000`, 64 KB**. **[MSV-12]** **QUALIFIED 14z-107 (9): THAT
 OFFSET IS PER CORE NOW.** Slice D2 re-packed bank 0 to make room for a 6 MB
 PRG region, so on `cores/cps2w` work RAM is at byte **`0x648000`**
 (`WRAM_OFFSET` word `0x32_4000`) and `0x600000` is **VRAM**. The dump hook
@@ -1015,7 +1015,7 @@ near `f + 462`.
 no purpose at all; the tool removes them, so a long series of runs no longer
 accumulates 64 MB of ROM-derived litter per run.
 
-**THE ANCHOR MEASUREMENT (stock `vsavj`, `05_timeout_idle`).** Round-1 match
+**[MSV-23]** **THE ANCHOR MEASUREMENT (stock `vsavj`, `05_timeout_idle`).** Round-1 match
 start: MAME frame **2146**, simulated frame **2609** — skew **+463**,
 RE-MEASURED 14z-107 (7) with host frame output OFF, and measured four ways in
 one 2x2: every leg that forks once or not at all reports 2609, and only the
@@ -1037,7 +1037,7 @@ meter fields, `p1_hitbox_base` **$093B6A on both** (Demitri — P1's pick
 matches), `p1_ptr64`, `p1_word132`, `p1_x/y/flip/attack_id`, and even the
 `phase` field `p1_anim_ptr` ($12CDF6 on both).
 
-**THE ONE DISAGREEMENT, AND IT IS THE GAME'S OWN LOTTERY.** The CPU opponent
+**[MSV-24]** **THE ONE DISAGREEMENT, AND IT IS THE GAME'S OWN LOTTERY.** The CPU opponent
 differs: MAME drew the character whose record base is **$0AE9D4**, jtcps2 drew
 **$0A9518**. `05_timeout_idle` is a 1P arcade match and the ladder's in-use
 mask `RAM:$FF8110.l` is SOUND-STATE-FED (`docs/game/atlas/ram.md:99` — the
@@ -1058,7 +1058,7 @@ commit. Informational, never a verdict: the whole 64 KB differs in ~1,500 of
 `JTSIM_SCRATCH` in the environment. Every step is idempotent (clone, symlinks,
 Go build, MRA, seed), it prints the sha1 of everything it reads, and it
 REFUSES an out-dir inside the repo (rule 7) or a scratch clone inside it.
-**Since 14z-107 (7) it also asserts the DUMP SET** — every `--wram` run ends
+**[MSC-43]** **Since 14z-107 (7) it also asserts the DUMP SET** — every `--wram` run ends
 with `tools/check_wram_dumps.py`, which requires every frame of
 [FIRST..LAST] to exist, at exactly the requested length, with the requested
 address in its name, and fails the run otherwise. That check exists because
@@ -1516,7 +1516,7 @@ what the core READ out of it.
   `rdprobe_<k>.txt` lists the tile codes the core fetched. That is what lets
   a fetch be checked against the roster's frozen extents rather than merely
   counted.
-- **Four slots, not two, and the reason is the instrument's own honesty.**
+- **[MSC-48]** **Four slots, not two, and the reason is the instrument's own honesty.**
   Two of them arm the windows under test and two arm windows that MUST see
   traffic (the vanilla object banks). Without the second pair a zero on the
   first pair would be ambiguous between "the core did not fetch" and "the
@@ -1542,7 +1542,7 @@ the 16 MB of tenant art lands on `gfx_bank = {1'b1, gfx_addr[23]}` at
 and 3, which is vanilla's obj banks 0 and 1 *and the whole scroll window*
 (`SCR_OFFSET = 0`). Everything drawn from those tiles is then garbage.
 
-Worth keeping for the shape of it: a two-legged experiment whose legs differ by
+**[MSC-49]** Worth keeping for the shape of it: a two-legged experiment whose legs differ by
 one byte is worth building even when the verdict is a counter, because the
 FIRST thing it produced was a picture that could not be misread.
 
@@ -1565,7 +1565,7 @@ SDRAM and changes no fetch at all, so the only thing that can be checked is
 the IMAGE — and the image was already reachable; the lane was throwing it
 away.
 
-- **`test.cpp` dumps all four banks, once, the instant a FULL download
+- **[MSC-50]** **`test.cpp` dumps all four banks, once, the instant a FULL download
   ends.** `test.cpp:915` `if( dwn.FullDownload() ) sdram.dump();`, and
   `SDRAM::dump()` writes `sdram_bank0-3.bin` (4 x 16 MB under
   `_JTFRAME_SDRAM_BANKS`) into `cores/<core>/ver/game`. Because it fires at
@@ -1629,7 +1629,7 @@ no conclusion below changes. The pre-correction table read 38,278 / 3,464 /
 9,453 (attract), 39,635 / 13,856 / 261 / 12,079 (select+VS) and 40,797 /
 14,132 / 1,017 / 17,467 (in-match).
 
-**Read "acc" as READ+WRITE commands and the percentage as the ROW MISS
+**[MSC-23]** **Read "acc" as READ+WRITE commands and the percentage as the ROW MISS
 rate.** They are different quantities because only bank 0 sets
 `JTFRAME_BA0_AUTOPRECH`: on banks 1-3 `jtframe_sdram64_bank.v:170`
 (`row_match = match && actd && !AUTOPRECH[0]`) skips both the PRECHARGE and
@@ -1862,7 +1862,7 @@ Everything here was learned building the WIDE download image
 (`docs/project/mister_map.md` slice D0). It is platform behaviour, true of
 any core.
 
-- **A set must exist in `$JTROOT/doc/mame.xml`** — jtframe's own REDUCED
+- **[MSC-63]** **A set must exist in `$JTROOT/doc/mame.xml`** — jtframe's own REDUCED
   machine catalogue, committed in the repo, not a MAME `-listxml` dump.
   `jtframe mra` streams it (`mamegame.go:167-250`) and everything else keys
   off what it finds there. A romset with no machine entry produces no MRA,
@@ -1879,7 +1879,7 @@ any core.
   but the string is one char short and never aligns). This is how the WIDE
   set is reachable from `cores/cps2w` and unreachable from `cores/cps2`
   without editing the reference core at all.
-- **`mra2rom` locates every zip member by CRC32 and by NOTHING ELSE**
+- **[MSC-64]** **`mra2rom` locates every zip member by CRC32 and by NOTHING ELSE**
   (`mra2rom.go:163-172`: it walks the zips comparing `file.CRC32`; the
   `name` attribute is used only in the warning text). **This is a real
   divergence from FBNeo and MAME**, which resolve by name and merely warn on
@@ -1887,7 +1887,7 @@ any core.
   CRCs in both of those drivers and why content there can change freely. On
   MiSTer a sentinel means `Warning: cannot find file … in zip` and no `.rom`.
   Consequence: **an MRA is pinned to the exact bytes of one romset build.**
-- **The zip search path is a HARD-CODED `$HOME/.mame/roms/<name>.zip`**
+- **[MSC-65]** **The zip search path is a HARD-CODED `$HOME/.mame/roms/<name>.zip`**
   (`mrazip.go:23`), so the tool's output is a function of the invoking
   user's home directory and there is no flag for it. `tools/mister_mra.sh`
   stages a PRIVATE `$HOME` per run instead of writing into the user's — and
@@ -1895,10 +1895,10 @@ any core.
   `vsav.zip` files (the merged build patched `vm3.13m/15m/17m/19m` into its
   own parent). **CORRECTED 14z-112: builds no longer pack a parent — the four patched members live INSIDE `vsavjw.zip` and BOTH legs use the PRISTINE dump, so one SD card can carry this profile and stock Vampire Savior.** The private `$HOME` staging stays: `jtframe`
   still hard-codes its lookup path.
-- **`jtframe mra -n` skips ROM generation entirely** — no zips are opened,
+- **[MSC-68]** **`jtframe mra -n` skips ROM generation entirely** — no zips are opened,
   `md5="None"`, and the MRA XML becomes a pure function of `doc/mame.xml`
   plus the core's TOML. That is the ROM-free mode a structural gate wants.
-- **`parts=` puts EVERY part of a region inside ONE `<interleave>` when
+- **[MSC-66]** **`parts=` puts EVERY part of a region inside ONE `<interleave>` when
   `width > 8`** (`corerom.go:462-479`), and `interleave2rom` resolves each
   output byte lane to the FIRST finger claiming it (`mra2rom.go:238-249`).
   So `parts=` can express a multi-member 16-bit region only if the members'
@@ -1909,7 +1909,7 @@ any core.
   every other set skips it — **a region with no config at all still emits
   its `<!-- … starts at … -->` comment**, which is enough to break a
   byte-identity twin.
-- **Region starts in the MRA comments are the generator's `pos`, which
+- **[MSC-67]** **Region starts in the MRA comments are the generator's `pos`, which
   INCLUDES the 20-byte `key` region; the RTL's `bulk_addr` does not.** On
   CPS-2 every region therefore starts at `<1 KiB-aligned> + 0x14`, and the
   `>> 10` header word is right only because `0x14 < 1024`. Measured on the
@@ -2025,7 +2025,7 @@ docker run --rm --network host -v $HOME/jtcores:/jtcores jotego/jtcore20x xjtcor
 docker run --rm --network host -v $HOME/jtcores:/jtcores jotego/jtcore20x xjtcore.sh cps2w mister
 ```
 
-**FOUR LOAD-BEARING DETAILS, none cosmetic:**
+**[MSC-57]** **FOUR LOAD-BEARING DETAILS, none cosmetic:**
 1. **`git clone` is NOT `--recursive`, and `git checkout 7b9a0d2d` comes
    BEFORE the submodule pass.** `--recursive` resolves submodules against the
    DEFAULT BRANCH, and jtcores master registers `modules/jt539`, which does
@@ -2080,3 +2080,64 @@ jtcore cps2w -mister --nodbg --seed 18269      # the 14z-108 shipping baseline
   same size class, same filename, same published path — and a sweep
   overwrites `release/mister/<core>.rbf` with whatever ran last. The only
   defences are the seed record and the hash. **Verify before flashing.**
+
+## THE 14z-108/109 MEASUREMENTS, RECORDED IN THE LOG (entered 14z-114)
+
+**Why this section exists.** This file is the LOG and the synthesis's own
+staleness rule says a number must be traceable to it — yet the tenant
+oracle, the bank-1 load, the QSound extension fetch, the OBJ-list oracle and
+the synthesis fit were recorded only in `mister_core.md` §12, the HANDOFF
+gate table and STATE 14z-108/109. The skill checker (`tools/checkskills.py`,
+"a number a skill quotes must appear in a log") refused every one of them,
+which is exactly the gap it was built to find. The figures below are
+quotations from the gates' own outputs as recorded at 14z-108/109; each names
+its gate, and the gate re-produces it.
+
+- **The tenant anchor** (`tests/test_mister_tenant_oracle.sh`, 14z-108;
+  `36_pick_tenant_cell`, `cps2w` + the WIDE romset vs MAME on the same set):
+  round-1 match start MAME **2886** / sim **3546** / skew **660** ± 30 — the
+  659-frame WIDE transfer plus one, the same +1 the stock replay shows on its
+  462-frame transfer. `p1_hitbox_base` **`0x003FA9D0`** on BOTH legs (the
+  relocated record above `CPU:$400000`); `p2_hitbox_base` excluded by name
+  (MAME `0x000ABD74` vs core `0x0009769E`, the sound-fed draw).
+- **[MSV-25]** **Both group-C banks fetched** (`tests/test_mister_gfxc_fetch.sh`,
+  14z-108, same replay, 4,400 frames): obj bank **4** (fighter art, SDRAM
+  ba1 `0x800000+`) **9,388,928** reads over **1,735** distinct codes
+  `0xAD8F-0xEE42`, first at frame 1781, traffic in **843 frames after match
+  start**; obj bank **5** (wheel art, ba0 `0x7E0000+`) 19,246,336 reads over
+  206 codes `0x74D6-0xFE41`, first at 1556, last at 3498 (the select/VS
+  boundary). Control leg (header byte 41 `0xFE`->`0xFF`): **0** in both
+  windows while still issuing 105,418,104 reads in bank 3.
+- **[MSV-10]** **Bank 1 under load** (same run, `--stats`, 3,738 post-transfer frames):
+  ba1 **11,905** accesses/frame, peak **15,496** = **12.5%** of the 123,825
+  all-miss ceiling, with the fighter art sharing the bank with PCM; ba0
+  peak 54,363 (43.9%), unchanged from stock; **zero** `SDRAM reads clashed`.
+  ONE replay, ONE tenant, one opponent — stated as the caveat it is.
+- **[MSV-26]** **The QSound extension fetched** (`tests/test_mister_qsound_ext.sh`,
+  14z-108, `108_tenant_voice.rpl`): **210,180** reads over **76** distinct
+  blocks in the 1 MB PCM-high window, first at frame **3783**, addresses
+  `0x830AA0-0x83FFFE` = DSP bank **`0x83`**; control leg **0** while still
+  issuing **54,113,994** QSound LOW reads; `pcm_addr[22:20] == 0`
+  throughout (the `SLOT5_AW=20` mask lossless in practice).
+- **[MSV-29]** **The OBJ-list oracle** (`tests/test_mister_obj_oracle.sh`, 14z-109): at
+  the tenant anchor the PROMOTED subset (y bit 12) is **31** entries on both
+  legs, ordered and field-for-field identical, 19-bit tile addresses the
+  same set **`0x4b0c4-0x4ecda`**; raw lists 40 vs 129 (the opponent
+  lottery, reported not asserted). Select screen: 81 core frames vs 111
+  MAME frames, both non-constant (21 / 31 distinct lists); promoted subset
+  exact on **all 81** frames with 67-72 promoted entries; whole list 55/81,
+  every shortfall in the unpromoted part; the authored "M6" mark (codes
+  `fe40`/`fe41`, palette row `0x19`) identical. Walker
+  `tools/oram_obj_records.py` calibrated **1153/1153** lines against
+  `tests/lua/obj_records_dump.lua` before any core data was read.
+- **Synthesis fit** (14z-108, Quartus 20.1.1 Lite, Cyclone V 5CSEBA6U23I7,
+  pin `7b9a0d2d`, `cps2` built first): `cps2w` **+206 ALMs** (+1.1%, 44% of
+  **41,910**), **+2,048** block-memory bits; RAM blocks, DSPs, PLLs
+  unchanged. The timing sweep is in "SYNTHESISING THE CORE" and
+  `docs/platform/gotchas.md` (`xjtcore.sh` retries until a seed passes).
+- **Field-test scale facts** used by the triage card
+  (`docs/project/mister_field.md`): the pre-D5 boot loop is a ~1,580-frame
+  cycle = about **26.5 s** at the real **59.6374 Hz**; the RAM-test pattern
+  stands ~4.5 s and the legal screen arrives ~15 s after reset (simulated
+  frame counts at native timing — the DOWNLOAD itself is not comparable,
+  it runs at HPS speed on hardware).

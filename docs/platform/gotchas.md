@@ -1042,7 +1042,7 @@ re-links, and `enable_load()` (`jtsim:249-258`) both defines `LOADROM` and
 **`mv sdram_bank?.* sdram.old`**. 14z-106 measured "the second run re-ran the
 download" and filed it against `-load`; the flag responsible is `-setname`.
 
-**Drop `-setname`, KEEP `-load` — and this is the second half of the trap.**
+**[MSC-38]** **Drop `-setname`, KEEP `-load` — and this is the second half of the trap.**
 It is tempting to drop `-load` too: `test.cpp:611-651` then preloads the four
 banks at t=0 and the download is shortened to 32 bytes (`test.cpp:263-281`,
 log lines `ROM download shortened to 32 bytes` / `ROM file transfered (frame
@@ -1060,7 +1060,7 @@ LVBL fall from t=0, download frames included, while the core is held in reset
 transfer unless the script is shifted by the download length
 (`rpl2siminputs.py --offset 462`).
 
-**THE NEAR-MISS WORTH RECORDING:** the preloaded run's all-zero dumps agreed
+**[MSC-42]** **THE NEAR-MISS WORTH RECORDING:** the preloaded run's all-zero dumps agreed
 with MAME's work RAM on **99.2% of sampled bytes**, because most of a 64 KB
 work-RAM image is zero. "High agreement" is not evidence of a live oracle;
 the first check on any new dump path is **is it non-constant** — two frames
@@ -1084,7 +1084,7 @@ is not: it exists only inside the **Verilog** SDRAM model
 never instantiates — there the C++ `SDRAM` class IS the SDRAM, and its
 `dump()` fires exactly once, right after a full ROM download.
 
-Reading emulated work RAM out of a Verilator run therefore needs a harness
+**[MSC-40]** Reading emulated work RAM out of a Verilator run therefore needs a harness
 hook, not a macro that already exists (ours: `JTFRAME_SIM_WRAMDUMP`, fork
 commit `553dd56`, `docs/platform/mister.md`). The general lesson is the
 14z-71 one in a new place: **a macro named for what you want is not evidence
@@ -1092,7 +1092,7 @@ that it does it — read the module that consumes it.**
 
 ## Editing a shell script WHILE it runs corrupts the running execution (14z-107)
 
-`sh` reads a script incrementally and keeps a BYTE OFFSET into the file. Edit
+**[MSC-54]** `sh` reads a script incrementally and keeps a BYTE OFFSET into the file. Edit
 the file while it is executing and the offset now points into the middle of a
 different line: the still-running shell resumes at a token boundary that never
 existed. Paid for here on a 55-minute gate — `tools/run_sim_jtcps2.sh` had run
@@ -1114,7 +1114,7 @@ hour of waiting with the file open).
 
 ## `JTFRAME_SDRAM_XL` without `JTFRAME_SDRAM_CACHE` aliases SILENTLY (14z-107)
 
-Upstream jtframe's 128 MB tier is real (`SDRAMW=24`,
+**[MSC-17]** Upstream jtframe's 128 MB tier is real (`SDRAMW=24`,
 `modules/jtframe/target/mister/hdl/jtframe_emu.sv:175-181`), but the
 controller that KNOWS about it exists only on one side of a fork.
 `hdl/jtframe_board_sdram.v:158` branches on `JTFRAME_SDRAM_CACHE`: the
@@ -1159,7 +1159,7 @@ so a Verilator run rendered from a corrupt tile map. Bank 0 (PRG 0-4 MB, VRAM
 but "the frames showed sprites" was NOT evidence that GFX addressing was
 faithful.
 
-**THE TRAP, and it is the general lesson: the missing bit was NOT the one the
+**[MSC-51]** **THE TRAP, and it is the general lesson: the missing bit was NOT the one the
 size arithmetic points at.** "13 row + 9 column = 22 bits, so widen the column
 to 10 bits (`<< 10`, `& 0x7fffff`, `0x3ff`)" is the natural reading, and it
 would have folded the TOP address bit onto `addr[9]` and produced a
@@ -1192,7 +1192,7 @@ carry into column bit 9).
     if( &rom_data ) begin
         // skip blank pixels
 
-The object pipeline SKIPS its 8-pixel draw loop when the fetched GFX word is
+**[MSC-25]** The object pipeline SKIPS its 8-pixel draw loop when the fetched GFX word is
 all-ones. So the number of cycles the object engine spends, and therefore its
 SDRAM request pattern, is a function of the DATA in the GFX ROM — not just of
 the object table.
@@ -1265,7 +1265,7 @@ address scramble at download time:
 gfx_addr = { gfx_addr[25:21], gfx_addr[3], gfx_addr[20:4], gfx_addr[2:0] };
 ```
 
-Composed, the two **cancel**: the SDRAM address of tile code `c` is exactly
+**[MSC-21]** Composed, the two **cancel**: the SDRAM address of tile code `c` is exactly
 `c * 128 + (byte within tile)`, contiguous and monotonic in `c`. The scramble
 is not an obfuscation, it is the de-interleaver.
 
@@ -1284,7 +1284,7 @@ Two consequences that are easy to get wrong, and both were:
    address map is worth nothing until it reproduces a number somebody already
    measured.** Run the known census first, then trust the derivation.
 
-3. **And the size SDRAM actually SPENDS is a THIRD number: the DECLARED
+3. **[MSC-22]** **And the size SDRAM actually SPENDS is a THIRD number: the DECLARED
    REGION** (added 14z-107 (9), found by the whole-image census). The MRA
    downloads the whole `[rom]` region the machine entry declares, so each
    8 MB group-C obj bank reserves its full 8 MB whatever the art does inside
@@ -1363,7 +1363,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
 
 ## jtframe's RTL plumbing (added 14z-107 (6), slice D1)
 
-- **An 8-bit SDRAM slot CANNOT be widened past `SDRAMW`, and the failure is
+- **[MSC-19]** **An 8-bit SDRAM slot CANNOT be widened past `SDRAMW`, and the failure is
   a BUILD failure.** `modules/jtframe/hdl/sdram/jtframe_romrq_bcache.v:74` is
 
       assign sdram_addr = offset + { {SDRAMW-AW{1'b0}}, addr_req>>(DW==8)};
@@ -1388,7 +1388,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   `get:` (e.g. cps15's `qsound.yaml`) brings the shared file WITH it, so a
   core that overrides a file inside such a yaml cannot pull that yaml at all
   — inline what it provides, minus the override.
-- **A NEW CORE WITHOUT `hdl/pal_lut.hex` RENDERS A BLACK SCREEN, AND
+- **[MSC-6]** **A NEW CORE WITHOUT `hdl/pal_lut.hex` RENDERS A BLACK SCREEN, AND
   NOTHING WARNS.** `cores/cps2w` shipped without it and cost four
   50-minute simulation runs to find. The chain: `jtcps1_pal.v:62`
   instantiates `jtframe_ram #(.SYNFILE("pal_lut.hex"))`; `jtframe_ram`
@@ -1403,7 +1403,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   silently — the file must be force-added. Gate:
   `tests/test_mister_wide_gate.sh` 3g requires every `hdl/*.hex` the
   reference cores carry to exist in the new core's `hdl/`, byte-identical.
-- **A FORKED CHILD THAT CALLS `exit()` REWINDS ITS PARENT'S INPUT FILE —
+- **[MSC-46]** **A FORKED CHILD THAT CALLS `exit()` REWINDS ITS PARENT'S INPUT FILE —
   and that is how a Verilator core's PICTURE moved its simulated CPU
   state.** RESOLVED 14z-107 (7); this entry used to say the path was open.
   `exit()` runs the C stdio cleanup, which `fclose()`s every open C stream;
@@ -1448,7 +1448,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   (`tests/test_mister_wide_inert.sh`) before anything is blamed on RTL, and
   `test_mister_sim_anchor.sh` is a cross-IMPLEMENTATION oracle, not an
   inertness instrument.
-- **The same cleanup DUPLICATES LOG LINES.** `exit()` in the child also
+- **[MSC-47]** **The same cleanup DUPLICATES LOG LINES.** `exit()` in the child also
   flushes a COPY of the parent's buffered `stdout`, so a `$display` line
   appears once per child (measured: 212 copies in a fork-mode jtsim log
   against one with frame output off). Anything that PARSES a jtsim log has
@@ -1468,7 +1468,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   last. Only EOF released P1's (`next()`'s else-branch restores `0x3ff`),
   which meant a SHORTER input file changed the inputs — the opposite of
   what a truncation should do; P2's were never released at all.
-  **THE GENERAL LESSON: a harness that DRIVES a port is asserting every bit
+  **[MSC-44]** **THE GENERAL LESSON: a harness that DRIVES a port is asserting every bit
   of it, including the ones it does not model — and an active-low port
   defaults to PRESSED.** "The harness has 4 buttons" was the natural
   reading and it was wrong by two buttons per player.
@@ -1490,7 +1490,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   moved when the inputs were corrected. The COVERAGE half (making buttons
   5/6 and P2 SCRIPTABLE) stays deferred by maintainer ruling;
   `tools/rpl2siminputs.py` still refuses them loudly.
-- **OVERRIDING ONE SHARED FILE COSTS YOU THE WHOLE `.yaml` THAT PULLED IT,
+- **[MSC-2]** **OVERRIDING ONE SHARED FILE COSTS YOU THE WHOLE `.yaml` THAT PULLED IT,
   AND IT COMPOUNDS (14z-107 (6) and (9)).** `jtframe files` deduplicates by
   FULL PATH, so a core cannot both `get:` a yaml and override a file that
   yaml pulls: the two copies of the module would both compile and the
@@ -1508,7 +1508,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   frozen line-by-line delta against the original is the thing you want to
   review; a renamed module would avoid the yaml surgery entirely and lose
   that.
-- **ADDING A MODULE TO jtframe: pull it from the CORE, never from jtframe's
+- **[MSC-3]** **ADDING A MODULE TO jtframe: pull it from the CORE, never from jtframe's
   own shared list (14z-107 (9)).** `modules/jtframe/hdl/sdram/
   jtframe_sdram64.yaml` enumerates the `ram1_Nslots` / `rom_Nslots` family
   and is included by every core that uses the 64 MB SDRAM front end. Adding
@@ -1520,7 +1520,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   same way `cores/cps1/cfg/common.yaml` pulls `jtframe_romrq.v`. Assert the
   absence, not just the presence: `test_mister_wide_gate` 5b greps the
   REFERENCE core's file list for the new module and fails if it is there.
-- **A DOWNLOAD-SIDE `?:` CHAIN HAS A FALL-THROUGH ARM THAT MORE REGIONS
+- **[MSC-26]** **A DOWNLOAD-SIDE `?:` CHAIN HAS A FALL-THROUGH ARM THAT MORE REGIONS
   REACH THAN YOU THINK (14z-107 (9)).** `jtcps1_prom_we.v`'s `prog_ba` ends
   in a bare `2'd1`, which is reached by the QSound region AND by the CPS-2
   firmware region (`is_qsnd`). The region-relative addresses it computes are
@@ -1531,7 +1531,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   observable. Qualify the condition with its own region's `is_*` anyway:
   **a signal that is correct only because its write-enable happens to be low
   is a defect waiting for a refactor**, and the census cannot see it.
-- **THE SIM's RAM-DUMP HOOK ADDRESSES *SDRAM*, NOT THE 68k BUS — AND SLICE D2
+- **[MSC-41]** **THE SIM's RAM-DUMP HOOK ADDRESSES *SDRAM*, NOT THE 68k BUS — AND SLICE D2
   MOVED WORK RAM (14z-107 (9)).** `JTFRAME_SIM_WRAMDUMP_OFF` is a BANK BYTE
   OFFSET. On the reference core `RAM:$FF0000-$FFFFFF` is bank 0 byte
   `0x600000`; on `cores/cps2w` the D2 bank-0 re-pack put it at `0x648000`,
@@ -1572,7 +1572,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   '+refs/heads/*:refs/remotes/local/*'`). It only bites when fork commits are
   held back from a push — which is exactly when RTL is being developed.
 
-- **A WIDENED BUS IS ONLY AS WIDE AS ITS NARROWEST PORT, AND VERILOG SAYS
+- **[MSC-29]** **A WIDENED BUS IS ONLY AS WIDE AS ITS NARROWEST PORT, AND VERILOG SAYS
   NOTHING (14z-107 (10), MiSTer slice D3).** The CPS-2 object bank goes from
   2 bits to 3 in `jtcps2_obj_scan`, but the value crosses FOUR module
   boundaries on its way to SDRAM — `jtcps2_obj_scan` -> `jtcps2_obj` ->
@@ -1584,7 +1584,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   content bug and sends you to the romset. Three of slice D3's four override
   files exist for nothing but this, and
   `tests/test_mister_wide_gate.sh` 8c asserts all six declarations by name.
-- **THE WIDE DOWNLOAD IS 197 FRAMES LONGER THAN THE STOCK ONE, AND EVERY
+- **[MSC-39]** **THE WIDE DOWNLOAD IS 197 FRAMES LONGER THAN THE STOCK ONE, AND EVERY
   ABSOLUTE FRAME NUMBER IN THE LANE MOVES WITH IT (14z-107 (10)).**
   `sim_inputs.hex` advances on every LVBL fall, download frames INCLUDED,
   so a replay is shifted by the transfer length: 462 frames for `vsavj.rom`
@@ -1614,7 +1614,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   `tests/test_mister_prg_probe.sh` 4e holds it to that with a fixture built
   from the real broken numbers. This is the same family as the four
   instrument defects of 14z-107: **suspect the instrument before the RTL.**
-- **THE CPS-2 KEY'S ENCRYPTED-OPCODE RANGE IS STORED COMPLEMENTED, AND
+- **[MSC-32]** **THE CPS-2 KEY'S ENCRYPTED-OPCODE RANGE IS STORED COMPLEMENTED, AND
   `jtcps2` READS IT STRAIGHT (14z-107 (11), MiSTer slice D5).** MAME and FBNeo
   both take `~decoded[9] & 0x3ff` (`cps2_crpt.cpp:771`); `jtcps2_dec_ctrl.v:44`
   is `en_latch <= op_fetch && en && (addr[14+:10] <= range[9:0])`, with no
@@ -1663,7 +1663,7 @@ Verilator, both dump sets integrity-checked:
 same 20 nonzero frames as before, which is what shows the fix re-ordered the
 bits rather than losing or doubling a press.
 
-**THE TRAP IS NOT THE BUG, IT IS THE HALF-MEASUREMENT.** 14z-107 (12) saw only
+**[MSC-45]** **THE TRAP IS NOT THE BUG, IT IS THE HALF-MEASUREMENT.** 14z-107 (12) saw only
 Left and Down (they are the only directions `36_pick_tenant_cell` presses) and
 inferred a two-bit SWAP leaving Up and Right untouched, from the translator's
 docstring. That inference fitted both data points and was WRONG: Up arrives as
@@ -1757,7 +1757,7 @@ tree you checked out, not of the clone command you typed.
 `xjtcore.sh` calls **`jtseed 4`**, which loops `jtcore --seed $RANDOM` and
 **BREAKS ON FIRST SUCCESS**.
 
-**BE PRECISE ABOUT WHAT THAT HIDES — the first draft of this entry was
+**[MSC-59]** **BE PRECISE ABOUT WHAT THAT HIDES — the first draft of this entry was
 stronger than the evidence.** It does NOT mean the flow ships failing
 bitstreams. At the measured per-seed failure rate the chance all four draws
 fail is about 1%, so **roughly 99% of invocations produce a gate-passing
@@ -1792,14 +1792,14 @@ the honest phrasing is "commonly, between about one seed in seven and three
 in five", NOT "exactly a third". The DIRECTION is not in doubt.
 
 **RULES.**
-1. **Never report a jtcores build as "closes timing" from one run.** Sweep
+1. **[MSC-58]** **Never report a jtcores build as "closes timing" from one run.** Sweep
    seeds and state the SPREAD and the MEDIAN, not the draw you got.
 2. **Always build the reference core on the same toolchain.** Here `cps2`
    passed 5 of 5, which is what makes the finding attributable at all.
 3. **A FAILING SEED STILL EMITS AN `.rbf`** that looks exactly like a good
    one, and a sweep OVERWRITES `release/<core>.rbf` with whatever ran last.
    **Verify the hash before flashing anything.**
-4. Failing paths that RESHUFFLE between seeds indicate a marginal CONE, not
+4. **[MSC-60]** Failing paths that RESHUFFLE between seeds indicate a marginal CONE, not
    a slow path. At n=12 the worst path was a different register on nearly
    every seed (`post_act`, `in_busy`, `br`, `st[0]`, `actd`, `rfsh|help`)
    landing on `sdram_a[7]`, `[8]` or `[11]`, and **the number of failing
@@ -1820,7 +1820,7 @@ the SAME seed reproduces the PLACEMENT and the TIMING exactly, and produces a
 **different bitstream and a different sha256**, purely because the macro moved.
 A same-day rebuild plausibly IS bit-identical; a next-day one certainly is not.
 
-**THE RULE THAT FOLLOWS: THE HASH IDENTIFIES THE ARTIFACT, THE SEED
+**[MSC-61]** **THE RULE THAT FOLLOWS: THE HASH IDENTIFIES THE ARTIFACT, THE SEED
 IDENTIFIES THE RESULT.** Never read a hash mismatch as a failed reproduction
 — check the SEED and the reported SLACK instead. This is the same shape as
 the green-build trap above: two different claims that look like one.

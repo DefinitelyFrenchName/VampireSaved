@@ -336,6 +336,13 @@ legacy behavior is a failed change.
   - `docs/project/patch_index.md` — one-page registry: status, dependencies,
     exclusivity, deprecation candidates. Updated in the same commit as any
     patch change.
+  - `.claude/skills/<name>/SKILL.md` — the DISTILLED DISCIPLINE, loaded
+    before the work (since 14z-114: `mister-cps2-wide-core`, `mister-vampire-
+    saved`). Skill = the laws and traps; docs = the facts. Every rule is
+    anchored `**[PFX-N]**` in the doc paragraph it distils and
+    `tools/checkskills.py` locks the two so they cannot drift; a skill that
+    quotes a number cites a LOG, never the synthesis. Editing an anchored
+    paragraph means keeping the marker with the fact or moving the rule.
   - `docs/GOTCHAS.md` — the index of traps that cost real debugging time;
     the entries live in `docs/{game,platform,project}/gotchas.md`. Append
     the moment one is paid for, to the bucket its FACT belongs to.

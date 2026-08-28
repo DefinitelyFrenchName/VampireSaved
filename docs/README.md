@@ -24,6 +24,7 @@ than guessing a filename):
 | how the game works, by subsystem | [`game/engine_internals.md`](game/engine_internals.md) → the `game/atlas/` rows it names |
 | what a specific address IS | [`game/atlas/`](game/atlas/) — `ram.md`, `character_tables.md`, `id_space.md`, `select_screen.md`, `sprite_lists.md`, `venue_assets.md` |
 | **what is true about the MiSTer core and why** | **[`project/mister_core.md`](project/mister_core.md) — the synthesis, in causal order. Read it BEFORE any MiSTer work**; its logs are `project/mister_map.md` (the SDRAM placement), `project/mister_fit.md` (what the roster needs) and [`platform/mister.md`](platform/mister.md) (jtcores, the simulation lane). Where the synthesis and a log disagree, THE LOG WINS |
+| **the MiSTer discipline, before touching the core, the lane, the MRAs or a board report** | the two SKILLS — `.claude/skills/mister-cps2-wide-core/SKILL.md` (level 1, game-independent, `[MSC-NN]`) and `.claude/skills/mister-vampire-saved/SKILL.md` (level 2, this romset, `[MSV-NN]`) — each rule anchored `**[MSC-NN]**` in the paragraph it distils and locked by `tools/checkskills.py` (`tests/test_checkskills.sh`); the scope is [`project/mister_scope.md`](project/mister_scope.md) |
 | what the extended hardware profile is and what rule 1 v2 permits | [`project/cps2_wide.md`](project/cps2_wide.md) |
 | what a change did, byte by byte | `project/patch_notes.md`; the registry is `project/patch_index.md` |
 | why something that "should work" does not | [`GOTCHAS.md`](GOTCHAS.md) — always check before re-deriving |
@@ -84,12 +85,19 @@ Entry points at this level, deliberately not in a bucket:
   every platform. Producer `tools/package_release_platforms.py`, gate
   `tests/test_release_roundtrip.sh` section 4
 - [`mister_scope.md`](project/mister_scope.md) — **the SCOPE of the MiSTer
-  documentation/skill distillation** (14z-113, scope only, not the skills):
+  documentation/skill distillation** (14z-113; **the skills were DISTILLED
+  14z-114** — see the routing row above):
   the two-level split (CPS-II/WIDE core vs VS-specific) with each skill's
   boundary, sources and gates; which docs feed which; and the
   **known-stale inventory** (S1-S20, file:line) measured against all
   ~5,000 lines of the MiSTer sources — read it before quoting any MiSTer
   document's STATUS line
+- [`mister_field.md`](project/mister_field.md) — **the MiSTer FIELD TEST
+  and TRIAGE, in-tree** (14z-114): what hardware answers that simulation
+  cannot, the bundle and its STOCK CONTROL, the stopwatch figures, the
+  symptom table (from the out-of-tree `FIELD_TRIAGE.txt`), field reports
+  as recordings, where the verdicts are. Written because the scope document
+  found this narrated only in NEXT_SESSION history and outside the repo
 - [`mister_fit.md`](project/mister_fit.md) — what merged-m6 needs vs what
   jtcps2 offers, per region; the bank-occupancy arithmetic (§6) behind the
   MiSTer memory-map route

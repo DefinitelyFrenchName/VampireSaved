@@ -4,7 +4,7 @@ Measured 14z-106 (2026-08-22) on `build/m3b_merged13` (merged-m6,
 fingerprint `64426955`) and the pristine `vsav.zip` in `$ROMDIR`. Every
 figure names its instrument; re-run them before quoting. The platform
 facts (bus widths, tiers) are in `docs/platform/mister.md`.
-**Provenance note, 14z-113:** the current freeze is merged-m9
+**[MSV-1]** **Provenance note, 14z-113:** the current freeze is merged-m9
 (`build/m3b_merged16`, fingerprint `32007911`) and `build/m3b_merged13` was
 deleted in the 14z-112 build-dir sweep. The ceilings this document feeds
 into the placement — group-C `0xEE73` / `0xFFDB`, QSound live `0x8E57F0`,
@@ -85,7 +85,7 @@ And blank is only the UPPER bound — a blank tile may still be referenced
 as transparent filler (the 14z-62e exclusivity caveat), so the usable
 figure is smaller still.
 
-**Conclusion: the roster's art is 13x larger than every blank tile in
+**[MSV-2]** **Conclusion: the roster's art is 13x larger than every blank tile in
 vanilla put together.** The "fit tenant art inside the stock 32 MB" option
 is not a trade-off to present — it is impossible without overwriting
 legacy art, which the superset invariant forbids. There is no

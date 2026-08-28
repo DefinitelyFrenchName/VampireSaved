@@ -197,7 +197,7 @@ a second emulator where practical; and ratified per profile version.
 ### THE MiSTer EDITION OF THE SAME RULE — added 14z-107 (6), slice D1;
 ### extended 14z-107 (9) for D2 and 14z-107 (10) for D3+D4
 
-The FPGA core is a THIRD implementation, and the RTL it needs is the same
+**[MSC-35]** The FPGA core is a THIRD implementation, and the RTL it needs is the same
 profile expressed in Verilog. It is governed here so that no future session
 finds modified core RTL under a ratification this document never mentioned
 (the 14z-91 lesson, CLAUDE.md rule 1 v2). Every clause has a MiSTer form:

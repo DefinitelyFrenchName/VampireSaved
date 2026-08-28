@@ -2877,7 +2877,7 @@ combat audits (timeout/downwin/throws/down_attack) carry that refusal.
 
 ## THE INSTRUMENT PROTOCOL — adopted 14z-107 (11), maintainer-directed
 
-**Paid for six times in one arc, and the class is older than the arc** (see
+**[MSC-52]** **Paid for six times in one arc, and the class is older than the arc** (see
 "half the Lua instruments stage inputs one frame off" and "success while the
 instrument was not the one being claimed", both above). The maintainer's
 direction, 2026-08-24: tighten how agent-driven instrumentation works, choose
@@ -2946,7 +2946,7 @@ vanilla; Donovan after the M2 port)" — accurate about its own era, on a tree
 now many generations past M2. Build-dependence was documented; the reader
 generalised anyway.
 
-**The rule.** This is the sibling of "identify moves by measured EFFECTS,
+**[MSC-56]** **The rule.** This is the sibling of "identify moves by measured EFFECTS,
 never the script's input name" (14z-102), one level up: **an artifact whose
 meaning depends on the build is a CLAIM about the build, and needs asserting
 like any other.** A replay named for a character is exactly as trustworthy as
@@ -2957,13 +2957,13 @@ already exist and were not consulted: the expectation class
 tenant one) and `tests/test_select_arrays.sh:85`, which says in words
 "11_pick_donovan … ending on Jedah".
 
-**Practical:** to reach a tenant on a current build use
+**[MSV-28]** **Practical:** to reach a tenant on a current build use
 `36_pick_tenant_cell` (Donovan `0x13`), `37_pick_huitzil_cell` (`0x10`) or
 `40_pick_pyron_cell` (`0x11`). All three tenants carry `gfx_bank: 4`.
 
 ## `pgrep -f` WAITERS MATCH THEMSELVES AND NEVER EXIT (paid: 2026-08-24, 14z-107, four times in one task)
 
-`until ! pgrep -f "<pattern>"; do sleep 30; done` **never terminates.** The
+**[MSC-55]** `until ! pgrep -f "<pattern>"; do sleep 30; done` **never terminates.** The
 shell running the loop has the pattern in its OWN command line, so `pgrep -f`
 finds it, and the waiter waits for itself forever. Long MiSTer simulation runs
 are exactly where this is reached for, and exactly where an unbounded hang is

@@ -1,4 +1,44 @@
-# NEXT SESSION — orientation (rewritten at the 14z-113 close, 2026-08-28)
+# NEXT SESSION — orientation (rewritten at the 14z-114 close, 2026-08-28)
+
+> ## **START HERE. NOTHING IS RED. THE MiSTer SKILLS EXIST AND ARE LOCKED
+> ## TO THE DOCS — load them before any MiSTer work.**
+> ##
+> ## **WHAT 14z-114 DID, one breath:** a retraction first (the merged-m10
+> ## registry row still called the `.rbf` "on the synthesis box"); then the
+> ## distillation. **Two skills**: `mister-cps2-wide-core` (level 1,
+> ## game-independent, `[MSC-1..73]`, sections 1.1-1.7 + 1.8 "what is NOT
+> ## known") and `mister-vampire-saved` (level 2, `[MSV-1..36]`, 2.1-2.5),
+> ## one section per `mister_scope.md` row. **The checker shape, decided
+> ## before a rule was written: the docs ARE the human rendition.** Each rule
+> ## is anchored `**[MSC-N]**` at the paragraph it distils and
+> ## `tools/checkskills.py` (`tests/test_checkskills.sh`, ci_portable) locks
+> ## it both ways, lints level 1 for game names/ceilings/build dirs, and
+> ## refuses any number not present in a LOG. **Its first real run found
+> ## that every 14z-108/109 measurement was missing from `platform/mister.md`**
+> ## — entered there now — and that skill 2.5 had no live carrier:
+> ## `docs/project/mister_field.md` (field test + triage) is new.
+> ##
+> ## **THE ONE RULE THIS ADDS TO EDITING DOCS:** an anchored paragraph carries
+> ## its marker — rewrite the fact and keep the marker with it, or move the
+> ## rule; delete the paragraph and the gate goes red, on purpose.
+> ##
+> ## **OPEN, unchanged:** #113 stays OPEN (camera evidence in progress — do
+> ## not close, do not re-derive); housekeeping deferred (`build/m3b_merged15`
+> ## referenced by `test_inp_crash_merged_m8_01` defect mode; STOCK CONTROL
+> ## re-scoped to once-per-`.rbf`, recommendation unruled; the cosmetic
+> ## backlog — DISASSEMBLE, NEVER SCAN). **FUTURE, unscheduled:** the other
+> ## skills the maintainer sketched (CPS-II emulation, VS/VS2/VH2) — reuse
+> ## this checker pattern; the living-documentation effort.
+> ##
+> ## **STATE OF THE BUILDS:** merged-m10 = `build/m3b_merged17`
+> ## (`tools/run_wide.sh build/m3b_merged17 fbneo`); bitstream seed 18269 at
+> ## `release/bitstreams/CURRENT`; everything pushed once this session's
+> ## commit lands (check `git ls-remote`, not this line).
+
+# HISTORY BELOW — the 14z-113 orientation and older; kept for the census
+# anchors, eliminations and traps, superseded as the opener.
+
+## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-113 close, 2026-08-28)
 
 > ## **START HERE. NOTHING IS RED. EVERYTHING IS PUSHED. THE OPENER IS THE
 > ## MiSTer SKILLS — and the reason this is a fresh session is the method:
@@ -63,8 +103,6 @@
 > ## `../mister_fieldtest_14z112/` IS this set. `run_all_static --strict`
 > ## PASS 110/0/0/0 at close.
 
-# HISTORY BELOW — the 14z-112 orientation and older; kept for the census
-# anchors, eliminations and traps, superseded as the opener.
 
 ## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-112 close, 2026-08-27; updated during 14z-113)
 

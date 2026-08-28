@@ -6,7 +6,7 @@ merged-m10 on; `release/merged-m6..m9/` keep the old layout as history.
 
 ## The rule
 
-`release/<name>/` holds **one subdirectory per platform**, and each one is
+**[MSV-20]** `release/<name>/` holds **one subdirectory per platform**, and each one is
 **self-sufficient: everything that platform needs and nothing else.** A
 FBNeo user never sees a `.mra`; a MiSTer user never sees a driver patch.
 **Every version releases every platform**, even when the change touched
@@ -35,7 +35,7 @@ release/<name>/
   binary** (ruled). The patch is the reviewable trust surface
   (`emu/fbneo-patches/0002`, `emu/mame-patches/0002` — one profile expressed
   twice); the recipe names the pinned upstream commit.
-* **MiSTer ships the MRAs the release was verified with, the `.rbf` itself
+* **[MSC-62]** **MiSTer ships the MRAs the release was verified with, the `.rbf` itself
   and its RECORD (`BITSTREAM.txt`: seed, slack, sha256, build date, fork
   pin, field history)** — ruled tracked in-tree, "as would any BPS or
   xdelta". **The bitstream is a BUILD RESOURCE with its own cadence**

@@ -1,5 +1,23 @@
 # STATE — living progress log
 
+## Session 14z-114 (2026-08-28) — **THE MiSTer SKILLS DISTILLED, WITH THEIR
+## CHECKER: two skill packages (level 1 `[MSC-1..73]`, level 2 `[MSV-1..36]`),
+## every rule ID-anchored in the doc paragraph it distils; the log gained the
+## 14z-108/109 measurements it never had; the field test got an in-tree carrier.**
+
+| | |
+|---|---|
+| opened with | the 14z-113 orientation; nothing red; main == origin/main at `09e4961` |
+| first | a retraction: the merged-m10 HANDOFF registry row still said the `.rbf` was "on the synthesis box" and the release format "the open item" — both retired by `09e4961` the same day. Fixed in place (14z-114 named), STATE freeze row + NEXT_SESSION history block marked as-written-then-superseded, re-grep empty (`3dcd5cd`) |
+| the design question, decided first | **the checker's shape.** Not the SMS two-renditions pattern (a second hand-written human doc per skill would be more prose to drift): **the docs ARE the human rendition.** Each rule is anchored `**[MSC-N]**` at the paragraph it distils; `tools/checkskills.py` asserts (1) the ID-lock BOTH ways — a deleted paragraph or an unanchored rule fails, one anchor per rule; (2) the `mister_scope.md` §1 liftability test on level 1 (no `vsav`, tenant, ceiling, fingerprint, build dir — fixed token list); (3) **every number a skill quotes appears in a LOG** (`platform/mister.md`, `mister_map.md`, `mister_fit.md`, `mister_field.md`, `release_format.md`, the gotchas, `BITSTREAM.txt`) and never only in the synthesis — the synthesis's own staleness rule, mechanised. Extractors self-tested on synthetic content every run; gate `tests/test_checkskills.sh` (ci_portable) adds four must-fire controls on a perturbed copy of the tree |
+| the skills | `.claude/skills/mister-cps2-wide-core/SKILL.md` — level 1, 73 rules, sections 1.1-1.7 per the scope rows + 1.8 "what is NOT known" (pixels/audio never measured, the decryption window inferred, the 128 MB CS polarity inferred, timing a seed lottery); `.claude/skills/mister-vampire-saved/SKILL.md` — level 2, 36 rules, 2.1-2.5. TWO packages rather than twelve: one SKILL.md per level with one section per scope row (a skill loads whole; the split the maintainer confirmed is the ROWS, not the file count). Both load in this session already. Cross-references to `[RH-NN]` rather than restating the general discipline |
+| what the checker found on its first real run (the point of building it first) | **every 14z-108/109 hardware-adjacent figure was missing from the LOG** — the tenant anchor 2886/3546/660, bank-1 load (15,496 / 12.5%), the QSound extension fetch (210,180 / bank `0x83`), the OBJ-list oracle (`0x4b0c4-0x4ecda`, 81 frames), the synthesis fit (+206 ALMs / 41,910) — they lived only in `mister_core.md` §12, HANDOFF and STATE. `platform/mister.md` now carries them ("THE 14z-108/109 MEASUREMENTS, RECORDED IN THE LOG"), each naming its gate |
+| the doc hole the scope document had flagged (§4, §5.4) | skill 2.5 (field test + triage) had NO live carrier — narrated only in NEXT_SESSION history, STATE_HISTORY 14z-109 and the out-of-tree `FIELD_TRIAGE.txt`. **`docs/project/mister_field.md`** written: what hardware answers, the bundle and its STOCK CONTROL, the stopwatch figures (26.5 s loop at 59.6374 Hz), the symptom table, field-reports-are-recordings, where the verdicts are |
+| anchors | 109 markers inserted across `platform/mister.md`, `mister_core.md`, `mister_map.md`, `mister_fit.md`, `mister_field.md`, `cps2_wide.md`, `release_format.md`, both gotchas, HANDOFF — each needle asserted UNIQUE before any edit (109/109 first pass). `mk_mister_page --check` still re-derives all 17 figures through them |
+| routing | `docs/README.md` (routing row + `mister_field.md` entry + scope row status), HANDOFF (MiSTer section lead + gate row), CLAUDE.md §5 taxonomy (skills bullet + the anchored-paragraph rule), `mister_scope.md` STATUS header, `tests/ci_portable.txt` |
+| green | `tests/test_checkskills.sh` PASS (109 rules, four controls fire); `run_all_static --tier portable` **PASS 54 / SKIP 0 / FAIL 0 / MISSING 0**; `ROMDIR=... run_all_static --strict` **PASS 111 / SKIP 0 / FAIL 0 / MISSING 0** (110 + `test_checkskills`) on the tree as committed |
+| push | committed to main; pushed at the maintainer's word (standing rule) |
+
 ## Session 14z-113 CLOSE — ritual complete. **THE MiSTer SCOPE DOCUMENT
 ## WRITTEN AND ITS THREE DECISIONS RULED; THE S1-S20 STALENESS PASS RUN;
 ## BUNDLE 14z112 FIELD-VERIFIED; merged-m10 FROZEN; THE RELEASE FORMAT RULED
@@ -1002,7 +1020,12 @@ the archive once they stop shaping active work.)*
   14z-60z/61, and it must not sit between the maintainer and a field test.
 
 - **DISTILL AI SKILLS FROM THE PROJECT'S LEARNINGS (maintainer direction,
-  2026-08-24).** Recorded as FUTURE, UNPLANNED work — nothing scheduled.
+  2026-08-24).** ~~Recorded as FUTURE, UNPLANNED work — nothing scheduled.~~
+  **THE MiSTer PAIR IS DONE 14z-114** (`mister-cps2-wide-core`,
+  `mister-vampire-saved`, checker `tools/checkskills.py`; STATE 14z-114). The
+  CPS-II-emulation and VS/VS2/VH2 skills remain future, unscheduled; the
+  checker shape (docs as the human rendition, anchored IDs, numbers cite the
+  log) is the pattern they should reuse.
   As was done for Sailor Moon S, distil the project's learnings into agent
   SKILLS, **scoped by subject rather than by task**. The maintainer's sketch:
   at least a **CPS-II** skill separate from a **VS / VS2 / VH2** skill, and
@@ -1039,7 +1062,8 @@ the archive once they stop shaping active work.)*
   both follow MiSTer.
 
 - **MiSTer DOCUMENTATION + SKILL DISTILLATION, AT TWO LEVELS (maintainer
-  direction, 2026-08-27). FIRST STEP AGREED 2026-08-27: produce the SCOPE
+  direction, 2026-08-27). DONE 14z-114 — both levels distilled, see the
+  14z-114 entry; `mister_scope.md` carries the status.** FIRST STEP AGREED 2026-08-27: produce the SCOPE
   DOCUMENT ONLY — ~~queued in `docs/NEXT_SESSION.md`~~ DONE 14z-113:
   `docs/project/mister_scope.md`; its three follow-on decisions are the
   entry "THE MiSTer SCOPE DOCUMENT — three decisions" above.** The scope document

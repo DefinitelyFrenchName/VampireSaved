@@ -1,5 +1,20 @@
 # MiSTer SCOPE — what the documentation/skill distillation should carry, and where each boundary falls
 
+> **STATUS 14z-114: THE SKILLS ARE DISTILLED.** Two skill packages, one per
+> level, one section per row of §2/§3: `.claude/skills/mister-cps2-wide-core/`
+> (level 1, rules `[MSC-1]`-`[MSC-73]`, 1.1-1.7 plus a 1.8 "what is NOT
+> known" carrying §7's level-1 holes) and `.claude/skills/mister-vampire-saved/`
+> (level 2, `[MSV-1]`-`[MSV-36]`, 2.1-2.5). **The checker shape, decided
+> first:** the docs ARE the human rendition — each rule is anchored
+> `**[MSC-N]**` at the paragraph it distils, and `tools/checkskills.py`
+> (`tests/test_checkskills.sh`, ci_portable) asserts the lock both ways, the
+> §1 liftability test on level 1, and that every number a skill quotes is in a
+> LOG (never only in `mister_core.md`). Two things the distillation forced:
+> the 14z-108/109 measurements had never reached `platform/mister.md` (the
+> log now carries them, "THE 14z-108/109 MEASUREMENTS"), and skill 2.5 had no
+> live carrier (§4's own finding) — `docs/project/mister_field.md` is it.
+> The rows below stand as the specification.
+
 Written 14z-113 (2026-08-28) as **the agreed first step of the
 documentation/skill-distillation effort — SCOPE ONLY, NOT THE SKILLS**
 (maintainer, 2026-08-27, STATE 14z-112 "queued"). It answers four questions

@@ -91,6 +91,15 @@ test_mister_wide_gate
 # ROM-free, no emulator, ~5 s. tools/mk_mister_page.py --check
 test_mister_page
 
+# 14z-114: the two MiSTer SKILLS (.claude/skills/mister-cps2-wide-core,
+# mister-vampire-saved) are LOCKED to the docs they distil — every rule
+# anchored exactly once (**[MSC-N]** / **[MSV-N]** in the doc paragraph),
+# every anchor defined, the level-1 skill game-free (liftability), every
+# quoted number present in a LOG and never only in the synthesis. Self-tested
+# extractors + four must-fire controls on a perturbed copy of the tree.
+# tools/checkskills.py. ROM-free, ~1 s.
+test_checkskills
+
 # 14z-107 (11): the ROM-free half of the slice D4 discriminator. Locks the 68k
 # program-ROM read probe's contract — it is inert unless JTCPS2W_PRGPROBE is
 # defined (with the hoisted-line control); its window bit IS the decode's
