@@ -106,6 +106,9 @@ consuming site in each artifact's patch payloads.
     build-inert). **GitHub #107**; the row flip to `0x04367A`
     (verified, callsite-anchored) moves shipped bytes → the next
     window, alongside #109 (the clone-beam 0xA00-low fix).
+    **SHIPPED 14z-102 (donovan-m10 / huitzil-m19 / pyron-m13 /
+    merged-m5): #107 CLOSED; the row reads `0x04367A` on every build
+    since.** (Status added 14z-114; the paragraph above is as written.)
 
 ### 3. The 113 planted tripwires, ranked by reachability (MEDIUM)
 69 distinct unresolved vs2 targets (donovan 23 / huitzil 46 / pyron 44),
@@ -211,7 +214,10 @@ Re-point the `[merged_*]` sections at every merged freeze.
   exists; the script's screen-palette event is dropped — the #101
   script-carried-id class) + the DF gold tint (our 14z-84 block;
   native's EX never tints) + burst occlusion behind the 4-copy train
-  (CPS-2 back-to-front list render).]** Fix waits on the tint ruling
+  (CPS-2 back-to-front list render).]** **#109 SHIPPED 14z-102 as
+  effect-class ROW 31 (the DF clone-mode beam emitter vsavj shipped as a
+  stub; gate `audit_clone_beam_lines.sh`), CLOSED; the gold tint KEPT by
+  maintainer ruling 2026-08-21.** As written before that landed: fix waits on the tint ruling
   and the palette-event hunt. (History: the earlier intermediate
   readings — "drawn-but-invisible markers", "never drawn", "0xA00
   low" — are all retracted in place in STATE 14z-101 (5)/(7)/(8).)
@@ -234,7 +240,9 @@ Re-point the `[merged_*]` sections at every merged freeze.
 ## Guard currency (the H2 sweep, 2026-08-20)
 - `audit_tripwire_reach.sh` → current freeze artifacts; six legs green.
 - `test_pcrel_escapes.sh` + `pcrel_escapes.toml` → hui45/pyron29/don_m9
-  (inventories identical; merged gap filed).
+  (inventories identical; merged gap filed). **Now hui48/pyron32/don_m14
+  + `[merged_*]` on m3b_merged16 (re-pointed 14z-102/111; merged17 is
+  member-identical).**
 - `test_pointer_flow.sh` NEW (ci_static): the comb, frozen baselines,
   synthetic must-fail controls both directions.
 - `bases.tsv` re-derived + re-derive-at-every-freeze note (14z-100).

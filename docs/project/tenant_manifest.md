@@ -6,7 +6,10 @@ single tenant.** `[[tenant]]` is consumed by `tools/gen_donovan_patch.py`
 are untouched) and drives the gfx half through `patch/tenant.json`. Landing
 it was byte-identical on both tracks with the tenant still at `0x0F`
 (14z-60t/u). Multi-tenant manifests are refused with a clear message until
-M3 Phase 3.
+M3 Phase 3. **STATUS 14z-114: Phase 3 happened — the three-tenant
+merged build is `tools/build_merged.sh` (tenant_loop over the per-tenant
+manifests, since 14z-8x; current merged-m10), so the sentence above is
+HISTORY. The PROPOSAL-only sub-tables below remain exactly that.**
 
 Still PROPOSAL-only below: the `[tenant.wheel]`, `[tenant.ladder]` and
 `[tenant.folds]` sub-tables. They describe work not yet done — the wheel

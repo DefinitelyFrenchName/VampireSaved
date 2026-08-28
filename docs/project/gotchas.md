@@ -1535,7 +1535,8 @@ Two related traps, paid together on vs2's row-8 machine:
    is redefined, because the ground-truth reader sits 0x3E bytes away
    inside a bsr subroutine — an "immediately after" rule can never see
    it. Verified to catch vs2 0x6D206 -> 0x6D868. The GENERATOR side is
-   still open, but see the entry above: for this case the fix is to
+   still open [CORRECTED 14z-114: it is NOT — `gen_donovan_patch.py`
+   relocates reader shape `"postinc"` since the same session], but see the entry above: for this case the fix is to
    make the region contain its tables, not to rewrite readers.
 2. Moving the region to RAW space does NOT solve an embedded data
    table. Raw storage holds ONE byte image, and for a code region

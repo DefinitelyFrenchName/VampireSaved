@@ -543,13 +543,16 @@ tools/run_wide.sh build/m3b_merged17 fbneo # THE 3-TENANT BUILD (all 18
                                            # newest first; m5w and merged1 are
                                            # refused by name.)
                                            # selectable, art included) =
-                                           # merged-m6, FROZEN 14z-105 —
-                                           # merged-m5 + the window batch:
-                                           # W1 the OBORO SELECT HOOK + W2
-                                           # the VERSION STRING.
+                                           # merged-m10, FROZEN 14z-113 (the
+                                           # one-zip repackaging of merged-m9,
+                                           # the 14z-111 #99 root-cause fix;
+                                           # program fingerprint 32007911).
+                                           # CORRECTED 14z-114: this comment
+                                           # said "merged-m6, FROZEN 14z-105"
+                                           # and "M6" for three freezes.
                                            # WHAT TO LOOK AT FIRST:
                                            # (1) the select screen shows
-                                           # "M6" bottom-right — THE NAKED-
+                                           # "M8" bottom-right — THE NAKED-
                                            # EYE A/B TELL (CLAUDE.md §5,
                                            # finally implemented; the text
                                            # names the freeze generation and
@@ -561,15 +564,27 @@ tools/run_wide.sh build/m3b_merged17 fbneo # THE 3-TENANT BUILD (all 18
                                            # "Bishamon" — aliased rows).
                                            # Works for P1 and P2. Without
                                            # Start it is plain Bishamon.
-tools/run_wide.sh build/don_m11 fbneo      # or the solo builds (hui47,
-                                           # pyron31); ... mame
+tools/run_wide.sh build/don_m14 fbneo      # or the solo builds (hui48,
+                                           # pyron32); ... mame
                                            # (registry rows name the CURRENT
-                                           # fingerprints — donovan-m11/
-                                           # huitzil-m20/pyron-m14 since the
-                                           # 14z-105 window freeze)
+                                           # fingerprints — donovan-m14/
+                                           # huitzil-m21/pyron-m15 since the
+                                           # 14z-111 #99 root-cause freeze)
 ```
 
-**Current WIDE builds — THE 14z-105 WINDOW FREEZE (maintainer "happy with
+**Current WIDE builds — THE 14z-111 #99 ROOT-CAUSE FREEZE, repackaged
+one-zip at 14z-113 (merged-m10; FIELD VERDICT GREEN 2026-08-27/28):
+donovan-m14 / huitzil-m21 / pyron-m15 / merged-m9 -> merged-m10.**
+`build/don_m14` (`772d8052`, 332 ops), `build/hui48` (`cd362ca4`, 366),
+`build/pyron32` (`c403a283`, 303), `build/m3b_merged17` (program
+fingerprint `32007911`, 819 ops; = `m3b_merged16` in every member, one zip),
+stock twin `build/m5_stock9` (`d29fd062`, UNCHANGED from m5_stock8). The
+naked-eye tell is the **M8** mark. Full rows: the registry entries for
+14z-110 / 110b / 111 / 113 below; detail STATE 14z-111 and 14z-113.
+(CORRECTED 14z-114: this header had stopped at the 14z-105 batch while
+four later freezes sat in the registry.)
+
+**Previous batch (14z-105 WINDOW FREEZE (maintainer "happy with
 the plan" 2026-08-22; FIELD-CONFIRMED + PUSHED the same day): donovan-m11 / huitzil-m20 /
 pyron-m14 / merged-m6.**
 `build/don_m11` (`1de9a027`, 325 ops), `build/hui47` (`24a27940`, 365),

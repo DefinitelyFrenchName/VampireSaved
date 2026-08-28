@@ -95,7 +95,9 @@ corrected to SHIPPED-14z-99).
   don_grab_pose, don_ko_writer, don_lilith_ko, hui_grunt,
   kill_poke_shape, roster_pairings, win_pal_auto, tenant_pairings —
   are correct TODAY but must join the freeze re-point sweep, or the
-  N-2 deletion policy will rot them at the next freeze.
+  N-2 deletion policy will rot them at the next freeze. **DONE — every
+  freeze since has carried the sweep (14z-113: 54 defaults
+  `m3b_merged16` -> `m3b_merged17`; `test_build_ref_rot.sh` polices it).**
 
 The original decision input follows, unchanged.
 
