@@ -21,9 +21,19 @@
 # THE FIX (maintainer-chosen 14z-116, of three options): the thunk's P2
 # branch now exits instead of writing. `tst.b $381(a4)` is followed by
 # `bne` to the pop/rts rather than `beq` past an `adda.w #$60,a1`. Same
-# byte count, so no allocation ripple. The trade the maintainer accepted:
-# P2's select-figure sword shows the vanilla grey ramp while P2 hovers a
-# tenant. P1's accent (row 0x17) is untouched.
+# byte count, so no allocation ripple. P1's accent (row 0x17) is untouched.
+#
+# THE TRADE, as the board actually shows it (maintainer, CRT, 2026-08-29 —
+# the session's own prediction of "the vanilla grey ramp" was WRONG): the
+# P2 sword draws with whatever row 0x1A holds, and that is now Pyron's
+# medallion palette — pixels move from steel blue-white (153,170,221) to
+# orange-gold (255,136,34), which on Donovan's gold-and-red costume reads
+# as the sword being ABSENT. The grey ramp was the PRE-62k state, before a
+# medallion lived in that row.
+# AND A PARTIAL FIX IS IMPOSSIBLE, measured: the sword and the medallion
+# draw from THE SAME entries of row 0x1A (23 shared colours in the rendered
+# frame), so the row cannot be split by pen. Do not re-propose "write the
+# accent only into the pens the medallion doesn't use".
 #
 # THE TWO LEGS ARE A PAIR, and neither is sufficient alone:
 #   1. P2 hovers Donovan -> row 0x1A must hold PYRON's vs2 palette for the

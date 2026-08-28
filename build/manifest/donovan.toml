@@ -1966,8 +1966,19 @@ thunk_hex = "207c002672aa0c0000tu66083d7c300000184e754e75"
 # NOT to Donovan's P2-hover portrait as 14z-87b supposed. `tst.b $381(a4)`
 # is now followed by `bne` to the pop/rts (disp 0x54 -> body offset 120)
 # and two NOPs where `adda.w #$60,a1` was — SAME BYTE COUNT, no allocation
-# ripple. Accepted trade: P2's select-figure sword shows the vanilla grey
-# ramp while P2 hovers a tenant. Measured: P1's accent byte-for-byte
+# ripple. ACCEPTED TRADE, and the FIELD-OBSERVED shape of it
+# (maintainer, CRT, 2026-08-29 — my pre-measurement prediction of "the
+# vanilla grey ramp" was WRONG): the sword does not go grey, it draws with
+# WHATEVER ROW 0x1A NOW HOLDS, which is Pyron's medallion palette. Measured
+# on the snapshot: its pixels move from steel blue-white (153,170,221) to
+# orange-gold (255,136,34) — and on Donovan's own gold-and-red costume that
+# reads as the sword being ABSENT ("entirely transparent"). The grey ramp
+# was the PRE-14z-62k state, before we put a medallion in that row; there is
+# no path back to it while Pyron lives there.
+# A PARTIAL FIX IS IMPOSSIBLE, measured rather than assumed: the sword and
+# the medallion draw from THE SAME palette entries of row 0x1A (23 shared
+# colours in the rendered frame), so the row cannot be split by pen and the
+# accent cannot be written "only where the medallion isn't looking". Measured: P1's accent byte-for-byte
 # unchanged, and 38_victor_p1_vsavj / 05_timeout_idle / 63_idle_select are
 # BIT-IDENTICAL to merged18 — the changed path only runs on a P2 tenant
 # hover, which no legacy replay does. Gate:
