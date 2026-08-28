@@ -8,12 +8,15 @@
 > ## **(1) #113** — the one-frame white-out at a down is MEASURED VANILLA
 > ## (identical on stock `vsavj` AND `vsav2`; gate
 > ## `tests/test_down_flash_vanilla.sh`). His MiSTer double-check closes it.
-> ## **(2) BUNDLE `../mister_fieldtest_14z112/`** — WIDE builds no longer
-> ## pack a patched `vsav.zip` (the four group-A members moved INSIDE
-> ## `vsavjw.zip`), so one SD card can hold this profile AND stock Vampire
-> ## Savior. `.rbf` UNCHANGED, wheel still M8, program fingerprint
-> ## `32007911` unchanged — packaging, not content. The question to answer
-> ## is whether STOCK vsav/vsavj now renders CORRECT art.
+> ## **(2) BUNDLE `../mister_fieldtest_14z112/` — ANSWERED 14z-113
+> ## (maintainer, 2026-08-28): NO REGRESSION.** Stock renders correctly on
+> ## Jotego's own core from the shared pristine `vsav.zip`, WIDE runs on
+> ## ours, the STOCK CONTROL boots too. One-zip packaging is field-proven;
+> ## freezing `build/m3b_merged17` is now unblocked (maintainer's call).
+> ## The STOCK CONTROL's remaining use is the superset invariant ON SILICON
+> ## — run it once per new `.rbf`, not per release (STATE "Decisions
+> ## pending"). **Next by the maintainer's own sequencing: the S1-S20
+> ## staleness pass, then the MiSTer release format, then the skills.**
 > ##
 > ## **THE MiSTer SCOPE DOCUMENT IS DONE (14z-113):
 > ## `docs/project/mister_scope.md`** — the two-level split with each

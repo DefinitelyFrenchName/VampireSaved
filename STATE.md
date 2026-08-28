@@ -13,6 +13,7 @@
 | not done, by design | NO stale claim was corrected — the ask was scope only. The retraction pass over S1-S20 is decision 2 below |
 | decisions pending | see "Decisions pending": (1) confirm the split, (2) run the staleness pass BEFORE the skills (recommended), (3) the `.rbf`'s home |
 | green | `run_all_static --strict` after the docs change: **PASS 110 / SKIP 0 / FAIL 0 / MISSING 0**; ROM audit 76/76 |
+| **BUNDLE 14z112 FIELD-VERIFIED (maintainer, 2026-08-28)** | "excellent: no regression" — **stock Vampire Savior renders correctly on Jotego's own JT core from the shared pristine `vsav.zip`, WIDE runs on our core, and the STOCK CONTROL MRA boots on our `.rbf` too.** So the one-zip packaging is CONFIRMED on hardware: one SD card carries this profile AND stock, which is what 14z-112's fix set out to do. The repackaged set `build/m3b_merged17` is therefore field-proven — registering/freezing it is now UNBLOCKED (still the maintainer's call; content unchanged, fingerprint `32007911`, only the zip layout moved). The maintainer asks whether the STOCK CONTROL still has a use — answered under "Decisions pending" (recommendation: keep it, as the per-BITSTREAM superset leg, run once per new `.rbf`, not per romset release). #113's hand check was not mentioned in this report and is NOT assumed closed |
 
 ## Session 14z-112 CLOSE — ritual complete. **#99 CLOSED ON A GREEN FIELD
 ## VERDICT; #112 REPRODUCED, RULED COSMETIC AND PARKED; #113 MEASURED VANILLA;
@@ -32,7 +33,7 @@
 | build-dir sweep | 26 generations deleted, **4.9 GB -> 2.9 GB**, keeping current + one back. It broke `test_shared_writes` (its fixture `don_m7` had 23 UNTRACKED outputs); recovered by rebuilding at the freezing commit — fingerprint `c90b60c3` reproduced exactly. The cheap alternative (re-point + re-freeze) was MEASURED and REFUSED: it would have laundered 103 unreviewed shared-surface writes |
 | green at close | `run_all_static --strict` **PASS 110 / SKIP 0 / FAIL 0** (the 14z-111 baseline) · inp corpus 6/6 on merged17 · MiSTer MRA map · romset identity · WIDE render-content · m3a reproducible (four WIDE manifests re-frozen for one-zip packaging, 42 -> 25; **MANI_STOCK unchanged** = the control that the stock track is untouched) |
 | queued | the MiSTer **scope document** (the agreed first step of the documentation/skill-distillation effort — scope only, not the skills); THE COSMETIC BACKLOG (win-quote text for all three tenants, ladder map names/pictures, select-wheel polish, #112) |
-| not done | the maintainer's MiSTer check on #113; the board test of bundle 14z112; `merged17` is NOT registered or frozen — that stays a separate decision |
+| not done | the maintainer's MiSTer check on #113; ~~the board test of bundle 14z112~~ **DONE 14z-113: field-verified, no regression, stock coexists** (see the 14z-113 group); `merged17` is NOT registered or frozen — that stays a separate decision, now unblocked |
 | push | main == origin/main at close (`git ls-remote`); no tags cut (no freeze) |
 
 **Ledger rollover:** the 14z-110 and 14z-109 groups moved verbatim to
@@ -815,6 +816,29 @@ the archive once they stop shaping active work.)*
   under `release/`. **This opens a NEW item, the MiSTer RELEASE FORMAT**
   (below): what a `release/<name>/` carries for MiSTer, how and where it is
   generated, and its provenance record.
+
+- **DOES THE STOCK CONTROL MRA STILL HAVE A USE? (maintainer's question,
+  2026-08-28, after it booted fine on bundle 14z112.) RECOMMENDATION: KEEP
+  IT, RE-SCOPED.** It was built (14z-109) to separate a fault in our
+  PROFILE from one in the bitstream/card/module/video chain, at a time when
+  the bundle's `vsav.zip` was patched and no stock MRA could serve as a
+  control. Two of its three jobs are now done by something else: a stock
+  MRA on Jotego's own core covers "the board/card/module is fine" (and it
+  just did), and the shared pristine `vsav.zip` means no bundle can poison
+  stock art any more. **The job nothing else does: it is the EMULATOR
+  SUPERSET INVARIANT ON SILICON** — stock `vsavj` running on OUR `.rbf`
+  with the profile bit at the `0xFF` fill, i.e. CLAUDE.md rule 1 v2's
+  "the patched binary running stock is untouched by construction",
+  measured on hardware rather than in Verilator (`test_mister_wide_inert`
+  is the simulated form). That claim is about the BITSTREAM, so the control
+  needs running **once per new `.rbf` (new seed / new slice / new pin),
+  NOT per romset release** — the `.rbf` has not changed since 14z-108, so
+  today's pass covers it until the next synthesis. Cost of keeping: one
+  XML file in the bundle and one line in the README. Recommendation: keep
+  it in the release format (the MRAs are tracked in-tree now), label it
+  "run when the bitstream changes", and drop it from the per-release
+  checklist. Dropping it outright is also defensible — the maintainer's
+  call; no gameplay surface.
 
 - **THE MiSTer RELEASE FORMAT — OPEN (opened 14z-113 by ruling (3) above;
   the details "have never been fixed").** What has to be decided, with a
