@@ -31,7 +31,7 @@ cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
-BUILD="${REC_BUILD:-build/hui48}"
+BUILD="${REC_BUILD:-build/hui49}"
 RPL="${REC_REPLAY:-tests/replays/26_don_arcade_mash.rpl}"  # truncated in section 0
 
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary at $MAME_BIN"; exit 0; }

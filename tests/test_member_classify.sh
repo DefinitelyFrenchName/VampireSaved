@@ -35,8 +35,8 @@ rc = 0
 print("== 1. every REAL program member still classifies as program ==")
 romdir = os.environ.get("ROMDIR", "")
 zips = sorted(glob.glob(os.path.join(romdir, "*.zip"))) if romdir else []
-zips += [p for p in ("build/hui48/rompath/vsavjw.zip",
-                     "build/m3b_merged17/rompath/vsavjw.zip") if os.path.exists(p)]
+zips += [p for p in ("build/hui49/rompath/vsavjw.zip",
+                     "build/m3b_merged18/rompath/vsavjw.zip") if os.path.exists(p)]
 if not zips:
     print("  SKIP: no ROMDIR and no packed build to read")
 else:

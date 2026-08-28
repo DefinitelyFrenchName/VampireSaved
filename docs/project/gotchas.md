@@ -2759,7 +2759,11 @@ non-debug tap (FBNEO_HTAP) — here it settled the question in one run.
 ## zsh: an argument beginning with `=` triggers =cmd expansion (14z-100)
 `echo ====` fails with "=== not found" in the Bash tool's zsh — `=word`
 expands as "path of command word". Quote it or avoid `=`-leading args in
-generated command lines.
+generated command lines. **Sibling (14z-115, paid for twice in one evening): an unquoted
+`$var` does NOT word-split in zsh** — `for f in $frames` iterates ONCE over
+the whole string, so a dump spec built from it was one malformed entry and
+the FBNeo harness silently wrote NO dumps (rc 0, logs complete). Write
+`for f in ${=frames}` in the Bash tool's zsh, or run the loop under `sh`.
 
 ## **[VSP-131]** A scripted motion input is NOT the move you named — the buffer FOLDS leading directions, so identify by effects, never by the script (14z-101)
 The #109 native-reference hunt scripted "6236+2P" and confidently called

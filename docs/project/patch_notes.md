@@ -1,5 +1,79 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-115 — THE SELECT-WHEEL SEPARATION (maintainer-directed "E2", approved 2026-08-28): byte detail
+
+**What and why.** The three appended medallions (Phobos 0x10 / Pyron 0x11 /
+Donovan 0x13) sat on the same row as the vanilla "?" cell 0x0B and overlapped
+it and each other (measured on the live OBJ list: "?" box 175-207 x 134-166
+screen, the tenants centred (150,152) / (180,160) / (208,152)). The
+maintainer's rule: at least 1 px of black between each new medallion and
+anything else. The "?" cannot move (its hover-ring base is legacy-visible), so
+the tenants moved — by the maintainer's own pixel offsets, iterated on MAME
+snapshots — and each gained a 1 px near-black ring. Everything below is
+WIDE-only (`[[select_wheel]]` is `profile = "cps2-wide-v1"`); the vanilla
+record `PRG:0x272A68`, coord list `PRG:0x32A50A` and the tilemap are
+untouched; the stock twin rebuilt bit-identical (`d29fd062`).
+
+**Positions (screen px, sprite corner; OBJ = screen + (64,16)):** Phobos
+(138,145) -> (137,148); Pyron (168,153) -> (168,160); Donovan (196,145) ->
+(197,148). In `build/manifest/wheel_layout_proposed.json` `pos` (ring
+centre, OBJ space): 0x10 (214,168)->(213,171), 0x11 (244,176)->(244,183),
+0x13 (272,168)->(273,171). The coord list (`data 0x413c70`) carries them.
+
+**Hover-ring bases (`code 0x05fb22/26/2e`, the 32-row pc-rel table at
+`PRG:0x5FAE2`, rows 0x10/0x11/0x13):** (158,80)/(188,72)/(216,80) ->
+**(165,77) / (191,65) / (217,77)**. Two facts learned on the way, both
+measured on the live OBJ list: the base's Y runs OPPOSITE to the cell
+position (a +3 base y moved the ring 3 px UP — first probe build), and the
+rings had always sat ~4 px left of the medallion centres (the reused Jedah
+ring records frame vs2's art differently), so the maintainer tuned them by
+eye: Phobos +8 x, Pyron +3 x, Donovan as it was.
+
+**Outline sprites (NEW content, `authored`):** one 4x3-tile (64x48) sprite
+per cell, its pixels = the medallion's own alpha (pen != 15) placed at
+(8,8) in the canvas, dilated by one pixel (8-neighbourhood), minus the art;
+ring pixels are pen 0, all else pen 15. Rendered by `build_gfx_donovan.py`
+from the same vs2 group-A tiles the medallions come from (`wheel_bank5.json`
+`"outline"`), placed at group C **`0x1F800 + 4k` (+col, +16*row)** — the
+free block found in the merged-m10 ledger after the first guess `0x1FE50`
+collided with effect art and the build refused it (same-source-or-fail).
+Palette: row **0x19** (Phobos' medallion row, thunk-re-asserted every select
+frame) **pen 0 = (1,1,1)** — NO palette content change, deliberately: the
+14z-88 lesson (fade-processed palette content is cycle-relevant) made any row
+edit a measured risk, and no vanilla row carries blue+purple+black together.
+
+**Record (`data 0x413ce0 +0x72`, count 17 -> 25, budget 0x55 carried):**
+entries = 18 vanilla, then per cell in id order **[outline, medallion]**
+(cells 0x10, 0x11, 0x13), then the 2 version glyphs. Order is the
+mechanism: later entries draw ON TOP (measured 14z-114 on the live list —
+Donovan over Pyron over Phobos over "?"), so a cell's ring precedes its own
+art (hidden under it) and covers the cell behind it — the black gap where
+they overlap. Entry attr `0x2300 | 0x19` (4x3, pal 0x19). Coord pair =
+cell corner - (8,8).
+
+**Version mark:** `version_text` "M8" -> "M9" (glyphs at 0x1FE40/41, screen
+(340,202)) — the naked-eye tell of this freeze.
+
+**Manifest knobs (all three tenant manifests, `[[select_wheel]] roster21`):**
+`cell_outline = true`, `outline_base = 0x1F800`, `outline_pal = 0x19`.
+Generator: `tools/gen_donovan_patch.py` (2a. CELL OUTLINES); gfx:
+`tools/build_gfx_donovan.py` (the outline pass); checker:
+`tools/check_wheel_bank5.py` (re-derives the interleaved entries).
+
+**Builds:** donovan-m15 `38a4becb` (`build/don_m15`), huitzil-m22
+`7bb36d0c` (`build/hui49`), pyron-m16 `7177229a` (`build/pyron33`),
+merged-m11 `dea2c918` (`build/m3b_merged18`, 819 ops — count unchanged,
+the data ops grew), stock twin `build/m5_stock10` = `d29fd062` UNCHANGED.
+Members moved: program `vm3j.03d/04d/07b/10b`, `vsw.41/42` (record, coords,
+ring bases), group C `vsw.31m/33m/35m/37m` (36 outline tiles + the M9
+glyphs). MiSTer tail: fork `202fc3e6` (catalogue), patch 0025, pin bumped.
+
+**Gates at freeze:** `test_wheel_bank5` (checker taught the interleave),
+`test_select_wheel`, `test_tenant_select_records` (host-pick window
+889-2415 held), `test_version_string` (M9 pixel-exact), `test_oboro_select`,
+`test_jtcores_twin`; the suites / merged legacy audit / inp corpus / m3a —
+see STATE 14z-115.
+
 ## 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail
 
 **Mechanism (captured on the maintainer's natural-path `.inp`, `tests/inp/crash-merged-m8-01`):**

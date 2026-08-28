@@ -36,7 +36,7 @@ cd "$REPO"
 # it reported PASS about three builds nobody ships. Section 5 adds the CURRENT
 # trio. Both are true at once; neither replaces the other.
 HIST_BUILDS="build/m5_wide build/hui30 build/pyron21"
-CUR_BUILDS="build/don_m14 build/hui48 build/pyron32"  # re-pointed 14z-111
+CUR_BUILDS="build/don_m15 build/hui49 build/pyron33"  # re-pointed 14z-115 (select-wheel freeze) <- 14z-111
 BUILDS="${*:-$HIST_BUILDS}"
 
 # Presence is two-tier. An UNBUILT tree (no build dir has placements.json at

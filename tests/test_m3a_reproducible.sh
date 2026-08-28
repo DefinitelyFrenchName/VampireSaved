@@ -64,7 +64,8 @@ trap 'rm -rf "$WORK"' EXIT
 # EXPECT_WIDE="c6a02cb01b0eb7c80cdd22cba8796030677ae706"  # git tag freeze/donovan-m10
 # EXPECT_WIDE="60b55a12a9b241b15242c3fedafd524788c6b988"  # 14z-110 d2 window
 # EXPECT_WIDE="ec86330ff1c5e1c8945973b55f434991801f5ead"   # 14z-110b (the 0x51->0x44 remap)
-EXPECT_WIDE="772d80521715ca484eeecb877dacef50bc233901"   # 14z-111 donovan-m14 (the #99 root-cause fix: AI script rows + x101aca at the wide_ext head via region_space; M8 mark is gfx-only)
+# EXPECT_WIDE="772d80521715ca484eeecb877dacef50bc233901"   # 14z-111 donovan-m14 (the #99 root-cause fix: AI script rows + x101aca at the wide_ext head via region_space; M8 mark is gfx-only)
+EXPECT_WIDE="38a4becb8ce0b20fd64ddbc982852326611df8b2"   # 14z-115 donovan-m15 (the select-wheel separation: cell positions, ring bases, outline sprites; M9 mark)
 # EXPECT_STOCK="a054de5c0cfe868cb0aa9722abebdffd9dfcdb0d"  # unchanged 14z-86..14z-96
 # 14z-99: THE STOCK TWIN MOVED for the first time since 14z-91 — #103's
 # pcrel_escape_fix rows are not profile-gated (the stock track gets the
@@ -110,7 +111,8 @@ EXPECT_STOCK="d29fd0620f67dcd70939be8712e9f86cff558ca3"  # 14z-110b (the remap r
 # EXPECT_HUI="c4bbb3752cc93494455bfebb83fff801051c7fec"  # git tag freeze/huitzil-m18
 # EXPECT_HUI="1a7249d68d1ce8472c5a25ab6bd05ef099c2ff29"  # git tag freeze/huitzil-m19
 # EXPECT_HUI="24a27940656c160c909de3a690e74da8aa7e9432"   # 14z-105 window (oboro hook + version string; placements +0x10)
-EXPECT_HUI="cd362ca4509ffa05d388ab8ec54321d4bc8b8b45"   # 14z-111 huitzil-m21 (AI script rows + x100000 + the 4 recon rows)
+# EXPECT_HUI="cd362ca4509ffa05d388ab8ec54321d4bc8b8b45"   # 14z-111 huitzil-m21 (AI script rows + x100000 + the 4 recon rows)
+EXPECT_HUI="7bb36d0c1a6790b9b960d06defb65510e67683e0"   # 14z-115 huitzil-m22 (the select-wheel separation; M9 mark)
 # pyron-m3 (14z-82c: + the ADOPTED hitclass_map_extend thunk — the f7997 fix)
 # EXPECT_PYR="6c7f7322da793c12b3681dd3ef5a76b3792ae5d0"  # git tag freeze/pyron-m3
 # pyron-m4 (14z-85b, maintainer-ruled: + pyr_sfx_records — kills the merged
@@ -130,7 +132,8 @@ EXPECT_HUI="cd362ca4509ffa05d388ab8ec54321d4bc8b8b45"   # 14z-111 huitzil-m21 (A
 # EXPECT_PYR="4c3c072bfe7a7b422d27194c986b27f53238f554"  # git tag freeze/pyron-m12
 # EXPECT_PYR="dbce705b0cf92f93103da73da35b55a75f05b666"  # git tag freeze/pyron-m13
 # EXPECT_PYR="6bf265abc5b8e0980f7f8b29fd39b64814af8a86"   # 14z-105 window (oboro hook + version string; placements +0x30)
-EXPECT_PYR="c403a283f5f3d14aee7165f8b153a015fccd718f"   # 14z-111 pyron-m15 (AI script rows + x100e3c)
+# EXPECT_PYR="c403a283f5f3d14aee7165f8b153a015fccd718f"   # 14z-111 pyron-m15 (AI script rows + x100e3c)
+EXPECT_PYR="7177229ab9cd71cf6f0583eee6c411c46771ca10"   # 14z-115 pyron-m16 (the select-wheel separation; M9 mark)
 
 # The WIDE overlay romset (deterministic from the audited reference sets;
 # built into scratch so the canonical build/wide0 is never clobbered).
@@ -208,7 +211,8 @@ done
 # MANI_WIDE="fc816b5aa1e88ca184f7ac38ff7fd8cc210ecc0a 42"   # 14z-110 (delta: vm3j.03d/04d/10b + vsw.41 PROGRAM — the #99 ...  # 14z-110
 # MANI_WIDE="f6abea514715b965ddfed2aab87e5df9c31bef03 42 42"   # 14z-110b (delta: vm3j.10b — the six remap bytes; nothing else moved)
 # MANI_WIDE="c26b7e6a6d0efed10c19e31585236ee8280d9b95 42 42" 
-MANI_WIDE="1be254bda2a12a6e293c857375592e5cc71b7981 25"  # 14z-112 (PACKAGING, not content: a WIDE set is now ONE zip — the four patched group-A members moved into vsavjw.zip and no vsav.zip is packed, so stock Vampire Savior and this profile can share one MiSTer card. Inventory 42 -> 25 for every WIDE track; MANI_STOCK is UNCHANGED, which is the control that the stock track is untouched. Program fingerprints all reproduced bit-exact in the same run.)
+# MANI_WIDE="1be254bda2a12a6e293c857375592e5cc71b7981 25"  # 14z-112 (PACKAGING, not content: a WIDE set is now ONE zip — the four patched group-A members moved into vsavjw.zip and no vsav.zip is packed, so stock Vampire Savior and this profile can share one MiSTer card. Inventory 42 -> 25 for every WIDE track; MANI_STOCK is UNCHANGED, which is the control that the stock track is untouched. Program fingerprints all reproduced bit-exact in the same run.)
+MANI_WIDE="a137ba772f77cefc46cdfe136adc01ff2327b47e 25"  # 14z-115 (delta: PROGRAM vm3j.03d/04d/07b/10b + vsw.41/42 — the wheel record, coord list and ring bases; GROUP C vsw.31m/33m/35m/37m — 36 outline tiles + the M9 glyphs; QSound and Z80 members untouched)
 # MANI_STOCK="08aac0881648185a9487230a3ac5fe19b78408d3 30"  # 14z-99 window (#103)
 # MANI_STOCK="23314532b00a77adaed4bda4b9e52155ad209252 30"  # 14z-102
 # MANI_STOCK="9985bf46a62732b32cbe143850b65a05038093f1 30"   # 14z-110 (delta: vm3j.03d/04d/10b PROGRAM only — the d2 wind...  # 14z-110
@@ -222,7 +226,8 @@ MANI_STOCK="af4f5e986c2fb1ad6ae90f71869cfbf4e103c80c 30 30"   # 14z-110b (delta:
 # MANI_HUI="548af9ffb25ef6732bc468b1d168b1f7d975f328 42"  # 14z-105 window
 # MANI_HUI="4a4c1ef74e2200113fe7e6ecab82cba46964402f 42"   # 14z-110 (delta: vsw.33m/37m GROUP C ONLY — the M7 glyphs; program bit-exact 24a27940, the d2 fix is Donovan-owned)
 # MANI_HUI="781a1a0731bf6c8f0c3cea719d2ff0b451024233 42" 
-MANI_HUI="af5e4cad7d9ead48e595fe39caec3beb604aff8b 25"  # 14z-112 (PACKAGING, not content: a WIDE set is now ONE zip — the four patched group-A members moved into vsavjw.zip and no vsav.zip is packed, so stock Vampire Savior and this profile can share one MiSTer card. Inventory 42 -> 25 for every WIDE track; MANI_STOCK is UNCHANGED, which is the control that the stock track is untouched. Program fingerprints all reproduced bit-exact in the same run.)
+# MANI_HUI="af5e4cad7d9ead48e595fe39caec3beb604aff8b 25"  # 14z-112 (PACKAGING, not content: a WIDE set is now ONE zip — the four patched group-A members moved into vsavjw.zip and no vsav.zip is packed, so stock Vampire Savior and this profile can share one MiSTer card. Inventory 42 -> 25 for every WIDE track; MANI_STOCK is UNCHANGED, which is the control that the stock track is untouched. Program fingerprints all reproduced bit-exact in the same run.)
+MANI_HUI="2f52eb8c8fd6a129bbb44e6353337f35d4c56c53 25"  # 14z-115 (delta: PROGRAM vm3j.03d/04d/07b/10b + vsw.41/42 — the wheel record, coord list and ring bases; GROUP C vsw.31m/33m/35m/37m — 36 outline tiles + the M9 glyphs; QSound and Z80 members untouched)
 # 14z-94 (#92 only — he takes no reconciliation row). Exactly ONE member
 # moved: vm3j.03d, which carries table B at PRG:0x00BB68. Huitzil moved four
 # because #91's row also relocated code; Pyron's four bytes are a pure data
@@ -232,7 +237,8 @@ MANI_HUI="af5e4cad7d9ead48e595fe39caec3beb604aff8b 25"  # 14z-112 (PACKAGING, no
 # MANI_PYR="8e8329cf7756834f2359d067ce1e7a18f87002b6 42"  # 14z-105 window
 # MANI_PYR="9862d502c5609f0d6125084d1d30e45a46484d4b 42"   # 14z-110 (delta: vsw.33m/37m GROUP C ONLY — the M7 glyphs; program bit-exact 6bf265ab)
 # MANI_PYR="afc4e657a58f6207f8cdabb0487b0ed3978fd85d 42" 
-MANI_PYR="4d87b43f775cd1a5671a38653a201892022ec43f 25"  # 14z-112 (PACKAGING, not content: a WIDE set is now ONE zip — the four patched group-A members moved into vsavjw.zip and no vsav.zip is packed, so stock Vampire Savior and this profile can share one MiSTer card. Inventory 42 -> 25 for every WIDE track; MANI_STOCK is UNCHANGED, which is the control that the stock track is untouched. Program fingerprints all reproduced bit-exact in the same run.)
+# MANI_PYR="4d87b43f775cd1a5671a38653a201892022ec43f 25"  # 14z-112 (PACKAGING, not content: a WIDE set is now ONE zip — the four patched group-A members moved into vsavjw.zip and no vsav.zip is packed, so stock Vampire Savior and this profile can share one MiSTer card. Inventory 42 -> 25 for every WIDE track; MANI_STOCK is UNCHANGED, which is the control that the stock track is untouched. Program fingerprints all reproduced bit-exact in the same run.)
+MANI_PYR="69ec5a4e94bcdcb00a472d0840d5e734b2e51a1f 25"  # 14z-115 (delta: PROGRAM vm3j.03d/04d/07b/10b + vsw.41/42 — the wheel record, coord list and ring bases; GROUP C vsw.31m/33m/35m/37m — 36 outline tiles + the M9 glyphs; QSound and Z80 members untouched)
 
 # REFREEZE=1 prints every computed manifest and asserts nothing, so a
 # DELIBERATE packaging/content move can be re-frozen in one pass instead of
@@ -296,14 +302,16 @@ m3a_manifest pyron       "$WORK/pyron/rompath"     "$MANI_PYR"
 # EXPECT_MERGED="64426955bf7877908a1014f134040c9672bddf5a"   # merged-m6, 14z-105 window — == the rehearsed merged_probe_w6, bit-for-bit (probe dir attic'd 14z-106; the pin is the fingerprint, not the dir)  # merged-m6 (14z-105)
 # EXPECT_MERGED="761fd35af754d791e5a7863ca670673e85588c22"  # 14z-110 merged-m7
 # EXPECT_MERGED="73690f21ebf1b83d31aad647f2b145169b175bf2"   # 14z-110b merged-m9 (the remap)
-EXPECT_MERGED="32007911f19a82619da6108132bff70329ac2c33"   # 14z-111 merged-m9 (the #99 root-cause fix)
+# EXPECT_MERGED="32007911f19a82619da6108132bff70329ac2c33"   # 14z-111 merged-m9 (the #99 root-cause fix)
+EXPECT_MERGED="dea2c9182627eb1901ab5f5fdaa11827392a7997"   # 14z-115 merged-m11 (the select-wheel separation)
 # MANI_MERGED="59f3b42e7f0022f509c3cc912abc54f159183688 42"  # 14z-99 window
 # MANI_MERGED="22092b65fd9db2f5b79f211afb51625a542cd45c 42"  # 14z-102 window
 # MANI_MERGED="efea5e9d0bd9590383eb614016eed1c388bf9c2b 42"  # 14z-105 window
 # MANI_MERGED="75a253eab6b47f5fb8772a719f4f6d59c173e96a 42"   # 14z-110 (delta: vm3j.03d/04d/07b/10b + vsw.41/42 PROGRAM —...  # 14z-110
 # MANI_MERGED="cd39a81c5e2692eb9726269f4b81c74ff2b1a402 42 42"   # 14z-110b (delta: vm3j.10b — the six remap bytes; nothing else moved)
 # MANI_MERGED="46ba85ace543bd1eab5ae3e2741a721a6602849f 42 42" 
-MANI_MERGED="c1197c36d8521bf0823d7d13768aeac8508b0c28 25"  # 14z-112 (PACKAGING, not content: a WIDE set is now ONE zip — the four patched group-A members moved into vsavjw.zip and no vsav.zip is packed, so stock Vampire Savior and this profile can share one MiSTer card. Inventory 42 -> 25 for every WIDE track; MANI_STOCK is UNCHANGED, which is the control that the stock track is untouched. Program fingerprints all reproduced bit-exact in the same run.)
+# MANI_MERGED="c1197c36d8521bf0823d7d13768aeac8508b0c28 25"  # 14z-112 (PACKAGING, not content: a WIDE set is now ONE zip — the four patched group-A members moved into vsavjw.zip and no vsav.zip is packed, so stock Vampire Savior and this profile can share one MiSTer card. Inventory 42 -> 25 for every WIDE track; MANI_STOCK is UNCHANGED, which is the control that the stock track is untouched. Program fingerprints all reproduced bit-exact in the same run.)
+MANI_MERGED="c7985fb920e825456a0851e7b4477fd955c85a71 25"  # 14z-115 (delta: PROGRAM vm3j.03d/04d/07b/10b + vsw.41/42 — wheel record/coords/ring bases; GROUP C vsw.31m/33m/35m/37m — 36 outline tiles + M9 glyphs; count unchanged 25; QSound/Z80 untouched — the same member set as the solos)
 
 MERGED_NEEDS="build/m5_wide/extract build/hui32/extract build/pyron21/extract
 build/wide0/rompath/vsavjw.zip"

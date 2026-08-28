@@ -29,12 +29,12 @@
 #      mame/emulator/ is rejected.
 #
 # Usage: ROMDIR=... tests/test_release_roundtrip.sh [build_rompath] [name]
-#   defaults build/m3b_merged17/rompath, merged-m10. Needs xdelta3.
+#   defaults build/m3b_merged18/rompath, merged-m10. Needs xdelta3.
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-RP="${1:-build/m3b_merged17/rompath}"  # re-pointed 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
+RP="${1:-build/m3b_merged18/rompath}"  # re-pointed 14z-115 (select-wheel freeze) <- 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
 NAME="${2:-merged-m10}"  # re-pointed 14z-113
 [ -d "$RP" ] || { echo "SKIP: $RP missing"; exit 77; }
 command -v xdelta3 >/dev/null || { echo "SKIP: xdelta3 not installed"; exit 77; }

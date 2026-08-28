@@ -380,3 +380,17 @@ the gate at a current build — was measured and REFUSED here: `don_m14` shows
 103 shared-surface writes against the frozen row's reviewed set, so
 re-freezing would have laundered an unreviewed inventory into the very gate
 that exists to prevent exactly that.
+
+## THE 14z-115 SWEEP (select-wheel freeze) — applied under the policy
+
+Deleted at the freeze (N-2 per track, grep-four-places read for intent,
+`run_all_static --strict` before the commit): `don_m13`, `hui46`, `hui47`,
+`pyron30`, `pyron31`, `m3b_merged16`, `m5_stock8` (tracked metadata `git
+rm`'d; recoverable via `freeze/*` tags + a historical rebuild), plus the
+untracked probe `probe_wheel_e2`. Two usage EXAMPLES re-pointed rather than
+left dangling (`tools/verify_pcrel_data.py` docstring, HANDOFF's
+`mister_mra.sh` recipes). Kept: `m3b_merged15` (the deferred
+`test_inp_crash_merged_m8_01` defect-mode item — the maintainer's call),
+`m5_stock3` (evidence). Current + one back now: `don_m14/m15`,
+`hui48/49`, `pyron32/33`, `m3b_merged17/18`, `m5_stock9/10`.
+

@@ -1,0 +1,9 @@
+# pointer-flow baseline for huitzil-m22 (build/hui49), frozen 14z-115 — the select-wheel separation.
+# vs the 14z-111 baseline: the 14z-115 select-wheel separation grew the copied wheel record and its
+# coord list (3 outline entries + pairs, +0x18 each -> the ext allocations behind them shift +0x20);
+# the WEAK data:long count DROPPED by 1-2 because the rewritten record/coord words read as fewer
+# 4-byte WIDE-hole windows. Nothing new is a pointer; STRONG content unchanged.
+# STRONG lines are REVIEWED findings (see hardening_register.md);
+# WEAK-COUNT lines freeze the noise volume — growth = investigate.
+WEAK-COUNT	code:move_imm	1
+WEAK-COUNT	data:long	1347

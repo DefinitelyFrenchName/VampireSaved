@@ -465,6 +465,31 @@ select work avoided all of this by strict in-place replacement with the
 host's budget word preserved; **adding cells makes that impossible by
 construction.**
 
+## The appended cells' PLACEMENT and OUTLINES (14z-115, maintainer-directed)
+
+Measured on the live OBJ list (`tests/lua/obj_records_dump.lua`; OBJ x/y =
+screen x + 64 / y + 16):
+
+| cell | sprite corner (screen) | hover-ring base (table row) |
+|---|---|---|
+| "?" 0x0B (vanilla, immovable) | (175,134), 2x2 | vanilla |
+| Phobos 0x10 | (137,148), 3x2 — was (138,145) | (165,77) — was (158,80) |
+| Pyron 0x11 | (168,160) — was (168,153) | (191,65) — was (188,72) |
+| Donovan 0x13 | (197,148) — was (196,145) | (217,77) — was (216,80) |
+
+- **The ring-base table's Y runs OPPOSITE to the cell position.** A +3 in
+  `highlight_base` y moved the ring 3 px UP on the first probe build; the
+  layout's bases carry the cell's x delta and the NEGATED y delta.
+- **Draw order = record order, later on top** (Donovan over Pyron over
+  Phobos over "?"). The 14z-115 record interleaves one authored 4x3 OUTLINE
+  entry (attr `0x2319`, pen 0 of row 0x19, tiles group C `0x1F800+4k`)
+  immediately BEFORE each cell's medallion, so a front cell's ring covers
+  the cell behind it and hides under its own art. The outline pixels are
+  derived at gfx-build time from the medallion's own alpha (dilate 1 px);
+  no palette content changes.
+- The stock track carries none of this (`[[select_wheel]]` is profile-gated).
+Byte detail: `docs/project/patch_notes.md` 14z-115.
+
 ## The RECORD-POINTER array — what the hovered cell displays (14z-61)
 
 Measured for M3a, to answer "the tenant needs its own select records at

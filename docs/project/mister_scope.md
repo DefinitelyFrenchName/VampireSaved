@@ -28,7 +28,10 @@ and `tools/gen_vsavjw_xml.py` headers, the 14z112 bundle README) — nothing
 here is summarised from session memory, and where a source is stale the
 staleness is listed in §6 rather than silently corrected.
 
-**Ground truth at the time of writing** (git, not prose): fork pin
+**Ground truth at the time of writing** (git, not prose; **MOVED ON at
+14z-115**: pin `202fc3e6` = 25 commits / 25 patches, romset merged-m11
+`build/m3b_merged18` M9 `dea2c918` — read `tools/setup_jtcores.sh` and the
+registry, not this paragraph): fork pin
 `63496069` = `v1.7.3-24-g634960697` (24 fork commits, 24 patches in
 `emu/jtcores-patches/`); romset merged-m9 (M8 mark, program fingerprint
 `32007911`), repackaged as `build/m3b_merged17` (not registered, not

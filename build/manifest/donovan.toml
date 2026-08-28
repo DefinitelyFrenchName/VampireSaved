@@ -2248,12 +2248,20 @@ march_retarget_mid = true
 # same-source-or-fail names any future collision). Screen position =
 # the empty bottom-right corner (measured on merged-m5 snapshots, 14z-105).
 # THE TEXT NAMES THE FREEZE GENERATION — change it at every freeze.
-version_text = "M8"
+version_text = "M9"
 version_font = "build/manifest/version_font.json"
 version_x = 340
 version_y = 202
 version_pal = 0x19
 version_base = 0x1FE40
+# cell outlines (14z-115, maintainer-directed "E2"): a 1px near-black ring
+# around each appended medallion, derived by build_gfx from the medallion's
+# own alpha; pen 0 of row 0x19 (already (1,1,1) — no palette content change).
+# outline_base: group C upper-bank codes 0x1F800-0x1F80B / 10-1B / 20-2B (free rows; 0x1FE5F+ holds effect art)
+# (three 4x3 sprites side by side; the ledger of merged-m10 has nothing there).
+cell_outline = true
+outline_base = 0x1F800
+outline_pal = 0x19
 
 # ── SELECT RECORDS at a variant id (M3a select-records half, 14z-62) ─────────
 # The tenant's OWN select records: what the hovered cell displays. Emitted

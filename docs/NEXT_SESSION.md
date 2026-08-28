@@ -1,4 +1,57 @@
-# NEXT SESSION — orientation (rewritten at the 14z-114 close, 2026-08-28)
+# NEXT SESSION — orientation (rewritten at the 14z-115 close, 2026-08-28)
+
+> ## **START HERE. THE SELECT WHEEL WAS RE-CUT AND FROZEN: merged-m11 (M9),
+> ## `build/m3b_merged18`, donovan-m15 / huitzil-m22 / pyron-m16 — approved
+> ## on MAME snapshots, NOT YET ON THE BOARD. Load `vampire-saved-port`
+> ## before touching anything.**
+> ##
+> ## **WHAT 14z-115 DID:** the maintainer's cosmetic pass on the three tenant
+> ## medallions ("E2"): positions moved by their own pixel offsets, hover
+> ## rings tuned by eye over four probe builds (Phobos +8 x, Pyron +3 x —
+> ## the ring-base table's Y runs OPPOSITE to the cell position), one
+> ## authored 1 px near-black ring sprite per cell interleaved before its
+> ## medallion in the wheel record (36 tiles at group C `0x1F800+`, pen 0
+> ## of row 0x19 — NO palette content change). Mockups + real snapshots:
+> ## `../images/wheel_mockups/`. The maintainer is drawing a "perfect"
+> ## mockup at 1:1 over `e2_outlines_build_1x.png`; when it arrives it
+> ## replaces the outline tiles through the SAME knobs (`cell_outline` /
+> ## `outline_base` / `outline_pal`, `build_gfx` outline pass) — nothing to
+> ## undo. Byte detail: patch_notes 14z-115; mechanism:
+> ## `select_screen.md` "PLACEMENT and OUTLINES".
+> ##
+> ## **THE FREEZE, honestly:** every gate at freeze PASS (STATE 14z-115 two
+> ## rows); the moved tenant `.sha1`s attributed by DUMPS diff (execution
+> ## position + dead stack + the ring objects' own positions — the change);
+> ## `test_fbneo_legacy_oracle` went RED on `05_timeout_idle` f8300 and was
+> ## REFIT per the 14z-110b ruling (instant → 9500, inventory unchanged,
+> ## PASS ×2); `bases.tsv` was found ROTTED since 14z-111 and re-derived;
+> ## `112_don_pod_*` got their expectations; the MiSTer tail is real this
+> ## time (fork `202fc3e6`, patch 0025, pin bumped, bundle
+> ## `../mister_fieldtest_14z115/`, release `release/merged-m11/`) — fork
+> ## and main NOT pushed, tags cut locally. **Still in flight at close:
+> ## `audit_legacy_pairings` (re-run) and `audit_guard_corpus` on merged18
+> ## — read `$SCRATCH/wheel/{legacy_pairings2,guard_corpus}.log` or re-run.**
+> ##
+> ## **OPEN — INSTRUMENT (read STATE 14z-115 "OPEN INSTRUMENT QUESTION"):**
+> ## FBNeo vanilla runs fell into two bit-identical families diverging from
+> ## frame 72 within one evening; not root-caused; the refit used the stable
+> ## later family. First check: `shasum emu/fbneo/fbneo` vs a fresh
+> ## `tools/setup_fbneo.sh` build.
+> ##
+> ## **OPEN, unchanged:** #113 parked (maintainer's camera evidence); the
+> ## `m3b_merged15` defect-mode reference; STOCK CONTROL once-per-`.rbf`;
+> ## the cosmetic backlog — DISASSEMBLE, NEVER SCAN. **FIELD TEST OF M9 is
+> ## the next board session** (tell: "M9" bottom-right, rings on the tenants).
+> ##
+> ## **STATE OF THE BUILDS:** `tools/run_wide.sh build/m3b_merged18 fbneo`;
+> ## solos `don_m15` / `hui49` / `pyron33`, stock twin `m5_stock10`
+> ## (unchanged `d29fd062`); N-2 dirs deleted under the policy; bitstream
+> ## seed 18269 unchanged.
+
+# HISTORY BELOW — the 14z-114, mid-14z-114 and 14z-113 orientations and older;
+# kept for the census anchors, eliminations and traps, superseded as the opener.
+
+## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-114 close, 2026-08-28 — superseded by the 14z-115 opener above)
 
 > ## **START HERE. NOTHING IS RED. SIX SKILLS EXIST AND ARE LOCKED TO THE
 > ## DOCS — load the relevant one BEFORE the work, every session.**
@@ -45,8 +98,6 @@
 > ## `hui48` / `pyron32`, stock twin `m5_stock9`; bitstream seed 18269 at
 > ## `release/bitstreams/CURRENT`. Strict static at close: 111/0/0/0.
 
-# HISTORY BELOW — the mid-14z-114 and 14z-113 orientations and older; kept for
-# the census anchors, eliminations and traps, superseded as the opener.
 
 ## (HISTORY) NEXT SESSION orientation (written mid-14z-114 after C, 2026-08-28 — superseded by the close opener above)
 

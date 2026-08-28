@@ -38,7 +38,7 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-OUT="${1:-build/m3b_merged17}"  # re-pointed 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
+OUT="${1:-build/m3b_merged18}"  # re-pointed 14z-115 (select-wheel freeze) <- 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
 [ -d "$OUT/rompath" ] || { echo "SKIP: $OUT/rompath missing"; exit 77; }

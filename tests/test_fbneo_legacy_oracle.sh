@@ -74,7 +74,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
-BUILD="${1:-build/don_m14}"  # re-pointed 14z-110b
+BUILD="${1:-build/don_m15}"  # re-pointed 14z-115 (select-wheel freeze) <- 14z-110b
 [ $# -gt 0 ] && shift
 REPLAYS="${*:-01_attract_long 06_test_mode 21_don_mash 05_timeout_idle}"  # 26 dropped 14z-110b, see header
 FB="$REPO/emu/fbneo/fbneo"
@@ -111,7 +111,15 @@ for R in $REPLAYS; do
     case "$R" in
         01_attract_long) OVERRIDE="600 1000 1400 2600 3400" ;;
         21_don_mash)     OVERRIDE="600 2523 3164 4446 5087" ;;
-        05_timeout_idle) OVERRIDE="600 2250 2800 3900 8300" ;;
+        # 14z-115: the select-wheel separation adds three OBJ entries to
+        # every select frame for every replay, and FBNeo's phase re-rolled
+        # again (the 14z-110b mechanism): f8300 read the P1 anim-node timer
+        # (+0x8420) one step apart while MAME's masked class stayed EXACT.
+        # Re-scanned on don_m15 (~25 instants, both legs): 600/2250/2800/3900
+        # still masked-zero-diff; 8300 -> 9500 (clean; dirty instants
+        # measured and avoided: 1000/1400/1800 select-screen, 3200, 7100,
+        # 8300). Inventory UNCHANGED — exact-only overrides.
+        05_timeout_idle) OVERRIDE="600 2250 2800 3900 9500" ;;
         *)               OVERRIDE="" ;;   # 06_test_mode etc.: derived
     esac
     FRAMES="$(SPEC="$SPEC" BASE="$BASE" OVERRIDE="$OVERRIDE" python3 - <<'PY'

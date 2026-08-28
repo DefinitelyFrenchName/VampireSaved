@@ -44,7 +44,7 @@ cd "$REPO"
 # opponent and stage pinned by construction — measured bit-identical
 # run-to-run AND across merged-m4/merged-m5. The per-hit damage
 # invariant lives in audit_fg_parity.sh (native-anchored), as ever.
-BUILD="${1:-build/m3b_merged17}"  # re-pointed 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
+BUILD="${1:-build/m3b_merged18}"  # re-pointed 14z-115 (select-wheel freeze) <- 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD"; exit 0; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN

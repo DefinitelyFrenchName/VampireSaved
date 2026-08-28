@@ -119,7 +119,7 @@ sys.path.insert(0, "tools")
 from _minitoml import loads
 man = loads(open("build/manifest/gfx_layout3.toml").read())
 rows = {r["name"]: r for r in man["tenant"]}
-BUILDS = {"huitzil": "build/hui48", "pyron": "build/pyron32"}
+BUILDS = {"huitzil": "build/hui49", "pyron": "build/pyron33"}
 checked = 0
 bad = 0
 for name, b in BUILDS.items():

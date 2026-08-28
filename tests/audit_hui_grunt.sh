@@ -36,7 +36,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 ROMDIR="$(CDPATH= cd "$ROMDIR" && pwd)"
-BUILD="${BUILD:-build/m3b_merged17}"   # merged-m7 since the 14z-110 freeze  # re-pointed 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
+BUILD="${BUILD:-build/m3b_merged18}"   # merged-m7 since the 14z-110 freeze  # re-pointed 14z-115 (select-wheel freeze) <- 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no build at $BUILD"; exit 0; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary"; exit 0; }
@@ -81,7 +81,7 @@ OURS_BY_BUILD = {
     "m3b_merged11": [None, "02a2", None, None, None],
     "m3b_merged13": [None, "02a2", None, None, None],   # 14z-105 (kernel rows untouched by the window)
     "m3b_merged16": [None, "02a2", None, None, None],   # 14z-111 (d2 window + remap are Donovan-owned; kernel rows untouched)
-    "m3b_merged17": [None, "02a2", None, None, None],   # 14z-113 merged-m10: same program as merged16 (one-zip repackaging)
+    "m3b_merged18": [None, "02a2", None, None, None],   # 14z-113 merged-m10: same program as merged16 (one-zip repackaging)
 }
 if ours_a2:
     ours = [None, ours_a2, None, None, None]

@@ -48,7 +48,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 
-MERGED="${1:-$REPO/build/m3b_merged17/rompath}"  # re-pointed 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
+MERGED="${1:-$REPO/build/m3b_merged18/rompath}"  # re-pointed 14z-115 (select-wheel freeze) <- 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
 MAME_WIDE_BIN="${MAME_WIDE_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 # THE SOLO REFERENCES MUST BE BUILDS THAT STILL BOOT ON THE CURRENT
 # EMULATOR BINARY, and that is not automatic (14z-92). WIDE v1.1 (14z-86)
@@ -63,9 +63,9 @@ MAME_WIDE_BIN="${MAME_WIDE_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 # WHEN A TENANT IS RE-FROZEN, RE-POINT ITS ROW HERE. D and P still name
 # older builds (donovan-m3a / pyron-m3); those boot and pass today, but
 # they are one profile bump away from the same failure.
-D_RP="$REPO/build/don_m14/rompath"   # re-pointed 14z-111 (remap freeze)
-H_RP="$REPO/build/hui48/rompath"    # re-pointed 14z-105 (window freeze)
-P_RP="$REPO/build/pyron32/rompath"  # re-pointed 14z-105 (window freeze)
+D_RP="$REPO/build/don_m15/rompath"   # re-pointed 14z-115 (select-wheel freeze) <- 14z-111 (remap freeze)
+H_RP="$REPO/build/hui49/rompath"    # re-pointed 14z-105 (window freeze)
+P_RP="$REPO/build/pyron33/rompath"  # re-pointed 14z-105 (window freeze)
 
 [ -f "$MERGED/vsavjw.zip" ] || {
     echo "SKIP: no merged build at $MERGED (tools/build_merged.sh)"; exit 0; }

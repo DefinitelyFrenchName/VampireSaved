@@ -33,7 +33,7 @@ cd "$REPO"
 rc=0
 fail() { echo "  FAIL: $*"; rc=1; }
 
-PLAY="build/m3b_merged17"     # the frozen merged-m9 playtest build (re-pointed 14z-111)
+PLAY="build/m3b_merged18"     # the frozen merged-m9 playtest build (re-pointed 14z-111)
 INSTR="build/merged1"         # the legacy-only instrument that shares its fp
 
 for d in "$PLAY" "$INSTR"; do

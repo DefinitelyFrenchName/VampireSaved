@@ -55,7 +55,7 @@ cd "$REPO"
 #
 # A build dir that is absent is SKIPPED, not failed, so a fresh checkout does
 # not red (GitHub #29: the skip is reported, never counted as a pass).
-BUILDS="${BUILDS:-build/hui48:0x10 build/pyron32:0x11 build/don_m14:0x13}"  # re-pointed 14z-111
+BUILDS="${BUILDS:-build/hui49:0x10 build/pyron33:0x11 build/don_m15:0x13}"  # re-pointed 14z-115 (select-wheel freeze) <- 14z-111
 
 _present=""
 for _b in $BUILDS; do

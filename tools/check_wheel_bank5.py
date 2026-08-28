@@ -166,9 +166,25 @@ def main():
         die("build/out/vsav2_data.bin missing (run the build first)")
     vs2_data = Path("build/out/vsav2_data.bin").read_bytes()
     cells = sorted((int(str(k), 16), v) for k, v in lay["cells"].items())
+    # 14z-115 cell OUTLINES: when the build carries them, each cell's
+    # entry is PRECEDED by its 4x3 ring entry (outline code, attr
+    # 0x23xx | pal) — the interleave is what puts a front cell's ring over
+    # the cell behind it. Re-derive the expected ring entry here too.
+    outl = built.get("outline", [])
+    stride = 2 if outl else 1
+    if outl and len(outl) != len(cells):
+        die(f"outline entries {len(outl)} != cells {len(cells)}")
     for i, (c, spec) in enumerate(cells):
-        at = int.from_bytes(bb[10 + 4 * (nvan + i) + 2:
-                               10 + 4 * (nvan + i) + 4], "big")
+        e = nvan + stride * i
+        if outl:
+            ot = int.from_bytes(bb[10 + 4 * e:10 + 4 * e + 2], "big")
+            oa = int.from_bytes(bb[10 + 4 * e + 2:10 + 4 * e + 4], "big")
+            want_t = int(outl[i]["code"]) & 0xFFFF
+            if ot != want_t or (oa & 0xFF00) != 0x2300:
+                die(f"cell {c:#04x}: outline entry {ot:#06x}/{oa:#06x} != "
+                    f"{want_t:#06x}/0x23xx")
+            e += 1
+        at = int.from_bytes(bb[10 + 4 * e + 2:10 + 4 * e + 4], "big")
         pr = int(str(spec["pal_row"]))
         ps = int(str(spec["pal_src"]))
         if (at & 0x1F) != pr:

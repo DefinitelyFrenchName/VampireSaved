@@ -38,8 +38,8 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-WIDE="${1:-build/m3b_merged17/rompath}"  # re-pointed 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
-STOCK="${2:-build/m5_stock9/rompath}"  # re-pointed 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
+WIDE="${1:-build/m3b_merged18/rompath}"  # re-pointed 14z-115 (select-wheel freeze) <- 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
+STOCK="${2:-build/m5_stock10/rompath}"  # re-pointed 14z-115 (select-wheel freeze) <- 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
 for d in "$WIDE" "$STOCK"; do

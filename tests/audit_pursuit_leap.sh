@@ -50,7 +50,7 @@ cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged17}"  # re-pointed 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
+BUILD="${BUILD:-build/m3b_merged18}"  # re-pointed 14z-115 (select-wheel freeze) <- 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 BASE="$REPO/tests/replays/judge/03_down_attack.rpl"

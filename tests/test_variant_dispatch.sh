@@ -35,7 +35,7 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
 
-BUILD="${1:-build/pyron32}"
+BUILD="${1:-build/pyron33}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 # THE TENANT COMES FROM THE BUILD, not from a default (14z-78).
 # It used to be `${2:-0x11}`, so `test_variant_dispatch.sh build/hui27` swept a

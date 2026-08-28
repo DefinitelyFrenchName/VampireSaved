@@ -22,14 +22,15 @@ keeps the conclusions and names them as the provenance.
 > the figure as unverified and say so rather than propagating it.
 
 **Ground truth.** jtcores fork `DefinitelyFrenchName/jtcores` branch
-`vampire-saved`, pinned at `emu/jtcores` = **`63496069`** (upstream tag
-`v1.7.3` = `63688ce5`, plus **twenty-four** fork commits, mirrored as
-`emu/jtcores-patches/0001-0024`; the pin is read from
-`tools/setup_jtcores.sh`, not from this sentence — **UPDATED 14z-113**, it
-had said `dd242a65` + fifteen since 14z-107 (10)). The romset is the
-merged build of the current freeze — **merged-m9 (M8), `build/m3b_merged16`,
-program fingerprint `32007911`**, repackaged one-zip as `build/m3b_merged17`
-at 14z-112 (same content). The measurements quoted in this document were
+`vampire-saved`, pinned at `emu/jtcores` = **`202fc3e6`** (upstream tag
+`v1.7.3` = `63688ce5`, plus **twenty-five** fork commits, mirrored as
+`emu/jtcores-patches/0001-0025`; the pin is read from
+`tools/setup_jtcores.sh`, not from this sentence — **UPDATED 14z-115** (the
+catalogue commit for merged-m11); 14z-113 had it at `63496069` + twenty-four,
+and before that `dd242a65` + fifteen since 14z-107 (10)). The romset is the
+merged build of the current freeze — **merged-m11 (M9), `build/m3b_merged18`,
+program fingerprint `dea2c918`** (14z-115, the select-wheel separation;
+merged-m10 = `build/m3b_merged17`, `32007911`, M8, was the previous). The measurements quoted in this document were
 taken on `build/m3b_merged13` (merged-m6) unless a section says otherwise;
 every later freeze re-ran the gates in §9 and none of the figures moved,
 because the freezes changed program bytes and version marks, not region
@@ -163,7 +164,7 @@ wider than 32 MB.** (`mister_fit.md` §3.)
 > different quantities.** `mister_fit.md` §3 reports **45,737 + 6,610 =
 > 52,347 codes / 6.39 MB** from the as-built *write set* — what the build
 > writes. `mister_map.md` §1 and `tests/audit_mister_map_fit.sh` report
-> **45,736 + 6,245 = 51,981 codes / 6.345 MB** from a *non-blank census* of
+> **45,736 + 6,271 = 52,007 codes / 6.349 MB** (14z-115; it was 45,736 + 6,245 = 51,981 / 6.345 MB through 14z-113 — the 14z-115 select-wheel outline sprites add 26 live codes to obj bank 5) from a *non-blank census* of
 > the shipped members. The 366-code difference is tiles the build writes that
 > are all-`00`/all-`FF`, 365 of them in obj bank 5. Neither document says so,
 > which is how the two get quoted as if they were the same measurement. The
@@ -266,7 +267,7 @@ interchangeable, and each one governs a different decision.
 
 | | group C, obj bank 4 | group C, obj bank 5 | total | what it governs |
 |---|---|---|---|---|
-| **live bytes** — art that exists | 45,736 codes | 6,245 codes | **6.345 MB** (write set: 6.39 MB) | the ROMSET. Nothing else |
+| **live bytes** — art that exists | 45,736 codes | 6,271 codes (6,245 until 14z-115) | **6.349 MB** (6.345 until 14z-115; write set: 6.39 MB) | the ROMSET. Nothing else |
 | **address footprint** — the span the codes reach | to `0xEE73` → `0x773A00` = 7.452 MB | to `0xFFDB` → `0x7FEE00` = 7.996 MB | **15.447 MB** | how much ADDRESS SPACE must exist |
 | **declared region** — what the MRA downloads | 8.000 MB | 8.000 MB | **16.000 MB** | **what consumes an SDRAM bank** |
 
@@ -288,7 +289,7 @@ data.**
    |-------|-------|-------|-------|-------|-------|-------|-------|
 D  ################################################################  16.000  what SDRAM reserves
 F  ##############################··################################  15.447  what the codes reach
-L  .++##############   .+########  ##+       .   .....+.+++    .  .   6.345  what actually exists
+L  .++##############   .+########  ##+       .   .....+.+++    .  .   6.349  what actually exists
    |-------|-------|-------|-------|-------|-------|-------|-------|
    ^ obj bank 4 (0-8 MB)                 ^ obj bank 5 (8-16 MB)
 

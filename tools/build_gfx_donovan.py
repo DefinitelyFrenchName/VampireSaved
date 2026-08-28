@@ -48,7 +48,7 @@ if not __debug__:
         f"{__file__}: refusing to run under python -O / PYTHONOPTIMIZE — its "
         f"safety checks are assertions and would be stripped (GitHub #79)")
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from gfx_tiles import GROUP_A, GROUP_B, GROUP_C, bank_word, cell_at, \
+from gfx_tiles import GROUP_A, GROUP_B, GROUP_C, attr_block, bank_word, cell_at, \
     tile_bytes, write_tile  # noqa: E402
 from _minitoml import loads as toml_loads  # noqa: E402
 
@@ -502,9 +502,44 @@ def main():
             tile = bytes.fromhex(h)
             assert len(tile) == 128, f"authored tile {k}: {len(tile)} bytes"
             place(dst, written, c, tile, "authored", c, "wheel-version")
+        # cell OUTLINES (14z-115): a 4x3 ring per appended medallion — the
+        # 3x2 vs2 art's alpha (pen != 15) placed at (8,8) in a 64x48 canvas,
+        # dilated by one pixel (8-neighbourhood), minus the art itself ->
+        # pen 0; everything else pen 15. Derived from the same vs2 tiles
+        # the medallions come from, so it is reproducible with no new asset.
+        from gfx_tiles import decode as _dec, encode as _enc
+        for o in wb5.get("outline", []):
+            bx, by = attr_block(o["attr"])
+            alpha = [[False] * 64 for _ in range(48)]
+            for dy in range(by):
+                for dx in range(bx):
+                    px = _dec(tile_bytes(srcA5, 0x10000 + cell_at(o["src"], dx, dy)))
+                    for i, v in enumerate(px):
+                        if v != 15:
+                            alpha[8 + dy * 16 + i // 16][8 + dx * 16 + i % 16] = True
+            ring = [[False] * 64 for _ in range(48)]
+            for y in range(48):
+                for x in range(64):
+                    if alpha[y][x]:
+                        continue
+                    if any(0 <= y + j < 48 and 0 <= x + i < 64 and alpha[y + j][x + i]
+                           for j in (-1, 0, 1) for i in (-1, 0, 1)):
+                        ring[y][x] = True
+            n_ring = sum(map(sum, ring))
+            assert n_ring, f"outline for cell {o['cell']:#x}: empty ring"
+            for r in range(3):
+                for q in range(4):
+                    px = bytearray([15] * 256)
+                    for y in range(16):
+                        for x in range(16):
+                            if ring[r * 16 + y][q * 16 + x]:
+                                px[y * 16 + x] = 0
+                    place(dst, written, o["code"] + q + 16 * r, _enc(px),
+                          "authored", o["code"] + q + 16 * r, "wheel-outline")
         print(f"wheel bank-5: {len(wb5['host'])} host tiles (byte-identical "
               f"vsav group A) + {len(wb5['vs2'])} vs2 medallion tiles "
               f"+ {len(wb5.get('authored', {}))} authored version glyphs "
+              f"+ {12 * len(wb5.get('outline', []))} outline tiles "
               f"copied to group C upper bank")
     elif args.wheel_bank5:
         wj = json.load(open(args.wheel_bank5))

@@ -240,9 +240,12 @@ Re-point the `[merged_*]` sections at every merged freeze.
 ## Guard currency (the H2 sweep, 2026-08-20)
 - `audit_tripwire_reach.sh` → current freeze artifacts; six legs green.
 - `test_pcrel_escapes.sh` + `pcrel_escapes.toml` → hui45/pyron29/don_m9
-  (inventories identical; merged gap filed). **Now hui48/pyron32/don_m14
-  + `[merged_*]` on m3b_merged16 (re-pointed 14z-102/111; merged17 is
-  member-identical).**
+  (inventories identical; merged gap filed). **Now hui49/pyron33/don_m15
+  + `[merged_*]` on m3b_merged18 (re-pointed 14z-115, the select-wheel
+  separation; inventories measured IDENTICAL again — no region moved).**
+  `test_pointer_flow` baselines re-frozen 14z-115 with attribution (the two
+  STRONG win_pal bases shifted +0x20 with the grown wheel record; WEAK
+  data:long DROPPED 1-2 per build).
 - `test_pointer_flow.sh` NEW (ci_static): the comb, frozen baselines,
   synthetic must-fail controls both directions.
 - `bases.tsv` re-derived + re-derive-at-every-freeze note (14z-100).

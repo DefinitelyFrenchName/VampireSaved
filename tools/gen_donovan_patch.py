@@ -4889,8 +4889,38 @@ def main():
                 # x=480+/y=344+ — emitted, never on screen (14z-62i).
                 _bx, _by = lay.get("obj_base", (0, 0))
                 _cx, _cy = lay.get("corner_offset", (0, 0))
-                for _c, spec in newcells:
+                # --- 2a. CELL OUTLINES (14z-115, maintainer-directed "E2"):
+                # one authored 4x3 ring sprite per appended cell, the
+                # medallion's own alpha dilated by 1px, pen 0 of outline_pal
+                # (a row that already holds a near-black: no palette change).
+                # Each ring entry sits IMMEDIATELY BEFORE its medallion in
+                # the record (later entries draw on top — measured 14z-114
+                # on the live list), so a cell in front of its neighbour
+                # separates from it by its own ring while its ring hides
+                # under its own art. Tiles: outline_base + 4*k (+col +16*row)
+                # in group C's upper bank, rendered by build_gfx from
+                # wheel_bank5.json "outline". Sprite corner = cell corner
+                # - (8,8), so the ring has room on every side.
+                ol_entries = []        # (tile, attr) per cell, in cell order
+                ol_json = []
+                if sw.get("cell_outline") and bank5_active:
+                    _ob = _int(sw["outline_base"])
+                    _op = _int(sw.get("outline_pal", 0x19))
+                    if _ob < 0x10000 or (_ob & 0xF) > 4:
+                        fail.append(f"select_wheel {nm}: outline_base "
+                                    f"{_ob:#x} must be a group C code with "
+                                    f"room for 3 cells x 4 columns in its row")
+                        continue
+                    for _k, (_c, spec) in enumerate(newcells):
+                        _code = _ob + 4 * _k
+                        ol_entries.append((_code & 0xFFFF, 0x2300 | (_op & 0x1F)))
+                        ol_json.append({"code": _code, "src": _int(spec["tile"]),
+                                        "attr": _int(spec["attr"]), "cell": _c})
+                for _k, (_c, spec) in enumerate(newcells):
                     x, y = spec["pos"]
+                    if ol_entries:
+                        cl += struct.pack(">hh", int(x) + int(_cx) - int(_bx) - 8,
+                                          int(y) + int(_cy) - int(_by) - 8)
                     cl += struct.pack(">hh", int(x) + int(_cx) - int(_bx),
                                       int(y) + int(_cy) - int(_by))
                 # --- 2b. VERSION STRING (14z-105, CLAUDE.md §5's "visible
@@ -4978,16 +5008,19 @@ def main():
 
                 # --- 3. record: copy + append + repoint ------------------------
                 body = bytearray(vj[rec:rec + 10 + nvan * 4])
+                n_ol = len(ol_entries)
                 struct.pack_into(">H", body, 4,
-                                 nvan + len(newcells) + len(vt_entries) - 1)  # count
+                                 nvan + len(newcells) + n_ol + len(vt_entries) - 1)  # count
                 struct.pack_into(">I", body, 6, cl_dst)                    # cptr
-                for _c, spec in newcells:
+                for _k, (_c, spec) in enumerate(newcells):
+                    if ol_entries:
+                        body += struct.pack(">HH", *ol_entries[_k])
                     body += struct.pack(">HH", _int(spec["tile"]), _int(spec["attr"]))
                 for _t, _a in vt_entries:
                     body += struct.pack(">HH", _t, _a)
-                if budget < nvan + len(newcells) + len(vt_entries):
+                if budget < nvan + len(newcells) + n_ol + len(vt_entries):
                     fail.append(f"select_wheel {nm}: record budget {budget} "
-                                f"< {nvan + len(newcells) + len(vt_entries)} "
+                                f"< {nvan + len(newcells) + n_ol + len(vt_entries)} "
                                 f"entries — the carried-over budget word no "
                                 f"longer covers the record")
                     continue
@@ -5001,17 +5034,17 @@ def main():
                 ops.append({"op": "poke32", "addr": f"{recptr:#x}", "val": f"{rec_dst:#x}"})
                 notes.append(f"data   {cl_dst:#08x} +{len(cl):#x}  select_wheel {nm} "
                              f"coord list ({nvan} vanilla + {len(newcells)} new "
-                             f"+ {len(vt_entries)} version glyphs)")
+                             f"+ {n_ol} cell outlines + {len(vt_entries)} version glyphs)")
                 notes.append(f"data   {rec_dst:#08x} +{len(body):#x}  select_wheel {nm} "
                              f"record (count {count}->"
-                             f"{nvan + len(newcells) + len(vt_entries) - 1}, "
+                             f"{nvan + len(newcells) + n_ol + len(vt_entries) - 1}, "
                              f"budget {budget:#x} CARRIED OVER, cptr -> {cl_dst:#x})")
                 notes.append(f"poke32 {recptr:#08x} <- {rec_dst:#x}  select_wheel "
                              f"{nm} record ptr (was {rec:#x}; the record's ONLY "
                              f"referrer — vanilla record and list are untouched)")
                 fragments.append((rec_dst, len(body), "NEW",
                                   f"select_wheel {nm} record ({nvan + len(newcells)} "
-                                  f"cells + {len(vt_entries)} version glyphs)"))
+                                  f"cells + {n_ol} outlines + {len(vt_entries)} version glyphs)"))
                 fragments.append((cl_dst, len(cl), "NEW",
                                   f"select_wheel {nm} coord list"))
 
@@ -5173,6 +5206,21 @@ def main():
                                         f"{sorted(hex(x) for x in _vt_c & (host_t | new_t))}")
                             continue
                         _wb5 = {"host": sorted(host_t), "vs2": sorted(new_t)}
+                        if ol_json:
+                            _ol_c = set()
+                            for _o in ol_json:
+                                for _r in range(3):
+                                    for _q in range(4):
+                                        _ol_c.add(_o["code"] - 0x10000 + _q + 16 * _r)
+                            if _ol_c & (host_t | new_t | {c - 0x10000 for c in vt_tiles}):
+                                fail.append(f"select_wheel {nm}: outline tile "
+                                            f"codes collide with wheel/glyph tiles")
+                                continue
+                            _wb5["outline"] = ol_json
+                            notes.append(f"# select_wheel {nm}: {len(ol_json)} cell "
+                                         f"outline sprites (4x3, pal {_op:#04x} pen 0) "
+                                         f"at {_ob:#x}+ (rendered by build_gfx from "
+                                         f"the medallions' alpha)")
                         if vt_tiles:
                             # authored glyphs: code (group C index, 0x10000+)
                             # -> canonical 128B tile hex; build_gfx places

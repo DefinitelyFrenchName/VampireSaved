@@ -65,7 +65,7 @@ fail=0; ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }
 [ -n "${ROMDIR:-}" ] || { echo "SKIP: ROMDIR unset (this gate runs the real romset)"; exit 77; }
 command -v verilator >/dev/null 2>&1 || { echo "SKIP: verilator not installed (docs/platform/mister.md Recipe)"; exit 77; }
 [ -f "$REPO/emu/jtcores/.gitmodules" ] || { echo "SKIP: emu/jtcores not initialised (tools/setup_jtcores.sh)"; exit 77; }
-BUILD="${CENSUS_BUILD:-build/m3b_merged17}"  # re-pointed 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
+BUILD="${CENSUS_BUILD:-build/m3b_merged18}"  # re-pointed 14z-115 (select-wheel freeze) <- 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
 [ -f "$REPO/$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE romset at $BUILD/rompath/vsavjw.zip"; exit 77; }
 
 RPL="$REPO/tests/replays/05_timeout_idle.rpl"

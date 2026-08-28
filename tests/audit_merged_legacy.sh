@@ -501,9 +501,9 @@ PY
 # divergence. Three references have already rotted this way in this repo
 # (hui31, pyron20, pyron17; docs/project/gotchas.md). Re-point these at each
 # re-freeze; the defaults are the currently-frozen solos.
-LEGB_DON="${LEGB_DON:-build/don_m14}"   # re-pointed 14z-110b (window freeze)
-LEGB_HUI="${LEGB_HUI:-build/hui48}"
-LEGB_PYR="${LEGB_PYR:-build/pyron32}"
+LEGB_DON="${LEGB_DON:-build/don_m15}"   # re-pointed 14z-115 (select-wheel freeze) <- 14z-110b
+LEGB_HUI="${LEGB_HUI:-build/hui49}"  # re-pointed 14z-115
+LEGB_PYR="${LEGB_PYR:-build/pyron33}"  # re-pointed 14z-115
 for _d in "$LEGB_DON" "$LEGB_HUI" "$LEGB_PYR"; do
     [ -f "$_d/rompath/vsavjw.zip" ] || {
         echo "FAIL: leg (b) reference $_d has no rompath/vsavjw.zip — a dead"

@@ -296,7 +296,7 @@ TILE = 128
 THREE_SIZES = [
     # (obj bank, sdram bank, declared, top_code, live_codes, top_live)
     (4, 1, GROUPC_BANK, 0xEE73, 45736, 0xEE73),
-    (5, 0, GROUPC_BANK, 0xFFDB, 6245, 0xFE41),
+    (5, 0, GROUPC_BANK, 0xFFDB, 6271, 0xFE41),   # 6245 -> 6271 at 14z-115 (+26 live outline tiles at 0x1F800+; extent unchanged)
 ]
 # mister_fit section 3's figure, from a DIFFERENT instrument (the as-built
 # write set rather than a non-blank census). Carried so the page can name the
@@ -306,7 +306,8 @@ WRITE_SET_CODES = 52347
 # Measured occupancy of the two group-C obj banks, 64 buckets of 1,024 tile
 # codes each: how many codes in each bucket carry art. Instrument:
 # tools/gfx_tiles.py's tile_bytes()+BLANK over
-# build/m3b_merged13/rompath/vsavjw.zip, i.e. the same census
+# build/m3b_merged13/rompath/vsavjw.zip (bucket 62 of bank 5 re-measured on
+# m3b_merged18, 14z-115), i.e. the same census
 # tests/audit_mister_map_fit.sh runs; --check re-derives it byte for byte
 # when that build is present. This is what makes the "live art" bar an actual
 # measurement of sparseness instead of a decorative scatter.
@@ -320,7 +321,7 @@ GROUPC_OCC = {
     5: [1023, 1024, 1024, 1024, 1024, 81, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 0, 1, 2, 0, 1, 1, 0, 0, 144,
         1, 0, 21, 280, 27, 84, 134, 341, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
-        0, 0, 0, 2],
+        0, 0, 26, 2],   # bucket 62: 14z-115 outline tiles at 0x1F800+ (26 live of 36)
 }
 
 # ---- the address path ------------------------------------------------------
@@ -1134,7 +1135,7 @@ def check():
             ok.append(f"the {label} ASCII figure in {CORE_DOC.name} is current")
 
     # -- 6. against the real artifacts, where reachable ----------------------
-    build = REPO / "build" / "m3b_merged17" / "rompath" / "vsavjw.zip"  # re-pointed 14z-111
+    build = REPO / "build" / "m3b_merged18" / "rompath" / "vsavjw.zip"  # re-pointed 14z-115 (select-wheel freeze) <- 14z-111
     if not build.exists():
         skipped.append(f"no WIDE romset at {build} — the group-C occupancy "
                        "census was not re-derived")
