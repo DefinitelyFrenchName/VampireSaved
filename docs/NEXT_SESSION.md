@@ -37,6 +37,22 @@
 > ## later family. First check: `shasum emu/fbneo/fbneo` vs a fresh
 > ## `tools/setup_fbneo.sh` build.
 > ##
+> ## **EMULATION VERDICT GREEN (maintainer, after the push): MAME + FBNeo,
+> ## no regression, "a big visual update already". MiSTer next.**
+> ##
+> ## **THE NEXT TASK THE MAINTAINER NAMED: the tenants' WIN QUOTES** —
+> ## today Phobos shows a Bulleta line, Pyron Demitri's, Donovan Victor's
+> ## (the 32-row quote offset table aliases the variant half); target = the
+> ## vs2 quotes. BUG ARCHAEOLOGY IS ALREADY DONE — read it before measuring:
+> ## `patch_index.md` "DEFERRED BY MAINTAINER DECISION (14z-76) — the
+> ## win-quote bank relocation" (the 16-bit SIGNED offsets pin the bank to
+> ## `0x32D28A ± 0x8000`, scanned: ZERO free bytes, so appending is
+> ## impossible and RELOCATING THE WHOLE BANK is the only path; it was
+> ## deferred "until the merged build is certified" — which it now is) and
+> ## `engine_internals.md` "THE WIN-QUOTE TEXT SYSTEM" (mechanism decoded).
+> ## Plan and scope first, show the extent, then bytes; cosmetic, no
+> ## gameplay surface. Fresh session.
+> ##
 > ## **OPEN, unchanged:** #113 parked (maintainer's camera evidence); the
 > ## `m3b_merged15` defect-mode reference; STOCK CONTROL once-per-`.rbf`;
 > ## the cosmetic backlog — DISASSEMBLE, NEVER SCAN. **FIELD TEST OF M9 is
