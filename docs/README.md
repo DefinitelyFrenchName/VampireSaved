@@ -92,6 +92,12 @@ Entry points at this level, deliberately not in a bucket:
   **known-stale inventory** (S1-S20, file:line) measured against all
   ~5,000 lines of the MiSTer sources — read it before quoting any MiSTer
   document's STATUS line
+- [`skills_scope.md`](project/skills_scope.md) — **the PLAN for the
+  remaining skill distillations** (14z-114): four skills (`cps2-hardware`,
+  `cps2-emulation`, `vampire-savior-engine`, `vampire-saved-port`), each
+  row's boundary/sources/gates, the checker extension, the staleness pass
+  each needs, the sequencing, and the five decisions taken under stated
+  assumptions
 - [`mister_field.md`](project/mister_field.md) — **the MiSTer FIELD TEST
   and TRIAGE, in-tree** (14z-114): what hardware answers that simulation
   cannot, the bundle and its STOCK CONTROL, the stopwatch figures, the

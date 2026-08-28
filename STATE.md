@@ -1019,6 +1019,17 @@ the archive once they stop shaping active work.)*
   change touching the hash-shadowing class that cost two sessions in
   14z-60z/61, and it must not sit between the maintainer and a field test.
 
+- **THE REMAINING SKILLS — PLANNED 14z-114 (`docs/project/skills_scope.md`),
+  five decisions taken under stated assumptions, OPEN TO VETO:** (1) FOUR
+  skills — `cps2-hardware`, `cps2-emulation` (split per "MiSTer separate
+  from emulation"), `vampire-savior-engine`, `vampire-saved-port`; (2) the
+  game skill quotes NO ROM addresses (laws + the atlas row it names); (3)
+  the port skill anchors into CLAUDE.md and points, never restates it; (4)
+  each skill's staleness pass runs in the same session as its distillation
+  as its own commit (the MiSTer ruling generalised); (5)
+  `engine_internals.md` counts as a LOG for the game skill's number-citation
+  check. Sequencing A+B (platform) -> C (game) -> D (port). Distillation of
+  A+B began the same session.
 - **DISTILL AI SKILLS FROM THE PROJECT'S LEARNINGS (maintainer direction,
   2026-08-24).** ~~Recorded as FUTURE, UNPLANNED work — nothing scheduled.~~
   **THE MiSTer PAIR IS DONE 14z-114** (`mister-cps2-wide-core`,
