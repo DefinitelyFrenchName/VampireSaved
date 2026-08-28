@@ -315,6 +315,63 @@ where `$3BD` holds the id committed BEFORE the copy, stored at
 `PRG:0x020AC8`), at `PRG:0x05F17A` (a different VS-screen figure state),
 and at `PRG:0x084648` (its own sprite record at `PRG:0x283690`, bank 2).
 
+### SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question)
+
+The maintainer's framing: the risk is not selecting Shadow, it is **whether
+the game breaks when Shadow faces a tenant — including the quiet failure,
+"Shadow takes the SHELL character instead of the tenant."** Every `$3BC`
+consumer in the ROM was disassembled and classified. **Nothing in this pass
+is a runtime measurement** — it bounds the risk, it does not clear it.
+
+**On the identity question the mechanism is decisive: Shadow becomes the
+TENANT, not the shell.** `PRG:0x009BB2` is `move.b $382(a1),$382(a0)` —
+no mask, no fold, no bound — and char-init then runs the SAME 32-row
+unmasked loader (`PRG:0x028DD8`) a normal tenant pick runs. There is no
+`andi #$0f` anywhere on this path. The seven vsavj folding sites
+(`id_space.md`) are the ones a normally-picked tenant already survives on
+every shipping build, and Shadow reaches them identically.
+
+**The `$3BC` consumers, all eleven:**
+
+| site | what it does when the flag is set | tenant risk |
+|---|---|---|
+| `0x009BB2` | the copy itself | none — unmasked |
+| `0x00C89C` | win quote -> forces winner row `0x20` | none — Shadow's own row, never the tenant's |
+| `0x00D116` | the name/text bank -> forces row `0x20` | none, same shape |
+| `0x004DD4` | uses a FIXED `d1 = 0x50` instead of `table[$382]` | none — skips the table |
+| `0x00A488` | sets a global byte `$14A(a5)` | none |
+| `0x014A92` | branches AROUND the `$3E0`-indexed lookup | none |
+| `0x0261E2` | diverts to `0x026C94` before the `0x0BD67A` index | none |
+| `0x05F17A` / `0x084648` | Shadow's own VS-screen state and sprite record (`PRG:0x283690`, bank 2) | see residuals |
+| `0x00AF1C` | ladder base `= ($3BD << 3) + 0x800` | **bounds-checked below** |
+| `0x00A77C` | `d2 = $3BD + 0x20` into the byte table at `PRG:0x00C668` | **bounds-checked below** |
+
+**`$3BD` is the id committed BEFORE the copy** (stored at `PRG:0x020AC8`),
+i.e. the cell Shadow was latched onto — and on the WIDE wheel that CAN be a
+tenant, which is the one way a tenant id reaches these two sites. Both were
+sized:
+
+- **Ladder:** table A is `PRG:0x00B268-0x00BB68` = `0x900` = exactly 36 rows
+  of `0x40`. `($3BD << 3) + 0x800` gives `0x800`/`0x878` for vanilla ids
+  `0x00`/`0x0F` (rows 32-33) and `0x880`/`0x888`/`0x898` for `0x10`/`0x11`/
+  `0x13` (row 34, groups 0/1/3). **All in bounds** — no over-read. It does
+  mean a tenant-latched Shadow draws its 1P ladder from row 34 rather than
+  the 32-33 vanilla reaches; a behavioural oddity in the arcade draw, not a
+  fault.
+- **`0x00C668`:** indexed `$3BD + 0x20`, so vanilla spans `0x20-0x2F` and
+  tenants add `0x30`/`0x31`/`0x33`. The table's bytes run well past `0x33`
+  (high-entropy data continuing beyond `0x0C6A8`), so the read is in
+  bounds; **what those particular VALUES mean is not established.**
+
+**RESIDUALS — what static analysis cannot settle, and what would.** (1) Does
+Shadow's fighter draw the tenant's art, which lives in group C banks 4/5
+under the WIDE profile, when `0x084648` forces bank 2 (`0x4000`) for its own
+record? (2) Does Shadow's silhouette palette compose correctly over a
+tenant's palette rows? Both are RENDER questions, and no RAM gate can see
+them ([VSP-43]). The rig that would settle them is a replay that navigates
+to `0x0B`, presses START 5x, confirms, and fights a tenant — cheap to
+script now that the arming condition is known to be START PRESSES.
+
 **THE COPY IS AN UNMASKED BYTE MOVE, WHICH IS THE WHOLE ANSWER FOR THIS
 PORT.** `move.b $382(a1),$382(a0)` applies no mask, no bound and no fold,
 and every table the copied id then indexes is 32 rows with this port's
