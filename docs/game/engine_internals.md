@@ -1759,7 +1759,55 @@ base**, so a ported block must live within `0x32D28A + 0xFFFF`. Offset space
 is not the problem (vanilla's last block sits at offset `0x3C5A`, and three
 blocks add ~`0xC20`); **whether there is free ROM immediately reachable from
 the bank is the open question**, and it is what decides whether this is a
-simple data port or needs the bank relocated.
+simple data port or needs the bank relocated. *(ANSWERED 14z-116 —
+`tools/scan_quote_window.py`: **zero** runs of `0x20`+ bytes of `00`/`FF` in
+`0x32D28A ± 0x8000`, and none in `± 0x10000` either. The 14z-76 prose claim
+re-derived as a script. §8 below carries what else the same session
+measured, and two numbers in the sections above are corrected there.)*
+
+**8. WHAT 14z-116 MEASURED, and the three corrections it forces.** The
+system above was decoded but never READ; `tools/decode_win_quotes.py` walks
+it (structure frozen by `tests/test_win_quote_decode.sh`, two must-fire
+controls) and `tools/audit_quote_font.py` compares the glyphs.
+
+- **THE ROOT IS A FOUR-ENTRY REGION ARRAY, AND THE FOUR BANKS ARE LANGUAGE
+  VARIANTS — not copies.** `move.b $93(a5),d0 / add.w d0,d0 / movea.l
+  (a1,d0.w),a1` indexes `PRG:0x0112BC` with `2*$FF8093`, so the banks are
+  `0x32D28A` (JAPANESE, 16-code lines, longest string 33) and `0x335694` /
+  `0x340B44` / `0x34C8D4` (ENGLISH: half-width glyphs, lines to 30, strings
+  to 61). The renderer's per-region advance table at `PRG:0x0890B6`, indexed
+  by the text object's `+0x39`, says the same thing: `0x10` px for region 0,
+  `0x08` for 1-3. `$FF8093` measured **0x00** at the win screen on
+  `23_don_matchwin`, `28_don_quotewin` and `104_1p_auto_ko_win`.
+  *(Corrects patch_index's "change ONE long": there are four, and the other
+  three are other languages' text.)*
+- **THE BANK IS `0x4104` BYTES, NOT `0x40DC`.** `0x40DC` is the first-level
+  OFFSET of the forced row, not a size. The four banks span `0x4104` /
+  `0x5B90` / `0x6130` / `0x5F2A`.
+- **A LINE CAN BE 17 CODES; THE REAL BOUND IS THE RENDERER'S BUFFER.**
+  `PRG:0x089062` does `lea $4c(a6),a0` and stores each masked code with
+  `move.w d0,(a0)+` until a zero-length record; the next field it takes an
+  address of is `$d0(a6)`, so the destination is **66 words**. A bad offset
+  does not fault — it hands the walker a garbage `len.w` and overruns that
+  buffer, which is the silent-poison shape any port here must be gated
+  against.
+- **THE FORCED ROW HAS EXACTLY ONE LINE.** Table A's row `0x20` is uniformly
+  `2` and table B's row 2 is all zeros, so `L` there can only be 0.
+- **THE INSTALLED POINTER IS WORK-RAM VISIBLE ON LEGACY CONTENT.**
+  `move.l a1,$30(a4)` lands at `RAM:$FFF230`; measured carrying `0x00331136`
+  (replay 23) and `0x0033101E` (replay 28) during the vanilla win screen. So
+  RELOCATING THE BANK PERTURBS LEGACY WORK RAM BY CONSTRUCTION — the
+  superset invariant, not a tolerance question.
+- **THE GLYPHS ARE THE REAL BLOCKER, and it is not the text.** The three vs2
+  tenant blocks use **331 distinct codes**; at the shared font base `0x3800`
+  **326 of 327 non-pad codes render a DIFFERENT glyph in vsavj** (they are
+  each game's own kanji inventory, in each game's own order — the
+  cross-game delta histogram has no peak). Every one of those glyphs DOES
+  exist in vsavj's gfx, but at tiles `0x22000-0x2FFFF` — **gfx bank 1**,
+  unreachable from a 12-bit code in the quote object's own bank — and
+  vsavj's bank-0 font window `0x3800-0x47FF` is **4096/4096 non-blank**, so
+  there is no free slot to remap into either. A code remap cannot fix this;
+  the glyph TILES have to travel.
 
 ### Per-tenant win-screen checklist
 1. `[[code_word]]` x2 — position x/y (slot-following, CODE rows).

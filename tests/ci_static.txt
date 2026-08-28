@@ -52,6 +52,14 @@ test_fsm_census
 test_gfx_tiles
 test_hitclass_map_thunk
 test_hui_winscreen
+# The win-quote text system's STRUCTURE, frozen 14z-116: the root is a
+# 4-entry REGION array (the four banks are LANGUAGE variants, not copies),
+# the first-level variant rows alias the base half (the defect itself),
+# every reachable line on all four banks walks clean against the renderer's
+# own 66-word buffer, and vs2 carries un-aliased tenant blocks. Two must-fire
+# controls. Needs ROMDIR only; ~40 s.
+# docs/game/engine_internals.md "The WIN-QUOTE TEXT SYSTEM"
+test_win_quote_decode
 test_id_space
 test_index_space
 test_index_window_thunk

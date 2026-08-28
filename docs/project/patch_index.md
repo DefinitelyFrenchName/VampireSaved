@@ -239,6 +239,32 @@ Facts: `../game/atlas/sprite_lists.md`.
 
 ## DEFERRED BY MAINTAINER DECISION (14z-76) — the win-quote bank relocation
 
+**STATUS 14z-116: MEASURED, NOT BUILT — AND THE PLAN BELOW IS SUPERSEDED IN
+THREE PLACES. A DECISION IS OPEN (STATE "Decisions pending").** The section
+below is kept as written because its eliminations stand; read this header
+first. `tools/scan_quote_window.py` RE-DERIVED its central claim and it
+HOLDS (zero runs of `0x20`+ free bytes at either hop, so appending in reach
+is impossible). What changed:
+1. **"change ONE long" is wrong — the root is a FOUR-ENTRY REGION ARRAY**
+   and the other three banks are the ENGLISH text. Relocating "the bank"
+   means choosing whether the other three languages come too.
+2. **The relocation is NOT legacy-invisible.** `move.l a1,$30(a4)` installs
+   an absolute bank pointer into `RAM:$FFF230`, measured live at the vanilla
+   win screen on replays 23 (`0x00331136`) and 28 (`0x0033101E`). Moving the
+   bank perturbs LEGACY work RAM on every win-reaching replay — a superset
+   hit by construction, needing a new ratified class per replay for a
+   cosmetic. That is the argument against the relocation, and it did not
+   exist when this section was written.
+3. **The blocker is the GLYPHS, not the text.** 326 of 327 non-pad codes the
+   vs2 tenant blocks use render a DIFFERENT character at vsavj's shared font
+   base; the glyphs exist in vsavj only in gfx bank 1 (`0x22000-0x2FFFF`),
+   unreachable by a 12-bit code, and the bank-0 font window is 4096/4096
+   occupied, so no remap target exists. Any version of this fix must move
+   ~330 authored glyph TILES, which this section never budgeted.
+Full measurements: `../game/engine_internals.md` "The WIN-QUOTE TEXT SYSTEM"
+§8; gate `tests/test_win_quote_decode.sh`; tools `decode_win_quotes.py`,
+`audit_quote_font.py`, `scan_quote_window.py`.
+
 **Status: NOT STARTED, deliberately. Do this LAST**, on the merged M3b build,
 after the mechanical port is complete and certified. Maintainer's ordering,
 and it is the correct one — see "why later is cheaper" below.

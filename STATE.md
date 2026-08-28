@@ -354,6 +354,60 @@ entries moved VERBATIM to `DECISIONS_HISTORY.md` — grep there by topic.
 Lifecycle: rulings are still marked DECIDED in place here first; they move to
 the archive once they stop shaping active work.)*
 
+- **THE TENANTS' WIN QUOTES — PHASE 0 MEASURED (14z-116), GO / FORGO IS
+  YOURS.** The maintainer's framing for this task: cosmetic, no 2P surface,
+  so equip the suite against a silent state poison — and **forgo it outright
+  if the implementation carries structural risk or costs compatibility**.
+  Phase 0 was run before any shipped byte. What it found:
+  - **A data-only fix is IMPOSSIBLE, confirmed.** `tools/scan_quote_window.py`
+    re-derived the 14z-76 prose claim as a script: **zero** runs of `0x20`+
+    free bytes within `±0x8000` of the bank base, and zero around any of the
+    16 winner blocks (the second hop). A control at `0x8` finds exactly one
+    9-byte run, so the scanner is not blind.
+  - **The 14z-76 relocation plan is wrong in three places** (all corrected in
+    place, `engine_internals.md` §8 + the `patch_index.md` header): the root
+    is a FOUR-ENTRY REGION array whose other three banks are the ENGLISH
+    text, not one long; the bank is `0x4104` bytes, not `0x40DC`; and lines
+    can be 17 codes — the real bound is the renderer's own 66-word buffer,
+    which is exactly what a bad offset overruns.
+  - **The relocation is NOT legacy-invisible.** `move.l a1,$30(a4)` installs
+    an absolute bank pointer at `RAM:$FFF230`, measured live during the
+    VANILLA win screen (replay 23 `0x00331136`, replay 28 `0x0033101E`). So
+    the deferral's "change one long" would move legacy work RAM on every
+    win-reaching replay and buy a permanent superset-invariant tax, with a
+    new ratified class per replay, for a cosmetic.
+  - **THE REAL COST IS GLYPHS, and nobody had measured it.** The three vs2
+    tenant blocks use 331 distinct codes; at the shared font base **326 of
+    327 non-pad codes draw a DIFFERENT character in vsavj**. Every glyph
+    DOES exist in vsavj — but at tiles `0x22000-0x2FFFF`, gfx **bank 1**,
+    unreachable from a 12-bit code in the quote object's bank — and vsavj's
+    bank-0 font window is **4096/4096 non-blank**, so there is no free slot
+    to remap into. A code remap cannot fix this: ~330 glyph tiles must
+    travel, which no version of the 14z-76 plan budgeted.
+  - **AND THERE IS A CLEAN ROUTE, if you want it.** Group C **bank 5's**
+    font window (in-group `0x13800-0x147FF`) is **4096/4096 blank** on
+    `build/m3b_merged18`, and the shipping `winquote_bank_variant_id` gate
+    (14z-62j, `site 0x05F328`, `only_variant_slot`) already flips the
+    win-quote drawer to bank 5 on a TENANT WIN ONLY. So the glyphs can be
+    authored into space we own, by the same mechanism the 14z-115 outline
+    sprites used, with **no vanilla tile touched**; the text would ride one
+    `site_thunk` on the selector for winner `>= 0x10`, leaving the vanilla
+    bank, the root array and `$FFF230`'s vanilla value byte-identical.
+    **NOT YET MEASURED, and it is the one thing left before a build could be
+    scoped:** whether the TEXT object (set up at `PRG:0x00C840-0x00C862`,
+    fed by `$30(a4)`) takes its bank from the same field that gate writes —
+    the gate patches the drawer object at `0x5F328`, which is a different
+    chain. If it does not, the thunk writes the bank itself.
+  **RECOMMENDATION: your call, and FORGO is a perfectly good answer.** The
+  route above is buildable and keeps the vanilla path bit-identical, but the
+  honest price is ~330 authored glyph tiles + a thunk on a legacy-reachable
+  site + a new win-quote render gate (pixels: no RAM gate can see text), for
+  a single-player cosmetic surface that your own "cosmetic is optional"
+  scope calls nice-to-have. If you want it, say GO and Phase 1 starts with
+  the one open measurement above; if you want it parked, everything measured
+  here is now in the docs and the next session starts from facts instead of
+  the 14z-76 prose.
+
 - **THE MiSTer SCOPE DOCUMENT — three decisions, ALL DECIDED (maintainer,
   2026-08-28, 14z-113; `docs/project/mister_scope.md` §8).**
   (1) **The split stands as written** ("in line with what I would do";
@@ -841,7 +895,14 @@ wrong is *safe and loud* over designs that are merely well-measured.
 - **OPEN (cosmetic):** win QUOTE TEXT — **all THREE tenants still show their
   SHELL's quote** (corrected 2026-08-27 by the maintainer; this entry used to
   say "Huitzil's", which understated the scope). Root-caused, not built: the
-  consumer's `lea -4(a0,d0.w)` bias means it reads index `0x60+id-1`. NOTE the
+  first-level table at the quote bank base ALIASES its variant half
+  (`0x10->0x00`, `0x11->0x01`, `0x13->0x03`) — *corrected 14z-116: this entry
+  said "consumer bias `lea -4(a0,d0.w)` -> reads index `0x60+id-1`", which is
+  the 14z-73 reading of the PORTRAIT fetch and was retracted in
+  `engine_internals.md` the same session; it is not the quote mechanism.*
+  MEASURED 14z-116 (see the session entry and "Decisions pending"): a
+  data-only fix is impossible, the relocation perturbs legacy work RAM, and
+  ~330 glyph TILES have to travel. NOTE the
   win-quote ART is already native and complete (14z-62e/62j, group C bank 5) —
   what remains is the TEXT. See the cosmetic backlog below.
 - **OPEN:** FG pacing — untouched.
@@ -856,7 +917,7 @@ nice-to-have). Collected so the pass does not start from a blank page:
 
 | item | status | what is known |
 |---|---|---|
-| **Win-quote TEXT for all three tenants** (each still shows its shell's quote) | root-caused, not built | consumer bias `lea -4(a0,d0.w)` -> reads index `0x60+id-1`. Art side already native (14z-62e/62j) |
+| **Win-quote TEXT for all three tenants** (each still shows its shell's quote) | MEASURED 14z-116, not built; a DECISION is open | the first-level table aliases the variant half; a data-only fix is IMPOSSIBLE (zero free bytes at either hop, re-derived by `tools/scan_quote_window.py`), the bank relocation perturbs `RAM:$FFF230` on legacy win screens, and ~330 glyph tiles must travel. Art side already native (14z-62e/62j) |
 | **Arcade ladder MAP NAMES and PICTURES** | not investigated | the map screen is the one that follows the win screen (a documented rig trap, STATE_HISTORY 14z-99); stage banners decode via `tools/decode_stage_banners.py`, venue byte `$FF8100` |
 | **Character SELECT WHEEL polish** | not investigated | the wheel is functionally correct and emulator-identical; this is look-and-feel only. Layout facts in `docs/game/atlas/select_screen.md`, the 21-cell roster and its inbound edges |
 | **#112 Press of Death black foot** | DECIDED cosmetic, parked | whole draw path measured VANILLA; why a tenant runs that vanilla sequence is unknown. Entry point when resumed: DISASSEMBLE the effect spawn, never scan |
