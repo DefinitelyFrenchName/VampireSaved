@@ -19,7 +19,7 @@ session has rolled off.)
 | MAME headless runner | `tools/run_mame.sh <set> [args]` | MAME 0.288 (brew), fresh sandbox per run |
 | Attract determinism | `tests/test_attract_determinism.sh` | PASS 3600 frames |
 | Decrypt oracle test | `tests/test_decrypt_oracle.sh` | PASS (python == MAME opcode space) |
-| FBNeo | `emu/fbneo` submodule + `tools/setup_fbneo.sh` | built (SDL2); TWO patches: `0001` harness (frontend-only: `-hinput/-hout/-hframes/-hdump`, plus `FBNEO_HVIDEO` framebuffer checksums, `FBNEO_HGFX` gfx-buffer dumps, and the B5b set — `FBNEO_HTAP` write tap with PC attribution, `FBNEO_HPOKE` frame-scheduled pokes, address-resolved dumps reaching OBJ/palette RAM) and `0002` the CPS-2 WIDE profile (driver descriptor + one gated core line). **CRC WARNING:** FBNeo matches zip members by CRC — a mismatched gfx/QSound member is silently replaced by 0xFF fill while still logging `(OK)` (docs/GOTCHAS.md) |
+| FBNeo | `emu/fbneo` submodule + `tools/setup_fbneo.sh` | built (SDL2); TWO patches: `0001` harness (frontend-only: `-hinput/-hout/-hframes/-hdump`, plus `FBNEO_HVIDEO` framebuffer checksums, `FBNEO_HGFX` gfx-buffer dumps, and the B5b set — `FBNEO_HTAP` write tap with PC attribution, `FBNEO_HPOKE` frame-scheduled pokes, address-resolved dumps reaching OBJ/palette RAM) and `0002` the CPS-2 WIDE profile (driver descriptor + TWO gated blocks in `Cps2ObjDraw` — the promote and the canary control; "one gated core line" until 14z-114, corrected per 14z-90). **CRC WARNING:** FBNeo matches zip members by CRC — a mismatched gfx/QSound member is silently replaced by 0xFF fill while still logging `(OK)` (docs/GOTCHAS.md) |
 
 FBNeo build: `(cd emu/fbneo && make sdl2 SKIPDEPEND=1 -j8)` — `SKIPDEPEND=1`
 is mandatory (docs/GOTCHAS.md). Needs brew `sdl2`(-compat) + `sdl2_image`.
@@ -34,8 +34,11 @@ profile that makes the roster physically possible. Spec + all measurements:
 ```
 CPS-2 WIDE v1   PRG 6 MB | GFX 48 MB (19-bit tiles) | QSound 16 MB
 ```
-Emulator cost: **one widened condition** in `cps_obj.cpp` plus the
-`Cps2Wide` flag lifecycle. Everything else is descriptor table data.
+Emulator cost: **two gated blocks** in `cps_obj.cpp` (the promote + the
+`CPS2_WIDE_CANARY` positive control; this line said "one widened
+condition" until 14z-114 — the 14z-90 correction is in `cps2_wide.md`
+"Emulator change budget") plus the `Cps2Wide` flag lifecycle. Everything
+else is descriptor table data.
 Governed by **Rule 1 v2** (profile-gated + emulator superset invariant);
 the profile runs under a separate driver entry `vsavjw`, so stock `vsavj`
 and every other CPS-2 game are untouched by construction.

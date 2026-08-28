@@ -114,7 +114,7 @@ legacy corpus, 24 comparisons per run.
 | **B4 (gfx)** | content fetched from the new 19-bit banks | **PASS** — 9/9 replays RAM+pixel identical with 15 characters' sprites served from banks 4/5 |
 | **B4 (prg)** | code/data fetched from above 4MB | **PASS** — all 20 per-char sound tables relocated to CPU $400000+, RAM identical; negative control (same rows -> zeros) DOES diverge, so the reads are real |
 | **B5** | MAME parity + the profile ported to MAME | **PASS** — parity 62/62 on the unpatched source build; the MAME WIDE gate 36/36 (superset invariant + inertness + B4 canary, RAM **and** framebuffer) |
-| B5b | suite preservation | pending |
+| B5b | suite preservation | **DONE 14z-59e** — the FBNeo instruments (`FBNEO_HTAP`/`HPOKE`, address-resolved dumps; `tests/test_fbneo_instruments.sh`), a known finding re-derived on FBNeo. *(This row read "pending" until 14z-114.)* |
 
 **The gate compares work RAM AND the framebuffer.** That second half was
 added at B2 and is not garnish: the FBNeo harness historically ran with
@@ -322,9 +322,11 @@ the member's real CRC must go into the descriptor.
 ## Where the profile stands
 
 Declared and proven inert: **PRG 6 MB, GFX 48 MB, QSound 16 MB** — the
-full v1 shape. Total emulator cost so far: **one widened condition** in
-`cps_obj.cpp` plus the flag's definition/extern/init/reset. Everything
-else is descriptor table data.
+full v1 shape. Total emulator cost: **two gated blocks** in `cps_obj.cpp`
+(the promote and the `CPS2_WIDE_CANARY` positive control — CORRECTED
+14z-114: this summary still said "one widened condition" after the 14z-90
+correction in "Emulator change budget" above) plus the flag's
+definition/extern/init/reset. Everything else is descriptor table data.
 
 **B4 has now proven the space USABLE on both axes**, each with a negative
 control: sprites render pixel-perfect from the appended 19-bit gfx banks
@@ -332,8 +334,10 @@ control: sprites render pixel-perfect from the appended 19-bit gfx banks
 (RAM-identical, and provably not vacuous). The profile is no longer just
 "declared and inert" — it is demonstrated.
 
-Remaining before content work: B5/B5b (MAME parity, or the suite-
-preservation gate if MAME cannot follow).
+~~Remaining before content work: B5/B5b (MAME parity, or the suite-
+preservation gate if MAME cannot follow).~~ **Both DONE** — B5 below
+(parity 62/62, MAME WIDE 36/36), B5b at 14z-59e. *(Status line updated
+14z-114; it had read as still pending.)*
 
 ## B4 attempt 1 — invalid canary, and what it did establish (14z-56)
 
@@ -637,6 +641,9 @@ bank-1 codes (374 codes as of m3a) — not a constraint.
   reference platform. A custom build means peers need the same binary and
   the same set — release notes must say so.
 - **MAME**: cannot follow any descriptor change as a Homebrew binary; a
-  pinned source build is a Phase B prerequisite. If MAME cannot follow,
-  the suite migrates to FBNeo *before* MAME is set aside — no path reduces
-  total test coverage.
+  pinned source build is a Phase B prerequisite — **DONE (B5): MAME 0.288
+  pinned as `emu/mame`, source-built, parity-gated, and it DID follow.**
+  The fallback that was planned here (migrate the suite to FBNeo before
+  setting MAME aside — no path reduces total test coverage) was never
+  needed and stays as the rule for any future descriptor change. *(Status
+  updated 14z-114.)*

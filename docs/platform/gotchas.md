@@ -392,6 +392,13 @@ Two responses, both in place:
   into the log if not, and `tools/run_replay_mame.sh` fails the run.
   Ground truth both directions: `tests/test_input_integrity.sh`.
 
+**STATUS 14z-114 (the fix moved on, 14z-59d): `tools/run_mame.sh` now also
+exports `SDL_VIDEODRIVER=dummy`, so SDL creates NO window at all — nothing
+can take focus. Measured non-perturbing (work RAM bit-identical to the
+frozen expectations; `VIDEO_OUT` still live). The provider flags and the
+per-frame integrity check above stay as belt-and-braces.** (HANDOFF
+"Platform / migration notes".)
+
 Related: MAME can also crash outright in some circumstances. That is
 already caught — `run_replay_mame.sh` requires a terminating `END` line,
 so a truncated log fails rather than being compared.
