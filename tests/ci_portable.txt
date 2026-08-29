@@ -124,3 +124,8 @@ test_mister_prg_probe
 # the report, not just counted), an absent zip, and the count excluding inline
 # literal parts. ROM-free, ~1 s.
 test_mra_parts
+# 14z-118: the character-data OVERRIDE channel — build/manifest/charmap_<t>.toml
+# compiles (tools/charmap_compile.py) into the marked [[region_fix]] block of the
+# tenant manifest; the committed block must equal a fresh compile. Three
+# must-fire controls (wrong expect, length mismatch, stale block). ~1 s.
+test_charmap_overrides

@@ -1,5 +1,19 @@
 # patch_notes — per-change detail: every byte, and why
 
+
+## 14z-118 (charmap) — THE CHARACTER-DATA MAP, phase 0: NO ROM BYTE MOVED
+
+- `build/manifest/{donovan,huitzil,pyron}.toml`: a comment-only block
+  `# BEGIN charmap … # END charmap` appended (the target of
+  `tools/charmap_compile.py`; empty until an override row exists). Comments
+  only — `test_m3a_reproducible` / the solo fingerprints unchanged.
+- `build/manifest/charmap_{donovan,huitzil,pyron}.toml`: new, empty override
+  files (header documents the grammar).
+- The map's attribution of every ours-vs-VS2 difference on the current solos
+  is in `docs/project/tables/chars/<tenant>.json` `diff_summary` — the one
+  substantive difference it surfaced is a NON-port: Donovan's physics rows
+  (STATE "Decisions pending").
+
 ## 14z-117 (2) — RANDOM SELECT INCLUDES THE TENANTS (maintainer-directed, freeze donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13, mark M11; field-validated on the board 2026-08-29, 14z-118): byte detail
 
 **What.** The "?" cell's draw now cycles the 15 vanilla ids PLUS this

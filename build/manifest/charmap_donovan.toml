@@ -1,0 +1,22 @@
+# build/manifest/charmap_donovan.toml — HAND-WRITTEN character-data overrides for
+# donovan (the one editable file of the character-data map; opened 14z-118).
+#
+# Each row changes bytes of donovan's ported data relative to VS2. The map
+# generator (tools/charmap_gen.py) verifies `expect` against the extracted VS2
+# bytes and shows the row as ours_source = override:<id>; the compiler
+# (tools/charmap_compile.py) turns every row into a [[region_fix]] row inside
+# the "# BEGIN charmap … # END charmap" block of build/manifest/donovan.toml,
+# which the generator consumes exactly like a hand-written region_fix.
+# Gate: tests/test_charmap_overrides.sh (the block must equal a fresh compile).
+#
+# Path grammar (phase 0): region/<extract region name>/<hex offset>.
+# expect and value are hex strings of the SAME length. Flat rows only —
+# the project's TOML reader is a subset (tools/_minitoml.py).
+#
+# [[override]]
+# id = "example"
+# path = "region/hitbox/0x11a9"
+# expect = "4e"
+# value = "06"
+# stage = 6
+# note = "why"

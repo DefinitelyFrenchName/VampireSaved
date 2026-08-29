@@ -1,9 +1,15 @@
 # NEXT SESSION — orientation (rewritten at the 14z-118 close, 2026-08-29)
 
-> ## **START HERE. NOTHING IS RED. THE DOCUMENTATION AUDIT'S FIRST PASS IS
-> ## DONE — eight commits, strict 114/0/0/0, NOT PUSHED (push at the
-> ## maintainer's word; check `git status -sb`). Read STATE 14z-118 CLOSE,
-> ## then `docs/project/doc_audit_14z118.md` §4 (one line per commit).**
+> ## **START HERE. NOTHING IS RED. TWO ARCS CLOSED THIS SESSION: the
+> ## documentation audit (16 commits, STATE 14z-118 CLOSE + CLOSE (2)) and
+> ## PHASE 0 OF THE CHARACTER-DATA MAP (STATE 14z-118 (charmap)):
+> ## `docs/project/tables/chars/<tenant>.{json,md}`, overrides in
+> ## `build/manifest/charmap_<tenant>.toml`, gates `test_charmap_current` /
+> ## `test_charmap_overrides`. **ONE DECISION WAITS: Donovan's physics rows are
+> ## NOT ported (he moves with Victor's values) — STATE "Decisions pending".**
+> ## Next phases: (1) anim node dumper + move naming (needs the maintainer's
+> ## move lists) + derived frame data; (2) hitbox rectangles + attack records
+> ## by measurement; (3) stun / projectile / auto tables. Check `git status -sb`.**
 > ##
 > ## **WHAT NOW EXISTS:** `tools/checkdocs.py` + `docs/doc_locks.tsv` (16
 > ## cross-document number locks, `test_checkdocs`, ci_portable — ADD A ROW

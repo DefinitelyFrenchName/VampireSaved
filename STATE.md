@@ -1,5 +1,20 @@
 # STATE — living progress log
 
+## Session 14z-118 (charmap) — **THE CHARACTER-DATA MAP, PHASE 0 (maintainer's request the same
+## day): every decoded per-tenant structure laid out ours-vs-VS2 with every difference attributed,
+## the override channel the build consumes, two gates — and the first finding: DONOVAN'S PHYSICS
+## ROWS ARE NOT PORTED (he walks and jumps with Victor's values).**
+
+| | |
+|---|---|
+| the request | map all three tenants' character data, readable by agents and humans, ours vs VS2 with differences flagged, Vampire Hunter (VH, the earlier game — not vhunt2) as a designed-in hook, and "edit the machine file; the build consumes it" (ruled). Rule-7 posture ruled: decoded values are derived data, tracked under `docs/`. Move names: the maintainer supplies lists at the naming step |
+| the record straightened first | the "Donovan 214+P" precedent the maintainer recalled is his **421+P Change Immortal** (14z-26/27/28/36: attack-record class bytes retyped by `[[region_fix]]` rows in the hitbox region) — exactly the layer the map's override channel compiles to |
+| delivered | `tools/charmap_gen.py` (the map: bank rows with physics decoded 16.16, 20 dispatch rows, every region's byte diff ATTRIBUTED — placements, reconciliation twins for engine refs, 24-bit frame pointers, `[gfx_remap]` band + the build's `effect_map.json` shelf codes, region_fix/port_patch/table_fix/data_port fixes, effect-list pointers, overrides — sfx records, FSM state-node runs, sprite-list summary, a generated NOT-DECODED worklist); `tools/charmap_md.py` (the page); `tools/charmap_compile.py` (overrides -> `[[region_fix]]` rows inside a marked block of the tenant manifest; gen_donovan_patch.py untouched); `build/manifest/charmap_{donovan,huitzil,pyron}.toml` (empty, documented); `docs/project/tables/chars/<tenant>.{json,md}`; gates `test_charmap_current` (ci_static, 2 controls) and `test_charmap_overrides` (ci_portable, 3 controls) |
+| attribution at close | bank fields UNATTRIBUTED 0/0/0; dispatch 0/0/0; data-region bytes unattributed 692 / 342 / 342 (all in `x2b7ef4`, the companion-effect tail — 24-bit frame pointers and tile words the effect pass rewrites; named in the worklist, frozen by the gate); code regions out of scope by design (relocated code is the reconciliation/pointer_flow gates' business) |
+| **THE FINDING** | **Donovan's `param32_a/b` and `jump_params` rows are NOT ported** — gen's `VALUE_SKIP` applies unless `[[tenant]] port_param32 = true`, which Huitzil (14z-66) and Pyron carry and Donovan does not (the 14w-b crash guard, written when he sat on slot 0x0F: "Jedah speeds retained"). At id 0x13 the row aliases `0x03`, so **he walks at Victor's 2.5/−2.25 instead of VS2's 3.0/−2.625 and jumps with Victor's parameters (back xv −3.625 vs −4.25, yv 8.0 vs 7.875 …)**. A gameplay-feel decision — "Decisions pending" below |
+| not done (the phases) | phase 1 anim node dumper + move naming + derived frame data (needs the maintainer's move lists and one native-leg rig); phase 2 hitbox rectangles + attack records (a measurement; settles the +0x17/+0x1D class-byte disagreement); phase 3 stun/projectile/auto tables. VH: nothing until a dump exists |
+| push | local; push at the maintainer's word |
+
 ## Session 14z-118 CLOSE (2) — **the audit's second half, same day: eight more commits (9)-(16).
 ## The (a)-(e) list closed; the `0xAA` question closed (Sasquatch's — blocks are 4 ids per
 ## PLAYER SIDE); `+0x381` and `$FF8127` settled by their WRITERS. Sixteen audit commits in all.**
@@ -422,6 +437,23 @@ them would reduce the legacy footprint from 5 bytes to 2.
 entries moved VERBATIM to `DECISIONS_HISTORY.md` — grep there by topic.
 Lifecycle: rulings are still marked DECIDED in place here first; they move to
 the archive once they stop shaping active work.)*
+
+- **DONOVAN'S PHYSICS ROWS (14z-118, found by the character-data map).**
+  `param32_a` (walk fwd/back), `param32_b` and `jump_params` (three jumps x
+  xv/xaccel/yv/gravity) are NOT ported for Donovan: `build/manifest/donovan.toml`
+  carries no `port_param32 = true`, so gen's `VALUE_SKIP` leaves his bank
+  rows at the vsavj alias — **Victor's** values (row `0x03`). Measured on
+  `build/don_m17`: walk 2.5 / −2.25 vs VS2's 3.0 / −2.625; back-jump xv
+  −3.625 vs −4.25, neutral yv 8.0 vs 7.75, forward yv 8.0 vs 7.875, gravity
+  −0.352 vs −0.375 (16.16). Huitzil (14z-66, after his own soak) and Pyron
+  port theirs. The skip was the 14w-b crash guard written for the slot-0x0F
+  port ("Jedah speeds retained"); whether the hazard survives the move to a
+  variant id was never re-examined for Donovan. **Options:** (a) set
+  `port_param32 = true` for Donovan and run the same soak battery Huitzil
+  ran (RECOMMENDED — VS2-faithful movement is the project's default; the
+  cost is one freeze); (b) keep Victor's physics deliberately (record it as
+  a tuning decision in `charmap_donovan.toml`'s header so the map stops
+  flagging it). Gameplay feel: the maintainer's call.
 
 - **THE `docs/project/tables/` PROMISE (14z-118, from the documentation
   audit's inventory `docs/project/doc_audit_14z118.md` §3). DECIDED

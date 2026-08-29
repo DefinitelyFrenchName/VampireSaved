@@ -148,3 +148,9 @@ test_tables_current
 # variant-half id can ever be featured by the demo. One negative control.
 # Needs ROMDIR (decrypt cache); ~2 s.
 test_attract_roster
+# 14z-118: THE CHARACTER-DATA MAP — docs/project/tables/chars/{donovan,huitzil,
+# pyron}.{json,md} are generated from the current solo builds (extract + built
+# image + placements + manifest) by tools/charmap_gen.py / charmap_md.py; every
+# ours-vs-vs2 difference attributed, the unattributed counts frozen by cmp.
+# Two must-fire controls. Needs the three solo build dirs; ~20 s.
+test_charmap_current

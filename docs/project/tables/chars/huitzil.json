@@ -1,0 +1,3569 @@
+{
+ "char": "0x10",
+ "diff_summary": {
+  "bank_fields_unattributed": 0,
+  "code_bytes_differ_out_of_scope": 102755,
+  "dispatch_unattributed": 0,
+  "physics_rows_ported": true,
+  "region_bytes_unattributed": 342,
+  "relocated_bad": 9
+ },
+ "inputs": {
+  "bank_map.toml": "776bcb9af5aef09c1b3204a6354c04165ad8b55d",
+  "manifest": "4f91439ab5c712e07fa3d0ff3a4638dbb505fe2f",
+  "overrides": "be0e9b96c8414532cc7a1d60f7a4a235a7d6362d",
+  "placements.json": "913270ce40f1e46e11e9b6daa7ff4346771009c3",
+  "reconciliation.toml": "40528aeb863028d885f868f34368443c460b5ca2",
+  "reconciliation_huitzil.toml": "23a15e51725a81723de8019f1e61bca7b8c62f22",
+  "regions.json": "9ed43c19fce9cf65581cf4f37d946e69dd91a633",
+  "verify_data.bin": "4c38741cf99226876de14e561934d9e1e6b31adf"
+ },
+ "overrides": [],
+ "schema": 1,
+ "sources": {
+  "ours": {
+   "kind": "built",
+   "set": "build/hui51"
+  },
+  "vh": null,
+  "vs2": {
+   "kind": "extract",
+   "oracle": "vhunt2",
+   "set": "vsav2"
+  }
+ },
+ "structures": {
+  "bank": {
+   "records": {
+    "ai_script_0": {
+     "fields": {
+      "ptr": {
+       "diff": false,
+       "expected_placed": "0x0fb6e0",
+       "fmt": "addr",
+       "ours": "0x0fb6e0",
+       "ours_source": "relocated",
+       "vh": null,
+       "vs2": "0x100000"
+      }
+     },
+     "loc": {
+      "kind": "data_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bf01a",
+      "vsavj_row": "0x0bf05a"
+     }
+    },
+    "ai_script_1": {
+     "fields": {
+      "ptr": {
+       "diff": false,
+       "expected_placed": "0x0fb7c0",
+       "fmt": "addr",
+       "ours": "0x0fb7c0",
+       "ours_source": "relocated",
+       "vh": null,
+       "vs2": "0x1000e0"
+      }
+     },
+     "loc": {
+      "kind": "data_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bf09a",
+      "vsavj_row": "0x0bf0da"
+     }
+    },
+    "ai_script_2": {
+     "fields": {
+      "ptr": {
+       "diff": false,
+       "expected_placed": "0x0fbfec",
+       "fmt": "addr",
+       "ours": "0x0fbfec",
+       "ours_source": "relocated",
+       "vh": null,
+       "vs2": "0x10090c"
+      }
+     },
+     "loc": {
+      "kind": "data_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bf11a",
+      "vsavj_row": "0x0bf15a"
+     }
+    },
+    "ai_script_3": {
+     "fields": {
+      "ptr": {
+       "diff": false,
+       "expected_placed": "0x0fc506",
+       "fmt": "addr",
+       "ours": "0x0fc506",
+       "ours_source": "relocated",
+       "vh": null,
+       "vs2": "0x100e26"
+      }
+     },
+     "loc": {
+      "kind": "data_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bf19a",
+      "vsavj_row": "0x0bf1da"
+     }
+    },
+    "anim_index_a": {
+     "fields": {
+      "ptr": {
+       "diff": false,
+       "expected_placed": "0x0d8dc0",
+       "fmt": "addr",
+       "ours": "0x0d8dc0",
+       "ours_source": "relocated",
+       "vh": null,
+       "vs2": "0x245872"
+      }
+     },
+     "loc": {
+      "kind": "data_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bce7a",
+      "vsavj_row": "0x0bceba"
+     }
+    },
+    "anim_index_a2": {
+     "fields": {
+      "ptr": {
+       "diff": false,
+       "expected_placed": "0x0dd91c",
+       "fmt": "addr",
+       "ours": "0x0dd91c",
+       "ours_source": "relocated",
+       "vh": null,
+       "vs2": "0x24a3ce"
+      }
+     },
+     "loc": {
+      "kind": "data_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bcefa",
+      "vsavj_row": "0x0bcf3a"
+     }
+    },
+    "anim_index_b": {
+     "fields": {
+      "ptr": {
+       "diff": false,
+       "expected_placed": "0x0db42a",
+       "fmt": "addr",
+       "ours": "0x0db42a",
+       "ours_source": "relocated",
+       "vh": null,
+       "vs2": "0x247edc"
+      }
+     },
+     "loc": {
+      "kind": "data_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bcf7a",
+      "vsavj_row": "0x0bcfba"
+     }
+    },
+    "anim_index_c": {
+     "fields": {
+      "ptr": {
+       "diff": false,
+       "expected_placed": "0x0db3b4",
+       "fmt": "addr",
+       "ours": "0x0db3b4",
+       "ours_source": "relocated",
+       "vh": null,
+       "vs2": "0x247e66"
+      }
+     },
+     "loc": {
+      "kind": "data_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bcffa",
+      "vsavj_row": "0x0bd03a"
+     }
+    },
+    "anim_index_proj": {
+     "fields": {
+      "ptr": {
+       "diff": false,
+       "expected_placed": "0x0e3424",
+       "fmt": "addr",
+       "ours": "0x0e3424",
+       "ours_source": "relocated",
+       "vh": null,
+       "vs2": "0x24fed6"
+      }
+     },
+     "loc": {
+      "kind": "data_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bd07a",
+      "vsavj_row": "0x0bd0ba"
+     }
+    },
+    "byte15b": {
+     "fields": {
+      "value": {
+       "diff": false,
+       "fmt": "u8",
+       "ours": 60,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": 60
+      }
+     },
+     "loc": {
+      "kind": "value8",
+      "len": 1,
+      "space": "bank",
+      "table_base": "0x0be87a",
+      "vsavj_row": "0x0be88a"
+     }
+    },
+    "byte2d_a": {
+     "fields": {
+      "row": {
+       "diff": false,
+       "fmt": "bytes",
+       "ours": "0a03030303030a03030303030a03030a0a030a03030a0a030a03030a0a03",
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": "0a03030303030a03030303030a03030a0a030a03030a0a030a03030a0a03"
+      }
+     },
+     "loc": {
+      "kind": "byte2d",
+      "len": 30,
+      "space": "bank",
+      "table_base": "0x0be89a",
+      "vsavj_row": "0x0bea7a"
+     }
+    },
+    "byte2d_b": {
+     "fields": {
+      "row": {
+       "diff": false,
+       "fmt": "bytes",
+       "ours": "0c03030303030c03030303030c03030c0c030c03030c0c030c03030c0c03",
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": "0c03030303030c03030303030c03030c0c030c03030c0c030c03030c0c03"
+      }
+     },
+     "loc": {
+      "kind": "byte2d",
+      "len": 30,
+      "space": "bank",
+      "table_base": "0x0bec5a",
+      "vsavj_row": "0x0bee3a"
+     }
+    },
+    "dispatch_00": {
+     "fields": {
+      "ptr": {
+       "diff": true,
+       "expected_placed": null,
+       "fmt": "addr",
+       "ours": "0x0fdd00",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "code_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bd0fa",
+      "vsavj_row": "0x0bd13a"
+     }
+    },
+    "dispatch_01": {
+     "fields": {
+      "ptr": {
+       "diff": true,
+       "expected_placed": null,
+       "fmt": "addr",
+       "ours": "0x0bf6ac",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "code_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bd17a",
+      "vsavj_row": "0x0bd1ba"
+     }
+    },
+    "dispatch_02": {
+     "fields": {
+      "ptr": {
+       "diff": true,
+       "expected_placed": null,
+       "fmt": "addr",
+       "ours": "0x0bff70",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "code_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bd1fa",
+      "vsavj_row": "0x0bd23a"
+     }
+    },
+    "dispatch_03": {
+     "fields": {
+      "ptr": {
+       "diff": true,
+       "expected_placed": null,
+       "fmt": "addr",
+       "ours": "0x0bff70",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "code_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bd27a",
+      "vsavj_row": "0x0bd2ba"
+     }
+    },
+    "dispatch_04": {
+     "fields": {
+      "ptr": {
+       "diff": true,
+       "expected_placed": null,
+       "fmt": "addr",
+       "ours": "0x0bff70",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "code_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bd2fa",
+      "vsavj_row": "0x0bd33a"
+     }
+    },
+    "dispatch_05": {
+     "fields": {
+      "ptr": {
+       "diff": true,
+       "expected_placed": null,
+       "fmt": "addr",
+       "ours": "0x0c1794",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "code_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bd37a",
+      "vsavj_row": "0x0bd3ba"
+     }
+    },
+    "dispatch_06": {
+     "fields": {
+      "ptr": {
+       "diff": true,
+       "expected_placed": null,
+       "fmt": "addr",
+       "ours": "0x0bf8c6",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "code_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bd3fa",
+      "vsavj_row": "0x0bd43a"
+     }
+    },
+    "dispatch_07": {
+     "fields": {
+      "ptr": {
+       "diff": true,
+       "expected_placed": null,
+       "fmt": "addr",
+       "ours": "0x024ea4",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "code_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bd47a",
+      "vsavj_row": "0x0bd4ba"
+     }
+    },
+    "dispatch_08": {
+     "fields": {
+      "ptr": {
+       "diff": true,
+       "expected_placed": null,
+       "fmt": "addr",
+       "ours": "0x0bfaf2",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "code_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bd4fa",
+      "vsavj_row": "0x0bd53a"
+     }
+    },
+    "dispatch_09": {
+     "fields": {
+      "ptr": {
+       "diff": true,
+       "expected_placed": null,
+       "fmt": "addr",
+       "ours": "0x0bfc3e",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "code_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bd57a",
+      "vsavj_row": "0x0bd5ba"
+     }
+    },
+    "dispatch_10": {
+     "fields": {
+      "ptr": {
+       "diff": true,
+       "expected_placed": null,
+       "fmt": "addr",
+       "ours": "0x0bf852",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "code_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bd5fa",
+      "vsavj_row": "0x0bd63a"
+     }
+    },
+    "dispatch_11": {
+     "fields": {
+      "ptr": {
+       "diff": true,
+       "expected_placed": null,
+       "fmt": "addr",
+       "ours": "0x0c1be4",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "code_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bd67a",
+      "vsavj_row": "0x0bd6ba"
+     }
+    },
+    "dispatch_12": {
+     "fields": {
+      "ptr": {
+       "diff": true,
+       "expected_placed": null,
+       "fmt": "addr",
+       "ours": "0x0c1e00",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "code_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bd6fa",
+      "vsavj_row": "0x0bd73a"
+     }
+    },
+    "dispatch_13": {
+     "fields": {
+      "ptr": {
+       "diff": true,
+       "expected_placed": null,
+       "fmt": "addr",
+       "ours": "0x0c1e30",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "code_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bd77a",
+      "vsavj_row": "0x0bd7ba"
+     }
+    },
+    "dispatch_14": {
+     "fields": {
+      "ptr": {
+       "diff": true,
+       "expected_placed": null,
+       "fmt": "addr",
+       "ours": "0x0c1a30",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "code_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bd7fa",
+      "vsavj_row": "0x0bd83a"
+     }
+    },
+    "dispatch_15": {
+     "fields": {
+      "ptr": {
+       "diff": true,
+       "expected_placed": null,
+       "fmt": "addr",
+       "ours": "0x0bfb16",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "code_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bf21a",
+      "vsavj_row": "0x0bf25a"
+     }
+    },
+    "dispatch_16": {
+     "fields": {
+      "ptr": {
+       "diff": true,
+       "expected_placed": null,
+       "fmt": "addr",
+       "ours": "0x0c168a",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "code_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bf31a",
+      "vsavj_row": "0x0bf35a"
+     }
+    },
+    "dispatch_17": {
+     "fields": {
+      "ptr": {
+       "diff": true,
+       "expected_placed": null,
+       "fmt": "addr",
+       "ours": "0x0c1778",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "code_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bf39a",
+      "vsavj_row": "0x0bf3da"
+     }
+    },
+    "dispatch_18": {
+     "fields": {
+      "ptr": {
+       "diff": true,
+       "expected_placed": null,
+       "fmt": "addr",
+       "ours": "0x0c1e9a",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "code_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bf49a",
+      "vsavj_row": "0x0bf4da"
+     }
+    },
+    "dispatch_19": {
+     "fields": {
+      "ptr": {
+       "diff": true,
+       "expected_placed": null,
+       "fmt": "addr",
+       "ours": "0x0c1780",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "code_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bf61a",
+      "vsavj_row": "0x0bf65a"
+     }
+    },
+    "gap_bd8fa": {
+     "fields": {
+      "raw": {
+       "diff": false,
+       "fmt": "hex",
+       "ours": "00026000",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "auto",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bd8fa",
+      "vsavj_row": "0x0bd93a"
+     }
+    },
+    "gap_bdc7a": {
+     "fields": {
+      "raw": {
+       "diff": false,
+       "fmt": "hex",
+       "ours": "fffd8000",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "auto",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bdc7a",
+      "vsavj_row": "0x0bdcba"
+     }
+    },
+    "gap_bdcfa": {
+     "fields": {
+      "raw": {
+       "diff": false,
+       "fmt": "hex",
+       "ours": "00046000",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "auto",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bdcfa",
+      "vsavj_row": "0x0bdd3a"
+     }
+    },
+    "gap_bdd7a": {
+     "fields": {
+      "raw": {
+       "diff": false,
+       "fmt": "hex",
+       "ours": "00000000",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "auto",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bdd7a",
+      "vsavj_row": "0x0bddba"
+     }
+    },
+    "gap_bddfa": {
+     "fields": {
+      "raw": {
+       "diff": false,
+       "fmt": "hex",
+       "ours": "fffbc000",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "auto",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bddfa",
+      "vsavj_row": "0x0bde3a"
+     }
+    },
+    "gap_bde7a": {
+     "fields": {
+      "raw": {
+       "diff": false,
+       "fmt": "hex",
+       "ours": "00040000",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "auto",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bde7a",
+      "vsavj_row": "0x0bdeba"
+     }
+    },
+    "gap_bdefa": {
+     "fields": {
+      "raw": {
+       "diff": false,
+       "fmt": "hex",
+       "ours": "00000000",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "auto",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bdefa",
+      "vsavj_row": "0x0bdf3a"
+     }
+    },
+    "gap_bdf7a": {
+     "fields": {
+      "raw": {
+       "diff": false,
+       "fmt": "hex",
+       "ours": "fffd8000",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "auto",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bdf7a",
+      "vsavj_row": "0x0bdfba"
+     }
+    },
+    "gap_bdffa": {
+     "fields": {
+      "raw": {
+       "diff": false,
+       "fmt": "hex",
+       "ours": "00046000",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "auto",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bdffa",
+      "vsavj_row": "0x0be03a"
+     }
+    },
+    "gap_be07a": {
+     "fields": {
+      "raw": {
+       "diff": false,
+       "fmt": "hex",
+       "ours": "00000000",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "auto",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0be07a",
+      "vsavj_row": "0x0be0ba"
+     }
+    },
+    "gap_be0fa": {
+     "fields": {
+      "raw": {
+       "diff": false,
+       "fmt": "hex",
+       "ours": "fffbc000",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "auto",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0be0fa",
+      "vsavj_row": "0x0be13a"
+     }
+    },
+    "gap_be23a": {
+     "fields": {
+      "raw": {
+       "diff": false,
+       "fmt": "hex",
+       "ours": "0000",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "auto",
+      "len": 2,
+      "space": "bank",
+      "table_base": "0x0be23a",
+      "vsavj_row": "0x0be25a"
+     }
+    },
+    "gap_be27a": {
+     "fields": {
+      "raw": {
+       "diff": false,
+       "fmt": "hex",
+       "ours": "0041",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "auto",
+      "len": 2,
+      "space": "bank",
+      "table_base": "0x0be27a",
+      "vsavj_row": "0x0be29a"
+     }
+    },
+    "gap_be2ba": {
+     "fields": {
+      "raw": {
+       "diff": false,
+       "fmt": "hex",
+       "ours": "0041",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "auto",
+      "len": 2,
+      "space": "bank",
+      "table_base": "0x0be2ba",
+      "vsavj_row": "0x0be2da"
+     }
+    },
+    "gap_be37a": {
+     "fields": {
+      "raw": {
+       "diff": false,
+       "fmt": "hex",
+       "ours": "00019000",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "auto",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0be37a",
+      "vsavj_row": "0x0be3ba"
+     }
+    },
+    "gap_be4fa": {
+     "fields": {
+      "raw": {
+       "diff": false,
+       "fmt": "hex",
+       "ours": "00000000",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "auto",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0be4fa",
+      "vsavj_row": "0x0be53a"
+     }
+    },
+    "gap_be57a": {
+     "fields": {
+      "raw": {
+       "diff": false,
+       "fmt": "hex",
+       "ours": "00000000",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "auto",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0be57a",
+      "vsavj_row": "0x0be5ba"
+     }
+    },
+    "gap_be5fa": {
+     "fields": {
+      "raw": {
+       "diff": false,
+       "fmt": "hex",
+       "ours": "00000000",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "auto",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0be5fa",
+      "vsavj_row": "0x0be63a"
+     }
+    },
+    "gap_be67a": {
+     "fields": {
+      "raw": {
+       "diff": false,
+       "fmt": "hex",
+       "ours": "00000000",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "auto",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0be67a",
+      "vsavj_row": "0x0be6ba"
+     }
+    },
+    "gap_be6fa": {
+     "fields": {
+      "raw": {
+       "diff": false,
+       "fmt": "hex",
+       "ours": "00000000",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "auto",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0be6fa",
+      "vsavj_row": "0x0be73a"
+     }
+    },
+    "gap_be77a": {
+     "fields": {
+      "raw": {
+       "diff": false,
+       "fmt": "hex",
+       "ours": "00000000",
+       "ours_source": "no-vs2-value",
+       "vh": null,
+       "vs2": null
+      }
+     },
+     "loc": {
+      "kind": "auto",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0be77a",
+      "vsavj_row": "0x0be7ba"
+     }
+    },
+    "hitbox_base": {
+     "fields": {
+      "ptr": {
+       "diff": false,
+       "expected_placed": "0x0f7870",
+       "fmt": "addr",
+       "ours": "0x0f7870",
+       "ours_source": "relocated",
+       "vh": null,
+       "vs2": "0x0c4370"
+      }
+     },
+     "loc": {
+      "kind": "data_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bd97a",
+      "vsavj_row": "0x0bd9ba"
+     }
+    },
+    "hitbox_comp": {
+     "fields": {
+      "ptr": {
+       "diff": false,
+       "expected_placed": "0x0f7750",
+       "fmt": "addr",
+       "ours": "0x0f7750",
+       "ours_source": "relocated",
+       "vh": null,
+       "vs2": "0x0c4250"
+      }
+     },
+     "loc": {
+      "kind": "data_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bd9fa",
+      "vsavj_row": "0x0bda3a"
+     }
+    },
+    "jump_params": {
+     "fields": {
+      "back_gravity": {
+       "diff": false,
+       "fmt": "s16.16",
+       "ours": -0.375,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": -0.375
+      },
+      "back_xaccel": {
+       "diff": false,
+       "fmt": "s16.16",
+       "ours": 0.01953,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": 0.01953
+      },
+      "back_xv": {
+       "diff": false,
+       "fmt": "s16.16",
+       "ours": -4.0,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": -4.0
+      },
+      "back_yv": {
+       "diff": false,
+       "fmt": "s16.16",
+       "ours": 8.0,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": 8.0
+      },
+      "forward_gravity": {
+       "diff": false,
+       "fmt": "s16.16",
+       "ours": -0.375,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": -0.375
+      },
+      "forward_xaccel": {
+       "diff": false,
+       "fmt": "s16.16",
+       "ours": -0.01953,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": -0.01953
+      },
+      "forward_xv": {
+       "diff": false,
+       "fmt": "s16.16",
+       "ours": 4.0,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": 4.0
+      },
+      "forward_yv": {
+       "diff": false,
+       "fmt": "s16.16",
+       "ours": 8.0,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": 8.0
+      },
+      "neutral_gravity": {
+       "diff": false,
+       "fmt": "s16.16",
+       "ours": -0.375,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": -0.375
+      },
+      "neutral_xaccel": {
+       "diff": false,
+       "fmt": "s16.16",
+       "ours": 0.0,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": 0.0
+      },
+      "neutral_xv": {
+       "diff": false,
+       "fmt": "s16.16",
+       "ours": 0.0,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": 0.0
+      },
+      "neutral_yv": {
+       "diff": false,
+       "fmt": "s16.16",
+       "ours": 8.0,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": 8.0
+      }
+     },
+     "loc": {
+      "kind": "rec8",
+      "len": 48,
+      "space": "bank",
+      "table_base": "0x0bdb7a",
+      "vsavj_row": "0x0bde7a"
+     }
+    },
+    "param32_a": {
+     "fields": {
+      "back_walk_xv": {
+       "diff": false,
+       "fmt": "s16.16",
+       "ours": -2.75,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": -2.75
+      },
+      "fwd_walk_xv": {
+       "diff": false,
+       "fmt": "s16.16",
+       "ours": 3.125,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": 3.125
+      }
+     },
+     "loc": {
+      "kind": "rec8",
+      "len": 8,
+      "space": "bank",
+      "table_base": "0x0bd87a",
+      "vsavj_row": "0x0bd8fa"
+     }
+    },
+    "param32_b": {
+     "fields": {
+      "back_walk_xv": {
+       "diff": false,
+       "fmt": "s16.16",
+       "ours": -2.25,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": -2.25
+      },
+      "fwd_walk_xv": {
+       "diff": false,
+       "fmt": "s16.16",
+       "ours": 1.625,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": 1.625
+      }
+     },
+     "loc": {
+      "kind": "rec8",
+      "len": 8,
+      "space": "bank",
+      "table_base": "0x0be2fa",
+      "vsavj_row": "0x0be37a"
+     }
+    },
+    "proj_hitbox_base": {
+     "fields": {
+      "ptr": {
+       "diff": false,
+       "expected_placed": "0x0faa44",
+       "fmt": "addr",
+       "ours": "0x0faa44",
+       "ours_source": "relocated",
+       "vh": null,
+       "vs2": "0x0d05f4"
+      }
+     },
+     "loc": {
+      "kind": "data_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bda7a",
+      "vsavj_row": "0x0bdaba"
+     }
+    },
+    "proj_hitbox_comp": {
+     "fields": {
+      "ptr": {
+       "diff": false,
+       "expected_placed": "0x0faa10",
+       "fmt": "addr",
+       "ours": "0x0faa10",
+       "ours_source": "relocated",
+       "vh": null,
+       "vs2": "0x0d05c0"
+      }
+     },
+     "loc": {
+      "kind": "data_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bdafa",
+      "vsavj_row": "0x0bdb3a"
+     }
+    },
+    "rec8_a": {
+     "fields": {
+      "long0": {
+       "diff": false,
+       "fmt": "s32",
+       "ours": -311296,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": -311296
+      },
+      "long1": {
+       "diff": false,
+       "fmt": "s32",
+       "ours": 1280,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": 1280
+      }
+     },
+     "loc": {
+      "kind": "rec8",
+      "len": 8,
+      "space": "bank",
+      "table_base": "0x0bdb7a",
+      "vsavj_row": "0x0bdbfa"
+     }
+    },
+    "rec8_b": {
+     "fields": {
+      "long0": {
+       "diff": false,
+       "fmt": "s32",
+       "ours": 0,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": 0
+      },
+      "long1": {
+       "diff": false,
+       "fmt": "s32",
+       "ours": 0,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": 0
+      }
+     },
+     "loc": {
+      "kind": "rec8",
+      "len": 8,
+      "space": "bank",
+      "table_base": "0x0be3fa",
+      "vsavj_row": "0x0be47a"
+     }
+    },
+    "tail_code_ptr": {
+     "fields": {
+      "ptr": {
+       "diff": false,
+       "expected_placed": "0x0bfe88",
+       "fmt": "addr",
+       "ours": "0x0bfe88",
+       "ours_source": "relocated",
+       "vh": null,
+       "vs2": "0x055478"
+      }
+     },
+     "loc": {
+      "kind": "code_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bf29a",
+      "vsavj_row": "0x0bf2da"
+     }
+    },
+    "tail_data_ptr": {
+     "fields": {
+      "ptr": {
+       "diff": true,
+       "expected_placed": "0x0fa92a",
+       "fmt": "addr",
+       "ours": "0x41eb80",
+       "ours_source": "manifest:sound_table:hui_sfx_records (the array is placed by the sound op; the row is its ptr_table)",
+       "vh": null,
+       "vs2": "0x0c742a"
+      }
+     },
+     "loc": {
+      "kind": "data_ptr",
+      "len": 4,
+      "space": "bank",
+      "table_base": "0x0bf41a",
+      "vsavj_row": "0x0bf45a"
+     }
+    },
+    "word132": {
+     "fields": {
+      "value": {
+       "diff": false,
+       "fmt": "u16",
+       "ours": 24,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": 24
+      }
+     },
+     "loc": {
+      "kind": "value16",
+      "len": 2,
+      "space": "bank",
+      "table_base": "0x0be17a",
+      "vsavj_row": "0x0be19a"
+     }
+    },
+    "word_pos_a": {
+     "fields": {
+      "value": {
+       "diff": false,
+       "fmt": "u16",
+       "ours": 16,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": 16
+      }
+     },
+     "loc": {
+      "kind": "value16",
+      "len": 2,
+      "space": "bank",
+      "table_base": "0x0be1ba",
+      "vsavj_row": "0x0be1da"
+     }
+    },
+    "word_pos_b": {
+     "fields": {
+      "value": {
+       "diff": false,
+       "fmt": "u16",
+       "ours": 8,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": 8
+      }
+     },
+     "loc": {
+      "kind": "value16",
+      "len": 2,
+      "space": "bank",
+      "table_base": "0x0be1fa",
+      "vsavj_row": "0x0be21a"
+     }
+    },
+    "word_range": {
+     "fields": {
+      "value": {
+       "diff": false,
+       "fmt": "u16",
+       "ours": 0,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": 0
+      }
+     },
+     "loc": {
+      "kind": "value16",
+      "len": 2,
+      "space": "bank",
+      "table_base": "0x0be83a",
+      "vsavj_row": "0x0be85a"
+     }
+    },
+    "word_y_off": {
+     "fields": {
+      "value": {
+       "diff": false,
+       "fmt": "u16",
+       "ours": 0,
+       "ours_source": "byte",
+       "vh": null,
+       "vs2": 0
+      }
+     },
+     "loc": {
+      "kind": "value16",
+      "len": 2,
+      "space": "bank",
+      "table_base": "0x0be7fa",
+      "vsavj_row": "0x0be81a"
+     }
+    }
+   }
+  },
+  "dispatch": {
+   "dispatch_00": {
+    "diff": true,
+    "expected_placed": "0x0c1e60",
+    "orc": "0x057486",
+    "ours": "0x0fdd00",
+    "ours_source": "manifest:init_shim (synthesised pool-seeding shim; falls into the relocated handler)",
+    "vs2": "0x057450"
+   },
+   "dispatch_01": {
+    "diff": false,
+    "expected_placed": "0x0bf6ac",
+    "orc": "0x054cd2",
+    "ours": "0x0bf6ac",
+    "ours_source": "relocated",
+    "vs2": "0x054c9c"
+   },
+   "dispatch_02": {
+    "diff": false,
+    "expected_placed": "0x0bff70",
+    "orc": "0x055596",
+    "ours": "0x0bff70",
+    "ours_source": "relocated",
+    "vs2": "0x055560"
+   },
+   "dispatch_03": {
+    "diff": false,
+    "expected_placed": "0x0bff70",
+    "orc": "0x055596",
+    "ours": "0x0bff70",
+    "ours_source": "relocated",
+    "vs2": "0x055560"
+   },
+   "dispatch_04": {
+    "diff": false,
+    "expected_placed": "0x0bff70",
+    "orc": "0x055596",
+    "ours": "0x0bff70",
+    "ours_source": "relocated",
+    "vs2": "0x055560"
+   },
+   "dispatch_05": {
+    "diff": false,
+    "expected_placed": "0x0c1794",
+    "orc": "0x056dba",
+    "ours": "0x0c1794",
+    "ours_source": "relocated",
+    "vs2": "0x056d84"
+   },
+   "dispatch_06": {
+    "diff": false,
+    "expected_placed": "0x0bf8c6",
+    "orc": "0x054eec",
+    "ours": "0x0bf8c6",
+    "ours_source": "relocated",
+    "vs2": "0x054eb6"
+   },
+   "dispatch_08": {
+    "diff": false,
+    "expected_placed": "0x0bfaf2",
+    "orc": "0x055118",
+    "ours": "0x0bfaf2",
+    "ours_source": "relocated",
+    "vs2": "0x0550e2"
+   },
+   "dispatch_09": {
+    "diff": false,
+    "expected_placed": "0x0bfc3e",
+    "orc": "0x055264",
+    "ours": "0x0bfc3e",
+    "ours_source": "relocated",
+    "vs2": "0x05522e"
+   },
+   "dispatch_10": {
+    "diff": false,
+    "expected_placed": "0x0bf852",
+    "orc": "0x054e78",
+    "ours": "0x0bf852",
+    "ours_source": "relocated",
+    "vs2": "0x054e42"
+   },
+   "dispatch_11": {
+    "diff": false,
+    "expected_placed": "0x0c1be4",
+    "orc": "0x05720a",
+    "ours": "0x0c1be4",
+    "ours_source": "relocated",
+    "vs2": "0x0571d4"
+   },
+   "dispatch_12": {
+    "diff": false,
+    "expected_placed": "0x0c1e00",
+    "orc": "0x057426",
+    "ours": "0x0c1e00",
+    "ours_source": "relocated",
+    "vs2": "0x0573f0"
+   },
+   "dispatch_13": {
+    "diff": false,
+    "expected_placed": "0x0c1e30",
+    "orc": "0x057456",
+    "ours": "0x0c1e30",
+    "ours_source": "relocated",
+    "vs2": "0x057420"
+   },
+   "dispatch_14": {
+    "diff": false,
+    "expected_placed": "0x0c1a30",
+    "orc": "0x057056",
+    "ours": "0x0c1a30",
+    "ours_source": "relocated",
+    "vs2": "0x057020"
+   },
+   "dispatch_15": {
+    "diff": false,
+    "expected_placed": "0x0bfb16",
+    "orc": "0x05513c",
+    "ours": "0x0bfb16",
+    "ours_source": "relocated",
+    "vs2": "0x055106"
+   },
+   "dispatch_16": {
+    "diff": false,
+    "expected_placed": "0x0c168a",
+    "orc": "0x056cb0",
+    "ours": "0x0c168a",
+    "ours_source": "relocated",
+    "vs2": "0x056c7a"
+   },
+   "dispatch_17": {
+    "diff": false,
+    "expected_placed": "0x0c1778",
+    "orc": "0x056d9e",
+    "ours": "0x0c1778",
+    "ours_source": "relocated",
+    "vs2": "0x056d68"
+   },
+   "dispatch_18": {
+    "diff": false,
+    "expected_placed": "0x0c1e9a",
+    "orc": "0x0574ba",
+    "ours": "0x0c1e9a",
+    "ours_source": "relocated",
+    "vs2": "0x05748a"
+   },
+   "dispatch_19": {
+    "diff": false,
+    "expected_placed": "0x0c1780",
+    "orc": "0x056da6",
+    "ours": "0x0c1780",
+    "ours_source": "relocated",
+    "vs2": "0x056d70"
+   }
+  },
+  "fsm_nodes": {
+   "anim": {
+    "runs": [
+     {
+      "diff": true,
+      "off": "0x9bda",
+      "ours_states": [
+       15,
+       15,
+       15,
+       15
+      ],
+      "vs2_states": null
+     },
+     {
+      "diff": true,
+      "off": "0x9cba",
+      "ours_states": null,
+      "vs2_states": [
+       38,
+       38,
+       38,
+       38
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0xc29c",
+      "ours_states": null,
+      "vs2_states": [
+       38,
+       38,
+       38,
+       38
+      ]
+     }
+    ],
+    "runs_ours": 1,
+    "runs_vs2": 2
+   },
+   "x100000": {
+    "runs": [
+     {
+      "diff": false,
+      "off": "0x8f8",
+      "ours_states": [
+       6,
+       1,
+       3,
+       3
+      ],
+      "vs2_states": [
+       6,
+       1,
+       3,
+       3
+      ]
+     }
+    ],
+    "runs_ours": 1,
+    "runs_vs2": 1
+   },
+   "x2b7ef4": {
+    "runs": [
+     {
+      "diff": true,
+      "off": "0x252",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": null
+     },
+     {
+      "diff": true,
+      "off": "0x342",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": null
+     },
+     {
+      "diff": true,
+      "off": "0x352",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": [
+       43,
+       43,
+       43,
+       43
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x582",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": [
+       43,
+       43,
+       43,
+       43
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x58a",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": [
+       43,
+       43,
+       43,
+       43
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x592",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": [
+       43,
+       43,
+       43,
+       43
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x1062",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": [
+       43,
+       43,
+       43,
+       43
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x106a",
+      "ours_states": null,
+      "vs2_states": [
+       43,
+       43,
+       43,
+       43,
+       44
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x108a",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": null
+     },
+     {
+      "diff": true,
+      "off": "0x1092",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": [
+       43,
+       43,
+       43,
+       44
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x10da",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": [
+       43,
+       44,
+       44,
+       44,
+       44
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x10e2",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": [
+       44,
+       44,
+       44,
+       44
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x114a",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": null
+     },
+     {
+      "diff": true,
+      "off": "0x123a",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": null
+     },
+     {
+      "diff": true,
+      "off": "0x1322",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": [
+       44,
+       44,
+       44,
+       44
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x1412",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": [
+       44,
+       44,
+       44,
+       44
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x235a",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": [
+       44,
+       44,
+       44,
+       44
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x2362",
+      "ours_states": null,
+      "vs2_states": [
+       44,
+       44,
+       44,
+       44
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x24f6",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": [
+       43,
+       43,
+       43,
+       43
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x24fe",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": [
+       43,
+       43,
+       43,
+       43
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x2526",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": [
+       43,
+       43,
+       43,
+       43
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x252e",
+      "ours_states": null,
+      "vs2_states": [
+       43,
+       43,
+       43,
+       43
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x274e",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": null
+     },
+     {
+      "diff": true,
+      "off": "0x2c5e",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": [
+       43,
+       43,
+       43,
+       43
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x2c66",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": [
+       43,
+       43,
+       43,
+       43
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x2c6e",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": [
+       43,
+       43,
+       43,
+       43
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x31b6",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": [
+       43,
+       43,
+       43,
+       43
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x31be",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": [
+       43,
+       43,
+       43,
+       43
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x31c6",
+      "ours_states": null,
+      "vs2_states": [
+       43,
+       43,
+       43,
+       43,
+       44
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x31e6",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": null
+     },
+     {
+      "diff": true,
+      "off": "0x31ee",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": [
+       43,
+       43,
+       43,
+       44
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x326e",
+      "ours_states": null,
+      "vs2_states": [
+       44,
+       43,
+       44,
+       44
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x32c6",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": null
+     },
+     {
+      "diff": true,
+      "off": "0x33ae",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": [
+       44,
+       44,
+       44,
+       44
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x3616",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": [
+       44,
+       44,
+       44,
+       44
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x361e",
+      "ours_states": null,
+      "vs2_states": [
+       44,
+       44,
+       44,
+       44
+      ]
+     },
+     {
+      "diff": true,
+      "off": "0x40a6",
+      "ours_states": [
+       64,
+       64,
+       64,
+       64
+      ],
+      "vs2_states": null
+     }
+    ],
+    "runs_ours": 31,
+    "runs_vs2": 28
+   }
+  },
+  "regions": {
+   "anim": {
+    "diff": {
+     "attributed_by": {
+      "port_patch:composite list 24A744: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 24ADEC: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 24AFCC: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 24B0BC: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 24E968: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 24E980: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 24E998: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 24E9B0: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 24E9C8: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 24E9E0: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 24E9F8: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 24EA10: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 24EA28: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251CD2: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251CE6: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251D02: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251D1E: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251D3A: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251D56: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251D72: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251D8E: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251DAA: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251DC6: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251DE2: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251DFE: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251E12: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251E26: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251E42: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251E56: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251E72: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251E8E: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251EAA: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251EC6: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251EE2: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251EFE: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251F1A: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251F2E: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251F42: list-type 12 -> the taken-over type 6": 1,
+      "port_patch:composite list 251F56: list-type 12 -> the taken-over type 6": 1
+     },
+     "counts": {
+      "attributed": 39,
+      "gfx_remap": 0,
+      "override": 0,
+      "relocated_bad": 0,
+      "relocated_ok": 4151,
+      "total": 12492,
+      "unattributed": 0
+     },
+     "sites": []
+    },
+    "kind": "data",
+    "len": 124928,
+    "orc": "0x231cfe",
+    "placed": "0x0d8dc0",
+    "refs": 4151,
+    "sha1_ours": "6e0995acd0723746bec0937bb887412d8b19cb15",
+    "sha1_vs2": "9b762a41de88a0b08fe66c829231544875267ed8",
+    "src": "0x245872",
+    "variant_sites": 0
+   },
+   "aux0_0": {
+    "diff": {
+     "attributed_by": {},
+     "counts": {
+      "attributed": 0,
+      "gfx_remap": 0,
+      "override": 0,
+      "relocated_bad": 0,
+      "relocated_ok": 0,
+      "total": 0,
+      "unattributed": 0
+     },
+     "sites": []
+    },
+    "kind": "data",
+    "len": 400,
+    "orc": "0x314144",
+    "placed": "0x0f75c0",
+    "refs": 0,
+    "sha1_ours": "41dfcc6bc3ea45a5e332ee9fdb32db5dc529bc24",
+    "sha1_vs2": "41dfcc6bc3ea45a5e332ee9fdb32db5dc529bc24",
+    "src": "0x334170",
+    "variant_sites": 0
+   },
+   "aux0_1": {
+    "diff": {
+     "attributed_by": {},
+     "counts": {
+      "attributed": 0,
+      "gfx_remap": 0,
+      "override": 0,
+      "relocated_bad": 0,
+      "relocated_ok": 0,
+      "total": 0,
+      "unattributed": 0
+     },
+     "sites": []
+    },
+    "kind": "data",
+    "len": 58912,
+    "orc": "0x316534",
+    "placed": "0x3ec720",
+    "refs": 0,
+    "sha1_ours": "7b71cb3dff16194727faf998e41c100ae7f7e4d1",
+    "sha1_vs2": "7b71cb3dff16194727faf998e41c100ae7f7e4d1",
+    "src": "0x336560",
+    "variant_sites": 0
+   },
+   "code": {
+    "diff": {
+     "bytes_differ": 10148,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 10182,
+    "orc": "0x054cc6",
+    "placed": "0x0bf6a0",
+    "refs": 418,
+    "sha1_ours": "a960c4395e1ef69cb04d73fd2fdb4f0d7603fcf5",
+    "sha1_vs2": "47f8f31195f0d25714452ed857a0068581047ed3",
+    "src": "0x054c90",
+    "variant_sites": 0
+   },
+   "hitbox": {
+    "diff": {
+     "attributed_by": {},
+     "counts": {
+      "attributed": 0,
+      "gfx_remap": 0,
+      "override": 0,
+      "relocated_bad": 0,
+      "relocated_ok": 0,
+      "total": 0,
+      "unattributed": 0
+     },
+     "sites": []
+    },
+    "kind": "data",
+    "len": 12978,
+    "orc": "0x0c3ae2",
+    "placed": "0x0f7750",
+    "refs": 0,
+    "sha1_ours": "869f46e933c7cc3b7aaff5f3a952189b9be43f2f",
+    "sha1_vs2": "869f46e933c7cc3b7aaff5f3a952189b9be43f2f",
+    "src": "0x0c4250",
+    "variant_sites": 4
+   },
+   "hitbox_proj": {
+    "diff": {
+     "attributed_by": {
+      "region_fix:trap dome hit record 1: class 0x52 -> 0x06 (vs2-alias-proven": 1,
+      "region_fix:trap dome hit record 2: class 0x52 -> 0x06 (vs2-alias-proven": 1
+     },
+     "counts": {
+      "attributed": 2,
+      "gfx_remap": 0,
+      "override": 0,
+      "relocated_bad": 0,
+      "relocated_ok": 0,
+      "total": 2,
+      "unattributed": 0
+     },
+     "sites": []
+    },
+    "kind": "data",
+    "len": 966,
+    "orc": "0x0cfe52",
+    "placed": "0x0faa10",
+    "refs": 0,
+    "sha1_ours": "da4e21dfe9f0f5d80d28e33b51c25dd43beea11b",
+    "sha1_vs2": "e502a357b4755e72ea556b3924e65c08f69f8d67",
+    "src": "0x0d05c0",
+    "variant_sites": 0
+   },
+   "x022400": {
+    "diff": {
+     "bytes_differ": 5616,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 5632,
+    "orc": "0x02242e",
+    "placed": "0x0c7070",
+    "refs": 49,
+    "sha1_ours": "4740f39ba16db14b418021e2b9c47e061ce842ae",
+    "sha1_vs2": "b891685eb004924f010fb5a91349e3e28c0b3b47",
+    "src": "0x022400",
+    "variant_sites": 0
+   },
+   "x02592a": {
+    "diff": {
+     "bytes_differ": 1105,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 1110,
+    "orc": "0x025958",
+    "placed": "0x0c87f0",
+    "refs": 9,
+    "sha1_ours": "1c54c048be29fc3087eab087abf2b501d0c22581",
+    "sha1_vs2": "146e6fb93e64ab313883fb19437a97d0c320d963",
+    "src": "0x02592a",
+    "variant_sites": 0
+   },
+   "x026142": {
+    "diff": {
+     "bytes_differ": 5103,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 5120,
+    "orc": "0x026170",
+    "placed": "0x0c8d70",
+    "refs": 44,
+    "sha1_ours": "41b457ad9c49c5a1881520ca99941d5afe3de99b",
+    "sha1_vs2": "05b198390f24fc4d84786a7416527e6880473dd5",
+    "src": "0x026142",
+    "variant_sites": 0
+   },
+   "x028122": {
+    "diff": {
+     "bytes_differ": 3571,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 3584,
+    "orc": "0x028150",
+    "placed": "0x0ca210",
+    "refs": 46,
+    "sha1_ours": "87e01047f4c464d80fbd60469c56001d18428fa4",
+    "sha1_vs2": "25f8809c49687e0e954078fb6e4f6841591cc5fb",
+    "src": "0x028122",
+    "variant_sites": 0
+   },
+   "x057456": {
+    "diff": {
+     "bytes_differ": 20912,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 20992,
+    "orc": "0x057486",
+    "placed": "0x0c1e66",
+    "refs": 755,
+    "sha1_ours": "2a52d2e9c2c00653bcb6a8d070fd54becfe0aa56",
+    "sha1_vs2": "1322376c61fb54331ca73f0ddc7445390a08d505",
+    "src": "0x057456",
+    "variant_sites": 3
+   },
+   "x05c800": {
+    "diff": {
+     "bytes_differ": 27026,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 27136,
+    "orc": "0x05c834",
+    "placed": "0x0cb010",
+    "refs": 723,
+    "sha1_ours": "5c49c0d436d06a29305102601675572f80118356",
+    "sha1_vs2": "92f9dc55ceda3666df2c6f1383462a9f9e9701b5",
+    "src": "0x05c800",
+    "variant_sites": 0
+   },
+   "x0672d0": {
+    "diff": {
+     "bytes_differ": 637,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 640,
+    "orc": "0x067304",
+    "placed": "0x0d1a30",
+    "refs": 14,
+    "sha1_ours": "16f120adddc766b36c209f8d06e9ad229ba32f1b",
+    "sha1_vs2": "30cd1a201195fa289112977db03a665673cb7989",
+    "src": "0x0672d0",
+    "variant_sites": 0
+   },
+   "x067550": {
+    "diff": {
+     "bytes_differ": 756,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 758,
+    "orc": "0x067584",
+    "placed": "0x0d1cb0",
+    "refs": 18,
+    "sha1_ours": "a05597d9bf892ba68feaa39faa78fdf2ab4349d2",
+    "sha1_vs2": "2f0e6b3267d4e1a8acd2b84de1f7782edcea6670",
+    "src": "0x067550",
+    "variant_sites": 0
+   },
+   "x067846": {
+    "diff": {
+     "bytes_differ": 441,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 442,
+    "orc": "0x06787a",
+    "placed": "0x0d1fb0",
+    "refs": 17,
+    "sha1_ours": "9392846c2fb0d0d523bf7618f033db6e961090bb",
+    "sha1_vs2": "0ae86ca393fb23ec3043e66519313d732f33a99c",
+    "src": "0x067846",
+    "variant_sites": 0
+   },
+   "x067a00": {
+    "diff": {
+     "bytes_differ": 1542,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 1548,
+    "orc": "0x067a34",
+    "placed": "0x0d2170",
+    "refs": 50,
+    "sha1_ours": "abade5564a3ca45cde34c5bca53dfff3efdb7338",
+    "sha1_vs2": "ee39ac82861f490ed74327dd4875bb915e5d4618",
+    "src": "0x067a00",
+    "variant_sites": 0
+   },
+   "x06800c": {
+    "diff": {
+     "bytes_differ": 1095,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 1100,
+    "orc": "0x068040",
+    "placed": "0x0d2780",
+    "refs": 20,
+    "sha1_ours": "8d751818bf7078a855984b1af3be8692a1b7250d",
+    "sha1_vs2": "aaea98f8edb1f7e3bb7beb869cce00fc4e1b55c1",
+    "src": "0x06800c",
+    "variant_sites": 0
+   },
+   "x068458": {
+    "diff": {
+     "bytes_differ": 782,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 784,
+    "orc": "0x06848c",
+    "placed": "0x0d2bd0",
+    "refs": 18,
+    "sha1_ours": "e91fcaa119460b7491c4c5788a2eeb69bfbd1afc",
+    "sha1_vs2": "44d8cc3037c81459953a8d2c8b87abc064add881",
+    "src": "0x068458",
+    "variant_sites": 0
+   },
+   "x068768": {
+    "diff": {
+     "bytes_differ": 607,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 612,
+    "orc": "0x06879c",
+    "placed": "0x0d2ee0",
+    "refs": 13,
+    "sha1_ours": "01c7a48bfff25e5694aa1c91fb6e5c024f4cdbbd",
+    "sha1_vs2": "54c901e3b8d43be650dfd86aaa26854e77b7b6af",
+    "src": "0x068768",
+    "variant_sites": 0
+   },
+   "x0689cc": {
+    "diff": {
+     "bytes_differ": 678,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 684,
+    "orc": "0x068a00",
+    "placed": "0x0d3150",
+    "refs": 16,
+    "sha1_ours": "536c8f7d677c8368ea5d510a1bad222c379591ae",
+    "sha1_vs2": "4a987f2a331f203eb6ddb08ce3db0be929b32775",
+    "src": "0x0689cc",
+    "variant_sites": 0
+   },
+   "x068c78": {
+    "diff": {
+     "bytes_differ": 965,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 974,
+    "orc": "0x068cac",
+    "placed": "0x0d3400",
+    "refs": 17,
+    "sha1_ours": "aff2aadd9c520c5e8105b18708488cd4e7dc2c2c",
+    "sha1_vs2": "1d65977a03425804216a9b118b039754bf872602",
+    "src": "0x068c78",
+    "variant_sites": 0
+   },
+   "x069046": {
+    "diff": {
+     "bytes_differ": 681,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 688,
+    "orc": "0x06907a",
+    "placed": "0x0d37d0",
+    "refs": 19,
+    "sha1_ours": "3feffb0d87ac8c144840d9e8487a1a2d704ea31e",
+    "sha1_vs2": "e66315313a352faf0b466ed2a50f2288ba9fa963",
+    "src": "0x069046",
+    "variant_sites": 0
+   },
+   "x0692f6": {
+    "diff": {
+     "bytes_differ": 871,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 872,
+    "orc": "0x06932a",
+    "placed": "0x0d3a80",
+    "refs": 25,
+    "sha1_ours": "4eadabe31e9fc6bbcb948b80241d211d5077213a",
+    "sha1_vs2": "a91894517d7a57613e66ec3409ec39463af9e67a",
+    "src": "0x0692f6",
+    "variant_sites": 0
+   },
+   "x06965e": {
+    "diff": {
+     "bytes_differ": 255,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 256,
+    "orc": "0x069692",
+    "placed": "0x0d3df0",
+    "refs": 8,
+    "sha1_ours": "cc4b7ff6b37bdade99629aaf838530d7778cee20",
+    "sha1_vs2": "3483340bb663b54f905d9f3adea3dd4d8f763d08",
+    "src": "0x06965e",
+    "variant_sites": 0
+   },
+   "x06cac0": {
+    "diff": {
+     "bytes_differ": 3760,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 3772,
+    "orc": "0x06cc34",
+    "placed": "0x0d3ef0",
+    "refs": 79,
+    "sha1_ours": "b59b421b0a042fe4d76758d2110ee37ddaac695c",
+    "sha1_vs2": "560b9fdec4c881677743a4cc2e0954545601e89b",
+    "src": "0x06cac0",
+    "variant_sites": 0
+   },
+   "x088512": {
+    "diff": {
+     "bytes_differ": 15181,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 15256,
+    "orc": "0x088512",
+    "placed": "0x0d4e10",
+    "refs": 333,
+    "sha1_ours": "e4aec85328db79161f1cf5d75196febbefcb2208",
+    "sha1_vs2": "a90fec1a80343005c6f3962ffb438a89076a27e7",
+    "src": "0x088512",
+    "variant_sites": 0
+   },
+   "x0926e4": {
+    "diff": {
+     "bytes_differ": 255,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 256,
+    "orc": "0x0922f0",
+    "placed": "0x0d89b0",
+    "refs": 3,
+    "sha1_ours": "52c920f0eb906c8377d116212f1c83551affec59",
+    "sha1_vs2": "2b32c68ce506a1e90d2c205c2440c201f3920a75",
+    "src": "0x0926e4",
+    "variant_sites": 0
+   },
+   "x093460": {
+    "diff": {
+     "bytes_differ": 768,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 774,
+    "orc": "0x09306c",
+    "placed": "0x0d8ab0",
+    "refs": 5,
+    "sha1_ours": "da3c2c1704a11b438dc9e02ba033814f632c1ea6",
+    "sha1_vs2": "bee6f889170d0c7fc42cf558f7da7eab337efbdc",
+    "src": "0x093460",
+    "variant_sites": 0
+   },
+   "x0d143e": {
+    "diff": {
+     "attributed_by": {},
+     "counts": {
+      "attributed": 0,
+      "gfx_remap": 0,
+      "override": 0,
+      "relocated_bad": 0,
+      "relocated_ok": 0,
+      "total": 0,
+      "unattributed": 0
+     },
+     "sites": []
+    },
+    "kind": "data",
+    "len": 2304,
+    "orc": "0x0d0cd0",
+    "placed": "0x0fade0",
+    "refs": 0,
+    "sha1_ours": "fcdd9c20018ea704bd3680e8b3400360e9a27ff1",
+    "sha1_vs2": "fcdd9c20018ea704bd3680e8b3400360e9a27ff1",
+    "src": "0x0d143e",
+    "variant_sites": 0
+   },
+   "x100000": {
+    "diff": {
+     "attributed_by": {},
+     "counts": {
+      "attributed": 0,
+      "gfx_remap": 0,
+      "override": 0,
+      "relocated_bad": 0,
+      "relocated_ok": 0,
+      "total": 0,
+      "unattributed": 0
+     },
+     "sites": []
+    },
+    "kind": "data",
+    "len": 3644,
+    "orc": "0x100000",
+    "placed": "0x0fb6e0",
+    "refs": 0,
+    "sha1_ours": "93d6614c8a812a2e0bd278256ca59c2cd8947233",
+    "sha1_vs2": "93d6614c8a812a2e0bd278256ca59c2cd8947233",
+    "src": "0x100000",
+    "variant_sites": 0
+   },
+   "x2b7ef4": {
+    "diff": {
+     "attributed_by": {
+      "effect_lists (companion-effect coord list pointer, resolved from a 0xEE placeholder)": 617
+     },
+     "counts": {
+      "attributed": 1851,
+      "gfx_remap": 0,
+      "override": 0,
+      "relocated_bad": 9,
+      "relocated_ok": 2056,
+      "total": 7154,
+      "unattributed": 342
+     },
+     "sites": [
+      {
+       "kind": "unattributed",
+       "off": "0x60f5",
+       "ours": "30",
+       "vs2": "33"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x60f6",
+       "ours": "32",
+       "vs2": "3b"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x60f7",
+       "ours": "82",
+       "vs2": "94"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x621b",
+       "ours": "31",
+       "vs2": "33"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x621c",
+       "ours": "38",
+       "vs2": "3c"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x621d",
+       "ours": "c0",
+       "vs2": "60"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x64d5",
+       "ours": "31",
+       "vs2": "33"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x64d6",
+       "ours": "30",
+       "vs2": "3e"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x64d7",
+       "ours": "34",
+       "vs2": "0c"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x64e3",
+       "ours": "30",
+       "vs2": "33"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x64e4",
+       "ours": "07",
+       "vs2": "3e"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x64e5",
+       "ours": "2a",
+       "vs2": "10"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x69ab",
+       "ours": "30",
+       "vs2": "33"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x69ac",
+       "ours": "34",
+       "vs2": "41"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x69ad",
+       "ours": "3a",
+       "vs2": "7c"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x6acd",
+       "ours": "31",
+       "vs2": "33"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x6ace",
+       "ours": "b7",
+       "vs2": "42"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x6acf",
+       "ours": "22",
+       "vs2": "20"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x6b63",
+       "ours": "32",
+       "vs2": "33"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x6b64",
+       "ours": "6b",
+       "vs2": "42"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x6b65",
+       "ours": "40",
+       "vs2": "6c"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x6ff5",
+       "ours": "30",
+       "vs2": "33"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x6ff6",
+       "ours": "23",
+       "vs2": "45"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x6ff7",
+       "ours": "cc",
+       "vs2": "c8"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x7003",
+       "ours": "30",
+       "vs2": "33"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x7004",
+       "ours": "23",
+       "vs2": "45"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x7005",
+       "ours": "cc",
+       "vs2": "c8"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x7011",
+       "ours": "30",
+       "vs2": "33"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x7012",
+       "ours": "23",
+       "vs2": "45"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x7013",
+       "ours": "cc",
+       "vs2": "c8"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x701f",
+       "ours": "30",
+       "vs2": "33"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x7020",
+       "ours": "23",
+       "vs2": "45"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x7021",
+       "ours": "cc",
+       "vs2": "c8"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x702d",
+       "ours": "30",
+       "vs2": "33"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x702e",
+       "ours": "d8",
+       "vs2": "45"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x702f",
+       "ours": "3a",
+       "vs2": "cc"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x703f",
+       "ours": "30",
+       "vs2": "33"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x7040",
+       "ours": "23",
+       "vs2": "45"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x7041",
+       "ours": "cc",
+       "vs2": "c8"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x704d",
+       "ours": "30",
+       "vs2": "33"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x704e",
+       "ours": "23",
+       "vs2": "45"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x704f",
+       "ours": "cc",
+       "vs2": "c8"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x705b",
+       "ours": "30",
+       "vs2": "33"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x705c",
+       "ours": "23",
+       "vs2": "45"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x705d",
+       "ours": "cc",
+       "vs2": "c8"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x7069",
+       "ours": "30",
+       "vs2": "33"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x706a",
+       "ours": "23",
+       "vs2": "45"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x706b",
+       "ours": "cc",
+       "vs2": "c8"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x7077",
+       "ours": "30",
+       "vs2": "33"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x7078",
+       "ours": "23",
+       "vs2": "45"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x7079",
+       "ours": "cc",
+       "vs2": "c8"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x7085",
+       "ours": "30",
+       "vs2": "33"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x7086",
+       "ours": "23",
+       "vs2": "45"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x7087",
+       "ours": "cc",
+       "vs2": "c8"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x7093",
+       "ours": "30",
+       "vs2": "33"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x7094",
+       "ours": "23",
+       "vs2": "45"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x7095",
+       "ours": "cc",
+       "vs2": "c8"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x70a1",
+       "ours": "30",
+       "vs2": "33"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x70a2",
+       "ours": "23",
+       "vs2": "45"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x70a3",
+       "ours": "cc",
+       "vs2": "c8"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x70af",
+       "ours": "30",
+       "vs2": "33"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x70b0",
+       "ours": "23",
+       "vs2": "45"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x70b1",
+       "ours": "cc",
+       "vs2": "c8"
+      },
+      {
+       "kind": "unattributed",
+       "off": "0x70bd",
+       "ours": "30",
+       "vs2": "33"
+      }
+     ]
+    },
+    "kind": "data",
+    "len": 45580,
+    "orc": "0x2a4398",
+    "placed": "0x400010",
+    "refs": 2065,
+    "sha1_ours": "d6ba17e3a7c54461e87baa5510a92b28e1470a4f",
+    "sha1_vs2": "699eb2f851919c838cf26e75bd2c2b2988dee7bb",
+    "src": "0x2b7ef4",
+    "variant_sites": 0
+   }
+  },
+  "sfx": {
+   "hui_sfx_records": {
+    "loc": {
+     "entries": 24,
+     "off": "0x31da",
+     "placed_in": "wide_ext",
+     "region": "hitbox",
+     "src": "0x0c742a"
+    },
+    "records": [
+     {
+      "alt_id": 0,
+      "d3": 0,
+      "id": 0,
+      "idx": 0,
+      "ours_alt_id": 0,
+      "ours_id": 0,
+      "ours_source": "byte",
+      "p4": 0,
+      "p5": 0
+     },
+     {
+      "alt_id": 272,
+      "d3": 0,
+      "id": 272,
+      "idx": 1,
+      "ours_alt_id": 272,
+      "ours_id": 272,
+      "ours_source": "byte",
+      "p4": 0,
+      "p5": 0
+     },
+     {
+      "alt_id": 273,
+      "d3": 0,
+      "id": 273,
+      "idx": 2,
+      "ours_alt_id": 273,
+      "ours_id": 273,
+      "ours_source": "byte",
+      "p4": 0,
+      "p5": 0
+     },
+     {
+      "alt_id": 274,
+      "d3": 0,
+      "id": 274,
+      "idx": 3,
+      "ours_alt_id": 274,
+      "ours_id": 274,
+      "ours_source": "byte",
+      "p4": 0,
+      "p5": 0
+     },
+     {
+      "alt_id": 300,
+      "d3": 0,
+      "id": 300,
+      "idx": 4,
+      "ours_alt_id": 300,
+      "ours_id": 300,
+      "ours_source": "byte",
+      "p4": 0,
+      "p5": 0
+     },
+     {
+      "alt_id": 1861,
+      "d3": 0,
+      "id": 1861,
+      "idx": 5,
+      "ours_alt_id": 141,
+      "ours_id": 141,
+      "ours_source": "manifest:sound_table.remap_ids",
+      "p4": 0,
+      "p5": 0
+     },
+     {
+      "alt_id": 1845,
+      "d3": 192,
+      "id": 1845,
+      "idx": 6,
+      "ours_alt_id": 127,
+      "ours_id": 127,
+      "ours_source": "manifest:sound_table.remap_ids",
+      "p4": 3,
+      "p5": 32
+     },
+     {
+      "alt_id": 1846,
+      "d3": 192,
+      "id": 1846,
+      "idx": 7,
+      "ours_alt_id": 128,
+      "ours_id": 128,
+      "ours_source": "manifest:sound_table.remap_ids",
+      "p4": 3,
+      "p5": 32
+     },
+     {
+      "alt_id": 1847,
+      "d3": 0,
+      "id": 1847,
+      "idx": 8,
+      "ours_alt_id": 129,
+      "ours_id": 129,
+      "ours_source": "manifest:sound_table.remap_ids",
+      "p4": 0,
+      "p5": 0
+     },
+     {
+      "alt_id": 1848,
+      "d3": 0,
+      "id": 1848,
+      "idx": 9,
+      "ours_alt_id": 130,
+      "ours_id": 130,
+      "ours_source": "manifest:sound_table.remap_ids",
+      "p4": 0,
+      "p5": 0
+     },
+     {
+      "alt_id": 1849,
+      "d3": 0,
+      "id": 1849,
+      "idx": 10,
+      "ours_alt_id": 216,
+      "ours_id": 216,
+      "ours_source": "manifest:sound_table.remap_ids",
+      "p4": 0,
+      "p5": 0
+     },
+     {
+      "alt_id": 1850,
+      "d3": 0,
+      "id": 1850,
+      "idx": 11,
+      "ours_alt_id": 409,
+      "ours_id": 409,
+      "ours_source": "manifest:sound_table.remap_ids",
+      "p4": 0,
+      "p5": 0
+     },
+     {
+      "alt_id": 1851,
+      "d3": 0,
+      "id": 1851,
+      "idx": 12,
+      "ours_alt_id": 131,
+      "ours_id": 131,
+      "ours_source": "manifest:sound_table.remap_ids",
+      "p4": 0,
+      "p5": 0
+     },
+     {
+      "alt_id": 1856,
+      "d3": 0,
+      "id": 1856,
+      "idx": 13,
+      "ours_alt_id": 136,
+      "ours_id": 136,
+      "ours_source": "manifest:sound_table.remap_ids",
+      "p4": 0,
+      "p5": 0
+     },
+     {
+      "alt_id": 1857,
+      "d3": 0,
+      "id": 1857,
+      "idx": 14,
+      "ours_alt_id": 137,
+      "ours_id": 137,
+      "ours_source": "manifest:sound_table.remap_ids",
+      "p4": 0,
+      "p5": 0
+     },
+     {
+      "alt_id": 1858,
+      "d3": 0,
+      "id": 1858,
+      "idx": 15,
+      "ours_alt_id": 138,
+      "ours_id": 138,
+      "ours_source": "manifest:sound_table.remap_ids",
+      "p4": 0,
+      "p5": 0
+     },
+     {
+      "alt_id": 1859,
+      "d3": 0,
+      "id": 1859,
+      "idx": 16,
+      "ours_alt_id": 139,
+      "ours_id": 139,
+      "ours_source": "manifest:sound_table.remap_ids",
+      "p4": 0,
+      "p5": 0
+     },
+     {
+      "alt_id": 1860,
+      "d3": 0,
+      "id": 1860,
+      "idx": 17,
+      "ours_alt_id": 140,
+      "ours_id": 140,
+      "ours_source": "manifest:sound_table.remap_ids",
+      "p4": 0,
+      "p5": 0
+     },
+     {
+      "alt_id": 1862,
+      "d3": 0,
+      "id": 1862,
+      "idx": 18,
+      "ours_alt_id": 142,
+      "ours_id": 142,
+      "ours_source": "manifest:sound_table.remap_ids",
+      "p4": 0,
+      "p5": 0
+     },
+     {
+      "alt_id": 1870,
+      "d3": 0,
+      "id": 1870,
+      "idx": 19,
+      "ours_alt_id": 150,
+      "ours_id": 150,
+      "ours_source": "manifest:sound_table.remap_ids",
+      "p4": 0,
+      "p5": 0
+     },
+     {
+      "alt_id": 1868,
+      "d3": 0,
+      "id": 1868,
+      "idx": 20,
+      "ours_alt_id": 148,
+      "ours_id": 148,
+      "ours_source": "manifest:sound_table.remap_ids",
+      "p4": 0,
+      "p5": 0
+     },
+     {
+      "alt_id": 409,
+      "d3": 0,
+      "id": 409,
+      "idx": 21,
+      "ours_alt_id": 409,
+      "ours_id": 409,
+      "ours_source": "byte",
+      "p4": 0,
+      "p5": 0
+     },
+     {
+      "alt_id": 408,
+      "d3": 0,
+      "id": 408,
+      "idx": 22,
+      "ours_alt_id": 408,
+      "ours_id": 408,
+      "ours_source": "byte",
+      "p4": 0,
+      "p5": 0
+     },
+     {
+      "alt_id": 994,
+      "d3": 0,
+      "id": 994,
+      "idx": 23,
+      "ours_alt_id": 994,
+      "ours_id": 994,
+      "ours_source": "byte",
+      "p4": 0,
+      "p5": 0
+     }
+    ]
+   }
+  },
+  "sprite_lists": {
+   "distinct_tiles": {
+    "ours": 17091,
+    "vs2": 16824
+   },
+   "entries": {
+    "ours": 15131,
+    "vs2": 15092
+   },
+   "gfx_remap": null,
+   "note": "tile-code differences inside the band are the [gfx_remap] delta by construction (phase 0 does not re-derive them per record)",
+   "records": {
+    "ours": 1440,
+    "vs2": 1525
+   }
+  }
+ },
+ "tenant": "huitzil",
+ "undecoded": [
+  {
+   "evidence": "[C] only (ram.md); phase 2 measurement",
+   "structure": "hitbox",
+   "what": "hurt/hit rectangle x/y/w/h encoding"
+  },
+  {
+   "evidence": "engine_internals 2392-2463; phase 2 write tap settles the class offset",
+   "structure": "hitbox",
+   "what": "attack record fields (real/white power +0x08/+0x09, hit id +0x10, class byte +0x17 vs +0x1D \u2014 the docs disagree)"
+  },
+  {
+   "evidence": "engine_internals 589-600; phase 1 dumper + live countdown check",
+   "structure": "anim",
+   "what": "node chains (0x18-byte nodes: duration, flags, sprite ptr, hitbox words, sfx, link) and move naming"
+  },
+  {
+   "evidence": "derivable from node durations once phase 1 lands",
+   "structure": "anim",
+   "what": "startup / active / recovery as data"
+  },
+  {
+   "evidence": "only the dispatch (0x2385C) and property bytes (0x28D00) are located",
+   "structure": "reaction",
+   "what": "hitstun / blockstun lengths per reaction class"
+  },
+  {
+   "evidence": "pool hit-class map bounded at 64; records undecoded",
+   "structure": "projectile",
+   "what": "projectile parameter records (speed, lifetime, hit class)"
+  },
+  {
+   "evidence": "oracle-classified values/pointers only",
+   "structure": "bank",
+   "what": "the 17 `gap_*` auto tables' semantics"
+  },
+  {
+   "evidence": "engine_internals 960",
+   "structure": "sfx",
+   "what": "sfx record field +6 (d3.w, 'level-ish')"
+  },
+  {
+   "evidence": "ram.md 120: semantics unconfirmed",
+   "structure": "meter",
+   "what": "+0x392.w meter candidate"
+  },
+  {
+   "evidence": "the region's `diff.sites`; attribute from the effect pass's own ledger in a later step",
+   "structure": "regions",
+   "what": "the x2b7ef4 (companion-effect tail) residue: 24-bit frame pointers and tile words rewritten by the effect pass (14z-71) that phase 0 does not attribute per byte \u2014 counted and frozen, not explained"
+  }
+ ]
+}

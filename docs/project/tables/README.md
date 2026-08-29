@@ -36,6 +36,19 @@ the numbers the community can review and, through the manifest, adjust.
 `*_ptr` rows are the source-set pointers the port repoints to the relocated
 copy. Consumers and semantics: `docs/game/atlas/character_tables.md`.
 
+## The character-data MAP (14z-118) — `chars/`
+
+| file | what | regenerate |
+|---|---|---|
+| `chars/<tenant>.json` | the MACHINE map: every decoded per-character structure with `vs2` / `ours` / `vh` (reserved) per field and an attribution for every difference | `python3 tools/charmap_gen.py build/<solo> docs/project/tables/chars/<tenant>.json` |
+| `chars/<tenant>.md` | the HUMAN page rendered from it | `python3 tools/charmap_md.py docs/project/tables/chars/<tenant>.json docs/project/tables/chars/<tenant>.md` |
+| `../../../build/manifest/charmap_<tenant>.toml` | the ONE hand-written file: overrides (`[[override]]`), compiled into the tenant manifest by `tools/charmap_compile.py` | `python3 tools/charmap_compile.py docs/project/tables/chars/<tenant>.json build/manifest/charmap_<tenant>.toml build/manifest/<tenant>.toml` |
+
+Gates: `tests/test_charmap_current.sh` (ci_static) and `tests/test_charmap_overrides.sh`
+(ci_portable). The page's "What is NOT decoded" section is the worklist for the
+later phases (anim node chains + move names, hitbox rectangles + attack records,
+stun/projectile params) — see `docs/project/doc_audit_14z118.md` and STATE 14z-118.
+
 ## The other tables
 
 - `reconciliation.md` — per-instance record of every VS2-vs-vanilla-vsav
