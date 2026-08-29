@@ -24,8 +24,8 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-for d in build/don_m17/extract build/hui51/extract build/pyron35/extract \
-         build/m3b_merged20/patch/placements.json; do  # re-pointed 14z-117b (random-select freeze) <- 14z-117
+for d in build/don_m18/extract build/hui52/extract build/pyron36/extract \
+         build/m3b_merged21/patch/placements.json; do  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
     [ -e "$d" ] || { echo "SKIP: $d absent"; exit 0; }
 done
 fail=0

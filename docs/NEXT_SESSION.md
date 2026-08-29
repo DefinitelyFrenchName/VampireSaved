@@ -1,4 +1,55 @@
-# NEXT SESSION — orientation (rewritten at the 14z-118 close, 2026-08-29, for a FRESH session)
+# NEXT SESSION — orientation (rewritten at the 14z-119 close, 2026-08-30)
+
+> ## **START HERE. NOTHING IS RED. THE M12 FREEZE IS DONE — donovan-m18 /
+> ## huitzil-m25 / pyron-m19 / merged-m14 (`build/m3b_merged21`, `6649523a`,
+> ## 826 ops), mark M12: DONOVAN WALKS AND JUMPS WITH VS2's VALUES on every
+> ## shipping track (maintainer-ruled 2026-08-29). The two red-by-design
+> ## gates are re-pinned. NOT PUSHED — push at the maintainer's word; NOT
+> ## FIELD-TESTED — the next event is the BOARD VERDICT on
+> ## `../mister_fieldtest_14z119/` (the tell is "M12"; pick Donovan, walk,
+> ## jump; `.rbf` unchanged, flash nothing).**
+> ##
+> ## **WHAT 14z-119 DID, one breath:** the whole 14z-115 battery in one
+> ## session (~6 h wall-clock, legs in parallel). The change was 17 bytes
+> ## in three bank rows and NO address moved, so every frozen structural
+> ## expectation (pointer_flow, pcrel, escape_triage, bases.tsv) came out
+> ## IDENTICAL; huitzil/pyron suites bit-identical to m24/m18; Donovan's
+> ## six tenant rigs moved and were attributed AT THE ONSET FRAME
+> ## (`$FF8441/42` = his X-velocity word, `0x0280 -> 0x0300` = 2.5 -> 3.0 —
+> ## the port itself). **TWO THINGS THE PLAN DID NOT PREDICT:** (1) THE STOCK
+> ## TWIN MOVED (`d29fd062 -> 38e9cb2c`): `port_param32` is a per-row
+> ## data_port, not profile-gated, so the substituted track writes his VS2
+> ## rows onto stock slot 0x0F too (six ops; no legacy row); (2) huitzil/
+> ## pyron program fingerprints did NOT change (the glyph is group C), so
+> ## the registry's m24/pyron-m18 rows are commented out and m25/m19 added
+> ## with the same sha (first-match resolver). Both in STATE 14z-119.
+> ##
+> ## **TRAP PAID (`project/gotchas.md`):** a re-point stamp trailing a TOML
+> ## section header / key line breaks the gates' regex parsers, and a blind
+> ## name sweep rewrites HISTORY in comments — after every sweep, read the
+> ## comment-line hits.
+> ##
+> ## **NEXT, the maintainer's pick:** the board verdict on M12; then (B)
+> ## phase 2 of the character-data map (hitbox rectangles + attack records
+> ## by MEASUREMENT on native vs2; settles the `+0x17` vs `+0x1D` class-byte
+> ## disagreement) or (C) the move lists -> `build/manifest/moves_<tenant>.toml`
+> ## (phase 1 naming; the chain decoder is live-verified). Load
+> ## `vampire-saved-port` first; the map's "What is NOT decoded" is the worklist.
+> ##
+> ## **OPEN, unchanged:** the 1:1 wheel mockup; #112/#113 parked; the FBNeo
+> ## two-run-family question; the tenant CPU AI "lackluster" note; win
+> ## quotes (forgone). `test_random_select_tenants.sh`'s CONTROL is still
+> ## `build/m3b_merged19` (kept on disk for it).
+> ##
+> ## **STATE OF THE BUILDS:** play `tools/run_wide.sh build/m3b_merged21
+> ## fbneo`. Current + one back: `don_m17/m18`, `hui51/52`, `pyron35/36`,
+> ## `m3b_merged20/21` (+ `m3b_merged19` control), `m5_stock12/13`. The
+> ## physics probe dirs are gone (their evidence is the freeze).
+
+# HISTORY BELOW — the 14z-118 fresh-session opener, the 14z-118 close (audit), 14z-118 verdict, 14z-117 closes, 14z-116, 14z-114, mid-14z-114 and 14z-113 orientations and older;
+# kept for the census anchors, eliminations and traps, superseded as the opener.
+
+## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-118 close, 2026-08-29, for a FRESH session — superseded by the 14z-119 opener above)
 
 > ## **START HERE. TWO GATES ARE RED BY DESIGN — not a defect: after Donovan's
 > ## physics port (`port_param32 = true`, maintainer-ruled) the tree
@@ -45,8 +96,6 @@
 > ## fbneo`. Current + one back: `don_m16/m17`, `hui50/51`, `pyron34/35`,
 > ## `m3b_merged19/20`, `m5_stock11/12`; plus the probe `don_phys_probe`.
 
-# HISTORY BELOW — the 14z-118 close (audit), 14z-118 verdict, 14z-117 final-close, 14z-117 second-close, 14z-117 first-close, 14z-116, 14z-114, mid-14z-114 and 14z-113 orientations and older;
-# kept for the census anchors, eliminations and traps, superseded as the opener.
 
 ## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-118 audit close, 2026-08-29 — superseded by the fresh-session opener above)
 

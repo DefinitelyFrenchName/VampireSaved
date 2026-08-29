@@ -65,7 +65,7 @@ build/m3b_merged19` output and verified against `build/m3b_merged19`
 (vsavjw.zip sha1 `6f566053…`; its STOCK CONTROL MRA is byte-identical to
 14z-115's, the `.rbf` unchanged); `../mister_fieldtest_14z117b/` (merged-m13,
 M11, random select includes the tenants) likewise at 14z-117b, verified
-against `build/m3b_merged20` (vsavjw.zip sha1 `f0f9cd1b…`) — **verdict GREEN 2026-08-29, STATE 14z-118**; 14z117 (M10) GREEN 2026-08-29 (STATE 14z-117 Open bugs row); 14z115 (M9) GREEN 2026-08-28 (STATE hidden-character block). **Its README was missing**
+against `build/m3b_merged20` (vsavjw.zip sha1 `f0f9cd1b…`) — **verdict GREEN 2026-08-29, STATE 14z-118**; `../mister_fieldtest_14z119/` (merged-m14, M12, Donovan's physics port) likewise at 14z-119, verified against `build/m3b_merged21` — **NOT YET FIELD-TESTED** (STOCK CONTROL MRA byte-identical, `.rbf` unchanged); 14z117 (M10) GREEN 2026-08-29 (STATE 14z-117 Open bugs row); 14z115 (M9) GREEN 2026-08-28 (STATE hidden-character block). **Its README was missing**
 — every earlier bundle had one — and was written at 14z-116; if a bundle is
 assembled by hand again, the README is part of it.
 

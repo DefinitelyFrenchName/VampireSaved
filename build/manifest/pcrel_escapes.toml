@@ -46,7 +46,10 @@
 # RE-POINTED 14z-117b (the random-select freeze): hui50/pyron34/don_m16 ->
 # hui51/pyron35/don_m17, merged m3b_merged19 -> m3b_merged20. Two hole-b thunk
 # bodies added; ext placements may shift — the gate measures.
-[hui51]
+# RE-POINTED 14z-119 (the physics-port freeze): hui51/pyron35/don_m17 ->
+# hui52/pyron36/don_m18, merged m3b_merged20 -> m3b_merged21. Donovan's three
+# physics value ops moved NO address; inventories identical (test_pcrel_escapes PASS).
+[hui52]
 unresolved = 69
 resolved = 0
 escapes = [
@@ -121,7 +124,8 @@ escapes = [
   "x028122 0x028c98 -> 0x029034",
 ]
 
-[pyron35]
+# re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+[pyron36]
 unresolved = 10
 resolved = 0
 escapes = [
@@ -137,10 +141,11 @@ escapes = [
   "x088512 0x08c038 -> 0x08c0a2",
 ]
 
-# [don_m17] CARRIED from [don_m11] at 14z-111: measured IDENTICAL on don_m12 and don_m13 (10/10, the
+# [don_m18] CARRIED from [don_m11] at 14z-111: measured IDENTICAL on don_m12 and don_m13 (10/10, the  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 # same lea->table pairs — the d2 window + the remap touch neither region). The section is keyed by
 # build dir, so a re-point with no re-key reads as "10 NEW" (paid for 14z-111).
-[don_m17]
+# re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+[don_m18]
 unresolved = 10
 resolved = 0
 escapes = [
@@ -170,19 +175,28 @@ escapes = [
 # both together (the #94 reference-rot class).
 
 [merged_don]
-build = "m3b_merged20"
-extract = "build/don_m17/extract"
+# re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+build = "m3b_merged21"
+# re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+extract = "build/don_m18/extract"
 placement_suffix = ""
-same_as = "don_m17"
+# re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+same_as = "don_m18"
 
 [merged_hui]
-build = "m3b_merged20"
-extract = "build/hui51/extract"
+# re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+build = "m3b_merged21"
+# re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+extract = "build/hui52/extract"
 placement_suffix = "@huitzil"
-same_as = "hui51"
+# re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+same_as = "hui52"
 
 [merged_pyr]
-build = "m3b_merged20"
-extract = "build/pyron35/extract"
+# re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+build = "m3b_merged21"
+# re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+extract = "build/pyron36/extract"
 placement_suffix = "@pyron"
-same_as = "pyron35"
+# re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+same_as = "pyron36"

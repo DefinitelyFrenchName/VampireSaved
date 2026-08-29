@@ -44,7 +44,7 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD="${BUILD:-build/m3b_merged20}"
+BUILD="${BUILD:-build/m3b_merged21}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 CONTROL="${CONTROL:-build/m3b_merged19}"   # the last merged WITHOUT the thunk
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary at $MAME_BIN"; exit 0; }

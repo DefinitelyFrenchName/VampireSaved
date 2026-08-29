@@ -18,13 +18,13 @@
 # MUST-FIRE CONTROL (RH-9): a copy of one extract with a single value byte
 # changed must regenerate DIFFERENTLY from the committed page.
 #
-# Usage: tests/test_tables_current.sh   [DON=build/don_m17 HUI=build/hui51 PYR=build/pyron35]
+# Usage: tests/test_tables_current.sh   [DON=build/don_m18 HUI=build/hui52 PYR=build/pyron36]  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-DON="${DON:-build/don_m17}"
-HUI="${HUI:-build/hui51}"
-PYR="${PYR:-build/pyron35}"
+DON="${DON:-build/don_m18}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+HUI="${HUI:-build/hui52}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+PYR="${PYR:-build/pyron36}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }

@@ -3051,3 +3051,32 @@ says `[rompath_dir]` and defaults to `build/donovan*` is a stock-track
 instrument. Before believing any gate's red on a new build, run it on the
 current freeze first — identical red means the instrument, not the change.
 
+
+## A RE-POINT SWEEP STAMP ON A TOML SECTION HEADER OR KEY LINE BREAKS THE GATES' HAND-ROLLED PARSERS — and a blind name sweep REWRITES HISTORY in comments (paid: 14z-119)
+
+The freeze re-point sweep (`m3b_merged20 -> m3b_merged21`, …, 93 files)
+appended its `# re-pointed 14z-119 …` stamp to every line it touched, as
+every earlier sweep had. Two of those lines lived in
+`build/manifest/pcrel_escapes.toml`: a SECTION HEADER (`[hui52]  # …`) and
+KEY LINES (`build = "m3b_merged21"  # …`). `tests/test_pcrel_escapes.sh`
+does not use a TOML library — it walks the file with `^\[(\w+)\]` and
+`^(\w+) = "(.*)"$` (the [VSP-74] minitoml class) — so the stamped header
+still matched but the stamped key lines did NOT, the `merged_*` sections
+came back with no `build` key, and the gate died with `KeyError: 'build'`
+one line after printing "inventory unchanged" for all three solos. Read
+as a broken inventory for a minute; it was the stamp.
+
+The second cut, same sweep: comments that RECORD a past re-point ("RE-POINTED
+14z-117b: hui50/pyron34/don_m16 -> hui51/pyron35/don_m17") contain the old
+names as HISTORY, and the sweep rewrote them into nonsense ("hui52/… ->
+hui52/…"). Three such lines were found and restored (`pcrel_escapes.toml`
+:47, `test_fbneo_legacy_oracle.sh` "Re-scanned on don_m15" — which earlier
+sweeps had already rolled twice — and `mk_mister_page.py` "m3b_merged18,
+14z-115").
+
+**Rules:** (1) in a `.toml`, a stamp goes on ITS OWN comment line above the
+header/key it annotates, never trailing it; (2) after every sweep, list the
+COMMENT-line hits (`grep -rn 're-pointed <tag>' | grep ':[0-9]*:\s*#'`) and
+read each one — a comment naming a build in the past tense is a record, not
+a reference, and a sweep must leave it alone; (3) `grep '\\ *# re-pointed'`
+for the continuation trap stays (14z-117).

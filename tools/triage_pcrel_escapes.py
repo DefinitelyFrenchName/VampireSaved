@@ -27,9 +27,9 @@ UNCOVERED = {
     "huitzil": ["x028122", "code", "x068c78"],
     "pyron":   ["x028122", "x068c78"],
 }
-SOLO = {"donovan": "don_m17", "huitzil": "hui51", "pyron": "pyron35"}  # re-pointed 14z-117b (random-select freeze) <- 14z-117
+SOLO = {"donovan": "don_m18", "huitzil": "hui52", "pyron": "pyron36"}  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 
-mp = json.load(open("build/m3b_merged20/patch/placements.json"))["regions"]  # re-pointed 14z-117b (random-select freeze) <- 14z-117
+mp = json.load(open("build/m3b_merged21/patch/placements.json"))["regions"]  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 
 def merged_key(tenant, region):
     return region if tenant == "donovan" else f"{region}@{tenant}"

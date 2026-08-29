@@ -67,14 +67,20 @@ trap 'rm -rf "$WORK"' EXIT
 # EXPECT_WIDE="772d80521715ca484eeecb877dacef50bc233901"   # 14z-111 donovan-m14 (the #99 root-cause fix: AI script rows + x101aca at the wide_ext head via region_space; M8 mark is gfx-only)
 # EXPECT_WIDE="38a4becb8ce0b20fd64ddbc982852326611df8b2"   # 14z-115 donovan-m15 (the select-wheel separation: cell positions, ring bases, outline sprites; M9 mark)
 # EXPECT_WIDE="7950c84485eaf7a2bef8d3aedbef85fa97444d8b"   # 14z-117 donovan-m16 (the Pyron-medallion fix + M10 mark)
-EXPECT_WIDE="90a225cefbebb1b229db19d4d5d06bf9fe744cad"   # 14z-117b donovan-m17 (random select includes the tenants; M11 mark)
+# EXPECT_WIDE="90a225cefbebb1b229db19d4d5d06bf9fe744cad"   # 14z-117b donovan-m17 (random select includes the tenants; M11 mark)
+EXPECT_WIDE="7109f83555c227dc4ddd1165bfa0f71e513f439c"   # 14z-119 donovan-m18 (THE PHYSICS PORT: port_param32 = true — his param32_a/b + jump_params rows carry VS2's values, three value ops at 0x0BD912/0x0BDF0A/0x0BE392, 17 bytes; = the validated probe build/don_phys_probe; M12 mark is gfx-only)
 # EXPECT_STOCK="a054de5c0cfe868cb0aa9722abebdffd9dfcdb0d"  # unchanged 14z-86..14z-96
 # 14z-99: THE STOCK TWIN MOVED for the first time since 14z-91 — #103's
 # pcrel_escape_fix rows are not profile-gated (the stock track gets the
 # stall fix too, by design). #104/#105 rows are variant-gated: no effect.
 # EXPECT_STOCK="16da59b6b29f4082b69c06d3e662843af4d00cc3"  # git tag freeze/donovan-m9
 # EXPECT_STOCK="cf4557602d82c6dbb1ccb76b5377825effdd5526"  # 14z-110
-EXPECT_STOCK="d29fd0620f67dcd70939be8712e9f86cff558ca3"  # 14z-110b (the remap rides stock too)
+# EXPECT_STOCK="d29fd0620f67dcd70939be8712e9f86cff558ca3"  # 14z-110b (the remap rides stock too)
+# 14z-119: THE STOCK TWIN MOVED — port_param32 is a per-row data_port, not
+# profile-gated, so the substituted track writes Donovan's VS2 physics onto
+# his stock slot 0x0F too: six data ops (param32_a/b + jump_params, [0xf]
+# value + [0x1f] mirror), member vm3j.04d only; no legacy row written.
+EXPECT_STOCK="38e9cb2cd790c044167f7991810293691386af66"  # 14z-119 donovan-m18-stock
 # huitzil-m3 (14z-79, maintainer-ratified). Supersedes huitzil-m2
 # (9deda0808e87601b10e2171405805d4669ba2624), which can no longer be
 # produced from the tree: huitzil.toml gained the (b') index-window thunk
@@ -220,11 +226,13 @@ done
 # MANI_WIDE="1be254bda2a12a6e293c857375592e5cc71b7981 25"  # 14z-112 (PACKAGING, not content: a WIDE set is now ONE zip — the four patched group-A members moved into vsavjw.zip and no vsav.zip is packed, so stock Vampire Savior and this profile can share one MiSTer card. Inventory 42 -> 25 for every WIDE track; MANI_STOCK is UNCHANGED, which is the control that the stock track is untouched. Program fingerprints all reproduced bit-exact in the same run.)
 # MANI_WIDE="a137ba772f77cefc46cdfe136adc01ff2327b47e 25"  # 14z-115 (delta: PROGRAM vm3j.03d/04d/07b/10b + vsw.41/42 — the wheel record, coord list and ring bases; GROUP C vsw.31m/33m/35m/37m — 36 outline tiles + the M9 glyphs; QSound and Z80 members untouched)
 # MANI_WIDE="5f48910e318567ec1e19d2b97c7abab5d6559bee 25"  # 14z-117 (delta: the Pyron-medallion fix — ten in-place thunk bytes — and the M10 mark, one more glyph: PROGRAM vsw.41 (solos: coord pair + thunk in the ext; merged adds vm3j.10b — its thunk sits in hole b); GROUP C vsw.31m/33m/35m/37m — the third glyph tile; count unchanged 25; QSound/Z80 untouched)
-MANI_WIDE="261625a02c0b4072215edb2afe2bae68a5bd91c0 25"  # 14z-117b (delta: RANDOM SELECT INCLUDES THE TENANTS — two hole-b site_thunks + M11 mark: PROGRAM vm3j.10b (the bodies in hole b) + vm3j.03d/04d/07b (the two engine sites at 0x020C74/0x020C80 and the ext allocations behind the bodies) + vsw.41/42 (ext); GROUP C vsw.31m/33m/35m/37m (the M11 glyphs); count unchanged 25; QSound/Z80 untouched)
+MANI_WIDE="544d0af3f023ba4474b987ac55c121aba2f8a99b 25"  # 14z-119 (delta: THE PHYSICS-PORT FREEZE + M12 mark: PROGRAM vm3j.04d (Donovan's three physics value rows at 0x0BD912/0x0BDF0A/0x0BE392 — solos/merged); GROUP C vsw.33m/37m (the M12 glyph); count unchanged; QSound/Z80 untouched)
+# MANI_WIDE="261625a02c0b4072215edb2afe2bae68a5bd91c0 25"  # 14z-117b (delta: RANDOM SELECT INCLUDES THE TENANTS — two hole-b site_thunks + M11 mark: PROGRAM vm3j.10b (the bodies in hole b) + vm3j.03d/04d/07b (the two engine sites at 0x020C74/0x020C80 and the ext allocations behind the bodies) + vsw.41/42 (ext); GROUP C vsw.31m/33m/35m/37m (the M11 glyphs); count unchanged 25; QSound/Z80 untouched)
 # MANI_STOCK="08aac0881648185a9487230a3ac5fe19b78408d3 30"  # 14z-99 window (#103)
 # MANI_STOCK="23314532b00a77adaed4bda4b9e52155ad209252 30"  # 14z-102
 # MANI_STOCK="9985bf46a62732b32cbe143850b65a05038093f1 30"   # 14z-110 (delta: vm3j.03d/04d/10b PROGRAM only — the d2 wind...  # 14z-110
-MANI_STOCK="af4f5e986c2fb1ad6ae90f71869cfbf4e103c80c 30 30"   # 14z-110b (delta: vm3j.10b — the six remap bytes; nothing else moved)
+MANI_STOCK="8d18778d8a77886b3256bad4f8625d251b9f355b 30 30"  # 14z-119 (THE STOCK TWIN MOVED: vm3j.04d — six data ops, Donovan's VS2 physics on stock slot 0x0F [0xf] value + [0x1f] mirror; nothing else moved; inventory 30 unchanged)
+# MANI_STOCK="af4f5e986c2fb1ad6ae90f71869cfbf4e103c80c 30 30"   # 14z-110b (delta: vm3j.10b — the six remap bytes; nothing else moved)
 # 14z-94 (#91 + #92). Attributed per member before re-pinning: exactly FOUR
 # members moved — vm3j.03d, vm3j.04d, vm3j.10b and vsw.41, all PROGRAM
 # members. No gfx member and no QSound member changed, which is what a
@@ -237,7 +245,8 @@ MANI_STOCK="af4f5e986c2fb1ad6ae90f71869cfbf4e103c80c 30 30"   # 14z-110b (delta:
 # MANI_HUI="af5e4cad7d9ead48e595fe39caec3beb604aff8b 25"  # 14z-112 (PACKAGING, not content: a WIDE set is now ONE zip — the four patched group-A members moved into vsavjw.zip and no vsav.zip is packed, so stock Vampire Savior and this profile can share one MiSTer card. Inventory 42 -> 25 for every WIDE track; MANI_STOCK is UNCHANGED, which is the control that the stock track is untouched. Program fingerprints all reproduced bit-exact in the same run.)
 # MANI_HUI="2f52eb8c8fd6a129bbb44e6353337f35d4c56c53 25"  # 14z-115 (delta: PROGRAM vm3j.03d/04d/07b/10b + vsw.41/42 — the wheel record, coord list and ring bases; GROUP C vsw.31m/33m/35m/37m — 36 outline tiles + the M9 glyphs; QSound and Z80 members untouched)
 # MANI_HUI="10c285def49db1f4f49fa892e8517821c9e999fb 25"  # 14z-117 (delta: the Pyron-medallion fix — ten in-place thunk bytes — and the M10 mark, one more glyph: PROGRAM vsw.41 (solos: coord pair + thunk in the ext; merged adds vm3j.10b — its thunk sits in hole b); GROUP C vsw.31m/33m/35m/37m — the third glyph tile; count unchanged 25; QSound/Z80 untouched)
-MANI_HUI="b0c22d0a0d5c946f3812db0f5a9f97b0333a9c27 25"  # 14z-117b (delta: RANDOM SELECT INCLUDES THE TENANTS — two hole-b site_thunks + M11 mark: PROGRAM vm3j.10b (the bodies in hole b) + vm3j.03d/04d/07b (the two engine sites at 0x020C74/0x020C80 and the ext allocations behind the bodies) + vsw.41/42 (ext); GROUP C vsw.31m/33m/35m/37m (the M11 glyphs); count unchanged 25; QSound/Z80 untouched)
+MANI_HUI="ddcec4e296d1175ed6bbab6f77415d5f95211718 25"  # 14z-119 (delta: THE PHYSICS-PORT FREEZE + M12 mark: PROGRAM vm3j.04d (Donovan's three physics value rows at 0x0BD912/0x0BDF0A/0x0BE392 — solos/merged); GROUP C vsw.33m/37m (the M12 glyph); count unchanged; QSound/Z80 untouched)
+# MANI_HUI="b0c22d0a0d5c946f3812db0f5a9f97b0333a9c27 25"  # 14z-117b (delta: RANDOM SELECT INCLUDES THE TENANTS — two hole-b site_thunks + M11 mark: PROGRAM vm3j.10b (the bodies in hole b) + vm3j.03d/04d/07b (the two engine sites at 0x020C74/0x020C80 and the ext allocations behind the bodies) + vsw.41/42 (ext); GROUP C vsw.31m/33m/35m/37m (the M11 glyphs); count unchanged 25; QSound/Z80 untouched)
 # 14z-94 (#92 only — he takes no reconciliation row). Exactly ONE member
 # moved: vm3j.03d, which carries table B at PRG:0x00BB68. Huitzil moved four
 # because #91's row also relocated code; Pyron's four bytes are a pure data
@@ -250,7 +259,8 @@ MANI_HUI="b0c22d0a0d5c946f3812db0f5a9f97b0333a9c27 25"  # 14z-117b (delta: RANDO
 # MANI_PYR="4d87b43f775cd1a5671a38653a201892022ec43f 25"  # 14z-112 (PACKAGING, not content: a WIDE set is now ONE zip — the four patched group-A members moved into vsavjw.zip and no vsav.zip is packed, so stock Vampire Savior and this profile can share one MiSTer card. Inventory 42 -> 25 for every WIDE track; MANI_STOCK is UNCHANGED, which is the control that the stock track is untouched. Program fingerprints all reproduced bit-exact in the same run.)
 # MANI_PYR="69ec5a4e94bcdcb00a472d0840d5e734b2e51a1f 25"  # 14z-115 (delta: PROGRAM vm3j.03d/04d/07b/10b + vsw.41/42 — the wheel record, coord list and ring bases; GROUP C vsw.31m/33m/35m/37m — 36 outline tiles + the M9 glyphs; QSound and Z80 members untouched)
 # MANI_PYR="109b01804736ea7b7c13e10605943ab614ea2f6d 25"  # 14z-117 (delta: the Pyron-medallion fix — ten in-place thunk bytes — and the M10 mark, one more glyph: PROGRAM vsw.41 (solos: coord pair + thunk in the ext; merged adds vm3j.10b — its thunk sits in hole b); GROUP C vsw.31m/33m/35m/37m — the third glyph tile; count unchanged 25; QSound/Z80 untouched)
-MANI_PYR="50f22d2a117c776633634e16390b63e4e200d75e 25"  # 14z-117b (delta: RANDOM SELECT INCLUDES THE TENANTS — two hole-b site_thunks + M11 mark: PROGRAM vm3j.10b (the bodies in hole b) + vm3j.03d/04d/07b (the two engine sites at 0x020C74/0x020C80 and the ext allocations behind the bodies) + vsw.41/42 (ext); GROUP C vsw.31m/33m/35m/37m (the M11 glyphs); count unchanged 25; QSound/Z80 untouched)
+MANI_PYR="a244e96a7433184dbfbde0d2e3e3393b789ddc19 25"  # 14z-119 (delta: THE PHYSICS-PORT FREEZE + M12 mark: PROGRAM vm3j.04d (Donovan's three physics value rows at 0x0BD912/0x0BDF0A/0x0BE392 — solos/merged); GROUP C vsw.33m/37m (the M12 glyph); count unchanged; QSound/Z80 untouched)
+# MANI_PYR="50f22d2a117c776633634e16390b63e4e200d75e 25"  # 14z-117b (delta: RANDOM SELECT INCLUDES THE TENANTS — two hole-b site_thunks + M11 mark: PROGRAM vm3j.10b (the bodies in hole b) + vm3j.03d/04d/07b (the two engine sites at 0x020C74/0x020C80 and the ext allocations behind the bodies) + vsw.41/42 (ext); GROUP C vsw.31m/33m/35m/37m (the M11 glyphs); count unchanged 25; QSound/Z80 untouched)
 
 # REFREEZE=1 prints every computed manifest and asserts nothing, so a
 # DELIBERATE packaging/content move can be re-frozen in one pass instead of
@@ -317,7 +327,8 @@ m3a_manifest pyron       "$WORK/pyron/rompath"     "$MANI_PYR"
 # EXPECT_MERGED="32007911f19a82619da6108132bff70329ac2c33"   # 14z-111 merged-m9 (the #99 root-cause fix)
 # EXPECT_MERGED="dea2c9182627eb1901ab5f5fdaa11827392a7997"   # 14z-115 merged-m11 (the select-wheel separation)
 # EXPECT_MERGED="cde712e115507b051766b941404f43d2e7627866"   # 14z-117 merged-m12 (the Pyron-medallion fix + M10 mark)
-EXPECT_MERGED="a1b7cb822ccacc3ad9b9f9e77e12c3b84ee050bf"   # 14z-117b merged-m13 (random select includes the tenants; M11 mark)
+# EXPECT_MERGED="a1b7cb822ccacc3ad9b9f9e77e12c3b84ee050bf"   # 14z-117b merged-m13 (random select includes the tenants; M11 mark)
+EXPECT_MERGED="6649523adac31ada095cb97fe3b3d115f8130b42"   # 14z-119 merged-m14 (the physics port: + the same three Donovan value ops, 826 ops, no address moved; M12 mark)
 # MANI_MERGED="59f3b42e7f0022f509c3cc912abc54f159183688 42"  # 14z-99 window
 # MANI_MERGED="22092b65fd9db2f5b79f211afb51625a542cd45c 42"  # 14z-102 window
 # MANI_MERGED="efea5e9d0bd9590383eb614016eed1c388bf9c2b 42"  # 14z-105 window
@@ -327,7 +338,8 @@ EXPECT_MERGED="a1b7cb822ccacc3ad9b9f9e77e12c3b84ee050bf"   # 14z-117b merged-m13
 # MANI_MERGED="c1197c36d8521bf0823d7d13768aeac8508b0c28 25"  # 14z-112 (PACKAGING, not content: a WIDE set is now ONE zip — the four patched group-A members moved into vsavjw.zip and no vsav.zip is packed, so stock Vampire Savior and this profile can share one MiSTer card. Inventory 42 -> 25 for every WIDE track; MANI_STOCK is UNCHANGED, which is the control that the stock track is untouched. Program fingerprints all reproduced bit-exact in the same run.)
 # MANI_MERGED="c7985fb920e825456a0851e7b4477fd955c85a71 25"  # 14z-115 (delta: PROGRAM vm3j.03d/04d/07b/10b + vsw.41/42 — wheel record/coords/ring bases; GROUP C vsw.31m/33m/35m/37m — 36 outline tiles + M9 glyphs; count unchanged 25; QSound/Z80 untouched — the same member set as the solos)
 # MANI_MERGED="8bb2a5dcb69499c8eca3c17ebadbb9cc358b8a59 25"  # 14z-117 (delta: the Pyron-medallion fix — ten in-place thunk bytes — and the M10 mark, one more glyph: PROGRAM vsw.41 (solos: coord pair + thunk in the ext; merged adds vm3j.10b — its thunk sits in hole b); GROUP C vsw.31m/33m/35m/37m — the third glyph tile; count unchanged 25; QSound/Z80 untouched)
-MANI_MERGED="21acb81774e1910ee5624cb969a5eec5d2079504 25"  # 14z-117b (delta: RANDOM SELECT INCLUDES THE TENANTS — two hole-b site_thunks + M11 mark: PROGRAM vm3j.10b (the bodies in hole b) + vm3j.03d/04d/07b (the two engine sites at 0x020C74/0x020C80 and the ext allocations behind the bodies) + vsw.41/42 (ext); GROUP C vsw.31m/33m/35m/37m (the M11 glyphs); count unchanged 25; QSound/Z80 untouched)
+MANI_MERGED="d0025713e80e2fec4ccdc52dd65291cdb031c2bd 25"  # 14z-119 (delta: THE PHYSICS-PORT FREEZE + M12 mark: PROGRAM vm3j.04d (Donovan's three physics value rows at 0x0BD912/0x0BDF0A/0x0BE392 — solos/merged); GROUP C vsw.33m/37m (the M12 glyph); count unchanged; QSound/Z80 untouched)
+# MANI_MERGED="21acb81774e1910ee5624cb969a5eec5d2079504 25"  # 14z-117b (delta: RANDOM SELECT INCLUDES THE TENANTS — two hole-b site_thunks + M11 mark: PROGRAM vm3j.10b (the bodies in hole b) + vm3j.03d/04d/07b (the two engine sites at 0x020C74/0x020C80 and the ext allocations behind the bodies) + vsw.41/42 (ext); GROUP C vsw.31m/33m/35m/37m (the M11 glyphs); count unchanged 25; QSound/Z80 untouched)
 
 MERGED_NEEDS="build/m5_wide/extract build/hui32/extract build/pyron21/extract
 build/wide0/rompath/vsavjw.zip"

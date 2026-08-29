@@ -1,0 +1,8 @@
+# pointer-flow baseline for pyron-m19 (build/pyron36), frozen 14z-119 — the physics-port freeze (M12).
+# vs the 14z-117b baseline (pyron-m18): IDENTICAL — Donovan's three physics value-row ops (param32_a/b, jump_params:
+# 16.16 fixed-point walk/jump values) carry no pointer-shaped long and no ext allocation moved (merged: no address
+# moved either, bases.tsv unchanged); STRONG and WEAK counts identical. The M12 glyph is group C, outside this comb.
+# STRONG lines are REVIEWED findings (see hardening_register.md);
+# WEAK-COUNT lines freeze the noise volume — growth = investigate.
+WEAK-COUNT	code:move_imm	1
+WEAK-COUNT	data:long	843

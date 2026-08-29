@@ -22,15 +22,15 @@ keeps the conclusions and names them as the provenance.
 > the figure as unverified and say so rather than propagating it.
 
 **Ground truth.** jtcores fork `DefinitelyFrenchName/jtcores` branch
-`vampire-saved`, pinned at `emu/jtcores` = **`f997cfe1`** (upstream tag
-`v1.7.3` = `63688ce5`, plus **twenty-seven** fork commits, mirrored as
-`emu/jtcores-patches/0001-0027`; the pin is read from
-`tools/setup_jtcores.sh`, not from this sentence — **UPDATED 14z-117b** (the
-catalogue commit for merged-m13); 14z-117 had it at `80e08111` + twenty-six, 14z-115 at `202fc3e6` + twenty-five, 14z-113 at `63496069` + twenty-four,
+`vampire-saved`, pinned at `emu/jtcores` = **`2bf41090`** (upstream tag
+`v1.7.3` = `63688ce5`, plus **twenty-eight** fork commits, mirrored as
+`emu/jtcores-patches/0001-0028`; the pin is read from
+`tools/setup_jtcores.sh`, not from this sentence — **UPDATED 14z-119** (the
+catalogue commit for merged-m14); 14z-117b had it at `f997cfe1` + twenty-seven, 14z-117 at `80e08111` + twenty-six, 14z-115 at `202fc3e6` + twenty-five, 14z-113 at `63496069` + twenty-four,
 and before that `dd242a65` + fifteen since 14z-107 (10)). The romset is the
-merged build of the current freeze — **merged-m13 (M11), `build/m3b_merged20`,
-program fingerprint `a1b7cb82`** (14z-117b, random select includes the
-tenants; merged-m12 = `build/m3b_merged19`, `cde712e1`, M10, was the previous). The measurements quoted in this document were
+merged build of the current freeze — **merged-m14 (M12), `build/m3b_merged21`,
+program fingerprint `6649523a`** (14z-119, Donovan's physics rows carry VS2's
+values; merged-m13 = `build/m3b_merged20`, `a1b7cb82`, M11, was the previous). The measurements quoted in this document were
 taken on `build/m3b_merged13` (merged-m6) unless a section says otherwise;
 every later freeze re-ran the gates in §9 and none of the figures moved,
 because the freezes changed program bytes and version marks, not region

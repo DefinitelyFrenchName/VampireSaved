@@ -1,6 +1,45 @@
 # patch_notes — per-change detail: every byte, and why
 
 
+## 14z-119 — THE PHYSICS-PORT FREEZE (donovan-m18 / huitzil-m25 / pyron-m19 / merged-m14, mark M12): byte detail
+
+**What.** The 14z-118 (charmap, 2) physics port FROZEN, plus the mark bump
+M11 -> M12. No other byte. Per build, versus the 14z-117b freeze:
+
+- **donovan-m18** (`build/don_m18`, fingerprint `7109f835` = the validated
+  probe `build/don_phys_probe`, 339 ops = 336 + the three value ops): the 17
+  bytes listed under 14z-118 (charmap, 2) — `PRG:0x0BD912` (param32_a row
+  0x13), `PRG:0x0BE392` (param32_b), `PRG:0x0BDF0A` (jump_params, 3 x 16 B).
+  Members moved: PROGRAM `vm3j.04d` (the three rows); GROUP C `vsw.33m/37m`
+  (the M12 glyph — the third glyph tile `GFX:tile 0x1FE42` now draws "2").
+- **huitzil-m25** (`build/hui52`, `ae953657`, 370 ops) and **pyron-m19**
+  (`build/pyron36`, `1222df18`, 307 ops): PROGRAM UNCHANGED — fingerprints
+  identical to huitzil-m24 / pyron-m18 (the dispatch fingerprint covers
+  program members only, `tools/build_fingerprint.py` KNOWN BLIND SPOT);
+  members moved: GROUP C `vsw.33m/37m` only (the M12 glyph). The registry
+  comments out the m24/m18 rows so the newer names resolve (first match).
+- **merged-m14** (`build/m3b_merged21`, `6649523a`, 826 ops = 823 + the same
+  three Donovan value ops at `0x0BD912/0x0BDF0A/0x0BE392`; NO address moved,
+  `bases.tsv` unchanged): PROGRAM `vm3j.04d`; GROUP C `vsw.33m/37m`.
+- **stock twin MOVED** (`build/m5_stock13`, `38e9cb2c`, was `d29fd062` since
+  14z-110b; 249 ops = 243 + 6): `port_param32` is a per-row `data_port`, not
+  profile-gated, so the substituted track writes Donovan's VS2 physics onto
+  his stock slot `0x0F` too — `param32_a[0xf]` value `PRG:0x0BD8F2` +
+  `[0x1f]` mirror `0x0BD972`, `jump_params[0xf]` `0x0BDE4A` + mirror
+  `0x0BE14A`, `param32_b[0xf]` `0x0BE372` + mirror `0x0BE3F2`; member
+  `vm3j.04d` only. No legacy row is written (per-char stride tables; slot
+  0x0F IS Donovan on the stock track). Registry: `donovan-m18-stock`; the
+  stage-4 image moves the same way (`donovan-m18-stage4`, `108f7523`).
+- QSound / Z80: untouched on every track.
+
+**Measured (the battery — numbers in STATE 14z-119).** Donovan's self-frozen
+tenant rigs move by construction (his walk/jump values ARE the change): each
+replay's checksum diverges at the tenant's FIRST MOVEMENT after match start
+(`103_tenant_2pwin_auto` f2980, `108_tenant_voice` f3068) and never
+re-converges — a different fight, attributed at the onset frame by DUMPS
+diff (see STATE). Every masked legacy class PASS on all three suites;
+huitzil-m25 / pyron-m19 suites bit-identical to their predecessors.
+
 ## 14z-118 (charmap, 2) — DONOVAN'S PHYSICS ROWS PORTED (maintainer-ruled 2026-08-29): 17 bytes, three bank rows, UNFROZEN
 
 - `build/manifest/donovan.toml` `[[tenant]]`: `port_param32 = true` (gen's

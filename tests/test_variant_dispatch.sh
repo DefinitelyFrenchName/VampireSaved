@@ -35,7 +35,7 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
 
-BUILD="${1:-build/pyron35}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117
+BUILD="${1:-build/pyron36}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 # THE TENANT COMES FROM THE BUILD, not from a default (14z-78).
 # It used to be `${2:-0x11}`, so `test_variant_dispatch.sh build/hui27` swept a

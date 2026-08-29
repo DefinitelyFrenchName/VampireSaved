@@ -37,7 +37,7 @@ WORK="$(mktemp -d)"; trap 'rm -rf "$WORK"' EXIT
    # (19 members, no vsw.z01/z02) — the script could not run at all.
    # Its frozen inventory may still describe the OLD build: run it
    # before trusting a green, and re-measure rather than absorb.
-BUILD="${1:-build/hui51}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD";; esac  # re-pointed 14z-117b (random-select freeze) <- 14z-117
+BUILD="${1:-build/hui52}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD";; esac  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: no $BUILD/rompath/vsavjw.zip"; exit 1; }
 REF_BIN="${MAME_REF_BIN:-$HOME/.cache/vampire-saved/mame-ref/cps2}"
 RPL="$REPO/tests/replays/hui/86_hui_beam_variants.rpl"

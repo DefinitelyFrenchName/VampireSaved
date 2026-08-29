@@ -1,0 +1,5 @@
+  ok: record parity (1374 records, 14911 entries)
+  ok: no tile codes on protected positions (358 protected)
+  ok: all 15034 tile codes within [0x0057,0x4EFC]
+  ok: placed bank table row 0x10 = 0x1000
+PASS: gfx build output verification

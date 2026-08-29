@@ -20,13 +20,13 @@
 # Measured 14z-118 on 3,638 in-match frames: 3638/3638 on-graph, 1225 edges +
 # 32 jumps, 1121 exact + 137 dur-1. Emulator tier (MAME), ~2 min.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/don_m17] tests/test_anim_node_walk.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/don_m18] tests/test_anim_node_walk.sh  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/don_m17}"
+BUILD="${BUILD:-build/don_m18}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 EX="$BUILD/extract"
 [ -f "$EX/regions.json" ] || { echo "SKIP: no $EX/regions.json"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM

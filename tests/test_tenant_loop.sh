@@ -171,7 +171,7 @@ echo "== 1: one tenant per run — the frozen op counts =="
 # 15 capture_kf slot_rows blobs + 17 table pokes, declared by every
 # manifest) + 2 (#105's colors 8->10 grows each win_pal sparse block by
 # the two AUTO sets). Donovan's #103 pcrel relocations move ops, net 0.
-FROZEN_1="donovan:336 huitzil:370 pyron:307"  # RE-FROZEN 14z-117 (was 332/366/303): +4 EVERY tenant = the profile-gated random_select_bound + random_select_roster site_thunks (two bodies + two sites; the "?" draw table lists this build's tenants).  # RE-FROZEN 14z-111 (was 327/365/298): +5 every tenant = the #99 AI-script unpark, see the note below.  # RE-FROZEN 14z-105 (was 323/363/296): +2 EVERY tenant = the profile-gated oboro_select_hook site_thunk (body + site); version_text adds 0 ops (it grows the wheel record/coord DATA ops). 14z-102: hui 361->363 = the #109 row-31 fix
+FROZEN_1="donovan:339 huitzil:370 pyron:307"  # RE-FROZEN 14z-119 (was 336/370/307): +3 DONOVAN ONLY = his param32_a / param32_b / jump_params bank-row value ops now emitted (`port_param32 = true`, maintainer-ruled 2026-08-29 "use VS2 parameters and not the shell character's"; STATE 14z-118 charmap, patch_notes 14z-118 (charmap, 2)); the M12 freeze.  # RE-FROZEN 14z-117 (was 332/366/303): +4 EVERY tenant = the profile-gated random_select_bound + random_select_roster site_thunks (two bodies + two sites; the "?" draw table lists this build's tenants).  # RE-FROZEN 14z-111 (was 327/365/298): +5 every tenant = the #99 AI-script unpark, see the note below.  # RE-FROZEN 14z-105 (was 323/363/296): +2 EVERY tenant = the profile-gated oboro_select_hook site_thunk (body + site); version_text adds 0 ops (it grows the wheel record/coord DATA ops). 14z-102: hui 361->363 = the #109 row-31 fix
 for row in $FROZEN_1; do
     who="${row%%:*}"; want="${row##*:}"
     case "$who" in donovan) ex="$D_EX" ;; huitzil) ex="$H_EX" ;; *) ex="$P_EX" ;; esac
@@ -274,8 +274,8 @@ check_n() {  # check_n <label> <dir> <want ops> <sum of 1-tenant counts>
 # resolved by reconciliation_huitzil rows (0x2cbde/0x2ce0a/0x2ce3e/0x364a —
 # reachable only by his own AI). Mechanism + capture: STATE 14z-111,
 # tests/test_inp_crash_merged_m8_01.sh.
-check_n "2 tenants" "$WORK/two"   612 668   # 14z-117: +4 (random_select_bound + _roster, ENGINE-SITE emitted once), sum +8 — READ FROM THE GATE'S OWN PRINT, see the 14z-117 note
-check_n "3 tenants" "$WORK/three" 823 932   # 14z-117: +4 / sum +12 (was 819 / 920)
+check_n "2 tenants" "$WORK/two"   615 671   # 14z-119: +3 (Donovan's three physics value-row ops, per-tenant addresses — nothing dedupes), sum +3 (was 612 / 668)  # 14z-117: +4 (random_select_bound + _roster, ENGINE-SITE emitted once), sum +8 — READ FROM THE GATE'S OWN PRINT, see the 14z-117 note
+check_n "3 tenants" "$WORK/three" 826 935   # 14z-119: +3 / sum +3 (was 823 / 932), same three ops  # 14z-117: +4 / sum +12 (was 819 / 920)
 
 # ── 3: every tenant's own content is present ────────────────────────────
 # An op count alone cannot tell "both tenants ran" from "tenant 0 ran twice".

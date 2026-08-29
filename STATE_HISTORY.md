@@ -19,6 +19,26 @@ Rules of this file:
 - References of the form "STATE 14z-XX": look in STATE.md first, then here
   — section names are preserved verbatim, so the reference always resolves.
 
+## Session 14z-116 CLOSE — ritual complete. **THE COSMETIC/EXTRAS ARC: win quotes
+## MEASURED THEN FORGONE, the hidden characters DECODED (Shadow takes the tenant —
+## confirmed on the board), and PYRON'S MEDALLION WHITE-OUT FIXED after two years
+## parked. 13 commits PUSHED. Nothing frozen — the freeze battery is next session.**
+
+| | |
+|---|---|
+| opened with | the 14z-115 close (`9174aed`, pushed); NEXT_SESSION naming the tenants' win quotes as the next task |
+| delivered | win-quote Phase 0 (measured -> FORGONE by ruling, parked clean-way-only) -> the select screen's hidden machinery decoded (random cell, hidden pick, Shadow) -> Shadow-vs-tenant proven on emulator AND board -> **Pyron's medallion white-out FIXED, field-validated** -> the MiSTer bundle documented and given the README it was missing |
+| green at close | `run_all_static --tier portable` **54 / 0 / 0 / 0**; `test_checkskills` PASS; `test_win_quote_decode`, `test_shadow_tenant`, `test_pyron_medallion_2p`, `test_wheel_bank5`, `test_select_wheel`, `test_id_space`, `test_hui_winscreen`, `test_decrypt_cache` all PASS. **The full strict tier was NOT run** — it belongs to the freeze battery, which is next session's work |
+| push | **PUSHED** at the maintainer's word: `origin/main` = `8055a27`, 13 commits. All `freeze/*` tags already on origin (none cut — nothing was frozen); fork pin `202fc3e6` matches its remote |
+| **the fix that landed** | Pyron's medallion: `PRG:0x05F9D0`'s P2 branch no longer writes row `0x1A`. **`build/m3b_merged19` (`af21bc88`) carries it and is UNREGISTERED / UNFROZEN** *(FROZEN 14z-117 as merged-m12 `cde712e1` after the M10 rebuild)* — the manifest is on origin, no shipping artifact has it |
+| not done, deliberately | **THE FREEZE BATTERY** (next session, see NEXT_SESSION); the maintainer's 1:1 wheel mockup (not yet provided); #112, the win quotes and Marionette all parked by ruling |
+| **the close ritual, audited** | The first pass did STATE + rollover + LEDGER + NEXT_SESSION and STOPPED — the maintainer asked "did you do the full ritual?" and the answer was NO. Missing and now written: **`patch_notes.md` 14z-116 (byte detail — I had shipped a BYTE CHANGE with no entry, which CLAUDE.md 5 and [VSP-99] both require)**, the `patch_index.md` registry row, the HANDOFF gate-index entry for `test_pyron_medallion_2p`, and THREE gotchas paid for this session and never filed (the wheel-route trap, "a parked item that lives only in STATE_HISTORY gets re-reported", and "an mtime is not a date"). Recorded because the omission is the lesson: the ritual is a checklist, and the ROM-change half of it is the half that gets skipped |
+| **the record corrected itself five times** | the stale `0x60+id-1` quote cause; the `$45` "constrained to 0x00-0x0F" bound our own wheel invalidated; the medallion bug's "accent march" attribution (it was our own sword thunk); and TWO of my own readings the measurements overturned — `PRG:0x009BB2` as match init, and the P2 sword "going grey" |
+
+**Ledger rollover:** the 14z-113 group (two records) moved verbatim to
+STATE_HISTORY.md; STATE holds 14z-114 / 14z-115 / 14z-116.
+
+
 ## Session 14z-115 CLOSE — ritual complete. **THE SELECT-WHEEL SEPARATION FROZEN
 ## (donovan-m15 / huitzil-m22 / pyron-m16 / merged-m11, mark M9, stock twin unchanged),
 ## tagged at `b30611a`, strict 111/0/0/0 on that tree, guard corpus 340/340 — NOT

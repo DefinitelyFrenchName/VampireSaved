@@ -19,7 +19,7 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD="${1:-build/m3b_merged20}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117
+BUILD="${1:-build/m3b_merged21}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -f "$BUILD/patch/patch.json" ] || { echo "SKIP: no $BUILD/patch"; exit 0; }
 
 python3 - "$BUILD" <<'PY'

@@ -1,0 +1,5 @@
+picks the DONOVAN cell (id 0x13), which this Pyron-only build does not back
+(it backs only Pyron at 0x11). The pick therefore lands on an unbacked cell
+and the select divergence is not a clean vanilla-legacy window — the same
+reason this replay is skipped on huitzil-m2, which backs only 0x10.
+The tenant pick is covered by 40_pick_pyron_cell.

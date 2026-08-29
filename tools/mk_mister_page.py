@@ -307,7 +307,7 @@ WRITE_SET_CODES = 52347
 # codes each: how many codes in each bucket carry art. Instrument:
 # tools/gfx_tiles.py's tile_bytes()+BLANK over
 # build/m3b_merged13/rompath/vsavjw.zip (bucket 62 of bank 5 re-measured on
-# m3b_merged20, 14z-115), i.e. the same census
+# m3b_merged18, 14z-115), i.e. the same census  # HISTORICAL build name restored 14z-119 (earlier sweeps had rolled it)
 # tests/audit_mister_map_fit.sh runs; --check re-derives it byte for byte
 # when that build is present. This is what makes the "live art" bar an actual
 # measurement of sparseness instead of a decorative scatter.
@@ -1135,7 +1135,7 @@ def check():
             ok.append(f"the {label} ASCII figure in {CORE_DOC.name} is current")
 
     # -- 6. against the real artifacts, where reachable ----------------------
-    build = REPO / "build" / "m3b_merged20" / "rompath" / "vsavjw.zip"  # re-pointed 14z-117b (random-select freeze) <- 14z-117
+    build = REPO / "build" / "m3b_merged21" / "rompath" / "vsavjw.zip"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
     if not build.exists():
         skipped.append(f"no WIDE romset at {build} — the group-C occupancy "
                        "census was not re-derived")

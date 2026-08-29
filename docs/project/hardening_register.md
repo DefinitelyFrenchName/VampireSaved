@@ -259,6 +259,11 @@ Re-point the `[merged_*]` sections at every merged freeze.
   tenant iteration ahead of the ext placements); `test_pointer_flow`
   baselines merged-m13 / donovan-m17 / huitzil-m24 / pyron-m18: solos
   IDENTICAL, merged's two STRONG win_pal bases +0x30, WEAK unchanged.**
+  **14z-119 (the physics-port freeze): hui52/pyron36/don_m18 + `[merged_*]`
+  on m3b_merged21; pcrel inventories IDENTICAL; escape triage 25 verdicts
+  identical, NO landing address moved (three data value ops, no allocation);
+  `test_pointer_flow` baselines merged-m14 / donovan-m18 / huitzil-m25 /
+  pyron-m19: ALL IDENTICAL to their predecessors (STRONG and WEAK).**
 - `test_pointer_flow.sh` NEW (ci_static): the comb, frozen baselines,
   synthetic must-fail controls both directions.
 - `bases.tsv` re-derived + re-derive-at-every-freeze note (14z-100).

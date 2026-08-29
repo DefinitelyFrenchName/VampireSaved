@@ -51,7 +51,7 @@ cd "$REPO"
 # profile-gated (the stock track carries donovan's regions and gets the
 # arcade-death-stall fix too). Ratified byte movement, not a refactor —
 # the "do NOT re-freeze to pass" warning above targets inert refactors.
-EXPECT="${1:-d29fd0620f67dcd70939be8712e9f86cff558ca3}"  # re-frozen 14z-110: the #99 d2 window is NOT profile-gated (the stock track carries the same six 0x51 nodes), so the stock image moves
+EXPECT="${1:-38e9cb2cd790c044167f7991810293691386af66}"  # re-frozen 14z-119: THE STOCK TWIN MOVED (was d29fd062 since 14z-110b) — port_param32 is a per-row data_port, not profile-gated, so the substituted track writes Donovan's VS2 physics onto stock slot 0x0F (six data ops in vm3j.04d, [0xf] value + [0x1f] mirror; no legacy row). Previous: # re-frozen 14z-110: the #99 d2 window is NOT profile-gated (the stock track carries the same six 0x51 nodes), so the stock image moves
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0

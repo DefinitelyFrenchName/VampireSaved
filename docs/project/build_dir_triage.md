@@ -416,6 +416,20 @@ left naming N-1 builds; re-labelled to the current names. Kept:
 the maintainer's call), `m5_stock3` (evidence). Current + one back now:
 `don_m15/m16`, `hui49/50`, `pyron33/34`, `m3b_merged18/19`, `m5_stock10/11`.
 
+## THE 14z-119 SWEEP (physics-port freeze) — applied under the policy
+
+Deleted at the freeze (N-2 per track): `don_m16`, `hui50`, `pyron34`,
+`m5_stock11` (tracked metadata `git rm`'d; recoverable via `freeze/*` tags).
+Grep-four-places before deletion: zero non-comment references in `tests/`
+and `tools/`, manifest references are the `pcrel_escapes.toml` re-point
+HISTORY comments only. `build/m3b_merged19` STAYS again (the
+`test_random_select_tenants.sh` CONTROL — see the 14z-117b note below);
+`build/don_phys_probe` (the validated physics probe, program-identical to
+`don_m18`) and the two attribution probes `build/don_stage4_m18` (the stage-4
+fingerprint `108f7523`) are deleted at the close — their evidence is the
+freeze itself. Current + one back per track: `don_m17/m18`, `hui51/52`,
+`pyron35/36`, `m3b_merged20/21` (+ `m3b_merged19` control), `m5_stock12/13`.
+
 ## THE 14z-117b SWEEP (random-select freeze, same session) — applied under the policy
 
 Deleted at the freeze (N-2 per track): `don_m15`, `hui49`, `pyron33`,

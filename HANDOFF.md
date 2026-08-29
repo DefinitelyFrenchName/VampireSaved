@@ -340,7 +340,7 @@ eliminations.
 
     ROMDIR=... JTSIM_SCRATCH=/tmp/vampire-saved-jtsim \
       tools/run_sim_jtcps2.sh tests/replays/11_pick_donovan.rpl /tmp/out \
-        --core cps2w --wide build/m3b_merged20 --frames 4000 \
+        --core cps2w --wide build/m3b_merged21 --frames 4000 \
         --frame-output fork --frame-window 0 999999 30 \
         --rdprobe 1 0x800000 0x1000000 --rdprobe 0 0x7E0000 0xFE0000 \
         --rdprobe 2 0 0x1000000 --rdprobe 3 0 0x1000000
@@ -354,7 +354,7 @@ run's own log before labelling a phase.
 
 ```sh
 export ROMDIR=/path/to/reference/sets
-tools/mister_mra.sh --core cps2w --wide build/m3b_merged20 --out /tmp/mra107   # re-pointed 14z-118 <- m3b_merged18 (the example figures below are the 14z-107 run's)
+tools/mister_mra.sh --core cps2w --wide build/m3b_merged21 --out /tmp/mra107   # re-pointed 14z-119 <- m3b_merged20 <- 14z-118 <- m3b_merged18 (the example figures below are the 14z-107 run's)
 #   -> /tmp/mra107/vsavjw.rom  66,265,152 B  (the WIDE download image)
 tools/mister_mra.sh --core cps2w --out /tmp/mra107stock   # the stock leg
 #   -> /tmp/mra107stock/vsavj.rom  46,407,744 B
@@ -426,7 +426,7 @@ HANDS BACK THE SDRAM IMAGE:**
 
 ```sh
 tools/run_sim_jtcps2.sh tests/replays/05_timeout_idle.rpl /tmp/census \
-    --core cps2w --wide build/m3b_merged20 \
+    --core cps2w --wide build/m3b_merged21 \
     --post-frames 2 --keep-banks       # ~12 min: the download and nothing else
 python3 tools/mister_sdram_census.py /tmp/census/sdram \
     --rom "$JTSIM_SCRATCH/rom/vsavjw.rom" --map wide
@@ -539,7 +539,7 @@ build drives inputs through the 0001 harness instead), so record on MAME.
 
 ```sh
 export ROMDIR=/path/to/reference/sets
-tools/run_wide.sh build/m3b_merged20 fbneo # THE 3-TENANT BUILD (all 18
+tools/run_wide.sh build/m3b_merged21 fbneo # THE 3-TENANT BUILD (all 18
                                            # (14z-97: the build argument is
                                            # now REQUIRED. It used to default
                                            # to build/m5w — the known-bad
@@ -549,14 +549,15 @@ tools/run_wide.sh build/m3b_merged20 fbneo # THE 3-TENANT BUILD (all 18
                                            # newest first; m5w and merged1 are
                                            # refused by name.)
                                            # selectable, art included) =
-                                           # merged-m13, FROZEN 14z-117b (random
-                                           # select includes the tenants: park
-                                           # on "?" and the draw cycles all 18;
-                                           # carries the M10 medallion fix;
-                                           # program fingerprint a1b7cb82).
+                                           # merged-m14, FROZEN 14z-119 (THE
+                                           # PHYSICS PORT: Donovan walks and
+                                           # jumps with VS2's values, not
+                                           # Victor's; carries the M11 random
+                                           # select + the M10 medallion fix;
+                                           # program fingerprint 6649523a).
                                            # WHAT TO LOOK AT FIRST:
                                            # (1) the select screen shows
-                                           # "M11" bottom-right — THE NAKED-
+                                           # "M12" bottom-right — THE NAKED-
                                            # EYE A/B TELL (CLAUDE.md §5,
                                            # finally implemented; the text
                                            # names the freeze generation and
@@ -568,25 +569,31 @@ tools/run_wide.sh build/m3b_merged20 fbneo # THE 3-TENANT BUILD (all 18
                                            # "Bishamon" — aliased rows).
                                            # Works for P1 and P2. Without
                                            # Start it is plain Bishamon.
-tools/run_wide.sh build/don_m17 fbneo      # or the solo builds (hui51,
-                                           # pyron35); ... mame
+tools/run_wide.sh build/don_m18 fbneo      # or the solo builds (hui52,
+                                           # pyron36); ... mame
                                            # (registry rows name the CURRENT
-                                           # fingerprints — donovan-m17/
-                                           # huitzil-m24/pyron-m18 since the
-                                           # 14z-117b random-select freeze)
+                                           # fingerprints — donovan-m18/
+                                           # huitzil-m25/pyron-m19 since the
+                                           # 14z-119 physics-port freeze)
 ```
 
-**Current WIDE builds — THE 14z-117b RANDOM-SELECT FREEZE (maintainer-directed
-2026-08-29; mark M11): donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13.**
-`build/don_m17` (`90a225ce`, 336 ops), `build/hui51` (`ae953657`, 370),
-`build/pyron35` (`1222df18`, 307), `build/m3b_merged20` (program
-fingerprint `a1b7cb82`, 823 ops), stock twin `build/m5_stock12` (`d29fd062`,
-UNCHANGED — both thunks are profile-gated, measured by rebuild: every
-member identical). The naked-eye tell is the **M11** mark; park the cursor
-on "?" and the draw cycles all 18 — confirm on a tenant and it loads.
-**FIELD VERDICT GREEN on the board (maintainer, MiSTer, 2026-08-29, STATE 14z-118): behaviour identical to emulation — the draw cycles all 18, a tenant confirm loads, the M10 trade re-observed.** Detail: patch_notes 14z-117 (2), STATE 14z-117 / 14z-118; the registry row below.
-
-**UNFROZEN since 14z-118 (maintainer-ruled 2026-08-29): `build/manifest/donovan.toml` carries `port_param32 = true` — Donovan's walk/jump rows port VS2's values instead of the alias row's (Victor's). The tree therefore reproduces the probe `build/don_phys_probe` (`7109f835`), NOT donovan-m17: `test_m3a_reproducible` and `test_tenant_loop` (339/615/826 ops) are RED BY DESIGN until the M12 battery. The character-data map (`docs/project/tables/chars/`) labels the rows accordingly.**
+**Current WIDE builds — THE 14z-119 PHYSICS-PORT FREEZE (maintainer-ruled
+2026-08-29 "use VS2 parameters and not the shell character's"; mark M12):
+donovan-m18 / huitzil-m25 / pyron-m19 / merged-m14.**
+`build/don_m18` (`7109f835`, 339 ops — program identical to the validated
+probe `build/don_phys_probe`), `build/hui52` (`ae953657`, 370 — program
+UNCHANGED from huitzil-m24, only the M12 glyph tiles moved), `build/pyron36`
+(`1222df18`, 307 — likewise), `build/m3b_merged21` (program fingerprint
+`6649523a`, 826 ops = merged-m13 + exactly Donovan's three physics value ops,
+no address moved), stock twin `build/m5_stock13` (`38e9cb2c`, **MOVED** from
+`d29fd062` — `port_param32` is a per-row data_port, not profile-gated, so the
+substituted track writes his VS2 physics onto stock slot `0x0F` too: six data
+ops, member `vm3j.04d` only, no legacy row written). The naked-eye tell is the
+**M12** mark; Donovan walks 3.0/−2.625 and jumps with VS2's parameters.
+**NOT YET FIELD-TESTED on the board** (bundle `../mister_fieldtest_14z119/`).
+Detail: patch_notes 14z-119 / 14z-118 (charmap, 2), STATE 14z-119; the
+registry row below. Previous freeze (merged-m13, M11): FIELD VERDICT GREEN
+2026-08-29 (STATE 14z-118).**
 
 **Previous batch (14z-117 PYRON-MEDALLION FREEZE, the 14z-116 fix,
 field-validated on the board 2026-08-29 before freezing; mark M10):
@@ -881,17 +888,17 @@ pair with:
 
 ```sh
 # THE FOUR TRACKS, as tests/test_m3a_reproducible.sh rebuilds them (re-pointed
-# 14z-118 <- the 14z-8x `build/m5_stock` / `build/don_m4` pair, which no longer
+# 14z-119 (physics-port freeze) <- 14z-118 <- the 14z-8x `build/m5_stock` / `build/don_m4` pair, which no longer
 # exists on disk; output names are the CURRENT freeze — roll them each freeze):
 python3 tools/build_wide_romset.py "$ROMDIR" build/wide0/rompath --qsound 2 --gfx 4 --prg 4
-GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.sh 6 build/m5_stock12      # the stock twin
+GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.sh 6 build/m5_stock13      # the stock twin
 KEY_SET=vsavj WIDE_ROMSET=build/wide0/rompath/vsavjw.zip \
     GEN_FLAGS="--allow-plausible --tripwire-open --profile cps2-wide-v1" \
-    tools/build_donovan.sh 6 build/don_m17                                                 # donovan (WIDE)
+    tools/build_donovan.sh 6 build/don_m18                                                 # donovan (WIDE)
 TENANT_MANIFEST=build/manifest/huitzil.toml TENANT_CHAR=0x10 WIDE_ROMSET=build/wide0/rompath/vsavjw.zip \
-    GEN_FLAGS="--profile cps2-wide-v1 --allow-plausible --tripwire-open" tools/build_donovan.sh 6 build/hui51
+    GEN_FLAGS="--profile cps2-wide-v1 --allow-plausible --tripwire-open" tools/build_donovan.sh 6 build/hui52
 TENANT_MANIFEST=build/manifest/pyron.toml   TENANT_CHAR=0x11 WIDE_ROMSET=build/wide0/rompath/vsavjw.zip \
-    GEN_FLAGS="--profile cps2-wide-v1 --allow-plausible --tripwire-open" tools/build_donovan.sh 6 build/pyron35
+    GEN_FLAGS="--profile cps2-wide-v1 --allow-plausible --tripwire-open" tools/build_donovan.sh 6 build/pyron36
 tools/build_merged.sh ...                                                                   # the merged set (its header)
 ```
 
@@ -3441,6 +3448,7 @@ Their expectation sets are BATTERY-SCOPED and say so in their own READMEs.
 
 | Build | SHA-1 (zip) | Notes |
 |---|---|---|
+| **THE 14z-119 PHYSICS-PORT FREEZE — donovan-m18 / huitzil-m25 / pyron-m19 / merged-m14 (stock twin MOVED = donovan-m18-stock). Maintainer-ruled 2026-08-29 ("use VS2 parameters and not the shell character's", STATE 14z-118 charmap): `build/manifest/donovan.toml` `port_param32 = true` — his `param32_a` / `param32_b` / `jump_params` bank rows carry VS2's walk/jump values (walk 3.0/−2.625, VS2's three jump rows) instead of the vsavj alias row's (Victor's). Mark M12. NOT YET FIELD-TESTED.** | donovan-m18 `7109f835` (`build/don_m18`, 339 ops — program identical to the validated probe `build/don_phys_probe`), huitzil-m25 `ae953657` (`build/hui52`, 370 — program UNCHANGED from m24, glyph tiles only), pyron-m19 `1222df18` (`build/pyron36`, 307 — likewise), merged-m14 `6649523a` (`build/m3b_merged21`, 826 ops = 823 + the three value ops, NO address moved, `bases.tsv` unchanged); stock twin `build/m5_stock13` `38e9cb2c` (MOVED from `d29fd062`: six data ops on stock slot 0x0F, `vm3j.04d` only) | Members moved vs 14z-117b: PROGRAM `vm3j.04d` (solos+merged: the three rows; stock: six), GROUP C `vsw.33m/37m` (the M12 glyph); QSound/Z80 untouched. Battery: three suites — every masked legacy class PASS, huitzil/pyron `.sha1`s bit-identical to their predecessors, Donovan's tenant rigs (103/108/110/112/113) moved and were ATTRIBUTED at the onset frame by DUMPS diff (`$FF8441/42` = P1's X-velocity word, `0x0280` -> `0x0300` = 2.5 -> 3.0, the change itself; 103 diverges f2980, 108 f3068, never re-converging = a different fight) and re-frozen; `audit_merged_legacy` 47/47; `audit_roster_pairings` 111/111 (`bases.tsv` unmoved); `audit_legacy_pairings` PASS; `audit_guard_corpus` (STATE); dualtrack, fbneo_legacy_oracle (NO refit), fbneo determinism, inp corpus, random_select_tenants, version_string (M12 pixel-exact), medallion, shadow, oboro, wheel gates, tenant_loop (re-frozen 339/615/826), pcrel (inventories IDENTICAL), escape_triage (25 verdicts identical), pointer_flow (baselines ALL IDENTICAL), m3a (re-pinned, five manifests), jtcores_twin, mister_mra_map, mra_parts, release_roundtrip — PASS. Release `release/merged-m14/{fbneo,mame,mister}/` (bitstream 18269 unchanged); fork `2bf41090` (catalogue: three CRCs), patch 0028, pin bumped; bundle `../mister_fieldtest_14z119/` (STOCK CONTROL MRA byte-identical). THE TELL IS M12. Detail: patch_notes 14z-119 / 14z-118 (charmap, 2); STATE 14z-119. Two traps paid: the re-point stamp on TOML header/key lines (`project/gotchas.md`) |
 | **THE 14z-117b RANDOM-SELECT FREEZE — donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13 (stock twin UNCHANGED = donovan-m13-stock). Maintainer-directed the same day ("do the random-select includes the tenants then"): the "?" cell's draw lists this build's tenants — TWO profile-gated site_thunks, `random_select_bound` (`0x020C74`, the wrap bound = 15 + tenants, re-entering `0x020C7C`) and `random_select_roster` (`0x020C80`, the table read + the routine's rts + an 18-entry table, hole b), ONE table filled per build by the new `roster_subst`; mark M11.** | `90a225ce` / `ae953657` / `1222df18` / merged program fingerprint `a1b7cb82`; stock twin `d29fd062` UNCHANGED (whole-artifact manifest identical) | `build/don_m17` (336 ops) / `build/hui51` (370) / `build/pyron35` (307) / `build/m3b_merged20` (823 ops) / `build/m5_stock12`; tags `freeze/{donovan-m17,huitzil-m24,pyron-m18,merged-m13}`. = the 14z-117 batch + the two thunks + `version_text` M11. **Members moved: solos `vm3j.03d` (the sites) + `vm3j.10b` (the bodies) + `vsw.33m/37m` (the M11 glyphs), don also `vsw.41`; merged additionally `vm3j.04d/07b` + `vsw.41/42` (ext allocations behind the two hole-b bodies: Phobos +0xC0, Pyron +0x30 — `bases.tsv` re-derived); QSound/Z80 untouched.** THE TRAP PAID FOR (game/gotchas.md, select_screen.md "THE WALKER HAS TWO PATHS"): a bound-only thunk let the walker's NON-tick frames read vanilla's table with cursor 15-17 (pad + code bytes as ids) and the figure refresh took an address error — measured on consecutive-frame DUMPS, fixed by displacing the read too. Gates at freeze: `test_random_select_tenants` (static shape / 91-frame sampled draw = 15 + tenants / confirm mid-plateau loads the tenant's own record / must-fire control on merged19) / version_string (M11) / pyron_medallion_2p / shadow_tenant / oboro / wheel gates / dualtrack / fbneo_legacy_oracle / inp corpus / m3a (re-pinned per member) / pointer_flow (merged: the two STRONG win_pal bases +0x30; solos identical) / pcrel + escape_triage (verdicts identical, three merged landings shifted) / tenant_loop (re-frozen 336/370/307, 823) / jtcores_twin / mister_mra_map / mra_parts / mister_page + map_fit (unchanged) / release_roundtrip (merged-m13) / audit_merged_legacy / audit_guard_corpus / audit_roster_pairings / audit_legacy_pairings / three full suites / strict — see STATE 14z-117 (2) for the numbers. Legacy cost: nine select replays BIT-IDENTICAL don_m16 vs the probe (no legacy replay hovers "?"). Release `release/merged-m13/`; MiSTer tail: fork `f997cfe1` (catalogue: eight CRCs), patch 0027, pin bumped; bundle `../mister_fieldtest_14z117b/` (`.rbf` unchanged) — **THE TELL IS M11.** **FIELD VERDICT GREEN (maintainer, MiSTer, 2026-08-29, 14z-118): "all green: behavior identical to emulation"** — random select cycles all 18 on "?" and confirming a tenant loads it; the M11 tell visible; no regression in play; the M10 sword/medallion trade re-observed (select screen only). STOCK CONTROL not re-run (`.rbf` 18269 unchanged — once-per-`.rbf`). |
 | **THE 14z-117 PYRON-MEDALLION FREEZE — donovan-m16 / huitzil-m23 / pyron-m17 / merged-m12 (stock twin UNCHANGED = donovan-m13-stock). The 14z-116 fix, FIELD-VALIDATED on the board 2026-08-29 BEFORE freezing: `select_sword_pal_variant_id`'s P2 branch no longer writes palette row `0x1A` (ten in-place bytes, body length unchanged 126), so Pyron's medallion keeps its colours while P2 hovers a tenant; the accepted trade is the P2 select figure's sword drawing orange (select screen only). Mark M9 -> **M10** (three glyphs; `version_x` 340 -> 324 so the third does not clip at pixel 384).** | `7950c844` / `7ade3180` / `01b39c39` / merged program fingerprint `cde712e1`; stock twin `d29fd062` UNCHANGED (`only_variant_slot`, measured by rebuild: whole-artifact manifest identical) | `build/don_m16` (332 ops) / `build/hui50` (366) / `build/pyron34` (303) / `build/m3b_merged19` (819 ops) / `build/m5_stock11`; tags `freeze/{donovan-m16,huitzil-m23,pyron-m17,merged-m12}`. = the 14z-115 batch + the 14z-116 thunk edit + `version_text` M10 / `version_x` 324. **On every build only THREE ops changed content and NO address moved** (coord list +1 pair, record count `0x19 -> 0x1A`, thunk body). **Members moved: solos `vsw.31m/33m/35m/37m` (the third glyph tile) + `vsw.41`; merged additionally `vm3j.10b` (its thunk copy sits in hole b); QSound/Z80 untouched.** Gates at freeze: version_string (M10 pixel-exact at (324,202)) / pyron_medallion_2p / shadow_tenant / wheel_bank5 / select_wheel / tenant_select_records / oboro_select / dualtrack / fbneo_legacy_oracle (no refit needed) / inp corpus 6/6 / m3a (all pins + whole-artifact manifests re-attributed per member) / pointer_flow (re-frozen: WEAK data:long +1 per build = the new coord pair, STRONG unchanged) / pcrel + escape_triage (IDENTICAL) / jtcores_twin / mister_mra_map / mra_parts / release_roundtrip (merged-m12) / mister_page + map_fit (bank-5 count 6271 -> 6272, extent `0xFE41 -> 0xFE42`: the third glyph) / audit_merged_legacy **47/47** (leg b on the new solos) / audit_guard_corpus **344/344** / audit_roster_pairings **111/111** (`bases.tsv` re-derived: no row moved) / audit_legacy_pairings PASS / three full suite verifies: every masked legacy class PASS, the moved `.sha1`s all tenant/select rigs (the 14z-115 inventory + 113_shadow_vs_tenant frozen for the first time), attributed on 103 and 92 by DUMPS diff (`$FF06CD/D0/D1` execution position + dead stack at select frames; ZERO bytes at 5800 past the victory screen; the fix's own effect is in palette RAM, covered by the medallion gate) / strict tier — see STATE 14z-117. Release `release/merged-m12/` (M10, per-platform, round-trip PASS, bitstream 18269 unchanged). MiSTer tail: fork `80e08111` (catalogue: the six moved CRCs), patch 0026, pin bumped, twin PASS; board bundle `../mister_fieldtest_14z117/` (WIDE MRA regenerated; STOCK CONTROL MRA byte-identical to 14z-115's; `.rbf` unchanged) — **THE TELL IS M10.** ~~Field test on the board pending.~~ Field-tested GREEN 2026-08-29 (the sword trade validated — STATE Open bugs row) and re-observed under M11 at 14z-118; this row's tail contradicted its own header until 14z-118. |
 | **THE 14z-115 SELECT-WHEEL SEPARATION FREEZE — donovan-m15 / huitzil-m22 / pyron-m16 / merged-m11 (stock twin UNCHANGED = donovan-m13-stock). Maintainer-directed "E2" (2026-08-28): the three appended medallions repositioned by the maintainer's own pixel offsets (Phobos -1,+3 / Pyron 0,+7 / Donovan +1,+3 screen px), the hover-ring bases tuned by eye on MAME snapshots (Phobos +8 x, Pyron +3 x), and one authored 1px near-black OUTLINE sprite per cell interleaved before its medallion in the wheel record (36 tiles at group C 0x1F800+, pen 0 of row 0x19 — no palette content change); M9 mark. APPROVED ON EMULATOR SNAPSHOTS; FIELD VERDICT GREEN on the board 2026-08-28 (maintainer, CRT: wheel "almost perfect", Shadow, Dark Gallon — STATE hidden-character block; this row said NOT YET FIELD-TESTED until 14z-118).** | `38a4becb` / `7bb36d0c` / `7177229a` / merged program fingerprint `dea2c918`; stock twin `d29fd062` UNCHANGED (profile-gated, measured by rebuild) | `build/don_m15` (332 ops) / `build/hui49` (366) / `build/pyron33` (303) / `build/m3b_merged18` (819 ops — count unchanged, the record/coord data ops grew) / `build/m5_stock10`; tags `freeze/{donovan-m15,huitzil-m22,pyron-m16,merged-m11}`. = the 14z-111 batch + `wheel_layout_proposed.json` pos/highlight_base + `[[select_wheel]]` `cell_outline`/`outline_base`/`outline_pal` (generator 2a, build_gfx outline pass, `check_wheel_bank5` taught the interleave) + `version_text` M9. **Members moved: PROGRAM `vm3j.03d/04d/07b/10b`, `vsw.41/42`; GROUP C `vsw.31m/33m/35m/37m`; QSound/Z80 untouched.** Gates at freeze: wheel_bank5 / select_wheel / tenant_select_records (host-pick window 889-2415 held) / version_string (M9 pixel-exact) / oboro_select / jtcores_twin / mister_mra_map / mra_parts / release_roundtrip / pointer_flow (re-frozen, attributed) / pcrel + escape_triage (inventories IDENTICAL) / tenant_loop / m3a (all pins + whole-artifact manifests re-attributed per member) / inp corpus 6/6 on merged18 / audit_merged_legacy 47/47 — see STATE 14z-115. **Suites: every moved `.sha1` is a tenant-content or select-rig replay; attributed on 103 and 109 (don_m14 vs don_m15 at four frames): the OBJ-builder execution-position words `$FF06CC/CD/D1` and record cursor `$FF06B7/B9`, the dead-stack window, the QSound latch phase, and the P1/P2 RING OBJECTS' position bytes `$FFBA11/15` / `$FFBC11/15` — the change itself; no gameplay field.** Release `release/merged-m11/` (M9, per-platform, round-trip PASS, bitstream 18269 hash-verified). MiSTer tail: fork `202fc3e6` (catalogue, patch 0025, pin bumped — NOT pushed), board bundle `../mister_fieldtest_14z115/` (`_Arcade/` WIDE + STOCK CONTROL MRAs, `games/mame/` zips; `.rbf` unchanged) — **THE TELL IS M9.** |

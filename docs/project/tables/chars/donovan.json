@@ -12,20 +12,20 @@
  },
  "inputs": {
   "bank_map.toml": "776bcb9af5aef09c1b3204a6354c04165ad8b55d",
-  "manifest": "7ab6f5cac4efddf0a09b9e80de8979c9191a8463",
+  "manifest": "e7878ff970541a62ca25303616d111365849c1bf",
   "overrides": "72b9812942192bf348508ddf7473cbb37b2d5275",
   "placements.json": "74b756174c2eac1a4e41919145114e2498d11082",
   "reconciliation.toml": "40528aeb863028d885f868f34368443c460b5ca2",
   "reconciliation_donovan.toml": "242368518282f41a728d879e0714380f621aaf49",
   "regions.json": "fe26a381132d702b5a68e3ec269880af7ebb0eb3",
-  "verify_data.bin": "9865f2385f90ff65f30710ef6f742712f23f6a38"
+  "verify_data.bin": "03e4fca9c82a285975992247143ad02a65446859"
  },
  "overrides": [],
  "schema": 1,
  "sources": {
   "ours": {
    "kind": "built",
-   "set": "build/don_m17"
+   "set": "build/don_m18"
   },
   "vh": null,
   "vs2": {
@@ -173784,10 +173784,10 @@
     "jump_params": {
      "fields": {
       "back_gravity": {
-       "diff": true,
+       "diff": false,
        "fmt": "s16.16",
-       "ours": -0.35938,
-       "ours_source": "manifest:port_param32 set AFTER this build (UNFROZEN physics port \u2014 the next freeze's image carries vs2's row; until then ours is the alias row's content)",
+       "ours": -0.375,
+       "ours_source": "byte",
        "vh": null,
        "vs2": -0.375
       },
@@ -173800,18 +173800,18 @@
        "vs2": 0.01953
       },
       "back_xv": {
-       "diff": true,
+       "diff": false,
        "fmt": "s16.16",
-       "ours": -3.625,
-       "ours_source": "manifest:port_param32 set AFTER this build (UNFROZEN physics port \u2014 the next freeze's image carries vs2's row; until then ours is the alias row's content)",
+       "ours": -4.25,
+       "ours_source": "byte",
        "vh": null,
        "vs2": -4.25
       },
       "back_yv": {
-       "diff": true,
+       "diff": false,
        "fmt": "s16.16",
-       "ours": 8.125,
-       "ours_source": "manifest:port_param32 set AFTER this build (UNFROZEN physics port \u2014 the next freeze's image carries vs2's row; until then ours is the alias row's content)",
+       "ours": 8.0,
+       "ours_source": "byte",
        "vh": null,
        "vs2": 8.0
       },
@@ -173832,26 +173832,26 @@
        "vs2": -0.01953
       },
       "forward_xv": {
-       "diff": true,
+       "diff": false,
        "fmt": "s16.16",
-       "ours": 3.5,
-       "ours_source": "manifest:port_param32 set AFTER this build (UNFROZEN physics port \u2014 the next freeze's image carries vs2's row; until then ours is the alias row's content)",
+       "ours": 4.0,
+       "ours_source": "byte",
        "vh": null,
        "vs2": 4.0
       },
       "forward_yv": {
-       "diff": true,
+       "diff": false,
        "fmt": "s16.16",
-       "ours": 8.0,
-       "ours_source": "manifest:port_param32 set AFTER this build (UNFROZEN physics port \u2014 the next freeze's image carries vs2's row; until then ours is the alias row's content)",
+       "ours": 7.875,
+       "ours_source": "byte",
        "vh": null,
        "vs2": 7.875
       },
       "neutral_gravity": {
-       "diff": true,
+       "diff": false,
        "fmt": "s16.16",
-       "ours": -0.35156,
-       "ours_source": "manifest:port_param32 set AFTER this build (UNFROZEN physics port \u2014 the next freeze's image carries vs2's row; until then ours is the alias row's content)",
+       "ours": -0.375,
+       "ours_source": "byte",
        "vh": null,
        "vs2": -0.375
       },
@@ -173872,10 +173872,10 @@
        "vs2": 0.0
       },
       "neutral_yv": {
-       "diff": true,
+       "diff": false,
        "fmt": "s16.16",
-       "ours": 8.0,
-       "ours_source": "manifest:port_param32 set AFTER this build (UNFROZEN physics port \u2014 the next freeze's image carries vs2's row; until then ours is the alias row's content)",
+       "ours": 7.75,
+       "ours_source": "byte",
        "vh": null,
        "vs2": 7.75
       }
@@ -173891,18 +173891,18 @@
     "param32_a": {
      "fields": {
       "back_walk_xv": {
-       "diff": true,
+       "diff": false,
        "fmt": "s16.16",
-       "ours": -2.25,
-       "ours_source": "manifest:port_param32 set AFTER this build (UNFROZEN physics port \u2014 the next freeze's image carries vs2's row; until then ours is the alias row's content)",
+       "ours": -2.625,
+       "ours_source": "byte",
        "vh": null,
        "vs2": -2.625
       },
       "fwd_walk_xv": {
-       "diff": true,
+       "diff": false,
        "fmt": "s16.16",
-       "ours": 2.5,
-       "ours_source": "manifest:port_param32 set AFTER this build (UNFROZEN physics port \u2014 the next freeze's image carries vs2's row; until then ours is the alias row's content)",
+       "ours": 3.0,
+       "ours_source": "byte",
        "vh": null,
        "vs2": 3.0
       }
@@ -173918,18 +173918,18 @@
     "param32_b": {
      "fields": {
       "back_walk_xv": {
-       "diff": true,
+       "diff": false,
        "fmt": "s16.16",
-       "ours": -2.25,
-       "ours_source": "manifest:port_param32 set AFTER this build (UNFROZEN physics port \u2014 the next freeze's image carries vs2's row; until then ours is the alias row's content)",
+       "ours": -2.625,
+       "ours_source": "byte",
        "vh": null,
        "vs2": -2.625
       },
       "fwd_walk_xv": {
-       "diff": true,
+       "diff": false,
        "fmt": "s16.16",
-       "ours": 1.625,
-       "ours_source": "manifest:port_param32 set AFTER this build (UNFROZEN physics port \u2014 the next freeze's image carries vs2's row; until then ours is the alias row's content)",
+       "ours": 2.0,
+       "ours_source": "byte",
        "vh": null,
        "vs2": 2.0
       }

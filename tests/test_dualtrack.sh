@@ -108,8 +108,8 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-STOCK="${1:-$REPO/build/m5_stock12/rompath}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117
-WIDE="${2:-$REPO/build/don_m17/rompath}"    # re-pointed 14z-117b (random-select freeze) <- 14z-117
+STOCK="${1:-$REPO/build/m5_stock13/rompath}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+WIDE="${2:-$REPO/build/don_m18/rompath}"    # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -f "$STOCK/vsavj.zip"  ] || { echo "no stock build at $STOCK";  exit 1; }
 [ -f "$WIDE/vsavjw.zip" ] || { echo "no WIDE build at $WIDE";     exit 1; }
 WORK="$(mktemp -d)"
