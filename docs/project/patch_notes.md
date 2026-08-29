@@ -1,5 +1,83 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-116 — PYRON'S MEDALLION WHITE-OUT: byte detail (maintainer-chosen fix, field-validated 2026-08-29)
+
+**What and why.** Select palette row `0x1A` is BOTH Pyron's medallion row
+(`wheel_layout_proposed.json` `cells.11 pal_row = 26`) and the P2 figure
+family's base+2 "sword accent" slot. Our own 14z-62k thunk
+`select_sword_pal_variant_id` at `PRG:0x05F9D0` wrote the accent there on a
+P2 TENANT hover, so Pyron's medallion turned to shades of white and stayed
+that way until screen re-entry — the residual the 14z-64 FINAL ALLOCATION
+shipped as a documented trade and that the board re-reported for sessions.
+
+**Attribution, and it overturned the record.** STATE and the 14z-63 round-10
+analysis blamed the ACCENT MARCH and the ~15 s select timer. That mechanism
+was retired in 14z-64 (marcher writes to `0x16/0x19/0x1A` redirected at
+`0x2B598`/`0x2B7D8`). A write tap on `0x90C340` over a P2-hover replay
+attributed **all 16 word writes to PCs `0x3FFC60`-`0x3FFCA6`** — the copy
+loop of our own thunk, in `hole_b`. Not the marcher, and not Donovan's
+P2-hover portrait either (the 14z-87b supposition).
+
+**The bytes.** In `build/manifest/donovan.toml`, `select_sword_pal_variant_id`
+`thunk_hex`, at body offset 30-39 (the only change; every other byte of the
+126-byte body is untouched):
+
+```
+  before   4a2c 0381   tst.b  $381(a4)     ; which side?
+           6704        beq.s  .p1
+           d2fc 0060   adda.w #$60,a1      ; a1 = 0x90C340 = ROW 0x1A
+  after    4a2c 0381   tst.b  $381(a4)
+           6654        bne.s  .pop_exit    ; -> body offset 120 (movea.l (sp)+,a1)
+           4e71 4e71   nop / nop
+```
+
+TEN BYTES, and the body length is **unchanged at 126**, so no allocation
+moved and no re-point sweep was needed. Branch arithmetic verified: the new
+`bne` at offset 34 has disp `0x54` -> `36 + 84 = 120`, the pop sequence; the
+pre-existing `bne` at offset 12 still resolves to `14 + 0x6e = 124`, the
+final `rts`. P1 (`$381 == 0`) falls through the `bne`, executes two NOPs and
+copies to `a1 = 0x90C2E0` = row `0x17` exactly as before.
+
+**Measured.**
+- Row `0x1A` holds Pyron's vs2 palette (`alpha(vs2[0x3BB15C])`) across the
+  whole select with P2 parked on Donovan; before, it flipped to
+  `f000/ffff/fdff` at f1100 and stuck.
+- P1's accent on row `0x17` is byte-for-byte identical to merged18.
+- `38_victor_p1_vsavj`, `05_timeout_idle`, `63_idle_select`: **BIT-IDENTICAL**
+  checksum logs merged18 vs merged19. Replay 38 is the one whose one-main-loop
+  slip forced the 14z-88 revert of the previous attempt at this bug; the
+  changed path runs only on a P2 tenant hover, which no legacy replay performs.
+- Pixel-diff of the select frame, merged18 vs merged19: exactly TWO regions
+  differ — the medallion (x160-223 y160-191) and the P2 figure's sword
+  (x256-351 y96-191). Nothing else.
+
+**The trade, as the board shows it** (maintainer, CRT, 2026-08-29:
+*"the sword is actually orange, and only on the select wheel screen, this is
+a good tradeoff"*). The sword does NOT revert to the vanilla grey ramp — that
+was the pre-62k state, before a medallion lived in that row. It draws with
+whatever row `0x1A` holds, which is now Pyron's medallion palette: its pixels
+move from steel blue-white `(153,170,221)` to orange-gold `(255,136,34)`, and
+on Donovan's own gold-and-red costume that reads as the sword being absent.
+Confined to the select screen — no in-match surface, which is what the site
+(`PRG:0x05F9D0`, the select-figure uploader) predicts and the board confirms.
+
+**A partial fix is impossible, measured rather than assumed.** "Write the
+accent only into the pens the medallion does not use" cannot work: the sword
+and the medallion draw from THE SAME entries of row `0x1A` — 23 shared
+colours in the rendered frame — so the row cannot be split by pen.
+
+**Gate.** `tests/test_pyron_medallion_2p.sh` (emulator tier, ~5 min, two
+runs). Leg 1: P2 hovers Donovan, row `0x1A` must hold Pyron's palette. Leg 2
+MUST-FIRE: P1 hovers Donovan, row `0x17` must still RECEIVE the accent — so
+nobody can "fix" leg 1 by deleting the thunk and silently undoing 14z-62k.
+Verified FAIL on merged18, PASS on merged19. It closes a real coverage gap:
+`test_wheel_bank5` section 3b already asserted all three medallion rows, but
+both of its protocols (replays 63/64) are SINGLE-PLAYER, so it could never
+see a P2-hover bug and stayed green through every freeze.
+
+**Build.** `build/m3b_merged19`, fingerprint `af21bc887a45b2ed6f0f15659bf779e4a0d2ab7c`.
+UNREGISTERED / UNFROZEN at the 14z-116 close — the freeze battery is 14z-117.
+
 ## 14z-115 — THE SELECT-WHEEL SEPARATION (maintainer-directed "E2", approved 2026-08-28): byte detail
 
 **What and why.** The three appended medallions (Phobos 0x10 / Pyron 0x11 /

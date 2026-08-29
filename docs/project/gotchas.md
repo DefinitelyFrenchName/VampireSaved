@@ -3136,3 +3136,46 @@ tooling was never the gap — its SYSTEMATIC use was:** WIDE_RECORD existed
 since 14z-9x, HANDOFF called a recorded report "a replay protocol", and no
 gate consumed one until `tests/test_inp_corpus.sh` (14z-111). Now law in
 CLAUDE.md §4 ("FIELD REPORTS ARE RECORDINGS").
+
+## OUR OWN WHEEL BREAKS VANILLA NAVIGATION PATHS — compute rig routes from the BUILT table (paid: 14z-116, one wasted rebuild)
+
+Every cursor path in an old replay, doc or session log was derived from
+vanilla's TABLE B. **The port re-points live rows in that table** — cell
+`0x08`'s DOWN edge goes to `0x10` (Phobos) on a WIDE build, which is how the
+new cells are reachable at all. So vanilla's route to the "?" cell,
+`D,D,D` from P1's default, walks past it into Phobos; the correct route on a
+WIDE build is `D,D,DR`. The 14z-116 Shadow rig used the vanilla route,
+landed both players on the wrong cells, produced a clean-looking run with
+`$3BC` never set, and cost a full rebuild before the paths were recomputed.
+
+**Rule:** derive navigation paths from the BUILD'S OWN TABLE B
+(`build/<dir>/verify_data.bin` at `PRG:0x0211E4`, 32 rows x 8, order
+`R L D U DR DL UR UL`) with a BFS, never from a vanilla path or an older
+replay's header. Both 14z-116 rigs carry their computed routes in the
+replay header with the reason, and so should the next one.
+
+## A PARKED ITEM THAT LIVES ONLY IN STATE_HISTORY GETS RE-REPORTED (paid: 14z-116)
+
+Pyron's medallion white-out was root-caused, parked and fully documented —
+in `STATE_HISTORY.md`. The LIVE cosmetic backlog in `STATE.md` never carried
+a row for it. Consequence: the maintainer re-reported it from the board as a
+fresh observation, and the session that picked it up started from a STATE
+entry that named the wrong mechanism (the accent march, retired two sessions
+after the entry was written).
+
+**Rule:** when an item is parked rather than closed, it belongs in the LIVE
+backlog with its mechanism, not only in the session record that parked it.
+The archive is where you look up HOW something was investigated; the live
+document is what stops it being investigated twice.
+
+## AN mtime IS NOT A DATE UNLESS YOU PRINT THE DATE (paid: 14z-115, corrected 14z-116)
+
+14z-115 recorded an open instrument question that included "`emu/fbneo/fbneo`
+mtime 16:35:59 by an unidentified writer" — read as a same-session rewrite
+and used to suspect the binary. `ls -l` prints only `HH:MM` for recent files.
+The full stamp is **2026-08-17 16:35:59**: eleven days earlier, and nothing
+touched the binary during 14z-115.
+
+**Rule:** print the full timestamp (`stat -f '%Sm' -t '%Y-%m-%d %H:%M:%S'`,
+or `ls --time-style=full-iso`) before drawing any conclusion from a file
+time — especially one that will be written into a standing open question.

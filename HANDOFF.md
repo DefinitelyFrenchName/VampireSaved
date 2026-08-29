@@ -3167,6 +3167,22 @@ tests/test_oboro_select.sh [wide stock] # 14z-105 (W1, ~4 min, 5 MAME runs): THE
                                       # pokes — the pick is made with the
                                       # sticks. Verdict control. Defaults
                                       # build/m3b_merged13 + build/m5_stock6
+tests/test_pyron_medallion_2p.sh [wide] # 14z-116 (~5 min, 2 MAME runs): THE
+                                      # P2-HOVER half of medallion palette
+                                      # stability. Row 0x1A is BOTH Pyron's
+                                      # medallion row and the P2 figure's
+                                      # sword-accent slot; the 62k thunk's
+                                      # P2 branch no longer writes it.
+                                      # Leg 1: P2 hovers Donovan -> 0x1A
+                                      # holds Pyron's vs2 palette. Leg 2
+                                      # MUST-FIRE: P1 hovers Donovan -> row
+                                      # 0x17 still RECEIVES the accent, so
+                                      # leg 1 cannot be "passed" by deleting
+                                      # the thunk. CLOSES A COVERAGE GAP:
+                                      # test_wheel_bank5 3b's two protocols
+                                      # are both single-player and could
+                                      # never see this. Default
+                                      # build/m3b_merged19
 tests/test_shadow_tenant.sh [wide]   # 14z-116 (~6 min, 2 MAME runs): SHADOW
                                       # MORPHING INTO A TENANT. The "?" cell
                                       # + FIVE START PRESSES arms $43
