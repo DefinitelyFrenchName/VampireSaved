@@ -28,7 +28,8 @@
 > ## unchanged). Gates: `test_random_select_tenants.sh` (emulator tier,
 > ## CONTROL = the previous merged; when `m3b_merged19` rolls off, re-point
 > ## or accept its SKIP). Full numbers: STATE 14z-117 (2) and its CLOSE.
-> ## **Push status: check `git status -sb`, not this line.**
+> ## **Everything PUSHED at the maintainer's word (fork, main, tags) — check
+> ## `git status -sb`, not this line.**
 > ##
 > ## **OPEN, unchanged:** the maintainer's 1:1 wheel mockup; #112/#113
 > ## parked; the FBNeo two-run-family question; the tenant CPU AI
