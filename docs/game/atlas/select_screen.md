@@ -172,7 +172,10 @@ size (the earlier figure is a sprite corner, this is the ring centre).
 
 Worth knowing before someone builds an auto-generator. Fitting the shipped
 TABLE B with "step to the nearest cell inside this direction's sector"
-reproduces at best **100 of 128 transitions (78%)** — with horizontal wrap
+reproduces at best **100 of 128 transitions (78%)** — that is the FIT's
+score, not the table's: the shipped table itself is measured 128/128 by
+`test_select_wheel.sh` §3, and the 28 the geometry misses are the hand
+choices this section is about — with horizontal wrap
 (period 184; the wheel wraps left↔right, cell `01` at x=160 goes L to `05`
 at x=336) , no vertical wrap, and ±65° sectors. Every simpler variant does
 worse; plain nearest-in-sector with no wrap manages 67%.
@@ -499,14 +502,17 @@ screen and `$0000` without; the per-player Start bitmask `RAM:$FF8060`
 reads `1` at the same time), and a confirm of **2-3 punches**
 (`d0` in `300/500/600/700`) or **2-3 kicks** (`3000/5000/6000/7000`), the id
 is overwritten with **`0x12`** — Gallon's variant — with `d1` recording
-which of the two. Id `0x12`'s per-character data rows are byte-identical to
-`0x02`'s, so it is the same character under a different id.
+which of the two. Id `0x12`'s hitbox / dispatch / anim rows are
+byte-identical to `0x02`'s and its two palette-pointer rows are its OWN
+(`character_tables.md`, `test_effect_palette_table.sh`): Gallon's moveset
+under a dark palette — Dark Gallon. *(This sentence said "the same
+character under a different id" until 14z-118.)*
 
 This is the only place vanilla writes a variant-half id as an immediate,
 and it makes `0x12` **reserved**: no tenant may take it
-(`docs/game/atlas/id_space.md`). It is also the likely resolution of the
+(`docs/game/atlas/id_space.md`). It IS the resolution of the former
 "Dark Talbain rides a different mechanism" open item in
-`character_tables.md`.
+`character_tables.md` — decoded 14z-116, played on the board 2026-08-28.
 
 ## The Oboro select hook (14z-105, the port's own path to `0x18`)
 
@@ -930,7 +936,7 @@ member identity + negative controls + the engine's own bank-5 walk).
 Legacy window consequence: onset 890 -> 889, end 2362 -> 2415 on the
 pick replays (the init writes the bank word one frame before the old
 onset's cache divergence; 0x5FD02 re-converges it) — re-frozen in
-`test_tenant_select_records.sh` §4, folds into the pending re-freeze.
+`test_tenant_select_records.sh` §4; folded into the donovan-m3a freeze (14z-64, HANDOFF registry) and carried by every freeze since *(this line said "the pending re-freeze" until 14z-118)*.
 
 ## The ring/highlight POSITION source — the 32-row base table (14z-63)
 

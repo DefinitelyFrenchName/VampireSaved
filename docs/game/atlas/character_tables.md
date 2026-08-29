@@ -38,18 +38,30 @@ Variant half (0x10-0x1F) aliases the base half except:
 - **vsavj: slot 0x8 only** — slot 0x8 is Bishamon (verified by pick), so the
   variant dataset 0x18 (base 0x0B3450) is **Oboro Bishamon**, the hidden
   boss version. (Early hypothesis "Dark Talbain" was wrong — Dark Talbain
-  must ride a different mechanism; open item.)
-  **RESOLVED 14z-60k (likely):** the select screen writes id **`0x12`**
-  outright at `PRG:0x020BB6`/`0x020BC6` when the cursor is on Gallon
-  (`0x02`) and the confirm is 2-3 punches or 2-3 kicks with an input bit
-  held. `0x12`'s data rows are byte-identical aliases of `0x02`, i.e. the
-  same character under a different id — the shape a Dark Talbain would
-  take. Detail in `docs/game/atlas/id_space.md`; not yet confirmed by playing
-  it.
+  rides the select-screen write below; RESOLVED, no longer open.)
+  **RESOLVED 14z-60k; CONFIRMED 14z-116 (static decode of the trigger at
+  `PRG:0x020C18`: two OR three punches, or kicks) and ON THE BOARD
+  2026-08-28 (maintainer, MiSTer: "Dark Gallon is properly selectable with
+  hold start + 3 punches" — STATE hidden-character block):** the select
+  screen writes id **`0x12`** outright at `PRG:0x020BB6`/`0x020BC6` when
+  the cursor is on Gallon (`0x02`), START is held and the confirm is 2-3
+  punches or 2-3 kicks. `0x12`'s rows are byte-identical copies of
+  `0x02`'s in the hitbox / dispatch / anim tables, **and `0x12` has ITS OWN
+  rows in the two palette pointer tables** (`0x38C198` / `0x38C218` — the
+  exception the table below records and `tests/test_effect_palette_table.sh`
+  assertion 2 freezes): the same moveset under a dark palette, which is
+  what Dark Gallon is. *(Until 14z-118 this paragraph said "byte-identical
+  aliases" with no palette exception and "not yet confirmed by playing it",
+  while the table below already carried the exception — the one-hop
+  error class the documentation audit exists for.)*
 - **vsav2 & vhunt2: slots {0x0, 0x1, 0x3, 0x8, 0x9}** → five true alternate
   datasets. This is Capcom's own dual-flavor (Start-hold) infrastructure —
   the mechanism SPEC §3.3 wants to reuse. Which characters occupy them in
-  those sets: open item (naming runs on vsav2 planned).
+  those sets: **Huitzil/Phobos `0x10`, Pyron `0x11`, Donovan `0x13`, and
+  two Oboro-class Bishamons `0x18`/`0x19`** — `id_space.md` "The other two
+  variant datasets" and its `test_id_space.sh` freeze ("bank rows distinct
+  at 10 11 13 18 19"). *(This line said "open item (naming runs on vsav2
+  planned)" until 14z-118; the naming was settled by 14z-60/14z-105.)*
 - **vsav2 ≡ vhunt2 per-slot hitbox data is byte-identical** (all 32 entries)
   — both games carry both flavors; they differ elsewhere (defaults/UI).
 

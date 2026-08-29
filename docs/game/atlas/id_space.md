@@ -132,8 +132,9 @@ PER-FIELD** — it counts folds applied to `$382(An)`, and derived fields
 carry their own. Do not read "7 sites" as "7 places in the game".
 
 A complete folding census has to follow those fields to *their* consumers.
-`$a(An)` is the owner-char-id an object carries, so its readers are the
-likely place for further masks.
+`$a(An)` is the owner-char-id an object carries, so its readers were the
+obvious place to look for further masks — and the bounded census that
+follows found none.
 
 A **bounded** follow-up censused the three distinctive fields — `$b1`
 (2 register reads), `$58` (26), `$9c` (6) — and found **no `andi` below
@@ -304,13 +305,18 @@ vsavj's `0x12` is the **Gallon variant** path, on the select screen:
 020BC6  move.b #$12,$382(a6)  ; -> id 0x12          (d1 = 1)
 ```
 
-Id `0x12`'s per-character rows are **byte-identical aliases of `0x02`**
-(hitbox base, dispatch, anim index, `word132` all verified equal), i.e. the
-same character under a different id — which is how an alternate version
-that shares its data would be built. This is consistent with the
-**Dark Talbain** secret that `character_tables.md` records as "must ride a
-different mechanism; open item", and is very likely its resolution. Stated
-as consistent-with rather than proven: nobody has selected it and watched.
+Id `0x12`'s per-character rows are **byte-identical aliases of `0x02`** in
+the four tables this audit covers (hitbox base, dispatch, anim index,
+`word132` all verified equal) — **but NOT in the two palette pointer tables
+`0x38C198`/`0x38C218`, where `0x12` owns its rows** (`character_tables.md`
+"Both variant halves alias the base half except at rows 0x12 and 0x18";
+frozen by `tests/test_effect_palette_table.sh` assertion 2). Same moveset,
+own palette: that IS Dark Gallon. *(Until 14z-118 this paragraph stopped at
+"same character under a different id" and called the Dark Talbain link
+"very likely … nobody has selected it and watched".)* It was selected and
+watched: the trigger was decoded 14z-116 (`PRG:0x020C18`) and the maintainer
+played it on the board 2026-08-28 — the `character_tables.md` "open item" is
+RESOLVED.
 
 vsav2's `0x19` is its second Oboro-class dataset, exactly as
 `character_tables.md` documents; its neighbouring sites `0x01F5A8`/`0x01F5BC`
