@@ -120,7 +120,7 @@ Verified FAIL on merged18, PASS on merged19. It closes a real coverage gap:
 both of its protocols (replays 63/64) are SINGLE-PLAYER, so it could never
 see a P2-hover bug and stayed green through every freeze.
 
-**Build.** `build/m3b_merged19`, fingerprint `af21bc887a45b2ed6f0f15659bf779e4a0d2ab7c`.
+**Build.** `build/m3b_merged19`, fingerprint `af21bc887a45b2ed6f0f15659bf779e4a0d2ab7c` *(superseded 14z-117: the same directory rebuilt with the M10 mark = `cde712e1`, frozen as merged-m12 — see the entry above)*.
 UNREGISTERED / UNFROZEN at the 14z-116 close — the freeze battery is 14z-117.
 
 ## 14z-115 — THE SELECT-WHEEL SEPARATION (maintainer-directed "E2", approved 2026-08-28): byte detail
