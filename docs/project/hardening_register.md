@@ -246,6 +246,12 @@ Re-point the `[merged_*]` sections at every merged freeze.
   `test_pointer_flow` baselines re-frozen 14z-115 with attribution (the two
   STRONG win_pal bases shifted +0x20 with the grown wheel record; WEAK
   data:long DROPPED 1-2 per build).
+  **14z-117 (the Pyron-medallion freeze): hui50/pyron34/don_m16 +
+  `[merged_*]` on m3b_merged19; inventories IDENTICAL (no region moved — ten
+  in-place thunk bytes + one glyph); `test_pointer_flow` baselines re-frozen
+  as merged-m12 / donovan-m16 / huitzil-m23 / pyron-m17: WEAK data:long +1
+  on every build (the one new 4-byte glyph coord pair), STRONG unchanged;
+  escape triage 25 verdicts identical.**
 - `test_pointer_flow.sh` NEW (ci_static): the comb, frozen baselines,
   synthetic must-fail controls both directions.
 - `bases.tsv` re-derived + re-derive-at-every-freeze note (14z-100).

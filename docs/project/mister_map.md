@@ -182,7 +182,7 @@ many codes it uses. Measured on the shipped merged build
 | group C obj bank | non-blank codes | highest **non-blank** code | highest code in the **manifests** | address footprint |
 |---|---|---|---|---|
 | 4 (fighter bands, effects, strips) | 45,736 | `0xEE73` | `0xEE73` (`patch/effect_map.json`) | `0xEE74 × 128` = **`0x773A00`** = 7.452 MB |
-| 5 (select/wheel art, ported effects) | 6,271 (6,245 until 14z-115: +26 outline-tile codes at `0x1F800+`, inside the extent) | `0xFE41` | `0xFFDB` (`patch/effect_c5.*.json`) | `0xFFDC × 128` = **`0x7FEE00`** = 7.995 MB |
+| 5 (select/wheel art, ported effects) | 6,272 (6,271 until 14z-117: +1 glyph code, the M10 mark's third character at `0x1FE42`; 6,245 until 14z-115: +26 outline-tile codes at `0x1F800+`) | `0xFE42` (`0xFE41` until 14z-117) | `0xFFDB` (`patch/effect_c5.*.json`) | `0xFFDC × 128` = **`0x7FEE00`** = 7.995 MB |
 | | | | **total** | **15.45 MB** |
 
 `0xEE73` is not a coincidence — it is exactly the top of Donovan's frozen

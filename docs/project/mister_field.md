@@ -59,7 +59,11 @@ Phoenix); no gate covers it and it would need the zips beside it.
 iff its `games/mame/vsavjw.zip` matches the freeze's
 `build/<dir>/rompath/vsavjw.zip`; the other three zips are the pristine
 parents from `$ROMDIR`. `../mister_fieldtest_14z115/` was verified current
-against `build/m3b_merged18` this way at 14z-116. **Its README was missing**
+against `build/m3b_merged18` this way at 14z-116; `../mister_fieldtest_14z117/`
+(merged-m12, M10) was assembled at 14z-117 from `tools/mister_mra.sh --wide
+build/m3b_merged19` output and verified against `build/m3b_merged19`
+(vsavjw.zip sha1 `6f566053…`; its STOCK CONTROL MRA is byte-identical to
+14z-115's, the `.rbf` unchanged). **Its README was missing**
 — every earlier bundle had one — and was written at 14z-116; if a bundle is
 assembled by hand again, the README is part of it.
 

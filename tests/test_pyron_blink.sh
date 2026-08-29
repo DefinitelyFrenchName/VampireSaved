@@ -55,7 +55,7 @@ fail=0
 # DEFAULT RE-POINTED 14z-92 (pyron17, pre-v1.1, MAME-refused) -> pyron26,
 # and 14z-103 -> pyron30 (pyron-m13, the current freeze). Every generation
 # carries the same blink fix pyron17 introduced. Re-point at each freeze.
-BUILD="${1:-build/pyron33}"
+BUILD="${1:-build/pyron34}"  # re-pointed 14z-117 (pyron-medallion freeze) <- 14z-115
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="${PYRON_BLINK_EXPECT:-fixed}"
 export MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"

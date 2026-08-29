@@ -1,0 +1,11 @@
+# pointer-flow baseline for merged-m12 (build/m3b_merged19), frozen 14z-117 — the Pyron-medallion freeze (M10).
+# vs the 14z-115 baseline (merged-m11): the M10 mark adds ONE glyph entry to the copied wheel record's
+# coord list (one 4-byte pair) and the medallion fix rewrites ten thunk bytes IN PLACE (body length
+# unchanged, no allocation moved); the WEAK data:long count grows by exactly 1 — that pair reads
+# as one more 4-byte WIDE-hole window. STRONG content unchanged; nothing new is a pointer.
+# STRONG lines are REVIEWED findings (see hardening_register.md);
+# WEAK-COUNT lines freeze the noise volume — growth = investigate.
+STRONG	code:movea_imm	0x4d3970+0x16	0x4c6ef0	WIDE-HOLE
+STRONG	code:movea_imm	0x4d3970+0x24	0x4cce90	WIDE-HOLE
+WEAK-COUNT	data:long	1182
+WEAK-COUNT	code:move_imm	3

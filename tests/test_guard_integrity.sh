@@ -27,7 +27,7 @@ cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
-BUILD="${GUARD_BUILD:-build/hui49}"
+BUILD="${GUARD_BUILD:-build/hui50}"  # re-pointed 14z-117 (pyron-medallion freeze) <- 14z-115
 RPL="${GUARD_REPLAY:-tests/replays/11_pick_donovan.rpl}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary at $MAME_BIN"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }

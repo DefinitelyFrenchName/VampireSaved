@@ -819,9 +819,9 @@ march_retarget_mid = true
 # same-source-or-fail names any future collision). Screen position =
 # the empty bottom-right corner (measured on merged-m5 snapshots, 14z-105).
 # THE TEXT NAMES THE FREEZE GENERATION — change it at every freeze.
-version_text = "M9"
+version_text = "M10"
 version_font = "build/manifest/version_font.json"
-version_x = 340
+version_x = 324
 version_y = 202
 version_pal = 0x19
 version_base = 0x1FE40

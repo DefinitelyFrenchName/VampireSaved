@@ -24,8 +24,8 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-for d in build/don_m15/extract build/hui49/extract build/pyron33/extract \
-         build/m3b_merged18/patch/placements.json; do  # re-pointed 14z-115 (select-wheel separation freeze); 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
+for d in build/don_m16/extract build/hui50/extract build/pyron34/extract \
+         build/m3b_merged19/patch/placements.json; do  # re-pointed 14z-117 (pyron-medallion freeze) <- 14z-115
     [ -e "$d" ] || { echo "SKIP: $d absent"; exit 0; }
 done
 fail=0

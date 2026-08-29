@@ -52,7 +52,7 @@ cd "$REPO"
 fail=0; ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }
 
 RPL="$REPO/tests/replays/11_pick_donovan.rpl"
-BUILD="build/m3b_merged18"  # re-pointed 14z-115 (select-wheel freeze) <- 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
+BUILD="build/m3b_merged19"  # re-pointed 14z-117 (pyron-medallion freeze) <- 14z-115
 FRAMES=2900
 EXPECT="$REPO/tests/expect/mister_prg_window.txt"
 OUTDIR=""; POSLOG=""; NEGLOG=""; FREEZE=0

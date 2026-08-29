@@ -394,3 +394,16 @@ left dangling (`tools/verify_pcrel_data.py` docstring, HANDOFF's
 `m5_stock3` (evidence). Current + one back now: `don_m14/m15`,
 `hui48/49`, `pyron32/33`, `m3b_merged17/18`, `m5_stock9/10`.
 
+## THE 14z-117 SWEEP (Pyron-medallion freeze) — applied under the policy
+
+Deleted at the freeze (N-2 per track, grep-four-places read for intent,
+`run_all_static --strict` before the commit): `don_m14`, `hui48`, `pyron32`,
+`m3b_merged17`, `m5_stock9` (tracked metadata `git rm`'d; recoverable via
+`freeze/*` tags + a historical rebuild). The four-places grep found NO live
+path reference to any of them — only three LABEL strings
+(`test_merged_render_content.sh` "== don_m14"-style `chk` labels and
+`test_region_overlap.sh`'s "CURRENT trio" banner) that the 14z-115 sweep had
+left naming N-1 builds; re-labelled to the current names. Kept:
+`m3b_merged15` (the deferred `test_inp_crash_merged_m8_01` defect-mode item —
+the maintainer's call), `m5_stock3` (evidence). Current + one back now:
+`don_m15/m16`, `hui49/50`, `pyron33/34`, `m3b_merged18/19`, `m5_stock10/11`.

@@ -74,7 +74,7 @@ export MAME_BIN
 JOBS="${JOBS:-6}"
 OUT="${PAIRINGS_OUT:-build/legacy_pairings}"
 CHK="python3 $REPO/tools/check_legacy_pairings.py"
-BUILDS="${*:-build/don_m15:13 build/hui49:10 build/pyron33:11}"  # re-pointed 14z-115 (select-wheel freeze) <- 14z-110b
+BUILDS="${*:-build/don_m16:13 build/hui50:10 build/pyron34:11}"  # re-pointed 14z-117 (pyron-medallion freeze) <- 14z-115
 FIELDS="ff8782:b:p1id,ff8b82:b:p2id,ff8460:l:p1hb,ff8860:l:p2hb"
 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT

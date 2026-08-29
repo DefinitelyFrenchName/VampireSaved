@@ -1,4 +1,51 @@
-# NEXT SESSION — orientation (rewritten at the 14z-116 close, 2026-08-29)
+# NEXT SESSION — orientation (rewritten at the 14z-117 close, 2026-08-29)
+
+> ## **START HERE. NOTHING IS RED. THE PYRON-MEDALLION FREEZE IS DONE —
+> ## merged-m12 (M10) is frozen, tagged, released and bundled; the next
+> ## event is the BOARD VERDICT on `../mister_fieldtest_14z117/` (the tell
+> ## is "M10" bottom-right, three glyphs).**
+> ##
+> ## **WHAT 14z-117 DID, one breath:** rebuilt the four tracks with the mark
+> ## M9 -> M10 (`version_x` 340 -> 324 — a third glyph at 340 clips at pixel
+> ## 384), ran the whole 14z-115 battery, and froze donovan-m16 `7950c844` /
+> ## huitzil-m23 `7ade3180` / pyron-m17 `01b39c39` / merged-m12 `cde712e1`
+> ## (`build/m3b_merged19`, 819 ops), stock twin `m5_stock11` = `d29fd062`
+> ## UNCHANGED. **The battery WAS cheap, as predicted:** on every build only
+> ## three ops changed content and NO address moved; every masked legacy
+> ## class passed on all three suites; the moved `.sha1`s were exactly the
+> ## 14z-115 tenant/select-rig inventory (+ `113_shadow_vs_tenant`, frozen
+> ## for the first time), attributed on 103 and 92 by DUMPS diff — execution
+> ## position + dead stack, zero bytes past the victory screen. Pointer-flow
+> ## WEAK +1 per build (the new coord pair); MiSTer bank-5 census 6,272 /
+> ## extent `0xFE42` (the third glyph). merged_legacy 47/47, guard corpus
+> ## 344/344, roster pairings 111/111, legacy pairings and strict — STATE
+> ## 14z-117 CLOSE has the final numbers.
+> ##
+> ## **THE MiSTer TAIL WAS NOT EMPTY** (the program moved): fork `80e08111`
+> ## (catalogue: six CRCs), patch 0026, pin bumped, `release/merged-m12/`,
+> ## bundle `../mister_fieldtest_14z117/` (STOCK CONTROL MRA byte-identical
+> ## to 14z-115's, `.rbf` unchanged — flash nothing). **Fork NOT pushed,
+> ## main NOT pushed** until the maintainer says so; check `git status -sb`
+> ## and `git -C emu/jtcores status -sb`, not this line.
+> ##
+> ## **ONE TRAP PAID FOR, in `project/gotchas.md`:** the re-point sweep
+> ## stamped four lines ending in `\` — `test_pointer_flow` PASSED with a
+> ## truncated `for` list. Read a re-pointed gate's PASS by its per-item
+> ## lines, and grep `'\\ *# re-pointed'` after every sweep.
+> ##
+> ## **OPEN, unchanged:** the maintainer's 1:1 wheel mockup (replaces the
+> ## outline tiles through the same knobs); random select "include the
+> ## tenants" (shape in STATE 14z-116, not built); #112/#113 parked; the
+> ## FBNeo two-run-family question; the tenant CPU AI "lackluster" note.
+> ##
+> ## **STATE OF THE BUILDS:** play `tools/run_wide.sh build/m3b_merged19
+> ## fbneo`. Current + one back: `don_m15/m16`, `hui49/50`, `pyron33/34`,
+> ## `m3b_merged18/19`, `m5_stock10/11`.
+
+# HISTORY BELOW — the 14z-116, 14z-114, mid-14z-114 and 14z-113 orientations and older;
+# kept for the census anchors, eliminations and traps, superseded as the opener.
+
+## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-116 close, 2026-08-29 — superseded by the 14z-117 opener above)
 
 > ## **START HERE. THE WORK IS THE FREEZE BATTERY, and it is the whole
 > ## session — start it fresh, on a full context budget. 14z-110b closed at
@@ -77,8 +124,6 @@
 > ## fbneo`. merged18 is the last FROZEN set (merged-m11, M9); merged19 is
 > ## the candidate. Everything is PUSHED (`origin/main` = `8055a27`).
 
-# HISTORY BELOW — the 14z-114, mid-14z-114 and 14z-113 orientations and older;
-# kept for the census anchors, eliminations and traps, superseded as the opener.
 
 ## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-114 close, 2026-08-28 — superseded by the 14z-115 opener above)
 

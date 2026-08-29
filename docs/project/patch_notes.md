@@ -1,5 +1,50 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-117 — THE PYRON-MEDALLION FREEZE (donovan-m16 / huitzil-m23 / pyron-m17 / merged-m12, mark M10): byte detail
+
+**What.** The 14z-116 medallion fix (below — ten in-place bytes in
+`select_sword_pal_variant_id`'s body, length unchanged) shipped under the
+freeze battery, plus the mark bump **M9 -> M10**. Nothing else moved.
+
+**The mark is now THREE glyphs, and it moved 16 px left.** `version_text =
+"M10"` appends one more 1x1 glyph entry to the copied `roster21` record
+(entries 27, was 26: the 21 cells + 3x[outline, medallion] interleave + 3
+glyphs) and one more coord pair to its coord list (+4 bytes, absorbed by the
+allocation's alignment slack — **no address moved**, measured: the three
+solos' op sets differ from their predecessors only in CONTENT at the coord
+list, the record head (`0x19 -> 0x1A` entry count) and the thunk body). The
+third tile is `GFX:tile 0x1FE42` (authored, provenance NEW, group C bank 5's
+extent `0xFE41 -> 0xFE42`, live count 6,271 -> 6,272). `version_x` is
+**324** (was 340 since 14z-105): the glyph ink box is 10 px centred in the
+16 px cell, so a third cell at x=372 puts the "0"'s last ink column at pixel
+384 — off the 384-wide screen. At 324 the string spans 324..372 and the
+pixel-exact gate (`test_version_string.sh`, which reads the knobs from the
+manifest) holds with ZERO mismatches on the live snapshot.
+
+**Members moved** (whole-artifact manifests, per build): the three solos
+`vsw.31m/33m/35m/37m` (the third glyph tile) + `vsw.41` (the coord pair
+and the thunk body — solos allocate that thunk in the ext); the merged
+image additionally `vm3j.10b`, because its copy of the thunk sits in hole
+b (`PRG:0x3FFC60`-, the 14z-116 write-tap attribution). Stock twin:
+**every member identical** (`af4f5e98… 30`, the `only_variant_slot` thunk
+does not exist there; measured by rebuild, `d29fd062` unchanged).
+
+**Fingerprints.** donovan-m16 `7950c844` (`build/don_m16`, 332 ops),
+huitzil-m23 `7ade3180` (`build/hui50`, 366), pyron-m17 `01b39c39`
+(`build/pyron34`, 303), merged-m12 `cde712e1` (`build/m3b_merged19`, 819
+ops), stock twin `build/m5_stock11` = `d29fd062` UNCHANGED. The 14z-116
+candidate `af21bc88` was these same bytes under the M9 mark and is
+superseded by the rebuild in place.
+
+**Frozen expectations that moved, attributed:** `test_pointer_flow`
+baselines (WEAK `data:long` +1 on every build — the one new 4-byte coord
+pair reads as one more WIDE-hole window; STRONG lines unchanged); the
+MiSTer bank-5 census (`audit_mister_map_fit`, `mk_mister_page` bucket 63
+2 -> 3); the suites' self-frozen tenant/select-rig `.sha1`s (attribution in
+STATE 14z-117: OBJ-builder execution position + dead stack at select
+frames, zero bytes past the victory screen). Escape triage: 25 verdicts
+IDENTICAL. `pcrel_escapes` inventories IDENTICAL.
+
 ## 14z-116 — PYRON'S MEDALLION WHITE-OUT: byte detail (maintainer-chosen fix, field-validated 2026-08-29)
 
 **What and why.** Select palette row `0x1A` is BOTH Pyron's medallion row

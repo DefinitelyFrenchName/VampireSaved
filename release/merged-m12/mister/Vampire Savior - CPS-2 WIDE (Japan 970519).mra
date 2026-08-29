@@ -1,0 +1,110 @@
+<!--          FPGA arcade hardware by Jotego
+
+              This core is available for hardware compatible with MiST and MiSTer
+              Other FPGA systems may be supported by the time you read this.
+              This work is not mantained by the MiSTer project. Please contact the
+              core author for issues and updates.
+
+              (c) Jose Tejada, 2026. Please support this research
+              Patreon: https://patreon.com/jotego
+
+              The author does not endorse or participate in illegal distribution
+              of copyrighted material. This work can be used with compatible
+              software. This software can be homebrew projects or legally
+              obtained memory dumps of compatible games.
+
+              This file license is GNU GPLv2.
+              You can read the whole license file in
+              https://opensource.org/licenses/gpl-2.0.php
+
+-->
+
+<misterromdescription default="ff,ff">
+    <about author="jotego" webpage="https://patreon.com/jotego" source="https://github.com/jotego" twitter="@topapate"/>
+    <name>Vampire Savior: The Lord of Vampire (Japan 970519, CPS-2 WIDE v1)</name>
+    <setname>vsavjw</setname>
+    <rbf>jtcps2w</rbf>
+    <mameversion>0251</mameversion>
+    <year>1997</year>
+    <manufacturer>Capcom</manufacturer>
+    <players>2</players>
+    <joystick>8</joystick>
+    <rotation>horizontal</rotation>
+    <region>World</region>
+    <mraauthor>jotego,atrac17</mraauthor>
+    <rom index="0" zip="vsavjw.zip|vsav.zip|qsound.zip" md5="None" address="0x30000000" asm_md5="31f05254676e594c4ce30014bfc3eabd">
+        <part>
+            00 18 00 19 C0 3C C0 FC
+            FF FF FF FF FF FF FF FF
+            32 FF 00 02 04 06 26 28
+            2A 2C 2E 00 00 30 02 04
+            08 30 FF FF FF FF FF FF
+            FC FE FF FF </part>
+        <!-- key - starts at 0x0 - length 0x14 (5 bits) -->
+        <part name="vsavj.key" crc="36d28ab8"/>
+        <!-- maincpu - starts at 0x14 - length 0x600000 (23 bits) -->
+        <part name="vm3j.03d" crc="83731703"/>
+        <part name="vm3j.04d" crc="96820a87"/>
+        <part name="vm3j.05a" crc="95ce88d5"/>
+        <part name="vm3j.06b" crc="2c4297e0"/>
+        <part name="vm3j.07b" crc="6871ce21"/>
+        <part name="vm3j.08a" crc="5773e5c9"/>
+        <part name="vm3j.09b" crc="d064f8b9"/>
+        <part name="vm3j.10b" crc="242bfe2a"/>
+        <part name="vsw.41" crc="ea2afb58"/>
+        <part name="vsw.42" crc="4c97be51"/>
+        <part name="vsw.43" crc="504bf849"/>
+        <part name="vsw.44" crc="ceb1784e"/>
+        <!-- audiocpu - starts at 0x600014 - length 0x40000 (18 bits) -->
+        <part name="vsw.z01" crc="153600b9"/>
+        <part name="vsw.z02" crc="26b6ecc5"/>
+        <!-- qsound - starts at 0x640014 - length 0x800000 (23 bits) -->
+        <interleave output="16">
+            <part name="vm3.11m" crc="e80e956e" map="12"/>
+        </interleave>
+        <interleave output="16">
+            <part name="vm3.12m" crc="9cd71557" map="12"/>
+        </interleave>
+        <!-- qsoundw - starts at 0xE40014 - length 0xF0000 (20 bits) -->
+        <interleave output="16">
+            <part name="vsw.21m" crc="f6c937e1" map="12" length="0xF0000"/>
+        </interleave>
+        <!-- gfx - starts at 0xF30014 - length 0x3000000 (26 bits) -->
+        <interleave output="64">
+            <part name="vm3.13m" crc="dd2551ff" map="00000021"/>
+            <part name="vm3.15m" crc="bc1b3db8" map="00002100"/>
+            <part name="vm3.17m" crc="c9727c5c" map="00210000"/>
+            <part name="vm3.19m" crc="8bf92753" map="21000000"/>
+        </interleave>
+        <interleave output="64">
+            <part name="vm3.14m" crc="c1a28e6c" map="00000021"/>
+            <part name="vm3.16m" crc="194a7304" map="00002100"/>
+            <part name="vm3.18m" crc="df9a9f47" map="00210000"/>
+            <part name="vm3.20m" crc="c22fc3d9" map="21000000"/>
+        </interleave>
+        <interleave output="64">
+            <part name="vsw.31m" crc="d75f7a69" map="00000021"/>
+            <part name="vsw.33m" crc="b86af29e" map="00002100"/>
+            <part name="vsw.35m" crc="4eae3882" map="00210000"/>
+            <part name="vsw.37m" crc="8b26a9e9" map="21000000"/>
+        </interleave>
+        <!-- firmware - starts at 0x3F30014 - length 0x2000 (13 bits) -->
+        <part name="dl-1425.bin" crc="d6cf5ef5" length="0x2000"/>
+        <!-- Total 0x3F32014 bytes - 64712 kBytes -->
+    </rom>
+    <rom index="2">
+01 09 01 00 00 01 00 01 00 02 00 00 00 00 00 00
+01 01 05 01 00 01 00 00 00 00 00 00 00 00 00 00
+05 97 0A 19 4D 56 45 33 65 72 73 20 76 61 6F 69
+01 09 01 00 00 01 00 01 00 02 00 00 00 00 00 00
+01 01 05 01 00 01 00 00 00 00 00 00 00 00 00 00
+05 97 0A 19 4D 56 45 33 65 72 73 20 76 61 6F 69
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+</rom>
+    <nvram index="2" size="128"/>
+    <rom index="1">
+        <part>00</part>
+    </rom>
+    <buttons names="Light Punch,Middle Punch,Heavy Punch,Light Kick,Middle Kick,Heavy Kick,Start,Coin,Core credits" default="Y,X,B,A,R,L,Start,Select,-" count="6"/>
+</misterromdescription>

@@ -40,7 +40,7 @@
 # Default build: build/don_m5. ~6 min (2 MAME runs).
 set -eu
 
-BUILD="${1:-build/don_m15}"  # re-pointed 14z-115 (select-wheel freeze) <- 14z-110b
+BUILD="${1:-build/don_m16}"  # re-pointed 14z-117 (pyron-medallion freeze) <- 14z-115
 EXPECT="${VOICE_BORROW_EXPECT:-own-class}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

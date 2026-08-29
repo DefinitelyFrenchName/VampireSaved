@@ -7,6 +7,9 @@
 # shifted every ext region behind the AI-script roots (+0x10D0 H / +0x1ED0 P)
 # and this file was NOT re-derived then — audit_roster_pairings was red on
 # merged-m9/m10 unnoticed (not in the static tier); 14z-115 adds +0x20.
+# RE-DERIVED 14z-117 from build/m3b_merged19 (merged-m12, the Pyron-medallion
+# freeze): no placement moved (ten in-place thunk bytes + one glyph entry),
+# measured by this re-derivation.
 # TENANT ROWS MOVE WITH FREEZES (measured 2026-08-20, the #94
 # reference-rot class caught live): the 14z-99 window's capture_kf
 # insertions relocated the H/P blocks (phobos 0x4477b0 -> 0x4594a0,

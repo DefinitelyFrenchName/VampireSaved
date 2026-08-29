@@ -25,12 +25,12 @@
 # <pc6>" — the gate then asserts that exact crash instead (so the capture
 # cannot rot) and lists it loudly as OPEN.
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged18] [ONLY=name] tests/test_inp_corpus.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged19] [ONLY=name] tests/test_inp_corpus.sh
 # Emulator tier (MAME, ~1 min per recording). NOT ci_static.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
-BUILD="${BUILD:-build/m3b_merged18}"   # re-point at every merged freeze
+BUILD="${BUILD:-build/m3b_merged19}"   # re-point at every merged freeze  # re-pointed 14z-117 (pyron-medallion freeze) <- 14z-115
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: no WIDE build at $BUILD"; exit 1; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 mkdir -p "$W/inp" "$W/.cache/vampire-saved"; ln -s "$W/inp" "$W/.cache/vampire-saved/inp"

@@ -49,7 +49,7 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD="${MAP_FIT_BUILD:-build/m3b_merged18}"  # re-pointed 14z-115 (select-wheel freeze) <- 14z-113 (merged-m10: one-zip repackaging of merged-m9, same program)
+BUILD="${MAP_FIT_BUILD:-build/m3b_merged19}"  # re-pointed 14z-117 (pyron-medallion freeze) <- 14z-115
 [ -f "$BUILD/rompath/vsavjw.zip" ] || {
     echo "SKIP: no WIDE romset at $BUILD/rompath/vsavjw.zip"; exit 0; }
 [ -f "$BUILD/patch/effect_map.json" ] || {
@@ -91,9 +91,9 @@ for t2 in range(0x20000):
 print(f"  group C obj bank 4: {len(live[4])} non-blank, max {max(live[4]):#06x}")
 print(f"  group C obj bank 5: {len(live[5])} non-blank, max {max(live[5]):#06x}")
 frozen("obj bank 4 non-blank count", len(live[4]), 45736)
-frozen("obj bank 5 non-blank count", len(live[5]), 6271)   # 6245 -> 6271 at 14z-115: +26 live outline-tile codes at 0x1F800+ (extent 0xFE41 unchanged)
+frozen("obj bank 5 non-blank count", len(live[5]), 6272)   # 6271 -> 6272 at 14z-117: +1 glyph tile (the M10 mark's third character, 0x1FE42); 6245 -> 6271 at 14z-115: +26 live outline-tile codes at 0x1F800+
 frozen("obj bank 4 highest non-blank code", max(live[4]), 0xEE73)
-frozen("obj bank 5 highest non-blank code", max(live[5]), 0xFE41)
+frozen("obj bank 5 highest non-blank code", max(live[5]), 0xFE42)   # 0xFE41 -> 0xFE42 at 14z-117 (the third M10 glyph)
 
 
 # ── 2. the DECLARED write set (the manifests, which may exceed the bytes) ──

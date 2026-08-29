@@ -1,0 +1,9 @@
+# pointer-flow baseline for donovan-m16 (build/don_m16), frozen 14z-117 — the Pyron-medallion freeze (M10).
+# vs the 14z-115 baseline (donovan-m15): the M10 mark adds ONE glyph entry to the copied wheel record's
+# coord list (one 4-byte pair) and the medallion fix rewrites ten thunk bytes IN PLACE (body length
+# unchanged, no allocation moved); the WEAK data:long count grows by exactly 1 — that pair reads
+# as one more 4-byte WIDE-hole window. STRONG content unchanged; nothing new is a pointer.
+# STRONG lines are REVIEWED findings (see hardening_register.md);
+# WEAK-COUNT lines freeze the noise volume — growth = investigate.
+WEAK-COUNT	code:move_imm	1
+WEAK-COUNT	data:long	1263

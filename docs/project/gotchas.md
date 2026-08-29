@@ -3179,3 +3179,20 @@ touched the binary during 14z-115.
 **Rule:** print the full timestamp (`stat -f '%Sm' -t '%Y-%m-%d %H:%M:%S'`,
 or `ls --time-style=full-iso`) before drawing any conclusion from a file
 time — especially one that will be written into a standing open question.
+
+## A RE-POINT SWEEP THAT STAMPS EVERY CHANGED LINE BREAKS SHELL CONTINUATIONS — and the broken gate can still exit 0 (paid: 14z-117)
+
+The freeze re-point sweep rewrites `build/<old>` -> `build/<new>` on every
+matching line and appends `# re-pointed 14z-NNN ...` to each changed CODE
+line. Four of the 85 files carried the old name on a line ending in `\`
+(`for d in a b c \`). A comment after the backslash turns the escaped newline
+into an escaped SPACE followed by a comment, so the list ends there and the
+next line is parsed as a fresh command: `test_escape_triage.sh` died with a
+syntax error (loud), but `test_pointer_flow.sh`'s truncated `for pair in`
+list still ran and PASSED — its second line, `"build/hui50:huitzil-m23"
+"build/pyron34:pyron-m17"; do`, was simply never reached as list items.
+
+**Rule:** the sweep never appends to a line whose last non-blank character
+is `\`; grep `'\\ *# re-pointed'` across `tests tools build/manifest` after
+any sweep, and read a re-pointed gate's PASS by its printed per-item lines
+(four "ok: <name> matches" here, not one) before trusting the verdict.
