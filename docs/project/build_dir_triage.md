@@ -1,5 +1,13 @@
 # BUILD-DIR DECISION PACKAGE — 14z-101 (2026-08-21)
 
+> **HOW TO READ THIS FILE (14z-118 audit) — two layers.** HISTORICAL: the
+> 14z-101 package and its A1-C classes with their dir counts and sizes are the
+> inventory AS OF 14z-101/102 (executed; `build/` has been swept at every
+> freeze since — the 14z-112 one-zip sweep is recorded in STATE_HISTORY
+> 14z-112, not here). LIVE, still governing: the recordings rule [VSP-98], the
+> grep-four-places rule [VSP-96], the partly-tracked-dirs finding [VSP-97], the
+> N-2 policy ("Recommendation"), and the per-freeze sweep records at the end.
+
 ## RULED AND EXECUTED 14z-102 (maintainer, 2026-08-21)
 
 **The ruling:** delete C + B2 + B3 + B4 + B1, plus the 14z-102 probe

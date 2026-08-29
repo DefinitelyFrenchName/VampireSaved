@@ -1,5 +1,10 @@
 # M1 — Map: acceptance review
 
+> **STATUS (14z-118 audit): HISTORICAL — M1 accepted 2026-07-25.** The atlas it
+> reviews has since grown per-set pages (`docs/game/atlas/`); the VS2-vs-VH2
+> variant policy clause 2 defers to was ruled (STATE STANDING PRINCIPLE,
+> DECISIONS_HISTORY). Nothing here is open.
+
 SPEC §4 M1 acceptance has two clauses. Assessed 2026-07-25.
 
 ## Clause 1 — "atlas documents let us answer 'where does character X's <thing> live in each set' without new disassembly"

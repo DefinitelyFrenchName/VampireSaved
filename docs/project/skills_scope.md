@@ -1,5 +1,10 @@
 # SKILLS SCOPE — the remaining distillations (CPS-2, emulation, the game, the port)
 
+> **STATUS (14z-118 audit): EXECUTED 14z-114 — all four skills exist and are
+> locked (`tests/test_checkskills.sh`).** §4 (the staleness pass each skill
+> needs) stays the live template the 14z-118 documentation audit follows;
+> the rest is the record of boundaries and decisions.
+
 Written 14z-114 (2026-08-28), **the plan before the work**, as the sibling of
 `mister_scope.md` (whose two skills shipped the same day with their checker).
 It answers: which skills remain, where each boundary falls, which docs feed

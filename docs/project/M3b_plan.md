@@ -1,5 +1,11 @@
 # M3b — the roster tenants: multi-tenant machinery + Huitzil/Phobos (0x10) + Pyron (0x11)
 
+> **STATUS (14z-118 audit): HISTORICAL — THE PLAN EXECUTED.** Both tenants ship
+> (huitzil-m24 / pyron-m18 inside merged-m13, HANDOFF registry); the multi-
+> tenant machinery is `tenant_manifest.md` (STATUS 14z-114) and `tools/build_merged.sh`.
+> Kept for its eliminations and the recon that fixed the phase order. Nothing
+> below is an open item; "decisions pending" here resolved in DECISIONS_HISTORY.
+
 Written 2026-08-07 (session 14z-65 open), from a three-way recon over the
 generator/build machinery, the docs corpus, and the STATE history, plus two
 baseline extraction dry-runs. This is the working plan; STATE.md carries

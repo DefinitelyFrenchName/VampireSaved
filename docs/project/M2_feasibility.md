@@ -1,5 +1,10 @@
 # M2 feasibility — Donovan into vsavj by replacing Jedah (slot 0x0F)
 
+> **STATUS (14z-118 audit): HISTORICAL.** M2 shipped (donovan-m2, 2026-07-28,
+> HANDOFF registry) on the slot-0x0F substitution this analysis governs; the
+> substitution itself was retired at 14z-64 (donovan-m3a: a tenant on its OWN
+> variant id, `id_space.md`). Read for the three-domain framing, not for scope.
+
 Analysis 2026-07-25, before implementation. Governs M2 scope and sequencing.
 
 ## The three data domains

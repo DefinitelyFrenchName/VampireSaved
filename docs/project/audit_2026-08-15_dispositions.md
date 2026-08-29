@@ -1,5 +1,10 @@
 # Adversarial audit of 2026-08-15 — dispositions
 
+> **STATUS (14z-118 audit): HISTORICAL — a closed record.** The 73 dispositions
+> stand as ruled in 14z-90/95; anything still open from them is tracked where
+> live items live (STATE "Open bugs", `hardening_register.md`), not here. The
+> "Open"/"awaiting" cells below are the state AT 14z-95.
+
 The 2026-08-15 multi-agent review filed 73 issues (index: GitHub #74). This is
 the ruling on each, produced by a second, independent adversarial pass in
 14z-90: per issue a VERIFIER (re-prove the claim at HEAD, with bug archaeology)

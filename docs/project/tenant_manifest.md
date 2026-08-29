@@ -1,5 +1,15 @@
 # Per-tenant manifests — proposed schema
 
+> **HOW TO READ THIS FILE (14z-118 audit) — three layers.** LIVE: the
+> `[[tenant]]` schema (ratified 2026-08-05, consumed by `gen_donovan_patch.py`,
+> three manifests, `build_merged.sh` since 14z-8x). HISTORICAL: every sentence
+> framing the port as single-tenant / slot-0x0F (the "Why this shape" narrative
+> — true when written, superseded 14z-64 and 14z-8x). PROPOSAL, never built:
+> the `[tenant.wheel]` / `[tenant.ladder]` / `[tenant.folds]` sub-tables — the
+> wheel is authored through `wheel_layout_proposed.json` + `[[select_wheel]]`
+> knobs (14z-63..115) and the ladder through the tenants' own vs2 AI/ladder
+> rows (14z-111); no plan to build these sub-tables exists.
+
 **Status: RATIFIED by the maintainer 2026-08-05, and IMPLEMENTED for a
 single tenant.** `[[tenant]]` is consumed by `tools/gen_donovan_patch.py`
 (normalised into the legacy `[port]` shape, so the six existing consumers
