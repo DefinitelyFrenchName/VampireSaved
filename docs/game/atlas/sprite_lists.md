@@ -6,9 +6,18 @@ entries**. Companion to `ram.md` (object fields) and
 pieces mean and how they fail — is
 `../engine_internals.md`, "The sprite-list drawer".
 
+Written 14z-71 (2026-08-09, the beam port), swept 14z-114 (S-C), audited
+14z-118 *(until then this file carried no date and no session tag — the only
+atlas page that could not be placed in time)*.
+
 Everything here is measured on the decrypted opcode view
 (`build/out/<set>_opcodes.bin`) and confirmed against live OBJ dumps
 (`tests/lua/obj_records_dump.lua`). Provenance `VSAV`/`VS2`/`VH2`.
+**Gates that re-derive it:** `tests/test_list_type_census.sh`
+(`tools/list_type_census.py` — every list type the three drawers dispatch,
+counted from the ROM), `tests/test_beam_list_type6.sh` (the type-4 byte at
+`handler+0x7E` and the type-6 path), `tests/test_obj_records.sh` (the OBJ
+record decoder calibrated byte-for-byte against `obj_records_dump.lua`).
 
 ---
 

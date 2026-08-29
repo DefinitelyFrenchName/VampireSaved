@@ -1,7 +1,12 @@
 # Per-slot presentation assets — what a tenant on a variant id inherits
 
 Measured 2026-08-05 (14z-60v), to de-risk moving a tenant from slot `0x0F`
-to id `0x13`. The question: which per-character *presentation* assets follow
+to id `0x13`. *Currency (14z-118 audit): the measurements below stand as
+made; what has been measured SINCE and lives elsewhere — the win-screen
+portrait/quote mechanism (`engine_internals.md` §8, 14z-99 #105 and 14z-116
+"win quotes"), the capture-pose port (14z-99 #104), and the select-screen
+palette rows (`select_screen.md`, 14z-62k/14z-116). "Twelve maintainer
+playtest rounds" in §2 is testimony, not a gate.* The question: which per-character *presentation* assets follow
 a tenant to a variant id, and which silently fall back to the base
 character's?
 

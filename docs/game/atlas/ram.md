@@ -14,8 +14,11 @@ will alter that attract from the demo's start frame — this is *correct*
 superset behavior (the attract "involves" the modified character), not a
 violation. The auto-detecting regression runner must treat attract
 expectations as build-fingerprint-dependent when a demo-featured slot is
-modified. (Full attract demo roster: TODO — enumerate all demo matchups so
-the runner knows which builds legitimately change attract.)
+modified. (Full attract demo roster: **OPEN MEASUREMENT, not run as of
+14z-118** — enumerate all demo matchups so the runner knows which builds
+legitimately change attract; the one demo measured is Jedah vs Victor from
+~frame 4278 of `01_attract_long`, `[VSE-83]` below. Until it is run, attract
+expectations stay build-fingerprint-dependent by rule, not by roster.)
 
 ## Masked windows for hooked-build legacy comparison (CLAUDE.md §4 amendment, 2026-07-25)
 
@@ -83,7 +86,8 @@ measured mechanism + maintainer sign-off.
 | `RAM:$FF8109` | round timer (counts down ~1/sec during match) | [D] |
 | `RAM:$FF810E` | rounds-completed counter (0 at match start; +1 per settled down, KO and timeout paths both) | [D: 14z-104, timeout+KO probes on merged-m5] |
 | `RAM:$FF8120` | ROUND WINNER code, written when a down settles: 0xFF = P1 won the down, 0x01 = P2 won, **0x00 = DRAW (double KO — measured on mirror trades, 14z-104 (4))**. Verified discriminating in all three directions. Consumed by audit_tenant_timeout / audit_tenant_downwin / audit_edge_cases | [D: 14z-104] |
-| `RAM:$FF8127` | P1 downs-won counter (0->1 seen on a P1 win; P2 twin not yet located — do not assume adjacency) | [D: 14z-104, single probe — weakest of the three rows] |
+| `RAM:$FF8127` | P1 downs-won counter (0->1 seen on a P1 win; P2 twin NOT LOCATED — an open measurement as of 14z-118; do not assume adjacency) | [D: 14z-104, single probe — weakest of the three rows] |
+| `RAM:$FF8440` | the "?" (random-select) cell's walker CURSOR — index into the draw table, advanced every 3 frames while the cell is hovered; the one byte that moved on `40_pick_pyron_cell` at the 14z-117 (2) freeze, zero bytes at match | [D: 14z-117 (2), DUMPS diff pyron34 vs pyron35; mechanism `select_screen.md` "THE RANDOM CELL"] |
 | `RAM:$FF0000.w` | **CPU-EXCEPTION CODE, written by the game's own exception handlers** (14z-109). Every 68k exception vector (`vec2` bus .. `vec11` line-F, targets `PRG:0xC0-0x140`) runs `move.w #code,($FF0000).l` — code = vector-2 (0 bus, 1 address, 2 illegal, ... 9 line-F) — then saves registers and SOFT-RESTARTS the game (see the two rows below and engine_internals "CPU exceptions"). **A "flaky reset" that reboots to the NAME SCREEN is one of these, and this word says which**; a cold/watchdog reset runs the full gold RAM test instead. Confirmed live: probe-H vec3 wrote 1 here; the 14z-109 field video shows the abbreviated white check list then the name screen | [D: 14z-109 — handler disasm (`verify_op` 0xC0-0x14E) + guarded vec3 + field video] |
 | `RAM:$FF0018-$FF0053` | **registers at the last CPU exception**: the handler's `movem.l d0-a6,-(sp)` from SP=`$FF0054` lands D0..D7/A0..A6 ASCENDING here (A1 at `$FF003C`, A3 at `$FF0044`). **Written only if the handler RUNS** — a guard/debugger that freezes the machine AT the exception leaves this region stale (measured: all zeros under the crash guard while the live registers held the answer; read them via `GUARD_PROBE`, not from RAM) | [D: 14z-109, handler disasm + the empty-dump measurement] |
 | `RAM:$FF0054.l` | saved SP at the last CPU exception (written by the same handler, before the register block) | [D: 14z-109] |
