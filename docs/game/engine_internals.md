@@ -229,7 +229,9 @@ port_patched to #$4000 (stage-gated rows); [table_fix] pads x026142 to
 vsavj values — fixing two stage-5 latent defects: the table was
 truncated at row 9 (the x088512 effect caller d0=0x0A read past the
 ported end) and carried VS2 bank values (row 0x0F = 0x0000 => bank-0
-reads — likely THE main-sprite garble mechanism). Output-image checks:
+reads — likely THE main-sprite garble mechanism; and it WAS: the garble
+  did not recur after this rewrite, `tests/test_m2b_stage6.sh` green — a
+  hypothesis confirmed by its fix, marked 14z-118). Output-image checks:
 placed records walk clean, band exactly 0xAD8F-0xEA3F matching the
 placed tiles, table decrypts to vanilla values, setters #$4000. The
 rompath carries the patched vsav.zip (ROMDIR pristine); stage-5
@@ -259,7 +261,18 @@ clean. Portrait/select-art palette tables (vsavj 0x3B5988/0x3BAEA8
 family, keyed >=0x18-split) ride with the portrait work. Other
 0x90C140 writers (vsavj 0xB0AC attract path, table 0x3A3CA0 keyed by
 $114(a5)) not yet repointed — if the attract demo shows wrong Donovan
-colors, that is the mechanism.
+colors, that is the mechanism. *(14z-118, DERIVED and bounded: still no
+manifest supplies `0x3A3CA0` rows for a tenant. But this note was written
+for the slot-0x0F substitution, where Donovan WAS Jedah and Jedah is in
+the attract demo. At a variant id the pool is reached only (i) by the
+ladder opponent path `PRG:0x00B094` — a tenant is a CPU opponent only
+when the player is a tenant (STATE hidden-character block, ladder rows
+16/17/19) — or (ii) in attract, whose id writes are vanilla's own
+(`tests/audit_id_writers.sh`: attract writes `02 0F` / `00 03`). So the
+attract demo cannot show a tenant; a tenant-vs-tenant VS screen in 1P
+would show the placeholder ramp at `0x3A3CA0 + id*32` (`id_space.md`) —
+single-player, cosmetic, never reported from the board. Not measured on
+screen.)*
 
 ### M2b in-emulator verification (session 14c, machine window)
 
@@ -432,7 +445,10 @@ Decoded via read/write/breakpoint traces on the live pick replay
 - Sibling code twins: vs2 select module ~0x6B3DE (root helper), plus
   two more root-helper twins at vs2 0x3D314/0x3ED4C reading table
   0xD153E — a DIFFERENT consumer family (likely in-match intro/win
-  portraits) to inventory when those screens get ported.
+  portraits) to inventory when those screens get ported. *(14z-118: still
+  UNIDENTIFIED — the win screen was ported through vsavj's own tables
+  (§8, 14z-99), and nothing has since read vs2 `0xD153E`; a labelled
+  inference with no consumer, not a claim.)*
 
 Phase-1 attempt (session 14d) — measured corrections to the map:
 - THE LIVE PREVIEW at select ALREADY WORKS in stage 6 (obj $FFB880
@@ -447,7 +463,10 @@ Phase-1 attempt (session 14d) — measured corrections to the map:
   0x26739A/0x26768A/NAME_ROW landed and changed nothing on screen.
 - A Demitri-pick dump shows menu objects riding the SHARED element
   window (0x267F32-0x267F72) during select — the 150-entry records are
-  most likely the WHEEL (15 chars x 10 entries); the per-char big-art
+  most likely the WHEEL (15 chars x 10 entries) *(14z-118: SUPERSEDED — the
+  wheel record is `PRG:0x272A68`, fmt 2, count 17, measured in
+  `atlas/select_screen.md` "wheel record"; this M2-era attribution was
+  wrong about the address and the count)*; the per-char big-art
   group attribution (0x2719xx Jedah confirm records etc.) still needs a
   two-char differential dump AT THE HOVER moment.
 - SPACE FACT for the eventual port: both PRG holes are nearly full
@@ -2578,7 +2597,10 @@ shadow, **all the time**. Narrowed as follows, all measured:
   and debugger watchpoints on OBJ RAM see nothing — the technique that
   worked for finding an emitter was a **work-RAM diff between a frame
   before and during** the effect (14z-68b).
-- Related, likely the same root: the 14z-67 note "ours spawns
+- Related, likely the same root *(14z-118: it WAS — see "The child
+  companion's shadow — SOLVED (14z-69o)": bank rewritten in the remap
+  window but the tiles never copied; fixed by `extra_tiles/<char>.json`,
+  and the effect family closed 14z-71)*: the 14z-67 note "ours spawns
   F8FC/F90A/F15x-family pieces WITH BANK WORD 0 that native NEVER
   stages — created through a path that leaves +0x18 unset".
 
@@ -2605,24 +2627,39 @@ static route does not work — see the warning below.
 |---|---|
 | `0x1E-0x21` | **Bulleta `0x00`** |
 | `0x26`, `0x27` | Demitri `0x01` |
-| `0x44-0x47` | Zabel `0x04` |
+| `0x44-0x47` | Zabel `0x04` (and slot `0x0B`, the Shadow machinery, by row alias — 14z-118) |
 | `0x6F-0x72` | Bishamon `0x08` **and** Oboro Bishamon `0x18` (same block) |
 | `0x264-0x267` | Q-Bee `0x0C` |
 | `0x29C-0x2A0` | `0x12` — **five ids, not four** |
-| none | Gallon `0x02`, Victor `0x03`, Morrigan `0x05`, Felicia `0x07`, Aulbath `0x09`, Sasquatch `0x0A`, Lei-Lei `0x0D`, Lilith `0x0E`, Jedah `0x0F` |
+| none | Gallon `0x02`, Victor `0x03`, Morrigan `0x05`, **Anakaris `0x06` (14z-118)**, Felicia `0x07`, Aulbath `0x09`, Sasquatch `0x0A`, Lei-Lei `0x0D`, Lilith `0x0E`, Jedah `0x0F` |
 
-**NOT MEASURED: Anakaris `0x06`.** Two attempts, both `$FF802E`=0 — the rig
-never entered Dark Force for him, so his zero is a fact about the RIG. (`0x0B`
-is also unmeasured and is not a character — Shadow/Marionette machinery.)
+**Anakaris `0x06` — MEASURED 14z-118: Dark Force ON, ZERO resolver calls.**
+Replay 85 never activated DF for him (two 14z-79b attempts and one more at
+14z-118, `$FF802E`=0 across 7,000 frames); `tests/replays/df/97_df_mech.rpl`
+— `audit_df_framework.sh`'s rig — did (`$FF802E`=1 at frames 3400-3600,
+Demitri control 577 calls of `0x26` in the same session). His DF has **no
+palette-seq path**, like Victor's. Add him to the "none" row above. The
+full-roster re-census on rig 97 (all 16 ids, every leg with DF observed;
+`tests/expected/df_palette_seq_census.txt`, log `build/df_census_14z118.log`)
+reproduced every owner in the table and added one fact: **`0x0B` (the
+Shadow/Marionette machinery slot, poked as P1) requests Zabel's `0x44-0x47`**
+— row `0x0B` of `0x02A8A4` aliases his routine.
 
-**STRONG INFERENCE, NOT A MEASUREMENT:** the routines hardcode seven base
+~~**STRONG INFERENCE, NOT A MEASUREMENT:** the routines hardcode seven base
 constants — `0x1E 0x26 0x44 0x6F 0xAA 0x264 0x29C` (e.g. `0640 001e` at
 `0x02a92c`). Six have measured owners above. The seventh, **`0xAA`, has no
 measured owner and Anakaris is the one character not measured**, so `0xAA-0xAD`
-is very probably his. Treat it as OCCUPIED until someone reaches his DF —
-what settles it is one run of the `df/97` rig (`tests/audit_df_framework.sh`)
-with Anakaris (`0x06`) as P1 and a write-tap on the seq resolver; not yet
-run (14z-118 audit: labelled inference, measurement named).
+is very probably his. Treat it as OCCUPIED until someone reaches his DF.~~
+**RETRACTED 14z-118 — the inference was FALSE.** Anakaris reached his DF and
+requested nothing. `0xAA-0xAD` is requested by **no character's Dark Force**
+(all sixteen base ids on rig 97 at 14z-118; `0x12`/`0x18` at 14z-79b). What
+is still NOT known: whether any non-DF path requests `0xAA` (phase A of the
+audit saw only `0x26/0x27` over its eight ordinary-play replays). So the
+block is "no known requester", not "proven free" — the deferred "give Phobos
+his own block" fix may take it only after a whole-corpus phase-A census
+(every replay, uncapped probe) also comes back empty. *(The retracted
+paragraph is kept struck as the audit's specimen of an inference that read
+as a fact for 39 sessions.)*
 
 **[VSE-70]** **WHY THIS CANNOT BE DERIVED FROM TABLE `0x02A8A4`.** The obvious model — row
 per character, each pointing at a routine with one hardcoded base — is WRONG.

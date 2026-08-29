@@ -1,0 +1,35 @@
+# tests/expected/df_palette_seq_census.txt — which palette-seq ids each vanilla
+# character's DARK FORCE requests at the resolver PRG:0x02AD82 (14z-118).
+#
+# Measured on pristine vsavj, rig tests/replays/df/97_df_mech.rpl with P1's id
+# poked at f1400/1450/1500 and stocks banked at f3100/3120 (the
+# audit_df_framework.sh leg form), GUARD_PROBE=2ad82 uncapped, $FF802E sampled
+# every 200 frames 3200-7000 — EVERY character read 1 at least once (the
+# control that makes a zero meaningful). Positive controls in the same batch:
+# Bulleta 1E-21, Demitri 26 (1,798 calls), char 04 44-47, Bishamon 6F-72,
+# 0C 264-267. Rerun: CHARS="00 .. 0f" DFRPL=tests/replays/df/97_df_mech.rpl
+# tests/audit_palette_seq_ids.sh (evidence log build/df_census_14z118.log).
+#
+# THE FINDING: of the seven base constants hardcoded in the per-character
+# palette routines (0x1E 0x26 0x44 0x6F 0xAA 0x264 0x29C), 0xAA and 0x29C are
+# requested by NO character's Dark Force. Anakaris (0x06) — "very probably"
+# 0xAA's owner in engine_internals.md until 14z-118 — has NO palette-seq path
+# (DF on, 0 calls), like Victor and eight others.
+#
+# char  df_seen/samples  resolver ids (count)
+00  3/20  {'1e': 59, '1f': 60, '20': 60, '21': 59}
+01  3/20  {'26': 1798}
+02  1/20  {}
+03  2/20  {}
+04  3/20  {'44': 59, '45': 60, '46': 60, '47': 59}
+05  1/20  {}
+06  2/20  {}
+07  2/20  {}
+08  3/20  {'6f': 59, '70': 60, '71': 59, '72': 59}
+09  2/20  {}
+0a  3/20  {}
+0b  3/20  {'44': 141, '45': 142, '46': 142, '47': 142}
+0c  3/20  {'264': 41, '265': 83, '266': 84, '267': 42}
+0d  2/20  {}
+0e  1/20  {}
+0f  2/20  {}

@@ -75,7 +75,13 @@ done
 # and $FF8782 forces the character. EVERY RUN IS CONTROLLED: $FF802E must
 # read 1, or the run is reported as NOT-DF and the audit fails rather than
 # quietly contributing a non-DF sample (that is exactly how phase A lied).
-DFRPL="tests/replays/hui/85_hui_df_vs2.rpl"
+# DFRPL: the DF-driving rig. 14z-118 MEASURED that replay 85's activation
+# timing does NOT land for every character (Anakaris 0x06: $FF802E stayed 0
+# for 7,000 frames on 85; on `df/97_df_mech.rpl` — audit_df_framework's rig —
+# it read 1 at frames 3400-3600). A char reported NOT IN DARK FORCE on one rig
+# is re-run on the other before it counts as unaccounted for. Full-roster
+# census (14z-118, rig 97): see the header of tests/expected/df_palette_seq_census.txt.
+DFRPL="${DFRPL:-tests/replays/hui/85_hui_df_vs2.rpl}"
 NODF=""
 echo
 echo "  -- phase B: Dark Force forced (the half phase A cannot reach) --"
@@ -118,7 +124,14 @@ print(best)")
         continue
     fi
     echo "$ids" >> "$W/ids.txt"
-    printf "  char 0x%-4s %6s calls   DF=on   ids: %s\n" "$ch" "$n" "$(echo $ids)"
+    if [ "$n" = 0 ]; then
+        # DF entered, resolver never called: this character's Dark Force has NO
+        # palette-seq path (Victor 0x03; Anakaris 0x06 measured 14z-118). It
+        # owns no block — a real, positive finding, not a missing sample.
+        printf "  char 0x%-4s      0 calls   DF=on   NO PALETTE-SEQ PATH (owns no block)\n" "$ch"
+    else
+        printf "  char 0x%-4s %6s calls   DF=on   ids: %s\n" "$ch" "$n" "$(echo $ids)"
+    fi
     total=$((total + n))
 done
 

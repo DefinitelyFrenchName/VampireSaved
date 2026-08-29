@@ -3112,6 +3112,11 @@ tests/audit_empty_tiles.sh    [bd]     # 14z-69o: does the build DRAW any sprite
                                       # build/hui14, FAILS on build/hui12 naming both
                                       # shadow tiles. RUN FOR EVERY NEW TENANT
 tests/audit_palette_seq_ids.sh        # 14z-69p: which palette-seq ids does LEGACY ever
+                                      # (14z-118: DFRPL= picks the DF rig — replay 85
+                                      # never activates Anakaris, df/97 does; a DF-on
+                                      # char with 0 calls is reported as NO PALETTE-SEQ
+                                      # PATH; the full-roster result is frozen in
+                                      # tests/expected/df_palette_seq_census.txt)
                                       # request? (uncapped probe on 0x2AD82, 8 replays).
                                       # The DF-palette data row is legacy-inert ONLY
                                       # because the answer is {0x26, 0x27} — and the

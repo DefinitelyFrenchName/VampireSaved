@@ -19,10 +19,13 @@
 > ## (three false leads, struck; `project/gotchas.md` "THE AUDIT'S OWN
 > ## INVENTORY IS ONE HOP AWAY TOO").
 > ##
-> ## **WHAT IS LEFT, in order (STATE 14z-118 CLOSE "NOT done"):** (a) the
-> ## `engine_internals.md` sites that need a MEASUREMENT — attract-palette
-> ## writer L290, the "likely" family, the Anakaris `0xAA` DF base (one
-> ## `df/97` run with Anakaris P1) — an emulator session; (b) re-file the 14
+> ## **WHAT IS LEFT, in order (STATE 14z-118 CLOSE "NOT done"):** ~~(a)~~
+> ## DONE the same day (AUDIT (9)): Anakaris's DF measured — `0xAA` has NO
+> ## Dark Force requester in the whole roster, the "very probably his" claim
+> ## retracted, census frozen (`tests/expected/df_palette_seq_census.txt`;
+> ## rerun with `DFRPL=tests/replays/df/97_df_mech.rpl CHARS="00 .. 0f"`).
+> ## Still open from (a): whether a NON-DF path requests `0xAA` — a whole-
+> ## corpus phase-A census before anyone calls the block free. (b) re-file the 14
 > ## emulator-fact gotchas project -> platform WITH their `[CPE]` anchors;
 > ## (c) `ram.md`'s two open measurements; (d) `id_space.md` tag refresh; (e)
 > ## the STOCK CONTROL once-per-`.rbf` ruling (unruled since 14z-113).
