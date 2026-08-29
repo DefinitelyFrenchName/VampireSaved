@@ -36,8 +36,9 @@ registry, not this paragraph): fork pin
 `emu/jtcores-patches/`); romset merged-m9 (M8 mark, program fingerprint
 `32007911`), repackaged as `build/m3b_merged17` (not registered, not
 frozen); field test PASSED on a DE10-Nano at 14z-109, #99 CLOSED at 14z-112;
-bundle `../mister_fieldtest_14z112/` awaiting the board's answer on stock
-coexistence.
+bundle `../mister_fieldtest_14z112/` ~~awaiting the board's answer on stock
+coexistence~~ (answered 14z-113: no regression, stock coexists — this line
+was left pending until 14z-118).
 
 ---
 

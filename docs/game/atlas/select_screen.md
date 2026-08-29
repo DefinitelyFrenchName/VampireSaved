@@ -432,8 +432,8 @@ shuffled order — a CYCLE, not a fresh roll; only its starting point is
 random. Both bounds are hard: the table is 15 entries and the wrap compare
 is `#$f`.
 
-**CONSEQUENCE FOR THIS PORT — RESOLVED 14z-117: the WIDE builds now list
-their tenants in the draw** (`random_select_bound` + `random_select_roster`
+**CONSEQUENCE FOR THIS PORT — RESOLVED 14z-117, board-confirmed 2026-08-29
+(STATE 14z-118): the WIDE builds now list their tenants in the draw** (`random_select_bound` + `random_select_roster`
 site_thunks, all three manifests, since donovan-m17 / huitzil-m24 /
 pyron-m18 / merged-m13; gate `tests/test_random_select_tenants.sh`). *(This
 paragraph said "random select can never pick a tenant" from 14z-116 to

@@ -1,4 +1,58 @@
-# NEXT SESSION — orientation (rewritten at the 14z-117 final close, 2026-08-29)
+# NEXT SESSION — orientation (rewritten at the 14z-118 verdict, 2026-08-29)
+
+> ## **START HERE. NOTHING IS RED. THE M11 BOARD VERDICT IS GREEN
+> ## ("behavior identical to emulation", maintainer, MiSTer, 2026-08-29 —
+> ## STATE 14z-118). Nothing is pending on hardware. THE WORK IS THE
+> ## DOCUMENTATION AUDIT, ruled by the maintainer: every claim MEASURED not
+> ## guessed, everything consistent, nothing stale. The Sailor Moon S
+> ## discipline.**
+> ##
+> ## **THE AUDIT ALREADY HAS ITS FIRST SPECIMEN, from recording the verdict:**
+> ## the M9 and M10 verdicts had each been written into ONE row while nine
+> ## "not field-tested / pending" lines stayed alive in headers, registry
+> ## rows and `mister_field.md` — the file whose job is the verdict log.
+> ## Retired 14z-118 (`project/gotchas.md` "A FIELD VERDICT LANDS IN ONE
+> ## ROW"). Expect the same shape everywhere: a claim right at its source
+> ## and wrong one hop away.
+> ##
+> ## **HOW TO SHAPE THE AUDIT** (the 14z-113/114 staleness passes are the
+> ## template — S1-S20 for MiSTer, S-C1..S-C12 for the game docs, S-D for
+> ## the port docs; one commit per document): INVENTORY FIRST —
+> ## `docs/project/doc_audit_14z118.md`, one row per document in
+> ## `docs/game/`, `docs/platform/`, `docs/project/`, HANDOFF and the six
+> ## skills (~29,000 lines), each claim marked MEASURED (name the log, gate
+> ## or dump) / DERIVED (from a measured fact by a stated rule) / GUESSED
+> ## (nothing behind it). Re-measure or RETRACT the third class; grep every
+> ## retraction across the repo ([VSP-13]: headers and summary lines first).
+> ## Lock cross-document numbers (addresses, counts, fingerprints, pins)
+> ## with a script where one is cheap — `checkskills.py` already locks the
+> ## skills to the docs; extend that idea to the atlas↔engine_internals
+> ## pairs. Start with the specimen family: `character_tables.md` ↔
+> ## `id_space.md` ↔ `engine_internals.md`'s character-bank section ↔ the
+> ## data-architecture artifact
+> ## (https://claude.ai/code/artifact/98d586db-1a69-49eb-b421-5085db07b707).
+> ##
+> ## **CURRENT:** donovan-m17 `90a225ce` / huitzil-m24 `ae953657` /
+> ## pyron-m18 `1222df18` / merged-m13 `a1b7cb82` (`build/m3b_merged20`,
+> ## 823 ops), stock twin `m5_stock12` = `d29fd062`. Fork `f997cfe1` (27
+> ## commits / patch 0027), `release/merged-m13/`, bundle
+> ## `../mister_fieldtest_14z117b/` — FIELD-VERIFIED. Everything pushed
+> ## — check `git status -sb`, not this line.
+> ##
+> ## **OPEN, unchanged:** the 1:1 wheel mockup; #112/#113 parked; the FBNeo
+> ## two-run-family question; the tenant CPU AI "lackluster" note; win
+> ## quotes (forgone, clean-way-only). `test_random_select_tenants.sh`'s
+> ## CONTROL is `build/m3b_merged19` — re-point or accept its SKIP when
+> ## that directory rolls off.
+> ##
+> ## **STATE OF THE BUILDS:** play `tools/run_wide.sh build/m3b_merged20
+> ## fbneo`. Current + one back: `don_m16/m17`, `hui50/51`, `pyron34/35`,
+> ## `m3b_merged19/20`, `m5_stock11/12`.
+
+# HISTORY BELOW — the 14z-117 final-close, 14z-117 second-close, 14z-117 first-close, 14z-116, 14z-114, mid-14z-114 and 14z-113 orientations and older;
+# kept for the census anchors, eliminations and traps, superseded as the opener.
+
+## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-117 FINAL close, 2026-08-29 — superseded by the 14z-118 opener above)
 
 > ## **START HERE. NOTHING IS RED. TWO FREEZES SHIPPED AND PUSHED TODAY
 > ## (merged-m12 M10, merged-m13 M11). THE NEXT SESSION IS RULED BY THE
@@ -47,8 +101,6 @@
 > ## fbneo`. Current + one back: `don_m16/m17`, `hui50/51`, `pyron34/35`,
 > ## `m3b_merged19/20`, `m5_stock11/12`.
 
-# HISTORY BELOW — the 14z-117 second-close, 14z-117 first-close, 14z-116, 14z-114, mid-14z-114 and 14z-113 orientations and older;
-# kept for the census anchors, eliminations and traps, superseded as the opener.
 
 ## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-117 SECOND close, 2026-08-29 — superseded by the final close above)
 

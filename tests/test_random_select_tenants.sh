@@ -16,6 +16,11 @@
 # 14z-117: a bound-only thunk let those frames read vanilla's pad/code
 # bytes as ids and crash the figure refresh).
 #
+# ON THE BOARD (maintainer, MiSTer, 2026-08-29, STATE 14z-118): GREEN —
+# "behavior identical to emulation": the draw cycles all 18 on "?" and a
+# tenant confirm loads it. Section 2/3 below is the emulator twin of that
+# observation; no frame has been captured off the board ([MSV-31]).
+#
 # Sections:
 #   1  STATIC — the built patch carries BOTH thunks: site A (0x020C74) is a
 #      jmp to the bound body (15 + tenant count, re-entering 0x020C7C), site

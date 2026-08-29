@@ -12,14 +12,14 @@ skill quotes it — and it names the record each one came from.
 
 ## 1. What hardware answers that simulation cannot
 
-Three things, and as of 14z-113 all three have happened by a HUMAN'S verdict
+Three things, and as of 14z-118 all three have happened by a HUMAN'S verdict
 and none by an instrument's:
 
 | question | simulation | the board |
 |---|---|---|
-| is the picture right? | never compared — VRAM is not an oracle, the OBJ list agrees, pixels have no instrument (`mister_core.md` §12) | select screen "emulator-identical" by eye (14z-109); stock coexists on the same card (14z-113) |
+| is the picture right? | never compared — VRAM is not an oracle, the OBJ list agrees, pixels have no instrument (`mister_core.md` §12) | select screen "emulator-identical" by eye (14z-109); stock coexists on the same card (14z-113); the E2 wheel "almost perfect on CRT" (M9, 2026-08-28); the M10 sword trade seen as predicted-then-corrected (2026-08-29); M11 "behavior identical to emulation" (2026-08-29) |
 | is a ported voice HEARD? | FETCHED (DSP bank `0x83`, `test_mister_qsound_ext`) — fetched is not heard | HEARD (14z-109); never measured |
-| does it survive real SDRAM, real timing, the analog chain? | fit yes, timing a seed lottery (`platform/mister.md` "SYNTHESISING") | boots, plays, feel "better than emulator" (14z-109); re-confirmed 14z-112/113 |
+| does it survive real SDRAM, real timing, the analog chain? | fit yes, timing a seed lottery (`platform/mister.md` "SYNTHESISING") | boots, plays, feel "better than emulator" (14z-109); re-confirmed 14z-112/113, M9 (Shadow + Dark Gallon on silicon, 2026-08-28), M10 (2026-08-29), M11 (random select with tenants, 2026-08-29 — STATE 14z-118) |
 
 **[MSV-31]** **Every hardware verdict is a person at a CRT.** No frame and no audio has
 ever been captured off the board. That is the standing hole, not a
@@ -65,7 +65,7 @@ build/m3b_merged19` output and verified against `build/m3b_merged19`
 (vsavjw.zip sha1 `6f566053…`; its STOCK CONTROL MRA is byte-identical to
 14z-115's, the `.rbf` unchanged); `../mister_fieldtest_14z117b/` (merged-m13,
 M11, random select includes the tenants) likewise at 14z-117b, verified
-against `build/m3b_merged20` (vsavjw.zip sha1 `f0f9cd1b…`). **Its README was missing**
+against `build/m3b_merged20` (vsavjw.zip sha1 `f0f9cd1b…`) — **verdict GREEN 2026-08-29, STATE 14z-118**; 14z117 (M10) GREEN 2026-08-29 (STATE 14z-117 Open bugs row); 14z115 (M9) GREEN 2026-08-28 (STATE hidden-character block). **Its README was missing**
 — every earlier bundle had one — and was written at 14z-116; if a bundle is
 assembled by hand again, the README is part of it.
 
@@ -132,7 +132,7 @@ reach its rarer scripts.
 
 | what | where |
 |---|---|
-| the field verdicts | STATE_HISTORY 14z-109 (3) (first boot, voices heard, the #99 crash), STATE 14z-112 (green board on M8), STATE 14z-113 (bundle 14z112: no regression, stock coexists, STOCK CONTROL boots) |
+| the field verdicts | STATE_HISTORY 14z-109 (3) (first boot, voices heard, the #99 crash), STATE 14z-112 (green board on M8), STATE 14z-113 (bundle 14z112: no regression, stock coexists, STOCK CONTROL boots), STATE 14z-115/116 "FIELD VERDICT ON M9" in the hidden-character block (E2 wheel, Shadow, Dark Gallon), STATE Open bugs — medallion row (M10, the sword trade validated 2026-08-29), STATE 14z-118 (M11: "behavior identical to emulation"). **This row stopped at 14z-113 until 14z-118 — three verdicts had no entry here** |
 | the bundle READMEs and the original triage card | `../mister_fieldtest_14z11x/` — outside the repo (rule 7: they carry zips). **[MSV-36]** A claim corrected in the tree does NOT reach them: sweep them by hand |
 | the crash-triage kit | `docs/NEXT_SESSION.md` (HISTORY) 14z-109 banner "CRASH-TRIAGE KIT"; `tests/lua/inp_guard.lua`, `tools/run_inp_guarded.sh`, `tools/run_inp_probe.sh` |
 | the bitstream record | `release/bitstreams/<CURRENT>/BITSTREAM.txt` |

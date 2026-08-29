@@ -3196,3 +3196,31 @@ list still ran and PASSED — its second line, `"build/hui50:huitzil-m23"
 is `\`; grep `'\\ *# re-pointed'` across `tests tools build/manifest` after
 any sweep, and read a re-pointed gate's PASS by its printed per-item lines
 (four "ok: <name> matches" here, not one) before trusting the verdict.
+
+## A FIELD VERDICT LANDS IN ONE ROW AND LEAVES ITS "PENDING" TWINS ALIVE (paid: 14z-118)
+
+Recording the M11 board verdict under the retraction discipline (grep the
+CLAIM, not the files you remember) found that the two previous verdicts had
+each been written where the session was looking and nowhere else. M9's CRT
+verdict (2026-08-28) went into STATE's hidden-character block while the
+14z-115 session header and close row, and the HANDOFF registry row, still
+said "NOT yet field-tested" / "NOT YET FIELD-TESTED". M10's (2026-08-29)
+went into the Open-bugs medallion row while the HANDOFF registry row ended
+"Field test on the board pending" UNDER ITS OWN HEADER saying
+"FIELD-VALIDATED on the board", and the 14z-117 first-close header said
+"NOT field-tested". `mister_field.md` §6 — the file that exists to be the
+verdict log — stopped at 14z-113 through three green verdicts; so did
+`mister_core.md` §12 and `platform/mister.md`. Nine live "pending" lines
+survived (`build/verdict_grep_before_14z118.txt`).
+
+Why it happens: a verdict arrives as chat, is recorded where the discussion
+was (a bug row, a session table), and the "pending" wording is written by a
+DIFFERENT session at freeze time in headers and registry rows nobody
+re-reads on the day the answer comes.
+
+**Rule:** a board verdict is a CLAIM CHANGE. Before writing it anywhere,
+`grep -rn "NOT field-tested\|not field-tested\|board verdict\|pending" docs
+HANDOFF.md STATE.md tests` and retire every live hit in the same commit —
+registry row, session header, `mister_field.md` §6 (the log), and the
+out-of-tree bundle README ([MSV-36]). Show the after-grep empty outside
+HISTORY blocks.

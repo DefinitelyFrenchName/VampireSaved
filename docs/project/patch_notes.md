@@ -1,6 +1,6 @@
 # patch_notes — per-change detail: every byte, and why
 
-## 14z-117 (2) — RANDOM SELECT INCLUDES THE TENANTS (maintainer-directed, freeze donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13, mark M11): byte detail
+## 14z-117 (2) — RANDOM SELECT INCLUDES THE TENANTS (maintainer-directed, freeze donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13, mark M11; field-validated on the board 2026-08-29, 14z-118): byte detail
 
 **What.** The "?" cell's draw now cycles the 15 vanilla ids PLUS this
 build's tenants (`10 11 13` on the merged image), vs2-style. Two
