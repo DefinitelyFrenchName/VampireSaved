@@ -14,11 +14,20 @@ will alter that attract from the demo's start frame — this is *correct*
 superset behavior (the attract "involves" the modified character), not a
 violation. The auto-detecting regression runner must treat attract
 expectations as build-fingerprint-dependent when a demo-featured slot is
-modified. (Full attract demo roster: **OPEN MEASUREMENT, not run as of
-14z-118** — enumerate all demo matchups so the runner knows which builds
-legitimately change attract; the one demo measured is Jedah vs Victor from
-~frame 4278 of `01_attract_long`, `[VSE-83]` below. Until it is run, attract
-expectations stay build-fingerprint-dependent by rule, not by roster.)
+modified. **The full attract-demo roster — MEASURED 14z-118, static + dynamic,
+gate `tests/test_attract_roster.sh`:** the assigner `PRG:0x005BEA` reads the
+demo counter `RAM:$FF1E2A` (`a5-0x61D6`), masks `#$e`, doubles, and reads an
+8-entry x 4-byte table at `PRG:0x005C08` (P1 id, P2 id, venue.w) into the
+two id fields (`+0x382` of each player struct) and the venue word `$FF8100`. The eight, in order: Jedah `0F` v Victor `03`
+(venue `0x10`); Gallon `02` v Bulleta `00` (`0x0C`); Q-Bee `0C` v Bishamon `08`
+(`0x08`); Lilith `0E` v Zabel `04` (`0x04`); Anakaris `06` v Sasquatch `0A`
+(`0x02`); Demitri `01` v Morrigan `05` (`0x00`); Aulbath `09` v Felicia `07`
+(`0x0A`); Lei-Lei `0D` v Anakaris `06` (`0x06`). Every base id appears once per column; **no variant-half
+id can ever be featured**, so a tenant at `0x10-0x1F` never changes attract
+(dynamic: 40,000 vanilla attract frames, all eight seen in table order ~3,470
+frames apart, counter stepping by 2 and wrapping at 16 —
+`build/attract_roster_trace_14z118.log`). The "demo-featured slot" caveat
+above therefore applies only to a build that modifies a BASE id's data.)
 
 ## Masked windows for hooked-build legacy comparison (CLAUDE.md §4 amendment, 2026-07-25)
 
@@ -84,9 +93,12 @@ measured mechanism + maintainer sign-off.
 | `RAM:$FF8100` | the **arcade-ladder STAGE index**, written by `0x00af10` as `pool[$FF8114]` from the table-B pool at `$FF1E50` (sign-extended byte). Legal values are the even `0x00..0x16` — the twelve stages, decoded by `tools/decode_stage_banners.py`. Consumers: `0x05ffa6` computes `A0 = 0x26775A + 2*v - 4` and STORES it to `$1c(a6)` (the banner-record pointer; the deref of the FOLLOWING row happens downstream), `0x01bf5e` indexes a `0xA0`-strided palette block into `$90C2C0`, `0x004daa` indexes a dispatch at `v/2 + 9`. `v=0x18` selects row 0x1A whose follower is the table's own `0x00400000` terminator → #92. **RETRACTED 14z-94: this row previously called `0x18` "the pool's TERMINATOR" and said consumers "must treat `0x18` as end-of-list, not as a class".** The selector at `0x00aeca` has NO compare against `0x18`; its only exits are the `$FF8138` bound and the in-use mask, and `0x18` in table B is simply a stage value vsav has no stage for. The terminator that reading described lives in the OTHER table — see the `$FF1E48` row below | [D: 14z-93 (chain), corrected 14z-94 by reading `0x05ffa6`/`0x00aeca` and confirmed in-emulator — poking this word changes the venue on screen] |
 | `RAM:$FF8114` | the SELECTOR into the voice-class borrow pool (`0x00af10` reads `pool[$FF8114]`). **Nothing measured yet bounds it below the terminator index** — at the #92 crash it was 2 and the pool's terminator was at index 2 | [D: 14z-93] |
 | `RAM:$FF8109` | round timer (counts down ~1/sec during match) | [D] |
-| `RAM:$FF810E` | rounds-completed counter (0 at match start; +1 per settled down, KO and timeout paths both) | [D: 14z-104, timeout+KO probes on merged-m5] |
+| `RAM:$FF810E` | ~~rounds-completed counter (+1 per settled down)~~ **RE-MEASURED 14z-118: a round-PHASE byte, not a monotonic counter** — 0 while fighting, 1 the frame the down settles (`f3608` on both timeout legs), back to 0 when the next round spawns (`f4082`), `0xFF` at the match's end/reset (`f4934`), 1 again at the next match's first refill, 0 at its round start (`build/timeout_{ctl2,inv2}_trace_14z118.log`). The 14z-104 reading saw only the 0->1 edge | [D: 14z-118, two vanilla legs, per-frame; supersedes 14z-104's single probe] |
+| `RAM:$FF8105`, `RAM:$FF810C` | the WINNING SIDE of the settled down as a code — **1 = P1 won, 2 = P2 won** — written the same frame as `$FF8120`; both clear at match end | [D: 14z-118, ctl (P1-won) = 1/1, inv (P2-won) = 2/2; frozen in `audit_tenant_timeout.sh`] |
+| `RAM:$FF8107`, `RAM:$FF810D` | set at the settled down (`0x01`, `0xFF`); `$FF810D` clears at the next round's spawn, `$FF8107` at match end — phase flags, side-agnostic | [D: 14z-118, both legs identical] |
+| `RAM:$FF1E2A` | the ATTRACT DEMO counter (`a5-0x61D6`), +2 per attract cycle, wraps at 16; indexes the demo table `PRG:0x005C08` (above) | [D: 14z-118 trace; static `test_attract_roster.sh`] |
 | `RAM:$FF8120` | ROUND WINNER code, written when a down settles: 0xFF = P1 won the down, 0x01 = P2 won, **0x00 = DRAW (double KO — measured on mirror trades, 14z-104 (4))**. Verified discriminating in all three directions. Consumed by audit_tenant_timeout / audit_tenant_downwin / audit_edge_cases | [D: 14z-104] |
-| `RAM:$FF8127` | P1 downs-won counter (0->1 seen on a P1 win; P2 twin NOT LOCATED — an open measurement as of 14z-118; do not assume adjacency) | [D: 14z-104, single probe — weakest of the three rows] |
+| `RAM:$FF8127` | ~~P1 downs-won counter (0->1 seen on a P1 win; P2 twin not located)~~ **RETRACTED 14z-118 — the polarity is the opposite: it goes 0 -> 1 the frame AFTER a P2-WON down and stays 0 through a P1-won one; it then FLIPS at the next match's first refill on both legs (ctl 0->1, inv 1->0).** So it is not a downs-won counter of either side; a "P1 lost the last down" flag fits the first down but not the flip. SEMANTICS OPEN; the per-side record the engine actually writes at the down is `$FF8105`/`$FF810C` (row above). The 14z-104 rig read its single 0->1 as "P1 win" — the [VSP-19] verdict-logic class | [D: 14z-118, two vanilla legs per-frame, `build/timeout_{ctl2,inv2}_trace_14z118.log`; polarity frozen in `audit_tenant_timeout.sh`] |
 | `RAM:$FF8440` | the "?" (random-select) cell's walker CURSOR — index into the draw table, advanced every 3 frames while the cell is hovered; the one byte that moved on `40_pick_pyron_cell` at the 14z-117 (2) freeze, zero bytes at match | [D: 14z-117 (2), DUMPS diff pyron34 vs pyron35; mechanism `select_screen.md` "THE RANDOM CELL"] |
 | `RAM:$FF0000.w` | **CPU-EXCEPTION CODE, written by the game's own exception handlers** (14z-109). Every 68k exception vector (`vec2` bus .. `vec11` line-F, targets `PRG:0xC0-0x140`) runs `move.w #code,($FF0000).l` — code = vector-2 (0 bus, 1 address, 2 illegal, ... 9 line-F) — then saves registers and SOFT-RESTARTS the game (see the two rows below and engine_internals "CPU exceptions"). **A "flaky reset" that reboots to the NAME SCREEN is one of these, and this word says which**; a cold/watchdog reset runs the full gold RAM test instead. Confirmed live: probe-H vec3 wrote 1 here; the 14z-109 field video shows the abbreviated white check list then the name screen | [D: 14z-109 — handler disasm (`verify_op` 0xC0-0x14E) + guarded vec3 + field video] |
 | `RAM:$FF0018-$FF0053` | **registers at the last CPU exception**: the handler's `movem.l d0-a6,-(sp)` from SP=`$FF0054` lands D0..D7/A0..A6 ASCENDING here (A1 at `$FF003C`, A3 at `$FF0044`). **Written only if the handler RUNS** — a guard/debugger that freezes the machine AT the exception leaves this region stale (measured: all zeros under the crash guard while the live registers held the answer; read them via `GUARD_PROBE`, not from RAM) | [D: 14z-109, handler disasm + the empty-dump measurement] |

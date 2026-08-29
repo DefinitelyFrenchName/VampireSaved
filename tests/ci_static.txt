@@ -143,3 +143,8 @@ test_mister_mra_map
 # (CLAUDE.md §2 rule 5). One must-fire control. Needs the three solo build
 # dirs; no ROM read, ~1 s.
 test_tables_current
+# 14z-118: the attract-demo roster (8 matchups + venues, PRG:0x005C08, read by
+# the assigner at 0x005BEA) decoded from the opcode view and frozen — no
+# variant-half id can ever be featured by the demo. One negative control.
+# Needs ROMDIR (decrypt cache); ~2 s.
+test_attract_roster
