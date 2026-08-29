@@ -1,5 +1,24 @@
 # STATE — living progress log
 
+## Session 14z-118 CLOSE (2) — **the audit's second half, same day: eight more commits (9)-(16).
+## The (a)-(e) list closed; the `0xAA` question closed (Sasquatch's — blocks are 4 ids per
+## PLAYER SIDE); `+0x381` and `$FF8127` settled by their WRITERS. Sixteen audit commits in all.**
+
+| | |
+|---|---|
+| (9) | `engine_internals` measurement pass: Anakaris's DF makes zero palette-seq calls; the `0xAA` inference retracted; full-roster DF census frozen |
+| (10) | fourteen gotchas re-filed by their fact (13 project -> platform, the onset entry game -> project), anchors intact |
+| (11) | `ram.md`: the attract roster decoded + traced + gated (`test_attract_roster`); `$FF8127`'s 14z-104 row wrong; side codes `$FF8105`/`$FF810C` found and frozen in `audit_tenant_timeout.sh` |
+| (12) | `id_space.md` refreshed; the Oboro "entry path unlocated" hole closed in place |
+| (13) | STOCK CONTROL cadence RULED (maintainer): keep, once per new `.rbf` |
+| (14) | **the whole-corpus non-DF census (73 legs): `0xAA-0xAD` requested nowhere AND NOT FREE — Sasquatch's, by the routine table; THE FAMILY RULE `BASE + (side<<2) + phase`; `REPLAYS=all` mode + frozen corpus union; the (9) "candidate free" reasoning retracted (the census fallacy)** |
+| (15) | `+0x381` = the PLAYER-SIDE index, set at init (`0x0058A4`/`0x0058AA`) — write-tapped |
+| (16) | `$FF8127` = a per-frame comparator of the two fighters' object byte `+0x10` (writer `0x02228E`), not match state; the coincidence-freezing assertion I had added in (11) removed |
+| the lesson of the second half | three of my own same-day readings were wrong and corrected by a later measurement in the same session ((9)'s "candidate free", (11)'s "P2-won polarity", (14)'s "costume index" before it became a claim) — a RAM byte is settled by its WRITER, a palette block by its ROUTINE ROW, never by an edge or an absence |
+| green | `checkskills` 425 / `checkdocs` 16 locks / portable tier after every commit; `REPLAYS=all` audit PASS end to end; `audit_tenant_timeout` PASS on merged20 |
+| open | what fighter-object byte `+0x10` is (only if it matters); the cosmetic backlog (maintainer's list, unscheduled) |
+| push | (15) `d383aaf` and (16) `5a87ea2` local; everything before pushed |
+
 ## Session 14z-118 CLOSE — **THE DOCUMENTATION AUDIT, FIRST PASS: the docs locked to each
 ## other (`checkdocs`, 16 locks), the community tables GENERATED and GATED, the specimen family
 ## and `engine_internals`' citable sites corrected, seven HIST banners, HANDOFF re-pointed —
