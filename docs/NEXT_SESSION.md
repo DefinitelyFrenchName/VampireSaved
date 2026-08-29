@@ -37,7 +37,9 @@
 > ## palette-seq blocks are 8 ids, `BASE + ($381<<2) + phase`, and a free one
 > ## is found by reading `0x02A8A4`'s routines, never by a census. `+0x381` is
 > ## the PLAYER-SIDE index (tapped: set at init, AUDIT (15)) — so a block is 4
-> ## ids per SIDE. Still open, only if it ever matters: `$FF8127`'s meaning.
+> ## ids per SIDE. `$FF8127` RESOLVED (AUDIT (16)): a per-frame comparator of
+> ## the two fighters' object byte `+0x10` (writer `0x02228E`), not match state.
+> ## Open, only if it ever matters: what object byte `+0x10` is.
 > ##
 > ## **CURRENT:** donovan-m17 `90a225ce` / huitzil-m24 `ae953657` /
 > ## pyron-m18 `1222df18` / merged-m13 `a1b7cb82` (`build/m3b_merged20`,

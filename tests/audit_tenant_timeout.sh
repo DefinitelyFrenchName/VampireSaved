@@ -43,7 +43,7 @@ BUILD="${BUILD:-build/m3b_merged20}"  # re-pointed 14z-117b (random-select freez
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 RPL="$REPO/tests/replays/judge/01_timeout_lead.rpl"
-FIELDS="ff8109:b:timer,ff8120:b:winner,ff810e:b:rounds,ff8450:w:p1hp,ff8850:w:p2hp,ff8105:b:side05,ff810c:b:side0c,ff8127:b:b27"
+FIELDS="ff8109:b:timer,ff8120:b:winner,ff810e:b:rounds,ff8450:w:p1hp,ff8850:w:p2hp,ff8105:b:side05,ff810c:b:side0c"
 
 leg() {  # name  p1id  extra-pokes
     n="$1"; id="$2"; extra="$3"
@@ -102,10 +102,8 @@ for leg, want in WANT.items():
         continue
     # 14z-118 (the ram.md audit, measured on vanilla vsavj, ctl+inv legs):
     # at the settled down the engine also writes the WINNING SIDE as a code
-    # in $FF8105 and $FF810C (1 = P1, 2 = P2), and $FF8127 goes 0 -> 1 the
-    # frame AFTER a P2-won down and stays 0 through a P1-won one. Frozen
-    # here so the ram.md rows cannot drift back to the retracted 14z-104
-    # reading ("$FF8127 = P1 downs-won").
+    # in $FF8105 and $FF810C (1 = P1, 2 = P2). Frozen here so the ram.md
+    # rows cannot drift back to the retracted 14z-104 reading.
     side = 2 if want == 0x01 else 1
     first = min(fr for fr in sorted(rows) if rows[fr]["rounds"] >= 1)
     at = rows[first]
@@ -113,11 +111,10 @@ for leg, want in WANT.items():
         errs.append(f"{leg}: side codes $FF8105/$FF810C = {at['side05']}/{at['side0c']} "
                     f"at the down (f{first}), expected {side}/{side}")
         continue
-    b27 = {rows[fr]["b27"] for fr in sorted(rows) if first <= fr <= first + 2}
-    if (want == 0x01 and 1 not in b27) or (want != 0x01 and b27 != {0}):
-        errs.append(f"{leg}: $FF8127 read {sorted(b27)} within 2 frames of the down — "
-                    f"expected {'1 on a P2-won down' if want == 0x01 else '0 on a P1-won down'}")
-        continue
+    # ($FF8127 was asserted here for a few hours at 14z-118 as "1 after a
+    #  P2-won down": its writer PRG:0x02228E compares the two fighters'
+    #  object byte +0x10 every frame — not match state; the assertion froze a
+    #  coincidence of this rig and was removed the same session.)
     # round 2 must spawn live: after the round advanced, HP refills
     refill = [fr for fr in sorted(rows)
               if rows[fr]["rounds"] >= 1 and rows[fr]["p1hp"] == 0x120
@@ -132,7 +129,7 @@ for e in errs:
     print("FAIL:", e)
 sys.exit(1 if errs else 0)
 PY
-echo '      (+14z-118: side codes $FF8105/$FF810C and the $FF8127 polarity frozen)'
+echo '      (+14z-118: side codes $FF8105/$FF810C frozen)'
 echo "PASS: the timeout judge awards the down to the HP leader for all"
 echo "      three tenants (legacy control green, inverted control judged"
 echo "      the other way)"
