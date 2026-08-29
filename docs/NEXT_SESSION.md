@@ -1,4 +1,54 @@
-# NEXT SESSION — orientation (rewritten at the 14z-118 close, 2026-08-29)
+# NEXT SESSION — orientation (rewritten at the 14z-118 close, 2026-08-29, for a FRESH session)
+
+> ## **START HERE. TWO GATES ARE RED BY DESIGN — not a defect: after Donovan's
+> ## physics port (`port_param32 = true`, maintainer-ruled) the tree
+> ## reproduces the probe `7109f835`, not the frozen donovan-m17, so
+> ## `test_m3a_reproducible` and `test_tenant_loop` (339/615/826 ops) stay red
+> ## until the M12 FREEZE BATTERY re-pins them. Everything else is green and
+> ## PUSHED.**
+> ##
+> ## **THE MAINTAINER CHOOSES THE ORDER: (A) the M12 battery first** (~5 h;
+> ## STATE 14z-115 has the order; it also regenerates the three
+> ## `docs/project/tables/{donovan,huitzil,pyron}.md` AND the six
+> ## `docs/project/tables/chars/*` pages — `test_tables_current` /
+> ## `test_charmap_current` gate them; mark M11 -> M12; expect the Donovan
+> ## tenant-rig `.sha1`s to move — his walk and jumps are VS2's now —
+> ## attribute by DUMPS as always) **or (B) phase 2 of the character-data
+> ## map first** (hitbox rectangles + attack records by MEASUREMENT on
+> ## native vs2; settles the `+0x17` vs `+0x1D` class-byte disagreement).
+> ## **(C) the move lists**, when the maintainer provides them ->
+> ## `build/manifest/moves_<tenant>.toml` (template committed) = phase 1's
+> ## naming; the chain decoder is already live-verified.
+> ##
+> ## **WHAT EXISTS (one breath):** the character-data map — `tools/charmap_gen.py`
+> ## -> `docs/project/tables/chars/<tenant>.json` (agents) + `.md` and
+> ## `_anim.md` (humans); overrides in `build/manifest/charmap_<tenant>.toml`
+> ## compiled by `tools/charmap_compile.py` into a marked block of the tenant
+> ## manifest; `tools/anim_nodes.py` + `tests/test_anim_node_walk.sh` (3,638/
+> ## 3,638 node pointers on the graph, Donovan on native vs2). Every ours-vs-
+> ## VS2 difference on the three solos is attributed (bank 0, dispatch 0,
+> ## anim nodes 0 unattributed; 692/342/342 bytes in the effect tail named).
+> ## Load `vampire-saved-port` first; the map's "What is NOT decoded" is the
+> ## worklist.
+> ##
+> ## **CURRENT (frozen):** donovan-m17 `90a225ce` / huitzil-m24 `ae953657` /
+> ## pyron-m18 `1222df18` / merged-m13 `a1b7cb82` (`build/m3b_merged20`),
+> ## stock twin `d29fd062`; bundle 14z117b FIELD-VERIFIED GREEN (M11).
+> ## UNFROZEN: Donovan's physics rows (probe `build/don_phys_probe`).
+> ##
+> ## **OPEN, unchanged:** the 1:1 wheel mockup; #112/#113 parked; the FBNeo
+> ## two-run-family question; the tenant CPU AI "lackluster" note; win
+> ## quotes (forgone). `test_random_select_tenants.sh`'s CONTROL is
+> ## `build/m3b_merged19` — re-point or accept its SKIP when it rolls off.
+> ##
+> ## **STATE OF THE BUILDS:** play `tools/run_wide.sh build/m3b_merged20
+> ## fbneo`. Current + one back: `don_m16/m17`, `hui50/51`, `pyron34/35`,
+> ## `m3b_merged19/20`, `m5_stock11/12`; plus the probe `don_phys_probe`.
+
+# HISTORY BELOW — the 14z-118 close (audit), 14z-118 verdict, 14z-117 final-close, 14z-117 second-close, 14z-117 first-close, 14z-116, 14z-114, mid-14z-114 and 14z-113 orientations and older;
+# kept for the census anchors, eliminations and traps, superseded as the opener.
+
+## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-118 audit close, 2026-08-29 — superseded by the fresh-session opener above)
 
 > ## **START HERE. NOTHING IS RED. TWO ARCS CLOSED THIS SESSION: the
 > ## documentation audit (16 commits, STATE 14z-118 CLOSE + CLOSE (2)) and
@@ -66,8 +116,6 @@
 > ## fbneo`. Current + one back: `don_m16/m17`, `hui50/51`, `pyron34/35`,
 > ## `m3b_merged19/20`, `m5_stock11/12`.
 
-# HISTORY BELOW — the 14z-118 verdict, 14z-117 final-close, 14z-117 second-close, 14z-117 first-close, 14z-116, 14z-114, mid-14z-114 and 14z-113 orientations and older;
-# kept for the census anchors, eliminations and traps, superseded as the opener.
 
 ## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-118 VERDICT, 2026-08-29 — superseded by the 14z-118 close above)
 

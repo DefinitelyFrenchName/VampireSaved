@@ -586,6 +586,8 @@ member identical). The naked-eye tell is the **M11** mark; park the cursor
 on "?" and the draw cycles all 18 — confirm on a tenant and it loads.
 **FIELD VERDICT GREEN on the board (maintainer, MiSTer, 2026-08-29, STATE 14z-118): behaviour identical to emulation — the draw cycles all 18, a tenant confirm loads, the M10 trade re-observed.** Detail: patch_notes 14z-117 (2), STATE 14z-117 / 14z-118; the registry row below.
 
+**UNFROZEN since 14z-118 (maintainer-ruled 2026-08-29): `build/manifest/donovan.toml` carries `port_param32 = true` — Donovan's walk/jump rows port VS2's values instead of the alias row's (Victor's). The tree therefore reproduces the probe `build/don_phys_probe` (`7109f835`), NOT donovan-m17: `test_m3a_reproducible` and `test_tenant_loop` (339/615/826 ops) are RED BY DESIGN until the M12 battery. The character-data map (`docs/project/tables/chars/`) labels the rows accordingly.**
+
 **Previous batch (14z-117 PYRON-MEDALLION FREEZE, the 14z-116 fix,
 field-validated on the board 2026-08-29 before freezing; mark M10):
 donovan-m16 / huitzil-m23 / pyron-m17 / merged-m12.**

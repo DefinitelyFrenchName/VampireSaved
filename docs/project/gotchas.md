@@ -3033,3 +3033,21 @@ rule sits within a few frames of it before moving it.
 VAMPIRE SAVIOR itself". Restored. It is a VERIFICATION-CLASS fact and a
 re-filing candidate for `../project/gotchas.md`; listed in
 `docs/project/skills_scope.md` §4.)*
+
+## A STOCK-TRACK GATE HANDED A WIDE ROMPATH RUNS PRISTINE vsavj AND FAILS IDENTICALLY ON ANY BUILD (paid: 14z-118)
+
+`test_don_reactions.sh`, `test_m2a_stage4_oracle.sh` and `test_don_column.sh`
+take a `[rompath_dir]` and default to the M2-era stock build (`build/donovan6`).
+Pointed at a WIDE build's rompath (which holds only `vsavjw.zip`), their
+`vsavj` set falls through to the pristine dump in `$ROMDIR` — vanilla Jedah
+plays the rig — and every assertion fails ("only 1 damage step — 421P must
+multi-hit", "diverges MORE than a native veteran"). Read as a physics-port
+regression for a moment; the CONTROL (the same invocation on the current
+freeze `don_m17`) failed identically and exposed it.
+
+**Rule:** a WIDE build is measured by the gates that take `BUILD=` and run
+`vsavjw` (`audit_don_*`, `audit_tenant_*`, the suites); a gate whose usage
+says `[rompath_dir]` and defaults to `build/donovan*` is a stock-track
+instrument. Before believing any gate's red on a new build, run it on the
+current freeze first — identical red means the instrument, not the change.
+
