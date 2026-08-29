@@ -88,8 +88,11 @@ assembled by hand again, the README is part of it.
    STOCK fails too -> not ours: the bitstream, the SDRAM module, the card or
    the video chain. **[MSV-22]** Since the bitstream, not the romset, is what this
    control certifies, it needs running once per NEW `.rbf` (seed, slice or
-   pin), not per romset release (STATE "Decisions pending", recommendation;
-   the maintainer asked, did not rule).
+   pin), not per romset release — **RULED so by the maintainer 2026-08-29
+   (14z-118): keep it in every release's `mister/`, run it when the
+   bitstream changes, off the per-release checklist; seed 18269 is covered
+   by the 14z-113 pass until the next synthesis** *(this sentence read
+   "recommendation; the maintainer asked, did not rule" until then)*.
 
 ## 3. What a good boot looks like (stopwatch figures)
 

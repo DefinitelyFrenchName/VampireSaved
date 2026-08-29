@@ -30,8 +30,10 @@
 > ## ~~(c)~~ DONE (AUDIT (11)): the attract roster decoded, traced and gated
 > ## (`test_attract_roster`); `$FF8127`'s 14z-104 reading was WRONG — it marks a
 > ## P2-won down, not a P1-won one, and flips at the refill (semantics OPEN);
-> ## the real side codes are `$FF8105`/`$FF810C`; ~~(d)~~ DONE (AUDIT (12)); (e)
-> ## the STOCK CONTROL once-per-`.rbf` ruling (unruled since 14z-113).
+> ## the real side codes are `$FF8105`/`$FF810C`; ~~(d)~~ DONE (AUDIT (12)); ~~(e)~~
+> ## RULED 2026-08-29 (AUDIT (13)): STOCK CONTROL kept, run once per NEW `.rbf`.
+> ## **THE 14z-118 LIST IS CLOSED.** Still open from it: the whole-corpus non-DF
+> ## census before `0xAA` is called free; `$FF8127`'s meaning if it ever matters.
 > ##
 > ## **CURRENT:** donovan-m17 `90a225ce` / huitzil-m24 `ae953657` /
 > ## pyron-m18 `1222df18` / merged-m13 `a1b7cb82` (`build/m3b_merged20`,
