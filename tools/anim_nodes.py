@@ -53,7 +53,7 @@ NODE = 0x18
 MAX_NODES = 4096
 
 
-def walk_table(img, base, table, end=None, max_seq=None):
+def walk_table(img, base, table, end=None, max_seq=None, entries=None):
     def rd(addr, n):
         o = addr - base
         if o < 0 or o + n > len(img):
@@ -74,9 +74,13 @@ def walk_table(img, base, table, end=None, max_seq=None):
         if words and k * 2 >= min(w for w in words if w):
             break
     nonzero = [w for w in words if w]
-    if not nonzero:
+    if not nonzero and entries is None:
         return {"table": f"{table:#x}", "entries": 0, "chains": {}, "error": "empty table"}
-    entries = min(nonzero) // 2
+    if entries is None:
+        entries = min(nonzero) // 2
+    else:
+        # a caller-imposed count (the ours side of a comparison): read that many words
+        words = [int.from_bytes(rd(table + 2 * k, 2) or b"\0\0", "big") for k in range(entries)]
     words = words[:entries]
     bad = [i for i, w in enumerate(words) if w and w < entries * 2]
     chains = {}

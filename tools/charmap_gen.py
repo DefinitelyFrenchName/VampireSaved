@@ -220,6 +220,7 @@ def attribute_diff(name, r, vs2, ours, manifest, overrides, built, regions, tile
     counts = {"total": 0, "relocated_ok": 0, "relocated_bad": 0, "attributed": 0, "override": 0, "gfx_remap": 0, "unattributed": 0}
     by_label = {}
     unatt = []
+    labels = {}  # differing offset -> label (for the structure-level passes)
     i = 0
     n = min(len(vs2), len(ours))
     seen_refs = set()
@@ -231,6 +232,7 @@ def attribute_diff(name, r, vs2, ours, manifest, overrides, built, regions, tile
         if i in ov:
             counts["override"] += 1
             by_label[ov[i]] = by_label.get(ov[i], 0) + 1
+            labels[i] = ov[i]
         elif i in refs:
             ref = refs[i]
             if id(ref) not in seen_refs:
@@ -245,37 +247,47 @@ def attribute_diff(name, r, vs2, ours, manifest, overrides, built, regions, tile
                 else:
                     ok = False
                 counts["relocated_ok" if ok else "relocated_bad"] += 1
+                for k in range(w):
+                    labels[ref["off"] + k] = "relocated" if ok else "relocated_bad"
                 if not ok and len(unatt) < UNATTRIBUTED_CAP:
                     unatt.append({"off": f"{ref['off']:#x}", "kind": "relocated_bad", "vs2": vs2[ref['off']:ref['off']+w].hex(), "ours": ours[ref['off']:ref['off']+w].hex(), "target": f"{ref['target']:#x}"})
         elif i in fixes:
             counts["attributed"] += 1
             by_label[fixes[i]] = by_label.get(fixes[i], 0) + 1
+            labels[i] = fixes[i]
         elif band and i % 2 == 0 and i + 1 < n and _is_remapped_word(vs2, ours, i, band):
             # a sprite-record tile code inside the [gfx_remap] band, moved by its delta
             counts["gfx_remap"] += 2
+            labels[i] = labels[i + 1] = "gfx_remap"
             i += 2
             continue
         elif band and i % 2 == 1 and i >= 1 and _is_remapped_word(vs2, ours, i - 1, band):
             counts["gfx_remap"] += 1
+            labels[i] = "gfx_remap"
         elif tilemap and i % 2 == 0 and i + 1 < n and tilemap.get(u16(vs2[i:i+2])) == u16(ours[i:i+2]):
             # a shelf-packed non-band tile code, per the build's own gfx ledger (patch/effect_map.json)
             counts["gfx_remap"] += 2
+            labels[i] = labels[i + 1] = "gfx_remap"
             i += 2
             continue
         elif tilemap and i % 2 == 1 and i >= 1 and tilemap.get(u16(vs2[i-1:i+1])) == u16(ours[i-1:i+1]):
             counts["gfx_remap"] += 1
+            labels[i] = "gfx_remap"
         elif ranges and _ptr_into(ours, i, ranges) is not None:
             lab, span = _ptr_into(ours, i, ranges)
             counts["attributed"] += span
             by_label[lab] = by_label.get(lab, 0) + 1
+            for k in range(span):
+                labels[i + k] = lab
             i += span
             continue
         else:
             counts["unattributed"] += 1
+            labels[i] = "UNATTRIBUTED"
             if len(unatt) < UNATTRIBUTED_CAP:
                 unatt.append({"off": f"{i:#x}", "kind": "unattributed", "vs2": f"{vs2[i]:02x}", "ours": f"{ours[i]:02x}"})
         i += 1
-    return counts, dict(sorted(by_label.items())), unatt
+    return counts, dict(sorted(by_label.items())), unatt, labels
 
 
 def _ptr_into(ours, i, ranges):
@@ -482,6 +494,7 @@ def main():
                     lo = int(op["addr"], 16) if isinstance(op["addr"], str) else int(op["addr"])
                     ranges.append((lo, lo + f.stat().st_size, "effect_lists (companion-effect coord list pointer, resolved from a 0xEE placeholder)"))
     reg_out = {}
+    region_labels = {}
     totals = {"unattributed": 0, "relocated_bad": 0, "code_bytes_differ": 0}
     for name, r in regions.items():
         vs2 = (ex / f"region_{name}.bin").read_bytes()
@@ -497,7 +510,8 @@ def main():
             entry["diff"] = {"bytes_differ": nd, "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks — attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"}
             totals["code_bytes_differ"] += nd
         else:
-            counts, by_label, unatt = attribute_diff(name, r, vs2, ours, manifest, overrides, built, regions, tilemap, ranges)
+            counts, by_label, unatt, labels = attribute_diff(name, r, vs2, ours, manifest, overrides, built, regions, tilemap, ranges)
+            region_labels[name] = labels
             entry["diff"] = {"counts": counts, "attributed_by": by_label, "sites": unatt}
             totals["unattributed"] += counts["unattributed"]
             totals["relocated_bad"] += counts["relocated_bad"]
@@ -571,10 +585,25 @@ def main():
             t_vs2 = int(v["ptr"], 16)
             t_ours = t_vs2 - r["src"] + dst
             wv = anim_nodes.walk_table(blob, r["src"], t_vs2, r["src"] + r["len"])
-            wo = anim_nodes.walk_table(ours_blob, dst, t_ours, dst + r["len"])
+            # ours: walk exactly vs2's entry count (a rewritten table word must not shrink the table)
+            wo = anim_nodes.walk_table(ours_blob, dst, t_ours, dst + r["len"], max_seq=wv["entries"], entries=wv["entries"])
             chains = {}
+            alab = region_labels.get("anim", {})
             for seq, cv in wv["chains"].items():
                 co = wo["chains"].get(seq, {"nodes": [], "end": "missing", "start": None})
+                # the index-table word: did the port move this chain's START?
+                sv = int(cv["start"], 16) - t_vs2 if cv["start"] else None
+                so = int(co["start"], 16) - t_ours if co.get("start") else None
+                if sv is not None and sv != so:
+                    woff = (t_vs2 - r["src"]) + 2 * int(seq, 16)
+                    lab = {alab.get(woff), alab.get(woff + 1)} - {None}
+                    chains[seq] = {"start": cv["start"], "end": cv["end"], "frames": cv.get("frames"), "n": len(cv["nodes"]),
+                                   "ours_end": co.get("end"), "nodes": [],
+                                   "start_moved": {"vs2_off": f"{sv:#x}", "ours_off": (f"{so:#x}" if so is not None else None),
+                                                   "ours_source": (",".join(sorted(lab)) if lab else "UNATTRIBUTED")}}
+                    totals_nodes["nodes"] += len(cv["nodes"]); totals_nodes["differ"] += 1
+                    if lab and "UNATTRIBUTED" not in lab: totals_nodes["attributed"] += 1
+                    continue
                 nodes = []
                 for k, nv in enumerate(cv["nodes"]):
                     no = co["nodes"][k] if k < len(co["nodes"]) else None
@@ -590,23 +619,17 @@ def main():
                     if nv.get("link"):
                         lv = int(nv["link"], 16); lo = int(no["link"], 16) if (no and no.get("link")) else None
                         wl = expected_placed(regions, built, lv)
-                        fields["link"] = {"vs2": nv["link"], "ours": (no.get("link") if no else None), "diff": not (lo == wl), "ours_source": ("relocated" if lo == wl else "UNATTRIBUTED")}
+                        lsrc = "relocated" if (wl is not None and lo == wl) else ("byte" if lo == lv else "UNATTRIBUTED")
+                        fields["link"] = {"vs2": nv["link"], "ours": (no.get("link") if no else None), "expected_placed": (f"{wl:#x}" if wl else None), "diff": lsrc == "UNATTRIBUTED", "ours_source": lsrc}
                     nd = [fn for fn, fd in fields.items() if fd["diff"]]
                     src = "byte"
                     if nd:
-                        lab = None
-                        for o in overrides:
-                            if o["region"] == "anim" and o["off"] <= off + 0x17 and off <= o["off"] + len(bytes.fromhex(o["value"])) - 1:
-                                lab = "override:" + o["id"]
-                        if lab is None:
-                            for rf in rows(manifest, "region_fix"):
-                                if rf.get("region") == "anim":
-                                    ro = int(rf["off"]) if not isinstance(rf["off"], str) else int(rf["off"], 0)
-                                    if off <= ro <= off + 0x17:
-                                        lab = "region_fix:" + str(rf.get("note", ""))[:60]
-                        src = lab or "UNATTRIBUTED"
+                        # reuse the region-level per-byte attribution of this node's 0x18 bytes
+                        labs = {alab[k] for k in range(off, off + 0x18) if k in alab}
+                        src = ",".join(sorted(labs)) if labs else "UNATTRIBUTED"
                         totals_nodes["differ"] += 1
-                        if lab: totals_nodes["attributed"] += 1
+                        if labs and "UNATTRIBUTED" not in labs and "relocated_bad" not in labs:
+                            totals_nodes["attributed"] += 1
                     totals_nodes["nodes"] += 1
                     nodes.append({"addr": nv["addr"], "off": f"{off:#x}", "fields": fields, "diff": nd, "ours_source": src})
                 chains[seq] = {"start": cv["start"], "end": cv["end"], "frames": cv.get("frames"), "n": len(cv["nodes"]),

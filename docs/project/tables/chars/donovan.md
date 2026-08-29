@@ -22,7 +22,7 @@ Sources: **vs2** = `vsav2` extract (oracle `vhunt2`); **ours** = the built image
 | measure | value |
 |---|---|
 | anim_nodes | 3308 |
-| anim_nodes_differ_unattributed | 8 |
+| anim_nodes_differ_unattributed | 0 |
 | bank_fields_unattributed | 0 |
 | code_bytes_differ_out_of_scope | 67383 |
 | dispatch_unattributed | 0 |
@@ -409,7 +409,7 @@ Sources: **vs2** = `vsav2` extract (oracle `vhunt2`); **ours** = the built image
 
 ## Animation node chains (phase 1) — summary
 
-3308 nodes across the five index tables; 8 nodes differ from vs2 in a decoded field (0 attributed). Verified by `tests/test_anim_node_walk.sh (Donovan, native vs2: 3638/3638 node pointers on the graph, 14z-118)`. Per-chain detail: the appendix page `donovan_anim.md`.
+3308 nodes across the five index tables; 8 nodes differ from vs2 in a decoded field (8 attributed). Verified by `tests/test_anim_node_walk.sh (Donovan, native vs2: 3638/3638 node pointers on the graph, 14z-118)`. Per-chain detail: the appendix page `donovan_anim.md`.
 
 | table | vs2 table | ours table | entries | chains | nodes | loops | holds |
 |---|---|---|---|---|---|---|---|

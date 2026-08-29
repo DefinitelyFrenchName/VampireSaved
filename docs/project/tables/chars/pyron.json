@@ -2,7 +2,7 @@
  "char": "0x11",
  "diff_summary": {
   "anim_nodes": 2140,
-  "anim_nodes_differ_unattributed": 89,
+  "anim_nodes_differ_unattributed": 0,
   "bank_fields_unattributed": 0,
   "code_bytes_differ_out_of_scope": 81072,
   "dispatch_unattributed": 0,
@@ -38,7 +38,7 @@
   "anim": {
    "_summary": {
     "attributed": 0,
-    "differ": 89,
+    "differ": 0,
     "nodes": 2140
    },
    "_verified_by": "tests/test_anim_node_walk.sh (Donovan, native vs2: 3638/3638 node pointers on the graph, 14z-118)",
@@ -825,6 +825,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd35fa",
           "ours": "0xd35fa",
           "ours_source": "relocated",
           "vs2": "0x264120"
@@ -1640,6 +1641,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd377e",
           "ours": "0xd377e",
           "ours_source": "relocated",
           "vs2": "0x2642a4"
@@ -2255,6 +2257,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd3902",
           "ours": "0xd3902",
           "ours_source": "relocated",
           "vs2": "0x264428"
@@ -3070,6 +3073,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd35fa",
           "ours": "0xd35fa",
           "ours_source": "relocated",
           "vs2": "0x264120"
@@ -3685,6 +3689,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd3a26",
           "ours": "0xd3a26",
           "ours_source": "relocated",
           "vs2": "0x26454c"
@@ -4500,6 +4505,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd35fa",
           "ours": "0xd35fa",
           "ours_source": "relocated",
           "vs2": "0x264120"
@@ -4541,183 +4547,156 @@
       "nodes": [
        {
         "addr": "0x2646a0",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 2,
           "vs2": 2
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 2,
           "vs2": 2
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "7d0000000000",
           "vs2": "7d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdf540",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdf540",
+          "ours_source": "relocated",
           "vs2": "0x270066"
          }
         },
         "off": "0x61a",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x2646b8",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 2,
           "vs2": 2
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "7d0000000000",
           "vs2": "7d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdf582",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdf582",
+          "ours_source": "relocated",
           "vs2": "0x2700a8"
          }
         },
         "off": "0x632",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x2646d0",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 64,
           "vs2": 64
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "7d0000000000",
           "vs2": "7d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdf582",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdf582",
+          "ours_source": "relocated",
           "vs2": "0x2700a8"
          }
         },
         "off": "0x64a",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        }
       ],
-      "ours_end": "missing",
+      "ours_end": "hold",
       "start": "0x2646a0"
      },
      "0x07": {
@@ -4727,183 +4706,156 @@
       "nodes": [
        {
         "addr": "0x2646a0",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 2,
           "vs2": 2
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 2,
           "vs2": 2
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "7d0000000000",
           "vs2": "7d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdf540",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdf540",
+          "ours_source": "relocated",
           "vs2": "0x270066"
          }
         },
         "off": "0x61a",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x2646b8",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 2,
           "vs2": 2
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "7d0000000000",
           "vs2": "7d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdf582",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdf582",
+          "ours_source": "relocated",
           "vs2": "0x2700a8"
          }
         },
         "off": "0x632",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x2646d0",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 64,
           "vs2": 64
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "7d0000000000",
           "vs2": "7d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdf582",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdf582",
+          "ours_source": "relocated",
           "vs2": "0x2700a8"
          }
         },
         "off": "0x64a",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        }
       ],
-      "ours_end": "missing",
+      "ours_end": "hold",
       "start": "0x2646a0"
      },
      "0x08": {
@@ -4913,124 +4865,106 @@
       "nodes": [
        {
         "addr": "0x2646b8",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 2,
           "vs2": 2
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "7d0000000000",
           "vs2": "7d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdf582",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdf582",
+          "ours_source": "relocated",
           "vs2": "0x2700a8"
          }
         },
         "off": "0x632",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x2646d0",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 64,
           "vs2": 64
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "7d0000000000",
           "vs2": "7d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdf582",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdf582",
+          "ours_source": "relocated",
           "vs2": "0x2700a8"
          }
         },
         "off": "0x64a",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        }
       ],
-      "ours_end": "missing",
+      "ours_end": "hold",
       "start": "0x2646b8"
      },
      "0x09": {
@@ -5040,124 +4974,106 @@
       "nodes": [
        {
         "addr": "0x264670",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 2,
           "vs2": 2
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "6d0000000000",
           "vs2": "6d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdf540",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdf540",
+          "ours_source": "relocated",
           "vs2": "0x270066"
          }
         },
         "off": "0x5ea",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264688",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 64,
           "vs2": 64
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 2,
           "vs2": 2
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "6d0000000000",
           "vs2": "6d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdf5c8",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdf5c8",
+          "ours_source": "relocated",
           "vs2": "0x2700ee"
          }
         },
         "off": "0x602",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        }
       ],
-      "ours_end": "missing",
+      "ours_end": "hold",
       "start": "0x264670"
      },
      "0x0a": {
@@ -5167,124 +5083,106 @@
       "nodes": [
        {
         "addr": "0x264670",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 2,
           "vs2": 2
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "6d0000000000",
           "vs2": "6d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdf540",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdf540",
+          "ours_source": "relocated",
           "vs2": "0x270066"
          }
         },
         "off": "0x5ea",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264688",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 64,
           "vs2": 64
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 2,
           "vs2": 2
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "6d0000000000",
           "vs2": "6d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdf5c8",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdf5c8",
+          "ours_source": "relocated",
           "vs2": "0x2700ee"
          }
         },
         "off": "0x602",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        }
       ],
-      "ours_end": "missing",
+      "ours_end": "hold",
       "start": "0x264670"
      },
      "0x0b": {
@@ -5294,65 +5192,56 @@
       "nodes": [
        {
         "addr": "0x264688",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 64,
           "vs2": 64
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 2,
           "vs2": 2
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "6d0000000000",
           "vs2": "6d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdf5c8",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdf5c8",
+          "ours_source": "relocated",
           "vs2": "0x2700ee"
          }
         },
         "off": "0x602",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        }
       ],
-      "ours_end": "missing",
+      "ours_end": "hold",
       "start": "0x264688"
      },
      "0x0c": {
@@ -5362,242 +5251,206 @@
       "nodes": [
        {
         "addr": "0x2646e8",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "7d0000000000",
           "vs2": "7d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdf492",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdf492",
+          "ours_source": "relocated",
           "vs2": "0x26ffb8"
          }
         },
         "off": "0x662",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264700",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "7d0000000000",
           "vs2": "7d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdf4cc",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdf4cc",
+          "ours_source": "relocated",
           "vs2": "0x26fff2"
          }
         },
         "off": "0x67a",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264718",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "7d0000000000",
           "vs2": "7d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdf50a",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdf50a",
+          "ours_source": "relocated",
           "vs2": "0x270030"
          }
         },
         "off": "0x692",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264730",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 64,
           "vs2": 64
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "7d0000000000",
           "vs2": "7d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdf50a",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdf50a",
+          "ours_source": "relocated",
           "vs2": "0x270030"
          }
         },
         "off": "0x6aa",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        }
       ],
-      "ours_end": "missing",
+      "ours_end": "hold",
       "start": "0x2646e8"
      },
      "0x0d": {
@@ -5607,242 +5460,206 @@
       "nodes": [
        {
         "addr": "0x264748",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 2,
           "vs2": 2
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "6d0000000000",
           "vs2": "6d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfc8a",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfc8a",
+          "ours_source": "relocated",
           "vs2": "0x2707b0"
          }
         },
         "off": "0x6c2",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264760",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 2,
           "vs2": 2
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "6d0000000000",
           "vs2": "6d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfcdc",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfcdc",
+          "ours_source": "relocated",
           "vs2": "0x270802"
          }
         },
         "off": "0x6da",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264778",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 2,
           "vs2": 2
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "6d0000000000",
           "vs2": "6d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfd22",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfd22",
+          "ours_source": "relocated",
           "vs2": "0x270848"
          }
         },
         "off": "0x6f2",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264790",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 64,
           "vs2": 64
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 2,
           "vs2": 2
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "6d0000000000",
           "vs2": "6d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfd22",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfd22",
+          "ours_source": "relocated",
           "vs2": "0x270848"
          }
         },
         "off": "0x70a",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        }
       ],
-      "ours_end": "missing",
+      "ours_end": "hold",
       "start": "0x264748"
      },
      "0x0e": {
@@ -5852,124 +5669,106 @@
       "nodes": [
        {
         "addr": "0x2647a8",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d1000000000",
           "vs2": "8d1000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfd70",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfd70",
+          "ours_source": "relocated",
           "vs2": "0x270896"
          }
         },
         "off": "0x722",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x2647c0",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 64,
           "vs2": 64
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d1000000000",
           "vs2": "8d1000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfd70",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfd70",
+          "ours_source": "relocated",
           "vs2": "0x270896"
          }
         },
         "off": "0x73a",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        }
       ],
-      "ours_end": "missing",
+      "ours_end": "hold",
       "start": "0x2647a8"
      },
      "0x0f": {
@@ -5979,183 +5778,156 @@
       "nodes": [
        {
         "addr": "0x2647d8",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdf540",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdf540",
+          "ours_source": "relocated",
           "vs2": "0x270066"
          }
         },
         "off": "0x752",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x2647f0",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 2,
           "vs2": 2
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdf582",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdf582",
+          "ours_source": "relocated",
           "vs2": "0x2700a8"
          }
         },
         "off": "0x76a",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264808",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 65,
           "vs2": 65
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdf582",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdf582",
+          "ours_source": "relocated",
           "vs2": "0x2700a8"
          }
         },
         "off": "0x782",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        }
       ],
-      "ours_end": "missing",
+      "ours_end": "hold",
       "start": "0x2647d8"
      },
      "0x10": {
@@ -6165,1252 +5937,1063 @@
       "nodes": [
        {
         "addr": "0x264820",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfe0a",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfe0a",
+          "ours_source": "relocated",
           "vs2": "0x270930"
          }
         },
         "off": "0x79a",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264838",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfe64",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfe64",
+          "ours_source": "relocated",
           "vs2": "0x27098a"
          }
         },
         "off": "0x7b2",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264850",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfede",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfede",
+          "ours_source": "relocated",
           "vs2": "0x270a04"
          }
         },
         "off": "0x7ca",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264868",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdff0c",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdff0c",
+          "ours_source": "relocated",
           "vs2": "0x270a32"
          }
         },
         "off": "0x7e2",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264880",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdff62",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdff62",
+          "ours_source": "relocated",
           "vs2": "0x270a88"
          }
         },
         "off": "0x7fa",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264898",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdffb0",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdffb0",
+          "ours_source": "relocated",
           "vs2": "0x270ad6"
          }
         },
         "off": "0x812",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x2648b0",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe0012",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe0012",
+          "ours_source": "relocated",
           "vs2": "0x270b38"
          }
         },
         "off": "0x82a",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x2648c8",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe0074",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe0074",
+          "ours_source": "relocated",
           "vs2": "0x270b9a"
          }
         },
         "off": "0x842",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x2648e0",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe00da",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe00da",
+          "ours_source": "relocated",
           "vs2": "0x270c00"
          }
         },
         "off": "0x85a",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x2648f8",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe04f4",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe04f4",
+          "ours_source": "relocated",
           "vs2": "0x27101a"
          }
         },
         "off": "0x872",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264910",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe0552",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe0552",
+          "ours_source": "relocated",
           "vs2": "0x271078"
          }
         },
         "off": "0x88a",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264928",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe05a4",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe05a4",
+          "ours_source": "relocated",
           "vs2": "0x2710ca"
          }
         },
         "off": "0x8a2",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264940",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe05fa",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe05fa",
+          "ours_source": "relocated",
           "vs2": "0x271120"
          }
         },
         "off": "0x8ba",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264958",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe0664",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe0664",
+          "ours_source": "relocated",
           "vs2": "0x27118a"
          }
         },
         "off": "0x8d2",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264970",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe06d2",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe06d2",
+          "ours_source": "relocated",
           "vs2": "0x2711f8"
          }
         },
         "off": "0x8ea",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264988",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe0730",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe0730",
+          "ours_source": "relocated",
           "vs2": "0x271256"
          }
         },
         "off": "0x902",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x2649a0",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe078a",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe078a",
+          "ours_source": "relocated",
           "vs2": "0x2712b0"
          }
         },
         "off": "0x91a",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x2649b8",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfede",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfede",
+          "ours_source": "relocated",
           "vs2": "0x270a04"
          }
         },
         "off": "0x932",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x2649d0",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfe64",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfe64",
+          "ours_source": "relocated",
           "vs2": "0x27098a"
          }
         },
         "off": "0x94a",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x2649e8",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 2,
           "vs2": 2
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfe0a",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfe0a",
+          "ours_source": "relocated",
           "vs2": "0x270930"
          }
         },
         "off": "0x962",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264a00",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite",
-         "link"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 128,
           "vs2": 128
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "link": {
-          "diff": true,
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "diff": false,
+          "expected_placed": "0xd3eda",
+          "ours": "0xd3eda",
+          "ours_source": "relocated",
           "vs2": "0x264a00"
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfe0a",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfe0a",
+          "ours_source": "relocated",
           "vs2": "0x270930"
          }
         },
         "off": "0x97a",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        }
       ],
-      "ours_end": "missing",
+      "ours_end": "loop:0xd3eda",
       "start": "0x264820"
      },
      "0x11": {
@@ -7420,1252 +7003,1063 @@
       "nodes": [
        {
         "addr": "0x264a1c",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfe0a",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfe0a",
+          "ours_source": "relocated",
           "vs2": "0x270930"
          }
         },
         "off": "0x996",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264a34",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfe64",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfe64",
+          "ours_source": "relocated",
           "vs2": "0x27098a"
          }
         },
         "off": "0x9ae",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264a4c",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfede",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfede",
+          "ours_source": "relocated",
           "vs2": "0x270a04"
          }
         },
         "off": "0x9c6",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264a64",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdff0c",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdff0c",
+          "ours_source": "relocated",
           "vs2": "0x270a32"
          }
         },
         "off": "0x9de",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264a7c",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdff62",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdff62",
+          "ours_source": "relocated",
           "vs2": "0x270a88"
          }
         },
         "off": "0x9f6",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264a94",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdffb0",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdffb0",
+          "ours_source": "relocated",
           "vs2": "0x270ad6"
          }
         },
         "off": "0xa0e",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264aac",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe0012",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe0012",
+          "ours_source": "relocated",
           "vs2": "0x270b38"
          }
         },
         "off": "0xa26",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264ac4",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe0074",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe0074",
+          "ours_source": "relocated",
           "vs2": "0x270b9a"
          }
         },
         "off": "0xa3e",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264adc",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe00da",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe00da",
+          "ours_source": "relocated",
           "vs2": "0x270c00"
          }
         },
         "off": "0xa56",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264af4",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe04f4",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe04f4",
+          "ours_source": "relocated",
           "vs2": "0x27101a"
          }
         },
         "off": "0xa6e",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264b0c",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe0552",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe0552",
+          "ours_source": "relocated",
           "vs2": "0x271078"
          }
         },
         "off": "0xa86",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264b24",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe05a4",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe05a4",
+          "ours_source": "relocated",
           "vs2": "0x2710ca"
          }
         },
         "off": "0xa9e",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264b3c",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe05fa",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe05fa",
+          "ours_source": "relocated",
           "vs2": "0x271120"
          }
         },
         "off": "0xab6",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264b54",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe0664",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe0664",
+          "ours_source": "relocated",
           "vs2": "0x27118a"
          }
         },
         "off": "0xace",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264b6c",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe06d2",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe06d2",
+          "ours_source": "relocated",
           "vs2": "0x2711f8"
          }
         },
         "off": "0xae6",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264b84",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe0730",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe0730",
+          "ours_source": "relocated",
           "vs2": "0x271256"
          }
         },
         "off": "0xafe",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264b9c",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe078a",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe078a",
+          "ours_source": "relocated",
           "vs2": "0x2712b0"
          }
         },
         "off": "0xb16",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264bb4",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfede",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfede",
+          "ours_source": "relocated",
           "vs2": "0x270a04"
          }
         },
         "off": "0xb2e",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264bcc",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfe64",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfe64",
+          "ours_source": "relocated",
           "vs2": "0x27098a"
          }
         },
         "off": "0xb46",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264be4",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 2,
           "vs2": 2
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfe0a",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfe0a",
+          "ours_source": "relocated",
           "vs2": "0x270930"
          }
         },
         "off": "0xb5e",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264bfc",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite",
-         "link"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 128,
           "vs2": 128
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "link": {
-          "diff": true,
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "diff": false,
+          "expected_placed": "0xd40d6",
+          "ours": "0xd40d6",
+          "ours_source": "relocated",
           "vs2": "0x264bfc"
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfe0a",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfe0a",
+          "ours_source": "relocated",
           "vs2": "0x270930"
          }
         },
         "off": "0xb76",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        }
       ],
-      "ours_end": "missing",
+      "ours_end": "loop:0xd40d6",
       "start": "0x264a1c"
      },
      "0x12": {
@@ -8675,1252 +8069,1063 @@
       "nodes": [
        {
         "addr": "0x264820",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfe0a",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfe0a",
+          "ours_source": "relocated",
           "vs2": "0x270930"
          }
         },
         "off": "0x79a",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264838",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfe64",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfe64",
+          "ours_source": "relocated",
           "vs2": "0x27098a"
          }
         },
         "off": "0x7b2",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264850",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfede",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfede",
+          "ours_source": "relocated",
           "vs2": "0x270a04"
          }
         },
         "off": "0x7ca",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264868",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdff0c",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdff0c",
+          "ours_source": "relocated",
           "vs2": "0x270a32"
          }
         },
         "off": "0x7e2",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264880",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdff62",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdff62",
+          "ours_source": "relocated",
           "vs2": "0x270a88"
          }
         },
         "off": "0x7fa",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264898",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdffb0",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdffb0",
+          "ours_source": "relocated",
           "vs2": "0x270ad6"
          }
         },
         "off": "0x812",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x2648b0",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe0012",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe0012",
+          "ours_source": "relocated",
           "vs2": "0x270b38"
          }
         },
         "off": "0x82a",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x2648c8",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe0074",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe0074",
+          "ours_source": "relocated",
           "vs2": "0x270b9a"
          }
         },
         "off": "0x842",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x2648e0",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe00da",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe00da",
+          "ours_source": "relocated",
           "vs2": "0x270c00"
          }
         },
         "off": "0x85a",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x2648f8",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe04f4",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe04f4",
+          "ours_source": "relocated",
           "vs2": "0x27101a"
          }
         },
         "off": "0x872",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264910",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe0552",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe0552",
+          "ours_source": "relocated",
           "vs2": "0x271078"
          }
         },
         "off": "0x88a",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264928",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe05a4",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe05a4",
+          "ours_source": "relocated",
           "vs2": "0x2710ca"
          }
         },
         "off": "0x8a2",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264940",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe05fa",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe05fa",
+          "ours_source": "relocated",
           "vs2": "0x271120"
          }
         },
         "off": "0x8ba",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264958",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe0664",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe0664",
+          "ours_source": "relocated",
           "vs2": "0x27118a"
          }
         },
         "off": "0x8d2",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264970",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe06d2",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe06d2",
+          "ours_source": "relocated",
           "vs2": "0x2711f8"
          }
         },
         "off": "0x8ea",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264988",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe0730",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe0730",
+          "ours_source": "relocated",
           "vs2": "0x271256"
          }
         },
         "off": "0x902",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x2649a0",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xe078a",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xe078a",
+          "ours_source": "relocated",
           "vs2": "0x2712b0"
          }
         },
         "off": "0x91a",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x2649b8",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfede",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfede",
+          "ours_source": "relocated",
           "vs2": "0x270a04"
          }
         },
         "off": "0x932",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x2649d0",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfe64",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfe64",
+          "ours_source": "relocated",
           "vs2": "0x27098a"
          }
         },
         "off": "0x94a",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x2649e8",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 2,
           "vs2": 2
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfe0a",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfe0a",
+          "ours_source": "relocated",
           "vs2": "0x270930"
          }
         },
         "off": "0x962",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        },
        {
         "addr": "0x264a00",
-        "diff": [
-         "dur",
-         "flags",
-         "hb8",
-         "hbA",
-         "shadow",
-         "sfx",
-         "op",
-         "sprite",
-         "link"
-        ],
+        "diff": [],
         "fields": {
          "dur": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 1,
           "vs2": 1
          },
          "flags": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 128,
           "vs2": 128
          },
          "hb8": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 3,
           "vs2": 3
          },
          "hbA": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "link": {
-          "diff": true,
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "diff": false,
+          "expected_placed": "0xd3eda",
+          "ours": "0xd3eda",
+          "ours_source": "relocated",
           "vs2": "0x264a00"
          },
          "op": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": "8d0000000000",
           "vs2": "8d0000000000"
          },
          "sfx": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "shadow": {
-          "diff": true,
-          "ours": null,
+          "diff": false,
+          "ours": 0,
           "vs2": 0
          },
          "sprite": {
-          "diff": true,
+          "diff": false,
           "expected_placed": "0xdfe0a",
-          "ours": null,
-          "ours_source": "UNATTRIBUTED",
+          "ours": "0xdfe0a",
+          "ours_source": "relocated",
           "vs2": "0x270930"
          }
         },
         "off": "0x97a",
-        "ours_source": "UNATTRIBUTED"
+        "ours_source": "byte"
        }
       ],
-      "ours_end": "missing",
+      "ours_end": "loop:0xd3eda",
       "start": "0x264820"
      }
     },
@@ -28858,6 +28063,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdaf7c",
           "ours": "0xdaf7c",
           "ours_source": "relocated",
           "vs2": "0x26baa2"
@@ -29073,6 +28279,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdafe0",
           "ours": "0xdafe0",
           "ours_source": "relocated",
           "vs2": "0x26bb06"
@@ -30947,6 +30154,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdb1f4",
           "ours": "0xdb1f4",
           "ours_source": "relocated",
           "vs2": "0x26bd1a"
@@ -32012,6 +31220,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdb1f4",
           "ours": "0xdb1f4",
           "ours_source": "relocated",
           "vs2": "0x26bd1a"
@@ -37799,6 +37008,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdb6c0",
           "ours": "0xdb6c0",
           "ours_source": "relocated",
           "vs2": "0x26c1e6"
@@ -38314,6 +37524,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdb7b4",
           "ours": "0xdb7b4",
           "ours_source": "relocated",
           "vs2": "0x26c2da"
@@ -38829,6 +38040,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdb8a8",
           "ours": "0xdb8a8",
           "ours_source": "relocated",
           "vs2": "0x26c3ce"
@@ -39344,6 +38556,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdb99c",
           "ours": "0xdb99c",
           "ours_source": "relocated",
           "vs2": "0x26c4c2"
@@ -40745,6 +39958,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdbbf8",
           "ours": "0xdbbf8",
           "ours_source": "relocated",
           "vs2": "0x26c71e"
@@ -41310,6 +40524,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdbd04",
           "ours": "0xdbd04",
           "ours_source": "relocated",
           "vs2": "0x26c82a"
@@ -41875,6 +41090,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdbe10",
           "ours": "0xdbe10",
           "ours_source": "relocated",
           "vs2": "0x26c936"
@@ -42440,6 +41656,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdbf1c",
           "ours": "0xdbf1c",
           "ours_source": "relocated",
           "vs2": "0x26ca42"
@@ -44023,6 +43240,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdc268",
           "ours": "0xdc268",
           "ours_source": "relocated",
           "vs2": "0x26cd8e"
@@ -44438,6 +43656,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdc29c",
           "ours": "0xdc29c",
           "ours_source": "relocated",
           "vs2": "0x26cdc2"
@@ -45053,6 +44272,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdc360",
           "ours": "0xdc360",
           "ours_source": "relocated",
           "vs2": "0x26ce86"
@@ -47763,6 +46983,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdc70c",
           "ours": "0xdc70c",
           "ours_source": "relocated",
           "vs2": "0x26d232"
@@ -49487,6 +48708,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd8c30",
           "ours": "0xd8c30",
           "ours_source": "relocated",
           "vs2": "0x269756"
@@ -50452,6 +49674,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd8e74",
           "ours": "0xd8e74",
           "ours_source": "relocated",
           "vs2": "0x26999a"
@@ -51667,6 +50890,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd9040",
           "ours": "0xd9040",
           "ours_source": "relocated",
           "vs2": "0x269b66"
@@ -56160,6 +55384,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd5fba",
           "ours": "0xd5fba",
           "ours_source": "relocated",
           "vs2": "0x266ae0"
@@ -56375,6 +55600,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd5fba",
           "ours": "0xd5fba",
           "ours_source": "relocated",
           "vs2": "0x266ae0"
@@ -56590,6 +55816,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd601e",
           "ours": "0xd601e",
           "ours_source": "relocated",
           "vs2": "0x266b44"
@@ -56973,6 +56200,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd6646",
           "ours": "0xd6646",
           "ours_source": "relocated",
           "vs2": "0x26716c"
@@ -57788,6 +57016,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd60ca",
           "ours": "0xd60ca",
           "ours_source": "relocated",
           "vs2": "0x266bf0"
@@ -58603,6 +57832,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd624e",
           "ours": "0xd624e",
           "ours_source": "relocated",
           "vs2": "0x266d74"
@@ -59268,6 +58498,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd644a",
           "ours": "0xd644a",
           "ours_source": "relocated",
           "vs2": "0x266f70"
@@ -59383,6 +58614,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd69a2",
           "ours": "0xd69a2",
           "ours_source": "relocated",
           "vs2": "0x2674c8"
@@ -59707,6 +58939,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd6daa",
           "ours": "0xd6daa",
           "ours_source": "relocated",
           "vs2": "0x2678d0"
@@ -61049,6 +60282,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd6646",
           "ours": "0xd6646",
           "ours_source": "relocated",
           "vs2": "0x26716c"
@@ -61155,6 +60389,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd6646",
           "ours": "0xd6646",
           "ours_source": "relocated",
           "vs2": "0x26716c"
@@ -62297,6 +61532,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd71ce",
           "ours": "0xd71ce",
           "ours_source": "relocated",
           "vs2": "0x267cf4"
@@ -62521,6 +61757,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd7202",
           "ours": "0xd7202",
           "ours_source": "relocated",
           "vs2": "0x267d28"
@@ -62963,6 +62200,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd6696",
           "ours": "0xd6696",
           "ours_source": "relocated",
           "vs2": "0x2671bc"
@@ -63187,6 +62425,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd69d6",
           "ours": "0xd69d6",
           "ours_source": "relocated",
           "vs2": "0x2674fc"
@@ -63252,6 +62491,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd6646",
           "ours": "0xd6646",
           "ours_source": "relocated",
           "vs2": "0x26716c"
@@ -63358,6 +62598,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd6646",
           "ours": "0xd6646",
           "ours_source": "relocated",
           "vs2": "0x26716c"
@@ -63973,6 +63214,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd6a0a",
           "ours": "0xd6a0a",
           "ours_source": "relocated",
           "vs2": "0x267530"
@@ -64406,6 +63648,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd6646",
           "ours": "0xd6646",
           "ours_source": "relocated",
           "vs2": "0x26716c"
@@ -64512,6 +63755,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd6646",
           "ours": "0xd6646",
           "ours_source": "relocated",
           "vs2": "0x26716c"
@@ -64827,6 +64071,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd690e",
           "ours": "0xd690e",
           "ours_source": "relocated",
           "vs2": "0x267434"
@@ -65101,6 +64346,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd6646",
           "ours": "0xd6646",
           "ours_source": "relocated",
           "vs2": "0x26716c"
@@ -65684,6 +64930,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd6646",
           "ours": "0xd6646",
           "ours_source": "relocated",
           "vs2": "0x26716c"
@@ -66326,6 +65573,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd6646",
           "ours": "0xd6646",
           "ours_source": "relocated",
           "vs2": "0x26716c"
@@ -66550,6 +65798,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd6646",
           "ours": "0xd6646",
           "ours_source": "relocated",
           "vs2": "0x26716c"
@@ -66665,6 +65914,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd72ae",
           "ours": "0xd72ae",
           "ours_source": "relocated",
           "vs2": "0x267dd4"
@@ -67057,6 +66307,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd6646",
           "ours": "0xd6646",
           "ours_source": "relocated",
           "vs2": "0x26716c"
@@ -67981,6 +67232,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd6646",
           "ours": "0xd6646",
           "ours_source": "relocated",
           "vs2": "0x26716c"
@@ -68596,6 +67848,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd7462",
           "ours": "0xd7462",
           "ours_source": "relocated",
           "vs2": "0x267f88"
@@ -69211,6 +68464,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd7586",
           "ours": "0xd7586",
           "ours_source": "relocated",
           "vs2": "0x2680ac"
@@ -69535,6 +68789,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd6646",
           "ours": "0xd6646",
           "ours_source": "relocated",
           "vs2": "0x26716c"
@@ -70009,6 +69264,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd690e",
           "ours": "0xd690e",
           "ours_source": "relocated",
           "vs2": "0x267434"
@@ -70751,6 +70007,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd6646",
           "ours": "0xd6646",
           "ours_source": "relocated",
           "vs2": "0x26716c"
@@ -71475,6 +70732,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd6b2e",
           "ours": "0xd6b2e",
           "ours_source": "relocated",
           "vs2": "0x267654"
@@ -72199,6 +71457,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd6c82",
           "ours": "0xd6c82",
           "ours_source": "relocated",
           "vs2": "0x2677a8"
@@ -73641,6 +72900,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd76aa",
           "ours": "0xd76aa",
           "ours_source": "relocated",
           "vs2": "0x2681d0"
@@ -74056,6 +73316,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd773e",
           "ours": "0xd773e",
           "ours_source": "relocated",
           "vs2": "0x268264"
@@ -74471,6 +73732,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd773e",
           "ours": "0xd773e",
           "ours_source": "relocated",
           "vs2": "0x268264"
@@ -74886,6 +74148,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd773e",
           "ours": "0xd773e",
           "ours_source": "relocated",
           "vs2": "0x268264"
@@ -75301,6 +74564,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd773e",
           "ours": "0xd773e",
           "ours_source": "relocated",
           "vs2": "0x268264"
@@ -75716,6 +74980,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd773e",
           "ours": "0xd773e",
           "ours_source": "relocated",
           "vs2": "0x268264"
@@ -76181,6 +75446,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd784a",
           "ours": "0xd784a",
           "ours_source": "relocated",
           "vs2": "0x268370"
@@ -76782,6 +76048,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd6646",
           "ours": "0xd6646",
           "ours_source": "relocated",
           "vs2": "0x26716c"
@@ -77097,6 +76364,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd7986",
           "ours": "0xd7986",
           "ours_source": "relocated",
           "vs2": "0x2684ac"
@@ -77821,6 +77089,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd7bd6",
           "ours": "0xd7bd6",
           "ours_source": "relocated",
           "vs2": "0x2686fc"
@@ -78236,6 +77505,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd7fca",
           "ours": "0xd7fca",
           "ours_source": "relocated",
           "vs2": "0x268af0"
@@ -78351,6 +77621,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd7b3a",
           "ours": "0xd7b3a",
           "ours_source": "relocated",
           "vs2": "0x268660"
@@ -78466,6 +77737,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd7b6e",
           "ours": "0xd7b6e",
           "ours_source": "relocated",
           "vs2": "0x268694"
@@ -78581,6 +77853,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd7ba2",
           "ours": "0xd7ba2",
           "ours_source": "relocated",
           "vs2": "0x2686c8"
@@ -78746,6 +78019,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd7c0a",
           "ours": "0xd7c0a",
           "ours_source": "relocated",
           "vs2": "0x268730"
@@ -80061,6 +79335,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd7c86",
           "ours": "0xd7c86",
           "ours_source": "relocated",
           "vs2": "0x2687ac"
@@ -80285,6 +79560,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd6696",
           "ours": "0xd6696",
           "ours_source": "relocated",
           "vs2": "0x2671bc"
@@ -80459,6 +79735,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd7ee2",
           "ours": "0xd7ee2",
           "ours_source": "relocated",
           "vs2": "0x268a08"
@@ -80574,6 +79851,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd7f16",
           "ours": "0xd7f16",
           "ours_source": "relocated",
           "vs2": "0x268a3c"
@@ -80989,6 +80267,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd7fca",
           "ours": "0xd7fca",
           "ours_source": "relocated",
           "vs2": "0x268af0"
@@ -81104,6 +80383,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd808e",
           "ours": "0xd808e",
           "ours_source": "relocated",
           "vs2": "0x268bb4"
@@ -81219,6 +80499,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd808e",
           "ours": "0xd808e",
           "ours_source": "relocated",
           "vs2": "0x268bb4"
@@ -81334,6 +80615,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd80c2",
           "ours": "0xd80c2",
           "ours_source": "relocated",
           "vs2": "0x268be8"
@@ -81449,6 +80731,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd80f6",
           "ours": "0xd80f6",
           "ours_source": "relocated",
           "vs2": "0x268c1c"
@@ -81564,6 +80847,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd812a",
           "ours": "0xd812a",
           "ours_source": "relocated",
           "vs2": "0x268c50"
@@ -81679,6 +80963,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd7f62",
           "ours": "0xd7f62",
           "ours_source": "relocated",
           "vs2": "0x268a88"
@@ -81794,6 +81079,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd7f96",
           "ours": "0xd7f96",
           "ours_source": "relocated",
           "vs2": "0x268abc"
@@ -81909,6 +81195,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd66ca",
           "ours": "0xd66ca",
           "ours_source": "relocated",
           "vs2": "0x2671f0"
@@ -83283,6 +82570,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd8176",
           "ours": "0xd8176",
           "ours_source": "relocated",
           "vs2": "0x268c9c"
@@ -83707,6 +82995,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd815e",
           "ours": "0xd815e",
           "ours_source": "relocated",
           "vs2": "0x268c84"
@@ -85013,6 +84302,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd8176",
           "ours": "0xd8176",
           "ours_source": "relocated",
           "vs2": "0x268c9c"
@@ -85678,6 +84968,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd815e",
           "ours": "0xd815e",
           "ours_source": "relocated",
           "vs2": "0x268c84"
@@ -86984,6 +86275,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd8176",
           "ours": "0xd8176",
           "ours_source": "relocated",
           "vs2": "0x268c9c"
@@ -87449,6 +86741,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd815e",
           "ours": "0xd815e",
           "ours_source": "relocated",
           "vs2": "0x268c84"
@@ -88755,6 +88048,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd8176",
           "ours": "0xd8176",
           "ours_source": "relocated",
           "vs2": "0x268c9c"
@@ -89220,6 +88514,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd815e",
           "ours": "0xd815e",
           "ours_source": "relocated",
           "vs2": "0x268c84"
@@ -90526,6 +89821,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd8176",
           "ours": "0xd8176",
           "ours_source": "relocated",
           "vs2": "0x268c9c"
@@ -90691,6 +89987,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd815e",
           "ours": "0xd815e",
           "ours_source": "relocated",
           "vs2": "0x268c84"
@@ -91997,6 +91294,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd8176",
           "ours": "0xd8176",
           "ours_source": "relocated",
           "vs2": "0x268c9c"
@@ -93312,6 +92610,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd815e",
           "ours": "0xd815e",
           "ours_source": "relocated",
           "vs2": "0x268c84"
@@ -94618,6 +93917,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd8176",
           "ours": "0xd8176",
           "ours_source": "relocated",
           "vs2": "0x268c9c"
@@ -95042,6 +94342,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xd71ce",
           "ours": "0xd71ce",
           "ours_source": "relocated",
           "vs2": "0x267cf4"
@@ -99059,6 +98360,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdcad4",
           "ours": "0xdcad4",
           "ours_source": "relocated",
           "vs2": "0x26d5fa"
@@ -99374,6 +98676,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdcb68",
           "ours": "0xdcb68",
           "ours_source": "relocated",
           "vs2": "0x26d68e"
@@ -99689,6 +98992,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdcbfc",
           "ours": "0xdcbfc",
           "ours_source": "relocated",
           "vs2": "0x26d722"
@@ -100004,6 +99308,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdcc90",
           "ours": "0xdcc90",
           "ours_source": "relocated",
           "vs2": "0x26d7b6"
@@ -102587,6 +101892,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdd118",
           "ours": "0xdd118",
           "ours_source": "relocated",
           "vs2": "0x26dc3e"
@@ -105211,6 +104517,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdd74c",
           "ours": "0xdd74c",
           "ours_source": "relocated",
           "vs2": "0x26e272"
@@ -105726,6 +105033,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdd888",
           "ours": "0xdd888",
           "ours_source": "relocated",
           "vs2": "0x26e3ae"
@@ -110881,6 +110189,7 @@
          },
          "link": {
           "diff": false,
+          "expected_placed": "0xdcd24",
           "ours": "0xdcd24",
           "ours_source": "relocated",
           "vs2": "0x26d84a"
