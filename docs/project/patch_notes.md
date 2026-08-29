@@ -1,6 +1,30 @@
 # patch_notes — per-change detail: every byte, and why
 
 
+## 14z-118 (charmap, 2) — DONOVAN'S PHYSICS ROWS PORTED (maintainer-ruled 2026-08-29): 17 bytes, three bank rows, UNFROZEN
+
+- `build/manifest/donovan.toml` `[[tenant]]`: `port_param32 = true` (gen's
+  `VALUE_SKIP` no longer skips `param32_a`, `param32_b`, `jump_params` for him).
+- Bytes (probe `build/don_phys_probe`, fingerprint `7109f835`; diff vs
+  `don_m17`'s `verify_data.bin` = EXACTLY these 17 bytes, nothing else):
+  `PRG:0x0BD912` (param32_a row 0x13, 8 B): fwd/back walk `00030000 FFFD6000`
+  = 3.0 / −2.625 (was the alias row's `00028000 FFFDC000` = 2.5 / −2.25);
+  `PRG:0x0BE392` (param32_b): `00020000 FFFD6000` = 2.0 / −2.625 (was 1.625 / −2.25);
+  `PRG:0x0BDF0A` (jump_params, 3 × 16 B): neutral `(0, 0, 7.75, −0.375)`,
+  forward `(4.0, −0.0195, 7.875, −0.375)`, back `(−4.25, 0.0195, 8.0, −0.375)`
+  (were Victor's: yv 8.0/8.0/8.125, xv 3.5/−3.625, gravity −0.3516/−0.3594).
+  Full decode: the map, `tools/charmap_gen.py build/don_phys_probe`.
+- Validated (rule 2): legacy `38_victor_p1_vsavj` / `05_timeout_idle` /
+  `03_two_player_vs` BIT-IDENTICAL don_m17 vs probe (5,001 / 12,121 / 5,321
+  frames, run separately from the build); `audit_don_vs_cpu`,
+  `audit_don_ko_writer`, `audit_don_lilith_ko` PASS on the probe;
+  `audit_don_grab_pose`'s Donovan half PASS (its Huitzil half needs a merged
+  build). The tenant-wide audits and the suite run at the next freeze battery.
+- Instrument note: `test_don_reactions` / `test_m2a_stage4_oracle` /
+  `test_don_column` are STOCK-track (slot-0x0F, `build/donovan6`) gates —
+  handed a WIDE rompath they run pristine vsavj and fail identically on any
+  build (measured on the probe AND on don_m17). Not WIDE instruments.
+
 ## 14z-118 (charmap) — THE CHARACTER-DATA MAP, phase 0: NO ROM BYTE MOVED
 
 - `build/manifest/{donovan,huitzil,pyron}.toml`: a comment-only block

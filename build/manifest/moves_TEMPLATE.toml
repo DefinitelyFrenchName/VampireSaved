@@ -1,0 +1,20 @@
+# build/manifest/moves_<tenant>.toml — the maintainer's move list for one tenant
+# (character-data map, phase 1). Hand-written from the maintainer's list;
+# the anim-chain ids (`table`, `seq`) are filled in by the naming step once
+# tools/anim_nodes.py has walked the chains and the live rig has matched
+# them. Flat rows only (tools/_minitoml.py subset).
+#
+#   name    the move's name as the community knows it
+#   input   numpad notation: 236P, 41236K, j.214P (air), 623PP (ES), 421P
+#   kind    normal | special | es | ex | super | throw | dash | df | misc
+#   notes   free text (mash gates, sword-only, hit caps, VS2-vs-VH remarks)
+#   table   (naming step) which anim index table owns the chain: a | a2 | b | c | proj
+#   seq     (naming step) the chain's sequence id in that table (hex)
+#
+# [[move]]
+# name = "Blizzard Sword"
+# input = "41236P"
+# kind = "special"
+# notes = "ES: 41236PP"
+# table = ""
+# seq = ""

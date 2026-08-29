@@ -12,8 +12,9 @@
 | delivered | `tools/charmap_gen.py` (the map: bank rows with physics decoded 16.16, 20 dispatch rows, every region's byte diff ATTRIBUTED — placements, reconciliation twins for engine refs, 24-bit frame pointers, `[gfx_remap]` band + the build's `effect_map.json` shelf codes, region_fix/port_patch/table_fix/data_port fixes, effect-list pointers, overrides — sfx records, FSM state-node runs, sprite-list summary, a generated NOT-DECODED worklist); `tools/charmap_md.py` (the page); `tools/charmap_compile.py` (overrides -> `[[region_fix]]` rows inside a marked block of the tenant manifest; gen_donovan_patch.py untouched); `build/manifest/charmap_{donovan,huitzil,pyron}.toml` (empty, documented); `docs/project/tables/chars/<tenant>.{json,md}`; gates `test_charmap_current` (ci_static, 2 controls) and `test_charmap_overrides` (ci_portable, 3 controls) |
 | attribution at close | bank fields UNATTRIBUTED 0/0/0; dispatch 0/0/0; data-region bytes unattributed 692 / 342 / 342 (all in `x2b7ef4`, the companion-effect tail — 24-bit frame pointers and tile words the effect pass rewrites; named in the worklist, frozen by the gate); code regions out of scope by design (relocated code is the reconciliation/pointer_flow gates' business) |
 | **THE FINDING** | **Donovan's `param32_a/b` and `jump_params` rows are NOT ported** — gen's `VALUE_SKIP` applies unless `[[tenant]] port_param32 = true`, which Huitzil (14z-66) and Pyron carry and Donovan does not (the 14w-b crash guard, written when he sat on slot 0x0F: "Jedah speeds retained"). At id 0x13 the row aliases `0x03`, so **he walks at Victor's 2.5/−2.25 instead of VS2's 3.0/−2.625 and jumps with Victor's parameters (back xv −3.625 vs −4.25, yv 8.0 vs 7.875 …)**. A gameplay-feel decision — "Decisions pending" below |
+| **THE PHYSICS PORT, same day (maintainer: "use VS2 parameters and not the shell character's")** | `port_param32 = true` for Donovan; probe `build/don_phys_probe` `7109f835`: exactly 17 bytes differ from don_m17, all in his three rows; the map reads them `byte`; legacy A/B ×3 bit-identical (run apart from the build); `audit_don_vs_cpu` / `audit_don_ko_writer` / `audit_don_lilith_ko` PASS, `audit_don_grab_pose` Donovan half PASS. **UNFROZEN — the next battery.** Instrument trap paid: `test_don_reactions` / `test_m2a_stage4_oracle` / `test_don_column` are STOCK gates (default `build/donovan6`); on a WIDE rompath they run pristine vsavj and fail identically on don_m17 — the control that exposed it |
 | not done (the phases) | phase 1 anim node dumper + move naming + derived frame data (needs the maintainer's move lists and one native-leg rig); phase 2 hitbox rectangles + attack records (a measurement; settles the +0x17/+0x1D class-byte disagreement); phase 3 stun/projectile/auto tables. VH: nothing until a dump exists |
-| push | local; push at the maintainer's word |
+| push | phase 0 pushed (`45163bb`); the physics port commit local |
 
 ## Session 14z-118 CLOSE (2) — **the audit's second half, same day: eight more commits (9)-(16).
 ## The (a)-(e) list closed; the `0xAA` question closed (Sasquatch's — blocks are 4 ids per
@@ -438,7 +439,7 @@ entries moved VERBATIM to `DECISIONS_HISTORY.md` — grep there by topic.
 Lifecycle: rulings are still marked DECIDED in place here first; they move to
 the archive once they stop shaping active work.)*
 
-- **DONOVAN'S PHYSICS ROWS (14z-118, found by the character-data map).**
+- **DONOVAN'S PHYSICS ROWS (14z-118, found by the character-data map). DECIDED (maintainer, 2026-08-29): "use VS2 parameters and not the shell character's" — option (a); `port_param32 = true` set, probe + soak below, freeze at the next battery.**
   `param32_a` (walk fwd/back), `param32_b` and `jump_params` (three jumps x
   xv/xaccel/yv/gravity) are NOT ported for Donovan: `build/manifest/donovan.toml`
   carries no `port_param32 = true`, so gen's `VALUE_SKIP` leaves his bank

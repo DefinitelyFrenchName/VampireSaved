@@ -3483,7 +3483,11 @@ def main():
             # property of velocity porting — Huitzil opts in after his own
             # soak battery re-examined the hazard (playtest round-1 item 2:
             # he moved at the row-0x10 ALIAS content = Bulleta's speeds).
-            # Donovan's manifest carries no flag -> his bytes are unchanged.
+            # Donovan's manifest carried no flag until 14z-118 -> his bytes were
+            # the vsavj ALIAS row's (id & 0x0F = Victor's at id 0x13; "Jedah's"
+            # only while he sat on slot 0x0F). 14z-118: port_param32 = true
+            # for Donovan too (maintainer-ruled 2026-08-29; found by the
+            # character-data map, tools/charmap_gen.py).
             VALUE_SKIP = set() if T.get("port_param32", False) \
                 else {"param32_a", "param32_b", "jump_params"}
             # Explicit-ownership claims (14z-65): a [[sound_table]] row that WILL
@@ -3503,7 +3507,7 @@ def main():
             for v in man["values"]:
                 if v["table"] in VALUE_SKIP:
                     notes.append(f"# {v['table']}: velocity pair NOT ported "
-                                 f"(14w-b crash guard; Jedah speeds retained)")
+                                 f"(14w-b crash guard; the vsavj alias row's content retained)")
                     continue
                 t = bank[v["table"]]
                 a, es = table_entry_addr(v["table"], dst_slot)

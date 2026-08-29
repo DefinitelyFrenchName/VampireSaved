@@ -5,8 +5,9 @@
 > ## PHASE 0 OF THE CHARACTER-DATA MAP (STATE 14z-118 (charmap)):
 > ## `docs/project/tables/chars/<tenant>.{json,md}`, overrides in
 > ## `build/manifest/charmap_<tenant>.toml`, gates `test_charmap_current` /
-> ## `test_charmap_overrides`. **ONE DECISION WAITS: Donovan's physics rows are
-> ## NOT ported (he moves with Victor's values) — STATE "Decisions pending".**
+> ## `test_charmap_overrides`. **RULED AND BUILT, UNFROZEN: Donovan's physics
+> ## rows now port VS2's values (`port_param32`, probe `don_phys_probe`
+> ## `7109f835`, validated) — THE NEXT FREEZE BATTERY carries it (M12).**
 > ## Next phases: (1) anim node dumper + move naming (needs the maintainer's
 > ## move lists) + derived frame data; (2) hitbox rectangles + attack records
 > ## by measurement; (3) stun / projectile / auto tables. Check `git status -sb`.**

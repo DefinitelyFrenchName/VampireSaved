@@ -21,6 +21,15 @@ src_char = 0x13
 # inside [[tenant]] like huitzil's; at doc root it hijacks every
 # tenant's overlay on a merged build (measured 14z-99, gotchas).
 recon_overlay = "build/manifest/reconciliation_donovan.toml"
+# 14z-118 (maintainer-ruled 2026-08-29, found by the character-data map):
+# port his OWN walk/jump physics (param32_a/b, jump_params) instead of the
+# vsavj alias row's (Victor's, id & 0x0F). The 14w-b "landmine" the default
+# VALUE_SKIP guarded was the mis-strided value32 write (fixed: rec8 rows,
+# stride 0x100 — only row 0x13 is written now); "port_param32 breaks
+# legacy" was retracted as a measurement artifact (STATE_HISTORY 14z-66).
+# Re-examined on build/don_phys_probe: legacy replays bit-identical, the
+# Donovan reaction/oracle gates green (STATE 14z-118 (charmap)).
+port_param32 = true
 # The id this tenant OCCUPIES. Stock track keeps the substituted slot 0x0F —
 # it is the frozen compatibility artifact (14z-59g) and has nowhere to put
 # the tenant's tiles other than the host's band. The WIDE track, which is
