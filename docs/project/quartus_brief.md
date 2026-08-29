@@ -7,7 +7,9 @@
 > (a); on failing seeds (c); it is NEVER (b), because the reference core
 > closed on every seed tried. Full result: STATE 14z-108, and the two
 > platform gotchas it produced (`xjtcore.sh` retries until a seed passes; a
-> jtcores bitstream carries a BUILD datestamp).
+> jtcores bitstream carries a BUILD datestamp). *(14z-118: STATE 14z-108 has
+> rolled to STATE_HISTORY; the LOG for every number above is
+> `docs/platform/mister.md` "SYNTHESISING" — cite that, not this banner.)*
 
 # BRIEF — Quartus synthesis of jtcps2w (CPS-2 WIDE on MiSTer)
 

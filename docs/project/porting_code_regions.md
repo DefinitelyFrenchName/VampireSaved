@@ -10,6 +10,14 @@ the engine reaches most of its tables **pc-relatively**, and CPS-2
 **decrypts opcode fetches only** — a data read returns the bytes as
 stored. See `../game/atlas/sprite_lists.md`, `../platform/gotchas.md`.
 
+**Newest instance (14z-118 audit, so the checklist's evidence stays current):**
+#99 (14z-111) — CPU-Phobos ran Demitri's AI because the four per-class AI
+script tables are "16 classes + the same 16 repeated"; the fix rooted each
+tenant's own vs2 AI script block as a DATA region (option A, zero code) —
+STATE_HISTORY 14z-111, `atlas/character_tables.md` "The CPU AI action-script
+tables". A region bound that stops at the code and leaves its script data
+behind is this checklist's mistake in a new costume.
+
 ---
 
 ## Why a bound is dangerous

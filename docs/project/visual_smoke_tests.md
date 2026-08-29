@@ -1,5 +1,13 @@
 # Visual smoke tests — checking the OUTPUT, not the internal state
 
+> *Currency (14z-118 audit): the doctrine below is embodied by gates that
+> compare RENDERED output — `tests/test_wide_render_content.sh` (pixel A/B vs
+> the stock track + a positive control, 14z-61), `tests/test_gfx_menus.sh`
+> (masked title/select renders vs committed goldens), `tests/test_version_string.sh`
+> (the M-mark pixel-exact at its coordinates) — and by the MAME snapshot
+> reviews the maintainer approves cosmetic work on (14z-115 E2). Last
+> corrected 14z-61; nothing below has been contradicted since.*
+
 **Origin: maintainer, 2026-08-05**, from the Sailor Moon SNES project —
 end-to-end emulator testing is paramount, but in some cases the internal
 monitoring is green and only the *standard output* shows the fault. Their

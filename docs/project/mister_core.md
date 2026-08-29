@@ -91,7 +91,9 @@ DE10-Nano at 14z-109 and again on bundle 14z112 (2026-08-28, no regression,
 stock coexisting on the same card), the `[STOCK CONTROL]` MRA ships in
 every bundle since 14z-109, and the maintainer ruled (2026-08-28) that the
 `.rbf` and the MRAs are tracked in-tree under `release/` — the release
-format itself is the open item in STATE "Decisions pending".
+format was RULED the same day (`release_format.md`: one self-sufficient
+directory per platform; `release/bitstreams/<seed>/` for the `.rbf`) *(this
+sentence said "the open item in STATE" until 14z-118)*.
 
 **[MSC-1]** **The separate-core mechanism is jtcores' own, not something we invented.**
 `cores/cps2`'s `cfg/game.yaml` pulls the CPS-1 video/SDRAM/tilemap pipeline

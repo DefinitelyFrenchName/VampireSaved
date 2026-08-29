@@ -9,7 +9,7 @@ facts (bus widths, tiers) are in `docs/platform/mister.md`.
 deleted in the 14z-112 build-dir sweep. The ceilings this document feeds
 into the placement — group-C `0xEE73` / `0xFFDB`, QSound live `0x8E57F0`,
 PRG live `0x5FFF1E` — are RE-DERIVED from the current build on every run of
-`tests/audit_mister_map_fit.sh` (`MAP_FIT_BUILD`, default `m3b_merged16`)
+`tests/audit_mister_map_fit.sh` (`MAP_FIT_BUILD`, default = the CURRENT merged build, `build/m3b_merged20` since 14z-117b, re-pointed at every freeze — this line said `m3b_merged16` until 14z-118)
 and have not moved. §1's wide_ext HIGH-WATER MARK `0x4D10F3` is NOT
 gate-frozen and is merged-m6's: merged-m9 shifted the extension by
 +0x10D0/+0x1ED0/+0x2B60 (STATE 14z-111), so quote that figure with its

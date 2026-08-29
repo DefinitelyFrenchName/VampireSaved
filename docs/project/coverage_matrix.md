@@ -25,7 +25,7 @@ judged on the 2P-competitive surface.
 | throw/tech: tenant as victim | **D covered; H/P thin** | D: `96_don_victor_grab` + `audit_don_grab_pose` (#104). H/P as victims of a legacy command grab: #104 ported every attacker's capture_kf block and the maintainer field-confirmed Victor's grab on tenants; instrument legs for ALL tenants as victims are `audit_tenant_throws.sh`'s v-legs (Victor throws each tenant; capture pose + thrown reaction), green on merged-m5. |
 | tech-hit (throw escape) + tech roll | **COVERED 14z-104 (3)** | `audit_throw_tech.sh`: the tech (victim's throw input held from grab-connect+2) halves damage — every tenant escapes (uniform 7) and every tenant is teched (thui 14->7, tpyr 12->2; tdon = the native-anchored 5/5 identity — vsav2 measures the same); no-tech control at full 13. `audit_tech_roll.sh`: the roll (held direction+button through landing) — every tenant rolls (147/120/120px), the legacy roll works off tenant knockdowns, Phobos' crouch-HK knockdown is UNTECHABLE (native-anchored: vsav2 identical), the PURSUIT-VS-ROLL counter behaves as designed (leap whiffs the vacated spot), tap control clean. |
 | pursuit attacks | **COVERED as DOWN-ATTACKS 14z-104 — naming question OPEN** | zero coverage existed. `audit_down_attack.sh` (rig `judge/03_down_attack.rpl`): every tenant hits a downed victim and every tenant IS hit while downed (8 legs + early-invuln control, green on merged-m5). MEASURED: the engine serves grounded heavies on downed opponents (11-14 dmg, per-character windows: Phobos wakes in 24f); a 12-candidate input screen produced NO leaping Night-Warriors-style pursuit. MAINTAINER QUESTION: does vsav carry a distinct leaping pursuit under some other grammar? If yes it gets its own rig; if no, this cell is closed as-is. |
-| Shadow/Marionette | **N/A-until-enabled (recorded decision, not new measurement)** | class 0x0B is engine machinery, excluded from the roster matrix (`tests/expected/roster_pairings/README.md`). See the measurement note below. |
+| Shadow/Marionette | **SHADOW: MEASURED 14z-116 (was "N/A-until-enabled" until 14z-118 — Shadow was never disabled: he is vanilla's own five-START code on the "?" cell). MARIONETTE: NOT IN THIS GAME (a vsav2 character, maintainer 2026-08-28)** | `tests/test_shadow_tenant.sh` (rig `113_shadow_vs_tenant.rpl`): Shadow beats P2 Donovan and takes the TENANT — id `0x00 -> 0x13`, Donovan's own record `0x003FA9D0` loaded, guard-clean; board-confirmed 2026-08-28 ("Shadow works perfectly even with the VS2 tenants in 2P vs"). Class 0x0B stays outside the roster matrix (`roster_pairings/README.md`). See the note below. |
 
 ## Remaining gaps, in priority order
 
@@ -44,10 +44,18 @@ judged on the 2P-competitive surface.
    EX inputs serve (hui/pyr fire, ctl/don act without a stock spend).
    Corner interactions are additionally covered by the pursuit corner
    measurement and the tech-roll wall-block leg.
-3. Shadow/Marionette interaction rigs — only if the modes are ever
-   enabled (see the measurement note).
+3. ~~Shadow/Marionette interaction rigs — only if the modes are ever
+   enabled~~ — Shadow-vs-tenant COVERED 14z-116 (`test_shadow_tenant.sh`);
+   Marionette does not exist in vsav (14z-116). What remains uncovered:
+   Shadow morphing into Huitzil and Pyron (the rig plays Donovan), and
+   Shadow armed by P2. Added 14z-118.
 
-## Shadow/Marionette measurement note (14z-104)
+## Shadow/Marionette measurement note (14z-104 — SUPERSEDED 14z-116 for Shadow; kept as written)
+
+*(14z-118: the conditional below — "if a future decision enables them" —
+rested on a misreading: Shadow needs no enabling. The 14z-116 run is the
+measurement this note said would go "straight to the top of the gap list";
+it is done for Donovan. Marionette is vsav2's, not vsav's.)*
 
 Class 0x0B is the Shadow/Marionette machinery slot; the roster census
 (`tests/expected/roster_pairings/README.md`, 14z-97) records it as "not
