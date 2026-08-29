@@ -32,8 +32,12 @@
 > ## P2-won down, not a P1-won one, and flips at the refill (semantics OPEN);
 > ## the real side codes are `$FF8105`/`$FF810C`; ~~(d)~~ DONE (AUDIT (12)); ~~(e)~~
 > ## RULED 2026-08-29 (AUDIT (13)): STOCK CONTROL kept, run once per NEW `.rbf`.
-> ## **THE 14z-118 LIST IS CLOSED.** Still open from it: the whole-corpus non-DF
-> ## census before `0xAA` is called free; `$FF8127`'s meaning if it ever matters.
+> ## **THE 14z-118 LIST IS CLOSED**, and the `0xAA` question with it (AUDIT (14)):
+> ## the whole-corpus census ran (73 legs) and `0xAA-0xAD` is SASQUATCH's —
+> ## palette-seq blocks are 8 ids, `BASE + ($381<<2) + phase`, and a free one
+> ## is found by reading `0x02A8A4`'s routines, never by a census. Still open:
+> ## `$FF8127`'s meaning and `+0x381`'s (costume index is the natural reading,
+> ## not established) — only if they ever matter.
 > ##
 > ## **CURRENT:** donovan-m17 `90a225ce` / huitzil-m24 `ae953657` /
 > ## pyron-m18 `1222df18` / merged-m13 `a1b7cb82` (`build/m3b_merged20`,

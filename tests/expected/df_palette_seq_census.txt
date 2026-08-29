@@ -15,6 +15,10 @@
 # requested by NO character's Dark Force. Anakaris (0x06) — "very probably"
 # 0xAA's owner in engine_internals.md until 14z-118 — has NO palette-seq path
 # (DF on, 0 calls), like Victor and eight others.
+# 0xAA IS NOT FREE for that: the routine table places the 0xAA base in
+# SASQUATCH's row (0x0A), a NON-DF family; the whole-corpus census caught his
+# $381=1 half 0xAE-0xB1 (tests/expected/palette_seq_ids_corpus.txt). Blocks
+# are 8 ids (BASE + ($381<<2) + phase); a DF census sees one half at most.
 #
 # char  df_seen/samples  resolver ids (count)
 00  3/20  {'1e': 59, '1f': 60, '20': 60, '21': 59}

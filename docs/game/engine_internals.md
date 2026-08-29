@@ -2625,13 +2625,27 @@ static route does not work — see the warning below.
 
 | ids | owner |
 |---|---|
-| `0x1E-0x21` | **Bulleta `0x00`** |
-| `0x26`, `0x27` | Demitri `0x01` |
+| `0x1E-0x21` | **Bulleta `0x00`** — her `$381=0` half; `0x22-0x25` is the other half (14z-118 family rule, below) |
+| `0x26`, `0x27` | Demitri `0x01` (DF); **`0x2E` is also his, NON-DF** — the corpus census, 104_1p_auto_ko_win f1965, P1 struct (14z-118) |
 | `0x44-0x47` | Zabel `0x04` (and slot `0x0B`, the Shadow machinery, by row alias — 14z-118) |
 | `0x6F-0x72` | Bishamon `0x08` **and** Oboro Bishamon `0x18` (same block) |
 | `0x264-0x267` | Q-Bee `0x0C` |
+| **`0xAA-0xB1`** | **Sasquatch `0x0A` — NON-DF, found 14z-118**: the corpus census caught `0xAE-0xB1` from a CPU Sasquatch (26_don_arcade_mash f12949, P2 struct, `$381`=1), and the routine table settles the rest statically — row `0x0A` of `0x02A8A4` is offset `0xE4` = routine `0x02A988`, whose `addi.w #$aa,d0` at `0x02A9C0` is the seventh base constant. `0xAA-0xAD` is his `$381=0` half, never reached by the corpus |
 | `0x29C-0x2A0` | `0x12` — **five ids, not four** |
-| none | Gallon `0x02`, Victor `0x03`, Morrigan `0x05`, **Anakaris `0x06` (14z-118)**, Felicia `0x07`, Aulbath `0x09`, Sasquatch `0x0A`, Lei-Lei `0x0D`, Lilith `0x0E`, Jedah `0x0F` |
+| none in DF | Gallon `0x02`, Victor `0x03`, Morrigan `0x05`, **Anakaris `0x06` (14z-118)**, Felicia `0x07`, Aulbath `0x09`, Sasquatch `0x0A` (his requests are NON-DF, row above), Lei-Lei `0x0D`, Lilith `0x0E`, Jedah `0x0F` |
+
+**THE FAMILY RULE (14z-118, read off the routines, not the census).** Every
+row's routine is one template — Bulleta `0x02A8EE`, Sasquatch `0x02A988`
+disassembled: `move.b $195(a6),d0 / addq #1 / andi #3` (a 4-phase cycle),
+`move.b $381(a6),d1 / lsl.w #2,d1 / add.w d1,d0 / addi.w #BASE,d0 / bra
+0x02AD82`. So a character's block is **EIGHT ids: BASE + ($381 << 2) + phase**,
+and each census row above saw ONE `$381` value. `$381(a6)` read 1 on the CPU
+Sasquatch and 0 on P1 in every other attributed run; a costume/colour index
+is the natural reading but the alt-colour pick replay (41) also read 0, so
+its meaning is NOT established (`ram.md` `+0x381`). Consequence: a free
+block is found by reading the ROUTINE TABLE (which rows point at which
+base, and what the `0x40` default rows do), never by a census — a census
+reports the halves the corpus happened to play.
 
 **Anakaris `0x06` — MEASURED 14z-118: Dark Force ON, ZERO resolver calls.**
 Replay 85 never activated DF for him (two 14z-79b attempts and one more at
@@ -2650,16 +2664,22 @@ constants — `0x1E 0x26 0x44 0x6F 0xAA 0x264 0x29C` (e.g. `0640 001e` at
 `0x02a92c`). Six have measured owners above. The seventh, **`0xAA`, has no
 measured owner and Anakaris is the one character not measured**, so `0xAA-0xAD`
 is very probably his. Treat it as OCCUPIED until someone reaches his DF.~~
-**RETRACTED 14z-118 — the inference was FALSE.** Anakaris reached his DF and
-requested nothing. `0xAA-0xAD` is requested by **no character's Dark Force**
-(all sixteen base ids on rig 97 at 14z-118; `0x12`/`0x18` at 14z-79b). What
-is still NOT known: whether any non-DF path requests `0xAA` (phase A of the
-audit saw only `0x26/0x27` over its eight ordinary-play replays). So the
-block is "no known requester", not "proven free" — the deferred "give Phobos
-his own block" fix may take it only after a whole-corpus phase-A census
-(every replay, uncapped probe) also comes back empty. *(The retracted
-paragraph is kept struck as the audit's specimen of an inference that read
-as a fact for 39 sessions.)*
+**RETRACTED 14z-118 — the inference was FALSE, and so was the next one.**
+Anakaris reached his DF and requested nothing; `0xAA-0xAD` is requested by
+no character's Dark Force (all sixteen base ids on rig 97). The whole-corpus
+phase-A census that followed (73 vsavj-targeted replays, every leg END-clean,
+uncapped, 23,800 calls — `tests/expected/palette_seq_ids_corpus.txt`,
+`REPLAYS=all tests/audit_palette_seq_ids.sh`) did not request `0xAA-0xAD`
+either — **but it requested `0xAE-0xB1`, from a CPU Sasquatch, and the
+routine table then showed the `0xAA` base sits in SASQUATCH's row.**
+`0xAA-0xAD` is his `$381=0` half. **NOT FREE.** The "no known requester ->
+candidate free" reasoning this paragraph carried for an afternoon was the
+census fallacy the family rule above names: a block can be owned and never
+requested by the corpus. The deferred "give Phobos his own block" fix must
+find a block by reading `0x02A8A4` and its routines, not by measuring
+absence. *(Both retracted paragraphs are kept struck as the audit's
+specimens: an inference that read as a fact for 39 sessions, and its
+replacement that lasted one session.)*
 
 **[VSE-70]** **WHY THIS CANNOT BE DERIVED FROM TABLE `0x02A8A4`.** The obvious model — row
 per character, each pointing at a routine with one hardcoded base — is WRONG.

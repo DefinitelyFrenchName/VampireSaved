@@ -45,18 +45,37 @@ cd "$REPO"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 export MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 
-REPLAYS="02_demitri_vs_cpu 03_two_player_vs 05_timeout_idle 07_mash_storm
-         08_challenger_join 09_mirror_pick 30_demitri_throw 20_don_round2"
+# REPLAYS: the phase-A set. Default = the cheap eight. `REPLAYS=all` sweeps
+# EVERY vsavj-targeted replay in tests/replays/*.rpl (14z-118: 73 legs, ~30
+# min, 4 in parallel) and then requires the union to EQUAL the frozen
+# whole-corpus inventory in tests/expected/palette_seq_ids_corpus.txt — the
+# census that decides whether a palette-seq block is FREE of any non-DF
+# requester (the 0xAA question, engine_internals "THE DARK FORCE
+# PALETTE-SEQUENCE BLOCKS"). Growth or shrinkage of that union fails.
+REPLAYS="${REPLAYS:-02_demitri_vs_cpu 03_two_player_vs 05_timeout_idle 07_mash_storm
+         08_challenger_join 09_mirror_pick 30_demitri_throw 20_don_round2}"
+CORPUS=0
+if [ "$REPLAYS" = "all" ]; then
+    CORPUS=1
+    REPLAYS="$(ls tests/replays/*.rpl | grep -v '_vsav2\.rpl$' | sed 's|tests/replays/||;s|\.rpl$||' | tr '\n' ' ')"
+fi
 FORBIDDEN="1e 1f 20 21"
 
 : > "$W/ids.txt"
 total=0
+_i=0
 for r in $REPLAYS; do
     [ -f "tests/replays/$r.rpl" ] || continue
     d="$W/$r"; mkdir -p "$d"
-    ( cd "$d" && GUARD_PROBE=2ad82 GUARD_PROBE_MAX=200000 \
+    ( cd "$d" && GUARD_PROBE=2ad82 GUARD_PROBE_MAX=400000 \
       "$REPO/tools/run_replay_guarded.sh" vsavj "$REPO/tests/replays/$r.rpl" \
-      "$d/g.log" "$d/box" > "$d/out" 2>&1 ) || true
+      "$d/g.log" "$d/box" > "$d/out" 2>&1 ) &
+    _i=$((_i + 1)); [ $((_i % 4)) = 0 ] && wait
+done
+wait
+for r in $REPLAYS; do
+    [ -f "tests/replays/$r.rpl" ] || continue
+    d="$W/$r"
     n=$(grep -c '^PROBE' "$d/g.log" 2>/dev/null || true)
     [ -n "$n" ] || n=0
     ids=$(grep '^PROBE' "$d/g.log" 2>/dev/null \
@@ -68,6 +87,20 @@ for r in $REPLAYS; do
         echo "FAIL: $r hit the probe cap — the census is truncated"; exit 1
     fi
 done
+
+if [ "$CORPUS" = 1 ]; then
+    UNION_A=$(sort -u "$W/ids.txt" | grep -v '^$' | tr '\n' ' ' | sed 's/ $//')
+    WANT_A=$(grep -v '^#' tests/expected/palette_seq_ids_corpus.txt | tr -s ' \n' ' ' | sed 's/^ //;s/ $//')
+    echo
+    echo "  whole-corpus (phase A) union: $UNION_A"
+    if [ "$UNION_A" != "$WANT_A" ]; then
+        echo "FAIL: the whole-corpus non-DF inventory MOVED — frozen: $WANT_A"
+        echo "      A new requester is a finding (a block thought free is not);"
+        echo "      a lost one means a replay or the probe changed. Root-cause, then re-freeze."
+        exit 1
+    fi
+    echo "  ok: whole-corpus non-DF inventory matches tests/expected/palette_seq_ids_corpus.txt"
+fi
 
 # ── PHASE B: the same census WITH DARK FORCE FORCED ON ──────────────────
 # The half phase A structurally cannot reach. Replay 85 drives a DF
