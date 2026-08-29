@@ -35,9 +35,9 @@
 > ## **THE 14z-118 LIST IS CLOSED**, and the `0xAA` question with it (AUDIT (14)):
 > ## the whole-corpus census ran (73 legs) and `0xAA-0xAD` is SASQUATCH's —
 > ## palette-seq blocks are 8 ids, `BASE + ($381<<2) + phase`, and a free one
-> ## is found by reading `0x02A8A4`'s routines, never by a census. Still open:
-> ## `$FF8127`'s meaning and `+0x381`'s (costume index is the natural reading,
-> ## not established) — only if they ever matter.
+> ## is found by reading `0x02A8A4`'s routines, never by a census. `+0x381` is
+> ## the PLAYER-SIDE index (tapped: set at init, AUDIT (15)) — so a block is 4
+> ## ids per SIDE. Still open, only if it ever matters: `$FF8127`'s meaning.
 > ##
 > ## **CURRENT:** donovan-m17 `90a225ce` / huitzil-m24 `ae953657` /
 > ## pyron-m18 `1222df18` / merged-m13 `a1b7cb82` (`build/m3b_merged20`,

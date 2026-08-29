@@ -9,11 +9,12 @@
 #   2e          Demitri, NON-DF (104_1p_auto_ko_win f1965, P1 struct)
 #   6f 70 71 72 Bishamon (his DF block; here from the arcade run 110)
 #   ae af b0 b1 Sasquatch, NON-DF (26_don_arcade_mash f12949, P2 = 0x0A) —
-#               the block directly AFTER 0xAA-0xAD
+#               his P2-SIDE half; 0xAA-0xAD is the P1-side half
 # NOT requested anywhere: 0xAA-0xAD (nor in any character's Dark Force —
 # tests/expected/df_palette_seq_census.txt) — and STILL NOT FREE: it is
-# Sasquatch's $381=0 half by the routine table (row 0x0A -> 0x02A988, base
-# 0xAA at 0x02A9C0). Absence in a census never proves a block free.
+# Sasquatch's P1-side half by the routine table (row 0x0A -> 0x02A988, base
+# 0xAA at 0x02A9C0; +0x381 = player side). Absence in a census never proves
+# a block free.
 #
 # The audit compares its phase-A union against the single data line below.
 26 27 2e 6f 70 71 72 ae af b0 b1

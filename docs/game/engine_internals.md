@@ -2625,12 +2625,12 @@ static route does not work — see the warning below.
 
 | ids | owner |
 |---|---|
-| `0x1E-0x21` | **Bulleta `0x00`** — her `$381=0` half; `0x22-0x25` is the other half (14z-118 family rule, below) |
+| `0x1E-0x21` | **Bulleta `0x00`** — her P1-side half; `0x22-0x25` is her P2-side half (14z-118 family rule, below) |
 | `0x26`, `0x27` | Demitri `0x01` (DF); **`0x2E` is also his, NON-DF** — the corpus census, 104_1p_auto_ko_win f1965, P1 struct (14z-118) |
 | `0x44-0x47` | Zabel `0x04` (and slot `0x0B`, the Shadow machinery, by row alias — 14z-118) |
 | `0x6F-0x72` | Bishamon `0x08` **and** Oboro Bishamon `0x18` (same block) |
 | `0x264-0x267` | Q-Bee `0x0C` |
-| **`0xAA-0xB1`** | **Sasquatch `0x0A` — NON-DF, found 14z-118**: the corpus census caught `0xAE-0xB1` from a CPU Sasquatch (26_don_arcade_mash f12949, P2 struct, `$381`=1), and the routine table settles the rest statically — row `0x0A` of `0x02A8A4` is offset `0xE4` = routine `0x02A988`, whose `addi.w #$aa,d0` at `0x02A9C0` is the seventh base constant. `0xAA-0xAD` is his `$381=0` half, never reached by the corpus |
+| **`0xAA-0xB1`** | **Sasquatch `0x0A` — NON-DF, found 14z-118**: the corpus census caught `0xAE-0xB1` from a CPU Sasquatch (26_don_arcade_mash f12949, P2 struct, `$381`=1), and the routine table settles the rest statically — row `0x0A` of `0x02A8A4` is offset `0xE4` = routine `0x02A988`, whose `addi.w #$aa,d0` at `0x02A9C0` is the seventh base constant. `0xAA-0xAD` is his P1-side half — the corpus only ever met him as the CPU (P2) |
 | `0x29C-0x2A0` | `0x12` — **five ids, not four** |
 | none in DF | Gallon `0x02`, Victor `0x03`, Morrigan `0x05`, **Anakaris `0x06` (14z-118)**, Felicia `0x07`, Aulbath `0x09`, Sasquatch `0x0A` (his requests are NON-DF, row above), Lei-Lei `0x0D`, Lilith `0x0E`, Jedah `0x0F` |
 
@@ -2639,10 +2639,13 @@ row's routine is one template — Bulleta `0x02A8EE`, Sasquatch `0x02A988`
 disassembled: `move.b $195(a6),d0 / addq #1 / andi #3` (a 4-phase cycle),
 `move.b $381(a6),d1 / lsl.w #2,d1 / add.w d1,d0 / addi.w #BASE,d0 / bra
 0x02AD82`. So a character's block is **EIGHT ids: BASE + ($381 << 2) + phase**,
-and each census row above saw ONE `$381` value. `$381(a6)` read 1 on the CPU
-Sasquatch and 0 on P1 in every other attributed run; a costume/colour index
-is the natural reading but the alt-colour pick replay (41) also read 0, so
-its meaning is NOT established (`ram.md` `+0x381`). Consequence: a free
+and each census row above saw ONE `$381` value. **`$381(a6)` is the
+PLAYER-SIDE index (0 = P1, 1 = P2)** — write-tapped 14z-118: set once at init
+by `0x0058A4`/`0x0058AA` (`move.b #$0,$781(a5)` / `move.b #$1,$b81(a5)`),
+never at pick time (`ram.md` `+0x381`). So the two halves are P1's and P2's:
+a mirror match never shares a palette sequence, and every census row above
+(P1 characters) saw the P1 half — the CPU Sasquatch, being P2, is the one
+P2-half sighting in the corpus. Consequence: a free
 block is found by reading the ROUTINE TABLE (which rows point at which
 base, and what the `0x40` default rows do), never by a census — a census
 reports the halves the corpus happened to play.
@@ -2672,7 +2675,7 @@ uncapped, 23,800 calls — `tests/expected/palette_seq_ids_corpus.txt`,
 `REPLAYS=all tests/audit_palette_seq_ids.sh`) did not request `0xAA-0xAD`
 either — **but it requested `0xAE-0xB1`, from a CPU Sasquatch, and the
 routine table then showed the `0xAA` base sits in SASQUATCH's row.**
-`0xAA-0xAD` is his `$381=0` half. **NOT FREE.** The "no known requester ->
+`0xAA-0xAD` is his P1-side half (`+0x381` = 0). **NOT FREE.** The "no known requester ->
 candidate free" reasoning this paragraph carried for an afternoon was the
 census fallacy the family rule above names: a block can be owned and never
 requested by the corpus. The deferred "give Phobos his own block" fix must
