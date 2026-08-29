@@ -24,9 +24,9 @@
 > ## **THE MiSTer TAIL WAS NOT EMPTY** (the program moved): fork `80e08111`
 > ## (catalogue: six CRCs), patch 0026, pin bumped, `release/merged-m12/`,
 > ## bundle `../mister_fieldtest_14z117/` (STOCK CONTROL MRA byte-identical
-> ## to 14z-115's, `.rbf` unchanged — flash nothing). **Fork NOT pushed,
-> ## main NOT pushed** until the maintainer says so; check `git status -sb`
-> ## and `git -C emu/jtcores status -sb`, not this line.
+> ## to 14z-115's, `.rbf` unchanged — flash nothing). **Fork, main and the
+> ## four tags PUSHED** at the maintainer's word (they took the bundle to
+> ## the board); check `git status -sb`, not this line.
 > ##
 > ## **ONE TRAP PAID FOR, in `project/gotchas.md`:** the re-point sweep
 > ## stamped four lines ending in `\` — `test_pointer_flow` PASSED with a
