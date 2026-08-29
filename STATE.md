@@ -1,5 +1,23 @@
 # STATE — living progress log
 
+## Session 14z-119 CLOSE — ritual complete. **THE PHYSICS-PORT FREEZE: donovan-m18 / huitzil-m25 /
+## pyron-m19 / merged-m14, mark M12, stock twin MOVED by design — strict 117/0/0/0 on the committed
+## tree, guard corpus 344/344, roster 111/111, every masked legacy class green on three suites.
+## Tagged at `5672291`. NOT field-tested, NOT pushed.**
+
+| | |
+|---|---|
+| opened with | the 14z-118 close (`0c2f993`, pushed); "proceed with (A)" |
+| delivered | the M12 battery end to end (the session entry above has every number), release `release/merged-m14/`, the MiSTer tail (fork `2bf41090`, patch 0028, pin, bundle `../mister_fieldtest_14z119/`), the re-point + N-2 sweeps, the docs |
+| green at close | `run_all_static --strict` **PASS 117 / SKIP 0 / FAIL 0 / MISSING 0** on the committed tree `5672291` (the first run was 116/0/1: `test_phasec_spaces`' stock pin — the fourth carrier of the moved stock twin — re-pinned); suites donovan-m18 61/21, huitzil-m25 67/21, pyron-m19 68/19 with every masked legacy class PASS; `audit_merged_legacy` 47/47; `audit_guard_corpus` 344/344; `audit_roster_pairings` 111/111; `audit_legacy_pairings` PASS; the gate list in the session entry — all PASS |
+| push | **NOT PUSHED** — main is ahead of origin by the freeze commit + this close; the fork `2bf41090` is local; tags `freeze/{donovan-m18,huitzil-m25,pyron-m19,merged-m14}` local. Push at the maintainer's word |
+| not done, by absence | the board verdict on M12 (the bundle is on disk, the tell is "M12"; pick Donovan, walk, jump); phase 2 of the map; the move lists |
+| next | the maintainer's pick — the board test, then (B) phase 2 or (C) the move lists (NEXT_SESSION). Load `vampire-saved-port` first |
+
+**Ledger rollover:** the 14z-116 group (one record) moved verbatim to
+STATE_HISTORY.md; STATE holds 14z-117 / 14z-118 / 14z-119.
+
+
 ## Session 14z-119 (2026-08-29/30) — **THE PHYSICS-PORT FREEZE: donovan-m18 / huitzil-m25 /
 ## pyron-m19 / merged-m14, mark M12 — the M12 battery NEXT_SESSION option (A), run end to end in one
 ## session. Donovan walks and jumps with VS2's values on every shipping track; the STOCK TWIN MOVED
