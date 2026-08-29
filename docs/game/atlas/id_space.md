@@ -3,6 +3,18 @@
 Measured 2026-08-04 (session 14z-60). Gate: `tests/test_id_space.sh`.
 Tool: `tools/audit_id_space.py`. Companion: `docs/game/atlas/select_screen.md`.
 
+*Currency (14z-118 audit): the gate PASSES on today's tree (44 tables, 25
+distinct variant rows, 7 folding sites — unchanged since 14z-111's +4 AI
+tables). Everything this page predicted has since SHIPPED and is measured
+elsewhere: the three tenants on `0x10`/`0x11`/`0x13` (14z-64/65/8x), the
+21-cell wheel with cell == id (`select_screen.md` "The measured extension",
+14z-63; repositioned 14z-115), the port's own `0x18` route
+(`oboro_select_hook`, 14z-105), the tenants' ladder rows and AI script
+roots (14z-111), random select listing the tenants (`roster_subst`,
+14z-117), and the full attract roster (`test_attract_roster.sh`, 14z-118).
+The sections below are the MEASUREMENT that licensed those; status notes
+mark where a later session settled a question they left open.*
+
 **[VSE-10]** **THE ANSWER: conventional.** The id is a 5-bit value everywhere it is
 stored and in every layout-verified table; vsavj simply fills the upper 16
 rows with copies. The only architectural narrowing is a small, enumerable
@@ -192,8 +204,8 @@ carrying its `END` summary line:
 |---|---|---|
 | `PRG:0x020A80` | `00 01 03 05 06 08` | the select commit (cursor cell) |
 | `PRG:0x00AEF6` | `0A 0C 0E` | the CPU-opponent picker |
-| `PRG:0x005BF4` | `02 0F` | attract assignment, P1 |
-| `PRG:0x005BFA` | `00 03` | attract assignment, P2 |
+| `PRG:0x005BF4` | `02 0F` | attract assignment, P1 — the corpus's two minutes of attract reach demos 0-1 only; the writer's FULL range is the 8-row table `PRG:0x005C08` (P1 `0F 02 0C 0E 06 01 09 0D`, P2 `03 00 08 04 0A 05 07 06`), decoded and frozen 14z-118 (`test_attract_roster.sh`): still not one variant-half id |
+| `PRG:0x005BFA` | `00 03` | attract assignment, P2 — same table, second byte |
 | `PRG:0x008A86` | `05` | challenger / 2P join |
 | `PRG:0x009008` | `01` | P1 init |
 | `0x000D34` `0x000D3A` `0x000DD8` `0x016E4C` `0x016E4E` | `00`, `FF` | boot RAM clear |
@@ -223,10 +235,14 @@ Oboro entry path is worth characterising before the argument is leaned on
 harder. Nothing static was found that sets bit 4 of the id directly. **The
 `$43`/`$45` confirm-path override has since been decoded and ruled out**
 (`select_screen.md`): `$45` can only hold `$ff` or a copy of the current
-cursor cell, so it cannot introduce a variant id. Oboro's entry path is
-still unlocated, and it is the one remaining hole in this argument.
+cursor cell, so it cannot introduce a variant id. ~~Oboro's entry path is
+still unlocated, and it is the one remaining hole in this argument.~~
+**CLOSED 14z-116 (marked 14z-118): there is no vanilla entry path — no
+vsavj code writes `0x18` to `$382` (the only immediate id writes are
+`0x02`, `0x04`, `0x0B`, `0x12`); the four compare sites read a value only
+the port's own hook can produce. The hole is measured shut, not assumed.**
 **14z-105 note: that sentence is about VANILLA's own route to `0x18`
-(the boss-encounter logic), which stays unlocated and no longer matters
+(the boss-encounter logic), which stays unlocated ~~and no longer matters~~ — and at 14z-116 was measured NOT TO EXIST (see the closure above; marked 14z-118)
 for the port — the WIDE build now carries ITS OWN player-facing path,
 the profile-gated `oboro_select_hook` (Bishamon's cell + Start held at
 confirm, vanilla's Gallon-variant idiom at `PRG:0x020B9C` one cell over;
@@ -328,9 +344,15 @@ is trusted.
 above `0x0F`":
 
 - **taken:** `0x00-0x0F` (the wheel), `0x12` (Gallon variant), `0x18`
-  (Oboro — vanilla uses it; vanilla's entry path still unlocated, the
-  port's own is the 14z-105 `oboro_select_hook`)
-- **free, and what the plan targets:** `0x10`, `0x11`, `0x13`
+  (Oboro — vanilla ships its DATA complete; **measured 14z-116: NO vanilla
+  path writes `0x18` to `$382` — the only immediate id writes in vsavj are
+  `0x02`, `0x04`, `0x0B`, `0x12` — so there is no vanilla entry path to
+  locate; the port's 14z-105 `oboro_select_hook` is the only one.** *(This
+  line said "vanilla's entry path still unlocated" until 14z-118.)*)
+- **free, and what the plan targets:** `0x10`, `0x11`, `0x13` — **taken by
+  Huitzil / Pyron / Donovan since 14z-65/8x; the reserved set is locked by
+  `test_id_space.sh` and no further id is free below `0x1F` without a
+  ruling (`0x14-0x17`, `0x19-0x1F` alias their base rows in vsavj)**
 
 The plan survives unchanged, but only because it happened to pick around
 `0x12`. `tests/test_id_space.sh` now locks the reserved set, so growth
@@ -346,6 +368,9 @@ Falls straight out of the above:
    wheel cells vs2 already ships.
 2. **`wheel_cell`** — equal to `id` (there is no indirection), plus the
    TABLE B row and the neighbouring rows edited to make it reachable.
+   *(Shipped exactly so at 14z-63: cells `0x10/0x11/0x13`, inbound edges from
+   `0x0B`/`0x08`/`0x09` — `select_screen.md`; the random cell's draw table
+   lists them since 14z-117.)*
 3. **Tables the tenant owns rows in** — the 39 layout-verified tables all
    have a row at the tenant's id.
 4. **Folding sites the tenant needs widened** — from the list above, per
@@ -358,7 +383,13 @@ Falls straight out of the above:
    vs2 left folded).
 5. **Arcade-ladder membership** — the opponent order list at `a5-0x61B8`
    and its length `$138(a5)`, plus the VS palette block at
-   `PRG:0x3A3CA0 + id*32`. Selectable is not fightable.
+   `PRG:0x3A3CA0 + id*32`. Selectable is not fightable. *(Status 14z-118:
+   the tenants' OWN ladder rows and AI script roots shipped 14z-111 (#99);
+   a tenant is a CPU opponent only when the player is a tenant — ladder
+   table A rows 16/17/19 — and no legacy character ever meets one in 1P,
+   ruled NOT A PROBLEM 2026-08-28 (STATE). The VS palette block for a
+   tenant is STILL UNSUPPLIED — the placeholder ramp; single-player,
+   cosmetic, never reported from the board.)*
 6. **Tables whose per-id layout is still unverified** (`rec8`, `byte2d`,
    `auto` gaps) — these must be resolved by decoding a consumer before a
    tenant is declared to own a row in them. Writing a speculative row into
@@ -371,6 +402,9 @@ export ROMDIR=/path/to/reference/sets
 tests/test_id_space.sh
 python3 tools/audit_id_space.py --set vsavj \
     --op build/out/vsavj_opcodes.bin --dat build/out/vsavj_data.bin
+tests/audit_id_writers.sh          # on-demand, 22 MAME runs: every id vanilla writes
+tests/test_attract_roster.sh       # the attract writer's full range (14z-118)
+tests/test_effect_palette_table.sh # the two palette tables' 0x12/0x18 exceptions
 ```
 
 Bank addresses are rebased per set from the origin delta

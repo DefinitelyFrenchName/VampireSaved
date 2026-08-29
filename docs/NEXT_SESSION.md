@@ -30,7 +30,7 @@
 > ## ~~(c)~~ DONE (AUDIT (11)): the attract roster decoded, traced and gated
 > ## (`test_attract_roster`); `$FF8127`'s 14z-104 reading was WRONG — it marks a
 > ## P2-won down, not a P1-won one, and flips at the refill (semantics OPEN);
-> ## the real side codes are `$FF8105`/`$FF810C`; (d) `id_space.md` tag refresh; (e)
+> ## the real side codes are `$FF8105`/`$FF810C`; ~~(d)~~ DONE (AUDIT (12)); (e)
 > ## the STOCK CONTROL once-per-`.rbf` ruling (unruled since 14z-113).
 > ##
 > ## **CURRENT:** donovan-m17 `90a225ce` / huitzil-m24 `ae953657` /
