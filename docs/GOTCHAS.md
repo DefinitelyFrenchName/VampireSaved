@@ -28,7 +28,7 @@ is a GAME gotcha if it is true of the game regardless of the port.
 ### appended 14z-105 (platform bucket — the window: Oboro hook + version string)
 - `gfx_tiles.decode` mirrored every 8-pixel half (plane bit i = pixel 7-i, not i) and no consumer had ever read pixel ORDER; the first AUTHORED tile exposed it — verify synthesized tiles at the RENDER layer, the byte round-trip only proves self-consistency. Transparent pen is 15. OBJ (x,y) -> screen (x-64, y-16)
 ### appended 14z-98 (project bucket — the #103 close)
-- Every -debug watch configuration is its own TIMELINE — two -debug trace runs are not comparable either; trace_writes now takes DUMPS so a run carries its own anchors (and the wpset stop PC is the instruction AFTER the access)
+- Every -debug watch configuration is its own TIMELINE — two -debug trace runs are not comparable either; trace_writes now takes DUMPS so a run carries its own anchors (and the wpset stop PC is the instruction AFTER the access) *(emulator half re-filed to [platform](platform/gotchas.md) 14z-118)*
 - GUARD_PROBE's RET (SP) is a caller only for jsr-reached code; a jmp/branch-reached routine shows stale stack — use GUARD_PROBE_HIST
 - A 2-byte HP kill poke manufactures #103's unjudgeable state on ANY character (the judge reads WHITE's sign); kill pokes write BOTH words (00010001) — audit_kill_poke_shape.sh freezes both shapes
 ### appended 14z-97b (project bucket — the #103 hunt)
@@ -135,7 +135,7 @@ is a GAME gotcha if it is true of the game regardless of the port.
 
 - Sibling-coincident engine refs are INVISIBLE to the diff oracle — and the coincident vsavj address is usually a WRONG routine (paid: 2026-07-27 sessions 11c-12, ~a full session across three playtest rounds)
 - Pre-seeded from the ROM-audit round (2026-07-25, before repo existed)
-- Cross-emulator replays: same inputs ≠ same content (paid: 2026-07-25, ~2h)
+- Cross-emulator replays: same inputs ≠ same content (paid: 2026-07-25, ~2h) — re-filed to [platform](platform/gotchas.md) 14z-118
 - Bare-long "pointers" in code are usually operand pairs — sibling-veto them (paid: 2026-07-25 session 7, ~3h incl. diagnosis)
 - Engine hooks on hot paths break whole-RAM legacy comparison — by construction (paid: 2026-07-25 session 7, ~2h) — ADDENDUM 14z-88: a masked window is a BASIS (regenerate the vanilla logs, re-base the specs); a palette-row move is a staging-slot move AND a fade-cycle change (data-only ≠ cycle-neutral)
 - PC-relative word tables are DATA — never let a pointer heuristic rewrite them (paid: 2026-07-25, ~1h)
@@ -163,15 +163,15 @@ is a GAME gotcha if it is true of the game regardless of the port.
 - replay.lua DUMPS separator is ';' — commas die silently late
 - Sound is invisible to every RAM and pixel gate — it needs its own
 - Censusing a structure without knowing its terminator counts garbage
-- The FBNeo gate never rendered a pixel — RAM checksums are blind to video
+- The FBNeo gate never rendered a pixel — RAM checksums are blind to video — re-filed to [platform](platform/gotchas.md) 14z-118
 - An A/B reference binary must differ by exactly one thing
-- A canary must change exactly ONE thing, or it cannot answer anything
-- A relocation test with no negative control proves nothing
-- The MAME replay harness was blind to the video path too — until B5
-- `git apply` SILENTLY SKIPS the patch when the target is inside another repo's working tree — and exits 0 (paid: 2026-08-03, B5)
-- `git submodule add` stages the DEFAULT BRANCH, not the tag you check out
-- The input-integrity check's first draft flagged EVERY replay — :IN2 carries the EEPROM data line
-- `WIDE=0 tools/setup_fbneo.sh` did not produce a clean reference — it only SKIPPED applying the profile patch, never reverted it
+- A canary must change exactly ONE thing, or it cannot answer anything — re-filed to [platform](platform/gotchas.md) 14z-118
+- A relocation test with no negative control proves nothing — re-filed to [platform](platform/gotchas.md) 14z-118
+- The MAME replay harness was blind to the video path too — until B5 — re-filed to [platform](platform/gotchas.md) 14z-118
+- `git apply` SILENTLY SKIPS the patch when the target is inside another repo's working tree — and exits 0 (paid: 2026-08-03, B5) — re-filed to [platform](platform/gotchas.md) 14z-118
+- `git submodule add` stages the DEFAULT BRANCH, not the tag you check out — re-filed to [platform](platform/gotchas.md) 14z-118
+- The input-integrity check's first draft flagged EVERY replay — :IN2 carries the EEPROM data line — re-filed to [platform](platform/gotchas.md) 14z-118
+- `WIDE=0 tools/setup_fbneo.sh` did not produce a clean reference — it only SKIPPED applying the profile patch, never reverted it — re-filed to [platform](platform/gotchas.md) 14z-118
 - A build-fingerprint call without `--set` silently fingerprints the PRISTINE reference ROM (paid: 2026-08-04, 14z-59i)
 - `_PRG_RE` did not match the WIDE extension members, so extension content was invisible to the build fingerprint
 - The sfx helper and the record array must be impossible to enable separately
@@ -300,7 +300,7 @@ is a GAME gotcha if it is true of the game regardless of the port.
   ride the uncomment rule (duplicate key) — stage it as an edit
   instruction.
 
-- **14z-100 (project):** probe PCs must sit on instruction boundaries
+- **14z-100 (project):** probe PCs must sit on instruction boundaries *(emulator half re-filed to [platform](platform/gotchas.md) 14z-118)*
   (a mid-operand probe reads 0-fires-green while measuring nothing) and
   every probe needs a must-fire control; rig iterations must not share
   a dump dir (overwrites destroy the prior iteration's evidence);
@@ -318,7 +318,7 @@ is a GAME gotcha if it is true of the game regardless of the port.
 - **14z-102 (project):** an "attack-only" entry-set A/B needs a
   QUIET-FRAME presence profile — a constant fixture (the stock pips)
   read as the #109 beam defect for a whole prep because no dump ever
-  looked away from the event; MAME palette RAM ($90C000) takes Lua
+  looked away from the event; MAME palette RAM ($90C000) takes Lua *(emulator half re-filed to [platform](platform/gotchas.md) 14z-118)*
   pokes for readback but NOT for rendering — a poke-based palette A/B
   is a dead instrument that passes its own liveness check; use a probe
   build.

@@ -1897,3 +1897,260 @@ surface. So "nobody reads this address" is NEVER a conclusion a read tap can
 support here — use the debugger trace (`INP_DEBUG=1 TRACE_FROM=`) or static
 pointer archaeology instead. The knob was written for #112 and removed the
 same session rather than left documented-and-dead.
+
+## RE-FILED FROM project/gotchas.md (14z-118, the documentation audit) — emulator and toolchain facts that had been filed by task
+
+Verbatim moves; the `(paid: …)` dates and session tags are the originals. Anchors
+`**[CPE-N]**` travelled with their paragraphs (`tests/test_checkskills.sh`).
+
+## Pre-seeded from the ROM-audit round (2026-07-25, before repo existed)
+
+**[CPE-20]** - **MAME audits the whole board, not just the game:** FBNeo has decryption
+  keys compiled in and synthesizes QSound (HLE) without the DSP dump; modern
+  MAME requires per-set `.key` files AND the shared device romset
+  `qsound_hle.zip` (`dl-1425.bin` — one copy in the rompath serves every
+  QSound game, but the audit lists it as missing under *every* dependent
+  game, which looks like mass failure). A collection that "works everywhere
+  but fails MAME audit" is usually packaging/device ROMs, not bad dumps —
+  read the audit line items. Also: `-verifyroms` uses the rompath from
+  mame.ini unless `-rompath` is passed — it can "fail" sets it never opened.
+- **vhunt2r1 has no key of its own:** its MAME definition loads the parent's
+  `vhunt2.key` under that exact filename (identical board key across both
+  revisions, CRC 61306b20).
+- **Clone/parent split:** `vsavj` and `vhunt2r1` are clones; in split sets
+  their gfx/QSound ROMs live in the parent zips (`vsav.zip`, `vhunt2.zip`),
+  which must be present alongside.
+
+## Cross-emulator replays: same inputs ≠ same content (paid: 2026-07-25, ~2h)
+
+**[CPE-33]** The MAME↔FBNeo frame offset (a few frames at boot) does more than shift
+frame indices — near any screen transition it changes WHICH content runs.
+Three measured mechanisms, all found while validating `tools/compare_fields.py`:
+
+1. **CPU-chosen opponents differ.** `02_demitri_vs_cpu` picks opponent 0x0E
+   on MAME and 0x0A on FBNeo: the coin lands at a different attract-PRNG
+   state. Any "vs CPU" replay has emulator-divergent content — dual-emulator
+   comparisons must use replays where BOTH characters are scripted picks.
+2. **Menu presses near an input-accept boundary.** In `03_two_player_vs`,
+   S2 pressed 30 frames after S1 (frames 830-833) joins P2 on MAME but NOT
+   on FBNeo (boundary measured between 830 and 836) — FBNeo then runs a
+   1P-vs-CPU game and every downstream state differs. P2's input path itself
+   is fine (verified with a P2-only replay: bit-identical behavior).
+3. **Match-start predicate flickers.** The naive anchor predicate
+   (match-active flags + full HP) is transiently true during round intros;
+   `compare_fields.py` debounces 30 frames before accepting an anchor.
+
+Even with matched content and a 1-frame anchor skew, anim-cursor-derived
+fields (anim ptr, box ids) and mid-intro positions differ by a few frames of
+phase slip — the tests/fields_m2a.tsv `phase` column (stable/settled/phase)
+encodes what is comparable when.
+
+**Authoring rules for dual-emulator replays** (see `16_xemu_2p.rpl`, the
+validated template): both characters scripted; menu presses ≥100 frames
+after the enabling transition and ≥10 frames from any expected boundary;
+cursor moves short (3 frames, no autorepeat ambiguity) on long-stable
+screens; input-neutral after the picks. Within-emulator oracles are
+unaffected (whole-RAM frame-exact remains the standard there).
+
+## The FBNeo gate never rendered a pixel — RAM checksums are blind to video
+**[CPE-35]** The FBNeo harness ran every frame with `pBurnDraw = NULL`. That is correct
+for speed and for a work-RAM oracle, but it means the emulator-side gate
+could not see the video path AT ALL: a change to sprite/tile rendering
+produces byte-identical RAM logs whether it works or draws garbage. This
+was discovered while trying to verify the CPS-2 WIDE 19-bit tile address,
+whose entire effect is in `cps_obj.cpp` — the gate would have "passed" it
+without ever executing the modified line. Fixed by an opt-in framebuffer
+checksum (`FBNEO_HVIDEO=<path>`, harness.cpp), now compared alongside RAM
+in tests/test_wide_profile.sh. General lesson: before trusting a gate on a
+change, confirm the gate's instrumentation actually EXECUTES the code path
+you changed.
+
+## A canary must change exactly ONE thing, or it cannot answer anything
+**[CPE-38]** The first CPS-2 WIDE B4 canary tried to prove the new 19-bit gfx banks
+were reachable by remapping 15 characters' bank-table rows to the new
+banks and requiring pixel-identical output. It failed — and the failure
+was uninterpretable, because the same edit ALSO changed game logic (see
+`docs/project/cps2_wide.md` "B4" — the reference was in-file before this
+entry was re-filed here at 14z-118). Two variables moved at once, so neither "the emulator path is
+broken" nor "the game strips the bit" could be concluded. The isolation
+that DID work was cheap and should have come first: run the modified
+program under the OTHER emulator (which lacks the feature entirely) and
+diff — that immediately separated "game behaves differently" from
+"emulator renders differently". Design canaries so that exactly one
+subsystem can account for the result, and prefer changing the EMULATOR
+under a test-only flag over changing the ROM when the ROM change has
+side effects.
+
+## A relocation test with no negative control proves nothing
+**[CPE-39]** The CPS-2 WIDE PRG canary relocated one character's sound table into the
+extension and came back RAM-identical — apparently proving the 68k could
+read above 4MB. It proved nothing: pointing the same table at ZERO FILL
+was *also* RAM-identical, because that row is never read in those
+replays. Any "I moved X and nothing changed, therefore X works" test must
+be paired with "I broke X and something changed". The fixed version
+relocated all 20 tables, where the zeros variant does diverge and the
+identical result is real evidence.
+
+## The MAME replay harness was blind to the video path too — until B5
+The FBNeo lesson (14z-55, `pBurnDraw = NULL`) applies verbatim to MAME:
+`tests/lua/replay.lua` checksummed work RAM only, so any MAME gate was
+structurally blind to rendering — and the CPS-2 WIDE 19-bit tile address
+is *entirely* a rendering change. `VIDEO_OUT=<path>` now writes a
+per-frame framebuffer checksum alongside (never into) the RAM log, and
+`tests/test_replay_video_selfcheck.sh` ground-truths it in both
+directions before any gate trusts it. Measured: 5,520 frames of
+`02_demitri_vs_cpu` produce 3,952 distinct framebuffer checksums, and the
+RAM log stays bit-identical to the frozen expectation with it enabled.
+
+## `git apply` SILENTLY SKIPS the patch when the target is inside another
+## repo's working tree — and exits 0 (paid: 2026-08-03, B5)
+**[CPE-25]** `tools/setup_mame.sh` builds from a mirror under `~/.cache/vampire-saved/`.
+On this machine **`$HOME` is itself a git repository**, so the mirror sits
+at prefix `.cache/vampire-saved/mame/` inside it. `git -C <mirror> apply
+0002-cps2-wide-v1.patch` therefore read the diff's paths
+(`src/mame/capcom/cps2.cpp`) as **$HOME-repo-root-relative**, found them
+outside the current prefix, printed `Skipped patch 'src/...'` — and
+**returned 0**. `git apply --check` "passed" for the same reason.
+
+Result: the script printed "CPS-2 WIDE profile patch applied", MAME built
+cleanly for nine minutes, and produced a completely STOCK binary. Nothing
+in any exit code said otherwise. Only `-listfull vsavjw` caught it.
+
+Rules that follow:
+- Use **`patch -p1 -d <dir>`** for out-of-tree trees. patch(1) has no
+  repository semantics and cannot be confused by an ancestor `.git`.
+- **Never treat an exit code as evidence that a patch landed.** Assert on
+  the RESULT: grep the patched file for a marker, and assert the built
+  ARTIFACT has the feature (`setup_mame.sh` now does both, and also
+  asserts that a `WIDE=0` reference binary does NOT know `vsavjw`).
+- Same family as the FBNeo CRC trap above: the toolchain reported success
+  while silently substituting nothing. Assume this failure mode exists in
+  every "it said OK" step of the build.
+
+## `git submodule add` stages the DEFAULT BRANCH, not the tag you check out
+(paid: 2026-08-03, B5 — invalidated a green 36/36 gate run)
+The sequence
+
+    git submodule add --depth 1 <url> emu/mame
+    git -C emu/mame fetch --depth 1 origin tag mame0288
+    git -C emu/mame checkout mame0288          # working tree only!
+
+**[CPE-21]** leaves the SUPERPROJECT INDEX pointing at the default branch head — the
+`add` staged it before the checkout, and the checkout never re-staged.
+Everything looks right (`git -C emu/mame log -1` shows the tag's commit)
+until something runs `git submodule update`, which dutifully restores the
+INDEXED commit and silently moves the tree back to master.
+
+That is exactly what `tools/setup_mame.sh` does on every invocation. The
+reference binary had been built before the reset (0.288) and the WIDE
+binary after it (**0.289**), so the emulator superset invariant compared
+two different MAME VERSIONS and still reported 36/36. The result was true
+about those two binaries and meaningless as the claim it was making —
+"the patched binary differs from the reference only by the profile patch".
+The drifting-reference trap of 14z-55, in a new costume.
+
+Rules:
+- After checking out a tag in a submodule, **`git add <submodule>`**.
+- Do not rely on the gitlink alone: `setup_mame.sh` now hard-codes the
+  pinned SHA and refuses to build anything else. A build that silently
+  changes the instrument is worse than a build that fails.
+- Annotated tags: `git rev-parse mame0288` returns the TAG OBJECT sha
+  (`2c38dc6e`), not the commit (`27a8d9e8`). Compare with
+  `mame0288^{commit}` or you will "discover" a mismatch that is not one.
+
+Side observation worth keeping: 0.288 and 0.289 produced **bit-identical**
+work RAM and framebuffers across the 12-replay legacy corpus, so CPS-2
+emulation did not change between those releases. Useful to know, and not a
+substitute for pinning.
+
+## The input-integrity check's first draft flagged EVERY replay — :IN2
+## carries the EEPROM data line
+Comparing whole input ports against "baseline with the staged bits
+cleared" fired on every single run at frame 77 (`:IN2` expected `ffff`, got
+`fffe`). Not external input: **`:IN2` mixes the EEPROM serial data line in
+with the coin/start bits**, and it legitimately toggles during boot. The
+check now masks to the union of bits the harness can actually drive, which
+loses no detection power because host keystrokes land on controller bits.
+Caught by testing the checker before trusting it (CLAUDE.md §4) — had it
+shipped silent-but-wrong in the other direction, it would have been worse.
+
+## `WIDE=0 tools/setup_fbneo.sh` did not produce a clean reference — it only
+## SKIPPED applying the profile patch, never reverted it
+(paid: 2026-08-03, B5b — the FBNeo emulator superset invariant may never
+have actually been tested)
+**[CPE-31]** `setup_fbneo.sh` applies the CPS-2 WIDE patch to the submodule WORKING TREE
+and leaves it there. On the next invocation with `WIDE=0` the script took
+the "skip" branch, printed **"WIDE=0: harness-only build (reference binary
+for the superset invariant)"** — and built a binary that still **carried the
+profile**, because the tree had never been reverted.
+
+Consequence: `tests/test_wide_profile.sh` section 1 compares FBNEO_REF
+against the WIDE binary. With a contaminated reference it was comparing
+**WIDE against WIDE**, which passes trivially. That section is the
+*emulator superset invariant* — the entire justification for permitting
+emulator changes under Rule 1 v2. A vacuous pass there is the most
+expensive kind of green.
+
+Fixes:
+- `WIDE=0` now **reverts** the patch (`git apply -R`) and refuses to build
+  if `Cps2Wide` survives.
+- Both builds assert on the ARTIFACT: the driver title string "CPS-2 WIDE
+  v1" is compiled in, so `grep` on the binary answers "does this build carry
+  the profile?" in both directions — a reference that has it and a WIDE
+  build that lacks it are equally broken.
+- `tests/test_wide_profile.sh` now FAILS if `FBNEO_REF` contains that
+  string, so a contaminated reference can never quietly pass again.
+
+Third member of the same family this session, after `git apply` silently
+skipping (exit 0) and the MAME submodule gitlink drifting to 0.289: **the
+tool reports success while the artifact is not what was asked for.** Assert
+on the artifact.
+
+## A probe PC that is not an instruction boundary measures NOTHING while looking green (14z-100)
+`GUARD_PROBE`/breakpoint addresses must sit on the OPCODE word, not inside
+an operand: the #107 reachability probe first sat at farm entry +0x3088 —
+the middle of the previous `jmp abs.l`'s operand — and produced a clean
+"0 fires / END clean" run that measured nothing. A dispatch-farm entry is
+6 bytes (`4ef9` + long); compute the entry PC from the FARM BASE, and when
+a zero surprises you, re-derive the PC from the bytes before trusting it.
+The same session's second instance: the hitclass-map probe only became
+meaningful after the Demitri-vs-Demitri control proved 468 fires — a
+probe with no must-fire control is not an instrument.
+
+## **[CPE-19]** MAME palette RAM ($90C000) takes Lua pokes for READBACK but not for RENDERING (14z-102)
+Poking palette rows from a frame_done hook (POKES or space:write) lands
+in the bytes — a later DUMPS readback shows the poked values sticking —
+but the rendered frame never changes; only the GAME's own writes
+recolor. Two magenta-row controls proved it (poked row read back intact
+at the next frames, snapshot unchanged, while the DF seq's writes to the
+same row visibly recolor). Do not build a palette A/B on pokes: it is a
+dead instrument that passes its own readback liveness check. Use a probe
+BUILD (or poke the game's staging buffer, once its per-frame copy source
+is measured), and treat any poke-based "no visual change" as
+unmeasured.
+
+## **[CPE-3]** 14z-98: two -debug INSTRUMENT-grammar traps from the #103 close — both
+## misread a measurement for a full round each
+
+**Every -debug watch configuration is its own TIMELINE, not just
+"different from non-debug".** Three trace_writes runs on the SAME rig
+with the SAME pokes — differing only in the WATCH argument — took three
+different match trajectories: one stalled at f3260, one drained the
+white bar to exactly 0 at ~f6957, one cycled round restarts through
+f8921. Reading run B's hit inventory against run A's state map produced
+"the kill commit never runs for Donovan" from a timeline that contained
+no Donovan death at all. The 14z-97b entry said "the -debug timeline is
+a different run"; the extension is that EACH -debug configuration is —
+two -debug runs are not comparable either. Remedy, now in the
+instrument: `trace_writes.lua` takes `DUMPS` (14z-98), so a trace run
+carries its own state anchors; interpret hits only against anchors from
+the SAME run. (Also worth knowing while reading its logs: the wpset
+stop PC is the instruction AFTER the access — the writer/reader is the
+instruction before the logged PC.)
+
+**`GUARD_PROBE`'s `RET <(SP)>` is a caller only for jsr-reached code.**
+A routine reached by `jmp`/`bra` (every jump-table dispatch in this
+engine) shows whatever the stack last held — measured: `RET 00ff02dc`,
+which is sound-task DATA, chased as "a RAM-resident caller" for a
+round. `GUARD_PROBE_HIST=N` gives the true path; prefer it whenever the
+callee could be branch-reached.

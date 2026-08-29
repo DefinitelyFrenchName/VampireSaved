@@ -8,29 +8,7 @@ too.
 
 Append the moment one is paid for. Read before touching the related area.
 
-## **[VSP-38]** Moving a frozen ONSET frame can silently cross a verification-class boundary (paid: 14z-90, GitHub issue #4)
-
-The §4 v3 `window` class freezes an onset frame; the §4 v2 `flicker`
-class requires >=60 identical frames of re-convergence. On the current
-builds every composite legacy replay is "hook flicker at 829, then the
-select window". When the select-wheel work moved the frozen onset from
-890 to 889 (14z-63), the gap between the flicker frame and the window
-onset went from exactly 60 to 59 — i.e. a one-frame content change
-stepped across the numeric threshold of a DIFFERENT class's rule, in 94
-frozen specs at once, with nothing in the tree asserting either way.
-Nobody noticed because no checker compared runs to each other; the
-composite checker only measures re-convergence after the LAST run.
-Whether >=60 binds across a flicker->window boundary at all is a
-class-definition question (two mechanisms, separately attributed), and
-it is open with the maintainer. The lesson is the general one: an onset
-or tolerance constant is not a private number — check what OTHER frozen
-rule sits within a few frames of it before moving it.
-
-*(Filing note 14z-114: this entry was spliced INTO the file's title line at
-14z-90 — the title read "# GOTCHAS (game)" + the entry + "— traps in
-VAMPIRE SAVIOR itself". Restored. It is a VERIFICATION-CLASS fact and a
-re-filing candidate for `../project/gotchas.md`; listed in
-`docs/project/skills_scope.md` §4.)*
+## (the 14z-90 onset-frame entry that opened this file was RE-FILED to `docs/project/gotchas.md` at 14z-118 — it is a VERIFICATION-CLASS fact, not a game fact; S-C12 flagged it)
 
 ## OBJ record formats differ in ENTRY STRIDE, not just header meaning
 
