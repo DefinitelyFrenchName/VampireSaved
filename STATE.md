@@ -387,6 +387,18 @@ entries moved VERBATIM to `DECISIONS_HISTORY.md` — grep there by topic.
 Lifecycle: rulings are still marked DECIDED in place here first; they move to
 the archive once they stop shaping active work.)*
 
+- **THE `docs/project/tables/` PROMISE (14z-118, from the documentation
+  audit's inventory `docs/project/doc_audit_14z118.md` §3).** The
+  directory's README says "per-character data manifests for Donovan /
+  Huitzil / Pyron" and still opens with "Empty until a ported character
+  exists"; it holds `donovan.md` (2026-08-09, never refreshed) and no
+  Huitzil or Pyron file. CLAUDE.md §2 rule 5 ([VSP-6]) makes these the
+  community-facing tunables. Options: **(a) generate `huitzil.md` /
+  `pyron.md` with the extractor that produced `donovan.md` and refresh all
+  three from the current manifests — RECOMMENDED, it is what the rule
+  says;** (b) retract the promise and name `build/manifest/*.toml` as the
+  table of record. Blocks audit step 5 only; steps 1-4 proceed.
+
 - **THE TENANTS' WIN QUOTES — FORGONE FOR NOW (maintainer, 2026-08-28,
   14z-116). DECIDED.** The ruling, verbatim in substance: *"Let's forgo for
   now but document everything so that, should we want to do it in the

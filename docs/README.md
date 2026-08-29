@@ -96,6 +96,11 @@ Entry points at this level, deliberately not in a bucket:
   **known-stale inventory** (S1-S20, file:line) measured against all
   ~5,000 lines of the MiSTer sources — read it before quoting any MiSTer
   document's STATUS line
+- [`doc_audit_14z118.md`](project/doc_audit_14z118.md) — **THE DOCUMENTATION
+  AUDIT (maintainer-ruled 2026-08-29, opened 14z-118)**: the inventory of
+  every document in `docs/`, HANDOFF and the six skills with its claims read
+  as MEASURED / DERIVED / GUESSED, the cross-document numbers to lock by
+  script, the commit order, and the log of the pass (one line per commit).
 - [`skills_scope.md`](project/skills_scope.md) — **the PLAN for the
   remaining skill distillations — ALL FOUR SHIPPED 14z-114** (kept as the
   record of boundaries, decisions and the staleness passes): four skills (`cps2-hardware`,
