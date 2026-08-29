@@ -340,7 +340,7 @@ eliminations.
 
     ROMDIR=... JTSIM_SCRATCH=/tmp/vampire-saved-jtsim \
       tools/run_sim_jtcps2.sh tests/replays/11_pick_donovan.rpl /tmp/out \
-        --core cps2w --wide build/m3b_merged18 --frames 4000 \
+        --core cps2w --wide build/m3b_merged20 --frames 4000 \
         --frame-output fork --frame-window 0 999999 30 \
         --rdprobe 1 0x800000 0x1000000 --rdprobe 0 0x7E0000 0xFE0000 \
         --rdprobe 2 0 0x1000000 --rdprobe 3 0 0x1000000
@@ -354,7 +354,7 @@ run's own log before labelling a phase.
 
 ```sh
 export ROMDIR=/path/to/reference/sets
-tools/mister_mra.sh --core cps2w --wide build/m3b_merged18 --out /tmp/mra107
+tools/mister_mra.sh --core cps2w --wide build/m3b_merged20 --out /tmp/mra107   # re-pointed 14z-118 <- m3b_merged18 (the example figures below are the 14z-107 run's)
 #   -> /tmp/mra107/vsavjw.rom  66,265,152 B  (the WIDE download image)
 tools/mister_mra.sh --core cps2w --out /tmp/mra107stock   # the stock leg
 #   -> /tmp/mra107stock/vsavj.rom  46,407,744 B
@@ -426,7 +426,7 @@ HANDS BACK THE SDRAM IMAGE:**
 
 ```sh
 tools/run_sim_jtcps2.sh tests/replays/05_timeout_idle.rpl /tmp/census \
-    --core cps2w --wide build/m3b_merged18 \
+    --core cps2w --wide build/m3b_merged20 \
     --post-frames 2 --keep-banks       # ~12 min: the download and nothing else
 python3 tools/mister_sdram_census.py /tmp/census/sdram \
     --rom "$JTSIM_SCRATCH/rom/vsavjw.rom" --map wide
@@ -503,6 +503,7 @@ see `docs/platform/gotchas.md` "`jtsim -verilator -stats` reports nothing".
 | `tests/test_mister_page.sh` | ci_portable (~8 s) | **THE SYNTHESIS CANNOT GO STALE.** `tools/mk_mister_page.py --check` re-derives every figure `docs/project/mister_core.md` states (17 checks) from the same constants the other gates freeze — the roster's live bytes and address footprint, the declared-region arithmetic, the four bank extents and the 0.125 MB slack, the `.rom` size and header words, the anchor and its band — and recounts the group-C ceilings from the romset. The rendered page is NEVER committed (`.gitignore`); the generator is. Written as the living-documentation pilot (14z-107 (10)) |
 | `tests/test_checkskills.sh` | ci_portable (~1 s) | **THE SKILLS ARE LOCKED TO THE DOCS (14z-114): the MiSTer pair `[MSC]`/`[MSV]`, the CPS-2 pair `cps2-hardware` `[CPH]` / `cps2-emulation` `[CPE]`, the game skill `vampire-savior-engine` `[VSE]` (anchored in `engine_internals.md`, `game/gotchas.md` and the atlas; forbids port vocabulary), and the port skill `vampire-saved-port` `[VSP]` (161 rules anchored in CLAUDE.md, HANDOFF, both gotchas, the porting/manifest/triage/hardening/registry docs and — ONLY under "STANDING PRINCIPLE" / "THE DEADNESS REGISTER", because the file rolls — STATE.md), table-driven per prefix.** `tools/checkskills.py`: every `- [PFX-N]` rule in `.claude/skills/*/SKILL.md` is anchored exactly once (`**[MSC-N]**` at the doc paragraph it distils) and every anchor has a rule; the level-1 skill names nothing game-specific (`mister_scope.md` §1); every number a skill quotes appears in a LOG (`platform/mister.md`, `mister_map.md`, `mister_fit.md`, `mister_field.md`, `release_format.md`, the gotchas, `BITSTREAM.txt`) and never only in the synthesis. Cross-references `[PFX-N]` between skills must name a defined rule. Extractors self-tested; eight must-fire controls on a perturbed copy (unanchored rule ×2, stripped anchor, a game name in level 1, a port token in the game skill, an uncited number, a dangling cross-reference, a VSP anchor in STATE outside the standing sections). **Editing an anchored paragraph: keep the marker with the fact, or move the rule** |
 | `tests/test_checkdocs.sh` | ci_portable (~0.2 s) | **THE DOCS ARE LOCKED TO EACH OTHER (14z-118, the documentation audit):** `tools/checkdocs.py` reads `docs/doc_locks.tsv` — one row per load-bearing number (label, canonical value, a key regex naming the fact, the documents that must quote it, the sibling values allowed beside it) — and asserts PRESENCE (every listed doc quotes the canonical verbatim) and NO RIVAL (no other value of the same shape within 80 chars after the key unless in `also`). The atlas row is canonical; syntheses follow it. Seeded with 16 locks / 40 file-sites from `doc_audit_14z118.md` §2 (OBJ bank table, sprite-palette pointer table, AI script tables, the voice-borrow writer, the Gallon-variant idiom, the loader, the id fold, the id pair, the fade window, name entries, the ring base, match-init normalisation). Twelve extractor self-tests every run; three must-fire controls on a perturbed copy (dropped number, rival number, missing file). **Add a row whenever a number is quoted in a second document** |
+| `tests/test_tables_current.sh` | ci_static (~1 s; SKIPs without the three solo build dirs) | **THE COMMUNITY TABLES FOLLOW THE BUILD (14z-118):** `docs/project/tables/{donovan,huitzil,pyron}.md` are rendered by `tools/tables_char_md.py` from each current solo build's `extract/regions.json` + `bank_map.toml` (inputs' SHA-1s, shifts, regions with SHA-1s, dispatch targets, VS2-vs-VH2 variant sites, the per-character VALUE rows = the tunables of CLAUDE.md §2 rule 5); the gate regenerates and `cmp`s, failing on drift. One must-fire control (a perturbed `word132` must regenerate differently). Defaults `DON/HUI/PYR` = the current solos (re-point sweep). **Regenerate the three pages in every freeze commit** |
 | `tests/test_mister_sdram_census.sh` | **manual/emulator (~45 min)** | **SLICE D2'S CORE EVIDENCE.** Downloads a `.rom` in the simulator, dumps all four 16 MB banks and checks every one of the 67,108,864 bytes against `mister_map.md` §5 with `tools/mister_sdram_census.py` (which replays the download mapping, CPS-2 GFX scramble included). FOUR legs: A cps2w+WIDE vs the WIDE map (THE census), B cps2+WIDE vs the STOCK map, C cps2w+stock vs the WIDE map, D cps2+stock vs the STOCK map (the calibration leg — the tool checked against a mapping nobody changed). Cross-checks independent of the tool: C vs D banks 1/2/3 BYTE-IDENTICAL and bank 0 differing; A vs B banks 2+3 DIFFERING (without the redirect group C aliases onto vanilla's art). Must-fire: leg B must FAIL the WIDE map, and A re-run with one expected constant moved 1 KiB must be rejected (twice, one per bank). `CENSUS_KEEP=<dir>` caches the bank images |
 | `tests/test_mister_prg_probe.sh` | ci_portable (~3 s) | **SLICE D4/D5's ROM-FREE HALF.** Locks the 68k program-ROM read probe's contract without a ROM or a simulator: every code line the probe adds to `jtcps2_main.v` sits inside `` `ifdef JTCPS2W_PRGPROBE `` (with the hoisted-line control); its window bit IS the decode's window bit, both re-read from the RTL; its ADDRESS half carries no chip select, which is what lets it speak on the profile-CLEAR leg where `rom_cs` cannot assert at all. Then the verdict logic itself — `tools/prgprobe_verdict.py` (CLAUDE.md §4: a test's classification code is validated before its verdicts are trusted) — on synthetic logs whose answer is known by construction: **all three answers plus FOUR refusals** — a silent control, a control whose bytes do not verify, a probe whose HI records sit BELOW `$400000` (the defect the probe's first draft shipped with, frozen from the real numbers), and raw-right/latched-wrong, which the tool's first version scored as a PASS over ten fetches the CPU received as garbage. Also asserts the byte order is DERIVED from the control rather than hard-coded, and that `--prgprobe` refuses `--core cps2` |
 | `tests/test_mister_prg_window.sh` | **manual/emulator (~2 x 40 min)** | **THE MEASURED PAIR, FROZEN.** Runs `11_pick_donovan` on `cps2w` with the WIDE romset twice, on `.rom` images that differ in ONE BYTE (header 41 `0xFE`/`0xFF`), and freezes the probe's own last per-frame report for each leg in `tests/expect/mister_prg_window.txt`. Structural assertions independent of the frozen numbers: `wide_en` really is 1 and 0; the must-fire count below `$400000` is in the tens of millions in BOTH legs; the CONTROL leg completes exactly ZERO reads above `$400000` (the decode is gated by construction); and both legs issue the same number of 68k bus READ cycles into the window. `--pos-log DIR --neg-log DIR` re-analyses finished runs; `--freeze` rewrites the expectation deliberately |
@@ -873,11 +874,19 @@ fingerprint moves with the generator — do not pin it in docs. Rebuild the
 pair with:
 
 ```sh
-GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.sh 6 build/m5_stock
-KEY_SET=vsavj GEN_FLAGS="--allow-plausible --tripwire-open --profile cps2-wide-v1" \
-    tools/build_donovan.sh 6 build/don_m4   # (build/m5_wide = the superseded
-                                            # donovan-m3a dir; its extract stays
-                                            # the tenant_loop/merged input)
+# THE FOUR TRACKS, as tests/test_m3a_reproducible.sh rebuilds them (re-pointed
+# 14z-118 <- the 14z-8x `build/m5_stock` / `build/don_m4` pair, which no longer
+# exists on disk; output names are the CURRENT freeze — roll them each freeze):
+python3 tools/build_wide_romset.py "$ROMDIR" build/wide0/rompath --qsound 2 --gfx 4 --prg 4
+GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.sh 6 build/m5_stock12      # the stock twin
+KEY_SET=vsavj WIDE_ROMSET=build/wide0/rompath/vsavjw.zip \
+    GEN_FLAGS="--allow-plausible --tripwire-open --profile cps2-wide-v1" \
+    tools/build_donovan.sh 6 build/don_m17                                                 # donovan (WIDE)
+TENANT_MANIFEST=build/manifest/huitzil.toml TENANT_CHAR=0x10 WIDE_ROMSET=build/wide0/rompath/vsavjw.zip \
+    GEN_FLAGS="--profile cps2-wide-v1 --allow-plausible --tripwire-open" tools/build_donovan.sh 6 build/hui51
+TENANT_MANIFEST=build/manifest/pyron.toml   TENANT_CHAR=0x11 WIDE_ROMSET=build/wide0/rompath/vsavjw.zip \
+    GEN_FLAGS="--profile cps2-wide-v1 --allow-plausible --tripwire-open" tools/build_donovan.sh 6 build/pyron35
+tools/build_merged.sh ...                                                                   # the merged set (its header)
 ```
 
 Three things must agree and `run_wide.sh` asserts all three, naming the one
@@ -3091,8 +3100,10 @@ tests/test_hui_df_style.sh     [bd]   # the DARK FORCE gate (14z-69): replay 85
                                       # (--expect differs: purple row 0x0A vs native
                                       # gold, his art drawn ~4x over); set
                                       # DF_STYLE_EXPECT=matches when fixed. Three
-                                      # verdict controls. Defaults to build/hui46
-                                      # (14z-103; roll at each freeze)
+                                      # verdict controls. Defaults to the CURRENT
+                                      # huitzil solo (build/hui51 since 14z-117b;
+                                      # re-pointed at every freeze — read the
+                                      # script's BUILD default, not this line)
 tests/audit_empty_tiles.sh    [bd]     # 14z-69o: does the build DRAW any sprite whose
                                       # group-C tile is BLANK? A remapped-but-uncopied
                                       # tile renders as a SOLID RECTANGLE and no other
@@ -3129,7 +3140,8 @@ tests/test_beam_anim_walk.sh   [bd]   # 14z-70: does the build ever WALK the ani
                                       # native leg, our leg, 3 verdict controls).
                                       # BEAM_WALK_EXPECT=walks (default since 14z-71) |
                                       # absent reproduces the pre-fix state.
-                                      # Defaults to build/hui46 (14z-103). ~2 min
+                                      # Defaults to the current huitzil solo
+                                      # (build/hui51, re-pointed each freeze). ~2 min
 tests/test_beam_list_type6.sh         # 14z-71: the list-type 6 TAKEOVER gate. The
                                       # thunk body must be Capcom's composite handler
                                       # (vs2 0x01A1FC) with EXACTLY six scratch
