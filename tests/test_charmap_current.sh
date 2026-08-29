@@ -39,12 +39,12 @@ for pair in "$DON:donovan" "$HUI:huitzil" "$PYR:pyron"; do
     b="${pair%%:*}"; n="${pair##*:}"
     python3 tools/charmap_gen.py "$b" "$W/$n.json" >"$W/$n.gen.log" 2>&1 \
         || { bad "$n: charmap_gen failed on $b"; sed 's/^/        /' "$W/$n.gen.log" | tail -5; continue; }
-    python3 tools/charmap_md.py "$W/$n.json" "$W/$n.md" >/dev/null 2>&1 \
+    python3 tools/charmap_md.py "$W/$n.json" "$W/$n.md" --anim "$W/${n}_anim.md" >/dev/null 2>&1 \
         || { bad "$n: charmap_md failed"; continue; }
-    if cmp -s "$W/$n.json" "docs/project/tables/chars/$n.json" && cmp -s "$W/$n.md" "docs/project/tables/chars/$n.md"; then
+    if cmp -s "$W/$n.json" "docs/project/tables/chars/$n.json" && cmp -s "$W/$n.md" "docs/project/tables/chars/$n.md" && cmp -s "$W/${n}_anim.md" "docs/project/tables/chars/${n}_anim.md"; then
         ok "$n: json + md match a regeneration from $b ($(grep -o '"region_bytes_unattributed": [0-9]*' "$W/$n.json"))"
     else
-        bad "$n: DRIFTED from $b — regenerate: python3 tools/charmap_gen.py $b docs/project/tables/chars/$n.json && python3 tools/charmap_md.py docs/project/tables/chars/$n.json docs/project/tables/chars/$n.md"
+        bad "$n: DRIFTED from $b — regenerate: python3 tools/charmap_gen.py $b docs/project/tables/chars/$n.json && python3 tools/charmap_md.py docs/project/tables/chars/$n.json docs/project/tables/chars/$n.md --anim docs/project/tables/chars/${n}_anim.md"
         diff "docs/project/tables/chars/$n.md" "$W/$n.md" | head -6 | sed 's/^/        /'
     fi
 done

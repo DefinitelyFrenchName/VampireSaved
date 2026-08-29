@@ -9,7 +9,7 @@ Sources: **vs2** = `vsav2` extract (oracle `vhunt2`); **ours** = the built image
 | input | SHA-1 |
 |---|---|
 | `bank_map.toml` | `776bcb9af5aef09c1b3204a6354c04165ad8b55d` |
-| `manifest` | `33e6d3a12383c1da8ff82daf60ff92712fb63c6c` |
+| `manifest` | `7ab6f5cac4efddf0a09b9e80de8979c9191a8463` |
 | `overrides` | `72b9812942192bf348508ddf7473cbb37b2d5275` |
 | `placements.json` | `74b756174c2eac1a4e41919145114e2498d11082` |
 | `reconciliation.toml` | `40528aeb863028d885f868f34368443c460b5ca2` |
@@ -21,10 +21,12 @@ Sources: **vs2** = `vsav2` extract (oracle `vhunt2`); **ours** = the built image
 
 | measure | value |
 |---|---|
+| anim_nodes | 3308 |
+| anim_nodes_differ_unattributed | 8 |
 | bank_fields_unattributed | 0 |
 | code_bytes_differ_out_of_scope | 67383 |
 | dispatch_unattributed | 0 |
-| physics_rows_ported | False |
+| physics_rows_ported | True |
 | region_bytes_unattributed | 692 |
 | relocated_bad | 33 |
 
@@ -89,22 +91,22 @@ Sources: **vs2** = `vsav2` extract (oracle `vhunt2`); **ours** = the built image
 | `gap_be77a` | auto | `0x0be7c6` | raw | hex | `None` | `ffffa000` |  | no-vs2-value |
 | `hitbox_base` | data_ptr | `0x0bd9c6` | ptr | addr | `0x0c8df8` | `0x3fa9d0` |  | relocated |
 | `hitbox_comp` | data_ptr | `0x0bda46` | ptr | addr | `0x0c8bb8` | `0x3fa790` |  | relocated |
-| `jump_params` | rec8 | `0x0bdf0a` | back_gravity | s16.16 | `-0.375` | `-0.35938` | **!** | manifest:VALUE_SKIP — row NOT ported (no port_param32 in [[tenant]]); ours is the vsavj ALIAS row's content (id & 0x0F) |
+| `jump_params` | rec8 | `0x0bdf0a` | back_gravity | s16.16 | `-0.375` | `-0.35938` | **!** | manifest:port_param32 set AFTER this build (UNFROZEN physics port — the next freeze's image carries vs2's row; until then ours is the alias row's content) |
 | `jump_params` | rec8 | `0x0bdf0a` | back_xaccel | s16.16 | `0.01953` | `0.01953` |  | byte |
-| `jump_params` | rec8 | `0x0bdf0a` | back_xv | s16.16 | `-4.25` | `-3.625` | **!** | manifest:VALUE_SKIP — row NOT ported (no port_param32 in [[tenant]]); ours is the vsavj ALIAS row's content (id & 0x0F) |
-| `jump_params` | rec8 | `0x0bdf0a` | back_yv | s16.16 | `8.0` | `8.125` | **!** | manifest:VALUE_SKIP — row NOT ported (no port_param32 in [[tenant]]); ours is the vsavj ALIAS row's content (id & 0x0F) |
+| `jump_params` | rec8 | `0x0bdf0a` | back_xv | s16.16 | `-4.25` | `-3.625` | **!** | manifest:port_param32 set AFTER this build (UNFROZEN physics port — the next freeze's image carries vs2's row; until then ours is the alias row's content) |
+| `jump_params` | rec8 | `0x0bdf0a` | back_yv | s16.16 | `8.0` | `8.125` | **!** | manifest:port_param32 set AFTER this build (UNFROZEN physics port — the next freeze's image carries vs2's row; until then ours is the alias row's content) |
 | `jump_params` | rec8 | `0x0bdf0a` | forward_gravity | s16.16 | `-0.375` | `-0.375` |  | byte |
 | `jump_params` | rec8 | `0x0bdf0a` | forward_xaccel | s16.16 | `-0.01953` | `-0.01953` |  | byte |
-| `jump_params` | rec8 | `0x0bdf0a` | forward_xv | s16.16 | `4.0` | `3.5` | **!** | manifest:VALUE_SKIP — row NOT ported (no port_param32 in [[tenant]]); ours is the vsavj ALIAS row's content (id & 0x0F) |
-| `jump_params` | rec8 | `0x0bdf0a` | forward_yv | s16.16 | `7.875` | `8.0` | **!** | manifest:VALUE_SKIP — row NOT ported (no port_param32 in [[tenant]]); ours is the vsavj ALIAS row's content (id & 0x0F) |
-| `jump_params` | rec8 | `0x0bdf0a` | neutral_gravity | s16.16 | `-0.375` | `-0.35156` | **!** | manifest:VALUE_SKIP — row NOT ported (no port_param32 in [[tenant]]); ours is the vsavj ALIAS row's content (id & 0x0F) |
+| `jump_params` | rec8 | `0x0bdf0a` | forward_xv | s16.16 | `4.0` | `3.5` | **!** | manifest:port_param32 set AFTER this build (UNFROZEN physics port — the next freeze's image carries vs2's row; until then ours is the alias row's content) |
+| `jump_params` | rec8 | `0x0bdf0a` | forward_yv | s16.16 | `7.875` | `8.0` | **!** | manifest:port_param32 set AFTER this build (UNFROZEN physics port — the next freeze's image carries vs2's row; until then ours is the alias row's content) |
+| `jump_params` | rec8 | `0x0bdf0a` | neutral_gravity | s16.16 | `-0.375` | `-0.35156` | **!** | manifest:port_param32 set AFTER this build (UNFROZEN physics port — the next freeze's image carries vs2's row; until then ours is the alias row's content) |
 | `jump_params` | rec8 | `0x0bdf0a` | neutral_xaccel | s16.16 | `0.0` | `0.0` |  | byte |
 | `jump_params` | rec8 | `0x0bdf0a` | neutral_xv | s16.16 | `0.0` | `0.0` |  | byte |
-| `jump_params` | rec8 | `0x0bdf0a` | neutral_yv | s16.16 | `7.75` | `8.0` | **!** | manifest:VALUE_SKIP — row NOT ported (no port_param32 in [[tenant]]); ours is the vsavj ALIAS row's content (id & 0x0F) |
-| `param32_a` | rec8 | `0x0bd912` | back_walk_xv | s16.16 | `-2.625` | `-2.25` | **!** | manifest:VALUE_SKIP — row NOT ported (no port_param32 in [[tenant]]); ours is the vsavj ALIAS row's content (id & 0x0F) |
-| `param32_a` | rec8 | `0x0bd912` | fwd_walk_xv | s16.16 | `3.0` | `2.5` | **!** | manifest:VALUE_SKIP — row NOT ported (no port_param32 in [[tenant]]); ours is the vsavj ALIAS row's content (id & 0x0F) |
-| `param32_b` | rec8 | `0x0be392` | back_walk_xv | s16.16 | `-2.625` | `-2.25` | **!** | manifest:VALUE_SKIP — row NOT ported (no port_param32 in [[tenant]]); ours is the vsavj ALIAS row's content (id & 0x0F) |
-| `param32_b` | rec8 | `0x0be392` | fwd_walk_xv | s16.16 | `2.0` | `1.625` | **!** | manifest:VALUE_SKIP — row NOT ported (no port_param32 in [[tenant]]); ours is the vsavj ALIAS row's content (id & 0x0F) |
+| `jump_params` | rec8 | `0x0bdf0a` | neutral_yv | s16.16 | `7.75` | `8.0` | **!** | manifest:port_param32 set AFTER this build (UNFROZEN physics port — the next freeze's image carries vs2's row; until then ours is the alias row's content) |
+| `param32_a` | rec8 | `0x0bd912` | back_walk_xv | s16.16 | `-2.625` | `-2.25` | **!** | manifest:port_param32 set AFTER this build (UNFROZEN physics port — the next freeze's image carries vs2's row; until then ours is the alias row's content) |
+| `param32_a` | rec8 | `0x0bd912` | fwd_walk_xv | s16.16 | `3.0` | `2.5` | **!** | manifest:port_param32 set AFTER this build (UNFROZEN physics port — the next freeze's image carries vs2's row; until then ours is the alias row's content) |
+| `param32_b` | rec8 | `0x0be392` | back_walk_xv | s16.16 | `-2.625` | `-2.25` | **!** | manifest:port_param32 set AFTER this build (UNFROZEN physics port — the next freeze's image carries vs2's row; until then ours is the alias row's content) |
+| `param32_b` | rec8 | `0x0be392` | fwd_walk_xv | s16.16 | `2.0` | `1.625` | **!** | manifest:port_param32 set AFTER this build (UNFROZEN physics port — the next freeze's image carries vs2's row; until then ours is the alias row's content) |
 | `proj_hitbox_base` | data_ptr | `0x0bdac6` | ptr | addr | `0x0d0ca8` | `0x0ca800` |  | relocated |
 | `proj_hitbox_comp` | data_ptr | `0x0bdb46` | ptr | addr | `0x0d1002` | `0x0cab5a` |  | relocated |
 | `rec8_a` | rec8 | `0x0bdc12` | long0 | s32 | `524288` | `524288` |  | byte |
@@ -405,6 +407,18 @@ Sources: **vs2** = `vsav2` extract (oracle `vhunt2`); **ours** = the built image
 
 `[gfx_remap]`: band `0x863f`-`0xc2ef`, delta `0x2750`. tile-code differences inside the band are the [gfx_remap] delta by construction (phase 0 does not re-derive them per record)
 
+## Animation node chains (phase 1) — summary
+
+3308 nodes across the five index tables; 8 nodes differ from vs2 in a decoded field (0 attributed). Verified by `tests/test_anim_node_walk.sh (Donovan, native vs2: 3638/3638 node pointers on the graph, 14z-118)`. Per-chain detail: the appendix page `donovan_anim.md`.
+
+| table | vs2 table | ours table | entries | chains | nodes | loops | holds |
+|---|---|---|---|---|---|---|---|
+| `a` | `0x27f548` | `0xd3070` | 51 | 51 | 682 | 26 | 24 |
+| `a2` | `0x281696` | `0xd51be` | 101 | 101 | 1211 | 18 | 82 |
+| `b` | `0x28709c` | `0xdabc4` | 69 | 69 | 284 | 16 | 53 |
+| `c` | `0x287192` | `0xdacba` | 57 | 57 | 273 | 24 | 32 |
+| `proj` | `0x289ef6` | `0xdda1e` | 441 | 441 | 858 | 21 | 419 |
+
 ## Overrides in effect (`charmap_donovan.toml`)
 
 (none)
@@ -415,8 +429,10 @@ Sources: **vs2** = `vsav2` extract (oracle `vhunt2`); **ours** = the built image
 |---|---|---|
 | hitbox | hurt/hit rectangle x/y/w/h encoding | [C] only (ram.md); phase 2 measurement |
 | hitbox | attack record fields (real/white power +0x08/+0x09, hit id +0x10, class byte +0x17 vs +0x1D — the docs disagree) | engine_internals 2392-2463; phase 2 write tap settles the class offset |
-| anim | node chains (0x18-byte nodes: duration, flags, sprite ptr, hitbox words, sfx, link) and move naming | engine_internals 589-600; phase 1 dumper + live countdown check |
-| anim | startup / active / recovery as data | derivable from node durations once phase 1 lands |
+| anim | MOVE NAMES for the chains (which seq is which move) | the chains are decoded and live-verified (test_anim_node_walk, 14z-118); names come from the maintainer's move lists -> build/manifest/moves_<tenant>.toml |
+| anim | startup / active / recovery as data — which hitbox-family word (+8 / +0xA) marks an ATTACK node | node durations are decoded; the attack/hurt semantics of hb8/hbA wait for phase 2 |
+| anim | table a2's entry rule: its chains are entered MID-CHAIN by node index (measured: 5 jumps onto a2 nodes 3/5/7/13) | test_anim_node_walk observation; the selecting code is unread |
+| anim | the 6-byte script-op area at +0x10..+0x15 of every node | kept as hex; engine_internals 'the [cf14]..[0b] script-op area' |
 | reaction | hitstun / blockstun lengths per reaction class | only the dispatch (0x2385C) and property bytes (0x28D00) are located |
 | projectile | projectile parameter records (speed, lifetime, hit class) | pool hit-class map bounded at 64; records undecoded |
 | bank | the 17 `gap_*` auto tables' semantics | oracle-classified values/pointers only |

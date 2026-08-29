@@ -21,6 +21,8 @@ Sources: **vs2** = `vsav2` extract (oracle `vhunt2`); **ours** = the built image
 
 | measure | value |
 |---|---|
+| anim_nodes | 2900 |
+| anim_nodes_differ_unattributed | 774 |
 | bank_fields_unattributed | 0 |
 | code_bytes_differ_out_of_scope | 102755 |
 | dispatch_unattributed | 0 |
@@ -353,6 +355,18 @@ Sources: **vs2** = `vsav2` extract (oracle `vhunt2`); **ours** = the built image
 | entries | 15092 | 15131 |
 | distinct_tiles | 16824 | 17091 |
 
+## Animation node chains (phase 1) — summary
+
+2900 nodes across the five index tables; 774 nodes differ from vs2 in a decoded field (0 attributed). Verified by `tests/test_anim_node_walk.sh (Donovan, native vs2: 3638/3638 node pointers on the graph, 14z-118)`. Per-chain detail: the appendix page `huitzil_anim.md`.
+
+| table | vs2 table | ours table | entries | chains | nodes | loops | holds |
+|---|---|---|---|---|---|---|---|
+| `a` | `0x245872` | `0xd8dc0` | 58 | 58 | 633 | 29 | 28 |
+| `a2` | `0x24a3ce` | `0xdd91c` | 85 | 85 | 915 | 27 | 57 |
+| `b` | `0x247edc` | `0xdb42a` | 18 | 18 | 75 | 7 | 11 |
+| `c` | `0x247e66` | `0xdb3b4` | 139 | 139 | 1059 | 18 | 59 |
+| `proj` | `0x24fed6` | `0xe3424` | 42 | 42 | 218 | 24 | 17 |
+
 ## Overrides in effect (`charmap_huitzil.toml`)
 
 (none)
@@ -363,8 +377,10 @@ Sources: **vs2** = `vsav2` extract (oracle `vhunt2`); **ours** = the built image
 |---|---|---|
 | hitbox | hurt/hit rectangle x/y/w/h encoding | [C] only (ram.md); phase 2 measurement |
 | hitbox | attack record fields (real/white power +0x08/+0x09, hit id +0x10, class byte +0x17 vs +0x1D — the docs disagree) | engine_internals 2392-2463; phase 2 write tap settles the class offset |
-| anim | node chains (0x18-byte nodes: duration, flags, sprite ptr, hitbox words, sfx, link) and move naming | engine_internals 589-600; phase 1 dumper + live countdown check |
-| anim | startup / active / recovery as data | derivable from node durations once phase 1 lands |
+| anim | MOVE NAMES for the chains (which seq is which move) | the chains are decoded and live-verified (test_anim_node_walk, 14z-118); names come from the maintainer's move lists -> build/manifest/moves_<tenant>.toml |
+| anim | startup / active / recovery as data — which hitbox-family word (+8 / +0xA) marks an ATTACK node | node durations are decoded; the attack/hurt semantics of hb8/hbA wait for phase 2 |
+| anim | table a2's entry rule: its chains are entered MID-CHAIN by node index (measured: 5 jumps onto a2 nodes 3/5/7/13) | test_anim_node_walk observation; the selecting code is unread |
+| anim | the 6-byte script-op area at +0x10..+0x15 of every node | kept as hex; engine_internals 'the [cf14]..[0b] script-op area' |
 | reaction | hitstun / blockstun lengths per reaction class | only the dispatch (0x2385C) and property bytes (0x28D00) are located |
 | projectile | projectile parameter records (speed, lifetime, hit class) | pool hit-class map bounded at 64; records undecoded |
 | bank | the 17 `gap_*` auto tables' semantics | oracle-classified values/pointers only |

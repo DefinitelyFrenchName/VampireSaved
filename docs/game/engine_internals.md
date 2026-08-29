@@ -598,6 +598,24 @@ PC 0xCE38A = vs2 0x2713C + port offset):
   stubbed_sound row silences).
 - **Node write:** `move.l a0,$1c(a6)` at vs2 0x2713C. Two writes in
   one frame = a zero/1-duration chain, normal.
+- **The walker's chain rules, read off vs2 `0x2713C..0x271F2` and LIVE-VERIFIED
+  14z-118** (`tests/test_anim_node_walk.sh`: Donovan on native vs2, 3,638/3,638
+  sampled node pointers on the decoded graph): node SELECT — `a0 = table +
+  word[table + 2*seq]` (the index-table words are offsets from the TABLE's own
+  base; tables a/a2/b at vs2 `0xD7018/0xD7098/0xD7118`, c `0xD7198`, proj
+  `0xD7218` = bank[0]−0x280/−0x200/−0x180/−0x100/−0x80), `obj+0x1C = a0`,
+  `obj+0x20.l = node[0..3]` (so `+0x21` = the flags byte), `node+8.w * 4`
+  indexes the `obj+0x64` hitbox-family table (`obj+0x68`, `obj+0x94` = its
+  first long), `node+0x16` * 8 indexes the per-node sfx array (`tail_data_ptr`
+  row); ADVANCE at countdown zero — flags bit7: next = the LINK long at
+  `+0x18`; bit6: `st.b obj+0x21`, stay (a HOLD ends the chain); else next =
+  `+0x18`. Chains therefore end on a hold or loop back through a link.
+  Measured in the same run: a chain switch driven by game logic lands on the
+  new chain's START (or, for table **a2** only, MID-chain by node index — its
+  rows are reaction sets entered at a phase; the selecting code is unread),
+  and the first countdown sample on a node is `dur` or `dur−1` (set and
+  decremented in one frame). Decoder: `tools/anim_nodes.py`; the per-tenant
+  chains, ours vs vs2, are in `docs/project/tables/chars/<tenant>_anim.md`.
 - **Hit-freeze ("the floating holds"):** on each connected hit the
   victim-side reaction handler freezes BOTH parties via obj+0x5C
   (walker timer hold — obj+0x20 simply stops decrementing while

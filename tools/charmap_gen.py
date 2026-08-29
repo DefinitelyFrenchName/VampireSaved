@@ -57,6 +57,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _minitoml import loads as toml_loads  # noqa: E402
 import obj_records  # noqa: E402
 import audit_fsm_census  # noqa: E402
+import anim_nodes  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
 SCHEMA = 1
@@ -66,8 +67,10 @@ UNATTRIBUTED_CAP = 64
 UNDECODED = [
     {"structure": "hitbox", "what": "hurt/hit rectangle x/y/w/h encoding", "evidence": "[C] only (ram.md); phase 2 measurement"},
     {"structure": "hitbox", "what": "attack record fields (real/white power +0x08/+0x09, hit id +0x10, class byte +0x17 vs +0x1D — the docs disagree)", "evidence": "engine_internals 2392-2463; phase 2 write tap settles the class offset"},
-    {"structure": "anim", "what": "node chains (0x18-byte nodes: duration, flags, sprite ptr, hitbox words, sfx, link) and move naming", "evidence": "engine_internals 589-600; phase 1 dumper + live countdown check"},
-    {"structure": "anim", "what": "startup / active / recovery as data", "evidence": "derivable from node durations once phase 1 lands"},
+    {"structure": "anim", "what": "MOVE NAMES for the chains (which seq is which move)", "evidence": "the chains are decoded and live-verified (test_anim_node_walk, 14z-118); names come from the maintainer's move lists -> build/manifest/moves_<tenant>.toml"},
+    {"structure": "anim", "what": "startup / active / recovery as data — which hitbox-family word (+8 / +0xA) marks an ATTACK node", "evidence": "node durations are decoded; the attack/hurt semantics of hb8/hbA wait for phase 2"},
+    {"structure": "anim", "what": "table a2's entry rule: its chains are entered MID-CHAIN by node index (measured: 5 jumps onto a2 nodes 3/5/7/13)", "evidence": "test_anim_node_walk observation; the selecting code is unread"},
+    {"structure": "anim", "what": "the 6-byte script-op area at +0x10..+0x15 of every node", "evidence": "kept as hex; engine_internals 'the [cf14]..[0b] script-op area'"},
     {"structure": "reaction", "what": "hitstun / blockstun lengths per reaction class", "evidence": "only the dispatch (0x2385C) and property bytes (0x28D00) are located"},
     {"structure": "projectile", "what": "projectile parameter records (speed, lifetime, hit class)", "evidence": "pool hit-class map bounded at 64; records undecoded"},
     {"structure": "bank", "what": "the 17 `gap_*` auto tables' semantics", "evidence": "oracle-classified values/pointers only"},
@@ -435,6 +438,8 @@ def main():
                         fd["ours_source"] = "byte"
                     elif name in value_skip:
                         fd["ours_source"] = "manifest:VALUE_SKIP — row NOT ported (no port_param32 in [[tenant]]); ours is the vsavj ALIAS row's content (id & 0x0F)"
+                    elif name in ("param32_a", "param32_b", "jump_params"):
+                        fd["ours_source"] = "manifest:port_param32 set AFTER this build (UNFROZEN physics port — the next freeze's image carries vs2's row; until then ours is the alias row's content)"
                     else:
                         fd["ours_source"] = "UNATTRIBUTED"
                 rec["fields"] = fields
@@ -553,13 +558,70 @@ def main():
                   "gfx_remap": ({"band_lo": f"{gr['band_lo']:#x}", "band_hi": f"{gr['band_hi']:#x}", "delta": f"{gr['delta']:#x}"} if gr else None),
                   "note": "tile-code differences inside the band are the [gfx_remap] delta by construction (phase 0 does not re-derive them per record)"}
 
+    # ---- anim node chains (phase 1): vs2 from the blob, ours from the built copy ----
+    anim = {}
+    if "anim" in regions and built.placed("anim") is not None:
+        r = regions["anim"]; blob = (ex / "region_anim.bin").read_bytes()
+        dst = built.placed("anim"); ours_blob = built.region_bytes("anim", r["len"])
+        totals_nodes = {"nodes": 0, "differ": 0, "attributed": 0}
+        for tname in ("a", "a2", "b", "c", "proj"):
+            v = values_by_name.get("anim_index_" + tname)
+            if not v or "ptr" not in v:
+                continue
+            t_vs2 = int(v["ptr"], 16)
+            t_ours = t_vs2 - r["src"] + dst
+            wv = anim_nodes.walk_table(blob, r["src"], t_vs2, r["src"] + r["len"])
+            wo = anim_nodes.walk_table(ours_blob, dst, t_ours, dst + r["len"])
+            chains = {}
+            for seq, cv in wv["chains"].items():
+                co = wo["chains"].get(seq, {"nodes": [], "end": "missing", "start": None})
+                nodes = []
+                for k, nv in enumerate(cv["nodes"]):
+                    no = co["nodes"][k] if k < len(co["nodes"]) else None
+                    off = int(nv["addr"], 16) - r["src"]
+                    fields = {}
+                    for fn in ("dur", "flags", "hb8", "hbA", "shadow", "sfx", "op"):
+                        a_, b_ = nv[fn], (no[fn] if no else None)
+                        fields[fn] = {"vs2": a_, "ours": b_, "diff": a_ != b_}
+                    sp_v = int(nv["sprite"], 16); sp_o = int(no["sprite"], 16) if no else None
+                    want = expected_placed(regions, built, sp_v)
+                    fields["sprite"] = {"vs2": nv["sprite"], "ours": (no["sprite"] if no else None), "expected_placed": (f"{want:#x}" if want else None),
+                                        "diff": not (sp_o == want or sp_o == sp_v), "ours_source": ("relocated" if sp_o == want else ("byte" if sp_o == sp_v else "UNATTRIBUTED"))}
+                    if nv.get("link"):
+                        lv = int(nv["link"], 16); lo = int(no["link"], 16) if (no and no.get("link")) else None
+                        wl = expected_placed(regions, built, lv)
+                        fields["link"] = {"vs2": nv["link"], "ours": (no.get("link") if no else None), "diff": not (lo == wl), "ours_source": ("relocated" if lo == wl else "UNATTRIBUTED")}
+                    nd = [fn for fn, fd in fields.items() if fd["diff"]]
+                    src = "byte"
+                    if nd:
+                        lab = None
+                        for o in overrides:
+                            if o["region"] == "anim" and o["off"] <= off + 0x17 and off <= o["off"] + len(bytes.fromhex(o["value"])) - 1:
+                                lab = "override:" + o["id"]
+                        if lab is None:
+                            for rf in rows(manifest, "region_fix"):
+                                if rf.get("region") == "anim":
+                                    ro = int(rf["off"]) if not isinstance(rf["off"], str) else int(rf["off"], 0)
+                                    if off <= ro <= off + 0x17:
+                                        lab = "region_fix:" + str(rf.get("note", ""))[:60]
+                        src = lab or "UNATTRIBUTED"
+                        totals_nodes["differ"] += 1
+                        if lab: totals_nodes["attributed"] += 1
+                    totals_nodes["nodes"] += 1
+                    nodes.append({"addr": nv["addr"], "off": f"{off:#x}", "fields": fields, "diff": nd, "ours_source": src})
+                chains[seq] = {"start": cv["start"], "end": cv["end"], "frames": cv.get("frames"), "n": len(cv["nodes"]),
+                               "ours_end": co["end"], "nodes": nodes}
+            anim[tname] = {"table_vs2": f"{t_vs2:#x}", "table_ours": f"{t_ours:#x}", "entries": wv["entries"], "chains": chains}
+        anim["_summary"] = totals_nodes
+        anim["_verified_by"] = "tests/test_anim_node_walk.sh (Donovan, native vs2: 3638/3638 node pointers on the graph, 14z-118)"
+
     out = {
         "schema": SCHEMA, "tenant": tenant, "char": f"{cid:#04x}",
         "inputs": inputs,
         "sources": {"vs2": {"set": rj["src_set"], "oracle": rj["oracle_set"], "kind": "extract"},
                     "ours": {"set": str(a.build_dir), "kind": "built"}, "vh": None},
         "structures": {"bank": {"records": bank_records}, "dispatch": dispatch, "regions": reg_out,
-                       "sfx": sfx, "fsm_nodes": fsm, "sprite_lists": sprite},
+                       "sfx": sfx, "fsm_nodes": fsm, "sprite_lists": sprite, "anim": anim},
         "overrides": overrides,
         "undecoded": UNDECODED,
         "diff_summary": {
@@ -569,6 +631,8 @@ def main():
             "relocated_bad": totals["relocated_bad"],
             "code_bytes_differ_out_of_scope": totals["code_bytes_differ"],
             "physics_rows_ported": port_param32,
+            "anim_nodes": anim.get("_summary", {}).get("nodes", 0),
+            "anim_nodes_differ_unattributed": anim.get("_summary", {}).get("differ", 0) - anim.get("_summary", {}).get("attributed", 0),
         },
     }
     text = json.dumps(out, indent=1, sort_keys=True) + "\n"

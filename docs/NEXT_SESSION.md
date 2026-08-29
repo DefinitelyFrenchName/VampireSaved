@@ -7,7 +7,10 @@
 > ## `build/manifest/charmap_<tenant>.toml`, gates `test_charmap_current` /
 > ## `test_charmap_overrides`. **RULED AND BUILT, UNFROZEN: Donovan's physics
 > ## rows now port VS2's values (`port_param32`, probe `don_phys_probe`
-> ## `7109f835`, validated) — THE NEXT FREEZE BATTERY carries it (M12).**
+> ## `7109f835`, validated) — THE NEXT FREEZE BATTERY carries it (M12). UNTIL
+> ## THEN `test_m3a_reproducible` + `test_tenant_loop` are RED BY DESIGN (339/615/826
+> ## ops). Phase 1's node chains are decoded AND live-verified
+> ## (`test_anim_node_walk`); `<tenant>_anim.md` pages exist.**
 > ## Next phases: (1) anim node dumper + move naming (needs the maintainer's
 > ## move lists) + derived frame data; (2) hitbox rectangles + attack records
 > ## by measurement; (3) stun / projectile / auto tables. Check `git status -sb`.**
