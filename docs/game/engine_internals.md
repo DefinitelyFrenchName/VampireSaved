@@ -497,8 +497,11 @@ replay) settle it:
   host the 8x8, but his full select+confirm family exclusive art
   (1,173 positions incl. the VS-bust rectangles) fits all 9 blocks
   (greedy fit verified; placements recorded in session log).
-- OPEN SAFETY GATE before writing tiles: the placements borrow from
-  what is believed to be Jedah's VS-splash bust art; the in-match
+- ~~OPEN SAFETY GATE before writing tiles~~ *(M2b-era item, SUPERSEDED
+  14z-63: the wheel art no longer borrows any vanilla positions — it lives
+  in group C bank 5 at `0x10000+code`, zero collisions by construction,
+  `tests/test_wheel_bank5.sh`; marked 14z-118)*: the placements borrowed from
+  what was believed to be Jedah's VS-splash bust art; the in-match
   module family (root table vsavj 0x0B76C0, helpers 0x3C6CE/0x3DE84 —
   STRUCTURE DIFFERS from the select table, chains did not parse) must
   be empirically dumped (VS-splash frame OBJ list) to prove no OTHER
@@ -2616,7 +2619,10 @@ is also unmeasured and is not a character — Shadow/Marionette machinery.)
 constants — `0x1E 0x26 0x44 0x6F 0xAA 0x264 0x29C` (e.g. `0640 001e` at
 `0x02a92c`). Six have measured owners above. The seventh, **`0xAA`, has no
 measured owner and Anakaris is the one character not measured**, so `0xAA-0xAD`
-is very probably his. Treat it as OCCUPIED until someone reaches his DF.
+is very probably his. Treat it as OCCUPIED until someone reaches his DF —
+what settles it is one run of the `df/97` rig (`tests/audit_df_framework.sh`)
+with Anakaris (`0x06`) as P1 and a write-tap on the seq resolver; not yet
+run (14z-118 audit: labelled inference, measurement named).
 
 **[VSE-70]** **WHY THIS CANNOT BE DERIVED FROM TABLE `0x02A8A4`.** The obvious model — row
 per character, each pointing at a routine with one hardcoded base — is WRONG.
@@ -2683,7 +2689,12 @@ vsavj's table has 80 entries where vs2's twin (`0x016D34`, dispatcher
 `0x016D2C`) has 84 — the index-space class. See the (b') thunk
 (`build/manifest/huitzil.toml`, `index_window_018468`).
 
-## Dark Force (14z-66/67 mechanics UNPROVEN; style measured 14z-69;
+## Dark Force (mechanics MEASURED 14z-101 and RULED 2026-08-21 — vsavj
+## semantics: one stock, per-character duration, tenants 360/377/360,
+## legacy control Demitri 360/1 — frozen by `tests/audit_df_framework.sh`
+## (14z-104); the 14z-66/67 "mechanics" readings were taken OUTSIDE the
+## mode, STATE_HISTORY 14z-69, and the header said "UNPROVEN" for them
+## until 14z-118; style measured 14z-69;
 ## the 14z-69p PALETTE FIX WAS WITHDRAWN 14z-79 — it broke Bulleta;
 ## THE PALETTE THEN FIXED 14z-84 — `df_gold_variant_id`, huitzil-m6, "THE
 ## TENANT ANSWER" below; the DF-FORM seq-0x16 fix SHIPPED, gate
