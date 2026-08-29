@@ -44,7 +44,7 @@ DECISIONS_HISTORY, NEXT_SESSION HISTORY blocks) are located, never rewritten.
 |---|---|---|---|---|---|
 | `engine_internals.md` | 3841 | "THE SYNTHESIS BACKLOG — CLEARED 14z-68n, re-swept 14z-71"; tags to 14z-117 | **36** (55 case-insensitive): L11 "NOT YET SYNTHESISED — the standing backlog", L125 "pending the OBJ", L232 "likely THE main-sprite garble mechanism", L261 "not yet repointed", L290 "attract-palette writer note UNVERIFIED", L434/450 "likely", L500 "OPEN SAFETY GATE", L501 "believed to be Jedah's VS-splash bust art", L937 "not yet decoded", L1617 "this line read KNOWN-OPEN", L2578 "likely the same root", L2619 "very probably his", L2686 "Dark Force mechanics UNPROVEN" | MEASURED dominant (272 evidence refs); DERIVED: 32-row aliasing consequences; **GUESSED: L290, L501, L2619, and every "likely" above** | **HEAVY — the audit's main body.** Each "likely/believed/UNVERIFIED/UNPROVEN" is re-measured or retracted; the L11 backlog header re-audited against 14z-114's S-C1 fix; L2686 DF "UNPROVEN" vs the 14z-101 DF measurement (STATE ledger) — a header/subsection conflict candidate |
 | `gotchas.md` | 677 | dated entries, last 14z-117 | 6, all recorded PAST errors | MEASURED-retrospective (47 refs) | light: confirm no entry is a live claim; the 14z-90 onset entry flagged for re-filing to the project bucket (skills_scope §4 C) |
-| `atlas/README.md` | 32 | "corrected 14z-114" | 0 | index; the three opcode-view SHA-1s (`22bb4684…`) appear NOWHERE else in docs | **lock the three SHA-1s to `docs/checksums.txt` / `test_decrypt_oracle`** — currently an unanchored fingerprint set |
+| `atlas/README.md` | 32 | "corrected 14z-114" | 0 | index; the three opcode-view SHA-1s (`22bb4684…`) appear NOWHERE else in docs | the three SHA-1s cannot be doc-locked (no second home; `checksums.txt` holds zip-member SHA-1s) — re-derive them with `tools/cps2_decrypt.py` in step 4 and say in the README how they are re-derived |
 | `atlas/character_tables.md` | 447 | write-trace 2026-07-25; last tag 14z-116 | 2: L42 "RESOLVED 14z-60k (likely)", L47 "not yet confirmed by playing" | 19 refs; loader `PRG:0x028DD8` disassembled | medium: L42/L47 re-measured (the 14z-116/117 Dark Gallon work — board-confirmed — likely settles both); the specimen family |
 | `atlas/id_space.md` | 372 | measured 14z-60, gate `test_id_space.sh`; last tag 14z-105 | 2: L136 "likely place for further masks", L312 "very likely its resolution" | strongest hygiene in the atlas | light: the two "likely"s; refresh the tag against the 21-cell wheel and `roster_subst` |
 | `atlas/ram.md` | 329 | evidence-class legend [C]/[D]/[T]/[V]; last tag 14z-114 | 2: L17 "attract roster: TODO", L86 "P2 twin not yet located" | best-tagged file (59 refs) | light: close or keep the two TODOs explicitly; add the 14z-117 `$FF8440` ("?" walker cursor) row if absent |
@@ -120,7 +120,7 @@ Game/atlas ↔ engine_internals (from §1.1's survey; `file:line` as of 14z-118)
 10. `PRG:0x898C4` name entries (8 B) — `engine_internals.md:659`, `venue_assets.md:119`; `PRG:0x268A02` ring base — `select_screen.md:759/960/996`
 11. `PRG:0x01F5A0` match-init normalisation — `character_tables.md:329`, `id_space.md:318`; `PRG:0x06C0E0` — `engine_internals.md:485`, `select_screen.md:770`
 12. the 32-row / `0x10-0x1F` alias invariant — stated in 7 of 9 game files
-13. `atlas/README.md`'s three opcode-view SHA-1s — nowhere else (lock to `docs/checksums.txt`)
+13. `atlas/README.md`'s three opcode-view SHA-1s — nowhere else; **cannot be doc-locked** (`docs/checksums.txt` holds the zip members' SHA-1s, not the decrypted opcode view) — verify by re-running `tools/cps2_decrypt.py` in step 4 instead
 
 Platform/MiSTer (already log-locked by `checkskills.py` for PRESENCE; the
 audit checks CURRENCY): `0x4D10F3`, `210,180` / frame `3783`, `0x7E0000` /
@@ -169,3 +169,4 @@ at `build/manifest/*.toml` as the table of record.
 | # | document | commit | claims re-measured / retracted | grep after |
 |---|---|---|---|---|
 | 0 | field-verdict carriers (the specimen) | `020a555` | 9 stale "pending" lines retired, 3 verdicts entered in `mister_field.md` §6 | empty outside HISTORY |
+| 1 | the script: `tools/checkdocs.py` + `docs/doc_locks.tsv` + `tests/test_checkdocs.sh` (ci_portable) | (this commit) | 16 locks / 40 file-sites seeded from §2; all agree today. NOT lockable: `atlas/README.md`'s three opcode-view SHA-1s — no second home in the tree (they come from `tools/cps2_decrypt.py`, not from a doc); left as a README-only fact, flagged in §1.1 | n/a |

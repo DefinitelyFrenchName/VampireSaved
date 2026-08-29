@@ -99,6 +99,11 @@ test_mister_page
 # extractors + four must-fire controls on a perturbed copy of the tree.
 # tools/checkskills.py. ROM-free, ~1 s.
 test_checkskills
+# 14z-118: the load-bearing numbers the DOCS share are locked across
+# documents (docs/doc_locks.tsv): every listed doc quotes the canonical value,
+# and no rival value of the same shape sits beside the fact's label unless
+# allowed. tools/checkdocs.py; three must-fire controls. ROM-free, ~0.2 s.
+test_checkdocs
 
 # 14z-107 (11): the ROM-free half of the slice D4 discriminator. Locks the 68k
 # program-ROM read probe's contract — it is inert unless JTCPS2W_PRGPROBE is

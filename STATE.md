@@ -388,7 +388,9 @@ Lifecycle: rulings are still marked DECIDED in place here first; they move to
 the archive once they stop shaping active work.)*
 
 - **THE `docs/project/tables/` PROMISE (14z-118, from the documentation
-  audit's inventory `docs/project/doc_audit_14z118.md` §3).** The
+  audit's inventory `docs/project/doc_audit_14z118.md` §3). DECIDED
+  (maintainer, 2026-08-29): option (a) — generate the two missing
+  manifests and refresh all three.** The
   directory's README says "per-character data manifests for Donovan /
   Huitzil / Pyron" and still opens with "Empty until a ported character
   exists"; it holds `donovan.md` (2026-08-09, never refreshed) and no
