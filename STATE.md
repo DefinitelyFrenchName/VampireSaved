@@ -1,5 +1,22 @@
 # STATE — living progress log
 
+## Session 14z-118 CLOSE — **THE DOCUMENTATION AUDIT, FIRST PASS: the docs locked to each
+## other (`checkdocs`, 16 locks), the community tables GENERATED and GATED, the specimen family
+## and `engine_internals`' citable sites corrected, seven HIST banners, HANDOFF re-pointed —
+## eight audit commits, strict 114/0/0/0. NOT pushed (the verdict commit was).**
+
+| | |
+|---|---|
+| opened with | the M11 board verdict recorded and pushed (`020a555`); the maintainer: proceed with the audit order, option (a) for `tables/` |
+| delivered | inventory `docs/project/doc_audit_14z118.md` (43 docs + 6 skills, MEASURED/DERIVED/GUESSED per file) -> `tools/checkdocs.py` + `docs/doc_locks.tsv` + `tests/test_checkdocs.sh` (ci_portable; PRESENCE + NO-RIVAL per lock; 12 self-tests, 3 must-fire controls) -> `character_tables`/`id_space`/`select_screen` (Dark Gallon decoded+board-confirmed, `0x12` OWNS its palette rows — the gate existed, the claim never cited it) -> `engine_internals` (DF header cites `audit_df_framework.sh`; the M2b safety gate struck; the Anakaris inference names its measurement) -> `sprite_lists` dated, `ram.md` open measurements + `$FF8440`, README SHA-1s re-derived, `venue_assets` currency -> **`tools/tables_char_md.py` + `tests/test_tables_current.sh` (ci_static): `donovan.md` regenerated (its `param32_a` was stale), `huitzil.md`/`pyron.md` created, README rewritten** -> HANDOFF: three MiSTer commands, two gate comments and the four-track rebuild recipe re-pointed -> five HIST banners + two two-layer notes -> the light rows (`mister_core`, `mister_fit`, `quartus_brief`, `visual_smoke_tests`, `coverage_matrix` Shadow cell, `porting_code_regions`) |
+| what the pass found, in one line | almost every GUESSED claim was settled by a CITATION to a gate that already existed and was never named at the claim — the docs measured more than they said; the real GUESSED residue is small and named (below) |
+| the audit's own errors | three survey leads were misreadings of true claims (`select_screen` 128 vs 100/128; `patch_index` L237; the `mister.md` runtime estimates) — struck in the inventory, gotcha filed ("THE AUDIT'S OWN INVENTORY IS ONE HOP AWAY TOO"); `coverage_matrix`'s Shadow cell was a DOC misreading, corrected |
+| green at close | `run_all_static --strict` **PASS 114 / 0 / 0 / 0** (113 + `test_tables_current`; `test_checkdocs` in the portable 55); `checkskills` ALL PASS (425 rules) after every commit; `checkdocs` PASS 16 locks / 40 sites |
+| commits | `2a6ebc3` inventory · `9f8edef` (1) checkdocs · `87c6c66` (2) specimen family · `a58635c` (3) engine_internals · `55fdf8b` (4) atlas pages · `56a65d0` (5) tables + HANDOFF re-points · `a1f3d02` (7) HIST banners · `bdf3e16` (8) light rows · this close |
+| NOT done, named | (a) `engine_internals.md`'s honest-inference sites that need a MEASUREMENT, not a citation: L290 attract-palette writer (UNVERIFIED since M2b), the "likely" family (L232/434/450/2578), the Anakaris `0xAA` DF base (`df/97` rig, Anakaris P1 — one emulator run); (b) the 14 emulator-fact gotchas to re-file `project/gotchas.md` -> `platform/gotchas.md` (skills_scope §4 B) — a pass of its own, the anchors must move with them; (c) `ram.md`'s two open measurements (attract roster; P2 downs twin); (d) `id_space.md`'s tag refresh against `roster_subst`; (e) the STOCK CONTROL once-per-`.rbf` recommendation, still unruled (`mister_field.md` L91) |
+| push | NOT pushed — eight audit commits + this close local; push at the maintainer's word |
+| next | the maintainer's read of the inventory and this pass; then (a)-(d) above in that order — (a) needs the emulator, budget it as a session |
+
 ## Session 14z-118 (2026-08-29) — **THE M11 BOARD VERDICT: GREEN. The random-select freeze
 ## (merged-m13, bundle 14z117b) behaves on silicon as on both emulators. Ruled item (1) of
 ## 14z-117 closed; item (2), the documentation audit, is the session's work — and this

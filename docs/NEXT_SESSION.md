@@ -1,4 +1,51 @@
-# NEXT SESSION — orientation (rewritten at the 14z-118 verdict, 2026-08-29)
+# NEXT SESSION — orientation (rewritten at the 14z-118 close, 2026-08-29)
+
+> ## **START HERE. NOTHING IS RED. THE DOCUMENTATION AUDIT'S FIRST PASS IS
+> ## DONE — eight commits, strict 114/0/0/0, NOT PUSHED (push at the
+> ## maintainer's word; check `git status -sb`). Read STATE 14z-118 CLOSE,
+> ## then `docs/project/doc_audit_14z118.md` §4 (one line per commit).**
+> ##
+> ## **WHAT NOW EXISTS:** `tools/checkdocs.py` + `docs/doc_locks.tsv` (16
+> ## cross-document number locks, `test_checkdocs`, ci_portable — ADD A ROW
+> ## whenever a number is quoted in a second document); `tools/tables_char_md.py`
+> ## + `test_tables_current` (ci_static — the three community tables follow
+> ## the build; REGENERATE THEM IN EVERY FREEZE COMMIT, the re-point sweep
+> ## moves their build names). Both are in the HANDOFF gate index.
+> ##
+> ## **WHAT THE PASS FOUND, one breath:** nearly every "guessed" claim was
+> ## settled by CITING a gate that already existed — the docs measured more
+> ## than they said. The one-hop class showed up inside single files
+> ## (`character_tables.md` L45 vs L128) and inside the audit's own survey
+> ## (three false leads, struck; `project/gotchas.md` "THE AUDIT'S OWN
+> ## INVENTORY IS ONE HOP AWAY TOO").
+> ##
+> ## **WHAT IS LEFT, in order (STATE 14z-118 CLOSE "NOT done"):** (a) the
+> ## `engine_internals.md` sites that need a MEASUREMENT — attract-palette
+> ## writer L290, the "likely" family, the Anakaris `0xAA` DF base (one
+> ## `df/97` run with Anakaris P1) — an emulator session; (b) re-file the 14
+> ## emulator-fact gotchas project -> platform WITH their `[CPE]` anchors;
+> ## (c) `ram.md`'s two open measurements; (d) `id_space.md` tag refresh; (e)
+> ## the STOCK CONTROL once-per-`.rbf` ruling (unruled since 14z-113).
+> ##
+> ## **CURRENT:** donovan-m17 `90a225ce` / huitzil-m24 `ae953657` /
+> ## pyron-m18 `1222df18` / merged-m13 `a1b7cb82` (`build/m3b_merged20`,
+> ## 823 ops), stock twin `m5_stock12` = `d29fd062`; bundle 14z117b
+> ## FIELD-VERIFIED GREEN (M11, 2026-08-29). Fork `f997cfe1` (27 commits).
+> ##
+> ## **OPEN, unchanged:** the 1:1 wheel mockup; #112/#113 parked; the FBNeo
+> ## two-run-family question; the tenant CPU AI "lackluster" note; win
+> ## quotes (forgone, clean-way-only). `test_random_select_tenants.sh`'s
+> ## CONTROL is `build/m3b_merged19` — re-point or accept its SKIP when
+> ## that directory rolls off.
+> ##
+> ## **STATE OF THE BUILDS:** play `tools/run_wide.sh build/m3b_merged20
+> ## fbneo`. Current + one back: `don_m16/m17`, `hui50/51`, `pyron34/35`,
+> ## `m3b_merged19/20`, `m5_stock11/12`.
+
+# HISTORY BELOW — the 14z-118 verdict, 14z-117 final-close, 14z-117 second-close, 14z-117 first-close, 14z-116, 14z-114, mid-14z-114 and 14z-113 orientations and older;
+# kept for the census anchors, eliminations and traps, superseded as the opener.
+
+## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-118 VERDICT, 2026-08-29 — superseded by the 14z-118 close above)
 
 > ## **START HERE. NOTHING IS RED. THE M11 BOARD VERDICT IS GREEN
 > ## ("behavior identical to emulation", maintainer, MiSTer, 2026-08-29 —
@@ -49,8 +96,6 @@
 > ## fbneo`. Current + one back: `don_m16/m17`, `hui50/51`, `pyron34/35`,
 > ## `m3b_merged19/20`, `m5_stock11/12`.
 
-# HISTORY BELOW — the 14z-117 final-close, 14z-117 second-close, 14z-117 first-close, 14z-116, 14z-114, mid-14z-114 and 14z-113 orientations and older;
-# kept for the census anchors, eliminations and traps, superseded as the opener.
 
 ## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-117 FINAL close, 2026-08-29 — superseded by the 14z-118 opener above)
 

@@ -3224,3 +3224,23 @@ HANDOFF.md STATE.md tests` and retire every live hit in the same commit —
 registry row, session header, `mister_field.md` §6 (the log), and the
 out-of-tree bundle README ([MSV-36]). Show the after-grep empty outside
 HISTORY blocks.
+
+## THE AUDIT'S OWN INVENTORY IS ONE HOP AWAY TOO — verify a survey finding at the source before acting on it (paid: 14z-118)
+
+The documentation audit opened with three read-only surveys over ~29,000
+lines, each returning a table of "GUESSED" claims per document. Three of
+those findings were misreadings of the very class the audit hunts:
+`select_screen.md` "header says 128 measured vs L175 says 100 of 128" (L175
+is a geometry FIT's score; the table is measured 128/128); `patch_index.md`
+L237 "believed unused, GUESSED" (the same cell continues "measured 14z-89
+to be REACHED BY LEGACY TOO"); `platform/mister.md` "~45 min / ~3.5-4 h
+runtime estimates" (no such line exists). A fourth was a misreading in the
+DOC, not the survey (`coverage_matrix` "Shadow N/A-until-enabled" — Shadow
+was never disabled), which the survey correctly passed through. Acting on
+the first three would have "corrected" true claims.
+
+**Rule:** a survey row is a lead, not a finding. Before editing, read the
+cited line AND the sentence after it at the source; when the survey's
+claim dies there, retract it in the inventory (the inventory is a document
+too — `doc_audit_14z118.md` §1 carries its own strike-throughs) so the next
+reader does not re-derive the false lead.
