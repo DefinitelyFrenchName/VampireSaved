@@ -19,6 +19,55 @@ Rules of this file:
 - References of the form "STATE 14z-XX": look in STATE.md first, then here
   — section names are preserved verbatim, so the reference always resolves.
 
+## Session 14z-113 CLOSE — ritual complete. **THE MiSTer SCOPE DOCUMENT
+## WRITTEN AND ITS THREE DECISIONS RULED; THE S1-S20 STALENESS PASS RUN;
+## BUNDLE 14z112 FIELD-VERIFIED; merged-m10 FROZEN; THE RELEASE FORMAT RULED
+## AND SHIPPED (one self-sufficient directory per platform).**
+
+| | |
+|---|---|
+| opened with | the 14z-112 orientation; nothing red; main == origin/main at `1a0d7bb` |
+| delivered | `docs/project/mister_scope.md` (split, boundaries, doc map, S1-S20) -> rulings (split confirmed; pass mandatory, after the board; `.rbf` + MRAs in-tree) -> board results ("excellent, no regression", stock coexists, STOCK CONTROL boots) -> the S1-S20 pass (one commit, re-grep empty, 110/0/0) -> **freeze merged-m10** (`build/m3b_merged17`, M8 + fingerprint `32007911` unchanged, tag pushed, 54 defaults re-pointed, MiSTer tail empty by construction) -> **the release format ruled** (self-sufficient per platform; patch set copied into each; driver patch + recipe, no binaries; every version releases every platform) and **shipped as `release/merged-m10/{fbneo,mame,mister}/`** with `tools/package_release_platforms.py`, `docs/project/release_format.md` and `test_release_roundtrip.sh` §4 (layout + no cross-platform leakage + must-fire) |
+| green at close | `run_all_static --strict` **PASS 110 / SKIP 0 / FAIL 0 / MISSING 0** (run four times this session, last on the tree as committed); inp corpus 6/6, version string, render-content on merged17; ROM audit 76/76 |
+| push | main == origin/main; `freeze/merged-m10` on origin; no local-only tags; fork current at `63496069` (`git ls-remote`, all three) |
+| not done, by ruling or by absence | **#113 OPEN** — the maintainer is producing CAMERA evidence that hardware may disagree with the emulator finding; nothing re-derived, nothing closed. **The `.rbf` is not in the tree** — it was never on this machine; its home is `release/merged-m10/mister/jtcps2w.rbf` (hash in `BITSTREAM.txt`), the maintainer will drop it in. `build/m3b_merged15` NOT deleted (referenced by `test_inp_crash_merged_m8_01` defect mode). STOCK CONTROL: kept, re-scoped to once-per-new-`.rbf` (recommendation; the maintainer asked, did not rule) |
+| next | **THE MiSTer SKILLS** — distilled in a FRESH session from the corrected docs per `mister_scope.md` (six core + one shared + five VS-specific), each shipping with its checker (the SMS `checkskills.py` pattern) |
+
+**Post-close addendum (same day, 2026-08-28) — THE BITSTREAM IS IN THE TREE,
+AS A BUILD RESOURCE.** The maintainer dropped `jtcps2w.rbf` in; sha256
+verified `46fc74af…f66f` (3,111,944 B) against the record. Then the
+maintainer's design point, adopted: the bitstream is a COMMON BUILD RESOURCE
+(rebuildable with the right environment) that every release includes, never
+copied from a previous release. So it lives once at
+**`release/bitstreams/18269/{jtcps2w.rbf, BITSTREAM.txt}`** with
+`release/bitstreams/CURRENT` = `18269`; `tools/package_release_platforms.py`
+resolves CURRENT (or `--bitstream DIR`), verifies the file against the
+record's sha256 and REFUSES on mismatch (exercised: a tampered record is
+refused), then copies both into `mister/`. `release/merged-m10/mister/` was
+regenerated from it (28 files; gate §4 now also checks the `.rbf` is present,
+its hash equals the record, and the record is byte-identical to the
+canonical one). `docs/project/release_format.md` carries the resource.
+
+**Ledger rollover:** the 14z-110b group (three records) moved verbatim to
+STATE_HISTORY.md; STATE holds 14z-111 / 14z-112 / 14z-113.
+
+
+## Session 14z-113 (2026-08-28) — **THE MiSTer SCOPE DOCUMENT IS WRITTEN
+## (`docs/project/mister_scope.md`) — scope only, not the skills, as agreed.**
+
+| | |
+|---|---|
+| opened with | the 14z-112 orientation: nothing red, two hardware answers pending (#113 hand check, bundle 14z112), the scope document queued. main == origin/main at `1a0d7bb` (`git ls-remote`) |
+| the deliverable | `docs/project/mister_scope.md` — the two-level split (**level 1 CPS-II/WIDE core**: separate-core mechanism, the runtime profile bit, SDRAM tiers/slots/placement RULES, the five format caps + the nine gated sites, the simulation lane + instruments, synthesis/release, MRA mechanics; **level 2 VS-specific**: the roster's demand, the placement NUMBERS, catalogue/MRA/bundle generation incl. the freeze's MiSTer tail, the WIDE oracles, field test + triage), each with boundary / sources by section / gates; the doc dependency map; five places the boundary is not clean; the **known-stale inventory S1-S20** with file:line and the session that moved each |
+| method | all ~5,000 lines of the MiSTer sources READ (`platform/mister.md`, `mister_map.md`, `mister_core.md`, `cps2_wide.md`, `mister_fit.md`, the HANDOFF section, the tool headers, the 14z112 bundle README) — none summarised from memory; every "true now" checked against git/tree, not prose |
+| the staleness that matters | (S1/S3/S12) `mister_core.md` still says pin `dd242a65` + fifteen commits, romset merged13, and "HARDWARE: never"; `mister_map.md`'s header still says no tenant ever fought and nothing ran on hardware; (S15) `patch_index.md` registers 7 of 24 jtcores patches, one marked "LOCAL-ONLY (not pushed)"; (S8) a 14z-112 correction was spliced mid-sentence in `mister.md:1593`; (S18) `release/mister/jtcps2w.rbf` is cited by three docs and tracked by none; (S20) every HANDOFF MiSTer example names `build/m3b_merged13`, which the 14z-112 sweep DELETED. The `mister_mra.sh` HEADER correction NEXT_SESSION asked to verify IS in place (S16 is its usage text only). **All numbers agree across synthesis and logs; every disagreement is STATUS** |
+| verified clean | the nine gated sites (three copies agree), the placement offsets (three copies), the anchors, the `.rom` arithmetic, the release policy; `audit_mister_map_fit.sh` re-derives the extents from `m3b_merged16` every run, so `mister_fit.md`'s ceilings hold on the current freeze (only its `0x4D10F3` high-water mark is un-frozen and merged-m6's) |
+| ~~not done, by design~~ **THE S1-S20 PASS RAN (same session, after the board results, per ruling (2))** | Fixed in place with the correcting session named at each site: `mister_core.md` ground truth (pin `63496069`, 24 commits, merged-m9), file counts, §12 HARDWARE / HEARD / DRAWN rows, the `.rbf` path; `mister.md` distribution status, the fork-commit row extended to 24, the spliced 14z-112 sentence re-flowed, D2-era counts qualified, the input-coverage bullet's lead rewritten, the Recipe re-pointed to `m3b_merged16`; `mister_map.md` pin note + a current STATUS paragraph above the 14z-107 header; `mister_fit.md` provenance note (`0x4D10F3` is merged-m6's, the gate-frozen ceilings are not); `cps2_wide.md` header DRAFT -> RATIFIED; `docs/README.md` map row D0-D5; `patch_index.md` rows 0008-0024 added, 0007's "LOCAL-ONLY" retired; `mister_mra.sh` usage text; HANDOFF's four operational `merged13` commands -> `merged16`. Measurement RECORDS naming `merged13` left as written (logs of runs on that image). Re-grep of every retracted wording: empty outside this row. Scope doc §6 header carries the status |
+| decisions pending | see "Decisions pending": (1) confirm the split, (2) run the staleness pass BEFORE the skills (recommended), (3) the `.rbf`'s home |
+| green | `run_all_static --strict` after the docs change: **PASS 110 / SKIP 0 / FAIL 0 / MISSING 0**; ROM audit 76/76 |
+| **THE FREEZE — merged-m10 (maintainer, 2026-08-28: "you can do the freeze, all the more so since the pass was green")** | `build/m3b_merged17` frozen as **merged-m10**: the one-zip repackaging of merged-m9, **M8 mark unchanged, program fingerprint `32007911` unchanged, every member CRC unchanged** — the zip sha1 moved (`eee7e4b1` -> `5aeefbec`) because `vsavjw.zip` gained the four patched group-A members and the parent is now the pristine dump. Tag `freeze/merged-m10`; HANDOFF registry row; `release/merged-m10/{fbneo,mame,mister}/` — **the first release in the per-platform format ruled the same day** (round-trip PASS, 20 patched + 5 pristine, manifests identical across the three) — `mister/` holding (the WIDE + `[STOCK CONTROL]` MRAs, 31/31 and 22/22 parts resolving, and `BITSTREAM.txt` — seed/slack/sha256; the `.rbf` file itself is still on the synthesis box, its home is the open RELEASE FORMAT item — *as written at freeze time; superseded the same day, see the post-close addendum above: in-tree at `release/bitstreams/18269/`*). Re-point sweep: 54 gate defaults `m3b_merged16` -> `m3b_merged17`, `test_pointer_flow` pair -> `merged-m10` (expectation copied from `merged-m9.txt`, identical program), `audit_hui_grunt` gains the merged17 key, `mk_mister_page.py` reads merged17. **The MiSTer tail of this freeze is EMPTY by construction** (`gen_vsavjw_xml.py --check` ok on merged17; catalogue keyed by name+CRC; `.rbf` unchanged) — the field bundle 14z112 IS this set. No tenant/stock build dir moved; build-dir policy: merged16 stays as "one back", merged15 is still referenced by `test_inp_crash_merged_m8_01` defect mode and is NOT deleted. **Gates at freeze, on merged17:** `test_inp_corpus` 6/6 no exception · `test_version_string` PASS · `test_merged_render_content` PASS · `test_release_roundtrip` PASS incl. the new §4 layout check · `gen_vsavjw_xml.py --check` ok · `check_mra_parts` WIDE 31/31, STOCK 22/22 · `run_all_static --strict` **PASS 110 / SKIP 0 / FAIL 0 / MISSING 0** on the tree as committed (gate §4 + the sweep included) |
+| **BUNDLE 14z112 FIELD-VERIFIED (maintainer, 2026-08-28)** | "excellent: no regression" — **stock Vampire Savior renders correctly on Jotego's own JT core from the shared pristine `vsav.zip`, WIDE runs on our core, and the STOCK CONTROL MRA boots on our `.rbf` too.** So the one-zip packaging is CONFIRMED on hardware: one SD card carries this profile AND stock, which is what 14z-112's fix set out to do. The repackaged set `build/m3b_merged17` is therefore field-proven — registering/freezing it is now UNBLOCKED (still the maintainer's call; content unchanged, fingerprint `32007911`, only the zip layout moved). The maintainer asks whether the STOCK CONTROL still has a use — answered under "Decisions pending" (recommendation: keep it, as the per-BITSTREAM superset leg, run once per new `.rbf`, not per romset release). #113's hand check was not mentioned in this report and is NOT assumed closed |
+
 ## Session 14z-112 CLOSE — ritual complete. **#99 CLOSED ON A GREEN FIELD
 ## VERDICT; #112 REPRODUCED, RULED COSMETIC AND PARKED; #113 MEASURED VANILLA;
 ## AND THE WIDE PROFILE STOPPED BREAKING STOCK VAMPIRE SAVIOR.**

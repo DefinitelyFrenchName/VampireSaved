@@ -1,76 +1,81 @@
-# NEXT SESSION — orientation (rewritten at the 14z-115 close, 2026-08-28)
+# NEXT SESSION — orientation (rewritten at the 14z-116 close, 2026-08-29)
 
-> ## **START HERE. THE SELECT WHEEL WAS RE-CUT AND FROZEN: merged-m11 (M9),
-> ## `build/m3b_merged18`, donovan-m15 / huitzil-m22 / pyron-m16 — approved
-> ## on MAME snapshots, NOT YET ON THE BOARD. Load `vampire-saved-port`
-> ## before touching anything.**
+> ## **START HERE. THE WORK IS THE FREEZE BATTERY, and it is the whole
+> ## session — start it fresh, on a full context budget. 14z-110b closed at
+> ## the context ceiling with three validations in flight and cost 14z-111
+> ## an opening audit; do not repeat that.**
 > ##
-> ## **WHAT 14z-115 DID:** the maintainer's cosmetic pass on the three tenant
-> ## medallions ("E2"): positions moved by their own pixel offsets, hover
-> ## rings tuned by eye over four probe builds (Phobos +8 x, Pyron +3 x —
-> ## the ring-base table's Y runs OPPOSITE to the cell position), one
-> ## authored 1 px near-black ring sprite per cell interleaved before its
-> ## medallion in the wheel record (36 tiles at group C `0x1F800+`, pen 0
-> ## of row 0x19 — NO palette content change). Mockups + real snapshots:
-> ## `../images/wheel_mockups/`. The maintainer is drawing a "perfect"
-> ## mockup at 1:1 over `e2_outlines_build_1x.png`; when it arrives it
-> ## replaces the outline tiles through the SAME knobs (`cell_outline` /
-> ## `outline_base` / `outline_pal`, `build_gfx` outline pass) — nothing to
-> ## undo. Byte detail: patch_notes 14z-115; mechanism:
-> ## `select_screen.md` "PLACEMENT and OUTLINES".
+> ## **WHAT IS WAITING TO BE FROZEN:** `build/m3b_merged19`
+> ## (fingerprint `af21bc88`) — merged18 PLUS one fix: **Pyron's medallion
+> ## white-out**. `PRG:0x05F9D0`'s P2 branch no longer writes palette row
+> ## `0x1A` (`tst.b $381(a4)` -> `bne` to the pop/rts, two NOPs where
+> ## `adda.w #$60,a1` was; SAME byte count, so no allocation ripple and
+> ## **no re-point sweep for the thunk itself**). FIELD-VALIDATED on the
+> ## board: medallion correct, the P2 select sword now orange, select
+> ## screen only, "a good tradeoff". Detail: `donovan.toml`'s
+> ## `select_sword_pal_variant_id` comment; gate
+> ## `tests/test_pyron_medallion_2p.sh`.
 > ##
-> ## **THE FREEZE, honestly:** every gate at freeze PASS (STATE 14z-115 two
-> ## rows); the moved tenant `.sha1`s attributed by DUMPS diff (execution
-> ## position + dead stack + the ring objects' own positions — the change);
-> ## `test_fbneo_legacy_oracle` went RED on `05_timeout_idle` f8300 and was
-> ## REFIT per the 14z-110b ruling (instant → 9500, inventory unchanged,
-> ## PASS ×2); `bases.tsv` was found ROTTED since 14z-111 and re-derived;
-> ## `112_don_pod_*` got their expectations; the MiSTer tail is real this
-> ## time (fork `202fc3e6`, patch 0025, pin bumped, bundle
-> ## `../mister_fieldtest_14z115/`, release `release/merged-m11/`) — fork
-> ## and main NOT pushed, tags cut locally at `b30611a`. Strict at close
-> ## **111/0/0/0**; guard corpus 340/340; legacy + roster pairings PASS.
+> ## **WHY THE BATTERY SHOULD BE CHEAP THIS TIME, and where to check that
+> ## assumption first:** the change is TEN BYTES inside one already-existing
+> ## thunk body, on a path that runs only on a P2 TENANT HOVER. Measured at
+> ## 14z-116: `38_victor_p1_vsavj`, `05_timeout_idle` and `63_idle_select`
+> ## are **BIT-IDENTICAL** between merged18 and merged19. Replay 38 is the
+> ## one whose one-main-loop slip forced the 14z-88 revert, so that is the
+> ## meaningful control. **EXPECT the solos to move** (they rebuild) and
+> ## expect the tenant select rigs' self-frozen `.sha1`s to move on the
+> ## P2-hover ones; attribute them by DUMPS diff as always.
 > ##
-> ## **OPEN — INSTRUMENT (read STATE 14z-115 "OPEN INSTRUMENT QUESTION"):**
-> ## FBNeo vanilla runs fell into two bit-identical families diverging from
-> ## frame 72 within one evening; not root-caused; the refit used the stable
-> ## later family. First check: `shasum emu/fbneo/fbneo` vs a fresh
-> ## `tools/setup_fbneo.sh` build.
+> ## **THE BATTERY, in the 14z-115 order** (STATE 14z-115 has the full
+> ## list): rebuild solos + merged + the stock twin (expect the stock twin
+> ## UNCHANGED — the thunk is `only_variant_slot`) -> `run_suite` verify on
+> ## the three sets -> `audit_merged_legacy` 47/47 -> `audit_guard_corpus`
+> ## -> `audit_roster_pairings` 111/111 (**re-derive `bases.tsv` first** —
+> ## it has rotted twice) -> `audit_legacy_pairings` -> `test_dualtrack`,
+> ## `test_m3a_reproducible`, `test_fbneo_legacy_oracle`, `test_pointer_flow`
+> ## (re-freeze WITH attribution), `pcrel`/`escape_triage`, `inp corpus`,
+> ## the wheel/MiSTer/release gates -> `run_all_static --strict` -> tags,
+> ## registry row, re-point sweep, N-2 build-dir sweep -> **the MiSTer tail
+> ## (group C does NOT move, but the PROGRAM does: `gen_vsavjw_xml.py
+> ## --check` will go red, so a new fork catalogue commit + patch + pin bump
+> ## + bundle + `release/merged-m12/` are all needed)** -> docs.
+> ## **NEW GATES TO INCLUDE, none in ci_static:**
+> ## `tests/test_pyron_medallion_2p.sh`, `tests/test_shadow_tenant.sh`
+> ## (both emulator tier, HANDOFF-indexed), and `test_win_quote_decode`
+> ## (ci_static, already registered).
 > ##
-> ## **EMULATION VERDICT GREEN (maintainer, after the push): MAME + FBNeo,
-> ## no regression, "a big visual update already". MiSTer next.**
+> ## **MARK: M9 -> M10** (`version_text` in all three manifests).
 > ##
-> ## **THE WIN QUOTES ARE MEASURED AND FORGONE — DO NOT RE-OPEN THEM AS
-> ## "the next task" (that line is 14z-115's and is now stale).** 14z-116 ran
-> ## the whole Phase 0 and the maintainer ruled: *forgo for now, document
-> ## everything, and if we ever do it, do it the CLEAN way, not touching
-> ## vanilla.* **PARKED WITH A CONSTRAINT — the whole-bank relocation of
-> ## 14z-76 is RULED OUT, not merely second-best.** What was measured, so it
-> ## is never re-derived: a data-only fix is impossible (zero free bytes at
-> ## BOTH hops, `tools/scan_quote_window.py`); the root is a FOUR-entry
-> ## REGION array whose other three banks are the ENGLISH text; the bank is
-> ## `0x4104` bytes not `0x40DC`; lines run to 17 codes and the real bound is
-> ## the renderer's 66-word buffer; the installed pointer `RAM:$FFF230` is
-> ## work-RAM visible on VANILLA win screens (so a relocation is a superset
-> ## hit by construction); and the true cost is ~330 GLYPH TILES — 326 of 327
-> ## codes draw a different character in vsavj, the glyphs live in gfx bank 1
-> ## out of code reach, and the bank-0 font window is 4096/4096 full. The
-> ## sanctioned future shape (group C bank 5's blank font window + the
-> ## shipping `winquote_bank_variant_id` gate + one tenant-only thunk) and
-> ## the ONE measurement still owed are in `patch_index.md`'s header and
-> ## STATE "Decisions pending". Tools: `decode_win_quotes.py` (dump/resolve/
-> ## audit), `audit_quote_font.py`, `scan_quote_window.py`; gate
-> ## `tests/test_win_quote_decode.sh` (ci_static).
+> ## **WHAT 14z-116 SETTLED, so none of it is re-derived:**
+> ## **WIN QUOTES — FORGONE** by ruling, parked CLEAN-WAY-ONLY (the 14z-76
+> ## whole-bank relocation is ruled OUT: it moves `RAM:$FFF230` on legacy
+> ## win screens). A data-only fix is impossible (zero free bytes at BOTH
+> ## hops); the real cost is ~330 GLYPH TILES. Tools + gate in the tree.
+> ## **RANDOM SELECT** cannot pick a tenant — fixed 15-entry table at
+> ## `PRG:0x020C88`, hard bounds; **the maintainer ADDED "include the
+> ## tenants" to the list** (fix shape recorded in STATE, not built).
+> ## **SHADOW** is armed by FIVE START PRESSES on the "?" cell and takes the
+> ## character he JUST BEAT (`PRG:0x009BB2`, round end, unmasked) — he takes
+> ## the TENANT, not the shell, confirmed on emulator and on the board in
+> ## 2P vs. **MARIONETTE is a vs2 character**, parked. **No legacy character
+> ## meets a tenant in 1P arcade** — ruled NOT A PROBLEM.
 > ##
-> ## **OPEN, unchanged:** #113 parked (maintainer's camera evidence); the
-> ## `m3b_merged15` defect-mode reference; STOCK CONTROL once-per-`.rbf`;
-> ## the cosmetic backlog — DISASSEMBLE, NEVER SCAN. **FIELD TEST OF M9 is
-> ## the next board session** (tell: "M9" bottom-right, rings on the tenants).
+> ## **TWO TRAPS THIS SESSION PAID FOR, both in gate headers now:** the
+> ## wheel route to the "?" cell is **Down, Down, Down-RIGHT** on a WIDE
+> ## build (our port re-pointed cell `0x08`'s Down edge to Phobos, so
+> ## vanilla's D,D,D is wrong); and Shadow's five STARTs are PRESSES, with
+> ## the 6th DISARMING.
 > ##
-> ## **STATE OF THE BUILDS:** `tools/run_wide.sh build/m3b_merged18 fbneo`;
-> ## solos `don_m15` / `hui49` / `pyron33`, stock twin `m5_stock10`
-> ## (unchanged `d29fd062`); N-2 dirs deleted under the policy; bitstream
-> ## seed 18269 unchanged.
+> ## **OPEN:** the maintainer's 1:1 wheel mockup (replaces the outline tiles
+> ## through the same knobs, nothing to undo); #113 parked; #112 and the
+> ## tenant CPU AI "lackluster" observation recorded, unscheduled. The
+> ## FBNeo instrument question is NARROWED (the "unidentified writer" is
+> ## retired — the binary's mtime is 2026-08-17, eleven days before the
+> ## session that flagged it) but the two run families are still unexplained.
+> ##
+> ## **STATE OF THE BUILDS:** play `tools/run_wide.sh build/m3b_merged19
+> ## fbneo`. merged18 is the last FROZEN set (merged-m11, M9); merged19 is
+> ## the candidate. Everything is PUSHED (`origin/main` = `8055a27`).
 
 # HISTORY BELOW — the 14z-114, mid-14z-114 and 14z-113 orientations and older;
 # kept for the census anchors, eliminations and traps, superseded as the opener.
