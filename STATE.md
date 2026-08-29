@@ -1,5 +1,16 @@
 # STATE — living progress log
 
+## Session 14z-117 CLOSE (3) — the session's last act. **The VS/VS2 data-architecture page
+## CORRECTED from a row-by-row measurement after the maintainer read it; the next session is
+## RULED: a full documentation audit — measured, consistent, nothing stale.**
+
+| | |
+|---|---|
+| the correction | the maintainer read the character-bank grid and asked why Gallon/Aulbath/Sasquatch looked un-doubled. The grid was WRONG in two places and its legend conflated two things. Measured on both data images (hitbox base, dispatch, anim index, and the two palette pointer tables): vsavj — every variant row 0x10-0x1F is a byte-identical COPY of row−16 except `0x18` (Oboro); `0x12` (the Dark Talbain id) copies Gallon's rows and has its own row ONLY in the two palette tables (`0x38C198` / `0x38C218`). vsav2 — all 16 base rows keep their own data (Gallon, Aulbath, Sasquatch leave the WHEEL, not the bank), variant `0x10/0x11/0x13/0x18` own, `0x19` own in the hitbox table only. The atlas had all of this right (`character_tables.md`, `id_space.md`); the translation to the grid was the error. Republished; legend now says COPY, not alias; linked from `docs/README.md` |
+| commits | `d2b2484` (push record) + this close; artifact v2 "bank grid corrected" |
+| **NEXT SESSION, RULED BY THE MAINTAINER** | (1) their board results on bundle 14z117b (M11); (2) **a full pass on the documentation: every claim derived from a MEASUREMENT, not a guess; everything consistent; nothing stale** — the Sailor Moon S discipline. Shape it as the 14z-113/114 staleness passes were shaped (S1-S20, S-C1..): inventory the claims per document, mark each MEASURED (with the log/gate that measured it) / DERIVED / GUESSED, re-measure or retract the last class, grep every retraction across the repo ([VSP-13]), and commit per document. Today's grid error is the specimen: a claim that was right in the atlas and wrong one hop away |
+| push | this close commit NOT pushed — push at the maintainer's word |
+
 ## Session 14z-117 CLOSE (2) — ritual complete. **THE RANDOM-SELECT FREEZE: donovan-m17 /
 ## huitzil-m24 / pyron-m18 / merged-m13, mark M11 — strict 112/0/0/0, guard corpus 344/344,
 ## roster 111/111, legacy pairings PASS, every masked legacy class green on three suites.

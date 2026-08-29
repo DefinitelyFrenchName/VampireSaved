@@ -1,4 +1,56 @@
-# NEXT SESSION — orientation (rewritten at the 14z-117 close, 2026-08-29 — TWO freezes in one session)
+# NEXT SESSION — orientation (rewritten at the 14z-117 final close, 2026-08-29)
+
+> ## **START HERE. NOTHING IS RED. TWO FREEZES SHIPPED AND PUSHED TODAY
+> ## (merged-m12 M10, merged-m13 M11). THE NEXT SESSION IS RULED BY THE
+> ## MAINTAINER: their board results on bundle 14z117b, then — the real
+> ## work — A FULL DOCUMENTATION AUDIT: every claim MEASURED not guessed,
+> ## everything consistent, nothing stale. The Sailor Moon S discipline.**
+> ##
+> ## **HOW TO SHAPE THE AUDIT** (the 14z-113/114 staleness passes are the
+> ## template — S1-S20 for MiSTer, S-C1..S-C12 for the game docs, S-D for
+> ## the port docs; one commit per document): for each document in
+> ## `docs/game/`, `docs/platform/`, `docs/project/`, HANDOFF and the six
+> ## skills, inventory its claims and mark each MEASURED (name the log,
+> ## gate or dump that measured it) / DERIVED (from a measured fact by a
+> ## stated rule) / GUESSED (nothing behind it). Re-measure or RETRACT the
+> ## third class; grep every retraction across the repo ([VSP-13]: headers
+> ## and summary lines first). Check cross-document consistency on the
+> ## load-bearing numbers (addresses, counts, fingerprints, pins) with a
+> ## script where one is cheap — `checkskills.py` already locks the skills
+> ## to the docs; extend that idea to the atlas↔engine_internals pairs.
+> ## **Today's specimen of the failure class:** the data-architecture page
+> ## drew the character bank wrong (0x12 as real data, vsav2's vacated
+> ## wheel cells as missing rows) while the atlas beneath it was right —
+> ## a claim can be correct at the source and wrong one hop away.
+> ##
+> ## **WHAT 14z-117 DID, one breath:** the medallion-fix freeze (M10, cheap
+> ## as predicted); the random-select feature (two thunks, one table,
+> ## `roster_subst`; the walker's non-tick path re-reads the table — a
+> ## bound-only thunk crashed, fixed; the Shadow rig re-timed) and its
+> ## freeze (M11); the VS/VS2 data-architecture artifact, corrected after
+> ## the maintainer's read: https://claude.ai/code/artifact/98d586db-1a69-49eb-b421-5085db07b707
+> ##
+> ## **CURRENT:** donovan-m17 `90a225ce` / huitzil-m24 `ae953657` /
+> ## pyron-m18 `1222df18` / merged-m13 `a1b7cb82` (`build/m3b_merged20`,
+> ## 823 ops), stock twin `m5_stock12` = `d29fd062`. Fork `f997cfe1` (27
+> ## commits / patch 0027), `release/merged-m13/`, bundle
+> ## `../mister_fieldtest_14z117b/` (`.rbf` unchanged). Everything pushed
+> ## except the final close commit — check `git status -sb`, not this line.
+> ##
+> ## **OPEN, unchanged:** the 1:1 wheel mockup; #112/#113 parked; the FBNeo
+> ## two-run-family question; the tenant CPU AI "lackluster" note; win
+> ## quotes (forgone, clean-way-only). `test_random_select_tenants.sh`'s
+> ## CONTROL is `build/m3b_merged19` — re-point or accept its SKIP when
+> ## that directory rolls off.
+> ##
+> ## **STATE OF THE BUILDS:** play `tools/run_wide.sh build/m3b_merged20
+> ## fbneo`. Current + one back: `don_m16/m17`, `hui50/51`, `pyron34/35`,
+> ## `m3b_merged19/20`, `m5_stock11/12`.
+
+# HISTORY BELOW — the 14z-117 second-close, 14z-117 first-close, 14z-116, 14z-114, mid-14z-114 and 14z-113 orientations and older;
+# kept for the census anchors, eliminations and traps, superseded as the opener.
+
+## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-117 SECOND close, 2026-08-29 — superseded by the final close above)
 
 > ## **START HERE. NOTHING IS RED. TWO FREEZES SHIPPED TODAY — merged-m12
 > ## (M10, the Pyron-medallion fix) and then merged-m13 (M11, RANDOM SELECT
@@ -39,8 +91,6 @@
 > ## fbneo`. Current + one back: `don_m16/m17`, `hui50/51`, `pyron34/35`,
 > ## `m3b_merged19/20`, `m5_stock11/12`.
 
-# HISTORY BELOW — the 14z-117 (first close), 14z-116, 14z-114, mid-14z-114 and 14z-113 orientations and older;
-# kept for the census anchors, eliminations and traps, superseded as the opener.
 
 ## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-117 FIRST close, 2026-08-29 — superseded by the second close above)
 
