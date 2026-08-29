@@ -39,7 +39,16 @@
 1280-1282 sys=S1
 1320-1322 sys=S1
 1360-1362 sys=S1
-1450-1452 p1=1
+# RE-TIMED 14z-117b (random select includes the tenants): the "?" draw now
+# cycles the tenants too, so the old confirm (1450) landed on THIS BUILD'S
+# tenant on every solo (a mirror match; the morph verdict went vacuous).
+# The solo cycle (period 48) and the merged cycle (54) coincide at 1499+3k:
+# frames 1520-1522 show Bulleta (0x00) on all four builds — the character
+# the fight script below was written for. Confirm registers one frame
+# early (input staged ahead), so 1521-1522 lands inside that plateau.
+# Measured 14z-117b: P1 0x00 at 3000, morph to 0x13/Donovan's record at 7800
+# on don_m17 AND merged20 with the fight lines unshifted.
+1521-1522 p1=1
 1500-1502 p2=1
 # P1 walks in and mashes to a MATCH WIN over an idle P2 Donovan, so the
 # WIN SCREEN runs with $3BC set on the winner and a TENANT as the loser —

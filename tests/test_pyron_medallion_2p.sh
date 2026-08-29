@@ -42,12 +42,12 @@
 #      must-fire half: it fails if someone "fixes" leg 1 by disabling the
 #      whole thunk, which would silently undo 14z-62k.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged19] tests/test_pyron_medallion_2p.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged20] tests/test_pyron_medallion_2p.sh
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
-BUILD="${BUILD:-build/m3b_merged19}"
+BUILD="${BUILD:-build/m3b_merged20}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no build at $BUILD"; exit 0; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary at $MAME_BIN"; exit 0; }

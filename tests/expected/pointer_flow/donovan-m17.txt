@@ -1,0 +1,7 @@
+# pointer-flow baseline for donovan-m17 (build/don_m17), frozen 14z-117b — the random-select freeze (M11).
+# vs the 14z-117 baseline: IDENTICAL — the two random-select thunk bodies carry no pointer-shaped operand
+# (the site jmps resolve as PATCHED) and the solo's ext allocations did not move.
+# STRONG lines are REVIEWED findings (see hardening_register.md);
+# WEAK-COUNT lines freeze the noise volume — growth = investigate.
+WEAK-COUNT	code:move_imm	1
+WEAK-COUNT	data:long	1263

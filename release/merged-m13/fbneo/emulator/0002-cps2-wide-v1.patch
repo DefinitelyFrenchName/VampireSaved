@@ -1,0 +1,172 @@
+diff --git a/src/burn/drv/capcom/cps.cpp b/src/burn/drv/capcom/cps.cpp
+index 4e76431..c855f1b 100644
+--- a/src/burn/drv/capcom/cps.cpp
++++ b/src/burn/drv/capcom/cps.cpp
+@@ -2373,6 +2373,8 @@ INT32 CpsExit()
+ 		BurnSampleExit();
+ 		Cps2Turbo = 0;
+ 	}
++	Cps2Wide = 0;   // never leak the profile into the next game loaded
++	Cps2WideCanary = 0;
+ 
+ 	return 0;
+ }
+diff --git a/src/burn/drv/capcom/cps.h b/src/burn/drv/capcom/cps.h
+index 4caf9bf..133e402 100644
+--- a/src/burn/drv/capcom/cps.h
++++ b/src/burn/drv/capcom/cps.h
+@@ -284,6 +284,8 @@ extern INT32 Dinohunt;
+ extern INT32 Port6SoundWrite;
+ extern INT32 CpsBootlegEEPROM;
+ extern INT32 Cps2Turbo;
++extern INT32 Cps2Wide;      // CPS-2 WIDE v1 profile
++extern INT32 Cps2WideCanary;  // TEST-ONLY bank-relocation probe (B4)
+ extern INT32 Jurassic99;
+ extern INT32 Dinoh;
+ extern INT32 Wofhfh;
+diff --git a/src/burn/drv/capcom/cps_obj.cpp b/src/burn/drv/capcom/cps_obj.cpp
+index 5cefed4..63c744b 100644
+--- a/src/burn/drv/capcom/cps_obj.cpp
++++ b/src/burn/drv/capcom/cps_obj.cpp
+@@ -426,7 +426,18 @@ INT32 Cps2ObjDraw(INT32 nLevelFrom, INT32 nLevelTo)
+ //		y -= CpsSaveFrg[0][0xB];
+ 
+ #endif
+-		if (Cps2Turbo) {
++		if (Cps2WideCanary && (BURN_ENDIAN_SWAP_INT16(ps[1]) & 0x4000)) {
++			// B4 probe: bank2 (0x4000) -> bank4 (0x1000), bank3 (0x6000) ->
++			// bank5 (0x3000). With gfx group C loaded as a byte copy of group
++			// B, the tiles are identical, so correct 19-bit addressing must
++			// render pixel-identically to stock.
++			ps[1] = BURN_ENDIAN_SWAP_INT16(
++				(UINT16)((BURN_ENDIAN_SWAP_INT16(ps[1]) & ~0x4000) | 0x1000));
++		}
++		if (Cps2Turbo || Cps2Wide) {
++			// 19-bit tile address (64MB reach). y-word bit 15 cannot carry it:
++			// CpsObjGet uses it as the END-OF-SPRITE-LIST marker, so the bit is
++			// promoted from bit 12 here, after the list has been walked.
+ 			if (ps[1] & 0x1000) ps[1] |= 0x8000;
+ 			n |= (BURN_ENDIAN_SWAP_INT16(ps[1]) & 0xe000) << 3;	// high bits of address
+ 		} else {
+diff --git a/src/burn/drv/capcom/cps_rw.cpp b/src/burn/drv/capcom/cps_rw.cpp
+index 1f70f87..ef8cd71 100644
+--- a/src/burn/drv/capcom/cps_rw.cpp
++++ b/src/burn/drv/capcom/cps_rw.cpp
+@@ -48,6 +48,15 @@ INT32 Dinohunt = 0;
+ INT32 Port6SoundWrite = 0;
+ INT32 CpsBootlegEEPROM = 0;
+ INT32 Cps2Turbo = 0;
++// CPS-2 WIDE v1 (Vampire Saved): extended-bus profile flag. Set ONLY by
++// the vsavjw driver init, cleared on exit. Gates the 19-bit sprite tile
++// address; see docs/cps2_wide.md in that project.
++INT32 Cps2Wide = 0;
++// TEST-ONLY (CPS2_WIDE_CANARY=1): relocates bank-2/3 sprites into the
++// WIDE banks 4/5 at draw time, WITHOUT touching the ROM, so game state is
++// identical by construction and only pixels can move. Never set in a
++// shipped build; see docs/cps2_wide.md (B4).
++INT32 Cps2WideCanary = 0;
+ INT32 Jurassic99 = 0;
+ INT32 Dinoh = 0;
+ INT32 Wofhfh = 0;
+diff --git a/src/burn/drv/capcom/d_cps2.cpp b/src/burn/drv/capcom/d_cps2.cpp
+index 6931097..1aa72c4 100644
+--- a/src/burn/drv/capcom/d_cps2.cpp
++++ b/src/burn/drv/capcom/d_cps2.cpp
+@@ -8822,6 +8822,80 @@ static struct BurnRomInfo VsavjRomDesc[] = {
+ STD_ROM_PICK(Vsavj)
+ STD_ROM_FN(Vsavj)
+ 
++// ── CPS-2 WIDE v1 (Vampire Saved project) ──
++// vsavj with the EXTENDED QSOUND REGION: 8MB -> 16MB, as four uniform 4MB
++// members. Pure descriptor change — FBNeo derives every region size from
++// this table (CpsGetROMs sums nCpsQSamLen) and the QSound reader masks with
++// `rom_mask = nCpsQSamLen - 1` (qs_c.cpp), so no code change is needed, and
++// nothing here touches the stock vsav/vsavj entries.
++// The length MUST stay a power of two or that mask is wrong: 8->16MB is
++// legal, 8->12MB is not.
++// The two added members are zero-filled placeholders at this stage (B0);
++// they exist to prove the grown region is inert before any content uses it.
++// Profile spec + Phase A measurements: docs/cps2_wide.md.
++static struct BurnRomInfo VsavjwRomDesc[] = {
++	{ "vm3j.03d",      0x080000, 0x2a2e74a4, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
++	{ "vm3j.04d",      0x080000, 0x1c2427bc, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
++	{ "vm3j.05a",      0x080000, 0x95ce88d5, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
++	{ "vm3j.06b",      0x080000, 0x2c4297e0, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
++	{ "vm3j.07b",      0x080000, 0xa38aaae7, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
++	{ "vm3j.08a",      0x080000, 0x5773e5c9, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
++	{ "vm3j.09b",      0x080000, 0xd064f8b9, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
++	{ "vm3j.10b",      0x080000, 0x434518e9, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
++
++	// WIDE v1 program extension: 4MB -> 6MB. FBNeo maps program ROM as
++	// SekMapMemory(CpsRom, 0, nCpsRomLen-1), so growth is descriptor-only
++	// (Phase A/A1 measured: vanilla never reads $400000-$5FFFFF, so the
++	// newly-covered window shadows nothing live). Everything above
++	// $0FFFFF is OUTSIDE the CPS-2 encryption window, so this space is
++	// raw - simpler to author into than the original in-crypt hole.
++	// Reserved, never allocate: $400000-$40000F (CpsFrg regs, now
++	// read-shadowed by ROM; writes still reach the handler).
++	{ "vsw.41",        0x080000, 0xdec0de41, CPS2_PRG_68K | BRF_ESS | BRF_PRG },   // WIDE v1 SENTINEL CRC (14z-90, GitHub issue #13): 0x75660aac is the REAL crc32 of a 512KB zero-fill, so all four rows aliased each other and FindRomByCrc - which returns the FIRST match with no entry de-duplication - served a zero-filled sibling for a content-bearing vsw.41. Same class as the gfx rows below; the one site the 14z-62d sweep missed
++	{ "vsw.42",        0x080000, 0xdec0de42, CPS2_PRG_68K | BRF_ESS | BRF_PRG },   // WIDE v1 SENTINEL CRC (14z-90, GitHub issue #13): 0x75660aac is the REAL crc32 of a 512KB zero-fill, so all four rows aliased each other and FindRomByCrc - which returns the FIRST match with no entry de-duplication - served a zero-filled sibling for a content-bearing vsw.41. Same class as the gfx rows below; the one site the 14z-62d sweep missed
++	{ "vsw.43",        0x080000, 0xdec0de43, CPS2_PRG_68K | BRF_ESS | BRF_PRG },   // WIDE v1 SENTINEL CRC (14z-90, GitHub issue #13): 0x75660aac is the REAL crc32 of a 512KB zero-fill, so all four rows aliased each other and FindRomByCrc - which returns the FIRST match with no entry de-duplication - served a zero-filled sibling for a content-bearing vsw.41. Same class as the gfx rows below; the one site the 14z-62d sweep missed
++	{ "vsw.44",        0x080000, 0xdec0de44, CPS2_PRG_68K | BRF_ESS | BRF_PRG },   // WIDE v1 SENTINEL CRC (14z-90, GitHub issue #13): 0x75660aac is the REAL crc32 of a 512KB zero-fill, so all four rows aliased each other and FindRomByCrc - which returns the FIRST match with no entry de-duplication - served a zero-filled sibling for a content-bearing vsw.41. Same class as the gfx rows below; the one site the 14z-62d sweep missed
++
++	{ "vm3.13m",       0x400000, 0xfd8a11eb, CPS2_GFX | BRF_GRA },
++	{ "vm3.15m",       0x400000, 0xdd1e7d4e, CPS2_GFX | BRF_GRA },
++	{ "vm3.17m",       0x400000, 0x6b89445e, CPS2_GFX | BRF_GRA },
++	{ "vm3.19m",       0x400000, 0x3830fdc7, CPS2_GFX | BRF_GRA },
++	{ "vm3.14m",       0x400000, 0xc1a28e6c, CPS2_GFX | BRF_GRA },
++	{ "vm3.16m",       0x400000, 0x194a7304, CPS2_GFX | BRF_GRA },
++	{ "vm3.18m",       0x400000, 0xdf9a9f47, CPS2_GFX | BRF_GRA },
++	{ "vm3.20m",       0x400000, 0xc22fc3d9, CPS2_GFX | BRF_GRA },
++
++	// WIDE v1 gfx group C: 32MB -> 48MB. Members MUST be appended in
++	// whole groups of FOUR, all the same size: Cps2LoadTiles consumes
++	// four at a time and advances by nGfxMaxSize*4, and a short member
++	// silently poisons nGfxMaxSize (~0U) and the entire load map.
++	{ "vsw.31m",       0x400000, 0xdec0de31, CPS2_GFX | BRF_GRA },   // WIDE v1 SENTINEL CRC: matches NOTHING, so the member ALWAYS resolves by NAME (a real CRC hash-shadows: group-B copies did at 14z-60z, and a zero-fill CRC collides with the zero QSound members — measured 14z-62d)
++	{ "vsw.33m",       0x400000, 0xdec0de33, CPS2_GFX | BRF_GRA },   // WIDE v1 SENTINEL CRC: matches NOTHING, so the member ALWAYS resolves by NAME (a real CRC hash-shadows: group-B copies did at 14z-60z, and a zero-fill CRC collides with the zero QSound members — measured 14z-62d)
++	{ "vsw.35m",       0x400000, 0xdec0de35, CPS2_GFX | BRF_GRA },   // WIDE v1 SENTINEL CRC: matches NOTHING, so the member ALWAYS resolves by NAME (a real CRC hash-shadows: group-B copies did at 14z-60z, and a zero-fill CRC collides with the zero QSound members — measured 14z-62d)
++	{ "vsw.37m",       0x400000, 0xdec0de37, CPS2_GFX | BRF_GRA },   // WIDE v1 SENTINEL CRC: matches NOTHING, so the member ALWAYS resolves by NAME (a real CRC hash-shadows: group-B copies did at 14z-60z, and a zero-fill CRC collides with the zero QSound members — measured 14z-62d)
++
++	{ "vsw.z01",       0x020000, 0xdec0de38, CPS2_PRG_Z80 | BRF_ESS | BRF_PRG },   // WIDE v1.1 Z80 CONTENT MEMBER (14z-86): sentinel CRC — resolves by NAME so builds can patch the sound driver (M5 songs). Stock vm3.01 bytes when unpatched. A stock name+CRC here would hash-shadow to vsav.zip's pristine member (the 14z-60z class)
++	{ "vsw.z02",       0x020000, 0xdec0de39, CPS2_PRG_Z80 | BRF_ESS | BRF_PRG },   // WIDE v1.1 Z80 CONTENT MEMBER (14z-86): sentinel CRC (see vsw.z01)
++
++	{ "vm3.11m",       0x400000, 0xe80e956e, CPS2_QSND | BRF_SND },
++	{ "vm3.12m",       0x400000, 0x9cd71557, CPS2_QSND | BRF_SND },
++	{ "vsw.21m",       0x400000, 0xdec0de3a, CPS2_QSND | BRF_SND },   // WIDE v1.2 QSOUND CONTENT MEMBER (14z-86): sentinel CRC — the M5 voice batch packs samples here; the old shared zero-fill CRC would hash-shadow a content-bearing 21m onto the still-zero 22m (the 14z-60z class)
++	{ "vsw.22m",       0x400000, 0xdec0de3b, CPS2_QSND | BRF_SND },   // WIDE v1.2 QSOUND CONTENT MEMBER (14z-86): sentinel CRC (see vsw.21m)
++
++	{ "vsavj.key",     0x000014, 0x36d28ab8, CPS2_ENCRYPTION_KEY },
++};
++
++STD_ROM_PICK(Vsavjw)
++STD_ROM_FN(Vsavjw)
++
++static INT32 Cps2WideInit()
++{
++	Cps2Wide = 1;
++	Cps2WideCanary = (getenv("CPS2_WIDE_CANARY") != NULL);   // TEST-ONLY
++	bprintf(0, _T("CPS-2 WIDE v1 profile active\n"));
++	return Cps2Init();
++}
++
+ static struct BurnRomInfo VsavuRomDesc[] = {
+ 	{ "vm3u.03d",      0x080000, 0x1f295274, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
+ 	{ "vm3u.04d",      0x080000, 0xc46adf81, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
+@@ -12553,6 +12627,16 @@ struct BurnDriver BurnDrvCpsVsavj = {
+ 	&CpsRecalcPal, 0x1000, 384, 224, 4, 3
+ };
+ 
++struct BurnDriver BurnDrvCpsVsavjw = {
++	"vsavjw", "vsav", NULL, NULL, "1997",
++	"Vampire Savior: The Lord of Vampire (Japan 970519, CPS-2 WIDE v1)\0", NULL, "Capcom", "CPS2",
++	NULL, NULL, NULL, NULL,
++	BDF_GAME_WORKING | BDF_CLONE | BDF_HISCORE_SUPPORTED, 2, HARDWARE_CAPCOM_CPS2, GBF_VSFIGHT, FBF_DSTLK,
++	NULL, VsavjwRomInfo, VsavjwRomName, NULL, NULL, NULL, NULL, Cps2FightingInputInfo, NULL,
++	Cps2WideInit, DrvExit, Cps2Frame, CpsRedraw, CpsAreaScan,
++	&CpsRecalcPal, 0x1000, 384, 224, 4, 3
++};
++
+ struct BurnDriver BurnDrvCpsVsavu = {
+ 	"vsavu", "vsav", NULL, NULL, "1997",
+ 	"Vampire Savior: The Lord of Vampire (USA 970519)\0", NULL, "Capcom", "CPS2",

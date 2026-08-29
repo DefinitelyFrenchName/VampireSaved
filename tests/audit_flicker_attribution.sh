@@ -36,7 +36,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/don_m16}"  # re-pointed 14z-117 (pyron-medallion freeze) <- 14z-115
+BUILD="${BUILD:-build/don_m17}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
 # The mask comes from the BUILD's own expectation set, resolved through
 # registry.tsv (the #96 mechanism) — 14z-103: this was pinned to

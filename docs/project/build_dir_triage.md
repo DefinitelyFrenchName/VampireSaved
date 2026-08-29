@@ -407,3 +407,16 @@ left naming N-1 builds; re-labelled to the current names. Kept:
 `m3b_merged15` (the deferred `test_inp_crash_merged_m8_01` defect-mode item —
 the maintainer's call), `m5_stock3` (evidence). Current + one back now:
 `don_m15/m16`, `hui49/50`, `pyron33/34`, `m3b_merged18/19`, `m5_stock10/11`.
+
+## THE 14z-117b SWEEP (random-select freeze, same session) — applied under the policy
+
+Deleted at the freeze (N-2 per track): `don_m15`, `hui49`, `pyron33`,
+`m3b_merged18`, `m5_stock10` (tracked metadata `git rm`'d; recoverable via
+`freeze/*` tags). Also deleted: the three `probe_random_*` rehearsal dirs
+(their evidence is the merged-m13 freeze itself). NOTE `build/m3b_merged19`
+STAYS one generation longer than the policy's N-1 slot implies for a
+different reason too: it is `test_random_select_tenants.sh`'s CONTROL (the
+last merged WITHOUT the draw thunks — the must-fire leg); when it rolls off,
+re-point CONTROL at the next tenant-less merged or accept the SKIP. Current
++ one back now: `don_m16/m17`, `hui50/51`, `pyron34/35`,
+`m3b_merged19/20`, `m5_stock11/12`.

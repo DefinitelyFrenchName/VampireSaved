@@ -36,7 +36,7 @@ rc=0
 python3 - <<'PY' || rc=1
 import os, re, subprocess, sys
 
-BUILDS = ["hui50", "pyron34", "don_m16"]  # re-pointed 14z-117 (pyron-medallion freeze) <- 14z-115
+BUILDS = ["hui51", "pyron35", "don_m17"]  # re-pointed 14z-117b (random-select freeze) <- 14z-117
 present = [b for b in BUILDS if os.path.isdir(f"build/{b}/rompath")]
 if not present:
     print("SKIP: none of the three tenant builds are on disk")

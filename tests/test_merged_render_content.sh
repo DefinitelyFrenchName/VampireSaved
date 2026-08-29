@@ -48,7 +48,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 
-MERGED="${1:-$REPO/build/m3b_merged19/rompath}"  # re-pointed 14z-117 (pyron-medallion freeze) <- 14z-115
+MERGED="${1:-$REPO/build/m3b_merged20/rompath}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117
 MAME_WIDE_BIN="${MAME_WIDE_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 # THE SOLO REFERENCES MUST BE BUILDS THAT STILL BOOT ON THE CURRENT
 # EMULATOR BINARY, and that is not automatic (14z-92). WIDE v1.1 (14z-86)
@@ -63,9 +63,9 @@ MAME_WIDE_BIN="${MAME_WIDE_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 # WHEN A TENANT IS RE-FROZEN, RE-POINT ITS ROW HERE. D and P still name
 # older builds (donovan-m3a / pyron-m3); those boot and pass today, but
 # they are one profile bump away from the same failure.
-D_RP="$REPO/build/don_m16/rompath"   # re-pointed 14z-117 (pyron-medallion freeze) <- 14z-115
-H_RP="$REPO/build/hui50/rompath"    # re-pointed 14z-105 (window freeze); re-pointed 14z-117 (pyron-medallion freeze)
-P_RP="$REPO/build/pyron34/rompath"  # re-pointed 14z-105 (window freeze); re-pointed 14z-117 (pyron-medallion freeze)
+D_RP="$REPO/build/don_m17/rompath"   # re-pointed 14z-117b (random-select freeze) <- 14z-117
+H_RP="$REPO/build/hui51/rompath"    # re-pointed 14z-105 (window freeze); re-pointed 14z-117b (random-select freeze) <- 14z-117
+P_RP="$REPO/build/pyron35/rompath"  # re-pointed 14z-105 (window freeze); re-pointed 14z-117b (random-select freeze) <- 14z-117
 
 [ -f "$MERGED/vsavjw.zip" ] || {
     echo "SKIP: no merged build at $MERGED (tools/build_merged.sh)"; exit 0; }
@@ -152,10 +152,10 @@ chk() {  # chk <label> <got> <want>
         echo "  FAIL: $1 — merged $2 != solo $3"; fail=1
     fi
 }
-chk "D band  0x4AD8F == don_m16 (label re-pointed 14z-117)"  "$m_d" "$s_d"
-chk "H band  0x40AF6 == hui50 (label re-pointed 14z-117)"    "$m_h" "$s_h"
-chk "P band  0x45000 == pyron34 (label re-pointed 14z-117)"  "$m_p" "$s_p"
-chk "strip   0x486A0 == hui50 (the S3 relocation, live; label re-pointed 14z-117)" "$m_s" "$s_s"
+chk "D band  0x4AD8F == don_m17 (label re-pointed 14z-117)"  "$m_d" "$s_d"  # re-pointed 14z-117b (random-select freeze) <- 14z-117
+chk "H band  0x40AF6 == hui51 (label re-pointed 14z-117)"    "$m_h" "$s_h"  # re-pointed 14z-117b (random-select freeze) <- 14z-117
+chk "P band  0x45000 == pyron35 (label re-pointed 14z-117)"  "$m_p" "$s_p"  # re-pointed 14z-117b (random-select freeze) <- 14z-117
+chk "strip   0x486A0 == hui51 (the S3 relocation, live; label re-pointed 14z-117)" "$m_s" "$s_s"  # re-pointed 14z-117b (random-select freeze) <- 14z-117
 chk "bank 2  0x2AD8F == PRISTINE (de-substitution held)" "$m_b2" "$prist"
 distinct="$(printf '%s\n%s\n%s\n%s\n' "$m_d" "$m_h" "$m_p" "$m_s" | sort -u | wc -l | tr -d ' ')"
 if [ "$distinct" = 4 ]; then

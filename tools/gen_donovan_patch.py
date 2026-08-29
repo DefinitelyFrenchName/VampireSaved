@@ -5951,6 +5951,47 @@ def main():
                                     f"placeholder '{_ph}' not present in "
                                     f"thunk_hex")
                     _hx = _hx.replace(_ph, "%08x" % _da)
+                # roster_subst (14z-117): "ids_ph:count_ph:base" — the thunk
+                # embeds the BUILD'S OWN TENANT ROSTER: `ids_ph` (a non-hex
+                # placeholder, conventionally at the END of the body so no
+                # displacement inside it moves) is replaced by the variant-half
+                # ids of every tenant on this build, ascending, one byte each;
+                # `count_ph` by (base + that count) as one byte. The random
+                # "?" draw walks a fixed table with a hard bound, and the
+                # sibling games simply list their own rosters there — a solo
+                # build lists its one tenant, the merged image all three, and
+                # a literal id list would be wrong on two of the three builds
+                # (the same trap as a literal TT, at the roster level).
+                for _kv in str(st.get("roster_subst", "")).split(","):
+                    if not _kv.strip():
+                        continue
+                    _parts = [x.strip().lower() for x in _kv.split(":")]
+                    _ph_ids = _parts[0]
+                    _ph_cnt = _parts[1] if len(_parts) > 1 else ""
+                    _base = _int(_parts[2]) if len(_parts) > 2 else 0
+                    _rids = sorted({_int(_t["dst_slot"]) & 0xFF
+                                    for _t in _tenant_list
+                                    if (_int(_t["dst_slot"]) & 0xFF) >= 0x10})
+                    if not _rids:
+                        fail.append(f"site_thunk {st['name']}: roster_subst on "
+                                    f"a build with no variant-half tenant "
+                                    f"(profile-gate the row)")
+                        continue
+                    if _ph_ids:      # empty = this body carries only the bound
+                        if _ph_ids not in _hx:
+                            fail.append(f"site_thunk {st['name']}: roster_subst "
+                                        f"placeholder '{_ph_ids}' not present in "
+                                        f"thunk_hex")
+                        _hx = _hx.replace(_ph_ids, "".join("%02x" % r for r in _rids))
+                    if _ph_cnt:
+                        if _ph_cnt not in _hx:
+                            fail.append(f"site_thunk {st['name']}: roster_subst "
+                                        f"count placeholder '{_ph_cnt}' not "
+                                        f"present in thunk_hex")
+                        _hx = _hx.replace(_ph_cnt, "%02x" % (_base + len(_rids)))
+                    notes.append(f"# site_thunk {st['name']}: roster_subst -> "
+                                 f"{[hex(r) for r in _rids]} (bound {_base}+"
+                                 f"{len(_rids)})")
                 for _fld in ("00ff8782", "00ff8b82"):
                     _i = 0
                     while True:

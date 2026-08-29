@@ -44,7 +44,7 @@ WORK="$(mktemp -d)"; trap 'rm -rf "$WORK"' EXIT
    # (19 members, no vsw.z01/z02) — the script could not run at all.
    # Its frozen inventory may still describe the OLD build: run it
    # before trusting a green, and re-measure rather than absorb.
-BUILD="${1:-build/pyron34}"  # re-pointed 14z-117 (pyron-medallion freeze) <- 14z-115
+BUILD="${1:-build/pyron35}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 fail=0
 

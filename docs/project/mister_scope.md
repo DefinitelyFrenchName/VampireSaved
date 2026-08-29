@@ -29,8 +29,8 @@ here is summarised from session memory, and where a source is stale the
 staleness is listed in §6 rather than silently corrected.
 
 **Ground truth at the time of writing** (git, not prose; **MOVED ON at
-14z-117**: pin `80e08111` = 26 commits / 26 patches, romset merged-m12
-`build/m3b_merged19` M10 `cde712e1` (14z-115: `202fc3e6` / 25, merged-m11) — read `tools/setup_jtcores.sh` and the
+14z-117b**: pin `f997cfe1` = 27 commits / 27 patches, romset merged-m13
+`build/m3b_merged20` M11 `a1b7cb82` (14z-117: `80e08111` / 26, merged-m12; 14z-115: `202fc3e6` / 25, merged-m11) — read `tools/setup_jtcores.sh` and the
 registry, not this paragraph): fork pin
 `63496069` = `v1.7.3-24-g634960697` (24 fork commits, 24 patches in
 `emu/jtcores-patches/`); romset merged-m9 (M8 mark, program fingerprint

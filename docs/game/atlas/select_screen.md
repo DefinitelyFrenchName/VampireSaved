@@ -432,12 +432,39 @@ shuffled order — a CYCLE, not a fresh roll; only its starting point is
 random. Both bounds are hard: the table is 15 entries and the wrap compare
 is `#$f`.
 
-**CONSEQUENCE FOR THIS PORT: random select can never pick a tenant.** The
-table holds no variant-half id and the cursor cannot exceed 14, so
-`0x10`/`0x11`/`0x13` are unreachable through the "?" cell. Measured on the
-pristine dumps; `build/m3b_merged18` emits NO op anywhere in
-`PRG:0x020900-0x020E00` except the Oboro hook at `0x020B9C`, so the draw is
-vanilla on every shipping build.
+**CONSEQUENCE FOR THIS PORT — RESOLVED 14z-117: the WIDE builds now list
+their tenants in the draw** (`random_select_bound` + `random_select_roster`
+site_thunks, all three manifests, since donovan-m17 / huitzil-m24 /
+pyron-m18 / merged-m13; gate `tests/test_random_select_tenants.sh`). *(This
+paragraph said "random select can never pick a tenant" from 14z-116 to
+14z-117; on the STOCK twin and on every build before merged-m13 that is
+still the measured fact.)* Vanilla's table holds no variant-half id and the
+cursor cannot exceed 14, so on those builds `0x10`/`0x11`/`0x13` are
+unreachable through the "?" cell; `build/m3b_merged18` emitted NO op in
+`PRG:0x020900-0x020E00` except the Oboro hook at `0x020B9C`.
+
+**THE WALKER HAS TWO PATHS AND BOTH READ THE TABLE (measured 14z-117, the
+trap the first attempt paid for).** The 3-frame timer at `020C66` branches
+`bpl 020C7C` on the two NON-tick frames of every step, and `020C7C-020C86`
+(`move.b d0,$40(a6); move.b $20C88(pc,d0.w),$382(a6); rts`) re-reads the
+table with the UNCHANGED cursor every frame — the id is rewritten into
+`$382` 60 times a second, not once per step. A thunk that widened only the
+bound at `020C74` let the non-tick frames read vanilla's table at cursor
+15/16/17: the pad byte (`0x00`), then CODE bytes (`0x4A`, `0x2D`) as ids,
+and the figure refresh at `0x05FFF6` (which re-spawns the figure whenever
+`$382` != its cached `$a(a6)`) indexed the 32-row accent pointer table
+`0x38C198` with `0x4A` and took an address error in the copy helper
+`0x1C3A4`. The port therefore displaces BOTH the bound (site A, `020C74`,
+re-entering `020C7C` by jmp) and the read (site B, `020C80`, whose body
+holds the read, the routine's own `rts` and the 18-entry table, outside
+the crypt range because the table is read as data). Cadence measured on
+merged: exactly 3 frames per id, table order, ids `… 09 06 10 11 13 04 …`.
+**Confirm semantics are vanilla's: whatever is showing when you confirm is
+what you get** — measured on merged19 (`0x04` showing -> P1 `0x04`) and on
+the thunked build (`0x10` showing -> P1 `0x10`, record base Phobos' own).
+The replay harness stages inputs ONE FRAME AHEAD, so a press written on the
+first frame of a 3-frame plateau registers on the previous id — press on
+the middle frame.
 
 **THE SIBLINGS SHOW THIS IS ROSTER CONTENT, NOT A LIMIT.** Both keep 15
 entries and the same `#$f` bound and simply list their own rosters —

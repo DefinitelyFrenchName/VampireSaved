@@ -7,6 +7,9 @@
 # shifted every ext region behind the AI-script roots (+0x10D0 H / +0x1ED0 P)
 # and this file was NOT re-derived then — audit_roster_pairings was red on
 # merged-m9/m10 unnoticed (not in the static tier); 14z-115 adds +0x20.
+# RE-DERIVED 14z-117b from build/m3b_merged20 (merged-m13, the random-select
+# freeze): two hole-b thunk bodies are allocated ahead of the ext placements
+# on the H/P iterations — MOVED: phobos 0x0045a6b0 -> 0x45a770, pyron 0x004ae85c -> 0x4ae88c.
 # RE-DERIVED 14z-117 from build/m3b_merged19 (merged-m12, the Pyron-medallion
 # freeze): no placement moved (ten in-place thunk bytes + one glyph entry),
 # measured by this re-derivation.
@@ -47,6 +50,6 @@
 0x0E	lilith	0x000ae9d4
 0x0F	jedah	0x000b0d2e
 0x18	oboro	0x000b3450
-0x10	phobos	0x0045a6b0
-0x11	pyron	0x004ae85c
+0x10	phobos	0x0045a770
+0x11	pyron	0x004ae88c
 0x13	donovan	0x003fa9d0

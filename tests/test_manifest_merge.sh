@@ -72,7 +72,10 @@ FROZEN = [
     # RE-FROZEN 14z-105 (was (19,14,6),30,5): +1 per manifest = the
     # oboro_select_hook, declared identically by all three -> merged +1,
     # shared +1 (it dedupes to ONE engine-site thunk; 806 ops measured).
-    ("site_thunk",       (20, 15, 7), 31, 6),
+    # 14z-117b: +2 per file (random_select_bound + random_select_roster,
+    # declared identically by all three tenants), merged +2, shared +2 —
+    # both dedupe to ONE engine-site thunk each (823 ops measured).
+    ("site_thunk",       (22, 17, 9), 33, 8),
     # RE-FROZEN 14z-99 (was (0,5,2),5,2): the WINDOW landed donovan's two
     # #103 rows. MEASURED merged=5 shared=2: his x05c800 row dedupes into
     # the existing H<->P shared-source pair (one merged row, shared count

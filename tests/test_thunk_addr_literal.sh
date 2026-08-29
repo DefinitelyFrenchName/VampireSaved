@@ -82,7 +82,7 @@ echo "== section 0: the guard is QUIET on all three real manifests =="
 # x0926e4 to extraction, and an extract that predates a manifest's regions
 # fails generation outright (the battery caught it — the #94 rot class).
 # RE-POINT the huitzil leg whenever the census gains a root.
-for t in donovan:build/m5_wide huitzil:build/hui50 pyron:build/pyron21; do  # re-pointed 14z-117 (pyron-medallion freeze) <- 14z-115
+for t in donovan:build/m5_wide huitzil:build/hui51 pyron:build/pyron21; do  # re-pointed 14z-117b (random-select freeze) <- 14z-117
     nm=${t%%:*}; bd=${t##*:}
     if [ ! -d "$bd/extract" ]; then
         echo "  SKIP: $nm (no $bd/extract)"; continue

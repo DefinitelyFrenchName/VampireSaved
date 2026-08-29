@@ -1,0 +1,55 @@
+  tenant huitzil id 0x10 -> gfx bank 4 (bank word 0x1000)
+  layout row huitzil: band 0x0af6-0x4efc delta +0x0 src bank 3
+  profile fields agree with the builder (bank4 0x1000, bank5 0x3000, collision same-source-or-fail)
+inventory: 15603 tiles, all placed at native codes (delta-0 tenant)
+  scatter bounds hold: 270 code(s) in 0x0000-0x0af5, the rest inside the band
+  read vs2.14m sha1 e582b20a948ae54f52590496051688dbfae2bc9c
+  read vs2.16m sha1 a924d53ab39f4d85173bdb92a197dde2db0dc3f7
+  read vs2.18m sha1 8d0cd1c387b4b6ac7f92bb2e5a25983856328cdc
+  read vs2.20m sha1 99bc27557741527ca678d7b6307164bc04ebedc6
+  chain build/m3b_merged20/gfx_donovan/gfx_written.json sha1 52d14432d659d5a074d646bd64586324e702a7e8
+  chain vsw.31m sha1 ee17ad93084365d6141fc3d9e356147bcf6a5413
+  chain vsw.33m sha1 095894363924e23a7995355ca40aeb889f17bc2b
+  chain vsw.35m sha1 5aaceb2fee820c2975dc0ef513c6dcc5f9d9e99f
+  chain vsw.37m sha1 7fbb48d9141af63777095be63427daa6433aed1d
+  read vs2.13m sha1 528ce7fc9a0451e2e2d221dbf5e4a5796584e053
+  read vs2.15m sha1 e873ad3e0fc8a06a5029113faf991f5c1b765316
+  read vs2.17m sha1 da94f1529da82a6bf2129f51548412e1ab2b001a
+  read vs2.19m sha1 0ff528e12e255ebf699101ac71f05b1f6bef7165
+strip tiles: 288 vs2 bank-1 tiles copied to group C bank 4 at +0x3800 (0x86A0-0x87BF)
+  read vs2.13m sha1 528ce7fc9a0451e2e2d221dbf5e4a5796584e053
+  read vs2.15m sha1 e873ad3e0fc8a06a5029113faf991f5c1b765316
+  read vs2.17m sha1 da94f1529da82a6bf2129f51548412e1ab2b001a
+  read vs2.19m sha1 0ff528e12e255ebf699101ac71f05b1f6bef7165
+effect-c5: 5714 native bank-1 tiles copied to group C upper bank
+select bank-5: 236 native tiles copied to group C upper bank
+  read vs2.13m sha1 528ce7fc9a0451e2e2d221dbf5e4a5796584e053
+  read vs2.15m sha1 e873ad3e0fc8a06a5029113faf991f5c1b765316
+  read vs2.17m sha1 da94f1529da82a6bf2129f51548412e1ab2b001a
+  read vs2.19m sha1 0ff528e12e255ebf699101ac71f05b1f6bef7165
+verified: 15603 tiles placed at codes 0x0057-0x4EFC (bank 4); all other tiles byte-identical
+  wrote vsw.31m sha1 08519434d8eaa0d16e837d0099ef72b2362a836b
+  wrote vsw.33m sha1 b17d946a6ad6a630466656919c7e3da62b8c3e90
+  wrote vsw.35m sha1 309245d2ee837f0b0432aac48700043ea1de67fc
+  wrote vsw.37m sha1 26830494eca410dfe98079355ab7546b57be6f90
+group C mode: vsav group B NOT written — the host band stays pristine
+  chain: prior link's group-A members carried forward
+  read vs2.13m sha1 528ce7fc9a0451e2e2d221dbf5e4a5796584e053
+  read vs2.15m sha1 e873ad3e0fc8a06a5029113faf991f5c1b765316
+  read vs2.17m sha1 da94f1529da82a6bf2129f51548412e1ab2b001a
+  read vs2.19m sha1 0ff528e12e255ebf699101ac71f05b1f6bef7165
+effect-tail: 2 host-slot place(s) SKIPPED (variant-id tenant)
+effect-tail: 1 variant-slot place(s) added (free-pool anchors)
+effect-tail: 2 place_variant_slot_huitzil place(s) added
+effect-tail: 276 bank-1 tiles placed
+  read vs2.13m sha1 528ce7fc9a0451e2e2d221dbf5e4a5796584e053
+  read vs2.15m sha1 e873ad3e0fc8a06a5029113faf991f5c1b765316
+  read vs2.17m sha1 da94f1529da82a6bf2129f51548412e1ab2b001a
+  read vs2.19m sha1 0ff528e12e255ebf699101ac71f05b1f6bef7165
+select: 0 bank-1 tiles placed
+  wrote vm3.13m sha1 aee4fd1761caab000153629726dfb584bb79ba0d
+  wrote vm3.15m sha1 85a9b203bddc4b0831c77a2b3393e0b7b7272ac1
+  wrote vm3.17m sha1 275f8edfe757bbe0eaaccdfda6623fc6f74f21ca
+  wrote vm3.19m sha1 1be1fa0b2f4c6d4a8ea03d8e24a13258152489ad
+wrote gfx_written.json (37916 group-C + 276 group-A entries)
+wrote remap_spec.json: {'delta': 0, 'band_lo': 2806, 'band_hi': 20220, 'dst_bank_word': 4096, 'src_bank_word': 24576, 'placed': [87, 20220]}

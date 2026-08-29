@@ -657,3 +657,21 @@ writes even venues, so this is a RIG hazard, not a game defect — but any
 tool that steers the ladder must keep the byte EVEN, and a wanted
 opponent that sits only at odd offsets of a row (e.g. Pyron on Donovan's
 row) is simply NOT steerable this way.
+
+## THE "?" WALKER WRITES THE DRAWN ID EVERY FRAME, FROM TWO PATHS (paid: 14z-117, one crashing probe)
+
+`PRG:0x020C58-0x020C86` looks like "advance a cursor every 3rd frame and
+read the table". It is not: the non-tick branch (`bpl 020C7C`) falls into
+the SAME `move.b $20C88(pc,d0.w),$382(a6)` with the unchanged cursor, so the
+table is read and `$382` rewritten on every frame, and the figure refresh at
+`0x05FFF6` re-spawns whenever `$382` != its cached `$a(a6)`. A thunk that
+widened the wrap bound at `020C74` alone gave the non-tick frames a cursor
+of 15-17 against vanilla's 15-entry table: pad byte, then CODE bytes, as
+character ids — an address error in the copy helper `0x1C3A4` two frames
+after the first tenant showed. Measured by DUMPS on consecutive frames
+(`06 → 10 → 00 → 11 → 4A…`), not by reading the code, which is why it was
+missed.
+
+**Rule:** when you widen a table's bound, grep for EVERY reader of the table
+(here two: both `move.b tbl(pc,d0.w)` sites share one cursor), and sample
+the consumer on CONSECUTIVE frames before trusting a 3-frame cadence.

@@ -819,7 +819,7 @@ march_retarget_mid = true
 # same-source-or-fail names any future collision). Screen position =
 # the empty bottom-right corner (measured on merged-m5 snapshots, 14z-105).
 # THE TEXT NAMES THE FREEZE GENERATION — change it at every freeze.
-version_text = "M10"
+version_text = "M11"
 version_font = "build/manifest/version_font.json"
 version_x = 324
 version_y = 202
@@ -1617,3 +1617,63 @@ site = 0x020B9C
 old_hex = "0c2e00020382"
 thunk_hex = "0c2e00080382660e082e0007039467061d7c001803820c2e000203824e75"
 id_literal_ok = "0x08,0x02"
+
+# ── 14z-117: RANDOM SELECT INCLUDES THE TENANTS ───────────────────────────
+# The "?" cell (0x0B) does not commit 0x0B: while hovered, a 3-frame timer
+# walks a cursor ($40(a6)) through a FIXED table and writes the id it lands
+# on into $382(a6) EVERY FRAME (select_screen.md "THE RANDOM CELL"):
+#   020C66  subq.b #1,$41(a6) / bpl 020C7C     ; non-tick frames: re-read
+#   020C72  addq.b #1,d0                       ; tick: advance,
+#   020C74  cmpi.b #$f,d0 / bcs 020C7C         ;   wrap at 15
+#   020C7A  moveq  #0,d0
+#   020C7C  move.b d0,$40(a6)
+#   020C80  move.b $20C88(pc,d0.w),$382(a6)    ; THE TABLE READ (both paths)
+#   020C86  rts
+# vsavj's table is 15 entries (the base-half roster minus 0x0B); both bounds
+# are hard, so a tenant could never come up. The siblings are the precedent
+# (vs2 PRG:0x01F8B4 lists 10/11/13). The table cannot grow in place (15
+# bytes + 1 pad, then code) and is read PC-relative, so TWO sites carry the
+# change, ONE table: the bound (site A) and the read (site B). MEASURED
+# 14z-117 on the first attempt, which displaced only the bound: the
+# non-tick frames re-read vanilla's table with cursor 15/16 — the pad byte
+# (id 0x00) and then a CODE byte (0x4A) — and the figure refresh took an
+# address error on the id no table has. Both paths must read one table.
+#   A (0x020C74, jmp_ok — re-enters the original by jmp):
+#     0c00 00NN  cmpi.b #NN,d0   NN = 15 + tenants on this build
+#     6502       bcs.s  .ok
+#     7000       moveq  #0,d0
+#     4ef9 00020c7c   .ok: jmp 0x020C7C
+#   B (0x020C80, rts_ok — the original's next instruction IS the rts):
+#     1d7b 0006 0382  move.b tbl(pc,d0.w),$382(a6)   ; tbl = body+8
+#     4e75            rts
+#     tbl: 04 07 02 0c 05 0f 0a 00 0e 03 08 01 0d 09 06 <this build's tenants>
+# roster_subst fills the tail and the bound per build (solo: one id; merged:
+# 10 11 13) — a literal list would be wrong on two of the three builds.
+# hole b: body B is READ AS DATA (the table), so it sits outside the crypt
+# range. profile-gated: roster UX, WIDE-only by construction (stock twin
+# bit-identical, measured). Declared identically by every tenant:
+# ENGINE-SITE, emitted once. Cost: cycles only while "?" is hovered — nine
+# legacy select replays measured BIT-IDENTICAL (none hovers "?").
+[[site_thunk]]
+stage = 6
+profile = "cps2-wide-v1"
+name = "random_select_bound"
+site = 0x020C74
+old_hex = "0c00000f6502"
+patch = "jmp"
+jmp_ok = true
+hole = "b"
+thunk_hex = "0c0000nn650270004ef900020c7c"
+roster_subst = ":nn:15"
+
+[[site_thunk]]
+stage = 6
+profile = "cps2-wide-v1"
+name = "random_select_roster"
+site = 0x020C80
+old_hex = "1d7b00060382"
+patch = "jmp"
+rts_ok = true
+hole = "b"
+thunk_hex = "1d7b000603824e750407020c050f0a000e0308010d0906rr"
+roster_subst = "rr::15"

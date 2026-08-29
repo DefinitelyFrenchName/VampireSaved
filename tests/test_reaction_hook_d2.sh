@@ -37,7 +37,7 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
-BUILD="${1:-build/don_m16}"  # re-pointed 14z-117 (pyron-medallion freeze) <- 14z-115
+BUILD="${1:-build/don_m17}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117
 [ -f "$BUILD/verify_op.bin" ] || { echo "SKIP: no verify_op.bin in $BUILD"; exit 0; }
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in ROMDIR"; exit 0; }
 [ -f "$ROMDIR/vsavj.zip" ] || { echo "SKIP: no vsavj.zip in ROMDIR"; exit 0; }

@@ -113,3 +113,6 @@ c403a283f5f3d14aee7165f8b153a015fccd718f	pyron-m15	14z-111 THE #99 ROOT-CAUSE FI
 7950c84485eaf7a2bef8d3aedbef85fa97444d8b	donovan-m16	14z-117 THE PYRON-MEDALLION FREEZE: select_sword_pal_variant_id thunk no longer writes row 0x1A on a P2 tenant hover (ten in-place bytes, body length unchanged 126); M10 mark (3 glyphs, version_x 340->324). Carried from donovan-m15; stock twin UNCHANGED (only_variant_slot, measured by rebuild).
 7ade31802a54f4d171ab7b6b59fdc9a63a5a98e6	huitzil-m23	14z-117 THE PYRON-MEDALLION FREEZE: same thunk fix + M10 mark. Carried from huitzil-m22.
 01b39c393b3cd0651005572515d951b79a75e3cb	pyron-m17	14z-117 THE PYRON-MEDALLION FREEZE: same thunk fix + M10 mark. Carried from pyron-m16.
+90a225cefbebb1b229db19d4d5d06bf9fe744cad	donovan-m17	14z-117 THE RANDOM-SELECT FREEZE (maintainer-directed 2026-08-29): the "?" draw lists this build's tenants (random_select_bound + random_select_roster site_thunks, two sites one table); M11 mark. Carried from donovan-m16; stock twin UNCHANGED (profile-gated, measured by rebuild).
+ae953657de8e8e83c71ed72e0bc85259543512d1	huitzil-m24	14z-117 THE RANDOM-SELECT FREEZE: same two thunks + M11 mark. Carried from huitzil-m23.
+1222df183e3d085c55850e4ec500cca01fd1e473	pyron-m18	14z-117 THE RANDOM-SELECT FREEZE: same two thunks + M11 mark. Carried from pyron-m17.

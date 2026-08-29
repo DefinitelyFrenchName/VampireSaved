@@ -38,7 +38,7 @@ cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged19}"  # re-pointed 14z-117 (pyron-medallion freeze) <- 14z-115
+BUILD="${BUILD:-build/m3b_merged20}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 FIELDS="ff8450:w:p1hp,ff8850:w:p2hp,ff8120:b:winner,ff810e:b:rounds,ff8509:b:stk,ff8406:b:p1seq"

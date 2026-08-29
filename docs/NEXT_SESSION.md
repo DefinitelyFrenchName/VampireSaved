@@ -1,4 +1,47 @@
-# NEXT SESSION — orientation (rewritten at the 14z-117 close, 2026-08-29)
+# NEXT SESSION — orientation (rewritten at the 14z-117 close, 2026-08-29 — TWO freezes in one session)
+
+> ## **START HERE. NOTHING IS RED. TWO FREEZES SHIPPED TODAY — merged-m12
+> ## (M10, the Pyron-medallion fix) and then merged-m13 (M11, RANDOM SELECT
+> ## INCLUDES THE TENANTS) — and the next event is the BOARD VERDICT on
+> ## `../mister_fieldtest_14z117b/` (the tell is "M11"; park on "?" and
+> ## the draw cycles all 18).**
+> ##
+> ## **WHAT 14z-117 DID, one breath:** the freeze battery for the medallion
+> ## fix (cheap as predicted: three ops changed content, no address moved),
+> ## pushed at the maintainer's word; then, at their word, the random-select
+> ## item: TWO profile-gated site_thunks at `0x020C74` (the bound) and
+> ## `0x020C80` (the table read + rts + an 18-entry table), one table filled
+> ## per build by the new generator feature `roster_subst`. **The trap paid
+> ## for:** the walker re-reads the table on its NON-tick frames — a
+> ## bound-only thunk crashed the figure refresh with a code byte as id
+> ## (`game/gotchas.md`, `select_screen.md` "THE WALKER HAS TWO PATHS").
+> ## Confirm semantics are vanilla's (what shows is what you get), the
+> ## harness stages inputs one frame ahead, nine legacy select replays are
+> ## bit-identical (none hovers "?"), stock twin unchanged both times.
+> ## The Shadow rig (`113`) was RE-TIMED (confirm 1450 -> 1521-1522) because
+> ## the wider draw made it a mirror match on the solos.
+> ##
+> ## **CURRENT:** donovan-m17 `90a225ce` / huitzil-m24 `ae953657` /
+> ## pyron-m18 `1222df18` / merged-m13 `a1b7cb82` (`build/m3b_merged20`,
+> ## 823 ops), stock twin `m5_stock12` = `d29fd062`. Fork `f997cfe1` (27
+> ## commits / patch 0027), `release/merged-m13/`, bundle 14z117b (`.rbf`
+> ## unchanged). Gates: `test_random_select_tenants.sh` (emulator tier,
+> ## CONTROL = the previous merged; when `m3b_merged19` rolls off, re-point
+> ## or accept its SKIP). Full numbers: STATE 14z-117 (2) and its CLOSE.
+> ## **Push status: check `git status -sb`, not this line.**
+> ##
+> ## **OPEN, unchanged:** the maintainer's 1:1 wheel mockup; #112/#113
+> ## parked; the FBNeo two-run-family question; the tenant CPU AI
+> ## "lackluster" note; the win quotes (forgone, clean-way-only).
+> ##
+> ## **STATE OF THE BUILDS:** play `tools/run_wide.sh build/m3b_merged20
+> ## fbneo`. Current + one back: `don_m16/m17`, `hui50/51`, `pyron34/35`,
+> ## `m3b_merged19/20`, `m5_stock11/12`.
+
+# HISTORY BELOW — the 14z-117 (first close), 14z-116, 14z-114, mid-14z-114 and 14z-113 orientations and older;
+# kept for the census anchors, eliminations and traps, superseded as the opener.
+
+## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-117 FIRST close, 2026-08-29 — superseded by the second close above)
 
 > ## **START HERE. NOTHING IS RED. THE PYRON-MEDALLION FREEZE IS DONE —
 > ## merged-m12 (M10) is frozen, tagged, released and bundled; the next
@@ -42,8 +85,6 @@
 > ## fbneo`. Current + one back: `don_m15/m16`, `hui49/50`, `pyron33/34`,
 > ## `m3b_merged18/19`, `m5_stock10/11`.
 
-# HISTORY BELOW — the 14z-116, 14z-114, mid-14z-114 and 14z-113 orientations and older;
-# kept for the census anchors, eliminations and traps, superseded as the opener.
 
 ## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-116 close, 2026-08-29 — superseded by the 14z-117 opener above)
 

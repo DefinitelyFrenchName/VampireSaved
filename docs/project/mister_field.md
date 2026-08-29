@@ -63,7 +63,9 @@ against `build/m3b_merged18` this way at 14z-116; `../mister_fieldtest_14z117/`
 (merged-m12, M10) was assembled at 14z-117 from `tools/mister_mra.sh --wide
 build/m3b_merged19` output and verified against `build/m3b_merged19`
 (vsavjw.zip sha1 `6f566053…`; its STOCK CONTROL MRA is byte-identical to
-14z-115's, the `.rbf` unchanged). **Its README was missing**
+14z-115's, the `.rbf` unchanged); `../mister_fieldtest_14z117b/` (merged-m13,
+M11, random select includes the tenants) likewise at 14z-117b, verified
+against `build/m3b_merged20` (vsavjw.zip sha1 `f0f9cd1b…`). **Its README was missing**
 — every earlier bundle had one — and was written at 14z-116; if a bundle is
 assembled by hand again, the README is part of it.
 

@@ -88,7 +88,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 fail=0; ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }
 
 RPL="$REPO/tests/replays/11_pick_donovan.rpl"
-BUILD="build/m3b_merged19"  # re-pointed 14z-117 (pyron-medallion freeze) <- 14z-115
+BUILD="build/m3b_merged20"  # re-pointed 14z-117b (random-select freeze) <- 14z-117
 FRAMES=4000
 OUTDIR=""; POSLOG=""; NEGLOG=""
 while [ $# -gt 0 ]; do

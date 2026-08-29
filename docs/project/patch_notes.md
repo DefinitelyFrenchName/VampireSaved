@@ -1,5 +1,52 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-117 (2) — RANDOM SELECT INCLUDES THE TENANTS (maintainer-directed, freeze donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13, mark M11): byte detail
+
+**What.** The "?" cell's draw now cycles the 15 vanilla ids PLUS this
+build's tenants (`10 11 13` on the merged image), vs2-style. Two
+profile-gated `site_thunk`s, declared identically by all three tenants
+(ENGINE-SITE, emitted once), plus the mark bump M10 -> M11 (no other byte).
+
+**Site A — the bound, `PRG:0x020C74`** (`old_hex 0c00000f 6502` = `cmpi.b
+#$f,d0 / bcs.s 020C7C`) -> `jmp <A>`; body A (hole b, 14 bytes, `jmp_ok`):
+```
+  0c00 00NN   cmpi.b #NN,d0        ; NN = 15 + tenant count (roster_subst ":nn:15")
+  6502        bcs.s  .ok
+  7000        moveq  #0,d0
+  4ef9 00020c7c   .ok: jmp 0x020C7C  ; re-enter the original: cursor store + read
+```
+**Site B — the read, `PRG:0x020C80`** (`old_hex 1d7b 0006 0382` = `move.b
+$20C88(pc,d0.w),$382(a6)`) -> `jmp <B>`; body B (hole b, 8 + 15 + N bytes,
+`rts_ok` — the original's next instruction IS the routine's `rts`):
+```
+  1d7b 0006 0382  move.b tbl(pc,d0.w),$382(a6)   ; tbl = body+8
+  4e75            rts
+  tbl: 04 07 02 0c 05 0f 0a 00 0e 03 08 01 0d 09 06  <tenant ids, ascending>
+```
+`roster_subst = "rr::15"` fills the tail from the build's own tenant list
+(solo: one id, bound 16; merged: three, bound 18) — a literal list would be
+wrong on two of the three builds. Hole b because body B is read as DATA.
+Merged placements: A `0x3FFD00`, B `0x3FFD10`; the WIDE solo puts them at
+`0x3FFFF0` / `0x41A370`.
+
+**Why two sites (measured, not designed).** The first attempt displaced the
+bound only and finished the routine from its own body. It crashed the merged
+build two frames after the first tenant showed: the walker's NON-tick
+frames branch to `020C7C` and re-read VANILLA's table with the widened
+cursor (`select_screen.md` "THE WALKER HAS TWO PATHS", `game/gotchas.md`).
+Both readers now share one table.
+
+**Measured.** Draw cadence exactly 3 frames per id, table order (`… 06 10 11
+13 04 …`). Confirm semantics vanilla's: what is showing is what you get —
+`0x04` -> P1 `0x04` on merged19, `0x10` -> P1 `0x10` with Phobos' own record
+base on the thunked build. Nine legacy select replays (04/63/03/09/11/38/05/
+08/36) BIT-IDENTICAL between don_m16 and the probe — no legacy replay hovers
+"?", and the sites cost nothing off that path. Stock twin: whole-artifact
+manifest identical (`af4f5e98… 30`, `d29fd062`). Ops +4 per build (two
+bodies + two sites): 336 / 370 / 307, merged 823 (`test_tenant_loop`
+re-frozen). Gate: `tests/test_random_select_tenants.sh` (static shape, the
+sampled draw, the confirm, a must-fire control on the previous merged).
+
 ## 14z-117 — THE PYRON-MEDALLION FREEZE (donovan-m16 / huitzil-m23 / pyron-m17 / merged-m12, mark M10): byte detail
 
 **What.** The 14z-116 medallion fix (below — ten in-place bytes in

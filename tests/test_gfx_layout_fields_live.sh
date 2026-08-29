@@ -119,7 +119,7 @@ sys.path.insert(0, "tools")
 from _minitoml import loads
 man = loads(open("build/manifest/gfx_layout3.toml").read())
 rows = {r["name"]: r for r in man["tenant"]}
-BUILDS = {"huitzil": "build/hui50", "pyron": "build/pyron34"}  # re-pointed 14z-117 (pyron-medallion freeze) <- 14z-115
+BUILDS = {"huitzil": "build/hui51", "pyron": "build/pyron35"}  # re-pointed 14z-117b (random-select freeze) <- 14z-117
 checked = 0
 bad = 0
 for name, b in BUILDS.items():
