@@ -356,6 +356,14 @@ DONOVAN = {
         ("Killshread (ES) plant (2)", qcb("KK"), 260, "far"),
         ("Killshread Summon [214HK] after ES", qcb("HK"), 320, "far"),
     ],
+    "13": [  # THE UNENTERED a2 IDS (14z-121 (4)): point-blank normals (the odd standing ids?), 6+button and 3+button normals
+        ("5LP point-blank", stand("LP"), 200, "near"), ("5MP point-blank", stand("MP"), 200, "near"), ("5HP point-blank", stand("HP"), 240, "near"),
+        ("5LK point-blank", stand("LK"), 200, "near"), ("5MK point-blank", stand("MK"), 200, "near"), ("5HK point-blank", stand("HK"), 240, "near"),
+        ("6LP", [(0, 3, "R1")], 200, "far"), ("6MP", [(0, 3, "R2")], 200, "far"), ("6HP", [(0, 3, "R3")], 240, "far"),
+        ("6LK", [(0, 3, "R4")], 200, "far"), ("6MK", [(0, 3, "R5")], 200, "far"),
+        ("3LK", [(0, 3, "DR4")], 200, "far"), ("3MK", [(0, 3, "DR5")], 200, "far"), ("3HK", [(0, 3, "DR6")], 240, "far"),
+        ("3LP", [(0, 3, "DR1")], 200, "far"), ("3HP", [(0, 3, "DR3")], 240, "far"), ("1HK", [(0, 3, "DL6")], 240, "far"),
+    ],
 }
 NORMALS = [(n, f, g) for n, f, g in (
     ("5LP", stand("LP"), 120), ("5MP", stand("MP"), 120), ("5HP", stand("HP"), 150),
@@ -520,6 +528,11 @@ HUITZIL = {
         ("Circuit Scrapper [63214MP] no-pin walk", [(0, 60, "R"), (90, 92, "R"), (92, 94, "DR"), (94, 96, "D"), (96, 98, "DL"), (98, 104, "L"), (100, 104, "2")], 300, "far"),
         ("Reflect Wall [gc MP] (meter)", gc_v("MP", 11, 12), 240, "near"),
         ("Reflect Wall [gc HP] (meter)", gc_v("HP", 11, 12), 240, "near"),
+    ],
+    "9": [  # PLASMA TRAP's chain by JUMP PHASE (14z-121 (4)): j.214K right after take-off vs at the apex, all three kicks
+        ("Plasma Trap [j.214LK] early", air_qcb("LK"), 260, "far"), ("Plasma Trap [j.214LK] late", air_qcb_late("LK"), 260, "far"),
+        ("Plasma Trap [j.214MK] early", air_qcb("MK"), 260, "far"), ("Plasma Trap [j.214MK] late", air_qcb_late("MK"), 260, "far"),
+        ("Plasma Trap [j.214HK] early", air_qcb("HK"), 260, "far"), ("Plasma Trap [j.214HK] late", air_qcb_late("HK"), 260, "far"),
     ],
 }
 DONOVAN_VICTIM = {   # P1 = Victor attacks P2 = Donovan; every contact class the naming rigs reached, plus the knockdowns

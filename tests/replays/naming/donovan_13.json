@@ -1,0 +1,158 @@
+{
+ "tenant": "donovan",
+ "part": "13",
+ "events": [
+  {
+   "name": "5LP point-blank",
+   "frame": 2600,
+   "gap": 420,
+   "movement": false
+  },
+  {
+   "name": "5MP point-blank",
+   "frame": 3020,
+   "gap": 420,
+   "movement": false
+  },
+  {
+   "name": "5HP point-blank",
+   "frame": 3440,
+   "gap": 420,
+   "movement": false
+  },
+  {
+   "name": "5LK point-blank",
+   "frame": 3860,
+   "gap": 420,
+   "movement": false
+  },
+  {
+   "name": "5MK point-blank",
+   "frame": 4280,
+   "gap": 420,
+   "movement": false
+  },
+  {
+   "name": "5HK point-blank",
+   "frame": 4700,
+   "gap": 420,
+   "movement": false
+  },
+  {
+   "name": "6LP",
+   "frame": 5120,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "6MP",
+   "frame": 5320,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "6HP",
+   "frame": 5520,
+   "gap": 240,
+   "movement": false
+  },
+  {
+   "name": "6LK",
+   "frame": 5760,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "6MK",
+   "frame": 5960,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "3LK",
+   "frame": 6160,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "3MK",
+   "frame": 6360,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "3HK",
+   "frame": 6560,
+   "gap": 240,
+   "movement": false
+  },
+  {
+   "name": "3LP",
+   "frame": 6800,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "3HP",
+   "frame": 7000,
+   "gap": 240,
+   "movement": false
+  },
+  {
+   "name": "1HK",
+   "frame": 7240,
+   "gap": 240,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "2550:ff8850:01200120",
+  "2950:ff8850:01200120",
+  "3350:ff8850:01200120",
+  "3750:ff8850:01200120",
+  "4150:ff8850:01200120",
+  "4550:ff8850:01200120",
+  "4950:ff8850:01200120",
+  "5350:ff8850:01200120",
+  "5750:ff8850:01200120",
+  "6150:ff8850:01200120",
+  "6550:ff8850:01200120",
+  "6950:ff8850:01200120",
+  "7350:ff8850:01200120",
+  "2370:ff8410:0228",
+  "2370:ff8810:02d8",
+  "2790:ff8410:0228",
+  "2790:ff8810:02d8",
+  "3210:ff8410:0228",
+  "3210:ff8810:02d8",
+  "3630:ff8410:0228",
+  "3630:ff8810:02d8",
+  "4050:ff8410:0228",
+  "4050:ff8810:02d8",
+  "4470:ff8410:0228",
+  "4470:ff8810:02d8",
+  "5080:ff8410:0228",
+  "5080:ff8810:02d8",
+  "5280:ff8410:0228",
+  "5280:ff8810:02d8",
+  "5480:ff8410:0228",
+  "5480:ff8810:02d8",
+  "5720:ff8410:0228",
+  "5720:ff8810:02d8",
+  "5920:ff8410:0228",
+  "5920:ff8810:02d8",
+  "6120:ff8410:0228",
+  "6120:ff8810:02d8",
+  "6320:ff8410:0228",
+  "6320:ff8810:02d8",
+  "6520:ff8410:0228",
+  "6520:ff8810:02d8",
+  "6760:ff8410:0228",
+  "6760:ff8810:02d8",
+  "6960:ff8410:0228",
+  "6960:ff8810:02d8",
+  "7200:ff8410:0228",
+  "7200:ff8810:02d8"
+ ],
+ "frames": 7730
+}

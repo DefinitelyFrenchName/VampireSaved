@@ -177,3 +177,20 @@
 8	Sharirum Luna [4HP]	a2:0x04  FACING-LEFT
 8	Change Immortal + 8 held	a2:0x02  FACING-LEFT
 8	Change Immortal + 2 held	a2:0x02  FACING-LEFT
+13	5LP point-blank	a2:0x00
+13	5MP point-blank	a2:0x02
+13	5HP point-blank	a2:0x04
+13	5LK point-blank	a2:0x06
+13	5MK point-blank	a2:0x08
+13	5HK point-blank	a2:0x0a
+13	6LP	a2:0x00
+13	6MP	a2:0x02
+13	6HP	a2:0x04
+13	6LK	a2:0x06
+13	6MK	a2:0x08
+13	3LK	a2:0x0f
+13	3MK	a2:0x10
+13	3HK	a2:0x11
+13	3LP	a2:0x0c
+13	3HP	a2:0x0e
+13	1HK	a2:0x11

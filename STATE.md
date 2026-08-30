@@ -1,5 +1,20 @@
 # STATE — living progress log
 
+## Session 14z-121 (4) — **THE CHARACTER-DATA MAP'S RESIDUE: Plasma Trap's chain is the JUMP PHASE (rising `0x2a` /
+## apex `0x2b`, every strength — measured, part 9); Donovan's `0x3d` is `0x3c`'s loop body; the unentered a2 ids are
+## entered by NO normal/6+button/3+button input (part 13, the negative frozen); `+0x392` is not an engine meter; the second
+## step family reads as the throw mash-escape. Two naming parts added to the gate. No build changed. Not pushed.**
+
+| | |
+|---|---|
+| **Plasma Trap** | Huitzil part 9 (`tests/replays/naming/huitzil_9.*`): early (right after take-off) `a2:0x2a`, late (apex) `a2:0x2b` for LK, MK and HK alike — the chain is the jump phase; the strength only sets the mine's distance (`projectile_params`: xv 1/2/3). TOML row note resolved; six lines appended to `move_naming_huitzil.txt` |
+| **Donovan `0x3d`** | not an input: `a2:0x3c`'s last node LOOPS onto `0x3d`'s first node (`0x28521c`), so the transformation loop runs under `0x3c`'s label (deterministic labelling keeps continuity). TOML note resolved |
+| **the unentered a2 ids** | Donovan part 13 (`donovan_13.*`): point-blank 5LP..5HK, 6LP/6MP/6HP/6LK/6MK, 3LP/3HP/3LK/3MK/3HK, 1HK — every one enters the plain chain (`a2:0x00..0x0a`, `0x0c/0x0e/0x0f/0x10/0x11`); `0x18-0x1d`, `0x24` and the odd standing ids stay unreached by any input tried (17 lines appended to `move_naming_donovan.txt` as the frozen negative) |
+| **`+0x392`** | not an engine meter: its only writer in vs2's engine range is `0x4D0C0`, inside one character's code block (vs2 id 0x0C's), no engine reader — the ram.md "meter candidate" row retired; worklist row DONE |
+| **the second step family** | `0x27082` (three lists `0x2797A`: 91/115/157 px) runs while `+0x185` is set; `+0x185` is set on the OTHER fighter by `0x2681E` when the mash counter `+0x170` reaches 10 (with a facing flip) — the shape of a throw mash-escape; read, not measured. The block-contact tap saw only the walk movers (P2 holds R), so it stays unmeasured |
+| gates | `test_move_naming` donovan + huitzil (parts 13 / 9 added); `test_charmap_current` (worklist rows: meter DONE, the a2 entry rule's select/advance named); portable tier |
+| still open (small) | which code picks a mid-chain ENTRY index for a2; the throw-escape family's measurement; the `x2b7ef4` effect-tail residue (a build-attribution job) |
+
 ## Session 14z-121 (3) — **THE OPEN LIST WORKED DOWN: the pushback's real carrier is the record's `+0xC` (a PER-FRAME
 ## STEP TABLE, `0x2783C`, whose end releases the hold — 14z-120 (12)'s "pushbox separation, not a velocity" RETRACTED);
 ## Killshread (ES) MEASURED and gated (one wave after a plain plant, TWO after the ES); the `0x0BE23A` table = the minimum

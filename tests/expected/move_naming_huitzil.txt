@@ -92,7 +92,7 @@
 5	Reflect Wall [gc LK at hit+6]	a:0x13 b:0x0c
 5	Reflect Wall [gc HK at hit+6]	a:0x13 b:0x0c
 5	Reflect Wall [gc PP at hit+6]	a:0x13 b:0x0c
-5	Reflect Wall [gc LP at hit+6] (control: no block)	b:0x03 c:0x00
+5	Reflect Wall [gc LP at hit+6] (control: no block)	b:0x03 b:0x23
 6	Circuit Scrapper [MP] cont	a:0x28 a:0x29 a2:0x23
 6	Circuit Scrapper [HP] cont	a:0x28 a:0x29 a2:0x1e a2:0x2d a2:0x2e a2:0x30 a2:0x31
 6	Circuit Scrapper (ES) cont	a:0x28 a:0x29 a2:0x1e a2:0x2d a2:0x2f a2:0x30 a2:0x31
@@ -109,7 +109,7 @@
 6	Reflect Wall [gc v: L to hit+1, 623LP at hit+6]	a:0x13 b:0x0c
 6	Reflect Wall [gc v: L to hit+1, 623HP at hit+2]	a:0x13 b:0x0c a2:0x4c
 6	Reflect Wall [gc v: L to hit+1, 623LK at hit+2]	a:0x13 b:0x0c
-6	Reflect Wall [gc v: 623 buffered pre-hit, LP at hit+2]	a:0x13 b:0x03 c:0x00
+6	Reflect Wall [gc v: 623 buffered pre-hit, LP at hit+2]	a:0x13 b:0x03 b:0x23
 6	Reflect Wall [gc v: P2 HK, L to hit+1, 623LP at hit+4]	a:0x13 b:0x0c a2:0x4c
 6	Reflect Wall [gc v: P2 HK, 623LP at hit+10]	a:0x13 b:0x0c
 7	Reflect Wall [gc LP]	a:0x13 b:0x0c a2:0x4c
@@ -137,5 +137,11 @@
 8	Circuit Scrapper [63214 LP+HP] (ES, meter)	a:0x28 a:0x29 a2:0x1e a2:0x2d a2:0x2f a2:0x30 a2:0x31
 8	Circuit Scrapper [63214MP] step back	a:0x28 a:0x29 a2:0x1e a2:0x2d a2:0x2e a2:0x30 a2:0x31
 8	Circuit Scrapper [63214MP] no-pin walk	a:0x28 a:0x29 a2:0x23
-8	Reflect Wall [gc MP] (meter)	b:0x03 c:0x00  FACING-LEFT
+8	Reflect Wall [gc MP] (meter)	b:0x03 b:0x23  FACING-LEFT
 8	Reflect Wall [gc HP] (meter)	a:0x13 b:0x0c a2:0x4c
+9	Plasma Trap [j.214LK] early	a:0x12 a2:0x2a
+9	Plasma Trap [j.214LK] late	a:0x12 a2:0x2b
+9	Plasma Trap [j.214MK] early	a:0x12 a2:0x2a
+9	Plasma Trap [j.214MK] late	a:0x12 a2:0x2b
+9	Plasma Trap [j.214HK] early	a:0x12 a2:0x2a
+9	Plasma Trap [j.214HK] late	a:0x12 a2:0x2b

@@ -1,0 +1,65 @@
+{
+ "tenant": "huitzil",
+ "part": "9",
+ "events": [
+  {
+   "name": "Plasma Trap [j.214LK] early",
+   "frame": 2600,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "Plasma Trap [j.214LK] late",
+   "frame": 2860,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "Plasma Trap [j.214MK] early",
+   "frame": 3120,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "Plasma Trap [j.214MK] late",
+   "frame": 3380,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "Plasma Trap [j.214HK] early",
+   "frame": 3640,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "Plasma Trap [j.214HK] late",
+   "frame": 3900,
+   "gap": 260,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "1400:ff8782:10",
+  "1450:ff8782:10",
+  "1500:ff8782:10",
+  "2550:ff8850:01200120",
+  "2950:ff8850:01200120",
+  "3350:ff8850:01200120",
+  "3750:ff8850:01200120",
+  "4150:ff8850:01200120",
+  "2560:ff8410:0228",
+  "2560:ff8810:02d8",
+  "2820:ff8410:0228",
+  "2820:ff8810:02d8",
+  "3080:ff8410:0228",
+  "3080:ff8810:02d8",
+  "3340:ff8410:0228",
+  "3340:ff8810:02d8",
+  "3600:ff8410:0228",
+  "3600:ff8810:02d8",
+  "3860:ff8410:0228",
+  "3860:ff8810:02d8"
+ ],
+ "frames": 4410
+}

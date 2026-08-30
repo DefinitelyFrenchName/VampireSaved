@@ -182,7 +182,7 @@ seq = "0x25"
 name = "Plasma Trap"
 input = "j.214K"
 kind = "special"
-notes = "Air only; throws a shock mine on the ground; distance by K (three by button); ES = Plasma Trap (ES); MEASURED 14z-120: j.214LK -> a2:0x2a, j.214MK -> a2:0x2b, j.214HK -> a2:0x2a right after take-off and a2:0x2b at the apex — the chain follows the situation, not the strength alone"
+notes = "Air only; throws a shock mine on the ground; distance by K (three by button); ES = Plasma Trap (ES); MEASURED 14z-120: j.214LK -> a2:0x2a, j.214MK -> a2:0x2b, j.214HK -> a2:0x2a right after take-off and a2:0x2b at the apex — the chain follows the situation, not the strength alone. RESOLVED 14z-121 (4), part 9 (early vs late for LK/MK/HK): the chain is the JUMP PHASE — a2:0x2a when thrown right after take-off (rising), a2:0x2b at the apex — for every strength; the strength only picks the mine's distance (projectile +0x9A -> xv 1/2/3, tests/expected/projectile_params.txt)"
 table = "a2"
 seq = "0x2a,0x2b"
 

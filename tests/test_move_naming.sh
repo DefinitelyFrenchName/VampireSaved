@@ -93,6 +93,7 @@ for p in $PARTS; do [ -s "$W/trace_$p.txt" ] || bad "part $p: no field samples (
 echo "== 4. measured chains vs the frozen expectation"
 : > "$W/got.txt"
 for p in $PARTS; do python3 tools/name_moves.py expect "$W/r_$p.json" "$W/trace_$p.txt" "$W/chains" >> "$W/got.txt" || bad "expect part $p"; done
+if [ "${FREEZE:-0}" = 1 ]; then cp "$W/got.txt" "$EXP"; echo "  FROZE  $EXP from this run ($(wc -l < "$EXP" | tr -d ' ') lines) — FREEZE=1 (14z-121 (4): the labels are 'the first decoded chain containing the node'; the chain-decoder bound fix relabelled shared nodes c:0x00 -> b:0x23)"; fi
 if diff -u "$EXP" "$W/got.txt" > "$W/diff.txt"; then
     ok "$(wc -l < "$W/got.txt" | tr -d ' ') event lines identical to $EXP"
 else

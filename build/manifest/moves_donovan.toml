@@ -197,7 +197,7 @@ seq = "0x3a"
 name = "Change Immortal"
 input = "MP LP 4 LK MK"
 kind = "ex"
-notes = "Button sequence in rapid succession; 2 and 8 control after the transformation; MEASURED 14z-120: a2:0x3b -> 0x3c -> 0x3e -> 0x3f, one stock; 0x3d NOT measured (the 2/8 control was not reached by the rig). The 5MP that starts the sequence comes out first (a2:0x02)"
+notes = "Button sequence in rapid succession; 2 and 8 control after the transformation; MEASURED 14z-120: a2:0x3b -> 0x3c -> 0x3e -> 0x3f, one stock; 0x3d is the LOOP BODY of 0x3c (0x3c's last node loops onto 0x3d's first node 0x28521c; resolved 14z-121 (4) from the decoded chains — no separate input enters it, the walker loops there under 0x3c's label). The 5MP that starts the sequence comes out first (a2:0x02)"
 table = "a2"
 seq = "0x3b"
 

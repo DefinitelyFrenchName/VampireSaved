@@ -151159,9 +151159,9 @@
    "what": "DONE 14z-120 (5): hbA != 0 marks an ATTACK node (hbA>>8 = the attack record); startup / active / recovery per chain are derived in <tenant>_anim.md"
   },
   {
-   "evidence": "test_anim_node_walk observation; the selecting code is unread",
+   "evidence": "test_anim_node_walk observation; the +0x1C write taps of 14z-121",
    "structure": "anim",
-   "what": "table a2's entry rule: its chains are entered MID-CHAIN by node index (measured: 5 jumps onto a2 nodes 3/5/7/13)"
+   "what": "table a2's entry rule: its chains are entered MID-CHAIN by node index (measured: 5 jumps onto a2 nodes 3/5/7/13); the select routine is vs2 0x271F4/0x2710C (table pointer by d1, (a0, seq*2) word offset -> node), the advance 0x27252 (+0x18 links / sequential) \u2014 14z-121; which code picks the node INDEX for a mid-chain entry is unread"
   },
   {
    "evidence": "kept as hex; engine_internals 'the [cf14]..[0b] script-op area'",
@@ -151189,9 +151189,9 @@
    "what": "sfx record field +6 (d3.w, 'level-ish')"
   },
   {
-   "evidence": "ram.md 120: semantics unconfirmed",
+   "evidence": "ram.md +0x392 row (static)",
    "structure": "meter",
-   "what": "+0x392.w meter candidate"
+   "what": "DONE 14z-121 (4): +0x392.w is NOT an engine meter \u2014 written only inside one character's code block (vs2 0x4D0C0), no engine reader"
   },
   {
    "evidence": "the region's `diff.sites`; attribute from the effect pass's own ledger in a later step",

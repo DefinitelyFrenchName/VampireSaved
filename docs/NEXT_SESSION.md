@@ -36,8 +36,8 @@
 > ## address~~ ~~per-type projectile handlers~~ ~~the `gap_*` tables~~ (ALL FOUR DONE
 > ## 14z-121 (2) — see STATE), ~~the Killshread (ES) two-way attack~~ (MEASURED
 > ## + gated 14z-121 (3)), ~~the accumulator's states~~ (Aulbath's, 14z-121 (3));
-> ## the pushback's carrier is record `+0xC` (14z-121 (3)); (C) the small naming opens (Donovan's `0x3d`, Plasma
-> ## Trap's HK chain). Load `vampire-saved-port` first; the maps' "What is
+> ## the pushback's carrier is record `+0xC` (14z-121 (3)); ~~(C) the small naming opens (Donovan's `0x3d`, Plasma
+> ## Trap's HK chain)~~ (BOTH RESOLVED 14z-121 (4)). Load `vampire-saved-port` first; the maps' "What is
 > ## NOT decoded" is the worklist.
 > ##
 > ## **TRAPS PAID 14z-120 (`project/gotchas.md`):** a throw leaves P2 behind

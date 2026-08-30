@@ -667,7 +667,12 @@ frame by `tests/lua/field_trace.lua`, each pointer mapped onto the graph
   chain**: Ifrit `0x2d-0x2f` + ES `0x30`, Blizzard `0x31-0x33` + ES `0x34`,
   Lightning `0x35-0x37` + ES `0x38`, common tail `0x39`. EX: Press of Death
   `0x3a` (one chain for LK/MK/HK — the distance is a parameter), Change
-  Immortal `0x3b -> 0x3c -> 0x3e -> 0x3f` (`0x3d` not reached). Grapple
+  Immortal `0x3b -> 0x3c -> 0x3e -> 0x3f` (`0x3d` = the loop body of `0x3c`:
+  `0x3c`'s last node loops onto `0x3d`'s first, so it is walked under
+  `0x3c`'s label — 14z-121 (4)). The ids `0x18-0x1d`, `0x24` and the odd
+  standing ids are entered by NO normal, 6+button or 3+button input
+  (part 13: point-blank 5P/5K, 6LP..6MK, 3P/3K, 1HK all map to the plain
+  chains — 14z-121 (4)). Grapple
   `0x41`. Stance: Killshread LK `0x44`, MK/HK `0x43`, ES `0x46`; summon
   ground `0x47`, air `0x48` (no ES — the pair spends no stock and enters
   `0x47`; maintainer-confirmed 14z-121, and the ES effect of the stance
@@ -698,7 +703,10 @@ frame by `tests/lua/field_trace.lua`, each pointer mapped onto the graph
   with the object's class byte 16 instead of 14; Galaxy Trip is ONE chain
   (`0x3a -> 0x3b`) for all twelve inputs and the destination is data (P =
   into the air, K = on the ground; L/M/H = distance); Cosmo Disruption is
-  one chain (`0x3c`) for PP and KK, held or tapped. Huitzil's Plasma Beam
+  one chain (`0x3c`) for PP and KK, held or tapped. Huitzil's Plasma Trap
+  is per JUMP PHASE, not per strength — `0x2a` thrown rising, `0x2b` at
+  the apex, for LK/MK/HK alike (the strength picks the mine's distance;
+  14z-121 (4), part 9), ES `0x2c`. Huitzil's Plasma Beam
   is per BUTTON KIND (P `0x44-0x46`, K `0x41-0x43`, ES `0x47-0x4a` for
   either pair) after a table-`a` wind-up `0x28`; the guard-cancel-only
   Reflect Wall is `0x4c` for any punch, entered from blockstun (`a:0x13`
@@ -853,9 +861,13 @@ the victim".
   51 px / 16 f (5MP), idx 2 = 80 px / 20 f, idx 3 = 159 / 24, idx 7 = 140 /
   20, idx 5/6/8/9 = 65/54/10/80 with zero tails, idx 4 = 24 frames of 0.
   The heavy (class 4) contact takes the VELOCITY path instead (`0x265DC`,
-  `+0x40` = 2.9 px/f decaying 1/32 per frame). `+0x1C` plays no part. A
-  sibling family at `0x27082` (lists at `0x2797A`, counter `+0x1B0`) is
-  unread. Measured returns to a stand
+  `+0x40` = 2.9 px/f decaying 1/32 per frame). `+0x1C` plays no part. The
+  sibling family at `0x27082` (three lists at `0x2797A`: 91 / 115 / 157 px,
+  fast-decaying, counter `+0x1B0`) runs while `+0x185` is set — and
+  `+0x185` is set on the OTHER fighter by `0x2681E` when a mash counter
+  `+0x170` (`+= (d1>>1)+1` per input) reaches 10, together with a facing
+  flip and `+0x171/+0x184/+0x5C/+0x3B5` on the masher: the shape of a THROW
+  MASH-ESCAPE pushing the thrower away (read, not measured — 14z-121 (4)). Measured returns to a stand
   chain are the same on all three tenants — light 19-20 f, medium 23-24,
   heavy ~35, blocked light/medium/heavy/DP/jump-in 22 / 26 / 24 / 18 /
   19 f, the sweep knockdown 67-76 f — with the freeze 11 on every
