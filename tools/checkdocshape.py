@@ -38,7 +38,8 @@ as dead, so the list cannot outlive its reasons.
 ALSO CHECKED: ORIENT = one `# ` header, no `(HISTORY` header (the twin holds
 history); HIST = carries no `**[PFX-N]**` anchor; every named history_twin
 exists and is classed HIST; `requires` = banner (a `**STATUS` line in the
-first 40 lines) / atlas-rows (every `## ` section names an atlas file);
+first 40 lines) / atlas-rows (every `## ` section names an atlas file — a
+`## ` line directly after another is the same header WRAPPED, one section);
 LINKS — every markdown link or backticked `docs/...md` path in docs/README.md,
 HANDOFF.md and CLAUDE.md resolves; CITATIONS — every `docs/x.md 'Section'`
 quoted-section citation in tools/ and tests/ names a real header of that file
@@ -211,12 +212,31 @@ def check_file(root, rel, row, allows, no_pending):
         if not re.search(r"\*\*STATUS", head, re.IGNORECASE):
             fails.append(f"{rel}: NO STATUS BANNER in the first 40 lines (requires banner)")
     if "atlas-rows" in row["req"]:
-        secs = re.split(r"(?m)^## ", text)[1:]
-        for s in secs:
+        for s in h2_sections(text):
             title = s.splitlines()[0][:60]
             if not any(a in s for a in ATLAS_NAMES):
                 fails.append(f"{rel}: section '## {title}' names no atlas row (requires atlas-rows)")
     return fails
+
+
+def h2_sections(text):
+    """The `## ` sections of a doc, WRAP-AWARE: a `## ` line that directly
+    follows another `## ` line is the same header wrapped (the house style
+    for long section titles), not a new, empty section. Returns each section
+    as its text without the leading `## ` (the first line is the title)."""
+    secs, cur, prev_h2 = [], None, False
+    for line in text.splitlines(keepends=True):
+        is_h2 = line.startswith("## ")
+        if is_h2 and not prev_h2:
+            if cur is not None:
+                secs.append(cur)
+            cur = line[3:]
+        elif cur is not None:
+            cur += line
+        prev_h2 = is_h2
+    if cur is not None:
+        secs.append(cur)
+    return secs
 
 
 def check_links(root):
@@ -370,6 +390,17 @@ def selftests():
         f, _ = check(root)
         if not any("NO STATUS BANNER" in x for x in f):
             bad.append("a missing banner was not caught")
+        # atlas-rows: a WRAPPED `## ` header is one section (its body names
+        # the atlas), and a section naming no atlas file still fails
+        doc("docs/a.md", "# A\n## A long title that wraps onto a\n## second header line\n"
+            "Atlas rows: `atlas/ram.md`.\n## Bare section\nnothing named\n")
+        shape([("HANDOFF.md", "EXEMPT", "-", "-"), ("docs/a.md", "REFERENCE", "-", "atlas-rows")])
+        f, _ = check(root)
+        atlas_f = [x for x in f if "names no atlas row" in x]
+        if any("second header line" in x or "A long title" in x for x in atlas_f):
+            bad.append("a wrapped `## ` header was split into an empty section")
+        if not any("Bare section" in x for x in atlas_f):
+            bad.append("a section naming no atlas row was not caught")
         # dangling link in README
         doc("docs/a.md", "# A\n")
         shape([("HANDOFF.md", "EXEMPT", "-", "-"), ("docs/a.md", "REFERENCE", "-", "-"),
