@@ -791,7 +791,7 @@ MEASURED on native vs2 (`tests/test_reactions.sh`, frozen `tests/expected/reacti
 | anim | table a2's entry rule: its chains are entered MID-CHAIN by node index (measured: 5 jumps onto a2 nodes 3/5/7/13) | test_anim_node_walk observation; the selecting code is unread |
 | anim | the 6-byte script-op area at +0x10..+0x15 of every node | kept as hex; engine_internals 'the [cf14]..[0b] script-op area' |
 | reaction | DONE 14z-120 (7): the tenant's reaction SET (which table:seq each class enters, the block chain b:0x0c, the measured stun lengths) — see 'Reactions as the victim'; still open: the engine counter that ends a hold reaction, and the unindexed lying/wake nodes (OFF) | tests/test_reactions.sh, tests/expected/reactions_<tenant>.txt |
-| projectile | projectile parameter records (speed, lifetime, hit class) | pool hit-class map bounded at 64; records undecoded |
+| projectile | projectile parameters are INLINE in each type's handler, not a table family (measured on Blizzard Sword 14z-120 (10): xv/yv by strength at vs2 0x670C0, in Donovan's ported region x066ec4); a per-type decode remains | engine_internals 'Projectile parameters live in the per-TYPE handler' |
 | bank | the 17 `gap_*` auto tables' semantics | oracle-classified values/pointers only |
 | sfx | sfx record field +6 (d3.w, 'level-ish') | engine_internals 960 |
 | meter | +0x392.w meter candidate | ram.md 120: semantics unconfirmed |

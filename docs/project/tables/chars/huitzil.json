@@ -163896,9 +163896,9 @@
    "what": "DONE 14z-120 (7): the tenant's reaction SET (which table:seq each class enters, the block chain b:0x0c, the measured stun lengths) \u2014 see 'Reactions as the victim'; still open: the engine counter that ends a hold reaction, and the unindexed lying/wake nodes (OFF)"
   },
   {
-   "evidence": "pool hit-class map bounded at 64; records undecoded",
+   "evidence": "engine_internals 'Projectile parameters live in the per-TYPE handler'",
    "structure": "projectile",
-   "what": "projectile parameter records (speed, lifetime, hit class)"
+   "what": "projectile parameters are INLINE in each type's handler, not a table family (measured on Blizzard Sword 14z-120 (10): xv/yv by strength at vs2 0x670C0, in Donovan's ported region x066ec4); a per-type decode remains"
   },
   {
    "evidence": "oracle-classified values/pointers only",

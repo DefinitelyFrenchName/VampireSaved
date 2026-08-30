@@ -45,11 +45,17 @@
 > ## medium 23 / heavy 35 / blocked 22-26 / sweep ~70 on all three).
 > ## Record fields `+0x14` (attacker meter) and `+0x1C` (pushback) measured.
 > ##
+> ## **Also measured (STATE 14z-120 (8)-(10)):** the stun = freeze + the
+> ## reaction chain + a HOLD released when the PUSHBACK SLIDE ends (record
+> ## `+0x1C`); projectile parameters are INLINE in each type's handler
+> ## (Blizzard Sword xv/yv by strength at vs2 `0x670C0`, ported region).
+> ##
 > ## **NEXT, the maintainer's pick:** (A) the board verdict on M12; (B) the
-> ## phase-3 remainder: the stun counter's source, the unindexed lying/wake
-> ## nodes (decode by LINK), projectile parameter records, the `gap_*`
-> ## tables; (C) the small opens: Donovan's `0x3d` / Killshread Summon
-> ## (ES); Plasma Trap's HK chain. Load `vampire-saved-port` first.
+> ## phase-3 remainder: the slide counter's home, the unindexed lying/wake
+> ## nodes (game-logic jumps — the per-victim pose tables are the
+> ## candidate), per-type projectile handlers, the `gap_*` tables; (C) the
+> ## small opens: Donovan's `0x3d` / Killshread Summon (ES); Plasma Trap's
+> ## HK chain. Load `vampire-saved-port` first.
 > ##
 > ## **OPEN, unchanged:** the 1:1 wheel mockup; #112/#113 parked; the FBNeo
 > ## two-run-family question; the tenant CPU AI "lackluster" note; win

@@ -829,6 +829,29 @@ the victim".
   19 f, the sweep knockdown 67-76 f — with the freeze 11 on every
   fighter-vs-fighter contact (Victor's constants).
 
+### Projectile parameters live in the per-TYPE handler, not in a table family (14z-120 (10), measured on Blizzard Sword)
+
+Depends on atlas rows: `ram.md` `$FF9400` (the projectile pool, 32 x
+0x100), fighter `+0x102` (resolved strength), `+0x22`. Method: sample the
+32 slots' headers across the spawn to find the slot (Blizzard Sword takes
+slot 3, type `0x3E`, alive 33 frames), then `-debug` taps on that slot's
+header / position / velocity (`trace_writes.lua`) and capstone on the
+writers. The spawn (`vs2 0x59E10`: `jsr 0x156D6` allocates the slot,
+`move.b #$3e,$2(a4)`, `+0x9A = attacker +0x102` (the resolved strength),
+`+0x0A = attacker +0x22`, then `jmp 0x5C7BE` places it at attacker
+`(x+0x40, y+0x80)` mirrored by `+0x0B`) hands the object to the TYPE
+HANDLER, whose init (`0x6706A..0x670AE`) reads `d0 = +0x9A * 8` and takes
+**`xv = 0x670C0[d0].l`, `yv = 0x670C4[d0].l`** — LP 6.0 / −4.0, MP 7.0 /
+−4.5, HP 8.0 / −5.0 px/frame (16.16) — with fixed `xacc = −0x1000`
+(−0.0625), `yacc = +0x2000`, `+0x26 = 0x20`, `+0x50 = 1`, all signs
+mirrored by `+0x0B`. Those tables are INLINE in the handler — for Donovan
+inside the ported region `x066ec4` (vs2 `0x66EC4-0x6717C`), so the port
+carries them by construction and the map's region attribution covers
+them as code bytes. Every projectile type has its own handler with its
+own inline data; decoding "the projectile records" is therefore a
+per-type job (the handler is found from the type byte through the pool
+walker's LONG table, [VSE-18]), not a table to lay out.
+
 ## Command-input / motion-tracker subsystem (session 14z-48, measured both engines)
 
 How special-move inputs are recognized (identical architecture in

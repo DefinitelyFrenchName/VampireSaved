@@ -71,7 +71,7 @@ UNDECODED = [
     {"structure": "anim", "what": "table a2's entry rule: its chains are entered MID-CHAIN by node index (measured: 5 jumps onto a2 nodes 3/5/7/13)", "evidence": "test_anim_node_walk observation; the selecting code is unread"},
     {"structure": "anim", "what": "the 6-byte script-op area at +0x10..+0x15 of every node", "evidence": "kept as hex; engine_internals 'the [cf14]..[0b] script-op area'"},
     {"structure": "reaction", "what": "DONE 14z-120 (7): the tenant's reaction SET (which table:seq each class enters, the block chain b:0x0c, the measured stun lengths) — see 'Reactions as the victim'; still open: the engine counter that ends a hold reaction, and the unindexed lying/wake nodes (OFF)", "evidence": "tests/test_reactions.sh, tests/expected/reactions_<tenant>.txt"},
-    {"structure": "projectile", "what": "projectile parameter records (speed, lifetime, hit class)", "evidence": "pool hit-class map bounded at 64; records undecoded"},
+    {"structure": "projectile", "what": "projectile parameters are INLINE in each type's handler, not a table family (measured on Blizzard Sword 14z-120 (10): xv/yv by strength at vs2 0x670C0, in Donovan's ported region x066ec4); a per-type decode remains", "evidence": "engine_internals 'Projectile parameters live in the per-TYPE handler'"},
     {"structure": "bank", "what": "the 17 `gap_*` auto tables' semantics", "evidence": "oracle-classified values/pointers only"},
     {"structure": "sfx", "what": "sfx record field +6 (d3.w, 'level-ish')", "evidence": "engine_internals 960"},
     {"structure": "meter", "what": "+0x392.w meter candidate", "evidence": "ram.md 120: semantics unconfirmed"},
