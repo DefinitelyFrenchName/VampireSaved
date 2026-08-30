@@ -1,5 +1,10 @@
 # The documentation audit (opened 14z-118, maintainer-ruled 2026-08-29) — INVENTORY
 
+> **STATUS (14z-123): the LOG of the 14z-118 claim-by-claim pass — it does not
+> change. The live worklist since 14z-122 is `inferred_claims.md` (the
+> documentation rationalization pass); this file's §3 promise was RULED
+> 2026-08-29 (the tables generated) and its commit log ends at 14z-118.**
+
 **The ruling** (14z-117 close, in the maintainer's words): *a full pass on the
 documentation — every claim derived from a MEASUREMENT, not a guess;
 everything consistent; nothing stale.* The Sailor Moon S discipline.

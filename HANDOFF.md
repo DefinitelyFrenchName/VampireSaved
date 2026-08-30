@@ -128,7 +128,7 @@ Descriptor CRCs: PRG/QSound extension rows carry the FILL members' real
 CRCs (fixed content); gfx group C rows carry SENTINELS (variable
 content — see above).
 
-## MAME from source (B5, 2026-08-03) — the oracle now follows the profile
+## MAME from source — the oracle follows the profile (B5, 2026-08-03)
 
 MAME is pinned as a submodule: `emu/mame`, tag **mame0288**, commit
 `27a8d9e8`. A Homebrew binary cannot follow a descriptor change, so the
@@ -181,7 +181,7 @@ separate file so no frozen RAM expectation moves). MAME's harness had the
 same video blind spot FBNeo did, and the WIDE change is entirely a
 rendering change. Ground truth: `tests/test_replay_video_selfcheck.sh`.
 
-## RELEASE PACKAGING (14z-105) — `release/<name>/`, no ROM bytes
+## RELEASE PACKAGING — `release/<name>/`, no ROM bytes (since 14z-105)
 
 `tools/package_release.py <rompath> <out> --romdir $ROMDIR --name merged-m6
 --version M6` turns a frozen build's two zips into a distributable package:
@@ -225,7 +225,7 @@ files> [--bitstream release/bitstreams/<seed>]`. Spec: `docs/project/release_for
 must-fire control). `release/merged-m6..m9/` keep the old single-package
 layout as history.
 
-## MiSTer (14z-106/107) — the jtcps2w core + the simulation oracle
+## MiSTer — the jtcps2w core + the simulation oracle (opened 14z-106/107)
 
 **THE MiSTer SKILLS (14z-114): load `mister-cps2-wide-core` (level 1,
 game-independent) and `mister-vampire-saved` (level 2, this romset) before
@@ -904,9 +904,9 @@ fingerprint moves with the generator — do not pin it in docs. Rebuild the
 pair with:
 
 ```sh
-# THE FOUR TRACKS, as tests/test_m3a_reproducible.sh rebuilds them (re-pointed
-# 14z-119 (physics-port freeze) <- 14z-118 <- the 14z-8x `build/m5_stock` / `build/don_m4` pair, which no longer
-# exists on disk; output names are the CURRENT freeze — roll them each freeze):
+# THE FOUR TRACKS, as tests/test_m3a_reproducible.sh rebuilds them. Output names
+# are the CURRENT freeze — roll them at each freeze (the lineage of earlier
+# pairs is in the git log of this block):
 python3 tools/build_wide_romset.py "$ROMDIR" build/wide0/rompath --qsound 2 --gfx 4 --prg 4
 GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.sh 6 build/m5_stock13      # the stock twin
 KEY_SET=vsavj WIDE_ROMSET=build/wide0/rompath/vsavjw.zip \
@@ -994,7 +994,7 @@ shadow, effect art) can now be A/B'd directly. Do not characterise a
 tenant symptom without this leg — 14z-69 retracted two findings that
 were artefacts of measuring our build alone (docs/GOTCHAS.md).
 
-## **[VSP-151]** THE DF PALETTE-SEQ BLOCK CENSUS (14z-79b) — measured, and it had to be
+## **[VSP-151]** THE DF PALETTE-SEQ BLOCK CENSUS — measured, and it had to be (measured 14z-79b)
 
 Which palette-seq ids each character requests in Dark Force, measured on
 vanilla vsavj with `$FF802E`=1 asserted per row:
@@ -1014,7 +1014,7 @@ gives a confident wrong map. **And the resolver masks to 12 bits**
 
 Run it: `CHARS="00 01 02 ... 18" tests/audit_palette_seq_ids.sh`.
 
-## DOCS ARE SPLIT THREE WAYS (14z-69) — `docs/README.md`
+## DOCS ARE SPLIT THREE WAYS — `docs/README.md` (since 14z-69)
 
 `docs/game/` (Vampire Savior itself) | `docs/platform/` (CPS-2, MAME,
 FBNeo) | `docs/project/` (this port). The discriminator: **would this
@@ -1049,7 +1049,7 @@ resembles one already fixed on tenant A, `grep -n "<subsystem>"
 docs/game/engine_internals.md docs/project/patch_index.md` and diff A's manifest
 rows against B's BEFORE measuring anything.
 
-## Repo path changed (2026-08-05): `Vampire Saved` -> `Vampire_Saved`
+## Repo path: `Vampire Saved` -> `Vampire_Saved` (since 2026-08-05)
 
 The project root is now `/Users/koneko/Developer/Vampire_Saved/VampireSaved`
 — the space is gone. Nothing in git was affected, but:
@@ -1130,7 +1130,7 @@ python3 tools/cps2_decrypt.py "$ROMDIR/vsavj.zip" build/out/vsavj_opcodes.bin --
 
 ## How to test
 
-### **[VSP-101]** THE PRE-COMMIT COMMAND (14z-94, GitHub #30) — run this, not a filename
+### **[VSP-101]** THE PRE-COMMIT COMMAND — run this, not a filename (since 14z-94, GitHub #30)
 
 ```sh
 tests/run_all_static.sh                    # portable tier: ROM-free, ~1 min
@@ -1207,7 +1207,7 @@ perturb a tool; never edit tracked source from a test.
 carrying their own rule) and `tools/decode_stage_banners.py` (names the #92
 value space).
 
-### **[VSP-150]** THE OUT-OF-RANGE INDEX TOOLKIT (14z-78) — three instruments, one class
+### **[VSP-150]** THE OUT-OF-RANGE INDEX TOOLKIT — three instruments, one class (measured 14z-78)
 
 `audit_index_space.py` names the DANGER WINDOWS (entries vsavj's table cannot
 answer but vs2's can). Two crashes had already landed in the same window

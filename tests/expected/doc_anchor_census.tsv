@@ -27,7 +27,7 @@ CPE-20	docs/platform/gotchas.md	Pre-seeded from the ROM-audit round (2026-07-25,
 CPE-21	docs/platform/gotchas.md	`git submodule add` stages the DEFAULT BRANCH, not the tag you check out	IN-LIST
 CPE-22	docs/platform/gotchas.md	MAME's build system cannot handle a SPACE anywhere in the source path	IN-LIST
 CPE-23	docs/platform/gotchas.md	MAME 0.288's OSD is SDL3 and it is found ONLY through pkg-config	IN-LIST
-CPE-24	HANDOFF.md	MAME from source (B5, 2026-08-03) — the oracle now follows the profile	IN-LIST
+CPE-24	HANDOFF.md	MAME from source — the oracle follows the profile (B5, 2026-08-03)	IN-LIST
 CPE-25	docs/platform/gotchas.md	repo's working tree — and exits 0 (paid: 2026-08-03, B5)	IN-LIST
 CPE-26	docs/platform/gotchas.md	FBNeo fresh builds need `SKIPDEPEND=1` (paid: 2026-07-25)	IN-LIST
 CPE-27	docs/platform/gotchas.md	FBNeo shared EEPROM breaks run-to-run determinism (paid: 2026-07-25, ~45min)	IN-LIST
@@ -367,8 +367,8 @@ VSP-96	docs/project/build_dir_triage.md	BEFORE DELETING A BUILD DIR, GREP FOUR P
 VSP-97	docs/project/build_dir_triage.md	THE DEEPER FLAW THE SWEEP EXPOSED: "tracked" build dirs are only PARTLY tracked	IN-LIST
 VSP-98	docs/project/build_dir_triage.md	Recordings under `tests/inp/` and the cache (maintainer-ruled 14z-111)	IN-LIST
 VSP-99	docs/project/patch_index.md	patch_index — one-page registry of every patch	IN-LIST
-VSP-100	HANDOFF.md	RELEASE PACKAGING (14z-105) — `release/<name>/`, no ROM bytes	IN-LIST
-VSP-101	HANDOFF.md	THE PRE-COMMIT COMMAND (14z-94, GitHub #30) — run this, not a filename	IN-LIST
+VSP-100	HANDOFF.md	RELEASE PACKAGING — `release/<name>/`, no ROM bytes (since 14z-105)	IN-LIST
+VSP-101	HANDOFF.md	THE PRE-COMMIT COMMAND — run this, not a filename (since 14z-94, GitHub #30)	IN-LIST
 VSP-102	HANDOFF.md	THE REVIEW-TRIAGE GATES (14z-94, GitHub #74's index)	IN-LIST
 VSP-103	docs/project/gotchas.md	A gate that is not in the battery can sit FAILING for sessions —	IN-LIST
 VSP-104	docs/project/gotchas.md	A self-test that drives a gate through DELIBERATE failures litters the gate's evidence directory (14	IN-LIST
@@ -417,8 +417,8 @@ VSP-146	docs/project/gotchas.md	A same-slot "vanilla control" controls nothing �
 VSP-147	docs/project/gotchas.md	The -debug write-trace and non-debug dumps can DISAGREE about one write (14z-100; RESOLVED 14z-101 —	IN-LIST
 VSP-148	docs/project/gotchas.md	capstone m68k mnemonics carry a SIZE SUFFIX — equality tests match	IN-LIST
 VSP-149	docs/project/gotchas.md	Half the Lua instruments stage inputs one frame off replay.lua — a frame number from one is not a fr	IN-LIST
-VSP-150	HANDOFF.md	THE OUT-OF-RANGE INDEX TOOLKIT (14z-78) — three instruments, one class	IN-LIST
-VSP-151	HANDOFF.md	THE DF PALETTE-SEQ BLOCK CENSUS (14z-79b) — measured, and it had to be	IN-LIST
+VSP-150	HANDOFF.md	THE OUT-OF-RANGE INDEX TOOLKIT — three instruments, one class (measured 14z-78)	IN-LIST
+VSP-151	HANDOFF.md	THE DF PALETTE-SEQ BLOCK CENSUS — measured, and it had to be (measured 14z-79b)	IN-LIST
 VSP-152	HANDOFF.md	The port pipeline — its tools, and the guarded-replay debug environment (M2a, 2026-07-25)	IN-LIST
 VSP-153	docs/project/gotchas.md	A symptom grouping is a HYPOTHESIS — test it member by member, cheapest	IN-LIST
 VSP-154	docs/project/gotchas.md	Cross-build A/B is the cheapest attribution we have, and it is	IN-LIST

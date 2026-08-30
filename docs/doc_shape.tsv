@@ -28,13 +28,13 @@
 #              atlas file — CLAUDE.md §5 rule 2).
 #
 # --- level 0
-docs/README.md	PENDING	-	-
+docs/README.md	INDEX	-	-
 docs/GOTCHAS.md	GENERATED	docs/GOTCHAS_history.md	-
 docs/GOTCHAS_history.md	HIST	-	-
 docs/annotations.md	GENERATED	-	-
 docs/NEXT_SESSION.md	ORIENT	docs/NEXT_SESSION_HISTORY.md	-
 docs/NEXT_SESSION_HISTORY.md	HIST	-	-
-HANDOFF.md	PENDING	HANDOFF_HISTORY.md	-
+HANDOFF.md	REFERENCE	HANDOFF_HISTORY.md	-
 HANDOFF_HISTORY.md	HIST	-	-
 # --- game
 docs/game/engine_internals.md	PENDING	docs/game/engine_internals_history.md	-
@@ -49,7 +49,7 @@ docs/game/atlas/sprite_lists.md	REFERENCE	-	-
 docs/game/atlas/venue_assets.md	REFERENCE	-	-
 # --- platform
 docs/platform/gotchas.md	REGISTER	-	-
-docs/platform/mister.md	PENDING	docs/platform/mister_history.md	-
+docs/platform/mister.md	REFERENCE	docs/platform/mister_history.md	-
 docs/platform/mister_history.md	HIST	-	-
 # --- project
 docs/project/M1_acceptance.md	HIST	-	-
@@ -67,10 +67,10 @@ docs/project/doc_audit_14z118.md	LOG	-	-
 docs/project/inferred_claims.md	LOG	-	-
 docs/project/gotchas.md	REGISTER	-	-
 docs/project/hardening_register.md	REFERENCE	-	-
-docs/project/mister_core.md	PENDING	-	-
+docs/project/mister_core.md	REFERENCE	-	-
 docs/project/mister_field.md	REFERENCE	-	-
 docs/project/mister_fit.md	REFERENCE	-	-
-docs/project/mister_map.md	PENDING	-	-
+docs/project/mister_map.md	INDEX	-	-
 docs/project/mister_scope.md	HIST	-	-
 docs/project/patch_index.md	INDEX	-	-
 docs/project/patch_notes.md	LOG	-	-
