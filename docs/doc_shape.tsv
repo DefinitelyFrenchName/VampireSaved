@@ -31,7 +31,8 @@
 docs/README.md	PENDING	-	-
 docs/GOTCHAS.md	GENERATED	docs/GOTCHAS_history.md	-
 docs/GOTCHAS_history.md	HIST	-	-
-docs/NEXT_SESSION.md	PENDING	-	-
+docs/NEXT_SESSION.md	ORIENT	docs/NEXT_SESSION_HISTORY.md	-
+docs/NEXT_SESSION_HISTORY.md	HIST	-	-
 HANDOFF.md	PENDING	-	-
 # --- game
 docs/game/engine_internals.md	PENDING	-	-
