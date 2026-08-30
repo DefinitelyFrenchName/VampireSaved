@@ -116,6 +116,21 @@ emu.register_frame_done(function()
         f:write(string.format("C%d p1x=%d p1y=%d p2x=%d p2y=%d cam=%d p1face=%d\n", frame,
             program:read_u16(0xff8410), program:read_u16(0xff8414), program:read_u16(0xff8810), program:read_u16(0xff8814),
             program:read_u16(0xff8290), program:read_u8(0xff840b)))
+        -- P1's OWNED pool objects (ram.md: effect-piece pool $FFB800 32 x 0x80, projectile pool $FF9400 32 x 0x100;
+        -- +0x00 alive, +0x02 type, +0x10/+0x14 position, +0x1C node, +0x30 owner link (movea.w-compatible = $8400 for P1)):
+        -- the detached hit of a move (Press of Death's foot, the flying Killshread, every projectile) lives here
+        for _, pool in ipairs({ { 0xffb800, 0x80, "b" }, { 0xff9400, 0x100, "p" } }) do
+            for i = 0, 31 do
+                local o = pool[1] + i * pool[2]
+                if program:read_u8(o) ~= 0 and (program:read_u16(o + 0x30) & 0xffff) == 0x8400 then
+                    local node = program:read_u32(o + 0x1c)
+                    local hb8, hbA = 0, 0
+                    if node >= 0x100000 and node < 0x400000 then hb8 = program:read_u16(node + 8); hbA = program:read_u16(node + 10) end
+                    f:write(string.format("O%d pool=%s slot=%d type=%02x x=%d y=%d node=%08x hb8=%d hbA=%d face=%d\n", frame, pool[3], i,
+                        program:read_u8(o + 2), program:read_u16(o + 0x10), program:read_u16(o + 0x14), node, hb8, hbA, program:read_u8(o + 0x0b)))
+                end
+            end
+        end
         dumped = dumped + 1
     end
 

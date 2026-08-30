@@ -8,14 +8,17 @@
 # The pipeline, every step rerunnable and every number from an instrument:
 #   A. tests/lua/field_trace.lua on every naming rig part (tests/replays/naming/
 #      <tenant>_<part>.*, native vs2): P1's node pointer per frame.
-#   B. the FRAME PICKER: per event the first frame P1's node is an ATTACK node
-#      of the move's chain (tools/anim_nodes.py's graph), else the chain's
-#      first frame -> build/p3_sprites/frames.tsv.
+#   B. the FRAME PICKER (tools/charpages_frames.py pick): per event the first
+#      frame P1's node is an ATTACK node of the move's chain, else the chain's
+#      first frame plus PROBE frames to +120 f (a move that hits through an
+#      object it owns lands later than its chain's start).
 #   C. tests/lua/sprite_capture.lua at those frames: the OBJ list + the palette
 #      page ($90C000) as the game had them.
-#   D. tools/sprite_render.py: the tenant's entries (its records' tile set,
-#      obj_records.walk; the bank from the OBJ bank table; the LEFT x-cluster — the rigs pin
-#      P1 left of P2) drawn from $ROMDIR/vsav2.zip's tiles -> PNG per move.
+#   D. tools/charpages_frames.py choose (the frame per move: active, else the
+#      first probe where an OWNED object carries a record with real power, else
+#      first) and tools/sprite_render.py: the tenant's entries (its records' tile
+#      set, bank 3, the LEFT x-cluster + everything near an owned object) drawn
+#      from $ROMDIR/vsav2.zip's tiles -> PNG + sidecar per move.
 #   E. tools/charmap_html.py --sprites: the page with the sprite beside each
 #      chain's box diagram.
 # ~15 min (A and C are ~24 MAME legs each, six in parallel). Needs ROMDIR.
@@ -70,44 +73,8 @@ for rig in $PARTS; do
   n=$((n + 1)); [ $((n % 6)) = 0 ] && wait
 done; wait
 
-echo "== B. the frame picker"
-python3 - "$W" <<'PY' > "$W/frames.tsv" || exit 1
-import json, sys, glob, html
-sys.path.insert(0, "tools"); import _minitoml
-W = sys.argv[1]
-for t in ("donovan", "huitzil", "pyron"):
-    chains = {}
-    for name in ("a", "a2", "b", "c", "proj"):
-        for seq, c in json.load(open(f"{W}/chains_{t}/{name}.json"))["chains"].items():
-            chains[(name, int(seq, 16))] = [(int(n["addr"], 16), n["hbA"]) for n in (c.get("nodes") or [])]
-    moves = _minitoml.loads(open(f"build/manifest/moves_{t}.toml").read())["move"]
-    for tr in sorted(glob.glob(f"{W}/t_{t}_*.txt")):
-        part = tr.rsplit("_", 1)[-1][:-4]
-        sched = json.load(open(f"tests/replays/naming/{t}_{part}.json"))
-        rows = {}
-        for l in open(tr):
-            f = l.split()
-            if len(f) >= 3 and f[0] == "F": rows[int(f[1])] = {k: int(v) for k, v in (kv.split("=") for kv in f[2:])}
-        for e in sched["events"]:
-            if e["name"].startswith("walk-in"): continue
-            m = max((mv for mv in moves if e["name"].startswith(mv["name"])), key=lambda mv: len(mv["name"]), default=None)
-            if not m or not m.get("table"): continue
-            seqs = [int(s, 16) for s in str(m["seq"]).split(",") if s.strip()]
-            atk, any_ = {}, {}
-            for sq in seqs:
-                for addr, hba in chains.get((m["table"], sq), []):
-                    any_[addr] = sq
-                    if hba: atk[addr] = sq
-            t0, t1 = e["frame"], e["frame"] + e["gap"]; pick = None
-            for want, kind in ((atk, "active"), (any_, "first")):
-                for fr in range(t0, t1):
-                    v = rows.get(fr)
-                    if v and (v["node"] & 0xffffffff) in want:
-                        pick = (fr, kind, want[v["node"] & 0xffffffff]); break
-                if pick: break
-            if pick:
-                print(f"{t}\t{part}\t{pick[0]}\t{pick[1]}\t{m['table']}:0x{pick[2]:02x}\t{html.escape(m['name']).replace(' ', '-')}__0x{pick[2]:02x}\t{e['name']}")
-PY
+echo "== B. the frame picker (tools/charpages_frames.py pick)"
+python3 tools/charpages_frames.py pick "$W" || exit 1
 
 echo "== C. captures"
 n=0
@@ -119,25 +86,23 @@ for rig in $(cut -f1,2 "$W/frames.tsv" | sort -u | tr '\t' '_'); do
   n=$((n + 1)); [ $((n % 6)) = 0 ] && wait
 done; wait
 
-echo "== D. renders (first occurrence of a move+seq wins)"
-python3 - "$W" "$ROMDIR" <<'PY' || exit 1
+echo "== D. the frame per move (tools/charpages_frames.py choose: active, else the first probe with an OWNED object hitting, else first) and the renders"
+python3 tools/charpages_frames.py choose "$W" donovan:"$DON" huitzil:"$HUI" pyron:"$PYR" || exit 1
+python3 - "$W" "$ROMDIR" <<'PYR'
 import subprocess, collections, sys
 W, romdir = sys.argv[1:3]
-BANK = {"donovan": "3", "huitzil": "3", "pyron": "3"}   # vs2's OBJ bank table 0x27530 (opcode view), id-indexed: ids 0x10/0x11/0x13 -> 0x6000 = bank 3 (measured on the captures: the fighters' mid-screen entries; bank 1 is the HUD)
-seen = set(); per = collections.defaultdict(dict)
-for l in open(f"{W}/frames.tsv"):
-    t, part, fr, kind, ts, name, ev = l.rstrip("\n").split("\t")
-    if (t, name) in seen: continue
-    seen.add((t, name)); per[(t, part)][int(fr)] = name
+per = collections.defaultdict(dict)
+for l in open(f"{W}/chosen.tsv"):
+    t, name, fr, kind, part = l.rstrip("\n").split("\t"); per[(t, part)][int(fr)] = name
 n = 0
 for (t, part), names in sorted(per.items()):
     r = subprocess.run(["python3", "tools/sprite_render.py", f"{W}/cap/{t}_{part}.txt", f"{romdir}/vsav2.zip:vs2", f"{W}/png/{t}", "--groups", "ab",
-                        "--tile-set", f"{W}/tiles_{t}.txt", "--bank", BANK[t], "--names", ",".join(f"{fr}={nm}" for fr, nm in names.items()), "--frames", ",".join(map(str, names))],
+                        "--tile-set", f"{W}/tiles_{t}.txt", "--bank", "3", "--names", ",".join(f"{fr}={nm}" for fr, nm in names.items()), "--frames", ",".join(map(str, names))],
                        capture_output=True, text=True)
     n += r.stdout.count(".png")
     if r.returncode: print(t, part, "render FAILED", r.stderr[-200:], file=sys.stderr)
 print(f"rendered {n} sprites")
-PY
+PYR
 
 echo "== E. the pages"
 for t in donovan:$DON huitzil:$HUI pyron:$PYR; do n="${t%%:*}"; b="${t#*:}"

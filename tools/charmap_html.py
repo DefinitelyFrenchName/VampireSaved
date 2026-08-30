@@ -187,6 +187,21 @@ def main():
                                 bx, by, hw, hh = b
                                 cx = fx - bx; cy = fy - by
                                 rects.append((kind, cx - hw, cy - hh, 2 * hw, 2 * hh))
+                        # the objects P1 owns at this frame (the detached hits): each one's attack record from the owner's
+                        # hitbox_proj table (node hbA>>8, engine_internals "the object-hit applier"), placed at the object
+                        for ob in meta.get("objects", []):
+                            if not ob.get("hbA"): continue
+                            try:
+                                rec = H.record(ob["hbA"] >> 8, proj=True)
+                            except Exception:
+                                continue
+                            b = rec.get("box")
+                            if not b or not any(b): continue
+                            bx, by, hw, hh = b
+                            ox = KX + (ob["x"] - meta["cam"]); oy = KY - ob["y"]
+                            cx = ox - bx if ob.get("face", 1) else ox + bx; cy = oy - by
+                            rects.append(("hit", cx - hw, cy - hh, 2 * hw, 2 * hh))
+                            rects.append(("obj", ox - 2, oy - 2, 4, 4))
                         xs = [meta["x0"], meta["x0"] + meta["w"]] + [r[1] for r in rects] + [r[1] + r[3] for r in rects]
                         ys = [meta["y0"], meta["y0"] + meta["h"]] + [r[2] for r in rects] + [r[2] + r[4] for r in rects]
                         X0, Y0, X1, Y1 = min(xs) - 4, min(ys) - 4, max(xs) + 4, max(ys) + 4
@@ -321,7 +336,7 @@ svg.boxes{background:var(--bg2);border:1px solid var(--line)}
 img.sprite{image-rendering:pixelated;background:var(--bg2);border:1px solid var(--line);max-height:180px}
 svg.composite{background:var(--bg2);border:1px solid var(--line);max-width:100%;height:auto}
 svg.composite rect{fill:none;stroke-width:1}
-svg.composite .hurt{stroke:var(--hurt)}svg.composite .push{stroke:var(--push)}svg.composite .hit{stroke:var(--hit)}
+svg.composite .hurt{stroke:var(--hurt)}svg.composite .push{stroke:var(--push)}svg.composite .hit{stroke:var(--hit)}svg.composite .obj{fill:var(--hit);stroke:none}
 svg.boxes .ground{stroke:var(--line);stroke-width:1}
 svg.boxes rect{fill-opacity:.28;stroke-width:1.2}
 svg.boxes .hurt{fill:var(--hurt);stroke:var(--hurt)}svg.boxes .push{fill:var(--push);stroke:var(--push)}svg.boxes .hit{fill:var(--hit);stroke:var(--hit)}

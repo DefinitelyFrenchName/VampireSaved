@@ -69,9 +69,15 @@ def render(capture, spec, out_dir, frames=None, min_addr=0x40000, tile_set=None,
         if a19 not in tile_cache:
             tile_cache[a19] = gfx_tiles.decode(gfx_tiles.tile_bytes(simms[g], t2))
         return tile_cache[a19]
-    ents, pals, cams = {}, {}, {}
+    ents, pals, cams, objs = {}, {}, {}, {}
+    KX = 64   # world -> OBJ-screen x (charmap_html.KX)
     for l in Path(capture).read_text().splitlines():
-        if l.startswith("C"):
+        if l.startswith("O") and l[1:2].isdigit():   # "O<frame> ..." (not the OBJDUMPSUMMARY trailer)
+            fr, rest = l[1:].split(" ", 1); d = dict(kv.split("=") for kv in rest.split())
+            for k in ("x", "y"): d[k] = int(d[k]) - 0x10000 if int(d[k]) >= 0x8000 else int(d[k])
+            for k in ("slot", "hb8", "hbA", "face"): d[k] = int(d[k])
+            objs.setdefault(int(fr), []).append(d)
+        elif l.startswith("C"):
             fr, rest = l[1:].split(" ", 1); cams[int(fr)] = {k: (int(v) - 0x10000 if k != "p1face" and int(v) >= 0x8000 else int(v)) for k, v in (kv.split("=") for kv in rest.split())}
         elif l.startswith("P"):
             fr, hx = l[1:].split(" ", 1); pals[int(fr)] = bytes.fromhex(hx)
@@ -101,7 +107,19 @@ def render(capture, spec, out_dir, frames=None, min_addr=0x40000, tile_set=None,
                 if gaps and max(gaps)[0] > 48:
                     cut = max(gaps)[1]
                     keep = {i for _, i in xs[:cut + 1]}
-                    cand = [e for i, e in enumerate(cand) if i in keep]
+                    # ... plus the entries near any object P1 OWNS at this frame (its foot, sword, projectile), wherever it is
+                    cam = cams.get(fr, {}).get("cam")
+                    near = set()
+                    if cam is not None:
+                        for ob in objs.get(fr, []):
+                            sx = KX + (ob["x"] - cam)
+                            near |= {i for i, e in enumerate(cand) if abs((e["x"] & 0x3FF) - sx) <= 56}
+                    # ... but never the OTHER fighter's: entries near P2's screen x are dropped when the fighters are apart
+                    c = cams.get(fr, {})
+                    if {"p1x", "p2x", "cam"} <= c.keys() and abs(c["p2x"] - c["p1x"]) > 80:
+                        p2s = KX + (c["p2x"] - c["cam"])
+                        near = {i for i in near if abs((cand[i]["x"] & 0x3FF) + 8 - p2s) > 44}
+                    cand = [e for i, e in enumerate(cand) if i in keep or i in near]
             mine = cand
         else:
             mine = [e for e in ents[fr] if e["a19"] >= min_addr]
@@ -134,7 +152,7 @@ def render(capture, spec, out_dir, frames=None, min_addr=0x40000, tile_set=None,
         rows = [bytes(v for pxl in row for v in pxl) for row in canvas]
         p = out_dir / (f"{names[fr]}.png" if names and fr in names else f"f{fr}.png"); p.write_bytes(png(W, H, rows)); written.append((fr, W, H, len(mine)))
         import json
-        p.with_suffix(".json").write_text(json.dumps({"frame": fr, "x0": X0, "y0": Y0, "w": W, "h": H, "entries": len(mine), **cams.get(fr, {})}))
+        p.with_suffix(".json").write_text(json.dumps({"frame": fr, "x0": X0, "y0": Y0, "w": W, "h": H, "entries": len(mine), "objects": objs.get(fr, []), **cams.get(fr, {})}))
     return written
 
 
