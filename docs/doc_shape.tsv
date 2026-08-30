@@ -54,7 +54,8 @@ docs/project/M3b_plan.md	HIST	-	-
 docs/project/WSL2_SETUP.md	REFERENCE	-	-
 docs/project/audit_2026-08-15_dispositions.md	HIST	-	-
 docs/project/beam_port_scope.md	HIST	-	-
-docs/project/build_dir_triage.md	PENDING	-	-
+docs/project/build_dir_triage.md	REFERENCE	docs/project/build_dir_triage_history.md	banner
+docs/project/build_dir_triage_history.md	HIST	-	-
 docs/project/coverage_matrix.md	REFERENCE	-	-
 docs/project/cps2_wide.md	PENDING	-	-
 docs/project/doc_audit_14z118.md	LOG	-	-

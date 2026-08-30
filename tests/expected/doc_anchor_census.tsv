@@ -365,7 +365,7 @@ VSP-94	HANDOFF.md	Build registry	IN-LIST
 VSP-95	docs/project/gotchas.md	A frozen build stops being a usable REFERENCE when the profile bumps (14z-92)	IN-LIST
 VSP-96	docs/project/build_dir_triage.md	BEFORE DELETING A BUILD DIR, GREP FOUR PLACES — NOT TWO (14z-112, paid for)	IN-LIST
 VSP-97	docs/project/build_dir_triage.md	THE DEEPER FLAW THE SWEEP EXPOSED: "tracked" build dirs are only PARTLY tracked	IN-LIST
-VSP-98	docs/project/build_dir_triage.md	Recordings (`tests/inp/`, `~/.cache/vampire-saved/inp/`) — 14z-111, maintainer-ruled	IN-LIST
+VSP-98	docs/project/build_dir_triage.md	Recordings under `tests/inp/` and the cache (maintainer-ruled 14z-111)	IN-LIST
 VSP-99	docs/project/patch_index.md	patch_index — one-page registry of every patch	IN-LIST
 VSP-100	HANDOFF.md	RELEASE PACKAGING (14z-105) — `release/<name>/`, no ROM bytes	IN-LIST
 VSP-101	HANDOFF.md	THE PRE-COMMIT COMMAND (14z-94, GitHub #30) — run this, not a filename	IN-LIST

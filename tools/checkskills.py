@@ -71,7 +71,10 @@ _PORT_DOCS = ["CLAUDE.md", "HANDOFF.md", "STATE.md", "docs/project/gotchas.md",
               "docs/project/patch_index.md", "docs/project/cps2_wide.md"]
 _PORT_LOGS = ["docs/project/gotchas.md", "docs/project/patch_notes.md",
               "docs/project/patch_index.md", "HANDOFF.md", "CLAUDE.md",
-              "STATE.md", "STATE_HISTORY.md"]
+              "STATE.md", "STATE_HISTORY.md",
+              # history twins join the LOG lists as they are created
+              # (14z-122, the documentation pass): a log is a log.
+              "docs/project/build_dir_triage_history.md"]
 SKILLS = {
     "VSP": dict(path=".claude/skills/vampire-saved-port/SKILL.md",
                 docs=_PORT_DOCS, logs=_PORT_LOGS, forbid=[],
