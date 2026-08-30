@@ -213,7 +213,7 @@ DONOVAN = {
         ("Lightning Sword (ES)", rdp("PP"), 300),
         ("Killshread (ES)", qcb("KK"), 220),
         ("Killshread Lightning (ES)", qcb("PP"), 260),
-        ("Killshread Summon (ES)", qcb("KK"), 240),
+        ("Killshread Summon (ES)", qcb("KK"), 240),  # NOT a TOML row since 14z-121 (no ES, maintainer-confirmed): kept as the measured negative control — enters 0x47, no stock
         ("Press of Death [LK]", hcf("LK"), 260),
         ("Press of Death [MK]", hcf("MK"), 260),
         ("Press of Death [HK]", hcf("HK"), 260),

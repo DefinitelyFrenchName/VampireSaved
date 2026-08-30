@@ -670,7 +670,9 @@ frame by `tests/lua/field_trace.lua`, each pointer mapped onto the graph
   Immortal `0x3b -> 0x3c -> 0x3e -> 0x3f` (`0x3d` not reached). Grapple
   `0x41`. Stance: Killshread LK `0x44`, MK/HK `0x43`, ES `0x46`; summon
   ground `0x47`, air `0x48` (no ES — the pair spends no stock and enters
-  `0x47`); Lightning-in-stance LP/MP/HP `0x54-0x56`, ES `0x57`, tail `0x58`.
+  `0x47`; maintainer-confirmed 14z-121, and the ES effect of the stance
+  pair is Killshread (ES) `0x46`'s: the sword attacks both going away and
+  coming back during the summon — stated, not measured); Lightning-in-stance LP/MP/HP `0x54-0x56`, ES `0x57`, tail `0x58`.
   Dashes `0x49/0x4a`, dash end `0x4b`. Pursuit `0x4c` (P and K identical),
   ES `0x4e`. Table `a` is the movement family: idle `0x00`, walk `0x02/0x04`,
   crouch `0x09 -> 0x01 -> 0x06`, jump `0x0e -> 0x10 -> 0x0f`.

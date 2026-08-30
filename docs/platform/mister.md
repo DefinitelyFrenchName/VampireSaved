@@ -26,7 +26,7 @@ updated 14z-113: the field test has run — PASSED 14z-109 on a DE10-Nano,
 re-confirmed on bundle 14z112 on 2026-08-28 with stock Vampire Savior
 coexisting on the same card, then green on bundles 14z115 (M9), 14z117 (M10)
 and 14z117b (M11, "behavior identical to emulation", 2026-08-29 — STATE
-14z-118); the `[STOCK CONTROL]` reference-leg MRA ships
+14z-118) and 14z119 (M12, "all green", 2026-08-30 — STATE 14z-121); the `[STOCK CONTROL]` reference-leg MRA ships
 since 14z-109; the `.rbf` + MRAs are to be tracked in-tree under
 `release/` by the maintainer's ruling of 2026-08-28 — format open in STATE.)**
 

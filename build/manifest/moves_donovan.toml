@@ -27,6 +27,11 @@
 # TAILS (recovery chains entered after the move's own) are in the notes.
 # Two positive controls: Blizzard Sword HP = vs2 0x283E58 (replay 59) and
 # Lightning Sword ES = vs2 0x284A64 (replay 56).
+#
+# 14z-121 (2026-08-30): the `Killshread Summon (ES)` row was DROPPED on the
+# maintainer's confirmation (measured 14z-120: 214KK in stance enters the plain
+# summon 0x47 and spends no stock). 53 rows. The rig keeps that probe as the
+# measured negative control (tools/name_moves.py part 3).
 
 # ---- throws -------------------------------------------------------------
 
@@ -102,7 +107,7 @@ seq = "0x44,0x43,0x43"
 name = "Killshread (ES)"
 input = "214KK"
 kind = "es"
-notes = "ES of Killshread; stance change (plants the sword); MEASURED 14z-120: a2:0x46, one stock spent"
+notes = "ES of Killshread; stance change (plants the sword); MEASURED 14z-120: a2:0x46, one stock spent. MAINTAINER 2026-08-30 (14z-121, stated not measured): the ES effect plays out DURING THE SUMMON — the returning Killshread attacks both going away AND coming back to Donovan, where the plain summon attacks one way only. This is the ONLY ES of the stance pair: the Summon itself has none"
 table = "a2"
 seq = "0x46"
 
@@ -110,17 +115,9 @@ seq = "0x46"
 name = "Killshread Summon"
 input = "214K, j.214K"
 kind = "special"
-notes = "In Killshread stance; stance change (summons back the sword); ground or air; ES = Killshread Summon (ES); MEASURED 14z-120: ground 214K (any K) -> a2:0x47; air j.214K -> a2:0x48"
+notes = "In Killshread stance; stance change (summons back the sword); ground or air; NO ES — maintainer-confirmed 2026-08-30 (14z-121), the `Killshread Summon (ES)` row DROPPED; the two-way attack is Killshread (ES)'s effect, see that row; MEASURED 14z-120: ground 214K (any K) -> a2:0x47; air j.214K -> a2:0x48"
 table = "a2"
 seq = "0x47,0x48"
-
-[[move]]
-name = "Killshread Summon (ES)"
-input = "214KK, j.214KK"
-kind = "es"
-notes = "ES of Killshread Summon; in Killshread stance; ground or air; MEASURED 14z-120: NO ES VERSION — 214KK in stance enters the plain summon a2:0x47 and spends NO stock (maintainer to confirm / drop this row)"
-table = "a2"
-seq = "0x47"
 
 [[move]]
 name = "Killshread Lightning"

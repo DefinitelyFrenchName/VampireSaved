@@ -2315,7 +2315,7 @@ Frame data (derived): startup 13 · active 18 (nodes 5-10, attack record 0x35) �
 | 18 | `0x285e68` | `0x6920` | 2 | 0x00 | 1 | 0 |  | 0 | 0 |  |  |
 | 19 | `0x285e80` | `0x6938` | 1 | 0x40 | 1 | 0 |  | 0 | 0 |  |  |
 
-### seq `0x47` — **Killshread Summon [214K] / Killshread Summon (ES)** — start `0x285e98`, 8 nodes, 20 frames, end hold
+### seq `0x47` — **Killshread Summon [214K]** — start `0x285e98`, 8 nodes, 20 frames, end hold
 
 | # | addr | off | dur | flags | hb8 | hbA | atk rec | shadow | sfx | link | ! |
 |---|---|---|---|---|---|---|---|---|---|---|---|
