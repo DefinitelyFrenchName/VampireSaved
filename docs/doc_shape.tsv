@@ -49,7 +49,8 @@ docs/game/atlas/sprite_lists.md	REFERENCE	-	-
 docs/game/atlas/venue_assets.md	REFERENCE	-	-
 # --- platform
 docs/platform/gotchas.md	REGISTER	-	-
-docs/platform/mister.md	PENDING	-	-
+docs/platform/mister.md	PENDING	docs/platform/mister_history.md	-
+docs/platform/mister_history.md	HIST	-	-
 # --- project
 docs/project/M1_acceptance.md	HIST	-	-
 docs/project/M2_feasibility.md	HIST	-	-

@@ -51,7 +51,8 @@ _MISTER_DOCS = ["docs/platform/mister.md", "docs/project/mister_core.md",
                 "docs/project/mister_field.md", "docs/project/cps2_wide.md",
                 "docs/project/release_format.md", "docs/platform/gotchas.md",
                 "docs/project/gotchas.md", "HANDOFF.md", "CLAUDE.md"]
-_MISTER_LOGS = ["docs/platform/mister.md", "docs/project/mister_map.md",
+_MISTER_LOGS = ["docs/platform/mister.md", "docs/platform/mister_history.md",  # the twin joins the LOG list (14z-123 G4)
+                "docs/project/mister_map.md",
                 "docs/project/mister_fit.md", "docs/project/mister_field.md",
                 "docs/project/release_format.md", "docs/platform/gotchas.md",
                 "docs/project/gotchas.md", "release/bitstreams/18269/BITSTREAM.txt",

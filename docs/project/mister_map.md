@@ -70,8 +70,8 @@ compared programmatically against MAME's, and nothing has run on hardware.**~~
 `docs/project/mister_core.md` §12 is the ledger of what has never been tried.
 **[SUPERSEDED, kept because its ELIMINATIONS stand — the state before D5:**
 "What has NOT happened is the end-to-end demonstration: the WIDE romset does
-not get past its own boot sequence on the core (`docs/platform/mister.md`
-"THE WIDE ROMSET DOES NOT BOOT ON THE CORE YET"), the read probe counts ZERO
+not get past its own boot sequence on the core (`docs/platform/mister.md` "The pre-D5 boot loop"; the eliminations verbatim in
+`docs/platform/mister_history.md`), the read probe counts ZERO
 reads in both group-C windows and zero in vanilla obj bank 2 as well, and the
 boot fault reproduces frame-for-frame with the profile bit CLEAR." The last
 clause is CORRECTED in place elsewhere: the two profile states are not
@@ -125,6 +125,29 @@ The stock `vsavj.rom` is BIT-IDENTICAL to the 14z-106 image (sha1
 was wrong in a way that fails silently — corrected in place there.
 
 ---
+
+## Index — where each slice's as-built paragraph is
+
+This document is the DERIVATION (numbered sections, cited by the gates as
+§3 / §5 / §9 — never renumber). Each slice's design lives here, its as-built
+record in the section named, its measurement in `docs/platform/mister.md`,
+and its status row in §10:
+
+| slice | what | design here | as built | measured in `mister.md` | gate |
+|---|---|---|---|---|---|
+| D0 | the MRA + the `.rom` trim | §3 | §3 "The QSound trim, concretely — AS BUILT" | "HOW THE MRA AND THE `.rom` ARE MADE" | `tests/test_mister_mra_map.sh` |
+| D1 | QSound sample-bank width, runtime-gated | §7, §9 Q3/Q8 | `mister_core.md` §8 | "The runtime profile gate", "The QSound bank bit IS `dsp_ab[7]`" | `tests/test_mister_wide_gate.sh` |
+| D2 | the SDRAM placement (bank-0 re-pack, group-C redirect, QSound split) | §5, §6 | §6 "AS BUILT (slice D2)" | "THE SDRAM IMAGE CENSUS", "The per-bank profile of the WIDE image" | `tests/test_mister_sdram_census.sh`, `tests/audit_sdram_bank_load.sh` |
+| D3 | the object promote (the 19th tile bit) | §6 | §6 "The promote — AS BUILT (slice D3)" | "THE SDRAM READ PROBE", "WITH SLICE D5 IN" | `tests/test_mister_gfxc_fetch.sh`, `tests/test_mister_obj_oracle.sh` |
+| D4 | the 6 MB program window | §8 | §8 "The minimal, profile-gated proposal — IMPLEMENTED" | "CAN THE 68k READ ABOVE 4 MB?" | `tests/test_mister_prg_window.sh`, `tests/test_mister_prg_probe.sh` |
+| D5 | the decryption range | §8 (retracted there), `mister_core.md` §7 | §10's D5 row | "THE MECHANISM: THE CPS-2 KEY'S RANGE WORD IS STORED COMPLEMENTED", "SLICE D5: THE FIX" | `tests/test_mister_wide_gate.sh` section 9 |
+| the stock legs | the emulator superset on FPGA | §10 (every slice) | — | "The work-RAM oracle" (the anchor), "The runtime profile gate" | `tests/test_mister_sim_anchor.sh`, `tests/test_mister_wide_inert.sh` |
+| the whole tier | does it fit | §1, §5, §11 | §5 "The whole-tier arithmetic" | "The numbers that bound a MiSTer-shaped profile" | `tests/audit_mister_map_fit.sh`, `tools/mk_mister_page.py --check` |
+
+The holes — what has never been tried — are `mister_core.md` §12; the field
+procedure is `mister_field.md`; the demand measurement is `mister_fit.md`.
+The status paragraphs above this index are the slices' closing records as
+written, newest first, each superseding the one below it in place.
 
 ## 0. The one-paragraph answer
 
@@ -905,15 +928,15 @@ slice as the decode.
    built to bound — obj fetches interleaving with the PCM stream inside bank
    1 — is therefore STILL UNMEASURED**, and it stays unmeasured until a
    tenant can be selected on the core (see the input defect in
-   `docs/platform/mister.md`, "THE SIMULATED JOYSTICK'S DIRECTIONS ARE
-   REVERSED" — the bits arrive and are PERMUTED, the whole nibble end for
+   `docs/platform/mister.md`, "The simulated joystick's direction nibble is
+   MSB-FIRST" — the bits arrive and are PERMUTED, the whole nibble end for
    end; they are not lost. Fixed 14z-108).
    *(Superseded text kept below; its eliminations stand.)*
    **[14z-107 (10): THE INSTRUMENT NOW HAS ITS SECOND LEG
    (`--core cps2w --wide build/m3b_merged13`) AND THE QUESTION IS STILL
    OPEN, for a reason that is not the instrument's.** The WIDE romset does
    not get past its own boot sequence on the core (`docs/platform/mister.md`
-   "THE WIDE ROMSET DOES NOT BOOT ON THE CORE YET"), so a run on it never
+   "The pre-D5 boot loop"; `mister_history.md` for the trace), so a run on it never
    reaches a select screen or a match: its four frozen phase boundaries
    label a looping boot, and **no obj bank 5 traffic exists to measure**.
    The leg is written, gated on the transfer length, and prints a PEAK
@@ -992,19 +1015,12 @@ slice as the decode.
 7. **Does widening `main_rom_addr` interact with `jtcps2_dtack.v`?** Unread.
 8. ~~**Should the profile be selected at RUNTIME from a spare header byte
    rather than by `ifdef` in `cps2w`?**~~ **RULED YES (maintainer,
-   2026-08-23) AND IMPLEMENTED IN D1.** The gate is **header byte 41, bit 0,
-   ACTIVE LOW** — `0xFF` (the generator's own `[header] fill`) means profile
-   OFF, and the WIDE MRA writes `0xFE`. The polarity is forced, not chosen:
-   any other one would change every stock MRA this core emits, and the twin
-   assertion forbids that. `jtcps1_prom_we.v` ignores bytes 41-43 (0-7 are
-   the region starts, 8-39 `is_cps`, 40 `JOY_BYTE`, 44-63 the CPS-2 key), so
-   byte 41 is free at this pin. RTL: `cores/cps2w/hdl/jtcps2w_profile.v`,
-   instantiated in the game top, output `wide_en`, taken by every gated site.
-   Measured end to end: the stock `.rom`'s byte 41 is `0xFF` and the WIDE
-   `.rom`'s is `0xFE` (`tests/test_mister_mra_map.sh`); the decode is
-   exhaustively simulated with three must-fire controls
-   (`tests/test_mister_wide_gate.sh`). Full argument:
-   `docs/platform/mister.md` "The runtime profile gate".
+   2026-08-23) AND IMPLEMENTED IN D1**: header byte 41, bit 0, ACTIVE LOW —
+   `0xFF` = profile off, the WIDE MRA writes `0xFE`; measured end to end
+   (`tests/test_mister_mra_map.sh`), decoded by `jtcps2w_profile.v` into
+   `wide_en`. The full argument — why the polarity is forced, why the byte is
+   free, how the row is scoped — is `docs/platform/mister.md` "The runtime
+   profile gate", the canonical home.
 
 ---
 

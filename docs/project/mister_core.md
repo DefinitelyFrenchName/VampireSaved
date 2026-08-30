@@ -7,8 +7,8 @@ rather than in the order any of it was discovered. Read it to answer "why is
 the map shaped like that, and what would break it?"
 
 **How it relates to the other docs.** `docs/platform/mister.md` is the
-platform LOG: what jtcps2 and jtframe do, measured, with every retraction
-still visible. `docs/project/mister_map.md` is the PLACEMENT with its
+platform RECORD: what jtcps2 and jtframe do, measured, one section per
+fact (its problem→fix chronology is `docs/platform/mister_history.md`). `docs/project/mister_map.md` is the PLACEMENT with its
 derivations, slice plan and open questions. `docs/project/mister_fit.md` is
 the DEMAND measurement — what the roster needs, region by region.
 `docs/project/cps2_wide.md` is the profile itself, of which MiSTer is the
@@ -577,29 +577,18 @@ header, and not by an `ifdef` — maintainer's ruling, 2026-08-23. `cps2w`'s
 `macros.def` differs from `cps2`'s by `CORENAME` alone, and it stays that
 way on purpose: **the WIDE profile is not a macro.**
 
-* **Which byte, and why it is free.** `jtcps1_prom_we.v` consumes header
-  bytes 0-7 (the region start words), 8-39 (`is_cps` and the CPS config
-  registers) and 40 (`JOY_BYTE`); 44-63 are the CPS-2 key. Bytes **41-43
-  fall through every branch of its decoder**, which is what the file's own
-  comment ("6 are actually used and 10 are reserved") describes.
-  `JTFRAME_HEADER=44`, so byte 41 exists in every CPS-2 `.rom`.
-* **Active low, and that is forced rather than chosen.** `mame2mra.toml`
-  declares `[header] fill=0xff`, so an unwritten header byte is `0xFF` — and
-  the stock `vsavj` MRA emitted by `cps2w` has to stay byte-identical to
-  `cps2`'s. Only a polarity in which the fill means "profile off" can do
-  that. **Byte 41 bit 0 CLEAR = CPS-2 WIDE**, and the WIDE MRA writes `fe`.
-  jtframe's own `JOY_BYTE` has exactly this shape.
-* **How the row is scoped.** `RawData` embeds `Selectable`, so
-  `{ setname="vsavjw", offset=41, data="fe" }` scores 3 for that set and 0
-  for everything else. No other MRA gains a byte. Measured end to end: the
-  stock `.rom`'s byte 41 is `0xFF` and the WIDE `.rom`'s is `0xFE`.
-* **Where it lands in RTL.** `cores/cps2w/hdl/jtcps2w_profile.v` snoops the
-  ioctl stream in the game top and outputs `wide_en`; it re-defaults at the
-  first byte of every download, ignores `ioctl_ram`, and is inert for every
-  address but 41. It is a *static configuration bit*: written only while the
-  ROM streams with the core held in reset, constant for the whole of play,
-  and on the same 96 MHz net as everything that consumes it. There is nothing
-  to synchronise.
+The bit is MRA header **byte 41, bit 0, ACTIVE LOW**: `0xFF` — the generator's
+own `[header] fill` — means profile OFF and the WIDE MRA writes `0xFE`, so
+the stock `vsavj` MRA `cps2w` emits stays byte-identical to `cps2`'s;
+`jtcps1_prom_we.v` ignores bytes 41-43, so the byte is free at this pin; the
+row is scoped to the `vsavjw` set alone by `RawData`'s `Selectable`; and
+`cores/cps2w/hdl/jtcps2w_profile.v` snoops the ioctl stream into the STATIC
+bit `wide_en` — written only while the ROM streams with the core in reset,
+constant for the whole of play, on the same 96 MHz net as its consumers, so
+there is nothing to synchronise. Why each of those is forced rather than
+chosen, and the end-to-end measurement (stock `.rom` byte 41 `0xFF`, WIDE
+`0xFE`, `tests/test_mister_mra_map.sh`): `docs/platform/mister.md` "The
+runtime profile gate" — the canonical home.
 
 **The consequence is the point.** Stock `vsavj` on **our** RBF runs with the
 bit clear, so every gated expression collapses to the reference core's,
@@ -799,8 +788,8 @@ object engine, so the slots are reachable and the profile is complete.
 > profile bit CLEAR is frame-for-frame identical, which eliminates all eight
 > gated sites; the whole-image census passes on the same image and core, which
 > eliminates the download; and MAME on the same romset and replay reaches the
-> select screen. `docs/platform/mister.md` "THE WIDE ROMSET DOES NOT BOOT ON
-> THE CORE YET" carries the trace, the eliminations and the next probe. **This
+> select screen. `docs/platform/mister.md` "The pre-D5 boot loop" (the eliminations
+> verbatim in `docs/platform/mister_history.md`) carries the trace, the eliminations and the next probe. **This
 > is the first thing to fix, and it is a bug hunt rather than a slice.**
 
 **Two findings recorded while reading, not acted on.** The wait-state line

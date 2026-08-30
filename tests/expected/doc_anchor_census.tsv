@@ -83,11 +83,11 @@ MSC-4	docs/platform/mister.md	Where things are	IN-LIST
 MSC-5	docs/platform/mister.md	How the CPS-2 core is put together (read 2026-08-22)	IN-LIST
 MSC-6	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
 MSC-7	docs/project/mister_core.md	4. The one escape, and why it is the fallback	IN-LIST
-MSC-8	docs/platform/mister.md	The runtime profile gate: MRA header byte 41 (slice D1, 14z-107 (6))	IN-LIST
-MSC-9	docs/platform/mister.md	The runtime profile gate: MRA header byte 41 (slice D1, 14z-107 (6))	IN-LIST
-MSC-10	docs/platform/mister.md	The runtime profile gate: MRA header byte 41 (slice D1, 14z-107 (6))	IN-LIST
-MSC-11	docs/platform/mister.md	The runtime profile gate: MRA header byte 41 (slice D1, 14z-107 (6))	IN-LIST
-MSC-12	docs/platform/mister.md	The runtime profile gate: MRA header byte 41 (slice D1, 14z-107 (6))	IN-LIST
+MSC-8	docs/platform/mister.md	The runtime profile gate: MRA header byte 41 (slice D1, measured 14z-107)	IN-LIST
+MSC-9	docs/platform/mister.md	The runtime profile gate: MRA header byte 41 (slice D1, measured 14z-107)	IN-LIST
+MSC-10	docs/platform/mister.md	The runtime profile gate: MRA header byte 41 (slice D1, measured 14z-107)	IN-LIST
+MSC-11	docs/platform/mister.md	The runtime profile gate: MRA header byte 41 (slice D1, measured 14z-107)	IN-LIST
+MSC-12	docs/platform/mister.md	The runtime profile gate: MRA header byte 41 (slice D1, measured 14z-107)	IN-LIST
 MSC-13	docs/project/mister_core.md	8. How the profile is switched on, and why it is a runtime bit	IN-LIST
 MSC-14	docs/project/mister_core.md	8. How the profile is switched on, and why it is a runtime bit	IN-LIST
 MSC-15	docs/project/mister_core.md	8. How the profile is switched on, and why it is a runtime bit	IN-LIST
@@ -98,14 +98,14 @@ MSC-19	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice
 MSC-20	docs/project/mister_map.md	5. THE MAP	IN-LIST
 MSC-21	docs/platform/gotchas.md	A CPS-2 tile code IS its SDRAM address — and the SAME ART HAS THREE SIZES (14z-107, third size added	IN-LIST
 MSC-22	docs/platform/gotchas.md	A CPS-2 tile code IS its SDRAM address — and the SAME ART HAS THREE SIZES (14z-107, third size added	IN-LIST
-MSC-23	docs/platform/mister.md	The per-bank SDRAM traffic profile (measured 14z-107 (3))	IN-LIST
+MSC-23	docs/platform/mister.md	The per-bank SDRAM traffic profile (measured 14z-107)	IN-LIST
 MSC-24	docs/project/mister_core.md	Why bank 1 can take the load	IN-LIST
 MSC-25	docs/platform/gotchas.md	On jtcps1/jtcps2, GFX ROM CONTENT changes object TIMING (14z-107)	IN-LIST
 MSC-26	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
 MSC-27	docs/project/mister_core.md	7. What no amount of memory would fix	IN-LIST
 MSC-28	docs/project/mister_map.md	The promote — **AS BUILT (slice D3)**	IN-LIST
 MSC-29	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
-MSC-30	docs/platform/mister.md	The QSound bank bit IS `dsp_ab[7]` — validated 14z-107 (6)	IN-LIST
+MSC-30	docs/platform/mister.md	The QSound bank bit IS `dsp_ab[7]` (validated against MAME's LLE device, 14z-107)	IN-LIST
 MSC-31	docs/project/mister_map.md	Everything else `jtcps2_main.v` decodes, and whether it collides	IN-LIST
 MSC-32	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
 MSC-33	docs/project/mister_core.md	8. How the profile is switched on, and why it is a runtime bit	IN-LIST
@@ -123,9 +123,9 @@ MSC-44	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice
 MSC-45	docs/platform/gotchas.md	THE SIM HARNESS'S DIRECTION BITS ARE REVERSED — all four, end for end (measured in full 2026-08-24, 	IN-LIST
 MSC-46	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
 MSC-47	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
-MSC-48	docs/platform/mister.md	THE SDRAM READ PROBE: watching the core FETCH (14z-107 (10), fork commit 12)	IN-LIST
+MSC-48	docs/platform/mister.md	THE SDRAM READ PROBE: watching the core FETCH (measured 14z-107, fork commit 12)	IN-LIST
 MSC-49	docs/platform/mister.md	The cheapest proof that the profile bit is live: LOOK AT THE SCREEN	IN-LIST
-MSC-50	docs/platform/mister.md	THE SDRAM IMAGE CENSUS: reading the download back out (14z-107 (9))	IN-LIST
+MSC-50	docs/platform/mister.md	THE SDRAM IMAGE CENSUS: reading the download back out (measured 14z-107)	IN-LIST
 MSC-51	docs/platform/gotchas.md	The Verilator SDRAM model dropped the TOP address bit — and the obvious fix was wrong (14z-107)	IN-LIST
 MSC-52	docs/project/gotchas.md	THE INSTRUMENT PROTOCOL (adopted 14z-107 (11), maintainer-directed)	IN-LIST
 MSC-53	docs/project/mister_core.md	12. The holes — what has never been tried	IN-LIST
@@ -138,12 +138,12 @@ MSC-59	docs/platform/gotchas.md	`xjtcore.sh` RETRIES UNTIL A SEED PASSES, SO A G
 MSC-60	docs/platform/gotchas.md	`xjtcore.sh` RETRIES UNTIL A SEED PASSES, SO A GREEN BUILD CERTIFIES A PLACEMENT AND NOT A DESIGN (m	IN-LIST
 MSC-61	docs/platform/gotchas.md	A jtcores BITSTREAM CARRIES A BUILD DATESTAMP, SO THE SAME SEED REBUILDS TO A DIFFERENT HASH ON A DI	IN-LIST
 MSC-62	docs/project/release_format.md	The rule	IN-LIST
-MSC-63	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107 (5))	IN-LIST
-MSC-64	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107 (5))	IN-LIST
-MSC-65	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107 (5))	IN-LIST
-MSC-66	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107 (5))	IN-LIST
-MSC-67	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107 (5))	IN-LIST
-MSC-68	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107 (5))	IN-LIST
+MSC-63	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107)	IN-LIST
+MSC-64	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107)	IN-LIST
+MSC-65	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107)	IN-LIST
+MSC-66	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107)	IN-LIST
+MSC-67	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107)	IN-LIST
+MSC-68	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107)	IN-LIST
 MSC-69	docs/project/mister_field.md	2. Before the board: the bundle and its control	IN-LIST
 MSC-70	docs/project/mister_core.md	12. The holes — what has never been tried	IN-LIST
 MSC-71	docs/project/mister_core.md	12. The holes — what has never been tried	IN-LIST
@@ -158,7 +158,7 @@ MSV-6	docs/project/mister_map.md	The two moves that make it fit, stated plainly	
 MSV-7	docs/project/mister_map.md	The two moves that make it fit, stated plainly	IN-LIST
 MSV-8	docs/project/mister_map.md	Mapped verbatim (WIDE v1 declared sizes) — TWO INDEPENDENT OVERFLOWS	IN-LIST
 MSV-9	docs/project/mister_map.md	Slot count — the one place this needs a new jtframe file	IN-LIST
-MSV-10	docs/platform/mister.md	THE 14z-108/109 MEASUREMENTS, RECORDED IN THE LOG (entered 14z-114)	IN-LIST
+MSV-10	docs/platform/mister.md	The tenant-content measurements: the tenant anchor, both group-C fetches, bank 1 under load, the QSo	IN-LIST
 MSV-11	docs/project/mister_map.md	9. Open questions, stated as questions	IN-LIST
 MSV-12	docs/platform/mister.md	The work-RAM oracle: `JTFRAME_SIM_WRAMDUMP` (measured 14z-107)	IN-LIST
 MSV-13	docs/project/mister_map.md	Is the reserved 16 bytes enough? — yes, and it is now load-bearing three times	IN-LIST
@@ -173,11 +173,11 @@ MSV-21	docs/project/mister_field.md	2. Before the board: the bundle and its cont
 MSV-22	docs/project/mister_field.md	2. Before the board: the bundle and its control	IN-LIST
 MSV-23	docs/platform/mister.md	The work-RAM oracle: `JTFRAME_SIM_WRAMDUMP` (measured 14z-107)	IN-LIST
 MSV-24	docs/platform/mister.md	The work-RAM oracle: `JTFRAME_SIM_WRAMDUMP` (measured 14z-107)	IN-LIST
-MSV-25	docs/platform/mister.md	THE 14z-108/109 MEASUREMENTS, RECORDED IN THE LOG (entered 14z-114)	IN-LIST
-MSV-26	docs/platform/mister.md	THE 14z-108/109 MEASUREMENTS, RECORDED IN THE LOG (entered 14z-114)	IN-LIST
+MSV-25	docs/platform/mister.md	The tenant-content measurements: the tenant anchor, both group-C fetches, bank 1 under load, the QSo	IN-LIST
+MSV-26	docs/platform/mister.md	The tenant-content measurements: the tenant anchor, both group-C fetches, bank 1 under load, the QSo	IN-LIST
 MSV-27	HANDOFF.md	upstream's behaviour and `collect` also gathers <outdir>/frames	IN-LIST
 MSV-28	docs/project/gotchas.md	A REPLAY'S NAME IS A CLAIM ABOUT THE BUILD (paid: 2026-08-24, 14z-107)	IN-LIST
-MSV-29	docs/platform/mister.md	THE 14z-108/109 MEASUREMENTS, RECORDED IN THE LOG (entered 14z-114)	IN-LIST
+MSV-29	docs/platform/mister.md	The tenant-content measurements: the tenant anchor, both group-C fetches, bank 1 under load, the QSo	IN-LIST
 MSV-30	docs/project/mister_core.md	9. How any of this is known to be true	IN-LIST
 MSV-31	docs/project/mister_field.md	1. What hardware answers that simulation cannot	IN-LIST
 MSV-32	docs/project/mister_field.md	2. Before the board: the bundle and its control	IN-LIST
@@ -419,7 +419,7 @@ VSP-148	docs/project/gotchas.md	capstone m68k mnemonics carry a SIZE SUFFIX — 
 VSP-149	docs/project/gotchas.md	Half the Lua instruments stage inputs one frame off replay.lua — a frame number from one is not a fr	IN-LIST
 VSP-150	HANDOFF.md	THE OUT-OF-RANGE INDEX TOOLKIT (14z-78) — three instruments, one class	IN-LIST
 VSP-151	HANDOFF.md	THE DF PALETTE-SEQ BLOCK CENSUS (14z-79b) — measured, and it had to be	IN-LIST
-VSP-152	HANDOFF.md	run it (guarded: exception breakpoints + register dump at fault)	IN-LIST
+VSP-152	HANDOFF.md	The port pipeline — its tools, and the guarded-replay debug environment (M2a, 2026-07-25)	IN-LIST
 VSP-153	docs/project/gotchas.md	A symptom grouping is a HYPOTHESIS — test it member by member, cheapest	IN-LIST
 VSP-154	docs/project/gotchas.md	Cross-build A/B is the cheapest attribution we have, and it is	IN-LIST
 VSP-155	HANDOFF.md	PRIOR ART FIRST — check the subsystem doc before re-deriving (14z-68m)	IN-LIST
