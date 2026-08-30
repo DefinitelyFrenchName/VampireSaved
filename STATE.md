@@ -1,5 +1,16 @@
 # STATE — living progress log
 
+## Session 14z-121 (5) — **THE MAP'S CARRIERS: the projectile parameters are IN the map (`structures.projectile`, page
+## section) and the hitbox summary's stale "+0x1C pushback scale" is gone; and THE CHARACTER PAGES — `tools/charmap_html.py`
+## renders each tenant's map as a wiki-style HTML page (physics, every move with frame data / damage / boxes / notes,
+## projectiles, reactions), committed as `chars/<tenant>.html` and published as artifacts. No build changed. Not pushed.**
+
+| | |
+|---|---|
+| the map | `charmap_gen.py` gains `structures.projectile` (each census type's handler on vs2 and on the build, the decoded rows, `ours_source`); `charmap_md.py` renders "Projectile parameters (phase 3)" and the reactions blurb names the step-list release and the labelling rule; the hitbox `_encoding` sentence lists the fields by their readers. `test_charmap_current` PASS |
+| the pages | `tools/charmap_html.py <tenant> <build> <out.html>` — reads only the map JSON, the move list, the extract's hitbox set and the frozen reaction lines; per move: name, input, kind, chain, startup/active/recovery/total (the map's derivation), damage/white, meter, class, pushback idx, freeze, the first active frame's hit/hurt/push boxes as an SVG (authored facing left, drawn facing right), the maintainer's notes; ES rows nest under their special. Design: night ground (dark-first, a moonlit-paper light theme), Marcellus / IBM Plex, the hitbox colours players know. Artifacts: Donovan `85d7fd52…`, Huitzil `f0dddc83…`, Pyron `ad618f12…` (URLs in `tables/README.md`) |
+| not gated | the HTML is regenerated with the map by hand (README row); a currency gate would be `test_charmap_current`'s pattern — deferred until the page's shape settles with the maintainer |
+
 ## Session 14z-121 (4) — **THE CHARACTER-DATA MAP'S RESIDUE: Plasma Trap's chain is the JUMP PHASE (rising `0x2a` /
 ## apex `0x2b`, every strength — measured, part 9); Donovan's `0x3d` is `0x3c`'s loop body; the unentered a2 ids are
 ## entered by NO normal/6+button/3+button input (part 13, the negative frozen); `+0x392` is not an engine meter; the second

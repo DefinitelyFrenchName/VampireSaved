@@ -1,0 +1,425 @@
+<title>Huitzil (Phobos)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#EFEBF3;--bg2:#E4DEEB;--ink:#1C1826;--ink2:#5A5468;--line:#CEC6D8;--accent:#A52E22;--gold:#8A6D12;--hurt:#3B7DD8;--push:#2F9A5C;--hit:#D9483B;--chip:#DDD5E6}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#121019;--bg2:#1B1826;--ink:#EDE7F5;--ink2:#A79FB8;--line:#302A3D;--accent:#E0523F;--gold:#D9B33A;--hurt:#5B9BEA;--push:#4BBF78;--hit:#F0604F;--chip:#262033}}
+:root[data-theme="dark"]{--bg:#121019;--bg2:#1B1826;--ink:#EDE7F5;--ink2:#A79FB8;--line:#302A3D;--accent:#E0523F;--gold:#D9B33A;--hurt:#5B9BEA;--push:#4BBF78;--hit:#F0604F;--chip:#262033}
+body{background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:15px;line-height:1.5}
+.page{display:grid;grid-template-columns:200px minmax(0,76ch);gap:0 40px;max-width:1100px;margin:0 auto;padding:32px 24px 80px}
+.masthead{grid-column:1/-1;border-bottom:2px solid var(--accent);padding-bottom:18px;margin-bottom:28px}
+.eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:11.5px;color:var(--ink2);margin:0 0 6px}
+h1{font-family:Marcellus,Georgia,serif;font-weight:400;font-size:44px;letter-spacing:.01em;margin:0;text-wrap:balance}
+.sub{color:var(--ink2);margin:8px 0 0}
+h2{font-family:Marcellus,Georgia,serif;font-weight:400;font-size:26px;margin:40px 0 14px;border-bottom:1px solid var(--line);padding-bottom:6px;text-wrap:balance}
+h3{font-family:Marcellus,Georgia,serif;font-weight:400;font-size:20px;margin:0}
+.index{position:sticky;top:24px;align-self:start}
+.index ol{list-style:none;margin:0;padding:0;border-left:1px solid var(--line)}
+.index li a{display:block;padding:5px 0 5px 14px;color:var(--ink2);text-decoration:none;font-size:13.5px}
+.index li a:hover,.index li a:focus-visible{color:var(--accent);outline:none;border-left:2px solid var(--accent);margin-left:-1px}
+main{min-width:0}
+code,.chain,dd,td,.input{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px 20px;margin:10px 0}
+.stats dl,.strip dl{margin:0}
+dt{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink2)}
+dd{margin:0;font-size:16px}
+dd small,.strip small{font-size:11px;color:var(--ink2);margin-left:2px}
+.fine{color:var(--ink2);font-size:13.5px}
+.move{padding:16px 0 14px;border-top:1px solid var(--line)}
+.move.nested{margin-left:26px;border-top:1px dashed var(--line)}
+.move header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.input{font-size:14px;color:var(--ink2)}
+.chip{font-size:11px;text-transform:uppercase;letter-spacing:.1em;padding:2px 8px;border-radius:2px;background:var(--chip);color:var(--ink2)}
+.chip.es,.chip.ex,.chip.df{color:var(--gold);border:1px solid var(--gold);background:transparent}
+.strip{display:flex;flex-wrap:wrap;gap:8px 22px;align-items:end;margin:10px 0 0}
+.chain{font-size:12.5px;color:var(--ink2);align-self:center}
+.na,.note{font-size:12.5px;color:var(--ink2);align-self:center}
+figure{margin:10px 0 0;display:flex;align-items:center;gap:14px}
+figcaption{font-size:12px;color:var(--ink2)}
+.k{display:inline-block;padding:0 6px;border-radius:2px;color:#fff;font-size:11px}
+.k.hurt{background:var(--hurt)}.k.push{background:var(--push)}.k.hit{background:var(--hit)}
+svg.boxes{background:var(--bg2);border:1px solid var(--line)}
+svg.boxes .ground{stroke:var(--line);stroke-width:1}
+svg.boxes rect{fill-opacity:.28;stroke-width:1.2}
+svg.boxes .hurt{fill:var(--hurt);stroke:var(--hurt)}svg.boxes .push{fill:var(--push);stroke:var(--push)}svg.boxes .hit{fill:var(--hit);stroke:var(--hit)}
+svg.boxes .origin{fill:var(--ink)}
+.notes{margin:10px 0 0;font-size:13.5px;color:var(--ink);max-width:66ch}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;font-size:13px;width:100%}
+th{text-align:left;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink2);border-bottom:1px solid var(--line);padding:6px 10px 6px 0}
+td{padding:5px 10px 5px 0;border-bottom:1px solid var(--line);vertical-align:top}
+td.path{font-size:12px}
+@media (max-width:820px){.page{grid-template-columns:1fr}.index{position:static;margin-bottom:20px}.index ol{display:flex;flex-wrap:wrap;gap:4px 14px;border:0}}
+@media (prefers-reduced-motion: no-preference){.index li a{transition:color .15s}}
+</style>
+<div class="page">
+<header class="masthead"><p class="eyebrow">Project Vampire Saved · character data map</p><h1>Huitzil (Phobos)</h1><p class="sub">Ported from Vampire Savior 2 / Vampire Hunter 2 · character id <code>0x10</code> · every value below is measured on the source game or read from the built image</p></header>
+<nav class="index"><ol><li><a href="#overview">Overview &amp; movement</a></li><li><a href="#normals">Normals</a></li><li><a href="#throws">Throws</a></li><li><a href="#specials">Specials</a></li><li><a href="#ex">EX moves</a></li><li><a href="#df">Dark Force</a></li><li><a href="#movement">Movement</a></li><li><a href="#projectiles">Projectiles</a></li><li><a href="#reactions">As the victim</a></li><li><a href="#provenance">Provenance</a></li></ol></nav>
+<main>
+<section id="overview"><h2>Overview &amp; movement</h2>
+<div class="stats">
+<dl><dt>walk forward</dt><dd>3.125 <small>px/f</small></dd></dl><dl><dt>walk back</dt><dd>-2.75 <small>px/f</small></dd></dl>
+<dl><dt>neutral jump</dt><dd>0 <small>xv</small> · 8 <small>yv</small> · -0.375 <small>gravity</small></dd></dl>
+<dl><dt>forward jump</dt><dd>4 <small>xv</small> · 8 <small>yv</small> · -0.375 <small>gravity</small> · -0.01953 <small>xacc</small></dd></dl>
+<dl><dt>back jump</dt><dd>-4 <small>xv</small> · 8 <small>yv</small> · -0.375 <small>gravity</small> · 0.01953 <small>xacc</small></dd></dl>
+</div>
+<p class="fine">The physics rows are the source game's (ported by value). 16.16 fixed point shown as decimals; the jump rows are the three <code>jump_params</code> records.</p></section>
+<section id="normals"><h2>Normals</h2>
+<article class="move" id="6LP">
+<header><h3>6LP</h3><span class="input">6LP</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x01</span><dl><dt>startup</dt><dd>4</dd></dl><dl><dt>active</dt><dd>15</dd></dl><dl><dt>recovery</dt><dd>7</dd></dl><dl><dt>total</dt><dd>26</dd></dl><dl><dt>damage</dt><dd>2<small>/2 white</small></dd></dl><dl><dt>meter</dt><dd>12</dd></dl><dl><dt>class</dt><dd>0x00</dd></dl><dl><dt>pushback</dt><dd>0<small>/0 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl><span class="note">2 attack records (0x3, 0x4); the first shown</span></div>
+<figure><svg class="boxes" viewBox="0 0 134 110" width="134" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="65.1" x2="134" y2="65.1"/><rect class="hurt" x="39.4" y="7.3" width="27.5" height="20.2"/><rect class="hurt" x="7.3" y="13.8" width="113.7" height="36.7"/><rect class="hurt" x="13.8" y="49.5" width="55.0" height="53.2"/><rect class="push" x="14.7" y="25.7" width="49.5" height="77.0"/><rect class="hit" x="58.7" y="35.8" width="67.8" height="11.0"/><circle class="origin" cx="50.4" cy="101.8" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">Alternate attack: different from 5LP (usually longer reach and different data); MEASURED 14z-120: the odd standing ids are the 6+button alternates</p>
+</article>
+<article class="move" id="6MP">
+<header><h3>6MP</h3><span class="input">6MP</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x03</span><dl><dt>startup</dt><dd>10</dd></dl><dl><dt>active</dt><dd>6</dd></dl><dl><dt>recovery</dt><dd>21</dd></dl><dl><dt>total</dt><dd>37</dd></dl><dl><dt>damage</dt><dd>10<small>/6 white</small></dd></dl><dl><dt>meter</dt><dd>6</dd></dl><dl><dt>class</dt><dd>0x00</dd></dl><dl><dt>pushback</dt><dd>1<small>/1 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl><span class="note">3 attack records (0x6, 0x7, 0x5e); the first shown</span></div>
+<figure><svg class="boxes" viewBox="0 0 143 110" width="143" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="68.2" x2="143" y2="68.2"/><rect class="hurt" x="52.9" y="6.8" width="83.6" height="27.3"/><rect class="hurt" x="6.8" y="20.5" width="100.6" height="34.1"/><rect class="hurt" x="12.8" y="53.7" width="75.0" height="49.5"/><rect class="push" x="13.6" y="31.6" width="46.0" height="71.6"/><rect class="hit" x="58.8" y="18.8" width="56.3" height="18.8"/><circle class="origin" cx="46.9" cy="102.3" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">Alternate attack: different from 5MP (usually longer reach and different data); MEASURED 14z-120</p>
+</article>
+<article class="move" id="6HP">
+<header><h3>6HP</h3><span class="input">6HP</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x05</span><dl><dt>startup</dt><dd>12</dd></dl><dl><dt>active</dt><dd>9</dd></dl><dl><dt>recovery</dt><dd>19</dd></dl><dl><dt>total</dt><dd>40</dd></dl><dl><dt>damage</dt><dd>7<small>/6 white</small></dd></dl><dl><dt>meter</dt><dd>12</dd></dl><dl><dt>class</dt><dd>0x00</dd></dl><dl><dt>pushback</dt><dd>2<small>/2 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl><span class="note">2 attack records (0xa, 0x1f); the first shown</span></div>
+<figure><svg class="boxes" viewBox="0 0 136 110" width="136" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="65.1" x2="136" y2="65.1"/><rect class="hurt" x="33.0" y="7.3" width="66.0" height="20.2"/><rect class="hurt" x="13.8" y="13.8" width="111.8" height="36.7"/><rect class="hurt" x="7.3" y="49.5" width="99.0" height="53.2"/><rect class="push" x="8.2" y="25.7" width="49.5" height="77.0"/><rect class="hit" x="55.0" y="35.8" width="73.3" height="14.7"/><circle class="origin" cx="44.0" cy="101.8" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">Alternate attack: different from 5HP (usually longer reach and different data); MEASURED 14z-120</p>
+</article>
+<article class="move" id="6LK">
+<header><h3>6LK</h3><span class="input">6LK</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x07</span><dl><dt>startup</dt><dd>5</dd></dl><dl><dt>active</dt><dd>3</dd></dl><dl><dt>recovery</dt><dd>11</dd></dl><dl><dt>total</dt><dd>19</dd></dl><dl><dt>damage</dt><dd>4<small>/3 white</small></dd></dl><dl><dt>meter</dt><dd>6</dd></dl><dl><dt>class</dt><dd>0x00</dd></dl><dl><dt>pushback</dt><dd>0<small>/0 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl></div>
+<figure><svg class="boxes" viewBox="0 0 138 110" width="138" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="65.1" x2="138" y2="65.1"/><rect class="hurt" x="39.4" y="7.3" width="27.5" height="20.2"/><rect class="hurt" x="7.3" y="13.8" width="64.2" height="36.7"/><rect class="hurt" x="13.8" y="49.5" width="97.2" height="53.2"/><rect class="push" x="14.7" y="25.7" width="49.5" height="77.0"/><rect class="hit" x="54.1" y="65.1" width="77.0" height="9.2"/><circle class="origin" cx="50.4" cy="101.8" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">Alternate attack: different from 5LK (usually longer reach and different data); MEASURED 14z-120</p>
+</article>
+<article class="move" id="6MK">
+<header><h3>6MK</h3><span class="input">6MK</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x09</span><dl><dt>startup</dt><dd>10</dd></dl><dl><dt>active</dt><dd>4</dd></dl><dl><dt>recovery</dt><dd>24</dd></dl><dl><dt>total</dt><dd>38</dd></dl><dl><dt>damage</dt><dd>13<small>/7 white</small></dd></dl><dl><dt>meter</dt><dd>6</dd></dl><dl><dt>class</dt><dd>0x00</dd></dl><dl><dt>pushback</dt><dd>1<small>/1 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl></div>
+<figure><svg class="boxes" viewBox="0 0 150 53" width="150" height="53" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="23.8" x2="150" y2="23.8"/><rect class="hurt" x="11.9" y="4.8" width="40.5" height="16.7"/><rect class="hurt" x="4.8" y="14.9" width="140.5" height="20.2"/><rect class="hurt" x="36.3" y="17.3" width="35.7" height="31.0"/><rect class="push" x="36.9" y="10.1" width="32.1" height="38.1"/><rect class="hit" x="68.5" y="22.6" width="73.8" height="7.1"/><circle class="origin" cx="60.1" cy="47.6" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">Alternate attack: different from 5MK (usually longer reach and different data); MEASURED 14z-120</p>
+</article>
+<article class="move" id="6HK">
+<header><h3>6HK</h3><span class="input">6HK</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x0b</span><dl><dt>startup</dt><dd>12</dd></dl><dl><dt>active</dt><dd>6</dd></dl><dl><dt>recovery</dt><dd>32</dd></dl><dl><dt>total</dt><dd>50</dd></dl><dl><dt>damage</dt><dd>12<small>/8 white</small></dd></dl><dl><dt>meter</dt><dd>12</dd></dl><dl><dt>class</dt><dd>0x00</dd></dl><dl><dt>pushback</dt><dd>2<small>/2 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl><span class="note">2 attack records (0x4f, 0x5f); the first shown</span></div>
+<figure><svg class="boxes" viewBox="0 0 150 99" width="150" height="99" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="65.1" x2="150" y2="65.1"/><rect class="hurt" x="78.8" y="5.5" width="65.8" height="42.5"/><rect class="hurt" x="49.3" y="38.4" width="64.4" height="32.9"/><rect class="hurt" x="5.5" y="61.6" width="76.7" height="31.5"/><rect class="push" x="13.0" y="49.3" width="37.0" height="43.8"/><rect class="hit" x="50.0" y="41.1" width="47.9" height="21.9"/><circle class="origin" cx="39.7" cy="92.5" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">Alternate attack: different from 5HK (usually longer reach and different data); MEASURED 14z-120</p>
+</article>
+<article class="move" id="5LP">
+<header><h3>5LP</h3><span class="input">5LP</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x00</span><dl><dt>startup</dt><dd>3</dd></dl><dl><dt>active</dt><dd>13</dd></dl><dl><dt>recovery</dt><dd>6</dd></dl><dl><dt>total</dt><dd>22</dd></dl><dl><dt>damage</dt><dd>3<small>/2 white</small></dd></dl><dl><dt>meter</dt><dd>6</dd></dl><dl><dt>class</dt><dd>0x00</dd></dl><dl><dt>pushback</dt><dd>0<small>/0 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl><span class="note">2 attack records (0x1, 0x2); the first shown</span></div>
+<figure><svg class="boxes" viewBox="0 0 126 110" width="126" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="65.1" x2="126" y2="65.1"/><rect class="hurt" x="39.4" y="7.3" width="27.5" height="20.2"/><rect class="hurt" x="7.3" y="13.8" width="99.0" height="36.7"/><rect class="hurt" x="13.8" y="49.5" width="55.0" height="53.2"/><rect class="push" x="14.7" y="25.7" width="49.5" height="77.0"/><rect class="hit" x="63.2" y="35.8" width="55.0" height="9.2"/><circle class="origin" cx="50.4" cy="101.8" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">MEASURED 14z-120 (the same layout as Donovan&#x27;s)</p>
+</article>
+<article class="move" id="5MP">
+<header><h3>5MP</h3><span class="input">5MP</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x02</span><dl><dt>startup</dt><dd>7</dd></dl><dl><dt>active</dt><dd>3</dd></dl><dl><dt>recovery</dt><dd>16</dd></dl><dl><dt>total</dt><dd>26</dd></dl><dl><dt>damage</dt><dd>12<small>/5 white</small></dd></dl><dl><dt>meter</dt><dd>3</dd></dl><dl><dt>class</dt><dd>0x00</dd></dl><dl><dt>pushback</dt><dd>1<small>/1 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl></div>
+<figure><svg class="boxes" viewBox="0 0 150 102" width="150" height="102" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="60.5" x2="150" y2="60.5"/><rect class="hurt" x="23.0" y="6.8" width="73.3" height="18.8"/><rect class="hurt" x="6.8" y="21.3" width="136.4" height="34.1"/><rect class="hurt" x="11.9" y="46.0" width="105.7" height="49.4"/><rect class="push" x="12.8" y="23.9" width="46.0" height="71.6"/><rect class="hit" x="59.7" y="49.4" width="83.5" height="17.0"/><circle class="origin" cx="46.0" cy="94.6" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">MEASURED 14z-120 (the same layout as Donovan&#x27;s)</p>
+</article>
+<article class="move" id="5HP">
+<header><h3>5HP</h3><span class="input">5HP</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x04</span><dl><dt>startup</dt><dd>13</dd></dl><dl><dt>active</dt><dd>6</dd></dl><dl><dt>recovery</dt><dd>28</dd></dl><dl><dt>total</dt><dd>47</dd></dl><dl><dt>damage</dt><dd>4<small>/4 white</small></dd></dl><dl><dt>meter</dt><dd>12</dd></dl><dl><dt>class</dt><dd>0x00</dd></dl><dl><dt>pushback</dt><dd>2<small>/2 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl><span class="note">3 attack records (0x8, 0x9, 0x4d); the first shown</span></div>
+<figure><svg class="boxes" viewBox="0 0 119 110" width="119" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="78.1" x2="119" y2="78.1"/><rect class="hurt" x="64.4" y="5.2" width="49.5" height="46.9"/><rect class="hurt" x="5.2" y="41.7" width="76.8" height="26.0"/><rect class="hurt" x="9.8" y="67.0" width="74.2" height="37.8"/><rect class="push" x="10.4" y="50.1" width="35.1" height="54.7"/><rect class="hit" x="64.4" y="22.8" width="35.1" height="16.9"/><circle class="origin" cx="35.8" cy="104.1" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">MEASURED 14z-120 (the same layout as Donovan&#x27;s)</p>
+</article>
+<article class="move" id="5LK">
+<header><h3>5LK</h3><span class="input">5LK</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x06</span><dl><dt>startup</dt><dd>4</dd></dl><dl><dt>active</dt><dd>5</dd></dl><dl><dt>recovery</dt><dd>8</dd></dl><dl><dt>total</dt><dd>17</dd></dl><dl><dt>damage</dt><dd>5<small>/3 white</small></dd></dl><dl><dt>meter</dt><dd>3</dd></dl><dl><dt>class</dt><dd>0x00</dd></dl><dl><dt>pushback</dt><dd>0<small>/0 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl></div>
+<figure><svg class="boxes" viewBox="0 0 125 110" width="125" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="65.1" x2="125" y2="65.1"/><rect class="hurt" x="39.4" y="7.3" width="27.5" height="20.2"/><rect class="hurt" x="7.3" y="13.8" width="64.2" height="36.7"/><rect class="hurt" x="13.8" y="49.5" width="95.3" height="53.2"/><rect class="push" x="14.7" y="25.7" width="49.5" height="77.0"/><rect class="hit" x="56.8" y="65.1" width="60.5" height="9.2"/><circle class="origin" cx="50.4" cy="101.8" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">MEASURED 14z-120 (the same layout as Donovan&#x27;s)</p>
+</article>
+<article class="move" id="5MK">
+<header><h3>5MK</h3><span class="input">5MK</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x08</span><dl><dt>startup</dt><dd>5</dd></dl><dl><dt>active</dt><dd>4</dd></dl><dl><dt>recovery</dt><dd>19</dd></dl><dl><dt>total</dt><dd>28</dd></dl><dl><dt>damage</dt><dd>12<small>/6 white</small></dd></dl><dl><dt>meter</dt><dd>12</dd></dl><dl><dt>class</dt><dd>0x02</dd></dl><dl><dt>pushback</dt><dd>1<small>/1 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl></div>
+<figure><svg class="boxes" viewBox="0 0 150 78" width="150" height="78" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="37.7" x2="150" y2="37.7"/><rect class="hurt" x="30.3" y="6.6" width="24.6" height="18.0"/><rect class="hurt" x="6.6" y="14.8" width="70.5" height="32.8"/><rect class="hurt" x="18.9" y="40.2" width="124.6" height="31.1"/><rect class="push" x="19.7" y="18.9" width="44.3" height="52.5"/><rect class="hit" x="63.1" y="56.6" width="80.3" height="11.5"/><circle class="origin" cx="51.6" cy="70.5" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">MEASURED 14z-120 (the same layout as Donovan&#x27;s)</p>
+</article>
+<article class="move" id="5HK">
+<header><h3>5HK</h3><span class="input">5HK</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x0a</span><dl><dt>startup</dt><dd>13</dd></dl><dl><dt>active</dt><dd>8</dd></dl><dl><dt>recovery</dt><dd>25</dd></dl><dl><dt>total</dt><dd>46</dd></dl><dl><dt>damage</dt><dd>16<small>/7 white</small></dd></dl><dl><dt>meter</dt><dd>12</dd></dl><dl><dt>class</dt><dd>0x00</dd></dl><dl><dt>pushback</dt><dd>2<small>/2 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl></div>
+<figure><svg class="boxes" viewBox="0 0 150 82" width="150" height="82" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="48.6" x2="150" y2="48.6"/><rect class="hurt" x="25.3" y="5.5" width="75.3" height="15.1"/><rect class="hurt" x="5.5" y="10.3" width="123.3" height="39.7"/><rect class="hurt" x="24.0" y="37.0" width="41.1" height="39.7"/><rect class="push" x="24.7" y="19.2" width="37.0" height="57.5"/><rect class="hit" x="61.0" y="24.0" width="83.6" height="13.7"/><circle class="origin" cx="51.4" cy="76.0" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">MEASURED 14z-120 (the same layout as Donovan&#x27;s)</p>
+</article>
+<article class="move" id="2LP">
+<header><h3>2LP</h3><span class="input">2LP</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x0c</span><dl><dt>startup</dt><dd>3</dd></dl><dl><dt>active</dt><dd>3</dd></dl><dl><dt>recovery</dt><dd>3</dd></dl><dl><dt>total</dt><dd>9</dd></dl><dl><dt>damage</dt><dd>5<small>/4 white</small></dd></dl><dl><dt>meter</dt><dd>6</dd></dl><dl><dt>class</dt><dd>0x00</dd></dl><dl><dt>pushback</dt><dd>0<small>/0 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl></div>
+<figure><svg class="boxes" viewBox="0 0 150 100" width="150" height="100" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="50.3" x2="150" y2="50.3"/><rect class="hurt" x="49.3" y="8.1" width="66.4" height="28.2"/><rect class="hurt" x="16.1" y="13.1" width="122.8" height="40.3"/><rect class="hurt" x="8.1" y="51.3" width="88.6" height="40.3"/><rect class="push" x="24.2" y="27.2" width="54.4" height="64.4"/><rect class="hit" x="71.5" y="40.3" width="70.5" height="8.1"/><circle class="origin" cx="63.4" cy="90.6" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">MEASURED 14z-120 (the same layout as Donovan&#x27;s)</p>
+</article>
+<article class="move" id="2MP">
+<header><h3>2MP</h3><span class="input">2MP</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x0d</span><dl><dt>startup</dt><dd>8</dd></dl><dl><dt>active</dt><dd>2</dd></dl><dl><dt>recovery</dt><dd>17</dd></dl><dl><dt>total</dt><dd>27</dd></dl><dl><dt>damage</dt><dd>10<small>/6 white</small></dd></dl><dl><dt>meter</dt><dd>12</dd></dl><dl><dt>class</dt><dd>0x00</dd></dl><dl><dt>pushback</dt><dd>1<small>/1 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl></div>
+<figure><svg class="boxes" viewBox="0 0 150 74" width="150" height="74" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="37.5" x2="150" y2="37.5"/><rect class="hurt" x="36.8" y="6.0" width="24.0" height="21.0"/><rect class="hurt" x="12.0" y="9.8" width="123.0" height="30.0"/><rect class="hurt" x="6.0" y="38.2" width="66.0" height="30.0"/><rect class="push" x="18.0" y="20.2" width="40.5" height="48.0"/><rect class="hit" x="58.5" y="32.2" width="85.5" height="12.0"/><circle class="origin" cx="47.2" cy="67.5" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">MEASURED 14z-120 (the same layout as Donovan&#x27;s)</p>
+</article>
+<article class="move" id="2HP">
+<header><h3>2HP</h3><span class="input">2HP</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x0e</span><dl><dt>startup</dt><dd>10</dd></dl><dl><dt>active</dt><dd>4</dd></dl><dl><dt>recovery</dt><dd>26</dd></dl><dl><dt>total</dt><dd>40</dd></dl><dl><dt>damage</dt><dd>15<small>/9 white</small></dd></dl><dl><dt>meter</dt><dd>12</dd></dl><dl><dt>class</dt><dd>0x00</dd></dl><dl><dt>pushback</dt><dd>2<small>/2 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl><span class="note">2 attack records (0x15, 0x50); the first shown</span></div>
+<figure><svg class="boxes" viewBox="0 0 150 95" width="150" height="95" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="48.1" x2="150" y2="48.1"/><rect class="hurt" x="47.1" y="7.7" width="30.8" height="26.9"/><rect class="hurt" x="15.4" y="12.5" width="123.1" height="38.5"/><rect class="hurt" x="7.7" y="49.0" width="84.6" height="38.5"/><rect class="push" x="23.1" y="26.0" width="51.9" height="61.5"/><rect class="hit" x="73.1" y="27.9" width="69.2" height="30.8"/><circle class="origin" cx="60.6" cy="86.5" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">MEASURED 14z-120 (the same layout as Donovan&#x27;s)</p>
+</article>
+<article class="move" id="2LK">
+<header><h3>2LK</h3><span class="input">2LK</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x0f</span><dl><dt>startup</dt><dd>3</dd></dl><dl><dt>active</dt><dd>3</dd></dl><dl><dt>recovery</dt><dd>8</dd></dl><dl><dt>total</dt><dd>14</dd></dl><dl><dt>damage</dt><dd>5<small>/3 white</small></dd></dl><dl><dt>meter</dt><dd>12</dd></dl><dl><dt>class</dt><dd>0x02</dd></dl><dl><dt>pushback</dt><dd>0<small>/0 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl></div>
+<figure><svg class="boxes" viewBox="0 0 150 98" width="150" height="98" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="49.7" x2="150" y2="49.7"/><rect class="hurt" x="48.7" y="7.9" width="31.8" height="27.8"/><rect class="hurt" x="15.9" y="12.9" width="69.5" height="39.7"/><rect class="hurt" x="7.9" y="50.7" width="117.2" height="39.7"/><rect class="push" x="23.8" y="26.8" width="53.6" height="63.6"/><rect class="hit" x="78.5" y="61.6" width="63.6" height="7.9"/><circle class="origin" cx="62.6" cy="89.4" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">MEASURED 14z-120 (the same layout as Donovan&#x27;s)</p>
+</article>
+<article class="move" id="2MK">
+<header><h3>2MK</h3><span class="input">2MK</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x10</span><dl><dt>startup</dt><dd>5</dd></dl><dl><dt>active</dt><dd>3</dd></dl><dl><dt>recovery</dt><dd>18</dd></dl><dl><dt>total</dt><dd>26</dd></dl><dl><dt>damage</dt><dd>10<small>/7 white</small></dd></dl><dl><dt>meter</dt><dd>12</dd></dl><dl><dt>class</dt><dd>0x02</dd></dl><dl><dt>pushback</dt><dd>1<small>/1 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl></div>
+<figure><svg class="boxes" viewBox="0 0 150 88" width="150" height="88" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="44.1" x2="150" y2="44.1"/><rect class="hurt" x="43.2" y="7.1" width="28.2" height="24.7"/><rect class="hurt" x="14.1" y="11.5" width="61.8" height="35.3"/><rect class="hurt" x="7.1" y="33.5" width="118.2" height="47.6"/><rect class="push" x="21.2" y="23.8" width="47.6" height="56.5"/><rect class="hit" x="74.1" y="52.1" width="68.8" height="14.1"/><circle class="origin" cx="55.6" cy="79.4" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">MEASURED 14z-120 (the same layout as Donovan&#x27;s)</p>
+</article>
+<article class="move" id="2HK">
+<header><h3>2HK</h3><span class="input">2HK</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x11</span><dl><dt>startup</dt><dd>11</dd></dl><dl><dt>active</dt><dd>18</dd></dl><dl><dt>recovery</dt><dd>16</dd></dl><dl><dt>total</dt><dd>45</dd></dl><dl><dt>damage</dt><dd>10<small>/8 white</small></dd></dl><dl><dt>meter</dt><dd>12</dd></dl><dl><dt>class</dt><dd>0x02</dd></dl><dl><dt>pushback</dt><dd>2<small>/2 blk</small></dd></dl><dl><dt>freeze</dt><dd>255</dd></dl><span class="note">2 attack records (0x18, 0x46); the first shown</span></div>
+<figure><svg class="boxes" viewBox="0 0 150 61" width="150" height="61" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="29.1" x2="150" y2="29.1"/><rect class="hurt" x="14.2" y="23.9" width="40.1" height="18.1"/><rect class="hurt" x="10.3" y="5.2" width="45.3" height="25.9"/><rect class="hurt" x="5.2" y="24.6" width="139.7" height="31.0"/><rect class="push" x="15.5" y="14.2" width="34.9" height="41.4"/><rect class="hit" x="49.1" y="46.6" width="82.8" height="9.1"/><circle class="origin" cx="40.7" cy="55.0" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">MEASURED 14z-120 (the same layout as Donovan&#x27;s)</p>
+</article>
+<article class="move" id="j.LP">
+<header><h3>j.LP</h3><span class="input">j.LP</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x12</span><dl><dt>startup</dt><dd>4</dd></dl><dl><dt>active</dt><dd>4</dd></dl><dl><dt>recovery</dt><dd>40</dd></dl><dl><dt>total</dt><dd>48</dd></dl><dl><dt>damage</dt><dd>6<small>/4 white</small></dd></dl><dl><dt>meter</dt><dd>18</dd></dl><dl><dt>class</dt><dd>0x00</dd></dl><dl><dt>pushback</dt><dd>0<small>/0 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl></div>
+<figure><svg class="boxes" viewBox="0 0 150 79" width="150" height="79" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="61.3" x2="150" y2="61.3"/><rect class="hurt" x="7.3" y="7.3" width="69.5" height="64.0"/><rect class="hurt" x="71.3" y="25.6" width="43.9" height="40.2"/><rect class="push" x="15.5" y="13.7" width="49.4" height="49.4"/><rect class="hit" x="69.5" y="18.3" width="73.2" height="16.5"/><circle class="origin" cx="51.2" cy="97.9" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">MEASURED 14z-120 (the same layout as Donovan&#x27;s)</p>
+</article>
+<article class="move" id="j.MP">
+<header><h3>j.MP</h3><span class="input">j.MP</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x13</span><dl><dt>startup</dt><dd>10</dd></dl><dl><dt>active</dt><dd>4</dd></dl><dl><dt>recovery</dt><dd>46</dd></dl><dl><dt>total</dt><dd>60</dd></dl><dl><dt>damage</dt><dd>17<small>/9 white</small></dd></dl><dl><dt>meter</dt><dd>12</dd></dl><dl><dt>class</dt><dd>0x00</dd></dl><dl><dt>pushback</dt><dd>2<small>/2 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl></div>
+<figure><svg class="boxes" viewBox="0 0 150 64" width="150" height="64" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="49.8" x2="150" y2="49.8"/><rect class="hurt" x="5.9" y="5.9" width="56.4" height="52.0"/><rect class="hurt" x="61.6" y="17.8" width="66.8" height="32.7"/><rect class="push" x="12.6" y="11.1" width="40.1" height="40.1"/><rect class="hit" x="52.0" y="22.3" width="92.1" height="8.9"/><circle class="origin" cx="41.6" cy="79.5" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">MEASURED 14z-120 (the same layout as Donovan&#x27;s)</p>
+</article>
+<article class="move" id="j.HP">
+<header><h3>j.HP</h3><span class="input">j.HP</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x14</span><dl><dt>startup</dt><dd>8</dd></dl><dl><dt>active</dt><dd>6</dd></dl><dl><dt>recovery</dt><dd>48</dd></dl><dl><dt>total</dt><dd>62</dd></dl><dl><dt>damage</dt><dd>17<small>/9 white</small></dd></dl><dl><dt>meter</dt><dd>6</dd></dl><dl><dt>class</dt><dd>0x00</dd></dl><dl><dt>pushback</dt><dd>0<small>/0 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl></div>
+<figure><svg class="boxes" viewBox="0 0 150 98" width="150" height="98" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="76.1" x2="150" y2="76.1"/><rect class="hurt" x="31.8" y="9.1" width="86.4" height="79.5"/><rect class="push" x="42.0" y="17.0" width="61.4" height="61.4"/><rect class="hit" x="9.1" y="25.0" width="131.8" height="31.8"/><circle class="origin" cx="86.4" cy="121.6" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">MEASURED 14z-120 (the same layout as Donovan&#x27;s)</p>
+</article>
+<article class="move" id="j.LK">
+<header><h3>j.LK</h3><span class="input">j.LK</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x15</span><dl><dt>startup</dt><dd>4</dd></dl><dl><dt>active</dt><dd>6</dd></dl><dl><dt>recovery</dt><dd>37</dd></dl><dl><dt>total</dt><dd>47</dd></dl><dl><dt>damage</dt><dd>6<small>/4 white</small></dd></dl><dl><dt>meter</dt><dd>6</dd></dl><dl><dt>class</dt><dd>0x00</dd></dl><dl><dt>pushback</dt><dd>0<small>/0 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl></div>
+<figure><svg class="boxes" viewBox="0 0 145 110" width="145" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="67.6" x2="145" y2="67.6"/><rect class="hurt" x="8.1" y="8.1" width="76.7" height="70.6"/><rect class="hurt" x="78.7" y="63.6" width="54.5" height="38.3"/><rect class="push" x="17.2" y="15.1" width="54.5" height="54.5"/><rect class="hit" x="80.7" y="77.7" width="56.5" height="20.2"/><circle class="origin" cx="56.5" cy="108.0" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">MEASURED 14z-120 (the same layout as Donovan&#x27;s)</p>
+</article>
+<article class="move" id="j.MK">
+<header><h3>j.MK</h3><span class="input">j.MK</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x16</span><dl><dt>startup</dt><dd>10</dd></dl><dl><dt>active</dt><dd>6</dd></dl><dl><dt>recovery</dt><dd>44</dd></dl><dl><dt>total</dt><dd>60</dd></dl><dl><dt>damage</dt><dd>9<small>/6 white</small></dd></dl><dl><dt>meter</dt><dd>6</dd></dl><dl><dt>class</dt><dd>0x00</dd></dl><dl><dt>pushback</dt><dd>0<small>/0 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl></div>
+<figure><svg class="boxes" viewBox="0 0 150 92" width="150" height="92" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="55.8" x2="150" y2="55.8"/><rect class="hurt" x="6.7" y="6.7" width="63.3" height="58.3"/><rect class="hurt" x="66.7" y="38.3" width="61.7" height="46.7"/><rect class="push" x="14.2" y="12.5" width="45.0" height="45.0"/><rect class="hit" x="83.3" y="62.5" width="60.0" height="13.3"/><circle class="origin" cx="46.7" cy="89.2" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">MEASURED 14z-120 (the same layout as Donovan&#x27;s)</p>
+</article>
+<article class="move" id="j.HK">
+<header><h3>j.HK</h3><span class="input">j.HK</span><span class="chip normal">Normal</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x17</span><dl><dt>startup</dt><dd>12</dd></dl><dl><dt>active</dt><dd>9</dd></dl><dl><dt>recovery</dt><dd>50</dd></dl><dl><dt>total</dt><dd>71</dd></dl><dl><dt>damage</dt><dd>9<small>/8 white</small></dd></dl><dl><dt>meter</dt><dd>0</dd></dl><dl><dt>class</dt><dd>0x00</dd></dl><dl><dt>pushback</dt><dd>0<small>/0 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl><span class="note">2 attack records (0x1e, 0x5b); the first shown</span></div>
+<figure><svg class="boxes" viewBox="0 0 135 110" width="135" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="63.0" x2="135" y2="63.0"/><rect class="hurt" x="7.5" y="7.5" width="71.5" height="65.8"/><rect class="hurt" x="37.6" y="31.0" width="90.3" height="71.5"/><rect class="push" x="16.0" y="14.1" width="50.8" height="50.8"/><rect class="hit" x="49.8" y="63.9" width="50.8" height="28.2"/><circle class="origin" cx="52.6" cy="100.6" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">MEASURED 14z-120 (the same layout as Donovan&#x27;s)</p>
+</article>
+</section>
+<section id="throws"><h2>Throws</h2>
+<article class="move" id="Magnet-Slam">
+<header><h3>Magnet Slam</h3><span class="input">4MP, 6MP, 4HP, 6HP</span><span class="chip throw">Throw</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x1e</span><span class="na">no attack node · 38 f · hold</span></div>
+<figure><svg class="boxes" viewBox="0 0 79 110" width="79" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="65.1" x2="79" y2="65.1"/><rect class="hurt" x="39.4" y="7.3" width="27.5" height="20.2"/><rect class="hurt" x="7.3" y="13.8" width="64.2" height="36.7"/><rect class="hurt" x="13.8" y="49.5" width="55.0" height="53.2"/><rect class="push" x="14.7" y="25.7" width="49.5" height="77.0"/><circle class="origin" cx="50.4" cy="101.8" r="2.5"/></svg><figcaption>boxes of the first frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">Ground throw, must be performed up close; direction by 4/6, MP or HP; MEASURED 14z-120: 6MP and 4MP enter a2:0x1e -&gt; a2:0x1f; 6HP enters a2:0x1e -&gt; a2:0x20</p>
+</article>
+<article class="move" id="Sky-Capture">
+<header><h3>Sky Capture</h3><span class="input">j.4MP, j.6MP, j.4HP, j.6HP</span><span class="chip throw">Throw</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x4e</span><span class="na">no attack node · 72 f · hold</span></div>
+<figure><svg class="boxes" viewBox="0 0 118 110" width="118" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="85.7" x2="118" y2="85.7"/><rect class="hurt" x="10.2" y="10.2" width="97.2" height="89.5"/><rect class="push" x="21.7" y="19.2" width="69.1" height="69.1"/><circle class="origin" cx="71.6" cy="136.9" r="2.5"/></svg><figcaption>boxes of the first frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">Air throw, must be performed up close; direction by 4/6, MP or HP; MEASURED 14z-120 (P2 scripted to jump with P1): MP and HP both enter a2:0x4e</p>
+</article>
+<article class="move" id="Circuit-Scrapper">
+<header><h3>Circuit Scrapper</h3><span class="input">63214MP, 63214HP</span><span class="chip throw">Throw</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x2d</span><span class="na">no attack node · 20 f · hold</span></div>
+<figure><svg class="boxes" viewBox="0 0 79 110" width="79" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="65.1" x2="79" y2="65.1"/><rect class="hurt" x="39.4" y="7.3" width="27.5" height="20.2"/><rect class="hurt" x="7.3" y="13.8" width="64.2" height="36.7"/><rect class="hurt" x="13.8" y="49.5" width="55.0" height="53.2"/><rect class="push" x="14.7" y="25.7" width="49.5" height="77.0"/><circle class="origin" cx="50.4" cy="101.8" r="2.5"/></svg><figcaption>boxes of the first frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">Command throw; ground throw, must be performed up close; MP or HP; ES = Circuit Scrapper (ES); MEASURED 14z-120: a2:0x1e (throw start) -&gt; a2:0x2d -&gt; a2:0x2e -&gt; a2:0x30 -&gt; a2:0x31 when it CONNECTS (rig: a step back then 63214MP, or 63214HP with no release inside the motion; a 63214MP with the button late came out as the launcher — the throw&#x27;s window is tight). An earlier reading that other pairs triggered other ES moves was the RIG facing LEFT — retracted: every pair enters the ES grapple</p>
+</article>
+</section>
+<section id="specials"><h2>Specials</h2>
+<article class="move" id="Sitting-Attack">
+<header><h3>Sitting Attack</h3><span class="input">8P, 8K</span><span class="chip special">Special</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x3a</span><span class="na">no attack node · 16 f · loop:0x24db84</span></div>
+<figure><svg class="boxes" viewBox="0 0 118 110" width="118" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="85.7" x2="118" y2="85.7"/><rect class="hurt" x="10.2" y="10.2" width="97.2" height="89.5"/><rect class="push" x="21.7" y="19.2" width="69.1" height="69.1"/><circle class="origin" cx="71.6" cy="136.9" r="2.5"/></svg><figcaption>boxes of the first frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">Pursuit move; P or K; ES = Sitting Attack (ES); MEASURED 14z-120 off a throw knockdown: 8P and 8K enter a2:0x3a -&gt; (a2:0x3b) -&gt; a2:0x3c</p>
+</article>
+<article class="move es nested" id="Sitting-Attack-(ES)">
+<header><h3>Sitting Attack (ES)</h3><span class="input">8PP, 8KK</span><span class="chip es">ES</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x3f</span><dl><dt>startup</dt><dd>1</dd></dl><dl><dt>active</dt><dd>5</dd></dl><dl><dt>recovery</dt><dd>0</dd></dl><dl><dt>total</dt><dd>6</dd></dl><dl><dt>damage</dt><dd>0<small>/3 white</small></dd></dl><dl><dt>meter</dt><dd>4</dd></dl><dl><dt>class</dt><dd>0x0f</dd></dl><dl><dt>pushback</dt><dd>2<small>/2 blk</small></dd></dl><dl><dt>freeze</dt><dd>5</dd></dl></div>
+<figure><svg class="boxes" viewBox="0 0 88 110" width="88" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="64.1" x2="88" y2="64.1"/><rect class="hurt" x="7.7" y="7.7" width="72.7" height="67.0"/><rect class="push" x="16.3" y="14.3" width="51.7" height="51.7"/><rect class="hit" x="42.1" y="56.4" width="23.0" height="45.9"/><circle class="origin" cx="53.6" cy="102.3" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">ES of Sitting Attack; pursuit move; MEASURED 14z-120: a2:0x3a (class 16) -&gt; a2:0x3b -&gt; a2:0x3f, one stock</p>
+</article>
+<article class="move" id="Plasma-Beam">
+<header><h3>Plasma Beam</h3><span class="input">236P, 236K</span><span class="chip special">Special</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x44 · 236P</span><dl><dt>startup</dt><dd>25</dd></dl><dl><dt>active</dt><dd>10</dd></dl><dl><dt>recovery</dt><dd>0</dd></dl><dl><dt>total</dt><dd>35</dd></dl><dl><dt>damage</dt><dd>11<small>/5 white</small></dd></dl><dl><dt>meter</dt><dd>9</dd></dl><dl><dt>class</dt><dd>0x14</dd></dl><dl><dt>pushback</dt><dd>0<small>/0 blk</small></dd></dl><dl><dt>freeze</dt><dd>255</dd></dl><span class="note">10 attack records (0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e); the first shown</span></div>
+<figure><svg class="boxes" viewBox="0 0 150 103" width="150" height="103" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="62.6" x2="150" y2="62.6"/><rect class="hurt" x="6.6" y="6.6" width="87.4" height="24.7"/><rect class="hurt" x="14.8" y="16.5" width="57.7" height="33.0"/><rect class="hurt" x="20.6" y="48.6" width="49.5" height="47.8"/><rect class="push" x="21.4" y="27.2" width="44.5" height="69.2"/><rect class="hit" x="64.3" y="18.1" width="79.1" height="8.2"/><circle class="origin" cx="53.6" cy="95.6" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x41 · 236K</span><dl><dt>startup</dt><dd>25</dd></dl><dl><dt>active</dt><dd>10</dd></dl><dl><dt>recovery</dt><dd>0</dd></dl><dl><dt>total</dt><dd>35</dd></dl><dl><dt>damage</dt><dd>11<small>/5 white</small></dd></dl><dl><dt>meter</dt><dd>9</dd></dl><dl><dt>class</dt><dd>0x14</dd></dl><dl><dt>pushback</dt><dd>0<small>/0 blk</small></dd></dl><dl><dt>freeze</dt><dd>255</dd></dl><span class="note">10 attack records (0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x33); the first shown</span></div>
+<figure><svg class="boxes" viewBox="0 0 150 66" width="150" height="66" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="25.5" x2="150" y2="25.5"/><rect class="hurt" x="28.8" y="10.7" width="67.6" height="21.4"/><rect class="hurt" x="6.6" y="19.0" width="92.3" height="33.0"/><rect class="hurt" x="29.7" y="29.7" width="49.5" height="29.7"/><rect class="push" x="30.5" y="6.6" width="44.5" height="52.7"/><rect class="hit" x="64.3" y="23.9" width="79.1" height="6.6"/><circle class="origin" cx="62.6" cy="58.5" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">Freezing projectile; P hits high, K hits low; ES = Plasma Beam (ES); MEASURED 14z-120: every P strength enters a:0x28 (the wind-up) -&gt; a2:0x44 -&gt; 0x45 -&gt; 0x46; every K strength -&gt; a2:0x41 -&gt; 0x42 -&gt; 0x43</p>
+</article>
+<article class="move es nested" id="Plasma-Beam-(ES)">
+<header><h3>Plasma Beam (ES)</h3><span class="input">236PP, 236KK</span><span class="chip es">ES</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x47</span><dl><dt>startup</dt><dd>43</dd></dl><dl><dt>active</dt><dd>16</dd></dl><dl><dt>recovery</dt><dd>0</dd></dl><dl><dt>total</dt><dd>59</dd></dl><dl><dt>damage</dt><dd>8<small>/6 white</small></dd></dl><dl><dt>meter</dt><dd>0</dd></dl><dl><dt>class</dt><dd>0x4f</dd></dl><dl><dt>pushback</dt><dd>2<small>/2 blk</small></dd></dl><dl><dt>freeze</dt><dd>255</dd></dl><span class="note">6 attack records (0x40, 0x41, 0x42, 0x43, 0x44, 0x45); the first shown</span></div>
+<figure><svg class="boxes" viewBox="0 0 150 65" width="150" height="65" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="38.2" x2="150" y2="38.2"/><rect class="hurt" x="23.1" y="4.3" width="16.1" height="11.8"/><rect class="hurt" x="4.3" y="8.1" width="37.6" height="21.5"/><rect class="hurt" x="8.1" y="29.0" width="32.3" height="31.2"/><rect class="push" x="8.6" y="15.1" width="29.0" height="45.2"/><rect class="hit" x="25.3" y="19.4" width="120.4" height="12.9"/><circle class="origin" cx="29.6" cy="59.7" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">ES of Plasma Beam; one move by either pair; freezing projectile, hits medium; MEASURED 14z-120: PP and KK both -&gt; a:0x28 -&gt; a2:0x47 -&gt; 0x48 -&gt; 0x49 -&gt; 0x4a, one stock (one move by either pair, as the maintainer said)</p>
+</article>
+<article class="move" id="Mighty-Launcher">
+<header><h3>Mighty Launcher</h3><span class="input">214P, j.214P</span><span class="chip special">Special</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x23 · 214P</span><span class="na">no attack node · 58 f · hold</span></div>
+<figure><svg class="boxes" viewBox="0 0 116 110" width="116" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="55.6" x2="116" y2="55.6"/><rect class="hurt" x="54.4" y="8.9" width="35.6" height="31.1"/><rect class="hurt" x="17.8" y="14.4" width="77.8" height="44.4"/><rect class="hurt" x="8.9" y="56.7" width="97.8" height="44.4"/><rect class="push" x="26.7" y="30.0" width="60.0" height="71.1"/><circle class="origin" cx="70.0" cy="100.0" r="2.5"/></svg><figcaption>boxes of the first frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x24 · j.214P</span><span class="na">no attack node · 88 f · loop:0x246112</span></div>
+<figure><svg class="boxes" viewBox="0 0 118 110" width="118" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="85.7" x2="118" y2="85.7"/><rect class="hurt" x="10.2" y="10.2" width="97.2" height="89.5"/><rect class="push" x="21.7" y="19.2" width="69.1" height="69.1"/><circle class="origin" cx="71.6" cy="136.9" r="2.5"/></svg><figcaption>boxes of the first frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">Projectile; usable in air; ES = Mighty Launcher (ES); MEASURED 14z-120: ground LP/MP/HP all -&gt; a:0x29 -&gt; a2:0x23 (one chain); air -&gt; a2:0x24</p>
+</article>
+<article class="move es nested" id="Mighty-Launcher-(ES)">
+<header><h3>Mighty Launcher (ES)</h3><span class="input">214PP, j.214PP</span><span class="chip es">ES</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x51 · 214PP</span><span class="na">no attack node · 62 f · hold</span></div>
+<figure><svg class="boxes" viewBox="0 0 116 110" width="116" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="55.6" x2="116" y2="55.6"/><rect class="hurt" x="54.4" y="8.9" width="35.6" height="31.1"/><rect class="hurt" x="17.8" y="14.4" width="77.8" height="44.4"/><rect class="hurt" x="8.9" y="56.7" width="97.8" height="44.4"/><rect class="push" x="26.7" y="30.0" width="60.0" height="71.1"/><circle class="origin" cx="70.0" cy="100.0" r="2.5"/></svg><figcaption>boxes of the first frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x52 · j.214PP</span><span class="na">no attack node · 84 f · loop:0x246112</span></div>
+<figure><svg class="boxes" viewBox="0 0 118 110" width="118" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="85.7" x2="118" y2="85.7"/><rect class="hurt" x="10.2" y="10.2" width="97.2" height="89.5"/><rect class="push" x="21.7" y="19.2" width="69.1" height="69.1"/><circle class="origin" cx="71.6" cy="136.9" r="2.5"/></svg><figcaption>boxes of the first frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">ES of Mighty Launcher; projectile; usable in air; MEASURED 14z-120: ground a2:0x51, air a2:0x52, one stock each</p>
+</article>
+<article class="move" id="Reflect-Wall">
+<header><h3>Reflect Wall</h3><span class="input">623P, j.623P</span><span class="chip special">Special</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x4c</span><dl><dt>startup</dt><dd>1</dd></dl><dl><dt>active</dt><dd>8</dd></dl><dl><dt>recovery</dt><dd>32</dd></dl><dl><dt>total</dt><dd>41</dd></dl><dl><dt>damage</dt><dd>2<small>/2 white</small></dd></dl><dl><dt>meter</dt><dd>9</dd></dl><dl><dt>class</dt><dd>0x53</dd></dl><dl><dt>pushback</dt><dd>3<small>/0 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl><span class="note">8 attack records (0x6a, 0x6b, 0x6c, 0x6d, 0x6e, 0x6f, 0x70, 0x71); the first shown</span></div>
+<figure><svg class="boxes" viewBox="0 0 94 110" width="94" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="65.1" x2="94" y2="65.1"/><rect class="hurt" x="39.4" y="7.3" width="27.5" height="20.2"/><rect class="hurt" x="7.3" y="13.8" width="64.2" height="36.7"/><rect class="hurt" x="13.8" y="49.5" width="55.0" height="53.2"/><rect class="push" x="14.7" y="25.7" width="49.5" height="77.0"/><rect class="hit" x="65.1" y="20.2" width="22.0" height="82.5"/><circle class="origin" cx="50.4" cy="101.8" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">GUARD-CANCEL-ONLY: exists only as Phobos&#x27;s guard cancel (623P in blockstun, ground or air) for 1 meter stock; no free input; NO ES version; MEASURED 14z-120 as the GUARD CANCEL (P2 Victor&#x27;s HP/HK blocked at contact, 623+P inside blockstun): a:0x13 (block) -&gt; b:0x0c (blockstun) -&gt; a2:0x4c, for LP, MP, HP and PP alike; NOTHING in neutral (623LP = 2LP), nothing with a kick. THE BANKED STOCK COUNT DID NOT MOVE (+0x109 9 -&gt; 9) on native vs2 — the bar fraction was not sampled</p>
+</article>
+<article class="move" id="Genocide-Vulcan">
+<header><h3>Genocide Vulcan</h3><span class="input">421K</span><span class="chip special">Special</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x25</span><dl><dt>startup</dt><dd>4</dd></dl><dl><dt>active</dt><dd>4</dd></dl><dl><dt>recovery</dt><dd>16</dd></dl><dl><dt>total</dt><dd>24</dd></dl><dl><dt>damage</dt><dd>1<small>/8 white</small></dd></dl><dl><dt>meter</dt><dd>9</dd></dl><dl><dt>class</dt><dd>0x4c</dd></dl><dl><dt>pushback</dt><dd>0<small>/0 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl></div>
+<figure><svg class="boxes" viewBox="0 0 126 110" width="126" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="65.1" x2="126" y2="65.1"/><rect class="hurt" x="39.4" y="7.3" width="27.5" height="20.2"/><rect class="hurt" x="7.3" y="13.8" width="64.2" height="36.7"/><rect class="hurt" x="13.8" y="49.5" width="55.0" height="53.2"/><rect class="push" x="14.7" y="25.7" width="49.5" height="77.0"/><rect class="hit" x="74.2" y="50.4" width="44.0" height="5.5"/><circle class="origin" cx="50.4" cy="101.8" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">Ground-to-air trap (whether hit or throw properties: unknown); ES = Genocide Vulcan (ES); MEASURED 14z-120: **THE INPUT IS 421+P, NOT 421+K** — 421LP/MP/HP -&gt; a:0x29 -&gt; a2:0x25 -&gt; a2:0x26 or 0x27 -&gt; a2:0x28 (attack boxes); 421K in nine cadences, ground/air/near/vs an airborne P2, only ever produced the crouching kick; 421KK is Erasing Sphere. Maintainer to confirm the list&#x27;s 421K</p>
+</article>
+<article class="move es nested" id="Genocide-Vulcan-(ES)">
+<header><h3>Genocide Vulcan (ES)</h3><span class="input">421KK</span><span class="chip es">ES</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x25</span><dl><dt>startup</dt><dd>4</dd></dl><dl><dt>active</dt><dd>4</dd></dl><dl><dt>recovery</dt><dd>16</dd></dl><dl><dt>total</dt><dd>24</dd></dl><dl><dt>damage</dt><dd>1<small>/8 white</small></dd></dl><dl><dt>meter</dt><dd>9</dd></dl><dl><dt>class</dt><dd>0x4c</dd></dl><dl><dt>pushback</dt><dd>0<small>/0 blk</small></dd></dl><dl><dt>freeze</dt><dd>0</dd></dl></div>
+<figure><svg class="boxes" viewBox="0 0 126 110" width="126" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="65.1" x2="126" y2="65.1"/><rect class="hurt" x="39.4" y="7.3" width="27.5" height="20.2"/><rect class="hurt" x="7.3" y="13.8" width="64.2" height="36.7"/><rect class="hurt" x="13.8" y="49.5" width="55.0" height="53.2"/><rect class="push" x="14.7" y="25.7" width="49.5" height="77.0"/><rect class="hit" x="74.2" y="50.4" width="44.0" height="5.5"/><circle class="origin" cx="50.4" cy="101.8" r="2.5"/></svg><figcaption>boxes of the first active frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">ES of Genocide Vulcan; ground-to-air trap; MEASURED 14z-120: 421PP -&gt; a2:0x25 (class 16) -&gt; 0x26 -&gt; 0x28, one stock</p>
+</article>
+<article class="move" id="Plasma-Trap">
+<header><h3>Plasma Trap</h3><span class="input">j.214K</span><span class="chip special">Special</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x2a</span><span class="na">no attack node · 44 f · hold</span></div>
+<figure><svg class="boxes" viewBox="0 0 118 110" width="118" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="85.7" x2="118" y2="85.7"/><rect class="hurt" x="10.2" y="10.2" width="97.2" height="89.5"/><rect class="push" x="21.7" y="19.2" width="69.1" height="69.1"/><circle class="origin" cx="71.6" cy="136.9" r="2.5"/></svg><figcaption>boxes of the first frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x2b</span><span class="na">no attack node · 44 f · hold</span></div>
+<figure><svg class="boxes" viewBox="0 0 118 110" width="118" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="85.7" x2="118" y2="85.7"/><rect class="hurt" x="10.2" y="10.2" width="97.2" height="89.5"/><rect class="push" x="21.7" y="19.2" width="69.1" height="69.1"/><circle class="origin" cx="71.6" cy="136.9" r="2.5"/></svg><figcaption>boxes of the first frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">Air only; throws a shock mine on the ground; distance by K (three by button); ES = Plasma Trap (ES); MEASURED 14z-120: j.214LK -&gt; a2:0x2a, j.214MK -&gt; a2:0x2b, j.214HK -&gt; a2:0x2a right after take-off and a2:0x2b at the apex — the chain follows the situation, not the strength alone. RESOLVED 14z-121 (4), part 9 (early vs late for LK/MK/HK): the chain is the JUMP PHASE — a2:0x2a when thrown right after take-off (rising), a2:0x2b at the apex — for every strength; the strength only picks the mine&#x27;s distance (projectile +0x9A -&gt; xv 1/2/3, tests/expected/projectile_params.txt)</p>
+</article>
+<article class="move es nested" id="Plasma-Trap-(ES)">
+<header><h3>Plasma Trap (ES)</h3><span class="input">j.214KK</span><span class="chip es">ES</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x2c</span><span class="na">no attack node · 44 f · hold</span></div>
+<figure><svg class="boxes" viewBox="0 0 118 110" width="118" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="85.7" x2="118" y2="85.7"/><rect class="hurt" x="10.2" y="10.2" width="97.2" height="89.5"/><rect class="push" x="21.7" y="19.2" width="69.1" height="69.1"/><circle class="origin" cx="71.6" cy="136.9" r="2.5"/></svg><figcaption>boxes of the first frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">ES of Plasma Trap; air only; shock mine on the ground; MEASURED 14z-120: a2:0x2c, one stock</p>
+</article>
+<article class="move es" id="Circuit-Scrapper-(ES)">
+<header><h3>Circuit Scrapper (ES)</h3><span class="input">63214PP</span><span class="chip es">ES</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x2f</span><span class="na">no attack node · 113 f · hold</span></div>
+<figure><svg class="boxes" viewBox="0 0 79 110" width="79" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="65.1" x2="79" y2="65.1"/><rect class="hurt" x="39.4" y="7.3" width="27.5" height="20.2"/><rect class="hurt" x="7.3" y="13.8" width="64.2" height="36.7"/><rect class="hurt" x="13.8" y="49.5" width="55.0" height="53.2"/><rect class="push" x="14.7" y="25.7" width="49.5" height="77.0"/><circle class="origin" cx="50.4" cy="101.8" r="2.5"/></svg><figcaption>boxes of the first frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">ES of Circuit Scrapper; any two punches; ground throw, must be performed up close; MEASURED 14z-120: 63214 with MP+HP, LP+HP or LP+MP -&gt; a2:0x1e -&gt; 0x2d -&gt; a2:0x2f (instead of 0x2e) -&gt; 0x30 -&gt; 0x31, one stock</p>
+</article>
+</section>
+<section id="ex"><h2>EX moves</h2>
+<article class="move" id="Final-Guardian-Beta">
+<header><h3>Final Guardian Beta</h3><span class="input">623KK</span><span class="chip ex">EX</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x33</span><span class="na">no attack node · 46 f · hold</span></div>
+<figure><svg class="boxes" viewBox="0 0 79 110" width="79" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="65.1" x2="79" y2="65.1"/><rect class="hurt" x="39.4" y="7.3" width="27.5" height="20.2"/><rect class="hurt" x="7.3" y="13.8" width="64.2" height="36.7"/><rect class="hurt" x="13.8" y="49.5" width="55.0" height="53.2"/><rect class="push" x="14.7" y="25.7" width="53.2" height="77.0"/><circle class="origin" cx="50.4" cy="101.8" r="2.5"/></svg><figcaption>boxes of the first frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">Projectile-type throw (touching the projectile = getting thrown); MEASURED 14z-120: a2:0x33 -&gt; a2:0x21 (the dash chain) -&gt; a2:0x34 -&gt; a2:0x35 -&gt; a2:0x39 -&gt; a2:0x36, one stock</p>
+</article>
+<article class="move" id="Erasing-Sphere">
+<header><h3>Erasing Sphere</h3><span class="input">421KK</span><span class="chip ex">EX</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x40</span><span class="na">no attack node · 48 f · hold</span></div>
+<figure><svg class="boxes" viewBox="0 0 79 110" width="79" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="65.1" x2="79" y2="65.1"/><rect class="hurt" x="39.4" y="7.3" width="27.5" height="20.2"/><rect class="hurt" x="7.3" y="13.8" width="64.2" height="36.7"/><rect class="hurt" x="13.8" y="49.5" width="55.0" height="53.2"/><rect class="push" x="14.7" y="25.7" width="49.5" height="77.0"/><circle class="origin" cx="50.4" cy="101.8" r="2.5"/></svg><figcaption>boxes of the first frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">Projectile; KK can be held for delay; the sphere only has a hitbox once it has travelled a certain distance, and that distance seems influenced by holding KK; MEASURED 14z-120: held or tapped -&gt; a:0x29 -&gt; a2:0x40 (class 18), one stock</p>
+</article>
+</section>
+<section id="df"><h2>Dark Force</h2>
+<article class="move" id="Ray-of-Doom">
+<header><h3>Ray of Doom</h3><span class="input">LP+LK, MP+MK, HP+HK</span><span class="chip df">Dark Force</span></header>
+<p class="notes">Dark Force; creates 2 clones that follow him and beam-attack when Phobos attacks; P+K of the same strength (universal input, listed for the name); MEASURED 14z-120: NO FIGHTER CHAIN (idle re-entered; two stocks on native vs2; 5LP and Plasma Beam inside DF enter their ordinary chains)</p>
+</article>
+</section>
+<section id="movement"><h2>Movement</h2>
+<article class="move" id="Air-Dash">
+<header><h3>Air Dash</h3><span class="input">j.66, j.44</span><span class="chip dash">Movement</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a:0x10</span><span class="na">no attack node · 48 f · loop:0x246112</span></div>
+<figure><svg class="boxes" viewBox="0 0 118 110" width="118" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="85.7" x2="118" y2="85.7"/><rect class="hurt" x="10.2" y="10.2" width="97.2" height="89.5"/><rect class="push" x="21.7" y="19.2" width="69.1" height="69.1"/><circle class="origin" cx="71.6" cy="136.9" r="2.5"/></svg><figcaption>boxes of the first frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">Air only; forward or back; MEASURED 14z-120: NO chain of its own — the airborne chain a:0x10 is RE-ENTERED with the object&#x27;s class byte = 20 (the dash class) and P1 travels ~260 px (66) / ~250 px (44); a forward air dash lands on a:0x0c, a back one on the plain landing a:0x0f. Fires from a 66/44 tap 8-28 frames after take-off</p>
+</article>
+<article class="move" id="Float">
+<header><h3>Float</h3><span class="input">j.7 (hold), j.8 (hold), j.9 (hold)</span><span class="chip misc">Movement / other</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a:0x12</span><span class="na">no attack node · 48 f · loop:0x246112</span></div>
+<figure><svg class="boxes" viewBox="0 0 118 110" width="118" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="85.7" x2="118" y2="85.7"/><rect class="hurt" x="10.2" y="10.2" width="97.2" height="89.5"/><rect class="push" x="21.7" y="19.2" width="69.1" height="69.1"/><circle class="origin" cx="71.6" cy="136.9" r="2.5"/></svg><figcaption>boxes of the first frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">Air only; hold an up direction; MEASURED 14z-120: NO chain of its own — holding an up direction re-enters the neutral-jump chain a:0x12 and the fighter hangs (160 frames airborne against ~55); measured with 8 held; 9 held gave a forward air dash instead</p>
+</article>
+<article class="move" id="Forward-dash">
+<header><h3>Forward dash</h3><span class="input">66</span><span class="chip dash">Movement</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x21</span><span class="na">no attack node · 32 f · loop:0x24c3d4</span></div>
+<figure><svg class="boxes" viewBox="0 0 99 110" width="99" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="72.3" x2="99" y2="72.3"/><rect class="hurt" x="8.6" y="8.6" width="82.0" height="75.5"/><rect class="hurt" x="8.6" y="84.1" width="82.0" height="17.3"/><rect class="push" x="18.3" y="16.2" width="58.2" height="71.2"/><circle class="origin" cx="60.4" cy="115.4" r="2.5"/></svg><figcaption>boxes of the first frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">MEASURED 14z-120</p>
+</article>
+<article class="move" id="Back-dash">
+<header><h3>Back dash</h3><span class="input">44</span><span class="chip dash">Movement</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a2:0x22</span><span class="na">no attack node · 32 f · loop:0x24c498</span></div>
+<figure><svg class="boxes" viewBox="0 0 99 110" width="99" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="72.3" x2="99" y2="72.3"/><rect class="hurt" x="8.6" y="8.6" width="82.0" height="75.5"/><rect class="hurt" x="8.6" y="84.1" width="82.0" height="17.3"/><rect class="push" x="18.3" y="16.2" width="58.2" height="71.2"/><circle class="origin" cx="60.4" cy="115.4" r="2.5"/></svg><figcaption>boxes of the first frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">MEASURED 14z-120</p>
+</article>
+<article class="move" id="Walk-forward">
+<header><h3>Walk forward</h3><span class="input">6</span><span class="chip misc">Movement / other</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a:0x02</span><span class="na">no attack node · 36 f · loop:0x245bbe</span></div>
+<figure><svg class="boxes" viewBox="0 0 79 110" width="79" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="65.1" x2="79" y2="65.1"/><rect class="hurt" x="39.4" y="7.3" width="27.5" height="20.2"/><rect class="hurt" x="7.3" y="13.8" width="64.2" height="36.7"/><rect class="hurt" x="13.8" y="49.5" width="55.0" height="53.2"/><rect class="push" x="14.7" y="25.7" width="49.5" height="77.0"/><circle class="origin" cx="50.4" cy="101.8" r="2.5"/></svg><figcaption>boxes of the first frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">MEASURED 14z-120 (idle = a:0x00)</p>
+</article>
+<article class="move" id="Walk-back">
+<header><h3>Walk back</h3><span class="input">4</span><span class="chip misc">Movement / other</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a:0x04</span><span class="na">no attack node · 36 f · loop:0x245ce2</span></div>
+<figure><svg class="boxes" viewBox="0 0 79 110" width="79" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="65.1" x2="79" y2="65.1"/><rect class="hurt" x="39.4" y="7.3" width="27.5" height="20.2"/><rect class="hurt" x="7.3" y="13.8" width="64.2" height="36.7"/><rect class="hurt" x="13.8" y="49.5" width="55.0" height="53.2"/><rect class="push" x="14.7" y="25.7" width="49.5" height="77.0"/><circle class="origin" cx="50.4" cy="101.8" r="2.5"/></svg><figcaption>boxes of the first frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">MEASURED 14z-120</p>
+</article>
+<article class="move" id="Crouch">
+<header><h3>Crouch</h3><span class="input">2</span><span class="chip misc">Movement / other</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a:0x01</span><span class="na">no attack node · 45 f · loop:0x245b42</span></div>
+<figure><svg class="boxes" viewBox="0 0 116 110" width="116" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="55.6" x2="116" y2="55.6"/><rect class="hurt" x="54.4" y="8.9" width="35.6" height="31.1"/><rect class="hurt" x="17.8" y="14.4" width="77.8" height="44.4"/><rect class="hurt" x="8.9" y="56.7" width="97.8" height="44.4"/><rect class="push" x="26.7" y="30.0" width="60.0" height="71.1"/><circle class="origin" cx="70.0" cy="100.0" r="2.5"/></svg><figcaption>boxes of the first frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">MEASURED 14z-120: a:0x09 -&gt; a:0x01 -&gt; a:0x06</p>
+</article>
+<article class="move" id="Jump">
+<header><h3>Jump</h3><span class="input">8, 7, 9</span><span class="chip misc">Movement / other</span></header>
+<div class="strip"><span class="chain" title="anim table:seq">a:0x12</span><span class="na">no attack node · 48 f · loop:0x246112</span></div>
+<figure><svg class="boxes" viewBox="0 0 118 110" width="118" height="110" role="img" aria-label="hit, hurt and push boxes of the first active frame"><line class="ground" x1="0" y1="85.7" x2="118" y2="85.7"/><rect class="hurt" x="10.2" y="10.2" width="97.2" height="89.5"/><rect class="push" x="21.7" y="19.2" width="69.1" height="69.1"/><circle class="origin" cx="71.6" cy="136.9" r="2.5"/></svg><figcaption>boxes of the first frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>
+<p class="notes">Neutral / back / forward; MEASURED 14z-120: pre-jump a:0x0e -&gt; airborne a:0x12 (neutral) / a:0x10 (forward) / a:0x11 (back) -&gt; landing a:0x0f</p>
+</article>
+</section>
+<section id="projectiles"><h2>Projectiles</h2><p class="fine">Each pool type this character spawns, with the parameters inline in its handler; velocities in px/frame, +0x9A 0/2/4 = LP/MP/HP, 6 = ES.</p><div class="tablewrap"><table><thead><tr><th>type</th><th>variant</th><th>xv</th><th>x accel</th><th>yv</th><th>y accel</th><th>+0x26</th><th>+0x50</th></tr></thead><tbody>
+<tr><td><code>0x44</code></td><td>0</td><td>3</td><td>0</td><td>0.5</td><td>-0.0625</td><td>0</td><td>1</td></tr>
+<tr><td><code>0x44</code></td><td>2</td><td>4</td><td>0</td><td>0.5</td><td>-0.0625</td><td>0</td><td>1</td></tr>
+<tr><td><code>0x44</code></td><td>4</td><td>5</td><td>0</td><td>0.5</td><td>-0.0625</td><td>0</td><td>1</td></tr>
+<tr><td><code>0x44</code></td><td>6</td><td>6</td><td>0</td><td>0.5</td><td>-0.0625</td><td>0</td><td>3</td></tr>
+<tr><td><code>0x45</code></td><td>0</td><td>1</td><td>0</td><td>5</td><td>-0.3125</td><td>2144</td><td>1</td></tr>
+<tr><td><code>0x45</code></td><td>2</td><td>2</td><td>0</td><td>5</td><td>-0.3125</td><td>4192</td><td>1</td></tr>
+<tr><td><code>0x45</code></td><td>4</td><td>3</td><td>0</td><td>5</td><td>-0.3125</td><td>8288</td><td>1</td></tr>
+<tr><td><code>0x45</code></td><td>6</td><td>3</td><td>0</td><td>5</td><td>-0.3125</td><td>8320</td><td>3</td></tr>
+<tr><td><code>0x46</code></td><td>0</td><td>3</td><td>0.0625</td><td>0</td><td>0</td><td>88</td><td>1</td></tr>
+<tr><td><code>0x46</code></td><td>2</td><td>3</td><td>0.0625</td><td>0</td><td>0</td><td>88</td><td>1</td></tr>
+<tr><td><code>0x46</code></td><td>4</td><td>3</td><td>0.0625</td><td>0</td><td>0</td><td>88</td><td>1</td></tr>
+<tr><td><code>0x46</code></td><td>6</td><td>3</td><td>0.0625</td><td>0</td><td>0</td><td>88</td><td>1</td></tr>
+<tr><td><code>0x47</code></td><td>0</td><td>1.5</td><td>0</td><td>0</td><td>0</td><td>24672</td><td>7</td></tr>
+<tr><td><code>0x47</code></td><td>2</td><td>0.5</td><td>0</td><td>0</td><td>0</td><td>14432</td><td>7</td></tr>
+<tr><td><code>0x47</code></td><td>4</td><td>1.5</td><td>0</td><td>0</td><td>0</td><td>49248</td><td>7</td></tr>
+<tr><td><code>0x47</code></td><td>6</td><td>1.5</td><td>0</td><td>0</td><td>0</td><td>61280</td><td>7</td></tr>
+</tbody></table></div></section>
+<section id="reactions"><h2>As the victim</h2><p class="fine">Victor attacks this character on the source game; per contact the reaction class, the hit-freeze, the chain path run and the frames until a stand chain returns (the stun as the engine ran it).</p><div class="tablewrap"><table><thead><tr><th>part</th><th>contact</th><th>class</th><th>freeze</th><th>chain path</th><th>frames</th></tr></thead><tbody>
+<tr><td>1</td><td>V 5LP</td><td>0x01</td><td>11</td><td class="path">b:0x03@0 a:0x00@0</td><td>19</td></tr>
+<tr><td>1</td><td>V 5MP</td><td>0x01</td><td>11</td><td class="path">a:0x00@8 b:0x03@0 a:0x00@0</td><td>23</td></tr>
+<tr><td>1</td><td>V 5HP</td><td>0x04</td><td>11</td><td class="path">a:0x00@7 b:0x03@0 b:0x23@0 a:0x00@0</td><td>35</td></tr>
+<tr><td>1</td><td>V j.HP</td><td>0x37</td><td>11</td><td class="path">a:0x00@11 b:0x03@0 b:0x2a@0 b:0x14@0 b:0x15@0 b:0x44@0 a:0x00@0</td><td>61</td></tr>
+<tr><td>1</td><td>V 6MP throw</td><td>0x00</td><td>0</td><td class="path">c:0x0d@0 b:0x00@0 c:0x0d@0 b:0x00@0 c:0x0d@0 b:0x00@0 c:0x0d@0 b:0x00@0</td><td>172</td></tr>
+<tr><td>1</td><td>V 6MP throw</td><td>0x00</td><td>0</td><td class="path">c:0x0d@0 b:0x00@0 c:0x0d@0 b:0x00@0 c:0x0d@0 b:0x00@0 c:0x0d@0 b:0x00@0</td><td>146</td></tr>
+<tr><td>1</td><td>V 6MP throw</td><td>0x00</td><td>0</td><td class="path">c:0x0d@0 b:0x00@0 c:0x0d@0 b:0x00@0 c:0x0d@0 b:0x00@0 c:0x0d@0 b:0x03@0</td><td>120</td></tr>
+<tr><td>1</td><td>V 6MP throw</td><td>0x00</td><td>0</td><td class="path">c:0x0d@0 b:0x00@0 c:0x0d@0 b:0x00@0 c:0x0d@0 b:0x03@0 b:0x23@0 a:0x00@0</td><td>93</td></tr>
+<tr><td>1</td><td>V 6MP throw</td><td>0x00</td><td>0</td><td class="path">c:0x0d@0 b:0x00@0 c:0x0d@0 b:0x03@0 b:0x23@0 a:0x00@0</td><td>67</td></tr>
+<tr><td>1</td><td>V 6MP throw</td><td>0x00</td><td>0</td><td class="path">c:0x0d@0 b:0x03@0 b:0x23@0 a:0x00@0</td><td>41</td></tr>
+<tr><td>1</td><td>V 6MP throw</td><td>0x04</td><td>10</td><td class="path">b:0x03@0 b:0x23@0 a:0x00@0</td><td>36</td></tr>
+<tr><td>1</td><td>V 623LP (DP)</td><td>0x01</td><td>11</td><td class="path">b:0x03@0 a:0x00@0</td><td>19</td></tr>
+<tr><td>1</td><td>V 236LP</td><td>0x01</td><td>11</td><td class="path">a:0x00@22 b:0x03@0 a:0x00@0</td><td>20</td></tr>
+<tr><td>2</td><td>V 5MP</td><td>0xff</td><td>11</td><td class="path">a:0x13@2 b:0x0c@0 a:0x00@0</td><td>22</td></tr>
+<tr><td>2</td><td>V 5HP</td><td>0xff</td><td>11</td><td class="path">a:0x13@2 b:0x0c@0 a:0x04@0</td><td>26</td></tr>
+<tr><td>2</td><td>V 2MK</td><td>0x02</td><td>11</td><td class="path">a:0x13@2 b:0x03@0 a:0x04@0</td><td>24</td></tr>
+<tr><td>2</td><td>V 2HK</td><td>0x03</td><td>11</td><td class="path">a:0x13@3 b:0x09@0 b:0x0a@0 b:0x0b@0 b:0x44@0 a:0x04@0</td><td>67</td></tr>
+<tr><td>2</td><td>V 623LP (DP)</td><td>0xff</td><td>11</td><td class="path">b:0x0c@0 a:0x00@0</td><td>18</td></tr>
+<tr><td>2</td><td>V j.HP</td><td>0xff</td><td>11</td><td class="path">a:0x13@1 b:0x0c@0 a:0x00@0</td><td>19</td></tr>
+</tbody></table></div></section>
+<section id="provenance"><h2>Provenance</h2><p class="fine">Map <code>docs/project/tables/chars/huitzil.json</code> (schema 1) from build <code>build/hui52</code> against the vsav2 extract; move list <code>build/manifest/moves_huitzil.toml</code>. Unattributed differences: bank 0, dispatch 0, region bytes 342. Gates: <code>test_charmap_current</code>, <code>test_move_naming</code>, <code>test_hitbox_encoding</code>, <code>test_reactions</code>, <code>test_projectile_params</code>.</p></section>
+</main>
+</div>
