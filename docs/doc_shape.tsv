@@ -57,7 +57,8 @@ docs/project/beam_port_scope.md	HIST	-	-
 docs/project/build_dir_triage.md	REFERENCE	docs/project/build_dir_triage_history.md	banner
 docs/project/build_dir_triage_history.md	HIST	-	-
 docs/project/coverage_matrix.md	REFERENCE	-	-
-docs/project/cps2_wide.md	PENDING	-	-
+docs/project/cps2_wide.md	REFERENCE	docs/project/cps2_wide_history.md	banner
+docs/project/cps2_wide_history.md	HIST	-	-
 docs/project/doc_audit_14z118.md	LOG	-	-
 docs/project/inferred_claims.md	LOG	-	-
 docs/project/gotchas.md	REGISTER	-	-

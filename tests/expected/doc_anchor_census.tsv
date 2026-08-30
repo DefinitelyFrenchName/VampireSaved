@@ -110,7 +110,7 @@ MSC-31	docs/project/mister_map.md	Everything else `jtcps2_main.v` decodes, and w
 MSC-32	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
 MSC-33	docs/project/mister_core.md	8. How the profile is switched on, and why it is a runtime bit	IN-LIST
 MSC-34	docs/project/mister_core.md	7. What no amount of memory would fix	IN-LIST
-MSC-35	docs/project/cps2_wide.md	extended 14z-107 (9) for D2 and 14z-107 (10) for D3+D4	IN-LIST
+MSC-35	docs/project/cps2_wide.md	THE MiSTer EDITION OF THE SAME RULE (added at slice D1, extended for D2-D4 — 14z-107 (6)-(10))	IN-LIST
 MSC-36	docs/project/mister_core.md	11. What would break it	IN-LIST
 MSC-37	docs/platform/mister.md	Recipe: the simulation lane on macOS (measured 14z-106, works)	IN-LIST
 MSC-38	docs/platform/gotchas.md	`jtsim -setname` re-downloads every run — and on CPS-2 you must download anyway (14z-107)	IN-LIST
