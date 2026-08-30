@@ -35,19 +35,11 @@ fi
 rm -f /tmp/checkskills.$$.log
 
 # --- must-fire controls on a perturbed copy -------------------------------
-FILES=".claude/skills/mister-cps2-wide-core/SKILL.md .claude/skills/mister-vampire-saved/SKILL.md
-.claude/skills/cps2-hardware/SKILL.md .claude/skills/cps2-emulation/SKILL.md
-.claude/skills/vampire-savior-engine/SKILL.md .claude/skills/vampire-saved-port/SKILL.md
-STATE.md STATE_HISTORY.md docs/project/patch_notes.md docs/project/patch_index.md
-docs/project/porting_code_regions.md docs/project/porting_sprite_lists.md docs/project/tenant_manifest.md
-docs/project/build_dir_triage.md docs/project/hardening_register.md
-docs/game/engine_internals.md docs/game/gotchas.md docs/game/atlas/README.md docs/game/atlas/ram.md
-docs/game/atlas/character_tables.md docs/game/atlas/id_space.md docs/game/atlas/select_screen.md
-docs/game/atlas/sprite_lists.md docs/game/atlas/venue_assets.md
-docs/checksums.txt docs/platform/mister.md docs/project/mister_core.md docs/project/mister_map.md docs/project/mister_fit.md
-docs/project/mister_field.md docs/project/cps2_wide.md docs/project/release_format.md
-docs/platform/gotchas.md docs/project/gotchas.md HANDOFF.md CLAUDE.md release/bitstreams/18269/BITSTREAM.txt
-docs/game/atlas/ram.md"
+# FILES is DERIVED (14z-122): the union of every path checkskills.py and
+# doc_anchor_census.py read, printed by the census tool — the hard-coded copy
+# of checkskills' own lists drifted whenever a list changed, and a missing
+# file makes every control fail for the wrong reason.
+FILES="$(python3 tools/doc_anchor_census.py --list-files)"
 mkcopy() {  # mkcopy <dir>
     for f in $FILES; do mkdir -p "$1/$(dirname "$f")"; cp "$f" "$1/$f"; done
 }
@@ -65,9 +57,14 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 mkcopy "$W/a"; printf -- '- [MSC-999] a rule nobody anchored\n' >> "$W/a/.claude/skills/mister-cps2-wide-core/SKILL.md"
 control "unanchored rule" "$W/a" "ANCHORED NOWHERE"
 
-mkcopy "$W/b"; sed -i '' 's/\*\*\[MSV-6\]\*\* //' "$W/b/docs/project/mister_map.md"
-grep -q '\*\*\[MSV-6\]\*\*' "$W/b/docs/project/mister_map.md" && bad "control b: the anchor was not stripped"
-control "stripped anchor" "$W/b" "ANCHORED NOWHERE: MSV-6"
+# control b picks the FIRST MSV anchor mister_map.md carries (14z-122: the
+# hard-coded MSV-6 broke the control whenever that one paragraph moved file).
+mkcopy "$W/b"
+BID="$(grep -o '\*\*\[MSV-[0-9]*\]\*\*' "$W/b/docs/project/mister_map.md" | head -1 | tr -d '*[]')"
+[ -n "$BID" ] || bad "control b: mister_map.md carries no MSV anchor to strip"
+sed -i '' "s/\*\*\[$BID\]\*\* //" "$W/b/docs/project/mister_map.md"
+grep -q "\*\*\[$BID\]\*\*" "$W/b/docs/project/mister_map.md" && bad "control b: the anchor was not stripped"
+control "stripped anchor" "$W/b" "ANCHORED NOWHERE: $BID"
 
 mkcopy "$W/c"; printf -- '\nA note that names Donovan by name.\n' >> "$W/c/.claude/skills/mister-cps2-wide-core/SKILL.md"
 control "game name in level 1" "$W/c" "level-1 skill names 'donovan'"

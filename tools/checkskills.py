@@ -226,6 +226,20 @@ def check(root, verbose=False):
                 fails.append(f"{prefix}: log missing: {rel}")
             else:
                 log_text += "\n" + t
+                # HISTORY FILES CARRY NO ANCHORS (14z-122, the documentation
+                # rationalization pass): a `<name>_history.md` twin is a LOG
+                # (numbers moved there still resolve) but an anchored
+                # paragraph may never move there — the anchor migrates to the
+                # surviving reference sentence, or the paragraph stays.
+                # STATE_HISTORY/DECISIONS_HISTORY are session archives, not
+                # twins, and are exempt (tools/doc_anchor_census.py walks
+                # them as reviewed OUT-OF-LIST rows).
+                if (re.search(r"_(history|HISTORY)\.md$", rel)
+                        and rel not in ("STATE_HISTORY.md", "DECISIONS_HISTORY.md")):
+                    for i in doc_anchors(t):
+                        if i.startswith(prefix + "-"):
+                            fails.append(f"{prefix}: {i} anchored in HISTORY file {rel} "
+                                         "— history carries no anchors")
         missing = sorted(t for t in numbers(text) if t not in log_text)
         if verbose:
             print(f"  {prefix}: {len(numbers(text))} numeric tokens quoted")
@@ -304,6 +318,13 @@ def selftests():
             write(skill=SYN_SKILL.replace("rule two", "rule two quotes 0x123456"))
             if not any("in NO log" in f for f in check(root)):
                 bad.append("a number missing from every log was not caught")
+            SKILLS["XX"] = dict(path="skill.md", docs=["doc.md"],
+                                logs=["log.md", "log_history.md"], forbid=["vsav"])
+            write()
+            (root / "log_history.md").write_text("archived. **[XX-2]** moved here\n")
+            if not any("anchored in HISTORY file" in f for f in check(root)):
+                bad.append("an anchor in a history-file log was not caught")
+            SKILLS["XX"] = dict(path="skill.md", docs=["doc.md"], logs=["log.md"], forbid=["vsav"])
     finally:
         SKILLS, XREF_PREFIXES = saved
     return bad
