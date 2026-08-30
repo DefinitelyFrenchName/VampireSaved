@@ -1,5 +1,36 @@
 # STATE — living progress log
 
+## Session 14z-122 CLOSE — ritual complete. **THE DOCUMENTATION RATIONALIZATION PASS OPENED (the maintainer's
+## first future item): the five enforcement tools (T1-T5) SHIPPED and green; the SPECIMEN restructure
+## (tables/reconciliation.md) done for the maintainer's review; NEXT_SESSION split (56 live lines); the
+## inferred-claim inventory (16 rows); the SECOND future item (Zabel j.LK proximity guard) RECORDED, not
+## started. No build changed. NOT pushed.**
+
+| | |
+|---|---|
+| opened with | the 14z-121 close (`abad01d`, pushed); the maintainer's two future items: (1) the documentation rationalization pass — "documentation should be rationalized and to the point"; logs kept but not as reference; some files carry duplication and INFERRED claims; (2) Zabel j.LK proximity guard, a surgical vanilla+WIDE patch, its OWN session |
+| rulings taken (maintainer, this session) | scope = ALL hand-written docs, one commit per document; chronology moves VERBATIM to `<name>_history.md` twins; `patch_notes.md` stays a log (index + whole-block reorder only); **every INFERRED claim is RE-MEASURED** before its document's commit (board/playtest/testimony rows retract into "What is NOT known" — the ruled fallback); gate WHY narratives go into the gate scripts' own headers; all five enforcement additions in scope |
+| **T1-T5, the enforcement (each its own commit, each with must-fire controls)** | `test_doc_anchor_census` (every `**[PFX-N]**` anchor's FILE+SECTION frozen — checkskills accepts a between-file move SILENTLY, proved on the real tree); checkdocs KEY LIVENESS (a reflow can no longer disarm NO-RIVAL silently; 3 new locks: byte-41 `0xFE`, `66,265,152`, wheel record `PRG:0x272A68` — the plan's guess 0x272A92 was wrong, the tree decides); checkskills HISTORY rule (no anchors in `_history.md` LOG twins) + the gate's FILES list DERIVED; `test_docshape` (`docs/doc_shape.tsv` classes every doc REFERENCE/REGISTER/LOG/HIST/ORIENT/INDEX/GENERATED/EXEMPT/PENDING; session-shaped headers barred from REFERENCE docs; links + quoted-section citations verified); `test_gotchas_index_current` (`docs/GOTCHAS.md` GENERATED from the buckets' `##` headers — 353 entries; the hand-written index + its ten session digests verbatim in `GOTCHAS_history.md`) |
+| **what the new gates caught on day one** | 26 session-shaped headers (venue_assets + the THREE gotchas buckets carry session-batch titles — re-classed PENDING, their retitling is now a pass item); **CLAUDE.md §5 promised `docs/annotations.md`, a file `git log --all` has NEVER seen** — row struck with a dated retirement note, **OPEN TO VETO** (recreate it and the row returns); three stale quoted-section citations; hardening_register:58 retitled; the [VSP-13] echo of the annotations mention in my own T4 row |
+| **G0** | the SPECIMEN: `tables/reconciliation.md` 658→182 lines (STATUS banner, methods kept, THE MAP AT A GLANCE measured from the toml — 272 rows: 220 verified / 12 plausible / 40 open, the damage-pipeline twin table, sound rows' three classes with "RESTORE AT M5" corrected as SUPERSEDED by 14z-86, twin-choice case law, What is NOT known); chronology :71-658 BYTE-VERBATIM in `reconciliation_history.md`. NEXT_SESSION → 56 live lines + `NEXT_SESSION_HISTORY.md` (18 openers; the rollover is now part of this ritual). `docs/project/inferred_claims.md` — 16 rows + 5 labelled unknowns (T0×6 T1×1 T2×5 T3×3 T4×2; the fork's draft spot-checked 8/8); two live contradictions found: select_screen:401 "never been run" vs the green `test_shadow_tenant` since 14z-116, and hardening_register:73's stale SUSPECT headline (#107 shipped the flip at 14z-102) |
+| green at close | portable tier **59 PASS / 0 FAIL** (+4 gates); census 427 anchors; checkdocs 19 locks / 50 sites; checkskills 425; the full static tier (ROMDIR) `--strict` **PASS 120 / SKIP 0 / FAIL 0 / MISSING 0** (run concurrently with the close edits — its dirty-tree note is those edits, and the four doc gates were re-run green after them) |
+| not done, by design | the remaining document commits (G1: patch_index, patch_notes index, build_dir_triage, tenant_manifest, sfx_records+tables/README, the atlas retags, cps2_wide; the gotchas retitling; G2 measurements before engine_internals; G4 mister; G6 HANDOFF; G7 close) — the maintainer should READ THE SPECIMEN first; the plan's per-file table is in the session plan file, the live worklist in `inferred_claims.md` |
+| open to veto | the CLAUDE.md annotations-row retirement; the specimen's shape |
+| push | NOT pushed — push at the maintainer's word |
+
+## Session 14z-122 (2026-08-30) — **THE TWO FUTURE ITEMS RULED: the documentation rationalization pass (opened,
+## tooling-first) and the Zabel j.LK proximity-guard patch (recorded in "Decisions pending", its own session).**
+
+| | |
+|---|---|
+| the brief, in substance | docs are largely/entirely logs in places; logs are fine (STATE/DECISIONS history keep them) but browsing logs for one fact is orders of magnitude slower for humans and agents; a previous effort built the current hierarchy; since then files were appended with discovery logs, duplication exists, and some claims were INFERRED not measured |
+| the survey (three read-only agents) | ~36.5k non-generated lines; five files = 49%; the log-shape/duplication/lock maps that shaped the plan (byte-41 paragraph ×3, `66,265,152` in 7 files, `+0x1C` in three states at once, the D2 window with NO engine_internals section) |
+| sequence | Zabel item recorded FIRST (this file + the NEXT_SESSION opener) so it survives any close; then T1..T5, the specimen, the split, the inventory — the CLOSE row above |
+
+**Ledger rollover:** the 14z-119 group (two records) moved verbatim to
+STATE_HISTORY.md; STATE holds 14z-120 / 14z-121 / 14z-122.
+
+
 ## Session 14z-121 CLOSE — ritual complete. **ONE DAY, FROM THE M12 VERDICT TO THE CHARACTER PAGES: the board
 ## verdict GREEN; the Killshread ruling; the phase-3 remainder (the record decoded from its readers, the decoder
 ## bound bug behind the "unindexed nodes", every projectile's parameters, the gap rows); the open list worked down
@@ -212,47 +243,6 @@
 | open | Huitzil's and Pyron's naming rigs (the schedules are data in `name_moves.py`; recipes for Galaxy Trip's six destinations, the air throws, Float, the held EX inputs are new); Change Immortal's `0x3d` (the 2/8 control); the odd standing ids `0x01,03,05,07,09,0b` and `0x18-0x1d`, `0x24` (unentered — the maintainer may recognise them); ~~whether to drop the `Killshread Summon (ES)` row (measured: no ES)~~ **DROPPED 14z-121 (maintainer-confirmed; the ES effect is Killshread (ES)'s)** |
 
 
-## Session 14z-119 CLOSE — ritual complete. **THE PHYSICS-PORT FREEZE: donovan-m18 / huitzil-m25 /
-## pyron-m19 / merged-m14, mark M12, stock twin MOVED by design — strict 117/0/0/0 on the committed
-## tree, guard corpus 344/344, roster 111/111, every masked legacy class green on three suites.
-## Tagged at `5672291`. NOT field-tested, NOT pushed.**
-
-| | |
-|---|---|
-| opened with | the 14z-118 close (`0c2f993`, pushed); "proceed with (A)" |
-| delivered | the M12 battery end to end (the session entry above has every number), release `release/merged-m14/`, the MiSTer tail (fork `2bf41090`, patch 0028, pin, bundle `../mister_fieldtest_14z119/`), the re-point + N-2 sweeps, the docs |
-| green at close | `run_all_static --strict` **PASS 117 / SKIP 0 / FAIL 0 / MISSING 0** on the committed tree `5672291` (the first run was 116/0/1: `test_phasec_spaces`' stock pin — the fourth carrier of the moved stock twin — re-pinned); suites donovan-m18 61/21, huitzil-m25 67/21, pyron-m19 68/19 with every masked legacy class PASS; `audit_merged_legacy` 47/47; `audit_guard_corpus` 344/344; `audit_roster_pairings` 111/111; `audit_legacy_pairings` PASS; the gate list in the session entry — all PASS |
-| push | **NOT PUSHED** — main is ahead of origin by the freeze commit + this close; the fork `2bf41090` is local; tags `freeze/{donovan-m18,huitzil-m25,pyron-m19,merged-m14}` local. Push at the maintainer's word |
-| not done, by absence | ~~the board verdict on M12~~ **GREEN 14z-121** (the bundle is on disk, the tell is "M12"; pick Donovan, walk, jump); phase 2 of the map; the move lists |
-| next | the maintainer's pick — the board test, then (B) phase 2 or (C) the move lists (NEXT_SESSION). Load `vampire-saved-port` first |
-
-**Ledger rollover:** the 14z-116 group (one record) moved verbatim to
-STATE_HISTORY.md; STATE holds 14z-117 / 14z-118 / 14z-119.
-
-
-## Session 14z-119 (2026-08-29/30) — **THE PHYSICS-PORT FREEZE: donovan-m18 / huitzil-m25 /
-## pyron-m19 / merged-m14, mark M12 — the M12 battery NEXT_SESSION option (A), run end to end in one
-## session. Donovan walks and jumps with VS2's values on every shipping track; the STOCK TWIN MOVED
-## (by design, first time since 14z-110b); every masked legacy class PASS on three suites; the two
-## RED-BY-DESIGN gates re-pinned. ~~NOT yet field-tested (bundle 14z119)~~ **FIELD VERDICT GREEN 14z-121 (2026-08-30)**. ~~NOT pushed~~ pushed 14z-120.**
-
-| | |
-|---|---|
-| opened with | the 14z-118 close (`0c2f993`, pushed); the maintainer: "proceed with (A)" — the M12 battery |
-| the builds | `version_text` M11 -> M12 in all three manifests (no other manifest change: `port_param32 = true` was already in). don_m18 **`7109f835`** (339 ops — PROGRAM IDENTICAL to the validated probe `build/don_phys_probe`; the mark is gfx-only), hui52 **`ae953657`** (370 — fingerprint UNCHANGED from huitzil-m24), pyron36 **`1222df18`** (307 — unchanged from pyron-m18), `build/m3b_merged21` **`6649523a`** (826 ops = 823 + exactly the three Donovan value ops at `0x0BD912/0x0BDF0A/0x0BE392`; NO address moved), `build/m5_stock13` **`38e9cb2c`** — **THE STOCK TWIN MOVED** (was `d29fd062` since 14z-110b). Members moved: PROGRAM `vm3j.04d` (solos/merged: the three rows; stock: six), GROUP C `vsw.33m/37m` (the M12 glyph); QSound/Z80 untouched |
-| **why the stock twin moved, attributed** | `port_param32` is a per-row `data_port`, not profile-gated (the #103 class): on the substituted track Donovan IS slot `0x0F`, so gen writes his VS2 rows there too — six data ops, `param32_a[0xf]` value `0x0BD8F2` + `[0x1f]` mirror `0x0BD972`, `jump_params[0xf]` `0x0BDE4A` + mirror `0x0BE14A`, `param32_b[0xf]` `0x0BE372` + mirror `0x0BE3F2` (per-op diff stock12 vs stock13: ADDED these six, nothing changed or removed; member `vm3j.04d` only). No legacy row is written — per-char stride tables. The 14z-118 record said "legacy x3 bit-identical" about WIDE and did not predict this; `test_m3a_reproducible` never showed it because the gate exits at its FIRST mismatch (WIDE). Registry: `donovan-m18-stock`; the stage-4 image moves the same way (`donovan-m18-stage4` `108f7523`, a record row — no gate dispatches on it) |
-| **the registry blind spot, handled** | huitzil/pyron programs did not change, so their dispatch fingerprints equal m24/m18's (the fingerprint covers program members only — `build_fingerprint.py` KNOWN BLIND SPOT; the glyph tiles are group C). `build_fingerprint.py` resolves FIRST match, so the m24 / pyron-m18 rows are COMMENTED OUT (kept as history) and huitzil-m25 / pyron-m19 rows added with the same sha; expectation sets carried m17->m18 / m24->m25 / m18->m19 / m13-stock->m18-stock |
-| the merged build refused first | `build_merged.sh` reads `test_tenant_loop`'s frozen 3-tenant count (823) and refused 826 — the red-by-design gate doing its job. `test_tenant_loop` re-frozen FROM ITS OWN PRINT: donovan 336 -> **339**, 2-tenant 612 -> **615** (sum 668 -> 671), 3-tenant 823 -> **826** (sum 932 -> 935); huitzil 370 / pyron 307 unchanged; PASS, then the merged build |
-| suites | three full verifies in parallel (~5 h under load): **every masked legacy class PASS** on all three (don 61 pass / 21 skip, hui 67 / 21, pyron 68 / 19). **huitzil-m25 and pyron-m19: ZERO moved `.sha1`s** — bit-identical to m24 / m18 (the control that the mark is inert and nothing else changed). **donovan-m18: six self-frozen tenant rigs moved** — `61_tenant_2pwin`, `103_tenant_2pwin_auto`, `108_tenant_voice`, `110_don_arcade_mash`, `112_don_pod_merged`, `113_shadow_vs_tenant` — every one a Donovan match; re-frozen with `SUITE_ONLY --freeze` and re-verified PASS |
-| **the moved rigs ATTRIBUTED (the method: onset frame, not a sampled frame)** | don_m17 vs don_m18 on 103 and 108. Sampled frames first: 2500 IDENTICAL on both; 4000 = 8 bytes (103) / 793 bytes (108); 5600 = 11 — a DIFFERENT FIGHT, not a phase artifact. Then the checksum logs: 103 diverges at **f2980** and 108 at **f3068** (match live from ~2900 — the first movement) and never re-converge. DUMPS at onset−1 / onset on both builds: onset−1 IDENTICAL; at the onset **exactly 2 bytes differ, `$FF8441/$FF8442` = P1 `+0x40.l`, the X-VELOCITY word: `0x0280 -> 0x0300` = 2.5 -> 3.0** — the ported walk speed, byte-exact, on both replays. Nothing outside P1's fighter block. Evidence: `build/attr_14z119/onset_summary.txt`, `summary.txt` |
-| audits | `audit_merged_legacy` **47/47** (leg (b) on the NEW solos, explicit `LEGB_*`) · `audit_guard_corpus` **344/344** clean on merged21 · `audit_roster_pairings` **111/111** (`bases.tsv` UNMOVED — no allocation shifted) · `audit_legacy_pairings` PASS on the three new sets |
-| gates | dualtrack PASS (onsets held) · fbneo_legacy_oracle PASS with **NO refit** · fbneo_replay_determinism · inp corpus 6/6 · random_select_tenants (CONTROL merged19, kept) · version_string (M12 pixel-exact) · pyron_medallion_2p · shadow_tenant · oboro_select · wheel_bank5 / select_wheel / tenant_select_records · tenant_loop (re-frozen) · manifest_merge · tenant_row_owner · thunk_addr_literal · pcrel_escapes (inventories IDENTICAL) · escape_triage (25 verdicts identical, no landing moved) · **pointer_flow: all four baselines IDENTICAL to their predecessors** (renamed merged-m14 / donovan-m18 / huitzil-m25 / pyron-m19) · m3a (EXPECT_WIDE/STOCK/MERGED + five MANI_* re-pinned from a `REFREEZE=1` run; HUI/PYR unchanged) · tables_current + charmap_current + charmap_overrides (the three tables and six map pages regenerated — `donovan.json/md` now read the rows `byte`) · anim_node_walk re-pointed · checkdocs 16 locks · checkskills 425 · build_ref_rot 66 live / 0 rotted · jtcores_twin · mister_mra_map · mra_parts · release_roundtrip · portable 56/0/0/0. **Strict: see the CLOSE row** |
-| release / MiSTer tail | `release/merged-m14/{fbneo,mame,mister}/` (M12; bitstream 18269 hash-verified, unchanged). Fork **`2bf41090`** (catalogue: THREE CRCs — `vm3j.04d`, `vsw.33m/37m`; `--check` clean), patch **0028**, `PINNED` + `PATCH_NAMES` bumped, twin PASS; the WIDE MRA differs from merged-m13's in exactly those three `<part>` lines (+ `asm_md5`); bundle **`../mister_fieldtest_14z119/`** (`vsavjw.zip` sha1 `3b34d35f…`; STOCK CONTROL MRA byte-identical to 14z-115/117/117b's; `.rbf` unchanged; README says what to try: pick Donovan, walk, jump). **THE TELL IS M12** |
-| re-point sweep | 93 files / 141 lines (+ the five audits after they finished — `audit_merged_legacy`'s `LEGB_*` defaults had been MISSED by the 14z-117b sweep and still named the one-back solos); syntax-swept; `test_random_select_tenants` re-pointed BUILD only (CONTROL stays `m3b_merged19`, which therefore STAYS on disk). N-2 sweep: `don_m16`, `hui50`, `pyron34`, `m5_stock11` deleted (grep-four-places clean) |
-| **paid for (two cuts of one trap, `project/gotchas.md`)** | the sweep stamp on TOML SECTION HEADER / KEY lines broke `test_pcrel_escapes`' hand-rolled parser (`KeyError: 'build'` after "inventory unchanged" x3); and the blind name replace REWROTE HISTORY in three comments ("RE-POINTED 14z-117b: … -> hui52…", "Re-scanned on don_m18", "m3b_merged18, 14z-115") — restored. Rules filed |
-| docs | patch_notes 14z-119; patch_index (track rows, stock row, 14z-119 additions, patch 0028); HANDOFF (playtest block, current-builds header, four-track recipe, MiSTer examples, registry row); `mister_core` / `platform/mister` / `mister_scope` / `mister_field` / `hardening_register` / `build_dir_triage` ground truth; the three community tables + six map pages regenerated |
-| **strict at close** | `run_all_static --strict` first run: **116 PASS / 0 SKIP / 1 FAIL** — `test_phasec_spaces`, whose stock-twin pin still said `d29fd062` (the FOURTH carrier of the moved stock twin, after m3a EXPECT_STOCK, the registry and the stock-track index row); re-pinned to `38e9cb2c` with the attribution, PASS standalone; a full strict re-run after the commit is recorded in the CLOSE row |
-| open | ~~the board verdict on M12 (bundle 14z119)~~ **GREEN 14z-121**; phase 2 of the character-data map (hitbox rectangles + attack records by measurement); the move lists (phase 1 naming); the cosmetic backlog unchanged |
 
 **SPLIT 2026-08-20 (14z-99 post-freeze close, maintainer-approved): this
 file holds the RECENT session groups + THE LEDGER; the full detail of every
@@ -283,6 +273,7 @@ Full detail for every line: `STATE_HISTORY.md` (verbatim; grep the session
 tag or any phrase below). `[+N more entries]` = the group has N further
 session records in the archive beyond the headline shown.
 
+- Session 14z-119 CLOSE — THE PHYSICS-PORT FREEZE: donovan-m18 / huitzil-m25 / pyron-m19 / merged-m14 (mark M12), the stock twin MOVED by design; strict 117/0/0/0; FIELD VERDICT GREEN 14z-121  [+1 more entries]  [rolled 14z-122 close]
 - Session 14z-118 CLOSE (3) — the session's close. One day, four arcs: the M11 board verdict  [+4 more entries]  [rolled 14z-121 close]
 - Session 14z-117 CLOSE (3) — the session's last act. The VS/VS2 data-architecture page CORRECTED from a row-by-row measurement after the maintainer read it; the next session is RULED: a full documentation audit — measured, consis… [+4 more entries]
 - Session 14z-116 CLOSE — THE COSMETIC/EXTRAS ARC: win quotes MEASURED THEN FORGONE, the hidden characters DECODED (Shadow takes the tenant — confirmed on the board), and PYRON'S MEDALLION WHITE-OUT FIXED after two years parked; 13 commits pushed; nothing frozen (the freeze battery = 14z-117). The close ritual audited: patch_notes/patch_index/HANDOFF/gotchas had been skipped on the first pass and were written.
