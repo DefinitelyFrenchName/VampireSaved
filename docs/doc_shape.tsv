@@ -75,7 +75,8 @@ docs/project/porting_sprite_lists.md	REFERENCE	-	-
 docs/project/quartus_brief.md	HIST	-	-
 docs/project/release_format.md	REFERENCE	-	-
 docs/project/skills_scope.md	HIST	-	-
-docs/project/tenant_manifest.md	PENDING	-	-
+docs/project/tenant_manifest.md	REFERENCE	docs/project/tenant_manifest_history.md	banner
+docs/project/tenant_manifest_history.md	HIST	-	-
 docs/project/visual_smoke_tests.md	REFERENCE	-	-
 # --- project/tables (chars/ is generated wholesale and excluded from the walk)
 docs/project/tables/README.md	PENDING	-	-
