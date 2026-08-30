@@ -138,7 +138,13 @@ def main():
                 continue
             seen.append(sq)
             chain = (anim.get(table) or {}).get("chains", {}).get(sq)
-            label = inputs[i] if i < len(inputs) and len(seqs) == len(inputs) and len(seqs) > 1 else ""
+            # the row's seq list follows the input list's order, or LP/MP/HP (LK/MK/HK) when one input covers three strengths
+            if len(seqs) > 1 and len(inputs) == len(seqs):
+                label = inputs[i]
+            elif len(seqs) > 1 and len(inputs) == 1 and inputs[0][-1:] in ("P", "K"):
+                label = ["L", "M", "H"][i] + inputs[0][-1] if i < 3 else f"#{i + 1}"
+            else:
+                label = ""
             if not chain or not chain.get("nodes"):
                 out.append(f'<div class="strip"><span class="chain">{esc(table)}:{esc(sq)}</span><span class="na">chain not in the decoded graph</span></div>')
                 continue
@@ -159,7 +165,7 @@ def main():
                               f'<dl><dt>freeze</dt><dd>{r["freeze"]}</dd></dl>']
                 if len(rids) > 1:
                     cells.append(f'<span class="note">{len(rids)} attack records ({", ".join(f"{x:#x}" for x in rids)}); the first shown</span>')
-            out.append(f'<div class="strip">{"".join(cells)}</div>')
+            out.append(f'<div class="strip">{("<span class=variant>" + esc(label) + "</span>") if label else ""}{"".join(cells)}</div>')
             img = ""
             if sprites is not None:
                 import base64, json as _json
@@ -302,7 +308,9 @@ dd small,.strip small{font-size:11px;color:var(--ink2);margin-left:2px}
 .input{font-size:14px;color:var(--ink2)}
 .chip{font-size:11px;text-transform:uppercase;letter-spacing:.1em;padding:2px 8px;border-radius:2px;background:var(--chip);color:var(--ink2)}
 .chip.es,.chip.ex,.chip.df{color:var(--gold);border:1px solid var(--gold);background:transparent}
-.strip{display:flex;flex-wrap:wrap;gap:8px 22px;align-items:end;margin:10px 0 0}
+.strip{display:flex;flex-wrap:wrap;gap:8px 22px;align-items:end;margin:12px 0 0;padding-top:6px;border-top:1px dotted var(--line)}
+.strip:first-of-type{border-top:0;padding-top:0}
+.variant{font-family:Marcellus,Georgia,serif;font-size:15px;color:var(--accent);align-self:center;min-width:2.5em}
 .chain{font-size:12.5px;color:var(--ink2);align-self:center}
 .na,.note{font-size:12.5px;color:var(--ink2);align-self:center}
 figure{margin:10px 0 0;display:flex;align-items:center;gap:14px}
