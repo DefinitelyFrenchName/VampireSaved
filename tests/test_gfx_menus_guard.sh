@@ -18,6 +18,14 @@
 # positive control does start MAME.
 #
 # Usage: ROMDIR=... tests/test_gfx_menus_guard.sh   (~40s, MAME for case 3)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-90 (issue #6): ground truth for the pixel gate's rompath guard. An
+#   absent rompath and a vsavjw-only rompath must both FAIL — the second is
+#   the one a directory check cannot catch, where MAME would resolve by hash
+#   out of $ROMDIR and compare vanilla to vanilla. Plus a positive control.
+#   ROMDIR, ~40s
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

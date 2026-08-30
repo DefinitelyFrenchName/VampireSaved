@@ -21,6 +21,11 @@
 #
 # The fix refuses (a) loudly and implements (b). This gate proves both,
 # because a silent check and an absent one look identical from the outside.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #31) The crash guard checks inputs and refuses what it
+#   cannot honour. **Not portable.**
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

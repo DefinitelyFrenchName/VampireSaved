@@ -25,6 +25,13 @@
 # pyron/71 NEEDS the meter pokes or the EX never fires (replay header).
 #
 # Usage: ROMDIR=... tests/audit_pyron_ring.sh [merged builddir] [solo builddir]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-85, RE-FROZEN 14z-85b (~10 min, 4 runs): pyron's merged-vs-solo ring-
+#   id diff must be EMPTY (the per-node sfx helper class is FIXED —
+#   pyr/hui_sfx_records curated arrays; pre-fix the diff was music 0x729 + 4
+#   ids). Any new id or a missing solo id FAILS. Solo default: pyron22
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

@@ -22,6 +22,11 @@
 #      control this gate fails back to if the port evaporates).
 #
 # Usage: ROMDIR=... tests/test_hui_walk.sh [existing-stage4-builddir]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   Huitzil velocity-port gate (14z-66): param32 rows 0x10 static + measured
+#   walk-speed deltas (16.16-exact). Self-builds stage 4 unless given a build
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

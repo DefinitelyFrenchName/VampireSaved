@@ -93,6 +93,32 @@
 # HITCLASS_TENANT_ONLY=1 skips sections 1 and 2 (the 2*N + N legacy runs)
 # so section 3 can be iterated; section 0 still runs because section 3
 # needs its build and its $BODY.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-82b ON-DEMAND (NO minute figure on purpose — the "~20 min" here was
+#   measured on the 4+2 replay version and was still being read a session
+#   after the corpus grew to 46. Budget on the work formula in the script
+#   header; poll the process): the adoption numbers on a PROBE build — the
+#   11,017-frame soak that crashes frozen pyron-m2 must END clean; legacy A/B
+#   bit-identical (measured: 30,284 frames, zero divergence); fire census.
+#   REWRITTEN 14z-92 (M4): corpus-wide (46 legacy pairings, was 4 + 2), the
+#   reference is now a NO-THUNK TWIN built from the current manifest (the old
+#   build/pyron20 no longer boots AND had stopped being a control), and the
+#   crash soak has a positive control. RESULT: the "legacy enters the map 0
+#   times" claim is FALSIFIED — 230 entries over 2 replays, all indices < 64,
+#   so legacy gets vanilla answers; 43/46 bit-identical. Never freezes the
+#   probe. EXTENDED 14z-93 with the OTHER HALF: section 3 is the TENANT fire
+#   census (what the thunk BUYS, the number M4 left open), all 37 hui+pyron
+#   rigs on verticals built from the CURRENT manifests, indices binned in-
+#   domain / vs2-extension / trap. Huitzil+Pyron only — donovan.toml does not
+#   declare the row. Section 4 diagnoses section 0's dead crash control with
+#   the same probe. THE THREE VERDICTS ARE KEPT APART BY DESIGN: "reaches the
+#   extension", "enters but stays below 64", and "NO RIG PRODUCES THE EVENT"
+#   (the sweep is POOL-vs-POOL, so a tenant projectile hitting a FIGHTER never
+#   transits the map) mean different things, and folding them is what produced
+#   the retracted claim. HITCLASS_TENANT_ONLY=1 skips 1+2. Verdict logic
+#   ground-truthed by tests/test_classify_hitclass_probe.sh
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

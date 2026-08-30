@@ -9,6 +9,15 @@
 # 0x45, Final Guardian 0x46, Erasing Sphere 0x47. Emulator tier (~2 min).
 #
 # Usage: ROMDIR=... [MAME_BIN=...] tests/test_projectile_census.sh
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier emulator (MAME, ~2 min)) WHICH PROJECTILE-POOL TYPES EACH MOVE
+#   SPAWNS (14z-120 (11)): the naming rigs' specials/meter parts with the 32
+#   pool slots' type bytes sampled; `tools/projectile_census.py` lists per
+#   event the types that first appear after the input; frozen
+#   `tests/expected/projectile_census.txt`. Run after any change to the rigs
+#   or a tenant's projectile handlers
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

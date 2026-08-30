@@ -27,6 +27,15 @@
 #
 # Usage: ROMDIR=... tests/test_hui_fx_flow.sh [stage-6-builddir]
 #        (self-builds stage 6 from huitzil.toml if no build given)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   the effect-flow attribution gate (14z-68): leg 1 fighter-side flow
+#   identity (H's ray runs HIS per-char handlers; the REFUTED 0x56D68 entry
+#   must stay cold); leg 2 piece-side machine attribution, auto-detecting
+#   pre/post-port from the build's own patch notes. Rig: replay 83b (2P dummy,
+#   3 spaced 236LP, FBNeo taps). Ground-truthed on hui9 + a bad-thunk negative
+#   control. Self-builds stage 6 unless given
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

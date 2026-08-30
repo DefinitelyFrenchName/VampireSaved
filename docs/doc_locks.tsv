@@ -19,7 +19,7 @@ obj_bank_table	PRG:0x282D4	per-char(acter)? OBJ bank table	docs/game/atlas/chara
 obj_bank_table_vsav2	PRG:0x27530	vsav2 `PRG:0x27530`	docs/game/atlas/character_tables.md,docs/game/engine_internals.md
 sprite_pal_ptr_table	PRG:0x38C198	(sprite|SPRITE)[- ]palette pointer table|per-char pointer table	docs/game/atlas/character_tables.md,docs/game/atlas/venue_assets.md,docs/game/engine_internals.md
 ai_script_tables	PRG:0xBF01A	AI action-script tables	docs/game/atlas/character_tables.md,docs/game/engine_internals.md,docs/game/atlas/ram.md,HANDOFF.md
-voice_borrow_writer	PRG:0x0AEF6	writer (is|must be) `?PRG:0x0AEF6|write at `PRG:0x0AEF6	docs/game/engine_internals.md,docs/game/gotchas.md,docs/game/atlas/ram.md,HANDOFF.md
+voice_borrow_writer	PRG:0x0AEF6	writer (is|must be) `?PRG:0x0AEF6|write at `PRG:0x0AEF6	docs/game/engine_internals.md,docs/game/gotchas.md,docs/game/atlas/ram.md,tests/audit_voice_borrow.sh
 gallon_variant_idiom	PRG:0x020B9C	Gallon-variant idiom at	docs/game/atlas/select_screen.md,docs/game/atlas/id_space.md,docs/game/engine_internals.md,docs/project/patch_index.md,HANDOFF.md
 char_loader	PRG:0x028DD8	unmasked loader \(|vsavj `PRG:0x028DD8` \(≡	docs/game/atlas/character_tables.md,docs/game/atlas/select_screen.md	PRG:0x0280B8,PRG:0x0280E6
 id_fold_site	PRG:0x04FAC4	\| `PRG:0x04FAC4` \||`PRG:0x04FAC4` folds	docs/game/atlas/id_space.md,docs/game/gotchas.md	PRG:0x04FFA8

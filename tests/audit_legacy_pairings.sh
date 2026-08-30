@@ -65,6 +65,24 @@
 # Default builds: the three current sets. ~30 min (225 MAME legs, JOBS-parallel).
 # Section 0 (verdict controls) is static and runs first — a checker that has
 # not been ground-truthed never issues a verdict.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-89: WHICH REPLAYS ARE LEGACY CONTENT — and is each one compared
+#   against VANILLA rather than against itself? Measures every non-skip
+#   replay's loaded-character signature on vanilla AND on the build and FAILS
+#   if a legacy pairing carries only a self-frozen `.sha1` (which by
+#   construction cannot see a legacy regression — that is how the 14z-88
+#   medallion regression stayed green). The filename does not answer it: the
+#   *_don_*/*_victor_* families became LEGACY when M3a restored Jedah to cell
+#   0x0F, and 35 of ~43 self-frozen replays per set measured as legacy
+#   pairings. Signature is +0x60.l (the per-character hitbox base) NOT +0x382
+#   (the voice class in match, 14z-87); compares the distinct-value SEQUENCE
+#   so a hook-cycle load phase is tolerated. 7 static verdict controls incl.
+#   the dead-instrument refusal, plus a LIVE positive control per set (the
+#   same replay with the tenant id poked must flip LEGACY->TENANT). NO POKES
+#   otherwise — it measures what run_suite dispatches. ~30 min, JOBS-parallel;
+#   report per set in build/legacy_pairings/*.tsv
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -29,6 +29,11 @@
 #      MAME/FBNeo frame skew, so a match cannot be a timing coincidence.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] tests/test_fbneo_instruments.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   B5b: FBNeo write tap (non-perturbing + re-derives a known MAME finding),
+#   pokes, and address-resolved dumps cross-checked byte-for-byte against MAME
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

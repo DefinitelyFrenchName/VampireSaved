@@ -27,6 +27,19 @@
 # perturbation is applied to a COPY of the manifest under $WORK.
 #
 # Usage: tests/test_thunk_addr_literal.sh [extract_dir]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-78: a placed address baked into a hand-authored site_thunk body is a
+#   BUILD error. Third guard of the family whose first two cover the tenant
+#   ID; this one covers the ALLOCATOR's output, the gap that made anim look
+#   immovable for a session. Opcode-anchored + word-aligned (an unanchored
+#   scan reads operand pairs as addresses); the anchor set is the documented
+#   coverage boundary — a raw longword in embedded data is OUT OF SCOPE and
+#   section 3c says so rather than letting section 1 read as total cover. 4
+#   sections incl. all three real manifests staying quiet, the addr_literal_ok
+#   escape hatch, and 2 verdict controls. Runs the GENERATOR ALONE against an
+#   extract dir; never edits a tracked file. No emulator, ~40s
 set -u
 cd "$(dirname "$0")/.."
 

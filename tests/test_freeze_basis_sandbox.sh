@@ -36,6 +36,15 @@
 #   GATE_SRC points at a directory holding an alternative
 #   freeze_masked_basis.sh — use it to re-run this against the pre-fix tool,
 #   where section 1 MUST fail. Section 3 does that automatically.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-91: freeze_masked_basis.sh must never hand one run's MAME sandbox to
+#   the next. The documented canary command named the same replay twice, so
+#   the freeze leg inherited the verify leg's EEPROM and OVERWROTE the basis
+#   it had just verified bit-for- bit. Scratch repo + stubbed runner; the
+#   verdict control reconstructs the pre-fix tool and requires the defect.
+#   ROM-free, ~1s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 SRC="${GATE_SRC:-$REPO/tools}"

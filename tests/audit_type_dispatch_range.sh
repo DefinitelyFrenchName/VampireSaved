@@ -43,6 +43,16 @@
 # checksum-compared (GOTCHAS).
 #
 # Usage: ROMDIR=... tests/audit_type_dispatch_range.sh [merged_builddir]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-82, EXTENDED 14z-85 (~15 min, 7 guarded runs): on the MERGED build,
+#   ZERO obj_hook dispatches in the ORIGINAL 114-119 range during hui/pyron
+#   replays (a census-missed stamp would land there), renumbered range LIVE
+#   for huitzil, originals still serving donovan; verdict control sees
+#   originals on the ref build. Reads type_map.json. 14z-85 §4-6: 0x54470
+#   family (59-75) dispatch LIVE on H+P legs with the tag-stub tripwire
+#   SILENT; solo verdict control
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

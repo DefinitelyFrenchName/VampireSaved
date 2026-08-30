@@ -33,6 +33,19 @@
 #
 # No emulator, no ROMs beyond $ROMDIR, seconds.
 # Usage: ROMDIR=... tests/test_index_window_thunk.sh [builddir]   (default build/hui30)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-79: the (b') index-window thunk at engine site 0x018460. RECONSTRUCTS
+#   all 470 body bytes from the two reference ROMs rather than diffing with a
+#   tolerance — old_hex proves only that we patched the right PLACE, and one
+#   wrong trampoline address is a SILENT wrong-routine dispatch, the very
+#   class the thunk removes. Also asserts the engine around it is vanilla (the
+#   table, the sibling dispatcher incl. 0x01850A, the shared handler pool) and
+#   re-derives the table at 80 entries. 3 verdict controls (perturb a
+#   trampoline, a table word, a danger body — each must be CAUGHT) + a build-
+#   level negative control (FAILS on a pre-thunk build, naming why). Static,
+#   no emulator, ~40s. Defaults build/hui30
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

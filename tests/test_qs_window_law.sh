@@ -16,6 +16,16 @@
 # caused the beep — so corruption confined to it passed every batch check.
 # The law now lives in tools/qs_window.py; this is what stops it drifting
 # apart again.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-93 (GitHub #82): the QSound sample-window endpoint is INCLUSIVE
+#   (packing law #3). The builder was corrected at 14z-87b; both AUDIT paths
+#   were not, and went on justifying the exclusive slice with the superseded
+#   belief — so the byte that caused the sword-plant beep sat OUTSIDE the
+#   audit surface. Law now in tools/qs_window.py, bounds CHECKED not clamped.
+#   14 cases incl. a terminal-byte corruption control and a control
+#   REPRODUCING the old blindness. ROM-free, ~1s; ci_portable
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

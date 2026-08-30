@@ -21,6 +21,16 @@
 # has one contact group, an ES summon two), so the frozen numbers are not
 # the only check.
 # Emulator tier (MAME, ~2 min). Usage: ROMDIR=... [MAME_BIN=...] [FREEZE=1] tests/test_killshread_es.sh
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier emulator (MAME, ~2 min)) KILLSHREAD (ES) (14z-121 (3)): the
+#   maintainer's ruling measured — Donovan part 12 (plain plant → summon, ES
+#   plant → summon, LK and HK; Victor idle in the sword's path): contact lines
+#   frozen in `tests/expected/killshread_es.txt` (`FREEZE=1`), plus the
+#   structural shape: a plain summon = ONE contact wave, an ES summon = TWO
+#   (going away and coming back), the plant never connects. Run after any
+#   change to the rig or Donovan's stance/summon chains
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 : "${ROMDIR:?set ROMDIR}"

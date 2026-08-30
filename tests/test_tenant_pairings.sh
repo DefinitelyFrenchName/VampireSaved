@@ -40,6 +40,22 @@
 # Usage: ROMDIR=... [MERGED=build/m3b_merged11] tests/test_tenant_pairings.sh
 # ~3 min (6 guarded MAME runs, parallel). Needs the MERGED build: the whole
 # point is two tenants in ONE image, which no solo build can express.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-95: TWO PORTED CHARACTERS IN ONE MATCH, all six orderings. The
+#   CLAUDE.md §4 coverage the suite did NOT have — "vs each of the 18 (both
+#   sides)" — and the gap GitHub #99 walked through. The arcade marathon
+#   cannot close it: single-credit, ONE character, and (measured 14z-95) only
+#   two ladder rungs. Asserts per ordering: no crash (guarded) + BOTH
+#   characters loaded, checked on the per-character hitbox base +0x60.l. THE
+#   SIGNATURE CHOICE IS LOAD-BEARING: +0x382 is the VOICE-FLAVOR class in
+#   match, not the id (14z-87, ram.md:85) — GitHub #16 records a live gate
+#   that false-REFUSEs on it. Frozen bases: donovan 0x3fa9d0, phobos 0x4477b0,
+#   pyron 0x49ab7c, measured identical as P1 and as P2. Replay 94 is
+#   character-AGNOSTIC, so adding a tenant is a row in CLASSES, not a new
+#   replay. Verdict control: an UNPOKED run must be REFUSED, else every ok is
+#   vacuous. Needs the MERGED build by construction. ~10s, 7 runs
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

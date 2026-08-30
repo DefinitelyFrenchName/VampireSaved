@@ -23,6 +23,24 @@
 # three ways and each copy must FAIL for the stated reason — a doc that drops
 # the number (PRESENCE), a doc that quotes a different number beside the
 # fact (RIVAL), and a lock row naming a file that does not exist (MISSING).
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier ci_portable (~0.2 s)) THE DOCS ARE LOCKED TO EACH OTHER (14z-118,
+#   the documentation audit): `tools/checkdocs.py` reads `docs/doc_locks.tsv`
+#   — one row per load-bearing number (label, canonical value, a key regex
+#   naming the fact, the documents that must quote it, the sibling values
+#   allowed beside it) — and asserts PRESENCE (every listed doc quotes the
+#   canonical verbatim) and NO RIVAL (no other value of the same shape within
+#   80 chars after the key unless in `also`). The atlas row is canonical;
+#   syntheses follow it. Seeded with 16 locks / 40 file-sites from
+#   `doc_audit_14z118.md` §2 (OBJ bank table, sprite-palette pointer table, AI
+#   script tables, the voice-borrow writer, the Gallon-variant idiom, the
+#   loader, the id fold, the id pair, the fade window, name entries, the ring
+#   base, match-init normalisation). Twelve extractor self-tests every run;
+#   three must-fire controls on a perturbed copy (dropped number, rival
+#   number, missing file). Add a row whenever a number is quoted in a second
+#   document
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

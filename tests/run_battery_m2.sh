@@ -34,6 +34,11 @@
 #   6. test_m2a_flavor_selector.sh — Start-hold latch
 #
 # Usage: ROMDIR=... tests/run_battery_m2.sh [outbase]   (default build/donovan6)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   THE deliverable battery: audit + all of the above in order; run before ANY
+#   build commit
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

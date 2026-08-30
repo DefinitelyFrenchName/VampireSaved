@@ -41,6 +41,18 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] tests/audit_phase_mode_cost.sh
 # On-demand: builds a probe variant and runs 14 replay legs (~15 min).
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-77: what Phobos' phase-gated latch costs Donovan — the maintainer's
+#   ratified condition for adopting it in the merge. Builds a phase-mode
+#   Donovan and A/Bs it LIVE against donovan-m3a (no registry row exists for
+#   it, and run_suite refuses an unregistered fingerprint). LEGACY must be
+#   bit-identical (4 replays, 30,284 frames — it is); his OWN content must
+#   diverge AND re-converge (24-135 frames in 13-16 runs from the exact frame
+#   the shim runs, then 6,000-9,700 identical incl. a full round-2). An
+#   IDENTICAL result FAILS — that means the rig stopped forming the match. On-
+#   demand, ~15 min
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

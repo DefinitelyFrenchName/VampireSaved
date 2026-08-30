@@ -29,6 +29,14 @@
 # clean result (list_type_census.py's lesson).
 #
 # Usage: ROMDIR=... tests/audit_type_writes.sh [outdir]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-82 ON-DEMAND (~8 min, 6 MAME tap legs): the DYNAMIC half — every
+#   family-valued type-byte write's PC must map to a frozen stamp row (catches
+#   register-sourced/computed stamps the static scan cannot see). 117-stamp
+#   rig-liveness control. Run BEFORE trusting any renumber-path change.
+#   Measured 14z-82: all writers in inventory; 118/120 NOT OBSERVED
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

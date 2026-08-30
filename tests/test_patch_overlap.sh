@@ -4,6 +4,12 @@
 # names both ops; disjoint and word-adjacent ops must stay clean. No emulator.
 #
 # Usage: ROMDIR=... tests/test_patch_overlap.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   ground truth for the patch_prg op-overlap assertion (14z-65): two ops
+#   writing one word is a NAMED build error; disjoint and word-adjacent ops
+#   stay clean. ~2s, no emulator
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

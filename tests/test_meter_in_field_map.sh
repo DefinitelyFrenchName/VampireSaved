@@ -17,6 +17,11 @@
 # the part that matters — that a difference confined to a meter byte is
 # actually CAUGHT. Section 3 is the control: without it this gate would pass
 # on a TSV whose rows are present but never read.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #83) The dual-emulator oracle actually compares meter,
+#   bound to `ram.md`.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

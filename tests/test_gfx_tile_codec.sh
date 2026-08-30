@@ -21,6 +21,13 @@
 #   3  verdict controls: the PRE-FIX mapping (bit i = pixel i) reconstructed
 #      inline must DISAGREE with encode on an asymmetric tile, and a
 #      one-bit corruption must not round-trip silently
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-105 (ci_portable, ~1s): the CPS-2 OBJ tile bit law (plane bit i =
+#   pixel 7-i within each 8-px half, pen 15 transparent), round trips both
+#   ways, and the PRE-FIX mirrored mapping reconstructed inline and required
+#   to DISAGREE on an asymmetric tile.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -35,6 +35,16 @@
 #      `_tenants[i]` with `_extracts[i]` BY POSITION: a reordering would
 #      build each tenant against another tenant's extraction and still
 #      report success.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   the tenant id is a BUILD INPUT: resolution, the variant-id-needs-profile
+#   refusal, and the frozen-reference reproducibility guard (no id_by_profile
+#   until M3a completes). EXTENDED 14z-77 (M3b slice C) with ROW OWNERSHIP:
+#   the per-FILE stamp, row_owner resolution, the row_applies truth table,
+#   row_hex selection, and the multi-tenant refusal in BOTH directions
+#   (asserted by no test before this; the loop slice deletes the refusal and
+#   flips it). Pure functions, no ROMs, no emulator. ~1s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

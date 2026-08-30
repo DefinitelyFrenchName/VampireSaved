@@ -26,6 +26,13 @@
 # parser check, and it returns 0 on the very file that was proven dead.
 #
 # Usage: tests/test_shell_portability.sh   (no ROMs, no emulator, ~1s)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-90 (issue #15): every #!/bin/sh script must be POSIX sh. Strips
+#   heredoc bodies first (these scripts embed Python and TOML; an unstripped
+#   census reports ~16 false [[table]] hits). A script that needs bash must
+#   say so in its shebang — today exactly one does. No ROMs, no emulator, ~1s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

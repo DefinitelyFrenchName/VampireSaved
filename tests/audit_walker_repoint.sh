@@ -23,6 +23,16 @@
 # Usage: ROMDIR=... [MAME_BIN=...] [JOBS=6] [REF_BUILD=build/don_m5] \
 #          [REPLAYS="..."] tests/audit_walker_repoint.sh <builddir>
 # ~5 min.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-91: after the relocation, does ANYTHING still reach the vanilla
+#   walkers? Closes the residual the static caller scan cannot (a target
+#   computed at runtime). Vanilla entries must be SILENT, relocated entries
+#   must FIRE. NEGATIVE CONTROL is not optional and is built in: the same
+#   instrument on an un-relocated REF_BUILD must see the vanilla walkers, or
+#   every zero is just a dead breakpoint. Measured identical counts either
+#   side of the move (1243 / 40236). ~5 min
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

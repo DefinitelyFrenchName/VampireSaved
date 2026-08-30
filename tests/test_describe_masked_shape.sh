@@ -20,6 +20,18 @@
 # catches an off-by-one in either threshold.
 #
 # Static, no emulator, no ROMs, ~1 s.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-89: ground truth for tools/describe_masked_shape.py, the classifier
+#   that turns a measured masked divergence into a PROPOSED expectation line.
+#   It used to be a heredoc inside audit_merged_legacy.sh, run only on that
+#   audit's failure path — i.e. only when something was already wrong — and
+#   its output is COPIED INTO EXPECTATION FILES by hand. 11 assertions: one
+#   per branch (exact/flicker/window/composite/two-window) + the replay-38
+#   signature (never re-converges = NOT expressible, must be root-caused) +
+#   both threshold boundaries (flicker<=2 frames, re-convergence>60) + the
+#   length-mismatch report. Static, ~1 s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

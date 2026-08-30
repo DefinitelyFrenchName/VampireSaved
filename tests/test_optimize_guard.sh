@@ -15,6 +15,13 @@
 #
 # Section 3 is the systemic half: any tool a BUILDER invokes that relies on
 # asserts must carry the guard, so a new one cannot quietly join without it.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #79) Six tools refuse `python -O`, which REMOVES asserts
+#   rather than weakening them. Its systemic section — any assert-using tool a
+#   builder invokes must carry the guard — is what found four of the six; #79
+#   named two.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

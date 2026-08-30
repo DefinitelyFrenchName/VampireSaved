@@ -20,6 +20,14 @@
 #      the historical defect — chaining P onto that H' link dies loudly at
 #      a strip-range dst naming both sources. A chain that swallows this
 #      is not a collision gate.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-83 (S2): the group-C gfx CHAIN (--chain: prior link's members + ledger
+#   seed the next). 4 sections: solo Donovan == frozen build/m5_wide /gfx
+#   byte-for-byte; idempotent re-chain; D->H cumulative; and the MUST-FAIL
+#   control — P onto H dies at the known strip collision naming both sources.
+#   >>> S3 flips section 4 to full-chain success. ~6 min
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

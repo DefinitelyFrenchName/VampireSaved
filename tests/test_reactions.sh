@@ -19,6 +19,17 @@
 # Emulator tier (MAME, ~1 min per tenant, legs in parallel).
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [DON=build/don_m18 HUI=build/hui52 PYR=build/pyron36] [TENANTS="donovan pyron huitzil"] tests/test_reactions.sh
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier emulator (MAME, ~2 min, legs in parallel)) THE REACTION SETS
+#   (14z-120 (7), phase 3): the tenant on P2 (P2 early-window poke) vs Victor
+#   on P1 (forced 0x03); every contact class hit and blocked;
+#   `tools/reaction_map.py` turns P2's node pointer into one line per contact
+#   (class, freeze, chain path table:seq@node, frames to the return) frozen in
+#   `tests/expected/reactions_<tenant>.txt` (`FREEZE=1` re-freezes from the
+#   run, 14z-121); both ids asserted from the trace. Run after any change to
+#   the extracts, the decoder, the victim rigs or a reaction-set remap
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

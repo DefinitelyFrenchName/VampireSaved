@@ -61,6 +61,18 @@
 #        this gate failed for reasons that had nothing to do with the
 #        build under test. When an expectation is flipped, move the
 #        default build with it.)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   the DARK FORCE gate (14z-69): replay 85 on NATIVE vsav2 vs the build. DF
+#   COSTS A BANKED STOCK — the replay pokes $FF8509 and the checker
+#   (tools/check_df_style.py) REFUSES to judge unless both legs show $FF802E=1
+#   and a stock spent (seq 0x0A with an empty meter is the DOWNGRADE, not DF —
+#   it fooled three sessions). Freezes the OPEN defect's shape (--expect
+#   differs: purple row 0x0A vs native gold, his art drawn ~4x over); set
+#   DF_STYLE_EXPECT=matches when fixed. Three verdict controls. Defaults to
+#   the CURRENT huitzil solo (build/hui51 since 14z-117b; re-pointed at every
+#   freeze — read the script's BUILD default, not this line)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

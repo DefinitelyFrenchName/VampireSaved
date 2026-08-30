@@ -24,6 +24,11 @@
 # larger than a window by the end of the sweep (i.e. the finding is real, not
 # a rounding quibble); and the audit's control shares the checker's window
 # maths rather than carrying a second copy of the constants.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #85) The WAV audit converts frames at the CPS rate
+#   (59.6374 Hz), not 60.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

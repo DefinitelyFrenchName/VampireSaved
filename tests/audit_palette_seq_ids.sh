@@ -38,6 +38,17 @@
 #
 # On-demand (not in the battery): ~10 MAME runs, several minutes.
 # Usage: ROMDIR=... tests/audit_palette_seq_ids.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-69p: which palette-seq ids does LEGACY ever (14z-118: DFRPL= picks the
+#   DF rig — replay 85 never activates Anakaris, df/97 does; a DF-on char with
+#   0 calls is reported as NO PALETTE-SEQ PATH; the full-roster result is
+#   frozen in tests/expected/df_palette_seq_census.txt) request? (uncapped
+#   probe on 0x2AD82, 8 replays). The DF-palette data row is legacy-inert ONLY
+#   because the answer is {0x26, 0x27} — and the palette path never transits
+#   work RAM, so this audit is its ONLY guard. Use GUARD_PROBE_MAX: the
+#   default 400-hit cap truncated it once and hid id 0x27
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

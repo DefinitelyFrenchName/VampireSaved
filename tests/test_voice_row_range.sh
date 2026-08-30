@@ -36,6 +36,29 @@
 # Usage: [BUILDS="build/hui41:0x10 ..."] tests/test_voice_row_range.sh
 # Needs build/out/vsavj_data.bin (the DATA view — these tables are read
 # An-relative and live inside the crypt window; the opcode view is noise).
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-93 (GitHub #92), TABLE-A SECTION ADDED 14z-94: the AUTHORED ARCADE-
+#   LADDER rows must stay inside VANILLA's value range. Each tenant build
+#   authors a 64-byte row in table A (0x00B268, candidate CLASSES) and table B
+#   (0x00BB68, the STAGE for each) at its own class; the selector scans ONE
+#   index across both, so they are pairs. A table-B value reaches $FF8100 and
+#   indexes the stage-banner family whose FOLLOWING row is dereferenced.
+#   Vanilla emits only even 0x00..0x16 over all 1024 bytes; 0x16 is also what
+#   the banner table can service. RED BY DESIGN (rule 6): huitzil and pyron
+#   rows carry 0x18 at four offsets each — all eight are class 0x13 (Donovan)
+#   at REVENGER'S ROOST, vs2's 13th stage, which vsav lacks; donovan's row is
+#   clean because it never lists his own class. DERIVES the bound from the
+#   tables and CROSS-CHECKS it against vanilla's range — that cross-check
+#   caught an off-by-one in its author's derivation that had declared the
+#   defect legal. SECTION B (14z-94) audits table A, which section A
+#   explicitly did not: two derived bounds (36 rows structurally; 32 by the
+#   in-use mask's `btst` MOD 32) and the two marker values asserted (0x18 at
+#   index 7 of all 36 rows; 0xff only as whole rows 0x0b/0x1b). It runs BEFORE
+#   the verdict combines, or it would never execute while section A is red.
+#   Table A is CLEAN. NOT in ci_portable: needs the DATA view + build dirs, so
+#   a clean checkout would SKIP and that job fails on SKIP. ~2s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

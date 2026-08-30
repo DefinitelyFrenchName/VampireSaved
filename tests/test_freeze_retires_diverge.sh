@@ -26,6 +26,11 @@
 # repo — never copied, so it cannot drift — with stubbed MAME runner,
 # fingerprint and check_diverge. The check_diverge stub prints a marker, so
 # "which branch dispatched" is observable rather than inferred.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #88) `--freeze` retires a superseded `.diverge` instead of
+#   leaving it to shadow the new `.sha1`.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -36,6 +36,17 @@
 #
 # Usage: ROMDIR=... [REPLAYS="02_demitri_vs_cpu 07_mash_storm ..."] \
 #            tests/audit_effect_class_rows.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-71: the THREE deadness measurements the beam port rests on — effect-
+#   class row 16 is never dispatched by vanilla (0 reads, against a 1760-hit
+#   control on row 37); the composite handler's A5 scratch $FF3578-$FF3581 IS
+#   used (39/replay) so vs2's displacements cannot be kept; and drawer list-
+#   type 10 is NOT a spare slot (2702 reads) — the closed shortcut. EVERY
+#   section carries a same-instrument positive control: this file exists
+#   because a blind watchpoint and a real zero look identical, and both traps
+#   bit here (GOTCHAS)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

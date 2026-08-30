@@ -25,6 +25,27 @@
 #                 FRAMES must report a FORCED stop rather than a clean one.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [REC_BUILD=build/hui46] tests/test_record_window.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-94: ground truth for tests/lua/record_window.lua, the in-emulator
+#   WINDOWED movie recorder. `-aviwrite` works headless but writes
+#   UNCOMPRESSED video for the whole run — measured 5.7 GB in two minutes of
+#   wall time — so the recorder starts and stops on named frames and defaults
+#   to MNG (2.4 MB for 120 frames). 4 assertions: EXTENT (the movie covers
+#   exactly the window), DETERMINISM (same window twice is byte-identical —
+#   the whole reason to prefer this over a screen capture), LIVENESS (a window
+#   VIDEO_OUT says CHANGES must not compress like a STILL one — catches a
+#   recorder reproducibly emitting blank frames, which determinism cannot),
+#   and 2 controls. The busy/still windows are CHOSEN FROM the measured
+#   checksum stream at run time, so no frame constant is baked in to rot. NOTE
+#   replay.lua has NO frame cap — it runs to the script's last line, so the
+#   gate truncates the rig instead. ROMDIR + a WIDE build, ~90s
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, 14z-94) the windowed MNG recorder (2.4 MB/120 frames vs
+#   `-aviwrite`'s 5.7 GB/2 min). **Not portable.**
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

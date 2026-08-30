@@ -74,6 +74,43 @@
 # a core that renders black is a broken core.) See docs/platform/gotchas.md.
 #
 # Usage: tests/test_mister_wide_gate.sh     (no ROMs; Verilator optional)
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier ci_portable (~30 s with Verilator, seconds without)) SLICE D1, the
+#   RTL trust surface. The frozen line-by-line delta of the two OVERRIDDEN
+#   files vs the shared originals (`tests/expect/cps2w_rtl_delta.txt`); the
+#   profile byte agreeing in all three copies (TOML `offset=41 data="fe"`, RTL
+#   `PROFILE_BYTE=6'd41`, `~profile[0]`) plus the `fill=0xff` and `JOY_BYTE`
+#   facts the polarity rests on; the widths, and that `PCM_AW` is NOT widened
+#   (it cannot be — `jtframe_romrq_bcache.v:74`); MAME's three qsound.cpp
+#   lines that validate `dsp_ab[7]`; and `jtframe files` resolving cps2w to
+#   OUR nine overrides + three new modules + the new jtframe slot module, and
+#   cps2 to NONE of ours (the two lists differ in exactly 22 entries). Then
+#   Verilator: `jtcps2w_qsnd_bank` over all 65,536 `dsp_ab` values in both
+#   profile states (bank[7] stuck at 0 with `wide_en` low, moving 16,384 times
+#   with it high) and `jtcps2w_profile` over a real 64-byte header stream.
+#   FOUR must-fire controls: gate bypassed; profile byte moved to 40; polarity
+#   flipped; an override perturbed by one width. EXTENDED AT D2 (section 7):
+#   every SDRAM placement constant re-read from `jtcps1_sdram.v` in BYTES and
+#   compared against `mister_map.md` §5 (VRAM `0x600000`, ORAM `0x640000`,
+#   WRAM `0x648000`, Z80 `0x658000`, PCM-high `0x6E0000`, group-C obj bank 5
+#   `0x7E0000`, obj bank 4 bank-1 `0x800000`); all four `wide_en` conjunctions
+#   re-read verbatim; the CPS1 arm of the re-pack still the reference values;
+#   and `jtframe_ram1_7slots` NOT in jtframe's shared `jtframe_sdram64.yaml`.
+#   EXTENDED AGAIN AT D3+D4 (section 8): a third Verilator bench,
+#   `jtcps2w_obj_bank` over all 65,536 y-words in both profile states (bank[2]
+#   stuck at 0 with `wide_en` low, set 32,768 times with it high) which also
+#   transcribes `tools/gfx_tiles.py`'s `bank_word` table and requires each of
+#   the six encodings to decode to its own bank with none of them setting y
+#   bit 15 — the sprite-list TERMINATOR; the sprite-list terminator test in
+#   the override asserted IDENTICAL to the reference core's AND at an earlier
+#   line than the promote; the 3-bit bank asserted at all six ports between
+#   the frame table and SDRAM; `rom0_bank[2]` now UNTIED; and D4's `wide_en &
+#   RnW` read decode, 22-bit `rom_addr`/`main_rom_addr`/`SLOT3_AW`, the `4'h6`
+#   wait-state boundary and the surviving `!RnW` on `objcfg_cs`. TWO more
+#   must-fire controls: the promote's gate bypassed, and the promote reading
+#   `y[15]` instead of `y[12]` — the profile's first draft
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

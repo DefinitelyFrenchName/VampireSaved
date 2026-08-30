@@ -29,6 +29,13 @@
 # Sections 3-4 need a working MAME; set WHEEL_STATIC_ONLY=1 to skip them.
 #
 # Usage: ROMDIR=... tests/test_select_wheel.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   the select cursor, 4 sections: tables decoded from the ROM; a generated
+#   walk over all 128 (cell,direction) pairs measured in MAME; four negative
+#   controls on the checker's verdicts; and all 16 cell screen positions
+#   measured
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 . "$REPO/tests/lib/decrypt_cache.sh"   # GitHub #69

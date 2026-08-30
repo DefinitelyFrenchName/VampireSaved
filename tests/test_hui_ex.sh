@@ -18,6 +18,12 @@
 #      (the 14z-44 "silent soak coverage loss" mechanism).
 #
 # Usage: ROMDIR=... tests/test_hui_ex.sh [existing-stage4-builddir]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   Huitzil EX-move gate (14z-66): FOUR sections (ES, FG-connect, FG-full-seq,
+#   FG+aftermath chaos) — each fires with the stock decrementing (anti-
+#   coverage-loss). Self-builds stage 4 unless given a build
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

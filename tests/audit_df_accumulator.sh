@@ -39,6 +39,16 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21] [FREEZE=1]
 #        tests/audit_df_accumulator.sh          (~3 min, four legs in parallel)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-123 (inferred_claims row 1): the +0x161 accumulator is SASQUATCH'S
+#   DARK FORCE ARMOR (dispatch_16 row 0x0A, PRG:0x047E60 — NOT Aulbath's; the
+#   14z-121 block attribution read the next table's heads as boundaries). Four
+#   legs on pristine vsavj + the merged build: armor (LP+LK: +0x15E=0x200,
+#   cr.LP/MP/HP add 20/30/40, no reaction, break past 60, decay 240), hphk
+#   (never arms), nodf (the must-fire negative), merged (field trace byte-
+#   identical = superset). 9 frozen lines; FREEZE=1; replay df/105. ~3 min.
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

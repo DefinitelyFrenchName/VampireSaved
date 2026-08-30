@@ -20,6 +20,14 @@
 # guard (docs/platform/gotchas.md).
 #
 # Static, no emulator. Usage: ROMDIR=... tests/test_qs_id_table.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-86: the Z80 sound-id-table census gate — both games' censuses frozen
+#   (bases DERIVED from the $3B00 anchors), the pilot rows, the code-identity
+#   licence (only the 2 envelope-base immediates differ below 0x34F1), the
+#   ejection content lock (vs2 0x255800 == vsav 0x18D800), + 2 verdict
+#   controls. Static, ~5 s. tools/audit_qs_id_table.py
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; export REPO
 ROMDIR="${ROMDIR:?set ROMDIR}"

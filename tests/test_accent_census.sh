@@ -23,6 +23,12 @@
 #   3. NEGATIVE CONTROL — a patch stripped of one route FAILS.
 #
 # Usage: ROMDIR=... tests/test_accent_census.sh [outbase]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   accent/march census (14z-63): 4 frozen family-base sites (0 direct T0/T1
+#   refs), all jsr-routed on variant builds. Static + negative control, ~30s
+#   (self-builds)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

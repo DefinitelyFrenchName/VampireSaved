@@ -26,6 +26,11 @@
 # evidence, not implementation. Section 4 asserts it survived, because
 # deleting the finding along with the code is the obvious way to get this
 # wrong.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #46) `select_port` is chainable, idempotent, and free of
+#   unreachable code — while KEEPING the round-22 analysis.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

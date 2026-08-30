@@ -34,6 +34,16 @@
 # construction: the byte lives in a region that exists only in this build.
 #
 # Usage: ROMDIR=... tests/test_pyron_cosmo.sh [outbase]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-74: the Cosmo Disruption crash. 3 sections — static (the guarded word
+#   + table+0x224 IS vs2's handler byte-for-byte), DEADNESS (0 dispatcher
+#   reads of entry 81 vs a live 12/7 control; watches the OPCODES space
+#   because the table is read pc-relatively, and filters BY PC because the
+#   boot ROM-checksum sweep touches every byte), and runtime (no crash, the EX
+#   still FIRES, the match survives — a watchdog reset is not a 68k exception,
+#   so the field trace proves it, not the guard). Defaults to build/pyron18
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

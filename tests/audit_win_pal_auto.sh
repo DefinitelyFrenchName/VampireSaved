@@ -48,6 +48,26 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged11]
 #        [EXPECT_WHITE=1] tests/audit_win_pal_auto.sh     (~10 min, 5 MAME runs)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-99, GitHub #105: with AUTO selected by the WINNER, the 2P victory
+#   screen draws a TENANT winner's portrait WHITE (the maintainer's captured
+#   surface, reproduced from their captures). 3 legs: A merged+AUTO = the
+#   frozen defect (EXPECT_WHITE=1, flip at the fix); B merged no-AUTO must
+#   stay COLORED; C PRISTINE VANILLA + AUTO must stay COLORED (the not-ours
+#   control — vanilla renders its AUTO winner fine, so this is ours). Verdicts
+#   SCAN the dump window over 0x90C2A0 — no pinned frame constants. RECORD-
+#   LEVEL fact for the fix: the win-pal colors arrive AFTER the screen (late
+#   upload, not absent). LEG D = the 1P-vs-COM flavor (replay 104, real-KO
+#   win, field-confirmed "one of the offending screens") — the flavor the
+#   maintainer plays. Merged+legacy+AUTO MEASURED 14z-123 (leg E, replay 105 —
+#   P1 on the default cell, inputs ended at the KO): COLORED, with P1 =
+#   Demitri's base and P2 KO'd asserted, else DEAD. AUTO is AUTO-GUARD, not
+#   autoplay; rigs for this screen END INPUTS AT THE KO and sample densely
+#   (the MAP screen comes AFTER the win screen — the two 14z-99 game gotchas).
+#   Rigs: replays/103_tenant_2pwin_auto (= 61 + three AUTO lines) +
+#   replays/104_1p_auto_ko_win. ~10 min, 4 MAME runs.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

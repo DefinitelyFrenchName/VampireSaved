@@ -23,6 +23,29 @@
 # stated reason: a chronology header prepended to a REFERENCE doc; an anchor
 # in a HIST-class doc; an undeclared file; a dead allow row; a required
 # banner absent; a dangling link; a citation of a nonexistent section.
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier ci_portable (~2 s)) EVERY HAND-WRITTEN DOC'S SHAPE IS DECLARED AND
+#   ENFORCED (14z-122): `tools/checkdocshape.py` reads `docs/doc_shape.tsv`
+#   (one row per doc: class, history twin, requirements; completeness both
+#   ways, so a new doc is classified at birth) and lints REFERENCE/REGISTER
+#   docs against SESSION-SHAPED HEADERS (a trailing provenance parenthetical —
+#   `(measured 14z-N)`, `(paid: 14z-N)` — is stripped by a wrap-tolerant
+#   scanner first; a group carrying RETRACTED/superseded words is never
+#   stripped), holds ORIENT (NEXT_SESSION) to one `# ` header with history in
+#   its twin, forbids anchors in HIST docs, requires declared banners/atlas-
+#   rows, resolves every doc link in README/HANDOFF/CLAUDE.md, and verifies
+#   every `docs/x.md 'Section'` citation in tools/tests against the file's
+#   real headers (backticks normalized, a trailing `...` = prefix). Allowances
+#   in `docs/doc_shape_allow.tsv` — a row matching no header FAILS as dead.
+#   PENDING rows are skipped until their document's commit flips them; `--no-
+#   pending` is the pass-close mode. THIS is what stops the logs re-accreting
+#   after the rationalization pass. Seven must-fire controls. First real run
+#   found: 26 session-shaped headers (venue_assets + the three gotchas buckets
+#   re-classed PENDING for their own commits), CLAUDE.md's docs/annotations.md
+#   row promising a file git never saw (retired, open to veto), and three
+#   stale section citations
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

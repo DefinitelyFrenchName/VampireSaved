@@ -27,6 +27,17 @@
 # tests/replays/hui/89_hui_ex_fg_vs2.rpl documents the shape.
 #
 # Usage: ROMDIR=... tests/audit_fg_parity.sh [builddir]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-85f (~4 min, 2 parallel runs): THE FG PARITY GATE — the native-
+#   comparable 89_hui_ex_fg_vs2 replay on native vsav2 AND the build; BOTH
+#   legs must match the frozen native staircase 23/23/23/23/52 HP with 12
+#   ticks and 5 per-attempt stock- decrement EX tells. Locks the x028122
+#   object-hit damage work-var reconciliation (same-value class 4: ported
+#   applier staged into vs2's $FF3494 family, vsavj reads $FF3442). Ground-
+#   truthed FAILING on the pre-fix merged; 2 verdict controls (tick removed,
+#   no stocks)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

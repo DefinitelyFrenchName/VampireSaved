@@ -22,6 +22,11 @@
 #      silently to make the gate green.
 #
 # Usage: ROMDIR=... tests/test_phasec_spaces.sh [expected-fingerprint]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   Phase C: the declarative address-space model is byte-for-byte inert on a
+#   stock build, and the WIDE extension is gated by construction
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

@@ -16,6 +16,11 @@
 # Section 3 drives the accounting functions directly, because the battery
 # itself builds ROMs and runs for many minutes — the logic has to be testable
 # without paying that.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #24) `run_battery_m2.sh` cannot print BATTERY GREEN while
+#   gates self-skip; counts branch skips by group size.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

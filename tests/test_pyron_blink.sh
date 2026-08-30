@@ -50,6 +50,29 @@
 #
 # Usage: ROMDIR=... tests/test_pyron_blink.sh [outbase]
 # Env: MAME_BIN, PYRON_BLINK_EXPECT, SKIP_RUNTIME=1 (controls only).
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-75: the sprite/HUD BLINK. Palette row 10 (0x90C140) carries Pyron's
+#   SPRITE and his in-match HUD MUGSHOT, so both blink. Native vsav2 vs the
+#   build on replay 76 (one rig, both games), compared by a PHASE-INDEPENDENT
+#   property — distinct row-10 values over 40 CONSECUTIVE frames — because the
+#   two games are never on the same frame and a frame-indexed diff produced a
+#   confounded figure that stood a whole session. native 1/0 changes, ours
+#   2/39. Attribution is part of the verdict: ours' two values must be NAMED
+#   (native's constant + vsavj palette-seq row 0x26 under the uploader's
+#   0xF000 OR), so a look-alike defect fails. REFUSES to judge unless each
+#   leg's +0x60.l (the hitbox base; never +0x382, the in-match voice-flavor
+#   byte — #16, fixed 14z-92) is ONE non-zero value AND equals Pyron's row of
+#   that game's own hitbox_base table (vs2 data 0xD7B18, the build's 0x3D97A);
+#   8 verdict controls incl. a loaded-wrong-character refusal (14z-123; this
+#   row carried a "KNOWN WEAKNESS … blocked" note for a fix already shipped at
+#   14z-92). FIXED 14z-75 (a DEAD ROW: per-char palette-routine table 0x2A8A4
+#   row 0x11 aliased row 0x01's ANIMATED handler; one word 0x2A8C6 008E->0040
+#   = vs2's own value). PYRON_BLINK_EXPECT=fixed (default) | blinks
+#   (reproduces the pre-fix shape on pyron15). Checker
+#   tools/check_pyron_blink.py. Defaults build/pyron30 (14z-103; roll at each
+#   freeze)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

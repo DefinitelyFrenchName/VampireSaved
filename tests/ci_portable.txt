@@ -131,6 +131,12 @@ test_gotchas_index_current
 # retirement note ("lives in the atlas + manifest comments") measured false.
 # tools/gen_annotations.py --check; four must-fire controls. ROM-free, ~1 s.
 test_annotations_current
+# 14z-123 (G6): docs/project/gate_index.md is GENERATED — one row per tests/*.sh
+# (kind, tier from the ci registries, family from tests/gate_index.tsv, the
+# script's own header sentence); completeness both ways. Replaces HANDOFF's
+# hand-written 2,160-line gate fence. tools/gen_gate_index.py --check; four
+# must-fire controls. ROM-free, ~1 s.
+test_gate_index_current
 
 # 14z-107 (11): the ROM-free half of the slice D4 discriminator. Locks the 68k
 # program-ROM read probe's contract — it is inert unless JTCPS2W_PRGPROBE is

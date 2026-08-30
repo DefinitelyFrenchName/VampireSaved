@@ -26,6 +26,14 @@
 # and read zeros; the struct BASE is not the id address (ram.md).
 #
 # Usage: ROMDIR=... tests/audit_fg_damage.sh [merged builddir]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-85e, REFRAMED 14z-85f (~5 min): FG damage vs CPU frozen at 10 HP —
+#   measured UNCHANGED by the fix: these rigs' ticks were fighter-path
+#   contacts, never the broken path. A plain regression lock now; the PARITY
+#   gate is audit_fg_parity.sh. Liveness: stock decrement or the run proves
+#   nothing (downgrade trap)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

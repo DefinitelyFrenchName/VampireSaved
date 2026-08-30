@@ -42,6 +42,18 @@
 #  8. Two verdict controls (a perturbed buffer must FAIL each direction).
 #
 # Static, no emulator, ~5 s warm. Usage: ROMDIR=... tests/test_capture_pose_sources.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-99 (GitHub #104, ci_static): THE OPTION-(a) FIX PREMISES, frozen — the
+#   ruling was "measure first" and this gate IS the measurement, rerunnable.
+#   Locks: the positioner's id-unmasked read (byte-exact at PRG:0x028058);
+#   exactly 5 consumers of 0xBE27A; the 14-offset-alias + 2-material- ized-
+#   alias block shapes; source twins for all 16 attackers in BOTH vs2 and
+#   vhunt2 (tenant rows distinct, stride-equal, vs2==vh2 cross-oracle); every
+#   BASE sub-block byte-identical vsavj==vs2 (the legacy-safety premise of the
+#   wholesale port); the signed-16-bit bound (worst 0x3730); the
+#   15-block/0x11BD0 port inventory. 2 verdict controls. Static, ~5 s warm
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; export REPO
 ROMDIR="${ROMDIR:?set ROMDIR}"

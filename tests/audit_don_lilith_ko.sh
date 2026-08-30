@@ -80,6 +80,17 @@
 #        [EXPECT_STALL=1] tests/audit_don_lilith_ko.sh
 #   EXPECT_STALL=0 rehearses the post-fix state: leg A's gap must then be
 #   under the threshold like leg B's. Flip the default when the fix lands.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-97 (GitHub #103): a DONOVAN P1 DEATH in arcade stalls the lose flow
+#   ~8,000 frames — OPPONENT-INDEPENDENT (corrected 14z-97 (9); the Lilith in
+#   the name is just the poke-free repro his own ladder provides). Normal
+#   flow: 580f, identical merged vs pristine vanilla for a legacy P1.
+#   Regression-locks the DEFECT (EXPECT_STALL=1, the #98 discipline) + a
+#   Victor control leg. ~5 min, 2 parallel MAME runs. ROOT-CAUSED 14z-98 (see
+#   the next row); a probe with the x026142 pcrel_escape_fix flips this to
+#   FLOWED 560. Flip EXPECT_STALL when the fix ships.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

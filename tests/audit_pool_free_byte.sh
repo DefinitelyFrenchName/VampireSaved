@@ -41,6 +41,16 @@
 # GOTCHA filed: bucket write taps by BYTE LANE, never by word offset.
 #
 # Usage: ROMDIR=... tests/audit_pool_free_byte.sh [merged builddir]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   REWRITTEN 14z-85 (the 14z-84 version measured only $FFB800 and attributed
+#   it to the 59-75 family — WRONG POOL; the family lives in $FF9400, 0x100
+#   stride, walker 0x54458): census + byte-lane PC-attributed tap on BOTH
+#   pools, 3 legs. Auto pre/post-tag mode by tag_map.json: post asserts family
+#   slots carry the stamper's tag and +0x7F writers are exactly the emitted
+#   thunks. Also caught: hole_b's WORD write at b8+0x7E covers +0x7F — the
+#   14z-84 zero-writes there was a word- offset accounting artifact. ~20 min
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

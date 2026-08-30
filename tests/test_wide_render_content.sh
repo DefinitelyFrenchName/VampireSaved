@@ -41,6 +41,16 @@
 #
 # Usage: ROMDIR=... tests/test_wide_render_content.sh [stock_rompath] [wide_rompath]
 #   env MAME_WIDE_BIN  WIDE-patched MAME (default ~/.cache/vampire-saved/mame/cps2)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   the WIDE track must SERVE the ported content's tiles (RE-SHAPED 14z-67 for
+#   m3a semantics — cross-track pixel identity ended BY DESIGN): member
+#   identity + decoded band equivalence at the correct banks (WIDE 0x4AD8F ==
+#   stock 0x2AD8F; WIDE 0x2AD8F == PRISTINE, the de-substitution invariant) +
+#   a true-shadow audit control + liveness (replay 36). This is the gate whose
+#   absence let the sprite garble reach a playtest — AND the gate that sat
+#   stale-red from 14z-64 to 14z-67 (GOTCHAS: the not-in-the-battery class)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

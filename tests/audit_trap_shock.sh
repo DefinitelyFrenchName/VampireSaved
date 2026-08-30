@@ -21,6 +21,14 @@
 # hit) on ours — this audit FAILS there by design.
 #
 # Usage: ROMDIR=... tests/audit_trap_shock.sh [builddir]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-85g(2) (~4 min, 2 parallel): the trap dome inflicts SHOCK — rig 92
+#   (deep-overlap, walk N=60) on ours + native; ours must show class 0x06 (the
+#   ruled remap) + seq7==4 + freeze>=0x10, native its own 0x52; ALSO asserts
+#   the accepted deviation (Phobos' 11f attacker freeze) PRESENT so drift is
+#   loud. Fails on huitzil-m9- by design
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

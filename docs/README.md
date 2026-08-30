@@ -47,6 +47,10 @@ Entry points at this level, deliberately not in a bucket:
   address the tree names, with the file and section that names it, and the
   CODE-ONLY tail that is the documentation gap. An index, not a source —
   grep the address, land in the carrier.
+- [`project/gate_index.md`](project/gate_index.md) — THE GATE INDEX, GENERATED
+  (`tools/gen_gate_index.py`, 14z-123): every script under `tests/` with its
+  kind, tier, family, needs and its own header sentence. Replaces HANDOFF's
+  hand-written gate fence; a gate's WHY lives in the gate.
 - `checksums.txt` — machine-read by `tools/audit_roms.py`. A data
   manifest, not documentation; its path is deliberately stable.
 

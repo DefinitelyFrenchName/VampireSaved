@@ -24,6 +24,15 @@
 # inventories, ours vs native; forbids 0739/073a on ours).
 #
 # Usage: ROMDIR=... tests/audit_trap_sound.sh [builddir]   (~10 min, 2 runs)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-82d, RE-SCOPED 14z-85g (~10 min): the MK Plasma Trap SPAWNS (type-69
+#   pool write) and the sound RING is live during the run (id 0x049A — which
+#   14z-85g measured as PERIODIC AMBIENT, ~144f cadence starting pre-trap; the
+#   14z-82d "detonation id" attribution is RETRACTED). Still locks the (b')
+#   crash fix (a crashing trap dies before ANY ring activity). The PARITY
+#   question is CLOSED by measurement — see audit_trap_parity
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

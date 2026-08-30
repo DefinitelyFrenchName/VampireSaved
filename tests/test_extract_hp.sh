@@ -14,6 +14,12 @@
 # (the literal-0x13 bug class).
 #
 # Usage: ROMDIR=... tests/test_extract_hp.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   Huitzil/Pyron extraction gate (14z-65): frozen region shapes (piecewise
+#   shifts, dead filler, the H insertion sliver) + unanchored-char refusal
+#   control. ~2min
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

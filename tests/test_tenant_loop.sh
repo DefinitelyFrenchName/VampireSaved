@@ -31,6 +31,26 @@
 # green run of the others.
 #
 # Usage: ROMDIR=... tests/test_tenant_loop.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-80: THE MERGE GATE. A 3-tenant patch composes AND applies — 590 ops,
+#   ZERO op collisions, patch_prg writes 12 members. Nine sections, GENERATOR
+#   ALONE against the existing extract dirs (~17s, no emulator, SKIPs without
+#   them). HONEST LIMIT, stated in the header: that is the PROGRAM half ONLY.
+#   The gfx half is single-tenant by decision, no merged image has run in an
+#   emulator, and no legacy gate has seen one. "N tenants generate", "the
+#   patch applies" and "the ROM is correct" are three different statements;
+#   this makes the first two. Sections: determinism; N=1 frozen per tenant (D
+#   243 / H 259 / P 205) with no tenant-suffixed side file; N=2 436 and N=3
+#   590 of 707 declared; each tenant's regions at DISTINCT addresses (the four
+#   shared names are different spans); 4 shared REGION rows reaching every
+#   tenant's copy; 4b the obj_hook union (17/17, entries ATTRIBUTED per tenant
+#   — a count alone cannot tell whose copy); 4c slot_table rows at 3 distinct
+#   slots + the agreeing-duplicate count; 4d both N-way chains DECODED (ids in
+#   declaration order, each element with its own data pointer); 5 zero
+#   collisions AND patch_prg actually applying it. 5 VERDICT CONTROLS, one of
+#   which caught ITSELF perturbing nothing (`set() or {...}` is falsy)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -83,6 +83,34 @@
 # --pos-log/--neg-log take the OUTDIR of a previous run (jtsim.log +
 # rdprobe_*.txt) and skip the simulation, the way
 # tests/audit_sdram_bank_load.sh --log does.
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier manual/emulator (~2 x 65 min)) SLICE D3'S PAYOFF, and the first
+#   VIDEO-adjacent verdict in this lane. Runs a tenant-picking replay
+#   (`11_pick_donovan`) on `cps2w` with the WIDE romset and counts the SDRAM
+#   READS the core issues into the group-C destinations, using the harness's
+#   read probe (`JTFRAME_SIM_RDPROBE`, fork commit 12). The windows are
+#   DERIVED FROM THE RTL (`GFXC4_OFFSET`/`GFXC5_OFFSET` and the bank each
+#   group-C slot sits in) because an instrument that names a physical address
+#   is invalidated by a memory-map change. The distinct-block list IS a tile-
+#   code list (a CPS-2 tile code is its own SDRAM address), and every code
+#   must be inside the roster's frozen live extent. The control leg is the
+#   SAME `.rom` with header byte 41 changed from `0xFE` to `0xFF` — one byte,
+#   the runtime profile bit — and must read ZERO from both group-C windows;
+#   two further probes on the VANILLA obj banks must be non-zero in BOTH legs,
+#   so a zero is evidence about the core rather than about the probe. `--pos-
+#   log DIR --neg-log DIR` re-analyses two finished run dirs. STATE 14z-107
+#   (12): the WHEEL half is GREEN (obj bank 5, 105 distinct codes
+#   `0x74D6-0xFE41` inside the frozen extent `0xFFDB`, control at zero) and
+#   the FIGHTER half — obj bank 4 — was RED for a HARNESS reason: the tenant-
+#   picking replay's directions were REVERSED end for end, so the cursor never
+#   reached a tenant (fixed 14z-108 in `tools/rpl2siminputs.py`; the fighter
+#   half is re-run on the corrected input path). Its first real measurement
+#   also found TWO defects IN ITSELF, both fixed — the tile code computed from
+#   the ABSOLUTE SDRAM address instead of relative to the armed window's base,
+#   and a liveness control demanding vanilla obj traffic in a leg that cannot
+#   boot by construction
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 fail=0; ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }

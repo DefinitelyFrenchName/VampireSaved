@@ -39,6 +39,17 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged11]
 #        tests/audit_kill_poke_shape.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-98 (2): a 2-byte HP kill poke (f:ff8450:0001) manufactures #103's
+#   unjudgeable state on ANY character (white stays ~288; the judge reads
+#   WHITE's sign) — measured on a pure- legacy Victor leg: UNRESOLVED 8760 vs
+#   FLOWED 600 for the 4-byte idiom (00010001, hp AND white). BOTH verdicts
+#   frozen — engine facts, stable across builds. Exists because "#103 instance
+#   2" WAS this artifact (settled by the no-poke MAME retest, 14z-98 (5): real
+#   tenant losses judge). THE RULE: kill pokes write both words. ~7 min, 2
+#   parallel MAME runs.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

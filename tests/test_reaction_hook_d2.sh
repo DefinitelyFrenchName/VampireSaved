@@ -34,6 +34,14 @@
 # STATE 14z-110; it needs an emulator and a fighting replay, so it lives there
 # and in the guard-corpus soaks rather than in this static gate.
 # Usage: ROMDIR=... tests/test_reaction_hook_d2.sh [builddir]   (default build/don_m12)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-110 (#99 FIX): the reaction_hook D2-WINDOW gate. RECONSTRUCTS the
+#   82-byte thunk from first principles, re-derives the four d2 cases from
+#   vsav2.zip (table 0x016DE4, entries 0x50-0x53), asserts dispatcher 2 byte-
+#   identical to vsavj's own decrypted dump (ruling (a)), and the census 6/6
+#   native-0x51. THREE verdict controls. ci_static, seconds.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

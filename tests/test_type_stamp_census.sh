@@ -22,6 +22,15 @@
 # Usage: tests/test_type_stamp_census.sh
 # Needs: build/out/vsav2_opcodes.bin (decrypted opcode view) and the three
 # tenants' extract dirs. No emulator, no ROMDIR. ~5 s.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-82: the STATIC type-stamp census (tools/audit_type_stamps.py)
+#   reproduces the FROZEN inventory build/manifest/ type_stamps.toml — every
+#   family stamp/ compare/reader/embedded-walker site, source-address-keyed,
+#   positive control on the six measured sites + negative control on the three
+#   unported stamps. Drift = FAIL (re-review, never absorb). 2 verdict
+#   controls. No emulator, ~5 s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

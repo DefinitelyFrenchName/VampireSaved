@@ -39,6 +39,25 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged11]
 #        [EXPECT_DEFECT=1] tests/audit_don_ko_writer.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-98 (GitHub #103): THE ROOT-CAUSE LOCK — who writes Donovan's HP at his
+#   arcade death, PC-attributed, NON-DEBUG (read_tap, canonical timeline). The
+#   judge kills on WHITE HP's sign (+0x52, engine_internals "THE ROUND
+#   JUDGE"); the x026142 pc-rel escape (vs2 0x262A4 bra.w $25F9A) runs his
+#   child-object init on the FIGHTER and pins hp:=1 with white ~200 -> the
+#   next hit underflows hp, white stays positive, unjudgeable. Leg A locks
+#   that shape (EXPECT_DEFECT=1); leg B (Victor) must show the healthy kill
+#   commit (both HP words 0xFFFF in one frame) or nothing is trustworthy.
+#   EXPECT_DEFECT=0 rehearsed on the 14z-98 probe (his death then takes the
+#   kill commit, f12730) — that rehearsal caught the RH-19 window trap now
+#   documented at leg A. ~9 min, 2 parallel MAME runs. WEAKEN_P1=1 (14z-99,
+#   both #103 audits): the fix-verification mode — the natural-mash death is
+#   LOTTERY-BOUND per build and the FIXED build's mash-Donovan WINS, so
+#   EXPECT_*=0 legs read NO-KO/ NEITHER without it. Cuts his inputs at f6100 +
+#   one both-words 5hp pin; the CPU's own hit kills through the real judge.
+#   REFUSED with the defect EXPECTs (the pin would mask the hp:=1 shape).
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -67,6 +67,17 @@
 #     that a softened copy is detected. Measured evidence:
 #     docs/platform/mister.md "SimInputs HELD BUTTONS 5 AND 6 DOWN".
 # Usage: tests/test_sim_wram_contract.sh   (no ROMs, no emulator, ~5s)
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier ci_portable) dump naming + 68k byte order + skew absorption, two
+#   must-fire controls, the rule-7 refusals, a static proof that every line
+#   the harness patch adds sits inside `#ifdef _JTFRAME_SIM_WRAMDUMP` — and
+#   since 14z-107 (7) the DUMP-INTEGRITY assertion
+#   (`tools/check_wram_dumps.py`, six checks: a hole, a truncated file, a
+#   stray frame, a wrong address, `--contiguous` and its hole) plus the lane's
+#   frame-output default (`--frame-output off` -> `-d JTFRAME_SIM_NOVIDEO=1`)
+#   with a flipped-default control and the shape of fork patch 0008
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 T="$(mktemp -d)"; fail=0

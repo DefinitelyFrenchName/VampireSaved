@@ -30,6 +30,15 @@
 #
 # ROMDIR + the pinned build dirs. ~2 min (three extractions + two generator
 # runs). Not portable: needs $ROMDIR.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #27) the merged build's four ROM-derived inputs are
+#   PRODUCED, not demanded — and a regenerated set yields the identical merged
+#   patch. Asserts the ARTIFACT is reproducible rather than that the input
+#   dirs are byte-equal, because the latter is false and cosmetic:
+#   `build/m5_wide/extract/regions.json` predates two `extract_char.py`
+#   changes. **Not portable.**
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

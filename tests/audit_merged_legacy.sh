@@ -64,6 +64,30 @@
 # so the documented coverage overstated the measured coverage by exactly the
 # replays that are NOT evaluated. Those two are now enumerated and named
 # loudly before the glob runs; see ENUMERATE below.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-81: THE MERGED-LEGACY MEASUREMENT, rerunnable (~45 min, on-demand).
+#   Builds build/merged1 (3-tenant program image against the zero-filled wide0
+#   overlay, gfx skipped — LEGACY-ONLY, never playtest, no registry row on
+#   purpose), proves the rig forms all three tenants' matches (guarded char-
+#   init probes) and merged determinism, then (a) THE LEGACY REPLAYS vs the
+#   frozen vanilla masked basis (V2; the mask comes from donovan-m5/mask) —
+#   the list is a GLOB over tests/expected/donovan-m5/*.masked, so it grew 14
+#   -> 47 with the 14z-89 legacy-pairing promotion and the runtime grew with
+#   it (~45 min -> ~2 h); a new .masked there joins this leg with no edit here
+#   — dispatched through donovan-m3a's ratified class table VERBATIM, except
+#   04's RATIFIED merged-specific inventory ({1525,2005,2009,2195}/889-1104,
+#   maintainer 2026-08-12, encoded inline in the script by design) — any other
+#   deviation FAILS with the measured shape + a proposed spec line, never a
+#   widened tolerance — and (b) tenant content vs the three frozen single-
+#   tenant builds (guard-clean + first-divergence floor + classified report).
+#   14z-83 result: FULL GREEN at leg (a) 14/14 — the first all-green merged
+#   measurement. CURRENT (14z-89, leg (a) grown to 45 by the legacy-pairing
+#   promotion): 42 PASS / 3 FAIL, leg (b) all six guard-clean. The 3 are
+#   measured and attributed, awaiting rulings (STATE "DECISIONS PENDING —
+#   14z-89"): 21/26 arm the type-6 tripwire on legacy, 12 measures the UNION
+#   of the two solo shapes. Failing logs kept in build/gate_failures/
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

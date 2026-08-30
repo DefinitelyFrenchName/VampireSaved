@@ -56,6 +56,14 @@
 #   tests/audit_mask_window_ff42a2.sh <pre_rompath_dir> <post_rompath_dir> <replay-name>...
 # (~2-3 min per replay without INFO; the 14z-88 run covered every moved
 #  .sha1 of the three sets — 40/41/42 replays.)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-88: the ROW-0x1D staging window ($FF42A2-C1, V3 basis) attributed on
+#   the tenant-content .sha1 replays the 14z-87b medallion move shifted: pre-
+#   move vs post-move build IDENTICAL under the V3 mask, DIFFERENT under V2
+#   (control), + unmasked first-div frame. Args: pre rompath, post rompath,
+#   replay names
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

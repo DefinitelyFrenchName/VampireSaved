@@ -16,6 +16,14 @@
 # ROMDIR and runs patch_prg/pack_build in its earlier sections.
 #
 # Usage: tests/test_audit_merged_dispatch.sh   (no ROMs, no emulator, ~1s)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-90 (issue #17): ground truth for the expectation enumeration
+#   audit_merged_legacy.sh runs before its leg-(a) glob. The glob is *.masked
+#   only, so `.pending` — a pairing with no ratified class anywhere — was
+#   dropped silently, putting the blind spot over the open regression. Case 3
+#   is live: donovan-m5 must name exactly 2 NOT-EVALUATED. ROM-free, ~1s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

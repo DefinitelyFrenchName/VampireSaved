@@ -31,6 +31,11 @@
 # artifact's spans are already filled, so re-deriving through the build path
 # is impossible by construction ("extension span not zero"). The ledger has
 # to be written at build time or it does not exist.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #89) QSound audit ids come from a ledger fingerprint-bound
+#   to the artifact under test, never rebuilt from `build/wide0`.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

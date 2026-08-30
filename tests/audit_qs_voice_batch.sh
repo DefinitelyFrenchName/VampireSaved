@@ -22,6 +22,15 @@
 # Usage: ROMDIR=... tests/audit_qs_voice_batch.sh [builddir]
 #   builddir given  -> verify that build's vsavjw.zip in place
 #   no builddir     -> self-build onto a scratch overlay copy
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-86 (~10 min, 2 parallel): THE VOICE-BATCH KEYON A/B — every authored
+#   voice id swept on ours vs the scoped vs2 ids on native; WHOLE-RUN content
+#   multisets compared (per-id window attribution is venue-flaky, measured):
+#   no native signature missing, nothing ours plays foreign to vs2's library,
+#   counts bounded. Verdict control (corrupted packed sample -> foreign).
+#   tools/check_qs_voice_batch.py. Self-builds or verifies a build's zip
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 ROMDIR="${ROMDIR:?set ROMDIR}"

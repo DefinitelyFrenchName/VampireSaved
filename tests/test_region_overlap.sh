@@ -21,6 +21,19 @@
 #
 # Usage: tests/test_region_overlap.sh [build...]   (defaults to the frozen 3)
 # Static, no ROMs, no emulator. ~40s (the normalisation scans every blob).
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-77: can the tenants' shared source spans be placed ONCE? M3b_plan
+#   Phase 2 item 2 assumes yes; MEASURED, four of the 17 cannot. Freezes 17
+#   shared / 8 name collisions (7 generic per-tenant names + x088512's extent)
+#   / 13 unique, and 2000 CONFLICTING bytes over x026142/x028122/
+#   x05c800/x2b7ef4 — fields two or more tenants write differently, so only
+#   one can ship. Two-tenant spans report UNDECIDABLE, never a reassuring
+#   zero. Section 3 is the control that placement normalisation is load-
+#   bearing: 7591 raw -> 2000, i.e. 73% of the raw number is an artefact of
+#   three INDEPENDENT builds' allocators. tools/audit_region_overlap.py (--no-
+#   normalise is the control only, never a verdict). Static, ~1s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

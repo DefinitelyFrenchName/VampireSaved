@@ -45,6 +45,17 @@
 #     this fix, so `test_mister_sim_anchor`'s frozen anchor (MAME 2146 / sim
 #     2609 / skew 463) CANNOT have moved either. It was not re-run for this
 #     change, and this is the reason.
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier ci_portable) `.rpl` -> `sim_inputs.hex` bit map, frozen translation,
+#   refusals, the per-direction lock + its must-fire control (5/5b), and the
+#   anchor-independence check + its positive control (6/6b). The direction map
+#   was REVERSED end for end and is FIXED (14z-108, measured on all four
+#   against `RAM:$FF8058`): the frozen vector moved `111 6ee 000 000 080` ->
+#   `181 67e 000 000 010`, and the `05_timeout_idle` sha1 `eb3e1d04…` did NOT
+#   move and cannot — that replay scripts no direction token, which is also
+#   why the sim anchor could not move
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; T="$(mktemp -d)"; fail=0
 ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }

@@ -18,6 +18,18 @@
 # (`data 00004040`), so a low-lane reading returns the right answer for the
 # wrong reason — which is what the first version of the tool did. Every lane
 # case below therefore uses UNEQUAL lanes, where only one reading can pass.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-93: ground truth for the SPAWN DENOMINATOR (tools/classify_pool_
+#   spawns.py) — how many type >= 64 objects entered the $FF9400 projectile
+#   pool. Without it a zero from the map census is ambiguous between "never
+#   stamps a dangerous type" and "stamps them constantly, nothing collided" —
+#   opposite rulings. 12 cases. THE LANE is the sharp one: the type byte is at
+#   +0x02, an EVEN address, so it is the HIGH lane of the logged word — and
+#   the real captures carry the SAME value in both lanes (data 00004040), so a
+#   low-lane reader is right by coincidence. Every lane case uses UNEQUAL
+#   lanes. Caught the tool's first version. No ROMs, ~1s; in ci_portable
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

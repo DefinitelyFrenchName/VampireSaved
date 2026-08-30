@@ -18,6 +18,11 @@
 # INERT ON EVERY FROZEN SET: all seven live masks are disjoint and ascending,
 # where max(pos, r[2]) == r[2]. Section 1 proves the equivalence directly
 # rather than resting on that argument.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #61) The mask reader masks exactly the spec and refuses
+#   nonsense. **Not portable** — needs ROMDIR + a WIDE build.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

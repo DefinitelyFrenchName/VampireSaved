@@ -33,6 +33,18 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged11] [JOBS=6]
 #        [ONLY=0x13] [BASES=...] tests/audit_roster_pairings.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-97: EVERY TENANT vs EVERY CHARACTER, BOTH SIDES — the CLAUDE.md §4
+#   mandate ("vs each of the 18, both sides") that the suite never had, and
+#   the gap #99 walked through. 111 pairings + a no-poke verdict control,
+#   guarded, on the merged build. MEASURED ~5 min at JOBS=6 (not the hour it
+#   looks like). Expectations are DERIVED from the merged image's own table at
+#   PRG:0x0BD97A, not harvested from a run — tests/expected/roster_pairings/.
+#   ONLY=<class> reproduces one tenant's row; BASES=<file> one pairing. NOT a
+#   replacement for test_tenant_pairings: that stays as the ~1 min six-
+#   ordering gate for routine use, and shares tests/lib/pairing.sh.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

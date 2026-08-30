@@ -16,6 +16,18 @@
 # with nothing downstream to catch it.
 #
 # Four checks, no ROMs, no emulator, no build (~1s).
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-77 (M3b slice F): what the three tenant manifests DO when merged.
+#   Freezes the shared-row dedup counts (space 9->3, obj_hook 6->2, wheel
+#   3->1, site_thunk 34->28, port_patch 90->87) and the exact 12-collision
+#   inventory in TWO classes: THREE real blockers ([init_shim] once,
+#   [table_fix] twice — TOML singletons, so the schema cannot express two) and
+#   SIX that DISSOLVE on the WIDE track (all three tenants agree on
+#   new_hex_variant, and a merged build is a WIDE build by construction). A
+#   span collision is invisible to row dedup AND to patch_prg.py's overlap
+#   assertion, hence its own check. 4 permissiveness controls. No ROMs, ~1s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

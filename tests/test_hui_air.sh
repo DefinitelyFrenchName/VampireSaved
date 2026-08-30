@@ -23,6 +23,12 @@
 #      near-constant height.
 #
 # Usage: ROMDIR=... tests/test_hui_air.sh [existing-stage4-builddir]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   Huitzil air-movement gate (14z-66): the float hovers (Y pinned) and the
+#   air dash engages (seq 0x14, flat advance) — mode signatures, not just no-
+#   crash. Self-builds stage 4 unless given a build
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

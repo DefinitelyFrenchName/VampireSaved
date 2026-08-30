@@ -10,6 +10,16 @@
 # MUST-FIRE CONTROLS (RH-9): (a) an override whose `expect` does not match the
 # vs2 bytes is REFUSED; (b) an expect/value length mismatch is REFUSED; (c) a
 # manifest copy with a stale block FAILS --check.
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier ci_portable (~1 s)) THE OVERRIDE CHANNEL:
+#   `build/manifest/charmap_<tenant>.toml` (hand-written: `[[override]]
+#   id/path/expect/value/stage/note`, path `region/<name>/<hexoff>` in phase
+#   0) compiles via `tools/charmap_compile.py` into the `# BEGIN charmap … #
+#   END charmap` block of the tenant manifest as ordinary `[[region_fix]]`
+#   rows — gen_donovan_patch.py unchanged. The committed block must equal a
+#   fresh compile; wrong `expect` / length mismatch / stale block all fail
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

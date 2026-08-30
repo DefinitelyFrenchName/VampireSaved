@@ -36,6 +36,24 @@
 #   extract_dir defaults to build/m5_wide/extract (Donovan, the WIDE
 #   reference). SKIPs when no extract dir is present — the build dirs are
 #   untracked, so a fresh checkout has none.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-77 (M3b slices C+D): is the row-OWNER threading LOAD-BEARING? Every
+#   slice of the multi-tenant refactor is INERT by design, so a threading
+#   accidentally DISCONNECTED from the emitted ops leaves the four
+#   fingerprints unchanged too and reads as a success. This gate perturbs ONE
+#   owner-derived row at a time and requires the generator's OUTPUT to change.
+#   10 sites (slices C/D/E). Compares the WHOLE OUTPUT DIR, not patch.json:
+#   region blobs leave as side .bin files, so a byte changed inside a blob
+#   moves no op — the first version had that blind spot and its own controls
+#   caught it. Runs the GENERATOR ALONE against an existing extract dir
+#   (default build/m5_wide/extract, SKIPs without one), so each control costs
+#   seconds not a 4-min four-target rebuild. Verdict logic ground-truthed: it
+#   perturbs an intentionally UNUSED binding and requires the checker to call
+#   it DEAD. Edits the generator in place; trap restores on EXIT/INT/TERM and
+#   a section asserts byte-identity. ~9s. Run it WITH test_m3a_reproducible.sh
+#   on every M3b machinery commit — opposite questions
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

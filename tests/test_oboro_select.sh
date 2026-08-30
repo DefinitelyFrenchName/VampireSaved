@@ -34,6 +34,15 @@
 #
 # Usage: ROMDIR=... tests/test_oboro_select.sh [wide_rompath] [stock_rompath]
 #   defaults: build/m3b_merged15/rompath, build/m5_stock8/rompath
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-105 (W1, ~4 min, 5 MAME runs): THE OBORO SELECT HOOK — Bishamon's cell
+#   + START held at confirm commits vanilla vsavj's Oboro (0x18) and the match
+#   loads base 0x0B3450. Legs: P1 hold / no-hold control / Start on Demitri
+#   (cell-gated) / P2 side / the STOCK twin (profile-gated => 0x08). Every leg
+#   asserts id AND loaded base. No pokes — the pick is made with the sticks.
+#   Verdict control. Defaults build/m3b_merged13 + build/m5_stock6
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

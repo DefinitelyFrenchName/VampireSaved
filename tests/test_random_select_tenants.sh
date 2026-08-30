@@ -40,6 +40,15 @@
 #      sampler would notice a tenant-less draw.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged19] [CONTROL=build/<prev>] tests/test_random_select_tenants.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-117 (~12 min, 4 MAME runs): RANDOM SELECT INCLUDES THE TENANTS.
+#   Static: both sites are jmps, body B's table = 15 vanilla ids + the build's
+#   tenants.json, outside the crypt range. Runtime: P1 parks on "?" (D,D,DR),
+#   $382 sampled 91 frames = exactly 15 + tenants; confirm on a tenant's
+#   MIDDLE frame loads that tenant's own record; must-fire control = the
+#   previous merged (CONTROL=, no tenant drawn).
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

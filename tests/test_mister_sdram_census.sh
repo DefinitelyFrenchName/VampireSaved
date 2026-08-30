@@ -57,6 +57,22 @@
 #   CENSUS_KEEP re-uses bank images already dumped there instead of simulating.
 #   It is a CACHE and it is not validated against the RTL that produced it —
 #   delete it after any RTL change.
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier manual/emulator (~45 min)) SLICE D2'S CORE EVIDENCE. Downloads a
+#   `.rom` in the simulator, dumps all four 16 MB banks and checks every one
+#   of the 67,108,864 bytes against `mister_map.md` §5 with
+#   `tools/mister_sdram_census.py` (which replays the download mapping, CPS-2
+#   GFX scramble included). FOUR legs: A cps2w+WIDE vs the WIDE map (THE
+#   census), B cps2+WIDE vs the STOCK map, C cps2w+stock vs the WIDE map, D
+#   cps2+stock vs the STOCK map (the calibration leg — the tool checked
+#   against a mapping nobody changed). Cross-checks independent of the tool: C
+#   vs D banks 1/2/3 BYTE-IDENTICAL and bank 0 differing; A vs B banks 2+3
+#   DIFFERING (without the redirect group C aliases onto vanilla's art). Must-
+#   fire: leg B must FAIL the WIDE map, and A re-run with one expected
+#   constant moved 1 KiB must be rejected (twice, one per bank).
+#   `CENSUS_KEEP=<dir>` caches the bank images
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

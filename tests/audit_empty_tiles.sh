@@ -22,6 +22,14 @@
 #
 # Usage: ROMDIR=... tests/audit_empty_tiles.sh <builddir> [replay...]
 #        default replays: the DF/2P rig and the effect showcase.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-69o: does the build DRAW any sprite whose group-C tile is BLANK? A
+#   remapped-but-uncopied tile renders as a SOLID RECTANGLE and no other gate
+#   can see it (records/codes/walk all correct). Complete, not a sample.
+#   Ground-truthed: PASSES on build/hui14, FAILS on build/hui12 naming both
+#   shadow tiles. RUN FOR EVERY NEW TENANT
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

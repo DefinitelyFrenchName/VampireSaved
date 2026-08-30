@@ -29,6 +29,20 @@
 # Emulator tier (MAME, ~3 min: five native legs in parallel). ROM-free parts
 # (1, 2) run first and alone when NOLIVE=1.
 # Usage: ROMDIR=... [MAME_BIN=...] [DON=build/don_m18 PYR=build/pyron36 HUI=build/hui52] [NOLIVE=1] [FREEZE=1] tests/test_projectile_params.sh
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier emulator (MAME, ~3 min; `NOLIVE=1` = the ROM-free half)) THE
+#   PROJECTILE PARAMETERS (14z-121, phase 3): `tools/projectile_params.py`
+#   decodes every `$FF9400` type handler's inline init (walker-2 table
+#   `0x5C620[type]`; `+0x9A` → `+0x26/+0x50` and an `(xv, xacc, yv, yacc)`
+#   record; Cosmo = immediates) — rows frozen in
+#   `tests/expected/projectile_params.txt` (`FREEZE=1`); the same decoder on
+#   each build's `verify_op.bin` at the placed handler must equal vs2 (ours ==
+#   vs2, three builds); the five census rigs' live spawns must match their
+#   rows (27 tabled spawns, one tick allowed; the seven tabled types each
+#   measured); a perturbed row must fail. Run after any change to the decoder,
+#   the rigs, or a projectile handler region
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 DON="${DON:-build/don_m18}"; PYR="${PYR:-build/pyron36}"; HUI="${HUI:-build/hui52}"

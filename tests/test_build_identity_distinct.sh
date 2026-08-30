@@ -27,6 +27,12 @@
 # So the discriminator is the WHOLE-ARTIFACT manifest, and this gate asserts
 # that it still discriminates — i.e. that a future rebuild has not made the
 # two indistinguishable by that measure too.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, 14z-94) the merged playtest build stays distinguishable
+#   from its legacy-only instrument, which SHARES its program fingerprint by
+#   design.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

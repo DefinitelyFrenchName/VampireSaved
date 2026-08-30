@@ -56,6 +56,16 @@
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21] [FREEZE=1]
 #        tests/test_ladder_tenant_vs_palette.sh      (~4 legs in parallel, ~5 min)
 # EMULATOR tier (MAME -debug, gfx-bearing build required — [VSP-141]).
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-123 (inferred_claims row 7): the 0x3A3CA0 pool MEASURED ON SCREEN for
+#   a tenant CPU opponent — it is the 1P opponent-ROULETTE tag's mini-art
+#   palette (PRG:0x00B094, once per ladder match, OBJ row 0x0A), NOT an
+#   attract path, NOT read by the VS screen (1P vs CPU Phobos == 2P vs Phobos,
+#   0 px). The tag shows the BASE character's name/ art for a tenant (cosmetic
+#   backlog). 4 -debug legs, red-poke A/B, liveness via the P2 hitbox base;
+#   FREEZE=1. Replay 111 = 110 cut at 3600. ~4 min.
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

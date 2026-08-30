@@ -4,6 +4,12 @@
 # Both sections assert the NATIVE-MATCHED signatures measured on the
 # A/B of record (replay headers), not just no-crash.
 # Usage: ROMDIR=... tests/test_hui_pairs.sh [existing-stage4-builddir]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   Reflect Wall GC + Dark Force gate (14z-66): both native-matched signatures
+#   (GC seq 0x0E + blowback; DF 0x0A at both activations). Self-builds stage 4
+#   unless given a build
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

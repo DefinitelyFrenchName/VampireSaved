@@ -16,6 +16,14 @@
 #          (the anti-leak control — her purple stays hers).
 #
 # Usage: ROMDIR=... tests/audit_df_gold.sh [builddir]   (default hui32)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-84: Phobos' DF uploads HIS gold block (live palette RAM vs the build's
+#   own placed block) and Bulleta's DF does NOT leak it (the 14z-69p anti-
+#   class). Compare on 0x0FFF color bits — the uploader ORs the alpha nibble
+#   (v1 compared raw bytes and called a WORKING upload dead). DF-controlled
+#   rig. ~10 min
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

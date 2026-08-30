@@ -34,6 +34,30 @@
 # explaining the canonical convention, so a naive grep reads them as
 # canonical — measured 14z-93, it turned a 10-deviant census into a
 # 3-deviant one and nearly got reported as "7 of 10 fixed".
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-93 (GitHub #10): FREEZES the input-staging split of every replay-
+#   driving Lua instrument. The canonical convention is replay.lua's (parse
+#   held[fr], stage held[frame+1]); TEN instruments net a +1 shift, so a frame
+#   number from one of their logs is NOT a frame number from a compare_* first
+#   divergence or a masked window onset. NOT A FIX — deliberately: the
+#   consuming gates' frame constants were tuned UNDER the drift, so the
+#   staging fix and the re-measurement are ONE change (docs/project/
+#   gotchas.md). This PINS it at 10 deviant / 11 canonical: a NEW instrument
+#   copying the wrong flavour FAILS, every deviant must carry its banner,
+#   replay.lua must stay canonical. EXPECT_DEVIANT=0 flips it to asserting
+#   uniformity once fixed. STRIP LUA COMMENTS when censusing — the banners
+#   quote `held[frame + 1]`, so a naive grep reads a drifted file as canonical
+#   (measured: 10 -> 3). 4 verdict controls. No ROMs, ~1s; in ci_portable
+#   14z-93 (GitHub #10): FREEZES the input-staging split (10 deviant / 11
+#   canonical). NOT a fix — the consuming gates' frame constants were tuned
+#   UNDER the drift, so the staging fix and the re-measurement are ONE change.
+#   Pins it so it cannot GROW, requires every deviant to carry its banner, and
+#   requires replay.lua to stay canonical. EXPECT_DEVIANT=0 flips it to
+#   asserting uniformity once fixed. STRIP LUA COMMENTS when censusing — the
+#   banners quote `held[frame + 1]` (measured: a naive grep turned 10 deviants
+#   into 3). ROM-free, ~1s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

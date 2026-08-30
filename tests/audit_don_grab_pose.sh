@@ -93,6 +93,35 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged11]
 #        [EXPECT_MATCH=0] [VICTIMS="01 13 10 11"] tests/audit_don_grab_pose.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-98 (6), REBUILT 14z-99, GitHub #104: a legacy grab holds a TENANT
+#   victim on the wrong capture record. MECHANISM = THE VARIANT-ROW ALIAS
+#   class (re-measured 14z-99, NOT the "reaction-index generation drift"
+#   14z-98 (9) claimed — that and its 5-table reorder are RETRACTED in the
+#   script header): the capture set is selected PER VICTIM through 32-row
+#   structures whose rows 0x10-0x1F copy 0x00-0x0F, so a tenant is served the
+#   base character it folds onto. MECHANISM LOCATED 14z-99 at PRG:0x02802E:
+#   the first 32 words of EVERY attacker's keyframe block are a per-victim
+#   offset table indexed by the victim's id UNMASKED, and vsavj aliases its
+#   0x10-0x1F half onto 0x00-0x0F in ALL 16 blocks (14 by offset,
+#   Zabel/special by materialized copies; vs2's are real). RULED option (a)
+#   full, feasibility MEASURED CLEAN — premises frozen in
+#   test_capture_pose_sources.sh; implementation + inventory: STATE 14z-99.
+#   Donovan 0x13->0x03 gets Victor's index 6 (native 11); Phobos 0x10->0x00
+#   gets Bulleta's 12 (native 26); PYRON 0x11->0x01 gets Demitri's 11, which
+#   IS his correct one — right by coincidence, and why the field named D and P
+#   only. SECTION 0 IS A LEGACY-VICTIM CONTROL: both engines must install the
+#   SAME index for a legacy victim or the shared-convention premise is dead
+#   and every tenant verdict here is meaningless. The anim region is resolved
+#   PER VICTIM (anim / anim@huitzil / anim@pyron) — doing that unconditionally
+#   through "anim" is what produced the retracted 14z-98 (7) Pyron reading on
+#   the MERGED build. Hold detected from hp-DROP samples (no tuned pixel
+#   window); a non-majority modal is NO-HOLD. EXPECT_MATCH=0 freezes the
+#   defect; flip at the fix. VICTIMS= overrides the set. Rig:
+#   replays/96_don_victor_grab.rpl (4 connects/run, no HP pokes). ~12 min, 8
+#   MAME runs (2 at a time).
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

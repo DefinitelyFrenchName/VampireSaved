@@ -32,6 +32,20 @@
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/don_m7] \
 #          tests/audit_flicker_attribution.sh
 # ~3 min (4 MAME runs, 2 legs x 2 replays).
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-91: WHY is each gained flicker frame in a frozen spec? The legacy re-
+#   freeze added exactly two (donovan-m7 41 +2313, 37 +7168) and the rule was
+#   that a gained frame is not written until it is attributed. Both are the
+#   palette-fade STAGING BUFFER ($FF3F02 + row*0x20, display- only per
+#   engine_internals): 41 in row 0x0C, which donovan.toml:862 documents this
+#   build patching, and 37 in row 0x0A. Re-derives it via
+#   tools/attribute_ramdiff.py against NAMED windows, so a byte landing
+#   outside one re-opens the specs rather than widening a window. Also fails
+#   on an IDENTICAL pair — these frames are in the specs BECAUSE they differ,
+#   so identity means the rig died, not that the build improved. ~3 min, 4
+#   MAME runs
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

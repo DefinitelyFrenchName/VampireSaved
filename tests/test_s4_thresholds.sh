@@ -22,6 +22,15 @@
 # A shared import makes drift impossible by construction; this gate exists
 # so that a future edit RE-INTRODUCING a local literal is caught, which an
 # import alone cannot prevent.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-93 (GitHub #44): the ratified §4 thresholds (FLICKER_MAX, RECONVERGE)
+#   are declared ONCE in tools/s4_thresholds.py and every comparator imports
+#   them. Asserts the values, that all four consumers import, that none re-
+#   declares a local literal, that none hardcodes an argparse default, + a
+#   verdict control both ways (a re-introduced literal caught; a COMMENT not
+#   flagged). ROM-free, ~1s; ci_portable
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

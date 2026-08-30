@@ -43,6 +43,17 @@
 #      whole thunk, which would silently undo 14z-62k.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21] tests/test_pyron_medallion_2p.sh  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-116 (~5 min, 2 MAME runs): THE P2-HOVER half of medallion palette
+#   stability. Row 0x1A is BOTH Pyron's medallion row and the P2 figure's
+#   sword-accent slot; the 62k thunk's P2 branch no longer writes it. Leg 1:
+#   P2 hovers Donovan -> 0x1A holds Pyron's vs2 palette. Leg 2 MUST-FIRE: P1
+#   hovers Donovan -> row 0x17 still RECEIVES the accent, so leg 1 cannot be
+#   "passed" by deleting the thunk. CLOSES A COVERAGE GAP: test_wheel_bank5
+#   3b's two protocols are both single-player and could never see this.
+#   Default build/m3b_merged19
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

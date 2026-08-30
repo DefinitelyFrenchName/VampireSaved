@@ -16,6 +16,14 @@
 # against the pre-fix build/m3b_merged, every gate FAILed with only 0x13.
 #
 # Usage: tests/audit_select_bank_gates.sh [merged builddir]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-84: the merged drawer bank gates (name/splash/winquote *_bank_variant
+#   _id) must gate EVERY declaring tenant's id — the first-playtest
+#   name/portrait garble class (shared TT-placeholder rows deduped to tenant
+#   0's compare). Static over patch.json + fragment + manifests, ground-
+#   truthed FAILING on the pre-fix build. ~1s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

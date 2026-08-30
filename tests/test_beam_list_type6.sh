@@ -35,6 +35,16 @@
 #
 # Usage: tests/test_beam_list_type6.sh [builddir]     (default build/hui25)
 #        No emulator, no ROMDIR. Seconds.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-71: the list-type 6 TAKEOVER gate. The thunk body must be Capcom's
+#   composite handler (vs2 0x01A1FC) with EXACTLY six scratch displacements,
+#   bsr.w -> jsr 0x1AFAE and one loop displacement changed — checked by
+#   RECONSTRUCTING it from vs2's bytes, not by diffing with a tolerance. Also
+#   proves the non-tenant FALLBACK reproduces vsav's own type-6 head and
+#   rejoins at 0x01B6B2, which is the entire safety argument and which legacy
+#   never exercises. Static, seconds
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

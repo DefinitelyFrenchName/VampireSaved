@@ -15,6 +15,12 @@
 # only guard.
 #
 # Usage: ROMDIR=... tests/test_don_accent.sh [rompath_dir]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   palette locks: accent steadiness, VICTOR byte guard + cycle, fixture-
+#   override rows, shock-window vanilla lock (palette ROM->RAM is RAM-gate-
+#   blind — these are the only locks)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

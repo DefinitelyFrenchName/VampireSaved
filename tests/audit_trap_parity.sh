@@ -43,6 +43,16 @@
 # — the defense-rows class, cosmetic, recorded not gated.
 #
 # Usage: ROMDIR=... tests/audit_trap_parity.sh [builddir]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-85g (~5 min, 2 parallel runs): THE TRAP-SOUND PARITY GATE — replay 87
+#   on native vsav2 AND the build; frozen per-attempt inventories: native
+#   0739(spawn)/010b/073a(timer detonation); ours 00d8(the RESTORED ejection,
+#   14z-86 authored Z80 song) + 010a + 0199 (the RESTORED chirp, 14z-85g
+#   sound_stub — same sample bytes both). RE-FROZEN 14z-86, ground-truthed
+#   failing on the pre-pilot shape. FORBIDS 0739/073a on ours (music ids on
+#   vsavj). Verdict control + per-leg liveness
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

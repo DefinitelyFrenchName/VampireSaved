@@ -19,6 +19,11 @@
 # instrument ground-truth calls the runner directly; the audit then dies in A1
 # and A3 never executes. This gate's first draft did exactly that and section
 # 3 caught it, which is the whole reason section 3 exists.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #25) A3 cannot decide gfx growth on a measurement it never
+#   made.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

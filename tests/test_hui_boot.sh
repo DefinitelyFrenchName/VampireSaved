@@ -16,6 +16,12 @@
 # music-class content) — see STATE 14z-65.
 #
 # Usage: ROMDIR=... tests/test_hui_boot.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   Huitzil stage-4 BOOT gate (14z-65): the forced-pick match forms with HIS
+#   data (base read from the build's own patch), guard clean, legacy bit-
+#   identical
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

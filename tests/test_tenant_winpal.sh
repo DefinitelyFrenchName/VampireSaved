@@ -28,6 +28,12 @@
 # Usage: ROMDIR=... tests/test_tenant_winpal.sh [outbase]
 # Env: MAME_WIDE_BIN (default ~/.cache/vampire-saved/mame/cps2);
 #      SKIP_RUNTIME=1 skips section 3 (two ~6k-frame MAME runs).
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   variant-id win-screen palette (14z-63): the sparse block + TT thunk at
+#   0x5F1B6; BOTH thunk paths measured on real 2P victories (replays 61/62).
+#   Self-builds at 0x13 unless
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

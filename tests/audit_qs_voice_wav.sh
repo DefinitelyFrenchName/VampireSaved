@@ -15,6 +15,14 @@
 # capture must fire the suspect verdict.
 #
 # Usage: ROMDIR=... tests/audit_qs_voice_wav.sh [builddir]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-86 (~12 min, 2 -wavwrite runs): THE EAR-LEVEL VOICE A/B — per-window
+#   RMS/high-band vs native audio. Exists because it CAUGHT the half-bank
+#   truncation the register/content gates were BLIND to (signed DSP pointer
+#   compare — equal data, different behavior). Synthetic-truncation verdict
+#   control. Keep BOTH gates
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; export REPO
 ROMDIR="${ROMDIR:?set ROMDIR}"; export ROMDIR

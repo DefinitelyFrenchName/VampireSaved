@@ -46,6 +46,22 @@
 #
 # Static: reads the built WIDE romset + frozen manifests. No emulator, no
 # build, ~5 s.
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier ci_static (~5 s)) the SDRAM PLACEMENT MAP fits the 64 MB tier AS
+#   PLACED — by 0.125 MB, with bank 1 EXACTLY FULL (corrected 14z-107 (9) by
+#   the census; the old 0.708 MB sized the group-C obj banks by the art's
+#   footprint where the download reserves the whole 8 MB region) — the banks
+#   are modelled from the placed offsets and lengths with an overlap check,
+#   and the four content extents are frozen: group-C obj bank 4 ceiling
+#   `0xEE73`, obj bank 5 ceiling `0xFFDB`, QSound live `0x8E57F0`, PRG live
+#   `0x5FFF1E`. Also checks the `.rom` against the 26-bit `ioctl_addr` and the
+#   16-bit header words. Re-checks the "tile code IS its SDRAM address"
+#   scramble identity §1 rests on. THREE must-fire controls (untrimmed QSound
+#   must be rejected; +1 MB of the obj-bank-5 REGION must overflow bank 0; the
+#   identity must fail without the scramble). Design:
+#   `docs/project/mister_map.md`
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -30,6 +30,13 @@
 #
 # Usage: ROMDIR=... tests/test_release_roundtrip.sh [build_rompath] [name]
 #   defaults build/m3b_merged21/rompath, merged-m14. Needs xdelta3.  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-105 (ci_static, ~40 s): THE RELEASE PACKAGE GATE — package, apply to
+#   the pristine dumps, byte-identical x42 + fingerprint + manifest; the
+#   applier refuses corrupted patch / wrong sha1 / wrong dump without writing;
+#   rule 7 verbatim-chunk scan with a must-fire control. Needs xdelta3.
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

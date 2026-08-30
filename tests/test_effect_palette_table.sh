@@ -16,6 +16,19 @@
 #      project has paid for repeatedly (docs/GOTCHAS.md).
 #
 # Usage: ROMDIR=... tests/test_effect_palette_table.sh [build] [tenant]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-76: the per-character palette POINTER tables are 32-row and id-
+#   INDEXED. 0x38C198 (sprite) and 0x38C218 (effect) each hold 32 rows;
+#   0x38C1D8/0x38C258 are their variant halves, never a base (0 refs in either
+#   ROM view); both alias the base half except rows 0x12/0x18 (Oboro Bishamon
+#   is real); and the 5 readers take the id byte UNMASKED. This is what
+#   licenses repointing a tenant's row — the "only sixteen rows" reading
+#   deferred Pyron's effect palette for two sessions. 4 negative controls (a
+#   fold in the reader, a reference to the second half, a de-aliased variant
+#   row, a build clobbering a base-half row).
+#   tools/audit_effect_palette_table.py. Static, seconds
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

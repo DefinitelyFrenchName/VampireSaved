@@ -62,6 +62,18 @@
 #     on it would either be wrong or would force ~27 declarations written by
 #     somebody guessing at intent. The report is the triage worksheet; turning
 #     any row into an assertion is a per-gate decision with the intent in hand.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #94 → 14z-97) A hardcoded `build/<name>` default must not
+#   have ROTTED (present, read as a romset, too old to carry the members the
+#   reader needs). **Extended 14z-97 twice:** the pattern matched POSITIONAL
+#   defaults only, so eleven named-env references
+#   (`BUILD="${BUILD:-build/don_m7}"`) were invisible — coverage 21 → 32; and
+#   it now REPORTS CURRENCY, which rot cannot see, because a superseded build
+#   loads perfectly (that is how #96 happened one level up). Currency reports
+#   and never fails: a superseded reference is often correct, and only the
+#   gate's author knows which. Today: 3 current, 16 superseded.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

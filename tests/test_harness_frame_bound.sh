@@ -22,6 +22,11 @@
 # tests/replays is the 40,620-frame arcade marathon, and 10,000,000 frames is
 # ~46 hours of emulated play. Nothing legitimate approaches it, and with both
 # addends bounded neither sum can wrap.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #77) FBNeo replay frames are bounded before the
+#   arithmetic; the cap is re-derived from `tests/replays`, not trusted.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

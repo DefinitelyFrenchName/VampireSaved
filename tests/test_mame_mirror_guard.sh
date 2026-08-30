@@ -25,6 +25,12 @@
 # harness — extracted, never copied, so it cannot drift from the shipped
 # code. Section 0 fails loudly if the extraction comes back empty, which is
 # the failure mode that would make every other section pass vacuously.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #80) `rsync --delete` runs only in a directory
+#   `setup_mame.sh` owns. Guard is EXTRACTED from the shipped script between
+#   markers, never copied.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

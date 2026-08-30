@@ -38,6 +38,26 @@
 #  5. THE RUNNER REFUSES --prgprobe ON THE REFERENCE CORE, which has no such
 #     block; asking for it there would produce a silent zero.
 # Usage: tests/test_mister_prg_probe.sh   (no ROMs, no emulator, ~3s)
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier ci_portable (~3 s)) SLICE D4/D5's ROM-FREE HALF. Locks the 68k
+#   program-ROM read probe's contract without a ROM or a simulator: every code
+#   line the probe adds to `jtcps2_main.v` sits inside `` `ifdef
+#   JTCPS2W_PRGPROBE `` (with the hoisted-line control); its window bit IS the
+#   decode's window bit, both re-read from the RTL; its ADDRESS half carries
+#   no chip select, which is what lets it speak on the profile-CLEAR leg where
+#   `rom_cs` cannot assert at all. Then the verdict logic itself —
+#   `tools/prgprobe_verdict.py` (CLAUDE.md §4: a test's classification code is
+#   validated before its verdicts are trusted) — on synthetic logs whose
+#   answer is known by construction: all three answers plus FOUR refusals — a
+#   silent control, a control whose bytes do not verify, a probe whose HI
+#   records sit BELOW `$400000` (the defect the probe's first draft shipped
+#   with, frozen from the real numbers), and raw-right/latched-wrong, which
+#   the tool's first version scored as a PASS over ten fetches the CPU
+#   received as garbage. Also asserts the byte order is DERIVED from the
+#   control rather than hard-coded, and that `--prgprobe` refuses `--core
+#   cps2`
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

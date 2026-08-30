@@ -26,6 +26,15 @@
 # arguments, and turns its result into the right verdict.
 #
 # Usage: tests/test_masked_compare.sh   (no emulator, no ROMDIR, ~2s)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-97 (#96): ground truth for tests/lib/masked_compare.sh, the ONE
+#   implementation of the §4 vocabulary
+#   (exact/flicker/diverge/window/composite + the #62 baseset/mask guard) now
+#   shared by run_suite.sh and the M2 battery. Every class in both directions;
+#   it caught a real bug in the lift (the diverge spec's temp-file STEM). No
+#   ROMs, no emulator, ~2s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

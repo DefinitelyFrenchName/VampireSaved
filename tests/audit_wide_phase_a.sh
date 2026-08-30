@@ -12,6 +12,11 @@
 #
 # Full rationale: the approved WIDE plan + docs/project/cps2_wide.md.
 # Usage: ROMDIR=... tests/audit_wide_phase_a.sh [corpus...]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   WIDE Phase A measurements (rerunnable; ground- truths its own instrument
+#   before trusting nulls)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

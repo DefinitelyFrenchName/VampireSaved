@@ -26,6 +26,21 @@
 #
 # Usage: ROMDIR=... tests/test_variant_dispatch.sh [outbase] [tenant]
 # Static, no emulator, seconds.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-75: THE VARIANT-ROW DISPATCH SWEEP. vsav aliases rows 0x10-0x1F of
+#   32-row per-character JUMP TABLES onto 0x00-0x0F, so a tenant silently
+#   inherits a base-half character's routine — the most common defect shape in
+#   this port. Sweeps every `jmp (d8,PC,Dn.w)` word table with a mostly-
+#   aliased variant half (5 exist) and requires ours[tenant row] == vs2's.
+#   Rows where OURS RUNS A ROUTINE vs2 DOES NOT fail; rows where vs2 runs one
+#   we do not are reported only (a missing feature, not a spurious one).
+#   Catches all THREE of Pyron's blink tables on pyron15. Two controls: a
+#   reintroduced aliased row must be caught, and NO table may be "unjudgeable"
+#   (vsav ships two identical dispatchers, so the twin finder matches by
+#   ORDINAL — demanding a unique context silently skipped the first defect).
+#   tools/audit_variant_dispatch.py. Static, seconds
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

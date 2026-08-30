@@ -45,6 +45,18 @@
 #
 # ROM-free, no emulator, ~3 s (or ~5 s with the WIDE build present, which adds
 # the real census). ci_portable.
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier ci_portable (~8 s)) THE SYNTHESIS CANNOT GO STALE.
+#   `tools/mk_mister_page.py --check` re-derives every figure
+#   `docs/project/mister_core.md` states (17 checks) from the same constants
+#   the other gates freeze — the roster's live bytes and address footprint,
+#   the declared-region arithmetic, the four bank extents and the 0.125 MB
+#   slack, the `.rom` size and header words, the anchor and its band — and
+#   recounts the group-C ceilings from the romset. The rendered page is NEVER
+#   committed (`.gitignore`); the generator is. Written as the living-
+#   documentation pilot (14z-107 (10))
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

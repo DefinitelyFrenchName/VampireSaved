@@ -38,6 +38,11 @@
 #     work-RAM hook became commit 2).
 #  4. Must-fire control: a perturbed copy of game.yaml FAILS section 2.
 # Usage: tests/test_jtcores_twin.sh
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier ci_portable) pin, cps2w-vs-cps2 twin, the patch SERIES == `format-
+#   patch` per commit
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$REPO/emu/jtcores"

@@ -29,6 +29,16 @@
 # the pre-refactor copy reconstructed from git.
 #
 # ROMDIR + git history. ~4 min (two decrypts + 3280 masked searches).
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #43(a)) ONE matcher, two callers. `reconcile_batch`'s
+#   drifted copy of `find_equiv`'s core is deleted; the three drifts survive
+#   as parameters pinned to the batch tool's MEASURED values. Section 2 proves
+#   the refactor inert against the pre-refactor copy reconstructed from git
+#   (1640/1640 probes), with a must-fire control; section 3 proves the
+#   parameters load-bearing (183/1640 change when freed), so #43(b) is a real
+#   change and section 2 is not vacuous. **Not portable.**
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

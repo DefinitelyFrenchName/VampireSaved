@@ -24,6 +24,25 @@
 # Needs the decrypted DATA views (these tables live inside the crypt window
 # and are read An-relative, so the opcode view is noise). Not in
 # ci_portable for that reason.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-94 (GitHub #92): ground truth for tools/decode_stage_banners.py, which
+#   NAMES the #92 value space — the replacement stage is a maintainer decision
+#   and must be taken against names, not numbers. 6 sections: both families
+#   enumerate to their measured sizes (vsavj 12, vs2 13), known records decode
+#   to known text, the 12 shared stages agree 1:1 in order (so the port owes
+#   NO renumber), and every out-of-range authored entry is #92's single known
+#   shape. 3 VERDICT CONTROLS, one of which is the trap: decoding vs2 from its
+#   table BASE instead of the ANCHOR read out of its code site manufactures a
+#   "+8 renumber between the games" that does not exist. The tool exits
+#   nonzero naming the anchor, because an empty family that merely omits the
+#   names reads as "no match" and is right by accident. Static, ~2s
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #92) the stage-banner decoder — incl. the control
+#   requiring a base-as-ANCHOR decode to FAIL LOUDLY. **Not portable.**
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

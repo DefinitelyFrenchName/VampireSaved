@@ -72,6 +72,45 @@
 #                its own boundaries before labelling anything.
 # The default OUTDIR is a temp dir OUTSIDE the repo (rule 7: RAM/ROM-derived
 # output never lands in the tree).
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier manual/emulator (~65 min)) the per-bank SDRAM traffic profile
+#   (ACTIVE counts, share, kiB/s, same-row hit rate and mean run, clash
+#   warnings) split into attract / select / in-match — the evidence for the
+#   MiSTer BANK REPACK ruling. Since D3 it has TWO legs: the default `--core
+#   cps2` on stock `vsavj` (the headroom bound) and `--core cps2w --wide
+#   build/m3b_merged18` on the WIDE romset, which is what answers
+#   `mister_map.md` §9 open question 1 — only a core carrying the obj promote
+#   can produce group-C traffic at all. The WIDE leg shifts every phase
+#   boundary by the longer transfer and ASSERTS the transfer length from the
+#   run's own log. It also prints a PEAK per-bank table derived from the run's
+#   own reporter intervals: saturation is a property of the worst interval,
+#   not of a phase average, and the peak table depends on no frozen boundary.
+#   `--log FILE` re-analyses `build/sdram_bank_load_14z107.log` offline. THE
+#   WIDE LEG HAS NOW RUN, 14z-107 (12), ON A BOOTING IMAGE, AND THE ANSWER IS
+#   YES WITH ROOM: bank 0 carries 40,717 accesses/frame through the select
+#   screen (32.9% of its 123,825 all-miss ceiling), 41,535 in-match, whole-run
+#   peak 54,363 (43.9%), data bus 16-18%, and ZERO `SDRAM reads clashed` in
+#   3,500 frames — the redirect costs bank 0 about 1,000 accesses/frame,
+#   ~2.5%. The run's own anchor landed at 2806 = the frozen 2609 + the
+#   197-frame transfer difference, so its phase boundaries were checked rather
+#   than assumed. What it does NOT bound: bank 1's group-C half.
+#   `05_timeout_idle` picks Demitri, so obj bank 4 is never fetched and ba1's
+#   13,890 accesses/frame are PCM alone `--rpl FILE` (14z-108) runs or re-
+#   analyses a DIFFERENT replay, and REFUSES the phase table when given one:
+#   the four boundaries are absolute simulated frames keyed to
+#   `05_timeout_idle`'s frozen match-start anchor, so on any other replay they
+#   label phases that are not there. It reports whole-run per-bank rates
+#   (download EXCLUDED, its end parsed from the log and refused if absent)
+#   plus the `WARNING: (test.cpp) SDRAM reads clashed` count, anchored to the
+#   line so this report's own prose about clashes is not scored as evidence.
+#   That path is validated on synthetic logs whose answer is known by
+#   construction (rates of exactly 10/5/2/3 per frame; 3 warnings counted as
+#   3, the same text as prose counted as 0), and the default path still
+#   reproduces the frozen 14z-107 table unchanged. `test_mister_gfxc_fetch`
+#   now passes `--stats`, so a tenant-match run answers the fetch question and
+#   the bank-load question from ONE simulation
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 

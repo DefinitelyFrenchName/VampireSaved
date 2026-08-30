@@ -24,6 +24,12 @@
 #   outbase: an existing variant-id WIDE build (default: builds fresh).
 # Env: MAME_WIDE_BIN (default ~/.cache/vampire-saved/mame/cps2);
 #      SKIP_RUNTIME=1 skips section 3.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   variant-id HUD (14z-63): the tenant's own in-match mugshot/name via row
+#   0x13 of the 32-row-aliased HUD tables + free-pool art; host cells
+#   pristine; staged codes measured in-match. Self-builds at 0x13 unless given
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

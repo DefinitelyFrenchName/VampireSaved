@@ -34,6 +34,17 @@
 # Usage: ROMDIR=... tests/test_version_string.sh [outbase]
 #   default build/m3b_merged15. Reads the knobs from the manifest the build
 #   names (donovan.toml — identical in all three tenant manifests, asserted).
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-105 (W2, ~2 min, 2 MAME runs): the select-screen VERSION STRING — the
+#   wheel record's last N entries are the glyph codes at the declared pal row
+#   and screen position; authored tiles packed byte-identical, non-blank,
+#   pen-15 background, font-exact; the LIVE OBJ list carries exactly N glyph
+#   sprites at OBJ (x+64, y+16); a MAME snapshot pixel-matches the intended
+#   bitmap with ZERO mismatches (this is what caught the codec half-mirror).
+#   Controls: 1px shift, corrupted tile. Knobs read from the manifests and
+#   asserted identical across them.
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

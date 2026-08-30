@@ -23,6 +23,13 @@
 # construction — the gate SKIPs on those builds).
 #
 # Usage: ROMDIR=... tests/test_don_throw_mirror.sh [outbase]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   the 14z-2 mirror-victim fix (applied 14z-64): base-slot mirror throws use
+#   the Donovan-victim block — static 2-byte assertion + a matched runtime
+#   control pair on replay 65. SKIPs on variant-id builds (correct by
+#   construction)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

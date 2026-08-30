@@ -14,6 +14,13 @@
 #      vanilla expectation (whole-RAM, unmasked).
 #
 # Usage: ROMDIR=... tests/test_hui_ladder.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   Huitzil stage 1-3 ladder gate (14z-65): builds from huitzil.toml + THE OP
+#   INVARIANT (every op = free space or a variant row) + legacy replay bit-
+#   identity. Build any tenant: TENANT_MANIFEST=... TENANT_CHAR=0x10
+#   tools/build_donovan.sh
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

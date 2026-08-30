@@ -17,6 +17,19 @@
 #      instrument and which was WRONG in this sweep's first version.
 #
 # Usage: ROMDIR=... tests/test_index_space.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-76: THE OUT-OF-RANGE INDEX SWEEP. vsavj's dispatch tables are SHORTER
+#   than vs2's, so a ported index can run past the end (Pyron's Cosmo sub-
+#   state 81 into an 80-entry table). Derives every `jmp (d8,PC,Dn.w)` table's
+#   entry count in BOTH roms from two structural bounds — a target cannot land
+#   inside the table, and a table cannot overlap the next dispatcher — and
+#   reports where vs2 is longer. Frozen: 110 tables, 81 twinned (24 by
+#   instruction SHAPE, which survives relocation where a byte-context match
+#   does not), 29 NOT JUDGED, 3 risky. The unjudged count is part of the
+#   verdict. Positive control: it must re-derive the Cosmo table at 80 vs 84.
+#   tools/audit_index_space.py. Static, seconds
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

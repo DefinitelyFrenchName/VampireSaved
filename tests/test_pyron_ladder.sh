@@ -23,6 +23,13 @@
 #      vanilla expectation (whole-RAM, unmasked).
 #
 # Usage: ROMDIR=... tests/test_pyr_ladder.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   the Pyron stage 1-4 ladder (14z-67): builds from pyron.toml, per-stage op
+#   invariant (stage 4 exempts exactly the four generator hook sites), forced-
+#   pick boot probe, stage-3 UNMASKED legacy bit-identity + stage-4 masked
+#   EXACT (V2 basis; V3 parked 14z-88)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

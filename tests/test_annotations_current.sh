@@ -16,6 +16,23 @@
 # MUST-FIRE CONTROLS on a synthetic root (the generator's --root): a doc
 # gaining an address must fail --check until regenerated; a hand-edit to a
 # current index must fail the cmp.
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier ci_portable (~1 s)) docs/annotations.md IS GENERATED (14z-123, the
+#   T1 annotations check): `tools/gen_annotations.py --check` regenerates the
+#   address -> label/comment stream CLAUDE.md §5 promised at M0 — every
+#   program-space address named by a live carrier (the atlas,
+#   `engine_internals.md`, the reference docs, `build/manifest/*.toml`,
+#   `tools/`, `tests/`) with the carrier file and the section or manifest row
+#   it sits under; no line numbers by design (they churn on unrelated edits).
+#   The tail section lists CODE-ONLY addresses — the documentation gap. WHY:
+#   `re/ghidra/` never held a project; the 14z-122 retirement note claimed the
+#   stream lived in the atlas + manifest comments, and the check measured
+#   ~2,900 addresses across five carrier kinds, ~220 named only in
+#   engine_internals prose and ~265 only in code. Four must-fire controls on a
+#   synthetic root. Regenerate after any edit that adds or removes a program
+#   address: `python3 tools/gen_annotations.py`.
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -21,6 +21,16 @@
 # 32 jumps, 1121 exact + 137 dur-1. Emulator tier (MAME), ~2 min.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/don_m18] tests/test_anim_node_walk.sh  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier emulator (MAME, ~2 min)) THE ANIM-NODE DECODER IS AN INSTRUMENT
+#   (14z-118, phase 1): `tools/anim_nodes.py`'s chains vs Donovan on NATIVE
+#   vs2 (`17_don_oracle_vsav2`), P1 `obj+0x1C`/`+0x20` per frame — every
+#   pointer on the graph, every change an edge or a jump onto a graph node,
+#   first countdown = dur or dur−1; negative control: a stride-0x17 decode
+#   must leave most pointers off-graph. Run after any change to the decoder or
+#   the node-format claims in `engine_internals.md`
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

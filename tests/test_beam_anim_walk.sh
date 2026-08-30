@@ -60,6 +60,16 @@
 # Usage: ROMDIR=... [BEAM_WALK_EXPECT=absent|walks] \
 #            tests/test_beam_anim_walk.sh [wide-builddir]
 #        (defaults to build/hui25; needs a build carrying H's real art)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-70: does the build ever WALK the anim nodes that carry the beam sprite
+#   lists? Native reads 0x24FCFA twice in its beam window; ours reads the
+#   placed twin 0x0E2DD8 ZERO times — the defect is anim-sequence SELECTION,
+#   not the draw path. 4 sections (static port check 11/11 relocated pointers,
+#   native leg, our leg, 3 verdict controls). BEAM_WALK_EXPECT=walks (default
+#   since 14z-71) | absent reproduces the pre-fix state. Defaults to the
+#   current huitzil solo (build/hui51, re-pointed each freeze). ~2 min
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

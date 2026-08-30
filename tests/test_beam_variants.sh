@@ -29,6 +29,16 @@
 #
 # Usage: ROMDIR=... tests/test_beam_variants.sh [wide-builddir]
 #        (defaults to build/hui25)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-70h: the beam-port premises. All THREE variants (236+P / 236+K /
+#   236+2P==2K) are ONE art path — pal 0x0C from the tenant band — and every
+#   tile they draw is ALREADY in group C, so the port needs no copy-inventory
+#   work. Encodes two paid-for traps: ES CONSUMES A METER STOCK (empty meter =
+#   silent downgrade, like DF, so it asserts the ES is richer than P), and
+#   multi-tile sprites must be expanded w*h at base+row*0x10+col
+#   (obj_records_dump reports the BASE code only). Native leg only, ~1 min
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"

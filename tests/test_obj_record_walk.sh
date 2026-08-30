@@ -36,6 +36,23 @@
 #                     COUNTS still match, so the pre-fix check passes and
 #                     the allow-map catches it. Strictly stronger, proved
 #                     rather than asserted
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-92 (GitHub #75): ground truth for the RELOCATION-AWARENESS of
+#   obj_records.walk's two heuristic passes. Both decide "is this a record"
+#   from ADDRESSES, and placement moves the addresses under the same bytes —
+#   sweep asks about the aux windows (hardened 14z-74), the pointer pass asks
+#   about the REGION window (hardened here, after it invented a record on
+#   merged huitzil and aborted every merged build from merged6). A built-image
+#   walk must VERIFY the source's structure, never re-derive it. 4 verdict
+#   controls, each of which must actually fire: A the phantom (ptr_allow=None
+#   MUST invent it — the pre-fix behaviour needs no reconstruction), B the
+#   session-14b clobbered fmt-0 count, C an un-relocated pointer, D two
+#   pointers swapped onto each other's targets — which a COUNT check cannot
+#   see, so the gate proves the old blindness rather than asserting the new
+#   strictness. Synthetic fixture, no ROMs, no build dirs, ~1s; in
+#   tests/ci_portable.txt
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

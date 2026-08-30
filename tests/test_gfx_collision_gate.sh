@@ -15,6 +15,14 @@
 #   4. textual coverage   -> no pass bypasses place(): the only direct
 #                            write_tile on a destination buffer is inside
 #                            place() itself
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-83 (S1): ground truth for build_gfx place() — same-source-or- fail on
+#   EVERY pass (was 2 of 8; the band pass had NO check). Clean write, benign
+#   same-source skip, different- bytes MUST-RAISE control naming both
+#   provenances, and the single-write- path textual lock. Emits
+#   gfx_written.json (the S2 chain ledger). No ROMs, ~1s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

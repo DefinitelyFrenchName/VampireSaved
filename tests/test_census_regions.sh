@@ -32,6 +32,13 @@
 #   hui_build_dir: an existing tenant build (needs extract/ + patch/);
 #   self-builds stage 4 from huitzil.toml if absent (code regions
 #   place at stage 4 — the adjacency assert needs them placed). ~6 min.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   ground truth for tools/census_regions.py (14z-67): the data_in_code +
+#   pcrel-escape censuses — H's frozen inventory (5 sites, 89/35 + 9/6
+#   escapes, adjacency-safe class, 2 known false positives, the x05c800 KNOWN-
+#   OPEN latent pair) + Pyron clean. Self-builds stage 4 unless given a build
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

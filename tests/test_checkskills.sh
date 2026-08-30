@@ -19,6 +19,30 @@
 # until it has failed on purpose): a copy of the relevant files is perturbed
 # eight ways (14z-114: + an unanchored CPH rule, + a dangling cross-reference, + a port token in the game skill, + a VSP anchor where STATE rolls over) — an unanchored rule appended, one anchor stripped from a doc,
 # a game name inserted into the level-1 skill — and each copy must FAIL.
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier ci_portable (~1 s)) THE SKILLS ARE LOCKED TO THE DOCS (14z-114): the
+#   MiSTer pair `[MSC]`/`[MSV]`, the CPS-2 pair `cps2-hardware` `[CPH]` /
+#   `cps2-emulation` `[CPE]`, the game skill `vampire-savior-engine` `[VSE]`
+#   (anchored in `engine_internals.md`, `game/gotchas.md` and the atlas;
+#   forbids port vocabulary), and the port skill `vampire-saved-port` `[VSP]`
+#   (161 rules anchored in CLAUDE.md, HANDOFF, both gotchas, the
+#   porting/manifest/triage/hardening/registry docs and — ONLY under "STANDING
+#   PRINCIPLE" / "THE DEADNESS REGISTER", because the file rolls — STATE.md),
+#   table-driven per prefix. `tools/checkskills.py`: every `- [PFX-N]` rule in
+#   `.claude/skills/*/SKILL.md` is anchored exactly once (`[MSC-N]` at the doc
+#   paragraph it distils) and every anchor has a rule; the level-1 skill names
+#   nothing game-specific (`mister_scope.md` §1); every number a skill quotes
+#   appears in a LOG (`platform/mister.md`, `mister_map.md`, `mister_fit.md`,
+#   `mister_field.md`, `release_format.md`, the gotchas, `BITSTREAM.txt`) and
+#   never only in the synthesis. Cross-references `[PFX-N]` between skills
+#   must name a defined rule. Extractors self-tested; eight must-fire controls
+#   on a perturbed copy (unanchored rule ×2, stripped anchor, a game name in
+#   level 1, a port token in the game skill, an uncited number, a dangling
+#   cross-reference, a VSP anchor in STATE outside the standing sections).
+#   Editing an anchored paragraph: keep the marker with the fact, or move the
+#   rule
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

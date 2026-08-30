@@ -52,6 +52,16 @@
 #
 # Emulator tier (MAME, four ~2.5 min legs in parallel). Usage:
 #   ROMDIR=... [FREEZE=1] tests/test_advancing_guard.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-123 (inferred_claims row 8): the 0x27082/0x2797A step family is the
+#   ADVANCING GUARD (guard push), NOT a throw mash-escape: a grounded block
+#   opens a 14-tick window +0x1AB, button presses feed +0x170, the ATTACKER is
+#   pushed 91/115/157 px (lists byte- identical vsavj PRG:0x02871C). vs2 fires
+#   at a weighted >=10, vsavj +1/ press with an RNG roll below 8. Four legs
+#   (vs2 + vsavj), 44 frozen lines; FREEZE=1; rig = name_moves victim part 4
+#   (regeneration-checked). ~3 min.
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 : "${ROMDIR:?set ROMDIR}"

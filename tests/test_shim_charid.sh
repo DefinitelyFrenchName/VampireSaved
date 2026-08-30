@@ -27,6 +27,20 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] tests/test_shim_charid.sh [build] [id]
 #   build defaults to build/m5_wide, id to 0x13 (donovan-m3a).
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-77 (M3b slice G): the init shim can identify WHICH tenant it runs for
+#   — (0x382,A6) already holds the character id at char-init. That was an
+#   ASSUMPTION the merged shim's per-id flavor chain rests on. (F2 FIXED
+#   14z-82: the merged shim is assembled at engine_here and planted on EVERY
+#   declaring tenant's row, each chain block exiting into its OWNER's handler;
+#   audit_merged_legacy section 0 asserts HENT==SHIM. The id-read finding here
+#   is what the chain rests on.) Measured on BOTH player structs ($FF8782 and
+#   $FF8B82 = 0x13), 2 replays. NEEDS THE FORCED-PICK POKES: replay 11 never
+#   forms a Donovan match and returns a meaningless zero, so section 0 proves
+#   the probe is armed before any verdict. Verdict control: offset +0x000 must
+#   NOT read the id. ~44s. Defaults build/m5_wide, id 0x13
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

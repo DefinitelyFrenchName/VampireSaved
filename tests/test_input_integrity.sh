@@ -25,6 +25,12 @@
 # check now compares only bits the harness can drive.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] tests/test_input_integrity.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   ground truth for the input-integrity check: silent on clean runs, catches
+#   a stray un-scripted press at the right frame. MAME's window takes focus
+#   even under -video none, so host keys reach the emulated controls
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

@@ -28,6 +28,17 @@
 # no Verilator — about two minutes.
 #
 # Usage: ROMDIR=... tests/test_obj_records.sh [build-dir]
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier MAME only, ~2 min) ground truth for `tools/oram_obj_records.py` —
+#   the byte-level OBJ-list walker reproduces `tests/lua/obj_records_dump.lua`
+#   BYTE FOR BYTE on the same ORAM bytes (1153/1153 lines at the frozen tenant
+#   anchor). Two must-fire controls: a one-bit tile-code change alters the
+#   records; an impossible page offset is REFUSED. CPS-2 ORAM is DOUBLE-
+#   BUFFERED with a runtime page select — the walker reports the terminator so
+#   live/idle pages are distinguished, never assumed. No fixture committed
+#   (ORAM is ROM-derived, rule 7)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

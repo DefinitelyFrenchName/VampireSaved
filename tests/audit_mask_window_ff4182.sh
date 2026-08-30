@@ -29,6 +29,11 @@
 # the window family for a new palette-block port (Huitzil/Pyron).
 #
 # Usage: ROMDIR=... tests/audit_mask_window_ff4182.sh [rompath_dir]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   on-demand: proves the masked palette-staging window hides the designed
+#   diff and nothing else
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

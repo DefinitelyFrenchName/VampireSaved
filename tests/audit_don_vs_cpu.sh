@@ -32,6 +32,14 @@
 # Usage: ROMDIR=... [BUILD=build/m3b_merged15] [FRAMES=40700]
 #        [LEGS="phobos bishamon pyron"] tests/audit_don_vs_cpu.sh
 # ~18 min per leg (one guarded marathon each). On-demand.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-110 (#111): deterministic Donovan-vs-CPU-{Phobos,Bishamon,Pyron} via
+#   the venue byte $FF8121 (0x02/03/05), liveness-asserted, guard-clean.
+#   Closes the coverage gap #99 fell through. Emulator, ~18 min/leg. NOTE #99
+#   does not reproduce here on MAME (P1-mash) — the gate is COVERAGE, not a
+#   crash lock.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

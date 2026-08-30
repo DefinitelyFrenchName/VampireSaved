@@ -28,6 +28,15 @@
 # dirs are not touched.
 #
 # Usage: ROMDIR=... tests/test_m3a_reproducible.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   M3b Phase 0 gate: ALL FOUR frozen references (donovan-m3a 4b7d0dc7 /
+#   m5_stock 6c93cfa8 / huitzil-m2 9deda080 / pyron-m2 69e8c6f0) rebuild bit-
+#   exact from the tree (scratch dirs). Extended from the original PAIR in
+#   14z-76; its value scales with the count — three independent tenant
+#   fingerprints are three independent oracles over one refactor. Needs only
+#   ROMDIR, no emulator. ~4 min. Run after EVERY M3b machinery commit
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

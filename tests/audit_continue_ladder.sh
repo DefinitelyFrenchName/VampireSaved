@@ -50,6 +50,19 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged11]
 #        tests/audit_continue_ladder.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-98 (4), GitHub #102 (CLOSED 2026-08-19, maintainer-ruled NOT OURS —
+#   this is now the REGRESSION LOCK, keep running it): THE DISCRIMINATOR —
+#   does a loss+continue reset the arcade ladder's in-use mask ON PRISTINE
+#   VANILLA with a legacy character? Measured YES: vanilla venues 06->0E->12,
+#   loss, continue (~960f, $8004=000E), mask 1->0, pool restarts 04->0A->06 (a
+#   repeat); merged same mechanism (0x401->0). Both #102 symptoms = the
+#   vanilla envelope; the tenant correlation = "switching requires
+#   continuing". Leg A red would mean the behavior was OURS — reopen 102. NO
+#   kill pokes by design (audit_kill_poke_shape). Venue VALUES are lottery
+#   draws; the RESET SHAPE is the assertion. ~20 min, 2 parallel marathons.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

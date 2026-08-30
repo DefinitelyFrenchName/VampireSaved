@@ -24,6 +24,19 @@
 #   3  NEGATIVE CONTROL: a copy with one id byte changed FAILS section 2
 #
 # Usage: ROMDIR=... tests/test_attract_roster.sh
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier ci_static (~2 s, ROMDIR)) THE ATTRACT-DEMO ROSTER (14z-118, the
+#   ram.md audit): the assigner `PRG:0x005BEA` (demo counter `RAM:$FF1E2A`,
+#   `#$e` mask, x2) and its 8 x 4-byte table `PRG:0x005C08` — Jedah v Victor,
+#   Gallon v Bulleta, Q-Bee v Bishamon, Lilith v Zabel, Anakaris v Sasquatch,
+#   Demitri v Morrigan, Aulbath v Felicia, Lei-Lei v Anakaris, with venues —
+#   decoded from the opcode view and frozen; every base id once per column,
+#   none in the variant half, so a tenant never changes attract. Dynamic twin:
+#   40,000 vanilla attract frames traced
+#   (`build/attract_roster_trace_14z118.log`), all eight in table order. One
+#   negative control (a tenant id planted in the table must fail)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -32,6 +32,13 @@
 # "vanilla cannot". A tenant must still avoid 0x18.
 #
 # Usage: ROMDIR=... tests/audit_id_writers.sh [outdir]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   on-demand (22 MAME runs): every character-id VALUE vanilla ever assigns,
+#   both player structs. Fails if any legacy gameplay path writes an id in
+#   0x10-0x1F — the invariant that would make a tenant on a variant id
+#   superset-safe by construction
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

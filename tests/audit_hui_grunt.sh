@@ -31,6 +31,22 @@
 # re-freezing: that would be the alternation phase moving, not noise.
 #
 # Usage: ROMDIR=... [BUILD=build/m3b_merged11] tests/audit_hui_grunt.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-96: THE ELECTROCUTE-GRUNT A/B over FIVE electrocutions (replay 95, the
+#   x4 rig) — the maintainer's grunt report ROOT-CAUSED: the sound KERNEL's
+#   per-class voice tables (events .0-.3, PRG:0x3BCE/3C3A/3CA6/3D10 + variant
+#   halves at +0x20) have vsavj rows 0x10-0x1F as COPIES of 0x00-0x0F, so
+#   Phobos' every-other-hit voice fires row 0x00's id 0x1d2 (a LEGACY hurt
+#   cry) where native vs2 fires his own row's 0x2a2 — a FREE Z80 id, i.e.
+#   DELIBERATE SILENCE (the robot does not grunt). PER-BUILD frozen
+#   expectations since the 14z-96 port: merged-m2 = the defect (regression
+#   lock), m3b_merged10 = the fix (02a2, the deliberate-silence id),
+#   m3b_merged11 = the 14z-99 row (kernel rows untouched by the window) — all
+#   green; an unknown build REFUSES until a row is frozen; GRUNT_OURS_A2
+#   rehearses. Static half: test_kernel_voice_tables (ci_static). ~3 min, 2
+#   MAME runs
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

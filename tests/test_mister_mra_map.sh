@@ -63,6 +63,19 @@
 # (CLAUDE.md rule 7).
 #
 # Usage: ROMDIR=... tests/test_mister_mra_map.sh
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier ci_static (~15 s)) SLICE D0: the WIDE `.rom` is EXACTLY
+#   `mister_map.md` §3 — 66,265,152 B, header words 6144/6400/15552/64704,
+#   every region 1 KiB-aligned and byte-for-byte the romset's, the trimmed
+#   QSound region a PURE truncation. Also: the stock `vsavj` MRA from `cps2w`
+#   == `cps2`'s except `<rbf>`, `cps2` emits NO WIDE MRA (the `cps2w.cpp`
+#   sourcefile gate), stock `vsavj.rom` still BIT-IDENTICAL (46,407,744 B,
+#   sha1 `f9dc2987…`), and the fork's catalogue entry names the CURRENT
+#   build's CRCs. TWO must-fire controls: untrimmed -> 73,670,720 B /
+#   `qsnd_start` 71,936 KiB (and the generator SILENTLY writes the wrapped
+#   word); `length` +0x400 -> the frozen table fails
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

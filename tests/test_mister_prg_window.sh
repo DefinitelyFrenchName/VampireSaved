@@ -46,6 +46,20 @@
 #         [--frames N] [--build DIR] [--rpl FILE]
 #         [--pos-log DIR --neg-log DIR]   re-analyse two finished run dirs
 #         [--freeze]                      rewrite the frozen expectation
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier manual/emulator (~2 x 40 min)) THE MEASURED PAIR, FROZEN. Runs
+#   `11_pick_donovan` on `cps2w` with the WIDE romset twice, on `.rom` images
+#   that differ in ONE BYTE (header 41 `0xFE`/`0xFF`), and freezes the probe's
+#   own last per-frame report for each leg in
+#   `tests/expect/mister_prg_window.txt`. Structural assertions independent of
+#   the frozen numbers: `wide_en` really is 1 and 0; the must-fire count below
+#   `$400000` is in the tens of millions in BOTH legs; the CONTROL leg
+#   completes exactly ZERO reads above `$400000` (the decode is gated by
+#   construction); and both legs issue the same number of 68k bus READ cycles
+#   into the window. `--pos-log DIR --neg-log DIR` re-analyses finished runs;
+#   `--freeze` rewrites the expectation deliberately
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

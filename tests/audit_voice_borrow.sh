@@ -38,6 +38,20 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] tests/audit_voice_borrow.sh [builddir]
 # Default build: build/don_m5. ~6 min (2 MAME runs).
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-87 (~6 min, 2 MAME runs): THE VOICE-CLASS BORROW mechanism gate — the
+#   sword-plant "ding" frozen as its LOTTERY-PROOF invariants (the fired id
+#   varies run-to-run with the QSound-latch phase, so no single id is frozen):
+#   static table facts (0x00B268/0x00BB68, tenant rows alias 0x03, vs2's
+#   Victor row lists 0x13), the serialized single-run write+read on $FF8782
+#   (writer must be PRG:0x0AEF6; the dispatcher must read the SAME value —
+#   tests/lua/read_tap.lua, the anti- cross-run-correlation instrument), and
+#   the ring-window membership over the WHOLE candidate family. 2 verdict
+#   controls. Default: own-class on build/don_m10 (14z-103; the b+c fix ships
+#   in every current build); VOICE_BORROW_EXPECT=lottery vs build/don_m4 = the
+#   ground-truth- failing pre-fix pair
 set -eu
 
 BUILD="${1:-build/don_m18}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b

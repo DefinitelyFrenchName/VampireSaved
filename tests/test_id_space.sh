@@ -29,6 +29,11 @@
 #     sites — the evidence that widening the folding sites is the fix.
 #
 # Usage: ROMDIR=... tests/test_id_space.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   freezes the id space: 0 out-of-range variant rows, the 5 sites that fold
+#   the id to 4 bits, and vsav2's 2-fold/6-widened reference shape
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

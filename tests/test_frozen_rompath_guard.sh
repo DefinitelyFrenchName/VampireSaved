@@ -29,6 +29,15 @@
 # protects would be worse than the defect.
 #
 # Usage: ROMDIR=... tests/test_frozen_rompath_guard.sh   (~4 min, no emulator)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-90 (issue #26): build_donovan.sh must refuse to replace one track's
+#   packed set with the other's under the same name (`run_battery_m2.sh
+#   build/don_m5` would repack STOCK over the registered WIDE reference).
+#   Track-mismatch check, NOT a frozen-reference check — the latter would
+#   block HANDOFF's own documented `build_donovan.sh 6 build/don_m4` recipe.
+#   Runs on a COPY. ON-DEMAND, ~8 min (two real builds)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

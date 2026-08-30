@@ -15,6 +15,20 @@
 # zero (or a total) into something that is NOT the number the audit is
 # reporting, and collapsing any of them into OK is how a decayed instrument
 # reads as a result.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-93: ground truth for the hit-class probe's VERDICT LOGIC
+#   (tools/classify_hitclass_probe.py), which decides whether a census zero
+#   means "the tenant stayed inside vanilla's 64 entries", "no rig produced
+#   the event" or "the rig died". 15 cases: the three real verdicts, the four
+#   states that are NOT a zero (DEAD / CRASH / CAPPED / absent log), and the
+#   ways it could be quietly wrong — D0 is the RAW index here (index*4 at the
+#   obj_hook sites, so a "fix" that divides would make 0x44 vanish), the low
+#   WORD is the index and a stale high word must be masked, while a LARGE low
+#   word is a real trap and must not be. Written first and it CAUGHT ITS
+#   AUTHOR: the high-word fixture encoded the wrong width. No ROMs, ~1s; in
+#   ci_portable
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -43,6 +43,24 @@
 #
 # Usage: ROMDIR=... [BUILD=build/m3b_merged9] tests/test_hui_electrocute.sh
 # ~2 min (4 MAME runs, parallel).
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-95: PHOBOS AS THE ELECTROCUTE VICTIM, ours vs native vsav2 — the
+#   consumer for replay 93. STATE said TWICE (14z-74/76) that no replay
+#   produced an electrocute; this is the first. TRIGGER FROM THE MAINTAINER,
+#   not derivable from the tree: Victor's HELD HP, a CHARGEABLE NORMAL. TWO
+#   PAID-FOR TRAPS ENCODED: (a) the class is 0x07, NOT 0x06 — 0x06 is the
+#   remapped TRAP DOME's route into the same shake handler (14z-85g(2)), so a
+#   gate on 0x06 reports "no electrocute" while producing one; (b) a SHORT
+#   press is the QUICK version — the rig's first draft landed a hit (288->275
+#   both legs) and produced an ordinary reaction, so the quick 6+HP is kept as
+#   a standing NEGATIVE control. Section 3 freezes the ring inventory across
+#   the electrocute window only, where the sole delta is the documented
+#   010a/010b cosmetic pair. DELIBERATELY NOT ASSERTED: the two extra Phobos
+#   voices (0x8e/0x91) measured PRE-match — a +0x382 poke confound is open on
+#   the native leg, so freezing them would ratify a possible rig artifact. ~2
+#   min
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

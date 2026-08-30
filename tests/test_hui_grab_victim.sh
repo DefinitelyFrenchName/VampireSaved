@@ -37,6 +37,17 @@
 # Usage: ROMDIR=... [GRAB_VICTIM_EXPECT=differs|matches] \
 #            tests/test_hui_grab_victim.sh [wide-builddir]
 #        (defaults to build/hui25)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   grab-victim placement A/B (14z-73): native vsav2 vs the build, replay 80
+#   through field_trace.lua, comparing the victim offset RELATIVE to the
+#   attacker (dx=p2x-p1x — cancels the ~21px global camera shift, so NO corner
+#   rig is needed). Refuses to judge unless both legs grabbed (seq 0x0E + 0x13
+#   dmg); 2 verdict controls. GRAB_VICTIM_EXPECT=matches (default since
+#   14z-103; the 14z-73 grab_hold_keyframes fix is what it guards, Δ=0) |
+#   =differs reproduces the pre-fix ~109px teleport (needs a pre-14z-73
+#   build). Checker tools/check_grab_victim.py. Defaults hui46
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

@@ -28,6 +28,17 @@
 # drift in a file no patch touches cannot hide either.
 #
 # Usage: tests/test_fbneo_tree_integrity.sh   (no ROMs, no emulator, ~5s)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-90 (issue #36): emu/fbneo must be EXACTLY the pinned commit + the two
+#   tracked patches. Reconstructs from `git archive PIN` + `git apply` and
+#   compares WHOLE FILES, because `git apply -R --check` only validates hunk
+#   context and accepts an edit a few lines away. Also checks the changed-file
+#   inventory, so drift in an untouched file is visible. Run it AFTER
+#   regenerating the patches, not before a build — a hard gate ahead of an
+#   untested change is rule 2 backwards. + _control.sh (5 cases) No ROMs, no
+#   emulator, ~5s / ~20s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

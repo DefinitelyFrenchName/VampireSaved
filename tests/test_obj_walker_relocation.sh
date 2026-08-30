@@ -30,6 +30,14 @@
 #
 # Usage: tests/test_obj_walker_relocation.sh [builddir]   (default build/don_m5)
 #        No emulator, no ROMDIR beyond the decrypted view. Seconds.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-91: the relocation is STRUCTURALLY what it claims, from patch.json
+#   alone — dispatch sites covered by NO op, walker bytes verbatim, table
+#   vanilla-prefixed, the copy's own pc-relative dispatch resolving to its own
+#   table, and every caller a 4-byte OPERAND write at caller+2 with 4EB9
+#   untouched. 2 verdict controls. ROM-free, seconds
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 # DEFAULT RE-POINTED 14z-92: was build/don_m5, which PREDATES the 14z-91

@@ -21,6 +21,10 @@
 # 15612, huitzil 15034, pyron 14225 tiles, and not one gained or lost. The
 # bug was latent — which is exactly why it needs a gate rather than a
 # rebuild to keep it fixed.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #51) Both record walkers examine the last long that fits.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

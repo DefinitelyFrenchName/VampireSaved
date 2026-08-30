@@ -32,6 +32,17 @@
 # Env: MAME_WIDE_BIN overrides the WIDE MAME binary
 #      (default ~/.cache/vampire-saved/mame/cps2). SKIP_RUNTIME=1 skips
 #      section 3 (e.g. no WIDE emulator on this machine).
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   M3a select-records mechanism (14z-62): a variant-id build carries the
+#   tenant's OWN six select records (space-model allocations, six array rows
+#   poked) and the host's select-family program bytes are VANILLA. Static re-
+#   derivation + verdict-logic negative controls + the engine's own row fetch
+#   onto cell 0x13 (replay 36, WIDE MAME). Self-builds at 0x13 unless given a
+#   build. 14z-88: reads the mask from the current set; the splash section
+#   matches the CPU opponent's RNG ladder draw as VANILLA (was pinned to one
+#   draw and went stale silently — run it in batteries)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

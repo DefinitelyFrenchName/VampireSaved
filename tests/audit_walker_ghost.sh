@@ -40,6 +40,19 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [JOBS=8] [--freeze] tests/audit_walker_ghost.sh
 # ~5 min (corpus-wide debug runs, JOBS-parallel).
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-91: WHERE does each object-pool walker's `jsr (A0)` push its return
+#   address, and is that longword inside the masked dead-stack window? THE
+#   measurement that gates the walker relocation — it is the single piece of
+#   state the move changes. Measured A7 = 0xff7ff6 CONSTANT at BOTH walkers
+#   over 279,577 dispatches in all 49 corpus replays, so the push lands at
+#   0xff7ff2-0xff7ff5, inside $FF7F00-$FF7FFF. Frozen in
+#   build/manifest/walker_ghost.toml. FAILS rather than widening anything: the
+#   header says widening the mask is NOT the remedy. Cross-check: the dispatch
+#   counts reproduce dispatch_census.toml exactly on a different register. ~5
+#   min
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

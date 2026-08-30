@@ -33,6 +33,15 @@
 #
 # Static, no emulator, ~5 s warm / ~25 s on a cold decrypt cache.
 # Usage: ROMDIR=... tests/test_kernel_voice_tables.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-96 (GitHub #101, ci_static): the KERNEL per-class voice tables —
+#   vsavj's variant halves are byte-copies (the grunt's alias shape), vs2's
+#   carry the newcomers' real rows (frozen verbatim), the event-nibble law on
+#   all 256 entries, and 0x2a1/0x2a2 FREE in both games' Z80 tables (the
+#   silence premise). 2 verdict controls. Static, ~5 s warm. Dynamic half:
+#   audit_hui_grunt + replay 95
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; export REPO
 ROMDIR="${ROMDIR:?set ROMDIR}"

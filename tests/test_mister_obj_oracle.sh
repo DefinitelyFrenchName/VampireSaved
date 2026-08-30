@@ -34,6 +34,23 @@
 # Usage:
 #   ROMDIR=... tests/test_mister_obj_oracle.sh                  # runs both legs (~65 min)
 #   tests/test_mister_obj_oracle.sh --sim-dir D --mame-log F    # re-analyse finished runs
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier manual/emulator (~65 min; `--sim-dir/--mame-log` and `--select-sim-
+#   dir/--select-mame-log` re-analyse finished runs)) THE OBJ-LIST ORACLE
+#   (14z-109) — the first cross-implementation agreement on a video-
+#   determining surface. VRAM was ruled out (implementations legitimately
+#   differ there); the OBJ list is what the 68k BUILDS. Match anchor: the
+#   PROMOTED (y-bit-12, group-C) subset — the port's own sprites — is 31
+#   entries on BOTH legs, ORDERED AND FIELD-FOR-FIELD IDENTICAL, 19-bit
+#   addresses the same set (`0x4b0c4-0x4ecda`); the unpromoted remainder is
+#   the CPU-opponent LOTTERY and is reported, never asserted. Select screen
+#   (section 3, no opponent so no lottery): promoted subset exact on ALL 81
+#   frames, whole list 55/81 with every shortfall in the unpromoted part, and
+#   the authored M6 mark (codes `fe40/fe41`, pal row 0x19) IDENTICAL across
+#   implementations. Must-fire: a one-bit promoted-code change turns 1c/1d red
+#   (verified end to end); 3z fails if the select list is CONSTANT
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

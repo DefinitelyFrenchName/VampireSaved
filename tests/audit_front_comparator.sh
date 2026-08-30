@@ -36,6 +36,14 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=mame] tests/audit_front_comparator.sh
 #        ~1 MAME run, ~3 min. Vanilla vsavj — no build dir needed.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-123 (inferred_claims row 4): what RAM:$FF8127 is — the FRONT/BACK
+#   draw- order selector: writer PRG:0x02228E compares byte +0x10 of each
+#   fighter's current ANIM NODE (a per-pose depth key, 19-value vocabulary
+#   frozen); identity exact on every non-capture frame of replay 37 (5,486/0).
+#   Pristine vsavj, reference MAME, ~1 min.
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

@@ -26,6 +26,17 @@
 #   C. B's fixture + a doctored vsav2.zip whose group A carries ONE strip
 #      tile's group-B bytes -> REAL drops to exactly 287 (per-tile
 #      identity detection, not range matching).
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-83 (M3b Phase 3 S0): the COMPLETE merged group-C write-set census
+#   (tools/audit_gfx_merged.py) — every build_gfx pass, both banks, incl. the
+#   side inventories test_gfx_layout3 is blind to (strip/extra/effect_map/
+#   bank-5 sets). Byte-compares every colliding dst at source. Freezes: the
+#   ONLY real collision = H's 288 strip dsts 0x5EA0-0x5FBF inside P's band
+#   (the S3 relocation target — flips to ZERO when it lands); occupancy
+#   45,449/65,536; pools EMPTY. Two comparator verdict controls (must- fire
+#   both directions). Static, ~3min
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

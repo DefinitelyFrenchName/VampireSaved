@@ -13,6 +13,12 @@
 # never re-converges, which would mean match state was touched.
 #
 # Usage: tests/test_compare_window.sh   (no emulator, no ROMDIR)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   ground truth for the §4 v3 "bounded re-convergent window" class: accepts
+#   the select-screen shape; rejects flicker, a drifting onset, a run that
+#   never re-converges, and a silently-identical pair. No emulator needed
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

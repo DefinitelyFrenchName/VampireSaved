@@ -70,6 +70,30 @@
 # Usage: ROMDIR=... tests/test_fbneo_legacy_oracle.sh [build] [replays...]
 #   env FBNEO_REF  optional reference (WIDE=0) fbneo binary for leg A
 # ~5 min.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-92 (GitHub #78 PARTIAL): the HACKED build's legacy content vs VANILLA,
+#   on FBNeo. CLAUDE.md §4 defined this oracle and the suite did not run it:
+#   FBNeo had the emulator superset invariant on PRISTINE vsavj + dual-track
+#   inertness, and the hacked-build legacy comparison lived on MAME — never
+#   their product. 4 replays x 5 frames (14z-110b: 26_don_arcade_mash DROPPED
+#   for 05_timeout_idle, frames are measured-clean OVERRIDES — the d2-window
+#   cycles moved FBNeo's phase; 14z-115: 05's fifth instant 8300 -> 9500, re-
+#   scanned on don_m15 — the wheel's three extra OBJ entries per select frame
+#   re-rolled the phase again, MAME exact at the same frame; gate header);
+#   otherwise SAMPLE FRAMES ARE DERIVED from each replay's frozen MAME spec
+#   and pushed clear of every ratified flicker/window, so a mismatch is FBNeo-
+#   only by construction. Set resolved from the build, never pinned. FBNEO_REF
+#   makes leg A a true reference binary; without it leg A runs vanilla on the
+#   patched binary and the claim is completed by test_wide_profile (named in
+#   the header, not assumed). 3 comparator controls incl. one proving the mask
+#   is APPLIED. FOUND ON ITS FIRST RUN, both cross-checked against MAME at the
+#   same frame (MAME: 0 diffs): $FF055B-$FF055D (sound-driver work area,
+#   ram.md:74) and $FF06D1/D4/DB (OBJ-builder secondary stack, ram.md:62
+#   "execution POSITION, not state"). Reported as `open:` — MEASURED
+#   DEVIATIONS AWAITING A RULING, bounded to two named windows; anything
+#   outside FAILS. FBNEO_ORACLE_EXPECT=exact is the post-ruling target. ~5 min
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

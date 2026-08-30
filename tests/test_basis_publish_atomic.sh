@@ -20,6 +20,11 @@
 # is a stub that fabricates deterministic logs and can be told to fail on a
 # named replay, on the second run only, or to return different bytes each run.
 # Section 0 proves the harness actually drives the real file.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #86) A masked basis publishes whole or not at all. Drives
+#   the REAL script symlinked into a fake repo with a stubbed MAME runner.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

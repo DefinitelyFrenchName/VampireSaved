@@ -21,6 +21,14 @@
 #      rather than a flicker: tests/expected/donovan-m8-stage4/README.md.
 #
 # Usage: ROMDIR=... tests/test_m2a_stage4_code.sh [outbase]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   stage-4 gate: veto lock + guarded moveset + masked legacy gate. 14z-97
+#   (#96): the legacy target is RESOLVED from the build's fingerprint
+#   (registry.tsv), so it follows each freeze — today donovan-m9-stage4, V2
+#   basis. It used to pin donovan-m2c + the V1 basis + three first-divergence
+#   constants.
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

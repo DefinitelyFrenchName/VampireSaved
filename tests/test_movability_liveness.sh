@@ -24,6 +24,14 @@
 # when the rig is genuinely alive.
 #
 # Usage: ROMDIR=... tests/test_movability_liveness.sh   (no emulator, seconds)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-90 (issue #5): ground truth that tests/audit_region_movability.sh
+#   cannot score a DEAD emulator as `runs`. Injects stub builder/runner via
+#   BUILDER_CMD and GUARDED_RUNNER: never-started and empty-log rigs must FAIL
+#   and be named `dead`; a live rig must still score `runs`. Pre-fix the same
+#   rig exited 0 and printed the budget claim. ROMDIR, no emulator, seconds
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

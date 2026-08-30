@@ -19,6 +19,19 @@
 # changed must regenerate DIFFERENTLY from the committed page.
 #
 # Usage: tests/test_tables_current.sh   [DON=build/don_m18 HUI=build/hui52 PYR=build/pyron36]  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier ci_static (~1 s; SKIPs without the three solo build dirs)) THE
+#   COMMUNITY TABLES FOLLOW THE BUILD (14z-118):
+#   `docs/project/tables/{donovan,huitzil,pyron}.md` are rendered by
+#   `tools/tables_char_md.py` from each current solo build's
+#   `extract/regions.json` + `bank_map.toml` (inputs' SHA-1s, shifts, regions
+#   with SHA-1s, dispatch targets, VS2-vs-VH2 variant sites, the per-character
+#   VALUE rows = the tunables of CLAUDE.md §2 rule 5); the gate regenerates
+#   and `cmp`s, failing on drift. One must-fire control (a perturbed `word132`
+#   must regenerate differently). Defaults `DON/HUI/PYR` = the current solos
+#   (re-point sweep). Regenerate the three pages in every freeze commit
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

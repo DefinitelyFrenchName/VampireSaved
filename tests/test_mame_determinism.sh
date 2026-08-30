@@ -30,6 +30,11 @@
 # Usage:
 #   ROMDIR=... [MAME_BIN=...] [RUNS=60] [SET=vsavj] [PROBE=<rpl>] \
 #     tests/test_mame_determinism.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   RUNS=/JOBS=/PROBE= repetitions; measures the run-to-run divergence rate
+#   the whole oracle assumes is zero (see STATE 14z-59)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

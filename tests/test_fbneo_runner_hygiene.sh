@@ -23,6 +23,13 @@
 # with the rest of the FBNeo cluster behind #36.
 #
 # Usage: ROMDIR=... tests/test_fbneo_runner_hygiene.sh   (no ROMs used, ~5s)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-90 (issue #12, shell half): a FAILED FBNeo run must not leave the
+#   previous run's log/.tap/side-channel outputs behind, because the
+#   completion check is an ARTIFACT check (grep ^END). Measured pre-fix: rc=1
+#   but $OUT still present with its old content. ROMDIR, ~5s
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

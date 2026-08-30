@@ -31,6 +31,18 @@
 #            pass just as well on a build where the flag did nothing.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21] tests/test_shadow_tenant.sh  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-116 (~6 min, 2 MAME runs): SHADOW MORPHING INTO A TENANT. The "?" cell
+#   + FIVE START PRESSES arms $43 (PRG:0x020CB0 — presses, not a hold);
+#   confirm sets $3BC; at the ROUND END PRG:0x009BB2 gives the flagged winner
+#   the LOSER's id, UNMASKED. Asserts P1 beats tenant Donovan and becomes id
+#   0x13 with DONOVAN'S OWN record 0x003FA9D0 — the point is that it is NOT
+#   Victor's 0x0009769E, the shell 0x13 aliases (the quiet failure the
+#   maintainer named). Must-fire control: the same replay with FOUR presses
+#   must not arm, not set $3BC and not morph. Replay 113; only the FIRST morph
+#   is deterministic (the arcade draw is a lottery past ~8500).
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

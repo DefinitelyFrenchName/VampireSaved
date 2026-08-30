@@ -22,6 +22,11 @@
 # A MISMATCH IS FATAL; an ABSENT identity is a warning, because several gates
 # build synthetic patches inline and those are legitimate. Section 4 pins that
 # asymmetry so it stays deliberate.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #18) A patch applies only to the source set it was
+#   verified against. **Not portable.**
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

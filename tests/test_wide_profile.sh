@@ -26,6 +26,11 @@
 #
 # Usage:
 #   ROMDIR=... [FBNEO_REF=/path/to/pre-wide/fbneo] tests/test_wide_profile.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   WIDE profile gate: emulator superset invariant + inertness + the B4 canary
+#   (needs FBNEO_REF)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

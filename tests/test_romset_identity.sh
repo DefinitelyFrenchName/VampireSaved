@@ -18,6 +18,13 @@
 #   4. nothing patched at all          -> PASS  (no false positive)
 #
 # Usage: ROMDIR=... tests/test_romset_identity.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   ground truth for tools/audit_romset_identity.py: no member may carry the
+#   PRISTINE bytes of a member the build patched (both emulators resolve a ROM
+#   entry by hash before name, so such a member silently reverts the patch —
+#   14z-60z). 4 synthetic sets, no emulator, ~1s
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

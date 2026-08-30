@@ -25,6 +25,13 @@
 # operator can silently switch off.
 #
 # Usage: ROMDIR=... tests/test_suite_dispatch_selftest.sh   (no emulator, ~10s)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-90 (issue #7): ground truth for the kind->owner table in
+#   tests/test_suite_dispatch.sh. Three negative controls: an unlisted kind,
+#   an owner that no longer reads its kind, and a false battery-chain claim —
+#   each must turn the gate RED and name the reason. ROMDIR, no emulator, ~10s
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

@@ -19,6 +19,14 @@
 # Needs ROMDIR (the vs2 classification oracle) + a build with verify_{data,op}.bin.
 # No emulator, seconds.
 # Usage: ROMDIR=... tests/test_fsm_census.sh [builddir]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-110 (#99): the STATIC object-script node-state census gate. Every
+#   ported node whose +0x17 state byte >= vsavj's 80-entry FSM table is
+#   enumerated (tools/audit_fsm_census.py, family-aware node-record signature
+#   + vs2 classify oracle) and locked to build/manifest/fsm_census.toml. TWO
+#   negative controls. Needs ROMDIR (vs2 oracle). ci_static, seconds.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

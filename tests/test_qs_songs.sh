@@ -16,6 +16,14 @@
 # LIVE id (0x119); (3) refuse a placement over non-zero bytes.
 #
 # Static, no emulator, ~5 s. Usage: ROMDIR=... tests/test_qs_songs.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-86: the authored-Z80-song machinery (WIDE v1.1 vsw.z01/z02 content
+#   members; tools/build_qs_songs.py). Placements == vs2 source bytes, id rows
+#   exact, vanilla-span identity, the b0==0 reachability law, 3 verdict
+#   controls (corrupt byte / live-id refusal / non-zero-span refusal). Static,
+#   ~5 s
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; export REPO
 ROMDIR="${ROMDIR:?set ROMDIR}"

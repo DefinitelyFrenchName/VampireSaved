@@ -15,6 +15,12 @@
 #   5. a window that never re-converges             -> FAIL (the whole point)
 #   6. bit-identical logs                           -> FAIL (asserts existence)
 #   7. a second, unfrozen window appearing          -> FAIL (nothing extra)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   ground truth for the §4 v4 composite class (frozen flicker inventory +
+#   frozen bounded windows, RATIFIED 2026-08-06): 7 synthetic cases + a no-
+#   loophole check. No emulator. donovan-m5w freezes 7 replays in this class
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 WORK="$(mktemp -d)"

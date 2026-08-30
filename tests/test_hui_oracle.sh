@@ -19,6 +19,12 @@
 #
 # Usage: ROMDIR=... tests/test_hui_oracle.sh [rompath_dir]
 #   rompath_dir default: build/hui4/rompath
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   THE vsav2-as-oracle battery (14z-66): the m2a template's 4 locks on H's
+#   full moveset (anchors/neutral-exact/HP-trajectory/ comparative bound); RNG
+#   determinized on both legs. ~10 min, 8 MAME runs
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

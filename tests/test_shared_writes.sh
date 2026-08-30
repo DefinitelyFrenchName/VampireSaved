@@ -29,6 +29,20 @@
 # Static, no emulator, seconds. Builds it cannot find are SKIPPED with a note
 # (a fresh checkout has no build dirs).
 # Usage: tests/test_shared_writes.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-79b: THE FROZEN SHARED-SURFACE WRITE INVENTORY. test_hui_ladder.sh
+#   already requires every op to write free space or a VARIANT ROW — but it
+#   runs stages 1-3, and the row that broke Bulleta was stage 4. Every write
+#   landing on vanilla-readable bytes is frozen per tenant in build/manifest/
+#   shared_writes.toml (D 67 / H 59 / P 50); any addition, removal or change
+#   FAILS, which is the point — it forces someone to establish whose bytes a
+#   new write touches. GROUND-TRUTHED: it flags 0x39acc0 +128 on build/hui27,
+#   the real defect. + 2 verdict controls. HONEST LIMIT, stated in the tool: a
+#   pass means the set is UNCHANGED SINCE REVIEWED, not that the writes are
+#   safe; an entry frozen without checking stays wrong and green. tools/
+#   audit_shared_writes.py. Static, seconds
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

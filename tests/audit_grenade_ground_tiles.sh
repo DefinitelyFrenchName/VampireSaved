@@ -33,6 +33,14 @@
 #
 # Usage: ROMDIR=... [BUILD=build/m3b_merged21] tests/audit_grenade_ground_tiles.sh
 #        2 MAME runs (~4 min). Needs the WIDE MAME binary and a gfx build.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-123 (inferred_claims row 9): the 214+LP ground explosion draws native
+#   vs2's own art tile-for-tile (441 tiles, intersection 441, 0 ours-only, 0
+#   blank; per-CONTENT across every detonation frame — phase-free). Closes the
+#   14z-70e 'most likely fixed' guess. Replay 83d, merged build vs native, ~1
+#   min.
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

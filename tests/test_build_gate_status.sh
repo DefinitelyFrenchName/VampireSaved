@@ -30,6 +30,15 @@
 # control — without the last one, a gate that ALWAYS aborts would pass.
 #
 # Usage: tests/test_build_gate_status.sh   (no ROMDIR, no emulator, ~1s)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-90 (issue #1): ground truth that a REJECTED build aborts the gate
+#   instead of being soaked and stamped PASS. Copies the stage-4/6 gates into
+#   a scratch repo with a stubbed build_donovan.sh; 3 failure modes (reject-
+#   after-pack, stale rompath, no rompath) + a positive control + the sibling
+#   gate. GATE_SRC=<dir> reruns it against the pre-fix gates, where it must
+#   FAIL. No ROMs, no emulator, ~1s
 set -eu
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

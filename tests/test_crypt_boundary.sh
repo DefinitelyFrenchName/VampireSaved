@@ -18,6 +18,11 @@
 # and pins the exact boundary word.
 #
 # Usage: ROMDIR=... tests/test_crypt_boundary.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   code above the encryption window is stored RAW (load-bearing: character
+#   code in the extension)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

@@ -23,6 +23,11 @@
 # .parent`, so a bare /tmp copy would find neither the manifests nor its
 # sibling modules). Section 3 is the systemic half: it fails any NEW test that
 # writes into tools/, which is how this pattern spread in the first place.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #81) No test writes into `tools/`; controls perturb a
+#   `shadow_tools.sh` copy.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -43,6 +43,16 @@
 #
 # Usage: ROMDIR=... tests/test_merged_render_content.sh [merged_rompath]
 #   env MAME_WIDE_BIN (default ~/.cache/vampire-saved/mame/cps2)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-83 (S5): the MERGED render gate — H/P's FIRST render gates anywhere.
+#   Live A/B vs the three frozen solo builds in decoded gfx memory (no frozen
+#   hashes): D 0x4AD8F, H 0x40AF6, P 0x45000, the relocated strip 0x486A0,
+#   group-B pristine at 0x2AD8F, pairwise-distinct check, 4-window poison
+#   control, 3 pick- replay liveness. WINDOW CHOICE IS LOAD-BEARING (header):
+#   merged bank 4 is a UNION — a window holding another tenant's exclusive
+#   codes fails BY DESIGN. ~25 min
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

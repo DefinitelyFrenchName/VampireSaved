@@ -29,6 +29,11 @@
 #
 # Usage: ROMDIR=... tests/test_m2a_stage4_oracle.sh [rompath_dir]
 #   rompath_dir default: build/donovan/rompath (an existing stage-4 build)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   vsav2-as-oracle: anchors/neutral-exact/ HP-trajectory/comparative bound
+#   (17+18 replays)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

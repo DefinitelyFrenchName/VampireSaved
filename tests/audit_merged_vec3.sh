@@ -42,6 +42,17 @@
 # Usage: ROMDIR=... [MAME_BIN=...] tests/audit_merged_vec3.sh [merged_build]
 # Default merged build: build/merged1 (rebuild it with
 # tests/audit_merged_legacy.sh). ~4 min: two guarded MAME runs.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-81: the merged Huitzil satellite anim-base probe — the crash localized
+#   by the measurement above, made rerunnable (~4 min, 2 guarded runs). Probes
+#   the vanilla walker ENTRY (0x15084; the pushed vec3 PC 0x15098 is MID-
+#   INSTRUCTION and probes as a clean zero — the dead-instrument trap, gotcha
+#   filed) on hui29 and the merged build, same object/frame/index, and
+#   compares the base against the placements-derived healthy value. FAILS BY
+#   DESIGN until the fix lands; then it is the regression gate. Rig control:
+#   no PROBE at 2886 on hui29 = rig dead, hard fail
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -21,6 +21,14 @@
 #      a claim until the engine agrees with it (the house lesson).
 #
 # Usage: ROMDIR=... tests/test_select_arrays.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   the select record-pointer arrays (M3a): all THREE UI pieces (portrait
+#   0x26742A, name 0x2675AA, highlight 0x268A02), 32 rows per player with P2
+#   at +0x80, indexed by cell/id with NO 4-bit fold, rows 0x10-0x1F variant
+#   aliases. A tenant at 0x13 costs SIX longs. Static model + a one-byte
+#   corruption control + the ENGINE's own row sequence for each piece. ~13s
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

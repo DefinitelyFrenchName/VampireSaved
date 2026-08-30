@@ -20,6 +20,11 @@
 #      this was first established.
 #
 # Usage: ROMDIR=... tests/test_phasec_image.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   Phase C step 2: image grows to 6MB, WIDE romset shaped+runs, extension
+#   PROVABLY READ (negative control), stock build untouched
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

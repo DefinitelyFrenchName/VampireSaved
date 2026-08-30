@@ -35,6 +35,26 @@
 # what makes its zero in the high window evidence about `wide_en`.
 #
 # COST: two ~75 min legs. EMULATOR tier.
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier manual/emulator (~2 x 75 min)) THE QSOUND EXTENSION FETCHED ON THE
+#   CORE (14z-108) — the last major subsystem of the profile to get any
+#   coverage. Stock CPS-2 cannot address banks `0x80-0x8E` at all
+#   (`qsnd_addr[22:16] <= dsp_ab[6:0]` keeps seven bank bits, so `0x8N` plays
+#   as `0x0N`); reaching them needs D1's width fix AND D2's QSound split.
+#   Counts SDRAM reads into the 1 MB QSound HIGH window while a tenant fights
+#   (`108_tenant_voice.rpl` — walk forward and mash, so attacks CONNECT), and
+#   requires the same image with the profile bit clear to issue NONE.
+#   Measured: 210,180 reads / 76 distinct / first frame 3783, addresses
+#   `0x830AA0-0x83FFFE` = DSP bank `0x83`; control leg ZERO while still
+#   issuing 54,113,994 QSound LOW reads. The window is DERIVED FROM THE RTL
+#   (`PCMH_OFFSET`, `SLOT5_AW`, and which `u_bankN` carries `pcmh_cs`), and
+#   the gate asserts `pcm_addr[22:20] == 0` — the condition that makes the
+#   `SLOT5_AW=20` truncation lossless (Quartus warning 10230). Proven able to
+#   FAIL on four fabricated defects: a leaking control, a zero positive, an
+#   out-of-range address, and a dead liveness probe. Fetched is NOT heard — no
+#   audio has been rendered or compared
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 fail=0; ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }

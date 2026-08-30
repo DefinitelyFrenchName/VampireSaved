@@ -25,6 +25,11 @@
 # THE POSITIVE CONTROL that the instrument still discriminates: region
 # x06cac0, broken on hui11 and fixed in 14z-69i, must stay ABSENT from the
 # inventory. If it ever reappears, the 14z-69i fix has regressed.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #22) The pc-rel DATA-escape set is unchanged since
+#   reviewed. **Not portable** — needs builds + `vsav2_data.bin`.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -29,6 +29,15 @@
 #   5. an unresolvable target -> FAIL naming rule 6, never a pass
 #
 # Usage: tests/test_m2a_flicker_gate.sh   (no ROMs, no emulator, ~3s)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   ground truth for the battery's masked legacy gate. REWRITTEN 14z-97 (#96)
+#   AND ITS PREDICATE INVERTED: it locked "GROWTH fails, a SHRINK does not",
+#   which rested on the battery running on UNFROZEN dev builds. The target is
+#   a FROZEN generation now, so drift EITHER way fails. 5 cases: growth,
+#   shrink, the frozen shape, a required replay with no spec, and an
+#   unresolvable target (must name rule 6). No ROMs, no emulator, ~3s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

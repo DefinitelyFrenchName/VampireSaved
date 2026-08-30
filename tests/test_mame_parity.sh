@@ -34,6 +34,11 @@
 #
 # Usage:
 #   ROMDIR=... [MAME_SRC_BIN=...] [MAME_REF_BIN=mame] tests/test_mame_parity.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   B5 PREREQUISITE: the pinned MAME source build reproduces every frozen
+#   oracle log bit-for-bit (refuses to run on a WIDE-patched binary)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR to the reference-set directory}"

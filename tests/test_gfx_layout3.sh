@@ -20,6 +20,13 @@
 #      measurement (bands, deltas, spans).
 # Drift in any number means the walker, the extraction shapes, or the
 # understanding moved: stop and root-cause, do not re-freeze.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   the 3-tenant group-C layout fact-locks (14z-67, D4): one-source-bank
+#   premise, frozen H/P/D tile inventories, H/P delta-0 disjoint from D's
+#   frozen band by interval, the flip-condition bound. Static, ~90s. Ledger:
+#   build/manifest/gfx_layout3.toml
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

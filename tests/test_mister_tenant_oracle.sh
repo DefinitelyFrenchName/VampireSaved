@@ -50,6 +50,29 @@
 # COST: the sim leg boots from frame 0 at ~1 s per simulated frame, so this
 # gate takes ~65 min and needs Verilator, ROMDIR and the WIDE build. It is an
 # EMULATOR-tier gate, not in ci_portable/ci_static.
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier manual/emulator (~65 min)) THE §4 DUAL-EMULATOR ORACLE ON TENANT
+#   CONTENT (14z-108) — the first evidence that a tenant FIGHTS CORRECTLY on
+#   the core, as opposed to having its art fetched. MAME and `cps2w` run
+#   `36_pick_tenant_cell` on the same WIDE romset; the mapped fields of
+#   `fields_m2a.tsv` must agree at the round-1 match-start anchor and its
+#   follow offsets. This is the case CLAUDE.md §4 wrote the dual-emulator rule
+#   FOR — authored content, no vanilla oracle — and jtcps2w is a third
+#   implementation, so a bug would have to manifest identically in two
+#   unrelated codebases and in Jotego's RTL. Frozen: MAME 2886 / sim 3546 /
+#   skew 660 ± 30, and the skew is the 659-frame WIDE transfer PLUS ONE — the
+#   same +1 the legacy replay shows on a 462-frame transfer, so the boot-phase
+#   offset is a constant rather than a function of content. Asserts P1's
+#   hitbox base is `0x003FA9D0` on BOTH legs — the RELOCATED tenant record; a
+#   core that loaded a legacy character instead fails there, which is what
+#   14z-107 (12) looked like. `p2_hitbox_base` is excluded BY NAME (the sound-
+#   fed CPU draw: MAME `0x000ABD74` vs core `0x0009769E`) and a control proves
+#   that exclusion is LIVE rather than vacuous. The must-fire control perturbs
+#   the TIMER, which is compared but is not an anchor input — a byte-swap
+#   control is weaker because it destroys the anchor and never exercises the
+#   field comparison at all
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 fail=0; ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }

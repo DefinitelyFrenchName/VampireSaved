@@ -18,6 +18,11 @@
 # WHAT IS ASSERTED HERE is the STATIC pairing across the whole tree, so the
 # invariant is checked even for expectation sets no current build dispatches
 # to. run_suite enforces it per-replay at run time; this covers the rest.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #62) Every `.masked` spec cites a basis frozen under its
+#   own mask.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

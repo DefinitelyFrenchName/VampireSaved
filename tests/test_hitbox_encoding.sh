@@ -31,6 +31,21 @@
 # Emulator tier (MAME, ~4 min: two field legs + two -debug legs, parallel).
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/don_m18] tests/test_hitbox_encoding.sh
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier emulator (MAME, ~4 min, four legs in parallel, two of them -debug))
+#   THE HITBOX ENCODING AND THE ATTACK RECORD (14z-120 (5), phase 2): Donovan
+#   on native vs2, `name_moves.py` parts 9/10 (normals that connect, a whiff
+#   ladder, a projectile, the multi-hit Lightning Sword, Ifrit, the column)
+#   under `field_trace.lua` + the `trace_writes.lua` tap on the victim's
+#   `+0x50..+0x55`; asserts the five table pointers (`+0x8C` = attack =
+#   base[4], `+0x90` = push = base[3]), A3 = attack record of the attacker's
+#   node (`hbA>>8`) on every HP write, 8/8 hits on the first overlap frame
+#   under the mirrored-x convention with no whiff overlap (negative control:
+#   the un-mirrored convention), and victim `+0x54` = record `+0x17` on the
+#   fighter, projectile, multi-hit and column paths. Run after any change to
+#   `tools/hitbox_records.py`, the rigs or the extracts
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

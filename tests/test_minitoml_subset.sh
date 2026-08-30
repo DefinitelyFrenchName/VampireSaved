@@ -24,6 +24,11 @@
 # the subset parser has never supported. They are read by hand-rolled `re`
 # parsers in their own tools, not through _minitoml, so they are unaffected
 # either way. A third parsing approach in the tree is its own (unfiled) smell.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #42) The TOML subset refuses dotted headers/keys,
+#   duplicates, signed hex.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

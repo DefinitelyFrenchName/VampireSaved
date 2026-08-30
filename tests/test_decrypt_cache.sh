@@ -16,6 +16,11 @@
 # errors discarded, fallback keyed on `[ -f ]`. A decrypt that dies
 # half-written leaves a file that EXISTS, so the fallback never fires and the
 # test reads a TRUNCATED image. Sections 3 and 4 are that scenario.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #69) the decrypt cache delivers full, correct images; a
+#   TRUNCATED cache is refused, not silently served.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

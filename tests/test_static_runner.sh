@@ -20,6 +20,11 @@
 # Method: a synthetic repo containing stub gates with known verdicts, run
 # through the REAL runner via its registry files — never a copy of its logic,
 # so the classifier under test is the shipped one.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #30) ground truth for `run_all_static.sh`'s PASS/SKIP/FAIL
+#   classifier. Sharpest case: SKIP in PROSE must still count PASS.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

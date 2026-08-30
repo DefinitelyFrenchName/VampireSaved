@@ -27,6 +27,13 @@
 #
 # Usage: tests/test_hitclass_map_thunk.sh   (no emulator; needs the
 # decrypted views in build/out/, ~2 s)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-82b: the f7997 fix body (the projectile hit-class byte map extended to
+#   vs2's 80 entries) reconstructs from the two ROMs; any committed manifest
+#   row must match it byte-for-byte. Notes "not adopted" while the maintainer
+#   re-freeze decision is pending. 2 verdict controls. No emulator, ~2 s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

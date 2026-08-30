@@ -104,6 +104,20 @@
 #          and that is what would mean the profile leaked into engine flow.
 #
 # Usage: ROMDIR=... tests/test_dualtrack.sh [stock_rompath] [wide_rompath]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   dual-track. RE-SCOPED 14z-94, MAINTAINER- RATIFIED 2026-08-17 (GitHub
+#   #95): this row said "WIDE is legacy-IDENTICAL to stock", which 14z-64's
+#   M3a de-substitution made false — the two builds carry DIFFERENT ROSTERS by
+#   construction (m5_stock puts Donovan at 0x0F over Jedah; m5_wide restores
+#   Jedah and takes native 0x13), so every select-reaching replay must differ.
+#   Now: bit-identical UP TO select entry with the onset frozen per replay
+#   (890, 3190 for the mid-attract one, none for 06_test_mode); patched-slot
+#   content differs; and the attract divergence is attributed at its ONSET
+#   (frame 4267, 3 bytes in the P1 effect-channel record pointer) with the
+#   SAME writer PC on both legs — data, not control flow. NOT in any runner
+#   (#30): that is how it stayed red 11 days
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

@@ -23,6 +23,25 @@
 #   B  a new header inserted above an anchor (a section move) must FAIL;
 #   C  a defined rule anchored in a history twin must FAIL as HISTORY;
 #   D  a stray bold token appended to an archive must appear as a new row.
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier ci_portable (~1 s)) EVERY SKILL ANCHOR'S FILE AND SECTION ARE FROZEN
+#   (14z-122, the documentation rationalization pass):
+#   `tools/doc_anchor_census.py` walks every doc `checkskills.py` reads PLUS
+#   the archives it does not (STATE_HISTORY, DECISIONS_HISTORY, NEXT_SESSION,
+#   GOTCHAS, patch_notes, every `*_history.md` twin) and freezes one row per
+#   `[PFX-N]` — id, file, nearest preceding header, list status — in
+#   `tests/expected/doc_anchor_census.tsv`; `--check` diffs it, and hard-fails
+#   a defined rule anchored in a history twin or on two rows. WHY:
+#   `checkskills` asserts "exactly one anchor somewhere in the list", so a
+#   paragraph moved between two files of one list, or to another section,
+#   passes it SILENTLY — control A proves that on the real tree (checkskills
+#   PASSES the move, the census fails it). A doc commit that moves an anchor
+#   reviews the diff and `--freeze`s in the same commit. Four must-fire
+#   controls (between-file move, section move, history-twin anchor, a stray
+#   token in an archive). `--list-files` prints every file this tool and
+#   checkskills read, for copies
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

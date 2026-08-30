@@ -35,6 +35,23 @@
 # early-window poke; every part pins both fighters' X before each event.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [DON=build/don_m18 HUI=build/hui52 PYR=build/pyron36] [TENANTS="donovan pyron huitzil"] tests/test_move_naming.sh   # emulator tier (MAME, ~3 min)
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier emulator (MAME, ~3 min, legs in parallel)) THE MOVE LISTS' CHAIN IDS
+#   ARE WHAT NATIVE VS2 ENTERS (14z-120, phase 1 naming step; all three
+#   tenants since 14z-120 (2)): `tools/name_moves.py gen` regenerates the rigs
+#   (`tests/replays/naming/<tenant>_<part>.{rpl,json}` must match — Donovan 8
+#   parts, Pyron 4, Huitzil 8), runs them on native vs2 (Pyron/Huitzil forced
+#   by the early-window poke, both fighters' X pinned before every event) with
+#   P1's `obj+0x1C` sampled per frame, maps every pointer onto
+#   `anim_nodes.py`'s graph from that tenant's extract and compares each
+#   event's entered-chain list to `tests/expected/move_naming_<tenant>.txt`;
+#   every `table:seq` in `build/manifest/moves_<tenant>.toml` must have been
+#   entered; positive controls Blizzard HP = vs2 `0x283E58` (replay 59) and
+#   Lightning ES = `0x284A64` (replay 56); negative control: a swapped line
+#   fails the compare. Run after any change to a move list's seq ids, the rig
+#   schedules, the decoder or the vs2 extracts
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

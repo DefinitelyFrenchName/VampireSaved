@@ -15,6 +15,18 @@
 # MUST-FIRE CONTROLS on a perturbed copy (RH-9): a new bucket entry must
 # change the render AND appear in it; a hand-edit to the committed index
 # must fail the cmp.
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier ci_portable (~1 s)) docs/GOTCHAS.md IS GENERATED (14z-122):
+#   `tools/gen_gotchas_index.py --check` regenerates the index from the three
+#   buckets' `## ` headers (consecutive `## ` lines are ONE wrapped header,
+#   `[PFX-N]` tokens stripped, `(paid:)` tags kept so a grep that hits the
+#   index hits the bucket; no per-entry slug links on purpose) and `cmp`s it —
+#   the `test_tables_current` pattern. The hand-written index it replaced (ten
+#   `### appended 14z-N` digests + a third abridged copy of the buckets) is
+#   verbatim in `docs/GOTCHAS_history.md`. After appending a gotcha,
+#   REGENERATE: `python3 tools/gen_gotchas_index.py`. Two must-fire controls
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

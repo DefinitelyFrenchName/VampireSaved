@@ -44,6 +44,23 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [JOBS=8] tests/audit_dispatch_census.sh
 # ~2 min (50 short debug runs, JOBS-parallel).
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-89: WHICH type indices does LEGACY ever dispatch at the two obj_hook
+#   sites? Vanilla vsavj over the whole legacy corpus (every replay with a
+#   vanilla basis log), breakpoint per site, D0/4 = the index, SET-accumulated
+#   so a site firing 270k times costs one line. Measured: 0x054470 9 types
+#   observed, 0x05E542 31. FROZEN in build/manifest/ dispatch_census.toml — a
+#   NEW index FAILS. THE COMPLEMENT IS NOT A FREE LIST (corrected 14z-91). It
+#   was read as "50 and 83 indices a tenant type can take over"; a pool-
+#   attributed STATIC sweep (forward from each pool's allocator, 0x16F8E /
+#   0x16FBA) puts the TRUE free lists at 1 and 6. This corpus reaches 9 of 58
+#   real spawn types at one site and 31 of 108 at the other — the same
+#   coverage artefact that falsified list-type 6, ~40x larger. NO REPOINT
+#   SHIPPED ON IT: the 14z-91 fix relocates the WALKER instead (see obj_hook
+#   in patch_index), so tenant types stay above the vanilla entry count where
+#   vanilla cannot reach them BY CONSTRUCTION. ~2 min, JOBS-parallel
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

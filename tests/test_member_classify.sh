@@ -19,6 +19,11 @@
 # THE FIX is that the suffix class excludes `m`. Section 2 is the one that
 # matters: it tests the names that do not exist yet, because the whole point
 # is a path that is inert today and wrong at the next member count.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #19) The PRG suffix class excludes `m` members. **Not
+#   portable.**
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

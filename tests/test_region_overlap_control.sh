@@ -15,6 +15,13 @@
 # an assertion.
 #
 # Usage: tests/test_region_overlap_control.sh   (no ROMs, no emulator, ~2 min)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-90 (issue #9): ground truth that the region-overlap gate's CURRENT-
+#   trio constants can fail. Points section 5 at the superseded trio (must
+#   reject: 2000 vs 2012) and names an absent build (must FAIL, not SKIP),
+#   plus a positive control. No ROMs, no emulator, ~2 min
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

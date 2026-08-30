@@ -28,6 +28,11 @@
 #
 # VERIFIED OUTPUT-INERT before this landed: both delta-0 tenants rebuilt
 # against HEAD with identical arguments, 10/10 files byte-identical each.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #87) `gfx_layout3.toml`'s profile/scatter fields are
+#   enforced, not decorative.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

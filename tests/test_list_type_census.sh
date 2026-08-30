@@ -29,6 +29,14 @@
 # re-run this over that data when it lands.
 #
 # Usage: ROMDIR=... tests/test_list_type_census.sh
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-74: the ONE-SOURCE-BANK re-check per tenant. gfx_layout3 assumes a
+#   tenant's art is one band in one source bank; a list TYPE 4 composes its
+#   OWN bank word and breaks that (Huitzil's beam). Frozen counts: H 26 type-4
+#   (the POSITIVE CONTROL — its first version was blind and read 0 for him), D
+#   1, PYRON 0 (so his delta-0 placement needs no strip-tiles). Static
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

@@ -20,6 +20,11 @@
 #   build (packed as vsavjw) as well as a stock one. The tripwire below is
 #   the SAME either way — and it matters MORE on the WIDE track, which is
 #   where the per-node sfx helper is actually live.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   sound-ring gate: NO vsavj music-range id may be enqueued + frozen per-
+#   replay id inventories (sound is invisible to every other gate)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

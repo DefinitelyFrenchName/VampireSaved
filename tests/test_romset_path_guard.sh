@@ -22,6 +22,12 @@
 # criterion that actually matters. Section 5 is the other half: a legitimate
 # separate-directory build must still work, or "reject everything" would pass
 # every other section here.
+#
+# HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (review-triage, #76) `build_wide_romset` cannot take the reference set as
+#   its own output. The one failure in that file with **no undo** (rule 7
+#   forbids in-tree romset copies).
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

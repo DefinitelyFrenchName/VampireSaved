@@ -21,6 +21,12 @@
 # blur those two.
 #
 # Usage: tests/test_attribute_ramdiff.sh   (no ROMs, no emulator, ~1s)
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-90 (issue #21): attribute_ramdiff must refuse when both logs resolve
+#   to the SAME dump file (MAME dump names are directory-scoped). A genuine
+#   zero-diff between DISTINCT files stays a note. No ROMs, no emulator, ~1s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -24,6 +24,20 @@
 # Usage: ROMDIR=... [MAME_BIN=...] tests/audit_objhook_owner_census.sh [build]
 # Default build: build/hui30. ~6 min: two guarded runs. REPORT-ONLY (exit 0
 # unless the rig is dead): this is a measurement, not a gate.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-81b: which OWNER does each extended obj_hook type (114-120, the multi-
+#   owner x088512 pool family) carry at DISPATCH TIME? The vec3-fix design
+#   measurement, rerunnable (~6 min, hui29 by default, REPORT-ONLY). Measured:
+#   117 carries P1 directly, 119 the creator object (player at depth 2), 115
+#   reads ZERO at dispatch while the same frame's dump shows 0x84 — TIME-
+#   VARYING; 114/116/ 118/120 not observed (says so rather than guessing).
+#   Probed the build's own obj_hook thunk (D0 still type*4 there; at site+6 it
+#   is already cleared). STALE SINCE 14z-91: there is no obj_hook thunk any
+#   more — the walker is relocated and the dispatch site is vanilla. Re-point
+#   this probe at the RELOCATED walker's dispatch (copy+0x18) before trusting
+#   it
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

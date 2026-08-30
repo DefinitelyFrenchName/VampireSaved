@@ -149,6 +149,20 @@
 #     so a lost dump would otherwise just move the anchor (14z-107 (7)).
 #
 # Usage: ROMDIR=... [JTSIM_SCRATCH=...] tests/test_mister_sim_anchor.sh
+#
+# HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   (tier manual/emulator (~50 min)) THE ORACLE: MAME and the core under test
+#   (`cps2w` since D1, `SIM_CORE=cps2` for the reference leg) agree on every
+#   mapped §4 field at the round-1 match-start anchor of `05_timeout_idle`
+#   (MAME 2146 / sim 2609, skew 463 ± 30 — RE-MEASURED 14z-107 (7) with host
+#   frame output OFF. It read 2502/356 and 2507/361 on runs whose input script
+#   the harness's frame writer was replaying, and 2606/460 before that, which
+#   was the BOOT offset rather than the anchor). Runs with `--frame-output
+#   off` and ASSERTS that mode from the run's own log banner; asserts BOTH
+#   dump sets are COMPLETE (`tools/check_wram_dumps.py`) and the sim window
+#   NON-CONSTANT before computing any anchor; then the byte-swap, hook-
+#   inertness and punched-hole controls
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -101,6 +101,22 @@
 #        tests/audit_region_movability.sh
 # On-demand: one build + one guarded replay per case (~10 min for the four
 # Donovan cases, ~8 min per tenant case).
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   14z-77, RE-FROZEN 14z-78: which regions can live in wide_ext? ALL OF THEM
+#   NOW — anim, aux0_4, hitbox(+proj) and x06717c (a CODE region, so code
+#   executes from the raw extension). anim was the ONE crasher and M3b's
+#   binding constraint; its vec3 (odd A0, vanilla PC 0x015098) was NOT a
+#   layout limit but a placed address baked into two donovan.toml thunk bodies
+#   — fixed 14z-78 with region_subst, and the class is now a BUILD error
+#   (test_thunk_addr_literal). Three tenants need 98,488 of the 344,640-byte
+#   crypt window, was 470,200. MEASURED ON ALL THREE (14z-123): H/P anim run
+#   from wide_ext too, with a LIVENESS control — the tenant's +0x60.l equals
+#   the build's own table row and the anim node pointer sits inside the moved
+#   range at three in-match frames; CASES= selects the six cases. Expectations
+#   frozen BOTH ways: if anim crashes again that is a REGRESSION. On-demand,
+#   ~4.5 min
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

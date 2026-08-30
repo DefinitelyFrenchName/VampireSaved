@@ -16,6 +16,12 @@
 # 0x0E grab seq and the victim takes the 0x13 damage.
 #
 # Usage: ROMDIR=... tests/test_hui_grab.sh [existing-stage4-builddir]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   Circuit Scrapper gate (14z-66): the 2P-dummy grab connects with the NATIVE
+#   damage datum (frame-identical A/B of record). Early-window 2P pokes only —
+#   see the replay 80 header. Self-builds stage 4 unless given a build
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

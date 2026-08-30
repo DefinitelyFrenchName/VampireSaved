@@ -24,6 +24,14 @@
 # RAM at rows 0x15-0x19 reads vs2's gold ramp under F000-alpha.
 #
 # Usage: ROMDIR=... tests/test_hui_winscreen.sh [existing-stage6-build]
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   the WIN-SCREEN gate (14z-68m): palette SOURCE (the OPCODE-view remap
+#   table, proved by Donovan's frozen row), the SELF-LABELLING marker (last
+#   word of each palette row = 5*row — the check that would have caught
+#   shipping Donovan's palette), all 8 colour sets, and the portrait POSITION
+#   row. Static, seconds. Negative control: FAILS on build/hui10
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

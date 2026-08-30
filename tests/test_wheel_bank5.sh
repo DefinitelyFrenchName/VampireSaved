@@ -31,6 +31,12 @@
 # Env: MAME_WIDE_BIN overrides the WIDE MAME binary
 #      (default ~/.cache/vampire-saved/mame/cps2). SKIP_RUNTIME=1 skips
 #      section 3.
+#
+# HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
+# documentation pass ruled a gate's WHY lives in the gate):
+#   the select-wheel bank-5 move (14z-63): site + re-derived tile inventory +
+#   group C member identity straight from the zips + negative controls + the
+#   engine's own bank-5 walk. Self-builds at 0x13 unless given a build
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
