@@ -1,5 +1,24 @@
 # STATE — living progress log
 
+## Session 14z-124 (2026-08-30/31) — **THE DOCUMENTATION RATIONALIZATION PASS IS DONE (G7): engine_internals'
+## last third rationalized and the document flipped to REFERENCE (19 narratives to the twin, 4,198 → 3,657
+## lines); `doc_shape.tsv` has ZERO PENDING; `test_docshape` runs the end-state `--no-pending` mode; the ci
+## floor 15 → 60; `inferred_claims` CLOSED. One tooling defect found and fixed on the way (the atlas-rows
+## splitter was wrap-blind). No build changed. Portable 61/0. NOT pushed.**
+
+| | |
+|---|---|
+| opened with | the 14z-123 close: NEXT_SESSION's "OPEN THE SESSION WITH G3 (c)", then the REFERENCE flip, `--no-pending` green, the ci floor = G7 |
+| delivered (3 commits) | tooling `4976647` (checkdocshape wrap-aware); G3 (c) `e99affd`; G7 `b1070b0` |
+| **the tooling defect** | the REFERENCE preview lint of engine_internals reported 27 "names no atlas row" failures, 22 of them on sections that DO carry the line: `checkdocshape`'s atlas-rows splitter was `re.split(r"(?m)^## ")`, which turns the house-style WRAPPED two-line `##` header into a header plus an empty section. The header lint already tolerated wraps by design; the requires check did not, and engine_internals is the first document to declare `atlas-rows`. Fixed (`h2_sections`: consecutive `## ` lines are one section) with a self-test control — whose first draft said "no atlas here" and was matched on the word "atlas" by the very check it tested; the control caught its author. Its own commit, before (c) |
+| **G3 (c) — `engine_internals.md` :2944-end** (the palette-seq specimens, the sub-state dispatcher family, Dark Force, the child shadow, the 214+P grenade, the beam family, the pod family, the pursuit, exceptions, the 0x018508 dispatcher) | **19 blocks (749 lines) moved VERBATIM** to `engine_internals_history.md` (`[14z-124 (c)] from «…»` heads): the two struck "Anakaris" specimens; the DF section's 14z-79 blockquote (row 10) + its 14z-66..68w outside-the-mode readings + the 14z-69 premises + the 69e header/blockquote + the purple's pre-fix analysis and parked fix design; the shadow's inverted 14z-68g diagnosis; the grenade's 70f blockquote, 69q triage, the 70 "tiles absent" and 70b "+0xA220" readings, the 70c/d x088512 chase, the 70g "never CREATED" beam, the 70e content-join narrative; the beam family's 69j state, the 70 never-walked chase, the "$FFD400 +0x1C" suggestion, the NEXT step. **Dark Force** now opens with the ruled framework [M: `audit_df_framework`: 1 stock, 360/360/377/360 ctl/don/hui/pyr] and the two DF-armed damage families [M: `audit_df_accumulator`], keeps the effect-channel machine, the measured per-engine table + `$FF802E`, VSE-69 verbatim, the flight form + the palette-sequence collision and its 14z-84 fix (`df_gold_variant_id`, `audit_df_gold`), and a "What is NOT known" line; its ten-line header is one line. **The grenade**: what it was (569 uncopied remapped tiles, the LP ground rig), the 14z-123 tile-for-tile verification (441/441), rig facts (VSE-79), the kept x088512 latent repair, THE ANCHOR METHOD (VSE-38, untouched), the content join (VSE-37). **The beam family**: the three stacked causes (VSE-39), the rig traps the arc paid for, the walker's node+4 read (VSE-8). Every `##` in the range carries Atlas rows + Gates (every cited `tests/` path asserted to exist); the STATUS banner in the intro; a pointer ties the three dispatcher carriers. `doc_shape.tsv` PENDING → REFERENCE (banner, atlas-rows); README's Contents line; inferred_claims row 10 CLOSED; census re-frozen for five reviewed renames (VSE-8/37/39/69/79); annotations regenerated from a clean worktree (2,921 → 2,892 — the addresses named only by the moved chase narrative; HIST is not a carrier by design). Per-hunk seam review: one sentence had landed as a bullet's lazy continuation — blank line added. [VSP-13] grep for eight moved phrasings → only the twin (+ "+0xA220" quoted live as the named artefact; "believed CORRECT" in skills_scope's 14z-114 log row) |
+| **G7 DONE** | `checkdocshape --no-pending` rc=0 (0 PENDING) → `tests/test_docshape.sh` now runs that mode (a PENDING row FAILS the suite; new must-fire control h); `ci.yml`'s portable floor `n >= 15` (14z-93) → `n >= 60` (61 registered), with the never-lower rule in a comment; `doc_shape.tsv`'s PENDING class described as transitional and gate-failing; `inferred_claims.md` STATUS CLOSED with the pass (every row MEASURED / RETRACTED / ruled-parked — row 11 alone, #113's camera evidence) |
+| green at close | portable tier **61 PASS / 0 FAIL** (three runs across the commits); checkdocshape `--no-pending` 0 PENDING; checkskills 425; census 427 (re-frozen once, five rows); checkdocs 19 locks; gate index current; annotations current on the clean worktree. The static tier (ROMDIR) was NOT run this session — no manifest, tool or test semantics changed (a gate's MODE did, and its own controls cover it) |
+| not done, by design | **CLAUDE.md pass 2** — a ruling ("Decisions pending"; the "before G7" slot note there is marked superseded — G7 closed without it, pass 2 stands alone); the **Zabel j.LK proximity guard** — its own session, recording first |
+| open (unchanged) | the 1:1 wheel mockup; #112/#113 parked; the FBNeo two-run-family question; the tenant CPU AI "lackluster" note; win quotes forgone; the COSMETIC BACKLOG; `test_random_select_tenants.sh`'s CONTROL still `build/m3b_merged19`; `test_hui_df_style.sh`'s header still describes its 14z-79 `differs` expectation (a gate-header staleness, noted in the DF section — not a defect) |
+| rollover | none needed: STATE holds 14z-122 / 14z-123 / 14z-124 (three groups, ~140 KB). NEXT_SESSION's 14z-123 opener → `NEXT_SESSION_HISTORY.md` |
+| push | NOT pushed — push at the maintainer's word |
+
 ## Session 14z-123 CLOSE — ritual complete. **THE DOCUMENTATION RATIONALIZATION PASS, ONE DAY: T1 (annotations.md
 ## CREATED, generated), G2 (three T3 rigs — EVERY claim RETRACTED: Sasquatch's DF armor, the roulette tag, the advancing
 ## guard), five T2 rows, G3 (a)+(b) of engine_internals, G4 (the MiSTer pair, a fork), G6 (1)+(2) (HANDOFF 3,652 → 1,374;
@@ -359,8 +378,9 @@ the archive once they stop shaping active work.)*
   ratify at the pass: the LAW (rules 1-8, §4's classes, §5's standing
   orders) stays verbatim-precise; the CORRECTION NARRATIVES appended inside
   rules (the 14z-91/94/110b/114 stories) condense to the rule + a dated
-  citation, with the narrative in the docs that already carry it. Slot:
-  before G7 (the close bumps floors; the law should settle first).
+  citation, with the narrative in the docs that already carry it. ~~Slot:
+  before G7 (the close bumps floors; the law should settle first).~~ (G7
+  CLOSED 14z-124 without it — pass 2 stands alone, no slot constraint.)
 - **ZABEL j.LK PROXIMITY GUARD — A LEGACY-CONTENT PATCH, ITS OWN SESSION
   (maintainer, 2026-08-30, 14z-122). RULED as the SECOND of two future items;
   not started.** The maintainer's report, in substance: Zabel's j.LK does not
