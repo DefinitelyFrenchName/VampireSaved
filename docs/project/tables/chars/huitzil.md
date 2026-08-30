@@ -753,24 +753,24 @@ Projectile records (`hitbox_proj`):
 
 Every `$FF9400` type this character spawns (the census), its handler on vs2 and on ours, and the inline parameters decoded from the handler's init block. per type: +0x9A (0/2/4 = LP/MP/HP, 6 = ES) selects +0x26 (byte or word), +0x50 (word) and an (xv, xacc, yv, yacc) 16.16 record (x-terms negated when flip_x = 0); Blizzard indexes (xv, yv) pairs by +0x0A*8; Cosmo Disruption = immediates per state. Verified by `tests/test_projectile_params.sh (29/29 live spawns match; ours == vs2 on three builds; 14z-121)`.
 
-| type | handler vs2 | handler ours | shape | +0x9A | +0x26 | +0x50 | xv | xacc | yv | yacc | ours |
+| move (type) | handler vs2 | handler ours | shape | +0x9A | +0x26 | +0x50 | xv | xacc | yv | yacc | ours |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| `0x44` | `0x6800c` | `0xd2780` | B | 0 | 0 | 1 | 3.0 | 0.0 | 0.5 | -0.0625 | byte |
-| `0x44` | `0x6800c` | `0xd2780` | B | 2 | 0 | 1 | 4.0 | 0.0 | 0.5 | -0.0625 | byte |
-| `0x44` | `0x6800c` | `0xd2780` | B | 4 | 0 | 1 | 5.0 | 0.0 | 0.5 | -0.0625 | byte |
-| `0x44` | `0x6800c` | `0xd2780` | B | 6 | 0 | 3 | 6.0 | 0.0 | 0.5 | -0.0625 | byte |
-| `0x45` | `0x68458` | `0xd2bd0` | B | 0 | 2144 | 1 | 1.0 | 0.0 | 5.0 | -0.3125 | byte |
-| `0x45` | `0x68458` | `0xd2bd0` | B | 2 | 4192 | 1 | 2.0 | 0.0 | 5.0 | -0.3125 | byte |
-| `0x45` | `0x68458` | `0xd2bd0` | B | 4 | 8288 | 1 | 3.0 | 0.0 | 5.0 | -0.3125 | byte |
-| `0x45` | `0x68458` | `0xd2bd0` | B | 6 | 8320 | 3 | 3.0 | 0.0 | 5.0 | -0.3125 | byte |
-| `0x46` | `0x68768` | `0xd2ee0` | B | 0 | 88 | 1 | 3.0 | 0.0625 | 0.0 | 0.0 | byte |
-| `0x46` | `0x68768` | `0xd2ee0` | B | 2 | 88 | 1 | 3.0 | 0.0625 | 0.0 | 0.0 | byte |
-| `0x46` | `0x68768` | `0xd2ee0` | B | 4 | 88 | 1 | 3.0 | 0.0625 | 0.0 | 0.0 | byte |
-| `0x46` | `0x68768` | `0xd2ee0` | B | 6 | 88 | 1 | 3.0 | 0.0625 | 0.0 | 0.0 | byte |
-| `0x47` | `0x689cc` | `0xd3150` | B | 0 | 24672 | 7 | 1.5 | 0.0 | 0.0 | 0.0 | byte |
-| `0x47` | `0x689cc` | `0xd3150` | B | 2 | 14432 | 7 | 0.5 | 0.0 | 0.0 | 0.0 | byte |
-| `0x47` | `0x689cc` | `0xd3150` | B | 4 | 49248 | 7 | 1.5 | 0.0 | 0.0 | 0.0 | byte |
-| `0x47` | `0x689cc` | `0xd3150` | B | 6 | 61280 | 7 | 1.5 | 0.0 | 0.0 | 0.0 | byte |
+| Mighty Launcher / Circuit Scrapper (`0x44`) | `0x6800c` | `0xd2780` | B | 0 | 0 | 1 | 3.0 | 0.0 | 0.5 | -0.0625 | byte |
+| Mighty Launcher / Circuit Scrapper (`0x44`) | `0x6800c` | `0xd2780` | B | 2 | 0 | 1 | 4.0 | 0.0 | 0.5 | -0.0625 | byte |
+| Mighty Launcher / Circuit Scrapper (`0x44`) | `0x6800c` | `0xd2780` | B | 4 | 0 | 1 | 5.0 | 0.0 | 0.5 | -0.0625 | byte |
+| Mighty Launcher / Circuit Scrapper (`0x44`) | `0x6800c` | `0xd2780` | B | 6 | 0 | 3 | 6.0 | 0.0 | 0.5 | -0.0625 | byte |
+| Plasma Trap (`0x45`) | `0x68458` | `0xd2bd0` | B | 0 | 2144 | 1 | 1.0 | 0.0 | 5.0 | -0.3125 | byte |
+| Plasma Trap (`0x45`) | `0x68458` | `0xd2bd0` | B | 2 | 4192 | 1 | 2.0 | 0.0 | 5.0 | -0.3125 | byte |
+| Plasma Trap (`0x45`) | `0x68458` | `0xd2bd0` | B | 4 | 8288 | 1 | 3.0 | 0.0 | 5.0 | -0.3125 | byte |
+| Plasma Trap (`0x45`) | `0x68458` | `0xd2bd0` | B | 6 | 8320 | 3 | 3.0 | 0.0 | 5.0 | -0.3125 | byte |
+| Final Guardian Beta (`0x46`) | `0x68768` | `0xd2ee0` | B | 0 | 88 | 1 | 3.0 | 0.0625 | 0.0 | 0.0 | byte |
+| Final Guardian Beta (`0x46`) | `0x68768` | `0xd2ee0` | B | 2 | 88 | 1 | 3.0 | 0.0625 | 0.0 | 0.0 | byte |
+| Final Guardian Beta (`0x46`) | `0x68768` | `0xd2ee0` | B | 4 | 88 | 1 | 3.0 | 0.0625 | 0.0 | 0.0 | byte |
+| Final Guardian Beta (`0x46`) | `0x68768` | `0xd2ee0` | B | 6 | 88 | 1 | 3.0 | 0.0625 | 0.0 | 0.0 | byte |
+| Genocide Vulcan / Erasing Sphere (`0x47`) | `0x689cc` | `0xd3150` | B | 0 | 24672 | 7 | 1.5 | 0.0 | 0.0 | 0.0 | byte |
+| Genocide Vulcan / Erasing Sphere (`0x47`) | `0x689cc` | `0xd3150` | B | 2 | 14432 | 7 | 0.5 | 0.0 | 0.0 | 0.0 | byte |
+| Genocide Vulcan / Erasing Sphere (`0x47`) | `0x689cc` | `0xd3150` | B | 4 | 49248 | 7 | 1.5 | 0.0 | 0.0 | 0.0 | byte |
+| Genocide Vulcan / Erasing Sphere (`0x47`) | `0x689cc` | `0xd3150` | B | 6 | 61280 | 7 | 1.5 | 0.0 | 0.0 | 0.0 | byte |
 
 ## Reactions as the victim (phase 3)
 

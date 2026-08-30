@@ -187016,6 +187016,10 @@
     "handler_ours": "0xd2780",
     "handler_vs2": "0x6800c",
     "immediates": [],
+    "moves": [
+     "Mighty Launcher",
+     "Circuit Scrapper"
+    ],
     "ours_source": "byte",
     "rows": [
      {
@@ -187093,6 +187097,9 @@
     "handler_ours": "0xd2bd0",
     "handler_vs2": "0x68458",
     "immediates": [],
+    "moves": [
+     "Plasma Trap"
+    ],
     "ours_source": "byte",
     "rows": [
      {
@@ -187170,6 +187177,9 @@
     "handler_ours": "0xd2ee0",
     "handler_vs2": "0x68768",
     "immediates": [],
+    "moves": [
+     "Final Guardian Beta"
+    ],
     "ours_source": "byte",
     "rows": [
      {
@@ -187247,6 +187257,10 @@
     "handler_ours": "0xd3150",
     "handler_vs2": "0x689cc",
     "immediates": [],
+    "moves": [
+     "Genocide Vulcan",
+     "Erasing Sphere"
+    ],
     "ours_source": "byte",
     "rows": [
      {

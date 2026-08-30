@@ -742,11 +742,11 @@ Projectile records (`hitbox_proj`):
 
 Every `$FF9400` type this character spawns (the census), its handler on vs2 and on ours, and the inline parameters decoded from the handler's init block. per type: +0x9A (0/2/4 = LP/MP/HP, 6 = ES) selects +0x26 (byte or word), +0x50 (word) and an (xv, xacc, yv, yacc) 16.16 record (x-terms negated when flip_x = 0); Blizzard indexes (xv, yv) pairs by +0x0A*8; Cosmo Disruption = immediates per state. Verified by `tests/test_projectile_params.sh (29/29 live spawns match; ours == vs2 on three builds; 14z-121)`.
 
-| type | handler vs2 | handler ours | shape | +0x9A | +0x26 | +0x50 | xv | xacc | yv | yacc | ours |
+| move (type) | handler vs2 | handler ours | shape | +0x9A | +0x26 | +0x50 | xv | xacc | yv | yacc | ours |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| `0x3e` | `0x66ec4` | `0xcd0d4` | A | 0 | 32 | 1 | 6.0 | -0.0625 | -4.0 | 0.125 | byte |
-| `0x3e` | `0x66ec4` | `0xcd0d4` | A | 2 | 32 | 1 | 7.0 | -0.0625 | -4.5 | 0.125 | byte |
-| `0x3e` | `0x66ec4` | `0xcd0d4` | A | 4 | 32 | 1 | 8.0 | -0.0625 | -5.0 | 0.125 | byte |
+| Blizzard Sword (`0x3e`) | `0x66ec4` | `0xcd0d4` | A | 0 | 32 | 1 | 6.0 | -0.0625 | -4.0 | 0.125 | byte |
+| Blizzard Sword (`0x3e`) | `0x66ec4` | `0xcd0d4` | A | 2 | 32 | 1 | 7.0 | -0.0625 | -4.5 | 0.125 | byte |
+| Blizzard Sword (`0x3e`) | `0x66ec4` | `0xcd0d4` | A | 4 | 32 | 1 | 8.0 | -0.0625 | -5.0 | 0.125 | byte |
 
 ## Reactions as the victim (phase 3)
 

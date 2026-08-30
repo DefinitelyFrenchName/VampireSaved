@@ -39,6 +39,9 @@ figcaption{font-size:12px;color:var(--ink2)}
 .k.hurt{background:var(--hurt)}.k.push{background:var(--push)}.k.hit{background:var(--hit)}
 svg.boxes{background:var(--bg2);border:1px solid var(--line)}
 img.sprite{image-rendering:pixelated;background:var(--bg2);border:1px solid var(--line);max-height:180px}
+svg.composite{background:var(--bg2);border:1px solid var(--line);max-width:100%;height:auto}
+svg.composite rect{fill:none;stroke-width:1}
+svg.composite .hurt{stroke:var(--hurt)}svg.composite .push{stroke:var(--push)}svg.composite .hit{stroke:var(--hit)}
 svg.boxes .ground{stroke:var(--line);stroke-width:1}
 svg.boxes rect{fill-opacity:.28;stroke-width:1.2}
 svg.boxes .hurt{fill:var(--hurt);stroke:var(--hurt)}svg.boxes .push{fill:var(--push);stroke:var(--push)}svg.boxes .hit{fill:var(--hit);stroke:var(--hit)}
@@ -340,23 +343,23 @@ td.path{font-size:12px}
 <p class="notes">Neutral / back / forward; MEASURED 14z-120: pre-jump a:0x0e -&gt; airborne a:0x10 (forward/neutral) or a:0x11 (back) -&gt; landing a:0x0f</p>
 </article>
 </section>
-<section id="projectiles"><h2>Projectiles</h2><p class="fine">Each pool type this character spawns, with the parameters inline in its handler; velocities in px/frame, +0x9A 0/2/4 = LP/MP/HP, 6 = ES.</p><div class="tablewrap"><table><thead><tr><th>type</th><th>variant</th><th>xv</th><th>x accel</th><th>yv</th><th>y accel</th><th>+0x26</th><th>+0x50</th></tr></thead><tbody>
-<tr><td><code>0x40</code></td><td>0</td><td>3</td><td>0.25</td><td>0</td><td>0</td><td>40</td><td>1</td></tr>
-<tr><td><code>0x40</code></td><td>2</td><td>4</td><td>0.25</td><td>0</td><td>0.375</td><td>56</td><td>1</td></tr>
-<tr><td><code>0x40</code></td><td>4</td><td>5</td><td>0.125</td><td>0</td><td>0.75</td><td>72</td><td>1</td></tr>
-<tr><td><code>0x40</code></td><td>6</td><td>6</td><td>0.25</td><td>0</td><td>0</td><td>72</td><td>3</td></tr>
-<tr><td><code>0x41</code></td><td>0</td><td>4</td><td>0</td><td>-1</td><td>-0.25</td><td>40</td><td>1</td></tr>
-<tr><td><code>0x41</code></td><td>2</td><td>4</td><td>0</td><td>-1</td><td>-0.1562</td><td>56</td><td>1</td></tr>
-<tr><td><code>0x41</code></td><td>4</td><td>4</td><td>0</td><td>-1</td><td>-0.0625</td><td>72</td><td>1</td></tr>
-<tr><td><code>0x41</code></td><td>6</td><td>4</td><td>0</td><td>-1</td><td>-0.0625</td><td>72</td><td>3</td></tr>
-<tr><td><code>0x42</code></td><td>state @0x67c48</td><td colspan="4">+0x40 = -11</td><td></td><td></td></tr>
-<tr><td><code>0x42</code></td><td>state @0x67c50</td><td colspan="4">+0x48 = 0.25</td><td></td><td></td></tr>
-<tr><td><code>0x42</code></td><td>state @0x67c58</td><td colspan="4">+0x44 = 0</td><td></td><td></td></tr>
-<tr><td><code>0x42</code></td><td>state @0x67c60</td><td colspan="4">+0x4c = 0</td><td></td><td></td></tr>
-<tr><td><code>0x42</code></td><td>state @0x67d5a</td><td colspan="4">+0x40 = -6</td><td></td><td></td></tr>
-<tr><td><code>0x42</code></td><td>state @0x67d62</td><td colspan="4">+0x48 = 0</td><td></td><td></td></tr>
-<tr><td><code>0x42</code></td><td>state @0x67d6a</td><td colspan="4">+0x44 = 0</td><td></td><td></td></tr>
-<tr><td><code>0x42</code></td><td>state @0x67d72</td><td colspan="4">+0x4c = -0.09375</td><td></td><td></td></tr>
+<section id="projectiles"><h2>Projectiles</h2><p class="fine">Each projectile this character spawns (the move, its pool type and handler address), with the parameters inline in the handler; velocities in px/frame, +0x9A 0/2/4 = LP/MP/HP, 6 = ES.</p><div class="tablewrap"><table><thead><tr><th>move</th><th>type · handler</th><th>variant</th><th>xv</th><th>x accel</th><th>yv</th><th>y accel</th><th>+0x26</th><th>+0x50</th></tr></thead><tbody>
+<tr><td>Sol Smasher</td><td><code>0x40</code> · <code>0x672d0</code></td><td>0</td><td>3</td><td>0.25</td><td>0</td><td>0</td><td>40</td><td>1</td></tr>
+<tr><td>Sol Smasher</td><td><code>0x40</code> · <code>0x672d0</code></td><td>2</td><td>4</td><td>0.25</td><td>0</td><td>0.375</td><td>56</td><td>1</td></tr>
+<tr><td>Sol Smasher</td><td><code>0x40</code> · <code>0x672d0</code></td><td>4</td><td>5</td><td>0.125</td><td>0</td><td>0.75</td><td>72</td><td>1</td></tr>
+<tr><td>Sol Smasher</td><td><code>0x40</code> · <code>0x672d0</code></td><td>6</td><td>6</td><td>0.25</td><td>0</td><td>0</td><td>72</td><td>3</td></tr>
+<tr><td>Sol Smasher</td><td><code>0x41</code> · <code>0x67550</code></td><td>0</td><td>4</td><td>0</td><td>-1</td><td>-0.25</td><td>40</td><td>1</td></tr>
+<tr><td>Sol Smasher</td><td><code>0x41</code> · <code>0x67550</code></td><td>2</td><td>4</td><td>0</td><td>-1</td><td>-0.1562</td><td>56</td><td>1</td></tr>
+<tr><td>Sol Smasher</td><td><code>0x41</code> · <code>0x67550</code></td><td>4</td><td>4</td><td>0</td><td>-1</td><td>-0.0625</td><td>72</td><td>1</td></tr>
+<tr><td>Sol Smasher</td><td><code>0x41</code> · <code>0x67550</code></td><td>6</td><td>4</td><td>0</td><td>-1</td><td>-0.0625</td><td>72</td><td>3</td></tr>
+<tr><td>Cosmo Disruption</td><td><code>0x42</code> · <code>0x67846</code></td><td>state @0x67c48</td><td colspan="4">+0x40 = -11</td><td></td><td></td></tr>
+<tr><td>Cosmo Disruption</td><td><code>0x42</code> · <code>0x67846</code></td><td>state @0x67c50</td><td colspan="4">+0x48 = 0.25</td><td></td><td></td></tr>
+<tr><td>Cosmo Disruption</td><td><code>0x42</code> · <code>0x67846</code></td><td>state @0x67c58</td><td colspan="4">+0x44 = 0</td><td></td><td></td></tr>
+<tr><td>Cosmo Disruption</td><td><code>0x42</code> · <code>0x67846</code></td><td>state @0x67c60</td><td colspan="4">+0x4c = 0</td><td></td><td></td></tr>
+<tr><td>Cosmo Disruption</td><td><code>0x42</code> · <code>0x67846</code></td><td>state @0x67d5a</td><td colspan="4">+0x40 = -6</td><td></td><td></td></tr>
+<tr><td>Cosmo Disruption</td><td><code>0x42</code> · <code>0x67846</code></td><td>state @0x67d62</td><td colspan="4">+0x48 = 0</td><td></td><td></td></tr>
+<tr><td>Cosmo Disruption</td><td><code>0x42</code> · <code>0x67846</code></td><td>state @0x67d6a</td><td colspan="4">+0x44 = 0</td><td></td><td></td></tr>
+<tr><td>Cosmo Disruption</td><td><code>0x42</code> · <code>0x67846</code></td><td>state @0x67d72</td><td colspan="4">+0x4c = -0.09375</td><td></td><td></td></tr>
 </tbody></table></div></section>
 <section id="reactions"><h2>As the victim</h2><p class="fine">Victor attacks this character on the source game; per contact the reaction class, the hit-freeze, the chain path run and the frames until a stand chain returns (the stun as the engine ran it).</p><div class="tablewrap"><table><thead><tr><th>part</th><th>contact</th><th>class</th><th>freeze</th><th>chain path</th><th>frames</th></tr></thead><tbody>
 <tr><td>1</td><td>V 5LP</td><td>0x01</td><td>11</td><td class="path">b:0x03@0 a:0x00@0</td><td>19</td></tr>

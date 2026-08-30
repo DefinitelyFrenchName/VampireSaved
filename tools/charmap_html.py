@@ -38,6 +38,10 @@ REPO = Path(__file__).resolve().parent.parent
 DISPLAY = {"donovan": ("Donovan Baine", "Vampire Savior 2 / Vampire Hunter 2", "0x13"),
            "huitzil": ("Huitzil (Phobos)", "Vampire Savior 2 / Vampire Hunter 2", "0x10"),
            "pyron": ("Pyron", "Vampire Savior 2 / Vampire Hunter 2", "0x11")}
+# World -> OBJ-screen placement of a fighter's boxes over its captured sprite (14z-121 (7)), calibrated on Donovan's
+# walk (f2600) and 5LP (f3623) captures: the sprite's feet sit at OBJ y = KY - world_y (world y = 40 on the ground),
+# its x at KX + (world_x - camera). A box (bx, by, hw, hh) authored facing LEFT is mirrored (P1 faces right on the rigs).
+KX, KY = 64, 262
 KIND_LABEL = {"normal": "Normal", "throw": "Throw", "special": "Special", "es": "ES", "ex": "EX", "df": "Dark Force", "dash": "Movement", "misc": "Movement / other"}
 SECTIONS = [("normals", "Normals", ("normal",)), ("throws", "Throws", ("throw",)), ("specials", "Specials", ("special", "es")),
             ("ex", "EX moves", ("ex",)), ("df", "Dark Force", ("df",)), ("movement", "Movement", ("dash", "misc"))]
@@ -158,12 +162,39 @@ def main():
             out.append(f'<div class="strip">{"".join(cells)}</div>')
             img = ""
             if sprites is not None:
-                import base64
+                import base64, json as _json
                 pf = sprites / (esc(m["name"]).replace(" ", "-") + f"__0x{int(sq, 16):02x}.png")
                 if pf.exists():
-                    img = f'<img class="sprite" alt="{esc(m["name"])} at its first active frame" src="data:image/png;base64,{base64.b64encode(pf.read_bytes()).decode()}">'
+                    meta = _json.loads(pf.with_suffix(".json").read_text()) if pf.with_suffix(".json").exists() else {}
+                    data = base64.b64encode(pf.read_bytes()).decode()
+                    if {"x0", "y0", "w", "h", "p1x", "p1y", "cam"} <= meta.keys():
+                        # ONE drawing: the sprite at its crop origin and the boxes OUTLINED in the same OBJ-screen space
+                        try:
+                            nb = H.node_boxes(first["hb8"]["vs2"], first["hbA"]["vs2"])
+                        except Exception:
+                            nb = None
+                        rects = []
+                        if nb:
+                            fx = KX + (meta["p1x"] - meta["cam"]); fy = KY - meta["p1y"]
+                            for kind, b in [("hurt", t) for t in nb["vuln"]] + [("push", nb["push"])] + ([("hit", (nb.get("attack") or {}).get("box"))] if nb.get("attack") else []):
+                                if not b or not any(b): continue
+                                bx, by, hw, hh = b
+                                cx = fx - bx; cy = fy - by
+                                rects.append((kind, cx - hw, cy - hh, 2 * hw, 2 * hh))
+                        xs = [meta["x0"], meta["x0"] + meta["w"]] + [r[1] for r in rects] + [r[1] + r[3] for r in rects]
+                        ys = [meta["y0"], meta["y0"] + meta["h"]] + [r[2] for r in rects] + [r[2] + r[4] for r in rects]
+                        X0, Y0, X1, Y1 = min(xs) - 4, min(ys) - 4, max(xs) + 4, max(ys) + 4
+                        sc = 2
+                        parts = [f'<svg class="composite" viewBox="{X0} {Y0} {X1 - X0} {Y1 - Y0}" width="{(X1 - X0) * sc}" height="{(Y1 - Y0) * sc}" role="img" aria-label="{esc(m["name"])}: the sprite with its boxes outlined">',
+                                 f'<image href="data:image/png;base64,{data}" x="{meta["x0"]}" y="{meta["y0"]}" width="{meta["w"]}" height="{meta["h"]}" style="image-rendering:pixelated"/>']
+                        for kind, x, y, w_, h_ in rects:
+                            parts.append(f'<rect class="{kind}" x="{x}" y="{y}" width="{w_}" height="{h_}"/>')
+                        parts.append("</svg>")
+                        img = "".join(parts)
+                    else:
+                        img = f'<img class="sprite" alt="{esc(m["name"])} at its first active frame" src="data:image/png;base64,{data}">'
             if svg or img:
-                out.append(f'<figure>{img}{svg}<figcaption>{"the sprite and " if img else ""}boxes of the {"first active" if a0 is not None else "first"} frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>')
+                out.append(f'<figure>{img}{svg}<figcaption>{"the sprite with its boxes outlined, and " if img else ""}boxes of the {"first active" if a0 is not None else "first"} frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>')
         if m.get("notes"):
             out.append(f'<p class="notes">{esc(m["notes"])}</p>')
         out.append("</article>")
@@ -211,15 +242,15 @@ def main():
     PJ = S.get("projectile") or {}
     types = [k for k in PJ if not k.startswith("_")]
     if types:
-        body.append('<section id="projectiles"><h2>Projectiles</h2><p class="fine">Each pool type this character spawns, with the parameters inline in its handler; velocities in px/frame, +0x9A 0/2/4 = LP/MP/HP, 6 = ES.</p><div class="tablewrap"><table><thead><tr><th>type</th><th>variant</th><th>xv</th><th>x accel</th><th>yv</th><th>y accel</th><th>+0x26</th><th>+0x50</th></tr></thead><tbody>')
+        body.append('<section id="projectiles"><h2>Projectiles</h2><p class="fine">Each projectile this character spawns (the move, its pool type and handler address), with the parameters inline in the handler; velocities in px/frame, +0x9A 0/2/4 = LP/MP/HP, 6 = ES.</p><div class="tablewrap"><table><thead><tr><th>move</th><th>type · handler</th><th>variant</th><th>xv</th><th>x accel</th><th>yv</th><th>y accel</th><th>+0x26</th><th>+0x50</th></tr></thead><tbody>')
         for ty in types:
-            d = PJ[ty]
+            d = PJ[ty]; mv = esc(" / ".join(d.get("moves", [])) or "?"); tycell = f'<code>{esc(ty)}</code> · <code>{esc(d["handler_vs2"])}</code>'
             if d["shape"] == "immediate":
                 for im in d["immediates"]:
-                    body.append(f'<tr><td><code>{esc(ty)}</code></td><td>state @{esc(im["pc"])}</td><td colspan="4">{esc(im["field"])} = {f(im["f16"])}</td><td></td><td></td></tr>')
+                    body.append(f'<tr><td>{mv}</td><td>{tycell}</td><td>state @{esc(im["pc"])}</td><td colspan="4">{esc(im["field"])} = {f(im["f16"])}</td><td></td><td></td></tr>')
                 continue
             for r in d["rows"]:
-                body.append(f'<tr><td><code>{esc(ty)}</code></td><td>{r["index"].get("+0x9A")}</td><td>{f(r["xv_f"])}</td><td>{f(r["xa_f"])}</td><td>{f(r["yv_f"])}</td><td>{f(r["ya_f"])}</td><td>{r["+0x26"]}</td><td>{r["+0x50"]}</td></tr>')
+                body.append(f'<tr><td>{mv}</td><td>{tycell}</td><td>{r["index"].get("+0x9A")}</td><td>{f(r["xv_f"])}</td><td>{f(r["xa_f"])}</td><td>{f(r["yv_f"])}</td><td>{f(r["ya_f"])}</td><td>{r["+0x26"]}</td><td>{r["+0x50"]}</td></tr>')
         body.append('</tbody></table></div></section>')
     # reactions
     if rx_lines:
@@ -280,6 +311,9 @@ figcaption{font-size:12px;color:var(--ink2)}
 .k.hurt{background:var(--hurt)}.k.push{background:var(--push)}.k.hit{background:var(--hit)}
 svg.boxes{background:var(--bg2);border:1px solid var(--line)}
 img.sprite{image-rendering:pixelated;background:var(--bg2);border:1px solid var(--line);max-height:180px}
+svg.composite{background:var(--bg2);border:1px solid var(--line);max-width:100%;height:auto}
+svg.composite rect{fill:none;stroke-width:1}
+svg.composite .hurt{stroke:var(--hurt)}svg.composite .push{stroke:var(--push)}svg.composite .hit{stroke:var(--hit)}
 svg.boxes .ground{stroke:var(--line);stroke-width:1}
 svg.boxes rect{fill-opacity:.28;stroke-width:1.2}
 svg.boxes .hurt{fill:var(--hurt);stroke:var(--hurt)}svg.boxes .push{fill:var(--push);stroke:var(--push)}svg.boxes .hit{fill:var(--hit);stroke:var(--hit)}

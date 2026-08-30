@@ -150022,6 +150022,9 @@
     "handler_ours": "0xcd560",
     "handler_vs2": "0x672d0",
     "immediates": [],
+    "moves": [
+     "Sol Smasher"
+    ],
     "ours_source": "byte",
     "rows": [
      {
@@ -150099,6 +150102,9 @@
     "handler_ours": "0xcd7e0",
     "handler_vs2": "0x67550",
     "immediates": [],
+    "moves": [
+     "Sol Smasher"
+    ],
     "ours_source": "byte",
     "rows": [
      {
@@ -150224,6 +150230,9 @@
       "pc": "0x67d72",
       "value": -6144
      }
+    ],
+    "moves": [
+     "Cosmo Disruption"
     ],
     "ours_source": "byte",
     "rows": [],

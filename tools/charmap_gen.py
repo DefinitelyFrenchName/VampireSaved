@@ -693,6 +693,18 @@ def main():
             same = do is not None and do["shape"] == dv["shape"] and (do.get("rows") == dv.get("rows")) and ([{k: v for k, v in i.items() if k != "pc"} for i in do.get("immediates", [])] == [{k: v for k, v in i.items() if k != "pc"} for i in dv.get("immediates", [])])
             projectile[f"{ty:#04x}"] = {"handler_vs2": f"{h:#x}", "handler_ours": (f"{oh:#x}" if oh is not None else None), "shape": dv["shape"],
                                         "rows": dv.get("rows", []), "immediates": dv.get("immediates", []), "ours_source": ("byte" if same else ("UNATTRIBUTED" if do else "not-ported"))}
+        # the moves that spawn each type (the frozen census, tests/expected/projectile_census.txt)
+        cen = REPO / "tests/expected/projectile_census.txt"
+        if cen.exists():
+            for l in cen.read_text().splitlines():
+                f = l.split("\t")
+                if len(f) < 4 or f[0] != tenant: continue
+                for tok in f[3].split():
+                    ty = f"{int(tok.split(':')[0], 16):#04x}"
+                    if ty in projectile:
+                        mv = f[2].split(" [")[0].split(" (")[0].split(" in ")[0]
+                        projectile[ty].setdefault("moves", [])
+                        if mv not in projectile[ty]["moves"]: projectile[ty]["moves"].append(mv)
         projectile["_encoding"] = "per type: +0x9A (0/2/4 = LP/MP/HP, 6 = ES) selects +0x26 (byte or word), +0x50 (word) and an (xv, xacc, yv, yacc) 16.16 record (x-terms negated when flip_x = 0); Blizzard indexes (xv, yv) pairs by +0x0A*8; Cosmo Disruption = immediates per state"
         projectile["_verified_by"] = "tests/test_projectile_params.sh (29/29 live spawns match; ours == vs2 on three builds; 14z-121)"
 

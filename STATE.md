@@ -1,5 +1,18 @@
 # STATE — living progress log
 
+## Session 14z-121 (7) — **THE MAINTAINER'S THREE + ONE ON THE INTERNAL PAGES: the boxes OUTLINED over the sprite in
+## one drawing (world→screen calibrated: `KX=64, KY=262`); projectiles named by their MOVE with the type and handler
+## kept; `tools/charpages_internal.sh` regenerates the pages from a user's OWN dumps (audits, builds, captures, renders);
+## the pages now live ABOVE the working tree (`../charpages/`). No build changed.**
+
+| | |
+|---|---|
+| the overlay | `sprite_capture.lua` now writes a `C<frame>` line (both fighters' world x/y, the camera `$FF8290`, P1's facing); `sprite_render.py` writes a sidecar JSON per PNG (crop origin + those values); `charmap_html.py --sprites` composes ONE SVG per chain — the sprite `<image>` at its crop origin and the hurt/push/hit boxes as OUTLINED rects in the same OBJ-screen space: box centre = (`KX + (p1x − cam) − bx`, `KY − (p1y + by)`) (authored facing left, P1 faces right). Calibrated by eye on Donovan's walk/5LP/5HP/2LK captures with PIL overlays (`build/p3_sprites_14z121/cal/ov*.png`): `KX=48` sat 16 px left; `KX=64` (the CPS OBJ x offset) fits, `KY=262` puts the feet on the ground. The plain box diagram stays beside it |
+| projectiles by move | `charmap_gen` joins the census (`tests/expected/projectile_census.txt`) into `structures.projectile[type].moves`; the map page and both HTML pages show "Sol Smasher (`0x40`) · `0x672d0`" — the move, the type and the address |
+| the user's own dumps | `tools/charpages_internal.sh` step 0: `audit_roms` against `docs/checksums.txt` (stop on mismatch), `setup_mame.sh` when the pinned binary is absent, `build_wide_romset.py` when `build/wide0` is absent, the three solo builds by the HANDOFF four-track recipe when their extracts are absent; then A-E as before. Output `${CHARPAGES_OUT:-../charpages}` |
+| above the tree | `../charpages/` (sibling of the repo, like the field bundles) — nothing under it can be added, committed or pushed from this repository; `build/charpages/` removed |
+| verified | the three pages built (composites: Donovan 63 / Huitzil 53 / Pyron 49); the overlays checked on four Donovan frames. The full script not re-run end to end after the prerequisites block was added (`sh -n` clean; every step ran individually this session) |
+
 ## Session 14z-121 (6) — **THE INTERNAL CHARACTER PAGES WITH SPRITES (maintainer: "for our internal, unpublished
 ## documentation, adding the sprites would be nice"): every move's sprite at its first active frame, captured from the
 ## native game's OWN OBJ list and palette page on the naming rigs and drawn from vsav2's tiles — 165 sprites, three

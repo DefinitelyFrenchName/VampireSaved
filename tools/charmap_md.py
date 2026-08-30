@@ -193,16 +193,17 @@ def main():
         w("")
         w(f"Every `$FF9400` type this character spawns (the census), its handler on vs2 and on ours, and the inline parameters decoded from the handler's init block. {h(PJ.get('_encoding',''))}. Verified by `{PJ.get('_verified_by','')}`.")
         w("")
-        w("| type | handler vs2 | handler ours | shape | +0x9A | +0x26 | +0x50 | xv | xacc | yv | yacc | ours |")
+        w("| move (type) | handler vs2 | handler ours | shape | +0x9A | +0x26 | +0x50 | xv | xacc | yv | yacc | ours |")
         w("|---|---|---|---|---|---|---|---|---|---|---|---|")
         for ty, d in PJ.items():
             if ty.startswith("_"): continue
+            mv = " / ".join(d.get("moves", [])) or "?"
             if d["shape"] == "immediate":
                 for im in d["immediates"]:
-                    w(f"| `{ty}` | `{d['handler_vs2']}` | `{d['handler_ours']}` | immediate @{im['pc']} | | | | {im['f16'] if im['field']=='+0x40' else ''} | {im['f16'] if im['field']=='+0x48' else ''} | {im['f16'] if im['field']=='+0x44' else ''} | {im['f16'] if im['field']=='+0x4c' else ''} | {d['ours_source']} |")
+                    w(f"| {h(mv)} (`{ty}`) | `{d['handler_vs2']}` | `{d['handler_ours']}` | immediate @{im['pc']} | | | | {im['f16'] if im['field']=='+0x40' else ''} | {im['f16'] if im['field']=='+0x48' else ''} | {im['f16'] if im['field']=='+0x44' else ''} | {im['f16'] if im['field']=='+0x4c' else ''} | {d['ours_source']} |")
                 continue
             for r in d["rows"]:
-                w(f"| `{ty}` | `{d['handler_vs2']}` | `{d['handler_ours']}` | {d['shape']} | {r['index'].get('+0x9A')} | {r['+0x26']} | {r['+0x50']} | {r['xv_f']} | {r['xa_f']} | {r['yv_f']} | {r['ya_f']} | {d['ours_source']} |")
+                w(f"| {h(mv)} (`{ty}`) | `{d['handler_vs2']}` | `{d['handler_ours']}` | {d['shape']} | {r['index'].get('+0x9A')} | {r['+0x26']} | {r['+0x50']} | {r['xv_f']} | {r['xa_f']} | {r['yv_f']} | {r['ya_f']} | {d['ours_source']} |")
         w("")
     # ---- reactions (phase 3): the frozen contact lines of tests/test_reactions.sh ----
     rx = Path(__file__).resolve().parent.parent / "tests" / "expected" / f"reactions_{j['tenant']}.txt"

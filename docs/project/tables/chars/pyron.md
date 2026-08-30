@@ -518,24 +518,24 @@ Projectile records (`hitbox_proj`):
 
 Every `$FF9400` type this character spawns (the census), its handler on vs2 and on ours, and the inline parameters decoded from the handler's init block. per type: +0x9A (0/2/4 = LP/MP/HP, 6 = ES) selects +0x26 (byte or word), +0x50 (word) and an (xv, xacc, yv, yacc) 16.16 record (x-terms negated when flip_x = 0); Blizzard indexes (xv, yv) pairs by +0x0A*8; Cosmo Disruption = immediates per state. Verified by `tests/test_projectile_params.sh (29/29 live spawns match; ours == vs2 on three builds; 14z-121)`.
 
-| type | handler vs2 | handler ours | shape | +0x9A | +0x26 | +0x50 | xv | xacc | yv | yacc | ours |
+| move (type) | handler vs2 | handler ours | shape | +0x9A | +0x26 | +0x50 | xv | xacc | yv | yacc | ours |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| `0x40` | `0x672d0` | `0xcd560` | B | 0 | 40 | 1 | 3.0 | 0.25 | 0.0 | 0.0 | byte |
-| `0x40` | `0x672d0` | `0xcd560` | B | 2 | 56 | 1 | 4.0 | 0.25 | 0.0 | 0.375 | byte |
-| `0x40` | `0x672d0` | `0xcd560` | B | 4 | 72 | 1 | 5.0 | 0.125 | 0.0 | 0.75 | byte |
-| `0x40` | `0x672d0` | `0xcd560` | B | 6 | 72 | 3 | 6.0 | 0.25 | 0.0 | 0.0 | byte |
-| `0x41` | `0x67550` | `0xcd7e0` | B | 0 | 40 | 1 | 4.0 | 0.0 | -1.0 | -0.25 | byte |
-| `0x41` | `0x67550` | `0xcd7e0` | B | 2 | 56 | 1 | 4.0 | 0.0 | -1.0 | -0.1562 | byte |
-| `0x41` | `0x67550` | `0xcd7e0` | B | 4 | 72 | 1 | 4.0 | 0.0 | -1.0 | -0.0625 | byte |
-| `0x41` | `0x67550` | `0xcd7e0` | B | 6 | 72 | 3 | 4.0 | 0.0 | -1.0 | -0.0625 | byte |
-| `0x42` | `0x67846` | `0xcdae0` | immediate @0x67c48 | | | | -11.0 |  |  |  | byte |
-| `0x42` | `0x67846` | `0xcdae0` | immediate @0x67c50 | | | |  | 0.25 |  |  | byte |
-| `0x42` | `0x67846` | `0xcdae0` | immediate @0x67c58 | | | |  |  | 0.0 |  | byte |
-| `0x42` | `0x67846` | `0xcdae0` | immediate @0x67c60 | | | |  |  |  | 0.0 | byte |
-| `0x42` | `0x67846` | `0xcdae0` | immediate @0x67d5a | | | | -6.0 |  |  |  | byte |
-| `0x42` | `0x67846` | `0xcdae0` | immediate @0x67d62 | | | |  | 0.0 |  |  | byte |
-| `0x42` | `0x67846` | `0xcdae0` | immediate @0x67d6a | | | |  |  | 0.0 |  | byte |
-| `0x42` | `0x67846` | `0xcdae0` | immediate @0x67d72 | | | |  |  |  | -0.09375 | byte |
+| Sol Smasher (`0x40`) | `0x672d0` | `0xcd560` | B | 0 | 40 | 1 | 3.0 | 0.25 | 0.0 | 0.0 | byte |
+| Sol Smasher (`0x40`) | `0x672d0` | `0xcd560` | B | 2 | 56 | 1 | 4.0 | 0.25 | 0.0 | 0.375 | byte |
+| Sol Smasher (`0x40`) | `0x672d0` | `0xcd560` | B | 4 | 72 | 1 | 5.0 | 0.125 | 0.0 | 0.75 | byte |
+| Sol Smasher (`0x40`) | `0x672d0` | `0xcd560` | B | 6 | 72 | 3 | 6.0 | 0.25 | 0.0 | 0.0 | byte |
+| Sol Smasher (`0x41`) | `0x67550` | `0xcd7e0` | B | 0 | 40 | 1 | 4.0 | 0.0 | -1.0 | -0.25 | byte |
+| Sol Smasher (`0x41`) | `0x67550` | `0xcd7e0` | B | 2 | 56 | 1 | 4.0 | 0.0 | -1.0 | -0.1562 | byte |
+| Sol Smasher (`0x41`) | `0x67550` | `0xcd7e0` | B | 4 | 72 | 1 | 4.0 | 0.0 | -1.0 | -0.0625 | byte |
+| Sol Smasher (`0x41`) | `0x67550` | `0xcd7e0` | B | 6 | 72 | 3 | 4.0 | 0.0 | -1.0 | -0.0625 | byte |
+| Cosmo Disruption (`0x42`) | `0x67846` | `0xcdae0` | immediate @0x67c48 | | | | -11.0 |  |  |  | byte |
+| Cosmo Disruption (`0x42`) | `0x67846` | `0xcdae0` | immediate @0x67c50 | | | |  | 0.25 |  |  | byte |
+| Cosmo Disruption (`0x42`) | `0x67846` | `0xcdae0` | immediate @0x67c58 | | | |  |  | 0.0 |  | byte |
+| Cosmo Disruption (`0x42`) | `0x67846` | `0xcdae0` | immediate @0x67c60 | | | |  |  |  | 0.0 | byte |
+| Cosmo Disruption (`0x42`) | `0x67846` | `0xcdae0` | immediate @0x67d5a | | | | -6.0 |  |  |  | byte |
+| Cosmo Disruption (`0x42`) | `0x67846` | `0xcdae0` | immediate @0x67d62 | | | |  | 0.0 |  |  | byte |
+| Cosmo Disruption (`0x42`) | `0x67846` | `0xcdae0` | immediate @0x67d6a | | | |  |  | 0.0 |  | byte |
+| Cosmo Disruption (`0x42`) | `0x67846` | `0xcdae0` | immediate @0x67d72 | | | |  |  |  | -0.09375 | byte |
 
 ## Reactions as the victim (phase 3)
 

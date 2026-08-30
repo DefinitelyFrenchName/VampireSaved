@@ -69,9 +69,11 @@ def render(capture, spec, out_dir, frames=None, min_addr=0x40000, tile_set=None,
         if a19 not in tile_cache:
             tile_cache[a19] = gfx_tiles.decode(gfx_tiles.tile_bytes(simms[g], t2))
         return tile_cache[a19]
-    ents, pals = {}, {}
+    ents, pals, cams = {}, {}, {}
     for l in Path(capture).read_text().splitlines():
-        if l.startswith("P"):
+        if l.startswith("C"):
+            fr, rest = l[1:].split(" ", 1); cams[int(fr)] = {k: (int(v) - 0x10000 if k != "p1face" and int(v) >= 0x8000 else int(v)) for k, v in (kv.split("=") for kv in rest.split())}
+        elif l.startswith("P"):
             fr, hx = l[1:].split(" ", 1); pals[int(fr)] = bytes.fromhex(hx)
         elif l.startswith("F") and " E" in l:
             f = dict(kv.split("=") for kv in l.split()[3:])
@@ -131,6 +133,8 @@ def render(capture, spec, out_dir, frames=None, min_addr=0x40000, tile_set=None,
                     canvas[cy - Y0 + r][cx - X0 + c] = cols[pen]
         rows = [bytes(v for pxl in row for v in pxl) for row in canvas]
         p = out_dir / (f"{names[fr]}.png" if names and fr in names else f"f{fr}.png"); p.write_bytes(png(W, H, rows)); written.append((fr, W, H, len(mine)))
+        import json
+        p.with_suffix(".json").write_text(json.dumps({"frame": fr, "x0": X0, "y0": Y0, "w": W, "h": H, "entries": len(mine), **cams.get(fr, {})}))
     return written
 
 

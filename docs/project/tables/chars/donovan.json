@@ -206075,6 +206075,9 @@
     "handler_ours": "0xcd0d4",
     "handler_vs2": "0x66ec4",
     "immediates": [],
+    "moves": [
+     "Blizzard Sword"
+    ],
     "ours_source": "byte",
     "rows": [
      {

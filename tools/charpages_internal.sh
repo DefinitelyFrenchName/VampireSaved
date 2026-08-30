@@ -1,8 +1,9 @@
 #!/bin/sh
 # charpages_internal.sh — regenerate the INTERNAL character pages with sprites
 # (14z-121 (6)). The published artifacts (docs/project/tables/chars/<t>.html)
-# carry no art by ruling; these pages do, and they live OUTSIDE the tracked
-# tree: build/charpages/<tenant>_internal.html.
+# carry no art by ruling; these pages do, and they live ABOVE the working
+# tree: ../charpages/<tenant>_internal.html (CHARPAGES_OUT overrides) — a
+# location git cannot add, commit or push from this repository.
 #
 # The pipeline, every step rerunnable and every number from an instrument:
 #   A. tests/lua/field_trace.lua on every naming rig part (tests/replays/naming/
@@ -20,10 +21,23 @@
 # ~15 min (A and C are ~24 MAME legs each, six in parallel). Needs ROMDIR.
 # Usage: ROMDIR=... tools/charpages_internal.sh [DON=build/don_m18 HUI=build/hui52 PYR=build/pyron36]
 set -u
-: "${ROMDIR:?set ROMDIR}"
+: "${ROMDIR:?set ROMDIR to the directory holding your OWN reference dumps (vsav.zip vsavj.zip vsav2.zip vhunt2.zip vhunt2r1.zip qsound_hle.zip)}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 DON="${DON:-build/don_m18}"; HUI="${HUI:-build/hui52}"; PYR="${PYR:-build/pyron36}"
-W="$REPO/build/p3_sprites"; rm -rf "$W"; mkdir -p "$W/cap" "$W/png" "$REPO/build/charpages"
+
+# ---- PREREQUISITES, for a user regenerating the pages from their own ROMs (14z-121 (7)) ----
+# Nothing copyrighted ships with the repo: the reference dumps are yours, in $ROMDIR; the
+# pipeline below builds everything it needs from them and only writes ABOVE the tree.
+echo "== 0. prerequisites"
+python3 tools/audit_roms.py "$ROMDIR" > /dev/null || { echo "STOP: \$ROMDIR does not match docs/checksums.txt (tools/audit_roms.py)"; exit 1; }
+[ -x "$HOME/.cache/vampire-saved/mame/cps2" ] || { echo "   building the pinned MAME (tools/setup_mame.sh, once; needs brew sdl3 pkgconf)"; tools/setup_mame.sh || exit 1; }
+[ -s build/wide0/rompath/vsavjw.zip ] || { echo "   building the CPS-2 WIDE overlay romset"; python3 tools/build_wide_romset.py "$ROMDIR" build/wide0/rompath --qsound 2 --gfx 4 --prg 4 > /dev/null || exit 1; }
+[ -s "$DON/extract/region_anim.bin" ] || { echo "   building $DON"; KEY_SET=vsavj WIDE_ROMSET=build/wide0/rompath/vsavjw.zip GEN_FLAGS="--allow-plausible --tripwire-open --profile cps2-wide-v1" tools/build_donovan.sh 6 "$DON" > /dev/null || exit 1; }
+[ -s "$HUI/extract/region_anim.bin" ] || { echo "   building $HUI"; TENANT_MANIFEST=build/manifest/huitzil.toml TENANT_CHAR=0x10 WIDE_ROMSET=build/wide0/rompath/vsavjw.zip GEN_FLAGS="--profile cps2-wide-v1 --allow-plausible --tripwire-open" tools/build_donovan.sh 6 "$HUI" > /dev/null || exit 1; }
+[ -s "$PYR/extract/region_anim.bin" ] || { echo "   building $PYR"; TENANT_MANIFEST=build/manifest/pyron.toml TENANT_CHAR=0x11 WIDE_ROMSET=build/wide0/rompath/vsavjw.zip GEN_FLAGS="--profile cps2-wide-v1 --allow-plausible --tripwire-open" tools/build_donovan.sh 6 "$PYR" > /dev/null || exit 1; }
+for t in donovan huitzil pyron; do [ -s "docs/project/tables/chars/$t.json" ] || { echo "STOP: the map docs/project/tables/chars/$t.json is missing (python3 tools/charmap_gen.py)"; exit 1; }; done
+OUT="${CHARPAGES_OUT:-$REPO/../charpages}"   # ABOVE the working tree: rendered art can never be added, committed or pushed from here
+W="$OUT/work"; rm -rf "$W"; mkdir -p "$W/cap" "$W/png" "$OUT"
 FIELDS="ff841c:l:node,ff8410:w:x,ff8414:w:y,ff8782:b:id,ff840b:b:face"
 
 echo "== chains + tile sets"
@@ -127,6 +141,6 @@ PY
 
 echo "== E. the pages"
 for t in donovan:$DON huitzil:$HUI pyron:$PYR; do n="${t%%:*}"; b="${t#*:}"
-  python3 tools/charmap_html.py "$n" "$b" "build/charpages/${n}_internal.html" --sprites "$W/png/$n"
+  python3 tools/charmap_html.py "$n" "$b" "$OUT/${n}_internal.html" --sprites "$W/png/$n"
 done
-echo "open build/charpages/<tenant>_internal.html — NOT for publishing"
+echo "open $OUT/<tenant>_internal.html — NOT for publishing (the directory sits above the working tree)"

@@ -3,7 +3,8 @@
 -- Same interface (REPLAY / POKES / DUMP_FRAMES / TRACE_OUT / FRAMES / OBJ_BASE);
 -- at every dumped frame it also writes the 4 KB palette page at PALETTE_BASE
 -- ($90C000, atlas ram.md) as one hex line "P<frame> <hex>" so a render can use
--- the colours the game had staged for that very frame. Read-only; no rendering
+-- the colours the game had staged for that very frame, and a "C<frame> p1x= p1y= p2x= p2y= cam= p1face="
+-- line (the fighters' world positions and the camera) so the box overlay can be anchored. Read-only; no rendering
 -- verdict lives here — the instrument dumps, tools/sprite_render.py draws.
 local out_path = os.getenv("TRACE_OUT") or "obj_records.txt"
 local obj_base = tonumber(os.getenv("OBJ_BASE") or "708000", 16)
@@ -111,6 +112,10 @@ emu.register_frame_done(function()
         local hex = {}
         for i = 1, #pal do hex[i] = string.format("%02x", pal:byte(i)) end
         f:write(string.format("P%d %s\n", frame, table.concat(hex)))
+        -- the fighters' world positions and the camera (ram.md: +0x10/+0x14, $FF8290 = the screen's left edge) — the box overlay's anchor
+        f:write(string.format("C%d p1x=%d p1y=%d p2x=%d p2y=%d cam=%d p1face=%d\n", frame,
+            program:read_u16(0xff8410), program:read_u16(0xff8414), program:read_u16(0xff8810), program:read_u16(0xff8814),
+            program:read_u16(0xff8290), program:read_u8(0xff840b)))
         dumped = dumped + 1
     end
 
