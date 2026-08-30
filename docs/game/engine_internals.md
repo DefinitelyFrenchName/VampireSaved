@@ -816,7 +816,14 @@ the victim".
   fighter block nor in `$FF3400-$FF35FF` (every byte and word of those
   sampled per frame: no monotone counter, and only the class `+0x54`,
   the state byte `+0x05` = 2 and the combo `+0x144` are set at the hit and
-  cleared at the return) — its source is OPEN. Measured returns to a stand
+  cleared at the return). **What releases it is the PUSHBACK SLIDE ending**
+  (14z-120 (9)): the victim's x moves from freeze-end until the return
+  frame (light: +9..+17 f, 30 px; medium: +10..+22 f, 51 px; heavy: still
+  sliding at +35 with a decaying `+0x40` velocity) and the hold exits the
+  frame the slide stops — so the hitstun beyond the chain is the
+  pushback's duration, i.e. the attack record's `+0x1C`. The counter that
+  implements the slide is the open detail (the light/medium slide moves x
+  by a per-frame table with `+0x40` = 0). Measured returns to a stand
   chain are the same on all three tenants — light 19-20 f, medium 23-24,
   heavy ~35, blocked light/medium/heavy/DP/jump-in 22 / 26 / 24 / 18 /
   19 f, the sweep knockdown 67-76 f — with the freeze 11 on every
