@@ -1,0 +1,32 @@
+donovan	2	Blizzard Sword [LP]	0x3e:3:+39..+71
+donovan	2	Blizzard Sword [MP]	0x3e:3:+39..+76
+donovan	2	Blizzard Sword [HP]	0x3e:3:+39..+76
+donovan	
+pyron	2	Sol Smasher [LP]	0x40:1:+25..+43
+pyron	2	Sol Smasher [MP]	0x40:1:+25..+42
+pyron	2	Sol Smasher [HP]	0x40:1:+25..+40
+pyron	2	Sol Smasher [j.236LP]	0x41:1:+33..+54
+pyron	2	Sol Smasher [j.236HP]	0x41:1:+33..+54
+pyron	4	Sol Smasher (ES)	0x40:1:+25..+59
+pyron	4	Sol Smasher (ES) [air]	0x41:1:+32..+73
+pyron	4	Cosmo Disruption [PP held]	0x42:1:+76..+219
+pyron	4	Cosmo Disruption [KK held]	0x42:1:+76..+213
+pyron	4	Cosmo Disruption [PP tap]	0x42:2:+41..+148
+pyron	4	Sol Smasher [LP] in DF	0x40:3:+25..+43
+huitzil	2	Mighty Launcher [LP]	0x44:1:+28..+63
+huitzil	2	Mighty Launcher [MP]	0x44:1:+28..+55
+huitzil	2	Mighty Launcher [HP]	0x44:1:+28..+51
+huitzil	2	Mighty Launcher [j.214LP]	0x44:1:+30..+65
+huitzil	2	Mighty Launcher [j.214HP]	0x44:1:+29..+77
+huitzil	2	Plasma Trap [j.214LK]	0x45:1:+29..+91
+huitzil	2	Plasma Trap [j.214MK]	0x45:1:+30..+97
+huitzil	2	Plasma Trap [j.214HK]	0x45:1:+30..+176
+huitzil	2	Plasma Trap [j.214HK] late	0x45:1:+41..+187
+huitzil	4	Mighty Launcher (ES)	0x44:1:+28..+68
+huitzil	4	Mighty Launcher (ES) [air]	0x44:1:+30..+69
+huitzil	4	Genocide Vulcan (ES)	0x47:1:+27..+141
+huitzil	4	Plasma Trap (ES)	0x45:1:+30..+200
+huitzil	4	Final Guardian Beta	0x46:2:+24..+32
+huitzil	4	Erasing Sphere [KK held]	0x47:2:+27..+141
+huitzil	4	Erasing Sphere [KK tap]	0x47:2:+27..+141
+huitzil	4	Circuit Scrapper (ES)	0x44:2:+32..+56

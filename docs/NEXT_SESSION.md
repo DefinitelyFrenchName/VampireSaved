@@ -45,15 +45,19 @@
 > ## medium 23 / heavy 35 / blocked 22-26 / sweep ~70 on all three).
 > ## Record fields `+0x14` (attacker meter) and `+0x1C` (pushback) measured.
 > ##
-> ## **Also measured (STATE 14z-120 (8)-(10)):** the stun = freeze + the
-> ## reaction chain + a HOLD released when the PUSHBACK SLIDE ends (record
-> ## `+0x1C`); projectile parameters are INLINE in each type's handler
-> ## (Blizzard Sword xv/yv by strength at vs2 `0x670C0`, ported region).
+> ## **Also measured (STATE 14z-120 (8)-(12)):** the stun = freeze + the
+> ## reaction chain + a HOLD released when the victim stops sliding — and
+> ## the light/medium slide is the PUSHBOX SEPARATION routine (vs2
+> ## `0x17D30`) settling the reaction nodes' push boxes, not a velocity;
+> ## projectile parameters are INLINE in each type's handler (Blizzard
+> ## Sword xv/yv by strength at vs2 `0x670C0`, ported region); the
+> ## projectile-type census per move is gated (`test_projectile_census.sh`).
 > ##
 > ## **NEXT, the maintainer's pick:** (A) the board verdict on M12; (B) the
-> ## phase-3 remainder: the slide counter's home, the unindexed lying/wake
-> ## nodes (game-logic jumps — the per-victim pose tables are the
-> ## candidate), per-type projectile handlers, the `gap_*` tables; (C) the
+> ## phase-3 remainder: how `+0x1C` couples to the separation, the
+> ## unindexed lying/wake nodes (NO long pointer to them anywhere in vs2's
+> ## program space — a computed address), per-type projectile handlers,
+> ## the `gap_*` tables; (C) the
 > ## small opens: Donovan's `0x3d` / Killshread Summon (ES); Plasma Trap's
 > ## HK chain. Load `vampire-saved-port` first.
 > ##
