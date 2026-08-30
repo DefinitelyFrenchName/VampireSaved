@@ -56,6 +56,12 @@
 |---|---|---|---|---|---|---|
 | 16 | "`0x0448a6→0x02563e` (0.94): SUSPECT — likely WRONG SIBLING" — written as live while the entry's own tail derives "Right answer: `0x04367A`" and #107 SHIPPED that flip at 14z-102 (`patch_index.md:210` "verified") | `docs/project/hardening_register.md:73` | STALE-CARRIER | none — mark the entry RESOLVED-AND-SHIPPED with the 14z-102 citation (status header tracks reality) | T0 | OPEN |
 
+### Ruled additions (14z-122 close (2))
+
+| # | claim | file:line | class | measurement | rig/gate | cost | status |
+|---|---|---|---|---|---|---|---|
+| 17 | CLAUDE.md §5 promised `docs/annotations.md` (an address→label/comment stream) — retired 14z-122 as never-created; the maintainer rules CHECK FIRST: stored elsewhere / unnecessary / else CREATE it | `CLAUDE.md:334` | GUESSED (the retirement note asserts the stream "lives in the atlas + manifest comments" — plausible, unverified) | enumerate what a label stream would hold vs the atlas rows + manifest comments + `re/ghidra/` (does the Ghidra project export labels?); outcome A reword the note to say WHERE, outcome B create the document | `re/ghidra/`, `docs/game/atlas/*` | T1 | OPEN (next session's opener) |
+
 ### What is NOT known — labelled unknowns that stay labelled (no measurement this pass)
 
 - **MSC-71** "That real CPS-2 silicon decrypts only the first 1 MB — INFERRED, never measured" (`mister_core.md:881`) — T4 hardware; already lives in the §12 holes ledger, which IS the "What is NOT known" form. No change.

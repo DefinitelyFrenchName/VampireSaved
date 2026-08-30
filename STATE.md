@@ -1,5 +1,11 @@
 # STATE — living progress log
 
+## Session 14z-122 CLOSE (2) — ritual complete for the CONTINUED session. **Two new rulings recorded: the
+## annotations row is now CHECK-FIRST (stored elsewhere / unnecessary / else CREATE the document), and THE
+## CLAUDE.md CONDENSING PASS is a named item ("more concise and to the point ... without losing precious
+## information, especially on the work style and discipline") — both in "Decisions pending". G1 done (the
+## post-close entry below); NEXT_SESSION rotated through its rollover. 10 commits LOCAL past `f7d4781`.**
+
 ## Session 14z-122 (post-close, same day) — **G1 EXECUTED after the specimen's ratification ("it's good"): eight
 ## document commits — patch_index folded, patch_notes reordered move-only, build_dir_triage / tenant_manifest /
 ## cps2_wide split to history twins, sfx_records + tables/README flipped, the atlas retagged (the Shadow-vs-tenant
@@ -30,7 +36,7 @@
 | **G0** | the SPECIMEN: `tables/reconciliation.md` 658→182 lines (STATUS banner, methods kept, THE MAP AT A GLANCE measured from the toml — 272 rows: 220 verified / 12 plausible / 40 open, the damage-pipeline twin table, sound rows' three classes with "RESTORE AT M5" corrected as SUPERSEDED by 14z-86, twin-choice case law, What is NOT known); chronology :71-658 BYTE-VERBATIM in `reconciliation_history.md`. NEXT_SESSION → 56 live lines + `NEXT_SESSION_HISTORY.md` (18 openers; the rollover is now part of this ritual). `docs/project/inferred_claims.md` — 16 rows + 5 labelled unknowns (T0×6 T1×1 T2×5 T3×3 T4×2; the fork's draft spot-checked 8/8); two live contradictions found: select_screen:401 "never been run" vs the green `test_shadow_tenant` since 14z-116, and hardening_register:73's stale SUSPECT headline (#107 shipped the flip at 14z-102) |
 | green at close | portable tier **59 PASS / 0 FAIL** (+4 gates); census 427 anchors; checkdocs 19 locks / 50 sites; checkskills 425; the full static tier (ROMDIR) `--strict` **PASS 120 / SKIP 0 / FAIL 0 / MISSING 0** (run concurrently with the close edits — its dirty-tree note is those edits, and the four doc gates were re-run green after them) |
 | not done, by design | the remaining document commits (G1: patch_index, patch_notes index, build_dir_triage, tenant_manifest, sfx_records+tables/README, the atlas retags, cps2_wide; the gotchas retitling; G2 measurements before engine_internals; G4 mister; G6 HANDOFF; G7 close) — the maintainer should READ THE SPECIMEN first; the plan's per-file table is in the session plan file, the live worklist in `inferred_claims.md` |
-| open to veto | the CLAUDE.md annotations-row retirement (maintainer asked what it is, 2026-08-30 — answered, awaiting the ruling); ~~the specimen's shape~~ **DECIDED (maintainer, 2026-08-30): "it's good" — the reference/history shape is ratified; anchored documents may move** |
+| open to veto | ~~the CLAUDE.md annotations-row retirement~~ **RULED (maintainer, 2026-08-30): CHECK FIRST — "we need to check if the information is either stored elsewhere or unnecessary. If it is necessary and not easily available then we should absolutely create the document." The check (T1, next session's opener): what an address→label/comment STREAM would hold vs what exists — the atlas (per-address rows with labels+evidence), the manifests' inline comments, and `re/ghidra/` (CLAUDE.md §3 names a Ghidra project — does it hold a label export?). Outcome A: covered → the retirement stands, reworded to say WHERE; outcome B: a gap → create `docs/annotations.md` for real and the row returns.** ~~the specimen's shape~~ **DECIDED (maintainer, 2026-08-30): "it's good" — ratified; anchored documents moved (the post-close block)** |
 | push | NOT pushed — push at the maintainer's word |
 
 ## Session 14z-122 (2026-08-30) — **THE TWO FUTURE ITEMS RULED: the documentation rationalization pass (opened,
@@ -489,6 +495,23 @@ entries moved VERBATIM to `DECISIONS_HISTORY.md` — grep there by topic.
 Lifecycle: rulings are still marked DECIDED in place here first; they move to
 the archive once they stop shaping active work.)*
 
+- **THE CLAUDE.md CONDENSING PASS (maintainer-directed 2026-08-30, 14z-122
+  close). RULED as a named item of the documentation pass; NOT started —
+  "for a next session".** The maintainer's words, in substance: CLAUDE.md
+  "has become very big and looks to have been extended like a log. This is
+  not bad but wastes resources: we should plan a pass on it to remove
+  duplicates if any and rewrite the contents in a more concise and to the
+  point manner, without losing precious information, especially on the work
+  style and discipline." Constraints the pass's tooling already enforces:
+  CLAUDE.md carries **30 `**[VSP-N]**` anchors** (checkskills + the census
+  freeze every one by section) and is a LOG for VSP skill numbers — every
+  rewrite keeps each marker with its fact or moves the rule ([VSP-13]-grade
+  discipline; the census diff is the review artifact). Shape suggestion to
+  ratify at the pass: the LAW (rules 1-8, §4's classes, §5's standing
+  orders) stays verbatim-precise; the CORRECTION NARRATIVES appended inside
+  rules (the 14z-91/94/110b/114 stories) condense to the rule + a dated
+  citation, with the narrative in the docs that already carry it. Slot:
+  before G7 (the close bumps floors; the law should settle first).
 - **ZABEL j.LK PROXIMITY GUARD — A LEGACY-CONTENT PATCH, ITS OWN SESSION
   (maintainer, 2026-08-30, 14z-122). RULED as the SECOND of two future items;
   not started.** The maintainer's report, in substance: Zabel's j.LK does not
