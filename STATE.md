@@ -4,8 +4,8 @@
 ## CREATED, generated), G2 (three T3 rigs — EVERY claim RETRACTED: Sasquatch's DF armor, the roulette tag, the advancing
 ## guard), five T2 rows, G3 (a)+(b) of engine_internals, G4 (the MiSTer pair, a fork), G6 (1)+(2) (HANDOFF 3,652 → 1,374;
 ## the gate index GENERATED, 222 WHYs into their scripts), CLAUDE.md pass 1, G7 partial (ONE doc still PENDING:
-## engine_internals — (c) is next session's). No build changed. Portable 61/0; strict static 121/0/0/0. NOT pushed
-## (26 commits local past `f7d4781`, this close included).**
+## engine_internals — (c) is next session's). No build changed. Portable 61/0; strict static 121/0/0/0. PUSHED
+## after the close at the maintainer's word (`f7d4781..719c560`).**
 
 | | |
 |---|---|
@@ -17,7 +17,7 @@
 | not done, by design | G3 (c) — `engine_internals.md` :2948-end (the Dark Force header + the 14z-79 blockquote = row 10; the grenade's six 14z-70x passes → history keeping the ANCHOR METHOD and the 14z-70f conclusion; the beam family → history), then the REFERENCE flip (banner + atlas-rows), `--no-pending` green and the ci floor = G7 done; CLAUDE.md pass 2 (a ruling — "Decisions pending"); the D2-window subsection was added in (a) |
 | open (unchanged unless noted) | the Zabel j.LK proximity guard (its own session, recording first); the COSMETIC BACKLOG gained the roulette-tag row; the 1:1 wheel mockup; #112/#113 parked; the FBNeo two-run-family question; win quotes forgone. `test_random_select_tenants.sh`'s CONTROL is still `build/m3b_merged19` |
 | rollover | the 14z-120 group (five records) AND — early, per the rule's ~150 KB line (STATE was 158 KB) — the 14z-121 group (8 records) moved verbatim to STATE_HISTORY + two ledger lines; STATE holds 14z-122 / 14z-123. NEXT_SESSION's 14z-122 (2) opener → `NEXT_SESSION_HISTORY.md` |
-| push | NOT pushed — 26 commits local past `f7d4781` (this close included); push at the maintainer's word |
+| push | PUSHED at the maintainer's word (2026-08-30, after the close): `f7d4781..719c560`, 26 commits |
 
 ## Session 14z-123 (2026-08-30) — **THE DOCUMENTATION RATIONALIZATION PASS CONTINUES. T1 (the annotations check,
 ## maintainer-ruled check-first) MEASURED — outcome B, a REAL GAP: `re/ghidra/` never held a project, and the 14z-122

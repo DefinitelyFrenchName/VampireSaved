@@ -7,8 +7,8 @@
 
 > ## **START HERE. NOTHING IS RED. NO BUILD CHANGED — the tree is still the
 > ## M12 freeze (merged-m14 `6649523a`, `build/m3b_merged21`), FIELD-VERIFIED
-> ## GREEN. 26 commits are LOCAL past the pushed `f7d4781` — push at the
-> ## maintainer's word; check `git status -sb`, not this line.**
+> ## GREEN. 14z-123 is PUSHED (maintainer's word, 2026-08-30: `f7d4781..719c560`);
+> ## check `git status -sb`, not this line.**
 > ##
 > ## **THE DOCUMENTATION RATIONALIZATION PASS IS ONE COMMIT FROM DONE.** 14z-123
 > ## did T1, G2 (all three rigs — every claim RETRACTED), the T2s, G3 (a)+(b),
