@@ -1,4 +1,62 @@
-# NEXT SESSION — orientation (rewritten at the 14z-120 close, 2026-08-30; updated at 14z-120 (2))
+# NEXT SESSION — orientation (rewritten at the 14z-120 close, 2026-08-30, for a FRESH session)
+
+> ## **START HERE. NOTHING IS RED. NO BUILD CHANGED SINCE THE M12 FREEZE
+> ## (merged-m14 `6649523a`, `build/m3b_merged21`; bundle
+> ## `../mister_fieldtest_14z119/`, tell "M12"). The maintainer's board test
+> ## of M12 was IN PROGRESS at the close — record the verdict FIRST (one row,
+> ## STATE + `mister_field.md`; the 14z-118 gotcha "a field verdict lands in
+> ## one row"). Everything is PUSHED.**
+> ##
+> ## **WHAT 14z-120 DID, one breath — the character-data map from the move
+> ## lists to phase 3, in one day:** the maintainer's three move lists live
+> ## in `build/manifest/moves_{donovan,pyron,huitzil}.toml`; EVERY chain of
+> ## the three tenants is NAMED on native vs2 (`tools/name_moves.py`,
+> ## `tests/test_move_naming.sh`: 412 frozen lines, each row's seq entered
+> ## by an event of its own name on the sampled id); PHASE 2 measured the
+> ## hitbox encoding (`(x, y, hw, hh)` authored facing LEFT; `+0x8C` =
+> ## attack records = base[4], `+0x90` = push = base[3]; family `hb8`,
+> ## record `hbA>>8`; class `+0x17` on every path, `+0x14` attacker meter,
+> ## `+0x1C` pushback — `tools/hitbox_records.py`,
+> ## `tests/test_hitbox_encoding.sh`); PHASE 3 measured the reaction sets
+> ## (each class enters the character's own table, block = `0xFF` on the
+> ## shared `b:0x0c`, stun = freeze + chain + a HOLD released when the
+> ## pushbox separation settles — `tools/reaction_map.py`,
+> ## `tests/test_reactions.sh`), projectile parameters inline per type
+> ## handler, and the projectile-type census (`test_projectile_census.sh`).
+> ## The maps (`docs/project/tables/chars/`) carry it all: named chains,
+> ## attack records, frame data, reactions.
+> ##
+> ## **RULINGS:** Dark Force at VS cost is on purpose (DECIDED); Genocide
+> ## Vulcan is 421+P (confirmed); Planet Burning ES confirmed as measured.
+> ##
+> ## **TRAPS PAID (`project/gotchas.md`):** a throw leaves P2 behind P1 and
+> ## mirrors every later motion — pin far, walk in, sample the facing byte;
+> ## a poked near pair overlapping pushboxes CROSSES the fighters; "+0x1D"
+> ## and "+0x17" were one byte counted from two bases; a table below the
+> ## crypt boundary is read through the DATA view; "hold away" for a
+> ## left-facing P2 is R; macOS `wc -l` pads.
+> ##
+> ## **NEXT, the maintainer's pick:** (A) the M12 verdict; (B) the phase-3
+> ## remainder — how `+0x1C` couples to the separation, the lying/wake nodes
+> ## reached by a COMPUTED address (no long pointer in vs2's program space),
+> ## per-type projectile handlers beyond Blizzard, the `gap_*` tables; (C)
+> ## the small naming opens (Donovan's `0x3d` / Killshread Summon (ES),
+> ## Plasma Trap's HK chain). Load `vampire-saved-port` first; the maps'
+> ## "What is NOT decoded" is the worklist.
+> ##
+> ## **OPEN, unchanged:** the 1:1 wheel mockup; #112/#113 parked; the FBNeo
+> ## two-run-family question; the tenant CPU AI "lackluster" note; win
+> ## quotes (forgone). `test_random_select_tenants.sh`'s CONTROL is still
+> ## `build/m3b_merged19`.
+> ##
+> ## **STATE OF THE BUILDS:** unchanged from 14z-119 — play `tools/run_wide.sh
+> ## build/m3b_merged21 fbneo`; current + one back: `don_m17/m18`, `hui51/52`,
+> ## `pyron35/36`, `m3b_merged20/21` (+ `merged19` control), `m5_stock12/13`.
+
+# HISTORY BELOW — the 14z-120 mid-day openers, the 14z-119 close opener, the 14z-118 openers and older;
+# kept for the census anchors, eliminations and traps, superseded as the opener.
+
+## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-120 close, 2026-08-30; updated at 14z-120 (2) — superseded by the fresh-session opener above)
 
 > ## **START HERE. NOTHING IS RED. NO BUILD CHANGED — the tree is still the
 > ## M12 freeze (merged-m14 `6649523a`, `build/m3b_merged21`), NOT PUSHED
@@ -72,8 +130,7 @@
 > ## build/m3b_merged21 fbneo`; current + one back: `don_m17/m18`, `hui51/52`,
 > ## `pyron35/36`, `m3b_merged20/21` (+ `merged19` control), `m5_stock12/13`.
 
-# HISTORY BELOW — the 14z-119 close opener, the 14z-118 fresh-session opener, the 14z-118 close (audit), 14z-118 verdict, 14z-117 closes, 14z-116, 14z-114, mid-14z-114 and 14z-113 orientations and older;
-# kept for the census anchors, eliminations and traps, superseded as the opener.
+
 
 ## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-119 close, 2026-08-30 — superseded by the 14z-120 opener above)
 

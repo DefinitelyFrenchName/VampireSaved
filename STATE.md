@@ -1,5 +1,25 @@
 # STATE — living progress log
 
+## Session 14z-120 CLOSE — ritual complete. **ONE DAY, THE CHARACTER-DATA MAP FROM THE MOVE LISTS TO
+## PHASE 3: the three move lists in the tree; every chain of the three tenants NAMED on native vs2
+## (`test_move_naming`, 412 frozen lines, own-name and id checks); the hitbox encoding, the attack
+## record and the reaction sets MEASURED (`test_hitbox_encoding`, `test_reactions`,
+## `test_projectile_census`); the maps carry hitboxes, frame data and reactions. No build changed;
+## strict 117/0/0/0; the M12 board test still running on the maintainer's side. PUSHED at close.**
+
+| | |
+|---|---|
+| opened with | the 14z-119 close (`71192cc`, unpushed); the maintainer asked for the move-list format |
+| delivered, in order | the move lists (Donovan / Pyron / Huitzil, 54 / 42 / 50 rows); the naming rig `tools/name_moves.py` and Donovan's 53 ids; the DF-cost ruling recorded (VS cost, DECIDED); Pyron's and Huitzil's naming (the mirrored-rig pass caught by the maintainer's Planet Burning challenge — position pins, facing byte, own-name row check + id check, swapped-seq control); phase 2 — the hitbox encoding, `+0x8C`/`+0x90`, the record's `+0x17` class (the "+0x1D" resolved), `+0x14` meter, `+0x1C` pushback; phase 3 — the reaction sets, the stun mechanism (freeze → chain → HOLD released by the pushbox separation settling), projectile parameters inline per type handler, the projectile-type census |
+| green at close | `run_all_static --strict` **117/0/0/0**; emulator gates `test_move_naming` x3, `test_hitbox_encoding`, `test_reactions` x3, `test_projectile_census`, `test_charmap_current` — all PASS on the committed tree |
+| corrections this session ([VSP-13], each grepped) | "no ES Planet Burning / 63214PP = Cosmo" (the rig facing left); "pairs trigger other ES trackers" (same); the class byte "+0x1D" (`engine_internals` 2538, `patch_notes` annotated); "+0x8C push / +0x90 attack" (`ram.md`); Genocide Vulcan 421+K → 421+P (maintainer-confirmed) |
+| maintainer rulings | Dark Force at VS cost, on purpose (DECIDED); Genocide Vulcan = 421+P; Planet Burning ES confirmed as described and measured |
+| not done, by absence | the M12 board verdict (maintainer, in progress); the phase-3 remainder (NEXT_SESSION); the small naming opens |
+| next | NEXT_SESSION — the board verdict first; then the phase-3 remainder or whatever the map's findings suggest. Load `vampire-saved-port` first |
+
+**Ledger rollover:** the 14z-117 group moved verbatim to STATE_HISTORY.md; STATE holds 14z-118 / 14z-119 / 14z-120.
+
+
 ## Session 14z-120 (7) — **PHASE 3 (reactions) — the tenants' REACTION SETS measured as the VICTIM: which
 ## of their own chains each class enters, the shared blockstun chain, the stun lengths as the engine ran
 ## them. `tools/reaction_map.py`, `tests/test_reactions.sh`, the maps' "Reactions as the victim". Not pushed.**
@@ -196,90 +216,6 @@ STATE_HISTORY.md; STATE holds 14z-117 / 14z-118 / 14z-119.
 | push | `main` pushed at the maintainer's word (this commit + `ca132f3`); fork untouched, no tags |
 | next | the documentation audit — inventory first (`docs/project/doc_audit_14z118.md`), one commit per document |
 
-## Session 14z-117 CLOSE (3) — the session's last act. **The VS/VS2 data-architecture page
-## CORRECTED from a row-by-row measurement after the maintainer read it; the next session is
-## RULED: a full documentation audit — measured, consistent, nothing stale.**
-
-| | |
-|---|---|
-| the correction | the maintainer read the character-bank grid and asked why Gallon/Aulbath/Sasquatch looked un-doubled. The grid was WRONG in two places and its legend conflated two things. Measured on both data images (hitbox base, dispatch, anim index, and the two palette pointer tables): vsavj — every variant row 0x10-0x1F is a byte-identical COPY of row−16 except `0x18` (Oboro); `0x12` (the Dark Talbain id) copies Gallon's rows and has its own row ONLY in the two palette tables (`0x38C198` / `0x38C218`). vsav2 — all 16 base rows keep their own data (Gallon, Aulbath, Sasquatch leave the WHEEL, not the bank), variant `0x10/0x11/0x13/0x18` own, `0x19` own in the hitbox table only. The atlas had all of this right (`character_tables.md`, `id_space.md`); the translation to the grid was the error. Republished; legend now says COPY, not alias; linked from `docs/README.md` |
-| commits | `d2b2484` (push record) + this close; artifact v2 "bank grid corrected" |
-| **NEXT SESSION, RULED BY THE MAINTAINER** | (1) ~~their board results on bundle 14z117b (M11)~~ DONE — GREEN, STATE 14z-118; (2) **a full pass on the documentation: every claim derived from a MEASUREMENT, not a guess; everything consistent; nothing stale** — the Sailor Moon S discipline. Shape it as the 14z-113/114 staleness passes were shaped (S1-S20, S-C1..): inventory the claims per document, mark each MEASURED (with the log/gate that measured it) / DERIVED / GUESSED, re-measure or retract the last class, grep every retraction across the repo ([VSP-13]), and commit per document. Today's grid error is the specimen: a claim that was right in the atlas and wrong one hop away |
-| push | this close commit NOT pushed — push at the maintainer's word |
-
-## Session 14z-117 CLOSE (2) — ritual complete. **THE RANDOM-SELECT FREEZE: donovan-m17 /
-## huitzil-m24 / pyron-m18 / merged-m13, mark M11 — strict 112/0/0/0, guard corpus 344/344,
-## roster 111/111, legacy pairings PASS, every masked legacy class green on three suites.
-## FIELD-TESTED GREEN on the board 2026-08-29 (bundle `../mister_fieldtest_14z117b/`, STATE 14z-118), PUSHED.**
-
-| | |
-|---|---|
-| opened with | merged-m12 (M10) pushed and on the board; "do the random-select includes the tenants then" |
-| delivered | the feature (two thunks, `roster_subst`), its gate, the crash-and-fix on the way (STATE 14z-117 (2)), the Shadow rig re-timed, the whole battery again, release + MiSTer tail, docs; **plus the VS/VS2 data-architecture page** at the maintainer's request: `https://claude.ai/code/artifact/98d586db-1a69-49eb-b421-5085db07b707` (eleven figures from the atlas; no ROM bytes — the palette is authored) |
-| green at close | `run_all_static --strict` **PASS 112 / SKIP 0 / FAIL 0 / MISSING 0**; suites donovan-m17 / huitzil-m24 / pyron-m18: 66 pass / 19 (18) skip, moved `.sha1`s = `113` ×3 (the re-timed rig, attributed) + `40_pick_pyron_cell` on pyron only (ONE byte, `$FF8440` = the "?" walker's cursor, zero bytes at match), re-frozen and re-verified; `audit_merged_legacy` 47/47; `audit_guard_corpus` 344/344; `audit_roster_pairings` 111/111 (`bases.tsv` re-derived: Phobos +0xC0, Pyron +0x30); `audit_legacy_pairings` PASS (50/10/7 · 52/8/7 · 52/9/7); m3a, dualtrack, fbneo_legacy_oracle (no refit), inp corpus 6/6, random_select_tenants, version_string (M11), medallion, shadow, oboro, wheel gates, pointer_flow, pcrel, escape_triage, tenant_loop, manifest_merge, MiSTer twin/mra_map/parts/page/fit, release_roundtrip — all PASS |
-| push | **PUSHED** at the maintainer's word (2026-08-29, "push"): fork `f997cfe1` FIRST, then main `085db97` + tags `freeze/{donovan-m17,huitzil-m24,pyron-m18,merged-m13}` |
-| not done, by absence | ~~the board verdict on M11~~ (GREEN 14z-118); the 1:1 wheel mockup; #112/#113 parked |
-| next | ~~the board test of bundle 14z117b (tell: "M11"; park on "?" — all 18 cycle; confirm one)~~ DONE, GREEN (14z-118). Load `vampire-saved-port` first |
-
-**Ledger rollover:** none this close — STATE holds 14z-115 / 14z-116 / 14z-117 (both freezes).
-
-
-## Session 14z-117 (2) — **RANDOM SELECT INCLUDES THE TENANTS, maintainer-directed
-## ("do the random-select includes the tenants then") and FROZEN the same day as
-## donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13, mark M11 — two sites, one table,
-## after a bound-only first cut crashed the figure refresh.**
-
-| | |
-|---|---|
-| opened with | merged-m12 (M10) pushed; the maintainer on the board with bundle 14z117; "do the random-select includes the tenants then" |
-| the mechanism, re-read | the 14z-116 record was right about the draw (fixed 15-entry table at `PRG:0x020C88`, bound `cmpi.b #$f`, cursor `$40(a6)`) and WRONG BY OMISSION about the walker: the 3-frame timer's NON-tick frames branch to `020C7C` and re-read the table with the unchanged cursor, so `$382` is rewritten every frame from two paths. `select_screen.md` "THE WALKER HAS TWO PATHS", `game/gotchas.md` |
-| the fix | `[[site_thunk]]` x2 in all three manifests, profile-gated, ENGINE-SITE emitted once: `random_select_bound` at `0x020C74` (`cmpi.b #NN,d0 / bcs / moveq #0 / jmp 020C7C`, `jmp_ok`) and `random_select_roster` at `0x020C80` (`move.b tbl(pc,d0.w),$382(a6) / rts` + the 18-entry table, hole b, `rts_ok`). NEW generator feature **`roster_subst = "ids_ph:count_ph:base"`** fills the table tail with the BUILD'S OWN variant-half tenant ids (ascending) and the bound with base+count — a literal list is wrong on two of the three builds (the TT trap at roster level). Byte detail: patch_notes 14z-117 (2) |
-| the first cut, and what it cost | one site (the bound) with a body that finished the routine. Solo PASS; MERGED: address error `vec3` at `PC 0x01C3B0`, `A0 0x02220FF5`, two frames after the first tenant showed. Attribution took a probe on the copy helper (no hit — wrong entry), an instruction trace (`GUARD_TRACE`, entry `05F9E4 jmp 1c3a4` from the figure refresh at `0x05FFF6`), then a `GUARD_PROBE` at `05F9C8` printing a0 per refresh: `0x46db00` (0x10) / `0x38c2a0` (0x00!) / `0x4bfbe0` (0x11) / `0x02220FF5` — and consecutive-frame DUMPS of `$382`: `06 → 10 → 00 → 11 → 4A…`. The `00` and `4A` are vanilla's pad byte and a CODE byte read by the non-tick path with cursor 15/16. Not a consumer problem: the 32-row accent table `0x38C198` already carries the tenants' rows |
-| measured | draw cadence exactly 3 frames per id in table order (`… 09 06 10 11 13 04 …`); **confirm semantics are vanilla's** — what is showing is what you get (merged19: `0x04` showing -> P1 `0x04`; the thunked build: `0x10` -> P1 `0x10`, record base Phobos' own `0x45a770`); the replay harness stages inputs one frame ahead, so a press on a plateau's FIRST frame registers on the previous id (the gate presses mid-plateau). Legacy cost: nine select replays (04/63/03/09/11/38/05/08/36) **BIT-IDENTICAL** don_m16 vs the probe, twice (both cuts) — no legacy replay hovers "?". Stock twin `d29fd062`, whole-artifact manifest identical |
-| gate | `tests/test_random_select_tenants.sh` (HANDOFF-indexed, emulator tier): static shape of both bodies; P1 parks on "?" (D,D,DR) and `$382` is sampled 91 frames = exactly 15 + this build's tenants; confirm on a tenant's middle frame loads that tenant's own record at frame 4300; must-fire control = the previous merged (`CONTROL=build/m3b_merged19`, no tenant drawn). PASS on the solo probe, the merged probe, and merged20 |
-| THE FREEZE | `version_text` M10 -> M11. don_m17 `90a225ce` (336 ops), hui51 `ae953657` (370), pyron35 `1222df18` (307), `build/m3b_merged20` `a1b7cb82` (823 ops), `build/m5_stock12` = `d29fd062` UNCHANGED. Members moved: solos `vm3j.03d` (sites) + `vm3j.10b` (bodies) + `vsw.33m/37m` (M11 glyphs), don also `vsw.41`; merged additionally `vm3j.04d/07b` + `vsw.41/42` — the two hole-b bodies are allocated per tenant iteration ahead of the ext placements: **Phobos +0xC0, Pyron +0x30** (`bases.tsv` re-derived; escape-triage's three merged landings shifted, verdicts identical; pointer_flow merged's two STRONG win_pal bases +0x30, solos identical). Registry +3, expectation sets carried m16->m17 / m23->m24 / m17->m18. `test_tenant_loop` re-frozen 336/370/307, 612/668, 823/932; `test_manifest_merge` (22,17,9)/33/8 |
-| gates at freeze | random_select_tenants · version_string (M11) · pyron_medallion_2p · shadow_tenant · oboro · wheel_bank5 / select_wheel / tenant_select_records · dualtrack · fbneo_legacy_oracle (no refit) · inp corpus 6/6 · pointer_flow · pcrel · escape_triage · tenant_loop · manifest_merge · jtcores_twin · mister_mra_map · mra_parts · mister_page + map_fit (census unchanged: still three glyph tiles) · release_roundtrip (merged-m13) — all PASS; portable 54/0/0/0. **The long legs — three suites, merged_legacy, guard corpus, m3a, roster + legacy pairings, strict — are in the CLOSE row** |
-| release / MiSTer tail | `release/merged-m13/{fbneo,mame,mister}/` (M11; bitstream 18269 unchanged). Fork **`f997cfe1`** (catalogue: eight CRCs; the first splice dropped the newline after `</machine>` and was amended in place), patch **0027**, pin bumped, twin PASS; bundle **`../mister_fieldtest_14z117b/`** (STOCK CONTROL MRA byte-identical to 14z-115's, `.rbf` unchanged). **THE TELL IS M11** |
-| the Shadow rig re-timed | `113_shadow_vs_tenant` moved on all three sets; DUMPS attribution (don_m16 vs don_m17): at 3000 P1 was `0x00`/Bulleta vs **`0x13`/Donovan** — the old confirm (1450) now lands on the solo's own tenant (a MIRROR match) and the "Shadow took the tenant" verdict at 7800 went vacuous (P1 already the tenant). Measured the drawn-id stream on all four builds: the solo cycle (period 48) and merged's (54) coincide at `1499+3k`; frames 1520-1522 show Bulleta on all four, so the confirm moved to 1521-1522 (registers one frame early). Verified: P1 `0x00` at 3000, morph to `0x13`/Donovan's record at 7800 on don_m17 AND merged20, fight lines unshifted; `test_shadow_tenant` PASS on merged20 with the re-timed replay; the three sets' `113` `.sha1` re-frozen. The N-1 sets (m16/m23/m17) keep their old `113.sha1`, now stale by construction — they are history, not run |
-| re-point sweep | 90 files, continuation-safe this time (the 14z-117 gotcha applied: no stamp after a trailing `\`); `pcrel_escapes.toml` sections; `test_random_select_tenants.sh` EXCLUDED on purpose (its CONTROL must stay the previous merged) |
-| open | ~~the board verdict on M11 (bundle 14z117b)~~ GREEN 14z-118; the maintainer's 1:1 wheel mockup; #112/#113 parked; the FBNeo two-run-family question |
-
-## Session 14z-117 CLOSE — ritual complete. **THE PYRON-MEDALLION FREEZE: donovan-m16 /
-## huitzil-m23 / pyron-m17 / merged-m12, mark M10, stock twin unchanged — strict 112/0/0/0,
-## guard corpus 344/344, roster 111/111, every masked legacy class green on three suites.
-## Field-tested GREEN on the board 2026-08-29 (bundle `../mister_fieldtest_14z117/`; the sword trade validated — Open bugs row; header marked 14z-118), PUSHED.**
-
-| | |
-|---|---|
-| opened with | the 14z-116 close (`d9bed17`, pushed); NEXT_SESSION: the freeze battery, whole session, fresh |
-| delivered | the battery end to end in the 14z-115 order — see the session entry below for every number; the release `release/merged-m12/`; the MiSTer tail (fork `80e08111`, patch 0026, pin, bundle); the re-point + N-2 sweeps; the docs |
-| green at close | `run_all_static --strict` **PASS 112 / SKIP 0 / FAIL 0 / MISSING 0** (111 + `test_win_quote_decode`); suites donovan-m16 / huitzil-m23 / pyron-m17 full verify: every masked legacy replay PASS, the self-frozen tenant/select rigs re-frozen after attribution and re-verified; `audit_merged_legacy` 47/47; `audit_guard_corpus` 344/344; `audit_roster_pairings` 111/111; `audit_legacy_pairings` PASS; dualtrack, m3a, fbneo_legacy_oracle (no refit), inp corpus 6/6, pointer_flow, pcrel, escape_triage, version_string, pyron_medallion_2p, shadow_tenant, oboro, wheel gates, jtcores_twin, mister_mra_map, mra_parts, mister_page, mister_map_fit, release_roundtrip — all PASS |
-| push | **PUSHED** at the maintainer's word (2026-08-29, "I'll do the MiSTer testing, you can already push"): fork `80e08111` pushed FIRST (`origin/vampire-saved`), then main `d27d45a` + tags `freeze/{donovan-m16,huitzil-m23,pyron-m17,merged-m12}` |
-| not done, by absence | ~~the board verdict on M10~~ (GREEN 2026-08-29, marked 14z-118); the maintainer's 1:1 wheel mockup; random select "include the tenants" (shape recorded 14z-116, unscheduled) |
-| next | the board test of `../mister_fieldtest_14z117/` (tell: "M10"); then whatever the maintainer brings. Load `vampire-saved-port` first |
-
-**Ledger rollover:** the 14z-114 group (two records) moved verbatim to
-STATE_HISTORY.md; STATE holds 14z-115 / 14z-116 / 14z-117.
-
-
-## Session 14z-117 (2026-08-29) — **THE PYRON-MEDALLION FREEZE: donovan-m16 / huitzil-m23 /
-## pyron-m17 / merged-m12, mark M10, stock twin unchanged — the whole battery in one session,
-## as NEXT_SESSION asked; the change was ten in-place bytes + one glyph and NO ADDRESS MOVED.**
-
-| | |
-|---|---|
-| opened with | the 14z-116 close (`d9bed17`, pushed); NEXT_SESSION: "the work is the freeze battery, the whole session, fresh"; `build/m3b_merged19` (`af21bc88`, M9) field-validated and unfrozen |
-| the builds | `version_text` M9 -> M10 in all three manifests; **`version_x` 340 -> 324** — a third glyph at x=340 puts the "0"'s last ink column at pixel 384, off the 384-wide screen (glyph ink box = 10 px centred in the 16 px cell). don_m16 `7950c844` (332 ops), hui50 `7ade3180` (366), pyron34 `01b39c39` (303), `build/m3b_merged19` rebuilt with the mark = `cde712e1` (819 ops), `build/m5_stock11` = `d29fd062` **UNCHANGED** (whole-artifact manifest identical, 30 members). Per-op diff vs the 14z-115 builds: exactly THREE ops changed CONTENT (coord list +1 pair at `0x413c70`, record count `0x19 -> 0x1A` at `0x413ce0`, the thunk body at `0x41a120`) and **no op moved** — the +4 coord bytes sat in alignment slack |
-| members moved | solos `vsw.31m/33m/35m/37m` (the third glyph tile, `GFX:tile 0x1FE42`) + `vsw.41`; merged also `vm3j.10b` (its thunk copy lives in hole b, the 14z-116 write-tap PCs `0x3FFC60`-); QSound/Z80 untouched. m3a re-pinned per member; the six CRCs are the whole MiSTer catalogue delta |
-| suites | three full verifies (~3 h each, parallel): **every masked legacy class PASS** (53/52/52 pass, 19/19/18 skip). Moved `.sha1`s = the 14z-115 inventory exactly (103/108/109/110/112, 36/37/44/58/61/62/64/92 + each set's pick-cell replay) plus `113_shadow_vs_tenant`, which had NO expectation since 14z-116 — self-frozen now. Attribution by DUMPS diff (don_m15 vs don_m16): replay 103 at 890 `$FF06CD/D0/D1` (OBJ-builder execution position — one more list entry per select frame), 1200/2412 `$FF06D1` + dead stack, **5800 ZERO bytes**; replay 92 (P2 hover walk, the path the fix changes) `$FF06D1` + dead stack only at 1100/1400/1700/2100 — the fix's own effect is palette RAM (`$90C340`), which `test_pyron_medallion_2p` checks, not work RAM. Re-frozen with `SUITE_ONLY --freeze`, then a filtered verify of the frozen names: all PASS |
-| audits | `audit_merged_legacy` **47/47** leg (a), leg (b) on the new solos; `audit_guard_corpus` **344/344** clean; `audit_roster_pairings` **111/111** after `bases.tsv` re-derived from merged19's `PRG:0x0BD97A` (no row moved — recorded in the file); `audit_legacy_pairings` PASS; `test_dualtrack` PASS (onsets held); `test_fbneo_legacy_oracle` PASS with NO refit (the 14z-115 instants stayed clean); inp corpus 6/6; m3a PASS end to end |
-| frozen expectations that moved, attributed | `test_pointer_flow`: WEAK `data:long` **+1** on every build (the one new 4-byte coord pair reads as one more WIDE-hole window), STRONG unchanged — new baselines merged-m12 / donovan-m16 / huitzil-m23 / pyron-m17. `audit_mister_map_fit` + `mk_mister_page`: bank-5 non-blank 6,271 -> **6,272**, extent `0xFE41 -> 0xFE42`, bucket 63 2 -> 3 (the third glyph); the ASCII figure unchanged (128 B is invisible at that scale). Escape triage: 25 verdicts IDENTICAL; pcrel inventories IDENTICAL |
-| release / MiSTer tail | `release/merged-m12/{fbneo,mame,mister}/` (M10; round-trip PASS; bitstream 18269 hash-verified, unchanged). Fork commit **`80e08111`** (catalogue: `vm3j.10b`, `vsw.41`, `vsw.31m/33m/35m/37m`), patch **0026**, pin bumped, `test_jtcores_twin` PASS, `test_mister_mra_map` PASS; bundle **`../mister_fieldtest_14z117/`** (`_Arcade/` WIDE MRA regenerated + STOCK CONTROL MRA byte-identical to 14z-115's, `games/mame/` zips, README). **THE TELL IS M10.** Fork NOT pushed |
-| re-point sweep | 85 files + `pcrel_escapes.toml` sections + `audit_merged_legacy.sh` after it finished; `bases.tsv` re-derived; three stale LABEL strings the 14z-115 sweep left (`don_m14`-style `chk` labels) re-labelled. N-2 sweep under the policy: `don_m14`, `hui48`, `pyron32`, `m3b_merged17`, `m5_stock9` deleted (no live reference, grep-four-places) |
-| paid for | the sweep appended its stamp to four lines ending in `\` (shell continuations): `test_escape_triage` died loudly, **`test_pointer_flow` PASSED with a truncated `for` list** — fixed, syntax-swept every re-pointed script, filed in `project/gotchas.md` |
-| docs | patch_notes 14z-117, patch_index (track rows, twin, 14z-116 row -> FROZEN, patch 0026), HANDOFF (playtest block, header, registry row), hardening_register, build_dir_triage, mister_core / mister_map / mister_scope / platform/mister / mister_field ground truth, engine_internals (version string position), STATE rollover (14z-114 group -> STATE_HISTORY + ledger) |
-| open | field test of M10 on the board (the bundle); the maintainer's 1:1 wheel mockup; #112/#113 parked; the FBNeo two-run-family question unchanged |
-
 **SPLIT 2026-08-20 (14z-99 post-freeze close, maintainer-approved): this
 file holds the RECENT session groups + THE LEDGER; the full detail of every
 older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
@@ -309,6 +245,7 @@ Full detail for every line: `STATE_HISTORY.md` (verbatim; grep the session
 tag or any phrase below). `[+N more entries]` = the group has N further
 session records in the archive beyond the headline shown.
 
+- Session 14z-117 CLOSE (3) — the session's last act. The VS/VS2 data-architecture page CORRECTED from a row-by-row measurement after the maintainer read it; the next session is RULED: a full documentation audit — measured, consis… [+4 more entries]
 - Session 14z-116 CLOSE — THE COSMETIC/EXTRAS ARC: win quotes MEASURED THEN FORGONE, the hidden characters DECODED (Shadow takes the tenant — confirmed on the board), and PYRON'S MEDALLION WHITE-OUT FIXED after two years parked; 13 commits pushed; nothing frozen (the freeze battery = 14z-117). The close ritual audited: patch_notes/patch_index/HANDOFF/gotchas had been skipped on the first pass and were written.
 - Session 14z-115 CLOSE — THE SELECT-WHEEL SEPARATION FROZEN (donovan-m15 / huitzil-m22 / pyron-m16 / merged-m11, mark M9, stock twin unchanged), tagged at `b30611a`, strict 111/0/0/0, guard corpus 340/340; emulation verdict "no regression", the maintainer's own mockup the next cut (moved to STATE_HISTORY 14z-118)
 - Session 14z-115 — THE SELECT-WHEEL SEPARATION ("E2"): the three tenant medallions repositioned by the maintainer's pixel offsets, hover rings tuned by eye, a 1 px black outline authored per cell; the OPEN FBNeo two-run-family instrument question first recorded (moved to STATE_HISTORY 14z-118)

@@ -3168,3 +3168,21 @@ Three phase-2 traps, all cleared by letting the engine say where it read:
    8/8 with no whiff overlap; the gate keeps the un-mirrored one as the
    negative control.
 
+
+## A TABLE DUMPED THROUGH THE OPCODE VIEW IS CRYPT NOISE; "HOLD AWAY" IS THE OTHER DIRECTION FOR A LEFT-FACING P2 (14z-120, phase 3)
+
+1. The phase-2 opcode dumper (`cpu.spaces["opcodes"]`) is right for CODE
+   below `PRG:0x100000` (the CPS-2 decrypts opcode fetches) and WRONG for a
+   table there: the reference push-box table at vs2 `0xA776C` read as
+   `0b8f 7bd3 fe2e …` through the opcode space and as `(0, 44, 27, 45)
+   (0, 30, 27, 31) …` through the program (data) space. Dump DATA through
+   `cpu.spaces["program"]`; a "random" table under the crypt boundary is the
+   wrong view, not a mystery ([CPH] opcode/data views).
+2. The first blocked-contact rig had P2 hold `L` to "block" — P2 faces
+   LEFT, so `L` is FORWARD and Victor walked into every attack, taking
+   damage the rig then called "blocked". Away for P2 is `R`; the same
+   facing rule as the naming rig's pins, one player over. State the facing
+   in every P2 recipe.
+3. macOS `wc -l` pads its count with spaces — a waiter comparing
+   `"$(wc -l < f)" = "13"` never fires; strip with `tr -d ' '`.
+
