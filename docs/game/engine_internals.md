@@ -3797,8 +3797,15 @@ phase lag — ours reaches the same pose at f3440.
 05/06/08 out of BANK 0, the +0x18-unset class") was measured on replay
 83 — the 1P-vs-CPU rig where our leg has Felicia point-blank and the
 projectile never travels. It characterised sprites that were not the
-explosion. The original maintainer report (ping #7, the fuchsia class)
-predates the 14z-67 effect work and was most likely fixed there.
+explosion. The original maintainer report (ping #7, the fuchsia class) is CLOSED
+[M: `tests/audit_grenade_ground_tiles.sh`, 14z-123 — this sentence read
+"was most likely fixed there" from 14z-70e]: the ground explosion draws
+native vs2's own art tile-for-tile (441 distinct pal-06 tiles, intersection
+441, ours-only 0, native-only 0, zero blank — the phase-free per-content
+measure over every detonation frame of replay 83d); the residual
+"ours-only / native-only contents" was the 5-6 frame leg phase lag (the
+seq-D thunk's cycle cost), not missing art. The "fuchsia" is pal-06, the
+explosion's correct orange→magenta fade.
 
 **Status as written 14z-70e — SUPERSEDED 14z-70f (the section header): it
 was NOT correct; 569 uncopied tiles, found by the rig this triage

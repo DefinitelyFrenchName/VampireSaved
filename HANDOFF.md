@@ -1680,6 +1680,23 @@ tests/test_advancing_guard.sh          # 14z-123 (inferred_claims row 8): the
                                       # legs (vs2 + vsavj), 44 frozen lines;
                                       # FREEZE=1; rig = name_moves victim
                                       # part 4 (regeneration-checked). ~3 min.
+tests/audit_front_comparator.sh        # 14z-123 (inferred_claims row 4): what
+                                      # RAM:$FF8127 is — the FRONT/BACK draw-
+                                      # order selector: writer PRG:0x02228E
+                                      # compares byte +0x10 of each fighter's
+                                      # current ANIM NODE (a per-pose depth
+                                      # key, 19-value vocabulary frozen);
+                                      # identity exact on every non-capture
+                                      # frame of replay 37 (5,486/0). Pristine
+                                      # vsavj, reference MAME, ~1 min.
+tests/audit_grenade_ground_tiles.sh    # 14z-123 (inferred_claims row 9): the
+                                      # 214+LP ground explosion draws native
+                                      # vs2's own art tile-for-tile (441 tiles,
+                                      # intersection 441, 0 ours-only, 0 blank;
+                                      # per-CONTENT across every detonation
+                                      # frame — phase-free). Closes the 14z-70e
+                                      # 'most likely fixed' guess. Replay 83d,
+                                      # merged build vs native, ~1 min.
 tests/test_ladder_tenant_vs_palette.sh # 14z-123 (inferred_claims row 7):
                                       # the 0x3A3CA0 pool MEASURED ON SCREEN
                                       # for a tenant CPU opponent — it is the
