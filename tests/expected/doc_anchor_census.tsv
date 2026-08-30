@@ -247,11 +247,11 @@ VSE-59	docs/game/engine_internals.md	the #92 crash; decoded end to end and confi
 VSE-60	docs/game/engine_internals.md	the #92 crash; decoded end to end and confirmed on screen)	IN-LIST
 VSE-61	docs/game/engine_internals.md	Sound subsystem: the QSound command path (session 14z-51, measured)	IN-LIST
 VSE-62	docs/game/gotchas.md	+0x382 is the char id only at SELECT — in match it is the VOICE-FLAVOR CLASS, and the engine reassig	IN-LIST
-VSE-63	docs/game/engine_internals.md	in the sound kernel itself, NOT the 0x0BF41A record path	IN-LIST
-VSE-64	docs/game/engine_internals.md	note-table array semantics, the dead type-C song class, the alias bit	IN-LIST
-VSE-65	docs/game/engine_internals.md	confirmed static; RETRACTS most of the 14z-85d filed detail)	IN-LIST
-VSE-66	docs/game/engine_internals.md	note-table array semantics, the dead type-C song class, the alias bit	IN-LIST
-VSE-67	docs/game/engine_internals.md	The 14z-51 id-space result (docs/project/m5/keyons_*.json)	IN-LIST
+VSE-63	docs/game/engine_internals.md	The KERNEL per-class voice tables — a SECOND voice family in the sound kernel, not the 0x0BF41A reco	IN-LIST
+VSE-64	docs/game/engine_internals.md	The Z80 command dispatch, the note-table array, the dead type-C song class and the alias bit (measur	IN-LIST
+VSE-65	docs/game/engine_internals.md	The QSound Z80 driver: id table, songs, streams, sample records (measured 14z-86, reader-traced on l	IN-LIST
+VSE-66	docs/game/engine_internals.md	The Z80 command dispatch, the note-table array, the dead type-C song class and the alias bit (measur	IN-LIST
+VSE-67	docs/game/engine_internals.md	The shared sfx library uses IDENTICAL ids in both games (the id-space sweep, `docs/project/m5/keyons	IN-LIST
 VSE-68	docs/game/gotchas.md	input is not entering it (14z-69, cost this session twice)	IN-LIST
 VSE-69	docs/game/engine_internals.md	14z-69c: THE MECHANISM, traced end to end	IN-LIST
 VSE-70	docs/game/engine_internals.md	THE DARK FORCE PALETTE-SEQUENCE BLOCKS — measured census (14z-79b)	IN-LIST
