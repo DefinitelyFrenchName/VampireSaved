@@ -1,0 +1,403 @@
+# build/manifest/moves_donovan.toml — the maintainer's move list for Donovan
+# (character-data map, phase 1). Transcribed 14z-120 (2026-08-30) from the
+# maintainer's corrected list; no move name, input or property here is
+# Claude's — the notes are the maintainer's words, normalised.
+# Schema: build/manifest/moves_TEMPLATE.toml (flat rows, tools/_minitoml.py).
+#
+# CONVENTIONS (maintainer, 2026-08-30):
+#   - inputs in numpad notation, no '+'; P/K = any strength; "by button" in
+#     notes when the strength picks a variant. `j.` = airborne.
+#   - ES: a special that has one is performed with two punches / two kicks
+#     (623P -> 623PP). Each ES version is its OWN row (kind = "es") because
+#     it usually owns its own chain; the parent special's row names it.
+#   - Dark Force is P+K of the same strength for every character; listed
+#     only for its name.
+#   - Guard cancel: every character's is 623P or 623K (character-specific)
+#     in blockstun for 1 meter stock; it is either one of their specials or
+#     a dedicated guard-cancel-only special. Donovan's is Ifrit Sword.
+#   - Plain normals / movement rows are skeletons (input = name): the
+#     naming step matches them against the remaining chains; the
+#     maintainer enriches the ones with specific properties (dash etc.).
+#   - `table` / `seq` are filled by the naming step, never by hand.
+
+# ---- throws -------------------------------------------------------------
+
+[[move]]
+name = "Sharirum Luna"
+input = "4MP, 6MP, 4HP, 6HP"
+kind = "throw"
+notes = "Ground throw, must be performed up close; direction by 4/6, MP or HP"
+table = ""
+seq = ""
+
+[[move]]
+name = "Sword Grapple"
+input = "63214MP, 63214HP"
+kind = "throw"
+notes = "Command throw; ground throw, must be performed up close; MP or HP"
+table = ""
+seq = ""
+
+# ---- command normals ----------------------------------------------------
+
+[[move]]
+name = "Killshread Surf"
+input = "j.2LK, j.2MK"
+kind = "normal"
+notes = "Command normal; dive-kick-type move; LK or MK"
+table = ""
+seq = ""
+
+[[move]]
+name = "Killshread Dive"
+input = "j.2HK"
+kind = "normal"
+notes = "Command normal; dive-kick-type move"
+table = ""
+seq = ""
+
+[[move]]
+name = "Hop Kick"
+input = "6HK"
+kind = "normal"
+notes = "Command normal"
+table = ""
+seq = ""
+
+# ---- specials (+ their ES rows) ----------------------------------------
+
+[[move]]
+name = "Foot Stab"
+input = "8P, 8K"
+kind = "special"
+notes = "Pursuit move; P or K; ES = Foot Stab (ES)"
+table = ""
+seq = ""
+
+[[move]]
+name = "Foot Stab (ES)"
+input = "8PP, 8KK"
+kind = "es"
+notes = "ES of Foot Stab; pursuit move"
+table = ""
+seq = ""
+
+[[move]]
+name = "Killshread"
+input = "214K"
+kind = "special"
+notes = "Stance change (plants the sword); ES = Killshread (ES)"
+table = ""
+seq = ""
+
+[[move]]
+name = "Killshread (ES)"
+input = "214KK"
+kind = "es"
+notes = "ES of Killshread; stance change (plants the sword)"
+table = ""
+seq = ""
+
+[[move]]
+name = "Killshread Summon"
+input = "214K, j.214K"
+kind = "special"
+notes = "In Killshread stance; stance change (summons back the sword); ground or air; ES = Killshread Summon (ES)"
+table = ""
+seq = ""
+
+[[move]]
+name = "Killshread Summon (ES)"
+input = "214KK, j.214KK"
+kind = "es"
+notes = "ES of Killshread Summon; in Killshread stance; ground or air"
+table = ""
+seq = ""
+
+[[move]]
+name = "Killshread Lightning"
+input = "214P"
+kind = "special"
+notes = "In Killshread stance; ES = Killshread Lightning (ES)"
+table = ""
+seq = ""
+
+[[move]]
+name = "Killshread Lightning (ES)"
+input = "214PP"
+kind = "es"
+notes = "ES of Killshread Lightning; in Killshread stance"
+table = ""
+seq = ""
+
+[[move]]
+name = "Ifrit Sword"
+input = "623P"
+kind = "special"
+notes = "Donovan's guard cancel: can be guard cancelled into (623P in blockstun) for 1 meter stock; ES = Ifrit Sword (ES)"
+table = ""
+seq = ""
+
+[[move]]
+name = "Ifrit Sword (ES)"
+input = "623PP"
+kind = "es"
+notes = "ES of Ifrit Sword"
+table = ""
+seq = ""
+
+[[move]]
+name = "Blizzard Sword"
+input = "41236P"
+kind = "special"
+notes = "Freezing projectile; ES = Blizzard Sword (ES)"
+table = ""
+seq = ""
+
+[[move]]
+name = "Blizzard Sword (ES)"
+input = "41236PP"
+kind = "es"
+notes = "ES of Blizzard Sword; freezing projectile"
+table = ""
+seq = ""
+
+[[move]]
+name = "Lightning Sword"
+input = "421P"
+kind = "special"
+notes = "Can be mashed for more hits; ES = Lightning Sword (ES)"
+table = ""
+seq = ""
+
+[[move]]
+name = "Lightning Sword (ES)"
+input = "421PP"
+kind = "es"
+notes = "ES of Lightning Sword; can be mashed for more hits"
+table = ""
+seq = ""
+
+# ---- EX ------------------------------------------------------------------
+
+[[move]]
+name = "Press of Death"
+input = "41236K"
+kind = "ex"
+notes = "The strength of K determines the distance"
+table = ""
+seq = ""
+
+[[move]]
+name = "Change Immortal"
+input = "MP LP 4 LK MK"
+kind = "ex"
+notes = "Button sequence in rapid succession; 2 and 8 control after the transformation"
+table = ""
+seq = ""
+
+# ---- Dark Force ----------------------------------------------------------
+
+[[move]]
+name = "Slay Shred"
+input = "LP+LK, MP+MK, HP+HK"
+kind = "df"
+notes = "Dark Force; P+K of the same strength (universal input, listed for the name)"
+table = ""
+seq = ""
+
+# ---- plain normals (skeleton: name = input; maintainer enriches) --------
+
+[[move]]
+name = "5LP"
+input = "5LP"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "5MP"
+input = "5MP"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "5HP"
+input = "5HP"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "5LK"
+input = "5LK"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "5MK"
+input = "5MK"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "5HK"
+input = "5HK"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "2LP"
+input = "2LP"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "2MP"
+input = "2MP"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "2HP"
+input = "2HP"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "2LK"
+input = "2LK"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "2MK"
+input = "2MK"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "2HK"
+input = "2HK"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "j.LP"
+input = "j.LP"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "j.MP"
+input = "j.MP"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "j.HP"
+input = "j.HP"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "j.LK"
+input = "j.LK"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "j.MK"
+input = "j.MK"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "j.HK"
+input = "j.HK"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+# ---- movement (skeleton; maintainer enriches, e.g. dash properties) -----
+
+[[move]]
+name = "Forward dash"
+input = "66"
+kind = "dash"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "Back dash"
+input = "44"
+kind = "dash"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "Walk forward"
+input = "6"
+kind = "misc"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "Walk back"
+input = "4"
+kind = "misc"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "Crouch"
+input = "2"
+kind = "misc"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "Jump"
+input = "8, 7, 9"
+kind = "misc"
+notes = "Neutral / back / forward"
+table = ""
+seq = ""
