@@ -70,7 +70,12 @@ consuming site in each artifact's patch payloads.
     `0x043cba→0x042aa6` (0.98): **VERIFIED-BY-REVIEW** — identical
     dispatch headers, diffs are sparse jump-table words + cross-game
     body drift, candidates unique or clearly leading.
-  - `0x0448a6→0x02563e` (0.94): **SUSPECT — likely WRONG SIBLING.**
+  - `0x0448a6→0x02563e` (0.94): **RESOLVED — it WAS the wrong sibling;
+    the flip to `0x04367A` SHIPPED 14z-102 (GitHub #107, `patch_index.md`
+    "#107 reconciliation row flip"; the row reads `0x04367A` on every
+    build since). Headline corrected 14z-123 — it had read "SUSPECT —
+    likely WRONG SIBLING" for three weeks above its own shipped status.
+    The analysis below is the record, as written.**
     Archaeology: the row dates to M2a stage 4; the batch's window
     ladder shows the match came from the LAST-RESORT 0x20 window where
     FOUR candidates tie at 0.94 (family prologue only) and the first

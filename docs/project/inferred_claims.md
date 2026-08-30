@@ -54,7 +54,7 @@
 
 | # | claim | file:line | class | measurement | cost | status |
 |---|---|---|---|---|---|---|
-| 16 | "`0x0448a6→0x02563e` (0.94): SUSPECT — likely WRONG SIBLING" — written as live while the entry's own tail derives "Right answer: `0x04367A`" and #107 SHIPPED that flip at 14z-102 (`patch_index.md:210` "verified") | `docs/project/hardening_register.md:73` | STALE-CARRIER | none — mark the entry RESOLVED-AND-SHIPPED with the 14z-102 citation (status header tracks reality) | T0 | OPEN |
+| 16 | "`0x0448a6→0x02563e` (0.94): SUSPECT — likely WRONG SIBLING" — written as live while the entry's own tail derives "Right answer: `0x04367A`" and #107 SHIPPED that flip at 14z-102 (`patch_index.md:210` "verified") | `docs/project/hardening_register.md:73` | STALE-CARRIER | none — mark the entry RESOLVED-AND-SHIPPED with the 14z-102 citation (status header tracks reality) | T0 | **FIXED 14z-123: headline reads RESOLVED with the #107 / 14z-102 citation; the analysis kept as the record** |
 
 ### Ruled additions (14z-122 close (2))
 
