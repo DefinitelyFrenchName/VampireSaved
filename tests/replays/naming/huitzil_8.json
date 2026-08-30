@@ -17,43 +17,43 @@
   {
    "name": "Circuit Scrapper [63214 MP+HP]",
    "frame": 3120,
-   "gap": 300,
+   "gap": 420,
    "movement": false
   },
   {
    "name": "Circuit Scrapper [63214 LP+MP]",
-   "frame": 3420,
-   "gap": 300,
+   "frame": 3540,
+   "gap": 420,
    "movement": false
   },
   {
    "name": "Circuit Scrapper [63214 LP+HP] (ES, meter)",
-   "frame": 3720,
-   "gap": 300,
+   "frame": 3960,
+   "gap": 420,
    "movement": false
   },
   {
    "name": "Circuit Scrapper [63214MP] step back",
-   "frame": 4020,
-   "gap": 300,
+   "frame": 4380,
+   "gap": 420,
    "movement": false
   },
   {
    "name": "Circuit Scrapper [63214MP] no-pin walk",
-   "frame": 4320,
+   "frame": 4800,
    "gap": 300,
    "movement": false
   },
   {
    "name": "Reflect Wall [gc MP] (meter)",
-   "frame": 4620,
-   "gap": 240,
+   "frame": 5100,
+   "gap": 420,
    "movement": false
   },
   {
    "name": "Reflect Wall [gc HP] (meter)",
-   "frame": 4860,
-   "gap": 240,
+   "frame": 5520,
+   "gap": 420,
    "movement": false
   }
  ],
@@ -68,26 +68,28 @@
   "4150:ff8850:01200120",
   "4550:ff8850:01200120",
   "4950:ff8850:01200120",
+  "5350:ff8850:01200120",
+  "5750:ff8850:01200120",
   "2560:ff8410:0228",
   "2560:ff8810:02d8",
   "2820:ff8410:0228",
   "2820:ff8810:02d8",
-  "3080:ff8410:0370",
-  "3080:ff8810:039d",
-  "3380:ff8410:0370",
-  "3380:ff8810:039d",
-  "3680:ff8410:0370",
-  "3680:ff8810:039d",
-  "3980:ff8410:0370",
-  "3980:ff8810:039d",
-  "4280:ff8410:0228",
-  "4280:ff8810:02d8",
-  "4580:ff8410:0370",
-  "4580:ff8810:039d",
-  "4820:ff8410:0370",
-  "4820:ff8810:039d",
+  "2890:ff8410:0228",
+  "2890:ff8810:02d8",
+  "3310:ff8410:0228",
+  "3310:ff8810:02d8",
+  "3730:ff8410:0228",
+  "3730:ff8810:02d8",
+  "4150:ff8410:0228",
+  "4150:ff8810:02d8",
+  "4760:ff8410:0228",
+  "4760:ff8810:02d8",
+  "4870:ff8410:0228",
+  "4870:ff8810:02d8",
+  "5290:ff8410:0228",
+  "5290:ff8810:02d8",
   "2540:ff8509:09",
-  "3950:ff8509:09"
+  "4370:ff8509:09"
  ],
- "frames": 5350
+ "frames": 6190
 }

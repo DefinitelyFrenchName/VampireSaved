@@ -15,7 +15,8 @@
 # vs2 (Pyron forced by the early-window poke) by tools/name_moves.py — see the
 # Donovan file's header for the method; gate tests/test_move_naming.sh. The
 # first pass measured half the roster MIRRORED (after a throw P2 stood behind
-# P1 and 623 became 421); the rig now pins both fighters' X before every event.
+# P1 and 623 became 421); the rig now pins both fighters' X far apart before
+# every event (a near event walks in from there) and samples the facing byte.
 
 # ---- throws -------------------------------------------------------------
 
@@ -23,7 +24,7 @@
 name = "Corona Whip"
 input = "4MP, 6MP, 4HP, 6HP"
 kind = "throw"
-notes = "Ground throw, must be performed up close; direction by 4/6, MP or HP; MEASURED 14z-120: 6MP, 6HP and 4MP enter a2:0x1e then a2:0x20 (one throw chain)"
+notes = "Ground throw, must be performed up close; direction by 4/6, MP or HP; MEASURED 14z-120: 6HP and 4MP enter a2:0x1e then a2:0x20 (one throw chain); a 6MP that whiffed at pushbox contact came out as a2:0x03 — the odd standing ids are 6+button attacks for Pyron too"
 table = "a2"
 seq = "0x1e"
 
@@ -47,9 +48,9 @@ seq = "0x21"
 name = "Planet Burning (ES)"
 input = "63214PP"
 kind = "es"
-notes = "ES of Planet Burning; any two punches; ground throw, must be performed up close; MEASURED 14z-120: 63214PP enters COSMO DISRUPTION's chain a2:0x3c (class 18, one stock) — no ES grapple chain was reached by any pair; the two half circles read the same for the EX. Maintainer: does an ES Planet Burning exist?"
+notes = "ES of Planet Burning; any two punches; ground throw, must be performed up close; MEASURED 14z-120 (2), P1 facing right, up close: 63214 + MP&HP, LP&HP or LP&MP all enter the SAME chains as the plain throw, a2:0x1e -> a2:0x21 -> a2:0x22, with the object's class byte 16 and one stock spent (like Sol Smasher's ES). An earlier reading that 63214PP gave Cosmo Disruption was the RIG facing LEFT (a mirrored 41236) — retracted"
 table = "a2"
-seq = "0x3c"
+seq = "0x21"
 
 # ---- command normals ----------------------------------------------------
 
@@ -149,7 +150,7 @@ seq = "0x3a"
 name = "Cosmo Disruption"
 input = "41236PP, 41236KK"
 kind = "ex"
-notes = "Either pair; the pair can be held to delay, the move comes out at release of the buttons; a PP/KK variant is believed to exist; MEASURED 14z-120: PP and KK, held or tapped, enter a2:0x3c (class 18, one stock); the rig could not distinguish a PP/KK variant by chain"
+notes = "Either pair; the pair can be held to delay, the move comes out at release of the buttons; a PP/KK variant is believed to exist; MEASURED 14z-120: PP and KK, held or tapped, enter a2:0x3c (class 18, one stock); the rig could not distinguish a PP/KK variant by chain; 63214+PP at range produces NOTHING (5LP), so the tracker does discriminate the two half circles"
 table = "a2"
 seq = "0x3c"
 

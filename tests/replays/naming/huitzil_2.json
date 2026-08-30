@@ -101,30 +101,30 @@
   {
    "name": "Genocide Vulcan [LK] near",
    "frame": 6120,
-   "gap": 220,
+   "gap": 420,
    "movement": false
   },
   {
    "name": "Plasma Trap [j.214LK]",
-   "frame": 6340,
+   "frame": 6540,
    "gap": 220,
    "movement": false
   },
   {
    "name": "Plasma Trap [j.214MK]",
-   "frame": 6560,
+   "frame": 6760,
    "gap": 220,
    "movement": false
   },
   {
    "name": "Plasma Trap [j.214HK]",
-   "frame": 6780,
+   "frame": 6980,
    "gap": 220,
    "movement": false
   },
   {
    "name": "Plasma Trap [j.214HK] late",
-   "frame": 7000,
+   "frame": 7200,
    "gap": 220,
    "movement": false
   }
@@ -178,16 +178,16 @@
   "5640:ff8810:02d8",
   "5860:ff8410:0228",
   "5860:ff8810:02d8",
-  "6080:ff8410:0370",
-  "6080:ff8810:039d",
-  "6300:ff8410:0228",
-  "6300:ff8810:02d8",
-  "6520:ff8410:0228",
-  "6520:ff8810:02d8",
-  "6740:ff8410:0228",
-  "6740:ff8810:02d8",
-  "6960:ff8410:0228",
-  "6960:ff8810:02d8"
+  "5890:ff8410:0228",
+  "5890:ff8810:02d8",
+  "6500:ff8410:0228",
+  "6500:ff8810:02d8",
+  "6720:ff8410:0228",
+  "6720:ff8810:02d8",
+  "6940:ff8410:0228",
+  "6940:ff8810:02d8",
+  "7160:ff8410:0228",
+  "7160:ff8810:02d8"
  ],
- "frames": 7470
+ "frames": 7670
 }

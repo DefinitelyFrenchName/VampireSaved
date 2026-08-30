@@ -128,7 +128,7 @@ is 0x400 bytes; combat struct at +0x000, further state above +0x100.
 
 | Offset | Meaning | Evidence |
 |---|---|---|
-| +0x0B | flip_x (facing) | [C] |
+| +0x0B | flip_x (facing) — **1 = the fighter faces RIGHT** (P1 at the left start, P2 on its right, reads 1; 0 after the engine crossed the fighters — measured 14z-120 (2), `tools/name_moves.py`) | [C; D: 14z-120] |
 | +0x0A | attack id (shift 5 for hitbox lookup) | [C] |
 | +0x10.w | X position (signed) | [C: script default, matches update_object] |
 | +0x14.w | Y position (signed) | [C] |

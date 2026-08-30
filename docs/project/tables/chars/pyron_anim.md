@@ -813,7 +813,7 @@ Named chains: 41 of 75 (from `build/manifest/moves_pyron.toml`, measured by `tes
 | 10 | `0x26ba2a` | `0x79a4` | 2 | 0x00 | 1 | 0 | 0 | 0 |  |  |
 | 11 | `0x26ba42` | `0x79bc` | 1 | 0x40 | 1 | 0 | 0 | 0 |  |  |
 
-### seq `0x21` — **Planet Burning** — start `0x26ba5a`, 7 nodes, 22 frames, end loop:0x26baa2 (ours: loop:0xdaf7c)
+### seq `0x21` — **Planet Burning / Planet Burning (ES)** — start `0x26ba5a`, 7 nodes, 22 frames, end loop:0x26baa2 (ours: loop:0xdaf7c)
 
 | # | addr | off | dur | flags | hb8 | hbA | shadow | sfx | link | ! |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -1245,7 +1245,7 @@ Named chains: 41 of 75 (from `build/manifest/moves_pyron.toml`, measured by `tes
 | 11 | `0x26cce6` | `0x8c60` | 2 | 0x00 | 3 | 0 | 0 | 0 |  |  |
 | 12 | `0x26ccfe` | `0x8c78` | 1 | 0x40 | 3 | 0 | 0 | 0 |  |  |
 
-### seq `0x3c` — **Planet Burning (ES) / Cosmo Disruption** — start `0x26cd16`, 7 nodes, 31 frames, end loop:0x26cd8e (ours: loop:0xdc268)
+### seq `0x3c` — **Cosmo Disruption** — start `0x26cd16`, 7 nodes, 31 frames, end loop:0x26cd8e (ours: loop:0xdc268)
 
 | # | addr | off | dur | flags | hb8 | hbA | shadow | sfx | link | ! |
 |---|---|---|---|---|---|---|---|---|---|---|

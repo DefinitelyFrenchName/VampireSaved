@@ -65,30 +65,30 @@
   {
    "name": "Planet Burning (ES)",
    "frame": 5500,
-   "gap": 300,
+   "gap": 420,
    "movement": false
   },
   {
    "name": "Sitting Attack (ES) [8PP] off throw",
-   "frame": 5800,
-   "gap": 320,
+   "frame": 5920,
+   "gap": 420,
    "movement": false
   },
   {
    "name": "Shining Gemini [LP+LK]",
-   "frame": 6120,
+   "frame": 6340,
    "gap": 200,
    "movement": false
   },
   {
    "name": "5LP in DF",
-   "frame": 6320,
+   "frame": 6540,
    "gap": 200,
    "movement": false
   },
   {
    "name": "Sol Smasher [LP] in DF",
-   "frame": 6520,
+   "frame": 6740,
    "gap": 300,
    "movement": false
   }
@@ -129,18 +129,18 @@
   "4860:ff8810:02d8",
   "5160:ff8410:0228",
   "5160:ff8810:02d8",
-  "5460:ff8410:0370",
-  "5460:ff8810:039d",
-  "5760:ff8410:0370",
-  "5760:ff8810:039d",
-  "6080:ff8410:0228",
-  "6080:ff8810:02d8",
-  "6280:ff8410:0228",
-  "6280:ff8810:02d8",
-  "6480:ff8410:0228",
-  "6480:ff8810:02d8",
+  "5270:ff8410:0228",
+  "5270:ff8810:02d8",
+  "5690:ff8410:0228",
+  "5690:ff8810:02d8",
+  "6300:ff8410:0228",
+  "6300:ff8810:02d8",
+  "6500:ff8410:0228",
+  "6500:ff8810:02d8",
+  "6700:ff8410:0228",
+  "6700:ff8810:02d8",
   "2540:ff8509:09",
-  "4810:ff8509:09"
+  "4920:ff8509:09"
  ],
- "frames": 7070
+ "frames": 7290
 }

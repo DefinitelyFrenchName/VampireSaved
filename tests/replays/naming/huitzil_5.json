@@ -5,55 +5,55 @@
   {
    "name": "Reflect Wall [gc LP at hit+2]",
    "frame": 2600,
-   "gap": 220,
+   "gap": 420,
    "movement": false
   },
   {
    "name": "Reflect Wall [gc LP at hit+6]",
-   "frame": 2820,
-   "gap": 220,
+   "frame": 3020,
+   "gap": 420,
    "movement": false
   },
   {
    "name": "Reflect Wall [gc LP at hit+10]",
-   "frame": 3040,
-   "gap": 220,
+   "frame": 3440,
+   "gap": 420,
    "movement": false
   },
   {
    "name": "Reflect Wall [gc LP at hit+14]",
-   "frame": 3260,
-   "gap": 220,
+   "frame": 3860,
+   "gap": 420,
    "movement": false
   },
   {
    "name": "Reflect Wall [gc HP at hit+6]",
-   "frame": 3480,
-   "gap": 220,
+   "frame": 4280,
+   "gap": 420,
    "movement": false
   },
   {
    "name": "Reflect Wall [gc LK at hit+6]",
-   "frame": 3700,
-   "gap": 220,
+   "frame": 4700,
+   "gap": 420,
    "movement": false
   },
   {
    "name": "Reflect Wall [gc HK at hit+6]",
-   "frame": 3920,
-   "gap": 220,
+   "frame": 5120,
+   "gap": 420,
    "movement": false
   },
   {
    "name": "Reflect Wall [gc PP at hit+6]",
-   "frame": 4140,
-   "gap": 220,
+   "frame": 5540,
+   "gap": 420,
    "movement": false
   },
   {
    "name": "Reflect Wall [gc LP at hit+6] (control: no block)",
-   "frame": 4360,
-   "gap": 220,
+   "frame": 5960,
+   "gap": 420,
    "movement": false
   }
  ],
@@ -67,26 +67,31 @@
   "3750:ff8850:01200120",
   "4150:ff8850:01200120",
   "4550:ff8850:01200120",
-  "2560:ff8410:0370",
-  "2560:ff8810:039d",
-  "2780:ff8410:0370",
-  "2780:ff8810:039d",
-  "3000:ff8410:0370",
-  "3000:ff8810:039d",
-  "3220:ff8410:0370",
-  "3220:ff8810:039d",
-  "3440:ff8410:0370",
-  "3440:ff8810:039d",
-  "3660:ff8410:0370",
-  "3660:ff8810:039d",
-  "3880:ff8410:0370",
-  "3880:ff8810:039d",
-  "4100:ff8410:0370",
-  "4100:ff8810:039d",
-  "4320:ff8410:0370",
-  "4320:ff8810:039d",
+  "4950:ff8850:01200120",
+  "5350:ff8850:01200120",
+  "5750:ff8850:01200120",
+  "6150:ff8850:01200120",
+  "6550:ff8850:01200120",
+  "2370:ff8410:0228",
+  "2370:ff8810:02d8",
+  "2790:ff8410:0228",
+  "2790:ff8810:02d8",
+  "3210:ff8410:0228",
+  "3210:ff8810:02d8",
+  "3630:ff8410:0228",
+  "3630:ff8810:02d8",
+  "4050:ff8410:0228",
+  "4050:ff8810:02d8",
+  "4470:ff8410:0228",
+  "4470:ff8810:02d8",
+  "4890:ff8410:0228",
+  "4890:ff8810:02d8",
+  "5310:ff8410:0228",
+  "5310:ff8810:02d8",
+  "5730:ff8410:0228",
+  "5730:ff8810:02d8",
   "2540:ff8509:09",
-  "3690:ff8509:09"
+  "4590:ff8509:09"
  ],
- "frames": 4830
+ "frames": 6630
 }

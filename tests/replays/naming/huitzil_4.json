@@ -59,30 +59,30 @@
   {
    "name": "Circuit Scrapper (ES)",
    "frame": 5160,
-   "gap": 300,
+   "gap": 420,
    "movement": false
   },
   {
    "name": "Sitting Attack (ES) [8PP] off throw",
-   "frame": 5460,
-   "gap": 320,
+   "frame": 5580,
+   "gap": 420,
    "movement": false
   },
   {
    "name": "Ray of Doom [LP+LK]",
-   "frame": 5780,
+   "frame": 6000,
    "gap": 200,
    "movement": false
   },
   {
    "name": "5LP in DF",
-   "frame": 5980,
+   "frame": 6200,
    "gap": 200,
    "movement": false
   },
   {
    "name": "Plasma Beam [LP] in DF",
-   "frame": 6180,
+   "frame": 6400,
    "gap": 300,
    "movement": false
   }
@@ -120,18 +120,18 @@
   "4320:ff8810:02d8",
   "4720:ff8410:0228",
   "4720:ff8810:02d8",
-  "5120:ff8410:0370",
-  "5120:ff8810:039d",
-  "5420:ff8410:0370",
-  "5420:ff8810:039d",
-  "5740:ff8410:0228",
-  "5740:ff8810:02d8",
-  "5940:ff8410:0228",
-  "5940:ff8810:02d8",
-  "6140:ff8410:0228",
-  "6140:ff8810:02d8",
+  "4930:ff8410:0228",
+  "4930:ff8810:02d8",
+  "5350:ff8410:0228",
+  "5350:ff8810:02d8",
+  "5960:ff8410:0228",
+  "5960:ff8810:02d8",
+  "6160:ff8410:0228",
+  "6160:ff8810:02d8",
+  "6360:ff8410:0228",
+  "6360:ff8810:02d8",
   "2540:ff8509:09",
-  "4640:ff8509:09"
+  "4750:ff8509:09"
  ],
- "frames": 6730
+ "frames": 6950
 }

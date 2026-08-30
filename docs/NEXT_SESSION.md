@@ -23,8 +23,10 @@
 > ## to PIN BOTH FIGHTERS' X before every event (a throw had put P2 behind
 > ## P1 and half the first pass measured MIRRORED motions — `project/
 > ## gotchas.md`). TWO QUESTIONS FOR THE MAINTAINER: Genocide Vulcan measured
-> ## as 421+P (the list says 421+K, which never fired in nine cadences); no
-> ## ES Planet Burning was reached (63214PP = Cosmo Disruption).
+> ## as 421+P (the list says 421+K, which never fired in nine cadences); the
+> ## guard cancel spent no banked stock. (An earlier "no ES Planet Burning"
+> ## reading was the rig facing LEFT — retracted; 63214+PP up close IS the ES
+> ## grapple, same chains as the throw with class byte 16.)
 > ##
 > ## **NEXT, the maintainer's pick:** (A) the board verdict on M12; (B) phase
 > ## 2 of the map (hitbox rectangles + attack records by measurement — every

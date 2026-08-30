@@ -3128,11 +3128,20 @@ frames before it both fighters' X (`+0x10.w`) are poked to a fixed pair
 (552/728, 880/925), so P1 always faces right and no walk-in is needed.
 Two smaller cuts of the same pass: (1) a walk-in's trailing R plus a
 motion's opening R is a DASH tap (Pyron `a2:0x24`, Huitzil `a2:0x21`) that
-eats the motion's first step; (2) a PAIR press inside a half circle is
-read by every ES tracker the motion CONTAINS — 63214 MP+HP gave the ES
-beam, LP+MP the ES launcher, and only LP+HP (the pair no other special
-claims) the ES grapple; and from a pinned pushbox OVERLAP the plain
-grapple never connected while one step back then 63214MP did. **Rule:**
+eats the motion's first step; (2) a POKED "near" pair (880/925, then
+861/925) OVERLAPPED the pushboxes — Pyron's is wide — and the engine
+resolved the overlap by CROSSING the fighters five frames later, so P1
+faced left for whole parts; a near event is now the far pin, a 150-frame
+walk-in and a 40-frame pause, with a 420-frame minimum gap so the
+previous throw is over before the next pin lands. RETRACTED on the way
+(14z-120 (2), same day): "a pair press inside a half circle is read by
+every ES tracker the motion contains" and "no ES Planet Burning exists,
+63214PP is Cosmo Disruption" — both were the mirrored rig; facing right,
+every pair enters the ES grapple (Pyron `0x1e -> 0x21 -> 0x22` class 16,
+Huitzil `0x1e -> 0x2d -> 0x2f -> 0x30 -> 0x31`) and 63214+PP at range
+produces nothing. The facing byte `+0x0B` (`flip_x`) is 1 when P1 faces
+RIGHT; `name_moves.py expect` marks every left-facing event so a flipped
+rig cannot freeze silently. **Rule:**
 in any rig that throws, pin positions per event; read the x delta before
 believing a chain; when a pair press is the input, list every special
 whose motion is a substring of it.

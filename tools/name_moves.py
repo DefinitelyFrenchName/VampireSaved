@@ -358,6 +358,18 @@ PYRON = {
         ("Shining Gemini [LP+LK]", pair("14"), 200, "far"),
         ("5LP in DF", stand("LP"), 200, "far"), ("Sol Smasher [LP] in DF", qcf("LP"), 300, "far"),
     ],
+    "5": [  # the maintainer's challenge (14z-120): ES Planet Burning by 63214 + MP&HP up close; does Cosmo's tracker discriminate 41236 from 63214?
+        ("Planet Burning [MP] step back (control)", [(0, 2, "L"), (30, 32, "R"), (32, 34, "DR"), (34, 36, "D"), (36, 38, "DL"), (38, 44, "L"), (40, 44, "2")], 320, "near"),
+        ("Planet Burning ES? [63214 MP+HP] step back", [(0, 2, "L"), (30, 32, "R"), (32, 34, "DR"), (34, 36, "D"), (36, 38, "DL"), (38, 44, "L"), (40, 44, "23")], 320, "near"),
+        ("Planet Burning ES? [63214 LP+HP] step back", [(0, 2, "L"), (30, 32, "R"), (32, 34, "DR"), (34, 36, "D"), (36, 38, "DL"), (38, 44, "L"), (40, 44, "13")], 320, "near"),
+        ("Planet Burning ES? [63214 LP+MP] step back", [(0, 2, "L"), (30, 32, "R"), (32, 34, "DR"), (34, 36, "D"), (36, 38, "DL"), (38, 44, "L"), (40, 44, "12")], 320, "near"),
+        ("Planet Burning ES? [63214 MP+HP] slow, step back", [(0, 2, "L"), (30, 34, "R"), (34, 38, "DR"), (38, 42, "D"), (42, 46, "DL"), (46, 54, "L"), (49, 54, "23")], 320, "near"),
+        ("Planet Burning ES? [63214 MP+HP] pair AFTER the motion", [(0, 2, "L"), (30, 32, "R"), (32, 34, "DR"), (34, 36, "D"), (36, 38, "DL"), (38, 42, "L"), (43, 46, "23")], 320, "near"),
+        ("Cosmo? [41236 PP] far", hcf("PP"), 400, "far"),
+        ("Cosmo? [63214 PP] far, no dash", [(0, 2, "L"), (30, 32, "R"), (32, 34, "DR"), (34, 36, "D"), (36, 38, "DL"), (38, 44, "L"), (40, 44, "13")], 400, "far"),
+        ("Cosmo? [63214 MP+HP] far, no dash", [(0, 2, "L"), (30, 32, "R"), (32, 34, "DR"), (34, 36, "D"), (36, 38, "DL"), (38, 44, "L"), (40, 44, "23")], 400, "far"),
+        ("Cosmo? [41236 MP+HP] far", hcf("MP")[:-1] + [(18, 22, "23")], 400, "far"),
+    ],
 }
 HUITZIL = {
     "1": [(n, r, g, "far") for n, r, g in MOVEMENT + NORMALS] + [
@@ -472,7 +484,15 @@ METER_PARTS = {"donovan": {"3", "4", "5", "6", "7", "8"}, "pyron": {"4", "5"}, "
 # before the event both fighters' X (+0x10.w) are poked — far = the natural
 # round-start spacing, near = pushbox contact — so P1 always faces RIGHT
 # and no walk-in (whose trailing R + the motion's R made a DASH) is needed.
-PIN = {"far": (552, 728), "near": (880, 925)}
+PIN = {"far": (552, 728)}
+# "near" is NOT a poked pair: 880/925 and then 861/925 both OVERLAPPED the
+# pushboxes (Pyron's is wide) and the engine resolved the overlap by
+# CROSSING the fighters five frames later — P1 faced LEFT for whole parts
+# (14z-120 (2)). A near event is the far pin, a 150-frame walk-in to pushbox
+# contact, then a 40-frame pause (past the dash-tap window) before the input.
+# The facing byte +0x0B (flip_x: 1 = P1 faces RIGHT) is sampled and `expect`
+# marks an event whose P1 faces left at its frame, so a flipped rig can
+# never freeze silently.
 
 
 def gen(tenant, part, out_rpl, out_sched):
@@ -487,9 +507,15 @@ def gen(tenant, part, out_rpl, out_sched):
     pin_pokes = []
     for e in ev:
         name, recipe, gap = e[:3]
+        if len(e) > 3 and e[3] == "near":
+            gap = max(gap, 420)   # the NEXT event's pin lands 230 f later; a throw here must be over by then
         if len(e) > 3:
-            x1, x2 = PIN[e[3]]
-            pin_pokes += [f"{t - 40}:ff8410:{x1:04x}", f"{t - 40}:ff8810:{x2:04x}"]
+            x1, x2 = PIN["far"]
+            if e[3] == "near":
+                pin_pokes += [f"{t - 230}:ff8410:{x1:04x}", f"{t - 230}:ff8810:{x2:04x}"]
+                lines.append(f"{t - 190}-{t - 40} p1=R")
+            else:
+                pin_pokes += [f"{t - 40}:ff8410:{x1:04x}", f"{t - 40}:ff8810:{x2:04x}"]
         for r in recipe:
             a, b, tok = r[:3]; who = r[3] if len(r) > 3 else "p1"
             lines.append(f"{t + a}-{t + b} {who}={tok}")
@@ -621,13 +647,14 @@ def expect(sched_path, trace_path, chains_dir):
     order. This is what tests/test_move_naming.sh freezes."""
     sched = json.load(open(sched_path))
     node2chain, starts, edges = load_graph(chains_dir)
-    rows = []
+    rows = []; facing = {}
     for line in open(trace_path):
         f = line.split()
         if len(f) < 3 or f[0] != "F":
             continue
         d = dict(kv.split("=") for kv in f[2:])
         rows.append((int(f[1]), int(d["node"])))
+        if "face" in d: facing[int(f[1])] = int(d["face"])
     ent = {}
     prev = None
     for fr, node in rows:
@@ -642,7 +669,9 @@ def expect(sched_path, trace_path, chains_dir):
             k = ent.get(fr)
             if k and (e.get("movement") or k not in BASELINE) and k not in seen:
                 seen.append(k)
-        out.append(f"{sched['part']}\t{e['name']}\t" + " ".join(f"{t}:0x{q:02x}" if t != "OFF" else f"OFF:{q:#x}" for t, q in seen))
+        # +0x0B (flip_x) = 1 when P1 faces RIGHT (measured: every far-pinned event, P2 on the right, reads 1)
+        mark = "  FACING-LEFT" if (e["frame"] in facing and facing[e["frame"]] == 0) else ""
+        out.append(f"{sched['part']}\t{e['name']}\t" + " ".join(f"{t}:0x{q:02x}" if t != "OFF" else f"OFF:{q:#x}" for t, q in seen) + mark)
     return out
 
 

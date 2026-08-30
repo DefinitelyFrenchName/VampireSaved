@@ -52,8 +52,8 @@
 2	Sword Grapple [HP]	a2:0x49 a2:0x4b a2:0x56 a2:0x58
 2	walk-in	a:0x02 a:0x00
 2	Foot Stab [8P]	a2:0x11
-2	walk-in	a:0x04 a:0x00
-2	Foot Stab [8K]	a2:0x11
+2	walk-in	a:0x04 a:0x00  FACING-LEFT
+2	Foot Stab [8K]	a2:0x11  FACING-LEFT
 3	Blizzard Sword (ES)	a2:0x4a a2:0x4b a2:0x34
 3	Ifrit Sword (ES)	a2:0x30
 3	Lightning Sword (ES)	a2:0x38 a2:0x39
@@ -66,9 +66,9 @@
 3	Change Immortal	a2:0x02 a2:0x3b a2:0x3c a2:0x3e a2:0x3f
 3	walk-in	a:0x02 a:0x00
 3	Foot Stab (ES) [8PP]	a2:0x11
-3	walk-in	a:0x04 a:0x00
-3	Foot Stab (ES) [8KK]	a2:0x11
-3	Slay Shred [MP+MK]	
+3	walk-in	a:0x04 a:0x00  FACING-LEFT
+3	Foot Stab (ES) [8KK]	a2:0x11  FACING-LEFT
+3	Slay Shred [MP+MK]	  FACING-LEFT
 4	Killshread [MK]	a2:0x43
 4	Killshread Lightning [MP]	a2:0x55 a2:0x58
 4	Killshread Summon [LK] (2)	a2:0x47
@@ -172,8 +172,8 @@
 7	Foot Stab [8P] swordless off throw	a2:0x2c a2:0x4c a2:0x1e
 7	Slay Shred [LP+LK] swordless	
 8	walk-in	a:0x02 a:0x00
-8	Sharirum Luna [4MP]	a2:0x2c
-8	walk-in	a:0x04 a:0x00
-8	Sharirum Luna [4HP]	a2:0x04
-8	Change Immortal + 8 held	a2:0x02
-8	Change Immortal + 2 held	a2:0x02
+8	Sharirum Luna [4MP]	a2:0x2c  FACING-LEFT
+8	walk-in	a:0x04 a:0x00  FACING-LEFT
+8	Sharirum Luna [4HP]	a2:0x04  FACING-LEFT
+8	Change Immortal + 8 held	a2:0x02  FACING-LEFT
+8	Change Immortal + 2 held	a2:0x02  FACING-LEFT

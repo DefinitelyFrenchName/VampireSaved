@@ -82,7 +82,7 @@ for p in $PARTS; do
     POKES="$(python3 -c "import json;print(';'.join(json.load(open('$W/r_$p.json'))['pokes']))")"
     FR="$(python3 -c "import json;print(json.load(open('$W/r_$p.json'))['frames'])")"
     ( cd "$W" && MAME_SANDBOX="$W/sb$p" REPLAY="$W/r_$p.rpl" POKES="$POKES" \
-      FIELDS="ff841c:l:node,ff8420:b:cnt,ff8406:b:seq,ff8407:b:sub,ff8509:b:stock,ff8410:w:x,ff8414:w:y,ff8850:w:p2hp,ff8109:b:timer,ff8782:b:id,ff881c:l:p2node,ff802e:b:df,ff8810:w:p2x" \
+      FIELDS="ff841c:l:node,ff8420:b:cnt,ff8406:b:seq,ff8407:b:sub,ff8509:b:stock,ff8410:w:x,ff8414:w:y,ff8850:w:p2hp,ff8109:b:timer,ff8782:b:id,ff881c:l:p2node,ff802e:b:df,ff8810:w:p2x,ff840b:b:face" \
       FIELD_OUT="$W/trace_$p.txt" FIELD_FROM=2300 FIELD_TO="$FR" FRAMES="$FR" \
       "$REPO/tools/run_mame.sh" vsav2 -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$W/out_$p.log" 2>&1 ) </dev/null &
 done
