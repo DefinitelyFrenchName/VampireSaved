@@ -101,3 +101,10 @@
   in the commit bodies (2bd0f4a, 22f2980, 4b93a6c, 2e8e9b4, this commit).
   Remaining OPEN: row 10 (a (c) item), row 11 (ruled-parked), row 12
   (HANDOFF :997, G6).
+- 14z-123 (the document commits): G3 (b) `9350ab3`, G3 (a) `bdf69a9`
+  (engine_internals :1-2947 → `engine_internals_history.md`, 26 blocks);
+  G6 (1) `7ff75d5` + G6 (2) `f998ac0` (HANDOFF → `HANDOFF_HISTORY.md`; the
+  gate index generated); G4 `518c4ea` (mister.md → `mister_history.md`);
+  CLAUDE.md pass 1 `76117d9`; G7 partial `37dbbe4` (five flips). Rows 12,
+  13, 14, 15 closed with G6 / T2. REMAINING: row 10 with G3 (c); row 11
+  ruled-parked. Retraction greps are in each commit body.
