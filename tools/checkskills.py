@@ -64,6 +64,8 @@ _GAME_DOCS = ["docs/game/engine_internals.md", "docs/game/gotchas.md",
               "docs/game/atlas/character_tables.md", "docs/game/atlas/id_space.md",
               "docs/game/atlas/select_screen.md", "docs/game/atlas/sprite_lists.md",
               "docs/game/atlas/venue_assets.md"]
+# history twins join the LOG lists as they are created (14z-122/123): a log is a log.
+_GAME_LOGS = _GAME_DOCS + ["docs/game/engine_internals_history.md"]
 _PORT_DOCS = ["CLAUDE.md", "HANDOFF.md", "STATE.md", "docs/project/gotchas.md",
               "docs/game/gotchas.md", "docs/project/porting_code_regions.md",
               "docs/project/porting_sprite_lists.md", "docs/project/tenant_manifest.md",
@@ -82,7 +84,7 @@ SKILLS = {
                 # sections that never roll (skills_scope.md §3).
                 sections={"STATE.md": ["## STANDING PRINCIPLE", "## THE DEADNESS REGISTER"]}),
     "VSE": dict(path=".claude/skills/vampire-savior-engine/SKILL.md",
-                docs=_GAME_DOCS, logs=_GAME_DOCS,   # decision 5: engine_internals counts as a log
+                docs=_GAME_DOCS, logs=_GAME_LOGS,   # decision 5: engine_internals counts as a log
                 forbid=["tenant", "build/", "merged", "m3b_", "wide_ext", "gen_donovan",
                         "gen_huitzil", "gen_pyron", ".toml", "x101aca", "x088512", "32007911"]),
     "MSC": dict(path=".claude/skills/mister-cps2-wide-core/SKILL.md",

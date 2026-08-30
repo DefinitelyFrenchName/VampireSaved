@@ -944,7 +944,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02822C` | build/manifest/donovan.toml — pcrel_escape_fix [vs2]; build/manifest/huitzil.toml — capture_kf_jedah [vs2]; build/manifest/pyron.toml — capture_kf_jedah [vs2] |
 | `PRG:0x0282C0` | docs/project/gotchas.md — "The substitution landed for free" — invisible slot dependencies (14z-62c); docs/project/gotchas.md — The -debug write-trace and non-debug dumps can DISAGREE about one write (14z-100; RESOLVED 14z-101 — they never disagreed); docs/project/hardening_register.md — 5. Known-uncovered DYNAMIC surfaces (H4); build/manifest/donovan.toml — select_companion_entry_0f; tests/audit_projectile_clash.sh |
 | `PRG:0x0282C8` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tools/audit_id_space.py |
-| `PRG:0x0282D4` | docs/game/atlas/character_tables.md — Sprites / tiles / sound — pipelines mapped, addresses sprite-bound; docs/game/atlas/id_space.md — 1. Data — do the upper rows exist?; docs/game/engine_internals.md — OBJ (sprite) pipeline — the R2 answer (session 14, static decode); docs/game/engine_internals.md — OBJ sprite-list structure (measured 14z-53, WIDE Phase A); docs/game/engine_internals.md — Per-char OBJ bank table (PRG:0x282D4) — measured 14z-56; docs/game/gotchas.md — The per-char OBJ bank word is NOT a display-only attribute; +21 more |
+| `PRG:0x0282D4` | docs/game/atlas/character_tables.md — Sprites / tiles / sound — pipelines mapped, addresses sprite-bound; docs/game/atlas/id_space.md — 1. Data — do the upper rows exist?; docs/game/engine_internals.md — OBJ (sprite) pipeline — the R2 answer (session 14, static decode); docs/game/engine_internals.md — OBJ sprite-list structure (measured 14z-53, WIDE Phase A); docs/game/engine_internals.md — Per-char OBJ bank table (PRG:0x282D4) (measured 14z-56); docs/game/gotchas.md — The per-char OBJ bank word is NOT a display-only attribute; +21 more |
 | `PRG:0x0282EE` | docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/reconciliation_donovan.toml — map; build/manifest/reconciliation_huitzil.toml — map; build/manifest/reconciliation_pyron.toml — map |
 | `PRG:0x0282F4` | docs/project/hardening_register.md — 5. Known-uncovered DYNAMIC surfaces (H4); build/manifest/shared_writes.toml — huitzil; tests/test_tenant_loop.sh |
 | `PRG:0x0282F6` | docs/project/gotchas.md — The -debug write-trace and non-debug dumps can DISAGREE about one write (14z-100; RESOLVED 14z-101 — they never disagreed); build/manifest/shared_writes.toml — pyron; tests/test_tenant_loop.sh |
@@ -1586,7 +1586,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x05F24C` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/shared_writes.toml — donovan; tests/test_tenant_loop.sh; tools/gen_donovan_patch.py |
 | `PRG:0x05F24E` | build/manifest/shared_writes.toml — donovan |
 | `PRG:0x05F326` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
-| `PRG:0x05F328` | docs/game/atlas/select_screen.md — The RECORD-POINTER array — what the hovered cell displays (14z-61); docs/game/engine_internals.md — Select-screen (portrait/name) pipeline — mapped (session 14c); docs/game/engine_internals.md — measured in-emulator; the earlier 14z-68 account was wrong on both); docs/project/patch_index.md — DEFERRED BY MAINTAINER DECISION (14z-76) — the win-quote bank relocation; docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — splash_bank_variant_id; +8 more |
+| `PRG:0x05F328` | docs/game/atlas/select_screen.md — The RECORD-POINTER array — what the hovered cell displays (14z-61); docs/game/engine_internals.md — 3. Portrait and quote — DIFFERENT mechanisms (measured 14z-73); docs/game/engine_internals.md — Select-screen (portrait/name) pipeline — mapped (session 14c); docs/project/patch_index.md — DEFERRED BY MAINTAINER DECISION (14z-76) — the win-quote bank relocation; docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — splash_bank_variant_id; +8 more |
 | `PRG:0x05F338` | build/manifest/donovan.toml — splash_bank_variant_id |
 | `PRG:0x05F3AA` | build/manifest/type_stamps.toml — reader |
 | `PRG:0x05F3C8` | build/manifest/type_stamps.toml — reader |
@@ -2315,7 +2315,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x267000` | docs/game/engine_internals.md — Select-screen (portrait/name) pipeline — mapped (session 14c); build/manifest/donovan.toml — select_pal_variant_id |
 | `PRG:0x267112` | docs/game/engine_internals.md — Select-screen (portrait/name) pipeline — mapped (session 14c); docs/game/gotchas.md — The per-char strip zone interleaves the SHARED MUSIC POOL; tools/overlay_port.py |
 | `PRG:0x2671C6` | docs/game/atlas/select_screen.md — The wheel DRAWER — object, bank word, and the bank-5 move (14z-63); tools/overlay_port.py |
-| `PRG:0x2672AA` | docs/game/engine_internals.md — Select palettes + the splash/win map (session 14f); docs/game/engine_internals.md — measured in-emulator; the earlier 14z-68 account was wrong on both); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — splash_p1; build/manifest/huitzil.toml — splash_p1; build/manifest/pyron.toml — splash_p1; +2 more |
+| `PRG:0x2672AA` | docs/game/engine_internals.md — 3. Portrait and quote — DIFFERENT mechanisms (measured 14z-73); docs/game/engine_internals.md — Select palettes + the splash/win map (session 14f); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — splash_p1; build/manifest/huitzil.toml — splash_p1; build/manifest/pyron.toml — splash_p1; +2 more |
 | `PRG:0x2672EA` | build/manifest/shared_writes.toml — huitzil |
 | `PRG:0x2672EE` | build/manifest/shared_writes.toml — pyron |
 | `PRG:0x2672F6` | build/manifest/shared_writes.toml — donovan |
@@ -2326,15 +2326,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x26739A` | docs/game/engine_internals.md — Select-screen (portrait/name) pipeline — mapped (session 14c) |
 | `PRG:0x2673AA` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — win_quote; build/manifest/huitzil.toml — win_quote; build/manifest/pyron.toml — win_quote; tools/check_tenant_select.py |
 | `PRG:0x2673E2` | build/manifest/donovan.toml — splash_bank_variant_id |
-| `PRG:0x2673E6` | docs/game/engine_internals.md — measured in-emulator; the earlier 14z-68 account was wrong on both) |
-| `PRG:0x2673EA` | docs/game/engine_internals.md — Per-tenant win-screen checklist; docs/game/engine_internals.md — measured in-emulator; the earlier 14z-68 account was wrong on both); build/manifest/huitzil.toml — win_quote; build/manifest/shared_writes.toml — huitzil |
+| `PRG:0x2673E6` | docs/game/engine_internals.md — 3. Portrait and quote — DIFFERENT mechanisms (measured 14z-73) |
+| `PRG:0x2673EA` | docs/game/engine_internals.md — 3. Portrait and quote — DIFFERENT mechanisms (measured 14z-73); docs/game/engine_internals.md — Per-tenant win-screen checklist; build/manifest/huitzil.toml — win_quote; build/manifest/shared_writes.toml — huitzil |
 | `PRG:0x2673EE` | build/manifest/shared_writes.toml — pyron |
 | `PRG:0x2673F6` | build/manifest/shared_writes.toml — donovan |
 | `PRG:0x267416` | docs/game/engine_internals.md — Select-screen phase 2 (session 14e): the real handles, empirically |
 | `PRG:0x267426` | docs/project/patch_index.md — Mechanism inventory (generator vocabulary) |
 | `PRG:0x26742A` | docs/game/atlas/select_screen.md — The RECORD-POINTER array — what the hovered cell displays (14z-61); HANDOFF.md — Individual gates; build/manifest/donovan.toml — portrait; build/manifest/huitzil.toml — portrait; build/manifest/pyron.toml — portrait; tools/check_tenant_select.py; +1 more |
 | `PRG:0x267462` | docs/game/engine_internals.md — Select-screen (portrait/name) pipeline — mapped (session 14c) |
-| `PRG:0x267466` | docs/game/engine_internals.md — Select-screen phase 2 (session 14e): the real handles, empirically; docs/game/engine_internals.md — measured in-emulator; the earlier 14z-68 account was wrong on both); tests/test_select_arrays.sh |
+| `PRG:0x267466` | docs/game/engine_internals.md — Select-screen phase 2 (session 14e): the real handles, empirically; tests/test_select_arrays.sh |
 | `PRG:0x26746A` | build/manifest/shared_writes.toml — huitzil |
 | `PRG:0x26746E` | build/manifest/shared_writes.toml — pyron |
 | `PRG:0x267476` | docs/game/atlas/select_screen.md — The RECORD-POINTER array — what the hovered cell displays (14z-61); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/shared_writes.toml — donovan; tests/test_select_arrays.sh; tools/select_arrays.py |
@@ -2459,7 +2459,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x2A0426` | docs/game/engine_internals.md — Select-screen (portrait/name) pipeline — mapped (session 14c); tools/gen_donovan_patch.py; tools/overlay_port.py |
 | `PRG:0x2A05E2` | docs/game/engine_internals.md — Select palettes + the splash/win map (session 14f) [vs2]; docs/game/engine_internals.md — Select-screen (portrait/name) pipeline — mapped (session 14c) [vs2]; docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 [vs2]; build/manifest/donovan.toml — splash_p1; build/manifest/huitzil.toml — splash_p1; build/manifest/pyron.toml — splash_p1; +2 more |
 | `PRG:0x2A0662` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — splash_p2; build/manifest/huitzil.toml — splash_p2; build/manifest/pyron.toml — splash_p2; tools/check_tenant_select.py |
-| `PRG:0x2A06E2` | docs/game/engine_internals.md — Per-tenant win-screen checklist; docs/game/engine_internals.md — measured in-emulator; the earlier 14z-68 account was wrong on both); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — win_quote; build/manifest/huitzil.toml — win_quote; build/manifest/pyron.toml — win_quote; +1 more |
+| `PRG:0x2A06E2` | docs/game/engine_internals.md — 3. Portrait and quote — DIFFERENT mechanisms (measured 14z-73); docs/game/engine_internals.md — Per-tenant win-screen checklist; docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — win_quote; build/manifest/huitzil.toml — win_quote; build/manifest/pyron.toml — win_quote; +1 more |
 | `PRG:0x2A0762` | docs/game/atlas/select_screen.md — The tenant move IMPLEMENTED, and vs2's own arrays (14z-62); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 [vs2]; build/manifest/donovan.toml — portrait; build/manifest/huitzil.toml — portrait; build/manifest/pyron.toml — portrait; tools/check_tenant_select.py |
 | `PRG:0x2A07E2` | build/manifest/donovan.toml — portrait; build/manifest/huitzil.toml — portrait; build/manifest/pyron.toml — portrait |
 | `PRG:0x2A08E2` | docs/game/atlas/select_screen.md — The tenant move IMPLEMENTED, and vs2's own arrays (14z-62); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 [vs2]; build/manifest/donovan.toml — name_banner; build/manifest/huitzil.toml — name_banner; build/manifest/pyron.toml — name_banner; tools/check_tenant_select.py; +1 more |
@@ -2495,7 +2495,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x2A7F4A` | build/manifest/pyron.toml — splash_p2 |
 | `PRG:0x2A7F68` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — splash_p1; tools/overlay_port.py; tools/select_port.py |
 | `PRG:0x2A7F86` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — splash_p2; tools/overlay_port.py; tools/select_port.py |
-| `PRG:0x2A881E` | docs/game/engine_internals.md — Per-tenant win-screen checklist [vs2]; docs/game/engine_internals.md — measured in-emulator; the earlier 14z-68 account was wrong on both) [vs2]; docs/project/patch_notes.md — where the detail lives; build/manifest/huitzil.toml — win_quote; build/manifest/huitzil.toml — win_quote [vs2] |
+| `PRG:0x2A881E` | docs/game/engine_internals.md — 3. Portrait and quote — DIFFERENT mechanisms (measured 14z-73) [vs2]; docs/game/engine_internals.md — Per-tenant win-screen checklist [vs2]; docs/project/patch_notes.md — where the detail lives; build/manifest/huitzil.toml — win_quote; build/manifest/huitzil.toml — win_quote [vs2] |
 | `PRG:0x2A8CB6` | build/manifest/pyron.toml — win_quote |
 | `PRG:0x2A8CF8` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — win_quote; tools/overlay_port.py; tools/select_port.py |
 | `PRG:0x2ABD58` | build/manifest/reconciliation.toml — map [vs2] |

@@ -767,10 +767,11 @@ the per-chain frame data in `<tenant>_anim.md`.
   14z-120 (6) on 13 contacts: 6/12/18 on L/M/H normals, 3 per Lightning
   Sword tick, 9 Ifrit, 2 the column, a fraction of it on block; the VICTIM
   gains 8 per hit whatever the record and 0 on block), **`+0x17` the
-  REACTION CLASS**, ~~`+0x1C` scales the PUSHBACK~~ **RETRACTED 14z-121:
-  `+0x1C` has ONE reader (vs2 `0x16B70`) and it never fired on any
-  measured contact — see "The attack record's fields, by their readers"
-  below; the 27/41/59 px correlation has another carrier, unread**,
+  REACTION CLASS**, `+0x1C` — ONE reader (vs2 `0x16B70`, the victim's
+  accumulator `+0x161`; "The attack record's fields, by their readers"
+  below and `ram.md`; the 27/41/59 px pushback correlation once pinned on
+  it was RETRACTED 14z-121 — the carrier is the record's `+0xC` step
+  table, "Reactions as the victim"),
   `+0x1D` zero in every record seen.
   Observed, not proven: `+0x12` = the strength index (1/2/3, 7 on
   specials), `+0x16` = 1 on specials and projectiles; `+0x11`, `+0x13`,
@@ -1694,6 +1695,9 @@ drawer, the handler table, all list formats, the per-game bias table),
 `atlas/ram.md` (object fields `+0x02` class, `+0x04` effect type, `+0x0B`
 facing, `+0x0F` palette, `+0x18`/`+0x1A` OBJ word bits, `+0x1C` anim node,
 `+0x30` owner), `atlas/character_tables.md` (the per-char OBJ bank table).
+**Gates:** `tests/test_list_type_census.sh`, `tests/test_beam_list_type6.sh`,
+`tests/audit_effect_class_rows.sh`, `tests/test_obj_records.sh`,
+`tests/test_biased_list_inventory.sh`; instrument `tests/lua/obj_records_dump.lua`.
 
 The section below it describes the OBJ *entry* the hardware reads. This one
 describes the machinery that PRODUCES those entries — the layer where every
@@ -1816,7 +1820,7 @@ bits are supplied from data (per-char OBJ bank table `PRG:0x282D4` and a
 few `move.w #$X000` setters), reaching banks 4-7 may require no game-side
 code change at all.
 
-### Per-char OBJ bank table (PRG:0x282D4) — measured 14z-56
+### Per-char OBJ bank table (PRG:0x282D4) (measured 14z-56)
 
 0x18 word rows indexed by character id, read through the **opcode
 (decrypted)** view — a pc-relative access, so it lives in
@@ -1836,7 +1840,6 @@ tile fetch: a build with 15 rows remapped diverges in work RAM at frame
 890 under MAME, which has no extended-bank support at all (14z-56
 measurement, GOTCHAS). Treat the row as behaviour-bearing.
 
-
 ## The CPU AI action-script system (14z-111, measured on the #99 capture)
 
 **Atlas rows this section depends on:** `ram.md` fighter `+0x205` (script
@@ -1844,6 +1847,8 @@ index), `+0x210/+0x214/+0x218/+0x21C` (channel cursors; `+0x224` mirrors
 channel 0's start), `+0x241` (current command byte), `+0x242/+0x244/+0x246`
 (the three stream words each command pulls), `+0x382` (class);
 `character_tables.md` `ai_script_0..3` (`PRG:0xBF01A/09A/11A/19A`).
+**Gates:** `tests/test_fsm_census.sh`, `tests/test_inp_corpus.sh` (the #99
+recording replays at every freeze), `tests/audit_don_vs_cpu.sh`.
 
 **[VSE-75]** - **Tables.** Four per-class tables of script-start pointers, 32 longs each:
   entries 0-15 = the 16 classes, **entries 16-31 = the same 16 repeated**
@@ -1875,6 +1880,14 @@ channel 0's start), `+0x241` (current command byte), `+0x242/+0x244/+0x246`
 
 ## The class-02 sequence system, per-char jump handlers, and the air
 ## system (session 14z-66, measured on the Huitzil port)
+
+**Atlas rows this section depends on:** `atlas/ram.md` (fighter `+0x06` seq /
+`+0x07` sub-state, `+0x21` node header, `+0x1C0` float timer, `+0x3C2`
+flavor, `+0x10/+0x14` position, `+0x32` victim link, `+0x382` id),
+`atlas/character_tables.md` (`jump_params`, the `0xBCE7A` pose family, the
+capture-keyframe pointer table `0x0BE27A`).
+**Gates:** `tests/test_hui_air.sh`, `tests/test_hui_grab_victim.sh`,
+`tests/test_m2a_flavor_selector.sh`, `tests/test_anim_node_walk.sh`.
 
 - **Class-02 seq dispatch:** the per-frame stepper (vsavj 0x225C4 /
   vs2 0x20FA8) dispatches on the seq byte +0x06 via a word table
@@ -1942,6 +1955,12 @@ channel 0's start), `+0x241` (current command byte), `+0x242/+0x244/+0x246`
 ## Select-portrait palette dispatch + HUD stager biases (14z-67,
 ## measured on the H gfx rung)
 
+**Atlas rows this section depends on:** `atlas/select_screen.md` (the portrait
+palette grid and record arrays), `atlas/venue_assets.md` (the HUD per-char
+tables), `atlas/id_space.md` (the variant-row alias rule).
+**Gates:** `tests/test_tenant_hud.sh`, `tests/test_gfx_menus.sh`,
+`tests/test_select_arrays.sh`, `tests/test_tenant_select_records.sh`.
+
 vs2's select-portrait palette uploader (compare chain at vs2 0x6B1A6,
 the twin of vsavj's 0x5F146 window) special-cases the newcomers THREE
 DIFFERENT WAYS — the per-tenant fact that decides each port's
@@ -1962,6 +1981,14 @@ pick flow only — forced-pick pokes load the character but leave the
 HUD reading the alias row (GOTCHAS).
 
 ## The per-char effect system (14z-67, decoded on the H ping rounds)
+
+**Atlas rows this section depends on:** `atlas/ram.md` (the `$FFB800` effect
+pool: `+0x54` effect id, `+0x56` sub-id, `+0x30` owner link, `+0x1C` record
+chain; fighter `+0x40..+0x4C` launch physics, `+0x5A`),
+`atlas/character_tables.md` (the `anim_index` family `0xBCE7A/EFA/F7A`, the
+seq-D dispatch row).
+**Gates:** `tests/test_hui_fx_flow.sh`, `tests/test_hui_pairs.sh`,
+`tests/test_hui_electrocute.sh`, `tests/test_effect_palette_table.sh`.
 
 Three coupled mechanisms drive character effects (beams, grab
 lightning, explosions):
@@ -2003,30 +2030,33 @@ indexes).
 ## The WIN SCREEN subsystem (measured on Donovan 14z-45, re-measured
 ## and corrected on Huitzil 14z-68m)
 
-**Read this before touching any tenant's win screen.** Donovan's win
-screen was fully solved in 14z-45; Huitzil's was then re-derived from
-scratch in 14z-68 and got TWO of three pieces wrong, because the prior
-analysis lived only in a session log. Everything a tenant needs is
-below, with both characters as worked instances.
+**Atlas rows this section depends on:** `atlas/ram.md` (fighter `+0x382`
+winner id, `$FF8093` the text-region byte, `RAM:$FFF230` the installed
+quote pointer), `atlas/select_screen.md` (the `0x267xxx` record arrays),
+`atlas/venue_assets.md` (per-slot presentation assets).
+**Gates:** `tests/audit_win_pal_auto.sh`, `tests/test_win_quote_decode.sh`,
+`tests/test_tenant_winpal.sh`, `tests/test_hui_winscreen.sh`,
+`tests/audit_tenant_downwin.sh`.
 
-**WHICH FLOWS REACH IT (measured 14z-99, corrected by the maintainer the
-same session):** the screen shows after match wins in BOTH 1P-vs-COM
-(corner: PRESS START) and 2P (corner: the loser's CONTINUE countdown).
-An earlier same-session reading — "a 2P-flow surface; 1P never shows it;
-a legacy 2P winner skips it" — is RETRACTED: it came from two rig traps,
-(a) coarse post-KO sampling landing on the MAP/tally screens that come
-AFTER the win screen, and (b) mash inputs running past the KO pressing
-through it (game gotchas, 14z-99). Rigs for this screen must end their
-inputs at the KO and sample densely between the settle and the map.
-**#105 — FIXED 14z-99 (`win_pal colors 8 -> 10`, all three builds — the
-AUTO sets; gate `tests/audit_win_pal_auto.sh`; this line read KNOWN-OPEN
-until 14z-114). The symptom as reported:** with AUTO (= auto-guard, a handicap
-mode — the human still plays) selected by the WINNER, a TENANT winner's
-portrait renders WHITE on the merged build: the `0x90C2A0` win-pal
-window holds all-0xFFFF during the screen and the real colors arrive
-AFTER it — the upload is LATE, not absent. Vanilla renders its AUTO
-winner colored (not the engine's own behavior). Locked by
-`tests/audit_win_pal_auto.sh` + `replays/103_tenant_2pwin_auto.rpl`.
+Everything a tenant's win screen needs is below, with Donovan and Huitzil
+as worked instances. (It was derived twice — the second derivation got two
+of three pieces wrong because the first lived only in a session log; the
+record is in `engine_internals_history.md`.)
+
+**Which flows reach it** [M: 14z-99, maintainer-corrected]: the screen
+shows after match wins in BOTH 1P-vs-COM (corner: PRESS START) and 2P
+(corner: the loser's CONTINUE countdown). Rigs for this screen must end
+their inputs at the KO and sample densely between the settle and the map —
+coarse post-KO sampling lands on the MAP/tally screens that follow it, and
+mash inputs press through it (`game/gotchas.md`).
+
+**The AUTO-winner palette upload is LATE** [M: `tests/audit_win_pal_auto.sh`,
+14z-99, GitHub #105]: with AUTO (auto-guard, a handicap mode — the human
+still plays) selected by the WINNER, the `0x90C2A0` win-pal window holds
+all-0xFFFF during the screen and the real colours arrive AFTER it, so a
+tenant winner's portrait rendered WHITE until the fix (`win_pal colors
+8 -> 10`, all three builds — the AUTO sets). Vanilla renders its AUTO
+winner coloured. Locked with `replays/103_tenant_2pwin_auto.rpl`.
 
 The victory screen draws from THREE independent per-winner tables, all
 indexed by the winner's char id from `+0x382(a4)`, all UNMASKED (so a
@@ -2073,36 +2103,38 @@ block laid out with the VANILLA 0xAA0 stride carrying only the tenant's
 8 sets, plus a thunk that rebases `a0 = block - id*0xA0` when
 `d6 == tenant`, so the vanilla arithmetic lands on the tenant's set).
 
-### 3. Win screen — PORTRAIT and QUOTE are DIFFERENT mechanisms (14z-73,
-### measured in-emulator; the earlier 14z-68 account was wrong on both)
+### 3. Portrait and quote — DIFFERENT mechanisms (measured 14z-73)
 The shared fetch helper vsavj `0x5F328`: `movea.l #$2672AA,a0;
 andi.w #$ff,d0; lsl.w #2,d0; lea -4(a0,d0.w),a0; move.l a0,$1c(a6)` —
 it stores the *slot address* as the anim ptr (+0x1C); the anim
 interpreter then reads the record from it.
 
-**RETRACTED (14z-73): `d0` is `0x40 + WINNER id`, not `0x60+id`.**
-Breakpointing `0x5F328` at the actual win screen (replay 28 + forced
-pick) measured `d0 = 0x50` for a Huitzil (id 0x10) win — so the slot is
-`0x2672AA + 4*(0x40+id) - 4`; for id 0x10 that is `0x2673E6`. The
-14z-68/NEXT_SESSION `0x60+id` (index `0x6F`, slot `0x267466`) was wrong;
-repointing it changes nothing (measured — hui27 did exactly that and the
-screen was unchanged). There is no separate P2 slot in evidence — the id
-is the WINNER's, and the arcade win screen (the one with the CONTINUE
-counter) always has a P1 winner.
+`d0` is `0x40 + WINNER id` [M: breakpoint at `0x5F328` on replay 28 + a
+forced pick: `d0 = 0x50` for a Huitzil (id 0x10) win], so the slot is
+`0x2672AA + 4*(0x40+id) - 4` — `0x2673E6` for id 0x10. There is no separate
+P2 slot: the id is the WINNER's, and the arcade win screen (the one with
+the CONTINUE counter) always has a P1 winner. (An earlier `0x60+id`
+reading, and the repoint that changed nothing, are in the history.)
 
-**The PORTRAIT already WORKS and is a DIFFERENT array from the quote.**
-The `[[select_records]]` entry misnamed `win_quote` in `huitzil.toml`
-ports Huitzil's victory PORTRAIT correctly (renders since hui16,
-maintainer-confirmed hui26): it reads array `0x2A06E2` (index id, NO `-4`
-bias) and pokes vsavj `0x2673ea` <- the placed vs2 `0x2A881E` = Huitzil's
-portrait record (tiles bank-1 `0xb7xx`, pal 15-19). Its tiles ARE placed.
-Do NOT touch it — a 14z-73 attempt to repurpose it for the quote stopped
-poking `0x2673ea` and BROKE the portrait (self-inflicted "placeholder"),
-reverted. The `d0=0x50 -> 0x2673E6` fetch measured at `0x5F328` was some
-OTHER piece; poking `0x2673E6` changed neither portrait nor quote, so it
-is not the lever for either.
+**The PORTRAIT is a DIFFERENT array from the quote, and it already works.**
+The `[[select_records]]` entry misnamed `win_quote` in `huitzil.toml` ports
+Huitzil's victory PORTRAIT (renders since hui16, maintainer-confirmed
+hui26): it reads array `0x2A06E2` (index id, NO `-4` bias) and pokes vsavj
+`0x2673ea` <- the placed vs2 `0x2A881E` = Huitzil's portrait record (tiles
+bank-1 `0xb7xx`, pal 15-19); its tiles ARE placed. **Do not repurpose that
+entry for the quote** — doing so stops the `0x2673ea` poke and breaks the
+portrait (measured, reverted; history). The `d0=0x50 -> 0x2673E6` fetch at
+`0x5F328` is some OTHER piece: poking `0x2673E6` changes neither portrait
+nor quote.
 
 ### The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76)
+
+**Status: the tenants' win quotes are FORGONE (maintainer, 2026-08-28,
+DECIDED) — any future attempt takes the clean route only: the vanilla bank,
+the four-entry region root, tables A/B and `RAM:$FFF230`'s vanilla value
+all stay byte-identical (STATE "Decisions pending", then
+`DECISIONS_HISTORY.md`). The facts below are why, and what a clean route
+would have to carry.**
 
 **[VSE-58]** Three sessions attempted this by repointing per-character POINTER arrays.
 None of them could ever have worked: **the quote system contains no absolute
@@ -2160,14 +2192,11 @@ winner 0x13 -> offset 0x0d62 = winner 0x03's (Victor)
 
 which is precisely the reported symptom for all three tenants.
 
-**RETRACTED (mine, same session):** I first diagnosed this as the INDEX-SPACE
-class — "table A is authored only to `0x1EF`, the tenant reads `0x263` in a
-zero region and falls back to a default". That is wrong. **Table A
-(`0xC912`, vs2 `0xB1EA`) is not the per-character selector at all** — it is a
-special-matchup flag, near-entirely zero in BOTH games including for vs2's own
-newcomers, its one non-zero being winner 0x01 vs loser 0x01 (a mirror match).
-Zero there is the correct default, not a fallback. The deadness measurement I
-took of that span is sound but measures a span the fix does not need.
+Table A (`0xC912`, vs2 `0xB1EA`) is NOT the per-character selector: it is a
+special-matchup flag, near-entirely zero in BOTH games including for vs2's
+own newcomers (its one non-zero: winner 0x01 vs loser 0x01, a mirror
+match); zero there is the correct default, not a fallback. (The
+INDEX-SPACE misdiagnosis it replaced is in the history.)
 
 **6. VS2 HAS THE DATA, for exactly our three tenants** (`root 0x00F954 ->
 bank 0x09CA24`, same 32-entry shape). Its variant half is aliased too, EXCEPT:
@@ -2189,11 +2218,9 @@ base**, so a ported block must live within `0x32D28A + 0xFFFF`. Offset space
 is not the problem (vanilla's last block sits at offset `0x3C5A`, and three
 blocks add ~`0xC20`); **whether there is free ROM immediately reachable from
 the bank is the open question**, and it is what decides whether this is a
-simple data port or needs the bank relocated. *(ANSWERED 14z-116 —
-`tools/scan_quote_window.py`: **zero** runs of `0x20`+ bytes of `00`/`FF` in
-`0x32D28A ± 0x8000`, and none in `± 0x10000` either. The 14z-76 prose claim
-re-derived as a script. §8 below carries what else the same session
-measured, and two numbers in the sections above are corrected there.)*
+simple data port or needs the bank relocated. Answered 14z-116
+(`tools/scan_quote_window.py`): **zero** runs of `0x20`+ bytes of `00`/`FF`
+in `0x32D28A ± 0x8000`, and none in `± 0x10000` either — see 8.
 
 **8. WHAT 14z-116 MEASURED, and the three corrections it forces.** The
 system above was decoded but never READ; `tools/decode_win_quotes.py` walks
@@ -2260,6 +2287,16 @@ controls) and `tools/audit_quote_font.py` compares the glyphs.
 
 ## Object TYPE dispatch and the pool walker (decoded 14z-65, fully
 ## measured 14z-68d on the Huitzil effect arc)
+
+**Atlas rows this section depends on:** `atlas/ram.md` (the `$FFB800` pool,
+0x80 stride: `+0x02` type, `+0x03` owner/sub, `+0x30` owner link; the
+`$FF9400` projectile pool and its `+0x7F` tag byte; the `$FFC800` local
+pool), `atlas/character_tables.md` (the `[[obj_hook]]` table rows).
+**Gates:** `tests/test_obj_walker_relocation.sh`, `tests/audit_walker_ghost.sh`,
+`tests/audit_walker_repoint.sh`, `tests/test_type_stamp_census.sh`,
+`tests/audit_type_dispatch_range.sh`, `tests/audit_type_writes.sh`,
+`tests/audit_pool_free_byte.sh`, `tests/test_hitclass_map_thunk.sh`,
+`tests/audit_hitclass_map_cost.sh`, `tests/test_classify_pool_spawns.sh`.
 
 **[VSE-18]** Every secondary object — companions, pods, effect pieces, the victory
 portrait drawer — is ticked from a per-frame walker that dispatches on
@@ -2484,29 +2521,23 @@ and shared by Huitzil (68/72 in the same pool). **[VSE-7]** Third instance of th
 "vs2 widened an index consumer" class (14z-26 property table, 14z-35
 dispatch table, 14z-79's 0x018460 window is the same family).
 
-Fix — **ADOPTED, not pending** (corrected 14z-91; the "ADOPTION PENDING"
-here contradicted HANDOFF's registry row for a whole session). The
-`hitclass_map_extend` site_thunk is declared by `huitzil.toml:2048` and
-`pyron.toml:1044` and is present in their builds; it was maintainer-adopted
-2026-08-12 and huitzil-m4 / pyron-m3 were re-frozen on it.
+Fix — SHIPPED: the `hitclass_map_extend` site_thunk (`huitzil.toml`,
+`pyron.toml`; maintainer-adopted 2026-08-12, huitzil-m4 / pyron-m3 frozen
+on it).
 
-**Because it IS shipped, it is a live hook on a SHARED engine site**, and
-**its "legacy never enters the map" evidence was FALSIFIED by measurement
-(14z-92, M4).** That claim rested on two census replays, and both of them
-happen to score zero. Over the 46-replay legacy corpus legacy enters the map
-**230 times** (`24_don_winmash` 2, `26_don_arcade_mash` 228). The fix is
-still sound and the argument is now the true one: every observed legacy index
-is 0x02/0x04/0x09/0x0b, far below 64, so legacy reads VANILLA's own bytes out
-of the thunk — "legacy enters constantly and receives vanilla answers", not
-"legacy never enters". Corroborated by 43/46 bit-identical in the same run.
-It was the same coverage shape that falsified the list-type 6 deadness claim
-and produced the 14z-91 legacy regression, and this time it did fire. It is a `jmp` over `0x1A888` plus a
-`cmpi.w`/`bcc` on every collision-map lookup. The dispatch is per-COLLISION,
-not per-frame, so it is far colder than the obj_hook site was — but if a
-legacy replay ever fails to re-converge and the walker relocation is not the
-cause, look here next and re-run `tests/audit_hitclass_map_cost.sh`, whose
-corpus IS the full 46 legacy pairings since 14z-92 (it had a four-replay
-default until then).
+**It is a live hook on a SHARED engine site, and legacy content ENTERS it**
+[M: `tests/audit_hitclass_map_cost.sh`, 14z-92]: over the 46-replay legacy
+corpus legacy enters the map **230 times** (`24_don_winmash` 2,
+`26_don_arcade_mash` 228), every observed index `0x02/0x04/0x09/0x0b` —
+far below 64 — so legacy reads VANILLA's own bytes out of the thunk:
+"legacy enters constantly and receives vanilla answers", never "legacy
+never enters" (43/46 bit-identical in the same run). The hook is a `jmp`
+over `0x1A888` plus a `cmpi.w`/`bcc` per collision-map lookup, per
+COLLISION not per frame — far colder than the obj_hook site was. If a
+legacy replay ever fails to re-converge and the walker relocation is not
+the cause, look here next; the audit's corpus IS the full 46 pairings.
+(The two-replay "never enters" claim this replaced, and how the same
+coverage shape produced the 14z-91 regression, are in the history.)
 
 **THE SWEEP IS POOL-vs-POOL (measured, 14z-82d).** Both loop registers
 stride pool slots, so a projectile hitting a FIGHTER never transits this
@@ -2526,9 +2557,9 @@ declare the row. The section reports THREE verdicts and never collapses
 them — "reaches the extension", "enters but stays below 64", and "no rig
 produces a pool-vs-pool contact at all". The third is a gap in the RIGS,
 not a finding about the thunk, and treating it as one is the coverage
-artefact that produced the retracted legacy claim below.
+artefact behind the retracted legacy claim (history).
 
-**Counting the exposure (corrected 14z-93):** the frozen stamp inventory
+**Counting the exposure:** the frozen stamp inventory
 has 93 rows with `type >= 64`, but only **36** are in the 64-75
 projectile-pool band that can over-index THIS map. The other 57 are the
 114-120 obj_hook family, served by the spawn-time owner tag and never
@@ -2539,17 +2570,15 @@ Generated and reconstructed by (STATE 14z-82b):
 `tools/gen_hitclass_map_thunk.py` + `tests/test_hitclass_map_thunk.sh` +
 `tests/audit_hitclass_map_cost.sh`.
 
-> **RETRACTED 14z-92.** This paragraph used to end "Legacy content measured
-> entering this map ZERO times across four replays — the sweep serves
-> secondary-object collisions vanilla content doesn't produce there." The
-> four-replay figure was falsified by the corpus-wide run: legacy enters
-> **230 times** (see the paragraph above). The sentence survived four lines
-> below its own retraction for a session — the §5 failure mode exactly.
-
 Atlas rows this depends on: the $FF9400 projectile-pool row and the
 +0x02 type-byte row in `docs/game/atlas/ram.md`.
 
 ## Allocator wrappers and slot recycling (14z-65)
+
+**Atlas rows this section depends on:** `atlas/ram.md` (the `$FFB800` /
+`$FF9400` pools and slot reuse).
+**Gates:** `tests/test_hui_soak.sh`, `tests/test_pyron_soak.sh` (the round-2
+class surfaces only after a pool cycle).
 
 **[VSE-23]** vs2's allocators `0x15702` / `0x1572E` are wrapped (`alloc_wrap` in the
 tenant manifest) with an 0x80-byte clear: vs2's allocator semantics
@@ -2558,6 +2587,11 @@ stale bytes under the new object's init — which surfaces as a
 round-2-only bug, after the pool has been through one cycle.
 
 ## Pool seeding and the `[[init_shim]]` (14z-65 — the watchdog class)
+
+**Atlas rows this section depends on:** `atlas/ram.md` (the pool-0 free-list
+head, fighter `+0x3C2` flavor).
+**Gates:** `tests/test_hui_boot.sh`, `tests/test_m2a_flavor_selector.sh`,
+`tests/test_shim_charid.sh`.
 
 **[VSE-22]** **Vanilla vsavj never seeds the secondary-object pools during a normal
 match; vs2 always does.** Every newcomer's ecosystem allocates from
@@ -2586,6 +2620,10 @@ selected the wrong branch and was only caught when the float landed.
 
 ## Update-queue classes (14z-65)
 
+**Atlas rows this section depends on:** `atlas/ram.md` (the object pools; no
+row yet for the update-queue nodes themselves — an open atlas item).
+**Gates:** `tests/test_hui_soak.sh` (round 2), `tests/test_crash_guard.sh`.
+
 vs2 registers companion-class objects in update-queue **class 7**,
 which does not exist on vsavj (classes 0-6). Unremapped, the
 registration leaves a stale vs2-encoded queue node; after the round-2
@@ -2595,6 +2633,13 @@ in palette space, two rounds after the real mistake. Fix is a
 `x088512` zone: `0x08B0F8`, `000e` -> `000c`).
 
 ## THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab)
+
+**Atlas rows this section depends on:** `atlas/ram.md` (fighter `+0x134`
+captured flag, `+0x1C` node, `+0x10/+0x14` position, `+0x32` link,
+`+0x382`), `atlas/character_tables.md` (`anim_index_c` `0x0BCFFA`, the
+capture-keyframe pointer table `0x0BE27A`).
+**Gates:** `tests/test_capture_pose_sources.sh`, `tests/audit_don_grab_pose.sh`,
+`tests/test_hui_grab_victim.sh`, `tests/test_hui_grab.sh`.
 
 **Read this before touching any grab/capture surface for a tenant.** It is
 the site of GitHub #104 and it is a variant-row alias defect, not a data
@@ -2614,7 +2659,7 @@ whose two entry points sit at `PRG:0x27FA0` and `PRG:0x27FAA`:
 0x27FCE  move.l a0,$1c(a4)         ; install on the victim
 ```
 
-Two facts that cost time in 14z-98/99, both measured:
+Two facts, both measured [M: 14z-98/99]:
 
 - **`0x27FAA` is never executed.** It is real, correct code and the
   four-sibling table at `0x27FEE` is real, but every live path enters
@@ -2685,22 +2730,10 @@ real, distinct rows for the newcomers (vs2 Victor `0x0A8824`: row 0x10 =
 because vs2 has no character there). The port gap is that vsavj's blocks
 have no tenant sub-blocks at all.
 
-**(A superseded reading, kept for the record: "the two exceptions are the
-useful part / read them first — their 32-entry tables are the shape the
-fix needs" — RETRACTED the same session, 14z-99.** Zabel `0x04` and the
-special slot `0x0B` do carry 32 distinct offsets at uniform `0x190`
-stride, but their variant-half sub-blocks measure as BYTE-COPIES of the
-base sub-blocks, 15/16 rows with `0x1F` the exception — the SAME defect
-stored as materialized content, not populated tenant data.)
-
-**SHIPPED 14z-99 — the 15 `capture_kf` slot_rows data_ports
-(`../project/patch_notes.md` "14z-99 — the window", gate
-`tests/test_capture_pose_sources.sh`); this heading still read "MEASURED
-FEASIBLE" until 14z-114.** The design record as it was written:
-**THE FIX IS MEASURED FEASIBLE AND ITS SHAPE IS SETTLED (14z-99;
-maintainer-ruled option (a) — full — conditioned on these measurements,
-which came back clean; every premise below is frozen in
-`tests/test_capture_pose_sources.sh`):**
+**The fix — SHIPPED 14z-99: the 15 `capture_kf` slot_rows data_ports
+(`../project/patch_notes.md` "14z-99 — the window"; maintainer-ruled
+option (a), full). What it rests on — every premise frozen by
+`tests/test_capture_pose_sources.sh`:**
 - **Source data exists for all 16 attackers in BOTH source games**, with
   distinct tenant rows (`0x10/0x11/0x13`), sub-block stride EQUAL to
   vsavj's per attacker (the keyframe-index-space compatibility signal),
@@ -2734,6 +2767,12 @@ Gate: `tests/audit_don_grab_pose.sh` (legacy-victim control in section 0).
 
 ## Throw / physics-arc tables (14z-67, measured on the command grab)
 
+**Atlas rows this section depends on:** `atlas/ram.md` (fighter `+0x40` xv,
+`+0x44` yv, `+0x48` xacc, `+0x4C` gravity, `+0x5A` the arc sub-index),
+`atlas/character_tables.md` (the throw-arc tables).
+**Gates:** `tests/test_hui_grab.sh`, `tests/audit_tenant_throws.sh`,
+`tests/test_don_throw_mirror.sh`, `tests/audit_throw_tech.sh`.
+
 The victim's launch physics come from a per-throw ROW installed by
 vsavj `0x28386` (vs2 `0x275E4` — a unique tail twin pair):
 ```
@@ -2766,6 +2805,8 @@ for in-match identity),
 `+0x3B3` per-char stat byte, `+0x8C` attack-record table ptr,
 `+0x32` attacker/owner link), the A5 work-var families below, and
 docs/game/gotchas.md "Same-value class #4".
+**Gates:** `tests/audit_fg_parity.sh`, `tests/audit_fg_damage.sh`,
+`tests/test_hitbox_encoding.sh`, `tests/audit_trap_parity.sh`.
 
 **[VSE-40]** **Two parallel damage APPLIERS feed one staging protocol** (all
 addresses vsavj; vs2 twins in parentheses, verified instruction-
@@ -2828,10 +2869,9 @@ stay at vs2 offsets. Gate: `tests/audit_fg_parity.sh`.
 after the appliers, the victim's reaction is chosen at `PRG:0x2384E`:
 `move.b (0x54,a6),d0; add.w d0,d0; move.w (0x2385C,pc,d0.w),d1;
 jmp (pc,d1)` — the class byte (copied from the hit record, byte **+0x17**
-of the 0x20-stride hitbox/hitbox_proj records — CORRECTED 14z-120 (5): this
-line said "+0x1D", an offset counted from the region start rather than the
-record base; the shipped Huitzil rows at `hitbox_proj +0x17D/+0x19D` ARE
-+0x17 of projectile records 5 and 6, see "Hitboxes and attack records")
+of the 0x20-stride hitbox/hitbox_proj records — see "Hitboxes and attack
+records"; the shipped Huitzil rows at `hitbox_proj +0x17D/+0x19D` are
++0x17 of projectile records 5 and 6)
 indexes a PC-relative
 word jump table. vs2's twin (dispatch 0x2237A, table 0x22388) has
 0x54 entries; **vsavj's table ends earlier — any vs2-extended class
@@ -2864,6 +2904,7 @@ identical between the games — unaffected either way.)
 ## The down-transition WHITE FRAME (14z-112, measured on stock vsavj)
 
 Depends on atlas rows: fighter `+0x11F` (death flag), `+0x50/+0x52`.
+**Gates:** `tests/test_down_flash_vanilla.sh`.
 
 Vampire Savior draws exactly ONE all-white frame (the whole 384x224
 framebuffer; fnv1a64 `eab1fb569cb99b25` under `tests/lua/inp_probe.lua`)
@@ -2893,6 +2934,8 @@ Depends on atlas rows: fighter `+0x50` / `+0x52` (the judge tests
 `+0x52`) / `+0x54` / `+0x5C` / `+0x11F`, work vars `$FF3442/$FF3444`
 (staged damage — the "Same-value class #4" family), `$FF800C` (phase
 cursor), `$FF810C` (KO mask), `$FF8129` (judge gate byte, 14z-97 (8)).
+**Gates:** `tests/audit_kill_poke_shape.sh`, `tests/audit_don_ko_writer.sh`,
+`tests/audit_don_lilith_ko.sh`, `tests/audit_tenant_timeout.sh`.
 
 **The phase machine.** `$FF800C` is a jump-table CURSOR (0,2,4,…)
 advanced by `addq.w #2,$c(a5)` at the transition sites. Several outer
