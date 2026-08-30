@@ -36,7 +36,7 @@ the numbers the community can review and, through the manifest, adjust.
 `*_ptr` rows are the source-set pointers the port repoints to the relocated
 copy. Consumers and semantics: `docs/game/atlas/character_tables.md`.
 
-## The character-data MAP (14z-118) — `chars/`
+## The character-data MAP — `chars/` (opened 14z-118)
 
 | file | what | regenerate |
 |---|---|---|
