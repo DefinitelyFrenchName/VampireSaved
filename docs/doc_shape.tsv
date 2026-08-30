@@ -37,7 +37,7 @@ docs/NEXT_SESSION_HISTORY.md	HIST	-	-
 HANDOFF.md	REFERENCE	HANDOFF_HISTORY.md	-
 HANDOFF_HISTORY.md	HIST	-	-
 # --- game
-docs/game/engine_internals.md	PENDING	docs/game/engine_internals_history.md	-
+docs/game/engine_internals.md	REFERENCE	docs/game/engine_internals_history.md	banner,atlas-rows
 docs/game/engine_internals_history.md	HIST	-	-
 docs/game/gotchas.md	REGISTER	-	-
 docs/game/atlas/README.md	REFERENCE	-	-

@@ -62,7 +62,7 @@ history twins and are listed last. Level-0 files are the entry points above.
 
 **`game/`**
 - [`atlas/`](game/atlas/) — **REFERENCE** · the verified ROM/RAM map: `README.md`, `ram.md`, `character_tables.md`, `id_space.md`, `select_screen.md`, `sprite_lists.md`, `venue_assets.md`
-- [`engine_internals.md`](game/engine_internals.md) — **PENDING (its (c) third lands next session)** · how the engine works, by subsystem. The document a stranger reads to understand the game. Read the relevant section before touching any subsystem. · history: `game/engine_internals_history.md`
+- [`engine_internals.md`](game/engine_internals.md) — **REFERENCE** · how the engine works, by subsystem. The document a stranger reads to understand the game. Read the relevant section before touching any subsystem. · history: `game/engine_internals_history.md`
 - [`gotchas.md`](game/gotchas.md) — **REGISTER** · traps in the game itself
 
 **`platform/`**

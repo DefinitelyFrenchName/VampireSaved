@@ -192,7 +192,7 @@ VSE-4	docs/game/gotchas.md	Same-value class #4: A5-relative work-var displacemen
 VSE-5	docs/game/gotchas.md	code inside per-char families — hook the LIVE one, found by tracing	IN-LIST
 VSE-6	docs/game/gotchas.md	sibling-verified structure can still drift behaviorally	IN-LIST
 VSE-7	docs/game/engine_internals.md	The projectile-pool HIT-CLASS map — a second type consumer, bounded at 64 (14z-82b)	IN-LIST
-VSE-8	docs/game/engine_internals.md	selection mechanism is now named	IN-LIST
+VSE-8	docs/game/engine_internals.md	The anim walker reads the sprite list from node+4 (measured 14z-70)	IN-LIST
 VSE-9	docs/game/atlas/character_tables.md	The full per-character table BANK — layout identical in all three sets	IN-LIST
 VSE-10	docs/game/atlas/id_space.md	The character-id space — is the variant half architectural or conventional?	IN-LIST
 VSE-11	docs/game/atlas/id_space.md	2. Code — how wide is the id where it is consumed?	IN-LIST
@@ -221,9 +221,9 @@ VSE-33	docs/game/atlas/sprite_lists.md	5. Multi-tile sprites	IN-LIST
 VSE-34	docs/game/gotchas.md	The per-char OBJ bank word is NOT a display-only attribute	IN-LIST
 VSE-35	docs/game/gotchas.md	SYSTEM-REFERENCED tiles too	IN-LIST
 VSE-36	docs/game/gotchas.md	and taps CAN legitimately disagree	IN-LIST
-VSE-37	docs/game/engine_internals.md	art" is RETRACTED — it was an index-join error and a phase offset	IN-LIST
+VSE-37	docs/game/engine_internals.md	Joining two legs' art by CONTENT (measured 14z-70e)	IN-LIST
 VSE-38	docs/game/engine_internals.md	(14z-70, maintainer-endorsed; use this FIRST)	IN-LIST
-VSE-39	docs/game/engine_internals.md	(history kept below)	IN-LIST
+VSE-39	docs/game/engine_internals.md	The beam / effect family — four members, three stacked causes (closed 14z-71)	IN-LIST
 VSE-40	docs/game/engine_internals.md	measured on Phobos' FINAL GUARDIAN; twins verified in both engines)	IN-LIST
 VSE-41	docs/game/engine_internals.md	machine that consumes it (14z-98, measured end to end on #103)	IN-LIST
 VSE-42	docs/game/engine_internals.md	measured on Phobos' FINAL GUARDIAN; twins verified in both engines)	IN-LIST
@@ -253,7 +253,7 @@ VSE-65	docs/game/engine_internals.md	The QSound Z80 driver: id table, songs, str
 VSE-66	docs/game/engine_internals.md	The Z80 command dispatch, the note-table array, the dead type-C song class and the alias bit (measur	IN-LIST
 VSE-67	docs/game/engine_internals.md	The shared sfx library uses IDENTICAL ids in both games (the id-space sweep, `docs/project/m5/keyons	IN-LIST
 VSE-68	docs/game/gotchas.md	input is not entering it (14z-69, cost this session twice)	IN-LIST
-VSE-69	docs/game/engine_internals.md	14z-69c: THE MECHANISM, traced end to end	IN-LIST
+VSE-69	docs/game/engine_internals.md	The two engines run DIFFERENT Dark Force systems (traced 14z-69c)	IN-LIST
 VSE-70	docs/game/engine_internals.md	THE DARK FORCE PALETTE-SEQUENCE BLOCKS — measured census (14z-79b)	IN-LIST
 VSE-71	docs/game/engine_internals.md	Shadow / reflection servants (14z-66; premise CORRECTED 14z-68f)	IN-LIST
 VSE-72	docs/game/engine_internals.md	THE LEAPING PURSUIT ATTACK (measured 14z-104, maintainer-confirmed mechanic)	IN-LIST
@@ -263,7 +263,7 @@ VSE-75	docs/game/engine_internals.md	The CPU AI action-script system (14z-111, m
 VSE-76	docs/game/gotchas.md	input is not entering it (14z-69, cost this session twice)	IN-LIST
 VSE-77	docs/game/gotchas.md	reproduced" (14z-68u)	IN-LIST
 VSE-78	docs/game/gotchas.md	A WATCHDOG REBOOT masquerades as a clean "nothing happened" (14z-65)	IN-LIST
-VSE-79	docs/game/engine_internals.md	never ported, drawn against vsav's unrelated art at the same indices	IN-LIST
+VSE-79	docs/game/engine_internals.md	Rig facts (measured 14z-70/70b)	IN-LIST
 VSE-80	docs/game/gotchas.md	portrait screen belongs to the 2P flow only (14z-99)	IN-LIST
 VSE-81	docs/game/engine_internals.md	THE LEAPING PURSUIT ATTACK (measured 14z-104, maintainer-confirmed mechanic)	IN-LIST
 VSE-82	docs/game/atlas/select_screen.md	THE RANDOM CELL `0x0B` — the cycling draw, decoded (14z-116)	IN-LIST
