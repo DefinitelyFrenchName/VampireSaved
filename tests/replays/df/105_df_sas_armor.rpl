@@ -1,0 +1,73 @@
+# 105_df_sas_armor.rpl — SASQUATCH'S DARK FORCE ARMOR (the +0x161 accumulator),
+# measured 14z-123 (tests/audit_df_accumulator.sh). Prologue = replay 97's;
+# the pair is chosen by POKES (P1 $FF8782 = 0x0A Sasquatch, P2 $FF8B82 = 0x03
+# Victor, both human; P1 $FF8509 = 3 stocks at f3100/3120 for the DF legs).
+#
+# P1 activates Dark Force with LP+LK at f3260 (the LP+LK / MP+MK activation
+# takes the ARMED sub-state; HP+HK takes the un-armed one — the audit's
+# second leg swaps this line to p1=36). P2 walks in and lands CROUCHING
+# normals only — a crouching button can never throw, and Victor's close
+# standing LP with L held is a throw (the 14z-123 first rig lost most of its
+# contacts to it). One button every 45 frames, L/M/H cycling.
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p2=R
+1160-1162 p2=R
+1300-1302 p1=1
+1360-1362 p2=1
+# activate Dark Force (stocks poked at f3100/3120)
+3260-3263 p1=14
+3300-3399 p2=L
+3400-3402 p2=D1
+3403-3444 p2=L
+3445-3447 p2=D2
+3448-3489 p2=L
+3490-3492 p2=D3
+3493-3534 p2=L
+3535-3537 p2=D1
+3538-3579 p2=L
+3580-3582 p2=D2
+3583-3624 p2=L
+3625-3627 p2=D3
+3628-3669 p2=L
+3670-3672 p2=D1
+3673-3714 p2=L
+3715-3717 p2=D2
+3718-3759 p2=L
+3760-3762 p2=D3
+3763-3804 p2=L
+3805-3807 p2=D1
+3808-3849 p2=L
+3850-3852 p2=D2
+3853-3894 p2=L
+3895-3897 p2=D3
+3898-3939 p2=L
+3940-3942 p2=D1
+3943-3984 p2=L
+3985-3987 p2=D2
+3988-4029 p2=L
+4030-4032 p2=D3
+4033-4074 p2=L
+4075-4077 p2=D1
+4078-4119 p2=L
+4120-4122 p2=D2
+4123-4164 p2=L
+4165-4167 p2=D3
+4168-4209 p2=L
+4210-4212 p2=D1
+4213-4254 p2=L
+4255-4257 p2=D2
+4258-4299 p2=L
+4300-4302 p2=D3
+4303-4344 p2=L
+4345-4347 p2=D1
+4348-4389 p2=L
+4390-4392 p2=D2
+4393-4434 p2=L
+4435-4437 p2=D3
+4438-4479 p2=L
+4480-4482 p2=D1
+4483-4524 p2=L
+4600 wait

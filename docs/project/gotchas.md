@@ -3248,3 +3248,28 @@ a build's property is not a property of the game; a "tile set" is a
 within-bank set until the bank word says otherwise; and a zsh `for x in
 $var` does not word-split — `${=var}` (memory `bash-tool-shell-is-zsh`;
 pass A ran ONE rig with a 26-name filename until it did).
+
+
+## A PER-ID POINTER TABLE'S HEAD ADDRESSES ARE NOT CODE-BLOCK BOUNDARIES — the routine between two heads belongs to whichever pointer REACHES it (paid: 14z-123)
+
+The DF accumulator's arming state was attributed to Aulbath because it
+sat between two consecutive heads of the per-character DF table `0xD9538`
+("the vs2 blocks sit in id order"). The table that actually dispatched it
+was the ADJACENT one, `dispatch_16` (`PRG:0x0BF31A`, the seq-0x16
+activation dispatch), whose row 0x0A — Sasquatch — pointed straight at
+it. Two sessions' docs carried "an Aulbath-victim mechanic" on that
+inference. Rule: attribute a routine by the pointer that reaches it (a
+breakpoint at its entry names the table row), never by where its address
+falls between other rows' targets — per-character code is not laid out
+one contiguous block per id.
+
+
+## VICTOR'S STANDING LP WITH TOWARD HELD IS A THROW — a "walk in and jab" victim rig loses its contacts to grabs (paid: 14z-123)
+
+A rig that walks the attacker in and presses LP to land a plain jab on a
+held opponent threw four of six contacts (Victor's toward+LP is his grab)
+and logged the grab's tick damage as "hits". Crouching normals never throw:
+a contact rig that must produce plain hits presses from crouch, or releases
+the direction before the button. Same family as [VSP-131] (a scripted input
+is not the move you named) — read the victim's state, not the script.
+

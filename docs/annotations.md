@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 2925 |
-| named by a document or manifest only | 2100 |
-| named by both a document/manifest and code | 557 |
-| named by CODE ONLY (the gap list below) | 268 |
-| carried by atlas | 439 |
-| carried by engine_internals | 603 |
-| carried by other docs | 941 |
+| distinct program-space addresses named | 2936 |
+| named by a document or manifest only | 2104 |
+| named by both a document/manifest and code | 562 |
+| named by CODE ONLY (the gap list below) | 270 |
+| carried by atlas | 445 |
+| carried by engine_internals | 610 |
+| carried by other docs | 944 |
 | carried by manifests | 1756 |
-| carried by code | 825 |
+| carried by code | 832 |
 
 ## Addresses
 
@@ -327,9 +327,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x016B3E` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x016B44` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x016B4A` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
-| `PRG:0x016B70` | docs/game/engine_internals.md — Hitboxes and attack records (phase 2 of the character-data map, 14z-120 (5), MEASURED) [vs2]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
-| `PRG:0x016B94` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2] |
-| `PRG:0x016B9C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
+| `PRG:0x016B70` | docs/game/engine_internals.md — Hitboxes and attack records (phase 2 of the character-data map, 14z-120 (5), MEASURED) [vs2]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); tests/audit_df_accumulator.sh |
 | `PRG:0x016BD6` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x016C64` | docs/game/engine_internals.md — Pool seeding and the '[[init_shim]]' (14z-65 — the watchdog class); build/manifest/donovan.toml — init_shim; build/manifest/donovan.toml — reaction_hook; build/manifest/huitzil.toml — init_shim; tests/test_shim_charid.sh |
 | `PRG:0x016CCE` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
@@ -433,6 +431,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01877C` | docs/game/engine_internals.md — The object-script state dispatcher at 'PRG:0x018508' (14z-109) |
 | `PRG:0x0187A6` | docs/platform/gotchas.md — PC-relative reads are DECRYPTED reads on CPS-2 (paid: 2026-07-25, ~45min) |
 | `PRG:0x0187BA` | docs/game/engine_internals.md — The SUB-STATE DISPATCHER FAMILY at 0x018460 (14z-79) |
+| `PRG:0x0187BC` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2]; tests/test_index_window_thunk.sh |
 | `PRG:0x01881A` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x01884E` | build/manifest/reconciliation.toml — map |
 | `PRG:0x0188BA` | build/manifest/reconciliation.toml — map |
@@ -632,7 +631,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x020CFE` | docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question) |
 | `PRG:0x020DF2` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x020E00` | docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116) |
-| `PRG:0x020E6A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
+| `PRG:0x020E6A` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x020F00` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated); docs/project/patch_notes.md — donovan-m2 stage 3 — anim + sprite sub-tables (2026-07-25, session 4); build/manifest/gfx_layout3.toml — donovan; tests/audit_region_movability.sh; tests/test_list_type_census.sh |
 | `PRG:0x020FA8` | docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port) [vs2]; docs/project/gotchas.md — (14z-68, refutes half of the 14z-67 entry theory) |
 | `PRG:0x020FD2` | docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port) [vs2]; docs/project/gotchas.md — (14z-68, refutes half of the 14z-67 entry theory) [vs2]; build/manifest/huitzil.toml — pcrel_escape_fix [vs2] |
@@ -660,11 +659,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x021DEA` | docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; build/manifest/donovan.toml — obj_hook; build/manifest/huitzil.toml — obj_hook; build/manifest/pyron.toml — obj_hook |
 | `PRG:0x021DEC` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
 | `PRG:0x022000` | docs/game/engine_internals.md — The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76); docs/project/patch_index.md — DEFERRED BY MAINTAINER DECISION (14z-76) — the win-quote bank relocation |
-| `PRG:0x022008` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2]; docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds) [vs2]; docs/project/gotchas.md — (14z-68, refutes half of the 14z-67 entry theory) [vs2]; docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/huitzil.toml — pcrel_escape_fix [vs2]; build/manifest/reconciliation_donovan.toml — map [vs2]; +2 more |
-| `PRG:0x02203A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2] |
-| `PRG:0x022078` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2] |
+| `PRG:0x022008` | docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds) [vs2]; docs/project/gotchas.md — (14z-68, refutes half of the 14z-67 entry theory) [vs2]; docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/huitzil.toml — pcrel_escape_fix [vs2]; build/manifest/reconciliation_donovan.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map [vs2]; +1 more |
 | `PRG:0x022174` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
-| `PRG:0x022282` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2] |
 | `PRG:0x02228E` | docs/game/atlas/ram.md — System / match globals; docs/project/doc_audit_14z118.md — 4. Log of the pass (one line per commit); tests/audit_tenant_timeout.sh |
 | `PRG:0x02237A` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; build/manifest/donovan.toml — ls_freeze_vs2_attacker [vs2] |
 | `PRG:0x022388` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/project/patch_notes.md — vs2-licensed class remaps; maintainer-ruled option (a)) [vs2] |
@@ -672,6 +668,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x022400` | docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); tools/build_donovan.sh |
 | `PRG:0x022406` | build/manifest/type_stamps.toml — compare |
 | `PRG:0x02245E` | build/manifest/pcrel_escapes.toml — hui52 |
+| `PRG:0x0224AA` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
+| `PRG:0x0224B4` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x022500` | docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds); docs/project/gotchas.md — (14z-68, refutes half of the 14z-67 entry theory); build/manifest/huitzil.toml — pcrel_escape_fix |
 | `PRG:0x02255E` | build/manifest/type_stamps.toml — compare |
 | `PRG:0x022576` | build/manifest/pcrel_escapes.toml — hui52 |
@@ -744,11 +742,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02320A` | build/manifest/pcrel_escapes.toml — hui52 |
 | `PRG:0x023244` | docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/reconciliation_donovan.toml — map; build/manifest/reconciliation_huitzil.toml — map; build/manifest/reconciliation_pyron.toml — map |
 | `PRG:0x023258` | build/manifest/bank_map.toml — tail_data_ptr |
+| `PRG:0x02325E` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2] |
 | `PRG:0x02328E` | build/manifest/pcrel_escapes.toml — hui52 |
 | `PRG:0x0232E6` | build/manifest/pcrel_escapes.toml — hui52 |
 | `PRG:0x023500` | docs/project/gotchas.md — (14z-68, refutes half of the 14z-67 entry theory); docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/huitzil.toml — pcrel_escape_fix; build/manifest/reconciliation_donovan.toml — map; build/manifest/reconciliation_huitzil.toml — map; build/manifest/reconciliation_pyron.toml — map |
+| `PRG:0x023532` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x02356E` | build/manifest/pcrel_escapes.toml — hui52 |
+| `PRG:0x023570` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x023624` | build/manifest/pcrel_escapes.toml — hui52 |
+| `PRG:0x02377A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x02380C` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — select_companion_resolve_s2 |
 | `PRG:0x02380E` | build/manifest/pcrel_escapes.toml — hui52 |
 | `PRG:0x02384E` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); HANDOFF.md — Build registry; docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-110b — the 0x51 -> 0x44 state remap: byte detail; docs/project/patch_notes.md — vs2-licensed class remaps; maintainer-ruled option (a)); build/manifest/donovan.toml — ls_freeze_vs2_attacker; +1 more |
@@ -780,7 +782,6 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x025F9A` | docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/reconciliation_donovan.toml — (top); build/manifest/reconciliation_donovan.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map [vs2]; build/manifest/reconciliation_pyron.toml — map [vs2] |
 | `PRG:0x026058` | docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/reconciliation.toml — map; build/manifest/reconciliation_donovan.toml — map; build/manifest/reconciliation_huitzil.toml — map; build/manifest/reconciliation_pyron.toml — map |
 | `PRG:0x026142` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2]; docs/project/patch_notes.md — 14z-65 (4) — Huitzil stage 4 BUILDS; the R1 frontier enumerated (2026-08-07); docs/project/patch_notes.md — donovan-m2 stage 4 — IN PROGRESS (2026-07-25, session 4); build/manifest/reconciliation.toml — map [vs2]; tools/build_donovan.sh |
-| `PRG:0x026166` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2] |
 | `PRG:0x02619E` | docs/game/engine_internals.md — 14z-69c: THE MECHANISM, traced end to end |
 | `PRG:0x0261A6` | docs/game/engine_internals.md — enters Dark Force, the symptom reproduces and is measured [vs2] |
 | `PRG:0x0261C2` | docs/game/engine_internals.md — enters Dark Force, the symptom reproduces and is measured [vs2] |
@@ -1272,6 +1273,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x03D9A8` | docs/project/tables/qs_voice_map.md — qs_voice_map — the M5 voice-block id map (14z-86) |
 | `PRG:0x03D9E7` | docs/project/tables/qs_voice_map.md — qs_voice_map — the M5 voice-block id map (14z-86) |
 | `PRG:0x03DA26` | docs/project/tables/qs_voice_map.md — qs_voice_map — the M5 voice-block id map (14z-86) |
+| `PRG:0x03DA60` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x03DA65` | docs/project/tables/qs_voice_map.md — qs_voice_map — the M5 voice-block id map (14z-86) |
 | `PRG:0x03DAA4` | docs/project/tables/qs_voice_map.md — qs_voice_map — the M5 voice-block id map (14z-86) |
 | `PRG:0x03DAE3` | docs/project/tables/qs_voice_map.md — qs_voice_map — the M5 voice-block id map (14z-86) |
@@ -1298,7 +1300,6 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x03E3C0` | docs/project/tables/qs_voice_map.md — The kernel voice pairs (14z-96, GitHub #101 — '[[song]]' rows, not batch); build/manifest/qs_songs.toml — hui_kernel_v3 |
 | `PRG:0x03E400` | docs/project/tables/qs_voice_map.md — The kernel voice pairs (14z-96, GitHub #101 — '[[song]]' rows, not batch); build/manifest/qs_songs.toml — hui_kernel_v3_alt |
 | `PRG:0x03E440` | docs/project/patch_notes.md — option (a): native-exact, incl. two new authored Phobos songs); build/manifest/qs_songs.toml — hui_trap_eject_alt |
-| `PRG:0x03E928` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2] |
 | `PRG:0x03ED4C` | docs/game/engine_internals.md — Select-screen (portrait/name) pipeline — mapped (session 14c) [vs2] |
 | `PRG:0x03FFFF` | docs/game/engine_internals.md — GFX ROM (sprite/tile) subsystem; tests/lua/scroll3_watch.lua; tools/gfx_tiles.py |
 | `PRG:0x040000` | docs/game/atlas/ram.md — System / match globals; docs/game/engine_internals.md — GFX ROM (sprite/tile) subsystem; docs/game/engine_internals.md — confirmed static; RETRACTS most of the 14z-85d filed detail); docs/game/gotchas.md — The attract INTRO CUTSCENE is Jedah — per-char display sites are legacy surface; docs/project/gotchas.md — "Run once at match start" is a TIMING TRAP — use a match-active countdown; docs/project/mister_map.md — As mapped (the proposal); +22 more |
@@ -1341,20 +1342,28 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0448D4` | docs/project/hardening_register.md — 2. The 13 plausible reconciliation rows (triaged 14z-100, H3.2); docs/project/patch_notes.md — 14z-65 (4) — Huitzil stage 4 BUILDS; the R1 frontier enumerated (2026-08-07); build/manifest/reconciliation.toml — map [vs2]; tools/build_donovan.sh |
 | `PRG:0x045000` | HANDOFF.md — Individual gates; tests/test_merged_render_content.sh |
 | `PRG:0x045CCC` | build/manifest/reconciliation.toml — map |
+| `PRG:0x045FA4` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
+| `PRG:0x045FAA` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x045FCC` | docs/project/hardening_register.md — 2. The 13 plausible reconciliation rows (triaged 14z-100, H3.2); docs/project/patch_notes.md — 14z-102 — the #107 row flip — FROZEN in donovan-m10 + every tenant + stock (the shared map), #107 CLOSED |
 | `PRG:0x046EE8` | build/manifest/reconciliation.toml — map [vs2] |
-| `PRG:0x0471E8` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2]; docs/project/hardening_register.md — 2. The 13 plausible reconciliation rows (triaged 14z-100, H3.2) [vs2] |
+| `PRG:0x0471E8` | docs/project/hardening_register.md — 2. The 13 plausible reconciliation rows (triaged 14z-100, H3.2) [vs2] |
+| `PRG:0x047E60` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); HANDOFF.md — Individual gates; docs/project/inferred_claims.md — G1 (9) — the atlas commits; tests/audit_df_accumulator.sh |
+| `PRG:0x047EDA` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2] |
 | `PRG:0x047FB6` | HANDOFF.md — Build registry; HANDOFF.md — Individual gates; docs/project/tables/reconciliation.md — Twin-choice case law; build/manifest/reconciliation.toml — map; tests/audit_tripwire_reach.sh; tests/test_tenant_loop.sh |
 | `PRG:0x0486A0` | HANDOFF.md — Individual gates; tests/test_merged_render_content.sh |
 | `PRG:0x0486D0` | docs/project/patch_notes.md — 14z-102 — #109 THE CLONE-BEAM FIX (row 31) — FROZEN as huitzil-m19/merged-m5 (bit-for-bit the probes), field-confirmed, #109 CLOSED |
 | `PRG:0x048790` | docs/project/patch_notes.md — 14z-102 — #109 THE CLONE-BEAM FIX (row 31) — FROZEN as huitzil-m19/merged-m5 (bit-for-bit the probes), field-confirmed, #109 CLOSED |
 | `PRG:0x0489DE` | docs/game/engine_internals.md — Shadow / reflection servants (14z-66; premise CORRECTED 14z-68f); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/project/patch_notes.md — (round-2 report; the capture-anim shadow over-index); build/manifest/huitzil.toml — obj_hook |
-| `PRG:0x04900A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2] |
-| `PRG:0x049486` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2] |
+| `PRG:0x048F9C` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2]; tests/audit_df_accumulator.sh |
+| `PRG:0x04900A` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2] |
 | `PRG:0x0494DE` | HANDOFF.md — Build registry [vs2]; HANDOFF.md — Individual gates; HANDOFF.md — Running a CPS-2 WIDE build (playtest); HANDOFF.md — Running a CPS-2 WIDE build (playtest) [vs2]; docs/project/hardening_register.md — 5. Known-uncovered DYNAMIC surfaces (H4); docs/project/tables/reconciliation.md — Twin-choice case law [vs2]; +5 more |
 | `PRG:0x04A9C2` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] [vs2] |
 | `PRG:0x04AD8F` | HANDOFF.md — Individual gates; docs/project/gotchas.md — sweep gates when a design changes (14z-67, paid twice in one day); tests/test_merged_render_content.sh; tests/test_wide_render_content.sh |
 | `PRG:0x04B0C4` | HANDOFF.md — MiSTer (14z-106/107) — the jtcps2w core + the simulation oracle; docs/platform/mister.md — THE 14z-108/109 MEASUREMENTS, RECORDED IN THE LOG (entered 14z-114); docs/project/mister_core.md — 12. The holes — what has never been tried; tests/test_mister_obj_oracle.sh |
+| `PRG:0x04C78E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
+| `PRG:0x04C7A0` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
+| `PRG:0x04D020` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
+| `PRG:0x04D040` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x04D0C0` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] [vs2]; tools/charmap_gen.py |
 | `PRG:0x04E650` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] [vs2] |
 | `PRG:0x04ECDA` | HANDOFF.md — MiSTer (14z-106/107) — the jtcps2w core + the simulation oracle; docs/platform/mister.md — THE 14z-108/109 MEASUREMENTS, RECORDED IN THE LOG (entered 14z-114); docs/project/mister_core.md — 12. The holes — what has never been tried; tests/test_mister_obj_oracle.sh |
@@ -2040,7 +2049,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0BF1E6` | docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail |
 | `PRG:0x0BF21A` | build/manifest/bank_map.toml — dispatch_15 |
 | `PRG:0x0BF29A` | docs/project/patch_notes.md — donovan-m2 stage 4 — IN PROGRESS (2026-07-25, session 4); build/manifest/bank_map.toml — tail_code_ptr |
-| `PRG:0x0BF31A` | docs/game/engine_internals.md — 14z-69c: THE MECHANISM, traced end to end; build/manifest/bank_map.toml — dispatch_16 |
+| `PRG:0x0BF31A` | docs/game/engine_internals.md — 14z-69c: THE MECHANISM, traced end to end; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2]; docs/project/gotchas.md — A PER-ID POINTER TABLE'S HEAD ADDRESSES ARE NOT CODE-BLOCK BOUNDARIES — the routine between two heads belongs to whichever pointer REACHES it (paid: 14z-123); build/manifest/bank_map.toml — dispatch_16; tests/audit_df_accumulator.sh |
 | `PRG:0x0BF330` | docs/project/hardening_register.md — 2. The 13 plausible reconciliation rows (triaged 14z-100, H3.2) |
 | `PRG:0x0BF39A` | build/manifest/bank_map.toml — dispatch_17 |
 | `PRG:0x0BF41A` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — BORROW: (0x382,A6) is the fighter's voice-FLAVOR class; docs/game/engine_internals.md — The per-node sfx dispatcher and per-char record arrays (14z-52); docs/game/engine_internals.md — in the sound kernel itself, NOT the 0x0BF41A record path; docs/project/cps2_wide.md — B4 prg: PASSED, with the control that made it meaningful; docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; +10 more |
@@ -2152,7 +2161,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0D92B8` | docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99) |
 | `PRG:0x0D9338` | docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99) |
 | `PRG:0x0D94D0` | docs/project/hardening_register.md — 2. The 13 plausible reconciliation rows (triaged 14z-100, H3.2) [vs2] |
-| `PRG:0x0D9538` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2]; docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds) |
+| `PRG:0x0D9538` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2]; docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds); docs/project/gotchas.md — A PER-ID POINTER TABLE'S HEAD ADDRESSES ARE NOT CODE-BLOCK BOUNDARIES — the routine between two heads belongs to whichever pointer REACHES it (paid: 14z-123) |
 | `PRG:0x0D95B8` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured); docs/game/engine_internals.md — The per-node sfx dispatcher and per-char record arrays (14z-52) [vs2] |
 | `PRG:0x0D96B8` | docs/project/gotchas.md — three traps from the #105 fix arc (paid: 14z-99 (2)); docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); build/manifest/reconciliation_huitzil.toml — map [vs2]; tools/gen_donovan_patch.py |
 | `PRG:0x0D97B8` | docs/game/engine_internals.md — 14z-69c: THE MECHANISM, traced end to end [vs2] |
@@ -2721,13 +2730,13 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x016EAE` | tools/audit_fsm_census.py |
 | `PRG:0x017452` | tests/test_hitbox_encoding.sh |
 | `PRG:0x017456` | tests/test_hitbox_encoding.sh |
+| `PRG:0x0182B4` | tests/audit_df_accumulator.sh |
 | `PRG:0x01845A` | tests/test_reaction_hook_d2.sh |
 | `PRG:0x01845E` | tests/test_reaction_hook_d2.sh |
 | `PRG:0x018464` | tests/lua/index_watch.lua; tools/audit_index_users.py; tools/gen_index_window_thunk.py |
 | `PRG:0x0184A8` | tests/test_index_space.sh |
 | `PRG:0x01850C` | tests/test_index_window_thunk.sh |
 | `PRG:0x0185D6` | tests/lua/index_watch.lua |
-| `PRG:0x0187BC` | tests/test_index_window_thunk.sh |
 | `PRG:0x0191AA` | tools/gen_hitclass_map_thunk.py |
 | `PRG:0x01A7A0` | tools/gen_hitclass_map_thunk.py |
 | `PRG:0x01AC44` | tests/audit_mask_window_ff42a2.sh |
@@ -2766,6 +2775,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x03975A` | tests/lua/index_watch.lua |
 | `PRG:0x03CB00` | tests/test_qs_songs.sh |
 | `PRG:0x03D97A` | tests/audit_continue_switch.sh; tests/audit_don_vs_cpu.sh; tests/test_ladder_tenant_vs_palette.sh; tests/test_random_select_tenants.sh |
+| `PRG:0x045D8A` | tests/audit_df_accumulator.sh |
 | `PRG:0x05316C` | tests/test_capture_pose_sources.sh |
 | `PRG:0x05442E` | tools/audit_walker_callers.py |
 | `PRG:0x054457` | tools/audit_walker_callers.py |
@@ -2886,6 +2896,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x0D8340` | tests/test_don_reactions.sh |
 | `PRG:0x0D89B0` | tests/test_beam_anim_walk.sh |
 | `PRG:0x0D8CC0` | tests/test_beam_anim_walk.sh |
+| `PRG:0x0D94B8` | tests/audit_df_accumulator.sh |
 | `PRG:0x0DB6D0` | tests/audit_don_lilith_ko.sh |
 | `PRG:0x0DF000` | tests/test_don_reactions.sh |
 | `PRG:0x0E2830` | tests/lua/replay_guard.lua |

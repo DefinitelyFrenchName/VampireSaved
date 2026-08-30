@@ -1,0 +1,9 @@
+armor df_on 3288 armed 3297 15e=0x1ff 18f=0
+armor contact 3403 hp-5 acc=20 decay=240 cls=0 react=no armored +20
+armor contact 3452 hp-12 acc=50 decay=240 cls=0 react=no armored +30
+armor contact 3498 hp-13 acc=0 decay=0 cls=4 react=yes BREAK
+armor contact 3538 hp-5 acc=20 decay=240 cls=0 react=no armored +20
+armor contact 3587 hp-12 acc=50 decay=239 cls=0 react=no armored +30
+armor df_off 3622 15e=0 acc=0 decay=0
+hphk df=yes 15e_max=0 acc_max=0 contacts=5 reacted=5
+nodf df=no 15e_max=0 acc_max=0 contacts=6 reacted=6

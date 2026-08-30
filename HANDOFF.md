@@ -1652,6 +1652,19 @@ tests/audit_don_vs_cpu.sh            # 14z-110 (#111): deterministic
                                       # Emulator, ~18 min/leg. NOTE #99 does not
                                       # reproduce here on MAME (P1-mash) — the
                                       # gate is COVERAGE, not a crash lock.
+tests/audit_df_accumulator.sh          # 14z-123 (inferred_claims row 1): the
+                                      # +0x161 accumulator is SASQUATCH'S DARK
+                                      # FORCE ARMOR (dispatch_16 row 0x0A,
+                                      # PRG:0x047E60 — NOT Aulbath's; the 14z-121
+                                      # block attribution read the next table's
+                                      # heads as boundaries). Four legs on
+                                      # pristine vsavj + the merged build: armor
+                                      # (LP+LK: +0x15E=0x200, cr.LP/MP/HP add
+                                      # 20/30/40, no reaction, break past 60,
+                                      # decay 240), hphk (never arms), nodf (the
+                                      # must-fire negative), merged (field trace
+                                      # byte-identical = superset). 9 frozen
+                                      # lines; FREEZE=1; replay df/105. ~3 min.
 tests/test_ladder_tenant_vs_palette.sh # 14z-123 (inferred_claims row 7):
                                       # the 0x3A3CA0 pool MEASURED ON SCREEN
                                       # for a tenant CPU opponent — it is the
