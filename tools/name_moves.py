@@ -60,6 +60,10 @@ FIRST_EVENT = 2600
 # 1400-1500 only, the idiom of audit_clone_beam_lines.sh). The chains are
 # decoded from each tenant's vs2 extract (the solo build dir).
 TENANTS = {"donovan": {"id": None, "build": "build/don_m18"},
+           # PHASE 3 (reactions): the tenant on the VICTIM side (P2) — P1 is Victor (0x03), both by the early-window pokes
+           "donovan_victim": {"id": "03", "id_p2": "13", "build": "build/don_m18"},
+           "huitzil_victim": {"id": "03", "id_p2": "10", "build": "build/hui52"},
+           "pyron_victim":   {"id": "03", "id_p2": "11", "build": "build/pyron36"},
            "huitzil": {"id": "10", "build": "build/hui52"},
            "pyron":   {"id": "11", "build": "build/pyron36"}}
 # P2 HP re-pin (both words, [VSP-125]) so a projectile-fed Victor never dies.
@@ -507,11 +511,41 @@ HUITZIL = {
         ("Reflect Wall [gc HP] (meter)", gc_v("HP", 11, 12), 240, "near"),
     ],
 }
-SCHEDULES = {"donovan": DONOVAN, "pyron": PYRON, "huitzil": HUITZIL}
+DONOVAN_VICTIM = {   # P1 = Victor attacks P2 = Donovan; every contact class the naming rigs reached, plus the knockdowns
+    "1": [  # HITS (P2 idle)
+        ("walk-in", walk_in(70), 90),
+        ("V 5LP", stand("LP"), 160), ("V 5MP", stand("MP"), 160), ("V 5HP", stand("HP"), 220),
+        ("V 2LK", crouch("LK"), 160), ("V 2MK", crouch("MK"), 160), ("V 2HK sweep", crouch("HK"), 320),
+        ("walk-in", walk_in(60), 80),
+        ("V j.HP", jump("HP"), 220),
+        ("walk-in", walk_in(40), 60),
+        ("V 6MP throw", throw_fwd("MP"), 320),
+        ("walk-in", walk_in(80), 100),
+        ("V 623LP (DP)", dp("LP"), 260),
+        ("walk-in", walk_in(60), 80),
+        ("V 236LP", qcf("LP"), 260),
+    ],
+    "2": [  # BLOCKED (P2 holds away = R, since P2 faces left) — the walk-ins are longer because P2 retreats
+        ("P2 blocks", [(0, 3200, "R", "p2")], 0),
+        ("walk-in", walk_in(90), 100),
+        ("V 5LP", stand("LP"), 150), ("walk-in", walk_in(30), 40), ("V 5MP", stand("MP"), 150), ("walk-in", walk_in(30), 40), ("V 5HP", stand("HP"), 200),
+        ("walk-in", walk_in(30), 40), ("V 2MK", crouch("MK"), 150), ("walk-in", walk_in(30), 40), ("V 2HK", crouch("HK"), 250),
+        ("walk-in", walk_in(40), 50), ("V 623LP (DP)", dp("LP"), 260),
+        ("walk-in", walk_in(40), 50), ("V j.HP", jump("HP"), 220),
+    ],
+    "3": [  # AIR HITS: P2 scripted to jump, P1 anti-airs
+        ("walk-in", walk_in(60), 80),
+        ("V 5HP vs jumping P2", [(0, 2, "U", "p2"), (12, 14, "3")], 260),
+        ("V 623LP vs jumping P2", [(0, 2, "U", "p2")] + [(a + 6, b + 6, t) for a, b, t in dp("LP")], 300),
+        ("V 2HK vs landing P2", [(0, 2, "U", "p2"), (30, 33, "D6")], 300),
+    ],
+}
+SCHEDULES = {"donovan": DONOVAN, "pyron": PYRON, "huitzil": HUITZIL,
+             "donovan_victim": DONOVAN_VICTIM, "huitzil_victim": DONOVAN_VICTIM, "pyron_victim": DONOVAN_VICTIM}
 NO_POKE_PARTS = {("donovan", "9"), ("donovan", "10"), ("donovan", "11")}   # parts the -debug write tap must be able to replay: no HP pin, no stock poke
 PHASE2_PARTS = NO_POKE_PARTS   # the hitbox rigs (tests/test_hitbox_encoding.sh) — NOT naming parts: test_move_naming.sh skips them
 # stock pokes for the meter parts: frame -> 9 stocks (each ES/EX/DF spends 1)
-METER_PARTS = {"donovan": {"3", "4", "5", "6", "7", "8"}, "pyron": {"4", "5"}, "huitzil": {"4", "5", "6", "7", "8"}}
+METER_PARTS = {"donovan": {"3", "4", "5", "6", "7", "8"}, "pyron": {"4", "5"}, "huitzil": {"4", "5", "6", "7", "8"}, "donovan_victim": set(), "huitzil_victim": set(), "pyron_victim": set()}
 
 
 # Per-event POSITION PINS (the 14z-120 fix for the Pyron/Huitzil first pass):
@@ -567,6 +601,8 @@ def gen(tenant, part, out_rpl, out_sched):
     pokes = [] if (tenant, part) in NO_POKE_PARTS else [f"{f}:ff8850:01200120" for f in range(FIRST_EVENT - 50, end, HP_PIN_EVERY)]
     if tid:
         pokes = [f"{f}:ff8782:{tid}" for f in (1400, 1450, 1500)] + pokes
+    if TENANTS[tenant].get("id_p2"):
+        pokes = [f"{f}:ff8b82:{TENANTS[tenant]['id_p2']}" for f in (1400, 1450, 1500)] + pokes
     pokes += pin_pokes
     # NO timer poke: $FF8109 is BINARY (99, one tick per ~82 frames = ~8,100
     # frames per round); a 0x99 poke read as 153 ENDED the round (measured

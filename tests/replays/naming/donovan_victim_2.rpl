@@ -1,0 +1,32 @@
+# naming rig — donovan_victim part 2 (tools/name_moves.py gen; DO NOT hand-edit,
+# regenerate). Native-game select prologue from replay 17; events from the
+# schedule in the tool. Analyse with: name_moves.py analyse <schedule.json>.
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p1=R
+1160-1162 p1=R
+1104-1106 p2=R
+1164-1166 p2=R
+1300-1302 p1=1
+1360-1362 p2=1
+2600-5800 p2=R
+2600-2690 p1=R
+2700-2702 p1=1
+2850-2880 p1=R
+2890-2892 p1=2
+3040-3070 p1=R
+3080-3082 p1=3
+3280-3310 p1=R
+3320-3323 p1=D5
+3470-3500 p1=R
+3510-3513 p1=D6
+3760-3800 p1=R
+3810-3812 p1=R
+3814-3816 p1=D
+3818-3821 p1=DR1
+4070-4110 p1=R
+4120-4122 p1=U
+4134-4137 p1=3
+4540 wait

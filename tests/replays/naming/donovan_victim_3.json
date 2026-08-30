@@ -1,0 +1,42 @@
+{
+ "tenant": "donovan_victim",
+ "part": "3",
+ "events": [
+  {
+   "name": "walk-in",
+   "frame": 2600,
+   "gap": 80,
+   "movement": true
+  },
+  {
+   "name": "V 5HP vs jumping P2",
+   "frame": 2680,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "V 623LP vs jumping P2",
+   "frame": 2940,
+   "gap": 300,
+   "movement": false
+  },
+  {
+   "name": "V 2HK vs landing P2",
+   "frame": 3240,
+   "gap": 300,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "1400:ff8b82:13",
+  "1450:ff8b82:13",
+  "1500:ff8b82:13",
+  "1400:ff8782:03",
+  "1450:ff8782:03",
+  "1500:ff8782:03",
+  "2550:ff8850:01200120",
+  "2950:ff8850:01200120",
+  "3350:ff8850:01200120"
+ ],
+ "frames": 3790
+}

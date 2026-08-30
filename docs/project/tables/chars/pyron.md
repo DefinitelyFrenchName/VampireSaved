@@ -514,6 +514,32 @@ Projectile records (`hitbox_proj`):
 | 0x15 | `0xd0c68` | (1, 1, 20, 13) | 10 | 7 | 1 | 3 | 0 | 1 | 0x51 | 0x00 | +0x17:0x51->0x4f | port_patch:Cosmo Disruption sub-state 81 -> 79: vsavj's dispatch table  |
 | 0x16 | `0xd0c88` | (1, 1, 20, 13) | 4 | 4 | 1 | 3 | 0 | 1 | 0x0a | 0x00 |  |  |
 
+## Reactions as the victim (phase 3)
+
+MEASURED on native vs2 (`tests/test_reactions.sh`, frozen `tests/expected/reactions_pyron.txt`): Victor attacks the tenant; per contact the victim's class byte `+0x54`, the hit-freeze `+0x5C`, the chain PATH the tenant runs (table:seq@entry-node; `OFF:` = a node the index tables do not reach) and the frames until it is back on a table-`a` stand chain. The reaction chains are HOLD chains ended by an engine counter, so `len` is the stun as the engine ran it, not the chains' data frames.
+
+| part | contact | class | freeze | chain path | frames |
+|---|---|---|---|---|---|
+| 1 | V 5LP | `0x01` | 11 | `b:0x04@0 a:0x05@0` | 19 |
+| 1 | V 5MP | `0x01` | 11 | `a:0x05@0 b:0x04@0 a:0x05@0` | 23 |
+| 1 | V 5HP | `0x04` | 11 | `a:0x05@14 b:0x78@0 b:0x23@0 a:0x05@0` | 35 |
+| 1 | V j.HP | `0x37` | 11 | `a:0x05@8 b:0x78@0 b:0x41@0 b:0x42@0 b:0x56@0 b:0x48@0 a:0x05@0` | 66 |
+| 1 | V 6MP throw | `0x00` | 0 | `c:0x02@0 c:0x00@0 c:0x01@0 c:0x02@0 c:0x00@0 c:0x01@0 c:0x02@0 c:0x00@0` | 173 |
+| 1 | V 6MP throw | `0x00` | 0 | `c:0x02@0 c:0x00@0 c:0x01@0 c:0x02@0 c:0x00@0 c:0x01@0 c:0x02@0 c:0x00@0` | 147 |
+| 1 | V 6MP throw | `0x00` | 0 | `c:0x02@0 c:0x00@0 c:0x01@0 c:0x02@0 c:0x00@0 c:0x01@0 c:0x02@0 c:0x00@0` | 121 |
+| 1 | V 6MP throw | `0x00` | 0 | `c:0x02@0 c:0x00@0 c:0x01@0 c:0x02@0 c:0x00@0 c:0x01@0 c:0x02@0 b:0x78@0` | 94 |
+| 1 | V 6MP throw | `0x00` | 0 | `c:0x02@0 c:0x00@0 c:0x01@0 c:0x02@0 b:0x78@0 b:0x23@0 a:0x05@0` | 68 |
+| 1 | V 6MP throw | `0x00` | 0 | `c:0x02@0 b:0x78@0 b:0x23@0 a:0x05@0` | 42 |
+| 1 | V 6MP throw | `0x04` | 10 | `b:0x78@0 b:0x23@0 a:0x05@0` | 37 |
+| 1 | V 623LP (DP) | `0x01` | 11 | `b:0x04@0 a:0x05@0` | 19 |
+| 1 | V 236LP | `0x01` | 11 | `a:0x05@13 b:0x04@0 a:0x05@0` | 20 |
+| 2 | V 5MP | `0xff` | 11 | `OFF:0x264cc0 b:0x0c@1 a:0x05@0` | 22 |
+| 2 | V 5HP | `0xff` | 11 | `OFF:0x264cf0 b:0x0c@0 a:0x04@0` | 26 |
+| 2 | V 2MK | `0x02` | 11 | `OFF:0x264cf0 b:0x04@0 a:0x04@0` | 24 |
+| 2 | V 2HK | `0x03` | 11 | `OFF:0x264d50 b:0x40@0 b:0x1a@0 b:0x56@1 b:0x48@0 a:0x05@0` | 70 |
+| 2 | V 623LP (DP) | `0xff` | 11 | `b:0x0c@0 a:0x05@0` | 18 |
+| 2 | V j.HP | `0xff` | 11 | `OFF:0x264d20 b:0x0c@0 a:0x05@0` | 19 |
+
 ## Animation node chains (phase 1) — summary
 
 2140 nodes across the five index tables; 0 nodes differ from vs2 in a decoded field (0 attributed). Verified by `tests/test_anim_node_walk.sh (Donovan, native vs2: 3638/3638 node pointers on the graph, 14z-118)`. Per-chain detail: the appendix page `pyron_anim.md`.
@@ -539,7 +565,7 @@ Projectile records (`hitbox_proj`):
 | anim | DONE 14z-120 (5): hbA != 0 marks an ATTACK node (hbA>>8 = the attack record); startup / active / recovery per chain are derived in <tenant>_anim.md | tests/test_hitbox_encoding.sh |
 | anim | table a2's entry rule: its chains are entered MID-CHAIN by node index (measured: 5 jumps onto a2 nodes 3/5/7/13) | test_anim_node_walk observation; the selecting code is unread |
 | anim | the 6-byte script-op area at +0x10..+0x15 of every node | kept as hex; engine_internals 'the [cf14]..[0b] script-op area' |
-| reaction | hitstun / blockstun lengths per reaction class | only the dispatch (0x2385C) and property bytes (0x28D00) are located |
+| reaction | DONE 14z-120 (7): the tenant's reaction SET (which table:seq each class enters, the block chain b:0x0c, the measured stun lengths) — see 'Reactions as the victim'; still open: the engine counter that ends a hold reaction, and the unindexed lying/wake nodes (OFF) | tests/test_reactions.sh, tests/expected/reactions_<tenant>.txt |
 | projectile | projectile parameter records (speed, lifetime, hit class) | pool hit-class map bounded at 64; records undecoded |
 | bank | the 17 `gap_*` auto tables' semantics | oracle-classified values/pointers only |
 | sfx | sfx record field +6 (d3.w, 'level-ish') | engine_internals 960 |

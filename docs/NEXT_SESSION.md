@@ -37,11 +37,19 @@
 > ## `tests/test_hitbox_encoding.sh`, the maps' "Hitboxes and attack
 > ## records" section and per-chain startup/active/recovery.
 > ##
-> ## **NEXT, the maintainer's pick:** (A) the board verdict on M12; (B) phase
-> ## 3 of the map (stun / projectile parameter / auto tables; record
-> ## `+0x1C` and `+0x11..+0x16` are the open fields); (C) the small opens:
-> ## Donovan's `0x3d` / Killshread Summon (ES); Plasma Trap's HK chain. Load
-> ## `vampire-saved-port` first.
+> ## **PHASE 3 (reactions) DONE (STATE 14z-120 (7)):** each tenant's reaction
+> ## SET measured as the victim (`tests/test_reactions.sh`, the maps'
+> ## "Reactions as the victim"): the classes enter the character's own
+> ## table (`c` Donovan/Huitzil, `b` Pyron), a block is class `0xFF` on the
+> ## shared `b:0x0c`, the stun lengths are an engine counter (light 19 /
+> ## medium 23 / heavy 35 / blocked 22-26 / sweep ~70 on all three).
+> ## Record fields `+0x14` (attacker meter) and `+0x1C` (pushback) measured.
+> ##
+> ## **NEXT, the maintainer's pick:** (A) the board verdict on M12; (B) the
+> ## phase-3 remainder: the stun counter's source, the unindexed lying/wake
+> ## nodes (decode by LINK), projectile parameter records, the `gap_*`
+> ## tables; (C) the small opens: Donovan's `0x3d` / Killshread Summon
+> ## (ES); Plasma Trap's HK chain. Load `vampire-saved-port` first.
 > ##
 > ## **OPEN, unchanged:** the 1:1 wheel mockup; #112/#113 parked; the FBNeo
 > ## two-run-family question; the tenant CPU AI "lackluster" note; win

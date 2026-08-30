@@ -1,0 +1,110 @@
+{
+ "tenant": "pyron_victim",
+ "part": "2",
+ "events": [
+  {
+   "name": "P2 blocks",
+   "frame": 2600,
+   "gap": 0,
+   "movement": true
+  },
+  {
+   "name": "walk-in",
+   "frame": 2600,
+   "gap": 100,
+   "movement": true
+  },
+  {
+   "name": "V 5LP",
+   "frame": 2700,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 2850,
+   "gap": 40,
+   "movement": true
+  },
+  {
+   "name": "V 5MP",
+   "frame": 2890,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 3040,
+   "gap": 40,
+   "movement": true
+  },
+  {
+   "name": "V 5HP",
+   "frame": 3080,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 3280,
+   "gap": 40,
+   "movement": true
+  },
+  {
+   "name": "V 2MK",
+   "frame": 3320,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 3470,
+   "gap": 40,
+   "movement": true
+  },
+  {
+   "name": "V 2HK",
+   "frame": 3510,
+   "gap": 250,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 3760,
+   "gap": 50,
+   "movement": true
+  },
+  {
+   "name": "V 623LP (DP)",
+   "frame": 3810,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 4070,
+   "gap": 50,
+   "movement": true
+  },
+  {
+   "name": "V j.HP",
+   "frame": 4120,
+   "gap": 220,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "1400:ff8b82:11",
+  "1450:ff8b82:11",
+  "1500:ff8b82:11",
+  "1400:ff8782:03",
+  "1450:ff8782:03",
+  "1500:ff8782:03",
+  "2550:ff8850:01200120",
+  "2950:ff8850:01200120",
+  "3350:ff8850:01200120",
+  "3750:ff8850:01200120",
+  "4150:ff8850:01200120"
+ ],
+ "frames": 4590
+}

@@ -1,5 +1,18 @@
 # STATE — living progress log
 
+## Session 14z-120 (7) — **PHASE 3 (reactions) — the tenants' REACTION SETS measured as the VICTIM: which
+## of their own chains each class enters, the shared blockstun chain, the stun lengths as the engine ran
+## them. `tools/reaction_map.py`, `tests/test_reactions.sh`, the maps' "Reactions as the victim". Not pushed.**
+
+| | |
+|---|---|
+| the rig | `name_moves.py` tenants `<tenant>_victim`: P1 = Victor (forced 0x03), P2 = the tenant (the P2 early-window poke `ff8b82`); part 1 hits (5LP/5MP/5HP, 2LK/2MK/2HK, j.HP, the throw, a DP, a fireball), part 2 the same BLOCKED (P2 holds AWAY = R since it faces left), part 3 (Donovan) anti-air. `field_trace` on P2's node/class/freeze/HP; both ids asserted from the trace (id=3, p2id=0x13/0x10/0x11) |
+| **the reaction sets are per character, in the character's own table** | Donovan and Huitzil: table `c`; Pyron: table `b`. Donovan: class 1/2 (light, medium, low) `c:0x08 -> c:0x09`; class 4 (heavy) `c:0x08 -> 0x1f -> 0x20`; class 3 (sweep) `c:0x1c -> 0x1d -> 0x1e -> 0x19 -> 0x1a -> 0x1b -> b:0x44`; class 0x37 (air hit) `c:0x08 -> 0x11 -> 0x16 -> 0x17 -> 0x18 -> b:0x43`; throw `c:0x01`. Huitzil: `c:0x19 -> c:0x1c`, heavy `-> c:0x00..0x04`, sweep via `b:0x09 -> c:0x09/0x0a` then FOUR UNINDEXED nodes (`OFF:0x248AE2..`, linked lying/wake nodes no index table reaches). Pyron: `b:0x04`, heavy `b:0x78 -> b:0x23`, air `b:0x78 -> 0x41 -> 0x42 -> 0x56 -> 0x48`, sweep `b:0x40 -> 0x1a -> 0x56 -> 0x48`; his block stance is an unindexed node |
+| **block and stun** | a block is class `0xFF` everywhere: the stance (`a:0x14` Donovan, `a:0x15` Huitzil) then the SHARED blockstun chain `b:0x0c` (one node, held). The reaction chains are HOLD chains ended by an engine counter, so the stun is NOT chain data — measured returns to a stand chain, IDENTICAL on the three tenants: light 19, medium 23, heavy 35, blocked 22/26 (light/heavy), blocked DP 18, blocked jump-in 19, low 24; the sweep knockdown 67-76, the air hit 61-69; freeze `+0x5C` = 11 on every contact |
+| deliverables | `tools/reaction_map.py` (one line per contact: class, freeze, chain path `table:seq@node`, frames to return); `tests/expected/reactions_{donovan,huitzil,pyron}.txt` (20/19/19 contacts); `tests/test_reactions.sh` (rigs = regeneration, legs, ids, lines identical); the rigs under `tests/replays/naming/<tenant>_victim_<p>`; `charmap_md` "Reactions as the victim" (rendered from the frozen lines); `engine_internals` "Reactions as the victim"; the worklist row; HANDOFF gate row |
+| open (phase 3) | the engine counter that ends a hold reaction (where the 19/23/35 come from); the unindexed lying/wake nodes (decode by LINK from the last indexed node); projectile parameter records; the `gap_*` auto tables |
+
+
 ## Session 14z-120 (5) — **PHASE 2 OF THE CHARACTER-DATA MAP (maintainer: "push then do phase 2"):
 ## the hitbox encoding and the attack record MEASURED on native vs2 — boxes are (x, y, hw, hh) authored for
 ## the LEFT-facing sprite; +0x8C = attack / +0x90 = push (the community row had them crossed); the class

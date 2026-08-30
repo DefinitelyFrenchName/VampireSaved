@@ -775,6 +775,39 @@ the per-chain frame data in `<tenant>_anim.md`.
 - Sizes: Donovan 144 family entries / 200 attack records, Huitzil 72 /
   364, Pyron 63 / 143 (the per-tenant pages).
 
+## Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED)
+
+Depends on atlas rows: `ram.md` `+0x54` (reaction class), `+0x5C`
+(hit-freeze), `+0x1C` (node); the anim index tables of
+`character_tables.md`. Rig `tools/name_moves.py` `<tenant>_victim`
+(Victor on P1 by the forced id 0x03, the tenant on P2 by the P2 poke),
+decoder `tools/reaction_map.py`, gate `tests/test_reactions.sh`, the
+per-tenant tables in `docs/project/tables/chars/<tenant>.md` "Reactions as
+the victim".
+
+- **Every tenant's reaction set is its OWN table, entered by the class**:
+  Donovan's and Huitzil's in table `c`, Pyron's in table `b` — the same
+  class lands on different (table, seq) per character, which is what the
+  per-victim pose tables of [VSE-44] and the class dispatch of [VSE-42]
+  would predict. Donovan: light/medium hit (class 1, 2) `c:0x08 -> c:0x09`;
+  heavy (class 4) `c:0x08 -> c:0x1f -> c:0x20`; the sweep knockdown (class
+  3) `c:0x1c -> 0x1d -> 0x1e -> 0x19 -> 0x1a -> 0x1b -> b:0x44`; an air hit
+  (class 0x37) `c:0x08 -> 0x11 -> 0x16 -> 0x17 -> 0x18 -> b:0x43`; a throw
+  `c:0x01` held. Huitzil: light `c:0x19 -> c:0x1c`, heavy `-> c:0x00..0x04`,
+  the sweep through `b:0x09 -> c:0x09/0x0a` and then FOUR nodes NO index
+  table reaches (`OFF:0x248AE2..`) — the lying/wake nodes are linked, not
+  indexed. Pyron: light `b:0x04`, heavy `b:0x78 -> b:0x23`, air hit `b:0x78
+  -> 0x41 -> 0x42 -> 0x56 -> 0x48`, sweep `b:0x40 -> 0x1a -> 0x56 -> 0x48`.
+- **A block is class `0xFF`** on every tenant: the block stance (Donovan
+  `a:0x14`, Huitzil `a:0x15`, Pyron an unindexed node) then the SHARED
+  blockstun chain **`b:0x0c`** (one node, 3 data frames, held).
+- **The stun is an engine counter, not chain data**: the reaction chains
+  are HOLD chains; measured returns to a stand chain are the same on all
+  three tenants — a light hit 19-20 f, a medium 23-24, a heavy ~35 (Donovan),
+  blocked light/medium/heavy/DP/jump-in 22 / 26 / 24 / 18 / 19 f, the sweep
+  knockdown 67-76 f — with the freeze `+0x5C` = 11 on every fighter-vs-
+  fighter contact (Victor's constants).
+
 ## Command-input / motion-tracker subsystem (session 14z-48, measured both engines)
 
 How special-move inputs are recognized (identical architecture in

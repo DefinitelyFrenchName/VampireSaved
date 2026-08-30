@@ -163891,9 +163891,9 @@
    "what": "the 6-byte script-op area at +0x10..+0x15 of every node"
   },
   {
-   "evidence": "only the dispatch (0x2385C) and property bytes (0x28D00) are located",
+   "evidence": "tests/test_reactions.sh, tests/expected/reactions_<tenant>.txt",
    "structure": "reaction",
-   "what": "hitstun / blockstun lengths per reaction class"
+   "what": "DONE 14z-120 (7): the tenant's reaction SET (which table:seq each class enters, the block chain b:0x0c, the measured stun lengths) \u2014 see 'Reactions as the victim'; still open: the engine counter that ends a hold reaction, and the unindexed lying/wake nodes (OFF)"
   },
   {
    "evidence": "pool hit-class map bounded at 64; records undecoded",

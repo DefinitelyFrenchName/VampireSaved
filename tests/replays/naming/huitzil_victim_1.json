@@ -1,0 +1,113 @@
+{
+ "tenant": "huitzil_victim",
+ "part": "1",
+ "events": [
+  {
+   "name": "walk-in",
+   "frame": 2600,
+   "gap": 90,
+   "movement": true
+  },
+  {
+   "name": "V 5LP",
+   "frame": 2690,
+   "gap": 160,
+   "movement": false
+  },
+  {
+   "name": "V 5MP",
+   "frame": 2850,
+   "gap": 160,
+   "movement": false
+  },
+  {
+   "name": "V 5HP",
+   "frame": 3010,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "V 2LK",
+   "frame": 3230,
+   "gap": 160,
+   "movement": false
+  },
+  {
+   "name": "V 2MK",
+   "frame": 3390,
+   "gap": 160,
+   "movement": false
+  },
+  {
+   "name": "V 2HK sweep",
+   "frame": 3550,
+   "gap": 320,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 3870,
+   "gap": 80,
+   "movement": true
+  },
+  {
+   "name": "V j.HP",
+   "frame": 3950,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 4170,
+   "gap": 60,
+   "movement": true
+  },
+  {
+   "name": "V 6MP throw",
+   "frame": 4230,
+   "gap": 320,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 4550,
+   "gap": 100,
+   "movement": true
+  },
+  {
+   "name": "V 623LP (DP)",
+   "frame": 4650,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 4910,
+   "gap": 80,
+   "movement": true
+  },
+  {
+   "name": "V 236LP",
+   "frame": 4990,
+   "gap": 260,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "1400:ff8b82:10",
+  "1450:ff8b82:10",
+  "1500:ff8b82:10",
+  "1400:ff8782:03",
+  "1450:ff8782:03",
+  "1500:ff8782:03",
+  "2550:ff8850:01200120",
+  "2950:ff8850:01200120",
+  "3350:ff8850:01200120",
+  "3750:ff8850:01200120",
+  "4150:ff8850:01200120",
+  "4550:ff8850:01200120",
+  "4950:ff8850:01200120",
+  "5350:ff8850:01200120"
+ ],
+ "frames": 5500
+}

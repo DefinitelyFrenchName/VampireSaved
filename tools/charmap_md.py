@@ -185,6 +185,23 @@ def main():
                 if f["box"] == [0, 0, 0, 0] and not f["real"] and not f["cls"] and not rec["ours_diff"]: continue
                 w(f"| {rec['idx']:#x} | `{rec['addr']}` | {tuple(f['box'])} | {f['real']} | {f['white']} | {f['hit_id']} | {f['strength']} | {f['meter']} | {f['special']} | {f['cls']:#04x} | {f['b1c']:#04x} | {' '.join(rec['ours_diff'])} | {rec['ours_source'] if rec['ours_diff'] else ''} |")
         w("")
+    # ---- reactions (phase 3): the frozen contact lines of tests/test_reactions.sh ----
+    rx = Path(__file__).resolve().parent.parent / "tests" / "expected" / f"reactions_{j['tenant']}.txt"
+    if rx.exists():
+        w("## Reactions as the victim (phase 3)")
+        w("")
+        w(f"MEASURED on native vs2 (`tests/test_reactions.sh`, frozen `tests/expected/reactions_{j['tenant']}.txt`): Victor attacks the tenant; "
+          "per contact the victim's class byte `+0x54`, the hit-freeze `+0x5C`, the chain PATH the tenant runs (table:seq@entry-node; `OFF:` = a node the "
+          "index tables do not reach) and the frames until it is back on a table-`a` stand chain. The reaction chains are HOLD chains ended by an engine "
+          "counter, so `len` is the stun as the engine ran it, not the chains' data frames.")
+        w("")
+        w("| part | contact | class | freeze | chain path | frames |")
+        w("|---|---|---|---|---|---|")
+        for line in rx.read_text().splitlines():
+            f = line.split("\t")
+            if len(f) < 6: continue
+            w(f"| {f[0]} | {h(f[1])} | `{f[2][4:]}` | {f[3][4:]} | `{h(f[4])}` | {f[5][4:]} |")
+        w("")
     # ---- anim summary (+ appendix) ----
     A = S.get("anim") or {}
     if A:
