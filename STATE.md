@@ -1,5 +1,23 @@
 # STATE — living progress log
 
+## Session 14z-121 CLOSE — ritual complete. **ONE DAY, FROM THE M12 VERDICT TO THE CHARACTER PAGES: the board
+## verdict GREEN; the Killshread ruling; the phase-3 remainder (the record decoded from its readers, the decoder
+## bound bug behind the "unindexed nodes", every projectile's parameters, the gap rows); the open list worked down
+## (the pushback = a STEP TABLE on record +0xC; Killshread (ES) measured; the air-attack height table; +0x1A);
+## the map's residue; the map's carriers; the three CHARACTER PAGES as artifacts and the INTERNAL pages with
+## sprites, outlined boxes and detached hits, regenerable from a user's own dumps. No build changed. PUSHED.**
+
+| | |
+|---|---|
+| opened with | the 14z-120 close (`127a621`); the maintainer's M12 verdict and the Killshread ruling |
+| delivered, in order | (1) verdict + ruling; (2) phase-3 remainder; (3) the open list; (4) the residue; (5) the map's carriers + the public character pages (artifacts Donovan `85d7fd52…` / Huitzil `f0dddc83…` / Pyron `ad618f12…`); (6) the internal pages with sprites; (7) boxes outlined over the sprite, projectiles named by move, the user-regeneration script, output above the tree; (7b) the detached-hit class (Press of Death's foot) |
+| retractions this session ([VSP-13], each grepped) | "+0x1C scales the pushback"; "each tenant's reaction set is its OWN table"; "the slide is the pushbox separation, not a velocity"; the "unindexed lying/wake nodes / computed address"; "+0x392 meter candidate" |
+| green at close | portable tier GREEN after every commit; `test_move_naming` x3, `test_reactions` x3, `test_anim_node_walk`, `test_hitbox_encoding`, `test_projectile_params`, `test_killshread_es`, `test_charmap_current`, `test_tables_current` — all PASS on the committed tree. The strict static tier was not re-run at the close (no build or manifest row of the build changed; `bank_map.toml` gained only `note` keys, `test_tables_current` PASS) |
+| not gated | the internal pages (a re-run of `tools/charpages_internal.sh` is the check); the sprite renders are checked by eye on seven frames, never against a MAME snapshot |
+| open | the a2 mid-chain ENTRY index picker; the throw mash-escape step family (`0x27082`); the `x2b7ef4` effect-tail residue; the Aulbath accumulator's threshold fork; the cosmetic backlog unchanged |
+| rollover | the 14z-118 group (five records) moved verbatim to STATE_HISTORY + one ledger line; STATE holds 14z-119 / 14z-120 / 14z-121 |
+| push | PUSHED at the maintainer's word through `abb1476`; this close pushed with it |
+
 ## Session 14z-121 (7) — **THE MAINTAINER'S THREE + ONE ON THE INTERNAL PAGES: the boxes OUTLINED over the sprite in
 ## one drawing (world→screen calibrated: `KX=64, KY=262`); projectiles named by their MOVE with the type and handler
 ## kept; `tools/charpages_internal.sh` regenerates the pages from a user's OWN dumps (audits, builds, captures, renders);
@@ -236,88 +254,6 @@ STATE_HISTORY.md; STATE holds 14z-117 / 14z-118 / 14z-119.
 | **strict at close** | `run_all_static --strict` first run: **116 PASS / 0 SKIP / 1 FAIL** — `test_phasec_spaces`, whose stock-twin pin still said `d29fd062` (the FOURTH carrier of the moved stock twin, after m3a EXPECT_STOCK, the registry and the stock-track index row); re-pinned to `38e9cb2c` with the attribution, PASS standalone; a full strict re-run after the commit is recorded in the CLOSE row |
 | open | ~~the board verdict on M12 (bundle 14z119)~~ **GREEN 14z-121**; phase 2 of the character-data map (hitbox rectangles + attack records by measurement); the move lists (phase 1 naming); the cosmetic backlog unchanged |
 
-## Session 14z-118 CLOSE (3) — the session's close. **One day, four arcs: the M11 board verdict
-## recorded; the documentation audit (16 commits) closed; the character-data map's phases 0 and 1
-## shipped; Donovan's physics rows ported (UNFROZEN). Strict tier RED BY DESIGN on two gates until
-## the M12 battery. Everything PUSHED at the maintainer's word, this close included.**
-
-| | |
-|---|---|
-| the day, one breath | verdict `020a555` -> audit `2a6ebc3`..`a20d60b` (13) + `d383aaf`/`5a87ea2`/`b242a95` (3 more) -> charmap `45163bb` (phase 0), `5a6637b` (physics port), `2d9e845` + `9c103d5` (phase 1) -> this close |
-| green at close | portable tier GREEN after every commit; `checkskills` 425 / `checkdocs` 16 locks; `test_charmap_current` + `test_charmap_overrides` + `test_anim_node_walk` PASS; **strict tier: 117 PASS, 2 RED BY DESIGN** — `test_m3a_reproducible` (tree reproduces the physics probe `7109f835`, not the frozen `90a225ce`) and `test_tenant_loop` (339/615/826 ops) until the M12 freeze re-pins them |
-| unfrozen | Donovan's `port_param32 = true` (probe `build/don_phys_probe`, keep until the freeze; evidence logs `build/phys_probe_*.log`, `build/timeout_*`, `build/c*_tap_*.log`, `build/*census*.log`) |
-| open for the maintainer | the move lists (phase 1 naming); which comes first next session — the M12 battery (~5 h; clears the red gates, ships the physics port, regenerates the three maps + tables) or phase 2 (hitbox rectangles + attack records by measurement); the cosmetic backlog unchanged |
-| rollover | the 14z-115 group (two records) moved verbatim to STATE_HISTORY + two ledger lines; STATE holds 14z-116 / 14z-117 / 14z-118 |
-| push | PUSHED (maintainer, 2026-08-29: "push, then close the session") |
-
-## Session 14z-118 (charmap) — **THE CHARACTER-DATA MAP, PHASE 0 (maintainer's request the same
-## day): every decoded per-tenant structure laid out ours-vs-VS2 with every difference attributed,
-## the override channel the build consumes, two gates — and the first finding: DONOVAN'S PHYSICS
-## ROWS ARE NOT PORTED (he walks and jumps with Victor's values).**
-
-| | |
-|---|---|
-| the request | map all three tenants' character data, readable by agents and humans, ours vs VS2 with differences flagged, Vampire Hunter (VH, the earlier game — not vhunt2) as a designed-in hook, and "edit the machine file; the build consumes it" (ruled). Rule-7 posture ruled: decoded values are derived data, tracked under `docs/`. Move names: the maintainer supplies lists at the naming step |
-| the record straightened first | the "Donovan 214+P" precedent the maintainer recalled is his **421+P Change Immortal** (14z-26/27/28/36: attack-record class bytes retyped by `[[region_fix]]` rows in the hitbox region) — exactly the layer the map's override channel compiles to |
-| delivered | `tools/charmap_gen.py` (the map: bank rows with physics decoded 16.16, 20 dispatch rows, every region's byte diff ATTRIBUTED — placements, reconciliation twins for engine refs, 24-bit frame pointers, `[gfx_remap]` band + the build's `effect_map.json` shelf codes, region_fix/port_patch/table_fix/data_port fixes, effect-list pointers, overrides — sfx records, FSM state-node runs, sprite-list summary, a generated NOT-DECODED worklist); `tools/charmap_md.py` (the page); `tools/charmap_compile.py` (overrides -> `[[region_fix]]` rows inside a marked block of the tenant manifest; gen_donovan_patch.py untouched); `build/manifest/charmap_{donovan,huitzil,pyron}.toml` (empty, documented); `docs/project/tables/chars/<tenant>.{json,md}`; gates `test_charmap_current` (ci_static, 2 controls) and `test_charmap_overrides` (ci_portable, 3 controls) |
-| attribution at close | bank fields UNATTRIBUTED 0/0/0; dispatch 0/0/0; data-region bytes unattributed 692 / 342 / 342 (all in `x2b7ef4`, the companion-effect tail — 24-bit frame pointers and tile words the effect pass rewrites; named in the worklist, frozen by the gate); code regions out of scope by design (relocated code is the reconciliation/pointer_flow gates' business) |
-| **THE FINDING** | **Donovan's `param32_a/b` and `jump_params` rows are NOT ported** — gen's `VALUE_SKIP` applies unless `[[tenant]] port_param32 = true`, which Huitzil (14z-66) and Pyron carry and Donovan does not (the 14w-b crash guard, written when he sat on slot 0x0F: "Jedah speeds retained"). At id 0x13 the row aliases `0x03`, so **he walks at Victor's 2.5/−2.25 instead of VS2's 3.0/−2.625 and jumps with Victor's parameters (back xv −3.625 vs −4.25, yv 8.0 vs 7.875 …)**. A gameplay-feel decision — "Decisions pending" below |
-| **THE PHYSICS PORT, same day (maintainer: "use VS2 parameters and not the shell character's")** | `port_param32 = true` for Donovan; probe `build/don_phys_probe` `7109f835`: exactly 17 bytes differ from don_m17, all in his three rows; the map reads them `byte`; legacy A/B ×3 bit-identical (run apart from the build); `audit_don_vs_cpu` / `audit_don_ko_writer` / `audit_don_lilith_ko` PASS, `audit_don_grab_pose` Donovan half PASS. **UNFROZEN — the next battery.** Instrument trap paid: `test_don_reactions` / `test_m2a_stage4_oracle` / `test_don_column` are STOCK gates (default `build/donovan6`); on a WIDE rompath they run pristine vsavj and fail identically on don_m17 — the control that exposed it |
-| **STRICT TIER RED BY DESIGN until the M12 freeze** | after the physics port the tree reproduces the probe, not the frozen set: `test_m3a_reproducible` (WIDE fingerprint `7109f835` != donovan-m17 `90a225ce`) and `test_tenant_loop` (donovan 336 -> **339** ops, 2-tenant 612 -> 615, 3-tenant 823 -> 826 = exactly the three value-row ops) — the named state of STATE_HISTORY 14z-8x ("THE ONE RED, red BY DESIGN"); everything else in the strict tier green (117 gates). The battery re-pins both |
-| **PHASE 1 SHIPPED THE SAME DAY: the anim node chains** | `tools/anim_nodes.py` walks the five index tables by the rules read off vs2's walker (`0x2713C`/`0x271C4`: table-relative offsets, +0x18 sequential, bit7 link, bit6 hold); **verified as an instrument** by `tests/test_anim_node_walk.sh` — Donovan on NATIVE vs2, 3,638/3,638 sampled node pointers on the decoded graph, 1,225 edge transitions + 32 jumps onto graph nodes, first countdown = dur (1,121) or dur−1 (137, set-and-decremented same frame), stride-0x17 control leaves 3,417 off-graph. The map gained `anim` (per-node vs2/ours diff, sprite/link pointers checked as relocations) and an appendix page `<tenant>_anim.md`; `engine_internals.md` carries the rules. Observation kept open: table a2's chains are entered MID-chain by node index |
-| not done (the phases) | phase 1 REMAINDER: move naming (the maintainer's lists -> `moves_<tenant>.toml`) and derived frame data (needs phase 2's attack-word semantics); phase 2 hitbox rectangles + attack records (a measurement; settles the +0x17/+0x1D class-byte disagreement); phase 3 stun/projectile/auto tables. VH: nothing until a dump exists |
-| push | phase 0 pushed (`45163bb`); the physics port commit local |
-
-## Session 14z-118 CLOSE (2) — **the audit's second half, same day: eight more commits (9)-(16).
-## The (a)-(e) list closed; the `0xAA` question closed (Sasquatch's — blocks are 4 ids per
-## PLAYER SIDE); `+0x381` and `$FF8127` settled by their WRITERS. Sixteen audit commits in all.**
-
-| | |
-|---|---|
-| (9) | `engine_internals` measurement pass: Anakaris's DF makes zero palette-seq calls; the `0xAA` inference retracted; full-roster DF census frozen |
-| (10) | fourteen gotchas re-filed by their fact (13 project -> platform, the onset entry game -> project), anchors intact |
-| (11) | `ram.md`: the attract roster decoded + traced + gated (`test_attract_roster`); `$FF8127`'s 14z-104 row wrong; side codes `$FF8105`/`$FF810C` found and frozen in `audit_tenant_timeout.sh` |
-| (12) | `id_space.md` refreshed; the Oboro "entry path unlocated" hole closed in place |
-| (13) | STOCK CONTROL cadence RULED (maintainer): keep, once per new `.rbf` |
-| (14) | **the whole-corpus non-DF census (73 legs): `0xAA-0xAD` requested nowhere AND NOT FREE — Sasquatch's, by the routine table; THE FAMILY RULE `BASE + (side<<2) + phase`; `REPLAYS=all` mode + frozen corpus union; the (9) "candidate free" reasoning retracted (the census fallacy)** |
-| (15) | `+0x381` = the PLAYER-SIDE index, set at init (`0x0058A4`/`0x0058AA`) — write-tapped |
-| (16) | `$FF8127` = a per-frame comparator of the two fighters' object byte `+0x10` (writer `0x02228E`), not match state; the coincidence-freezing assertion I had added in (11) removed |
-| the lesson of the second half | three of my own same-day readings were wrong and corrected by a later measurement in the same session ((9)'s "candidate free", (11)'s "P2-won polarity", (14)'s "costume index" before it became a claim) — a RAM byte is settled by its WRITER, a palette block by its ROUTINE ROW, never by an edge or an absence |
-| green | `checkskills` 425 / `checkdocs` 16 locks / portable tier after every commit; `REPLAYS=all` audit PASS end to end; `audit_tenant_timeout` PASS on merged20 |
-| open | what fighter-object byte `+0x10` is (only if it matters); the cosmetic backlog (maintainer's list, unscheduled) |
-| push | (15) `d383aaf` and (16) `5a87ea2` local; everything before pushed |
-
-## Session 14z-118 CLOSE — **THE DOCUMENTATION AUDIT, FIRST PASS: the docs locked to each
-## other (`checkdocs`, 16 locks), the community tables GENERATED and GATED, the specimen family
-## and `engine_internals`' citable sites corrected, seven HIST banners, HANDOFF re-pointed —
-## eight audit commits, strict 114/0/0/0. NOT pushed (the verdict commit was).**
-
-| | |
-|---|---|
-| opened with | the M11 board verdict recorded and pushed (`020a555`); the maintainer: proceed with the audit order, option (a) for `tables/` |
-| delivered | inventory `docs/project/doc_audit_14z118.md` (43 docs + 6 skills, MEASURED/DERIVED/GUESSED per file) -> `tools/checkdocs.py` + `docs/doc_locks.tsv` + `tests/test_checkdocs.sh` (ci_portable; PRESENCE + NO-RIVAL per lock; 12 self-tests, 3 must-fire controls) -> `character_tables`/`id_space`/`select_screen` (Dark Gallon decoded+board-confirmed, `0x12` OWNS its palette rows — the gate existed, the claim never cited it) -> `engine_internals` (DF header cites `audit_df_framework.sh`; the M2b safety gate struck; the Anakaris inference names its measurement) -> `sprite_lists` dated, `ram.md` open measurements + `$FF8440`, README SHA-1s re-derived, `venue_assets` currency -> **`tools/tables_char_md.py` + `tests/test_tables_current.sh` (ci_static): `donovan.md` regenerated (its `param32_a` was stale), `huitzil.md`/`pyron.md` created, README rewritten** -> HANDOFF: three MiSTer commands, two gate comments and the four-track rebuild recipe re-pointed -> five HIST banners + two two-layer notes -> the light rows (`mister_core`, `mister_fit`, `quartus_brief`, `visual_smoke_tests`, `coverage_matrix` Shadow cell, `porting_code_regions`) |
-| what the pass found, in one line | almost every GUESSED claim was settled by a CITATION to a gate that already existed and was never named at the claim — the docs measured more than they said; the real GUESSED residue is small and named (below) |
-| the audit's own errors | three survey leads were misreadings of true claims (`select_screen` 128 vs 100/128; `patch_index` L237; the `mister.md` runtime estimates) — struck in the inventory, gotcha filed ("THE AUDIT'S OWN INVENTORY IS ONE HOP AWAY TOO"); `coverage_matrix`'s Shadow cell was a DOC misreading, corrected |
-| green at close | `run_all_static --strict` **PASS 114 / 0 / 0 / 0** (113 + `test_tables_current`; `test_checkdocs` in the portable 55); `checkskills` ALL PASS (425 rules) after every commit; `checkdocs` PASS 16 locks / 40 sites |
-| commits | `2a6ebc3` inventory · `9f8edef` (1) checkdocs · `87c6c66` (2) specimen family · `a58635c` (3) engine_internals · `55fdf8b` (4) atlas pages · `56a65d0` (5) tables + HANDOFF re-points · `a1f3d02` (7) HIST banners · `bdf3e16` (8) light rows · this close |
-| NOT done, named | (a) ~~`engine_internals.md`'s measurement sites~~ **DONE later the same session (AUDIT (9)): Anakaris's `0xAA` inference MEASURED FALSE — DF on, zero palette-seq calls; full-roster census frozen; `0xAA` has no DF requester; the four "likely"s settled, the attract-palette note derived and bounded**; (b) ~~the 14 emulator-fact gotchas to re-file~~ **DONE (AUDIT (10)): 13 moved project -> platform with their anchors, the onset entry game -> project;** (c) ~~`ram.md`'s two open measurements~~ **DONE (AUDIT (11)): attract roster decoded + traced + gated; `$FF8127` was NOT P1-downs-won (polarity inverted, semantics open), the real side codes `$FF8105`/`$FF810C` found and frozen;** (d) ~~`id_space.md`'s tag refresh~~ **DONE (AUDIT (12));** (e) ~~the STOCK CONTROL once-per-`.rbf` recommendation~~ **RULED 2026-08-29: keep, once per new `.rbf` (AUDIT (13))** |
-| push | NOT pushed — eight audit commits + this close local; push at the maintainer's word |
-| next | the maintainer's read of the inventory and this pass; then (a)-(d) above in that order — (a) needs the emulator, budget it as a session |
-
-## Session 14z-118 (2026-08-29) — **THE M11 BOARD VERDICT: GREEN. The random-select freeze
-## (merged-m13, bundle 14z117b) behaves on silicon as on both emulators. Ruled item (1) of
-## 14z-117 closed; item (2), the documentation audit, is the session's work — and this
-## record is its first specimen.**
-
-| | |
-|---|---|
-| opened with | the 14z-117 close (`ca132f3`, local); the maintainer: "My test results on MiSTer are all green: behavior identical to emulation." Scope confirmed on request: random select cycles all 18 + a tenant confirm loads; the M11 tell; general play no regression; the M10 medallion/sword trade re-observed. STOCK CONTROL not re-run (`.rbf` unchanged) |
-| the verdict | **FIELD VERDICT GREEN (maintainer, MiSTer, 2026-08-29, 14z-118): "all green: behavior identical to emulation"** — random select cycles all 18 on "?" and confirming a tenant loads it; the M11 tell visible; no regression in play; the M10 sword/medallion trade re-observed (select screen only). STOCK CONTROL not re-run (`.rbf` 18269 unchanged — once-per-`.rbf`). |
-| what it validates on silicon | both profile-gated site_thunks (`random_select_bound` `0x020C74`, `random_select_roster` `0x020C80`), the per-build `roster_subst` table, and the walker's two-path re-read — the same surface `tests/test_random_select_tenants.sh` measures on MAME; the jtcps2w core executing hole-b code the emulators had only ever run. Still a person at a CRT ([MSV-31]): no frame captured |
-| **what the sweep found — the audit's first specimen** | recording the verdict under [VSP-13] (grep the claim, not the files) found the M9 and M10 verdicts had each been written into ONE row while their "pending" twins stayed alive: `HANDOFF` M10 registry row ended "Field test on the board pending" under its own "FIELD-VALIDATED" header; the M9 row said "NOT YET FIELD-TESTED" a day after the CRT verdict; four STATE headers/rows (14z-115 close, 14z-115, 14z-117 first close) still said not-tested/pending; `mister_field.md` §6's verdict list, §1's board column, `mister_core.md` §12 and `platform/mister.md` all stopped at 14z-113; `mister_scope.md` still "awaiting the board's answer" on bundle 14z112. All marked in place this session (before-grep `build/verdict_grep_before_14z118.txt`, 9 live hits; after: 0 outside HISTORY blocks). Gotcha filed: `project/gotchas.md` "A FIELD VERDICT LANDS IN ONE ROW" |
-| push | `main` pushed at the maintainer's word (this commit + `ca132f3`); fork untouched, no tags |
-| next | the documentation audit — inventory first (`docs/project/doc_audit_14z118.md`), one commit per document |
-
 **SPLIT 2026-08-20 (14z-99 post-freeze close, maintainer-approved): this
 file holds the RECENT session groups + THE LEDGER; the full detail of every
 older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
@@ -347,6 +283,7 @@ Full detail for every line: `STATE_HISTORY.md` (verbatim; grep the session
 tag or any phrase below). `[+N more entries]` = the group has N further
 session records in the archive beyond the headline shown.
 
+- Session 14z-118 CLOSE (3) — the session's close. One day, four arcs: the M11 board verdict  [+4 more entries]  [rolled 14z-121 close]
 - Session 14z-117 CLOSE (3) — the session's last act. The VS/VS2 data-architecture page CORRECTED from a row-by-row measurement after the maintainer read it; the next session is RULED: a full documentation audit — measured, consis… [+4 more entries]
 - Session 14z-116 CLOSE — THE COSMETIC/EXTRAS ARC: win quotes MEASURED THEN FORGONE, the hidden characters DECODED (Shadow takes the tenant — confirmed on the board), and PYRON'S MEDALLION WHITE-OUT FIXED after two years parked; 13 commits pushed; nothing frozen (the freeze battery = 14z-117). The close ritual audited: patch_notes/patch_index/HANDOFF/gotchas had been skipped on the first pass and were written.
 - Session 14z-115 CLOSE — THE SELECT-WHEEL SEPARATION FROZEN (donovan-m15 / huitzil-m22 / pyron-m16 / merged-m11, mark M9, stock twin unchanged), tagged at `b30611a`, strict 111/0/0/0, guard corpus 340/340; emulation verdict "no regression", the maintainer's own mockup the next cut (moved to STATE_HISTORY 14z-118)
