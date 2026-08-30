@@ -114,7 +114,12 @@ class HitboxSet:
         b = self.rd(a, REC)
         return {"addr": f"{a:#x}", "box": self.box(a), "real": b[8], "white": b[9], "hit_id": b[0x10],
                 "meter": b[0x14], "strength": b[0x12], "special": b[0x16],
-                "cls": b[0x17], "b1c": b[0x1c], "b1d": b[0x1d], "raw": b.hex()}
+                "cls": b[0x17], "b1c": b[0x1c], "b1d": b[0x1d],
+                # 14z-121 (3), from the record's READERS (engine_internals "The attack record's fields, by their readers"):
+                "pb_hit": b[0x0c], "pb_blk": b[0x0d],      # PUSHBACK step-table index on hit / on block (vs2 0x2783C[idx] -> victim +0x59 -> 0x27038 steps x per frame)
+                "facing": b[0x0e], "freeze": b[0x13],      # the victim's facing rule; the hit-freeze class (pairs table 0x17FA4)
+                "scale": b[0x1a], "recov": b[0x1b],        # combo-scaling row selector (0 = the attacker's own); white-damage recovery-rate class (0x18018)
+                "raw": b.hex()}
 
     def proj_attack(self):
         pb = self.vals["proj_hitbox_base"]

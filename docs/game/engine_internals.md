@@ -672,7 +672,10 @@ frame by `tests/lua/field_trace.lua`, each pointer mapped onto the graph
   ground `0x47`, air `0x48` (no ES — the pair spends no stock and enters
   `0x47`; maintainer-confirmed 14z-121, and the ES effect of the stance
   pair is Killshread (ES) `0x46`'s: the sword attacks both going away and
-  coming back during the summon — stated, not measured); Lightning-in-stance LP/MP/HP `0x54-0x56`, ES `0x57`, tail `0x58`.
+  coming back during the summon — MEASURED 14z-121 (3), `tests/test_killshread_es.sh`:
+  a summon after a plain plant lands ONE wave of 3 ticks, after the ES plant
+  TWO waves, the second ending in the knockdown class 0x16; the plant itself
+  never connects at 176 px); Lightning-in-stance LP/MP/HP `0x54-0x56`, ES `0x57`, tail `0x58`.
   Dashes `0x49/0x4a`, dash end `0x4b`. Pursuit `0x4c` (P and K identical),
   ES `0x4e`. Table `a` is the movement family: idle `0x00`, walk `0x02/0x04`,
   crouch `0x09 -> 0x01 -> 0x06`, jump `0x0e -> 0x10 -> 0x0f`.
@@ -831,19 +834,28 @@ the victim".
   frame (light: +9..+17 f, 30 px; medium: +10..+22 f, 51 px; heavy: still
   sliding at +35 with a decaying `+0x40` velocity) and the hold exits the
   frame the slide stops — so the hitstun beyond the chain is the
-  pushback's duration, i.e. the attack record's `+0x1C`. **What moves the
+  pushback's duration, i.e. the attack record's `+0x1C`. ~~**What moves the
   victim on a light/medium hit is not a velocity** (`+0x40` stays 0): the
   only writer of the victim's x through the stun is the PUSHBOX SEPARATION
-  routine (vs2 `0x17D30-0x17D7A`: when two push boxes overlap it splits the
-  overlap `d1` between the two fighters — `add.l d0,$10(a6)` / `add.l
-  d1,$10(a4)` — or gives it all to the one not against a wall, `+0x38`),
-  fed by the victim's reaction NODES' push-box ids (the family word of each
-  `c:0x08/0x09` node) against the attacker's; the reference push boxes at
-  vs2 `0xA776C` are `(0,44,27,45) (0,30,27,31) (0,75,27,29) (0,0,24,6)` in
-  the data view. So the slide's length is the reaction chain's push boxes
-  settling, and the hold releases when it has — ~~`+0x1C` selects that
-  through the class/record~~ (RETRACTED 14z-121: `+0x1C` is not read on
-  these contacts; what selects the slide length per strength is unread). Measured returns to a stand
+  routine~~ **RETRACTED 14z-121 (3) — the 14z-120 (12) tap had watched a
+  light hit while the fighters still overlapped and saw only the separation
+  routine's first frames (`0x17D5C`, +0..+8).** Tapped through 5LP / 5MP /
+  5HP (`build/p3_push_14z121/`): the slide's writer is **`0x27038`** — a
+  PUSHBACK STEP TABLE: `d0 = victim +0x59` (the attack record's **`+0xC`**
+  on a hit, `+0xD` on a block, copied at contact by `0x172DA`) → the word
+  list at vs2 `0x2783C` (read through the DATA view) → a byte list of
+  per-frame x steps indexed by the counter `+0x164` (cleared at the contact,
+  `0x1714A`); each frame `x += step` (negated by the victim's facing `+0x5D`,
+  suppressed while the other fighter's `+0x198` is set); a NEGATIVE byte
+  ends the list and the routine returns 1 — **which is what releases the
+  HOLD reaction** (the "slide stops = hold exits" of (9)). The lists:
+  idx 0 `4 4 4 4 3 3 3 2 1 1 1` = 30 px / 11 f (the measured 5LP), idx 1 =
+  51 px / 16 f (5MP), idx 2 = 80 px / 20 f, idx 3 = 159 / 24, idx 7 = 140 /
+  20, idx 5/6/8/9 = 65/54/10/80 with zero tails, idx 4 = 24 frames of 0.
+  The heavy (class 4) contact takes the VELOCITY path instead (`0x265DC`,
+  `+0x40` = 2.9 px/f decaying 1/32 per frame). `+0x1C` plays no part. A
+  sibling family at `0x27082` (lists at `0x2797A`, counter `+0x1B0`) is
+  unread. Measured returns to a stand
   chain are the same on all three tenants — light 19-20 f, medium 23-24,
   heavy ~35, blocked light/medium/heavy/DP/jump-in 22 / 26 / 24 / 18 /
   19 f, the sweep knockdown 67-76 f — with the freeze 11 on every
@@ -860,7 +872,7 @@ disassembly, `tools/m68dis.py`); a field with no reader there is marked so.
 | field | reader | what it does |
 |---|---|---|
 | `+0x8` / `+0x9` | `0x1735C` / `0x17390` (+ `0x1745E/0x17480`) | real / white power (the damage subtract) |
-| `+0xC` (hit) / `+0xD` (block) | `0x16B4A` / `0x16CCE` → `0x172DA` | copied to the victim's `+0x59` (forced 1 when the attacker's `+0x8`/`+0x11A` say so) |
+| `+0xC` (hit) / `+0xD` (block) | `0x16B4A` / `0x16CCE` → `0x172DA` | **THE PUSHBACK STEP-TABLE INDEX** → victim `+0x59` (forced 1 when the attacker's `+0x8`/`+0x11A` say so), consumed per frame by `0x27038` (see "Reactions as the victim", 14z-121 (3)) |
 | `+0xE` | `0x1717E` | the victim's FACING rule → `+0x5D`: 0/1 eor'd in, 2 = opposite of its own, 3 = the attacker's `+0xA`, 4 = by x against the other fighter, 5 = by the attacker's velocity sign, negative = by the attacker's x |
 | `+0xF` | `0x16B44` | → victim `+0x5A` |
 | `+0x10` | `0x16930`, `0x16B38` | the hit id, stored in the victim's ring at `+0x6C` (the multi-hit dedup) |
@@ -869,9 +881,9 @@ disassembly, `tools/m68dis.py`); a field with no reader there is marked so.
 | `+0x16` | `0x16FA0` | the special flag: class 4 becomes 5 (+ `+0x117`) |
 | `+0x17` | `0x16F70` and the compares | the REACTION CLASS |
 | `+0x19` | `0x16B3E` | → victim `+0x56` |
-| `+0x1A` | `0x175F6` | a COMBO-SCALING table selector: 0 = the attacker's per-character 32-byte table (`0x18C1A`/`0x1881A[id]`, one per a global at `-0x4B68(a5)`), else `0x1841A[+0x1A]`; the table is walked by the combo count `+0x144` (< 0x1F) — the arithmetic unread |
+| `+0x1A` | `0x175F6` | the COMBO-SCALING ROW selector. The damage routine (`0x175AE-0x176E0`) sums a scale index d3 = a per-VICTIM state term (`0xD2ABE[id*0x20 + +0x3B3]`, + `0xD32BE[id]` while `+0x1C3`) + the combo term (row = `+0x1A` ? `0x1841A/0x1801A[+0x1A*0x20]` : the attacker's own `0x18C1A/0x1881A[id*0x20]`, the pair chosen by the global `-0x4B68(a5)`; column = the combo count `+0x144`, capped 0x1F) + (when the attacker's white `+0x52` ≥ the victim's) a random term `0xD54FE[victim id*0x20 + rand&0x1F]`; then the damage is a LOOKUP `0xD32DE[min(d3,0x20)*128 + power]` (negative d3 → `0xD435E[(-d3&0x7F)*128 + power] + power`), passed through `0x177D4` and capped 0x7F |
 | `+0x1B` | `0x172B8` | **the WHITE-DAMAGE RECOVERY-RATE class**: `0x18018[+0x1B]` → victim `+0x13A/+0x13B`, the per-frame refill at `0x20DF2` (`+0x13A` counts down, reloads from `+0x13B`, `+0x52` += 1); fixed 1/3 while `+0x1C3` is set |
-| `+0x1C` | `0x16B70` ONLY | ADDED to the victim's accumulator `+0x161` (decay timer `+0x162` := 240 f; the per-frame tick `0x20E6A` clears both when it expires) and compared with the per-character threshold `+0x15B` — the bank row **`byte15b`, 60 for every character in vsavj AND vs2** — but ONLY while the victim's `+0x15E` is armed and it is grounded (`+0x38` = 0), with `+0x11F`/`+0x18F` clear. **`+0x15E` is armed nowhere the rigs reach**: it is written after init by NO state of Donovan's naming parts 1-3 and by nothing on the victim side (write taps 14z-121, both fighters); its writers are four state entries inside the per-character DARK FORCE handlers (`0x2203A`, `0x22078`, `0x22282`, `0x3E928` — each with `+0x18F/+0x190/+0x143`; reached through `0x22008: jmp 0xD9538[id]` from the activation flow `0x26166`). What crossing the threshold does (the `0x170DE` vs `0x16B94` fork, both ending in the class writes) and which characters' DF arm it: OPEN |
+| `+0x1C` | `0x16B70` ONLY | ADDED to the victim's accumulator `+0x161` (decay timer `+0x162` := 240 f; the per-frame tick `0x20E6A` clears both when it expires) and compared with the per-character threshold `+0x15B` — the bank row **`byte15b`, 60 for every character in vsavj AND vs2** — but ONLY while the victim's `+0x15E` is armed and it is grounded (`+0x38` = 0), with `+0x11F`/`+0x18F` clear. **`+0x15E` is armed nowhere the rigs reach**: it is written after init by NO state of Donovan's naming parts 1-3 and by nothing on the victim side (write taps 14z-121, both fighters); its writers are four state entries inside the per-character DARK FORCE handlers (`0x2203A`, `0x22078`, `0x22282`, `0x3E928` — each with `+0x18F/+0x190/+0x143`; reached through `0x22008: jmp 0xD9538[id]` from the activation flow `0x26166`). The arming sites all set `+0x18F` too, and the accumulator needs it CLEAR: the only `+0x18F` clear that leaves `+0x15E` armed is `0x4900A`, inside **Aulbath's** code block (the vs2 blocks sit in id order: `0x471E8` (0x09) .. `0x49486` (0x0A), from the DF table `0xD9538`) — so the accumulator is live only for an Aulbath VICTIM in that state, a legacy mechanic the tenants' records feed by value (their `+0x1C` bytes ride verbatim). What crossing the threshold does (the `0x170DE` vs `0x16B94` fork): OPEN, out of the map's scope |
 | `+0x1D` | `0x16BD6` | tested on the node-byte-3 branch |
 | `+0x1E` | `0x16CF2` | → victim `+0x1A4` |
 | `+0x11`, `+0x12`, `+0x15`, `+0x18`, `+0x1F` | **none in the hit code** | the "+0x12 strength index" observation of 14z-120 (6) is not consumed here |
@@ -971,9 +983,13 @@ longs, read at `0x026646` for chain `a2:0x4C`); the two halves of the
 32-LONG capture-keyframe pointer table `0x0BE27A[attacker id]` (the
 installer of [VSE-44], `0x02802E/0x0280C6/0x028140`; the manifests'
 `throw_victim_keyframes`/`grab_hold_keyframes` rows repoint its rows);
-and ONE real per-character WORD table at `0x0BE23A`, read `id*2` at
-`0x027B94` as a height threshold (`+0x14 − +0x3A`) while airborne
-(`+0x38`), gating a check on `+0x113|+0x114` — the check itself unread.
+and ONE real per-character WORD table at `0x0BE23A`: the **MINIMUM
+AIR-ATTACK HEIGHT** — `0x027B80` (five callers in the state code) returns
+1 ("the attack input is taken") when a button is pressed (`+0x113|+0x114`)
+and the fighter is either grounded or airborne with `+0x14 − +0x3A` ≥ the
+word; below it the press is refused. 36 for Zabel, Lilith and Jedah (rows
+`0x04/0x0D/0x0F` + their variant mirrors), 0 for everyone else — so the
+tenants (rows 0x10/0x11/0x13 = 0) may attack at any height.
 `byte15b` (`0x0BE87A`, read at `0x022392` → fighter `+0x15B`) is the
 accumulator threshold above. Each row's resolution is a `note` on the
 row in `bank_map.toml`, rendered in the maps' bank tables.

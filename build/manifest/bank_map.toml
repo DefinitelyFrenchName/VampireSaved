@@ -339,7 +339,7 @@ name = "gap_be23a"
 vsavj = 0x0BE23A
 kind = "auto"
 stride = 0x40
-note = "REAL per-char WORD table (14z-121): read id*2 at vsavj 0x027B94 as a height threshold against fighter +0x14 - +0x3A when +0x38 != 0 (airborne), gating +0x113/+0x114 — semantics of the check unread"
+note = "REAL per-char WORD table (14z-121): the MINIMUM AIR-ATTACK HEIGHT, vsavj 0x027B80 refuses a button press while airborne below +0x14 - +0x3A < word; 36 for Zabel/Lilith/Jedah (0x04/0x0D/0x0F + variant mirrors), 0 for everyone else incl. the tenants"
 
 [[table]]
 name = "gap_be27a"

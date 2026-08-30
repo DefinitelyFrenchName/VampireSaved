@@ -1,0 +1,82 @@
+{
+ "tenant": "donovan",
+ "part": "12",
+ "events": [
+  {
+   "name": "Killshread [214LK] plant",
+   "frame": 2600,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "Killshread Summon [214LK] after plain",
+   "frame": 2860,
+   "gap": 320,
+   "movement": false
+  },
+  {
+   "name": "Killshread (ES) plant",
+   "frame": 3180,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "Killshread Summon [214LK] after ES",
+   "frame": 3440,
+   "gap": 320,
+   "movement": false
+  },
+  {
+   "name": "Killshread [214HK] plant",
+   "frame": 3760,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "Killshread Summon [214HK] after plain",
+   "frame": 4020,
+   "gap": 320,
+   "movement": false
+  },
+  {
+   "name": "Killshread (ES) plant (2)",
+   "frame": 4340,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "Killshread Summon [214HK] after ES",
+   "frame": 4600,
+   "gap": 320,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "2550:ff8850:01200120",
+  "2950:ff8850:01200120",
+  "3350:ff8850:01200120",
+  "3750:ff8850:01200120",
+  "4150:ff8850:01200120",
+  "4550:ff8850:01200120",
+  "4950:ff8850:01200120",
+  "2560:ff8410:0228",
+  "2560:ff8810:02d8",
+  "2820:ff8410:0228",
+  "2820:ff8810:02d8",
+  "3140:ff8410:0228",
+  "3140:ff8810:02d8",
+  "3400:ff8410:0228",
+  "3400:ff8810:02d8",
+  "3720:ff8410:0228",
+  "3720:ff8810:02d8",
+  "3980:ff8410:0228",
+  "3980:ff8810:02d8",
+  "4300:ff8410:0228",
+  "4300:ff8810:02d8",
+  "4560:ff8410:0228",
+  "4560:ff8810:02d8",
+  "2540:ff8509:09",
+  "3860:ff8509:09"
+ ],
+ "frames": 5170
+}

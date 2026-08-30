@@ -107,7 +107,7 @@ seq = "0x44,0x43,0x43"
 name = "Killshread (ES)"
 input = "214KK"
 kind = "es"
-notes = "ES of Killshread; stance change (plants the sword); MEASURED 14z-120: a2:0x46, one stock spent. MAINTAINER 2026-08-30 (14z-121, stated not measured): the ES effect plays out DURING THE SUMMON — the returning Killshread attacks both going away AND coming back to Donovan, where the plain summon attacks one way only. This is the ONLY ES of the stance pair: the Summon itself has none"
+notes = "ES of Killshread; stance change (plants the sword); MEASURED 14z-120: a2:0x46, one stock spent. MAINTAINER 2026-08-30 (14z-121, stated not measured): the ES effect plays out DURING THE SUMMON — the returning Killshread attacks both going away AND coming back to Donovan, where the plain summon attacks one way only. This is the ONLY ES of the stance pair: the Summon itself has none. MEASURED 14z-121 (3), tests/test_killshread_es.sh: a summon after the ES plant lands TWO contact waves (+31..+38 and +84..+86, knockdown class 0x16), after a plain plant ONE (3 ticks); the plant never connects at 176 px"
 table = "a2"
 seq = "0x46"
 

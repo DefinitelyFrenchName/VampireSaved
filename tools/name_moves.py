@@ -345,6 +345,17 @@ DONOVAN = {
         ("Walk back", [(0, 90, "L")], 120),
         ("Blizzard Sword [LP] blocked", hcf("LP"), 300),
     ],
+    "12": [  # KILLSHREAD (ES) — the maintainer's ruling 14z-121: the ES plant's effect plays DURING THE SUMMON (the sword
+             # attacks going away AND coming back; the plain summon one way). P2 (Victor, idle) pinned in the sword's path.
+        ("Killshread [214LK] plant", qcb("LK"), 260, "far"),
+        ("Killshread Summon [214LK] after plain", qcb("LK"), 320, "far"),
+        ("Killshread (ES) plant", qcb("KK"), 260, "far"),
+        ("Killshread Summon [214LK] after ES", qcb("LK"), 320, "far"),
+        ("Killshread [214HK] plant", qcb("HK"), 260, "far"),
+        ("Killshread Summon [214HK] after plain", qcb("HK"), 320, "far"),
+        ("Killshread (ES) plant (2)", qcb("KK"), 260, "far"),
+        ("Killshread Summon [214HK] after ES", qcb("HK"), 320, "far"),
+    ],
 }
 NORMALS = [(n, f, g) for n, f, g in (
     ("5LP", stand("LP"), 120), ("5MP", stand("MP"), 120), ("5HP", stand("HP"), 150),
@@ -543,9 +554,9 @@ DONOVAN_VICTIM = {   # P1 = Victor attacks P2 = Donovan; every contact class the
 SCHEDULES = {"donovan": DONOVAN, "pyron": PYRON, "huitzil": HUITZIL,
              "donovan_victim": DONOVAN_VICTIM, "huitzil_victim": DONOVAN_VICTIM, "pyron_victim": DONOVAN_VICTIM}
 NO_POKE_PARTS = {("donovan", "9"), ("donovan", "10"), ("donovan", "11")}   # parts the -debug write tap must be able to replay: no HP pin, no stock poke
-PHASE2_PARTS = NO_POKE_PARTS   # the hitbox rigs (tests/test_hitbox_encoding.sh) — NOT naming parts: test_move_naming.sh skips them
+PHASE2_PARTS = NO_POKE_PARTS | {("donovan", "12")}   # the hitbox rigs (tests/test_hitbox_encoding.sh) and the Killshread (ES) rig (tests/test_killshread_es.sh) — NOT naming parts: test_move_naming.sh skips them
 # stock pokes for the meter parts: frame -> 9 stocks (each ES/EX/DF spends 1)
-METER_PARTS = {"donovan": {"3", "4", "5", "6", "7", "8"}, "pyron": {"4", "5"}, "huitzil": {"4", "5", "6", "7", "8"}, "donovan_victim": set(), "huitzil_victim": set(), "pyron_victim": set()}
+METER_PARTS = {"donovan": {"3", "4", "5", "6", "7", "8", "12"}, "pyron": {"4", "5"}, "huitzil": {"4", "5", "6", "7", "8"}, "donovan_victim": set(), "huitzil_victim": set(), "pyron_victim": set()}
 
 
 # Per-event POSITION PINS (the 14z-120 fix for the Pyron/Huitzil first pass):

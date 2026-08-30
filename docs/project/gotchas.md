@@ -3220,3 +3220,16 @@ accumulator is armed only inside a DARK FORCE handler, so the rig could not
 have measured what it was written for. The part is gone from
 `name_moves.py` ([VSP-137], [VSP-98]); the sweep-only lines were not
 frozen. Write the rig AFTER the arming condition is known.
+
+
+## "THE ONLY WRITER" IS A CLAIM ABOUT THE TAP'S WINDOW — a light hit's overlap frames named the wrong mechanism for the pushback (14z-120 (12), corrected 14z-121 (3))
+
+The 14z-120 (12) tap on the victim's x watched ONE light hit and saw only
+the pushbox separation routine (`0x17D5C`) — for that hit's first frames
+the fighters still overlapped, and the trace was read before the real
+slide began at +26. Tapped through 5LP / 5MP / 5HP the writer is
+`0x27038`, a per-frame STEP TABLE indexed by the attack record's `+0xC`,
+whose end is the hold release. Two rules: a "the only writer is X"
+finding names the WINDOW it was measured in, and it is re-tapped on at
+least two contacts of different strength before it explains a
+strength-dependent quantity.
