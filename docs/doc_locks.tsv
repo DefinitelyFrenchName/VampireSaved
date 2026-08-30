@@ -9,20 +9,38 @@
 # after it unless it is in `also`. Add a row when a number is quoted in a
 # second document; the canonical file is the atlas row (docs/game/atlas/) —
 # a synthesis or a plan follows the atlas, never the other way round.
+#
+# SINCE 14z-122 a key matching ZERO lines across its files FAILS ("matches
+# NOTHING") — a reflow that rewords the fact's label used to disarm the
+# NO-RIVAL half silently while PRESENCE stayed green. Keys were re-verified
+# live against the tree at 14z-122; a purely canonical-quoting key cannot
+# catch a rival, but liveness now makes its decay loud, which was the defect.
 obj_bank_table	PRG:0x282D4	per-char(acter)? OBJ bank table	docs/game/atlas/character_tables.md,docs/game/engine_internals.md,docs/game/gotchas.md,docs/project/cps2_wide.md	PRG:0x27530
-obj_bank_table_vsav2	PRG:0x27530	vsav2 `PRG:0x27530`	docs/game/atlas/character_tables.md,docs/game/engine_internals.md	
-sprite_pal_ptr_table	PRG:0x38C198	(sprite|SPRITE)[- ]palette pointer table|per-char pointer table	docs/game/atlas/character_tables.md,docs/game/atlas/venue_assets.md,docs/game/engine_internals.md	
-ai_script_tables	PRG:0xBF01A	AI action-script tables	docs/game/atlas/character_tables.md,docs/game/engine_internals.md,docs/game/atlas/ram.md,HANDOFF.md	
-voice_borrow_writer	PRG:0x0AEF6	writer (is|must be) `?PRG:0x0AEF6|write at `PRG:0x0AEF6	docs/game/engine_internals.md,docs/game/gotchas.md,docs/game/atlas/ram.md,HANDOFF.md	
-gallon_variant_idiom	PRG:0x020B9C	Gallon-variant idiom at	docs/game/atlas/select_screen.md,docs/game/atlas/id_space.md,docs/game/engine_internals.md,docs/project/patch_index.md,HANDOFF.md	
+obj_bank_table_vsav2	PRG:0x27530	vsav2 `PRG:0x27530`	docs/game/atlas/character_tables.md,docs/game/engine_internals.md
+sprite_pal_ptr_table	PRG:0x38C198	(sprite|SPRITE)[- ]palette pointer table|per-char pointer table	docs/game/atlas/character_tables.md,docs/game/atlas/venue_assets.md,docs/game/engine_internals.md
+ai_script_tables	PRG:0xBF01A	AI action-script tables	docs/game/atlas/character_tables.md,docs/game/engine_internals.md,docs/game/atlas/ram.md,HANDOFF.md
+voice_borrow_writer	PRG:0x0AEF6	writer (is|must be) `?PRG:0x0AEF6|write at `PRG:0x0AEF6	docs/game/engine_internals.md,docs/game/gotchas.md,docs/game/atlas/ram.md,HANDOFF.md
+gallon_variant_idiom	PRG:0x020B9C	Gallon-variant idiom at	docs/game/atlas/select_screen.md,docs/game/atlas/id_space.md,docs/game/engine_internals.md,docs/project/patch_index.md,HANDOFF.md
 char_loader	PRG:0x028DD8	unmasked loader \(|vsavj `PRG:0x028DD8` \(≡	docs/game/atlas/character_tables.md,docs/game/atlas/select_screen.md	PRG:0x0280B8,PRG:0x0280E6
-id_fold_site	PRG:0x04FAC4	\| `PRG:0x04FAC4` \|	docs/game/atlas/id_space.md,docs/game/gotchas.md	PRG:0x04FFA8
-id_fold_target	PRG:0x04FFA8	into `?PRG:0x04FFA8	docs/game/atlas/id_space.md	
+id_fold_site	PRG:0x04FAC4	\| `PRG:0x04FAC4` \||`PRG:0x04FAC4` folds	docs/game/atlas/id_space.md,docs/game/gotchas.md	PRG:0x04FFA8
+id_fold_target	PRG:0x04FFA8	into `?PRG:0x04FFA8	docs/game/atlas/id_space.md
 char_id_p1	RAM:$FF8782	`RAM:\$FF8782`	docs/game/atlas/select_screen.md,docs/game/atlas/id_space.md	RAM:$FF8B82
 char_id_pair	$FF8782	`\$FF8782`/`\$FF8B82`	docs/game/atlas/ram.md,docs/game/gotchas.md	$FF8B82
-fade_staging_window	RAM:$FF4182	palette-fade stagi|fade staging	docs/game/atlas/ram.md,docs/game/engine_internals.md	
-name_entries	PRG:0x898C4	name entries `PRG:0x898C4`|name `0x898C4`	docs/game/engine_internals.md,docs/game/atlas/venue_assets.md	
-cursor_highlight_base	PRG:0x268A02	\| cursor highlight \|	docs/game/atlas/select_screen.md	PRG:0x268A82,PRG:0x2A18FE
+fade_staging_window	RAM:$FF4182	palette-fade stagi|fade staging	docs/game/atlas/ram.md,docs/game/engine_internals.md
+name_entries	PRG:0x898C4	name entries	docs/game/engine_internals.md,docs/game/atlas/venue_assets.md
+cursor_highlight_base	PRG:0x268A02	cursor highlight	docs/game/atlas/select_screen.md	PRG:0x268A82,PRG:0x2A18FE
 # (cursor_highlight_base `also`: 0x268A82 is the P2 mirror; 0x2A18FE is vsav2's own table, select_screen.md "vs2 carries the same three arrays")
-match_init_normalise_vs2	PRG:0x01F5A0	ID normali[sz]ation \(vsav2|places at `PRG:0x01F5A0`	docs/game/atlas/id_space.md,docs/game/atlas/character_tables.md	
+match_init_normalise_vs2	PRG:0x01F5A0	ID normali[sz]ation \(vsav2|places at `PRG:0x01F5A0`	docs/game/atlas/id_space.md,docs/game/atlas/character_tables.md
 select_consumer_06C0E0	PRG:0x06C0E0	`PRG:0x06C0E0`	docs/game/atlas/select_screen.md,docs/game/engine_internals.md	PRG:0x05F328
+# --- 14z-122, the documentation rationalization pass: the duplicated numbers
+# --- the pass collapses to one canonical home stay LOCKED in every carrier.
+# (mra_profile_byte: cps2_wide.md describes byte 41 without quoting 0xFE, so it
+#  is not a PRESENCE carrier; the canonical home is platform/mister.md "The
+#  runtime profile gate".)
+mra_profile_byte	0xFE	byte 41	docs/platform/mister.md,docs/project/mister_core.md,docs/project/mister_map.md	0xFF
+# (wide_rom_bytes `also`: the four header words of that same .rom, which
+#  legitimately sit beside the size in mister_map.md §3, and the 3,500-frame
+#  run length that sits beside the name at platform/mister.md:1665. Separated
+#  by ';' because a comma-grouped number cannot ride comma-splitting.)
+wide_rom_bytes	66,265,152	vsavjw\.rom	docs/project/mister_map.md,docs/project/mister_core.md,docs/platform/mister.md,docs/platform/gotchas.md,HANDOFF.md	6144;6400;15552;64704;3,500
+wheel_record	PRG:0x272A68	wheel record	docs/game/atlas/select_screen.md,docs/game/engine_internals.md	PRG:0x2689FE

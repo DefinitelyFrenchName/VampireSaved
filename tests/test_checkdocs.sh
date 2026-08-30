@@ -68,4 +68,14 @@ control "rival number beside the label (RIVAL)" "$W/b" "RIVAL PRG:0x282D8"
 mkcopy "$W/c"; printf 'ghost\tPRG:0x282D4\tOBJ bank table\tdocs/game/atlas/ghost.md\t\n' >> "$W/c/docs/doc_locks.tsv"
 control "lock names a missing file (MISSING)" "$W/c" "file MISSING: docs/game/atlas/ghost.md"
 
+# d (14z-122): a reflow that removes every line the key matches must be LOUD —
+# the NO-RIVAL half of the lock is disarmed while PRESENCE still passes.
+# Reword "OBJ bank table" everywhere it appears in the locked files; the
+# canonical address stays, so only key-liveness can fire.
+mkcopy "$W/d"
+for f in docs/game/atlas/character_tables.md docs/game/engine_internals.md docs/game/gotchas.md docs/project/cps2_wide.md; do
+    sed -i '' 's/OBJ bank table/OBJ bank chart/g' "$W/d/$f"
+done
+control "key matches nothing (NO-RIVAL disarmed)" "$W/d" "matches NOTHING"
+
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

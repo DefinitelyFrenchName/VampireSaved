@@ -94,7 +94,11 @@ def read_locks(path):
         if len(cols) < 4:
             raise SystemExit(f"{path}:{ln}: expected 4-5 tab-separated columns, got {len(cols)}")
         label, canonical, key, files = (c.strip() for c in cols[:4])
-        also = [a.strip() for a in cols[4].split(",")] if len(cols) > 4 and cols[4].strip() else []
+        # `also` splits on ';' when one is present (a comma-grouped number like
+        # 3,500 cannot be expressed under comma-splitting — 14z-122), else ','.
+        raw_also = cols[4].strip() if len(cols) > 4 else ""
+        sep = ";" if ";" in raw_also else ","
+        also = [a.strip() for a in raw_also.split(sep)] if raw_also else []
         rows.append(dict(label=label, canonical=canonical, key=key,
                          files=[f.strip() for f in files.split(",") if f.strip()],
                          also=also, line=ln))
@@ -110,6 +114,7 @@ def check_row(root, row):
         return [f"{row['label']}: canonical {canon!r} matches no known shape"]
     allowed = {norm(canon)} | {norm(a) for a in row["also"]}
     key = re.compile(row["key"], re.IGNORECASE)
+    key_hits = 0
     for rel in row["files"]:
         p = root / rel
         if not p.is_file():
@@ -120,12 +125,20 @@ def check_row(root, row):
             fails.append(f"{row['label']}: {rel} does not quote {canon} (PRESENCE)")
         for n, line in enumerate(text.splitlines(), 1):
             for km in key.finditer(line):
+                key_hits += 1
                 window = line[km.end(): km.end() + WINDOW]
                 for tm in rx.finditer(window):
                     tok = tm.group(0)
                     if norm(tok) not in allowed:
                         fails.append(f"{row['label']}: {rel}:{n} RIVAL {tok} beside "
                                      f"'{km.group(0)}' (canonical {canon})")
+    # KEY LIVENESS (14z-122): a key matching zero lines across every listed
+    # file means the NO-RIVAL half of this lock is DISARMED — a reflow or a
+    # reword did it silently, which is exactly the drift this tool exists to
+    # make loud. PRESENCE alone is not the lock.
+    if key_hits == 0:
+        fails.append(f"{row['label']}: key {row['key']!r} matches NOTHING — "
+                     "a reflow disarmed NO-RIVAL")
     return fails
 
 
@@ -204,6 +217,12 @@ def selftests():
         "t\t22bb468496cc9738\topcode-view sha1\ta.md\t\n", None)
     run("unknown shape is refused",
         {"a.md": "x\n"}, "t\tnot-a-number\tx\ta.md\t\n", "matches no known shape")
+    run("semicolon-separated also allows a comma-grouped number",
+        {"a.md": "run length beside the name: file.rom, 3,500 frames, size 66,265,152 B\n"},
+        "t\t66,265,152\tfile\\.rom\ta.md\t3,500;6144\n", None)
+    run("a key matching nothing fires (NO-RIVAL disarmed by a reflow)",
+        {"a.md": "The table `PRG:0x282D4` is described in other words now.\n"},
+        "t\tPRG:0x282D4\tOBJ bank table\ta.md\t\n", "matches NOTHING")
     return ok
 
 
