@@ -60,7 +60,7 @@
 
 | # | claim | file:line | class | measurement | rig/gate | cost | status |
 |---|---|---|---|---|---|---|---|
-| 17 | CLAUDE.md §5 promised `docs/annotations.md` (an address→label/comment stream) — retired 14z-122 as never-created; the maintainer rules CHECK FIRST: stored elsewhere / unnecessary / else CREATE it | `CLAUDE.md:334` | GUESSED (the retirement note asserts the stream "lives in the atlas + manifest comments" — plausible, unverified) | enumerate what a label stream would hold vs the atlas rows + manifest comments + `re/ghidra/` (does the Ghidra project export labels?); outcome A reword the note to say WHERE, outcome B create the document | `re/ghidra/`, `docs/game/atlas/*` | T1 | OPEN (next session's opener) |
+| 17 | CLAUDE.md §5 promised `docs/annotations.md` (an address→label/comment stream) — retired 14z-122 as never-created; the maintainer rules CHECK FIRST: stored elsewhere / unnecessary / else CREATE it | `CLAUDE.md:334` | GUESSED (the retirement note asserts the stream "lives in the atlas + manifest comments" — plausible, unverified) | enumerate what a label stream would hold vs the atlas rows + manifest comments + `re/ghidra/` (does the Ghidra project export labels?); outcome A reword the note to say WHERE, outcome B create the document | `re/ghidra/`, `docs/game/atlas/*` | T1 | **MEASURED 14z-123 — outcome B, a real gap: `re/ghidra/` holds a `.keep` + the M0 README, no project, no export; 2,921 program-space addresses across five carrier kinds — atlas 438, engine_internals 602 (~220 in NO other document), other docs 940, manifests 1,756, code 818 (265 code-only). Created as a GENERATED index (`tools/gen_annotations.py`, `tests/test_annotations_current.sh`); the CLAUDE.md row returned with the corrected description** |
 
 ### What is NOT known — labelled unknowns that stay labelled (no measurement this pass)
 
@@ -89,3 +89,7 @@
   (post-close). Retraction greps per commit are in the commit bodies; the
   headline: `grep -rn "and it has never been run" docs` -> only the struck
   original inside its own correction (select_screen.md).
+- 14z-123 (T1, the annotations check): row 17 closed, outcome B. Retraction
+  grep for the false note: `grep -rn "lives in .docs/game/atlas/. and the manifests" CLAUDE.md docs HANDOFF.md STATE.md`
+  -> empty (the CLAUDE.md row rewritten in place; the 14z-122 STATE row
+  quotes it as history and stays).

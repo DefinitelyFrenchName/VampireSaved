@@ -125,6 +125,12 @@ test_docshape
 # all verbatim in docs/GOTCHAS_history.md now. tools/gen_gotchas_index.py
 # --check; two must-fire controls. ROM-free, ~1 s.
 test_gotchas_index_current
+# 14z-123: docs/annotations.md — the address -> label/comment stream CLAUDE.md
+# §5 promised at M0 — is GENERATED from every live carrier (atlas,
+# engine_internals, reference docs, manifests, tools/tests); the 14z-122
+# retirement note ("lives in the atlas + manifest comments") measured false.
+# tools/gen_annotations.py --check; four must-fire controls. ROM-free, ~1 s.
+test_annotations_current
 
 # 14z-107 (11): the ROM-free half of the slice D4 discriminator. Locks the 68k
 # program-ROM read probe's contract — it is inert unless JTCPS2W_PRGPROBE is

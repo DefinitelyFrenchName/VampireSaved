@@ -42,6 +42,11 @@ Entry points at this level, deliberately not in a bucket:
   bucket files at the 14z-107 close: 46 game / 79 platform / 179 project —
   one `##` heading each, so `grep -c '^## '` is the count). ~195 places in
   the repo cite `docs/GOTCHAS.md`; they all still land somewhere useful.
+- [`annotations.md`](annotations.md) — the address → label/comment stream,
+  GENERATED (`tools/gen_annotations.py`, 14z-123): every program-space
+  address the tree names, with the file and section that names it, and the
+  CODE-ONLY tail that is the documentation gap. An index, not a source —
+  grep the address, land in the carrier.
 - `checksums.txt` — machine-read by `tools/audit_roms.py`. A data
   manifest, not documentation; its path is deliberately stable.
 

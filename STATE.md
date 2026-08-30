@@ -1,5 +1,20 @@
 # STATE — living progress log
 
+## Session 14z-123 (2026-08-30) — **THE DOCUMENTATION RATIONALIZATION PASS CONTINUES. T1 (the annotations check,
+## maintainer-ruled check-first) MEASURED — outcome B, a REAL GAP: `re/ghidra/` never held a project, and the 14z-122
+## retirement note ("the stream lives in the atlas + manifest comments") was FALSE — 2,921 program-space addresses across
+## five carrier kinds, ~220 named only in engine_internals prose, 265 only in code. `docs/annotations.md` CREATED as a
+## GENERATED index (`tools/gen_annotations.py`, gate `test_annotations_current`); the CLAUDE.md row RETURNED. No build changed.**
+
+| | |
+|---|---|
+| opened with | the 14z-122 close (2); NEXT_SESSION's order: T1 → G2 → G3 → T2s → G4 → G6 → CLAUDE.md condensing → G7 |
+| **T1, measured** | `re/ghidra/`: a `.keep` + the M0 README ("exported annotations" would live here — none ever were; `git log --all` shows one commit, M0). The carriers, counted by distinct program-space address (`0x001000-0x3FFFFF`; HIST/EXEMPT/GENERATED docs and `probe_*.toml` excluded): atlas **438**, engine_internals **602** (~220 in NO other document), other reference docs **940**, manifests **1,756**, code (`tools/`, `tests/`) **818** — union **2,921**, of which **265 are CODE-ONLY** (named by a gate or tool and by no document or manifest). So the stream exists, scattered across five kinds of carrier, and no single place answers "what is `PRG:0x027038`?" — the maintainer's CREATE branch |
+| the shape chosen | GENERATED, not hand-written (a sixth copy would drift — the project's own doctrine; the GOTCHAS-index pattern): `tools/gen_annotations.py` renders one row per address with the carrier FILE and SECTION (or manifest `name =` row) in tier order; **no line numbers by design** (they churn on every unrelated edit and would make the currency gate a tax on every commit); a `vs2`/`vh2` hint when the line named the sibling set; RAM excluded (`ram.md` IS the RAM stream); the tail section = the code-only list, kept visible as the documentation gap. `tests/test_annotations_current.sh` (ci_portable): `--check` + four must-fire controls on a synthetic root (fresh passes; a new address fails until regenerated and lands under its section; a hand-edit fails; a code-only address lands in the gap section). The tool and the gate exclude THEMSELVES as carriers (their synthetic control addresses had leaked into the gap list — caught on the first run: 2,921 → 2,925 → 2,921) |
+| the row | CLAUDE.md §5's struck row is LIVE again, describing the generated document and carrying the measurement; `docs/README.md` entry; HANDOFF gate row; `doc_shape.tsv` GENERATED row; `inferred_claims.md` row 17 closed + pass log |
+| green | `test_annotations_current` PASS; checkdocshape (6 PENDING unchanged); checkdocs 19 locks; checkskills 425; census 427 `--check`; portable tier **60 PASS / 0 FAIL** (+1). [VSP-13] grep for the false note (`"lives in .docs/game/atlas/. and the manifests"`) → only the pass-log line quoting the grep |
+| next | G2 — the three T3 measurements (Aulbath-victim DF accumulator; attract-palette VS-screen surface; throw mash-escape), then G3 |
+
 ## Session 14z-122 CLOSE (2) — ritual complete for the CONTINUED session. **Two new rulings recorded: the
 ## annotations row is now CHECK-FIRST (stored elsewhere / unnecessary / else CREATE the document), and THE
 ## CLAUDE.md CONDENSING PASS is a named item ("more concise and to the point ... without losing precious
