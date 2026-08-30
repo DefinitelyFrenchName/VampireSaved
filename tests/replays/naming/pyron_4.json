@@ -1,0 +1,146 @@
+{
+ "tenant": "pyron",
+ "part": "4",
+ "events": [
+  {
+   "name": "Sol Smasher (ES)",
+   "frame": 2600,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Sol Smasher (ES) [air]",
+   "frame": 2820,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Zodiac Fire (ES)",
+   "frame": 3040,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Orbital Blaze (ES)",
+   "frame": 3260,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Orbital Blaze (ES) late",
+   "frame": 3480,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Cosmo Disruption [PP held]",
+   "frame": 3700,
+   "gap": 400,
+   "movement": false
+  },
+  {
+   "name": "Cosmo Disruption [KK held]",
+   "frame": 4100,
+   "gap": 400,
+   "movement": false
+  },
+  {
+   "name": "Cosmo Disruption [PP tap]",
+   "frame": 4500,
+   "gap": 400,
+   "movement": false
+  },
+  {
+   "name": "Piled Hell [623KK]",
+   "frame": 4900,
+   "gap": 300,
+   "movement": false
+  },
+  {
+   "name": "Piled Hell [j.623KK]",
+   "frame": 5200,
+   "gap": 300,
+   "movement": false
+  },
+  {
+   "name": "Planet Burning (ES)",
+   "frame": 5500,
+   "gap": 300,
+   "movement": false
+  },
+  {
+   "name": "Sitting Attack (ES) [8PP] off throw",
+   "frame": 5800,
+   "gap": 320,
+   "movement": false
+  },
+  {
+   "name": "Shining Gemini [LP+LK]",
+   "frame": 6120,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "5LP in DF",
+   "frame": 6320,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Sol Smasher [LP] in DF",
+   "frame": 6520,
+   "gap": 300,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "1400:ff8782:11",
+  "1450:ff8782:11",
+  "1500:ff8782:11",
+  "2550:ff8850:01200120",
+  "2950:ff8850:01200120",
+  "3350:ff8850:01200120",
+  "3750:ff8850:01200120",
+  "4150:ff8850:01200120",
+  "4550:ff8850:01200120",
+  "4950:ff8850:01200120",
+  "5350:ff8850:01200120",
+  "5750:ff8850:01200120",
+  "6150:ff8850:01200120",
+  "6550:ff8850:01200120",
+  "6950:ff8850:01200120",
+  "2560:ff8410:0228",
+  "2560:ff8810:02d8",
+  "2780:ff8410:0228",
+  "2780:ff8810:02d8",
+  "3000:ff8410:0228",
+  "3000:ff8810:02d8",
+  "3220:ff8410:0228",
+  "3220:ff8810:02d8",
+  "3440:ff8410:0228",
+  "3440:ff8810:02d8",
+  "3660:ff8410:0228",
+  "3660:ff8810:02d8",
+  "4060:ff8410:0228",
+  "4060:ff8810:02d8",
+  "4460:ff8410:0228",
+  "4460:ff8810:02d8",
+  "4860:ff8410:0228",
+  "4860:ff8810:02d8",
+  "5160:ff8410:0228",
+  "5160:ff8810:02d8",
+  "5460:ff8410:0370",
+  "5460:ff8810:039d",
+  "5760:ff8410:0370",
+  "5760:ff8810:039d",
+  "6080:ff8410:0228",
+  "6080:ff8810:02d8",
+  "6280:ff8410:0228",
+  "6280:ff8810:02d8",
+  "6480:ff8410:0228",
+  "6480:ff8810:02d8",
+  "2540:ff8509:09",
+  "4810:ff8509:09"
+ ],
+ "frames": 7070
+}

@@ -1,0 +1,357 @@
+{
+ "tenant": "huitzil",
+ "part": "1",
+ "events": [
+  {
+   "name": "Walk forward",
+   "frame": 2600,
+   "gap": 120,
+   "movement": true
+  },
+  {
+   "name": "Walk back",
+   "frame": 2720,
+   "gap": 120,
+   "movement": true
+  },
+  {
+   "name": "Crouch",
+   "frame": 2840,
+   "gap": 120,
+   "movement": true
+  },
+  {
+   "name": "Jump [8]",
+   "frame": 2960,
+   "gap": 120,
+   "movement": true
+  },
+  {
+   "name": "Jump [9]",
+   "frame": 3080,
+   "gap": 120,
+   "movement": true
+  },
+  {
+   "name": "Jump [7]",
+   "frame": 3200,
+   "gap": 120,
+   "movement": true
+  },
+  {
+   "name": "Forward dash",
+   "frame": 3320,
+   "gap": 150,
+   "movement": true
+  },
+  {
+   "name": "Back dash",
+   "frame": 3470,
+   "gap": 150,
+   "movement": true
+  },
+  {
+   "name": "5LP",
+   "frame": 3620,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "5MP",
+   "frame": 3740,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "5HP",
+   "frame": 3860,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "5LK",
+   "frame": 4010,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "5MK",
+   "frame": 4130,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "5HK",
+   "frame": 4250,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "2LP",
+   "frame": 4400,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "2MP",
+   "frame": 4520,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "2HP",
+   "frame": 4640,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "2LK",
+   "frame": 4790,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "2MK",
+   "frame": 4910,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "2HK",
+   "frame": 5030,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.LP",
+   "frame": 5180,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.MP",
+   "frame": 5330,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.HP",
+   "frame": 5480,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.LK",
+   "frame": 5630,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.MK",
+   "frame": 5780,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.HK",
+   "frame": 5930,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "6LP",
+   "frame": 6080,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "6MP",
+   "frame": 6230,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "6HP",
+   "frame": 6380,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "6LK",
+   "frame": 6530,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "6MK",
+   "frame": 6680,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "6HK",
+   "frame": 6830,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "Air Dash [j.66] early",
+   "frame": 6980,
+   "gap": 200,
+   "movement": true
+  },
+  {
+   "name": "Air Dash [j.66] mid",
+   "frame": 7180,
+   "gap": 200,
+   "movement": true
+  },
+  {
+   "name": "Air Dash [j.66] apex",
+   "frame": 7380,
+   "gap": 200,
+   "movement": true
+  },
+  {
+   "name": "Air Dash [j.44] mid",
+   "frame": 7580,
+   "gap": 200,
+   "movement": true
+  },
+  {
+   "name": "Air Dash [j.66] fwd jump",
+   "frame": 7780,
+   "gap": 200,
+   "movement": true
+  },
+  {
+   "name": "Float [j.8 hold]",
+   "frame": 7980,
+   "gap": 250,
+   "movement": true
+  },
+  {
+   "name": "Float [j.8 re-press]",
+   "frame": 8230,
+   "gap": 250,
+   "movement": true
+  },
+  {
+   "name": "Float [j.9 hold]",
+   "frame": 8480,
+   "gap": 250,
+   "movement": true
+  },
+  {
+   "name": "Float [j.7 hold at apex]",
+   "frame": 8730,
+   "gap": 250,
+   "movement": true
+  }
+ ],
+ "pokes": [
+  "1400:ff8782:10",
+  "1450:ff8782:10",
+  "1500:ff8782:10",
+  "2550:ff8850:01200120",
+  "2950:ff8850:01200120",
+  "3350:ff8850:01200120",
+  "3750:ff8850:01200120",
+  "4150:ff8850:01200120",
+  "4550:ff8850:01200120",
+  "4950:ff8850:01200120",
+  "5350:ff8850:01200120",
+  "5750:ff8850:01200120",
+  "6150:ff8850:01200120",
+  "6550:ff8850:01200120",
+  "6950:ff8850:01200120",
+  "7350:ff8850:01200120",
+  "7750:ff8850:01200120",
+  "8150:ff8850:01200120",
+  "8550:ff8850:01200120",
+  "8950:ff8850:01200120",
+  "2560:ff8410:0228",
+  "2560:ff8810:02d8",
+  "2680:ff8410:0228",
+  "2680:ff8810:02d8",
+  "2800:ff8410:0228",
+  "2800:ff8810:02d8",
+  "2920:ff8410:0228",
+  "2920:ff8810:02d8",
+  "3040:ff8410:0228",
+  "3040:ff8810:02d8",
+  "3160:ff8410:0228",
+  "3160:ff8810:02d8",
+  "3280:ff8410:0228",
+  "3280:ff8810:02d8",
+  "3430:ff8410:0228",
+  "3430:ff8810:02d8",
+  "3580:ff8410:0228",
+  "3580:ff8810:02d8",
+  "3700:ff8410:0228",
+  "3700:ff8810:02d8",
+  "3820:ff8410:0228",
+  "3820:ff8810:02d8",
+  "3970:ff8410:0228",
+  "3970:ff8810:02d8",
+  "4090:ff8410:0228",
+  "4090:ff8810:02d8",
+  "4210:ff8410:0228",
+  "4210:ff8810:02d8",
+  "4360:ff8410:0228",
+  "4360:ff8810:02d8",
+  "4480:ff8410:0228",
+  "4480:ff8810:02d8",
+  "4600:ff8410:0228",
+  "4600:ff8810:02d8",
+  "4750:ff8410:0228",
+  "4750:ff8810:02d8",
+  "4870:ff8410:0228",
+  "4870:ff8810:02d8",
+  "4990:ff8410:0228",
+  "4990:ff8810:02d8",
+  "5140:ff8410:0228",
+  "5140:ff8810:02d8",
+  "5290:ff8410:0228",
+  "5290:ff8810:02d8",
+  "5440:ff8410:0228",
+  "5440:ff8810:02d8",
+  "5590:ff8410:0228",
+  "5590:ff8810:02d8",
+  "5740:ff8410:0228",
+  "5740:ff8810:02d8",
+  "5890:ff8410:0228",
+  "5890:ff8810:02d8",
+  "6040:ff8410:0228",
+  "6040:ff8810:02d8",
+  "6190:ff8410:0228",
+  "6190:ff8810:02d8",
+  "6340:ff8410:0228",
+  "6340:ff8810:02d8",
+  "6490:ff8410:0228",
+  "6490:ff8810:02d8",
+  "6640:ff8410:0228",
+  "6640:ff8810:02d8",
+  "6790:ff8410:0228",
+  "6790:ff8810:02d8",
+  "6940:ff8410:0228",
+  "6940:ff8810:02d8",
+  "7140:ff8410:0228",
+  "7140:ff8810:02d8",
+  "7340:ff8410:0228",
+  "7340:ff8810:02d8",
+  "7540:ff8410:0228",
+  "7540:ff8810:02d8",
+  "7740:ff8410:0228",
+  "7740:ff8810:02d8",
+  "7940:ff8410:0228",
+  "7940:ff8810:02d8",
+  "8190:ff8410:0228",
+  "8190:ff8810:02d8",
+  "8440:ff8410:0228",
+  "8440:ff8810:02d8",
+  "8690:ff8410:0228",
+  "8690:ff8810:02d8"
+ ],
+ "frames": 9230
+}

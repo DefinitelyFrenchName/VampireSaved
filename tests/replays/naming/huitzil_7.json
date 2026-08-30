@@ -1,0 +1,170 @@
+{
+ "tenant": "huitzil",
+ "part": "7",
+ "events": [
+  {
+   "name": "Reflect Wall [gc LP]",
+   "frame": 2600,
+   "gap": 240,
+   "movement": false
+  },
+  {
+   "name": "Reflect Wall [gc MP]",
+   "frame": 2840,
+   "gap": 240,
+   "movement": false
+  },
+  {
+   "name": "Reflect Wall [gc HP]",
+   "frame": 3080,
+   "gap": 240,
+   "movement": false
+  },
+  {
+   "name": "Reflect Wall [gc LK]",
+   "frame": 3320,
+   "gap": 240,
+   "movement": false
+  },
+  {
+   "name": "Reflect Wall [gc MK]",
+   "frame": 3560,
+   "gap": 240,
+   "movement": false
+  },
+  {
+   "name": "Reflect Wall [gc HK]",
+   "frame": 3800,
+   "gap": 240,
+   "movement": false
+  },
+  {
+   "name": "Reflect Wall [gc PP]",
+   "frame": 4040,
+   "gap": 240,
+   "movement": false
+  },
+  {
+   "name": "Reflect Wall [623LP neutral]",
+   "frame": 4280,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Circuit Scrapper [MP] late button",
+   "frame": 4500,
+   "gap": 300,
+   "movement": false
+  },
+  {
+   "name": "Circuit Scrapper [HP] late button",
+   "frame": 4800,
+   "gap": 300,
+   "movement": false
+  },
+  {
+   "name": "Circuit Scrapper [MP] motion then button",
+   "frame": 5100,
+   "gap": 300,
+   "movement": false
+  },
+  {
+   "name": "Vulcan? [421LP]",
+   "frame": 5400,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Vulcan? [421MP]",
+   "frame": 5620,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Vulcan? [421HP]",
+   "frame": 5840,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Vulcan? [421LK vs airborne P2]",
+   "frame": 6060,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Vulcan? [421HK vs airborne P2]",
+   "frame": 6280,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Vulcan? [421KK vs airborne P2]",
+   "frame": 6500,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Vulcan? [421LK near vs airborne P2]",
+   "frame": 6720,
+   "gap": 220,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "1400:ff8782:10",
+  "1450:ff8782:10",
+  "1500:ff8782:10",
+  "2550:ff8850:01200120",
+  "2950:ff8850:01200120",
+  "3350:ff8850:01200120",
+  "3750:ff8850:01200120",
+  "4150:ff8850:01200120",
+  "4550:ff8850:01200120",
+  "4950:ff8850:01200120",
+  "5350:ff8850:01200120",
+  "5750:ff8850:01200120",
+  "6150:ff8850:01200120",
+  "6550:ff8850:01200120",
+  "6950:ff8850:01200120",
+  "2560:ff8410:0370",
+  "2560:ff8810:039d",
+  "2800:ff8410:0370",
+  "2800:ff8810:039d",
+  "3040:ff8410:0370",
+  "3040:ff8810:039d",
+  "3280:ff8410:0370",
+  "3280:ff8810:039d",
+  "3520:ff8410:0370",
+  "3520:ff8810:039d",
+  "3760:ff8410:0370",
+  "3760:ff8810:039d",
+  "4000:ff8410:0370",
+  "4000:ff8810:039d",
+  "4240:ff8410:0228",
+  "4240:ff8810:02d8",
+  "4460:ff8410:0370",
+  "4460:ff8810:039d",
+  "4760:ff8410:0370",
+  "4760:ff8810:039d",
+  "5060:ff8410:0370",
+  "5060:ff8810:039d",
+  "5360:ff8410:0228",
+  "5360:ff8810:02d8",
+  "5580:ff8410:0228",
+  "5580:ff8810:02d8",
+  "5800:ff8410:0228",
+  "5800:ff8810:02d8",
+  "6020:ff8410:0228",
+  "6020:ff8810:02d8",
+  "6240:ff8410:0228",
+  "6240:ff8810:02d8",
+  "6460:ff8410:0228",
+  "6460:ff8810:02d8",
+  "6680:ff8410:0370",
+  "6680:ff8810:039d",
+  "2540:ff8509:09",
+  "4870:ff8509:09"
+ ],
+ "frames": 7190
+}

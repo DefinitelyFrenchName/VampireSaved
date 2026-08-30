@@ -1,0 +1,243 @@
+{
+ "tenant": "pyron",
+ "part": "2",
+ "events": [
+  {
+   "name": "Sol Smasher [LP]",
+   "frame": 2600,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Sol Smasher [MP]",
+   "frame": 2800,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Sol Smasher [HP]",
+   "frame": 3000,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Sol Smasher [j.236LP]",
+   "frame": 3200,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Sol Smasher [j.236HP]",
+   "frame": 3400,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Zodiac Fire [LP]",
+   "frame": 3600,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Zodiac Fire [MP]",
+   "frame": 3800,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Zodiac Fire [HP]",
+   "frame": 4000,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Orbital Blaze [j.214LK]",
+   "frame": 4200,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Orbital Blaze [j.214MK]",
+   "frame": 4400,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Orbital Blaze [j.214HK]",
+   "frame": 4600,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Orbital Blaze [j.214LK] late",
+   "frame": 4800,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Orbital Blaze [j.214HK] late",
+   "frame": 5000,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Galaxy Trip [421LP]",
+   "frame": 5200,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Galaxy Trip [421MP]",
+   "frame": 5400,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Galaxy Trip [421HP]",
+   "frame": 5600,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Galaxy Trip [421LK]",
+   "frame": 5800,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Galaxy Trip [421MK]",
+   "frame": 6000,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Galaxy Trip [421HK]",
+   "frame": 6200,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Galaxy Trip [421LK] slow",
+   "frame": 6400,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Galaxy Trip [421HK] slow",
+   "frame": 6600,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Galaxy Trip [j.421LP]",
+   "frame": 6800,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Galaxy Trip [j.421MP]",
+   "frame": 7000,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Galaxy Trip [j.421HP]",
+   "frame": 7200,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Galaxy Trip [j.421LK]",
+   "frame": 7400,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Galaxy Trip [j.421MK]",
+   "frame": 7600,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Galaxy Trip [j.421HK]",
+   "frame": 7800,
+   "gap": 200,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "1400:ff8782:11",
+  "1450:ff8782:11",
+  "1500:ff8782:11",
+  "2550:ff8850:01200120",
+  "2950:ff8850:01200120",
+  "3350:ff8850:01200120",
+  "3750:ff8850:01200120",
+  "4150:ff8850:01200120",
+  "4550:ff8850:01200120",
+  "4950:ff8850:01200120",
+  "5350:ff8850:01200120",
+  "5750:ff8850:01200120",
+  "6150:ff8850:01200120",
+  "6550:ff8850:01200120",
+  "6950:ff8850:01200120",
+  "7350:ff8850:01200120",
+  "7750:ff8850:01200120",
+  "8150:ff8850:01200120",
+  "2560:ff8410:0228",
+  "2560:ff8810:02d8",
+  "2760:ff8410:0228",
+  "2760:ff8810:02d8",
+  "2960:ff8410:0228",
+  "2960:ff8810:02d8",
+  "3160:ff8410:0228",
+  "3160:ff8810:02d8",
+  "3360:ff8410:0228",
+  "3360:ff8810:02d8",
+  "3560:ff8410:0228",
+  "3560:ff8810:02d8",
+  "3760:ff8410:0228",
+  "3760:ff8810:02d8",
+  "3960:ff8410:0228",
+  "3960:ff8810:02d8",
+  "4160:ff8410:0228",
+  "4160:ff8810:02d8",
+  "4360:ff8410:0228",
+  "4360:ff8810:02d8",
+  "4560:ff8410:0228",
+  "4560:ff8810:02d8",
+  "4760:ff8410:0228",
+  "4760:ff8810:02d8",
+  "4960:ff8410:0228",
+  "4960:ff8810:02d8",
+  "5160:ff8410:0228",
+  "5160:ff8810:02d8",
+  "5360:ff8410:0228",
+  "5360:ff8810:02d8",
+  "5560:ff8410:0228",
+  "5560:ff8810:02d8",
+  "5760:ff8410:0228",
+  "5760:ff8810:02d8",
+  "5960:ff8410:0228",
+  "5960:ff8810:02d8",
+  "6160:ff8410:0228",
+  "6160:ff8810:02d8",
+  "6360:ff8410:0228",
+  "6360:ff8810:02d8",
+  "6560:ff8410:0228",
+  "6560:ff8810:02d8",
+  "6760:ff8410:0228",
+  "6760:ff8810:02d8",
+  "6960:ff8410:0228",
+  "6960:ff8810:02d8",
+  "7160:ff8410:0228",
+  "7160:ff8810:02d8",
+  "7360:ff8410:0228",
+  "7360:ff8810:02d8",
+  "7560:ff8410:0228",
+  "7560:ff8810:02d8",
+  "7760:ff8410:0228",
+  "7760:ff8810:02d8"
+ ],
+ "frames": 8250
+}

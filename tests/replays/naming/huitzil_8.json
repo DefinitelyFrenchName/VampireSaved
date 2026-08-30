@@ -1,0 +1,93 @@
+{
+ "tenant": "huitzil",
+ "part": "8",
+ "events": [
+  {
+   "name": "Genocide Vulcan (ES) [421PP]",
+   "frame": 2600,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "Genocide Vulcan [421LP] (2)",
+   "frame": 2860,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "Circuit Scrapper [63214 MP+HP]",
+   "frame": 3120,
+   "gap": 300,
+   "movement": false
+  },
+  {
+   "name": "Circuit Scrapper [63214 LP+MP]",
+   "frame": 3420,
+   "gap": 300,
+   "movement": false
+  },
+  {
+   "name": "Circuit Scrapper [63214 LP+HP] (ES, meter)",
+   "frame": 3720,
+   "gap": 300,
+   "movement": false
+  },
+  {
+   "name": "Circuit Scrapper [63214MP] step back",
+   "frame": 4020,
+   "gap": 300,
+   "movement": false
+  },
+  {
+   "name": "Circuit Scrapper [63214MP] no-pin walk",
+   "frame": 4320,
+   "gap": 300,
+   "movement": false
+  },
+  {
+   "name": "Reflect Wall [gc MP] (meter)",
+   "frame": 4620,
+   "gap": 240,
+   "movement": false
+  },
+  {
+   "name": "Reflect Wall [gc HP] (meter)",
+   "frame": 4860,
+   "gap": 240,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "1400:ff8782:10",
+  "1450:ff8782:10",
+  "1500:ff8782:10",
+  "2550:ff8850:01200120",
+  "2950:ff8850:01200120",
+  "3350:ff8850:01200120",
+  "3750:ff8850:01200120",
+  "4150:ff8850:01200120",
+  "4550:ff8850:01200120",
+  "4950:ff8850:01200120",
+  "2560:ff8410:0228",
+  "2560:ff8810:02d8",
+  "2820:ff8410:0228",
+  "2820:ff8810:02d8",
+  "3080:ff8410:0370",
+  "3080:ff8810:039d",
+  "3380:ff8410:0370",
+  "3380:ff8810:039d",
+  "3680:ff8410:0370",
+  "3680:ff8810:039d",
+  "3980:ff8410:0370",
+  "3980:ff8810:039d",
+  "4280:ff8410:0228",
+  "4280:ff8810:02d8",
+  "4580:ff8410:0370",
+  "4580:ff8810:039d",
+  "4820:ff8410:0370",
+  "4820:ff8810:039d",
+  "2540:ff8509:09",
+  "3950:ff8509:09"
+ ],
+ "frames": 5350
+}

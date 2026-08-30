@@ -12,39 +12,47 @@
 # are six distinct command normals; Plasma Beam's ES is one move by
 # either pair; Air Dash / Float are filed as movement (dash / misc).
 
+
+# NAMING STEP DONE 14z-120 (2026-08-30): every seq below was MEASURED on native
+# vs2 (Huitzil forced by the early-window poke) by tools/name_moves.py — see the
+# Donovan file's header for the method; gate tests/test_move_naming.sh. TWO
+# FINDINGS FOR THE MAINTAINER: Genocide Vulcan's input measured as 421+P (the
+# list says 421+K, which never fired); Reflect Wall's guard cancel spent no
+# banked stock on native vs2.
+
 # ---- throws -------------------------------------------------------------
 
 [[move]]
 name = "Magnet Slam"
 input = "4MP, 6MP, 4HP, 6HP"
 kind = "throw"
-notes = "Ground throw, must be performed up close; direction by 4/6, MP or HP"
-table = ""
-seq = ""
+notes = "Ground throw, must be performed up close; direction by 4/6, MP or HP; MEASURED 14z-120: 6MP and 4MP enter a2:0x1e -> a2:0x1f; 6HP enters a2:0x1e -> a2:0x20"
+table = "a2"
+seq = "0x1e"
 
 [[move]]
 name = "Sky Capture"
 input = "j.4MP, j.6MP, j.4HP, j.6HP"
 kind = "throw"
-notes = "Air throw, must be performed up close; direction by 4/6, MP or HP"
-table = ""
-seq = ""
+notes = "Air throw, must be performed up close; direction by 4/6, MP or HP; MEASURED 14z-120 (P2 scripted to jump with P1): MP and HP both enter a2:0x4e"
+table = "a2"
+seq = "0x4e"
 
 [[move]]
 name = "Circuit Scrapper"
 input = "63214MP, 63214HP"
 kind = "throw"
-notes = "Command throw; ground throw, must be performed up close; MP or HP; ES = Circuit Scrapper (ES)"
-table = ""
-seq = ""
+notes = "Command throw; ground throw, must be performed up close; MP or HP; ES = Circuit Scrapper (ES); MEASURED 14z-120: a2:0x1e (throw start) -> a2:0x2d -> a2:0x2e -> a2:0x30 -> a2:0x31 when it CONNECTS (rig: a step back then 63214MP; from a pinned pushbox overlap the input came out as a special instead). A pair press with two OTHER buttons triggers the ES beam (MP+HP) or the ES launcher (LP+MP)"
+table = "a2"
+seq = "0x2d"
 
 [[move]]
 name = "Circuit Scrapper (ES)"
 input = "63214PP"
 kind = "es"
-notes = "ES of Circuit Scrapper; any two punches; ground throw, must be performed up close"
-table = ""
-seq = ""
+notes = "ES of Circuit Scrapper; any two punches; ground throw, must be performed up close; MEASURED 14z-120: 63214 LP+HP with meter -> a2:0x1e -> 0x2d -> a2:0x2f (instead of 0x2e) -> 0x30 -> 0x31, one stock"
+table = "a2"
+seq = "0x2f"
 
 # ---- command normals (the six "alternate attacks") ----------------------
 
@@ -52,49 +60,49 @@ seq = ""
 name = "6LP"
 input = "6LP"
 kind = "normal"
-notes = "Alternate attack: different from 5LP (usually longer reach and different data)"
-table = ""
-seq = ""
+notes = "Alternate attack: different from 5LP (usually longer reach and different data); MEASURED 14z-120: the odd standing ids are the 6+button alternates"
+table = "a2"
+seq = "0x01"
 
 [[move]]
 name = "6MP"
 input = "6MP"
 kind = "normal"
-notes = "Alternate attack: different from 5MP (usually longer reach and different data)"
-table = ""
-seq = ""
+notes = "Alternate attack: different from 5MP (usually longer reach and different data); MEASURED 14z-120"
+table = "a2"
+seq = "0x03"
 
 [[move]]
 name = "6HP"
 input = "6HP"
 kind = "normal"
-notes = "Alternate attack: different from 5HP (usually longer reach and different data)"
-table = ""
-seq = ""
+notes = "Alternate attack: different from 5HP (usually longer reach and different data); MEASURED 14z-120"
+table = "a2"
+seq = "0x05"
 
 [[move]]
 name = "6LK"
 input = "6LK"
 kind = "normal"
-notes = "Alternate attack: different from 5LK (usually longer reach and different data)"
-table = ""
-seq = ""
+notes = "Alternate attack: different from 5LK (usually longer reach and different data); MEASURED 14z-120"
+table = "a2"
+seq = "0x07"
 
 [[move]]
 name = "6MK"
 input = "6MK"
 kind = "normal"
-notes = "Alternate attack: different from 5MK (usually longer reach and different data)"
-table = ""
-seq = ""
+notes = "Alternate attack: different from 5MK (usually longer reach and different data); MEASURED 14z-120"
+table = "a2"
+seq = "0x09"
 
 [[move]]
 name = "6HK"
 input = "6HK"
 kind = "normal"
-notes = "Alternate attack: different from 5HK (usually longer reach and different data)"
-table = ""
-seq = ""
+notes = "Alternate attack: different from 5HK (usually longer reach and different data); MEASURED 14z-120"
+table = "a2"
+seq = "0x0b"
 
 # ---- specials (+ their ES rows) ----------------------------------------
 
@@ -102,89 +110,89 @@ seq = ""
 name = "Sitting Attack"
 input = "8P, 8K"
 kind = "special"
-notes = "Pursuit move; P or K; ES = Sitting Attack (ES)"
-table = ""
-seq = ""
+notes = "Pursuit move; P or K; ES = Sitting Attack (ES); MEASURED 14z-120 off a throw knockdown: 8P and 8K enter a2:0x3a -> (a2:0x3b) -> a2:0x3c"
+table = "a2"
+seq = "0x3a"
 
 [[move]]
 name = "Sitting Attack (ES)"
 input = "8PP, 8KK"
 kind = "es"
-notes = "ES of Sitting Attack; pursuit move"
-table = ""
-seq = ""
+notes = "ES of Sitting Attack; pursuit move; MEASURED 14z-120: a2:0x3a (class 16) -> a2:0x3b -> a2:0x3f, one stock"
+table = "a2"
+seq = "0x3f"
 
 [[move]]
 name = "Plasma Beam"
 input = "236P, 236K"
 kind = "special"
-notes = "Freezing projectile; P hits high, K hits low; ES = Plasma Beam (ES)"
-table = ""
-seq = ""
+notes = "Freezing projectile; P hits high, K hits low; ES = Plasma Beam (ES); MEASURED 14z-120: every P strength enters a:0x28 (the wind-up) -> a2:0x44 -> 0x45 -> 0x46; every K strength -> a2:0x41 -> 0x42 -> 0x43"
+table = "a2"
+seq = "0x44,0x41"
 
 [[move]]
 name = "Plasma Beam (ES)"
 input = "236PP, 236KK"
 kind = "es"
-notes = "ES of Plasma Beam; one move by either pair; freezing projectile, hits medium"
-table = ""
-seq = ""
+notes = "ES of Plasma Beam; one move by either pair; freezing projectile, hits medium; MEASURED 14z-120: PP and KK both -> a:0x28 -> a2:0x47 -> 0x48 -> 0x49 -> 0x4a, one stock (one move by either pair, as the maintainer said)"
+table = "a2"
+seq = "0x47"
 
 [[move]]
 name = "Mighty Launcher"
 input = "214P, j.214P"
 kind = "special"
-notes = "Projectile; usable in air; ES = Mighty Launcher (ES)"
-table = ""
-seq = ""
+notes = "Projectile; usable in air; ES = Mighty Launcher (ES); MEASURED 14z-120: ground LP/MP/HP all -> a:0x29 -> a2:0x23 (one chain); air -> a2:0x24"
+table = "a2"
+seq = "0x23,0x24"
 
 [[move]]
 name = "Mighty Launcher (ES)"
 input = "214PP, j.214PP"
 kind = "es"
-notes = "ES of Mighty Launcher; projectile; usable in air"
-table = ""
-seq = ""
+notes = "ES of Mighty Launcher; projectile; usable in air; MEASURED 14z-120: ground a2:0x51, air a2:0x52, one stock each"
+table = "a2"
+seq = "0x51,0x52"
 
 [[move]]
 name = "Reflect Wall"
 input = "623P, j.623P"
 kind = "special"
-notes = "GUARD-CANCEL-ONLY: exists only as Phobos's guard cancel (623P in blockstun, ground or air) for 1 meter stock; no free input; NO ES version"
-table = ""
-seq = ""
+notes = "GUARD-CANCEL-ONLY: exists only as Phobos's guard cancel (623P in blockstun, ground or air) for 1 meter stock; no free input; NO ES version; MEASURED 14z-120 as the GUARD CANCEL (P2 Victor's HP/HK blocked at contact, 623+P inside blockstun): a:0x13 (block) -> b:0x0c (blockstun) -> a2:0x4c, for LP, MP, HP and PP alike; NOTHING in neutral (623LP = 2LP), nothing with a kick. THE BANKED STOCK COUNT DID NOT MOVE (+0x109 9 -> 9) on native vs2 — the bar fraction was not sampled"
+table = "a2"
+seq = "0x4c"
 
 [[move]]
 name = "Genocide Vulcan"
 input = "421K"
 kind = "special"
-notes = "Ground-to-air trap (whether hit or throw properties: unknown); ES = Genocide Vulcan (ES)"
-table = ""
-seq = ""
+notes = "Ground-to-air trap (whether hit or throw properties: unknown); ES = Genocide Vulcan (ES); MEASURED 14z-120: **THE INPUT IS 421+P, NOT 421+K** — 421LP/MP/HP -> a:0x29 -> a2:0x25 -> a2:0x26 or 0x27 -> a2:0x28 (attack boxes); 421K in nine cadences, ground/air/near/vs an airborne P2, only ever produced the crouching kick; 421KK is Erasing Sphere. Maintainer to confirm the list's 421K"
+table = "a2"
+seq = "0x25"
 
 [[move]]
 name = "Genocide Vulcan (ES)"
 input = "421KK"
 kind = "es"
-notes = "ES of Genocide Vulcan; ground-to-air trap"
-table = ""
-seq = ""
+notes = "ES of Genocide Vulcan; ground-to-air trap; MEASURED 14z-120: 421PP -> a2:0x25 (class 16) -> 0x26 -> 0x28, one stock"
+table = "a2"
+seq = "0x25"
 
 [[move]]
 name = "Plasma Trap"
 input = "j.214K"
 kind = "special"
-notes = "Air only; throws a shock mine on the ground; distance by K (three by button); ES = Plasma Trap (ES)"
-table = ""
-seq = ""
+notes = "Air only; throws a shock mine on the ground; distance by K (three by button); ES = Plasma Trap (ES); MEASURED 14z-120: j.214LK -> a2:0x2a, j.214MK -> a2:0x2b, j.214HK -> a2:0x2a right after take-off and a2:0x2b at the apex — the chain follows the situation, not the strength alone"
+table = "a2"
+seq = "0x2a,0x2b"
 
 [[move]]
 name = "Plasma Trap (ES)"
 input = "j.214KK"
 kind = "es"
-notes = "ES of Plasma Trap; air only; shock mine on the ground"
-table = ""
-seq = ""
+notes = "ES of Plasma Trap; air only; shock mine on the ground; MEASURED 14z-120: a2:0x2c, one stock"
+table = "a2"
+seq = "0x2c"
 
 # ---- EX ------------------------------------------------------------------
 
@@ -192,17 +200,17 @@ seq = ""
 name = "Final Guardian Beta"
 input = "623KK"
 kind = "ex"
-notes = "Projectile-type throw (touching the projectile = getting thrown)"
-table = ""
-seq = ""
+notes = "Projectile-type throw (touching the projectile = getting thrown); MEASURED 14z-120: a2:0x33 -> a2:0x21 (the dash chain) -> a2:0x34 -> a2:0x35 -> a2:0x39 -> a2:0x36, one stock"
+table = "a2"
+seq = "0x33"
 
 [[move]]
 name = "Erasing Sphere"
 input = "421KK"
 kind = "ex"
-notes = "Projectile; KK can be held for delay; the sphere only has a hitbox once it has travelled a certain distance, and that distance seems influenced by holding KK"
-table = ""
-seq = ""
+notes = "Projectile; KK can be held for delay; the sphere only has a hitbox once it has travelled a certain distance, and that distance seems influenced by holding KK; MEASURED 14z-120: held or tapped -> a:0x29 -> a2:0x40 (class 18), one stock"
+table = "a2"
+seq = "0x40"
 
 # ---- Dark Force ----------------------------------------------------------
 
@@ -210,7 +218,7 @@ seq = ""
 name = "Ray of Doom"
 input = "LP+LK, MP+MK, HP+HK"
 kind = "df"
-notes = "Dark Force; creates 2 clones that follow him and beam-attack when Phobos attacks; P+K of the same strength (universal input, listed for the name)"
+notes = "Dark Force; creates 2 clones that follow him and beam-attack when Phobos attacks; P+K of the same strength (universal input, listed for the name); MEASURED 14z-120: NO FIGHTER CHAIN (idle re-entered; two stocks on native vs2; 5LP and Plasma Beam inside DF enter their ordinary chains)"
 table = ""
 seq = ""
 
@@ -220,145 +228,145 @@ seq = ""
 name = "5LP"
 input = "5LP"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (the same layout as Donovan's)"
+table = "a2"
+seq = "0x00"
 
 [[move]]
 name = "5MP"
 input = "5MP"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (the same layout as Donovan's)"
+table = "a2"
+seq = "0x02"
 
 [[move]]
 name = "5HP"
 input = "5HP"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (the same layout as Donovan's)"
+table = "a2"
+seq = "0x04"
 
 [[move]]
 name = "5LK"
 input = "5LK"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (the same layout as Donovan's)"
+table = "a2"
+seq = "0x06"
 
 [[move]]
 name = "5MK"
 input = "5MK"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (the same layout as Donovan's)"
+table = "a2"
+seq = "0x08"
 
 [[move]]
 name = "5HK"
 input = "5HK"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (the same layout as Donovan's)"
+table = "a2"
+seq = "0x0a"
 
 [[move]]
 name = "2LP"
 input = "2LP"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (the same layout as Donovan's)"
+table = "a2"
+seq = "0x0c"
 
 [[move]]
 name = "2MP"
 input = "2MP"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (the same layout as Donovan's)"
+table = "a2"
+seq = "0x0d"
 
 [[move]]
 name = "2HP"
 input = "2HP"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (the same layout as Donovan's)"
+table = "a2"
+seq = "0x0e"
 
 [[move]]
 name = "2LK"
 input = "2LK"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (the same layout as Donovan's)"
+table = "a2"
+seq = "0x0f"
 
 [[move]]
 name = "2MK"
 input = "2MK"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (the same layout as Donovan's)"
+table = "a2"
+seq = "0x10"
 
 [[move]]
 name = "2HK"
 input = "2HK"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (the same layout as Donovan's)"
+table = "a2"
+seq = "0x11"
 
 [[move]]
 name = "j.LP"
 input = "j.LP"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (the same layout as Donovan's)"
+table = "a2"
+seq = "0x12"
 
 [[move]]
 name = "j.MP"
 input = "j.MP"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (the same layout as Donovan's)"
+table = "a2"
+seq = "0x13"
 
 [[move]]
 name = "j.HP"
 input = "j.HP"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (the same layout as Donovan's)"
+table = "a2"
+seq = "0x14"
 
 [[move]]
 name = "j.LK"
 input = "j.LK"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (the same layout as Donovan's)"
+table = "a2"
+seq = "0x15"
 
 [[move]]
 name = "j.MK"
 input = "j.MK"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (the same layout as Donovan's)"
+table = "a2"
+seq = "0x16"
 
 [[move]]
 name = "j.HK"
 input = "j.HK"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (the same layout as Donovan's)"
+table = "a2"
+seq = "0x17"
 
 # ---- movement (Air Dash / Float are Phobos's; the rest skeleton) --------
 
@@ -366,62 +374,62 @@ seq = ""
 name = "Air Dash"
 input = "j.66, j.44"
 kind = "dash"
-notes = "Air only; forward or back"
-table = ""
-seq = ""
+notes = "Air only; forward or back; MEASURED 14z-120: NO chain of its own — the airborne chain a:0x10 is RE-ENTERED with the object's class byte = 20 (the dash class) and P1 travels ~260 px (66) / ~250 px (44); a forward air dash lands on a:0x0c, a back one on the plain landing a:0x0f. Fires from a 66/44 tap 8-28 frames after take-off"
+table = "a"
+seq = "0x10"
 
 [[move]]
 name = "Float"
 input = "j.7 (hold), j.8 (hold), j.9 (hold)"
 kind = "misc"
-notes = "Air only; hold an up direction"
-table = ""
-seq = ""
+notes = "Air only; hold an up direction; MEASURED 14z-120: NO chain of its own — holding an up direction re-enters the neutral-jump chain a:0x12 and the fighter hangs (160 frames airborne against ~55); measured with 8 held; 9 held gave a forward air dash instead"
+table = "a"
+seq = "0x12"
 
 [[move]]
 name = "Forward dash"
 input = "66"
 kind = "dash"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120"
+table = "a2"
+seq = "0x21"
 
 [[move]]
 name = "Back dash"
 input = "44"
 kind = "dash"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120"
+table = "a2"
+seq = "0x22"
 
 [[move]]
 name = "Walk forward"
 input = "6"
 kind = "misc"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (idle = a:0x00)"
+table = "a"
+seq = "0x02"
 
 [[move]]
 name = "Walk back"
 input = "4"
 kind = "misc"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120"
+table = "a"
+seq = "0x04"
 
 [[move]]
 name = "Crouch"
 input = "2"
 kind = "misc"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120: a:0x09 -> a:0x01 -> a:0x06"
+table = "a"
+seq = "0x01"
 
 [[move]]
 name = "Jump"
 input = "8, 7, 9"
 kind = "misc"
-notes = "Neutral / back / forward"
-table = ""
-seq = ""
+notes = "Neutral / back / forward; MEASURED 14z-120: pre-jump a:0x0e -> airborne a:0x12 (neutral) / a:0x10 (forward) / a:0x11 (back) -> landing a:0x0f"
+table = "a"
+seq = "0x12"

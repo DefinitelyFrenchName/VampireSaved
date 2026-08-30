@@ -1,0 +1,137 @@
+{
+ "tenant": "huitzil",
+ "part": "4",
+ "events": [
+  {
+   "name": "Plasma Beam (ES) [PP]",
+   "frame": 2600,
+   "gap": 240,
+   "movement": false
+  },
+  {
+   "name": "Plasma Beam (ES) [KK]",
+   "frame": 2840,
+   "gap": 240,
+   "movement": false
+  },
+  {
+   "name": "Mighty Launcher (ES)",
+   "frame": 3080,
+   "gap": 240,
+   "movement": false
+  },
+  {
+   "name": "Mighty Launcher (ES) [air]",
+   "frame": 3320,
+   "gap": 240,
+   "movement": false
+  },
+  {
+   "name": "Genocide Vulcan (ES)",
+   "frame": 3560,
+   "gap": 240,
+   "movement": false
+  },
+  {
+   "name": "Plasma Trap (ES)",
+   "frame": 3800,
+   "gap": 240,
+   "movement": false
+  },
+  {
+   "name": "Final Guardian Beta",
+   "frame": 4040,
+   "gap": 320,
+   "movement": false
+  },
+  {
+   "name": "Erasing Sphere [KK held]",
+   "frame": 4360,
+   "gap": 400,
+   "movement": false
+  },
+  {
+   "name": "Erasing Sphere [KK tap]",
+   "frame": 4760,
+   "gap": 400,
+   "movement": false
+  },
+  {
+   "name": "Circuit Scrapper (ES)",
+   "frame": 5160,
+   "gap": 300,
+   "movement": false
+  },
+  {
+   "name": "Sitting Attack (ES) [8PP] off throw",
+   "frame": 5460,
+   "gap": 320,
+   "movement": false
+  },
+  {
+   "name": "Ray of Doom [LP+LK]",
+   "frame": 5780,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "5LP in DF",
+   "frame": 5980,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Plasma Beam [LP] in DF",
+   "frame": 6180,
+   "gap": 300,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "1400:ff8782:10",
+  "1450:ff8782:10",
+  "1500:ff8782:10",
+  "2550:ff8850:01200120",
+  "2950:ff8850:01200120",
+  "3350:ff8850:01200120",
+  "3750:ff8850:01200120",
+  "4150:ff8850:01200120",
+  "4550:ff8850:01200120",
+  "4950:ff8850:01200120",
+  "5350:ff8850:01200120",
+  "5750:ff8850:01200120",
+  "6150:ff8850:01200120",
+  "6550:ff8850:01200120",
+  "2560:ff8410:0228",
+  "2560:ff8810:02d8",
+  "2800:ff8410:0228",
+  "2800:ff8810:02d8",
+  "3040:ff8410:0228",
+  "3040:ff8810:02d8",
+  "3280:ff8410:0228",
+  "3280:ff8810:02d8",
+  "3520:ff8410:0228",
+  "3520:ff8810:02d8",
+  "3760:ff8410:0228",
+  "3760:ff8810:02d8",
+  "4000:ff8410:0228",
+  "4000:ff8810:02d8",
+  "4320:ff8410:0228",
+  "4320:ff8810:02d8",
+  "4720:ff8410:0228",
+  "4720:ff8810:02d8",
+  "5120:ff8410:0370",
+  "5120:ff8810:039d",
+  "5420:ff8410:0370",
+  "5420:ff8810:039d",
+  "5740:ff8410:0228",
+  "5740:ff8810:02d8",
+  "5940:ff8410:0228",
+  "5940:ff8810:02d8",
+  "6140:ff8410:0228",
+  "6140:ff8810:02d8",
+  "2540:ff8509:09",
+  "4640:ff8509:09"
+ ],
+ "frames": 6730
+}

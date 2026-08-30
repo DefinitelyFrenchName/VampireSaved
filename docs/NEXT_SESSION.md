@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-120 close, 2026-08-30)
+# NEXT SESSION — orientation (rewritten at the 14z-120 close, 2026-08-30; updated at 14z-120 (2))
 
 > ## **START HERE. NOTHING IS RED. NO BUILD CHANGED — the tree is still the
 > ## M12 freeze (merged-m14 `6649523a`, `build/m3b_merged21`), NOT PUSHED
@@ -17,14 +17,20 @@
 > ## Slay Shred has no fighter chain (2 stocks natively); `$FF8109` is a
 > ## BINARY timer (a `0x99` poke ends the round — `project/gotchas.md`).
 > ##
-> ## **NEXT, the maintainer's pick:** (A) the board verdict on M12; (B) the
-> ## naming rigs for HUITZIL and PYRON — add a schedule per tenant in
-> ## `tools/name_moves.py` (the Donovan one is the template; new recipes:
-> ## Galaxy Trip's six buttons ground+air, the air throws, Float, held-pair
-> ## EX inputs, Phobos's six 6+button normals), run, freeze
-> ## `tests/expected/move_naming_<tenant>.txt`, extend the gate's TENANT
-> ## loop; (C) phase 2 of the map (hitbox rectangles + attack records by
-> ## measurement — the chains now have NAMES to hang them on). Load
+> ## **UPDATE, same day (STATE 14z-120 (2)):** PYRON'S AND HUITZIL'S NAMING
+> ## STEPS ARE DONE TOO — 41 + 49 chain ids, both TOMLs filled, the gate
+> ## loops the three tenants, the appendices are labelled. The rig learned
+> ## to PIN BOTH FIGHTERS' X before every event (a throw had put P2 behind
+> ## P1 and half the first pass measured MIRRORED motions — `project/
+> ## gotchas.md`). TWO QUESTIONS FOR THE MAINTAINER: Genocide Vulcan measured
+> ## as 421+P (the list says 421+K, which never fired in nine cadences); no
+> ## ES Planet Burning was reached (63214PP = Cosmo Disruption).
+> ##
+> ## **NEXT, the maintainer's pick:** (A) the board verdict on M12; (B) phase
+> ## 2 of the map (hitbox rectangles + attack records by measurement — every
+> ## chain of the three tenants now has a NAME to hang them on); (C) the
+> ## small opens: Donovan's `0x3d` / Killshread Summon (ES); the Vulcan
+> ## input; the guard cancel's meter cost (sample `+0x10A`). Load
 > ## `vampire-saved-port` first.
 > ##
 > ## **OPEN, unchanged:** the 1:1 wheel mockup; #112/#113 parked; the FBNeo

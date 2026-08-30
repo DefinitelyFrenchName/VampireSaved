@@ -1,0 +1,178 @@
+{
+ "tenant": "huitzil",
+ "part": "6",
+ "events": [
+  {
+   "name": "Circuit Scrapper [MP] cont",
+   "frame": 2600,
+   "gap": 300,
+   "movement": false
+  },
+  {
+   "name": "Circuit Scrapper [HP] cont",
+   "frame": 2900,
+   "gap": 300,
+   "movement": false
+  },
+  {
+   "name": "Circuit Scrapper (ES) cont",
+   "frame": 3200,
+   "gap": 300,
+   "movement": false
+  },
+  {
+   "name": "Vulcan? [214LK ground]",
+   "frame": 3500,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Vulcan? [623LK]",
+   "frame": 3720,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Vulcan? [41236LK]",
+   "frame": 3940,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Vulcan? [63214LK]",
+   "frame": 4160,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Vulcan? [charge 2-8 LK]",
+   "frame": 4380,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Vulcan? [charge 4-6 LK]",
+   "frame": 4600,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Vulcan? [22LK]",
+   "frame": 4820,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Vulcan? [421LK near, slow]",
+   "frame": 5040,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Vulcan? [421LK air]",
+   "frame": 5260,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Reflect Wall [gc v: L to hit+1, 623LP at hit+2]",
+   "frame": 5480,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Reflect Wall [gc v: L to hit+1, 623LP at hit+6]",
+   "frame": 5700,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Reflect Wall [gc v: L to hit+1, 623HP at hit+2]",
+   "frame": 5920,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Reflect Wall [gc v: L to hit+1, 623LK at hit+2]",
+   "frame": 6140,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Reflect Wall [gc v: 623 buffered pre-hit, LP at hit+2]",
+   "frame": 6360,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Reflect Wall [gc v: P2 HK, L to hit+1, 623LP at hit+4]",
+   "frame": 6580,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Reflect Wall [gc v: P2 HK, 623LP at hit+10]",
+   "frame": 6800,
+   "gap": 220,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "1400:ff8782:10",
+  "1450:ff8782:10",
+  "1500:ff8782:10",
+  "2550:ff8850:01200120",
+  "2950:ff8850:01200120",
+  "3350:ff8850:01200120",
+  "3750:ff8850:01200120",
+  "4150:ff8850:01200120",
+  "4550:ff8850:01200120",
+  "4950:ff8850:01200120",
+  "5350:ff8850:01200120",
+  "5750:ff8850:01200120",
+  "6150:ff8850:01200120",
+  "6550:ff8850:01200120",
+  "6950:ff8850:01200120",
+  "2560:ff8410:0370",
+  "2560:ff8810:039d",
+  "2860:ff8410:0370",
+  "2860:ff8810:039d",
+  "3160:ff8410:0370",
+  "3160:ff8810:039d",
+  "3460:ff8410:0228",
+  "3460:ff8810:02d8",
+  "3680:ff8410:0228",
+  "3680:ff8810:02d8",
+  "3900:ff8410:0228",
+  "3900:ff8810:02d8",
+  "4120:ff8410:0228",
+  "4120:ff8810:02d8",
+  "4340:ff8410:0228",
+  "4340:ff8810:02d8",
+  "4560:ff8410:0228",
+  "4560:ff8810:02d8",
+  "4780:ff8410:0228",
+  "4780:ff8810:02d8",
+  "5000:ff8410:0370",
+  "5000:ff8810:039d",
+  "5220:ff8410:0228",
+  "5220:ff8810:02d8",
+  "5440:ff8410:0370",
+  "5440:ff8810:039d",
+  "5660:ff8410:0370",
+  "5660:ff8810:039d",
+  "5880:ff8410:0370",
+  "5880:ff8810:039d",
+  "6100:ff8410:0370",
+  "6100:ff8810:039d",
+  "6320:ff8410:0370",
+  "6320:ff8810:039d",
+  "6540:ff8410:0370",
+  "6540:ff8810:039d",
+  "6760:ff8410:0370",
+  "6760:ff8810:039d",
+  "2540:ff8509:09",
+  "4910:ff8509:09"
+ ],
+ "frames": 7270
+}

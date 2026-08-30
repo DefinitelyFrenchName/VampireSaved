@@ -1,0 +1,193 @@
+{
+ "tenant": "huitzil",
+ "part": "2",
+ "events": [
+  {
+   "name": "Plasma Beam [LP]",
+   "frame": 2600,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Plasma Beam [MP]",
+   "frame": 2820,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Plasma Beam [HP]",
+   "frame": 3040,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Plasma Beam [LK]",
+   "frame": 3260,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Plasma Beam [MK]",
+   "frame": 3480,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Plasma Beam [HK]",
+   "frame": 3700,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Mighty Launcher [LP]",
+   "frame": 3920,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Mighty Launcher [MP]",
+   "frame": 4140,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Mighty Launcher [HP]",
+   "frame": 4360,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Mighty Launcher [j.214LP]",
+   "frame": 4580,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Mighty Launcher [j.214HP]",
+   "frame": 4800,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Genocide Vulcan [LK]",
+   "frame": 5020,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Genocide Vulcan [MK]",
+   "frame": 5240,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Genocide Vulcan [HK]",
+   "frame": 5460,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Genocide Vulcan [LK] slow",
+   "frame": 5680,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Genocide Vulcan [LK] end-D",
+   "frame": 5900,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Genocide Vulcan [LK] near",
+   "frame": 6120,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Plasma Trap [j.214LK]",
+   "frame": 6340,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Plasma Trap [j.214MK]",
+   "frame": 6560,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Plasma Trap [j.214HK]",
+   "frame": 6780,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Plasma Trap [j.214HK] late",
+   "frame": 7000,
+   "gap": 220,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "1400:ff8782:10",
+  "1450:ff8782:10",
+  "1500:ff8782:10",
+  "2550:ff8850:01200120",
+  "2950:ff8850:01200120",
+  "3350:ff8850:01200120",
+  "3750:ff8850:01200120",
+  "4150:ff8850:01200120",
+  "4550:ff8850:01200120",
+  "4950:ff8850:01200120",
+  "5350:ff8850:01200120",
+  "5750:ff8850:01200120",
+  "6150:ff8850:01200120",
+  "6550:ff8850:01200120",
+  "6950:ff8850:01200120",
+  "7350:ff8850:01200120",
+  "2560:ff8410:0228",
+  "2560:ff8810:02d8",
+  "2780:ff8410:0228",
+  "2780:ff8810:02d8",
+  "3000:ff8410:0228",
+  "3000:ff8810:02d8",
+  "3220:ff8410:0228",
+  "3220:ff8810:02d8",
+  "3440:ff8410:0228",
+  "3440:ff8810:02d8",
+  "3660:ff8410:0228",
+  "3660:ff8810:02d8",
+  "3880:ff8410:0228",
+  "3880:ff8810:02d8",
+  "4100:ff8410:0228",
+  "4100:ff8810:02d8",
+  "4320:ff8410:0228",
+  "4320:ff8810:02d8",
+  "4540:ff8410:0228",
+  "4540:ff8810:02d8",
+  "4760:ff8410:0228",
+  "4760:ff8810:02d8",
+  "4980:ff8410:0228",
+  "4980:ff8810:02d8",
+  "5200:ff8410:0228",
+  "5200:ff8810:02d8",
+  "5420:ff8410:0228",
+  "5420:ff8810:02d8",
+  "5640:ff8410:0228",
+  "5640:ff8810:02d8",
+  "5860:ff8410:0228",
+  "5860:ff8810:02d8",
+  "6080:ff8410:0370",
+  "6080:ff8810:039d",
+  "6300:ff8410:0228",
+  "6300:ff8810:02d8",
+  "6520:ff8410:0228",
+  "6520:ff8810:02d8",
+  "6740:ff8410:0228",
+  "6740:ff8810:02d8",
+  "6960:ff8410:0228",
+  "6960:ff8810:02d8"
+ ],
+ "frames": 7470
+}

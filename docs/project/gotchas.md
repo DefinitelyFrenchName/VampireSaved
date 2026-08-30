@@ -3114,3 +3114,26 @@ rig confirmed. **Rule:** when an unexplained chain fires, list what STATE
 differed at the two firings before theorising — both firings were in a
 part whose sword was still planted.
 
+
+## A THROW PUTS P2 BEHIND P1 AND EVERY LATER MOTION MEASURES ITS MIRROR (14z-120 (2)) — pin both X before each event
+
+The Pyron/Huitzil naming pass measured 623 as 421, 41236 as 63214 and a
+"Zodiac Fire" that teleported: after the first throw P2 stood on P1's LEFT,
+P1 turned, and every scripted direction was read relative to the new
+facing. Nothing in the trace said so — the chains were real chains, the
+stocks were spent — only the x delta (a "rush" of −180) and the
+by-strength pattern (623LP and 421LP entering the SAME chain) gave it away.
+The fix is in the generator: an event may carry `far` / `near`, and 40
+frames before it both fighters' X (`+0x10.w`) are poked to a fixed pair
+(552/728, 880/925), so P1 always faces right and no walk-in is needed.
+Two smaller cuts of the same pass: (1) a walk-in's trailing R plus a
+motion's opening R is a DASH tap (Pyron `a2:0x24`, Huitzil `a2:0x21`) that
+eats the motion's first step; (2) a PAIR press inside a half circle is
+read by every ES tracker the motion CONTAINS — 63214 MP+HP gave the ES
+beam, LP+MP the ES launcher, and only LP+HP (the pair no other special
+claims) the ES grapple; and from a pinned pushbox OVERLAP the plain
+grapple never connected while one step back then 63214MP did. **Rule:**
+in any rig that throws, pin positions per event; read the x delta before
+believing a chain; when a pair press is the input, list every special
+whose motion is a substring of it.
+

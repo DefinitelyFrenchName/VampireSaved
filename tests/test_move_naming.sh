@@ -23,35 +23,48 @@
 #
 # TRAPS THIS RIG PAID FOR (project/gotchas.md): $FF8109 is a BINARY timer —
 # a 0x99 poke ends the round; 63214 contains 214, so a grapple with the sword
-# planted is Killshread Lightning; a facing flip turns "4" into forward.
+# planted is Killshread Lightning; a facing flip turns "4" into forward; a
+# throw leaves P2 behind P1 and mirrors every later motion (hence the
+# per-event position pins); and a MAME sandbox reused across tenants
+# carried an nvram that changed one throw's outcome ([VSP-117]) — every leg
+# now starts from a cleared sandbox.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/don_m18] tests/test_move_naming.sh   # emulator tier (MAME)
+# 14z-120 (2): all THREE tenants — Pyron (4 parts) and Huitzil (8 parts, the
+# last four the input search for Genocide Vulcan / the guard cancel / the
+# grapple, kept as measured) — each on its own extract, forced by the
+# early-window poke; every part pins both fighters' X before each event.
+#
+# Usage: ROMDIR=... [MAME_BIN=...] [DON=build/don_m18 HUI=build/hui52 PYR=build/pyron36] [TENANTS="donovan pyron huitzil"] tests/test_move_naming.sh   # emulator tier (MAME, ~3 min)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/don_m18}"  # the vs2 EXTRACT (the anim region + index pointers) comes from here
-EX="$BUILD/extract"
-[ -f "$EX/regions.json" ] || { echo "SKIP: no $EX/regions.json"; exit 0; }
+DON="${DON:-build/don_m18}"; HUI="${HUI:-build/hui52}"; PYR="${PYR:-build/pyron36}"   # the vs2 EXTRACTS (anim region + index pointers)
+TENANTS="${TENANTS:-donovan pyron huitzil}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
-TENANT=donovan
-PARTS="1 2 3 4 5 6 7 8"
+allfail=0
+for TENANT in $TENANTS; do
+case $TENANT in donovan) EX="$DON/extract";; huitzil) EX="$HUI/extract";; pyron) EX="$PYR/extract";; esac
+[ -f "$EX/regions.json" ] || { echo "SKIP: no $EX/regions.json"; exit 0; }
+PARTS="$(python3 -c "import sys; sys.path.insert(0,'tools'); import name_moves; print(' '.join(sorted(name_moves.SCHEDULES['$TENANT'], key=int)))")"
 EXP="tests/expected/move_naming_$TENANT.txt"
+fail=0
+echo "######## $TENANT (parts $PARTS)"
 
 echo "== 1. the committed rigs equal a regeneration"
 for p in $PARTS; do
     python3 tools/name_moves.py gen $TENANT $p "$W/r_$p.rpl" "$W/r_$p.json" >/dev/null || { bad "gen part $p"; continue; }
     if cmp -s "$W/r_$p.rpl" "tests/replays/naming/${TENANT}_$p.rpl" && cmp -s "$W/r_$p.json" "tests/replays/naming/${TENANT}_$p.json"; then :; else bad "part $p: tests/replays/naming/${TENANT}_$p.* drifted from tools/name_moves.py — regenerate"; fi
 done
-[ $fail = 0 ] && ok "8 rigs match the schedule"
+[ $fail = 0 ] && ok "$(echo $PARTS | wc -w | tr -d ' ') rigs match the schedule"
 
 echo "== 2. decode the five anim tables from the vs2 extract"
-mkdir -p "$W/chains"
+rm -rf "$W/chains"; mkdir -p "$W/chains"
 python3 - "$EX" "$W/chains" <<'PY' || { bad "decode"; echo FAIL; exit 1; }
 import json, subprocess, sys
 ex, w = sys.argv[1], sys.argv[2]
@@ -63,9 +76,9 @@ for name in ("a", "a2", "b", "c", "proj"):
                            "--json", f"{w}/{name}.json"], stdout=subprocess.DEVNULL)
 PY
 
-echo "== 3. the eight native vs2 legs (parallel)"
+echo "== 3. the native vs2 legs (parallel)"
 for p in $PARTS; do
-    mkdir -p "$W/sb$p"
+    rm -rf "$W/sb$p"; mkdir -p "$W/sb$p"   # [VSP-117]: a sandbox carried from another tenant's leg flipped one throw outcome (14z-120 (2))
     POKES="$(python3 -c "import json;print(';'.join(json.load(open('$W/r_$p.json'))['pokes']))")"
     FR="$(python3 -c "import json;print(json.load(open('$W/r_$p.json'))['frames'])")"
     ( cd "$W" && MAME_SANDBOX="$W/sb$p" REPLAY="$W/r_$p.rpl" POKES="$POKES" \
@@ -75,13 +88,13 @@ for p in $PARTS; do
 done
 wait
 for p in $PARTS; do [ -s "$W/trace_$p.txt" ] || bad "part $p: no field samples (see the MAME log)"; done
-[ $fail = 0 ] || { echo FAIL; exit 1; }
+[ $fail = 0 ] || { echo "$TENANT: FAIL (a leg did not run)"; allfail=1; continue; }
 
 echo "== 4. measured chains vs the frozen expectation"
 : > "$W/got.txt"
 for p in $PARTS; do python3 tools/name_moves.py expect "$W/r_$p.json" "$W/trace_$p.txt" "$W/chains" >> "$W/got.txt" || bad "expect part $p"; done
 if diff -u "$EXP" "$W/got.txt" > "$W/diff.txt"; then
-    ok "$(wc -l < "$W/got.txt" | tr -d ' ') event lines identical to $EXP (incl. the two positive controls)"
+    ok "$(wc -l < "$W/got.txt" | tr -d ' ') event lines identical to $EXP"
 else
     bad "measured chains differ from $EXP:"; head -40 "$W/diff.txt"
 fi
@@ -115,6 +128,8 @@ L[i] = L[i].replace("a2:0x00", "a2:0x02")
 open(sys.argv[2], "w").write("\n".join(L))
 PY
 if diff -q "$W/ctl.txt" "$W/got.txt" >/dev/null; then bad "control: a swapped 5LP chain compared EQUAL — the compare is not comparing"; else ok "control: the swapped 5LP line fails the compare"; fi
-
-[ $fail = 0 ] && echo PASS || echo FAIL
-exit $fail
+[ $fail = 0 ] && echo "$TENANT: PASS" || { echo "$TENANT: FAIL"; allfail=1; }
+rm -f "$W"/trace_*.txt "$W"/r_*.rpl "$W"/r_*.json "$W"/got.txt
+done
+[ $allfail = 0 ] && echo PASS || echo FAIL
+exit $allfail

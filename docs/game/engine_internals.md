@@ -682,6 +682,29 @@ frame by `tests/lua/field_trace.lua`, each pointer mapped onto the graph
   vs2 (the port spends one — 14z-69), and the mode lasted 332 frames in the
   rig; the normals inside DF enter their ordinary chains (the DF effect is
   the object family, not the fighter's animation).
+- **Pyron and Huitzil (14z-120 (2), same rig, each forced by the early-window
+  poke, both fighters' X pinned before every event):** the `a2` layout is
+  the SAME (standing `0x00-0x0b` with the ODD ids = the 6+button
+  alternates — Huitzil's six "alternate attacks" `0x01,03,05,07,09,0b`,
+  Pyron's Rushing Punch `0x01` — crouching `0x0c-0x11`, jumping `0x12-0x17`,
+  throw start `0x1e`), then each character's own specials. What differs
+  from Donovan is HOW MUCH is a parameter: Pyron's Sol Smasher is ONE chain
+  for all three strengths (`0x26`, air `0x2a`) and its ES is the SAME chain
+  with the object's class byte 16 instead of 14; Galaxy Trip is ONE chain
+  (`0x3a -> 0x3b`) for all twelve inputs and the destination is data (P =
+  into the air, K = on the ground; L/M/H = distance); Cosmo Disruption is
+  one chain (`0x3c`) for PP and KK, held or tapped. Huitzil's Plasma Beam
+  is per BUTTON KIND (P `0x44-0x46`, K `0x41-0x43`, ES `0x47-0x4a` for
+  either pair) after a table-`a` wind-up `0x28`; the guard-cancel-only
+  Reflect Wall is `0x4c` for any punch, entered from blockstun (`a:0x13`
+  block -> `b:0x0c` blockstun) and NOT from neutral, with the banked stock
+  count unchanged; **Genocide Vulcan's input measured as 421+P** (`0x25 ->
+  0x26|0x27 -> 0x28`; 421+K in nine cadences only ever gave the crouching
+  kick, and 421+KK is Erasing Sphere `0x40`). Air Dash and Float have NO
+  chain of their own: the air dash RE-ENTERS the airborne chain `a:0x10`
+  with class byte 20 (a ~260 px displacement, forward landing `a:0x0c`),
+  Float re-enters the neutral-jump chain `a:0x12` and hangs. Both Dark
+  Forces (Shining Gemini, Ray of Doom) are chain-less like Slay Shred.
 - **Three ways the rig's own input lied**, filed in `project/gotchas.md`: the
   round timer `$FF8109` is BINARY (99, one tick per ~82 frames) so a `0x99`
   poke ENDS the round; `63214` contains `214`, so a grapple with the sword

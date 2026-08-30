@@ -55,12 +55,21 @@ PROLOGUE = """300-305 sys=C1
 1360-1362 p2=1
 """
 FIRST_EVENT = 2600
+# The native game is vsav2 for all three; Donovan is the default cursor's
+# R,R pick, the other two are FORCED by the early-window poke ([VSP-120]:
+# 1400-1500 only, the idiom of audit_clone_beam_lines.sh). The chains are
+# decoded from each tenant's vs2 extract (the solo build dir).
+TENANTS = {"donovan": {"id": None, "build": "build/don_m18"},
+           "huitzil": {"id": "10", "build": "build/hui52"},
+           "pyron":   {"id": "11", "build": "build/pyron36"}}
 # P2 HP re-pin (both words, [VSP-125]) so a projectile-fed Victor never dies.
 HP_PIN_EVERY = 400
 
 # ---------------------------------------------------------------- recipes
-# A recipe is a list of (start_offset, end_offset, tokens) relative to the
-# event frame; tokens in replay.lua grammar (U D L R 1-6). P1 faces RIGHT.
+# A recipe is a list of (start_offset, end_offset, tokens[, who]) relative to
+# the event frame; tokens in replay.lua grammar (U D L R 1-6), who = p1
+# (default) or p2 (the idle Victor, scripted only for an air throw's jump
+# and the guard-cancel setup). P1 faces RIGHT.
 B = {"LP": "1", "MP": "2", "HP": "3", "LK": "4", "MK": "5", "HK": "6",
      "PP": "13", "KK": "46"}  # PP/KK = any two: LP+HP / LK+HK (ES resolver takes any pair)
 
@@ -99,6 +108,40 @@ def throw_then_pursuit(b):
     # a press that misses the window reads as a plain jump (a:0x0e) and is
     # visible as such.
     return [(0, 3, "R2")] + [(o, o + 2, "U" + B[b]) for o in (50, 65, 80, 95, 110)]
+
+
+def air_throw(b):   # both jump from contact; P1 presses toward+button at the apex
+    return [(0, 2, "U"), (0, 2, "U", "p2"), (14, 17, "R" + B[b])]
+def hold_pair(motion, pair, hold):  # an EX whose pair is HELD then released
+    r = motion("LP")[:-1]; a, bb, _ = motion("LP")[-1]
+    return r + [(a, a + hold, pair)]
+def rushing_punch():  # while dashing, 6+P
+    return [(0, 1, "R"), (4, 5, "R"), (9, 12, "R1")]
+def guard_cancel(b, hit_at):
+    # P2 (Victor, at contact) presses HP; P1 blocks (holds back through the
+    # hit) then inputs 623+b inside blockstun. hit_at = frames from P2's press
+    # to the block, tried at several values by separate events.
+    return [(0, 3, "3", "p2"), (-4, hit_at + 4, "L"), (hit_at + 5, hit_at + 7, "R"), (hit_at + 8, hit_at + 10, "D"), (hit_at + 11, hit_at + 14, "DR" + B[b])]
+
+
+def air_qcb_late(b):  # the motion at the apex (Pyron's high jump)
+    return [(0, 2, "U"), (18, 20, "D"), (21, 23, "DL"), (24, 30, "L"), (26, 30, B[b])]
+def rdp_slow(b):      # 421 with longer holds, button on the DL
+    return [(0, 4, "L"), (6, 10, "D"), (12, 18, "DL"), (14, 18, B[b])]
+def rdp_end_d(b):     # 4 2 1 then the button on a final D (some trackers want 4-2-1-2)
+    return [(0, 2, "L"), (4, 6, "D"), (8, 10, "DL"), (12, 16, "D"), (13, 16, B[b])]
+def gc_fast(b, at):   # guard cancel: P2 HP at 0; P1 holds back through the block, then a 6-frame 623+b at `at`
+    return [(0, 3, "3", "p2"), (-4, at + 1, "L"), (at, at + 1, "R"), (at + 2, at + 3, "D"), (at + 4, at + 7, "DR" + B[b])]
+
+
+def hcb_cont(b):      # 63214 with no release between R and DR (a release re-reads as a dash tap)
+    return [(0, 2, "R"), (2, 4, "DR"), (4, 6, "D"), (6, 8, "DL"), (8, 14, "L"), (10, 14, B[b])]
+def charge_du(b):     # charge D then U+button
+    return [(0, 60, "D"), (61, 64, "U" + B[b])]
+def charge_bf(b):     # charge back then F+button
+    return [(0, 60, "L"), (61, 64, "R" + B[b])]
+def gc_v(b, l_end, at):  # guard cancel variant: back held until l_end, 623+b from `at`
+    return [(0, 3, "3", "p2"), (-4, l_end, "L"), (at, at + 1, "R"), (at + 2, at + 3, "D"), (at + 4, at + 7, "DR" + B[b])]
 
 
 def pursuit(b):
@@ -264,9 +307,172 @@ DONOVAN = {
         ("Change Immortal + 2 held", seq_buttons(["MP", "LP", "L", "LK", "MK"]) + [(20, 200, "D")], 400),
     ],
 }
-SCHEDULES = {"donovan": DONOVAN}
+NORMALS = [(n, f, g) for n, f, g in (
+    ("5LP", stand("LP"), 120), ("5MP", stand("MP"), 120), ("5HP", stand("HP"), 150),
+    ("5LK", stand("LK"), 120), ("5MK", stand("MK"), 120), ("5HK", stand("HK"), 150),
+    ("2LP", crouch("LP"), 120), ("2MP", crouch("MP"), 120), ("2HP", crouch("HP"), 150),
+    ("2LK", crouch("LK"), 120), ("2MK", crouch("MK"), 120), ("2HK", crouch("HK"), 150),
+    ("j.LP", jump("LP"), 150), ("j.MP", jump("MP"), 150), ("j.HP", jump("HP"), 150),
+    ("j.LK", jump("LK"), 150), ("j.MK", jump("MK"), 150), ("j.HK", jump("HK"), 150))]
+MOVEMENT = [
+    ("Walk forward", walk_in(40), 120), ("Walk back", [(0, 40, "L")], 120), ("Crouch", [(0, 30, "D")], 120),
+    ("Jump [8]", [(0, 2, "U")], 120), ("Jump [9]", [(0, 2, "UR")], 120), ("Jump [7]", [(0, 2, "UL")], 120),
+    ("Forward dash", dash_f(), 150), ("Back dash", dash_b(), 150)]
+
+PYRON = {
+    "1": [(n, r, g, "far") for n, r, g in MOVEMENT + NORMALS] + [
+        ("Rushing Punch", rushing_punch(), 200, "far"),
+        ("Diving Punch [j.2LP]", air_down("LP"), 150, "far"), ("Diving Punch [j.2MP]", air_down("MP"), 150, "far"), ("Diving Punch [j.2HP]", air_down("HP"), 150, "far"),
+    ],
+    "2": [
+        ("Sol Smasher [LP]", qcf("LP"), 200, "far"), ("Sol Smasher [MP]", qcf("MP"), 200, "far"), ("Sol Smasher [HP]", qcf("HP"), 200, "far"),
+        ("Sol Smasher [j.236LP]", air_qcf("LP"), 200, "far"), ("Sol Smasher [j.236HP]", air_qcf("HP"), 200, "far"),
+        ("Zodiac Fire [LP]", dp("LP"), 200, "far"), ("Zodiac Fire [MP]", dp("MP"), 200, "far"), ("Zodiac Fire [HP]", dp("HP"), 200, "far"),
+        ("Orbital Blaze [j.214LK]", air_qcb_fast("LK"), 200, "far"), ("Orbital Blaze [j.214MK]", air_qcb_fast("MK"), 200, "far"), ("Orbital Blaze [j.214HK]", air_qcb_fast("HK"), 200, "far"),
+        ("Orbital Blaze [j.214LK] late", air_qcb_late("LK"), 200, "far"), ("Orbital Blaze [j.214HK] late", air_qcb_late("HK"), 200, "far"),
+        ("Galaxy Trip [421LP]", rdp("LP"), 200, "far"), ("Galaxy Trip [421MP]", rdp("MP"), 200, "far"), ("Galaxy Trip [421HP]", rdp("HP"), 200, "far"),
+        ("Galaxy Trip [421LK]", rdp("LK"), 200, "far"), ("Galaxy Trip [421MK]", rdp("MK"), 200, "far"), ("Galaxy Trip [421HK]", rdp("HK"), 200, "far"),
+        ("Galaxy Trip [421LK] slow", rdp_slow("LK"), 200, "far"), ("Galaxy Trip [421HK] slow", rdp_slow("HK"), 200, "far"),
+        ("Galaxy Trip [j.421LP]", air_rdp("LP"), 200, "far"), ("Galaxy Trip [j.421MP]", air_rdp("MP"), 200, "far"), ("Galaxy Trip [j.421HP]", air_rdp("HP"), 200, "far"),
+        ("Galaxy Trip [j.421LK]", air_rdp("LK"), 200, "far"), ("Galaxy Trip [j.421MK]", air_rdp("MK"), 200, "far"), ("Galaxy Trip [j.421HK]", air_rdp("HK"), 200, "far"),
+    ],
+    "3": [
+        ("Corona Whip [6MP]", throw_fwd("MP"), 260, "near"), ("Corona Whip [6HP]", throw_fwd("HP"), 260, "near"),
+        ("Corona Whip [4MP]", [(0, 3, "L2")], 260, "near"),
+        ("Planet Burning [MP]", hcb("MP"), 300, "near"), ("Planet Burning [HP]", hcb("HP"), 300, "near"),
+        ("Planet Burning [MP] far (whiff)", hcb("MP"), 260, "far"),
+        ("Galactic Throw [j.6MP]", air_throw("MP"), 220, "near"), ("Galactic Throw [j.6HP]", air_throw("HP"), 220, "near"),
+        ("Sitting Attack [8P] off throw", throw_then_pursuit("LP"), 320, "near"),
+        ("Sitting Attack [8K] off throw", throw_then_pursuit("LK"), 320, "near"),
+    ],
+    "4": [  # meter
+        ("Sol Smasher (ES)", qcf("PP"), 220, "far"), ("Sol Smasher (ES) [air]", air_qcf("PP"), 220, "far"),
+        ("Zodiac Fire (ES)", dp("PP"), 220, "far"),
+        ("Orbital Blaze (ES)", air_qcb_fast("KK"), 220, "far"), ("Orbital Blaze (ES) late", air_qcb_late("KK"), 220, "far"),
+        ("Cosmo Disruption [PP held]", hold_pair(hcf, "13", 40), 400, "far"),
+        ("Cosmo Disruption [KK held]", hold_pair(hcf, "46", 40), 400, "far"),
+        ("Cosmo Disruption [PP tap]", hcf("PP"), 400, "far"),
+        ("Piled Hell [623KK]", dp("KK"), 300, "far"), ("Piled Hell [j.623KK]", air_dp("KK"), 300, "far"),
+        ("Planet Burning (ES)", hcb("PP"), 300, "near"),
+        ("Sitting Attack (ES) [8PP] off throw", throw_then_pursuit("PP"), 320, "near"),
+        ("Shining Gemini [LP+LK]", pair("14"), 200, "far"),
+        ("5LP in DF", stand("LP"), 200, "far"), ("Sol Smasher [LP] in DF", qcf("LP"), 300, "far"),
+    ],
+}
+HUITZIL = {
+    "1": [(n, r, g, "far") for n, r, g in MOVEMENT + NORMALS] + [
+        ("6LP", fwd("LP"), 150, "far"), ("6MP", fwd("MP"), 150, "far"), ("6HP", fwd("HP"), 150, "far"),
+        ("6LK", fwd("LK"), 150, "far"), ("6MK", fwd("MK"), 150, "far"), ("6HK", fwd("HK"), 150, "far"),
+        ("Air Dash [j.66] early", [(0, 2, "U"), (8, 9, "R"), (12, 13, "R")], 200, "far"),
+        ("Air Dash [j.66] mid", [(0, 2, "U"), (14, 15, "R"), (18, 19, "R")], 200, "far"),
+        ("Air Dash [j.66] apex", [(0, 2, "U"), (24, 25, "R"), (28, 29, "R")], 200, "far"),
+        ("Air Dash [j.44] mid", [(0, 2, "U"), (14, 15, "L"), (18, 19, "L")], 200, "far"),
+        ("Air Dash [j.66] fwd jump", [(0, 2, "UR"), (14, 15, "R"), (18, 19, "R")], 200, "far"),
+        ("Float [j.8 hold]", [(0, 2, "U"), (10, 90, "U")], 250, "far"),
+        ("Float [j.8 re-press]", [(0, 2, "U"), (20, 80, "U")], 250, "far"),
+        ("Float [j.9 hold]", [(0, 2, "UR"), (8, 80, "UR")], 250, "far"),
+        ("Float [j.7 hold at apex]", [(0, 2, "U"), (28, 90, "UL")], 250, "far"),
+    ],
+    "2": [
+        ("Plasma Beam [LP]", qcf("LP"), 220, "far"), ("Plasma Beam [MP]", qcf("MP"), 220, "far"), ("Plasma Beam [HP]", qcf("HP"), 220, "far"),
+        ("Plasma Beam [LK]", qcf("LK"), 220, "far"), ("Plasma Beam [MK]", qcf("MK"), 220, "far"), ("Plasma Beam [HK]", qcf("HK"), 220, "far"),
+        ("Mighty Launcher [LP]", qcb("LP"), 220, "far"), ("Mighty Launcher [MP]", qcb("MP"), 220, "far"), ("Mighty Launcher [HP]", qcb("HP"), 220, "far"),
+        ("Mighty Launcher [j.214LP]", air_qcb_fast("LP"), 220, "far"), ("Mighty Launcher [j.214HP]", air_qcb_fast("HP"), 220, "far"),
+        ("Genocide Vulcan [LK]", rdp("LK"), 220, "far"), ("Genocide Vulcan [MK]", rdp("MK"), 220, "far"), ("Genocide Vulcan [HK]", rdp("HK"), 220, "far"),
+        ("Genocide Vulcan [LK] slow", rdp_slow("LK"), 220, "far"), ("Genocide Vulcan [LK] end-D", rdp_end_d("LK"), 220, "far"),
+        ("Genocide Vulcan [LK] near", rdp("LK"), 220, "near"),
+        ("Plasma Trap [j.214LK]", air_qcb_fast("LK"), 220, "far"), ("Plasma Trap [j.214MK]", air_qcb_fast("MK"), 220, "far"), ("Plasma Trap [j.214HK]", air_qcb_fast("HK"), 220, "far"),
+        ("Plasma Trap [j.214HK] late", air_qcb_late("HK"), 220, "far"),
+    ],
+    "3": [
+        ("Magnet Slam [6MP]", throw_fwd("MP"), 260, "near"), ("Magnet Slam [6HP]", throw_fwd("HP"), 260, "near"),
+        ("Magnet Slam [4MP]", [(0, 3, "L2")], 260, "near"),
+        ("Circuit Scrapper [MP]", hcb("MP"), 300, "near"), ("Circuit Scrapper [HP]", hcb("HP"), 300, "near"),
+        ("Circuit Scrapper [MP] far (whiff)", hcb("MP"), 260, "far"),
+        ("Sky Capture [j.6MP]", air_throw("MP"), 220, "near"), ("Sky Capture [j.6HP]", air_throw("HP"), 220, "near"),
+        ("Sitting Attack [8P] off throw", throw_then_pursuit("LP"), 320, "near"),
+        ("Sitting Attack [8K] off throw", throw_then_pursuit("LK"), 320, "near"),
+    ],
+    "4": [  # meter
+        ("Plasma Beam (ES) [PP]", qcf("PP"), 240, "far"), ("Plasma Beam (ES) [KK]", qcf("KK"), 240, "far"),
+        ("Mighty Launcher (ES)", qcb("PP"), 240, "far"), ("Mighty Launcher (ES) [air]", air_qcb_fast("PP"), 240, "far"),
+        ("Genocide Vulcan (ES)", rdp("KK"), 240, "far"),
+        ("Plasma Trap (ES)", air_qcb_fast("KK"), 240, "far"),
+        ("Final Guardian Beta", dp("KK"), 320, "far"),
+        ("Erasing Sphere [KK held]", hold_pair(rdp, "46", 40), 400, "far"), ("Erasing Sphere [KK tap]", rdp("KK"), 400, "far"),
+        ("Circuit Scrapper (ES)", hcb("PP"), 300, "near"),
+        ("Sitting Attack (ES) [8PP] off throw", throw_then_pursuit("PP"), 320, "near"),
+        ("Ray of Doom [LP+LK]", pair("14"), 200, "far"),
+        ("5LP in DF", stand("LP"), 200, "far"), ("Plasma Beam [LP] in DF", qcf("LP"), 300, "far"),
+    ],
+    "5": [  # Reflect Wall = the guard cancel: P2 Victor HP at contact, P1 blocks then 623+button inside blockstun
+        ("Reflect Wall [gc LP at hit+2]", gc_fast("LP", 12), 220, "near"),
+        ("Reflect Wall [gc LP at hit+6]", gc_fast("LP", 16), 220, "near"),
+        ("Reflect Wall [gc LP at hit+10]", gc_fast("LP", 20), 220, "near"),
+        ("Reflect Wall [gc LP at hit+14]", gc_fast("LP", 24), 220, "near"),
+        ("Reflect Wall [gc HP at hit+6]", gc_fast("HP", 16), 220, "near"),
+        ("Reflect Wall [gc LK at hit+6]", gc_fast("LK", 16), 220, "near"),
+        ("Reflect Wall [gc HK at hit+6]", gc_fast("HK", 16), 220, "near"),
+        ("Reflect Wall [gc PP at hit+6]", gc_fast("PP", 16), 220, "near"),
+        ("Reflect Wall [gc LP at hit+6] (control: no block)", [(0, 3, "3", "p2"), (16, 17, "R"), (18, 19, "D"), (20, 23, "DR1")], 220, "near"),
+    ],
+    "6": [  # the three holes: Genocide Vulcan's input, the grapple without a dash tap, guard-cancel variants
+        ("Circuit Scrapper [MP] cont", hcb_cont("MP"), 300, "near"), ("Circuit Scrapper [HP] cont", hcb_cont("HP"), 300, "near"),
+        ("Circuit Scrapper (ES) cont", hcb_cont("PP"), 300, "near"),
+        ("Vulcan? [214LK ground]", qcb("LK"), 220, "far"), ("Vulcan? [623LK]", dp("LK"), 220, "far"),
+        ("Vulcan? [41236LK]", hcf("LK"), 220, "far"), ("Vulcan? [63214LK]", hcb_cont("LK"), 220, "far"),
+        ("Vulcan? [charge 2-8 LK]", charge_du("LK"), 220, "far"), ("Vulcan? [charge 4-6 LK]", charge_bf("LK"), 220, "far"),
+        ("Vulcan? [22LK]", [(0, 2, "D"), (4, 6, "D"), (5, 8, "4")], 220, "far"),
+        ("Vulcan? [421LK near, slow]", rdp_slow("LK"), 220, "near"),
+        ("Vulcan? [421LK air]", air_rdp("LK"), 220, "far"),
+        ("Reflect Wall [gc v: L to hit+1, 623LP at hit+2]", gc_v("LP", 11, 12), 220, "near"),
+        ("Reflect Wall [gc v: L to hit+1, 623LP at hit+6]", gc_v("LP", 11, 16), 220, "near"),
+        ("Reflect Wall [gc v: L to hit+1, 623HP at hit+2]", gc_v("HP", 11, 12), 220, "near"),
+        ("Reflect Wall [gc v: L to hit+1, 623LK at hit+2]", gc_v("LK", 11, 12), 220, "near"),
+        ("Reflect Wall [gc v: 623 buffered pre-hit, LP at hit+2]", [(0, 3, "3", "p2"), (-4, 4, "L"), (5, 6, "R"), (7, 8, "D"), (9, 10, "DR"), (12, 15, "1")], 220, "near"),
+        ("Reflect Wall [gc v: P2 HK, L to hit+1, 623LP at hit+4]", [(0, 3, "6", "p2"), (-4, 13, "L"), (14, 15, "R"), (16, 17, "D"), (18, 21, "DR1")], 220, "near"),
+        ("Reflect Wall [gc v: P2 HK, 623LP at hit+10]", [(0, 3, "6", "p2"), (-4, 13, "L"), (20, 21, "R"), (22, 23, "D"), (24, 27, "DR1")], 220, "near"),
+    ],
+    "7": [  # the guard cancel by button; the plain grapple with a later button; Vulcan with punches / vs an airborne P2
+        ("Reflect Wall [gc LP]", gc_v("LP", 11, 12), 240, "near"), ("Reflect Wall [gc MP]", gc_v("MP", 11, 12), 240, "near"),
+        ("Reflect Wall [gc HP]", gc_v("HP", 11, 12), 240, "near"), ("Reflect Wall [gc LK]", gc_v("LK", 11, 12), 240, "near"),
+        ("Reflect Wall [gc MK]", gc_v("MK", 11, 12), 240, "near"), ("Reflect Wall [gc HK]", gc_v("HK", 11, 12), 240, "near"),
+        ("Reflect Wall [gc PP]", gc_v("PP", 11, 12), 240, "near"),
+        ("Reflect Wall [623LP neutral]", dp("LP"), 220, "far"),
+        ("Circuit Scrapper [MP] late button", [(0, 2, "R"), (2, 4, "DR"), (4, 6, "D"), (6, 8, "DL"), (8, 18, "L"), (14, 18, "2")], 300, "near"),
+        ("Circuit Scrapper [HP] late button", [(0, 2, "R"), (2, 4, "DR"), (4, 6, "D"), (6, 8, "DL"), (8, 18, "L"), (14, 18, "3")], 300, "near"),
+        ("Circuit Scrapper [MP] motion then button", [(0, 2, "R"), (2, 4, "DR"), (4, 6, "D"), (6, 8, "DL"), (8, 12, "L"), (13, 16, "2")], 300, "near"),
+        ("Vulcan? [421LP]", rdp("LP"), 220, "far"), ("Vulcan? [421MP]", rdp("MP"), 220, "far"), ("Vulcan? [421HP]", rdp("HP"), 220, "far"),
+        ("Vulcan? [421LK vs airborne P2]", [(0, 2, "U", "p2")] + [(a + 10, b + 10, t) for a, b, t in rdp("LK")], 220, "far"),
+        ("Vulcan? [421HK vs airborne P2]", [(0, 2, "U", "p2")] + [(a + 10, b + 10, t) for a, b, t in rdp("HK")], 220, "far"),
+        ("Vulcan? [421KK vs airborne P2]", [(0, 2, "U", "p2")] + [(a + 10, b + 10, t) for a, b, t in rdp("KK")], 220, "far"),
+        ("Vulcan? [421LK near vs airborne P2]", [(0, 2, "U", "p2")] + [(a + 10, b + 10, t) for a, b, t in rdp("LK")], 220, "near"),
+    ],
+    "8": [  # Vulcan's ES (421PP), the grapple with pairs and at a step more distance, the GC's stock cost with meter
+        ("Genocide Vulcan (ES) [421PP]", rdp("PP"), 260, "far"),
+        ("Genocide Vulcan [421LP] (2)", rdp("LP"), 260, "far"),
+        ("Circuit Scrapper [63214 MP+HP]", [(0, 2, "R"), (2, 4, "DR"), (4, 6, "D"), (6, 8, "DL"), (8, 14, "L"), (10, 14, "23")], 300, "near"),
+        ("Circuit Scrapper [63214 LP+MP]", [(0, 2, "R"), (2, 4, "DR"), (4, 6, "D"), (6, 8, "DL"), (8, 14, "L"), (10, 14, "12")], 300, "near"),
+        ("Circuit Scrapper [63214 LP+HP] (ES, meter)", hcb_cont("PP"), 300, "near"),
+        ("Circuit Scrapper [63214MP] step back", [(0, 2, "L"), (30, 32, "R"), (32, 34, "DR"), (34, 36, "D"), (36, 38, "DL"), (38, 44, "L"), (40, 44, "2")], 300, "near"),
+        ("Circuit Scrapper [63214MP] no-pin walk", [(0, 60, "R"), (90, 92, "R"), (92, 94, "DR"), (94, 96, "D"), (96, 98, "DL"), (98, 104, "L"), (100, 104, "2")], 300, "far"),
+        ("Reflect Wall [gc MP] (meter)", gc_v("MP", 11, 12), 240, "near"),
+        ("Reflect Wall [gc HP] (meter)", gc_v("HP", 11, 12), 240, "near"),
+    ],
+}
+SCHEDULES = {"donovan": DONOVAN, "pyron": PYRON, "huitzil": HUITZIL}
 # stock pokes for the meter parts: frame -> 9 stocks (each ES/EX/DF spends 1)
-METER_PARTS = {"3", "4", "5", "6", "7", "8"}
+METER_PARTS = {"donovan": {"3", "4", "5", "6", "7", "8"}, "pyron": {"4", "5"}, "huitzil": {"4", "5", "6", "7", "8"}}
+
+
+# Per-event POSITION PINS (the 14z-120 fix for the Pyron/Huitzil first pass):
+# after a throw P2 may land BEHIND P1, P1 turns, and every motion mirrors
+# (623 <-> 421, 41236 <-> 63214) — half the first pass measured the mirror
+# move. A schedule entry may carry a 4th field "far" / "near": 40 frames
+# before the event both fighters' X (+0x10.w) are poked — far = the natural
+# round-start spacing, near = pushbox contact — so P1 always faces RIGHT
+# and no walk-in (whose trailing R + the motion's R made a DASH) is needed.
+PIN = {"far": (552, 728), "near": (880, 925)}
 
 
 def gen(tenant, part, out_rpl, out_sched):
@@ -277,23 +483,33 @@ def gen(tenant, part, out_rpl, out_sched):
              PROLOGUE.rstrip()]
     sched = {"tenant": tenant, "part": part, "events": [], "pokes": []}
     t = FIRST_EVENT
-    for name, recipe, gap in ev:
-        for a, b, tok in recipe:
-            lines.append(f"{t + a}-{t + b} p1={tok}")
+    tid = TENANTS[tenant]["id"]
+    pin_pokes = []
+    for e in ev:
+        name, recipe, gap = e[:3]
+        if len(e) > 3:
+            x1, x2 = PIN[e[3]]
+            pin_pokes += [f"{t - 40}:ff8410:{x1:04x}", f"{t - 40}:ff8810:{x2:04x}"]
+        for r in recipe:
+            a, b, tok = r[:3]; who = r[3] if len(r) > 3 else "p1"
+            lines.append(f"{t + a}-{t + b} {who}={tok}")
         # a MOVEMENT event (no button in its recipe) is measured by the baseline
         # family itself (idle/walk/crouch/jump), which other events filter out
-        movement = not any(ch.isdigit() for _, _, tok in recipe for ch in tok)
+        movement = not any(ch.isdigit() for r in recipe for ch in r[2])
         sched["events"].append({"name": name, "frame": t, "gap": gap, "movement": movement})
         t += gap
     end = t + 200
     lines.append(f"{end} wait")
     # pokes: P2 HP pin every HP_PIN_EVERY frames from the first event; stocks
     pokes = [f"{f}:ff8850:01200120" for f in range(FIRST_EVENT - 50, end, HP_PIN_EVERY)]
+    if tid:
+        pokes = [f"{f}:ff8782:{tid}" for f in (1400, 1450, 1500)] + pokes
+    pokes += pin_pokes
     # NO timer poke: $FF8109 is BINARY (99, one tick per ~82 frames = ~8,100
     # frames per round); a 0x99 poke read as 153 ENDED the round (measured
     # 14z-120). Parts are kept under a round instead.
     assert end - FIRST_EVENT < 7500, f"part {part} exceeds a round ({end - FIRST_EVENT} frames)"
-    if part in METER_PARTS:
+    if part in METER_PARTS[tenant]:
         pokes += [f"{FIRST_EVENT - 60}:ff8509:09", f"{FIRST_EVENT + (end - FIRST_EVENT) // 2}:ff8509:09"]
     sched["pokes"] = pokes
     sched["frames"] = end + 50
