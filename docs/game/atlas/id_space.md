@@ -294,12 +294,16 @@ Two things follow:
   select wheel, and easy to forget because the wheel is the visible half.
 
 Downstream, `PRG:0x00B094` takes the picked list index, reads the id, and
-does `id * 32` into a palette-source pool at `PRG:0x3A3CA0` (the opponent's
-VS-screen palette). That pool holds **real, non-aliased data at variant
-ids** and continues past 32 entries, so a tenant at `0x13` lands on real
-memory rather than out of bounds — the entry there is currently a
-placeholder-looking grayscale ramp, i.e. content the tenant must supply
-rather than a bound to fix.
+does `id * 32` into a palette-source pool at `PRG:0x3A3CA0` — the
+opponent-ROULETTE tag's mini-art palette, OBJ row `0x0A` (measured on
+screen 14z-123, `tests/test_ladder_tenant_vs_palette.sh`; the VS screen
+does not read it — this row said "the opponent's VS-screen palette" until
+then). That pool holds **real, non-aliased data at variant ids** and
+continues past 32 entries (it is the tail of a palette bank indexed from
+`0x3A3C00`), so a tenant at `0x13` lands on real memory rather than out of
+bounds: row `0x13` is a grey ramp, rows `0x10`/`0x11` are unrelated real
+palettes of the same bank — content the tenant must supply rather than a
+bound to fix, and the name/art beside it fold to the BASE character's.
 
 ## RESERVED IDS — vanilla does use part of the variant half
 
@@ -389,9 +393,10 @@ Falls straight out of the above:
    the tenants' OWN ladder rows and AI script roots shipped 14z-111 (#99);
    a tenant is a CPU opponent only when the player is a tenant — ladder
    table A rows 16/17/19 — and no legacy character ever meets one in 1P,
-   ruled NOT A PROBLEM 2026-08-28 (STATE). The VS palette block for a
-   tenant is STILL UNSUPPLIED — the placeholder ramp; single-player,
-   cosmetic, never reported from the board.)*
+   ruled NOT A PROBLEM 2026-08-28 (STATE). The roulette-tag palette row and
+   its folded name/art for a tenant are STILL UNSUPPLIED — measured on screen
+   14z-123: "BULLETA" in a brown ramp for CPU Phobos, the VS screen itself
+   correct; single-player, cosmetic, never reported from the board.)*
 6. **Tables whose per-id layout is still unverified** (`byte2d` and the
    `auto` gaps; `rec8` graduated 14z-121, see above) — these must be resolved by decoding a consumer before a
    tenant is declared to own a row in them. Writing a speculative row into

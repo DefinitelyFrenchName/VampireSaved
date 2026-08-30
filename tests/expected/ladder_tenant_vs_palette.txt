@@ -1,0 +1,31 @@
+state phobos_ctl 2520 8008=00080000 2700 8008=000a0000
+ok   phobos_ctl: roulette at 2520, VS screen at 2700 (state words)
+state phobos_red 2520 8008=00080000 2700 8008=000a0000
+ok   phobos_red: roulette at 2520, VS screen at 2700 (state words)
+state bishamon_ctl 2520 8008=00080000 2700 8008=000a0000
+ok   bishamon_ctl: roulette at 2520, VS screen at 2700 (state words)
+state p2_ctl 2550 8008=000a0000
+ok   p2_ctl: VS screen at 2550
+probe phobos_ctl hits=1 frame=2416 A0=003a3ea0 A1=0090c140
+ok   phobos_ctl: one copy of pool row 0x10 (PRG:0x3A3EA0) into 0x90C140 before the match
+pool phobos_ctl row=0x10 0111 0422 0512 0624 0734 0776 0986 0ba8 0344 0233 0122 0400 0800 0a00 0905 0015
+pal140 phobos_ctl 2700 f111 f422 f512 f624 f734 f776 f986 fba8 f344 f233 f122 f400 f800 fa00 f905 f015
+ok   phobos_ctl: palette RAM 0x90C140 at the VS frame == pool row | 0xF000
+liveness phobos_ctl P2base want=0045a770 seen=0045a770
+ok   phobos_ctl: P2 loaded the venue-selected opponent (id 0x10) at match start
+probe bishamon_ctl hits=1 frame=2416 A0=003a3da0 A1=0090c140
+ok   bishamon_ctl: one copy of pool row 0x08 (PRG:0x3A3DA0) into 0x90C140 before the match
+pool bishamon_ctl row=0x08 0222 0ff3 0fb5 0f85 0f43 0b32 0821 09de 06ab 0589 0367 0246 0eee 0aaa 0777 000d
+pal140 bishamon_ctl 2700 f222 fff3 ffb5 ff85 ff43 fb32 f821 f9de f6ab f589 f367 f246 feee faaa f777 f00d
+ok   bishamon_ctl: palette RAM 0x90C140 at the VS frame == pool row | 0xF000
+liveness bishamon_ctl P2base want=000a6418 seen=000a6418
+ok   bishamon_ctl: P2 loaded the venue-selected opponent (id 0x08) at match start
+probe p2_ctl hits=0
+ok   p2_ctl: the 2P path never runs the ladder pool copy
+pal140 p2_ctl 2550 f000 fcec ffda fea8 fd99 fb78 f967 f856 f605 f666 f888 faaa fd87 ffa8 ffff f00a
+red roulette 2520 tag_bbox=(123, 56, 171, 72) px_inside=607 px_outside=0
+ok   roulette 2520: row 0x0A colours ONLY the tag mini-art (bbox (123, 56, 171, 72))
+red vs 2700 px=0
+ok   VS screen 2700: nothing drawn from row 0x0A
+vs_ab phobos 1P@2700 vs 2P@2550 P2portrait_px=0 P1portrait_px=0
+ok   the tenant's VS-screen portraits are pixel-identical on the ladder and 2P paths

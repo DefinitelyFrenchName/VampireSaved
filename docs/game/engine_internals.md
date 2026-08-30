@@ -258,21 +258,32 @@ slots + fade scheduler (0x142C2) are the separate stage/system path
 (atlas). The M2b port places Donovan's whole block (vs2 0x39CB9C, VS2
 provenance) and poke32s row 0x0F — replaced-slot content, superset-
 clean. Portrait/select-art palette tables (vsavj 0x3B5988/0x3BAEA8
-family, keyed >=0x18-split) ride with the portrait work. Other
-0x90C140 writers (vsavj 0xB0AC attract path, table 0x3A3CA0 keyed by
-$114(a5)) not yet repointed — if the attract demo shows wrong Donovan
-colors, that is the mechanism. *(14z-118, DERIVED and bounded: still no
-manifest supplies `0x3A3CA0` rows for a tenant. But this note was written
-for the slot-0x0F substitution, where Donovan WAS Jedah and Jedah is in
-the attract demo. At a variant id the pool is reached only (i) by the
-ladder opponent path `PRG:0x00B094` — a tenant is a CPU opponent only
-when the player is a tenant (STATE hidden-character block, ladder rows
-16/17/19) — or (ii) in attract, whose id writes are vanilla's own
-(`tests/audit_id_writers.sh`: attract writes `02 0F` / `00 03`). So the
-attract demo cannot show a tenant; a tenant-vs-tenant VS screen in 1P
-would show the placeholder ramp at `0x3A3CA0 + id*32` (`id_space.md`) —
-single-player, cosmetic, never reported from the board. Not measured on
-screen.)*
+family, keyed >=0x18-split) ride with the portrait work.
+
+**The `0x3A3CA0` palette pool is the 1P OPPONENT-ROULETTE tag's mini-art
+palette — not an attract path, and not read by the VS screen** [M:
+`tests/test_ladder_tenant_vs_palette.sh`, 14z-123; this paragraph said
+"vsavj 0xB0AC attract path … if the attract demo shows wrong Donovan
+colors, that is the mechanism" from M2b to 14z-123, and 14z-118 bounded it
+to "a tenant-vs-tenant VS screen in 1P would show the placeholder ramp";
+both RETRACTED on measurement]. `PRG:0x00B094-0x00B0B4` runs ONCE per
+ladder match on the roulette screen (`$FF8008 == 0x0008`; frame 2416 on
+replay 111): it reads the picked opponent's id from the ladder order list
+`a5-0x61B8` at `$114(a5)` and copies pool row `PRG:0x3A3CA0 + id*32` (32
+bytes, the copy helper `0x1C3A4` with d7=0, words | `0xF000`) into OBJ
+palette row `0x0A` (`0x90C140`). That row colours ONE element — the mini
+character art beside the roulette's name tag (bbox (123,56)-(171,72); a
+red-poke A/B changes 0 px anywhere else, 0 px on the VS screen). The 2P
+path never executes it. For CPU Phobos the 1P VS screen is PIXEL-IDENTICAL
+to the 2P Donovan-vs-Phobos VS screen in both portrait regions. What a
+tenant opponent DOES show, on the roulette only: the BASE character's name
+and mini-art (Phobos `0x10` -> "BULLETA", a 4-bit-folded consumer whose PC
+is not attributed) in pool row `0x10`'s brown ramp. The pool is the tail of
+a palette bank indexed from `0x3A3C00` (its 16th word is a running index;
+pen 15 is transparent): row `0x13` is a grey ramp, rows `0x10`/`0x11` are
+unrelated real palettes. The built image ships the pool byte-identical to
+vsavj (no manifest supplies rows). Single-player, tenant-plays-1P only,
+cosmetic — STATE "THE COSMETIC BACKLOG", not fixed.
 
 ### M2b in-emulator verification (session 14c, machine window)
 
@@ -300,8 +311,7 @@ palettes, vsavj 0x3B5988/0x3BAEA8 family), the attract palette path
 (0xB0AC/0x3A3CA0), and the x2b7ef4 engine-effect tail (385 non-same-idx
 tiles — minor effect artifacts if any).~~ *(M2b-era list; the select art
 and palettes shipped 14z-62/63 (`atlas/select_screen.md`), the effect
-family closed 14z-71. The attract-palette writer note above is UNVERIFIED
-status — nobody has re-measured it since M2b. Marked 14z-114.)*
+family closed 14z-71; the `0x3A3CA0` pool MEASURED 14z-123, above.)*
 
 ## The ARCADE LADDER: who you fight next, and where (14z-94, measured on
 ## the #92 crash; decoded end to end and confirmed on screen)

@@ -1652,6 +1652,19 @@ tests/audit_don_vs_cpu.sh            # 14z-110 (#111): deterministic
                                       # Emulator, ~18 min/leg. NOTE #99 does not
                                       # reproduce here on MAME (P1-mash) — the
                                       # gate is COVERAGE, not a crash lock.
+tests/test_ladder_tenant_vs_palette.sh # 14z-123 (inferred_claims row 7):
+                                      # the 0x3A3CA0 pool MEASURED ON SCREEN
+                                      # for a tenant CPU opponent — it is the
+                                      # 1P opponent-ROULETTE tag's mini-art
+                                      # palette (PRG:0x00B094, once per ladder
+                                      # match, OBJ row 0x0A), NOT an attract
+                                      # path, NOT read by the VS screen (1P vs
+                                      # CPU Phobos == 2P vs Phobos, 0 px). The
+                                      # tag shows the BASE character's name/
+                                      # art for a tenant (cosmetic backlog).
+                                      # 4 -debug legs, red-poke A/B, liveness
+                                      # via the P2 hitbox base; FREEZE=1.
+                                      # Replay 111 = 110 cut at 3600. ~4 min.
 tests/test_index_window_thunk.sh [bd] # 14z-79: the (b') index-window thunk at
                                       # engine site 0x018460. RECONSTRUCTS all
                                       # 470 body bytes from the two reference
