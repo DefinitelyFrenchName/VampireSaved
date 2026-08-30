@@ -1,6 +1,107 @@
 # patch_notes — per-change detail: every byte, and why
 
 
+**Index — topic -> entry** (added 14z-122; blocks below are NEWEST SESSION
+FIRST, original authored order within a session — the 14z-122 reorder moved
+whole blocks and changed no entry text):
+
+**Freezes and windows (the shipped batches):**
+- 14z-119 — THE PHYSICS-PORT FREEZE (donovan-m18 / huitzil-m25 / pyron-m19 / merged-m14, mark M12): byte detail
+- 14z-117 (2) — RANDOM SELECT INCLUDES THE TENANTS (maintainer-directed, freeze donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13, mark M11; field-vali
+- 14z-117 — THE PYRON-MEDALLION FREEZE (donovan-m16 / huitzil-m23 / pyron-m17 / merged-m12, mark M10): byte detail
+- 14z-110 — the #99 fix: the reaction_hook D2 WINDOW, byte detail
+- 14z-105 — THE OBORO + VERSION-STRING WINDOW (donovan-m11 / huitzil-m20 / pyron-m14 / merged-m6; maintainer "happy with the plan" 2026-08-22, field tes
+- 14z-99 — the window (#43(b) + #103 + #104 + #105): byte detail
+- 14z-79 — (b') the index-window thunk, and a withdrawal
+- 14z-65 (6) — the specials hunt: window widened, alias rule, farm verified (2026-08-07)
+
+**The #99 arc (CPU AI / dispatch):**
+- 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail
+- 14z-110b — the 0x51 -> 0x44 state remap: byte detail
+- 14z-110 — the #99 fix: the reaction_hook D2 WINDOW, byte detail
+- donovan-m2 stage 5 — reaction_hook: ES-DP crash fix (2026-07-27, session 11, playtest-driven)
+
+**Sound / QSound / voices:**
+- 14z-96 — the kernel voice-table port (GitHub #101, maintainer-ruled option (a): native-exact, incl. two new authored Phobos songs)
+- 14z-94 — the arcade-ladder stage retarget (#92), and one manifest bound re-measured (#87): byte detail
+- 14z-85b — per-tenant sfx records (pyr_sfx_records / hui_sfx_records; maintainer-ruled option (a))
+- 14z-85g — the restored trap-detonation chirp (huitzil-m9: the sound_stub row + the sound_table remap machinery)
+- 14z-85g(2) — the trap SHOCK restoration (huitzil-m10: two vs2-licensed class remaps; maintainer-ruled option (a))
+- Session 14z-66 — EX-move crash-reset fix: three farm-voice stubs (playtest round-1 item 1; manifest-data only, no machinery)
+- donovan-m2 stage 5 — the last two music triggers: engine_data masquerade rows (2026-07-28, playtest round 2)
+- donovan-m2 stage 5 — move-sfx reclassification (2026-07-28, playtest-driven)
+- donovan-m2 stage 4 — +0x14E state hook, sound stubs, anim_index_a2 (2026-07-27, session 9)
+
+**Beam / effects / palettes:**
+- 14z-117 — THE PYRON-MEDALLION FREEZE (donovan-m16 / huitzil-m23 / pyron-m17 / merged-m12, mark M10): byte detail
+- 14z-116 — PYRON'S MEDALLION WHITE-OUT: byte detail (maintainer-chosen fix, field-validated 2026-08-29)
+- 14z-102 — #109 THE CLONE-BEAM FIX (row 31) — FROZEN as huitzil-m19/merged-m5 (bit-for-bit the probes), field-confirmed, #109 CLOSED
+- 14z-84 — Phobos' own Dark Force palette block (huitzil-m5 -> m6): byte detail
+- 14z-83 S3 — the beam-strip relocation (huitzil-m4 -> m5): byte detail
+- Session 14z-76 (Pyron's effect palette; build/pyron20 69e8c6f0)
+- 14z-71 — the beam: byte detail
+- 14z-70 — the ground explosion, and one inert repair
+
+**Select screen / wheel:**
+- 14z-117 (2) — RANDOM SELECT INCLUDES THE TENANTS (maintainer-directed, freeze donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13, mark M11; field-vali
+- 14z-117 — THE PYRON-MEDALLION FREEZE (donovan-m16 / huitzil-m23 / pyron-m17 / merged-m12, mark M10): byte detail
+- 14z-115 — THE SELECT-WHEEL SEPARATION (maintainer-directed "E2", approved 2026-08-28): byte detail
+- donovan-m2 stage 5 — Start-hold flavor selector + alternate-table poison (2026-07-27, session 11)
+
+**Physics / movement:**
+- 14z-119 — THE PHYSICS-PORT FREEZE (donovan-m18 / huitzil-m25 / pyron-m19 / merged-m14, mark M12): byte detail
+- 14z-118 (charmap, 2) — DONOVAN'S PHYSICS ROWS PORTED (maintainer-ruled 2026-08-29): 17 bytes, three bank rows, UNFROZEN
+- Session 14z-66 — velocity port (playtest round-1 item 2): param32 rows 0x10 + the per-tenant VALUE_SKIP default
+- Session 14z-66 — AIR MOVEMENT LIVE (item 3): the per-char jump handler clone + the x026142 escape fix
+- Session 14z-66 — the alias-physics port, first row: jump_params (the float ceiling + jump feel)
+
+**Damage / judge / grabs:**
+- 14z-99 — the window (#43(b) + #103 + #104 + #105): byte detail
+- 14z-85f — the x028122 object-hit damage work-var reconciliation (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix)
+- Session 14z-66 — the second FG crash: shadow_seq_guard site thunk (round-2 report; the capture-anim shadow over-index)
+- donovan-m2 stage 4 — damage-pipeline R1 rows; BOTH GATES GREEN (2026-07-27, session 10)
+
+**Extraction / mechanisms / hardening:**
+- 14z-118 (charmap) — THE CHARACTER-DATA MAP, phase 0: NO ROM BYTE MOVED
+- 14z-91 — THE LEGACY REGRESSION FIX (m5/m13/m7 -> m7/m15/m9): byte detail
+- 14z-85 — the spawn-time OWNER TAG (site 0x54470's 59-75 family; maintainer option (a))
+- 14z-82 — per-tenant TYPE NUMBERS (the merged obj_hook vec3 fix) + the F2 merged shim
+- 14z-82b — the f7997 fix: vsavj's hit-class byte map extended to vs2's 80 entries (probe build at the time; ADOPTED 2026-08-12 — huitzil-m4 / pyron-m3 
+- 14z-79 — (b') the index-window thunk, and a withdrawal
+- Session 14z-78 — `anim`'s placed address stops being a literal
+- Session 14z-66 — the second FG crash: shadow_seq_guard site thunk (round-2 report; the capture-anim shadow over-index)
+- Session 14z-66 — the THIRD FG crash: embedded data tables in crypt-placed code (data_in_code mechanism + census)
+- 14z-65 (4) — Huitzil stage 4 BUILDS; the R1 frontier enumerated (2026-08-07)
+- 14z-65 (2) — M3b Phase 1: extraction de-Donovanized (2026-08-07)
+- 14z-65 — M3b Phase 0: op-overlap assertion + tail_data_ptr ownership (2026-08-07)
+- donovan-m2 stage 5 — the last two music triggers: engine_data masquerade rows (2026-07-28, playtest round 2)
+- donovan-m2 stage 4 — damage-pipeline R1 rows; BOTH GATES GREEN (2026-07-27, session 10)
+
+**Donovan bring-up (M2a, July 2026):**
+- donovan-m2 stage 5 — the last two music triggers: engine_data masquerade rows (2026-07-28, playtest round 2)
+- donovan-m2 stage 5 — move-sfx reclassification (2026-07-28, playtest-driven)
+- donovan-m2 stage 5 — shared-table remap: mash/time crash fix (2026-07-27, session 11b)
+- donovan-m2 stage 5 — reaction_hook: ES-DP crash fix (2026-07-27, session 11, playtest-driven)
+- donovan-m2 stage 5 — Start-hold flavor selector + alternate-table poison (2026-07-27, session 11)
+- donovan-m2 stage 4 — damage-pipeline R1 rows; BOTH GATES GREEN (2026-07-27, session 10)
+- donovan-m2 stage 4 — +0x14E state hook, sound stubs, anim_index_a2 (2026-07-27, session 9)
+- donovan-m2 stage 4 — dispatch_14 repoint (2026-07-27, session 8)
+- donovan-m2 stage 4 — VS2 default flavor via the init shim (2026-07-27)
+- donovan-m2 stage 4 — session 7: extraction corruption fixed; ghost-clean hooks (2026-07-25)
+- donovan-m2 stage 1 — null relocation (2026-07-25, session 4)
+- donovan-m2 stage 2 — passive data (2026-07-25, session 4)
+- donovan-m2 stage 3 — anim + sprite sub-tables (2026-07-25, session 4)
+- donovan-m2 stage 4 — IN PROGRESS (2026-07-25, session 4)
+
+**(other):**
+- 14z-102 — the #107 row flip — FROZEN in donovan-m10 + every tenant + stock (the shared map), #107 CLOSED
+- 14z-70 — byte detail
+- 14z-69 (session close) — byte detail
+- Session 14z-67 — the H gfx rung (D4 opener 3): every byte class, and where the detail lives
+- Session 14z-67b — the ping-round fixes (byte detail)
+- 14z-65 (5) — HUITZIL BOOTS: first match on the vsavj engine (2026-08-07)
+- 14z-65 (3) — the Huitzil stage 1-3 ladder opens (2026-08-07)
+
 ## 14z-119 — THE PHYSICS-PORT FREEZE (donovan-m18 / huitzil-m25 / pyron-m19 / merged-m14, mark M12): byte detail
 
 **What.** The 14z-118 (charmap, 2) physics port FROZEN, plus the mark bump
@@ -467,6 +568,102 @@ lazy-armed). Gate: `tests/test_reaction_hook_d2.sh` (reconstruction + three
 verdict controls), PASS on don_m12 and m3b_merged14.
 
 
+## 14z-105 — THE OBORO + VERSION-STRING WINDOW (donovan-m11 / huitzil-m20 /
+## pyron-m14 / merged-m6; maintainer "happy with the plan" 2026-08-22,
+## field test before push)
+
+Two roster-UX changes, both living INSIDE the ratified §4 v3 select-window
+divergence class, both PROFILE-GATED (the stock twin rebuilt under the new
+rows is bit-identical: `883e7d17` = `m5_stock5`, measured).
+
+### W1 — `oboro_select_hook` (`[[site_thunk]]`, every tenant manifest, deduped)
+
+**What:** vanilla vsavj ships Oboro Bishamon complete at variant id 0x18
+(base `0x0B3450`) and the commit path accepts the id end-to-end — it only
+lacks a player-facing way to pick him (maintainer-ruled: vanilla's Oboro,
+not a vs2 port). The hook is vanilla's own Gallon-variant idiom
+(`PRG:0x020B9C`: on Gallon's cell + `btst #7,$394(a6)` + a 2-3-button
+confirm -> id 0x12) one cell over: Bishamon's cell + the same bit -> 0x18.
+
+**The bit is START — measured before anything was written:** with P1's
+Start held on the select screen the struct's input word `+0x394` reads
+`$8000` (`$0000` without), and `RAM:$FF8060` reads 1 at the same time
+(the 14z-104 question "is the bitmask live at select?" answered yes; the
+hook uses vanilla's own source).
+
+**Every byte:** the 6-byte site `0c2e00020382` (`cmpi.b #$2,$382(a6)`)
+becomes `jsr <thunk>`; the 30-byte body (hole a, placed by the allocator):
+`0c2e00080382 660e 082e00070394 6706 1d7c00180382 0c2e00020382 4e75` —
+Bishamon? / Start? / commit 0x18 / re-execute the displaced cmpi (its flags
+feed vanilla's `bne` at `0x020BA2`: 0x18 != 2 skips the Gallon block like
+any non-Gallon id) / rts. Without Start, or on another cell, the body is
+branch-inert and the flags are vanilla's. `id_literal_ok = "0x08,0x02"`
+(the body compares the id field on purpose). +2 ops per build.
+
+**Measured (gate `tests/test_oboro_select.sh`, five legs, MAME, no
+pokes):** P1 Start-held Bishamon -> id 0x18, base `0x0B3450` in-match;
+no-hold -> 0x08 / `0x0A6418`; Start on Demitri's cell -> 0x01; P2 side
+(default cell 0x05, path D D L L) -> P2 0x18 / `0x0B3450` with P1
+untouched; the STOCK twin under the same inputs -> 0x08. Verdict control:
+a wrong expectation is refused. Name/portrait rows for 0x18 alias
+Bishamon's (32-row arrays) — the naked-eye tell is the pale colorway.
+
+### W2 — the select-screen version string (`version_*` knobs on `[[select_wheel]] roster21`)
+
+**What (CLAUDE.md §5, open since 14z-92):** N authored glyph sprites
+appended to the SAME copied wheel record the roster extension already
+repoints, so the string costs no new divergence class. Knobs, identical in
+all three manifests (ENGINE-SITE row, emitted once): `version_text =
+"M6"` (names the freeze generation — CHANGE IT AT EVERY FREEZE),
+`version_font = build/manifest/version_font.json` (authored 5x7 glyphs,
+0-9 A-Z - . space, provenance NEW), `version_x/y = 340/202` (screen
+position of the first glyph's top-left; OBJ = screen + (64, 16),
+measured on the live OBJ list), `version_pal = 0x19` (Phobos' medallion
+row — thunk-re-asserted every select frame, so stable by construction;
+ink = pen 7 = 0xFF8), `version_base = 0x1FE40` (group C upper-bank codes,
+one per glyph; chosen from the merged-m5 ledger's free rows).
+
+**Bytes:** the record's count word 20 -> 22 (two entries `FE40 0019`,
+`FE41 0019`), the coord list +2 pairs (`+148,+42` / `+164,+42` relative
+to the drawer base (256,176)); budget word 0x55 still CARRIED OVER
+(>= 23 entries, asserted). Tiles: `wheel_bank5.json` gained an
+`"authored"` map (code -> 128B canonical tile); `build_gfx_donovan.py`
+places them with the same same-source-or-fail rule; `audit_gfx_merged.py`
+and `check_wheel_bank5.py` know the "authored" kind. 0 ops.
+
+**The codec finding on the way (docs/platform/gotchas.md):** the first
+probe drew every 8-pixel half MIRRORED and pen 0 as an opaque black box —
+`gfx_tiles.decode` had mapped plane bit i to pixel i since it was written
+(nothing had ever consumed pixel ORDER); fixed both ways (bit i = pixel
+7-i, transparent pen 15), gate `tests/test_gfx_tile_codec.sh`.
+
+**Measured (gate `tests/test_version_string.sh`):** the built record's
+last 2 entries/coords match the knobs; packed group C tiles byte-identical
+to the generator's, non-blank, pen-15 background, font-exact; the live OBJ
+list on select carries exactly the 2 glyph sprites at OBJ (404+16i, 218),
+bank 5, pal 0x19; a MAME snapshot pixel-matches the intended bitmap with
+ZERO mismatches and zero opaque pen-0 pixels; controls: a 1-px shift does
+not match, a corrupted tile is refused.
+
+### The freeze
+
+| artifact | dir | fingerprint | ops |
+|---|---|---|---|
+| donovan-m11 | `build/don_m11` | `1de9a027` | 325 |
+| donovan-m11-stock | `build/m5_stock6` | `883e7d17` (= m5_stock5, UNCHANGED) | — |
+| huitzil-m20 | `build/hui47` | `24a27940` | 365 |
+| pyron-m14 | `build/pyron31` | `6bf265ab` | 298 |
+| merged-m6 | `build/m3b_merged13` | `64426955` (= the rehearsed `build/merged_probe_w6` bit-for-bit; probe attic'd 14z-106) | 806 |
+
+Op counts re-frozen in `tests/test_tenant_loop.sh` with attribution
+(325/365/298; 600/652; 806/907). **The select-window specs were PREDICTED
+to move (NEXT_SESSION at the 14z-104 close: "more sprites/cycles shift the
+window end") and MEASURED NOT TO: `tools/propose_masked_specs.sh` over all
+148 window/composite specs of the three carried sets proposed the frozen
+line verbatim in every case** — the window's end is the VS-phase re-init
+that re-converges the select state, not a function of how many sprites
+the wheel record draws. Only the self-frozen `.sha1` replays were
+re-frozen (`run_suite --freeze`), see STATE 14z-105.
 ## 14z-102 — #109 THE CLONE-BEAM FIX (row 31) — FROZEN as huitzil-m19/merged-m5 (bit-for-bit the probes), field-confirmed, #109 CLOSED
 
 **`tools/build_donovan.sh`** — huitzil census root added:
@@ -857,6 +1054,285 @@ fallback's EXECUTION against a frozen per-replay inventory instead, and its
 default replay set includes the two rigs that arm it — their absence is why
 the false claim survived ten sessions. Ops unchanged (a body edit).
 
+## 14z-85 — the spawn-time OWNER TAG (site 0x54470's 59-75 family; maintainer option (a))
+
+The last known merged program-behavior defect class: obj_hook union
+entries 64-75 served every tenant through HUITZIL's copies by
+declaration-order luck (huitzil declares before pyron). Ruled option (a)
+2026-08-13; implemented and verified this session.
+
+**Every byte, and why:**
+
+- **80 stamp-site detours** (blob edits, 0 ops): every frozen 59-75
+  stamp row (`build/manifest/type_stamps.toml`; d16==2 only; both
+  family forms are exactly 6 bytes) in every declaring tenant's copy —
+  donovan 9, huitzil 40, pyron 31 — has its 6-byte stamp instruction
+  replaced by `jsr <thunk>` (`4EB9 xxxxxxxx`), full source span
+  old-verified before the write (the type_renumber discipline).
+- **46 tag thunks** (code ops, alloc chain → wide_ext; memoized per
+  (tenant, original-instruction)): `move.b #tenant_id,(0x7F,A4)`
+  (`197C 00id 007F`) + the ORIGINAL stamp instruction (CCR-LAST — jsr/
+  rts set no flags, so the site's flag result is reproduced exactly) +
+  `rts`. A4 = the slot pointer at every family stamp site (all 41
+  inventory rows). The jsr push is tenant-code-only; no legacy path
+  executes these sites.
+- **12 tag stubs** on entries 64-75 (+12 tripwire ops):
+  `owner_dispatch_stub` shape `"tag"` — per resolving tenant
+  `cmpi.b #id,(0x7F,A6); beq.s exit_i` (A6 = object at the walker's
+  dispatch, per the measured 14z-81b entry contract), fall-through
+  `jmp <tripwire>` (zero tag = a stamp site the emission missed, LOUD;
+  unclaimed tag = same). Exits re-establish vanilla handler entry state
+  (`moveq #0,d0; movea.l #handler,a0; jmp (a0)`).
+- **The tag byte: +0x7F of the $FF9400 slot** (0x100 stride, walker
+  0x54458). Measured free THIS session: 804 live-slot observations,
+  zero +0x7F writes across 19,357 tapped pool writes under BYTE-LANE
+  accounting, three legs with live family content (types 0x42/0x45).
+  The 14z-84 census had measured the WRONG POOL ($FFB800 = the
+  0x5E542/114-120 family's) — retracted in place; and its "+0x7F free"
+  was itself a word-offset accounting artifact (hole_b writes a word at
+  b8+0x7E covering byte +0x7F). A tag there would have been clobbered.
+- **Scope**: stubs on 64-75 exactly as ruled. Entries 59-63 are
+  single-resolver (donovan's copies) — H/P stamp those types at
+  (currently dead) shared sites; their tags emit anyway so any future
+  live spawn tripwires under its own tag. Stamper-not-resolver cases
+  (donovan stamps 65/66/73/75, places no handler) are printed notes,
+  not errors — solo builds already tripwire those types for him and
+  playtest green.
+- **N=1 inert by construction** (the `len(_tenant_list) >= 2` gate):
+  all four frozen solo references rebuild bit-exact
+  (4b7d0dc7/6c93cfa8/db4bcd11/6c7f7322). Side file `tag_map.json`
+  (only when non-empty) carries site/tenant/tag/thunk rows = the
+  writer PCs the pool audit asserts.
+
+**Measured green:** tenant_loop 473/667 (re-frozen; §4b decodes the
+stubs per entry) + 5 verdict controls; dispatch-range §0-6 ALL PASS —
+2,046 stubbed family dispatches on pyron's mash leg, tripwire SILENT,
+0x54470 family visible on the solo control; vec3 GREEN; pool audit
+post-tag mode GREEN (293/293 family live-slot obs carry the stamper's
+tag; +0x7F writer PCs == the emitted thunks; forced-pre negative
+control fails both directions); merged legacy audit 14/14 (04+11
+ratified expectations).
+
+**What the fix did NOT change (measured, own before/after):** the ring
+inventory on pyron's replays — the music retrigger is the per-node sfx
+helper class (see the 14z-85 STATE entry), not 64-75 dispatch.
+
+## 14z-85b — per-tenant sfx records (pyr_sfx_records / hui_sfx_records; maintainer-ruled option (a))
+
+The ACTUAL music-retrigger fix (the mechanism the owner tag was wrongly
+credited with — see 14z-85 above). Two manifest rows, the don_sfx_records
+precedent verbatim; per-id curation in docs/project/tables/sfx_records.md.
+
+**Every byte, and why:**
+- `pyr_sfx_records`: vs2 0x0C8B18, 23 records (exact shape-scanned bound;
+  the over-run span holds keep-id lookalikes) → wide_ext, id-allowlisted
+  (keep 0x110/0x111/0x112/0x202 — all in don's ratified set; 15 zeroed
+  incl. the 0x720-0x72F voice block whose 0x729 WAS the measured music
+  retrigger). poke32 ptr row 0x11 (was the vanilla 0x95894 Demitri alias,
+  displaced pre-fix by the generic tail_data_ptr repoint at his RAW
+  records).
+- `hui_sfx_records`: vs2 0x0C742A, 24 records → wide_ext (keep the trio +
+  0x198/0x199, measured SHARED 14z-85 — equal keyon signatures, don-0x119's
+  sample family; 18 zeroed). poke32 ptr row 0x10 (was 0x938BA).
+- Both rows carry the idempotent helper unstub (vs2 0x5122 → vsavj 0x4CE2),
+  so SOLO H/P builds gain audible node sfx (they were silent — no build of
+  theirs ever carried the unstub). NET +1 op per declaring build (the
+  claim machinery suppresses the generic repoint).
+
+**Freeze ceremony:** huitzil-m7 = build/hui33 (284e3b1c), pyron-m4 =
+build/pyron22 (ac22418f); expectation sets carried RENAMED; suites GREEN
+with --freeze; every .sha1 mover byte-attributed: ONE divergent frame
+(f890, the select-init staging of the repointed ptr rows, re-converges
+same frame) on every replay, plus one bounded run (f2410-2596, the
+tenant's now-audible node sfx) on the two tenant-pick replays ONLY.
+tenant_loop re-frozen 266/208 solo, 474/669 merged. Ring gate re-frozen
+to EMPTY merged-vs-solo diff — measured: every pre-fix id incl. 0x729
+gone, no solo id missing.
+
+**FIELD-CONFIRMED (maintainer, first playtest, 2026-08-13): "the music
+triggering is gone, Piled Hell has its hitbox — needs deeper testing but
+it does look very good."**
+
+## 14z-85f — the x028122 object-hit damage work-var reconciliation
+## (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix)
+
+**The defect (closing the 14z-85e parity item):** FG's beam ticks are
+hits BY pool objects (the type-02 beam particles; attacker context a6 =
+per-hit ctx), processed by per-hit-class REACTION handlers that live in
+ported vs2 code. The reaction (vs2 0x55FA8/combo writer 0x56002; H's
+copy at merged 0x4026E2, region "code (grouped)") calls the ported
+object-hit damage APPLIER (vs2 0x28A6A → H's copy 0x40C828, region
+x028122). The porting machinery reconciled the applier's jsr targets
+(vsavj scaler 0x18B8C, post-process 0x18AB0, pre-check 0x5E9B4) but its
+A5-relative STAGING DISPLACEMENTS shipped verbatim: scaled damage
+staged at vs2's -0x4B6C/-0x4B6A/-0x4B68(a5) = $FF3494/96/98, while
+vsavj's post-process reads -0x4BBE/-0x4BBC/-0x4BBA = $FF3442/44/46.
+Result: 12 combo-counted beam ticks (hitstop, sparks, satellites all
+live), ZERO HP staged. Same-value class #4 — and byte-for-byte
+Donovan's session-14n throw-damage defect, whose six port_patch rows
+patch the SAME instructions in the SAME region and never propagated to
+the H/P manifests (gotcha filed).
+
+**Eliminated by measurement en route (14z-85e's two hypotheses):** the
+scaler tables are byte-equivalent between the games (attack
+0x0B8140↔0x0D22BE, final 2D maps 0x0B9140/0x0BA1C0↔0x0D32DE/0x0D435E,
+combo + RNG-spice; defense/low-HP tables differ only on per-char-id
+rows — the roster shuffle), and native hit count is identical (12
+ticks). Full pipeline synthesis: docs/game/engine_internals.md "The
+DAMAGE pipeline".
+
+**Every byte, and why:** six [[port_patch]] rows per manifest
+(huitzil.toml + pyron.toml), stage 6, region x028122 — vs2 src
+0x28AC2/0x28AC8/0x28AD8/0x28ADC/0x28AE2/0x28AF2, each a 2-byte
+displacement change (b498→b446, b494→b442 ×2, b496→b444 ×2, plus the
+flag-word immediates' rows) = 12 bytes per tenant copy. Donovan's rows
+verbatim. The 14x rollback family (-0x4B74/-0x4B72/-0x4B3D — attacker/
+victim registration + state byte) left at vs2 offsets on purpose:
+ported readers consume them (donovan.toml stage-99 parked rows).
+Static census after: ZERO vs2 damage-band A5 writes remain in ported
+space on either build (the remaining b48c/b48e/b4c3 hits are the
+rollback family, by design).
+
+**Measured (tests/replays/hui/89_hui_ex_fg_vs2.rpl — new
+native-comparable rig, the 85_hui_df_vs2 opening + five spaced 623+2K
+attempts):** before: native 23/23/23/23/52 HP (12 ticks each; the 5th
+cornered, 11 ticks + one 30-HP terminal hit) vs ours 1/1/1/1/1. After:
+BIT-EXACT parity, both solos and the merged rebuild. audit_fg_damage's
+71/73 CPU rigs measure 10 HP UNCHANGED by the fix — those ticks were
+fighter-path contacts (never broken); header reframed.
+
+**Gates:** tests/audit_fg_parity.sh NEW (both legs vs the frozen
+staircase; per-attempt stock-decrement EX tells; 2 verdict controls;
+ground-truthed FAILING on the pre-fix merged), tenant_loop GREEN with
+counts UNCHANGED (port_patch rows are region rewrites, not ops),
+m3a_reproducible on the new EXPECTs, merged legacy audit PASS (leg a
+verbatim incl. ratified 04+11), run_suite on the carried-renamed sets.
+Builds: huitzil-m8 = build/hui34 (c48cd722), pyron-m5 = build/pyron23
+(65e9a40e), merged = build/m3b_merged2 (moves with generator).
+Reconciliation rows added (applier 0x28A6A↔0x29738 verified + the five
+scaler-table data rows); verified build-inert (fingerprint unchanged).
+
+**DECIDED (maintainer, 2026-08-14): keep the vanilla vsavj
+approximation** for the tenant DEFENSE rows (defender-side; found
+during the table compare). The choice, the exact values on both
+sides, and the option-(a) change recipe (variant-gated reader thunks,
+hitclass precedent; Donovan's row would supersede donovan-m3a) are
+documented in docs/project/tables/defense_rows.md. Pyron needs
+nothing either way — his rows are byte-identical between the games.
+
+## 14z-85g — the restored trap-detonation chirp (huitzil-m9: the
+## sound_stub row + the sound_table remap machinery)
+
+**The finding chain (each step measured):** the four-leg ring A/B
+killed the 14z-85e volume/pan hypothesis (entries essentially identical
+across legs; 0x049A = periodic ambient, the 14z-82d detonation
+attribution retracted); the real delta is native firing
+0739/010b/073a per attempt where ours fired 010a. First reading
+("record nodes 10/11 zeroed, restoration = M5") was corrected by the
+maintainer's field observation and the content check: **vs2 0x73A's
+sample bytes are BYTE-IDENTICAL in vsav's own QSound image**
+(0x6C0000, bank 108, 0-20480, pitch 12548; vsavj ids 0x198/0x199
+family, +0x300 alias 0x498/0x499). **[CORRECTED 14z-95, GitHub #93:
+identical for 20,480 of 20,481 bytes — the INCLUSIVE endpoint
+0x6C5000, the byte packing law #3 says is PLAYED, differs between the
+two games' original sample ROMs (vsav 0xFF, vsav2 0x00). Fourth
+instance of the inclusive-endpoint class (#82/14z-87b).]** And the detonation call is not the
+record path: bp-attributed (USP-top return — the bp_regs A7-first fix)
+to **sound-farm stub vs2 0x4F2E** (`jsr $330E; move.l #$73A,d1;
+moveq 0,d2/d3; bsr $5122; jmp $3306` — a farm of such one-id stubs at
+0x4EE0-0x4F60), jsr'd from the mine handler at x068458+0x120. Hui's
+recon overlay had silenced it to the 0x2A7E0 rts (the 14z-65 blanket
+"0x7xx = voice bank" number rule — see the new GOTCHA).
+
+**Every byte, and why:**
+- `reconciliation_huitzil.toml` 0x4F2E row: stubbed_sound → **kind =
+  "sound_stub", sfx_id = 0x199**. The generator (new kind, sibling of
+  farm_port) synthesizes a 26-byte vsavj twin stub in hole_a:
+  `jsr $330E.l; move.l #$199,d1; moveq #0,d2; moveq #0,d3;
+  jsr $4CE2.l; jmp $3306.l`. The save (0x330E) / restore (0x3306)
+  pair is byte-identical at the SAME address in both games (verified
+  rows); the helper is the per-node sfx helper; base id 0x199 lets
+  the helper's own (0x70,a6) flag produce the 0x499 alias exactly as
+  the engine intends. +1 op (tenant_loop re-frozen 243/267/208 +
+  491/678).
+- `huitzil.toml` hui_sfx_records gained **remap_ids = "0x73A:0x199"**
+  (new sound_table key, target must be in keep_ids or the build
+  fails): record node 11 stays content-faithful for any record-path
+  dispatch (none observed in the 87/88 rigs — data-only, defense in
+  depth). Node 10 (0x739, the mine-ejection sound) stays zeroed: no
+  vsavj equivalent exists; fully M5 scope (maintainer-scoped
+  2026-08-14).
+
+**Measured after:** ours fires 0x199 at f3500/f4301 — native's 0x73A
+timing (f3494/f4295), both attempts, replay 87.
+
+**Gates:** audit_trap_parity RE-FROZEN to the restored state
+(ground-truthed failing on pre-fix huitzil-m8); audit_trap_sound
+green (re-scoped: spawn + ring liveness); tenant_loop re-frozen;
+m3a_reproducible on the new EXPECT_HUI; run_suite on the
+carried-renamed set; merged rebuilt (build/m3b_merged3).
+Build: huitzil-m9 = build/hui36 (3d9ffc89). Maintainer EAR-CHECK
+pending — the final gate for a sound item.
+
+## 14z-85g(2) — the trap SHOCK restoration (huitzil-m10: two
+## vs2-licensed class remaps; maintainer-ruled option (a))
+
+**The defect (maintainer field report, same day as the chirp
+confirmation):** the trap dome's hit inflicted no shock status. The
+dome's hit records carry vs2's EXTENDED class 0x52 (victim +0x54 =
+0x52 at the hit, both games — measured on the new deep-overlap rig
+92). The victim-side reaction dispatch (`PRG:0x2384E`: class × 2 into
+the PC-relative word jump table at 0x2385C) reaches a dedicated shock
+handler on vs2 (table 0x22388 entry[0x52] = 0x2CE → 0x22656,
+bp-verified firing at the native hit) — but vsavj's table ends before
+0x52: entry[0x52] reads CODE BYTES (0x1D7C) and ours took a
+wild-but-lucky plain-hit jump (bp-verified: the dispatch runs, no
+shock handler fires). Donovan's 14z-33/34 class, one dispatch table
+over.
+
+**The licence (the 14z-33 rule — "only remap when the source engine
+itself proves equivalence"):** vs2's OWN table aliases class 0x52 ≡
+0x06 ≡ 0x38 (one entry), and vsavj entry[0x06] = its native
+electric-shake handler 0x23AC8 — a STRUCTURAL TWIN of vs2's 0x22656
+(instruction-parallel; same sub-state 4 / freeze 0x18 / property
+lookup / common-install tail 0x27EC0 ↔ 0x27114) minus ONE guard:
+vs2's `cmpi.b #$52; beq` skips the ATTACKER's 0x0B hit-freeze (the
+attacker is a mine). property[0x06] == property[0x52] == 0x0F on both
+games (Donovan's ported extension rows cover 0x52 on ours anyway).
+
+**Every byte, and why:** two `[[region_fix]]` rows in huitzil.toml —
+hitbox_proj +0x17D and +0x19D (the dome's two records, class byte at
+record +0x1D *[CORRECTED 14z-120 (5): that is byte +0x17 of projectile records 5 and 6 — the records start at region+0xC6, not at the region start; the bytes patched were the right ones]*): `52` → `06`. Nothing else; the shock rides pure
+vanilla machinery (Victor's own path).
+
+**KNOWN, MAINTAINER-ACCEPTED DEVIATION:** Phobos receives the normal
+11-frame attacker hit-freeze when the trap connects (vsavj's 0x06
+path applies it; vs2's 0x52 guard exempts him). The gate asserts the
+deviation PRESENT so drift in either direction is loud. Option (b) —
+a dispatch site_thunk with an inline clone carrying the exemption
+(the es_type51_dispatch pattern) — is specified in STATE 14z-85g(2)
+if play dislikes the freeze; its cost is jsr cycles on the ENGINE-WIDE
+reaction dispatch (legacy flicker-inventory ratification).
+
+**Also measured en route (rig sweep):** the mine's roll is
+PROXIMITY-TERMINATED — it stops shorter the closer the opponent
+stands (549/545/527/509 across P2-walk N=40-55) — and rolling THROUGH
+the opponent triggers nothing: the shock is the dome hit, by vs2's
+design.
+
+**Measured after:** vsavj 0x23AC8 fires at the dome hit (D0=0x0C =
+class 0x06×2), victim shows the native shock signature (seq7=4,
+freeze 0x18 decay — pre-fix ours showed seq7=2), attacker freeze
+present. Native leg unchanged (its own 0x52 path).
+
+**Gates:** audit_trap_shock NEW (rig 92 ours+native, per-leg class
+expectations, the deviation assertion, verdict control; ground-truthed
+FAILING on huitzil-m9); audit_trap_parity green (chirp unaffected);
+tenant_loop counts UNCHANGED (region_fix = region rewrite);
+m3a_reproducible on the new EXPECT_HUI; run_suite on the
+carried-renamed set. Build: huitzil-m10 = build/hui37 (9a948a11),
+merged = build/m3b_merged4.
+
 ## 14z-84 — Phobos' own Dark Force palette block (huitzil-m5 -> m6): byte detail
 
 **Why (maintainer pull-forward, design ratified 2026-08-13):** the proper
@@ -933,6 +1409,333 @@ real collisions (old shift kept as the must-fire fixture, controls B/C);
 strip/extras/pool-honesty locks. New fingerprint
 `38188bb12dd6b971a4067b89edaad54eabbfe343` = huitzil-m5.
 
+## 14z-82 — per-tenant TYPE NUMBERS (the merged obj_hook vec3 fix) + the F2 merged shim
+
+**The defect (14z-81b):** the merged obj_hook union gave multi-owner types
+114-120 (site 0x5E542; handlers all inside x088512, which every tenant
+ports as an internally tenant-reconciled copy) ONE table entry each,
+first-wins → tenant-0's copy — so merged Huitzil's type-117 satellite
+consumed Donovan's planted tripwire address 0xCB9C0 as an anim base (the
+deterministic char-init vec3). The dispatch-time owner-read stub was
+implemented and WITHDRAWN the same day (14z-81c, two measured timing
+failure modes); the ratified direction is the build-time route
+(docs/project/gotchas.md "Route on facts baked at BUILD time").
+
+**The fix (maintainer-decided scope: FIRST RESOLVER KEEPS ORIGINALS):**
+
+* `build/manifest/type_stamps.toml` — the FROZEN, human-reviewed census of
+  every family stamp site / compare / +0x02-+0x03 reader / embedded
+  walker, produced by `tools/audit_type_stamps.py` (opcode-anchored;
+  positive control on the six measured sites; negative control on the
+  three unported stamps). The census found a whole stamp FORM the 14z-81b
+  ad-hoc scan was blind to — `move.b #type,(2,A4)` (~20 additional
+  type-115 sites, the spawn idiom `beq.s; move.b #1,(A4); type at +2;
+  owner at +3`) — and proved NO compare in any tenant's code regions reads
+  the type byte (d16 values are 0x54/0x14/0xA8 or register-sourced).
+  Dynamically cross-checked by `tests/audit_type_writes.sh` (6 tap legs on
+  the ground-truth builds): every observed 114-120 write maps to a frozen
+  stamp row; types 118/120 NOT OBSERVED (recorded, not assumed); the
+  115→117 "morph" is the 117 header re-stamp at x088512+0x27CE, which
+  renumbers with everything else.
+* Generator (`tools/gen_donovan_patch.py`): a pre-loop pure map
+  (`compute`-style block after `_tenant_list`) assigns new type numbers to
+  every NON-first resolver tenant with ≥1 frozen stamp site — 12
+  assignments at N=3 (indices 124-135: H/P × types 114-119; type 120 has
+  ZERO reachable stamp sites anywhere and keeps first-wins). A
+  per-iteration blob pass rewrites ONLY the TT byte of each stamp
+  immediate in that tenant's own region copies (full source span verified
+  first; 69 rewrites at N=3, reconciled 1:1 against the inventory), and
+  the union appends per-tenant entries resolving through the OWNING
+  tenant's view (no-gap asserted). Table op grows 0x1F0→0x220; op COUNT
+  unchanged. Empty at N=1 — all four frozen fingerprints bit-exact.
+* Byte-level proof: hui copy x088512+0x27CE stamps `28BC 0100 8200`
+  (130), pyron's `...8300` (131), donovan's untouched `...7500`.
+
+**Measured green:** `audit_merged_vec3.sh` PASS (merged satellite A0 =
+0x425FFC = anim@huitzil+0xB8AC, crash-free); new gate
+`tests/audit_type_dispatch_range.sh`: merged hui mash = original range
+[0x1C8,0x1E4) CLEAN with 5,862 renumbered dispatches (the full stream
+moved), donovan originals intact (4,575), verdict control on hui29 sees
+5,862 original-range hits.
+
+**F2 (the merged shim served only tenant 0) — fixed the same emit path:**
+`flavor_chain_multi()` gives each 54-byte chain block its OWNER's handler
+exit (the old chain's uniform `jmp` could only exit into tenant-0);
+declaring tenants' handlers are collected per iteration and ONE merged
+shim is assembled at engine_here (the 14z-80h shape), planted on BOTH
+declaring rows (dispatch_00[0x13] and [0x10] → the shim; pyron [0x11]
+stays direct by ratified decision); unmatched id → planted tripwire —
+that fall-through tripwire is the ONE op the fix adds (590→591,
+re-frozen in test_tenant_loop.sh + audit_merged_legacy.sh FIRST, per the
+standing rule). audit_merged_legacy section 0 now asserts the POST-fix
+shape (HENT == SHIM, PENT != SHIM).
+
+**Pyron f7997: NOT this class — measured elimination.** Crash-time
+instruction history (GUARD_PROBE_HIST now also fires from the guard's
+crash handler) names a vanilla dispatcher chain 0x1A77E→0x1A790
+`move.b (2,A6),d0` → byte map 0x1A888 → word table → computed jmp; a probe
+with `b@(a6+2) >= 0x72` recorded ZERO hits through the whole replay while
+the crash still fired identically — so no extended-family type ever enters
+that mapper, and the census's exposure claim stands. ~~A3=0x49bb8a (inside
+pyron's wide_ext) feeding that vanilla path + the odd derived pointer
+$FF31B5 point at a pyron-placed data/table defect one level removed —
+open, next session.~~ **RETRACTED same day (14z-82b below): the input was
+type 64 (< 0x72, invisible to that probe by construction); A3 was live
+register context, not causal; and the crash is LATENT in frozen pyron-m2
+itself.**
+
+## 14z-82b — the f7997 fix: vsavj's hit-class byte map extended to vs2's 80 entries
+## (probe build at the time; ADOPTED 2026-08-12 — huitzil-m4 / pyron-m3 were re-frozen on it,
+## and it is live in huitzil.toml:2048 / pyron.toml:1044. Header corrected 14z-91: the entry
+## below is the record of the probe session and is NOT rewritten.)
+
+**Third instance of the "vs2 widened an index consumer" class** (14z-26:
+property table 0x28D00; 14z-35: the 0x50-entry dispatch table; now the
+projectile-pool hit sweep). The sweep at `PRG:0x1A770-0x1A886` is SEVEN
+dispatchers (4 `bsr.w` + 3 `bsr.s`) that all map BOTH colliding objects'
+type bytes through ONE routine:
+
+    0x1A888: move.b (4,PC,D0.w),d0 ; rts     map at 0x1A88E, 64 entries
+
+vs2's sibling (dispatcher 0x1919A, routine 0x19292, map 0x19298) has
+**80 entries**. A ported type >= 64 in the $FF94xx pool that LANDS A HIT
+(the dispatch runs only on overlap — why it took an 11,017-frame chaos
+soak to fire once) indexes past vsavj's map: map[64] = the rts opcode's
+0x4E — exactly the crash D0 — then a garbage word-table displacement and
+a wild jmp. Measured LATENT in frozen pyron-m2 (type-64 satellite;
+crashes solo, no merge), shared by huitzil (68/72 stamped into the same
+pool, unexercised by his suite replays), safe for donovan (59-63 fit).
+
+**Body (94 bytes, GENERATED by `tools/gen_hitclass_map_thunk.py` — never
+hand-typed):** `cmpi.w #80,d0; bcc.s ILLEGAL; move.b (4,PC,D0.w),d0;
+rts; <64 vanilla map bytes verbatim><16 vs2 extension bytes>; ILLEGAL`.
+Site patch `jmp body` over the routine's own 6 bytes (`rts_ok`: a
+bsr-entered handler; stack-neutral, ghost-clean; final CCR on the normal
+path = the loaded byte's NZ, exactly vanilla). The generator ASSERTS the
+transplant licence: the engines' 0-58 map prefixes are byte-identical
+(vanilla's true domain — its type table has 59 rows), every extension
+value lands on a word-table entry byte-identical across the engines or
+the do-nothing default (a plain rts), and vs2's map ends at 79. Its own
+asserts caught two wrong first readings (an 83-entry miscount via an
+odd-alignment impossibility, and the 61/62 divergence below).
+
+**Deliberate policy: map[59-63] keep VANILLA's bytes.** vs2 populates
+61/62 (DONOVAN's satellite types) with classes 0x0E/0x04 where vsavj
+holds 0 — his projectile hit-class reactions are silently absent on
+every shipped build. Adopting vs2's two bytes = a Donovan re-freeze —
+recorded as a separate maintainer decision (STATE).
+
+**Measured (probe build; `tests/audit_hitclass_map_cost.sh`):** the
+soak that crashes the frozen build END-clean through 11,017 frames;
+legacy BIT-IDENTICAL over 30,284 frames on four replays; fire census =
+legacy enters the map ZERO times on any measured replay (the probe's
+liveness proven by pyron's own f7997 dispatch) — the thunk is
+unreachable for measured legacy content. Reconstruction gate:
+`tests/test_hitclass_map_thunk.sh` (2 verdict controls).
+
+> **THE FIRE-CENSUS SENTENCE ABOVE IS RETRACTED (14z-92, M4).** It is kept
+> as written because this is the 14z-82b record and historical entries are
+> not rewritten (CLAUDE.md §5.4) — but do not carry it forward. That census
+> was TWO replays (`02_demitri_vs_cpu`, `03_two_player_vs`), both of which
+> happen to score zero. Over the full 46-replay legacy corpus legacy enters
+> the map **230 times** (`26_don_arcade_mash` 228, `24_don_winmash` 2).
+> "The thunk is unreachable for legacy content" is FALSE. The fix is
+> unaffected and still sound: every observed legacy index is
+> 0x02/0x04/0x09/0x0b, far below 64, so legacy reads vanilla's own bytes
+> out of the thunk body. The correct argument is **"legacy enters
+> constantly and receives vanilla answers"**.
+
+**NOT ADOPTED in the manifests** — the row moves the huitzil + pyron
+frozen fingerprints; decision + recommendation in STATE. Harness repairs
+landed with it: `audit_merged_legacy` leg-b now always measures the REF
+leg on a crash (MERGE-SPECIFIC vs LATENT verdict), closing the gap that
+mis-attributed this crash for two sessions.
+
+### 14z-82c — ADOPTED: huitzil-m4 (e66678d0) + pyron-m3 (6c7f7322)
+
+Maintainer decision 1 adopted the row into BOTH tenant manifests (shared;
+dedups to one thunk on the merge; donovan not exposed, does not declare).
+pyron-m3 is byte-identical to the measured probe build. Re-freezes in the
+re-freeze-FIRST order: m3a constants, tenant_loop 261/207/439/593,
+audit_merged_legacy 593. Suites: both builds moved EXACTLY the three
+don-mash `.sha1` self-baselines (21/22/26) and no masked entry —
+attributed BY BYTES on the checksum timeline (full-RAM dump-diff at a
+divergent frame: 3 bytes, all $FF7Fxx dead-stack ghosts, zero live) and
+re-frozen; hui30 SUITE GREEN. THE PAIRSWEEP DISSOLVED under the fix with
+a control (pyron-m2: CRASH f4638, the f7997 signature; pyron-m3:
+END-clean 7,520) — one vanilla map was THREE defects. The merged
+instrument now: leg (a) 13/14 verbatim, leg (b) all six guard-clean
+(pyron/70 END 11017 merged). Decision 2 (Donovan's map[61]/[62]) leaning
+keep-zeros; measured: his sword-companion objects never enter the map in
+his replays (0 entries) — unexercised.
+
+> **BASIS RESTATED 14z-92 (the decision is UNCHANGED).** The "0 entries"
+> above came from the same two-replay census that was falsified for legacy.
+> The corpus-wide run does NOT overturn decision 2: legacy enters 230 times
+> and every observed index is 0x02/0x04/0x09/0x0b — **none at 61 or 62** —
+> so Donovan's satellite hit classes remain unexercised on a 46-replay
+> basis rather than a 2-replay one. Keep-vanilla's-zeros stands, now on
+> evidence 23x wider.
+
+## 14z-79 — (b') the index-window thunk, and a withdrawal
+
+**`site_thunk index_window_018468`** — engine site `PRG:0x018460`, 6 bytes
+`323b 0006 4efb` replaced by `4ef9 <thunk>` (`patch = "jmp"`, `rts_ok`);
+`0x018466-67` orphaned and never executed. Body 470 bytes in `hole_a`,
+GENERATED by `tools/gen_index_window_thunk.py` from the two decrypted images
+and reconstructed byte-for-byte by `tests/test_index_window_thunk.sh`.
+
+Layout: a 2-instruction filter, the normal path, a 4-way exact-equality
+dispatch, the four vs2 handler bodies verbatim, an 80-entry index table, and
+23 trampolines.
+
+    +0x00  cmpi.w #$00A0,d0 / bcc.s danger
+    +0x06  move.w (0x48,PC,d0.w),d1 / jmp (2,PC,d1.w)      <- normal path
+    +0x0e  4x cmpi.w/beq.s -> the four bodies
+    +0x26  jmp $00000001                                   <- defined vec3
+    +0x2c  80: 137c 000f 0054 4e75     (vs2 0x017024)
+    +0x34  81: 136b 0017 0054 4e75     (vs2 0x016F70)
+    +0x3c  82: 137c 0052 0054 4e75     (vs2 0x016FEC)
+    +0x44  83: 4229 0121 137c 0001 0054 4e75  (vs2 0x016F78)
+    +0x50  index table, 80 words: entry n -> (tramp + 10*k(n)) - 0x0e
+    +0xf0  23 trampolines: `move.w #<vanilla offset>,d1 / jmp <handler>.l`
+
+TWO THINGS THE BODY DOES THAT THE 14z-78 SPEC DID NOT, both forced by
+measurement:
+
+1. **The table copy is LOCAL and read PC-relatively.** The spec's
+   `lea 0x018468,a0 / move.w (0,a0,d0.w),d1` is a DATA-space read, and CPS-2
+   decrypts program-space fetches only, so it returns ciphertext: 38 of the 80
+   legacy targets come out ODD (0 in the opcode view). Because the body is a
+   `code` op it re-encrypts with the placed code, so a pc-relative read of an
+   embedded table decrypts back to what was authored.
+2. **Each trampoline restores D1 to the vanilla offset.** "D1 is dead on ENTRY
+   to all 80 handlers" is true and licenses nothing: the handlers `rts` into
+   `0x01821A`, a chain of five `bsr.w`. A build without the restore moved every
+   self-frozen legacy log and pushed two masked replays from one divergent run
+   to two. `move.w #imm,d1` also reproduces vanilla's CCR exactly, so register
+   and flag state at handler entry is bit-identical to vanilla.
+
+Cost to legacy: two compares and one extra jmp, touching D1 (rewritten to the
+vanilla value) and the CCR, writing NOTHING to RAM. The site is COLD — 22
+dispatches per 5,520-frame replay.
+
+**`data_port df_palette_seq_rows` — WITHDRAWN** (see the 14z-69 entry above,
+now marked RETRACTED). It overwrote BULLETA'S Dark Force palette block.
+
+## Session 14z-78 — `anim`'s placed address stops being a literal
+
+**Files:** `build/manifest/donovan.toml` (2 rows + comments),
+`tools/gen_donovan_patch.py` (new guard), `tests/test_thunk_addr_literal.sh`
+(new), `tests/audit_region_movability.sh` (expectation flipped),
+`tests/run_battery_m2.sh` (gate registered).
+
+**Emitted-byte delta on every frozen build: ZERO.** All four references rebuild
+bit-exact (donovan-m3a `4b7d0dc7`, m5_stock `6c93cfa8`, huitzil-m2 `9deda080`,
+pyron-m2 `69e8c6f0`). The change only alters what is emitted when `anim` is
+placed somewhere other than its default `hole_a` address.
+
+### The two rows
+
+`[[site_thunk]] select_companion_tbl_a` (site `0x0845EC`) and
+`select_companion_tbl_b` (site `0x0845F8`), authored in 14z-22 (see that
+session's entry above, whose "ported anim table 0xDDA1E" is the literal in
+question — historical, superseded here):
+
+```
+-  thunk_hex = "0c2e00TT000a6708207c002083bc4e75207c000dda1e4e75"
++  thunk_hex = "0c2e00TT000a6708207c002083bc4e75207cnnnnnnnn4e75"
++  region_subst = "nnnnnnnn=anim:0xa9ae"
+```
+
+(`_b` identically, with its own vanilla lea `207c002087ca`.)
+
+`207c 000dda1e` is `movea.l #$000DDA1E,A0`. `0x0DDA1E` was `anim`'s placed
+address, hand-computed once and tracking nothing thereafter. The offset is
+derived from the SOURCE side and cross-checks against the placement side:
+vs2 `0x289EF6` (the ported anim table) − anim's src `0x27F548` = `0xA9AE`;
+`placed[anim] 0x0D3070 + 0xA9AE = 0x0DDA1E`, the literal itself. In the
+default layout `region_subst` therefore emits the identical longword; on a
+build with `region_space = "anim=wide_ext"` it emits `207c 0040a9be`.
+
+Placeholder `nnnnnnnn` is deliberately NON-HEX. Substitution is textual, so
+the existing `aaaaaaaa` spelling (huitzil.toml:1387) can in principle collide
+with a real byte run in a longer body.
+
+### Why it mattered
+
+Relocating `anim` left both bodies aiming into the vacated address range,
+where `x2b7ef4` slid in. The resolver at `0x015084` reads
+`move.w (0,A0,D0.w),D0` / `lea (0,A0,D0.w),A0` — a base-plus-signed-16-bit
+offset table — so it produced an odd A0 and `move.l (A0),(0x20,A6)` took a
+vec3 address error in VANILLA code at `PC 0x015098`. That crash was recorded
+as M3b's binding constraint for a session. `anim` is 371,712 of the 470,200
+bytes three tenants needed from a 344,640-byte crypt window; with it movable
+the requirement is 98,488 and the overflow is gone.
+
+### The guard
+
+`gen_donovan_patch.py` gains a third stale-literal guard beside the two that
+cover the tenant id. An opcode-anchored (`2n7c` movea.l / `4nf9` lea /
+`4ef9`,`4eb9` jmp,jsr / `2n3c` / `4879` pea), word-aligned 32-bit operand in
+the PRE-SUBSTITUTION body that lands in any placed region's destination span
+fails the build, naming the region and printing the exact `region_subst`
+spelling to use. Escape hatch `addr_literal_ok`, mirroring `id_literal_ok`.
+
+Coverage boundary, asserted in the gate rather than assumed: a raw longword in
+embedded data is NOT caught. An unanchored scan was tried and rejected — it
+reads operand pairs as addresses (`...0040` + `4e75` parses as `0x00404E75`,
+inside wide_ext).
+
+## Session 14z-76 (Pyron's effect palette; build/pyron20 69e8c6f0)
+
+One `[[palette]]` row added to `build/manifest/pyron.toml`, immediately after
+his `sprite` entry:
+
+```toml
+[[palette]]
+name = "effect"
+stage = 6
+src = 0x3AC45C          # vs2 0x396C14[0x11]; stride 0xDC0
+len = 0xDC0
+src_head_hex = "05370639075b088d"
+table = 0x38C218
+```
+
+Generated delta against `pyron19`, exactly two ops and nothing else:
+
+| op | addr | value | provenance |
+|---|---|---|---|
+| `data_file` | `0x3FABA0` (hole_b) | `palette_block_effect.bin`, `0xDC0` | `VS2` (vs2 `0x3AC45C`) |
+| `poke32` | `0x38C25C` | `0x003FABA0` | `GEN` — effect table row `0x11` |
+
+`0x38C25C` = `0x38C218 + 4*0x11`, i.e. **row 0x11 of the 32-row effect
+palette pointer table** — a variant alias row, which legacy never indexes
+(`tests/audit_id_writers.sh`). Before this change it held `0x3923E0`, row
+0x01's value, so Pyron drew his effect/flash palettes from **Demitri's**
+block. No `extra_tables` key: the generator emits extras only on the base
+half, so a variant-id tenant has none.
+
+**RETRACTION.** The deferral note in `pyron.toml` (and M3b merge blocker #2 in
+`docs/NEXT_SESSION.md`) claimed this table has only 16 rows and that a variant
+id spills into a separate table at `0x38C258`. It does not — see
+`docs/game/atlas/character_tables.md` "The per-character palette POINTER
+tables" and `docs/game/gotchas.md` "A VARIANT ALIAS ROW holds a value vanilla
+uses". The comment block in the manifest was rewritten to the measured model,
+keeping the still-valid eliminations from the 14z-74/75 blink hunt.
+
+Gates: `run_suite.sh vsavjw` GREEN (55 PASS / 17 SKIP / 0 FAIL — the same
+class inventory as `pyron-m1`, so legacy is untouched), `test_pyron_blink.sh`
+still `fixed`, plus cosmo / variant_dispatch / gfx_layout3 / empty_tiles /
+m3a_reproducible and the new `tests/test_effect_palette_table.sh`.
+
+NOT established: visibility. The block is read 0 times in ordinary play
+(two vanilla fighting replays, a 6000-frame Pyron soak; positive control 60
+reads of his sprite block on the same rig). It is a rare-event palette whose
+only documented trigger is the electrocute X-ray plus DF/status tints.
+
+---
+
 ## 14z-71 — the beam: byte detail
 
 **`code_ptr beam_effect_class16`** — 4 bytes at vsavj `PRG:0x080AEC`,
@@ -1006,6 +1809,50 @@ immediately after (`0x0D8988/98/A0`), so the machine read animation bytes
 as its parameters. A real latent repair with no observable effect today
 (the code that reads them does not run in any current scenario).
 
+## 14z-70 — the ground explosion, and one inert repair
+
+**`extra_tiles/0x10.json`: 2 -> 569 tiles.** The 214+P grenade's GROUND
+detonation (NOT the on-contact hit explosion — see the rig note below)
+drew a solid fuchsia rectangle. Its sprite codes are correctly remapped
+bank 3 -> bank 4 (identical code ranges to native, verified in the same
+OBJ dump that shows pal 0a/0c remapped correctly), but the tiles were
+never copied into group C, so they resolve to all-zero tiles. Same class
+as the child sidekick's shadow (14z-69o), two orders of magnitude bigger.
+
+Rule used: every tile in the effect's span **0x0A00-0x0C40** that vs2
+bank 3 has art for and our group C lacks. Source mapping validated on 6
+populated tiles — group C bank 4 tile `c` <- vs2 group B index
+`0x10000 + c`. Gfx-only: `build/hui17` carries the SAME program
+fingerprint as hui15/hui16 (`699de9b7`), which is the evidence that no
+program byte moved.
+
+**The first attempt shipped 115 tiles and did not work.** A per-drawn-
+tile inventory misses the other 35 tiles of every 6x6 sprite, because
+`obj_records_dump` reports only a sprite's BASE code — and the fuchsia
+block IS one 6x6 sprite. The span rule is a superset that covers any
+multi-tile layout.
+
+**Rig, because it is the whole reason this hid for three sessions:**
+`tests/replays/hui/83d_hui_grenade_ground.rpl` — 214+**LP** (shortest
+arc) with BOTH fighters walked back to their corners. Every earlier rig
+fired 214+MP from 2P start distance, where the bomb reaches the opponent;
+those captures show the on-contact explosion, which is correct and always
+was.
+
+**`x088512` 0x3B40 -> 0x3B98, raw tail from +0x3B78.** Its own three
+`lea (d16,pc),A0` at 0x08C014/26/38 target tables at 0x08C08A/9A/A2,
+0x38/0x48/0x50 past the old end, so each resolved to `target + delta`
+inside the ANIM region placed immediately after (0x0D8950). Fixed via the
+14z-69j mechanism, plus a small `extract_char.py` change so a SOURCE-ONLY
+root honours `f<off>` at all. `verify_pcrel_data.py` 72 BROKEN -> 69.
+
+**It fixes nothing observable and is kept on that basis.** The code that
+reads those tables never executes in any measured scenario (execution
+breakpoint at the placed twin `PRG:0x0D8912`: zero hits), and the
+explosion's sprite codes are byte-identical before and after. It is a
+latent repair of an already-ratified class, proven safe by legacy
+masked-v2 EXACT and both frozen references rebuilding bit-exact.
+
 ## 14z-69 (session close) — byte detail
 
 **`data_port df_palette_seq_rows`** — **WITHDRAWN 14z-79.** Rows
@@ -1040,6 +1887,334 @@ byte-identical to vs2. Behaviour unchanged so far: the beam still does
 not draw.
 
 Newest first.
+
+## Session 14z-67 — the H gfx rung (D4 opener 3): every byte class, and
+## where the detail lives
+
+Build hui6 = b99b7359 (stage 6, 0x10, profile cps2-wide-v1). Per-op
+byte detail: `build/hui6/patch/patch_notes_fragment.md` (generated,
+op-exact). The manifest-level record:
+
+- **12 OBJ bank setters** (`[[port_patch]]`, huitzil.toml): every
+  `move.w #$6000,$18(aN)` in H's ported regions -> `#$1000` (WIDE bank
+  4) on the variant build. Sites from a fresh scan (opcode
+  `(w & 0xF1FF) == 0x317C`, imm 0x6000, disp 0x0018): x057456 0x5938C;
+  x05c800 0x5CF38/0x620D4/0x62194; x088512 0x8873E/0x89D26/0x8B100;
+  x06800c 0x68360/0x683A2/0x683EA/0x6842E; x0692f6 0x69490. Donovan's
+  six shared-zone rows reproduce as the exact subset (scan validation).
+  One near-miss triaged: 0x8BF1A writes #$6000 to +0x1A (the X word),
+  not a bank — left alone.
+- **[table_fix]** x026142+0x13EE: vanilla vsavj rows EXCEPT row 0x10 =
+  0x1000. **[[code_word]]** obj_bank_word_slot: vsavj 0x282D4 row 0x10
+  (variant-alias anchored) -> 0x1000.
+- **[[palette]] x2**: sprite block vs2 0x39BC9C len 0x500 (head
+  0111 0630 0a40 0c60), effect block vs2 0x3AB69C len 0xDC0 (head
+  0503 0704 0815 0947), tables 0x38C198/0x38C218 + extra 0x38C258 —
+  the Donovan template with H's blocks (pointer-table rows 0x10,
+  strides 0x500/0xDC0 verified across rows 0x0F-0x13).
+- **Seven [[select_records]]**: same array bases as Donovan's (the
+  arrays are engine-global; the generator indexes row = tenant id).
+  H's vs2 rows: portrait 0x2A5E4A/0x2A625A, name 0x2A64D6/0x2A7506,
+  splash 0x2A7B06/0x2A7E36, win_quote 0x2A881E; vj alias rows = row
+  0x00's records (verified equal). Highlight = host_ring; vs2's
+  newcomer highlight rows hold sentinels 0x5000000/0x4000000.
+- **Drawer bank thunks**: name/splash/winquote rows verbatim (tt/tu
+  substitution follows the manifest's tenant).
+  **select_pal_variant_id**: H has NO dedicated palette block — vs2's
+  uploader remaps id 0x10 INTO the shared grid at column 0x0B
+  (`cmpi #$10 -> moveq #$B,d6`, vs2 0x6B1A6; grid base 0x3C117C, row
+  = (variant*16+id)*0x20). His 10 rows = 0x3C12DC + v*0x200, gathered
+  contiguous by the NEW data_subst form `x10@0x200`.
+- **HUD rows**: vs2 DATA-view entries (name 0x9910E row 0x10 =
+  04AB 0102 FFE8 0002; mug 0x990CE row 0x10 = 05A0; vs2 stager bias
+  +0x4200 -> art 0x46AB 2x1 / 0x47A0 2x2, non-blank verified). Pool
+  anchors 0xBE92 (plate) / 0xBE9A (mug; bottom row 0xBEAA-AB). Pokes:
+  0x898A4=0x869A, 0x89944=0x86920102, 0x89948=0xFFE80002 (vsavj bias
+  -0x3800). Art rides effect_tail `place_variant_slot_huitzil` (the
+  NEW per-tenant key — the generic key would leak H's art into
+  Donovan's builds and break m3a bit-exactness).
+- **[[win_pal_variant]]** hui_win_pal: vs2_src 0x3C347C (= vs2 pool
+  0x3C2A7C + 0x10*0xA0; head 0x0111... = his palette family), same
+  site/pool/strides as Donovan's row.
+- **[[select_wheel]] roster21**: verbatim — the 21-cell extension is
+  tenant-independent (cells 0x10/0x11/0x13 from the layout json).
+- **[[pcrel_escape_fix]] x05c800** (stage 4, pad 0x20): the census
+  find. Sites 0x631D0/0x631D8 (`tst.b $18E/$134(a4); bne.w 0x635FC`);
+  target does `subq.b #1,$149(a4); jmp <engine>`. Resolution: vsavj
+  0x5B25C — UNIQUE pattern match, jmp targets twin-verified (vs2
+  0x15770 / vsavj 0x17028, 60/64 bytes, diffs = A5-operand drift).
+  Recon row in reconciliation_huitzil.toml.
+
+Machinery (all Donovan-bit-exact, m3a-reproducible run at every step):
+per-tenant layout resolution (gfx_layout3.toml rows by tenant NAME —
+the id differs per track), the delta-0 placement path, per-tenant
+effect_tail keys, the data_subst gather form, verify_gfx_build
+de-Donovanized (span/aux/sweep per tenant), obj_records entry-bounds
+check + per-tenant sweep windows (inventories re-frozen H 15,034 /
+P 14,225; Donovan unchanged 15,612).
+
+## Session 14z-67b — the ping-round fixes (byte detail)
+
+Builds: hui7 93c9aa44 (c5), hui8 59cf9f85 (+byte map), hui9 9e3105e0
+(+throw arc = PING #8). Per-op detail in each build's generated
+patch_notes_fragment.md.
+
+- **Effect byte-map rows** (hui8; huitzil.toml aux_pokes
+  effect_map_4e4f/5051/5253): DATA 0x28D4E..0x28D53 <- 0F1B 1F19 0F03.
+  The id->handler-index map (vj DATA 0x28D00 / vs2 0x27FD8) is
+  byte-identical through id 0x4A; vs2's six live entries at 0x4E-0x53
+  read zero on vsavj -> every newcomer effect collapsed to index 0.
+  Also divergent (not poked): id 0x5F (vs2 0x00 / vj 0xFF). The
+  per-char record rows needed nothing (bank_map anim_index_a/a2/b rows
+  0x10 already repointed; verified on the built image). Restores the
+  236P ray SPAWN (visible but brief/wrong-palette — the segment
+  behavior needs the zone flow).
+- **c5 mode** (hui7; generator + build_gfx): delta-0 group-C tenants
+  keep companion-record bank-1 words NATIVE; effect_c5.json (5,714
+  codes) places the art at native codes in group C bank 5; three
+  ported spawner setters flip #$2000 -> #$3000 (x088512 0x8B224/
+  0x8BF14/0x8BF52). Corrects hui6's wrong-art remaps (records at
+  x2b7ef4+0x900C carried effect_tail anchor words 0x0FE7+ where
+  native reads 0x0FA0+).
+- **Throw-arc superset tables** (hui9; site_thunk throw_arc_tables,
+  patch=jmp+jmp_ok at vj 0x28386): full tail replacement of the
+  physics-row installer reading PLACED copies of vs2's map1 (0x54B
+  from 0x279B4) + table2 (0x370B from 0x27A08). Statically proven
+  strict supersets (map1 prefix 0-0x49 and rows 0-0x31 byte-identical
+  across the games) -> serves ALL throws unconditionally; boot
+  masked-EXACT confirms. vs2's five extra map entries -> rows
+  0x32-0x36 (63214 arcs rows 0x33/0x34: yv 16.0/20.0, gravity
+  -0.688). Measured: launch yv 0x0010 == native, decay lockstep
+  (FBNeo tap A/B on the 2P replay).
+- **The effect zone + fleet spawners** (regions x022400 = vs2
+  0x22400+0x1600 t+0x2E, x06d240 = 0x6D240+0x500 t+0x174) with
+  escape pads (0x180/0x60) and recon rows: stage-2 installer twins
+  0x2710C/14/1C -> 0x27EB4/BC/C4; byte-map data rows 0x27FD8/DA ->
+  0x28D00/02; per-char pointer table 0xD96B8 -> 0xBF51A
+  (shape-matched; per-game pointer content). ENTRY THUNKS PARKED
+  (seq_d_dispatch: the real entry, regresses the ray pending the
+  flow's dependency closure; effect_machine: wrong entry, hot for
+  legacy). The parked bodies + anatomy live as comments in
+  huitzil.toml.
+
+## Session 14z-66 — EX-move crash-reset fix: three farm-voice stubs
+## (playtest round-1 item 1; manifest-data only, no machinery)
+
+Change: THREE `[[map]]` rows appended to
+build/manifest/reconciliation_huitzil.toml (H overlay; the shared map
+untouched, Donovan's builds unaffected by construction):
+  vsav2 0x004efa -> vsavj 0x02a7e0  stubbed_sound  (sfx id 0x748)
+  vsav2 0x004fb0 -> vsavj 0x02a7e0  stubbed_sound  (sfx id 0x729)
+  vsav2 0x004fca -> vsavj 0x02a7e0  stubbed_sound  (sfx id 0x72e)
+Ids disasm-verified from the farm stanzas (jsr 0x330E; move.l #id,D1;
+bsr 0x5122; jmp 0x3306) in vsav2 opcodes view. All 0x7xx newcomer
+voice range = the established stub class (six precedent rows).
+
+Byte effect on the stage-4 build (117 -> 114 ops): the three ILLEGAL
+tripwire words at hole_a 0xf8720/0xf8730/0xf8740 are no longer
+emitted, and the three referencing jsr operands now carry 0x02A7E0
+(engine rts) instead of tripwire addresses:
+  x067846+0xd2  (was -> 0xf8720)   [family sweep; never seen to fire]
+  x067846+0xec  (was -> 0xf8730)   [family sweep; never seen to fire]
+  x0689cc+0xec  (was -> 0xf8740)   [the shared one-shot voice cue:
+                                    tst.b $23(a6); clr.b; jsr]
+Fingerprints: pre-fix e8d95a5c (crashes: ES f3513, FG-connect f3364,
+both vec4 at 0xf8740), post-fix 01f6f907 (both EX moves fire to
+completion repeatedly; stock 9->6 on the FG-connect replay).
+
+Repro/validation artifacts: replays tests/replays/hui/71_hui_ex_fg.rpl
+(mid-range control — clean even pre-fix: a whiffing FG never reaches
+the cue), 72_hui_ex_es.rpl, 73_hui_ex_fg_close.rpl; gate
+tests/test_hui_ex.sh (guard-clean AND stock-decrement so the coverage
+cannot silently evaporate — the 14z-44 lesson).
+
+## Session 14z-66 — velocity port (playtest round-1 item 2): param32
+## rows 0x10 + the per-tenant VALUE_SKIP default
+
+Mechanism (measured before any change): both vsavj param32 tables are
+32-ROW — rows 0x10-0x1F byte-identical aliases of 0x00-0x0F
+(param32_a 0x0BD87A, param32_b 0x0BE2FA, rec8) — and all three
+consumers (0x228e2/0x271a8 read a, 0x26484 reads b) index the RAW
++0x382 id via ext.w/lsl #3 with NO fold. Tenant 0x10 therefore read
+the alias CONTENT = Bulleta's row 0 — the measured mechanism behind
+"feels a bit slower". A write at row 0x10 is a variant row: legal
+under the op invariant, zero consumer work.
+
+Changes:
+- tools/gen_donovan_patch.py: VALUE_SKIP (the 14w-b crash guard)
+  became a per-tenant DEFAULT — [[tenant]] port_param32 = true opts a
+  tenant in; absent flag keeps the skip (Donovan's manifest carries no
+  flag, so his bytes are unchanged — m3a reproducibility gate PASS).
+  normalise_tenants passes the key through.
+- build/manifest/huitzil.toml: port_param32 = true.
+
+Byte effect (fingerprint 3a172c52, 114 -> 116 ops): two data ops,
+  0x0BD8FA +0x8 = 00032000 fffd4000  (param32_a[0x10] — his true pair:
+                                      fwd 3.125 vs alias 3.0, back equal)
+  0x0BE37A +0x8 = 0001a000 fffdc000  (param32_b[0x10] — fwd 1.625 vs
+                                      alias 2.0, back -2.25 vs -2.75)
+Vanilla rows 0x00-0x0F untouched (verified from the built zip's data
+view).
+
+Verification: NEW gate tests/test_hui_walk.sh — static rows + the
+walk-speed replay 74 (16.16 X deltas over two 15-frame windows before
+push-box contact: frozen 0x1C2000/0x384000; the alias build measures
+0x1B0000/0x360000 — both windows scale by exactly 25/24 = his fwd /
+alias fwd; the walk anim runs a 0.6x/1.2x phase profile, hence the
+window asymmetry). The 14w-b hazard RE-EXAMINED for H, second half:
+full battery GREEN on the ported tree including the 11k chaos soak
+(Donovan's 14w-b crash was at soak f10050 — H shows no analog) + EX
+gate + boot masked-v2 EXACT + m3a-reproducible.
+
+## Session 14z-66 — the second FG crash: shadow_seq_guard site thunk
+## (round-2 report; the capture-anim shadow over-index)
+
+Root chain (every link measured; instruments: replays 77 + the pair
+matrix, GUARD_TRACE 3396-3398, taps, native A/B snapshots):
+- Final Guardian is a CAPTURE-class transformation super (native: the
+  giant + 7-hit barrage; pieces = poolB secondaries types 0x75/0x77 —
+  correctly relocated on our build, cursor byte-exact).
+- The per-player SHADOW/REFLECTION servants (class-0x0C trio, spawner
+  0x489DE+, installer 0x8237E+) mirror a linked character's anim by
+  reading each anim NODE's +0xC word: low 13 bits = a seq id into the
+  SHARED shadow tables 0x2083BC/0x2087CA (row space 0x40E each,
+  hardcoded at 0x823E2/0x823F2 — NOT per-char; sequence data follows
+  at 0x208BD8). Node stride 0x18; walk site 0x8245C -> engine
+  installer 0x1508A.
+- H's ported anim nodes carry VS2 seq ids; the FG capture anims carry
+  0x488 (valid in vs2's larger table at 0x1E42D2, found via the twin
+  installer vs2 0x90B08). On vsavj, word[0x488] lands in sequence
+  DATA: fetched 0x0021 -> odd cursor -> vec3 f3398 at 0x15098.
+- THE VICTIM'S servant crashes, not H's: capture supers make the
+  victim play ATTACKER-supplied nodes (measured: crash servant owner
+  id 0x0C = P2). A first-attempt owner==tenant gate missed exactly
+  this (build 22ea24f9, kept as the negative lesson in the manifest
+  comment).
+
+Fix (build 44be1266): [[site_thunk]] shadow_seq_guard in huitzil.toml
+— site 0x8245C (old 4ef90001508a, the walk jmp) routed via a
+stack-neutral jmp (NEW patch="jmp" emitter option) to a 14-byte body:
+  cmpi.w #$40e,d0 ; bcs.s vanilla ; moveq #0,d0 ; vanilla: jmp $1508a
+Unconditional by design: no vanilla content can produce seq*2 >= 0x40E
+(it would vec3 on vanilla hardware), so legacy behavior is invariant
+by construction; the clamp serves any tenant's out-of-range ids
+(capture victims included). Clamped seq 0 = the default shadow every
+sparse vanilla row already falls back to; the +0x50 cache keeps the
+raw id so the walk does not thrash. RESTORE AT THE GFX PASS: same
+site, extended table instead of clamp.
+
+Generator changes: site_thunk block gate 6 -> 4 with per-row default
+stage raised to 6 (all existing rows declare stage explicitly — no
+emission change for Donovan at any stage; m3a gate PASS), and the
+patch="jmp" option (guarded: old_hex must be a jmp).
+
+Measured fixed: replay 77 (whiff/mid FG) guard-clean END 4720, stock
+9->8, snapshots show the full native sequence (FIRST ATTACK -> the
+7-HIT barrage, matching native's hit count). test_hui_ex.sh gained
+replay 77 as section 3.
+
+## Session 14z-66 — the THIRD FG crash: embedded data tables in
+## crypt-placed code (data_in_code mechanism + census)
+
+Maintainer round 3: FG "still crash-resets, a bit later after the
+capture" on 44be1266 (the shadow guard held — this was a THIRD site).
+Repro (after plain/kill/victim variants stayed clean): FG + a
+deterministic post-capture chaos block (replay 78) — vec3 f3892 at PC
+0xC8156, inside the ported x026142 copy: the capture-victim anim
+installer walking a VANILLA per-victim capture table (the 0xBCE7A+
+Midnight-Bliss-family sets) with seq D0=0xFF.
+
+Root (trace-caught, the whole chain): his FG picks each barrage hit's
+victim pose RANDOMLY — seq = table16[rand&15] via engine RNG 0x14E8A —
+from a 16-byte DATA table EMBEDDED IN HIS CODE (vs2 0x56074, read
+`lea (0x26,pc),a1; move.b (a1,d0.w),d0`). The code region sits in the
+crypt hole: placed bytes are stored re-encrypted for opcode fetches,
+so the runtime DATA read saw garbage — 0xFF drawn where native reads
+01/03/05 (vs2 data view: 01050305050305010305010505010503). Garbage
+seqs over-ran the victims' capture tables with per-victim/per-draw
+crash signatures; safe draws = clean casts. THE RANDOM DRAW is why
+three repro campaigns produced three different-looking crashes and
+several clean runs.
+
+Fix: NEW generator mechanism [[data_in_code]] (generalized 14z-20
+class, region form): relocates the table's SOURCE-DATA-VIEW bytes to a
+raw hole and reroutes the placed reader through a 12-byte helper
+(lea abs,An + the verbatim read op + rts; site = jsr helper + nop —
+ghost-clean, the read op sets NZ identically). Supported shape:
+lea(d16,pc),An + any move.b/w/l via (An,Xn.w).
+
+CENSUS (the class had bitten three times, so: scan of ALL crypt-placed
+region bytes for the shape with in-region targets): FIVE instances —
+the FG table + 0x56064/0x5649C (the 0x56-0x59 pose set), 0x564AC
+(01/03/05 twin), and x088512's 0x8C042 (a word offset/record table the
+POD code re-derives a3 from; self-relative, copied 0x100). All five
+rerouted in one build. Fingerprint 4317353c; helpers/tables in hole_b.
+
+Measured: replay 78 clean in BOTH timelines; full battery GREEN
+(boot masked-v2 EXACT — the reroutes are tenant-code-only; m3a
+bit-exact — the mechanism is manifest-driven, Donovan has no rows).
+Gate: test_hui_ex.sh section 4 (replay 78 + stock assertion).
+
+## Session 14z-66 — AIR MOVEMENT LIVE (item 3): the per-char jump
+## handler clone + the x026142 escape fix
+
+Continuation of the float arc (see the previous entry + STATE 14z-66).
+After the float landed, the air dash (66 during the float) dispatched
+into his own air-dash physics setter (vs2 0x586F0: xv/yv/gravity
+installs, byte-faithful in the x057456 copy) but crashed vec4 at a
+mid-instruction address. The trace showed the REAL fault one level up:
+the air-dash SEQ STARTER (vs2 0x26E14, inside the x026142 shared-zone
+copy) ends with `bra.w` back to the engine stepper — an
+oracle-invisible pcrel escape THE x026142 REGION HAS CARRIED SINCE
+14z-65. Its other escapes were never reached (or wandered benignly);
+the air-dash flow was the first to die on one.
+
+Fix: [[pcrel_escape_fix]] extended to x026142 (7 unique escape
+targets, 9 sites -> 6 trampolines + pad 0x60). Targets resolved by the
+SITE-TWIN method (per-site interpolation between bracketing known
+pairs, reading vsavj's own branch at the twin site): 0x210C0->0x226DC,
+0x219C4->0x22FC0 (two sites agree), 0x21C64->0x23244 (two sites
+agree), 0x22008->0x23500, 0x25F9A->0x26E16 (unique exact-16),
+0x27542->0x282EE (the region-end fall-through), and 0x24CBA->0x26058
+(unique wildcarded match; the neutral-reset family). Rows in the H
+overlay.
+
+Measured (build 2898c495): jump -> float hover at 109.4 -> 66 -> seq
+0x1400 with X +119.6px over 15f at dy=0 (the flat accelerated air
+dash) -> dash end -> gravity fall with carry -> landing sub-state ->
+grounded. NEW gate tests/test_hui_air.sh (float: Y pinned >= 100px;
+air dash: seq byte 0x14 at +0x06 + >=30px flat advance — mode
+signatures, not just no-crash). Full battery GREEN incl. boot
+masked-v2 EXACT and m3a bit-exact. build/hui4 = 2898c495 (ping #5:
+float + air dash + all prior fixes; flavor default now VS2-correct
+per measurement — Start-hold selects the other flavor, so D1 is
+playtestable for the first time).
+
+## Session 14z-66 — the alias-physics port, first row: jump_params
+## (the float ceiling + jump feel)
+
+The one family behind the remaining feel deltas, first consumer
+decoded and ported. The JUMP-PARAM INSTALLER (vsavj 0x27A34, vs2
+0x26C86 — the routine every seq-0600 starter bsr's) computes id*0x30 +
+variant offset (0/0x10/0x20 = neutral/forward/back) into the per-char
+jump table (vsavj 0x0BDB7A, vs2 0xD7D18 — EXACTLY the bank-origin
+delta, validating the bank scheme), RAW id, no fold. Rows = (xv.l,
+xacc.l, yv.l, gravity.l). The vsavj table is 32-row with 0x10-0x1F
+byte-aliasing 0x00-0x0F (dumped; ends exactly at the known 0x0BE17A
+table), so H's row 0x10 is a superset-safe variant write.
+
+Change: bank_map [[table]] jump_params (rec8, stride 0x600) +
+VALUE_SKIP gains "jump_params" (the 14w-b physics caution class;
+port_param32 tenants port it — Donovan flagless, bytes unchanged,
+m3a PASS). Build 8bea919e emits ONE op: data 0x0BDE7A +0x30 (his
+three rows: neutral yv 8.0/grav -0.375 vs the alias 6.75/-0.4375).
+
+Measured: the float ceiling moved 109.4 -> 121.1 = NATIVE EXACT, with
+the native rise curve; oracle-battery mismatches dropped 1770 -> 1741;
+every gate green (air-gate sample frames retuned to the native rise —
+the old frames were calibrated to the alias climb). Residual known
+delta: the GROUND dash (ours ~7 vs native ~8.2 px/f) — its per-char
+param consumer is not yet decoded; next row of the same family.
 
 ## 14z-65 (6) — the specials hunt: window widened, alias rule, farm verified (2026-08-07)
 
@@ -2990,1077 +4165,3 @@ V2 masked basis (build 4b7d0dc7):
   to vanilla; the 14-replay sweep clean except the staging slots (v2
   masks them by design).
 
-## Session 14z-66 — EX-move crash-reset fix: three farm-voice stubs
-## (playtest round-1 item 1; manifest-data only, no machinery)
-
-Change: THREE `[[map]]` rows appended to
-build/manifest/reconciliation_huitzil.toml (H overlay; the shared map
-untouched, Donovan's builds unaffected by construction):
-  vsav2 0x004efa -> vsavj 0x02a7e0  stubbed_sound  (sfx id 0x748)
-  vsav2 0x004fb0 -> vsavj 0x02a7e0  stubbed_sound  (sfx id 0x729)
-  vsav2 0x004fca -> vsavj 0x02a7e0  stubbed_sound  (sfx id 0x72e)
-Ids disasm-verified from the farm stanzas (jsr 0x330E; move.l #id,D1;
-bsr 0x5122; jmp 0x3306) in vsav2 opcodes view. All 0x7xx newcomer
-voice range = the established stub class (six precedent rows).
-
-Byte effect on the stage-4 build (117 -> 114 ops): the three ILLEGAL
-tripwire words at hole_a 0xf8720/0xf8730/0xf8740 are no longer
-emitted, and the three referencing jsr operands now carry 0x02A7E0
-(engine rts) instead of tripwire addresses:
-  x067846+0xd2  (was -> 0xf8720)   [family sweep; never seen to fire]
-  x067846+0xec  (was -> 0xf8730)   [family sweep; never seen to fire]
-  x0689cc+0xec  (was -> 0xf8740)   [the shared one-shot voice cue:
-                                    tst.b $23(a6); clr.b; jsr]
-Fingerprints: pre-fix e8d95a5c (crashes: ES f3513, FG-connect f3364,
-both vec4 at 0xf8740), post-fix 01f6f907 (both EX moves fire to
-completion repeatedly; stock 9->6 on the FG-connect replay).
-
-Repro/validation artifacts: replays tests/replays/hui/71_hui_ex_fg.rpl
-(mid-range control — clean even pre-fix: a whiffing FG never reaches
-the cue), 72_hui_ex_es.rpl, 73_hui_ex_fg_close.rpl; gate
-tests/test_hui_ex.sh (guard-clean AND stock-decrement so the coverage
-cannot silently evaporate — the 14z-44 lesson).
-
-## Session 14z-66 — velocity port (playtest round-1 item 2): param32
-## rows 0x10 + the per-tenant VALUE_SKIP default
-
-Mechanism (measured before any change): both vsavj param32 tables are
-32-ROW — rows 0x10-0x1F byte-identical aliases of 0x00-0x0F
-(param32_a 0x0BD87A, param32_b 0x0BE2FA, rec8) — and all three
-consumers (0x228e2/0x271a8 read a, 0x26484 reads b) index the RAW
-+0x382 id via ext.w/lsl #3 with NO fold. Tenant 0x10 therefore read
-the alias CONTENT = Bulleta's row 0 — the measured mechanism behind
-"feels a bit slower". A write at row 0x10 is a variant row: legal
-under the op invariant, zero consumer work.
-
-Changes:
-- tools/gen_donovan_patch.py: VALUE_SKIP (the 14w-b crash guard)
-  became a per-tenant DEFAULT — [[tenant]] port_param32 = true opts a
-  tenant in; absent flag keeps the skip (Donovan's manifest carries no
-  flag, so his bytes are unchanged — m3a reproducibility gate PASS).
-  normalise_tenants passes the key through.
-- build/manifest/huitzil.toml: port_param32 = true.
-
-Byte effect (fingerprint 3a172c52, 114 -> 116 ops): two data ops,
-  0x0BD8FA +0x8 = 00032000 fffd4000  (param32_a[0x10] — his true pair:
-                                      fwd 3.125 vs alias 3.0, back equal)
-  0x0BE37A +0x8 = 0001a000 fffdc000  (param32_b[0x10] — fwd 1.625 vs
-                                      alias 2.0, back -2.25 vs -2.75)
-Vanilla rows 0x00-0x0F untouched (verified from the built zip's data
-view).
-
-Verification: NEW gate tests/test_hui_walk.sh — static rows + the
-walk-speed replay 74 (16.16 X deltas over two 15-frame windows before
-push-box contact: frozen 0x1C2000/0x384000; the alias build measures
-0x1B0000/0x360000 — both windows scale by exactly 25/24 = his fwd /
-alias fwd; the walk anim runs a 0.6x/1.2x phase profile, hence the
-window asymmetry). The 14w-b hazard RE-EXAMINED for H, second half:
-full battery GREEN on the ported tree including the 11k chaos soak
-(Donovan's 14w-b crash was at soak f10050 — H shows no analog) + EX
-gate + boot masked-v2 EXACT + m3a-reproducible.
-
-## Session 14z-66 — the second FG crash: shadow_seq_guard site thunk
-## (round-2 report; the capture-anim shadow over-index)
-
-Root chain (every link measured; instruments: replays 77 + the pair
-matrix, GUARD_TRACE 3396-3398, taps, native A/B snapshots):
-- Final Guardian is a CAPTURE-class transformation super (native: the
-  giant + 7-hit barrage; pieces = poolB secondaries types 0x75/0x77 —
-  correctly relocated on our build, cursor byte-exact).
-- The per-player SHADOW/REFLECTION servants (class-0x0C trio, spawner
-  0x489DE+, installer 0x8237E+) mirror a linked character's anim by
-  reading each anim NODE's +0xC word: low 13 bits = a seq id into the
-  SHARED shadow tables 0x2083BC/0x2087CA (row space 0x40E each,
-  hardcoded at 0x823E2/0x823F2 — NOT per-char; sequence data follows
-  at 0x208BD8). Node stride 0x18; walk site 0x8245C -> engine
-  installer 0x1508A.
-- H's ported anim nodes carry VS2 seq ids; the FG capture anims carry
-  0x488 (valid in vs2's larger table at 0x1E42D2, found via the twin
-  installer vs2 0x90B08). On vsavj, word[0x488] lands in sequence
-  DATA: fetched 0x0021 -> odd cursor -> vec3 f3398 at 0x15098.
-- THE VICTIM'S servant crashes, not H's: capture supers make the
-  victim play ATTACKER-supplied nodes (measured: crash servant owner
-  id 0x0C = P2). A first-attempt owner==tenant gate missed exactly
-  this (build 22ea24f9, kept as the negative lesson in the manifest
-  comment).
-
-Fix (build 44be1266): [[site_thunk]] shadow_seq_guard in huitzil.toml
-— site 0x8245C (old 4ef90001508a, the walk jmp) routed via a
-stack-neutral jmp (NEW patch="jmp" emitter option) to a 14-byte body:
-  cmpi.w #$40e,d0 ; bcs.s vanilla ; moveq #0,d0 ; vanilla: jmp $1508a
-Unconditional by design: no vanilla content can produce seq*2 >= 0x40E
-(it would vec3 on vanilla hardware), so legacy behavior is invariant
-by construction; the clamp serves any tenant's out-of-range ids
-(capture victims included). Clamped seq 0 = the default shadow every
-sparse vanilla row already falls back to; the +0x50 cache keeps the
-raw id so the walk does not thrash. RESTORE AT THE GFX PASS: same
-site, extended table instead of clamp.
-
-Generator changes: site_thunk block gate 6 -> 4 with per-row default
-stage raised to 6 (all existing rows declare stage explicitly — no
-emission change for Donovan at any stage; m3a gate PASS), and the
-patch="jmp" option (guarded: old_hex must be a jmp).
-
-Measured fixed: replay 77 (whiff/mid FG) guard-clean END 4720, stock
-9->8, snapshots show the full native sequence (FIRST ATTACK -> the
-7-HIT barrage, matching native's hit count). test_hui_ex.sh gained
-replay 77 as section 3.
-
-## Session 14z-66 — the THIRD FG crash: embedded data tables in
-## crypt-placed code (data_in_code mechanism + census)
-
-Maintainer round 3: FG "still crash-resets, a bit later after the
-capture" on 44be1266 (the shadow guard held — this was a THIRD site).
-Repro (after plain/kill/victim variants stayed clean): FG + a
-deterministic post-capture chaos block (replay 78) — vec3 f3892 at PC
-0xC8156, inside the ported x026142 copy: the capture-victim anim
-installer walking a VANILLA per-victim capture table (the 0xBCE7A+
-Midnight-Bliss-family sets) with seq D0=0xFF.
-
-Root (trace-caught, the whole chain): his FG picks each barrage hit's
-victim pose RANDOMLY — seq = table16[rand&15] via engine RNG 0x14E8A —
-from a 16-byte DATA table EMBEDDED IN HIS CODE (vs2 0x56074, read
-`lea (0x26,pc),a1; move.b (a1,d0.w),d0`). The code region sits in the
-crypt hole: placed bytes are stored re-encrypted for opcode fetches,
-so the runtime DATA read saw garbage — 0xFF drawn where native reads
-01/03/05 (vs2 data view: 01050305050305010305010505010503). Garbage
-seqs over-ran the victims' capture tables with per-victim/per-draw
-crash signatures; safe draws = clean casts. THE RANDOM DRAW is why
-three repro campaigns produced three different-looking crashes and
-several clean runs.
-
-Fix: NEW generator mechanism [[data_in_code]] (generalized 14z-20
-class, region form): relocates the table's SOURCE-DATA-VIEW bytes to a
-raw hole and reroutes the placed reader through a 12-byte helper
-(lea abs,An + the verbatim read op + rts; site = jsr helper + nop —
-ghost-clean, the read op sets NZ identically). Supported shape:
-lea(d16,pc),An + any move.b/w/l via (An,Xn.w).
-
-CENSUS (the class had bitten three times, so: scan of ALL crypt-placed
-region bytes for the shape with in-region targets): FIVE instances —
-the FG table + 0x56064/0x5649C (the 0x56-0x59 pose set), 0x564AC
-(01/03/05 twin), and x088512's 0x8C042 (a word offset/record table the
-POD code re-derives a3 from; self-relative, copied 0x100). All five
-rerouted in one build. Fingerprint 4317353c; helpers/tables in hole_b.
-
-Measured: replay 78 clean in BOTH timelines; full battery GREEN
-(boot masked-v2 EXACT — the reroutes are tenant-code-only; m3a
-bit-exact — the mechanism is manifest-driven, Donovan has no rows).
-Gate: test_hui_ex.sh section 4 (replay 78 + stock assertion).
-
-## Session 14z-66 — AIR MOVEMENT LIVE (item 3): the per-char jump
-## handler clone + the x026142 escape fix
-
-Continuation of the float arc (see the previous entry + STATE 14z-66).
-After the float landed, the air dash (66 during the float) dispatched
-into his own air-dash physics setter (vs2 0x586F0: xv/yv/gravity
-installs, byte-faithful in the x057456 copy) but crashed vec4 at a
-mid-instruction address. The trace showed the REAL fault one level up:
-the air-dash SEQ STARTER (vs2 0x26E14, inside the x026142 shared-zone
-copy) ends with `bra.w` back to the engine stepper — an
-oracle-invisible pcrel escape THE x026142 REGION HAS CARRIED SINCE
-14z-65. Its other escapes were never reached (or wandered benignly);
-the air-dash flow was the first to die on one.
-
-Fix: [[pcrel_escape_fix]] extended to x026142 (7 unique escape
-targets, 9 sites -> 6 trampolines + pad 0x60). Targets resolved by the
-SITE-TWIN method (per-site interpolation between bracketing known
-pairs, reading vsavj's own branch at the twin site): 0x210C0->0x226DC,
-0x219C4->0x22FC0 (two sites agree), 0x21C64->0x23244 (two sites
-agree), 0x22008->0x23500, 0x25F9A->0x26E16 (unique exact-16),
-0x27542->0x282EE (the region-end fall-through), and 0x24CBA->0x26058
-(unique wildcarded match; the neutral-reset family). Rows in the H
-overlay.
-
-Measured (build 2898c495): jump -> float hover at 109.4 -> 66 -> seq
-0x1400 with X +119.6px over 15f at dy=0 (the flat accelerated air
-dash) -> dash end -> gravity fall with carry -> landing sub-state ->
-grounded. NEW gate tests/test_hui_air.sh (float: Y pinned >= 100px;
-air dash: seq byte 0x14 at +0x06 + >=30px flat advance — mode
-signatures, not just no-crash). Full battery GREEN incl. boot
-masked-v2 EXACT and m3a bit-exact. build/hui4 = 2898c495 (ping #5:
-float + air dash + all prior fixes; flavor default now VS2-correct
-per measurement — Start-hold selects the other flavor, so D1 is
-playtestable for the first time).
-
-## Session 14z-66 — the alias-physics port, first row: jump_params
-## (the float ceiling + jump feel)
-
-The one family behind the remaining feel deltas, first consumer
-decoded and ported. The JUMP-PARAM INSTALLER (vsavj 0x27A34, vs2
-0x26C86 — the routine every seq-0600 starter bsr's) computes id*0x30 +
-variant offset (0/0x10/0x20 = neutral/forward/back) into the per-char
-jump table (vsavj 0x0BDB7A, vs2 0xD7D18 — EXACTLY the bank-origin
-delta, validating the bank scheme), RAW id, no fold. Rows = (xv.l,
-xacc.l, yv.l, gravity.l). The vsavj table is 32-row with 0x10-0x1F
-byte-aliasing 0x00-0x0F (dumped; ends exactly at the known 0x0BE17A
-table), so H's row 0x10 is a superset-safe variant write.
-
-Change: bank_map [[table]] jump_params (rec8, stride 0x600) +
-VALUE_SKIP gains "jump_params" (the 14w-b physics caution class;
-port_param32 tenants port it — Donovan flagless, bytes unchanged,
-m3a PASS). Build 8bea919e emits ONE op: data 0x0BDE7A +0x30 (his
-three rows: neutral yv 8.0/grav -0.375 vs the alias 6.75/-0.4375).
-
-Measured: the float ceiling moved 109.4 -> 121.1 = NATIVE EXACT, with
-the native rise curve; oracle-battery mismatches dropped 1770 -> 1741;
-every gate green (air-gate sample frames retuned to the native rise —
-the old frames were calibrated to the alias climb). Residual known
-delta: the GROUND dash (ours ~7 vs native ~8.2 px/f) — its per-char
-param consumer is not yet decoded; next row of the same family.
-
-## Session 14z-67 — the H gfx rung (D4 opener 3): every byte class, and
-## where the detail lives
-
-Build hui6 = b99b7359 (stage 6, 0x10, profile cps2-wide-v1). Per-op
-byte detail: `build/hui6/patch/patch_notes_fragment.md` (generated,
-op-exact). The manifest-level record:
-
-- **12 OBJ bank setters** (`[[port_patch]]`, huitzil.toml): every
-  `move.w #$6000,$18(aN)` in H's ported regions -> `#$1000` (WIDE bank
-  4) on the variant build. Sites from a fresh scan (opcode
-  `(w & 0xF1FF) == 0x317C`, imm 0x6000, disp 0x0018): x057456 0x5938C;
-  x05c800 0x5CF38/0x620D4/0x62194; x088512 0x8873E/0x89D26/0x8B100;
-  x06800c 0x68360/0x683A2/0x683EA/0x6842E; x0692f6 0x69490. Donovan's
-  six shared-zone rows reproduce as the exact subset (scan validation).
-  One near-miss triaged: 0x8BF1A writes #$6000 to +0x1A (the X word),
-  not a bank — left alone.
-- **[table_fix]** x026142+0x13EE: vanilla vsavj rows EXCEPT row 0x10 =
-  0x1000. **[[code_word]]** obj_bank_word_slot: vsavj 0x282D4 row 0x10
-  (variant-alias anchored) -> 0x1000.
-- **[[palette]] x2**: sprite block vs2 0x39BC9C len 0x500 (head
-  0111 0630 0a40 0c60), effect block vs2 0x3AB69C len 0xDC0 (head
-  0503 0704 0815 0947), tables 0x38C198/0x38C218 + extra 0x38C258 —
-  the Donovan template with H's blocks (pointer-table rows 0x10,
-  strides 0x500/0xDC0 verified across rows 0x0F-0x13).
-- **Seven [[select_records]]**: same array bases as Donovan's (the
-  arrays are engine-global; the generator indexes row = tenant id).
-  H's vs2 rows: portrait 0x2A5E4A/0x2A625A, name 0x2A64D6/0x2A7506,
-  splash 0x2A7B06/0x2A7E36, win_quote 0x2A881E; vj alias rows = row
-  0x00's records (verified equal). Highlight = host_ring; vs2's
-  newcomer highlight rows hold sentinels 0x5000000/0x4000000.
-- **Drawer bank thunks**: name/splash/winquote rows verbatim (tt/tu
-  substitution follows the manifest's tenant).
-  **select_pal_variant_id**: H has NO dedicated palette block — vs2's
-  uploader remaps id 0x10 INTO the shared grid at column 0x0B
-  (`cmpi #$10 -> moveq #$B,d6`, vs2 0x6B1A6; grid base 0x3C117C, row
-  = (variant*16+id)*0x20). His 10 rows = 0x3C12DC + v*0x200, gathered
-  contiguous by the NEW data_subst form `x10@0x200`.
-- **HUD rows**: vs2 DATA-view entries (name 0x9910E row 0x10 =
-  04AB 0102 FFE8 0002; mug 0x990CE row 0x10 = 05A0; vs2 stager bias
-  +0x4200 -> art 0x46AB 2x1 / 0x47A0 2x2, non-blank verified). Pool
-  anchors 0xBE92 (plate) / 0xBE9A (mug; bottom row 0xBEAA-AB). Pokes:
-  0x898A4=0x869A, 0x89944=0x86920102, 0x89948=0xFFE80002 (vsavj bias
-  -0x3800). Art rides effect_tail `place_variant_slot_huitzil` (the
-  NEW per-tenant key — the generic key would leak H's art into
-  Donovan's builds and break m3a bit-exactness).
-- **[[win_pal_variant]]** hui_win_pal: vs2_src 0x3C347C (= vs2 pool
-  0x3C2A7C + 0x10*0xA0; head 0x0111... = his palette family), same
-  site/pool/strides as Donovan's row.
-- **[[select_wheel]] roster21**: verbatim — the 21-cell extension is
-  tenant-independent (cells 0x10/0x11/0x13 from the layout json).
-- **[[pcrel_escape_fix]] x05c800** (stage 4, pad 0x20): the census
-  find. Sites 0x631D0/0x631D8 (`tst.b $18E/$134(a4); bne.w 0x635FC`);
-  target does `subq.b #1,$149(a4); jmp <engine>`. Resolution: vsavj
-  0x5B25C — UNIQUE pattern match, jmp targets twin-verified (vs2
-  0x15770 / vsavj 0x17028, 60/64 bytes, diffs = A5-operand drift).
-  Recon row in reconciliation_huitzil.toml.
-
-Machinery (all Donovan-bit-exact, m3a-reproducible run at every step):
-per-tenant layout resolution (gfx_layout3.toml rows by tenant NAME —
-the id differs per track), the delta-0 placement path, per-tenant
-effect_tail keys, the data_subst gather form, verify_gfx_build
-de-Donovanized (span/aux/sweep per tenant), obj_records entry-bounds
-check + per-tenant sweep windows (inventories re-frozen H 15,034 /
-P 14,225; Donovan unchanged 15,612).
-
-## Session 14z-67b — the ping-round fixes (byte detail)
-
-Builds: hui7 93c9aa44 (c5), hui8 59cf9f85 (+byte map), hui9 9e3105e0
-(+throw arc = PING #8). Per-op detail in each build's generated
-patch_notes_fragment.md.
-
-- **Effect byte-map rows** (hui8; huitzil.toml aux_pokes
-  effect_map_4e4f/5051/5253): DATA 0x28D4E..0x28D53 <- 0F1B 1F19 0F03.
-  The id->handler-index map (vj DATA 0x28D00 / vs2 0x27FD8) is
-  byte-identical through id 0x4A; vs2's six live entries at 0x4E-0x53
-  read zero on vsavj -> every newcomer effect collapsed to index 0.
-  Also divergent (not poked): id 0x5F (vs2 0x00 / vj 0xFF). The
-  per-char record rows needed nothing (bank_map anim_index_a/a2/b rows
-  0x10 already repointed; verified on the built image). Restores the
-  236P ray SPAWN (visible but brief/wrong-palette — the segment
-  behavior needs the zone flow).
-- **c5 mode** (hui7; generator + build_gfx): delta-0 group-C tenants
-  keep companion-record bank-1 words NATIVE; effect_c5.json (5,714
-  codes) places the art at native codes in group C bank 5; three
-  ported spawner setters flip #$2000 -> #$3000 (x088512 0x8B224/
-  0x8BF14/0x8BF52). Corrects hui6's wrong-art remaps (records at
-  x2b7ef4+0x900C carried effect_tail anchor words 0x0FE7+ where
-  native reads 0x0FA0+).
-- **Throw-arc superset tables** (hui9; site_thunk throw_arc_tables,
-  patch=jmp+jmp_ok at vj 0x28386): full tail replacement of the
-  physics-row installer reading PLACED copies of vs2's map1 (0x54B
-  from 0x279B4) + table2 (0x370B from 0x27A08). Statically proven
-  strict supersets (map1 prefix 0-0x49 and rows 0-0x31 byte-identical
-  across the games) -> serves ALL throws unconditionally; boot
-  masked-EXACT confirms. vs2's five extra map entries -> rows
-  0x32-0x36 (63214 arcs rows 0x33/0x34: yv 16.0/20.0, gravity
-  -0.688). Measured: launch yv 0x0010 == native, decay lockstep
-  (FBNeo tap A/B on the 2P replay).
-- **The effect zone + fleet spawners** (regions x022400 = vs2
-  0x22400+0x1600 t+0x2E, x06d240 = 0x6D240+0x500 t+0x174) with
-  escape pads (0x180/0x60) and recon rows: stage-2 installer twins
-  0x2710C/14/1C -> 0x27EB4/BC/C4; byte-map data rows 0x27FD8/DA ->
-  0x28D00/02; per-char pointer table 0xD96B8 -> 0xBF51A
-  (shape-matched; per-game pointer content). ENTRY THUNKS PARKED
-  (seq_d_dispatch: the real entry, regresses the ray pending the
-  flow's dependency closure; effect_machine: wrong entry, hot for
-  legacy). The parked bodies + anatomy live as comments in
-  huitzil.toml.
-
-## 14z-70 — the ground explosion, and one inert repair
-
-**`extra_tiles/0x10.json`: 2 -> 569 tiles.** The 214+P grenade's GROUND
-detonation (NOT the on-contact hit explosion — see the rig note below)
-drew a solid fuchsia rectangle. Its sprite codes are correctly remapped
-bank 3 -> bank 4 (identical code ranges to native, verified in the same
-OBJ dump that shows pal 0a/0c remapped correctly), but the tiles were
-never copied into group C, so they resolve to all-zero tiles. Same class
-as the child sidekick's shadow (14z-69o), two orders of magnitude bigger.
-
-Rule used: every tile in the effect's span **0x0A00-0x0C40** that vs2
-bank 3 has art for and our group C lacks. Source mapping validated on 6
-populated tiles — group C bank 4 tile `c` <- vs2 group B index
-`0x10000 + c`. Gfx-only: `build/hui17` carries the SAME program
-fingerprint as hui15/hui16 (`699de9b7`), which is the evidence that no
-program byte moved.
-
-**The first attempt shipped 115 tiles and did not work.** A per-drawn-
-tile inventory misses the other 35 tiles of every 6x6 sprite, because
-`obj_records_dump` reports only a sprite's BASE code — and the fuchsia
-block IS one 6x6 sprite. The span rule is a superset that covers any
-multi-tile layout.
-
-**Rig, because it is the whole reason this hid for three sessions:**
-`tests/replays/hui/83d_hui_grenade_ground.rpl` — 214+**LP** (shortest
-arc) with BOTH fighters walked back to their corners. Every earlier rig
-fired 214+MP from 2P start distance, where the bomb reaches the opponent;
-those captures show the on-contact explosion, which is correct and always
-was.
-
-**`x088512` 0x3B40 -> 0x3B98, raw tail from +0x3B78.** Its own three
-`lea (d16,pc),A0` at 0x08C014/26/38 target tables at 0x08C08A/9A/A2,
-0x38/0x48/0x50 past the old end, so each resolved to `target + delta`
-inside the ANIM region placed immediately after (0x0D8950). Fixed via the
-14z-69j mechanism, plus a small `extract_char.py` change so a SOURCE-ONLY
-root honours `f<off>` at all. `verify_pcrel_data.py` 72 BROKEN -> 69.
-
-**It fixes nothing observable and is kept on that basis.** The code that
-reads those tables never executes in any measured scenario (execution
-breakpoint at the placed twin `PRG:0x0D8912`: zero hits), and the
-explosion's sprite codes are byte-identical before and after. It is a
-latent repair of an already-ratified class, proven safe by legacy
-masked-v2 EXACT and both frozen references rebuilding bit-exact.
-
-## Session 14z-76 (Pyron's effect palette; build/pyron20 69e8c6f0)
-
-One `[[palette]]` row added to `build/manifest/pyron.toml`, immediately after
-his `sprite` entry:
-
-```toml
-[[palette]]
-name = "effect"
-stage = 6
-src = 0x3AC45C          # vs2 0x396C14[0x11]; stride 0xDC0
-len = 0xDC0
-src_head_hex = "05370639075b088d"
-table = 0x38C218
-```
-
-Generated delta against `pyron19`, exactly two ops and nothing else:
-
-| op | addr | value | provenance |
-|---|---|---|---|
-| `data_file` | `0x3FABA0` (hole_b) | `palette_block_effect.bin`, `0xDC0` | `VS2` (vs2 `0x3AC45C`) |
-| `poke32` | `0x38C25C` | `0x003FABA0` | `GEN` — effect table row `0x11` |
-
-`0x38C25C` = `0x38C218 + 4*0x11`, i.e. **row 0x11 of the 32-row effect
-palette pointer table** — a variant alias row, which legacy never indexes
-(`tests/audit_id_writers.sh`). Before this change it held `0x3923E0`, row
-0x01's value, so Pyron drew his effect/flash palettes from **Demitri's**
-block. No `extra_tables` key: the generator emits extras only on the base
-half, so a variant-id tenant has none.
-
-**RETRACTION.** The deferral note in `pyron.toml` (and M3b merge blocker #2 in
-`docs/NEXT_SESSION.md`) claimed this table has only 16 rows and that a variant
-id spills into a separate table at `0x38C258`. It does not — see
-`docs/game/atlas/character_tables.md` "The per-character palette POINTER
-tables" and `docs/game/gotchas.md` "A VARIANT ALIAS ROW holds a value vanilla
-uses". The comment block in the manifest was rewritten to the measured model,
-keeping the still-valid eliminations from the 14z-74/75 blink hunt.
-
-Gates: `run_suite.sh vsavjw` GREEN (55 PASS / 17 SKIP / 0 FAIL — the same
-class inventory as `pyron-m1`, so legacy is untouched), `test_pyron_blink.sh`
-still `fixed`, plus cosmo / variant_dispatch / gfx_layout3 / empty_tiles /
-m3a_reproducible and the new `tests/test_effect_palette_table.sh`.
-
-NOT established: visibility. The block is read 0 times in ordinary play
-(two vanilla fighting replays, a 6000-frame Pyron soak; positive control 60
-reads of his sprite block on the same rig). It is a rare-event palette whose
-only documented trigger is the electrocute X-ray plus DF/status tints.
-
----
-
-## Session 14z-78 — `anim`'s placed address stops being a literal
-
-**Files:** `build/manifest/donovan.toml` (2 rows + comments),
-`tools/gen_donovan_patch.py` (new guard), `tests/test_thunk_addr_literal.sh`
-(new), `tests/audit_region_movability.sh` (expectation flipped),
-`tests/run_battery_m2.sh` (gate registered).
-
-**Emitted-byte delta on every frozen build: ZERO.** All four references rebuild
-bit-exact (donovan-m3a `4b7d0dc7`, m5_stock `6c93cfa8`, huitzil-m2 `9deda080`,
-pyron-m2 `69e8c6f0`). The change only alters what is emitted when `anim` is
-placed somewhere other than its default `hole_a` address.
-
-### The two rows
-
-`[[site_thunk]] select_companion_tbl_a` (site `0x0845EC`) and
-`select_companion_tbl_b` (site `0x0845F8`), authored in 14z-22 (see that
-session's entry above, whose "ported anim table 0xDDA1E" is the literal in
-question — historical, superseded here):
-
-```
--  thunk_hex = "0c2e00TT000a6708207c002083bc4e75207c000dda1e4e75"
-+  thunk_hex = "0c2e00TT000a6708207c002083bc4e75207cnnnnnnnn4e75"
-+  region_subst = "nnnnnnnn=anim:0xa9ae"
-```
-
-(`_b` identically, with its own vanilla lea `207c002087ca`.)
-
-`207c 000dda1e` is `movea.l #$000DDA1E,A0`. `0x0DDA1E` was `anim`'s placed
-address, hand-computed once and tracking nothing thereafter. The offset is
-derived from the SOURCE side and cross-checks against the placement side:
-vs2 `0x289EF6` (the ported anim table) − anim's src `0x27F548` = `0xA9AE`;
-`placed[anim] 0x0D3070 + 0xA9AE = 0x0DDA1E`, the literal itself. In the
-default layout `region_subst` therefore emits the identical longword; on a
-build with `region_space = "anim=wide_ext"` it emits `207c 0040a9be`.
-
-Placeholder `nnnnnnnn` is deliberately NON-HEX. Substitution is textual, so
-the existing `aaaaaaaa` spelling (huitzil.toml:1387) can in principle collide
-with a real byte run in a longer body.
-
-### Why it mattered
-
-Relocating `anim` left both bodies aiming into the vacated address range,
-where `x2b7ef4` slid in. The resolver at `0x015084` reads
-`move.w (0,A0,D0.w),D0` / `lea (0,A0,D0.w),A0` — a base-plus-signed-16-bit
-offset table — so it produced an odd A0 and `move.l (A0),(0x20,A6)` took a
-vec3 address error in VANILLA code at `PC 0x015098`. That crash was recorded
-as M3b's binding constraint for a session. `anim` is 371,712 of the 470,200
-bytes three tenants needed from a 344,640-byte crypt window; with it movable
-the requirement is 98,488 and the overflow is gone.
-
-### The guard
-
-`gen_donovan_patch.py` gains a third stale-literal guard beside the two that
-cover the tenant id. An opcode-anchored (`2n7c` movea.l / `4nf9` lea /
-`4ef9`,`4eb9` jmp,jsr / `2n3c` / `4879` pea), word-aligned 32-bit operand in
-the PRE-SUBSTITUTION body that lands in any placed region's destination span
-fails the build, naming the region and printing the exact `region_subst`
-spelling to use. Escape hatch `addr_literal_ok`, mirroring `id_literal_ok`.
-
-Coverage boundary, asserted in the gate rather than assumed: a raw longword in
-embedded data is NOT caught. An unanchored scan was tried and rejected — it
-reads operand pairs as addresses (`...0040` + `4e75` parses as `0x00404E75`,
-inside wide_ext).
-
-## 14z-79 — (b') the index-window thunk, and a withdrawal
-
-**`site_thunk index_window_018468`** — engine site `PRG:0x018460`, 6 bytes
-`323b 0006 4efb` replaced by `4ef9 <thunk>` (`patch = "jmp"`, `rts_ok`);
-`0x018466-67` orphaned and never executed. Body 470 bytes in `hole_a`,
-GENERATED by `tools/gen_index_window_thunk.py` from the two decrypted images
-and reconstructed byte-for-byte by `tests/test_index_window_thunk.sh`.
-
-Layout: a 2-instruction filter, the normal path, a 4-way exact-equality
-dispatch, the four vs2 handler bodies verbatim, an 80-entry index table, and
-23 trampolines.
-
-    +0x00  cmpi.w #$00A0,d0 / bcc.s danger
-    +0x06  move.w (0x48,PC,d0.w),d1 / jmp (2,PC,d1.w)      <- normal path
-    +0x0e  4x cmpi.w/beq.s -> the four bodies
-    +0x26  jmp $00000001                                   <- defined vec3
-    +0x2c  80: 137c 000f 0054 4e75     (vs2 0x017024)
-    +0x34  81: 136b 0017 0054 4e75     (vs2 0x016F70)
-    +0x3c  82: 137c 0052 0054 4e75     (vs2 0x016FEC)
-    +0x44  83: 4229 0121 137c 0001 0054 4e75  (vs2 0x016F78)
-    +0x50  index table, 80 words: entry n -> (tramp + 10*k(n)) - 0x0e
-    +0xf0  23 trampolines: `move.w #<vanilla offset>,d1 / jmp <handler>.l`
-
-TWO THINGS THE BODY DOES THAT THE 14z-78 SPEC DID NOT, both forced by
-measurement:
-
-1. **The table copy is LOCAL and read PC-relatively.** The spec's
-   `lea 0x018468,a0 / move.w (0,a0,d0.w),d1` is a DATA-space read, and CPS-2
-   decrypts program-space fetches only, so it returns ciphertext: 38 of the 80
-   legacy targets come out ODD (0 in the opcode view). Because the body is a
-   `code` op it re-encrypts with the placed code, so a pc-relative read of an
-   embedded table decrypts back to what was authored.
-2. **Each trampoline restores D1 to the vanilla offset.** "D1 is dead on ENTRY
-   to all 80 handlers" is true and licenses nothing: the handlers `rts` into
-   `0x01821A`, a chain of five `bsr.w`. A build without the restore moved every
-   self-frozen legacy log and pushed two masked replays from one divergent run
-   to two. `move.w #imm,d1` also reproduces vanilla's CCR exactly, so register
-   and flag state at handler entry is bit-identical to vanilla.
-
-Cost to legacy: two compares and one extra jmp, touching D1 (rewritten to the
-vanilla value) and the CCR, writing NOTHING to RAM. The site is COLD — 22
-dispatches per 5,520-frame replay.
-
-**`data_port df_palette_seq_rows` — WITHDRAWN** (see the 14z-69 entry above,
-now marked RETRACTED). It overwrote BULLETA'S Dark Force palette block.
-
-## 14z-82 — per-tenant TYPE NUMBERS (the merged obj_hook vec3 fix) + the F2 merged shim
-
-**The defect (14z-81b):** the merged obj_hook union gave multi-owner types
-114-120 (site 0x5E542; handlers all inside x088512, which every tenant
-ports as an internally tenant-reconciled copy) ONE table entry each,
-first-wins → tenant-0's copy — so merged Huitzil's type-117 satellite
-consumed Donovan's planted tripwire address 0xCB9C0 as an anim base (the
-deterministic char-init vec3). The dispatch-time owner-read stub was
-implemented and WITHDRAWN the same day (14z-81c, two measured timing
-failure modes); the ratified direction is the build-time route
-(docs/project/gotchas.md "Route on facts baked at BUILD time").
-
-**The fix (maintainer-decided scope: FIRST RESOLVER KEEPS ORIGINALS):**
-
-* `build/manifest/type_stamps.toml` — the FROZEN, human-reviewed census of
-  every family stamp site / compare / +0x02-+0x03 reader / embedded
-  walker, produced by `tools/audit_type_stamps.py` (opcode-anchored;
-  positive control on the six measured sites; negative control on the
-  three unported stamps). The census found a whole stamp FORM the 14z-81b
-  ad-hoc scan was blind to — `move.b #type,(2,A4)` (~20 additional
-  type-115 sites, the spawn idiom `beq.s; move.b #1,(A4); type at +2;
-  owner at +3`) — and proved NO compare in any tenant's code regions reads
-  the type byte (d16 values are 0x54/0x14/0xA8 or register-sourced).
-  Dynamically cross-checked by `tests/audit_type_writes.sh` (6 tap legs on
-  the ground-truth builds): every observed 114-120 write maps to a frozen
-  stamp row; types 118/120 NOT OBSERVED (recorded, not assumed); the
-  115→117 "morph" is the 117 header re-stamp at x088512+0x27CE, which
-  renumbers with everything else.
-* Generator (`tools/gen_donovan_patch.py`): a pre-loop pure map
-  (`compute`-style block after `_tenant_list`) assigns new type numbers to
-  every NON-first resolver tenant with ≥1 frozen stamp site — 12
-  assignments at N=3 (indices 124-135: H/P × types 114-119; type 120 has
-  ZERO reachable stamp sites anywhere and keeps first-wins). A
-  per-iteration blob pass rewrites ONLY the TT byte of each stamp
-  immediate in that tenant's own region copies (full source span verified
-  first; 69 rewrites at N=3, reconciled 1:1 against the inventory), and
-  the union appends per-tenant entries resolving through the OWNING
-  tenant's view (no-gap asserted). Table op grows 0x1F0→0x220; op COUNT
-  unchanged. Empty at N=1 — all four frozen fingerprints bit-exact.
-* Byte-level proof: hui copy x088512+0x27CE stamps `28BC 0100 8200`
-  (130), pyron's `...8300` (131), donovan's untouched `...7500`.
-
-**Measured green:** `audit_merged_vec3.sh` PASS (merged satellite A0 =
-0x425FFC = anim@huitzil+0xB8AC, crash-free); new gate
-`tests/audit_type_dispatch_range.sh`: merged hui mash = original range
-[0x1C8,0x1E4) CLEAN with 5,862 renumbered dispatches (the full stream
-moved), donovan originals intact (4,575), verdict control on hui29 sees
-5,862 original-range hits.
-
-**F2 (the merged shim served only tenant 0) — fixed the same emit path:**
-`flavor_chain_multi()` gives each 54-byte chain block its OWNER's handler
-exit (the old chain's uniform `jmp` could only exit into tenant-0);
-declaring tenants' handlers are collected per iteration and ONE merged
-shim is assembled at engine_here (the 14z-80h shape), planted on BOTH
-declaring rows (dispatch_00[0x13] and [0x10] → the shim; pyron [0x11]
-stays direct by ratified decision); unmatched id → planted tripwire —
-that fall-through tripwire is the ONE op the fix adds (590→591,
-re-frozen in test_tenant_loop.sh + audit_merged_legacy.sh FIRST, per the
-standing rule). audit_merged_legacy section 0 now asserts the POST-fix
-shape (HENT == SHIM, PENT != SHIM).
-
-**Pyron f7997: NOT this class — measured elimination.** Crash-time
-instruction history (GUARD_PROBE_HIST now also fires from the guard's
-crash handler) names a vanilla dispatcher chain 0x1A77E→0x1A790
-`move.b (2,A6),d0` → byte map 0x1A888 → word table → computed jmp; a probe
-with `b@(a6+2) >= 0x72` recorded ZERO hits through the whole replay while
-the crash still fired identically — so no extended-family type ever enters
-that mapper, and the census's exposure claim stands. ~~A3=0x49bb8a (inside
-pyron's wide_ext) feeding that vanilla path + the odd derived pointer
-$FF31B5 point at a pyron-placed data/table defect one level removed —
-open, next session.~~ **RETRACTED same day (14z-82b below): the input was
-type 64 (< 0x72, invisible to that probe by construction); A3 was live
-register context, not causal; and the crash is LATENT in frozen pyron-m2
-itself.**
-
-## 14z-82b — the f7997 fix: vsavj's hit-class byte map extended to vs2's 80 entries
-## (probe build at the time; ADOPTED 2026-08-12 — huitzil-m4 / pyron-m3 were re-frozen on it,
-## and it is live in huitzil.toml:2048 / pyron.toml:1044. Header corrected 14z-91: the entry
-## below is the record of the probe session and is NOT rewritten.)
-
-**Third instance of the "vs2 widened an index consumer" class** (14z-26:
-property table 0x28D00; 14z-35: the 0x50-entry dispatch table; now the
-projectile-pool hit sweep). The sweep at `PRG:0x1A770-0x1A886` is SEVEN
-dispatchers (4 `bsr.w` + 3 `bsr.s`) that all map BOTH colliding objects'
-type bytes through ONE routine:
-
-    0x1A888: move.b (4,PC,D0.w),d0 ; rts     map at 0x1A88E, 64 entries
-
-vs2's sibling (dispatcher 0x1919A, routine 0x19292, map 0x19298) has
-**80 entries**. A ported type >= 64 in the $FF94xx pool that LANDS A HIT
-(the dispatch runs only on overlap — why it took an 11,017-frame chaos
-soak to fire once) indexes past vsavj's map: map[64] = the rts opcode's
-0x4E — exactly the crash D0 — then a garbage word-table displacement and
-a wild jmp. Measured LATENT in frozen pyron-m2 (type-64 satellite;
-crashes solo, no merge), shared by huitzil (68/72 stamped into the same
-pool, unexercised by his suite replays), safe for donovan (59-63 fit).
-
-**Body (94 bytes, GENERATED by `tools/gen_hitclass_map_thunk.py` — never
-hand-typed):** `cmpi.w #80,d0; bcc.s ILLEGAL; move.b (4,PC,D0.w),d0;
-rts; <64 vanilla map bytes verbatim><16 vs2 extension bytes>; ILLEGAL`.
-Site patch `jmp body` over the routine's own 6 bytes (`rts_ok`: a
-bsr-entered handler; stack-neutral, ghost-clean; final CCR on the normal
-path = the loaded byte's NZ, exactly vanilla). The generator ASSERTS the
-transplant licence: the engines' 0-58 map prefixes are byte-identical
-(vanilla's true domain — its type table has 59 rows), every extension
-value lands on a word-table entry byte-identical across the engines or
-the do-nothing default (a plain rts), and vs2's map ends at 79. Its own
-asserts caught two wrong first readings (an 83-entry miscount via an
-odd-alignment impossibility, and the 61/62 divergence below).
-
-**Deliberate policy: map[59-63] keep VANILLA's bytes.** vs2 populates
-61/62 (DONOVAN's satellite types) with classes 0x0E/0x04 where vsavj
-holds 0 — his projectile hit-class reactions are silently absent on
-every shipped build. Adopting vs2's two bytes = a Donovan re-freeze —
-recorded as a separate maintainer decision (STATE).
-
-**Measured (probe build; `tests/audit_hitclass_map_cost.sh`):** the
-soak that crashes the frozen build END-clean through 11,017 frames;
-legacy BIT-IDENTICAL over 30,284 frames on four replays; fire census =
-legacy enters the map ZERO times on any measured replay (the probe's
-liveness proven by pyron's own f7997 dispatch) — the thunk is
-unreachable for measured legacy content. Reconstruction gate:
-`tests/test_hitclass_map_thunk.sh` (2 verdict controls).
-
-> **THE FIRE-CENSUS SENTENCE ABOVE IS RETRACTED (14z-92, M4).** It is kept
-> as written because this is the 14z-82b record and historical entries are
-> not rewritten (CLAUDE.md §5.4) — but do not carry it forward. That census
-> was TWO replays (`02_demitri_vs_cpu`, `03_two_player_vs`), both of which
-> happen to score zero. Over the full 46-replay legacy corpus legacy enters
-> the map **230 times** (`26_don_arcade_mash` 228, `24_don_winmash` 2).
-> "The thunk is unreachable for legacy content" is FALSE. The fix is
-> unaffected and still sound: every observed legacy index is
-> 0x02/0x04/0x09/0x0b, far below 64, so legacy reads vanilla's own bytes
-> out of the thunk body. The correct argument is **"legacy enters
-> constantly and receives vanilla answers"**.
-
-**NOT ADOPTED in the manifests** — the row moves the huitzil + pyron
-frozen fingerprints; decision + recommendation in STATE. Harness repairs
-landed with it: `audit_merged_legacy` leg-b now always measures the REF
-leg on a crash (MERGE-SPECIFIC vs LATENT verdict), closing the gap that
-mis-attributed this crash for two sessions.
-
-### 14z-82c — ADOPTED: huitzil-m4 (e66678d0) + pyron-m3 (6c7f7322)
-
-Maintainer decision 1 adopted the row into BOTH tenant manifests (shared;
-dedups to one thunk on the merge; donovan not exposed, does not declare).
-pyron-m3 is byte-identical to the measured probe build. Re-freezes in the
-re-freeze-FIRST order: m3a constants, tenant_loop 261/207/439/593,
-audit_merged_legacy 593. Suites: both builds moved EXACTLY the three
-don-mash `.sha1` self-baselines (21/22/26) and no masked entry —
-attributed BY BYTES on the checksum timeline (full-RAM dump-diff at a
-divergent frame: 3 bytes, all $FF7Fxx dead-stack ghosts, zero live) and
-re-frozen; hui30 SUITE GREEN. THE PAIRSWEEP DISSOLVED under the fix with
-a control (pyron-m2: CRASH f4638, the f7997 signature; pyron-m3:
-END-clean 7,520) — one vanilla map was THREE defects. The merged
-instrument now: leg (a) 13/14 verbatim, leg (b) all six guard-clean
-(pyron/70 END 11017 merged). Decision 2 (Donovan's map[61]/[62]) leaning
-keep-zeros; measured: his sword-companion objects never enter the map in
-his replays (0 entries) — unexercised.
-
-> **BASIS RESTATED 14z-92 (the decision is UNCHANGED).** The "0 entries"
-> above came from the same two-replay census that was falsified for legacy.
-> The corpus-wide run does NOT overturn decision 2: legacy enters 230 times
-> and every observed index is 0x02/0x04/0x09/0x0b — **none at 61 or 62** —
-> so Donovan's satellite hit classes remain unexercised on a 46-replay
-> basis rather than a 2-replay one. Keep-vanilla's-zeros stands, now on
-> evidence 23x wider.
-
-## 14z-85 — the spawn-time OWNER TAG (site 0x54470's 59-75 family; maintainer option (a))
-
-The last known merged program-behavior defect class: obj_hook union
-entries 64-75 served every tenant through HUITZIL's copies by
-declaration-order luck (huitzil declares before pyron). Ruled option (a)
-2026-08-13; implemented and verified this session.
-
-**Every byte, and why:**
-
-- **80 stamp-site detours** (blob edits, 0 ops): every frozen 59-75
-  stamp row (`build/manifest/type_stamps.toml`; d16==2 only; both
-  family forms are exactly 6 bytes) in every declaring tenant's copy —
-  donovan 9, huitzil 40, pyron 31 — has its 6-byte stamp instruction
-  replaced by `jsr <thunk>` (`4EB9 xxxxxxxx`), full source span
-  old-verified before the write (the type_renumber discipline).
-- **46 tag thunks** (code ops, alloc chain → wide_ext; memoized per
-  (tenant, original-instruction)): `move.b #tenant_id,(0x7F,A4)`
-  (`197C 00id 007F`) + the ORIGINAL stamp instruction (CCR-LAST — jsr/
-  rts set no flags, so the site's flag result is reproduced exactly) +
-  `rts`. A4 = the slot pointer at every family stamp site (all 41
-  inventory rows). The jsr push is tenant-code-only; no legacy path
-  executes these sites.
-- **12 tag stubs** on entries 64-75 (+12 tripwire ops):
-  `owner_dispatch_stub` shape `"tag"` — per resolving tenant
-  `cmpi.b #id,(0x7F,A6); beq.s exit_i` (A6 = object at the walker's
-  dispatch, per the measured 14z-81b entry contract), fall-through
-  `jmp <tripwire>` (zero tag = a stamp site the emission missed, LOUD;
-  unclaimed tag = same). Exits re-establish vanilla handler entry state
-  (`moveq #0,d0; movea.l #handler,a0; jmp (a0)`).
-- **The tag byte: +0x7F of the $FF9400 slot** (0x100 stride, walker
-  0x54458). Measured free THIS session: 804 live-slot observations,
-  zero +0x7F writes across 19,357 tapped pool writes under BYTE-LANE
-  accounting, three legs with live family content (types 0x42/0x45).
-  The 14z-84 census had measured the WRONG POOL ($FFB800 = the
-  0x5E542/114-120 family's) — retracted in place; and its "+0x7F free"
-  was itself a word-offset accounting artifact (hole_b writes a word at
-  b8+0x7E covering byte +0x7F). A tag there would have been clobbered.
-- **Scope**: stubs on 64-75 exactly as ruled. Entries 59-63 are
-  single-resolver (donovan's copies) — H/P stamp those types at
-  (currently dead) shared sites; their tags emit anyway so any future
-  live spawn tripwires under its own tag. Stamper-not-resolver cases
-  (donovan stamps 65/66/73/75, places no handler) are printed notes,
-  not errors — solo builds already tripwire those types for him and
-  playtest green.
-- **N=1 inert by construction** (the `len(_tenant_list) >= 2` gate):
-  all four frozen solo references rebuild bit-exact
-  (4b7d0dc7/6c93cfa8/db4bcd11/6c7f7322). Side file `tag_map.json`
-  (only when non-empty) carries site/tenant/tag/thunk rows = the
-  writer PCs the pool audit asserts.
-
-**Measured green:** tenant_loop 473/667 (re-frozen; §4b decodes the
-stubs per entry) + 5 verdict controls; dispatch-range §0-6 ALL PASS —
-2,046 stubbed family dispatches on pyron's mash leg, tripwire SILENT,
-0x54470 family visible on the solo control; vec3 GREEN; pool audit
-post-tag mode GREEN (293/293 family live-slot obs carry the stamper's
-tag; +0x7F writer PCs == the emitted thunks; forced-pre negative
-control fails both directions); merged legacy audit 14/14 (04+11
-ratified expectations).
-
-**What the fix did NOT change (measured, own before/after):** the ring
-inventory on pyron's replays — the music retrigger is the per-node sfx
-helper class (see the 14z-85 STATE entry), not 64-75 dispatch.
-
-## 14z-85b — per-tenant sfx records (pyr_sfx_records / hui_sfx_records; maintainer-ruled option (a))
-
-The ACTUAL music-retrigger fix (the mechanism the owner tag was wrongly
-credited with — see 14z-85 above). Two manifest rows, the don_sfx_records
-precedent verbatim; per-id curation in docs/project/tables/sfx_records.md.
-
-**Every byte, and why:**
-- `pyr_sfx_records`: vs2 0x0C8B18, 23 records (exact shape-scanned bound;
-  the over-run span holds keep-id lookalikes) → wide_ext, id-allowlisted
-  (keep 0x110/0x111/0x112/0x202 — all in don's ratified set; 15 zeroed
-  incl. the 0x720-0x72F voice block whose 0x729 WAS the measured music
-  retrigger). poke32 ptr row 0x11 (was the vanilla 0x95894 Demitri alias,
-  displaced pre-fix by the generic tail_data_ptr repoint at his RAW
-  records).
-- `hui_sfx_records`: vs2 0x0C742A, 24 records → wide_ext (keep the trio +
-  0x198/0x199, measured SHARED 14z-85 — equal keyon signatures, don-0x119's
-  sample family; 18 zeroed). poke32 ptr row 0x10 (was 0x938BA).
-- Both rows carry the idempotent helper unstub (vs2 0x5122 → vsavj 0x4CE2),
-  so SOLO H/P builds gain audible node sfx (they were silent — no build of
-  theirs ever carried the unstub). NET +1 op per declaring build (the
-  claim machinery suppresses the generic repoint).
-
-**Freeze ceremony:** huitzil-m7 = build/hui33 (284e3b1c), pyron-m4 =
-build/pyron22 (ac22418f); expectation sets carried RENAMED; suites GREEN
-with --freeze; every .sha1 mover byte-attributed: ONE divergent frame
-(f890, the select-init staging of the repointed ptr rows, re-converges
-same frame) on every replay, plus one bounded run (f2410-2596, the
-tenant's now-audible node sfx) on the two tenant-pick replays ONLY.
-tenant_loop re-frozen 266/208 solo, 474/669 merged. Ring gate re-frozen
-to EMPTY merged-vs-solo diff — measured: every pre-fix id incl. 0x729
-gone, no solo id missing.
-
-**FIELD-CONFIRMED (maintainer, first playtest, 2026-08-13): "the music
-triggering is gone, Piled Hell has its hitbox — needs deeper testing but
-it does look very good."**
-
-## 14z-85f — the x028122 object-hit damage work-var reconciliation
-## (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix)
-
-**The defect (closing the 14z-85e parity item):** FG's beam ticks are
-hits BY pool objects (the type-02 beam particles; attacker context a6 =
-per-hit ctx), processed by per-hit-class REACTION handlers that live in
-ported vs2 code. The reaction (vs2 0x55FA8/combo writer 0x56002; H's
-copy at merged 0x4026E2, region "code (grouped)") calls the ported
-object-hit damage APPLIER (vs2 0x28A6A → H's copy 0x40C828, region
-x028122). The porting machinery reconciled the applier's jsr targets
-(vsavj scaler 0x18B8C, post-process 0x18AB0, pre-check 0x5E9B4) but its
-A5-relative STAGING DISPLACEMENTS shipped verbatim: scaled damage
-staged at vs2's -0x4B6C/-0x4B6A/-0x4B68(a5) = $FF3494/96/98, while
-vsavj's post-process reads -0x4BBE/-0x4BBC/-0x4BBA = $FF3442/44/46.
-Result: 12 combo-counted beam ticks (hitstop, sparks, satellites all
-live), ZERO HP staged. Same-value class #4 — and byte-for-byte
-Donovan's session-14n throw-damage defect, whose six port_patch rows
-patch the SAME instructions in the SAME region and never propagated to
-the H/P manifests (gotcha filed).
-
-**Eliminated by measurement en route (14z-85e's two hypotheses):** the
-scaler tables are byte-equivalent between the games (attack
-0x0B8140↔0x0D22BE, final 2D maps 0x0B9140/0x0BA1C0↔0x0D32DE/0x0D435E,
-combo + RNG-spice; defense/low-HP tables differ only on per-char-id
-rows — the roster shuffle), and native hit count is identical (12
-ticks). Full pipeline synthesis: docs/game/engine_internals.md "The
-DAMAGE pipeline".
-
-**Every byte, and why:** six [[port_patch]] rows per manifest
-(huitzil.toml + pyron.toml), stage 6, region x028122 — vs2 src
-0x28AC2/0x28AC8/0x28AD8/0x28ADC/0x28AE2/0x28AF2, each a 2-byte
-displacement change (b498→b446, b494→b442 ×2, b496→b444 ×2, plus the
-flag-word immediates' rows) = 12 bytes per tenant copy. Donovan's rows
-verbatim. The 14x rollback family (-0x4B74/-0x4B72/-0x4B3D — attacker/
-victim registration + state byte) left at vs2 offsets on purpose:
-ported readers consume them (donovan.toml stage-99 parked rows).
-Static census after: ZERO vs2 damage-band A5 writes remain in ported
-space on either build (the remaining b48c/b48e/b4c3 hits are the
-rollback family, by design).
-
-**Measured (tests/replays/hui/89_hui_ex_fg_vs2.rpl — new
-native-comparable rig, the 85_hui_df_vs2 opening + five spaced 623+2K
-attempts):** before: native 23/23/23/23/52 HP (12 ticks each; the 5th
-cornered, 11 ticks + one 30-HP terminal hit) vs ours 1/1/1/1/1. After:
-BIT-EXACT parity, both solos and the merged rebuild. audit_fg_damage's
-71/73 CPU rigs measure 10 HP UNCHANGED by the fix — those ticks were
-fighter-path contacts (never broken); header reframed.
-
-**Gates:** tests/audit_fg_parity.sh NEW (both legs vs the frozen
-staircase; per-attempt stock-decrement EX tells; 2 verdict controls;
-ground-truthed FAILING on the pre-fix merged), tenant_loop GREEN with
-counts UNCHANGED (port_patch rows are region rewrites, not ops),
-m3a_reproducible on the new EXPECTs, merged legacy audit PASS (leg a
-verbatim incl. ratified 04+11), run_suite on the carried-renamed sets.
-Builds: huitzil-m8 = build/hui34 (c48cd722), pyron-m5 = build/pyron23
-(65e9a40e), merged = build/m3b_merged2 (moves with generator).
-Reconciliation rows added (applier 0x28A6A↔0x29738 verified + the five
-scaler-table data rows); verified build-inert (fingerprint unchanged).
-
-**DECIDED (maintainer, 2026-08-14): keep the vanilla vsavj
-approximation** for the tenant DEFENSE rows (defender-side; found
-during the table compare). The choice, the exact values on both
-sides, and the option-(a) change recipe (variant-gated reader thunks,
-hitclass precedent; Donovan's row would supersede donovan-m3a) are
-documented in docs/project/tables/defense_rows.md. Pyron needs
-nothing either way — his rows are byte-identical between the games.
-
-## 14z-85g — the restored trap-detonation chirp (huitzil-m9: the
-## sound_stub row + the sound_table remap machinery)
-
-**The finding chain (each step measured):** the four-leg ring A/B
-killed the 14z-85e volume/pan hypothesis (entries essentially identical
-across legs; 0x049A = periodic ambient, the 14z-82d detonation
-attribution retracted); the real delta is native firing
-0739/010b/073a per attempt where ours fired 010a. First reading
-("record nodes 10/11 zeroed, restoration = M5") was corrected by the
-maintainer's field observation and the content check: **vs2 0x73A's
-sample bytes are BYTE-IDENTICAL in vsav's own QSound image**
-(0x6C0000, bank 108, 0-20480, pitch 12548; vsavj ids 0x198/0x199
-family, +0x300 alias 0x498/0x499). **[CORRECTED 14z-95, GitHub #93:
-identical for 20,480 of 20,481 bytes — the INCLUSIVE endpoint
-0x6C5000, the byte packing law #3 says is PLAYED, differs between the
-two games' original sample ROMs (vsav 0xFF, vsav2 0x00). Fourth
-instance of the inclusive-endpoint class (#82/14z-87b).]** And the detonation call is not the
-record path: bp-attributed (USP-top return — the bp_regs A7-first fix)
-to **sound-farm stub vs2 0x4F2E** (`jsr $330E; move.l #$73A,d1;
-moveq 0,d2/d3; bsr $5122; jmp $3306` — a farm of such one-id stubs at
-0x4EE0-0x4F60), jsr'd from the mine handler at x068458+0x120. Hui's
-recon overlay had silenced it to the 0x2A7E0 rts (the 14z-65 blanket
-"0x7xx = voice bank" number rule — see the new GOTCHA).
-
-**Every byte, and why:**
-- `reconciliation_huitzil.toml` 0x4F2E row: stubbed_sound → **kind =
-  "sound_stub", sfx_id = 0x199**. The generator (new kind, sibling of
-  farm_port) synthesizes a 26-byte vsavj twin stub in hole_a:
-  `jsr $330E.l; move.l #$199,d1; moveq #0,d2; moveq #0,d3;
-  jsr $4CE2.l; jmp $3306.l`. The save (0x330E) / restore (0x3306)
-  pair is byte-identical at the SAME address in both games (verified
-  rows); the helper is the per-node sfx helper; base id 0x199 lets
-  the helper's own (0x70,a6) flag produce the 0x499 alias exactly as
-  the engine intends. +1 op (tenant_loop re-frozen 243/267/208 +
-  491/678).
-- `huitzil.toml` hui_sfx_records gained **remap_ids = "0x73A:0x199"**
-  (new sound_table key, target must be in keep_ids or the build
-  fails): record node 11 stays content-faithful for any record-path
-  dispatch (none observed in the 87/88 rigs — data-only, defense in
-  depth). Node 10 (0x739, the mine-ejection sound) stays zeroed: no
-  vsavj equivalent exists; fully M5 scope (maintainer-scoped
-  2026-08-14).
-
-**Measured after:** ours fires 0x199 at f3500/f4301 — native's 0x73A
-timing (f3494/f4295), both attempts, replay 87.
-
-**Gates:** audit_trap_parity RE-FROZEN to the restored state
-(ground-truthed failing on pre-fix huitzil-m8); audit_trap_sound
-green (re-scoped: spawn + ring liveness); tenant_loop re-frozen;
-m3a_reproducible on the new EXPECT_HUI; run_suite on the
-carried-renamed set; merged rebuilt (build/m3b_merged3).
-Build: huitzil-m9 = build/hui36 (3d9ffc89). Maintainer EAR-CHECK
-pending — the final gate for a sound item.
-
-## 14z-85g(2) — the trap SHOCK restoration (huitzil-m10: two
-## vs2-licensed class remaps; maintainer-ruled option (a))
-
-**The defect (maintainer field report, same day as the chirp
-confirmation):** the trap dome's hit inflicted no shock status. The
-dome's hit records carry vs2's EXTENDED class 0x52 (victim +0x54 =
-0x52 at the hit, both games — measured on the new deep-overlap rig
-92). The victim-side reaction dispatch (`PRG:0x2384E`: class × 2 into
-the PC-relative word jump table at 0x2385C) reaches a dedicated shock
-handler on vs2 (table 0x22388 entry[0x52] = 0x2CE → 0x22656,
-bp-verified firing at the native hit) — but vsavj's table ends before
-0x52: entry[0x52] reads CODE BYTES (0x1D7C) and ours took a
-wild-but-lucky plain-hit jump (bp-verified: the dispatch runs, no
-shock handler fires). Donovan's 14z-33/34 class, one dispatch table
-over.
-
-**The licence (the 14z-33 rule — "only remap when the source engine
-itself proves equivalence"):** vs2's OWN table aliases class 0x52 ≡
-0x06 ≡ 0x38 (one entry), and vsavj entry[0x06] = its native
-electric-shake handler 0x23AC8 — a STRUCTURAL TWIN of vs2's 0x22656
-(instruction-parallel; same sub-state 4 / freeze 0x18 / property
-lookup / common-install tail 0x27EC0 ↔ 0x27114) minus ONE guard:
-vs2's `cmpi.b #$52; beq` skips the ATTACKER's 0x0B hit-freeze (the
-attacker is a mine). property[0x06] == property[0x52] == 0x0F on both
-games (Donovan's ported extension rows cover 0x52 on ours anyway).
-
-**Every byte, and why:** two `[[region_fix]]` rows in huitzil.toml —
-hitbox_proj +0x17D and +0x19D (the dome's two records, class byte at
-record +0x1D *[CORRECTED 14z-120 (5): that is byte +0x17 of projectile records 5 and 6 — the records start at region+0xC6, not at the region start; the bytes patched were the right ones]*): `52` → `06`. Nothing else; the shock rides pure
-vanilla machinery (Victor's own path).
-
-**KNOWN, MAINTAINER-ACCEPTED DEVIATION:** Phobos receives the normal
-11-frame attacker hit-freeze when the trap connects (vsavj's 0x06
-path applies it; vs2's 0x52 guard exempts him). The gate asserts the
-deviation PRESENT so drift in either direction is loud. Option (b) —
-a dispatch site_thunk with an inline clone carrying the exemption
-(the es_type51_dispatch pattern) — is specified in STATE 14z-85g(2)
-if play dislikes the freeze; its cost is jsr cycles on the ENGINE-WIDE
-reaction dispatch (legacy flicker-inventory ratification).
-
-**Also measured en route (rig sweep):** the mine's roll is
-PROXIMITY-TERMINATED — it stops shorter the closer the opponent
-stands (549/545/527/509 across P2-walk N=40-55) — and rolling THROUGH
-the opponent triggers nothing: the shock is the dome hit, by vs2's
-design.
-
-**Measured after:** vsavj 0x23AC8 fires at the dome hit (D0=0x0C =
-class 0x06×2), victim shows the native shock signature (seq7=4,
-freeze 0x18 decay — pre-fix ours showed seq7=2), attacker freeze
-present. Native leg unchanged (its own 0x52 path).
-
-**Gates:** audit_trap_shock NEW (rig 92 ours+native, per-leg class
-expectations, the deviation assertion, verdict control; ground-truthed
-FAILING on huitzil-m9); audit_trap_parity green (chirp unaffected);
-tenant_loop counts UNCHANGED (region_fix = region rewrite);
-m3a_reproducible on the new EXPECT_HUI; run_suite on the
-carried-renamed set. Build: huitzil-m10 = build/hui37 (9a948a11),
-merged = build/m3b_merged4.
-
-## 14z-105 — THE OBORO + VERSION-STRING WINDOW (donovan-m11 / huitzil-m20 /
-## pyron-m14 / merged-m6; maintainer "happy with the plan" 2026-08-22,
-## field test before push)
-
-Two roster-UX changes, both living INSIDE the ratified §4 v3 select-window
-divergence class, both PROFILE-GATED (the stock twin rebuilt under the new
-rows is bit-identical: `883e7d17` = `m5_stock5`, measured).
-
-### W1 — `oboro_select_hook` (`[[site_thunk]]`, every tenant manifest, deduped)
-
-**What:** vanilla vsavj ships Oboro Bishamon complete at variant id 0x18
-(base `0x0B3450`) and the commit path accepts the id end-to-end — it only
-lacks a player-facing way to pick him (maintainer-ruled: vanilla's Oboro,
-not a vs2 port). The hook is vanilla's own Gallon-variant idiom
-(`PRG:0x020B9C`: on Gallon's cell + `btst #7,$394(a6)` + a 2-3-button
-confirm -> id 0x12) one cell over: Bishamon's cell + the same bit -> 0x18.
-
-**The bit is START — measured before anything was written:** with P1's
-Start held on the select screen the struct's input word `+0x394` reads
-`$8000` (`$0000` without), and `RAM:$FF8060` reads 1 at the same time
-(the 14z-104 question "is the bitmask live at select?" answered yes; the
-hook uses vanilla's own source).
-
-**Every byte:** the 6-byte site `0c2e00020382` (`cmpi.b #$2,$382(a6)`)
-becomes `jsr <thunk>`; the 30-byte body (hole a, placed by the allocator):
-`0c2e00080382 660e 082e00070394 6706 1d7c00180382 0c2e00020382 4e75` —
-Bishamon? / Start? / commit 0x18 / re-execute the displaced cmpi (its flags
-feed vanilla's `bne` at `0x020BA2`: 0x18 != 2 skips the Gallon block like
-any non-Gallon id) / rts. Without Start, or on another cell, the body is
-branch-inert and the flags are vanilla's. `id_literal_ok = "0x08,0x02"`
-(the body compares the id field on purpose). +2 ops per build.
-
-**Measured (gate `tests/test_oboro_select.sh`, five legs, MAME, no
-pokes):** P1 Start-held Bishamon -> id 0x18, base `0x0B3450` in-match;
-no-hold -> 0x08 / `0x0A6418`; Start on Demitri's cell -> 0x01; P2 side
-(default cell 0x05, path D D L L) -> P2 0x18 / `0x0B3450` with P1
-untouched; the STOCK twin under the same inputs -> 0x08. Verdict control:
-a wrong expectation is refused. Name/portrait rows for 0x18 alias
-Bishamon's (32-row arrays) — the naked-eye tell is the pale colorway.
-
-### W2 — the select-screen version string (`version_*` knobs on `[[select_wheel]] roster21`)
-
-**What (CLAUDE.md §5, open since 14z-92):** N authored glyph sprites
-appended to the SAME copied wheel record the roster extension already
-repoints, so the string costs no new divergence class. Knobs, identical in
-all three manifests (ENGINE-SITE row, emitted once): `version_text =
-"M6"` (names the freeze generation — CHANGE IT AT EVERY FREEZE),
-`version_font = build/manifest/version_font.json` (authored 5x7 glyphs,
-0-9 A-Z - . space, provenance NEW), `version_x/y = 340/202` (screen
-position of the first glyph's top-left; OBJ = screen + (64, 16),
-measured on the live OBJ list), `version_pal = 0x19` (Phobos' medallion
-row — thunk-re-asserted every select frame, so stable by construction;
-ink = pen 7 = 0xFF8), `version_base = 0x1FE40` (group C upper-bank codes,
-one per glyph; chosen from the merged-m5 ledger's free rows).
-
-**Bytes:** the record's count word 20 -> 22 (two entries `FE40 0019`,
-`FE41 0019`), the coord list +2 pairs (`+148,+42` / `+164,+42` relative
-to the drawer base (256,176)); budget word 0x55 still CARRIED OVER
-(>= 23 entries, asserted). Tiles: `wheel_bank5.json` gained an
-`"authored"` map (code -> 128B canonical tile); `build_gfx_donovan.py`
-places them with the same same-source-or-fail rule; `audit_gfx_merged.py`
-and `check_wheel_bank5.py` know the "authored" kind. 0 ops.
-
-**The codec finding on the way (docs/platform/gotchas.md):** the first
-probe drew every 8-pixel half MIRRORED and pen 0 as an opaque black box —
-`gfx_tiles.decode` had mapped plane bit i to pixel i since it was written
-(nothing had ever consumed pixel ORDER); fixed both ways (bit i = pixel
-7-i, transparent pen 15), gate `tests/test_gfx_tile_codec.sh`.
-
-**Measured (gate `tests/test_version_string.sh`):** the built record's
-last 2 entries/coords match the knobs; packed group C tiles byte-identical
-to the generator's, non-blank, pen-15 background, font-exact; the live OBJ
-list on select carries exactly the 2 glyph sprites at OBJ (404+16i, 218),
-bank 5, pal 0x19; a MAME snapshot pixel-matches the intended bitmap with
-ZERO mismatches and zero opaque pen-0 pixels; controls: a 1-px shift does
-not match, a corrupted tile is refused.
-
-### The freeze
-
-| artifact | dir | fingerprint | ops |
-|---|---|---|---|
-| donovan-m11 | `build/don_m11` | `1de9a027` | 325 |
-| donovan-m11-stock | `build/m5_stock6` | `883e7d17` (= m5_stock5, UNCHANGED) | — |
-| huitzil-m20 | `build/hui47` | `24a27940` | 365 |
-| pyron-m14 | `build/pyron31` | `6bf265ab` | 298 |
-| merged-m6 | `build/m3b_merged13` | `64426955` (= the rehearsed `build/merged_probe_w6` bit-for-bit; probe attic'd 14z-106) | 806 |
-
-Op counts re-frozen in `tests/test_tenant_loop.sh` with attribution
-(325/365/298; 600/652; 806/907). **The select-window specs were PREDICTED
-to move (NEXT_SESSION at the 14z-104 close: "more sprites/cycles shift the
-window end") and MEASURED NOT TO: `tools/propose_masked_specs.sh` over all
-148 window/composite specs of the three carried sets proposed the frozen
-line verbatim in every case** — the window's end is the VS-phase re-init
-that re-converges the select state, not a function of how many sprites
-the wheel record draws. Only the self-frozen `.sha1` replays were
-re-frozen (`run_suite --freeze`), see STATE 14z-105.
