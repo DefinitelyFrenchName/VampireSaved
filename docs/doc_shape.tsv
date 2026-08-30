@@ -34,7 +34,8 @@ docs/GOTCHAS_history.md	HIST	-	-
 docs/annotations.md	GENERATED	-	-
 docs/NEXT_SESSION.md	ORIENT	docs/NEXT_SESSION_HISTORY.md	-
 docs/NEXT_SESSION_HISTORY.md	HIST	-	-
-HANDOFF.md	PENDING	-	-
+HANDOFF.md	PENDING	HANDOFF_HISTORY.md	-
+HANDOFF_HISTORY.md	HIST	-	-
 # --- game
 docs/game/engine_internals.md	PENDING	docs/game/engine_internals_history.md	-
 docs/game/engine_internals_history.md	HIST	-	-

@@ -54,11 +54,13 @@ _MISTER_DOCS = ["docs/platform/mister.md", "docs/project/mister_core.md",
 _MISTER_LOGS = ["docs/platform/mister.md", "docs/project/mister_map.md",
                 "docs/project/mister_fit.md", "docs/project/mister_field.md",
                 "docs/project/release_format.md", "docs/platform/gotchas.md",
-                "docs/project/gotchas.md", "release/bitstreams/18269/BITSTREAM.txt"]
+                "docs/project/gotchas.md", "release/bitstreams/18269/BITSTREAM.txt",
+                "HANDOFF_HISTORY.md"]
 _PLATFORM_DOCS = ["docs/platform/gotchas.md", "docs/project/gotchas.md",
                   "docs/project/cps2_wide.md", "HANDOFF.md", "docs/game/atlas/ram.md"]
 _PLATFORM_LOGS = ["docs/platform/gotchas.md", "docs/project/gotchas.md",
-                  "docs/project/cps2_wide.md", "HANDOFF.md", "docs/checksums.txt"]
+                  "docs/project/cps2_wide.md", "HANDOFF.md", "docs/checksums.txt",
+                  "HANDOFF_HISTORY.md"]
 _GAME_DOCS = ["docs/game/engine_internals.md", "docs/game/gotchas.md",
               "docs/game/atlas/README.md", "docs/game/atlas/ram.md",
               "docs/game/atlas/character_tables.md", "docs/game/atlas/id_space.md",
@@ -76,7 +78,7 @@ _PORT_LOGS = ["docs/project/gotchas.md", "docs/project/patch_notes.md",
               "STATE.md", "STATE_HISTORY.md",
               # history twins join the LOG lists as they are created
               # (14z-122, the documentation pass): a log is a log.
-              "docs/project/build_dir_triage_history.md"]
+              "docs/project/build_dir_triage_history.md", "HANDOFF_HISTORY.md"]
 SKILLS = {
     "VSP": dict(path=".claude/skills/vampire-saved-port/SKILL.md",
                 docs=_PORT_DOCS, logs=_PORT_LOGS, forbid=[],
