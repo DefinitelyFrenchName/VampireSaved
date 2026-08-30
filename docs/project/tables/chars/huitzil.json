@@ -175724,7 +175724,7 @@
    }
   },
   "hitbox": {
-   "_encoding": "box = (x, y, hw, hh) signed words, centre at fighter (x + (flip_x ? -x : x), y + y), half-extents; node hb8 -> family entry {vuln0,vuln1,vuln2,push}; node hbA>>8 -> attack record (0x20: +0 box, +8 real, +9 white, +0x10 hit id, +0x12 strength (observed), +0x14 attacker meter gain (measured), +0x16 special flag (observed), +0x17 class, +0x1C pushback scale (measured), +0x1D 0)",
+   "_encoding": "box = (x, y, hw, hh) signed words, centre at fighter (x + (flip_x ? -x : x), y + y), half-extents; node hb8 -> family entry {vuln0,vuln1,vuln2,push}; node hbA>>8 -> attack record (0x20: +0 box, +8 real, +9 white, +0x10 hit id, +0xC/+0xD pushback step-table index on hit/block, +0xE facing rule, +0x13 hit-freeze class, +0x14 attacker meter gain, +0x16 special flag, +0x17 reaction class, +0x1A combo-scaling row, +0x1B white-damage recovery class, +0x1C the DF-armed accumulator value (Aulbath-victim mechanic), +0x1D 0; +0x11/+0x12/+0x15/+0x18/+0x1F unread \u2014 14z-121)",
    "_summary": {
     "attack_differ": 0,
     "attack_records": 364,
@@ -187011,6 +187011,318 @@
     "vuln2": "0xc462a"
    }
   },
+  "projectile": {
+   "0x44": {
+    "handler_ours": "0xd2780",
+    "handler_vs2": "0x6800c",
+    "immediates": [],
+    "ours_source": "byte",
+    "rows": [
+     {
+      "+0x26": 0,
+      "+0x26_kind": "b",
+      "+0x50": 1,
+      "index": {
+       "+0x9A": 0,
+       "long_offset": 0
+      },
+      "xa": 0,
+      "xa_f": 0.0,
+      "xv": 196608,
+      "xv_f": 3.0,
+      "ya": -4096,
+      "ya_f": -0.0625,
+      "yv": 32768,
+      "yv_f": 0.5
+     },
+     {
+      "+0x26": 0,
+      "+0x26_kind": "b",
+      "+0x50": 1,
+      "index": {
+       "+0x9A": 2,
+       "long_offset": 16
+      },
+      "xa": 0,
+      "xa_f": 0.0,
+      "xv": 262144,
+      "xv_f": 4.0,
+      "ya": -4096,
+      "ya_f": -0.0625,
+      "yv": 32768,
+      "yv_f": 0.5
+     },
+     {
+      "+0x26": 0,
+      "+0x26_kind": "b",
+      "+0x50": 1,
+      "index": {
+       "+0x9A": 4,
+       "long_offset": 32
+      },
+      "xa": 0,
+      "xa_f": 0.0,
+      "xv": 327680,
+      "xv_f": 5.0,
+      "ya": -4096,
+      "ya_f": -0.0625,
+      "yv": 32768,
+      "yv_f": 0.5
+     },
+     {
+      "+0x26": 0,
+      "+0x26_kind": "b",
+      "+0x50": 3,
+      "index": {
+       "+0x9A": 6,
+       "long_offset": 48
+      },
+      "xa": 0,
+      "xa_f": 0.0,
+      "xv": 393216,
+      "xv_f": 6.0,
+      "ya": -4096,
+      "ya_f": -0.0625,
+      "yv": 32768,
+      "yv_f": 0.5
+     }
+    ],
+    "shape": "B"
+   },
+   "0x45": {
+    "handler_ours": "0xd2bd0",
+    "handler_vs2": "0x68458",
+    "immediates": [],
+    "ours_source": "byte",
+    "rows": [
+     {
+      "+0x26": 2144,
+      "+0x26_kind": "w",
+      "+0x50": 1,
+      "index": {
+       "+0x9A": 0,
+       "long_offset": 0
+      },
+      "xa": 0,
+      "xa_f": 0.0,
+      "xv": 65536,
+      "xv_f": 1.0,
+      "ya": -20480,
+      "ya_f": -0.3125,
+      "yv": 327680,
+      "yv_f": 5.0
+     },
+     {
+      "+0x26": 4192,
+      "+0x26_kind": "w",
+      "+0x50": 1,
+      "index": {
+       "+0x9A": 2,
+       "long_offset": 16
+      },
+      "xa": 0,
+      "xa_f": 0.0,
+      "xv": 131072,
+      "xv_f": 2.0,
+      "ya": -20480,
+      "ya_f": -0.3125,
+      "yv": 327680,
+      "yv_f": 5.0
+     },
+     {
+      "+0x26": 8288,
+      "+0x26_kind": "w",
+      "+0x50": 1,
+      "index": {
+       "+0x9A": 4,
+       "long_offset": 32
+      },
+      "xa": 0,
+      "xa_f": 0.0,
+      "xv": 196608,
+      "xv_f": 3.0,
+      "ya": -20480,
+      "ya_f": -0.3125,
+      "yv": 327680,
+      "yv_f": 5.0
+     },
+     {
+      "+0x26": 8320,
+      "+0x26_kind": "w",
+      "+0x50": 3,
+      "index": {
+       "+0x9A": 6,
+       "long_offset": 48
+      },
+      "xa": 0,
+      "xa_f": 0.0,
+      "xv": 196608,
+      "xv_f": 3.0,
+      "ya": -20480,
+      "ya_f": -0.3125,
+      "yv": 327680,
+      "yv_f": 5.0
+     }
+    ],
+    "shape": "B"
+   },
+   "0x46": {
+    "handler_ours": "0xd2ee0",
+    "handler_vs2": "0x68768",
+    "immediates": [],
+    "ours_source": "byte",
+    "rows": [
+     {
+      "+0x26": 88,
+      "+0x26_kind": "b",
+      "+0x50": 1,
+      "index": {
+       "+0x9A": 0,
+       "long_offset": 0
+      },
+      "xa": 4096,
+      "xa_f": 0.0625,
+      "xv": 196608,
+      "xv_f": 3.0,
+      "ya": 0,
+      "ya_f": 0.0,
+      "yv": 0,
+      "yv_f": 0.0
+     },
+     {
+      "+0x26": 88,
+      "+0x26_kind": "b",
+      "+0x50": 1,
+      "index": {
+       "+0x9A": 2,
+       "long_offset": 16
+      },
+      "xa": 4096,
+      "xa_f": 0.0625,
+      "xv": 196608,
+      "xv_f": 3.0,
+      "ya": 0,
+      "ya_f": 0.0,
+      "yv": 0,
+      "yv_f": 0.0
+     },
+     {
+      "+0x26": 88,
+      "+0x26_kind": "b",
+      "+0x50": 1,
+      "index": {
+       "+0x9A": 4,
+       "long_offset": 32
+      },
+      "xa": 4096,
+      "xa_f": 0.0625,
+      "xv": 196608,
+      "xv_f": 3.0,
+      "ya": 0,
+      "ya_f": 0.0,
+      "yv": 0,
+      "yv_f": 0.0
+     },
+     {
+      "+0x26": 88,
+      "+0x26_kind": "b",
+      "+0x50": 1,
+      "index": {
+       "+0x9A": 6,
+       "long_offset": 48
+      },
+      "xa": 4096,
+      "xa_f": 0.0625,
+      "xv": 196608,
+      "xv_f": 3.0,
+      "ya": 0,
+      "ya_f": 0.0,
+      "yv": 0,
+      "yv_f": 0.0
+     }
+    ],
+    "shape": "B"
+   },
+   "0x47": {
+    "handler_ours": "0xd3150",
+    "handler_vs2": "0x689cc",
+    "immediates": [],
+    "ours_source": "byte",
+    "rows": [
+     {
+      "+0x26": 24672,
+      "+0x26_kind": "w",
+      "+0x50": 7,
+      "index": {
+       "+0x9A": 0,
+       "long_offset": 0
+      },
+      "xa": 0,
+      "xa_f": 0.0,
+      "xv": 98304,
+      "xv_f": 1.5,
+      "ya": 0,
+      "ya_f": 0.0,
+      "yv": 0,
+      "yv_f": 0.0
+     },
+     {
+      "+0x26": 14432,
+      "+0x26_kind": "w",
+      "+0x50": 7,
+      "index": {
+       "+0x9A": 2,
+       "long_offset": 16
+      },
+      "xa": 0,
+      "xa_f": 0.0,
+      "xv": 32768,
+      "xv_f": 0.5,
+      "ya": 0,
+      "ya_f": 0.0,
+      "yv": 0,
+      "yv_f": 0.0
+     },
+     {
+      "+0x26": 49248,
+      "+0x26_kind": "w",
+      "+0x50": 7,
+      "index": {
+       "+0x9A": 4,
+       "long_offset": 32
+      },
+      "xa": 0,
+      "xa_f": 0.0,
+      "xv": 98304,
+      "xv_f": 1.5,
+      "ya": 0,
+      "ya_f": 0.0,
+      "yv": 0,
+      "yv_f": 0.0
+     },
+     {
+      "+0x26": 61280,
+      "+0x26_kind": "w",
+      "+0x50": 7,
+      "index": {
+       "+0x9A": 6,
+       "long_offset": 48
+      },
+      "xa": 0,
+      "xa_f": 0.0,
+      "xv": 98304,
+      "xv_f": 1.5,
+      "ya": 0,
+      "ya_f": 0.0,
+      "yv": 0,
+      "yv_f": 0.0
+     }
+    ],
+    "shape": "B"
+   },
+   "_encoding": "per type: +0x9A (0/2/4 = LP/MP/HP, 6 = ES) selects +0x26 (byte or word), +0x50 (word) and an (xv, xacc, yv, yacc) 16.16 record (x-terms negated when flip_x = 0); Blizzard indexes (xv, yv) pairs by +0x0A*8; Cosmo Disruption = immediates per state",
+   "_verified_by": "tests/test_projectile_params.sh (29/29 live spawns match; ours == vs2 on three builds; 14z-121)"
+  },
   "regions": {
    "anim": {
     "diff": {
@@ -188309,7 +188621,7 @@
   {
    "evidence": "tools/projectile_params.py, tests/test_projectile_params.sh, tests/expected/projectile_params.txt",
    "structure": "projectile",
-   "what": "DONE 14z-121: every $FF9400 type's inline parameters decoded from its handler (walker-2 table 0x5C620[type]; one init shape: +0x9A selects (xv, xacc, yv, yacc) 16.16 records + the +0x26 byte and +0x50 word; Cosmo Disruption is state-immediate) and MEASURED on the live spawns for all seven tabled types; ours == vs2 on every build (the values ride inside the ported code regions)"
+   "what": "DONE 14z-121: in the map as `structures.projectile` (page section 'Projectile parameters'); every $FF9400 type's inline parameters decoded from its handler (walker-2 table 0x5C620[type]; one init shape: +0x9A selects (xv, xacc, yv, yacc) 16.16 records + the +0x26 byte and +0x50 word; Cosmo Disruption is state-immediate) and MEASURED on the live spawns for all seven tabled types; ours == vs2 on every build (the values ride inside the ported code regions)"
   },
   {
    "evidence": "bank_map.toml notes; engine_internals 'The physics bank's gap rows'",

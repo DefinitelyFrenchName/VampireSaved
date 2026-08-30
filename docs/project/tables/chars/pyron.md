@@ -340,7 +340,7 @@ Sources: **vs2** = `vsav2` extract (oracle `vhunt2`); **ours** = the built image
 
 ## Hitboxes and attack records (phase 2)
 
-Base `0xc75fe`, family table `0xc7502` (63 entries of {vuln0, vuln1, vuln2, push}), tables attack `0xc79d8`, push `0xc7950`, vuln0 `0xc7608`, vuln1 `0xc7728`, vuln2 `0xc7850`; boxes {'push': 17, 'vuln0': 36, 'vuln1': 37, 'vuln2': 32}. 143 attack records (0 differ ours vs VS2, 0 unattributed), 23 projectile records (1 differ, 0 unattributed). Encoding: box = (x, y, hw, hh) signed words, centre at fighter (x + (flip_x ? -x : x), y + y), half-extents; node hb8 -> family entry {vuln0,vuln1,vuln2,push}; node hbA>>8 -> attack record (0x20: +0 box, +8 real, +9 white, +0x10 hit id, +0x12 strength (observed), +0x14 attacker meter gain (measured), +0x16 special flag (observed), +0x17 class, +0x1C pushback scale (measured), +0x1D 0). Verified by `tests/test_hitbox_encoding.sh (Donovan on native vs2, 14z-120 (5): 8/8 hits on the first overlap frame, class = record +0x17 on every path)`.
+Base `0xc75fe`, family table `0xc7502` (63 entries of {vuln0, vuln1, vuln2, push}), tables attack `0xc79d8`, push `0xc7950`, vuln0 `0xc7608`, vuln1 `0xc7728`, vuln2 `0xc7850`; boxes {'push': 17, 'vuln0': 36, 'vuln1': 37, 'vuln2': 32}. 143 attack records (0 differ ours vs VS2, 0 unattributed), 23 projectile records (1 differ, 0 unattributed). Encoding: box = (x, y, hw, hh) signed words, centre at fighter (x + (flip_x ? -x : x), y + y), half-extents; node hb8 -> family entry {vuln0,vuln1,vuln2,push}; node hbA>>8 -> attack record (0x20: +0 box, +8 real, +9 white, +0x10 hit id, +0xC/+0xD pushback step-table index on hit/block, +0xE facing rule, +0x13 hit-freeze class, +0x14 attacker meter gain, +0x16 special flag, +0x17 reaction class, +0x1A combo-scaling row, +0x1B white-damage recovery class, +0x1C the DF-armed accumulator value (Aulbath-victim mechanic), +0x1D 0; +0x11/+0x12/+0x15/+0x18/+0x1F unread — 14z-121). Verified by `tests/test_hitbox_encoding.sh (Donovan on native vs2, 14z-120 (5): 8/8 hits on the first overlap frame, class = record +0x17 on every path)`.
 
 | idx | addr | box (x, y, hw, hh) | real | white | hit id | str | meter | spc | class | pb hit/blk (+0xC/+0xD) | frz (+0x13) | face (+0xE) | scale (+0x1A) | recov (+0x1B) | +0x1C (DF acc) | ours differs | ours source |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -514,9 +514,32 @@ Projectile records (`hitbox_proj`):
 | 0x15 | `0xd0c68` | (1, 1, 20, 13) | 10 | 7 | 1 | 3 | 0 | 1 | 0x51 | 0/0 | 12 | 0 | 0 | 0 | 0x00 | +0x17:0x51->0x4f | port_patch:Cosmo Disruption sub-state 81 -> 79: vsavj's dispatch table  |
 | 0x16 | `0xd0c88` | (1, 1, 20, 13) | 4 | 4 | 1 | 3 | 0 | 1 | 0x0a | 0/0 | 12 | 0 | 0 | 0 | 0x00 |  |  |
 
+## Projectile parameters (phase 3)
+
+Every `$FF9400` type this character spawns (the census), its handler on vs2 and on ours, and the inline parameters decoded from the handler's init block. per type: +0x9A (0/2/4 = LP/MP/HP, 6 = ES) selects +0x26 (byte or word), +0x50 (word) and an (xv, xacc, yv, yacc) 16.16 record (x-terms negated when flip_x = 0); Blizzard indexes (xv, yv) pairs by +0x0A*8; Cosmo Disruption = immediates per state. Verified by `tests/test_projectile_params.sh (29/29 live spawns match; ours == vs2 on three builds; 14z-121)`.
+
+| type | handler vs2 | handler ours | shape | +0x9A | +0x26 | +0x50 | xv | xacc | yv | yacc | ours |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| `0x40` | `0x672d0` | `0xcd560` | B | 0 | 40 | 1 | 3.0 | 0.25 | 0.0 | 0.0 | byte |
+| `0x40` | `0x672d0` | `0xcd560` | B | 2 | 56 | 1 | 4.0 | 0.25 | 0.0 | 0.375 | byte |
+| `0x40` | `0x672d0` | `0xcd560` | B | 4 | 72 | 1 | 5.0 | 0.125 | 0.0 | 0.75 | byte |
+| `0x40` | `0x672d0` | `0xcd560` | B | 6 | 72 | 3 | 6.0 | 0.25 | 0.0 | 0.0 | byte |
+| `0x41` | `0x67550` | `0xcd7e0` | B | 0 | 40 | 1 | 4.0 | 0.0 | -1.0 | -0.25 | byte |
+| `0x41` | `0x67550` | `0xcd7e0` | B | 2 | 56 | 1 | 4.0 | 0.0 | -1.0 | -0.1562 | byte |
+| `0x41` | `0x67550` | `0xcd7e0` | B | 4 | 72 | 1 | 4.0 | 0.0 | -1.0 | -0.0625 | byte |
+| `0x41` | `0x67550` | `0xcd7e0` | B | 6 | 72 | 3 | 4.0 | 0.0 | -1.0 | -0.0625 | byte |
+| `0x42` | `0x67846` | `0xcdae0` | immediate @0x67c48 | | | | -11.0 |  |  |  | byte |
+| `0x42` | `0x67846` | `0xcdae0` | immediate @0x67c50 | | | |  | 0.25 |  |  | byte |
+| `0x42` | `0x67846` | `0xcdae0` | immediate @0x67c58 | | | |  |  | 0.0 |  | byte |
+| `0x42` | `0x67846` | `0xcdae0` | immediate @0x67c60 | | | |  |  |  | 0.0 | byte |
+| `0x42` | `0x67846` | `0xcdae0` | immediate @0x67d5a | | | | -6.0 |  |  |  | byte |
+| `0x42` | `0x67846` | `0xcdae0` | immediate @0x67d62 | | | |  | 0.0 |  |  | byte |
+| `0x42` | `0x67846` | `0xcdae0` | immediate @0x67d6a | | | |  |  | 0.0 |  | byte |
+| `0x42` | `0x67846` | `0xcdae0` | immediate @0x67d72 | | | |  |  |  | -0.09375 | byte |
+
 ## Reactions as the victim (phase 3)
 
-MEASURED on native vs2 (`tests/test_reactions.sh`, frozen `tests/expected/reactions_pyron.txt`): Victor attacks the tenant; per contact the victim's class byte `+0x54`, the hit-freeze `+0x5C`, the chain PATH the tenant runs (table:seq@entry-node; `OFF:` = a node the index tables do not reach) and the frames until it is back on a table-`a` stand chain. The reaction chains are HOLD chains ended by an engine counter, so `len` is the stun as the engine ran it, not the chains' data frames.
+MEASURED on native vs2 (`tests/test_reactions.sh`, frozen `tests/expected/reactions_pyron.txt`): Victor attacks the tenant; per contact the victim's class byte `+0x54`, the hit-freeze `+0x5C`, the chain PATH the tenant runs (table:seq@entry-node; `OFF:` = a node the index tables do not reach — none since the 14z-121 decoder fix) and the frames until it is back on a table-`a` stand chain. The reaction chains are HOLD chains released when the pushback step list (`0x2783C[record +0xC]`) ends, so `len` is the stun as the engine ran it, not the chains' data frames. Labels: the previous node's chain, else the entering chain with the smallest seq — the three tenants share the same canonical `b:` seqs (14z-121 (2)).
 
 | part | contact | class | freeze | chain path | frames |
 |---|---|---|---|---|---|
@@ -566,7 +589,7 @@ MEASURED on native vs2 (`tests/test_reactions.sh`, frozen `tests/expected/reacti
 | anim | table a2's entry rule: its chains are entered MID-CHAIN by node index (measured: 5 jumps onto a2 nodes 3/5/7/13); the select routine is vs2 0x271F4/0x2710C (table pointer by d1, (a0, seq*2) word offset -> node), the advance 0x27252 (+0x18 links / sequential) — 14z-121; which code picks the node INDEX for a mid-chain entry is unread | test_anim_node_walk observation; the +0x1C write taps of 14z-121 |
 | anim | the 6-byte script-op area at +0x10..+0x15 of every node | kept as hex; engine_internals 'the [cf14]..[0b] script-op area' |
 | reaction | DONE 14z-120 (7): the tenant's reaction SET (which table:seq each class enters, the block chain b:0x0c, the measured stun lengths) — see 'Reactions as the victim'; the hold ends when the pushback step list (0x2783C[record +0xC]) ends (14z-121 (3); the 14z-120 (12) 'pushbox separation' reading is retracted); the 'own table per tenant' reading was a labelling artefact — deterministically labelled, the three tenants share the same canonical b: seqs (14z-121 (2)); the 'unindexed lying/wake nodes' were table-b entries the chain decoder's table bound had cut off (fixed 14z-121: tools/anim_nodes.py; Huitzil's b:0x2a/0x2d/0x44/0x46/0x48) | tests/test_reactions.sh, tests/expected/reactions_<tenant>.txt (Huitzil re-frozen 14z-121), tests/test_anim_node_walk.sh |
-| projectile | DONE 14z-121: every $FF9400 type's inline parameters decoded from its handler (walker-2 table 0x5C620[type]; one init shape: +0x9A selects (xv, xacc, yv, yacc) 16.16 records + the +0x26 byte and +0x50 word; Cosmo Disruption is state-immediate) and MEASURED on the live spawns for all seven tabled types; ours == vs2 on every build (the values ride inside the ported code regions) | tools/projectile_params.py, tests/test_projectile_params.sh, tests/expected/projectile_params.txt |
+| projectile | DONE 14z-121: in the map as `structures.projectile` (page section 'Projectile parameters'); every $FF9400 type's inline parameters decoded from its handler (walker-2 table 0x5C620[type]; one init shape: +0x9A selects (xv, xacc, yv, yacc) 16.16 records + the +0x26 byte and +0x50 word; Cosmo Disruption is state-immediate) and MEASURED on the live spawns for all seven tabled types; ours == vs2 on every build (the values ride inside the ported code regions) | tools/projectile_params.py, tests/test_projectile_params.sh, tests/expected/projectile_params.txt |
 | bank | DONE 14z-121 (a reference scan of vsavj's code for every base in the physics bank): the 17 `gap_*` rows are 13 SLICES of param32_a / jump_params / param32_b / rec8_b (the bank map declared the interiors of larger-stride tables as their own rows), the two halves of the 32-LONG capture-keyframe pointer table 0x0BE27A, and one REAL per-char word table at 0x0BE23A (an airborne height threshold, check unread); rec8_b = the pursuit physics record pair (0x0BE3FA, id*0x20). Each row carries the resolution in bank_map.toml `note` | bank_map.toml notes; engine_internals 'The physics bank's gap rows' |
 | sfx | sfx record field +6 (d3.w, 'level-ish') | engine_internals 960 |
 | meter | DONE 14z-121 (4): +0x392.w is NOT an engine meter — written only inside one character's code block (vs2 0x4D0C0), no engine reader | ram.md +0x392 row (static) |

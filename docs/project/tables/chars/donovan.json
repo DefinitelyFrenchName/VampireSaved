@@ -196556,7 +196556,7 @@
    }
   },
   "hitbox": {
-   "_encoding": "box = (x, y, hw, hh) signed words, centre at fighter (x + (flip_x ? -x : x), y + y), half-extents; node hb8 -> family entry {vuln0,vuln1,vuln2,push}; node hbA>>8 -> attack record (0x20: +0 box, +8 real, +9 white, +0x10 hit id, +0x12 strength (observed), +0x14 attacker meter gain (measured), +0x16 special flag (observed), +0x17 class, +0x1C pushback scale (measured), +0x1D 0)",
+   "_encoding": "box = (x, y, hw, hh) signed words, centre at fighter (x + (flip_x ? -x : x), y + y), half-extents; node hb8 -> family entry {vuln0,vuln1,vuln2,push}; node hbA>>8 -> attack record (0x20: +0 box, +8 real, +9 white, +0x10 hit id, +0xC/+0xD pushback step-table index on hit/block, +0xE facing rule, +0x13 hit-freeze class, +0x14 attacker meter gain, +0x16 special flag, +0x17 reaction class, +0x1A combo-scaling row, +0x1B white-damage recovery class, +0x1C the DF-armed accumulator value (Aulbath-victim mechanic), +0x1D 0; +0x11/+0x12/+0x15/+0x18/+0x1F unread \u2014 14z-121)",
    "_summary": {
     "attack_differ": 20,
     "attack_records": 200,
@@ -206070,6 +206070,70 @@
     "vuln2": "0xc953a"
    }
   },
+  "projectile": {
+   "0x3e": {
+    "handler_ours": "0xcd0d4",
+    "handler_vs2": "0x66ec4",
+    "immediates": [],
+    "ours_source": "byte",
+    "rows": [
+     {
+      "+0x26": 32,
+      "+0x26_kind": "b",
+      "+0x50": 1,
+      "index": {
+       "+0x0A": 0,
+       "+0x9A": 0
+      },
+      "xa": -4096,
+      "xa_f": -0.0625,
+      "xv": 393216,
+      "xv_f": 6.0,
+      "ya": 8192,
+      "ya_f": 0.125,
+      "yv": -262144,
+      "yv_f": -4.0
+     },
+     {
+      "+0x26": 32,
+      "+0x26_kind": "b",
+      "+0x50": 1,
+      "index": {
+       "+0x0A": 1,
+       "+0x9A": 2
+      },
+      "xa": -4096,
+      "xa_f": -0.0625,
+      "xv": 458752,
+      "xv_f": 7.0,
+      "ya": 8192,
+      "ya_f": 0.125,
+      "yv": -294912,
+      "yv_f": -4.5
+     },
+     {
+      "+0x26": 32,
+      "+0x26_kind": "b",
+      "+0x50": 1,
+      "index": {
+       "+0x0A": 2,
+       "+0x9A": 4
+      },
+      "xa": -4096,
+      "xa_f": -0.0625,
+      "xv": 524288,
+      "xv_f": 8.0,
+      "ya": 8192,
+      "ya_f": 0.125,
+      "yv": -327680,
+      "yv_f": -5.0
+     }
+    ],
+    "shape": "A"
+   },
+   "_encoding": "per type: +0x9A (0/2/4 = LP/MP/HP, 6 = ES) selects +0x26 (byte or word), +0x50 (word) and an (xv, xacc, yv, yacc) 16.16 record (x-terms negated when flip_x = 0); Blizzard indexes (xv, yv) pairs by +0x0A*8; Cosmo Disruption = immediates per state",
+   "_verified_by": "tests/test_projectile_params.sh (29/29 live spawns match; ours == vs2 on three builds; 14z-121)"
+  },
   "regions": {
    "anim": {
     "diff": {
@@ -207466,7 +207530,7 @@
   {
    "evidence": "tools/projectile_params.py, tests/test_projectile_params.sh, tests/expected/projectile_params.txt",
    "structure": "projectile",
-   "what": "DONE 14z-121: every $FF9400 type's inline parameters decoded from its handler (walker-2 table 0x5C620[type]; one init shape: +0x9A selects (xv, xacc, yv, yacc) 16.16 records + the +0x26 byte and +0x50 word; Cosmo Disruption is state-immediate) and MEASURED on the live spawns for all seven tabled types; ours == vs2 on every build (the values ride inside the ported code regions)"
+   "what": "DONE 14z-121: in the map as `structures.projectile` (page section 'Projectile parameters'); every $FF9400 type's inline parameters decoded from its handler (walker-2 table 0x5C620[type]; one init shape: +0x9A selects (xv, xacc, yv, yacc) 16.16 records + the +0x26 byte and +0x50 word; Cosmo Disruption is state-immediate) and MEASURED on the live spawns for all seven tabled types; ours == vs2 on every build (the values ride inside the ported code regions)"
   },
   {
    "evidence": "bank_map.toml notes; engine_internals 'The physics bank's gap rows'",

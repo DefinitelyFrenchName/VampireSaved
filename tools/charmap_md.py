@@ -186,6 +186,24 @@ def main():
                 if f["box"] == [0, 0, 0, 0] and not f["real"] and not f["cls"] and not rec["ours_diff"]: continue
                 w(f"| {rec['idx']:#x} | `{rec['addr']}` | {tuple(f['box'])} | {f['real']} | {f['white']} | {f['hit_id']} | {f['strength']} | {f['meter']} | {f['special']} | {f['cls']:#04x} | {f.get('pb_hit',0)}/{f.get('pb_blk',0)} | {f.get('freeze',0)} | {f.get('facing',0)} | {f.get('scale',0)} | {f.get('recov',0)} | {f['b1c']:#04x} | {' '.join(rec['ours_diff'])} | {rec['ours_source'] if rec['ours_diff'] else ''} |")
         w("")
+    # ---- projectile parameters (phase 3, 14z-121) ----
+    PJ = S.get("projectile") or {}
+    if PJ:
+        w("## Projectile parameters (phase 3)")
+        w("")
+        w(f"Every `$FF9400` type this character spawns (the census), its handler on vs2 and on ours, and the inline parameters decoded from the handler's init block. {h(PJ.get('_encoding',''))}. Verified by `{PJ.get('_verified_by','')}`.")
+        w("")
+        w("| type | handler vs2 | handler ours | shape | +0x9A | +0x26 | +0x50 | xv | xacc | yv | yacc | ours |")
+        w("|---|---|---|---|---|---|---|---|---|---|---|---|")
+        for ty, d in PJ.items():
+            if ty.startswith("_"): continue
+            if d["shape"] == "immediate":
+                for im in d["immediates"]:
+                    w(f"| `{ty}` | `{d['handler_vs2']}` | `{d['handler_ours']}` | immediate @{im['pc']} | | | | {im['f16'] if im['field']=='+0x40' else ''} | {im['f16'] if im['field']=='+0x48' else ''} | {im['f16'] if im['field']=='+0x44' else ''} | {im['f16'] if im['field']=='+0x4c' else ''} | {d['ours_source']} |")
+                continue
+            for r in d["rows"]:
+                w(f"| `{ty}` | `{d['handler_vs2']}` | `{d['handler_ours']}` | {d['shape']} | {r['index'].get('+0x9A')} | {r['+0x26']} | {r['+0x50']} | {r['xv_f']} | {r['xa_f']} | {r['yv_f']} | {r['ya_f']} | {d['ours_source']} |")
+        w("")
     # ---- reactions (phase 3): the frozen contact lines of tests/test_reactions.sh ----
     rx = Path(__file__).resolve().parent.parent / "tests" / "expected" / f"reactions_{j['tenant']}.txt"
     if rx.exists():
@@ -193,8 +211,8 @@ def main():
         w("")
         w(f"MEASURED on native vs2 (`tests/test_reactions.sh`, frozen `tests/expected/reactions_{j['tenant']}.txt`): Victor attacks the tenant; "
           "per contact the victim's class byte `+0x54`, the hit-freeze `+0x5C`, the chain PATH the tenant runs (table:seq@entry-node; `OFF:` = a node the "
-          "index tables do not reach) and the frames until it is back on a table-`a` stand chain. The reaction chains are HOLD chains ended by an engine "
-          "counter, so `len` is the stun as the engine ran it, not the chains' data frames.")
+          "index tables do not reach — none since the 14z-121 decoder fix) and the frames until it is back on a table-`a` stand chain. The reaction chains are HOLD chains "
+          "released when the pushback step list (`0x2783C[record +0xC]`) ends, so `len` is the stun as the engine ran it, not the chains' data frames. Labels: the previous node's chain, else the entering chain with the smallest seq — the three tenants share the same canonical `b:` seqs (14z-121 (2)).")
         w("")
         w("| part | contact | class | freeze | chain path | frames |")
         w("|---|---|---|---|---|---|")
