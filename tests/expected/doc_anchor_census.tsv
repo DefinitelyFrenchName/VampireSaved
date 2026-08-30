@@ -5,7 +5,7 @@
 CPE-1	docs/platform/gotchas.md	MAME `logerror` output needs `-log`, not `-verbose` (paid: 2026-07-25)	IN-LIST
 CPE-2	docs/platform/gotchas.md	MAME `-debug` perturbs multi-CPU timing — never compare its checksums to non-debug runs (paid: 2026-	IN-LIST
 CPE-3	STATE_HISTORY.md	14z-108/109 measurements it never had; the field test got an in-tree carrier.**	OUT-OF-LIST
-CPE-3	docs/platform/gotchas.md	14z-98: two -debug INSTRUMENT-grammar traps from the #103 close — both	IN-LIST
+CPE-3	docs/platform/gotchas.md	two -debug INSTRUMENT-grammar traps from the #103 close — both misread a measurement for a full roun	IN-LIST
 CPE-4	docs/platform/gotchas.md	MAME breakpoint logging is a SAMPLER, not an inventory	IN-LIST
 CPE-5	docs/platform/gotchas.md	Debugger stops DESYNC replay frame counting	IN-LIST
 CPE-6	docs/platform/gotchas.md	screen the replay never left (14z-63)	IN-LIST
@@ -45,7 +45,7 @@ CPE-38	docs/platform/gotchas.md	A canary must change exactly ONE thing, or it ca
 CPE-39	docs/platform/gotchas.md	A relocation test with no negative control proves nothing	IN-LIST
 CPE-40	HANDOFF.md	If it still will not start, in order	IN-LIST
 CPE-41	HANDOFF.md	Platform / migration notes (14z-59d)	IN-LIST
-CPE-42	docs/platform/gotchas.md	its legacy-only instrument do, deliberately	IN-LIST
+CPE-42	docs/platform/gotchas.md	TWO BUILDS CAN SHARE A PROGRAM FINGERPRINT — the merged build and its legacy-only instrument do, del	IN-LIST
 CPH-1	docs/platform/gotchas.md	CPS-2 ROM file byte order is NOT 68k logical order (paid: 2026-07-25, ~1h)	IN-LIST
 CPH-2	docs/platform/gotchas.md	CPS-2 program zips store CODE encrypted — static byte reads of code are noise	IN-LIST
 CPH-3	docs/platform/gotchas.md	absolutizing a pc-relative table read on CPS-2 reads CIPHERTEXT	IN-LIST
@@ -127,7 +127,7 @@ MSC-48	docs/platform/mister.md	THE SDRAM READ PROBE: watching the core FETCH (14
 MSC-49	docs/platform/mister.md	The cheapest proof that the profile bit is live: LOOK AT THE SCREEN	IN-LIST
 MSC-50	docs/platform/mister.md	THE SDRAM IMAGE CENSUS: reading the download back out (14z-107 (9))	IN-LIST
 MSC-51	docs/platform/gotchas.md	The Verilator SDRAM model dropped the TOP address bit — and the obvious fix was wrong (14z-107)	IN-LIST
-MSC-52	docs/project/gotchas.md	THE INSTRUMENT PROTOCOL — adopted 14z-107 (11), maintainer-directed	IN-LIST
+MSC-52	docs/project/gotchas.md	THE INSTRUMENT PROTOCOL (adopted 14z-107 (11), maintainer-directed)	IN-LIST
 MSC-53	docs/project/mister_core.md	12. The holes — what has never been tried	IN-LIST
 MSC-54	docs/platform/gotchas.md	Editing a shell script WHILE it runs corrupts the running execution (14z-107)	IN-LIST
 MSC-55	docs/project/gotchas.md	`pgrep -f` WAITERS MATCH THEMSELVES AND NEVER EXIT (paid: 2026-08-24, 14z-107, four times in one tas	IN-LIST
@@ -307,7 +307,7 @@ VSP-36	docs/project/gotchas.md	A self-frozen `.sha1` cannot see a legacy regress
 VSP-37	docs/project/gotchas.md	A comparator's own ground-truth test can RATIFY a deviation from the governing spec (paid: 14z-95, G	IN-LIST
 VSP-38	docs/project/gotchas.md	Moving a frozen ONSET frame can silently cross a verification-class boundary (paid: 14z-90, GitHub i	IN-LIST
 VSP-39	docs/project/gotchas.md	A hook on a hot shared path can flip a frame-boundary parity	IN-LIST
-VSP-40	docs/project/gotchas.md	Never chain a legacy measurement onto a build in one step (14z-74)	IN-LIST
+VSP-40	docs/project/gotchas.md	Never chain a legacy measurement onto a build in one step — it produced a WRONG COMMIT (paid: 14z-74	IN-LIST
 VSP-41	docs/project/gotchas.md	Engine hooks on hot paths break whole-RAM legacy comparison — by construction (paid: 2026-07-25 sess	IN-LIST
 VSP-42	docs/project/gotchas.md	GFX and coordinate data are INVISIBLE to every RAM-basis gate	IN-LIST
 VSP-43	docs/project/gotchas.md	The RAM gate cannot see NEW-CHAR visual wrongness — pixel A/B is the tool	IN-LIST
@@ -338,7 +338,7 @@ VSP-67	docs/project/gotchas.md	`placements.json`'s dst/src is a LINEAR map, but 
 VSP-68	docs/project/gotchas.md	A pointer-shaped heuristic is placement-dependent — merged5 passed by luck (14z-92)	IN-LIST
 VSP-69	docs/project/gotchas.md	Every TYPE/CLASS byte in a ported record indexes some engine dispatch —	IN-LIST
 VSP-70	docs/project/gotchas.md	"Entry N" past the end of a jump table is the NEXT routine's OPERAND	IN-LIST
-VSP-71	docs/project/gotchas.md	14z-111 — "16 + the same 16 repeated": an aliasing guard is a silent tenant trap; and a rig that win	IN-LIST
+VSP-71	docs/project/gotchas.md	"16 + the same 16 repeated": an aliasing guard is a silent tenant trap; and a rig that wins fast can	IN-LIST
 VSP-72	docs/project/gotchas.md	Hole "a" is inside the CPS-2 crypt range — thunks with EMBEDDED DATA	IN-LIST
 VSP-73	docs/project/gotchas.md	A slot id baked into hand-authored MACHINE CODE is invisible to a	IN-LIST
 VSP-74	docs/project/gotchas.md	Dotted TOML table names parse DIFFERENTLY per host (14z-62c)	IN-LIST
@@ -375,9 +375,9 @@ VSP-104	docs/project/gotchas.md	A self-test that drives a gate through DELIBERAT
 VSP-105	docs/project/gotchas.md	Pipe a build tool through tail and a crash packs STALE artifacts	IN-LIST
 VSP-106	docs/project/gotchas.md	A build-fingerprint call without `--set` silently fingerprints the	IN-LIST
 VSP-107	docs/project/gotchas.md	`BUILD=... tests/<gate>.sh` is SILENTLY IGNORED by positional-arg gates —	IN-LIST
-VSP-108	docs/project/gotchas.md	14z-97: two ways a tool measures the wrong thing and says nothing	IN-LIST
-VSP-109	docs/project/gotchas.md	14z-96: three instrument traps, each paid for in this session	IN-LIST
-VSP-110	docs/project/gotchas.md	14z-94: five shell/tooling traps, each paid for in this session	IN-LIST
+VSP-108	docs/project/gotchas.md	two ways a tool measures the wrong thing and says nothing (paid: 14z-97)	IN-LIST
+VSP-109	docs/project/gotchas.md	three instrument traps, each paid for in this session (paid: 14z-96)	IN-LIST
+VSP-110	docs/project/gotchas.md	five shell/tooling traps, each paid for in this session (paid: 14z-94)	IN-LIST
 VSP-111	docs/project/gotchas.md	awk compares hex fields as NUMBERS when they happen to look numeric (14z-91)	IN-LIST
 VSP-112	docs/project/gotchas.md	A `|| fallback` after a pipeline reads the LAST command's status, not the failing one (paid: 14z-93,	IN-LIST
 VSP-113	docs/project/gotchas.md	A worktree branched from a STALE `origin/main` silently changes the	IN-LIST
@@ -391,8 +391,8 @@ VSP-120	docs/project/gotchas.md	2P forced-pick pokes must end by ~frame 1500 —
 VSP-121	docs/project/gotchas.md	Forced-pick pokes do NOT populate the HUD index field — HUD	IN-LIST
 VSP-122	docs/project/gotchas.md	Forced-pick pokes hold through SELECT only — a vs-CPU P2 carries the CPU's REAL pick at match time (	IN-LIST
 VSP-123	HANDOFF.md	THE NATIVE LEG IS REACHABLE FOR ANY TENANT SCREEN (14z-69)	IN-LIST
-VSP-124	docs/project/gotchas.md	14z-97b: five traps from the #103 hunt — four are RIG grammar, one is a	IN-LIST
-VSP-125	docs/project/gotchas.md	14z-98: the kill/heal POKE SHAPE trap from the #103 close (the	IN-LIST
+VSP-124	docs/project/gotchas.md	five traps from the #103 hunt — four are RIG grammar, one is a classifier lying by omission (paid: 1	IN-LIST
+VSP-125	docs/project/gotchas.md	the kill/heal POKE SHAPE trap from the #103 close (paid: 14z-98; the instrument-grammar half of this	IN-LIST
 VSP-126	docs/project/gotchas.md	The pushed group-0 exception PC is mid-instruction — probing it reads a clean zero (14z-81)	IN-LIST
 VSP-127	docs/project/gotchas.md	Rig iterations must NOT share a dump directory (14z-100)	IN-LIST
 VSP-128	docs/project/gotchas.md	replay.lua DUMPS separator is ';' — commas die silently late	IN-LIST
@@ -408,8 +408,8 @@ VSP-137	docs/project/gotchas.md	A no-crash soak can silently lose the behavior i
 VSP-138	docs/project/gotchas.md	Phantom fixes: validate against the USER'S repro, at the RIGHT frames	IN-LIST
 VSP-139	docs/project/gotchas.md	Verify a fix at the RENDER layer before believing the RAM layer	IN-LIST
 VSP-140	docs/project/gotchas.md	Mid-frame transients and perturbing probes (win-palette post-mortem)	IN-LIST
-VSP-141	docs/project/gotchas.md	14z-99 (2): three traps from the #105 fix arc	IN-LIST
-VSP-142	docs/project/gotchas.md	14z-99: two traps from the #104 re-measurement — both produced a	IN-LIST
+VSP-141	docs/project/gotchas.md	three traps from the #105 fix arc (paid: 14z-99 (2))	IN-LIST
+VSP-142	docs/project/gotchas.md	two traps from the #104 re-measurement — both produced a CONFIDENT WRONG ANSWER from a working instr	IN-LIST
 VSP-143	docs/project/gotchas.md	A cited address in a session log is a CLAIM, not a fact — re-verify	IN-LIST
 VSP-144	docs/project/gotchas.md	A pool measurement is a claim about ONE pool — decode the walker first (14z-85)	IN-LIST
 VSP-145	docs/project/gotchas.md	A0-at-write is post-increment — SECOND payment (14z-18 tail row)	IN-LIST
@@ -425,7 +425,7 @@ VSP-154	docs/project/gotchas.md	Cross-build A/B is the cheapest attribution we h
 VSP-155	HANDOFF.md	PRIOR ART FIRST — check the subsystem doc before re-deriving (14z-68m)	IN-LIST
 VSP-156	docs/project/gotchas.md	A REPLAY'S NAME IS A CLAIM ABOUT THE BUILD (paid: 2026-08-24, 14z-107)	IN-LIST
 VSP-157	docs/project/gotchas.md	Root-causing a stochastic hardware crash: make ANY repro deterministic	IN-LIST
-VSP-158	docs/project/gotchas.md	14z-111 — "16 + the same 16 repeated": an aliasing guard is a silent tenant trap; and a rig that win	IN-LIST
+VSP-158	docs/project/gotchas.md	"16 + the same 16 repeated": an aliasing guard is a silent tenant trap; and a rig that wins fast can	IN-LIST
 VSP-159	docs/project/porting_sprite_lists.md	The four questions to ask of any ported effect	IN-LIST
 VSP-160	docs/project/porting_sprite_lists.md	Inventories are SPANS, not samples	IN-LIST
 VSP-161	docs/project/porting_sprite_lists.md	Order of work, and the checks at each step	IN-LIST

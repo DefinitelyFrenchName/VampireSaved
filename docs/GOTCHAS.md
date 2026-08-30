@@ -112,7 +112,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - QSound packing law #3: the record's `end` offset PLAYS — copy the inclusive window (14z-87b)
 - A pc-relatively-read table must be a `code` op at ANY address (14z-91)
 - MAME `-aviwrite` is headless-capable but uncompressed (14z-94)
-- 14z-94: TWO BUILDS CAN SHARE A PROGRAM FINGERPRINT — the merged build and its legacy-only instrument do, deliberately
+- TWO BUILDS CAN SHARE A PROGRAM FINGERPRINT — the merged build and its legacy-only instrument do, deliberately (paid: 14z-94)
 - `gfx_tiles.decode` had every 8-pixel half MIRRORED, and nothing noticed for 14 sessions (14z-105)
 - `jtsim -setname` re-downloads every run — and on CPS-2 you must download anyway (14z-107)
 - `JTFRAME_SIM_IODUMP` on CPS-2 dumps the EEPROM, not RAM (14z-107)
@@ -132,7 +132,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A jtcores BITSTREAM CARRIES A BUILD DATESTAMP, SO THE SAME SEED REBUILDS TO A DIFFERENT HASH ON A DIFFERENT DAY (measured 2026-08-25, 14z-108)
 - An ARMED DEBUGGER BREAKPOINT skews the Lua harness's input application — deterministic INPUT-VIOLATIONs that look like host input (14z-110)
 - A RELATIVE `FBNEO_ROMPATH` builds an overlay of BROKEN SYMLINKS — and the only symptom is a bare "DrvInit failed" (14z-110)
-- 14z-111 — the macOS tmp reaper hollows out the jtsim scratch clone
+- the macOS tmp reaper hollows out the jtsim scratch clone (paid: 14z-111)
 - MAME Lua: WRITE taps fire, READ taps do not (14z-112, measured)
 - RE-FILED FROM project/gotchas.md (14z-118, the documentation audit) — emulator and toolchain facts that had been filed by task
 - Pre-seeded from the ROM-audit round (2026-07-25, before repo existed)
@@ -147,7 +147,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - `WIDE=0 tools/setup_fbneo.sh` did not produce a clean reference — it only SKIPPED applying the profile patch, never reverted it
 - A probe PC that is not an instruction boundary measures NOTHING while looking green (14z-100)
 - MAME palette RAM ($90C000) takes Lua pokes for READBACK but not for RENDERING (14z-102)
-- 14z-98: two -debug INSTRUMENT-grammar traps from the #103 close — both misread a measurement for a full round each
+- two -debug INSTRUMENT-grammar traps from the #103 close — both misread a measurement for a full round each (paid: 14z-98)
 
 ## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 142 entries
 
@@ -223,7 +223,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - Cross-build A/B is the cheapest attribution we have, and it is routinely skipped in favour of analysis (14z-71)
 - When a claim changes, GREP FOR THE CLAIM — not for the files (14z-71)
 - Cross-emulator position A/B: compare RELATIVE offset, not absolute x (14z-72 lost a session to this; 14z-73)
-- Never chain a legacy measurement onto a build in one step (14z-74) — it produced a WRONG COMMIT
+- Never chain a legacy measurement onto a build in one step — it produced a WRONG COMMIT (paid: 14z-74)
 - A dead-filler classifier that compares the OPCODE view is blind to DATA (14z-74, cost the air-214+P bug)
 - `placements.json`'s dst/src is a LINEAR map, but the extractor auto-discovers SUB-REGION shifts — comparing through it fabricates "the ported data is corrupt" (14z-75)
 - "Entry N" past the end of a jump table is the NEXT routine's OPERAND (14z-75, cost a shipped legacy regression and a blocked freeze)
@@ -251,13 +251,13 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A PASS line that hard-codes its control's conclusion (paid: 14z-93, caught by reading a red log)
 - `DUMPS` land next to the LOG, not in the sandbox (paid: 14z-93, caught before the sweep ran)
 - A `|| fallback` after a pipeline reads the LAST command's status, not the failing one (paid: 14z-93, GitHub #84's residue)
-- 14z-94: five shell/tooling traps, each paid for in this session
-- 14z-97b: five traps from the #103 hunt — four are RIG grammar, one is a classifier lying by omission
-- 14z-97: two ways a tool measures the wrong thing and says nothing
-- 14z-96: three instrument traps, each paid for in this session
-- 14z-98: the kill/heal POKE SHAPE trap from the #103 close (the instrument-grammar half of this entry was re-filed to `platform/gotchas.md` at 14z-118)
-- 14z-99: two traps from the #104 re-measurement — both produced a CONFIDENT WRONG ANSWER from a working instrument
-- 14z-99 (2): three traps from the #105 fix arc
+- five shell/tooling traps, each paid for in this session (paid: 14z-94)
+- five traps from the #103 hunt — four are RIG grammar, one is a classifier lying by omission (paid: 14z-97b)
+- two ways a tool measures the wrong thing and says nothing (paid: 14z-97)
+- three instrument traps, each paid for in this session (paid: 14z-96)
+- the kill/heal POKE SHAPE trap from the #103 close (paid: 14z-98; the instrument-grammar half of this entry was re-filed to `platform/gotchas.md` at 14z-118)
+- two traps from the #104 re-measurement — both produced a CONFIDENT WRONG ANSWER from a working instrument (paid: 14z-99)
+- three traps from the #105 fix arc (paid: 14z-99 (2))
 - Rig iterations must NOT share a dump directory (14z-100)
 - `grep -c pattern file || echo 0` DOUBLE-PRINTS on zero (14z-100)
 - The -debug write-trace and non-debug dumps can DISAGREE about one write (14z-100; RESOLVED 14z-101 — they never disagreed)
@@ -267,14 +267,14 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A self-test that drives a gate through DELIBERATE failures litters the gate's evidence directory (14z-103)
 - A 1P-arcade rig is silently pinned to the ARCADE DRAW — any timing change re-rolls its opponent and stage (14z-103, GitHub #110)
 - A fixed-frame rig verified on ONE character whiffs on another — reach, knockdown arcs, down windows and wake timing are ALL per-character, on BOTH sides (14z-104)
-- THE INSTRUMENT PROTOCOL — adopted 14z-107 (11), maintainer-directed
+- THE INSTRUMENT PROTOCOL (adopted 14z-107 (11), maintainer-directed)
 - A REPLAY'S NAME IS A CLAIM ABOUT THE BUILD (paid: 2026-08-24, 14z-107)
 - `pgrep -f` WAITERS MATCH THEMSELVES AND NEVER EXIT (paid: 2026-08-24, 14z-107, four times in one task)
 - macOS's awk HAS NO `and()` OR `strtonum()`, AND A GATE CHECK THAT USES THEM PASSES BY ERRORING (2026-08-25, 14z-108)
 - Every TYPE/CLASS byte in a ported record indexes some engine dispatch — and the engines RENUMBERED families between games (14z-109, the #99 crash)
 - Root-causing a stochastic hardware crash: make ANY repro deterministic first, then interrogate the corpse (14z-109 method note)
 - `BUILD=... tests/<gate>.sh` is SILENTLY IGNORED by positional-arg gates — and you measure the DEFAULT build with full confidence (14z-110b)
-- 14z-111 — "16 + the same 16 repeated": an aliasing guard is a silent tenant trap; and a rig that wins fast cannot see a time-dependent AI crash
+- "16 + the same 16 repeated": an aliasing guard is a silent tenant trap; and a rig that wins fast cannot see a time-dependent AI crash (paid: 14z-111)
 - OUR OWN WHEEL BREAKS VANILLA NAVIGATION PATHS — compute rig routes from the BUILT table (paid: 14z-116, one wasted rebuild)
 - A PARKED ITEM THAT LIVES ONLY IN STATE_HISTORY GETS RE-REPORTED (paid: 14z-116)
 - AN mtime IS NOT A DATE UNLESS YOU PRINT THE DATE (paid: 14z-115, corrected 14z-116)
@@ -285,11 +285,11 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - Moving a frozen ONSET frame can silently cross a verification-class boundary (paid: 14z-90, GitHub issue #4)
 - A STOCK-TRACK GATE HANDED A WIDE ROMPATH RUNS PRISTINE vsavj AND FAILS IDENTICALLY ON ANY BUILD (paid: 14z-118)
 - A RE-POINT SWEEP STAMP ON A TOML SECTION HEADER OR KEY LINE BREAKS THE GATES' HAND-ROLLED PARSERS — and a blind name sweep REWRITES HISTORY in comments (paid: 14z-119)
-- THE NAMING RIG'S THREE SELF-INFLICTED MISREADS (14z-120): a BINARY timer, a motion that CONTAINS another, a facing flip
-- A THROW PUTS P2 BEHIND P1 AND EVERY LATER MOTION MEASURES ITS MIRROR (14z-120 (2)) — pin both X before each event
+- THE NAMING RIG'S THREE SELF-INFLICTED MISREADS — a BINARY timer, a motion that CONTAINS another, a facing flip (paid: 14z-120)
+- A THROW PUTS P2 BEHIND P1 AND EVERY LATER MOTION MEASURES ITS MIRROR — pin both X before each event (paid: 14z-120 (2))
 - "+0x1D" AND "+0x17" WERE THE SAME BYTE COUNTED FROM TWO BASES; "+0x8C = attack" AND "+0x90 = push" WERE CROSSED; BOXES ARE AUTHORED FACING LEFT (14z-120 (5))
 - A TABLE DUMPED THROUGH THE OPCODE VIEW IS CRYPT NOISE; "HOLD AWAY" IS THE OTHER DIRECTION FOR A LEFT-FACING P2 (14z-120, phase 3)
-- A TABLE BOUND THAT TESTS THE WORD AFTER APPENDING IT IS POISONED BY THE FIRST NON-TABLE WORD (14z-121) — the "unindexed lying/wake nodes" were decoder entries never read
+- A TABLE BOUND THAT TESTS THE WORD AFTER APPENDING IT IS POISONED BY THE FIRST NON-TABLE WORD — the "unindexed lying/wake nodes" were decoder entries never read (paid: 14z-121)
 - THE PURSUIT RIG NEVER FIRED, TWICE — a part that does not produce its event is deleted, not kept (14z-121)
 - "THE ONLY WRITER" IS A CLAIM ABOUT THE TAP'S WINDOW — a light hit's overlap frames named the wrong mechanism for the pushback (14z-120 (12), corrected 14z-121 (3))
 - THE NAMING RIGS RUN ON NATIVE vs2 — THERE, THE TENANT'S ART IS NOT IN GROUP C, AND ITS TILE CODES SHARE A BANK WITH THE HUD AND THE OPPONENT (14z-121 (6))

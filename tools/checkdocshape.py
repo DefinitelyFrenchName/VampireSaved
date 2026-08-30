@@ -152,11 +152,22 @@ def walk_docs(root):
 
 def lint_headers(rel, text, cls, allows):
     fails = []
-    for n, line in enumerate(text.splitlines(), 1):
+    lines = text.splitlines()
+    for n, line in enumerate(lines, 1):
         m = HEADER_RE.match(line)
         if not m:
             continue
-        residue = strip_trailing_paren(m.group(2))
+        # consecutive header lines of the SAME level are one WRAPPED header
+        # (the gotchas-bucket convention; gen_gotchas_index merges them too):
+        # lint the merged text once, at the first line.
+        if n >= 2 and lines[n-2].startswith(m.group(1) + " "):
+            continue
+        merged = m.group(2)
+        k = n
+        while k < len(lines) and lines[k].startswith(m.group(1) + " "):
+            merged += " " + lines[k][len(m.group(1)) + 1:]
+            k += 1
+        residue = strip_trailing_paren(merged)
         cm = CHRONO.search(residue)
         if not cm:
             continue

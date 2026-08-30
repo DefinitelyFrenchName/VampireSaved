@@ -961,8 +961,7 @@ blanks frames still produces a file that plays.
 
 ---
 
-## 14z-94: TWO BUILDS CAN SHARE A PROGRAM FINGERPRINT — the merged build and
-## its legacy-only instrument do, deliberately
+## TWO BUILDS CAN SHARE A PROGRAM FINGERPRINT — the merged build and its legacy-only instrument do, deliberately (paid: 14z-94)
 
 **[CPE-42]** The maintainer asked to confirm which merged build to playtest, fearing they
 had tested the wrong one. They were right to ask, and the fingerprint would
@@ -1872,7 +1871,7 @@ stands for every overlay-by-symlink mechanism: absolutize before linking,
 and suspect the instrument when a KNOWN-GOOD input fails the same way as
 the thing under test.
 
-## 14z-111 — the macOS tmp reaper hollows out the jtsim scratch clone
+## the macOS tmp reaper hollows out the jtsim scratch clone (paid: 14z-111)
 
 `tools/mister_mra.sh` / `run_sim_jtcps2.sh` keep a clone of the jtcores
 fork under `${TMPDIR}/vampire-saved-jtsim` and only RE-CLONE when `.git`
@@ -2129,8 +2128,7 @@ BUILD (or poke the game's staging buffer, once its per-frame copy source
 is measured), and treat any poke-based "no visual change" as
 unmeasured.
 
-## **[CPE-3]** 14z-98: two -debug INSTRUMENT-grammar traps from the #103 close — both
-## misread a measurement for a full round each
+## **[CPE-3]** two -debug INSTRUMENT-grammar traps from the #103 close — both misread a measurement for a full round each (paid: 14z-98)
 
 **Every -debug watch configuration is its own TIMELINE, not just
 "different from non-debug".** Three trace_writes runs on the SAME rig

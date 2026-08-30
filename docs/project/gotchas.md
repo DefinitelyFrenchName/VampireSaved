@@ -1541,8 +1541,7 @@ Rules:
   the event) is a free same-instrument positive control — if it does NOT
   agree pre-event, THEN suspect the rig.
 
-## **[VSP-40]** Never chain a legacy measurement onto a build in one step (14z-74)
-## — it produced a WRONG COMMIT
+## **[VSP-40]** Never chain a legacy measurement onto a build in one step — it produced a WRONG COMMIT (paid: 14z-74)
 
 Running a rebuild and then the legacy check inside ONE command block gave a
 false FAIL twice in a row: once on a build carrying `port_param32` (which I
@@ -2230,7 +2229,7 @@ probe's own defect and the crash it was hiding surfaced in the same run.
 
 ---
 
-## **[VSP-110]** 14z-94: five shell/tooling traps, each paid for in this session
+## **[VSP-110]** five shell/tooling traps, each paid for in this session (paid: 14z-94)
 
 Grouped because they share a shape: **a construct that fails SILENTLY and
 leaves a plausible result behind.** None produced an error message.
@@ -2310,8 +2309,7 @@ The real scenario it guards — a host key physically held before the run — IS
 in that read, because MAME samples host input ahead of the frame. Reachable
 in the field, not from the harness.
 
-## **[VSP-124]** 14z-97b: five traps from the #103 hunt — four are RIG grammar, one is a
-## classifier lying by omission
+## **[VSP-124]** five traps from the #103 hunt — four are RIG grammar, one is a classifier lying by omission (paid: 14z-97b)
 
 **A blanket opponent-class poke window that overlaps a LIVE match kills the
 match.** `+0x382` is live in-match state (the voice-flavor class, ram.md:85);
@@ -2355,7 +2353,7 @@ ladder-mask movement under continuous HP pokes — the strong signal
 (+0x1C record pointer + HP-reset) reversed it. A verdict is only as
 strong as the weakest signal it was read from.
 
-## **[VSP-108]** 14z-97: two ways a tool measures the wrong thing and says nothing
+## **[VSP-108]** two ways a tool measures the wrong thing and says nothing (paid: 14z-97)
 
 **A path argument must be CANONICALISED before anything uses it — the
 "correct only when called one way" trap, and this is its THIRD instance in
@@ -2387,7 +2385,7 @@ exit STATUS as a verdict must distinguish "rejected" from "died" — and the
 cheap proof that a control is live is to make the fixture GOOD and watch the
 control complain (done here; it does).
 
-## **[VSP-109]** 14z-96: three instrument traps, each paid for in this session
+## **[VSP-109]** three instrument traps, each paid for in this session (paid: 14z-96)
 
 **A gate must not depend on the CALLER'S environment — measured twice in
 one session.** (1) `ROMDIR=../ROMS` (relative) failed two gates that
@@ -2420,8 +2418,7 @@ for SOME moves, so a motion that "does nothing" should try the overlap
 shape before concluding anything about the game. [game-adjacent; filed
 here because the trap is the REPLAY GRAMMAR, not the engine]
 
-## **[VSP-125]** 14z-98: the kill/heal POKE SHAPE trap from the #103 close (the
-## instrument-grammar half of this entry was re-filed to `platform/gotchas.md` at 14z-118)
+## **[VSP-125]** the kill/heal POKE SHAPE trap from the #103 close (paid: 14z-98; the instrument-grammar half of this entry was re-filed to `platform/gotchas.md` at 14z-118)
 
 **A kill/heal poke that writes ONLY the 2-byte HP word manufactures
 #103's unjudgeable state — on ANY character, vanilla engine included.**
@@ -2436,8 +2433,7 @@ paid: the 14z-97 (7) continue rig's "HP set to 1" pokes (byte-width not
 committed) mean "#103 instance 2" (Phobos x Bishamon) is UNVERIFIED —
 possibly the rig's own poke. Kill pokes write BOTH words, always.
 
-## **[VSP-142]** 14z-99: two traps from the #104 re-measurement — both produced a
-## CONFIDENT WRONG ANSWER from a working instrument
+## **[VSP-142]** two traps from the #104 re-measurement — both produced a CONFIDENT WRONG ANSWER from a working instrument (paid: 14z-99)
 
 **A placement lookup that hardcodes ONE region name is wrong on a MERGED
 build, and it fails by pointing somewhere plausible.** `placements.json`
@@ -2470,7 +2466,7 @@ poked run gives 904 hits at `0x27FA0`. The forced Donovan/Victor pick
 simply never requests a palette sequence. Test the scary instrument claim
 before writing it down.
 
-## **[VSP-141]** 14z-99 (2): three traps from the #105 fix arc
+## **[VSP-141]** three traps from the #105 fix arc (paid: 14z-99 (2))
 
 **A RENDER verdict from a gfx-free build is void — and it fails by
 looking like a new defect.** The merged1-style pack (program image over
@@ -2643,7 +2639,7 @@ combat audits (timeout/downwin/throws/down_attack) carry that refusal.
   is in the brief because it is easy to do by accident while filling the
   wait productively.)
 
-## THE INSTRUMENT PROTOCOL — adopted 14z-107 (11), maintainer-directed
+## THE INSTRUMENT PROTOCOL (adopted 14z-107 (11), maintainer-directed)
 
 **[MSC-52]** **Paid for six times in one arc, and the class is older than the arc** (see
 "half the Lua instruments stage inputs one frame off" and "success while the
@@ -2872,7 +2868,7 @@ build (grep its BUILD= line) — and when a differential comes out
 identical, check you actually varied the variable (RH-23) before theorizing
 about the mechanism.
 
-## **[VSP-71]** 14z-111 — "16 + the same 16 repeated": an aliasing guard is a silent tenant trap; and a rig that wins fast cannot see a time-dependent AI crash
+## **[VSP-71]** "16 + the same 16 repeated": an aliasing guard is a silent tenant trap; and a rig that wins fast cannot see a time-dependent AI crash (paid: 14z-111)
 
 **The fact.** Several per-class tables in vsavj are 32 entries with the
 second half a COPY of the first (`0xBF01A/09A/11A/19A`, the CPU AI action
@@ -3082,7 +3078,7 @@ a reference, and a sweep must leave it alone; (3) `grep '\\ *# re-pointed'`
 for the continuation trap stays (14z-117).
 
 
-## THE NAMING RIG'S THREE SELF-INFLICTED MISREADS (14z-120): a BINARY timer, a motion that CONTAINS another, a facing flip
+## THE NAMING RIG'S THREE SELF-INFLICTED MISREADS — a BINARY timer, a motion that CONTAINS another, a facing flip (paid: 14z-120)
 
 `tools/name_moves.py` drives every Donovan move on native vs2 and reads the
 chain entered ([VSE-47]: never the input's name). Three times the rig, not
@@ -3115,7 +3111,7 @@ differed at the two firings before theorising — both firings were in a
 part whose sword was still planted.
 
 
-## A THROW PUTS P2 BEHIND P1 AND EVERY LATER MOTION MEASURES ITS MIRROR (14z-120 (2)) — pin both X before each event
+## A THROW PUTS P2 BEHIND P1 AND EVERY LATER MOTION MEASURES ITS MIRROR — pin both X before each event (paid: 14z-120 (2))
 
 The Pyron/Huitzil naming pass measured 623 as 421, 41236 as 63214 and a
 "Zodiac Fire" that teleported: after the first throw P2 stood on P1's LEFT,
@@ -3188,7 +3184,7 @@ Three phase-2 traps, all cleared by letting the engine say where it read:
 
 
 
-## A TABLE BOUND THAT TESTS THE WORD AFTER APPENDING IT IS POISONED BY THE FIRST NON-TABLE WORD (14z-121) — the "unindexed lying/wake nodes" were decoder entries never read
+## A TABLE BOUND THAT TESTS THE WORD AFTER APPENDING IT IS POISONED BY THE FIRST NON-TABLE WORD — the "unindexed lying/wake nodes" were decoder entries never read (paid: 14z-121)
 
 `tools/anim_nodes.py` bounded an anim index table by "the smallest
 offset seen so far", but appended each word BEFORE the test — so the first

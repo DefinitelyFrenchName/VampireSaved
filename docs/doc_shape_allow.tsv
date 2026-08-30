@@ -5,3 +5,6 @@
 # reasons. Expected to stay nearly empty; a session-shaped header in a
 # REFERENCE document is normally the thing the pass removes, not allows.
 docs/project/coverage_matrix.md	Shadow/Marionette measurement note \(14z-104	A deliberate tombstone: the note is kept as written with its SUPERSEDED marker, which the lint must keep visible by design
+docs/platform/gotchas.md	^## RE-FILED FROM project/gotchas\.md	A deliberate re-filing tombstone (14z-118): the header IS the pointer; hiding its provenance would hide its nature
+docs/project/gotchas.md	^## RE-FILED 14z-118 -> `docs/platform/gotchas\.md`	same — the re-filing tombstone class
+docs/project/gotchas.md	^## RE-FILED FROM game/gotchas\.md \(14z-118\)	same — the re-filing tombstone class
