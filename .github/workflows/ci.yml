@@ -162,7 +162,10 @@ jobs:
             echo "PASS $t"
           done < tests/ci_portable.txt
           echo "ran $n gates"
-          [ "$n" -ge 15 ] || { echo "::error::only $n gates ran — the list shrank"; exit 1; }
+          # FLOOR: 61 registered at 14z-124 (the documentation pass's close, G7);
+          # it was 15 from 14z-93. Raise it when the list grows; never lower it
+          # to make a shrunken list green.
+          [ "$n" -ge 60 ] || { echo "::error::only $n gates ran — the list shrank"; exit 1; }
           exit "$fail"
 
       # Advisory, not blocking: shellcheck has never run on this repo, so

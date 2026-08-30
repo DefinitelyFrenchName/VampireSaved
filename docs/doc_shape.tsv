@@ -19,7 +19,10 @@
 #   INDEX      a registry/index document: no header lint
 #   GENERATED  written by a committed tool, gated elsewhere: untouched here
 #   EXEMPT     out of the pass's scope (session logs)
-#   PENDING    not yet rationalized: lint SKIPPED; must be empty at the end
+#   PENDING    transitional (the 14z-122..124 pass): lint skipped by the
+#              tool's default, but the GATE runs --no-pending since 14z-124
+#              (the pass closed at zero PENDING) — a PENDING row FAILS the
+#              suite; classify a new document at birth
 #              of the pass (--no-pending, the ci gate's final mode)
 # history_twin: "-" or the sibling file that holds this document's moved
 #              chronology; it must exist and be classed HIST.

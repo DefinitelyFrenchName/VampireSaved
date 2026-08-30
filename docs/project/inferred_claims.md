@@ -1,6 +1,8 @@
 # inferred_claims — the LIVE worklist of the documentation rationalization pass (14z-122)
 
-> **STATUS (14z-122):** LIVE. Every claim found INFERRED rather than measured
+> **STATUS (14z-124): CLOSED with the pass — every row MEASURED, RETRACTED
+> or ruled-parked (row 11 alone, the maintainer's camera evidence on #113);
+> the pass log at the bottom is the record. Opened 14z-122 as:** LIVE. Every claim found INFERRED rather than measured
 > in the hand-written docs, with the measurement that answers it and its
 > cost. Maintainer ruling: every row is RE-MEASURED before its document's
 > commit lands; a row needing the board / a playtest / testimony is

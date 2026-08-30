@@ -11,9 +11,10 @@
 # header and no (HISTORY header; HIST files carry no anchors; twins exist and
 # are HIST; declared banner/atlas-rows requirements; no dangling doc link in
 # README/HANDOFF/CLAUDE.md; every docs/x.md 'Section' citation in tools/
-# and tests/ names a real header. PENDING rows are skipped during the pass —
-# the tool's --no-pending mode is the end-state check, run at the pass close,
-# NOT here (a red gate for the whole pass would be a decayed gate).
+# and tests/ names a real header. SINCE 14z-124 (G7, the pass's close at
+# zero PENDING) the gate runs the tool's --no-pending END-STATE mode: a
+# PENDING row FAILS (control h). During the pass (14z-122/123) PENDING was
+# skipped here — a red gate for the whole pass would have been a decayed gate.
 #
 # WHY. The pass moves appended chronology out of reference documents; this is
 # the enforcement that stops it growing back (the SMS lesson: staleness is
@@ -54,7 +55,7 @@ ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 
 echo "== test_docshape: doc shapes declared and enforced =="
-if python3 tools/checkdocshape.py >/tmp/docshape.$$.log 2>&1; then
+if python3 tools/checkdocshape.py --no-pending >/tmp/docshape.$$.log 2>&1; then
     ok "checkdocshape.py PASS on the tree ($(grep -o '[0-9]* still PENDING' /tmp/docshape.$$.log | head -1))"
 else
     bad "checkdocshape.py FAILS on the tree:"; sed 's/^/        /' /tmp/docshape.$$.log | head -30
@@ -106,5 +107,17 @@ control "dangling link" "$W/f" "DANGLING LINK"
 # g: a tool citing a section that does not exist
 mkcopy "$W/g"; printf '# per docs/game/atlas/id_space.md %sA Section Nobody Wrote%s\n' '"' '"' > "$W/g/tools/synthetic_control.py"
 control "citation of a nonexistent section" "$W/g" "SECTION THAT DOES NOT EXIST"
+
+# h: a PENDING row fails the end-state mode the gate runs (since 14z-124)
+mkcopy "$W/h"
+sed -i '' 's|^docs/game/atlas/id_space.md\tREFERENCE\t-\t-$|docs/game/atlas/id_space.md\tPENDING\t-\t-|' "$W/h/docs/doc_shape.tsv"
+grep -q 'id_space.md	PENDING' "$W/h/docs/doc_shape.tsv" || bad "control h: the TSV perturbation did not apply"
+if python3 tools/checkdocshape.py --root "$W/h" --no-pending --no-selftest >"$W/h/log" 2>&1; then
+    bad "PENDING row under --no-pending: the perturbed copy PASSED — the end state is not enforced"
+elif grep -q "still PENDING" "$W/h/log"; then
+    ok "PENDING row under --no-pending: fires (still PENDING)"
+else
+    bad "PENDING row under --no-pending: failed for the wrong reason:"; sed 's/^/        /' "$W/h/log" | head -12
+fi
 
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi
