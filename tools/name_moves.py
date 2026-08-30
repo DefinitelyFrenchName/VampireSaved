@@ -277,9 +277,9 @@ DONOVAN = {
     ],
     "7": [  # SWORDLESS: plant the sword (Killshread), then the whole set without it
         ("Killshread [LK] (plant)", qcb("LK"), 200),
-        ("5LP swordless", stand("LP"), 120), ("5MP swordless", stand("MP"), 120), ("5HP swordless", stand("HP"), 150),
-        ("5LK swordless", stand("LK"), 120), ("5MK swordless", stand("MK"), 120), ("5HK swordless", stand("HK"), 150),
-        ("2LP swordless", crouch("LP"), 120), ("2MP swordless", crouch("MP"), 120), ("2HP swordless", crouch("HP"), 150),
+        ("5LP (swordless)", stand("LP"), 120), ("5MP (swordless)", stand("MP"), 120), ("5HP (swordless)", stand("HP"), 150),
+        ("5LK (swordless)", stand("LK"), 120), ("5MK (swordless)", stand("MK"), 120), ("5HK (swordless)", stand("HK"), 150),
+        ("2LP swordless", crouch("LP"), 120), ("2MP (swordless)", crouch("MP"), 120), ("2HP (swordless)", crouch("HP"), 150),
         ("2LK swordless", crouch("LK"), 120), ("2MK swordless", crouch("MK"), 120), ("2HK swordless", crouch("HK"), 150),
         ("j.LP swordless", jump("LP"), 150), ("j.MP swordless", jump("MP"), 150), ("j.HP swordless", jump("HP"), 150),
         ("j.LK swordless", jump("LK"), 150), ("j.MK swordless", jump("MK"), 150), ("j.HK swordless", jump("HK"), 150),
@@ -360,15 +360,15 @@ PYRON = {
     ],
     "5": [  # the maintainer's challenge (14z-120): ES Planet Burning by 63214 + MP&HP up close; does Cosmo's tracker discriminate 41236 from 63214?
         ("Planet Burning [MP] step back (control)", [(0, 2, "L"), (30, 32, "R"), (32, 34, "DR"), (34, 36, "D"), (36, 38, "DL"), (38, 44, "L"), (40, 44, "2")], 320, "near"),
-        ("Planet Burning ES? [63214 MP+HP] step back", [(0, 2, "L"), (30, 32, "R"), (32, 34, "DR"), (34, 36, "D"), (36, 38, "DL"), (38, 44, "L"), (40, 44, "23")], 320, "near"),
-        ("Planet Burning ES? [63214 LP+HP] step back", [(0, 2, "L"), (30, 32, "R"), (32, 34, "DR"), (34, 36, "D"), (36, 38, "DL"), (38, 44, "L"), (40, 44, "13")], 320, "near"),
-        ("Planet Burning ES? [63214 LP+MP] step back", [(0, 2, "L"), (30, 32, "R"), (32, 34, "DR"), (34, 36, "D"), (36, 38, "DL"), (38, 44, "L"), (40, 44, "12")], 320, "near"),
-        ("Planet Burning ES? [63214 MP+HP] slow, step back", [(0, 2, "L"), (30, 34, "R"), (34, 38, "DR"), (38, 42, "D"), (42, 46, "DL"), (46, 54, "L"), (49, 54, "23")], 320, "near"),
-        ("Planet Burning ES? [63214 MP+HP] pair AFTER the motion", [(0, 2, "L"), (30, 32, "R"), (32, 34, "DR"), (34, 36, "D"), (36, 38, "DL"), (38, 42, "L"), (43, 46, "23")], 320, "near"),
-        ("Cosmo? [41236 PP] far", hcf("PP"), 400, "far"),
-        ("Cosmo? [63214 PP] far, no dash", [(0, 2, "L"), (30, 32, "R"), (32, 34, "DR"), (34, 36, "D"), (36, 38, "DL"), (38, 44, "L"), (40, 44, "13")], 400, "far"),
-        ("Cosmo? [63214 MP+HP] far, no dash", [(0, 2, "L"), (30, 32, "R"), (32, 34, "DR"), (34, 36, "D"), (36, 38, "DL"), (38, 44, "L"), (40, 44, "23")], 400, "far"),
-        ("Cosmo? [41236 MP+HP] far", hcf("MP")[:-1] + [(18, 22, "23")], 400, "far"),
+        ("Planet Burning (ES) [63214 MP+HP] step back", [(0, 2, "L"), (30, 32, "R"), (32, 34, "DR"), (34, 36, "D"), (36, 38, "DL"), (38, 44, "L"), (40, 44, "23")], 320, "near"),
+        ("Planet Burning (ES) [63214 LP+HP] step back", [(0, 2, "L"), (30, 32, "R"), (32, 34, "DR"), (34, 36, "D"), (36, 38, "DL"), (38, 44, "L"), (40, 44, "13")], 320, "near"),
+        ("Planet Burning (ES) [63214 LP+MP] step back", [(0, 2, "L"), (30, 32, "R"), (32, 34, "DR"), (34, 36, "D"), (36, 38, "DL"), (38, 44, "L"), (40, 44, "12")], 320, "near"),
+        ("Planet Burning (ES) [63214 MP+HP] slow, step back", [(0, 2, "L"), (30, 34, "R"), (34, 38, "DR"), (38, 42, "D"), (42, 46, "DL"), (46, 54, "L"), (49, 54, "23")], 320, "near"),
+        ("Planet Burning (ES) [63214 MP+HP] pair AFTER the motion", [(0, 2, "L"), (30, 32, "R"), (32, 34, "DR"), (34, 36, "D"), (36, 38, "DL"), (38, 42, "L"), (43, 46, "23")], 320, "near"),
+        ("Cosmo Disruption [41236 PP] far", hcf("PP"), 400, "far"),
+        ("Cosmo Disruption [63214 PP] far, no dash", [(0, 2, "L"), (30, 32, "R"), (32, 34, "DR"), (34, 36, "D"), (36, 38, "DL"), (38, 44, "L"), (40, 44, "13")], 400, "far"),
+        ("Cosmo Disruption [63214 MP+HP] far, no dash", [(0, 2, "L"), (30, 32, "R"), (32, 34, "DR"), (34, 36, "D"), (36, 38, "DL"), (38, 44, "L"), (40, 44, "23")], 400, "far"),
+        ("Cosmo Disruption [41236 MP+HP] far", hcf("MP")[:-1] + [(18, 22, "23")], 400, "far"),
     ],
 }
 HUITZIL = {
@@ -431,12 +431,12 @@ HUITZIL = {
     "6": [  # the three holes: Genocide Vulcan's input, the grapple without a dash tap, guard-cancel variants
         ("Circuit Scrapper [MP] cont", hcb_cont("MP"), 300, "near"), ("Circuit Scrapper [HP] cont", hcb_cont("HP"), 300, "near"),
         ("Circuit Scrapper (ES) cont", hcb_cont("PP"), 300, "near"),
-        ("Vulcan? [214LK ground]", qcb("LK"), 220, "far"), ("Vulcan? [623LK]", dp("LK"), 220, "far"),
-        ("Vulcan? [41236LK]", hcf("LK"), 220, "far"), ("Vulcan? [63214LK]", hcb_cont("LK"), 220, "far"),
-        ("Vulcan? [charge 2-8 LK]", charge_du("LK"), 220, "far"), ("Vulcan? [charge 4-6 LK]", charge_bf("LK"), 220, "far"),
-        ("Vulcan? [22LK]", [(0, 2, "D"), (4, 6, "D"), (5, 8, "4")], 220, "far"),
-        ("Vulcan? [421LK near, slow]", rdp_slow("LK"), 220, "near"),
-        ("Vulcan? [421LK air]", air_rdp("LK"), 220, "far"),
+        ("Genocide Vulcan [214LK ground]", qcb("LK"), 220, "far"), ("Genocide Vulcan [623LK]", dp("LK"), 220, "far"),
+        ("Genocide Vulcan [41236LK]", hcf("LK"), 220, "far"), ("Genocide Vulcan [63214LK]", hcb_cont("LK"), 220, "far"),
+        ("Genocide Vulcan [charge 2-8 LK]", charge_du("LK"), 220, "far"), ("Genocide Vulcan [charge 4-6 LK]", charge_bf("LK"), 220, "far"),
+        ("Genocide Vulcan [22LK]", [(0, 2, "D"), (4, 6, "D"), (5, 8, "4")], 220, "far"),
+        ("Genocide Vulcan [421LK near, slow]", rdp_slow("LK"), 220, "near"),
+        ("Genocide Vulcan [421LK air]", air_rdp("LK"), 220, "far"),
         ("Reflect Wall [gc v: L to hit+1, 623LP at hit+2]", gc_v("LP", 11, 12), 220, "near"),
         ("Reflect Wall [gc v: L to hit+1, 623LP at hit+6]", gc_v("LP", 11, 16), 220, "near"),
         ("Reflect Wall [gc v: L to hit+1, 623HP at hit+2]", gc_v("HP", 11, 12), 220, "near"),
@@ -454,11 +454,11 @@ HUITZIL = {
         ("Circuit Scrapper [MP] late button", [(0, 2, "R"), (2, 4, "DR"), (4, 6, "D"), (6, 8, "DL"), (8, 18, "L"), (14, 18, "2")], 300, "near"),
         ("Circuit Scrapper [HP] late button", [(0, 2, "R"), (2, 4, "DR"), (4, 6, "D"), (6, 8, "DL"), (8, 18, "L"), (14, 18, "3")], 300, "near"),
         ("Circuit Scrapper [MP] motion then button", [(0, 2, "R"), (2, 4, "DR"), (4, 6, "D"), (6, 8, "DL"), (8, 12, "L"), (13, 16, "2")], 300, "near"),
-        ("Vulcan? [421LP]", rdp("LP"), 220, "far"), ("Vulcan? [421MP]", rdp("MP"), 220, "far"), ("Vulcan? [421HP]", rdp("HP"), 220, "far"),
-        ("Vulcan? [421LK vs airborne P2]", [(0, 2, "U", "p2")] + [(a + 10, b + 10, t) for a, b, t in rdp("LK")], 220, "far"),
-        ("Vulcan? [421HK vs airborne P2]", [(0, 2, "U", "p2")] + [(a + 10, b + 10, t) for a, b, t in rdp("HK")], 220, "far"),
-        ("Vulcan? [421KK vs airborne P2]", [(0, 2, "U", "p2")] + [(a + 10, b + 10, t) for a, b, t in rdp("KK")], 220, "far"),
-        ("Vulcan? [421LK near vs airborne P2]", [(0, 2, "U", "p2")] + [(a + 10, b + 10, t) for a, b, t in rdp("LK")], 220, "near"),
+        ("Genocide Vulcan [421LP]", rdp("LP"), 220, "far"), ("Genocide Vulcan [421MP]", rdp("MP"), 220, "far"), ("Genocide Vulcan [421HP]", rdp("HP"), 220, "far"),
+        ("Genocide Vulcan [421LK vs airborne P2]", [(0, 2, "U", "p2")] + [(a + 10, b + 10, t) for a, b, t in rdp("LK")], 220, "far"),
+        ("Genocide Vulcan [421HK vs airborne P2]", [(0, 2, "U", "p2")] + [(a + 10, b + 10, t) for a, b, t in rdp("HK")], 220, "far"),
+        ("Genocide Vulcan [421KK vs airborne P2]", [(0, 2, "U", "p2")] + [(a + 10, b + 10, t) for a, b, t in rdp("KK")], 220, "far"),
+        ("Genocide Vulcan [421LK near vs airborne P2]", [(0, 2, "U", "p2")] + [(a + 10, b + 10, t) for a, b, t in rdp("LK")], 220, "near"),
     ],
     "8": [  # Vulcan's ES (421PP), the grapple with pairs and at a step more distance, the GC's stock cost with meter
         ("Genocide Vulcan (ES) [421PP]", rdp("PP"), 260, "far"),
@@ -647,7 +647,8 @@ def expect(sched_path, trace_path, chains_dir):
     order. This is what tests/test_move_naming.sh freezes."""
     sched = json.load(open(sched_path))
     node2chain, starts, edges = load_graph(chains_dir)
-    rows = []; facing = {}
+    rows = []; facing = {}; ids = {}
+    want_id = int(TENANTS[sched["tenant"]]["id"] or "13", 16)   # Donovan = 0x13, the default cursor's pick
     for line in open(trace_path):
         f = line.split()
         if len(f) < 3 or f[0] != "F":
@@ -655,6 +656,7 @@ def expect(sched_path, trace_path, chains_dir):
         d = dict(kv.split("=") for kv in f[2:])
         rows.append((int(f[1]), int(d["node"])))
         if "face" in d: facing[int(f[1])] = int(d["face"])
+        if "id" in d: ids[int(f[1])] = int(d["id"])
     ent = {}
     prev = None
     for fr, node in rows:
@@ -671,6 +673,8 @@ def expect(sched_path, trace_path, chains_dir):
                 seen.append(k)
         # +0x0B (flip_x) = 1 when P1 faces RIGHT (measured: every far-pinned event, P2 on the right, reads 1)
         mark = "  FACING-LEFT" if (e["frame"] in facing and facing[e["frame"]] == 0) else ""
+        if e["frame"] in ids and ids[e["frame"]] != want_id:
+            mark += f"  WRONG-ID:{ids[e['frame']]:#x}"   # the wrong character is on P1 — the line can never match a sane freeze
         out.append(f"{sched['part']}\t{e['name']}\t" + " ".join(f"{t}:0x{q:02x}" if t != "OFF" else f"OFF:{q:#x}" for t, q in seen) + mark)
     return out
 

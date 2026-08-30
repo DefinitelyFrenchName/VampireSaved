@@ -99,25 +99,44 @@ else
     bad "measured chains differ from $EXP:"; head -40 "$W/diff.txt"
 fi
 
-echo "== 5. every seq named in moves_$TENANT.toml was entered"
-python3 - "$W/got.txt" "build/manifest/moves_$TENANT.toml" <<'PY' || fail=1
+echo "== 5. every seq named in moves_$TENANT.toml was entered BY AN EVENT OF ITS OWN NAME (14z-120 (3): the cross-character check)"
+cat > "$W/ownname.py" <<'PY'
 import sys; sys.path.insert(0, "tools"); import _minitoml
-got = set()
+rows = [r for r in _minitoml.loads(open(sys.argv[2]).read())["move"] if r["seq"]]
+names = sorted((r["name"] for r in rows), key=len, reverse=True)   # longest prefix wins
+by_row = {r["name"]: set() for r in rows}
+unowned = []
 for line in open(sys.argv[1]):
-    for tok in line.rstrip("\n").split("\t")[2].split():
-        got.add(tok)
+    part, ev, rest = line.rstrip("\n").split("\t")
+    if "WRONG-ID" in rest:
+        print("  FAIL  the wrong character was on P1:", ev, rest); sys.exit(1)
+    owner = next((n for n in names if ev == n or ev.startswith(n + " ")), None)
+    if owner is None: unowned.append(ev); continue
+    by_row[owner] |= set(rest.split())
 missing = []
 n = 0
-for r in _minitoml.loads(open(sys.argv[2]).read())["move"]:
-    if not r["seq"]: continue
+for r in rows:
     for q in r["seq"].split(","):
         n += 1
         k = f"{r['table']}:0x{int(q.strip(), 16):02x}"
-        if k not in got: missing.append((r["name"], k))
+        if k not in by_row[r["name"]]: missing.append((r["name"], k, sorted(by_row[r["name"]])[:6]))
 if missing:
-    print("  FAIL  named but never entered:", missing); sys.exit(1)
-print(f"  ok    {n} table:seq ids in the TOML, every one entered by a rig event")
+    print("  FAIL  seq not entered by any event of the row's own name (wrong row or wrong file?):")
+    for m in missing: print("        ", m)
+    sys.exit(1)
+print(f"  ok    {n} table:seq ids in the TOML, every one entered by an event named for its row; {len(unowned)} events own no row (movement/controls)")
 PY
+python3 "$W/ownname.py" "$W/got.txt" "build/manifest/moves_$TENANT.toml" || fail=1
+# CONTROL (RH-9): the first two seq-carrying rows swap their seq — the check must FAIL
+python3 - "build/manifest/moves_$TENANT.toml" "$W/swapped.toml" <<'PY'
+import re, sys
+s = open(sys.argv[1]).read()
+seqs = re.findall(r'\nseq = "(0x[0-9a-f,x]+)"', s)
+a, b = seqs[0], seqs[1]
+s = s.replace(f'\nseq = "{a}"', '\nseq = "@@A"', 1).replace(f'\nseq = "{b}"', f'\nseq = "{a}"', 1).replace('\nseq = "@@A"', f'\nseq = "{b}"', 1)
+open(sys.argv[2], "w").write(s)
+PY
+if python3 "$W/ownname.py" "$W/got.txt" "$W/swapped.toml" >/dev/null 2>&1; then bad "control: two rows with swapped seqs PASSED the own-name check — it is not checking"; else ok "control: two rows with swapped seqs fail the own-name check"; fi
 
 echo "== 6. negative control: a swapped chain must fail the compare"
 python3 - "$EXP" "$W/ctl.txt" <<'PY'

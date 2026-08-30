@@ -81,12 +81,12 @@
 4	5LP in DF	a2:0x00
 4	Sol Smasher [LP] in DF	a2:0x26
 5	Planet Burning [MP] step back (control)	a2:0x02
-5	Planet Burning ES? [63214 MP+HP] step back	a2:0x1e a2:0x21 a2:0x22
-5	Planet Burning ES? [63214 LP+HP] step back	a2:0x1e a2:0x21 a2:0x22
-5	Planet Burning ES? [63214 LP+MP] step back	a2:0x1e a2:0x21 a2:0x22
-5	Planet Burning ES? [63214 MP+HP] slow, step back	a2:0x1e a2:0x21 a2:0x22
-5	Planet Burning ES? [63214 MP+HP] pair AFTER the motion	a2:0x1e a2:0x21 a2:0x22
-5	Cosmo? [41236 PP] far	a2:0x24 a2:0x3c
-5	Cosmo? [63214 PP] far, no dash	a2:0x00
-5	Cosmo? [63214 MP+HP] far, no dash	a2:0x02
-5	Cosmo? [41236 MP+HP] far	a2:0x24 a2:0x3c
+5	Planet Burning (ES) [63214 MP+HP] step back	a2:0x1e a2:0x21 a2:0x22
+5	Planet Burning (ES) [63214 LP+HP] step back	a2:0x1e a2:0x21 a2:0x22
+5	Planet Burning (ES) [63214 LP+MP] step back	a2:0x1e a2:0x21 a2:0x22
+5	Planet Burning (ES) [63214 MP+HP] slow, step back	a2:0x1e a2:0x21 a2:0x22
+5	Planet Burning (ES) [63214 MP+HP] pair AFTER the motion	a2:0x1e a2:0x21 a2:0x22
+5	Cosmo Disruption [41236 PP] far	a2:0x24 a2:0x3c
+5	Cosmo Disruption [63214 PP] far, no dash	a2:0x00
+5	Cosmo Disruption [63214 MP+HP] far, no dash	a2:0x02
+5	Cosmo Disruption [41236 MP+HP] far	a2:0x24 a2:0x3c

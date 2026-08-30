@@ -9,37 +9,37 @@
    "movement": false
   },
   {
-   "name": "5LP swordless",
+   "name": "5LP (swordless)",
    "frame": 2800,
    "gap": 120,
    "movement": false
   },
   {
-   "name": "5MP swordless",
+   "name": "5MP (swordless)",
    "frame": 2920,
    "gap": 120,
    "movement": false
   },
   {
-   "name": "5HP swordless",
+   "name": "5HP (swordless)",
    "frame": 3040,
    "gap": 150,
    "movement": false
   },
   {
-   "name": "5LK swordless",
+   "name": "5LK (swordless)",
    "frame": 3190,
    "gap": 120,
    "movement": false
   },
   {
-   "name": "5MK swordless",
+   "name": "5MK (swordless)",
    "frame": 3310,
    "gap": 120,
    "movement": false
   },
   {
-   "name": "5HK swordless",
+   "name": "5HK (swordless)",
    "frame": 3430,
    "gap": 150,
    "movement": false
@@ -51,13 +51,13 @@
    "movement": false
   },
   {
-   "name": "2MP swordless",
+   "name": "2MP (swordless)",
    "frame": 3700,
    "gap": 120,
    "movement": false
   },
   {
-   "name": "2HP swordless",
+   "name": "2HP (swordless)",
    "frame": 3820,
    "gap": 150,
    "movement": false

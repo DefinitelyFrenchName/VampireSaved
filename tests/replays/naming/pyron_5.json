@@ -9,55 +9,55 @@
    "movement": false
   },
   {
-   "name": "Planet Burning ES? [63214 MP+HP] step back",
+   "name": "Planet Burning (ES) [63214 MP+HP] step back",
    "frame": 3020,
    "gap": 420,
    "movement": false
   },
   {
-   "name": "Planet Burning ES? [63214 LP+HP] step back",
+   "name": "Planet Burning (ES) [63214 LP+HP] step back",
    "frame": 3440,
    "gap": 420,
    "movement": false
   },
   {
-   "name": "Planet Burning ES? [63214 LP+MP] step back",
+   "name": "Planet Burning (ES) [63214 LP+MP] step back",
    "frame": 3860,
    "gap": 420,
    "movement": false
   },
   {
-   "name": "Planet Burning ES? [63214 MP+HP] slow, step back",
+   "name": "Planet Burning (ES) [63214 MP+HP] slow, step back",
    "frame": 4280,
    "gap": 420,
    "movement": false
   },
   {
-   "name": "Planet Burning ES? [63214 MP+HP] pair AFTER the motion",
+   "name": "Planet Burning (ES) [63214 MP+HP] pair AFTER the motion",
    "frame": 4700,
    "gap": 420,
    "movement": false
   },
   {
-   "name": "Cosmo? [41236 PP] far",
+   "name": "Cosmo Disruption [41236 PP] far",
    "frame": 5120,
    "gap": 400,
    "movement": false
   },
   {
-   "name": "Cosmo? [63214 PP] far, no dash",
+   "name": "Cosmo Disruption [63214 PP] far, no dash",
    "frame": 5520,
    "gap": 400,
    "movement": false
   },
   {
-   "name": "Cosmo? [63214 MP+HP] far, no dash",
+   "name": "Cosmo Disruption [63214 MP+HP] far, no dash",
    "frame": 5920,
    "gap": 400,
    "movement": false
   },
   {
-   "name": "Cosmo? [41236 MP+HP] far",
+   "name": "Cosmo Disruption [41236 MP+HP] far",
    "frame": 6320,
    "gap": 400,
    "movement": false
