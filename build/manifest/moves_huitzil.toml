@@ -1,0 +1,427 @@
+# build/manifest/moves_huitzil.toml — the maintainer's move list for Huitzil
+# (display name PHOBOS; the manifests call him huitzil) — character-data
+# map, phase 1. Transcribed 14z-120 (2026-08-30) from the maintainer's
+# list; no move name, input or property here is Claude's — the notes are
+# the maintainer's words, normalised.
+# Schema: build/manifest/moves_TEMPLATE.toml (flat rows, tools/_minitoml.py).
+# CONVENTIONS: see the header of moves_donovan.toml (numpad inputs, ES =
+# two punches / two kicks as its own row, Dark Force = P+K, guard cancel =
+# 623P/K in blockstun for 1 stock). Phobos's guard cancel is Reflect Wall,
+# which is a GUARD-CANCEL-ONLY special (no free 623P input, no ES —
+# maintainer-corrected 2026-08-30). The six 6+button "alternate attacks"
+# are six distinct command normals; Plasma Beam's ES is one move by
+# either pair; Air Dash / Float are filed as movement (dash / misc).
+
+# ---- throws -------------------------------------------------------------
+
+[[move]]
+name = "Magnet Slam"
+input = "4MP, 6MP, 4HP, 6HP"
+kind = "throw"
+notes = "Ground throw, must be performed up close; direction by 4/6, MP or HP"
+table = ""
+seq = ""
+
+[[move]]
+name = "Sky Capture"
+input = "j.4MP, j.6MP, j.4HP, j.6HP"
+kind = "throw"
+notes = "Air throw, must be performed up close; direction by 4/6, MP or HP"
+table = ""
+seq = ""
+
+[[move]]
+name = "Circuit Scrapper"
+input = "63214MP, 63214HP"
+kind = "throw"
+notes = "Command throw; ground throw, must be performed up close; MP or HP; ES = Circuit Scrapper (ES)"
+table = ""
+seq = ""
+
+[[move]]
+name = "Circuit Scrapper (ES)"
+input = "63214PP"
+kind = "es"
+notes = "ES of Circuit Scrapper; any two punches; ground throw, must be performed up close"
+table = ""
+seq = ""
+
+# ---- command normals (the six "alternate attacks") ----------------------
+
+[[move]]
+name = "6LP"
+input = "6LP"
+kind = "normal"
+notes = "Alternate attack: different from 5LP (usually longer reach and different data)"
+table = ""
+seq = ""
+
+[[move]]
+name = "6MP"
+input = "6MP"
+kind = "normal"
+notes = "Alternate attack: different from 5MP (usually longer reach and different data)"
+table = ""
+seq = ""
+
+[[move]]
+name = "6HP"
+input = "6HP"
+kind = "normal"
+notes = "Alternate attack: different from 5HP (usually longer reach and different data)"
+table = ""
+seq = ""
+
+[[move]]
+name = "6LK"
+input = "6LK"
+kind = "normal"
+notes = "Alternate attack: different from 5LK (usually longer reach and different data)"
+table = ""
+seq = ""
+
+[[move]]
+name = "6MK"
+input = "6MK"
+kind = "normal"
+notes = "Alternate attack: different from 5MK (usually longer reach and different data)"
+table = ""
+seq = ""
+
+[[move]]
+name = "6HK"
+input = "6HK"
+kind = "normal"
+notes = "Alternate attack: different from 5HK (usually longer reach and different data)"
+table = ""
+seq = ""
+
+# ---- specials (+ their ES rows) ----------------------------------------
+
+[[move]]
+name = "Sitting Attack"
+input = "8P, 8K"
+kind = "special"
+notes = "Pursuit move; P or K; ES = Sitting Attack (ES)"
+table = ""
+seq = ""
+
+[[move]]
+name = "Sitting Attack (ES)"
+input = "8PP, 8KK"
+kind = "es"
+notes = "ES of Sitting Attack; pursuit move"
+table = ""
+seq = ""
+
+[[move]]
+name = "Plasma Beam"
+input = "236P, 236K"
+kind = "special"
+notes = "Freezing projectile; P hits high, K hits low; ES = Plasma Beam (ES)"
+table = ""
+seq = ""
+
+[[move]]
+name = "Plasma Beam (ES)"
+input = "236PP, 236KK"
+kind = "es"
+notes = "ES of Plasma Beam; one move by either pair; freezing projectile, hits medium"
+table = ""
+seq = ""
+
+[[move]]
+name = "Mighty Launcher"
+input = "214P, j.214P"
+kind = "special"
+notes = "Projectile; usable in air; ES = Mighty Launcher (ES)"
+table = ""
+seq = ""
+
+[[move]]
+name = "Mighty Launcher (ES)"
+input = "214PP, j.214PP"
+kind = "es"
+notes = "ES of Mighty Launcher; projectile; usable in air"
+table = ""
+seq = ""
+
+[[move]]
+name = "Reflect Wall"
+input = "623P, j.623P"
+kind = "special"
+notes = "GUARD-CANCEL-ONLY: exists only as Phobos's guard cancel (623P in blockstun, ground or air) for 1 meter stock; no free input; NO ES version"
+table = ""
+seq = ""
+
+[[move]]
+name = "Genocide Vulcan"
+input = "421K"
+kind = "special"
+notes = "Ground-to-air trap (whether hit or throw properties: unknown); ES = Genocide Vulcan (ES)"
+table = ""
+seq = ""
+
+[[move]]
+name = "Genocide Vulcan (ES)"
+input = "421KK"
+kind = "es"
+notes = "ES of Genocide Vulcan; ground-to-air trap"
+table = ""
+seq = ""
+
+[[move]]
+name = "Plasma Trap"
+input = "j.214K"
+kind = "special"
+notes = "Air only; throws a shock mine on the ground; distance by K (three by button); ES = Plasma Trap (ES)"
+table = ""
+seq = ""
+
+[[move]]
+name = "Plasma Trap (ES)"
+input = "j.214KK"
+kind = "es"
+notes = "ES of Plasma Trap; air only; shock mine on the ground"
+table = ""
+seq = ""
+
+# ---- EX ------------------------------------------------------------------
+
+[[move]]
+name = "Final Guardian Beta"
+input = "623KK"
+kind = "ex"
+notes = "Projectile-type throw (touching the projectile = getting thrown)"
+table = ""
+seq = ""
+
+[[move]]
+name = "Erasing Sphere"
+input = "421KK"
+kind = "ex"
+notes = "Projectile; KK can be held for delay; the sphere only has a hitbox once it has travelled a certain distance, and that distance seems influenced by holding KK"
+table = ""
+seq = ""
+
+# ---- Dark Force ----------------------------------------------------------
+
+[[move]]
+name = "Ray of Doom"
+input = "LP+LK, MP+MK, HP+HK"
+kind = "df"
+notes = "Dark Force; creates 2 clones that follow him and beam-attack when Phobos attacks; P+K of the same strength (universal input, listed for the name)"
+table = ""
+seq = ""
+
+# ---- plain normals (skeleton: name = input; maintainer enriches) --------
+
+[[move]]
+name = "5LP"
+input = "5LP"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "5MP"
+input = "5MP"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "5HP"
+input = "5HP"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "5LK"
+input = "5LK"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "5MK"
+input = "5MK"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "5HK"
+input = "5HK"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "2LP"
+input = "2LP"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "2MP"
+input = "2MP"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "2HP"
+input = "2HP"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "2LK"
+input = "2LK"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "2MK"
+input = "2MK"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "2HK"
+input = "2HK"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "j.LP"
+input = "j.LP"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "j.MP"
+input = "j.MP"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "j.HP"
+input = "j.HP"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "j.LK"
+input = "j.LK"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "j.MK"
+input = "j.MK"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "j.HK"
+input = "j.HK"
+kind = "normal"
+notes = ""
+table = ""
+seq = ""
+
+# ---- movement (Air Dash / Float are Phobos's; the rest skeleton) --------
+
+[[move]]
+name = "Air Dash"
+input = "j.66, j.44"
+kind = "dash"
+notes = "Air only; forward or back"
+table = ""
+seq = ""
+
+[[move]]
+name = "Float"
+input = "j.7 (hold), j.8 (hold), j.9 (hold)"
+kind = "misc"
+notes = "Air only; hold an up direction"
+table = ""
+seq = ""
+
+[[move]]
+name = "Forward dash"
+input = "66"
+kind = "dash"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "Back dash"
+input = "44"
+kind = "dash"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "Walk forward"
+input = "6"
+kind = "misc"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "Walk back"
+input = "4"
+kind = "misc"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "Crouch"
+input = "2"
+kind = "misc"
+notes = ""
+table = ""
+seq = ""
+
+[[move]]
+name = "Jump"
+input = "8, 7, 9"
+kind = "misc"
+notes = "Neutral / back / forward"
+table = ""
+seq = ""

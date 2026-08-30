@@ -202,7 +202,7 @@ seq = ""
 name = "Slay Shred"
 input = "LP+LK, MP+MK, HP+HK"
 kind = "df"
-notes = "Dark Force; P+K of the same strength (universal input, listed for the name)"
+notes = "Dark Force; makes Killshread act on top of Donovan's attacks; P+K of the same strength (universal input, listed for the name)"
 table = ""
 seq = ""
 
