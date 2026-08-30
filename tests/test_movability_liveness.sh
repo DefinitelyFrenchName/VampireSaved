@@ -72,6 +72,12 @@ R
     chmod +x "$WORK/runner"
 }
 
+# 14z-123: the audit gained two TENANT cases whose liveness reads the built
+# prg member and placements.json — things the stub builder does not write, so
+# under these stubs they can only ever score `dead`. The controls are scoped
+# to the four Donovan cases; a positive control that passed on ANY `-> runs`
+# line would otherwise hide a tenant case that had quietly stopped proving.
+CASES="anim aux4 codereg hitboxes"; export CASES
 run_audit() {
     write_runner "$1"
     set +e
@@ -128,8 +134,8 @@ fi
 # --- 3. POSITIVE CONTROL: a live rig still scores 'runs' ---------------
 echo "== 3. positive control: live rig =="
 run_audit alive
-if echo "$OUT" | grep -qE '^ *ok: .* -> runs'; then
-    echo "  ok: a live rig still scores 'runs'"
+if [ "$(echo "$OUT" | grep -cE '^ *ok: .* -> runs')" = 4 ]; then
+    echo "  ok: a live rig still scores 'runs' (all 4 Donovan cases)"
 else
     echo "FAIL: the liveness check rejected a healthy run — over-tightened"
     echo "$OUT" | tail -5

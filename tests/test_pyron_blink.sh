@@ -41,6 +41,13 @@
 # (0 hits at 0x2AD82). huitzil-m2 is FROZEN; changing it is a maintainer
 # call.
 #
+# THE PICK GUARD (GitHub #16, fixed 14z-92; hardened 14z-123): each leg's P1
+# `+0x60.l` (hitbox base) must be ONE non-zero value for the window AND equal
+# Pyron's row of that game's hitbox_base table — never `+0x382`, which is the
+# voice-flavor class in match and produced a false REFUSE on the native leg.
+# Measured 14z-123 on build/pyron36: native 0x0c75fe, ours 0x0fc6ac, both ==
+# their tables' row 0x11.
+#
 # Usage: ROMDIR=... tests/test_pyron_blink.sh [outbase]
 # Env: MAME_BIN, PYRON_BLINK_EXPECT, SKIP_RUNTIME=1 (controls only).
 set -eu
@@ -73,6 +80,26 @@ print(';'.join(['%d:ff8400-ff87ff'%f for f in (3200,3400,3600)]
 
 VAN="$WORK/vsavj_data.bin"
 decrypt_view vsavj "$WORK/vsavj_op.bin" "$VAN"
+decrypt_view vsav2 "$WORK/vsav2_op.bin" "$WORK/vsav2_data.bin"
+# 14z-123 (inferred_claims row 15): the guard requires each leg's base to be
+# PYRON'S OWN ROW of that game's hitbox_base table, read from the images the
+# legs run — vs2's data view (bank_map hitbox_base 0x0BD97A + the vs2 origin
+# delta = 0xD7B18; anchor row 0x13 == 0x0C8DF8) and the BUILD's prg member
+# (0x3D97A, LE-word file order — the audit_continue_switch derivation).
+EXPECT_BASE="$(python3 - "$WORK/vsav2_data.bin" "$BUILD/prg/vm3j.04d" <<'PY'
+import struct, sys
+v2 = open(sys.argv[1], "rb").read()
+t2 = struct.unpack(">32I", v2[0xD7B18:0xD7B18 + 128])
+assert t2[0x13] == 0x0C8DF8, "vs2 hitbox_base anchor moved (bank_map.toml)"
+data = open(sys.argv[2], "rb").read()
+raw = data[0x3D97A:0x3D97A + 128]
+sw = bytearray()
+for i in range(0, 128, 2):
+    sw += raw[i+1:i+2] + raw[i:i+1]
+tj = struct.unpack(">32I", bytes(sw))
+print(f"native={t2[0x11]:#x},ours={tj[0x11]:#x}")
+PY
+)"
 
 if [ "${SKIP_RUNTIME:-0}" = 1 ]; then
     echo "== 1. native vs ours: SKIPPED (SKIP_RUNTIME=1)"
@@ -96,7 +123,7 @@ else
             exit 1; }
     done
     python3 tools/check_pyron_blink.py "$WORK/native" "$WORK/ours" "$VAN" \
-        "$LO" "$HI" --expect "$EXPECT" || fail=1
+        "$LO" "$HI" --expect "$EXPECT" --expect-base "$EXPECT_BASE" || fail=1
 fi
 
 echo "== 2. verdict controls (the checker's own logic)"
@@ -131,14 +158,18 @@ mk("real",        [good if i % 2 else seq for i in range(n)])
 mk("noblink",     [good] * n)
 mk("wrongsource", [good if i % 2 else other for i in range(n)])
 mk("notpicked",   [good if i % 2 else seq for i in range(n)], base=0)
+mk("wrongchar",   [good if i % 2 else seq for i in range(n)], base=0x0009769E)  # Victor, loaded
 mk("natmoves",    [good if i % 2 else seq for i in range(n)],
    nat_vals=[good if i % 3 else other for i in range(n)])
-print("   built: real, noblink, wrongsource, notpicked, natmoves")
+print("   built: real, noblink, wrongsource, notpicked, wrongchar, natmoves")
 PY
 
+# the synthetic legs carry PYRON_BASE on both sides, so that is the expected
+# base for the controls; wrongchar carries Victor's and must be refused.
+CTL_BASE="native=0x93b6a,ours=0x93b6a"
 ctl_case() {  # name expect want(pass|fail) why
     if python3 tools/check_pyron_blink.py "$CTL/$1/native" "$CTL/$1/ours" \
-            "$VAN" "$LO" "$HI" --expect "$2" > "$WORK/c.txt" 2>&1
+            "$VAN" "$LO" "$HI" --expect "$2" --expect-base "$CTL_BASE" > "$WORK/c.txt" 2>&1
     then got=pass; else got=fail; fi
     if [ "$got" = "$3" ]; then
         echo "  ok: $1 (--expect $2) -> $got  [$4]"
@@ -153,8 +184,9 @@ ctl_case noblink     fixed  pass "...and is exactly what 'fixed' accepts"
 ctl_case real        fixed  fail "the blink must not pass as fixed"
 ctl_case wrongsource blinks fail "a 2-value blink from the WRONG source is a different defect"
 ctl_case notpicked   blinks fail "a leg where Pyron was never picked must be refused"
+ctl_case wrongchar   fixed  fail "a leg where a DIFFERENT character was loaded must be refused (14z-123)"
 ctl_case natmoves    blinks fail "a native leg that is NOT constant invalidates the reference"
 
 if [ "$fail" -ne 0 ]; then echo "FAIL: pyron blink gate"; exit 1; fi
 echo "PASS: pyron blink gate (native/ours per-leg row-10 variance +"
-echo "      mechanism attribution + 7 verdict controls)"
+echo "      mechanism attribution + per-leg Pyron-base guard + 8 verdict controls)"

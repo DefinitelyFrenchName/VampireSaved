@@ -1595,11 +1595,13 @@ tests/audit_region_movability.sh      # 14z-77, RE-FROZEN 14z-78: which regions
                                       # BUILD error (test_thunk_addr_literal).
                                       # Three tenants need 98,488 of the
                                       # 344,640-byte crypt window, was 470,200.
-                                      # MEASURED ON DONOVAN ONLY: H/P anim
-                                      # movability is inferred from the
-                                      # manifests, not measured — a "runs"
-                                      # verdict for them needs a liveness
-                                      # control first (header says why).
+                                      # MEASURED ON ALL THREE (14z-123): H/P
+                                      # anim run from wide_ext too, with a
+                                      # LIVENESS control — the tenant's +0x60.l
+                                      # equals the build's own table row and
+                                      # the anim node pointer sits inside the
+                                      # moved range at three in-match frames;
+                                      # CASES= selects the six cases.
                                       # Expectations frozen BOTH ways: if anim
                                       # crashes again that is a REGRESSION.
                                       # On-demand, ~4.5 min
@@ -2117,9 +2119,12 @@ tests/audit_win_pal_auto.sh           # 14z-99, GitHub #105: with AUTO
                                       # field-confirmed "one of the
                                       # offending screens") — the
                                       # flavor the maintainer plays.
-                                      # Merged+legacy+AUTO is
-                                      # UNMEASURED (its one attempt
-                                      # mashed past the KO — void).
+                                      # Merged+legacy+AUTO MEASURED
+                                      # 14z-123 (leg E, replay 105 — P1
+                                      # on the default cell, inputs ended
+                                      # at the KO): COLORED, with P1 =
+                                      # Demitri's base and P2 KO'd
+                                      # asserted, else DEAD.
                                       # AUTO is AUTO-GUARD, not
                                       # autoplay; rigs for this screen
                                       # END INPUTS AT THE KO and sample
@@ -2654,15 +2659,15 @@ tests/test_pyron_blink.sh      [bd]   # 14z-75: the sprite/HUD BLINK. Palette ro
                                       # NAMED (native's constant + vsavj palette-seq row
                                       # 0x26 under the uploader's 0xF000 OR), so a
                                       # look-alike defect fails. REFUSES to judge unless
-                                      # both legs show +0x382=0x11. 7 verdict controls.
-                                      # KNOWN WEAKNESS (14z-90, GitHub issue #16): that
-                                      # guard reads +0x382 IN MATCH (f3200/3400/3600),
-                                      # where 14z-87 proved it is the voice-flavor class,
-                                      # not the char id. Ours is protected by the shipped
-                                      # voice_borrow_keep_tenant thunk; the NATIVE leg is
-                                      # not, so a borrow there yields a false REFUSE.
-                                      # Zero recorded firings. Fix = gate on +0x60.l,
-                                      # blocked on freezing our tenant hitbox bases.
+                                      # each leg's +0x60.l (the hitbox base; never
+                                      # +0x382, the in-match voice-flavor byte — #16,
+                                      # fixed 14z-92) is ONE non-zero value AND equals
+                                      # Pyron's row of that game's own hitbox_base table
+                                      # (vs2 data 0xD7B18, the build's 0x3D97A); 8
+                                      # verdict controls incl. a loaded-wrong-character
+                                      # refusal (14z-123; this row carried a "KNOWN
+                                      # WEAKNESS … blocked" note for a fix already
+                                      # shipped at 14z-92).
                                       # FIXED 14z-75 (a DEAD ROW: per-char palette-routine
                                       # table 0x2A8A4 row 0x11 aliased row 0x01's ANIMATED
                                       # handler; one word 0x2A8C6 008E->0040 = vs2's own

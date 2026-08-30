@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 2963 |
-| named by a document or manifest only | 2098 |
-| named by both a document/manifest and code | 572 |
-| named by CODE ONLY (the gap list below) | 293 |
+| distinct program-space addresses named | 2966 |
+| named by a document or manifest only | 2096 |
+| named by both a document/manifest and code | 575 |
+| named by CODE ONLY (the gap list below) | 295 |
 | carried by atlas | 449 |
 | carried by engine_internals | 615 |
-| carried by other docs | 946 |
+| carried by other docs | 948 |
 | carried by manifests | 1756 |
-| carried by code | 865 |
+| carried by code | 870 |
 
 ## Addresses
 
@@ -517,7 +517,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01B2BC` | docs/game/engine_internals.md — (14z-70, maintainer-endorsed; use this FIRST); docs/game/engine_internals.md — it is NOT the explosion's root. Claim RETRACTED, see 14z-70d below. |
 | `PRG:0x01B300` | docs/game/engine_internals.md — Per-tenant win-screen checklist |
 | `PRG:0x01B3F8` | docs/game/engine_internals.md — Per-tenant win-screen checklist |
-| `PRG:0x01B500` | build/manifest/gfx_layout3.toml — pyron; build/manifest/pyron.toml — (top); tests/test_list_type_census.sh; tools/list_type_census.py |
+| `PRG:0x01B500` | build/manifest/gfx_layout3.toml — pyron; build/manifest/pyron.toml — (top); tests/audit_region_movability.sh; tests/test_list_type_census.sh; tools/list_type_census.py |
 | `PRG:0x01B526` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
 | `PRG:0x01B536` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
 | `PRG:0x01B61A` | docs/game/atlas/sprite_lists.md — Handler targets; docs/project/patch_notes.md — 14z-71 — the beam: byte detail; docs/project/patch_notes.md — 14z-83 S3 — the beam-strip relocation (huitzil-m4 -> m5): byte detail; tests/lua/obj_record_full_trace.lua; tests/test_beam_list_type6.sh |
@@ -553,7 +553,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01DBB6` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x01DFE2` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x01E3A8` | build/manifest/reconciliation.toml — map [vs2] |
-| `PRG:0x01E800` | build/manifest/gfx_layout3.toml — huitzil; build/manifest/huitzil.toml — beam_list_type6 |
+| `PRG:0x01E800` | build/manifest/gfx_layout3.toml — huitzil; build/manifest/huitzil.toml — beam_list_type6; tests/audit_region_movability.sh |
 | `PRG:0x01E9D2` | build/manifest/huitzil.toml — beam_effect_class31 |
 | `PRG:0x01F034` | build/manifest/reconciliation.toml — map |
 | `PRG:0x01F142` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
@@ -1274,6 +1274,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x03D92B` | docs/project/tables/qs_voice_map.md — qs_voice_map — the M5 voice-block id map (14z-86) |
 | `PRG:0x03D951` | docs/project/tables/qs_voice_map.md — qs_voice_map — the M5 voice-block id map (14z-86) |
 | `PRG:0x03D977` | docs/project/tables/qs_voice_map.md — qs_voice_map — the M5 voice-block id map (14z-86) |
+| `PRG:0x03D97A` | HANDOFF.md — Individual gates [vs2]; tests/audit_continue_switch.sh; tests/audit_don_vs_cpu.sh; tests/audit_region_movability.sh; tests/test_ladder_tenant_vs_palette.sh; tests/test_pyron_blink.sh; +2 more |
 | `PRG:0x03D9A8` | docs/project/tables/qs_voice_map.md — qs_voice_map — the M5 voice-block id map (14z-86) |
 | `PRG:0x03D9E7` | docs/project/tables/qs_voice_map.md — qs_voice_map — the M5 voice-block id map (14z-86) |
 | `PRG:0x03DA26` | docs/project/tables/qs_voice_map.md — qs_voice_map — the M5 voice-block id map (14z-86) |
@@ -1891,11 +1892,11 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x093764` | docs/project/patch_notes.md — 14z-71 — the beam: byte detail; tools/build_donovan.sh |
 | `PRG:0x0937BA` | docs/game/engine_internals.md — a vs2-only effect handler that was never ported [vs2] |
 | `PRG:0x0938BA` | docs/project/patch_notes.md — 14z-85b — per-tenant sfx records (pyr_sfx_records / hui_sfx_records; maintainer-ruled option (a)) |
-| `PRG:0x093B6A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/project/gotchas.md — A self-frozen '.sha1' cannot see a legacy regression — and a replay's FILENAME does not tell you what it loads (14z-88 paid it, 14z-89 measured the extent); tests/test_m2_repoint.sh; tests/test_oboro_select.sh; tests/test_pyron_blink.sh; tools/check_legacy_pairings.py |
+| `PRG:0x093B6A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/project/gotchas.md — A self-frozen '.sha1' cannot see a legacy regression — and a replay's FILENAME does not tell you what it loads (14z-88 paid it, 14z-89 measured the extent); tests/audit_win_pal_auto.sh; tests/test_m2_repoint.sh; tests/test_oboro_select.sh; tests/test_pyron_blink.sh; +1 more |
 | `PRG:0x094954` | build/manifest/donovan.toml — capture_kf_demitri; build/manifest/huitzil.toml — capture_kf_demitri; build/manifest/huitzil.toml — grab_hold_keyframes; build/manifest/pyron.toml — capture_kf_demitri |
 | `PRG:0x095894` | docs/project/patch_notes.md — 14z-85b — per-tenant sfx records (pyr_sfx_records / hui_sfx_records; maintainer-ruled option (a)) |
 | `PRG:0x0968DE` | build/manifest/donovan.toml — capture_kf_gallon; build/manifest/huitzil.toml — capture_kf_gallon; build/manifest/pyron.toml — capture_kf_gallon |
-| `PRG:0x09769E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question); HANDOFF.md — Individual gates; HANDOFF.md — MiSTer (14z-106/107) — the jtcps2w core + the simulation oracle; docs/platform/mister.md — THE 14z-108/109 MEASUREMENTS, RECORDED IN THE LOG (entered 14z-114); docs/project/gotchas.md — A self-frozen '.sha1' cannot see a legacy regression — and a replay's FILENAME does not tell you what it loads (14z-88 paid it, 14z-89 measured the extent); +4 more |
+| `PRG:0x09769E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question); HANDOFF.md — Individual gates; HANDOFF.md — MiSTer (14z-106/107) — the jtcps2w core + the simulation oracle; docs/platform/mister.md — THE 14z-108/109 MEASUREMENTS, RECORDED IN THE LOG (entered 14z-114); docs/project/gotchas.md — A self-frozen '.sha1' cannot see a legacy regression — and a replay's FILENAME does not tell you what it loads (14z-88 paid it, 14z-89 measured the extent); +5 more |
 | `PRG:0x098C28` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); build/manifest/donovan.toml — capture_kf_victor; build/manifest/huitzil.toml — capture_kf_victor; build/manifest/pyron.toml — capture_kf_victor; tests/audit_don_grab_pose.sh |
 | `PRG:0x0990CE` | docs/game/engine_internals.md — In-fight HUD top strip (mugshot beside the timer, name under the bar) [vs2]; docs/project/patch_notes.md — where the detail lives; build/manifest/pyron.toml — select_pal_variant_id |
 | `PRG:0x09910E` | docs/game/engine_internals.md — In-fight HUD top strip (mugshot beside the timer, name under the bar) [vs2]; docs/project/patch_notes.md — where the detail lives [vs2]; build/manifest/donovan.toml — obj_hook [vs2]; build/manifest/pyron.toml — select_pal_variant_id [vs2] |
@@ -1990,7 +1991,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0BD8FA` | docs/project/patch_notes.md — rows 0x10 + the per-tenant VALUE_SKIP default; build/manifest/bank_map.toml — gap_bd8fa; tests/test_hui_walk.sh |
 | `PRG:0x0BD912` | docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122) [vs2]; docs/project/patch_notes.md — 14z-118 (charmap, 2) — DONOVAN'S PHYSICS ROWS PORTED (maintainer-ruled 2026-08-29): 17 bytes, three bank rows, UNFROZEN; docs/project/patch_notes.md — 14z-119 — THE PHYSICS-PORT FREEZE (donovan-m18 / huitzil-m25 / pyron-m19 / merged-m14, mark M12): byte detail; tests/test_m3a_reproducible.sh |
 | `PRG:0x0BD972` | docs/project/patch_notes.md — 14z-119 — THE PHYSICS-PORT FREEZE (donovan-m18 / huitzil-m25 / pyron-m19 / merged-m14, mark M12): byte detail; docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
-| `PRG:0x0BD97A` | docs/game/atlas/character_tables.md — Slot→character map, vsavj (COMPLETE; select-name/HUD verified picks); docs/game/atlas/character_tables.md — Table addresses (32 entries each: slots 0x00-0x0F, variants 0x10-0x1F); docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets; HANDOFF.md — Individual gates; build/manifest/bank_map.toml — hitbox_base; tests/audit_continue_switch.sh; +8 more |
+| `PRG:0x0BD97A` | docs/game/atlas/character_tables.md — Slot→character map, vsavj (COMPLETE; select-name/HUD verified picks); docs/game/atlas/character_tables.md — Table addresses (32 entries each: slots 0x00-0x0F, variants 0x10-0x1F); docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets; HANDOFF.md — Individual gates; build/manifest/bank_map.toml — hitbox_base; tests/audit_continue_switch.sh; +9 more |
 | `PRG:0x0BD9FA` | docs/game/atlas/character_tables.md — Table addresses (32 entries each: slots 0x00-0x0F, variants 0x10-0x1F); docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets; docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; build/manifest/bank_map.toml — hitbox_comp; tests/test_sim_wram_contract.sh |
 | `PRG:0x0BDA7A` | docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets; build/manifest/bank_map.toml — proj_hitbox_base; build/manifest/reconciliation.toml — map |
 | `PRG:0x0BDAFA` | docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets; build/manifest/bank_map.toml — proj_hitbox_comp; build/manifest/reconciliation.toml — map |
@@ -2080,12 +2081,12 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0C56AA` | docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port) [vs2]; HANDOFF.md — Build registry [vs2]; docs/project/patch_index.md — Mechanism inventory (generator vocabulary) [vs2]; build/manifest/huitzil.toml — df_seq_entry_10 [vs2]; build/manifest/huitzil.toml — grab_hold_keyframes; build/manifest/huitzil.toml — grab_hold_keyframes [vs2]; +1 more |
 | `PRG:0x0C6E90` | docs/game/atlas/character_tables.md — THE PORTED THREE — located (2026-07-25, pick-verified on vsav2 AND vhunt2) |
 | `PRG:0x0C742A` | docs/project/patch_notes.md — 14z-85b — per-tenant sfx records (pyr_sfx_records / hui_sfx_records; maintainer-ruled option (a)) [vs2]; docs/project/tables/sfx_records.md — huitzil/phobos — 'hui_sfx_records' (24 entries, vs2 '0x0C742A'; 14z-85) [vs2]; build/manifest/huitzil.toml — hitclass_map_extend [vs2]; build/manifest/huitzil.toml — hui_sfx_records |
-| `PRG:0x0C75FE` | docs/game/atlas/character_tables.md — THE PORTED THREE — located (2026-07-25, pick-verified on vsav2 AND vhunt2); tools/extract_char.py |
+| `PRG:0x0C75FE` | docs/game/atlas/character_tables.md — THE PORTED THREE — located (2026-07-25, pick-verified on vsav2 AND vhunt2); tests/test_pyron_blink.sh; tools/extract_char.py |
 | `PRG:0x0C8156` | docs/project/patch_notes.md — crypt-placed code (data_in_code mechanism + census) |
 | `PRG:0x0C868A` | docs/game/atlas/character_tables.md — THE PORTED THREE — located (2026-07-25, pick-verified on vsav2 AND vhunt2) |
 | `PRG:0x0C8B18` | docs/project/patch_notes.md — 14z-85b — per-tenant sfx records (pyr_sfx_records / hui_sfx_records; maintainer-ruled option (a)) [vs2]; docs/project/tables/sfx_records.md — pyron — 'pyr_sfx_records' (23 entries, vs2 '0x0C8B18'; 14z-85) [vs2]; build/manifest/pyron.toml — hitclass_map_extend [vs2]; build/manifest/pyron.toml — pyr_sfx_records |
 | `PRG:0x0C8BB8` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated); docs/project/patch_notes.md — 14z-110b — the 0x51 -> 0x44 state remap: byte detail [vs2]; tests/test_m2a_stage2_data.sh |
-| `PRG:0x0C8DF8` | docs/game/atlas/character_tables.md — Start-hold flavor: RESOLVED (community-confirmed 2026-07-27, mechanism pinned); docs/game/atlas/character_tables.md — THE PORTED THREE — located (2026-07-25, pick-verified on vsav2 AND vhunt2); build/manifest/bank_map.toml — (top); tests/test_m2a_stage2_data.sh; tools/extract_char.py; tools/patch_prg.py |
+| `PRG:0x0C8DF8` | docs/game/atlas/character_tables.md — Start-hold flavor: RESOLVED (community-confirmed 2026-07-27, mechanism pinned); docs/game/atlas/character_tables.md — THE PORTED THREE — located (2026-07-25, pick-verified on vsav2 AND vhunt2); build/manifest/bank_map.toml — (top); tests/test_m2a_stage2_data.sh; tests/test_pyron_blink.sh; tools/extract_char.py; +1 more |
 | `PRG:0x0C986A` | docs/game/engine_internals.md — Hitboxes and attack records (phase 2 of the character-data map, 14z-120 (5), MEASURED); tools/hitbox_records.py |
 | `PRG:0x0C9A5C` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 [vh2]; build/manifest/donovan.toml — port_patch [vh2]; build/manifest/donovan.toml — throw_victim_keyframes |
 | `PRG:0x0C9EB0` | docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); HANDOFF.md — Build registry; HANDOFF.md — Build registry [vh2]; docs/project/patch_index.md — Mechanism inventory (generator vocabulary); build/manifest/huitzil.toml — df_seq_entry_10 |
@@ -2145,7 +2146,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0D75E4` | docs/game/engine_internals.md — The 14z-69j state, superseded |
 | `PRG:0x0D7718` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) |
 | `PRG:0x0D7A6E` | docs/game/engine_internals.md — it is NOT the explosion's root. Claim RETRACTED, see 14z-70d below. |
-| `PRG:0x0D7B18` | docs/game/atlas/character_tables.md — Table addresses (32 entries each: slots 0x00-0x0F, variants 0x10-0x1F); docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets [vs2] |
+| `PRG:0x0D7B18` | docs/game/atlas/character_tables.md — Table addresses (32 entries each: slots 0x00-0x0F, variants 0x10-0x1F); docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets [vs2]; HANDOFF.md — Individual gates [vs2]; tests/test_pyron_blink.sh; tools/check_pyron_blink.py |
 | `PRG:0x0D7B98` | docs/game/atlas/character_tables.md — Table addresses (32 entries each: slots 0x00-0x0F, variants 0x10-0x1F) |
 | `PRG:0x0D7BAA` | docs/game/atlas/character_tables.md — Table addresses (32 entries each: slots 0x00-0x0F, variants 0x10-0x1F) |
 | `PRG:0x0D7C18` | build/manifest/reconciliation.toml — map [vs2] |
@@ -2801,7 +2802,6 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x032000` | tests/test_hui_walk.sh |
 | `PRG:0x03975A` | tests/lua/index_watch.lua |
 | `PRG:0x03CB00` | tests/test_qs_songs.sh |
-| `PRG:0x03D97A` | tests/audit_continue_switch.sh; tests/audit_don_vs_cpu.sh; tests/test_ladder_tenant_vs_palette.sh; tests/test_random_select_tenants.sh |
 | `PRG:0x045D8A` | tests/audit_df_accumulator.sh |
 | `PRG:0x05316C` | tests/test_capture_pose_sources.sh |
 | `PRG:0x05442E` | tools/audit_walker_callers.py |
@@ -2926,10 +2926,13 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x0D94B8` | tests/audit_df_accumulator.sh |
 | `PRG:0x0DB6D0` | tests/audit_don_lilith_ko.sh |
 | `PRG:0x0DF000` | tests/test_don_reactions.sh |
+| `PRG:0x0E11AC` | tests/audit_region_movability.sh |
 | `PRG:0x0E2830` | tests/lua/replay_guard.lua |
 | `PRG:0x0E456C` | tests/audit_merged_vec3.sh |
+| `PRG:0x0E7690` | tests/audit_region_movability.sh |
 | `PRG:0x0F0400` | tests/test_mister_mra_map.sh |
 | `PRG:0x0F4000` | tests/audit_don_ko_writer.sh |
+| `PRG:0x0FC6AC` | tests/test_pyron_blink.sh |
 | `PRG:0x0FD180` | tests/test_index_window_thunk.sh |
 | `PRG:0x102436` | tests/test_biased_list_inventory.sh |
 | `PRG:0x123456` | tests/test_manifest_merge.sh; tests/test_type_stamp_census.sh; tools/checkskills.py |

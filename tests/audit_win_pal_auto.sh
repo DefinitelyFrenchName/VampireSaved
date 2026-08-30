@@ -25,9 +25,13 @@
 #   replay 104 (1P vs COM, AUTO, real-KO match win) on merged -> the 1P
 #       victory screen WHITE too (leg D) — the flavor the maintainer
 #       actually plays.
-# UNMEASURED, recorded: merged + LEGACY winner + AUTO — the leg that
-# tried it mashed past the KO and pressed through the screen, so its
-# reading is VOID; re-measure with inputs ended at the KO if needed.
+#   replay 105 (= 103 with P1 left on the DEFAULT cell = Demitri, a
+#       LEGACY winner, inputs ENDED AT THE KO) on merged -> leg E,
+#       MEASURED 14z-123 (inferred_claims row 14; the one earlier
+#       attempt mashed past the KO and was VOID): see the frozen
+#       verdict line. Leg E carries its own liveness — P1 +0x60.l must
+#       be Demitri's base and P2 must be KO'd (white HP < 0) at f5000 —
+#       so a pressed-through or unformed match cannot score.
 #
 # LEG A (merged + replay 103) freezes the DEFECT while EXPECT_WHITE=1
 # (the #98 discipline — flip when the fix lands). LEG B (merged + replay
@@ -43,7 +47,7 @@
 # no single frame constant is pinned (the #10 lesson).
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged11]
-#        [EXPECT_WHITE=1] tests/audit_win_pal_auto.sh
+#        [EXPECT_WHITE=1] tests/audit_win_pal_auto.sh     (~10 min, 5 MAME runs)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
@@ -70,6 +74,10 @@ run_leg A vsavjw "$REPO/$BUILD/rompath;$ROMDIR" "$REPO/tests/replays/103_tenant_
 run_leg C vsavj  "$ROMDIR"                      "$REPO/tests/replays/103_tenant_2pwin_auto.rpl"
 wait
 run_leg B vsavjw "$REPO/$BUILD/rompath;$ROMDIR" "$REPO/tests/replays/61_tenant_2pwin.rpl"
+# leg E (14z-123): merged + LEGACY winner + AUTO, inputs ended at the KO;
+# its dump set adds the two fighter blocks for the liveness check.
+d="$W/E"; mkdir -p "$d/sbx"
+( cd "$d" && REPLAY="$REPO/tests/replays/105_legacy_2pwin_auto.rpl" DUMPS="$DF;3000:ff8400-ff847f;5000:ff8800-ff887f" CHECKSUM_OUT="$d/out.log" MAME_SANDBOX="$d/sbx" MAME_ROMPATH="$REPO/$BUILD/rompath;$ROMDIR" "$REPO/tools/run_mame.sh" vsavjw -autoboot_script "$REPO/tests/lua/replay.lua" > "$d/mame.log" 2>&1 ) &
 # leg D: the 1P-vs-COM flavor — forced-pick Phobos + early-round
 # both-words weakening pokes (audit_kill_poke_shape: never the 2-byte
 # shape, never near a corpse); the win screen sits later in this flow,
@@ -102,14 +110,35 @@ print("WHITE" if white_run >= 2 else "COLORED" if colored else "DEAD")
 PY
 }
 
-A="$(classify A)"; B="$(classify B)"; C="$(classify C)"; D="$(classify D)"
+A="$(classify A)"; B="$(classify B)"; C="$(classify C)"; D="$(classify D)"; E="$(classify E)"
+# leg E liveness: Demitri's base on P1 (bases.tsv row 0x01, byte-identical
+# to vanilla's table) and a KO'd P2 at f5000 — else the leg is DEAD.
+E_LIVE="$(python3 - "$W/E" <<'PY'
+import sys
+d = sys.argv[1]
+try:
+    p1 = open(f"{d}/dump_3000_ff8400.bin", "rb").read()
+    p2 = open(f"{d}/dump_5000_ff8800.bin", "rb").read()
+except OSError:
+    print("DEAD (no fighter-block dumps)"); sys.exit(0)
+base = int.from_bytes(p1[0x60:0x64], "big")
+white = int.from_bytes(p2[0x52:0x54], "big", signed=True)
+ok = base == 0x00093B6A and white < 0
+print(("LIVE" if ok else "DEAD") + f" (P1 +0x60.l {base:#x}, P2 white HP {white} at f5000)")
+PY
+)"
+case "$E_LIVE" in LIVE*) ;; *) E="DEAD";; esac
 echo "  leg A (merged 2P + AUTO tenant winner):    $A"
 echo "  leg B (merged 2P + no-AUTO tenant winner): $B"
 echo "  leg C (vanilla + AUTO winner):             $C"
 echo "  leg D (merged 1P-vs-COM + AUTO tenant):    $D"
+echo "  leg E (merged 2P + AUTO LEGACY winner):    $E  [$E_LIVE]"
 
 [ "$B" = COLORED ] || { echo "FAIL: leg B not colored ($B) — the no-AUTO control died or the defect grew past the AUTO gate"; fail=1; }
 [ "$C" = COLORED ] || { echo "FAIL: leg C not colored ($C) — vanilla shows it too; the not-ours premise is dead, re-derive #105"; fail=1; }
+# FROZEN 14z-123: a LEGACY AUTO winner on the merged build renders COLORED —
+# the tenant-only defect never touched the legacy path (superset check).
+[ "$E" = COLORED ] || { echo "FAIL: leg E not colored ($E) — a LEGACY AUTO winner on the merged build; if DEAD the rig died or pressed through, if WHITE the defect reaches legacy content: rule 6"; fail=1; }
 if [ "$EXPECT_WHITE" = 1 ]; then
     [ "$A" = WHITE ] && echo "  ok: the frozen defect (2P) — AUTO tenant winner draws WHITE (#105 open)" \
         || { echo "FAIL: leg A is $A — if a fix landed, flip EXPECT_WHITE; if none did, rule 6"; fail=1; }

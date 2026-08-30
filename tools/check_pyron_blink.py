@@ -28,6 +28,12 @@ same symptom.
 
 Usage: check_pyron_blink.py <nativedir> <oursdir> <vsavj_data.bin>
                             <lo> <hi> [--expect blinks|fixed]
+                            [--expect-base native=0xHEX,ours=0xHEX]
+  --expect-base (14z-123): each leg's ONE base must EQUAL the given value —
+  the tenant's own row of that game's hitbox_base table (vs2 data view
+  0xD7B18 row 0x11; the build's prg/vm3j.04d @ 0x3D97A row 0x11). Without
+  it the guard only rules out "no fighter" and "fighter changed"; WITH it a
+  wrong character that WAS loaded is refused too (the wrongchar control).
   <dir>/dump_<f>_90c140.bin  palette row 10 per frame (DUMPS grammar)
   <dir>/dump_<f>_ff8400.bin  P1 fighter block (+0x60.l = hitbox base)
 """
@@ -92,6 +98,11 @@ def main():
     expect = "blinks"
     if "--expect" in sys.argv:
         expect = sys.argv[sys.argv.index("--expect") + 1]
+    want_base = {}
+    if "--expect-base" in sys.argv:
+        for kv in sys.argv[sys.argv.index("--expect-base") + 1].split(","):
+            k, v = kv.split("=")
+            want_base[k.strip()] = int(v, 16)
     nat_d, our_d, vj_path, lo, hi = a[0], a[1], a[2], int(a[3]), int(a[4])
     vj = Path(vj_path).read_bytes()
 
@@ -118,6 +129,17 @@ def main():
                 f"palette says nothing.")
     print(f"  ok: both legs hold ONE non-zero fighter for the whole window "
           f"(+0x{HB_OFF:02X}.l native {nat_ids[0]:#08x}, ours {our_ids[0]:#08x})")
+    # 1b. (14z-123) and that fighter is PYRON: the base must equal the
+    #     tenant's own row of each game's hitbox_base table. A loaded WRONG
+    #     character has a real, constant base and passed 1. above.
+    for tag, bases in (("native", nat_ids), ("ours", our_ids)):
+        if tag in want_base and bases[0] != want_base[tag]:
+            die(f"{tag}: P1 +0x{HB_OFF:02X}.l = {bases[0]:#08x} is not Pyron's "
+                f"row of this game's hitbox_base table ({want_base[tag]:#08x}) "
+                f"— a different character was loaded; the palette says nothing")
+    if want_base:
+        print(f"  ok: both bases are Pyron's own table rows "
+              f"({', '.join(f'{k} {v:#08x}' for k, v in want_base.items())})")
 
     # 2. the phase-independent property
     nd, od = distinct(nat), distinct(our)
