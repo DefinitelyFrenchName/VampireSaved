@@ -1,0 +1,431 @@
+# tests/expected/doc_anchor_census.tsv — every skill anchor's FILE and SECTION,
+# frozen by tools/doc_anchor_census.py --freeze (gate tests/test_doc_anchor_census.sh).
+# A changed row is a MOVED anchor: review it, then --freeze in the same commit.
+# id	file	section	status
+CPE-1	docs/platform/gotchas.md	MAME `logerror` output needs `-log`, not `-verbose` (paid: 2026-07-25)	IN-LIST
+CPE-2	docs/platform/gotchas.md	MAME `-debug` perturbs multi-CPU timing — never compare its checksums to non-debug runs (paid: 2026-	IN-LIST
+CPE-3	STATE_HISTORY.md	14z-108/109 measurements it never had; the field test got an in-tree carrier.**	OUT-OF-LIST
+CPE-3	docs/platform/gotchas.md	14z-98: two -debug INSTRUMENT-grammar traps from the #103 close — both	IN-LIST
+CPE-4	docs/platform/gotchas.md	MAME breakpoint logging is a SAMPLER, not an inventory	IN-LIST
+CPE-5	docs/platform/gotchas.md	Debugger stops DESYNC replay frame counting	IN-LIST
+CPE-6	docs/platform/gotchas.md	screen the replay never left (14z-63)	IN-LIST
+CPE-7	docs/platform/gotchas.md	deterministic INPUT-VIOLATIONs that look like host input (14z-110)	IN-LIST
+CPE-8	docs/platform/gotchas.md	CPS-2 — jump/handler tables need the OPCODES space (14z-71)	IN-LIST
+CPE-9	docs/platform/gotchas.md	regex rejects kills the run and prints a clean-looking zero (14z-71)	IN-LIST
+CPE-10	docs/platform/gotchas.md	on any address reports phantom hits (14z-71)	IN-LIST
+CPE-11	docs/platform/gotchas.md	value off a register snapshot attributed a write to the wrong caller (14z-76)	IN-LIST
+CPE-12	docs/platform/gotchas.md	MAME Lua write taps are silently dropped on handler re-install	IN-LIST
+CPE-13	docs/platform/gotchas.md	MAME write taps must be WORD-ALIGNED	IN-LIST
+CPE-14	docs/platform/gotchas.md	MAME Lua: WRITE taps fire, READ taps do not (14z-112, measured)	IN-LIST
+CPE-15	docs/platform/gotchas.md	host keystrokes are injected into the EMULATED controls	IN-LIST
+CPE-16	docs/platform/gotchas.md	MAME `-aviwrite` is headless-capable but uncompressed (14z-94)	IN-LIST
+CPE-17	docs/platform/gotchas.md	MAME cross-driver VIDEO_OUT checksums are NOT comparable (14z-62d)	IN-LIST
+CPE-18	docs/platform/gotchas.md	A chained rompath makes MAME a LIAR about member identity (14z-62h)	IN-LIST
+CPE-19	STATE_HISTORY.md	14z-108/109 measurements it never had; the field test got an in-tree carrier.**	OUT-OF-LIST
+CPE-19	docs/platform/gotchas.md	MAME palette RAM ($90C000) takes Lua pokes for READBACK but not for RENDERING (14z-102)	IN-LIST
+CPE-20	docs/platform/gotchas.md	Pre-seeded from the ROM-audit round (2026-07-25, before repo existed)	IN-LIST
+CPE-21	docs/platform/gotchas.md	`git submodule add` stages the DEFAULT BRANCH, not the tag you check out	IN-LIST
+CPE-22	docs/platform/gotchas.md	MAME's build system cannot handle a SPACE anywhere in the source path	IN-LIST
+CPE-23	docs/platform/gotchas.md	MAME 0.288's OSD is SDL3 and it is found ONLY through pkg-config	IN-LIST
+CPE-24	HANDOFF.md	MAME from source (B5, 2026-08-03) — the oracle now follows the profile	IN-LIST
+CPE-25	docs/platform/gotchas.md	repo's working tree — and exits 0 (paid: 2026-08-03, B5)	IN-LIST
+CPE-26	docs/platform/gotchas.md	FBNeo fresh builds need `SKIPDEPEND=1` (paid: 2026-07-25)	IN-LIST
+CPE-27	docs/platform/gotchas.md	FBNeo shared EEPROM breaks run-to-run determinism (paid: 2026-07-25, ~45min)	IN-LIST
+CPE-28	docs/platform/gotchas.md	still prints "(OK)"	IN-LIST
+CPE-29	docs/platform/gotchas.md	FBNeo's SDL frontend has NO `-rompath` — the flag is silently ignored	IN-LIST
+CPE-30	docs/platform/gotchas.md	is captured to the sandbox log	IN-LIST
+CPE-31	docs/platform/gotchas.md	SKIPPED applying the profile patch, never reverted it	IN-LIST
+CPE-32	HANDOFF.md	What exists (M0 bench, 2026-07-25)	IN-LIST
+CPE-33	docs/platform/gotchas.md	Cross-emulator replays: same inputs ≠ same content (paid: 2026-07-25, ~2h)	IN-LIST
+CPE-34	docs/platform/gotchas.md	FBNeo/MAME frame indices and object slots do not transfer — a slot-keyed tap chases a different obje	IN-LIST
+CPE-35	docs/platform/gotchas.md	The FBNeo gate never rendered a pixel — RAM checksums are blind to video	IN-LIST
+CPE-36	docs/project/gotchas.md	Sound is invisible to every RAM and pixel gate — it needs its own	IN-LIST
+CPE-37	docs/platform/gotchas.md	A state-dependent value may not be correlated ACROSS runs — serialize read and write in ONE run (14z	IN-LIST
+CPE-38	docs/platform/gotchas.md	A canary must change exactly ONE thing, or it cannot answer anything	IN-LIST
+CPE-39	docs/platform/gotchas.md	A relocation test with no negative control proves nothing	IN-LIST
+CPE-40	HANDOFF.md	If it still will not start, in order	IN-LIST
+CPE-41	HANDOFF.md	Platform / migration notes (14z-59d)	IN-LIST
+CPE-42	docs/platform/gotchas.md	its legacy-only instrument do, deliberately	IN-LIST
+CPH-1	docs/platform/gotchas.md	CPS-2 ROM file byte order is NOT 68k logical order (paid: 2026-07-25, ~1h)	IN-LIST
+CPH-2	docs/platform/gotchas.md	CPS-2 program zips store CODE encrypted — static byte reads of code are noise	IN-LIST
+CPH-3	docs/platform/gotchas.md	absolutizing a pc-relative table read on CPS-2 reads CIPHERTEXT	IN-LIST
+CPH-4	docs/platform/gotchas.md	A pc-relatively-read table must be a `code` op at ANY address (14z-91)	IN-LIST
+CPH-5	docs/platform/gotchas.md	encrypted range (14z-68)	IN-LIST
+CPH-6	docs/platform/gotchas.md	PC-relative reads are DECRYPTED reads on CPS-2 (paid: 2026-07-25, ~45min)	IN-LIST
+CPH-7	docs/platform/gotchas.md	0x100000 (measured 14z-59k)	IN-LIST
+CPH-8	docs/platform/gotchas.md	Ported CODE above the encryption window is stored RAW, automatically	IN-LIST
+CPH-9	docs/platform/gotchas.md	CPS-2 gfx simms are not tile-contiguous — naive slicing silently "works" on siblings only	IN-LIST
+CPH-10	docs/platform/gotchas.md	Dump a tile band WITH its bank bits, or you will exonerate the guilty	IN-LIST
+CPH-11	docs/platform/gotchas.md	`gfx_tiles.decode` had every 8-pixel half MIRRORED, and nothing noticed for 14 sessions (14z-105)	IN-LIST
+CPH-12	docs/platform/gotchas.md	emulators resolve a ROM entry by HASH before NAME	IN-LIST
+CPH-13	docs/project/cps2_wide.md	The profile	IN-LIST
+CPH-14	docs/platform/gotchas.md	OBJ y-word bit 15 is the sprite-list TERMINATOR, not a spare bit	IN-LIST
+CPH-15	docs/project/cps2_wide.md	Correction A2 — the 19th bit is bit 12, not bit 15	IN-LIST
+CPH-16	docs/platform/gotchas.md	blame the wrong drawer	IN-LIST
+CPH-17	docs/project/gotchas.md	Censusing a structure without knowing its terminator counts garbage	IN-LIST
+CPH-18	docs/platform/gotchas.md	A member's REGION layout is not its FILE layout — and the Z80 driver's own address space is a THIRD 	IN-LIST
+CPH-19	docs/platform/gotchas.md	QSound sample windows must live in ONE HALF of their 64K bank — the DSP compares pointers SIGNED (14	IN-LIST
+CPH-20	docs/platform/gotchas.md	QSound packing law #2: the destination offset must keep the SOURCE offset's BYTE PARITY (14z-86)	IN-LIST
+CPH-21	docs/platform/gotchas.md	QSound packing law #3: the record's `end` offset PLAYS — copy the inclusive window (14z-87b)	IN-LIST
+CPH-22	docs/platform/gotchas.md	A QSound "pure synthetic beep" is a TIGHT-LOOP sample — and a raw-window render can never reproduce 	IN-LIST
+CPH-23	docs/project/cps2_wide.md	The profile	IN-LIST
+CPH-24	docs/project/cps2_wide.md	CPS-2 WIDE — extended hardware profile (v1, RATIFIED — implemented in three emulators/cores)	IN-LIST
+CPH-25	docs/project/cps2_wide.md	Two things MAME taught us that FBNeo did not	IN-LIST
+CPH-26	docs/project/cps2_wide.md	B4 prg: PASSED, with the control that made it meaningful	IN-LIST
+CPH-27	docs/project/cps2_wide.md	Phase A measurements (2026-08-03, vanilla vsavj, full legacy corpus)	IN-LIST
+CPH-28	docs/project/cps2_wide.md	Phase B progress (proving the profile inert, one variable per build)	IN-LIST
+CPH-29	docs/project/cps2_wide.md	Governance (Rule 1 v2)	IN-LIST
+CPH-30	docs/project/cps2_wide.md	Emulator change budget (measured, not estimated)	IN-LIST
+MSC-1	docs/project/mister_core.md	1. What we are building	IN-LIST
+MSC-2	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
+MSC-3	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
+MSC-4	docs/platform/mister.md	Where things are	IN-LIST
+MSC-5	docs/platform/mister.md	How the CPS-2 core is put together (read 2026-08-22)	IN-LIST
+MSC-6	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
+MSC-7	docs/project/mister_core.md	4. The one escape, and why it is the fallback	IN-LIST
+MSC-8	docs/platform/mister.md	The runtime profile gate: MRA header byte 41 (slice D1, 14z-107 (6))	IN-LIST
+MSC-9	docs/platform/mister.md	The runtime profile gate: MRA header byte 41 (slice D1, 14z-107 (6))	IN-LIST
+MSC-10	docs/platform/mister.md	The runtime profile gate: MRA header byte 41 (slice D1, 14z-107 (6))	IN-LIST
+MSC-11	docs/platform/mister.md	The runtime profile gate: MRA header byte 41 (slice D1, 14z-107 (6))	IN-LIST
+MSC-12	docs/platform/mister.md	The runtime profile gate: MRA header byte 41 (slice D1, 14z-107 (6))	IN-LIST
+MSC-13	docs/project/mister_core.md	8. How the profile is switched on, and why it is a runtime bit	IN-LIST
+MSC-14	docs/project/mister_core.md	8. How the profile is switched on, and why it is a runtime bit	IN-LIST
+MSC-15	docs/project/mister_core.md	8. How the profile is switched on, and why it is a runtime bit	IN-LIST
+MSC-16	docs/platform/mister.md	The SDRAM ceiling at our pin: 64 MB is PHYSICAL (measured 14z-107)	IN-LIST
+MSC-17	docs/platform/gotchas.md	`JTFRAME_SDRAM_XL` without `JTFRAME_SDRAM_CACHE` aliases SILENTLY (14z-107)	IN-LIST
+MSC-18	docs/platform/mister.md	The SDRAM ceiling at our pin: 64 MB is PHYSICAL (measured 14z-107)	IN-LIST
+MSC-19	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
+MSC-20	docs/project/mister_map.md	5. THE MAP	IN-LIST
+MSC-21	docs/platform/gotchas.md	A CPS-2 tile code IS its SDRAM address — and the SAME ART HAS THREE SIZES (14z-107, third size added	IN-LIST
+MSC-22	docs/platform/gotchas.md	A CPS-2 tile code IS its SDRAM address — and the SAME ART HAS THREE SIZES (14z-107, third size added	IN-LIST
+MSC-23	docs/platform/mister.md	The per-bank SDRAM traffic profile (measured 14z-107 (3))	IN-LIST
+MSC-24	docs/project/mister_core.md	Why bank 1 can take the load	IN-LIST
+MSC-25	docs/platform/gotchas.md	On jtcps1/jtcps2, GFX ROM CONTENT changes object TIMING (14z-107)	IN-LIST
+MSC-26	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
+MSC-27	docs/project/mister_core.md	7. What no amount of memory would fix	IN-LIST
+MSC-28	docs/project/mister_map.md	The promote — **AS BUILT (slice D3)**	IN-LIST
+MSC-29	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
+MSC-30	docs/platform/mister.md	The QSound bank bit IS `dsp_ab[7]` — validated 14z-107 (6)	IN-LIST
+MSC-31	docs/project/mister_map.md	Everything else `jtcps2_main.v` decodes, and whether it collides	IN-LIST
+MSC-32	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
+MSC-33	docs/project/mister_core.md	8. How the profile is switched on, and why it is a runtime bit	IN-LIST
+MSC-34	docs/project/mister_core.md	7. What no amount of memory would fix	IN-LIST
+MSC-35	docs/project/cps2_wide.md	extended 14z-107 (9) for D2 and 14z-107 (10) for D3+D4	IN-LIST
+MSC-36	docs/project/mister_core.md	11. What would break it	IN-LIST
+MSC-37	docs/platform/mister.md	Recipe: the simulation lane on macOS (measured 14z-106, works)	IN-LIST
+MSC-38	docs/platform/gotchas.md	`jtsim -setname` re-downloads every run — and on CPS-2 you must download anyway (14z-107)	IN-LIST
+MSC-39	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
+MSC-40	docs/platform/gotchas.md	`JTFRAME_SIM_IODUMP` on CPS-2 dumps the EEPROM, not RAM (14z-107)	IN-LIST
+MSC-41	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
+MSC-42	docs/platform/gotchas.md	`jtsim -setname` re-downloads every run — and on CPS-2 you must download anyway (14z-107)	IN-LIST
+MSC-43	docs/platform/mister.md	The work-RAM oracle: `JTFRAME_SIM_WRAMDUMP` (measured 14z-107)	IN-LIST
+MSC-44	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
+MSC-45	docs/platform/gotchas.md	THE SIM HARNESS'S DIRECTION BITS ARE REVERSED — all four, end for end (measured in full 2026-08-24, 	IN-LIST
+MSC-46	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
+MSC-47	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
+MSC-48	docs/platform/mister.md	THE SDRAM READ PROBE: watching the core FETCH (14z-107 (10), fork commit 12)	IN-LIST
+MSC-49	docs/platform/mister.md	The cheapest proof that the profile bit is live: LOOK AT THE SCREEN	IN-LIST
+MSC-50	docs/platform/mister.md	THE SDRAM IMAGE CENSUS: reading the download back out (14z-107 (9))	IN-LIST
+MSC-51	docs/platform/gotchas.md	The Verilator SDRAM model dropped the TOP address bit — and the obvious fix was wrong (14z-107)	IN-LIST
+MSC-52	docs/project/gotchas.md	THE INSTRUMENT PROTOCOL — adopted 14z-107 (11), maintainer-directed	IN-LIST
+MSC-53	docs/project/mister_core.md	12. The holes — what has never been tried	IN-LIST
+MSC-54	docs/platform/gotchas.md	Editing a shell script WHILE it runs corrupts the running execution (14z-107)	IN-LIST
+MSC-55	docs/project/gotchas.md	`pgrep -f` WAITERS MATCH THEMSELVES AND NEVER EXIT (paid: 2026-08-24, 14z-107, four times in one tas	IN-LIST
+MSC-56	docs/project/gotchas.md	A REPLAY'S NAME IS A CLAIM ABOUT THE BUILD (paid: 2026-08-24, 14z-107)	IN-LIST
+MSC-57	docs/platform/mister.md	3. build — the CONTROL FIRST, deliberately	IN-LIST
+MSC-58	docs/platform/gotchas.md	`xjtcore.sh` RETRIES UNTIL A SEED PASSES, SO A GREEN BUILD CERTIFIES A PLACEMENT AND NOT A DESIGN (m	IN-LIST
+MSC-59	docs/platform/gotchas.md	`xjtcore.sh` RETRIES UNTIL A SEED PASSES, SO A GREEN BUILD CERTIFIES A PLACEMENT AND NOT A DESIGN (m	IN-LIST
+MSC-60	docs/platform/gotchas.md	`xjtcore.sh` RETRIES UNTIL A SEED PASSES, SO A GREEN BUILD CERTIFIES A PLACEMENT AND NOT A DESIGN (m	IN-LIST
+MSC-61	docs/platform/gotchas.md	A jtcores BITSTREAM CARRIES A BUILD DATESTAMP, SO THE SAME SEED REBUILDS TO A DIFFERENT HASH ON A DI	IN-LIST
+MSC-62	docs/project/release_format.md	The rule	IN-LIST
+MSC-63	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107 (5))	IN-LIST
+MSC-64	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107 (5))	IN-LIST
+MSC-65	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107 (5))	IN-LIST
+MSC-66	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107 (5))	IN-LIST
+MSC-67	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107 (5))	IN-LIST
+MSC-68	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107 (5))	IN-LIST
+MSC-69	docs/project/mister_field.md	2. Before the board: the bundle and its control	IN-LIST
+MSC-70	docs/project/mister_core.md	12. The holes — what has never been tried	IN-LIST
+MSC-71	docs/project/mister_core.md	12. The holes — what has never been tried	IN-LIST
+MSC-72	docs/project/mister_core.md	12. The holes — what has never been tried	IN-LIST
+MSC-73	docs/project/mister_core.md	12. The holes — what has never been tried	IN-LIST
+MSV-1	docs/project/mister_fit.md	MiSTer fit — what merged-m6 actually needs vs what jtcps2 offers	IN-LIST
+MSV-2	docs/project/mister_fit.md	3. GFX tiles — the decisive number	IN-LIST
+MSV-3	docs/project/mister_core.md	2. What the roster needs	IN-LIST
+MSV-4	docs/project/mister_map.md	9. Open questions, stated as questions	IN-LIST
+MSV-5	docs/project/mister_map.md	Bank 0 — 16 MB, the only read/**write** bank (`ba_wr[3:1] = 0`, `:215`)	IN-LIST
+MSV-6	docs/project/mister_map.md	The two moves that make it fit, stated plainly	IN-LIST
+MSV-7	docs/project/mister_map.md	The two moves that make it fit, stated plainly	IN-LIST
+MSV-8	docs/project/mister_map.md	Mapped verbatim (WIDE v1 declared sizes) — TWO INDEPENDENT OVERFLOWS	IN-LIST
+MSV-9	docs/project/mister_map.md	Slot count — the one place this needs a new jtframe file	IN-LIST
+MSV-10	docs/platform/mister.md	THE 14z-108/109 MEASUREMENTS, RECORDED IN THE LOG (entered 14z-114)	IN-LIST
+MSV-11	docs/project/mister_map.md	9. Open questions, stated as questions	IN-LIST
+MSV-12	docs/platform/mister.md	The work-RAM oracle: `JTFRAME_SIM_WRAMDUMP` (measured 14z-107)	IN-LIST
+MSV-13	docs/project/mister_map.md	Is the reserved 16 bytes enough? — yes, and it is now load-bearing three times	IN-LIST
+MSV-14	docs/project/mister_core.md	Where to go from here	IN-LIST
+MSV-15	docs/project/mister_map.md	Three things D0 found that the design above did not know	IN-LIST
+MSV-16	docs/project/mister_core.md	11. What would break it	IN-LIST
+MSV-17	docs/project/mister_map.md	WRONG — kept so it is not re-proposed. Do not use.	IN-LIST
+MSV-18	docs/project/mister_map.md	Three things D0 found that the design above did not know	IN-LIST
+MSV-19	docs/platform/mister.md	Recipe: the simulation lane on macOS (measured 14z-106, works)	IN-LIST
+MSV-20	docs/project/release_format.md	The rule	IN-LIST
+MSV-21	docs/project/mister_field.md	2. Before the board: the bundle and its control	IN-LIST
+MSV-22	docs/project/mister_field.md	2. Before the board: the bundle and its control	IN-LIST
+MSV-23	docs/platform/mister.md	The work-RAM oracle: `JTFRAME_SIM_WRAMDUMP` (measured 14z-107)	IN-LIST
+MSV-24	docs/platform/mister.md	The work-RAM oracle: `JTFRAME_SIM_WRAMDUMP` (measured 14z-107)	IN-LIST
+MSV-25	docs/platform/mister.md	THE 14z-108/109 MEASUREMENTS, RECORDED IN THE LOG (entered 14z-114)	IN-LIST
+MSV-26	docs/platform/mister.md	THE 14z-108/109 MEASUREMENTS, RECORDED IN THE LOG (entered 14z-114)	IN-LIST
+MSV-27	HANDOFF.md	upstream's behaviour and `collect` also gathers <outdir>/frames	IN-LIST
+MSV-28	docs/project/gotchas.md	A REPLAY'S NAME IS A CLAIM ABOUT THE BUILD (paid: 2026-08-24, 14z-107)	IN-LIST
+MSV-29	docs/platform/mister.md	THE 14z-108/109 MEASUREMENTS, RECORDED IN THE LOG (entered 14z-114)	IN-LIST
+MSV-30	docs/project/mister_core.md	9. How any of this is known to be true	IN-LIST
+MSV-31	docs/project/mister_field.md	1. What hardware answers that simulation cannot	IN-LIST
+MSV-32	docs/project/mister_field.md	2. Before the board: the bundle and its control	IN-LIST
+MSV-33	docs/project/mister_field.md	4. The symptom table (from `FIELD_TRIAGE.txt`, 14z-108, kept current)	IN-LIST
+MSV-34	docs/project/mister_field.md	5. Field reports are recordings (CLAUDE.md §4, maintainer-ruled 14z-111)	IN-LIST
+MSV-35	docs/project/mister_field.md	5. Field reports are recordings (CLAUDE.md §4, maintainer-ruled 14z-111)	IN-LIST
+MSV-36	docs/project/mister_field.md	6. Where the records are	IN-LIST
+VSE-1	docs/game/atlas/character_tables.md	The full per-character table BANK — layout identical in all three sets	IN-LIST
+VSE-2	docs/game/engine_internals.md	vs2/vh2 fill them (named 14z-74; SIX instances and counting)	IN-LIST
+VSE-3	docs/game/gotchas.md	The sibling-coincidence gotcha, third strike: the global coordinate pool	IN-LIST
+VSE-4	docs/game/gotchas.md	Same-value class #4: A5-relative work-var displacements	IN-LIST
+VSE-5	docs/game/gotchas.md	code inside per-char families — hook the LIVE one, found by tracing	IN-LIST
+VSE-6	docs/game/gotchas.md	sibling-verified structure can still drift behaviorally	IN-LIST
+VSE-7	docs/game/engine_internals.md	The projectile-pool HIT-CLASS map — a second type consumer, bounded at 64 (14z-82b)	IN-LIST
+VSE-8	docs/game/engine_internals.md	selection mechanism is now named	IN-LIST
+VSE-9	docs/game/atlas/character_tables.md	The full per-character table BANK — layout identical in all three sets	IN-LIST
+VSE-10	docs/game/atlas/id_space.md	The character-id space — is the variant half architectural or conventional?	IN-LIST
+VSE-11	docs/game/atlas/id_space.md	2. Code — how wide is the id where it is consumed?	IN-LIST
+VSE-12	docs/game/gotchas.md	SLOT used, and reading it that way deferred a fix for two sessions (14z-76)	IN-LIST
+VSE-13	docs/game/atlas/id_space.md	RESERVED IDS — vanilla does use part of the variant half	IN-LIST
+VSE-14	docs/game/atlas/id_space.md	Which ids vanilla ever assigns (measured over the corpus)	IN-LIST
+VSE-15	docs/game/atlas/id_space.md	The arcade-opponent path (a fourth roster work item)	IN-LIST
+VSE-16	docs/game/gotchas.md	Per-char table entries are PAIRS more often than you think	IN-LIST
+VSE-17	docs/game/atlas/character_tables.md	The other two variant datasets: two Oboro-class Bishamons	IN-LIST
+VSE-18	docs/game/engine_internals.md	measured 14z-68d on the Huitzil effect arc)	IN-LIST
+VSE-19	docs/game/engine_internals.md	measured 14z-68d on the Huitzil effect arc)	IN-LIST
+VSE-20	docs/game/engine_internals.md	The shared-type trap, and `[[obj_hook_extra]]`	IN-LIST
+VSE-21	docs/game/engine_internals.md	Per-tenant TYPE NUMBERS on multi-tenant builds (14z-82)	IN-LIST
+VSE-22	docs/game/engine_internals.md	Pool seeding and the `[[init_shim]]` (14z-65 — the watchdog class)	IN-LIST
+VSE-23	docs/game/engine_internals.md	Allocator wrappers and slot recycling (14z-65)	IN-LIST
+VSE-24	docs/game/engine_internals.md	system (session 14z-66, measured on the Huitzil port)	IN-LIST
+VSE-25	docs/game/engine_internals.md	Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured)	IN-LIST
+VSE-26	docs/game/gotchas.md	Anim numbers: facing adds 0x300; set-anim QUEUES, display resolves	IN-LIST
+VSE-27	docs/game/atlas/sprite_lists.md	The table length is SELF-ENCODING	IN-LIST
+VSE-28	docs/game/atlas/sprite_lists.md	4. THE GAME-SPECIFIC CONSTANTS (the trap)	IN-LIST
+VSE-29	docs/game/engine_internals.md	Where the BANK comes from — and why it differs per list type	IN-LIST
+VSE-30	docs/game/atlas/sprite_lists.md	2. The per-list budget	IN-LIST
+VSE-31	docs/game/gotchas.md	OBJ record formats differ in ENTRY STRIDE, not just header meaning	IN-LIST
+VSE-32	docs/game/gotchas.md	Record walks that follow POINTERS miss offset-computed records	IN-LIST
+VSE-33	docs/game/atlas/sprite_lists.md	5. Multi-tile sprites	IN-LIST
+VSE-34	docs/game/gotchas.md	The per-char OBJ bank word is NOT a display-only attribute	IN-LIST
+VSE-35	docs/game/gotchas.md	SYSTEM-REFERENCED tiles too	IN-LIST
+VSE-36	docs/game/gotchas.md	and taps CAN legitimately disagree	IN-LIST
+VSE-37	docs/game/engine_internals.md	art" is RETRACTED — it was an index-join error and a phase offset	IN-LIST
+VSE-38	docs/game/engine_internals.md	(14z-70, maintainer-endorsed; use this FIRST)	IN-LIST
+VSE-39	docs/game/engine_internals.md	(history kept below)	IN-LIST
+VSE-40	docs/game/engine_internals.md	measured on Phobos' FINAL GUARDIAN; twins verified in both engines)	IN-LIST
+VSE-41	docs/game/engine_internals.md	machine that consumes it (14z-98, measured end to end on #103)	IN-LIST
+VSE-42	docs/game/engine_internals.md	measured on Phobos' FINAL GUARDIAN; twins verified in both engines)	IN-LIST
+VSE-43	docs/game/gotchas.md	In the engine hit-spark spawner, a1 is the VICTIM, a6 the attacker	IN-LIST
+VSE-44	docs/game/engine_internals.md	THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab)	IN-LIST
+VSE-45	docs/game/engine_internals.md	Throw / physics-arc tables (14z-67, measured on the command grab)	IN-LIST
+VSE-46	docs/game/engine_internals.md	Command-input / motion-tracker subsystem (session 14z-48, measured both engines)	IN-LIST
+VSE-47	docs/game/gotchas.md	portrait screen belongs to the 2P flow only (14z-99)	IN-LIST
+VSE-48	docs/game/gotchas.md	An 0xFF inside a LIVE select-wheel row is committed as character id 0xFF	IN-LIST
+VSE-49	docs/game/atlas/select_screen.md	The adjacency is HAND-TUNED — do not generate it from geometry	IN-LIST
+VSE-50	docs/game/atlas/select_screen.md	The RECORD-POINTER array — what the hovered cell displays (14z-61)	IN-LIST
+VSE-51	docs/game/gotchas.md	cells by MEASURING the cursor, not by suggestive constants	IN-LIST
+VSE-52	docs/game/gotchas.md	There is no such thing as a free palette row on a venue screen (14z-63)	IN-LIST
+VSE-53	docs/game/gotchas.md	roster-varied control, not a same-roster control	IN-LIST
+VSE-54	docs/game/gotchas.md	"Slot-indexed cell" does not mean "slot-exclusive data" — three surgery traps	IN-LIST
+VSE-55	docs/game/gotchas.md	The per-char strip zone interleaves the SHARED MUSIC POOL	IN-LIST
+VSE-56	docs/game/gotchas.md	The attract INTRO CUTSCENE is Jedah — per-char display sites are legacy surface	IN-LIST
+VSE-57	docs/game/atlas/venue_assets.md	Per-slot presentation assets — what a tenant on a variant id inherits	IN-LIST
+VSE-58	docs/game/engine_internals.md	The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76)	IN-LIST
+VSE-59	docs/game/engine_internals.md	the #92 crash; decoded end to end and confirmed on screen)	IN-LIST
+VSE-60	docs/game/engine_internals.md	the #92 crash; decoded end to end and confirmed on screen)	IN-LIST
+VSE-61	docs/game/engine_internals.md	Sound subsystem: the QSound command path (session 14z-51, measured)	IN-LIST
+VSE-62	docs/game/gotchas.md	+0x382 is the char id only at SELECT — in match it is the VOICE-FLAVOR CLASS, and the engine reassig	IN-LIST
+VSE-63	docs/game/engine_internals.md	in the sound kernel itself, NOT the 0x0BF41A record path	IN-LIST
+VSE-64	docs/game/engine_internals.md	note-table array semantics, the dead type-C song class, the alias bit	IN-LIST
+VSE-65	docs/game/engine_internals.md	confirmed static; RETRACTS most of the 14z-85d filed detail)	IN-LIST
+VSE-66	docs/game/engine_internals.md	note-table array semantics, the dead type-C song class, the alias bit	IN-LIST
+VSE-67	docs/game/engine_internals.md	The 14z-51 id-space result (docs/project/m5/keyons_*.json)	IN-LIST
+VSE-68	docs/game/gotchas.md	input is not entering it (14z-69, cost this session twice)	IN-LIST
+VSE-69	docs/game/engine_internals.md	14z-69c: THE MECHANISM, traced end to end	IN-LIST
+VSE-70	docs/game/engine_internals.md	THE DARK FORCE PALETTE-SEQUENCE BLOCKS — measured census (14z-79b)	IN-LIST
+VSE-71	docs/game/engine_internals.md	Shadow / reflection servants (14z-66; premise CORRECTED 14z-68f)	IN-LIST
+VSE-72	docs/game/engine_internals.md	THE LEAPING PURSUIT ATTACK (measured 14z-104, maintainer-confirmed mechanic)	IN-LIST
+VSE-73	docs/game/engine_internals.md	CPU exceptions and the soft-reset path (14z-109)	IN-LIST
+VSE-74	docs/game/engine_internals.md	The object-script state dispatcher at `PRG:0x018508` (14z-109)	IN-LIST
+VSE-75	docs/game/engine_internals.md	The CPU AI action-script system (14z-111, measured on the #99 capture)	IN-LIST
+VSE-76	docs/game/gotchas.md	input is not entering it (14z-69, cost this session twice)	IN-LIST
+VSE-77	docs/game/gotchas.md	reproduced" (14z-68u)	IN-LIST
+VSE-78	docs/game/gotchas.md	A WATCHDOG REBOOT masquerades as a clean "nothing happened" (14z-65)	IN-LIST
+VSE-79	docs/game/engine_internals.md	never ported, drawn against vsav's unrelated art at the same indices	IN-LIST
+VSE-80	docs/game/gotchas.md	portrait screen belongs to the 2P flow only (14z-99)	IN-LIST
+VSE-81	docs/game/engine_internals.md	THE LEAPING PURSUIT ATTACK (measured 14z-104, maintainer-confirmed mechanic)	IN-LIST
+VSE-82	docs/game/atlas/select_screen.md	THE RANDOM CELL `0x0B` — the cycling draw, decoded (14z-116)	IN-LIST
+VSE-83	docs/game/atlas/ram.md	Attract-mode demo roster (superset-invariant note)	IN-LIST
+VSP-1	CLAUDE.md	1. Mission and prime constraint	IN-LIST
+VSP-2	CLAUDE.md	2. Non-negotiable rules	IN-LIST
+VSP-3	CLAUDE.md	2. Non-negotiable rules	IN-LIST
+VSP-4	CLAUDE.md	2. Non-negotiable rules	IN-LIST
+VSP-5	CLAUDE.md	2. Non-negotiable rules	IN-LIST
+VSP-6	CLAUDE.md	2. Non-negotiable rules	IN-LIST
+VSP-7	CLAUDE.md	2. Non-negotiable rules	IN-LIST
+VSP-8	CLAUDE.md	2. Non-negotiable rules	IN-LIST
+VSP-9	CLAUDE.md	3. Environment	IN-LIST
+VSP-10	CLAUDE.md	5. Working style	IN-LIST
+VSP-11	CLAUDE.md	5. Working style	IN-LIST
+VSP-12	CLAUDE.md	5. Working style	IN-LIST
+VSP-13	CLAUDE.md	5. Working style	IN-LIST
+VSP-14	CLAUDE.md	5. Working style	IN-LIST
+VSP-15	CLAUDE.md	5. Working style	IN-LIST
+VSP-16	CLAUDE.md	5. Working style	IN-LIST
+VSP-17	CLAUDE.md	5. Working style	IN-LIST
+VSP-18	CLAUDE.md	4. Verification protocol (the harness is the project's spine)	IN-LIST
+VSP-19	CLAUDE.md	4. Verification protocol (the harness is the project's spine)	IN-LIST
+VSP-20	CLAUDE.md	4. Verification protocol (the harness is the project's spine)	IN-LIST
+VSP-21	STATE.md	STANDING PRINCIPLE (maintainer, 2026-08-05): vanilla wins ties	IN-LIST
+VSP-22	STATE.md	THE DEADNESS REGISTER (opened 14z-71, maintainer's standing instruction)	IN-LIST
+VSP-23	STATE.md	THE DEADNESS REGISTER (opened 14z-71, maintainer's standing instruction)	IN-LIST
+VSP-24	CLAUDE.md	4. Verification protocol (the harness is the project's spine)	IN-LIST
+VSP-25	CLAUDE.md	4. Verification protocol (the harness is the project's spine)	IN-LIST
+VSP-26	CLAUDE.md	4. Verification protocol (the harness is the project's spine)	IN-LIST
+VSP-27	CLAUDE.md	4. Verification protocol (the harness is the project's spine)	IN-LIST
+VSP-28	CLAUDE.md	4. Verification protocol (the harness is the project's spine)	IN-LIST
+VSP-29	CLAUDE.md	4. Verification protocol (the harness is the project's spine)	IN-LIST
+VSP-30	CLAUDE.md	4. Verification protocol (the harness is the project's spine)	IN-LIST
+VSP-31	CLAUDE.md	4. Verification protocol (the harness is the project's spine)	IN-LIST
+VSP-32	CLAUDE.md	4. Verification protocol (the harness is the project's spine)	IN-LIST
+VSP-33	CLAUDE.md	4. Verification protocol (the harness is the project's spine)	IN-LIST
+VSP-34	docs/project/gotchas.md	Engine hooks on hot paths break whole-RAM legacy comparison — by construction (paid: 2026-07-25 sess	IN-LIST
+VSP-35	docs/project/gotchas.md	Engine hooks on hot paths break whole-RAM legacy comparison — by construction (paid: 2026-07-25 sess	IN-LIST
+VSP-36	docs/project/gotchas.md	A self-frozen `.sha1` cannot see a legacy regression — and a replay's FILENAME does not tell you wha	IN-LIST
+VSP-37	docs/project/gotchas.md	A comparator's own ground-truth test can RATIFY a deviation from the governing spec (paid: 14z-95, G	IN-LIST
+VSP-38	docs/project/gotchas.md	Moving a frozen ONSET frame can silently cross a verification-class boundary (paid: 14z-90, GitHub i	IN-LIST
+VSP-39	docs/project/gotchas.md	A hook on a hot shared path can flip a frame-boundary parity	IN-LIST
+VSP-40	docs/project/gotchas.md	Never chain a legacy measurement onto a build in one step (14z-74)	IN-LIST
+VSP-41	docs/project/gotchas.md	Engine hooks on hot paths break whole-RAM legacy comparison — by construction (paid: 2026-07-25 sess	IN-LIST
+VSP-42	docs/project/gotchas.md	GFX and coordinate data are INVISIBLE to every RAM-basis gate	IN-LIST
+VSP-43	docs/project/gotchas.md	The RAM gate cannot see NEW-CHAR visual wrongness — pixel A/B is the tool	IN-LIST
+VSP-44	docs/project/gotchas.md	The sfx helper and the record array must be impossible to enable separately	IN-LIST
+VSP-45	docs/project/gotchas.md	Sibling-coincident engine refs are INVISIBLE to the diff oracle — and the coincident vsavj address i	IN-LIST
+VSP-46	docs/project/gotchas.md	Bare-long "pointers" in code are usually operand pairs — sibling-veto them (paid: 2026-07-25 session	IN-LIST
+VSP-47	docs/project/gotchas.md	PC-relative word tables are DATA — never let a pointer heuristic rewrite them (paid: 2026-07-25, ~1h	IN-LIST
+VSP-48	docs/project/gotchas.md	Blind long-relocation over ported data blobs corrupts streams	IN-LIST
+VSP-49	docs/project/gotchas.md	Never write an unverified gap (the Felicia wall-jump lesson)	IN-LIST
+VSP-50	docs/project/gotchas.md	Disabling a heuristic CLASS wholesale can revert load-bearing writes	IN-LIST
+VSP-51	docs/project/gotchas.md	Early-session generic rows can masquerade over later-understood structures	IN-LIST
+VSP-52	docs/project/gotchas.md	Sibling twins can differ by ONE hoisted instruction — codebyte-matching lies	IN-LIST
+VSP-53	docs/project/gotchas.md	Fuzzy code-similarity reconciliation collapses near-identical	IN-LIST
+VSP-54	docs/project/gotchas.md	Twin-site identification by BYTE PATTERN alone can land on the	IN-LIST
+VSP-55	docs/project/gotchas.md	A single-shift sibling scan dies at the newcomer window's hidden	IN-LIST
+VSP-56	docs/project/gotchas.md	The vanilla-alias assumption fails where per-char rows hide in engine	IN-LIST
+VSP-57	docs/project/gotchas.md	An odd-offset "engine ref" ate a jsr opcode — and a pool-head latch	IN-LIST
+VSP-58	docs/project/gotchas.md	Three lessons from the day Huitzil came alive (14z-65)	IN-LIST
+VSP-59	docs/project/gotchas.md	PC-relative escapes in engine-style regions are INVISIBLE to the	IN-LIST
+VSP-60	docs/project/gotchas.md	A tenant porting SHARED regions inherits every region-scoped	IN-LIST
+VSP-61	docs/project/gotchas.md	A port_patch on a shared engine-family region fixes ONE tenant's copy (14z-85f)	IN-LIST
+VSP-62	docs/project/porting_code_regions.md	The four checks, before you build	IN-LIST
+VSP-63	docs/project/porting_code_regions.md	Crypt placement: opcode vs data views	IN-LIST
+VSP-64	docs/project/porting_code_regions.md	The habit that would have saved all four sessions	IN-LIST
+VSP-65	docs/project/gotchas.md	A ported region's pc-relative DATA POINTERS are copied VERBATIM —	IN-LIST
+VSP-66	docs/project/gotchas.md	A dead-filler classifier that compares the OPCODE view is blind to DATA	IN-LIST
+VSP-67	docs/project/gotchas.md	`placements.json`'s dst/src is a LINEAR map, but the extractor	IN-LIST
+VSP-68	docs/project/gotchas.md	A pointer-shaped heuristic is placement-dependent — merged5 passed by luck (14z-92)	IN-LIST
+VSP-69	docs/project/gotchas.md	Every TYPE/CLASS byte in a ported record indexes some engine dispatch —	IN-LIST
+VSP-70	docs/project/gotchas.md	"Entry N" past the end of a jump table is the NEXT routine's OPERAND	IN-LIST
+VSP-71	docs/project/gotchas.md	14z-111 — "16 + the same 16 repeated": an aliasing guard is a silent tenant trap; and a rig that win	IN-LIST
+VSP-72	docs/project/gotchas.md	Hole "a" is inside the CPS-2 crypt range — thunks with EMBEDDED DATA	IN-LIST
+VSP-73	docs/project/gotchas.md	A slot id baked into hand-authored MACHINE CODE is invisible to a	IN-LIST
+VSP-74	docs/project/gotchas.md	Dotted TOML table names parse DIFFERENTLY per host (14z-62c)	IN-LIST
+VSP-75	docs/project/gotchas.md	Descriptor CRCs for variable-content members: use SENTINELS (14z-62d)	IN-LIST
+VSP-76	docs/project/gotchas.md	Stale build-output members get re-packed (14z-62h, maintainer-caught)	IN-LIST
+VSP-77	docs/project/gotchas.md	Two generator sections silently owned one table row — last-write-wins	IN-LIST
+VSP-78	docs/project/gotchas.md	The tile-placement pool is block-aware first-fit — carving cells out	IN-LIST
+VSP-79	docs/project/gotchas.md	"Inside the placed band window" is NOT "overwritten" (14z-62)	IN-LIST
+VSP-80	docs/project/gotchas.md	"The substitution landed for free" — invisible slot dependencies (14z-62c)	IN-LIST
+VSP-81	docs/project/gotchas.md	Per-record BANK attribution: the effect-tail triage has no bank column	IN-LIST
+VSP-82	docs/game/gotchas.md	Same-value class #4: A5-relative work-var displacements	IN-LIST
+VSP-83	docs/project/gotchas.md	A ported region whose consumers index NEGATIVELY needs headroom	IN-LIST
+VSP-84	docs/project/gotchas.md	Dispatch-time owner reads are transient at spawn instants — two measured counterexamples (14z-81c)	IN-LIST
+VSP-85	docs/project/gotchas.md	Routing a tenant's objects to a ported machine: the discriminator	IN-LIST
+VSP-86	docs/project/gotchas.md	An "owner-gated" thunk on a shared engine routine is NOT scoped by	IN-LIST
+VSP-87	docs/project/gotchas.md	Per-char dispatch on a COMMON seq state needs the target flow's	IN-LIST
+VSP-88	docs/project/gotchas.md	A stamp census must enumerate WRITE FORMS, not just the known immediate shape (14z-82)	IN-LIST
+VSP-89	docs/project/gotchas.md	Sampled uniformity is not uniformity — extract the FULL set before	IN-LIST
+VSP-90	docs/project/gotchas.md	"Run once at match start" is a TIMING TRAP — use a match-active countdown	IN-LIST
+VSP-91	docs/project/gotchas.md	A 0x7xx sfx id's faithfulness is a property of its CONTENT, not its number (14z-85g)	IN-LIST
+VSP-92	docs/project/tenant_manifest.md	The slot-row vocabulary (14z-62c — how a row states its tenant behavior)	IN-LIST
+VSP-93	docs/project/hardening_register.md	Guard currency (the H2 sweep, 2026-08-20)	IN-LIST
+VSP-94	HANDOFF.md	Build registry	IN-LIST
+VSP-95	docs/project/gotchas.md	A frozen build stops being a usable REFERENCE when the profile bumps (14z-92)	IN-LIST
+VSP-96	docs/project/build_dir_triage.md	BEFORE DELETING A BUILD DIR, GREP FOUR PLACES — NOT TWO (14z-112, paid for)	IN-LIST
+VSP-97	docs/project/build_dir_triage.md	THE DEEPER FLAW THE SWEEP EXPOSED: "tracked" build dirs are only PARTLY tracked	IN-LIST
+VSP-98	docs/project/build_dir_triage.md	Recordings (`tests/inp/`, `~/.cache/vampire-saved/inp/`) — 14z-111, maintainer-ruled	IN-LIST
+VSP-99	docs/project/patch_index.md	patch_index — one-page registry of every patch	IN-LIST
+VSP-100	HANDOFF.md	RELEASE PACKAGING (14z-105) — `release/<name>/`, no ROM bytes	IN-LIST
+VSP-101	HANDOFF.md	THE PRE-COMMIT COMMAND (14z-94, GitHub #30) — run this, not a filename	IN-LIST
+VSP-102	HANDOFF.md	THE REVIEW-TRIAGE GATES (14z-94, GitHub #74's index)	IN-LIST
+VSP-103	docs/project/gotchas.md	A gate that is not in the battery can sit FAILING for sessions —	IN-LIST
+VSP-104	docs/project/gotchas.md	A self-test that drives a gate through DELIBERATE failures litters the gate's evidence directory (14	IN-LIST
+VSP-105	docs/project/gotchas.md	Pipe a build tool through tail and a crash packs STALE artifacts	IN-LIST
+VSP-106	docs/project/gotchas.md	A build-fingerprint call without `--set` silently fingerprints the	IN-LIST
+VSP-107	docs/project/gotchas.md	`BUILD=... tests/<gate>.sh` is SILENTLY IGNORED by positional-arg gates —	IN-LIST
+VSP-108	docs/project/gotchas.md	14z-97: two ways a tool measures the wrong thing and says nothing	IN-LIST
+VSP-109	docs/project/gotchas.md	14z-96: three instrument traps, each paid for in this session	IN-LIST
+VSP-110	docs/project/gotchas.md	14z-94: five shell/tooling traps, each paid for in this session	IN-LIST
+VSP-111	docs/project/gotchas.md	awk compares hex fields as NUMBERS when they happen to look numeric (14z-91)	IN-LIST
+VSP-112	docs/project/gotchas.md	A `|| fallback` after a pipeline reads the LAST command's status, not the failing one (paid: 14z-93,	IN-LIST
+VSP-113	docs/project/gotchas.md	A worktree branched from a STALE `origin/main` silently changes the	IN-LIST
+VSP-114	docs/project/gotchas.md	A PASS line that hard-codes its control's conclusion (paid: 14z-93, caught by reading a red log)	IN-LIST
+VSP-115	docs/project/gotchas.md	A two-leg A/B that bails on leg 1 leaves leg 2's health an ASSUMPTION — and the assumption was false	IN-LIST
+VSP-116	docs/project/gotchas.md	A pre-armed attribution is a hypothesis, not a finding — print the measured mechanism (14z-81)	IN-LIST
+VSP-117	docs/project/gotchas.md	The masked-basis canary corrupted the basis it verified (14z-91)	IN-LIST
+VSP-118	docs/project/gotchas.md	`_PRG_RE` did not match the WIDE extension members, so extension content	IN-LIST
+VSP-119	HANDOFF.md	Running a CPS-2 WIDE build (playtest)	IN-LIST
+VSP-120	docs/project/gotchas.md	2P forced-pick pokes must end by ~frame 1500 — later pokes leak	IN-LIST
+VSP-121	docs/project/gotchas.md	Forced-pick pokes do NOT populate the HUD index field — HUD	IN-LIST
+VSP-122	docs/project/gotchas.md	Forced-pick pokes hold through SELECT only — a vs-CPU P2 carries the CPU's REAL pick at match time (	IN-LIST
+VSP-123	HANDOFF.md	THE NATIVE LEG IS REACHABLE FOR ANY TENANT SCREEN (14z-69)	IN-LIST
+VSP-124	docs/project/gotchas.md	14z-97b: five traps from the #103 hunt — four are RIG grammar, one is a	IN-LIST
+VSP-125	docs/project/gotchas.md	14z-98: the kill/heal POKE SHAPE trap from the #103 close (the	IN-LIST
+VSP-126	docs/project/gotchas.md	The pushed group-0 exception PC is mid-instruction — probing it reads a clean zero (14z-81)	IN-LIST
+VSP-127	docs/project/gotchas.md	Rig iterations must NOT share a dump directory (14z-100)	IN-LIST
+VSP-128	docs/project/gotchas.md	replay.lua DUMPS separator is ';' — commas die silently late	IN-LIST
+VSP-129	docs/project/gotchas.md	Cross-build A/B dumps must run PROBE-FREE — debugger overhead lands differently on two different bui	IN-LIST
+VSP-130	docs/project/gotchas.md	-debug fire counts do not transfer to checksum timelines on vs-CPU/chaos content — attribute diverge	IN-LIST
+VSP-131	docs/project/gotchas.md	A scripted motion input is NOT the move you named — the buffer FOLDS leading directions, so identify	IN-LIST
+VSP-132	docs/project/gotchas.md	A 1P-arcade rig is silently pinned to the ARCADE DRAW — any timing change re-rolls its opponent and 	IN-LIST
+VSP-133	docs/project/gotchas.md	A fixed-frame rig verified on ONE character whiffs on another — reach, knockdown arcs, down windows 	IN-LIST
+VSP-134	docs/project/gotchas.md	An "attack-only" entry-set A/B needs a QUIET-FRAME presence profile, or a constant fixture becomes y	IN-LIST
+VSP-135	docs/project/gotchas.md	Cross-emulator position A/B: compare RELATIVE offset, not absolute x	IN-LIST
+VSP-136	docs/project/gotchas.md	Cross-game A/B pixel comparison: align by DISPLAYED RECORD, not frame	IN-LIST
+VSP-137	docs/project/gotchas.md	A no-crash soak can silently lose the behavior it was written to	IN-LIST
+VSP-138	docs/project/gotchas.md	Phantom fixes: validate against the USER'S repro, at the RIGHT frames	IN-LIST
+VSP-139	docs/project/gotchas.md	Verify a fix at the RENDER layer before believing the RAM layer	IN-LIST
+VSP-140	docs/project/gotchas.md	Mid-frame transients and perturbing probes (win-palette post-mortem)	IN-LIST
+VSP-141	docs/project/gotchas.md	14z-99 (2): three traps from the #105 fix arc	IN-LIST
+VSP-142	docs/project/gotchas.md	14z-99: two traps from the #104 re-measurement — both produced a	IN-LIST
+VSP-143	docs/project/gotchas.md	A cited address in a session log is a CLAIM, not a fact — re-verify	IN-LIST
+VSP-144	docs/project/gotchas.md	A pool measurement is a claim about ONE pool — decode the walker first (14z-85)	IN-LIST
+VSP-145	docs/project/gotchas.md	A0-at-write is post-increment — SECOND payment (14z-18 tail row)	IN-LIST
+VSP-146	docs/project/gotchas.md	A same-slot "vanilla control" controls nothing — vary the dimension	IN-LIST
+VSP-147	docs/project/gotchas.md	The -debug write-trace and non-debug dumps can DISAGREE about one write (14z-100; RESOLVED 14z-101 —	IN-LIST
+VSP-148	docs/project/gotchas.md	capstone m68k mnemonics carry a SIZE SUFFIX — equality tests match	IN-LIST
+VSP-149	docs/project/gotchas.md	Half the Lua instruments stage inputs one frame off replay.lua — a frame number from one is not a fr	IN-LIST
+VSP-150	HANDOFF.md	THE OUT-OF-RANGE INDEX TOOLKIT (14z-78) — three instruments, one class	IN-LIST
+VSP-151	HANDOFF.md	THE DF PALETTE-SEQ BLOCK CENSUS (14z-79b) — measured, and it had to be	IN-LIST
+VSP-152	HANDOFF.md	run it (guarded: exception breakpoints + register dump at fault)	IN-LIST
+VSP-153	docs/project/gotchas.md	A symptom grouping is a HYPOTHESIS — test it member by member, cheapest	IN-LIST
+VSP-154	docs/project/gotchas.md	Cross-build A/B is the cheapest attribution we have, and it is	IN-LIST
+VSP-155	HANDOFF.md	PRIOR ART FIRST — check the subsystem doc before re-deriving (14z-68m)	IN-LIST
+VSP-156	docs/project/gotchas.md	A REPLAY'S NAME IS A CLAIM ABOUT THE BUILD (paid: 2026-08-24, 14z-107)	IN-LIST
+VSP-157	docs/project/gotchas.md	Root-causing a stochastic hardware crash: make ANY repro deterministic	IN-LIST
+VSP-158	docs/project/gotchas.md	14z-111 — "16 + the same 16 repeated": an aliasing guard is a silent tenant trap; and a rig that win	IN-LIST
+VSP-159	docs/project/porting_sprite_lists.md	The four questions to ask of any ported effect	IN-LIST
+VSP-160	docs/project/porting_sprite_lists.md	Inventories are SPANS, not samples	IN-LIST
+VSP-161	docs/project/porting_sprite_lists.md	Order of work, and the checks at each step	IN-LIST

@@ -27,6 +27,14 @@
 > ## mash-escape step family (`0x27082`), the `x2b7ef4` effect-tail residue.
 > ## Load `vampire-saved-port` first.
 > ##
+> ## **RULED 14z-122 (maintainer): TWO FUTURE ITEMS.** (1) THE DOCUMENTATION
+> ## RATIONALIZATION PASS — in progress from 14z-122 (STATE 14z-122; plan:
+> ## enforcement tooling first, then one commit per document, chronology to
+> ## `<name>_history.md` twins, inferred claims RE-MEASURED). (2) ZABEL j.LK
+> ## PROXIMITY GUARD — a surgical patch for BOTH vanilla vsav and WIDE, its
+> ## own session, NOT started; the record and its constraints are in STATE
+> ## "Decisions pending". Start it with a recording ([VSP-20]), never a theory.
+> ##
 > ## **TRAPS PAID 14z-121 (`project/gotchas.md`):** a table bound that tests a
 > ## word AFTER appending it; "the only writer" names the tap's WINDOW; a
 > ## filter naming a BUILD's property (group C) is not a property of the game;

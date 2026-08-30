@@ -483,6 +483,25 @@ entries moved VERBATIM to `DECISIONS_HISTORY.md` — grep there by topic.
 Lifecycle: rulings are still marked DECIDED in place here first; they move to
 the archive once they stop shaping active work.)*
 
+- **ZABEL j.LK PROXIMITY GUARD — A LEGACY-CONTENT PATCH, ITS OWN SESSION
+  (maintainer, 2026-08-30, 14z-122). RULED as the SECOND of two future items;
+  not started.** The maintainer's report, in substance: Zabel's j.LK does not
+  trigger proximity guard properly — "afaik it does, but not all the time it
+  should, and definitely unlike any normal of any character". The ask: a
+  SURGICAL patch for BOTH vanilla vsav and the WIDE build that corrects this
+  and nothing else — no side effects. What that implies for the session that
+  takes it: (1) it is a deliberate change to LEGACY behaviour, so by
+  definition outside the superset invariant's "untouched" set — it needs its
+  own ratified expectation class and its own build flag (CLAUDE.md §1/§4; a
+  stock `vsav` patch is a NEW track, not the stock twin); (2) [VSP-20]
+  first — a hand-played MAME recording of the whiff BEFORE any theory;
+  (3) [VSP-14] — archaeology on "proximity guard" across STATE_HISTORY and
+  the engine docs before measuring; (4) measure vanilla's proximity-guard
+  test against every other normal (the maintainer's own comparison class)
+  so the fix is bounded by a measured difference, not an impression.
+  Recommendation: a data-side fix on Zabel's j.LK record (the guard-range or
+  a record flag) if the difference is in his data; a code-side change only if
+  the engine special-cases the move. Nothing decided beyond "its own session".
 - **DARK FORCE STOCK COST FOR THE TENANTS (14z-120, found by the naming rig). DECIDED (maintainer, 2026-08-30): option (a) — the character-specific DF at VS (vanilla) cost is ON PURPOSE; "vanilla stays untouched and guides how the game should be played"; adjustments, if any, will be per character, never to the general mechanic.** On native vs2 Donovan's Slay Shred spends TWO stocks (`+0x109` 9 -> 7 at activation; Huitzil measured the same 14z-69); on our vsav engine every Dark Force, tenants included, spends ONE (the two engines run different DF systems, [VSE-69]). So a tenant's DF is cheaper here than at home. Options: (a) keep vsav's 1 stock — every character in this cabinet pays the same, "vanilla wins ties" [VSP-21]; (b) charge the tenants VS2's 2 stocks (a per-character cost hook the vsav engine does not have — new code on the DF path). **Recommendation: (a).** Note also (maintainer, 14z-120): Phobos's and Pyron's physics rows were CHECKED — `port_param32 = true` in both manifests and every value field of the 32-row bank equals VS2 for all three tenants (the map, `docs/project/tables/chars/*.json`; only relocated pointers differ). What the bank does NOT cover — throw-arc rows, hit-freeze tuning, the generation-drift class [VSE-6] — is phase 2's measurement.
 - **DONOVAN'S PHYSICS ROWS (14z-118, found by the character-data map). DECIDED (maintainer, 2026-08-29): "use VS2 parameters and not the shell character's" — option (a); `port_param32 = true` set, probe + soak below, freeze at the next battery. **FROZEN 14z-119 as donovan-m18 / merged-m14 (M12); the stock twin moved with it, by design — STATE 14z-119.**
   `param32_a` (walk fwd/back), `param32_b` and `jump_params` (three jumps x

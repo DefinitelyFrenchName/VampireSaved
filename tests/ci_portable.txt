@@ -104,6 +104,13 @@ test_checkskills
 # and no rival value of the same shape sits beside the fact's label unless
 # allowed. tools/checkdocs.py; three must-fire controls. ROM-free, ~0.2 s.
 test_checkdocs
+# 14z-122 (the documentation rationalization pass): every skill anchor's FILE
+# and SECTION are frozen (tests/expected/doc_anchor_census.tsv) — checkskills
+# accepts an anchor moved between two files of one list SILENTLY (proved on
+# the real tree by control A); this makes every move a reviewed diff, and
+# forbids anchors in `*_history.md` twins. tools/doc_anchor_census.py; four
+# must-fire controls. ROM-free, ~1 s.
+test_doc_anchor_census
 
 # 14z-107 (11): the ROM-free half of the slice D4 discriminator. Locks the 68k
 # program-ROM read probe's contract — it is inert unless JTCPS2W_PRGPROBE is
