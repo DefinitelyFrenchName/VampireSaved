@@ -3937,7 +3937,7 @@ games (Donovan's ported extension rows cover 0x52 on ours anyway).
 
 **Every byte, and why:** two `[[region_fix]]` rows in huitzil.toml —
 hitbox_proj +0x17D and +0x19D (the dome's two records, class byte at
-record +0x1D): `52` → `06`. Nothing else; the shock rides pure
+record +0x1D *[CORRECTED 14z-120 (5): that is byte +0x17 of projectile records 5 and 6 — the records start at region+0xC6, not at the region start; the bytes patched were the right ones]*): `52` → `06`. Nothing else; the shock rides pure
 vanilla machinery (Victor's own path).
 
 **KNOWN, MAINTAINER-ACCEPTED DEVIATION:** Phobos receives the normal

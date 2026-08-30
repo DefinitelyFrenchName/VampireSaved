@@ -175130,6 +175130,6596 @@
     "runs_vs2": 28
    }
   },
+  "hitbox": {
+   "_encoding": "box = (x, y, hw, hh) signed words, centre at fighter (x + (flip_x ? -x : x), y + y), half-extents; node hb8 -> family entry {vuln0,vuln1,vuln2,push}; node hbA>>8 -> attack record (0x20: +0 box, +8 real, +9 white, +0x10 hit id, +0x17 class)",
+   "_summary": {
+    "attack_differ": 20,
+    "attack_records": 200,
+    "attack_unattributed": 0,
+    "proj_differ": 9,
+    "proj_records": 125,
+    "proj_unattributed": 0
+   },
+   "_verified_by": "tests/test_hitbox_encoding.sh (Donovan on native vs2, 14z-120 (5): 8/8 hits on the first overlap frame, class = record +0x17 on every path)",
+   "attack": [
+    {
+     "addr": "0xc986a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 0,
+      "real": 0,
+      "white": 0
+     },
+     "idx": 0,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc988a",
+     "fields": {
+      "b1c": 20,
+      "b1d": 0,
+      "box": [
+       -79,
+       82,
+       52,
+       7
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 5,
+      "white": 3
+     },
+     "idx": 1,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc98aa",
+     "fields": {
+      "b1c": 30,
+      "b1d": 0,
+      "box": [
+       -40,
+       72,
+       22,
+       6
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 11,
+      "white": 6
+     },
+     "idx": 2,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc98ca",
+     "fields": {
+      "b1c": 30,
+      "b1d": 0,
+      "box": [
+       -114,
+       72,
+       53,
+       6
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 10,
+      "white": 6
+     },
+     "idx": 3,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc98ea",
+     "fields": {
+      "b1c": 40,
+      "b1d": 0,
+      "box": [
+       -57,
+       125,
+       20,
+       17
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 14,
+      "white": 7
+     },
+     "idx": 4,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc990a",
+     "fields": {
+      "b1c": 40,
+      "b1d": 0,
+      "box": [
+       -81,
+       77,
+       44,
+       19
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 14,
+      "white": 7
+     },
+     "idx": 5,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc992a",
+     "fields": {
+      "b1c": 20,
+      "b1d": 0,
+      "box": [
+       -73,
+       14,
+       28,
+       8
+      ],
+      "cls": 2,
+      "hit_id": 1,
+      "real": 4,
+      "white": 4
+     },
+     "idx": 6,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc994a",
+     "fields": {
+      "b1c": 30,
+      "b1d": 0,
+      "box": [
+       -48,
+       17,
+       23,
+       12
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 10,
+      "white": 7
+     },
+     "idx": 7,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc996a",
+     "fields": {
+      "b1c": 40,
+      "b1d": 0,
+      "box": [
+       -71,
+       56,
+       46,
+       10
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 13,
+      "white": 8
+     },
+     "idx": 8,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc998a",
+     "fields": {
+      "b1c": 20,
+      "b1d": 0,
+      "box": [
+       -51,
+       50,
+       25,
+       10
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 5,
+      "white": 3
+     },
+     "idx": 9,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc99aa",
+     "fields": {
+      "b1c": 30,
+      "b1d": 0,
+      "box": [
+       -64,
+       50,
+       39,
+       10
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 10,
+      "white": 6
+     },
+     "idx": 10,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc99ca",
+     "fields": {
+      "b1c": 40,
+      "b1d": 0,
+      "box": [
+       -55,
+       41,
+       30,
+       8
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 13,
+      "white": 8
+     },
+     "idx": 11,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc99ea",
+     "fields": {
+      "b1c": 40,
+      "b1d": 0,
+      "box": [
+       -49,
+       86,
+       30,
+       11
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 13,
+      "white": 8
+     },
+     "idx": 12,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9a0a",
+     "fields": {
+      "b1c": 40,
+      "b1d": 0,
+      "box": [
+       -46,
+       120,
+       26,
+       9
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 13,
+      "white": 8
+     },
+     "idx": 13,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9a2a",
+     "fields": {
+      "b1c": 20,
+      "b1d": 0,
+      "box": [
+       -55,
+       6,
+       30,
+       7
+      ],
+      "cls": 2,
+      "hit_id": 1,
+      "real": 3,
+      "white": 4
+     },
+     "idx": 14,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9a4a",
+     "fields": {
+      "b1c": 30,
+      "b1d": 0,
+      "box": [
+       -60,
+       8,
+       34,
+       9
+      ],
+      "cls": 2,
+      "hit_id": 1,
+      "real": 8,
+      "white": 7
+     },
+     "idx": 15,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9a6a",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -51,
+       6,
+       24,
+       7
+      ],
+      "cls": 3,
+      "hit_id": 1,
+      "real": 9,
+      "white": 8
+     },
+     "idx": 16,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9a8a",
+     "fields": {
+      "b1c": 20,
+      "b1d": 0,
+      "box": [
+       -57,
+       54,
+       35,
+       6
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 5,
+      "white": 3
+     },
+     "idx": 17,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9aaa",
+     "fields": {
+      "b1c": 20,
+      "b1d": 0,
+      "box": [
+       -60,
+       44,
+       28,
+       11
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 5,
+      "white": 3
+     },
+     "idx": 18,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9aca",
+     "fields": {
+      "b1c": 20,
+      "b1d": 0,
+      "box": [
+       -55,
+       28,
+       25,
+       6
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 5,
+      "white": 3
+     },
+     "idx": 19,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9aea",
+     "fields": {
+      "b1c": 30,
+      "b1d": 0,
+      "box": [
+       -66,
+       67,
+       41,
+       11
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 11,
+      "white": 6
+     },
+     "idx": 20,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9b0a",
+     "fields": {
+      "b1c": 30,
+      "b1d": 0,
+      "box": [
+       -115,
+       77,
+       26,
+       7
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 11,
+      "white": 6
+     },
+     "idx": 21,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9b2a",
+     "fields": {
+      "b1c": 30,
+      "b1d": 0,
+      "box": [
+       -127,
+       95,
+       26,
+       7
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 11,
+      "white": 6
+     },
+     "idx": 22,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9b4a",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -79,
+       91,
+       48,
+       10
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 14,
+      "white": 7
+     },
+     "idx": 23,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9b6a",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -116,
+       103,
+       36,
+       10
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 14,
+      "white": 7
+     },
+     "idx": 24,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9b8a",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -116,
+       128,
+       36,
+       10
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 14,
+      "white": 7
+     },
+     "idx": 25,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9baa",
+     "fields": {
+      "b1c": 20,
+      "b1d": 0,
+      "box": [
+       -44,
+       64,
+       22,
+       13
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 4,
+      "white": 4
+     },
+     "idx": 26,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9bca",
+     "fields": {
+      "b1c": 30,
+      "b1d": 0,
+      "box": [
+       -44,
+       64,
+       22,
+       15
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 10,
+      "white": 7
+     },
+     "idx": 27,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9bea",
+     "fields": {
+      "b1c": 40,
+      "b1d": 0,
+      "box": [
+       -42,
+       20,
+       15,
+       13
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 13,
+      "white": 8
+     },
+     "idx": 28,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9c0a",
+     "fields": {
+      "b1c": 40,
+      "b1d": 0,
+      "box": [
+       -57,
+       34,
+       21,
+       12
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 13,
+      "white": 7
+     },
+     "idx": 29,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9c2a",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -67,
+       66,
+       22,
+       39
+      ],
+      "cls": 10,
+      "hit_id": 1,
+      "real": 10,
+      "white": 6
+     },
+     "idx": 30,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9c4a",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -89,
+       117,
+       35,
+       14
+      ],
+      "cls": 10,
+      "hit_id": 1,
+      "real": 10,
+      "white": 6
+     },
+     "idx": 31,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9c6a",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -103,
+       146,
+       38,
+       18
+      ],
+      "cls": 10,
+      "hit_id": 1,
+      "real": 10,
+      "white": 6
+     },
+     "idx": 32,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9c8a",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -67,
+       66,
+       22,
+       39
+      ],
+      "cls": 81,
+      "hit_id": 1,
+      "real": 4,
+      "white": 3
+     },
+     "idx": 33,
+     "ours_diff": [
+      "+0x17:0x51->0x44"
+     ],
+     "ours_source": "region_fix:RETIRED 14z-43 (was: 0x51->0x4E crash preempt) \u2014 superseded "
+    },
+    {
+     "addr": "0xc9caa",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -89,
+       117,
+       35,
+       14
+      ],
+      "cls": 81,
+      "hit_id": 2,
+      "real": 4,
+      "white": 4
+     },
+     "idx": 34,
+     "ours_diff": [
+      "+0x17:0x51->0x44"
+     ],
+     "ours_source": "region_fix:RETIRED 14z-43 (was: 0x51->0x4E crash preempt) \u2014 superseded "
+    },
+    {
+     "addr": "0xc9cca",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -103,
+       146,
+       38,
+       18
+      ],
+      "cls": 81,
+      "hit_id": 3,
+      "real": 4,
+      "white": 4
+     },
+     "idx": 35,
+     "ours_diff": [
+      "+0x17:0x51->0x44"
+     ],
+     "ours_source": "region_fix:RETIRED 14z-43 (was: 0x51->0x4E crash preempt) \u2014 superseded "
+    },
+    {
+     "addr": "0xc9cea",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -67,
+       66,
+       22,
+       39
+      ],
+      "cls": 81,
+      "hit_id": 4,
+      "real": 4,
+      "white": 3
+     },
+     "idx": 36,
+     "ours_diff": [
+      "+0x17:0x51->0x44"
+     ],
+     "ours_source": "region_fix:RETIRED 14z-43 (was: 0x51->0x4E crash preempt) \u2014 superseded "
+    },
+    {
+     "addr": "0xc9d0a",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -89,
+       117,
+       35,
+       14
+      ],
+      "cls": 81,
+      "hit_id": 5,
+      "real": 4,
+      "white": 4
+     },
+     "idx": 37,
+     "ours_diff": [
+      "+0x17:0x51->0x44"
+     ],
+     "ours_source": "region_fix:RETIRED 14z-43 (was: 0x51->0x4E crash preempt) \u2014 superseded "
+    },
+    {
+     "addr": "0xc9d2a",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -103,
+       146,
+       38,
+       18
+      ],
+      "cls": 81,
+      "hit_id": 6,
+      "real": 4,
+      "white": 4
+     },
+     "idx": 38,
+     "ours_diff": [
+      "+0x17:0x51->0x44"
+     ],
+     "ours_source": "region_fix:RETIRED 14z-43 (was: 0x51->0x4E crash preempt) \u2014 superseded "
+    },
+    {
+     "addr": "0xc9d4a",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -50,
+       69,
+       29,
+       18
+      ],
+      "cls": 78,
+      "hit_id": 1,
+      "real": 6,
+      "white": 4
+     },
+     "idx": 39,
+     "ours_diff": [
+      "+0x17:0x4e->0x06"
+     ],
+     "ours_source": "region_fix:sworded deity hit 1/7: type 0x4E -> 0x06 (vs2 dispatch alias"
+    },
+    {
+     "addr": "0xc9d6a",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -69,
+       69,
+       47,
+       18
+      ],
+      "cls": 78,
+      "hit_id": 2,
+      "real": 6,
+      "white": 4
+     },
+     "idx": 40,
+     "ours_diff": [
+      "+0x17:0x4e->0x06"
+     ],
+     "ours_source": "region_fix:sworded deity hit 2/7: type 0x4E -> 0x06 (vs2 dispatch alias"
+    },
+    {
+     "addr": "0xc9d8a",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -89,
+       69,
+       67,
+       18
+      ],
+      "cls": 78,
+      "hit_id": 3,
+      "real": 6,
+      "white": 4
+     },
+     "idx": 41,
+     "ours_diff": [
+      "+0x17:0x4e->0x06"
+     ],
+     "ours_source": "region_fix:sworded deity hit 3/7: type 0x4E -> 0x06 (vs2 dispatch alias"
+    },
+    {
+     "addr": "0xc9daa",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -93,
+       69,
+       72,
+       8
+      ],
+      "cls": 78,
+      "hit_id": 4,
+      "real": 1,
+      "white": 1
+     },
+     "idx": 42,
+     "ours_diff": [
+      "+0x17:0x4e->0x06"
+     ],
+     "ours_source": "region_fix:sworded deity hit 4/7: type 0x4E -> 0x06 (vs2 dispatch alias"
+    },
+    {
+     "addr": "0xc9dca",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -68,
+       94,
+       46,
+       15
+      ],
+      "cls": 78,
+      "hit_id": 5,
+      "real": 1,
+      "white": 1
+     },
+     "idx": 43,
+     "ours_diff": [
+      "+0x17:0x4e->0x06"
+     ],
+     "ours_source": "region_fix:sworded deity hit 5/7: type 0x4E -> 0x06 (vs2 dispatch alias"
+    },
+    {
+     "addr": "0xc9dea",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -83,
+       63,
+       61,
+       22
+      ],
+      "cls": 78,
+      "hit_id": 6,
+      "real": 1,
+      "white": 1
+     },
+     "idx": 44,
+     "ours_diff": [
+      "+0x17:0x4e->0x06"
+     ],
+     "ours_source": "region_fix:sworded deity hit 6/7: type 0x4E -> 0x06 (vs2 dispatch alias"
+    },
+    {
+     "addr": "0xc9e0a",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -91,
+       52,
+       70,
+       19
+      ],
+      "cls": 78,
+      "hit_id": 7,
+      "real": 1,
+      "white": 1
+     },
+     "idx": 45,
+     "ours_diff": [
+      "+0x17:0x4e->0x06"
+     ],
+     "ours_source": "region_fix:"
+    },
+    {
+     "addr": "0xc9e2a",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -50,
+       69,
+       29,
+       18
+      ],
+      "cls": 78,
+      "hit_id": 1,
+      "real": 6,
+      "white": 4
+     },
+     "idx": 46,
+     "ours_diff": [
+      "+0x17:0x4e->0x06"
+     ],
+     "ours_source": "region_fix:ES-variant deity record type 0x4E -> 0x06 (14z-44; vs2-alias"
+    },
+    {
+     "addr": "0xc9e4a",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -69,
+       69,
+       47,
+       18
+      ],
+      "cls": 78,
+      "hit_id": 2,
+      "real": 6,
+      "white": 4
+     },
+     "idx": 47,
+     "ours_diff": [
+      "+0x17:0x4e->0x06"
+     ],
+     "ours_source": "region_fix:ES-variant deity record type 0x4E -> 0x06 (14z-44; vs2-alias"
+    },
+    {
+     "addr": "0xc9e6a",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -89,
+       69,
+       67,
+       18
+      ],
+      "cls": 78,
+      "hit_id": 3,
+      "real": 6,
+      "white": 4
+     },
+     "idx": 48,
+     "ours_diff": [
+      "+0x17:0x4e->0x06"
+     ],
+     "ours_source": "region_fix:ES-variant deity record type 0x4E -> 0x06 (14z-44; vs2-alias"
+    },
+    {
+     "addr": "0xc9e8a",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -93,
+       69,
+       72,
+       8
+      ],
+      "cls": 78,
+      "hit_id": 4,
+      "real": 1,
+      "white": 1
+     },
+     "idx": 49,
+     "ours_diff": [
+      "+0x17:0x4e->0x06"
+     ],
+     "ours_source": "region_fix:ES-variant deity record type 0x4E -> 0x06 (14z-44; vs2-alias"
+    },
+    {
+     "addr": "0xc9eaa",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -68,
+       94,
+       46,
+       15
+      ],
+      "cls": 78,
+      "hit_id": 5,
+      "real": 1,
+      "white": 1
+     },
+     "idx": 50,
+     "ours_diff": [
+      "+0x17:0x4e->0x06"
+     ],
+     "ours_source": "region_fix:ES-variant deity record type 0x4E -> 0x06 (14z-44; vs2-alias"
+    },
+    {
+     "addr": "0xc9eca",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -83,
+       63,
+       61,
+       22
+      ],
+      "cls": 78,
+      "hit_id": 6,
+      "real": 1,
+      "white": 1
+     },
+     "idx": 51,
+     "ours_diff": [
+      "+0x17:0x4e->0x06"
+     ],
+     "ours_source": "region_fix:ES-variant deity record type 0x4E -> 0x06 (14z-44; vs2-alias"
+    },
+    {
+     "addr": "0xc9eea",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -91,
+       52,
+       70,
+       19
+      ],
+      "cls": 78,
+      "hit_id": 7,
+      "real": 1,
+      "white": 1
+     },
+     "idx": 52,
+     "ours_diff": [
+      "+0x17:0x4e->0x06"
+     ],
+     "ours_source": "region_fix:ES-variant deity record type 0x4E -> 0x06 (14z-44; vs2-alias"
+    },
+    {
+     "addr": "0xc9f0a",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -30,
+       64,
+       8,
+       23
+      ],
+      "cls": 8,
+      "hit_id": 1,
+      "real": 29,
+      "white": 9
+     },
+     "idx": 53,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9f2a",
+     "fields": {
+      "b1c": 30,
+      "b1d": 0,
+      "box": [
+       -45,
+       24,
+       16,
+       7
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 8,
+      "white": 4
+     },
+     "idx": 54,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9f4a",
+     "fields": {
+      "b1c": 30,
+      "b1d": 0,
+      "box": [
+       -34,
+       12,
+       11,
+       8
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 8,
+      "white": 4
+     },
+     "idx": 55,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9f6a",
+     "fields": {
+      "b1c": 30,
+      "b1d": 0,
+      "box": [
+       -53,
+       8,
+       15,
+       11
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 7,
+      "white": 4
+     },
+     "idx": 56,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9f8a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -22,
+       39,
+       6,
+       40
+      ],
+      "cls": 17,
+      "hit_id": 0,
+      "real": 0,
+      "white": 0
+     },
+     "idx": 57,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9faa",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 0,
+      "real": 5,
+      "white": 5
+     },
+     "idx": 58,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9fca",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -24,
+       39,
+       8,
+       40
+      ],
+      "cls": 5,
+      "hit_id": 0,
+      "real": 2,
+      "white": 2
+     },
+     "idx": 59,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xc9fea",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -104,
+       64,
+       0,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 0,
+      "real": 134,
+      "white": 130
+     },
+     "idx": 60,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca00a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -88,
+       60,
+       0,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 0,
+      "real": 134,
+      "white": 130
+     },
+     "idx": 61,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca02a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -144,
+       68,
+       0,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 0,
+      "real": 134,
+      "white": 130
+     },
+     "idx": 62,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca04a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -32,
+       13,
+       25,
+       22
+      ],
+      "cls": 15,
+      "hit_id": 1,
+      "real": 0,
+      "white": 5
+     },
+     "idx": 63,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca06a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -32,
+       13,
+       25,
+       22
+      ],
+      "cls": 15,
+      "hit_id": 1,
+      "real": 0,
+      "white": 6
+     },
+     "idx": 64,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca08a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -5,
+       18,
+       23,
+       31
+      ],
+      "cls": 15,
+      "hit_id": 2,
+      "real": 1,
+      "white": 7
+     },
+     "idx": 65,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca0aa",
+     "fields": {
+      "b1c": 20,
+      "b1d": 0,
+      "box": [
+       -49,
+       84,
+       27,
+       8
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 4,
+      "white": 2
+     },
+     "idx": 66,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca0ca",
+     "fields": {
+      "b1c": 30,
+      "b1d": 0,
+      "box": [
+       -90,
+       81,
+       52,
+       11
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 11,
+      "white": 6
+     },
+     "idx": 67,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca0ea",
+     "fields": {
+      "b1c": 40,
+      "b1d": 0,
+      "box": [
+       -85,
+       79,
+       55,
+       7
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 13,
+      "white": 6
+     },
+     "idx": 68,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca10a",
+     "fields": {
+      "b1c": 20,
+      "b1d": 0,
+      "box": [
+       -73,
+       14,
+       28,
+       8
+      ],
+      "cls": 2,
+      "hit_id": 1,
+      "real": 4,
+      "white": 4
+     },
+     "idx": 69,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca12a",
+     "fields": {
+      "b1c": 30,
+      "b1d": 0,
+      "box": [
+       -48,
+       16,
+       23,
+       12
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 10,
+      "white": 7
+     },
+     "idx": 70,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca14a",
+     "fields": {
+      "b1c": 40,
+      "b1d": 0,
+      "box": [
+       -71,
+       56,
+       46,
+       10
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 11,
+      "white": 8
+     },
+     "idx": 71,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca16a",
+     "fields": {
+      "b1c": 30,
+      "b1d": 0,
+      "box": [
+       -44,
+       54,
+       33,
+       9
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 9,
+      "white": 5
+     },
+     "idx": 72,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca18a",
+     "fields": {
+      "b1c": 40,
+      "b1d": 0,
+      "box": [
+       -57,
+       58,
+       32,
+       25
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 12,
+      "white": 7
+     },
+     "idx": 73,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca1aa",
+     "fields": {
+      "b1c": 40,
+      "b1d": 0,
+      "box": [
+       -36,
+       104,
+       17,
+       26
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 12,
+      "white": 7
+     },
+     "idx": 74,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca1ca",
+     "fields": {
+      "b1c": 10,
+      "b1d": 104,
+      "box": [
+       64,
+       264,
+       464,
+       664
+      ],
+      "cls": 96,
+      "hit_id": 6,
+      "real": 3,
+      "white": 96
+     },
+     "idx": 75,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca1ea",
+     "fields": {
+      "b1c": 10,
+      "b1d": 104,
+      "box": [
+       3064,
+       3264,
+       464,
+       3464
+      ],
+      "cls": 96,
+      "hit_id": 6,
+      "real": 3,
+      "white": 96
+     },
+     "idx": 76,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca20a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 1,
+      "box": [
+       0,
+       0,
+       256,
+       0
+      ],
+      "cls": 7,
+      "hit_id": 255,
+      "real": 255,
+      "white": 200
+     },
+     "idx": 77,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca22a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -56,
+       0,
+       1,
+       1
+      ],
+      "cls": 7,
+      "hit_id": 255,
+      "real": 255,
+      "white": 192
+     },
+     "idx": 78,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca24a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -77,
+       72,
+       257,
+       18
+      ],
+      "cls": 20,
+      "hit_id": 255,
+      "real": 255,
+      "white": 168
+     },
+     "idx": 79,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca26a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -88,
+       0,
+       257,
+       22
+      ],
+      "cls": 7,
+      "hit_id": 255,
+      "real": 255,
+      "white": 196
+     },
+     "idx": 80,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca28a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -80,
+       18,
+       257,
+       9
+      ],
+      "cls": 1,
+      "hit_id": 255,
+      "real": 255,
+      "white": 158
+     },
+     "idx": 81,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca2aa",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -88,
+       20,
+       257,
+       11
+      ],
+      "cls": 11,
+      "hit_id": 255,
+      "real": 255,
+      "white": 168
+     },
+     "idx": 82,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca2ca",
+     "fields": {
+      "b1c": 0,
+      "b1d": 1,
+      "box": [
+       -88,
+       20,
+       257,
+       11
+      ],
+      "cls": 8,
+      "hit_id": 255,
+      "real": 0,
+      "white": 0
+     },
+     "idx": 83,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca2ea",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       -64,
+       0,
+       1,
+       0
+      ],
+      "cls": 1,
+      "hit_id": 255,
+      "real": 255,
+      "white": 192
+     },
+     "idx": 84,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca30a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       -77,
+       147,
+       259,
+       21
+      ],
+      "cls": 38,
+      "hit_id": 255,
+      "real": 255,
+      "white": 179
+     },
+     "idx": 85,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca32a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -91,
+       42,
+       256,
+       21
+      ],
+      "cls": 1,
+      "hit_id": 255,
+      "real": 255,
+      "white": 184
+     },
+     "idx": 86,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca34a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -96,
+       18,
+       257,
+       8
+      ],
+      "cls": 2,
+      "hit_id": 255,
+      "real": 255,
+      "white": 158
+     },
+     "idx": 87,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca36a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -98,
+       12,
+       257,
+       1
+      ],
+      "cls": 12,
+      "hit_id": 255,
+      "real": 255,
+      "white": 124
+     },
+     "idx": 88,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca38a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 1,
+      "box": [
+       -128,
+       12,
+       257,
+       9
+      ],
+      "cls": 0,
+      "hit_id": 0,
+      "real": 255,
+      "white": 128
+     },
+     "idx": 89,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca3aa",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       -64,
+       0,
+       1,
+       7
+      ],
+      "cls": 0,
+      "hit_id": 255,
+      "real": 255,
+      "white": 192
+     },
+     "idx": 90,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca3ca",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       -81,
+       20,
+       256,
+       8
+      ],
+      "cls": 19,
+      "hit_id": 255,
+      "real": 255,
+      "white": 182
+     },
+     "idx": 91,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca3ea",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -100,
+       81,
+       257,
+       20
+      ],
+      "cls": 21,
+      "hit_id": 255,
+      "real": 255,
+      "white": 164
+     },
+     "idx": 92,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca40a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -86,
+       21,
+       257,
+       7
+      ],
+      "cls": 9,
+      "hit_id": 255,
+      "real": 255,
+      "white": 174
+     },
+     "idx": 93,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca42a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -98,
+       22,
+       257,
+       1
+      ],
+      "cls": 11,
+      "hit_id": 255,
+      "real": 255,
+      "white": 162
+     },
+     "idx": 94,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca44a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       -120,
+       19,
+       257,
+       11
+      ],
+      "cls": 8,
+      "hit_id": 255,
+      "real": 255,
+      "white": 140
+     },
+     "idx": 95,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca46a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 1,
+      "box": [
+       -64,
+       0,
+       1,
+       3
+      ],
+      "cls": 1,
+      "hit_id": 255,
+      "real": 255,
+      "white": 192
+     },
+     "idx": 96,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca48a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 3,
+      "box": [
+       -71,
+       12,
+       256,
+       0
+      ],
+      "cls": 12,
+      "hit_id": 255,
+      "real": 255,
+      "white": 162
+     },
+     "idx": 97,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca4aa",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -76,
+       111,
+       256,
+       14
+      ],
+      "cls": 25,
+      "hit_id": 255,
+      "real": 255,
+      "white": 133
+     },
+     "idx": 98,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca4ca",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -78,
+       7,
+       257,
+       0
+      ],
+      "cls": 3,
+      "hit_id": 255,
+      "real": 255,
+      "white": 190
+     },
+     "idx": 99,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca4ea",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -102,
+       29,
+       257,
+       7
+      ],
+      "cls": 0,
+      "hit_id": 255,
+      "real": 255,
+      "white": 149
+     },
+     "idx": 100,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca50a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -109,
+       7,
+       257,
+       5
+      ],
+      "cls": 4,
+      "hit_id": 255,
+      "real": 255,
+      "white": 142
+     },
+     "idx": 101,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca52a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 1,
+      "box": [
+       0,
+       0,
+       256,
+       0
+      ],
+      "cls": 11,
+      "hit_id": 255,
+      "real": 255,
+      "white": 192
+     },
+     "idx": 102,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca54a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       -64,
+       0,
+       1,
+       0
+      ],
+      "cls": 7,
+      "hit_id": 255,
+      "real": 255,
+      "white": 190
+     },
+     "idx": 103,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca56a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 3,
+      "box": [
+       -72,
+       160,
+       259,
+       19
+      ],
+      "cls": 6,
+      "hit_id": 255,
+      "real": 255,
+      "white": 174
+     },
+     "idx": 104,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca58a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -104,
+       4,
+       256,
+       21
+      ],
+      "cls": 16,
+      "hit_id": 255,
+      "real": 255,
+      "white": 183
+     },
+     "idx": 105,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca5aa",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -108,
+       25,
+       257,
+       6
+      ],
+      "cls": 1,
+      "hit_id": 255,
+      "real": 255,
+      "white": 148
+     },
+     "idx": 106,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca5ca",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -117,
+       13,
+       257,
+       7
+      ],
+      "cls": 7,
+      "hit_id": 255,
+      "real": 255,
+      "white": 128
+     },
+     "idx": 107,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca5ea",
+     "fields": {
+      "b1c": 0,
+      "b1d": 1,
+      "box": [
+       -154,
+       23,
+       257,
+       6
+      ],
+      "cls": 6,
+      "hit_id": 255,
+      "real": 0,
+      "white": 0
+     },
+     "idx": 108,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca60a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       -47,
+       0,
+       1,
+       38
+      ],
+      "cls": 37,
+      "hit_id": 255,
+      "real": 255,
+      "white": 209
+     },
+     "idx": 109,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca62a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 3,
+      "box": [
+       -68,
+       140,
+       259,
+       19
+      ],
+      "cls": 25,
+      "hit_id": 255,
+      "real": 255,
+      "white": 181
+     },
+     "idx": 110,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca64a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -95,
+       31,
+       256,
+       19
+      ],
+      "cls": 37,
+      "hit_id": 255,
+      "real": 255,
+      "white": 181
+     },
+     "idx": 111,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca66a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -101,
+       23,
+       257,
+       7
+      ],
+      "cls": 0,
+      "hit_id": 255,
+      "real": 255,
+      "white": 151
+     },
+     "idx": 112,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca68a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -97,
+       22,
+       257,
+       1
+      ],
+      "cls": 8,
+      "hit_id": 255,
+      "real": 255,
+      "white": 130
+     },
+     "idx": 113,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca6aa",
+     "fields": {
+      "b1c": 0,
+      "b1d": 1,
+      "box": [
+       -142,
+       16,
+       257,
+       6
+      ],
+      "cls": 0,
+      "hit_id": 0,
+      "real": 255,
+      "white": 104
+     },
+     "idx": 114,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca6ca",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       -64,
+       0,
+       1,
+       6
+      ],
+      "cls": 0,
+      "hit_id": 255,
+      "real": 255,
+      "white": 192
+     },
+     "idx": 115,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca6ea",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       -78,
+       11,
+       256,
+       7
+      ],
+      "cls": 29,
+      "hit_id": 255,
+      "real": 255,
+      "white": 201
+     },
+     "idx": 116,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca70a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -111,
+       140,
+       259,
+       3
+      ],
+      "cls": 20,
+      "hit_id": 255,
+      "real": 255,
+      "white": 138
+     },
+     "idx": 117,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca72a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -99,
+       11,
+       257,
+       6
+      ],
+      "cls": 8,
+      "hit_id": 255,
+      "real": 255,
+      "white": 167
+     },
+     "idx": 118,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca74a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -91,
+       6,
+       257,
+       1
+      ],
+      "cls": 10,
+      "hit_id": 255,
+      "real": 255,
+      "white": 170
+     },
+     "idx": 119,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca76a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       -123,
+       11,
+       257,
+       10
+      ],
+      "cls": 8,
+      "hit_id": 255,
+      "real": 255,
+      "white": 128
+     },
+     "idx": 120,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca78a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 1,
+      "box": [
+       -64,
+       0,
+       1,
+       7
+      ],
+      "cls": 1,
+      "hit_id": 255,
+      "real": 255,
+      "white": 192
+     },
+     "idx": 121,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca7aa",
+     "fields": {
+      "b1c": 1,
+      "b1d": 3,
+      "box": [
+       -68,
+       15,
+       256,
+       1
+      ],
+      "cls": 20,
+      "hit_id": 255,
+      "real": 255,
+      "white": 185
+     },
+     "idx": 122,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca7ca",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       -69,
+       177,
+       259,
+       17
+      ],
+      "cls": 20,
+      "hit_id": 255,
+      "real": 255,
+      "white": 144
+     },
+     "idx": 123,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca7ea",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -71,
+       16,
+       257,
+       0
+      ],
+      "cls": 8,
+      "hit_id": 255,
+      "real": 255,
+      "white": 162
+     },
+     "idx": 124,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca80a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -101,
+       14,
+       257,
+       5
+      ],
+      "cls": 0,
+      "hit_id": 255,
+      "real": 255,
+      "white": 160
+     },
+     "idx": 125,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca82a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -131,
+       25,
+       257,
+       9
+      ],
+      "cls": 8,
+      "hit_id": 255,
+      "real": 255,
+      "white": 127
+     },
+     "idx": 126,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca84a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 1,
+      "box": [
+       0,
+       0,
+       256,
+       0
+      ],
+      "cls": 6,
+      "hit_id": 255,
+      "real": 255,
+      "white": 192
+     },
+     "idx": 127,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca86a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -64,
+       0,
+       1,
+       0
+      ],
+      "cls": 8,
+      "hit_id": 255,
+      "real": 255,
+      "white": 184
+     },
+     "idx": 128,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca88a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       -61,
+       175,
+       259,
+       18
+      ],
+      "cls": 15,
+      "hit_id": 255,
+      "real": 255,
+      "white": 173
+     },
+     "idx": 129,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca8aa",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -98,
+       0,
+       256,
+       20
+      ],
+      "cls": 6,
+      "hit_id": 255,
+      "real": 255,
+      "white": 190
+     },
+     "idx": 130,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca8ca",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -104,
+       19,
+       257,
+       7
+      ],
+      "cls": 2,
+      "hit_id": 255,
+      "real": 255,
+      "white": 165
+     },
+     "idx": 131,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca8ea",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -125,
+       17,
+       257,
+       10
+      ],
+      "cls": 10,
+      "hit_id": 255,
+      "real": 255,
+      "white": 121
+     },
+     "idx": 132,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca90a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 1,
+      "box": [
+       -151,
+       21,
+       257,
+       7
+      ],
+      "cls": 7,
+      "hit_id": 255,
+      "real": 0,
+      "white": 0
+     },
+     "idx": 133,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca92a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       -64,
+       0,
+       1,
+       1
+      ],
+      "cls": 1,
+      "hit_id": 255,
+      "real": 255,
+      "white": 192
+     },
+     "idx": 134,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca94a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -52,
+       48,
+       257,
+       16
+      ],
+      "cls": 18,
+      "hit_id": 255,
+      "real": 255,
+      "white": 194
+     },
+     "idx": 135,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca96a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -112,
+       35,
+       257,
+       20
+      ],
+      "cls": 0,
+      "hit_id": 255,
+      "real": 255,
+      "white": 156
+     },
+     "idx": 136,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca98a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -100,
+       25,
+       257,
+       7
+      ],
+      "cls": 5,
+      "hit_id": 255,
+      "real": 255,
+      "white": 150
+     },
+     "idx": 137,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca9aa",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -77,
+       15,
+       257,
+       1
+      ],
+      "cls": 9,
+      "hit_id": 255,
+      "real": 255,
+      "white": 128
+     },
+     "idx": 138,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca9ca",
+     "fields": {
+      "b1c": 0,
+      "b1d": 1,
+      "box": [
+       -141,
+       28,
+       257,
+       7
+      ],
+      "cls": 0,
+      "hit_id": 0,
+      "real": 255,
+      "white": 106
+     },
+     "idx": 139,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xca9ea",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       -64,
+       0,
+       1,
+       28
+      ],
+      "cls": 0,
+      "hit_id": 255,
+      "real": 255,
+      "white": 192
+     },
+     "idx": 140,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcaa0a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 3,
+      "box": [
+       -69,
+       22,
+       256,
+       8
+      ],
+      "cls": 16,
+      "hit_id": 255,
+      "real": 255,
+      "white": 204
+     },
+     "idx": 141,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcaa2a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -131,
+       67,
+       256,
+       17
+      ],
+      "cls": 25,
+      "hit_id": 255,
+      "real": 255,
+      "white": 150
+     },
+     "idx": 142,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcaa4a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       -95,
+       19,
+       257,
+       28
+      ],
+      "cls": 9,
+      "hit_id": 255,
+      "real": 255,
+      "white": 162
+     },
+     "idx": 143,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcaa6a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -85,
+       18,
+       257,
+       1
+      ],
+      "cls": 8,
+      "hit_id": 255,
+      "real": 255,
+      "white": 174
+     },
+     "idx": 144,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcaa8a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       -142,
+       19,
+       257,
+       10
+      ],
+      "cls": 8,
+      "hit_id": 255,
+      "real": 255,
+      "white": 110
+     },
+     "idx": 145,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcaaaa",
+     "fields": {
+      "b1c": 0,
+      "b1d": 1,
+      "box": [
+       -60,
+       0,
+       1,
+       8
+      ],
+      "cls": 0,
+      "hit_id": 255,
+      "real": 255,
+      "white": 196
+     },
+     "idx": 146,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcaaca",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -72,
+       12,
+       256,
+       1
+      ],
+      "cls": 15,
+      "hit_id": 255,
+      "real": 255,
+      "white": 176
+     },
+     "idx": 147,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcaaea",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -96,
+       80,
+       257,
+       17
+      ],
+      "cls": 19,
+      "hit_id": 255,
+      "real": 255,
+      "white": 148
+     },
+     "idx": 148,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcab0a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -60,
+       12,
+       257,
+       0
+      ],
+      "cls": 7,
+      "hit_id": 255,
+      "real": 255,
+      "white": 164
+     },
+     "idx": 149,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcab2a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -98,
+       16,
+       257,
+       2
+      ],
+      "cls": 0,
+      "hit_id": 255,
+      "real": 255,
+      "white": 158
+     },
+     "idx": 150,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcab4a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -116,
+       4,
+       257,
+       9
+      ],
+      "cls": 9,
+      "hit_id": 255,
+      "real": 255,
+      "white": 136
+     },
+     "idx": 151,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcab6a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 1,
+      "box": [
+       0,
+       0,
+       256,
+       0
+      ],
+      "cls": 7,
+      "hit_id": 255,
+      "real": 255,
+      "white": 192
+     },
+     "idx": 152,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcab8a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 3,
+      "box": [
+       -64,
+       0,
+       1,
+       1
+      ],
+      "cls": 6,
+      "hit_id": 255,
+      "real": 255,
+      "white": 200
+     },
+     "idx": 153,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcabaa",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       -51,
+       177,
+       259,
+       18
+      ],
+      "cls": 15,
+      "hit_id": 255,
+      "real": 255,
+      "white": 177
+     },
+     "idx": 154,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcabca",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -80,
+       0,
+       256,
+       20
+      ],
+      "cls": 2,
+      "hit_id": 255,
+      "real": 255,
+      "white": 174
+     },
+     "idx": 155,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcabea",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -105,
+       32,
+       257,
+       6
+      ],
+      "cls": 2,
+      "hit_id": 255,
+      "real": 255,
+      "white": 139
+     },
+     "idx": 156,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcac0a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -128,
+       21,
+       257,
+       8
+      ],
+      "cls": 8,
+      "hit_id": 255,
+      "real": 255,
+      "white": 126
+     },
+     "idx": 157,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcac2a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 1,
+      "box": [
+       -149,
+       34,
+       257,
+       7
+      ],
+      "cls": 6,
+      "hit_id": 255,
+      "real": 0,
+      "white": 0
+     },
+     "idx": 158,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcac4a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       -55,
+       0,
+       1,
+       4
+      ],
+      "cls": 1,
+      "hit_id": 255,
+      "real": 255,
+      "white": 209
+     },
+     "idx": 159,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcac6a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 3,
+      "box": [
+       -68,
+       140,
+       259,
+       19
+      ],
+      "cls": 25,
+      "hit_id": 255,
+      "real": 255,
+      "white": 181
+     },
+     "idx": 160,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcac8a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -95,
+       31,
+       256,
+       19
+      ],
+      "cls": 0,
+      "hit_id": 255,
+      "real": 255,
+      "white": 181
+     },
+     "idx": 161,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcacaa",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -101,
+       23,
+       257,
+       7
+      ],
+      "cls": 0,
+      "hit_id": 255,
+      "real": 255,
+      "white": 151
+     },
+     "idx": 162,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcacca",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -97,
+       22,
+       257,
+       1
+      ],
+      "cls": 8,
+      "hit_id": 255,
+      "real": 255,
+      "white": 130
+     },
+     "idx": 163,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcacea",
+     "fields": {
+      "b1c": 0,
+      "b1d": 1,
+      "box": [
+       -142,
+       16,
+       257,
+       6
+      ],
+      "cls": 0,
+      "hit_id": 0,
+      "real": 255,
+      "white": 104
+     },
+     "idx": 164,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcad0a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       -60,
+       0,
+       1,
+       6
+      ],
+      "cls": 1,
+      "hit_id": 255,
+      "real": 255,
+      "white": 196
+     },
+     "idx": 165,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcad2a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -86,
+       16,
+       256,
+       8
+      ],
+      "cls": 18,
+      "hit_id": 255,
+      "real": 255,
+      "white": 180
+     },
+     "idx": 166,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcad4a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -94,
+       72,
+       257,
+       20
+      ],
+      "cls": 22,
+      "hit_id": 255,
+      "real": 255,
+      "white": 165
+     },
+     "idx": 167,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcad6a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -92,
+       14,
+       257,
+       7
+      ],
+      "cls": 9,
+      "hit_id": 255,
+      "real": 255,
+      "white": 160
+     },
+     "idx": 168,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcad8a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -98,
+       14,
+       257,
+       0
+      ],
+      "cls": 9,
+      "hit_id": 255,
+      "real": 255,
+      "white": 158
+     },
+     "idx": 169,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcadaa",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       -104,
+       4,
+       257,
+       11
+      ],
+      "cls": 11,
+      "hit_id": 255,
+      "real": 255,
+      "white": 152
+     },
+     "idx": 170,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcadca",
+     "fields": {
+      "b1c": 0,
+      "b1d": 1,
+      "box": [
+       -64,
+       0,
+       1,
+       25
+      ],
+      "cls": 13,
+      "hit_id": 255,
+      "real": 255,
+      "white": 192
+     },
+     "idx": 171,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcadea",
+     "fields": {
+      "b1c": 1,
+      "b1d": 3,
+      "box": [
+       -61,
+       -8,
+       256,
+       0
+      ],
+      "cls": 4,
+      "hit_id": 255,
+      "real": 255,
+      "white": 179
+     },
+     "idx": 172,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcae0a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       -95,
+       213,
+       259,
+       2
+      ],
+      "cls": 4,
+      "hit_id": 255,
+      "real": 255,
+      "white": 128
+     },
+     "idx": 173,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcae2a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -66,
+       6,
+       257,
+       11
+      ],
+      "cls": 27,
+      "hit_id": 255,
+      "real": 255,
+      "white": 167
+     },
+     "idx": 174,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcae4a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -95,
+       15,
+       257,
+       22
+      ],
+      "cls": 16,
+      "hit_id": 255,
+      "real": 255,
+      "white": 165
+     },
+     "idx": 175,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcae6a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -116,
+       10,
+       257,
+       29
+      ],
+      "cls": 27,
+      "hit_id": 255,
+      "real": 255,
+      "white": 138
+     },
+     "idx": 176,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcae8a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 1,
+      "box": [
+       0,
+       0,
+       256,
+       0
+      ],
+      "cls": 6,
+      "hit_id": 255,
+      "real": 255,
+      "white": 192
+     },
+     "idx": 177,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcaeaa",
+     "fields": {
+      "b1c": 1,
+      "b1d": 3,
+      "box": [
+       -45,
+       0,
+       1,
+       0
+      ],
+      "cls": 8,
+      "hit_id": 255,
+      "real": 255,
+      "white": 161
+     },
+     "idx": 178,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcaeca",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       -65,
+       197,
+       259,
+       19
+      ],
+      "cls": 17,
+      "hit_id": 255,
+      "real": 255,
+      "white": 157
+     },
+     "idx": 179,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcaeea",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -94,
+       0,
+       256,
+       22
+      ],
+      "cls": 6,
+      "hit_id": 255,
+      "real": 255,
+      "white": 210
+     },
+     "idx": 180,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcaf0a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -90,
+       23,
+       257,
+       7
+      ],
+      "cls": 2,
+      "hit_id": 255,
+      "real": 255,
+      "white": 161
+     },
+     "idx": 181,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcaf2a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -107,
+       2,
+       257,
+       8
+      ],
+      "cls": 10,
+      "hit_id": 255,
+      "real": 255,
+      "white": 137
+     },
+     "idx": 182,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcaf4a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 1,
+      "box": [
+       -155,
+       19,
+       257,
+       7
+      ],
+      "cls": 8,
+      "hit_id": 255,
+      "real": 0,
+      "white": 0
+     },
+     "idx": 183,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcaf6a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       -56,
+       0,
+       1,
+       1
+      ],
+      "cls": 0,
+      "hit_id": 255,
+      "real": 255,
+      "white": 200
+     },
+     "idx": 184,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcaf8a",
+     "fields": {
+      "b1c": 1,
+      "b1d": 3,
+      "box": [
+       -61,
+       166,
+       259,
+       20
+      ],
+      "cls": 18,
+      "hit_id": 255,
+      "real": 255,
+      "white": 217
+     },
+     "idx": 185,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcafaa",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -108,
+       42,
+       256,
+       21
+      ],
+      "cls": 0,
+      "hit_id": 255,
+      "real": 255,
+      "white": 161
+     },
+     "idx": 186,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcafca",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -76,
+       8,
+       257,
+       9
+      ],
+      "cls": 18,
+      "hit_id": 255,
+      "real": 255,
+      "white": 170
+     },
+     "idx": 187,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcafea",
+     "fields": {
+      "b1c": 1,
+      "b1d": 1,
+      "box": [
+       -60,
+       9,
+       257,
+       0
+      ],
+      "cls": 10,
+      "hit_id": 255,
+      "real": 255,
+      "white": 153
+     },
+     "idx": 188,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcb00a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -139,
+       17,
+       257,
+       8
+      ],
+      "cls": 0,
+      "hit_id": 0,
+      "real": 255,
+      "white": 101
+     },
+     "idx": 189,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcb02a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       273,
+       273,
+       0,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 7,
+      "real": 1,
+      "white": 18
+     },
+     "idx": 190,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcb04a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       1794,
+       1794,
+       0,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 7,
+      "real": 7,
+      "white": 3
+     },
+     "idx": 191,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcb06a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       1798,
+       1798,
+       0,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 7,
+      "real": 7,
+      "white": 7
+     },
+     "idx": 192,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcb08a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       1802,
+       1802,
+       0,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 7,
+      "real": 7,
+      "white": 11
+     },
+     "idx": 193,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcb0aa",
+     "fields": {
+      "b1c": 3,
+      "b1d": 32,
+      "box": [
+       1806,
+       1806,
+       0,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 3,
+      "real": 7,
+      "white": 15
+     },
+     "idx": 194,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcb0ca",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       281,
+       281,
+       0,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 7,
+      "real": 7,
+      "white": 16
+     },
+     "idx": 195,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcb0ea",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       1811,
+       1811,
+       0,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 7,
+      "real": 7,
+      "white": 20
+     },
+     "idx": 196,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcb10a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       1815,
+       1815,
+       0,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 7,
+      "real": 7,
+      "white": 24
+     },
+     "idx": 197,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcb12a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       1819,
+       1819,
+       0,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 7,
+      "real": 7,
+      "white": 28
+     },
+     "idx": 198,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xcb14a",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       1823,
+       1823,
+       0,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 7,
+      "real": 7,
+      "white": 80
+     },
+     "idx": 199,
+     "ours_diff": [],
+     "ours_source": "byte"
+    }
+   ],
+   "base": "0xc8df8",
+   "box_counts": {
+    "push": 32,
+    "vuln0": 112,
+    "vuln1": 119,
+    "vuln2": 70
+   },
+   "family_entries": 144,
+   "family_table": "0xc8bb8",
+   "proj": [
+    {
+     "addr": "0xd0d02",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 0,
+      "real": 0,
+      "white": 0
+     },
+     "idx": 0,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd0d22",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       0,
+       0,
+       12,
+       9
+      ],
+      "cls": 20,
+      "hit_id": 1,
+      "real": 9,
+      "white": 5
+     },
+     "idx": 1,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd0d42",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       0,
+       0,
+       12,
+       9
+      ],
+      "cls": 79,
+      "hit_id": 1,
+      "real": 4,
+      "white": 3
+     },
+     "idx": 2,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd0d62",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       0,
+       0,
+       12,
+       9
+      ],
+      "cls": 79,
+      "hit_id": 1,
+      "real": 4,
+      "white": 3
+     },
+     "idx": 3,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd0d82",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       0,
+       0,
+       12,
+       9
+      ],
+      "cls": 20,
+      "hit_id": 1,
+      "real": 4,
+      "white": 3
+     },
+     "idx": 4,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd0da2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -3,
+       -173,
+       44,
+       6
+      ],
+      "cls": 0,
+      "hit_id": 0,
+      "real": 0,
+      "white": 0
+     },
+     "idx": 5,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd0dc2",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -1,
+       -48,
+       38,
+       54
+      ],
+      "cls": 80,
+      "hit_id": 1,
+      "real": 15,
+      "white": 8
+     },
+     "idx": 6,
+     "ours_diff": [
+      "+0x17:0x50->0x0f"
+     ],
+     "ours_source": "region_fix:extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry"
+    },
+    {
+     "addr": "0xd0de2",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -3,
+       -104,
+       44,
+       30
+      ],
+      "cls": 80,
+      "hit_id": 2,
+      "real": 15,
+      "white": 8
+     },
+     "idx": 7,
+     "ours_diff": [
+      "+0x17:0x50->0x0f"
+     ],
+     "ours_source": "region_fix:extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry"
+    },
+    {
+     "addr": "0xd0e02",
+     "fields": {
+      "b1c": 20,
+      "b1d": 0,
+      "box": [
+       0,
+       0,
+       23,
+       7
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 4,
+      "white": 2
+     },
+     "idx": 8,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd0e22",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       0,
+       0,
+       23,
+       7
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 4,
+      "white": 2
+     },
+     "idx": 9,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd0e42",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       0,
+       0,
+       23,
+       7
+      ],
+      "cls": 22,
+      "hit_id": 1,
+      "real": 4,
+      "white": 2
+     },
+     "idx": 10,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd0e62",
+     "fields": {
+      "b1c": 20,
+      "b1d": 0,
+      "box": [
+       0,
+       0,
+       28,
+       19
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 4,
+      "white": 2
+     },
+     "idx": 11,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd0e82",
+     "fields": {
+      "b1c": 20,
+      "b1d": 0,
+      "box": [
+       0,
+       0,
+       28,
+       19
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 4,
+      "white": 2
+     },
+     "idx": 12,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd0ea2",
+     "fields": {
+      "b1c": 20,
+      "b1d": 0,
+      "box": [
+       0,
+       0,
+       28,
+       19
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 4,
+      "white": 2
+     },
+     "idx": 13,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd0ec2",
+     "fields": {
+      "b1c": 20,
+      "b1d": 0,
+      "box": [
+       0,
+       0,
+       28,
+       19
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 4,
+      "white": 2
+     },
+     "idx": 14,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd0ee2",
+     "fields": {
+      "b1c": 20,
+      "b1d": 0,
+      "box": [
+       0,
+       0,
+       28,
+       19
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 4,
+      "white": 2
+     },
+     "idx": 15,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd0f02",
+     "fields": {
+      "b1c": 20,
+      "b1d": 0,
+      "box": [
+       0,
+       0,
+       28,
+       19
+      ],
+      "cls": 0,
+      "hit_id": 1,
+      "real": 4,
+      "white": 2
+     },
+     "idx": 16,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd0f22",
+     "fields": {
+      "b1c": 20,
+      "b1d": 0,
+      "box": [
+       1,
+       106,
+       32,
+       123
+      ],
+      "cls": 82,
+      "hit_id": 1,
+      "real": 5,
+      "white": 1
+     },
+     "idx": 17,
+     "ours_diff": [
+      "+0x17:0x52->0x06"
+     ],
+     "ours_source": "region_fix:column KO record type 0x52 -> 0x06 (vs2 dispatch alias; vsav"
+    },
+    {
+     "addr": "0xd0f42",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       1,
+       106,
+       34,
+       123
+      ],
+      "cls": 82,
+      "hit_id": 1,
+      "real": 5,
+      "white": 1
+     },
+     "idx": 18,
+     "ours_diff": [
+      "+0x17:0x52->0x06"
+     ],
+     "ours_source": "region_fix:column sibling hit record, same type-0x52 alias remap (would"
+    },
+    {
+     "addr": "0xd0f62",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       1,
+       106,
+       32,
+       123
+      ],
+      "cls": 82,
+      "hit_id": 1,
+      "real": 5,
+      "white": 1
+     },
+     "idx": 19,
+     "ours_diff": [
+      "+0x17:0x52->0x06"
+     ],
+     "ours_source": "region_fix:column sibling hit record, same type-0x52 alias remap (would"
+    },
+    {
+     "addr": "0xd0f82",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -1,
+       -48,
+       38,
+       54
+      ],
+      "cls": 80,
+      "hit_id": 1,
+      "real": 10,
+      "white": 6
+     },
+     "idx": 20,
+     "ours_diff": [
+      "+0x17:0x50->0x0f"
+     ],
+     "ours_source": "region_fix:extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry"
+    },
+    {
+     "addr": "0xd0fa2",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -3,
+       -104,
+       44,
+       30
+      ],
+      "cls": 80,
+      "hit_id": 2,
+      "real": 10,
+      "white": 6
+     },
+     "idx": 21,
+     "ours_diff": [
+      "+0x17:0x50->0x0f"
+     ],
+     "ours_source": "region_fix:extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry"
+    },
+    {
+     "addr": "0xd0fc2",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -1,
+       -48,
+       38,
+       54
+      ],
+      "cls": 80,
+      "hit_id": 3,
+      "real": 10,
+      "white": 6
+     },
+     "idx": 22,
+     "ours_diff": [
+      "+0x17:0x50->0x0f"
+     ],
+     "ours_source": "region_fix:extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry"
+    },
+    {
+     "addr": "0xd0fe2",
+     "fields": {
+      "b1c": 70,
+      "b1d": 0,
+      "box": [
+       -3,
+       -104,
+       44,
+       30
+      ],
+      "cls": 80,
+      "hit_id": 4,
+      "real": 10,
+      "white": 6
+     },
+     "idx": 23,
+     "ours_diff": [
+      "+0x17:0x50->0x0f"
+     ],
+     "ours_source": "region_fix:extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry"
+    },
+    {
+     "addr": "0xd1002",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       0,
+       0,
+       256,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 4,
+      "real": 2,
+      "white": 0
+     },
+     "idx": 24,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1022",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       904,
+       904,
+       1280,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 252,
+      "real": 3,
+      "white": 136
+     },
+     "idx": 25,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1042",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       814,
+       814,
+       1152,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 252,
+      "real": 3,
+      "white": 46
+     },
+     "idx": 26,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1062",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       723,
+       723,
+       1024,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 253,
+      "real": 2,
+      "white": 211
+     },
+     "idx": 27,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1082",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       633,
+       633,
+       896,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 253,
+      "real": 2,
+      "white": 121
+     },
+     "idx": 28,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd10a2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       542,
+       542,
+       768,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 253,
+      "real": 2,
+      "white": 30
+     },
+     "idx": 29,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd10c2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       452,
+       452,
+       640,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 254,
+      "real": 1,
+      "white": 196
+     },
+     "idx": 30,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd10e2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       361,
+       361,
+       512,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 254,
+      "real": 1,
+      "white": 105
+     },
+     "idx": 31,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1102",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       271,
+       271,
+       384,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 254,
+      "real": 1,
+      "white": 15
+     },
+     "idx": 32,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1122",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       180,
+       180,
+       256,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 255,
+      "real": 0,
+      "white": 180
+     },
+     "idx": 33,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1142",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       135,
+       135,
+       192,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 255,
+      "real": 0,
+      "white": 135
+     },
+     "idx": 34,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1162",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       90,
+       90,
+       128,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 255,
+      "real": 0,
+      "white": 90
+     },
+     "idx": 35,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1182",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       782,
+       1890,
+       1447,
+       1447
+      ],
+      "cls": 89,
+      "hit_id": 7,
+      "real": 7,
+      "white": 98
+     },
+     "idx": 36,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd11a2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -782,
+       -1890,
+       -1447,
+       -1447
+      ],
+      "cls": 167,
+      "hit_id": 248,
+      "real": 248,
+      "white": 158
+     },
+     "idx": 37,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd11c2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 0,
+      "real": 0,
+      "white": 0
+     },
+     "idx": 38,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd11e2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 0,
+      "real": 0,
+      "white": 0
+     },
+     "idx": 39,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1202",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 0,
+      "real": 0,
+      "white": 0
+     },
+     "idx": 40,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1222",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "cls": 0,
+      "hit_id": 0,
+      "real": 0,
+      "white": 0
+     },
+     "idx": 41,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1242",
+     "fields": {
+      "b1c": 0,
+      "b1d": 8,
+      "box": [
+       1,
+       7,
+       3,
+       7
+      ],
+      "cls": 3,
+      "hit_id": 0,
+      "real": 0,
+      "white": 4
+     },
+     "idx": 42,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1262",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       7,
+       -1,
+       7,
+       -3
+      ],
+      "cls": 249,
+      "hit_id": 0,
+      "real": 0,
+      "white": 6
+     },
+     "idx": 43,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1282",
+     "fields": {
+      "b1c": 255,
+      "b1d": 248,
+      "box": [
+       -1,
+       -7,
+       -3,
+       -7
+      ],
+      "cls": 253,
+      "hit_id": 255,
+      "real": 255,
+      "white": 252
+     },
+     "idx": 44,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd12a2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -7,
+       1,
+       -7,
+       3
+      ],
+      "cls": 7,
+      "hit_id": 255,
+      "real": 255,
+      "white": 250
+     },
+     "idx": 45,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd12c2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 16,
+      "box": [
+       3,
+       15,
+       6,
+       14
+      ],
+      "cls": 6,
+      "hit_id": 0,
+      "real": 0,
+      "white": 8
+     },
+     "idx": 46,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd12e2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       15,
+       -3,
+       14,
+       -6
+      ],
+      "cls": 242,
+      "hit_id": 0,
+      "real": 0,
+      "white": 13
+     },
+     "idx": 47,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1302",
+     "fields": {
+      "b1c": 255,
+      "b1d": 240,
+      "box": [
+       -3,
+       -15,
+       -6,
+       -14
+      ],
+      "cls": 250,
+      "hit_id": 255,
+      "real": 255,
+      "white": 248
+     },
+     "idx": 48,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1322",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -15,
+       3,
+       -14,
+       6
+      ],
+      "cls": 14,
+      "hit_id": 255,
+      "real": 255,
+      "white": 243
+     },
+     "idx": 49,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1342",
+     "fields": {
+      "b1c": 0,
+      "b1d": 24,
+      "box": [
+       4,
+       23,
+       9,
+       22
+      ],
+      "cls": 9,
+      "hit_id": 0,
+      "real": 0,
+      "white": 13
+     },
+     "idx": 50,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1362",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       23,
+       -4,
+       22,
+       -9
+      ],
+      "cls": 234,
+      "hit_id": 0,
+      "real": 0,
+      "white": 19
+     },
+     "idx": 51,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1382",
+     "fields": {
+      "b1c": 255,
+      "b1d": 232,
+      "box": [
+       -4,
+       -23,
+       -9,
+       -22
+      ],
+      "cls": 247,
+      "hit_id": 255,
+      "real": 255,
+      "white": 243
+     },
+     "idx": 52,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd13a2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -23,
+       4,
+       -22,
+       9
+      ],
+      "cls": 22,
+      "hit_id": 255,
+      "real": 255,
+      "white": 237
+     },
+     "idx": 53,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd13c2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 128,
+      "box": [
+       24,
+       125,
+       48,
+       118
+      ],
+      "cls": 48,
+      "hit_id": 0,
+      "real": 0,
+      "white": 71
+     },
+     "idx": 54,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd13e2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       125,
+       -24,
+       118,
+       -48
+      ],
+      "cls": 138,
+      "hit_id": 0,
+      "real": 0,
+      "white": 106
+     },
+     "idx": 55,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1402",
+     "fields": {
+      "b1c": 255,
+      "b1d": 128,
+      "box": [
+       -24,
+       -125,
+       -48,
+       -118
+      ],
+      "cls": 208,
+      "hit_id": 255,
+      "real": 255,
+      "white": 185
+     },
+     "idx": 56,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1422",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -125,
+       24,
+       -118,
+       48
+      ],
+      "cls": 118,
+      "hit_id": 255,
+      "real": 255,
+      "white": 150
+     },
+     "idx": 57,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1442",
+     "fields": {
+      "b1c": 1,
+      "b1d": 0,
+      "box": [
+       49,
+       250,
+       97,
+       236
+      ],
+      "cls": 97,
+      "hit_id": 0,
+      "real": 0,
+      "white": 142
+     },
+     "idx": 58,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1462",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       250,
+       -49,
+       236,
+       -97
+      ],
+      "cls": 20,
+      "hit_id": 0,
+      "real": 0,
+      "white": 212
+     },
+     "idx": 59,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1482",
+     "fields": {
+      "b1c": 255,
+      "b1d": 0,
+      "box": [
+       -49,
+       -250,
+       -97,
+       -236
+      ],
+      "cls": 159,
+      "hit_id": 255,
+      "real": 255,
+      "white": 114
+     },
+     "idx": 60,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd14a2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -250,
+       49,
+       -236,
+       97
+      ],
+      "cls": 236,
+      "hit_id": 255,
+      "real": 255,
+      "white": 44
+     },
+     "idx": 61,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd14c2",
+     "fields": {
+      "b1c": 2,
+      "b1d": 0,
+      "box": [
+       99,
+       501,
+       195,
+       472
+      ],
+      "cls": 195,
+      "hit_id": 1,
+      "real": 1,
+      "white": 28
+     },
+     "idx": 62,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd14e2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       501,
+       -99,
+       472,
+       -195
+      ],
+      "cls": 40,
+      "hit_id": 1,
+      "real": 1,
+      "white": 169
+     },
+     "idx": 63,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1502",
+     "fields": {
+      "b1c": 254,
+      "b1d": 0,
+      "box": [
+       -99,
+       -501,
+       -195,
+       -472
+      ],
+      "cls": 61,
+      "hit_id": 254,
+      "real": 254,
+      "white": 228
+     },
+     "idx": 64,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1522",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -501,
+       99,
+       -472,
+       195
+      ],
+      "cls": 216,
+      "hit_id": 254,
+      "real": 254,
+      "white": 87
+     },
+     "idx": 65,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1542",
+     "fields": {
+      "b1c": 3,
+      "b1d": 0,
+      "box": [
+       149,
+       752,
+       293,
+       708
+      ],
+      "cls": 37,
+      "hit_id": 2,
+      "real": 1,
+      "white": 170
+     },
+     "idx": 66,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1562",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       752,
+       -149,
+       708,
+       -293
+      ],
+      "cls": 60,
+      "hit_id": 1,
+      "real": 2,
+      "white": 126
+     },
+     "idx": 67,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1582",
+     "fields": {
+      "b1c": 253,
+      "b1d": 0,
+      "box": [
+       -149,
+       -752,
+       -293,
+       -708
+      ],
+      "cls": 219,
+      "hit_id": 253,
+      "real": 254,
+      "white": 86
+     },
+     "idx": 68,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd15a2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -752,
+       149,
+       -708,
+       293
+      ],
+      "cls": 196,
+      "hit_id": 254,
+      "real": 253,
+      "white": 130
+     },
+     "idx": 69,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd15c2",
+     "fields": {
+      "b1c": 4,
+      "b1d": 0,
+      "box": [
+       199,
+       1003,
+       391,
+       945
+      ],
+      "cls": 135,
+      "hit_id": 3,
+      "real": 2,
+      "white": 56
+     },
+     "idx": 70,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd15e2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       1003,
+       -199,
+       945,
+       -391
+      ],
+      "cls": 79,
+      "hit_id": 2,
+      "real": 3,
+      "white": 82
+     },
+     "idx": 71,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1602",
+     "fields": {
+      "b1c": 252,
+      "b1d": 0,
+      "box": [
+       -199,
+       -1003,
+       -391,
+       -945
+      ],
+      "cls": 121,
+      "hit_id": 252,
+      "real": 253,
+      "white": 200
+     },
+     "idx": 72,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1622",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -1003,
+       199,
+       -945,
+       391
+      ],
+      "cls": 177,
+      "hit_id": 253,
+      "real": 252,
+      "white": 174
+     },
+     "idx": 73,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1642",
+     "fields": {
+      "b1c": 5,
+      "b1d": 0,
+      "box": [
+       249,
+       1254,
+       488,
+       1181
+      ],
+      "cls": 232,
+      "hit_id": 4,
+      "real": 2,
+      "white": 198
+     },
+     "idx": 74,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1662",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       1254,
+       -249,
+       1181,
+       -488
+      ],
+      "cls": 99,
+      "hit_id": 2,
+      "real": 4,
+      "white": 39
+     },
+     "idx": 75,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1682",
+     "fields": {
+      "b1c": 251,
+      "b1d": 0,
+      "box": [
+       -249,
+       -1254,
+       -488,
+       -1181
+      ],
+      "cls": 24,
+      "hit_id": 251,
+      "real": 253,
+      "white": 58
+     },
+     "idx": 76,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd16a2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -1254,
+       249,
+       -1181,
+       488
+      ],
+      "cls": 157,
+      "hit_id": 253,
+      "real": 251,
+      "white": 217
+     },
+     "idx": 77,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd16c2",
+     "fields": {
+      "b1c": 6,
+      "b1d": 0,
+      "box": [
+       299,
+       1505,
+       586,
+       1417
+      ],
+      "cls": 74,
+      "hit_id": 4,
+      "real": 3,
+      "white": 84
+     },
+     "idx": 78,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd16e2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       1505,
+       -299,
+       1417,
+       -586
+      ],
+      "cls": 119,
+      "hit_id": 3,
+      "real": 4,
+      "white": 252
+     },
+     "idx": 79,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1702",
+     "fields": {
+      "b1c": 250,
+      "b1d": 0,
+      "box": [
+       -299,
+       -1505,
+       -586,
+       -1417
+      ],
+      "cls": 182,
+      "hit_id": 251,
+      "real": 252,
+      "white": 172
+     },
+     "idx": 80,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1722",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -1505,
+       299,
+       -1417,
+       586
+      ],
+      "cls": 137,
+      "hit_id": 252,
+      "real": 251,
+      "white": 4
+     },
+     "idx": 81,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1742",
+     "fields": {
+      "b1c": 7,
+      "b1d": 0,
+      "box": [
+       349,
+       1756,
+       684,
+       1653
+      ],
+      "cls": 172,
+      "hit_id": 5,
+      "real": 3,
+      "white": 226
+     },
+     "idx": 82,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1762",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       1756,
+       -349,
+       1653,
+       -684
+      ],
+      "cls": 139,
+      "hit_id": 3,
+      "real": 5,
+      "white": 208
+     },
+     "idx": 83,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1782",
+     "fields": {
+      "b1c": 249,
+      "b1d": 0,
+      "box": [
+       -349,
+       -1756,
+       -684,
+       -1653
+      ],
+      "cls": 84,
+      "hit_id": 250,
+      "real": 252,
+      "white": 30
+     },
+     "idx": 84,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd17a2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -1756,
+       349,
+       -1653,
+       684
+      ],
+      "cls": 117,
+      "hit_id": 252,
+      "real": 250,
+      "white": 48
+     },
+     "idx": 85,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd17c2",
+     "fields": {
+      "b1c": 8,
+      "b1d": 0,
+      "box": [
+       399,
+       2007,
+       782,
+       1890
+      ],
+      "cls": 14,
+      "hit_id": 6,
+      "real": 4,
+      "white": 112
+     },
+     "idx": 86,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd17e2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       2007,
+       -399,
+       1890,
+       -782
+      ],
+      "cls": 158,
+      "hit_id": 4,
+      "real": 6,
+      "white": 165
+     },
+     "idx": 87,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1802",
+     "fields": {
+      "b1c": 248,
+      "b1d": 0,
+      "box": [
+       -399,
+       -2007,
+       -782,
+       -1890
+      ],
+      "cls": 242,
+      "hit_id": 249,
+      "real": 251,
+      "white": 144
+     },
+     "idx": 88,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1822",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -2007,
+       399,
+       -1890,
+       782
+      ],
+      "cls": 98,
+      "hit_id": 251,
+      "real": 249,
+      "white": 91
+     },
+     "idx": 89,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1842",
+     "fields": {
+      "b1c": 9,
+      "b1d": 0,
+      "box": [
+       448,
+       2257,
+       879,
+       2126
+      ],
+      "cls": 111,
+      "hit_id": 7,
+      "real": 4,
+      "white": 254
+     },
+     "idx": 90,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1862",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       2257,
+       -448,
+       2126,
+       -879
+      ],
+      "cls": 178,
+      "hit_id": 4,
+      "real": 7,
+      "white": 122
+     },
+     "idx": 91,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1882",
+     "fields": {
+      "b1c": 247,
+      "b1d": 0,
+      "box": [
+       -448,
+       -2257,
+       -879,
+       -2126
+      ],
+      "cls": 145,
+      "hit_id": 248,
+      "real": 251,
+      "white": 2
+     },
+     "idx": 92,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd18a2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -2257,
+       448,
+       -2126,
+       879
+      ],
+      "cls": 78,
+      "hit_id": 251,
+      "real": 248,
+      "white": 134
+     },
+     "idx": 93,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd18c2",
+     "fields": {
+      "b1c": 10,
+      "b1d": 0,
+      "box": [
+       498,
+       2508,
+       977,
+       2362
+      ],
+      "cls": 209,
+      "hit_id": 8,
+      "real": 5,
+      "white": 140
+     },
+     "idx": 94,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd18e2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       2508,
+       -498,
+       2362,
+       -977
+      ],
+      "cls": 198,
+      "hit_id": 5,
+      "real": 8,
+      "white": 78
+     },
+     "idx": 95,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1902",
+     "fields": {
+      "b1c": 246,
+      "b1d": 0,
+      "box": [
+       -498,
+       -2508,
+       -977,
+       -2362
+      ],
+      "cls": 47,
+      "hit_id": 247,
+      "real": 250,
+      "white": 116
+     },
+     "idx": 96,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1922",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -2508,
+       498,
+       -2362,
+       977
+      ],
+      "cls": 58,
+      "hit_id": 250,
+      "real": 247,
+      "white": 178
+     },
+     "idx": 97,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1942",
+     "fields": {
+      "b1c": 14,
+      "b1d": 0,
+      "box": [
+       698,
+       3512,
+       1368,
+       3307
+      ],
+      "cls": 88,
+      "hit_id": 11,
+      "real": 7,
+      "white": 196
+     },
+     "idx": 98,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1962",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       3512,
+       -698,
+       3307,
+       -1368
+      ],
+      "cls": 21,
+      "hit_id": 7,
+      "real": 11,
+      "white": 161
+     },
+     "idx": 99,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1982",
+     "fields": {
+      "b1c": 242,
+      "b1d": 0,
+      "box": [
+       -698,
+       -3512,
+       -1368,
+       -3307
+      ],
+      "cls": 168,
+      "hit_id": 244,
+      "real": 248,
+      "white": 60
+     },
+     "idx": 100,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd19a2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -3512,
+       698,
+       -3307,
+       1368
+      ],
+      "cls": 235,
+      "hit_id": 248,
+      "real": 244,
+      "white": 95
+     },
+     "idx": 101,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd19c2",
+     "fields": {
+      "b1c": 2,
+      "b1d": 30,
+      "box": [
+       75,
+       764,
+       149,
+       752
+      ],
+      "cls": 126,
+      "hit_id": 1,
+      "real": 0,
+      "white": 222
+     },
+     "idx": 102,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd19e2",
+     "fields": {
+      "b1c": 3,
+      "b1d": 0,
+      "box": [
+       593,
+       486,
+       638,
+       426
+      ],
+      "cls": 149,
+      "hit_id": 2,
+      "real": 2,
+      "white": 164
+     },
+     "idx": 103,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1a02",
+     "fields": {
+      "b1c": 2,
+      "b1d": 30,
+      "box": [
+       764,
+       -75,
+       752,
+       -149
+      ],
+      "cls": 86,
+      "hit_id": 2,
+      "real": 2,
+      "white": 222
+     },
+     "idx": 104,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1a22",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       486,
+       -593,
+       426,
+       -638
+      ],
+      "cls": 16,
+      "hit_id": 0,
+      "real": 1,
+      "white": 105
+     },
+     "idx": 105,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1a42",
+     "fields": {
+      "b1c": 253,
+      "b1d": 226,
+      "box": [
+       -75,
+       -764,
+       -149,
+       -752
+      ],
+      "cls": 130,
+      "hit_id": 254,
+      "real": 255,
+      "white": 34
+     },
+     "idx": 106,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1a62",
+     "fields": {
+      "b1c": 253,
+      "b1d": 0,
+      "box": [
+       -593,
+       -486,
+       -638,
+       -426
+      ],
+      "cls": 107,
+      "hit_id": 253,
+      "real": 253,
+      "white": 92
+     },
+     "idx": 107,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1a82",
+     "fields": {
+      "b1c": 253,
+      "b1d": 226,
+      "box": [
+       -764,
+       75,
+       -752,
+       149
+      ],
+      "cls": 170,
+      "hit_id": 253,
+      "real": 253,
+      "white": 34
+     },
+     "idx": 108,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1aa2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -486,
+       593,
+       -426,
+       638
+      ],
+      "cls": 240,
+      "hit_id": 255,
+      "real": 254,
+      "white": 151
+     },
+     "idx": 109,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1ac2",
+     "fields": {
+      "b1c": 2,
+      "b1d": 211,
+      "box": [
+       100,
+       1018,
+       199,
+       1003
+      ],
+      "cls": 82,
+      "hit_id": 1,
+      "real": 1,
+      "white": 40
+     },
+     "idx": 110,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1ae2",
+     "fields": {
+      "b1c": 4,
+      "b1d": 0,
+      "box": [
+       791,
+       649,
+       850,
+       568
+      ],
+      "cls": 199,
+      "hit_id": 3,
+      "real": 3,
+      "white": 134
+     },
+     "idx": 111,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1b02",
+     "fields": {
+      "b1c": 2,
+      "b1d": 211,
+      "box": [
+       1018,
+       -100,
+       1003,
+       -199
+      ],
+      "cls": 200,
+      "hit_id": 3,
+      "real": 3,
+      "white": 210
+     },
+     "idx": 112,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1b22",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       649,
+       -791,
+       568,
+       -850
+      ],
+      "cls": 21,
+      "hit_id": 1,
+      "real": 1,
+      "white": 226
+     },
+     "idx": 113,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1b42",
+     "fields": {
+      "b1c": 253,
+      "b1d": 45,
+      "box": [
+       -100,
+       -1018,
+       -199,
+       -1003
+      ],
+      "cls": 174,
+      "hit_id": 254,
+      "real": 254,
+      "white": 216
+     },
+     "idx": 114,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1b62",
+     "fields": {
+      "b1c": 252,
+      "b1d": 0,
+      "box": [
+       -791,
+       -649,
+       -850,
+       -568
+      ],
+      "cls": 57,
+      "hit_id": 252,
+      "real": 252,
+      "white": 122
+     },
+     "idx": 115,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1b82",
+     "fields": {
+      "b1c": 253,
+      "b1d": 45,
+      "box": [
+       -1018,
+       100,
+       -1003,
+       199
+      ],
+      "cls": 56,
+      "hit_id": 252,
+      "real": 252,
+      "white": 46
+     },
+     "idx": 116,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1ba2",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       -649,
+       791,
+       -568,
+       850
+      ],
+      "cls": 235,
+      "hit_id": 254,
+      "real": 254,
+      "white": 30
+     },
+     "idx": 117,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1bc2",
+     "fields": {
+      "b1c": 3,
+      "b1d": 136,
+      "box": [
+       125,
+       1273,
+       249,
+       1254
+      ],
+      "cls": 39,
+      "hit_id": 2,
+      "real": 1,
+      "white": 114
+     },
+     "idx": 118,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1be2",
+     "fields": {
+      "b1c": 5,
+      "b1d": 0,
+      "box": [
+       989,
+       811,
+       1063,
+       710
+      ],
+      "cls": 249,
+      "hit_id": 4,
+      "real": 4,
+      "white": 103
+     },
+     "idx": 119,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1c02",
+     "fields": {
+      "b1c": 3,
+      "b1d": 136,
+      "box": [
+       1273,
+       -125,
+       1254,
+       -249
+      ],
+      "cls": 58,
+      "hit_id": 4,
+      "real": 4,
+      "white": 199
+     },
+     "idx": 120,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1c22",
+     "fields": {
+      "b1c": 0,
+      "b1d": 0,
+      "box": [
+       811,
+       -989,
+       710,
+       -1063
+      ],
+      "cls": 26,
+      "hit_id": 1,
+      "real": 2,
+      "white": 90
+     },
+     "idx": 121,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1c42",
+     "fields": {
+      "b1c": 252,
+      "b1d": 120,
+      "box": [
+       -125,
+       -1273,
+       -249,
+       -1254
+      ],
+      "cls": 217,
+      "hit_id": 253,
+      "real": 254,
+      "white": 142
+     },
+     "idx": 122,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1c62",
+     "fields": {
+      "b1c": 251,
+      "b1d": 0,
+      "box": [
+       -989,
+       -811,
+       -1063,
+       -710
+      ],
+      "cls": 7,
+      "hit_id": 251,
+      "real": 251,
+      "white": 153
+     },
+     "idx": 123,
+     "ours_diff": [],
+     "ours_source": "byte"
+    },
+    {
+     "addr": "0xd1c82",
+     "fields": {
+      "b1c": 252,
+      "b1d": 120,
+      "box": [
+       -1273,
+       125,
+       -1254,
+       249
+      ],
+      "cls": 198,
+      "hit_id": 251,
+      "real": 251,
+      "white": 57
+     },
+     "idx": 124,
+     "ours_diff": [],
+     "ours_source": "byte"
+    }
+   ],
+   "tables": {
+    "attack": "0xc986a",
+    "push": "0xc976a",
+    "vuln0": "0xc8e02",
+    "vuln1": "0xc9182",
+    "vuln2": "0xc953a"
+   }
+  },
   "regions": {
    "anim": {
     "diff": {
@@ -176494,14 +183084,9 @@
  "tenant": "donovan",
  "undecoded": [
   {
-   "evidence": "[C] only (ram.md); phase 2 measurement",
+   "evidence": "tests/test_hitbox_encoding.sh (8/8 hits on the first overlap frame; class = +0x17 on the fighter, projectile, multi-hit and column paths); tools/hitbox_records.py",
    "structure": "hitbox",
-   "what": "hurt/hit rectangle x/y/w/h encoding"
-  },
-  {
-   "evidence": "engine_internals 2392-2463; phase 2 write tap settles the class offset",
-   "structure": "hitbox",
-   "what": "attack record fields (real/white power +0x08/+0x09, hit id +0x10, class byte +0x17 vs +0x1D \u2014 the docs disagree)"
+   "what": "DONE 14z-120 (5): box = (x, y, hw, hh) signed words, authored for the LEFT-facing sprite and mirrored when flip_x=1; +0x8C = attack (base[4]), +0x90 = push (base[3]); family hb8 -> {vuln,vuln,vuln,push}; record +8 real / +9 white / +0x10 hit id / +0x17 CLASS (the '+0x1D' was the same byte counted from the wrong base). Still open: record +0x1C (0x14/0x1E/0x28 normals, 0x46 specials) and +0x11..+0x16"
   },
   {
    "evidence": "the chains are decoded and live-verified (test_anim_node_walk, 14z-118); names come from the maintainer's move lists -> build/manifest/moves_<tenant>.toml, seq ids from tools/name_moves.py on the native game",
@@ -176509,9 +183094,9 @@
    "what": "MOVE NAMES for the chains (which seq is which move) \u2014 DONE for Donovan 14z-120 (build/manifest/moves_donovan.toml, measured by tests/test_move_naming.sh; labelled in donovan_anim.md); Huitzil and Pyron await their naming rigs"
   },
   {
-   "evidence": "node durations are decoded; the attack/hurt semantics of hb8/hbA wait for phase 2",
+   "evidence": "tests/test_hitbox_encoding.sh",
    "structure": "anim",
-   "what": "startup / active / recovery as data \u2014 which hitbox-family word (+8 / +0xA) marks an ATTACK node"
+   "what": "DONE 14z-120 (5): hbA != 0 marks an ATTACK node (hbA>>8 = the attack record); startup / active / recovery per chain are derived in <tenant>_anim.md"
   },
   {
    "evidence": "test_anim_node_walk observation; the selecting code is unread",

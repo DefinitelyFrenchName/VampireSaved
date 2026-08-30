@@ -306,6 +306,29 @@ DONOVAN = {
         ("Change Immortal + 8 held", seq_buttons(["MP", "LP", "L", "LK", "MK"]) + [(20, 200, "U")], 400),
         ("Change Immortal + 2 held", seq_buttons(["MP", "LP", "L", "LK", "MK"]) + [(20, 200, "D")], 400),
     ],
+    "9": [  # PHASE 2 hit rig (no pokes: the -debug write tap cannot poke): walk to contact, then normals that CONNECT; a projectile at range
+        ("walk-in", walk_in(60), 90),
+        ("5LP hit", stand("LP"), 150), ("5MP hit", stand("MP"), 150), ("5HP hit", stand("HP"), 200),
+        ("2MK hit", crouch("MK"), 150), ("2HK hit", crouch("HK"), 300),
+        ("walk-in", walk_in(60), 90),
+        ("j.HP hit", jump("HP"), 200),
+        ("Walk back", [(0, 90, "L")], 120),
+        ("Blizzard Sword [LP] hit", hcf("LP"), 300),
+        ("walk-in", walk_in(80), 100),
+        ("5MP whiff-to-hit ladder 0", stand("MP"), 120), ("step", walk_in(4), 40), ("5MP ladder 1", stand("MP"), 120),
+        ("step", walk_in(4), 40), ("5MP ladder 2", stand("MP"), 120), ("step", walk_in(4), 40), ("5MP ladder 3", stand("MP"), 120),
+        ("step", walk_in(4), 40), ("5MP ladder 4", stand("MP"), 120), ("step", walk_in(4), 40), ("5MP ladder 5", stand("MP"), 120),
+    ],
+    "10": [  # PHASE 2 projectile / multi-hit rig (no pokes): the object-hit applier's path
+        ("Blizzard Sword [LP] at range", hcf("LP"), 300), ("Blizzard Sword [MP] at range", hcf("MP"), 300), ("Blizzard Sword [HP] at range", hcf("HP"), 300),
+        ("walk-in", walk_in(60), 90),
+        ("Lightning Sword [LP] hit", rdp("LP"), 300),
+        ("walk-in", walk_in(30), 60),
+        ("Ifrit Sword [LP] hit", dp("LP"), 300),
+        ("walk-in", walk_in(30), 60),
+        ("Killshread [LK] plant on P2", qcb("LK"), 300),
+        ("Killshread Lightning [LP] column", qcb("LP"), 300),
+    ],
 }
 NORMALS = [(n, f, g) for n, f, g in (
     ("5LP", stand("LP"), 120), ("5MP", stand("MP"), 120), ("5HP", stand("HP"), 150),
@@ -473,6 +496,8 @@ HUITZIL = {
     ],
 }
 SCHEDULES = {"donovan": DONOVAN, "pyron": PYRON, "huitzil": HUITZIL}
+NO_POKE_PARTS = {("donovan", "9"), ("donovan", "10")}   # parts the -debug write tap must be able to replay: no HP pin, no stock poke
+PHASE2_PARTS = NO_POKE_PARTS   # the hitbox rigs (tests/test_hitbox_encoding.sh) — NOT naming parts: test_move_naming.sh skips them
 # stock pokes for the meter parts: frame -> 9 stocks (each ES/EX/DF spends 1)
 METER_PARTS = {"donovan": {"3", "4", "5", "6", "7", "8"}, "pyron": {"4", "5"}, "huitzil": {"4", "5", "6", "7", "8"}}
 
@@ -527,7 +552,7 @@ def gen(tenant, part, out_rpl, out_sched):
     end = t + 200
     lines.append(f"{end} wait")
     # pokes: P2 HP pin every HP_PIN_EVERY frames from the first event; stocks
-    pokes = [f"{f}:ff8850:01200120" for f in range(FIRST_EVENT - 50, end, HP_PIN_EVERY)]
+    pokes = [] if (tenant, part) in NO_POKE_PARTS else [f"{f}:ff8850:01200120" for f in range(FIRST_EVENT - 50, end, HP_PIN_EVERY)]
     if tid:
         pokes = [f"{f}:ff8782:{tid}" for f in (1400, 1450, 1500)] + pokes
     pokes += pin_pokes

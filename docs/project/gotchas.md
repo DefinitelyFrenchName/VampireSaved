@@ -3146,3 +3146,25 @@ in any rig that throws, pin positions per event; read the x delta before
 believing a chain; when a pair press is the input, list every special
 whose motion is a substring of it.
 
+
+## "+0x1D" AND "+0x17" WERE THE SAME BYTE COUNTED FROM TWO BASES; "+0x8C = attack" AND "+0x90 = push" WERE CROSSED; BOXES ARE AUTHORED FACING LEFT (14z-120 (5))
+
+Three phase-2 traps, all cleared by letting the engine say where it read:
+
+1. The map's worklist carried "class byte +0x17 vs +0x1D — the docs
+   disagree". The write tap on the victim's `+0x54` logged A3 = the record
+   and the instruction `move.b $17(a3),$54(a1)`; the shipped Huitzil rows
+   at `hitbox_proj +0x17D/+0x19D` are byte +0x17 of records 5 and 6 once
+   the projectile attack table's real base (`proj_base + proj_base[4]` =
+   region+0xC6) is used. **Count record offsets from the RECORD, and derive
+   the record base from the base table's words, never from the region.**
+2. `ram.md` said "+0x8C attack, +0x90 push" AND "base[0..8] in order";
+   both true only if attack = base[3]. The live pointers say `+0x8C =
+   base+base[4]`, `+0x90 = base+base[3]`. A pointer field is read from RAM
+   before its table index is believed.
+3. The first overlap test matched 0/8 hits: the box x is authored for the
+   unflipped sprite (facing LEFT) and must be NEGATED when `flip_x` = 1 —
+   a forward attack box has a negative x. The mirrored convention matched
+   8/8 with no whiff overlap; the gate keeps the un-mirrored one as the
+   negative control.
+

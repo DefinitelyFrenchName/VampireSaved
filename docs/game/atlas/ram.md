@@ -129,7 +129,7 @@ is 0x400 bytes; combat struct at +0x000, further state above +0x100.
 | Offset | Meaning | Evidence |
 |---|---|---|
 | +0x0B | flip_x (facing) — **1 = the fighter faces RIGHT** (P1 at the left start, P2 on its right, reads 1; 0 after the engine crossed the fighters — measured 14z-120 (2), `tools/name_moves.py`) | [C; D: 14z-120] |
-| +0x0A | attack id (shift 5 for hitbox lookup) | [C] |
+| +0x0A | attack id (shift 5 for hitbox lookup) — [C]; the sampled value was 0 at every frame-done of the 14z-120 (5) rigs (transient); the attack RECORD a node uses is its `hbA>>8` (engine_internals "Hitboxes and attack records") | [C; D: 14z-120] |
 | +0x10.w | X position (signed) | [C: script default, matches update_object] |
 | +0x14.w | Y position (signed) | [C] |
 | +0x1C | anim ptr (node write: vs2 walker PC 0x2713C / vsavj 0x27EE8 family / ported walker 0xCE38A) | [C] |
@@ -140,10 +140,10 @@ is 0x400 bytes; combat struct at +0x000, further state above +0x100.
 | +0x52.w | white/displayed HP (regenerating damage). **THE ROUND JUDGE KILLS ON THIS WORD'S SIGN, not +0x50's** (14z-98, GitHub #103): in-match phase-6 handler `PRG:0x97DC` tests `tst.w $852(a5)`/`tst.w $452(a5)` at `0x97FC/0x9804` (vs2 twin `0x800C/0x8014` — same offsets, not a generation drift). The damage pipeline keeps white <= hp (applier `0x18AB0` subtracts staged `$FF3442/44` from BOTH words), so white crosses zero FIRST; the death decision `0x18A46-0x18A66` then runs the kill commit. A state with hp < 0 and white >= 0 is UNJUDGEABLE — the engine never sees the death (#103's stall shape) | [D: 14z-98] |
 | +0x54.b | reaction/hit-state id written by the near-death commit `0x18B34` from attack byte `$17(a3)` (observed 0x11 during a death, 0x05 during regen) | [D: 14z-98] |
 | +0x11F.b | DEATH FLAG, set by the kill commits (`0x18A7C` hp:=-1+white:=-1 flavor; `0x18B12` near-death flavor; `0x2980A/0x29810` the arcade-KO instance measured live). Read with +0x111 by the settle helper `0x995A`, which dispatches the dead fighter per-char through `0x0BF61A` row `$382<<2` (dispatch_19, PORTED at row 0x13) | [D: 14z-98] |
-| +0x60.l | per-character hitbox data base (ROM ptr; Demitri 0x93B6A, Victor 0x9769E) | [T,D] |
-| +0x64.l | per-character ptr from table PRG:0x0BD9FA | [T] |
-| +0x80/84/88/8C/90.l | hitbox addr tables: base + word offsets base[0..8] (push=+0x90, vuln=+0x80/84/88, attack=+0x8C) | [C,T] |
-| +0x94..0x97 | current box ids (vuln×3, push) | [C] |
+| +0x60.l | per-character hitbox data base (ROM ptr; Demitri 0x93B6A, Victor 0x9769E) — a table of WORD offsets base[0..4] from itself (14z-120 (5)) | [T,D] |
+| +0x64.l | per-character ptr from table PRG:0x0BD9FA = the hitbox FAMILY table (`hitbox_comp`): 4 bytes per entry {vuln0, vuln1, vuln2, push}, indexed by the anim node's hb8 word; +0x94.l is the current entry | [T; D: 14z-120 (5), `tests/test_hitbox_encoding.sh`] |
+| +0x80/84/88/8C/90.l | hitbox table pointers: +0x80/84/88 = base+base[0..2] (the three VULN tables), **+0x8C = base+base[4] = the ATTACK records (0x20 each), +0x90 = base+base[3] = the PUSH boxes** — measured from the live pointers 14z-120 (5); the community note had the last two crossed. Box = (x, y, hw, hh) signed words, authored for the LEFT-facing sprite (x negated when +0x0B = 1) | [C,T; D: 14z-120 (5)] |
+| +0x94..0x97 | current box ids (vuln×3, push) = the family-table entry selected by the node's hb8 | [C; D: 14z-120 (5)] |
 | +0x98 | throw box id | [C] |
 | +0x102 | resolved strength/flavor byte (written by the ES/strength resolver — ported code 0xCF598 on our build) | [D: 14z-44] |
 | +0x105 | ~48f transient raised by performing any special (gauge-blink family; NOT the stock) | [D: 14z-44] |

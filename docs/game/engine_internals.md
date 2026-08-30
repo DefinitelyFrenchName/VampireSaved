@@ -714,6 +714,59 @@ frame by `tests/lua/field_trace.lua`, each pointer mapped onto the graph
   normals" (the same chains at pushbox contact) and "DF-form normals"
   (the same chains with `$FF802E` = 1).
 
+## Hitboxes and attack records (phase 2 of the character-data map, 14z-120 (5), MEASURED)
+
+Depends on atlas rows: `ram.md` fighter `+0x0B` (flip_x), `+0x10/+0x14`
+(position), `+0x1C` (node), `+0x54` (reaction class), `+0x60/+0x64`
+(hitbox base / family table), `+0x80..+0x90` (the five resolved tables),
+`+0x94` (current box ids); `character_tables.md` (the `hitbox_base` /
+`hitbox_comp` bank rows). Decoder `tools/hitbox_records.py`; gate
+`tests/test_hitbox_encoding.sh` (Donovan on native vs2, two field legs +
+two `-debug` write-tap legs); the per-tenant tables are in
+`docs/project/tables/chars/<tenant>.md` "Hitboxes and attack records" and
+the per-chain frame data in `<tenant>_anim.md`.
+
+- **The five tables.** `+0x60.l` is the hitbox BASE, a table of word
+  offsets from itself; the fighter caches `+0x80 = base+base[0]`, `+0x84 =
+  base+base[1]`, `+0x88 = base+base[2]` (the three VULN tables), **`+0x8C =
+  base+base[4]` (the ATTACK records) and `+0x90 = base+base[3]` (PUSH)** —
+  measured from the live pointers (`ff848c` = `0xC986A` on Donovan); the
+  community row had the last two crossed.
+- **A box is 4 signed words `(x, y, hw, hh)`**: centre at fighter `(x + x',
+  y + y)` with **`x' = x` when `flip_x` (+0x0B) is 0 and `-x` when it is 1**
+  — the data is authored for the UNFLIPPED sprite, which faces LEFT, so a
+  forward attack box has a negative x — half-extents `hw/hh`, y up (ground
+  y = 40). Verified: on 8/8 fighter hits the victim's HP write landed on
+  the first frame the attack box overlapped one of the victim's three vuln
+  boxes, and no whiff window overlapped outside the victim's hitstun (one
+  extra overlap was the 5MP's second record while the victim was already
+  in hitstun — the hit-id dedup); the un-mirrored convention matched 0/8.
+- **`+0x64.l` is the FAMILY table** (`hitbox_comp`): 4 bytes per entry
+  `{vuln0, vuln1, vuln2, push}`, box ids into tables 0/1/2 and the push
+  table. A node's `hb8` word indexes it and the fighter's `+0x94.l` IS the
+  entry (equal every sampled frame).
+- **A node's `hbA` word `>> 8` is the ATTACK RECORD index** (0 = not
+  attacking): a chain's ACTIVE frames are its nodes with `hbA != 0`,
+  startup is the nodes before, recovery after — derived per chain in the
+  appendix. Record (0x20 bytes): `+0` the box, `+8` real power, `+9` white
+  power (the stager's `(8,A3)/(9,A3)` above), `+0x10` hit id (the multi-hit
+  dedup key), **`+0x17` the REACTION CLASS**, `+0x1C` unexplained
+  (0x14/0x1E/0x28 on normals, 0x46 on specials), `+0x1D` zero in every
+  record seen.
+- **How the class reaches the victim** (vs2 stager, the same on the
+  projectile path): `0x16F5E move.w -$4b44(a5),d1; cmp.w -$4b42(a5),d1;
+  bcs 0x16F70; move.b #1,$54(a1); rts; 0x16F70 move.b $17(a3),$54(a1)` — a
+  counter test forces the generic class 1, otherwise the record's `+0x17`
+  is copied; the special classes dispatch on that byte to handlers that
+  write their class as an immediate (`0x16FE4 move.b #$4e` electric,
+  `0x16FEC #$52` column, `0x16FF4 #$0a`, plus `+0x117` flags). Projectiles:
+  the object-hit applier `0x28A6A` takes `A3 = ($8C,a6) + id*0x20` from
+  the OWNER's `hitbox_proj` records (whose table sits at `proj_base +
+  proj_base[4]`, region+0xC6 for Huitzil) and reaches the same dispatch —
+  Blizzard Sword's record 1 (`+0x17` = 0x14) put 0x14 on the victim.
+- Sizes: Donovan 144 family entries / 200 attack records, Huitzil 72 /
+  364, Pyron 63 / 143 (the per-tenant pages).
+
 ## Command-input / motion-tracker subsystem (session 14z-48, measured both engines)
 
 How special-move inputs are recognized (identical architecture in
@@ -2535,8 +2588,12 @@ stay at vs2 offsets. Gate: `tests/audit_fg_parity.sh`.
 **[VSE-42]** **The victim-side REACTION CLASS dispatch (14z-85g(2), measured):**
 after the appliers, the victim's reaction is chosen at `PRG:0x2384E`:
 `move.b (0x54,a6),d0; add.w d0,d0; move.w (0x2385C,pc,d0.w),d1;
-jmp (pc,d1)` — the class byte (copied from the hit record, byte +0x1D
-of the 0x20-stride hitbox/hitbox_proj records) indexes a PC-relative
+jmp (pc,d1)` — the class byte (copied from the hit record, byte **+0x17**
+of the 0x20-stride hitbox/hitbox_proj records — CORRECTED 14z-120 (5): this
+line said "+0x1D", an offset counted from the region start rather than the
+record base; the shipped Huitzil rows at `hitbox_proj +0x17D/+0x19D` ARE
++0x17 of projectile records 5 and 6, see "Hitboxes and attack records")
+indexes a PC-relative
 word jump table. vs2's twin (dispatch 0x2237A, table 0x22388) has
 0x54 entries; **vsavj's table ends earlier — any vs2-extended class
 (0x4E+) over-indexes into code bytes** (the Donovan 421P/column class,

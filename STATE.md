@@ -1,5 +1,23 @@
 # STATE — living progress log
 
+## Session 14z-120 (5) — **PHASE 2 OF THE CHARACTER-DATA MAP (maintainer: "push then do phase 2"):
+## the hitbox encoding and the attack record MEASURED on native vs2 — boxes are (x, y, hw, hh) authored for
+## the LEFT-facing sprite; +0x8C = attack / +0x90 = push (the community row had them crossed); the class
+## byte is record +0x17 on every path (the "+0x1D" was the same byte counted from the region start).
+## `tools/hitbox_records.py`, `tests/test_hitbox_encoding.sh`, the map's "Hitboxes and attack records"
+## section and per-chain frame data. No build changed. Pushed up to `af729df`; the rest NOT pushed.**
+
+| | |
+|---|---|
+| the instruments | `name_moves.py` parts 9 (walk to contact, 5LP/5MP/5HP/2MK/2HK, j.HP, a Blizzard at range, a 5MP ladder) and 10 (three Blizzards at range, Lightning Sword, Ifrit, Killshread + the column), both POKE-FREE so the `-debug` tap can replay them; `field_trace.lua` (positions, facing, node, box ids `+0x94`, the five table pointers, victim HP/class/freeze) and `trace_writes.lua` on the victim's `+0x50..+0x55` (PC + A3 at every HP/class write); opcode dumps around the writers disassembled with capstone |
+| **tables** | `+0x60` = base = a table of word offsets from itself; `+0x80/84/88 = base+base[0..2]` (VULN 0/1/2), **`+0x8C = base+base[4]` = ATTACK records, `+0x90 = base+base[3]` = PUSH** (live pointers: `ff848c` = `0xC986A`); `+0x64` = the FAMILY table (`hitbox_comp`, 4 bytes {vuln0, vuln1, vuln2, push} per entry), indexed by the node's hb8 — `+0x94.l` equalled the entry on every frame. Sizes: Donovan 144 families / 200 records, Huitzil 72 / 364, Pyron 63 / 143 |
+| **the box** | `(x, y, hw, hh)` signed words, centre at fighter `(x + x', y + y)`, **`x' = -x` when flip_x (+0x0B) = 1** — authored for the unflipped LEFT-facing sprite (a forward attack box has a negative x), half-extents, y up (ground 40). PROOF: 8/8 fighter hits (HP write frames from the tap) begin on the first frame the attack box overlaps a victim vuln box; zero whiff windows overlap (one extra overlap = 5MP's second record while the victim was in hitstun — the hit-id dedup); the un-mirrored convention matched 0/8 (the gate's negative control) |
+| **the attack record** | selected by the node's `hbA >> 8` (0 = not attacking → a chain's ACTIVE nodes are those with hbA != 0; startup/recovery derived); 0x20 bytes: `+0` box, `+8` real power, `+9` white power, `+0x10` hit id, **`+0x17` reaction class**, `+0x1C` unexplained (0x14/0x1E/0x28 normals, 0x46 specials), `+0x1D` zero everywhere. Writers: the vs2 stager `0x16F5E` (a counter test forces class 1, else `move.b $17(a3),$54(a1)` at `0x16F70`; the special classes dispatch to immediates — `0x16FE4 #$4e` electric, `0x16FEC #$52` column, `0x16FF4 #$0a`); HP at `0x17444/0x17448` (`sub.w d4,$50/$52(a1)`); the object-hit applier `0x28A6A` takes `A3 = ($8C,a6) + id*0x20` from the owner's `hitbox_proj` records (table at `proj_base + proj_base[4]`) — Blizzard's record 1 (`+0x17` = 0x14) put 0x14 on the victim; Lightning Sword 0x4E, Ifrit 0x0A, the column 0x52, all = their record's +0x17 |
+| **the "+0x1D" resolved** | the worklist's "class byte +0x17 vs +0x1D — the docs disagree": the shipped Huitzil rows `hitbox_proj +0x17D/+0x19D` (14z-85g) are byte +0x17 of projectile records 5 and 6 — the records start at region+0xC6, not the region start. The bytes patched were right; the wording was an offset from the wrong base. `engine_internals` 2538 corrected, `patch_notes` annotated, `project/gotchas.md` |
+| deliverables | `tools/hitbox_records.py` (decoder: tables, family, boxes, attack + projectile records, `node_boxes(hb8, hbA)`, `placed()`/`overlap()`); `charmap_gen.py` "hitbox" structure (vs2 vs ours per record with region-label attribution — Donovan 20/200 records differ, 0 unattributed; the class remaps) + `charmap_md.py` "Hitboxes and attack records" table and, in `<tenant>_anim.md`, an `atk rec` column and a derived **startup · active · recovery** line per chain; the worklist rows 68/69/71 marked DONE (open: record `+0x1C` and `+0x11..+0x16`); `engine_internals` "Hitboxes and attack records"; `ram.md` rows `+0x0A/+0x60/+0x64/+0x80..+0x94` upgraded to [D] with the corrected mapping; HANDOFF gate row |
+| gates | `test_hitbox_encoding.sh` (emulator, ~4 min): rigs, the four legs, the six assertions above + the negative control; `test_charmap_current` PASS on the regenerated maps |
+
+
 ## Session 14z-120 (2) — **THE NAMING STEP FOR PYRON AND HUITZIL (maintainer: "do the Phobos and
 ## Pyron naming rigs"): 41 + 49 chain ids measured on native vs2, both TOMLs filled, the gate now
 ## covers the three tenants. Two findings for the maintainer: Genocide Vulcan answers to 421+P (the

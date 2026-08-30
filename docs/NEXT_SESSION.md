@@ -28,11 +28,19 @@
 > ## reading was the rig facing LEFT — retracted; 63214+PP up close IS the ES
 > ## grapple, same chains as the throw with class byte 16.)
 > ##
+> ## **PHASE 2 DONE (STATE 14z-120 (5)):** the hitbox encoding and the attack
+> ## record are MEASURED — boxes `(x, y, hw, hh)` authored facing LEFT (x
+> ## negated when flip_x = 1), `+0x8C` = attack records (base[4]) / `+0x90`
+> ## = push (base[3]), node `hb8` = the vuln/push family, `hbA>>8` = the
+> ## attack record, class = record `+0x17` on every path (the "+0x1D" was
+> ## the same byte from the wrong base). `tools/hitbox_records.py`,
+> ## `tests/test_hitbox_encoding.sh`, the maps' "Hitboxes and attack
+> ## records" section and per-chain startup/active/recovery.
+> ##
 > ## **NEXT, the maintainer's pick:** (A) the board verdict on M12; (B) phase
-> ## 2 of the map (hitbox rectangles + attack records by measurement — every
-> ## chain of the three tenants now has a NAME to hang them on); (C) the
-> ## small opens: Donovan's `0x3d` / Killshread Summon (ES); the Vulcan
-> ## input; the guard cancel's meter cost (sample `+0x10A`). Load
+> ## 3 of the map (stun / projectile parameter / auto tables; record
+> ## `+0x1C` and `+0x11..+0x16` are the open fields); (C) the small opens:
+> ## Donovan's `0x3d` / Killshread Summon (ES); Plasma Trap's HK chain. Load
 > ## `vampire-saved-port` first.
 > ##
 > ## **OPEN, unchanged:** the 1:1 wheel mockup; #112/#113 parked; the FBNeo

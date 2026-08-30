@@ -51,7 +51,7 @@ allfail=0
 for TENANT in $TENANTS; do
 case $TENANT in donovan) EX="$DON/extract";; huitzil) EX="$HUI/extract";; pyron) EX="$PYR/extract";; esac
 [ -f "$EX/regions.json" ] || { echo "SKIP: no $EX/regions.json"; exit 0; }
-PARTS="$(python3 -c "import sys; sys.path.insert(0,'tools'); import name_moves; print(' '.join(sorted(name_moves.SCHEDULES['$TENANT'], key=int)))")"
+PARTS="$(python3 -c "import sys; sys.path.insert(0,'tools'); import name_moves; print(' '.join(p for p in sorted(name_moves.SCHEDULES['$TENANT'], key=int) if ('$TENANT', p) not in name_moves.PHASE2_PARTS))")"
 EXP="tests/expected/move_naming_$TENANT.txt"
 fail=0
 echo "######## $TENANT (parts $PARTS)"
