@@ -801,12 +801,26 @@ the victim".
 - **A block is class `0xFF`** on every tenant: the block stance (Donovan
   `a:0x14`, Huitzil `a:0x15`, Pyron an unindexed node) then the SHARED
   blockstun chain **`b:0x0c`** (one node, 3 data frames, held).
-- **The stun is an engine counter, not chain data**: the reaction chains
-  are HOLD chains; measured returns to a stand chain are the same on all
-  three tenants — a light hit 19-20 f, a medium 23-24, a heavy ~35 (Donovan),
-  blocked light/medium/heavy/DP/jump-in 22 / 26 / 24 / 18 / 19 f, the sweep
-  knockdown 67-76 f — with the freeze `+0x5C` = 11 on every fighter-vs-
-  fighter contact (Victor's constants).
+- **How the stun runs (frame by frame, Donovan taking Victor's 5LP / 5MP,
+  14z-120 (8)):** the contact frame installs the class and the freeze
+  `+0x5C` = 11 and puts the node pointer on `c:0x08` node 0 with the node
+  timer `+0x20` = 3; the timer is HELD while the freeze counts 11 -> 0
+  (11 frames, the walker parked); then ONE node of `c:0x08` runs (the
+  walker leaves the chain by a game-logic jump, not the chain's own links),
+  `c:0x09`'s three nodes run (3+3+3 data frames, the timer sometimes
+  stepping by 2), and its last node carries flag `0x40` = HOLD (`+0x21` =
+  0x40, later 0xFF): a light hit leaves the hold the frame it is reached
+  (19 f in all), a medium keeps it ~5 more frames with the timer wrapping
+  (0, 255, 253, 252 …). So the stun = freeze + the reaction chain's data
+  frames + a HOLD released by an engine counter that is NOT in either
+  fighter block nor in `$FF3400-$FF35FF` (every byte and word of those
+  sampled per frame: no monotone counter, and only the class `+0x54`,
+  the state byte `+0x05` = 2 and the combo `+0x144` are set at the hit and
+  cleared at the return) — its source is OPEN. Measured returns to a stand
+  chain are the same on all three tenants — light 19-20 f, medium 23-24,
+  heavy ~35, blocked light/medium/heavy/DP/jump-in 22 / 26 / 24 / 18 /
+  19 f, the sweep knockdown 67-76 f — with the freeze 11 on every
+  fighter-vs-fighter contact (Victor's constants).
 
 ## Command-input / motion-tracker subsystem (session 14z-48, measured both engines)
 
