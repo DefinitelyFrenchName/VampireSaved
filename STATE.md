@@ -1,5 +1,20 @@
 # STATE — living progress log
 
+## Session 14z-122 (post-close, same day) — **G1 EXECUTED after the specimen's ratification ("it's good"): eight
+## document commits — patch_index folded, patch_notes reordered move-only, build_dir_triage / tenant_manifest /
+## cps2_wide split to history twins, sfx_records + tables/README flipped, the atlas retagged (the Shadow-vs-tenant
+## contradiction CORRECTED; rec8 graduated), the three gotchas buckets retitled REGISTER. 6 docs remain PENDING —
+## all G2-gated or big-session items. PUSHED through the ratification commit; the post-close commits are LOCAL.**
+
+| | |
+|---|---|
+| unblocked by | the maintainer's three answers (2026-08-30): the SPECIMEN ratified ("it's good"); the annotations-row question answered (awaiting the ruling); PUSH executed at `f7d4781` |
+| the commits (4-11) | patch_index: eleven out-of-order `## 14z-N additions` sections -> ONE named-patches registry (row accounting exact; the first fold attempt crashed BEFORE writing while its TSV flip applied — the INDEX class masked the unfolded file until a grep caught it, the [VSP-40] shape); patch_notes: 61 whole blocks to newest-session-first + a topic index, body sorted-sha BYTE-IDENTICAL (move-only, asserted); build_dir_triage 444->114 (policy + latest sweep live; the 14z-101 package + A1-C inventory + old sweeps -> `_history`); tenant_manifest (single-tenant-era narrative -> twin; rule 5 names only `byte2d`+`auto` — rec8 GRADUATED 14z-121); sfx_records needed NO text change (the lint proved it); tables/README's build names re-pointed (the 14z-119 sweep had missed the prose); the ATLAS: ram/venue retitles, select_screen:401 "never been run" CORRECTED against the green `test_shadow_tenant` (six sessions of contradiction), character_tables' "?"-cell guess RETIRED, id_space's rec8 rows reworded; the GOTCHAS buckets: 16 session-batch titles -> topical `(paid: 14z-N)` form, wrapped headers taught to the lint, RE-FILED tombstones allowed by name, index regenerated; cps2_wide: the B4 attempt-1 + diagnostic-path narratives -> twin (anchors asserted absent from the moved spans), the spec whole |
+| the lint's own harvest | commit 8 briefly landed on a RED lint (a `\| tail -1` ate the status — [VSP-112]'s pipeline trap, in the very pass built to catch staleness); fixed forward, and every later commit captures tool exit statuses directly. The gotchas retitle's FIRST pass mangled five wrapped headers — caught by the printed before/after review, reverted, redone wrap-aware |
+| inferred_claims | rows 2/3/5/6 CLOSED (T0/T1); the pass log accretes in the file; OPEN: the three T3 rigs (Aulbath-victim DF accumulator, attract-palette surface, throw mash-escape), the T2s (object byte +0x10, region-movability H/P legs, win_pal merged+legacy+AUTO, grenade A/B, pyron_blink guard switch), HANDOFF rows 12-15 (ride G6) |
+| green | portable tier at close of the block (see below); census 427 (re-frozen thrice for reviewed section renames); checkdocs 19 locks; checkskills 425; docshape 6 PENDING (README, HANDOFF, engine_internals, platform/mister, mister_core, mister_map) |
+| next | G2 FIRST (the three T3 measurements gate engine_internals); then G3 (engine_internals, three commits); G4 (mister pair); G6 (HANDOFF); G7 close (`--no-pending`, the ci floor). The worklist: `docs/project/inferred_claims.md` + the NEXT_SESSION opener |
+
 ## Session 14z-122 CLOSE — ritual complete. **THE DOCUMENTATION RATIONALIZATION PASS OPENED (the maintainer's
 ## first future item): the five enforcement tools (T1-T5) SHIPPED and green; the SPECIMEN restructure
 ## (tables/reconciliation.md) done for the maintainer's review; NEXT_SESSION split (56 live lines); the

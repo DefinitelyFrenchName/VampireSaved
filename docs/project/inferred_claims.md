@@ -79,3 +79,7 @@
   claims: `grep -rn "and it has never been run" docs` -> only the struck
   original inside its own correction; `grep -rn "(Shadow/Marionette machinery?)" docs`
   -> the retired-guess cell + the decoded block it cites.
+- 14z-122 (post-close 4-11): the G1 document commits — see STATE 14z-122
+  (post-close). Retraction greps per commit are in the commit bodies; the
+  headline: `grep -rn "and it has never been run" docs` -> only the struck
+  original inside its own correction (select_screen.md).

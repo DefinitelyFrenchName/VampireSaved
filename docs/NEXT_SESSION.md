@@ -19,16 +19,17 @@
 > ## `docs/project/inferred_claims.md` (16 rows; its T3 rigs gate the
 > ## engine_internals commits).
 > ##
-> ## **FIRST: the maintainer reads the SPECIMEN** (reconciliation.md — does
-> ## the reference/history shape fit?) **and rules on the CLAUDE.md
-> ## annotations-row retirement** (STATE 14z-122 "open to veto"). **THEN, in
-> ## order:** G1 — patch_index fold, patch_notes index+reorder,
-> ## build_dir_triage, tenant_manifest, sfx_records + tables/README, the
-> ## atlas retags (T0 rows 2/3/5/6 of the inventory ride these), cps2_wide,
-> ## the gotchas-bucket retitling; G2 — the three T3 measurements (the
-> ## Aulbath-victim DF accumulator rig, the attract-palette VS-screen
-> ## surface, the throw mash-escape rig) BEFORE engine_internals (G3, three
-> ## commits, never (a) and (c) in one session); then G4 mister, G6 HANDOFF,
+> ## **THE SPECIMEN IS RATIFIED ("it's good", maintainer 2026-08-30) and G1
+> ## IS DONE (post-close, same day — STATE 14z-122 post-close entry): eight
+> ## document commits; 6 docs remain PENDING (README, HANDOFF,
+> ## engine_internals, platform/mister, mister_core, mister_map). STILL
+> ## AWAITING THE RULING: the CLAUDE.md annotations-row retirement (asked,
+> ## answered, open to veto).** **NEXT, in order:** G2 — the three T3
+> ## measurements (the Aulbath-victim DF accumulator rig, the
+> ## attract-palette VS-screen surface, the throw mash-escape rig) BEFORE
+> ## engine_internals (G3, three commits, never (a) and (c) in one
+> ## session); the T2s batch by instrument (inferred_claims); then G4
+> ## mister, G6 HANDOFF (gate index + WHY-to-script-header migration),
 > ## G7 close (`checkdocshape --no-pending` green, ci floor bumped).
 > ## Per-commit verification: portable tier + census `--check`/`--freeze` +
 > ## `checkdocshape --only <path>` + the [VSP-13] moved-block grep in the
