@@ -1,0 +1,7 @@
+# docs/doc_shape_allow.tsv — per-file allowances for tools/checkdocshape.py's
+# header lint (14z-122). One row per allowed header:  path <TAB> header-regex
+# <TAB> reason. EVERY row must match at least one header in its file — a row
+# matching nothing FAILS as a dead allowance, so the list cannot outlive its
+# reasons. Expected to stay nearly empty; a session-shaped header in a
+# REFERENCE document is normally the thing the pass removes, not allows.
+docs/project/coverage_matrix.md	Shadow/Marionette measurement note \(14z-104	A deliberate tombstone: the note is kept as written with its SUPERSEDED marker, which the lint must keep visible by design

@@ -14,7 +14,7 @@ character-data map) exactly as the engine's node walker does.
                 outside it and report `out_of_region`)
 
 THE RULES, READ OFF THE WALKER (vs2 PRG:0x02713C..0x0271F2, decoded 14z-118 —
-docs/game/engine_internals.md "The animation walker"):
+docs/game/engine_internals.md "Anim-script walker"):
   node select (0x2713C): a0 = table + word[table + 2*seq]  (offsets are
     relative to the TABLE base); obj+0x1C = a0; obj+0x20.l = node[0..3]
     (+0 duration countdown, +1 flags -> obj+0x21); node+8.w * 4 indexes the

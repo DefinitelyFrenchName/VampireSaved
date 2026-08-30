@@ -111,6 +111,14 @@ test_checkdocs
 # forbids anchors in `*_history.md` twins. tools/doc_anchor_census.py; four
 # must-fire controls. ROM-free, ~1 s.
 test_doc_anchor_census
+# 14z-122: every hand-written doc's SHAPE is declared (docs/doc_shape.tsv:
+# REFERENCE/REGISTER/LOG/HIST/ORIENT/INDEX/GENERATED/EXEMPT/PENDING) and
+# enforced — no session-shaped header may return to a REFERENCE doc, history
+# twins carry no anchors, links in README/HANDOFF/CLAUDE resolve, and every
+# docs/x.md 'Section' citation in tools/tests names a real header. PENDING
+# rows are skipped until their document's own commit; --no-pending is the
+# end-state check. tools/checkdocshape.py; seven must-fire controls. ~2 s.
+test_docshape
 
 # 14z-107 (11): the ROM-free half of the slice D4 discriminator. Locks the 68k
 # program-ROM read probe's contract — it is inert unless JTCPS2W_PRGPROBE is

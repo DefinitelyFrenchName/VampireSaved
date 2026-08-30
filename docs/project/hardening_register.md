@@ -55,7 +55,7 @@ The gate fails on any drift (a new escape, a placement turning
 ADJACENT-OK foreign, a lost pcrel row) and carries a 269-verdict
 must-fire control.
 
-### 2. The 13 plausible reconciliation rows — TRIAGED 14z-100 H3.2
+### 2. The 13 plausible reconciliation rows (triaged 14z-100, H3.2)
 **Liveness measured first (the lesson: score is not risk; CONSUMPTION
 is).** Method: for every ref in the tenants' extracts targeting a
 plausible row's vs2 source, read the long actually SHIPPED at the

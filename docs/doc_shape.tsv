@@ -1,0 +1,84 @@
+# docs/doc_shape.tsv — every hand-written document's declared SHAPE, read by
+# tools/checkdocshape.py (gate tests/test_docshape.sh, ci_portable).
+# Opened 14z-122 by the documentation rationalization pass.
+#
+# path	class	history_twin	requires
+#
+# Classes:
+#   REFERENCE  themed reference material: no session-shaped headers (a
+#              trailing provenance parenthetical like "(measured 14z-101)"
+#              is allowed and stripped before the check)
+#   REGISTER   the three gotchas buckets: topical entries whose headers
+#              carry a "(paid: 14z-N)" cost suffix — same header rule
+#   LOG        an append-only chronology BY DESIGN (patch_notes, audits):
+#              no header lint
+#   HIST       a superseded record or a `<name>_history.md` twin: no header
+#              lint, and NO `**[PFX-N]**` anchor may live in it
+#   ORIENT     docs/NEXT_SESSION.md: exactly one `# ` header, no `(HISTORY`
+#              header — its history lives in the twin
+#   INDEX      a registry/index document: no header lint
+#   GENERATED  written by a committed tool, gated elsewhere: untouched here
+#   EXEMPT     out of the pass's scope (session logs)
+#   PENDING    not yet rationalized: lint SKIPPED; must be empty at the end
+#              of the pass (--no-pending, the ci gate's final mode)
+# history_twin: "-" or the sibling file that holds this document's moved
+#              chronology; it must exist and be classed HIST.
+# requires:    "-" or comma-separated of: banner (a "**STATUS" line in the
+#              first 40 lines), atlas-rows (every `## ` section names an
+#              atlas file — CLAUDE.md §5 rule 2).
+#
+# --- level 0
+docs/README.md	PENDING	-	-
+docs/GOTCHAS.md	PENDING	-	-
+docs/NEXT_SESSION.md	PENDING	-	-
+HANDOFF.md	PENDING	-	-
+# --- game
+docs/game/engine_internals.md	PENDING	-	-
+docs/game/gotchas.md	PENDING	-	-
+docs/game/atlas/README.md	REFERENCE	-	-
+docs/game/atlas/character_tables.md	PENDING	-	-
+docs/game/atlas/id_space.md	REFERENCE	-	-
+docs/game/atlas/ram.md	PENDING	-	-
+docs/game/atlas/select_screen.md	PENDING	-	-
+docs/game/atlas/sprite_lists.md	REFERENCE	-	-
+docs/game/atlas/venue_assets.md	PENDING	-	-
+# --- platform
+docs/platform/gotchas.md	PENDING	-	-
+docs/platform/mister.md	PENDING	-	-
+# --- project
+docs/project/M1_acceptance.md	HIST	-	-
+docs/project/M2_feasibility.md	HIST	-	-
+docs/project/M3b_plan.md	HIST	-	-
+docs/project/WSL2_SETUP.md	REFERENCE	-	-
+docs/project/audit_2026-08-15_dispositions.md	HIST	-	-
+docs/project/beam_port_scope.md	HIST	-	-
+docs/project/build_dir_triage.md	PENDING	-	-
+docs/project/coverage_matrix.md	REFERENCE	-	-
+docs/project/cps2_wide.md	PENDING	-	-
+docs/project/doc_audit_14z118.md	LOG	-	-
+docs/project/gotchas.md	PENDING	-	-
+docs/project/hardening_register.md	REFERENCE	-	-
+docs/project/mister_core.md	PENDING	-	-
+docs/project/mister_field.md	REFERENCE	-	-
+docs/project/mister_fit.md	REFERENCE	-	-
+docs/project/mister_map.md	PENDING	-	-
+docs/project/mister_scope.md	HIST	-	-
+docs/project/patch_index.md	PENDING	-	-
+docs/project/patch_notes.md	LOG	-	-
+docs/project/playtest_m3a_interims.md	HIST	-	-
+docs/project/porting_code_regions.md	REFERENCE	-	-
+docs/project/porting_sprite_lists.md	REFERENCE	-	-
+docs/project/quartus_brief.md	HIST	-	-
+docs/project/release_format.md	REFERENCE	-	-
+docs/project/skills_scope.md	HIST	-	-
+docs/project/tenant_manifest.md	PENDING	-	-
+docs/project/visual_smoke_tests.md	REFERENCE	-	-
+# --- project/tables (chars/ is generated wholesale and excluded from the walk)
+docs/project/tables/README.md	PENDING	-	-
+docs/project/tables/defense_rows.md	REFERENCE	-	-
+docs/project/tables/donovan.md	GENERATED	-	-
+docs/project/tables/huitzil.md	GENERATED	-	-
+docs/project/tables/pyron.md	GENERATED	-	-
+docs/project/tables/qs_voice_map.md	REFERENCE	-	-
+docs/project/tables/reconciliation.md	PENDING	-	-
+docs/project/tables/sfx_records.md	PENDING	-	-

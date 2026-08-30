@@ -331,7 +331,11 @@ legacy behavior is a failed change.
     a mode it had never entered while the cost of entering it sat
     documented in `ram.md`.
   - `docs/game/atlas/` — the verified ROM/RAM map per romset (the project bible).
-  - `docs/annotations.md` — raw address → label/comment stream.
+  - ~~docs/annotations.md — raw address → label/comment stream.~~
+    (RETIRED 14z-122, the documentation pass: the file was NEVER created —
+    `git log --all` finds no trace of it. The address → label stream lives
+    in `docs/game/atlas/` and the manifests' inline comments. Open to the
+    maintainer's veto: recreate it instead, and this row comes back.)
   - `docs/project/patch_notes.md` — per-change detail: every byte, and why.
   - `docs/project/patch_index.md` — one-page registry: status, dependencies,
     exclusivity, deprecation candidates. Updated in the same commit as any
