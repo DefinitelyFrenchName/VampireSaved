@@ -1,0 +1,164 @@
+{
+ "tenant": "donovan",
+ "part": "4",
+ "events": [
+  {
+   "name": "Killshread [MK]",
+   "frame": 2600,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Killshread Lightning [MP]",
+   "frame": 2800,
+   "gap": 240,
+   "movement": false
+  },
+  {
+   "name": "Killshread Summon [LK] (2)",
+   "frame": 3040,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Killshread [LK] (2)",
+   "frame": 3260,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Killshread Lightning [HP]",
+   "frame": 3460,
+   "gap": 240,
+   "movement": false
+  },
+  {
+   "name": "Killshread Summon [HK]",
+   "frame": 3700,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Killshread [HK] (2)",
+   "frame": 3920,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Killshread Summon [j.214LK]",
+   "frame": 4120,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Killshread Summon [MK]",
+   "frame": 4340,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 4560,
+   "gap": 240,
+   "movement": true
+  },
+  {
+   "name": "Sword Grapple [MP] (sword in hand)",
+   "frame": 4800,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 5060,
+   "gap": 140,
+   "movement": true
+  },
+  {
+   "name": "Sword Grapple [HP] (sword in hand)",
+   "frame": 5200,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 5460,
+   "gap": 140,
+   "movement": true
+  },
+  {
+   "name": "Foot Stab [8P] off throw",
+   "frame": 5600,
+   "gap": 320,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 5920,
+   "gap": 180,
+   "movement": true
+  },
+  {
+   "name": "Foot Stab [8K] off throw",
+   "frame": 6100,
+   "gap": 320,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 6420,
+   "gap": 180,
+   "movement": true
+  },
+  {
+   "name": "Foot Stab (ES) [8PP] off throw",
+   "frame": 6600,
+   "gap": 320,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 6920,
+   "gap": 180,
+   "movement": true
+  },
+  {
+   "name": "Foot Stab (ES) [8KK] off throw",
+   "frame": 7100,
+   "gap": 320,
+   "movement": false
+  },
+  {
+   "name": "Slay Shred [LP+LK]",
+   "frame": 7420,
+   "gap": 400,
+   "movement": false
+  },
+  {
+   "name": "5LP in DF",
+   "frame": 7820,
+   "gap": 200,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "2550:ff8850:01200120",
+  "2950:ff8850:01200120",
+  "3350:ff8850:01200120",
+  "3750:ff8850:01200120",
+  "4150:ff8850:01200120",
+  "4550:ff8850:01200120",
+  "4950:ff8850:01200120",
+  "5350:ff8850:01200120",
+  "5750:ff8850:01200120",
+  "6150:ff8850:01200120",
+  "6550:ff8850:01200120",
+  "6950:ff8850:01200120",
+  "7350:ff8850:01200120",
+  "7750:ff8850:01200120",
+  "8150:ff8850:01200120",
+  "2540:ff8509:09",
+  "5410:ff8509:09"
+ ],
+ "frames": 8270
+}

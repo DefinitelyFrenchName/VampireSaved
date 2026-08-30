@@ -1,0 +1,224 @@
+{
+ "tenant": "donovan",
+ "part": "7",
+ "events": [
+  {
+   "name": "Killshread [LK] (plant)",
+   "frame": 2600,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "5LP swordless",
+   "frame": 2800,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "5MP swordless",
+   "frame": 2920,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "5HP swordless",
+   "frame": 3040,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "5LK swordless",
+   "frame": 3190,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "5MK swordless",
+   "frame": 3310,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "5HK swordless",
+   "frame": 3430,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "2LP swordless",
+   "frame": 3580,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "2MP swordless",
+   "frame": 3700,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "2HP swordless",
+   "frame": 3820,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "2LK swordless",
+   "frame": 3970,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "2MK swordless",
+   "frame": 4090,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "2HK swordless",
+   "frame": 4210,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.LP swordless",
+   "frame": 4360,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.MP swordless",
+   "frame": 4510,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.HP swordless",
+   "frame": 4660,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.LK swordless",
+   "frame": 4810,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.MK swordless",
+   "frame": 4960,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.HK swordless",
+   "frame": 5110,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "Hop Kick swordless",
+   "frame": 5260,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "Killshread Surf [j.2LK] swordless",
+   "frame": 5410,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "Killshread Dive [j.2HK] swordless",
+   "frame": 5560,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "Blizzard Sword [LP] swordless",
+   "frame": 5710,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Ifrit Sword [LP] swordless",
+   "frame": 5930,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Lightning Sword [LP] swordless",
+   "frame": 6150,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "Lightning Sword [HP] swordless",
+   "frame": 6410,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "Press of Death [LK] swordless",
+   "frame": 6670,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "Forward dash swordless",
+   "frame": 6930,
+   "gap": 150,
+   "movement": true
+  },
+  {
+   "name": "walk-in",
+   "frame": 7080,
+   "gap": 240,
+   "movement": true
+  },
+  {
+   "name": "Sharirum Luna [6MP] swordless",
+   "frame": 7320,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 7580,
+   "gap": 140,
+   "movement": true
+  },
+  {
+   "name": "Foot Stab [8P] swordless off throw",
+   "frame": 7720,
+   "gap": 320,
+   "movement": false
+  },
+  {
+   "name": "Slay Shred [LP+LK] swordless",
+   "frame": 8040,
+   "gap": 200,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "2550:ff8850:01200120",
+  "2950:ff8850:01200120",
+  "3350:ff8850:01200120",
+  "3750:ff8850:01200120",
+  "4150:ff8850:01200120",
+  "4550:ff8850:01200120",
+  "4950:ff8850:01200120",
+  "5350:ff8850:01200120",
+  "5750:ff8850:01200120",
+  "6150:ff8850:01200120",
+  "6550:ff8850:01200120",
+  "6950:ff8850:01200120",
+  "7350:ff8850:01200120",
+  "7750:ff8850:01200120",
+  "8150:ff8850:01200120",
+  "2540:ff8509:09",
+  "5520:ff8509:09"
+ ],
+ "frames": 8490
+}

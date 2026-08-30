@@ -1,0 +1,120 @@
+#!/bin/sh
+# test_move_naming.sh — THE MOVE LIST'S CHAIN IDS ARE WHAT NATIVE VS2 ENTERS
+# (character-data map, phase 1 naming step; 14z-120).
+#
+# WHAT IT HOLDS. build/manifest/moves_donovan.toml carries a (table, seq) per
+# move, measured by tools/name_moves.py: eight scripted rigs on NATIVE vs2
+# (P1 Donovan, P2 Victor idle) perform every move; P1's anim node pointer
+# obj+0x1C is sampled per frame (tests/lua/field_trace.lua) and mapped onto
+# the chain graph decoded by tools/anim_nodes.py (the instrument
+# test_anim_node_walk.sh verified). The chains ENTERED inside each event's
+# window are frozen in tests/expected/move_naming_donovan.txt, and every seq
+# the TOML names must appear among the measured chains. So a wrong seq in
+# the TOML, a changed rig, a changed decoder, or a changed extract fails here.
+#
+#   1. the committed rigs equal a regeneration (the schedule is code);
+#   2. the eight legs run (parallel, ~1 min headless) and every event's
+#      entered-chain list equals the frozen line — the two positive controls
+#      are Blizzard Sword HP (a2:0x33 = vs2 0x283E58, replay 59's chain) and
+#      Lightning Sword ES (a2:0x38 = vs2 0x284A64, replay 56's);
+#   3. every table:seq named in moves_donovan.toml was entered by some event;
+#   4. NEGATIVE CONTROL: the expectation lines are not vacuous — an event
+#      whose frozen chain is replaced by a neighbour's must FAIL the compare.
+#
+# TRAPS THIS RIG PAID FOR (project/gotchas.md): $FF8109 is a BINARY timer —
+# a 0x99 poke ends the round; 63214 contains 214, so a grapple with the sword
+# planted is Killshread Lightning; a facing flip turns "4" into forward.
+#
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/don_m18] tests/test_move_naming.sh   # emulator tier (MAME)
+set -u
+REPO="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$REPO"
+ROMDIR="${ROMDIR:?set ROMDIR}"
+MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
+BUILD="${BUILD:-build/don_m18}"  # the vs2 EXTRACT (the anim region + index pointers) comes from here
+EX="$BUILD/extract"
+[ -f "$EX/regions.json" ] || { echo "SKIP: no $EX/regions.json"; exit 0; }
+[ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+fail=0
+ok()  { printf '  ok    %s\n' "$1"; }
+bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
+TENANT=donovan
+PARTS="1 2 3 4 5 6 7 8"
+EXP="tests/expected/move_naming_$TENANT.txt"
+
+echo "== 1. the committed rigs equal a regeneration"
+for p in $PARTS; do
+    python3 tools/name_moves.py gen $TENANT $p "$W/r_$p.rpl" "$W/r_$p.json" >/dev/null || { bad "gen part $p"; continue; }
+    if cmp -s "$W/r_$p.rpl" "tests/replays/naming/${TENANT}_$p.rpl" && cmp -s "$W/r_$p.json" "tests/replays/naming/${TENANT}_$p.json"; then :; else bad "part $p: tests/replays/naming/${TENANT}_$p.* drifted from tools/name_moves.py — regenerate"; fi
+done
+[ $fail = 0 ] && ok "8 rigs match the schedule"
+
+echo "== 2. decode the five anim tables from the vs2 extract"
+mkdir -p "$W/chains"
+python3 - "$EX" "$W/chains" <<'PY' || { bad "decode"; echo FAIL; exit 1; }
+import json, subprocess, sys
+ex, w = sys.argv[1], sys.argv[2]
+rj = json.load(open(f"{ex}/regions.json")); r = rj["regions"]["anim"]
+ptr = {v["table"]: int(v["ptr"], 16) for v in rj["values"] if v["table"].startswith("anim_index")}
+for name in ("a", "a2", "b", "c", "proj"):
+    subprocess.check_call(["python3", "tools/anim_nodes.py", f"{ex}/region_anim.bin", "--base", hex(r["src"]),
+                           "--table", hex(ptr["anim_index_" + name]), "--name", name, "--end", hex(r["src"] + r["len"]),
+                           "--json", f"{w}/{name}.json"], stdout=subprocess.DEVNULL)
+PY
+
+echo "== 3. the eight native vs2 legs (parallel)"
+for p in $PARTS; do
+    mkdir -p "$W/sb$p"
+    POKES="$(python3 -c "import json;print(';'.join(json.load(open('$W/r_$p.json'))['pokes']))")"
+    FR="$(python3 -c "import json;print(json.load(open('$W/r_$p.json'))['frames'])")"
+    ( cd "$W" && MAME_SANDBOX="$W/sb$p" REPLAY="$W/r_$p.rpl" POKES="$POKES" \
+      FIELDS="ff841c:l:node,ff8420:b:cnt,ff8406:b:seq,ff8407:b:sub,ff8509:b:stock,ff8410:w:x,ff8414:w:y,ff8850:w:p2hp,ff8109:b:timer,ff8782:b:id,ff881c:l:p2node,ff802e:b:df,ff8810:w:p2x" \
+      FIELD_OUT="$W/trace_$p.txt" FIELD_FROM=2300 FIELD_TO="$FR" FRAMES="$FR" \
+      "$REPO/tools/run_mame.sh" vsav2 -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$W/out_$p.log" 2>&1 ) </dev/null &
+done
+wait
+for p in $PARTS; do [ -s "$W/trace_$p.txt" ] || bad "part $p: no field samples (see the MAME log)"; done
+[ $fail = 0 ] || { echo FAIL; exit 1; }
+
+echo "== 4. measured chains vs the frozen expectation"
+: > "$W/got.txt"
+for p in $PARTS; do python3 tools/name_moves.py expect "$W/r_$p.json" "$W/trace_$p.txt" "$W/chains" >> "$W/got.txt" || bad "expect part $p"; done
+if diff -u "$EXP" "$W/got.txt" > "$W/diff.txt"; then
+    ok "$(wc -l < "$W/got.txt" | tr -d ' ') event lines identical to $EXP (incl. the two positive controls)"
+else
+    bad "measured chains differ from $EXP:"; head -40 "$W/diff.txt"
+fi
+
+echo "== 5. every seq named in moves_$TENANT.toml was entered"
+python3 - "$W/got.txt" "build/manifest/moves_$TENANT.toml" <<'PY' || fail=1
+import sys; sys.path.insert(0, "tools"); import _minitoml
+got = set()
+for line in open(sys.argv[1]):
+    for tok in line.rstrip("\n").split("\t")[2].split():
+        got.add(tok)
+missing = []
+n = 0
+for r in _minitoml.loads(open(sys.argv[2]).read())["move"]:
+    if not r["seq"]: continue
+    for q in r["seq"].split(","):
+        n += 1
+        k = f"{r['table']}:0x{int(q.strip(), 16):02x}"
+        if k not in got: missing.append((r["name"], k))
+if missing:
+    print("  FAIL  named but never entered:", missing); sys.exit(1)
+print(f"  ok    {n} table:seq ids in the TOML, every one entered by a rig event")
+PY
+
+echo "== 6. negative control: a swapped chain must fail the compare"
+python3 - "$EXP" "$W/ctl.txt" <<'PY'
+import sys
+L = open(sys.argv[1]).read().split("\n")
+i = next(k for k, l in enumerate(L) if l.split("\t")[1:2] == ["5LP"])
+L[i] = L[i].replace("a2:0x00", "a2:0x02")
+open(sys.argv[2], "w").write("\n".join(L))
+PY
+if diff -q "$W/ctl.txt" "$W/got.txt" >/dev/null; then bad "control: a swapped 5LP chain compared EQUAL — the compare is not comparing"; else ok "control: the swapped 5LP line fails the compare"; fi
+
+[ $fail = 0 ] && echo PASS || echo FAIL
+exit $fail

@@ -3080,3 +3080,37 @@ COMMENT-line hits (`grep -rn 're-pointed <tag>' | grep ':[0-9]*:\s*#'`) and
 read each one — a comment naming a build in the past tense is a record, not
 a reference, and a sweep must leave it alone; (3) `grep '\\ *# re-pointed'`
 for the continuation trap stays (14z-117).
+
+
+## THE NAMING RIG'S THREE SELF-INFLICTED MISREADS (14z-120): a BINARY timer, a motion that CONTAINS another, a facing flip
+
+`tools/name_moves.py` drives every Donovan move on native vs2 and reads the
+chain entered ([VSE-47]: never the input's name). Three times the rig, not
+the game, produced the result:
+
+1. **`$FF8109` is a BINARY round timer** — 99 decimal, one tick per ~82
+   frames (a round is ~8,100 frames, not 5,940). A "keep the round alive"
+   poke of `0x99` wrote 153, and the timeout check ended the round the same
+   frame: P1 entered the win pose `a:0x2c`, every later event read UNFIRED.
+   No timer poke is needed for a rig under ~7,500 in-match frames; the
+   generator now asserts the length instead.
+2. **`63214` contains `214`** — with the sword PLANTED, `63214+P` (Sword
+   Grapple) is recognised as `214+P` in stance (Killshread Lightning MP/HP,
+   `a2:0x55/0x56`) and the grapple chain `a2:0x41` never appears. The stance
+   persists across the whole part once planted (an air summon returned the
+   sword and the next "summon back" re-planted it). Measure the grapple in a
+   part that never plants; state the sword's location in every stance rig.
+3. **A facing flip inverts a button SEQUENCE** — Change Immortal's "4" is
+   BACK; once P1 was cornered on the right facing left, "4" became forward,
+   the 5MP that starts the sequence came out and nothing else did. Rigs that
+   walk to the corner must re-derive their directions from the facing.
+
+Two readings of the unexplained `a2:0x1e/0x21` were REFUTED before the
+right one held: "close-range normals" (at pushbox contact the normals enter
+the same `0x00..0x11`) and "Dark-Force normals" (the same chains with
+`$FF802E` = 1). They are the SWORDLESS standing normals (`0x1e-0x23`), a
+reading the decoded chains' own hitbox families suggested and a plant-first
+rig confirmed. **Rule:** when an unexplained chain fires, list what STATE
+differed at the two firings before theorising — both firings were in a
+part whose sword was still planted.
+

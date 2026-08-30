@@ -1,4 +1,47 @@
-# NEXT SESSION — orientation (rewritten at the 14z-119 close, 2026-08-30)
+# NEXT SESSION — orientation (rewritten at the 14z-120 close, 2026-08-30)
+
+> ## **START HERE. NOTHING IS RED. NO BUILD CHANGED — the tree is still the
+> ## M12 freeze (merged-m14 `6649523a`, `build/m3b_merged21`), NOT PUSHED
+> ## (main is ahead of origin by the 14z-119 freeze + close and the 14z-120
+> ## commits), NOT FIELD-TESTED (bundle `../mister_fieldtest_14z119/`, tell
+> ## "M12"; pick Donovan, walk, jump; `.rbf` unchanged).**
+> ##
+> ## **WHAT 14z-120 DID, one breath:** the maintainer's three move lists live
+> ## in `build/manifest/moves_{donovan,pyron,huitzil}.toml` (conventions in
+> ## the Donovan header), and DONOVAN'S NAMING STEP IS DONE: 53 chain ids
+> ## measured on native vs2 by `tools/name_moves.py` (eight rigs, P1's
+> ## `obj+0x1C` per frame onto the decoded graph), frozen by
+> ## `tests/test_move_naming.sh`, labelled in `docs/project/tables/chars/
+> ## donovan_anim.md`. Found on the way: the SWORDLESS normal set
+> ## (`a2:0x1e-0x23`, `0x25/0x26`); ES = its own chain for every special;
+> ## Slay Shred has no fighter chain (2 stocks natively); `$FF8109` is a
+> ## BINARY timer (a `0x99` poke ends the round — `project/gotchas.md`).
+> ##
+> ## **NEXT, the maintainer's pick:** (A) the board verdict on M12; (B) the
+> ## naming rigs for HUITZIL and PYRON — add a schedule per tenant in
+> ## `tools/name_moves.py` (the Donovan one is the template; new recipes:
+> ## Galaxy Trip's six buttons ground+air, the air throws, Float, held-pair
+> ## EX inputs, Phobos's six 6+button normals), run, freeze
+> ## `tests/expected/move_naming_<tenant>.txt`, extend the gate's TENANT
+> ## loop; (C) phase 2 of the map (hitbox rectangles + attack records by
+> ## measurement — the chains now have NAMES to hang them on). Load
+> ## `vampire-saved-port` first.
+> ##
+> ## **OPEN, unchanged:** the 1:1 wheel mockup; #112/#113 parked; the FBNeo
+> ## two-run-family question; the tenant CPU AI "lackluster" note; win
+> ## quotes (forgone). `test_random_select_tenants.sh`'s CONTROL is still
+> ## `build/m3b_merged19`. New small ones (STATE 14z-120 "open"): Change
+> ## Immortal's `0x3d`; the unentered `a2` ids; the `Killshread Summon (ES)`
+> ## row (measured: no ES — drop it?).
+> ##
+> ## **STATE OF THE BUILDS:** unchanged from 14z-119 — play `tools/run_wide.sh
+> ## build/m3b_merged21 fbneo`; current + one back: `don_m17/m18`, `hui51/52`,
+> ## `pyron35/36`, `m3b_merged20/21` (+ `merged19` control), `m5_stock12/13`.
+
+# HISTORY BELOW — the 14z-119 close opener, the 14z-118 fresh-session opener, the 14z-118 close (audit), 14z-118 verdict, 14z-117 closes, 14z-116, 14z-114, mid-14z-114 and 14z-113 orientations and older;
+# kept for the census anchors, eliminations and traps, superseded as the opener.
+
+## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-119 close, 2026-08-30 — superseded by the 14z-120 opener above)
 
 > ## **START HERE. NOTHING IS RED. THE M12 FREEZE IS DONE — donovan-m18 /
 > ## huitzil-m25 / pyron-m19 / merged-m14 (`build/m3b_merged21`, `6649523a`,
@@ -46,8 +89,6 @@
 > ## `m3b_merged20/21` (+ `m3b_merged19` control), `m5_stock12/13`. The
 > ## physics probe dirs are gone (their evidence is the freeze).
 
-# HISTORY BELOW — the 14z-118 fresh-session opener, the 14z-118 close (audit), 14z-118 verdict, 14z-117 closes, 14z-116, 14z-114, mid-14z-114 and 14z-113 orientations and older;
-# kept for the census anchors, eliminations and traps, superseded as the opener.
 
 ## (HISTORY) NEXT SESSION orientation (rewritten at the 14z-118 close, 2026-08-29, for a FRESH session — superseded by the 14z-119 opener above)
 

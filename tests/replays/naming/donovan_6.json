@@ -1,0 +1,192 @@
+{
+ "tenant": "donovan",
+ "part": "6",
+ "events": [
+  {
+   "name": "U+LP neutral",
+   "frame": 2600,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "U+LK neutral",
+   "frame": 2750,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "Slay Shred [LP+LK]",
+   "frame": 2900,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "5LP in DF",
+   "frame": 3020,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "5MP in DF",
+   "frame": 3140,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "5HP in DF",
+   "frame": 3260,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "5LK in DF",
+   "frame": 3410,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "5MK in DF",
+   "frame": 3530,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "5HK in DF",
+   "frame": 3650,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "2LP in DF",
+   "frame": 3800,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "2MP in DF",
+   "frame": 3920,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "2HP in DF",
+   "frame": 4040,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "2LK in DF",
+   "frame": 4190,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "2MK in DF",
+   "frame": 4310,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "2HK in DF",
+   "frame": 4430,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.LP in DF",
+   "frame": 4580,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.MP in DF",
+   "frame": 4730,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.HP in DF",
+   "frame": 4880,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.LK in DF",
+   "frame": 5030,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.MK in DF",
+   "frame": 5180,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.HK in DF",
+   "frame": 5330,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "Hop Kick in DF",
+   "frame": 5480,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "Blizzard Sword [LP] in DF",
+   "frame": 5630,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Ifrit Sword [LP] in DF",
+   "frame": 5850,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Lightning Sword [LP] in DF",
+   "frame": 6050,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "Killshread [LK] in DF",
+   "frame": 6310,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Killshread Summon [LK] in DF",
+   "frame": 6530,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "idle to DF expiry",
+   "frame": 6750,
+   "gap": 600,
+   "movement": true
+  }
+ ],
+ "pokes": [
+  "2550:ff8850:01200120",
+  "2950:ff8850:01200120",
+  "3350:ff8850:01200120",
+  "3750:ff8850:01200120",
+  "4150:ff8850:01200120",
+  "4550:ff8850:01200120",
+  "4950:ff8850:01200120",
+  "5350:ff8850:01200120",
+  "5750:ff8850:01200120",
+  "6150:ff8850:01200120",
+  "6550:ff8850:01200120",
+  "6950:ff8850:01200120",
+  "7350:ff8850:01200120",
+  "2540:ff8509:09",
+  "5075:ff8509:09"
+ ],
+ "frames": 7600
+}

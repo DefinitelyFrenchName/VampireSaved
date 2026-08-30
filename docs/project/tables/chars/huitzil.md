@@ -377,7 +377,7 @@ Sources: **vs2** = `vsav2` extract (oracle `vhunt2`); **ours** = the built image
 |---|---|---|
 | hitbox | hurt/hit rectangle x/y/w/h encoding | [C] only (ram.md); phase 2 measurement |
 | hitbox | attack record fields (real/white power +0x08/+0x09, hit id +0x10, class byte +0x17 vs +0x1D — the docs disagree) | engine_internals 2392-2463; phase 2 write tap settles the class offset |
-| anim | MOVE NAMES for the chains (which seq is which move) | the chains are decoded and live-verified (test_anim_node_walk, 14z-118); names come from the maintainer's move lists -> build/manifest/moves_<tenant>.toml |
+| anim | MOVE NAMES for the chains (which seq is which move) — DONE for Donovan 14z-120 (build/manifest/moves_donovan.toml, measured by tests/test_move_naming.sh; labelled in donovan_anim.md); Huitzil and Pyron await their naming rigs | the chains are decoded and live-verified (test_anim_node_walk, 14z-118); names come from the maintainer's move lists -> build/manifest/moves_<tenant>.toml, seq ids from tools/name_moves.py on the native game |
 | anim | startup / active / recovery as data — which hitbox-family word (+8 / +0xA) marks an ATTACK node | node durations are decoded; the attack/hurt semantics of hb8/hbA wait for phase 2 |
 | anim | table a2's entry rule: its chains are entered MID-CHAIN by node index (measured: 5 jumps onto a2 nodes 3/5/7/13) | test_anim_node_walk observation; the selecting code is unread |
 | anim | the 6-byte script-op area at +0x10..+0x15 of every node | kept as hex; engine_internals 'the [cf14]..[0b] script-op area' |

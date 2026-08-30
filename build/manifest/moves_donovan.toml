@@ -19,6 +19,14 @@
 #     naming step matches them against the remaining chains; the
 #     maintainer enriches the ones with specific properties (dash etc.).
 #   - `table` / `seq` are filled by the naming step, never by hand.
+#
+# NAMING STEP DONE 14z-120 (2026-08-30): every seq below was MEASURED on native
+# vs2 by tools/name_moves.py (P1's node pointer obj+0x1C sampled per frame and
+# mapped onto the decoded chain graph; gate tests/test_move_naming.sh). A seq
+# list follows the input list's order (LP/MP/HP or the listed inputs); chain
+# TAILS (recovery chains entered after the move's own) are in the notes.
+# Two positive controls: Blizzard Sword HP = vs2 0x283E58 (replay 59) and
+# Lightning Sword ES = vs2 0x284A64 (replay 56).
 
 # ---- throws -------------------------------------------------------------
 
@@ -26,17 +34,17 @@
 name = "Sharirum Luna"
 input = "4MP, 6MP, 4HP, 6HP"
 kind = "throw"
-notes = "Ground throw, must be performed up close; direction by 4/6, MP or HP"
-table = ""
-seq = ""
+notes = "Ground throw, must be performed up close; direction by 4/6, MP or HP; MEASURED 14z-120: 6MP, 6HP and 4MP all enter a2:0x2c (one throw chain; 4HP whiffed in the rig)"
+table = "a2"
+seq = "0x2c"
 
 [[move]]
 name = "Sword Grapple"
 input = "63214MP, 63214HP"
 kind = "throw"
-notes = "Command throw; ground throw, must be performed up close; MP or HP"
-table = ""
-seq = ""
+notes = "Command throw; ground throw, must be performed up close; MP or HP; MEASURED 14z-120: MP and HP both enter a2:0x41 (measured on a whiff at range, sword in hand). TRAP: with the sword PLANTED the 63214P input is read as Killshread Lightning (63214 contains 214)"
+table = "a2"
+seq = "0x41"
 
 # ---- command normals ----------------------------------------------------
 
@@ -44,25 +52,25 @@ seq = ""
 name = "Killshread Surf"
 input = "j.2LK, j.2MK"
 kind = "normal"
-notes = "Command normal; dive-kick-type move; LK or MK"
-table = ""
-seq = ""
+notes = "Command normal; dive-kick-type move; LK or MK; MEASURED 14z-120: j.2LK -> a2:0x28, j.2MK -> a2:0x29; ABSENT swordless (the plain j.LK/j.MK come out)"
+table = "a2"
+seq = "0x28,0x29"
 
 [[move]]
 name = "Killshread Dive"
 input = "j.2HK"
 kind = "normal"
-notes = "Command normal; dive-kick-type move"
-table = ""
-seq = ""
+notes = "Command normal; dive-kick-type move; MEASURED 14z-120; ABSENT swordless (the plain j.HK comes out)"
+table = "a2"
+seq = "0x2a"
 
 [[move]]
 name = "Hop Kick"
 input = "6HK"
 kind = "normal"
-notes = "Command normal"
-table = ""
-seq = ""
+notes = "Command normal; MEASURED 14z-120: a2:0x27 then the landing chain a2:0x63; identical swordless"
+table = "a2"
+seq = "0x27"
 
 # ---- specials (+ their ES rows) ----------------------------------------
 
@@ -70,113 +78,113 @@ seq = ""
 name = "Foot Stab"
 input = "8P, 8K"
 kind = "special"
-notes = "Pursuit move; P or K; ES = Foot Stab (ES)"
-table = ""
-seq = ""
+notes = "Pursuit move; P or K; ES = Foot Stab (ES); MEASURED 14z-120 off a throw knockdown: 8P and 8K enter the SAME chain a2:0x4c; identical swordless"
+table = "a2"
+seq = "0x4c"
 
 [[move]]
 name = "Foot Stab (ES)"
 input = "8PP, 8KK"
 kind = "es"
-notes = "ES of Foot Stab; pursuit move"
-table = ""
-seq = ""
+notes = "ES of Foot Stab; pursuit move; MEASURED 14z-120: a2:0x4e, one stock spent (8PP and 8KK identical)"
+table = "a2"
+seq = "0x4e"
 
 [[move]]
 name = "Killshread"
-input = "214K"
+input = "214LK, 214MK, 214HK"
 kind = "special"
-notes = "Stance change (plants the sword); ES = Killshread (ES)"
-table = ""
-seq = ""
+notes = "Stance change (plants the sword); ES = Killshread (ES); MEASURED 14z-120: LK -> a2:0x44; MK and HK -> a2:0x43"
+table = "a2"
+seq = "0x44,0x43,0x43"
 
 [[move]]
 name = "Killshread (ES)"
 input = "214KK"
 kind = "es"
-notes = "ES of Killshread; stance change (plants the sword)"
-table = ""
-seq = ""
+notes = "ES of Killshread; stance change (plants the sword); MEASURED 14z-120: a2:0x46, one stock spent"
+table = "a2"
+seq = "0x46"
 
 [[move]]
 name = "Killshread Summon"
 input = "214K, j.214K"
 kind = "special"
-notes = "In Killshread stance; stance change (summons back the sword); ground or air; ES = Killshread Summon (ES)"
-table = ""
-seq = ""
+notes = "In Killshread stance; stance change (summons back the sword); ground or air; ES = Killshread Summon (ES); MEASURED 14z-120: ground 214K (any K) -> a2:0x47; air j.214K -> a2:0x48"
+table = "a2"
+seq = "0x47,0x48"
 
 [[move]]
 name = "Killshread Summon (ES)"
 input = "214KK, j.214KK"
 kind = "es"
-notes = "ES of Killshread Summon; in Killshread stance; ground or air"
-table = ""
-seq = ""
+notes = "ES of Killshread Summon; in Killshread stance; ground or air; MEASURED 14z-120: NO ES VERSION — 214KK in stance enters the plain summon a2:0x47 and spends NO stock (maintainer to confirm / drop this row)"
+table = "a2"
+seq = "0x47"
 
 [[move]]
 name = "Killshread Lightning"
 input = "214P"
 kind = "special"
-notes = "In Killshread stance; ES = Killshread Lightning (ES)"
-table = ""
-seq = ""
+notes = "In Killshread stance; ES = Killshread Lightning (ES); MEASURED 14z-120: LP/MP/HP -> a2:0x54/0x55/0x56, then the common tail a2:0x58"
+table = "a2"
+seq = "0x54,0x55,0x56"
 
 [[move]]
 name = "Killshread Lightning (ES)"
 input = "214PP"
 kind = "es"
-notes = "ES of Killshread Lightning; in Killshread stance"
-table = ""
-seq = ""
+notes = "ES of Killshread Lightning; in Killshread stance; MEASURED 14z-120: a2:0x57 then the tail a2:0x58, one stock spent"
+table = "a2"
+seq = "0x57"
 
 [[move]]
 name = "Ifrit Sword"
 input = "623P"
 kind = "special"
-notes = "Donovan's guard cancel: can be guard cancelled into (623P in blockstun) for 1 meter stock; ES = Ifrit Sword (ES)"
-table = ""
-seq = ""
+notes = "Donovan's guard cancel: can be guard cancelled into (623P in blockstun) for 1 meter stock; ES = Ifrit Sword (ES); MEASURED 14z-120: LP/MP/HP -> a2:0x2d/0x2e/0x2f; ABSENT swordless (the plain 2LP came out for 623LP)"
+table = "a2"
+seq = "0x2d,0x2e,0x2f"
 
 [[move]]
 name = "Ifrit Sword (ES)"
 input = "623PP"
 kind = "es"
-notes = "ES of Ifrit Sword"
-table = ""
-seq = ""
+notes = "ES of Ifrit Sword; MEASURED 14z-120: a2:0x30, one stock spent"
+table = "a2"
+seq = "0x30"
 
 [[move]]
 name = "Blizzard Sword"
 input = "41236P"
 kind = "special"
-notes = "Freezing projectile; ES = Blizzard Sword (ES)"
-table = ""
-seq = ""
+notes = "Freezing projectile; ES = Blizzard Sword (ES); MEASURED 14z-120: LP/MP/HP -> a2:0x31/0x32/0x33 (HP = vs2 0x283E58, the chain replay 59 recorded — the rig's positive control); ABSENT swordless"
+table = "a2"
+seq = "0x31,0x32,0x33"
 
 [[move]]
 name = "Blizzard Sword (ES)"
 input = "41236PP"
 kind = "es"
-notes = "ES of Blizzard Sword; freezing projectile"
-table = ""
-seq = ""
+notes = "ES of Blizzard Sword; freezing projectile; MEASURED 14z-120: a2:0x34, one stock spent"
+table = "a2"
+seq = "0x34"
 
 [[move]]
 name = "Lightning Sword"
 input = "421P"
 kind = "special"
-notes = "Can be mashed for more hits; ES = Lightning Sword (ES)"
-table = ""
-seq = ""
+notes = "Can be mashed for more hits; ES = Lightning Sword (ES); MEASURED 14z-120: LP/MP/HP -> a2:0x35/0x36/0x37 (mash loops inside the chain), then the common tail a2:0x39; ABSENT swordless (the plain normal comes out)"
+table = "a2"
+seq = "0x35,0x36,0x37"
 
 [[move]]
 name = "Lightning Sword (ES)"
 input = "421PP"
 kind = "es"
-notes = "ES of Lightning Sword; can be mashed for more hits"
-table = ""
-seq = ""
+notes = "ES of Lightning Sword; can be mashed for more hits; MEASURED 14z-120: a2:0x38 = vs2 0x284A64 (replay 56's ES chain — the rig's second positive control), tail a2:0x39, one stock spent"
+table = "a2"
+seq = "0x38"
 
 # ---- EX ------------------------------------------------------------------
 
@@ -184,17 +192,17 @@ seq = ""
 name = "Press of Death"
 input = "41236K"
 kind = "ex"
-notes = "The strength of K determines the distance"
-table = ""
-seq = ""
+notes = "The strength of K determines the distance; MEASURED 14z-120: LK, MK and HK all enter a2:0x3a (the distance is a parameter, not a chain), one stock each; works swordless"
+table = "a2"
+seq = "0x3a"
 
 [[move]]
 name = "Change Immortal"
 input = "MP LP 4 LK MK"
 kind = "ex"
-notes = "Button sequence in rapid succession; 2 and 8 control after the transformation"
-table = ""
-seq = ""
+notes = "Button sequence in rapid succession; 2 and 8 control after the transformation; MEASURED 14z-120: a2:0x3b -> 0x3c -> 0x3e -> 0x3f, one stock; 0x3d NOT measured (the 2/8 control was not reached by the rig). The 5MP that starts the sequence comes out first (a2:0x02)"
+table = "a2"
+seq = "0x3b"
 
 # ---- Dark Force ----------------------------------------------------------
 
@@ -202,7 +210,7 @@ seq = ""
 name = "Slay Shred"
 input = "LP+LK, MP+MK, HP+HK"
 kind = "df"
-notes = "Dark Force; makes Killshread act on top of Donovan's attacks; P+K of the same strength (universal input, listed for the name)"
+notes = "Dark Force; makes Killshread act on top of Donovan's attacks; P+K of the same strength (universal input, listed for the name); MEASURED 14z-120: NO FIGHTER CHAIN — the activation re-enters idle a:0x00; $FF802E (DF flag) rises 25 frames after the press; TWO stocks spent on native vs2; DF lasted 332 frames in the rig. Inside DF the normals enter their ordinary chains"
 table = ""
 seq = ""
 
@@ -212,145 +220,145 @@ seq = ""
 name = "5LP"
 input = "5LP"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (same at range and up close, inside DF, and — except 5P/5K/2MP/2HP — swordless)"
+table = "a2"
+seq = "0x00"
 
 [[move]]
 name = "5MP"
 input = "5MP"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (same at range and up close, inside DF, and — except 5P/5K/2MP/2HP — swordless)"
+table = "a2"
+seq = "0x02"
 
 [[move]]
 name = "5HP"
 input = "5HP"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (same at range and up close, inside DF, and — except 5P/5K/2MP/2HP — swordless)"
+table = "a2"
+seq = "0x04"
 
 [[move]]
 name = "5LK"
 input = "5LK"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (same at range and up close, inside DF, and — except 5P/5K/2MP/2HP — swordless)"
+table = "a2"
+seq = "0x06"
 
 [[move]]
 name = "5MK"
 input = "5MK"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (same at range and up close, inside DF, and — except 5P/5K/2MP/2HP — swordless)"
+table = "a2"
+seq = "0x08"
 
 [[move]]
 name = "5HK"
 input = "5HK"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (same at range and up close, inside DF, and — except 5P/5K/2MP/2HP — swordless)"
+table = "a2"
+seq = "0x0a"
 
 [[move]]
 name = "2LP"
 input = "2LP"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (same at range and up close, inside DF, and — except 5P/5K/2MP/2HP — swordless)"
+table = "a2"
+seq = "0x0c"
 
 [[move]]
 name = "2MP"
 input = "2MP"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (same at range and up close, inside DF, and — except 5P/5K/2MP/2HP — swordless)"
+table = "a2"
+seq = "0x0d"
 
 [[move]]
 name = "2HP"
 input = "2HP"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (same at range and up close, inside DF, and — except 5P/5K/2MP/2HP — swordless)"
+table = "a2"
+seq = "0x0e"
 
 [[move]]
 name = "2LK"
 input = "2LK"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (same at range and up close, inside DF, and — except 5P/5K/2MP/2HP — swordless)"
+table = "a2"
+seq = "0x0f"
 
 [[move]]
 name = "2MK"
 input = "2MK"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (same at range and up close, inside DF, and — except 5P/5K/2MP/2HP — swordless)"
+table = "a2"
+seq = "0x10"
 
 [[move]]
 name = "2HK"
 input = "2HK"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (same at range and up close, inside DF, and — except 5P/5K/2MP/2HP — swordless)"
+table = "a2"
+seq = "0x11"
 
 [[move]]
 name = "j.LP"
 input = "j.LP"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (same at range and up close, inside DF, and — except 5P/5K/2MP/2HP — swordless)"
+table = "a2"
+seq = "0x12"
 
 [[move]]
 name = "j.MP"
 input = "j.MP"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (same at range and up close, inside DF, and — except 5P/5K/2MP/2HP — swordless)"
+table = "a2"
+seq = "0x13"
 
 [[move]]
 name = "j.HP"
 input = "j.HP"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (same at range and up close, inside DF, and — except 5P/5K/2MP/2HP — swordless)"
+table = "a2"
+seq = "0x14"
 
 [[move]]
 name = "j.LK"
 input = "j.LK"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (same at range and up close, inside DF, and — except 5P/5K/2MP/2HP — swordless)"
+table = "a2"
+seq = "0x15"
 
 [[move]]
 name = "j.MK"
 input = "j.MK"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (same at range and up close, inside DF, and — except 5P/5K/2MP/2HP — swordless)"
+table = "a2"
+seq = "0x16"
 
 [[move]]
 name = "j.HK"
 input = "j.HK"
 kind = "normal"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (same at range and up close, inside DF, and — except 5P/5K/2MP/2HP — swordless)"
+table = "a2"
+seq = "0x17"
 
 # ---- movement (skeleton; maintainer enriches, e.g. dash properties) -----
 
@@ -358,46 +366,112 @@ seq = ""
 name = "Forward dash"
 input = "66"
 kind = "dash"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120: a2:0x49 then the dash-end chain a2:0x4b"
+table = "a2"
+seq = "0x49"
 
 [[move]]
 name = "Back dash"
 input = "44"
 kind = "dash"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120: a2:0x4a then the dash-end chain a2:0x4b"
+table = "a2"
+seq = "0x4a"
 
 [[move]]
 name = "Walk forward"
 input = "6"
 kind = "misc"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120 (idle = a:0x00)"
+table = "a"
+seq = "0x02"
 
 [[move]]
 name = "Walk back"
 input = "4"
 kind = "misc"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120"
+table = "a"
+seq = "0x04"
 
 [[move]]
 name = "Crouch"
 input = "2"
 kind = "misc"
-notes = ""
-table = ""
-seq = ""
+notes = "MEASURED 14z-120: crouch-down a:0x09 -> crouched a:0x01 -> stand-up a:0x06"
+table = "a"
+seq = "0x01"
 
 [[move]]
 name = "Jump"
 input = "8, 7, 9"
 kind = "misc"
-notes = "Neutral / back / forward"
-table = ""
-seq = ""
+notes = "Neutral / back / forward; MEASURED 14z-120: pre-jump a:0x0e -> airborne a:0x10 -> landing a:0x0f, the same three for 7/8/9"
+table = "a"
+seq = "0x10"
+
+# ---- SWORDLESS normals (sword planted by Killshread) — MEASURED 14z-120: their own chains ---
+
+[[move]]
+name = "5LP (swordless)"
+input = "5LP"
+kind = "normal"
+notes = "MEASURED 14z-120: with the sword planted 5LP enters its own chain (2LP/2LK/2MK/2HK and every jumping normal keep the sworded chain)"
+table = "a2"
+seq = "0x1e"
+
+[[move]]
+name = "5MP (swordless)"
+input = "5MP"
+kind = "normal"
+notes = "MEASURED 14z-120: with the sword planted 5MP enters its own chain (2LP/2LK/2MK/2HK and every jumping normal keep the sworded chain)"
+table = "a2"
+seq = "0x1f"
+
+[[move]]
+name = "5HP (swordless)"
+input = "5HP"
+kind = "normal"
+notes = "MEASURED 14z-120: with the sword planted 5HP enters its own chain (2LP/2LK/2MK/2HK and every jumping normal keep the sworded chain)"
+table = "a2"
+seq = "0x20"
+
+[[move]]
+name = "5LK (swordless)"
+input = "5LK"
+kind = "normal"
+notes = "MEASURED 14z-120: with the sword planted 5LK enters its own chain (2LP/2LK/2MK/2HK and every jumping normal keep the sworded chain)"
+table = "a2"
+seq = "0x21"
+
+[[move]]
+name = "5MK (swordless)"
+input = "5MK"
+kind = "normal"
+notes = "MEASURED 14z-120: with the sword planted 5MK enters its own chain (2LP/2LK/2MK/2HK and every jumping normal keep the sworded chain)"
+table = "a2"
+seq = "0x22"
+
+[[move]]
+name = "5HK (swordless)"
+input = "5HK"
+kind = "normal"
+notes = "MEASURED 14z-120: with the sword planted 5HK enters its own chain (2LP/2LK/2MK/2HK and every jumping normal keep the sworded chain)"
+table = "a2"
+seq = "0x23"
+
+[[move]]
+name = "2MP (swordless)"
+input = "2MP"
+kind = "normal"
+notes = "MEASURED 14z-120: with the sword planted 2MP enters its own chain (2LP/2LK/2MK/2HK and every jumping normal keep the sworded chain)"
+table = "a2"
+seq = "0x25"
+
+[[move]]
+name = "2HP (swordless)"
+input = "2HP"
+kind = "normal"
+notes = "MEASURED 14z-120: with the sword planted 2HP enters its own chain (2LP/2LK/2MK/2HK and every jumping normal keep the sworded chain)"
+table = "a2"
+seq = "0x26"

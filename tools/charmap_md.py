@@ -175,6 +175,23 @@ def main():
               f"{sum(1 for c in ch.values() if c['end'].startswith('loop'))} | {sum(1 for c in ch.values() if c['end']=='hold')} |")
         w("")
         if a.anim:
+            # MOVE NAMES (phase 1 naming step, 14z-120): build/manifest/moves_<tenant>.toml
+            # rows carry table/seq measured by tools/name_moves.py; label each chain.
+            names = {}
+            mv = Path(__file__).resolve().parent.parent / "build" / "manifest" / f"moves_{j['tenant']}.toml"
+            if mv.exists():
+                import sys as _sys
+                _sys.path.insert(0, str(Path(__file__).resolve().parent))
+                import _minitoml
+                for r in _minitoml.loads(mv.read_text()).get("move", []):
+                    if r.get("table") and r.get("seq"):
+                        inputs = [x.strip() for x in r["input"].split(",")]
+                        seqs = [x.strip() for x in r["seq"].split(",")]
+                        if len(seqs) == 3 and len(inputs) != 3:      # LP/MP/HP (or LK/MK/HK) of one motion
+                            inputs = [st + inputs[0][-1] for st in ("L", "M", "H")]
+                        for k, q in enumerate(seqs):
+                            lab = r["name"] + (f" [{inputs[k]}]" if len(seqs) > 1 and k < len(inputs) else "")
+                            names.setdefault((r["table"], int(q, 16)), []).append(lab)
             ao = []
             ao.append(f"# {j['tenant'].capitalize()} — animation node chains (appendix of the character-data map)")
             ao.append("")
@@ -186,10 +203,15 @@ def main():
                 if not T: continue
                 ao.append(f"## table `{tn}` — {T['entries']} entries (vs2 `{T['table_vs2']}`, ours `{T['table_ours']}`)")
                 ao.append("")
+                named = sum(1 for seq in T["chains"] if (tn, int(seq, 16)) in names)
+                if names:
+                    ao.append(f"Named chains: {named} of {T['entries']} (from `build/manifest/moves_{j['tenant']}.toml`, measured by `tests/test_move_naming.sh`).")
+                    ao.append("")
                 for seq, c in T["chains"].items():
                     if not c["start"]:
                         ao.append(f"- seq `{seq}`: unused"); continue
-                    ao.append(f"### seq `{seq}` — start `{c['start']}`, {c['n']} nodes, {c['frames']} frames, end {c['end']}"
+                    lab = names.get((tn, int(seq, 16)))
+                    ao.append(f"### seq `{seq}`" + (f" — **{' / '.join(lab)}**" if lab else "") + f" — start `{c['start']}`, {c['n']} nodes, {c['frames']} frames, end {c['end']}"
                               + ("" if c['ours_end'] == c['end'] else f" (ours: {c['ours_end']})"))
                     ao.append("")
                     ao.append("| # | addr | off | dur | flags | hb8 | hbA | shadow | sfx | link | ! |")

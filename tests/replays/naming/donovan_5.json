@@ -1,0 +1,128 @@
+{
+ "tenant": "donovan",
+ "part": "5",
+ "events": [
+  {
+   "name": "walk-in",
+   "frame": 2600,
+   "gap": 240,
+   "movement": true
+  },
+  {
+   "name": "Sword Grapple [MP]",
+   "frame": 2840,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 3100,
+   "gap": 140,
+   "movement": true
+  },
+  {
+   "name": "Sword Grapple [HP]",
+   "frame": 3240,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 3500,
+   "gap": 140,
+   "movement": true
+  },
+  {
+   "name": "5LP close",
+   "frame": 3640,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "5MP close",
+   "frame": 3760,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "5HP close",
+   "frame": 3880,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "5LK close",
+   "frame": 4030,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "5MK close",
+   "frame": 4150,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "5HK close",
+   "frame": 4270,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "2LP close",
+   "frame": 4420,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "2MP close",
+   "frame": 4540,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "2HP close",
+   "frame": 4660,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "2LK close",
+   "frame": 4810,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "2MK close",
+   "frame": 4930,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "2HK close",
+   "frame": 5050,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "Change Immortal + 2/8",
+   "frame": 5200,
+   "gap": 400,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "2550:ff8850:01200120",
+  "2950:ff8850:01200120",
+  "3350:ff8850:01200120",
+  "3750:ff8850:01200120",
+  "4150:ff8850:01200120",
+  "4550:ff8850:01200120",
+  "4950:ff8850:01200120",
+  "5350:ff8850:01200120",
+  "5750:ff8850:01200120",
+  "2540:ff8509:09",
+  "4200:ff8509:09"
+ ],
+ "frames": 5850
+}

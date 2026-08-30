@@ -176504,9 +176504,9 @@
    "what": "attack record fields (real/white power +0x08/+0x09, hit id +0x10, class byte +0x17 vs +0x1D \u2014 the docs disagree)"
   },
   {
-   "evidence": "the chains are decoded and live-verified (test_anim_node_walk, 14z-118); names come from the maintainer's move lists -> build/manifest/moves_<tenant>.toml",
+   "evidence": "the chains are decoded and live-verified (test_anim_node_walk, 14z-118); names come from the maintainer's move lists -> build/manifest/moves_<tenant>.toml, seq ids from tools/name_moves.py on the native game",
    "structure": "anim",
-   "what": "MOVE NAMES for the chains (which seq is which move)"
+   "what": "MOVE NAMES for the chains (which seq is which move) \u2014 DONE for Donovan 14z-120 (build/manifest/moves_donovan.toml, measured by tests/test_move_naming.sh; labelled in donovan_anim.md); Huitzil and Pyron await their naming rigs"
   },
   {
    "evidence": "node durations are decoded; the attack/hurt semantics of hb8/hbA wait for phase 2",

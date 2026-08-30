@@ -641,6 +641,56 @@ PC 0xCE38A = vs2 0x2713C + port offset):
   ls_freeze_vs2_{victim,attacker} site_thunks at vsavj
   0x23AD8/0x23ADE (see donovan.toml 14z-42 block).
 
+### Donovan's anim-chain map — the moves named (14z-120, measured on native vs2)
+
+The naming step of the character-data map (phase 1): every row of
+`build/manifest/moves_donovan.toml` carries the `(table, seq)` the walker
+ENTERS when the move is performed on native vs2 — measured by
+`tools/name_moves.py` (eight scripted rigs, P1's `obj+0x1C` sampled per
+frame by `tests/lua/field_trace.lua`, each pointer mapped onto the graph
+`tools/anim_nodes.py` decodes) and frozen by `tests/test_move_naming.sh`
+(`tests/expected/move_naming_donovan.txt`). The labelled per-chain page is
+`docs/project/tables/chars/donovan_anim.md`. Atlas rows: `ram.md` `+0x1C`
+(node pointer), `+0x109` (banked stocks), `$FF802E` (the DF flag), `$FF8109`
+(round timer). What the layout says about the engine:
+
+- **Table `a2` is the MOVE table, laid out by class in input order:** standing
+  normals `0x00,02,04,06,08,0a` (LP MP HP LK MK HK; the odd ids between them
+  were not entered by any rig), crouching `0x0c-0x11`, jumping `0x12-0x17`,
+  then a SECOND standing set `0x1e-0x23` and crouching MP/HP `0x25/0x26` —
+  **the SWORDLESS normals**, entered only while the sword is planted (Killshread);
+  the other crouching and every jumping normal keep their sworded chain, and
+  the sword specials and the dive kicks are simply absent swordless (the
+  button's plain normal comes out). Command normals `0x27` (6HK, landing
+  `0x63`), `0x28/0x29/0x2a` (j.2LK/MK/HK). Throw `0x2c` (4/6 + MP/HP, one
+  chain). Specials in blocks of LP/MP/HP **plus their ES as a fourth
+  chain**: Ifrit `0x2d-0x2f` + ES `0x30`, Blizzard `0x31-0x33` + ES `0x34`,
+  Lightning `0x35-0x37` + ES `0x38`, common tail `0x39`. EX: Press of Death
+  `0x3a` (one chain for LK/MK/HK — the distance is a parameter), Change
+  Immortal `0x3b -> 0x3c -> 0x3e -> 0x3f` (`0x3d` not reached). Grapple
+  `0x41`. Stance: Killshread LK `0x44`, MK/HK `0x43`, ES `0x46`; summon
+  ground `0x47`, air `0x48` (no ES — the pair spends no stock and enters
+  `0x47`); Lightning-in-stance LP/MP/HP `0x54-0x56`, ES `0x57`, tail `0x58`.
+  Dashes `0x49/0x4a`, dash end `0x4b`. Pursuit `0x4c` (P and K identical),
+  ES `0x4e`. Table `a` is the movement family: idle `0x00`, walk `0x02/0x04`,
+  crouch `0x09 -> 0x01 -> 0x06`, jump `0x0e -> 0x10 -> 0x0f`.
+- **ES is separate CONTENT, not a flag** (confirms 14z-44 for every special):
+  each ES owns a chain next to its parent's three strengths and spends one
+  stock (`+0x109`); the input layer's resolver takes ANY two punches/kicks.
+- **Dark Force has NO fighter chain of its own:** the P+K pair re-enters idle
+  `a:0x00`, `$FF802E` rises 25 frames later, TWO stocks are spent on native
+  vs2 (the port spends one — 14z-69), and the mode lasted 332 frames in the
+  rig; the normals inside DF enter their ordinary chains (the DF effect is
+  the object family, not the fighter's animation).
+- **Three ways the rig's own input lied**, filed in `project/gotchas.md`: the
+  round timer `$FF8109` is BINARY (99, one tick per ~82 frames) so a `0x99`
+  poke ENDS the round; `63214` contains `214`, so a grapple with the sword
+  planted is Killshread Lightning; a facing flip turns the "4" of a button
+  sequence into forward and the sequence never fires. Two hypotheses were
+  REFUTED by measurement before the swordless reading held: "close-range
+  normals" (the same chains at pushbox contact) and "DF-form normals"
+  (the same chains with `$FF802E` = 1).
+
 ## Command-input / motion-tracker subsystem (session 14z-48, measured both engines)
 
 How special-move inputs are recognized (identical architecture in

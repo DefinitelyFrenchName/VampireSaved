@@ -1,0 +1,112 @@
+{
+ "tenant": "donovan",
+ "part": "3",
+ "events": [
+  {
+   "name": "Blizzard Sword (ES)",
+   "frame": 2600,
+   "gap": 240,
+   "movement": false
+  },
+  {
+   "name": "Ifrit Sword (ES)",
+   "frame": 2840,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Lightning Sword (ES)",
+   "frame": 3060,
+   "gap": 300,
+   "movement": false
+  },
+  {
+   "name": "Killshread (ES)",
+   "frame": 3360,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Killshread Lightning (ES)",
+   "frame": 3580,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "Killshread Summon (ES)",
+   "frame": 3840,
+   "gap": 240,
+   "movement": false
+  },
+  {
+   "name": "Press of Death [LK]",
+   "frame": 4080,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "Press of Death [MK]",
+   "frame": 4340,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "Press of Death [HK]",
+   "frame": 4600,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "Change Immortal",
+   "frame": 4860,
+   "gap": 400,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 5260,
+   "gap": 120,
+   "movement": true
+  },
+  {
+   "name": "Foot Stab (ES) [8PP]",
+   "frame": 5380,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 5640,
+   "gap": 120,
+   "movement": true
+  },
+  {
+   "name": "Foot Stab (ES) [8KK]",
+   "frame": 5760,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "Slay Shred [MP+MK]",
+   "frame": 6020,
+   "gap": 500,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "2550:ff8850:01200120",
+  "2950:ff8850:01200120",
+  "3350:ff8850:01200120",
+  "3750:ff8850:01200120",
+  "4150:ff8850:01200120",
+  "4550:ff8850:01200120",
+  "4950:ff8850:01200120",
+  "5350:ff8850:01200120",
+  "5750:ff8850:01200120",
+  "6150:ff8850:01200120",
+  "6550:ff8850:01200120",
+  "2540:ff8509:09",
+  "4660:ff8509:09"
+ ],
+ "frames": 6770
+}

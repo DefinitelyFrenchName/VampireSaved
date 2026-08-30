@@ -1,0 +1,180 @@
+{
+ "tenant": "donovan",
+ "part": "2",
+ "events": [
+  {
+   "name": "Blizzard Sword [LP]",
+   "frame": 2600,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Blizzard Sword [MP]",
+   "frame": 2820,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Blizzard Sword [HP]",
+   "frame": 3040,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Ifrit Sword [LP]",
+   "frame": 3260,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Ifrit Sword [MP]",
+   "frame": 3460,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Ifrit Sword [HP]",
+   "frame": 3660,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Lightning Sword [LP]",
+   "frame": 3860,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "Lightning Sword [MP]",
+   "frame": 4120,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "Lightning Sword [HP]",
+   "frame": 4380,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "Killshread [LK]",
+   "frame": 4640,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Killshread Lightning [LP]",
+   "frame": 4840,
+   "gap": 240,
+   "movement": false
+  },
+  {
+   "name": "Killshread Summon [LK]",
+   "frame": 5080,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "Killshread [HK]",
+   "frame": 5300,
+   "gap": 200,
+   "movement": false
+  },
+  {
+   "name": "Killshread Summon [j.214K]",
+   "frame": 5500,
+   "gap": 220,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 5720,
+   "gap": 240,
+   "movement": true
+  },
+  {
+   "name": "Sharirum Luna [6MP]",
+   "frame": 5960,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 6220,
+   "gap": 140,
+   "movement": true
+  },
+  {
+   "name": "Sharirum Luna [6HP]",
+   "frame": 6360,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 6620,
+   "gap": 140,
+   "movement": true
+  },
+  {
+   "name": "Sword Grapple [MP]",
+   "frame": 6760,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 7020,
+   "gap": 140,
+   "movement": true
+  },
+  {
+   "name": "Sword Grapple [HP]",
+   "frame": 7160,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 7420,
+   "gap": 120,
+   "movement": true
+  },
+  {
+   "name": "Foot Stab [8P]",
+   "frame": 7540,
+   "gap": 260,
+   "movement": false
+  },
+  {
+   "name": "walk-in",
+   "frame": 7800,
+   "gap": 120,
+   "movement": true
+  },
+  {
+   "name": "Foot Stab [8K]",
+   "frame": 7920,
+   "gap": 260,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "2550:ff8850:01200120",
+  "2950:ff8850:01200120",
+  "3350:ff8850:01200120",
+  "3750:ff8850:01200120",
+  "4150:ff8850:01200120",
+  "4550:ff8850:01200120",
+  "4950:ff8850:01200120",
+  "5350:ff8850:01200120",
+  "5750:ff8850:01200120",
+  "6150:ff8850:01200120",
+  "6550:ff8850:01200120",
+  "6950:ff8850:01200120",
+  "7350:ff8850:01200120",
+  "7750:ff8850:01200120",
+  "8150:ff8850:01200120"
+ ],
+ "frames": 8430
+}

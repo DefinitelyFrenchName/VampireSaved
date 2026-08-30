@@ -1,0 +1,200 @@
+{
+ "tenant": "donovan",
+ "part": "1",
+ "events": [
+  {
+   "name": "Walk forward",
+   "frame": 2600,
+   "gap": 120,
+   "movement": true
+  },
+  {
+   "name": "Walk back",
+   "frame": 2720,
+   "gap": 120,
+   "movement": true
+  },
+  {
+   "name": "Crouch",
+   "frame": 2840,
+   "gap": 120,
+   "movement": true
+  },
+  {
+   "name": "Jump [8]",
+   "frame": 2960,
+   "gap": 120,
+   "movement": true
+  },
+  {
+   "name": "Jump [9]",
+   "frame": 3080,
+   "gap": 120,
+   "movement": true
+  },
+  {
+   "name": "Jump [7]",
+   "frame": 3200,
+   "gap": 120,
+   "movement": true
+  },
+  {
+   "name": "Forward dash",
+   "frame": 3320,
+   "gap": 150,
+   "movement": true
+  },
+  {
+   "name": "Back dash",
+   "frame": 3470,
+   "gap": 150,
+   "movement": true
+  },
+  {
+   "name": "5LP",
+   "frame": 3620,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "5MP",
+   "frame": 3740,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "5HP",
+   "frame": 3860,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "5LK",
+   "frame": 4010,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "5MK",
+   "frame": 4130,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "5HK",
+   "frame": 4250,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "2LP",
+   "frame": 4400,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "2MP",
+   "frame": 4520,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "2HP",
+   "frame": 4640,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "2LK",
+   "frame": 4790,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "2MK",
+   "frame": 4910,
+   "gap": 120,
+   "movement": false
+  },
+  {
+   "name": "2HK",
+   "frame": 5030,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.LP",
+   "frame": 5180,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.MP",
+   "frame": 5330,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.HP",
+   "frame": 5480,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.LK",
+   "frame": 5630,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.MK",
+   "frame": 5780,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "j.HK",
+   "frame": 5930,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "Hop Kick",
+   "frame": 6080,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "Killshread Surf [j.2LK]",
+   "frame": 6230,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "Killshread Surf [j.2MK]",
+   "frame": 6380,
+   "gap": 150,
+   "movement": false
+  },
+  {
+   "name": "Killshread Dive [j.2HK]",
+   "frame": 6530,
+   "gap": 150,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "2550:ff8850:01200120",
+  "2950:ff8850:01200120",
+  "3350:ff8850:01200120",
+  "3750:ff8850:01200120",
+  "4150:ff8850:01200120",
+  "4550:ff8850:01200120",
+  "4950:ff8850:01200120",
+  "5350:ff8850:01200120",
+  "5750:ff8850:01200120",
+  "6150:ff8850:01200120",
+  "6550:ff8850:01200120"
+ ],
+ "frames": 6930
+}
