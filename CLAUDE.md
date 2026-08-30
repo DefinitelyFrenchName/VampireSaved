@@ -5,6 +5,14 @@ Full-roster Vampire Savior on the real CPS-2 engine. Emulator-target romhack
 This file governs how Claude Code operates inside this repository. Read it fully
 at the start of every session. Read `STATE.md` immediately after.
 
+Condensed 14z-123 at the maintainer's direction ("more concise and to the
+point, without losing precious information, especially on the work style and
+discipline"). The LAW is verbatim; the correction narratives that had
+accreted inside rules are now a rule plus a dated citation — the stories
+live in STATE_HISTORY and the documents named. Every `**[VSP-N]**` marker
+stays on the paragraph it anchors (`tools/checkskills.py` and
+`tests/test_doc_anchor_census.sh` lock them).
+
 ## 1. Mission and prime constraint
 
 Produce a modified `vsav` romset in which all 18 series characters (the 15+1 of
@@ -41,9 +49,9 @@ legacy behavior is a failed change.
    a second emulator where practical, and ratified per profile version. The
    spec is NOT copied here on purpose — two copies drift, and that document
    is the one kept current. Anything outside that profile is still
-   stop-and-escalate. (Corrected 14z-91, GitHub #35: this rule named sprite
-   code as stop-and-escalate while the tree had modified `cps_obj.cpp` under
-   a ratification this file never mentioned.)
+   stop-and-escalate. (This rule named sprite code as stop-and-escalate while
+   the tree had modified `cps_obj.cpp` under a ratification it never
+   mentioned — corrected 14z-91, GitHub #35.)
 2. **[VSP-3]** **No untested change survives a session.** Every patch, however trivial, is
    validated through the headless harness before being committed. "It should
    be equivalent" is not a test result. This standard is inherited from the
@@ -67,18 +75,13 @@ legacy behavior is a failed change.
    The repo holds tools, patches (xdelta/BPS against named reference dumps),
    documentation, and authored assets only. Reference romsets live outside the
    tree in `ROMDIR` (env var) and are never committed, quoted at length, or
-   uploaded anywhere.
-
-   **RENDERED FRAMES ARE OUTSIDE THIS RULE** (ruled 14z-91, GitHub #73). The
-   three committed PNG goldens under `tests/` are full renders of Capcom's
-   title and select artwork, and they stay: a rendered frame is a derived
-   work produced by our own pipeline, not ROM bytes. Recorded here so it is
-   not re-litigated. Worth knowing if it is ever revisited: `test_gfx_menus.sh`
-   compares `tobytes()` AFTER masking, so replacing each golden with a
-   SHA-256 of the masked buffer would be verdict-identical — the only loss is
-   the "N pixels differ" diagnostic. That is a diagnostics trade, not a rule-7
-   obligation. ROM BYTES remain forbidden in every form, including excerpts
-   pasted into docs.
+   uploaded anywhere. **Rendered frames are outside this rule** (ruled 14z-91,
+   GitHub #73): the committed PNG goldens under `tests/` are derived work
+   produced by our own pipeline, not ROM bytes, and they stay — recorded so it
+   is not re-litigated. (`test_gfx_menus.sh` compares masked `tobytes()`, so a
+   SHA-256 of the masked buffer would be verdict-identical; that is a
+   diagnostics trade, not a rule-7 obligation.) ROM BYTES remain forbidden in
+   every form, including excerpts pasted into docs.
 
 ## 3. Environment
 
@@ -87,9 +90,10 @@ legacy behavior is a failed change.
   located in `$ROMDIR`. Verify SHA-1 against `docs/checksums.txt` before any
   session that reads them. If checksums mismatch, stop.
 - Toolchain: Python 3 for analysis/extraction; vasm or asmx for 68000 assembly
-  hooks; Ghidra headless for bulk disassembly (project under `re/ghidra/`);
-  MAME with `-video none` + Lua for tracing and the oracle harness; patched
-  FBNeo build under `emu/fbneo/` (submodule + our driver patch).
+  hooks; MAME with `-video none` + Lua for tracing and the oracle harness;
+  patched FBNeo build under `emu/fbneo/` (submodule + our driver patch). The
+  Ghidra project area `re/ghidra/` was never populated — the address → label
+  stream is `docs/annotations.md` (generated).
 - All analysis scripts are rerunnable, take the ROM path as argument, and
   print the SHA-1 of what they read. Follow the conventions of
   `tools/` (see existing extractors for style — modeled on the SMS project's
@@ -103,147 +107,114 @@ legacy behavior is a failed change.
   match for the full script length. First divergent frame + RAM diff is the
   standard bug report format.
 
-  **[VSP-24]** **WHICH EMULATOR ACTUALLY RUNS THIS, corrected 2026-08-16 (GitHub #78) —
-  this clause said "vanilla FBNeo … patched FBNeo" and described an oracle the
-  suite did not run.** The per-frame whole-corpus legacy oracle is **MAME**
+  **[VSP-24]** **Which emulator runs which oracle** (corrected 2026-08-16,
+  GitHub #78): the per-frame whole-corpus legacy oracle is **MAME**
   (`tests/lib/m2a_common.sh`, the frozen `.masked` classes below). FBNeo
-  carries: the **emulator superset invariant** on pristine `vsavj`
+  carries the **emulator superset invariant** on pristine `vsavj`
   (`test_wide_profile.sh`, reference vs patched binary), **dual-track**
-  inertness on one binary (`test_dualtrack.sh` — **[VSP-25]** **SCOPE CORRECTED 14z-94,
-  maintainer-ratified 2026-08-17, GitHub #95: "inertness" here means
-  bit-identical UP TO SELECT ENTRY, not for the whole replay.** The stock
-  and WIDE builds carry DIFFERENT ROSTERS by construction — a stock-size
-  ROM can only hold Donovan by substituting over someone, which is the
-  reason WIDE exists — so every select-reaching replay must differ, and
-  full cross-track bit-identity was never achievable once M3a
-  de-substituted at 14z-64. Onsets are frozen per replay; an onset moving
-  EARLIER is the failure. **This clause previously rested on a gate no
-  runner executed** — see GitHub #30), and since 14z-92 a
-  **sampled** hacked-build-vs-vanilla legacy check
-  (`test_fbneo_legacy_oracle.sh` — 4 replays × 5 frames, chosen clear of every
-  ratified divergence; **since 14z-110b (maintainer-ruled) the frames are
-  MEASURED-CLEAN OVERRIDES per replay and 26_don_arcade_mash is dropped
-  for 05_timeout_idle** — the ruled d2-window cycles shift FBNeo's phase
-  corpus-wide, the soak has no clean instant, and it stays MAME-covered;
-  the inventory did not grow — see the gate header). The **full** FBNeo legacy track is
-  ACCEPTED-AND-DEFERRED: FBNeo has no frozen expectation corpus by design
-  (every FBNeo gate is a live A/B, which is what makes them
-  machine-independent), so building it means either freezing an FBNeo basis or
-  a live vanilla leg across all 46 legacy replays. Revisit at MiSTer — a third
-  implementation is where MAME-specific behaviour would surface.
+  inertness on one binary (`test_dualtrack.sh`), and a **sampled**
+  hacked-vs-vanilla legacy check (`test_fbneo_legacy_oracle.sh`: 4 replays ×
+  5 frames, each frame a measured-clean override chosen clear of every
+  ratified divergence — 14z-92/110b). The **full** FBNeo legacy track is
+  ACCEPTED-AND-DEFERRED: every FBNeo gate is a live A/B by design (no frozen
+  corpus), which is what makes them machine-independent; revisit at MiSTer,
+  where a third implementation would surface MAME-specific behaviour.
 
-  **[VSP-26]** **THE TWO FBNeo-ONLY PHASE CLASSES — RATIFIED 2026-08-16 (maintainer,
-  GitHub #78).** Two windows may differ on FBNeo where MAME shows ZERO
-  difference at the same frames: the sound-driver work area
-  `$FF0500-$FF05FF` (`atlas/ram.md:74`, already recorded as differing
-  between MAME/FBNeo boot phase) and the OBJ-builder secondary stack
-  `$FF06D0-$FF06EF` (`ram.md:62`, "execution POSITION, not state" — a
-  build whose per-frame work costs different cycles sits one `bsr`
-  further along at the sample instant). Neither is gameplay state.
-  **The ratification EXTENDS `ram.md:62`**, which had recorded that class
-  as appearing only on tenant-content replays where no vanilla oracle
-  applies; it appears here on LEGACY content under FBNeo.
-  **The window is NOT the tolerance.** As with every other non-exact
-  class, the expectation is FROZEN: `test_fbneo_legacy_oracle.sh` carries
-  the measured offset inventory (`$FF055B-$FF055D`, `$FF06D1/D4/DB`) and a
-  byte differing inside a window but OUTSIDE that inventory FAILS as
-  GROWTH. The standing watch applies verbatim — growth means stop and
-  root-cause, not widen. `FBNEO_ORACLE_EXPECT=exact` requires bit-identity
-  for anyone who wants it.
-- **[VSP-27]** **Hooked-build legacy comparison (amended 2026-07-25 v1, refined to v2
-  2026-07-27, both maintainer-approved):** for builds carrying engine
-  hooks (code the vanilla game executes routed through added
-  instructions), the legacy oracle compares **live RAM**: all work RAM
-  except two named windows, both documented in `docs/game/atlas/ram.md` — the
-  dead-stack window `RAM:$FF7F00-$FF7FFF` (below resting SP at the
-  frame-done sample point) and the QSound handshake latch `RAM:$FF043C`
-  (one-frame phase). On that masked basis, per-replay comparison classes
-  (v2): **exact** by default; **flicker-tolerated** where measurement
-  shows isolated ≤2-frame divergences that fully re-converge (≥60 frames)
-  with ≤8 divergent frames total (`tools/compare_flicker.py`,
-  ground-truth tested — the input-accept/spawn-boundary phase artifact);
-  **frozen first-divergence constant** where a masked byte's phase
-  provably propagates into live state on a path with no gameplay surface
-  (test mode reading the sound latch); and, **[VSP-28]** **added v3 2026-08-05
-  (maintainer-approved), bounded re-convergent window** — for a screen the
-  roster work deliberately alters. A replay may sit in this class only when
-  all four hold, each frozen per replay: a single CONTIGUOUS divergent run;
-  a fixed ONSET frame; full RE-CONVERGENCE to bit-identical; and **match
-  state untouched**. Introduced for the select screen, whose wheel must gain
-  three cells for the roster (option 1) — measured over five replays before
-  ratification: onset frame 890 in every one, one run each, windows ending
-  1051/1622/1802/1882/1622, and 2469-10498 bit-identical frames afterwards
-  including a full timeout match. Mechanism: select-screen init caches the
-  record pointer the wheel extension repoints (docs/GOTCHAS.md class 4).
-  Note this class is STRICTER than the frozen first-divergence constant
-  above, which never re-converges at all — it is a narrower licence for one
-  screen, not a loosening. Checker `tools/compare_window.py`, ground-truthed
-  by `tests/test_compare_window.sh`. **[VSP-29]** **Added v4 2026-08-06
-  (maintainer-ratified): composite** — the strict CONJUNCTION of
-  flicker-tolerated and bounded re-convergent window, for replays that
-  exhibit both. It adds NO tolerance: every divergent run must be accounted
-  for by name, the flicker set must match its frozen inventory exactly, the
-  window list must match exactly, and the run must fully re-converge; it
-  therefore permits nothing that either component permits alone, and a
-  bit-identical pair FAILS it. Introduced because on a build carrying BOTH
-  engine hooks and the extended select wheel, every select-reaching legacy
-  replay measures as "the frozen hook-flicker inventory + one bounded
-  window per select-screen ENTRY". Measured over seven replays before
-  ratification (14z-61): every flicker frame matched the frozen `donovan-
-  m2c` inventory with **none added and none missing**, and the windows were
-  attributable one-to-one to select entries — including a replay with TWO
-  windows (the challenger join re-enters the screen) and one whose onset is
-  3190 rather than 890 (it starts mid-attract). Checker
-  `tools/compare_composite.py`, ground-truthed by
-  `tests/test_compare_composite.sh` (seven cases plus a no-loophole check).
-  **[VSP-30]** **Added v5 2026-08-16 (maintainer-ruled), THE >=60 RULE IS
+  **[VSP-25]** **Dual-track "inertness" means bit-identical UP TO SELECT
+  ENTRY, not for the whole replay** (ratified 2026-08-17, GitHub #95). The
+  stock and WIDE builds carry DIFFERENT ROSTERS by construction — a
+  stock-size ROM can only hold Donovan by substituting over someone, which is
+  why WIDE exists — so every select-reaching replay must differ. Onsets are
+  frozen per replay; an onset moving EARLIER is the failure.
+
+  **[VSP-26]** **The two FBNeo-only phase classes** (ratified 2026-08-16,
+  GitHub #78): the sound-driver work area `$FF0500-$FF05FF` and the
+  OBJ-builder secondary stack `$FF06D0-$FF06EF` may differ on FBNeo where MAME
+  shows none — execution POSITION, not state (`atlas/ram.md`), on legacy as
+  well as tenant content. **The window is NOT the tolerance:** the
+  expectation is FROZEN as the measured offset inventory
+  (`$FF055B-$FF055D`, `$FF06D1/D4/DB`, in `test_fbneo_legacy_oracle.sh`) and
+  a byte differing inside a window but OUTSIDE it FAILS as GROWTH — stop and
+  root-cause, never widen. `FBNEO_ORACLE_EXPECT=exact` demands bit-identity.
+- **[VSP-27]** **Hooked-build legacy comparison** (v1 2026-07-25, v2
+  2026-07-27, both maintainer-approved): for builds carrying engine hooks
+  (code the vanilla game executes routed through added instructions), the
+  legacy oracle compares **live RAM**: all work RAM except two named windows,
+  both documented in `docs/game/atlas/ram.md` — the dead-stack window
+  `RAM:$FF7F00-$FF7FFF` (below resting SP at the frame-done sample point) and
+  the QSound handshake latch `RAM:$FF043C` (one-frame phase). On that masked
+  basis, per-replay comparison classes: **exact** by default;
+  **flicker-tolerated** where measurement shows isolated ≤2-frame
+  divergences that fully re-converge (≥60 frames) with ≤8 divergent frames
+  total (`tools/compare_flicker.py`, ground-truth tested — the
+  input-accept/spawn-boundary phase artifact); **frozen first-divergence
+  constant** where a masked byte's phase provably propagates into live state
+  on a path with no gameplay surface (test mode reading the sound latch).
+  **[VSP-28]** **v3 (2026-08-05, maintainer-approved): the bounded
+  re-convergent window** — for a screen the roster work deliberately alters.
+  A replay may sit in this class only when all four hold, each frozen per
+  replay: a single CONTIGUOUS divergent run; a fixed ONSET frame; full
+  RE-CONVERGENCE to bit-identical; and **match state untouched**. Introduced
+  for the select screen, whose wheel gains three cells for the roster;
+  ratified on five replays — onset 890 in every one, one run each, windows
+  ending 1051/1622/1802/1882/1622, 2469-10498 bit-identical frames after
+  (mechanism: select-screen init caches the record pointer the wheel extension
+  repoints, `docs/GOTCHAS.md` class 4). STRICTER than the first-divergence
+  constant, which never re-converges — a narrower licence for one screen.
+  Checker `tools/compare_window.py`, ground truth `tests/test_compare_window.sh`.
+  **[VSP-29]** **v4 (2026-08-06, maintainer-ratified): composite** — the
+  strict CONJUNCTION of flicker-tolerated and bounded re-convergent window,
+  for replays that exhibit both. It adds NO tolerance: every divergent run
+  must be accounted for by name, the flicker set must match its frozen
+  inventory exactly, the window list must match exactly, and the run must
+  fully re-converge; it permits nothing that either component permits alone,
+  and a bit-identical pair FAILS it. On a build carrying BOTH engine hooks and
+  the extended wheel, every select-reaching legacy replay measures as "the
+  frozen hook-flicker inventory + one bounded window per select-screen ENTRY"
+  (seven replays at 14z-61; a challenger join re-enters the screen and gives
+  TWO windows; a mid-attract start moves the onset to 3190). Checker
+  `tools/compare_composite.py`, ground truth `tests/test_compare_composite.sh`.
+  **[VSP-30]** **v5 (2026-08-16, maintainer-ruled): THE ≥60 RULE IS
   INTRA-MECHANISM.** The 60-frame non-propagation figure is a
-  single-mechanism proof: it governs the RE-CONVERGENCE TAIL after the
-  last divergence, and it does NOT bind across the gap between two
-  SEPARATELY ATTRIBUTED mechanisms. So a flicker run followed by a
-  window onset, or one flicker run followed by another, is not
-  constrained by it. `tools/compare_composite.py` implements the
-  alternative behind `--min-converge-flicker`, which stays DEFAULT-OFF
-  and is opted into by no spec. Rationale: nothing measured suggests the
-  mechanisms interact, and applying it across a boundary would have
-  redded 99 of 121 committed composite specs purely because the
-  select-window onset moved 890 -> 889 in 14z-63. **Two NAMED
-  EXEMPTIONS are recorded against the day the flag is ever turned on**,
-  both 56 frames apart (55 identical between) and both the palette-fade
-  staging family, per-frame-attributed on every audit run:
-  `donovan-m7/22_don_dualmash` (11862/11918) and
-  `huitzil-m15/26_don_arcade_mash` (8744/8800). A third would mean the
-  gap is a property of the mechanism rather than a coincidence, and the
-  right response then is to measure the real minimum, not to lengthen
-  this list. (Historical note: this question was opened when flicker 829
-  sat 59 frames before window onset 889; frame 829 was the obj_hook
-  cycle-skew and 14z-91 removed it, so no current spec exercises the
-  boundary at all.)
-  Every non-exact class must be
-  mechanism-attributed and its expectation frozen; a replay may not be
-  reclassified to a looser class without a new measured mechanism and
-  maintainer sign-off. **[VSP-31]** **Standing watch (maintainer, 2026-07-27): if
-  flickers grow beyond the frozen inventory or divergences turn
-  systematic, stop and root-cause — that pattern would indicate a deeper
-  issue, not tolerance noise.** Rationale (measured, session 7,
-  docs/GOTCHAS.md): hooks cost cycles; interrupts land at skewed
-  instruction boundaries in otherwise-vanilla frames; zero-cycle hooking
-  is impossible on this engine. Whole-RAM frame-exact remains the
-  standard for vanilla oracles, run-to-run determinism, and hook-free
-  builds.
-- **[VSP-32]** **Dual-emulator agreement (amended 2026-07-25, maintainer-approved):** for
-  new-character content (no vanilla oracle exists), the same replay is run on
-  patched FBNeo and patched MAME and the two must agree on **mapped gameplay
-  state compared at sync anchors** (match start, round transitions):
-  character IDs, HP, positions, timer, meter, and the other fields in
-  `docs/game/atlas/ram.md` — not whole-work-RAM checksums frame-by-frame.
-  Rationale (measured, session 2): the emulators traverse identical states
-  on slightly different frame indices after boot, so frame-exact whole-RAM
-  equality is unachievable between codebases; field-level agreement at
-  anchors preserves the original intent — a bug would still have to manifest
-  identically in two unrelated codebases to slip through. Whole-RAM
-  frame-exact checksums remain the standard **within** each emulator
-  (vanilla-vs-patched superset oracle, run-to-run determinism).
+  single-mechanism proof: it governs the RE-CONVERGENCE TAIL after the last
+  divergence, and it does NOT bind across the gap between two SEPARATELY
+  ATTRIBUTED mechanisms. So a flicker run followed by a window onset, or one
+  flicker run followed by another, is not constrained by it.
+  `--min-converge-flicker` in `tools/compare_composite.py` implements the
+  alternative and stays DEFAULT-OFF, opted into by no spec (nothing measured
+  suggests the mechanisms interact, and applying it across a boundary would
+  have redded 99 of 121 composite specs when the select-window onset moved
+  890 -> 889 at 14z-63). **Two NAMED EXEMPTIONS are recorded against the day
+  the flag is ever turned on**, both 56 frames apart (55 identical between)
+  and both the palette-fade staging family: `donovan-m7/22_don_dualmash`
+  (11862/11918) and `huitzil-m15/26_don_arcade_mash` (8744/8800). A third
+  would mean the gap is a property of the mechanism, and the right response
+  is to measure the real minimum, not to lengthen this list. (No current spec
+  exercises the boundary: the flicker that opened the question, frame 829,
+  was the obj_hook cycle-skew removed at 14z-91.)
+  Every non-exact class must be mechanism-attributed and its expectation
+  frozen; a replay may not be reclassified to a looser class without a new
+  measured mechanism and maintainer sign-off. **[VSP-31]** **Standing watch
+  (maintainer, 2026-07-27): if flickers grow beyond the frozen inventory or
+  divergences turn systematic, stop and root-cause — that pattern would
+  indicate a deeper issue, not tolerance noise.** Rationale (measured,
+  session 7, `docs/GOTCHAS.md`): hooks cost cycles; interrupts land at skewed
+  instruction boundaries in otherwise-vanilla frames; zero-cycle hooking is
+  impossible on this engine. Whole-RAM frame-exact remains the standard for
+  vanilla oracles, run-to-run determinism, and hook-free builds.
+- **[VSP-32]** **Dual-emulator agreement** (amended 2026-07-25,
+  maintainer-approved): for new-character content (no vanilla oracle exists),
+  the same replay is run on patched FBNeo and patched MAME and the two must
+  agree on **mapped gameplay state compared at sync anchors** (match start,
+  round transitions): character IDs, HP, positions, timer, meter, and the
+  other fields in `docs/game/atlas/ram.md` — not whole-work-RAM checksums
+  frame-by-frame. Rationale (measured, session 2): the emulators traverse
+  identical states on slightly different frame indices after boot, so
+  frame-exact whole-RAM equality is unachievable between codebases;
+  field-level agreement at anchors preserves the original intent — a bug
+  would still have to manifest identically in two unrelated codebases to slip
+  through. Whole-RAM frame-exact checksums remain the standard **within**
+  each emulator (vanilla-vs-patched superset oracle, run-to-run determinism).
 - **Test matrix growth:** every new capability adds replays. Minimum coverage
   for a ported character: vs each of the 18 (both sides), each stage, Dark
   Force activation/expiry, life-marker transition, timeout, throw/tech
@@ -259,26 +230,21 @@ legacy behavior is a failed change.
   mechanism theory, and tracked under `tests/inp/<name>/` (force-added,
   with a one-line `NOTE`). **NAMING: `<what>-<freeze set>-NN`** — the
   freeze the recording was PLAYED on, never the mark or the session
-  (`crash-merged-m8-01`: 110b shipped merged-m8 under the same M7 mark as
-  merged-m7, and "14z-110" is two freezes) — so a replay is always tied to
-  the exact image it was made on. **CLEANUP (maintainer-ruled 14z-111):
-  the `~/.cache/vampire-saved/inp/<name>/` copy is deleted once tracked; a
-  recording that is neither tracked nor named by any gate/doc (grep first)
-  is deleted, not kept "just in case" — a plain-play attempt has no value.** `tools/run_inp_guarded.sh` plays it back with a
-  write tap on the game's OWN exception-code store (`RAM:$FF0000`) — no
-  debugger, faithful playback — and yields the vector, fault PC, registers
-  and stack at the instruction; `INP_DEBUG=1 TRACE_FROM=` adds the
-  instruction trace, `WATCH=` write taps. **`tests/test_inp_corpus.sh`
+  (`crash-merged-m8-01`; a mark can cover two freezes and a session two
+  freezes). **CLEANUP:** the `~/.cache/vampire-saved/inp/<name>/` copy is
+  deleted once tracked; a recording neither tracked nor named by any gate or
+  doc (grep first) is deleted, not kept. `tools/run_inp_guarded.sh` plays a
+  recording back with a write tap on the game's OWN exception-code store
+  (`RAM:$FF0000`) — no debugger, faithful playback — and yields the vector,
+  fault PC, registers and stack (`INP_DEBUG=1 TRACE_FROM=` for the
+  instruction trace, `WATCH=` for write taps). **`tests/test_inp_corpus.sh`
   replays EVERY tracked recording on the current merged build at every
-  freeze and fails on the first exception** (a captured-but-unfixed defect
-  is declared by a `DEFECT` file naming the expected crash, so the capture
-  cannot rot). The cost that made this law: the tooling existed since
-  14z-9x and HANDOFF called a recorded report "a replay protocol", but no
-  gate consumed recordings and no crash report was ever captured as one —
-  14z-109..111 spent three sessions and TWO shipped fixes on a rig-derived,
-  poke-contaminated mechanism that was never the field crash; the first
-  recording found the real one (#99) in an evening. Scripted rigs that win
-  fast never give a CPU opponent's AI the time to reach its rarer scripts.
+  freeze and fails on the first exception** (a captured-but-unfixed defect is
+  declared by a `DEFECT` file so the capture cannot rot). The cost that made
+  this law: 14z-109..111 spent three sessions and two shipped fixes on a
+  rig-derived mechanism that was never the field crash; the first recording
+  found the real one (#99) in an evening — win-fast rigs never give a CPU
+  opponent's AI time to reach its rarer scripts.
 - **[VSP-18]** **THE PERSISTENT SUITE DOCTRINE (SMS lesson, promoted to law):** every
   in-emulator test executed during development — measurement, probe, or
   verification — is captured as a scripted, rerunnable case in `tests/` before
@@ -289,7 +255,9 @@ legacy behavior is a failed change.
   build under test (which features/patches are present) and selects
   expectations accordingly, so one command validates any build variant
   (SMS `test_regression.lua` pattern). Engine-invariant "rule locks" for
-  vanilla behavior run on every build.
+  vanilla behavior run on every build. The index of every gate is
+  `docs/project/gate_index.md` (generated); the pre-commit command is
+  `tests/run_all_static.sh` (HANDOFF "How to test").
 - **[VSP-19]** **Verdict logic is itself tested.** A test's classification code
   (HIT/BLOCK/TECH/etc.) must be validated against known ground-truth
   scenarios before its verdicts are trusted — SMS shipped a wrong conclusion
@@ -319,27 +287,33 @@ legacy behavior is a failed change.
   abandoned the roster hack tomorrow?** — into `docs/game/` (Vampire
   Savior itself), `docs/platform/` (CPS-2, MAME, FBNeo) and
   `docs/project/` (this port). Read `docs/README.md`; file by the FACT,
-  not by the task you were doing when you learned it.
-  - `HANDOFF.md` — operational map: current state, build registry, how to
-    build, how to test, key findings. The first read of any session after
-    this file.
+  not by the task you were doing when you learned it. Every hand-written
+  document declares its SHAPE in `docs/doc_shape.tsv` (REFERENCE / REGISTER
+  / LOG / HIST / INDEX / GENERATED); chronology lives in `<name>_history.md`
+  twins, never re-accreting into a reference document
+  (`tests/test_docshape.sh`).
+  - `HANDOFF.md` — operational map: what exists, the build registry, how to
+    build, how to test. The first read of any session after this file.
   - `docs/NEXT_SESSION.md` — 60-second orientation, rewritten at session end.
   - `docs/game/engine_internals.md` — how the engine works, by subsystem (the
     synthesis; the document a stranger reads to understand the game).
-    **Every subsystem section names the `atlas/` rows it depends on** —
-    a section that does not is how 14z-69 spent three sessions measuring
-    a mode it had never entered while the cost of entering it sat
-    documented in `ram.md`.
+    **Every subsystem section names the `atlas/` rows it depends on and the
+    gates that lock it** — a section that does not is how 14z-69 spent three
+    sessions measuring a mode it had never entered while the cost of entering
+    it sat documented in `ram.md`.
   - `docs/game/atlas/` — the verified ROM/RAM map per romset (the project bible).
   - `docs/annotations.md` — raw address → label/comment stream, GENERATED
     (`tools/gen_annotations.py`, gate `test_annotations_current`) from every
     live carrier: each program-space address with the file and section (or
     manifest row) that names it, plus the CODE-ONLY list — the documentation
-    gap. (Promised at M0, never created; retired 14z-122 as "living in the
-    atlas + manifest comments"; that claim was MEASURED FALSE at 14z-123 —
-    `re/ghidra/` never held a project, ~2,900 addresses sit across five
-    carrier kinds — and the maintainer's check-first ruling made it real.
-    Regenerate it in any commit that adds or removes a program address.)
+    gap. Regenerate it in any commit that adds or removes a program address.
+    (Promised at M0, never created, retired 14z-122 as "living in the atlas +
+    manifest comments" — measured false at 14z-123: ~2,900 addresses sit
+    across five carrier kinds; the maintainer's check-first ruling made it
+    real.)
+  - `docs/project/gate_index.md` — every script under `tests/`, GENERATED
+    (`tools/gen_gate_index.py`): kind, tier, family, needs, the script's own
+    header sentence. A gate's WHY lives in its header (ruled 14z-122).
   - `docs/project/patch_notes.md` — per-change detail: every byte, and why.
   - `docs/project/patch_index.md` — one-page registry: status, dependencies,
     exclusivity, deprecation candidates. Updated in the same commit as any
@@ -348,14 +322,16 @@ legacy behavior is a failed change.
     before the work (since 14z-114: `mister-cps2-wide-core`, `mister-vampire-
     saved`, `cps2-hardware`, `cps2-emulation`, `vampire-savior-engine`,
     `vampire-saved-port` — the last one cites THIS file by section and never
-    restates it; plan and boundaries in `docs/project/skills_scope.md`). Skill = the laws and traps; docs = the facts. Every rule is
-    anchored `**[PFX-N]**` in the doc paragraph it distils and
-    `tools/checkskills.py` locks the two so they cannot drift; a skill that
-    quotes a number cites a LOG, never the synthesis. Editing an anchored
-    paragraph means keeping the marker with the fact or moving the rule.
-  - `docs/GOTCHAS.md` — the index of traps that cost real debugging time;
-    the entries live in `docs/{game,platform,project}/gotchas.md`. Append
-    the moment one is paid for, to the bucket its FACT belongs to.
+    restates it; plan and boundaries in `docs/project/skills_scope.md`).
+    Skill = the laws and traps; docs = the facts. Every rule is anchored
+    `**[PFX-N]**` in the doc paragraph it distils and `tools/checkskills.py`
+    locks the two so they cannot drift; a skill that quotes a number cites a
+    LOG, never the synthesis. Editing an anchored paragraph means keeping the
+    marker with the fact or moving the rule.
+  - `docs/GOTCHAS.md` — the index of traps that cost real debugging time
+    (generated from the buckets' headers); the entries live in
+    `docs/{game,platform,project}/gotchas.md`. Append the moment one is paid
+    for, to the bucket its FACT belongs to.
   Findings land in the right document *at discovery time*, not at milestone
   end. An undocumented discovery is a discovery we will pay for twice.
 - **[VSP-13]** **RETRACTION DISCIPLINE (standing order, 14z-71): when a claim changes,
@@ -364,19 +340,18 @@ legacy behavior is a failed change.
   HEADERS, summary lines, registry rows, gate comments, the GOTCHAS index
   and `NEXT_SESSION`, and the copies outlive the correction. Fixing "where
   I remember writing it" is how a document ends up asserting the opposite
-  of the subsection directly beneath it — measured twice in one session:
-  `docs/game/engine_internals.md` carried "the 214+P explosion is NOT a
-  tile-inventory defect" as a HEADER above a subsection proving it was,
-  and a corrected effect-family finding survived in five other places
-  including a registry row written *after* the correction started.
-  The procedure, in order:
+  of the subsection directly beneath it (measured twice in one session:
+  `engine_internals.md` carried "the 214+P explosion is NOT a tile-inventory
+  defect" as a HEADER above the subsection proving it was, and a corrected
+  effect-family finding survived in five other places). The procedure, in
+  order:
   1. `grep -rn "<the old claim>" docs HANDOFF.md STATE.md STATE_HISTORY.md DECISIONS_HISTORY.md tests build/manifest`
      — search the assertion's WORDING, and its paraphrases, across the repo.
-     STATE_HISTORY.md and DECISIONS_HISTORY.md are in the list on purpose:
-     archived entries are not rewritten, but a claim that ONLY survives
-     there must still be found so its live carriers can be traced.
-     (DECISIONS_HISTORY.md added 14z-109: resolved decisions move there
-     verbatim from STATE.md once they stop shaping active work.)
+     The archives are in the list on purpose: archived entries are not
+     rewritten, but a claim that ONLY survives there must still be found so
+     its live carriers can be traced. (DECISIONS_HISTORY.md: resolved
+     decisions move there verbatim from STATE.md once they stop shaping
+     active work.)
   2. Fix the **HEADER and the summary line** first. A skimmer reads those;
      an appended "actually, it turned out…" subsection does not reach them.
   3. Re-grep afterwards and show the empty result. The pass is not done
@@ -404,12 +379,10 @@ legacy behavior is a failed change.
      rigs, and a wrong assumption here is expensive in both directions:
      re-fixing something already fixed, or declaring "never fixed" about
      something that was.
-  Paid for in 14z-75: I concluded "the 14z-74 word never fixed the Cosmo
-  crash" from rigs that never fired the move, published it, and was corrected
-  by the maintainer — who remembered the fix working and told me to find that
-  version and diff it. That is exactly what cracked it. The archaeology took
-  two commands; the wrong conclusion took hours and produced a build with the
-  crash reintroduced.
+  Paid for in 14z-75: a "never fixed" conclusion published from rigs that
+  never fired the move, corrected by the maintainer who remembered the fix
+  working; the archaeology took two commands, the wrong conclusion took
+  hours and reintroduced the crash.
 
 - **[VSP-15]** **Anti-hyperfocus checkpoint (standing order):** deep-dive focus is the
   project's engine but also its failure mode. At natural boundaries — a
