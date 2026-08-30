@@ -3233,3 +3233,22 @@ whose end is the hold release. Two rules: a "the only writer is X"
 finding names the WINDOW it was measured in, and it is re-tapped on at
 least two contacts of different strength before it explains a
 strength-dependent quantity.
+
+
+## THE NAMING RIGS RUN ON NATIVE vs2 — THERE, THE TENANT'S ART IS NOT IN GROUP C, AND ITS TILE CODES SHARE A BANK WITH THE HUD AND THE OPPONENT (14z-121 (6))
+
+Rendering a tenant's sprite from a naming-rig capture: the first filter
+("entries with a 19-bit tile address in group C = the ported art") is a
+fact about OUR build only — on vs2 the same character draws from vs2's own
+banks. The second ("entries whose within-bank code is in the character's
+records' tile set") admitted the HUD and the downed opponent: several
+characters and the HUD share one bank's code space, and the set is 15k
+codes wide. What separates them is the game's own bookkeeping, measured:
+the OBJ bank table `0x27530` (id-indexed, `0x6000` = bank 3 for the three
+tenants — the captures' mid-screen entries agree), the y window that
+excludes the HUD strips (bank 1, top and bottom), and the x-cluster (the
+rigs pin P1 left of P2, facing right). Rules paid for: a filter that names
+a build's property is not a property of the game; a "tile set" is a
+within-bank set until the bank word says otherwise; and a zsh `for x in
+$var` does not word-split — `${=var}` (memory `bash-tool-shell-is-zsh`;
+pass A ran ONE rig with a 26-name filename until it did).

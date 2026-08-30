@@ -1,5 +1,18 @@
 # STATE — living progress log
 
+## Session 14z-121 (6) — **THE INTERNAL CHARACTER PAGES WITH SPRITES (maintainer: "for our internal, unpublished
+## documentation, adding the sprites would be nice"): every move's sprite at its first active frame, captured from the
+## native game's OWN OBJ list and palette page on the naming rigs and drawn from vsav2's tiles — 165 sprites, three
+## pages under `build/charpages/` (untracked, unpublished). Pipeline `tools/charpages_internal.sh`. No build changed.**
+
+| | |
+|---|---|
+| the route chosen | not a ROM-side renderer (the attr→palette-row mapping and the block row order were unread) but the emulator's truth: at the frame the naming rig reaches a move's first attack node, dump the OBJ list and the `$90C000` palette page (`tests/lua/sprite_capture.lua`, `obj_records_dump.lua` + the page), draw the character's entries from the zip's tiles (`tools/sprite_render.py`: `gfx_tiles` decode, attr flips/blocks, CPS-2 colour words, pen 15 transparent, entry 0 on top) |
+| what separates the tenant's entries (the trap, `project/gotchas.md`) | the rigs are NATIVE vs2, so "group C" is not where the art is; the records' tile set (`obj_records.walk`, 15k within-bank codes) admitted the HUD and the downed opponent — settled by the OBJ bank table (`0x27530[id]` = `0x6000` = bank 3 for all three; the mid-screen entries agree), the y window (the HUD strips are bank 1 at the top/bottom), and the LEFT x-cluster (P1 pinned left of P2, facing right) |
+| the frames | the picker over `field_trace` traces of all 24 naming parts: 328 (move, seq) frames, 177 at an attack node, 151 at a chain's first node; 165 distinct sprites after dedupe (Donovan 63 / Huitzil 53 / Pyron 49 embedded) |
+| verified by eye | Donovan 5HP and Blizzard Sword (with Anita), Pyron Sol Smasher, Zodiac Fire, Huitzil 2HK — the character alone, the game's palette. Not measured against a MAME snapshot (an OBJ-to-pixel oracle would be the gate; deferred) |
+| record | `tools/charpages_internal.sh` regenerates everything (~15 min); README row; HANDOFF row; `charmap_html.py --sprites`. Rendered art stays untracked and unpublished |
+
 ## Session 14z-121 (5) — **THE MAP'S CARRIERS: the projectile parameters are IN the map (`structures.projectile`, page
 ## section) and the hitbox summary's stale "+0x1C pushback scale" is gone; and THE CHARACTER PAGES — `tools/charmap_html.py`
 ## renders each tenant's map as a wiki-style HTML page (physics, every move with frame data / damage / boxes / notes,

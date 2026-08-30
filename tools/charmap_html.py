@@ -2,7 +2,14 @@
 """charmap_html.py — the CHARACTER PAGE: a wiki-style HTML rendering of one
 tenant's character-data map (14z-121 (5)).
 
-  python3 tools/charmap_html.py <tenant> <build_dir> <out.html>
+  python3 tools/charmap_html.py <tenant> <build_dir> <out.html> [--sprites <dir>]
+
+--sprites <dir> (14z-121 (6), INTERNAL pages only — the published artifacts
+carry no art): embed <dir>/<Move-Name>__<seq>.png beside each chain's box
+diagram — the character's own sprite at that chain's first active frame,
+captured from the native game's OBJ list by tests/lua/sprite_capture.lua and
+drawn by tools/sprite_render.py. The output is written OUTSIDE the tracked
+tree (build/charpages/); rendered art is not published.
 
 Reads, and only reads:
   docs/project/tables/chars/<tenant>.json     the map (charmap_gen.py) — physics rows, chains, records, projectiles
@@ -86,7 +93,11 @@ def box_svg(H, hb8, hbA, width=150, height=110):
 
 
 def main():
-    tenant, build_dir, out = sys.argv[1], Path(sys.argv[2]), Path(sys.argv[3])
+    argv = sys.argv[1:]
+    sprites = None
+    if "--sprites" in argv:
+        k = argv.index("--sprites"); sprites = Path(argv[k + 1]); del argv[k:k + 2]
+    tenant, build_dir, out = argv[0], Path(argv[1]), Path(argv[2])
     j = json.load(open(REPO / "docs/project/tables/chars" / f"{tenant}.json"))
     S = j["structures"]
     moves = _minitoml.loads((REPO / "build/manifest" / f"moves_{tenant}.toml").read_text())["move"]
@@ -145,8 +156,14 @@ def main():
                 if len(rids) > 1:
                     cells.append(f'<span class="note">{len(rids)} attack records ({", ".join(f"{x:#x}" for x in rids)}); the first shown</span>')
             out.append(f'<div class="strip">{"".join(cells)}</div>')
-            if svg:
-                out.append(f'<figure>{svg}<figcaption>boxes of the {"first active" if a0 is not None else "first"} frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>')
+            img = ""
+            if sprites is not None:
+                import base64
+                pf = sprites / (esc(m["name"]).replace(" ", "-") + f"__0x{int(sq, 16):02x}.png")
+                if pf.exists():
+                    img = f'<img class="sprite" alt="{esc(m["name"])} at its first active frame" src="data:image/png;base64,{base64.b64encode(pf.read_bytes()).decode()}">'
+            if svg or img:
+                out.append(f'<figure>{img}{svg}<figcaption>{"the sprite and " if img else ""}boxes of the {"first active" if a0 is not None else "first"} frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>')
         if m.get("notes"):
             out.append(f'<p class="notes">{esc(m["notes"])}</p>')
         out.append("</article>")
@@ -262,6 +279,7 @@ figcaption{font-size:12px;color:var(--ink2)}
 .k{display:inline-block;padding:0 6px;border-radius:2px;color:#fff;font-size:11px}
 .k.hurt{background:var(--hurt)}.k.push{background:var(--push)}.k.hit{background:var(--hit)}
 svg.boxes{background:var(--bg2);border:1px solid var(--line)}
+img.sprite{image-rendering:pixelated;background:var(--bg2);border:1px solid var(--line);max-height:180px}
 svg.boxes .ground{stroke:var(--line);stroke-width:1}
 svg.boxes rect{fill-opacity:.28;stroke-width:1.2}
 svg.boxes .hurt{fill:var(--hurt);stroke:var(--hurt)}svg.boxes .push{fill:var(--push);stroke:var(--push)}svg.boxes .hit{fill:var(--hit);stroke:var(--hit)}
