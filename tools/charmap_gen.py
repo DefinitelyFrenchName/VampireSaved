@@ -65,7 +65,7 @@ TENANT_BY_CHAR = {0x10: "huitzil", 0x11: "pyron", 0x13: "donovan"}
 UNATTRIBUTED_CAP = 64
 
 UNDECODED = [
-    {"structure": "hitbox", "what": "DONE 14z-120 (5): box = (x, y, hw, hh) signed words, authored for the LEFT-facing sprite and mirrored when flip_x=1; +0x8C = attack (base[4]), +0x90 = push (base[3]); family hb8 -> {vuln,vuln,vuln,push}; record +8 real / +9 white / +0x10 hit id / +0x17 CLASS (the '+0x1D' was the same byte counted from the wrong base). Still open: record +0x1C (0x14/0x1E/0x28 normals, 0x46 specials) and +0x11..+0x16", "evidence": "tests/test_hitbox_encoding.sh (8/8 hits on the first overlap frame; class = +0x17 on the fighter, projectile, multi-hit and column paths); tools/hitbox_records.py"},
+    {"structure": "hitbox", "what": "DONE 14z-120 (5): box = (x, y, hw, hh) signed words, authored for the LEFT-facing sprite and mirrored when flip_x=1; +0x8C = attack (base[4]), +0x90 = push (base[3]); family hb8 -> {vuln,vuln,vuln,push}; record +8 real / +9 white / +0x10 hit id / +0x17 CLASS (the '+0x1D' was the same byte counted from the wrong base). +0x14 = the attacker's meter gain on hit, +0x1C scales the pushback (both measured 14z-120 (6)); observed only: +0x12 strength index, +0x16 special flag; +0x11/+0x13/+0x15 open", "evidence": "tests/test_hitbox_encoding.sh (8/8 hits on the first overlap frame; class = +0x17 on the fighter, projectile, multi-hit and column paths); tools/hitbox_records.py; STATE 14z-120 (6) for the meter/pushback correlation"},
     {"structure": "anim", "what": "MOVE NAMES for the chains (which seq is which move) — DONE for Donovan 14z-120 (build/manifest/moves_donovan.toml, measured by tests/test_move_naming.sh; labelled in donovan_anim.md); Huitzil and Pyron await their naming rigs", "evidence": "the chains are decoded and live-verified (test_anim_node_walk, 14z-118); names come from the maintainer's move lists -> build/manifest/moves_<tenant>.toml, seq ids from tools/name_moves.py on the native game"},
     {"structure": "anim", "what": "DONE 14z-120 (5): hbA != 0 marks an ATTACK node (hbA>>8 = the attack record); startup / active / recovery per chain are derived in <tenant>_anim.md", "evidence": "tests/test_hitbox_encoding.sh"},
     {"structure": "anim", "what": "table a2's entry rule: its chains are entered MID-CHAIN by node index (measured: 5 jumps onto a2 nodes 3/5/7/13)", "evidence": "test_anim_node_walk observation; the selecting code is unread"},
@@ -655,7 +655,7 @@ def main():
             for k in range(n):
                 rv = Hv.record(k, proj=proj); off = base_v - src + k * 0x20
                 ob = blob[off:off + 0x20] if len(blob) >= off + 0x20 else b""
-                fields = {"box": rv["box"], "real": rv["real"], "white": rv["white"], "hit_id": rv["hit_id"], "cls": rv["cls"], "b1c": rv["b1c"], "b1d": rv["b1d"]}
+                fields = {"box": rv["box"], "real": rv["real"], "white": rv["white"], "hit_id": rv["hit_id"], "meter": rv["meter"], "strength": rv["strength"], "special": rv["special"], "cls": rv["cls"], "b1c": rv["b1c"], "b1d": rv["b1d"]}
                 diff = [i for i in range(0x20) if ob and ob[i] != bytes.fromhex(rv["raw"])[i]]
                 labs = {hlab.get(off + i) if not proj else plab.get(off + i) for i in diff} - {None}
                 out.append({"idx": k, "addr": rv["addr"], "fields": fields, "ours_diff": [f"+{i:#x}:{bytes.fromhex(rv['raw'])[i]:#04x}->{ob[i]:#04x}" for i in diff],
@@ -665,7 +665,7 @@ def main():
                   "tables": {k: f"{v:#x}" for k, v in Hv.tables.items()},
                   "box_counts": {k: Hv.table_len(k) // 8 for k in ("vuln0", "vuln1", "vuln2", "push")},
                   "attack": recs(False), "proj": recs(True) if rp else [],
-                  "_encoding": "box = (x, y, hw, hh) signed words, centre at fighter (x + (flip_x ? -x : x), y + y), half-extents; node hb8 -> family entry {vuln0,vuln1,vuln2,push}; node hbA>>8 -> attack record (0x20: +0 box, +8 real, +9 white, +0x10 hit id, +0x17 class)",
+                  "_encoding": "box = (x, y, hw, hh) signed words, centre at fighter (x + (flip_x ? -x : x), y + y), half-extents; node hb8 -> family entry {vuln0,vuln1,vuln2,push}; node hbA>>8 -> attack record (0x20: +0 box, +8 real, +9 white, +0x10 hit id, +0x12 strength (observed), +0x14 attacker meter gain (measured), +0x16 special flag (observed), +0x17 class, +0x1C pushback scale (measured), +0x1D 0)",
                   "_verified_by": "tests/test_hitbox_encoding.sh (Donovan on native vs2, 14z-120 (5): 8/8 hits on the first overlap frame, class = record +0x17 on every path)"}
         hitbox["_summary"] = {"attack_records": len(hitbox["attack"]), "attack_differ": sum(1 for x in hitbox["attack"] if x["ours_diff"]),
                               "attack_unattributed": sum(1 for x in hitbox["attack"] if x["ours_source"] == "UNATTRIBUTED"),

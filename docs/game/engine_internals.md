@@ -750,9 +750,17 @@ the per-chain frame data in `<tenant>_anim.md`.
   startup is the nodes before, recovery after — derived per chain in the
   appendix. Record (0x20 bytes): `+0` the box, `+8` real power, `+9` white
   power (the stager's `(8,A3)/(9,A3)` above), `+0x10` hit id (the multi-hit
-  dedup key), **`+0x17` the REACTION CLASS**, `+0x1C` unexplained
-  (0x14/0x1E/0x28 on normals, 0x46 on specials), `+0x1D` zero in every
-  record seen.
+  dedup key), **`+0x14` the ATTACKER'S METER GAIN on a hit** (measured
+  14z-120 (6) on 13 contacts: 6/12/18 on L/M/H normals, 3 per Lightning
+  Sword tick, 9 Ifrit, 2 the column, a fraction of it on block; the VICTIM
+  gains 8 per hit whatever the record and 0 on block), **`+0x17` the
+  REACTION CLASS**, **`+0x1C` scales the PUSHBACK** (the victim moved
+  27/41/59 px in 15 frames for 0x14/0x1E/0x28; 0x46 on specials; the
+  friction law is not derived), `+0x1D` zero in every record seen.
+  Observed, not proven: `+0x12` = the strength index (1/2/3, 7 on
+  specials), `+0x16` = 1 on specials and projectiles; `+0x11`, `+0x13`,
+  `+0x15` open. A BLOCKED contact writes class `0xFF` on the victim
+  (chip: white −1, real 0 on the LS ticks).
 - **How the class reaches the victim** (vs2 stager, the same on the
   projectile path): `0x16F5E move.w -$4b44(a5),d1; cmp.w -$4b42(a5),d1;
   bcs 0x16F70; move.b #1,$54(a1); rts; 0x16F70 move.b $17(a3),$54(a1)` — a

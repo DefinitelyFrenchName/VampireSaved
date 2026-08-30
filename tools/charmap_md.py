@@ -168,22 +168,22 @@ def main():
           f"{sm.get('proj_records', 0)} projectile records ({sm.get('proj_differ', 0)} differ, {sm.get('proj_unattributed', 0)} unattributed). "
           f"Encoding: {HB['_encoding']}. Verified by `{HB['_verified_by']}`.")
         w("")
-        w("| idx | addr | box (x, y, hw, hh) | real | white | hit id | class | +0x1C | ours differs | ours source |")
-        w("|---|---|---|---|---|---|---|---|---|---|")
+        w("| idx | addr | box (x, y, hw, hh) | real | white | hit id | str | meter | spc | class | push (+0x1C) | ours differs | ours source |")
+        w("|---|---|---|---|---|---|---|---|---|---|---|---|---|")
         for rec in HB["attack"]:
             f = rec["fields"]
             if f["box"] == [0, 0, 0, 0] and not f["real"] and not f["cls"] and not rec["ours_diff"]: continue
-            w(f"| {rec['idx']:#x} | `{rec['addr']}` | {tuple(f['box'])} | {f['real']} | {f['white']} | {f['hit_id']} | {f['cls']:#04x} | {f['b1c']:#04x} | {' '.join(rec['ours_diff'])} | {rec['ours_source'] if rec['ours_diff'] else ''} |")
+            w(f"| {rec['idx']:#x} | `{rec['addr']}` | {tuple(f['box'])} | {f['real']} | {f['white']} | {f['hit_id']} | {f['strength']} | {f['meter']} | {f['special']} | {f['cls']:#04x} | {f['b1c']:#04x} | {' '.join(rec['ours_diff'])} | {rec['ours_source'] if rec['ours_diff'] else ''} |")
         if HB.get("proj"):
             w("")
             w("Projectile records (`hitbox_proj`):")
             w("")
-            w("| idx | addr | box | real | white | hit id | class | +0x1C | ours differs | ours source |")
-            w("|---|---|---|---|---|---|---|---|---|---|")
+            w("| idx | addr | box | real | white | hit id | str | meter | spc | class | push (+0x1C) | ours differs | ours source |")
+            w("|---|---|---|---|---|---|---|---|---|---|---|---|---|")
             for rec in HB["proj"]:
                 f = rec["fields"]
                 if f["box"] == [0, 0, 0, 0] and not f["real"] and not f["cls"] and not rec["ours_diff"]: continue
-                w(f"| {rec['idx']:#x} | `{rec['addr']}` | {tuple(f['box'])} | {f['real']} | {f['white']} | {f['hit_id']} | {f['cls']:#04x} | {f['b1c']:#04x} | {' '.join(rec['ours_diff'])} | {rec['ours_source'] if rec['ours_diff'] else ''} |")
+                w(f"| {rec['idx']:#x} | `{rec['addr']}` | {tuple(f['box'])} | {f['real']} | {f['white']} | {f['hit_id']} | {f['strength']} | {f['meter']} | {f['special']} | {f['cls']:#04x} | {f['b1c']:#04x} | {' '.join(rec['ours_diff'])} | {rec['ours_source'] if rec['ours_diff'] else ''} |")
         w("")
     # ---- anim summary (+ appendix) ----
     A = S.get("anim") or {}

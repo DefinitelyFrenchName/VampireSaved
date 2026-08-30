@@ -329,6 +329,18 @@ DONOVAN = {
         ("Killshread [LK] plant on P2", qcb("LK"), 300),
         ("Killshread Lightning [LP] column", qcb("LP"), 300),
     ],
+    "11": [  # PHASE 2 (2): the same contacts BLOCKED — P2 holds back the whole part
+        ("P2 blocks", [(0, 3000, "R", "p2")], 0),   # P2 faces LEFT: away = R
+        ("walk-in", walk_in(60), 90),
+        ("5LP blocked", stand("LP"), 150), ("5MP blocked", stand("MP"), 150), ("5HP blocked", stand("HP"), 200),
+        ("2MK blocked", crouch("MK"), 150), ("2HK blocked", crouch("HK"), 300),
+        ("walk-in", walk_in(60), 90),
+        ("Lightning Sword [LP] blocked", rdp("LP"), 300),
+        ("walk-in", walk_in(30), 60),
+        ("Ifrit Sword [LP] blocked", dp("LP"), 300),
+        ("Walk back", [(0, 90, "L")], 120),
+        ("Blizzard Sword [LP] blocked", hcf("LP"), 300),
+    ],
 }
 NORMALS = [(n, f, g) for n, f, g in (
     ("5LP", stand("LP"), 120), ("5MP", stand("MP"), 120), ("5HP", stand("HP"), 150),
@@ -496,7 +508,7 @@ HUITZIL = {
     ],
 }
 SCHEDULES = {"donovan": DONOVAN, "pyron": PYRON, "huitzil": HUITZIL}
-NO_POKE_PARTS = {("donovan", "9"), ("donovan", "10")}   # parts the -debug write tap must be able to replay: no HP pin, no stock poke
+NO_POKE_PARTS = {("donovan", "9"), ("donovan", "10"), ("donovan", "11")}   # parts the -debug write tap must be able to replay: no HP pin, no stock poke
 PHASE2_PARTS = NO_POKE_PARTS   # the hitbox rigs (tests/test_hitbox_encoding.sh) — NOT naming parts: test_move_naming.sh skips them
 # stock pokes for the meter parts: frame -> 9 stocks (each ES/EX/DF spends 1)
 METER_PARTS = {"donovan": {"3", "4", "5", "6", "7", "8"}, "pyron": {"4", "5"}, "huitzil": {"4", "5", "6", "7", "8"}}

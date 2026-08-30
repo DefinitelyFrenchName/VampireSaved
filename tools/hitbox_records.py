@@ -36,9 +36,15 @@ THE ENCODING, MEASURED (every claim below is what the engine did, not a reading)
   A node's hbA word (+0xA) >> 8 is the ATTACK RECORD index (0 = not
   attacking; a chain's ACTIVE frames are its nodes with hbA != 0). Record
   (0x20 bytes): +0 box (4 words), +8 real power, +9 white power, +0x10
-  hit id (the multi-hit dedup key), +0x17 REACTION CLASS, +0x1C an
-  unexplained byte (0x14/0x1E/0x28 on normals, 0x46 on specials), +0x1D
-  always 0 in the records seen. The stager reads +0x17 (`move.b $17(a3),
+  hit id (the multi-hit dedup key), +0x14 the ATTACKER'S METER GAIN on a
+  hit (measured: 6/12/18 on L/M/H normals, 3 per Lightning Sword tick, 9
+  Ifrit, 2 the column — a fraction of it on block; the VICTIM gains 8 per
+  hit whatever the record), +0x17 REACTION CLASS, +0x1C scales the
+  PUSHBACK (the victim moved 27/41/59 px in 15 frames for 0x14/0x1E/0x28;
+  0x46 on specials — the exact law is not derived), +0x1D always 0.
+  Observed, not proven: +0x12 = the strength index (1/2/3 on L/M/H, 7 on
+  specials), +0x16 = 1 on specials/projectiles, +0x11 (5/6/7 normals,
+  0xC/0x3/0xD specials) and +0x13/+0x15 unexplained. The stager reads +0x17 (`move.b $17(a3),
   $54(a1)` at vs2 0x16F70 for the generic classes; the special classes
   dispatch on it to handlers that write their class as an immediate —
   0x4E electric at 0x16FE4, 0x52 column at 0x16FEC, 0x0A at 0x16FF4 — and
@@ -107,6 +113,7 @@ class HitboxSet:
         a = (self.proj_attack() if proj else self.tables["attack"]) + idx * REC
         b = self.rd(a, REC)
         return {"addr": f"{a:#x}", "box": self.box(a), "real": b[8], "white": b[9], "hit_id": b[0x10],
+                "meter": b[0x14], "strength": b[0x12], "special": b[0x16],
                 "cls": b[0x17], "b1c": b[0x1c], "b1d": b[0x1d], "raw": b.hex()}
 
     def proj_attack(self):
