@@ -821,9 +821,18 @@ the victim".
   frame (light: +9..+17 f, 30 px; medium: +10..+22 f, 51 px; heavy: still
   sliding at +35 with a decaying `+0x40` velocity) and the hold exits the
   frame the slide stops — so the hitstun beyond the chain is the
-  pushback's duration, i.e. the attack record's `+0x1C`. The counter that
-  implements the slide is the open detail (the light/medium slide moves x
-  by a per-frame table with `+0x40` = 0). Measured returns to a stand
+  pushback's duration, i.e. the attack record's `+0x1C`. **What moves the
+  victim on a light/medium hit is not a velocity** (`+0x40` stays 0): the
+  only writer of the victim's x through the stun is the PUSHBOX SEPARATION
+  routine (vs2 `0x17D30-0x17D7A`: when two push boxes overlap it splits the
+  overlap `d1` between the two fighters — `add.l d0,$10(a6)` / `add.l
+  d1,$10(a4)` — or gives it all to the one not against a wall, `+0x38`),
+  fed by the victim's reaction NODES' push-box ids (the family word of each
+  `c:0x08/0x09` node) against the attacker's; the reference push boxes at
+  vs2 `0xA776C` are `(0,44,27,45) (0,30,27,31) (0,75,27,29) (0,0,24,6)` in
+  the data view. So the slide's length is the reaction chain's push boxes
+  settling, and the hold releases when it has — `+0x1C` selects that
+  through the class/record, the exact coupling still unread. Measured returns to a stand
   chain are the same on all three tenants — light 19-20 f, medium 23-24,
   heavy ~35, blocked light/medium/heavy/DP/jump-in 22 / 26 / 24 / 18 /
   19 f, the sweep knockdown 67-76 f — with the freeze 11 on every
@@ -851,6 +860,25 @@ them as code bytes. Every projectile type has its own handler with its
 own inline data; decoding "the projectile records" is therefore a
 per-type job (the handler is found from the type byte through the pool
 walker's LONG table, [VSE-18]), not a table to lay out.
+
+### Which moves spawn PROJECTILE-POOL objects, and their types (14z-120 (11), measured census)
+
+The 32 slots' type bytes (`$FF9400 + n*0x100 + 2`) sampled through the
+naming rigs' specials and meter parts; a type counts for a move only if
+it first appears AFTER the input. **Donovan:** Blizzard Sword `0x3E`
+(slot 3; the sword swings, Lightning Sword, Ifrit, Killshread and the
+column spawn NO pool object — they are fighter boxes and effect-piece
+pool objects). **Pyron:** Sol Smasher `0x40` ground / `0x41` air (ES: the
+same types, longer-lived), Cosmo Disruption `0x42` (alive ~140-220 f);
+Zodiac Fire, Orbital Blaze, Galaxy Trip, Piled Hell spawn none.
+**Huitzil:** Mighty Launcher `0x44` (ground, air and ES alike), Plasma
+Trap `0x45` (the mine, alive up to ~200 f), Final Guardian Beta `0x46`,
+Erasing Sphere `0x47` — and 421+KK enters Erasing Sphere's `0x47`
+whether the row is called Genocide Vulcan (ES) or not; Plasma Beam and
+the plain Genocide Vulcan spawn none. Each type's parameters are inline
+in its handler (above); the type's handler is `pool_table[type]` through
+the walker's LONG table ([VSE-18]), and the projectile hit-class map of
+"The projectile-pool HIT-CLASS map" is indexed by these same types.
 
 ## Command-input / motion-tracker subsystem (session 14z-48, measured both engines)
 
