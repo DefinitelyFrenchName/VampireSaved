@@ -15,9 +15,9 @@ this directory. Maintainer-ruled 2026-08-29: generate all three.)*
 
 | file | build it follows | regenerate |
 |---|---|---|
-| `donovan.md` | `build/don_m17` (donovan-m17) | `python3 tools/tables_char_md.py build/don_m17/extract docs/project/tables/donovan.md` |
-| `huitzil.md` | `build/hui51` (huitzil-m24) | `python3 tools/tables_char_md.py build/hui51/extract docs/project/tables/huitzil.md` |
-| `pyron.md` | `build/pyron35` (pyron-m18) | `python3 tools/tables_char_md.py build/pyron35/extract docs/project/tables/pyron.md` |
+| `donovan.md` | `build/don_m18` (donovan-m18) | `python3 tools/tables_char_md.py build/don_m18/extract docs/project/tables/donovan.md` |
+| `huitzil.md` | `build/hui52` (huitzil-m25) | `python3 tools/tables_char_md.py build/hui52/extract docs/project/tables/huitzil.md` |
+| `pyron.md` | `build/pyron36` (pyron-m19) | `python3 tools/tables_char_md.py build/pyron36/extract docs/project/tables/pyron.md` |
 
 Each page is rendered by `tools/tables_char_md.py` from the build's
 `extract/regions.json` (what `tools/extract_char.py` measured: source and

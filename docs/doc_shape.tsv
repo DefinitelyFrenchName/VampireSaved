@@ -79,7 +79,7 @@ docs/project/tenant_manifest.md	REFERENCE	docs/project/tenant_manifest_history.m
 docs/project/tenant_manifest_history.md	HIST	-	-
 docs/project/visual_smoke_tests.md	REFERENCE	-	-
 # --- project/tables (chars/ is generated wholesale and excluded from the walk)
-docs/project/tables/README.md	PENDING	-	-
+docs/project/tables/README.md	REFERENCE	-	-
 docs/project/tables/defense_rows.md	REFERENCE	-	-
 docs/project/tables/donovan.md	GENERATED	-	-
 docs/project/tables/huitzil.md	GENERATED	-	-
@@ -87,4 +87,4 @@ docs/project/tables/pyron.md	GENERATED	-	-
 docs/project/tables/qs_voice_map.md	REFERENCE	-	-
 docs/project/tables/reconciliation.md	REFERENCE	docs/project/tables/reconciliation_history.md	banner
 docs/project/tables/reconciliation_history.md	HIST	-	-
-docs/project/tables/sfx_records.md	PENDING	-	-
+docs/project/tables/sfx_records.md	REFERENCE	-	-
