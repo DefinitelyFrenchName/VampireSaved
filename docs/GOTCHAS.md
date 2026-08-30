@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-265 entries (35 game / 86 platform / 144 project), counted from the buckets at generation.
+269 entries (35 game / 86 platform / 148 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 35 entries
 
@@ -149,7 +149,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - MAME palette RAM ($90C000) takes Lua pokes for READBACK but not for RENDERING (14z-102)
 - two -debug INSTRUMENT-grammar traps from the #103 close — both misread a measurement for a full round each (paid: 14z-98)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 144 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 148 entries
 
 - A comparator's own ground-truth test can RATIFY a deviation from the governing spec (paid: 14z-95, GitHub #52)
 - Half the Lua instruments stage inputs one frame off replay.lua — a frame number from one is not a frame number from the other (paid: 14z-90, GitHub issue #10)
@@ -295,3 +295,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - THE NAMING RIGS RUN ON NATIVE vs2 — THERE, THE TENANT'S ART IS NOT IN GROUP C, AND ITS TILE CODES SHARE A BANK WITH THE HUD AND THE OPPONENT (14z-121 (6))
 - A PER-ID POINTER TABLE'S HEAD ADDRESSES ARE NOT CODE-BLOCK BOUNDARIES — the routine between two heads belongs to whichever pointer REACHES it (paid: 14z-123)
 - VICTOR'S STANDING LP WITH TOWARD HELD IS A THROW — a "walk in and jab" victim rig loses its contacts to grabs (paid: 14z-123)
+- A "NEAR"-PINNED FIRST EVENT LANDS IN THE ROUND INTRO — lead every pinned part with a spacer event (paid: 14z-123)
+- THE ENGINE RUNS TWO TICKS IN ONE VIDEO FRAME, PERIODICALLY — compare step lists against the CONSUMED COUNTER, never one byte per frame (paid: 14z-123)
+- A CORNERED BLOCKER TRANSFERS THE BLOCK PUSHBACK ONTO THE ATTACKER — stage push measurements mid-screen (paid: 14z-123)
+- A `mash` RECIPE MUST RELEASE BETWEEN TAPS — a held button is one press (paid: 14z-123)

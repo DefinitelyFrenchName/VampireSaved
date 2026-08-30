@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 2936 |
-| named by a document or manifest only | 2104 |
-| named by both a document/manifest and code | 562 |
-| named by CODE ONLY (the gap list below) | 270 |
-| carried by atlas | 445 |
-| carried by engine_internals | 610 |
-| carried by other docs | 944 |
+| distinct program-space addresses named | 2963 |
+| named by a document or manifest only | 2098 |
+| named by both a document/manifest and code | 572 |
+| named by CODE ONLY (the gap list below) | 293 |
+| carried by atlas | 449 |
+| carried by engine_internals | 615 |
+| carried by other docs | 946 |
 | carried by manifests | 1756 |
-| carried by code | 832 |
+| carried by code | 865 |
 
 ## Addresses
 
@@ -283,7 +283,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x014D62` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
 | `PRG:0x014D72` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
 | `PRG:0x014E58` | docs/game/engine_internals.md — The mechanism, as far as it is decoded (14z-68v) |
-| `PRG:0x014E8A` | docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99); docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture); docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail; docs/project/patch_notes.md — crypt-placed code (data_in_code mechanism + census); build/manifest/bank_map.toml — dispatch_19; +2 more |
+| `PRG:0x014E8A` | docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99); docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture); docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail; docs/project/patch_notes.md — crypt-placed code (data_in_code mechanism + census); +4 more |
 | `PRG:0x014ED0` | build/manifest/huitzil.toml — beam_effect_class16 [vs2]; tools/build_donovan.sh |
 | `PRG:0x014F90` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x015030` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/reconciliation.toml — map; tools/overlay_port.py |
@@ -668,6 +668,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x022400` | docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); tools/build_donovan.sh |
 | `PRG:0x022406` | build/manifest/type_stamps.toml — compare |
 | `PRG:0x02245E` | build/manifest/pcrel_escapes.toml — hui52 |
+| `PRG:0x02246E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); tests/test_advancing_guard.sh |
 | `PRG:0x0224AA` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x0224B4` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x022500` | docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds); docs/project/gotchas.md — (14z-68, refutes half of the 14z-67 entry theory); build/manifest/huitzil.toml — pcrel_escape_fix |
@@ -811,7 +812,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0266B8` | build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x026760` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x02678C` | docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port) |
-| `PRG:0x02681E` | docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED) |
+| `PRG:0x0267B8` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); tests/test_advancing_guard.sh |
 | `PRG:0x02686A` | build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x02694A` | build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x026978` | build/manifest/reconciliation_huitzil.toml — map [vs2] |
@@ -844,7 +845,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02704E` | docs/game/engine_internals.md — 14z-69c: THE MECHANISM, traced end to end |
 | `PRG:0x02705A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x02706E` | build/manifest/reconciliation_huitzil.toml — map |
-| `PRG:0x027082` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/project/inferred_claims.md — G2/G3 — measurements feeding engine_internals |
+| `PRG:0x027082` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); HANDOFF.md — Individual gates; docs/project/inferred_claims.md — G2/G3 — measurements feeding engine_internals; tests/test_advancing_guard.sh |
 | `PRG:0x02708E` | build/manifest/pcrel_escapes.toml — don_m18; build/manifest/pcrel_escapes.toml — hui52; build/manifest/pcrel_escapes.toml — pyron36 |
 | `PRG:0x0270A4` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x0270B6` | build/manifest/reconciliation.toml — map |
@@ -883,6 +884,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x027542` | docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/reconciliation_donovan.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map [vs2]; build/manifest/reconciliation_pyron.toml — map [vs2] |
 | `PRG:0x027576` | build/manifest/reconciliation.toml — map |
 | `PRG:0x027582` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2] |
+| `PRG:0x0275CE` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); tests/test_advancing_guard.sh |
 | `PRG:0x0275E4` | docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds) [vs2]; docs/game/engine_internals.md — Throw / physics-arc tables (14z-67, measured on the command grab) [vs2]; build/manifest/huitzil.toml — effect_map_5253 [vs2] |
 | `PRG:0x027694` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x027774` | build/manifest/reconciliation_huitzil.toml — map |
@@ -892,7 +894,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02783C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED) [vs2]; build/manifest/pcrel_escapes.toml — don_m18; build/manifest/pcrel_escapes.toml — hui52; build/manifest/pcrel_escapes.toml — pyron36; tools/charmap_gen.py; +2 more |
 | `PRG:0x02786A` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x02790A` | build/manifest/reconciliation_huitzil.toml — map |
-| `PRG:0x02797A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/project/inferred_claims.md — G2/G3 — measurements feeding engine_internals; build/manifest/pcrel_escapes.toml — don_m18; build/manifest/pcrel_escapes.toml — hui52; build/manifest/pcrel_escapes.toml — pyron36 |
+| `PRG:0x02797A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); HANDOFF.md — Individual gates; docs/project/inferred_claims.md — G2/G3 — measurements feeding engine_internals; build/manifest/pcrel_escapes.toml — don_m18; build/manifest/pcrel_escapes.toml — hui52; +4 more |
 | `PRG:0x027982` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x0279B4` | docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); build/manifest/huitzil.toml — throw_arc_tables |
 | `PRG:0x027A08` | docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); build/manifest/huitzil.toml — throw_arc_tables |
@@ -906,6 +908,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x027D78` | build/manifest/pcrel_escapes.toml — hui52 |
 | `PRG:0x027DF8` | build/manifest/pcrel_escapes.toml — hui52 |
 | `PRG:0x027E18` | build/manifest/pcrel_escapes.toml — hui52 |
+| `PRG:0x027E2E` | docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); tests/test_advancing_guard.sh |
 | `PRG:0x027E38` | build/manifest/pcrel_escapes.toml — hui52 |
 | `PRG:0x027E86` | build/manifest/reconciliation.toml — map |
 | `PRG:0x027EB4` | docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds); docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); build/manifest/reconciliation_huitzil.toml — map |
@@ -963,6 +966,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x028684` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x0286C0` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x028708` | build/manifest/reconciliation.toml — map [vs2] |
+| `PRG:0x02871C` | docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); HANDOFF.md — Individual gates; tests/test_advancing_guard.sh; tools/advancing_guard.py |
 | `PRG:0x028778` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x0287D2` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x028992` | build/manifest/reconciliation.toml — map [vs2] |
@@ -989,10 +993,10 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x028D34` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x028D48` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x028D4E` | docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — hit_class_props_ext_lo; build/manifest/huitzil.toml — effect_map_4e4f; build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; +1 more |
-| `PRG:0x028D50` | build/manifest/donovan.toml — hit_class_props_ext_hi; build/manifest/donovan.toml — hit_class_props_ext_lo; build/manifest/huitzil.toml — effect_map_5051; build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil |
+| `PRG:0x028D50` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/project/inferred_claims.md — G2/G3 — measurements feeding engine_internals; build/manifest/donovan.toml — hit_class_props_ext_hi; build/manifest/donovan.toml — hit_class_props_ext_lo; build/manifest/huitzil.toml — effect_map_5051; +3 more |
 | `PRG:0x028D52` | build/manifest/huitzil.toml — effect_map_5253; build/manifest/shared_writes.toml — huitzil |
 | `PRG:0x028D53` | docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); tools/gen_donovan_patch.py |
-| `PRG:0x028D54` | build/manifest/donovan.toml — hit_class_props_ext_hi |
+| `PRG:0x028D54` | build/manifest/donovan.toml — hit_class_props_ext_hi; tests/test_advancing_guard.sh |
 | `PRG:0x028DD8` | docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets; docs/game/atlas/character_tables.md — The loader (per-character struct fill); docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question); docs/project/doc_audit_14z118.md — 1.1 'docs/game/' — the game itself (surveyed 14z-118); docs/project/doc_audit_14z118.md — 2. Cross-document numbers to lock (candidates for the script) |
 | `PRG:0x028E42` | HANDOFF.md — Build registry [vs2]; docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-99 — the window (#43(b) + #103 + #104 + #105): byte detail; build/manifest/reconciliation.toml — map |
 | `PRG:0x028EE6` | docs/game/atlas/ram.md — Fighter + effect-pool fields (14z-67, measured on the H effect arc); build/manifest/reconciliation.toml — map [vs2] |
@@ -2760,9 +2764,32 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x020005` | tests/test_gfx_collision_gate.sh |
 | `PRG:0x020A70` | tools/audit_id_space.py |
 | `PRG:0x020BA4` | tests/test_oboro_select.sh |
+| `PRG:0x022496` | tests/test_advancing_guard.sh |
+| `PRG:0x02249C` | tests/test_advancing_guard.sh |
+| `PRG:0x0224A2` | tests/test_advancing_guard.sh |
+| `PRG:0x0224A8` | tests/test_advancing_guard.sh |
 | `PRG:0x025936` | tools/build_donovan.sh |
 | `PRG:0x025D80` | tools/build_donovan.sh |
+| `PRG:0x0267BE` | tests/test_advancing_guard.sh |
+| `PRG:0x0267F0` | tests/test_advancing_guard.sh |
+| `PRG:0x0267F4` | tests/test_advancing_guard.sh |
+| `PRG:0x0267F8` | tests/test_advancing_guard.sh |
+| `PRG:0x0267FC` | tests/test_advancing_guard.sh |
+| `PRG:0x026800` | tests/test_advancing_guard.sh |
+| `PRG:0x02681E` | tests/test_advancing_guard.sh |
+| `PRG:0x026824` | tests/test_advancing_guard.sh |
+| `PRG:0x027090` | tests/test_advancing_guard.sh |
 | `PRG:0x027532` | tests/test_gfx_layout3.sh |
+| `PRG:0x0275D4` | tests/test_advancing_guard.sh |
+| `PRG:0x027606` | tests/test_advancing_guard.sh |
+| `PRG:0x02760A` | tests/test_advancing_guard.sh |
+| `PRG:0x02760E` | tests/test_advancing_guard.sh |
+| `PRG:0x027612` | tests/test_advancing_guard.sh |
+| `PRG:0x02761E` | tests/test_advancing_guard.sh |
+| `PRG:0x027624` | tests/test_advancing_guard.sh |
+| `PRG:0x027648` | tests/test_advancing_guard.sh |
+| `PRG:0x02764E` | tests/test_advancing_guard.sh |
+| `PRG:0x027E3C` | tests/test_advancing_guard.sh |
 | `PRG:0x027F1A` | tests/audit_voice_borrow.sh |
 | `PRG:0x02804E` | tests/test_capture_pose_sources.sh |
 | `PRG:0x028065` | tests/test_capture_pose_sources.sh |

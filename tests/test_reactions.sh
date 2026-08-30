@@ -37,7 +37,7 @@ fail=0
 case $TENANT in donovan) EX="$DON/extract"; WANT=19;; huitzil) EX="$HUI/extract"; WANT=16;; pyron) EX="$PYR/extract"; WANT=17;; esac
 [ -f "$EX/regions.json" ] || { echo "SKIP: no $EX/regions.json"; exit 0; }
 V="${TENANT}_victim"
-PARTS="$(python3 -c "import sys; sys.path.insert(0,'tools'); import name_moves; print(' '.join(sorted(name_moves.SCHEDULES['$V'], key=int)))")"
+PARTS="$(python3 -c "import sys; sys.path.insert(0,'tools'); import name_moves; print(' '.join(p for p in sorted(name_moves.SCHEDULES['$V'], key=int) if ('$V', p) not in name_moves.PHASE2_PARTS))")"   # 14z-123: victim part 4 is the advancing-guard rig (test_advancing_guard.sh), not a reaction part
 [ "$TENANT" = donovan ] || PARTS="1 2"
 EXP="tests/expected/reactions_$TENANT.txt"
 echo "######## $TENANT (parts $PARTS)"

@@ -148,6 +148,19 @@ def gc_v(b, l_end, at):  # guard cancel variant: back held until l_end, 623+b fr
     return [(0, 3, "3", "p2"), (-4, l_end, "L"), (at, at + 1, "R"), (at + 2, at + 3, "D"), (at + 4, at + 7, "DR" + B[b])]
 
 
+def block():
+    # the BLOCKER (p2, facing left) holds back from 2 f before the attacker's press to +60
+    return [(-2, 60, "R", "p2")]
+
+
+def mash(tok, start, end, every=2):
+    # the BLOCKER (p2) taps `tok` for ONE frame every `every` frames from +start to +end
+    # after the attacker's press (the ADVANCING GUARD rig, tests/test_advancing_guard.sh:
+    # the guard's mash window +0x1AB is 14 frames from the block; a tap must RELEASE
+    # between presses to count — +0x126 is a new-press mask)
+    return [(o, o, tok, "p2") for o in range(start, end, every)]
+
+
 def pursuit(b):
     # sweep (2HK) up close then U+button during the FALL ([VSE-72]: the
     # window is the fall + first flat frames). 2HK's active frames + the
@@ -563,11 +576,28 @@ DONOVAN_VICTIM = {   # P1 = Victor attacks P2 = Donovan; every contact class the
         ("V 623LP vs jumping P2", [(0, 2, "U", "p2")] + [(a + 6, b + 6, t) for a, b, t in dp("LP")], 300),
         ("V 2HK vs landing P2", [(0, 2, "U", "p2"), (30, 33, "D6")], 300),
     ],
+    "4": [  # THE ADVANCING GUARD (14z-123, tests/test_advancing_guard.sh): P2 BLOCKS Victor's 5MP / 5HP (holding back
+            # from 2 f before the press to +60 — not for the whole part, so the "near" walk-in reaches contact and the
+            # block lands MID-SCREEN: a cornered blocker transfers the block pushback onto the attacker and that mover
+            # would overlap the guard push) and TAPS one button on alternate frames inside the 14-frame window the block
+            # opens (+0x1AB = 14, +0x140 = 2, class 0xFF; the 5MP block lands at +7, measured), or after it closes (the
+            # late negative). The engine's counter +0x170 and the attacker's push (+0x185 / +0x59 / the 0x2797A step
+            # lists) are what the gate samples. A spacer first: a "near" pin on the FIRST event lands in the round intro.
+        ("spacer", walk_in(10), 300),
+        ("V 5MP, P2 no mash", stand("MP") + block(), 460, "near"),
+        ("V 5MP, P2 mash LP", stand("MP") + block() + mash("1", 8, 22), 460, "near"),
+        ("V 5MP, P2 mash MP", stand("MP") + block() + mash("2", 8, 22), 460, "near"),
+        ("V 5MP, P2 mash HP", stand("MP") + block() + mash("3", 8, 22), 460, "near"),
+        ("V 5MP, P2 mash LK", stand("MP") + block() + mash("4", 8, 22), 460, "near"),
+        ("V 5MP, P2 mash HK", stand("MP") + block() + mash("6", 8, 22), 460, "near"),
+        ("V 5MP, P2 mash HP late", stand("MP") + block() + mash("3", 24, 40), 460, "near"),
+        ("V 5HP, P2 mash HP", stand("HP") + block() + mash("3", 9, 23), 460, "near"),
+    ],
 }
 SCHEDULES = {"donovan": DONOVAN, "pyron": PYRON, "huitzil": HUITZIL,
              "donovan_victim": DONOVAN_VICTIM, "huitzil_victim": DONOVAN_VICTIM, "pyron_victim": DONOVAN_VICTIM}
 NO_POKE_PARTS = {("donovan", "9"), ("donovan", "10"), ("donovan", "11")}   # parts the -debug write tap must be able to replay: no HP pin, no stock poke
-PHASE2_PARTS = NO_POKE_PARTS | {("donovan", "12")}   # the hitbox rigs (tests/test_hitbox_encoding.sh) and the Killshread (ES) rig (tests/test_killshread_es.sh) — NOT naming parts: test_move_naming.sh skips them
+PHASE2_PARTS = NO_POKE_PARTS | {("donovan", "12"), ("donovan_victim", "4")}   # the hitbox rigs (tests/test_hitbox_encoding.sh) and the Killshread (ES) rig (tests/test_killshread_es.sh) — NOT naming parts: test_move_naming.sh skips them
 # stock pokes for the meter parts: frame -> 9 stocks (each ES/EX/DF spends 1)
 METER_PARTS = {"donovan": {"3", "4", "5", "6", "7", "8", "12"}, "pyron": {"4", "5"}, "huitzil": {"4", "5", "6", "7", "8"}, "donovan_victim": set(), "huitzil_victim": set(), "pyron_victim": set()}
 

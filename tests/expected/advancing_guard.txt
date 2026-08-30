@@ -1,0 +1,44 @@
+## leg vs2
+# ids=0x03,0x13 lists@2797A: 0:11f/91px | 1:16f/115px | 2:20f/157px
+spacer	block=none
+V 5MP, P2 no mash	block=+6	win=14	taps=0	counter=0	push=none
+V 5MP, P2 mash LP	block=+7	win=14	taps=3	counter=0,1,2,3,4,5,0	push=none
+V 5MP, P2 mash MP	block=+7	win=13	taps=3	counter=0,2,4,6,8,10,0	push=+16	idx=1	face=1/0	steps=13f/-115px	list=MATCH	flags=1,0xe,0,1
+V 5MP, P2 mash HP	block=+6	win=14	taps=4	counter=0,3,6,9,12,0	push=+14	idx=2	face=1/0	steps=15f/-157px	list=MATCH	flags=1,0xf,4,0
+V 5MP, P2 mash LK	block=+7	win=14	taps=3	counter=0,1,2,3,4,5,0	push=none
+V 5MP, P2 mash HK	block=+7	win=13	taps=3	counter=0,3,6,9,12,0	push=+14	idx=2	face=1/0	steps=16f/-157px	list=MATCH	flags=1,0xf,4,0
+V 5MP, P2 mash HP late	block=+6	win=14	taps=0	counter=0	push=none
+V 5HP, P2 mash HP	block=+8	win=14	taps=3	counter=0,3,6,9,12,0	push=+15	idx=2	face=1/0	steps=16f/-157px	list=MATCH	flags=1,0xf,4,0
+## leg vs2_anak
+# ids=0x03,0x06 lists@2797A: 0:11f/91px | 1:16f/115px | 2:20f/157px
+spacer	block=none
+V 5MP, P2 no mash	block=+6	win=14	taps=0	counter=0	push=none
+V 5MP, P2 mash LP	block=+7	win=14	taps=3	counter=0	push=none
+V 5MP, P2 mash MP	block=+7	win=13	taps=3	counter=0	push=none
+V 5MP, P2 mash HP	block=+6	win=14	taps=4	counter=0	push=none
+V 5MP, P2 mash LK	block=+7	win=14	taps=3	counter=0	push=none
+V 5MP, P2 mash HK	block=+7	win=13	taps=3	counter=0	push=none
+V 5MP, P2 mash HP late	block=+6	win=14	taps=0	counter=0	push=none
+V 5HP, P2 mash HP	block=+8	win=14	taps=3	counter=0	push=none
+## leg vsavj
+# ids=0x03,0x01 lists@2871C: 0:11f/91px | 1:16f/115px | 2:20f/157px
+spacer	block=none
+V 5MP, P2 no mash	block=+7	win=14	taps=0	counter=0	push=none
+V 5MP, P2 mash LP	block=+7	win=14	taps=5	counter=0,1,2,3,4,0	push=+14	idx=0	face=1/0	steps=10f/-91px	list=MATCH	flags=1,0xf,4,0
+V 5MP, P2 mash MP	block=+7	win=14	taps=3	counter=0,1,2,3,0	push=+12	idx=1	face=1/0	steps=14f/-115px	list=MATCH	flags=1,0xf,4,0
+V 5MP, P2 mash HP	block=+7	win=14	taps=5	counter=0,1,2,3,0	push=+12	idx=2	face=1/0	steps=17f/-157px	list=MATCH	flags=1,0xf,4,0
+V 5MP, P2 mash LK	block=+7	win=14	taps=4	counter=0,1,2,3,4,5,6,0	push=+18	idx=0	face=1/0	steps=9f/-91px	list=MATCH	flags=1,0xf,4,1
+V 5MP, P2 mash HK	block=+8	win=13	taps=3	counter=0,1,2,3,4,5,0	push=+18	idx=2	face=1/0	steps=17f/-157px	list=MATCH	flags=1,0xf,4,1
+V 5MP, P2 mash HP late	block=+7	win=14	taps=0	counter=0	push=none
+V 5HP, P2 mash HP	block=+9	win=14	taps=3	counter=0,1,2,3,4,5,0	push=none
+## leg vsavj_anak
+# ids=0x03,0x06 lists@2871C: 0:11f/91px | 1:16f/115px | 2:20f/157px
+spacer	block=none
+V 5MP, P2 no mash	block=+7	win=14	taps=0	counter=0	push=none
+V 5MP, P2 mash LP	block=+7	win=14	taps=5	counter=0	push=none
+V 5MP, P2 mash MP	block=+7	win=14	taps=3	counter=0	push=none
+V 5MP, P2 mash HP	block=+7	win=14	taps=5	counter=0	push=none
+V 5MP, P2 mash LK	block=+7	win=14	taps=4	counter=0	push=none
+V 5MP, P2 mash HK	block=+8	win=13	taps=3	counter=0	push=none
+V 5MP, P2 mash HP late	block=+7	win=14	taps=0	counter=0	push=none
+V 5HP, P2 mash HP	block=+9	win=14	taps=3	counter=0	push=none

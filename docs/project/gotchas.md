@@ -3273,3 +3273,39 @@ a contact rig that must produce plain hits presses from crouch, or releases
 the direction before the button. Same family as [VSP-131] (a scripted input
 is not the move you named) — read the victim's state, not the script.
 
+
+## A "NEAR"-PINNED FIRST EVENT LANDS IN THE ROUND INTRO — lead every pinned part with a spacer event (paid: 14z-123)
+
+The advancing-guard rig's first event pinned the fighters at t−230 =
+frame 2370, before either is actionable; P1 did not walk until ~2540 and
+the event whiffed at 129 px. A `name_moves.py` part whose first event is
+position-pinned starts with a spacer event so the pin lands on a fighter
+that can move.
+
+
+## THE ENGINE RUNS TWO TICKS IN ONE VIDEO FRAME, PERIODICALLY — compare step lists against the CONSUMED COUNTER, never one byte per frame (paid: 14z-123)
+
+A per-frame countdown sampled at frame_done skips values (`+0x1AB`: 14,
+13, 12, 10, 9, 8, 6 …) and a per-frame step list can consume two bytes —
+or its last byte plus the terminator — inside one video frame. A
+frame-indexed comparison of x deltas against the list bytes fails on
+those frames; comparing the delta against the bytes consumed between two
+samples of the step counter (`+0x1B0`) matches 9/9. The same fact is why
+`+0x15E` reads 0x1FF the frame after it is armed 0x200.
+
+
+## A CORNERED BLOCKER TRANSFERS THE BLOCK PUSHBACK ONTO THE ATTACKER — stage push measurements mid-screen (paid: 14z-123)
+
+With P2 at the wall the ATTACKER moved −3/−4 px in the frames before the
+guard push began (the blocker cannot be pushed, so the separation moves
+the other fighter), and the per-frame list comparison failed on the
+lead-in. Pin both fighters mid-screen before measuring any pushback.
+
+
+## A `mash` RECIPE MUST RELEASE BETWEEN TAPS — a held button is one press (paid: 14z-123)
+
+`+0x126` is a NEW-PRESS mask: a recipe that holds the button across
+consecutive frames (`(o, o+1)` every 2 frames) counts as zero presses and
+the guard-mash counter `+0x170` never moves. Same family as [VSP-131]: read
+the counter the engine keeps, not the script.
+

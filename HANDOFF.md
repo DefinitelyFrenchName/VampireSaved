@@ -1665,6 +1665,19 @@ tests/audit_df_accumulator.sh          # 14z-123 (inferred_claims row 1): the
                                       # must-fire negative), merged (field trace
                                       # byte-identical = superset). 9 frozen
                                       # lines; FREEZE=1; replay df/105. ~3 min.
+tests/test_advancing_guard.sh          # 14z-123 (inferred_claims row 8): the
+                                      # 0x27082/0x2797A step family is the
+                                      # ADVANCING GUARD (guard push), NOT a
+                                      # throw mash-escape: a grounded block
+                                      # opens a 14-tick window +0x1AB, button
+                                      # presses feed +0x170, the ATTACKER is
+                                      # pushed 91/115/157 px (lists byte-
+                                      # identical vsavj PRG:0x02871C). vs2
+                                      # fires at a weighted >=10, vsavj +1/
+                                      # press with an RNG roll below 8. Four
+                                      # legs (vs2 + vsavj), 44 frozen lines;
+                                      # FREEZE=1; rig = name_moves victim
+                                      # part 4 (regeneration-checked). ~3 min.
 tests/test_ladder_tenant_vs_palette.sh # 14z-123 (inferred_claims row 7):
                                       # the 0x3A3CA0 pool MEASURED ON SCREEN
                                       # for a tenant CPU opponent — it is the

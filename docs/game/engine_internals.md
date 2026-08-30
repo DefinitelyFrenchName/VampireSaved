@@ -872,13 +872,25 @@ the victim".
   51 px / 16 f (5MP), idx 2 = 80 px / 20 f, idx 3 = 159 / 24, idx 7 = 140 /
   20, idx 5/6/8/9 = 65/54/10/80 with zero tails, idx 4 = 24 frames of 0.
   The heavy (class 4) contact takes the VELOCITY path instead (`0x265DC`,
-  `+0x40` = 2.9 px/f decaying 1/32 per frame). `+0x1C` plays no part. The
-  sibling family at `0x27082` (three lists at `0x2797A`: 91 / 115 / 157 px,
-  fast-decaying, counter `+0x1B0`) runs while `+0x185` is set — and
-  `+0x185` is set on the OTHER fighter by `0x2681E` when a mash counter
-  `+0x170` (`+= (d1>>1)+1` per input) reaches 10, together with a facing
-  flip and `+0x171/+0x184/+0x5C/+0x3B5` on the masher: the shape of a THROW
-  MASH-ESCAPE pushing the thrower away (read, not measured — 14z-121 (4)). Measured returns to a stand
+  `+0x40` = 2.9 px/f decaying 1/32 per frame). `+0x1C` plays no part. The sibling family at `0x27082` (three byte lists at `0x2797A`: 91 / 115 /
+  157 px over 11 / 16 / 20 steps, counter `+0x1B0`) is the **ADVANCING GUARD**
+  [M: `tests/test_advancing_guard.sh`, 14z-123, native vs2 AND vsavj; the
+  14z-121 (4) reading "the shape of a throw mash-escape" is RETRACTED — no
+  throw opens the window, a block does]. A grounded BLOCK (class byte `0xFF`,
+  handler `0x2246E`, state `0x0202`, `+0x140` = 2) opens a 14-tick window
+  `+0x1AB`; each NEW button press (`+0x126 & 0x77` — directions do not count)
+  feeds the blocker's `+0x170`, and when it crosses the threshold the check
+  (`0x267B8`, vsavj `0x275CE`) arms the ATTACKER — `+0x185` = 1, `+0x1B0` = 0,
+  `+0x5D` = flip_x ^ 1, `+0x59` = the strength class of the completing press —
+  so `0x27082` walks list[`+0x59`] and pushes the attacker AWAY 91 (light) /
+  115 (medium) / 157 (heavy) px; the blocker gets `+0x171` = 0x10, `+0x184` =
+  1, `+0x5C` = 1, `+0x3B5` = 4. The threshold is where the games differ: vs2
+  adds a weight per press (light 1 / medium 2 / heavy 3) and fires at >= 10 —
+  a light-only mash cannot make it inside the window; vsavj adds 1 per press
+  and below 8 rolls the RNG `0x14E8A` against the per-count mask table
+  `PRG:0x028D50` (count 3: 8/32, 4: 16/32, 5: 24/32, 6+: always). Anakaris
+  (id `0x06`) is skipped by both games. Push routine and lists are
+  byte-identical twins (vsavj `PRG:0x027E2E` / `PRG:0x02871C`). Measured returns to a stand
   chain are the same on all three tenants — light 19-20 f, medium 23-24,
   heavy ~35, blocked light/medium/heavy/DP/jump-in 22 / 26 / 24 / 18 /
   19 f, the sweep knockdown 67-76 f — with the freeze 11 on every

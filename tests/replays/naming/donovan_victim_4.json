@@ -1,0 +1,96 @@
+{
+ "tenant": "donovan_victim",
+ "part": "4",
+ "events": [
+  {
+   "name": "spacer",
+   "frame": 2600,
+   "gap": 300,
+   "movement": true
+  },
+  {
+   "name": "V 5MP, P2 no mash",
+   "frame": 2900,
+   "gap": 460,
+   "movement": false
+  },
+  {
+   "name": "V 5MP, P2 mash LP",
+   "frame": 3360,
+   "gap": 460,
+   "movement": false
+  },
+  {
+   "name": "V 5MP, P2 mash MP",
+   "frame": 3820,
+   "gap": 460,
+   "movement": false
+  },
+  {
+   "name": "V 5MP, P2 mash HP",
+   "frame": 4280,
+   "gap": 460,
+   "movement": false
+  },
+  {
+   "name": "V 5MP, P2 mash LK",
+   "frame": 4740,
+   "gap": 460,
+   "movement": false
+  },
+  {
+   "name": "V 5MP, P2 mash HK",
+   "frame": 5200,
+   "gap": 460,
+   "movement": false
+  },
+  {
+   "name": "V 5MP, P2 mash HP late",
+   "frame": 5660,
+   "gap": 460,
+   "movement": false
+  },
+  {
+   "name": "V 5HP, P2 mash HP",
+   "frame": 6120,
+   "gap": 460,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "1400:ff8b82:13",
+  "1450:ff8b82:13",
+  "1500:ff8b82:13",
+  "1400:ff8782:03",
+  "1450:ff8782:03",
+  "1500:ff8782:03",
+  "2550:ff8850:01200120",
+  "2950:ff8850:01200120",
+  "3350:ff8850:01200120",
+  "3750:ff8850:01200120",
+  "4150:ff8850:01200120",
+  "4550:ff8850:01200120",
+  "4950:ff8850:01200120",
+  "5350:ff8850:01200120",
+  "5750:ff8850:01200120",
+  "6150:ff8850:01200120",
+  "6550:ff8850:01200120",
+  "2670:ff8410:0228",
+  "2670:ff8810:02d8",
+  "3130:ff8410:0228",
+  "3130:ff8810:02d8",
+  "3590:ff8410:0228",
+  "3590:ff8810:02d8",
+  "4050:ff8410:0228",
+  "4050:ff8810:02d8",
+  "4510:ff8410:0228",
+  "4510:ff8810:02d8",
+  "4970:ff8410:0228",
+  "4970:ff8810:02d8",
+  "5430:ff8410:0228",
+  "5430:ff8810:02d8",
+  "5890:ff8410:0228",
+  "5890:ff8810:02d8"
+ ],
+ "frames": 6830
+}

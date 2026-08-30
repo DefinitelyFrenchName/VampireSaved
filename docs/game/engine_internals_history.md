@@ -139,3 +139,13 @@ of the 0x20-stride hitbox/hitbox_proj records — CORRECTED 14z-120 (5): this
 line said "+0x1D", an offset counted from the region start rather than the
 record base; the shipped Huitzil rows at `hitbox_proj +0x17D/+0x19D` ARE
 +0x17 of projectile records 5 and 6, see "Hitboxes and attack records")
+
+## [14z-123 G2 #3] from «Reactions as the victim — the second step family sentence»
+
+The
+  sibling family at `0x27082` (three lists at `0x2797A`: 91 / 115 / 157 px,
+  fast-decaying, counter `+0x1B0`) runs while `+0x185` is set — and
+  `+0x185` is set on the OTHER fighter by `0x2681E` when a mash counter
+  `+0x170` (`+= (d1>>1)+1` per input) reaches 10, together with a facing
+  flip and `+0x171/+0x184/+0x5C/+0x3B5` on the masher: the shape of a THROW
+  MASH-ESCAPE pushing the thrower away (read, not measured — 14z-121 (4)).
