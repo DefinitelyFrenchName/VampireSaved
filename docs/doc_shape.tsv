@@ -29,7 +29,8 @@
 #
 # --- level 0
 docs/README.md	PENDING	-	-
-docs/GOTCHAS.md	PENDING	-	-
+docs/GOTCHAS.md	GENERATED	docs/GOTCHAS_history.md	-
+docs/GOTCHAS_history.md	HIST	-	-
 docs/NEXT_SESSION.md	PENDING	-	-
 HANDOFF.md	PENDING	-	-
 # --- game
