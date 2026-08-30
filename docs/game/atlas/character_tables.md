@@ -281,7 +281,7 @@ when tenants coexist.
 | 0x00 | Bulleta (B.B. Hood) | | 0x08 | Bishamon (0x18 = Oboro Bishamon) |
 | 0x01 | Demitri | | 0x09 | Aulbath (Rikuo) |
 | 0x02 | Gallon (J. Talbain) | | 0x0A | Sasquatch |
-| 0x03 | Victor | | 0x0B | special: 1898 B, byte-identical in all three sets — **the "?" RANDOM cell**; the "(Shadow/Marionette machinery?)" guess is UNCONFIRMED, see below |
+| 0x03 | Victor | | 0x0B | special: 1898 B, byte-identical in all three sets — **the "?" RANDOM cell**; the old "(Shadow/Marionette machinery?)" guess is RETIRED — the cell is DECODED (14z-116), see the measured block below this table |
 | 0x04 | Zabel (L. Raptor) | | 0x0C | Q-Bee |
 | 0x05 | Morrigan | | 0x0D | Lei-Lei (Hsien-Ko) |
 | 0x06 | Anakaris | | 0x0E | Lilith |

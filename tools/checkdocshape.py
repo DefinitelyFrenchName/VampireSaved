@@ -26,7 +26,9 @@ unclosed group at end-of-line (headers wrap) — but only when it opens with a
 provenance word (paid/measured/ruled/...) or CONTAINS a session token, and
 never when the group carries a retraction/history word (those must stay
 visible); the residue must not look like chronology:
-`14z-N` / `Session N` / a date / "appended" / "(HISTORY" / "superseded" /
+`14z-N` / `Session N` / a date / "appended 14z" (the digest style;
+bare "appended" is a GAME term — the ROM-appended window/cells) /
+"(HISTORY" / "superseded" /
 "second|third pass" / "RETRACTED". So
   `## Hitboxes and attack records (measured 14z-120)`   passes
   `### 14z-70: the explosion's tiles LOCATED`           fails.
@@ -61,7 +63,7 @@ HEADER_RE = re.compile(r"^(#{1,3})\s+(.*)$")
 ANCHOR_RE = re.compile(r"\*\*\[[A-Z]+-\d+\]\*\*")
 SESSION_TOKEN = re.compile(r"(?i)\b14z-\d+[a-z]?\b|\bsession \d|\b20\d\d-\d\d-\d\d\b")
 CHRONO = re.compile(r"(?i)\b14z-\d+[a-z]?\b|\bsession \d|\b20\d\d-\d\d-\d\d\b"
-                    r"|\bappended\b|\(HISTORY|\bsuperseded\b"
+                    r"|\bappended 14z|\(HISTORY|\bsuperseded\b"
                     r"|\b(second|third) pass\b|\bRETRACT(S|ED)?\b")
 PROVENANCE_OPENER = re.compile(
     r"(?i)^\((paid|measured|named|session|ruled|opened|audited|static|confirmed"

@@ -59,7 +59,9 @@ The 21 `distinct` rows are **not** noise:
 
 Not counted as evidence, and reported apart by the tool: `auto` gap rows
 (no decoded consumer — `GOTCHAS`, "Never write an unverified gap") and
-`rec8`/`byte2d` rows whose per-id entry LAYOUT is unverified (`GOTCHAS`,
+`byte2d` rows whose per-id entry LAYOUT is unverified (`rec8` GRADUATED
+14z-121: `rec8_b` = the PURSUIT physics record pair, reader `0x026646`;
+`rec8_a` a `jump_params` slice — `bank_map.toml` notes) (`GOTCHAS`,
 "Per-char table entries are PAIRS more often than you think" — a 16-char
 table of 8-byte pairs and a 32-char table of 8-byte values have identical
 spacing). Those need a decoded consumer each before their variant rows mean
@@ -390,8 +392,8 @@ Falls straight out of the above:
    ruled NOT A PROBLEM 2026-08-28 (STATE). The VS palette block for a
    tenant is STILL UNSUPPLIED — the placeholder ramp; single-player,
    cosmetic, never reported from the board.)*
-6. **Tables whose per-id layout is still unverified** (`rec8`, `byte2d`,
-   `auto` gaps) — these must be resolved by decoding a consumer before a
+6. **Tables whose per-id layout is still unverified** (`byte2d` and the
+   `auto` gaps; `rec8` graduated 14z-121, see above) — these must be resolved by decoding a consumer before a
    tenant is declared to own a row in them. Writing a speculative row into
    one is precisely the Felicia wall-jump defect.
 

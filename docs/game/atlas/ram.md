@@ -207,7 +207,7 @@ hazards recorded with it:
   diff means a shared row; a slot diff alone is the ratified-invisible
   class.
 
-## 14z-66 additions — object physics, air system, servants [D: measured]
+## Object physics, air system, servants [D] (measured 14z-66)
 
 | Field | Meaning | Evidence |
 |---|---|---|

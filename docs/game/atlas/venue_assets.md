@@ -143,7 +143,7 @@ family in section 2 (Donovan's wrong COLOURS there), and its two
 unmasked 0x021C64/0x021C8E siblings. That work is separate and still
 open — see section 2's consequence paragraph.
 
-## §2 addendum (14z-64): the fold path is DORMANT in every measured flow
+## §2 addendum: the fold path is DORMANT in every measured flow (measured 14z-64)
 
 The concern above presupposed the `0x00A43E` fold executing on tenant
 surfaces. Audited (14z-64), it does not:

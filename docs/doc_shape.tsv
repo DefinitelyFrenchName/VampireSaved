@@ -38,12 +38,12 @@ HANDOFF.md	PENDING	-	-
 docs/game/engine_internals.md	PENDING	-	-
 docs/game/gotchas.md	PENDING	-	-
 docs/game/atlas/README.md	REFERENCE	-	-
-docs/game/atlas/character_tables.md	PENDING	-	-
+docs/game/atlas/character_tables.md	REFERENCE	-	-
 docs/game/atlas/id_space.md	REFERENCE	-	-
-docs/game/atlas/ram.md	PENDING	-	-
-docs/game/atlas/select_screen.md	PENDING	-	-
+docs/game/atlas/ram.md	REFERENCE	-	-
+docs/game/atlas/select_screen.md	REFERENCE	-	-
 docs/game/atlas/sprite_lists.md	REFERENCE	-	-
-docs/game/atlas/venue_assets.md	PENDING	-	-
+docs/game/atlas/venue_assets.md	REFERENCE	-	-
 # --- platform
 docs/platform/gotchas.md	PENDING	-	-
 docs/platform/mister.md	PENDING	-	-

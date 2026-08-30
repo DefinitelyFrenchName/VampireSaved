@@ -398,7 +398,12 @@ one on this Japan set, and what the `PRG:0x00C668` values selected by
 PORT.** `move.b $382(a1),$382(a0)` applies no mask, no bound and no fold,
 and every table the copied id then indexes is 32 rows with this port's
 tenant rows populated (`character_tables.md`, `id_space.md`). **So copying
-a TENANT is structurally expected to work** — and it has never been run.
+a TENANT is structurally expected to work** — ~~and it has never been
+run~~ (CORRECTED 14z-122, the documentation pass: it HAS — measured
+14z-116 by `tests/test_shadow_tenant.sh`: Shadow beats tenant Donovan and
+becomes id 0x13 with Donovan's OWN record `0x003FA9D0`, guard-clean END
+21120; CRT-confirmed 2026-08-28. This sentence had contradicted that green
+gate for six sessions).
 `$3B4`, tested first and skipping the copy, has two writers only
 (`PRG:0x0090B2`, `PRG:0x008A5C`, the init/challenger paths).
 
@@ -811,7 +816,7 @@ the same way — tap the array, walk the cursor, compare the fetched records
 against the row arithmetic — and each matched on all four cursor positions.
 The gate runs all three.
 
-## The tenant move IMPLEMENTED (14z-62) — and vs2's own arrays
+## The tenant move IMPLEMENTED, and vs2's own arrays (14z-62)
 
 The mechanism above is now built: on a variant-id build
 (`--tenant-id 0x13 --profile cps2-wide-v1`) the generator's
