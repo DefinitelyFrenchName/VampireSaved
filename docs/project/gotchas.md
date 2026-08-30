@@ -3186,3 +3186,37 @@ Three phase-2 traps, all cleared by letting the engine say where it read:
 3. macOS `wc -l` pads its count with spaces — a waiter comparing
    `"$(wc -l < f)" = "13"` never fires; strip with `tr -d ' '`.
 
+
+
+## A TABLE BOUND THAT TESTS THE WORD AFTER APPENDING IT IS POISONED BY THE FIRST NON-TABLE WORD (14z-121) — the "unindexed lying/wake nodes" were decoder entries never read
+
+`tools/anim_nodes.py` bounded an anim index table by "the smallest
+offset seen so far", but appended each word BEFORE the test — so the first
+node word past the table's real end (Huitzil's table `b`: `0x0025` at index
+129, odd) entered the `min` and cut the table to 18 entries where 139 were
+real. The chains that vanished were exactly the ones 14z-120 (7) recorded
+as `OFF:` "nodes no index table reaches" and 14z-120's close called "a
+computed address": `b:0x2a/0x2d/0x44/0x46/0x48`. Two rules paid for:
+1. A structural bound must reject a word BEFORE it can bias the bound —
+   here, an odd word or one pointing back inside the table ends the table.
+   The `test_anim_node_walk` "every sampled pointer is on the graph"
+   verdict cannot catch this: the sampled Donovan frames never entered a
+   cut-off chain.
+2. A measurement labelled `OFF:` / "unindexed" by a DECODER is a claim
+   about the decoder first. Before theorising about how the engine reaches
+   an address, tap the writer of the pointer: one `-debug` tap on `+0x1C`
+   named the select routine and the index in an evening; the "computed
+   address" survived a whole session's close.
+
+## THE PURSUIT RIG NEVER FIRED, TWICE — a part that does not produce its event is deleted, not kept (14z-121)
+
+A knocked-down-victim part (sweep + `pursuit()` recipes, then OTG
+normals) was written to arm the `+0x161` accumulator. Pass 1 (the far
+pin): every sweep pushed Donovan onto the wall (x = 1000) and every
+pursuit whiffed. Pass 2 (a mid-screen pin, all four buttons): three of six
+sweeps connected, no pursuit did — Victor's pursuit needs a cadence the
+Donovan recipe does not have. And the static read had already said the
+accumulator is armed only inside a DARK FORCE handler, so the rig could not
+have measured what it was written for. The part is gone from
+`name_moves.py` ([VSP-137], [VSP-98]); the sweep-only lines were not
+frozen. Write the rig AFTER the arming condition is known.

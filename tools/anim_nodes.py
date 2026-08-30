@@ -66,7 +66,17 @@ def walk_table(img, base, table, end=None, max_seq=None, entries=None):
         b = rd(table + 2 * k, 2)
         if b is None:
             break
-        words.append(int.from_bytes(b, "big"))
+        w = int.from_bytes(b, "big")
+        # THE TABLE ENDS AT THE FIRST WORD THAT CANNOT BE AN ENTRY (14z-121):
+        # an entry is an even offset past the table's own end (or 0 = unused).
+        # Until 14z-121 the word was appended BEFORE the bound test, so the
+        # first NODE word past the real end (Huitzil's table b: 0x0025 at index
+        # 129, odd) entered the min and collapsed the count to 18 — the
+        # "unindexed lying/wake nodes" of 14z-120 (7) were b:0x2a/0x2d,
+        # entries the decoder never read.
+        if w and (w & 1 or w < 2 * (k + 1)):
+            break
+        words.append(w)
         k += 1
         if max_seq and k >= max_seq:
             break

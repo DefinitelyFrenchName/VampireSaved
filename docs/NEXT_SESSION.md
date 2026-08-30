@@ -22,7 +22,7 @@
 > ## hh)` authored facing LEFT; `+0x8C` = attack records, `+0x90` = push;
 > ## class `+0x17`, `+0x14` attacker meter, `+0x1C` pushback —
 > ## `tools/hitbox_records.py`, `tests/test_hitbox_encoding.sh`); PHASE 3 the
-> ## reaction sets (own table per character, block = `0xFF` on shared
+> ## reaction sets (~~own table per character~~ — SHARED canonical `b:` seqs, 14z-121 (2); block = `0xFF` on shared
 > ## `b:0x0c`, stun = freeze + chain + a HOLD released when the pushbox
 > ## separation settles — `tools/reaction_map.py`, `tests/test_reactions.sh`),
 > ## projectile parameters inline per type handler, the projectile-type
@@ -32,10 +32,10 @@
 > ## Genocide Vulcan is 421+P; Planet Burning ES confirmed; Killshread as above.
 > ##
 > ## **NEXT, the maintainer's pick:** (B) the phase-3 remainder — how `+0x1C`
-> ## couples to the separation, the lying/wake nodes reached by a COMPUTED
-> ## address (no long pointer in vs2's program space), per-type projectile
-> ## handlers beyond Blizzard, the `gap_*` tables, the Killshread (ES)
-> ## two-way attack; (C) the small naming opens (Donovan's `0x3d`, Plasma
+> ## couples to the separation ~~the lying/wake nodes reached by a COMPUTED
+> ## address~~ ~~per-type projectile handlers~~ ~~the `gap_*` tables~~ (ALL FOUR DONE
+> ## 14z-121 (2) — see STATE), the Killshread (ES) two-way attack, the
+> ## DF-armed `+0x161` accumulator's states; (C) the small naming opens (Donovan's `0x3d`, Plasma
 > ## Trap's HK chain). Load `vampire-saved-port` first; the maps' "What is
 > ## NOT decoded" is the worklist.
 > ##

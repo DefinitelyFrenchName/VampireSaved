@@ -207,6 +207,7 @@ name = "gap_bd8fa"
 vsavj = 0x0BD8FA
 kind = "auto"
 stride = 0x80
+note = "SLICE of param32_a rows 16-31 (14z-121 reference scan: no reader of this base; param32_a is read id*8 from 0x0BD87A at vsavj 0x0228E2/0x0271A8)"
 
 [[table]]
 name = "hitbox_base"
@@ -241,6 +242,7 @@ name = "rec8_a"
 vsavj = 0x0BDB7A
 kind = "rec8"
 stride = 0x100
+note = "SLICE of jump_params rows 0-5 (14z-121: jump_params is read id*0x30 + {0,0x10,0x20} from 0x0BDB7A at vsavj 0x027A76; no reader of this base)"
 
 # ── the 0xBDC7A-0xBE0FA gap: no documented consumers; oracle-classify ────────
 [[table]]
@@ -248,60 +250,70 @@ name = "gap_bdc7a"
 vsavj = 0x0BDC7A
 kind = "auto"
 stride = 0x80
+note = "SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base)"
 
 [[table]]
 name = "gap_bdcfa"
 vsavj = 0x0BDCFA
 kind = "auto"
 stride = 0x80
+note = "SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base)"
 
 [[table]]
 name = "gap_bdd7a"
 vsavj = 0x0BDD7A
 kind = "auto"
 stride = 0x80
+note = "SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base)"
 
 [[table]]
 name = "gap_bddfa"
 vsavj = 0x0BDDFA
 kind = "auto"
 stride = 0x80
+note = "SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base)"
 
 [[table]]
 name = "gap_bde7a"
 vsavj = 0x0BDE7A
 kind = "auto"
 stride = 0x80
+note = "SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base)"
 
 [[table]]
 name = "gap_bdefa"
 vsavj = 0x0BDEFA
 kind = "auto"
 stride = 0x80
+note = "SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base)"
 
 [[table]]
 name = "gap_bdf7a"
 vsavj = 0x0BDF7A
 kind = "auto"
 stride = 0x80
+note = "SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base)"
 
 [[table]]
 name = "gap_bdffa"
 vsavj = 0x0BDFFA
 kind = "auto"
 stride = 0x80
+note = "SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base)"
 
 [[table]]
 name = "gap_be07a"
 vsavj = 0x0BE07A
 kind = "auto"
 stride = 0x80
+note = "SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base)"
 
 [[table]]
 name = "gap_be0fa"
 vsavj = 0x0BE0FA
 kind = "auto"
 stride = 0x80
+note = "SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base)"
 
 # ── word tables (stride 0x40) ────────────────────────────────────────────────
 [[table]]
@@ -327,18 +339,21 @@ name = "gap_be23a"
 vsavj = 0x0BE23A
 kind = "auto"
 stride = 0x40
+note = "REAL per-char WORD table (14z-121): read id*2 at vsavj 0x027B94 as a height threshold against fighter +0x14 - +0x3A when +0x38 != 0 (airborne), gating +0x113/+0x114 — semantics of the check unread"
 
 [[table]]
 name = "gap_be27a"
 vsavj = 0x0BE27A
 kind = "auto"
 stride = 0x40
+note = "FIRST HALF of the 32-LONG capture-keyframe pointer table 0x0BE27A[attacker id] (14z-121 scan: read at vsavj 0x02802E/0x0280C6/0x028140, the capture-pose installer of [VSE-44]; the throw_victim_keyframes / grab_hold_keyframes rows repoint its rows)"
 
 [[table]]
 name = "gap_be2ba"
 vsavj = 0x0BE2BA
 kind = "auto"
 stride = 0x40
+note = "SECOND HALF of the capture-keyframe pointer table 0x0BE27A (rows 16-31; Huitzil's row 0xBE2BA is the grab_hold_keyframes target) — see gap_be27a"
 
 [[table]]
 name = "param32_b"
@@ -351,12 +366,14 @@ name = "gap_be37a"
 vsavj = 0x0BE37A
 kind = "auto"
 stride = 0x80
+note = "SLICE of param32_b rows 16-31 (14z-121: param32_b read id*8 from 0x0BE2FA at vsavj 0x026484 for chain a2:0x4C, the pursuit leap; no reader of this base)"
 
 [[table]]
 name = "rec8_b"
 vsavj = 0x0BE3FA
 kind = "rec8"
 stride = 0x100
+note = "the PURSUIT physics record pair (14z-121): read id*0x20 + (+0x0A ? 0x10 : 0) from 0x0BE3FA at vsavj 0x026646 = four longs (xv, xacc, yv, yacc) x 2 variants per char, 0x400 bytes 0x0BE3FA-0x0BE7FA — gap_be4fa..gap_be77a are its interior"
 
 # ── the 0xBE4FA-0xBE7FA gap ──────────────────────────────────────────────────
 [[table]]
@@ -364,36 +381,42 @@ name = "gap_be4fa"
 vsavj = 0x0BE4FA
 kind = "auto"
 stride = 0x80
+note = "SLICE of rec8_b, the pursuit physics record pair (0x0BE3FA + id*0x20; 14z-121 scan: no reader of this base)"
 
 [[table]]
 name = "gap_be57a"
 vsavj = 0x0BE57A
 kind = "auto"
 stride = 0x80
+note = "SLICE of rec8_b, the pursuit physics record pair (0x0BE3FA + id*0x20; 14z-121 scan: no reader of this base)"
 
 [[table]]
 name = "gap_be5fa"
 vsavj = 0x0BE5FA
 kind = "auto"
 stride = 0x80
+note = "SLICE of rec8_b, the pursuit physics record pair (0x0BE3FA + id*0x20; 14z-121 scan: no reader of this base)"
 
 [[table]]
 name = "gap_be67a"
 vsavj = 0x0BE67A
 kind = "auto"
 stride = 0x80
+note = "SLICE of rec8_b, the pursuit physics record pair (0x0BE3FA + id*0x20; 14z-121 scan: no reader of this base)"
 
 [[table]]
 name = "gap_be6fa"
 vsavj = 0x0BE6FA
 kind = "auto"
 stride = 0x80
+note = "SLICE of rec8_b, the pursuit physics record pair (0x0BE3FA + id*0x20; 14z-121 scan: no reader of this base)"
 
 [[table]]
 name = "gap_be77a"
 vsavj = 0x0BE77A
 kind = "auto"
 stride = 0x80
+note = "SLICE of rec8_b, the pursuit physics record pair (0x0BE3FA + id*0x20; 14z-121 scan: no reader of this base)"
 
 # ── tail words / bytes / 2D tables ───────────────────────────────────────────
 [[table]]

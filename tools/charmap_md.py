@@ -69,7 +69,8 @@ def main():
         for fn, fd in rec["fields"].items():
             flag = "**!**" if fd.get("diff") else ""
             extra = f" (expected placed `{fd['expected_placed']}`)" if fd.get("expected_placed") and fd.get("diff") else ""
-            w(f"| `{name}` | {loc['kind']} | `{loc['vsavj_row']}` | {fn} | {fd['fmt']} | `{fd['vs2']}` | `{fd['ours']}` | {flag} | {h(str(fd.get('ours_source','')))}{extra} |")
+            note = (" — " + h(rec["note"])) if rec.get("note") else ""
+            w(f"| `{name}` | {loc['kind']} | `{loc['vsavj_row']}` | {fn} | {fd['fmt']} | `{fd['vs2']}` | `{fd['ours']}` | {flag} | {h(str(fd.get('ours_source','')))}{extra}{note} |")
     w("")
     # ---- dispatch ----
     w("## Dispatch rows (the per-character code pointers)")

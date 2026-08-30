@@ -756,9 +756,11 @@ the per-chain frame data in `<tenant>_anim.md`.
   14z-120 (6) on 13 contacts: 6/12/18 on L/M/H normals, 3 per Lightning
   Sword tick, 9 Ifrit, 2 the column, a fraction of it on block; the VICTIM
   gains 8 per hit whatever the record and 0 on block), **`+0x17` the
-  REACTION CLASS**, **`+0x1C` scales the PUSHBACK** (the victim moved
-  27/41/59 px in 15 frames for 0x14/0x1E/0x28; 0x46 on specials; the
-  friction law is not derived), `+0x1D` zero in every record seen.
+  REACTION CLASS**, ~~`+0x1C` scales the PUSHBACK~~ **RETRACTED 14z-121:
+  `+0x1C` has ONE reader (vs2 `0x16B70`) and it never fired on any
+  measured contact — see "The attack record's fields, by their readers"
+  below; the 27/41/59 px correlation has another carrier, unread**,
+  `+0x1D` zero in every record seen.
   Observed, not proven: `+0x12` = the strength index (1/2/3, 7 on
   specials), `+0x16` = 1 on specials and projectiles; `+0x11`, `+0x13`,
   `+0x15` open. A BLOCKED contact writes class `0xFF` on the victim
@@ -787,19 +789,25 @@ decoder `tools/reaction_map.py`, gate `tests/test_reactions.sh`, the
 per-tenant tables in `docs/project/tables/chars/<tenant>.md` "Reactions as
 the victim".
 
-- **Every tenant's reaction set is its OWN table, entered by the class**:
-  Donovan's and Huitzil's in table `c`, Pyron's in table `b` — the same
-  class lands on different (table, seq) per character, which is what the
-  per-victim pose tables of [VSE-44] and the class dispatch of [VSE-42]
-  would predict. Donovan: light/medium hit (class 1, 2) `c:0x08 -> c:0x09`;
-  heavy (class 4) `c:0x08 -> c:0x1f -> c:0x20`; the sweep knockdown (class
-  3) `c:0x1c -> 0x1d -> 0x1e -> 0x19 -> 0x1a -> 0x1b -> b:0x44`; an air hit
-  (class 0x37) `c:0x08 -> 0x11 -> 0x16 -> 0x17 -> 0x18 -> b:0x43`; a throw
-  `c:0x01` held. Huitzil: light `c:0x19 -> c:0x1c`, heavy `-> c:0x00..0x04`,
-  the sweep through `b:0x09 -> c:0x09/0x0a` and then FOUR nodes NO index
-  table reaches (`OFF:0x248AE2..`) — the lying/wake nodes are linked, not
-  indexed. Pyron: light `b:0x04`, heavy `b:0x78 -> b:0x23`, air hit `b:0x78
-  -> 0x41 -> 0x42 -> 0x56 -> 0x48`, sweep `b:0x40 -> 0x1a -> 0x56 -> 0x48`.
+- ~~**Every tenant's reaction set is its OWN table, entered by the class**
+  (Donovan's and Huitzil's in table `c`, Pyron's in table `b`)~~ **RETRACTED
+  14z-121 (2): that was a LABELLING artefact.** A reaction node sits on
+  MANY chains — the same node is indexed from several seqs of table `b` AND
+  of table `c` — and `reaction_map.py` labelled it by whichever chain the
+  decoder enumerated LAST, which differed per tenant with the decoder's (then
+  truncated) table bound. Labelled deterministically (the previous node's
+  chain, else the entering chain with the smallest seq), **the three
+  tenants' reaction paths carry the SAME canonical seqs**: light/medium
+  `b:0x03`, heavy `b:0x03 -> b:0x23`, the sweep knockdown `b:0x09 -> 0x0a ->
+  0x0b -> b:0x44`, an air hit `b:0x03 -> b:0x2a -> b:0x14 -> b:0x15 -> b:0x44`
+  (Pyron `b:0x19 -> b:0x2a -> b:0x14 -> b:0x29 -> b:0x44`), a throw `c:0x01`
+  (Donovan) / `c:0x0d` (Huitzil) / `c:0x02` (Pyron) held, the block stance
+  `a:0x13`/`a:0x14`, the stand `a:0x00` — a cross-character CONVENTION of
+  the anim index (the per-victim pose index of [VSE-44] reads the same
+  way). The eliminations of 14z-120 (7) (which class enters which nodes,
+  the stun lengths) stand; only the "own table" reading is withdrawn.
+  `tests/expected/reactions_<tenant>.txt` re-frozen 14z-121 under the
+  deterministic rule.
 - **A block is class `0xFF`** on every tenant: the block stance (Donovan
   `a:0x14`, Huitzil `a:0x15`, Pyron an unindexed node) then the SHARED
   blockstun chain **`b:0x0c`** (one node, 3 data frames, held).
@@ -833,12 +841,60 @@ the victim".
   `c:0x08/0x09` node) against the attacker's; the reference push boxes at
   vs2 `0xA776C` are `(0,44,27,45) (0,30,27,31) (0,75,27,29) (0,0,24,6)` in
   the data view. So the slide's length is the reaction chain's push boxes
-  settling, and the hold releases when it has — `+0x1C` selects that
-  through the class/record, the exact coupling still unread. Measured returns to a stand
+  settling, and the hold releases when it has — ~~`+0x1C` selects that
+  through the class/record~~ (RETRACTED 14z-121: `+0x1C` is not read on
+  these contacts; what selects the slide length per strength is unread). Measured returns to a stand
   chain are the same on all three tenants — light 19-20 f, medium 23-24,
   heavy ~35, blocked light/medium/heavy/DP/jump-in 22 / 26 / 24 / 18 /
   19 f, the sweep knockdown 67-76 f — with the freeze 11 on every
   fighter-vs-fighter contact (Victor's constants).
+
+### The attack record's fields, by their READERS (14z-121, static on vs2 `0x16930-0x175F6`, the hit-apply code that holds the record in A3)
+
+Depends on atlas rows: `ram.md` fighter `+0x54`, `+0x56`, `+0x59`,
+`+0x5A`, `+0x5C`, `+0x5D`, `+0x13A/+0x13B`, `+0x141`, `+0x144`, `+0x15B`,
+`+0x15E`, `+0x161/+0x162`, `+0x1A4`; `character_tables.md` bank row
+`byte15b`. Every `$xx(a3)` read in that range was enumerated (one linear
+disassembly, `tools/m68dis.py`); a field with no reader there is marked so.
+
+| field | reader | what it does |
+|---|---|---|
+| `+0x8` / `+0x9` | `0x1735C` / `0x17390` (+ `0x1745E/0x17480`) | real / white power (the damage subtract) |
+| `+0xC` (hit) / `+0xD` (block) | `0x16B4A` / `0x16CCE` → `0x172DA` | copied to the victim's `+0x59` (forced 1 when the attacker's `+0x8`/`+0x11A` say so) |
+| `+0xE` | `0x1717E` | the victim's FACING rule → `+0x5D`: 0/1 eor'd in, 2 = opposite of its own, 3 = the attacker's `+0xA`, 4 = by x against the other fighter, 5 = by the attacker's velocity sign, negative = by the attacker's x |
+| `+0xF` | `0x16B44` | → victim `+0x5A` |
+| `+0x10` | `0x16930`, `0x16B38` | the hit id, stored in the victim's ring at `+0x6C` (the multi-hit dedup) |
+| `+0x13` | `0x171FC` | **the HIT-FREEZE class**: → victim `+0x141`, and `+0x13*4` indexes the pairs table `0x17FA4` (hit) / `0x17FA6` (block, class byte negative) — `(a0)+` → the attacker's `+0x5C`, `(a0)` → the victim's; index 0x60 forced when the attacker's `+0x8` is clear and `+0x11A` set. The 11 measured on every normal is this table's entry |
+| `+0x14` | `0x172F6` | the attacker's METER (halved on block, `jsr 0x28D48`); the victim gets 8 while its combo count `+0x144` < 12 |
+| `+0x16` | `0x16FA0` | the special flag: class 4 becomes 5 (+ `+0x117`) |
+| `+0x17` | `0x16F70` and the compares | the REACTION CLASS |
+| `+0x19` | `0x16B3E` | → victim `+0x56` |
+| `+0x1A` | `0x175F6` | a COMBO-SCALING table selector: 0 = the attacker's per-character 32-byte table (`0x18C1A`/`0x1881A[id]`, one per a global at `-0x4B68(a5)`), else `0x1841A[+0x1A]`; the table is walked by the combo count `+0x144` (< 0x1F) — the arithmetic unread |
+| `+0x1B` | `0x172B8` | **the WHITE-DAMAGE RECOVERY-RATE class**: `0x18018[+0x1B]` → victim `+0x13A/+0x13B`, the per-frame refill at `0x20DF2` (`+0x13A` counts down, reloads from `+0x13B`, `+0x52` += 1); fixed 1/3 while `+0x1C3` is set |
+| `+0x1C` | `0x16B70` ONLY | ADDED to the victim's accumulator `+0x161` (decay timer `+0x162` := 240 f; the per-frame tick `0x20E6A` clears both when it expires) and compared with the per-character threshold `+0x15B` — the bank row **`byte15b`, 60 for every character in vsavj AND vs2** — but ONLY while the victim's `+0x15E` is armed and it is grounded (`+0x38` = 0), with `+0x11F`/`+0x18F` clear. **`+0x15E` is armed nowhere the rigs reach**: it is written after init by NO state of Donovan's naming parts 1-3 and by nothing on the victim side (write taps 14z-121, both fighters); its writers are four state entries inside the per-character DARK FORCE handlers (`0x2203A`, `0x22078`, `0x22282`, `0x3E928` — each with `+0x18F/+0x190/+0x143`; reached through `0x22008: jmp 0xD9538[id]` from the activation flow `0x26166`). What crossing the threshold does (the `0x170DE` vs `0x16B94` fork, both ending in the class writes) and which characters' DF arm it: OPEN |
+| `+0x1D` | `0x16BD6` | tested on the node-byte-3 branch |
+| `+0x1E` | `0x16CF2` | → victim `+0x1A4` |
+| `+0x11`, `+0x12`, `+0x15`, `+0x18`, `+0x1F` | **none in the hit code** | the "+0x12 strength index" observation of 14z-120 (6) is not consumed here |
+
+### The chain decoder's table bound, and the "unindexed" lying/wake nodes (14z-121)
+
+The six `OFF:` nodes of 14z-120 (7) (Huitzil's sweep and air-hit paths)
+are table-`b` entries: `b:0x2a`/`b:0x2d` (the lying pose) and
+`b:0x44/0x46/0x48` (the lying/wake family Donovan's sweep also ends on,
+`b:0x44`). The select routine (`0x271F4`: pointer table `0xD7018/98/118/198[id]`
+= tables a/a2/b/c, `(a0, seq*2)` word offset → node → `+0x1C`; the advance
+`0x27252` follows `+0x18` links and sequential nodes) had entered them by
+INDEX — `tools/anim_nodes.py` had bounded Huitzil's table `b` at 18
+entries because its loop appended a word BEFORE testing it, so the first
+non-table word past the real end (`0x0025` at index 129, odd node data)
+entered the `min` and collapsed the count (the raw bound is 139). Fixed:
+a word that is odd or points back inside the table ends it. The
+`test_anim_node_walk` verdict is unchanged (3638/3638, Donovan native);
+Huitzil's `reactions_huitzil.txt` was re-frozen with the two lines that
+carried `OFF:`. Note the path labels are "a chain containing the node",
+not unique: nodes shared by several `b` chains relabel when more chains
+decode — so `reaction_map.py` labels deterministically since 14z-121:
+the previous node's chain, else the entering chain with the smallest seq.
 
 ### Projectile parameters live in the per-TYPE handler, not in a table family (14z-120 (10), measured on Blizzard Sword)
 
@@ -881,6 +937,46 @@ the plain Genocide Vulcan spawn none. Each type's parameters are inline
 in its handler (above); the type's handler is `pool_table[type]` through
 the walker's LONG table ([VSE-18]), and the projectile hit-class map of
 "The projectile-pool HIT-CLASS map" is indexed by these same types.
+
+### Every `$FF9400` type's parameters, decoded and measured (14z-121)
+
+`tools/projectile_params.py` decodes the init block of a type handler
+(walker-2 table vs2 `0x5C620[type]` — the `$FF9400` pool's walker, NOT the
+`0x6A51C` table, whose Huitzil entries all point at a generic `jmp
+0x157C2`): ONE shape across the eight types — `+0x9A` (the spawn's
+variant: 0/2/4 = LP/MP/HP, 6 = ES) selects a byte (or word) for `+0x26`, a
+word for `+0x50`, and through a word index an `(xv, xacc, yv, yacc)`
+16.16 record (x-terms negated when `+0x0B` = 0); Blizzard Sword indexes
+its `(xv, yv)` pairs by `+0x0A*8` with immediate accelerations; Cosmo
+Disruption writes immediates per state (the seven orbiting pieces). Frozen
+rows: `tests/expected/projectile_params.txt`; gate
+`tests/test_projectile_params.sh` — every live spawn on the census rigs
+matches its row (27/27 tabled spawns, one tick allowed) and the decoder
+on each BUILD's opcode view at the placed handler yields vs2's rows
+(Pyron and Huitzil carry ALL of vs2's handler regions `x0672d0..x0689cc`).
+Ground values: Sol Smasher 3/4/5/6 px/f (ES 6); Mighty Launcher 3/4/5/6
+with `yv` 0.5, `ya` −0.0625; Plasma Trap 1/2/3/3 with `yv` 5, `ya`
+−0.3125; Final Guardian 3 + 0.0625/f; Erasing Sphere 1.5/0.5/1.5/1.5.
+
+### The physics bank's `gap_*` rows (14z-121, a reference scan of vsavj's code)
+
+Every absolute reference into `PRG:0x0BD800-0x0BEC60` was listed (25
+sites). The 17 `gap_*` auto rows of `bank_map.toml` are: 13 SLICES of
+tables the map already names but declares with a smaller stride than their
+readers use (`param32_a` rows 16-31; `jump_params`' interior, read
+`id*0x30 + {0,0x10,0x20}` at `0x027A76` — `rec8_a` is its rows 0-5;
+`param32_b` rows 16-31; and `rec8_b`'s interior — `rec8_b` = the PURSUIT
+physics record pair, `0x0BE3FA + id*0x20 + (+0x0A ? 0x10 : 0)`, four
+longs, read at `0x026646` for chain `a2:0x4C`); the two halves of the
+32-LONG capture-keyframe pointer table `0x0BE27A[attacker id]` (the
+installer of [VSE-44], `0x02802E/0x0280C6/0x028140`; the manifests'
+`throw_victim_keyframes`/`grab_hold_keyframes` rows repoint its rows);
+and ONE real per-character WORD table at `0x0BE23A`, read `id*2` at
+`0x027B94` as a height threshold (`+0x14 − +0x3A`) while airborne
+(`+0x38`), gating a check on `+0x113|+0x114` — the check itself unread.
+`byte15b` (`0x0BE87A`, read at `0x022392` → fighter `+0x15B`) is the
+accumulator threshold above. Each row's resolution is a `note` on the
+row in `bank_map.toml`, rendered in the maps' bank tables.
 
 ## Command-input / motion-tracker subsystem (session 14z-48, measured both engines)
 

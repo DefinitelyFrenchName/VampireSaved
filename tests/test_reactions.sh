@@ -11,7 +11,9 @@
 # into one line per contact: the victim's class byte, the freeze, the chain
 # PATH (table:seq@entry-node, OFF:<addr> for nodes the index tables do not
 # reach) and the frames until the tenant is back on a stand chain — frozen in
-# tests/expected/reactions_<tenant>.txt. So a changed reaction set, a changed
+# tests/expected/reactions_<tenant>.txt (FREEZE=1 re-freezes it FROM THE RUN —
+# only after the change is attributed: 14z-121 re-froze Huitzil's when the chain
+# decoder's table bound was fixed and the OFF: nodes became b: chains). So a changed reaction set, a changed
 # extract, a changed decoder or a changed rig fails here. The ids of both
 # fighters are asserted from the trace (P1 0x03, P2 the tenant).
 # Emulator tier (MAME, ~1 min per tenant, legs in parallel).
@@ -70,6 +72,7 @@ ids="$(awk '$1=="F"&&$2==3000{for(i=3;i<=NF;i++){split($i,a,"=");if(a[1]=="id"||
 case "$ids" in "id=3 p2id=$WANT ") ok "P1 = Victor (3), P2 = $TENANT ($WANT)";; *) bad "ids at f3000: $ids (want id=3 p2id=$WANT)";; esac
 : > "$W/got.txt"
 for p in $PARTS; do python3 tools/reaction_map.py "$W/r_$p.json" "$W/t_$p.txt" "$W/chains" >> "$W/got.txt" || bad "reaction_map $p"; done
+if [ "${FREEZE:-0}" = 1 ]; then cp "$W/got.txt" "$EXP"; echo "  FROZE  $EXP from this run ($(wc -l < "$EXP" | tr -d ' ') lines) — FREEZE=1"; fi
 if diff -u "$EXP" "$W/got.txt" > "$W/diff.txt"; then ok "$(wc -l < "$W/got.txt" | tr -d ' ') contact lines identical to $EXP"; else bad "contact lines differ from $EXP:"; head -30 "$W/diff.txt"; fi
 n="$(grep -c 'cls=0x' "$W/got.txt" | tr -d ' ')"; [ "$n" -ge 10 ] && ok "$n contacts measured" || bad "only $n contacts"
 [ $fail = 0 ] && echo "$TENANT: PASS" || { echo "$TENANT: FAIL"; allfail=1; }

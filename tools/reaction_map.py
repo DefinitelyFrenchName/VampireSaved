@@ -33,12 +33,30 @@ import sys
 
 
 def load_chains(cd):
+    """node address -> the list of (table, seq, index) chains it belongs to.
+
+    A node is usually on SEVERAL chains (the lying/wake family, the block
+    stance, every shared tail), so the label is chosen by label_for():
+    the chain the previous node was on (continuity), else the chain that
+    ENTERS at this node (index 0) with the smallest seq, else the smallest
+    seq. Before 14z-121 the map kept "the last chain enumerated", which
+    moved labels whenever the decoder learned more chains (the table bound
+    fix relabelled Donovan's b:0x44 -> b:0x79 and Pyron's a:0x05 -> a:0x3f)."""
     node2 = {}
     for name in ("a", "a2", "b", "c", "proj"):
         for seq, c in json.load(open(f"{cd}/{name}.json"))["chains"].items():
             for i, n in enumerate(c.get("nodes") or []):
-                node2[int(n["addr"], 16)] = (name, int(seq, 16), i)
+                node2.setdefault(int(n["addr"], 16), []).append((name, int(seq, 16), i))
     return node2
+
+
+def label_for(cands, prev):
+    if prev:
+        for c in cands:
+            if c[:2] == prev[:2]:
+                return c
+    entries = [c for c in cands if c[2] == 0]
+    return min(entries or cands, key=lambda c: (c[0], c[1]))
 
 
 def contacts(sched_path, trace_path, chains_dir):
@@ -60,9 +78,11 @@ def contacts(sched_path, trace_path, chains_dir):
         if prev is None: prev = fr; continue
         pv = rows[prev]
         if v["p2hp"] < pv["p2hp"] or v["p2white"] < pv["p2white"] or (v["p2frz"] and not pv["p2frz"]):
-            path = []; k = fr; last = None; back = None; reacted = False
+            path = []; k = fr; last = None; back = None; reacted = False; prevkey = None
             while k in rows and k < fr + 240:
-                key = node2.get(rows[k]["p2node"] & 0xffffffff)
+                cands = node2.get(rows[k]["p2node"] & 0xffffffff)
+                key = label_for(cands, prevkey) if cands else None
+                prevkey = key
                 lab = f"{key[0]}:0x{key[1]:02x}@{key[2]}" if key else f"OFF:{rows[k]['p2node']:#x}"
                 if lab.rsplit("@", 1)[0] != (last.rsplit("@", 1)[0] if last else None): path.append(lab)
                 last = lab

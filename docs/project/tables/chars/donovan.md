@@ -8,7 +8,7 @@ Sources: **vs2** = `vsav2` extract (oracle `vhunt2`); **ours** = the built image
 
 | input | SHA-1 |
 |---|---|
-| `bank_map.toml` | `776bcb9af5aef09c1b3204a6354c04165ad8b55d` |
+| `bank_map.toml` | `5180da8932e4b7ee2a350cf9ddc978d4f79dc623` |
 | `manifest` | `e7878ff970541a62ca25303616d111365849c1bf` |
 | `overrides` | `72b9812942192bf348508ddf7473cbb37b2d5275` |
 | `placements.json` | `74b756174c2eac1a4e41919145114e2498d11082` |
@@ -21,7 +21,7 @@ Sources: **vs2** = `vsav2` extract (oracle `vhunt2`); **ours** = the built image
 
 | measure | value |
 |---|---|
-| anim_nodes | 3308 |
+| anim_nodes | 3722 |
 | anim_nodes_differ_unattributed | 0 |
 | bank_fields_unattributed | 0 |
 | code_bytes_differ_out_of_scope | 67383 |
@@ -68,27 +68,27 @@ Sources: **vs2** = `vsav2` extract (oracle `vhunt2`); **ours** = the built image
 | `dispatch_17` | code_ptr | `0x0bf3e6` | ptr | addr | `None` | `0x0c10d8` | **!** | no-vs2-value |
 | `dispatch_18` | code_ptr | `0x0bf4e6` | ptr | addr | `None` | `0x0c1124` | **!** | no-vs2-value |
 | `dispatch_19` | code_ptr | `0x0bf666` | ptr | addr | `None` | `0x0c1106` | **!** | no-vs2-value |
-| `gap_bd8fa` | auto | `0x0bd946` | raw | hex | `None` | `fffd0000` |  | no-vs2-value |
-| `gap_bdc7a` | auto | `0x0bdcc6` | raw | hex | `None` | `ffffec00` |  | no-vs2-value |
-| `gap_bdcfa` | auto | `0x0bdd46` | raw | hex | `None` | `ffff9400` |  | no-vs2-value |
-| `gap_bdd7a` | auto | `0x0bddc6` | raw | hex | `None` | `ffffa000` |  | no-vs2-value |
-| `gap_bddfa` | auto | `0x0bde46` | raw | hex | `None` | `ffff9a00` |  | no-vs2-value |
-| `gap_bde7a` | auto | `0x0bdec6` | raw | hex | `None` | `ffffa000` |  | no-vs2-value |
-| `gap_bdefa` | auto | `0x0bdf46` | raw | hex | `None` | `ffff8400` |  | no-vs2-value |
-| `gap_bdf7a` | auto | `0x0bdfc6` | raw | hex | `None` | `ffffec00` |  | no-vs2-value |
-| `gap_bdffa` | auto | `0x0be046` | raw | hex | `None` | `ffff9400` |  | no-vs2-value |
-| `gap_be07a` | auto | `0x0be0c6` | raw | hex | `None` | `ffffa000` |  | no-vs2-value |
-| `gap_be0fa` | auto | `0x0be146` | raw | hex | `None` | `ffff9a00` |  | no-vs2-value |
-| `gap_be23a` | auto | `0x0be260` | raw | hex | `None` | `0000` |  | no-vs2-value |
-| `gap_be27a` | auto | `0x0be2a0` | raw | hex | `None` | `db60` |  | no-vs2-value |
-| `gap_be2ba` | auto | `0x0be2e0` | raw | hex | `None` | `8aec` |  | no-vs2-value |
-| `gap_be37a` | auto | `0x0be3c6` | raw | hex | `None` | `fffd0000` |  | no-vs2-value |
-| `gap_be4fa` | auto | `0x0be546` | raw | hex | `None` | `ffff8300` |  | no-vs2-value |
-| `gap_be57a` | auto | `0x0be5c6` | raw | hex | `None` | `ffffa000` |  | no-vs2-value |
-| `gap_be5fa` | auto | `0x0be646` | raw | hex | `None` | `ffff7000` |  | no-vs2-value |
-| `gap_be67a` | auto | `0x0be6c6` | raw | hex | `None` | `ffffe000` |  | no-vs2-value |
-| `gap_be6fa` | auto | `0x0be746` | raw | hex | `None` | `ffff8300` |  | no-vs2-value |
-| `gap_be77a` | auto | `0x0be7c6` | raw | hex | `None` | `ffffa000` |  | no-vs2-value |
+| `gap_bd8fa` | auto | `0x0bd946` | raw | hex | `None` | `fffd0000` |  | no-vs2-value — SLICE of param32_a rows 16-31 (14z-121 reference scan: no reader of this base; param32_a is read id*8 from 0x0BD87A at vsavj 0x0228E2/0x0271A8) |
+| `gap_bdc7a` | auto | `0x0bdcc6` | raw | hex | `None` | `ffffec00` |  | no-vs2-value — SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base) |
+| `gap_bdcfa` | auto | `0x0bdd46` | raw | hex | `None` | `ffff9400` |  | no-vs2-value — SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base) |
+| `gap_bdd7a` | auto | `0x0bddc6` | raw | hex | `None` | `ffffa000` |  | no-vs2-value — SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base) |
+| `gap_bddfa` | auto | `0x0bde46` | raw | hex | `None` | `ffff9a00` |  | no-vs2-value — SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base) |
+| `gap_bde7a` | auto | `0x0bdec6` | raw | hex | `None` | `ffffa000` |  | no-vs2-value — SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base) |
+| `gap_bdefa` | auto | `0x0bdf46` | raw | hex | `None` | `ffff8400` |  | no-vs2-value — SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base) |
+| `gap_bdf7a` | auto | `0x0bdfc6` | raw | hex | `None` | `ffffec00` |  | no-vs2-value — SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base) |
+| `gap_bdffa` | auto | `0x0be046` | raw | hex | `None` | `ffff9400` |  | no-vs2-value — SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base) |
+| `gap_be07a` | auto | `0x0be0c6` | raw | hex | `None` | `ffffa000` |  | no-vs2-value — SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base) |
+| `gap_be0fa` | auto | `0x0be146` | raw | hex | `None` | `ffff9a00` |  | no-vs2-value — SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base) |
+| `gap_be23a` | auto | `0x0be260` | raw | hex | `None` | `0000` |  | no-vs2-value — REAL per-char WORD table (14z-121): read id*2 at vsavj 0x027B94 as a height threshold against fighter +0x14 - +0x3A when +0x38 != 0 (airborne), gating +0x113/+0x114 — semantics of the check unread |
+| `gap_be27a` | auto | `0x0be2a0` | raw | hex | `None` | `db60` |  | no-vs2-value — FIRST HALF of the 32-LONG capture-keyframe pointer table 0x0BE27A[attacker id] (14z-121 scan: read at vsavj 0x02802E/0x0280C6/0x028140, the capture-pose installer of [VSE-44]; the throw_victim_keyframes / grab_hold_keyframes rows repoint its rows) |
+| `gap_be2ba` | auto | `0x0be2e0` | raw | hex | `None` | `8aec` |  | no-vs2-value — SECOND HALF of the capture-keyframe pointer table 0x0BE27A (rows 16-31; Huitzil's row 0xBE2BA is the grab_hold_keyframes target) — see gap_be27a |
+| `gap_be37a` | auto | `0x0be3c6` | raw | hex | `None` | `fffd0000` |  | no-vs2-value — SLICE of param32_b rows 16-31 (14z-121: param32_b read id*8 from 0x0BE2FA at vsavj 0x026484 for chain a2:0x4C, the pursuit leap; no reader of this base) |
+| `gap_be4fa` | auto | `0x0be546` | raw | hex | `None` | `ffff8300` |  | no-vs2-value — SLICE of rec8_b, the pursuit physics record pair (0x0BE3FA + id*0x20; 14z-121 scan: no reader of this base) |
+| `gap_be57a` | auto | `0x0be5c6` | raw | hex | `None` | `ffffa000` |  | no-vs2-value — SLICE of rec8_b, the pursuit physics record pair (0x0BE3FA + id*0x20; 14z-121 scan: no reader of this base) |
+| `gap_be5fa` | auto | `0x0be646` | raw | hex | `None` | `ffff7000` |  | no-vs2-value — SLICE of rec8_b, the pursuit physics record pair (0x0BE3FA + id*0x20; 14z-121 scan: no reader of this base) |
+| `gap_be67a` | auto | `0x0be6c6` | raw | hex | `None` | `ffffe000` |  | no-vs2-value — SLICE of rec8_b, the pursuit physics record pair (0x0BE3FA + id*0x20; 14z-121 scan: no reader of this base) |
+| `gap_be6fa` | auto | `0x0be746` | raw | hex | `None` | `ffff8300` |  | no-vs2-value — SLICE of rec8_b, the pursuit physics record pair (0x0BE3FA + id*0x20; 14z-121 scan: no reader of this base) |
+| `gap_be77a` | auto | `0x0be7c6` | raw | hex | `None` | `ffffa000` |  | no-vs2-value — SLICE of rec8_b, the pursuit physics record pair (0x0BE3FA + id*0x20; 14z-121 scan: no reader of this base) |
 | `hitbox_base` | data_ptr | `0x0bd9c6` | ptr | addr | `0x0c8df8` | `0x3fa9d0` |  | relocated |
 | `hitbox_comp` | data_ptr | `0x0bda46` | ptr | addr | `0x0c8bb8` | `0x3fa790` |  | relocated |
 | `jump_params` | rec8 | `0x0bdf0a` | back_gravity | s16.16 | `-0.375` | `-0.375` |  | byte |
@@ -109,10 +109,10 @@ Sources: **vs2** = `vsav2` extract (oracle `vhunt2`); **ours** = the built image
 | `param32_b` | rec8 | `0x0be392` | fwd_walk_xv | s16.16 | `2.0` | `2.0` |  | byte |
 | `proj_hitbox_base` | data_ptr | `0x0bdac6` | ptr | addr | `0x0d0ca8` | `0x0ca800` |  | relocated |
 | `proj_hitbox_comp` | data_ptr | `0x0bdb46` | ptr | addr | `0x0d1002` | `0x0cab5a` |  | relocated |
-| `rec8_a` | rec8 | `0x0bdc12` | long0 | s32 | `524288` | `524288` |  | byte |
-| `rec8_a` | rec8 | `0x0bdc12` | long1 | s32 | `-23040` | `-23040` |  | byte |
-| `rec8_b` | rec8 | `0x0be492` | long0 | s32 | `614400` | `614400` |  | byte |
-| `rec8_b` | rec8 | `0x0be492` | long1 | s32 | `-31744` | `-31744` |  | byte |
+| `rec8_a` | rec8 | `0x0bdc12` | long0 | s32 | `524288` | `524288` |  | byte — SLICE of jump_params rows 0-5 (14z-121: jump_params is read id*0x30 + {0,0x10,0x20} from 0x0BDB7A at vsavj 0x027A76; no reader of this base) |
+| `rec8_a` | rec8 | `0x0bdc12` | long1 | s32 | `-23040` | `-23040` |  | byte — SLICE of jump_params rows 0-5 (14z-121: jump_params is read id*0x30 + {0,0x10,0x20} from 0x0BDB7A at vsavj 0x027A76; no reader of this base) |
+| `rec8_b` | rec8 | `0x0be492` | long0 | s32 | `614400` | `614400` |  | byte — the PURSUIT physics record pair (14z-121): read id*0x20 + (+0x0A ? 0x10 : 0) from 0x0BE3FA at vsavj 0x026646 = four longs (xv, xacc, yv, yacc) x 2 variants per char, 0x400 bytes 0x0BE3FA-0x0BE7FA — gap_be4fa..gap_be77a are its interior |
+| `rec8_b` | rec8 | `0x0be492` | long1 | s32 | `-31744` | `-31744` |  | byte — the PURSUIT physics record pair (14z-121): read id*0x20 + (+0x0A ? 0x10 : 0) from 0x0BE3FA at vsavj 0x026646 = four longs (xv, xacc, yv, yacc) x 2 variants per char, 0x400 bytes 0x0BE3FA-0x0BE7FA — gap_be4fa..gap_be77a are its interior |
 | `tail_code_ptr` | code_ptr | `0x0bf2e6` | ptr | addr | `0x059adc` | `0x0bfcec` |  | relocated |
 | `tail_data_ptr` | data_ptr | `0x0bf466` | ptr | addr | `0x0cb01a` | `0x413b10` | **!** | manifest:sound_table:don_sfx_records (the array is placed by the sound op; the row is its ptr_table) (expected placed `0x3fcbf2`) |
 | `word132` | value16 | `0x0be1a0` | value | u16 | `24` | `24` |  | byte |
@@ -744,36 +744,36 @@ MEASURED on native vs2 (`tests/test_reactions.sh`, frozen `tests/expected/reacti
 
 | part | contact | class | freeze | chain path | frames |
 |---|---|---|---|---|---|
-| 1 | V 5LP | `0x01` | 11 | `c:0x08@0 c:0x09@0 a:0x2f@0` | 19 |
-| 1 | V 5MP | `0x01` | 11 | `a:0x2f@0 c:0x08@0 c:0x09@0 a:0x2f@0` | 23 |
-| 1 | V 5HP | `0x04` | 11 | `a:0x2f@22 c:0x08@0 c:0x1f@0 c:0x20@0 a:0x2f@0` | 35 |
-| 1 | V j.HP | `0x37` | 11 | `a:0x2f@17 c:0x08@0 c:0x11@0 c:0x16@0 c:0x17@0 c:0x18@0 b:0x43@0 c:0x1b@0` | 69 |
-| 1 | V 6MP throw | `0x00` | 0 | `c:0x01@0 c:0x08@0 c:0x01@1 c:0x08@0 c:0x01@1 c:0x08@0 c:0x01@1 c:0x08@0` | 173 |
-| 1 | V 6MP throw | `0x00` | 0 | `c:0x01@0 c:0x08@0 c:0x01@1 c:0x08@0 c:0x01@1 c:0x08@0 c:0x01@1 c:0x08@0` | 147 |
-| 1 | V 6MP throw | `0x00` | 0 | `c:0x01@0 c:0x08@0 c:0x01@1 c:0x08@0 c:0x01@1 c:0x08@0 c:0x01@1 c:0x08@0` | 121 |
-| 1 | V 6MP throw | `0x00` | 0 | `c:0x01@0 c:0x08@0 c:0x01@1 c:0x08@0 c:0x01@1 c:0x08@0 c:0x1f@0 c:0x20@0` | 94 |
-| 1 | V 6MP throw | `0x00` | 0 | `c:0x01@0 c:0x08@0 c:0x01@1 c:0x08@0 c:0x1f@0 c:0x20@0 a:0x2f@0` | 68 |
-| 1 | V 6MP throw | `0x00` | 0 | `c:0x01@0 c:0x08@0 c:0x1f@0 c:0x20@0 a:0x2f@0` | 42 |
-| 1 | V 6MP throw | `0x04` | 10 | `c:0x08@0 c:0x1f@0 c:0x20@0 a:0x2f@0` | 37 |
-| 1 | V 623LP (DP) | `0x01` | 11 | `c:0x08@0 c:0x09@0 a:0x2f@0` | 19 |
-| 1 | V 236LP | `0x01` | 11 | `a:0x2f@10 c:0x08@0 c:0x09@0 a:0x2f@0` | 20 |
-| 2 | V 5MP | `0xff` | 11 | `a:0x14@0 b:0x0c@0 a:0x2f@0` | 22 |
+| 1 | V 5LP | `0x01` | 11 | `b:0x03@0 a:0x00@0` | 19 |
+| 1 | V 5MP | `0x01` | 11 | `a:0x00@0 b:0x03@0 a:0x00@0` | 23 |
+| 1 | V 5HP | `0x04` | 11 | `a:0x00@22 b:0x03@0 b:0x23@0 a:0x00@0` | 35 |
+| 1 | V j.HP | `0x37` | 11 | `a:0x00@17 b:0x03@0 b:0x2a@0 b:0x14@0 b:0x15@0 b:0x44@0 a:0x00@0` | 69 |
+| 1 | V 6MP throw | `0x00` | 0 | `c:0x01@0 b:0x03@0 b:0x00@0 b:0x03@0 b:0x00@0 b:0x03@0 b:0x00@0 b:0x03@0` | 173 |
+| 1 | V 6MP throw | `0x00` | 0 | `c:0x01@0 b:0x03@0 b:0x00@0 b:0x03@0 b:0x00@0 b:0x03@0 b:0x00@0 b:0x03@0` | 147 |
+| 1 | V 6MP throw | `0x00` | 0 | `c:0x01@0 b:0x03@0 b:0x00@0 b:0x03@0 b:0x00@0 b:0x03@0 b:0x00@0 b:0x03@0` | 121 |
+| 1 | V 6MP throw | `0x00` | 0 | `c:0x01@0 b:0x03@0 b:0x00@0 b:0x03@0 b:0x00@0 b:0x03@0 b:0x23@0 a:0x00@0` | 94 |
+| 1 | V 6MP throw | `0x00` | 0 | `c:0x01@0 b:0x03@0 b:0x00@0 b:0x03@0 b:0x23@0 a:0x00@0` | 68 |
+| 1 | V 6MP throw | `0x00` | 0 | `c:0x01@0 b:0x03@0 b:0x23@0 a:0x00@0` | 42 |
+| 1 | V 6MP throw | `0x04` | 10 | `b:0x03@0 b:0x23@0 a:0x00@0` | 37 |
+| 1 | V 623LP (DP) | `0x01` | 11 | `b:0x03@0 a:0x00@0` | 19 |
+| 1 | V 236LP | `0x01` | 11 | `a:0x00@10 b:0x03@0 a:0x00@0` | 20 |
+| 2 | V 5MP | `0xff` | 11 | `a:0x14@0 b:0x0c@0 a:0x00@0` | 22 |
 | 2 | V 5HP | `0xff` | 11 | `a:0x14@0 b:0x0c@0 a:0x04@0` | 26 |
-| 2 | V 2MK | `0x02` | 11 | `a:0x14@0 c:0x08@0 c:0x09@0 a:0x04@0` | 24 |
-| 2 | V 2HK | `0x03` | 11 | `a:0x14@0 c:0x1c@0 c:0x1d@0 c:0x1e@0 c:0x19@0 c:0x1a@0 c:0x1b@0 b:0x44@0` | 76 |
-| 2 | V 623LP (DP) | `0xff` | 11 | `b:0x0c@0 a:0x2f@0` | 18 |
-| 2 | V j.HP | `0xff` | 11 | `a:0x14@0 b:0x0c@0 a:0x2f@0` | 19 |
-| 3 | V 2HK vs landing P2 | `0x03` | 11 | `a:0x2f@0 c:0x1c@0 c:0x1d@0 c:0x1e@0 c:0x19@0 c:0x1a@0 c:0x1b@0 b:0x44@0` | 76 |
+| 2 | V 2MK | `0x02` | 11 | `a:0x14@0 b:0x03@0 a:0x04@0` | 24 |
+| 2 | V 2HK | `0x03` | 11 | `a:0x14@0 b:0x09@0 b:0x0a@0 b:0x0b@0 b:0x44@0 a:0x00@0` | 76 |
+| 2 | V 623LP (DP) | `0xff` | 11 | `b:0x0c@0 a:0x00@0` | 18 |
+| 2 | V j.HP | `0xff` | 11 | `a:0x14@0 b:0x0c@0 a:0x00@0` | 19 |
+| 3 | V 2HK vs landing P2 | `0x03` | 11 | `a:0x00@0 b:0x09@0 b:0x0a@0 b:0x0b@0 b:0x44@0 a:0x00@0` | 76 |
 
 ## Animation node chains (phase 1) — summary
 
-3308 nodes across the five index tables; 8 nodes differ from vs2 in a decoded field (8 attributed). Verified by `tests/test_anim_node_walk.sh (Donovan, native vs2: 3638/3638 node pointers on the graph, 14z-118)`. Per-chain detail: the appendix page `donovan_anim.md`.
+3722 nodes across the five index tables; 8 nodes differ from vs2 in a decoded field (8 attributed). Verified by `tests/test_anim_node_walk.sh (Donovan, native vs2: 3638/3638 node pointers on the graph, 14z-118)`. Per-chain detail: the appendix page `donovan_anim.md`.
 
 | table | vs2 table | ours table | entries | chains | nodes | loops | holds |
 |---|---|---|---|---|---|---|---|
 | `a` | `0x27f548` | `0xd3070` | 51 | 51 | 682 | 26 | 24 |
 | `a2` | `0x281696` | `0xd51be` | 101 | 101 | 1211 | 18 | 82 |
-| `b` | `0x28709c` | `0xdabc4` | 69 | 69 | 284 | 16 | 53 |
+| `b` | `0x28709c` | `0xdabc4` | 192 | 123 | 698 | 40 | 81 |
 | `c` | `0x287192` | `0xdacba` | 57 | 57 | 273 | 24 | 32 |
 | `proj` | `0x289ef6` | `0xdda1e` | 441 | 441 | 858 | 21 | 419 |
 
@@ -785,14 +785,14 @@ MEASURED on native vs2 (`tests/test_reactions.sh`, frozen `tests/expected/reacti
 
 | structure | what | evidence today |
 |---|---|---|
-| hitbox | DONE 14z-120 (5): box = (x, y, hw, hh) signed words, authored for the LEFT-facing sprite and mirrored when flip_x=1; +0x8C = attack (base[4]), +0x90 = push (base[3]); family hb8 -> {vuln,vuln,vuln,push}; record +8 real / +9 white / +0x10 hit id / +0x17 CLASS (the '+0x1D' was the same byte counted from the wrong base). +0x14 = the attacker's meter gain on hit, +0x1C scales the pushback (both measured 14z-120 (6)); observed only: +0x12 strength index, +0x16 special flag; +0x11/+0x13/+0x15 open | tests/test_hitbox_encoding.sh (8/8 hits on the first overlap frame; class = +0x17 on the fighter, projectile, multi-hit and column paths); tools/hitbox_records.py; STATE 14z-120 (6) for the meter/pushback correlation |
+| hitbox | DONE 14z-120 (5): box = (x, y, hw, hh) signed words, authored for the LEFT-facing sprite and mirrored when flip_x=1; +0x8C = attack (base[4]), +0x90 = push (base[3]); family hb8 -> {vuln,vuln,vuln,push}; record +8 real / +9 white / +0x10 hit id / +0x17 CLASS (the '+0x1D' was the same byte counted from the wrong base). +0x14 = the attacker's meter gain on hit (measured 14z-120 (6)). 14z-121, from the record's READERS in the vs2 hit code (0x16930-0x175F6): +0x13 = the HIT-FREEZE class (pairs table 0x17FA4), +0x1B = the white-damage RECOVERY-RATE class (table 0x18018 -> victim +0x13A/+0x13B), +0xE = the victim's FACING rule, +0x1A = a combo-scaling table selector (0 = the attacker's per-character table), +0xC/+0xD -> victim +0x59 on hit/block, +0xF -> +0x5A, +0x19 -> +0x56, +0x1E -> +0x1A4, +0x16 = special flag (class 4 -> 5), +0x1D tested on the node-byte-3 path; +0x1C is ADDED to the victim's +0x161 accumulator (240 f decay, threshold byte15b = 60) ONLY while +0x15E is armed by a per-character DARK FORCE handler — the 14z-120 (6) 'scales the pushback' reading is RETRACTED (the reader never fired on any measured contact). NOT READ by the hit code: +0x11, +0x12, +0x15, +0x18, +0x1F | tests/test_hitbox_encoding.sh (8/8 hits on the first overlap frame; class = +0x17 on the fighter, projectile, multi-hit and column paths); tools/hitbox_records.py; engine_internals 'The attack record's fields, by their readers' (14z-121) |
 | anim | MOVE NAMES for the chains (which seq is which move) — DONE for Donovan 14z-120 (build/manifest/moves_donovan.toml, measured by tests/test_move_naming.sh; labelled in donovan_anim.md); Huitzil and Pyron await their naming rigs | the chains are decoded and live-verified (test_anim_node_walk, 14z-118); names come from the maintainer's move lists -> build/manifest/moves_<tenant>.toml, seq ids from tools/name_moves.py on the native game |
 | anim | DONE 14z-120 (5): hbA != 0 marks an ATTACK node (hbA>>8 = the attack record); startup / active / recovery per chain are derived in <tenant>_anim.md | tests/test_hitbox_encoding.sh |
 | anim | table a2's entry rule: its chains are entered MID-CHAIN by node index (measured: 5 jumps onto a2 nodes 3/5/7/13) | test_anim_node_walk observation; the selecting code is unread |
 | anim | the 6-byte script-op area at +0x10..+0x15 of every node | kept as hex; engine_internals 'the [cf14]..[0b] script-op area' |
-| reaction | DONE 14z-120 (7): the tenant's reaction SET (which table:seq each class enters, the block chain b:0x0c, the measured stun lengths) — see 'Reactions as the victim'; still open: the engine counter that ends a hold reaction, and the unindexed lying/wake nodes (OFF) | tests/test_reactions.sh, tests/expected/reactions_<tenant>.txt |
-| projectile | projectile parameters are INLINE in each type's handler, not a table family (measured on Blizzard Sword 14z-120 (10): xv/yv by strength at vs2 0x670C0, in Donovan's ported region x066ec4); a per-type decode remains | engine_internals 'Projectile parameters live in the per-TYPE handler' |
-| bank | the 17 `gap_*` auto tables' semantics | oracle-classified values/pointers only |
+| reaction | DONE 14z-120 (7): the tenant's reaction SET (which table:seq each class enters, the block chain b:0x0c, the measured stun lengths) — see 'Reactions as the victim'; the hold ends when the pushbox separation settles (14z-120 (9)); the 'own table per tenant' reading was a labelling artefact — deterministically labelled, the three tenants share the same canonical b: seqs (14z-121 (2)); the 'unindexed lying/wake nodes' were table-b entries the chain decoder's table bound had cut off (fixed 14z-121: tools/anim_nodes.py; Huitzil's b:0x2a/0x2d/0x44/0x46/0x48) | tests/test_reactions.sh, tests/expected/reactions_<tenant>.txt (Huitzil re-frozen 14z-121), tests/test_anim_node_walk.sh |
+| projectile | DONE 14z-121: every $FF9400 type's inline parameters decoded from its handler (walker-2 table 0x5C620[type]; one init shape: +0x9A selects (xv, xacc, yv, yacc) 16.16 records + the +0x26 byte and +0x50 word; Cosmo Disruption is state-immediate) and MEASURED on the live spawns for all seven tabled types; ours == vs2 on every build (the values ride inside the ported code regions) | tools/projectile_params.py, tests/test_projectile_params.sh, tests/expected/projectile_params.txt |
+| bank | DONE 14z-121 (a reference scan of vsavj's code for every base in the physics bank): the 17 `gap_*` rows are 13 SLICES of param32_a / jump_params / param32_b / rec8_b (the bank map declared the interiors of larger-stride tables as their own rows), the two halves of the 32-LONG capture-keyframe pointer table 0x0BE27A, and one REAL per-char word table at 0x0BE23A (an airborne height threshold, check unread); rec8_b = the pursuit physics record pair (0x0BE3FA, id*0x20). Each row carries the resolution in bank_map.toml `note` | bank_map.toml notes; engine_internals 'The physics bank's gap rows' |
 | sfx | sfx record field +6 (d3.w, 'level-ish') | engine_internals 960 |
 | meter | +0x392.w meter candidate | ram.md 120: semantics unconfirmed |
 | regions | the x2b7ef4 (companion-effect tail) residue: 24-bit frame pointers and tile words rewritten by the effect pass (14z-71) that phase 0 does not attribute per byte — counted and frozen, not explained | the region's `diff.sites`; attribute from the effect pass's own ledger in a later step |
