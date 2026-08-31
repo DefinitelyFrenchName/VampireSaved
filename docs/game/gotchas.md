@@ -653,3 +653,34 @@ missed.
 **Rule:** when you widen a table's bound, grep for EVERY reader of the table
 (here two: both `move.b tbl(pc,d0.w)` sites share one cursor), and sample
 the consumer on CONSECUTIVE frames before trusting a 3-frame cadence.
+
+## THE ENGINE DOES NOT RUN ONE TICK PER VIDEO FRAME — a `frame_done` trace
+## CANNOT count animation frames (paid: 14z-125b, measured)
+
+`tests/lua/field_trace.lua` samples at `frame_done`, one row per video frame.
+The animation node timer `+0x20` counts down in ENGINE ticks, and the two are
+not the same clock: over four characters' whiff legs, **1,143 of 6,831 sampled
+frames (16%) advanced `+0x20` by TWO ticks**, not one. So a per-frame trace
+systematically UNDER-COUNTS how long a node ran, by a per-move amount nobody
+can predict from the trace itself.
+
+What that costs: any question of the form "is this move's startup 5 or 6?"
+is BELOW THIS INSTRUMENT'S RESOLUTION. The community cross-check's whole
+finding is a one-frame convention difference (`startup +1`, `recovery +2`), and
+a frame-rate trace can neither confirm nor refute it — which is why those
+offsets are recorded as named conventions rather than adjudicated
+(`docs/project/tables/community_crosscheck.md`).
+
+What the same trace CAN do, because none of it needs tick accuracy:
+- **which chain** a button enters (the node pointer `+0x1C` is exact whenever
+  sampled) — the whole standing-normal slot map was measured this way;
+- **the first value** a node's countdown shows, which equals the node's data
+  duration byte on 334/380 nodes — direct confirmation that the durations we
+  read are the ones the engine loads;
+- **discrete events**: HP drops, hit counts, flag transitions.
+
+**Rule:** measure ORDER and EVENTS with a frame-rate trace; never measure
+DURATIONS with one. A tick-accurate question needs a tick-accurate instrument
+(a `-debug` trace, or a Lua hook on the engine tick), and the difference is
+invisible in the log — it looks like clean data with occasional skipped
+countdown values.
