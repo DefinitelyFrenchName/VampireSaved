@@ -3275,9 +3275,17 @@ handler, and the tenants' handlers are their own** [M:
   maintainer suspected — but every built image REPOINTS them to the placed
   vs2 handlers (merged-m14: `0x41612A` / `0x4730E8` / `0x0C109C`), whose
   first sub-state arms **Huitzil 0x4F (79), Pyron 0x29 (41), Donovan 0x40
-  (64)** — byte-identical to vs2's own rows `0x056C7A/0x058D28/0x05AE8C`.
+  (64)** — byte-identical to vs2's own rows `0x056C7A/0x058D28/0x05AE8C`
+  AND to vhunt2's (`0x056CB0/0x058D58/0x05AEBC`, the third sibling agrees).
   Shells: Bulleta 41, Demitri 41, Victor 59. Pyron's equals Demitri's by
-  VALUE only; the code path is his own.
+  VALUE only; the code path is his own. **Where the values come from:**
+  they are Capcom's bytes, in the tenants' own per-character seq-0x16
+  handlers that vs2 and vh2 SHIP but never reach — their activation clears
+  seq 0x16 the same frame ([VSE-69]) — i.e. authored for the VS-style DF
+  activation this engine runs, dead in the shipped sequels, live here; the
+  same provenance as Huitzil's flight form below. Caveat stated once: dead
+  code may carry untuned values — Capcom's, but never player-tested in a
+  shipped game.
 - **natively on vs2 there is no window at all**: the seq-0x16 handler never
   runs ([VSE-69]) and the vs2 DF path writes `+0x147` = 1 (`0x025F2A`),
   cleared before frame_done — measured "never armed" on the native leg. The

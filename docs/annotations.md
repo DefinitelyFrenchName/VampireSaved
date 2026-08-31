@@ -23,12 +23,12 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 2914 |
-| named by a document or manifest only | 2034 |
+| distinct program-space addresses named | 2917 |
+| named by a document or manifest only | 2037 |
 | named by both a document/manifest and code | 573 |
 | named by CODE ONLY (the gap list below) | 307 |
 | carried by atlas | 467 |
-| carried by engine_internals | 526 |
+| carried by engine_internals | 529 |
 | carried by other docs | 914 |
 | carried by manifests | 1756 |
 | carried by code | 880 |
@@ -1450,6 +1450,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x056BFC` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x056C1A` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x056C7A` | docs/game/engine_internals.md — The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126) [vs2] |
+| `PRG:0x056CB0` | docs/game/engine_internals.md — The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126) [vh2] |
 | `PRG:0x056CB6` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x056CD8` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x056D68` | docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds); build/manifest/huitzil.toml — pcrel_escape_fix; tests/test_hui_fx_flow.sh |
@@ -1481,6 +1482,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x058924` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x058D28` | docs/game/engine_internals.md — The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126) [vs2] |
 | `PRG:0x058D4C` | build/manifest/type_stamps.toml — stamp |
+| `PRG:0x058D58` | docs/game/engine_internals.md — The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126) [vh2] |
 | `PRG:0x058ED0` | build/manifest/type_stamps.toml — triage |
 | `PRG:0x059380` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x05938C` | docs/project/patch_notes.md — where the detail lives; build/manifest/huitzil.toml — port_patch; build/manifest/pyron.toml — pcrel_escape_fix; build/manifest/pyron.toml — port_patch |
@@ -1512,6 +1514,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x05AE50` | docs/game/atlas/character_tables.md — Ported-three handler code (bank[0] rows; the "code" manifest entry) |
 | `PRG:0x05AE54` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x05AE8C` | docs/game/engine_internals.md — The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126) [vs2] |
+| `PRG:0x05AEBC` | docs/game/engine_internals.md — The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126) [vh2] |
 | `PRG:0x05AF1C` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x05B25C` | docs/project/patch_notes.md — where the detail lives; build/manifest/donovan.toml — pcrel_escape_fix; build/manifest/huitzil.toml — shadow_seq_guard; build/manifest/reconciliation_donovan.toml — map; build/manifest/reconciliation_huitzil.toml — map; build/manifest/reconciliation_pyron.toml — map; +1 more |
 | `PRG:0x05B4B2` | build/manifest/type_stamps.toml — compare |
