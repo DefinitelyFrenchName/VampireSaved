@@ -24,14 +24,14 @@
 > ## the tenants already ship with their own; retuning one is a single byte.
 > ## Read engine_internals "Dark Force" -> "The STARTUP INVINCIBILITY window".
 > ##
-> ## **TWO THINGS BEFORE ANY NEW WORK, both waiting on the maintainer:**
-> ## (a) **THE ARTIFACT REPUBLISH IS STILL OWED** — the Artifact publish was
-> ## REFUSED by the auto-mode permission classifier (an outward-facing action)
-> ## and was not worked around. Approve the publish when prompted (or run this
-> ## step outside auto mode); the procedure and the three URLs are in
-> ## `NEXT_SESSION_HISTORY.md` (the 14z-125 opener). Budget ~50k context per
-> ## page; do all three or none.
-> ## (b) **THE FRAME-DATA-IN-A-PUBLIC-REPO RULING** — the maintainer proposed
+> ## **THE ARTIFACT REPUBLISH IS DONE (14z-126, second pass):** all three
+> ## character pages are current (Donovan `85d7fd52`, Huitzil `f0dddc83`,
+> ## Pyron `ad618f12`). Note for next time: the first publish was refused by
+> ## the auto-mode classifier and went through after the maintainer's explicit
+> ## word — ask BEFORE spending the ~50k-context reads per page.
+> ##
+> ## **ONE THING BEFORE ANY NEW WORK, waiting on the maintainer:**
+> ## **THE FRAME-DATA-IN-A-PUBLIC-REPO RULING** — the maintainer proposed
 > ## (2026-08-31) removing the public documents that carry per-move frame data
 > ## and shipping regenerating tools instead; the assessment and the options are
 > ## in STATE "Decisions pending" (recommendation: option (b), the class rule —
