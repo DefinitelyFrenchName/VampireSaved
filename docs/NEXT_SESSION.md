@@ -31,8 +31,11 @@
 > ## COMMUNITY CROSS-CHECK** — our DERIVED tenant frame data
 > ## (`chars/<tenant>_anim.md`) and a vanilla derivation to build vs the
 > ## maintainer's `../community/vsav-framedata.xlsx` (15 vanilla characters,
-> ## inventoried) and the mizuumi RE page (needs a BROWSER — bot challenge;
-> ## saved HTML into `../community/` unblocks it); THE RULE: EXACT or a
+> ## inventoried) and the mizuumi RE page (received as a PDF, text at
+> ## `../community/mizuumi_reverse_engineering.txt`, inventoried — 146
+> ## player-struct offsets, 94 not in `ram.md`; `+0x1B3` "Dark Force
+> ## Startup" is item (1)'s lead; the 14z-123 advancing guard is their
+> ## "Tech Hit", field for field); UNBLOCKED. THE RULE: EXACT or a
 > ## CONSTANT OFFSET validates ours, an INCONSISTENT pattern means re-measure
 > ## OURS in-emulator — the emulator arbitrates, never the sheet; (3) the
 > ## **ZABEL j.LK

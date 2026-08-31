@@ -17,7 +17,7 @@
 | **G7 DONE** | `checkdocshape --no-pending` rc=0 (0 PENDING) → `tests/test_docshape.sh` now runs that mode (a PENDING row FAILS the suite; new must-fire control h); `ci.yml`'s portable floor `n >= 15` (14z-93) → `n >= 60` (61 registered), with the never-lower rule in a comment; `doc_shape.tsv`'s PENDING class described as transitional and gate-failing; `inferred_claims.md` STATUS CLOSED with the pass (every row MEASURED / RETRACTED / ruled-parked — row 11 alone, #113's camera evidence) |
 | green at close | portable tier **61 PASS / 0 FAIL** (three runs across the commits); checkdocshape `--no-pending` 0 PENDING; checkskills 425; census 427 (re-frozen once, five rows); checkdocs 19 locks; gate index current; annotations current on the clean worktree. The static tier (ROMDIR) was NOT run this session — no manifest, tool or test semantics changed (a gate's MODE did, and its own controls cover it) |
 | not done, by design | **CLAUDE.md pass 2** — a ruling ("Decisions pending"; the "before G7" slot note there is marked superseded — G7 closed without it, pass 2 stands alone); the **Zabel j.LK proximity guard** — its own session, recording first |
-| **backlog added by the maintainer (2026-08-31), recorded in "Decisions pending", not started** | (1) DF-startup invincibility for the tenants — the [VSE-69] seam: shared activation body vs per-character handler; (2) the community cross-check — the webpage + the vanilla frame-data `.xlsx` vs our DERIVED tenant frame data and a vanilla derivation to build; the `.xlsx` received and inventoried (15 vanilla characters, no vs2), the wiki page still needs a browser (bot challenge); the maintainer's rule recorded in the entry |
+| **backlog added by the maintainer (2026-08-31), recorded in "Decisions pending", not started** | (1) DF-startup invincibility for the tenants — the [VSE-69] seam: shared activation body vs per-character handler; (2) the community cross-check — the webpage + the vanilla frame-data `.xlsx` vs our DERIVED tenant frame data and a vanilla derivation to build; the `.xlsx` received and inventoried (15 vanilla characters, no vs2); the wiki page received as a PDF and inventoried — 146 player-struct offsets (52 shared with `ram.md`, 94 new candidates), the 14z-123 advancing guard confirmed field for field as VS's "Tech Hit", `+0x1B3` "Dark Force Startup" named, two disagreements to measure; the maintainer's rule recorded in the entry |
 | open (unchanged) | the 1:1 wheel mockup; #112/#113 parked; the FBNeo two-run-family question; the tenant CPU AI "lackluster" note; win quotes forgone; the COSMETIC BACKLOG; `test_random_select_tenants.sh`'s CONTROL still `build/m3b_merged19`; `test_hui_df_style.sh`'s header still describes its 14z-79 `differs` expectation (a gate-header staleness, noted in the DF section — not a defect) |
 | rollover | none needed: STATE holds 14z-122 / 14z-123 / 14z-124 (three groups, ~140 KB). NEXT_SESSION's 14z-123 opener → `NEXT_SESSION_HISTORY.md` |
 | push | NOT pushed — push at the maintainer's word |
@@ -423,8 +423,40 @@ the archive once they stop shaping active work.)*
   https://mizuumi.wiki/w/Vampire_Savior/Reverse_Engineering ("arguably the
   best source of deep information on Vampire Savior") — BLOCKED for any
   fetcher by a bot challenge (WebFetch 403; curl with a browser UA gets the
-  challenge page): the maintainer saves it as HTML into `../community/`, or
-  a Chrome session drives it. Both sources stay out of the tree.
+  challenge page) — **RESOLVED 2026-08-31: the maintainer saved it as a PDF**
+  (`../community/Vampire Savior_Reverse Engineering - Mizuumi Wiki.pdf`,
+  74 pages; text extracted with `pypdf` in a scratch venv — poppler is not
+  installed — to `../community/mizuumi_reverse_engineering.txt`, 74 K
+  chars, 421 address tokens). Both sources stay out of the tree.
+  **FIRST-PASS INVENTORY of the wiki page (14z-124; an inventory, NOT an
+  adoption — nothing in the atlas changes until measured):** sections =
+  the CPS2 memory map, the IVT, RAM maps by base (`$FF8000` globals, `$FF8280`
+  stage/camera, `$FF8400/$FF8800` the player struct — CPS2 AND the PS1
+  `MIPS 0x8D8400` mirror), graphics/palettes/raster matrices, ROM function
+  and per-character data/function tables, per-character move
+  "Conditions" (pp. 25-63), data structures, palettes, backgrounds, HUD.
+  Method not stated (credits "Thanks Jed"; disassembly-shaped comments);
+  region unstated — but `0x275CE` / `0x28D50` / `0x2246E` sit exactly at our
+  vsavj addresses. Their player struct: 146 offsets, 52 also named in our
+  `ram.md`, 94 only theirs (candidates), ~50 only ours. CONVERGENCES with
+  our measurements: `+0x110/+0x111/+0x176` the vsavj DF fields (they name
+  `+0x17B` "Dark Force Flight" — Huitzil's form), `+0x189` DF timer
+  reduction, `+0x3B4` "CPU Opponent Flag"; and the 14z-123 advancing guard
+  field for field under VS's OWN NAME, **Tech Hit**: `0x275CE` "Tech-Hit
+  Checks", `0x28D50` "Tech-Hit Chance Tables" (our RNG table), `+0x170`
+  Tech Hit Input Counter, `+0x171` Tech Hit Active State (0x10 frames — the
+  consumer we never traced), `+0x1AB` Tech-Hit Timer, `+0x1B0` Push-block
+  Push-back Timer, `+0x126/+0x127` Mash to Escape. DIRECT LEAD for the DF
+  backlog item: **`+0x1B3` "Dark Force Startup"** and `+0x1B5` "Dark Force
+  type-2 (HP+HK)" (we had read `+0x1B5` as set by JUMPING — a disagreement),
+  `+0x147` "Invincibility Timer" (ours: the multi-hit re-hit gate —
+  compatible), `+0x143` Throw Invulnerability Timer; ROM `0x26FD2` DF
+  Activate / `0x2706E` DF Deactivate bracket our activation body `0x027000`.
+  DISAGREEMENTS to measure: `+0x161` "Oboro Fight Flag" vs our live-measured
+  Sasquatch DF accumulator (`audit_df_accumulator`, 9 frozen lines — ours is
+  a measurement, theirs a name; the byte may serve both); `0x2246E` "System
+  Timer Reducers" vs our "class-0xFF block handler" (14z-123). Naming to
+  adopt after measurement: "Tech Hit" beside "advancing guard".
 
 - **THE CLAUDE.md CONDENSING PASS (maintainer-directed 2026-08-30, 14z-122
   close). PASS 1 DONE 14z-123 (441 → 414 lines; narratives → rule + citation;
