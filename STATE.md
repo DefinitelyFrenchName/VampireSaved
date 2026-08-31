@@ -1,5 +1,27 @@
 # STATE — living progress log
 
+## Session 14z-126 (2026-08-31) — **THE DF-STARTUP INVINCIBILITY QUESTION ANSWERED IN ONE SITTING, STATIC THEN
+## MEASURED: the window is `+0x147`, armed PER CHARACTER by the seq-0x16 handler — NEITHER a global property of the
+## activation NOR inherited from the shell — and the tenants arm THEIR OWN vs2 values (Donovan 64, Huitzil 79, Pyron
+## 41 ticks). All 15 vanilla windows measured and frozen for the first time. Two 14z-123 attributions corrected in
+## mizuumi's favour. The artifact errand BLOCKED by the auto-mode classifier; the frame-data-privacy proposal recorded
+## for ruling. No build changed.**
+
+| | |
+|---|---|
+| opened with | the 14z-125b close; the maintainer: "proceed as planned, in order" + the frame-data-in-a-public-repo proposal (assessment given, entry in "Decisions pending") |
+| **the errand, blocked** | the three character-page artifacts: Donovan's live page and the committed file were both read in full, the publish was REFUSED by the auto-mode permission classifier (outward-facing action); not worked around. Nothing republished — all three stay five generator commits stale; the publish is ready to re-issue the moment it is permitted |
+| **archaeology ([VSP-14])** | nothing prior: the only carriers were the 14z-124/125 entries and `ram.md`'s one `[C]` row (`+0x11E,+0x134,+0x145,+0x1A4`). Mizuumi's lead `+0x1B3` "Dark Force Startup" turned out to be ANAKARIS's private flag (set by his handler `0x3DA54`, read by his Pharaoh's Magic conditions); the real field is `+0x147`, mizuumi's "Invincibility Timer" — its per-move "Add N frames of invincibility" conditions are `move.b #N,$147(a6)` |
+| **the static answer (vsavj opcode view, `tools/m68dis.py`)** | the SHARED activation body `PRG:0x027000` arms only `+0x143` = 0x14 (20 ticks of THROW immunity; vs2's body `0x2619E` identical). `+0x147` is the hit test's VICTIM gate (`0x18064`: `tst.b $134/$147/$11e(a1)`), decremented by the System Timer Reducer `0x2246E`. It is armed for DF by the handler `dispatch_16` (`0xBF31A`, data-view rows = mizuumi's per-character "Dark Force XX" addresses exactly) selects for seq 0x16, in its first sub-state: BU/DE 0x29, GA/AU 0x22, VI 0x3B, ZA 0x46, AN/LI 0x3C, FE 0x2E, BI 0x2B, QB 4, JE 0x7F. Rows 0x10/0x11/0x13 ALIAS Bulleta/Demitri/Victor on pristine vsavj — the inheritance the maintainer suspected — but every built image REPOINTS them to the placed vs2 handlers (merged `0x41612A/0x4730E8/0x0C109C`), which arm Huitzil 0x4F, Pyron 0x29, Donovan 0x40 — byte-identical to vs2's rows `0x56C7A/0x58D28/0x5AE8C`. Natively on vs2 the handler never runs and the DF path writes `+0x147` = 1 (`0x25F2A`), gone before frame_done |
+| **measured ([VSP-3]/[VSP-18]): `tests/audit_df_startup_invuln.sh`** | TRACE: replay df/97 (activation at f3260), `field_trace` of `+0x147/+0x143/$FF802E`, 22 legs (15 vanilla on pristine vsavj, shells + tenants on merged-m14, Donovan on native vs2) — every value equals the static table; Morrigan settles to 0x3C, SA 5 / QB 3 / LE 4 real, Jedah's 0x7F re-armed to 4 (zero at +23 f); the shells' merged traces BYTE-IDENTICAL to pristine; native vs2 NEVER armed. The count-down runs in engine TICKS (Donovan's 64 elapse in 52 frames; `zero` frozen beside `arm`). CONTACT: replay df/98 (NEW — Victor walks in, 5HP at +4 then at +110 after a second activation): IN lands at +12..+14 with `+0x147` = 24..26 / 47..49 and HP stays 288; OUT lands for 14 (Donovan 13) with `+0x147` = 0 — on Demitri, Pyron, Donovan; Huitzil's OUT whiffs because he is FLYING (y 124), reported not asserted. Both checkers ground-truth tested in-run ([VSP-19]): a perturbed frozen value fails, the inverted contact expectation fails. Frozen `tests/expected/df_startup_invuln.tsv` (22 rows); `REUSE=1` re-checks kept traces without MAME; ~3 min at MAME's 24x |
+| **two 14z-123 attributions corrected, both in mizuumi's favour** | `0x2246E` is the System Timer Reducer (one `subq.b` per tick on `+0x147/+0x174/+0x143/+0x158/+0x1AB`), NOT "the class-0xFF block handler" — the window is OPENED by the block-entry handler `0x2395A`-`0x23966` (`+0x140` = 2, `+0x158` = 0xE, `+0x1AB` = 0xE); the write tap had named the decrementer. `+0x161` is a per-character DF WORK BYTE (Sasquatch's accumulator AND Bishamon's/Anakaris's/Aulbath's handlers write it) — "Oboro Fight Flag" is Bishamon/Oboro's use: both true. Carriers fixed: `ram.md`, engine_internals (the advancing-guard sentence + a new DF subsection), `test_advancing_guard.sh` header + assertion label; STATE's cross-check entry marked in place. [VSP-13] grep of "handler `0x2246E`" -> the archives only |
+| **atlas rows added / upgraded** | `+0x147` (the invincibility timer: gate, reducer, every armer, the per-character DF table), `+0x143` (throw invulnerability; the body's 0x14; AN/AU/LE override 0xFF), `+0x134`/`+0x11E` (hit gates, [D]), `+0x145` (midair received hits vs record `+0x14`), `+0x1B3` (Anakaris's flag), `+0x161` (the work byte), `+0x1AB` (opener/reducer). Instrument note frozen with the data: `field_trace` samples one reducer tick AFTER the body's write, so `+0x143`'s 0x14 is always SAMPLED as 0x13 |
+| gotcha filed | project: "A WRITE TAP ON A COUNTDOWN FIELD NAMES THE DECREMENTER, NOT THE OPENER" (+ the sampled-one-tick-late face) |
+| **gameplay surface ([VSP-10])** | none changed — the tenants already ship with their own windows; retuning one is a single data byte in its ported handler. Recorded, not proposed |
+| not done, by design | the artifact republish (permission); item (2) Zabel j.LK — needs the maintainer's hand-played RECORDING first ([VSP-20]); item (3) Jedah's crouching recovery (needs the tick-accurate instrument); the frame-data-privacy implementation (awaits the class ruling); the HANDOFF shape item; the ~90 unadopted mizuumi candidates |
+| green | `audit_df_startup_invuln` PASS (22 + 4 legs, both controls); the close battery below |
+| push | NOT pushed — push at the maintainer's word |
+
 ## Session 14z-125b CLOSE — ritual complete. **THE COMMUNITY CROSS-CHECK DELIVERED AND THEN FINISHED IN ONE DAY:
 ## all 15 vanilla characters derived for the first time, ~96% agreement per column, the JOIN measured in-emulator
 ## after a fitted model was overturned, and the residue arbitrated — two families closed, one honestly open. Two
@@ -326,8 +348,53 @@ entries moved VERBATIM to `DECISIONS_HISTORY.md` — grep there by topic.
 Lifecycle: rulings are still marked DECIDED in place here first; they move to
 the archive once they stop shaping active work.)*
 
-- **DF-STARTUP INVINCIBILITY FOR THE TENANTS (maintainer backlog item,
-  2026-08-31, 14z-124). RECORDED, not started — and it is THE NEXT ARC
+- **FRAME DATA IN A PUBLIC REPO — the maintainer's proposal (2026-08-31,
+  14z-126), AWAITING THE CLASS RULING.** The repo is PUBLIC
+  (`DefinitelyFrenchName/VampireSaved`). The maintainer's position, in
+  substance: frame data has been published in community docs and in
+  Capcom-sanctioned mooks, so the DIFFS forwarded to the community are fine,
+  but we should refrain from publishing the data ourselves — remove the
+  public documents that carry it, keep them private, and instead ship TOOLS
+  that regenerate the frame-data documentation from the romsets, as the
+  character pages already do (`tools/charpages_internal.sh` -> `../charpages/`);
+  argued as beneficial because the focus moves to the validity of the
+  reader/interpreter and the documentation can never go stale. Claude's
+  assessment (given in session): agree with the direction — it is [VSP-12]'s
+  GENERATED-doc law applied one step further — with four riders: (1)
+  regeneration guarantees CURRENCY, not correctness — both 14z-125 defects
+  were interpretation defects a hash-locked page would have reproduced; the
+  in-emulator rigs (`test_vanilla_frame_join`, the hit rig) stay the validity
+  gates and carry no tables; (2) draw the line by CLASS, not file: per-move
+  ROM-derived numbers live today in `community_crosscheck.md` (ours + the
+  workbook's), the three tenant `_anim.md`/`.html` pages, and
+  `tests/expected/vanilla_hit_damage.tsv` — the 91-row
+  `community_crosscheck.txt` is already verdict-shaped; (3) the workbook's
+  OWN values stay out regardless (the compilation is the author's work) —
+  the delta-only `render_md` fix; (4) removing a file from HEAD does not
+  remove it from the PUBLIC history (24 pushed commits) — accept-in-history
+  is the recommendation; a rewrite of pushed `main` is destructive and the
+  maintainer's alone. **Options:** (a) third-party values only out, ours
+  stay; (b) RECOMMENDED — every per-move ROM-derived table (ours and theirs)
+  becomes generator output under `../charpages/` via one route
+  (`tools/framedata_pages.sh` beside `charpages_internal.sh`), the in-tree
+  `community_crosscheck.md` keeps verdicts / mechanisms / counts /
+  "What is NOT known" only, the tenant pages move to the same route, gates
+  lock SHA-256s of the regenerated output under ROMDIR plus the verdict rows;
+  (c) leave as is. Half a session for (b); the class boundary and the
+  history question are the maintainer's to rule.
+- **DF-STARTUP INVINCIBILITY FOR THE TENANTS — ANSWERED 14z-126, MEASURED,
+  NO CHANGE NEEDED (DECIDED by measurement; nothing to rule unless a window
+  is to be retuned).** The window is `+0x147` (the victim's invincibility
+  timer, the hit test's gate at `PRG:0x018064`), armed PER CHARACTER by the
+  seq-0x16 handler `dispatch_16` selects — NEITHER global (the shared body
+  arms only `+0x143` = 0x14, the throw immunity) NOR inherited (the tenants'
+  rows are repointed to their own vs2 handlers): Donovan 64 ticks (Victor 59),
+  Huitzil 79 (Bulleta 41), Pyron 41 (Demitri 41, coincident by value). All 15
+  vanilla values measured and frozen too (`tests/expected/df_startup_invuln.tsv`,
+  gate `tests/audit_df_startup_invuln.sh`; engine_internals "Dark Force" ->
+  "The STARTUP INVINCIBILITY window"). Natively on vs2: no window at all
+  ([VSE-69]). Retuning a tenant is one data byte in its ported handler, if
+  ever wanted. The original entry follows. **RECORDED, not started — and it is THE NEXT ARC
   (maintainer, 2026-08-31: the DF question first, then the Zabel j.LK patch,
   then Jedah's crouching recovery).** THE MAINTAINER SHARPENED IT (2026-08-31):
   not just *do the tenants have the startup invincibility*, but **if they do, is
@@ -463,7 +530,18 @@ the archive once they stop shaping active work.)*
   Sasquatch DF accumulator (`audit_df_accumulator`, 9 frozen lines — ours is
   a measurement, theirs a name; the byte may serve both); `0x2246E` "System
   Timer Reducers" vs our "class-0xFF block handler" (14z-123). Naming to
-  adopt after measurement: "Tech Hit" beside "advancing guard".
+  adopt after measurement: "Tech Hit" beside "advancing guard". **BOTH
+  RESOLVED 14z-126 (the opcode listing): `0x2246E` IS the System Timer
+  Reducer (one `subq.b` per tick on `+0x147/+0x174/+0x143/+0x158/+0x1AB`);
+  the block window is OPENED by the block-entry handler `0x2395A`-`0x23966`
+  — 14z-123's write tap had named the decrementer, corrected in `ram.md`,
+  engine_internals and `test_advancing_guard.sh`; and `+0x161` is a
+  per-character DF WORK BYTE written by Sasquatch's (the measured
+  accumulator), Bishamon's, Anakaris's and Aulbath's handlers — mizuumi's
+  "Oboro Fight Flag" is Bishamon/Oboro's use of it: both names true. Four
+  wiki rows adopted into `ram.md` with the mechanism measured or read
+  (`+0x134`, `+0x145`, `+0x143`, `+0x1B3`); the other ~90 candidates stay
+  unadopted [C].**
 
 - **THE CLAUDE.md CONDENSING PASS (maintainer-directed 2026-08-30, 14z-122
   close). PASS 1 DONE 14z-123 (441 → 414 lines; narratives → rule + citation;
