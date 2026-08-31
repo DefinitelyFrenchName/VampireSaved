@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**286 scripts** — 61 ci_portable, 63 ci_static, 162 emulator-tier (run by name).
+**287 scripts** — 61 ci_portable, 63 ci_static, 163 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -27,7 +27,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [oracle](#oracle) | 27 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 81 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 14 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 15 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 30 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 18 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -311,6 +311,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | gate | kind | tier | needs | locks (the script's own header) | since |
 |---|---|---|---|---|---|
 | `tests/audit_df_accumulator.sh` | audit | emulator | MAME, a build dir, ~3 min | THE +0x161 ACCUMULATOR IS SASQUATCH'S DARK FORCE ARMOR (measured 14z-123; inferred_claims row 1). | 14z-123 |
+| `tests/audit_df_dead_family.sh` | audit | emulator | ~3 min | THE VS-STYLE DARK FORCE FAMILY IS DEAD IN NATIVE vs2: its shared field-setter tail at vs2 PRG:0x02622A takes ZERO hits while the activation body takes exactly one (measured 14z-126). | 14z-126 |
 | `tests/audit_df_startup_invuln.sh` | audit | emulator | MAME, a build dir, ~3 min | THE DARK FORCE STARTUP INVINCIBILITY IS +0x147, ARMED PER CHARACTER BY THE seq-0x16 HANDLER, AND THE TENANTS ARM THEIR OWN (measured 14z-126; STATE "Decisions pending" DF-startup item). | 14z-126 |
 | `tests/audit_front_comparator.sh` | audit | emulator | MAME, a build dir, ~3 min | what $FF8127 is, and what its input byte +0x10 is (14z-123, the documentation rationalization pass, inferred_claims row 4; closes the 14z-118 (16) leftover "Open: what object byte +0x10 is"). | 14z-123 |
 | `tests/test_advancing_guard.sh` | test | emulator | MAME, ~2.5 min | THE ADVANCING GUARD (guard push), MEASURED on native vs2 and on vsavj, and frozen (14z-123, the documentation pass's G2). | 14z-123 |

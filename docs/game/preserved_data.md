@@ -39,6 +39,13 @@ sets. Measured: native 0 hits at vs2 `0x056D70` with a positive control on
 our leg (`engine_internals.md` "The two engines run DIFFERENT Dark Force
 systems"); the native Donovan leg of `tests/audit_df_startup_invuln.sh`
 never arms `+0x147` (vs2 writes 1 at `0x025F2A`, gone before frame_done).
+The family has a shared TAIL, also dead: a vsav-style field setter at vs2
+`0x02622A` (`+0x111/+0x110/+0x143/+0x176`, and `+0x189` = 5 / `+0x188` =
+0x23 as constants where vsavj's body reads a per-character table), reached
+only by `jmp $2622a.l` from ten per-character sites inside the handler
+ranges — probed on native vs2 with Donovan and Demitri: 0 hits, while the
+activation body `0x02619E` fires once at the press on both legs
+(`tests/audit_df_dead_family.sh`, 14z-126).
 
 **The values agree across the three ROMs.** `tests/test_df_startup_provenance.sh`
 (ci_static): every vanilla row arms the SAME `+0x147` value in vsavj, vsav2
@@ -111,12 +118,8 @@ multi-track songs; the class is kept as a capability reserve.
 
 ## Candidates — seen in a listing, reachability not yet measured
 
-- **A vsav-style DF field setter still in vs2** at `0x02622A`: writes
-  `+0x111/+0x110/+0x143/+0x176` and fixed `+0x189` = 5 / `+0x188` = 0x23
-  — the VS activation's field set, with constants where vsavj reads a
-  per-character table (14z-126 listing). Whether anything reaches it is not
-  measured; it may be the body the newcomers' DF used before the redesign,
-  or an assembler leftover. A probe with a positive control decides.
+(none open — the vsav-style DF field setter at vs2 `0x02622A` was measured
+dead the same session and moved into entry 1.)
 
 An entry moves out of this list only with a measurement; a candidate that
 turns out reachable is deleted, not kept.
