@@ -412,7 +412,14 @@ the archive once they stop shaping active work.)*
   hit / on block / renda on block / throw tech / red damage / white damage /
   gauge whiff / gauge block` (AN adds gauge hit / cancel / guard);
   multi-hit actives as text (`2(4)3,2`, `3{(3)3}x6`); NO vs2 characters, no
-  Oboro / Dark Gallon. The webpage:
+  Oboro / Dark Gallon. **Sheet names = the first two letters of the
+  JAPANESE character name (maintainer-confirmed 2026-08-31), mapped to our
+  ids:** BU Bulleta `0x00` · DE Demitri `0x01` · GA Gallon `0x02` · VI
+  Victor `0x03` · ZA Zabel `0x04` · MO Morrigan `0x05` · AN Anakaris `0x06`
+  · FE Felicia `0x07` · BI Bishamon `0x08` · AU Aulbath `0x09` · SA
+  Sasquatch `0x0A` · QB Q-Bee `0x0C` · LE Lei-Lei `0x0D` · LI Lilith `0x0E`
+  · JE Jedah `0x0F` (the two to not confuse: LE = Lei-Lei, LI = Lilith).
+  The webpage:
   https://mizuumi.wiki/w/Vampire_Savior/Reverse_Engineering ("arguably the
   best source of deep information on Vampire Savior") — BLOCKED for any
   fetcher by a bot challenge (WebFetch 403; curl with a browser UA gets the
