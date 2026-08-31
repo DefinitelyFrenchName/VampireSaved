@@ -43,11 +43,14 @@ nope() { echo "  FAIL  $1"; bad=$((bad + 1)); }
 
 [ -f "$SHEET" ] || { echo "SKIP: no $SHEET (the community workbook is third-party and lives outside the tree)"; exit 0; }
 if [ ! -f "$IMG" ]; then
-    # the data view is ROM-derived and lives outside git; make it when ROMDIR allows
-    if [ -n "${ROMDIR:-}" ] && [ -f "$ROMDIR/vsavj.zip" ]; then
+    # the data view is ROM-derived and lives outside git; take it from the shared
+    # decrypt CACHE (tests/lib/decrypt_cache.sh) — never shell out to the decrypt
+    # directly, which is what tests/test_decrypt_cache.sh section 5 enforces
+    if [ -n "${ROMDIR:-}" ] || [ -f build/out/vsavj_data.bin ]; then
+        . "$REPO/tests/lib/decrypt_cache.sh"
+        decrypt_view vsavj "$W/vsavj_op.bin" "$W/vsavj_data.bin" >/dev/null 2>&1 \
+            || { echo "SKIP: no vsavj data view and the cache could not fill it"; exit 0; }
         IMG="$W/vsavj_data.bin"
-        python3 tools/cps2_decrypt.py "$ROMDIR/vsavj.zip" "$W/vsavj_op.bin" --data-out "$IMG" >/dev/null 2>&1 \
-            || { echo "SKIP: could not decrypt vsavj"; exit 0; }
     else
         echo "SKIP: no $IMG and no ROMDIR (the vsavj data view is ROM-derived)"; exit 0
     fi

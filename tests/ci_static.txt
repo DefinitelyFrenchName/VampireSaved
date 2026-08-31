@@ -154,4 +154,11 @@ test_attract_roster
 # ours-vs-vs2 difference attributed, the unattributed counts frozen by cmp.
 # Two must-fire controls. Needs the three solo build dirs; ~20 s.
 test_charmap_current
-tests/test_community_crosscheck.sh
+
+# test_community_crosscheck — OUR DERIVED VANILLA FRAME DATA vs the community
+# workbook (14z-125): all 15 characters derived from the vsavj data view, every
+# (character, column) classified EXACT / CONSTANT OFFSET / CONSTANT RATIO /
+# INCONSISTENT / UNCOMPARABLE and frozen. The workbook is third-party and lives
+# OUTSIDE the tree, so the gate SKIPs without it rather than passing vacuously.
+# Two must-fire controls; ~10 s.
+test_community_crosscheck

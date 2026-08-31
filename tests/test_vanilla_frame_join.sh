@@ -42,13 +42,11 @@ nope() { echo "  FAIL  $1"; bad=$((bad + 1)); }
 
 [ -n "${ROMDIR:-}" ] || { echo "SKIP: ROMDIR unset"; exit 0; }
 if [ ! -f "$IMG" ]; then
-    if [ -f "$ROMDIR/vsavj.zip" ]; then
-        IMG="$W/vsavj_data.bin"
-        python3 tools/cps2_decrypt.py "$ROMDIR/vsavj.zip" "$W/vsavj_op.bin" --data-out "$IMG" >/dev/null 2>&1 \
-            || { echo "SKIP: could not decrypt vsavj"; exit 0; }
-    else
-        echo "SKIP: no $IMG and no vsavj.zip in ROMDIR"; exit 0
-    fi
+    # from the shared decrypt CACHE, never a direct decrypt (test_decrypt_cache §5)
+    . "$REPO/tests/lib/decrypt_cache.sh"
+    decrypt_view vsavj "$W/vsavj_op.bin" "$W/vsavj_data.bin" >/dev/null 2>&1 \
+        || { echo "SKIP: no vsavj data view and the cache could not fill it"; exit 0; }
+    IMG="$W/vsavj_data.bin"
 fi
 
 # tab:id — the sheet tab beside the vsavj character id (STATE 14z-124)
