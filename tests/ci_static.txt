@@ -154,3 +154,4 @@ test_attract_roster
 # ours-vs-vs2 difference attributed, the unattributed counts frozen by cmp.
 # Two must-fire controls. Needs the three solo build dirs; ~20 s.
 test_charmap_current
+tests/test_community_crosscheck.sh

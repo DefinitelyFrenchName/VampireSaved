@@ -51,6 +51,28 @@ Gates: `tests/test_charmap_current.sh` (ci_static) and `tests/test_charmap_overr
 later phases (anim node chains + move names, hitbox rectangles + attack records,
 stun/projectile params) — see `docs/project/doc_audit_14z118.md` and STATE 14z-118.
 
+## The community cross-check — vanilla frame data (opened 14z-125)
+
+| file | what | regenerate |
+|---|---|---|
+| `community_crosscheck.md` | **GENERATED.** Our DERIVED frame data for all 15 vanilla characters against the maintainer's community workbook, classified by the ruled vocabulary (EXACT / CONSTANT OFFSET / CONSTANT RATIO / INCONSISTENT / UNCOMPARABLE) | `python3 tools/crosscheck_framedata.py --md docs/project/tables/community_crosscheck.md --tsv tests/expected/community_crosscheck.txt` |
+| `../../../tests/expected/vanilla_normal_slots.tsv` | the MEASURED slot map: which anim chain each character's standing normals enter, at two distances (180 rows) | `ROMDIR=... FREEZE=1 tests/test_vanilla_frame_join.sh` |
+
+The tools: `tools/vanilla_frames.py` (derive any vanilla character from the
+vsavj data view + `bank_map.toml`, reusing `anim_nodes.py`,
+`hitbox_records.HitboxSet.from_image` and `frame_data.py`),
+`tools/crosscheck_framedata.py` (the comparator), `tools/xlsx_read.py` (a
+stdlib-only workbook reader, validated cell for cell against openpyxl) and
+`tools/vanilla_join_rig.py` (the in-emulator join measurement).
+Gates: `tests/test_community_crosscheck.sh` (ci_static) and
+`tests/test_vanilla_frame_join.sh` (emulator).
+
+**Both community sources stay OUT of the tree** — they are third-party work,
+cited and never committed: `../community/vsav-framedata.xlsx` and
+`../community/mizuumi_reverse_engineering.txt` (the mizuumi wiki's Reverse
+Engineering page, `oldid 416342`, 2025-07-31 — a RAM/ROM map with no per-move
+frame data; its player-struct table vs `atlas/ram.md` is a queued item).
+
 ## The other tables
 
 - `reconciliation.md` — per-instance record of every VS2-vs-vanilla-vsav

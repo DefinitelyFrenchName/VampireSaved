@@ -76,6 +76,27 @@ class HitboxSet:
         self.src, self.img = r["src"], (ex / "region_hitbox.bin").read_bytes()
         rp = rj["regions"].get("hitbox_proj")
         self.psrc, self.pimg = (rp["src"], (ex / "region_hitbox_proj.bin").read_bytes()) if rp else (None, b"")
+        self._resolve()
+
+    @classmethod
+    def from_image(cls, img, base, comp, src=0, vals=None, proj_base=None):
+        """A hitbox set read straight out of a WHOLE data-view image, for a character
+        that has no extract — i.e. any VANILLA vsavj character (14z-125, the community
+        cross-check). `base`/`comp` are the per-character bank rows `hitbox_base` /
+        `hitbox_comp` (build/manifest/bank_map.toml, row = table.vsavj + id*4); the
+        decoding below is identical, because the encoding is the engine's, not the port's."""
+        self = cls.__new__(cls)
+        self.img, self.src = img, src
+        self.pimg, self.psrc = b"", None
+        self.vals = dict(vals or {})
+        self.vals.setdefault("hitbox_base", base)
+        self.vals.setdefault("hitbox_comp", comp)
+        if proj_base is not None:
+            self.vals.setdefault("proj_hitbox_base", proj_base)
+        self._resolve()
+        return self
+
+    def _resolve(self):
         self.end = self.src + len(self.img)
         self.base = self.vals["hitbox_base"]
         self.comp = self.vals["hitbox_comp"]

@@ -1,0 +1,125 @@
+#!/bin/sh
+# test_vanilla_frame_join.sh — WHICH ANIM CHAIN EACH VANILLA CHARACTER'S STANDING
+# NORMALS ENTER, MEASURED ON vsavj (14z-125, the community cross-check's join).
+#
+# WHAT IT HOLDS. docs/project/tables/community_crosscheck.md joins the community
+# workbook's rows to our derived chains, and the join is only as good as the
+# claim "button B on character C enters chain a2:S". That claim is NOT inferred
+# here: tools/vanilla_join_rig.py performs each of the six standing normals at a
+# far pin and again after a 150-frame walk-in, and the verdict is the chain the
+# game's own anim node pointer (+0x1C, tests/lua/field_trace.lua) entered inside
+# the event window, mapped onto the graph tools/anim_nodes.py decodes. 180 rows
+# (15 characters x 2 distances x 6 buttons) frozen in
+# tests/expected/vanilla_normal_slots.tsv.
+#
+# WHY IT EXISTS — a fixed layout was tried and this measurement KILLED it. The
+# model was "even slot = the close normal, odd = the far one" for every
+# character, inferred by fitting our own numbers against the workbook we were
+# checking; that is circular, and it was wrong. Zabel is the specimen: he has NO
+# proximity variants (both distances enter 0x00/02/04/06/08/0a), so the fixed
+# model handed him the odd slots — which are his 6-prefixed COMMAND normals —
+# and he came out INCONSISTENT on all five compared columns. On the measured
+# join he is clean on all five. AN, BI, JE and QB are the same shape; LP's slot
+# is character-dependent (0x00 on GA/VI/ZA/AN/BI/JE/QB, 0x01 elsewhere).
+#
+#   1. the rigs regenerate byte-identically (the schedule is code, not a file);
+#   2. all 30 legs run on vsavj and every event fires (never UNFIRED);
+#   3. the measured table equals tests/expected/vanilla_normal_slots.tsv;
+#   4. MUST-FIRE CONTROL: the frozen table is not vacuous — swapping one
+#      character's far and near rows must FAIL the compare.
+#
+# Usage: ROMDIR=... tests/test_vanilla_frame_join.sh   # emulator tier (MAME, ~4 min, legs in parallel)
+#        CHARS="DE ZA" to measure a subset; FREEZE=1 to re-freeze.
+set -u
+REPO="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$REPO"
+EXP=tests/expected/vanilla_normal_slots.tsv
+IMG="${IMG:-build/out/vsavj_data.bin}"
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+bad=0
+ok()  { echo "  ok    $1"; }
+nope() { echo "  FAIL  $1"; bad=$((bad + 1)); }
+
+[ -n "${ROMDIR:-}" ] || { echo "SKIP: ROMDIR unset"; exit 0; }
+if [ ! -f "$IMG" ]; then
+    if [ -f "$ROMDIR/vsavj.zip" ]; then
+        IMG="$W/vsavj_data.bin"
+        python3 tools/cps2_decrypt.py "$ROMDIR/vsavj.zip" "$W/vsavj_op.bin" --data-out "$IMG" >/dev/null 2>&1 \
+            || { echo "SKIP: could not decrypt vsavj"; exit 0; }
+    else
+        echo "SKIP: no $IMG and no vsavj.zip in ROMDIR"; exit 0
+    fi
+fi
+
+# tab:id — the sheet tab beside the vsavj character id (STATE 14z-124)
+ALL="BU:0x00 DE:0x01 GA:0x02 VI:0x03 ZA:0x04 MO:0x05 AN:0x06 FE:0x07 BI:0x08 AU:0x09 SA:0x0a QB:0x0c LE:0x0d LI:0x0e JE:0x0f"
+WANT="${CHARS:-}"
+FIELDS="ff8410:w:p1x,ff840b:b:p1face,ff841c:l:node,ff8420:b:cnt,ff8810:w:p2x,ff8850:w:p2hp,ff8782:b:id,ff8b82:b:p2id"
+
+echo "== test_vanilla_frame_join: the standing-normal slot map, measured on vsavj =="
+
+echo "== 1-2. the legs"
+n=0
+for pair in $ALL; do
+    tab="${pair%%:*}"; cid="${pair##*:}"
+    case " $WANT " in *" $tab "*) ;; "  ") ;; *) [ -n "$WANT" ] && continue;; esac
+    for d in far near; do
+        python3 tools/vanilla_join_rig.py gen "$cid" "$d" "$W/${tab}_$d.rpl" "$W/${tab}_$d.json" >/dev/null || nope "gen $tab $d"
+        mkdir -p "$W/${tab}_$d"
+        P="$(python3 -c "import json;print(';'.join(json.load(open('$W/${tab}_$d.json'))['pokes']))")"
+        FR="$(python3 -c "import json;print(json.load(open('$W/${tab}_$d.json'))['frames'])")"
+        ( cd "$W/${tab}_$d" && MAME_SANDBOX="$W/${tab}_$d/sb" REPLAY="$W/${tab}_$d.rpl" POKES="$P" \
+            FIELDS="$FIELDS" FIELD_OUT="$W/${tab}_$d/t.txt" FIELD_FROM=2400 FIELD_TO="$FR" FRAMES="$FR" \
+            "$REPO/tools/run_mame.sh" vsavj -autoboot_script "$REPO/tests/lua/field_trace.lua" > l.log 2>&1 ) </dev/null &
+        n=$((n + 1))
+        [ $((n % 8)) -eq 0 ] && wait
+    done
+done
+wait
+ok "$n legs ran"
+
+: > "$W/got.txt"
+head -6 "$EXP" > "$W/hdr.txt" 2>/dev/null || : > "$W/hdr.txt"
+cat "$W/hdr.txt" > "$W/got.txt"
+for pair in $ALL; do
+    tab="${pair%%:*}"; cid="${pair##*:}"
+    [ -n "$WANT" ] && { case " $WANT " in *" $tab "*) ;; *) continue;; esac; }
+    for d in far near; do
+        [ -s "$W/${tab}_$d/t.txt" ] || { nope "leg $tab $d: no samples (see $W/${tab}_$d/l.log)"; continue; }
+        python3 tools/vanilla_join_rig.py analyse "$W/${tab}_$d/t.txt" "$W/${tab}_$d.json" "$IMG" "$cid" \
+            --tab "$tab" --tsv >> "$W/got.txt" || nope "analyse $tab $d"
+    done
+done
+if grep -q UNFIRED "$W/got.txt"; then nope "some events never fired:"; grep UNFIRED "$W/got.txt" | sed 's/^/        /'
+else ok "every event entered a chain (no UNFIRED)"; fi
+
+echo "== 3. against the frozen table"
+if [ "${FREEZE:-0}" = 1 ]; then cp "$W/got.txt" "$EXP"; echo "  FROZE $EXP ($(grep -vc '^#' "$EXP") rows)"; fi
+if [ -n "$WANT" ]; then
+    grep -v '^#' "$EXP" > "$W/exp_all.txt"
+    for tab in $WANT; do grep "^$tab	" "$W/exp_all.txt"; done > "$W/exp.txt"
+    grep -v '^#' "$W/got.txt" > "$W/g.txt"
+else
+    grep -v '^#' "$EXP" > "$W/exp.txt"; grep -v '^#' "$W/got.txt" > "$W/g.txt"
+fi
+if cmp -s "$W/exp.txt" "$W/g.txt"; then ok "the measured slot map equals $EXP ($(grep -c . "$W/g.txt") rows)"
+else nope "the slot map moved"; diff "$W/exp.txt" "$W/g.txt" | head -20; fi
+
+echo "== 4. must-fire control"
+python3 - "$W/exp.txt" "$W/ctl.txt" <<'PY'
+import sys
+rows = [l.rstrip("\n").split("\t") for l in open(sys.argv[1]) if l.strip()]
+# swap far/near for the FIRST character that actually has a distinction
+by = {}
+for t, d, b, c in rows:
+    by.setdefault(t, {}).setdefault(b, {})[d] = c
+victim = next(t for t, bs in by.items() if any(v.get("far") != v.get("near") for v in bs.values()))
+out = [("\t".join([t, {"far": "near", "near": "far"}[d] if t == victim else d, b, c])) for t, d, b, c in rows]
+open(sys.argv[2], "w").write("\n".join(out) + "\n")
+print(f"  (control swaps far/near for {victim})")
+PY
+if cmp -s "$W/exp.txt" "$W/ctl.txt"; then nope "control: the swapped table compares EQUAL — the freeze is vacuous"
+else ok "control: swapping one character's far/near rows fails the compare"; fi
+
+[ $bad -eq 0 ] && echo "PASS" || echo "FAIL ($bad)"
+exit $bad

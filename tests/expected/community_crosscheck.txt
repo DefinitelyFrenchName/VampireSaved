@@ -1,0 +1,91 @@
+character	column	verdict	n	detail
+AN	startup	CONSTANT OFFSET	15	sheet = ours +1 on all 15
+AN	active	EXACT	15	15/15
+AN	recovery	CONSTANT OFFSET	12	sheet = ours +2 on all 12
+AN	white	INCONSISTENT	15	most common delta +0 on 14/15; spread +0..+5
+AN	gauge_hit	EXACT	15	15/15
+AN	red	UNCOMPARABLE	15	the record's raw +8 power vs damage DEALT after the [VSE-40] scaler chain; proven not a function of ours alone (+8=3 -> sheet {5,6,7,8})
+AU	startup	INCONSISTENT	19	most common delta +1 on 18/19; spread +1..+2
+AU	active	INCONSISTENT	19	most common delta +0 on 17/19; spread -1..+9
+AU	recovery	CONSTANT OFFSET	12	sheet = ours +2 on all 12
+AU	white	EXACT	19	19/19
+AU	gauge_hit	EXACT	19	19/19
+AU	red	UNCOMPARABLE	19	the record's raw +8 power vs damage DEALT after the [VSE-40] scaler chain; proven not a function of ours alone (+8=3 -> sheet {5,6,7,8})
+BI	startup	INCONSISTENT	17	most common delta +1 on 14/17; spread +0..+5
+BI	active	INCONSISTENT	17	most common delta +0 on 15/17; spread -3..+0
+BI	recovery	CONSTANT OFFSET	12	sheet = ours +2 on all 12
+BI	white	INCONSISTENT	17	most common delta +0 on 15/17; spread -8..+0
+BI	gauge_hit	INCONSISTENT	17	most common delta +0 on 14/17; spread -18..+6
+BI	red	UNCOMPARABLE	17	the record's raw +8 power vs damage DEALT after the [VSE-40] scaler chain; proven not a function of ours alone (+8=3 -> sheet {5,6,7,8})
+BU	startup	INCONSISTENT	18	most common delta +1 on 17/18; spread -1..+1
+BU	active	INCONSISTENT	18	most common delta +0 on 16/18; spread +0..+1
+BU	recovery	CONSTANT OFFSET	13	sheet = ours +2 on all 13
+BU	white	EXACT	18	18/18
+BU	gauge_hit	EXACT	18	18/18
+BU	red	UNCOMPARABLE	18	the record's raw +8 power vs damage DEALT after the [VSE-40] scaler chain; proven not a function of ours alone (+8=3 -> sheet {5,6,7,8})
+DE	startup	CONSTANT OFFSET	21	sheet = ours +1 on all 21
+DE	active	EXACT	21	21/21
+DE	recovery	CONSTANT OFFSET	15	sheet = ours +2 on all 15
+DE	white	EXACT	21	21/21
+DE	gauge_hit	EXACT	21	21/21
+DE	red	UNCOMPARABLE	21	the record's raw +8 power vs damage DEALT after the [VSE-40] scaler chain; proven not a function of ours alone (+8=3 -> sheet {5,6,7,8})
+FE	startup	CONSTANT OFFSET	19	sheet = ours +1 on all 19
+FE	active	INCONSISTENT	19	most common delta +0 on 17/19; spread -1..+2
+FE	recovery	CONSTANT OFFSET	13	sheet = ours +2 on all 13
+FE	white	EXACT	19	19/19
+FE	gauge_hit	INCONSISTENT	19	most common delta +0 on 18/19; spread -10..+0
+FE	red	UNCOMPARABLE	19	the record's raw +8 power vs damage DEALT after the [VSE-40] scaler chain; proven not a function of ours alone (+8=3 -> sheet {5,6,7,8})
+GA	startup	CONSTANT OFFSET	18	sheet = ours +1 on all 18
+GA	active	EXACT	18	18/18
+GA	recovery	CONSTANT OFFSET	12	sheet = ours +2 on all 12
+GA	white	EXACT	18	18/18
+GA	gauge_hit	EXACT	18	18/18
+GA	red	UNCOMPARABLE	18	the record's raw +8 power vs damage DEALT after the [VSE-40] scaler chain; proven not a function of ours alone (+8=3 -> sheet {5,6,7,8})
+JE	startup	CONSTANT OFFSET	18	sheet = ours +1 on all 18
+JE	active	EXACT	18	18/18
+JE	recovery	INCONSISTENT	12	most common delta +3 on 6/12; spread +2..+3
+JE	white	INCONSISTENT	18	most common delta +0 on 17/18; spread +0..+6
+JE	gauge_hit	EXACT	18	18/18
+JE	red	UNCOMPARABLE	18	the record's raw +8 power vs damage DEALT after the [VSE-40] scaler chain; proven not a function of ours alone (+8=3 -> sheet {5,6,7,8})
+LE	startup	CONSTANT OFFSET	19	sheet = ours +1 on all 19
+LE	active	INCONSISTENT	19	most common delta +0 on 18/19; spread -1..+0
+LE	recovery	CONSTANT OFFSET	13	sheet = ours +2 on all 13
+LE	white	INCONSISTENT	19	most common delta +0 on 18/19; spread -9..+0
+LE	gauge_hit	INCONSISTENT	19	most common delta +0 on 18/19; spread -18..+0
+LE	red	UNCOMPARABLE	19	the record's raw +8 power vs damage DEALT after the [VSE-40] scaler chain; proven not a function of ours alone (+8=3 -> sheet {5,6,7,8})
+LI	startup	CONSTANT OFFSET	21	sheet = ours +1 on all 21
+LI	active	EXACT	21	21/21
+LI	recovery	INCONSISTENT	16	most common delta +2 on 15/16; spread +2..+3
+LI	white	INCONSISTENT	21	most common delta +0 on 18/21; spread -1..+7
+LI	gauge_hit	EXACT	21	21/21
+LI	red	UNCOMPARABLE	21	the record's raw +8 power vs damage DEALT after the [VSE-40] scaler chain; proven not a function of ours alone (+8=3 -> sheet {5,6,7,8})
+MO	startup	CONSTANT OFFSET	21	sheet = ours +1 on all 21
+MO	active	EXACT	21	21/21
+MO	recovery	CONSTANT OFFSET	15	sheet = ours +2 on all 15
+MO	white	INCONSISTENT	21	most common delta +0 on 20/21; spread +0..+7
+MO	gauge_hit	EXACT	21	21/21
+MO	red	UNCOMPARABLE	21	the record's raw +8 power vs damage DEALT after the [VSE-40] scaler chain; proven not a function of ours alone (+8=3 -> sheet {5,6,7,8})
+QB	startup	CONSTANT OFFSET	15	sheet = ours +1 on all 15
+QB	active	EXACT	15	15/15
+QB	recovery	CONSTANT OFFSET	10	sheet = ours +2 on all 10
+QB	white	INCONSISTENT	15	most common delta +0 on 14/15; spread +0..+7
+QB	gauge_hit	EXACT	15	15/15
+QB	red	UNCOMPARABLE	15	the record's raw +8 power vs damage DEALT after the [VSE-40] scaler chain; proven not a function of ours alone (+8=3 -> sheet {5,6,7,8})
+SA	startup	INCONSISTENT	19	most common delta +1 on 18/19; spread +0..+1
+SA	active	EXACT	19	19/19
+SA	recovery	CONSTANT OFFSET	13	sheet = ours +2 on all 13
+SA	white	INCONSISTENT	19	most common delta +0 on 18/19; spread +0..+8
+SA	gauge_hit	INCONSISTENT	19	most common delta +0 on 17/19; spread -18..+0
+SA	red	UNCOMPARABLE	19	the record's raw +8 power vs damage DEALT after the [VSE-40] scaler chain; proven not a function of ours alone (+8=3 -> sheet {5,6,7,8})
+VI	startup	INCONSISTENT	23	most common delta +1 on 22/23; spread +1..+4
+VI	active	INCONSISTENT	23	most common delta +0 on 22/23; spread +0..+1
+VI	recovery	CONSTANT OFFSET	17	sheet = ours +2 on all 17
+VI	white	INCONSISTENT	23	most common delta +0 on 21/23; spread -1..+8
+VI	gauge_hit	EXACT	23	23/23
+VI	red	UNCOMPARABLE	23	the record's raw +8 power vs damage DEALT after the [VSE-40] scaler chain; proven not a function of ours alone (+8=3 -> sheet {5,6,7,8})
+ZA	startup	CONSTANT OFFSET	18	sheet = ours +1 on all 18
+ZA	active	EXACT	18	18/18
+ZA	recovery	CONSTANT OFFSET	12	sheet = ours +2 on all 12
+ZA	white	EXACT	18	18/18
+ZA	gauge_hit	EXACT	18	18/18
+ZA	red	UNCOMPARABLE	18	the record's raw +8 power vs damage DEALT after the [VSE-40] scaler chain; proven not a function of ours alone (+8=3 -> sheet {5,6,7,8})

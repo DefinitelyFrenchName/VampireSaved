@@ -89,6 +89,7 @@ docs/project/tenant_manifest_history.md	HIST	-	-
 docs/project/visual_smoke_tests.md	REFERENCE	-	-
 # --- project/tables (chars/ is generated wholesale and excluded from the walk)
 docs/project/tables/README.md	REFERENCE	-	-
+docs/project/tables/community_crosscheck.md	GENERATED	-	-
 docs/project/tables/defense_rows.md	REFERENCE	-	-
 docs/project/gate_index.md	GENERATED	-	-
 docs/project/tables/donovan.md	GENERATED	-	-

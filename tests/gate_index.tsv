@@ -103,6 +103,7 @@ tests/test_checkdocs.sh	docs
 tests/test_checkskills.sh	docs
 tests/test_classify_hitclass_probe.sh	oracle
 tests/test_classify_pool_spawns.sh	oracle
+tests/test_community_crosscheck.sh	character-data
 tests/test_compare_composite.sh	oracle
 tests/test_compare_fields_selfcheck.sh	oracle
 tests/test_compare_flicker.sh	oracle
@@ -140,6 +141,7 @@ tests/test_freeze_basis_sandbox.sh	oracle
 tests/test_freeze_retires_diverge.sh	review-triage
 tests/test_frozen_rompath_guard.sh	platform
 tests/test_fsm_census.sh	pipeline
+tests/test_gate_index_current.sh	docs
 tests/test_gfx_chain.sh	gfx
 tests/test_gfx_collision_gate.sh	gfx
 tests/test_gfx_layout3.sh	gfx
@@ -283,6 +285,7 @@ tests/test_tenant_select_records.sh	pipeline
 tests/test_tenant_winpal.sh	tenant
 tests/test_thunk_addr_literal.sh	pipeline
 tests/test_type_stamp_census.sh	pipeline
+tests/test_vanilla_frame_join.sh	character-data
 tests/test_variant_dispatch.sh	pipeline
 tests/test_version_string.sh	gfx
 tests/test_voice_row_range.sh	pipeline
@@ -290,4 +293,3 @@ tests/test_wheel_bank5.sh	gfx
 tests/test_wide_profile.sh	platform
 tests/test_wide_render_content.sh	gfx
 tests/test_win_quote_decode.sh	pipeline
-tests/test_gate_index_current.sh	docs
