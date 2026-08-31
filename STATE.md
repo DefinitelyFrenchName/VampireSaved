@@ -1,5 +1,26 @@
 # STATE — living progress log
 
+## Session 14z-125 (2026-08-31) — **THE COMMUNITY CROSS-CHECK (backlog item 2, the maintainer's order): all 15
+## VANILLA characters derived for the first time and compared against the community workbook. ~96% of every
+## comparable column agrees under one stated convention each. Two things were found before any comparison and
+## both were OURS: `active` counted non-attacking gap nodes (18 tenant chains inflated, the published character
+## pages affected), and the standing-normal JOIN is per character — a fixed model fitted against the workbook
+## was overturned by an in-emulator measurement of all 15. No build changed.**
+
+| | |
+|---|---|
+| opened with | the 14z-124 close; NEXT_SESSION's "OPEN THE SESSION WITH THE COMMUNITY CROSS-CHECK (item 2)" and the maintainer's rule ([[community-data-rule]]) |
+| **the defect found first, in our own derivation** | `charmap_md.py:288` and `charmap_html.py:159` both computed `active = sum(durs[first:last+1])` — the INCLUSIVE SPAN from the first to the last attack node, counting non-attacking gap nodes as active. That contradicts the law `hitbox_records.py`'s own docstring states and `test_hitbox_encoding` measured ("a chain's ACTIVE frames are its nodes with `hbA != 0`); the tree carried both readings and rendered the wrong one. **18 tenant chains were inflated** — Huitzil 5LP read 13 where the true active is 6 (`3(7)3`), his 6LP 15 vs 6, his 2HK 18 vs 12, chain 0x27 60 vs 40; Donovan's Ifrit Sword ES 22 vs 16. Fixed by `tools/frame_data.py`, THE one derivation, imported by both renderers (and by the vanilla one) so they cannot drift again; it also emits the community RUNS GRAMMAR (`2(4)3`, hits split on the record's `+0x10` hit id), which is what made a like-for-like comparison possible at all. The three tenants' `_anim.md` and `.html` regenerated; the map JSONs and `.md` are byte-unchanged, so every UNATTRIBUTED count is untouched. **The three published character-page artifacts now differ from the tree until re-published** |
+| **the vanilla derivation** | `tools/vanilla_frames.py` — a SIBLING of `charmap_gen.py`, not a flag (that tool needs a port build; `extract_char.py` refuses any (set, char) without a `CHAR_ANCHORS` row and there is no vsavj row). It reads the vsavj data view + `bank_map.toml` (`table.vsavj + id*4`) and reuses `anim_nodes.py` unchanged, `frame_data.py`, and a NEW raw-image constructor `hitbox_records.HitboxSet.from_image` (the extract path is untouched). All 15 characters, ~110 chains each, first vanilla frame data the project has ever had |
+| **the comparator** | `tools/crosscheck_framedata.py` + `tools/xlsx_read.py` (stdlib-only; validated against openpyxl on **28,234 cells**, the only differences the 4 date-corrupted `VI!U43:U46` `Invuln` cells — a column not compared). Two definitional corrections, both measured before adoption: the workbook's `guage hit` INCLUDES the swing's own gauge, so the comparison subtracts its `gauge whiff` column (`sheet(hit) - sheet(whiff) == our +0x14` on 255 of 287 before the join was fixed); and `red damage` is NOT our quantity — the record's `+8` is raw power before the [VSE-40] scaler, the sheet lists damage DEALT, proven not a function of ours alone (our `+8` = 3 appears against sheet {5,6,7,8}) — so it is REPORTED, never classified |
+| **THE JOIN WAS MEASURED, AND THE MEASUREMENT KILLED THE MODEL** | Two structural shortcuts were tried and BOTH failed their own controls before anything shipped. (1) Predicting a character's command normals from whether our odd slot aliases the even one: **31/90**. (2) A fixed "even = close normal, odd = far" layout for everyone, fitted against the very workbook being checked — circular, and wrong. `tools/vanilla_join_rig.py` settles it instead: each standing normal performed at a far pin and again after a 150-frame walk-in (a near pair may NOT be poked — it overlaps the pushboxes and the engine CROSSES the fighters, 14z-120 (2)), the verdict read off the game's own `+0x1C`. **All 15 measured, 180 rows frozen.** AN/BI/JE/QB/**ZA** have NO proximity variants at all; DE/MO/FE/SA/LE/LI take odd-far/even-near for MP..HK with LP at 0x01; GA/VI the same with LP at 0x00; BU and AU lack a close HP. Zabel is why it mattered: the fixed model gave him the odd slots, which are his real `6`-prefixed COMMAND normals, and he came out INCONSISTENT on all five columns — **on the measured join he is clean on all five** |
+| **the result** | per MOVE, over all 15 characters: **startup 274/281 (97%) at +1** (the sheet counts the first active frame), **active 271/281 (96%) at +0**, **recovery 190/197 (96%) at +2** (aerials excluded — their recovery ends at the LANDING, a physics event, which is why the workbook writes those cells "until landing"), **white 268/281 (95%) at +0** (the record's `+9` is dealt white damage, unscaled), **gauge 274/281 (97%) at +0**. Per column-and-character: startup 10 CONSTANT OFFSET, active 9 EXACT, recovery 13 CONSTANT OFFSET, white 6 EXACT, gauge 11 EXACT. So the two independent measurements corroborate each other, and the residual ~4% is a named worklist, NOT arbitrated yet |
+| delivered | `docs/project/tables/community_crosscheck.md` (GENERATED, with a "What is NOT known"), `tests/expected/community_crosscheck.txt` (91 frozen rows), `tests/expected/vanilla_normal_slots.tsv` (180), gates `tests/test_community_crosscheck.sh` (ci_static, 2 must-fire controls, SKIPs cleanly without the third-party workbook) and `tests/test_vanilla_frame_join.sh` (emulator, 30 legs in ~28 s, must-fire control), registered in `gate_index.tsv` / `ci_static.txt` / `doc_shape.tsv` |
+| the sources | BOTH stay OUT of the tree, cited never committed. The mizuumi page turned out to carry **NO per-move frame data** — it is a RAM/ROM map (`oldid 416342`, 2025-07-31, region unqualified) — so it is not a second frame-data source; its player-struct table vs `ram.md` is the deferred half of the item (the maintainer's call this session) |
+| not done, by design | the residual outliers are NOT arbitrated in-emulator (listed with both numbers); `red damage` through the scaler chain; specials/supers/throws/`CL.` rows/the `6`-prefixed normals (each needs its own vsavj naming rig — the bulk of the workbook's 730 rows); the seven workbook columns nothing in the tree derives (`on hit`, `on block`, renda, throw tech, cancel, `Invuln`); the crouching/jumping slot layout is the TENANTS' measured layout carried, not re-measured on vanilla |
+| green | portable tier 61 PASS / 0 FAIL; `test_charmap_current` PASS (both controls fire); `test_community_crosscheck` PASS; `test_vanilla_frame_join` PASS 180/180; gate index current (284 scripts); `checkdocshape --no-pending` 0 PENDING |
+| push | NOT pushed — push at the maintainer's word |
+
 ## Session 14z-124 (2026-08-30/31) — **THE DOCUMENTATION RATIONALIZATION PASS IS DONE (G7): engine_internals'
 ## last third rationalized and the document flipped to REFERENCE (19 narratives to the twin, 4,198 → 3,657
 ## lines); `doc_shape.tsv` has ZERO PENDING; `test_docshape` runs the end-state `--no-pending` mode; the ci
@@ -378,8 +399,22 @@ the archive once they stop shaping active work.)*
   legacy-clean by construction); (b) accept. No recommendation before the
   measurement.
 - **THE COMMUNITY CROSS-CHECK — our data vs the best community reverse
-  engineering (maintainer backlog item, 2026-08-31, 14z-124). RECORDED, not
-  started; NEEDS INPUTS.** Two sources the maintainer will provide: a
+  engineering (maintainer backlog item, 2026-08-31, 14z-124). ~~RECORDED, not
+  started~~ PHASE 1 DELIVERED 14z-125 (the maintainer's order: "start with item
+  2 to get proper confirmed data"): all 15 vanilla characters derived, the
+  standing-normal join MEASURED in-emulator, and every comparable column
+  classified — ~96% agreement per move under one stated convention each
+  (`docs/project/tables/community_crosscheck.md`, gates
+  `test_community_crosscheck` + `test_vanilla_frame_join`). STILL OPEN, and
+  named on the page: the residual ~4% outliers are not yet arbitrated
+  in-emulator; `red damage` needs the [VSE-40] scaler to be comparable at all;
+  specials / supers / throws / the `CL.` and `6`-prefixed rows need their own
+  vsavj naming rigs (the bulk of the workbook's 730 rows); seven workbook
+  columns have no counterpart in the tree. The WIKI half — the 146
+  player-struct offsets against `ram.md` — was DEFERRED by the maintainer this
+  session to item 1's session, whose lead `+0x1B3` sits in the same table; note
+  the page carries NO per-move frame data, so it was never a second frame-data
+  source. The original entry follows.** Two sources the maintainer will provide: a
   WEBPAGE, and an EXCEL of frame data for the VANILLA characters. What we
   have: frame data DERIVED for the three tenants only (`docs/project/tables/
   chars/<tenant>_anim.md` "Frame data (derived): startup / active /
