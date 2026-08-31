@@ -16,14 +16,14 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**287 scripts** — 61 ci_portable, 63 ci_static, 163 emulator-tier (run by name).
+**288 scripts** — 62 ci_portable, 63 ci_static, 163 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 6 | the suite runners and their own ground truth |
 | [docs](#docs) | 10 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 26 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
-| [pipeline](#pipeline) | 49 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
+| [pipeline](#pipeline) | 50 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 27 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 81 | tenant content — per-character gates and on-demand audits on the ported characters |
@@ -113,6 +113,7 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 | `tests/test_census_regions.sh` | test | ci_static | ROMDIR | ground truth for tools/census_regions.py (the 14z-66 data_in_code + pcrel-escape censuses, promoted to a tool for the D4 step-2 Pyron early warning, 14z-67). | 14z-66 |
 | `tests/test_escape_triage.sh` | test | ci_static | ROMDIR | H3.1's verdicts, frozen (14z-100 hardening). | 14z-100 |
 | `tests/test_extract_hp.sh` | test | ci_static | ROMDIR | the Huitzil/Pyron extraction gate (14z-65, M3b Phase 1). | 14z-65 |
+| `tests/test_freeze_tag_coverage.sh` | test | ci_portable | — | EVERY FROZEN BUILD IS GIT-TAGGED (14z-126b). ci_portable: no ROM, no build dir, no emulator, ~1 s. Needs git tags. | 14z-126b |
 | `tests/test_fsm_census.sh` | test | ci_static | ROMDIR | the STATIC object-script node-state census gate (14z-110, GitHub #99). Locks tools/audit_fsm_census.py against its frozen inventory (build/manifest/fsm_census.toml) AND proves the checker can fail. | 14z-110 |
 | `tests/test_hitclass_map_thunk.sh` | test | ci_static | ROMDIR | the hit-class map-extension thunk (14z-82b) reconstructs from the two reference ROMs, and any committed row matches the reconstruction byte-for-byte. | 14z-82b |
 | `tests/test_id_space.sh` | test | ci_static | ROMDIR | freeze the shape of the character-id space. | 14z-60 |

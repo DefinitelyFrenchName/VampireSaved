@@ -142,6 +142,7 @@ tests/test_fbneo_tree_integrity.sh	platform
 tests/test_fbneo_tree_integrity_control.sh	platform
 tests/test_freeze_basis_sandbox.sh	oracle
 tests/test_freeze_retires_diverge.sh	review-triage
+tests/test_freeze_tag_coverage.sh	pipeline
 tests/test_frozen_rompath_guard.sh	platform
 tests/test_fsm_census.sh	pipeline
 tests/test_gate_index_current.sh	docs

@@ -50,6 +50,7 @@ test_fbneo_overlay_hygiene
 test_fbneo_overlay_hygiene_control
 test_freeze_basis_sandbox
 test_freeze_retires_diverge
+test_freeze_tag_coverage
 test_gfx_collision_gate
 test_gfx_layout_fields_live
 test_harness_frame_bound
