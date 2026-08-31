@@ -731,21 +731,31 @@ run it at every freeze). Open cells: tech-hit/tech-roll rigs (also
 unlocks pursuit-connect); KO-frame/corner edge cases;
 Shadow/Marionette (N/A-until-enabled).
 
-**KNOWN-OPEN on `merged-m1` (14z-93, GitHub #91/#92): it carries a
-REACHABLE planted ILLEGAL.** `tests/audit_tripwire_reach.sh` measures
+**~~KNOWN-OPEN on `merged-m1`~~ RESOLVED 14z-94 (GitHub #91/#92) — kept
+because the MECHANISM is still how a tripwire reaches a player.** The fix is
+the #91+#92 batch (huitzil-m16 / pyron-m10 / merged-m2), "the first builds on
+which a planted tripwire is NOT reachable in extended play"; `merged-m1` is
+THIRTEEN freezes superseded and the current merged build is `merged-m14`. What
+was measured on merged-m1, and still describes the failure MODE: `tests/audit_tripwire_reach.sh` measures
 `CRASH 8887 vec4 PC 456930` — the tripwire for unresolved vs2 `0x494de` —
 on the 40,620-frame arcade marathon with Huitzil forced. Deterministic.
 **NOT Huitzil-only — retracted 14z-93:** the Pyron and Donovan legs' clean
 `END 40620` is a TIMING accident, and under a sparse probe Pyron crashes
 identically (#92). It is a RACE, which is why three clean playtest matches
 prove nothing. The reconciliation row that resolves it is COMMITTED but this
-fingerprint predates it; resolving it exposes a second crash (#92), so the
-re-freeze waits for #92 rather than shipping twice. **`run_suite` does not
-see this** — no suite replay is long enough, which is why the artifact was
-frozen green. Playtesting a long arcade run with Phobos is the field
+fingerprint predated it; resolving it exposed a second crash (#92), which is
+why the re-freeze waited for #92 rather than shipping twice — both landed
+together at 14z-94. **THE DURABLE PART: `run_suite` does not see this class**
+— no suite replay is long enough, which is why that artifact was frozen
+green. `tests/audit_tripwire_reach.sh` (on-demand, ~15 min) is the instrument
+that does, and playtesting a long arcade run with Phobos is its field
 equivalent.
-**`build/m3b_merged8` is the current merged** — `merged-m1`,
-frozen 14z-92 (merged7 and merged6 superseded).
+**THE CURRENT MERGED BUILD IS `build/m3b_merged21` = merged-m14** (the M12
+freeze, program fingerprint `6649523a`) — see "Current WIDE builds" above and
+the registry's top row. `build/m3b_merged8` was `merged-m1`, frozen 14z-92
+and superseded eight times since; the paragraphs below describe IT and are
+kept for the superseded-build facts they carry (which dirs are known-bad,
+which cannot boot on current binaries), not as a statement of what to run.
 The map: `docs/project/tables/qs_voice_map.md`. Superseded:
 hui38/pyron23/m5_wide (donovan-m3a — tag `freeze/donovan-m3a` is the
 way back; its expectation set carried-renamed `donovan-m4`),
