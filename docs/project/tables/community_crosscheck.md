@@ -745,6 +745,16 @@ compare, under one stated convention per column. The residue is the worklist bel
   — it is the tenants' measured layout, carried.
 - **Slot `a2:0x00` on the characters that do not use it for LP** has no established
   role; the rig never entered it there.
+- **AN OPEN QUESTION THIS RAISES ABOUT THE TENANTS.** `build/manifest/moves_huitzil.toml`
+  labels `a2:0x01/03/05` as `6LP` / `6MP` / `6HP`, filled by `tools/name_moves.py`
+  performing `6`+button at a FAR pin. On vanilla characters those odd slots are the
+  FAR standing normal, and the maintainer's own note on those rows reads *"Alternate
+  attack: different from 5LP (usually longer reach and different data)"* — which
+  describes a far normal exactly. So the tenants' `6XX` labels may be a naming
+  artifact of the rig's input choice rather than distinct command normals.
+  **Not measured, not corrected here**: settling it means running the two-distance
+  rig on native vs2 for the three tenants. Nothing in the shipped build depends on
+  the label — it is documentation.
 - **The workbook's own defects are not corrected**, only avoided: `AN` row 48 is
   shifted one column from `gauge whiff` on, `AN` rows 49-50 carry no frame data,
   `AN!K50` reads `[1+0x8+1x5+7`, and `VI!U43:U46` were eaten by Excel into dates.
