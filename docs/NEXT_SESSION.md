@@ -31,13 +31,23 @@
 > ## variants; on the fixed model he was INCONSISTENT on all five columns, on
 > ## the measured join he is clean on all five.
 > ##
+> ## **THE OPEN HALVES WERE FINISHED (14z-125b).** `red damage` is comparable
+> ## after all — 266/281 (94%): the workbook's column is our `+8` PLUS `+9`, and
+> ## 14z-125's "needs the [VSE-40] scaler" is RETRACTED. The damage residue is
+> ## settled AGAINST the workbook: it sums attack records that share the engine's
+> ## `+0x10` dedup key, which can only land once — a hit rig confirms our count on
+> ## 75/78 connecting events. And the duration bytes are the engine's (334/380),
+> ## though 16% of sampled frames carry two engine ticks, so a frame-rate trace
+> ## CANNOT adjudicate a one-frame convention: `startup +1` / `recovery +2` stay
+> ## named conventions.
+> ##
 > ## **WHAT TO DO NEXT — the maintainer's call between three:**
-> ## (a) **FINISH THE CROSS-CHECK'S OPEN HALVES** (all named on the page):
-> ## arbitrate the residual ~4% outliers in-emulator (`field_trace`, per-frame
-> ## hitbox state, ours re-measured FIRST); derive dealt damage through the
-> ## [VSE-40] scaler so `red damage` becomes comparable at all; then the
-> ## specials/supers/throws, each needing its own vsavj naming rig — that is
-> ## the bulk of the workbook's 730 rows.
+> ## (a) **WHAT THE CROSS-CHECK STILL LEAVES OPEN:** Jedah's whole crouching
+> ## family (and Lilith's `2MK`) reads recovery +3 where everyone else reads +2,
+> ## unexplained; the seven aerial startup/active outliers; and the
+> ## specials/supers/throws, each needing its own vsavj naming rig — the bulk of
+> ## the workbook's 730 rows. A TICK-ACCURATE instrument (a `-debug` trace or a
+> ## Lua hook on the engine tick) is the precondition for the first two.
 > ## (b) **ITEM 1, DF-STARTUP INVINCIBILITY FOR THE TENANTS** — unchanged in
 > ## STATE "Decisions pending"; its lead `+0x1B3 "Dark Force Startup"` sits in
 > ## the mizuumi player-struct table, and **the WIKI half of item 2 was

@@ -22,6 +22,23 @@
 | green | portable tier 61 PASS / 0 FAIL; `test_charmap_current` PASS (both controls fire); `test_community_crosscheck` PASS; `test_vanilla_frame_join` PASS 180/180; gate index current (284 scripts); `checkdocshape --no-pending` 0 PENDING |
 | push | NOT pushed — push at the maintainer's word |
 
+## Session 14z-125b (2026-08-31, same day) — **THE CROSS-CHECK'S OPEN HALVES, at the maintainer's word ("finish
+## the cross-check open halves"): `red damage` becomes COMPARABLE (94%) — the previous session's "different
+## quantity, needs the [VSE-40] scaler" was WRONG and is retracted — and the damage residue is settled AGAINST
+## the workbook, which double-counts attack records that share the engine's dedup key. Two families closed, one
+## honestly open, and the instrument's own limit measured. No build changed.**
+
+| | |
+|---|---|
+| **(1) `red damage` RETRACTED and re-compared: 266/281 (94%), 5 characters EXACT** | 14z-125 classified it UNCOMPARABLE, reasoning that our record `+8` is raw power and the workbook lists damage DEALT through the scaler, on the evidence that `+8` alone does not determine the sheet value (`+8` = 3 appears against {5,6,7,8}). The evidence was true; the conclusion was wrong. The workbook's `red damage` is `+8` PLUS `+9` — the move's TOTAL. Corrected in place in `crosscheck_framedata.py` (the old reasoning kept as the retraction) and on the page. All six columns are now comparable |
+| **(2) the duration bytes are the ENGINE's — and the instrument's resolution is measured** | tracing the engine's own node countdown `+0x20` beside the pointer: the first value observed on a node equals the duration byte we read on **334/380 nodes**, so the derivation's INPUT is confirmed live. But **16% of sampled frames advance that counter by TWO ticks** — `field_trace` samples at `frame_done` and the engine does not run one tick per video frame — so **a frame-rate trace cannot arbitrate a one-frame convention**; its resolution is the size of the question. The `startup +1` / `recovery +2` offsets therefore stay NAMED CONVENTIONS, not verdicts. Settling them needs a tick-accurate instrument, which was not built |
+| **(3) the damage residue is the WORKBOOK's error, with the mechanism** | every move whose `white`/`red` reads ~half the workbook's carries **two or more attack records SHARING HIT ID 1** — the engine's own multi-hit dedup key (record `+0x10`). Records with one id are alternative boxes for ONE hit; the victim's recent-hit ring refuses the second ([VSE-43]). We take one; the workbook sums them (MO 5HK white 14 = 7+7, QB 2HK 16 = 9+7, SA 5HP 17 = 9+8, VI 2HP 16 = 8+8, JE 5HK 13 = 7+6). **The new `hit` rig confirms ours and not theirs**: P1 performs each normal on a victim whose HP is re-pinned before each event and every drop in P2's `+0x50` is counted — our dedup-aware run count matches the engine's hit count on **75 of 78** connecting events; summing every record would not |
+| **what the hit rig also established** | the workbook is a **ROM-DERIVED** source, not play-measured: on a live connect the DEALT drops are neither figure (P2's `+0x50` fell 9 where the record reads 11, `+0x52` fell 14), yet it quotes the record values to the byte. That is why its `white damage` matches our `+9` exactly — and it is the only evidence available about a method the page never states |
+| still open, named on the page | **Jedah's entire crouching family** (and Lilith's `2MK`) reads recovery **+3** where every other character reads +2, with nothing structural in the chains to explain it — and by finding (2) the available instrument cannot resolve it; the **seven aerial startup/active outliers** (BI `J.HP`/`J.LP`, BU `J.MP`, VI `J.HP`, FE `J.HK`/`J.LK`, SA `J.MP`), where the chain is entered from the jump and no rig separated the two |
+| delivered | the `hit` / `crouch` / `jump` event sets on `tools/vanilla_join_rig.py` (+ `--durations`, `--damage`); `tests/expected/vanilla_hit_damage.tsv` (90 rows); the gate gains section 4 — 45 legs, 270 frozen rows, ~45 s; the page gains an ARBITRATION section and a rewritten "What is NOT known" |
+| green | `test_vanilla_frame_join` PASS (180 + 90 rows); `test_community_crosscheck` PASS (both controls); gate index current |
+| push | NOT pushed |
+
 ## Session 14z-124 (2026-08-30/31) — **THE DOCUMENTATION RATIONALIZATION PASS IS DONE (G7): engine_internals'
 ## last third rationalized and the document flipped to REFERENCE (19 narratives to the twin, 4,198 → 3,657
 ## lines); `doc_shape.tsv` has ZERO PENDING; `test_docshape` runs the end-state `--no-pending` mode; the ci
@@ -407,8 +424,16 @@ the archive once they stop shaping active work.)*
   classified — ~96% agreement per move under one stated convention each
   (`docs/project/tables/community_crosscheck.md`, gates
   `test_community_crosscheck` + `test_vanilla_frame_join`). STILL OPEN, and
-  named on the page: the residual ~4% outliers are not yet arbitrated
-  in-emulator; `red damage` needs the [VSE-40] scaler to be comparable at all;
+  named on the page: **~~the residual ~4% outliers are not yet arbitrated
+  in-emulator~~ ARBITRATED 14z-125b — two of the three families closed (the
+  damage residue is the WORKBOOK double-counting records that share the engine's
+  +0x10 dedup key, confirmed by a hit rig 75/78; the duration bytes are the
+  engine's, 334/380, but a frame-rate trace cannot resolve a one-frame
+  convention, so startup +1 / recovery +2 stay named conventions). STILL OPEN:
+  Jedah's crouching recovery (+3, not +2) and the seven aerial outliers.**
+  ~~`red damage` needs the [VSE-40] scaler to be comparable at all~~ **WRONG and
+  RETRACTED 14z-125b: the workbook's `red damage` is our `+8` PLUS `+9`, the
+  move's total — 266/281 (94%) once compared as the sum;**
   specials / supers / throws / the `CL.` and `6`-prefixed rows need their own
   vsavj naming rigs (the bulk of the workbook's 730 rows); seven workbook
   columns have no counterpart in the tree. The WIKI half — the 146
