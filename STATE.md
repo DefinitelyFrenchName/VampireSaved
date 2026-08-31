@@ -393,7 +393,19 @@ Lifecycle: rulings are still marked DECIDED in place here first; they move to
 the archive once they stop shaping active work.)*
 
 - **DF-STARTUP INVINCIBILITY FOR THE TENANTS (maintainer backlog item,
-  2026-08-31, 14z-124). RECORDED, not started.** The question: do the VS2
+  2026-08-31, 14z-124). RECORDED, not started — and it is THE NEXT ARC
+  (maintainer, 2026-08-31: the DF question first, then the Zabel j.LK patch,
+  then Jedah's crouching recovery).** THE MAINTAINER SHARPENED IT (2026-08-31):
+  not just *do the tenants have the startup invincibility*, but **if they do, is
+  it a GLOBAL property of the DF activation or is it INHERITED FROM THE SHELL
+  CHARACTER?** That third possibility is the one the tree makes most likely and
+  the measurement plan below did not name: the tenants sit at variant ids
+  `0x10`/`0x11`/`0x13`, which ALIAS base-half rows in every table vsavj did not
+  repoint ([VSE-10]), so a flag read from an id-indexed row would hand Phobos
+  Bulleta's, Pyron Demitri's and Donovan Victor's. **So the rig needs three
+  legs, not two: the tenant, its SHELL character, and a legacy control** — if
+  the tenant matches its shell rather than its vs2 self, the answer is
+  inheritance and the fix is a repoint, not a port. The original question: do the VS2
   tenants get the invulnerable STARTUP window vanilla characters get at Dark
   Force activation? What the tree knows: activation is the shared body
   `PRG:0x027000` (seq 0x16, one stock) followed by the PER-CHARACTER

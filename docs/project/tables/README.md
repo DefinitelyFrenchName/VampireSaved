@@ -55,7 +55,7 @@ stun/projectile params) — see `docs/project/doc_audit_14z118.md` and STATE 14z
 
 | file | what | regenerate |
 |---|---|---|
-| `community_crosscheck.md` | **GENERATED.** Our DERIVED frame data for all 15 vanilla characters against the maintainer's community workbook, classified by the ruled vocabulary (EXACT / CONSTANT OFFSET / CONSTANT RATIO / INCONSISTENT / UNCOMPARABLE) | `python3 tools/crosscheck_framedata.py --md docs/project/tables/community_crosscheck.md --tsv tests/expected/community_crosscheck.txt` |
+| `community_crosscheck.md` | **GENERATED.** Snapshot published as a PRIVATE artifact (maintainer-ruled 2026-08-31: internal only, like the character pages that carry IP): https://claude.ai/code/artifact/f572a468-2e35-441c-aa1a-130353e9c9ff — a curated summary, NOT the exhaustive page; re-publish it from the same file path when the findings move. Our DERIVED frame data for all 15 vanilla characters against the maintainer's community workbook, classified by the ruled vocabulary (EXACT / CONSTANT OFFSET / CONSTANT RATIO / INCONSISTENT / UNCOMPARABLE) | `python3 tools/crosscheck_framedata.py --md docs/project/tables/community_crosscheck.md --tsv tests/expected/community_crosscheck.txt` |
 | `../../../tests/expected/vanilla_normal_slots.tsv` | the MEASURED slot map: which anim chain each character's standing normals enter, at two distances (180 rows) | `ROMDIR=... FREEZE=1 tests/test_vanilla_frame_join.sh` |
 
 The tools: `tools/vanilla_frames.py` (derive any vanilla character from the

@@ -59,6 +59,21 @@
 > ## it — doing one of three would leave the set inconsistent. Do all three in a
 > ## fresh session, before anything else.
 > ##
+> ## **THE ORDER IS SET (maintainer, 2026-08-31): (1) the DF-startup
+> ## invincibility question, (2) the Zabel j.LK proximity guard, (3) Jedah's
+> ## crouching recovery.** The maintainer also SHARPENED (1): if the tenants do
+> ## have the startup invincibility, **is it a global property of DF activation
+> ## or INHERITED FROM THE SHELL CHARACTER?** The tenants' variant ids alias
+> ## base-half rows, so a flag read from an id-indexed row would give Phobos
+> ## Bulleta's, Pyron Demitri's, Donovan Victor's — the rig therefore needs
+> ## THREE legs (tenant, its shell, a legacy control), not the two the 14z-124
+> ## plan named. Detail in STATE "Decisions pending".
+> ##
+> ## **The cross-check page is published as a PRIVATE artifact** (internal only,
+> ## like the character pages that carry IP):
+> ## https://claude.ai/code/artifact/f572a468-2e35-441c-aa1a-130353e9c9ff
+> ## The maintainer is forwarding the frame-data findings to the community.
+> ##
 > ## **WHAT TO DO NEXT — the maintainer's call between three:**
 > ## (a) **WHAT THE CROSS-CHECK STILL LEAVES OPEN:** Jedah's whole crouching
 > ## family (and Lilith's `2MK`) reads recovery +3 where everyone else reads +2,
