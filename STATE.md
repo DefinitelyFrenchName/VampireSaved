@@ -17,6 +17,7 @@
 | **G7 DONE** | `checkdocshape --no-pending` rc=0 (0 PENDING) → `tests/test_docshape.sh` now runs that mode (a PENDING row FAILS the suite; new must-fire control h); `ci.yml`'s portable floor `n >= 15` (14z-93) → `n >= 60` (61 registered), with the never-lower rule in a comment; `doc_shape.tsv`'s PENDING class described as transitional and gate-failing; `inferred_claims.md` STATUS CLOSED with the pass (every row MEASURED / RETRACTED / ruled-parked — row 11 alone, #113's camera evidence) |
 | green at close | portable tier **61 PASS / 0 FAIL** (three runs across the commits); checkdocshape `--no-pending` 0 PENDING; checkskills 425; census 427 (re-frozen once, five rows); checkdocs 19 locks; gate index current; annotations current on the clean worktree. The static tier (ROMDIR) was NOT run this session — no manifest, tool or test semantics changed (a gate's MODE did, and its own controls cover it) |
 | not done, by design | **CLAUDE.md pass 2** — a ruling ("Decisions pending"; the "before G7" slot note there is marked superseded — G7 closed without it, pass 2 stands alone); the **Zabel j.LK proximity guard** — its own session, recording first |
+| **backlog added by the maintainer (2026-08-31), recorded in "Decisions pending", not started** | (1) DF-startup invincibility for the tenants — the [VSE-69] seam: shared activation body vs per-character handler; (2) the community cross-check — the webpage + the vanilla frame-data `.xlsx` vs our DERIVED tenant frame data and a vanilla derivation to build; needs the two inputs |
 | open (unchanged) | the 1:1 wheel mockup; #112/#113 parked; the FBNeo two-run-family question; the tenant CPU AI "lackluster" note; win quotes forgone; the COSMETIC BACKLOG; `test_random_select_tenants.sh`'s CONTROL still `build/m3b_merged19`; `test_hui_df_style.sh`'s header still describes its 14z-79 `differs` expectation (a gate-header staleness, noted in the DF section — not a defect) |
 | rollover | none needed: STATE holds 14z-122 / 14z-123 / 14z-124 (three groups, ~140 KB). NEXT_SESSION's 14z-123 opener → `NEXT_SESSION_HISTORY.md` |
 | push | NOT pushed — push at the maintainer's word |
@@ -351,6 +352,54 @@ them would reduce the legacy footprint from 5 bytes to 2.
 entries moved VERBATIM to `DECISIONS_HISTORY.md` — grep there by topic.
 Lifecycle: rulings are still marked DECIDED in place here first; they move to
 the archive once they stop shaping active work.)*
+
+- **DF-STARTUP INVINCIBILITY FOR THE TENANTS (maintainer backlog item,
+  2026-08-31, 14z-124). RECORDED, not started.** The question: do the VS2
+  tenants get the invulnerable STARTUP window vanilla characters get at Dark
+  Force activation? What the tree knows: activation is the shared body
+  `PRG:0x027000` (seq 0x16, one stock) followed by the PER-CHARACTER
+  `dispatch_16` row (`PRG:0x0BF31A`) — the tenants' rows are repointed to
+  their ported vs2 handlers, which were written for vs2's DIFFERENT DF system
+  ([VSE-69], `oracle`-independent: `engine_internals.md` "Dark Force"). So if
+  the window is armed in the shared body the tenants inherit it; if it is
+  armed in the per-character handler, they do not — that is the seam to
+  measure. `ram.md` names `+0x11E/+0x134/+0x145/+0x1A4` as
+  "invulnerability/status flags", class [C] (a candidate, never verified).
+  Measurement (T3, half a session): replay 97's activation rig
+  (`tests/replays/df/97_df_mech.rpl`, `audit_df_framework.sh`) with the
+  opponent's attack timed to land INSIDE the startup window, legacy control
+  Demitri (expect no hit) vs each tenant, positive control = the same attack
+  landing outside the window; instrument = field_trace of `+0x54` /
+  HP / the four flag bytes across the window; freeze as
+  `tests/audit_df_startup_invuln.sh`. If a tenant lacks it, the fix is a
+  GAMEPLAY decision ([VSP-10]) under the DF ruling above ("adjustments per
+  character, never to the general mechanic") — options then: (a) arm the
+  vanilla flag from the tenant's ported handler (a thunk on our own code,
+  legacy-clean by construction); (b) accept. No recommendation before the
+  measurement.
+- **THE COMMUNITY CROSS-CHECK — our data vs the best community reverse
+  engineering (maintainer backlog item, 2026-08-31, 14z-124). RECORDED, not
+  started; NEEDS INPUTS.** Two sources the maintainer will provide: a
+  WEBPAGE, and an EXCEL of frame data for the VANILLA characters. What we
+  have: frame data DERIVED for the three tenants only (`docs/project/tables/
+  chars/<tenant>_anim.md` "Frame data (derived): startup / active /
+  recovery", read off anim-node durations + attack records by the charmap,
+  phase 2, 14z-120/121; move identities measured on native vs2 by
+  `test_move_naming`), and NOTHING collected for vanilla characters; the
+  derivation has never been checked against an independent source. Plan:
+  (1) inputs — the URL and the `.xlsx`, kept OUTSIDE the tree (third-party
+  work; we commit only our comparison and cite the source); (2) derive the
+  same figures for the vanilla characters from vsavj's own 32-row bank
+  (does `tools/charmap_gen.py` walk a vanilla character? if not, extend it —
+  the bank is per-character by law) and compare per move: startup / active /
+  recovery, damage, hit counts; (3) every mismatch is MEASURED in-emulator
+  on vanilla (a replay + field_trace) — the emulator is the arbiter, not the
+  sheet and not our derivation; (4) if the sources cover vs2, compare the
+  tenants' derived figures the same way. Deliverable:
+  `docs/project/tables/community_crosscheck.md` + a gate freezing the
+  agreements and naming the measured disagreements. Cost: T3, one to two
+  sessions. Open questions for the maintainer: the URL; where to drop the
+  `.xlsx` (`../community/` suggested); whether either source covers vs2.
 
 - **THE CLAUDE.md CONDENSING PASS (maintainer-directed 2026-08-30, 14z-122
   close). PASS 1 DONE 14z-123 (441 → 414 lines; narratives → rule + citation;

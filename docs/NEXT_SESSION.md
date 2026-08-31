@@ -23,8 +23,17 @@
 > ## ([VSP-27..30] live there — edit a class THERE, never in §4); the document
 > ## roster is `docs/README.md` "The documents, by role".
 > ##
-> ## **NOTHING IS QUEUED AS WORK. ONE RULING WAITS** (STATE "Decisions
-> ## pending"): the **ZABEL j.LK
+> ## **THREE ITEMS ARE QUEUED (maintainer, 2026-08-31), none started** —
+> ## all in STATE "Decisions pending": (1) **DF-STARTUP INVINCIBILITY FOR
+> ## THE TENANTS** — measure the [VSE-69] seam (shared activation body vs
+> ## the per-character seq-0x16 handler) on replay 97's rig with a hit timed
+> ## into the window, Demitri control + a positive control; (2) **THE
+> ## COMMUNITY CROSS-CHECK** — our DERIVED tenant frame data
+> ## (`chars/<tenant>_anim.md`) and a vanilla derivation to build vs the
+> ## maintainer's webpage + vanilla `.xlsx` — BLOCKED ON THE TWO INPUTS (ask
+> ## for the URL and the file; keep the file out of the tree); every
+> ## mismatch is measured in-emulator, the emulator arbitrates; (3) the
+> ## **ZABEL j.LK
 > ## PROXIMITY GUARD** — its own session; a LEGACY-content patch needing its
 > ## own track/flag and expectation class; START WITH A RECORDING ([VSP-20]),
 > ## then archaeology ([VSP-14]), then measure vanilla's proximity-guard test
