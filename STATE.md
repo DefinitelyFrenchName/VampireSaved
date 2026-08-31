@@ -17,7 +17,7 @@
 | **G7 DONE** | `checkdocshape --no-pending` rc=0 (0 PENDING) → `tests/test_docshape.sh` now runs that mode (a PENDING row FAILS the suite; new must-fire control h); `ci.yml`'s portable floor `n >= 15` (14z-93) → `n >= 60` (61 registered), with the never-lower rule in a comment; `doc_shape.tsv`'s PENDING class described as transitional and gate-failing; `inferred_claims.md` STATUS CLOSED with the pass (every row MEASURED / RETRACTED / ruled-parked — row 11 alone, #113's camera evidence) |
 | green at close | portable tier **61 PASS / 0 FAIL** (three runs across the commits); checkdocshape `--no-pending` 0 PENDING; checkskills 425; census 427 (re-frozen once, five rows); checkdocs 19 locks; gate index current; annotations current on the clean worktree. The static tier (ROMDIR) was NOT run this session — no manifest, tool or test semantics changed (a gate's MODE did, and its own controls cover it) |
 | not done, by design | **CLAUDE.md pass 2** — a ruling ("Decisions pending"; the "before G7" slot note there is marked superseded — G7 closed without it, pass 2 stands alone); the **Zabel j.LK proximity guard** — its own session, recording first |
-| **backlog added by the maintainer (2026-08-31), recorded in "Decisions pending", not started** | (1) DF-startup invincibility for the tenants — the [VSE-69] seam: shared activation body vs per-character handler; (2) the community cross-check — the webpage + the vanilla frame-data `.xlsx` vs our DERIVED tenant frame data and a vanilla derivation to build; needs the two inputs |
+| **backlog added by the maintainer (2026-08-31), recorded in "Decisions pending", not started** | (1) DF-startup invincibility for the tenants — the [VSE-69] seam: shared activation body vs per-character handler; (2) the community cross-check — the webpage + the vanilla frame-data `.xlsx` vs our DERIVED tenant frame data and a vanilla derivation to build; the `.xlsx` received and inventoried (15 vanilla characters, no vs2), the wiki page still needs a browser (bot challenge); the maintainer's rule recorded in the entry |
 | open (unchanged) | the 1:1 wheel mockup; #112/#113 parked; the FBNeo two-run-family question; the tenant CPU AI "lackluster" note; win quotes forgone; the COSMETIC BACKLOG; `test_random_select_tenants.sh`'s CONTROL still `build/m3b_merged19`; `test_hui_df_style.sh`'s header still describes its 14z-79 `differs` expectation (a gate-header staleness, noted in the DF section — not a defect) |
 | rollover | none needed: STATE holds 14z-122 / 14z-123 / 14z-124 (three groups, ~140 KB). NEXT_SESSION's 14z-123 opener → `NEXT_SESSION_HISTORY.md` |
 | push | NOT pushed — push at the maintainer's word |
@@ -398,8 +398,26 @@ the archive once they stop shaping active work.)*
   tenants' derived figures the same way. Deliverable:
   `docs/project/tables/community_crosscheck.md` + a gate freezing the
   agreements and naming the measured disagreements. Cost: T3, one to two
-  sessions. Open questions for the maintainer: the URL; where to drop the
-  `.xlsx` (`../community/` suggested); whether either source covers vs2.
+  sessions. **INPUTS RECEIVED 2026-08-31 + THE RULE, maintainer's words:**
+  "measurement is king, not a source that we don't know how it was measured;
+  however, community information is precious: if it aligns perfectly or
+  with a constant offset, then we know the measure is good; if we find an
+  inconsistent pattern, then we must search whether the measurement is
+  correctly done or not." So every column's deltas are classified EXACT /
+  CONSTANT OFFSET (a convention difference — state it) / INCONSISTENT (a
+  defect in somebody's measurement — re-measure OURS in-emulator first).
+  The sheet: `../community/vsav-framedata.xlsx` — 15 sheets = the 15
+  vanilla characters (FE AN AU BI BU DE GA JE LE LI MO QB SA VI ZA; ~37-68
+  moves each), per move `startup / active / recovery / on hit / renda on
+  hit / on block / renda on block / throw tech / red damage / white damage /
+  gauge whiff / gauge block` (AN adds gauge hit / cancel / guard);
+  multi-hit actives as text (`2(4)3,2`, `3{(3)3}x6`); NO vs2 characters, no
+  Oboro / Dark Gallon. The webpage:
+  https://mizuumi.wiki/w/Vampire_Savior/Reverse_Engineering ("arguably the
+  best source of deep information on Vampire Savior") — BLOCKED for any
+  fetcher by a bot challenge (WebFetch 403; curl with a browser UA gets the
+  challenge page): the maintainer saves it as HTML into `../community/`, or
+  a Chrome session drives it. Both sources stay out of the tree.
 
 - **THE CLAUDE.md CONDENSING PASS (maintainer-directed 2026-08-30, 14z-122
   close). PASS 1 DONE 14z-123 (441 → 414 lines; narratives → rule + citation;

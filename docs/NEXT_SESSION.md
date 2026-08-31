@@ -30,9 +30,11 @@
 > ## into the window, Demitri control + a positive control; (2) **THE
 > ## COMMUNITY CROSS-CHECK** — our DERIVED tenant frame data
 > ## (`chars/<tenant>_anim.md`) and a vanilla derivation to build vs the
-> ## maintainer's webpage + vanilla `.xlsx` — BLOCKED ON THE TWO INPUTS (ask
-> ## for the URL and the file; keep the file out of the tree); every
-> ## mismatch is measured in-emulator, the emulator arbitrates; (3) the
+> ## maintainer's `../community/vsav-framedata.xlsx` (15 vanilla characters,
+> ## inventoried) and the mizuumi RE page (needs a BROWSER — bot challenge;
+> ## saved HTML into `../community/` unblocks it); THE RULE: EXACT or a
+> ## CONSTANT OFFSET validates ours, an INCONSISTENT pattern means re-measure
+> ## OURS in-emulator — the emulator arbitrates, never the sheet; (3) the
 > ## **ZABEL j.LK
 > ## PROXIMITY GUARD** — its own session; a LEGACY-content patch needing its
 > ## own track/flag and expectation class; START WITH A RECORDING ([VSP-20]),
