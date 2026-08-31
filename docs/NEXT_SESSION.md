@@ -7,8 +7,8 @@
 
 > ## **START HERE. NOTHING IS RED. NO BUILD CHANGED — the tree is still the
 > ## M12 freeze (merged-m14 `6649523a`, `build/m3b_merged21`), FIELD-VERIFIED
-> ## GREEN. Commits are LOCAL past the pushed `26255a9` — push at the
-> ## maintainer's word; check `git status -sb`, not this line.**
+> ## GREEN. PUSHED through `4d97ec9` (the 14z-126 close); check
+> ## `git status -sb`, not this line.**
 > ##
 > ## **ITEM (1) OF THE ORDER IS DONE — THE DF-STARTUP INVINCIBILITY QUESTION IS
 > ## ANSWERED (14z-126).** The window is `+0x147` (the victim's invincibility
