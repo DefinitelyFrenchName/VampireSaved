@@ -479,7 +479,9 @@ PC 0xCE38A = vs2 0x2713C + port offset):
   rows are reaction sets entered at a phase; the selecting code is unread),
   and the first countdown sample on a node is `dur` or `dur−1` (set and
   decremented in one frame). Decoder: `tools/anim_nodes.py`; the per-tenant
-  chains, ours vs vs2, are in `docs/project/tables/chars/<tenant>_anim.md`.
+  chains, ours vs vs2, are in `<tenant>_anim.md` — OUT of the tree
+  (`../charpages/framedata/`, `tools/framedata_pages.sh`: per-move frame data
+  is regenerated from the romsets, not published, maintainer-ruled 2026-08-31).
 - **Hit-freeze ("the floating holds"):** on each connected hit the
   victim-side reaction handler freezes BOTH parties via obj+0x5C
   (walker timer hold — obj+0x20 simply stops decrementing while
@@ -545,7 +547,7 @@ ENTERS when the move is performed on native vs2 — measured by
 frame by `tests/lua/field_trace.lua`, each pointer mapped onto the graph
 `tools/anim_nodes.py` decodes) and frozen by `tests/test_move_naming.sh`
 (`tests/expected/move_naming_donovan.txt`). The labelled per-chain page is
-`docs/project/tables/chars/donovan_anim.md`. Atlas rows: `ram.md` `+0x1C`
+`donovan_anim.md`, regenerated out of the tree by `tools/framedata_pages.sh`. Atlas rows: `ram.md` `+0x1C`
 (node pointer), `+0x109` (banked stocks), `$FF802E` (the DF flag), `$FF8109`
 (round timer). What the layout says about the engine:
 
@@ -632,7 +634,7 @@ Depends on atlas rows: `ram.md` fighter `+0x0B` (flip_x), `+0x10/+0x14`
 `tests/test_hitbox_encoding.sh` (Donovan on native vs2, two field legs +
 two `-debug` write-tap legs); the per-tenant tables are in
 `docs/project/tables/chars/<tenant>.md` "Hitboxes and attack records" and
-the per-chain frame data in `<tenant>_anim.md`.
+the per-chain frame data in the out-of-tree `<tenant>_anim.md`.
 **Gates:** `tests/test_hitbox_encoding.sh`, `tests/test_charmap_current.sh`,
 `tests/test_projectile_params.sh`.
 

@@ -243,7 +243,13 @@ def compare(vanilla, sheet_path):
     return result
 
 
-def render_md(vanilla, cmp_):
+def render_md(vanilla, cmp_, full=False):
+    """full=False (the in-tree page): verdicts, mechanisms, counts and "What is NOT
+    known" ONLY — no per-move number of ours or the workbook's. full=True: the whole
+    comparison, written OUT of the tree (../charpages/framedata/) by
+    tools/framedata_pages.sh. THE RULE (maintainer, 2026-08-31, STATE 14z-126): per-move
+    ROM-derived frame data — ours and third-party alike — is generator output kept out
+    of the public repository; the tree ships the readers and the verdicts."""
     L = []
     A = L.append
     A("# Community cross-check — our derived frame data vs the community sources")
@@ -251,6 +257,14 @@ def render_md(vanilla, cmp_):
     A("**GENERATED** by `tools/crosscheck_framedata.py` from `tools/vanilla_frames.py`'s")
     A("derivation and the maintainer's workbook. Do not hand-edit; regenerate.")
     A("Gate: `tests/test_community_crosscheck.sh`.")
+    if not full:
+        A("")
+        A("**THIS IS THE VERDICT-ONLY PAGE.** Per-move frame data — ours and the workbook's")
+        A("alike — stays out of the public tree (maintainer-ruled 2026-08-31, STATE 14z-126:")
+        A("the tree ships the READERS and the VERDICTS; the numbers are regenerated from the")
+        A("romsets). The full comparison, move by move, is `../charpages/framedata/")
+        A("community_crosscheck_full.md`, written above the working tree by")
+        A("`tools/framedata_pages.sh` for anyone holding the reference dumps and the workbook.")
     A("")
     A("## The rule this page applies")
     A("")
@@ -387,24 +401,30 @@ def render_md(vanilla, cmp_):
     A("alternative boxes for ONE hit — the victim's recent-hit ring refuses the second")
     A("([VSE-43]) — so only one of them can land. We take one; **the workbook sums them**:")
     A("")
-    A("| move | records (id, red/white) | workbook white | ours |")
-    A("|---|---|---|---|")
-    A("| MO 5HK | 17 (id 1, 14/7), 99 (id 1, 12/7) | 14 = 7+7 | 7 |")
-    A("| QB 2HK | 13 (id 1, 11/9), 14 (id 1, 9/7) | 16 = 9+7 | 9 |")
-    A("| SA 5HP | 7 (id 1, 15/9), 8 (id 1, 12/8) | 17 = 9+8 | 9 |")
-    A("| VI 2HP | 15 (id 1, 15/8), 16 (id 1, 14/8) | 16 = 8+8 | 8 |")
-    A("| JE 5HK | 8, 9, 56 — all id 1 | 13 = 7+6 | 7 |")
+    if not full:
+        A("Five moves carry it (MO 5HK, QB 2HK, SA 5HP, VI 2HP, JE 5HK — two or more attack")
+        A("records sharing hit id 1; the per-record values are on the full page).")
+    full and A("| move | records (id, red/white) | workbook white | ours |")
+    full and A("|---|---|---|---|")
+    full and A("| MO 5HK | 17 (id 1, 14/7), 99 (id 1, 12/7) | 14 = 7+7 | 7 |")
+    full and A("| QB 2HK | 13 (id 1, 11/9), 14 (id 1, 9/7) | 16 = 9+7 | 9 |")
+    full and A("| SA 5HP | 7 (id 1, 15/9), 8 (id 1, 12/8) | 17 = 9+8 | 9 |")
+    full and A("| VI 2HP | 15 (id 1, 15/8), 16 (id 1, 14/8) | 16 = 8+8 | 8 |")
+    full and A("| JE 5HK | 8, 9, 56 — all id 1 | 13 = 7+6 | 7 |")
     A("")
     A("**The hit rig confirms our reading and not theirs.** P1 performs each normal on a")
     A("victim whose HP is re-pinned before every event, and each DROP in P2's `+0x50` is")
     A("counted: our dedup-aware run count matches the engine's hit count on **75 of 78**")
-    A("connecting events (`tests/expected/vanilla_hit_damage.tsv`). Summing every record,")
+    A("connecting events (the measurement is hashed in `tests/expected/vanilla_hit_damage.sha256`; the values live out of tree, `../charpages/framedata/vanilla_hit_damage.tsv`). Summing every record,")
     A("as the workbook does, would not. So on this family ours is right and the")
     A("workbook is wrong, and the mechanism says why.")
     A("")
     A("The same rig also showed the workbook is a **ROM-derived** source, not a")
-    A("play-measured one: on a live connect the DEALT drops are neither figure (P2's")
-    A("`+0x50` fell 9 where the record reads 11, its `+0x52` fell 14), yet the workbook")
+    A("play-measured one: on a live connect the DEALT drops are neither figure")
+    if full:
+        A("(P2's `+0x50` fell 9 where the record reads 11, its `+0x52` fell 14), yet the workbook")
+    else:
+        A("(the worked example is on the full page), yet the workbook")
     A("quotes the record values to the byte. That is why its `white damage` matches our")
     A("`+9` exactly, and it is the best evidence available about a method the page")
     A("itself never states.")
@@ -417,7 +437,7 @@ def render_md(vanilla, cmp_):
     A("explains it, and by finding 1 the available instrument cannot resolve a one-frame")
     A("question. Left open rather than guessed.")
     A("")
-    A("## Every INCONSISTENT column, move by move")
+    A("## Every INCONSISTENT column" + (", move by move" if full else " — per character (the moves are on the full page)"))
     A("")
     any_bad = False
     for tab, c in sorted(cmp_["characters"].items()):
@@ -428,6 +448,10 @@ def render_md(vanilla, cmp_):
             any_bad = True
             A(f"### {tab} {c['name']} — `{key}` — {v['detail']}")
             A("")
+            if not full:
+                A(f"{len(v['rows'])} move(s) deviate; the per-move table is on the full page.")
+                A("")
+                continue
             A("| move | sheet | ours | delta |")
             A("|---|---|---|---|")
             for r in v["rows"]:
@@ -492,7 +516,8 @@ def main():
     ap.add_argument("--vanilla", type=Path, help="tools/vanilla_frames.py --json output (else derived on the fly)")
     ap.add_argument("--image", type=Path)
     ap.add_argument("--tsv", type=Path)
-    ap.add_argument("--md", type=Path)
+    ap.add_argument("--md", type=Path, help="the VERDICT-ONLY page (the one committed in the tree)")
+    ap.add_argument("--md-full", type=Path, help="the full move-by-move page — write it OUT of the tree (tools/framedata_pages.sh)")
     ap.add_argument("--json", type=Path)
     a = ap.parse_args()
 
@@ -518,6 +543,8 @@ def main():
         print(f"wrote {a.tsv}")
     if a.md:
         a.md.write_text(render_md(vanilla, cmp_))
+    if a.md_full:
+        a.md_full.write_text(render_md(vanilla, cmp_, full=True))
         print(f"wrote {a.md}")
     if a.json:
         a.json.write_text(json.dumps(cmp_, indent=1, sort_keys=True) + "\n")

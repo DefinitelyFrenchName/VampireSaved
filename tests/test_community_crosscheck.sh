@@ -12,6 +12,14 @@
 # changed workbook all fail here. The page it feeds is
 # docs/project/tables/community_crosscheck.md (GENERATED; regenerate with it).
 #
+# THE FRAME-DATA RULE (maintainer, 2026-08-31, STATE 14z-126): the committed page
+# is the VERDICT-ONLY rendering — verdicts, mechanisms, counts and "What is NOT
+# known", no per-move number of ours or the workbook's. The full move-by-move
+# comparison is written OUT of the tree by tools/framedata_pages.sh
+# (--md-full -> ../charpages/framedata/community_crosscheck_full.md). This gate
+# checks the committed page against a --md regeneration, so the split is locked:
+# a per-move value creeping back into the public page fails section 4.
+#
 # THE SOURCES ARE THIRD-PARTY AND LIVE OUTSIDE THE TREE (CLAUDE.md rule 7 keeps
 # ROM content out; this is the same instinct applied to somebody else's work):
 # ../community/vsav-framedata.xlsx is cited, never committed. Without it this

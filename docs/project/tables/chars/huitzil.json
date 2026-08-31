@@ -188615,7 +188615,7 @@
   {
    "evidence": "tests/test_hitbox_encoding.sh",
    "structure": "anim",
-   "what": "DONE 14z-120 (5): hbA != 0 marks an ATTACK node (hbA>>8 = the attack record); startup / active / recovery per chain are derived in <tenant>_anim.md"
+   "what": "DONE 14z-120 (5): hbA != 0 marks an ATTACK node (hbA>>8 = the attack record); startup / active / recovery per chain are derived in the out-of-tree <tenant>_anim.md (tools/framedata_pages.sh)"
   },
   {
    "evidence": "test_anim_node_walk observation; the +0x1C write taps of 14z-121",

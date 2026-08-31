@@ -37,6 +37,7 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
+PAGES=tests/expected/charmap_pages.sha256
 DON="${DON:-build/don_m18}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 HUI="${HUI:-build/hui52}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 PYR="${PYR:-build/pyron36}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
@@ -58,11 +59,25 @@ for pair in "$DON:donovan" "$HUI:huitzil" "$PYR:pyron"; do
         || { bad "$n: charmap_gen failed on $b"; sed 's/^/        /' "$W/$n.gen.log" | tail -5; continue; }
     python3 tools/charmap_md.py "$W/$n.json" "$W/$n.md" --anim "$W/${n}_anim.md" >/dev/null 2>&1 \
         || { bad "$n: charmap_md failed"; continue; }
-    if cmp -s "$W/$n.json" "docs/project/tables/chars/$n.json" && cmp -s "$W/$n.md" "docs/project/tables/chars/$n.md" && cmp -s "$W/${n}_anim.md" "docs/project/tables/chars/${n}_anim.md"; then
-        ok "$n: json + md match a regeneration from $b ($(grep -o '"region_bytes_unattributed": [0-9]*' "$W/$n.json"))"
+    python3 tools/charmap_html.py "$n" "$b" "$W/$n.html" >/dev/null 2>&1 || { bad "$n: charmap_html failed"; continue; }
+    # THE FRAME-DATA RULE (maintainer, 2026-08-31, STATE 14z-126): the per-move pages
+    # <tenant>_anim.md and <tenant>.html stay OUT of the tree (tools/framedata_pages.sh
+    # regenerates them under ../charpages/framedata/); their currency is locked by
+    # SHA-256 in tests/expected/charmap_pages.sha256 — FREEZE=1 re-freezes after review.
+    SHA="$(python3 -c 'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1],"rb").read()).hexdigest())' "$W/${n}_anim.md")"
+    HSHA="$(python3 -c 'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1],"rb").read()).hexdigest())' "$W/$n.html")"
+    if [ "${FREEZE:-0}" = 1 ]; then
+        grep -v "^${n}_anim.md \|^${n}.html " "$PAGES" > "$W/pages.tmp" 2>/dev/null || true
+        { cat "$W/pages.tmp"; echo "${n}_anim.md $SHA"; echo "${n}.html $HSHA"; } | sort > "$PAGES"; echo "  FROZE $PAGES for $n"
+    fi
+    want_a="$(grep "^${n}_anim.md " "$PAGES" 2>/dev/null | cut -d' ' -f2)"; want_h="$(grep "^${n}.html " "$PAGES" 2>/dev/null | cut -d' ' -f2)"
+    if cmp -s "$W/$n.json" "docs/project/tables/chars/$n.json" && cmp -s "$W/$n.md" "docs/project/tables/chars/$n.md" && [ "$want_a" = "$SHA" ] && [ "$want_h" = "$HSHA" ]; then
+        ok "$n: json + md match a regeneration from $b ($(grep -o '"region_bytes_unattributed": [0-9]*' "$W/$n.json")); the out-of-tree anim page and html hash to $PAGES"
     else
-        bad "$n: DRIFTED from $b — regenerate: python3 tools/charmap_gen.py $b docs/project/tables/chars/$n.json && python3 tools/charmap_md.py docs/project/tables/chars/$n.json docs/project/tables/chars/$n.md --anim docs/project/tables/chars/${n}_anim.md"
+        bad "$n: DRIFTED from $b — regenerate: python3 tools/charmap_gen.py $b docs/project/tables/chars/$n.json && python3 tools/charmap_md.py docs/project/tables/chars/$n.json docs/project/tables/chars/$n.md --anim /dev/null; out-of-tree pages: tools/framedata_pages.sh, then FREEZE=1 here after review"
         diff "docs/project/tables/chars/$n.md" "$W/$n.md" | head -6 | sed 's/^/        /'
+        [ "$want_a" = "$SHA" ] || echo "        ${n}_anim.md sha256 $SHA != frozen ${want_a:-none}"
+        [ "$want_h" = "$HSHA" ] || echo "        ${n}.html sha256 $HSHA != frozen ${want_h:-none}"
     fi
 done
 

@@ -30,6 +30,13 @@
 #
 # Usage: ROMDIR=... tests/test_vanilla_frame_join.sh   # emulator tier (MAME, ~4 min, legs in parallel)
 #        CHARS="DE ZA" to measure a subset; FREEZE=1 to re-freeze.
+#
+# THE FRAME-DATA RULE (maintainer, 2026-08-31, STATE 14z-126): section 4's table
+# is per-move ROM-derived data, so its VALUES are written above the working tree
+# (../charpages/framedata/vanilla_hit_damage.tsv, FRAMEDATA_OUT overrides) and only
+# their SHA-256 is frozen in tests/expected/vanilla_hit_damage.sha256 — currency
+# locked, numbers unpublished. Sections 1-3's slot map is chain ids, not frame
+# data, and stays in the tree.
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
@@ -77,7 +84,10 @@ wait
 ok "$n legs ran"
 
 : > "$W/got.txt"
-head -6 "$EXP" > "$W/hdr.txt" 2>/dev/null || : > "$W/hdr.txt"
+# the WHOLE leading comment block, not a fixed count: `head -6` here dropped the
+# 7th header line (the column legend) on every FREEZE=1 run — the compare strips
+# `#` lines, so it was silent. Found and fixed 14z-126.
+awk '/^#/{print; next} {exit}' "$EXP" > "$W/hdr.txt" 2>/dev/null || : > "$W/hdr.txt"
 cat "$W/hdr.txt" > "$W/got.txt"
 for pair in $ALL; do
     tab="${pair%%:*}"; cid="${pair##*:}"
@@ -104,7 +114,8 @@ if cmp -s "$W/exp.txt" "$W/g.txt"; then ok "the measured slot map equals $EXP ($
 else nope "the slot map moved"; diff "$W/exp.txt" "$W/g.txt" | head -20; fi
 
 echo "== 4. the HIT set: what the moves actually do to a victim"
-HEXP=tests/expected/vanilla_hit_damage.tsv
+HEXP=tests/expected/vanilla_hit_damage.sha256   # the HASH of the measured body — the values stay out of the tree
+FRAMEDATA_OUT="${FRAMEDATA_OUT:-$REPO/../charpages/framedata}"   # where the measured table is written (above the working tree)
 n=0
 for pair in $ALL; do
     tab="${pair%%:*}"; cid="${pair##*:}"
@@ -119,23 +130,37 @@ for pair in $ALL; do
     n=$((n + 1)); [ $((n % 8)) -eq 0 ] && wait
 done
 wait
-head -8 "$HEXP" > "$W/hgot.txt"
+cat > "$W/hgot.txt" <<'HDR'
+# vanilla_hit_damage.tsv (OUT OF TREE, ../charpages/framedata/) — what each vanilla character's standing
+# normals ACTUALLY DO to a victim, measured on vsavj (14z-125b).
+# tools/vanilla_join_rig.py 'hit' set: P1 walks in, performs the normal on an idle
+# Victor whose HP is re-pinned before each event, and every DROP in P2's +0x50 is
+# read back. So the hit COUNT is the engine's own, not a reading of the data.
+# It is what confirms the +0x10 dedup rule: our record-run count matches this on
+# 75 of 78 connecting events, while summing every record (as the community
+# workbook does) would not.
+# tab<TAB>button<TAB>hits<TAB>total<TAB>per-hit
+HDR
 for pair in $ALL; do
     tab="${pair%%:*}"; cid="${pair##*:}"
     [ -n "$WANT" ] && { case " $WANT " in *" $tab "*) ;; *) continue;; esac; }
     python3 tools/vanilla_join_rig.py analyse "$W/${tab}_hit/t.txt" "$W/${tab}_hit.json" "$IMG" "$cid" \
         --tab "$tab" --damage | awk -F'\t' '{print $1"\t"$3"\t"$4"\t"$5"\t"$6}' >> "$W/hgot.txt" || nope "damage $tab"
 done
-if [ "${FREEZE:-0}" = 1 ] && [ -z "$WANT" ]; then cp "$W/hgot.txt" "$HEXP"; echo "  FROZE $HEXP"; fi
-if [ -n "$WANT" ]; then
-    grep -v '^#' "$HEXP" > "$W/hexp_all.txt"
-    for tab in $WANT; do grep "^$tab	" "$W/hexp_all.txt"; done > "$W/hexp.txt"
-else
-    grep -v '^#' "$HEXP" > "$W/hexp.txt"
-fi
+# THE FRAME-DATA RULE (maintainer, 2026-08-31, STATE 14z-126): per-move ROM-derived
+# numbers stay out of the public tree. The measured table is written ABOVE the
+# working tree and only its SHA-256 is frozen here — currency is still locked, the
+# values are not published. A CHARS subset prints its rows and does not judge.
 grep -v '^#' "$W/hgot.txt" > "$W/hg.txt"
-if cmp -s "$W/hexp.txt" "$W/hg.txt"; then ok "the dealt damage and hit counts equal $HEXP ($(grep -c . "$W/hg.txt") rows)"
-else nope "the hit measurement moved"; diff "$W/hexp.txt" "$W/hg.txt" | head -12; fi
+HSHA="$(python3 -c 'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1],"rb").read()).hexdigest())' "$W/hg.txt")"
+if [ -n "$WANT" ]; then
+    echo "  (CHARS subset — section 4 measured, not judged:)"; sed 's/^/    /' "$W/hg.txt"
+else
+    if mkdir -p "$FRAMEDATA_OUT" 2>/dev/null; then cp "$W/hgot.txt" "$FRAMEDATA_OUT/vanilla_hit_damage.tsv"; echo "  wrote $FRAMEDATA_OUT/vanilla_hit_damage.tsv ($(grep -c . "$W/hg.txt") rows, out of tree)"; fi
+    if [ "${FREEZE:-0}" = 1 ]; then printf '%s  vanilla_hit_damage.tsv body, %s rows (the values live out of tree; tests/test_vanilla_frame_join.sh section 4)\n' "$HSHA" "$(grep -c . "$W/hg.txt")" > "$HEXP"; echo "  FROZE $HEXP"; fi
+    if [ "$(cut -c1-64 "$HEXP" 2>/dev/null)" = "$HSHA" ]; then ok "the dealt damage and hit counts hash to the frozen $HEXP ($(grep -c . "$W/hg.txt") rows)"
+    else nope "the hit measurement moved (sha256 $HSHA != frozen) — review $FRAMEDATA_OUT/vanilla_hit_damage.tsv, then FREEZE=1"; fi
+fi
 
 echo "== 5. must-fire control"
 python3 - "$W/exp.txt" "$W/ctl.txt" <<'PY'
