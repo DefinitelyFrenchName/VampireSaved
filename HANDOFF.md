@@ -639,20 +639,38 @@ STATE.md / `STATE_HISTORY.md`. This paragraph is the pointer; the chronology
 does not come back here (`tests/test_docshape.sh` now bars a bold paragraph
 that leads with a session token or a `Previous batch` announcement, which is
 how these accreted unseen for eight freezes).
-**ONE GAP, MEASURED at the cut and recorded rather than papered over
-(14z-126b):** the 14z-91 LEGACY-REGRESSION batch — `donovan-m7`
-(`c90b60c3`) / `huitzil-m15` (`4531af1e`) / `pyron-m9` (`fac4a777`), the
-builds that superseded the BURNED m6/m14/m8 — has **no registry row in the
-table below, no narrative in the history, and NO `freeze/*` TAG**: the tag
-list holds 75 tags and skips exactly these three (donovan m6 -> m8, huitzil
-m14 -> m16, pyron m8 -> m10, verified with `git tag -l 'freeze/*'`). It is
-the one freeze [VSP-94] did not get, and the deleted paragraph was its most
-visible carrier. What DOES hold it: `tests/expected/registry.tsv` rows 79-81
-(the three fingerprints, freeze-time rows),
-`docs/project/patch_notes.md` "14z-91 — THE LEGACY REGRESSION FIX
-(m5/m13/m7 -> m7/m15/m9): byte detail", and STATE_HISTORY 14z-91. Tagging
-them retroactively needs the freeze commit named, so it is the maintainer's
-call, not a cleanup.
+**THE ONE GAP THE CUT FOUND — MEASURED, THEN CLOSED (14z-126b,
+maintainer's word "do it"):** the 14z-91 LEGACY-REGRESSION batch —
+`donovan-m7` (`c90b60c3`) / `huitzil-m15` (`4531af1e`) / `pyron-m9`
+(`fac4a777`), the builds that superseded the BURNED m6/m14/m8 — had a
+`tests/expected/registry.tsv` row (79-81) but **no `freeze/*` tag and no row
+in the table below**, breaking the invariant registry.tsv's own header
+states ("Every row also has an annotated git tag `freeze/<expectation-set>`
+at the commit that froze it"). CAUSE: not recoverable from the log — the
+batch was registered at `271838e` (14z-91 (8), the corpus re-freeze) and the
+tagging step of the ritual was simply skipped. What makes it an OVERSIGHT
+rather than a policy: the burned predecessors it replaced ARE tagged, and
+`freeze/huitzil-m16`'s own message names huitzil-m15 as its base.
+**FIXED:** the three annotated tags now sit at `271838e`, placed by
+registry.tsv's rule and by the placement convention MEASURED across the
+PRE-EXISTING tagged registry rows (these three excluded, so the evidence is
+not this edit's own) — 29 of 39 sit exactly at their registry-row commit, and
+all ten exceptions are 14z-110-or-later freezes (donovan m12+, huitzil m21+,
+pyron m15+) whose tag sits a few commits later at the session's freeze; below
+that line the rule is uniform, so `271838e` is what its contemporaries did. Nothing turns on the choice anyway, because the only manifests that move
+between that commit and the session close are `shared_writes.toml` and
+`dispatch_census.toml`, audit expectations the builder chain never reads.
+Each tag message says it was created RETROACTIVELY, so it is never read as
+contemporaneous evidence. **TWO OF THE THREE ARE MEASURED, not asserted:**
+`build/hui41/rompath` and `build/pyron26/rompath` survived the build-dir
+pruning, and `tools/build_fingerprint.py <dir> --set vsavjw --sha-only`
+returns `4531af1e…` and `fac4a777…` — their registry fingerprints exactly
+(2026-09-01, no rebuild). `donovan-m7` could NOT be: `build/don_m7` kept only
+`extract/ gfx/ patch/`, its rompath pruned, so no packed image is left to
+fingerprint; its tag says so and names the rebuild as the only route.
+Every registry row that is a build now has its tag; the only untagged rows
+left are the documented non-builds (the `-stock` / `-stage4` battery legs and
+`vsavj`).
 
 **THE HARDENING PROGRAM (14z-100, maintainer-directed) — the
 crash-candidate map of the merged build lives in
@@ -1209,6 +1227,7 @@ entry and STATE close. Newest first; the top row is the CURRENT freeze.**
 | THE #101 KERNEL VOICE-TABLE PORT | `d038553d` / `bfd819a0` / `738bcfc2` / merged program fingerprint `ac3d06184f8c248717ba754275d5ab0147c69f07` | `build/don_m8`, `build/hui44`, `build/pyron28` … · tags `freeze/donovan-m8`, `freeze/huitzil-m17`, `freeze/pyron-m11`, `freeze/merged-m3` | donovan-m8 / huitzil-m17 / pyron-m11 / merged-m3 (FROZEN 14z-96, maintainer-ruled option (a) + freeze 2026-08-18). Th… | history §Build registry narratives; `docs/project/patch_notes.md`; STATE close |
 | THE #91+#92 FIX BATCH | `da734d49` / `e29cac23` / merged program fingerprint `081e2e53c5debff6d2d5bb4d4376d2a1ef6be842` | `build/hui43`, `build/pyron27`, `build/m3b_merged9` · tags `freeze/huitzil-m16`, `freeze/pyron-m10`, `freeze/merged-m2` | huitzil-m16 / pyron-m10 / merged-m2 (FROZEN 14z-94). The first builds on which a planted tripwire is NOT reachable in… | history §Build registry narratives; `docs/project/patch_notes.md`; STATE close |
 | merged-m1 | program fingerprint `952fc73138b93e2024516872b95ddc615694d900` | `build/m3b_merged8`, `build/merged1` · tags `freeze/merged-m1` | THE FIRST FROZEN MERGED BUILD (14z-92, maintainer-decided). All 18 characters, one image. | history §Build registry narratives; `docs/project/patch_notes.md`; STATE close |
+| THE 14z-91 LEGACY-REGRESSION FIX | `c90b60c3` / `4531af1e` / `fac4a777` | `build/don_m7`, `build/hui41`, `build/pyron26` · tags `freeze/donovan-m7`, `freeze/huitzil-m15`, `freeze/pyron-m9` (created RETROACTIVELY 14z-126b at `271838e` — the row existed in `registry.tsv` from 14z-91, the tags did not) | donovan-m7 / huitzil-m15 / pyron-m9 (supersede the BURNED m6/m14/m8, withdrawn 14z-88). (A) the two `fixture_row0f_override` site_thunks DELETED, (B) the obj_hook dispatch sites left VANILLA — each 0x2C-byte object-pool walker relocated with its union table at copy+0x2C and only the 23 caller OPERANDS rewritten, (C, huitzil only) the beam_list_type6 `RAM:$FF010C` counter removed. Cleared all six `.pending` legacy replays; ~30 specs per set became STRICTER | `docs/project/patch_notes.md` "14z-91"; STATE_HISTORY 14z-91; `tests/expected/registry.tsv` 79-81 |
 | ~~donovan-m6 / huitzil-m14 / pyron-m8~~ | `57754602` / `66feb5e8` / `fab92eb7` | `build/don_m5`, `build/hui40`, `build/pyron25` · tags `freeze/donovan-m6`, `freeze/huitzil-m14`, `freeze/pyron-m8`, `freeze/donovan-m5` | THE 14z-87b BATCH (beep fix + medallion fix) WITHDRAWN 14z-88 (maintainer-decided revert): the medallion row move cos… | history §Build registry narratives; `docs/project/patch_notes.md`; STATE close |
 | donovan-m5 / huitzil-m13 / pyron-m7 | `3c599fb6` / `2629561c` / `94ce9a48` | `build/don_m5`, `build/hui40`, `build/pyron25` · tags `freeze/donovan-m5`, `freeze/huitzil-m13`, `freeze/pyron-m7` | THE VOICE-CLASS BORROW FIX (14z-87, maintainer-decided b+c) — CURRENT again since the 14z-88 revert (tags freeze/{don… | history §Build registry narratives; `docs/project/patch_notes.md`; STATE close |
 | donovan-m4 / huitzil-m12 / pyron-m6 | `84f49aaa` / `e1f598d6` / `4c6e3fb6` | `build/don_m4`, `build/hui39`, `build/pyron24` · tags `freeze/donovan-m4`, `freeze/huitzil-m12`, `freeze/pyron-m6` | THE M5 VOICE BATCH (14z-86) — superseded by the 14z-87 row above (tags freeze/{donovan-m4,huitzil-m12,pyron-m6} are t… | history §Build registry narratives; `docs/project/patch_notes.md`; STATE close |
