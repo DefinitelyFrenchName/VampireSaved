@@ -52,7 +52,7 @@ COLUMNS = [
     ("recovery",  ["recovery"],                   "frames after the last active frame"),
     ("white",     ["white damage"],               "the attack record's +9 white power"),
     ("gauge_hit", ["guage hit", "gauge hit"],     "the attack record's +0x14 attacker meter gain"),
-    ("red",       ["red damage"],                 "the attack record's +8 real power"),
+    ("red",       ["red damage"],                 "the attack record's +8 real power PLUS its +9 white — the move's total"),
 ]
 
 # `gauge hit` is not our quantity: the workbook's on-hit gauge INCLUDES the meter the
@@ -63,15 +63,19 @@ COLUMNS = [
 # SUBTRACTS the whiff column, which is a definitional correction, not a fudge.
 GAUGE_WHIFF = ["gauge whiff", "guage whiff"]
 
-# `red damage` is a DIFFERENT QUANTITY and is reported, never classified: the record's
-# +8 is the attack's raw power BEFORE the damage pipeline ([VSE-40]: attack class x
-# the attacker stat table, the damage-level config, a random spice pass, floor 1 /
-# cap 0x7F, the defender table, combo tables, low-HP rally, a 2D final map), while the
-# workbook lists damage DEALT. Proven not a function of ours alone on the joined
-# corpus: our +8 = 3 appears against sheet values {5, 6, 7, 8}, +8 = 4 against
-# {6, 7, 8, 9}. Deriving dealt damage through the scaler is a phase-2 item.
-QUANTITY_DIFFERS = {"red": ("the record's raw +8 power vs damage DEALT after the [VSE-40] scaler chain; "
-                            "proven not a function of ours alone (+8=3 -> sheet {5,6,7,8})")}
+# `red damage` is the record's +8 PLUS its +9 — the move's TOTAL damage, not the red
+# half alone. Comparing it against +8 by itself made the column look UNCOMPARABLE and
+# invited a wrong explanation: a first pass concluded "different quantity, ours is raw
+# power and theirs is damage DEALT through the [VSE-40] scaler", on the evidence that
+# +8 alone does not determine the sheet value (+8 = 3 appears against {5,6,7,8}). True,
+# and beside the point — +9 is the rest of the sum. MEASURED (14z-125b, the hit rig):
+# on a live connect the DEALT drops are neither figure (P2's +0x50 fell 9 where the
+# record reads 11, its +0x52 fell 14), so the workbook is quoting ROM RECORD values
+# exactly as we do, not play measurements — which is also why its `white damage`
+# column matches our +9 to the byte. 266 of 281 joined moves agree on the sum; the
+# residue is a HIT-COUNT question, not a damage one.
+RED_IS_SUM = True
+QUANTITY_DIFFERS = {}
 
 NUM = re.compile(r"^-?\d+(\.\d+)?$")
 
@@ -211,7 +215,14 @@ def compare(vanilla, sheet_path):
                         continue
                 else:
                     d = o.get("damage_per_hit") or {}
-                    ov = sum(d[key]) if d.get(key) else (o.get("damage") or {}).get(key)
+                    if key == "red" and RED_IS_SUM:      # the sheet's red = +8 plus +9
+                        if d.get("red"):
+                            ov = sum(d["red"]) + sum(d.get("white") or [])
+                        else:
+                            dm = o.get("damage") or {}
+                            ov = None if dm.get("red") is None else dm["red"] + dm["white"]
+                    else:
+                        ov = sum(d[key]) if d.get(key) else (o.get("damage") or {}).get(key)
                     sv = parse_total(cell)
                     if key == "gauge_hit" and sv is not None:
                         whiff = next((parse_total(r[h]) for h in GAUGE_WHIFF if r.get(h) not in (None, "")), 0)
@@ -346,6 +357,66 @@ def render_md(vanilla, cmp_):
             cells.append(f"{v['verdict']}" + (f" ({v['detail']})" if v["verdict"] in ("CONSTANT OFFSET", "CONSTANT RATIO") else "") + f" · n={v['n']}")
         A(f"| **{tab}** {c['name']} `{c['id']}` | {c['joined']} | " + " | ".join(cells) + " |")
     A("")
+    A("## The arbitration — what the emulator said about the residue")
+    A("")
+    A("The rule obliges us to re-measure OURS before concluding anything about the")
+    A("workbook. Three rigs were run on vanilla vsavj (`tools/vanilla_join_rig.py`,")
+    A("gate `tests/test_vanilla_frame_join.sh`), and they split the residue into three")
+    A("families, two of which are now settled.")
+    A("")
+    A("### 1. The duration bytes are the engine's — CONFIRMED, and the instrument's limit is measured")
+    A("")
+    A("Tracing the engine's own node countdown `+0x20` beside the node pointer: the")
+    A("first value observed on a node equals the duration byte we read on **334 of 380**")
+    A("nodes. So the derivation's INPUT is what the engine loads, measured directly.")
+    A("")
+    A("But the same trace shows **16% of sampled frames advance that counter by two**")
+    A("ticks, not one — `field_trace` samples at `frame_done`, and the engine does not")
+    A("run one tick per video frame. **A frame-rate trace therefore cannot arbitrate a")
+    A("ONE-frame convention difference**: its resolution is the size of the thing being")
+    A("measured. That is why the `startup +1` and `recovery +2` offsets stay *named")
+    A("conventions* rather than being declared right or wrong here; settling them needs")
+    A("a tick-accurate instrument (a `-debug` trace or a Lua hook on the tick), which")
+    A("this session did not build.")
+    A("")
+    A("### 2. The damage residue is the WORKBOOK double-counting — SETTLED")
+    A("")
+    A("Every move whose `white` and `red` read about HALF the workbook's has the same")
+    A("shape: the chain carries **two or more attack records that share hit id 1**, the")
+    A("engine's own multi-hit dedup key (record `+0x10`). Records sharing a hit id are")
+    A("alternative boxes for ONE hit — the victim's recent-hit ring refuses the second")
+    A("([VSE-43]) — so only one of them can land. We take one; **the workbook sums them**:")
+    A("")
+    A("| move | records (id, red/white) | workbook white | ours |")
+    A("|---|---|---|---|")
+    A("| MO 5HK | 17 (id 1, 14/7), 99 (id 1, 12/7) | 14 = 7+7 | 7 |")
+    A("| QB 2HK | 13 (id 1, 11/9), 14 (id 1, 9/7) | 16 = 9+7 | 9 |")
+    A("| SA 5HP | 7 (id 1, 15/9), 8 (id 1, 12/8) | 17 = 9+8 | 9 |")
+    A("| VI 2HP | 15 (id 1, 15/8), 16 (id 1, 14/8) | 16 = 8+8 | 8 |")
+    A("| JE 5HK | 8, 9, 56 — all id 1 | 13 = 7+6 | 7 |")
+    A("")
+    A("**The hit rig confirms our reading and not theirs.** P1 performs each normal on a")
+    A("victim whose HP is re-pinned before every event, and each DROP in P2's `+0x50` is")
+    A("counted: our dedup-aware run count matches the engine's hit count on **75 of 78**")
+    A("connecting events (`tests/expected/vanilla_hit_damage.tsv`). Summing every record,")
+    A("as the workbook does, would not. So on this family ours is right and the")
+    A("workbook is wrong, and the mechanism says why.")
+    A("")
+    A("The same rig also showed the workbook is a **ROM-derived** source, not a")
+    A("play-measured one: on a live connect the DEALT drops are neither figure (P2's")
+    A("`+0x50` fell 9 where the record reads 11, its `+0x52` fell 14), yet the workbook")
+    A("quotes the record values to the byte. That is why its `white damage` matches our")
+    A("`+9` exactly, and it is the best evidence available about a method the page")
+    A("itself never states.")
+    A("")
+    A("### 3. Jedah's crouching recovery — OPEN")
+    A("")
+    A("All six of Jedah's crouching normals (and Lilith's `2MK`) read `+3` where every")
+    A("other character reads `+2`. Their chains are structurally ordinary — `hold`-ended,")
+    A("nothing distinctive in node count or attack position — so nothing in our data")
+    A("explains it, and by finding 1 the available instrument cannot resolve a one-frame")
+    A("question. Left open rather than guessed.")
+    A("")
     A("## Every INCONSISTENT column, move by move")
     A("")
     any_bad = False
@@ -367,14 +438,16 @@ def render_md(vanilla, cmp_):
         A("")
     A("## What is NOT known")
     A("")
-    A("- **The residual outliers are NOT arbitrated.** They are listed above with both")
-    A("  numbers; none has an in-emulator measurement attached yet. Under the rule, OURS")
-    A("  is re-measured first — `tests/lua/field_trace.lua` on a vanilla replay, per-frame")
-    A("  hitbox state — before anything is concluded about the workbook.")
-    A("- **`red damage` is not compared at all** (see above): the record's `+8` is the raw")
-    A("  power before the [VSE-40] scaler chain, the workbook lists damage DEALT. Deriving")
-    A("  dealt damage through the scaler and re-comparing is the obvious next step and is")
-    A("  not done.")
+    A("- **The startup `+1` and recovery `+2` offsets are NAMED, not adjudicated.** The")
+    A("  instrument available samples at video-frame rate and 16% of its frames carry two")
+    A("  engine ticks, so it cannot resolve a one-frame question. A tick-accurate")
+    A("  instrument would settle whether either side is counting wrongly; neither is")
+    A("  assumed to be.")
+    A("- **Jedah's crouching recovery (+3, not +2) is unexplained** — see the arbitration")
+    A("  section. Lilith's `2MK` behaves the same way.")
+    A("- **The aerial startup/active outliers are untouched** (BI `J.HP`/`J.LP`, BU `J.MP`,")
+    A("  VI `J.HP`, FE `J.HK`/`J.LK`, SA `J.MP`). A jumping normal's chain is entered from")
+    A("  the jump, and no rig here separated the two.")
     A("- **Specials, supers, EX/ES moves, throws, pursuits and the `6`-prefixed command")
     A("  normals are not joined.** Each needs its own measured naming rig on vsavj, the way")
     A("  `tools/name_moves.py` did for the tenants. That is the bulk of the workbook's 730")

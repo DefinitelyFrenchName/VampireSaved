@@ -40,7 +40,7 @@ the measurement is correctly done or not."*
 | `recovery` | `recovery` | frames after the last active frame |
 | `white damage` | `white` | the attack record's +9 white power |
 | `guage hit` | `gauge_hit` | the attack record's +0x14 attacker meter gain |
-| `red damage` | `red` | the attack record's +8 real power |
+| `red damage` | `red` | the attack record's +8 real power PLUS its +9 white — the move's total |
 
 Not compared, because nothing in the tree derives them yet: `on hit`,
 `renda on hit`, `on block`, `renda on block`, `throw tech`, `cancel`, `guard`,
@@ -95,21 +95,81 @@ compare, under one stated convention per column. The residue is the worklist bel
 
 | character | joined | startup | active | recovery | white | gauge_hit | red |
 |---|---|---|---|---|---|---|---|
-| **AN** Anakaris `0x06` | 15 | CONSTANT OFFSET (sheet = ours +1 on all 15) · n=15 | EXACT · n=15 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | INCONSISTENT · n=15 | EXACT · n=15 | UNCOMPARABLE · n=15 |
-| **AU** Aulbath `0x09` | 19 | INCONSISTENT · n=19 | INCONSISTENT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=19 | EXACT · n=19 | UNCOMPARABLE · n=19 |
-| **BI** Bishamon `0x08` | 18 | INCONSISTENT · n=17 | INCONSISTENT · n=17 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | INCONSISTENT · n=17 | INCONSISTENT · n=17 | UNCOMPARABLE · n=17 |
-| **BU** Bulleta `0x00` | 18 | INCONSISTENT · n=18 | INCONSISTENT · n=18 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | EXACT · n=18 | EXACT · n=18 | UNCOMPARABLE · n=18 |
-| **DE** Demitri `0x01` | 21 | CONSTANT OFFSET (sheet = ours +1 on all 21) · n=21 | EXACT · n=21 | CONSTANT OFFSET (sheet = ours +2 on all 15) · n=15 | EXACT · n=21 | EXACT · n=21 | UNCOMPARABLE · n=21 |
-| **FE** Felicia `0x07` | 19 | CONSTANT OFFSET (sheet = ours +1 on all 19) · n=19 | INCONSISTENT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | EXACT · n=19 | INCONSISTENT · n=19 | UNCOMPARABLE · n=19 |
-| **GA** Gallon `0x02` | 18 | CONSTANT OFFSET (sheet = ours +1 on all 18) · n=18 | EXACT · n=18 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=18 | EXACT · n=18 | UNCOMPARABLE · n=18 |
-| **JE** Jedah `0x0f` | 18 | CONSTANT OFFSET (sheet = ours +1 on all 18) · n=18 | EXACT · n=18 | INCONSISTENT · n=12 | INCONSISTENT · n=18 | EXACT · n=18 | UNCOMPARABLE · n=18 |
-| **LE** Lei-Lei `0x0d` | 19 | CONSTANT OFFSET (sheet = ours +1 on all 19) · n=19 | INCONSISTENT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | INCONSISTENT · n=19 | INCONSISTENT · n=19 | UNCOMPARABLE · n=19 |
-| **LI** Lilith `0x0e` | 21 | CONSTANT OFFSET (sheet = ours +1 on all 21) · n=21 | EXACT · n=21 | INCONSISTENT · n=16 | INCONSISTENT · n=21 | EXACT · n=21 | UNCOMPARABLE · n=21 |
-| **MO** Morrigan `0x05` | 21 | CONSTANT OFFSET (sheet = ours +1 on all 21) · n=21 | EXACT · n=21 | CONSTANT OFFSET (sheet = ours +2 on all 15) · n=15 | INCONSISTENT · n=21 | EXACT · n=21 | UNCOMPARABLE · n=21 |
-| **QB** Q-Bee `0x0c` | 15 | CONSTANT OFFSET (sheet = ours +1 on all 15) · n=15 | EXACT · n=15 | CONSTANT OFFSET (sheet = ours +2 on all 10) · n=10 | INCONSISTENT · n=15 | EXACT · n=15 | UNCOMPARABLE · n=15 |
-| **SA** Sasquatch `0x0a` | 19 | INCONSISTENT · n=19 | EXACT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | INCONSISTENT · n=19 | INCONSISTENT · n=19 | UNCOMPARABLE · n=19 |
-| **VI** Victor `0x03` | 23 | INCONSISTENT · n=23 | INCONSISTENT · n=23 | CONSTANT OFFSET (sheet = ours +2 on all 17) · n=17 | INCONSISTENT · n=23 | EXACT · n=23 | UNCOMPARABLE · n=23 |
-| **ZA** Zabel `0x04` | 18 | CONSTANT OFFSET (sheet = ours +1 on all 18) · n=18 | EXACT · n=18 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=18 | EXACT · n=18 | UNCOMPARABLE · n=18 |
+| **AN** Anakaris `0x06` | 15 | CONSTANT OFFSET (sheet = ours +1 on all 15) · n=15 | EXACT · n=15 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | INCONSISTENT · n=15 | EXACT · n=15 | INCONSISTENT · n=15 |
+| **AU** Aulbath `0x09` | 19 | INCONSISTENT · n=19 | INCONSISTENT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=19 | EXACT · n=19 | EXACT · n=19 |
+| **BI** Bishamon `0x08` | 18 | INCONSISTENT · n=17 | INCONSISTENT · n=17 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | INCONSISTENT · n=17 | INCONSISTENT · n=17 | INCONSISTENT · n=17 |
+| **BU** Bulleta `0x00` | 18 | INCONSISTENT · n=18 | INCONSISTENT · n=18 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | EXACT · n=18 | EXACT · n=18 | INCONSISTENT · n=18 |
+| **DE** Demitri `0x01` | 21 | CONSTANT OFFSET (sheet = ours +1 on all 21) · n=21 | EXACT · n=21 | CONSTANT OFFSET (sheet = ours +2 on all 15) · n=15 | EXACT · n=21 | EXACT · n=21 | EXACT · n=21 |
+| **FE** Felicia `0x07` | 19 | CONSTANT OFFSET (sheet = ours +1 on all 19) · n=19 | INCONSISTENT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | EXACT · n=19 | INCONSISTENT · n=19 | EXACT · n=19 |
+| **GA** Gallon `0x02` | 18 | CONSTANT OFFSET (sheet = ours +1 on all 18) · n=18 | EXACT · n=18 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=18 | EXACT · n=18 | EXACT · n=18 |
+| **JE** Jedah `0x0f` | 18 | CONSTANT OFFSET (sheet = ours +1 on all 18) · n=18 | EXACT · n=18 | INCONSISTENT · n=12 | INCONSISTENT · n=18 | EXACT · n=18 | INCONSISTENT · n=18 |
+| **LE** Lei-Lei `0x0d` | 19 | CONSTANT OFFSET (sheet = ours +1 on all 19) · n=19 | INCONSISTENT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | INCONSISTENT · n=19 | INCONSISTENT · n=19 | INCONSISTENT · n=19 |
+| **LI** Lilith `0x0e` | 21 | CONSTANT OFFSET (sheet = ours +1 on all 21) · n=21 | EXACT · n=21 | INCONSISTENT · n=16 | INCONSISTENT · n=21 | EXACT · n=21 | INCONSISTENT · n=21 |
+| **MO** Morrigan `0x05` | 21 | CONSTANT OFFSET (sheet = ours +1 on all 21) · n=21 | EXACT · n=21 | CONSTANT OFFSET (sheet = ours +2 on all 15) · n=15 | INCONSISTENT · n=21 | EXACT · n=21 | INCONSISTENT · n=21 |
+| **QB** Q-Bee `0x0c` | 15 | CONSTANT OFFSET (sheet = ours +1 on all 15) · n=15 | EXACT · n=15 | CONSTANT OFFSET (sheet = ours +2 on all 10) · n=10 | INCONSISTENT · n=15 | EXACT · n=15 | INCONSISTENT · n=15 |
+| **SA** Sasquatch `0x0a` | 19 | INCONSISTENT · n=19 | EXACT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | INCONSISTENT · n=19 | INCONSISTENT · n=19 | INCONSISTENT · n=19 |
+| **VI** Victor `0x03` | 23 | INCONSISTENT · n=23 | INCONSISTENT · n=23 | CONSTANT OFFSET (sheet = ours +2 on all 17) · n=17 | INCONSISTENT · n=23 | EXACT · n=23 | INCONSISTENT · n=23 |
+| **ZA** Zabel `0x04` | 18 | CONSTANT OFFSET (sheet = ours +1 on all 18) · n=18 | EXACT · n=18 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=18 | EXACT · n=18 | EXACT · n=18 |
+
+## The arbitration — what the emulator said about the residue
+
+The rule obliges us to re-measure OURS before concluding anything about the
+workbook. Three rigs were run on vanilla vsavj (`tools/vanilla_join_rig.py`,
+gate `tests/test_vanilla_frame_join.sh`), and they split the residue into three
+families, two of which are now settled.
+
+### 1. The duration bytes are the engine's — CONFIRMED, and the instrument's limit is measured
+
+Tracing the engine's own node countdown `+0x20` beside the node pointer: the
+first value observed on a node equals the duration byte we read on **334 of 380**
+nodes. So the derivation's INPUT is what the engine loads, measured directly.
+
+But the same trace shows **16% of sampled frames advance that counter by two**
+ticks, not one — `field_trace` samples at `frame_done`, and the engine does not
+run one tick per video frame. **A frame-rate trace therefore cannot arbitrate a
+ONE-frame convention difference**: its resolution is the size of the thing being
+measured. That is why the `startup +1` and `recovery +2` offsets stay *named
+conventions* rather than being declared right or wrong here; settling them needs
+a tick-accurate instrument (a `-debug` trace or a Lua hook on the tick), which
+this session did not build.
+
+### 2. The damage residue is the WORKBOOK double-counting — SETTLED
+
+Every move whose `white` and `red` read about HALF the workbook's has the same
+shape: the chain carries **two or more attack records that share hit id 1**, the
+engine's own multi-hit dedup key (record `+0x10`). Records sharing a hit id are
+alternative boxes for ONE hit — the victim's recent-hit ring refuses the second
+([VSE-43]) — so only one of them can land. We take one; **the workbook sums them**:
+
+| move | records (id, red/white) | workbook white | ours |
+|---|---|---|---|
+| MO 5HK | 17 (id 1, 14/7), 99 (id 1, 12/7) | 14 = 7+7 | 7 |
+| QB 2HK | 13 (id 1, 11/9), 14 (id 1, 9/7) | 16 = 9+7 | 9 |
+| SA 5HP | 7 (id 1, 15/9), 8 (id 1, 12/8) | 17 = 9+8 | 9 |
+| VI 2HP | 15 (id 1, 15/8), 16 (id 1, 14/8) | 16 = 8+8 | 8 |
+| JE 5HK | 8, 9, 56 — all id 1 | 13 = 7+6 | 7 |
+
+**The hit rig confirms our reading and not theirs.** P1 performs each normal on a
+victim whose HP is re-pinned before every event, and each DROP in P2's `+0x50` is
+counted: our dedup-aware run count matches the engine's hit count on **75 of 78**
+connecting events (`tests/expected/vanilla_hit_damage.tsv`). Summing every record,
+as the workbook does, would not. So on this family ours is right and the
+workbook is wrong, and the mechanism says why.
+
+The same rig also showed the workbook is a **ROM-derived** source, not a
+play-measured one: on a live connect the DEALT drops are neither figure (P2's
+`+0x50` fell 9 where the record reads 11, its `+0x52` fell 14), yet the workbook
+quotes the record values to the byte. That is why its `white damage` matches our
+`+9` exactly, and it is the best evidence available about a method the page
+itself never states.
+
+### 3. Jedah's crouching recovery — OPEN
+
+All six of Jedah's crouching normals (and Lilith's `2MK`) read `+3` where every
+other character reads `+2`. Their chains are structurally ordinary — `hold`-ended,
+nothing distinctive in node count or attack position — so nothing in our data
+explains it, and by finding 1 the available instrument cannot resolve a one-frame
+question. Left open rather than guessed.
 
 ## Every INCONSISTENT column, move by move
 
@@ -132,6 +192,26 @@ compare, under one stated convention per column. The residue is the worklist bel
 | J.HP | 10 | 10 | +0 |
 | J.LP | 4 | 4 | +0 |
 | J.MP | 9 | 9 | +0 |
+
+### AN Anakaris — `red` — most common delta +0 on 14/15; spread +0..+15
+
+| move | sheet | ours | delta |
+|---|---|---|---|
+| 2HK | 19 | 19 | +0 |
+| 2HP | 20 | 20 | +0 |
+| 2LK | 9 | 9 | +0 |
+| 2LP | 9 | 9 | +0 |
+| 2MK | 16 | 16 | +0 |
+| 2MP | 33 | 18 | +15 |
+| 5HK | 25 | 25 | +0 |
+| 5HP | 22 | 22 | +0 |
+| 5LK | 9 | 9 | +0 |
+| 5LP | 9 | 9 | +0 |
+| 5MK | 19 | 19 | +0 |
+| 5MP | 18 | 18 | +0 |
+| J.HP | 24 | 24 | +0 |
+| J.LP | 10 | 10 | +0 |
+| J.MP | 19 | 19 | +0 |
 
 ### AU Aulbath — `startup` — most common delta +1 on 18/19; spread +1..+2
 
@@ -269,6 +349,28 @@ compare, under one stated convention per column. The residue is the worklist bel
 | J.LP | 6 | 12 | -6 |
 | J.MK | 12 | 12 | +0 |
 
+### BI Bishamon — `red` — most common delta +0 on 15/17; spread -18..+0
+
+| move | sheet | ours | delta |
+|---|---|---|---|
+| 2HK | 34 | 34 | +0 |
+| 2HP | 19 | 19 | +0 |
+| 2LK | 6 | 6 | +0 |
+| 2LP | 6 | 6 | +0 |
+| 2MK | 15 | 15 | +0 |
+| 2MP | 15 | 15 | +0 |
+| 5HK | 19 | 19 | +0 |
+| 5HP | 22 | 22 | +0 |
+| 5LK | 8 | 8 | +0 |
+| 5LP | 8 | 8 | +0 |
+| 5MK | 15 | 15 | +0 |
+| 5MP | 17 | 17 | +0 |
+| J.HK | 20 | 20 | +0 |
+| J.HP | 23 | 41 | -18 |
+| J.LK | 8 | 8 | +0 |
+| J.LP | 8 | 15 | -7 |
+| J.MK | 16 | 16 | +0 |
+
 ### BU Bulleta — `startup` — most common delta +1 on 17/18; spread -1..+1
 
 | move | sheet | ours | delta |
@@ -314,6 +416,29 @@ compare, under one stated convention per column. The residue is the worklist bel
 | J.LP | 6 | 6 | +0 |
 | J.MK | 7 | 6 | +1 |
 | J.MP | 4 | 3 | +1 |
+
+### BU Bulleta — `red` — most common delta +0 on 16/18; spread -1..+0
+
+| move | sheet | ours | delta |
+|---|---|---|---|
+| 2HK | 17 | 17 | +0 |
+| 2HP | 49 | 49 | +0 |
+| 2LK | 7 | 7 | +0 |
+| 2LP | 7 | 7 | +0 |
+| 2MK | 15 | 15 | +0 |
+| 2MP | 16 | 16 | +0 |
+| 5HP | 49 | 49 | +0 |
+| 5LK | 7 | 7 | +0 |
+| 5LP | 7 | 7 | +0 |
+| 5MK | 17 | 17 | +0 |
+| 5MP | 16 | 16 | +0 |
+| CL.5LK | 7 | 7 | +0 |
+| CL.5MP | 17 | 17 | +0 |
+| J.HP | 18 | 18 | +0 |
+| J.LK | 8 | 8 | +0 |
+| J.LP | 8 | 8 | +0 |
+| J.MK | 16 | 17 | -1 |
+| J.MP | 16 | 17 | -1 |
 
 ### FE Felicia — `active` — most common delta +0 on 17/19; spread -1..+2
 
@@ -403,6 +528,29 @@ compare, under one stated convention per column. The residue is the worklist bel
 | J.MK | 7 | 7 | +0 |
 | J.MP | 7 | 7 | +0 |
 
+### JE Jedah — `red` — most common delta +0 on 17/18; spread +0..+16
+
+| move | sheet | ours | delta |
+|---|---|---|---|
+| 2HK | 21 | 21 | +0 |
+| 2HP | 24 | 24 | +0 |
+| 2LK | 8 | 8 | +0 |
+| 2LP | 8 | 8 | +0 |
+| 2MK | 17 | 17 | +0 |
+| 2MP | 16 | 16 | +0 |
+| 5HK | 36 | 20 | +16 |
+| 5HP | 24 | 24 | +0 |
+| 5LK | 8 | 8 | +0 |
+| 5LP | 8 | 8 | +0 |
+| 5MK | 17 | 17 | +0 |
+| 5MP | 16 | 16 | +0 |
+| J.HK | 23 | 23 | +0 |
+| J.HP | 24 | 24 | +0 |
+| J.LK | 9 | 9 | +0 |
+| J.LP | 9 | 9 | +0 |
+| J.MK | 17 | 17 | +0 |
+| J.MP | 16 | 16 | +0 |
+
 ### LE Lei-Lei — `active` — most common delta +0 on 18/19; spread -1..+0
 
 | move | sheet | ours | delta |
@@ -475,6 +623,30 @@ compare, under one stated convention per column. The residue is the worklist bel
 | J.MK | 12 | 12 | +0 |
 | J.MP | 12 | 12 | +0 |
 
+### LE Lei-Lei — `red` — most common delta +0 on 18/19; spread -21..+0
+
+| move | sheet | ours | delta |
+|---|---|---|---|
+| 2HK | 20 | 20 | +0 |
+| 2HP | 18 | 18 | +0 |
+| 2LK | 7 | 7 | +0 |
+| 2LP | 7 | 7 | +0 |
+| 2MK | 15 | 15 | +0 |
+| 2MP | 16 | 16 | +0 |
+| 5HK | 20 | 20 | +0 |
+| 5HP | 18 | 18 | +0 |
+| 5LK | 7 | 7 | +0 |
+| 5LP | 7 | 7 | +0 |
+| 5MK | 17 | 17 | +0 |
+| 5MP | 16 | 16 | +0 |
+| CL.5HP | 22 | 22 | +0 |
+| J.HK | 20 | 20 | +0 |
+| J.HP | 21 | 42 | -21 |
+| J.LK | 8 | 8 | +0 |
+| J.LP | 8 | 8 | +0 |
+| J.MK | 17 | 17 | +0 |
+| J.MP | 16 | 16 | +0 |
+
 ### LI Lilith — `recovery` — most common delta +2 on 15/16; spread +2..+3
 
 | move | sheet | ours | delta |
@@ -522,6 +694,32 @@ compare, under one stated convention per column. The residue is the worklist bel
 | J.LP | 4 | 4 | +0 |
 | J.MP | 6 | 7 | -1 |
 
+### LI Lilith — `red` — most common delta +0 on 18/21; spread -1..+18
+
+| move | sheet | ours | delta |
+|---|---|---|---|
+| 2HK | 18 | 18 | +0 |
+| 2HP | 20 | 20 | +0 |
+| 2LK | 5 | 5 | +0 |
+| 2LP | 6 | 6 | +0 |
+| 2MK | 15 | 15 | +0 |
+| 2MP | 15 | 15 | +0 |
+| 5HK | 26 | 26 | +0 |
+| 5HP | 19 | 19 | +0 |
+| 5LK | 7 | 7 | +0 |
+| 5LP | 6 | 6 | +0 |
+| 5MK | 15 | 15 | +0 |
+| 5MP | 15 | 15 | +0 |
+| CL.5HK | 24 | 24 | +0 |
+| CL.5HP | 20 | 20 | +0 |
+| CL.5LK | 7 | 7 | +0 |
+| CL.5MP | 16 | 16 | +0 |
+| J.HK | 38 | 20 | +18 |
+| J.HP | 20 | 20 | +0 |
+| J.LK | 8 | 5 | +3 |
+| J.LP | 8 | 8 | +0 |
+| J.MP | 16 | 17 | -1 |
+
 ### MO Morrigan — `white` — most common delta +0 on 20/21; spread +0..+7
 
 | move | sheet | ours | delta |
@@ -548,6 +746,32 @@ compare, under one stated convention per column. The residue is the worklist bel
 | J.MK | 6 | 6 | +0 |
 | J.MP | 6 | 6 | +0 |
 
+### MO Morrigan — `red` — most common delta +0 on 20/21; spread +0..+19
+
+| move | sheet | ours | delta |
+|---|---|---|---|
+| 2HK | 17 | 17 | +0 |
+| 2HP | 20 | 20 | +0 |
+| 2LK | 5 | 5 | +0 |
+| 2LP | 6 | 6 | +0 |
+| 2MK | 15 | 15 | +0 |
+| 2MP | 14 | 14 | +0 |
+| 5HK | 40 | 21 | +19 |
+| 5HP | 19 | 19 | +0 |
+| 5LK | 6 | 6 | +0 |
+| 5LP | 6 | 6 | +0 |
+| 5MK | 15 | 15 | +0 |
+| 5MP | 15 | 15 | +0 |
+| CL.5HK | 24 | 24 | +0 |
+| CL.5HP | 20 | 20 | +0 |
+| CL.5MP | 16 | 16 | +0 |
+| J.HK | 20 | 20 | +0 |
+| J.HP | 19 | 19 | +0 |
+| J.LK | 7 | 7 | +0 |
+| J.LP | 7 | 7 | +0 |
+| J.MK | 15 | 15 | +0 |
+| J.MP | 16 | 16 | +0 |
+
 ### QB Q-Bee — `white` — most common delta +0 on 14/15; spread +0..+7
 
 | move | sheet | ours | delta |
@@ -567,6 +791,26 @@ compare, under one stated convention per column. The residue is the worklist bel
 | J.LP | 3 | 3 | +0 |
 | J.MK | 6 | 6 | +0 |
 | J.MP | 7 | 7 | +0 |
+
+### QB Q-Bee — `red` — most common delta +0 on 14/15; spread +0..+16
+
+| move | sheet | ours | delta |
+|---|---|---|---|
+| 2HK | 36 | 20 | +16 |
+| 2LK | 6 | 6 | +0 |
+| 2LP | 7 | 7 | +0 |
+| 2MK | 16 | 16 | +0 |
+| 2MP | 16 | 16 | +0 |
+| 5HK | 24 | 24 | +0 |
+| 5LK | 7 | 7 | +0 |
+| 5LP | 7 | 7 | +0 |
+| 5MK | 17 | 17 | +0 |
+| 5MP | 16 | 16 | +0 |
+| J.HK | 22 | 22 | +0 |
+| J.LK | 8 | 8 | +0 |
+| J.LP | 8 | 8 | +0 |
+| J.MK | 17 | 17 | +0 |
+| J.MP | 16 | 16 | +0 |
 
 ### SA Sasquatch — `startup` — most common delta +1 on 18/19; spread +0..+1
 
@@ -639,6 +883,30 @@ compare, under one stated convention per column. The residue is the worklist bel
 | J.LP | 6 | 6 | +0 |
 | J.MK | 12 | 12 | +0 |
 | J.MP | 12 | 12 | +0 |
+
+### SA Sasquatch — `red` — most common delta +0 on 18/19; spread +0..+20
+
+| move | sheet | ours | delta |
+|---|---|---|---|
+| 2HK | 18 | 18 | +0 |
+| 2HP | 43 | 43 | +0 |
+| 2LK | 7 | 7 | +0 |
+| 2LP | 8 | 8 | +0 |
+| 2MK | 17 | 17 | +0 |
+| 2MP | 17 | 17 | +0 |
+| 5HK | 44 | 44 | +0 |
+| 5HP | 44 | 24 | +20 |
+| 5LK | 9 | 9 | +0 |
+| 5LP | 9 | 9 | +0 |
+| 5MK | 18 | 18 | +0 |
+| 5MP | 17 | 17 | +0 |
+| CL.5LK | 9 | 9 | +0 |
+| J.HK | 22 | 22 | +0 |
+| J.HP | 21 | 21 | +0 |
+| J.LK | 9 | 9 | +0 |
+| J.LP | 9 | 9 | +0 |
+| J.MK | 17 | 17 | +0 |
+| J.MP | 18 | 18 | +0 |
 
 ### VI Victor — `startup` — most common delta +1 on 22/23; spread +1..+4
 
@@ -724,16 +992,46 @@ compare, under one stated convention per column. The residue is the worklist bel
 | J.MK | 7 | 7 | +0 |
 | J.MP | 6 | 6 | +0 |
 
+### VI Victor — `red` — most common delta +0 on 21/23; spread -4..+22
+
+| move | sheet | ours | delta |
+|---|---|---|---|
+| 2HK | 20 | 20 | +0 |
+| 2HP | 45 | 23 | +22 |
+| 2LK | 8 | 8 | +0 |
+| 2LP | 9 | 9 | +0 |
+| 2MK | 17 | 17 | +0 |
+| 2MP | 18 | 18 | +0 |
+| 5HK | 23 | 23 | +0 |
+| 5HP | 23 | 23 | +0 |
+| 5LK | 9 | 9 | +0 |
+| 5LP | 9 | 9 | +0 |
+| 5MK | 19 | 19 | +0 |
+| 5MP | 18 | 18 | +0 |
+| CL.5HK | 26 | 26 | +0 |
+| CL.5HP | 25 | 25 | +0 |
+| CL.5LK | 10 | 10 | +0 |
+| CL.5MK | 21 | 21 | +0 |
+| CL.5MP | 20 | 20 | +0 |
+| J.HK | 22 | 22 | +0 |
+| J.HP | 20 | 24 | -4 |
+| J.LK | 9 | 9 | +0 |
+| J.LP | 9 | 9 | +0 |
+| J.MK | 18 | 18 | +0 |
+| J.MP | 18 | 18 | +0 |
+
 ## What is NOT known
 
-- **The residual outliers are NOT arbitrated.** They are listed above with both
-  numbers; none has an in-emulator measurement attached yet. Under the rule, OURS
-  is re-measured first — `tests/lua/field_trace.lua` on a vanilla replay, per-frame
-  hitbox state — before anything is concluded about the workbook.
-- **`red damage` is not compared at all** (see above): the record's `+8` is the raw
-  power before the [VSE-40] scaler chain, the workbook lists damage DEALT. Deriving
-  dealt damage through the scaler and re-comparing is the obvious next step and is
-  not done.
+- **The startup `+1` and recovery `+2` offsets are NAMED, not adjudicated.** The
+  instrument available samples at video-frame rate and 16% of its frames carry two
+  engine ticks, so it cannot resolve a one-frame question. A tick-accurate
+  instrument would settle whether either side is counting wrongly; neither is
+  assumed to be.
+- **Jedah's crouching recovery (+3, not +2) is unexplained** — see the arbitration
+  section. Lilith's `2MK` behaves the same way.
+- **The aerial startup/active outliers are untouched** (BI `J.HP`/`J.LP`, BU `J.MP`,
+  VI `J.HP`, FE `J.HK`/`J.LK`, SA `J.MP`). A jumping normal's chain is entered from
+  the jump, and no rig here separated the two.
 - **Specials, supers, EX/ES moves, throws, pursuits and the `6`-prefixed command
   normals are not joined.** Each needs its own measured naming rig on vsavj, the way
   `tools/name_moves.py` did for the tenants. That is the bulk of the workbook's 730

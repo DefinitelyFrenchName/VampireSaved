@@ -103,7 +103,41 @@ fi
 if cmp -s "$W/exp.txt" "$W/g.txt"; then ok "the measured slot map equals $EXP ($(grep -c . "$W/g.txt") rows)"
 else nope "the slot map moved"; diff "$W/exp.txt" "$W/g.txt" | head -20; fi
 
-echo "== 4. must-fire control"
+echo "== 4. the HIT set: what the moves actually do to a victim"
+HEXP=tests/expected/vanilla_hit_damage.tsv
+n=0
+for pair in $ALL; do
+    tab="${pair%%:*}"; cid="${pair##*:}"
+    [ -n "$WANT" ] && { case " $WANT " in *" $tab "*) ;; *) continue;; esac; }
+    python3 tools/vanilla_join_rig.py gen "$cid" hit "$W/${tab}_hit.rpl" "$W/${tab}_hit.json" >/dev/null || nope "gen $tab hit"
+    mkdir -p "$W/${tab}_hit"
+    P="$(python3 -c "import json;print(';'.join(json.load(open('$W/${tab}_hit.json'))['pokes']))")"
+    FR="$(python3 -c "import json;print(json.load(open('$W/${tab}_hit.json'))['frames'])")"
+    ( cd "$W/${tab}_hit" && MAME_SANDBOX="$W/${tab}_hit/sb" REPLAY="$W/${tab}_hit.rpl" POKES="$P" \
+        FIELDS="$FIELDS" FIELD_OUT="$W/${tab}_hit/t.txt" FIELD_FROM=2400 FIELD_TO="$FR" FRAMES="$FR" \
+        "$REPO/tools/run_mame.sh" vsavj -autoboot_script "$REPO/tests/lua/field_trace.lua" > l.log 2>&1 ) </dev/null &
+    n=$((n + 1)); [ $((n % 8)) -eq 0 ] && wait
+done
+wait
+head -8 "$HEXP" > "$W/hgot.txt"
+for pair in $ALL; do
+    tab="${pair%%:*}"; cid="${pair##*:}"
+    [ -n "$WANT" ] && { case " $WANT " in *" $tab "*) ;; *) continue;; esac; }
+    python3 tools/vanilla_join_rig.py analyse "$W/${tab}_hit/t.txt" "$W/${tab}_hit.json" "$IMG" "$cid" \
+        --tab "$tab" --damage | awk -F'\t' '{print $1"\t"$3"\t"$4"\t"$5"\t"$6}' >> "$W/hgot.txt" || nope "damage $tab"
+done
+if [ "${FREEZE:-0}" = 1 ] && [ -z "$WANT" ]; then cp "$W/hgot.txt" "$HEXP"; echo "  FROZE $HEXP"; fi
+if [ -n "$WANT" ]; then
+    grep -v '^#' "$HEXP" > "$W/hexp_all.txt"
+    for tab in $WANT; do grep "^$tab	" "$W/hexp_all.txt"; done > "$W/hexp.txt"
+else
+    grep -v '^#' "$HEXP" > "$W/hexp.txt"
+fi
+grep -v '^#' "$W/hgot.txt" > "$W/hg.txt"
+if cmp -s "$W/hexp.txt" "$W/hg.txt"; then ok "the dealt damage and hit counts equal $HEXP ($(grep -c . "$W/hg.txt") rows)"
+else nope "the hit measurement moved"; diff "$W/hexp.txt" "$W/hg.txt" | head -12; fi
+
+echo "== 5. must-fire control"
 python3 - "$W/exp.txt" "$W/ctl.txt" <<'PY'
 import sys
 rows = [l.rstrip("\n").split("\t") for l in open(sys.argv[1]) if l.strip()]
