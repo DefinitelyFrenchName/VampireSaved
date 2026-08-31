@@ -74,6 +74,35 @@
 > ## https://claude.ai/code/artifact/f572a468-2e35-441c-aa1a-130353e9c9ff
 > ## The maintainer is forwarding the frame-data findings to the community.
 > ##
+> ## **TWO CARRIED FORWARD FROM THE 14z-125b CLOSE.** (1) **THE MAINTAINER IS
+> ## CHECKING THE LEGALITY of carrying the workbook's per-move values.** The
+> ## committed `community_crosscheck.md` prints their figures beside ours in the
+> ## per-move tables and is PUSHED; the artifact is private, which does not help
+> ## if the repo is public. **If the ruling is "don't carry them", the fix is
+> ## scoped and ready: cut their raw values from the generated page — keep ours,
+> ## the verdicts and the mechanisms, print the DELTA only** (one change in
+> ## `render_md`, then regenerate + re-freeze `test_community_crosscheck`).
+> ## (2) **When the findings go to the community, carry the caveat:** the damage
+> ## finding is solid (the workbook double-counts records sharing the engine's
+> ## `+0x10` dedup key; hit counts 75/78 behind it), but `startup +1` /
+> ## `recovery +2` are NAMED CONVENTIONS, not corrections — we measured that our
+> ## instrument cannot resolve a one-frame question. Do not present them as the
+> ## workbook being wrong.
+> ##
+> ## **A DOC-SHAPE ITEM, MEASURED 14z-125b (maintainer's question: does HANDOFF
+> ## need STATE's rollover?).** NEXT_SESSION does NOT — it is `ORIENT` with a
+> ## HIST twin and already rolls at every close (119 live lines vs 3,022
+> ## archived; the mechanism works). **HANDOFF does not need a rollover either —
+> ## it needs its declared shape enforced.** It is `REFERENCE`, and [VSP-12] bars
+> ## chronology from a reference document, yet it carries **8 `**Previous batch
+> ## (14z-N…)**` blocks, ~93 lines**, whose content `HANDOFF_HISTORY.md`
+> ## "Build registry narratives" ALREADY holds in richer form. So the fix is
+> ## DELETE-AND-POINT, not a move: keep the current batch, replace the eight with
+> ## one pointer to the twin and the registry table. **And the durable half:
+> ## `test_docshape` bars session-shaped HEADERS from a REFERENCE doc but not
+> ## session-token-led BOLD PARAGRAPHS, which is why this accreted unseen — teach
+> ## the lint that shape, or it comes back.**
+> ##
 > ## **WHAT TO DO NEXT — the maintainer's call between three:**
 > ## (a) **WHAT THE CROSS-CHECK STILL LEAVES OPEN:** Jedah's whole crouching
 > ## family (and Lilith's `2MK`) reads recovery +3 where everyone else reads +2,
