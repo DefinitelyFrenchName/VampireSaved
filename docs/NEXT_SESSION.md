@@ -41,6 +41,24 @@
 > ## CANNOT adjudicate a one-frame convention: `startup +1` / `recovery +2` stay
 > ## named conventions.
 > ##
+> ## **FIRST, A 10-MINUTE ERRAND: RE-PUBLISH THE THREE CHARACTER-PAGE
+> ## ARTIFACTS.** They are **five generator commits stale**, not just missing
+> ## 14z-125's `active` fix: the live pages are byte-exact `9b8844d` output
+> ## (verified by diffing the fetched artifact against every commit that touched
+> ## the file), so they also lack the per-strength strip labels, the detached-hit
+> ## handling and the sprite/composite styles. **Nothing was hand-edited in the
+> ## artifact UI — there is nothing to merge, just republish the committed file.**
+> ##   Donovan https://claude.ai/code/artifact/85d7fd52-9b14-4b19-b3a1-d76334f2cb3e
+> ##   Huitzil https://claude.ai/code/artifact/f0dddc83-5b9b-4139-a637-91c55695fdf7
+> ##   Pyron   https://claude.ai/code/artifact/ad618f12-5166-4a88-94e8-d89625a3500e
+> ## For each: Artifact `action: "read"` the URL, Read the saved file IN FULL
+> ## (the publish is refused otherwise), then publish with that `url` and
+> ## `file_path: docs/project/tables/chars/<tenant>.html`. Omit `favicon` — the
+> ## icons (🗡️ etc.) must not change. **BUDGET ~50k CONTEXT PER PAGE** (the
+> ## Donovan file alone reads as 46,719 tokens); that is why 14z-125b deferred
+> ## it — doing one of three would leave the set inconsistent. Do all three in a
+> ## fresh session, before anything else.
+> ##
 > ## **WHAT TO DO NEXT — the maintainer's call between three:**
 > ## (a) **WHAT THE CROSS-CHECK STILL LEAVES OPEN:** Jedah's whole crouching
 > ## family (and Lilith's `2MK`) reads recovery +3 where everyone else reads +2,
