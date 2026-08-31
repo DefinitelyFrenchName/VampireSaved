@@ -23,6 +23,26 @@
 > ## ([VSP-27..30] live there — edit a class THERE, never in §4); the document
 > ## roster is `docs/README.md` "The documents, by role".
 > ##
+> ## **OPEN THE SESSION WITH THE COMMUNITY CROSS-CHECK (item 2 below —
+> ## the maintainer's order, 2026-08-31: "start with item 2 to get proper
+> ## confirmed data").** First steps, in order: load `vampire-savior-engine`
+> ## + `cps2-emulation`; read STATE "Decisions pending" → the cross-check
+> ## entry (the rule, both sources, the first-pass inventory); (a) the
+> ## VANILLA derivation — make `tools/charmap_gen.py` (or a sibling) walk a
+> ## vsavj vanilla character's bank and emit the same per-chain
+> ## startup/active/recovery the tenants' `chars/<t>_anim.md` carries;
+> ## (b) a comparator against `../community/vsav-framedata.xlsx` (tab =
+> ## first two letters of the Japanese name; the id map is in STATE) that
+> ## classifies every column's deltas EXACT / CONSTANT OFFSET / INCONSISTENT
+> ## per character; (c) the INCONSISTENT rows measured in-emulator on a
+> ## vanilla replay (`field_trace`, hitbox state per frame) — the emulator
+> ## arbitrates; (d) the wiki's player-struct map (146 offsets, 94 not in
+> ## `ram.md`) against the atlas the same way, starting with the two
+> ## disagreements (`+0x161`, `0x2246E`). Deliverable
+> ## `docs/project/tables/community_crosscheck.md` + a gate; both sources
+> ## stay OUT of the tree (cite them). Then item (1), whose lead — `+0x1B3`
+> ## "Dark Force Startup" — the cross-check will have measured.
+> ##
 > ## **THREE ITEMS ARE QUEUED (maintainer, 2026-08-31), none started** —
 > ## all in STATE "Decisions pending": (1) **DF-STARTUP INVINCIBILITY FOR
 > ## THE TENANTS** — measure the [VSE-69] seam (shared activation body vs
