@@ -33,6 +33,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import _minitoml  # noqa: E402
 import hitbox_records  # noqa: E402
+import frame_data  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
 DISPLAY = {"donovan": ("Donovan Baine", "Vampire Savior 2 / Vampire Hunter 2", "0x13"),
@@ -51,16 +52,13 @@ def esc(s):
     return html.escape(str(s), quote=True)
 
 
-def chain_frame_data(chain):
-    """(durs, first_attack, last_attack, records) from a map chain (vs2 values)."""
+def chain_frame_data(chain, atk_recs=None):
+    """(durs, frame_data-dict-or-None) from a map chain (vs2 values). THE derivation
+    is tools/frame_data.py — `active` is the attack nodes only, never the
+    first..last SPAN (corrected 14z-125; see that module's header)."""
     nodes = chain.get("nodes") or []
     durs = [n["fields"]["dur"]["vs2"] for n in nodes]
-    hba = [n["fields"]["hbA"]["vs2"] for n in nodes]
-    atk = [i for i, v in enumerate(hba) if v]
-    recs = sorted({v >> 8 for v in hba if v})
-    if not atk:
-        return durs, None, None, recs
-    return durs, atk[0], atk[-1], recs
+    return durs, frame_data.from_nodes(nodes, atk_recs)
 
 
 def box_svg(H, hb8, hbA, width=150, height=110):
@@ -109,7 +107,8 @@ def main():
     name, home, cid = DISPLAY[tenant]
     bank = S["bank"]["records"]
     anim = S["anim"]
-    recs = {r["idx"]: r for r in S["hitbox"]["attack"]}
+    atk_recs = S["hitbox"]["attack"]
+    recs = {r["idx"]: r for r in atk_recs}
     reactions = (REPO / "tests/expected" / f"reactions_{tenant}.txt")
     rx_lines = [l.rstrip("\n").split("\t") for l in reactions.read_text().splitlines() if l.strip()] if reactions.exists() else []
 
@@ -148,17 +147,19 @@ def main():
             if not chain or not chain.get("nodes"):
                 out.append(f'<div class="strip"><span class="chain">{esc(table)}:{esc(sq)}</span><span class="na">chain not in the decoded graph</span></div>')
                 continue
-            durs, a0, a1, rids = chain_frame_data(chain)
+            durs, fd = chain_frame_data(chain, atk_recs)
             total = sum(durs)
-            first = chain["nodes"][a0 if a0 is not None else 0]["fields"]
+            rids = fd["records"] if fd else []
+            first = chain["nodes"][fd["first"] if fd else 0]["fields"]
             svg = box_svg(H, first["hb8"]["vs2"], first["hbA"]["vs2"])
             cells = [f'<span class="chain" title="anim table:seq">{esc(table)}:{esc(sq)}{(" · " + esc(label)) if label else ""}</span>']
-            if a0 is None:
+            if fd is None:
                 cells.append(f'<span class="na">no attack node · {total} f{" · " + chain["end"] if chain.get("end") else ""}</span>')
             else:
                 r = recs.get(rids[0], {}).get("fields", {}) if rids else {}
-                cells += [f'<dl><dt>startup</dt><dd>{sum(durs[:a0])}</dd></dl>', f'<dl><dt>active</dt><dd>{sum(durs[a0:a1 + 1])}</dd></dl>',
-                          f'<dl><dt>recovery</dt><dd>{sum(durs[a1 + 1:])}</dd></dl>', f'<dl><dt>total</dt><dd>{total}</dd></dl>']
+                act = f'{fd["active"]}' + (f'<small> ({esc(fd["notation"])})</small>' if fd["notation"] != str(fd["active"]) else "")
+                cells += [f'<dl><dt>startup</dt><dd>{fd["startup"]}</dd></dl>', f'<dl><dt>active</dt><dd>{act}</dd></dl>',
+                          f'<dl><dt>recovery</dt><dd>{fd["recovery"]}</dd></dl>', f'<dl><dt>total</dt><dd>{total}</dd></dl>']
                 if r:
                     cells += [f'<dl><dt>damage</dt><dd>{r["real"]}<small>/{r["white"]} white</small></dd></dl>', f'<dl><dt>meter</dt><dd>{r["meter"]}</dd></dl>',
                               f'<dl><dt>class</dt><dd>{r["cls"]:#04x}</dd></dl>', f'<dl><dt>pushback</dt><dd>{r["pb_hit"]}<small>/{r["pb_blk"]} blk</small></dd></dl>',
@@ -215,7 +216,7 @@ def main():
                     else:
                         img = f'<img class="sprite" alt="{esc(m["name"])} at its first active frame" src="data:image/png;base64,{data}">'
             if svg or img:
-                out.append(f'<figure>{img}{svg}<figcaption>{"the sprite with its boxes outlined, and " if img else ""}boxes of the {"first active" if a0 is not None else "first"} frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>')
+                out.append(f'<figure>{img}{svg}<figcaption>{"the sprite with its boxes outlined, and " if img else ""}boxes of the {"first active" if fd is not None else "first"} frame · <span class="k hurt">hurt</span> <span class="k push">push</span> <span class="k hit">hit</span></figcaption></figure>')
         if m.get("notes"):
             out.append(f'<p class="notes">{esc(m["notes"])}</p>')
         out.append("</article>")

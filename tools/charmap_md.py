@@ -14,7 +14,11 @@ hand-written, so the page can only claim what the generator knows.
 """
 import argparse
 import json
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import frame_data  # noqa: E402
 
 
 def h(s):
@@ -241,6 +245,8 @@ def main():
               f"{sum(1 for c in ch.values() if c['end'].startswith('loop'))} | {sum(1 for c in ch.values() if c['end']=='hold')} |")
         w("")
         if a.anim:
+            # the attack records, for the hit ids the frame-data runs split on
+            atk_recs = (j["structures"].get("hitbox") or {}).get("attack") or []
             # MOVE NAMES (phase 1 naming step, 14z-120): build/manifest/moves_<tenant>.toml
             # rows carry table/seq measured by tools/name_moves.py; label each chain.
             names = {}
@@ -279,14 +285,13 @@ def main():
                     lab = names.get((tn, int(seq, 16)))
                     ao.append(f"### seq `{seq}`" + (f" — **{' / '.join(lab)}**" if lab else "") + f" — start `{c['start']}`, {c['n']} nodes, {c['frames']} frames, end {c['end']}"
                               + ("" if c['ours_end'] == c['end'] else f" (ours: {c['ours_end']})"))
-                    # phase 2: startup / active / recovery from the nodes' hbA words (hbA != 0 = an attack node, hbA>>8 = the record)
-                    durs = [n["fields"]["dur"]["vs2"] for n in c["nodes"]]; atk = [n["fields"]["hbA"]["vs2"] >> 8 for n in c["nodes"]]
-                    if any(atk):
-                        first = next(i for i, a in enumerate(atk) if a); last = max(i for i, a in enumerate(atk) if a)
-                        recs = sorted({a for a in atk if a})
+                    # phase 2: startup / active / recovery from the nodes' hbA words (hbA != 0 = an attack node,
+                    # hbA>>8 = the record). THE ONE derivation lives in tools/frame_data.py — see its header for
+                    # why `active` is attack nodes only and not the first..last SPAN (corrected 14z-125).
+                    fd = frame_data.from_nodes(c["nodes"], atk_recs)
+                    if fd:
                         ao.append("")
-                        ao.append(f"Frame data (derived): startup {sum(durs[:first])} · active {sum(durs[first:last + 1])} (nodes {first}-{last}, attack record{'s' if len(recs) > 1 else ''} {', '.join(f'{x:#x}' for x in recs)}) · recovery {sum(durs[last + 1:])}"
-                                  + (" — the chain loops/holds, so the tail is the data's, not the move's" if not c["end"] == "hold" else ""))
+                        ao.append(frame_data.line(fd, c["end"] == "hold"))
                     ao.append("")
                     ao.append("| # | addr | off | dur | flags | hb8 | hbA | atk rec | shadow | sfx | link | ! |")
                     ao.append("|---|---|---|---|---|---|---|---|---|---|---|---|")

@@ -1774,7 +1774,7 @@ Frame data (derived): startup 8 · active 8 (nodes 4-6, attack records 0x1e, 0x1
 
 ### seq `0x30` — **Ifrit Sword (ES)** — start `0x2837f8`, 20 nodes, 68 frames, end hold
 
-Frame data (derived): startup 8 · active 22 (nodes 4-11, attack records 0x21, 0x22, 0x23, 0x24, 0x25, 0x26) · recovery 38
+Frame data (derived): startup 8 · active 16 (2,3,3(6)2,3,3) (nodes 4-11, attack records 0x21, 0x22, 0x23, 0x24, 0x25, 0x26) · recovery 38 — 6 frame(s) between hits are NOT active (span 22)
 
 | # | addr | off | dur | flags | hb8 | hbA | atk rec | shadow | sfx | link | ! |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -1925,7 +1925,7 @@ Frame data (derived): startup 8 · active 22 (nodes 4-11, attack records 0x21, 0
 
 ### seq `0x35` — **Lightning Sword [LP]** — start `0x284398`, 24 nodes, 38 frames, end loop:0x284500 (ours: loop:0xd8028)
 
-Frame data (derived): startup 16 · active 22 (nodes 12-23, attack records 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d) · recovery 0 — the chain loops/holds, so the tail is the data's, not the move's
+Frame data (derived): startup 16 · active 22 (2,2,2,4,4,4,4) (nodes 12-23, attack records 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d) · recovery 0 — the chain loops/holds, so the tail is the data's, not the move's
 
 | # | addr | off | dur | flags | hb8 | hbA | atk rec | shadow | sfx | link | ! |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -1956,7 +1956,7 @@ Frame data (derived): startup 16 · active 22 (nodes 12-23, attack records 0x27,
 
 ### seq `0x36` — **Lightning Sword [MP]** — start `0x2845dc`, 24 nodes, 40 frames, end loop:0x284744 (ours: loop:0xd826c)
 
-Frame data (derived): startup 18 · active 22 (nodes 12-23, attack records 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d) · recovery 0 — the chain loops/holds, so the tail is the data's, not the move's
+Frame data (derived): startup 18 · active 22 (2,2,2,4,4,4,4) (nodes 12-23, attack records 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d) · recovery 0 — the chain loops/holds, so the tail is the data's, not the move's
 
 | # | addr | off | dur | flags | hb8 | hbA | atk rec | shadow | sfx | link | ! |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -1987,7 +1987,7 @@ Frame data (derived): startup 18 · active 22 (nodes 12-23, attack records 0x27,
 
 ### seq `0x37` — **Lightning Sword [HP]** — start `0x284820`, 24 nodes, 42 frames, end loop:0x284988 (ours: loop:0xd84b0)
 
-Frame data (derived): startup 20 · active 22 (nodes 12-23, attack records 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d) · recovery 0 — the chain loops/holds, so the tail is the data's, not the move's
+Frame data (derived): startup 20 · active 22 (2,2,2,4,4,4,4) (nodes 12-23, attack records 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d) · recovery 0 — the chain loops/holds, so the tail is the data's, not the move's
 
 | # | addr | off | dur | flags | hb8 | hbA | atk rec | shadow | sfx | link | ! |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -2018,7 +2018,7 @@ Frame data (derived): startup 20 · active 22 (nodes 12-23, attack records 0x27,
 
 ### seq `0x38` — **Lightning Sword (ES)** — start `0x284a64`, 24 nodes, 39 frames, end loop:0x284bcc (ours: loop:0xd86f4)
 
-Frame data (derived): startup 16 · active 23 (nodes 12-23, attack records 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x33, 0x34) · recovery 0 — the chain loops/holds, so the tail is the data's, not the move's
+Frame data (derived): startup 16 · active 23 (2,2,2,4,4,4,5) (nodes 12-23, attack records 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x33, 0x34) · recovery 0 — the chain loops/holds, so the tail is the data's, not the move's
 
 | # | addr | off | dur | flags | hb8 | hbA | atk rec | shadow | sfx | link | ! |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -6396,7 +6396,7 @@ Frame data (derived): startup 4 · active 14 (nodes 2-9, attack records 0x5, 0x1
 
 ### seq `0x23` — start `0x28c560`, 18 nodes, 120 frames, end hold
 
-Frame data (derived): startup 0 · active 60 (nodes 0-9, attack records 0x14, 0x15, 0x16, 0x17) · recovery 60
+Frame data (derived): startup 0 · active 26 (16(34)10) (nodes 0-9, attack records 0x14, 0x15, 0x16, 0x17) · recovery 60 — 34 frame(s) between hits are NOT active (span 60)
 
 | # | addr | off | dur | flags | hb8 | hbA | atk rec | shadow | sfx | link | ! |
 |---|---|---|---|---|---|---|---|---|---|---|---|

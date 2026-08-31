@@ -1209,7 +1209,7 @@ Frame data (derived): startup 9 · active 9 (nodes 2-4, attack record 0x5) · re
 
 ### seq `0x04` — **5HP** — start `0x26a062`, 14 nodes, 45 frames, end hold
 
-Frame data (derived): startup 8 · active 12 (nodes 2-5, attack records 0x6, 0x7, 0x8, 0x9) · recovery 25
+Frame data (derived): startup 8 · active 12 (3,3,6) (nodes 2-5, attack records 0x6, 0x7, 0x8, 0x9) · recovery 25
 
 | # | addr | off | dur | flags | hb8 | hbA | atk rec | shadow | sfx | link | ! |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -1230,7 +1230,7 @@ Frame data (derived): startup 8 · active 12 (nodes 2-5, attack records 0x6, 0x7
 
 ### seq `0x05` — start `0x26a1b2`, 29 nodes, 54 frames, end hold
 
-Frame data (derived): startup 10 · active 18 (nodes 2-14, attack records 0xa, 0xb) · recovery 26
+Frame data (derived): startup 10 · active 10 (3(2)1(2)1(2)1(2)4) (nodes 2-14, attack records 0xa, 0xb) · recovery 26 — 8 frame(s) between hits are NOT active (span 18)
 
 | # | addr | off | dur | flags | hb8 | hbA | atk rec | shadow | sfx | link | ! |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -2032,7 +2032,7 @@ Frame data (derived): startup 8 · active 16 (nodes 2-9, attack records 0x1e, 0x
 
 ### seq `0x31` — **Zodiac Fire (ES)** — start `0x26c432`, 10 nodes, 21 frames, end loop:0x26c4c2 (ours: loop:0xdb99c)
 
-Frame data (derived): startup 5 · active 16 (nodes 2-9, attack records 0x20, 0x21, 0x22) · recovery 0 — the chain loops/holds, so the tail is the data's, not the move's
+Frame data (derived): startup 5 · active 16 (2,2,2,2,2,2,2,2) (nodes 2-9, attack records 0x20, 0x21, 0x22) · recovery 0 — the chain loops/holds, so the tail is the data's, not the move's
 
 | # | addr | off | dur | flags | hb8 | hbA | atk rec | shadow | sfx | link | ! |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -2139,7 +2139,7 @@ Frame data (derived): startup 14 · active 12 (nodes 5-10, attack record 0x1b) �
 
 ### seq `0x39` — **Orbital Blaze (ES)** — start `0x26c9ca`, 11 nodes, 26 frames, end loop:0x26ca42 (ours: loop:0xdbf1c)
 
-Frame data (derived): startup 14 · active 10 (nodes 5-9, attack records 0x1c, 0x1d) · recovery 2 — the chain loops/holds, so the tail is the data's, not the move's
+Frame data (derived): startup 14 · active 6 (2(2)2(2)2) (nodes 5-9, attack records 0x1c, 0x1d) · recovery 2 — 4 frame(s) between hits are NOT active (span 10) — the chain loops/holds, so the tail is the data's, not the move's
 
 | # | addr | off | dur | flags | hb8 | hbA | atk rec | shadow | sfx | link | ! |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -2203,7 +2203,7 @@ Frame data (derived): startup 14 · active 10 (nodes 5-9, attack records 0x1c, 0
 
 ### seq `0x3d` — start `0x26cdc2`, 8 nodes, 12 frames, end loop:0x26cdc2 (ours: loop:0xdc29c)
 
-Frame data (derived): startup 0 · active 11 (nodes 0-6, attack record 0x23) · recovery 1 — the chain loops/holds, so the tail is the data's, not the move's
+Frame data (derived): startup 0 · active 8 (2(1)2(1)2(1)2) (nodes 0-6, attack record 0x23) · recovery 1 — 3 frame(s) between hits are NOT active (span 11) — the chain loops/holds, so the tail is the data's, not the move's
 
 | # | addr | off | dur | flags | hb8 | hbA | atk rec | shadow | sfx | link | ! |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -2218,7 +2218,7 @@ Frame data (derived): startup 0 · active 11 (nodes 0-6, attack record 0x23) · 
 
 ### seq `0x3e` — **Sitting Attack (ES)** — start `0x26ce86`, 12 nodes, 12 frames, end loop:0x26ce86 (ours: loop:0xdc360)
 
-Frame data (derived): startup 0 · active 11 (nodes 0-10, attack record 0x24) · recovery 1 — the chain loops/holds, so the tail is the data's, not the move's
+Frame data (derived): startup 0 · active 6 (1(1)1(1)1(1)1(1)1(1)1) (nodes 0-10, attack record 0x24) · recovery 1 — 5 frame(s) between hits are NOT active (span 11) — the chain loops/holds, so the tail is the data's, not the move's
 
 | # | addr | off | dur | flags | hb8 | hbA | atk rec | shadow | sfx | link | ! |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -4298,7 +4298,7 @@ Frame data (derived): startup 0 · active 12 (nodes 0-5, attack record 0x4) · r
 
 ### seq `0x06` — start `0x26d9fe`, 24 nodes, 56 frames, end hold
 
-Frame data (derived): startup 3 · active 53 (nodes 1-23, attack record 0x5) · recovery 0
+Frame data (derived): startup 3 · active 48 (39(1)1(1)1(1)1(1)3(1)3) (nodes 1-23, attack record 0x5) · recovery 0 — 5 frame(s) between hits are NOT active (span 53)
 
 | # | addr | off | dur | flags | hb8 | hbA | atk rec | shadow | sfx | link | ! |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -4421,7 +4421,7 @@ Frame data (derived): startup 12 · active 12 (nodes 4-10, attack record 0x6) ·
 
 ### seq `0x0a` — start `0x26e31e`, 10 nodes, 24 frames, end loop:0x26e3ae (ours: loop:0xdd888)
 
-Frame data (derived): startup 14 · active 10 (nodes 5-9, attack records 0x7, 0x8) · recovery 0 — the chain loops/holds, so the tail is the data's, not the move's
+Frame data (derived): startup 14 · active 10 (2,8) (nodes 5-9, attack records 0x7, 0x8) · recovery 0 — the chain loops/holds, so the tail is the data's, not the move's
 
 | # | addr | off | dur | flags | hb8 | hbA | atk rec | shadow | sfx | link | ! |
 |---|---|---|---|---|---|---|---|---|---|---|---|
