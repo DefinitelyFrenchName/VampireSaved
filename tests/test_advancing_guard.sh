@@ -8,7 +8,11 @@
 # thrower away (read, not measured)". Measured here, it is NOT a throw
 # mechanic at all — it is the ADVANCING GUARD: while a fighter is in
 # grounded BLOCKSTUN (state word 0x0202, `+0x140` = 2, class byte 0xFF —
-# the block handler `0x2246E` opens a 14-frame window `+0x1AB` = 14), each
+# the block-ENTRY handler vsavj `0x2395A`/`0x23966` (vs2 `0x22496`/`0x224A2`)
+# opens a 14-frame window `+0x1AB` = 14, and the System Timer Reducer vsavj
+# `0x2246E` / vs2 `0x20E24` counts it down; this header said "the block
+# handler `0x2246E`" until 14z-126 — the write tap had named the
+# decrementer), each
 # NEW button press (the new-press mask `+0x126` & 0x77; directions do not
 # count) feeds the counter `+0x170`, and when it crosses the threshold the
 # ATTACKER (`+0x32(a6)` -> a4) gets `+0x185` = 1, `+0x1B0` = 0, `+0x5D` =
@@ -118,7 +122,7 @@ chk(vs2o[0x267B8:0x267BE] == bytes.fromhex("0c2e00060382") and vjo[0x275CE:0x275
 chk(vs2o[0x2681E:0x26824] == bytes.fromhex("197c00010185") and vjo[0x27648:0x2764E] == bytes.fromhex("197c00010185"),
     "the arming write +0x185(a4) = 1 on the OTHER fighter: vs2 0x2681E, vsavj 0x27648")
 chk(vs2o[0x224A2:0x224A8] == bytes.fromhex("1d7c000e01ab") and vs2o[0x22496:0x2249C] == bytes.fromhex("1d7c00020140"),
-    "vs2 block handler 0x2246E opens the window: +0x1AB = 14, +0x140 = 2")
+    "vs2 block-ENTRY handler 0x22496/0x224A2 (vsavj 0x2395A/0x23966) opens the window: +0x1AB = 14, +0x140 = 2")
 sys.exit(bad)
 PY
 

@@ -1,0 +1,37 @@
+# tests/expected/df_startup_invuln.tsv — the Dark Force STARTUP INVINCIBILITY
+# window each character's seq-0x16 handler arms in +0x147 (frames), measured
+# 14z-126 on MAME with replay df/97 (tests/audit_df_startup_invuln.sh). `arm` is
+# the first non-zero value after the activation press, `peak` the maximum over
+# the mode entry, `zero` the FRAMES from the arm to the first zero sample (fewer
+# than `arm` — the reducer runs per ENGINE TICK and ~20% of frames carry two,
+# 14z-125b), `thr` the shared body's +0x143 throw invulnerability as SAMPLED at
+# frame_done (written 0x14, one tick gone: 0x13 on every leg — the only GLOBAL
+# half). Legs: v_ pristine vsavj, m_ the merged WIDE
+# build (shells 00/01/03 + tenants 10/11/13), n_ native vsav2 (Donovan: arm 0 —
+# vs2's own DF system shows NO window, [VSE-69]; the small values of SA/QB/LE
+# and Jedah's 0x7F-then-4 are real: `zero` is the honest length). Regenerate
+# with FREEZE=1, review the
+# diff, never hand-edit.
+# leg	char	arm	peak	zero	thr
+m_00	BU	0x29	0x29	33	0x13
+m_01	DE	0x29	0x29	33	0x13
+m_03	VI	0x3b	0x3b	48	0x13
+m_10	HUI	0x4f	0x4f	67	0x13
+m_11	PYR	0x29	0x29	33	0x13
+m_13	DON	0x40	0x40	52	0x13
+n_13	DON	0x00	0x00	0	0x12
+v_00	BU	0x29	0x29	33	0x13
+v_01	DE	0x29	0x29	33	0x13
+v_02	GA	0x22	0x22	28	0x13
+v_03	VI	0x3b	0x3b	48	0x13
+v_04	ZA	0x46	0x46	57	0x13
+v_05	MO	0x3c	0x3c	49	0x13
+v_06	AN	0x3c	0x3c	49	0xff
+v_07	FE	0x2e	0x2e	37	0x13
+v_08	BI	0x2b	0x2b	35	0x13
+v_09	AU	0x22	0x22	28	0xff
+v_0a	SA	0x05	0x05	28	0x13
+v_0c	QB	0x03	0x03	3	0x13
+v_0d	LE	0x04	0x04	3	0xff
+v_0e	LI	0x3c	0x3c	49	0x13
+v_0f	JE	0x7f	0x7f	23	0x13

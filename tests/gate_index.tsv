@@ -14,6 +14,7 @@ tests/audit_continue_ladder.sh	tenant
 tests/audit_continue_switch.sh	tenant
 tests/audit_df_accumulator.sh	character-data
 tests/audit_df_framework.sh	tenant
+tests/audit_df_startup_invuln.sh	character-data
 tests/audit_df_gold.sh	tenant
 tests/audit_dispatch_census.sh	pipeline
 tests/audit_don_grab_pose.sh	tenant

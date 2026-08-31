@@ -3309,3 +3309,20 @@ consecutive frames (`(o, o+1)` every 2 frames) counts as zero presses and
 the guard-mash counter `+0x170` never moves. Same family as [VSP-131]: read
 the counter the engine keeps, not the script.
 
+
+## A WRITE TAP ON A COUNTDOWN FIELD NAMES THE DECREMENTER, NOT THE OPENER (paid: 14z-123 -> 14z-126)
+
+A countdown byte is written ONCE by whatever opens the window and EVERY
+TICK by the timer block that counts it down — so a write tap, a sampled
+attribution or "who writes offset X" lands on the reducer almost every time.
+14z-123 named `PRG:0x02246E` "the class-0xFF block handler" for `+0x1AB`;
+it is the System Timer Reducer (`+0x147/+0x174/+0x143/+0x158/+0x1AB`, one
+`subq.b` each per engine tick — the name the mizuumi page had all along),
+and the block-entry handler that OPENS the window is `0x02395A`-`0x023966`.
+Rule: for any field that counts down, attribute the OPENER from the write
+that sets the non-decremented value (grep the listing for the immediate
+`move.b #N,$off(a6)` forms), and the reducer separately. Second face of the
+same trap: `field_trace` samples at frame_done, one reducer tick AFTER an
+opener that runs earlier in the frame — the DF body's `+0x143` = 0x14 is
+always SAMPLED as 0x13. Freeze what is sampled, and say why.
+

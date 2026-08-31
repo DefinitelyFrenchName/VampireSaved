@@ -496,7 +496,9 @@ PC 0xCE38A = vs2 0x2713C + port offset):
   vs2 (newer): victim 0x0C, attacker 0x04, PLUS victim +0x147=0x0C —
   and **+0x147 is the multi-hit re-hit gate** (period ~10f with it,
   ~victim-freeze-length without it: vsavj-constants gave 12f, vs2
-  freeze without $147 gave 7f, vs2 full semantics 10f).
+  freeze without $147 gave 7f, vs2 full semantics 10f) — because `+0x147`
+  is the victim's general INVINCIBILITY TIMER, the gate the hit test at
+  `0x18064` refuses on (14z-126; the Dark Force startup window below).
 - **Mash extension:** extends the LOOP-LINK iteration count (3 base
   -> 4 measured with LP/MP-alternating mash on both games; maintainer
   max-mash datums 5/9/11 per strength). The mechanism is
@@ -756,8 +758,10 @@ the victim".
   [M: `tests/test_advancing_guard.sh`, 14z-123, native vs2 AND vsavj; the
   14z-121 (4) reading "the shape of a throw mash-escape" is RETRACTED — no
   throw opens the window, a block does]. A grounded BLOCK (class byte `0xFF`,
-  handler `0x2246E`, state `0x0202`, `+0x140` = 2) opens a 14-tick window
-  `+0x1AB`; each NEW button press (`+0x126 & 0x77` — directions do not count)
+  state `0x0202`, `+0x140` = 2; the block-entry handler `0x2395A`-`0x23966`
+  opens it, the System Timer Reducer `0x2246E` counts it down — 14z-123 named
+  the reducer as the handler from a write tap, corrected 14z-126) opens a
+  14-tick window `+0x1AB`; each NEW button press (`+0x126 & 0x77` — directions do not count)
   feeds the blocker's `+0x170`, and when it crosses the threshold the check
   (`0x267B8`, vsavj `0x275CE`) arms the ATTACKER — `+0x185` = 1, `+0x1B0` = 0,
   `+0x5D` = flip_x ^ 1, `+0x59` = the strength class of the completing press —
@@ -3041,12 +3045,15 @@ dispatcher at `PRG:0x018508`" (below).
 stock count, `+0x107` resolver marker — 0xFE = pair downgraded, no stock —,
 `+0x006` sequence: 0x16 the activation, 0x18 the form, `+0x110/+0x111/+0x17B`
 the vsav DF-form fields, `+0x15E/+0x161/+0x162` the DF armor family, the
-match-level flag `$FF802E`; `+0x381` the player-side index the palette
-blocks key on), `atlas/character_tables.md` (the per-character seq dispatch
-rows the tenants' DF-form handlers are repointed through).
+match-level flag `$FF802E`; `+0x147` the victim's invincibility timer and
+`+0x143` the throw invulnerability timer — the STARTUP window; `+0x381` the
+player-side index the palette blocks key on), `atlas/character_tables.md`
+(the per-character seq dispatch rows the tenants' DF-form handlers are
+repointed through).
 **Gates:** `tests/audit_df_framework.sh`, `tests/test_hui_df_style.sh`,
 `tests/audit_df_gold.sh`, `tests/audit_df_accumulator.sh`,
-`tests/audit_palette_seq_ids.sh`, `tests/audit_clone_beam_lines.sh`.
+`tests/audit_df_startup_invuln.sh`, `tests/audit_palette_seq_ids.sh`,
+`tests/audit_clone_beam_lines.sh`.
 
 **The ruled framework** [M: `tests/audit_df_framework.sh`, measured 14z-101,
 frozen 14z-104; maintainer-ruled 2026-08-21 and reaffirmed 2026-08-30 for
@@ -3231,6 +3238,68 @@ precedent, the parked script-table decode) is in the history.
 recoil) and a pod anim phase difference at replay 85's f3250 sample,
 unattributed; the CPU-side armor choice (`+0x3B4` / `$B4(a5)`) and the
 node-byte-+0xB armor exception, not reached (14z-123).
+
+### The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126)
+
+**The question (maintainer, 2026-08-31):** do the tenants get the
+invulnerable startup window vanilla characters get at DF activation — and if
+so, is it a GLOBAL property of the activation or INHERITED FROM THE SHELL
+(their variant ids alias base-half rows in every table vsavj did not repoint,
+[VSE-10])? **Answer: neither. It is armed PER CHARACTER by the seq-0x16
+handler, and the tenants' handlers are their own** [M:
+`tests/audit_df_startup_invuln.sh`, 22 trace legs + 4 contact legs, frozen in
+`tests/expected/df_startup_invuln.tsv`].
+
+**The mechanism, static (vsavj opcode view) and confirmed live:**
+- the SHARED activation body `PRG:0x027000` (seq `0x16`, one stock, the
+  `+0x111/+0x110/+0x176` fields) arms only **`+0x143` = 0x14** — the THROW
+  invulnerability timer, 20 ticks. It never touches `+0x147`. That is the
+  only global half, and it is identical in vs2's body (`0x0261B2`).
+- **`+0x147` is the victim's INVINCIBILITY TIMER** (mizuumi's name): the hit
+  test at `PRG:0x018064` refuses a contact while the VICTIM's `+0x134`,
+  `+0x147` or `+0x11E` is non-zero (`tst.b $147(a1)`, a1 = the victim,
+  [VSE-43]); the System Timer Reducer `PRG:0x02246E` decrements it once per
+  engine tick. Mizuumi's per-move "Add N frames of invincibility" is a
+  `move.b #N,$147(a6)` (the guard cancel `0x02E19A`: #$1E).
+- it is armed for Dark Force by the handler `dispatch_16` (`PRG:0x0BF31A`;
+  its data-view rows are exactly mizuumi's per-character "Dark Force XX"
+  addresses) selects for seq `0x16`, in the handler's first sub-state —
+  e.g. Bulleta `0x02F99C` `move.b #$29,$147(a6)`. The measured windows, in
+  ENGINE TICKS (the frames to zero are fewer: ~20% of frames carry two ticks,
+  14z-125b): BU 41 · DE 41 · GA 34 · VI 59 · ZA 70 · MO 60 · AN 60 · FE 46 ·
+  BI 43 · AU 34 · SA 5 · QB 3 · LE 4 · LI 60 · JE 0x7F re-armed to 4 (zero
+  at +23 f). Anakaris/Aulbath/Lei-Lei's handlers also overwrite `+0x143`
+  with 0xFF (full throw immunity for the mode).
+- **the tenants:** rows `0x10/0x11/0x13` of `dispatch_16` ALIAS Bulleta's /
+  Demitri's / Victor's handlers on pristine vsavj — the inheritance the
+  maintainer suspected — but every built image REPOINTS them to the placed
+  vs2 handlers (merged-m14: `0x41612A` / `0x4730E8` / `0x0C109C`), whose
+  first sub-state arms **Huitzil 0x4F (79), Pyron 0x29 (41), Donovan 0x40
+  (64)** — byte-identical to vs2's own rows `0x056C7A/0x058D28/0x05AE8C`.
+  Shells: Bulleta 41, Demitri 41, Victor 59. Pyron's equals Demitri's by
+  VALUE only; the code path is his own.
+- **natively on vs2 there is no window at all**: the seq-0x16 handler never
+  runs ([VSE-69]) and the vs2 DF path writes `+0x147` = 1 (`0x025F2A`),
+  cleared before frame_done — measured "never armed" on the native leg. The
+  window the tenants have HERE is their Vampire-Savior-era handler's, live
+  on this engine as their flight/form code is; vsavj semantics govern (the
+  ruled framework).
+- **the hit test honours it** [M: contact legs]: Victor's 5HP landing at
+  +12..+14 after the press, with `+0x147` = 24..26 (Demitri/Pyron) or 47..49
+  (Donovan), leaves HP at 288; the same attack at +118 lands for 14 (13 on
+  Donovan). Huitzil's OUT attack whiffs because he is FLYING (`+0x14` y =
+  124) — reported, not asserted.
+
+**Rig traps this arc paid for** (`docs/project/gotchas.md`): a write tap on a
+COUNTDOWN field names the decrementer (the reducer), not the opener — which
+is how 14z-123 called `0x2246E` "the block handler" (it opens nothing; the
+grounded-block entry at `0x02395A` does); and `field_trace` samples one
+reducer tick AFTER the body's write, so `+0x143`'s 0x14 is always SAMPLED as
+0x13.
+
+**Gameplay note ([VSP-10]):** nothing here is a change — the tenants ship
+with their own vs2 windows today. Retuning one is a single data byte in the
+ported handler, if the maintainer ever wants it.
 
 ## The child companion's shadow — a remapped tile never copied (fixed 14z-69o)
 
