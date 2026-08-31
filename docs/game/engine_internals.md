@@ -3286,6 +3286,36 @@ handler, and the tenants' handlers are their own** [M:
   same provenance as Huitzil's flight form below. Caveat stated once: dead
   code may carry untuned values — Capcom's, but never player-tested in a
   shipped game.
+- **THE DEAD FAMILY, MEASURED ACROSS ALL THREE ROMS** [M:
+  `tests/test_df_startup_provenance.sh`, 14z-126]: vs2 and vh2 do not carry
+  VS-style DF handlers for the three newcomers only — they carry them for
+  ALL 18. Every vanilla row of `dispatch_16` arms the SAME `+0x147` value in
+  vsavj, vsav2 and vhunt2 (BU/DE 0x29, GA/AU 0x22, VI 0x3B, ZA 0x46, AN/LI
+  0x3C, FE 0x2E, BI 0x2B, SA/QB 0x04, JE 0x7F, MO 0x3C — Lei-Lei arms hers
+  deeper in the handler, outside the static window, measured live), and
+  the three tenant rows arm the same value in vsav2 and vhunt2 (their
+  handlers differ only by pointer-shifted operands, 4-7 bytes of 0x80),
+  which is not the value of the vsavj row they alias. So the family was
+  carried into the sequels whole and switched off for everyone by the new
+  activation body; the tenants' handlers are its three extra members. The
+  class this belongs to — what a shipped ROM carries but never reaches — is
+  catalogued in `docs/game/preserved_data.md`.
+  **What the ROMs cannot say is WHEN they were written** — before VS shipped
+  (an internal build with the three characters, cut with their data; the
+  shipped vsavj carries no trace of them, 14z-116) or during vs2/vh2
+  development on the VS engine before the DF redesign. Huitzil's handler
+  being a whole flight-mode design vs2 discarded leans toward the former;
+  it is a lean, not evidence.
+- **THE PRESERVATION READING (maintainer, 2026-08-31, recorded as
+  assessment):** because the port repoints each tenant's row to its own
+  handler, it RESTORED the values Capcom set for these characters on this
+  DF mechanism rather than inheriting the shells' — "while this may be luck,
+  this shows that the data actually existed", and so, frame data that may
+  have changed between Vampire Hunter and vs2/vh2 aside, the port is likely
+  as close as Capcom had intended; it remains possible the values were never
+  put to the test and something is unbalanced. What is MEASURED: the
+  three-way agreement above and the live windows. What is INFERRED: intent
+  and balance.
 - **natively on vs2 there is no window at all**: the seq-0x16 handler never
   runs ([VSE-69]) and the vs2 DF path writes `+0x147` = 1 (`0x025F2A`),
   cleared before frame_done — measured "never armed" on the native leg. The

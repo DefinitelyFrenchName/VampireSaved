@@ -162,3 +162,4 @@ test_charmap_current
 # OUTSIDE the tree, so the gate SKIPs without it rather than passing vacuously.
 # Two must-fire controls; ~10 s.
 test_community_crosscheck
+test_df_startup_provenance

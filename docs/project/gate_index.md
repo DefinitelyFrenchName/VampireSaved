@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**285 scripts** — 61 ci_portable, 62 ci_static, 162 emulator-tier (run by name).
+**286 scripts** — 61 ci_portable, 63 ci_static, 162 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -27,7 +27,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [oracle](#oracle) | 27 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 81 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 13 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 14 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 30 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 18 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -316,6 +316,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/test_advancing_guard.sh` | test | emulator | MAME, ~2.5 min | THE ADVANCING GUARD (guard push), MEASURED on native vs2 and on vsavj, and frozen (14z-123, the documentation pass's G2). | 14z-123 |
 | `tests/test_anim_node_walk.sh` | test | emulator | MAME, a build dir, ~2 min | THE ANIMATION-NODE DECODER IS AN INSTRUMENT (character-data map, phase 1; 14z-118). tools/anim_nodes.py reads the per-character anim index tables and walks the 0x18-byte node chains by the rules read off vs2's walker (PRG:0x02713C / 0x0271C… | 14z-118 |
 | `tests/test_community_crosscheck.sh` | test | ci_static | ROMDIR | OUR DERIVED VANILLA FRAME DATA STILL SAYS WHAT THE COMMUNITY WORKBOOK SAYS (14z-125, the community cross-check). | 14z-125 |
+| `tests/test_df_startup_provenance.sh` | test | ci_static | ROMDIR | THE TENANTS' DARK FORCE STARTUP WINDOWS ARE CAPCOM'S OWN, CARRIED FROM vs2/vh2 — the three-way ROM agreement that backs the preservation claim, frozen (14z-126). | 14z-126 |
 | `tests/test_hitbox_encoding.sh` | test | emulator | MAME, a build dir, ~4 min | THE HITBOX ENCODING AND THE ATTACK RECORD ARE WHAT THE ENGINE USES (character-data map, PHASE 2; measured 14z-120 (5)). | 14z-120 (5) |
 | `tests/test_killshread_es.sh` | test | emulator | MAME, ~2 min | KILLSHREAD (ES): the maintainer's ruling (14z-121) that the ES stance change's effect plays out DURING THE SUMMON — the returning Killshread attacks going away AND coming back, where the plain summon attacks one way — MEASURED on native vs2… | 14z-121 |
 | `tests/test_move_naming.sh` | test | emulator | MAME, a build dir, ~1 min | THE MOVE LIST'S CHAIN IDS ARE WHAT NATIVE VS2 ENTERS (character-data map, phase 1 naming step; 14z-120). | 14z-120 |

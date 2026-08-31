@@ -23,6 +23,12 @@
 > ## Natively on vs2 there is NO window ([VSE-69]). No gameplay change proposed:
 > ## the tenants already ship with their own; retuning one is a single byte.
 > ## Read engine_internals "Dark Force" -> "The STARTUP INVINCIBILITY window".
+> ## **And the PRESERVATION FINDING that followed:** vs2/vh2 carry the VS-style
+> ## DF handlers for ALL 18, switched off; the vanilla rows arm the same value
+> ## in all three ROMs, the tenants' the same in vs2 and vh2 — so the port
+> ## RESTORED Capcom's own values (the maintainer's reading, recorded as
+> ## assessment). Locked by `tests/test_df_startup_provenance.sh` (ci_static);
+> ## the class now has its own small document, `docs/game/preserved_data.md`.
 > ##
 > ## **THE ARTIFACT REPUBLISH IS DONE (14z-126, second pass):** all three
 > ## character pages are current (Donovan `85d7fd52`, Huitzil `f0dddc83`,

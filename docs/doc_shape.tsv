@@ -41,6 +41,7 @@ HANDOFF.md	REFERENCE	HANDOFF_HISTORY.md	-
 HANDOFF_HISTORY.md	HIST	-	-
 # --- game
 docs/game/engine_internals.md	REFERENCE	docs/game/engine_internals_history.md	banner,atlas-rows
+docs/game/preserved_data.md	REFERENCE	-	banner
 docs/game/engine_internals_history.md	HIST	-	-
 docs/game/gotchas.md	REGISTER	-	-
 docs/game/atlas/README.md	REFERENCE	-	-
