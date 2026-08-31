@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """compare_flicker.py — checksum-log comparison with bounded flicker tolerance.
 
-Instrument for the hooked-build legacy gate (CLAUDE.md §4 amendment, v2
-refinement pending): cycle-skew from engine hooks can capture a state
+Instrument for the hooked-build legacy gate (docs/project/oracle_classes.md v2
+— CLAUDE.md §4's spec of record since 14z-124; the v2 refinement written here
+as "pending" was ratified 2026-07-27): cycle-skew from engine hooks can capture a state
 transition one frame apart at input-accept/spawn boundaries, producing an
 ISOLATED divergent frame (or two) after which the logs re-converge exactly
 (measured: 03_two_player_vs frames 829/2093, 10_midattract_start 3007/3129,

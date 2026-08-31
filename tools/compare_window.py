@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """compare_window.py — the "bounded re-convergent window" comparison class
-(CLAUDE.md §4 v3, maintainer-approved 2026-08-05).
+(docs/project/oracle_classes.md v3 — CLAUDE.md §4's spec of record since
+14z-124; maintainer-approved 2026-08-05).
 
 For a screen the roster work deliberately alters. A replay qualifies ONLY
 when all four hold, each frozen per replay:

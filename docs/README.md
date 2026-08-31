@@ -29,8 +29,9 @@ than guessing a filename):
 | **the MiSTer discipline, before touching the core, the lane, the MRAs or a board report** | the two SKILLS — `.claude/skills/mister-cps2-wide-core/SKILL.md` (level 1, game-independent, `[MSC-NN]`) and `.claude/skills/mister-vampire-saved/SKILL.md` (level 2, this romset, `[MSV-NN]`) — each rule anchored `**[MSC-NN]**` in the paragraph it distils and locked by `tools/checkskills.py` (`tests/test_checkskills.sh`); the scope is [`project/mister_scope.md`](project/mister_scope.md) |
 | **the game's LAWS before reading, tracing or reasoning about any Vampire Savior subsystem** | the skill `.claude/skills/vampire-savior-engine/SKILL.md` (`[VSE-NN]`: the three-sibling method and the dead-row class, the per-character bank and the id space, pools and type dispatch, the drawer, damage/judge/capture, the select screen and venue assets, sound, Dark Force, exceptions, the rig traps the game sets) — it quotes NO addresses; each rule names the `engine_internals.md` section or atlas row that carries them |
 | **the CPS-2 board's laws and the emulators' behaviour as instruments, before any probe, dump or build** | the skills `.claude/skills/cps2-hardware/SKILL.md` (`[CPH-NN]`: byte order, the encryption window and views, gfx interleave, the OBJ format, QSound packing laws, the WIDE profile as an artifact) and `.claude/skills/cps2-emulation/SKILL.md` (`[CPE-NN]`: what MAME/FBNeo probes see and miss, the pinned builds, the two-implementation protocol) — anchored in [`platform/gotchas.md`](platform/gotchas.md), `project/cps2_wide.md`, `project/gotchas.md` and HANDOFF; plan and boundaries in [`project/skills_scope.md`](project/skills_scope.md) |
-| **the port's own discipline before touching a manifest, a tool, a gate, a freeze, a release or a field report** | the skill `.claude/skills/vampire-saved-port/SKILL.md` (`[VSP-NN]`, 161 rules: CLAUDE.md by citation, the oracle classes and what may never loosen them, the extraction/reconciliation/generation law, freezes and build-dir policy, the pre-commit suite, every rig and probe and how each has lied) — anchored in CLAUDE.md, HANDOFF, `project/gotchas.md`, `game/gotchas.md`, the two porting method docs, `tenant_manifest.md`, `build_dir_triage.md`, `hardening_register.md`, `patch_index.md` and the two standing STATE sections |
+| **the port's own discipline before touching a manifest, a tool, a gate, a freeze, a release or a field report** | the skill `.claude/skills/vampire-saved-port/SKILL.md` (`[VSP-NN]`, 161 rules: CLAUDE.md by citation, the oracle classes and what may never loosen them, the extraction/reconciliation/generation law, freezes and build-dir policy, the pre-commit suite, every rig and probe and how each has lied) — anchored in CLAUDE.md, `project/oracle_classes.md`, HANDOFF, `project/gotchas.md`, `game/gotchas.md`, the two porting method docs, `tenant_manifest.md`, `build_dir_triage.md`, `hardening_register.md`, `patch_index.md` and the two standing STATE sections |
 | what the extended hardware profile is and what rule 1 v2 permits | [`project/cps2_wide.md`](project/cps2_wide.md) |
+| **the frozen legacy-oracle CLASSES** — exact / flicker-tolerated / first-divergence constant / bounded window / composite / the v5 intra-mechanism rule — their definitions, dates, exemptions, checkers and ground truth | [`project/oracle_classes.md`](project/oracle_classes.md) — the spec of record; CLAUDE.md §4 names the classes and points here |
 | what a change did, byte by byte | `project/patch_notes.md`; the registry is `project/patch_index.md` |
 | why something that "should work" does not | [`GOTCHAS.md`](GOTCHAS.md) — always check before re-deriving |
 
@@ -53,6 +54,39 @@ Entry points at this level, deliberately not in a bucket:
   hand-written gate fence; a gate's WHY lives in the gate.
 - `checksums.txt` — machine-read by `tools/audit_roms.py`. A data
   manifest, not documentation; its path is deliberately stable.
+
+## The documents, by role
+
+The roster CLAUDE.md §5 carried until 14z-124 (pass 2 moved it here; §5
+keeps the one-question rule and the disciplines). `NEXT_SESSION.md`,
+`GOTCHAS.md`, `annotations.md` and `project/gate_index.md` are the entry
+points above.
+
+- `HANDOFF.md` — operational map: what exists, the build registry, how to
+  build, how to test. The first read of any session after this file.
+- `docs/game/engine_internals.md` — how the engine works, by subsystem (the
+  synthesis; the document a stranger reads to understand the game).
+  **Every subsystem section names the `atlas/` rows it depends on and the
+  gates that lock it** — a section that does not is how 14z-69 spent three
+  sessions measuring a mode it had never entered while the cost of entering
+  it sat documented in `ram.md`.
+- `docs/game/atlas/` — the verified ROM/RAM map per romset (the project bible).
+- `docs/project/patch_notes.md` — per-change detail: every byte, and why.
+- `docs/project/patch_index.md` — one-page registry: status, dependencies,
+  exclusivity, deprecation candidates. Updated in the same commit as any
+  patch change.
+- `.claude/skills/<name>/SKILL.md` — the DISTILLED DISCIPLINE, loaded
+  before the work (since 14z-114: `mister-cps2-wide-core`, `mister-vampire-
+  saved`, `cps2-hardware`, `cps2-emulation`, `vampire-savior-engine`,
+  `vampire-saved-port` — the last one cites THIS file by section and never
+  restates it; plan and boundaries in `docs/project/skills_scope.md`).
+  Skill = the laws and traps; docs = the facts. Every rule is anchored
+  `**[PFX-N]**` in the doc paragraph it distils and `tools/checkskills.py`
+  locks the two so they cannot drift; a skill that quotes a number cites a
+  LOG, never the synthesis. Editing an anchored paragraph means keeping the
+  marker with the fact or moving the rule.
+- `../HANDOFF.md` sits above `docs/`: the first read of any session after
+  CLAUDE.md and STATE.md.
 
 ## Contents
 
@@ -83,6 +117,7 @@ history twins and are listed last. Level-0 files are the entry points above.
 - [`mister_field.md`](project/mister_field.md) — **REFERENCE** · the MiSTer FIELD TEST and TRIAGE, in-tree
 - [`mister_fit.md`](project/mister_fit.md) — **REFERENCE** · what merged-m6 needs vs what jtcps2 offers, per region
 - [`mister_map.md`](project/mister_map.md) — **INDEX** · the MiSTer SDRAM PLACEMENT MAP: which region lands in which bank at which offset and why it fits, the `.rom` layout against the 26-bit `ioctl_addr`…
+- [`oracle_classes.md`](project/oracle_classes.md) — **REFERENCE** · the legacy oracle classes — the ratified comparison vocabulary (CLAUDE.md §4's spec of record, moved 14z-124)
 - [`patch_index.md`](project/patch_index.md) — **INDEX** · patch_index — one-page registry of every patch
 - [`patch_notes.md`](project/patch_notes.md) — **LOG** · patch_notes — per-change detail: every byte, and why
 - [`porting_code_regions.md`](project/porting_code_regions.md) — **REFERENCE** · how to root a block of vs2/vh2 CODE so it still works after we move it: bounds, pc-relative data tables, branch escapes, and crypt placement

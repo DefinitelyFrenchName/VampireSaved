@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""s4_thresholds.py — THE RATIFIED CLAUDE.md §4 THRESHOLDS, in one place
-(14z-93, GitHub #44).
+"""s4_thresholds.py — THE RATIFIED §4 THRESHOLDS, in one place (14z-93,
+GitHub #44; the spec of record is docs/project/oracle_classes.md since 14z-124).
 
 Two numbers govern every non-exact legacy comparison class:
 

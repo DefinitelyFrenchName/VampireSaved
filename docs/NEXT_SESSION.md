@@ -7,7 +7,7 @@
 
 > ## **START HERE. NOTHING IS RED. NO BUILD CHANGED — the tree is still the
 > ## M12 freeze (merged-m14 `6649523a`, `build/m3b_merged21`), FIELD-VERIFIED
-> ## GREEN. Four commits are LOCAL past the pushed `719c560` (14z-124) — push
+> ## GREEN. Five commits are LOCAL past the pushed `719c560` (14z-124) — push
 > ## at the maintainer's word; check `git status -sb`, not this line.**
 > ##
 > ## **THE DOCUMENTATION RATIONALIZATION PASS IS DONE (14z-124, G7 closed).**
@@ -18,13 +18,13 @@
 > ## every `##`; its chronology is `engine_internals_history.md`).
 > ## `inferred_claims.md` is CLOSED (row 11 alone ruled-parked, #113).
 > ##
-> ## **NOTHING IS QUEUED AS WORK. TWO RULINGS WAIT** (STATE "Decisions
-> ## pending"): (1) **CLAUDE.md PASS 2** — the structural cut (the oracle-class
-> ## spec [VSP-27..31] to `docs/project/oracle_classes.md`; the §5 taxonomy
-> ## list to `docs/README.md`; the recordings how-to to HANDOFF); it moves
-> ## anchored law out of the constitution, so it is the maintainer's call —
-> ## if ruled, the method is the pass's (a restructure script, per-hunk
-> ## review, census re-freeze, checkskills green). (2) the **ZABEL j.LK
+> ## **CLAUDE.md PASS 2 IS DONE TOO** (ruled and executed 2026-08-31): 344
+> ## lines; the oracle-class spec of record is `docs/project/oracle_classes.md`
+> ## ([VSP-27..30] live there — edit a class THERE, never in §4); the document
+> ## roster is `docs/README.md` "The documents, by role".
+> ##
+> ## **NOTHING IS QUEUED AS WORK. ONE RULING WAITS** (STATE "Decisions
+> ## pending"): the **ZABEL j.LK
 > ## PROXIMITY GUARD** — its own session; a LEGACY-content patch needing its
 > ## own track/flag and expectation class; START WITH A RECORDING ([VSP-20]),
 > ## then archaeology ([VSP-14]), then measure vanilla's proximity-guard test

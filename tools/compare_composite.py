@@ -2,7 +2,8 @@
 """compare_composite.py — the CONJUNCTION of two already-ratified §4
 comparison classes, for replays whose masked comparison shows both.
 
-STATUS: RATIFIED. CLAUDE.md §4 v4 (maintainer-ratified 2026-08-06) defines this
+STATUS: RATIFIED. docs/project/oracle_classes.md v4 (CLAUDE.md §4's spec of
+record since 14z-124; maintainer-ratified 2026-08-06) defines this
 class; 121 of the 185 frozen `.masked` specs use it. The header previously read
 "PROPOSED, awaiting maintainer ratification (STATE 14z-61)" and was stale by ten
 days — corrected 14z-90 under RETRACTION DISCIPLINE (GitHub issue #4).
