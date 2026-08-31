@@ -35,6 +35,19 @@ bare "appended" is a GAME term — the ROM-appended window/cells) /
 Allowances live in docs/doc_shape_allow.tsv; a row matching no header FAILS
 as dead, so the list cannot outlive its reasons.
 
+THE BOLD-PARAGRAPH RULE (REFERENCE and REGISTER, added 14z-126b): the header
+rule bars `### 14z-70: ...`, so the log came back one level down, as bold
+paragraphs — HANDOFF carried eight `**Previous batch (14z-N...)**` blocks,
+~140 lines, through eight freezes without a gate looking at them. A
+PARAGRAPH-OPENING bold run FAILS when it LEADS with chronology (a session
+token, a date, or a `Previous batch|freeze|build` announcement) AND carries a
+session token. Both halves matter: a bold opener that merely CARRIES
+provenance is a fact and must pass (HANDOFF's live
+`**Current WIDE builds - THE 14z-119 PHYSICS-PORT FREEZE (...)**` is exactly
+that shape). `superseded` and `RETRACTED` are deliberately NOT chronology
+leads: CLAUDE.md §5 [VSP-13] step 4 requires a retraction marker to stay in
+the body prose where it corrects the claim. Same allow table as the headers.
+
 ALSO CHECKED: ORIENT = one `# ` header, no `(HISTORY` header (the twin holds
 history); HIST = carries no `**[PFX-N]**` anchor; every named history_twin
 exists and is classed HIST; `requires` = banner (a `**STATUS` line in the
@@ -66,6 +79,22 @@ SESSION_TOKEN = re.compile(r"(?i)\b14z-\d+[a-z]?\b|\bsession \d|\b20\d\d-\d\d-\d
 CHRONO = re.compile(r"(?i)\b14z-\d+[a-z]?\b|\bsession \d|\b20\d\d-\d\d-\d\d\b"
                     r"|\bappended 14z|\(HISTORY|\bsuperseded\b"
                     r"|\b(second|third) pass\b|\bRETRACT(S|ED)?\b")
+# A BOLD PARAGRAPH OPENER that LEADS with chronology (14z-126b). The header
+# rule bars `### 14z-70: ...`; the same log came back as bold paragraphs
+# (HANDOFF's eight `**Previous batch (14z-N...)**` blocks) because nothing
+# looked at them. Calibrated against all 619 bold openers in the tree's
+# REFERENCE/REGISTER docs: 70 carry a session token, and only the eight lead
+# with a superseded-batch announcement. NOT in the lead set, deliberately:
+# `superseded` and `RETRACTED` — [VSP-13] step 4 requires a retraction marker
+# to stay in the body prose where it corrects the claim.
+CHRONO_LEAD = re.compile(
+    r"(?i)^\W*(?:14z-\d+[a-z]?\b"
+    r"|session\s+\d"
+    r"|20\d\d-\d\d-\d\d\b"
+    r"|(?:the\s+)?previous\s+(?:batch|freeze|build|window|set|release)\b"
+    r"|earlier\s+(?:batch|freeze|build)\b)")
+BOLD_OPEN_RE = re.compile(r"^\*\*+\s*(.+?)\s*(?:\*\*)?$")
+
 PROVENANCE_OPENER = re.compile(
     r"(?i)^\((paid|measured|named|session|ruled|opened|audited|static|confirmed"
     r"|as built|since|decided|frozen|re-pointed|corrected|updated|rewritten"
@@ -183,6 +212,40 @@ def lint_headers(rel, text, cls, allows):
     return fails
 
 
+def lint_bold_openers(rel, text, cls, allows):
+    """A PARAGRAPH-OPENING bold run that leads with chronology and carries a
+    session token, in a REFERENCE/REGISTER doc. The lead and the token are
+    read from the OPENING LINE only: every real instance carries both there,
+    and a run-joining scanner would have to guess where an unclosed bold run
+    ends. Allowances share docs/doc_shape_allow.tsv with the header lint."""
+    fails = []
+    lines = text.splitlines()
+    for n, line in enumerate(lines, 1):
+        if not line.startswith("**"):
+            continue
+        prev = lines[n - 2] if n >= 2 else ""
+        if prev.strip() and not HEADER_RE.match(prev):
+            continue  # a continuation line, not a paragraph opener
+        m = BOLD_OPEN_RE.match(line)
+        if not m:
+            continue
+        body = m.group(1)
+        if not CHRONO_LEAD.match(body):
+            continue
+        tok = SESSION_TOKEN.search(body)
+        if not tok:
+            continue
+        allowed = False
+        for a in allows:
+            if a["rel"] == rel and a["rx"].search(line):
+                a["hit"] = True
+                allowed = True
+        if not allowed:
+            fails.append(f"{rel}:{n} BOLD CHRONOLOGY PARAGRAPH in a {cls} doc "
+                         f"('{tok.group(0)}'): {line.strip()[:110]}")
+    return fails
+
+
 def check_file(root, rel, row, allows, no_pending):
     fails = []
     p = root / rel
@@ -194,6 +257,7 @@ def check_file(root, rel, row, allows, no_pending):
     text = p.read_text(encoding="utf-8", errors="replace")
     if cls in LINT_CLASSES:
         fails += lint_headers(rel, text, cls, allows)
+        fails += lint_bold_openers(rel, text, cls, allows)
     if cls == "ORIENT":
         h1 = [ln for ln, l in enumerate(text.splitlines(), 1) if re.match(r"^# ", l)]
         if len(h1) != 1:
@@ -361,6 +425,37 @@ def selftests():
             bad.append("closed trailing provenance group not stripped")
         if strip_trailing_paren("A (14z-70) middle group") == "A":
             bad.append("a NON-trailing group was stripped")
+        # BOLD CHRONOLOGY PARAGRAPHS (14z-126b), both directions
+        shape([("HANDOFF.md", "EXEMPT", "-", "-"), ("docs/a.md", "REFERENCE", "-", "-")])
+        doc("docs/a.md", "# A file\n\n**Previous batch (14z-99, ruled): don-m9.**\ntext\n")
+        f, _ = check(root)
+        if not any("BOLD CHRONOLOGY" in x for x in f):
+            bad.append("a bold chronology paragraph was not caught")
+        doc("docs/a.md", "# A file\n\n**14z-70: the tiles LOCATED**\ntext\n")
+        f, _ = check(root)
+        if not any("BOLD CHRONOLOGY" in x for x in f):
+            bad.append("a bare session-token bold lead was not caught")
+        # a session token in a bold opener that does NOT lead with chronology
+        # is a fact with provenance — HANDOFF's live "Current WIDE builds"
+        # paragraph is exactly this shape and must survive
+        doc("docs/a.md", "# A file\n\n**Current builds — THE 14z-119 FREEZE (ruled 2026-08-29):\n"
+            "don-m18 / merged-m14.**\n")
+        f, _ = check(root)
+        if any("BOLD CHRONOLOGY" in x for x in f):
+            bad.append("a provenance-carrying bold opener was rejected as chronology")
+        # [VSP-13] step 4: a retraction marker STAYS in the body prose, so a
+        # bold opener announcing one is never chronology
+        doc("docs/a.md", "# A file\n\n**SUPERSEDED 14z-127: the old reading, kept.**\n")
+        f, _ = check(root)
+        if any("BOLD CHRONOLOGY" in x for x in f):
+            bad.append("a retraction marker was barred — [VSP-13] step 4 requires it")
+        # a mid-paragraph bold line is a continuation, not an opener
+        doc("docs/a.md", "# A file\n\nprose runs on\n**Previous batch (14z-99): don-m9.**\n")
+        f, _ = check(root)
+        if any("BOLD CHRONOLOGY" in x for x in f):
+            bad.append("a mid-paragraph bold line was linted as an opener")
+        doc("docs/a.md", "# A file\n## Topic one (measured 14z-101)\nfacts\n")
+
         # ORIENT: one # header, no (HISTORY
         doc("docs/a.md", "# One\n## (HISTORY) old opener\n")
         shape([("HANDOFF.md", "EXEMPT", "-", "-"), ("docs/a.md", "ORIENT", "-", "-")])

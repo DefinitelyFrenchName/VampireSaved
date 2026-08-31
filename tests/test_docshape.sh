@@ -7,7 +7,13 @@
 # per document: class, history twin, requirements) and asserts: completeness
 # (every .md under docs/ except the generated tables/chars/, plus HANDOFF.md,
 # is declared); no session-shaped header in a REFERENCE/REGISTER doc (a
-# trailing provenance parenthetical is stripped first); ORIENT holds one `# `
+# trailing provenance parenthetical is stripped first); no BOLD CHRONOLOGY
+# PARAGRAPH in one either (14z-126b — a paragraph-opening bold run that LEADS
+# with a session token or a `Previous batch` announcement AND carries a
+# session token; a bold opener that merely carries provenance is a fact and
+# passes, and a `SUPERSEDED`/`RETRACTED` lead is never barred because
+# [VSP-13] step 4 requires that marker to stay in the body prose);
+# ORIENT holds one `# `
 # header and no (HISTORY header; HIST files carry no anchors; twins exist and
 # are HIST; declared banner/atlas-rows requirements; no dangling doc link in
 # README/HANDOFF/CLAUDE.md; every docs/x.md 'Section' citation in tools/
@@ -23,7 +29,11 @@
 # MUST-FIRE CONTROLS on a perturbed copy (RH-9), each must FAIL for its
 # stated reason: a chronology header prepended to a REFERENCE doc; an anchor
 # in a HIST-class doc; an undeclared file; a dead allow row; a required
-# banner absent; a dangling link; a citation of a nonexistent section.
+# banner absent; a dangling link; a citation of a nonexistent section; a bold
+# chronology paragraph. The must-NOT-fire side of the bold rule is the tree
+# itself — 619 bold paragraph openers in the REFERENCE/REGISTER docs, 70 of
+# them carrying a session token, and the rule was calibrated to fire on the
+# eight and none of the other 611 (14z-126b).
 #
 # HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -119,5 +129,12 @@ elif grep -q "still PENDING" "$W/h/log"; then
 else
     bad "PENDING row under --no-pending: failed for the wrong reason:"; sed 's/^/        /' "$W/h/log" | head -12
 fi
+
+# i: a bold chronology paragraph in a REFERENCE doc (14z-126b). THE HEADER
+# RULE'S BLIND SPOT: barred from headers, the log came back as bold
+# paragraphs — HANDOFF carried eight `**Previous batch (14z-N…)**` blocks,
+# ~140 lines, unseen through eight freezes.
+mkcopy "$W/i"; printf '\n**Previous batch (14z-999, ruled): don-m9 / merged-m4.**\n' >> "$W/i/docs/game/atlas/id_space.md"
+control "bold chronology paragraph in a REFERENCE doc" "$W/i" "BOLD CHRONOLOGY PARAGRAPH"
 
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

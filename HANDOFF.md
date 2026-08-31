@@ -599,6 +599,18 @@ tools/run_wide.sh build/don_m18 fbneo      # or the solo builds (hui52,
                                            # 14z-119 physics-port freeze)
 ```
 
+**The Oboro path in (2) is OURS and the Dark Gallon one beside it is
+VANILLA'S**, which is why the two must not be confused when either is
+touched: the shipping `oboro_select_hook` is a `[[site_thunk]]` at
+`PRG:0x020B9C` in all three tenant manifests, displacing the confirm-time
+`cmpi.b #$2,$382(a6)` and re-executing it, so vanilla's own Gallon-variant
+idiom at `PRG:0x020B9C` one cell over (Gallon + START + 2-3 punches or
+kicks -> Dark Gallon `0x12`) is preserved BY CONSTRUCTION. Removing the hook
+would make Oboro unreachable again and leave Dark Gallon untouched — no
+vanilla path anywhere writes `0x18` (STATE "THE ARCADE HIDDEN-CHARACTER
+ROSTER"). Detail: `docs/game/atlas/select_screen.md`,
+`docs/project/patch_index.md` W1.
+
 **Current WIDE builds — THE 14z-119 PHYSICS-PORT FREEZE (maintainer-ruled
 2026-08-29 "use VS2 parameters and not the shell character's"; mark M12):
 donovan-m18 / huitzil-m25 / pyron-m19 / merged-m14.**
@@ -617,98 +629,30 @@ Detail: patch_notes 14z-119 / 14z-118 (charmap, 2), STATE 14z-119; the
 registry row below. Previous freeze (merged-m13, M11): FIELD VERDICT GREEN
 2026-08-29 (STATE 14z-118).**
 
-**Previous batch (14z-117 PYRON-MEDALLION FREEZE, the 14z-116 fix,
-field-validated on the board 2026-08-29 before freezing; mark M10):
-donovan-m16 / huitzil-m23 / pyron-m17 / merged-m12.**
-`build/don_m16` (`7950c844`, 332 ops), `build/hui50` (`7ade3180`, 366),
-`build/pyron34` (`01b39c39`, 303), `build/m3b_merged19` (program
-fingerprint `cde712e1`, 819 ops), stock twin `build/m5_stock11` (`d29fd062`,
-UNCHANGED — the thunk is `only_variant_slot`, measured by rebuild: every
-member identical). The naked-eye tell is the **M10** mark (three glyphs,
-16 px further left); with P2 parked on a tenant cell Pyron's medallion
-keeps its colours and the P2 figure's sword is orange (select screen only).
-Detail: patch_notes 14z-117 and 14z-116, STATE 14z-117; the registry row
-below.
-
-**Previous batch (14z-115 SELECT-WHEEL SEPARATION FREEZE, maintainer-directed
-"E2", approved on MAME snapshots 2026-08-28; emulation verdict "no
-regression"): donovan-m15 / huitzil-m22 / pyron-m16 / merged-m11.**
-`build/don_m15` (`38a4becb`, 332 ops), `build/hui49` (`7bb36d0c`, 366),
-`build/pyron33` (`7177229a`, 303), `build/m3b_merged18` (program
-fingerprint `dea2c918`, 819 ops), stock twin `build/m5_stock10` (`d29fd062`,
-UNCHANGED — the change is profile-gated, measured by rebuild). The
-naked-eye tell is the **M9** mark; the three tenant medallions sit lower,
-spread, each with a 1 px black ring. Detail: patch_notes 14z-115, STATE
-14z-115; the registry row below.
-
-**Previous batch (14z-111 #99 ROOT-CAUSE FREEZE, repackaged
-one-zip at 14z-113 (merged-m10; FIELD VERDICT GREEN 2026-08-27/28):
-donovan-m14 / huitzil-m21 / pyron-m15 / merged-m9 -> merged-m10.**
-`build/don_m14` (`772d8052`, 332 ops), `build/hui48` (`cd362ca4`, 366),
-`build/pyron32` (`c403a283`, 303), `build/m3b_merged17` (program
-fingerprint `32007911`, 819 ops; = `m3b_merged16` in every member, one zip),
-stock twin `build/m5_stock9` (`d29fd062`, UNCHANGED from m5_stock8). The
-naked-eye tell is the **M8** mark. Full rows: the registry entries for
-14z-110 / 110b / 111 / 113 below; detail STATE 14z-111 and 14z-113.
-
-**Previous batch (14z-105 WINDOW FREEZE (maintainer "happy with
-the plan" 2026-08-22; FIELD-CONFIRMED + PUSHED the same day): donovan-m11 / huitzil-m20 /
-pyron-m14 / merged-m6.**
-`build/don_m11` (`1de9a027`, 325 ops), `build/hui47` (`24a27940`, 365),
-`build/pyron31` (`6bf265ab`, 298), `build/m3b_merged13` (`64426955`, 806
-ops — BIT-FOR-BIT the rehearsed build/merged_probe_w6, attic'd 14z-106), stock twin
-`build/m5_stock6` (`883e7d17` — UNCHANGED from m5_stock5: both features
-are profile-gated, measured by rebuild). = the 14z-102 batch + (W1) the
-`oboro_select_hook` site_thunk at PRG:0x020B9C — Bishamon's cell + START
-held at confirm commits vanilla vsavj's Oboro 0x18 (vanilla's Gallon-
-variant idiom one cell over; the Start bit MEASURED: +0x394 = $8000) +
-(W2) the select-screen version string "M6" (two authored glyph sprites on
-the roster21 wheel record, group C 0x1FE40+, pal row 0x19, pixel-exact
-gate). Gates: `test_oboro_select.sh` (5 legs incl. P2 + stock),
-`test_version_string.sh`, `test_gfx_tile_codec.sh` (the codec half-mirror
-found on the way — docs/platform/gotchas.md). Detail: STATE 14z-105;
-patch_notes 14z-105.
-
-**Previous batch (14z-102 WINDOW FREEZE (maintainer "go"
-2026-08-21; beams field-confirmed on the rehearsal probe): donovan-m10 /
-huitzil-m19 / pyron-m13 / merged-m5.**
-`build/don_m10` (`c6a02cb0`, 323 ops), `build/hui46` (`1a7249d6`, 363),
-`build/pyron30` (`dbce705b`, 296), `build/m3b_merged12` (`393f92a5`,
-804 ops — BIT-FOR-BIT the rehearsed build/merged_probe_row31; hui46 is
-likewise bit-for-bit the rehearsed build/hui_probe_row31), stock twin
-`build/m5_stock5` (`883e7d17` — moved again: #107's reconciliation flip
-is in the SHARED map, not profile-gated). = the 14z-99 batch + (#107)
-the reconciliation row 0x0448a6 -> 0x04367a (verified,
-callsite-anchored, re-derived at the flip) + (#109) THE CLONE-BEAM FIX:
-effect-class ROW 31 (the DF clone-mode beam emitter vsavj shipped as a
-stub) ported — root 0x926e4:0x11e:t0x922f0 (vh2-oracled, 6/0x11E
-operand-only diffs) + beam_effect_class31 code_ptr at PRG:0x080B28.
-THE ROOT CHANGED EXTRACTION: build/hui32/extract regenerated (old
-kept as extract.pre-14z102), every hui placement shifted, op counts
-re-frozen (hui 363; merged 804/901), tenant bases re-derived
-(phobos 0x4595a0, pyron 0x4ac8dc, +0x100 each). Gold tint KEPT
-(maintainer ruling 2026-08-21). WHAT TO LOOK AT FIRST: Phobos DF
-(HP+HK with stocks) -> move (train forms) -> attack: the clone beams
-STROBE green/blue (they were invisible before — GitHub #109; gate
-audit_clone_beam_lines.sh, default EXPECT_LINES=1).
-Detail: STATE 14z-102; patch_notes 14z-102.
-
-**Previous batch (14z-99, maintainer "go"
-2026-08-20): donovan-m9 / huitzil-m18 / pyron-m12 / merged-m4.**
-`build/don_m9` (`428fc0c9`, 323 ops), `build/hui45` (`c4bbb375`, 361),
-`build/pyron29` (`4c3c072b`, 296), `build/m3b_merged11` (`2343607a`,
-802 ops — BIT-FOR-BIT the rehearsed build/probe_window), stock twin
-`build/m5_stock4` (`16da59b6` — THE STOCK TWIN MOVED for the first
-time since 14z-91: #103's fix is not profile-gated, by design). = the
-14z-96 batch + (#43(b)) the fallback flip (one map row, zero build
-effect) + (#103) the x026142/x05c800 pcrel escape fixes + the donovan
-reconciliation overlay (the arcade-death stall) + (#104) the 15
-capture_kf blocks (every attacker's keyframe block ported whole from
-vs2; tenants hold NATIVE capture records — Victor's grab holds them
-upright) + (#105) win_pal colors 8->10 (the AUTO sets; AUTO winners'
-portraits colored). Every piece was REHEARSED on probe_window before
-landing; suite GREEN x3 on re-frozen sets; merged gates all green.
-Detail: STATE 14z-99 FREEZE.
+**Every superseded freeze is a ROW, not a paragraph.** The eight
+`Previous batch (14z-N…)` blocks this section carried until 14z-126b are
+DELETED, not moved: each freeze's fingerprints and directories are a row of
+"Build registry" below (newest first), its narrative is verbatim in
+`HANDOFF_HISTORY.md` "Build registry narratives", its byte detail is the
+matching `docs/project/patch_notes.md` entry, and its session record is
+STATE.md / `STATE_HISTORY.md`. This paragraph is the pointer; the chronology
+does not come back here (`tests/test_docshape.sh` now bars a bold paragraph
+that leads with a session token or a `Previous batch` announcement, which is
+how these accreted unseen for eight freezes).
+**ONE GAP, MEASURED at the cut and recorded rather than papered over
+(14z-126b):** the 14z-91 LEGACY-REGRESSION batch — `donovan-m7`
+(`c90b60c3`) / `huitzil-m15` (`4531af1e`) / `pyron-m9` (`fac4a777`), the
+builds that superseded the BURNED m6/m14/m8 — has **no registry row in the
+table below, no narrative in the history, and NO `freeze/*` TAG**: the tag
+list holds 75 tags and skips exactly these three (donovan m6 -> m8, huitzil
+m14 -> m16, pyron m8 -> m10, verified with `git tag -l 'freeze/*'`). It is
+the one freeze [VSP-94] did not get, and the deleted paragraph was its most
+visible carrier. What DOES hold it: `tests/expected/registry.tsv` rows 79-81
+(the three fingerprints, freeze-time rows),
+`docs/project/patch_notes.md` "14z-91 — THE LEGACY REGRESSION FIX
+(m5/m13/m7 -> m7/m15/m9): byte detail", and STATE_HISTORY 14z-91. Tagging
+them retroactively needs the freeze commit named, so it is the maintainer's
+call, not a cleanup.
 
 **THE HARDENING PROGRAM (14z-100, maintainer-directed) — the
 crash-candidate map of the merged build lives in
@@ -769,53 +713,7 @@ run it at every freeze). Open cells: tech-hit/tech-roll rigs (also
 unlocks pursuit-connect); KO-frame/corner edge cases;
 Shadow/Marionette (N/A-until-enabled).
 
-**Previous batch (14z-96, THE #101 KERNEL VOICE-TABLE PORT,
-maintainer-ruled 2026-08-18): donovan-m8 / huitzil-m17 / pyron-m11 /
-merged-m3.**
-`build/don_m8` (`d038553d`, 289 ops), `build/hui44` (`bfd819a0`),
-`build/pyron28` (`738bcfc2`), `build/m3b_merged10` (`ac3d0618`, 764
-ops), stock twin `build/m5_stock3` (`a054de5c` = m5_stock2
-BIT-IDENTICAL, whole-artifact digest also unchanged). = the 14z-94
-batch + the kernel voice-table port (GitHub #101, option (a)): 12
-variant-half words + 16 authored (base,alias) Z80 song pairs + 2 batch
-scope ids. The grunt fix, measured identity-only. Registered (registry
-rows d038553d/bfd819a0/738bcfc2); merged-m3 = tag + this row, NO
-registry.tsv row per the merged convention. Detail: patch_notes 14z-96,
-STATE 14z-96 (2)/(3).
-
-**Previous batch (14z-91, THE LEGACY-REGRESSION FIX):**
-`build/don_m7` = **`donovan-m7` (`c90b60c3`)**, `build/hui41` =
-**`huitzil-m15` (`4531af1e`)**, `build/pyron26` = **`pyron-m9`
-(`fac4a777`)**, stock twin `build/m5_stock2` (`a054de5c`). All four moved
-because the fix is NOT profile-gated. = the 14z-87 batch + (A) the two
-`fixture_row0f_override` site_thunks DELETED, (B) the obj_hook dispatch
-sites left VANILLA — each 0x2C-byte object-pool walker relocated into free
-space with its union table appended at copy+0x2C and only the 23 caller
-OPERANDS rewritten — and (C, huitzil only) the beam_list_type6 fallback's
-`$FF010C` counter removed. That cleared all six `.pending` legacy replays;
-frame 829 disappeared corpus-wide and ~30 specs per set became STRICTER
-(`composite … 829 889-2091` -> `window 889 2091`). `donovan-m6`/
-`huitzil-m14`/`pyron-m8` are BURNED (withdrawn 14z-88), hence m7/m15/m9.
-Previous batch: `build/don_m5` = `donovan-m5` (`3c599fb6`), `build/hui40` =
-`huitzil-m13` (`2629561c`), `build/pyron25` = `pyron-m7` (`94ce9a48`) —
-the 14z-87 voice-borrow sets + the beep fix (packing law #3, sound
-members).
-The 14z-87b medallion move (Pyron wheel pal_row 0x1A->0x1D, briefly
-donovan-m6/huitzil-m14/pyron-m8) was WITHDRAWN 14z-88 (maintainer-
-decided): the palette content on row 0x1D changed the select->VS fade's
-cycles enough to cost a LEGACY pairing (replay 38, Victor vs Jedah) one
-main-loop frame on the H/P/merged builds — never re-converging vs vanilla
-(STATE 14z-88). Consequence: the merged-only cosmetic P2-ring-on-Donovan
-medallion whitening is BACK until the collision is fixed on Donovan's
-P2-hover PORTRAIT side (NEXT_SESSION). See the registry rows. Previous batch (14z-86, THE M5 VOICE BATCH):
-`build/hui39` = **`huitzil-m12` (`e1f598d6`)**, `build/pyron24` =
-**`pyron-m6` (`4c6e3fb6`)**, `build/don_m4` = **`donovan-m4`
-(`84f49aaa`)** — each
-= its predecessor + its voice block restored (79 verbatim vs2 songs at
-authored vsavj ids 0x58-0xA6; WIDE v1.2 content members incl. packed
-samples in `vsw.21m`; the facing-alias thunk; per-tenant remaps + farm
-stubs; the whole batch PROFILE-GATED — the stock twin is bit-identical
-6c93cfa8, measured). **KNOWN-OPEN on `merged-m1` (14z-93, GitHub #91/#92): it carries a
+**KNOWN-OPEN on `merged-m1` (14z-93, GitHub #91/#92): it carries a
 REACHABLE planted ILLEGAL.** `tests/audit_tripwire_reach.sh` measures
 `CRASH 8887 vec4 PC 456930` — the tripwire for unresolved vs2 `0x494de` —
 on the 40,620-frame arcade marathon with Huitzil forced. Deterministic.
