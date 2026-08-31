@@ -1,5 +1,30 @@
 # STATE — living progress log
 
+## Session 14z-125b CLOSE — ritual complete. **THE COMMUNITY CROSS-CHECK DELIVERED AND THEN FINISHED IN ONE DAY:
+## all 15 vanilla characters derived for the first time, ~96% agreement per column, the JOIN measured in-emulator
+## after a fitted model was overturned, and the residue arbitrated — two families closed, one honestly open. Two
+## defects were OURS and both are corrected in place. No build changed, nothing frozen. Strict static 123/0/0/0.
+## PUSHED (`44bc6f5..5eb3497`, 24 commits).**
+
+| | |
+|---|---|
+| opened with | the 14z-124 close; NEXT_SESSION's "OPEN THE SESSION WITH THE COMMUNITY CROSS-CHECK (item 2)" and the maintainer's rule |
+| the two arcs | 14z-125 (the cross-check: derivation, comparator, measured join) and 14z-125b (the open halves: arbitration, `red damage` retraction, the hit rig) — their own entries above |
+| **what was ours, not the workbook's** | (1) `active` counted NON-attacking gap nodes — 18 tenant chains inflated, both renderers, the published artifacts affected; fixed by `tools/frame_data.py`, THE one derivation. (2) `red damage` was called UNCOMPARABLE on a wrong conclusion from true evidence; it is `+8` PLUS `+9` — retracted in place in the tool and on the page, 266/281 once compared as the sum |
+| **what the emulator settled against the workbook** | it double-counts attack records that SHARE the engine's `+0x10` dedup key and so cannot both land; our dedup-aware count matches the engine's hit count 75/78. It is also a ROM-DERIVED source, not play-measured — the dealt drops match neither figure while it quotes the records to the byte |
+| **the instrument bound, measured** | 16% of `field_trace` frames advance the node countdown by TWO engine ticks, so a frame-rate trace cannot adjudicate a one-frame convention. `startup +1` / `recovery +2` stay NAMED, not judged. Filed as a game gotcha with the rule: measure ORDER and EVENTS with a frame-rate trace, never DURATIONS |
+| rule 6 fired three times | the suite caught what the new gates' own controls could not: a registry row written as a path where the registry takes bare names (which also failed `test_static_runner`), both gates shelling out to the decrypt instead of `tests/lib/decrypt_cache.sh`, and a stale gate index after the header edits. Each fixed in its own commit |
+| the close battery, exit statuses captured directly | census `rc=0` · `checkdocshape --no-pending` `rc=0` (0 PENDING) · checkdocs `rc=0` · checkskills `rc=0` (425) · `gen_gate_index --check` `rc=0` (284) · gotchas index `rc=0` · annotations current `rc=0`. Portable tier 61/0; **strict static tier PASS 123 / SKIP 0 / FAIL 0 / MISSING 0**, "no tracked file changed during the run" |
+| patch_notes / patch_index | **checked, and correctly NO entry**: `git diff 44bc6f5..HEAD -- build/manifest tools/gen_donovan_patch.py` is EMPTY — no shipped byte moved and nothing was frozen, so the newest entries stay 14z-119. (Checked rather than assumed: the 14z-116 ritual audit found these skipped) |
+| rollover | STATE held FOUR groups at 160 KB; the 14z-122 group (4 records) and then — the file still over the rule's ~150 KB line — the 14z-123 group (2) moved VERBATIM to STATE_HISTORY with a ledger line each. **160 KB → 128 KB**, holding 14z-124 / 14z-125. NEXT_SESSION's 14z-124 opener rolled to its own history at the 14z-125 close |
+| artifacts | the cross-check page published as a **PRIVATE** artifact (maintainer-ruled: internal only, like the character pages that carry IP) — `f572a468-2e35-441c-aa1a-130353e9c9ff`, a curated summary beside the generated page. **The three character-page artifacts were NOT re-published**: measured at ~50 k context each (the Donovan file alone reads as 46,719 tokens) and they are FIVE generator commits stale, so doing one of three would split the set — deferred to next session as a first-thing errand, with the procedure in the opener |
+| carried forward | the maintainer is checking the LEGALITY of carrying the workbook's per-move values (the committed page prints them and is pushed; the private artifact does not settle it — the delta-only fix is scoped in the opener); and the caveat that must travel with the findings to the community |
+| the maintainer's rulings this session | publish internally only; the order (1) DF-startup invincibility, (2) Zabel j.LK, (3) Jedah's crouching recovery; and the DF question SHARPENED — global property or INHERITED FROM THE SHELL CHARACTER? (the tenants' variant ids alias base-half rows, so the rig needs THREE legs) |
+| doc-shape finding | asked whether HANDOFF and NEXT_SESSION need STATE's rollover. Measured: NEXT_SESSION already rolls (ORIENT + HIST twin, 119 live vs 3,022 archived); HANDOFF needs its SHAPE enforced instead — 8 `Previous batch` blocks, ~93 lines of chronology in a REFERENCE doc, already held richer in its twin, so delete-and-point. The durable half: `test_docshape` bars session-shaped HEADERS but not session-token-led BOLD PARAGRAPHS, which is why it accreted unseen |
+| not done, by design | the artifact republish; the DF arc; Zabel; Jedah's recovery; the HANDOFF cleanup; the aerial outliers and the specials/supers naming rigs |
+| tree note | `emu/fbneo` shows a submodule marker with a ZERO-line diff — pre-existing at session start (patches 0001+0002), not session residue |
+| push | **PUSHED** at the maintainer's word: `44bc6f5..5eb3497` |
+
 ## Session 14z-125 (2026-08-31) — **THE COMMUNITY CROSS-CHECK (backlog item 2, the maintainer's order): all 15
 ## VANILLA characters derived for the first time and compared against the community workbook. ~96% of every
 ## comparable column agrees under one stated convention each. Two things were found before any comparison and
