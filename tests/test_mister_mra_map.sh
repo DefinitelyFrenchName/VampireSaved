@@ -153,7 +153,7 @@ def ok(m):
     print("  ok", m)
 
 STOCK = "Vampire Savior The Lord of Vampire (Japan 970519).mra"
-WIDE  = "Vampire Savior The Lord of Vampire (Japan 970519, CPS-2 WIDE v1).mra"
+WIDE  = "Vampire Saved - CPS-2 WIDE (Japan 970519).mra"
 
 def find(root, name):
     for d, _, fs in os.walk(root):

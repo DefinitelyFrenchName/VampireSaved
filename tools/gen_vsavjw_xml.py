@@ -21,8 +21,10 @@ entry from the same catalogue with three deliberate differences:
     `sourcefile=["cps2.cpp"]`, which does not match, so the WIDE set is
     invisible to it BY CONSTRUCTION and `cores/cps2` stays untouched.
     `cores/cps2w` opts in with `sourcefile=[ "cps2.cpp", "cps2w.cpp" ]`.
-  * the description carries ", CPS-2 WIDE v1", matching the MAME driver entry
-    (`emu/mame-patches/0002-cps2-wide-v1.patch`).
+  * the description is the SHIPPING NAME, "Vampire Saved - CPS-2 WIDE
+    (Japan 970519)" -- jtframe derives the MRA filename from it and that is
+    the MiSTer core-list entry (maintainer-chosen 2026-09-01; it used to be
+    Capcom's own title, which named this build after the game it is not).
   * the ROM list is the WIDE v1 load map, with the QSound EXTENSION declared
     in a region of its own (`qsoundw`) so the MRA can trim it — see below.
 
@@ -105,8 +107,17 @@ PARENT_MEMBERS = {
     "vm3.13m", "vm3.14m", "vm3.15m", "vm3.16m",
     "vm3.17m", "vm3.18m", "vm3.19m", "vm3.20m",
 }
-DESCRIPTION = ("Vampire Savior: The Lord of Vampire "
-               "(Japan 970519, CPS-2 WIDE v1)")
+# THE SHIPPING NAME (maintainer-chosen 2026-09-01).  jtframe derives BOTH the
+# MRA's <name> AND its FILENAME from this, and the filename is what MiSTer
+# shows in the core list -- so this string IS the core-list entry.  It used to
+# read "Vampire Savior: The Lord of Vampire (Japan 970519, CPS-2 WIDE v1)",
+# which is Capcom's title for a build that is NOT stock Vampire Savior; the
+# shipped bundles then carried a SHORTER name applied BY HAND during assembly,
+# a step no tool owned and nothing checked.  Naming it here retires that step:
+# what jtframe emits is what ships.  The profile version (v1) is deliberately
+# not in the display name -- it lives in the MAME/FBNeo driver entries and the
+# binaries' own "CPS-2 WIDE v1" string, which the gates assert.
+DESCRIPTION = "Vampire Saved - CPS-2 WIDE (Japan 970519)"
 SOURCEFILE = "capcom/cps2w.cpp"
 
 

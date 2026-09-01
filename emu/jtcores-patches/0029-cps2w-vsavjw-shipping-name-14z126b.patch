@@ -1,0 +1,48 @@
+From c1850b44e8477ff7cc5add3f9d8d6605548c0def Mon Sep 17 00:00:00 2001
+From: Chaton <definitelyfrenchname@gmail.com>
+Date: Tue, 1 Sep 2026 13:49:55 +0200
+Subject: [PATCH] =?UTF-8?q?cps2w:=20vsavjw=20catalogue=20=E2=80=94=20the?=
+ =?UTF-8?q?=20SHIPPING=20NAME=20(VampireSaved=2014z-126b,=20merged-m14):?=
+ =?UTF-8?q?=20"Vampire=20Saved=20-=20CPS-2=20WIDE=20(Japan=20970519)"?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Maintainer-chosen 2026-09-01. jtframe derives BOTH the MRA's <name> and its
+FILENAME from this description, and the filename is the MiSTer core-list
+entry — so this string IS what a user sees when picking the core.
+
+It read "Vampire Savior: The Lord of Vampire (Japan 970519, CPS-2 WIDE v1)",
+which is Capcom's title for a build that is NOT stock Vampire Savior, and
+sat one letter from the stock control MRA in a sorted list. The shipped
+bundles then carried a SHORTER name applied BY HAND during assembly — a
+step no tool owned and no gate checked. Naming it here retires that step:
+what jtframe emits is now what ships.
+
+The profile version (v1) is deliberately not in the display name; it lives
+in the MAME/FBNeo driver entries and in the binaries' own "CPS-2 WIDE v1"
+string, which the gates assert.
+
+DESCRIPTION-ONLY: the diff is exactly one line. setname (vsavjw), rbf,
+sourcefile, every ROM row and all 31 CRCs are untouched, so nothing
+functional moves and no romset re-verification is implied.
+---
+ doc/mame.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/doc/mame.xml b/doc/mame.xml
+index 4b3dc1b23..9dbe3cfc4 100644
+--- a/doc/mame.xml
++++ b/doc/mame.xml
+@@ -147710,7 +147710,7 @@
+ 		<driver status="good" emulation="good" savestate="supported"/>
+ 	</machine>
+ <machine name="vsavjw" sourcefile="capcom/cps2w.cpp" cloneof="vsav" romof="vsav">
+-		<description>Vampire Savior: The Lord of Vampire (Japan 970519, CPS-2 WIDE v1)</description>
++		<description>Vampire Saved - CPS-2 WIDE (Japan 970519)</description>
+ 		<year>1997</year>
+ 		<manufacturer>Capcom</manufacturer>
+ 		<rom name="vm3j.03d" size="524288" crc="2acc5d6d" sha1="c1f1e1c7ae017564c975a12da740ed983ad3a0ee" region="maincpu" offset="0"/>
+-- 
+2.50.1 (Apple Git-155)
+
