@@ -323,9 +323,22 @@ entries moved VERBATIM to `DECISIONS_HISTORY.md` — grep there by topic.
 Lifecycle: rulings are still marked DECIDED in place here first; they move to
 the archive once they stop shaping active work.)*
 
-- **A NEW SESSION SERIES — the maintainer opened it 2026-09-01 ("I agree the
-  keys are reliable, best not change them, although we could indeed start a
-  new series"). NOT STARTED; needs a ruling.** The existing keys are SETTLED:
+- **A NEW SESSION SERIES — RESOLVED TOWARD (d) KEEP `14z-`, 2026-09-01;
+  awaiting only the maintainer's one-word confirm.** The maintainer: "I like
+  S127 but if there's a risk, even low, I don't mind keeping the 14z prefix
+  honestly." **THE RECOMMENDATION FLIPPED FROM (a) TO (d), and NOT on the
+  risk** — the risk is the wrong axis. The `checkdocshape`-blindness failure
+  is a known three-line change that a must-fire control eliminates, which is
+  this project's own standard for "not a risk"; residual is only an unknown
+  fourth consumer (405 files grepped, 3 parses found). **The real reason is
+  that the BENEFIT collapsed when the prefix was DOCUMENTED an hour earlier:**
+  [VSP-162] fixes the confusion by explaining it, so a reader is un-confused
+  in ten seconds, and what a rename adds beyond that is cosmetic legibility —
+  bought at a PERMANENT second namespace and a seam that every future grep and
+  reader must know, which no control removes. For a key whose whole value is
+  resolving cleanly, a boundary is an ongoing cost against a cosmetic gain.
+  If it is ever wanted, the cheap moment is a NATURAL BOUNDARY (a new
+  milestone, or the MiSTer arc closing), not mid-arc. The options as put:** The existing keys are SETTLED:
   they stay as they are, resolvable forever ([VSP-162]). This is only about
   what the NEXT session is called. **Why it is even on the table:** the
   maintainer read [VSP-162] as written and asked "why are we still on session
