@@ -163,3 +163,4 @@ test_charmap_current
 # Two must-fire controls; ~10 s.
 test_community_crosscheck
 test_df_startup_provenance
+test_tenant_anim_relocation

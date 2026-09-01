@@ -16,14 +16,14 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**288 scripts** — 62 ci_portable, 63 ci_static, 163 emulator-tier (run by name).
+**289 scripts** — 62 ci_portable, 64 ci_static, 163 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 6 | the suite runners and their own ground truth |
 | [docs](#docs) | 10 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 26 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
-| [pipeline](#pipeline) | 50 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
+| [pipeline](#pipeline) | 51 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 27 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 81 | tenant content — per-character gates and on-demand audits on the ported characters |
@@ -143,6 +143,7 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 | `tests/test_select_arrays.sh` | test | emulator | ~13 s | freeze the select-screen record-pointer array, the table M3a's tenant move depends on. | M3a |
 | `tests/test_shared_writes.sh` | test | ci_static | ROMDIR | the frozen shared-surface write inventory (14z-79). | 14z-79 |
 | `tests/test_shim_charid.sh` | test | emulator | MAME, a build dir, ~44 s | the init shim can identify WHICH tenant it is running for, because (0x382,A6) already holds the character id when it runs. | M3b |
+| `tests/test_tenant_anim_relocation.sh` | test | ci_static | ROMDIR | EVERY SPRITE-RECORD POINTER IN A TENANT'S PLACED ANIM CHAINS IS RELOCATED (14z-126b). ci_static: needs the tenant build dirs, no ROMDIR, no emulator, ~5 s. | 14z-126b |
 | `tests/test_tenant_row_owner.sh` | test | ci_static | ROMDIR | the row-OWNER threading is LIVE, not decoration. | M3b |
 | `tests/test_tenant_select_records.sh` | test | emulator | MAME | the M3a select-records half: at a variant-half tenant id the build must carry the tenant's OWN select records and the host's records must return to VANILLA bytes. | M3a |
 | `tests/test_thunk_addr_literal.sh` | test | ci_static | ROMDIR | ground truth for the STALE PLACED-ADDRESS guard in tools/gen_donovan_patch.py (14z-78). | 14z-78 |

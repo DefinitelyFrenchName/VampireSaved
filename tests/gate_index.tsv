@@ -280,6 +280,7 @@ tests/test_static_runner.sh	review-triage
 tests/test_suite_dispatch.sh	runner
 tests/test_suite_dispatch_selftest.sh	runner
 tests/test_tables_current.sh	docs
+tests/test_tenant_anim_relocation.sh	pipeline
 tests/test_tenant_hud.sh	tenant
 tests/test_tenant_id.sh	tenant
 tests/test_tenant_loop.sh	tenant
