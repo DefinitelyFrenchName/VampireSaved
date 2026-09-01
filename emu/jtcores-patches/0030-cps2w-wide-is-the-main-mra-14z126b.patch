@@ -1,0 +1,52 @@
+From 5fd9bb9a6e34ee2a968bfcaa19b26e3981afe1e3 Mon Sep 17 00:00:00 2001
+From: Chaton <definitelyfrenchname@gmail.com>
+Date: Wed, 2 Sep 2026 00:23:34 +0200
+Subject: [PATCH] cps2w: the WIDE set is the MAIN mra, not an alternative
+ (VampireSaved 14z-126b)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+jtframe files a CLONE under release/mra/_alternatives/<parent> unless its
+setname appears in parse.main_setnames (mame2mra.go is_main / dump_mra).
+vsavjw is a clone of vsav, so without this the roster the core EXISTS FOR was
+buried one directory down while a stock regional set took the main slot.
+
+That is backwards for a core whose purpose is the roster, and it is the other
+half of why the entry was hard to find in the MiSTer menu — the first half
+being the display name, fixed in c1850b44e.
+
+Uses the same upstream mechanism kiwi / s16 / s16b already use; no shared
+jtframe code is touched and cores/cps2 is unaffected. The stock legs stay in
+_alternatives, which matches the "ship the WIDE MRA only" ruling
+(maintainer, 2026-08-25).
+
+Config-only: no RTL, no ROM map, no CRC changes.
+---
+ cores/cps2w/cfg/mame2mra.toml | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/cores/cps2w/cfg/mame2mra.toml b/cores/cps2w/cfg/mame2mra.toml
+index 9d607a50e..663279eb4 100644
+--- a/cores/cps2w/cfg/mame2mra.toml
++++ b/cores/cps2w/cfg/mame2mra.toml
+@@ -13,6 +13,16 @@ sourcefile=[ "cps2.cpp", "cps2w.cpp" ]
+ # jtcps2w: only the Vampire Savior family (vsav + clones, incl. vsavj) —
+ # the stock reference leg of this core. The Vampire Saved set is added later.
+ mustbe.machines=[ "vsav" ]
++# THE WIDE SET IS THE MAIN MRA, not an alternative. jtframe files a CLONE
++# under release/mra/_alternatives/<parent> unless its setname is listed here
++# (mame2mra.go is_main / dump_mra); vsavjw is a clone of vsav, so without this
++# the roster the core EXISTS FOR was buried one directory down while a stock
++# regional set took the main slot. That is backwards for a core whose purpose
++# is the roster, and it is what made the entry hard to find in the MiSTer
++# menu. Same mechanism kiwi / s16 / s16b already use. The stock legs stay in
++# _alternatives, which matches the "ship the WIDE MRA only" ruling
++# (maintainer, 2026-08-25).
++main_setnames=[ "vsavjw" ]
+ parents= [
+     {name="megaman", description="Megaman: The Power Battle"},
+ ]
+-- 
+2.50.1 (Apple Git-155)
+

@@ -4,6 +4,23 @@
 `release/<name>/<name>/` patch package of 14z-105 for every release from
 merged-m10 on; `release/merged-m6..m9/` keep the old layout as history.
 
+## WHICH MRAs SHIP, AND WHY IT IS BY SETNAME (14z-126b, 2026-09-02)
+
+A release's `mister/` carries exactly TWO MRAs: the WIDE roster set
+(`vsavjw`) and the `[STOCK CONTROL]` reference leg (`vsavj`, run once per new
+bitstream — maintainer, 2026-08-29).
+
+`tools/package_release_platforms.py` selects them by reading each candidate
+MRA's own `<setname>`, walking `--mister-src` RECURSIVELY, and FAILING if
+either is absent. It does NOT glob a directory level, because the level an
+MRA lands in is a jtframe layout decision: clones go to
+`release/mra/_alternatives/<parent>/` unless their setname is in the core's
+`parse.main_setnames`. When cps2w made the WIDE set main (so the roster stops
+being buried in the MiSTer menu), the stock control leg MOVED into
+`_alternatives` — and a non-recursive glob would have dropped it from every
+release silently. Selecting on setname is layout-independent and loud.
+
+
 ## The rule
 
 **[MSV-20]** `release/<name>/` holds **one subdirectory per platform**, and each one is

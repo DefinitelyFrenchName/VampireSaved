@@ -85,6 +85,7 @@ d="$(diff "$A/mame2mra.toml" "$B/mame2mra.toml" | grep '^[<>]' \
 want='< sourcefile=[ "cps2.cpp" ]
 > sourcefile=[ "cps2.cpp", "cps2w.cpp" ]
 > mustbe.machines=[ "vsav" ]
+> main_setnames=[ "vsavjw" ]
 >     { setname="vsavjw",   offset=41, data="fe" },
 >     { name="qsoundw", skip=true },
 >     { name="qsoundw", width=16, setname="vsavjw", parts=[

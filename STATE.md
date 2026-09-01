@@ -1309,7 +1309,21 @@ the archive once they stop shaping active work.)*
   feature. The generator currently makes the **Euro** set the main MRA and
   buries the WIDE entry in `_alternatives/`, which is backwards for a core
   whose purpose is the roster.
-  **Option B stays the target shape "in time"**: move those four members
+  ~~**Option B stays the target shape "in time"**~~ **OPTION B WAS SHIPPED AT
+  14z-113 AND THIS ENTRY WAS STALE FOR THIRTEEN FREEZES — corrected
+  2026-09-02 after the maintainer asked for it to be "made ready for the next
+  freeze" and the archaeology ([VSP-14]) found it already done.** Measured on
+  `build/m3b_merged21`: the build packs NO `vsav.zip` at all, and
+  `vsavjw.zip` carries all 25 members including the four patched group-A ones
+  (`vm3.13m/15m/17m/19m`), so `vsav.zip` stays pristine from `$ROMDIR` and a
+  user's existing romset folder works untouched. The freeze that did it is the
+  14z-113 ONE-ZIP PACKAGING FREEZE (merged-m10). **What was still undone is
+  the OTHER half of this decision — "which MRA is MAIN" — and that landed
+  2026-09-02:** `parse.main_setnames=["vsavjw"]` in the fork's
+  `cores/cps2w/cfg/mame2mra.toml` (fork `5fd9bb9a6`), the upstream mechanism
+  kiwi/s16/s16b already use, so the WIDE set is no longer filed under
+  `_alternatives/` while a stock regional set takes the main slot. The
+  original text follows: move those four members
   INTO `vsavjw.zip` so `vsav.zip` can stay pristine and a user's existing
   romset folder works untouched. Not done now because it is a build-pipeline
   change touching the hash-shadowing class that cost two sessions in

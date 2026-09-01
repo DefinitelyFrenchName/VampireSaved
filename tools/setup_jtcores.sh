@@ -63,7 +63,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$REPO/emu/jtcores"
 UPSTREAM_TAG_SHA="63688ce5f4de9b92ac4d2ea4b306009b8ba4bcdb"   # jotego/jtcores v1.7.3
-PINNED="c1850b44e8477ff7cc5add3f9d8d6605548c0def"             # fork branch vampire-saved
+PINNED="5fd9bb9a6e34ee2a968bfcaa19b26e3981afe1e3"             # fork branch vampire-saved
 FORK_URL="https://github.com/DefinitelyFrenchName/jtcores"
 
 if [ ! -f "$SRC/.gitmodules" ]; then
@@ -90,7 +90,7 @@ echo "jtcores @ $HEAD (fork of v1.7.3 $UPSTREAM_TAG_SHA); jtdsp16 $(git -C "$SRC
 # The reviewable mirror of the fork's delta, one file per commit IN ORDER.
 # The names are declared here (not derived from the commit subject) so the
 # in-tree filenames stay stable and greppable; the gate reads this same list.
-PATCH_NAMES="0001-cps2w-scaffold.patch 0002-jtframe-sim-wramdump.patch 0003-jtframe-sim-sdram-top-address-bit.patch 0004-jtframe-sim-advance-model-time.patch 0005-jtframe-sim-sdram-stats-raw.patch 0006-cps2w-wide-mra-trim.patch 0007-cps2w-qsound-width-runtime-gate.patch 0008-jtframe-sim-optional-frame-writer.patch 0009-jtframe-sim-child-must-exit-hard.patch 0010-jtframe-sim-joystick-top-bits.patch 0011-cps2w-sdram-placement.patch 0012-jtframe-sim-sdram-read-probe.patch 0013-cps2w-obj-promote.patch 0014-jtframe-sim-frame-window.patch 0015-cps2w-prg-window.patch 0016-cps2w-prg-read-probe.patch 0017-cps2w-decrypt-range.patch 0018-cps2w-retract-d4-decrypt-claim.patch 0019-cps2w-readme-d0-d5.patch 0020-jtframe-sim-p2-scriptable.patch 0021-cps2w-vsavjw-crcs-14z110.patch 0022-cps2w-vsavjw-crcs-m7-mark.patch 0023-cps2w-vsavjw-crcs-remap-110b.patch 0024-cps2w-vsavjw-crcs-99-rootcause-14z111.patch 0025-cps2w-vsavjw-crcs-wheel-14z115.patch 0026-cps2w-vsavjw-crcs-medallion-14z117.patch 0027-cps2w-vsavjw-crcs-random-select-14z117b.patch 0028-cps2w-vsavjw-crcs-physics-port-14z119.patch 0029-cps2w-vsavjw-shipping-name-14z126b.patch"
+PATCH_NAMES="0001-cps2w-scaffold.patch 0002-jtframe-sim-wramdump.patch 0003-jtframe-sim-sdram-top-address-bit.patch 0004-jtframe-sim-advance-model-time.patch 0005-jtframe-sim-sdram-stats-raw.patch 0006-cps2w-wide-mra-trim.patch 0007-cps2w-qsound-width-runtime-gate.patch 0008-jtframe-sim-optional-frame-writer.patch 0009-jtframe-sim-child-must-exit-hard.patch 0010-jtframe-sim-joystick-top-bits.patch 0011-cps2w-sdram-placement.patch 0012-jtframe-sim-sdram-read-probe.patch 0013-cps2w-obj-promote.patch 0014-jtframe-sim-frame-window.patch 0015-cps2w-prg-window.patch 0016-cps2w-prg-read-probe.patch 0017-cps2w-decrypt-range.patch 0018-cps2w-retract-d4-decrypt-claim.patch 0019-cps2w-readme-d0-d5.patch 0020-jtframe-sim-p2-scriptable.patch 0021-cps2w-vsavjw-crcs-14z110.patch 0022-cps2w-vsavjw-crcs-m7-mark.patch 0023-cps2w-vsavjw-crcs-remap-110b.patch 0024-cps2w-vsavjw-crcs-99-rootcause-14z111.patch 0025-cps2w-vsavjw-crcs-wheel-14z115.patch 0026-cps2w-vsavjw-crcs-medallion-14z117.patch 0027-cps2w-vsavjw-crcs-random-select-14z117b.patch 0028-cps2w-vsavjw-crcs-physics-port-14z119.patch 0029-cps2w-vsavjw-shipping-name-14z126b.patch 0030-cps2w-wide-is-the-main-mra-14z126b.patch"
 i=1
 for name in $PATCH_NAMES; do
     sha="$(git -C "$SRC" rev-list --reverse "$UPSTREAM_TAG_SHA..$PINNED" | sed -n "${i}p")"

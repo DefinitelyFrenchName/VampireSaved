@@ -42,7 +42,7 @@ Rule 7: nothing here reads a reference ROM except through package_release.py
 (which reads them only to compute deltas), and nothing ROM-derived is written.
 Deterministic: two runs produce byte-identical trees.
 """
-import argparse, os, shutil, subprocess, sys, tempfile
+import argparse, os, re, shutil, subprocess, sys, tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
@@ -172,13 +172,36 @@ def bitstream_side(dest, bdir):
 def mister_side(dest, src, name, bdir):
     if not src:
         sys.exit("mister: --mister-src DIR (holding the .mra files) is required for the mister platform")
-    copied = []
-    for f in sorted(os.listdir(src)):
-        if f.endswith(".mra"):
-            shutil.copy(os.path.join(src, f), os.path.join(dest, f))
+    # WHAT SHIPS IS DECLARED BY SETNAME, NOT BY DIRECTORY LAYOUT (14z-126b).
+    # jtframe files clones under _alternatives/<parent> and only setnames in
+    # the core's parse.main_setnames land at the top level, so a listdir() of
+    # the output dir silently depended on that layout: when cps2w made the
+    # WIDE set main, the STOCK CONTROL leg moved into _alternatives and a
+    # non-recursive scan would have dropped it from every release -- against
+    # the ruling that it ships in each one (maintainer, 2026-08-29). Selecting
+    # on the MRA's own <setname> is layout-independent and fails LOUDLY if one
+    # goes missing, which a glob never would.
+    SHIP = {"vsavjw": "the WIDE roster set",
+            "vsavj":  "the [STOCK CONTROL] reference leg"}
+    found, copied = {}, []
+    for root, _dirs, files in os.walk(src):
+        for f in sorted(files):
+            if not f.endswith(".mra"):
+                continue
+            path = os.path.join(root, f)
+            with open(path, encoding="utf-8", errors="replace") as fh:
+                m = re.search(r"<setname>([^<]+)</setname>", fh.read())
+            if not m or m.group(1) not in SHIP:
+                continue
+            if m.group(1) in found:
+                sys.exit(f"mister: two MRAs claim setname {m.group(1)}: "
+                         f"{found[m.group(1)]} and {path}")
+            found[m.group(1)] = path
+            shutil.copy(path, os.path.join(dest, f))
             copied.append(f)
-    if not copied:
-        sys.exit(f"--mister-src {src} holds no .mra file")
+    missing = [f"{k} ({v})" for k, v in SHIP.items() if k not in found]
+    if missing:
+        sys.exit(f"--mister-src {src} is missing: " + ", ".join(missing))
     bitstream_side(dest, bdir)
     text = f"""# {name} — MiSTer side
 
