@@ -234,6 +234,42 @@ legacy behavior is a failed change.
   first, then STATE_HISTORY.md — section names are preserved in the
   archive, and archived entries are never rewritten (corrections are
   marked in place, as always).
+- **[VSP-162]** **THE `14z-N` SESSION KEY — a naming convention AND the
+  archive's INDEX, which is why it is never re-based.** A tag names ONE
+  SITTING (a working session, several per day at times — not a calendar day,
+  not a milestone, not a build). **Three namespaces, never conflated:**
+  sessions `14z-N`; milestones `M0`..`M12`; freeze marks `donovan-m18` /
+  `merged-m14`. **Shape:** letter suffixes mark CONTINUATIONS, same-day or
+  after a close (`14z-82c`, `14z-110b`, `14z-117b`, `14z-125b`, `14z-126b`);
+  parenthetical numbers are PHASES within one sitting (`14z-107 (11)`,
+  `14z-118 (14)`).
+  **It is a LOOKUP KEY, and that is the load-bearing part.** "STATE 14z-XX"
+  resolves in STATE.md, then STATE_HISTORY.md, then DECISIONS_HISTORY.md —
+  section names are preserved verbatim across every rollover *precisely so
+  the key keeps resolving*. Hundreds of pointers into it live in gate
+  headers, annotated tag messages, `patch_notes.md`, gotcha datelines and
+  THE LEDGER's lines. **So a tag is never renamed, renumbered or tidied**:
+  renaming one silently breaks every citation, and a citation that cannot
+  resolve cannot be corrected ([VSP-13]).
+  **ORIGIN — RECONSTRUCTED FROM THE ARCHIVE 2026-09-01, not lost.** The name
+  is a CHAIN OF EXHAUSTED COUNTERS, each continued by suffix rather than
+  re-based: plain integers (`Session 3`, `4`, `5-6`, `7`, `9`, `13`) →
+  `Session 14` continued through the alphabet (`14b`…`14x`, `14z`, with
+  `14w-b`/`14w-c`/`14k-b` where a letter itself continued) → the letters
+  exhausted at **`14z`**, so continuation moved to a NUMBER (`14z-2`,
+  `14z-3`, … `14z-126`) → and letters resumed one level down (`14z-126b`).
+  So `14z` is not opaque: it is *session 14, continuation z*, and `-N`
+  counts on from there. Dates fix the chain (Session 9 2026-07-27, Session
+  13 2026-07-28, first `14z-2` reference 2026-07-31, `14z-59` 2026-08-03),
+  and they are what show a "session" is a sitting: ~26 of them between
+  2026-07-28 and 2026-07-31.
+  **WHAT IS STILL NOT RECORDED, stated as unverified rather than theorised:**
+  why session 14 alone began taking letter continuations, and whether the
+  practice was inherited with the SMS working discipline. **THE SEARCH THAT
+  BACKS THAT: THIS REPOSITORY ONLY** — the archive, every doc, and the git
+  history to the first commit (2026-07-25). No commit or document defines
+  the convention; it is only ever used. The answer may exist in the SMS
+  material or predate the first commit, neither of which was searched.
 - **[VSP-11]** Address notation: 68k addresses as `PRG:0x0F1234` (program ROM offset) or
   `CPU:$0F1234` (address-space); tiles as `GFX:tile 0x1A2B3`; RAM as
   `RAM:$FF8000`. Never bare hex without a namespace.

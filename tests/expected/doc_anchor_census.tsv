@@ -429,3 +429,4 @@ VSP-158	docs/project/gotchas.md	"16 + the same 16 repeated": an aliasing guard i
 VSP-159	docs/project/porting_sprite_lists.md	The four questions to ask of any ported effect	IN-LIST
 VSP-160	docs/project/porting_sprite_lists.md	Inventories are SPANS, not samples	IN-LIST
 VSP-161	docs/project/porting_sprite_lists.md	Order of work, and the checks at each step	IN-LIST
+VSP-162	CLAUDE.md	5. Working style	IN-LIST
