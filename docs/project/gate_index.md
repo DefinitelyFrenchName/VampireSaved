@@ -174,7 +174,7 @@ the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, du
 | `tests/test_compare_flicker.sh` | test | ci_portable | — | ground truth for the flicker comparator's verdict logic (CLAUDE.md §4: classification code is validated before its verdicts are trusted). Synthetic logs, no emulator, fast. | — |
 | `tests/test_compare_window.sh` | test | ci_portable | — | ground truth for the "bounded re-convergent window" comparison class (CLAUDE.md §4 v3). | 14z-123 |
 | `tests/test_describe_masked_shape.sh` | test | ci_portable | — | ground truth for tools/describe_masked_shape.py, the classifier that turns a measured masked divergence into a PROPOSED expectation line in the ratified §4 vocabulary. | 14z-89 |
-| `tests/test_down_flash_vanilla.sh` | test | emulator | MAME | GitHub #113 ground truth (14z-112): the one-frame WHOLE-SCREEN WHITE at a down is VANILLA Vampire Savior behaviour, not ours. | 14z-112 |
+| `tests/test_down_flash_vanilla.sh` | test | emulator | MAME | GitHub #113 ground truth (14z-112; #113 CLOSED 2026-09-01 as vanilla, board-confirmed — this gate is what keeps that verdict honest, so it stays): the one-frame WHOLE-SCREEN WHITE at a down is VANILLA Vampire Savior behaviour, not ours. | 14z-112 |
 | `tests/test_dualtrack.sh` | test | emulator | a build dir | the two tracks must differ ONLY where they are meant to. | 14z-59g |
 | `tests/test_fbneo_legacy_oracle.sh` | test | emulator | MAME, FBNeo, ~5 min | the HACKED build's legacy content, compared against VANILLA, on FBNeo (14z-92, GitHub #78 partial). | 14z-92 |
 | `tests/test_freeze_basis_sandbox.sh` | test | ci_portable | — | GROUND TRUTH: tools/freeze_masked_basis.sh must never hand one run's MAME sandbox to the next run. | 14z-91 |

@@ -624,7 +624,7 @@ no address moved), stock twin `build/m5_stock13` (`38e9cb2c`, **MOVED** from
 substituted track writes his VS2 physics onto stock slot `0x0F` too: six data
 ops, member `vm3j.04d` only, no legacy row written). The naked-eye tell is the
 **M12** mark; Donovan walks 3.0/−2.625 and jumps with VS2's parameters.
-**FIELD VERDICT GREEN 2026-08-30 (maintainer, MiSTer, 14z-121): "all green"** on bundle `../mister_fieldtest_14z119/`.
+**FIELD VERDICT GREEN 2026-08-30 (maintainer, MiSTer, 14z-121): "all green"** on bundle `../mister_fieldtest_14z119/`. **RE-VERIFIED GREEN 2026-09-01 (maintainer, MiSTer): "my tests on M14 on MiSTer are all green" — a SECOND independent field pass on the same unchanged build** (`merged-m14`; the naked-eye tell reads **M12**, the mark — "M14" names the BUILD, [VSP-162]'s three namespaces).
 Detail: patch_notes 14z-119 / 14z-118 (charmap, 2), STATE 14z-119; the
 registry row below. Previous freeze (merged-m13, M11): FIELD VERDICT GREEN
 2026-08-29 (STATE 14z-118).**

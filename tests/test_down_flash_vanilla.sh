@@ -1,5 +1,7 @@
 #!/bin/sh
-# test_down_flash_vanilla.sh — GitHub #113 ground truth (14z-112): the one-frame
+# test_down_flash_vanilla.sh — GitHub #113 ground truth (14z-112; #113 CLOSED
+# 2026-09-01 as vanilla, board-confirmed — this gate is what keeps that verdict
+# honest, so it stays): the one-frame
 # WHOLE-SCREEN WHITE at a down is VANILLA Vampire Savior behaviour, not ours.
 #
 # Runs tests/lua/inp_probe.lua (per-frame framebuffer fnv1a64 + fighter death

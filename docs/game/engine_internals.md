@@ -2789,7 +2789,8 @@ reference MAME): intro 2307/2309, start 2546 = HP-set 2363 + 183, down 4088 ->
 4176 (+88), end pair. Vanilla in both games; a shared engine behaviour.
 It was reported as "the screen flashes at the first down" (GitHub #113) and
 on a CRT as "background stays, sprites vanish" — one white frame on
-phosphor. Not a port defect. The MECHANISM (palette RAM blanked vs a CPS-B
+phosphor. Not a port defect. **GitHub #113 is CLOSED (maintainer,
+2026-09-01): their board check agreed with this measurement.** The MECHANISM (palette RAM blanked vs a CPS-B
 layer/priority register) is NOT measured; only the framebuffer is.
 
 ## THE ROUND JUDGE: death is the SIGN OF WHITE HP, and the phase

@@ -850,8 +850,17 @@ the archive once they stop shaping active work.)*
   effect spawn — not a byte scan** (two instruction-boundary false positives
   were paid for here: `e768 7105` and `0028394E`).
 
-- **#113 — THE ONE-FRAME WHITE-OUT AT A DOWN IS VANILLA (measured 14z-112,
-  `tests/test_down_flash_vanilla.sh` PASS on stock vsavj / reference MAME).**
+- **#113 — THE ONE-FRAME WHITE-OUT AT A DOWN IS VANILLA. CLOSED BY THE
+  MAINTAINER 2026-09-01 ("I closed #113 since the behavior is indeed
+  vanilla"), option (a) — GitHub #113 CLOSED 2026-09-01T11:16:19Z.** The
+  board agrees with the emulator measurement: the camera/MiSTer evidence the
+  2026-08-28 update was waiting for came back consistent, so the finding
+  stands as measured and nothing was re-derived. The accessibility softening
+  (b) was NOT taken and needs a fresh ruling if ever revived. **What survives
+  as an honest boundary: the MECHANISM (palette RAM blanked vs a CPS-B
+  layer/priority register) is still NOT measured — only the framebuffer is.**
+  The original entry follows. (measured 14z-112,
+  `tests/test_down_flash_vanilla.sh` PASS on stock vsavj / reference MAME).
   Stock Vampire Savior draws ONE all-white frame (fnv `eab1fb569cb99b25`,
   whole framebuffer) 57..96 frames after every down, plus the intro pair and
   the match-start frame — merged-m9 reproduces exactly that inventory and
@@ -869,6 +878,10 @@ the archive once they stop shaping active work.)*
   close regardless of vs2; measured BOTH — vsavj (104: +96) AND vsav2
   (37_victor_ko_vsav2, native Donovan: +88) show it. Awaiting the
   maintainer's own hand check on stock vsavj, then CLOSE.**
+  **~~UPDATE 2026-08-28~~ SUPERSEDED 2026-09-01 — the camera evidence below
+  ARRIVED and AGREED with the emulator finding; #113 is CLOSED. The
+  paragraph is kept because its eliminations and its "if the board
+  disagrees" clause are the reasoning that made the closure safe.**
   **UPDATE 2026-08-28 (maintainer): NOT closed, and not to be closed yet.
   The maintainer is gathering CAMERA evidence because original
   hardware/MiSTer may DISAGREE with the emulation finding, and wants
@@ -1265,7 +1278,7 @@ uploader) predicts and the board now measures. MEASURED: row `0x1A` holds Pyron'
 | ~~**RANDOM SELECT should include the three tenants**~~ — ADDED TO THE LIST by the maintainer 2026-08-28; **BUILT 14z-117 at the maintainer's word ("do the random-select includes the tenants then"), gated (`test_random_select_tenants.sh`: draw = 15 vanilla + this build's tenants; confirm on a tenant frame loads the tenant's own record; must-fire control), frozen as merged-m13 (M11); FIELD VERDICT GREEN on the board (maintainer, MiSTer, 2026-08-29, STATE 14z-118)** | DONE 14z-117 — TWO sites, not one: the walker re-reads the table on its non-tick frames (`select_screen.md` "THE WALKER HAS TWO PATHS"); a bound-only thunk crashed the figure refresh with a code byte as id | the "?" cell walks a FIXED 15-entry table at `PRG:0x020C88` (`04 07 02 0C 05 0F 0A 00 0E 03 08 01 0D 09 06` = the base-half roster minus `0x0B`), 3-frame cursor, wrap `cmpi.b #$f`. Both bounds hard -> a tenant can never come up. **The siblings are the precedent**: vsav2's twin table (`PRG:0x01F8B4`) lists `10 11 13`, vhunt2's too — including the newcomers is what the source games do. FIX SHAPE: 18-entry relocated table + bound `#$f` -> `#$12`; it cannot grow in place (15 bytes + 1 pad, then code at `0x020C98`) and the table is read PC-relative, so it is a `site_thunk` on `PRG:0x020C80` + a `code` op, not a data poke. COST TO WATCH: the added cycles land on the select screen, whose legacy replays are already the bounded-window class — measure the onset before and after |
 | **MARIONETTE — a vs2 character, PARKED UNTIL FURTHER NOTICE (maintainer, 2026-08-28)** | not ported, not planned | **Assets live in VS2, not in VS.** She is not in Vampire Savior at all, so nothing in our romset is missing or broken by her absence. The maintainer's framing, and it is the right one: **Marionette and Shadow are both just MIRROR-MATCH MECHANISMS** — the shared machinery at `PRG:0x009BB2` copies the opponent's id and palette, so "playing as" either is playing the opponent's character. That makes porting her a low-value item: it adds a second route to a mirror match, not a character. **Not before everything else.** If it is ever revisited, note that vs2's arming counter is the SAME single `#$5` check as vsavj's (`PRG:0x01F8D6`), so whatever arms her in vs2 is a different mechanism and has not been located |
 | **Oboro's intro eats into the round** | **DECLINED by the maintainer 2026-08-28 — do NOT delay round start or cut the intro** | recorded so it is not revived: it would be a match-state TIMING change on a shared path for a cosmetic reason, which is the trade the superset invariant exists to refuse. The maintainer will instead check whether vsavj's Oboro has an alternate SHORT intro |
-| (#113 first-down white-out) | **not ours** — vanilla in vsavj AND vsav2 | pending only the maintainer's MiSTer double-check, then it closes |
+| ~~(#113 first-down white-out)~~ **CLOSED 2026-09-01** | **not ours** — vanilla in vsavj AND vsav2, and the board agrees | the maintainer's MiSTer check came back consistent and they closed GitHub #113 the same day. Mechanism (palette RAM vs CPS-B layer register) still unmeasured — an honest boundary, not an open item |
 
 **THE ARCADE HIDDEN-CHARACTER ROSTER — CONFIRMED BY THE MAINTAINER
 2026-08-28.** Exactly THREE exist in the arcade game: **Oboro Bishamon,

@@ -95,8 +95,14 @@
 > ## `pgrep -f` waiter matches its own command line and never exits** — wait on
 > ## the log's verdict line. The shell is zsh: use `${=var}`.
 > ##
-> ## **OPEN, unchanged:** the 1:1 wheel mockup; #113 parked (the maintainer is
-> ## analysing it on vanilla MiSTer); the FBNeo two-run-family question; the
+> ## **CLOSED 2026-09-01: #113** — the maintainer's board check agreed with
+> ## the emulator measurement and they closed it ("the behavior is indeed
+> ## vanilla"). Do NOT reopen or re-derive it.
+> ## **FIELD: merged-m14 (mark M12) RE-VERIFIED GREEN on MiSTer 2026-09-01**
+> ## — a SECOND independent field pass on the same build (the first was
+> ## 2026-08-30, 14z-121). No build changed.
+> ##
+> ## **OPEN, unchanged:** the 1:1 wheel mockup; the FBNeo two-run-family question; the
 > ## tenant CPU AI "lackluster" note; win quotes forgone; the COSMETIC BACKLOG.
 > ## `test_random_select_tenants.sh`'s CONTROL is still `build/m3b_merged19`;
 > ## `test_hui_df_style.sh`'s header still describes its 14z-79 `differs`

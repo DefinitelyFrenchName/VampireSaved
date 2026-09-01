@@ -1,7 +1,11 @@
 # inferred_claims — the LIVE worklist of the documentation rationalization pass (14z-122)
 
 > **STATUS (14z-124): CLOSED with the pass — every row MEASURED, RETRACTED
-> or ruled-parked (row 11 alone, the maintainer's camera evidence on #113);
+> or ruled-parked (row 11 alone, the maintainer's camera evidence on #113 —
+> **that park REASON is now discharged: #113 was CLOSED 2026-09-01 as
+> vanilla, board-confirmed. The row's CLAIM still stands** — the white-frame
+> MECHANISM remains unmeasured, which is an honest boundary in "What is NOT
+> known", no longer a blocked item);
 > the pass log at the bottom is the record. Opened 14z-122 as:** LIVE. Every claim found INFERRED rather than measured
 > in the hand-written docs, with the measurement that answers it and its
 > cost. Maintainer ruling: every row is RE-MEASURED before its document's
@@ -41,7 +45,7 @@
 | 8 | the throw MASH-ESCAPE step family `0x27082`/`0x2797A` — "the shape of a THROW MASH-ESCAPE pushing the thrower away (read, not measured — 14z-121 (4))" | `docs/game/engine_internals.md:870` | DERIVED-UNMEASURED | a throw rig where the VICTIM mashes: tap `+0x170` (mash counter), `+0x185`, the x steps against the `0x2797A` lists; freeze the escape shape | `name_moves.py` victim-rig pattern + `trace_writes.lua`; already a named NEXT_SESSION open | T3 | **MEASURED 14z-123 — RETRACTED: it is the ADVANCING GUARD (guard push): a grounded block opens a 14-tick window `+0x1AB`, button presses feed `+0x170`, the ATTACKER is pushed 91/115/157 px; no throw opens it. vs2 fires at a weighted >= 10, vsavj at +1/press with an RNG roll below 8 (`PRG:0x028D50`). `tests/test_advancing_guard.sh`, 44 frozen lines on both games; carriers corrected: engine_internals, ram.md ×6, STATE 14z-121 (4) marked** |
 | 9 | "The original maintainer report (ping #7, the fuchsia class) … was most likely fixed there" | `docs/game/engine_internals.md:3909` | GUESSED | run the grenade-ground rig on the CURRENT build vs native at matched pose; `audit_empty_tiles` on that replay; a clean A/B closes the guess with a citation | `tests/replays/hui/83d_hui_grenade_ground.rpl`; `audit_empty_tiles.sh` | T2 | **MEASURED 14z-123 — CONFIRMED and CLOSED: 441 explosion tiles, intersection 441 / ours-only 0 / native-only 0 / zero blank, per-content across every detonation frame; the residual was a 5-6 frame leg phase. `tests/audit_grenade_ground_tiles.sh`; the engine_internals sentence rewritten** |
 | 10 | the DF section's superseded 14z-79 blockquote ("the DF palette is OPEN … mechanics are still unproven") kept under a header already corrected 14z-114 | `docs/game/engine_internals.md:3151-3173` | STALE-CARRIER | none — mechanics were measured 14z-101/104 (`audit_df_framework.sh`, frozen durations/cost); the blockquote is history material for `engine_internals_history.md`; the live sentence cites the gate | `audit_df_framework.sh` | T0 | CLOSED 14z-124 (c) — the blockquote moved VERBATIM to `engine_internals_history.md`; the live section opens with the ruled framework [M: `audit_df_framework.sh`] |
-| 11 | white-frame mechanism "(palette RAM blanked vs a CPS-B layer/priority register) is NOT measured; only the framebuffer is" | `docs/game/engine_internals.md:2887` | TESTIMONY/PARKED | NONE THIS PASS — #113 is maintainer-parked pending their camera evidence ("do not re-derive"); the sentence is an honest boundary and stays as "What is NOT known" | `test_down_flash_vanilla.sh` (the framebuffer half) | T4 | RULED-PARKED (maintainer, 2026-08-28) |
+| 11 | white-frame mechanism "(palette RAM blanked vs a CPS-B layer/priority register) is NOT measured; only the framebuffer is" | `docs/game/engine_internals.md:2887` | TESTIMONY/PARKED | NONE THIS PASS — #113 is maintainer-parked pending their camera evidence ("do not re-derive"); the sentence is an honest boundary and stays as "What is NOT known" | `test_down_flash_vanilla.sh` (the framebuffer half) | T4 | RULED-PARKED (maintainer, 2026-08-28) → **UNBLOCKED 2026-09-01: #113 CLOSED as vanilla (board agrees), so the park reason is gone. The claim is UNCHANGED and still correct — the mechanism was never measured — so it stays an honest boundary, measurable if ever wanted, not an open worklist row** |
 
 ### G6 — HANDOFF
 
