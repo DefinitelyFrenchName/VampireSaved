@@ -534,8 +534,19 @@ the archive once they stop shaping active work.)*
   damage residue is the WORKBOOK double-counting records that share the engine's
   +0x10 dedup key, confirmed by a hit rig 75/78; the duration bytes are the
   engine's, 334/380, but a frame-rate trace cannot resolve a one-frame
-  convention, so startup +1 / recovery +2 stay named conventions). STILL OPEN:
-  Jedah's crouching recovery (+3, not +2) and the seven aerial outliers.**
+  convention, so startup +1 / recovery +2 stay named conventions). ~~STILL OPEN:
+  Jedah's crouching recovery (+3, not +2)~~ **CLOSED 2026-09-02 — ARBITRATED IN
+  ENGINE TICKS, AND THE RESIDUE IS THE WORKBOOK'S.** The instrument the entry
+  said did not exist does: a write tap fires per WRITE, and `PRG:0x027F70`
+  (`subq.b #$1,$20(a6)`) IS one engine tick, so the multi-tick frames that
+  defeated the frame-rate trace are fully visible. **18 of 18 derived totals
+  equal the engine's measured tick count EXACTLY** (JE, LI, DE crouching
+  normals; no tolerance). Our `startup` and `active` are not flagged and agree
+  with the workbook's own conventions, and the total is now ground truth — so
+  our recovery is right and the workbook's sits one frame below its own
+  convention for those seven moves. `tools/tick_durations.py` +
+  `tests/test_tick_durations.sh` (with a must-fire control). **STILL OPEN: the
+  seven aerial outliers.**
   ~~`red damage` needs the [VSE-40] scaler to be comparable at all~~ **WRONG and
   RETRACTED 14z-125b: the workbook's `red damage` is our `+8` PLUS `+9`, the
   move's total — 266/281 (94%) once compared as the sum;**

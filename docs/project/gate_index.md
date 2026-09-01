@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**291 scripts** — 62 ci_portable, 64 ci_static, 165 emulator-tier (run by name).
+**292 scripts** — 62 ci_portable, 64 ci_static, 166 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -27,7 +27,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 81 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 15 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 16 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 30 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 18 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -328,6 +328,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/test_projectile_census.sh` | test | emulator | MAME, ~2 min | WHICH PROJECTILE-POOL TYPES EACH TENANT'S MOVES SPAWN (character-data map phase 3, 14z-120 (11)). The naming rigs' specials and meter parts (donovan/pyron/huitzil parts 2 and 4) replayed on native vs2 with the 32 pool slots' type bytes samp… | 14z-120 (11) |
 | `tests/test_projectile_params.sh` | test | emulator | MAME, a build dir, ~3 min | THE PROJECTILE PARAMETERS (character-data map phase 3, 14z-121): every $FF9400-pool projectile type's inline parameter tables, decoded from the type HANDLER (tools/projectile_params.py) and MEASURED on the live spawn. | 14z-121 |
 | `tests/test_reactions.sh` | test | emulator | MAME, a build dir, ~1 min | WHICH CHAINS A TENANT RUNS AS THE VICTIM, PER REACTION CLASS, AND HOW LONG (character-data map, PHASE 3; measured 14z-120 (7)). | 14z-120 (7) |
+| `tests/test_tick_durations.sh` | test | emulator | MAME, ~12 min | OUR DERIVED FRAME DATA IS THE ENGINE'S, measured in ENGINE TICKS (14z-126b). This is what closed the last open residue of the community cross-check: Jedah's crouching recovery. | 14z-126b |
 | `tests/test_vanilla_frame_join.sh` | test | emulator | MAME, ~4 min | WHICH ANIM CHAIN EACH VANILLA CHARACTER'S STANDING NORMALS ENTER, MEASURED ON vsavj (14z-125, the community cross-check's join). | 14z-125 |
 
 ## review-triage

@@ -165,13 +165,28 @@ quotes the record values to the byte. That is why its `white damage` matches our
 `+9` exactly, and it is the best evidence available about a method the page
 itself never states.
 
-### 3. Jedah's crouching recovery — OPEN
+### 3. Jedah's crouching recovery — CLOSED 2026-09-02: THE RESIDUE IS THE WORKBOOK'S
 
 All six of Jedah's crouching normals (and Lilith's `2MK`) read `+3` where every
-other character reads `+2`. Their chains are structurally ordinary — `hold`-ended,
-nothing distinctive in node count or attack position — so nothing in our data
-explains it, and by finding 1 the available instrument cannot resolve a one-frame
-question. Left open rather than guessed.
+other character reads `+2`. ~~by finding 1 the available instrument cannot resolve
+a one-frame question. Left open rather than guessed.~~ **ARBITRATED IN THE
+EMULATOR, in ENGINE TICKS.** The instrument the entry said did not exist does:
+a write tap fires per WRITE, and `PRG:0x027F70` (`subq.b #$1,$20(a6)`) IS one
+engine tick, so multi-tick frames — which is exactly what defeated the
+frame-rate trace — are fully visible.
+
+**MEASURED: 18 of 18 derived totals equal the engine's tick count exactly**, for
+JE, LI and DE, with no tolerance (`tests/test_tick_durations.sh`,
+`tools/tick_durations.py`). Jedah's six: 13/29/66/13/29/57 derived, 13/29/66/13/29/57
+measured.
+
+**THE ARBITRATION.** Our `startup` and `active` are not flagged for these
+characters — they agree with the workbook under its own stated conventions — and
+the TOTAL is now ground truth. Since total = startup + active + recovery, our
+recovery is right, and the workbook's recovery for those seven moves sits one
+frame below its own convention. **The residue is in the workbook's data, not
+ours.** Measurement is king (the maintainer's rule): a source we cannot see the
+method of loses to a tick count from the engine itself.
 
 ## Every INCONSISTENT column — per character (the moves are on the full page)
 
@@ -326,7 +341,7 @@ question. Left open rather than guessed.
   engine ticks, so it cannot resolve a one-frame question. A tick-accurate
   instrument would settle whether either side is counting wrongly; neither is
   assumed to be.
-- **Jedah's crouching recovery (+3, not +2) is unexplained** — see the arbitration
+- ~~**Jedah's crouching recovery (+3, not +2) is unexplained**~~ **CLOSED 2026-09-02: measured in engine ticks, 18/18 exact — the residue is the workbook's, not ours** — see the arbitration
   section. Lilith's `2MK` behaves the same way.
 - **The aerial startup/active outliers are untouched** (BI `J.HP`/`J.LP`, BU `J.MP`,
   VI `J.HP`, FE `J.HK`/`J.LK`, SA `J.MP`). A jumping normal's chain is entered from

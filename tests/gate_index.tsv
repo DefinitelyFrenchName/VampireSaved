@@ -127,6 +127,7 @@ tests/test_don_sound.sh	tenant
 tests/test_don_sword.sh	tenant
 tests/test_don_throw_mirror.sh	tenant
 tests/test_down_flash_mechanism.sh	oracle
+tests/test_tick_durations.sh	character-data
 tests/test_pod_black_foot_palette.sh	oracle
 tests/test_down_flash_vanilla.sh	oracle
 tests/test_dualtrack.sh	oracle
