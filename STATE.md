@@ -905,11 +905,31 @@ the archive once they stop shaping active work.)*
   window, so `f111` is presumably correct for its other uses; editing it
   would be a WORKAROUND that could damage them. A sound fix targets the
   SELECTION.
-  **STILL OPEN, and it is the precondition for any fix:** which caller sets
-  `a0` at the f14341 write, and why it differs from the f14313 one. Static
-  chasing is exhausted — no immediate and no pointer in the image reaches
-  either block — so this needs `a0` MEASURED at `0x02AD64` (a `-debug`
-  breakpoint, or a tap extended to log a register).
+  **CLOSED 2026-09-01 — `a0` MEASURED** with `tap_writes.lua`'s existing
+  `REGLOG` (no tooling needed; its own comment says it exists to "name the
+  source table pointers for computed cursors"). Every index-14 write in
+  f13400-14375 carries **`A6 = 0x00FF8400`, P1's FIGHTER BLOCK** — the same
+  object every time — and the source varies: `0x0CEB70` (idx 0, the DEFAULT,
+  20 of 24 writes), `0x0CF050` (39), `0x0CF070` (40), `0x0CF110` (**45**, the
+  effect's own, idx14 = `fcff`).
+  **THE TIMELINE IS THE WHOLE MECHANISM:**
+  * CLEAN — seq 45 loaded f13589, **foot draws f13645**, revert to seq 0 at
+    f13697: the revert lands 108 frames after the load, PAST the draw.
+  * BLACK — seq 45 loaded f14313, **revert to seq 0 at f14341**, foot draws
+    f14370: the revert lands 28 frames after the load, 29 frames BEFORE it.
+  **THE TWO TIMELINES ARE DECOUPLED BY DESIGN: the palette is requested by the
+  PLAYER OBJECT's state machine (`$FF8400`), while the foot sprite is drawn by
+  a SEPARATE POOL OBJECT with its own lifetime.** When the player's state
+  advances and reverts the palette before the pool object has finished
+  drawing, the sprite renders against the default block. That is why it is
+  intermittent, why it cannot be reproduced on demand, and why nothing about
+  the tiles, the records or the addresses was ever wrong.
+  **WHAT A FIX WOULD TARGET, now the mechanism is known:** the LIFETIME
+  RELATIONSHIP, not the palette bytes — either the player's revert waits for
+  the effect, or the effect owns its palette instead of borrowing the
+  player's. Both are gameplay-adjacent and neither is Claude's to choose
+  ([VSP-10]). What IS now known is that the bytes in play are OURS, so the
+  superset invariant is not the obstacle it was believed to be.
   **A method note worth keeping:** the first discriminator appeared to REFUTE
   this (three clean instances carried the "black" row `0b`) — they never reach
   the `bbxx` foot phase at all. Scope a discriminator to the phase that draws
