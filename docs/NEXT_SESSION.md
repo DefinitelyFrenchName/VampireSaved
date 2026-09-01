@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-126b close, 2026-09-01)
+# NEXT SESSION — orientation (rewritten at the 14z-126b CLOSE (2), 2026-09-01)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
@@ -7,92 +7,90 @@
 
 > ## **START HERE. NOTHING IS RED. NO BUILD CHANGED — the tree is still the
 > ## M12 freeze (merged-m14 `6649523a`, `build/m3b_merged21`), FIELD-VERIFIED
-> ## GREEN, and PUSHED through the 14z-126b close. Check `git status -sb`, not
-> ## this line.**
+> ## GREEN, and PUSHED. Strict static floor is now **126**. Check
+> ## `git status -sb`, not this line.**
 > ##
-> ## **THE NEXT THING IS STILL ITEM (2), ZABEL j.LK — AND IT STILL NEEDS THE
-> ## MAINTAINER'S RECORDING.** Ask for it FIRST; do not build a rig before it
-> ## exists ([VSP-20], and the 14z-109..111 cost: three sessions on a
-> ## rig-derived mechanism that was never the field crash). The command for
-> ## them is `WIDE_RECORD=zabel-jlk-m14-01 tools/run_wide.sh
+> ## **OPEN WORK, IN THE ORDER IT IS LIKELY TO BECOME AVAILABLE:**
+> ##
+> ## **(1) ZABEL j.LK — STILL BLOCKED ON THE MAINTAINER'S RECORDING.** Ask for
+> ## it FIRST; do not build a rig before it exists ([VSP-20]; the 14z-109..111
+> ## cost was three sessions on a rig-derived mechanism that was never the
+> ## field crash). Command: `WIDE_RECORD=zabel-jlk-m14-01 tools/run_wide.sh
 > ## build/m3b_merged21 mame`, play the j.LK that fails to trigger proximity
-> ## guard, then hand over `~/.cache/vampire-saved/inp/zabel-jlk-m14-01/`.
-> ## Then: archaeology ([VSP-14]: `git log --grep`, `grep -n "proximity guard"
-> ## STATE_HISTORY.md docs/game/*.md`), then vanilla's proximity-guard test
-> ## measured against every other normal so the fix is bounded by a measured
-> ## difference. **Facts already in hand:** Zabel has NO proximity variants at
-> ## all and his standing-normal slots are known exactly
-> ## (`tests/expected/vanilla_normal_slots.tsv`, 14z-125). It is a
-> ## LEGACY-content patch: outside the superset invariant's "untouched" set by
-> ## definition, so it needs its OWN track/flag and its own ratified
-> ## expectation class (STATE "Decisions pending").
+> ## guard, hand over `~/.cache/vampire-saved/inp/zabel-jlk-m14-01/`. Then
+> ## archaeology ([VSP-14]), then vanilla's proximity-guard test measured
+> ## against every other normal. Zabel has NO proximity variants and his
+> ## standing-normal slots are known exactly
+> ## (`tests/expected/vanilla_normal_slots.tsv`). It is a LEGACY-content patch:
+> ## outside the superset invariant's "untouched" set by definition, so it
+> ## needs its own track/flag and its own ratified expectation class.
 > ##
-> ## **AFTER THAT: (3) Jedah's crouching recovery — BLOCKED ON AN INSTRUMENT.**
-> ## His whole crouching family (and Lilith's `2MK`) reads recovery +3 where
-> ## everyone else reads +2. 14z-125b measured that a frame-rate trace CANNOT
-> ## resolve a one-frame convention (16% of `field_trace` frames carry two
-> ## engine ticks), so the precondition is a TICK-ACCURATE instrument — a
-> ## `-debug` trace or a Lua hook on the engine tick — not another rig.
+> ## **(2) #112's ONE REMAINING QUESTION — and it is now a SMALL one.** The
+> ## premise is REFUTED: a tenant object does NOT run a vanilla sequence (see
+> ## STATE 14z-126b addendum (2) for the three independent legs). The black
+> ## foot is FOUND, reproducible and characterised: input `41236+MK` at
+> ## **f14307** of `tests/inp/pod-black-m14-01`, rendering at **f14370-14375**,
+> ## drawing `bbe5`/`bbea` at pal 05 where every clean instance draws
+> ## `0xe768-0xe796`. **The open question is why THAT instance selects
+> ## `0xbbxx` when nine earlier ones in the same fight did not.** Next step: a
+> ## WRITE tap on the record behind the f14370 OBJ entry (read taps never fire,
+> ## [CPE-14]). **Do NOT reach for `effect_map` membership as the answer** —
+> ## `0xbbe5`, `0xbbea` AND the clean `0xe768` are all absent from it, so it
+> ## does not discriminate. Cosmetic and maintainer-accepted, so this is
+> ## knowledge work, not a fix.
 > ##
-> ## **WHAT 14z-126b SETTLED, so it is not re-derived:** HANDOFF's eight
-> ## `Previous batch` blocks are DELETED (−140 lines) and will not come back —
-> ## `test_docshape` now bars a bold paragraph that LEADS with chronology and
-> ## carries a session token, calibrated so it fires on those eight and none of
-> ## the other 611 bold openers. **A REFERENCE doc's chronology now has two
-> ## gates on it, headers and bold paragraphs; if the log reappears in a THIRD
-> ## shape, extend the same checker rather than starting a list.**
+> ## **(3) JEDAH'S CROUCHING RECOVERY — BLOCKED ON AN INSTRUMENT.** His whole
+> ## crouching family (and Lilith's `2MK`) reads recovery +3 where everyone
+> ## else reads +2. A frame-rate trace CANNOT resolve a one-frame convention
+> ## (16% of `field_trace` frames carry two engine ticks), so the precondition
+> ## is a TICK-ACCURATE instrument — a `-debug` trace or a Lua hook on the
+> ## engine tick — not another rig.
 > ##
-> ## **AND THE FREEZE-TAG LEDGER IS WHOLE, WITH NOTHING GRANDFATHERED:** the
-> ## 14z-91 batch (`donovan-m7` / `huitzil-m15` / `pyron-m9`) had registry rows
-> ## but no `freeze/*` tag for 35 sessions; the three tags now exist at
-> ## `271838e` (two MEASURED against surviving `rompath` artifacts, donovan-m7
-> ## not — its rompath was pruned). Then the three 14z-102 tags whose messages
-> ## named no fingerprint (`donovan-m10` / `huitzil-m19` / `pyron-m13`) were
-> ## AMENDED and force-pushed at the maintainer's word (commit unchanged,
-> ## `MESSAGE AMENDED 2026-09-01` in each). So
-> ## **`tests/test_freeze_tag_coverage.sh` now runs all three sections HARD
-> ## with NO allow-list**: every build row has an annotated tag, no tag is
-> ## lightweight, every message names its fingerprint. **If you ever need to
-> ## grandfather something there, delete the allowance the moment its reason
-> ## dies — this one lived less than a day and was still worth removing.**
+> ## **(4) THE MIZUUMI CHARACTER DATA — NEW, queued into no session yet.** The
+> ## maintainer has found the character data on the mizuumi wiki (2026-09-01)
+> ## and wants it checked against ours in a future session. It joins the
+> ## community cross-check's existing two sources (the frame-data workbook, the
+> ## 146 player-struct offsets of which ~90 remain `[C]`). The rule is
+> ## unchanged: **measurement is king** — a perfect match or a CONSTANT OFFSET
+> ## validates ours, an INCONSISTENT pattern means re-check OUR measurement
+> ## first.
 > ##
-> ## **STILL OPEN FROM THE CROSS-CHECK:** Jedah's crouching family above; the
-> ## seven aerial startup/active outliers; and the specials/supers/throws —
-> ## the bulk of the workbook's 730 rows — each needing its own vsavj naming
-> ## rig. **The WIKI half is queued into no session yet:** 146 mizuumi
-> ## player-struct offsets vs `ram.md`, of which four were adopted 14z-126 and
-> ## ~90 remain [C] candidates.
+> ## **THE METHOD THAT CAME OUT OF 14z-126b, and it is the maintainer's:**
+> ## **to locate a move in a recording, search the INPUTS, never the art.** A
+> ## `.inp` IS an input recording and `inp_probe.lua` already logs
+> ## `in=IN0,IN1,IN2` on every `V` line (CPS-2 P1, active LOW: IN0 bit0 R /
+> ## bit1 L / bit2 D / bit3 U, bits 4-6 LP/MP/HP; IN1 bits 0-2 LK/MK/HK). A
+> ## motion is a PARTIAL ORDER over mandatory steps, so a human's
+> ## non-frame-perfect input is absorbed by an ordered-subsequence match, and
+> ## the inputs are ground truth INDEPENDENT of the defect — art, palette and
+> ## tile codes are all downstream of it. Allow for the input->effect LAG (63
+> ## frames for that super). The `#112` detector keyed on the CLEAN art is the
+> ## cautionary tale: ten confident clean instances, blind to the defect.
 > ##
-> ## **THE FRAME-DATA RULE IS LAW (ruled 14z-126, option (b)):** every
-> ## per-move ROM-derived table — OURS AND THIRD-PARTY ALIKE — is generator
-> ## output under `../charpages/framedata/`, regenerated by
-> ## `tools/framedata_pages.sh`; the tree ships the READERS and the VERDICTS,
-> ## currency hash-locked. **Route new per-move data through that script from
-> ## the START.** The three character artifacts are published FROM that
-> ## out-of-tree output — regenerate before republishing, and get the
-> ## maintainer's word on the publish BEFORE spending the ~50 k-context reads
-> ## per page.
+> ## **AND: A RECORDING'S FRAME NUMBERS ARE A CLAIM ABOUT ITS BUILD.**
+> ## `run-merged-m9-05` replays on merged-m14 length-exact (END 7490) and
+> ## guard-clean but CONTENT-DIVERGENT. Length matching is not evidence of
+> ## reproduction. Both facts are gotchas now.
 > ##
-> ## **IF A DOC IS TOUCHED:** the per-commit battery is census `--check`
-> ## (`--freeze` only after reviewing renames) + `checkdocshape --no-pending`
-> ## + checkdocs + checkskills + `gen_annotations.py` regenerated from a CLEAN
-> ## WORKTREE of the commit's files + `gen_gate_index.py --check` +
-> ## `gen_gotchas_index.py --check`, exit statuses captured directly; wrapped
-> ## `##` headers are house style. **The shell is zsh: `python3 tools/$c` does
-> ## NOT word-split — use `${=c}`.** **And do NOT run individual gates while
-> ## `run_all_static.sh` is running** — a collision produced a red
-> ## `gen_annotations --check` that re-ran green (14z-126b). **A `pgrep -f`
-> ## waiter matches its own command line and never exits: wait on the log's
-> ## verdict line.**
+> ## **IF A DOC IS TOUCHED:** census `--check` + `checkdocshape --no-pending` +
+> ## checkdocs + checkskills + `gen_annotations.py` from a CLEAN WORKTREE +
+> ## `gen_gate_index.py --check` + `gen_gotchas_index.py --check`, exit
+> ## statuses captured directly. **Do NOT run individual gates while
+> ## `run_all_static.sh` is running** (a collision produced a red
+> ## `gen_annotations --check` that re-ran green), do NOT edit tracked files
+> ## during it (its last section asserts the tree did not move), and **a
+> ## `pgrep -f` waiter matches its own command line and never exits** — wait on
+> ## the log's verdict line. The shell is zsh: use `${=var}`.
 > ##
-> ## **OPEN, unchanged:** the 1:1 wheel mockup; #112/#113 parked; the FBNeo
-> ## two-run-family question; the tenant CPU AI "lackluster" note; win quotes
-> ## forgone; the COSMETIC BACKLOG. `test_random_select_tenants.sh`'s CONTROL
-> ## is still `build/m3b_merged19`; `test_hui_df_style.sh`'s header still
-> ## describes its 14z-79 `differs` expectation (a stale gate header, not a
-> ## defect).
+> ## **OPEN, unchanged:** the 1:1 wheel mockup; #113 parked (the maintainer is
+> ## analysing it on vanilla MiSTer); the FBNeo two-run-family question; the
+> ## tenant CPU AI "lackluster" note; win quotes forgone; the COSMETIC BACKLOG.
+> ## `test_random_select_tenants.sh`'s CONTROL is still `build/m3b_merged19`;
+> ## `test_hui_df_style.sh`'s header still describes its 14z-79 `differs`
+> ## expectation (a stale gate header, not a defect).
 > ##
 > ## **STATE OF THE BUILDS:** unchanged — play `tools/run_wide.sh
 > ## build/m3b_merged21 fbneo`; current + one back: `don_m17/m18`,
 > ## `hui51/52`, `pyron35/36`, `m3b_merged20/21` (+ `merged19` control),
-> ## `m5_stock12/13`.
+> ## `m5_stock12/13`. The MiSTer bundle `../mister_fieldtest_14z119/` IS this
+> ## freeze — verified by hash (`vsavjw.zip` sha1 `3b34d35f…`).
