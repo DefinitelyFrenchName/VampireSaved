@@ -29,26 +29,30 @@
 #   2 HARD  no lightweight tags — [VSP-94] says annotated, and a lightweight
 #           tag carries no message, so it cannot carry the fingerprint or the
 #           reproduce recipe the rule asks for.
-#   3 GRANDFATHERED  the tag message names its build's fingerprint (full SHA-1
-#           or the 8-char short form). THREE tags predate this check and carry
-#           neither — the 14z-102 window freeze (donovan-m10, huitzil-m19,
-#           pyron-m13), whose messages describe the freeze but name no build.
-#           They are frozen as a named allow-list so they cannot grow: a FOURTH
-#           such tag FAILS. Fixing the three is a re-tag, not this gate's job.
+#   3 HARD  the tag message names its build's fingerprint (full SHA-1 or the
+#           8-char short form) — [VSP-94]: "the tag message carries the
+#           fingerprint and how to reproduce". A tag that says what a freeze
+#           CHANGED but never which image it certifies cannot answer the one
+#           question it exists for. WAS GRANDFATHERED when this gate opened:
+#           three tags carried neither form — the 14z-102 window freeze
+#           (donovan-m10 / huitzil-m19 / pyron-m13) — and were held as a named
+#           allow-list so they could not GROW. The maintainer ruled the amend
+#           on 2026-09-01; all three tag messages were rewritten (commit
+#           unchanged) and force-pushed, so the allowance had no reason left
+#           and was REMOVED rather than left to rot. There are now no
+#           exceptions.
 #
 # MUST-FIRE CONTROLS (both on a COPY; the gate never edits a tracked file and
 # never creates, moves or deletes a tag):
-#   a  a registry row naming a build with no tag  -> section 1 fires
-#   b  the section-3 allow-list emptied           -> section 3 fires on the
-#      three known tags, proving the check is live and not vacuous
+#   a  a registry row naming a build with no tag       -> section 1 fires
+#   b  a tagged build whose registry fingerprint the tag message does NOT
+#      contain (a copy with one fingerprint perturbed)  -> section 3 fires
 #
-# Env: REGISTRY=<path> (default tests/expected/registry.tsv);
-#      NOFP_ALLOW="<sets>" (default the three; "" is control b).
+# Env: REGISTRY=<path> (default tests/expected/registry.tsv).
 set -u
 SELF="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
 cd "$(dirname "$0")/.."
 REGISTRY="${REGISTRY:-tests/expected/registry.tsv}"
-NOFP_ALLOW="${NOFP_ALLOW-donovan-m10 huitzil-m19 pyron-m13}"
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
@@ -98,15 +102,12 @@ while IFS="$(printf '\t')" read -r fp set rest; do
     case "$msg" in *"$fp"*|*"$short"*) continue;; esac
     nofp="$nofp $set"
 done < "$REGISTRY"
-unexpected=""
-for s in $nofp; do
-    case " $NOFP_ALLOW " in *" $s "*) ;; *) unexpected="$unexpected $s";; esac
-done
-if [ -n "$unexpected" ]; then
-    bad "TAG MESSAGE NAMES NO FINGERPRINT (beyond the frozen three):$unexpected"
+if [ -n "$nofp" ]; then
+    bad "TAG MESSAGE NAMES NO FINGERPRINT:$nofp"
     bad "  [VSP-94]: the tag message carries the fingerprint and how to reproduce."
+    bad "  Amend it (git tag -f -a <tag> <same commit>) and force-push."
 else
-    ok "fingerprint-in-message: only the frozen$( [ -n "$NOFP_ALLOW" ] && echo " 14z-102 three" ) lack it (${nofp:-none})"
+    ok "every freeze tag's message names its build's fingerprint"
 fi
 
 # --- must-fire controls, on COPIES; no tag is ever created/moved/deleted ---
@@ -122,10 +123,13 @@ if [ "${FTC_CONTROLS:-1}" = 1 ]; then
     else
         bad "control a: fired for the wrong reason:"; sed 's/^/        /' "$W/a.log" | head -6
     fi
-    if FTC_CONTROLS=0 NOFP_ALLOW="" sh "$SELF" >"$W/b.log" 2>&1; then
-        bad "control b: the emptied allow-list PASSED — section 3 is vacuous"
-    elif grep -q "TAG MESSAGE NAMES NO FINGERPRINT" "$W/b.log"; then
-        ok "control b: section 3 fires when its allow-list is emptied"
+    # a tagged build whose registry fingerprint its tag message cannot contain
+    awk -F'\t' 'BEGIN{OFS="\t"} $2=="donovan-m18"{$1="0123456789abcdef0123456789abcdef01234567"} {print}' \
+        "$REGISTRY" > "$W/reg_b.tsv"
+    if FTC_CONTROLS=0 REGISTRY="$W/reg_b.tsv" sh "$SELF" >"$W/b.log" 2>&1; then
+        bad "control b: a fingerprint the tag message lacks PASSED — section 3 is vacuous"
+    elif grep -q "TAG MESSAGE NAMES NO FINGERPRINT.*donovan-m18" "$W/b.log"; then
+        ok "control b: a tag whose message lacks its fingerprint fires"
     else
         bad "control b: fired for the wrong reason:"; sed 's/^/        /' "$W/b.log" | head -6
     fi

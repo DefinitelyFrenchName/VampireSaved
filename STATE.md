@@ -1,5 +1,21 @@
 # STATE — living progress log
 
+## Session 14z-126b addendum (2026-09-01, after the close) — **THE THREE GRANDFATHERED TAGS AMENDED AND
+## FORCE-PUSHED at the maintainer's word, so the freeze-tag gate now runs HARD with no allow-list. Found because
+## the maintainer went looking for the open item in NEXT_SESSION and COULD NOT FIND IT — it was filed under a
+## header announcing a CLOSURE. No build changed.**
+
+| | |
+|---|---|
+| opened with | the maintainer: "I looked for them and can't find them in next_session, can you elaborate" |
+| **the reporting defect, mine** | the item WAS in NEXT_SESSION (lines 51-54) but as the tail of a block headed **"AND THE GAP THE CUT UNCOVERED IS CLOSED"**. A reader scanning an orientation doc for open work skips a block headed CLOSED, so "named in NEXT_SESSION" was technically true and practically false. Same class as the stale headers fixed hours earlier ([VSP-13]: a skimmer reads the HEADER; an appended "actually…" does not reach them). **Standing lesson: an OPEN item never lives under a CLOSED banner — it goes in the block that announces open work** |
+| the substance | `freeze/donovan-m10` / `huitzil-m19` / `pyron-m13` (the 14z-102 window freeze) all carried one identical line naming what the freeze CHANGED and no fingerprint, no recipe — against [VSP-94] ("the tag message carries the fingerprint and how to reproduce"). 11 other tags omit the full SHA-1 but carry the 8-char form and so self-identify; these three named nothing |
+| **the ruling** | the maintainer chose AMEND-AND-FORCE-PUSH over leaving them, having been given the cost explicitly: these were PUBLISHED refs, so rewriting them changes what other clones have already fetched — unlike the three 14z-91 tags created the same session, which had never existed remotely |
+| **done** | all three amended at the SAME commit `3f2c87a` (verified unchanged) with the fingerprint, the batch siblings, the reproduce recipe, and a visible `MESSAGE AMENDED 2026-09-01 (14z-126b)` note stating that the tag object was rewritten and force-pushed while no build byte moved. Force-pushed: `d12b055…6f8c561`, `bfae61a…8cb8527`, `6be7d0a…a3a2a15`. NOT measured — all three build dirs are pruned ([VSP-96]); the fingerprints are transcribed from `registry.tsv`, and each tag says so |
+| **the consequence, taken rather than left** | with the reason gone, the gate's allow-list was DEAD — an allowance that outlives its reason is precisely the rot the gate exists to stop (the `checkdocshape` precedent: a row matching nothing FAILS as dead). Section 3 of `test_freeze_tag_coverage.sh` is now **HARD with no exceptions**, and control (b) was rewritten: it no longer empties an allow-list but perturbs one fingerprint in a registry COPY, so a tag whose message lacks its fingerprint fires. All 78 tags now name theirs |
+| green | `test_freeze_tag_coverage` PASS (3 sections + 2 controls); the doc battery and strict static re-run below |
+| push | **PUSHED** (tags force-pushed; the doc commit follows) |
+
 ## Session 14z-126b CLOSE — ritual complete. **THE HANDOFF SHAPE ITEM DONE (the eight `Previous batch` blocks
 ## DELETE-AND-POINTED, −140 lines) AND THE THREE THINGS IT UNCOVERED ALL CLOSED IN ORDER: a load-bearing fact the
 ## chronology alone carried, the 14z-91 batch's MISSING FREEZE TAGS (created, two of them MEASURED against
@@ -19,7 +35,7 @@
 | process notes | the `pgrep -f` waiter self-match was hit TWICE despite being in memory — a waiter whose own command line contains the pattern never exits; wait on the log's verdict line instead. And a `gen_annotations --check` rc=1 that contradicted a green was a COLLISION with the concurrently running suite, not a defect ([VSP-40]: re-run before believing) — do not run gates alongside `run_all_static` |
 | the close battery, exit statuses captured directly | `test_freeze_tag_coverage` rc=0 · census `--check` rc=0 · `checkdocshape --no-pending` rc=0 · checkdocs rc=0 · checkskills rc=0 · `gen_annotations --check` rc=0 · `gen_gate_index --check` rc=0 · gotchas index rc=0. **Strict static tier PASS 125 / SKIP 0 / FAIL 0 / MISSING 0** — the floor rises by one |
 | patch_notes / patch_index | **checked, and correctly NO entry**: nothing under `build/manifest` or `tools/gen_donovan_patch.py` moved. No shipped byte changed and nothing was frozen |
-| not done, by design | item (2) Zabel j.LK still needs the maintainer's RECORDING ([VSP-20]); item (3) Jedah's crouching recovery still needs a tick-accurate instrument; the three 14z-102 tags that name no fingerprint are grandfathered, not fixed (a re-tag, the maintainer's call); the ~90 unadopted mizuumi candidates |
+| not done, by design | item (2) Zabel j.LK still needs the maintainer's RECORDING ([VSP-20]); item (3) Jedah's crouching recovery still needs a tick-accurate instrument; ~~the three 14z-102 tags that name no fingerprint are grandfathered, not fixed~~ **AMENDED AND FORCE-PUSHED the same day at the maintainer's word — see the addendum above; the gate's allow-list is gone**; the ~90 unadopted mizuumi candidates |
 | push | **PUSHED** |
 
 ## Session 14z-126 CLOSE — ritual complete. **THE DF-STARTUP QUESTION ANSWERED (the window is `+0x147`, armed PER

@@ -42,16 +42,19 @@
 > ## gates on it, headers and bold paragraphs; if the log reappears in a THIRD
 > ## shape, extend the same checker rather than starting a list.**
 > ##
-> ## **AND THE GAP THE CUT UNCOVERED IS CLOSED:** the 14z-91 batch
-> ## (`donovan-m7` / `huitzil-m15` / `pyron-m9`) had registry rows but no
-> ## `freeze/*` tag for 35 sessions. The three tags now exist at `271838e`
-> ## (two MEASURED against surviving `rompath` artifacts, donovan-m7 not —
-> ## its rompath was pruned), and **`tests/test_freeze_tag_coverage.sh` is the
-> ## new lock**: every registry row that is a build has an annotated tag.
-> ## **STILL OPEN, deliberately grandfathered:** the three 14z-102 tags
-> ## (`donovan-m10` / `huitzil-m19` / `pyron-m13`) whose messages name NO
-> ## fingerprint — the gate freezes them as an allow-list so a fourth fails.
-> ## Fixing them is a re-tag and the maintainer's call.
+> ## **AND THE FREEZE-TAG LEDGER IS WHOLE, WITH NOTHING GRANDFATHERED:** the
+> ## 14z-91 batch (`donovan-m7` / `huitzil-m15` / `pyron-m9`) had registry rows
+> ## but no `freeze/*` tag for 35 sessions; the three tags now exist at
+> ## `271838e` (two MEASURED against surviving `rompath` artifacts, donovan-m7
+> ## not — its rompath was pruned). Then the three 14z-102 tags whose messages
+> ## named no fingerprint (`donovan-m10` / `huitzil-m19` / `pyron-m13`) were
+> ## AMENDED and force-pushed at the maintainer's word (commit unchanged,
+> ## `MESSAGE AMENDED 2026-09-01` in each). So
+> ## **`tests/test_freeze_tag_coverage.sh` now runs all three sections HARD
+> ## with NO allow-list**: every build row has an annotated tag, no tag is
+> ## lightweight, every message names its fingerprint. **If you ever need to
+> ## grandfather something there, delete the allowance the moment its reason
+> ## dies — this one lived less than a day and was still worth removing.**
 > ##
 > ## **STILL OPEN FROM THE CROSS-CHECK:** Jedah's crouching family above; the
 > ## seven aerial startup/active outliers; and the specials/supers/throws —
