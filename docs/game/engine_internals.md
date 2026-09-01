@@ -2790,8 +2790,18 @@ reference MAME): intro 2307/2309, start 2546 = HP-set 2363 + 183, down 4088 ->
 It was reported as "the screen flashes at the first down" (GitHub #113) and
 on a CRT as "background stays, sprites vanish" — one white frame on
 phosphor. Not a port defect. **GitHub #113 is CLOSED (maintainer,
-2026-09-01): their board check agreed with this measurement.** The MECHANISM (palette RAM blanked vs a CPS-B
-layer/priority register) is NOT measured; only the framebuffer is.
+2026-09-01): their board check agreed with this measurement.**
+**THE MECHANISM IS MEASURED (2026-09-01) AND IT IS A PALETTE-BASE SWAP.**
+The game writes CPS-A register `0x80410a` (`CPS1_PALETTE_BASE`) from its
+normal `0x90c0` to `0x9240` for exactly one frame; `0x924000` is filled
+entirely with `ffff`, so every layer resolves to white, and the next frame
+restores `0x90c0`. ~~palette RAM blanked vs a CPS-B layer/priority register~~
+**both of those candidates are RETRACTED: palette CONTENTS are untouched
+across the flash (mean luma 344 -> 344) and no layer register moves.** The
+discriminator is 4/4 — `0x9240` occurs exactly four times in a 6,700-frame
+run, one frame before each of the four white frames — and FBNeo reproduces
+the inventory, so it is engine behaviour, not an emulator artifact
+(STATE's #113 entry carries the rig and the two instrument traps).
 
 ## THE ROUND JUDGE: death is the SIGN OF WHITE HP, and the phase
 ## machine that consumes it (14z-98, measured end to end on #103)

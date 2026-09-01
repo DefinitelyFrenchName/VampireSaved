@@ -42,19 +42,18 @@
 > ## writes the f14341 `f111`. Rig: `tests/lua/tap_writes.lua` with
 > ## `TAP=90c17c,2` over `tests/inp/pod-black-m14-01`.
 > ##
-> ## **(3) THE #113 WHITE-FRAME RESEARCH TOPIC — NEW, opened by the
-> ## maintainer 2026-09-01, EXPLICITLY SEQUENCED AFTER (2).** #113 itself is
-> ## CLOSED (the behaviour is vanilla, board-confirmed) — this is KNOWLEDGE
-> ## work on vanilla, not a fix, and nothing may change a legacy frame. TWO
-> ## questions: the MECHANISM (palette RAM zeroed vs a CPS-B layer/priority
-> ## register at the white frame) and, the maintainer's actual curiosity, the
-> ## REASON Capcom's engine does it at a down at all. The framebuffer half is
-> ## already measured and gated (`test_down_flash_vanilla.sh`); the
-> ## palette/register half never was, and a framebuffer hash CANNOT separate
-> ## the two — so the precondition is a palette-RAM dump or CPS-B register
-> ## read AT the white frame (write tap or frame-anchored dump; read taps
-> ## never fire, [CPE-14]). Start from STATE's #113 entry and
-> ## `inferred_claims` row 11; do NOT re-derive the eliminations.
+> ## **(3) THE #113 WHITE-FRAME MECHANISM — ANSWERED 2026-09-01, the same
+> ## day it was opened. Nothing to do; do NOT re-derive it.** The one-frame
+> ## white-out is a DELIBERATE PALETTE-BASE SWAP: CPS-A `0x80410a`
+> ## (`CPS1_PALETTE_BASE`) goes from its normal `0x90c0` to `0x9240` for one
+> ## frame, and `0x924000` is filled entirely with `ffff`, so every layer
+> ## resolves to white. Both candidates the record named (palette RAM
+> ## blanked / a CPS-B layer register) are RETRACTED — palette contents are
+> ## untouched. Discriminator 4/4 (`0x9240` occurs exactly four times in
+> ## 6,700 frames, one frame before each white frame); FBNeo reproduces the
+> ## inventory. It also answers the "why": one register write flashes every
+> ## layer at once and reverses instantly. Detail + the two instrument traps:
+> ## STATE's #113 entry.
 > ##
 > ## **(4) JEDAH'S CROUCHING RECOVERY — BLOCKED ON AN INSTRUMENT.** His whole
 > ## crouching family (and Lilith's `2MK`) reads recovery +3 where everyone

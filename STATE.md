@@ -891,7 +891,39 @@ the archive once they stop shaping active work.)*
   (b) was NOT taken and needs a fresh ruling if ever revived. **What survives
   as an honest boundary: the MECHANISM (palette RAM blanked vs a CPS-B
   layer/priority register) is still NOT measured — only the framebuffer is.**
-  **-> OPEN AS A RESEARCH TOPIC (maintainer, 2026-09-01): "we don't know the
+  **-> ANSWERED 2026-09-01, SAME DAY THE TOPIC WAS OPENED: THE WHITE FRAME IS
+  A DELIBERATE PALETTE-BASE SWAP.** The game writes CPS-A register
+  `0x80410a` (`CPS1_PALETTE_BASE`, confirmed from MAME's `cps1.h`
+  `CPS1_PALETTE_BASE = 0x0a/2`) from its normal `0x90c0` to **`0x9240`** for
+  exactly ONE frame; the region at `0x924000` is filled wall-to-wall with
+  `ffff`, so every pixel of every layer resolves to white. The next frame the
+  base returns to `0x90c0`. **BOTH CANDIDATES IN THIS ENTRY WERE WRONG:** it
+  is NOT palette RAM being blanked (rows `0x00-0x5f` at `0x90c000` change only
+  by +/-1 colour cycling across the flash, mean luma 344 -> 344) and NOT a
+  CPS-B layer/priority register. It is the palette POINTER.
+  **And that answers the maintainer's "why is this like this" too:** one
+  register write flashes every layer at once, costs nothing, disturbs no
+  colour and no sprite, and reverses instantly — the cheapest full-screen
+  flash the hardware offers.
+  **DISCRIMINATOR, 4/4:** `0x9240` occurs EXACTLY FOUR TIMES in the 6,700-frame
+  run — f1908, f1910, f2147, f6645 — one frame before each of the four known
+  white frames (1909/1911/2148/6646) and nowhere else. Cross-implementation:
+  FBNeo reproduces the same inventory at +1 frame (hash `0e86f1dc0b964325` at
+  1910/1912/2149), so it is not a MAME artifact. The frame is genuinely 100%
+  white (86,016 px, ONE distinct colour). Rig: `tests/lua/tap_writes.lua`
+  `TAP=80410a,2` + `inp_probe.lua` `PAL_BASE=924000`, on STOCK vsavj with
+  `104_1p_auto_ko_win.rpl` — the `test_down_flash_vanilla.sh` rig.
+  **TWO INSTRUMENT TRAPS PAID FOR, both caught by controls:** (1) the first
+  register tap used `0x800100`, which the driver's own map comments call
+  "Mirror (sfa)" — NEVER written by this game, so a "zero writes" elimination
+  was measuring a dead address (the tap MECHANISM was control-proven at
+  `0x90c000`, which is not the same as proving the ADDRESS meaningful); the
+  live block is `0x804100-0x80417f`. (2) `0x90c0` was briefly read as the
+  flash value; it is the NORMAL one, and only the whole-run distribution shows
+  which is rare. **Nothing is proposed and nothing changes** — vanilla
+  behaviour, #113 stays closed, and the superset invariant forbids touching
+  it. The original topic follows.
+  **-> OPENED AS A RESEARCH TOPIC (maintainer, 2026-09-01): "we don't know the
   mechanism, much less the reason (there has to be one and I must admit I
   wonder why this is like this). We should open a research topic on it and
   tackle it after we get to the bottom of the black foot analysis."

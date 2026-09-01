@@ -126,6 +126,7 @@ tests/test_don_reactions.sh	tenant
 tests/test_don_sound.sh	tenant
 tests/test_don_sword.sh	tenant
 tests/test_don_throw_mirror.sh	tenant
+tests/test_down_flash_mechanism.sh	oracle
 tests/test_down_flash_vanilla.sh	oracle
 tests/test_dualtrack.sh	oracle
 tests/test_effect_palette_table.sh	gfx

@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**289 scripts** — 62 ci_portable, 64 ci_static, 163 emulator-tier (run by name).
+**290 scripts** — 62 ci_portable, 64 ci_static, 164 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -24,7 +24,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [docs](#docs) | 10 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 26 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 51 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
-| [oracle](#oracle) | 27 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
+| [oracle](#oracle) | 28 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 81 | tenant content — per-character gates and on-demand audits on the ported characters |
 | [character-data](#character-data) | 15 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
@@ -174,6 +174,7 @@ the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, du
 | `tests/test_compare_flicker.sh` | test | ci_portable | — | ground truth for the flicker comparator's verdict logic (CLAUDE.md §4: classification code is validated before its verdicts are trusted). Synthetic logs, no emulator, fast. | — |
 | `tests/test_compare_window.sh` | test | ci_portable | — | ground truth for the "bounded re-convergent window" comparison class (CLAUDE.md §4 v3). | 14z-123 |
 | `tests/test_describe_masked_shape.sh` | test | ci_portable | — | ground truth for tools/describe_masked_shape.py, the classifier that turns a measured masked divergence into a PROPOSED expectation line in the ratified §4 vocabulary. | 14z-89 |
+| `tests/test_down_flash_mechanism.sh` | test | emulator | MAME | THE MECHANISM behind GitHub #113's one-frame white-out, measured 2026-09-01 (14z-126b) and locked here. | 2026-09-01 |
 | `tests/test_down_flash_vanilla.sh` | test | emulator | MAME | GitHub #113 ground truth (14z-112; #113 CLOSED 2026-09-01 as vanilla, board-confirmed — this gate is what keeps that verdict honest, so it stays): the one-frame WHOLE-SCREEN WHITE at a down is VANILLA Vampire Savior behaviour, not ours. | 14z-112 |
 | `tests/test_dualtrack.sh` | test | emulator | a build dir | the two tracks must differ ONLY where they are meant to. | 14z-59g |
 | `tests/test_fbneo_legacy_oracle.sh` | test | emulator | MAME, FBNeo, ~5 min | the HACKED build's legacy content, compared against VANILLA, on FBNeo (14z-92, GitHub #78 partial). | 14z-92 |
