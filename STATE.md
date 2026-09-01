@@ -875,9 +875,41 @@ the archive once they stop shaping active work.)*
   sprite draws, by another write from the SAME palette-copy routine putting
   `f111` back. Whether two requests genuinely race or the ordering is
   deterministic is NOT established.
-  **STILL OPEN (small):** WHICH palette-sequence request writes the `f111` at
-  f14341, i.e. what the source block is at `0x02AD78` on that pass. The
-  mechanism does not depend on it.
+  **THE DETAIL CHAIN, dug out 2026-09-01 at the maintainer's direction.**
+  * **The writer is VANILLA code, byte-identical to pristine vsavj**
+    (`PRG:0x02AD20-0x02AD80`, verified against `vanilla_data.bin`). It is a
+    generic 16-entry palette copy: dest row from `+0x18B` of the object,
+    source from `a0`, and it preserves the destination's top nibble
+    (`andi.l #$f000f000`).
+  * **Its resolver entry (`0x02AD20`) is a TWO-LEVEL lookup:**
+    `a0 = charPaletteBase[(a6+0x382)] + (seq_id & 0xFFF)*32`, with the
+    per-character base table at **`PRG:0x38C218`**. `0x02AD3C` is a SECOND
+    entry point with `a0` preloaded, and that is the one our writes come
+    through — so the caller, not this table, chose the block.
+  * **The two source blocks are FOUND:** `PRG:0x0CF110` is the CLEAN one
+    (idx 14 = `fcff`) and `PRG:0x0CEB70` the BLACK one (idx 14 = `f111`).
+  * **PROVENANCE, AND IT IS THE ANSWER TO THE FIX QUESTION: BOTH BLOCKS ARE
+    OURS.** Pristine vsavj holds `0xFF` FILLER at both addresses — unused ROM
+    space the port allocated. The char-table row for id `0x13` is also ours
+    (vanilla aliases Donovan's slot to `0x393460`, Victor's base; the port
+    repoints it to `0x0FF180`). The routine itself is untouched vanilla.
+  **SO THE 2026-08-28 REFUSAL OF OPTION (b) RESTED ON A FALSE PREMISE.** It
+  read "the sequence is vanilla vsavj data, so editing it breaks the superset
+  invariant". The palette data in play is NOT vanilla — it is port-authored
+  bytes in filler vanilla never reads. **That does NOT by itself make a fix
+  right** (see the caution below); it means the risk must be re-assessed
+  rather than assumed. Maintainer's call ([VSP-10]).
+  **THE CAUTION, and it is why no fix is proposed here:** what differs
+  between clean and black is WHICH BLOCK IS SELECTED, not what the blocks
+  contain. Block `0x0CEB70` is used for 22 of the 24 index-14 writes in the
+  window, so `f111` is presumably correct for its other uses; editing it
+  would be a WORKAROUND that could damage them. A sound fix targets the
+  SELECTION.
+  **STILL OPEN, and it is the precondition for any fix:** which caller sets
+  `a0` at the f14341 write, and why it differs from the f14313 one. Static
+  chasing is exhausted — no immediate and no pointer in the image reaches
+  either block — so this needs `a0` MEASURED at `0x02AD64` (a `-debug`
+  breakpoint, or a tap extended to log a register).
   **A method note worth keeping:** the first discriminator appeared to REFUTE
   this (three clean instances carried the "black" row `0b`) — they never reach
   the `bbxx` foot phase at all. Scope a discriminator to the phase that draws
