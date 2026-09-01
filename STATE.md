@@ -323,6 +323,55 @@ entries moved VERBATIM to `DECISIONS_HISTORY.md` — grep there by topic.
 Lifecycle: rulings are still marked DECIDED in place here first; they move to
 the archive once they stop shaping active work.)*
 
+- **#112's FIX — SCOPED 2026-09-01 at the maintainer's direction ("I'd want to
+  scope the second properly before recommending it -> do it"). NOT STARTED;
+  needs a ruling, and my recommendation is (C).**
+  **THE SELECTION POINT, measured:** the palette source is
+  `base + seq_id*32` with the base CONSTANT — Donovan's `+0x3A4` is written
+  exactly twice in a 14,375-frame run (round starts, `PC 0x01C68E`, value
+  `0x0CEB50`) and `[0x38C1E4]` holds the same pointer. So nothing about the
+  base or the blocks varies: **only the SEQ ID does** — `1` for the default
+  (Donovan's body palette, idx14 = `f111`) and `46` for the effect
+  (idx14 = `fcff`). The black foot is seq 1 being re-requested 29 frames
+  before the pool object finishes drawing.
+  **THE PIECES AND WHO OWNS THEM** (all verified against `vanilla_op/data`):
+  the copy routine `0x02AD20-0x02AD80` is VANILLA, byte-identical; the base
+  pointer at `[0x38C1E4]`, the palette blocks at `0x0CEB50+`, the char-table
+  row for id `0x13`, the resolver hook at `PRG:0x3FFAF0` and the palette
+  animator at `PRG:0x471560` are ALL OURS (vanilla holds `0xFF` filler or a
+  different pointer at each).
+  **AND THE PORT ALREADY HAS OWNER-AWARE EFFECT PALETTES.** `0x3FFAF0`'s
+  second branch reads the drawing object's OWNER (`+0x30`) and, if the owner
+  is Donovan, resolves `[0x38C1E4] + owner(+0x3AE)*128`. It exists and is
+  shipped — but it is NOT exercised here: all 24 palette writes in the window
+  carry `A6 = $FF8400`, the PLAYER. The effect's sprites simply draw with
+  pal row `0b`, which the player's machinery fills.
+  **OPTIONS:**
+  **(A) Delay the revert** — gate the seq-1 request while an owned effect is
+  alive. Smallest byte-wise, WORST placed: the request site is on a path every
+  character runs, so it needs a tenant-only condition on legacy-reachable
+  code, plus a flicker-inventory measurement. It also changes WHEN a legacy
+  data path writes, which is the class the superset invariant exists to
+  refuse. NOT RECOMMENDED without a much stronger reason than a cosmetic.
+  **(B) The effect owns its palette** — make the pool object request its own
+  palette into its own row via the EXISTING owner branch. Architecturally
+  right and reuses shipped machinery. **COST, and it is the reason this is not
+  free: it needs a FREE PALETTE ROW** (unmeasured, and rows are scarce), the
+  pool object must carry the fields the hook reads (`+0x30`, `+0x382`,
+  `+0x3AE`, `+0x18B` — none verified present on pool objects), and every
+  effect sprite record must be repointed to the new row. Two to three
+  sessions, and a new render gate.
+  **(C) RECOMMENDED — DO NOTHING TO THE BUILD, and say why in the docs.** The
+  defect is one palette entry on one frame of one super, on a build the
+  maintainer has already accepted as cosmetically imperfect. What CHANGED
+  today is not the cost of a fix but the QUALITY OF THE RECORD: the mechanism
+  is fully known, the 2026-08-28 "vanilla data" objection is retired as
+  FALSE, and the work is now a scoped engineering task rather than an
+  unknown. That is worth banking without spending a freeze on it.
+  **WHAT IS STILL UNMEASURED, and (B) cannot be costed without it:** whether a
+  free palette row exists, and whether pool objects carry the four fields the
+  owner branch reads. Both are half a session.
+
 - **A NEW SESSION SERIES — RESOLVED TOWARD (d) KEEP `14z-`, 2026-09-01;
   awaiting only the maintainer's one-word confirm.** The maintainer: "I like
   S127 but if there's a risk, even low, I don't mind keeping the 14z prefix
