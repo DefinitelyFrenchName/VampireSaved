@@ -251,6 +251,13 @@ legacy behavior is a failed change.
   THE LEDGER's lines. **So a tag is never renamed, renumbered or tidied**:
   renaming one silently breaks every citation, and a citation that cannot
   resolve cannot be corrected ([VSP-13]).
+  **`14z-` IS A FOSSILISED PREFIX — READ IT AS ONE OPAQUE TOKEN. THE LIVE
+  COUNTER IS `-N`.** We are NOT "in session 14" and never have been since
+  2026-07-30: `14z-126` is the 126th session of the `14z-` series, nothing
+  more. Session 14 itself was ONE sitting, 2026-07-28, the M2a freeze — for
+  scale, the MiSTer arc did not open until `14z-106`, 2026-08-22, 104
+  sessions later. Anyone reading the prefix as a live continuation of
+  session 14 has been misled by its ETYMOLOGY, which is only this:
   **ORIGIN — RECONSTRUCTED FROM THE ARCHIVE 2026-09-01, not lost.** The name
   is a CHAIN OF EXHAUSTED COUNTERS, each continued by suffix rather than
   re-based: plain integers (`Session 3`, `4`, `5-6`, `7`, `9`, `13`) →
@@ -258,11 +265,12 @@ legacy behavior is a failed change.
   `14w-b`/`14w-c`/`14k-b` where a letter itself continued) → the letters
   exhausted at **`14z`**, so continuation moved to a NUMBER (`14z-2`,
   `14z-3`, … `14z-126`) → and letters resumed one level down (`14z-126b`).
-  So `14z` is not opaque: it is *session 14, continuation z*, and `-N`
-  counts on from there. Dates fix the chain (Session 9 2026-07-27, Session
-  13 2026-07-28, first `14z-2` reference 2026-07-31, `14z-59` 2026-08-03),
-  and they are what show a "session" is a sitting: ~26 of them between
-  2026-07-28 and 2026-07-31.
+  Each stage FOSSILISED the one before it instead of restarting, which is
+  why the head of the name stopped carrying meaning. Dates (pickaxed from
+  the archive): Session 14 2026-07-28, `14b` 2026-07-28, `14z` 2026-07-30,
+  `14z-2` 2026-07-30, `14z-59` 2026-08-03. **They are also what show a
+  "session" is a CONTEXT WINDOW rather than a day** — 25 letter sessions
+  inside three days, ~8/day.
   **WHAT IS STILL NOT RECORDED, stated as unverified rather than theorised:**
   why session 14 alone began taking letter continuations, and whether the
   practice was inherited with the SMS working discipline. **THE SEARCH THAT
