@@ -154,7 +154,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 ## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 150 entries
 
 - A comparator's own ground-truth test can RATIFY a deviation from the governing spec (paid: 14z-95, GitHub #52)
-- an ART-KEYED detector cannot locate a defect in the ART — search the INPUTS (paid: 14z-126b, #112)
+- SEARCH METHODS ARE ORDERED BY COST, NOT BY PROHIBITION — inputs first because they are cheap, art LAST because it is expensive for Claude and CHEAP the moment the maintainer is shown a capture (paid: 14z-126b, #112; the ordering corrected by the maintainer 2026-09-01)
 - Half the Lua instruments stage inputs one frame off replay.lua — a frame number from one is not a frame number from the other (paid: 14z-90, GitHub issue #10)
 - Sibling-coincident engine refs are INVISIBLE to the diff oracle — and the coincident vsavj address is usually a WRONG routine (paid: 2026-07-27 sessions 11c-12, ~a full session across three playtest rounds)
 - RE-FILED 14z-118 -> `docs/platform/gotchas.md` (the documentation audit, maintainer-ruled)

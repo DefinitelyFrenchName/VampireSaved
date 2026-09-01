@@ -35,7 +35,7 @@ after the last frozen flicker frame is a `wc -l` away. Smallest live tail:
 **1325 frames**. Scope the population to the instrument before concluding
 a question is unanswerable.
 
-## an ART-KEYED detector cannot locate a defect in the ART — search the INPUTS (paid: 14z-126b, #112)
+## SEARCH METHODS ARE ORDERED BY COST, NOT BY PROHIBITION — inputs first because they are cheap, art LAST because it is expensive for Claude and CHEAP the moment the maintainer is shown a capture (paid: 14z-126b, #112; the ordering corrected by the maintainer 2026-09-01)
 
 `inp_probe.lua`'s #112 helper auto-logs "the foot" as **palette row 05 + tile
 `0x0e7xx`** — the art of the CLEAN case. So on the maintainer's black capture
@@ -45,11 +45,28 @@ outside its tile window entirely. Everything downstream inherited the blind
 spot, including a published "the black case does not reproduce on merged-m14"
 that the maintainer's own recording refuted the same hour.
 
-THE RULE: a detector keyed on what a move DRAWS encodes an assumption about
-the art, which is exactly what is under investigation when something renders
-wrong. Locate the move by its **INPUTS** instead — a `.inp` is an input
-recording, and `inp_probe.lua` already logs `in=IN0,IN1,IN2` on every `V`
-line. CPS-2 P1, active LOW: IN0 bit0 R / bit1 L / bit2 D / bit3 U, bits 4-6
+THE RULE, IN THE MAINTAINER'S OWN TERMS (2026-09-01 — the first version of
+this entry got it wrong and the correction is the point of it):
+**this is a COST ORDERING, and none of the legs is forbidden.**
+
+1. **INPUT SEARCH — cheap and reliable. START HERE UNLESS YOU CANNOT.**
+   A `.inp` is an input recording, and `inp_probe.lua` already logs
+   `in=IN0,IN1,IN2` on every `V` line.
+2. **MEMORY WATCHING — more expensive, and reliable UNLESS THE PATTERN IS
+   NOT RELIABLE.** The cost is real and so is the failure mode: the guard is
+   whether the value you key on actually discriminates.
+3. **ART SEARCH — very hard and very expensive FOR CLAUDE. But that price is
+   not intrinsic: THE MAINTAINER CAN CONFIRM OR INFIRM A CAPTURE IMMEDIATELY,
+   so showing them one makes it MUCH more cost-effective.** Art search has a
+   place; the mistake is paying Claude's price for it alone when a human
+   glance is available (the same loop as "show captures before analysis").
+4. **THE LIST IS NOT CLOSED.** Other means likely exist depending on the
+   use-case; do not treat these three as the whole space.
+
+Within that ordering, the defect that paid for the entry is still a real
+trap: a detector keyed on what a move DRAWS encodes an assumption about the
+art, which is exactly what is under investigation when something renders
+wrong. CPS-2 P1, active LOW: IN0 bit0 R / bit1 L / bit2 D / bit3 U, bits 4-6
 LP/MP/HP; IN1 bits 0-2 LK/MK/HK (`cps2_2p6b`, MAME `capcom/cps2.cpp`).
 WHY IT IS ROBUST, not merely cheap (the maintainer's own framing): a motion is
 a PARTIAL ORDER OVER MANDATORY STEPS, not a timed sequence. A human is not
@@ -63,8 +80,16 @@ while the inputs are ground truth INDEPENDENT of the defect.
 Scanning for the motion found all 25 `41236+K` attempts in ONE pass over a log
 already on disk; the last (MK at f14307) was the black one, 2.65 s before the
 cutoff — matching the maintainer's "3 to 4 seconds" estimate. Allow for the
-input->effect LAG (~45 frames for this super), and use the art only to CONFIRM
-a frame the inputs already named.
+input->effect LAG (~45 frames for this super); the art then CONFIRMS the frame
+the inputs named, which is leg 3 doing the job it is good at.
+
+RETRACTED IN THE SAME ENTRY, 2026-09-01: this rule was first written as
+"search the INPUTS, **never** the art", attributed to the maintainer. They
+never said it and have corrected it — *"input search is easy and cheap, art
+search is hard and expensive and long"*, plus the caveat above that a shown
+capture collapses art's cost. The absolute did active harm: it would forbid
+the cheapest confirmation route this project has. Cost ordering, not
+prohibition.
 
 Corollary paid in the same hour: the frame numbers in a recording's NOTE are a
 claim about the build it was played on (see the platform-side entry).

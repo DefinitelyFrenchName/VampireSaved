@@ -55,17 +55,30 @@
 > ## validates ours, an INCONSISTENT pattern means re-check OUR measurement
 > ## first.
 > ##
-> ## **THE METHOD THAT CAME OUT OF 14z-126b, and it is the maintainer's:**
-> ## **to locate a move in a recording, search the INPUTS, never the art.** A
-> ## `.inp` IS an input recording and `inp_probe.lua` already logs
+> ## **THE METHOD FROM 14z-126b — RESTATED CORRECTLY BY THE MAINTAINER
+> ## 2026-09-01, because the first version of it was WRONG AND HARMFUL.** It
+> ## is a **COST ORDERING, not a prohibition.** The bad version said "search
+> ## the INPUTS, never the art" and attributed that to the maintainer; they
+> ## never said it. What they said:
+> ## **(1) INPUT SEARCH — cheap and reliable, so START HERE UNLESS YOU
+> ## CANNOT.** A `.inp` IS an input recording and `inp_probe.lua` already logs
 > ## `in=IN0,IN1,IN2` on every `V` line (CPS-2 P1, active LOW: IN0 bit0 R /
 > ## bit1 L / bit2 D / bit3 U, bits 4-6 LP/MP/HP; IN1 bits 0-2 LK/MK/HK). A
 > ## motion is a PARTIAL ORDER over mandatory steps, so a human's
-> ## non-frame-perfect input is absorbed by an ordered-subsequence match, and
-> ## the inputs are ground truth INDEPENDENT of the defect — art, palette and
-> ## tile codes are all downstream of it. Allow for the input->effect LAG (63
-> ## frames for that super). The `#112` detector keyed on the CLEAN art is the
-> ## cautionary tale: ten confident clean instances, blind to the defect.
+> ## non-frame-perfect input is absorbed by an ordered-subsequence match.
+> ## Allow for the input->effect LAG (63 frames for that super).
+> ## **(2) MEMORY WATCHING — more expensive; reliable UNLESS THE PATTERN IS
+> ## NOT RELIABLE.**
+> ## **(3) ART SEARCH — very hard and very expensive FOR CLAUDE, BUT the
+> ## maintainer can confirm or infirm a capture IMMEDIATELY, so SHOWING THEM
+> ## ONE makes it much more cost-effective.** Art search has a place; do not
+> ## refuse it, and do not pay Claude's price for it alone when a human
+> ## glance is available.
+> ## **(4) THE LIST IS NOT CLOSED** — other means likely exist per use-case.
+> ## The `#112` detector keyed on the CLEAN art is still the cautionary tale
+> ## (ten confident clean instances, blind to the defect), but the lesson is
+> ## "do not key a DETECTOR on the thing under investigation", not "avoid
+> ## art".
 > ##
 > ## **AND: A RECORDING'S FRAME NUMBERS ARE A CLAIM ABOUT ITS BUILD.**
 > ## `run-merged-m9-05` replays on merged-m14 length-exact (END 7490) and
