@@ -39,14 +39,28 @@
 > ## does not discriminate. Cosmetic and maintainer-accepted, so this is
 > ## knowledge work, not a fix.
 > ##
-> ## **(3) JEDAH'S CROUCHING RECOVERY — BLOCKED ON AN INSTRUMENT.** His whole
+> ## **(3) THE #113 WHITE-FRAME RESEARCH TOPIC — NEW, opened by the
+> ## maintainer 2026-09-01, EXPLICITLY SEQUENCED AFTER (2).** #113 itself is
+> ## CLOSED (the behaviour is vanilla, board-confirmed) — this is KNOWLEDGE
+> ## work on vanilla, not a fix, and nothing may change a legacy frame. TWO
+> ## questions: the MECHANISM (palette RAM zeroed vs a CPS-B layer/priority
+> ## register at the white frame) and, the maintainer's actual curiosity, the
+> ## REASON Capcom's engine does it at a down at all. The framebuffer half is
+> ## already measured and gated (`test_down_flash_vanilla.sh`); the
+> ## palette/register half never was, and a framebuffer hash CANNOT separate
+> ## the two — so the precondition is a palette-RAM dump or CPS-B register
+> ## read AT the white frame (write tap or frame-anchored dump; read taps
+> ## never fire, [CPE-14]). Start from STATE's #113 entry and
+> ## `inferred_claims` row 11; do NOT re-derive the eliminations.
+> ##
+> ## **(4) JEDAH'S CROUCHING RECOVERY — BLOCKED ON AN INSTRUMENT.** His whole
 > ## crouching family (and Lilith's `2MK`) reads recovery +3 where everyone
 > ## else reads +2. A frame-rate trace CANNOT resolve a one-frame convention
 > ## (16% of `field_trace` frames carry two engine ticks), so the precondition
 > ## is a TICK-ACCURATE instrument — a `-debug` trace or a Lua hook on the
 > ## engine tick — not another rig.
 > ##
-> ## **(4) THE MIZUUMI CHARACTER DATA — NEW, queued into no session yet.** The
+> ## **(5) THE MIZUUMI CHARACTER DATA — NEW, queued into no session yet.** The
 > ## maintainer has found the character data on the mizuumi wiki (2026-09-01)
 > ## and wants it checked against ours in a future session. It joins the
 > ## community cross-check's existing two sources (the frame-data workbook, the

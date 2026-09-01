@@ -859,6 +859,27 @@ the archive once they stop shaping active work.)*
   (b) was NOT taken and needs a fresh ruling if ever revived. **What survives
   as an honest boundary: the MECHANISM (palette RAM blanked vs a CPS-B
   layer/priority register) is still NOT measured — only the framebuffer is.**
+  **-> OPEN AS A RESEARCH TOPIC (maintainer, 2026-09-01): "we don't know the
+  mechanism, much less the reason (there has to be one and I must admit I
+  wonder why this is like this). We should open a research topic on it and
+  tackle it after we get to the bottom of the black foot analysis."
+  SEQUENCED AFTER #112.** Note it is TWO questions, and the second is the
+  maintainer's real curiosity: (1) the MECHANISM — what makes the frame
+  white (palette RAM zeroed vs a CPS-B layer/priority register at that
+  frame); (2) the REASON — why Capcom's engine does it at all at a down.
+  Knowledge work on VANILLA behaviour, not a port defect and not a fix: the
+  superset invariant forbids changing legacy frames, and #113 is closed.
+  WHAT EXISTS TO START FROM, so nothing is re-derived: the behaviour is
+  frozen and gated (`tests/test_down_flash_vanilla.sh` — one all-white frame,
+  fnv `eab1fb569cb99b25`, 57..96 frames after every down, plus the intro pair
+  and the match-start frame), it is present in BOTH vsavj and vsav2
+  (`37_victor_ko_vsav2`), and the framebuffer half is measured while the
+  palette/register half never was. The instrument gap is the whole topic:
+  a framebuffer hash cannot distinguish a blanked palette from a disabled
+  layer — that wants a palette-RAM dump or a CPS-B register read AT the white
+  frame ([CPE-14]: MAME read taps never fire on this driver, so a write tap
+  or a frame-anchored dump is the route). `inferred_claims` row 11 is the
+  standing record of the unmeasured half.
   The original entry follows. (measured 14z-112,
   `tests/test_down_flash_vanilla.sh` PASS on stock vsavj / reference MAME).
   Stock Vampire Savior draws ONE all-white frame (fnv `eab1fb569cb99b25`,
