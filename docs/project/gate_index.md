@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**290 scripts** — 62 ci_portable, 64 ci_static, 164 emulator-tier (run by name).
+**291 scripts** — 62 ci_portable, 64 ci_static, 165 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -24,7 +24,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [docs](#docs) | 10 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 26 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 51 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
-| [oracle](#oracle) | 28 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
+| [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 81 | tenant content — per-character gates and on-demand audits on the ported characters |
 | [character-data](#character-data) | 15 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
@@ -186,6 +186,7 @@ the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, du
 | `tests/test_m2a_stage4_oracle.sh` | test | emulator | a build dir | M2a stage-4 behavior gate: ported Donovan on vsavj vs NATIVE Donovan on vsav2 (CLAUDE.md §4 dual-oracle for new content, same-emulator two-game form). | M2a |
 | `tests/test_m2a_stage4_xemu.sh` | test | emulator | MAME, FBNeo | M2a stage-4 dual-emulator gate (CLAUDE.md §4): the PATCHED build runs 17_don_oracle_vsavj (both picks scripted, 16_xemu authoring rules) on MAME and on patched FBNeo; | M2a |
 | `tests/test_masked_compare.sh` | test | ci_portable | — | ground truth for tests/lib/masked_compare.sh, the ONE implementation of the CLAUDE.md §4 masked comparison vocabulary (14z-97, GitHub #96). | 14z-97 |
+| `tests/test_pod_black_foot_palette.sh` | test | emulator | MAME, ~7 min | GitHub #112's black foot, CAUSALLY located (14z-126b, 2026-09-01): the black pixels ARE palette row 0b index 14 (RAM:$90C17C) of the OBJ palette page, and nothing else. | 14z-126b |
 
 ## gfx
 

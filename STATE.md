@@ -857,6 +857,24 @@ the archive once they stop shaping active work.)*
   art, same composed addresses; (c) "not a palette fault" — it IS one, on row
   `0b`. Row 05 is genuinely constant across the whole 14,400-frame run, which
   is why checking it alone said "no palette fault".
+  **THE FOOT<->ROW LINK IS NOW CAUSAL, NOT CORRELATIONAL (2026-09-01, after
+  the maintainer asked "is it truly complete?" — it was NOT).** As first
+  published, "the foot is row `0b` index 14" was ASSERTED from a colour
+  coincidence (`f111` = rgb(17,17,17) being the commonest colour near the
+  effect) and from comparing pixel boxes at the SAME SCREEN COORDINATES in two
+  frames where the effect sits at DIFFERENT positions — i.e. mismatched
+  content. That was correlation dressed as a root cause. **Replaced by an
+  INTERVENTION:** forcing `$90C17C` = `fcff` across the black frame moves
+  EXACTLY 7,007 pixels, every one of them rgb(17,17,17) -> rgb(204,255,255),
+  and the black sole and toes vanish from the snapshot. **Control fired:**
+  poking the neighbouring entry `$90C17A` moves 8,898 DISJOINT pixels, none of
+  them black — so the attribution is index-specific. Gated as
+  `tests/test_pod_black_foot_palette.sh`.
+  **LANGUAGE CORRECTED: "race" was too strong.** What is measured is an
+  OVERWRITE with an ordering: the effect's `fcff` load is followed, before the
+  sprite draws, by another write from the SAME palette-copy routine putting
+  `f111` back. Whether two requests genuinely race or the ordering is
+  deterministic is NOT established.
   **STILL OPEN (small):** WHICH palette-sequence request writes the `f111` at
   f14341, i.e. what the source block is at `0x02AD78` on that pass. The
   mechanism does not depend on it.

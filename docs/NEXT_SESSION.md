@@ -38,6 +38,13 @@
 > ## eliminations**: the tile codes, the composed `a18`/`a19` addresses, the
 > ## OBJ entries and row 05 are all IDENTICAL between a clean and the black
 > ## instance; three earlier claims are retracted in STATE's #112 entry.
+> ## **THE FOOT<->ROW LINK IS CAUSAL, not correlational** (the maintainer
+> ## asked "is it truly complete?" and it was not): forcing `$90C17C`=`fcff`
+> ## moves EXACTLY 7,007 px, all rgb(17,17,17)->rgb(204,255,255), and the
+> ## sole and toes vanish; the control on the neighbouring entry moves 8,898
+> ## DISJOINT px, none black. Gated: `test_pod_black_foot_palette.sh`.
+> ## "Race" was too strong — an OVERWRITE with an ordering is what is
+> ## measured; whether it truly races is not established.
 > ## Only remaining question, and it is optional: which palette-seq request
 > ## writes the f14341 `f111`. Rig: `tests/lua/tap_writes.lua` with
 > ## `TAP=90c17c,2` over `tests/inp/pod-black-m14-01`.
