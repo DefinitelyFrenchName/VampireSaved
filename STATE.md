@@ -323,6 +323,44 @@ entries moved VERBATIM to `DECISIONS_HISTORY.md` — grep there by topic.
 Lifecycle: rulings are still marked DECIDED in place here first; they move to
 the archive once they stop shaping active work.)*
 
+- **A NEW SESSION SERIES — the maintainer opened it 2026-09-01 ("I agree the
+  keys are reliable, best not change them, although we could indeed start a
+  new series"). NOT STARTED; needs a ruling.** The existing keys are SETTLED:
+  they stay as they are, resolvable forever ([VSP-162]). This is only about
+  what the NEXT session is called. **Why it is even on the table:** the
+  maintainer read [VSP-162] as written and asked "why are we still on session
+  14?" — the prefix is fossilised and actively misleads (session 14 was ONE
+  sitting, 2026-07-28, the M2a freeze; MiSTer opened 104 sessions later at
+  `14z-106`).
+  **Options:**
+  **(a) RECOMMENDED — `S127`: drop the dead prefix, KEEP the live counter and
+  the whole grammar** (letter suffix = continuation `S127b`; parenthetical =
+  phase `S127 (3)`). The seam is one line — "S127 immediately follows
+  14z-126b" — chronological order is preserved, every existing habit carries
+  over, and nothing in the archive moves.
+  **(b) Restart at `S1`. NOT RECOMMENDED: it COLLIDES** with the early bare
+  integers still live in the archive (`Session 3`, `4`, `5-6`, `7`, `9`,
+  `13`, `14`), so `S1`..`S14` would be ambiguous to exactly the greps the key
+  exists to serve.
+  **(c) Date-based (`2026-09-01a`).** Self-describing, but sessions are
+  context windows (~8/day measured), so it needs letter suffixes anyway and
+  buys nothing the counter does not.
+  **(d) Do nothing** — defensible; the prefix is inert and now documented, so
+  the confusion it caused is a one-time cost already paid.
+  **THE COST, MEASURED 2026-09-01 (and it is small but has a TRAP):** of 405
+  files mentioning `14z`, only THREE are PARSES —
+  `tools/gen_gate_index.py:60` (`SESSION_RE`) and `tools/checkdocshape.py:78`
+  and `:79` (`SESSION_TOKEN`, `CHRONO`). Everything else is prose citation,
+  which is exactly why renaming old keys is forbidden and why a NEW series is
+  nearly free. **THE TRAP: `checkdocshape`'s two regexes are the gate that
+  bars a REFERENCE doc from re-accreting chronology (built 14z-126b). A new
+  prefix not added there makes that gate SILENTLY BLIND to the new tags** —
+  green while checking nothing, the failure mode that let eight freezes of
+  chronology accrete in HANDOFF unseen. So the ruling, if it is (a), lands as
+  ONE commit: three regexes extended + a must-fire control proving the new
+  prefix is caught + the seam line in [VSP-162] and the port skill. No
+  gameplay surface; the maintainer's convention, so theirs to rule.
+
 - **FRAME DATA IN A PUBLIC REPO — DECIDED (maintainer, 2026-08-31: "I agree
   with the recommendation") AND IMPLEMENTED 14z-126, option (b).** THE CLASS
   RULE: every per-move ROM-derived table — OURS AND THIRD-PARTY ALIKE — is
