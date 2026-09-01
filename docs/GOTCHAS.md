@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-273 entries (36 game / 87 platform / 150 project), counted from the buckets at generation.
+274 entries (36 game / 87 platform / 151 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 36 entries
 
@@ -151,9 +151,10 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - MAME palette RAM ($90C000) takes Lua pokes for READBACK but not for RENDERING (14z-102)
 - two -debug INSTRUMENT-grammar traps from the #103 close — both misread a measurement for a full round each (paid: 14z-98)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 150 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 151 entries
 
 - A comparator's own ground-truth test can RATIFY a deviation from the governing spec (paid: 14z-95, GitHub #52)
+- A DEFECT THAT LIVES IN A RELATIONSHIP BETWEEN TWO TIMELINES IS INVISIBLE TO EVERY SINGLE-FRAME INSTRUMENT (paid: 14z-126b, #112 — a session and a half)
 - SEARCH METHODS ARE ORDERED BY COST, NOT BY PROHIBITION — inputs first because they are cheap, art LAST because it is expensive for Claude and CHEAP the moment the maintainer is shown a capture (paid: 14z-126b, #112; the ordering corrected by the maintainer 2026-09-01)
 - Half the Lua instruments stage inputs one frame off replay.lua — a frame number from one is not a frame number from the other (paid: 14z-90, GitHub issue #10)
 - Sibling-coincident engine refs are INVISIBLE to the diff oracle — and the coincident vsavj address is usually a WRONG routine (paid: 2026-07-27 sessions 11c-12, ~a full session across three playtest rounds)

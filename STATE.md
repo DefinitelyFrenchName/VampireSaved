@@ -973,6 +973,22 @@ the archive once they stop shaping active work.)*
   drawing, the sprite renders against the default block. That is why it is
   intermittent, why it cannot be reproduced on demand, and why nothing about
   the tiles, the records or the addresses was ever wrong.
+  **THE TRIGGER, MEASURED 11/11 (2026-09-02, the maintainer's question "why
+  such a specific issue, on a single move, and not even all the time?"):
+  DONOVAN IS HIT WHILE HIS OWN EFFECT IS STILL DRAWING.** The effect palette
+  (seq 46) has a FIXED nominal lifetime: across the whole recording it is
+  loaded ELEVEN times and survives 108/108/109x7/144 frames — except once, at
+  f14313, where it survives **28**. That one load is the ONLY one whose window
+  contains P1 taking damage (`hp1` 203 -> 201 exactly at the f14341 revert
+  frame). Being hit moves the player's state machine to a reaction, which
+  re-requests his DEFAULT body palette (seq 1); the pool object is still
+  drawing and borrows his row, so it renders against the wrong block.
+  **So the answer to "why only this move, and not always" is exact:** the move
+  is a super whose effect OUTLIVES the player's state (~109 frames), and the
+  condition is GETTING HIT during that window. Ten clean instances, none hit,
+  all held the palette for its full lifetime. **This also RETRACTS the earlier
+  guess** that the state advanced at outcome-dependent speeds — it does not;
+  the lifetime is fixed and only an interruption shortens it.
   **WHAT A FIX WOULD TARGET, now the mechanism is known:** the LIFETIME
   RELATIONSHIP, not the palette bytes — either the player's revert waits for
   the effect, or the effect owns its palette instead of borrowing the

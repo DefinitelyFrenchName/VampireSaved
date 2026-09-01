@@ -35,6 +35,42 @@ after the last frozen flicker frame is a `wc -l` away. Smallest live tail:
 **1325 frames**. Scope the population to the instrument before concluding
 a question is unanswerable.
 
+## A DEFECT THAT LIVES IN A RELATIONSHIP BETWEEN TWO TIMELINES IS INVISIBLE TO EVERY SINGLE-FRAME INSTRUMENT (paid: 14z-126b, #112 — a session and a half)
+
+Every single-frame observable was IDENTICAL between a clean instance and the
+defective one: the same 16 tile codes, the same attrs and sizes, the same
+composed `a18`/`a19` addresses, the same palette row 05, the same OBJ list
+length, the same sprite positions modulo the effect's own movement. The
+defect existed ONLY in a relationship between two timelines — a palette owned
+by the player's state machine, and sprites owned by a pool object with its own
+lifetime — and no photograph of one frame can contain that.
+
+**WHAT THIS COSTS IF YOU DO NOT RECOGNISE IT.** Every art-keyed and
+frame-keyed instrument is STRUCTURALLY blind, not merely unlucky: the #112
+detector keyed on the clean art and reported ten confident clean instances; a
+frame-diff of the two instances returned "identical" and was TRUE; three
+successive mechanism stories (wrong tile codes, art from the wrong place, a
+palette-row fault) were each consistent with everything visible in a frame and
+each wrong. Being consistent with every single-frame observable is NOT
+evidence when the defect is not in a frame.
+
+**THE TELL, and it is cheap to check.** You have a defect that reproduces, and
+a clean and a bad instance that compare EQUAL on every state you can dump.
+That equality is the finding: stop diffing states and start measuring
+DURATIONS AND ORDERINGS. Ask "what is the lifetime of each participant, and
+what interrupts it?" — for #112 the answer arrived the moment the effect
+palette's SURVIVAL TIME was tabulated across all eleven loads: ten at
+108-144 frames, one at 28, and only that one had the player taking damage
+inside its window. 11/11 with one measurement.
+
+**WHAT ACTUALLY BROKE IT OPEN, in order:** an INTERVENTION (poke the suspected
+palette entry and count the pixels that move — 7007, all of them, plus a
+negative control on the neighbouring entry); a PROVENANCE diff (whose bytes
+are these — vanilla's or ours?); and REGISTERS at the write (`REGLOG` naming
+the source pointer and the owning object). None of those is a picture.
+Corollary for the cost ordering above: art is for CONFIRMING a frame the data
+already named, and it cannot adjudicate a timing relationship at all.
+
 ## SEARCH METHODS ARE ORDERED BY COST, NOT BY PROHIBITION — inputs first because they are cheap, art LAST because it is expensive for Claude and CHEAP the moment the maintainer is shown a capture (paid: 14z-126b, #112; the ordering corrected by the maintainer 2026-09-01)
 
 `inp_probe.lua`'s #112 helper auto-logs "the foot" as **palette row 05 + tile

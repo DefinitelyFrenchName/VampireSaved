@@ -2810,6 +2810,43 @@ the first down). A bulk palette reload around the flash was looked for and
 NOT found (flat ~96 writes/frame at `0x90c000` across the window), so a
 "palette-swap artifact" reading is not supported by that evidence.
 
+## EFFECT PALETTES ARE OWNED BY THE PLAYER, NOT THE EFFECT — and that is a
+## LIFETIME HAZARD (measured 14z-126b, 2026-09-02)
+
+A palette row is filled by the vanilla copy routine `PRG:0x02AD20-0x02AD80`
+from `base + seq_id*32`, driven by an object's own state machine: the
+destination row comes from the object's `+0x18B` and the source base from its
+`+0x3A4` (constant in practice — written twice a run, at round starts). The
+requesting object is the PLAYER (`RAM:$FF8400`); its effects are drawn by
+SEPARATE POOL OBJECTS with their own lifetimes, and those sprites simply
+reference the player's palette row.
+
+**Nothing synchronises the two.** A palette request is per PLAYER STATE; a
+pool object's sprites live as long as the effect does. When a player's state
+changes while an owned effect is still drawing, the palette reverts under the
+effect and its sprites render against the new block.
+
+**MEASURED INSTANCE (GitHub #112, Donovan's Press of Death).** The effect
+palette (seq 46) has a fixed nominal lifetime: over one recording it is loaded
+ELEVEN times and survives 108/108/109x7/144 frames. The single exception
+survives **28** — and is the only load whose window contains the player TAKING
+DAMAGE. Being hit moves the state machine to a reaction, which re-requests the
+default body palette (seq 1), whose index 14 is near-black where the effect's
+is bright cyan. Hence a "black foot" on one super, only when the player is
+clipped mid-move. Causally gated by
+`tests/test_pod_black_foot_palette.sh`; the full trail is STATE's #112 entry.
+
+**THE GENERAL FORM, worth recognising elsewhere:** any effect that outlives
+the state which requested its palette is exposed to this, and the exposure
+window is the effect's own duration. It is invisible until something
+interrupts the owner.
+
+Atlas rows this rests on: `atlas/ram.md` player-block `+0x18B` (palette
+destination row), `+0x3A4` (palette source base), `+0x3AE` (the owner's
+effect-palette index), `+0x30` (owner link) and `+0x382` (char id), plus the
+player blocks `RAM:$FF8400`/`$FF8800`. Locked by
+`tests/test_pod_black_foot_palette.sh` (the causal poke + its control).
+
 ## THE ROUND JUDGE: death is the SIGN OF WHITE HP, and the phase
 ## machine that consumes it (14z-98, measured end to end on #103)
 
