@@ -35,6 +35,40 @@ after the last frozen flicker frame is a `wc -l` away. Smallest live tail:
 **1325 frames**. Scope the population to the instrument before concluding
 a question is unanswerable.
 
+## an ART-KEYED detector cannot locate a defect in the ART — search the INPUTS (paid: 14z-126b, #112)
+
+`inp_probe.lua`'s #112 helper auto-logs "the foot" as **palette row 05 + tile
+`0x0e7xx`** — the art of the CLEAN case. So on the maintainer's black capture
+it reported TEN confident clean instances and was structurally blind to the
+one frame it exists to find: the black foot draws `0xbbe5`/`0xbbea` at pal 05,
+outside its tile window entirely. Everything downstream inherited the blind
+spot, including a published "the black case does not reproduce on merged-m14"
+that the maintainer's own recording refuted the same hour.
+
+THE RULE: a detector keyed on what a move DRAWS encodes an assumption about
+the art, which is exactly what is under investigation when something renders
+wrong. Locate the move by its **INPUTS** instead — a `.inp` is an input
+recording, and `inp_probe.lua` already logs `in=IN0,IN1,IN2` on every `V`
+line. CPS-2 P1, active LOW: IN0 bit0 R / bit1 L / bit2 D / bit3 U, bits 4-6
+LP/MP/HP; IN1 bits 0-2 LK/MK/HK (`cps2_2p6b`, MAME `capcom/cps2.cpp`).
+WHY IT IS ROBUST, not merely cheap (the maintainer's own framing): a motion is
+a PARTIAL ORDER OVER MANDATORY STEPS, not a timed sequence. A human is not
+frame-perfect, so directions are held for several frames — but repetition is
+free to an ordered-subsequence match (`4444411122333333` matches
+`4 -> {1,2} -> {3,6}` as well as a clean `41236`), and sloppiness is absorbed
+by widening a SET, not by rewriting the matcher. One dimension, ~14k symbols,
+against a quarter-million pixels per frame or 64 KB of work RAM per frame —
+and both of those need a hypothesis about the EFFECT before they can start,
+while the inputs are ground truth INDEPENDENT of the defect.
+Scanning for the motion found all 25 `41236+K` attempts in ONE pass over a log
+already on disk; the last (MK at f14307) was the black one, 2.65 s before the
+cutoff — matching the maintainer's "3 to 4 seconds" estimate. Allow for the
+input->effect LAG (~45 frames for this super), and use the art only to CONFIRM
+a frame the inputs already named.
+
+Corollary paid in the same hour: the frame numbers in a recording's NOTE are a
+claim about the build it was played on (see the platform-side entry).
+
 ## **[VSP-149]** Half the Lua instruments stage inputs one frame off replay.lua — a frame number from one is not a frame number from the other (paid: 14z-90, GitHub issue #10)
 
 `tests/lua/replay.lua` writes its checksum for frame N and THEN stages

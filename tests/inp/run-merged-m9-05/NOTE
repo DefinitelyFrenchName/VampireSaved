@@ -1,1 +1,17 @@
 THE #112 CAPTURE (maintainer recording 2026-08-27, merged-m9/MAME). 1P Donovan arcade: match 1 vs VICTOR = Press of Death always WHITE; match 2 vs Q-BEE (opponent id 0x0c from f6215) — the LAST instance of the move, f7357-7370, comes down white and lifts BLACK (sole/toes/stripes solid black, outline still cyan). Real playback is 7490 frames (MAME "Total playback frames"); anything after that is the attract demo, NOT play. Guard-clean. This is the deterministic A/B for #112: white f5685-5693 (Victor) vs black f7357-7370 (Q-Bee), same recording, same build.
+
+FRAME NUMBERS ABOVE ARE A CLAIM ABOUT merged-m9 ONLY (measured 14z-126b).
+Replayed on merged-m14 (build/m3b_merged21) this recording still runs to
+END 7490 — length-exact and guard-clean — but the CONTENT diverges: the
+Press of Death lands in 11 instances at f1108/1996/2911/4717/4727/4782/4792/
+5217/5943/6018/6483, none of them at f5685 or f7357, and NONE draws the lift
+(black) tile set 0xe768-0xe796; nine draw 0xe7c0-0xe7d6, a range the 14z-112
+record does not name. Cause: merged-m14 carries the physics port, so the same
+stick input puts Donovan in different positions and the fights diverge
+([VSP-119] means frame-exact ON THE SAME PINNED BINARY, and merged-m9's build
+dir is pruned under [VSP-96] — freeze/merged-m9 is the way back).
+So: for the WHITE/BLACK A/B use `tests/inp/pod-black-m14-01` (captured on merged-m14, 14z-126b) — NOT this
+recording. And note what this recording does NOT show: that the black case is gone. The move reaches the
+lift phase only on some outcomes, and this playback simply never takes them.
+For anything about the MECHANISM, the instances on the current build serve —
+that is what 14z-126b measured.

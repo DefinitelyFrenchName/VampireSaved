@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-271 entries (36 game / 86 platform / 149 project), counted from the buckets at generation.
+273 entries (36 game / 87 platform / 150 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 36 entries
 
@@ -61,7 +61,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - THE "?" WALKER WRITES THE DRAWN ID EVERY FRAME, FROM TWO PATHS (paid: 14z-117, one crashing probe)
 - THE ENGINE DOES NOT RUN ONE TICK PER VIDEO FRAME — a `frame_done` trace CANNOT count animation frames (paid: 14z-125b, measured)
 
-## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 86 entries
+## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 87 entries
 
 - CPS-2 ROM file byte order is NOT 68k logical order (paid: 2026-07-25, ~1h)
 - MAME `logerror` output needs `-log`, not `-verbose` (paid: 2026-07-25)
@@ -133,6 +133,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A jtcores BITSTREAM CARRIES A BUILD DATESTAMP, SO THE SAME SEED REBUILDS TO A DIFFERENT HASH ON A DIFFERENT DAY (measured 2026-08-25, 14z-108)
 - An ARMED DEBUGGER BREAKPOINT skews the Lua harness's input application — deterministic INPUT-VIOLATIONs that look like host input (14z-110)
 - A RELATIVE `FBNEO_ROMPATH` builds an overlay of BROKEN SYMLINKS — and the only symptom is a bare "DrvInit failed" (14z-110)
+- a recording's FRAME NUMBERS are a claim about the BUILD it was played on (paid: 14z-126b)
 - the macOS tmp reaper hollows out the jtsim scratch clone (paid: 14z-111)
 - MAME Lua: WRITE taps fire, READ taps do not (14z-112, measured)
 - RE-FILED FROM project/gotchas.md (14z-118, the documentation audit) — emulator and toolchain facts that had been filed by task
@@ -150,9 +151,10 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - MAME palette RAM ($90C000) takes Lua pokes for READBACK but not for RENDERING (14z-102)
 - two -debug INSTRUMENT-grammar traps from the #103 close — both misread a measurement for a full round each (paid: 14z-98)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 149 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 150 entries
 
 - A comparator's own ground-truth test can RATIFY a deviation from the governing spec (paid: 14z-95, GitHub #52)
+- an ART-KEYED detector cannot locate a defect in the ART — search the INPUTS (paid: 14z-126b, #112)
 - Half the Lua instruments stage inputs one frame off replay.lua — a frame number from one is not a frame number from the other (paid: 14z-90, GitHub issue #10)
 - Sibling-coincident engine refs are INVISIBLE to the diff oracle — and the coincident vsavj address is usually a WRONG routine (paid: 2026-07-27 sessions 11c-12, ~a full session across three playtest rounds)
 - RE-FILED 14z-118 -> `docs/platform/gotchas.md` (the documentation audit, maintainer-ruled)

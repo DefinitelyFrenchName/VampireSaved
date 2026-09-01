@@ -1871,6 +1871,26 @@ stands for every overlay-by-symlink mechanism: absolutize before linking,
 and suspect the instrument when a KNOWN-GOOD input fails the same way as
 the thing under test.
 
+## a recording's FRAME NUMBERS are a claim about the BUILD it was played on (paid: 14z-126b)
+
+`WIDE_RECORD` `.inp` playback is frame-exact ON THE SAME PINNED
+BINARY ([VSP-119]) — and that is the whole of the guarantee. Replaying
+`run-merged-m9-05` (recorded on merged-m9) against merged-m14 still ends at
+`END 7490`, the exact recorded length, and is guard-clean, so nothing looks
+wrong. But the CONTENT diverges: the move the recording was captured for
+lands in 11 instances at completely different frames, none at the recorded
+ones, and drawing a tile set the original never showed. Cause: merged-m14
+carries the physics port, so identical stick input puts the character in
+different positions and the fights go differently.
+
+So a NOTE's frame numbers are historical, not an index. Length matching is
+NOT evidence the run reproduced — the input stream is the same length by
+construction. Before trusting any frame number from a recording, check which
+build it was played on; if it is not the build in front of you, RE-LOCATE the
+event (the probe's own detectors do this — `inp_probe.lua` auto-logs the #112
+foot) or rebuild from the freeze tag, because the old build dir is pruned
+under the current-plus-one-back policy ([VSP-96]).
+
 ## the macOS tmp reaper hollows out the jtsim scratch clone (paid: 14z-111)
 
 `tools/mister_mra.sh` / `run_sim_jtcps2.sh` keep a clone of the jtcores
