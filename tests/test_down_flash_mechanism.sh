@@ -17,6 +17,12 @@
 # value, present on ~6,590 frames -- must FAIL, proving the test discriminates
 # rather than accepting any base value.
 #
+# WHAT THIS GATE DOES NOT ESTABLISH: WHY Capcom flashes the screen at all.
+# It locks the MECHANISM (how the flash is produced) and the fact that a base
+# swap is the cheap way to produce one. The DESIGN INTENT is unknown; all four
+# occurrences happen to sit at state transitions, which is an observation, not
+# a finding. Do not read this gate as explaining the effect's purpose.
+#
 # WHY A SECOND GATE rather than an assert inside test_down_flash_vanilla.sh:
 # that one locks the INVENTORY (where white frames are) from the framebuffer
 # alone; this one locks WHY, and needs a register tap. Keeping them apart means

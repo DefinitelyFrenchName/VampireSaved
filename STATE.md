@@ -901,10 +901,25 @@ the archive once they stop shaping active work.)*
   is NOT palette RAM being blanked (rows `0x00-0x5f` at `0x90c000` change only
   by +/-1 colour cycling across the flash, mean luma 344 -> 344) and NOT a
   CPS-B layer/priority register. It is the palette POINTER.
-  **And that answers the maintainer's "why is this like this" too:** one
-  register write flashes every layer at once, costs nothing, disturbs no
-  colour and no sprite, and reverses instantly — the cheapest full-screen
-  flash the hardware offers.
+  **TWO DIFFERENT "WHY"s, AND ONLY ONE IS ANSWERED — corrected 2026-09-01
+  after the maintainer read this entry and said "I still don't understand why
+  would Capcom want to blink the screen, but now we at least know how".** They
+  are right and the first version of this entry overstated it:
+  * **WHY THIS IMPLEMENTATION — ANSWERED.** Given that a full-screen flash is
+    wanted, a palette-base swap is the cheapest way to get one: a single
+    register write flashes every layer at once, disturbs no colour and no
+    sprite, and reverses instantly.
+  * **WHY A FLASH AT ALL — STILL OPEN, and it is the interesting half.**
+    Nothing measured says what design purpose a one-frame white-out serves.
+    THE ONE OBSERVATION WORTH CARRYING, stated as an observation and not a
+    theory: all four occurrences in the run sit at STATE TRANSITIONS (the
+    match-intro pair, match start, and the first down), not at arbitrary
+    moments — so "an impact accent" and "a side effect of a palette swap at a
+    transition" are both still live. Evidence AGAINST the second: the palette
+    at `0x90c000` shows NO bulk reload around the flash (writes are a flat
+    ~96/frame across f6640-6652, no burst at f6646), so if it is a swap
+    artifact the reload is not happening there. Not pursued further; nothing
+    depends on it.
   **DISCRIMINATOR, 4/4:** `0x9240` occurs EXACTLY FOUR TIMES in the 6,700-frame
   run — f1908, f1910, f2147, f6645 — one frame before each of the four known
   white frames (1909/1911/2148/6646) and nowhere else. Cross-implementation:

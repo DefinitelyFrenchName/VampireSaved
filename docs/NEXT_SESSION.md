@@ -51,9 +51,13 @@
 > ## blanked / a CPS-B layer register) are RETRACTED — palette contents are
 > ## untouched. Discriminator 4/4 (`0x9240` occurs exactly four times in
 > ## 6,700 frames, one frame before each white frame); FBNeo reproduces the
-> ## inventory. It also answers the "why": one register write flashes every
-> ## layer at once and reverses instantly. Detail + the two instrument traps:
-> ## STATE's #113 entry.
+> ## inventory. **HOW is answered; WHY CAPCOM FLASHES THE SCREEN AT ALL IS
+> ## NOT** (maintainer, 2026-09-01: "I still don't understand why would
+> ## Capcom want to blink the screen, but now we at least know how"). The
+> ## base swap explains the IMPLEMENTATION, not the design intent. Only
+> ## observation: all four occurrences sit at STATE TRANSITIONS; a bulk
+> ## palette reload was looked for and not found. Open, and nothing depends
+> ## on it. Detail + the two instrument traps: STATE's #113 entry.
 > ##
 > ## **(4) JEDAH'S CROUCHING RECOVERY — BLOCKED ON AN INSTRUMENT.** His whole
 > ## crouching family (and Lilith's `2MK`) reads recovery +3 where everyone

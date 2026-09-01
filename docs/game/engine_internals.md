@@ -2802,6 +2802,13 @@ discriminator is 4/4 — `0x9240` occurs exactly four times in a 6,700-frame
 run, one frame before each of the four white frames — and FBNeo reproduces
 the inventory, so it is engine behaviour, not an emulator artifact
 (STATE's #113 entry carries the rig and the two instrument traps).
+**WHAT IS STILL NOT KNOWN: WHY CAPCOM FLASHES THE SCREEN AT ALL.** The
+mechanism above explains HOW, and why a base swap is the cheapest way to do
+it; it says nothing about the design intent. Observation only, not a theory:
+all four occurrences sit at STATE TRANSITIONS (the intro pair, match start,
+the first down). A bulk palette reload around the flash was looked for and
+NOT found (flat ~96 writes/frame at `0x90c000` across the window), so a
+"palette-swap artifact" reading is not supported by that evidence.
 
 ## THE ROUND JUDGE: death is the SIGN OF WHITE HP, and the phase
 ## machine that consumes it (14z-98, measured end to end on #103)
