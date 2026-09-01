@@ -41,7 +41,11 @@ a question is unanswerable.
 `0x0e7xx`** — the art of the CLEAN case. So on the maintainer's black capture
 it reported TEN confident clean instances and was structurally blind to the
 one frame it exists to find: the black foot draws `0xbbe5`/`0xbbea` at pal 05,
-outside its tile window entirely. Everything downstream inherited the blind
+outside its tile window entirely. (**Both readings of WHY were wrong, and the
+detector is why: `bbe5`/`bbea` turned out to be a NORMAL later phase every
+clean instance draws — root-caused 2026-09-01 to an overwrite race on palette
+row `0b` index 14, STATE's #112 entry. The detector's blindness produced a
+wrong locator AND then a wrong mechanism story on top of it.**) Everything downstream inherited the blind
 spot, including a published "the black case does not reproduce on merged-m14"
 that the maintainer's own recording refuted the same hour.
 

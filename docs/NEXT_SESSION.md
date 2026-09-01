@@ -25,19 +25,22 @@
 > ## outside the superset invariant's "untouched" set by definition, so it
 > ## needs its own track/flag and its own ratified expectation class.
 > ##
-> ## **(2) #112's ONE REMAINING QUESTION — and it is now a SMALL one.** The
-> ## premise is REFUTED: a tenant object does NOT run a vanilla sequence (see
-> ## STATE 14z-126b addendum (2) for the three independent legs). The black
-> ## foot is FOUND, reproducible and characterised: input `41236+MK` at
-> ## **f14307** of `tests/inp/pod-black-m14-01`, rendering at **f14370-14375**,
-> ## drawing `bbe5`/`bbea` at pal 05 where every clean instance draws
-> ## `0xe768-0xe796`. **The open question is why THAT instance selects
-> ## `0xbbxx` when nine earlier ones in the same fight did not.** Next step: a
-> ## WRITE tap on the record behind the f14370 OBJ entry (read taps never fire,
-> ## [CPE-14]). **Do NOT reach for `effect_map` membership as the answer** —
-> ## `0xbbe5`, `0xbbea` AND the clean `0xe768` are all absent from it, so it
-> ## does not discriminate. Cosmetic and maintainer-accepted, so this is
-> ## knowledge work, not a fix.
+> ## **(2) #112 IS ROOT-CAUSED — an OVERWRITE RACE on palette row `0b`
+> ## index 14 (2026-09-01). Nothing is blocked on it; it stays COSMETIC and
+> ## ACCEPTED.** The foot is row `0b` idx 14, NOT row 05. Idx 14's default is
+> ## `f111` (near-black); the effect loads `fcff` (cyan). Over f13400-14375
+> ## there are 24 writes to it and only TWO are `fcff`, one per Press of
+> ## Death: the CLEAN one (f13589) survives 56 frames to the foot at f13645;
+> ## the BLACK one (f14313) is OVERWRITTEN back to `f111` at f14341, 29
+> ## frames before the foot at f14370. Same writer PC both times
+> ## (`PRG:0x02AD64`/`0x02AD78`, vanilla code), so it is the SOURCE that
+> ## differs — two palette-seq requests racing. **DO NOT re-derive the
+> ## eliminations**: the tile codes, the composed `a18`/`a19` addresses, the
+> ## OBJ entries and row 05 are all IDENTICAL between a clean and the black
+> ## instance; three earlier claims are retracted in STATE's #112 entry.
+> ## Only remaining question, and it is optional: which palette-seq request
+> ## writes the f14341 `f111`. Rig: `tests/lua/tap_writes.lua` with
+> ## `TAP=90c17c,2` over `tests/inp/pod-black-m14-01`.
 > ##
 > ## **(3) THE #113 WHITE-FRAME RESEARCH TOPIC — NEW, opened by the
 > ## maintainer 2026-09-01, EXPLICITLY SEQUENCED AFTER (2).** #113 itself is

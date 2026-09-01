@@ -16,7 +16,7 @@
 | gotchas filed | project: an ART-KEYED detector cannot locate a defect in the art (**header and rule REWRITTEN 2026-09-01 to the maintainer's cost ordering — see the row above; the entry as first filed prescribed "never the art", which they never said**). platform: a recording's FRAME NUMBERS are a claim about the BUILD it was played on |
 | the close battery, exit statuses captured directly | census `--check` rc=0 · `checkdocshape --no-pending` rc=0 · checkdocs rc=0 · checkskills rc=0 · `gen_annotations --check` rc=0 · `gen_gate_index --check` rc=0 · gotchas index rc=0 · `test_freeze_tag_coverage` rc=0 · `test_tenant_anim_relocation` rc=0. **Strict static PASS 126 / SKIP 0 / FAIL 0 / MISSING 0** |
 | patch_notes / patch_index | **checked, correctly NO entry** — nothing under `build/manifest` or `tools/gen_donovan_patch.py` moved |
-| not done, by design | #112's remaining question (why THAT instance selects `0xbbxx` — needs a write tap on the f14370 record); Zabel j.LK still awaits the maintainer's recording; Jedah's crouching recovery still needs a tick-accurate instrument; the mizuumi CHARACTER DATA the maintainer has found, queued for a future session against `community_crosscheck` |
+| not done, by design | ~~#112's remaining question (why THAT instance selects `0xbbxx`)~~ **ANSWERED 2026-09-01 — the question was mis-posed; nothing "selects `0xbbxx`". See the ROOT CAUSE entry above.** (as written: needs a write tap on the f14370 record); Zabel j.LK still awaits the maintainer's recording; Jedah's crouching recovery still needs a tick-accurate instrument; the mizuumi CHARACTER DATA the maintainer has found, queued for a future session against `community_crosscheck` |
 | push | **PUSHED** |
 
 ## Session 14z-126b addendum (2) — **#112 PICKED UP FOR KNOWLEDGE ONLY (maintainer: "I am perfectly fine with the
@@ -36,7 +36,7 @@
 | **what is still open — AND THE CLAIM I NEARLY OVERSTATED** | ~~the BLACK case does not reproduce on the current build~~ **WRONG AS STATED, corrected the same day: it does not reproduce IN THAT RECORDING'S PLAYBACK, which is a fact about the recording, not the build.** The maintainer field-captured `pod-black-m14-01` on merged-m14 within the hour — the LAST Press of Death of the run, second fight, vs BISHAMON, is black; every earlier one is clean. That matches 14z-112's own "the move only reaches the lift phase on some outcomes", so the old recording simply never took those outcomes. The distinction was flagged BEFORE the board time was spent, which is the only reason it cost nothing |
 | gameplay surface ([VSP-10]) | none touched. The maintainer's framing stands: the cosmetic imprecision is accepted and no tenant effect animation was given or proposed |
 | **(5) THE BLACK FOOT FOUND — by the maintainer's method, not mine** | the maintainer captured `pod-black-m14-01` on merged-m14 (tracked, [VSP-20]) and then said the thing that broke it open: *"if the recording is indeed the recording of inputs, do not look for the image, look for the input, you're looking for a pattern of 41236+K"*. Scanning P1's input stream (`in=IN0,IN1,IN2`, already logged on every `V` line) found ALL 25 `41236+K` attempts in one pass over a log on disk. The LAST is **MK at f14307**, 2.65 s before the cutoff — matching the maintainer's own "3 to 4 seconds". The effect renders at **f14370-14375** (~45-frame lag, cross-checked against the previous MK at f13584 → effect f13629) |
-| **what the black frame draws** | `bbe5/pal05/4x2` ×2 and `bbea/pal05/3x2` ×2 — **palette 05, but tile codes `0xbbxx`**, where every CLEAN instance draws `0xe768-0xe796`. Same move, same build, same palette row, DIFFERENT TILE CODES: real art fetched from the wrong place ([VSE-29]'s signature), not a palette fault. Snapshot confirms it by eye ([VSP-139]) — solid black sole and toes inside the white/cyan effect |
+| **what the black frame draws** — ~~"palette 05, but tile codes `0xbbxx`… real art fetched from the wrong place"~~ **RETRACTED AND ROOT-CAUSED 2026-09-01, see the ROOT CAUSE entry above: the pal-05 `bbxx` entries are BYTE-IDENTICAL to a clean instance's (same codes, attrs, sizes and composed `a18`/`a19`, differing only in x/y) — `bbe5`/`bbea` are a NORMAL later phase every clean instance draws, and `0xe768-0xe796` is an EARLIER phase, so the two were never counterparts. The defect is palette row `0b` index 14, not the tiles** | as first written: `bbe5/pal05/4x2` ×2 and `bbea/pal05/3x2` ×2 — **palette 05, but tile codes `0xbbxx`**, where every CLEAN instance draws `0xe768-0xe796`. Same move, same build, same palette row, DIFFERENT TILE CODES: real art fetched from the wrong place ([VSE-29]'s signature), not a palette fault. Snapshot confirms it by eye ([VSP-139]) — solid black sole and toes inside the white/cyan effect |
 | **three claims killed** | (a) 14z-112's last surviving conclusion, "the lift-phase tiles simply carry dark art in this build" — the CLEAN instances draw those exact lift tiles; (b) my own "the black case does not reproduce on merged-m14"; (c) **the #112 detector itself** — `inp_probe.lua` keys on `pal 05 + tile 0x0e7xx`, the art of the CLEAN case, so it is structurally blind to the defect it was written for and reported ten confident clean instances. Gotcha filed both sides (project: art-keyed detectors — **its "never the art" prescription corrected to a cost ordering 2026-09-01, see the CLOSE (2) row**; platform: a recording's frames are a claim about its build) |
 | **NOT explained, stated as such** | `0xbbe5`, `0xbbea` AND the clean `0xe768` are all absent from `effect_map.json` as src or dst (939 pairs, dst range `0xad80-0xee73` spans both), so "an unmapped effect code" does NOT discriminate black from clean on this evidence. Why this instance selects `0xbbxx` when nine earlier ones in the same fight did not is the open question; the next step is the record behind that OBJ entry at f14370, attributable with a write tap (read taps never fire, [CPE-14]) |
 | green | `test_tenant_anim_relocation` PASS · strict static 126/0/0/0 |
@@ -832,6 +832,38 @@ the archive once they stop shaping active work.)*
   **Not started; waits behind the board results and the staleness pass by
   the maintainer's own sequencing.** No gameplay surface.
 
+- **#112 — ROOT-CAUSED 2026-09-01 (14z-126b): AN OVERWRITE RACE ON PALETTE
+  ROW `0b` INDEX 14. Still cosmetic, still accepted — this is knowledge, not a
+  fix.** The foot is **row `0b` index 14**, NOT row 05. Row `0b` is written by
+  VANILLA engine code (`PRG:0x02AD64` + `PRG:0x02AD78`, a 16-entry palette
+  copy; both well below the relocated tenant region). Index 14's DEFAULT value
+  is `f111` = rgb(17,17,17), near-black; the effect's own load writes `fcff`,
+  bright cyan. Measured over f13400-14375 with `tests/lua/tap_writes.lua`
+  (memory tap, no debugger, so playback stays frame-exact): **24 writes to
+  index 14, only TWO of them `fcff` — one per Press of Death.**
+  * CLEAN: `fcff` at **f13589** survives 56 frames to the foot draw at
+    **f13645**.
+  * BLACK: `fcff` at **f14313** is **OVERWRITTEN back to `f111` at f14341**,
+    29 frames before the foot draws at **f14370**.
+  Both values come from the SAME PC, so it is the SOURCE that differs — two
+  palette-sequence requests racing, not a bad code path. That is why it is
+  intermittent and cannot be reproduced on demand, and it is consistent with
+  14z-112's own "the move only reaches the lift phase on some outcomes".
+  **THREE PRIOR CLAIMS RETRACTED, all measured on merged-m14:** (a) "draws
+  `bbe5`/`bbea` at pal 05 where every clean instance draws `0xe768-0xe796`" —
+  those are DIFFERENT ANIMATION PHASES; clean f13645 and black f14370 have
+  BYTE-IDENTICAL pal-05 entries (16 codes, same attrs/sizes, same `a18`/`a19`,
+  differing only in x/y); (b) "real art fetched from the wrong place" — same
+  art, same composed addresses; (c) "not a palette fault" — it IS one, on row
+  `0b`. Row 05 is genuinely constant across the whole 14,400-frame run, which
+  is why checking it alone said "no palette fault".
+  **STILL OPEN (small):** WHICH palette-sequence request writes the `f111` at
+  f14341, i.e. what the source block is at `0x02AD78` on that pass. The
+  mechanism does not depend on it.
+  **A method note worth keeping:** the first discriminator appeared to REFUTE
+  this (three clean instances carried the "black" row `0b`) — they never reach
+  the `bbxx` foot phase at all. Scope a discriminator to the phase that draws
+  the thing, or it measures nothing. Original entry follows.
 - **#112 — PRESS OF DEATH BLACK FOOT: ACCEPTED AS COSMETIC. DECIDED
   (maintainer, 2026-08-27): option (c) — accept for now; option (a) (give
   tenants their own effect animation) is PARKED for a later pass over the
