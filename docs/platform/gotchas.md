@@ -6,6 +6,27 @@ it is specific to this roster hack.
 
 Append the moment one is paid for. Read before touching the related area.
 
+## A 1-BYTE MEMORY TAP MISSES WORD ACCESSES ON THIS 16-BIT BUS — and reads as a clean, meaningless zero (paid: 14z-126b)
+
+`space:install_write_tap(a, a, ...)` over a SINGLE BYTE returned ZERO hits on
+`RAM:$FF8420`, a field the engine writes ~1.5 times per frame. Widening the
+same tap to the containing WORD (`TAP=ff8420,2`) returned 3,254 hits. Every
+tap that worked in this project used an EVEN, WORD-ALIGNED range; the one that
+silently failed was `len=1`.
+
+**Why it is dangerous rather than merely wrong:** the failure is a clean zero,
+indistinguishable from "this field is never written", and it survives a
+positive control taken at a DIFFERENT address — proving the tap MECHANISM
+works says nothing about whether THIS range can observe THIS access. It cost
+a false conclusion here ("+0x20 is not written at $FF8420") before a
+96-byte-range survey of the same block showed 154 writes to exactly that
+address.
+
+**RULE: tap on even, word-aligned ranges, and control ON THE RANGE YOU ARE
+USING** — the cheapest form is to widen the range and confirm the count rises,
+or to survey the enclosing structure once before trusting a zero.
+
+
 ## CPS-2 ROM file byte order is NOT 68k logical order (paid: 2026-07-25, ~1h)
 
 **[CPH-1]** The 16-bit words in the dumped program ROM files are stored **low-byte-first**.

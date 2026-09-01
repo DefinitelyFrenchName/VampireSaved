@@ -2810,6 +2810,30 @@ the first down). A bulk palette reload around the flash was looked for and
 NOT found (flat ~96 writes/frame at `0x90c000` across the window), so a
 "palette-swap artifact" reading is not supported by that evidence.
 
+## THE ENGINE TICK IS DIRECTLY OBSERVABLE — a write tap on `+0x20` is a TICK-ACCURATE instrument (14z-126b)
+
+The anim node timer `+0x20` (`atlas/ram.md`, combat struct) is driven by three
+distinct PCs, and a word-aligned write tap on it separates them cleanly:
+
+| PC | instruction | role |
+|---|---|---|
+| `PRG:0x027F70` | `subq.b #$1, $20(a6)` | **ONE ENGINE TICK** |
+| `PRG:0x027EEC` | `move.l (a0), $20(a6)` | **NODE ENTRY** — loads the node's duration byte and anim pointer together |
+| `PRG:0x027F88` | `st.b $21(a6)` | a different byte; not the timer |
+
+**Why this matters: it resolves what a frame-rate trace cannot.** `field_trace`
+samples once per FRAME, and ~16% of frames advance the countdown by TWO ticks,
+so a one-frame convention question is unanswerable from it. A tap fires per
+WRITE: measured on a Jedah crouch rig, 640 frames carried 2 tick-writes, 204
+carried 3 and 2 carried 4 — all of them invisible to per-frame sampling.
+
+**Segmenting a move** needs the anim pointer as well: `+0x1C` is written by the
+`0x027EE8` family at chain entry, and each chain's start address is in the
+derivation (`tools/vanilla_frames.py`, a chain's `start`). Ticks between
+entering a chain and leaving it are that chain's true duration; the crouch
+IDLE animation ticks continuously, so an unsegmented tick count over a rig
+window measures the idle, not the move.
+
 ## EFFECT PALETTES ARE OWNED BY THE PLAYER, NOT THE EFFECT — and that is a
 ## LIFETIME HAZARD (measured 14z-126b, 2026-09-02)
 
