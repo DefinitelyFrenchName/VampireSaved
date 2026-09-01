@@ -11,6 +11,11 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
+# ROMDIR MUST BE ABSOLUTE: this script `cd "$OUT"` before invoking MAME, so a
+# RELATIVE ROMDIR resolves against the OUTPUT dir, the parent zip is not found,
+# and playback silently becomes a ZERO-FRAME run (paid for 14z-126b). Resolve it
+# here and fail loudly if it does not exist.
+ROMDIR="$(cd "$ROMDIR" 2>/dev/null && pwd)" || { echo "ROMDIR does not exist: ${ROMDIR}" >&2; exit 2; }
 BUILD="${1:?build dir}"; NAME="${2:?inp name}"; OUT="${3:-$REPO/build/inp_guard/$NAME}"
 BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 D="$HOME/.cache/vampire-saved/inp/$NAME"
@@ -47,7 +52,11 @@ PB="$(grep -o 'Total playback frames: [0-9]*' "$OUT/mame.out" | tail -1 | awk '{
 # ONLY a run that MAME itself reports as a playback gets a terminator: an
 # absent END must stay absent so the corpus gate's dead-run check can still
 # fail (RH-25 — a gate that cannot fail is not a gate).
-if [ -n "$PB" ]; then
+# PB="0" means MAME loaded no recorded frames at all (bad .inp, missing member,
+# relative ROMDIR). That is a DEAD RUN and must not be terminated, or the corpus
+# gate greps a green "END 0" and asserts nothing. `[ -n "$PB" ]` alone was true
+# for "0" and defeated the rule this very comment states (fixed 14z-126b).
+if [ -n "$PB" ] && [ "$PB" -gt 0 ] 2>/dev/null; then
     echo "PLAYBACK $PB" >> "$OUT/inp_guard.log"
     grep -q '^END' "$OUT/inp_guard.log" || echo "END $PB" >> "$OUT/inp_guard.log"
 fi
