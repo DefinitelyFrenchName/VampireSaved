@@ -208,7 +208,7 @@ test_mister_wide_inert	mister	release	-	THE FPGA SUPERSET INVARIANT, measured di
 test_mister_sim_anchor	mister	release	-	the MiSTer leg of the §4 dual-emulator oracle
 test_mister_tenant_oracle	mister	release	-	the §4 dual-emulator oracle on TENANT content
 test_mister_obj_oracle	mister	release	-	cross-implementation agreement on a VIDEO-DETERMINING surface; ~65 min
-test_mister_gfxc_fetch	mister	release	-	the core FETCHES a tenant tile; ~2 x 65 min. HEADER STATUS LINE IS STALE — it still says 'IT IS RED, AND HAS NEVER BEEN GREEN' while HANDOFF records it PASSING in full since 14z-108.
+test_mister_gfxc_fetch	mister	release	--rpl tests/replays/36_pick_tenant_cell.rpl --frames 4400	the core FETCHES a tenant tile. THE ARGS ARE LOAD-BEARING: the gate's own default replay ends at the select screen, so a bare run is red by construction. These are the operands measured PASS in full at 14z-108 (~93 min a leg, two legs).
 test_mister_prg_window	mister	release	-	slice D4's own evidence: the 68k and CPU:$400000-$5FFFFF; ~2 x 40 min
 test_mister_qsound_ext	mister	release	-	the QSound extension is fetched on the core
 test_mister_sdram_census	mister	release	-	the WIDE romset lands in SDRAM exactly where mister_map.md places it

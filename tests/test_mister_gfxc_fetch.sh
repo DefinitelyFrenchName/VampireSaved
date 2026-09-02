@@ -1,6 +1,8 @@
 #!/bin/sh
 # test_mister_gfxc_fetch.sh — THE PAYOFF GATE: it goes green the day the core
-# FETCHES a tenant tile. IT IS RED, AND HAS NEVER BEEN GREEN (see STATUS).
+# FETCHES a tenant tile. IT HAS BEEN GREEN — with the right replay (see
+# STATUS). Its DEFAULT replay cannot reach a match, so a bare run is red
+# by construction; pass the measured-green operands.
 # 14z-107 (10), MiSTer slice D3 (+D4). Emulator tier: ROMDIR + Verilator +
 # ~2 x 65 min. NOT ci_portable, NOT ci_static.
 #
@@ -51,7 +53,24 @@
 # group-C slot sits in are read out of cores/cps2w/hdl/jtcps1_sdram.v on every
 # run.
 #
-# STATUS 14z-107 (11): THE WHEEL HALF IS GREEN — THE CORE FETCHES TENANT ART —
+# STATUS 14z-108: **PASS IN FULL, BOTH HALVES, BOTH CONTROLS** — but ONLY
+# with the operands that reach a match:
+#
+#     tests/test_mister_gfxc_fetch.sh \
+#         --rpl tests/replays/36_pick_tenant_cell.rpl --frames 4400
+#
+# 93m26s a leg. obj bank 4 (the FIGHTER art) 9,388,928 reads over 1,735
+# distinct codes from frame 1781, all inside the frozen extent; obj bank 5
+# 19,246,336 over 206 codes; the control leg ZERO on both windows
+# (STATE_HISTORY 14z-108 "THE PAYOFF: A TENANT HAS FOUGHT ON THE CORE",
+# HANDOFF "MiSTer"). THE DEFAULTS BELOW WERE NOT MOVED: `11_pick_donovan`
+# at 4000 frames ends at the select screen, so the fighter half is red by
+# construction on a bare run. That is a deliberate operand choice, not a
+# verdict — `tests/ci_emulator.tsv` carries the green invocation so the
+# release lane runs the meaningful one. NOT RE-RUN SINCE 14z-108.
+#
+# Superseded status, kept because its reasoning is still the rule here —
+# 14z-107 (11): THE WHEEL HALF IS GREEN — THE CORE FETCHES TENANT ART —
 # AND THE FIGHTER HALF IS STILL RED, HONESTLY. Slice D5 (the CPS-2 decryption
 # range) unblocked the boot, and on `11_pick_donovan` over 2,900 simulated
 # frames this gate now measures:
