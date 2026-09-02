@@ -193,7 +193,23 @@ else
     echo "  note: no timeout(1) — TIMEOUT case not exercised"
 fi
 
-echo "8. the shipped registry is complete both ways"
+echo "8. --lane ACCUMULATES (it used to assign, and silently dropped a lane)"
+reg "$(row g_pass mame release - '')" "$(row g_prereq fbneo release - '')"
+out10="$(run --lane fbneo --lane mame --log "$T/l10" || true)"
+if printf '%s\n' "$out10" | grep -q "== fbneo lane" \
+   && printf '%s\n' "$out10" | grep -q "== mame lane"; then
+    ok "two --lane flags select BOTH lanes"
+else
+    fail "two --lane flags did not select both lanes"
+fi
+out11="$(run --lane mame --lane mame --log "$T/l11" || true)"
+if [ "$(printf '%s\n' "$out11" | grep -c '== mame lane')" = 1 ]; then
+    ok "a repeated --lane is not run twice"
+else
+    fail "a repeated --lane ran the lane more than once"
+fi
+
+echo "9. the shipped registry is complete both ways"
 python3 - <<'PY' || rc=1
 import glob, os, sys
 def reg(p):

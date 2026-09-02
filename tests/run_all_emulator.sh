@@ -71,14 +71,22 @@ fi
 cd "$REPO"
 
 REG=tests/ci_emulator.tsv
-SCOPE=release; LANES="prereq fbneo mame"; ONLY=""; JOBS=1; TMO=5400
+SCOPE=release; LANES="prereq fbneo mame"; LANES_SET=""; ONLY=""; JOBS=1; TMO=5400
 LOGDIR=""; RESUME=0; STRICT=0; KEEPGOING=0; DRY=0; LIST=0
 while [ $# -gt 0 ]; do
     case "$1" in
     --scope)   shift; SCOPE="${1:?--scope needs release|all}" ;;
+    # --lane ACCUMULATES. It used to assign, so `--lane fbneo --lane mame`
+    # silently ran only the mame lane — six gates skipped without a word, in
+    # the runner whose whole point is that nothing goes unasked. Caught on its
+    # first real invocation (14z-128).
     --lane)    shift; case "${1:?--lane needs a lane}" in
                       all) LANES="prereq fbneo mame mister" ;;
-                      *)   LANES="$1" ;; esac ;;
+                      *)   case " $LANES_SET " in
+                           *" $1 "*) ;;                    # already selected
+                           *) LANES_SET="$LANES_SET $1" ;;
+                           esac
+                           LANES="${LANES_SET# }" ;; esac ;;
     --only)    shift; ONLY="${1:?--only needs a glob}" ;;
     --jobs)    shift; JOBS="${1:?--jobs needs N}" ;;
     --timeout) shift; TMO="${1:?--timeout needs seconds}" ;;
