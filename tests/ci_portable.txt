@@ -47,6 +47,7 @@ test_compare_window
 test_decrypt_cache
 test_describe_masked_shape
 test_emulator_runner
+test_expectation_provenance
 test_fbneo_overlay_hygiene
 test_fbneo_overlay_hygiene_control
 test_freeze_basis_sandbox
