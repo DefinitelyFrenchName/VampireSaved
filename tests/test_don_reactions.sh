@@ -95,14 +95,23 @@ for f in frames:
     if prev is not None and hp < prev:
         hits += 1; last_hit_frame = f
     prev = hp; hp_last = hp
-assert hits >= 2, f"only {hits} damage steps — 421P must multi-hit"
+# TIGHTENED 14z-127 TO TWO-SIDED. These bounds were one-sided until native was
+# measured (test_don_immortal_native.sh §1: HP no-mash = 6 hits / 10 damage,
+# last hit f2685 native / f2690 ours), so "too few hits, finishing early"
+# passed cleanly -- the blind spot GitHub #114 reported. Now an UNDERSHOOT
+# fails too. Measured on the current freeze: 6 steps, 10 total, last at f2690.
+assert hits >= 5, (
+    f"only {hits} damage steps at 10f sampling — native-class is 6 hits "
+    f"(undershoot: the move is ending early or losing ticks)")
 total = hp_first - hp_last
-assert total <= 10, (
-    f"{total} total damage no-mash — exceeds the native total of 10 "
-    f"(hit-freeze regression: the pre-14z-42 build dealt 22)")
-assert last_hit_frame is not None and last_hit_frame <= 2700, (
-    f"last damage step at f{last_hit_frame} — past the native-class window "
-    f"(<=2700); the move is running slow (hit-freeze regression)")
+assert total == 10, (
+    f"{total} total damage no-mash — native is EXACTLY 10, measured in-run by "
+    f"test_don_immortal_native.sh (over: the pre-14z-42 build dealt 22; "
+    f"under: the move is ending early)")
+assert last_hit_frame is not None and 2670 <= last_hit_frame <= 2700, (
+    f"last damage step at f{last_hit_frame} — native-class window is f2670-2700 "
+    f"(native f2685, ours f2690). Above: running slow (hit-freeze regression). "
+    f"Below: ending early")
 print(f"  ok: 421P multi-hits ({hits} steps, {total} total, last at "
       f"f{last_hit_frame}) native-class, no knockdown on a standing opponent")
 EOF2

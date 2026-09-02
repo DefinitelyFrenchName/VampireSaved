@@ -268,6 +268,8 @@ VSE-80	docs/game/gotchas.md	portrait screen belongs to the 2P flow only (14z-99)
 VSE-81	docs/game/engine_internals.md	THE LEAPING PURSUIT ATTACK (measured 14z-104, maintainer-confirmed mechanic)	IN-LIST
 VSE-82	docs/game/atlas/select_screen.md	THE RANDOM CELL `0x0B` — the cycling draw, decoded (14z-116)	IN-LIST
 VSE-83	docs/game/atlas/ram.md	Attract-mode demo roster (superset-invariant note)	IN-LIST
+VSE-84	docs/game/gotchas.md	A DURATION IN VIDEO FRAMES IS NOT COMPARABLE BETWEEN THE SIBLING GAMES — vsavj and vsav2 do not run 	IN-LIST
+VSE-85	docs/game/gotchas.md	A "MASH" THAT PRESSES ONE FRAME AND RELEASES ONE FRAME IS HALF THE CEILING — and a saturation claim 	IN-LIST
 VSP-1	CLAUDE.md	1. Mission and prime constraint	IN-LIST
 VSP-2	CLAUDE.md	2. Non-negotiable rules	IN-LIST
 VSP-3	CLAUDE.md	2. Non-negotiable rules	IN-LIST
@@ -430,3 +432,4 @@ VSP-159	docs/project/porting_sprite_lists.md	The four questions to ask of any po
 VSP-160	docs/project/porting_sprite_lists.md	Inventories are SPANS, not samples	IN-LIST
 VSP-161	docs/project/porting_sprite_lists.md	Order of work, and the checks at each step	IN-LIST
 VSP-162	CLAUDE.md	5. Working style	IN-LIST
+VSP-163	docs/project/gotchas.md	A TENANT REPLAY AUTHORED FOR THE SUBSTITUTED WHEEL SELECTS A LEGACY CHARACTER ON THE SEPARATED (WIDE	IN-LIST

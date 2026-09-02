@@ -686,7 +686,7 @@ invisible in the log — it looks like clean data with occasional skipped
 countdown values.
 
 
-## A DURATION IN VIDEO FRAMES IS NOT COMPARABLE BETWEEN THE SIBLING GAMES — vsavj and vsav2 do not run the same number of ENGINE TICKS per frame (paid: 14z-127, GitHub #114)
+## **[VSE-84]** A DURATION IN VIDEO FRAMES IS NOT COMPARABLE BETWEEN THE SIBLING GAMES — vsavj and vsav2 do not run the same number of ENGINE TICKS per frame (paid: 14z-127, GitHub #114)
 
 The engine periodically runs two ticks in one video frame, and **the two games
 do it at different rates**. Measured on vanilla content, so no port is
@@ -755,7 +755,7 @@ family as [VSE-79] (a 1P-arcade rig is pinned to the arcade draw) and
 [VSP-132].
 
 
-## A "MASH" THAT PRESSES ONE FRAME AND RELEASES ONE FRAME IS HALF THE CEILING — and a saturation claim measured below the ceiling manufactures a difference (paid: 14z-127)
+## **[VSE-85]** A "MASH" THAT PRESSES ONE FRAME AND RELEASES ONE FRAME IS HALF THE CEILING — and a saturation claim measured below the ceiling manufactures a difference (paid: 14z-127)
 
 `+0x126` is a NEW-PRESS mask, so a recipe must release between taps
 (the entry above). The obvious next step — press for 1 frame, release for 1,

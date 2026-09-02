@@ -3427,7 +3427,7 @@ always SAMPLED as 0x13. Freeze what is sampled, and say why.
 
 
 
-## A TENANT REPLAY AUTHORED FOR THE SUBSTITUTED WHEEL SELECTS A LEGACY CHARACTER ON THE SEPARATED (WIDE) WHEEL — and a POSITION confound-check cannot see it (paid: 14z-126b -> 14z-127, GitHub #114)
+## **[VSP-163]** A TENANT REPLAY AUTHORED FOR THE SUBSTITUTED WHEEL SELECTS A LEGACY CHARACTER ON THE SEPARATED (WIDE) WHEEL — and a POSITION confound-check cannot see it (paid: 14z-126b -> 14z-127, GitHub #114)
 
 Replay 48's P1 path is `U,U,R` from the default Demitri cell: on the
 SUBSTITUTED stock track that walks to slot `0x0F`, where the build puts
