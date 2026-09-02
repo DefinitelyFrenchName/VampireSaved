@@ -21,27 +21,29 @@
 > ##
 > ## **OPEN WORK, IN THE ORDER IT IS LIKELY TO BE AVAILABLE:**
 > ##
-> ## **(1) GitHub #114 — REFUTED AND CLOSED (14z-127). 421+P REPRODUCES
-> ## NATIVE.** The 14z-126b "ours" leg was **JEDAH**: replay 48's P1 path
-> ## (`U,U,R` → slot `0x0F`) picks Donovan only on the SUBSTITUTED stock
-> ## track, and since the 14z-115 wheel separation a WIDE build puts the
-> ## tenants on their own row — so that path lands on vanilla Jedah, whose
-> ## 421+HP is exactly the "3 hits / 11 damage, pushed 728 → 852" that was
-> ## filed as ours. Measured on three legs: native vsav2 **6 hits / 10 dmg,
-> ## victim held**; ours the same on the stock twin AND on merged-m14, with
-> ## P1's identity asserted from `bases.tsv`. New gate
-> ## `tests/test_don_immortal_native.sh` (native + ours + the artefact as its
-> ## must-fire control); new WIDE twin `tests/replays/don/114_don_immortal_wide.rpl`.
-> ## **RESIDUE, recorded not fixed:** ours spans 52 f against native's 49 over
-> ## the six hits (gaps 10/11/10/11/10 vs 10/10/10/9/10); mechanism NOT
-> ## measured. Maintainer's read, no work without a ruling.
-> ## **THE CLASS TO CARRY FORWARD — this is the reusable half:** a tenant
-> ## replay is a claim about the build it was authored for ([VSP-156]), and
-> ## **a confound check on POSITIONS does not establish IDENTITY** (Jedah and
-> ## Donovan stand at the same x, which is why the original check passed).
-> ## **32 replays carry the substituted-wheel path**; they are correct on a
-> ## stock build and select a legacy character on a WIDE one. Assert
-> ## `+0x60` against `bases.tsv` in any gate that reads a tenant number.
+> ## **(1) GitHub #114 — PREMISE REFUTED, SCOPE MEASURED, MASH OPEN
+> ## (14z-127).** The 14z-126b "ours" leg was **JEDAH** — replay 48's
+> ## substituted-wheel path on the separated WIDE wheel. Measured against
+> ## native at four strengths, no mash, both tracks: **LP 3h/7d · MP 5h/9d ·
+> ## HP 6h/10d · ES 9h/13d, ours EQUALS native in every cell**, victim held,
+> ## identity asserted from `bases.tsv`. Gate
+> ## `tests/test_don_immortal_native.sh` (native measured in-run, the Jedah
+> ## artefact as its must-fire control).
+> ## **THE FRAME-CADENCE GAP IS THE HOST ENGINE'S** — vanilla Victor,
+> ## Demitri, Morrigan and Bishamon all drain `+0x5C` = 11 in 9 frames on
+> ## vsav2 and 10 on vsavj. **RULING (maintainer, 2026-09-02): the engine,
+> ## being vanilla vsav, takes precedence** — so assert hit COUNT and DAMAGE,
+> ## never vsav2's frame numbers. Frozen as §4 of the gate.
+> ## **STILL OPEN — MASHING.** Multi-level by rate (maintainer: at least two
+> ## extra levels). Measured across six rates and **the measurement is
+> ## confounded**: fixed absolute press frames against a slower host clock put
+> ## the presses at different phases per leg (it produced non-monotonic cells).
+> ## Needs a script anchored to each leg's OWN move progress. Not started.
+> ## **THE CLASS TO CARRY FORWARD:** a tenant replay is a claim about the
+> ## build it was authored for ([VSP-156]); **a confound check on POSITIONS
+> ## does not establish IDENTITY**; and **a duration in VIDEO FRAMES is not
+> ## comparable between the sibling games** — counts, damage and engine ticks
+> ## are. **32 replays carry the substituted-wheel path.**
 > ##
 > ## **(2) THE MIZUUMI CORPUS ARC — barely opened, and it is the next big
 > ## one.** `../community/` now holds 26 wiki pages (HTML + PDF) including all

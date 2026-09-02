@@ -1509,44 +1509,45 @@ wrong is *safe and loud* over designs that are merely well-measured.
   ~330 glyph TILES have to travel. NOTE the
   win-quote ART is already native and complete (14z-62e/62j, group C bank 5) —
   what remains is the TEXT. See the cosmetic backlog below.
-- ~~**OPEN (gameplay, GitHub #114): DONOVAN'S 421+P DOES NOT REPRODUCE
-  NATIVE**~~ **REFUTED AND CLOSED 14z-127 (2026-09-02). 421+P DOES REPRODUCE
-  NATIVE. THE "OURS" LEG OF THE 14z-126b MEASUREMENT WAS JEDAH.**
-  Measured on three legs in one run (`tests/test_don_immortal_native.sh`,
-  written for this): NATIVE stock vsav2 (replay 51) lands **6 hits / 10
-  damage** holding the victim at x=728, span 49 f; **OURS lands 6 hits / 10
-  damage holding the victim, span 52 f — on BOTH tracks**, the stock twin
-  `build/m5_stock13` and the shipping `merged-m14` alike, with P1's identity
-  asserted as Donovan (`+0x60 = 0x003fa9d0`, `bases.tsv`) on each.
-  **THE ARTEFACT, and it is a rig-validity class worth remembering:** replay
-  48's P1 path (`U,U,R` → slot `0x0F`) selects Donovan only on the
-  SUBSTITUTED stock track. **Since the 14z-115 select-wheel separation the
-  tenants live on their own appended row**, so on a WIDE build that same path
-  lands on vanilla **Jedah** (`+0x60 = 0x000b0d2e`) — and Jedah's 421+HP is
-  exactly the "3 hits / 11 damage, victim pushed 728 → 852" the issue
-  recorded as ours. Pristine `vsavj` reproduces those numbers to the frame,
-  which is now the gate's must-fire control. A tenant replay is a claim about
-  the build it was authored for ([VSP-156]). WIDE twin authored:
-  `tests/replays/don/114_don_immortal_wide.rpl`.
-  **WHAT THE ISSUE GOT RIGHT, and it is why the gate exists now:** the
-  provenance criticism was fair — `native == 10` did enter
-  `test_don_reactions.sh` as testimony (STATE 14z-42c) and all four of its
-  legs do run `vsavj`. The number turned out CORRECT, and it is now measured
-  rather than remembered.
-  **THE ONLY RESIDUE, recorded not fixed:** ours runs 3 frames longer over
-  the six hits (span 52 vs 49; inter-tick gaps 10/11/10/11/10 against native's
-  10/10/10/9/10 — two gaps one frame long). **The mechanism is NOT measured**
-  — the first gap is 10 on both legs, so it is not a plain freeze-length
-  difference. Inside every existing bound. On #114 for the maintainer's read;
-  no work planned without a ruling ([VSP-10]).
-  **THE SUPERSEDED ANALYSIS IS KEPT** (the eliminations stand even though the
-  conclusion does not): the 14z-42 cadence root cause and the 14z-43 dispatch
-  fix were real and are untouched by this; the positions-identical-until-
-  contact confound check was sound and is what made the two legs comparable
-  at all — it simply could not see that the two legs held DIFFERENT
-  CHARACTERS, because Jedah and Donovan stand at the same x. **That is the
-  durable lesson: a confound check on POSITIONS does not establish
-  IDENTITY.**
+- **GitHub #114 — 421+P: PREMISE REFUTED, SCOPE MEASURED, MASH STILL OPEN
+  (14z-127, 2026-09-02).**
+  **(a) THE ISSUE'S EVIDENCE WAS JEDAH.** Replay 48's P1 path (`U,U,R` → slot
+  `0x0F`) selects Donovan only on the SUBSTITUTED stock track; since the
+  14z-115 wheel separation a WIDE build puts the tenants on their own appended
+  row, so that path lands on vanilla **Jedah** (`+0x60 = 0x000b0d2e`) and the
+  "3 hits / 11 damage, victim pushed 728 → 852" filed as ours was his 421+HP.
+  Pristine `vsavj` reproduces it to the frame and is now the gate's must-fire
+  control. **The confound check in the issue was sound and still could not see
+  it: positions WERE identical until contact, because Jedah and Donovan stand
+  at the same x. A position check establishes SPACING, never IDENTITY.**
+  **(b) MEASURED AGAINST NATIVE, all four strengths, no mash, both tracks:
+  LP 3h/7d · MP 5h/9d · HP 6h/10d · ES 9h/13d — OURS EQUALS NATIVE IN EVERY
+  CELL**, victim held throughout, P1's identity asserted from `bases.tsv` on
+  each. Gate `tests/test_don_immortal_native.sh` (native measured in-run).
+  **(c) THE FRAME-CADENCE GAP IS THE HOST ENGINE'S, NOT THE PORT'S.** Our
+  deity ticks run ~1 video frame slower per ~11 engine ticks. **Controlled on
+  VANILLA content: Victor, Demitri, Morrigan and Bishamon mirrors, forced
+  picks, identical inputs — the hit-freeze `+0x5C` = 11 drains in 9 video
+  frames on vsav2 and 10 on vsavj for ALL FOUR.** vsavj runs fewer engine
+  double-ticks per video frame than vsav2. A ported character cannot tick at
+  vsav2's frame rate without ticking unlike every other character in the game
+  it now lives in. Frozen as section 4 of the gate.
+  **RULING (maintainer, 2026-09-02): "we must respect the fact that we are
+  porting the character to a different engine and the engine, being vanilla
+  vsav, takes precedence."** So the gate asserts HIT COUNT and DAMAGE — the
+  quantities the host clock does not set — and never vsav2's frame numbers.
+  **(d) STILL OPEN — MASHING.** Mash extends the loop and the extension is
+  MULTI-LEVEL (maintainer: at least two extra levels by rate; measured across
+  six rates 14z-127). **The measurement is CONFOUNDED and is not reported as
+  game truth:** the rig fires presses at FIXED ABSOLUTE FRAMES while our move
+  runs on the slower host clock, so presses land at different PHASES of the
+  move on the two legs — it produced non-monotonic cells (MP at the slowest
+  rate reading FEWER hits than no-mash), which no real mechanic does. Needs a
+  script anchored to each leg's OWN move progress. Not started.
+  **WHAT THE ISSUE GOT RIGHT:** the provenance criticism was fair —
+  `native == 10` did enter `test_don_reactions.sh` as testimony (STATE
+  14z-42c). It is correct, and is now measured in-run. 14z-42's cadence root
+  cause and 14z-43's dispatch fix stand untouched.
 - **OPEN:** FG pacing — untouched.
 
 ### THE COSMETIC BACKLOG (parked, 2026-08-27 — the maintainer's own list)

@@ -20,9 +20,9 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-276 entries (36 game / 88 platform / 152 project), counted from the buckets at generation.
+277 entries (37 game / 88 platform / 152 project), counted from the buckets at generation.
 
-## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 36 entries
+## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 37 entries
 
 - (the 14z-90 onset-frame entry that opened this file was RE-FILED to `docs/project/gotchas.md` at 14z-118 — it is a VERIFICATION-CLASS fact, not a game fact; S-C12 flagged it)
 - OBJ record formats differ in ENTRY STRIDE, not just header meaning
@@ -60,6 +60,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - The ladder pick faults on an ODD venue byte — steer `$FF8121` with EVEN values only (14z-110)
 - THE "?" WALKER WRITES THE DRAWN ID EVERY FRAME, FROM TWO PATHS (paid: 14z-117, one crashing probe)
 - THE ENGINE DOES NOT RUN ONE TICK PER VIDEO FRAME — a `frame_done` trace CANNOT count animation frames (paid: 14z-125b, measured)
+- A DURATION IN VIDEO FRAMES IS NOT COMPARABLE BETWEEN THE SIBLING GAMES — vsavj and vsav2 do not run the same number of ENGINE TICKS per frame (paid: 14z-127, GitHub #114)
 
 ## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 88 entries
 

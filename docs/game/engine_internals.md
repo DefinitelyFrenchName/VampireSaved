@@ -538,18 +538,30 @@ from the reference ROMs + three verdict controls); bytes in
 `../project/patch_notes.md` "14z-110 — the #99 fix: the reaction_hook D2
 WINDOW"]
 
-**421+P (the sworded Lightning Sword / deity) on native vsav2, MEASURED.** The
-no-mash HP version at replay 51's spacing lands **6 hits for 10 damage** — a
-5-point sword hit then five 1-point deity ticks about 10 frames apart, spanning
-49 frames — with the victim's reaction class `+0x54` = `0x4E`, and **the victim
-does not move for the whole shake**: its x is constant from the first hit to the
-last and the pushback step counter `+0x164` stays 0 until the list begins
-stepping at the shake's end (the step machinery is "Reactions as the victim"
-above). So the move HOLDS its victim in place rather than pushing it, which is
-what lets the later deity ticks connect at all. [M:
-`tests/test_don_immortal_native.sh` native leg, per-frame fighter-block dumps;
-the port's reproduction of it and the 3-frame cadence residue are that gate and
-GitHub #114, not a game fact]
+**421+P (the sworded Lightning Sword / deity) on native vsav2, MEASURED at
+four strengths, no mash.** LP lands **3 hits for 7 damage**, MP **5 for 9**,
+HP **6 for 10**, ES **9 for 13** — in each case a 5-point sword hit then
+1-point deity ticks about 10 frames apart — with the victim's reaction class
+`+0x54` = `0x4E`, and **the victim does not move for the whole shake**: its x
+is constant from the first hit to the last and the pushback step counter
+`+0x164` stays 0 until the list begins stepping at the shake's end (the step
+machinery is "Reactions as the victim" above). So the move HOLDS its victim
+rather than pushing it, which is what lets the later ticks connect at all.
+Mashing extends the loop, and the extension is MULTI-LEVEL by mash rate — not
+measured cleanly (see the gate's header). [M:
+`tests/test_don_immortal_native.sh` §1, native measured in-run; 14z-127]
+
+**THE TWO ENGINES DO NOT TICK AT THE SAME VIDEO-FRAME RATE, and it is not a
+per-character fact.** vsavj runs fewer engine double-ticks per video frame
+than vsav2 does, so the same countdown drains in more frames on vsavj:
+measured on **vanilla Victor, Demitri, Morrigan and Bishamon** mirrors (forced
+picks, identical inputs, the same scenario on both games), the hit-freeze
+`+0x5C` = 11 drains in **9 video frames on vsav2 and 10 on vsavj for every one
+of the four**. Consequence for any cross-game work: a duration in VIDEO FRAMES
+is not comparable between the siblings, while hit COUNTS, damage and engine
+TICKS are. Same family as "THE ENGINE RUNS TWO TICKS IN ONE VIDEO FRAME"
+(`gotchas.md`) and the reason `tools/tick_durations.py` exists. [M:
+`tests/test_don_immortal_native.sh` §4, frozen at +1 frame; 14z-127]
 
 ### Donovan's anim-chain map — the moves named (14z-120, measured on native vs2)
 

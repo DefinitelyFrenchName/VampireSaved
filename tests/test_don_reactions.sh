@@ -17,11 +17,13 @@
 # PROVENANCE, RESOLVED (14z-127, GitHub #114). THE MOVE REPRODUCES NATIVE, AND
 # THIS GATE IS GREEN FOR THE RIGHT REASON. Read this instead of the warning
 # that stood here between 2026-09-02 and 14z-127.
-#   * MEASURED on three legs in one run by `tests/test_don_immortal_native.sh`
-#     (which exists because of #114): NATIVE stock vsav2 (replay 51) lands
-#     6 hits / 10 damage holding the victim at x=728, span 49 f. OURS lands
-#     6 hits / 10 damage holding the victim, span 52 f -- on BOTH tracks, the
-#     stock twin and merged-m14 alike.
+#   * MEASURED by `tests/test_don_immortal_native.sh` (which exists because of
+#     #114), native in-run, all four strengths, no mash, on BOTH tracks:
+#     LP 3h/7d - MP 5h/9d - HP 6h/10d - ES 9h/13d, OURS EQUAL TO NATIVE in
+#     every cell, victim held throughout. MASHING is NOT covered by either
+#     gate: the extension is multi-level by mash rate and the rig's fixed
+#     absolute press frames land at different phases of the move on the two
+#     legs. Open on #114.
 #   * SO THE HARDCODED `native == 10` BELOW IS NOW MEASURED AND CORRECT. It
 #     did enter this file as testimony (STATE 14z-42c) and that criticism was
 #     fair; the number it asserted turned out to be right.
@@ -33,14 +35,15 @@
 #     421+HP. This gate was never affected -- it runs `vsavj` against a STOCK
 #     build (the battery passes its own outbase), which is the track replay 48
 #     is authored for. See `don/114_don_immortal_wide.rpl` for the WIDE twin.
-#   * WHAT REMAINS, and it is small: ours runs 3 frames longer over the six
-#     hits -- span 52 vs 49, inter-tick gaps 10/11/10/11/10 against native's
-#     10/10/10/9/10, so two of the five gaps are one frame long. THE
-#     MECHANISM IS NOT MEASURED (the first gap is 10 on both legs, so it is
-#     not a simple freeze-length difference; nothing further was traced).
-#     Well inside this gate's `by f2700` bound (ours last hits f2690, native
-#     f2685). Recorded on #114 for the maintainer, not treated as a defect by
-#     either gate.
+#   * THE FRAME-CADENCE DIFFERENCE IS THE HOST ENGINE'S, NOT THE PORT'S
+#     (measured 14z-127). Our deity ticks run ~1 video frame slower per ~11
+#     engine ticks than native's. Controlled on VANILLA content -- Victor,
+#     Demitri, Morrigan and Bishamon mirrors, forced picks, identical inputs:
+#     the hit-freeze +0x5C = 11 drains in 9 video frames on vsav2 and 10 on
+#     vsavj FOR ALL FOUR. vsavj runs fewer engine double-ticks per video
+#     frame. Maintainer's ruling 2026-09-02: the host engine takes precedence,
+#     so frame timings are not the assertable quantity -- hit COUNT and
+#     DAMAGE are, and those match native at every strength.
 #   * THE ONE-SIDED BOUNDS below (`total <= 10`, "by f2700") are still
 #     one-sided. `test_don_immortal_native.sh` carries the two-sided form
 #     (hits == 6, total == 10, victim held, span 45..60) with a must-fire

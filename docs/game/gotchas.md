@@ -684,3 +684,31 @@ DURATIONS with one. A tick-accurate question needs a tick-accurate instrument
 (a `-debug` trace, or a Lua hook on the engine tick), and the difference is
 invisible in the log — it looks like clean data with occasional skipped
 countdown values.
+
+
+## A DURATION IN VIDEO FRAMES IS NOT COMPARABLE BETWEEN THE SIBLING GAMES — vsavj and vsav2 do not run the same number of ENGINE TICKS per frame (paid: 14z-127, GitHub #114)
+
+The engine periodically runs two ticks in one video frame, and **the two games
+do it at different rates**. Measured on vanilla content, so no port is
+involved: **Victor, Demitri, Morrigan and Bishamon** mirrors (forced picks,
+identical inputs, the same scenario on both games) all drain the hit-freeze
+`+0x5C` = 11 in **9 video frames on vsav2 and 10 on vsavj** — four for four,
+same start value, same node sequence.
+
+So a ported character whose data is byte-correct will still show LONGER
+video-frame durations on vsavj than its native original, and that is the host
+engine, not a defect. Chasing it produces the wrong fix: making the character
+tick at vsav2's frame rate would make it tick unlike every other character in
+the game it now lives in.
+
+**What IS comparable across the siblings:** hit COUNTS, damage, and durations
+in ENGINE TICKS (`tools/tick_durations.py` — a write tap fires per write, so
+it sees every tick; a frame-sampled trace cannot). **What is not:** any
+duration, gap or span expressed in video frames.
+
+Paid for on Donovan's 421+P: the six deity ticks span 49 frames on native and
+52 on ours, which read as a cadence defect for most of a session. The counts
+and damage are equal at every strength. Maintainer's ruling (2026-09-02):
+*"we must respect the fact that we are porting the character to a different
+engine and the engine, being vanilla vsav, takes precedence."*
+Frozen as section 4 of `tests/test_don_immortal_native.sh`.
