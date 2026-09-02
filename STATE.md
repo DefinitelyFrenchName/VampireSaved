@@ -344,6 +344,36 @@ what a triage is looking at, so those are where the thinking time goes.
 
 ## Decisions pending (human)
 
+- **THE BOOT NAME SCREEN: "SAVIOR" -> "SAVED" — DECIDED AND SPECIFIED
+  (maintainer, 2026-09-02), NOT YET BUILT.** Scoped and measured 14z-127; the
+  mechanism and the trap are in `docs/game/gotchas.md` "THE BOOT NAME SCREEN'S
+  DISPLAY SCRIPT TAKES AN EVEN COLUMN".
+  **THE EDIT, at its strict minimum (maintainer: "minimal change (i.e. e, d,
+  space instead of i, o, r) is perfect for me"):**
+  one `data` op, **`PRG:0x01C822`, 6 bytes word-aligned, `" I O R"` ->
+  `" E D  "`** — 3 bytes actually differ (`0x01C823` I->E, `0x01C825` O->D,
+  `0x01C827` R->space). One program member (`vm3j.10b`). The start-COLUMN byte
+  is NOT touched: the shorter title simply ends one character earlier and sits
+  marginally left of where it did. **Verified: the minimal-span build is
+  BYTE-IDENTICAL to the 30-byte-span build that was booted and photographed.**
+  **BLAST RADIUS, MEASURED not argued:** work-RAM checksums patched-vs-pristine
+  are **IDENTICAL across 1,621 frames of boot and attract**, so no RAM-basis
+  expectation moves and the legacy corpus does NOT re-freeze. Same length, so no
+  relocation and no shifted coordinates. It is TEXT, not authored tiles — the
+  glyphs are an existing gfx-ROM font, reused, so no tile or font work.
+  **SCOPE, ruled the same day:** JAPAN entry only (`0x01C806`'s first record) —
+  *"Our region of reference is Japan anyway"*; the other six region entries are
+  left alone. **The TITLE SCREEN is NOT touched** — *"the fact that the
+  character wheel is different is differentiator enough"*.
+  **AND A STANDING PRINCIPLE, in the maintainer's words:** *"staff references
+  should be intact, after all it's a Capcom game made by Capcom staff, and
+  especially since we restored dead code from them, virtually nothing we did was
+  a true novelty compared to their creations."* So the staff-roll strings
+  (`PRG:0x01301A`, `PRG:0x01D96A`) are NOT to be edited, now or later.
+  **WHY NOT BUILT YET:** a manifest row means a rebuild and a re-freeze (new
+  fingerprint, registry row, patch_notes, battery). Fold it into the next
+  freeze rather than opening one mid-session.
+
 *(Cleaned 14z-109, maintainer-directed: resolved and no-longer-shaping
 entries moved VERBATIM to `DECISIONS_HISTORY.md` — grep there by topic.
 Lifecycle: rulings are still marked DECIDED in place here first; they move to

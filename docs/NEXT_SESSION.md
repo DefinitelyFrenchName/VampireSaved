@@ -21,6 +21,15 @@
 > ##
 > ## **OPEN WORK, IN THE ORDER IT IS LIKELY TO BE AVAILABLE:**
 > ##
+> ## **READY TO BUILD AT THE NEXT FREEZE (decided 2026-09-02, not yet built):**
+> ## the boot name screen `SAVIOR` -> `SAVED`. ONE data op,
+> ## **`PRG:0x01C822`, 6 bytes, `" I O R"` -> `" E D  "`** (3 bytes differ),
+> ## JAPAN entry only, column byte UNTOUCHED. Measured free: work-RAM
+> ## checksums identical to pristine over 1,621 frames. **DO NOT touch the
+> ## start-column byte — an odd value is a 68k ADDRESS ERROR that soft-boots
+> ## and looks exactly like a real CPU exception** (`game/gotchas.md`).
+> ## Credits, other regions and the title screen are ruled OUT OF SCOPE.
+> ##
 > ## **(0) THE EMULATOR-TIER AGGREGATOR — RULED THE NEXT ARC (maintainer,
 > ## 2026-09-02), EXPECTED TO RUN OVERNIGHT.** *"we need this in another
 > ## session, likely to run tonight during the night. I know it'll be hours but

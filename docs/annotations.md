@@ -23,13 +23,13 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 2927 |
-| named by a document or manifest only | 2035 |
+| distinct program-space addresses named | 2930 |
+| named by a document or manifest only | 2038 |
 | named by both a document/manifest and code | 584 |
 | named by CODE ONLY (the gap list below) | 308 |
 | carried by atlas | 473 |
 | carried by engine_internals | 535 |
-| carried by other docs | 931 |
+| carried by other docs | 934 |
 | carried by manifests | 1756 |
 | carried by code | 892 |
 
@@ -39,6 +39,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 |---|---|
 | `PRG:0x0011DE` | docs/game/atlas/ram.md — Masked windows for hooked-build legacy comparison (CLAUDE.md §4 amendment, 2026-07-25); tests/audit_ff0460_writer.sh |
 | `PRG:0x0011E2` | docs/game/atlas/ram.md — Masked windows for hooked-build legacy comparison (CLAUDE.md §4 amendment, 2026-07-25); tests/audit_ff0460_writer.sh |
+| `PRG:0x00238A` | docs/game/gotchas.md — THE BOOT NAME SCREEN'S DISPLAY SCRIPT TAKES AN EVEN COLUMN — an odd one is a 68k ADDRESS ERROR that soft-boots the machine (paid: 14z-127) |
+| `PRG:0x002FD3` | docs/game/gotchas.md — THE BOOT NAME SCREEN'S DISPLAY SCRIPT TAKES AN EVEN COLUMN — an odd one is a 68k ADDRESS ERROR that soft-boots the machine (paid: 14z-127) |
 | `PRG:0x003140` | docs/game/atlas/character_tables.md — Sprites / tiles / sound — pipelines mapped, addresses sprite-bound |
 | `PRG:0x003190` | docs/game/atlas/character_tables.md — Sprites / tiles / sound — pipelines mapped, addresses sprite-bound |
 | `PRG:0x003306` | build/manifest/reconciliation.toml — map; build/manifest/reconciliation.toml — map [vs2] |
@@ -545,6 +547,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01C5CE` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tools/gen_donovan_patch.py; tools/select_port.py |
 | `PRG:0x01C670` | build/manifest/donovan.toml — hit_class_props_ext_lo |
 | `PRG:0x01C68E` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; build/manifest/donovan.toml — hit_class_props_ext_lo |
+| `PRG:0x01C806` | docs/game/gotchas.md — THE BOOT NAME SCREEN'S DISPLAY SCRIPT TAKES AN EVEN COLUMN — an odd one is a 68k ADDRESS ERROR that soft-boots the machine (paid: 14z-127) |
 | `PRG:0x01D160` | docs/project/gotchas.md — A pointer-shaped heuristic is placement-dependent — merged5 passed by luck (14z-92); tools/obj_records.py |
 | `PRG:0x01D363` | build/manifest/huitzil.toml — port_patch; tools/gen_index_window_thunk.py |
 | `PRG:0x01DBB6` | build/manifest/reconciliation.toml — map [vs2] |

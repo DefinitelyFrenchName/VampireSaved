@@ -782,3 +782,37 @@ increase the rate and show the result does not move. `tests/test_don_immortal_na
 carries that as a live control (native ES: 9 hits unmashed → 15 at the
 ceiling), so the assertions cannot go vacuous if the mash script ever stops
 reaching the game.
+
+
+## THE BOOT NAME SCREEN'S DISPLAY SCRIPT TAKES AN EVEN COLUMN — an odd one is a 68k ADDRESS ERROR that soft-boots the machine (paid: 14z-127)
+
+The white-on-black name screen (`VAMPIRE SAVIOR / 970519 / JAPAN`) is drawn by a
+per-region display script at `PRG:0x01C806`, seven entries, one per region
+(JAPAN / USA / HISPANIC / OCEANIA / ASIA / +2). Each entry is a run of
+`<row> <col> 01 <string>` records terminated by `0000`:
+
+    0a 24 01  "V A M P I R E   S A V I O R"     row 0x0A, col 0x24
+    7f 12 30 01  "9 7 0 5 1 9"
+    7f 13 3c 01  "J A P A N"
+
+**THE STRINGS ARE STORED LETTER-SPACED, EXACTLY AS DISPLAYED** — `S A V I O R`,
+not `SAVIOR`. That is why a contiguous-ASCII search for the title finds only the
+CPS-2 region header (`PRG:0x002FD3`, six entries), the `VM3J/VM3U/...` ROM-label
+table (`PRG:0x00238A`, stride 0x30) and the staff-roll strings — none of which
+drive this screen. All three were patched and the screen did not move; the
+letter-spaced form is the one that does.
+
+**THE COLUMN BYTE MUST BE EVEN.** The script writes the tilemap (`CPS:0x900000`,
+64 wide, tile code = the ASCII character, blank = `0x0020`) in WORDS. Changing
+the title's `col` from `0x24` to `0x25` — the obvious way to re-centre a shorter
+title — faults on the very first glyph: measured, the game's own exception store
+`RAM:$FF0000` reads `0x0001` (= vector − 2, so **vector 3, ADDRESS ERROR**) with
+`D0 = 0x00000056` = `'V'`, and the handler soft-boots. The visible symptom is the
+abbreviated check list restarting for ever — i.e. **it looks exactly like a
+genuine CPU-exception reboot** ([VSE-73]), which is what makes it expensive to
+debug. Shorten a string and leave the column alone, or move it by an EVEN amount.
+
+**What is free:** the string bytes themselves. A same-length edit of the title
+was measured work-RAM-checksum-IDENTICAL to pristine across 1,621 frames of boot
+and attract, so it moves no RAM-basis expectation at all. The glyphs are an
+existing font in gfx ROM; no tile or font work is involved.
