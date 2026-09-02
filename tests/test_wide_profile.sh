@@ -26,6 +26,8 @@
 #
 # Usage:
 #   ROMDIR=... [FBNEO_REF=/path/to/pre-wide/fbneo] tests/test_wide_profile.sh
+#   FBNEO_REF defaults to ~/.cache/vampire-saved/fbneo_ref and is REFUSED
+#   when it is older than emu/fbneo-patches/0001-*.patch.
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -54,6 +56,34 @@ python3 tools/build_fingerprint.py "$ROMDIR" --set vsavj --full \
     | sed 's/^/  stock /'
 
 echo "== 1. emulator superset invariant (stock vsavj: reference binary vs WIDE binary) =="
+# THE REFERENCE BINARY HAS A CANONICAL HOME AND A SHELF LIFE (added 14z-128).
+# It had neither: the invariant that justifies modifying an emulator at all
+# could only be run by remembering an env var and a path, and this gate's own
+# premise — "the reference binary MUST differ from the build under test by ONLY
+# patch 0002; rebuild it whenever the harness changes" (HANDOFF, CPS-2 WIDE) —
+# was documented and unenforced. Measured 14z-128 on this machine:
+# ~/.cache/vampire-saved/fbneo_ref was built 2026-08-14 while patch 0001 last
+# changed 2026-08-17, so the only reference present was THREE DAYS STALE and
+# nothing said so.
+FBNEO_REF="${FBNEO_REF:-$HOME/.cache/vampire-saved/fbneo_ref}"
+_HARNESS_PATCH="$REPO/emu/fbneo-patches/0001-vampire-saved-harness.patch"
+if [ -x "$FBNEO_REF" ] && [ -f "$_HARNESS_PATCH" ] \
+   && [ "$_HARNESS_PATCH" -nt "$FBNEO_REF" ]; then
+    echo "  FAIL: the reference binary is OLDER than the harness patch."
+    echo "        $FBNEO_REF"
+    echo "        vs $_HARNESS_PATCH"
+    echo "        A reference built with a different harness makes this"
+    echo "        comparison measure HARNESS deltas as PROFILE deltas."
+    echo "        Rebuild BOTH, in this order:"
+    echo "          WIDE=0 tools/setup_fbneo.sh && cp emu/fbneo/fbneo \\"
+    echo "              \"$HOME/.cache/vampire-saved/fbneo_ref\""
+    echo "          tools/setup_fbneo.sh"
+    echo "        (mtime is a WEAK signal — a fresh checkout resets it — so"
+    echo "         this refuses conservatively: on this invariant, a false"
+    echo "         alarm costs a rebuild and a false pass costs the rule.)"
+    fail=1
+    FBNEO_REF=""
+fi
 if [ -n "${FBNEO_REF:-}" ] && [ -x "${FBNEO_REF}" ] \
    && strings -a "${FBNEO_REF}" 2>/dev/null | grep -q "CPS-2 WIDE v1"; then
     # Paid for 14z-59e: `WIDE=0 tools/setup_fbneo.sh` used to only SKIP
@@ -83,7 +113,11 @@ elif [ -n "${FBNEO_REF:-}" ] && [ -x "${FBNEO_REF}" ]; then
         fi
     done
 else
-    echo "  SKIPPED: set FBNEO_REF to a pre-WIDE fbneo binary to run this."
+    echo "  SKIPPED: no usable pre-WIDE fbneo binary."
+    echo "    Build one:  WIDE=0 tools/setup_fbneo.sh && cp emu/fbneo/fbneo \\"
+    echo "                    \"$HOME/.cache/vampire-saved/fbneo_ref\""
+    echo "                then tools/setup_fbneo.sh to restore the WIDE binary."
+    echo "    (that path is the default; FBNEO_REF overrides it)"
     echo "  NOTE: this invariant is the whole basis for allowing emulator"
     echo "        changes at all (Rule 1 v2 clause 3) — a build that has not"
     echo "        run it is NOT validated, regardless of section 2 below."

@@ -69,7 +69,7 @@ test_fbneo_smoke	prereq	release	-	FBNeo boots and soaks
 test_fbneo_replay_determinism	prereq	release	-	FBNeo run-to-run determinism (the EEPROM sandbox fix)
 test_fbneo_runner_hygiene	prereq	release	-	a failed FBNeo run must not leave the previous run's artifacts (#12)
 test_fbneo_instruments	prereq	release	-	ground truth for the B5b FBNeo instruments
-test_wide_profile	fbneo	release	-	THE EMULATOR SUPERSET INVARIANT ([VSP-24]): patched binary vs reference on pristine vsavj. Needs FBNEO_REF.
+test_wide_profile	fbneo	release	-	THE EMULATOR SUPERSET INVARIANT ([VSP-24]): patched binary vs reference on pristine vsavj. RED 14z-128 and correctly so — the only reference binary on this machine predates the harness patch by three days, so section 1 cannot run. Fix = rebuild both binaries (see the gate's own message); it must wait for a moment when no lane is using FBNeo.
 test_dualtrack	fbneo	release	-	dual-track inertness up to select entry ([VSP-25])
 test_fbneo_legacy_oracle	fbneo	release	-	the SAMPLED hacked-vs-vanilla legacy check ([VSP-24]/[VSP-26])
 test_phasec_image	fbneo	release	-	the program extension is genuinely READ
