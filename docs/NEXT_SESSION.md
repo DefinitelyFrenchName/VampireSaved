@@ -21,6 +21,29 @@
 > ##
 > ## **OPEN WORK, IN THE ORDER IT IS LIKELY TO BE AVAILABLE:**
 > ##
+> ## **(0) THE EMULATOR-TIER AGGREGATOR — RULED THE NEXT ARC (maintainer,
+> ## 2026-09-02), EXPECTED TO RUN OVERNIGHT.** *"we need this in another
+> ## session, likely to run tonight during the night. I know it'll be hours but
+> ## that's the price of accuracy and quality."*
+> ## **THE GAP, MEASURED 14z-127: 167 emulator-tier gates; 29 reachable from a
+> ## runner (battery or static aggregator); 138 ORPHANED** — reachable only by
+> ## typing a filename, so under the release rule (anything red or skipped is a
+> ## hard fail) nothing would even ask them.
+> ## **BUILD:** `tests/run_all_emulator.sh` on the `run_all_static.sh` pattern —
+> ## registry files, PASS/SKIP/FAIL counted SEPARATELY, `--strict`, and the
+> ## ANTI-ORPHAN registry-coverage check (without that last piece the runner is
+> ## just a smaller thing to forget to update — the static runner's own stated
+> ## reason for having it). A missing prerequisite is a HARD FAIL, never a
+> ## silent `exit 0`.
+> ## **EXPECT REDS AND ROT, AND THAT IS THE DELIVERABLE:** *"anything stale will
+> ## be either updated or dropped so it'll be either more safety or less time
+> ## spent on valueless tests, both a win."* Each finding resolves as FIX THE
+> ## GATE / FIX WHAT IT CAUGHT / DELETE AS VALUELESS — **decided on measured
+> ## data, never on the gate's own say-so** (see STATE "HOW A RED IS
+> ## ADJUDICATED"; 15 of 45 frozen expectations do not name their provenance).
+> ## **OPERATIONAL:** land every commit BEFORE starting it — the suite asserts a
+> ## clean tree during a run, and a run was voided that way on 2026-09-02.
+> ##
 > ## **(1) GitHub #114 — PREMISE REFUTED, SCOPE MEASURED, MASH OPEN
 > ## (14z-127).** The 14z-126b "ours" leg was **JEDAH** — replay 48's
 > ## substituted-wheel path on the separated WIDE wheel. Measured against
@@ -34,6 +57,21 @@
 > ## vsav2 and 10 on vsavj. **RULING (maintainer, 2026-09-02): the engine,
 > ## being vanilla vsav, takes precedence** — so assert hit COUNT and DAMAGE,
 > ## never vsav2's frame numbers. Frozen as §4 of the gate.
+> ## **RELEASE-TIME TEST SCOPE — RULED (maintainer, 2026-09-02): AT RELEASE,
+> ## ALL TESTS RUN.** The only exceptions are gates whose SUBJECT is a
+> ## different romset or platform, or momentary probes. **A gate that uses
+> ## vsav2 or pristine vsavj as an ORACLE is IN SCOPE — the reference leg is
+> ## not the subject — and tests on native-VS content INSIDE vsavjw are
+> ## absolutely in scope.** Corollary: a release-scope gate must FAIL LOUDLY on
+> ## a missing prerequisite, never `SKIP:` + exit 0, because `bat` counts a
+> ## bare exit 0 as PASS. Full text in STATE's standing sections.
+> ##
+> ## **`test_don_immortal_native.sh` IS NOW A FREEZE-BATTERY LEG (3f), ruled
+> ## MANDATORY AT RELEASE** (maintainer 2026-09-02: "it's mandatory and cheap
+> ## whenever we want to release a version"). ~15 min, the longest leg in
+> ## `run_battery_m2.sh`, and the only one that MEASURES NATIVE rather than
+> ## asserting a remembered constant. Budget for it at every freeze.
+> ##
 > ## **THE MASH ARC — MEASURED AND CLOSED (14z-127).** Mash extends the loop:
 > ## a press adds 1 to the accumulator `+0x0A`; at **>= 7** the routine spends
 > ## one unit of the budget `+0x27` — **the per-strength cap, DATA, 2/3/3/4 for

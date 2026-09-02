@@ -74,7 +74,12 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 RPDIR="${1:-$REPO/build/m5_stock13/rompath}"
-[ -d "$RPDIR" ] || { echo "SKIP: no build at $RPDIR"; exit 0; }
+# A MISSING PREREQUISITE IS LOUD, NEVER A SILENT exit 0. This gate is a
+# FREEZE-BATTERY LEG (run_battery_m2.sh 3f) and `bat` invokes it as a bare
+# command, so an exit 0 would be counted as PASS and "BATTERY GREEN" would be
+# a lie — the exact class tests/test_battery_accounting.sh exists to bar
+# ([VSP-101]: SKIP IS NOT PASS). Same convention as test_don_reactions.sh.
+[ -d "$RPDIR" ] || { echo "FAIL: no build at $RPDIR"; exit 1; }
 RPDIR="$(cd "$RPDIR" && pwd)"                    # [VSP-108]
 BASES="$REPO/tests/expected/roster_pairings/bases.tsv"
 [ -f "$BASES" ] || { echo "FAIL: missing $BASES"; exit 1; }
@@ -106,7 +111,10 @@ run() {   # run <name> <set> <rompath> <rpl file> <pokes> [mame_bin]
 if [ -f "$RPDIR/vsavjw.zip" ]; then
     OURS_SET=vsavjw; OURS_BASE=don/114_don_immortal_wide.rpl
     OURS_BIN="$HOME/.cache/vampire-saved/mame/cps2"
-    [ -x "$OURS_BIN" ] || { echo "SKIP: WIDE build but no WIDE MAME at $OURS_BIN"; exit 0; }
+    [ -x "$OURS_BIN" ] || { echo "FAIL: WIDE build under test but no WIDE MAME binary at"
+                            echo "      $OURS_BIN — build it with tools/setup_mame.sh. Refusing to"
+                            echo "      self-skip: this gate is battery leg 3f and a silent exit 0"
+                            echo "      would be counted as PASS."; exit 1; }
 else
     OURS_SET=vsavj; OURS_BASE=48_don_immortal_ko.rpl; OURS_BIN=""
 fi

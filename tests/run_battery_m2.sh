@@ -27,6 +27,13 @@
 #   3c. test_don_reactions.sh — 421P gameplay lock (multi-hit, no KD)
 #   3d. test_don_column.sh    — column-KO crash gate (record-type aliases)
 #   3e. test_don_sound.sh     — sound-ring gate: no vsavj MUSIC-range id
+#   3f. test_don_immortal_native.sh — 421+P AGAINST NATIVE vsav2, measured in
+#       the same run (four strengths, no-mash AND at the mash ceiling) with the
+#       vanilla engine-clock licence and two must-fire controls. ~15 min, the
+#       longest leg here. MAINTAINER-RULED 2026-09-02 as mandatory at release:
+#       "it's mandatory and cheap whenever we want to release a version." It is
+#       the only gate in this chain that measures NATIVE rather than asserting a
+#       remembered constant (GitHub #114).
 #                              may be enqueued (the 14z-52 tripwire), and
 #                              per-replay id inventories are frozen
 #   4. test_m2a_stage4_oracle.sh — vsav2-as-oracle field gates
@@ -156,6 +163,7 @@ bat tests/test_don_colors.sh "$OUTBASE/rompath"
 bat tests/test_don_reactions.sh "$OUTBASE/rompath"
 bat tests/test_don_column.sh "$OUTBASE/rompath"
 bat tests/test_don_sound.sh "$OUTBASE/rompath"
+bat tests/test_don_immortal_native.sh "$OUTBASE/rompath"
 # The 14z-2 mirror-victim fix (applied 14z-64 in the re-freeze bundle):
 # base-slot mirror throws use the Donovan-victim block. SKIPs on
 # variant-id builds (correct by construction there).

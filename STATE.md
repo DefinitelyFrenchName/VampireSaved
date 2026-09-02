@@ -257,6 +257,39 @@ session records in the archive beyond the headline shown.
 ---
 
 # STANDING SECTIONS (current state — never archived)
+## RELEASE-TIME TEST SCOPE (maintainer, 2026-09-02)
+
+**AT RELEASE TIME, ALL TESTS ARE RUN.** Verbatim: *"at release time, ALL tests
+should be run. The only exception would be test whose scope is not applicable
+to what is released, which honestly would be specific tests used momentarily or
+tests on a different romset or platform. So tests that would measure VS2 or
+vsavj for instance are out of scope since we release vsavjw BUT tests on native
+VS within vsavjw are absolutely relevant."*
+
+The discriminator is **THE SUBJECT OF THE TEST, NOT THE ROMSETS IT TOUCHES**:
+- IN SCOPE — anything whose subject is the released artifact, **including its
+  LEGACY / native-VS content**. A gate that uses `vsav2` or pristine `vsavj` as
+  an ORACLE is in scope: the reference leg is not the subject.
+- OUT OF SCOPE — a gate whose SUBJECT is a different romset or platform
+  (a pristine-set rule lock, a stock-twin-only gate, another platform's lane),
+  or a momentary//specific probe.
+
+**THE ABSOLUTE (maintainer, 2026-09-02):** *"there is no approximation in our
+testing discipline both in general and absolutely at release: unless explicitly
+approved AT release time, anything red, anything skipped is a hard fail of the
+release process."* And the asymmetry that makes the cost sane: *"we may not
+need ALL the tests for every small change but how could we not run them when we
+release, since we have them!"* — a subset during development, EVERYTHING at
+release.
+
+**CONSEQUENCE FOR SELF-SKIPPING GATES:** a gate that prints `SKIP:` and exits 0
+because a prerequisite is absent has NOT been run, and in `run_battery_m2.sh`
+`bat` counts a bare exit 0 as PASS — the exact class
+`tests/test_battery_accounting.sh` exists to bar ([VSP-101], SKIP IS NOT PASS).
+Under this policy a release-scope gate must FAIL LOUDLY on a missing
+prerequisite rather than self-skip. `test_don_immortal_native.sh` was corrected
+to that convention when the policy was ruled (it had two silent `exit 0`s).
+
 ## STANDING PRINCIPLE (maintainer, 2026-08-05): vanilla wins ties
 
 **[VSP-21]** "vsav vanilla is always better when we can." **When a console port and
@@ -288,6 +321,26 @@ because without them, pressing Down on the cell directly above the new row
 does nothing while three medallions are visible below it, which is the UX
 failure "as long as we can select characters" is meant to exclude. Dropping
 them would reduce the legacy footprint from 5 bytes to 2.
+
+**HOW A RED IS ADJUDICATED — the maintainer's explicit statement of the obvious
+(2026-09-02):** *"to know if we should fix the gate or what it caught, we must
+use data we can trust, and that means measuring or relying on data that is
+known to be true for it was vetted by measurements."* **A RED GATE IS A
+QUESTION, NOT AN ANSWER.** Before choosing fix-the-gate / fix-what-it-caught /
+delete-as-valueless, establish WHICH SIDE'S EXPECTATION RESTS ON MEASUREMENT.
+A frozen expectation whose provenance cannot be named is a claim with a number
+in it. **The worked example is this session:** `test_don_reactions.sh` was
+GREEN on `native == 10`, a constant of playtest-testimony provenance
+(STATE 14z-42c) presented as measured — it happened to be correct, which is
+luck, not method. **MEASURED 14z-127, as input to the emulator-tier arc: 30 of
+45 frozen expectation files declare their provenance in their header; 15 do
+not** (`advancing_guard`, `community_crosscheck`, `df_accumulator`,
+`escape_triage`, `front_comparator`, `killshread_es`,
+`ladder_tenant_vs_palette`, `move_naming_{donovan,huitzil,pyron}`,
+`projectile_census`, `projectile_params`,
+`reactions_{donovan,huitzil,pyron}`). That says the provenance is not IN THE
+FILE — several have it in their gate header or a STATE entry — but the file is
+what a triage is looking at, so those are where the thinking time goes.
 
 ## Decisions pending (human)
 
@@ -1560,6 +1613,10 @@ wrong is *safe and loud* over designs that are merely well-measured.
   presses-counted-per-check — which manufactured a reading of "ours never
   extends LP and over-extends HP/ES by 2" that the ceiling erased. Ruled out
   along the way: `+0x12e` (saturates at 3) and the `$FF8058` input mirrors.
+  **THE GATE IS A FREEZE-BATTERY LEG (3f) — RULED MANDATORY AT RELEASE
+  (maintainer, 2026-09-02): "it's mandatory and cheap whenever we want to
+  release a version."** ~15 min, the longest leg of `run_battery_m2.sh`, and
+  the only one that MEASURES NATIVE instead of asserting a remembered constant.
   **WHAT THE ISSUE GOT RIGHT:**  **WHAT THE ISSUE GOT RIGHT:** the provenance criticism was fair —
   `native == 10` did enter `test_don_reactions.sh` as testimony (STATE
   14z-42c). It is correct, and is now measured in-run. 14z-42's cadence root
