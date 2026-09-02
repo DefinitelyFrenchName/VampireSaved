@@ -34,20 +34,35 @@
 > ## vsav2 and 10 on vsavj. **RULING (maintainer, 2026-09-02): the engine,
 > ## being vanilla vsav, takes precedence** — so assert hit COUNT and DAMAGE,
 > ## never vsav2's frame numbers. Frozen as §4 of the gate.
-> ## **STILL OPEN — MASHING, and it needs ONE new instrument that two things
-> ## want.** Mash extension is multi-level by rate (maintainer: at least two
-> ## extra levels). Measured across six rates and **the measurement is
-> ## confounded**: fixed absolute press frames against a slower host clock put
-> ## the presses at different phases per leg (it produced non-monotonic cells —
-> ## MP at the SLOWEST rate reading FEWER hits than no-mash, which no mechanic
-> ## does). **THE SAME GAP BLOCKS THE CROSS-REGION CONTROL:** `vsav`'s match
-> ## starts ~200+ frames after `vsavj`'s, so the replay lands in the round
-> ## intro and the attack whiffs (both sets DO place P1 at x=552 at round
-> ## start, and the forced pick loads the same record — consistent with the
-> ## maintainer's rule that regional variants have no mechanical differences,
-> ## but nowhere near a test of it). **BUILD THE PHASE-ANCHORED RIG ONCE** —
-> ## inputs expressed relative to each leg's own match/move progress — and both
-> ## fall out. Not started.
+> ## **THE MASH ARC — OPENED 14z-127, THE RIG DESIGN IS NOW EVIDENCE-BASED.**
+> ## Mash extension is multi-level by rate (maintainer: at least two extra
+> ## levels). **DO NOT measure it by mash RATE: that is confounded** — presses
+> ## fire at fixed absolute frames while our move runs on the slower host
+> ## clock, so ours absorbs MORE presses for the same script and the legs are
+> ## never given equal input. It produced non-monotonic cells (MP at the
+> ## SLOWEST rate reading FEWER hits than no-mash), which no mechanic does.
+> ## **THE INDEPENDENT VARIABLE IS PRESSES CONSUMED DURING THE MOVE.**
+> ## **WHAT IS ALREADY MEASURED (14z-127, data on disk):**
+> ## `RAM:$FF840A` = P1 `+0x0A`, the ATTACK ID (`ram.md`:135), climbs once per
+> ## consumed press — a usable proxy for presses-delivered-into-the-move.
+> ## Against it: **native looks CAPPED — HP stays 8 hits across attack-ids
+> ## 8→21, ES stays 11 across 8→27 — while ours reaches 10 (HP, id 23) and 13
+> ## (ES, id 27).** A cap difference is the live hypothesis; it is NOT
+> ## established, because the legs never received equal press counts.
+> ## **RULED OUT, so it is not re-derived:** `+0x12e` is not the counter (0
+> ## with no mash, saturates at 3 whenever mashing happens at all, while hits
+> ## range 3..13). The other press-frame-correlated bytes found by a whole
+> ## work-RAM sweep are input mirrors (`$FF8058` and friends).
+> ## **THE ORDER THAT MATTERS:** find/confirm the counter FIRST, then build the
+> ## phase-anchored rig around it, then assert native vs ours on the
+> ## press→level curve. Building the rig first means guessing what to anchor
+> ## to, which is how the rate table came out non-monotonic.
+> ## **THE SAME RIG UNBLOCKS THE CROSS-REGION CONTROL:** `vsav`'s match starts
+> ## ~200+ frames after `vsavj`'s, so an absolute-frame replay lands in the
+> ## round intro (both sets DO place P1 at x=552 at round start and load the
+> ## same record — consistent with the maintainer's rule that regional
+> ## variants have no mechanical differences, but far short of testing it).
+> ##
 > ## **THE CLASS TO CARRY FORWARD:** a tenant replay is a claim about the
 > ## build it was authored for ([VSP-156]); **a confound check on POSITIONS
 > ## does not establish IDENTITY**; and **a duration in VIDEO FRAMES is not
