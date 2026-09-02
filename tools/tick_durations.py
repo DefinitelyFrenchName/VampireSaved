@@ -58,19 +58,31 @@ NODE_STRIDE = 0x18          # measured: consecutive in-chain node pointers
 
 
 def durations(ev, starts, nodes):
-    """For every entry into a chain start, ticks until the pointer LEAVES it.
+    """Ticks consumed by ONE FORWARD PASS through each chain.
 
-    A chain occupies `nodes` records of NODE_STRIDE bytes from its start, so a
-    chain occurrence ends the moment the anim pointer lands outside
-    [start, start + nodes*NODE_STRIDE).  Closing instead on "the next known
-    chain start" is WRONG and silently measures the IDLE: after a normal the
-    engine returns to the crouch idle chain, which is not in the caller's map,
-    so the occurrence would run on and every move would report the same
-    idle-dominated number (~365 here) -- the shape of a wrong reading.
+    A pass is closed by whichever comes first:
+      * a BACKWARD STEP inside the chain -- the chain looped. An aerial normal
+        repeats until landing, back to the start (BI J.LP) or to a late node
+        (BI J.MP, 0x1c6ed6 -> 0x1c6ebe).
+      * the pointer LEAVING the chain's address range -- the ordinary ending
+        for a grounded normal, and the condition that reproduces the engine
+        EXACTLY on all 18 grounded chains measured.
+
+    WHAT DOES NOT WORK, both tried and both leaving a signature:
+      * range-exit ALONE measures the crouch IDLE (grounded, if the chain is
+        re-entered) or the AIRTIME (aerial), reporting the SAME number for
+        every move -- identical numbers across different moves are the tell.
+      * closing after the Nth node entry stops before the last node's duration
+        is consumed and under-reports every grounded chain by ~2 ticks.
+
+    KNOWN LIMIT, stated rather than hidden: an aerial whose last node HOLDS
+    without the pointer moving again before landing (VI, FE, SA) is closed by
+    neither condition, and still reports airtime. Those are not separable by
+    this instrument as it stands.
     """
     out = defaultdict(list)
     rng = {m: (s, s + nodes[m] * NODE_STRIDE) for m, s in starts.items()}
-    cur, ticks = None, 0
+    cur, ticks, prev = None, 0, None
     for kind, fr, val in ev:
         if kind == "tick":
             if cur is not None:
@@ -78,14 +90,15 @@ def durations(ev, starts, nodes):
             continue
         if cur is not None:
             lo, hi = rng[cur]
-            if not (lo <= val < hi):        # left the chain -> close it
+            if (lo <= val < hi and prev is not None and val < prev) or not (lo <= val < hi):
                 out[cur].append(ticks)
                 cur, ticks = None, 0
         if cur is None:
-            for m, s in starts.items():
-                if val == s:
+            for m, st in starts.items():
+                if val == st:
                     cur, ticks = m, 0
                     break
+        prev = val
     if cur is not None:
         out[cur].append(ticks)
     return out

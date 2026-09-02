@@ -343,9 +343,25 @@ method of loses to a tick count from the engine itself.
   assumed to be.
 - ~~**Jedah's crouching recovery (+3, not +2) is unexplained**~~ **CLOSED 2026-09-02: measured in engine ticks, 18/18 exact — the residue is the workbook's, not ours** — see the arbitration
   section. Lilith's `2MK` behaves the same way.
-- **The aerial startup/active outliers are untouched** (BI `J.HP`/`J.LP`, BU `J.MP`,
-  VI `J.HP`, FE `J.HK`/`J.LK`, SA `J.MP`). A jumping normal's chain is entered from
-  the jump, and no rig here separated the two.
+- **The aerial outliers — PARTLY RESOLVED 2026-09-02, and the likely cause is now
+  NAMED** (BI `J.HP`/`J.LP`, BU `J.MP`, VI `J.HP`, FE `J.HK`/`J.LK`, SA `J.MP`).
+  ~~A jumping normal's chain is entered from the jump, and no rig here separated
+  the two.~~ `tools/tick_durations.py` now separates them for chains that LOOP:
+  an aerial repeats until landing, either back to its start (BI `J.LP`) or to a
+  late node (BI `J.MP`, `0x1c6ed6 -> 0x1c6ebe`), and closing the span there gives
+  ONE FORWARD PASS. **BI measures 5/6 exact** — and the miss is a flagged move:
+  `J.HP` derives 28 where the engine spends **27**. BU gives `J.LK`/`J.LP` exact.
+  **STILL NOT SEPARABLE:** an aerial whose last node HOLDS with no further
+  pointer write before landing (VI, FE, SA) is closed by neither condition and
+  still reports airtime — identical numbers across that character's moves are
+  the tell, not a result.
+  **THE LIKELY CAUSE, from the community corpus and not yet measured:** the
+  mizuumi pages distinguish **NEUTRAL-jump from FORWARD-jump variants of the
+  same button** — `8J.LP` vs `9J.LP`, `J.HP8` vs `9J.HP` — where our slot map
+  carries ONE chain per aerial button. If the flagged moves are exactly those
+  whose two variants differ, the outlier is a variant we collapse rather than an
+  arithmetic error. That is the first thing to test, and it needs a rig that
+  performs both jump directions.
 - **Specials, supers, EX/ES moves, throws, pursuits and the `6`-prefixed command
   normals are not joined.** Each needs its own measured naming rig on vsavj, the way
   `tools/name_moves.py` did for the tenants. That is the bulk of the workbook's 730

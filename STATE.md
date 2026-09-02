@@ -545,8 +545,18 @@ the archive once they stop shaping active work.)*
   with the workbook's own conventions, and the total is now ground truth — so
   our recovery is right and the workbook's sits one frame below its own
   convention for those seven moves. `tools/tick_durations.py` +
-  `tests/test_tick_durations.sh` (with a must-fire control). **STILL OPEN: the
-  seven aerial outliers.**
+  `tests/test_tick_durations.sh` (with a must-fire control). **THE SEVEN AERIAL OUTLIERS — PARTLY RESOLVED 2026-09-02.**
+  `tick_durations.py` separates the move from the jump for chains that LOOP
+  (BI 5/6 exact; the miss is the flagged `J.HP`, ours 28 vs the engine's 27; BU
+  `J.LK`/`J.LP` exact). NOT separable yet: aerials whose last node HOLDS with no
+  further pointer write before landing (VI, FE, SA) — those still report
+  AIRTIME, and identical numbers across a character's moves are the tell.
+  **THE LIKELY CAUSE IS NOW NAMED, from the community corpus that arrived
+  2026-09-02:** mizuumi distinguishes NEUTRAL-jump from FORWARD-jump variants of
+  the same button (`8J.LP` vs `9J.LP`, `J.HP8` vs `9J.HP`) where our slot map
+  carries ONE chain per aerial button. If the flagged moves are exactly those
+  whose variants differ, we are collapsing a variant, not miscounting. Needs a
+  two-direction jump rig; not yet measured.
   ~~`red damage` needs the [VSE-40] scaler to be comparable at all~~ **WRONG and
   RETRACTED 14z-125b: the workbook's `red damage` is our `+8` PLUS `+9`, the
   move's total — 266/281 (94%) once compared as the sum;**
