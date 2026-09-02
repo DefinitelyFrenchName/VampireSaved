@@ -66,7 +66,42 @@ def spaces_from(manifest):
 
 
 def variant_tables():
-    """Per-character tables from bank_map.toml, as (base, entry_size)."""
+    """Per-character tables from bank_map.toml, as (base, entry_size).
+
+    A `kind = "auto"` row GRANTS NO EXEMPTION (14z-128). "auto" means the
+    scanner discovered a per-character region and nothing measured its entry
+    size, so its `stride` is the scan default rather than a fact — and the
+    exemption this function computes is `base + 0x10*es .. base + 0x20*es`,
+    which is only the variant half if `es` is right.
+
+    MEASURED, and this is why the rule exists rather than being a scruple.
+    `gap_be27a` is declared `kind = "auto"`, `stride = 0x40`, so es came out
+    2 and the exempt window was 0x0BE29A-0x0BE2BA. The table is the CAPTURE-
+    KEYFRAME POINTER TABLE and its entries are LONGWORDS — three independent
+    ways: bank_map's own note calls it "the 32-LONG capture-keyframe pointer
+    table", donovan.toml's `slot_ptr_table = 0xBE27A` places row 0x00 at
+    0xBE27A and row 0x01 at 0xBE27E, and the values written are 32-bit ROM
+    pointers. So es is 4, the real variant half is 0x0BE2BA-0x0BE2FA, and
+    that window was exempting LONGWORD ROWS 0x08-0x0F — Bishamon, Aulbath,
+    Sasquatch, 0x0B, Q-Bee, Lei-Lei, Lilith and Jedah. LEGACY rows, in the
+    one gate whose whole purpose is to make a legacy-surface write a
+    build-time review. Eight writes per tenant build sat inside it (the #104
+    capture-pose port, 14z-99) and never reached the inventory.
+
+    Nothing shipped unreviewed through the hole — that work is maintainer-
+    ruled and locked by audit_don_grab_pose.sh — but the gate that exists to
+    force the review was blind to it, which is the same shape as the defect
+    the gate was built for (the Bulleta DF block, 14z-69).
+
+    The ROOT cause is the bank_map row, not this function: `gap_be27a` +
+    `gap_be2ba` model one 32-long table as two 0x40 halves, which also makes
+    the generated character-data pages read both rows at the wrong address.
+    Correcting it moves `kind`, and `kind` is load-bearing in
+    extract_char.py and gen_donovan_patch.py, so it can move BUILD OUTPUT —
+    a measured change of its own, recorded in STATE for the maintainer. This
+    function is the containment: an unmeasured stride now exempts nothing,
+    so being wrong is safe and loud ([VSP-22]).
+    """
     out = []
     txt = (ROOT / "build/manifest/bank_map.toml").read_text()
     for block in txt.split("[[table]]")[1:]:
@@ -74,8 +109,11 @@ def variant_tables():
                               block, re.M))
         if "vsavj" not in row:
             continue
+        kind = row.get("kind", '""').strip('"')
+        if kind == "auto":
+            continue
         base = int(row["vsavj"].strip('"'), 0)
-        if row.get("kind", "").strip('"') == "byte2d":
+        if kind == "byte2d":
             es = int(row["span"].strip('"'), 0) // 32
         else:
             es = int(row.get("stride", '"0x80"').strip('"'), 0) // 32

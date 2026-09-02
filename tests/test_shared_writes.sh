@@ -134,5 +134,86 @@ print(f"  control: the UNMUTATED build still passes: {r.returncode == 0}")
 sys.exit(0 if ok and r.returncode == 0 else 1)
 PY
 
+echo "== 4. THE AUTO-STRIDE BLIND SPOT STAYS CLOSED (14z-128)"
+# WHAT THIS LOCKS. The audit exempts a write that lands on a per-character
+# table's VARIANT half, computed as `base + 0x10*es .. base + 0x20*es` with
+# `es = stride/32` read from bank_map.toml. For a `kind = "auto"` row the
+# stride is the SCANNER'S DEFAULT, not a measurement — so the window is not
+# the variant half and the exemption lands somewhere else entirely.
+#
+# It did. `gap_be27a` (auto, stride 0x40) gave es=2 and a window of
+# 0x0BE29A-0x0BE2BA on a table whose entries are LONGWORDS: those are rows
+# 0x08-0x0F of the capture-keyframe pointer table — Bishamon, Aulbath,
+# Sasquatch, 0x0B, Q-Bee, Lei-Lei, Lilith, Jedah. EIGHT LEGACY ROWS, exempted
+# by the one gate whose purpose is to make a legacy-surface write a
+# build-time review. Nine writes per tenant build sat inside it (the #104
+# capture-pose port) and never reached the inventory.
+#
+# Two-sided control, on a synthetic root so it cannot depend on the real
+# manifests: a MEASURED table exempts its variant window, and the SAME table
+# marked `auto` exempts nothing.
+python3 - "$WORK" <<'PY' || fail=1
+import json, shutil, subprocess, sys
+from pathlib import Path
+work = Path(sys.argv[1]) / "autostride"
+shutil.rmtree(work, ignore_errors=True)
+(work / "tools").mkdir(parents=True)
+(work / "build/manifest").mkdir(parents=True)
+(work / "build/fake/patch").mkdir(parents=True)
+shutil.copy("tools/audit_shared_writes.py", work / "tools")
+for m in ("donovan", "huitzil", "pyron"):
+    # one declared free space, far from the fixture tables
+    (work / f"build/manifest/{m}.toml").write_text(
+        '[[space]]\nstart = 0x700000\nend = 0x700100\n')
+BASE = 0x0B0000
+def bank_map(kind):
+    return (f'[[table]]\nname = "fixture"\nvsavj = 0x{BASE:06X}\n'
+            f'kind = "{kind}"\nstride = 0x80\n')
+# one write inside the variant window of a stride-0x80 table: base + 0x10*4
+addr = BASE + 0x10 * 4
+(work / "build/fake/patch/patch.json").write_text(json.dumps(
+    {"ops": [{"op": "poke32", "addr": hex(addr), "val": "0x400000"}]}))
+seen = {}
+for kind in ("data_ptr", "auto"):
+    (work / "build/manifest/bank_map.toml").write_text(bank_map(kind))
+    r = subprocess.run(["python3", str(work / "tools/audit_shared_writes.py"),
+                        str(work / "build/fake"), "--json"],
+                       capture_output=True, text=True)
+    rows = json.loads(r.stdout) if r.stdout.strip().startswith("[") else []
+    seen[kind] = any(int(x["addr"], 16) == addr for x in rows)
+ok = (seen["data_ptr"] is False) and (seen["auto"] is True)
+print(f"  control: a MEASURED (data_ptr) table exempts its variant window: "
+      f"{'yes' if not seen['data_ptr'] else 'NO — the exemption is gone'}")
+print(f"  control: the SAME table as `auto` exempts nothing: "
+      f"{'yes' if seen['auto'] else 'NO — the blind spot is back'}")
+sys.exit(0 if ok else 1)
+PY
+# And the regression lock on the real tree: the nine capture-keyframe rows the
+# blind spot used to hide must be VISIBLE to the audit on a current build.
+# Addresses, not a count: a count moves with unrelated work.
+HID="0x0be29a 0x0be29e 0x0be2a2 0x0be2a6 0x0be2aa 0x0be2ae 0x0be2b2 0x0be2b6 0x0be2da"
+CUR=""
+for b in build/m3b_merged21 build/don_m18 build/hui52 build/pyron36; do
+    [ -f "$b/patch/patch.json" ] && { CUR="$b"; break; }
+done
+if [ -z "$CUR" ]; then
+    echo "  SKIP (no current build to check the capture-keyframe rows on)"
+else
+    inv="$(python3 tools/audit_shared_writes.py "$CUR" 2>/dev/null || true)"
+    miss=""
+    for a in $HID; do
+        printf '%s' "$inv" | grep -q "\"$a " || miss="$miss $a"
+    done
+    if [ -n "$miss" ]; then
+        echo "  FAIL: on $CUR these capture-keyframe rows are NOT in the"
+        echo "        inventory —$miss"
+        echo "        That is the 14z-128 blind spot, back."
+        fail=1
+    else
+        echo "  ok: all nine capture-keyframe rows (0x0be29a-0x0be2b6, 0x0be2da)"
+        echo "      are visible to the audit on $CUR"
+    fi
+fi
+
 [ "$fail" -ne 0 ] && { echo "FAIL: shared-surface write inventory"; exit 1; }
 echo "PASS: shared-surface writes match the frozen, reviewed inventory"
