@@ -1,34 +1,39 @@
 # shared_writes.toml — THE FROZEN SHARED-SURFACE WRITE INVENTORY (14z-79)
 #
 # ***********************************************************************
-# ** STALE AS OF 14z-127 (2026-09-02) — THIS INVENTORY PINS THE 14z-91  **
-# ** BUILDS (don_m7 / hui41 / pyron26) AND HAS NOT SEEN A CURRENT BUILD **
-# ** IN TEN FREEZES. `tests/test_shared_writes.sh` IS GREEN AGAINST     **
-# ** THOSE PINNED DIRS, NOT AGAINST WHAT SHIPS.                         **
-# ** Audited against the 14z-127 builds: donovan 108 writes vs 90 frozen **
-# ** (18 NEW), huitzil 106 vs 87 (19 NEW), pyron 94 vs 76 (18 NEW).      **
-# ** Only 3 per tenant are 14z-127's (the boot_title_saved_* rows); the  **
-# ** other ~15 are shipped work from m8..m14 that NOBODY WAS EVER FORCED **
-# ** TO REVIEW -- e.g. 0x020B9C (the Oboro select hook, 14z-105),        **
-# ** 0x020C74/0x020C80 (random select, 14z-117), 0x0BE27A..0x0BE296      **
-# ** (eight poke32 -- CORRECTED 14z-128: these are the #104 CAPTURE-     **
-# ** KEYFRAME pointer-table rows 0x00-0x07, NOT the #99 AI-script        **
-# ** unpark. The AI unpark is PRG:0xBF01A/09A/11A/19A, whose writes are  **
-# ** genuine variant rows and were never shared surface).                **
+# ** RE-POINTED AND RE-REVIEWED 14z-128 (2026-09-03). The inventory now  **
+# ** pins the CURRENT REGISTERED FREEZE — don_m18 / hui52 / pyron36      **
+# ** (merged-m14, mark M12, 14z-119) — and every write in it has been    **
+# ** attributed to a named change with its `why` recorded below, which   **
+# ** is the step [VSP-97] refuses to let a re-point skip.                **
 # **                                                                     **
-# ** AND THE AUDIT WAS BLIND TO NINE MORE (14z-128): rows 0x08-0x0F plus **
-# ** 0x18 of the same table were EXEMPTED as 'variant rows' because      **
-# ** bank_map's `gap_be27a` is kind=auto with the scanner's default      **
-# ** stride. Fixed in tools/audit_shared_writes.py; the current counts   **
-# ** are therefore donovan 114 / huitzil 112 / pyron 100, and the NEW    **
-# ** sets are 24 / 25 / 24.                                              **
-# ** DO NOT SIMPLY RE-POINT AND RE-FREEZE: that would launder an         **
-# ** unreviewed inventory into the gate that exists to review it         **
-# ** ([VSP-97]). The work is to establish WHOSE bytes each new write     **
-# ** lands on and record the `why`, then re-point. Handed to the         **
-# ** emulator-tier arc (maintainer, 2026-09-02: "as long as we hand the  **
-# ** audit to tonight's arc I don't mind freezing now: after all frozen  **
-# ** is not released").                                                  **
+# ** WHAT IT WAS: pinned to the 14z-91 builds (don_m7 / hui41 /          **
+# ** pyron26), green against those dirs and not against what ships, for  **
+# ** TEN FREEZES. The re-point added, per tenant, the #101 kernel        **
+# ** voice-table words, the #104 capture-keyframe pointer rows, the      **
+# ** Oboro select hook, the two random-select thunks, and (huitzil) the  **
+# ** #109 beam effect-class row: donovan 90 -> 114, huitzil 87 -> 112,   **
+# ** pyron 76 -> 100.                                                    **
+# **                                                                     **
+# ** AND NINE PER TENANT WERE INVISIBLE TO THE AUDIT ITSELF (14z-128):   **
+# ** capture-keyframe rows 0x08-0x0F and 0x18 were EXEMPTED as "variant  **
+# ** rows" because bank_map's `gap_be27a` is kind=auto carrying the      **
+# ** scanner's default stride — eight LEGACY rows, in the gate whose     **
+# ** purpose is to make a legacy-surface write a build-time review.      **
+# ** Fixed in tools/audit_shared_writes.py; locked by section 4 of       **
+# ** tests/test_shared_writes.sh. The ROOT cause is the bank_map row and **
+# ** is NOT fixed: `kind` is load-bearing in extract_char.py and         **
+# ** gen_donovan_patch.py, so correcting it can move BUILD OUTPUT — see  **
+# ** STATE "Decisions pending".                                          **
+# **                                                                     **
+# ** ONE CORRECTION carried from the 14z-127 note: 0x0BE27A..0x0BE296 is **
+# ** the #104 CAPTURE-KEYFRAME table, NOT the #99 AI-script unpark (that **
+# ** is PRG:0xBF01A/09A/11A/19A, genuine variant rows, never shared      **
+# ** surface).                                                           **
+# **                                                                     **
+# ** STILL TO DO AT THE NEXT FREEZE: the M13 tracks (don_m19 / hui53 /   **
+# ** pyron37) add three `boot_title_saved_*` rows each — reviewed at     **
+# ** 14z-127, so that re-point is a one-liner once M13 is registered.    **
 # ***********************************************************************
 #
 # Every build op that lands OUTSIDE declared free space and OUTSIDE a known
@@ -79,9 +84,26 @@
 
 [[tenant]]
 name = "donovan"
-build = "build/don_m7"
-count = 90
+build = "build/don_m18"
+count = 114
 writes = [
+  # 14z-96 (GitHub #101) THE KERNEL VOICE-TABLE PORT, maintainer-ruled option
+  # (a). REVIEWED 14z-128: these four words are THIS TENANT'S OWN variant-half
+  # entry of the sound kernel's four per-class voice tables (vsavj bases
+  # 0x3BCE / 0x3C3A / 0x3CA6 / 0x3D10, variant half at +0x20, one WORD per
+  # class — so the address is base + 0x20 + 2*(id - 0x10): donovan 0x13 ->
+  # +0x26, phobos 0x10 -> +0x20, pyron 0x11 -> +0x22, which is what the three
+  # tenants' differing addresses are). Legacy classes are 0x00-0x0F and never
+  # read the variant half. vsavj ships that half as byte-copies of the base
+  # rows, which is exactly why a tenant class fired the LEGACY alias voice
+  # (the merged-m2 electrocute grunt). `only_variant_slot` skips them on the
+  # stock track, where the tenant sits at 0x0F and reads the legacy row
+  # anyway. Locks: tests/test_kernel_voice_tables.sh (static),
+  # tests/audit_hui_grunt.sh (the dynamic A/B over five electrocutions).
+  "0x003bf4 2 code",
+  "0x003c60 2 code",
+  "0x003ccc 2 code",
+  "0x003d36 2 code",
   # 14z-91 THE WALKER RELOCATION. REMOVED: "0x054470 6 code" and
   # "0x05e542 6 code" — the obj_hook dispatch sites are VANILLA again, so
   # the two engine-site writes that used to install `jmp thunk` are gone.
@@ -106,16 +128,6 @@ writes = [
   "0x00a18a 4 code",
   "0x00a806 4 code",
   "0x00abce 4 code",
-  "0x010dfc 4 code",
-  "0x012a40 4 code",
-  "0x012d18 4 code",
-  "0x012e4e 4 code",
-  "0x012e68 4 code",
-  "0x020312 4 code",
-  "0x020318 4 code",
-  "0x02163a 4 code",
-  "0x021adc 4 code",
-  "0x021dec 4 code",
   # 14z-87 (the voice-borrow fix, maintainer-decided b+c): the shared
   # engine borrow site (jsr + nop pad at 0x0AEF2/0x0AEF8 — the
   # keep-tenant thunk; only_variant_slot-gated, stock twin bit-identical)
@@ -126,8 +138,27 @@ writes = [
   "0x00aef8 2 code",
   "0x00b728 64 data",
   "0x00c028 64 data",
+  "0x010dfc 4 code",
+  "0x012a40 4 code",
+  "0x012d18 4 code",
+  "0x012e4e 4 code",
+  "0x012e68 4 code",
   "0x018458 6 code",
   "0x0185ca 6 code",
+  "0x020312 4 code",
+  "0x020318 4 code",
+  # 14z-105 (W1) THE OBORO SELECT HOOK. REVIEWED 14z-128: a [[site_thunk]] on
+  # VANILLA code — the confirm-time `cmpi.b #$2,$382(a6)` at PRG:0x020B9C,
+  # displaced and re-executed inside the thunk, so vanilla's own
+  # Gallon-variant idiom one cell over (Gallon + START + punches -> Dark
+  # Gallon 0x12) is preserved BY CONSTRUCTION. Profile-gated; no vanilla path
+  # anywhere writes 0x18. Lock: tests/test_oboro_select.sh.
+  "0x020b9c 6 code",
+  # 14z-117 RANDOM SELECT INCLUDES THE TENANTS. REVIEWED 14z-128: two
+  # profile-gated [[site_thunk]]s on vanilla select code — the random bound
+  # and the roster draw table. Lock: tests/test_random_select_tenants.sh.
+  "0x020c74 6 code",
+  "0x020c80 6 code",
   # 0x01c586 / 0x01c59a REMOVED 14z-91: the fixture row-0x0F override thunks
   # are deleted (a legacy-regression root cause; those venue fixture-load
   # sites are shared by match intro AND attract, so legacy paid for them on
@@ -138,6 +169,9 @@ writes = [
   "0x021264 8 data",
   "0x02126c 8 data",
   "0x02127c 8 data",
+  "0x02163a 4 code",
+  "0x021adc 4 code",
+  "0x021dec 4 code",
   "0x023ad8 6 code",
   "0x023ade 6 code",
   "0x0282fa 2 code",
@@ -170,7 +204,51 @@ writes = [
   "0x0898aa 2 poke16",
   "0x08995c 4 poke32",
   "0x089960 4 poke32",
+  # 14z-99 (GitHub #104) THE CAPTURE-POSE KEYFRAME BLOCKS, maintainer-ruled
+  # option (a). REVIEWED 14z-128, and this is the group that most needed it:
+  # rows 0x00-0x0F of the capture-keyframe pointer table 0x0BE27A[attacker]
+  # are LEGACY attacker rows, plus row 0x18 (Oboro, which follows Bishamon).
+  # The capture positioner (PRG:0x02802E) resolves the ATTACKER's block
+  # through this table and then indexes its 32-word head by the VICTIM's id
+  # UNMASKED; vsavj's blocks alias rows 0x10-0x1F onto 0x00-0x0F, so a TENANT
+  # victim was held on the base character's sub-block (Donovan got Victor's,
+  # Phobos got Bulleta's). Each row is repointed to that attacker's vs2 block,
+  # ported VERBATIM into wide_ext.
+  #
+  # THE LEGACY-SAFETY PREMISE IS VERIFIED, not asserted:
+  # tests/test_capture_pose_sources.sh section 5 — "every base sub-block
+  # byte-identical vsavj vs vs2 (16/16)" — with its own must-fire control
+  # (8b, a corrupted base sub-block IS detected). So a legacy attacker
+  # capturing a legacy victim reads the same bytes it always did. Measured
+  # legacy A/B at the 14z-99 rehearsal: EXACTLY ONE differing frame (f890,
+  # the ratified §4 class-4 select-init pointer cache), bit-identical from
+  # f891 through full matches including the grab-heavy legacy leg (replay 96
+  # unpoked). `only_variant_slot` skips them on the stock track. Lock:
+  # tests/audit_don_grab_pose.sh (EXPECT_MATCH=1).
+  #
+  # NINE OF THESE SEVENTEEN WERE INVISIBLE TO THIS AUDIT UNTIL 14z-128 (rows
+  # 0x08-0x0F and 0x18): bank_map's `gap_be27a` is kind=auto carrying the
+  # scanner's DEFAULT stride, so the variant-row exemption this tool computes
+  # landed on those very rows. Fixed in tools/audit_shared_writes.py
+  # variant_tables(); locked by tests/test_shared_writes.sh section 4.
+  "0x0be27a 4 poke32",
+  "0x0be27e 4 poke32",
+  "0x0be282 4 poke32",
+  "0x0be286 4 poke32",
+  "0x0be28a 4 poke32",
+  "0x0be28e 4 poke32",
+  "0x0be292 4 poke32",
+  "0x0be296 4 poke32",
+  "0x0be29a 4 poke32",
+  "0x0be29e 4 poke32",
+  "0x0be2a2 4 poke32",
+  "0x0be2a6 4 poke32",
+  "0x0be2aa 4 poke32",
+  "0x0be2ae 4 poke32",
+  "0x0be2b2 4 poke32",
+  "0x0be2b6 4 poke32",
   "0x0be2c6 4 poke32",
+  "0x0be2da 4 poke32",
   "0x2672f6 4 poke32",
   "0x267376 4 poke32",
   "0x2673f6 4 poke32",
@@ -197,9 +275,26 @@ writes = [
 
 [[tenant]]
 name = "huitzil"
-build = "build/hui41"
-count = 87
+build = "build/hui52"
+count = 112
 writes = [
+  # 14z-96 (GitHub #101) THE KERNEL VOICE-TABLE PORT, maintainer-ruled option
+  # (a). REVIEWED 14z-128: these four words are THIS TENANT'S OWN variant-half
+  # entry of the sound kernel's four per-class voice tables (vsavj bases
+  # 0x3BCE / 0x3C3A / 0x3CA6 / 0x3D10, variant half at +0x20, one WORD per
+  # class — so the address is base + 0x20 + 2*(id - 0x10): donovan 0x13 ->
+  # +0x26, phobos 0x10 -> +0x20, pyron 0x11 -> +0x22, which is what the three
+  # tenants' differing addresses are). Legacy classes are 0x00-0x0F and never
+  # read the variant half. vsavj ships that half as byte-copies of the base
+  # rows, which is exactly why a tenant class fired the LEGACY alias voice
+  # (the merged-m2 electrocute grunt). `only_variant_slot` skips them on the
+  # stock track, where the tenant sits at 0x0F and reads the legacy row
+  # anyway. Locks: tests/test_kernel_voice_tables.sh (static),
+  # tests/audit_hui_grunt.sh (the dynamic A/B over five electrocutions).
+  "0x003bee 2 code",
+  "0x003c5a 2 code",
+  "0x003cc6 2 code",
+  "0x003d30 2 code",
   # 14z-91 THE WALKER RELOCATION. REMOVED: "0x054470 6 code" and
   # "0x05e542 6 code" — the obj_hook dispatch sites are VANILLA again, so
   # the two engine-site writes that used to install `jmp thunk` are gone.
@@ -224,22 +319,17 @@ writes = [
   "0x00a18a 4 code",
   "0x00a806 4 code",
   "0x00abce 4 code",
-  "0x010dfc 4 code",
-  "0x012a40 4 code",
-  "0x012d18 4 code",
-  "0x012e4e 4 code",
-  "0x012e68 4 code",
-  "0x020312 4 code",
-  "0x020318 4 code",
-  "0x02163a 4 code",
-  "0x021adc 4 code",
-  "0x021dec 4 code",
   # 14z-87: the voice-borrow site + his candidate/voice-number rows
   # (variant rows 0x10) — see the donovan section's review note.
   "0x00aef2 6 code",
   "0x00aef8 2 code",
   "0x00b668 64 data",
   "0x00bf68 64 data",
+  "0x010dfc 4 code",
+  "0x012a40 4 code",
+  "0x012d18 4 code",
+  "0x012e4e 4 code",
+  "0x012e68 4 code",
   "0x018460 6 code",
   # 14z-84 BACKFILL: the hitclass_map_extend site (the ADOPTED 14z-82c
   # fix, maintainer decision 1 — vsavj's 64-entry projectile hit-class
@@ -249,12 +339,29 @@ writes = [
   # body from the ROMs).
   "0x01a888 6 code",
   "0x01b6aa 6 code",
+  "0x020312 4 code",
+  "0x020318 4 code",
+  # 14z-105 (W1) THE OBORO SELECT HOOK. REVIEWED 14z-128: a [[site_thunk]] on
+  # VANILLA code — the confirm-time `cmpi.b #$2,$382(a6)` at PRG:0x020B9C,
+  # displaced and re-executed inside the thunk, so vanilla's own
+  # Gallon-variant idiom one cell over (Gallon + START + punches -> Dark
+  # Gallon 0x12) is preserved BY CONSTRUCTION. Profile-gated; no vanilla path
+  # anywhere writes 0x18. Lock: tests/test_oboro_select.sh.
+  "0x020b9c 6 code",
+  # 14z-117 RANDOM SELECT INCLUDES THE TENANTS. REVIEWED 14z-128: two
+  # profile-gated [[site_thunk]]s on vanilla select code — the random bound
+  # and the roster draw table. Lock: tests/test_random_select_tenants.sh.
+  "0x020c74 6 code",
+  "0x020c80 6 code",
   "0x021224 8 data",
   "0x02122c 8 data",
   "0x02123c 8 data",
   "0x021264 8 data",
   "0x02126c 8 data",
   "0x02127c 8 data",
+  "0x02163a 4 code",
+  "0x021adc 4 code",
+  "0x021dec 4 code",
   "0x022a0e 6 code",
   "0x0282f4 2 code",
   "0x028386 6 code",
@@ -287,11 +394,66 @@ writes = [
   "0x060ef0 6 code",
   "0x06c0e0 6 code",
   "0x080aec 4 code",
+  # 14z-102 (GitHub #109) THE DARK FORCE CLONE-MODE BEAM EMITTER. REVIEWED
+  # 14z-128: a [[code_ptr]] into effect-class ROW 31, which vsav ships as a
+  # STUB (0x00080B44) while vs2 and vh2 both fill it. The deadness claim is
+  # measured, not assumed: 0 reads of slot PRG:0x080B28 across replays
+  # 02/07/09/30 AND both long mash marathons (21_don_mash, 26_don_arcade_mash
+  # — the two that broke the type-6 deadness claim at 14z-89, included on
+  # purpose), against a 2418-hit row-0 control on the same instrument, and
+  # `old_hex` pins the slot to the stub so a moved table fails the build.
+  # Locks: tests/audit_effect_class_rows.sh (the deadness),
+  # tests/audit_clone_beam_lines.sh (the behaviour, burst-control must-fire).
+  "0x080b28 4 code",
   "0x08245c 6 code",
   "0x0898a4 2 poke16",
   "0x089944 4 poke32",
   "0x089948 4 poke32",
+  # 14z-99 (GitHub #104) THE CAPTURE-POSE KEYFRAME BLOCKS, maintainer-ruled
+  # option (a). REVIEWED 14z-128, and this is the group that most needed it:
+  # rows 0x00-0x0F of the capture-keyframe pointer table 0x0BE27A[attacker]
+  # are LEGACY attacker rows, plus row 0x18 (Oboro, which follows Bishamon).
+  # The capture positioner (PRG:0x02802E) resolves the ATTACKER's block
+  # through this table and then indexes its 32-word head by the VICTIM's id
+  # UNMASKED; vsavj's blocks alias rows 0x10-0x1F onto 0x00-0x0F, so a TENANT
+  # victim was held on the base character's sub-block (Donovan got Victor's,
+  # Phobos got Bulleta's). Each row is repointed to that attacker's vs2 block,
+  # ported VERBATIM into wide_ext.
+  #
+  # THE LEGACY-SAFETY PREMISE IS VERIFIED, not asserted:
+  # tests/test_capture_pose_sources.sh section 5 — "every base sub-block
+  # byte-identical vsavj vs vs2 (16/16)" — with its own must-fire control
+  # (8b, a corrupted base sub-block IS detected). So a legacy attacker
+  # capturing a legacy victim reads the same bytes it always did. Measured
+  # legacy A/B at the 14z-99 rehearsal: EXACTLY ONE differing frame (f890,
+  # the ratified §4 class-4 select-init pointer cache), bit-identical from
+  # f891 through full matches including the grab-heavy legacy leg (replay 96
+  # unpoked). `only_variant_slot` skips them on the stock track. Lock:
+  # tests/audit_don_grab_pose.sh (EXPECT_MATCH=1).
+  #
+  # NINE OF THESE SEVENTEEN WERE INVISIBLE TO THIS AUDIT UNTIL 14z-128 (rows
+  # 0x08-0x0F and 0x18): bank_map's `gap_be27a` is kind=auto carrying the
+  # scanner's DEFAULT stride, so the variant-row exemption this tool computes
+  # landed on those very rows. Fixed in tools/audit_shared_writes.py
+  # variant_tables(); locked by tests/test_shared_writes.sh section 4.
+  "0x0be27a 4 poke32",
+  "0x0be27e 4 poke32",
+  "0x0be282 4 poke32",
+  "0x0be286 4 poke32",
+  "0x0be28a 4 poke32",
+  "0x0be28e 4 poke32",
+  "0x0be292 4 poke32",
+  "0x0be296 4 poke32",
+  "0x0be29a 4 poke32",
+  "0x0be29e 4 poke32",
+  "0x0be2a2 4 poke32",
+  "0x0be2a6 4 poke32",
+  "0x0be2aa 4 poke32",
+  "0x0be2ae 4 poke32",
+  "0x0be2b2 4 poke32",
+  "0x0be2b6 4 poke32",
   "0x0be2ba 4 poke32",
+  "0x0be2da 4 poke32",
   "0x2672ea 4 poke32",
   "0x26736a 4 poke32",
   "0x2673ea 4 poke32",
@@ -318,9 +480,26 @@ writes = [
 
 [[tenant]]
 name = "pyron"
-build = "build/pyron26"
-count = 76
+build = "build/pyron36"
+count = 100
 writes = [
+  # 14z-96 (GitHub #101) THE KERNEL VOICE-TABLE PORT, maintainer-ruled option
+  # (a). REVIEWED 14z-128: these four words are THIS TENANT'S OWN variant-half
+  # entry of the sound kernel's four per-class voice tables (vsavj bases
+  # 0x3BCE / 0x3C3A / 0x3CA6 / 0x3D10, variant half at +0x20, one WORD per
+  # class — so the address is base + 0x20 + 2*(id - 0x10): donovan 0x13 ->
+  # +0x26, phobos 0x10 -> +0x20, pyron 0x11 -> +0x22, which is what the three
+  # tenants' differing addresses are). Legacy classes are 0x00-0x0F and never
+  # read the variant half. vsavj ships that half as byte-copies of the base
+  # rows, which is exactly why a tenant class fired the LEGACY alias voice
+  # (the merged-m2 electrocute grunt). `only_variant_slot` skips them on the
+  # stock track, where the tenant sits at 0x0F and reads the legacy row
+  # anyway. Locks: tests/test_kernel_voice_tables.sh (static),
+  # tests/audit_hui_grunt.sh (the dynamic A/B over five electrocutions).
+  "0x003bf0 2 code",
+  "0x003c5c 2 code",
+  "0x003cc8 2 code",
+  "0x003d32 2 code",
   # 14z-91 THE WALKER RELOCATION. REMOVED: "0x054470 6 code" and
   # "0x05e542 6 code" — the obj_hook dispatch sites are VANILLA again, so
   # the two engine-site writes that used to install `jmp thunk` are gone.
@@ -345,32 +524,44 @@ writes = [
   "0x00a18a 4 code",
   "0x00a806 4 code",
   "0x00abce 4 code",
-  "0x010dfc 4 code",
-  "0x012a40 4 code",
-  "0x012d18 4 code",
-  "0x012e4e 4 code",
-  "0x012e68 4 code",
-  "0x020312 4 code",
-  "0x020318 4 code",
-  "0x02163a 4 code",
-  "0x021adc 4 code",
-  "0x021dec 4 code",
   # 14z-87: the voice-borrow site + his candidate/voice-number rows
   # (variant rows 0x11) — see the donovan section's review note.
   "0x00aef2 6 code",
   "0x00aef8 2 code",
   "0x00b6a8 64 data",
   "0x00bfa8 64 data",
+  "0x010dfc 4 code",
+  "0x012a40 4 code",
+  "0x012d18 4 code",
+  "0x012e4e 4 code",
+  "0x012e68 4 code",
   # 14z-84 BACKFILL: the hitclass_map_extend site (ADOPTED 14z-82c, the
   # f7997 fix) — shipped in pyron-m3 but this inventory was never
   # regenerated past pyron20. Review = the adoption record.
   "0x01a888 6 code",
+  "0x020312 4 code",
+  "0x020318 4 code",
+  # 14z-105 (W1) THE OBORO SELECT HOOK. REVIEWED 14z-128: a [[site_thunk]] on
+  # VANILLA code — the confirm-time `cmpi.b #$2,$382(a6)` at PRG:0x020B9C,
+  # displaced and re-executed inside the thunk, so vanilla's own
+  # Gallon-variant idiom one cell over (Gallon + START + punches -> Dark
+  # Gallon 0x12) is preserved BY CONSTRUCTION. Profile-gated; no vanilla path
+  # anywhere writes 0x18. Lock: tests/test_oboro_select.sh.
+  "0x020b9c 6 code",
+  # 14z-117 RANDOM SELECT INCLUDES THE TENANTS. REVIEWED 14z-128: two
+  # profile-gated [[site_thunk]]s on vanilla select code — the random bound
+  # and the roster draw table. Lock: tests/test_random_select_tenants.sh.
+  "0x020c74 6 code",
+  "0x020c80 6 code",
   "0x021224 8 data",
   "0x02122c 8 data",
   "0x02123c 8 data",
   "0x021264 8 data",
   "0x02126c 8 data",
   "0x02127c 8 data",
+  "0x02163a 4 code",
+  "0x021adc 4 code",
+  "0x021dec 4 code",
   "0x0282f6 2 code",
   "0x02a8c6 2 code",
   "0x02b598 6 code",
@@ -391,6 +582,50 @@ writes = [
   "0x0898a6 2 poke16",
   "0x08994c 4 poke32",
   "0x089950 4 poke32",
+  # 14z-99 (GitHub #104) THE CAPTURE-POSE KEYFRAME BLOCKS, maintainer-ruled
+  # option (a). REVIEWED 14z-128, and this is the group that most needed it:
+  # rows 0x00-0x0F of the capture-keyframe pointer table 0x0BE27A[attacker]
+  # are LEGACY attacker rows, plus row 0x18 (Oboro, which follows Bishamon).
+  # The capture positioner (PRG:0x02802E) resolves the ATTACKER's block
+  # through this table and then indexes its 32-word head by the VICTIM's id
+  # UNMASKED; vsavj's blocks alias rows 0x10-0x1F onto 0x00-0x0F, so a TENANT
+  # victim was held on the base character's sub-block (Donovan got Victor's,
+  # Phobos got Bulleta's). Each row is repointed to that attacker's vs2 block,
+  # ported VERBATIM into wide_ext.
+  #
+  # THE LEGACY-SAFETY PREMISE IS VERIFIED, not asserted:
+  # tests/test_capture_pose_sources.sh section 5 — "every base sub-block
+  # byte-identical vsavj vs vs2 (16/16)" — with its own must-fire control
+  # (8b, a corrupted base sub-block IS detected). So a legacy attacker
+  # capturing a legacy victim reads the same bytes it always did. Measured
+  # legacy A/B at the 14z-99 rehearsal: EXACTLY ONE differing frame (f890,
+  # the ratified §4 class-4 select-init pointer cache), bit-identical from
+  # f891 through full matches including the grab-heavy legacy leg (replay 96
+  # unpoked). `only_variant_slot` skips them on the stock track. Lock:
+  # tests/audit_don_grab_pose.sh (EXPECT_MATCH=1).
+  #
+  # NINE OF THESE SEVENTEEN WERE INVISIBLE TO THIS AUDIT UNTIL 14z-128 (rows
+  # 0x08-0x0F and 0x18): bank_map's `gap_be27a` is kind=auto carrying the
+  # scanner's DEFAULT stride, so the variant-row exemption this tool computes
+  # landed on those very rows. Fixed in tools/audit_shared_writes.py
+  # variant_tables(); locked by tests/test_shared_writes.sh section 4.
+  "0x0be27a 4 poke32",
+  "0x0be27e 4 poke32",
+  "0x0be282 4 poke32",
+  "0x0be286 4 poke32",
+  "0x0be28a 4 poke32",
+  "0x0be28e 4 poke32",
+  "0x0be292 4 poke32",
+  "0x0be296 4 poke32",
+  "0x0be29a 4 poke32",
+  "0x0be29e 4 poke32",
+  "0x0be2a2 4 poke32",
+  "0x0be2a6 4 poke32",
+  "0x0be2aa 4 poke32",
+  "0x0be2ae 4 poke32",
+  "0x0be2b2 4 poke32",
+  "0x0be2b6 4 poke32",
+  "0x0be2da 4 poke32",
   "0x2672ee 4 poke32",
   "0x26736e 4 poke32",
   "0x2673ee 4 poke32",
