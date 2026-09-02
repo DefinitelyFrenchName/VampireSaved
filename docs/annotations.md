@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 2923 |
+| distinct program-space addresses named | 2925 |
 | named by a document or manifest only | 2035 |
 | named by both a document/manifest and code | 582 |
-| named by CODE ONLY (the gap list below) | 306 |
+| named by CODE ONLY (the gap list below) | 308 |
 | carried by atlas | 473 |
 | carried by engine_internals | 534 |
 | carried by other docs | 930 |
 | carried by manifests | 1756 |
-| carried by code | 888 |
+| carried by code | 890 |
 
 ## Addresses
 
@@ -920,7 +920,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x027EEC` | docs/game/engine_internals.md — THE ENGINE TICK IS DIRECTLY OBSERVABLE — a write tap on '+0x20' is a TICK-ACCURATE instrument (14z-126b); tools/tick_durations.py |
 | `PRG:0x027F16` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — THE VOICE-CLASS BORROW: '(0x382,A6)' is the fighter's voice-FLAVOR class (measured 14z-87); docs/game/engine_internals.md — The per-node sfx dispatcher and per-char record arrays (14z-52); docs/game/gotchas.md — +0x382 is the char id only at SELECT — in match it is the VOICE-FLAVOR CLASS, and the engine reassigns it (14z-87); tests/audit_voice_borrow.sh |
 | `PRG:0x027F18` | build/manifest/pcrel_escapes.toml — don_m18; build/manifest/pcrel_escapes.toml — hui52; build/manifest/pcrel_escapes.toml — pyron36 |
-| `PRG:0x027F70` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/game/engine_internals.md — THE ENGINE TICK IS DIRECTLY OBSERVABLE — a write tap on '+0x20' is a TICK-ACCURATE instrument (14z-126b); build/manifest/reconciliation.toml — map; tests/test_tick_durations.sh; tools/tick_durations.py |
+| `PRG:0x027F70` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/game/engine_internals.md — THE ENGINE TICK IS DIRECTLY OBSERVABLE — a write tap on '+0x20' is a TICK-ACCURATE instrument (14z-126b); build/manifest/reconciliation.toml — map; tests/test_tick_durations.sh; tools/crosscheck_framedata.py; tools/tick_durations.py |
 | `PRG:0x027F78` | build/manifest/pcrel_escapes.toml — don_m18; build/manifest/pcrel_escapes.toml — hui52; build/manifest/pcrel_escapes.toml — pyron36 |
 | `PRG:0x027F88` | docs/game/engine_internals.md — THE ENGINE TICK IS DIRECTLY OBSERVABLE — a write tap on '+0x20' is a TICK-ACCURATE instrument (14z-126b); tools/tick_durations.py |
 | `PRG:0x027FA0` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/project/gotchas.md — two traps from the #104 re-measurement — both produced a CONFIDENT WRONG ANSWER from a working instrument (paid: 14z-99) |
@@ -2895,6 +2895,8 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x1586FF` | tests/test_don_reactions.sh |
 | `PRG:0x180000` | tests/test_mister_page.sh; tools/audit_pointer_flow.py |
 | `PRG:0x190000` | tests/test_qs_id_table.sh |
+| `PRG:0x1C6EBE` | tools/tick_durations.py |
+| `PRG:0x1C6ED6` | tools/tick_durations.py |
 | `PRG:0x1F9FC0` | tests/test_phasec_spaces.sh |
 | `PRG:0x248000` | tools/overlay_port.py |
 | `PRG:0x2499F0` | tests/test_biased_list_inventory.sh |

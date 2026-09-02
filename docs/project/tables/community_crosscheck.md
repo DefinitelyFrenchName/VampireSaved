@@ -169,24 +169,22 @@ itself never states.
 
 All six of Jedah's crouching normals (and Lilith's `2MK`) read `+3` where every
 other character reads `+2`. ~~by finding 1 the available instrument cannot resolve
-a one-frame question. Left open rather than guessed.~~ **ARBITRATED IN THE
-EMULATOR, in ENGINE TICKS.** The instrument the entry said did not exist does:
-a write tap fires per WRITE, and `PRG:0x027F70` (`subq.b #$1,$20(a6)`) IS one
-engine tick, so multi-tick frames — which is exactly what defeated the
-frame-rate trace — are fully visible.
+a one-frame question. Left open rather than guessed.~~ **ARBITRATED IN THE EMULATOR,
+IN ENGINE TICKS.** The instrument that entry said did not exist does: a write tap
+fires per WRITE, and `PRG:0x027F70` (`subq.b #$1,$20(a6)`) IS one engine tick, so
+the multi-tick frames that defeat a frame-rate trace are fully visible.
 
-**MEASURED: 18 of 18 derived totals equal the engine's tick count exactly**, for
-JE, LI and DE, with no tolerance (`tests/test_tick_durations.sh`,
-`tools/tick_durations.py`). Jedah's six: 13/29/66/13/29/57 derived, 13/29/66/13/29/57
-measured.
+**MEASURED: 18 of 18 derived totals equal the engine's tick count EXACTLY** (JE, LI,
+DE crouching normals, no tolerance — `tools/tick_durations.py`,
+`tests/test_tick_durations.sh`). Jedah's six: 13/29/66/13/29/57 derived, and the
+same six measured.
 
-**THE ARBITRATION.** Our `startup` and `active` are not flagged for these
-characters — they agree with the workbook under its own stated conventions — and
-the TOTAL is now ground truth. Since total = startup + active + recovery, our
-recovery is right, and the workbook's recovery for those seven moves sits one
-frame below its own convention. **The residue is in the workbook's data, not
-ours.** Measurement is king (the maintainer's rule): a source we cannot see the
-method of loses to a tick count from the engine itself.
+**THE ARBITRATION.** Our `startup` and `active` are not flagged for these characters
+— they agree with the workbook under its own stated conventions — and the TOTAL is
+now ground truth. Since total = startup + active + recovery, our recovery is right,
+and the workbook's for those seven moves sits one frame below its own convention.
+Measurement is king: a source whose method we cannot see loses to a tick count
+taken from the engine itself.
 
 ## Every INCONSISTENT column — per character (the moves are on the full page)
 
@@ -341,27 +339,21 @@ method of loses to a tick count from the engine itself.
   engine ticks, so it cannot resolve a one-frame question. A tick-accurate
   instrument would settle whether either side is counting wrongly; neither is
   assumed to be.
-- ~~**Jedah's crouching recovery (+3, not +2) is unexplained**~~ **CLOSED 2026-09-02: measured in engine ticks, 18/18 exact — the residue is the workbook's, not ours** — see the arbitration
-  section. Lilith's `2MK` behaves the same way.
-- **The aerial outliers — PARTLY RESOLVED 2026-09-02, and the likely cause is now
-  NAMED** (BI `J.HP`/`J.LP`, BU `J.MP`, VI `J.HP`, FE `J.HK`/`J.LK`, SA `J.MP`).
-  ~~A jumping normal's chain is entered from the jump, and no rig here separated
-  the two.~~ `tools/tick_durations.py` now separates them for chains that LOOP:
-  an aerial repeats until landing, either back to its start (BI `J.LP`) or to a
-  late node (BI `J.MP`, `0x1c6ed6 -> 0x1c6ebe`), and closing the span there gives
-  ONE FORWARD PASS. **BI measures 5/6 exact** — and the miss is a flagged move:
-  `J.HP` derives 28 where the engine spends **27**. BU gives `J.LK`/`J.LP` exact.
-  **STILL NOT SEPARABLE:** an aerial whose last node HOLDS with no further
-  pointer write before landing (VI, FE, SA) is closed by neither condition and
-  still reports airtime — identical numbers across that character's moves are
-  the tell, not a result.
-  **THE LIKELY CAUSE, from the community corpus and not yet measured:** the
-  mizuumi pages distinguish **NEUTRAL-jump from FORWARD-jump variants of the
-  same button** — `8J.LP` vs `9J.LP`, `J.HP8` vs `9J.HP` — where our slot map
-  carries ONE chain per aerial button. If the flagged moves are exactly those
-  whose two variants differ, the outlier is a variant we collapse rather than an
-  arithmetic error. That is the first thing to test, and it needs a rig that
-  performs both jump directions.
+- ~~**Jedah's crouching recovery (+3, not +2) is unexplained**~~ **CLOSED 2026-09-02:
+  measured in engine ticks, 18/18 exact — the residue is the WORKBOOK'S, not ours**
+  — see the arbitration section. Lilith's `2MK` behaves the same way.
+- **The aerial outliers — PART-RESOLVED 2026-09-02, and the likely cause is NAMED**
+  (BI `J.HP`/`J.LP`, BU `J.MP`, VI `J.HP`, FE `J.HK`/`J.LK`, SA `J.MP`).
+  `tools/tick_durations.py` separates the move from the jump for chains that LOOP:
+  an aerial repeats until landing, back to its start (BI `J.LP`) or to a late node
+  (BI `J.MP`). **BI measures 5/6 exact** and the miss is a flagged move — `J.HP`
+  derives 28 where the engine spends 27; BU `J.LK`/`J.LP` are exact. STILL NOT
+  SEPARABLE: aerials whose last node HOLDS with no further pointer write before
+  landing (VI, FE, SA) still report AIRTIME — identical numbers across a
+  character's moves are the tell, not a result. **LIKELY CAUSE, from the community
+  corpus and NOT yet measured:** mizuumi distinguishes NEUTRAL- from FORWARD-jump
+  variants of the same button (`8J.LP` vs `9J.LP`) where our slot map carries ONE
+  chain per aerial button. Needs a two-direction jump rig.
 - **Specials, supers, EX/ES moves, throws, pursuits and the `6`-prefixed command
   normals are not joined.** Each needs its own measured naming rig on vsavj, the way
   `tools/name_moves.py` did for the tenants. That is the bulk of the workbook's 730
