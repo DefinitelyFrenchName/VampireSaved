@@ -312,6 +312,75 @@ what a triage is looking at, so those are where the thinking time goes.
 
 ## Decisions pending (human)
 
+- **THE EMULATOR-TIER RELEASE SCOPE — PROPOSED 14z-128, THE MAINTAINER'S TO
+  RULE.** `tests/ci_emulator.tsv` gives every one of the 164 emulator-tier
+  gates a `scope` of `release` or `out`, and that column is what
+  `tests/run_all_emulator.sh` hard-fails on at release. **139 release, 25
+  out.** The discriminator is the maintainer's own (STATE "RELEASE-TIME TEST
+  SCOPE"): the SUBJECT of the test, not the romsets it touches. Every `out`
+  row leads with a reason keyword so the judgement can be checked row by row
+  rather than argued in bulk:
+  **`romset:`** (12) — the subject is a reference romset's own behaviour, not
+  ours: `audit_wide_phase_a`, `audit_id_writers`, `audit_palette_seq_ids`,
+  `audit_ladder_selector`, `audit_df_accumulator`, `audit_df_dead_family`,
+  `audit_front_comparator`, `test_advancing_guard`, `test_killshread_es`,
+  `test_tick_durations`, `test_vanilla_frame_join`, `audit_sdram_bank_load`,
+  plus `test_down_flash_vanilla` / `test_down_flash_mechanism` (#113's
+  "vanilla, not ours" verdict — kept deliberately, and the borderline one:
+  their subject is vanilla vsav but what they protect is a claim about OUR
+  build).
+  **`momentary:`** (7) — a specific probe for one investigation:
+  `audit_ff0460_writer`, `audit_mask_window_ff42a2`, `audit_continue_ladder`,
+  `audit_hitclass_map_cost`, `audit_phase_mode_cost`,
+  `audit_objhook_owner_census`, `audit_region_movability`.
+  **`dev-ladder:`** (4) — the subject is a scratch dev build:
+  `test_m2a_stage1_nullreloc`, `test_m2a_stage2_data`, `test_m2a_stage3_anim`,
+  `test_m2a_stage4_code`.
+  **`out` NEVER MEANS "DO NOT RUN"** — `--scope all` runs them and the sweep
+  does, because a gate nobody runs rots whether or not it gates a release.
+  **THE JUDGEMENT CALLS worth a look:** (1) the two #113 gates above; (2) the
+  MiSTer lane is `release` (a release ships `release/<name>/mister/`), which
+  makes a release cost the Verilator lane — hours, and `--lane mister` is
+  opt-in for that reason; (3) the four `dev-ladder` gates still exercise the
+  BUILDER, so an argument exists for calling them release-scope pipeline
+  locks. No change is needed for the arc to proceed; the ruling decides what a
+  release hard-fails on.
+
+- **THE `gap_be27a` / `gap_be2ba` BANK-MAP ROWS ARE WRONG, AND CORRECTING THEM
+  CAN MOVE BUILD OUTPUT (found 14z-128, NOT fixed).** `bank_map.toml` models
+  ONE 32-long table — the capture-keyframe pointer table `PRG:0x0BE27A`,
+  entry size 4 — as TWO `kind = "auto"` rows of `stride = 0x40`, i.e. as two
+  32-entry WORD tables. **Measured three ways that the entries are longwords:**
+  bank_map's own `note` calls it "the 32-LONG capture-keyframe pointer table";
+  `donovan.toml`'s `slot_ptr_table = 0xBE27A` places row 0x00 at 0xBE27A and
+  row 0x01 at 0xBE27E; the values written are 32-bit ROM pointers.
+  **Two consequences already measured.** (1) `audit_shared_writes.py` computes
+  its variant-row exemption as `base + 0x10*es .. base + 0x20*es` with
+  `es = stride/32`, so the wrong stride put the exemption on LONGWORD ROWS
+  0x08-0x0F — eight LEGACY rows — and nine writes per tenant were invisible to
+  the shared-surface guard. CONTAINED 14z-128 (a `kind = "auto"` row now grants
+  no exemption at all), not fixed at the root. (2) The generated
+  character-data pages read both rows at the wrong address —
+  `docs/project/tables/chars/huitzil.md` prints `gap_be27a` at `0x0be29a`,
+  which is BISHAMON's longword row, and donovan's `0x0be2a0` is not even
+  4-aligned.
+  **WHY IT IS NOT FIXED HERE:** the correction is one row
+  (`vsavj = 0x0BE27A`, `kind = "data_ptr"`, `stride = 0x80`) replacing two,
+  and the tiling is preserved exactly (0xBE27A + 0x80 = 0xBE2FA = `param32_b`).
+  But `kind` is LOAD-BEARING: `extract_char.py` takes a different extraction
+  path for `auto` than for `data_ptr` (:1289 vs :1321) and
+  `gen_donovan_patch.py` gives `data_ptr`/`code_ptr` tables pointer treatment
+  (:3514). So it can move BUILD OUTPUT, which makes it a measured change with
+  a rebuild and a diff, not a manifest tidy.
+  **RECOMMENDED:** do it in a build-touching window — rebuild one track,
+  diff `patch.json` against the current freeze, and expect either zero op
+  movement (then it is a pure map fix + a charmap re-freeze) or a named delta
+  that has to be understood before it ships. Half a session. Meanwhile the
+  containment holds and `tests/test_shared_writes.sh` section 4 locks it.
+  **AND THE OTHER `kind = "auto"` ROWS ARE UNAUDITED:** 21 of them exist; only
+  these two were exempting anything, but none of their strides is a
+  measurement.
+
 - **THE BOOT NAME SCREEN: "SAVIOR" -> "SAVED" — DECIDED AND SPECIFIED
   (maintainer, 2026-09-02), NOT YET BUILT.** Scoped and measured 14z-127; the
   mechanism and the trap are in `docs/game/gotchas.md` "THE BOOT NAME SCREEN'S
