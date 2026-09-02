@@ -171,9 +171,9 @@ test_pyron_medallion_2p	mame	release	-	the P2-hover half of medallion palette st
 audit_continue_switch	mame	release	-	the #99 continue+switch lock
 audit_don_vs_cpu	mame	release	-	the deterministic Donovan-vs-CPU pairing (#111) — the coverage gap #99 fell through
 audit_don_grab_pose	mame	release	-	the #104 lock: a legacy grab holding a TENANT victim
-audit_don_ko_writer	mame	release	-	the #103 root-cause lock. PREDICTION: EXPECT_DEFECT defaults to 1 (the pre-fix state) and #103 shipped fixed at 14z-99, so a default run should go RED as ROT, not as a regression.
-audit_don_lilith_ko	mame	release	-	the #103 stall repro. Same shape: EXPECT_STALL defaults to 1, the pre-fix state.
-audit_win_pal_auto	mame	release	-	the #105 lock. Same shape: EXPECT_WHITE defaults to 1, the pre-fix state.
+audit_don_ko_writer	mame	release	-	the #103 root-cause lock. The header read as if EXPECT_DEFECT still defaulted to 1; MEASURED 14z-128 — the code default was flipped to 0 at the 14z-99 window and only the header was stale (corrected).
+audit_don_lilith_ko	mame	release	-	the #103 stall repro. Same stale-header shape as audit_don_ko_writer; the code default is 0. Its BUILD default names build/m3b_merged11, which no longer exists.
+audit_win_pal_auto	mame	release	-	the #105 lock. Same stale-header shape; the code default is 0 (flipped at 14z-99).
 audit_df_framework	mame	release	-	the ruled DF table: cost 1 stock, durations 360/360/377/360
 audit_df_gold	mame	release	-	Phobos' DF uploads HIS gold block; Bulleta's does not leak it
 audit_down_attack	mame	release	-	hitting a downed opponent, both directions per tenant

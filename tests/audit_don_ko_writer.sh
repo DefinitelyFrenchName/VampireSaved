@@ -15,7 +15,13 @@
 # while white sits ~200. The next ordinary hit underflows hp with white
 # still positive; the judge never fires; the round stalls ~8,000f (#103).
 #
-# LEG A (Donovan, EXPECT_DEFECT=1 default) asserts the DEFECT IS STILL
+# STATUS (corrected in place 14z-128): #103 SHIPPED FIXED at the 14z-99
+# window and the default was flipped there — `EXPECT_DEFECT` defaults to 0,
+# the post-fix expectation, and the paragraphs below describe the pre-fix
+# world they were written in. Run it bare; pass EXPECT_DEFECT=1 only to
+# re-measure the old shape on an old build.
+#
+# LEG A (Donovan, EXPECT_DEFECT=1) asserts the DEFECT IS STILL
 # THERE on the current build (the #98/audit_don_lilith_ko discipline):
 #   - a write to $FF8450 from a PC inside the placed x026142/x066ec4
 #     window (the escape path; measured PC 0x0CD286 on don_m8/merged-m3)
@@ -38,7 +44,7 @@
 # FLOWED 560 — the healthy legacy constant.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged11]
-#        [EXPECT_DEFECT=1] tests/audit_don_ko_writer.sh
+#        [EXPECT_DEFECT=1] tests/audit_don_ko_writer.sh   # default is 0
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):

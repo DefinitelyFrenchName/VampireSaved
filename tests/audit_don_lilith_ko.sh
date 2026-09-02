@@ -76,10 +76,16 @@
 # inventory: Donovan/Lilith 7,980; Victor/Lilith 580 on both merged and
 # vanilla. Threshold 3000 -- over 5x the healthy flow, under half the stall.
 #
+# STATUS (corrected in place 14z-128): #103 SHIPPED FIXED at the 14z-99
+# window and the default was flipped there — `EXPECT_STALL` defaults to 0,
+# the post-fix expectation. The paragraphs above describe the pre-fix world
+# they were written in; the BUILD default below is a 14z-91-era dir that no
+# longer exists, so pass BUILD= or let the arc's registry pass it.
+#
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged11]
-#        [EXPECT_STALL=1] tests/audit_don_lilith_ko.sh
-#   EXPECT_STALL=0 rehearses the post-fix state: leg A's gap must then be
-#   under the threshold like leg B's. Flip the default when the fix lands.
+#        [EXPECT_STALL=1] tests/audit_don_lilith_ko.sh   # default is 0
+#   EXPECT_STALL=0 is the post-fix state: leg A's gap must be under the
+#   threshold like leg B's. The default was flipped when the fix landed.
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):

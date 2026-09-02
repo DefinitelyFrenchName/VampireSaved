@@ -33,8 +33,10 @@
 #       be Demitri's base and P2 must be KO'd (white HP < 0) at f5000 —
 #       so a pressed-through or unformed match cannot score.
 #
+# STATUS (corrected in place 14z-128): #105 SHIPPED FIXED at the 14z-99
+# window and the default was flipped there — `EXPECT_WHITE` defaults to 0.
 # LEG A (merged + replay 103) freezes the DEFECT while EXPECT_WHITE=1
-# (the #98 discipline — flip when the fix lands). LEG B (merged + replay
+# (the #98 discipline — flipped when the fix landed). LEG B (merged + replay
 # 61) proves the same screen colored without AUTO — if B ever whites, the
 # defect grew past the AUTO gate. LEG C (vanilla + replay 103) is the
 # not-ours control — if C ever whites, the reading here is wrong and #105
@@ -47,7 +49,7 @@
 # no single frame constant is pinned (the #10 lesson).
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged11]
-#        [EXPECT_WHITE=1] tests/audit_win_pal_auto.sh     (~10 min, 5 MAME runs)
+#        [EXPECT_WHITE=1] tests/audit_win_pal_auto.sh     (~10 min, 5 MAME runs; default is 0)
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):

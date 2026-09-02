@@ -41,7 +41,8 @@
 > ## **donovan 108 writes vs 90 frozen (18 NEW), huitzil 106 vs 87 (19), pyron
 > ## 94 vs 76 (18)** — only 3 per tenant are 14z-127's; the rest is shipped work
 > ## nobody was forced to review (`0x020B9C` Oboro hook, `0x020C74/80` random
-> ## select, `0x0BE27A..96` the #99 AI unpark). **DO NOT re-point and
+> ## select, `0x0BE27A..96` — CORRECTED 14z-128: the #104 CAPTURE-KEYFRAME
+> ## rows, not the #99 AI unpark). **DO NOT re-point and
 > ## re-freeze** — that launders an unreviewed inventory into the gate that
 > ## exists to review it ([VSP-97]). Establish whose bytes each lands on, record
 > ## the `why`, THEN re-point. The inventory is marked STALE in place.

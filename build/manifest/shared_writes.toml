@@ -11,7 +11,17 @@
 # ** other ~15 are shipped work from m8..m14 that NOBODY WAS EVER FORCED **
 # ** TO REVIEW -- e.g. 0x020B9C (the Oboro select hook, 14z-105),        **
 # ** 0x020C74/0x020C80 (random select, 14z-117), 0x0BE27A..0x0BE296      **
-# ** (eight poke32, the #99 AI-script unpark, 14z-111).                  **
+# ** (eight poke32 -- CORRECTED 14z-128: these are the #104 CAPTURE-     **
+# ** KEYFRAME pointer-table rows 0x00-0x07, NOT the #99 AI-script        **
+# ** unpark. The AI unpark is PRG:0xBF01A/09A/11A/19A, whose writes are  **
+# ** genuine variant rows and were never shared surface).                **
+# **                                                                     **
+# ** AND THE AUDIT WAS BLIND TO NINE MORE (14z-128): rows 0x08-0x0F plus **
+# ** 0x18 of the same table were EXEMPTED as 'variant rows' because      **
+# ** bank_map's `gap_be27a` is kind=auto with the scanner's default      **
+# ** stride. Fixed in tools/audit_shared_writes.py; the current counts   **
+# ** are therefore donovan 114 / huitzil 112 / pyron 100, and the NEW    **
+# ** sets are 24 / 25 / 24.                                              **
 # ** DO NOT SIMPLY RE-POINT AND RE-FREEZE: that would launder an         **
 # ** unreviewed inventory into the gate that exists to review it         **
 # ** ([VSP-97]). The work is to establish WHOSE bytes each new write     **
