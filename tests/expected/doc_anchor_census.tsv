@@ -433,3 +433,4 @@ VSP-160	docs/project/porting_sprite_lists.md	Inventories are SPANS, not samples	
 VSP-161	docs/project/porting_sprite_lists.md	Order of work, and the checks at each step	IN-LIST
 VSP-162	CLAUDE.md	5. Working style	IN-LIST
 VSP-163	docs/project/gotchas.md	A TENANT REPLAY AUTHORED FOR THE SUBSTITUTED WHEEL SELECTS A LEGACY CHARACTER ON THE SEPARATED (WIDE	IN-LIST
+VSP-164	HANDOFF.md	THE EMULATOR-TIER COMMAND — `tests/run_all_emulator.sh` (since 14z-128)	IN-LIST

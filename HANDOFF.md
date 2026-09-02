@@ -1092,11 +1092,62 @@ smaller thing to forget to update. Its classifier is TRANSITIVE (follows
 `tests/lib/*.sh` sources), because two gates reach an emulator indirectly and
 were mis-registered on the first pass.
 
-Emulator gates, soaks and one-off rigs are deliberately NOT here — they stay
-manual, and this file is their index. This is also not `run_battery_m2.sh`,
+Emulator gates, soaks and one-off rigs are deliberately NOT here — they have
+their own runner since 14z-128 (below). This is also not `run_battery_m2.sh`,
 which builds a ROM and is the stage-6 dev-build chain.
 
 Ground truth for the runner itself: `tests/test_static_runner.sh`.
+
+### **[VSP-164]** THE EMULATOR-TIER COMMAND — `tests/run_all_emulator.sh` (since 14z-128)
+
+```sh
+ROMDIR=... tests/run_all_emulator.sh                  # prereq + fbneo + mame, release scope
+ROMDIR=... tests/run_all_emulator.sh --scope all      # + the out-of-release-scope rows
+ROMDIR=... tests/run_all_emulator.sh --lane mister    # the Verilator lane, HOURS — opt-in
+ROMDIR=... tests/run_all_emulator.sh --strict         # SKIP and UNREGISTERED are failures too
+tests/run_all_emulator.sh --list                      # the registry, as selected
+ROMDIR=... tests/run_all_emulator.sh --dry-run        # the resolved command per gate
+```
+
+**The registry is `tests/ci_emulator.tsv`** — one row per emulator-tier gate:
+`gate / lane / scope / args / note`. Completeness is enforced BOTH WAYS on
+every run (an emulator-tier script with no row is UNREGISTERED, a row whose
+script is gone is DEAD), with the same transitive classifier
+`run_all_static.sh` uses, so a gate cannot fall between the two runners.
+
+**Why it exists, measured at the 14z-127 close and re-derived by the runner
+itself: 164 emulator-tier gates, 32 reachable from any runner, 132 reachable
+only by typing a filename.** That was survivable while the tier was a
+development instrument; it stopped being survivable when the maintainer ruled
+that at release ALL tests run and *"anything red, anything skipped is a hard
+fail"* (STATE "RELEASE-TIME TEST SCOPE"). A policy of "all tests" cannot
+operate over a set nobody enumerates.
+
+**`scope` is the release decision and the CLASSIFICATION IS PROPOSED, NOT
+RULED** (STATE "Decisions pending"): `release` = the gate's subject is the
+released artifact, legacy content inside it included (an oracle leg on `vsav2`
+or pristine `vsavj` is a REFERENCE, not the subject); `out` = out of release
+scope, and every `out` row leads with its reason keyword — `romset:`,
+`platform:`, `momentary:` or `dev-ladder:`. **`out` never means "do not run":**
+`--scope all` runs them, and the sweep is how they are kept honest.
+
+**The `prereq` lane runs first, sequentially, and a red there STOPS the run.**
+Those gates measure the INSTRUMENTS, and a measurement taken after a moved
+instrument is not evidence ([CPE-24] — `test_mame_parity.sh` is the case that
+named the rule). `--keep-going` overrides.
+
+**`args` defaults to `-`, the gate's OWN defaults, deliberately.** What a
+release run would actually hit is what the sweep must measure — a path-named
+default is a dated assertion with no expiry ([VSP-95]). A row is given explicit
+arguments only once a triage has established what the gate should measure, and
+the `%MERGED% %MERGED_RP% %DON% %HUI% %PYR% %STOCK%` placeholders expand to the
+build set under test (env-overridable; the run prints each build's FINGERPRINT,
+never just its name).
+
+Ground truth for this runner: `tests/test_emulator_runner.sh` (ROM-free, in
+`ci_portable`) — the three verdicts counted separately, SKIP-in-prose,
+MISSING, TIMEOUT, both anti-orphan directions, `--strict`, the prereq stop,
+scope selection and placeholder expansion.
 
 ### Individual gates — the index
 

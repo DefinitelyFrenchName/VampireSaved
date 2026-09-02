@@ -75,6 +75,7 @@ tests/audit_walker_ghost.sh	tenant
 tests/audit_walker_repoint.sh	tenant
 tests/audit_wide_phase_a.sh	platform
 tests/audit_win_pal_auto.sh	tenant
+tests/run_all_emulator.sh	runner
 tests/run_all_static.sh	runner
 tests/run_battery_m2.sh	runner
 tests/run_suite.sh	runner
@@ -128,6 +129,7 @@ tests/test_don_sound.sh	tenant
 tests/test_don_sword.sh	tenant
 tests/test_don_throw_mirror.sh	tenant
 tests/test_down_flash_mechanism.sh	oracle
+tests/test_emulator_runner.sh	runner
 tests/test_tick_durations.sh	character-data
 tests/test_pod_black_foot_palette.sh	oracle
 tests/test_down_flash_vanilla.sh	oracle

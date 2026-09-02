@@ -1,0 +1,215 @@
+# ci_emulator.tsv — THE EMULATOR-TIER REGISTRY (14z-128). One row per gate under
+# tests/ that needs MAME, FBNeo or the Verilator simulator, i.e. every script
+# that tests/run_all_static.sh's classifier calls emulator-tier. It is the
+# input to tests/run_all_emulator.sh and the ONLY place a release's emulator
+# scope is declared.
+#
+# WHY IT EXISTS. Measured at the 14z-127 close: 164 emulator-tier gates, 32 of
+# them reachable from any runner. The other 132 could be run only by typing a
+# filename, so nothing would even ASK them at release. The maintainer's release
+# policy (STATE "RELEASE-TIME TEST SCOPE", 2026-09-02) is that at release ALL
+# tests run and "anything red, anything skipped is a hard fail" — a policy that
+# cannot operate over a set nobody enumerates.
+#
+# COLUMNS   gate <TAB> lane <TAB> scope <TAB> args <TAB> note
+#
+#   gate    the script's basename without .sh
+#   lane    prereq | mame | fbneo | mister
+#           prereq = the instrument and verdict-logic ground truths ([VSP-19]);
+#           they run FIRST because a moved instrument invalidates every result
+#           after it ([CPE-24]). The other three are the three implementations.
+#   scope   release | out
+#           release = its SUBJECT is the released artifact (legacy content
+#           inside it included — an oracle leg on vsav2 or pristine vsavj is a
+#           reference, not the subject).
+#           out     = out of RELEASE scope by the maintainer's discriminator.
+#           OUT IS NOT "DELETE" AND NOT "DO NOT RUN": run_all_emulator.sh
+#           --scope all runs these too, and the sweep is how they are kept
+#           honest. It only means they do not gate a release.
+#   args    the invocation. `-` = the gate's OWN defaults, deliberately: what a
+#           release run would actually hit is what the sweep must measure
+#           ([VSP-95] — a path-named default is a dated assertion with no
+#           expiry). Tokens shaped VAR=value before the script are passed as
+#           environment, the rest positionally; %MERGED% %MERGED_RP% %DON%
+#           %HUI% %PYR% %STOCK% expand to the build set under test.
+#   note    for scope=out the REASON, and it must lead with one keyword:
+#             romset:      the subject is a reference romset's own behaviour
+#                          (vanilla vsavj or native vs2), not ours
+#             platform:    the subject is another platform
+#             momentary:   a specific probe for one investigation
+#             dev-ladder:  the subject is a scratch dev build, not the artifact
+#           for scope=release, free text (a runtime hint, a known trap).
+#
+# THE CLASSIFICATION IS PROPOSED, NOT RULED. Which gates gate a release is the
+# maintainer's call (STATE "Decisions pending"); every `out` row states its
+# reason so the judgement can be checked row by row rather than argued in bulk.
+#
+# COMPLETENESS IS ENFORCED BOTH WAYS by run_all_emulator.sh: an emulator-tier
+# script with no row is UNREGISTERED, a row whose script is gone is DEAD.
+#
+# gate	lane	scope	args	note
+
+test_mame_parity	prereq	release	-	THE instrument gate: the pinned MAME source build must reproduce every frozen oracle log before the profile patch goes near it ([CPE-24]). Run it FIRST.
+test_mame_determinism	prereq	release	-	RUNS defaults high; MAME's own run-to-run determinism
+test_attract_determinism	prereq	release	-	M0 acceptance, 3600 frames
+test_decrypt_oracle	prereq	release	-	python decrypt == MAME opcode space
+test_crash_guard	prereq	release	-	clean negative + vec4/vec3 positive controls ([VSP-19])
+test_input_integrity	prereq	release	-	ground truth for the input-integrity check
+test_replay_video_selfcheck	prereq	release	-	ground truth for replay.lua VIDEO_OUT
+test_record_window	prereq	release	-	ground truth for record_window.lua; REC_BUILD default may have rotted
+test_obj_records	prereq	release	-	ground truth for tools/oram_obj_records.py
+test_patch_prg	prereq	release	-	the program patcher round-trips through MAME
+test_suite_dispatch	prereq	release	-	ground truth for the auto-detecting runner's dispatch
+test_movability_liveness	prereq	release	-	a dead emulator must not score as a successful movability run
+test_guard_integrity	prereq	release	-	the crash guard carries the input-integrity assertion (#31)
+test_mask_ranges_reader	prereq	release	-	the MASK_RANGES reader masks exactly the spec (#61)
+test_compare_fields_selfcheck	prereq	release	-	ground truth for the dual-emulator field comparator
+audit_kill_poke_shape	prereq	release	-	GROUND TRUTH FOR RIG AUTHORS, frozen both ways ([VSP-125])
+test_fbneo_smoke	prereq	release	-	FBNeo boots and soaks
+test_fbneo_replay_determinism	prereq	release	-	FBNeo run-to-run determinism (the EEPROM sandbox fix)
+test_fbneo_runner_hygiene	prereq	release	-	a failed FBNeo run must not leave the previous run's artifacts (#12)
+test_fbneo_instruments	prereq	release	-	ground truth for the B5b FBNeo instruments
+test_wide_profile	fbneo	release	-	THE EMULATOR SUPERSET INVARIANT ([VSP-24]): patched binary vs reference on pristine vsavj. Needs FBNEO_REF.
+test_dualtrack	fbneo	release	-	dual-track inertness up to select entry ([VSP-25])
+test_fbneo_legacy_oracle	fbneo	release	-	the SAMPLED hacked-vs-vanilla legacy check ([VSP-24]/[VSP-26])
+test_phasec_image	fbneo	release	-	the program extension is genuinely READ
+test_hui_fx_flow	fbneo	release	-	the effect-flow attribution gate (14z-68)
+audit_ff0460_writer	fbneo	out	-	momentary: an investigation probe — who writes RAM:$FF0460
+test_mame_wide	mame	release	-	the WIDE profile gate, MAME side (superset invariant + inertness + B4 canary)
+audit_merged_legacy	mame	release	-	does the 3-tenant merged program image perturb LEGACY
+audit_legacy_pairings	mame	release	-	is every legacy replay compared against VANILLA rather than itself ([VSP-36])
+audit_roster_pairings	mame	release	-	EVERY tenant against EVERY character, both sides; ~1 h
+audit_guard_corpus	mame	release	-	the whole replay corpus x 4 legs under the crash guard
+audit_flicker_attribution	mame	release	-	re-derives WHY each frozen flicker frame is there; BUILD default is a 14z-91 build
+audit_mask_window_ff4182	mame	release	-	the third masked window
+audit_merged_vec3	mame	release	-	the merged Huitzil satellite anim-base regression gate
+test_inp_corpus	mame	release	-	EVERY tracked hand-played recording, no exception ([VSP-20])
+test_inp_crash_merged_m8_01	mame	release	-	the #99 natural-path capture as a gate
+test_pod_black_foot_palette	mame	release	-	#112's black foot, causally located
+test_m2a_stage4_oracle	mame	release	-	ported Donovan vs NATIVE Donovan on vsav2 (dual-oracle, two-game form)
+test_m2a_stage4_xemu	mame	release	-	MAME/FBNeo agreement at the match-start anchor ([VSP-32])
+audit_mask_window_ff42a2	mame	out	-	momentary: a pre/post attribution instrument for a select-palette row move; it needs two rompaths and a replay list, so it has no standing operands ([VSP-35])
+test_down_flash_vanilla	mame	out	-	romset: the subject is VANILLA vsav's one-frame white-out (#113 ground truth). Kept deliberately — it is what keeps the 'vanilla, not ours' verdict honest.
+test_down_flash_mechanism	mame	out	-	romset: the vanilla mechanism behind #113
+test_m2_repoint	mame	release	-	the M2 slot-repoint mechanism + the superset invariant
+test_select_arrays	mame	release	-	freezes the select-screen record-pointer array
+test_shim_charid	mame	release	-	the init shim can identify which tenant it runs for
+test_tenant_select_records	mame	release	-	a variant-id build carries the tenant's OWN select records
+audit_dispatch_census	mame	release	-	which type indices LEGACY dispatches at the obj_hook sites; frozen observation
+audit_type_dispatch_range	mame	release	-	the dynamic census-gap detector on a MERGED build
+audit_type_writes	mame	release	-	which PCs write extended-family type bytes ([VSP-88])
+audit_walker_ghost	mame	release	-	where each walker's jsr (A0) pushes its return address ([VSP-41])
+audit_walker_repoint	mame	release	-	does anything still reach the vanilla object-pool walkers
+audit_wide_phase_a	mame	out	-	romset: CPS-2 WIDE Phase A measurements on VANILLA vsavj — what the original game does
+audit_objhook_owner_census	mame	out	-	momentary: the 14z-81b vec3-fix DESIGN measurement
+audit_region_movability	mame	out	-	momentary: a design-space measurement (which regions can live in wide_ext); it rebuilds a case set
+test_m2a_stage1_nullreloc	mame	out	-	dev-ladder: the M2a stage-1 scratch build, not the artifact
+test_m2a_stage2_data	mame	out	-	dev-ladder: the M2a stage-2 scratch build
+test_m2a_stage3_anim	mame	out	-	dev-ladder: the M2a stage-3 scratch build
+test_m2a_stage4_code	mame	out	-	dev-ladder: the M2a stage-4 scratch build
+test_gfx_menus	mame	release	-	the pixel-level menu/UI regression gate — the only gate that is not RAM-basis ([VSP-42])
+test_wide_render_content	mame	release	-	the WIDE track SERVES the ported tiles, in decoded gfx memory
+test_merged_render_content	mame	release	-	the merged build serves all THREE tenants' tiles
+test_wheel_bank5	mame	release	-	the select wheel serves from group C bank 5
+test_version_string	mame	release	-	the in-game version mark, the naked-eye A/B tell
+audit_empty_tiles	mame	release	-	does the build DRAW any blank-tile sprite ([VSP-161] — run it on the effect's OWN replay)
+audit_clone_beam_lines	mame	release	-	the #109 lock: DF clone-mode draws the beam-line sprites
+audit_effect_class_rows	mame	release	-	the three deadness measurements the beam port rests on ([VSP-22])
+audit_grenade_ground_tiles	mame	release	-	Huitzil's 214+LP ground explosion draws native vs2 art
+test_beam_anim_walk	mame	release	-	does the build WALK the beam anim nodes; default builddir is a 14z-71 solo build
+test_beam_variants	mame	release	-	the beam variant + gfx-readiness gate; same default
+test_anim_node_walk	mame	release	-	the anim-node decoder as an INSTRUMENT, checked against the emulator
+test_hitbox_encoding	mame	release	-	the hitbox encoding and attack record are what the engine uses
+test_move_naming	mame	release	-	our tenants' chain ids, named on native vs2 as the oracle
+test_reactions	mame	release	-	which chains a TENANT runs as the victim, per reaction class
+test_projectile_census	mame	release	-	which projectile-pool types each TENANT's moves spawn
+test_projectile_params	mame	release	-	the projectile parameter tables, decoded and measured on the live spawn
+audit_df_startup_invuln	mame	release	-	the DF startup window, armed per character — the TENANTS arm their own
+audit_df_accumulator	mame	out	-	romset: +0x161 is SASQUATCH's DF armor — a vanilla-character engine fact
+audit_df_dead_family	mame	out	-	romset: the VS-style DF family is dead in NATIVE vs2
+audit_front_comparator	mame	out	-	romset: what $FF8127 is, on vanilla vsavj — no build dir
+test_advancing_guard	mame	out	-	romset: the advancing guard measured on native vs2 and vsavj
+test_killshread_es	mame	out	-	romset: the ES stance change measured on NATIVE vs2
+test_tick_durations	mame	out	-	romset: vanilla frame data in engine ticks (the community cross-check's arbiter)
+test_vanilla_frame_join	mame	out	-	romset: which chain each VANILLA character's standing normals enter, on vsavj
+test_don_sword	mame	release	-	sword-swing behaviour (frozen anim node)
+test_don_accent	mame	release	-	weapon-accent steadiness + the Victor-accent legacy guard
+test_don_colors	mame	release	-	kick colours + mirror rows + the select sword
+test_don_reactions	mame	release	-	the 421P gameplay lock (multi-hit, no KD)
+test_don_column	mame	release	-	the column-KO crash gate
+test_don_sound	mame	release	-	the sound-ring gate: no vsavj MUSIC-range id ([VSP-44])
+test_don_immortal_native	mame	release	-	421+P against NATIVE vs2, measured in-run; maintainer-ruled mandatory at release
+test_don_throw_mirror	mame	release	-	the base-slot mirror-victim fix
+test_m2a_flavor_selector	mame	release	-	the Start-hold flavor selector
+test_m2b_scroll3	mame	release	-	scroll3-vs-OBJ-band exclusivity
+test_m2b_stage6	mame	release	-	the M2b graphics build gate: build + static verify + guarded soaks + the MASKED LEGACY GATE
+test_select_wheel	mame	release	-	the select-cursor mechanism, decoded and measured — a §4 rule lock that runs on every build
+test_oboro_select	mame	release	-	the Oboro select hook (W1)
+test_random_select_tenants	mame	release	-	random select includes the tenants
+test_shadow_tenant	mame	release	-	Shadow morphing into a TENANT
+test_tenant_hud	mame	release	-	the variant-id HUD
+test_tenant_winpal	mame	release	-	the variant-id win-screen palette
+test_tenant_pairings	mame	release	-	two ported characters in one match, every ordering
+test_ladder_tenant_vs_palette	mame	release	-	the arcade-ladder VS palette pool, measured on screen for a tenant
+test_hui_boot	mame	release	-	the Huitzil stage-4 BOOT gate — run after ANY site_thunk addition ([VSP-87])
+test_hui_ladder	mame	release	-	the Huitzil stage 1-3 ladder
+test_hui_soak	mame	release	-	the Huitzil stage-4 soak
+test_hui_air	mame	release	-	float + air dash
+test_hui_ex	mame	release	-	the EX-move gate
+test_hui_grab	mame	release	-	Circuit Scrapper
+test_hui_grab_victim	mame	release	-	the grab-victim placement A/B
+test_hui_walk	mame	release	-	the velocity port
+test_hui_pairs	mame	release	-	Reflect Wall guard-cancel + pair-press; run on ANY change that routes objects ([VSP-85])
+test_hui_oracle	mame	release	-	Huitzil vs2-as-oracle behaviour
+test_hui_df_style	mame	release	-	Dark Force style, ours vs NATIVE
+test_hui_electrocute	mame	release	-	Phobos as the electrocute victim, ours vs native
+test_pyron_ladder	mame	release	-	the Pyron stage 1-3 ladder
+test_pyron_soak	mame	release	-	the Pyron stage-4 chaos soak
+test_pyron_cosmo	mame	release	-	the Cosmo Disruption crash gate
+test_pyron_blink	mame	release	-	the sprite/HUD blink gate
+test_pyron_medallion_2p	mame	release	-	the P2-hover half of medallion palette stability
+audit_continue_switch	mame	release	-	the #99 continue+switch lock
+audit_don_vs_cpu	mame	release	-	the deterministic Donovan-vs-CPU pairing (#111) — the coverage gap #99 fell through
+audit_don_grab_pose	mame	release	-	the #104 lock: a legacy grab holding a TENANT victim
+audit_don_ko_writer	mame	release	-	the #103 root-cause lock. PREDICTION: EXPECT_DEFECT defaults to 1 (the pre-fix state) and #103 shipped fixed at 14z-99, so a default run should go RED as ROT, not as a regression.
+audit_don_lilith_ko	mame	release	-	the #103 stall repro. Same shape: EXPECT_STALL defaults to 1, the pre-fix state.
+audit_win_pal_auto	mame	release	-	the #105 lock. Same shape: EXPECT_WHITE defaults to 1, the pre-fix state.
+audit_df_framework	mame	release	-	the ruled DF table: cost 1 stock, durations 360/360/377/360
+audit_df_gold	mame	release	-	Phobos' DF uploads HIS gold block; Bulleta's does not leak it
+audit_down_attack	mame	release	-	hitting a downed opponent, both directions per tenant
+audit_tech_roll	mame	release	-	the tech roll, both directions per tenant
+audit_throw_tech	mame	release	-	the throw tech-hit, both directions per tenant
+audit_tenant_throws	mame	release	-	normal throws, both directions per tenant
+audit_tenant_downwin	mame	release	-	the life-marker transition, every tenant as winner AND victim
+audit_tenant_timeout	mame	release	-	the timeout judge, per tenant
+audit_pursuit_leap	mame	release	-	the leaping pursuit, per tenant both directions
+audit_edge_cases	mame	release	-	deliberate state-transition edges per tenant ([VSP-33])
+audit_stage_sweep	mame	release	-	every tenant on every stage
+audit_projectile_clash	mame	release	-	the pool-vs-pool contact surface, frozen at NATIVE PARITY
+audit_pool_free_byte	mame	release	-	the owner-tag byte (+0x7F), both pools
+audit_tripwire_reach	mame	release	-	do any planted tripwires fire in extended play (~15 min)
+audit_fg_damage	mame	release	-	Phobos' EX Final Guardian damage, frozen
+audit_fg_parity	mame	release	-	the same, against the frozen native staircase
+audit_trap_parity	mame	release	-	the Plasma Trap SOUND parity A/B
+audit_trap_shock	mame	release	-	the Plasma Trap dome inflicts SHOCK
+audit_trap_sound	mame	release	-	the MK Plasma Trap fires, ring live
+audit_hui_grunt	mame	release	-	the electrocute-grunt A/B over five electrocutions
+audit_pyron_ring	mame	release	-	Pyron's merged-vs-solo sound-ring inventory
+audit_qs_voice_batch	mame	release	-	the voice-batch keyon A/B
+audit_qs_voice_wav	mame	release	-	the ear-level voice A/B (-wavwrite)
+audit_voice_borrow	mame	release	-	the voice-class borrow mechanism
+audit_continue_ladder	mame	out	-	momentary: the #102 discriminator (does a continue reset the ladder mask ON VANILLA) — the question was answered 14z-98
+audit_hitclass_map_cost	mame	out	-	momentary: what the 14z-82b hit-class map extension fixes and costs — the adoption measurement
+audit_phase_mode_cost	mame	out	-	momentary: what Phobos' phase-gated latch costs Donovan — a design cost measurement
+audit_ladder_selector	mame	out	-	romset: the vanilla arcade-ladder selector, made rerunnable (14z-95)
+audit_id_writers	mame	out	-	romset: which character ids VANILLA ever assigns
+audit_palette_seq_ids	mame	out	-	romset: which palette-seq ids LEGACY ever requests ([VSP-151])
+test_mister_wide_inert	mister	release	-	THE FPGA SUPERSET INVARIANT, measured directly ([MSV-27]); ~22 min
+test_mister_sim_anchor	mister	release	-	the MiSTer leg of the §4 dual-emulator oracle
+test_mister_tenant_oracle	mister	release	-	the §4 dual-emulator oracle on TENANT content
+test_mister_obj_oracle	mister	release	-	cross-implementation agreement on a VIDEO-DETERMINING surface; ~65 min
+test_mister_gfxc_fetch	mister	release	-	the core FETCHES a tenant tile; ~2 x 65 min. HEADER STATUS LINE IS STALE — it still says 'IT IS RED, AND HAS NEVER BEEN GREEN' while HANDOFF records it PASSING in full since 14z-108.
+test_mister_prg_window	mister	release	-	slice D4's own evidence: the 68k and CPU:$400000-$5FFFFF; ~2 x 40 min
+test_mister_qsound_ext	mister	release	-	the QSound extension is fetched on the core
+test_mister_sdram_census	mister	release	-	the WIDE romset lands in SDRAM exactly where mister_map.md places it
+audit_sdram_bank_load	mister	out	-	romset: stock vsavj on the STOCK jtcps2 core — the D2 repack's GO measurement, not a verdict on the shipped core
