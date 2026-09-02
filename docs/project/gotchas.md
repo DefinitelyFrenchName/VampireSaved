@@ -1,5 +1,48 @@
 # GOTCHAS (project) — traps in OUR pipeline and method
 
+## A gate that prints `SKIP:` AND exits NON-ZERO is a FAILURE, not a skip (paid: 14z-128)
+
+`tests/test_wide_profile.sh` is scrupulous about the invariant it carries. With
+no reference binary it prints `SKIPPED: set FBNEO_REF ...`, then a NOTE saying
+"this invariant is the whole basis for allowing emulator changes at all (Rule 1
+v2 clause 3) — a build that has not run it is NOT validated", and then exits
+**2** with `PARTIAL: profile inert, but the emulator superset invariant was NOT
+run`.
+
+Both suite runners classified it as a SKIP, because both matched `^ *SKIP`
+BEFORE looking at the exit status. So the one gate that justifies modifying an
+emulator at all reported as a benign skip.
+
+**The rule: exit status decides first. SKIP is exit 0 plus the marker, only.**
+A gate that prints a skip marker and exits non-zero RAN, could not complete,
+and SAID SO. GitHub #29 established that SKIP is not PASS; this is the same
+argument one level deeper — a skip marker must not be able to DOWNGRADE a
+failure either.
+
+Fixed in `run_all_static.sh` and `run_all_emulator.sh`, with the case added to
+both ground truths (a stub that prints a SKIP marker and exits 2 must count
+FAIL).
+
+## `... | while read` puts the loop in a SUBSHELL, so the `wait` after it waits for nothing (paid: 14z-128)
+
+`run_all_emulator.sh` ran its gates in parallel from
+`printf '%s\n' "$rows" | while read ...; do gate & ...; done`, then `wait`ed
+after the loop before announcing the next lane. The background gates are the
+SUBSHELL's children, so the main shell's `wait` had none of its own and
+returned immediately: the lane printed its heading, the next lane started, and
+the previous lane's last partial batch kept running ORPHANED. Measured by
+`pgrep`, which found `test_wide_profile` mid-flight while the log already read
+`== mame lane ==`.
+
+The same subshell ate the `_running` counter, so the batching worked only by
+accident.
+
+**Read the list from a FILE, not a pipe** (`while read ...; done < "$f"`), and
+the loop, its `wait` and its counters all stay in the main shell. Adding a
+second `wait` inside the pipeline treats the symptom; the counter would still
+have been lost. Beside [VSP-110]'s `VAR=x funcname` persistence trap: in this
+shell, what is in a subshell and what is not is never obvious from the layout.
+
 ## **[VSP-37]** A comparator's own ground-truth test can RATIFY a deviation from the governing spec (paid: 14z-95, GitHub #52)
 
 `tools/compare_flicker.py` exempted the LAST divergent stretch from the

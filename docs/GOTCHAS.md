@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-280 entries (40 game / 88 platform / 152 project), counted from the buckets at generation.
+282 entries (40 game / 88 platform / 154 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 40 entries
 
@@ -156,8 +156,10 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - MAME palette RAM ($90C000) takes Lua pokes for READBACK but not for RENDERING (14z-102)
 - two -debug INSTRUMENT-grammar traps from the #103 close — both misread a measurement for a full round each (paid: 14z-98)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 152 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 154 entries
 
+- A gate that prints `SKIP:` AND exits NON-ZERO is a FAILURE, not a skip (paid: 14z-128)
+- `... | while read` puts the loop in a SUBSHELL, so the `wait` after it waits for nothing (paid: 14z-128)
 - A comparator's own ground-truth test can RATIFY a deviation from the governing spec (paid: 14z-95, GitHub #52)
 - A DEFECT THAT LIVES IN A RELATIONSHIP BETWEEN TWO TIMELINES IS INVISIBLE TO EVERY SINGLE-FRAME INSTRUMENT (paid: 14z-126b, #112 — a session and a half)
 - SEARCH METHODS ARE ORDERED BY COST, NOT BY PROHIBITION — inputs first because they are cheap, art LAST because it is expensive for Claude and CHEAP the moment the maintainer is shown a capture (paid: 14z-126b, #112; the ordering corrected by the maintainer 2026-09-01)
