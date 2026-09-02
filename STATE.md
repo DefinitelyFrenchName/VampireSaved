@@ -1562,8 +1562,21 @@ wrong is *safe and loud* over designs that are merely well-measured.
   ~330 glyph TILES have to travel. NOTE the
   win-quote ART is already native and complete (14z-62e/62j, group C bank 5) —
   what remains is the TEXT. See the cosmetic backlog below.
-- **GitHub #114 — 421+P: PREMISE REFUTED, SCOPE MEASURED, MASH STILL OPEN
-  (14z-127, 2026-09-02).**
+- ~~**GitHub #114 — 421+P**~~ **CLOSED BY THE MAINTAINER 2026-09-02T17:53Z.
+  THEIR VERDICT, verbatim, and it is a GAMEPLAY RULING that must not be
+  re-opened as a defect:** *"Ceilings are the same, mash rate required slightly
+  under VS2 for everything but LP, which is not a bad thing given how stringent
+  VS2 is for max damage (max number of hits requires well above average
+  mashing, it is legitimately very hard), LP is short one hit and comparatively
+  slightly nerfed, which is acceptable on the whole, especially given the
+  additional bit of leniency for other punch strengths. Close enough, leverages
+  VS engine, good tradeoff, closing the ticket."*
+  **SO THE LOWER MASH REQUIREMENT IS AN ACCEPTED POSITIVE, NOT A NEUTRAL
+  FACT** — VS2's maximum is legitimately very hard to reach, and the host
+  clock making ours slightly more forgiving is a good trade. Anyone re-reading
+  the §5 numbers should read them that way. Detail of the investigation
+  follows (PREMISE REFUTED, SCOPE MEASURED, MASH MEASURED — 14z-127,
+  2026-09-02).**
   **(a) THE ISSUE'S EVIDENCE WAS JEDAH.** Replay 48's P1 path (`U,U,R` → slot
   `0x0F`) selects Donovan only on the SUBSTITUTED stock track; since the
   14z-115 wheel separation a WIDE build puts the tenants on their own appended
@@ -1622,6 +1635,20 @@ wrong is *safe and loud* over designs that are merely well-measured.
   14z-42c). It is correct, and is now measured in-run. 14z-42's cadence root
   cause and 14z-43's dispatch fix stand untouched.
 - **OPEN:** FG pacing — untouched.
+
+- **DECLINED (maintainer, 2026-09-02): a STATIC "substituted-wheel replay
+  paired with a WIDE set" gate.** *"I don't think the static wheel/track gate
+  is valuable at the moment given your arguments."* The arguments, kept so it
+  is not re-proposed: 26 gates match that pattern and all 26 were checked —
+  most run those replays for LEGACY content where the tenant is irrelevant, and
+  every Donovan-semantic one (`audit_don_ko_writer`, `audit_don_lilith_ko`,
+  `audit_continue_ladder`) FORCES THE PICK with `ff8782` pokes, so the wheel
+  path cannot affect them. No text scan separates those from a real defect, so
+  the gate would be 26 false positives plus an allow-list that rots.
+  `test_don_sound.sh` was the only live instance and it now refuses. **The
+  defence that IS in place: [VSP-163] (assert `+0x60` against `bases.tsv`, or
+  force the pick) and the runtime identity assertion in
+  `test_don_immortal_native.sh`.**
 
 ### THE COSMETIC BACKLOG (parked, 2026-08-27 — the maintainer's own list)
 

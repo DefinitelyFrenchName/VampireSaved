@@ -44,52 +44,15 @@
 > ## **OPERATIONAL:** land every commit BEFORE starting it — the suite asserts a
 > ## clean tree during a run, and a run was voided that way on 2026-09-02.
 > ##
-> ## **(1) GitHub #114 — PREMISE REFUTED, SCOPE MEASURED, MASH OPEN
-> ## (14z-127).** The 14z-126b "ours" leg was **JEDAH** — replay 48's
-> ## substituted-wheel path on the separated WIDE wheel. Measured against
-> ## native at four strengths, no mash, both tracks: **LP 3h/7d · MP 5h/9d ·
-> ## HP 6h/10d · ES 9h/13d, ours EQUALS native in every cell**, victim held,
-> ## identity asserted from `bases.tsv`. Gate
-> ## `tests/test_don_immortal_native.sh` (native measured in-run, the Jedah
-> ## artefact as its must-fire control).
-> ## **THE FRAME-CADENCE GAP IS THE HOST ENGINE'S** — vanilla Victor,
-> ## Demitri, Morrigan and Bishamon all drain `+0x5C` = 11 in 9 frames on
-> ## vsav2 and 10 on vsavj. **RULING (maintainer, 2026-09-02): the engine,
-> ## being vanilla vsav, takes precedence** — so assert hit COUNT and DAMAGE,
-> ## never vsav2's frame numbers. Frozen as §4 of the gate.
-> ## **RELEASE-TIME TEST SCOPE — RULED (maintainer, 2026-09-02): AT RELEASE,
-> ## ALL TESTS RUN.** The only exceptions are gates whose SUBJECT is a
-> ## different romset or platform, or momentary probes. **A gate that uses
-> ## vsav2 or pristine vsavj as an ORACLE is IN SCOPE — the reference leg is
-> ## not the subject — and tests on native-VS content INSIDE vsavjw are
-> ## absolutely in scope.** Corollary: a release-scope gate must FAIL LOUDLY on
-> ## a missing prerequisite, never `SKIP:` + exit 0, because `bat` counts a
-> ## bare exit 0 as PASS. Full text in STATE's standing sections.
-> ##
-> ## **`test_don_immortal_native.sh` IS NOW A FREEZE-BATTERY LEG (3f), ruled
-> ## MANDATORY AT RELEASE** (maintainer 2026-09-02: "it's mandatory and cheap
-> ## whenever we want to release a version"). ~15 min, the longest leg in
-> ## `run_battery_m2.sh`, and the only one that MEASURES NATIVE rather than
-> ## asserting a remembered constant. Budget for it at every freeze.
-> ##
-> ## **THE MASH ARC — MEASURED AND CLOSED (14z-127).** Mash extends the loop:
-> ## a press adds 1 to the accumulator `+0x0A`; at **>= 7** the routine spends
-> ## one unit of the budget `+0x27` — **the per-strength cap, DATA, 2/3/3/4 for
-> ## LP/MP/HP/ES, identical in both games.** Nodes, deciding code and cap all
-> ## verified identical. **At the TRUE ceiling MP/HP/ES equal native
-> ## (8/12, 10/14, 15/19); LP is one hit short (4 vs 5) — hit phase, RULED
-> ## within "altered by the VS engine" and not chased.** Frozen as §5.
-> ## **THE TRAP, now a gotcha:** one-frame-on/one-frame-off is HALF the
-> ## ceiling. Below the ceiling the legs sit at different points of the same
-> ## response curve (the host clock changes presses-per-check), which read as
-> ## "ours never extends LP, over-extends HP/ES by 2" — all of it erased at the
-> ## ceiling. **Demonstrate saturation, never assume it.**
-> ##
-> ## **THE CLASS TO CARRY FORWARD:** a tenant replay is a claim about the
-> ## build it was authored for ([VSP-156]); **a confound check on POSITIONS
-> ## does not establish IDENTITY**; and **a duration in VIDEO FRAMES is not
-> ## comparable between the sibling games** — counts, damage and engine ticks
-> ## are. **32 replays carry the substituted-wheel path.**
+> ## **(1) GitHub #114 — CLOSED 2026-09-02 by the maintainer. Kept here only
+> ## so it is not re-opened.** Their verdict: *"Ceilings are the same, mash
+> ## rate required slightly under VS2 for everything but LP ... not a bad thing
+> ## given how stringent VS2 is for max damage ... Close enough, leverages VS
+> ## engine, good tradeoff."* **READ THE §5 NUMBERS THAT WAY: ours saturating
+> ## at a lower mash rate is an ACCEPTED POSITIVE, not a neutral fact.** The
+> ## investigation, the mechanism and the gate are in STATE and in
+> ## `test_don_immortal_native.sh`. **The static wheel/track gate was DECLINED
+> ## the same day** — 26 false positives; the defence is [VSP-163] instead.
 > ##
 > ## **(2) THE MIZUUMI CORPUS ARC — barely opened, and it is the next big
 > ## one.** `../community/` now holds 26 wiki pages (HTML + PDF) including all
