@@ -1,5 +1,64 @@
 # STATE_HISTORY — the STATE.md archive
 
+## Session 14z-126b CLOSE (3) — ritual complete for the LONG CONTINUED session (2026-09-01/02). **NINE ARCS: a
+## maintainer correction to a rule I had overstated, the `14z-N` key documented as law, #113 CLOSED then
+## MECHANISED, the MiSTer core-list name + main-MRA fix, a corpus gate that could pass while asserting
+## nothing, #112 ROOT-CAUSED, Jedah ARBITRATED, the aerials part-resolved, and #114 opened on 421+P. No build
+## byte moved all session. Strict static 126/0/0/0. PUSHED.**
+
+| | |
+|---|---|
+| opened with | reading the three session documents; then the maintainer's correction of the search-method rule, and a run of items they raised in turn |
+| **the correction that set the tone** | I had recorded "search the INPUTS, never the art" as theirs. They never said it: *"input search is easy and cheap, art search is hard and expensive and long... that never you put is doing a LOT of harm."* It is a COST ORDERING — inputs, then memory watching, then art, **which is cheap the moment they are shown a capture** — and the list is not closed. Retraction pass run across both gotchas files, NEXT_SESSION, STATE and the memory |
+| **[VSP-162] the `14z-N` key** | documented as a naming convention AND the archive's lookup index, in CLAUDE.md §5 at the maintainer's steer. **Its origin was RECONSTRUCTED, not lost**: a chain of exhausted counters (`Session 3..14` → `14b..14z` → `14z-2..126` → `14z-126b`), so `14z` is *session 14, continuation z*. Corrected once more after the maintainer read it and asked "why are we still on session 14?" — the prefix is FOSSILISED; the live counter is `-N` |
+| **#113 — closed, then answered** | the maintainer closed it (the board agreed with the emulator). Swept from every live carrier. Then, as the research topic they opened, **the MECHANISM was measured the same day: a PALETTE-BASE SWAP** — CPS-A `0x80410a` goes `0x90c0` → `0x9240` for one frame and `0x924000` is all `ffff`. Both recorded candidates (palette RAM blanked / a layer register) RETRACTED. 4/4 discriminator, FBNeo-confirmed, gated. **The design "why" is explicitly still open** — I conflated it with the implementation "why" and was corrected |
+| **MiSTer** | the core-list name is now `Vampire Saved - CPS-2 WIDE` with the maintainer's approved attribution header (fork `c1850b44e`), and the WIDE set is the MAIN MRA rather than buried in `_alternatives` (fork `5fd9bb9a6`). Option B turned out **already shipped at 14z-113** — the STATE entry claiming otherwise was stale by thirteen freezes. The packager now selects MRAs by `<setname>`, not by directory layout, which is what stopped the stock control leg vanishing from releases |
+| **a gate that could pass asserting NOTHING** | `test_inp_corpus.sh` would have reported PASS with all seven recordings playing ZERO frames: a relative `ROMDIR` makes both runners lose the parent zip, and the runner still wrote `END 0`, which the only liveness check accepted. Fixed at three levels with four self-tests on the verdict logic |
+| **#112 ROOT-CAUSED** | an OVERWRITE ORDERING on palette row `0b` index 14. Proven CAUSALLY after the maintainer asked "is it truly complete?" — it was not; the foot↔row link was a colour coincidence. Forcing the entry moves exactly 7,007 px, all of them, with a disjoint control. **The trigger is 11/11: Donovan is HIT while his own effect is still drawing**, cutting the palette's fixed ~109-frame lifetime to 28. Fix scoped; (C) do-nothing agreed, and the "it is vanilla data" objection retired as FALSE |
+| **Jedah ARBITRATED** | the tick-accurate instrument the record said did not exist: a write tap fires per WRITE, and `PRG:0x027F70` IS one engine tick. **18/18 derived totals equal the engine's ticks exactly** — so the residue is the WORKBOOK'S, not ours. Gated. The aerials followed part-way (BI 5/6; VI/FE/SA not separable yet), and the community corpus named the likely cause within an hour of arriving: mizuumi distinguishes `8J`/`9J` variants we collapse |
+| **#114 OPENED — and it is the live thread** (**CORRECTED 14z-127: REFUTED. The "ours" leg was JEDAH — replay 48's substituted-wheel path on the separated WIDE wheel. 421+P reproduces native on both tracks; see Open bugs and `test_don_immortal_native.sh`. Entry left as written, per the archive rule.**) | the maintainer corrected the record: 421+P's cadence half was root-caused, the multi-hit values half was tuned against playtest, never measured. Measured now on BOTH games: **native 6 hits/10 damage holding the victim at x=728; ours 3 hits/11 damage pushing it to 852.** Positions identical until contact, so no confound. **Our reaction does not hold the victim.** The gate is green and structurally cannot see it |
+| **the instrument traps, the reusable half** | a 1-BYTE TAP misses word accesses on this 16-bit bus and returns a clean zero that survives a control at another address; IDENTICAL NUMBERS ACROSS DIFFERENT MOVES is the tell that segmentation failed (printed twice before I recognised it); an ART-KEYED detector cannot find a defect in the art; and `0x800100` is a driver "Mirror (sfa)" this game never writes, so a zero there measured nothing |
+| **the standing lesson** | **THE RECORD CAN OVERSTATE WHAT WAS VERIFIED.** Three times today: option B "not done" (shipped 13 freezes earlier), `test_don_reactions`' `native == 10` (testimony written as measurement), and my own #112 "root cause" (correlation). All three were caught by MEASURING or by the maintainer asking. A gate header is a claim like any other |
+| gates added | `test_down_flash_mechanism.sh`, `test_pod_black_foot_palette.sh`, `test_tick_durations.sh`, plus the corpus-gate liveness controls — every one with a must-fire control |
+| tools added | `tools/mra_header.py`, `tools/tick_durations.py` |
+| the close battery, exit statuses captured directly | census `--check` rc=0 · `checkdocshape --no-pending` rc=0 · checkdocs rc=0 · checkskills rc=0 · `gen_annotations --check` rc=0 · `gen_gate_index --check` rc=0 · gotchas index rc=0 · `test_tick_durations` PASS · `test_down_flash_mechanism` PASS · `test_pod_black_foot_palette` PASS · `test_inp_corpus` PASS · `test_jtcores_twin` PASS · `test_mister_mra_map` PASS · `test_release_roundtrip` PASS. **Strict static PASS 126 / SKIP 0 / FAIL 0 / MISSING 0** |
+| patch_notes / patch_index | **checked, correctly NO entry** — nothing under `build/manifest` or `tools/gen_donovan_patch.py` moved; no build byte changed all session |
+| not done, by design | #114's next step (why the victim is not held) and the gate tightening that would turn it RED — the maintainer's call ([VSP-7]); the aerial `8J`/`9J` hypothesis, named not measured; #112 fix option (B); Zabel j.LK still awaiting a recording; the mizuumi corpus arc, barely opened |
+| push | **PUSHED** |
+
+## Session 14z-126b CLOSE (2) — ritual complete for the CONTINUED session. **FIVE ARCS AFTER THE FIRST CLOSE: the
+## three grandfathered tags amended and force-pushed (allow-list removed, not left to rot), a red root-caused to the
+## macOS tmp reaper, #112 PICKED UP AND ITS PREMISE REFUTED, the black foot FOUND by searching the INPUTS, and two
+## gotchas + a gate that came out of it. No build changed. Strict static 126/0/0/0. PUSHED.**
+
+| | |
+|---|---|
+| opened with | the maintainer's "do all 3, in order, with a push at session close" — then, after the close, four more items they raised in turn |
+| after the first close | (1) the three 14z-102 tags AMENDED and force-pushed, and the gate's allow-list REMOVED the moment its reason died; (2) a RED (`test_mister_mra_map`) root-caused in one grep to the documented macOS tmp reaper — 4,099 files deleted from the jtsim scratch while `.git` and HEAD survived, so the pin check could not see it; (3) #112 for knowledge; (4) the black foot; (5) the input-search lesson recorded |
+| **#112, the headline** | the maintainer's question — "why a tenant object runs that vanilla sequence" — is answered: **IT DOES NOT.** `0x28394E` is never stored anywhere (all 7 sites disassembled), all 9,755 tenant sprite pointers are relocated (gated), and at runtime nothing holds a vsavj record pointer while the control fires 15/15 on the record-chain fields. The black foot draws `0xbbxx` where clean instances draw `0xe7xx` — real art from the wrong place, not a palette fault and not "dark lift tiles" |
+| **the method, and it was the maintainer's** — ~~stated here as "search the inputs, never the art"~~ **OVERSTATED BY ME AND CORRECTED BY THE MAINTAINER 2026-09-01: it is a COST ORDERING, not a prohibition** (1 inputs, cheap+reliable, start here unless you cannot; 2 memory watching, dearer, reliable unless the pattern is not; 3 art search, expensive FOR CLAUDE but **cheap the moment they are shown a capture, which they can confirm or infirm immediately**; 4 the list is not closed). Their words: *"input search is easy and cheap, art search is hard and expensive and long"* — never "never". The absolute did harm: it forbids this project's cheapest confirmation route. Retraction pass run the same day (gotchas both files, NEXT_SESSION, this row, the memory) | "do not look for the image, look for the input" — 25 `41236+K` attempts found in ONE pass over a log already on disk; the last (MK at f14307) is the black one, 2.65 s before their cutoff. That instruction was for THAT hunt and is sound: a motion is a PARTIAL ORDER over mandatory steps, so a human's non-frame-perfect input is absorbed by an ordered-subsequence match, and the inputs are ground truth INDEPENDENT of the defect. What was NOT theirs is the generalisation to a ban on art |
+| **what I got wrong, and how it was caught** | four claims failed verification before they set (the "only session with no FREEZE commit", a 3/3 precedent that was really 29/39, a figure that counted my own new tags as its own evidence, "eight freezes" for thirteen) — all caught by MEASURING. Two more were caught by the maintainer: "the black case does not reproduce on merged-m14" (true only of one recording's playback) and filing an OPEN item under a CLOSED banner where they could not find it. Both are recorded as standing lessons |
+| new gates / instruments | `test_freeze_tag_coverage.sh` (126 floor), `test_tenant_anim_relocation.sh` + `anim_reloc_audit.py` + `plant_anim_reloc_control.py` |
+| gotchas filed | project: an ART-KEYED detector cannot locate a defect in the art (**header and rule REWRITTEN 2026-09-01 to the maintainer's cost ordering — see the row above; the entry as first filed prescribed "never the art", which they never said**). platform: a recording's FRAME NUMBERS are a claim about the BUILD it was played on |
+| the close battery, exit statuses captured directly | census `--check` rc=0 · `checkdocshape --no-pending` rc=0 · checkdocs rc=0 · checkskills rc=0 · `gen_annotations --check` rc=0 · `gen_gate_index --check` rc=0 · gotchas index rc=0 · `test_freeze_tag_coverage` rc=0 · `test_tenant_anim_relocation` rc=0. **Strict static PASS 126 / SKIP 0 / FAIL 0 / MISSING 0** |
+| patch_notes / patch_index | **checked, correctly NO entry** — nothing under `build/manifest` or `tools/gen_donovan_patch.py` moved |
+| not done, by design | ~~#112's remaining question (why THAT instance selects `0xbbxx`)~~ **ANSWERED 2026-09-01 — the question was mis-posed; nothing "selects `0xbbxx`". See the ROOT CAUSE entry above.** (as written: needs a write tap on the f14370 record); Zabel j.LK still awaits the maintainer's recording; Jedah's crouching recovery still needs a tick-accurate instrument; the mizuumi CHARACTER DATA the maintainer has found, queued for a future session against `community_crosscheck` |
+| push | **PUSHED** |
+
+**Ledger rollover:** the three OLDER 14z-126b entries (the first CLOSE, the
+2026-09-01 addendum, and addendum (2)) moved verbatim to STATE_HISTORY.md at
+the 14z-126b CLOSE (3) — STATE had crossed the rule's ~150 KB line again.
+STATE now holds the 14z-126b CLOSE (3) and CLOSE (2). The 14z-126 group rolled
+at CLOSE (2), the 14z-125 group at the first 14z-126b close.
+
+**Ledger rollover (the previous one, kept for the trail):** the 14z-126 group
+(14z-126 and its CLOSE) moved verbatim to STATE_HISTORY.md at the 14z-126b
+CLOSE (2). ~~STATE holds 14z-126b only (its CLOSE (2), two addenda and the
+first CLOSE)~~ — superseded by the rollover above, which archived the two
+addenda and the first CLOSE. The 14z-125 group rolled the same way at the
+first 14z-126b close, and 14z-124 at the 14z-126 close.
+
+
 **This is the verbatim archive of STATE.md session records** (split out at
 the 14z-99 post-freeze close, 2026-08-20, maintainer-approved). STATE.md
 holds the newest ~3 session groups plus THE LEDGER (a one-line-per-session
