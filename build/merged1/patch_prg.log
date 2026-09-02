@@ -1,5 +1,5 @@
 image: 0x400000 -> 0x600000 (+4 x 0x80000: vsw.41, vsw.42, vsw.43, vsw.44, fill 0xff)
-  vm3j.03d  sha1 c1f1e1c7ae017564c975a12da740ed983ad3a0ee  CHANGED
+  vm3j.03d  sha1 451486ba13ee66e02f9d690384f66903709091b1  CHANGED
   vm3j.04d  sha1 52e02ba355e315387865ce2655c89a8571692bea  CHANGED
   vm3j.05a  sha1 ba5e64c2551d97a71d2f4d7a78663aede4b722e8
   vm3j.06b  sha1 3a7103456ba3937f63c28dd42020cac1955b5741

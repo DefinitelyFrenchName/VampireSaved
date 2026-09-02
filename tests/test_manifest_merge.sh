@@ -114,7 +114,13 @@ FROZEN = [
     # RE-FROZEN 14z-87 (was (5,6,3),14,0 — STALE since 14z-86: the M5
     # voice-alias thunk added 15 byte-identical aux_poke rows to every
     # manifest and this gate was not re-run at that close; caught here)
-    ("aux_poke",         (20, 21, 18), 29, 15), # HUD anchors + the 15 shared alias-thunk pokes
+    ("aux_poke",         (23, 24, 21), 32, 18), # HUD anchors + the 15 shared alias-thunk pokes
+                                                # RE-FROZEN 14z-127 (was (20,21,18)/29/15): +3 per file,
+                                                # +3 merged, +3 SHARED = the boot_title_saved_* rows
+                                                # (PRG:0x01C822/24/26). They are declared identically in
+                                                # all three manifests, so `_same_row` classes them SHARED
+                                                # and emits ONE write each -- which is exactly why the
+                                                # merged count rises by 3 and not by 9.
 ]
 for sect, per, total, shared in FROZEN:
     eq("%s per-file" % sect, tuple(len(d.get(sect, [])) for d in docs), per)

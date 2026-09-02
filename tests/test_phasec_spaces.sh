@@ -56,7 +56,7 @@ cd "$REPO"
 # profile-gated (the stock track carries donovan's regions and gets the
 # arcade-death-stall fix too). Ratified byte movement, not a refactor —
 # the "do NOT re-freeze to pass" warning above targets inert refactors.
-EXPECT="${1:-38e9cb2cd790c044167f7991810293691386af66}"  # re-frozen 14z-119: THE STOCK TWIN MOVED (was d29fd062 since 14z-110b) — port_param32 is a per-row data_port, not profile-gated, so the substituted track writes Donovan's VS2 physics onto stock slot 0x0F (six data ops in vm3j.04d, [0xf] value + [0x1f] mirror; no legacy row). Previous: # re-frozen 14z-110: the #99 d2 window is NOT profile-gated (the stock track carries the same six 0x51 nodes), so the stock image moves
+EXPECT="${1:-e86e1d04aca290c7ab63bcb9416b3fb021df41b2}"  # RE-FROZEN 14z-127 (was 38e9cb2c): the boot name screen SAVIOR -> SAVED — three `boot_title_saved_*` aux_poke poke16 rows at PRG:0x01C822/24/26, declared in all three tenant manifests and deduped to one shared engine row on a merged build; plus the M12 -> M13 mark (gfx). Legacy unaffected: audit_merged_legacy 96/0 with 01_attract_long bit-identical, and work RAM identical to pristine over 1,621 frames of boot+attract.  # previous:  # re-frozen 14z-119: THE STOCK TWIN MOVED (was d29fd062 since 14z-110b) — port_param32 is a per-row data_port, not profile-gated, so the substituted track writes Donovan's VS2 physics onto stock slot 0x0F (six data ops in vm3j.04d, [0xf] value + [0x1f] mirror; no legacy row). Previous: # re-frozen 14z-110: the #99 d2 window is NOT profile-gated (the stock track carries the same six 0x51 nodes), so the stock image moves
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0

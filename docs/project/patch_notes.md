@@ -1,5 +1,48 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-127 — THE BOOT NAME SCREEN: "VAMPIRE SAVIOR" -> "VAMPIRE SAVED"
+
+Three `aux_poke poke16` rows, declared IDENTICALLY in all three tenant
+manifests so `_same_row` dedups them to ONE shared engine row on a merged build
+(declared +9, emitted +3, deduped +6 — `tests/test_tenant_loop.sh` re-frozen
+342/373/310, 3-tenant 829 of 944):
+
+    PRG:0x01C822  poke16 0x2045   " E"   (was " I")
+    PRG:0x01C824  poke16 0x2044   " D"   (was " O")
+    PRG:0x01C826  poke16 0x2020   "  "   (was " R")
+
+WHAT THEY WRITE. The boot name screen is drawn by a per-region DISPLAY SCRIPT
+at `PRG:0x01C806` — seven entries (JAPAN / USA / HISPANIC / OCEANIA / ASIA
+/ +2), each a run of `<row> <col> 01 <string>` records terminated by `0000`.
+**The strings are stored LETTER-SPACED exactly as displayed** (`S A V I O R`),
+which is why no contiguous-ASCII search finds them; three earlier candidates
+(the CPS-2 region header `PRG:0x002FD3`, the `VM3J/VM3U` ROM-label table
+`PRG:0x00238A`, the staff-roll strings) were each patched and each left the
+screen unchanged. The text layer is `CPS:0x900000`, 64 wide, **tile code = the
+ASCII character**, blank `0x0020`: this is TEXT, not authored tiles, and the
+glyphs are an existing gfx-ROM font reused — no tile or font work.
+
+SCOPE (maintainer, 2026-09-02): the JAPAN entry only — *"our region of
+reference is Japan anyway"*. The other six regions, the STAFF ROLL and the
+TITLE SCREEN are out of scope; the staff strings are deliberately preserved
+(*"it's a Capcom game made by Capcom staff ... virtually nothing we did was a
+true novelty compared to their creations"*).
+
+**THE START-COLUMN BYTE IS NOT TOUCHED, AND MUST NOT BE.** The shorter title
+simply ends one character earlier. Bumping `col` 0x24 -> 0x25 to "re-centre"
+faults on the FIRST GLYPH: measured, `RAM:$FF0000` = `0x0001` (= vector − 2, so
+**vector 3, ADDRESS ERROR**) with `D0 = 0x00000056` = `'V'`, and the handler
+soft-boots for ever — indistinguishable from a genuine CPU-exception reboot
+(`docs/game/gotchas.md`).
+
+MEASURED FREE: work-RAM checksums patched-vs-pristine are IDENTICAL across
+1,621 frames of boot and attract, and `audit_merged_legacy` passes 96/0 with
+`01_attract_long` **bit-identical** — the replay that traverses this very
+screen. Same length, so no relocation. One program member.
+
+Also in this batch: `version_text` M12 -> M13 in all three manifests (the
+select-screen mark names the freeze generation).
+
 
 **Index — topic -> entry** (added 14z-122; blocks below are NEWEST SESSION
 FIRST, original authored order within a session — the 14z-122 reorder moved

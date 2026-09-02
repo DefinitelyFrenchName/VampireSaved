@@ -38,6 +38,18 @@
 > ## runner (battery or static aggregator); 138 ORPHANED** — reachable only by
 > ## typing a filename, so under the release rule (anything red or skipped is a
 > ## hard fail) nothing would even ask them.
+> ## **FIRST FINDING, ALREADY IN HAND — `test_shared_writes.sh` IS GREEN
+> ## AGAINST BUILDS FROM TEN FREEZES AGO.** Its inventory pins `don_m7` /
+> ## `hui41` / `pyron26` (14z-91). Audited against the 14z-127 builds:
+> ## **donovan 108 writes vs 90 frozen (18 NEW), huitzil 106 vs 87 (19),
+> ## pyron 94 vs 76 (18)** — only 3 per tenant are 14z-127's; the rest is
+> ## shipped work from m8..m14 that the gate never showed anyone
+> ## (`0x020B9C` Oboro hook, `0x020C74/80` random select, `0x0BE27A..96` the
+> ## #99 AI unpark). **DO NOT re-point and re-freeze** — that launders an
+> ## unreviewed inventory into the gate that exists to review it ([VSP-97]).
+> ## Establish whose bytes each lands on, record the `why`, THEN re-point.
+> ## This is the shape the whole sweep will find; treat it as the worked example.
+> ##
 > ## **BUILD:** `tests/run_all_emulator.sh` on the `run_all_static.sh` pattern —
 > ## registry files, PASS/SKIP/FAIL counted SEPARATELY, `--strict`, and the
 > ## ANTI-ORPHAN registry-coverage check (without that last piece the runner is

@@ -2285,7 +2285,7 @@ march_retarget_mid = true
 # same-source-or-fail names any future collision). Screen position =
 # the empty bottom-right corner (measured on merged-m5 snapshots, 14z-105).
 # THE TEXT NAMES THE FREEZE GENERATION — change it at every freeze.
-version_text = "M12"
+version_text = "M13"
 version_font = "build/manifest/version_font.json"
 version_x = 324
 version_y = 202
@@ -2950,3 +2950,43 @@ roster_subst = "rr::15"
 # (no overrides in charmap_<tenant>.toml)
 
 # END charmap
+
+# ---------------------------------------------------------------------------
+# THE BOOT NAME SCREEN: "VAMPIRE SAVIOR" -> "VAMPIRE SAVED" (14z-127,
+# maintainer-decided 2026-09-02). The per-region display script at
+# PRG:0x01C806 holds its strings LETTER-SPACED exactly as displayed
+# ("S A V I O R", which is why no contiguous-ASCII search finds it); each
+# record is `<row> <col> 01 <string>`. JAPAN entry only -- "our region of
+# reference is Japan anyway"; the other six regions, the staff roll and the
+# title screen are ruled OUT OF SCOPE.
+#
+# STRICT MINIMUM, 3 words: " I O R" -> " E D  ". The start-COLUMN byte is NOT
+# touched, so the shorter title simply ends one character earlier.
+# ** DO NOT "RE-CENTRE" BY BUMPING THE COLUMN. ** An odd column faults on the
+# first glyph: measured, RAM:$FF0000 = 0x0001 (vector - 2 => VECTOR 3, ADDRESS
+# ERROR) with D0 = 'V', and the handler soft-boots for ever -- indistinguishable
+# from a real CPU-exception reboot (docs/game/gotchas.md "THE BOOT NAME SCREEN'S
+# DISPLAY SCRIPT TAKES AN EVEN COLUMN").
+#
+# Declared in shared_writes.toml: this lands on vanilla-readable bytes.
+# Measured free: work-RAM checksums identical to pristine over 1,621 frames of
+# boot and attract. Identical rows in all three tenant manifests DEDUP to one
+# shared row on a merged build (gen_donovan_patch `_same_row`), so every build
+# carries the same title.
+[[aux_poke]]
+name = "boot_title_saved_1"
+addr = 0x01C822
+op = "poke16"
+val = 0x2045             # " E"  (was " I")
+
+[[aux_poke]]
+name = "boot_title_saved_2"
+addr = 0x01C824
+op = "poke16"
+val = 0x2044             # " D"  (was " O")
+
+[[aux_poke]]
+name = "boot_title_saved_3"
+addr = 0x01C826
+op = "poke16"
+val = 0x2020             # "  "  (was " R")

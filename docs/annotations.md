@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 2930 |
-| named by a document or manifest only | 2038 |
-| named by both a document/manifest and code | 584 |
+| distinct program-space addresses named | 2934 |
+| named by a document or manifest only | 2041 |
+| named by both a document/manifest and code | 585 |
 | named by CODE ONLY (the gap list below) | 308 |
 | carried by atlas | 473 |
 | carried by engine_internals | 535 |
-| carried by other docs | 934 |
-| carried by manifests | 1756 |
-| carried by code | 892 |
+| carried by other docs | 937 |
+| carried by manifests | 1761 |
+| carried by code | 893 |
 
 ## Addresses
 
@@ -39,8 +39,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 |---|---|
 | `PRG:0x0011DE` | docs/game/atlas/ram.md — Masked windows for hooked-build legacy comparison (CLAUDE.md §4 amendment, 2026-07-25); tests/audit_ff0460_writer.sh |
 | `PRG:0x0011E2` | docs/game/atlas/ram.md — Masked windows for hooked-build legacy comparison (CLAUDE.md §4 amendment, 2026-07-25); tests/audit_ff0460_writer.sh |
-| `PRG:0x00238A` | docs/game/gotchas.md — THE BOOT NAME SCREEN'S DISPLAY SCRIPT TAKES AN EVEN COLUMN — an odd one is a 68k ADDRESS ERROR that soft-boots the machine (paid: 14z-127) |
-| `PRG:0x002FD3` | docs/game/gotchas.md — THE BOOT NAME SCREEN'S DISPLAY SCRIPT TAKES AN EVEN COLUMN — an odd one is a 68k ADDRESS ERROR that soft-boots the machine (paid: 14z-127) |
+| `PRG:0x00238A` | docs/game/gotchas.md — THE BOOT NAME SCREEN'S DISPLAY SCRIPT TAKES AN EVEN COLUMN — an odd one is a 68k ADDRESS ERROR that soft-boots the machine (paid: 14z-127); docs/project/patch_notes.md — 14z-127 — THE BOOT NAME SCREEN: "VAMPIRE SAVIOR" -> "VAMPIRE SAVED" |
+| `PRG:0x002FD3` | docs/game/gotchas.md — THE BOOT NAME SCREEN'S DISPLAY SCRIPT TAKES AN EVEN COLUMN — an odd one is a 68k ADDRESS ERROR that soft-boots the machine (paid: 14z-127); docs/project/patch_notes.md — 14z-127 — THE BOOT NAME SCREEN: "VAMPIRE SAVIOR" -> "VAMPIRE SAVED" |
 | `PRG:0x003140` | docs/game/atlas/character_tables.md — Sprites / tiles / sound — pipelines mapped, addresses sprite-bound |
 | `PRG:0x003190` | docs/game/atlas/character_tables.md — Sprites / tiles / sound — pipelines mapped, addresses sprite-bound |
 | `PRG:0x003306` | build/manifest/reconciliation.toml — map; build/manifest/reconciliation.toml — map [vs2] |
@@ -547,7 +547,10 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01C5CE` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tools/gen_donovan_patch.py; tools/select_port.py |
 | `PRG:0x01C670` | build/manifest/donovan.toml — hit_class_props_ext_lo |
 | `PRG:0x01C68E` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; build/manifest/donovan.toml — hit_class_props_ext_lo |
-| `PRG:0x01C806` | docs/game/gotchas.md — THE BOOT NAME SCREEN'S DISPLAY SCRIPT TAKES AN EVEN COLUMN — an odd one is a 68k ADDRESS ERROR that soft-boots the machine (paid: 14z-127) |
+| `PRG:0x01C806` | docs/game/gotchas.md — THE BOOT NAME SCREEN'S DISPLAY SCRIPT TAKES AN EVEN COLUMN — an odd one is a 68k ADDRESS ERROR that soft-boots the machine (paid: 14z-127); docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-127 — THE BOOT NAME SCREEN: "VAMPIRE SAVIOR" -> "VAMPIRE SAVED"; build/manifest/donovan.toml — random_select_roster; build/manifest/huitzil.toml — random_select_roster; build/manifest/pyron.toml — random_select_roster |
+| `PRG:0x01C822` | docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-127 — THE BOOT NAME SCREEN: "VAMPIRE SAVIOR" -> "VAMPIRE SAVED"; build/manifest/donovan.toml — boot_title_saved_1; build/manifest/huitzil.toml — boot_title_saved_1; build/manifest/pyron.toml — boot_title_saved_1; tests/test_m3a_reproducible.sh; +3 more |
+| `PRG:0x01C824` | docs/project/patch_notes.md — 14z-127 — THE BOOT NAME SCREEN: "VAMPIRE SAVIOR" -> "VAMPIRE SAVED"; build/manifest/donovan.toml — boot_title_saved_2; build/manifest/huitzil.toml — boot_title_saved_2; build/manifest/pyron.toml — boot_title_saved_2 |
+| `PRG:0x01C826` | docs/project/patch_notes.md — 14z-127 — THE BOOT NAME SCREEN: "VAMPIRE SAVIOR" -> "VAMPIRE SAVED"; build/manifest/donovan.toml — boot_title_saved_3; build/manifest/huitzil.toml — boot_title_saved_3; build/manifest/pyron.toml — boot_title_saved_3 |
 | `PRG:0x01D160` | docs/project/gotchas.md — A pointer-shaped heuristic is placement-dependent — merged5 passed by luck (14z-92); tools/obj_records.py |
 | `PRG:0x01D363` | build/manifest/huitzil.toml — port_patch; tools/gen_index_window_thunk.py |
 | `PRG:0x01DBB6` | build/manifest/reconciliation.toml — map [vs2] |
@@ -608,15 +611,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x020AB4` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; tests/test_shadow_tenant.sh |
 | `PRG:0x020AC8` | docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question); docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path |
 | `PRG:0x020AE8` | docs/game/atlas/venue_assets.md — §2 addendum: the fold path is DORMANT in every measured flow (measured 14z-64) |
-| `PRG:0x020B9C` | docs/game/atlas/id_space.md — Which ids vanilla ever assigns (measured over the corpus); docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116); docs/game/atlas/select_screen.md — The Gallon variant path — vanilla's one immediate variant-half id; docs/game/atlas/select_screen.md — The Oboro select hook (14z-105, the port's own path to '0x18'); docs/game/engine_internals.md — The version string and the Oboro pick (atlas: select_screen.md); HANDOFF.md — Running a CPS-2 WIDE build (playtest); +11 more |
+| `PRG:0x020B9C` | docs/game/atlas/id_space.md — Which ids vanilla ever assigns (measured over the corpus); docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116); docs/game/atlas/select_screen.md — The Gallon variant path — vanilla's one immediate variant-half id; docs/game/atlas/select_screen.md — The Oboro select hook (14z-105, the port's own path to '0x18'); docs/game/engine_internals.md — The version string and the Oboro pick (atlas: select_screen.md); HANDOFF.md — Running a CPS-2 WIDE build (playtest); +12 more |
 | `PRG:0x020BA2` | docs/game/atlas/select_screen.md — The Oboro select hook (14z-105, the port's own path to '0x18'); docs/project/patch_notes.md — W1 — 'oboro_select_hook' ('[[site_thunk]]', every tenant manifest, deduped); build/manifest/donovan.toml — capture_kf_jedah; build/manifest/huitzil.toml — capture_kf_jedah; build/manifest/pyron.toml — capture_kf_jedah |
 | `PRG:0x020BB6` | docs/game/atlas/character_tables.md — Variant-slot semantics (structural finding); docs/game/atlas/id_space.md — RESERVED IDS — vanilla does use part of the variant half; docs/project/tenant_manifest.md — Rules the loader should enforce; tests/test_id_space.sh |
 | `PRG:0x020BC6` | docs/game/atlas/character_tables.md — Variant-slot semantics (structural finding); docs/game/atlas/id_space.md — RESERVED IDS — vanilla does use part of the variant half; docs/project/tenant_manifest.md — Rules the loader should enforce; tests/test_id_space.sh |
 | `PRG:0x020C18` | docs/game/atlas/character_tables.md — Variant-slot semantics (structural finding); docs/game/atlas/id_space.md — RESERVED IDS — vanilla does use part of the variant half |
 | `PRG:0x020C58` | docs/game/gotchas.md — THE "?" WALKER WRITES THE DRAWN ID EVERY FRAME, FROM TWO PATHS (paid: 14z-117, one crashing probe) |
-| `PRG:0x020C74` | docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-117 (2) — RANDOM SELECT INCLUDES THE TENANTS (maintainer-directed, freeze donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13, mark M11; field-validated on the board 2026-08-29, 14z-118): byte detail; build/manifest/donovan.toml — oboro_select_hook; build/manifest/donovan.toml — random_select_bound; build/manifest/huitzil.toml — oboro_select_hook; build/manifest/huitzil.toml — random_select_bound; +4 more |
+| `PRG:0x020C74` | docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-117 (2) — RANDOM SELECT INCLUDES THE TENANTS (maintainer-directed, freeze donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13, mark M11; field-validated on the board 2026-08-29, 14z-118): byte detail; build/manifest/donovan.toml — oboro_select_hook; build/manifest/donovan.toml — random_select_bound; build/manifest/huitzil.toml — oboro_select_hook; build/manifest/huitzil.toml — random_select_bound; +5 more |
 | `PRG:0x020C7C` | docs/project/patch_notes.md — 14z-117 (2) — RANDOM SELECT INCLUDES THE TENANTS (maintainer-directed, freeze donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13, mark M11; field-validated on the board 2026-08-29, 14z-118): byte detail; build/manifest/donovan.toml — oboro_select_hook; build/manifest/huitzil.toml — oboro_select_hook; build/manifest/pyron.toml — oboro_select_hook; tests/test_random_select_tenants.sh |
-| `PRG:0x020C80` | docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116); docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-117 (2) — RANDOM SELECT INCLUDES THE TENANTS (maintainer-directed, freeze donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13, mark M11; field-validated on the board 2026-08-29, 14z-118): byte detail; build/manifest/donovan.toml — oboro_select_hook; build/manifest/donovan.toml — random_select_roster; build/manifest/huitzil.toml — oboro_select_hook; +5 more |
+| `PRG:0x020C80` | docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116); docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-117 (2) — RANDOM SELECT INCLUDES THE TENANTS (maintainer-directed, freeze donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13, mark M11; field-validated on the board 2026-08-29, 14z-118): byte detail; build/manifest/donovan.toml — oboro_select_hook; build/manifest/donovan.toml — random_select_roster; build/manifest/huitzil.toml — oboro_select_hook; +6 more |
 | `PRG:0x020C86` | docs/game/gotchas.md — THE "?" WALKER WRITES THE DRAWN ID EVERY FRAME, FROM TWO PATHS (paid: 14z-117, one crashing probe) |
 | `PRG:0x020C88` | docs/game/atlas/character_tables.md — Slot→character map, vsavj (COMPLETE; select-name/HUD verified picks); docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116) |
 | `PRG:0x020C97` | docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116) |
@@ -2017,7 +2020,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0BE1BA` | docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets; build/manifest/bank_map.toml — word_pos_a |
 | `PRG:0x0BE1FA` | docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets; build/manifest/bank_map.toml — word_pos_b; build/manifest/reconciliation.toml — map |
 | `PRG:0x0BE23A` | docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); build/manifest/bank_map.toml — gap_be23a; tools/charmap_gen.py |
-| `PRG:0x0BE27A` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/game/engine_internals.md — vs2/vh2 fill them (named 14z-74; SIX instances and counting); docs/project/patch_index.md — Mechanism inventory (generator vocabulary); +60 more |
+| `PRG:0x0BE27A` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/game/engine_internals.md — vs2/vh2 fill them (named 14z-74; SIX instances and counting); docs/project/patch_index.md — Mechanism inventory (generator vocabulary); +61 more |
+| `PRG:0x0BE296` | build/manifest/shared_writes.toml — (top) |
 | `PRG:0x0BE2BA` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated); docs/project/patch_index.md — Mechanism inventory (generator vocabulary) [vh2]; build/manifest/bank_map.toml — gap_be2ba; build/manifest/shared_writes.toml — (top); build/manifest/shared_writes.toml — huitzil; tests/test_hui_grab_victim.sh |
 | `PRG:0x0BE2C6` | build/manifest/shared_writes.toml — donovan |
 | `PRG:0x0BE2FA` | docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets; docs/project/patch_notes.md — rows 0x10 + the per-tenant VALUE_SKIP default; build/manifest/bank_map.toml — gap_be37a; build/manifest/bank_map.toml — param32_b; tests/test_hui_walk.sh |

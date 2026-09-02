@@ -1,5 +1,26 @@
 # shared_writes.toml — THE FROZEN SHARED-SURFACE WRITE INVENTORY (14z-79)
 #
+# ***********************************************************************
+# ** STALE AS OF 14z-127 (2026-09-02) — THIS INVENTORY PINS THE 14z-91  **
+# ** BUILDS (don_m7 / hui41 / pyron26) AND HAS NOT SEEN A CURRENT BUILD **
+# ** IN TEN FREEZES. `tests/test_shared_writes.sh` IS GREEN AGAINST     **
+# ** THOSE PINNED DIRS, NOT AGAINST WHAT SHIPS.                         **
+# ** Audited against the 14z-127 builds: donovan 108 writes vs 90 frozen **
+# ** (18 NEW), huitzil 106 vs 87 (19 NEW), pyron 94 vs 76 (18 NEW).      **
+# ** Only 3 per tenant are 14z-127's (the boot_title_saved_* rows); the  **
+# ** other ~15 are shipped work from m8..m14 that NOBODY WAS EVER FORCED **
+# ** TO REVIEW -- e.g. 0x020B9C (the Oboro select hook, 14z-105),        **
+# ** 0x020C74/0x020C80 (random select, 14z-117), 0x0BE27A..0x0BE296      **
+# ** (eight poke32, the #99 AI-script unpark, 14z-111).                  **
+# ** DO NOT SIMPLY RE-POINT AND RE-FREEZE: that would launder an         **
+# ** unreviewed inventory into the gate that exists to review it         **
+# ** ([VSP-97]). The work is to establish WHOSE bytes each new write     **
+# ** lands on and record the `why`, then re-point. Handed to the         **
+# ** emulator-tier arc (maintainer, 2026-09-02: "as long as we hand the  **
+# ** audit to tonight's arc I don't mind freezing now: after all frozen  **
+# ** is not released").                                                  **
+# ***********************************************************************
+#
 # Every build op that lands OUTSIDE declared free space and OUTSIDE a known
 # variant row (0x10-0x1F of a bank_map per-character table) is listed here,
 # per tenant. `tests/test_shared_writes.sh` fails on any addition, removal or
