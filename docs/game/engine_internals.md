@@ -563,6 +563,28 @@ TICKS are. Same family as "THE ENGINE RUNS TWO TICKS IN ONE VIDEO FRAME"
 (`gotchas.md`) and the reason `tools/tick_durations.py` exists. [M:
 `tests/test_don_immortal_native.sh` §4, frozen at +1 frame; 14z-127]
 
+**THE MASH EXTENSION OF 421+P, AND WHAT GATES IT (measured 14z-127).** Mashing
+during the Lightning Sword extends its node loop. The mechanism, read off the
+deciding routine (vs2 `PRG:0x059EEA` and its two branches above it): each call
+adds 1 to a **MASH ACCUMULATOR**, the fighter block's `+0x0A`, if the new-press
+mask `+0x126 & 0x770F` is non-zero; the routine first tests `+0x0A >= 7` and,
+when it passes, spends one unit of an **ITERATION BUDGET** at `+0x27` and
+clears the accumulator, letting the chain advance into its loop node; when
+`+0x0A` is below 7, or the budget reaches 0, it instead adds 2 to the
+sub-state, loads seq `0x39` and switches to the common tail chain. **The budget
+IS the per-strength cap and it is data: 2 / 3 / 3 / 4 for LP / MP / HP / ES**,
+identical in both games. So the reachable hit counts are 3/5/6/9 unmashed and
+5/8/10/15 at the maximum press rate, on native vsav2.
+**The accumulator is fed on the VIDEO-FRAME clock while the check arrives on
+the TICK clock**, so the host engine's slower tick rate (the entry above) makes
+a ported character count MORE presses per check and therefore saturate at a
+LOWER mash rate than native — a mid-rate comparison reads as "extra hits" and
+the ceiling comparison reads as equal. Measure mash behaviour AT THE CEILING or
+not at all. [M: `tests/test_don_immortal_native.sh` §5; the deciding code is
+instruction-for-instruction identical between the games and all 94 chain nodes
+match in every non-pointer field, so neither the cap nor the gate is a port
+artefact; 14z-127]
+
 ### Donovan's anim-chain map — the moves named (14z-120, measured on native vs2)
 
 The naming step of the character-data map (phase 1): every row of

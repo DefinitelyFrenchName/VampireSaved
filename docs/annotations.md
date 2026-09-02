@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 2925 |
+| distinct program-space addresses named | 2927 |
 | named by a document or manifest only | 2035 |
-| named by both a document/manifest and code | 583 |
-| named by CODE ONLY (the gap list below) | 307 |
+| named by both a document/manifest and code | 584 |
+| named by CODE ONLY (the gap list below) | 308 |
 | carried by atlas | 473 |
-| carried by engine_internals | 534 |
+| carried by engine_internals | 535 |
 | carried by other docs | 931 |
 | carried by manifests | 1756 |
-| carried by code | 890 |
+| carried by code | 892 |
 
 ## Addresses
 
@@ -1496,6 +1496,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0598BE` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x059E10` | docs/game/engine_internals.md — Projectile parameters live in the per-TYPE handler, not in a table family (14z-120 (10), measured on Blizzard Sword) [vs2] |
 | `PRG:0x059E1A` | build/manifest/type_stamps.toml — stamp |
+| `PRG:0x059EEA` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2]; tests/test_don_immortal_native.sh |
 | `PRG:0x059FA0` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x059FAC` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x059FD4` | build/manifest/type_stamps.toml — stamp |
@@ -2865,6 +2866,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x0BF80A` | tests/test_patch_overlap.sh |
 | `PRG:0x0BF900` | tests/test_patch_overlap.sh |
 | `PRG:0x0C0000` | tests/test_patch_prg.sh; tests/test_pointer_flow.sh |
+| `PRG:0x0C00FA` | tests/test_don_immortal_native.sh |
 | `PRG:0x0C0114` | tests/audit_merged_vec3.sh |
 | `PRG:0x0CD286` | tests/audit_don_ko_writer.sh |
 | `PRG:0x0D0000` | tests/test_don_reactions.sh |

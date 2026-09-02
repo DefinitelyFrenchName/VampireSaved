@@ -753,3 +753,32 @@ frames.** Until that exists, do not read a cross-region null as a mechanical
 fact — read it as "the script did not transfer", which is what it is. Same
 family as [VSE-79] (a 1P-arcade rig is pinned to the arcade draw) and
 [VSP-132].
+
+
+## A "MASH" THAT PRESSES ONE FRAME AND RELEASES ONE FRAME IS HALF THE CEILING — and a saturation claim measured below the ceiling manufactures a difference (paid: 14z-127)
+
+`+0x126` is a NEW-PRESS mask, so a recipe must release between taps
+(the entry above). The obvious next step — press for 1 frame, release for 1,
+alternating two buttons — looks maximal and is **not**: the release frame is
+dead. **Alternating two buttons EVERY frame makes every frame a new press**,
+because the previous button is released as the next is pressed. That is double
+the rate, and it is the real ceiling.
+
+**What measuring below the ceiling did (Donovan's 421+P):** at the one-on/one-off
+rate ours read LP 3 / MP 8 / HP 10 / ES 13 against native's 5 / 8 / 8 / 11 —
+i.e. "ours never extends LP, and over-extends HP and ES by two". At the TRUE
+ceiling the same builds read LP 4 / MP 8 / HP 10 / ES 15 against native's
+5 / 8 / 10 / 15: **three of the four are EQUAL and the fourth is one hit
+short.** Nothing changed but the input.
+
+**Why it went wrong, and it generalises to any real-time-input mechanic
+compared across the sibling games:** the two engines run different numbers of
+engine ticks per video frame, so at a sub-maximal rate the two legs sit at
+different points of the SAME response curve. The ceiling is where the curve is
+flat on both, which is the only place the comparison is honest.
+
+**The rule:** before calling any input rate "saturating", demonstrate it —
+increase the rate and show the result does not move. `tests/test_don_immortal_native.sh`
+carries that as a live control (native ES: 9 hits unmashed → 15 at the
+ceiling), so the assertions cannot go vacuous if the mash script ever stops
+reaching the game.

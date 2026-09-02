@@ -34,34 +34,18 @@
 > ## vsav2 and 10 on vsavj. **RULING (maintainer, 2026-09-02): the engine,
 > ## being vanilla vsav, takes precedence** — so assert hit COUNT and DAMAGE,
 > ## never vsav2's frame numbers. Frozen as §4 of the gate.
-> ## **THE MASH ARC — OPENED 14z-127, THE RIG DESIGN IS NOW EVIDENCE-BASED.**
-> ## Mash extension is multi-level by rate (maintainer: at least two extra
-> ## levels). **DO NOT measure it by mash RATE: that is confounded** — presses
-> ## fire at fixed absolute frames while our move runs on the slower host
-> ## clock, so ours absorbs MORE presses for the same script and the legs are
-> ## never given equal input. It produced non-monotonic cells (MP at the
-> ## SLOWEST rate reading FEWER hits than no-mash), which no mechanic does.
-> ## **THE INDEPENDENT VARIABLE IS PRESSES CONSUMED DURING THE MOVE.**
-> ## **WHAT IS ALREADY MEASURED (14z-127, data on disk):**
-> ## `RAM:$FF840A` = P1 `+0x0A`, the ATTACK ID (`ram.md`:135), climbs once per
-> ## consumed press — a usable proxy for presses-delivered-into-the-move.
-> ## Against it: **native looks CAPPED — HP stays 8 hits across attack-ids
-> ## 8→21, ES stays 11 across 8→27 — while ours reaches 10 (HP, id 23) and 13
-> ## (ES, id 27).** A cap difference is the live hypothesis; it is NOT
-> ## established, because the legs never received equal press counts.
-> ## **RULED OUT, so it is not re-derived:** `+0x12e` is not the counter (0
-> ## with no mash, saturates at 3 whenever mashing happens at all, while hits
-> ## range 3..13). The other press-frame-correlated bytes found by a whole
-> ## work-RAM sweep are input mirrors (`$FF8058` and friends).
-> ## **THE ORDER THAT MATTERS:** find/confirm the counter FIRST, then build the
-> ## phase-anchored rig around it, then assert native vs ours on the
-> ## press→level curve. Building the rig first means guessing what to anchor
-> ## to, which is how the rate table came out non-monotonic.
-> ## **THE SAME RIG UNBLOCKS THE CROSS-REGION CONTROL:** `vsav`'s match starts
-> ## ~200+ frames after `vsavj`'s, so an absolute-frame replay lands in the
-> ## round intro (both sets DO place P1 at x=552 at round start and load the
-> ## same record — consistent with the maintainer's rule that regional
-> ## variants have no mechanical differences, but far short of testing it).
+> ## **THE MASH ARC — MEASURED AND CLOSED (14z-127).** Mash extends the loop:
+> ## a press adds 1 to the accumulator `+0x0A`; at **>= 7** the routine spends
+> ## one unit of the budget `+0x27` — **the per-strength cap, DATA, 2/3/3/4 for
+> ## LP/MP/HP/ES, identical in both games.** Nodes, deciding code and cap all
+> ## verified identical. **At the TRUE ceiling MP/HP/ES equal native
+> ## (8/12, 10/14, 15/19); LP is one hit short (4 vs 5) — hit phase, RULED
+> ## within "altered by the VS engine" and not chased.** Frozen as §5.
+> ## **THE TRAP, now a gotcha:** one-frame-on/one-frame-off is HALF the
+> ## ceiling. Below the ceiling the legs sit at different points of the same
+> ## response curve (the host clock changes presses-per-check), which read as
+> ## "ours never extends LP, over-extends HP/ES by 2" — all of it erased at the
+> ## ceiling. **Demonstrate saturation, never assume it.**
 > ##
 > ## **THE CLASS TO CARRY FORWARD:** a tenant replay is a claim about the
 > ## build it was authored for ([VSP-156]); **a confound check on POSITIONS

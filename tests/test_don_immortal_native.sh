@@ -39,17 +39,29 @@
 #   4. ENGINE   vanilla Victor mirror, both games      -> the +1 frame gap on
 #               content the port never touches: the licence for section 2's
 #               units, with the gap itself frozen
+#   5. CEILING  all four strengths at the TRUE maximum press rate -> MP/HP/ES
+#               must EQUAL native; LP is frozen at native-minus-one, ruled
 #
-# NOT COVERED HERE, deliberately (scoped 14z-127, not started):
-#   * MASHING. Mash extends the loop, and the extension is MULTI-LEVEL (the
-#     maintainer: at least two extra levels by rate). Measured 14z-127 across
-#     six rates, but the rig fires presses at FIXED ABSOLUTE FRAMES while our
-#     move runs on the slower host clock, so the presses land at different
-#     PHASES of the move on the two legs and the comparison is confounded --
-#     it produced non-monotonic cells (MP at the slowest rate reading FEWER
-#     hits than no-mash), which no real mechanic does. A mash assertion needs
-#     a script anchored to each leg's OWN move progress. Until then this gate
-#     says nothing about mashing rather than something false.
+# MASHING IS NOW COVERED (section 5, measured 14z-127). Mash extends the loop:
+# each new press bumps a MASH ACCUMULATOR (`+0x0A`), and when the deciding code
+# finds it at >= 7 it spends one unit of an ITERATION BUDGET (`+0x27`, the
+# per-strength cap: 2/3/3/4 for LP/MP/HP/ES) and loops again. VERIFIED
+# IDENTICAL BETWEEN THE GAMES AT THREE LEVELS -- the 94 chain nodes (every
+# non-pointer field, every link relocated by the port delta), the deciding code
+# (vs2 0x059EEA vs ours 0x0C00FA, instruction for instruction, only the jmp
+# relocated), and the budget's start value per strength.
+# AT THE TRUE INPUT CEILING MP/HP/ES REACH NATIVE'S COUNTS EXACTLY (8/12,
+# 10/14, 15/19); LP is ONE HIT SHORT (4 vs 5). Everything else that looked
+# like a mash defect was the HOST CLOCK: ours counts more presses per check
+# (more video frames per tick), so it saturates at a LOWER mash rate -- at a
+# mid rate that reads as "+2 hits", at the ceiling it reads as equal.
+# LP's residue is hit PHASE: ours' last hit lands ON the decision node, its
+# freeze holds that node, and the loop re-entry skips one node, costing one
+# hitbox window. MAINTAINER-RULED 2026-09-02, within "altered by the VS
+# engine": not chased -- the alternative is a one-frame phase change on a
+# shared path, which is the trade the superset invariant exists to refuse.
+#
+# NOT COVERED HERE, deliberately:
 #   * TICK-ACCURATE DURATIONS. `tools/tick_durations.py` is the right
 #     instrument (a write tap fires per write, so it sees every tick); it is
 #     PC-pinned to vsavj and needs vs2's twin PCs for a cross-game run.
@@ -57,7 +69,7 @@
 # Usage: ROMDIR=... tests/test_don_immortal_native.sh [rompath_dir]
 #   The rompath's pack picks the track: a `vsavjw.zip` runs the WIDE leg
 #   (replay don/114 + the WIDE MAME binary), anything else the stock leg.
-# Runtime: ~9 min, emulator tier.
+# Runtime: ~15 min, emulator tier.
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -70,7 +82,7 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 cd "$REPO"
 
-DSPEC="$(python3 -c "print(';'.join(f'{f}:ff8800-ff8a00' for f in range(2600,2761))+';2600:ff8400-ff8600')")"
+DSPEC="$(python3 -c "print(';'.join(f'{f}:ff8800-ff8a00' for f in range(2600,2801))+';2600:ff8400-ff8600')")"
 
 # Per-strength replays are DERIVED from the two committed bases by substituting
 # the button on the activation line -- one line, printed, rather than eight
@@ -117,6 +129,33 @@ grep -v '^#' "$REPO/tests/replays/48_don_immortal_ko.rpl" \
 run van_vs2  vsav2 "$ROMDIR" "$WORK/van.rpl" "$VPOKE"
 run van_vsavj vsavj "$ROMDIR" "$WORK/van.rpl" "$VPOKE"
 
+# Section 5: THE TRUE INPUT CEILING. A "mash" that presses for one frame and
+# releases for one frame leaves a DEAD FRAME -- it is HALF the achievable rate.
+# Alternating two buttons every frame makes EVERY frame a new press (the
+# previous button is released), which is the real ceiling. Measuring below the
+# ceiling compares the two legs at different points of the response curve and
+# manufactures a difference (paid for 14z-127).
+mkceil() {  # mkceil <base rpl> <button> <out>
+    python3 - "$REPO/tests/replays/$1" "$2" "$3" <<'EOP'
+import sys
+src, btn, out = sys.argv[1], sys.argv[2], sys.argv[3]
+body = [l for l in open(src).read().splitlines() if not l.startswith('#')]
+body = [f'2620-2624 p1={btn}' if l.startswith('2620-2624 p1=') else l for l in body]
+mash = [f'{f}-{f} p1=' + ('1' if f % 2 == 0 else '2') for f in range(2636, 2791)]
+body = [l for l in body if not l.endswith(' wait')] + mash + ['3600 wait']
+open(out, 'w').write("\n".join(body) + "\n")
+EOP
+    grep -q "^2620-2624 p1=$2\$" "$3" || { echo "FAIL: ceiling replay $3 malformed"; exit 1; }
+}
+for s in LP:1 MP:2 HP:3 ES:13; do
+    st="${s%%:*}"; b="${s##*:}"; pk=""
+    [ "$st" = ES ] && pk="2550:ff8509:09"
+    mkceil 51_vs2_immortal_native.rpl "$b" "$WORK/nat_${st}_ceil.rpl"
+    mkceil "$OURS_BASE"               "$b" "$WORK/our_${st}_ceil.rpl"
+    run "nat_${st}_ceil" vsav2       "$ROMDIR"         "$WORK/nat_${st}_ceil.rpl" "$pk"
+    run "our_${st}_ceil" "$OURS_SET" "$RPDIR;$ROMDIR"  "$WORK/our_${st}_ceil.rpl" "$pk" "$OURS_BIN"
+done
+
 python3 - "$WORK" "$BASES" <<'EOF2'
 import sys, os, struct
 work, bases_path = sys.argv[1], sys.argv[2]
@@ -134,7 +173,7 @@ def u32(b,o): return struct.unpack('>I',b[o:o+4])[0]
 def measure(leg):
     d = os.path.join(work, leg); prev=None; hits=[]; xs={}
     p1 = u32(open(os.path.join(d,'dump_2600_ff8400.bin'),'rb').read(), 0x60)
-    for f in range(2600, 2761):
+    for f in range(2600, 2801):
         p = os.path.join(d, f'dump_{f}_ff8800.bin')
         if not os.path.exists(p): continue
         b = open(p,'rb').read(); hp = u16(b,0x50); xs[f] = s16(b,0x10)
@@ -185,7 +224,7 @@ print(f"  ok: CONTROL fires — pristine vsavj (Jedah) {c['n']}h/{c['dmg']}d "
 # ── 4. the engine clock, on vanilla content: why §2 compares counts ─────
 def drain(leg):
     d = os.path.join(work, leg); prev=None; hit=None; vals=[]
-    for f in range(2600, 2761):
+    for f in range(2600, 2801):
         p = os.path.join(d, f'dump_{f}_ff8800.bin')
         if not os.path.exists(p): continue
         b = open(p,'rb').read(); hp = u16(b,0x50)
@@ -204,5 +243,36 @@ assert fj == f2 + 1, (
 print(f"  ok: ENGINE CLOCK on vanilla content — freeze {s2} drains in {f2} f on "
       f"vsav2, {fj} f on vsavj (+1, frozen). The host clock is slower FOR "
       f"EVERYONE, so §2 asserts counts, not frames")
+
+# ── 5. THE CEILING: at maximum press rate the counts must meet native ────
+# Frozen from the 14z-127 measurement. LP's one-hit shortfall is RULED
+# (maintainer 2026-09-02) as within "altered by the VS engine" -- it is hit
+# PHASE, not data or code, and it is asserted EXACTLY so a move either way fails.
+CEIL_NATIVE = {'LP': (5, 9), 'MP': (8, 12), 'HP': (10, 14), 'ES': (15, 19)}
+CEIL_OURS   = {'LP': (4, 8), 'MP': (8, 12), 'HP': (10, 14), 'ES': (15, 19)}
+for st in ('LP', 'MP', 'HP', 'ES'):
+    n = measure(f'nat_{st}_ceil'); o = measure(f'our_{st}_ceil')
+    assert n['p1'] == DON_VS2, f"ceiling native {st}: P1 is {n['p1']:#x}, not vs2 Donovan"
+    assert o['p1'] == DON,     f"ceiling ours {st}: P1 is {o['p1']:#x}, not Donovan (bases.tsv)"
+    assert (n['n'], n['dmg']) == CEIL_NATIVE[st], (
+        f"NATIVE {st} at the ceiling = {n['n']}h/{n['dmg']}d, frozen "
+        f"{CEIL_NATIVE[st]} — the instrument moved, not the port")
+    assert (o['n'], o['dmg']) == CEIL_OURS[st], (
+        f"OURS {st} at the ceiling = {o['n']}h/{o['dmg']}d, frozen {CEIL_OURS[st]}")
+    tag = 'EQUALS native' if CEIL_OURS[st] == CEIL_NATIVE[st] else \
+          'native-minus-one (RULED: engine hit-phase, 14z-127)'
+    print(f"  ok: CEILING {st:2} ours {o['n']}h/{o['dmg']:2}d vs native "
+          f"{n['n']}h/{n['dmg']:2}d — {tag}")
+
+# MUST-FIRE CONTROL FOR THE CEILING ITSELF: the one-on/one-off mash used
+# everywhere before 14z-127 is NOT the ceiling (it leaves a dead frame). If
+# section 2's no-mash ES and the ceiling ES agreed, the ceiling script would be
+# doing nothing and every assertion above would be vacuous.
+nomash_es = measure('nat_ES')['n']
+assert CEIL_NATIVE['ES'][0] > nomash_es, (
+    f"CEILING CONTROL DEAD: native ES is {CEIL_NATIVE['ES'][0]} at the ceiling and "
+    f"{nomash_es} with no mash — the mash script is not reaching the game")
+print(f"  ok: ceiling control fires — native ES {nomash_es}h no-mash -> "
+      f"{CEIL_NATIVE['ES'][0]}h at max press rate (the mash is live)")
 EOF2
-echo "PASS: 421+P equals native in hit count and damage at every strength (no-mash)"
+echo "PASS: 421+P matches native at every strength (no-mash AND at the mash ceiling, LP's ruled one-hit phase residue excepted)"

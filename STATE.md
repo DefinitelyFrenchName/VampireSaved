@@ -1536,29 +1536,31 @@ wrong is *safe and loud* over designs that are merely well-measured.
   porting the character to a different engine and the engine, being vanilla
   vsav, takes precedence."** So the gate asserts HIT COUNT and DAMAGE — the
   quantities the host clock does not set — and never vsav2's frame numbers.
-  **(d) STILL OPEN — MASHING; the arc is opened and the rig design is now
-  evidence-based (14z-127).** `RAM:$FF840A` = P1 `+0x0A`, the ATTACK ID
-  (`ram.md`:135), climbs once per consumed press and is a usable proxy for
-  presses-delivered-into-the-move. Against it, **native looks CAPPED — HP
-  stays 8 hits across attack-ids 8→21, ES stays 11 across 8→27 — while ours
-  reaches 10 (HP at 23) and 13 (ES at 27).** A CAP DIFFERENCE IS THE LIVE
-  HYPOTHESIS AND IS NOT ESTABLISHED: the legs never received equal press
-  counts, because ours absorbs more presses for the same script (its move
-  lasts longer in video frames — the host clock again). RULED OUT so it is not
-  re-derived: `+0x12e` is not the counter (0 unmashed, saturates at 3 whenever
-  mashing happens, while hits range 3..13); the other press-correlated bytes a
-  whole work-RAM sweep found are input mirrors (`$FF8058` and friends).
-  ORDER: confirm the counter, then build the phase-anchored rig around it,
-  then assert the press→level curve. **THE ORIGINAL MASH MEASUREMENT AND WHY
-  IT IS NOT REPORTED AS GAME TRUTH:** Mash extends the loop and the extension is
-  MULTI-LEVEL (maintainer: at least two extra levels by rate; measured across
-  six rates 14z-127). **The measurement is CONFOUNDED and is not reported as
-  game truth:** the rig fires presses at FIXED ABSOLUTE FRAMES while our move
-  runs on the slower host clock, so presses land at different PHASES of the
-  move on the two legs — it produced non-monotonic cells (MP at the slowest
-  rate reading FEWER hits than no-mash), which no real mechanic does. Needs a
-  script anchored to each leg's OWN move progress. Not started.
-  **WHAT THE ISSUE GOT RIGHT:** the provenance criticism was fair —
+  **(d) MASHING — MEASURED AND CLOSED (14z-127).** Mash extends the node loop:
+  each new press adds 1 to the MASH ACCUMULATOR `+0x0A` (gate: `+0x126 &
+  0x770F`), and when the deciding routine finds it at **>= 7** it spends one
+  unit of the ITERATION BUDGET `+0x27` — **the per-strength cap, and it is
+  DATA: 2/3/3/4 for LP/MP/HP/ES, identical in both games.** Verified identical
+  at three levels: the 94 chain nodes (every non-pointer field; every link
+  relocated by the port delta), the deciding code (vs2 `PRG:0x059EEA` vs ours
+  `PRG:0x0C00FA`, instruction for instruction, only the `jmp` relocated), and
+  the budget's start value.
+  **AT THE TRUE INPUT CEILING MP/HP/ES EQUAL NATIVE EXACTLY** (8/12, 10/14,
+  15/19); **LP is ONE HIT SHORT (4 vs 5)** — hit PHASE: ours' last hit lands ON
+  the decision node, its freeze holds that node, and the loop re-entry skips one
+  node, costing one hitbox window. **RULED (maintainer, 2026-09-02): within
+  "altered by the VS engine", NOT chased** — the alternative is a one-frame
+  phase change on a shared path, the trade the superset invariant exists to
+  refuse. Frozen as §5 of the gate, LP asserted exactly so a move either way
+  fails.
+  **THE MEASUREMENT TRAP THAT COST THE MOST, now a gotcha:** a one-frame-on /
+  one-frame-off mash is HALF the ceiling (the release frame is dead);
+  alternating buttons EVERY frame is the ceiling. Below it the two legs sit at
+  different points of the same response curve, because the host clock changes
+  presses-counted-per-check — which manufactured a reading of "ours never
+  extends LP and over-extends HP/ES by 2" that the ceiling erased. Ruled out
+  along the way: `+0x12e` (saturates at 3) and the `$FF8058` input mirrors.
+  **WHAT THE ISSUE GOT RIGHT:**  **WHAT THE ISSUE GOT RIGHT:** the provenance criticism was fair —
   `native == 10` did enter `test_don_reactions.sh` as testimony (STATE
   14z-42c). It is correct, and is now measured in-run. 14z-42's cadence root
   cause and 14z-43's dispatch fix stand untouched.
