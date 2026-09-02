@@ -712,3 +712,44 @@ and damage are equal at every strength. Maintainer's ruling (2026-09-02):
 *"we must respect the fact that we are porting the character to a different
 engine and the engine, being vanilla vsav, takes precedence."*
 Frozen as section 4 of `tests/test_don_immortal_native.sh`.
+
+**THIS IS ABOUT DIFFERENT GAMES, NOT DIFFERENT REGIONS — and `vsavj` is not
+"a region" here, it is THE REFERENCE.** Vanilla Japanese VS has been this
+project's source of truth for vanilla VS since the beginning ([VSP-9],
+DECIDED, do not reopen), so the comparison above is *the host engine* (vsavj,
+our reference for VS) against *the donor game* (vsav2) — not one region
+against another.
+**Maintainer's rule (2026-09-02): the REGIONAL variants of VS differ only in
+translated text, naming and the like; per Capcom AND the community the
+FIGHTING ENGINE ITSELF IS EXACTLY THE SAME.** (The one axis that could
+plausibly have moved timing is PAL, and it does not apply — this is a CPS-2
+arcade board.) **So if you ever measure a mechanical difference between `vsav`
+and `vsavj`, THE STRONG PRIOR IS THAT YOUR MEASUREMENT OR YOUR TOOL IS
+WRONG** — check the instrument before you write it down. Not zero, though: a
+genuine undocumented niche difference is conceivable and would be a real find,
+so measure it properly rather than dismissing it.
+**What was and was not measured here (14z-127): the +1 frame gap is `vsavj`
+vs `vsav2`, on four vanilla characters. `vsav` vs `vsavj` was NOT tested** —
+see the entry below for why the attempt did not produce a comparison.
+
+
+## A REPLAY DOES NOT TRANSFER BETWEEN REGIONAL SETS EITHER — `vsav`'s match starts ~200+ frames after `vsavj`'s (paid: 14z-127)
+
+The same absolute-frame script that lands a clean hit on `vsavj` at f2629
+lands in the ROUND INTRO on `vsav`: P1 never consumes the `2500-2560` walk, so
+it is still at its round-start x when the attack frame arrives and the attack
+whiffs. Measured: P1's first x change is f2548 on `vsavj` and f2764 on `vsav`
+(and the latter is a drift, not the scripted walk). The World set's boot and
+attract are longer.
+
+**The reassuring half, and the only cross-region datum this produced: both sets
+place P1 at x = 552 at round start**, and the same forced pick loads the same
+record base (`0x0009769e`, Victor) on both — consistent with the regional rule
+above, and nowhere near enough to test it.
+
+So a cross-region control needs the same thing the mash matrix needs: **a rig
+anchored to each leg's OWN match/move progress rather than to absolute
+frames.** Until that exists, do not read a cross-region null as a mechanical
+fact — read it as "the script did not transfer", which is what it is. Same
+family as [VSE-79] (a 1P-arcade rig is pinned to the arcade draw) and
+[VSP-132].

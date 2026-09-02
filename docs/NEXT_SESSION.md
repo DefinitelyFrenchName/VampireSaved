@@ -34,11 +34,20 @@
 > ## vsav2 and 10 on vsavj. **RULING (maintainer, 2026-09-02): the engine,
 > ## being vanilla vsav, takes precedence** — so assert hit COUNT and DAMAGE,
 > ## never vsav2's frame numbers. Frozen as §4 of the gate.
-> ## **STILL OPEN — MASHING.** Multi-level by rate (maintainer: at least two
+> ## **STILL OPEN — MASHING, and it needs ONE new instrument that two things
+> ## want.** Mash extension is multi-level by rate (maintainer: at least two
 > ## extra levels). Measured across six rates and **the measurement is
 > ## confounded**: fixed absolute press frames against a slower host clock put
-> ## the presses at different phases per leg (it produced non-monotonic cells).
-> ## Needs a script anchored to each leg's OWN move progress. Not started.
+> ## the presses at different phases per leg (it produced non-monotonic cells —
+> ## MP at the SLOWEST rate reading FEWER hits than no-mash, which no mechanic
+> ## does). **THE SAME GAP BLOCKS THE CROSS-REGION CONTROL:** `vsav`'s match
+> ## starts ~200+ frames after `vsavj`'s, so the replay lands in the round
+> ## intro and the attack whiffs (both sets DO place P1 at x=552 at round
+> ## start, and the forced pick loads the same record — consistent with the
+> ## maintainer's rule that regional variants have no mechanical differences,
+> ## but nowhere near a test of it). **BUILD THE PHASE-ANCHORED RIG ONCE** —
+> ## inputs expressed relative to each leg's own match/move progress — and both
+> ## fall out. Not started.
 > ## **THE CLASS TO CARRY FORWARD:** a tenant replay is a claim about the
 > ## build it was authored for ([VSP-156]); **a confound check on POSITIONS
 > ## does not establish IDENTITY**; and **a duration in VIDEO FRAMES is not
