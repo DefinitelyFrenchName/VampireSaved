@@ -243,14 +243,21 @@ run_one() {   # run_one <gate> <lane> <scope> <args> — writes one results row
         env $_env "tests/$_g.sh" $_pos </dev/null >> "$_log" 2>&1 && _st=0 || _st=$?
     fi
     _t1=$(date +%s); _dur=$((_t1 - _t0))
+    # EXIT STATUS DECIDES FIRST. A gate that prints `SKIP:` AND exits non-zero
+    # is a FAILURE, not a skip — and the case is not hypothetical: on the first
+    # sweep `test_wide_profile.sh` printed "SKIPPED: set FBNEO_REF ..." and then
+    # exited 2 with "PARTIAL: the emulator superset invariant was NOT run". The
+    # gate was scrupulous; the classifier downgraded it, and the ONE gate that
+    # justifies modifying an emulator at all read as a benign skip. SKIP is
+    # only ever exit 0 plus the marker.
     if [ "$_st" = 124 ] || [ "$_st" = 137 ]; then
         _v=TIMEOUT; _d="killed after ${TMO}s"
+    elif [ "$_st" != 0 ]; then
+        _v=FAIL;    _d="exit $_st: $(grep -aE '^ *(SKIP|PARTIAL)|FAIL|ERROR|Traceback|not found' "$_log" | tail -1 | cut -c1-90)"
     elif grep -qE '^ *SKIP' "$_log"; then
         _v=SKIP;    _d="$(grep -E '^ *SKIP' "$_log" | head -1 | cut -c1-90)"
-    elif [ "$_st" = 0 ]; then
-        _v=PASS;    _d=""
     else
-        _v=FAIL;    _d="exit $_st: $(grep -aE 'FAIL|ERROR|Traceback|not found' "$_log" | tail -1 | cut -c1-90)"
+        _v=PASS;    _d=""
     fi
     printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$_g" "$_lane" "$_scope" "$_v" "$_dur" "$_d" >> "$RESULTS"
     printf '  %-34s %-7s %4ss  %s\n' "$_g" "$_v" "$_dur" "$_d"

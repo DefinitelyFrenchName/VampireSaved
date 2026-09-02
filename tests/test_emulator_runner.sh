@@ -67,6 +67,13 @@ mk g_pass    0 "all good"
 mk g_fail    1 "something broke" "FAIL: nope"
 mk g_skip    0 "SKIP: no build at build/nope"
 mk g_prose   0 "checked 3 things, none had to be skipped"
+# The one that had to be paid for: a SKIP marker AND a non-zero exit. It ran,
+# could not complete, and said so — a FAILURE. test_wide_profile.sh does
+# exactly this (printing "SKIPPED: set FBNEO_REF" then exiting 2 with
+# "PARTIAL: the emulator superset invariant was NOT run"), and the first
+# classifier called it a skip: the one gate that justifies modifying an
+# emulator at all read as benign.
+mk g_skipfail 2 "  SKIPPED: no reference binary" "PARTIAL: the invariant was NOT run"
 mk g_out     0 "an out-of-release-scope gate ran"
 mk g_args    0 "argument check"
 mk g_prereq  0 "the instrument is sound"
@@ -99,7 +106,8 @@ reg "$(row g_pass mame release - '')" \
     "$(row g_noexec mame release - '')" \
     "$(row g_out mame out - 'momentary: a stub')" \
     "$(row g_args mame release '%MERGED%/rompath EXTRA=1' '')" \
-    "$(row g_orphan mame release - '')"
+    "$(row g_orphan mame release - '')" \
+    "$(row g_skipfail mame release - '')"
 out="$(run --log "$T/l1" || true)"
 printf '%s\n' "$out" > "$T/out1.txt"
 line="$(printf '%s\n' "$out" | grep -E '^PASS ' || true)"
@@ -107,10 +115,10 @@ case "$line" in
 *"PASS 4 "*) ok "PASS counted 4 (g_pass, g_prose, g_args, g_orphan): $line" ;;
 *) fail "expected PASS 4 (incl. the prose gate), got: $line" ;;
 esac
+case "$line" in *"FAIL 2 "*) ok "a SKIP marker with a NON-ZERO exit counts FAIL, not SKIP" ;;
+*) fail "expected FAIL 2 (g_fail + the SKIP-and-exit-2 gate), got: $line" ;; esac
 case "$line" in *"SKIP 1 "*) ok "SKIP counted separately from PASS" ;;
 *) fail "expected SKIP 1, got: $line" ;; esac
-case "$line" in *"FAIL 1 "*) ok "FAIL counted 1" ;;
-*) fail "expected FAIL 1, got: $line" ;; esac
 case "$line" in *"MISSING 1"*) ok "a non-executable registered gate is MISSING" ;;
 *) fail "expected MISSING 1, got: $line" ;; esac
 printf '%s\n' "$out" | grep -q "g_out" && fail "an \`out\` row ran under --scope release" \

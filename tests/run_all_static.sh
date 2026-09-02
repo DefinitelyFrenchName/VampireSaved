@@ -117,17 +117,23 @@ run_tier() {  # run_tier <label> <names>
         _out="$(tests/"$g".sh </dev/null 2>&1)" && _st=0 || _st=$?
         _t1=$(date +%s)
         _dur=$((_t1 - _t0))
-        if printf '%s' "$_out" | grep -qE '^ *SKIP'; then
-            _why="$(printf '%s' "$_out" | grep -E '^ *SKIP' | head -1 | cut -c1-58)"
-            printf '  %-34s SKIP  %3ss  %s\n' "$g" "$_dur" "$_why"
-            n_skip=$((n_skip + 1)); skipped="$skipped $g"
-        elif [ "$_st" = 0 ]; then
-            printf '  %-34s PASS  %3ss\n' "$g" "$_dur"
-            n_pass=$((n_pass + 1))
-        else
+        # EXIT STATUS DECIDES FIRST (corrected 14z-128). A gate that prints
+        # `SKIP:` AND exits non-zero is a FAILURE: it ran, could not complete,
+        # and said so. Found in the emulator twin of this runner, where
+        # test_wide_profile.sh printed "SKIPPED: set FBNEO_REF" and exited 2
+        # with "PARTIAL: the emulator superset invariant was NOT run" — the
+        # classifier called it a skip. SKIP is exit 0 plus the marker, only.
+        if [ "$_st" != 0 ]; then
             printf '  %-34s FAIL  %3ss  (exit %s)\n' "$g" "$_dur" "$_st"
             printf '%s\n' "$_out" | tail -4 | sed 's/^/        | /'
             n_fail=$((n_fail + 1)); failed="$failed $g"
+        elif printf '%s' "$_out" | grep -qE '^ *SKIP'; then
+            _why="$(printf '%s' "$_out" | grep -E '^ *SKIP' | head -1 | cut -c1-58)"
+            printf '  %-34s SKIP  %3ss  %s\n' "$g" "$_dur" "$_why"
+            n_skip=$((n_skip + 1)); skipped="$skipped $g"
+        else
+            printf '  %-34s PASS  %3ss\n' "$g" "$_dur"
+            n_pass=$((n_pass + 1))
         fi
     done
 }

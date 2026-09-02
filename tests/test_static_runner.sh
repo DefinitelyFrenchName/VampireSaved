@@ -52,8 +52,14 @@ mk g_skip_indent 0 "  SKIP: indented skip marker"
 # marker. It must be read as PASS, or every gate that documents the skip
 # convention in its output would be miscounted.
 mk g_prose 0 "checked 3 things, none had to be skipped" "PASS: prose only"
+# The one that had to be paid for: a gate that prints a SKIP marker AND exits
+# NON-ZERO. It ran, could not complete, and said so — that is a FAILURE, not a
+# skip. Found 14z-128 in the emulator twin, where test_wide_profile.sh printed
+# "SKIPPED: set FBNEO_REF" and exited 2 with "PARTIAL: the emulator superset
+# invariant was NOT run", and the classifier called it a skip.
+mk g_skip_fail 2 "  SKIPPED: no reference binary" "PARTIAL: the invariant was NOT run"
 
-printf 'g_pass\ng_fail\ng_skip\ng_skip_indent\ng_prose\n' > "$FR/tests/ci_portable.txt"
+printf 'g_pass\ng_fail\ng_skip\ng_skip_indent\ng_prose\ng_skip_fail\n' > "$FR/tests/ci_portable.txt"
 : > "$FR/tests/ci_static.txt"
 
 out="$(cd "$FR" && sh tests/run_all_static.sh --tier portable 2>&1)" && st=0 || st=$?
@@ -72,10 +78,11 @@ check g_fail FAIL
 check g_skip SKIP
 check g_skip_indent SKIP
 check g_prose PASS
+check g_skip_fail FAIL
 
 echo "== 2. the TALLY matches (the number a human reads) =="
-if printf '%s' "$out" | grep -q "PASS 2 .*SKIP 2 .*FAIL 1"; then
-    echo "  ok: PASS 2  SKIP 2  FAIL 1"
+if printf '%s' "$out" | grep -q "PASS 2 .*SKIP 2 .*FAIL 2"; then
+    echo "  ok: PASS 2  SKIP 2  FAIL 2 (the SKIP-and-exit-2 gate counts FAIL)"
 else
     fail "wrong tally: $(printf '%s' "$out" | grep -E '^PASS ' || echo '(none printed)')"
 fi
