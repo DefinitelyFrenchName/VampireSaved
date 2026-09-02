@@ -217,7 +217,28 @@ else
     fail "a repeated --lane ran the lane more than once"
 fi
 
-echo "9. the shipped registry is complete both ways"
+echo "9. a lane WAITS for its own gates (--jobs > 1)"
+# The pipeline version announced the next lane while the previous lane's last
+# partial batch was still running, orphaning gates across the boundary.
+{ echo '#!/bin/sh'; echo ': "${MAME_BIN:-}"'; echo 'sleep 3'; echo 'echo slow-done'; } \
+    > "$FR/tests/g_slow3.sh"; chmod +x "$FR/tests/g_slow3.sh"
+reg "$(row g_slow3 fbneo release - '')" "$(row g_pass mame release - '')"
+out12="$(run --jobs 4 --log "$T/l12" || true)"
+# the slow fbneo gate's verdict line must appear BEFORE the mame lane heading
+slow_line="$(printf '%s\n' "$out12" | grep -n 'g_slow3 ' | head -1 | cut -d: -f1)"
+mame_line="$(printf '%s\n' "$out12" | grep -n '== mame lane' | head -1 | cut -d: -f1)"
+if [ -n "$slow_line" ] && [ -n "$mame_line" ] && [ "$slow_line" -lt "$mame_line" ]; then
+    ok "a lane's gates finish before the next lane is announced"
+else
+    fail "lane boundary crossed: g_slow3 at line ${slow_line:-none}, mame lane at ${mame_line:-none}"
+fi
+if awk -F'\t' 'NR>1 && $1=="g_slow3" && $2=="fbneo"' "$T/l12/results.tsv" | grep -q .; then
+    ok "its result is recorded under its OWN lane"
+else
+    fail "g_slow3's result is missing or filed under the wrong lane"
+fi
+
+echo "10. the shipped registry is complete both ways"
 python3 - <<'PY' || rc=1
 import glob, os, sys
 def reg(p):

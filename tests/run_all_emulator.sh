@@ -280,7 +280,16 @@ for _l in $LANES; do
     # a different instrument.
     _jobs=$JOBS; [ "$_l" = prereq ] && _jobs=1
     _running=0
-    printf '%s\n' "$_rows" | while IFS="$(printf '\t')" read -r g lane scope args note; do
+    # THE LANE'S ROWS GO THROUGH A FILE, NOT A PIPE. A `... | while read` loop
+    # runs in a SUBSHELL: the background gates it starts belong to the
+    # subshell, so the main shell's `wait` had nothing of its own to wait for
+    # and the lane announced itself finished while its last partial batch was
+    # still running. Measured on the second real invocation (14z-128):
+    # `test_wide_profile` was left running ORPHANED, overlapping the next
+    # lane, and its result landed under the wrong heading. Reading from a file
+    # keeps the loop — and `wait`, and `_running` — in the main shell.
+    printf '%s\n' "$_rows" > "$LOGDIR/.lane_$_l"
+    while IFS="$(printf '\t')" read -r g lane scope args note; do
         [ -n "$g" ] || continue
         if already_done "$g"; then
             printf '  %-34s %-7s        (resumed: already in results.tsv)\n' "$g" "-"
@@ -298,8 +307,9 @@ for _l in $LANES; do
             _running=$((_running + 1))
             if [ "$_running" -ge "$_jobs" ]; then wait; _running=0; fi
         fi
-    done
-    wait 2>/dev/null || true
+    done < "$LOGDIR/.lane_$_l"
+    wait                       # the lane is not finished until its gates are
+    rm -f "$LOGDIR/.lane_$_l"
     # THE INSTRUMENT GATE. A red prereq means every later measurement is
     # measured with a moved instrument, so the run stops by default.
     if [ "$_l" = prereq ] && [ "$DRY" = 0 ] && [ "$KEEPGOING" = 0 ]; then
