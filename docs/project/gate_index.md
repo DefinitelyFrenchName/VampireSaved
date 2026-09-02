@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**295 scripts** — 63 ci_portable, 64 ci_static, 168 emulator-tier (run by name).
+**296 scripts** — 64 ci_portable, 64 ci_static, 168 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 8 | the suite runners and their own ground truth |
+| [runner](#runner) | 9 | the suite runners and their own ground truth |
 | [docs](#docs) | 10 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 26 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 51 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -42,6 +42,7 @@ the suite runners and their own ground truth.
 | `tests/run_battery_m2.sh` | run | emulator | MAME, FBNeo, a build dir, ~15 min | the M2 deliverable battery: the EXACT gate chain a stage-6 dev build must pass before any commit that touches the build (CLAUDE.md rule 2 / persistent-suite doctrine). One command, no chat-memory chain. Sections: 0. | M2 |
 | `tests/run_suite.sh` | run | emulator | MAME | the oracle replay suite (MAME side), auto-detecting runner. | 14z-94 |
 | `tests/test_emulator_runner.sh` | test | ci_portable | — | ground truth for tests/run_all_emulator.sh (14z-128). ROM-free, ~5 s. | 14z-128 |
+| `tests/test_header_defaults.sh` | test | ci_portable | — | a gate's HEADER must state the default its CODE actually uses (14z-128). ROM-free, ~2 s. | 14z-128 |
 | `tests/test_shell_portability.sh` | test | ci_portable | — | a `#!/bin/sh` script must actually be POSIX sh (14z-90, GitHub issue #15). | 14z-90 |
 | `tests/test_suite_dispatch.sh` | test | emulator | emulator | ground truth for the auto-detecting runner's dispatch pieces (no emulator needed; the emulator-side behaviors they gate are proven by test_m2_repoint.sh and the suite itself): 1. build_fingerprint: vanilla rompath -> 'vsavj'; | — |
 | `tests/test_suite_dispatch_selftest.sh` | test | ci_static | ROMDIR | ground truth for the kind->owner table in tests/test_suite_dispatch.sh (14z-90, GitHub issue #7). | 14z-90 |

@@ -48,7 +48,7 @@
 # Kill pokes: NONE — losses are the mash's own (audit_kill_poke_shape:
 # a 2-byte HP poke would manufacture #103's stall and wedge the leg).
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged11]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21]
 #        tests/audit_continue_ladder.sh
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the

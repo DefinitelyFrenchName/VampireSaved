@@ -33,7 +33,7 @@
 # produced the CHARACTER, not just a byte.
 #
 # Usage: ROMDIR=... tests/test_oboro_select.sh [wide_rompath] [stock_rompath]
-#   defaults: build/m3b_merged15/rompath, build/m5_stock8/rompath
+#   defaults: build/m3b_merged21/rompath, build/m5_stock13/rompath
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):

@@ -48,7 +48,7 @@
 # ramp (>=4 distinct non-white non-zero values), and DEAD otherwise —
 # no single frame constant is pinned (the #10 lesson).
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged11]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21]
 #        [EXPECT_WHITE=1] tests/audit_win_pal_auto.sh     (~10 min, 5 MAME runs; default is 0)
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the

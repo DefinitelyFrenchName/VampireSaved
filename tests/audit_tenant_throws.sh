@@ -25,7 +25,7 @@
 # throw input at spawn range) must deal NO damage, proving the connect
 # signal is load-bearing.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged12]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21]
 #        tests/audit_tenant_throws.sh          (~9 legs x ~1 min)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

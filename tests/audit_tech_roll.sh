@@ -32,7 +32,7 @@
 # proves the held requirement and that the roll signature cannot fire
 # from the sweep alone; `ctl` all-legacy (instrument leg).
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged12]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21]
 #        tests/audit_tech_roll.sh          (~9 legs x ~1 min)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

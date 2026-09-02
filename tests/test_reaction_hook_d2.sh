@@ -33,7 +33,7 @@
 # pre-fix vec3 @ADDR 0x18511, post-fix scratch +0x54 := 0x51) is recorded in
 # STATE 14z-110; it needs an emulator and a fighting replay, so it lives there
 # and in the guard-corpus soaks rather than in this static gate.
-# Usage: ROMDIR=... tests/test_reaction_hook_d2.sh [builddir]   (default build/don_m12)
+# Usage: ROMDIR=... tests/test_reaction_hook_d2.sh [builddir]   (default build/don_m18)
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):

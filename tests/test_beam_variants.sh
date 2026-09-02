@@ -28,7 +28,7 @@
 #   3. GFX READY — 0 of the tiles they draw are missing from group C.
 #
 # Usage: ROMDIR=... tests/test_beam_variants.sh [wide-builddir]
-#        (defaults to build/hui25)
+#        (defaults to build/hui52)
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):

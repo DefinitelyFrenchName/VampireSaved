@@ -42,7 +42,7 @@
 # port. The grounded down-attack damage surface is covered by
 # audit_down_attack.sh.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged12]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21]
 #        tests/audit_pursuit_leap.sh          (~8 legs x ~1 min)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

@@ -62,7 +62,7 @@
 # Kill pokes: NONE (audit_kill_poke_shape: a 2-byte HP poke manufactures
 # the #103 stall shape by instrument; losses here are the mash's own).
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged11] tests/audit_continue_switch.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged21] tests/audit_continue_switch.sh
 # ~18 min (one guarded 40,620-frame MAME marathon). On-demand.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

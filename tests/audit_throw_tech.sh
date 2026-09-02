@@ -23,7 +23,7 @@
 # the tech input is load-bearing and the reduced values cannot appear
 # on their own.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged12]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21]
 #        tests/audit_throw_tech.sh          (~8 legs x ~1 min)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

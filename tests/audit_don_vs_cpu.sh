@@ -29,7 +29,7 @@
 # audit_continue_switch caveat. This gate's value is the deterministic pairing
 # reachability; the #99 fix is verified elsewhere (fsm_census + the ported fix).
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged15] [FRAMES=40700]
+# Usage: ROMDIR=... [BUILD=build/m3b_merged21] [FRAMES=40700]
 #        [LEGS="phobos bishamon pyron"] tests/audit_don_vs_cpu.sh
 # ~18 min per leg (one guarded marathon each). On-demand.
 #

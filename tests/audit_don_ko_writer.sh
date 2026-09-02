@@ -43,7 +43,7 @@
 # in reconciliation_huitzil.toml) flips audit_don_lilith_ko to
 # FLOWED 560 — the healthy legacy constant.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged11]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21]
 #        [EXPECT_DEFECT=1] tests/audit_don_ko_writer.sh   # default is 0
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the

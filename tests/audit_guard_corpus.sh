@@ -30,7 +30,7 @@
 # line is not a measurement) and a per-run verdict map kept under
 # build/guard_corpus/ for the record.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged12] [JOBS=2]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21] [JOBS=2]
 #        [LEGS="none 10 11 13"] [ONLY=<replay-stem>]
 #        [PICK_FRAMES="1400 1450 1500 1600 1700"]
 #        tests/audit_guard_corpus.sh

@@ -30,7 +30,7 @@
 # attempt 4 ever GAINS an id while 2 keeps one, re-measure before
 # re-freezing: that would be the alternation phase moving, not noise.
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged11] tests/audit_hui_grunt.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged21] tests/audit_hui_grunt.sh
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):

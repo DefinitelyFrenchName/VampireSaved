@@ -91,7 +91,7 @@
 # The ours->vs2 mapping is DERIVED from the build's own placements.json anim
 # row FOR THAT VICTIM (never hardcoded — placements move at every re-freeze).
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged11]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21]
 #        [EXPECT_MATCH=0] [VICTIMS="01 13 10 11"] tests/audit_don_grab_pose.sh
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the

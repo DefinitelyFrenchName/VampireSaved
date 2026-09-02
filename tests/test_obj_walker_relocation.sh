@@ -28,7 +28,7 @@
 # at any address and `data` is right at none. The old design could use
 # `data` only because its thunk read the table An-relatively.
 #
-# Usage: tests/test_obj_walker_relocation.sh [builddir]   (default build/don_m5)
+# Usage: tests/test_obj_walker_relocation.sh [builddir]   (default build/don_m18)
 #        No emulator, no ROMDIR beyond the decrypted view. Seconds.
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the

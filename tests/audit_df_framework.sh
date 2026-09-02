@@ -33,7 +33,7 @@
 # the MAINTAINER'S to research from period sources (the ruling); this
 # audit freezes what ships, it does not retune.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged12] [JOBS=4]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21] [JOBS=4]
 #        tests/audit_df_framework.sh          (~4 legs x ~2 min)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

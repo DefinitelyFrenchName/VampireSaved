@@ -82,7 +82,7 @@
 # they were written in; the BUILD default below is a 14z-91-era dir that no
 # longer exists, so pass BUILD= or let the arc's registry pass it.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged11]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21]
 #        [EXPECT_STALL=1] tests/audit_don_lilith_ko.sh   # default is 0
 #   EXPECT_STALL=0 is the post-fix state: leg A's gap must be under the
 #   threshold like leg B's. The default was flipped when the fix landed.

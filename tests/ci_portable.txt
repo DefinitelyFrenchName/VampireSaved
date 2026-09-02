@@ -55,6 +55,7 @@ test_freeze_tag_coverage
 test_gfx_collision_gate
 test_gfx_layout_fields_live
 test_harness_frame_bound
+test_header_defaults
 test_hex_lengths
 test_masked_compare
 test_m2a_flicker_gate

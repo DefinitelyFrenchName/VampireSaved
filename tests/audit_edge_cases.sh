@@ -30,7 +30,7 @@
 #      shapes and must simply produce an action without a stock spend
 #      (measured 14z-104 (4)); Phobos and Pyron fire theirs.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged12]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21]
 #        tests/audit_edge_cases.sh          (~14 legs x ~1 min)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

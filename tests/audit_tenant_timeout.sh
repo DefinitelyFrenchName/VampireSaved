@@ -31,7 +31,7 @@
 #     the OTHER way ($FF8120 == 0x01): proves the winner byte
 #     discriminates rather than always reading 0xFF.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged12]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21]
 #        tests/audit_tenant_timeout.sh          (~5 legs x ~2 min)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

@@ -41,7 +41,7 @@
 # delta is the 010a/010b pair audit_trap_parity already records as cosmetic
 # (same content, relocated banks, the defense-rows class).
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged9] tests/test_hui_electrocute.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged21] tests/test_hui_electrocute.sh
 # ~2 min (4 MAME runs, parallel).
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the

@@ -37,7 +37,7 @@
 # full stop) and the 4-byte leg must flow (if it stalls, the kill commit
 # broke). A NO-KO on either leg is a dead rig, not a pass.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged11]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21]
 #        tests/audit_kill_poke_shape.sh
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the

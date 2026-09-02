@@ -29,7 +29,7 @@
 # fall in a window someone can name, and tools/attribute_ramdiff.py prints
 # the strays when one does not.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/don_m7] \
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/don_m18] \
 #          tests/audit_flicker_attribution.sh
 # ~3 min (4 MAME runs, 2 legs x 2 replays).
 #

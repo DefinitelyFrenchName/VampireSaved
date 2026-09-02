@@ -37,7 +37,7 @@
 # The three tenant values are unchanged by that move (checked both ways).
 # Build re-pointed m3b_merged9 -> m3b_merged10 (merged-m3, the current freeze).
 #
-# Usage: ROMDIR=... [MERGED=build/m3b_merged11] tests/test_tenant_pairings.sh
+# Usage: ROMDIR=... [MERGED=build/m3b_merged21] tests/test_tenant_pairings.sh
 # ~3 min (6 guarded MAME runs, parallel). Needs the MERGED build: the whole
 # point is two tenants in ONE image, which no solo build can express.
 #

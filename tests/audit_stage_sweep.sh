@@ -25,7 +25,7 @@
 # ASSET side, not only on the readback (palettes are compared for
 # distinctness, never frozen).
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged12] [JOBS=6]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21] [JOBS=6]
 #        tests/audit_stage_sweep.sh          (~37 legs, ~6 min at JOBS=6)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

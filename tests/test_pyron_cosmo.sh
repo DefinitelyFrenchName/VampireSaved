@@ -34,6 +34,8 @@
 # construction: the byte lives in a region that exists only in this build.
 #
 # Usage: ROMDIR=... tests/test_pyron_cosmo.sh [outbase]
+#        outbase default: build/pyron36 (the current freeze; the dated
+#        figure in the verbatim note below is 14z-103's)
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):

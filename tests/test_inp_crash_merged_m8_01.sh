@@ -11,7 +11,7 @@
 #   MODE=clean (DEFAULT since 14z-111): asserts NO exception fires through frame 6000 (the recording
 #         ends ~4900; MAX_FRAMES overrides) (the
 #         fix's acceptance; flip the default in the same commit as the fix).
-# Usage: ROMDIR=... [MODE=defect|clean] [BUILD=build/m3b_merged15] tests/test_inp_crash_merged_m8_01.sh
+# Usage: ROMDIR=... [MODE=defect|clean] [BUILD=build/m3b_merged21] tests/test_inp_crash_merged_m8_01.sh
 # Emulator tier (MAME, ~1 min). NOT ci_static.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"

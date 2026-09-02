@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 2934 |
-| named by a document or manifest only | 2041 |
-| named by both a document/manifest and code | 585 |
-| named by CODE ONLY (the gap list below) | 308 |
+| distinct program-space addresses named | 2950 |
+| named by a document or manifest only | 2046 |
+| named by both a document/manifest and code | 595 |
+| named by CODE ONLY (the gap list below) | 309 |
 | carried by atlas | 473 |
 | carried by engine_internals | 535 |
 | carried by other docs | 937 |
-| carried by manifests | 1761 |
-| carried by code | 893 |
+| carried by manifests | 1776 |
+| carried by code | 904 |
 
 ## Addresses
 
@@ -55,18 +55,18 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x003AC4` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x003AF6` | build/manifest/reconciliation.toml — map |
 | `PRG:0x003B2C` | build/manifest/reconciliation.toml — map [vs2] |
-| `PRG:0x003BEE` | build/manifest/huitzil.toml — hui_kernel_voice_e0 |
-| `PRG:0x003BF0` | build/manifest/pyron.toml — pyr_kernel_voice_e0 |
-| `PRG:0x003BF4` | build/manifest/donovan.toml — don_kernel_voice_e0 |
-| `PRG:0x003C5A` | build/manifest/huitzil.toml — hui_kernel_voice_e1 |
-| `PRG:0x003C5C` | build/manifest/pyron.toml — pyr_kernel_voice_e1 |
-| `PRG:0x003C60` | build/manifest/donovan.toml — don_kernel_voice_e1 |
-| `PRG:0x003CC6` | build/manifest/huitzil.toml — hui_kernel_voice_e2 |
-| `PRG:0x003CC8` | build/manifest/pyron.toml — pyr_kernel_voice_e2 |
-| `PRG:0x003CCC` | build/manifest/donovan.toml — don_kernel_voice_e2 |
-| `PRG:0x003D30` | build/manifest/huitzil.toml — hui_kernel_voice_e3 |
-| `PRG:0x003D32` | build/manifest/pyron.toml — pyr_kernel_voice_e3 |
-| `PRG:0x003D36` | build/manifest/donovan.toml — don_kernel_voice_e3 |
+| `PRG:0x003BEE` | build/manifest/huitzil.toml — hui_kernel_voice_e0; build/manifest/shared_writes.toml — huitzil |
+| `PRG:0x003BF0` | build/manifest/pyron.toml — pyr_kernel_voice_e0; build/manifest/shared_writes.toml — pyron |
+| `PRG:0x003BF4` | build/manifest/donovan.toml — don_kernel_voice_e0; build/manifest/shared_writes.toml — donovan |
+| `PRG:0x003C5A` | build/manifest/huitzil.toml — hui_kernel_voice_e1; build/manifest/shared_writes.toml — huitzil |
+| `PRG:0x003C5C` | build/manifest/pyron.toml — pyr_kernel_voice_e1; build/manifest/shared_writes.toml — pyron |
+| `PRG:0x003C60` | build/manifest/donovan.toml — don_kernel_voice_e1; build/manifest/shared_writes.toml — donovan |
+| `PRG:0x003CC6` | build/manifest/huitzil.toml — hui_kernel_voice_e2; build/manifest/shared_writes.toml — huitzil |
+| `PRG:0x003CC8` | build/manifest/pyron.toml — pyr_kernel_voice_e2; build/manifest/shared_writes.toml — pyron |
+| `PRG:0x003CCC` | build/manifest/donovan.toml — don_kernel_voice_e2; build/manifest/shared_writes.toml — donovan |
+| `PRG:0x003D30` | build/manifest/huitzil.toml — hui_kernel_voice_e3; build/manifest/shared_writes.toml — huitzil |
+| `PRG:0x003D32` | build/manifest/pyron.toml — pyr_kernel_voice_e3; build/manifest/shared_writes.toml — pyron |
+| `PRG:0x003D36` | build/manifest/donovan.toml — don_kernel_voice_e3; build/manifest/shared_writes.toml — donovan |
 | `PRG:0x003E40` | docs/game/atlas/id_space.md — The seven vsavj folding sites; docs/game/atlas/id_space.md — What a per-tenant manifest must declare; docs/project/tenant_manifest.md — The schema |
 | `PRG:0x003F10` | build/manifest/reconciliation.toml — map |
 | `PRG:0x003F46` | build/manifest/reconciliation.toml — map [vs2] |
@@ -611,15 +611,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x020AB4` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; tests/test_shadow_tenant.sh |
 | `PRG:0x020AC8` | docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question); docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path |
 | `PRG:0x020AE8` | docs/game/atlas/venue_assets.md — §2 addendum: the fold path is DORMANT in every measured flow (measured 14z-64) |
-| `PRG:0x020B9C` | docs/game/atlas/id_space.md — Which ids vanilla ever assigns (measured over the corpus); docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116); docs/game/atlas/select_screen.md — The Gallon variant path — vanilla's one immediate variant-half id; docs/game/atlas/select_screen.md — The Oboro select hook (14z-105, the port's own path to '0x18'); docs/game/engine_internals.md — The version string and the Oboro pick (atlas: select_screen.md); HANDOFF.md — Running a CPS-2 WIDE build (playtest); +12 more |
+| `PRG:0x020B9C` | docs/game/atlas/id_space.md — Which ids vanilla ever assigns (measured over the corpus); docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116); docs/game/atlas/select_screen.md — The Gallon variant path — vanilla's one immediate variant-half id; docs/game/atlas/select_screen.md — The Oboro select hook (14z-105, the port's own path to '0x18'); docs/game/engine_internals.md — The version string and the Oboro pick (atlas: select_screen.md); HANDOFF.md — Running a CPS-2 WIDE build (playtest); +14 more |
 | `PRG:0x020BA2` | docs/game/atlas/select_screen.md — The Oboro select hook (14z-105, the port's own path to '0x18'); docs/project/patch_notes.md — W1 — 'oboro_select_hook' ('[[site_thunk]]', every tenant manifest, deduped); build/manifest/donovan.toml — capture_kf_jedah; build/manifest/huitzil.toml — capture_kf_jedah; build/manifest/pyron.toml — capture_kf_jedah |
 | `PRG:0x020BB6` | docs/game/atlas/character_tables.md — Variant-slot semantics (structural finding); docs/game/atlas/id_space.md — RESERVED IDS — vanilla does use part of the variant half; docs/project/tenant_manifest.md — Rules the loader should enforce; tests/test_id_space.sh |
 | `PRG:0x020BC6` | docs/game/atlas/character_tables.md — Variant-slot semantics (structural finding); docs/game/atlas/id_space.md — RESERVED IDS — vanilla does use part of the variant half; docs/project/tenant_manifest.md — Rules the loader should enforce; tests/test_id_space.sh |
 | `PRG:0x020C18` | docs/game/atlas/character_tables.md — Variant-slot semantics (structural finding); docs/game/atlas/id_space.md — RESERVED IDS — vanilla does use part of the variant half |
 | `PRG:0x020C58` | docs/game/gotchas.md — THE "?" WALKER WRITES THE DRAWN ID EVERY FRAME, FROM TWO PATHS (paid: 14z-117, one crashing probe) |
-| `PRG:0x020C74` | docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-117 (2) — RANDOM SELECT INCLUDES THE TENANTS (maintainer-directed, freeze donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13, mark M11; field-validated on the board 2026-08-29, 14z-118): byte detail; build/manifest/donovan.toml — oboro_select_hook; build/manifest/donovan.toml — random_select_bound; build/manifest/huitzil.toml — oboro_select_hook; build/manifest/huitzil.toml — random_select_bound; +5 more |
+| `PRG:0x020C74` | docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-117 (2) — RANDOM SELECT INCLUDES THE TENANTS (maintainer-directed, freeze donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13, mark M11; field-validated on the board 2026-08-29, 14z-118): byte detail; build/manifest/donovan.toml — oboro_select_hook; build/manifest/donovan.toml — random_select_bound; build/manifest/huitzil.toml — oboro_select_hook; build/manifest/huitzil.toml — random_select_bound; +7 more |
 | `PRG:0x020C7C` | docs/project/patch_notes.md — 14z-117 (2) — RANDOM SELECT INCLUDES THE TENANTS (maintainer-directed, freeze donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13, mark M11; field-validated on the board 2026-08-29, 14z-118): byte detail; build/manifest/donovan.toml — oboro_select_hook; build/manifest/huitzil.toml — oboro_select_hook; build/manifest/pyron.toml — oboro_select_hook; tests/test_random_select_tenants.sh |
-| `PRG:0x020C80` | docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116); docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-117 (2) — RANDOM SELECT INCLUDES THE TENANTS (maintainer-directed, freeze donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13, mark M11; field-validated on the board 2026-08-29, 14z-118): byte detail; build/manifest/donovan.toml — oboro_select_hook; build/manifest/donovan.toml — random_select_roster; build/manifest/huitzil.toml — oboro_select_hook; +6 more |
+| `PRG:0x020C80` | docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116); docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-117 (2) — RANDOM SELECT INCLUDES THE TENANTS (maintainer-directed, freeze donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13, mark M11; field-validated on the board 2026-08-29, 14z-118): byte detail; build/manifest/donovan.toml — oboro_select_hook; build/manifest/donovan.toml — random_select_roster; build/manifest/huitzil.toml — oboro_select_hook; +8 more |
 | `PRG:0x020C86` | docs/game/gotchas.md — THE "?" WALKER WRITES THE DRAWN ID EVERY FRAME, FROM TWO PATHS (paid: 14z-117, one crashing probe) |
 | `PRG:0x020C88` | docs/game/atlas/character_tables.md — Slot→character map, vsavj (COMPLETE; select-name/HUD verified picks); docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116) |
 | `PRG:0x020C97` | docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116) |
@@ -940,7 +940,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x028000` | docs/game/engine_internals.md — The QSound Z80 driver: id table, songs, streams, sample records (measured 14z-86, reader-traced on live vsavj, id 0x119); docs/platform/gotchas.md — A member's REGION layout is not its FILE layout — and the Z80 driver's own address space is a THIRD thing (14z-86) |
 | `PRG:0x028026` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 [vs2]; build/manifest/donovan.toml — hit_class_props_ext_lo |
 | `PRG:0x028028` | build/manifest/donovan.toml — hit_class_props_ext_hi |
-| `PRG:0x02802E` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); build/manifest/bank_map.toml — gap_be27a; build/manifest/donovan.toml — pcrel_escape_fix; build/manifest/huitzil.toml — voice_alias_thunk_w14; +4 more |
+| `PRG:0x02802E` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); build/manifest/bank_map.toml — gap_be27a; build/manifest/donovan.toml — pcrel_escape_fix; build/manifest/huitzil.toml — voice_alias_thunk_w14; +7 more |
 | `PRG:0x02804C` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — port_patch |
 | `PRG:0x028058` | docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); build/manifest/huitzil.toml — df_seq_entry_10; tests/test_capture_pose_sources.sh |
 | `PRG:0x028072` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab) |
@@ -1781,8 +1781,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x080A9C` | build/manifest/huitzil.toml — beam_effect_class16; tests/audit_clone_beam_lines.sh; tools/build_donovan.sh |
 | `PRG:0x080AAC` | docs/game/engine_internals.md — The chain, end to end; docs/project/porting_sprite_lists.md — 1. Does the host have the CLASS row?; build/manifest/huitzil.toml — grab_hold_keyframes; tests/audit_effect_class_rows.sh |
 | `PRG:0x080AEC` | docs/game/engine_internals.md — vs2/vh2 fill them (named 14z-74; SIX instances and counting); docs/project/patch_index.md — The beam takeover trio (Huitzil — three mechanisms, 14z-71); docs/project/patch_notes.md — 14z-71 — the beam: byte detail; build/manifest/huitzil.toml — beam_effect_class16; build/manifest/shared_writes.toml — huitzil; tests/audit_effect_class_rows.sh |
-| `PRG:0x080B28` | docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-102 — #109 THE CLONE-BEAM FIX (row 31) — FROZEN as huitzil-m19/merged-m5 (bit-for-bit the probes), field-confirmed, #109 CLOSED; build/manifest/huitzil.toml — beam_effect_class16; build/manifest/huitzil.toml — beam_effect_class31; tests/audit_clone_beam_lines.sh |
-| `PRG:0x080B44` | build/manifest/huitzil.toml — grab_hold_keyframes; tests/audit_clone_beam_lines.sh; tools/build_donovan.sh |
+| `PRG:0x080B28` | docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-102 — #109 THE CLONE-BEAM FIX (row 31) — FROZEN as huitzil-m19/merged-m5 (bit-for-bit the probes), field-confirmed, #109 CLOSED; build/manifest/huitzil.toml — beam_effect_class16; build/manifest/huitzil.toml — beam_effect_class31; build/manifest/shared_writes.toml — huitzil; tests/audit_clone_beam_lines.sh |
+| `PRG:0x080B44` | build/manifest/huitzil.toml — grab_hold_keyframes; build/manifest/shared_writes.toml — huitzil; tests/audit_clone_beam_lines.sh; tools/build_donovan.sh |
 | `PRG:0x080B46` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x08237E` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/project/patch_notes.md — (round-2 report; the capture-anim shadow over-index) |
 | `PRG:0x0823E2` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — Dark Force (measured 14z-69/69c/101, ruled 2026-08-21); docs/game/engine_internals.md — Shadow / reflection servants (14z-66; premise CORRECTED 14z-68f); docs/project/patch_notes.md — (round-2 report; the capture-anim shadow over-index); build/manifest/huitzil.toml — obj_hook |
@@ -2020,11 +2020,26 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0BE1BA` | docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets; build/manifest/bank_map.toml — word_pos_a |
 | `PRG:0x0BE1FA` | docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets; build/manifest/bank_map.toml — word_pos_b; build/manifest/reconciliation.toml — map |
 | `PRG:0x0BE23A` | docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); build/manifest/bank_map.toml — gap_be23a; tools/charmap_gen.py |
-| `PRG:0x0BE27A` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/game/engine_internals.md — vs2/vh2 fill them (named 14z-74; SIX instances and counting); docs/project/patch_index.md — Mechanism inventory (generator vocabulary); +61 more |
-| `PRG:0x0BE296` | build/manifest/shared_writes.toml — (top) |
-| `PRG:0x0BE2BA` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated); docs/project/patch_index.md — Mechanism inventory (generator vocabulary) [vh2]; build/manifest/bank_map.toml — gap_be2ba; build/manifest/shared_writes.toml — (top); build/manifest/shared_writes.toml — huitzil; tests/test_hui_grab_victim.sh |
+| `PRG:0x0BE27A` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/game/engine_internals.md — vs2/vh2 fill them (named 14z-74; SIX instances and counting); docs/project/patch_index.md — Mechanism inventory (generator vocabulary); +65 more |
+| `PRG:0x0BE27E` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron; tools/audit_shared_writes.py |
+| `PRG:0x0BE282` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
+| `PRG:0x0BE286` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
+| `PRG:0x0BE28A` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
+| `PRG:0x0BE28E` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
+| `PRG:0x0BE292` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
+| `PRG:0x0BE296` | build/manifest/shared_writes.toml — (top); build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
+| `PRG:0x0BE29A` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron; tests/test_shared_writes.sh; tools/audit_shared_writes.py |
+| `PRG:0x0BE29E` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron; tests/test_shared_writes.sh |
+| `PRG:0x0BE2A2` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron; tests/test_shared_writes.sh |
+| `PRG:0x0BE2A6` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron; tests/test_shared_writes.sh |
+| `PRG:0x0BE2AA` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron; tests/test_shared_writes.sh |
+| `PRG:0x0BE2AE` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron; tests/test_shared_writes.sh |
+| `PRG:0x0BE2B2` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron; tests/test_shared_writes.sh |
+| `PRG:0x0BE2B6` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron; tests/test_shared_writes.sh |
+| `PRG:0x0BE2BA` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated); docs/project/patch_index.md — Mechanism inventory (generator vocabulary) [vh2]; build/manifest/bank_map.toml — gap_be2ba; build/manifest/shared_writes.toml — (top); build/manifest/shared_writes.toml — huitzil; tests/test_hui_grab_victim.sh; +2 more |
 | `PRG:0x0BE2C6` | build/manifest/shared_writes.toml — donovan |
-| `PRG:0x0BE2FA` | docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets; docs/project/patch_notes.md — rows 0x10 + the per-tenant VALUE_SKIP default; build/manifest/bank_map.toml — gap_be37a; build/manifest/bank_map.toml — param32_b; tests/test_hui_walk.sh |
+| `PRG:0x0BE2DA` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron; tests/test_shared_writes.sh |
+| `PRG:0x0BE2FA` | docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets; docs/project/patch_notes.md — rows 0x10 + the per-tenant VALUE_SKIP default; build/manifest/bank_map.toml — gap_be37a; build/manifest/bank_map.toml — param32_b; tests/test_hui_walk.sh; tools/audit_shared_writes.py |
 | `PRG:0x0BE372` | docs/project/patch_notes.md — 14z-119 — THE PHYSICS-PORT FREEZE (donovan-m18 / huitzil-m25 / pyron-m19 / merged-m14, mark M12): byte detail |
 | `PRG:0x0BE37A` | docs/project/patch_notes.md — rows 0x10 + the per-tenant VALUE_SKIP default; build/manifest/bank_map.toml — gap_be37a; tests/test_hui_walk.sh |
 | `PRG:0x0BE392` | docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122) [vs2]; docs/project/patch_notes.md — 14z-118 (charmap, 2) — DONOVAN'S PHYSICS ROWS PORTED (maintainer-ruled 2026-08-29): 17 bytes, three bank rows, UNFROZEN; docs/project/patch_notes.md — 14z-119 — THE PHYSICS-PORT FREEZE (donovan-m18 / huitzil-m25 / pyron-m19 / merged-m14, mark M12): byte detail; tests/test_m3a_reproducible.sh |
@@ -2043,7 +2058,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0BE89A` | docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets; build/manifest/bank_map.toml — byte2d_a |
 | `PRG:0x0BEC5A` | docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets; build/manifest/bank_map.toml — byte2d_b |
 | `PRG:0x0BEC60` | docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code) |
-| `PRG:0x0BF01A` | docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99); docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture); HANDOFF.md — Build registry; docs/project/doc_audit_14z118.md — 2. Cross-document numbers to lock (candidates for the script); docs/project/gotchas.md — "16 + the same 16 repeated": an aliasing guard is a silent tenant trap; and a rig that wins fast cannot see a time-dependent AI crash (paid: 14z-111); +6 more |
+| `PRG:0x0BF01A` | docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99); docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture); HANDOFF.md — Build registry; docs/project/doc_audit_14z118.md — 2. Cross-document numbers to lock (candidates for the script); docs/project/gotchas.md — "16 + the same 16 repeated": an aliasing guard is a silent tenant trap; and a rig that wins fast cannot see a time-dependent AI crash (paid: 14z-111); +7 more |
 | `PRG:0x0BF05A` | docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail |
 | `PRG:0x0BF05E` | docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail |
 | `PRG:0x0BF066` | docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail |
@@ -2859,6 +2874,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x09306C` | tools/build_donovan.sh |
 | `PRG:0x093766` | tools/build_donovan.sh |
 | `PRG:0x0A0000` | tests/test_ladder_tenant_vs_palette.sh |
+| `PRG:0x0B0000` | tests/test_shared_writes.sh |
 | `PRG:0x0B2528` | tests/test_don_throw_mirror.sh |
 | `PRG:0x0B2780` | tests/test_don_throw_mirror.sh |
 | `PRG:0x0BD9B6` | tests/test_m2_repoint.sh |

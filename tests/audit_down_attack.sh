@@ -39,7 +39,7 @@
 # it must deal NO down-attack damage, proving the connect signal is
 # time-gated and cannot pass on any contact.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged12]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21]
 #        tests/audit_down_attack.sh          (~9 legs x ~1 min)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

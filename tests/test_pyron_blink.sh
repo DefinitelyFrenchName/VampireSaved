@@ -49,6 +49,8 @@
 # their tables' row 0x11.
 #
 # Usage: ROMDIR=... tests/test_pyron_blink.sh [outbase]
+#        outbase default: build/pyron36 (the current freeze; the dated
+#        figure in the verbatim note below is 14z-103's)
 # Env: MAME_BIN, PYRON_BLINK_EXPECT, SKIP_RUNTIME=1 (controls only).
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the

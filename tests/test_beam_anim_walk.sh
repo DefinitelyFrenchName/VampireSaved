@@ -59,7 +59,7 @@
 #
 # Usage: ROMDIR=... [BEAM_WALK_EXPECT=absent|walks] \
 #            tests/test_beam_anim_walk.sh [wide-builddir]
-#        (defaults to build/hui25; needs a build carrying H's real art)
+#        (defaults to build/hui52; needs a build carrying H's real art)
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):

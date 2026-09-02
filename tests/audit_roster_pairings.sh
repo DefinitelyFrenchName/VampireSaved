@@ -31,7 +31,7 @@
 # and report it — do not keep batching for a completeness number. The matrix
 # below prints as it goes so a stopped run is still evidence.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged11] [JOBS=6]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21] [JOBS=6]
 #        [ONLY=0x13] [BASES=...] tests/audit_roster_pairings.sh
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the

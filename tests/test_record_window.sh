@@ -24,7 +24,7 @@
 #   4 CONTROLS    an inverted window must abort, and a window still open at
 #                 FRAMES must report a FORCED stop rather than a clean one.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [REC_BUILD=build/hui46] tests/test_record_window.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [REC_BUILD=build/hui52] tests/test_record_window.sh
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):

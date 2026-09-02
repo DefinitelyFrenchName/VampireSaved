@@ -26,7 +26,7 @@
 # transition in-window, proving the KO poke is load-bearing and the
 # "round advanced" signal cannot pass vacuously.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged12]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21]
 #        tests/audit_tenant_downwin.sh          (~9 legs x ~1.5 min)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
