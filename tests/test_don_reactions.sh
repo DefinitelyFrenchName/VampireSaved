@@ -14,26 +14,38 @@
 # neutral-pose bug for the sworded variant too.
 #
 # ---------------------------------------------------------------------------
-# PROVENANCE WARNING (2026-09-02, GitHub #114). THIS GATE IS GREEN AND THE MOVE
-# IS STILL WRONG. Read before trusting anything below.
-#   * ALL FOUR LEGS RUN `vsavj`. Nothing here measures native. The "native ==
-#     10" and "native window ends ~2689" figures are HARDCODED CONSTANTS whose
-#     source was the maintainer's playtest plus community information
-#     ("definitely 9 base on VS2, ours 8", STATE 14z-42c) -- TESTIMONY, not a
-#     measurement. The comments below read as if measured; they were not.
-#   * MEASURED 2026-09-02 on stock vsav2 (Donovan forced, [VSP-123]) with this
-#     same replay: NATIVE lands 6 hits / 10 damage and HOLDS the victim at
-#     x=728 through f2685. OURS lands 3 hits / 11 damage and pushes the victim
-#     728 -> 852, ending at f2640. Positions are identical between the games
-#     until the move connects, so this is not a rig artifact.
-#   * TWO BLIND SPOTS, both structural: the dump window starts at f2630 and our
-#     FIRST HIT IS AT f2627, so the gate sums 7 of the true 11; and the
-#     assertions are ONE-SIDED (`<= 10`, "by f2700"), so "too few hits,
-#     finishing early" passes. This gate was written against the OLD symptom
-#     (14-15 hits, too slow) and cannot see an overcorrection.
-#   * NOT TIGHTENED HERE ON PURPOSE: widening the window and making the bounds
-#     two-sided turns this gate RED, and a red gate halts forward work
-#     ([VSP-7]). That is the maintainer's call, tracked on #114.
+# PROVENANCE, RESOLVED (14z-127, GitHub #114). THE MOVE REPRODUCES NATIVE, AND
+# THIS GATE IS GREEN FOR THE RIGHT REASON. Read this instead of the warning
+# that stood here between 2026-09-02 and 14z-127.
+#   * MEASURED on three legs in one run by `tests/test_don_immortal_native.sh`
+#     (which exists because of #114): NATIVE stock vsav2 (replay 51) lands
+#     6 hits / 10 damage holding the victim at x=728, span 49 f. OURS lands
+#     6 hits / 10 damage holding the victim, span 52 f -- on BOTH tracks, the
+#     stock twin and merged-m14 alike.
+#   * SO THE HARDCODED `native == 10` BELOW IS NOW MEASURED AND CORRECT. It
+#     did enter this file as testimony (STATE 14z-42c) and that criticism was
+#     fair; the number it asserted turned out to be right.
+#   * THE #114 "OURS: 3 hits / 11 damage, victim pushed 728 -> 852" WAS JEDAH.
+#     Replay 48's P1 path (U,U,R -> slot 0x0F) selects Donovan only on the
+#     SUBSTITUTED stock track. Since the 14z-115 wheel separation the tenants
+#     sit on their own appended row, so on a WIDE build that path lands on
+#     vanilla Jedah (+0x60 = 0x000b0d2e) and the numbers measured were his
+#     421+HP. This gate was never affected -- it runs `vsavj` against a STOCK
+#     build (the battery passes its own outbase), which is the track replay 48
+#     is authored for. See `don/114_don_immortal_wide.rpl` for the WIDE twin.
+#   * WHAT REMAINS, and it is small: ours runs 3 frames longer over the six
+#     hits -- span 52 vs 49, inter-tick gaps 10/11/10/11/10 against native's
+#     10/10/10/9/10, so two of the five gaps are one frame long. THE
+#     MECHANISM IS NOT MEASURED (the first gap is 10 on both legs, so it is
+#     not a simple freeze-length difference; nothing further was traced).
+#     Well inside this gate's `by f2700` bound (ours last hits f2690, native
+#     f2685). Recorded on #114 for the maintainer, not treated as a defect by
+#     either gate.
+#   * THE ONE-SIDED BOUNDS below (`total <= 10`, "by f2700") are still
+#     one-sided. `test_don_immortal_native.sh` carries the two-sided form
+#     (hits == 6, total == 10, victim held, span 45..60) with a must-fire
+#     control, so the coverage exists; these are left as they are rather than
+#     duplicated.
 # ---------------------------------------------------------------------------
 #
 # STRENGTHENED 14z-42 (hit-freeze fix, ls_freeze_vs2_* thunks): the

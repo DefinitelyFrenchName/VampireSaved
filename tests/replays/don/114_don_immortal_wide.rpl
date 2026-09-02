@@ -1,0 +1,41 @@
+# 114: 421+HP (Lightning Sword) on the SEPARATED (CPS-2 WIDE) wheel — the
+# WIDE-track twin of replay 48 (GitHub #114, 14z-127).
+#
+# WHY IT EXISTS. Replay 48's P1 path (U,U,R from the default Demitri cell)
+# walks to slot 0x0F, which is Donovan ONLY on the SUBSTITUTED stock track.
+# Since the 14z-115 select-wheel separation the tenants live on their own
+# appended row, so on a WIDE build that same path lands on JEDAH — measured
+# 2026-09-02: P1 +0x60 = 0x000b0d2e (jedah) on merged-m14, and the move that
+# gets measured is Jedah's 421+HP (3 hits / 11 damage, victim pushed
+# 728 -> 852). That artefact is what GitHub #114 mistook for a Donovan
+# regression. A tenant replay is only a claim about the build it was
+# authored for ([VSP-156]).
+#
+# This script uses the APPENDED-CELL path of replay 36 (L,L,D,D -> cell 0x13)
+# and is otherwise replay 48 frame for frame. BUILD-ONLY: on a stock or
+# vanilla set the final D lands elsewhere and the run is meaningless — the
+# gate asserts P1's identity against tests/expected/roster_pairings/bases.tsv
+# rather than trusting the path.
+#
+# Measured on merged-m14 (build/m3b_merged21, vsavjw): P1 +0x60 = 0x003fa9d0
+# (donovan), 6 hits / 10 total at f2638/2648/2659/2669/2680/2690, victim HELD
+# at x=728 until the shake ends — identical to the stock twin and matching
+# native vsav2's 6 hits / 10 total (replay 51).
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p1=L
+1140-1142 p1=L
+1180-1182 p1=D
+1220-1222 p1=D
+1104-1106 p2=R
+1164-1166 p2=R
+1300-1302 p1=1
+1360-1362 p2=1
+2500-2560 p1=R
+2610-2612 p1=L
+2614-2616 p1=D
+2618-2622 p1=DL
+2620-2624 p1=3
+3400 wait

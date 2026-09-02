@@ -122,6 +122,7 @@ tests/test_docshape.sh	docs
 tests/test_don_accent.sh	tenant
 tests/test_don_colors.sh	tenant
 tests/test_don_column.sh	tenant
+tests/test_don_immortal_native.sh	tenant
 tests/test_don_reactions.sh	tenant
 tests/test_don_sound.sh	tenant
 tests/test_don_sword.sh	tenant

@@ -21,18 +21,27 @@
 > ##
 > ## **OPEN WORK, IN THE ORDER IT IS LIKELY TO BE AVAILABLE:**
 > ##
-> ## **(1) GitHub #114 — 421+P DOES NOT REPRODUCE NATIVE. THE LIVE THREAD.**
-> ## MEASURED on both games with the gate's own rig: native vsav2 lands **6
-> ## hits / 10 damage and HOLDS the victim at x=728** to f2685; ours lands
-> ## **3 hits / 11 damage and pushes it 728 → 852**, ending f2640. Positions
-> ## are byte-identical until contact, so there is NO confound. **Our reaction
-> ## does not hold the victim** — this is not hit-count tuning. NEXT: why, at
-> ## the reaction/pushback path (`0x2783C[record +0xC]`, `+0x50`/`+0x144`),
-> ## then mizuumi's Donovan page as a third opinion. **THE GATE IS GREEN AND
-> ## CANNOT SEE IT** (all legs `vsavj`; window starts f2630 while our first
-> ## hit is f2627, so it sums 7 of the true 11; bounds one-sided). Tightening
-> ## it turns the tree RED and halts work ([VSP-7]) — MAINTAINER'S CALL, not
-> ## Claude's. Full analysis and resources on the issue.
+> ## **(1) GitHub #114 — REFUTED AND CLOSED (14z-127). 421+P REPRODUCES
+> ## NATIVE.** The 14z-126b "ours" leg was **JEDAH**: replay 48's P1 path
+> ## (`U,U,R` → slot `0x0F`) picks Donovan only on the SUBSTITUTED stock
+> ## track, and since the 14z-115 wheel separation a WIDE build puts the
+> ## tenants on their own row — so that path lands on vanilla Jedah, whose
+> ## 421+HP is exactly the "3 hits / 11 damage, pushed 728 → 852" that was
+> ## filed as ours. Measured on three legs: native vsav2 **6 hits / 10 dmg,
+> ## victim held**; ours the same on the stock twin AND on merged-m14, with
+> ## P1's identity asserted from `bases.tsv`. New gate
+> ## `tests/test_don_immortal_native.sh` (native + ours + the artefact as its
+> ## must-fire control); new WIDE twin `tests/replays/don/114_don_immortal_wide.rpl`.
+> ## **RESIDUE, recorded not fixed:** ours spans 52 f against native's 49 over
+> ## the six hits (gaps 10/11/10/11/10 vs 10/10/10/9/10); mechanism NOT
+> ## measured. Maintainer's read, no work without a ruling.
+> ## **THE CLASS TO CARRY FORWARD — this is the reusable half:** a tenant
+> ## replay is a claim about the build it was authored for ([VSP-156]), and
+> ## **a confound check on POSITIONS does not establish IDENTITY** (Jedah and
+> ## Donovan stand at the same x, which is why the original check passed).
+> ## **32 replays carry the substituted-wheel path**; they are correct on a
+> ## stock build and select a legacy character on a WIDE one. Assert
+> ## `+0x60` against `bases.tsv` in any gate that reads a tenant number.
 > ##
 > ## **(2) THE MIZUUMI CORPUS ARC — barely opened, and it is the next big
 > ## one.** `../community/` now holds 26 wiki pages (HTML + PDF) including all
@@ -65,10 +74,13 @@
 > ## TRANSITIONS (observation, not theory) and no bulk palette reload happens
 > ## around the flash.
 > ##
-> ## **(6) #112 fix option (B)** — "the effect owns its palette", using the
-> ## owner branch the port already ships (`PRG:0x3FFAF0`). Needs half a session
-> ## first: is there a FREE PALETTE ROW, and do pool objects carry
-> ## `+0x30`/`+0x382`/`+0x3AE`/`+0x18B`? (C) do-nothing is agreed for now.
+> ## **(6) #112 fix option (B) — RULED OPEN, NOT CLOSED (maintainer,
+> ## 2026-09-02).** (C) do-nothing is the ruling for the build; **(B) "the
+> ## effect owns its palette" is explicitly KEPT as a future option** — *"it
+> ## may still be a valuable option"* depending on the scoping. That scoping
+> ## is the half-session gate: is there a FREE PALETTE ROW, and do pool
+> ## objects carry `+0x30`/`+0x382`/`+0x3AE`/`+0x18B`? It uses the owner
+> ## branch the port already ships (`PRG:0x3FFAF0`).
 > ##
 > ## **FUTURE ARCS the maintainer has named (not scheduled):** the harness
 > ## itself — this project is an exploratory PoC, and the intent is to REDO it

@@ -25,11 +25,11 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 |---|---|
 | distinct program-space addresses named | 2925 |
 | named by a document or manifest only | 2035 |
-| named by both a document/manifest and code | 582 |
-| named by CODE ONLY (the gap list below) | 308 |
+| named by both a document/manifest and code | 583 |
+| named by CODE ONLY (the gap list below) | 307 |
 | carried by atlas | 473 |
 | carried by engine_internals | 534 |
-| carried by other docs | 930 |
+| carried by other docs | 931 |
 | carried by manifests | 1756 |
 | carried by code | 890 |
 
@@ -1936,6 +1936,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0AFBFE` | build/manifest/donovan.toml — capture_kf_lilith; build/manifest/huitzil.toml — capture_kf_lilith; build/manifest/pyron.toml — capture_kf_lilith |
 | `PRG:0x0B0A2C` | build/manifest/donovan.toml — capture_kf_anakaris; build/manifest/huitzil.toml — capture_kf_anakaris; build/manifest/pyron.toml — capture_kf_anakaris |
 | `PRG:0x0B0C2E` | docs/project/patch_notes.md — donovan-m2 stage 1 — null relocation (2026-07-25, session 4) |
+| `PRG:0x0B0D2E` | docs/project/gotchas.md — A TENANT REPLAY AUTHORED FOR THE SUBSTITUTED WHEEL SELECTS A LEGACY CHARACTER ON THE SEPARATED (WIDE) WHEEL — and a POSITION confound-check cannot see it (paid: 14z-126b -> 14z-127, GitHub #114); tests/test_don_immortal_native.sh; tests/test_don_reactions.sh; tests/test_don_sound.sh; tests/test_m2_repoint.sh |
 | `PRG:0x0B119A` | build/manifest/donovan.toml — capture_kf_anakaris; build/manifest/huitzil.toml — capture_kf_anakaris; build/manifest/pyron.toml — capture_kf_anakaris |
 | `PRG:0x0B19F8` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — capture_kf_jedah; build/manifest/donovan.toml — port_patch; build/manifest/donovan.toml — throw_victim_keyframes; build/manifest/huitzil.toml — capture_kf_jedah; build/manifest/pyron.toml — capture_kf_jedah; +2 more |
 | `PRG:0x0B1A16` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tests/test_don_throw_mirror.sh; tests/test_phasec_spaces.sh |
@@ -2085,7 +2086,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0C868A` | docs/game/atlas/character_tables.md — THE PORTED THREE — located (2026-07-25, pick-verified on vsav2 AND vhunt2) |
 | `PRG:0x0C8B18` | docs/project/patch_notes.md — 14z-85b — per-tenant sfx records (pyr_sfx_records / hui_sfx_records; maintainer-ruled option (a)) [vs2]; docs/project/tables/sfx_records.md — pyron — 'pyr_sfx_records' (23 entries, vs2 '0x0C8B18'; 14z-85) [vs2]; build/manifest/pyron.toml — hitclass_map_extend [vs2]; build/manifest/pyron.toml — pyr_sfx_records |
 | `PRG:0x0C8BB8` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated); docs/project/patch_notes.md — 14z-110b — the 0x51 -> 0x44 state remap: byte detail [vs2]; tests/test_m2a_stage2_data.sh |
-| `PRG:0x0C8DF8` | docs/game/atlas/character_tables.md — Start-hold flavor: RESOLVED (community-confirmed 2026-07-27, mechanism pinned); docs/game/atlas/character_tables.md — THE PORTED THREE — located (2026-07-25, pick-verified on vsav2 AND vhunt2); build/manifest/bank_map.toml — (top); tests/test_m2a_stage2_data.sh; tests/test_pyron_blink.sh; tools/extract_char.py; +1 more |
+| `PRG:0x0C8DF8` | docs/game/atlas/character_tables.md — Start-hold flavor: RESOLVED (community-confirmed 2026-07-27, mechanism pinned); docs/game/atlas/character_tables.md — THE PORTED THREE — located (2026-07-25, pick-verified on vsav2 AND vhunt2); build/manifest/bank_map.toml — (top); tests/test_don_immortal_native.sh; tests/test_m2a_stage2_data.sh; tests/test_pyron_blink.sh; +2 more |
 | `PRG:0x0C986A` | docs/game/engine_internals.md — Hitboxes and attack records (phase 2 of the character-data map, 14z-120 (5), MEASURED); tools/hitbox_records.py |
 | `PRG:0x0C9A5C` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 [vh2]; build/manifest/donovan.toml — port_patch [vh2]; build/manifest/donovan.toml — throw_victim_keyframes |
 | `PRG:0x0C9EB0` | docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/project/patch_index.md — Mechanism inventory (generator vocabulary); build/manifest/huitzil.toml — df_seq_entry_10 |
@@ -2640,7 +2641,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x3EC720` | docs/project/gotchas.md — must go to hole "b"; docs/project/patch_index.md — DEFERRED BY MAINTAINER DECISION (14z-76) — the win-quote bank relocation; docs/project/patch_notes.md — donovan-m2 stage 1 — null relocation (2026-07-25, session 4); build/manifest/donovan.toml — hole_b; build/manifest/huitzil.toml — hole_b; build/manifest/pyron.toml — hole_b; +5 more |
 | `PRG:0x3EC840` | docs/project/patch_notes.md — 14z-65 (5) — HUITZIL BOOTS: first match on the vsavj engine (2026-08-07) |
 | `PRG:0x3FA790` | docs/project/patch_notes.md — 14z-110b — the 0x51 -> 0x44 state remap: byte detail; tests/test_mister_tenant_oracle.sh |
-| `PRG:0x3FA9D0` | docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question); docs/platform/mister.md — The tenant-content measurements: the tenant anchor, both group-C fetches, bank 1 under load, the QSound extension, the OBJ-list oracle, the synthesis fit (measured 14z-108/109, entered 14z-114); docs/project/coverage_matrix.md — §4 COVERAGE MATRIX — the mandate vs the corpus, measured (14z-104) [vs2]; docs/project/inferred_claims.md — G1 (9) — the atlas commits; tests/lib/pairing.sh; tests/test_mister_tenant_oracle.sh; +2 more |
+| `PRG:0x3FA9D0` | docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question); docs/platform/mister.md — The tenant-content measurements: the tenant anchor, both group-C fetches, bank 1 under load, the QSound extension, the OBJ-list oracle, the synthesis fit (measured 14z-108/109, entered 14z-114); docs/project/coverage_matrix.md — §4 COVERAGE MATRIX — the mandate vs the corpus, measured (14z-104) [vs2]; docs/project/gotchas.md — A TENANT REPLAY AUTHORED FOR THE SUBSTITUTED WHEEL SELECTS A LEGACY CHARACTER ON THE SEPARATED (WIDE) WHEEL — and a POSITION confound-check cannot see it (paid: 14z-126b -> 14z-127, GitHub #114); docs/project/inferred_claims.md — G1 (9) — the atlas commits; tests/lib/pairing.sh; +3 more |
 | `PRG:0x3FABA0` | docs/project/patch_notes.md — Session 14z-76 (Pyron's effect palette; build/pyron20 69e8c6f0); tests/test_effect_palette_table.sh |
 | `PRG:0x3FB879` | docs/project/patch_notes.md — 14z-110b — the 0x51 -> 0x44 state remap: byte detail |
 | `PRG:0x3FB899` | docs/game/engine_internals.md — The object-script state dispatcher at 'PRG:0x018508' (14z-109); docs/project/gotchas.md — and the engines RENUMBERED families between games (14z-109, the #99 crash); docs/project/patch_notes.md — 14z-110b — the 0x51 -> 0x44 state remap: byte detail; tests/audit_don_vs_cpu.sh |
@@ -2850,7 +2851,6 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x09306C` | tools/build_donovan.sh |
 | `PRG:0x093766` | tools/build_donovan.sh |
 | `PRG:0x0A0000` | tests/test_ladder_tenant_vs_palette.sh |
-| `PRG:0x0B0D2E` | tests/test_m2_repoint.sh |
 | `PRG:0x0B2528` | tests/test_don_throw_mirror.sh |
 | `PRG:0x0B2780` | tests/test_don_throw_mirror.sh |
 | `PRG:0x0BD9B6` | tests/test_m2_repoint.sh |

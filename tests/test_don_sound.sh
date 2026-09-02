@@ -15,11 +15,24 @@
 # loud failure, not a silent behavior change (sound is invisible to every
 # RAM/pixel gate we have, so this is the only detector).
 #
-# Usage: ROMDIR=... [SET=vsavjw] tests/test_don_sound.sh [rompath_dir]
-#   SET selects the driver, so this gate can be pointed at a CPS-2 WIDE
-#   build (packed as vsavjw) as well as a stock one. The tripwire below is
-#   the SAME either way — and it matters MORE on the WIDE track, which is
-#   where the per-node sfx helper is actually live.
+# Usage: ROMDIR=... tests/test_don_sound.sh [rompath_dir]
+#
+# ** THE `SET=vsavjw` MODE THIS LINE USED TO ADVERTISE IS VOID (14z-127,
+#    GitHub #114). DO NOT USE IT WITHOUT RE-AUTHORING THE REPLAYS. ** Three of
+#    the four replays below (19 / 25 / 56) walk P1 with the SUBSTITUTED-wheel
+#    path `U,U,R` -> slot 0x0F, which is Donovan only on the stock track.
+#    Since the 14z-115 wheel separation the tenants sit on their own appended
+#    row, so on a WIDE build that path selects vanilla JEDAH (measured on
+#    merged-m14: replay 56 gives P1 +0x60 = 0x000b0d2e) and this gate's
+#    Donovan tripwire and frozen id inventories would describe HIS moveset.
+#    Nothing invokes the mode (the battery passes a stock outbase, and per the
+#    2026-08-15 audit dispositions it cannot build WIDE at any outbase), so
+#    this was a latent trap in the header rather than a false green — but the
+#    header is what a future session would have believed. The observation that
+#    the per-node sfx helper is live on the WIDE track STANDS and is the
+#    reason to want this coverage; getting it needs WIDE-wheel twins of the
+#    three replays (see `tests/replays/don/114_don_immortal_wide.rpl` for the
+#    pattern), not a SET override. docs/project/gotchas.md carries the class.
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -30,6 +43,17 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 RPDIR="${1:-$REPO/build/donovan6/rompath}"
 [ -d "$RPDIR" ] || { echo "no build at $RPDIR"; exit 1; }
+# SAFE AND LOUD ([VSP-22]): refuse the void WIDE mode rather than document it.
+# Three of the four replays below select JEDAH on a separated wheel, so a
+# vsavjw run here measures the wrong character's sounds while printing PASS.
+case "${SET:-vsavj}" in
+  vsavj) ;;
+  *) echo "FAIL: SET=${SET} refused — replays 19/25/56 use the SUBSTITUTED-wheel"
+     echo "      path and select vanilla Jedah on a separated (WIDE) wheel."
+     echo "      This gate is stock-track only until WIDE-wheel twins exist."
+     echo "      See the header, GitHub #114, docs/project/gotchas.md."
+     exit 1 ;;
+esac
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 cd "$REPO"

@@ -16,7 +16,7 @@
 | **a gate that could pass asserting NOTHING** | `test_inp_corpus.sh` would have reported PASS with all seven recordings playing ZERO frames: a relative `ROMDIR` makes both runners lose the parent zip, and the runner still wrote `END 0`, which the only liveness check accepted. Fixed at three levels with four self-tests on the verdict logic |
 | **#112 ROOT-CAUSED** | an OVERWRITE ORDERING on palette row `0b` index 14. Proven CAUSALLY after the maintainer asked "is it truly complete?" — it was not; the foot↔row link was a colour coincidence. Forcing the entry moves exactly 7,007 px, all of them, with a disjoint control. **The trigger is 11/11: Donovan is HIT while his own effect is still drawing**, cutting the palette's fixed ~109-frame lifetime to 28. Fix scoped; (C) do-nothing agreed, and the "it is vanilla data" objection retired as FALSE |
 | **Jedah ARBITRATED** | the tick-accurate instrument the record said did not exist: a write tap fires per WRITE, and `PRG:0x027F70` IS one engine tick. **18/18 derived totals equal the engine's ticks exactly** — so the residue is the WORKBOOK'S, not ours. Gated. The aerials followed part-way (BI 5/6; VI/FE/SA not separable yet), and the community corpus named the likely cause within an hour of arriving: mizuumi distinguishes `8J`/`9J` variants we collapse |
-| **#114 OPENED — and it is the live thread** | the maintainer corrected the record: 421+P's cadence half was root-caused, the multi-hit values half was tuned against playtest, never measured. Measured now on BOTH games: **native 6 hits/10 damage holding the victim at x=728; ours 3 hits/11 damage pushing it to 852.** Positions identical until contact, so no confound. **Our reaction does not hold the victim.** The gate is green and structurally cannot see it |
+| **#114 OPENED — and it is the live thread** (**CORRECTED 14z-127: REFUTED. The "ours" leg was JEDAH — replay 48's substituted-wheel path on the separated WIDE wheel. 421+P reproduces native on both tracks; see Open bugs and `test_don_immortal_native.sh`. Entry left as written, per the archive rule.**) | the maintainer corrected the record: 421+P's cadence half was root-caused, the multi-hit values half was tuned against playtest, never measured. Measured now on BOTH games: **native 6 hits/10 damage holding the victim at x=728; ours 3 hits/11 damage pushing it to 852.** Positions identical until contact, so no confound. **Our reaction does not hold the victim.** The gate is green and structurally cannot see it |
 | **the instrument traps, the reusable half** | a 1-BYTE TAP misses word accesses on this 16-bit bus and returns a clean zero that survives a control at another address; IDENTICAL NUMBERS ACROSS DIFFERENT MOVES is the tell that segmentation failed (printed twice before I recognised it); an ART-KEYED detector cannot find a defect in the art; and `0x800100` is a driver "Mirror (sfa)" this game never writes, so a zero there measured nothing |
 | **the standing lesson** | **THE RECORD CAN OVERSTATE WHAT WAS VERIFIED.** Three times today: option B "not done" (shipped 13 freezes earlier), `test_don_reactions`' `native == 10` (testimony written as measurement), and my own #112 "root cause" (correlation). All three were caught by MEASURING or by the maintainer asking. A gate header is a claim like any other |
 | gates added | `test_down_flash_mechanism.sh`, `test_pod_black_foot_palette.sh`, `test_tick_durations.sh`, plus the corpus-gate liveness controls — every one with a must-fire control |
@@ -296,9 +296,16 @@ entries moved VERBATIM to `DECISIONS_HISTORY.md` — grep there by topic.
 Lifecycle: rulings are still marked DECIDED in place here first; they move to
 the archive once they stop shaping active work.)*
 
-- **#112's FIX — SCOPED 2026-09-01 at the maintainer's direction ("I'd want to
-  scope the second properly before recommending it -> do it"). NOT STARTED;
-  needs a ruling, and my recommendation is (C).**
+- **#112's FIX — DECIDED (maintainer, 2026-09-02): (C) DO NOTHING TO THE
+  BUILD — *"yes it's (C) BUT we keep the option (B) fix as possible in the
+  future because depending on the scoping, it may still be a valuable
+  option."* So (C) is the ruling for now and **(B) IS NOT CLOSED**: it stays a
+  live candidate whose value the scoping below decides. (A) remains refused.
+  The half-session that would let (B) be costed — is there a FREE PALETTE ROW,
+  and do pool objects carry `+0x30`/`+0x382`/`+0x3AE`/`+0x18B`? — is
+  UNSCHEDULED but no longer hypothetical: it is the gate on a decision the
+  maintainer has explicitly left open. Scoped 2026-09-01 at their direction
+  ("I'd want to scope the second properly before recommending it -> do it").**
   **THE SELECTION POINT, measured:** the palette source is
   `base + seq_id*32` with the base CONSTANT — Donovan's `+0x3A4` is written
   exactly twice in a 14,375-frame run (round starts, `PC 0x01C68E`, value
@@ -326,7 +333,7 @@ the archive once they stop shaping active work.)*
   code, plus a flicker-inventory measurement. It also changes WHEN a legacy
   data path writes, which is the class the superset invariant exists to
   refuse. NOT RECOMMENDED without a much stronger reason than a cosmetic.
-  **(B) The effect owns its palette** — make the pool object request its own
+  **(B) KEPT OPEN AS A FUTURE OPTION (maintainer, 2026-09-02) — The effect owns its palette** — make the pool object request its own
   palette into its own row via the EXISTING owner branch. Architecturally
   right and reuses shipped machinery. **COST, and it is the reason this is not
   free: it needs a FREE PALETTE ROW** (unmeasured, and rows are scarce), the
@@ -334,7 +341,8 @@ the archive once they stop shaping active work.)*
   `+0x3AE`, `+0x18B` — none verified present on pool objects), and every
   effect sprite record must be repointed to the new row. Two to three
   sessions, and a new render gate.
-  **(C) RECOMMENDED — DO NOTHING TO THE BUILD, and say why in the docs.** The
+  **(C) RULED (maintainer, 2026-09-02) — DO NOTHING TO THE BUILD, and say why
+  in the docs.** The
   defect is one palette entry on one frame of one super, on a build the
   maintainer has already accepted as cosmetically imperfect. What CHANGED
   today is not the cost of a fix but the QUALITY OF THE RECORD: the mechanism
@@ -345,8 +353,14 @@ the archive once they stop shaping active work.)*
   free palette row exists, and whether pool objects carry the four fields the
   owner branch reads. Both are half a session.
 
-- **A NEW SESSION SERIES — RESOLVED TOWARD (d) KEEP `14z-`, 2026-09-01;
-  awaiting only the maintainer's one-word confirm.** The maintainer: "I like
+- **A NEW SESSION SERIES — DECIDED (maintainer, 2026-09-02): (d) KEEP `14z-`.**
+  *"yes, we keep 14z- for the reasons found in previous sessions."* No seam,
+  no second namespace, no regex change: `tools/gen_gate_index.py`'s
+  `SESSION_RE` and `tools/checkdocshape.py`'s `SESSION_TOKEN`/`CHRONO` keep
+  matching every tag, past and future, and the [VSP-162] documentation of the
+  prefix is what resolves the confusion that opened this. The next session is
+  `14z-127`. **This entry is now history; the reasoning is kept below.**
+  Recorded 2026-09-01 as: RESOLVED TOWARD (d), awaiting the one-word confirm.** The maintainer: "I like
   S127 but if there's a risk, even low, I don't mind keeping the 14z prefix
   honestly." **THE RECOMMENDATION FLIPPED FROM (a) TO (d), and NOT on the
   risk** — the risk is the wrong axis. The `checkdocshape`-blindness failure
@@ -1495,26 +1509,44 @@ wrong is *safe and loud* over designs that are merely well-measured.
   ~330 glyph TILES have to travel. NOTE the
   win-quote ART is already native and complete (14z-62e/62j, group C bank 5) —
   what remains is the TEXT. See the cosmetic backlog below.
-- **OPEN (gameplay, GitHub #114): DONOVAN'S 421+P DOES NOT REPRODUCE NATIVE —
-  MEASURED 2026-09-02, and `test_don_reactions.sh` is GREEN THROUGHOUT.**
-  Native vsav2 lands **6 hits / 10 damage** and HOLDS the victim at x=728 to
-  f2685; ours lands **3 hits / 11 damage** and pushes the victim 728 -> 852,
-  ending f2640. Positions are byte-identical between the games until the move
-  connects, so the confound is eliminated: **our reaction does not hold the
-  victim**, the opponent leaves range after three hits and the remaining deity
-  ticks whiff. Not a count-tuning error.
-  **WHY IT LOOKED CLOSED:** the 14z-42 cadence root cause (vsavj's older
-  freeze tuning) and the 14z-43 dispatch fix were real and stand; the
-  MULTI-HIT VALUES half was never validated against native — it was tuned
-  against playtest + community information. The gate cannot see the gap: all
-  four legs run `vsavj`, `native == 10` is a hardcoded constant from
-  testimony, its window starts at f2630 while our first hit is at **f2627**
-  (so it sums 7 of the true 11), and its bounds are ONE-SIDED so an
-  undershoot passes.
-  **NOT TIGHTENED, DELIBERATELY:** widening the window and making the bounds
-  two-sided turns the gate RED, and a red gate halts forward work ([VSP-7]).
-  Maintainer's call. Next: why the victim is not held (reaction/pushback path,
-  `0x2783C[record +0xC]`), then mizuumi's Donovan page as a third opinion.
+- ~~**OPEN (gameplay, GitHub #114): DONOVAN'S 421+P DOES NOT REPRODUCE
+  NATIVE**~~ **REFUTED AND CLOSED 14z-127 (2026-09-02). 421+P DOES REPRODUCE
+  NATIVE. THE "OURS" LEG OF THE 14z-126b MEASUREMENT WAS JEDAH.**
+  Measured on three legs in one run (`tests/test_don_immortal_native.sh`,
+  written for this): NATIVE stock vsav2 (replay 51) lands **6 hits / 10
+  damage** holding the victim at x=728, span 49 f; **OURS lands 6 hits / 10
+  damage holding the victim, span 52 f — on BOTH tracks**, the stock twin
+  `build/m5_stock13` and the shipping `merged-m14` alike, with P1's identity
+  asserted as Donovan (`+0x60 = 0x003fa9d0`, `bases.tsv`) on each.
+  **THE ARTEFACT, and it is a rig-validity class worth remembering:** replay
+  48's P1 path (`U,U,R` → slot `0x0F`) selects Donovan only on the
+  SUBSTITUTED stock track. **Since the 14z-115 select-wheel separation the
+  tenants live on their own appended row**, so on a WIDE build that same path
+  lands on vanilla **Jedah** (`+0x60 = 0x000b0d2e`) — and Jedah's 421+HP is
+  exactly the "3 hits / 11 damage, victim pushed 728 → 852" the issue
+  recorded as ours. Pristine `vsavj` reproduces those numbers to the frame,
+  which is now the gate's must-fire control. A tenant replay is a claim about
+  the build it was authored for ([VSP-156]). WIDE twin authored:
+  `tests/replays/don/114_don_immortal_wide.rpl`.
+  **WHAT THE ISSUE GOT RIGHT, and it is why the gate exists now:** the
+  provenance criticism was fair — `native == 10` did enter
+  `test_don_reactions.sh` as testimony (STATE 14z-42c) and all four of its
+  legs do run `vsavj`. The number turned out CORRECT, and it is now measured
+  rather than remembered.
+  **THE ONLY RESIDUE, recorded not fixed:** ours runs 3 frames longer over
+  the six hits (span 52 vs 49; inter-tick gaps 10/11/10/11/10 against native's
+  10/10/10/9/10 — two gaps one frame long). **The mechanism is NOT measured**
+  — the first gap is 10 on both legs, so it is not a plain freeze-length
+  difference. Inside every existing bound. On #114 for the maintainer's read;
+  no work planned without a ruling ([VSP-10]).
+  **THE SUPERSEDED ANALYSIS IS KEPT** (the eliminations stand even though the
+  conclusion does not): the 14z-42 cadence root cause and the 14z-43 dispatch
+  fix were real and are untouched by this; the positions-identical-until-
+  contact confound check was sound and is what made the two legs comparable
+  at all — it simply could not see that the two legs held DIFFERENT
+  CHARACTERS, because Jedah and Donovan stand at the same x. **That is the
+  durable lesson: a confound check on POSITIONS does not establish
+  IDENTITY.**
 - **OPEN:** FG pacing — untouched.
 
 ### THE COSMETIC BACKLOG (parked, 2026-08-27 — the maintainer's own list)
@@ -1537,7 +1569,7 @@ tradeoff. The fix is validated."** The scope confirmation matters as much as
 the verdict: the trade is CONFINED TO THE SELECT SCREEN — no in-match
 surface — which is what the thunk's site (`PRG:0x05F9D0`, the select figure
 uploader) predicts and the board now measures. MEASURED: row `0x1A` holds Pyron's vs2 palette across the whole select with P2 on Donovan; P1's accent on row `0x17` byte-for-byte unchanged; **`38_victor_p1_vsavj`, `05_timeout_idle` and `63_idle_select` BIT-IDENTICAL to merged18** (the changed path runs only on a P2 tenant hover, which no legacy replay does) — note `38` is the exact replay whose one-main-loop slip forced the 14z-88 revert of the previous attempt. Gate: **`tests/test_pyron_medallion_2p.sh`**, two legs, verified to FAIL on merged18 and PASS on merged19. **It closes a real coverage gap:** `test_wheel_bank5` 3b's two protocols are both SINGLE-PLAYER, so it could never see this and stayed green through every freeze. **NOT FROZEN — a freeze is a separate decision** |
-| **#112 Press of Death black foot** (Donovan's EX foot super) | DECIDED cosmetic, parked; **maintainer 2026-08-28: too risky for a small cosmetic gain** | whole draw path measured VANILLA. ~~why a tenant runs that vanilla sequence is unknown~~ **REFUTED 14z-126b: it does NOT run one** — at every instance on merged-m14 the drawing objects' `+0x1C` point into Donovan's PLACED region and no work-RAM field holds a vsavj record pointer (positive control fired 15/15); `0x28394E` is never stored anywhere (all 7 candidate sites disassembled to instruction-boundary noise); and all 9,755 tenant sprite pointers are relocated (now gated). WHAT REMAINS: the records' TILE CODES — the effect map's coverage, the builder's own "render garbled, never crash" note. The BLACK case does not reproduce on the current build (needs a rebuild from `freeze/merged-m9` or a fresh recording) |
+| **#112 Press of Death black foot** (Donovan's EX foot super) | **ROOT-CAUSED 14z-126b; FIX RULED (C) DO-NOTHING (maintainer, 2026-09-02) WITH OPTION (B) EXPLICITLY KEPT OPEN for the future — see "Decisions pending"**; DECIDED cosmetic, parked; **maintainer 2026-08-28: too risky for a small cosmetic gain** | whole draw path measured VANILLA. ~~why a tenant runs that vanilla sequence is unknown~~ **REFUTED 14z-126b: it does NOT run one** — at every instance on merged-m14 the drawing objects' `+0x1C` point into Donovan's PLACED region and no work-RAM field holds a vsavj record pointer (positive control fired 15/15); `0x28394E` is never stored anywhere (all 7 candidate sites disassembled to instruction-boundary noise); and all 9,755 tenant sprite pointers are relocated (now gated). WHAT REMAINS: the records' TILE CODES — the effect map's coverage, the builder's own "render garbled, never crash" note. The BLACK case does not reproduce on the current build (needs a rebuild from `freeze/merged-m9` or a fresh recording) |
 | ~~**RANDOM SELECT should include the three tenants**~~ — ADDED TO THE LIST by the maintainer 2026-08-28; **BUILT 14z-117 at the maintainer's word ("do the random-select includes the tenants then"), gated (`test_random_select_tenants.sh`: draw = 15 vanilla + this build's tenants; confirm on a tenant frame loads the tenant's own record; must-fire control), frozen as merged-m13 (M11); FIELD VERDICT GREEN on the board (maintainer, MiSTer, 2026-08-29, STATE 14z-118)** | DONE 14z-117 — TWO sites, not one: the walker re-reads the table on its non-tick frames (`select_screen.md` "THE WALKER HAS TWO PATHS"); a bound-only thunk crashed the figure refresh with a code byte as id | the "?" cell walks a FIXED 15-entry table at `PRG:0x020C88` (`04 07 02 0C 05 0F 0A 00 0E 03 08 01 0D 09 06` = the base-half roster minus `0x0B`), 3-frame cursor, wrap `cmpi.b #$f`. Both bounds hard -> a tenant can never come up. **The siblings are the precedent**: vsav2's twin table (`PRG:0x01F8B4`) lists `10 11 13`, vhunt2's too — including the newcomers is what the source games do. FIX SHAPE: 18-entry relocated table + bound `#$f` -> `#$12`; it cannot grow in place (15 bytes + 1 pad, then code at `0x020C98`) and the table is read PC-relative, so it is a `site_thunk` on `PRG:0x020C80` + a `code` op, not a data poke. COST TO WATCH: the added cycles land on the select screen, whose legacy replays are already the bounded-window class — measure the onset before and after |
 | **MARIONETTE — a vs2 character, PARKED UNTIL FURTHER NOTICE (maintainer, 2026-08-28)** | not ported, not planned | **Assets live in VS2, not in VS.** She is not in Vampire Savior at all, so nothing in our romset is missing or broken by her absence. The maintainer's framing, and it is the right one: **Marionette and Shadow are both just MIRROR-MATCH MECHANISMS** — the shared machinery at `PRG:0x009BB2` copies the opponent's id and palette, so "playing as" either is playing the opponent's character. That makes porting her a low-value item: it adds a second route to a mirror match, not a character. **Not before everything else.** If it is ever revisited, note that vs2's arming counter is the SAME single `#$5` check as vsavj's (`PRG:0x01F8D6`), so whatever arms her in vs2 is a different mechanism and has not been located |
 | **Oboro's intro eats into the round** | **DECLINED by the maintainer 2026-08-28 — do NOT delay round start or cut the intro** | recorded so it is not revived: it would be a match-state TIMING change on a shared path for a cosmetic reason, which is the trade the superset invariant exists to refuse. The maintainer will instead check whether vsavj's Oboro has an alternate SHORT intro |

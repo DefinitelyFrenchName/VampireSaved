@@ -3425,3 +3425,37 @@ same trap: `field_trace` samples at frame_done, one reducer tick AFTER an
 opener that runs earlier in the frame — the DF body's `+0x143` = 0x14 is
 always SAMPLED as 0x13. Freeze what is sampled, and say why.
 
+
+
+## A TENANT REPLAY AUTHORED FOR THE SUBSTITUTED WHEEL SELECTS A LEGACY CHARACTER ON THE SEPARATED (WIDE) WHEEL — and a POSITION confound-check cannot see it (paid: 14z-126b -> 14z-127, GitHub #114)
+
+Replay 48's P1 path is `U,U,R` from the default Demitri cell: on the
+SUBSTITUTED stock track that walks to slot `0x0F`, where the build puts
+Donovan. **Since the 14z-115 select-wheel separation the tenants live on
+their own APPENDED ROW**, so on a WIDE build the same path lands on the cell's
+vanilla occupant — **Jedah** — and every number the run produces is his.
+Measured 2026-09-02 on `merged-m14`: P1 `+0x60` = `0x000b0d2e` (jedah), not
+`0x003fa9d0` (donovan). **32 of the tenant-era replays carry this path**
+(the `17..65_don_*` / `_victor_*` family); all are correct on a stock build
+and all mis-select on a WIDE one. `tests/test_don_sound.sh` still ADVERTISES
+`SET=vsavjw` in its usage line for exactly this family — its WIDE mode is
+void, and is not invoked anywhere.
+
+**WHAT IT COST, and why the check that was run did not catch it:** GitHub
+#114 was opened on "Donovan's 421+P does not reproduce native — ours lands 3
+hits / 11 damage and pushes the victim away". The comparability confound was
+checked, carefully, the right way round: **positions were byte-identical
+between the two legs until the move connected.** They were — because **Jedah
+and Donovan stand at the same x.** A position check establishes SPACING; it
+says nothing about IDENTITY, and the two legs held different characters.
+With the right build on both tracks the move lands 6 hits / 10 damage holding
+the victim, matching native vsav2 exactly (`tests/test_don_immortal_native.sh`,
+whose must-fire control is this artefact reproduced on pristine `vsavj`).
+
+**THE RULE:** any gate or rig that reads a number and calls it a tenant's
+asserts the tenant's `+0x60` hitbox base against
+`tests/expected/roster_pairings/bases.tsv` FIRST — it is re-derived at every
+freeze, so it does not rot. Same family as [VSP-156] (a replay's name is a
+claim about the build) and [VSP-58] (a set-name mismatch is a false green);
+the new face is that the wrong character is a false RED as readily as a false
+green.

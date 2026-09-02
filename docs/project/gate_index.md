@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**292 scripts** — 62 ci_portable, 64 ci_static, 166 emulator-tier (run by name).
+**293 scripts** — 62 ci_portable, 64 ci_static, 167 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -26,7 +26,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [pipeline](#pipeline) | 51 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
-| [tenant](#tenant) | 81 | tenant content — per-character gates and on-demand audits on the ported characters |
+| [tenant](#tenant) | 82 | tenant content — per-character gates and on-demand audits on the ported characters |
 | [character-data](#character-data) | 16 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 30 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 18 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
@@ -271,6 +271,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 | `tests/test_don_accent.sh` | test | emulator | emulator | weapon-accent steadiness + Victor-accent legacy guard (session 14z-19, rounds 34-35). | session 14z |
 | `tests/test_don_colors.sh` | test | emulator | emulator | Donovan color-set gate (session 14z-21). | session 14z |
 | `tests/test_don_column.sh` | test | emulator | emulator | swordless-421P column KO crash gate (14z-33). | 14z-33 |
+| `tests/test_don_immortal_native.sh` | test | emulator | MAME, ~3 min | THE CROSS-GAME 421+P LOCK (14z-127, GitHub #114). | 14z-127 |
 | `tests/test_don_reactions.sh` | test | emulator | emulator | Change Immortal behavior gate (14z-26..28). | 14z-26 |
 | `tests/test_don_sound.sh` | test | emulator | emulator | Donovan sound gate (session 14z-52). | session 14z |
 | `tests/test_don_sword.sh` | test | emulator | emulator | Donovan sword-swing behavior gate (session 14z-5). | session 14z |

@@ -538,6 +538,19 @@ from the reference ROMs + three verdict controls); bytes in
 `../project/patch_notes.md` "14z-110 — the #99 fix: the reaction_hook D2
 WINDOW"]
 
+**421+P (the sworded Lightning Sword / deity) on native vsav2, MEASURED.** The
+no-mash HP version at replay 51's spacing lands **6 hits for 10 damage** — a
+5-point sword hit then five 1-point deity ticks about 10 frames apart, spanning
+49 frames — with the victim's reaction class `+0x54` = `0x4E`, and **the victim
+does not move for the whole shake**: its x is constant from the first hit to the
+last and the pushback step counter `+0x164` stays 0 until the list begins
+stepping at the shake's end (the step machinery is "Reactions as the victim"
+above). So the move HOLDS its victim in place rather than pushing it, which is
+what lets the later deity ticks connect at all. [M:
+`tests/test_don_immortal_native.sh` native leg, per-frame fighter-block dumps;
+the port's reproduction of it and the 3-frame cadence residue are that gate and
+GitHub #114, not a game fact]
+
 ### Donovan's anim-chain map — the moves named (14z-120, measured on native vs2)
 
 The naming step of the character-data map (phase 1): every row of
