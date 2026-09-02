@@ -1522,6 +1522,26 @@ wrong is *safe and loud* over designs that are merely well-measured.
   ~330 glyph TILES have to travel. NOTE the
   win-quote ART is already native and complete (14z-62e/62j, group C bank 5) —
   what remains is the TEXT. See the cosmetic backlog below.
+- **OPEN (gameplay, GitHub #114): DONOVAN'S 421+P DOES NOT REPRODUCE NATIVE —
+  MEASURED 2026-09-02, and `test_don_reactions.sh` is GREEN THROUGHOUT.**
+  Native vsav2 lands **6 hits / 10 damage** and HOLDS the victim at x=728 to
+  f2685; ours lands **3 hits / 11 damage** and pushes the victim 728 -> 852,
+  ending f2640. Positions are byte-identical between the games until the move
+  connects, so the confound is eliminated: **our reaction does not hold the
+  victim**, the opponent leaves range after three hits and the remaining deity
+  ticks whiff. Not a count-tuning error.
+  **WHY IT LOOKED CLOSED:** the 14z-42 cadence root cause (vsavj's older
+  freeze tuning) and the 14z-43 dispatch fix were real and stand; the
+  MULTI-HIT VALUES half was never validated against native — it was tuned
+  against playtest + community information. The gate cannot see the gap: all
+  four legs run `vsavj`, `native == 10` is a hardcoded constant from
+  testimony, its window starts at f2630 while our first hit is at **f2627**
+  (so it sums 7 of the true 11), and its bounds are ONE-SIDED so an
+  undershoot passes.
+  **NOT TIGHTENED, DELIBERATELY:** widening the window and making the bounds
+  two-sided turns the gate RED, and a red gate halts forward work ([VSP-7]).
+  Maintainer's call. Next: why the victim is not held (reaction/pushback path,
+  `0x2783C[record +0xC]`), then mizuumi's Donovan page as a third opinion.
 - **OPEN:** FG pacing — untouched.
 
 ### THE COSMETIC BACKLOG (parked, 2026-08-27 — the maintainer's own list)
