@@ -2,6 +2,17 @@
 # audit_hitclass_map_cost.sh — what the 14z-82b hit-class map extension
 # FIXES and what it COSTS legacy content (ADOPTED 14z-82c; rerunnable).
 #
+# THE CONSEQUENCE IS PER-INDEX, and this decides what can be a control
+# (measured 14z-129, vsavj OPCODE view at PRG:0x1A88E — the map lives in the
+# opcode image, which is what tools/gen_hitclass_map_thunk.py reads):
+#     map[64] = 0x4e  pyron satellite  -> LOUD, the f7997 fault
+#     map[67] = 0x00  pyron            -> the do-nothing default
+#     map[68] = 0x12  huitzil grenade  -> SILENT (a real clash, no crash)
+#     map[70] = 0x00  huitzil EX FG    -> the do-nothing default
+# So only a type-64 clash can be section 0's positive control. HANDOFF's
+# out-of-range doctrine: "no crash" clears a LOUD entry completely and a
+# SILENT one not at all.
+#
 # THE DEFECT IT FIXES (measured, 14z-82b): vsavj's projectile-pool hit
 # sweep maps both colliding objects' type bytes through one 64-entry byte
 # map (routine PRG:0x1A888, seven callers); ported types >= 64 landing a
@@ -22,11 +33,20 @@
 #
 # Sections:
 #   0  build the CURRENT pyron vertical (pyron.toml verbatim — it carries
-#      the row since 14z-82c) AND a no-thunk twin, then prove THE FIX: the
-#      11,017-frame chaos soak must END clean WITH the thunk and CRASH at
-#      f7997 WITHOUT it. The crash half is the positive control — an
-#      END-clean run alone cannot tell a fix from a rig that stopped
-#      firing the move.
+#      the row since 14z-82c) AND a no-thunk twin, then prove THE FIX on
+#      tests/replays/pyron/84_pyron_clash_type64.rpl: it must END clean WITH
+#      the thunk and CRASH WITHOUT it. The crash half is the positive
+#      control — an END-clean run alone cannot tell a fix from a rig that
+#      stopped firing the move.
+#      RIG CHANGED 14z-129: the control used to ride the 11,017-frame chaos
+#      soak and expected the f7997 crash. The soak stopped reaching the map
+#      at all (section 4: total=0), so the control was DEAD for sessions and
+#      this gate refused a verdict — correctly. What was missing was
+#      CONTACT: the sweep is POOL-vs-POOL, so a tenant projectile hitting a
+#      FIGHTER never transits the map, and the 37-leg census put 107 objects
+#      of type >= 64 into the pool with ZERO map entries. The new rig adds
+#      the opposing PROJECTILE and lands 14 dispatches at map index 0x40.
+#      GUARD_DEBUG=1 is load-bearing (cheap mode sees no vec3).
 #   1  LEGACY COST: live A/B fix-vs-no-thunk-twin whole-RAM checksums over
 #      THE WHOLE LEGACY CORPUS. The builds differ by ONLY the thunk BY
 #      CONSTRUCTION (same manifest, one row stripped), so any
@@ -49,9 +69,12 @@
 #      is now a REGRESSION GATE on that ruling, not an open question:
 #      the only measurement that would reopen it is a pool-vs-pool
 #      contact rig scoring 0 extension entries.
-#   4  WHY IS SECTION 0's CRASH CONTROL DEAD? Same probe on the soak rig,
+#   4  WHY THE SOAK IS NO LONGER THE CONTROL. Same probe on the soak rig,
 #      separating "the over-index still happens, the address moved" from
-#      "the rig stopped producing the event".
+#      "the rig stopped producing the event". It answered the second
+#      (total=0), which is what sent 14z-129 to build the clash rig section
+#      0 now uses. Kept as the standing check that the soak's own map
+#      transit is still zero — if it ever returns, that is a finding.
 #
 # WHAT SECTIONS 3-4 CANNOT DO, STATED UP FRONT. The hit sweep is
 # POOL-vs-POOL, so a tenant projectile hitting a FIGHTER never transits
@@ -271,49 +294,77 @@ else
     echo "  ok: A/B is non-vacuous — fix $FP_FIX != twin $FP_NOT"
 fi
 
+# THE RIG IS THE POOL-VS-POOL CLASH, NOT THE MASH SOAK (14z-129).
+# The soak (70_pyron_mash) stopped reaching the map at all — section 4
+# measured total=0 — so its crash control was DEAD and this gate correctly
+# refused a verdict rather than pass on an END-clean run that proved
+# nothing. What was missing was CONTACT, not exposure: the 37-leg census put
+# 107 objects of type >= 64 into the pool and entered the map zero times,
+# because the sweep is POOL-vs-POOL and a tenant projectile hitting a
+# FIGHTER never transits it. 84_pyron_clash_type64 supplies the opposing
+# PROJECTILE (P2 Demitri flares through Pyron's satellite spawns) and lands
+# 14 dispatches at map index 0x40 — the LOUD one, map[64] = 0x4e.
+# The soak still runs below as the LEGACY-COST leg; it is simply no longer
+# asked to be the control it can no longer be.
+CLASH_POKES="1400:ff8782:11;1450:ff8782:11;1500:ff8782:11;1400:ff8b82:01;1450:ff8b82:01;1500:ff8b82:01"
+# The 1P forced-pick string for pyron. Section 0 no longer uses it (its rig is
+# the 2P clash above), but sections 3 and 4 DO — it is the census corpus row
+# for pyron/70_pyron_mash and the probe string for section 4's standing check.
+# Keep it defined HERE: section 3's table comment says "PYR_SOAK is defined up
+# in section 0", and the table is expanded with `eval`, so an undefined name
+# does not fail loudly — it silently empties the corpus (measured 14z-129:
+# removing it collapsed section 3 to "0 tenant rigs" and still printed a
+# verdict shaped like a result).
 PYR_SOAK="1704:ff8782:11;1760:ff8782:11;1900:ff8782:11;2100:ff8782:11;2400:ff8782:11"
-soak() {  # soak <build> <out>
-    POKES="$PYR_SOAK" MAME_ROMPATH="$(abspath "$1")/rompath;$ROMDIR" \
-        tools/run_replay_guarded.sh vsavjw tests/replays/pyron/70_pyron_mash.rpl \
+clash() {  # clash <build> <out> — GUARD_DEBUG=1 is LOAD-BEARING: cheap mode
+           # installs no exception breakpoints, so the twin's vec3 is
+           # INVISIBLE there and both legs report END 5020 (measured 14z-129).
+    GUARD_DEBUG=1 POKES="$CLASH_POKES" \
+        MAME_ROMPATH="$(abspath "$1")/rompath;$ROMDIR" \
+        tools/run_replay_guarded.sh vsavjw \
+        tests/replays/pyron/84_pyron_clash_type64.rpl \
         "$2" "$2.box" >/dev/null 2>&1 || true
 }
-soak "$WORK/fix"     "$WORK/soak.log"
-soak "$WORK/nothunk" "$WORK/soak_nothunk.log"
-# THE POSITIVE CONTROL IS NOT OPTIONAL: an END-clean soak proves nothing
-# unless the same soak CRASHES without the thunk. Otherwise "no crash" may
+clash "$WORK/fix"     "$WORK/clash.log"
+clash "$WORK/nothunk" "$WORK/clash_nothunk.log"
+# THE POSITIVE CONTROL IS NOT OPTIONAL: an END-clean run proves nothing
+# unless the same rig CRASHES without the thunk. Otherwise "no crash" may
 # mean the rig stopped firing the move (the downgrade class, paid for
-# repeatedly on this project).
+# repeatedly on this project — and paid for by THIS control, which sat dead
+# from the moment the soak's trajectory drifted off the map).
 ctl_live=1
-if grep -q "^CRASH" "$WORK/soak_nothunk.log"; then
-    echo "  ok: CONTROL — without the thunk the soak still CRASHES" \
-         "($(grep -m1 '^CRASH' "$WORK/soak_nothunk.log" | cut -c1-60))"
+if grep -q "^CRASH" "$WORK/clash_nothunk.log"; then
+    echo "  ok: CONTROL — without the thunk the clash CRASHES" \
+         "($(grep -m1 '^CRASH' "$WORK/clash_nothunk.log" | cut -c1-60))"
 else
-    echo "  FAIL: CONTROL DEAD — the soak did NOT crash on the no-thunk twin,"
+    echo "  FAIL: CONTROL DEAD — the clash did NOT crash on the no-thunk twin,"
     echo "        so an END-clean run on the fix build proves nothing about"
-    echo "        the thunk. Section 4 diagnoses WHY with the map probe;"
-    echo "        do not re-point the control at a new address until it has."
-    grep -E "^(CRASH|END)" "$WORK/soak_nothunk.log" | head -3
+    echo "        the thunk. Check the map index the rig reaches (section 3's"
+    echo "        probe): only map[64] = 0x4e is LOUD. A clash at a SILENT"
+    echo "        index (huitzil's 68 = 0x12) cannot be this control —"
+    echo "        tests/replays/hui/96_hui_grenade_clash.rpl records that."
+    grep -E "^(CRASH|END)" "$WORK/clash_nothunk.log" | head -3
     ctl_live=0
     fail=1
 fi
-if grep -q "^END 11017" "$WORK/soak.log" \
-        && ! grep -q "^CRASH" "$WORK/soak.log"; then
+if grep -q "^END 5020" "$WORK/clash.log" \
+        && ! grep -q "^CRASH" "$WORK/clash.log"; then
     # 14z-93: this message used to read "the soak that crashes the no-thunk
     # twin at f7997 runs END-clean" UNCONDITIONALLY — so on a dead control it
     # asserted the crash two lines under the branch that had just reported
     # there wasn't one. A success line must not restate the premise the
     # control failed to establish.
     if [ "$ctl_live" = 1 ]; then
-        echo "  ok: THE FIX HOLDS — the soak that crashes the no-thunk twin at"
-        echo "      f7997 runs END-clean through 11,017 frames"
+        echo "  ok: THE FIX HOLDS — the clash that crashes the no-thunk twin"
+        echo "      at its FIRST index-64 dispatch runs END-clean here"
     else
-        echo "  note: the soak runs END-clean through 11,017 frames on the fix"
-        echo "        build — but with the control DEAD that is not evidence"
-        echo "        about the thunk, only that this rig does not crash."
+        echo "  note: the clash runs END-clean on the fix build — but with the"
+        echo "        control DEAD that is not evidence about the thunk, only"
+        echo "        that this rig does not crash."
     fi
 else
-    echo "  FAIL: the soak did not complete clean on the fix build:"
-    grep -E "^(CRASH|END)" "$WORK/soak.log" | head -3
+    echo "  FAIL: the clash did not complete clean on the fix build:"
+    grep -E "^(CRASH|END)" "$WORK/clash.log" | head -3
     fail=1
 fi
 

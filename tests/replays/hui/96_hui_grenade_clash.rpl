@@ -1,0 +1,86 @@
+# hui GRENADE vs legacy FLARE — the SILENT half of the pool-vs-pool
+# contact class (14z-129).
+#
+# The twin of tests/replays/pyron/84_pyron_clash_type64.rpl, and it exists
+# to record a NEGATIVE that is easy to misread. It is what 88's header asked
+# for — "an opposing PROJECTILE to clash with (P2 doing a pool-object move
+# into the mine), not a walking fighter" — and it WORKS: the contact is real.
+# It just is not a crash control, and the reason is the map, not the rig.
+#
+# THE SHAPE: P1 Huitzil throws the 214+MP grenade (pool type 68) while P2
+# Demitri throws a head-on Chaos Flare on the same frame. Six attempts at
+# varied relative offsets and with three different Huitzil pool moves;
+# ATTEMPT A (simultaneous, f3400) is the one that lands.
+#
+# BOTH SIDES POKED, early window only (the replay-80 rule):
+# POKES="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:01;1450:ff8b82:01;1500:ff8b82:01"
+#
+# MEASURED 14z-129 on the huitzil stage-6 vertical (08944a7e) and its
+# no-thunk twin (bc33983c), GUARD_DEBUG=1:
+#   WITH the thunk    2 probe fires at f3430-3431 — one at map index 0x44
+#                     (68, the grenade) and one at 0x04 (the flare) — with
+#                     A1=ffff9400 and A6=ffff9500, i.e. TWO POOL SLOTS.
+#                     That is the pool-vs-pool contact the 37-leg census
+#                     could not produce. END 5520.
+#   WITHOUT it        END 5520 — NO CRASH.
+#
+# WHY NO CRASH, and why that is not a licence to drop the thunk: the
+# consequence of over-indexing the vanilla 64-entry map is PER-INDEX.
+# map[68] = 0x12 is survivable where map[64] = 0x4e (pyron's satellite) is
+# the f7997 fault. HANDOFF's out-of-range doctrine: "no crash" clears a LOUD
+# entry completely and a SILENT one not at all — so this leg says the
+# huitzil grenade's over-index is SILENT, and says nothing whatever about
+# whether it is safe.
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p2=R
+1160-1162 p2=R
+1300-1302 p1=1
+1360-1362 p2=1
+3400-3402 p1=D
+3403-3405 p1=DL
+3406-3408 p1=L2
+3400-3402 p2=D
+3403-3405 p2=DL
+3406-3408 p2=L
+3409-3412 p2=1
+3700-3702 p1=D
+3703-3705 p1=DL
+3706-3708 p1=L2
+3730-3732 p2=D
+3733-3735 p2=DL
+3736-3738 p2=L
+3739-3742 p2=1
+4000-4002 p1=R
+4003-4005 p1=D
+4006-4009 p1=DR45
+4000-4002 p2=D
+4003-4005 p2=DL
+4006-4008 p2=L
+4009-4012 p2=1
+4300-4302 p1=R
+4303-4305 p1=D
+4306-4309 p1=DR45
+4330-4332 p2=D
+4333-4335 p2=DL
+4336-4338 p2=L
+4339-4342 p2=1
+4600-4602 p1=R
+4603-4605 p1=DR
+4606-4608 p1=D
+4609-4611 p1=DL
+4612-4615 p1=L2
+4620-4622 p2=D
+4623-4625 p2=DL
+4626-4628 p2=L
+4629-4632 p2=1
+4900-4902 p2=D
+4903-4905 p2=DL
+4906-4908 p2=L
+4909-4912 p2=1
+4920-4922 p1=D
+4923-4925 p1=DL
+4926-4928 p1=L2
+5400 wait

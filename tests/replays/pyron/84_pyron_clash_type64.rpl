@@ -1,0 +1,247 @@
+# pyron POOL-VS-POOL CONTACT at the FATAL map index (14z-129).
+#
+# WHY THIS EXISTS. tests/audit_hitclass_map_cost.sh section 0 needs a
+# POSITIVE CRASH CONTROL: an END-clean soak with the hit-class thunk proves
+# nothing unless the SAME rig CRASHES without it. Its old control — the
+# 11,017-frame pyron mash soak — stopped reaching the map at all (section 4:
+# "total=0 ext=0 trap=0"), so the control was DEAD and the gate said so
+# rather than give a verdict.
+#
+# WHAT WAS MISSING WAS CONTACT, NOT EXPOSURE. The 37-leg tenant census put
+# 107 objects of type >= 64 into the projectile pool and entered the map ZERO
+# times: the sweep is POOL-vs-POOL (both loop registers stride pool slots),
+# so a tenant projectile hitting a FIGHTER never transits it. This rig
+# supplies the missing half — an OPPOSING PROJECTILE.
+#
+# THE SHAPE: P1 Pyron runs the 70_pyron_mash chaos body (which is what
+# spawns his type 64 satellite); P2 Demitri throws a Chaos Flare every 100
+# frames across the same window, so a flare and a satellite occupy the pool
+# together. Built on 105_projectile_clash_ctl's proven head-on volley shape
+# and 83c's 2P poked-select shape.
+#
+# BOTH SIDES POKED, early window only (the replay-80 rule):
+# POKES="1400:ff8782:11;1450:ff8782:11;1500:ff8782:11;1400:ff8b82:01;1450:ff8b82:01;1500:ff8b82:01"
+#
+# MEASURED 14z-129 on the pyron stage-6 vertical (a43da974) and its no-thunk
+# twin (c4e1057a), both built from the CURRENT manifest, GUARD_DEBUG=1:
+#   WITH the thunk    28 probe fires — 14 at map index 0x40 (64, his
+#                     satellite) and 14 at 0x04 (Demitri's flare: the sweep
+#                     maps BOTH colliding objects) — and END 5020 CLEAN.
+#   WITHOUT it        CRASH 3709 vec3 PC 01ab10 ADDR 00ff31b7 — an ODD
+#                     address fault at the FIRST index-64 dispatch (f3708).
+# That is the f7997 mechanism of 14z-82b reproduced on demand: its write-up
+# records "the garbage stream faulted on odd $FF31B5" and A3 = 0xFDC8A;
+# this rig faults on odd $FF31B7 with A3 = 0x000FDC8A.
+#
+# THE INDEX MATTERS AND IS NOT INTERCHANGEABLE. Over-indexing the vanilla
+# 64-entry map reads whatever follows it, and the CONSEQUENCE is per-index
+# (vsavj opcode view, PRG:0x1A88E):
+#     map[64] = 0x4e  pyron satellite   -> LOUD, this crash
+#     map[67] = 0x00  pyron             -> the do-nothing default
+#     map[68] = 0x12  huitzil grenade   -> SILENT (measured: no crash)
+#     map[70] = 0x00  huitzil EX FG     -> the do-nothing default
+# A huitzil clash therefore does NOT make a crash control, however real the
+# contact is — see tests/replays/hui/96_hui_grenade_clash.rpl. HANDOFF's
+# out-of-range doctrine: "no crash" clears a LOUD entry completely and a
+# SILENT one not at all.
+#
+# THE GUARD MUST BE IN -debug MODE. Under GUARD_DEBUG=0 both legs report
+# END 5020 and the twin's crash is INVISIBLE: cheap mode installs no
+# exception breakpoints, so it cannot see a vec3 (docs/GOTCHAS.md).
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p2=R
+1160-1162 p2=R
+1300-1302 p1=1
+1360-1362 p2=1
+3000-3002 p1=D
+3003-3005 p1=DR
+3006-3008 p1=R1
+3029-3031 p1=D
+3032-3034 p1=DR
+3035-3037 p1=R2
+3058-3060 p1=D
+3061-3063 p1=DL
+3064-3066 p1=L4
+3087-3089 p1=D
+3090-3092 p1=DL
+3093-3095 p1=L5
+3116-3118 p1=R
+3119-3121 p1=D
+3122-3124 p1=DR
+3125-3127 p1=R3
+3148-3187 p1=L
+3188-3190 p1=R6
+3211-3213 p1=U
+3224-3226 p1=D
+3227-3229 p1=D1
+3246-3247 p1=1
+3250-3251 p1=2
+3254-3255 p1=3
+3258-3259 p1=4
+3262-3263 p1=5
+3266-3267 p1=6
+3280-3282 p1=R12
+3291-3293 p1=L45
+3302-3304 p1=D36
+3325-3327 p1=D
+3328-3330 p1=DR
+3331-3333 p1=R1
+3354-3356 p1=D
+3357-3359 p1=DR
+3360-3362 p1=R2
+3383-3385 p1=D
+3386-3388 p1=DL
+3389-3391 p1=L4
+3412-3414 p1=D
+3415-3417 p1=DL
+3418-3420 p1=L5
+3441-3443 p1=R
+3444-3446 p1=D
+3447-3449 p1=DR
+3450-3452 p1=R3
+3473-3512 p1=L
+3513-3515 p1=R6
+3536-3538 p1=U
+3549-3551 p1=D
+3552-3554 p1=D1
+3571-3572 p1=1
+3575-3576 p1=2
+3579-3580 p1=3
+3583-3584 p1=4
+3587-3588 p1=5
+3591-3592 p1=6
+3605-3607 p1=R12
+3616-3618 p1=L45
+3627-3629 p1=D36
+3650-3652 p1=D
+3653-3655 p1=DR
+3656-3658 p1=R1
+3679-3681 p1=D
+3682-3684 p1=DR
+3685-3687 p1=R2
+3708-3710 p1=D
+3711-3713 p1=DL
+3714-3716 p1=L4
+3737-3739 p1=D
+3740-3742 p1=DL
+3743-3745 p1=L5
+3766-3768 p1=R
+3769-3771 p1=D
+3772-3774 p1=DR
+3775-3777 p1=R3
+3798-3837 p1=L
+3838-3840 p1=R6
+3861-3863 p1=U
+3874-3876 p1=D
+3877-3879 p1=D1
+3896-3897 p1=1
+3900-3901 p1=2
+3904-3905 p1=3
+3908-3909 p1=4
+3912-3913 p1=5
+3916-3917 p1=6
+3930-3932 p1=R12
+3941-3943 p1=L45
+3952-3954 p1=D36
+3975-3977 p1=D
+3978-3980 p1=DR
+3981-3983 p1=R1
+4004-4006 p1=D
+4007-4009 p1=DR
+4010-4012 p1=R2
+4033-4035 p1=D
+4036-4038 p1=DL
+4039-4041 p1=L4
+4062-4064 p1=D
+4065-4067 p1=DL
+4068-4070 p1=L5
+4091-4093 p1=R
+4094-4096 p1=D
+4097-4099 p1=DR
+4100-4102 p1=R3
+4123-4162 p1=L
+4163-4165 p1=R6
+4186-4188 p1=U
+4199-4201 p1=D
+4202-4204 p1=D1
+4221-4222 p1=1
+4225-4226 p1=2
+4229-4230 p1=3
+4233-4234 p1=4
+4237-4238 p1=5
+4241-4242 p1=6
+4255-4257 p1=R12
+4266-4268 p1=L45
+4277-4279 p1=D36
+4300-4302 p1=D
+4303-4305 p1=DR
+4306-4308 p1=R1
+4329-4331 p1=D
+4332-4334 p1=DR
+4335-4337 p1=R2
+4358-4360 p1=D
+4361-4363 p1=DL
+4364-4366 p1=L4
+4387-4389 p1=D
+4390-4392 p1=DL
+4393-4395 p1=L5
+3040-3042 p2=D
+3043-3045 p2=DL
+3046-3048 p2=L
+3049-3052 p2=1
+3140-3142 p2=D
+3143-3145 p2=DL
+3146-3148 p2=L
+3149-3152 p2=1
+3240-3242 p2=D
+3243-3245 p2=DL
+3246-3248 p2=L
+3249-3252 p2=1
+3340-3342 p2=D
+3343-3345 p2=DL
+3346-3348 p2=L
+3349-3352 p2=1
+3440-3442 p2=D
+3443-3445 p2=DL
+3446-3448 p2=L
+3449-3452 p2=1
+3540-3542 p2=D
+3543-3545 p2=DL
+3546-3548 p2=L
+3549-3552 p2=1
+3640-3642 p2=D
+3643-3645 p2=DL
+3646-3648 p2=L
+3649-3652 p2=1
+3740-3742 p2=D
+3743-3745 p2=DL
+3746-3748 p2=L
+3749-3752 p2=1
+3840-3842 p2=D
+3843-3845 p2=DL
+3846-3848 p2=L
+3849-3852 p2=1
+3940-3942 p2=D
+3943-3945 p2=DL
+3946-3948 p2=L
+3949-3952 p2=1
+4040-4042 p2=D
+4043-4045 p2=DL
+4046-4048 p2=L
+4049-4052 p2=1
+4140-4142 p2=D
+4143-4145 p2=DL
+4146-4148 p2=L
+4149-4152 p2=1
+4240-4242 p2=D
+4243-4245 p2=DL
+4246-4248 p2=L
+4249-4252 p2=1
+4340-4342 p2=D
+4343-4345 p2=DL
+4346-4348 p2=L
+4349-4352 p2=1
+4900 wait
