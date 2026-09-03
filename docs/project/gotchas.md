@@ -3511,3 +3511,55 @@ freeze, so it does not rot. Same family as [VSP-156] (a replay's name is a
 claim about the build) and [VSP-58] (a set-name mismatch is a false green);
 the new face is that the wrong character is a false RED as readily as a false
 green.
+
+## **[VSP-166]** RE-TARGETING AN INSTRUMENT FROM THE BUILD'S OWN METADATA IS WRITING THE TEST FROM THE ALGORITHM — name what the new site's expectation is anchored to, and it must not be the artifact under test (paid: 14z-129)
+
+`audit_type_dispatch_range` probes an `obj_hook` thunk whose address it
+scrapes from the build's own `patch_notes_fragment.md`. 14z-91 DELETED those
+thunks (each walker relocated with its union table at copy+0x2C, only the 23
+caller operands rewritten), so the scrape returns empty and the gate has been
+unrunnable since. The decision recorded in STATE was RE-TARGET or DROP.
+
+**The proposal that was wrong, and it looked reasonable.** Re-target the probe
+at the RELOCATED walker, resolving its address the way `audit_walker_repoint`
+already does — from the build's own `patch.json` plus the manifest's
+`obj_hook` rows. The reasoning ran: a sibling gate can LOCATE the relocated
+walker, therefore this gate can be re-targeted there.
+
+**THE MAINTAINER'S RULE, which is the general form (2026-09-03):** re-targeting
+supposes we know HOW to re-target, *and that this knowledge is not itself the
+result of code we have written* — **"we don't write that what we coded is
+indeed what we coded."** Dropping, by contrast, says either "we do not know
+how to correct it" or, more importantly, "even if we do, we cannot guarantee
+the correction rests on MEASURED data rather than on our own inference from
+the situation." Their analogy: it is TDD with the tests written after the
+code, from the algorithms the code implements.
+
+**What was actually missing.** Nobody had measured that the relocated walker
+HAS a point where `D0` carries the family index with the thunk's semantics.
+The step from "the address is resolvable" to "the question is answerable
+there" was an inference about our own artifact, drawn from our own build
+metadata.
+
+**AND IT HAS A MEASURED CONSEQUENCE, which is what makes this concrete rather
+than philosophical.** The gate's only verdict control is `build/hui30`
+(14z-82c) — a build that PREDATES the relocation and therefore still carries
+the thunks (measured: hui30 has 2 such rows, post-14z-91 builds have ZERO).
+A re-targeted probe **cannot run its control there**: there is no relocated
+walker in hui30 to probe. So the re-target orphans the liveness control, and a
+probe with no liveness control reporting "zero original-range dispatches" is
+indistinguishable from a probe pointed at nothing — the failure this project
+keeps paying for.
+
+**THE RULE.** Before re-targeting any instrument, state what the new site's
+expectation is ANCHORED to, and check that the anchor is outside the thing
+under test. If the only anchor available is our own build metadata, the honest
+options are: (a) build a control from the CURRENT manifest whose expected
+answer follows from DESIGN independently of the machinery under test — for
+this gate, a single-tenant vertical where originals are kept because the lone
+tenant IS the first resolver — or (b) drop. Re-pointing at a site we merely
+believe is equivalent is neither.
+
+This is [VSP-19] one level up: that rule says a verdict's CLASSIFIER must be
+validated against ground truth; this one says WHERE THE CLASSIFIER LOOKS must
+be too, and neither may be established by reading our own generator.
