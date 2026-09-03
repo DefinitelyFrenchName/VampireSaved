@@ -43,9 +43,9 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD_D="${BUILD_D:-build/don_m18}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-BUILD_H="${BUILD_H:-build/hui52}"   # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-BUILD_P="${BUILD_P:-build/pyron36}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD_D="${BUILD_D:-build/don_m19}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD_H="${BUILD_H:-build/hui53}"   # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD_P="${BUILD_P:-build/pyron37}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 
 # the vs2 data view (logical byte order); derive it if no cached copy exists

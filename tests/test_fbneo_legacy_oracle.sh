@@ -98,7 +98,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
-BUILD="${1:-build/don_m18}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${1:-build/don_m19}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ $# -gt 0 ] && shift
 REPLAYS="${*:-01_attract_long 06_test_mode 21_don_mash 05_timeout_idle}"  # 26 dropped 14z-110b, see header
 FB="$REPO/emu/fbneo/fbneo"

@@ -1,5 +1,130 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-130 — THE M13 BOOT-TITLE FREEZE (donovan-m19 / huitzil-m26 / pyron-m20 / merged-m15, mark M13), and the `gap_be27a` bank-map correction folded into it
+
+**NO NEW SHIPPED BYTE BEYOND 14z-127's.** The boot-title bytes are the three
+`aux_poke poke16` of the 14z-127 entry below, unchanged. What this session
+added is the bank-map correction the maintainer ruled into this window
+(2026-09-03: *"if folding it in allows us to pay only once, that's an easy
+choice: fold it in!"*), and it is **byte-neutral on every track** — proven by
+rebuild, not by argument.
+
+### The correction
+
+`build/manifest/bank_map.toml` modelled ONE 32-longword table as TWO 32-entry
+WORD tables:
+
+    - gap_be27a   vsavj 0x0BE27A  kind auto  stride 0x40
+    - gap_be2ba   vsavj 0x0BE2BA  kind auto  stride 0x40
+    + capture_kf_ptr  vsavj 0x0BE27A  kind data_ptr  stride 0x80  region auto
+
+It is the capture-keyframe pointer table `PRG:0x0BE27A[attacker id]` — the
+capture-pose installer's block pointer ([VSE-44]; consumers `PRG:0x02802E`,
+`PRG:0x0280C6`, `PRG:0x028140`). **Measured three ways from the ROMs:**
+
+* vsavj's 32 longs at `PRG:0x0BE27A` are exactly the sixteen old-verified
+  pointers the `capture_kf_*` `slot_rows` carry, and rows `0x10-0x1F` alias
+  `0x00-0x0F` byte for byte;
+* vsav2 row `0x13` = `0x000CA1CA` = `throw_victim_keyframes.src`, and vhunt2's
+  = `0x000C9A5C` = its `orc` (sibling delta `0x76E`, uniform across all 32);
+* `0x0BE27A + 0x80 = 0x0BE2FA = param32_b`, so the tiling is exact.
+
+`kind = "auto"` was also wrong by bank_map's own vocabulary — it means "gap
+table with NO DOCUMENTED CONSUMER", and this table's three consumers are named
+on the row.
+
+### Why it was not a manifest tidy: the table is HAND-OWNED
+
+The corrected `kind` enables the generic per-character repoint
+(`gen_donovan_patch.py`, the `man["values"]` loop) on a table already owned row
+by row by **17 `[[data_port]]` rows**: fifteen `capture_kf_*` with `slot_rows`
+(attacker rows `0x00-0x0F`, `0x0B`, `0x18`), donovan's `throw_victim_keyframes`
+(row `0x13`), huitzil's `grab_hold_keyframes` (row `0x10`). Left to fire, the
+generic repoint would have done three things — measured on the M13 tracks, and
+only the first of them loud:
+
+| track | what the generic repoint writes | why it is wrong |
+|---|---|---|
+| donovan (WIDE) | `0x0BE2C6 <- 0x003fbda2` instead of `0x004010e0` | `0x003fbda2` is the `hitbox`-region copy and carries `0x0b30` at `+0x1E`; the shipped wide_ext blob carries `0x0d88` — **it would have silently reverted the 14z-64 mirror-victim fix** |
+| pyron (WIDE) | `0x0BE2BE <- 0x004af226` (NEW) | repoints his attacker row `0x11` off Demitri's block onto his own vs2 block — a throw/capture gameplay change nobody ruled ([VSP-10]) |
+| stock twin | `0x0BE2B6` (NEW) | repoints JEDAH's row into Donovan's placed hitbox copy; the base-slot track replaces the block IN PLACE at `dst` and needs the row untouched |
+
+Only the donovan case is loud — `patch_prg.py` catches it as
+`OP OVERLAP at 0x0BE2C6` ([VSP-77]). The other two are silent.
+
+### The fix: an ownership claim, on a mechanism that already existed
+
+14z-65 added `claimed_ptr_tables` after the identical defect on
+`tail_data_ptr[tenant]` (`PRG:0x0BF466`), where "the shipped bytes were correct
+only because the sound op was emitted later — silent last-write-wins". It is
+extended here to `slot_ptr_table`, with **two deliberate differences from the
+sound_table claim, each measured rather than reasoned:**
+
+1. **UNGATED.** The sound_table claim mirrors its section's gating so a stock
+   build keeps the generic repoint. Here the stock track is exactly where the
+   generic repoint does the most damage, so the claim holds on every track.
+2. **Scoped to `port` (the MERGED manifest), not `tenant_rows`.** The
+   `capture_kf_*` rows are declared identically in all three manifests, so
+   `merge_manifests` dedups them and `row_here()` hands them to ONE iteration;
+   scoped per-iteration, the other tenants' iterations see an empty claim.
+   **Found by measurement, after a first pass shipped it that way:** the merged
+   build emitted `poke32 0x0be2be <- 0x004af226  capture_kf_ptr[0x11] donovan
+   hitbox` — Pyron's row, written by Donovan's iteration.
+   `tests/test_merged_inputs.sh` section 2 is what caught it, and it could only
+   have been caught there: the pinned merged extracts predate the row, so the
+   merged BUILD cannot show it.
+
+### The result, by rebuild
+
+| track | fingerprint | vs pre-correction |
+|---|---|---|
+| `build/don_m19` | `8065bc92` | IDENTICAL |
+| `build/hui53` | `08944a7e` | IDENTICAL |
+| `build/pyron37` | `a43da974` | IDENTICAL |
+| `build/m5_stock14` | `e86e1d04` | IDENTICAL |
+| `build/m3b_merged22` | `f42f7569` | IDENTICAL |
+
+`patch.json` sha1 identical on every track as well. The five dirs were rebuilt
+IN PLACE so their extract metadata follows the corrected tree — the ROM bytes
+never moved, but `extract/regions.json` did (`gap_be27a` -> `capture_kf_ptr`),
+and the generated pages read it.
+
+### What DID move
+
+* **The shared-writes exemption** is now the real variant half
+  (`es = stride/32 = 4`, window `0x0BE2BA-0x0BE2FA`), so each tenant's OWN
+  capture-keyframe row and row `0x18` leave the inventory. With the three M13
+  boot-title rows added (reviewed 14z-127), the counts go D/H/P
+  **114/112/100 -> 115/113/102**.
+  **NOTE WHAT DID NOT MOVE: rows `0x08-0x0F` stay listed.** Only ONE of the
+  nine writes the 14z-128 containment surfaced returns to exemption; the other
+  eight are LEGACY attacker rows and belong under review. The root fix NARROWS
+  the exemption rather than restoring the hole.
+* **The generated character-data pages** read the tenant row at `0x0be2c6`
+  (donovan) instead of the un-4-aligned `0x0be2a0`.
+* **`test_id_space`** re-frozen `44 tables / 679 alias / 25 distinct` ->
+  `45 / 695 / 25`. That is an INDEPENDENT confirmation, not bookkeeping: the
+  audit now classifies the row and, reading the ROM, finds all sixteen of its
+  variant rows are ALIASES with 0 out-of-range.
+
+### The gate
+
+`tests/test_capture_kf_ownership.sh` (ci_static) — anchored in the reference
+ROM and the shipped image, never in `patch.json`, `placements.json` or the
+manifests ([VSP-166]): the model from the ROM, the per-track repoint inventory
+(stock `{}`; donovan `0x00-0x0F,0x13,0x18`; huitzil `0x00-0x0F,0x10,0x18`;
+pyron `0x00-0x0F,0x18`; merged the union), the mirror-victim fix riding the
+shipped row, and four controls — including the liveness one that finds the
+UNFIXED twin at `0x3fbda2` and so shows the check can tell the two blocks
+apart.
+
+### The open item this surfaced
+
+**Pyron's attacker row `0x11` is not ported** — he uses Demitri's capture
+keyframes as a thrower. That is the pre-existing state, deliberately preserved
+here; whether to port it is a [VSP-10] call and is recorded in STATE
+"Decisions pending".
+
 ## 14z-127 — THE BOOT NAME SCREEN: "VAMPIRE SAVIOR" -> "VAMPIRE SAVED"
 
 Three `aux_poke poke16` rows, declared IDENTICALLY in all three tenant

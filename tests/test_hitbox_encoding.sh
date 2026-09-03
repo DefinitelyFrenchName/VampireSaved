@@ -30,7 +30,7 @@
 #      0x0A / 0x52) — the "+0x1D class byte" is never what the engine used.
 # Emulator tier (MAME, ~4 min: two field legs + two -debug legs, parallel).
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/don_m18] tests/test_hitbox_encoding.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/don_m19] tests/test_hitbox_encoding.sh
 #
 # HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -51,7 +51,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/don_m18}"
+BUILD="${BUILD:-build/don_m19}"
 EX="$BUILD/extract"
 [ -f "$EX/regions.json" ] || { echo "SKIP: no $EX/regions.json"; exit 0; }
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }

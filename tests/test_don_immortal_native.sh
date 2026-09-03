@@ -73,7 +73,7 @@
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-RPDIR="${1:-$REPO/build/m5_stock13/rompath}"
+RPDIR="${1:-$REPO/build/m5_stock14/rompath}"
 # A MISSING PREREQUISITE IS LOUD, NEVER A SILENT exit 0. This gate is a
 # FREEZE-BATTERY LEG (run_battery_m2.sh 3f) and `bat` invokes it as a bare
 # command, so an exit 0 would be counted as PASS and "BATTERY GREEN" would be

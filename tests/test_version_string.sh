@@ -32,7 +32,7 @@
 #      a corrupted glyph tile must be refused by section 1.
 #
 # Usage: ROMDIR=... tests/test_version_string.sh [outbase]
-#   default build/m3b_merged21. Reads the knobs from the manifest the build
+#   default build/m3b_merged22. Reads the knobs from the manifest the build
 #   names (donovan.toml — identical in all three tenant manifests, asserted).
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -49,7 +49,7 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-OUT="${1:-build/m3b_merged21}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+OUT="${1:-build/m3b_merged22}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
 [ -d "$OUT/rompath" ] || { echo "SKIP: $OUT/rompath missing"; exit 77; }

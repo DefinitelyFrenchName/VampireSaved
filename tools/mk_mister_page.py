@@ -1135,7 +1135,7 @@ def check():
             ok.append(f"the {label} ASCII figure in {CORE_DOC.name} is current")
 
     # -- 6. against the real artifacts, where reachable ----------------------
-    build = REPO / "build" / "m3b_merged21" / "rompath" / "vsavjw.zip"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+    build = REPO / "build" / "m3b_merged22" / "rompath" / "vsavjw.zip"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
     if not build.exists():
         skipped.append(f"no WIDE romset at {build} — the group-C occupancy "
                        "census was not re-derived")

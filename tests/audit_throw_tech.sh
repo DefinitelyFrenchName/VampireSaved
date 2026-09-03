@@ -23,7 +23,7 @@
 # the tech input is load-bearing and the reduced values cannot appear
 # on their own.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged22]
 #        tests/audit_throw_tech.sh          (~8 legs x ~1 min)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -31,7 +31,7 @@ cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged21}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged22}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 BASE="$REPO/tests/replays/judge/02_throw.rpl"

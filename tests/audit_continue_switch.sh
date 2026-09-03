@@ -14,7 +14,7 @@
 #   guarded to the marathon's END at 40620.
 #
 # WHAT IT LOCKS (RE-MEASURED 14z-129, 2026-09-03, on merged-m14 =
-# build/m3b_merged21 / 6649523a, two identical guarded runs; first frozen
+# build/m3b_merged22 / 6649523a, two identical guarded runs; first frozen
 # 2026-08-20 on merged-m4, re-measured 14z-110 on merged14):
 #   1. #99 regression lock: the guarded run ENDs at 40620 with ZERO
 #      CRASH/PCWEEDS/SOFTRESET/END-CRASH lines, across two continues and
@@ -69,13 +69,13 @@
 # Kill pokes: NONE (audit_kill_poke_shape: a 2-byte HP poke manufactures
 # the #103 stall shape by instrument; losses here are the mash's own).
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged21] tests/audit_continue_switch.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged22] tests/audit_continue_switch.sh
 # ~18 min (one guarded 40,620-frame MAME marathon). On-demand.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
-BUILD="${BUILD:-build/m3b_merged21}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged22}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no build at $BUILD"; exit 0; }
 [ -f "$BUILD/prg/vm3j.04d" ] || { echo "SKIP: no prg/vm3j.04d in $BUILD (need the decoded member for the base table)"; exit 0; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"

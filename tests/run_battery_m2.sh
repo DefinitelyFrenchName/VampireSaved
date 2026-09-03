@@ -177,11 +177,11 @@ bat tests/test_m2a_flavor_selector.sh "$OUTBASE/rompath"
 # Donovan shipped rendering as garbage with a green battery (14z-60z).
 # Needs the stock-track twin as its reference, so it runs only when both
 # tracks are present.
-if [ -f "$OUTBASE/rompath/vsavjw.zip" ] && [ -f "$REPO/build/m5_stock13/rompath/vsavj.zip" ]; then  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-    bat tests/test_wide_render_content.sh "$REPO/build/m5_stock13/rompath" "$OUTBASE/rompath"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+if [ -f "$OUTBASE/rompath/vsavjw.zip" ] && [ -f "$REPO/build/m5_stock14/rompath/vsavj.zip" ]; then  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+    bat tests/test_wide_render_content.sh "$REPO/build/m5_stock14/rompath" "$OUTBASE/rompath"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 else
     echo "note: WIDE rendering gate skipped (not a WIDE build, or no stock twin"
-    echo "      at build/m5_stock13 — tests/test_wide_render_content.sh)"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+    echo "      at build/m5_stock14 — tests/test_wide_render_content.sh)"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
     bat_group_skip wide-render 1
 fi
 if [ "$_bat_skip" = 0 ]; then

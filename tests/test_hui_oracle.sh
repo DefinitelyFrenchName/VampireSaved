@@ -18,7 +18,7 @@
 #       measured exactly as the Donovan gate froze it).
 #
 # Usage: ROMDIR=... tests/test_hui_oracle.sh [rompath_dir]
-#   rompath_dir default: build/hui52/rompath — the current huitzil freeze.
+#   rompath_dir default: build/hui53/rompath — the current huitzil freeze.
 #   Re-pointed 14z-128 from build/hui4, which is pre-WIDE-v1.1 (19 members,
 #   no vsw.z01) and cannot boot on the current binaries.
 #
@@ -31,7 +31,7 @@ set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-RPDIR="${1:-$REPO/build/hui52/rompath}"  # re-pointed 14z-128 <- build/hui4 (19 members, no vsw.z01 — pre-WIDE-v1.1 and unbootable on current binaries; the sweep found it as "no dump files", and test_build_ref_rot could not see the $REPO/-prefixed form until the same session)
+RPDIR="${1:-$REPO/build/hui53/rompath}"  # re-pointed 14z-128 <- build/hui4 (19 members, no vsw.z01 — pre-WIDE-v1.1 and unbootable on current binaries; the sweep found it as "no dump files", and test_build_ref_rot could not see the $REPO/-prefixed form until the same session)
 [ -d "$RPDIR" ] || { echo "no build at $RPDIR — run tools/build_donovan.sh 4 first"; exit 1; }
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT

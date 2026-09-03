@@ -29,7 +29,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 case "$ROMDIR" in /*) ;; *) ROMDIR="$(cd "$ROMDIR" && pwd)" ;; esac
 export ROMDIR
-BUILD="${BUILD:-build/m3b_merged21}"
+BUILD="${BUILD:-build/m3b_merged22}"
 [ -f "$REPO/$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
 [ -f "$REPO/tests/inp/pod-black-m14-01/pod-black-m14-01.inp" ] || { echo "SKIP: recording absent"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT

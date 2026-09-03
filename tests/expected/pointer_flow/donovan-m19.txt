@@ -1,0 +1,10 @@
+# pointer-flow baseline for donovan-m19 (build/don_m19), frozen 14z-130 — the M13 boot-title freeze.
+# vs the 14z-119 baseline (donovan-m18): IDENTICAL, and MEASURED so rather than assumed — the M13 build
+# was run against the donovan-m18 baseline and satisfied it with no growth and no missing line. The three
+# boot-title [[aux_poke]] poke16 write TEXT (PRG:0x01C822/24/26), so they introduce no pointer-shaped
+# long and allocate nothing; the gap_be27a -> capture_kf_ptr bank-map correction folded into this
+# freeze is byte-neutral on every track (tests/test_capture_kf_ownership.sh).
+# STRONG lines are REVIEWED findings (see hardening_register.md);
+# WEAK-COUNT lines freeze the noise volume — growth = investigate.
+WEAK-COUNT	code:move_imm	1
+WEAK-COUNT	data:long	1263

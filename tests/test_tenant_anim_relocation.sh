@@ -45,10 +45,10 @@
 # +4 rewritten to a source-range address must FAIL section 1. The gate never
 # writes into a build dir.
 #
-# Env: BUILDS="don_m18 hui52 pyron36" to re-point at another freeze.
+# Env: BUILDS="don_m19 hui53 pyron37" to re-point at another freeze.
 set -u
 cd "$(dirname "$0")/.."
-BUILDS="${BUILDS:-don_m18 hui52 pyron36}"
+BUILDS="${BUILDS:-don_m19 hui53 pyron37}"
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }

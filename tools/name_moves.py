@@ -59,13 +59,13 @@ FIRST_EVENT = 2600
 # R,R pick, the other two are FORCED by the early-window poke ([VSP-120]:
 # 1400-1500 only, the idiom of audit_clone_beam_lines.sh). The chains are
 # decoded from each tenant's vs2 extract (the solo build dir).
-TENANTS = {"donovan": {"id": None, "build": "build/don_m18"},
+TENANTS = {"donovan": {"id": None, "build": "build/don_m19"},
            # PHASE 3 (reactions): the tenant on the VICTIM side (P2) — P1 is Victor (0x03), both by the early-window pokes
-           "donovan_victim": {"id": "03", "id_p2": "13", "build": "build/don_m18"},
-           "huitzil_victim": {"id": "03", "id_p2": "10", "build": "build/hui52"},
-           "pyron_victim":   {"id": "03", "id_p2": "11", "build": "build/pyron36"},
-           "huitzil": {"id": "10", "build": "build/hui52"},
-           "pyron":   {"id": "11", "build": "build/pyron36"}}
+           "donovan_victim": {"id": "03", "id_p2": "13", "build": "build/don_m19"},
+           "huitzil_victim": {"id": "03", "id_p2": "10", "build": "build/hui53"},
+           "pyron_victim":   {"id": "03", "id_p2": "11", "build": "build/pyron37"},
+           "huitzil": {"id": "10", "build": "build/hui53"},
+           "pyron":   {"id": "11", "build": "build/pyron37"}}
 # P2 HP re-pin (both words, [VSP-125]) so a projectile-fed Victor never dies.
 HP_PIN_EVERY = 400
 

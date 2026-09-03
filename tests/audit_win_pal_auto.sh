@@ -48,7 +48,7 @@
 # ramp (>=4 distinct non-white non-zero values), and DEAD otherwise —
 # no single frame constant is pinned (the #10 lesson).
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged21]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged22]
 #        [EXPECT_WHITE=1] tests/audit_win_pal_auto.sh     (~10 min, 5 MAME runs; default is 0)
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -74,7 +74,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
-BUILD="${BUILD:-build/m3b_merged21}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged22}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no build at $BUILD"; exit 0; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary"; exit 0; }

@@ -22,11 +22,11 @@
 #   E. tools/charmap_html.py --sprites: the page with the sprite beside each
 #      chain's box diagram.
 # ~15 min (A and C are ~24 MAME legs each, six in parallel). Needs ROMDIR.
-# Usage: ROMDIR=... tools/charpages_internal.sh [DON=build/don_m18 HUI=build/hui52 PYR=build/pyron36]
+# Usage: ROMDIR=... tools/charpages_internal.sh [DON=build/don_m19 HUI=build/hui53 PYR=build/pyron37]
 set -u
 : "${ROMDIR:?set ROMDIR to the directory holding your OWN reference dumps (vsav.zip vsavj.zip vsav2.zip vhunt2.zip vhunt2r1.zip qsound_hle.zip)}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
-DON="${DON:-build/don_m18}"; HUI="${HUI:-build/hui52}"; PYR="${PYR:-build/pyron36}"
+DON="${DON:-build/don_m19}"; HUI="${HUI:-build/hui53}"; PYR="${PYR:-build/pyron37}"
 
 # ---- PREREQUISITES, for a user regenerating the pages from their own ROMs (14z-121 (7)) ----
 # Nothing copyrighted ships with the repo: the reference dumps are yours, in $ROMDIR; the

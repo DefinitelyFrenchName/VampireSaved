@@ -11,12 +11,12 @@
 #   MODE=clean (DEFAULT since 14z-111): asserts NO exception fires through frame 6000 (the recording
 #         ends ~4900; MAX_FRAMES overrides) (the
 #         fix's acceptance; flip the default in the same commit as the fix).
-# Usage: ROMDIR=... [MODE=defect|clean] [BUILD=build/m3b_merged21] tests/test_inp_crash_merged_m8_01.sh
+# Usage: ROMDIR=... [MODE=defect|clean] [BUILD=build/m3b_merged22] tests/test_inp_crash_merged_m8_01.sh
 # Emulator tier (MAME, ~1 min). NOT ci_static.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
-BUILD="${BUILD:-build/m3b_merged21}"   # re-point at every merged freeze  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged22}"   # re-point at every merged freeze  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 MODE="${MODE:-clean}"   # flipped 14z-111 with the fix (merged-m9); MODE=defect reproduces the capture on merged15
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 # stage the tracked recording where run_inp_guarded.sh expects it, isolated

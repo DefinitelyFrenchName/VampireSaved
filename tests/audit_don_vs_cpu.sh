@@ -29,7 +29,7 @@
 # audit_continue_switch caveat. This gate's value is the deterministic pairing
 # reachability; the #99 fix is verified elsewhere (fsm_census + the ported fix).
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged21] [FRAMES=40700]
+# Usage: ROMDIR=... [BUILD=build/m3b_merged22] [FRAMES=40700]
 #        [LEGS="phobos bishamon pyron"] tests/audit_don_vs_cpu.sh
 # ~18 min per leg (one guarded marathon each). On-demand.
 #
@@ -43,7 +43,7 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
-BUILD="${BUILD:-build/m3b_merged21}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged22}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 FRAMES="${FRAMES:-40700}"
 LEGS="${LEGS:-phobos bishamon}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"

@@ -7,7 +7,7 @@
 # the freeze ritual's re-point sweep has kept those honest. Nobody was
 # re-pointing the HEADERS: measured 14z-128, 37 lines across 37 gates told a
 # reader to pass `BUILD=build/m3b_merged11` or `build/m3b_merged12` — dirs
-# pruned freezes earlier — while the code defaulted to `build/m3b_merged21`.
+# pruned freezes earlier — while the code defaulted to `build/m3b_merged22`.
 #
 # WHY IT MATTERS even though nothing was broken: the maintainer ruled at
 # 14z-122 that a gate's WHY lives in its header, and `docs/project/gate_index.md`

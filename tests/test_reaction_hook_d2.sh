@@ -33,7 +33,7 @@
 # pre-fix vec3 @ADDR 0x18511, post-fix scratch +0x54 := 0x51) is recorded in
 # STATE 14z-110; it needs an emulator and a fighting replay, so it lives there
 # and in the guard-corpus soaks rather than in this static gate.
-# Usage: ROMDIR=... tests/test_reaction_hook_d2.sh [builddir]   (default build/don_m18)
+# Usage: ROMDIR=... tests/test_reaction_hook_d2.sh [builddir]   (default build/don_m19)
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -45,7 +45,7 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
-BUILD="${1:-build/don_m18}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${1:-build/don_m19}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -f "$BUILD/verify_op.bin" ] || { echo "SKIP: no verify_op.bin in $BUILD"; exit 0; }
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in ROMDIR"; exit 0; }
 [ -f "$ROMDIR/vsavj.zip" ] || { echo "SKIP: no vsavj.zip in ROMDIR"; exit 0; }

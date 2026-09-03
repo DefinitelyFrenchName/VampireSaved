@@ -58,7 +58,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 
-MERGED="${1:-$REPO/build/m3b_merged21/rompath}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+MERGED="${1:-$REPO/build/m3b_merged22/rompath}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 MAME_WIDE_BIN="${MAME_WIDE_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 # THE SOLO REFERENCES MUST BE BUILDS THAT STILL BOOT ON THE CURRENT
 # EMULATOR BINARY, and that is not automatic (14z-92). WIDE v1.1 (14z-86)
@@ -73,9 +73,9 @@ MAME_WIDE_BIN="${MAME_WIDE_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 # WHEN A TENANT IS RE-FROZEN, RE-POINT ITS ROW HERE. D and P still name
 # older builds (donovan-m3a / pyron-m3); those boot and pass today, but
 # they are one profile bump away from the same failure.
-D_RP="$REPO/build/don_m18/rompath"   # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-H_RP="$REPO/build/hui52/rompath"    # re-pointed 14z-105 (window freeze); re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-P_RP="$REPO/build/pyron36/rompath"  # re-pointed 14z-105 (window freeze); re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+D_RP="$REPO/build/don_m19/rompath"   # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+H_RP="$REPO/build/hui53/rompath"    # re-pointed 14z-105 (window freeze); re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+P_RP="$REPO/build/pyron37/rompath"  # re-pointed 14z-105 (window freeze); re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 
 [ -f "$MERGED/vsavjw.zip" ] || {
     echo "SKIP: no merged build at $MERGED (tools/build_merged.sh)"; exit 0; }
@@ -162,10 +162,10 @@ chk() {  # chk <label> <got> <want>
         echo "  FAIL: $1 — merged $2 != solo $3"; fail=1
     fi
 }
-chk "D band  0x4AD8F == don_m18 (label re-pointed 14z-117)"  "$m_d" "$s_d"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-chk "H band  0x40AF6 == hui52 (label re-pointed 14z-117)"    "$m_h" "$s_h"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-chk "P band  0x45000 == pyron36 (label re-pointed 14z-117)"  "$m_p" "$s_p"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-chk "strip   0x486A0 == hui52 (the S3 relocation, live; label re-pointed 14z-117)" "$m_s" "$s_s"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+chk "D band  0x4AD8F == don_m19 (label re-pointed 14z-117)"  "$m_d" "$s_d"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+chk "H band  0x40AF6 == hui53 (label re-pointed 14z-117)"    "$m_h" "$s_h"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+chk "P band  0x45000 == pyron37 (label re-pointed 14z-117)"  "$m_p" "$s_p"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+chk "strip   0x486A0 == hui53 (the S3 relocation, live; label re-pointed 14z-117)" "$m_s" "$s_s"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 chk "bank 2  0x2AD8F == PRISTINE (de-substitution held)" "$m_b2" "$prist"
 distinct="$(printf '%s\n%s\n%s\n%s\n' "$m_d" "$m_h" "$m_p" "$m_s" | sort -u | wc -l | tr -d ' ')"
 if [ "$distinct" = 4 ]; then
