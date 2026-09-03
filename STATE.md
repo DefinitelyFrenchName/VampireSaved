@@ -434,7 +434,26 @@ what a triage is looking at, so those are where the thinking time goes.
   release hard-fails on.
 
 - **THE `gap_be27a` / `gap_be2ba` BANK-MAP ROWS ARE WRONG, AND CORRECTING THEM
-  CAN MOVE BUILD OUTPUT (found 14z-128, NOT fixed).** `bank_map.toml` models
+  CAN MOVE BUILD OUTPUT (found 14z-128). DECIDED (maintainer, 2026-09-03):
+  FOLD THE CORRECTION INTO THE M13 REGISTRATION — *"if folding it in allows us
+  to pay only once, that's an easy choice: fold it in!"*.** The three couplings
+  that make one window cheaper than two, each verified 14z-129 rather than
+  argued: (1) `charmap_gen.py` reads `bank_map.toml` directly (`--bank-map`,
+  :364) and emits every table's tenant row, and those pages are hash-locked by
+  `tests/expected/charmap_pages.sha256` — so a fix moves them and owes a
+  charmap re-freeze; (2) `tests/test_m3a_reproducible.sh` pins fingerprints per
+  freeze generation, so a bank_map change landing AFTER M13 is registered makes
+  the registered fingerprints stale; (3) `build/manifest/shared_writes.toml` is
+  per-build and per-write reviewed, M13 already owes it a re-point (the three
+  `boot_title_saved_*` rows per tenant, reviewed at 14z-127), and the
+  correction changes the exemption window — the ~9 writes per tenant that the
+  `auto` containment currently leaves unexempted come back under exemption — so
+  separating the two costs a SECOND review pass. The M13 builds exist on disk
+  (`don_m19` / `hui53` / `pyron37` / `m5_stock14` / `m3b_merged22`) and are NOT
+  in `registry.tsv`, so nothing is locked to them yet: this is the cheapest
+  moment in the cycle to disturb them. **If the rebuild shows a named op delta
+  rather than zero movement, that delta is understood BEFORE the freeze suite
+  runs, not after.** Original entry follows. `bank_map.toml` models
   ONE 32-long table — the capture-keyframe pointer table `PRG:0x0BE27A`,
   entry size 4 — as TWO `kind = "auto"` rows of `stride = 0x40`, i.e. as two
   32-entry WORD tables. **Measured three ways that the entries are longwords:**
@@ -459,7 +478,8 @@ what a triage is looking at, so those are where the thinking time goes.
   `gen_donovan_patch.py` gives `data_ptr`/`code_ptr` tables pointer treatment
   (:3514). So it can move BUILD OUTPUT, which makes it a measured change with
   a rebuild and a diff, not a manifest tidy.
-  **RECOMMENDED:** do it in a build-touching window — rebuild one track,
+  **RECOMMENDED (and RULED — see the head of this entry):** do it in a
+  build-touching window — rebuild one track,
   diff `patch.json` against the current freeze, and expect either zero op
   movement (then it is a pure map fix + a charmap re-freeze) or a named delta
   that has to be understood before it ships. Half a session. Meanwhile the

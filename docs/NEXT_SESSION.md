@@ -185,18 +185,26 @@
 > ## `boot_title_saved_*` rows per tenant, already reviewed at 14z-127).
 > ## **(c) NO RELEASE** — still deliberately held back.
 > ##
-> ## # TWO DECISIONS WAITING ON THE MAINTAINER (STATE "Decisions pending")
+> ## # DECISIONS — ONE RULED 2026-09-03, ONE STILL WAITING (STATE "Decisions pending")
 > ##
-> ## **THE RELEASE SCOPE** — `ci_emulator.tsv` marks 139 gates `release` and 25
+> ## **THE `gap_be27a` BANK-MAP ROW — RULED: FOLD IT INTO (b).** The maintainer,
+> ## 2026-09-03: *"if folding it in allows us to pay only once, that's an easy
+> ## choice: fold it in!"* Three couplings make one window cheaper than two, all
+> ## verified: `charmap_gen.py` reads `bank_map.toml` and its pages are
+> ## hash-locked; `test_m3a_reproducible` pins fingerprints per generation, so a
+> ## post-registration change makes them stale; and `shared_writes.toml` is
+> ## per-build reviewed and already owes M13 a re-point, which the exemption
+> ## change would make a second pass. The M13 dirs exist but are NOT in
+> ## `registry.tsv` — nothing is locked to them yet. Rebuild one track and diff
+> ## `patch.json` FIRST: a named op delta gets understood before the ~5 h freeze
+> ## suite runs, not after.
+> ##
+> ## **STILL WAITING — THE RELEASE SCOPE** — `ci_emulator.tsv` marks 139 gates `release` and 25
 > ## `out`, each `out` row leading with the reason keyword. That column is what a
 > ## release hard-fails on, so it is a ruling, not a preference. Three judgement
 > ## calls are named in the entry.
-> ## **THE `gap_be27a` BANK-MAP ROW** — it models ONE 32-long table as two 32-entry
-> ## WORD tables, which is what blinded the shared-writes guard and what makes the
-> ## generated character pages read two rows at the wrong address. The correction
-> ## is one row, but `kind` is load-bearing in `extract_char.py` and
-> ## `gen_donovan_patch.py`, so it can move BUILD OUTPUT: half a session in a
-> ## build-touching window, rebuild one track and diff `patch.json`.
+> ## (The `gap_be27a` entry that stood here is RULED — see the top of this
+> ## section. What it models and why `kind` is load-bearing stays in STATE.)
 > ##
 > ## # OPERATIONAL, and each was paid for tonight
 > ##
