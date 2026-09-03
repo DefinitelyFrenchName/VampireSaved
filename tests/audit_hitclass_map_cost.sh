@@ -316,6 +316,9 @@ CLASH_POKES="1400:ff8782:11;1450:ff8782:11;1500:ff8782:11;1400:ff8b82:01;1450:ff
 # removing it collapsed section 3 to "0 tenant rigs" and still printed a
 # verdict shaped like a result).
 PYR_SOAK="1704:ff8782:11;1760:ff8782:11;1900:ff8782:11;2100:ff8782:11;2400:ff8782:11"
+# The two 14z-129 CLASH rigs are 2P and poke BOTH sides (P1 tenant, P2 Demitri
+# 0x01 for the opposing flare). CLASH_POKES above is pyron's; this is huitzil's.
+HUI_CLASH="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:01;1450:ff8b82:01;1500:ff8b82:01"
 clash() {  # clash <build> <out> — GUARD_DEBUG=1 is LOAD-BEARING: cheap mode
            # installs no exception breakpoints, so the twin's vec3 is
            # INVISIBLE there and both legs report END 5020 (measured 14z-129).
@@ -567,7 +570,9 @@ h|hui/88_hui_plasma_trap_contact|$HUI_2P
 h|hui/89_hui_ex_fg_vs2|$HUI_2P;3100:ff8509:03;3120:ff8509:03;3900:ff8509:03;4300:ff8509:03
 h|hui/90_hui_oracle|$HUI_FX;2360:ff80d4:42;2360:ff80d5:42;2500:ff8509:09
 h|hui/92_hui_trap_shock|$HUI_2P
+h|hui/96_hui_grenade_clash|$HUI_CLASH
 p|pyron/70_pyron_mash|$PYR_SOAK
+p|pyron/84_pyron_clash_type64|$CLASH_POKES
 p|pyron/71_pyron_cosmo|$PYR_PICK;3000:ff8509:03;3020:ff8509:03
 p|pyron/72_pyron_cosmo_2p|$PYR_2P;3300:ff8509:03;3700:ff8509:03;4100:ff8509:03
 p|pyron/73_pyron_air_214p|$PYR_2P
@@ -875,9 +880,12 @@ elif [ "$c_total" -gt 0 ]; then
     echo "     nothing for the twin to crash on. The control needs a new rig,"
     echo "     not a new address."
 else
-    echo "  => THE RIG NO LONGER REACHES THE MAP AT ALL. Section 0's control"
-    echo "     cannot work on this replay under any build; it needs a rig that"
-    echo "     produces a pool-vs-pool contact (see section 3)."
+    echo "  => THE SOAK DOES NOT REACH THE MAP — a RECORDED FACT now, not a"
+    echo "     blocked verdict. Section 0 no longer rides this rig: since"
+    echo "     14z-129 its control is pyron/84_pyron_clash_type64, which"
+    echo "     supplies the opposing PROJECTILE the soak never had. Kept as a"
+    echo "     standing check: if this transit ever returns to nonzero, the"
+    echo "     soak's trajectory moved back onto the map and that is a finding."
 fi
 
 echo
