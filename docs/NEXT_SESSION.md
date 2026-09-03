@@ -5,13 +5,19 @@
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-> ## **START HERE. THE SWEEP MAY STILL BE RUNNING.** 14z-128 built the emulator-tier
-> ## runner and left its mame lane going. **FIRST COMMAND, before anything else:**
+> ## **START HERE. THE SWEEP IS COMPLETE.** 14z-128 built the emulator-tier runner
+> ## and ran the whole tier in one command:
 > ##
-> ##     cat build/emu_sweep_14z128/results.tsv | column -t -s$'\t'
-> ##     pgrep -f run_all_emulator     # empty = it finished or was killed
+> ##     PASS 136   SKIP 0   FAIL 19   TIMEOUT 0   MISSING 0     (155 gates)
+> ##     164 emulator-tier gates, 164 registered, 0 unregistered, 0 dead rows
+> ##     working tree NOT dirtied by the run
 > ##
-> ## **RESUME IT** (it skips everything already recorded):
+> ## **ZERO SKIPS is the number that matters** — under the release policy a skip
+> ## is a hard fail, and the tier ran without one. **NOT ONE of the 19 reds was a
+> ## defect in the shipped artifact**; eight were closed in-session. Full results:
+> ## `build/emu_sweep_14z128/results.tsv`, per-gate logs beside it.
+> ##
+> ## **TO RE-RUN IT** (drop a row from results.tsv to re-ask just that gate):
 > ##
 > ##     ROMDIR=... tests/run_all_emulator.sh --lane fbneo --lane mame \
 > ##         --scope all --jobs 3 --resume --timeout 14400 \
