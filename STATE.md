@@ -312,6 +312,52 @@ what a triage is looking at, so those are where the thinking time goes.
 
 ## Decisions pending (human)
 
+- **REPLAY `105_legacy_2pwin_auto` — THE SPEC IS MEASURED AND READY TO AUTHOR;
+  WHAT IS MISSING IS THE ATTRIBUTION OF TWO FRAMES (14z-128).** The replay
+  entered the corpus at 14z-123 as LEGACY content and has been guarded by
+  NOTHING since — no `.masked` spec, no self-frozen `.sha1`, in any of the
+  three tenant sets. `audit_legacy_pairings` has been saying so for five
+  sessions into an empty room ([VSP-103]); tonight's runner is what made it
+  audible. **A census of all 88 top-level replays finds this is the ONLY hole**
+  (the other expectation-less replay, `111_don_arcade_vs_screen`, is TENANT
+  content and correctly has no vanilla oracle).
+  **DONE:** the vanilla basis is frozen in `tests/expected/vsavj/masked-v2`
+  (sha1 `41fffe38…`, 9,621 lines) under the sets' own mask, with
+  `VERIFY_BASIS=01_attract_long` reproducing an already-frozen name
+  bit-for-bit — the instrument control `freeze_masked_basis.sh` requires on
+  every extension.
+  **MEASURED, and IDENTICAL on all three builds** (`don_m18`, `hui52`,
+  `pyron36` — which is itself evidence the mechanism is SHARED, not
+  tenant-specific):
+  ```
+  shape: 1605/9620 frames differ in 3 runs, first 889, last ends 5868, then 3752 identical
+  runs:  889-2491   2713-2713   5868-5868
+  proposed: composite vsavj/masked-v2 2713,5868 889-2491
+  ```
+  **WHY IT IS NOT AUTHORED YET.** `composite` is a non-exact class, and
+  [VSP-27]/[VSP-29] require every non-exact class to be MECHANISM-ATTRIBUTED,
+  with the standing watch ([VSP-31]) that flickers appearing outside a frozen
+  inventory mean stop and root-cause. The WINDOW half is already attributed:
+  onset 889 is the same onset every select-reaching legacy replay in these sets
+  carries — the ratified select-wheel window of the 14z-115 separation. **The
+  two single-frame flickers at 2713 and 5868 are NOT attributed.** The obvious
+  reading — 2713 is the VS-screen transition, 5868 the KO/victory transition —
+  is a HYPOTHESIS, not a measurement ([VSP-116]), and freezing an unattributed
+  flicker inventory is exactly what the standing watch exists to refuse.
+  **THE MEASUREMENT THAT SETTLES IT, ~20 min:** `DUMPS` of work RAM at 2713 and
+  5868 on one tenant build and on pristine vsavj, diffed, with the differing
+  bytes named against `docs/game/atlas/ram.md`. Then author, per set:
+  ```
+  echo 'composite vsavj/masked-v2 2713,5868 889-2491' \
+      > tests/expected/<set>/105_legacy_2pwin_auto.masked
+  ```
+  **Authoring it is a STRICT tightening either way** — today the replay is
+  compared against nothing, and composite adds no tolerance of its own (a
+  bit-identical pair fails it). So the only question the maintainer needs to
+  rule is whether to author on the measured shape now and attribute after, or
+  attribute first. Recommendation: attribute first — it is one rig and the
+  window has been open five sessions already.
+
 - **THE EMULATOR-TIER RELEASE SCOPE — PROPOSED 14z-128, THE MAINTAINER'S TO
   RULE.** `tests/ci_emulator.tsv` gives every one of the 164 emulator-tier
   gates a `scope` of `release` or `out`, and that column is what
