@@ -41,7 +41,13 @@
 > ##
 > ## # THE THREE REDS, ALREADY ADJUDICATED — do not re-freeze any of them
 > ##
-> ## **(1) `test_wide_profile` — REAL, and the fix is a rebuild.** The only FBNeo
+> ## **(1) `test_wide_profile` — WAS real, FIXED AND GREEN.** The reference
+> ## binary was three days older than the harness patch; both binaries were
+> ## rebuilt from one tree state and the gate PASSES in full — section 1, the
+> ## emulator superset invariant, 12/12 replays bit-identical in work RAM AND
+> ## framebuffer, plus inertness 12/12 and the B4 canary 12/12. The reference
+> ## now lives at the canonical path the gate defaults to, and the gate refuses
+> ## it if it ever falls behind the harness again. Kept here for the record:** The only FBNeo
 > ## reference binary on this machine (`~/.cache/vampire-saved/fbneo_ref`) was
 > ## built 2026-08-14 while harness patch `0001` last changed 2026-08-17. The gate
 > ## now defaults to that path AND REFUSES it as stale, with the commands in its
