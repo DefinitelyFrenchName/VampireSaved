@@ -142,7 +142,7 @@ test_don_immortal_native	mame	release	-	421+P against NATIVE vs2, measured in-ru
 test_don_throw_mirror	mame	release	-	the base-slot mirror-victim fix
 test_m2a_flavor_selector	mame	release	-	the Start-hold flavor selector
 test_m2b_scroll3	mame	release	-	scroll3-vs-OBJ-band exclusivity
-test_m2b_stage6	mame	release	-	the M2b graphics build gate: build + static verify + guarded soaks + the MASKED LEGACY GATE
+test_m2b_stage6	mame	release	-	the M2b graphics build gate: build + static verify + guarded soaks + the MASKED LEGACY GATE. RED 14z-128 for ONE reason, shared with test_phasec_image section 1: it builds a stage-6 image from the CURRENT manifests, which now produce the M13 generation (fingerprint e86e1d04 = the M13 stock twin m5_stock14), and M13 IS NOT REGISTERED — so the fingerprint dispatch finds no expectation set. Everything else in it passed: five guarded soaks END-clean, three pixel frames identical. REGISTERING M13 CLEARS THIS AND test_phasec_image TOGETHER.
 test_select_wheel	mame	release	-	the select-cursor mechanism, decoded and measured — a §4 rule lock that runs on every build
 test_oboro_select	mame	release	-	the Oboro select hook (W1)
 test_random_select_tenants	mame	release	-	random select includes the tenants

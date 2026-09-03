@@ -107,7 +107,13 @@
 > ## re-freeze: *"to know if we should fix the gate or what it caught, we must use
 > ## data we can trust"*. `tests/expected/PROVENANCE.md` (new) answers the first
 > ## question — which side rests on a measurement — in seconds.
-> ## **(b) REGISTER THE M13 FREEZE** (`don_m19` / `hui53` / `pyron37` /
+> ## **(b) REGISTER THE M13 FREEZE — AND IT IS NOT HOUSEKEEPING: IT CLEARS TWO
+> ## RELEASE-SCOPE REDS.** `test_m2b_stage6` and `test_phasec_image` section 1
+> ## both fail for ONE reason — the current manifests build the M13 generation
+> ## (fingerprint `e86e1d04`, the M13 stock twin) and M13 is not in
+> ## `registry.tsv`, so the fingerprint dispatch finds no expectation set.
+> ## Everything else in `test_m2b_stage6` passed: five guarded soaks END-clean,
+> ## three pixel frames identical.** (`don_m19` / `hui53` / `pyron37` /
 > ## `m5_stock14` / `m3b_merged22`, boot title SAVED): `run_suite.sh --freeze` per
 > ## track (~5 h), registry rows, `freeze/*` tags, HANDOFF's build-registry row and
 > ## "Current WIDE builds", and the one-line shared-writes re-point it owes (three
