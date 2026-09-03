@@ -92,8 +92,21 @@ import glob, os, re, sys, zipfile
 #                               None of the seven is rotted today, which is
 #                               exactly when closing a hole is cheap — the same
 #                               argument gap (1) above was closed on.
+#   VAR="${1:-$REPO/build/name/rompath}"   $REPO-PREFIXED, and usually the
+#                               ROMPATH itself — 28 references across 25 gates,
+#                               added 14z-128. THIS ONE WAS HIDING A REAL ROT:
+#                               test_hui_oracle defaults to build/hui4, whose
+#                               zip is 19 members with vsw.* and no vsw.z01 —
+#                               the exact pre-WIDE-v1.1 signature this gate was
+#                               built to name — and the sweep found it only
+#                               because the gate produced no dumps and failed.
+#                               Two things made it invisible: the regex had no
+#                               $REPO allowance, and the read-as-romset test
+#                               looks for "$VAR/rompath" while these variables
+#                               ARE the rompath.
 DEF = re.compile(r'^\s*([A-Za-z_][A-Za-z0-9_]*)='
-                 r'(?:"\$\{(?:[0-9]+|[A-Za-z_][A-Za-z0-9_]*):-(?P<sub>build/[a-z0-9_]+)\}"'
+                 r'(?:"\$\{(?:[0-9]+|[A-Za-z_][A-Za-z0-9_]*):-'
+                 r'(?:\$\{?REPO\}?/)?(?P<sub>build/[a-z0-9_]+)(?P<subtail>/rompath)?\}"'
                  r'|"?(?P<plain>build/[a-z0-9_]+)"?\s*(?:#.*)?$)', re.M)
 
 rotted, absent, ok, skipped = [], [], [], []
@@ -104,7 +117,12 @@ for path in sorted(glob.glob("tests/*.sh")):
         var = m.group(1); bdir = m.group("sub") or m.group("plain")
         # Only defaults the script reads as a ROMSET. A build referenced for
         # its extract/ or patch/ dir is a different contract.
-        if f'${var}/rompath' not in body and f'${{{var}}}/rompath' not in body:
+        # A default that ENDS IN /rompath is itself the romset — the variable
+        # is not dereferenced as "$VAR/rompath" anywhere, so the test below
+        # would skip it (which is how build/hui4 stayed invisible, 14z-128).
+        if m.group("subtail"):
+            pass
+        elif f'${var}/rompath' not in body and f'${{{var}}}/rompath' not in body:
             skipped.append((os.path.basename(path), var, bdir, "not read as a romset"))
             continue
         if not os.path.isdir(bdir):
