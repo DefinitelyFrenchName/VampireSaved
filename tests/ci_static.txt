@@ -115,6 +115,11 @@ test_m2a_target_resolution
 # signed-16-bit bound, and the 15-block/0x11bd0 port inventory. Needs ROMDIR
 # (decrypt cache), no emulator.
 test_capture_pose_sources
+# 14z-130: the same table's OWNERSHIP — the 32-long capture-keyframe pointer
+# table is hand-owned by 17 data_port rows, so the generic bank_map repoint
+# must never write it. Anchored in the reference ROMs and the shipped image,
+# never in patch.json ([VSP-166]). Needs the build dirs; SKIPs without them.
+test_capture_kf_ownership
 test_pointer_flow
 test_escape_triage
 

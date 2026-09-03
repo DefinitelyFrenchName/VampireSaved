@@ -148,6 +148,7 @@ Bytes that DIFFER between the source and oracle sets inside a ported region and 
 | `word132` | `PRG:0x0be17a` | value16 | `0018` |
 | `word_pos_a` | `PRG:0x0be1ba` | value16 | `0010` |
 | `word_pos_b` | `PRG:0x0be1fa` | value16 | `0008` |
+| `capture_kf_ptr` | `PRG:0x0be27a` | data_ptr | `0xc56aa` |
 | `param32_b` | `PRG:0x0be2fa` | rec8 | `0001A000 FFFDC000` |
 | `rec8_b` | `PRG:0x0be3fa` | rec8 | `00000000 00000000` |
 | `word_y_off` | `PRG:0x0be7fa` | value16 | `0000` |
@@ -178,8 +179,6 @@ Bytes that DIFFER between the source and oracle sets inside a ported region and 
 | `gap_be07a` | values | `00000000` |
 | `gap_be0fa` | values | `fffbc000` |
 | `gap_be23a` | values | `0018` |
-| `gap_be27a` | pointers | `` |
-| `gap_be2ba` | pointers | `` |
 | `gap_be37a` | values | `00019000` |
 | `gap_be4fa` | values | `00000000` |
 | `gap_be57a` | values | `00000000` |

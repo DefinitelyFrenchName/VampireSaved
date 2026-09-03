@@ -16,14 +16,14 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**296 scripts** — 65 ci_portable, 64 ci_static, 167 emulator-tier (run by name).
+**297 scripts** — 65 ci_portable, 65 ci_static, 167 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 9 | the suite runners and their own ground truth |
 | [docs](#docs) | 11 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 26 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
-| [pipeline](#pipeline) | 50 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
+| [pipeline](#pipeline) | 51 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 82 | tenant content — per-character gates and on-demand audits on the ported characters |
@@ -112,6 +112,7 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 | `tests/test_audit_merged_dispatch.sh` | test | ci_portable | — | ground truth for the expectation enumeration that tests/audit_merged_legacy.sh now runs before its leg-(a) glob (14z-90, GitHub issue #17). | 14z-90 |
 | `tests/test_build_gate_status.sh` | test | ci_portable | — | ground truth for "a rejected build must abort the gate" (14z-90, GitHub issue #1). | 14z-90 |
 | `tests/test_build_identity_distinct.sh` | test | ci_portable | — | a playtest build must be distinguishable from its legacy-only instrument (14z-94). ROM-free, ~2 s. | 14z-94 |
+| `tests/test_capture_kf_ownership.sh` | test | ci_static | ROMDIR | THE CAPTURE-KEYFRAME POINTER TABLE IS HAND-OWNED, AND NO GENERIC bank_map REPOINT MAY WRITE IT (14z-130). | 14z-130 |
 | `tests/test_capture_pose_sources.sh` | test | ci_static | ROMDIR | THE #104 FIX PREMISES (14z-99). The maintainer ruled the fix scope: option (a), full, "measure first: if option (a) is not feasible, then we reassess". | 14z-99 |
 | `tests/test_census_regions.sh` | test | ci_static | ROMDIR | ground truth for tools/census_regions.py (the 14z-66 data_in_code + pcrel-escape censuses, promoted to a tool for the D4 step-2 Pyron early warning, 14z-67). | 14z-66 |
 | `tests/test_escape_triage.sh` | test | ci_static | ROMDIR | H3.1's verdicts, frozen (14z-100 hardening). | 14z-100 |

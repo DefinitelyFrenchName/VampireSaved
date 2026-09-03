@@ -149,6 +149,14 @@ echo "== 4. THE AUTO-STRIDE BLIND SPOT STAYS CLOSED (14z-128)"
 # build-time review. Nine writes per tenant build sat inside it (the #104
 # capture-pose port) and never reached the inventory.
 #
+# THE BANK_MAP ROW ITSELF WAS FIXED 14z-130 (one `capture_kf_ptr` row,
+# data_ptr, stride 0x80), so the exemption is now the real variant half. This
+# section stays, and stays two-sided: it locks the RULE, not that one row.
+# Note what the root fix did and did NOT do — only ONE of those nine returned
+# to exemption (row 0x18) plus each tenant's own row; rows 0x08-0x0F stay in
+# the inventory, which is where legacy attacker rows belong. The table's
+# ownership is locked separately by tests/test_capture_kf_ownership.sh.
+#
 # Two-sided control, on a synthetic root so it cannot depend on the real
 # manifests: a MEASURED table exempts its variant window, and the SAME table
 # marked `auto` exempts nothing.
@@ -188,12 +196,18 @@ print(f"  control: the SAME table as `auto` exempts nothing: "
       f"{'yes' if seen['auto'] else 'NO — the blind spot is back'}")
 sys.exit(0 if ok else 1)
 PY
-# And the regression lock on the real tree: the nine capture-keyframe rows the
+# And the regression lock on the real tree: the capture-keyframe rows the
 # blind spot used to hide must be VISIBLE to the audit on a current build.
 # Addresses, not a count: a count moves with unrelated work.
-HID="0x0be29a 0x0be29e 0x0be2a2 0x0be2a6 0x0be2aa 0x0be2ae 0x0be2b2 0x0be2b6 0x0be2da"
+# 14z-130: row 0x18 (0x0be2da) LEFT this list, and that is the root fix
+# working rather than the blind spot returning. It is a genuine VARIANT
+# row, so once `capture_kf_ptr` carried the measured entry size 4 the
+# exemption window became the real variant half and covered it. What the
+# lock is actually about is the EIGHT LEGACY rows 0x08-0x0F, which must
+# never be exempt again; they are all still here.
+HID="0x0be29a 0x0be29e 0x0be2a2 0x0be2a6 0x0be2aa 0x0be2ae 0x0be2b2 0x0be2b6"
 CUR=""
-for b in build/m3b_merged21 build/don_m18 build/hui52 build/pyron36; do
+for b in build/m3b_merged22 build/don_m19 build/hui53 build/pyron37; do
     [ -f "$b/patch/patch.json" ] && { CUR="$b"; break; }
 done
 if [ -z "$CUR" ]; then
@@ -210,7 +224,7 @@ else
         echo "        That is the 14z-128 blind spot, back."
         fail=1
     else
-        echo "  ok: all nine capture-keyframe rows (0x0be29a-0x0be2b6, 0x0be2da)"
+        echo "  ok: all eight LEGACY capture-keyframe rows (0x0be29a-0x0be2b6)"
         echo "      are visible to the audit on $CUR"
     fi
 fi

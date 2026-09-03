@@ -8,13 +8,13 @@ Sources: **vs2** = `vsav2` extract (oracle `vhunt2`); **ours** = the built image
 
 | input | SHA-1 |
 |---|---|
-| `bank_map.toml` | `44752938767ec8cb9e8e53ff3c777cb6ceca18c2` |
+| `bank_map.toml` | `bfe42f907b500775af2a064b18391b30dad78d38` |
 | `manifest` | `8d07908d044387587bb846a63ed8cc8f2ddf6174` |
 | `overrides` | `72b9812942192bf348508ddf7473cbb37b2d5275` |
 | `placements.json` | `74b756174c2eac1a4e41919145114e2498d11082` |
 | `reconciliation.toml` | `40528aeb863028d885f868f34368443c460b5ca2` |
 | `reconciliation_donovan.toml` | `242368518282f41a728d879e0714380f621aaf49` |
-| `regions.json` | `fe26a381132d702b5a68e3ec269880af7ebb0eb3` |
+| `regions.json` | `a819047aa0b2491e3bc5e72149608639854a813d` |
 | `verify_data.bin` | `f69d4e0ed6396dae7bc0a88e6ae0610e391a7e13` |
 
 ## Diff summary
@@ -23,7 +23,7 @@ Sources: **vs2** = `vsav2` extract (oracle `vhunt2`); **ours** = the built image
 |---|---|
 | anim_nodes | 3722 |
 | anim_nodes_differ_unattributed | 0 |
-| bank_fields_unattributed | 0 |
+| bank_fields_unattributed | 1 |
 | code_bytes_differ_out_of_scope | 67383 |
 | dispatch_unattributed | 0 |
 | physics_rows_ported | True |
@@ -48,6 +48,7 @@ Sources: **vs2** = `vsav2` extract (oracle `vhunt2`); **ours** = the built image
 | `byte15b` | value8 | `0x0be88d` | value | u8 | `60` | `60` |  | byte |
 | `byte2d_a` | byte2d | `0x0bead4` | row | bytes | `0a0a030303030a0a0a0a03030a0a030a0a030303030a0a030303030a0a03` | `0a0a030303030a0a0a0a03030a0a030a0a030303030a0a030303030a0a03` |  | byte |
 | `byte2d_b` | byte2d | `0x0bee94` | row | bytes | `0c0c030303030c0c0c0c03030c0c030c0c030303030c0c030303030c0c03` | `0c0c030303030c0c0c0c03030c0c030c0c030303030c0c030303030c0c03` |  | byte |
+| `capture_kf_ptr` | data_ptr | `0x0be2c6` | ptr | addr | `0x0ca1ca` | `0x4010e0` | **!** | UNATTRIBUTED (expected placed `0x3fbda2`) — the 32-LONG capture-keyframe pointer table 0x0BE27A[attacker id] (14z-121 scan: read at vsavj 0x02802E/0x0280C6/0x028140, the capture-pose installer of [VSE-44]; the throw_victim_keyframes / grab_hold_keyframes / capture_kf_* data_port rows own its rows, so the generic repoint is suppressed). the character-data map therefore reports this row's `ours` as UNATTRIBUTED BY DESIGN — the placement model predicts the extraction's own copy (0x3fbda2 for donovan) while the shipped pointer is the data_port blob (0x4010e0), which is the one carrying the 14z-64 mirror-victim fix; tests/test_capture_kf_ownership.sh is what locks that, not the map. FORMER NAMES, kept so every citation greps: gap_be27a (rows 0-15) + gap_be2ba (rows 16-31), corrected 14z-130 |
 | `dispatch_00` | code_ptr | `0x0bd146` | ptr | addr | `None` | `0x3ffdb0` | **!** | no-vs2-value |
 | `dispatch_01` | code_ptr | `0x0bd1c6` | ptr | addr | `None` | `0x0bf6aa` | **!** | no-vs2-value |
 | `dispatch_02` | code_ptr | `0x0bd246` | ptr | addr | `None` | `0x0bff64` | **!** | no-vs2-value |
@@ -80,8 +81,6 @@ Sources: **vs2** = `vsav2` extract (oracle `vhunt2`); **ours** = the built image
 | `gap_be07a` | auto | `0x0be0c6` | raw | hex | `None` | `ffffa000` |  | no-vs2-value — SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base) |
 | `gap_be0fa` | auto | `0x0be146` | raw | hex | `None` | `ffff9a00` |  | no-vs2-value — SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base) |
 | `gap_be23a` | auto | `0x0be260` | raw | hex | `None` | `0000` |  | no-vs2-value — REAL per-char WORD table (14z-121): the MINIMUM AIR-ATTACK HEIGHT, vsavj 0x027B80 refuses a button press while airborne below +0x14 - +0x3A < word; 36 for Zabel/Lilith/Jedah (0x04/0x0D/0x0F + variant mirrors), 0 for everyone else incl. the tenants |
-| `gap_be27a` | auto | `0x0be2a0` | raw | hex | `None` | `db60` |  | no-vs2-value — FIRST HALF of the 32-LONG capture-keyframe pointer table 0x0BE27A[attacker id] (14z-121 scan: read at vsavj 0x02802E/0x0280C6/0x028140, the capture-pose installer of [VSE-44]; the throw_victim_keyframes / grab_hold_keyframes rows repoint its rows) |
-| `gap_be2ba` | auto | `0x0be2e0` | raw | hex | `None` | `8aec` |  | no-vs2-value — SECOND HALF of the capture-keyframe pointer table 0x0BE27A (rows 16-31; Huitzil's row 0xBE2BA is the grab_hold_keyframes target) — see gap_be27a |
 | `gap_be37a` | auto | `0x0be3c6` | raw | hex | `None` | `fffd0000` |  | no-vs2-value — SLICE of param32_b rows 16-31 (14z-121: param32_b read id*8 from 0x0BE2FA at vsavj 0x026484 for chain a2:0x4C, the pursuit leap; no reader of this base) |
 | `gap_be4fa` | auto | `0x0be546` | raw | hex | `None` | `ffff8300` |  | no-vs2-value — SLICE of rec8_b, the pursuit physics record pair (0x0BE3FA + id*0x20; 14z-121 scan: no reader of this base) |
 | `gap_be57a` | auto | `0x0be5c6` | raw | hex | `None` | `ffffa000` |  | no-vs2-value — SLICE of rec8_b, the pursuit physics record pair (0x0BE3FA + id*0x20; 14z-121 scan: no reader of this base) |

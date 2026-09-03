@@ -20,20 +20,33 @@
 # ** rows" because bank_map's `gap_be27a` is kind=auto carrying the      **
 # ** scanner's default stride — eight LEGACY rows, in the gate whose     **
 # ** purpose is to make a legacy-surface write a build-time review.      **
-# ** Fixed in tools/audit_shared_writes.py; locked by section 4 of       **
-# ** tests/test_shared_writes.sh. The ROOT cause is the bank_map row and **
-# ** is NOT fixed: `kind` is load-bearing in extract_char.py and         **
-# ** gen_donovan_patch.py, so correcting it can move BUILD OUTPUT — see  **
-# ** STATE "Decisions pending".                                          **
+# ** Contained in tools/audit_shared_writes.py; locked by section 4 of  **
+# ** tests/test_shared_writes.sh.                                        **
+# **                                                                     **
+# ** RE-POINTED AGAIN 14z-130 FOR M13, AND THE ROOT CAUSE IS NOW FIXED.  **
+# ** bank_map's two bad rows became ONE `capture_kf_ptr` (0x0BE27A,      **
+# ** data_ptr, stride 0x80), so the exemption is the REAL variant half.  **
+# ** Two changes to this file, both measured by rebuild, not argued:     **
+# **  (a) THREE ROWS ADDED PER TENANT — `0x01c822/24/26`, the boot name  **
+# **      screen "SAVIOR" -> "SAVED" (M13, reviewed 14z-127);            **
+# **  (b) FIVE ROWS REMOVED — each tenant's OWN capture-keyframe row     **
+# **      (0x0be2c6 donovan / 0x0be2ba huitzil; pyron has none) and      **
+# **      0x0be2da (row 0x18, Oboro) on all three. They are genuine      **
+# **      VARIANT rows and are now exempt as such.                       **
+# ** NOTE WHAT DID *NOT* MOVE: rows 0x08-0x0F stay listed. Only ONE of   **
+# ** the nine 14z-128 arrivals returns to exemption; the other eight are **
+# ** LEGACY attacker rows and belong under review. Counts D 114 -> 115,  **
+# ** H 112 -> 113, P 100 -> 102.                                         **
+# ** All five M13 builds rebuilt BIT-IDENTICAL under the correction      **
+# ** (patch.json sha1 + fingerprint) — the generic repoint the corrected **
+# ** `kind` enables is suppressed by the ownership claim, because the    **
+# ** table is hand-owned by 17 [[data_port]] rows. Gate:                 **
+# ** tests/test_capture_kf_ownership.sh.                                 **
 # **                                                                     **
 # ** ONE CORRECTION carried from the 14z-127 note: 0x0BE27A..0x0BE296 is **
 # ** the #104 CAPTURE-KEYFRAME table, NOT the #99 AI-script unpark (that **
 # ** is PRG:0xBF01A/09A/11A/19A, genuine variant rows, never shared      **
 # ** surface).                                                           **
-# **                                                                     **
-# ** STILL TO DO AT THE NEXT FREEZE: the M13 tracks (don_m19 / hui53 /   **
-# ** pyron37) add three `boot_title_saved_*` rows each — reviewed at     **
-# ** 14z-127, so that re-point is a one-liner once M13 is registered.    **
 # ***********************************************************************
 #
 # Every build op that lands OUTSIDE declared free space and OUTSIDE a known
@@ -84,7 +97,7 @@
 
 [[tenant]]
 name = "donovan"
-build = "build/don_m18"
+build = "build/don_m19"
 count = 114
 writes = [
   # 14z-96 (GitHub #101) THE KERNEL VOICE-TABLE PORT, maintainer-ruled option
@@ -145,6 +158,21 @@ writes = [
   "0x012e68 4 code",
   "0x018458 6 code",
   "0x0185ca 6 code",
+  # 14z-127/130 THE BOOT NAME SCREEN "SAVIOR" -> "SAVED" (mark M13,
+  # maintainer-ruled 2026-09-02, JAPAN entry only). One 6-byte span at
+  # PRG:0x01C822, word-aligned, of which 3 bytes differ (I->E, O->D,
+  # R->space). WHOSE BYTES: the boot name screen's own display-script
+  # text for the Japan region record at 0x01C806 — legacy-readable, which
+  # is why it is listed here rather than exempt. Blast radius MEASURED
+  # 14z-127, not argued: work-RAM checksums patched-vs-pristine are
+  # IDENTICAL across 1,621 frames of boot and attract, so no RAM-basis
+  # expectation moves and the legacy corpus does not re-freeze. Same
+  # length, so no relocation and no shifted coordinates; the glyphs are
+  # an existing gfx-ROM font, reused. The staff-roll strings
+  # (PRG:0x01301A, PRG:0x01D96A) are NOT touched, by standing ruling.
+  "0x01c822 2 poke16",
+  "0x01c824 2 poke16",
+  "0x01c826 2 poke16",
   "0x020312 4 code",
   "0x020318 4 code",
   # 14z-105 (W1) THE OBORO SELECT HOOK. REVIEWED 14z-128: a [[site_thunk]] on
@@ -226,11 +254,15 @@ writes = [
   # unpoked). `only_variant_slot` skips them on the stock track. Lock:
   # tests/audit_don_grab_pose.sh (EXPECT_MATCH=1).
   #
-  # NINE OF THESE SEVENTEEN WERE INVISIBLE TO THIS AUDIT UNTIL 14z-128 (rows
-  # 0x08-0x0F and 0x18): bank_map's `gap_be27a` is kind=auto carrying the
-  # scanner's DEFAULT stride, so the variant-row exemption this tool computes
-  # landed on those very rows. Fixed in tools/audit_shared_writes.py
+  # NINE OF THESE WERE INVISIBLE TO THIS AUDIT UNTIL 14z-128 (rows 0x08-0x0F
+  # and 0x18): bank_map's `gap_be27a` was kind=auto carrying the scanner's
+  # DEFAULT stride, so the variant-row exemption this tool computes landed on
+  # those very rows. Contained in tools/audit_shared_writes.py
   # variant_tables(); locked by tests/test_shared_writes.sh section 4.
+  # ROOT-FIXED 14z-130 (one `capture_kf_ptr` row, entry size 4). ONLY ONE of
+  # the nine went back under exemption — row 0x18, plus this tenant's OWN row
+  # where it has one. Rows 0x00-0x0F remain listed BECAUSE THEY ARE LEGACY
+  # attacker rows: that is the correct end state, not a residue.
   "0x0be27a 4 poke32",
   "0x0be27e 4 poke32",
   "0x0be282 4 poke32",
@@ -247,8 +279,6 @@ writes = [
   "0x0be2ae 4 poke32",
   "0x0be2b2 4 poke32",
   "0x0be2b6 4 poke32",
-  "0x0be2c6 4 poke32",
-  "0x0be2da 4 poke32",
   "0x2672f6 4 poke32",
   "0x267376 4 poke32",
   "0x2673f6 4 poke32",
@@ -275,7 +305,7 @@ writes = [
 
 [[tenant]]
 name = "huitzil"
-build = "build/hui52"
+build = "build/hui53"
 count = 112
 writes = [
   # 14z-96 (GitHub #101) THE KERNEL VOICE-TABLE PORT, maintainer-ruled option
@@ -339,6 +369,21 @@ writes = [
   # body from the ROMs).
   "0x01a888 6 code",
   "0x01b6aa 6 code",
+  # 14z-127/130 THE BOOT NAME SCREEN "SAVIOR" -> "SAVED" (mark M13,
+  # maintainer-ruled 2026-09-02, JAPAN entry only). One 6-byte span at
+  # PRG:0x01C822, word-aligned, of which 3 bytes differ (I->E, O->D,
+  # R->space). WHOSE BYTES: the boot name screen's own display-script
+  # text for the Japan region record at 0x01C806 — legacy-readable, which
+  # is why it is listed here rather than exempt. Blast radius MEASURED
+  # 14z-127, not argued: work-RAM checksums patched-vs-pristine are
+  # IDENTICAL across 1,621 frames of boot and attract, so no RAM-basis
+  # expectation moves and the legacy corpus does not re-freeze. Same
+  # length, so no relocation and no shifted coordinates; the glyphs are
+  # an existing gfx-ROM font, reused. The staff-roll strings
+  # (PRG:0x01301A, PRG:0x01D96A) are NOT touched, by standing ruling.
+  "0x01c822 2 poke16",
+  "0x01c824 2 poke16",
+  "0x01c826 2 poke16",
   "0x020312 4 code",
   "0x020318 4 code",
   # 14z-105 (W1) THE OBORO SELECT HOOK. REVIEWED 14z-128: a [[site_thunk]] on
@@ -431,11 +476,15 @@ writes = [
   # unpoked). `only_variant_slot` skips them on the stock track. Lock:
   # tests/audit_don_grab_pose.sh (EXPECT_MATCH=1).
   #
-  # NINE OF THESE SEVENTEEN WERE INVISIBLE TO THIS AUDIT UNTIL 14z-128 (rows
-  # 0x08-0x0F and 0x18): bank_map's `gap_be27a` is kind=auto carrying the
-  # scanner's DEFAULT stride, so the variant-row exemption this tool computes
-  # landed on those very rows. Fixed in tools/audit_shared_writes.py
+  # NINE OF THESE WERE INVISIBLE TO THIS AUDIT UNTIL 14z-128 (rows 0x08-0x0F
+  # and 0x18): bank_map's `gap_be27a` was kind=auto carrying the scanner's
+  # DEFAULT stride, so the variant-row exemption this tool computes landed on
+  # those very rows. Contained in tools/audit_shared_writes.py
   # variant_tables(); locked by tests/test_shared_writes.sh section 4.
+  # ROOT-FIXED 14z-130 (one `capture_kf_ptr` row, entry size 4). ONLY ONE of
+  # the nine went back under exemption — row 0x18, plus this tenant's OWN row
+  # where it has one. Rows 0x00-0x0F remain listed BECAUSE THEY ARE LEGACY
+  # attacker rows: that is the correct end state, not a residue.
   "0x0be27a 4 poke32",
   "0x0be27e 4 poke32",
   "0x0be282 4 poke32",
@@ -452,8 +501,6 @@ writes = [
   "0x0be2ae 4 poke32",
   "0x0be2b2 4 poke32",
   "0x0be2b6 4 poke32",
-  "0x0be2ba 4 poke32",
-  "0x0be2da 4 poke32",
   "0x2672ea 4 poke32",
   "0x26736a 4 poke32",
   "0x2673ea 4 poke32",
@@ -480,7 +527,7 @@ writes = [
 
 [[tenant]]
 name = "pyron"
-build = "build/pyron36"
+build = "build/pyron37"
 count = 100
 writes = [
   # 14z-96 (GitHub #101) THE KERNEL VOICE-TABLE PORT, maintainer-ruled option
@@ -539,6 +586,21 @@ writes = [
   # f7997 fix) — shipped in pyron-m3 but this inventory was never
   # regenerated past pyron20. Review = the adoption record.
   "0x01a888 6 code",
+  # 14z-127/130 THE BOOT NAME SCREEN "SAVIOR" -> "SAVED" (mark M13,
+  # maintainer-ruled 2026-09-02, JAPAN entry only). One 6-byte span at
+  # PRG:0x01C822, word-aligned, of which 3 bytes differ (I->E, O->D,
+  # R->space). WHOSE BYTES: the boot name screen's own display-script
+  # text for the Japan region record at 0x01C806 — legacy-readable, which
+  # is why it is listed here rather than exempt. Blast radius MEASURED
+  # 14z-127, not argued: work-RAM checksums patched-vs-pristine are
+  # IDENTICAL across 1,621 frames of boot and attract, so no RAM-basis
+  # expectation moves and the legacy corpus does not re-freeze. Same
+  # length, so no relocation and no shifted coordinates; the glyphs are
+  # an existing gfx-ROM font, reused. The staff-roll strings
+  # (PRG:0x01301A, PRG:0x01D96A) are NOT touched, by standing ruling.
+  "0x01c822 2 poke16",
+  "0x01c824 2 poke16",
+  "0x01c826 2 poke16",
   "0x020312 4 code",
   "0x020318 4 code",
   # 14z-105 (W1) THE OBORO SELECT HOOK. REVIEWED 14z-128: a [[site_thunk]] on
@@ -604,11 +666,15 @@ writes = [
   # unpoked). `only_variant_slot` skips them on the stock track. Lock:
   # tests/audit_don_grab_pose.sh (EXPECT_MATCH=1).
   #
-  # NINE OF THESE SEVENTEEN WERE INVISIBLE TO THIS AUDIT UNTIL 14z-128 (rows
-  # 0x08-0x0F and 0x18): bank_map's `gap_be27a` is kind=auto carrying the
-  # scanner's DEFAULT stride, so the variant-row exemption this tool computes
-  # landed on those very rows. Fixed in tools/audit_shared_writes.py
+  # NINE OF THESE WERE INVISIBLE TO THIS AUDIT UNTIL 14z-128 (rows 0x08-0x0F
+  # and 0x18): bank_map's `gap_be27a` was kind=auto carrying the scanner's
+  # DEFAULT stride, so the variant-row exemption this tool computes landed on
+  # those very rows. Contained in tools/audit_shared_writes.py
   # variant_tables(); locked by tests/test_shared_writes.sh section 4.
+  # ROOT-FIXED 14z-130 (one `capture_kf_ptr` row, entry size 4). ONLY ONE of
+  # the nine went back under exemption — row 0x18, plus this tenant's OWN row
+  # where it has one. Rows 0x00-0x0F remain listed BECAUSE THEY ARE LEGACY
+  # attacker rows: that is the correct end state, not a residue.
   "0x0be27a 4 poke32",
   "0x0be27e 4 poke32",
   "0x0be282 4 poke32",
@@ -625,7 +691,6 @@ writes = [
   "0x0be2ae 4 poke32",
   "0x0be2b2 4 poke32",
   "0x0be2b6 4 poke32",
-  "0x0be2da 4 poke32",
   "0x2672ee 4 poke32",
   "0x26736e 4 poke32",
   "0x2673ee 4 poke32",

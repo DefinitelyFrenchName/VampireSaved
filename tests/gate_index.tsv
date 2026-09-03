@@ -97,6 +97,7 @@ tests/test_build_gate_status.sh	pipeline
 tests/test_build_identity_distinct.sh	pipeline
 tests/test_build_ref_rot.sh	review-triage
 tests/test_builder_rom_audit.sh	review-triage
+tests/test_capture_kf_ownership.sh	pipeline
 tests/test_capture_pose_sources.sh	pipeline
 tests/test_census_regions.sh	pipeline
 tests/test_charmap_current.sh	docs

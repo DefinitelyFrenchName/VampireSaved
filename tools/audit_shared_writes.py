@@ -93,10 +93,20 @@ def variant_tables():
     force the review was blind to it, which is the same shape as the defect
     the gate was built for (the Bulleta DF block, 14z-69).
 
-    The ROOT cause is the bank_map row, not this function: `gap_be27a` +
-    `gap_be2ba` model one 32-long table as two 0x40 halves, which also makes
-    the generated character-data pages read both rows at the wrong address.
-    Correcting it moves `kind`, and `kind` is load-bearing in
+    ROOT-FIXED 14z-130, so the paragraph above is now HISTORY and this rule
+    is the belt to its braces. `gap_be27a` + `gap_be2ba` were replaced by ONE
+    row `capture_kf_ptr` (vsavj 0x0BE27A, `kind = "data_ptr"`, `stride = 0x80`,
+    `region = "auto"`), so `es` is 4 and the exemption is the real variant half
+    0x0BE2BA-0x0BE2FA. WHAT THAT MOVED, measured by rebuild on all five M13
+    tracks: exactly ONE of the nine returns to exemption (row 0x18, Oboro) plus
+    each tenant's OWN row (0x13 donovan / 0x10 huitzil; pyron has none). Rows
+    0x08-0x0F STAY in the inventory, because they are legacy attacker rows and
+    always should have been — the fix narrows the exemption, it does not
+    restore the hole. The five builds rebuilt BIT-IDENTICAL (patch.json sha1
+    and fingerprint), because the generic repoint the corrected `kind` enables
+    is suppressed by the ownership claim in gen_donovan_patch.py; the table is
+    hand-owned by 17 [[data_port]] rows. Gate: tests/test_capture_kf_ownership.sh.
+    This rule is KEPT anyway: `kind` was load-bearing in
     extract_char.py and gen_donovan_patch.py, so it can move BUILD OUTPUT —
     a measured change of its own, recorded in STATE for the maintainer. This
     function is the containment: an unmeasured stride now exempts nothing,

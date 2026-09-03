@@ -67,7 +67,7 @@ done
 
 echo "== vsavj: every id has storage, and the folding set is known =="
 want "no variant row is out-of-range" "$WORK/vsavj.txt" \
-     "44 tables x 16 variant ids: 679 alias, 25 distinct, 0 out-of-range"   # 14z-111: +4 tables (bank_map ai_script_0..3, the CPU AI script tables) = +60 alias / +4 distinct variant rows in VANILLA (measured; was 40 tables / 619 / 21)
+     "45 tables x 16 variant ids: 695 alias, 25 distinct, 0 out-of-range"   # 14z-130: +1 table (bank_map gap_be27a + gap_be2ba, two kind=auto rows the audit could not classify, corrected to ONE `capture_kf_ptr` data_ptr row) = +16 alias / +0 distinct in VANILLA — and that is an INDEPENDENT confirmation of the correction, not bookkeeping: the audit reads the ROM and finds all 16 variant rows of the new table are ALIASES of the base half, which is exactly what the model says (rows 0x10-0x1F byte-identical to 0x00-0x0F, tests/test_capture_kf_ownership.sh section 1). (was 44 / 679 / 25; 14z-111: +4 tables ai_script_0..3 = +60 alias / +4 distinct, was 40 / 619 / 21)
 want "the 5 register-path folding sites" "$WORK/vsavj.txt" \
      "mask #\$0f: 003E40 004082 00A43E 0409EC 04FAC4"
 want "the 2 direct-to-memory folds (id cycling)" "$WORK/vsavj.txt" \

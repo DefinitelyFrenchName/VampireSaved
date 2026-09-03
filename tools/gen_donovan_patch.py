@@ -3509,6 +3509,46 @@ def main():
                 if args.stage >= _int(st.get("stage", 0))
                 and not (st.get("profile") and st["profile"] != args.profile)
             }
+            # 14z-130: the same claim for a `slot_ptr_table` declared by any
+            # [[data_port]] row. Unlike the sound_table claim above this one is
+            # UNGATED — deliberately, and the difference is measured, not a
+            # scruple. The capture-keyframe pointer table 0x0BE27A is owned row
+            # by row on EVERY track: on a variant build by the 15 `capture_kf_*`
+            # slot_rows plus the tenant's own throw_victim/grab_hold row, and on
+            # the BASE-slot (stock twin) track by the same rows writing the host
+            # block IN PLACE at `dst`, which needs the table row left ALONE.
+            # A track-gated claim would therefore restore the generic repoint on
+            # exactly the track where it does the most damage. What the generic
+            # repoint would do, all measured 14z-130 on the M13 tracks:
+            #   * donovan (WIDE): overwrite throw_victim_keyframes' wide_ext
+            #     blob pointer 0x004010e0 with the hitbox-region copy
+            #     0x003fbda2, silently discarding the 14z-64 mirror-victim
+            #     `fixes = "0x1E:0b30:0d88"` that exists only in the blob;
+            #   * pyron  (WIDE): a NEW write at 0x0BE2BE repointing his attacker
+            #     row off Demitri's block onto his own vs2 block — a throw
+            #     surface nobody ruled ([VSP-10]; recorded in STATE);
+            #   * the stock twin: a write at 0x0BE2B6 repointing JEDAH's row
+            #     into Donovan's placed hitbox copy, breaking the in-place path.
+            # The donovan case is the one the builder already caught as
+            # `OP OVERLAP at 0x0BE2C6` ([VSP-77]); the other two are silent.
+            # NOTE THE SCOPE: `port` (the MERGED manifest), never
+            # `tenant_rows`. A capture_kf_* row is declared IDENTICALLY by all
+            # three manifests, so merge_manifests dedups it and row_here()
+            # hands it to ONE iteration; asking `tenant_rows` would leave the
+            # OTHER tenants' iterations with an empty claim. Measured 14z-130:
+            # scoped that way the merged build emitted `poke32 0x0be2be <-
+            # 0x004af226` — "capture_kf_ptr[0x11] donovan hitbox", i.e. PYRON's
+            # attacker row, repointed by donovan's iteration off a table it
+            # does not own. The table is owned GLOBALLY, so the claim is too.
+            # (It surfaced only once the merged inputs were re-extracted:
+            # tests/test_merged_inputs.sh section 2 is what caught it, and the
+            # pinned extracts predate the row, so the merged build could not
+            # have shown it.)
+            claimed_ptr_tables.update({
+                _int(dp["slot_ptr_table"]): f"data_port {dp['name']}"
+                for dp in port.get("data_port", [])
+                if "slot_ptr_table" in dp
+            })
             for v in man["values"]:
                 if v["table"] in VALUE_SKIP:
                     notes.append(f"# {v['table']}: velocity pair NOT ported "
@@ -3520,7 +3560,8 @@ def main():
                     owner = claimed_ptr_tables.get(_int(t["vsavj"]))
                     if owner:
                         notes.append(f"# {v['table']}: ptr row owned by {owner} "
-                                     f"— generic repoint suppressed (14z-65)")
+                                     f"— generic repoint suppressed "
+                                     f"(14z-65 sound_table / 14z-130 data_port)")
                         continue
                     ptr = _int(v["ptr"])
                     host = region_of(ptr)
