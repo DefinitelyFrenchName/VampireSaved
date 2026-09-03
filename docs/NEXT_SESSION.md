@@ -86,6 +86,40 @@
 > ## `A0` directly. Parses by field name now; PASSES, and confirms the 14z-81
 > ## satellite defect stays fixed. Its FAIL row in the sweep log is pre-fix.
 > ##
+> ## # THE SEVENTEEN REDS, BY WHAT THEY NEED — the whole triage, done
+> ##
+> ## 132 PASS / 17 FAIL of 149 recorded (prereq 20 + fbneo 6 + mame 129 = 155;
+> ## the six unrecorded are all `out` scope). **NOT ONE was a defect in the
+> ## shipped artifact.** Seven are already CLOSED:
+> ##
+> ## | gate | state |
+> ## |---|---|
+> ## | `test_wide_profile` | **FIXED, GREEN** — reference rebuilt; 12/12 superset invariant |
+> ## | `audit_legacy_pairings` | **FIXED, GREEN** — the five-session hole, spec authored + accepted |
+> ## | `audit_merged_vec3` | **FIXED, GREEN** — its parser; confirms the 14z-81 defect stays fixed |
+> ## | `test_m2a_stage4_oracle` | **FIXED, GREEN** — re-pointed off an M2a build |
+> ## | `test_hui_oracle` | **FIXED, GREEN** — re-pointed off pre-v1.1 `build/hui4` |
+> ## | `audit_walker_repoint` | **VERIFIED PASS** — needed an operand; vanilla walkers take 0 hits |
+> ## | `audit_empty_tiles` | **VERIFIED PASS** — needed an operand; no blank group-C tile |
+> ## | `audit_mask_window_ff42a2` | **FIXED** — an instrument; SKIPs with its reason now |
+> ##
+> ## **STILL OPEN, and what each needs:**
+> ## * `test_m2b_stage6` + `test_phasec_image` — **ONE cause: register M13** (b).
+> ## * `test_pyron_soak` + `test_pyron_ladder` — **the only CRASH class**, on
+> ##   stage-image builds the gates make themselves. `audit_guard_corpus` PASSED
+> ##   on the MERGED build (1727 s, corpus x 4 legs), so the artifact is not
+> ##   implicated. Needs a bisect; the select flow they force id 0x11 through has
+> ##   changed three times since the soak was last clean (14z-67).
+> ## * `audit_continue_switch` — the frozen arcade trajectory moved ([VSP-132]);
+> ##   re-measure it, do not re-freeze the verdict.
+> ## * `audit_qs_voice_wav` — its LAST must-fire control is dead (a last-window
+> ##   boundary in the checker). Audio itself clean: 74 windows, 0 suspects.
+> ## * `audit_type_dispatch_range` — probes a mechanism 14z-91 deleted; the
+> ##   update-or-drop decision in STATE.
+> ## * `audit_region_movability`, `test_m2a_stage2_data` — `out` scope; a
+> ##   duplicate manifest key and a half-pruned M2a dir, both diagnosed in the
+> ##   registry rows.
+> ##
 > ## # THE PATTERN IN THE SWEEP'S REDS, so the next batch is quick
 > ##
 > ## Ten reds by the time the lane was a third done, and **every one was the
