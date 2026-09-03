@@ -1,5 +1,25 @@
 # STATE — living progress log
 
+## Session 14z-128 — THE EMULATOR-TIER SWEEP: THE RUNNER BUILT, AND IT FOUND THREE
+## DEFECTS IN ITSELF BEFORE IT FOUND ANY IN THE SUITE. **164 gates enumerated (132 were
+## reachable only by typing a filename); the shared-writes guard was EXEMPTING EIGHT LEGACY
+## ROWS; and a LEGACY replay had sat in the corpus FIVE SESSIONS guarded by NOTHING — found,
+## attributed and closed.** Sweep RUNNING at close.
+
+| | |
+|---|---|
+| opened with | the three session documents, then "start, the night is still young" |
+| **the deliverable** | `tests/run_all_emulator.sh` + `tests/ci_emulator.tsv` (164 rows, completeness enforced BOTH ways on every run) + `tests/test_emulator_runner.sh` (10 ground-truth sections). Lanes `prereq`/`fbneo`/`mame`/`mister`; the prereq lane runs FIRST and sequentially and a red there STOPS the run ([CPE-24]); `scope` is the RELEASE decision with a mandatory reason keyword; `args` defaults to the gate's OWN defaults, because what a release run would actually hit is what the sweep must measure |
+| **THREE DEFECTS IN THE RUNNER, all found by RUNNING it, all one shape** | (1) `--lane` ASSIGNED instead of accumulating — six FBNeo gates silently dropped, including the superset invariant; (2) the classifier matched `^ *SKIP` BEFORE the exit status, so `test_wide_profile`'s exit-2 *"PARTIAL: the emulator superset invariant was NOT run"* filed as a benign skip — **the same bug in `run_all_static.sh`**; (3) `\| while read` put the loop in a SUBSHELL, so `wait` waited for nothing and a lane announced itself finished with gates still running (measured by `pgrep`). Each locked with a ground-truth case |
+| **the first target, finished** | the shared-writes audit was EXEMPTING EIGHT LEGACY ROWS: `bank_map`'s `gap_be27a` is `kind = "auto"` carrying the scanner's DEFAULT stride, so `es = stride/32` came out 2 on a 32-LONG table and the "variant half" window landed on longword rows 0x08-0x0F — Bishamon..Jedah. Contained (an `auto` row now exempts nothing); inventory re-pointed from the 14z-91 builds to the M12 freeze with every write REVIEWED and its `why` recorded (90/87/76 → 114/112/100) |
+| **the sweep's real find** | `105_legacy_2pwin_auto` entered the corpus at 14z-123 as LEGACY content and was guarded by NOTHING — no `.masked`, not even a self-frozen `.sha1`, in any set. `audit_legacy_pairings` had been saying so for five sessions into an empty room ([VSP-103]). **A census of all 88 replays says it is the ONLY hole.** CLOSED END TO END: basis frozen with the instrument control, shape measured IDENTICAL on all three builds, both flickers ATTRIBUTED (palette-fade staging slot row 0x0C at f2713; the OBJ-builder secondary stack at f5868), `composite vsavj/masked-v2 2713,5868 889-2491` authored |
+| **rot fixed** | 37 gate headers naming build dirs pruned freezes ago (+ `test_header_defaults.sh` to close the class); three defect-lock headers still describing the pre-fix world (#103/#105 shipped fixed at 14z-99 — only the prose was stale); `test_mister_gfxc_fetch`'s "NEVER BEEN GREEN" (it passed in full at 14z-108; its DEFAULT operands are why a bare run is red); the FBNeo reference binary given a canonical home and a shelf life |
+| **and one thing NOBODY was checking** | `tests/expected/PROVENANCE.md` — every frozen expectation now says what it describes, what EVIDENCE CLASS it rests on and how to re-freeze it, with a gate keeping it complete both ways. `hash-lock` locks CURRENCY, never correctness |
+| reds adjudicated, not re-frozen | `test_wide_profile` (the only reference binary on this machine is THREE DAYS OLDER than the harness patch — real, and the gate now refuses it); `test_phasec_image` (two stale premises: a donovan-m2c-era stock constant, and a negative control zeroing a byte range its own replay never reads — wide_ext's first placement is now Donovan's AI script block) |
+| decisions recorded | the release SCOPE classification (139/25, PROPOSED — the maintainer's to rule); the `gap_be27a` bank_map correction (it can move BUILD OUTPUT, so it needs a measured window) |
+| not done, by design | the sweep's mame lane (127 gates left, RUNNING — `--resume` continues it); the FBNeo reference rebuild (needs a moment when no lane is using FBNeo); the M13 freeze REGISTRATION |
+| **the standing lesson** | **every defect tonight was something SILENTLY NOT HAPPENING** — a lane dropped, a failure downgraded, a boundary crossed, eight legacy rows exempted, a replay compared against nothing. None was visible by reading; all five came from running the thing and looking at what it actually did |
+
 ## Session 14z-127 CLOSE — ONE DAY, TWO OPEN QUESTIONS ANSWERED "THE PORT IS FINE", AND THE
 ## INSTRUMENTS THAT PROVE IT. **#114 REFUTED THEN PROPERLY SCOPED (its evidence was JEDAH; the
 ## cadence is the HOST ENGINE; the mash ceilings MATCH); the boot title SAVIOR -> SAVED BUILT on
