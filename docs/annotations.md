@@ -25,12 +25,12 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 |---|---|
 | distinct program-space addresses named | 2956 |
 | named by a document or manifest only | 2048 |
-| named by both a document/manifest and code | 596 |
-| named by CODE ONLY (the gap list below) | 312 |
+| named by both a document/manifest and code | 597 |
+| named by CODE ONLY (the gap list below) | 311 |
 | carried by atlas | 473 |
 | carried by engine_internals | 535 |
 | carried by other docs | 937 |
-| carried by manifests | 1779 |
+| carried by manifests | 1780 |
 | carried by code | 908 |
 
 ## Addresses
@@ -2671,6 +2671,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x3FABA0` | docs/project/patch_notes.md — Session 14z-76 (Pyron's effect palette; build/pyron20 69e8c6f0); tests/test_effect_palette_table.sh |
 | `PRG:0x3FB879` | docs/project/patch_notes.md — 14z-110b — the 0x51 -> 0x44 state remap: byte detail |
 | `PRG:0x3FB899` | docs/game/engine_internals.md — The object-script state dispatcher at 'PRG:0x018508' (14z-109); docs/project/gotchas.md — and the engines RENUMBERED families between games (14z-109, the #99 crash); docs/project/patch_notes.md — 14z-110b — the 0x51 -> 0x44 state remap: byte detail; tests/audit_don_vs_cpu.sh |
+| `PRG:0x3FBDA2` | build/manifest/bank_map.toml — capture_kf_ptr; tools/gen_donovan_patch.py |
 | `PRG:0x3FFAF0` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] |
 | `PRG:0x3FFC60` | docs/project/patch_notes.md — 14z-116 — PYRON'S MEDALLION WHITE-OUT: byte detail (maintainer-chosen fix, field-validated 2026-08-29); docs/project/patch_notes.md — 14z-117 — THE PYRON-MEDALLION FREEZE (donovan-m16 / huitzil-m23 / pyron-m17 / merged-m12, mark M10): byte detail; build/manifest/donovan.toml — winquote_bank_variant_id; tests/test_pyron_medallion_2p.sh |
 | `PRG:0x3FFCA6` | docs/project/patch_notes.md — 14z-116 — PYRON'S MEDALLION WHITE-OUT: byte detail (maintainer-chosen fix, field-validated 2026-08-29); build/manifest/donovan.toml — winquote_bank_variant_id; tests/test_pyron_medallion_2p.sh |
@@ -2999,4 +3000,3 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x3FB4A2` | tools/audit_fsm_census.py |
 | `PRG:0x3FB862` | tests/test_fsm_census.sh |
 | `PRG:0x3FB882` | tests/lua/fsm_census.lua; tools/audit_fsm_census.py |
-| `PRG:0x3FBDA2` | tools/gen_donovan_patch.py |
