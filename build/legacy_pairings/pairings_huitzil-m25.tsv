@@ -9,7 +9,7 @@
 09_mirror_pick	LEGACY	masked
 103_tenant_2pwin_auto	LEGACY	sha1
 104_1p_auto_ko_win	LEGACY	masked
-105_legacy_2pwin_auto	LEGACY	none
+105_legacy_2pwin_auto	LEGACY	masked
 105_projectile_clash_ctl	LEGACY	masked
 106_pyron_cosmo_clash	LEGACY	masked
 107_four_directions	NO-MATCH	sha1
