@@ -59,7 +59,7 @@
 > ## where a tenant is CPU-controlled.
 > ##
 > ## **(3) `audit_legacy_pairings` — WAS a real hole, now CLOSED and the spec
-> ## ACCEPTED by `run_suite` (`PASS masked-composite`, SUITE GREEN).** `105_legacy_2pwin_auto` sat in the corpus from 14z-123 as LEGACY
+> ## ACCEPTED by `run_suite` on all three builds (`PASS masked-composite`, SUITE GREEN).** `105_legacy_2pwin_auto` sat in the corpus from 14z-123 as LEGACY
 > ## content guarded by NOTHING. Basis frozen, shape measured identical on all
 > ## three builds, both flickers attributed, `composite vsavj/masked-v2 2713,5868
 > ## 889-2491` authored in all three sets. A census says it was the only such hole
