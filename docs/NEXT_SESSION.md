@@ -1,98 +1,113 @@
-# NEXT SESSION — orientation (rewritten at the 14z-127 CLOSE, 2026-09-03)
+# NEXT SESSION — orientation (rewritten at the 14z-128 CLOSE, 2026-09-03)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-> ## **START HERE. NOTHING IS RED. Strict static 126/0/0/0.** The tree carries a
-> ## BUILT BUT UNREGISTERED freeze: `SAVIOR` -> `SAVED` on the boot name screen,
-> ## five tracks (`don_m19` `8065bc92` / `hui53` `08944a7e` / `pyron37`
-> ## `a43da974` / `m5_stock14` `e86e1d04` / **`m3b_merged22` `f42f7569`**, mark
-> ## M13). `patch_index` records them **active, UNREGISTERED**: the expectation
-> ## sets are the ~5h battery and were deliberately deferred. **Check
-> ## `git status -sb`, not this line.**
+> ## **START HERE. THE SWEEP MAY STILL BE RUNNING.** 14z-128 built the emulator-tier
+> ## runner and left its mame lane going. **FIRST COMMAND, before anything else:**
 > ##
-> ## # THIS SESSION IS THE EMULATOR-TIER SWEEP (maintainer-ruled, overnight)
+> ##     cat build/emu_sweep_14z128/results.tsv | column -t -s$'\t'
+> ##     pgrep -f run_all_emulator     # empty = it finished or was killed
 > ##
-> ## *"at release time, ALL tests should be run ... unless explicitly approved
-> ## AT release time, anything red, anything skipped is a hard fail of the
-> ## release process"* — and *"we may not need ALL the tests for every small
-> ## change but how could we not run them when we release, since we have them!"*
-> ## Full policy in STATE's standing sections.
+> ## **RESUME IT** (it skips everything already recorded):
 > ##
-> ## **THE GAP (measured 14z-127): 167 emulator-tier gates; 29 reachable from a
-> ## runner; 138 ORPHANED** — reachable only by typing a filename, so nothing
-> ## would even ask them at release. **CAVEAT: that 138 is a GREP of mine**
-> ## (tier from the generated index, "reachable" = a runner mentions the
-> ## basename). Good enough to size the arc, not to plan against — **re-derive
-> ## it inside the runner, where it becomes a maintained check.**
+> ##     ROMDIR=... tests/run_all_emulator.sh --lane fbneo --lane mame \
+> ##         --scope all --jobs 3 --resume --log build/emu_sweep_14z128
 > ##
-> ## **BUILD** `tests/run_all_emulator.sh` on the `run_all_static.sh` pattern:
-> ## registries, PASS/SKIP/FAIL counted SEPARATELY, `--strict`, and the
-> ## ANTI-ORPHAN registry-coverage check (without it the runner is just a
-> ## smaller thing to forget to update). A missing prerequisite is a HARD FAIL,
-> ## never a silent `exit 0` — `bat` counts a bare exit 0 as PASS, which is how
-> ## "BATTERY GREEN" becomes a lie.
+> ## Per-gate logs are `build/emu_sweep_14z128/<gate>.log`. Nothing is red that
+> ## was not adjudicated below. No build byte moved this session.
 > ##
-> ## **FIRST TARGET, ALREADY IN HAND — the worked example.**
-> ## `test_shared_writes.sh` has been GREEN AGAINST 14z-91 BUILDS FOR TEN
-> ## FREEZES (its inventory pins `don_m7`/`hui41`/`pyron26`). Current builds:
-> ## **donovan 108 writes vs 90 frozen (18 NEW), huitzil 106 vs 87 (19), pyron
-> ## 94 vs 76 (18)** — only 3 per tenant are 14z-127's; the rest is shipped work
-> ## nobody was forced to review (`0x020B9C` Oboro hook, `0x020C74/80` random
-> ## select, `0x0BE27A..96` — CORRECTED 14z-128: the #104 CAPTURE-KEYFRAME
-> ## rows, not the #99 AI unpark). **DO NOT re-point and
-> ## re-freeze** — that launders an unreviewed inventory into the gate that
-> ## exists to review it ([VSP-97]). Establish whose bytes each lands on, record
-> ## the `why`, THEN re-point. The inventory is marked STALE in place.
+> ## # WHAT THE RUNNER IS, in one paragraph
 > ##
-> ## **HOW A RED IS ADJUDICATED** (maintainer, and it governs the whole sweep):
-> ## *"to know if we should fix the gate or what it caught, we must use data we
-> ## can trust ... measuring or relying on data that is known to be true for it
-> ## was vetted by measurements."* **A RED GATE IS A QUESTION, NOT AN ANSWER.**
-> ## Establish which side's expectation rests on MEASUREMENT before choosing
-> ## fix-the-gate / fix-what-it-caught / delete-as-valueless. **30 of 45 frozen
-> ## expectation files name their provenance; 15 do NOT** (listed in STATE) —
-> ## that is where the thinking time goes. The worked warning is 14z-127's own:
-> ## `test_don_reactions` was GREEN on `native == 10`, a constant of playtest
-> ## testimony presented as measurement. It happened to be right, which is luck.
+> ## `tests/run_all_emulator.sh` is `run_all_static.sh`'s twin for the tier that
+> ## needs MAME, FBNeo or the simulator; `tests/ci_emulator.tsv` is its registry,
+> ## one row per gate (`gate / lane / scope / args / note`), completeness enforced
+> ## BOTH ways on every run. Lanes: `prereq` (instruments — runs FIRST,
+> ## sequentially, and a red there STOPS the run, [CPE-24]), `fbneo`, `mame`,
+> ## `mister` (opt-in, HOURS). `--scope all` adds the out-of-release-scope rows.
+> ## Ground truth: `tests/test_emulator_runner.sh`. Read [VSP-164].
 > ##
-> ## **EXPECT REDS AND ROT — that is the deliverable:** *"anything stale will be
-> ## either updated or dropped so it'll be either more safety or less time spent
-> ## on valueless tests, both a win."*
+> ## **PREREQ LANE WAS 20/20 GREEN**, `test_mame_parity` included — so the
+> ## instruments are sound and everything measured after them is evidence.
 > ##
-> ## **OPERATIONAL:** land every commit BEFORE starting the run — the suite
-> ## asserts a clean tree during a run, and a run was voided that way on
-> ## 2026-09-02. `pgrep -f` waiters match their own command line; wait on a log
-> ## verdict line instead. The shell is zsh: `${=var}`.
+> ## # THE THREE REDS, ALREADY ADJUDICATED — do not re-freeze any of them
 > ##
-> ## **THEN, WHEN THE MACHINE IS FREE: REGISTER THE FREEZE.** `run_suite.sh
-> ## --freeze` per track (~88 expectation entries each, ~5h total), registry
-> ## rows, `freeze/*` tags, HANDOFF's build-registry row and "Current WIDE
-> ## builds". **NO RELEASE** — the release is the pipeline's first real
-> ## exercise, deliberately held back.
+> ## **(1) `test_wide_profile` — REAL, and the fix is a rebuild.** The only FBNeo
+> ## reference binary on this machine (`~/.cache/vampire-saved/fbneo_ref`) was
+> ## built 2026-08-14 while harness patch `0001` last changed 2026-08-17. The gate
+> ## now defaults to that path AND REFUSES it as stale, with the commands in its
+> ## own failure message. **DO THIS FIRST WHEN NO LANE IS USING FBNeo:**
 > ##
-> ## **SMALL, OPEN, NOT URGENT:**
-> ## **(1) THE ONE-BYTE IDENTIFICATION.** The name-screen display script's
-> ## record is read as `<row> <col> 01 <string>` at `PRG:0x01C806`. The ROW
-> ## reading is CORROBORATED (`0x0a` = 10 matched the tilemap decode's first
-> ## glyph row) and the COLUMN is INFERRED — what is proven about `0x24` is only
-> ## that changing it to `0x25` faults (`RAM:$FF0000`=`0x0001` = vector 3,
-> ## ADDRESS ERROR, `D0`=`'V'`). **The confirming test is ONE BYTE: change the
-> ## ROW (`0x0a` -> `0x0c`) in a scratch ROM and see whether the title moves
-> ## DOWN two cells.** ~10 min, nothing in the tree. It would turn the record's
-> ## field semantics from inference into fact.
-> ## **(2) #112 fix option (B)** — kept OPEN by the maintainer; needs the
-> ## half-session scoping (is there a FREE PALETTE ROW; do pool objects carry
-> ## `+0x30`/`+0x382`/`+0x3AE`/`+0x18B`?). (C) do-nothing stands meanwhile.
-> ## **(3) THE MIZUUMI CORPUS ARC** — 26 wiki pages in `../community/`, barely
-> ## opened. Measurement stays king; a constant offset validates ours, an
-> ## inconsistent pattern means re-check OURS first.
+> ##     WIDE=0 tools/setup_fbneo.sh && cp emu/fbneo/fbneo ~/.cache/vampire-saved/fbneo_ref
+> ##     tools/setup_fbneo.sh            # restore the WIDE binary — do not skip
+> ##     ROMDIR=... tests/test_wide_profile.sh
+> ##
+> ## It cannot be done while the mame lane runs: reverting the profile patch hands
+> ## `test_m2a_stage4_xemu` (position 14 of that lane) a non-WIDE binary.
+> ##
+> ## **(2) `test_phasec_image` — two STALE PREMISES, neither a defect in the
+> ## build.** Section 1 compares against a hardcoded donovan-m2c-era stock
+> ## fingerprint; the value it measured, `e86e1d04`, is exactly the M13 stock twin,
+> ## so the pipeline reproduces correctly and the CONSTANT is what is wrong (fix it
+> ## at the M13 registration, ideally by resolving through `registry.tsv` instead of
+> ## a 40-hex literal). Section 4 zeroes CPU:$400010 expecting the Phase-C sound
+> ## table, but wide_ext's first placement is now region `x101aca` = DONOVAN'S CPU
+> ## AI SCRIPT BLOCK, which replay `12_donovan_vs_cpu` never reads because Donovan
+> ## is the PLAYER there. Needs a zeroing target that replay reads, or a replay
+> ## where a tenant is CPU-controlled.
+> ##
+> ## **(3) `audit_legacy_pairings` — WAS a real hole, now CLOSED; re-run to
+> ## confirm.** `105_legacy_2pwin_auto` sat in the corpus from 14z-123 as LEGACY
+> ## content guarded by NOTHING. Basis frozen, shape measured identical on all
+> ## three builds, both flickers attributed, `composite vsavj/masked-v2 2713,5868
+> ## 889-2491` authored in all three sets. A census says it was the only such hole
+> ## of 88 replays.
+> ##
+> ## # THEN, IN ORDER
+> ##
+> ## **(a) FINISH THE SWEEP** and triage what it finds. Adjudicate, never
+> ## re-freeze: *"to know if we should fix the gate or what it caught, we must use
+> ## data we can trust"*. `tests/expected/PROVENANCE.md` (new) answers the first
+> ## question — which side rests on a measurement — in seconds.
+> ## **(b) REGISTER THE M13 FREEZE** (`don_m19` / `hui53` / `pyron37` /
+> ## `m5_stock14` / `m3b_merged22`, boot title SAVED): `run_suite.sh --freeze` per
+> ## track (~5 h), registry rows, `freeze/*` tags, HANDOFF's build-registry row and
+> ## "Current WIDE builds", and the one-line shared-writes re-point it owes (three
+> ## `boot_title_saved_*` rows per tenant, already reviewed at 14z-127).
+> ## **(c) NO RELEASE** — still deliberately held back.
+> ##
+> ## # TWO DECISIONS WAITING ON THE MAINTAINER (STATE "Decisions pending")
+> ##
+> ## **THE RELEASE SCOPE** — `ci_emulator.tsv` marks 139 gates `release` and 25
+> ## `out`, each `out` row leading with the reason keyword. That column is what a
+> ## release hard-fails on, so it is a ruling, not a preference. Three judgement
+> ## calls are named in the entry.
+> ## **THE `gap_be27a` BANK-MAP ROW** — it models ONE 32-long table as two 32-entry
+> ## WORD tables, which is what blinded the shared-writes guard and what makes the
+> ## generated character pages read two rows at the wrong address. The correction
+> ## is one row, but `kind` is load-bearing in `extract_char.py` and
+> ## `gen_donovan_patch.py`, so it can move BUILD OUTPUT: half a session in a
+> ## build-touching window, rebuild one track and diff `patch.json`.
+> ##
+> ## # OPERATIONAL, and each was paid for tonight
+> ##
+> ## * **Never edit a running `.sh`** — sh reads by byte offset ([VSP-110]). Two
+> ##   runner fixes needed the sweep stopped first; killing it and relaunching with
+> ##   `--resume` costs only the gates in flight.
+> ## * **Do not run the static tier while the sweep runs** — it timed out at two
+> ##   minutes under load. Batch static work, run it when the machine is quiet.
+> ## * **Name `MAME_BIN` for a `vsavjw` run.** A bare `run_replay_mame.sh vsavjw`
+> ##   with the default binary produces NO dumps and NO error.
+> ## * The runner batches `--jobs` gates and waits for ALL of them before the next
+> ##   batch, so one slow gate idles the other slots. A proper slot loop would help
+> ##   throughput; it is not a correctness problem.
 > ##
 > ## **IF A DOC IS TOUCHED:** census `--check` + `checkdocshape --no-pending` +
-> ## checkdocs + checkskills + `gen_annotations --check` + `gen_gate_index
-> ## --check` + `gen_gotchas_index --check` + `doc_anchor_census --check`, exit
-> ## statuses captured directly. Regenerate the GENERATED indexes in the commit
-> ## that changes what they index — and regenerate them AFTER the prose, not
-> ## before (a 14z-127 red came from exactly that ordering slip).
+> ## checkdocs + checkskills + `gen_annotations --check` + `gen_gate_index --check`
+> ## + `gen_gotchas_index --check` + `doc_anchor_census --check`, exit statuses
+> ## captured directly. Regenerate the GENERATED indexes in the commit that changes
+> ## what they index, and AFTER the prose (a 14z-128 red came from exactly that
+> ## ordering slip — the shared-writes re-freeze moved `annotations.md` by 16
+> ## addresses).
