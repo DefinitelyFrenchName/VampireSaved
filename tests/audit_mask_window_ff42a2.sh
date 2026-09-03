@@ -67,8 +67,23 @@
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-PRE="${1:?pre-move rompath dir}"; POST="${2:?post-move rompath dir}"; shift 2
-[ $# -ge 1 ] || { echo "no replay names given"; exit 2; }
+# THIS IS AN INSTRUMENT, NOT A GATE, and with no operands there is nothing to
+# attribute — so it SKIPS rather than dying on a raw `${1:?...}` shell error
+# (added 14z-128, after the emulator-tier sweep invoked it bare and recorded
+# "FAIL 0s: line 70: 1: pre-move rompath dir", which is a message about the
+# caller, not a verdict about the build). Its operands DESCRIBE A CHANGE UNDER
+# INVESTIGATION — a pre-move and a post-move rompath and the replays a
+# select-palette row move shifted — so there is no standing pair to sweep it
+# with. `tests/ci_emulator.tsv` marks it out of release scope for that reason.
+if [ $# -lt 3 ]; then
+    echo "  SKIP: no operands — this is the pre/post attribution INSTRUMENT for a"
+    echo "        select-palette row move ([VSP-35]), not a standing gate. It needs"
+    echo "        a pre-move rompath, a post-move rompath and the replay names of"
+    echo "        the change being attributed; there is no default pair, because"
+    echo "        there is no default change."
+    exit 0
+fi
+PRE="$1"; POST="$2"; shift 2
 case "$PRE" in /*) ;; *) PRE="$REPO/$PRE" ;; esac
 case "$POST" in /*) ;; *) POST="$REPO/$POST" ;; esac
 V2="043c-043d,4182-41a2,41c2-41e2,4222-4262,7f00-8000"

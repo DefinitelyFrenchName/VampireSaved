@@ -88,7 +88,7 @@ test_inp_crash_merged_m8_01	mame	release	-	the #99 natural-path capture as a gat
 test_pod_black_foot_palette	mame	release	-	#112's black foot, causally located
 test_m2a_stage4_oracle	mame	release	-	ported Donovan vs NATIVE Donovan on vsav2 (dual-oracle, two-game form)
 test_m2a_stage4_xemu	mame	release	-	MAME/FBNeo agreement at the match-start anchor ([VSP-32])
-audit_mask_window_ff42a2	mame	out	-	momentary: a pre/post attribution instrument for a select-palette row move; it needs two rompaths and a replay list, so it has no standing operands ([VSP-35])
+audit_mask_window_ff42a2	mame	out	-	momentary: a pre/post attribution INSTRUMENT for a select-palette row move; its operands DESCRIBE A CHANGE UNDER INVESTIGATION (a pre-move and a post-move rompath plus the replays it shifted), so there is no standing pair ([VSP-35]). Bare invocation now SKIPs with that reason instead of dying on a raw ${1:?} shell error (14z-128).
 test_down_flash_vanilla	mame	out	-	romset: the subject is VANILLA vsav's one-frame white-out (#113 ground truth). Kept deliberately — it is what keeps the 'vanilla, not ours' verdict honest.
 test_down_flash_mechanism	mame	out	-	romset: the vanilla mechanism behind #113
 test_m2_repoint	mame	release	-	the M2 slot-repoint mechanism + the superset invariant
