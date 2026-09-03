@@ -1,38 +1,5 @@
 # STATE — living progress log
 
-## Session 14z-128 — THE EMULATOR-TIER SWEEP: THE RUNNER BUILT, AND IT FOUND THREE
-## DEFECTS IN ITSELF BEFORE IT FOUND ANY IN THE SUITE. **164 gates enumerated (132 were
-## reachable only by typing a filename); the shared-writes guard was EXEMPTING EIGHT LEGACY
-## ROWS; and a LEGACY replay had sat in the corpus FIVE SESSIONS guarded by NOTHING — found,
-## attributed and closed.** **THE SWEEP COMPLETED: 155 gates in one command — 136 PASS, 19 FAIL,
-## ZERO SKIP, ZERO TIMEOUT, ZERO MISSING — and NOT ONE red was a defect in the shipped
-## artifact.** Eight closed in-session. **Strict static 129/0/0/0** (126 at the
-## 14z-127 close + the three gates added tonight), run once the machine was quiet.
-
-| | |
-|---|---|
-| opened with | the three session documents, then "start, the night is still young" |
-| **the deliverable** | `tests/run_all_emulator.sh` + `tests/ci_emulator.tsv` (164 rows, completeness enforced BOTH ways on every run) + `tests/test_emulator_runner.sh` (10 ground-truth sections). Lanes `prereq`/`fbneo`/`mame`/`mister`; the prereq lane runs FIRST and sequentially and a red there STOPS the run ([CPE-24]); `scope` is the RELEASE decision with a mandatory reason keyword; `args` defaults to the gate's OWN defaults, because what a release run would actually hit is what the sweep must measure |
-| **THREE DEFECTS IN THE RUNNER, all found by RUNNING it, all one shape** | (1) `--lane` ASSIGNED instead of accumulating — six FBNeo gates silently dropped, including the superset invariant; (2) the classifier matched `^ *SKIP` BEFORE the exit status, so `test_wide_profile`'s exit-2 *"PARTIAL: the emulator superset invariant was NOT run"* filed as a benign skip — **the same bug in `run_all_static.sh`**; (3) `\| while read` put the loop in a SUBSHELL, so `wait` waited for nothing and a lane announced itself finished with gates still running (measured by `pgrep`). Each locked with a ground-truth case |
-| **the first target, finished** | the shared-writes audit was EXEMPTING EIGHT LEGACY ROWS: `bank_map`'s `gap_be27a` is `kind = "auto"` carrying the scanner's DEFAULT stride, so `es = stride/32` came out 2 on a 32-LONG table and the "variant half" window landed on longword rows 0x08-0x0F — Bishamon..Jedah. Contained (an `auto` row now exempts nothing); inventory re-pointed from the 14z-91 builds to the M12 freeze with every write REVIEWED and its `why` recorded (90/87/76 → 114/112/100) |
-| **the sweep's real find** | `105_legacy_2pwin_auto` entered the corpus at 14z-123 as LEGACY content and was guarded by NOTHING — no `.masked`, not even a self-frozen `.sha1`, in any set. `audit_legacy_pairings` had been saying so for five sessions into an empty room ([VSP-103]). **A census of all 88 replays says it is the ONLY hole.** CLOSED END TO END: basis frozen with the instrument control, shape measured IDENTICAL on all three builds, both flickers ATTRIBUTED (palette-fade staging slot row 0x0C at f2713; the OBJ-builder secondary stack at f5868), `composite vsavj/masked-v2 2713,5868 889-2491` authored — and ACCEPTED by `run_suite` on ALL THREE (`PASS masked-composite`, SUITE GREEN, identical figures), which is the gate that runs each replay twice and fails on nondeterminism. **And the attribution is now ENFORCED, not argued:** `audit_flicker_attribution` gained both frames as cases plus a new named window `obj-builder-stack` ($FF06D0-$FF06EF), and reproduces the dump reading byte for byte — f2713 = 4 in `staging-row-0x0C` (the window it ALREADY enforces on replay 41, same window, same count), f5868 = 3 in `obj-builder-stack`. **`audit_legacy_pairings` re-run GREEN.** |
-| **rot fixed** | 37 gate headers naming build dirs pruned freezes ago (+ `test_header_defaults.sh` to close the class); three defect-lock headers still describing the pre-fix world (#103/#105 shipped fixed at 14z-99 — only the prose was stale); `test_mister_gfxc_fetch`'s "NEVER BEEN GREEN" (it passed in full at 14z-108; its DEFAULT operands are why a bare run is red); the FBNeo reference binary given a canonical home and a shelf life |
-| **and one thing NOBODY was checking** | `tests/expected/PROVENANCE.md` — every frozen expectation now says what it describes, what EVIDENCE CLASS it rests on and how to re-freeze it, with a gate keeping it complete both ways. `hash-lock` locks CURRENCY, never correctness |
-| **and one gate had been blaming the game since 14z-109** | `audit_merged_vec3` reported *"rig dead — the replay or pokes moved"*. The rig was fine: its A0 extractor required `A6` to follow `A0` DIRECTLY, which stopped being true when 14z-109 added `A1`/`A3` to the PROBE line. NINETEEN SESSIONS. Fixed to parse by FIELD NAME; the gate then PASSES — and the verdict it could not deliver is that the 14z-81 satellite defect is confirmed FIXED. **16 seconds was the tell**: a guarded replay cannot run that fast, so it had bailed before measuring |
-| **TEN REDS, TEN DIAGNOSED — five FIXED or verified in-session** | `audit_legacy_pairings` (the five-session hole -> closed, gate PASS); `audit_merged_vec3` (its own parser since 14z-109 -> fixed, PASSES, and confirms the 14z-81 defect stays fixed); `test_m2a_stage4_oracle` (measuring an M2a-era build -> re-pointed to the current stock twin, PASSES); `audit_mask_window_ff42a2` (an INSTRUMENT invoked bare, dying on a raw `${1:?}` -> SKIPs with the reason); `audit_walker_repoint` (no operand and no default -> `%MERGED%` in the registry, and with it PASSES: the vanilla walkers take ZERO hits while the relocated pair takes 1,140 and 39,934); `audit_empty_tiles` (same class -> `%MERGED%`, and with it PASSES: every group-C sprite on all three Huitzil surfaces resolves to real art). **The operand-with-no-default class is CLOSED by census — exactly two gates, both now carrying args and both verified PASS.** TWO MORE DIAGNOSED, NOT FIXED: `audit_region_movability` injects a `region_space` key donovan.toml has carried since 14z-111, so `_minitoml` refuses the duplicate (the 14z-123 tenant path has the guard for exactly this; the older path never got it); `test_m2a_stage2_data` builds into a half-pruned M2a dir and `pack_build.sh` rightly REFUSES to pack a set that would fingerprint as VANILLA. ONE REAL AND ACTIONABLE: `test_wide_profile` (the FBNeo reference binary is three days older than the harness patch — the gate now refuses it; the fix is a rebuild on a quiet machine). TWO STALE PREMISES: `test_phasec_image` (a donovan-m2c-era stock constant; a negative control zeroing a byte range its own replay never reads). ONE ESCALATED: `audit_type_dispatch_range` probes a mechanism 14z-91 DELETED — update or drop, and which is genuinely open |
-| reds adjudicated, not re-frozen | `test_wide_profile` (the only reference binary on this machine is THREE DAYS OLDER than the harness patch — real, and the gate now refuses it); `test_phasec_image` (two stale premises: a donovan-m2c-era stock constant, and a negative control zeroing a byte range its own replay never reads — wide_ext's first placement is now Donovan's AI script block) |
-| decisions recorded | the release SCOPE classification (139/25, PROPOSED — the maintainer's to rule); the `gap_be27a` bank_map correction (it can move BUILD OUTPUT, so it needs a measured window) |
-| **the sweep's own verdict** | 136/19/0/0/0 over 155 gates. The anti-orphan check: 164 emulator-tier gates, 164 registered, zero unregistered, zero dead rows. The working tree was NOT dirtied by the run. **ZERO SKIPs is the number that matters** — under the maintainer's release policy a skip is a hard fail, and the tier ran without one |
-| the nineteen, by what they need | EIGHT CLOSED in-session (five fixed green, two verified PASS once given an operand, one instrument taught to SKIP); TWO are one cause (register M13); TWO are the only CRASH class and `audit_guard_corpus` PASSED on the merged build (1727 s) so the artifact is not implicated; TWO are DEAD MUST-FIRE CONTROLS — the class that matters most, because a dead control is how a gate goes green while asserting nothing; the rest are a frozen arcade trajectory, a deleted mechanism, a duplicate manifest key, a half-pruned dev dir and a reference 25 freezes old |
-| not done, by design | the M13 freeze REGISTRATION (which clears two of the nineteen); the MiSTer lane (opt-in, hours); the eleven open reds, each recorded with its remedy |
-| **the standing lesson** | **every defect tonight was something SILENTLY NOT HAPPENING** — a lane dropped, a failure downgraded, a boundary crossed, eight legacy rows exempted, a replay compared against nothing. None was visible by reading; all five came from running the thing and looking at what it actually did |
-
-**Ledger rollover:** the 14z-127 group moved verbatim to STATE_HISTORY.md at this
-close — STATE had crossed the rule's ~150 KB line again (160 KB). STATE now holds
-the 14z-128 close only; four RESOLVED decisions also moved to DECISIONS_HISTORY.md
-earlier in the session. What is left above the ledger is one group, so the file's
-remaining size is THE LEDGER plus the standing sections, not session records.
-
 **SPLIT 2026-08-20 (14z-99 post-freeze close, maintainer-approved): this
 file holds the RECENT session groups + THE LEDGER; the full detail of every
 older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
@@ -56,12 +23,33 @@ older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
   VERBATIM to `DECISIONS_HISTORY.md`** (grep there by topic; the §5
   retraction grep covers it).
 
+## Session 14z-129 — THE TRIAGE SESSION: FIVE RED GATES TO GREEN, ONE DELETED ON
+## MEASURED GROUND, AND **NOT ONE WAS A DEFECT IN THE SHIPPED ARTIFACT** — the same
+## verdict 14z-128's sweep reached about its own nineteen. **Two decisions ruled and
+## IMPLEMENTED** (the release scope 141/23 + a new `cadence` column that makes the
+## MiSTer ruling enforce itself; `gap_be27a` folded into M13). **A new law, [VSP-166],
+## ruled by the maintainer against a proposal of mine — and it paid for itself within
+## the hour.** No build byte moved; twelve commits, all pushed.
+
+| | |
+|---|---|
+| opened with | the three session documents, then the two pending decisions |
+| **the two rulings** | **RELEASE SCOPE 141/23** — the two #113 gates -> `release` ("51s is basically nothing"), the four `dev-ladder` gates stay `out`, and the MiSTer lane keeps release scope but splits onto a NEW `cadence` column: `bitstream` rows run at every release and at a freeze only when it targets MiSTer. `--freeze` drops them AND NAMES them, so the question is asked by the runner rather than remembered — a ritual step in prose is the step that gets skipped (14z-126b). **`gap_be27a`** folded into the M13 registration, the three couplings verified rather than argued |
+| **five gates red -> green** | `audit_qs_voice_wav` (the dead late-end control was truncating SILENCE — voice 80 is RMS 1.0 on both legs; now targets the last SOUNDING window, with two new guards, both must-fire checked); `test_pyron_ladder` (a missing `MAME_BIN` — a stock binary exits "Unknown system" before the machine runs and the guard cannot tell that from a machine that died; the build was perfect); `test_pyron_soak` (STAGE 5 is the select plumbing, so a stage-4 image cannot take a forced tenant pick — moved to stage 6, which also closes the recorded gap that the frozen artifact was never soaked); `audit_continue_switch` (the #99 trajectory moved SEVEN THOUSAND frames — re-measured and re-frozen, assertions NOT widened, deterministic over three runs); `audit_hitclass_map_cost` (the dead crash control revived) |
+| **the rig the gate had been asking for** | `tests/replays/pyron/84_pyron_clash_type64.rpl` — the sweep is POOL-vs-POOL, so the 37-leg census could put 107 dangerous objects in the pool and never enter the map. P2 Demitri flares through Pyron's satellite spawns: **14 dispatches at map index 0x40**, fix build clean, twin CRASH 3708 vec3 at the FIRST one (A3 = 0x000FDC8A — the historical pyron20 crash's own A3). Its silent twin `hui/96_hui_grenade_clash` is committed deliberately: `map[68] = 0x12` is survivable where `map[64] = 0x4e` is the f7997 fault, so a huitzil clash can never be this control |
+| **and the census could not see either rig** | it is an EXPLICIT TABLE, not a glob — so "NO RIG PRODUCES A POOL-VS-POOL CONTACT" survived in the tree containing the rig that produces one. Both added (corpus 39): **15 dispatches at index >=0x40, and section 3 now prints THE THUNK IS LOAD-BEARING** — the first time the gate could say that from measurement. The 2026-08-16 KEEP ruling was taken without it |
+| **[VSP-166], the maintainer's rule** | *"we don't write that what we coded is indeed what we coded"* — re-targeting an instrument from the build's own metadata is TDD with the tests written from the algorithm. **It caught my `audit_type_dispatch_range` re-target before it was built**, and the measurement then proved it: the site I proposed (the relocated walker's `jsr`) fires 8,990 times with **D0 = 0 every time**, a permanent false green. The index lives 6 bytes earlier — but the VERDICT CONTROL could not be rebuilt (hui30 fires 5,862 times in the original range; a current single-tenant vertical fires 8,990 with ZERO), so the gate was **DROPPED**: *"better no test than a bad one"* |
+| **the M13 probe, run before closing** | the `gap_be27a` one-row correction **DOES NOT BUILD**: `data_ptr` needs a `region` key (`region = "auto"`). With it, ops 342 -> 343 and the builder catches `OP OVERLAP at 0x0BE2C6` — longword row 0x13, DONOVAN's slot, written by both the corrected table and `throw_victim_keyframes`. **The fold-in is an OWNERSHIP question, not a manifest tidy**, and which pointer his capture keyframes use may be a [VSP-10] call. Tree reverted and verified byte-identical |
+| my own errors, corrected in-session | read the hit-class map from the DATA view and got a confident wrong `map[64]` until the generator's opcode-view assert caught it; broke `PYR_SOAK` while re-pointing section 0, which SILENTLY emptied the census rather than failing; extracted a control block with a sed range that matched nothing, producing an empty script that exited 0 and looked like a pass |
+| **the standing lesson** | **every red was an instrument that had rotted around a healthy artifact** — a control truncating silence, a guard with no exception breakpoints, an emulator that never started, a census with an empty corpus still printing a verdict, a probe site where D0 is always zero. Read the NUMBERS, never the verdict word |
+
 # THE LEDGER — archived sessions, one line each (newest first)
 
 Full detail for every line: `STATE_HISTORY.md` (verbatim; grep the session
 tag or any phrase below). `[+N more entries]` = the group has N further
 session records in the archive beyond the headline shown.
 
+- Session 14z-128 CLOSE — THE EMULATOR-TIER SWEEP: the runner built (`run_all_emulator.sh` + `ci_emulator.tsv`, 164 gates enumerated where 132 had been reachable only by typing a filename), THREE DEFECTS FOUND IN IT BY RUNNING IT, the shared-writes guard caught EXEMPTING EIGHT LEGACY ROWS, and a LEGACY replay found guarded by NOTHING for five sessions. Sweep 155 gates: 136 PASS / 19 FAIL / ZERO SKIP — and not one red was a defect in the shipped artifact; eight closed in-session. Strict static 129/0/0/0  [rolled 14z-129 close — STATE was 164 KB]
 - Session 14z-127 CLOSE — ONE DAY, TWO OPEN QUESTIONS ANSWERED "THE PORT IS FINE", AND THE INSTRUMENTS THAT PROVE IT: #114 REFUTED then properly scoped (its evidence was JEDAH; the cadence is the HOST ENGINE; the mash ceilings MATCH), the boot title SAVIOR -> SAVED BUILT on all five tracks, and `test_shared_writes` FOUND GREEN AGAINST 14z-91 BUILDS FOR TEN FREEZES. Ten commits, all pushed; strict static 126/0/0/0  [rolled 14z-128 close — STATE was 160 KB]
 - Session 14z-126b CLOSE (3) — ritual complete for the LONG CONTINUED session: NINE ARCS — a maintainer correction to a rule I had overstated, the `14z-N` key documented as law, #113 CLOSED then MECHANISED, the MiSTer core-list name + main-MRA fix, a corpus gate that could pass while asserting nothing, #112 ROOT-CAUSED, Jedah ARBITRATED, the aerials part-resolved, and #114 opened on 421+P. No build byte moved; strict static 126/0/0/0  [rolled 14z-127 close, early — STATE was 164 KB]
 - Session 14z-126b CLOSE (2) — FIVE ARCS AFTER THE FIRST CLOSE: the three grandfathered tags amended and force-pushed, a red root-caused to the macOS tmp reaper, #112 picked up and its premise refuted, the black foot found by searching the INPUTS, and two gotchas + a gate that came out of it. No build changed; strict static 126/0/0/0  [rolled 14z-127 close]
@@ -563,6 +551,37 @@ what a triage is looking at, so those are where the thinking time goes.
   `gen_donovan_patch.py` gives `data_ptr`/`code_ptr` tables pointer treatment
   (:3514). So it can move BUILD OUTPUT, which makes it a measured change with
   a rebuild and a diff, not a manifest tidy.
+  **PROBED 14z-129 (the measurement the ruling asked for, run before the M13
+  window opens so its cost is known going in). THE ONE-ROW CORRECTION DOES NOT
+  BUILD, AND THE REAL SHAPE IS AN OWNERSHIP QUESTION.** Two findings, in order:
+  1. **`kind = "data_ptr"` + `stride = 0x80` is INCOMPLETE.** A `data_ptr` row
+     also requires a `region` key — `extract_char.py:1291` dies
+     `KeyError: 'region'` without one. `region = "auto"` is the right value
+     (the 14z-111 #99 handling: the pointer's host is whichever extracted
+     region contains it), and with it the build proceeds.
+  2. **IT THEN COLLIDES, and the builder catches it:**
+     `OP OVERLAP at 0x0BE2C6: op[86] poke32@0xbe2c6 then op[192] poke32@0xbe2c6
+     — two ops write the same word and the later silently wins. Fix the
+     generator (explicit ownership); do not reorder ops.`
+     `0xBE2C6` is longword row **19 = 0x13 — DONOVAN's own slot**. The two
+     values disagree: op[86] writes `0x003fbda2` (his placed region), op[192]
+     writes `0x004010e0` (wide_ext). Ops 342 -> 343.
+  **WHY IT COLLIDES:** modelled correctly, `gap_be27a` is a 32-long pointer
+  table and the generic `data_ptr` path emits a pointer for every row —
+  INCLUDING row 0x13, which `donovan.toml`'s `throw_victim_keyframes` /
+  `grab_hold_keyframes` rows already repoint individually
+  (`slot_ptr_table = 0xBE27A`, donovan.toml:831). While the row was `auto`
+  with the wrong stride it emitted nothing there, so the conflict was hidden
+  by the very defect being fixed.
+  **SO THE M13 FOLD-IN IS NOT A MANIFEST TIDY.** It needs an explicit
+  ownership rule between the bank_map table and the per-row repoint rows, and
+  the rule decides which pointer Donovan's capture keyframes use — a
+  throw/capture surface, so if the two values are not equivalent it is a
+  [VSP-10] call, not a generator detail. Budget accordingly; the probe cost
+  one build.
+  **The tree is UNCHANGED — `bank_map.toml` was reverted and verified
+  byte-identical to its pre-probe state.**
+
   **RECOMMENDED (and RULED — see the head of this entry):** do it in a
   build-touching window — rebuild one track,
   diff `patch.json` against the current freeze, and expect either zero op

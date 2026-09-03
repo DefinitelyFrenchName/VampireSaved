@@ -1110,7 +1110,8 @@ ROMDIR=... tests/run_all_emulator.sh --dry-run        # the resolved command per
 ```
 
 **The registry is `tests/ci_emulator.tsv`** — one row per emulator-tier gate:
-`gate / lane / scope / cadence / args / note`. Completeness is enforced BOTH WAYS on
+`gate / lane / scope / cadence / args / note` (163 rows since
+`audit_type_dispatch_range` was dropped 14z-129). Completeness is enforced BOTH WAYS on
 every run (an emulator-tier script with no row is UNREGISTERED, a row whose
 script is gone is DEAD), with the same transitive classifier
 `run_all_static.sh` uses, so a gate cannot fall between the two runners.
