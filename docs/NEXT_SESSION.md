@@ -124,6 +124,12 @@
 > ## * The runner batches `--jobs` gates and waits for ALL of them before the next
 > ##   batch, so one slow gate idles the other slots. A proper slot loop would help
 > ##   throughput; it is not a correctness problem.
+> ## * `test_build_ref_rot.sh` has NO synthetic must-fire control — its
+> ##   extraction and verdict logic are inline and can only be exercised against
+> ##   the real tree. Its pattern was extended twice (14z-97, 14z-128) by
+> ##   hand-verification. Factoring the block behind a root override would let it
+> ##   be controlled properly; small, and it is the one gate about rot that
+> ##   cannot demonstrate it detects rot.
 > ##
 > ## **IF A DOC IS TOUCHED:** census `--check` + `checkdocshape --no-pending` +
 > ## checkdocs + checkskills + `gen_annotations --check` + `gen_gate_index --check`

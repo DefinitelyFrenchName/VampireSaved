@@ -84,14 +84,24 @@ import glob, os, re, sys, zipfile
 # The default-reference idioms this gate is about. BOTH forms, 14z-97:
 #   VAR="${1:-build/name}"      positional
 #   VAR="${VAR:-build/name}"    named env — eleven references, previously unseen
+#   VAR=build/name              PLAIN, no override at all — seven references,
+#                               added 14z-128. Found while triaging
+#                               audit_merged_vec3, whose reference build is a
+#                               bare `REF=build/hui30`: the least overridable
+#                               form was the one form this gate could not see.
+#                               None of the seven is rotted today, which is
+#                               exactly when closing a hole is cheap — the same
+#                               argument gap (1) above was closed on.
 DEF = re.compile(r'^\s*([A-Za-z_][A-Za-z0-9_]*)='
-                 r'"\$\{(?:[0-9]+|[A-Za-z_][A-Za-z0-9_]*):-(build/[a-z0-9_]+)\}"', re.M)
+                 r'(?:"\$\{(?:[0-9]+|[A-Za-z_][A-Za-z0-9_]*):-(?P<sub>build/[a-z0-9_]+)\}"'
+                 r'|"?(?P<plain>build/[a-z0-9_]+)"?\s*(?:#.*)?$)', re.M)
 
 rotted, absent, ok, skipped = [], [], [], []
 for path in sorted(glob.glob("tests/*.sh")):
     src = open(path, errors="replace").read()
     body = "\n".join(l for l in src.splitlines() if not l.lstrip().startswith("#"))
-    for var, bdir in DEF.findall(body):
+    for m in DEF.finditer(body):
+        var = m.group(1); bdir = m.group("sub") or m.group("plain")
         # Only defaults the script reads as a ROMSET. A build referenced for
         # its extract/ or patch/ dir is a different contract.
         if f'${var}/rompath' not in body and f'${{{var}}}/rompath' not in body:
