@@ -116,11 +116,30 @@ else
 fi
 
 echo "== 5. and it exercises the LATE end of the sweep, not just index 0 =="
-if grep -q '("last", n - 1)' tests/audit_qs_voice_wav.sh; then
-    echo "  ok: the control truncates the last voice as well as the first"
+# Asserts the PROPERTY, not a literal (14z-129). This used to grep for
+# `("last", n - 1)`, which was true of the code but wrong about the world:
+# the last INDEX is silent on both legs (voice 80 is RMS 1.0), the checker
+# skips windows where both legs are silent, and the control was therefore
+# truncating silence and could never fire. The control now takes the last
+# SOUNDING index, so the literal changed while the intent did not — and the
+# intent is what this section exists to protect.
+_late_ok=1
+grep -q '("last", LATE)' tests/audit_qs_voice_wav.sh || _late_ok=0
+grep -q 'LATE = sounding\[-1\]' tests/audit_qs_voice_wav.sh || _late_ok=0
+if [ "$_late_ok" = 1 ]; then
+    echo "  ok: the control truncates the last SOUNDING voice, not just the first"
 else
-    fail "the control still only targets index 0 — the window where the"
-    fail "      conversion error is SMALLEST, so it cannot see this class"
+    fail "the control no longer derives a LATE end from the sounding windows —"
+    fail "      index 0 alone is the window where the conversion error is"
+    fail "      SMALLEST, so it cannot see this class"
+fi
+# ... and the late end must STAY late, or this section passes while the
+# control has quietly become a duplicate of the near one (GitHub #85).
+if grep -q 'CONTROL DEGRADED' tests/audit_qs_voice_wav.sh; then
+    echo "  ok: and it refuses a LATE index that has drifted early"
+else
+    fail "nothing stops the derived LATE index drifting to the near end,"
+    fail "      which is the #85 failure this section was written for"
 fi
 
 echo "== 6. the sweep constants still match tests/lua/qs_sweep.lua =="
