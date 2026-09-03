@@ -6,9 +6,8 @@
 ## ROWS; and a LEGACY replay had sat in the corpus FIVE SESSIONS guarded by NOTHING — found,
 ## attributed and closed.** **THE SWEEP COMPLETED: 155 gates in one command — 136 PASS, 19 FAIL,
 ## ZERO SKIP, ZERO TIMEOUT, ZERO MISSING — and NOT ONE red was a defect in the shipped
-## artifact.** Eight closed in-session. Portable tier 65/0/0/0; the STATIC tier
-## was deliberately NOT run — it times out under sweep load and the standing note is never
-## alongside other gates, so it is owed at the next quiet moment.
+## artifact.** Eight closed in-session. **Strict static 129/0/0/0** (126 at the
+## 14z-127 close + the three gates added tonight), run once the machine was quiet.
 
 | | |
 |---|---|

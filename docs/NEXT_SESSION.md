@@ -17,6 +17,11 @@
 > ## defect in the shipped artifact**; eight were closed in-session. Full results:
 > ## `build/emu_sweep_14z128/results.tsv`, per-gate logs beside it.
 > ##
+> ## **Strict static is 129/0/0/0** — 126 at the 14z-127 close plus the three
+> ## gates this session added (`test_emulator_runner`, `test_header_defaults`,
+> ## `test_expectation_provenance`). Run it when the machine is QUIET: under
+> ## sweep load it timed out at two minutes.
+> ##
 > ## **TO RE-RUN IT** (drop a row from results.tsv to re-ask just that gate):
 > ##
 > ##     ROMDIR=... tests/run_all_emulator.sh --lane fbneo --lane mame \
