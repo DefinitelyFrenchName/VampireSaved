@@ -349,9 +349,47 @@ what a triage is looking at, so those are where the thinking time goes.
   that it does** — the two ask different questions (which PCs WRITE a type byte
   vs which indices are DISPATCHED), and answering it is the first step either
   way.
-  **No recommendation without that check**, which is why this is a decision and
-  not a fix. Half a session for (a); an afternoon of reading for the (b)
-  determination. Meanwhile the row stays `release` scope and RED, honestly.
+  **MEASURED 14z-129, and the decision now rests on data rather than on a
+  reading of our own generator ([VSP-166], which this arc produced).**
+  **The (b) determination is DONE: `audit_type_writes` does NOT cover it.**
+  Different BUILD (it runs on single-tenant builds, where the
+  renumbering claim is VACUOUS — the lone tenant IS the first resolver and
+  keeps originals by design), different QUESTION (which PCs WRITE a type byte
+  vs which indices are DISPATCHED), and different SCOPE (`type_writes`
+  explicitly DEFERS the 0x54470 family — "REPORTED per writer class … not
+  gated" — which `dispatch_range` sections 4-6 lock). So "drop as superseded"
+  is not available on the grounds proposed above.
+  **THE RE-TARGET IS TECHNICALLY POSSIBLE — the site exists and carries the
+  index.** The relocated walker's SITE is base+0x18 (its `jsr (A0)` is at
+  +0x1E, and D0 is ZERO there — 8,990 fires, all `D0=0`, because the index has
+  already been consumed to compute A0; probing the jsr would have produced a
+  gate that reports "zero original-range dispatches" forever, a perfect false
+  green). At base+0x18 D0 carries real dispatch indices: 8,990 fires over 10
+  distinct values on `hui/70_hui_mash`.
+  **BUT THE CONTROL CANNOT BE RECONSTITUTED, and that is what decides it.**
+  The gate's verdict control requires a build that DOES dispatch original
+  family indices, so the instrument is proven able to see what the merged legs
+  claim is absent. Measured on the gate's own control replay and pokes:
+  * `build/hui30` (14z-82c, pre-relocation, the gate's REF): thunk `0xfcb70`,
+    **5,862 fires in [0x1C8,0x1E4)** — `D0` = 0x1cc / 0x1d4 / 0x1dc (types
+    115 / 117 / 119). The control is alive there.
+  * a CURRENT-manifest single-tenant huitzil vertical (`08944a7e`) at the
+    equivalent relocated site: **8,990 fires, ZERO in [0x1C8,0x1E4)** — the
+    highest value seen is 0x1b8 (type 110).
+  So on modern builds the phenomenon the control depends on does not occur,
+  and a re-targeted gate would assert "zero originals on merged" with NO
+  liveness control — precisely what [VSP-166] forbids. **WHAT IS NOT
+  ESTABLISHED: WHY** the modern single-tenant build shows no originals (the
+  replay may not spawn those types on it; the renumbering may now apply to the
+  first resolver too; something else). That is the one open question, and it is
+  the difference between "drop, the class is gone" and "drop, we cannot
+  instrument it".
+  **RECOMMENDATION: DROP**, on the measured ground that the control is not
+  reconstitutible — not on the superseded-by-`type_writes` ground, which is
+  false. If the maintainer wants the class kept under watch instead, the
+  honest replacement is not this gate but a rebuilt control leg, and that
+  starts with the WHY above. Meanwhile the row stays `release` scope and RED,
+  honestly.
 
 - **REPLAY `105_legacy_2pwin_auto` — THE SPEC IS MEASURED AND READY TO AUTHOR;
   WHAT IS MISSING IS THE ATTRIBUTION OF TWO FRAMES (14z-128).** The replay
