@@ -11,7 +11,7 @@
 # tests run and "anything red, anything skipped is a hard fail" — a policy that
 # cannot operate over a set nobody enumerates.
 #
-# COLUMNS   gate <TAB> lane <TAB> scope <TAB> args <TAB> note
+# COLUMNS   gate <TAB> lane <TAB> scope <TAB> cadence <TAB> args <TAB> note
 #
 #   gate    the script's basename without .sh
 #   lane    prereq | mame | fbneo | mister
@@ -26,6 +26,29 @@
 #           OUT IS NOT "DELETE" AND NOT "DO NOT RUN": run_all_emulator.sh
 #           --scope all runs these too, and the sweep is how they are kept
 #           honest. It only means they do not gate a release.
+#   cadence romset | bitstream — WHAT MOVING THING THE GATE FOLLOWS, which is
+#           a DIFFERENT question from whether it gates a release.
+#           romset    = its subject moves when the romset moves, so it runs at
+#                       every freeze AND at every release. The default; 158 of
+#                       164 rows.
+#           bitstream = its subject is the CORE/BITSTREAM, which moves on its
+#                       own cadence (the .rbf has not moved since 14z-108 while
+#                       the romset moved many times). Runs at every RELEASE,
+#                       and at a freeze ONLY when the freeze targets MiSTer.
+#           RULED 2026-09-03 by the maintainer, as the same rule already made
+#           for the stock control MRA ("run once per new .rbf (seed / slice /
+#           pin), NOT per romset release" — STATE "DOES THE STOCK CONTROL MRA
+#           STILL HAVE A USE?"). Verbatim: "it should be applied ALWAYS on
+#           release but not for a freeze, UNLESS explicitly in scope, typically
+#           because the changes target MiSTer specifically. If such an
+#           automation is unrealistic, the question should be asked at freeze
+#           if it should be included."  IT IS AUTOMATED: `--freeze`
+#           (= --cadence romset) drops them and NAMES what it dropped, so the
+#           question is asked by the runner rather than remembered.
+#           Only a `mister` lane row may be `bitstream` (enforced).
+#           THE TWO MiSTer EXCEPTIONS ARE DELIBERATE: test_mister_sdram_census
+#           and test_mister_gfxc_fetch measure where THIS ROMSET lands in
+#           SDRAM, so they follow the romset and run at every freeze.
 #   args    the invocation. `-` = the gate's OWN defaults, deliberately: what a
 #           release run would actually hit is what the sweep must measure
 #           ([VSP-95] — a path-named default is a dated assertion with no
@@ -40,176 +63,193 @@
 #             dev-ladder:  the subject is a scratch dev build, not the artifact
 #           for scope=release, free text (a runtime hint, a known trap).
 #
-# THE CLASSIFICATION IS PROPOSED, NOT RULED. Which gates gate a release is the
-# maintainer's call (STATE "Decisions pending"); every `out` row states its
-# reason so the judgement can be checked row by row rather than argued in bulk.
+# THE CLASSIFICATION IS RULED (maintainer, 2026-09-03) — 141 release, 23 out.
+# Every `out` row states its reason so the judgement stays checkable row by row
+# rather than argued in bulk. The three judgement calls the proposal flagged
+# were each ruled, and each is recorded where it applies:
+#   (a) THE TWO #113 GATES -> release, against the letter of the subject
+#       discriminator. "51s is basically nothing for a release and still not
+#       enough cost not to run every time we freeze honestly." Their rows carry
+#       the exception.
+#   (b) THE MiSTer LANE -> release scope KEPT, but split onto the `bitstream`
+#       cadence above, so a release always pays it and a freeze only does when
+#       it targets MiSTer.
+#   (c) THE FOUR dev-ladder GATES -> stay `out`. test_m3a_reproducible is the
+#       real pipeline lock on the released artifact and is already release.
+# TWO THINGS `out` DOES NOT MEAN, both affirmed by the maintainer the same day:
+#   * `out` IS NOT "resolved". audit_hitclass_map_cost is `out` AND is one of
+#     the two DEAD MUST-FIRE CONTROLS — the class that goes green while
+#     asserting nothing ([VSP-19]). Scope and control-health are orthogonal.
+#   * `out` IS NOT "quietly green". audit_region_movability and
+#     audit_phase_mode_cost are red RIGHT NOW with exact diagnoses; their `out`
+#     classing is only what keeps them from blocking.
 #
 # COMPLETENESS IS ENFORCED BOTH WAYS by run_all_emulator.sh: an emulator-tier
 # script with no row is UNREGISTERED, a row whose script is gone is DEAD.
 #
-# gate	lane	scope	args	note
+# gate	lane	scope	cadence	args	note
 
-test_mame_parity	prereq	release	-	THE instrument gate: the pinned MAME source build must reproduce every frozen oracle log before the profile patch goes near it ([CPE-24]). Run it FIRST.
-test_mame_determinism	prereq	release	-	RUNS defaults high; MAME's own run-to-run determinism
-test_attract_determinism	prereq	release	-	M0 acceptance, 3600 frames
-test_decrypt_oracle	prereq	release	-	python decrypt == MAME opcode space
-test_crash_guard	prereq	release	-	clean negative + vec4/vec3 positive controls ([VSP-19])
-test_input_integrity	prereq	release	-	ground truth for the input-integrity check
-test_replay_video_selfcheck	prereq	release	-	ground truth for replay.lua VIDEO_OUT
-test_record_window	prereq	release	-	ground truth for record_window.lua; REC_BUILD default may have rotted
-test_obj_records	prereq	release	-	ground truth for tools/oram_obj_records.py
-test_patch_prg	prereq	release	-	the program patcher round-trips through MAME
-test_suite_dispatch	prereq	release	-	ground truth for the auto-detecting runner's dispatch
-test_movability_liveness	prereq	release	-	a dead emulator must not score as a successful movability run
-test_guard_integrity	prereq	release	-	the crash guard carries the input-integrity assertion (#31)
-test_mask_ranges_reader	prereq	release	-	the MASK_RANGES reader masks exactly the spec (#61)
-test_compare_fields_selfcheck	prereq	release	-	ground truth for the dual-emulator field comparator
-audit_kill_poke_shape	prereq	release	-	GROUND TRUTH FOR RIG AUTHORS, frozen both ways ([VSP-125])
-test_fbneo_smoke	prereq	release	-	FBNeo boots and soaks
-test_fbneo_replay_determinism	prereq	release	-	FBNeo run-to-run determinism (the EEPROM sandbox fix)
-test_fbneo_runner_hygiene	prereq	release	-	a failed FBNeo run must not leave the previous run's artifacts (#12)
-test_fbneo_instruments	prereq	release	-	ground truth for the B5b FBNeo instruments
-test_wide_profile	fbneo	release	-	THE EMULATOR SUPERSET INVARIANT ([VSP-24]): patched binary vs reference on pristine vsavj. Was RED 14z-128 — the only reference binary on this machine predated the harness patch by three days — and is now GREEN: both binaries rebuilt from one tree state (revert -> build -> copy -> re-apply -> build, each half verified by the driver-title string), and the gate PASSES in full. Section 1, the emulator superset invariant itself, ran for the first time in this sweep: 12/12 replays BIT-IDENTICAL in work RAM AND framebuffer between the reference and the patched binary on stock vsavj. Sections 2 (inertness) and 3 (B4 canary) 12/12 too.
-test_dualtrack	fbneo	release	-	dual-track inertness up to select entry ([VSP-25])
-test_fbneo_legacy_oracle	fbneo	release	-	the SAMPLED hacked-vs-vanilla legacy check ([VSP-24]/[VSP-26])
-test_phasec_image	fbneo	release	-	the program extension is genuinely READ. RED 14z-128, TWO stale premises, neither a defect in the build: (1) section 1 compares against a hardcoded donovan-m2c-era stock fingerprint ae701ffb, but the stock twin legitimately MOVES at a freeze whenever a change is not profile-gated ([VSP-94]) — the value it measured, e86e1d04, is exactly the M13 stock twin m5_stock14, so the pipeline is reproducing correctly; (2) section 4 zeroes CPU:$400010 expecting the Phase-C sound table, but wide_ext's first placement is now region x101aca = DONOVAN'S CPU AI SCRIPT BLOCK (14z-111, #99), which replay 12_donovan_vs_cpu never reads because Donovan is the PLAYER there. Fix = a zeroing target that replay demonstrably reads, or a replay where a tenant is CPU-controlled; and section 1 re-pointed at the M13 registration.
-test_hui_fx_flow	fbneo	release	-	the effect-flow attribution gate (14z-68)
-audit_ff0460_writer	fbneo	out	-	momentary: an investigation probe — who writes RAM:$FF0460
-test_mame_wide	mame	release	-	the WIDE profile gate, MAME side (superset invariant + inertness + B4 canary)
-audit_merged_legacy	mame	release	-	does the 3-tenant merged program image perturb LEGACY
-audit_legacy_pairings	mame	release	-	is every legacy replay compared against VANILLA rather than itself ([VSP-36]). RED 14z-128 AND IT IS A REAL HOLE: replay 105_legacy_2pwin_auto entered the corpus at 14z-123 as a LEGACY pairing (Demitri wins) and has NO expectation of any kind in any of the three tenant sets — not a .masked spec, not even a self-frozen .sha1. Five sessions unguarded, unnoticed because this gate is emulator-tier and no runner called it. FIXED AND RE-VERIFIED THE SAME SESSION: basis frozen, both flicker frames attributed and enforced as cases in audit_flicker_attribution, `composite vsavj/masked-v2 2713,5868 889-2491` authored and accepted by run_suite on all three builds — LEGACY-PAIRING COVERAGE: PASS. The FAIL row in a sweep log older than that is the pre-fix state.
-audit_roster_pairings	mame	release	-	EVERY tenant against EVERY character, both sides; ~1 h
-audit_guard_corpus	mame	release	-	the whole replay corpus x 4 legs under the crash guard
-audit_flicker_attribution	mame	release	-	re-derives WHY each frozen flicker frame is there; BUILD default is a 14z-91 build
-audit_mask_window_ff4182	mame	release	-	the third masked window
-audit_merged_vec3	mame	release	-	the merged Huitzil satellite anim-base regression gate. RED in the sweep and it was its OWN PARSER: the A0 extractor required A6 to follow A0 directly, which stopped being true at 14z-109 when A1/A3 were added to the PROBE line. Fixed to parse by field name 14z-128; the gate then PASSES and the 14z-81 defect is confirmed fixed. The FAIL row in a sweep log older than that is the pre-fix state.
-test_inp_corpus	mame	release	-	EVERY tracked hand-played recording, no exception ([VSP-20])
-test_inp_crash_merged_m8_01	mame	release	-	the #99 natural-path capture as a gate
-test_pod_black_foot_palette	mame	release	-	#112's black foot, causally located
-test_m2a_stage4_oracle	mame	release	-	ported Donovan vs NATIVE Donovan on vsav2 (dual-oracle, two-game form)
-test_m2a_stage4_xemu	mame	release	-	MAME/FBNeo agreement at the match-start anchor ([VSP-32])
-audit_mask_window_ff42a2	mame	out	-	momentary: a pre/post attribution INSTRUMENT for a select-palette row move; its operands DESCRIBE A CHANGE UNDER INVESTIGATION (a pre-move and a post-move rompath plus the replays it shifted), so there is no standing pair ([VSP-35]). Bare invocation now SKIPs with that reason instead of dying on a raw ${1:?} shell error (14z-128).
-test_down_flash_vanilla	mame	out	-	romset: the subject is VANILLA vsav's one-frame white-out (#113 ground truth). Kept deliberately — it is what keeps the 'vanilla, not ours' verdict honest.
-test_down_flash_mechanism	mame	out	-	romset: the vanilla mechanism behind #113
-test_m2_repoint	mame	release	-	the M2 slot-repoint mechanism + the superset invariant
-test_select_arrays	mame	release	-	freezes the select-screen record-pointer array
-test_shim_charid	mame	release	-	the init shim can identify which tenant it runs for
-test_tenant_select_records	mame	release	-	a variant-id build carries the tenant's OWN select records
-audit_dispatch_census	mame	release	-	which type indices LEGACY dispatches at the obj_hook sites; frozen observation
-audit_type_dispatch_range	mame	release	-	the dynamic census-gap detector on a MERGED build. RED 14z-128 AND UNRUNNABLE SINCE 14z-91: it scrapes an `obj_hook thunk` address from patch_notes_fragment.md, and 14z-91 DELETED the thunks (the walker is relocated and only caller operands are rewritten). hui30 has 2 such rows, merged1 has ZERO. UPDATE OR DROP — see STATE "Decisions pending".
-audit_type_writes	mame	release	-	which PCs write extended-family type bytes ([VSP-88])
-audit_walker_ghost	mame	release	-	where each walker's jsr (A0) pushes its return address ([VSP-41])
-audit_walker_repoint	mame	release	%MERGED%	does anything still reach the vanilla object-pool walkers. ARGS REQUIRED: it takes <builddir> and has no default, so a bare invocation dies on its usage line (the sweep recorded that as FAIL 0s, 14z-128). The merged build is the right subject — a caller left pointing at the vanilla walker is a wild dispatch for a TENANT type, which only a build carrying tenants can show. VERIFIED 14z-128 with the operand: WALKER REPOINT: PASS — vanilla 54476 and 5e548 never reached (0 hits), the relocated pair reached 1,140 and 39,934 times, and the instrument's own control sees the vanilla walkers on an un-relocated build, so the zeros are real.
-audit_wide_phase_a	mame	out	-	romset: CPS-2 WIDE Phase A measurements on VANILLA vsavj — what the original game does
-audit_objhook_owner_census	mame	out	-	momentary: the 14z-81b vec3-fix DESIGN measurement
-audit_region_movability	mame	out	-	momentary: a design-space measurement (which regions can live in wide_ext). RED 14z-128, and the diagnosis is exact: it INJECTS a `region_space` line into a copy of the manifest, and donovan.toml has carried its OWN since 14z-111 (`x101aca=wide_ext`, twice, lines 56 and 82) — so `_minitoml` correctly refuses the duplicate key and 4 of 6 cases die before measuring. The 2 TENANT cases pass because huitzil/pyron carry none. The 14z-123 tenant path even has the guard (`assert "region_space" not in man, "this probe needs updating"`); the older donovan path never got it. Fix = MERGE into the existing value, never append — dropping `x101aca=wide_ext` would move Donovan's AI block back to hole_a and cascade 56 regions.
-test_m2a_stage1_nullreloc	mame	out	-	dev-ladder: the M2a stage-1 scratch build, not the artifact
-test_m2a_stage2_data	mame	out	-	dev-ladder: the M2a stage-2 scratch build. RED 14z-128: it builds into `build/donovan`, an M2a-era dir the build-dir policy has pruned around, and `pack_build.sh` REFUSES to pack because no program members were copied from its `prg/` — a good refusal, since packing would fingerprint as VANILLA and dispatch to the vanilla expectations. Same root as test_m2a_stage4_oracle's red: the M2a dev dirs are half-gone. Fix = build into a fresh temp dir per run.
-test_m2a_stage3_anim	mame	out	-	dev-ladder: the M2a stage-3 scratch build
-test_m2a_stage4_code	mame	out	-	dev-ladder: the M2a stage-4 scratch build
-test_gfx_menus	mame	release	-	the pixel-level menu/UI regression gate — the only gate that is not RAM-basis ([VSP-42])
-test_wide_render_content	mame	release	-	the WIDE track SERVES the ported tiles, in decoded gfx memory
-test_merged_render_content	mame	release	-	the merged build serves all THREE tenants' tiles
-test_wheel_bank5	mame	release	-	the select wheel serves from group C bank 5
-test_version_string	mame	release	-	the in-game version mark, the naked-eye A/B tell
-audit_empty_tiles	mame	release	%MERGED%	does the build DRAW any blank-tile sprite. ARGS REQUIRED: it takes <builddir> with no default, so a bare invocation dies on its usage line (FAIL 0s in the sweep, 14z-128). The merged build is the subject; its DEFAULT replays are the Huitzil DF / fx / grenade surfaces with the pokes forcing 0x10. [VSP-161] still stands for a NEW effect — the defaults never fire it and would pass vacuously, so a new effect is checked by passing ITS OWN replay, not by this standing row. VERIFIED 14z-128 with the operand: PASS on all three surfaces — every group-C sprite resolves to real art.
-audit_clone_beam_lines	mame	release	-	the #109 lock: DF clone-mode draws the beam-line sprites
-audit_effect_class_rows	mame	release	-	the three deadness measurements the beam port rests on ([VSP-22])
-audit_grenade_ground_tiles	mame	release	-	Huitzil's 214+LP ground explosion draws native vs2 art
-test_beam_anim_walk	mame	release	-	does the build WALK the beam anim nodes; default builddir is a 14z-71 solo build
-test_beam_variants	mame	release	-	the beam variant + gfx-readiness gate; same default
-test_anim_node_walk	mame	release	-	the anim-node decoder as an INSTRUMENT, checked against the emulator
-test_hitbox_encoding	mame	release	-	the hitbox encoding and attack record are what the engine uses
-test_move_naming	mame	release	-	our tenants' chain ids, named on native vs2 as the oracle
-test_reactions	mame	release	-	which chains a TENANT runs as the victim, per reaction class
-test_projectile_census	mame	release	-	which projectile-pool types each TENANT's moves spawn
-test_projectile_params	mame	release	-	the projectile parameter tables, decoded and measured on the live spawn
-audit_df_startup_invuln	mame	release	-	the DF startup window, armed per character — the TENANTS arm their own
-audit_df_accumulator	mame	out	-	romset: +0x161 is SASQUATCH's DF armor — a vanilla-character engine fact
-audit_df_dead_family	mame	out	-	romset: the VS-style DF family is dead in NATIVE vs2
-audit_front_comparator	mame	out	-	romset: what $FF8127 is, on vanilla vsavj — no build dir
-test_advancing_guard	mame	out	-	romset: the advancing guard measured on native vs2 and vsavj
-test_killshread_es	mame	out	-	romset: the ES stance change measured on NATIVE vs2
-test_tick_durations	mame	out	-	romset: vanilla frame data in engine ticks (the community cross-check's arbiter)
-test_vanilla_frame_join	mame	out	-	romset: which chain each VANILLA character's standing normals enter, on vsavj
-test_don_sword	mame	release	-	sword-swing behaviour (frozen anim node)
-test_don_accent	mame	release	-	weapon-accent steadiness + the Victor-accent legacy guard
-test_don_colors	mame	release	-	kick colours + mirror rows + the select sword
-test_don_reactions	mame	release	-	the 421P gameplay lock (multi-hit, no KD)
-test_don_column	mame	release	-	the column-KO crash gate
-test_don_sound	mame	release	-	the sound-ring gate: no vsavj MUSIC-range id ([VSP-44])
-test_don_immortal_native	mame	release	-	421+P against NATIVE vs2, measured in-run; maintainer-ruled mandatory at release
-test_don_throw_mirror	mame	release	-	the base-slot mirror-victim fix
-test_m2a_flavor_selector	mame	release	-	the Start-hold flavor selector
-test_m2b_scroll3	mame	release	-	scroll3-vs-OBJ-band exclusivity
-test_m2b_stage6	mame	release	-	the M2b graphics build gate: build + static verify + guarded soaks + the MASKED LEGACY GATE. RED 14z-128 for ONE reason, shared with test_phasec_image section 1: it builds a stage-6 image from the CURRENT manifests, which now produce the M13 generation (fingerprint e86e1d04 = the M13 stock twin m5_stock14), and M13 IS NOT REGISTERED — so the fingerprint dispatch finds no expectation set. Everything else in it passed: five guarded soaks END-clean, three pixel frames identical. REGISTERING M13 CLEARS THIS AND test_phasec_image TOGETHER.
-test_select_wheel	mame	release	-	the select-cursor mechanism, decoded and measured — a §4 rule lock that runs on every build
-test_oboro_select	mame	release	-	the Oboro select hook (W1)
-test_random_select_tenants	mame	release	-	random select includes the tenants
-test_shadow_tenant	mame	release	-	Shadow morphing into a TENANT
-test_tenant_hud	mame	release	-	the variant-id HUD
-test_tenant_winpal	mame	release	-	the variant-id win-screen palette
-test_tenant_pairings	mame	release	-	two ported characters in one match, every ordering
-test_ladder_tenant_vs_palette	mame	release	-	the arcade-ladder VS palette pool, measured on screen for a tenant
-test_hui_boot	mame	release	-	the Huitzil stage-4 BOOT gate — run after ANY site_thunk addition ([VSP-87])
-test_hui_ladder	mame	release	-	the Huitzil stage 1-3 ladder
-test_hui_soak	mame	release	-	the Huitzil stage-4 soak
-test_hui_air	mame	release	-	float + air dash
-test_hui_ex	mame	release	-	the EX-move gate
-test_hui_grab	mame	release	-	Circuit Scrapper
-test_hui_grab_victim	mame	release	-	the grab-victim placement A/B
-test_hui_walk	mame	release	-	the velocity port
-test_hui_pairs	mame	release	-	Reflect Wall guard-cancel + pair-press; run on ANY change that routes objects ([VSP-85])
-test_hui_oracle	mame	release	-	Huitzil vs2-as-oracle behaviour. RED 14z-128 ("no dump files") because its default was build/hui4 — 19 members, vsw.* without vsw.z01, pre-WIDE-v1.1 and unbootable on current binaries, a rot test_build_ref_rot could not see until the same session. Re-pointed to build/hui52 and it PASSES.
-test_hui_df_style	mame	release	-	Dark Force style, ours vs NATIVE
-test_hui_electrocute	mame	release	-	Phobos as the electrocute victim, ours vs native
-test_pyron_ladder	mame	release	-	the Pyron stage 1-3 ladder. RED 14z-128, same family as test_pyron_soak: it builds its own stage images and the boot probe trips the guard before reaching frame 2600, so the id-hold and load verdicts are NOT statements about the load path (the gate says so itself). Triage the two together.
-test_pyron_soak	mame	release	-	the Pyron stage-4 chaos soak. RED 14z-128 and it is a CRASH — `CRASH 3020 vec4 PC 000000` on the stage-4 image it builds itself (a01c586a). CROSS-CHECK THAT BOUNDS IT: audit_guard_corpus PASSED the same sweep (1727s, the whole corpus x 4 legs under the guard on the MERGED build), so the shipped artifact is not implicated. The soak was clean at 14z-67. Untriaged: needs archaeology, not a 4am guess — and note the select flow it forces id 0x11 through has changed three times since (Oboro 14z-105, wheel separation 14z-115, random select 14z-117).
-test_pyron_cosmo	mame	release	-	the Cosmo Disruption crash gate
-test_pyron_blink	mame	release	-	the sprite/HUD blink gate
-test_pyron_medallion_2p	mame	release	-	the P2-hover half of medallion palette stability
-audit_continue_switch	mame	release	-	the #99 continue+switch lock. RED 14z-128 and SELF-DIAGNOSING: "Donovan-vs-CPU-Phobos not reached — the frozen trajectory moved; re-measure". That is [VSP-132] exactly — a 1P-arcade rig is pinned to the ARCADE DRAW, and any timing change re-rolls its opponent. Re-measure the trajectory; do not re-freeze the verdict.
-audit_don_vs_cpu	mame	release	-	the deterministic Donovan-vs-CPU pairing (#111) — the coverage gap #99 fell through
-audit_don_grab_pose	mame	release	-	the #104 lock: a legacy grab holding a TENANT victim
-audit_don_ko_writer	mame	release	-	the #103 root-cause lock. The header read as if EXPECT_DEFECT still defaulted to 1; MEASURED 14z-128 — the code default was flipped to 0 at the 14z-99 window and only the header was stale (corrected).
-audit_don_lilith_ko	mame	release	-	the #103 stall repro. Same stale-header shape as audit_don_ko_writer; the code default is 0. Its BUILD default names build/m3b_merged11, which no longer exists.
-audit_win_pal_auto	mame	release	-	the #105 lock. Same stale-header shape; the code default is 0 (flipped at 14z-99).
-audit_df_framework	mame	release	-	the ruled DF table: cost 1 stock, durations 360/360/377/360
-audit_df_gold	mame	release	-	Phobos' DF uploads HIS gold block; Bulleta's does not leak it
-audit_down_attack	mame	release	-	hitting a downed opponent, both directions per tenant
-audit_tech_roll	mame	release	-	the tech roll, both directions per tenant
-audit_throw_tech	mame	release	-	the throw tech-hit, both directions per tenant
-audit_tenant_throws	mame	release	-	normal throws, both directions per tenant
-audit_tenant_downwin	mame	release	-	the life-marker transition, every tenant as winner AND victim
-audit_tenant_timeout	mame	release	-	the timeout judge, per tenant
-audit_pursuit_leap	mame	release	-	the leaping pursuit, per tenant both directions
-audit_edge_cases	mame	release	-	deliberate state-transition edges per tenant ([VSP-33])
-audit_stage_sweep	mame	release	-	every tenant on every stage
-audit_projectile_clash	mame	release	-	the pool-vs-pool contact surface, frozen at NATIVE PARITY
-audit_pool_free_byte	mame	release	-	the owner-tag byte (+0x7F), both pools
-audit_tripwire_reach	mame	release	-	do any planted tripwires fire in extended play (~15 min)
-audit_fg_damage	mame	release	-	Phobos' EX Final Guardian damage, frozen
-audit_fg_parity	mame	release	-	the same, against the frozen native staircase
-audit_trap_parity	mame	release	-	the Plasma Trap SOUND parity A/B
-audit_trap_shock	mame	release	-	the Plasma Trap dome inflicts SHOCK
-audit_trap_sound	mame	release	-	the MK Plasma Trap fires, ring live
-audit_hui_grunt	mame	release	-	the electrocute-grunt A/B over five electrocutions
-audit_pyron_ring	mame	release	-	Pyron's merged-vs-solo sound-ring inventory
-audit_qs_voice_batch	mame	release	-	the voice-batch keyon A/B
-audit_qs_voice_wav	mame	release	-	the ear-level voice A/B (-wavwrite). RED 14z-128 on its OWN MUST-FIRE CONTROL, not on the audio: "CONTROL DEAD (last, voice 80): truncated window not flagged" — the FIRST-voice control fires, the LAST-voice one does not, so it is a boundary case in the checker (the last window ends at the log's end, where a truncation may be indistinguishable). The measurement it did produce is clean: 74 sounding windows, 0 suspects. The gate refusing to give a verdict while a control is dead is [VSP-19] working; fix the checker's last-window edge, do not relax the control.
-audit_voice_borrow	mame	release	-	the voice-class borrow mechanism
-audit_continue_ladder	mame	out	-	momentary: the #102 discriminator (does a continue reset the ladder mask ON VANILLA) — the question was answered 14z-98
-audit_hitclass_map_cost	mame	out	-	momentary: what the 14z-82b hit-class map extension fixes and costs. RED 14z-128 on a DEAD MUST-FIRE CONTROL: "the soak did NOT crash on the no-thunk twin, so an END-clean run on the fix build proves nothing about the thunk". The gate says what to do and what NOT to do — section 4 diagnoses why with the map probe, and the control must not be re-pointed at a new address until it has. Second dead control of the sweep (with audit_qs_voice_wav).
-audit_phase_mode_cost	mame	out	-	momentary: what Phobos' phase-gated latch costs Donovan. RED 14z-128 with an ALARMING-LOOKING but hollow symptom — "phase mode reached legacy content", 8,785 of 9,321 frames differing from frame 469. It compares a freshly built phase-mode Donovan's LEGACY replays against `REF_BUILD=build/m5_wide`, which fingerprints 4b7d0dc7 = donovan-m3a, THE 14z-64 FREEZE, and whose registry row is COMMENTED OUT. Legacy behaviour has legitimately moved many times since (the 14z-91 walker relocation rewrote 23 caller operands; #104 repointed 17 capture rows; #99 unparked AI rows), so ~90% divergence says nothing about the latch. The reference must be BUILT FROM CURRENT MANIFESTS WITHOUT THE PHASE FLAG — a freeze 25 generations old cannot answer what this latch costs. Diagnosed, not re-run.
-audit_ladder_selector	mame	out	-	romset: the vanilla arcade-ladder selector, made rerunnable (14z-95)
-audit_id_writers	mame	out	-	romset: which character ids VANILLA ever assigns
-audit_palette_seq_ids	mame	out	-	romset: which palette-seq ids LEGACY ever requests ([VSP-151])
-test_mister_wide_inert	mister	release	-	THE FPGA SUPERSET INVARIANT, measured directly ([MSV-27]); ~22 min
-test_mister_sim_anchor	mister	release	-	the MiSTer leg of the §4 dual-emulator oracle
-test_mister_tenant_oracle	mister	release	-	the §4 dual-emulator oracle on TENANT content
-test_mister_obj_oracle	mister	release	-	cross-implementation agreement on a VIDEO-DETERMINING surface; ~65 min
-test_mister_gfxc_fetch	mister	release	--rpl tests/replays/36_pick_tenant_cell.rpl --frames 4400	the core FETCHES a tenant tile. THE ARGS ARE LOAD-BEARING: the gate's own default replay ends at the select screen, so a bare run is red by construction. These are the operands measured PASS in full at 14z-108 (~93 min a leg, two legs).
-test_mister_prg_window	mister	release	-	slice D4's own evidence: the 68k and CPU:$400000-$5FFFFF; ~2 x 40 min
-test_mister_qsound_ext	mister	release	-	the QSound extension is fetched on the core
-test_mister_sdram_census	mister	release	-	the WIDE romset lands in SDRAM exactly where mister_map.md places it
-audit_sdram_bank_load	mister	out	-	romset: stock vsavj on the STOCK jtcps2 core — the D2 repack's GO measurement, not a verdict on the shipped core
+test_mame_parity	prereq	release	romset	-	THE instrument gate: the pinned MAME source build must reproduce every frozen oracle log before the profile patch goes near it ([CPE-24]). Run it FIRST.
+test_mame_determinism	prereq	release	romset	-	RUNS defaults high; MAME's own run-to-run determinism
+test_attract_determinism	prereq	release	romset	-	M0 acceptance, 3600 frames
+test_decrypt_oracle	prereq	release	romset	-	python decrypt == MAME opcode space
+test_crash_guard	prereq	release	romset	-	clean negative + vec4/vec3 positive controls ([VSP-19])
+test_input_integrity	prereq	release	romset	-	ground truth for the input-integrity check
+test_replay_video_selfcheck	prereq	release	romset	-	ground truth for replay.lua VIDEO_OUT
+test_record_window	prereq	release	romset	-	ground truth for record_window.lua; REC_BUILD default may have rotted
+test_obj_records	prereq	release	romset	-	ground truth for tools/oram_obj_records.py
+test_patch_prg	prereq	release	romset	-	the program patcher round-trips through MAME
+test_suite_dispatch	prereq	release	romset	-	ground truth for the auto-detecting runner's dispatch
+test_movability_liveness	prereq	release	romset	-	a dead emulator must not score as a successful movability run
+test_guard_integrity	prereq	release	romset	-	the crash guard carries the input-integrity assertion (#31)
+test_mask_ranges_reader	prereq	release	romset	-	the MASK_RANGES reader masks exactly the spec (#61)
+test_compare_fields_selfcheck	prereq	release	romset	-	ground truth for the dual-emulator field comparator
+audit_kill_poke_shape	prereq	release	romset	-	GROUND TRUTH FOR RIG AUTHORS, frozen both ways ([VSP-125])
+test_fbneo_smoke	prereq	release	romset	-	FBNeo boots and soaks
+test_fbneo_replay_determinism	prereq	release	romset	-	FBNeo run-to-run determinism (the EEPROM sandbox fix)
+test_fbneo_runner_hygiene	prereq	release	romset	-	a failed FBNeo run must not leave the previous run's artifacts (#12)
+test_fbneo_instruments	prereq	release	romset	-	ground truth for the B5b FBNeo instruments
+test_wide_profile	fbneo	release	romset	-	THE EMULATOR SUPERSET INVARIANT ([VSP-24]): patched binary vs reference on pristine vsavj. Was RED 14z-128 — the only reference binary on this machine predated the harness patch by three days — and is now GREEN: both binaries rebuilt from one tree state (revert -> build -> copy -> re-apply -> build, each half verified by the driver-title string), and the gate PASSES in full. Section 1, the emulator superset invariant itself, ran for the first time in this sweep: 12/12 replays BIT-IDENTICAL in work RAM AND framebuffer between the reference and the patched binary on stock vsavj. Sections 2 (inertness) and 3 (B4 canary) 12/12 too.
+test_dualtrack	fbneo	release	romset	-	dual-track inertness up to select entry ([VSP-25])
+test_fbneo_legacy_oracle	fbneo	release	romset	-	the SAMPLED hacked-vs-vanilla legacy check ([VSP-24]/[VSP-26])
+test_phasec_image	fbneo	release	romset	-	the program extension is genuinely READ. RED 14z-128, TWO stale premises, neither a defect in the build: (1) section 1 compares against a hardcoded donovan-m2c-era stock fingerprint ae701ffb, but the stock twin legitimately MOVES at a freeze whenever a change is not profile-gated ([VSP-94]) — the value it measured, e86e1d04, is exactly the M13 stock twin m5_stock14, so the pipeline is reproducing correctly; (2) section 4 zeroes CPU:$400010 expecting the Phase-C sound table, but wide_ext's first placement is now region x101aca = DONOVAN'S CPU AI SCRIPT BLOCK (14z-111, #99), which replay 12_donovan_vs_cpu never reads because Donovan is the PLAYER there. Fix = a zeroing target that replay demonstrably reads, or a replay where a tenant is CPU-controlled; and section 1 re-pointed at the M13 registration.
+test_hui_fx_flow	fbneo	release	romset	-	the effect-flow attribution gate (14z-68)
+audit_ff0460_writer	fbneo	out	romset	-	momentary: an investigation probe — who writes RAM:$FF0460
+test_mame_wide	mame	release	romset	-	the WIDE profile gate, MAME side (superset invariant + inertness + B4 canary)
+audit_merged_legacy	mame	release	romset	-	does the 3-tenant merged program image perturb LEGACY
+audit_legacy_pairings	mame	release	romset	-	is every legacy replay compared against VANILLA rather than itself ([VSP-36]). RED 14z-128 AND IT IS A REAL HOLE: replay 105_legacy_2pwin_auto entered the corpus at 14z-123 as a LEGACY pairing (Demitri wins) and has NO expectation of any kind in any of the three tenant sets — not a .masked spec, not even a self-frozen .sha1. Five sessions unguarded, unnoticed because this gate is emulator-tier and no runner called it. FIXED AND RE-VERIFIED THE SAME SESSION: basis frozen, both flicker frames attributed and enforced as cases in audit_flicker_attribution, `composite vsavj/masked-v2 2713,5868 889-2491` authored and accepted by run_suite on all three builds — LEGACY-PAIRING COVERAGE: PASS. The FAIL row in a sweep log older than that is the pre-fix state.
+audit_roster_pairings	mame	release	romset	-	EVERY tenant against EVERY character, both sides; ~1 h
+audit_guard_corpus	mame	release	romset	-	the whole replay corpus x 4 legs under the crash guard
+audit_flicker_attribution	mame	release	romset	-	re-derives WHY each frozen flicker frame is there; BUILD default is a 14z-91 build
+audit_mask_window_ff4182	mame	release	romset	-	the third masked window
+audit_merged_vec3	mame	release	romset	-	the merged Huitzil satellite anim-base regression gate. RED in the sweep and it was its OWN PARSER: the A0 extractor required A6 to follow A0 directly, which stopped being true at 14z-109 when A1/A3 were added to the PROBE line. Fixed to parse by field name 14z-128; the gate then PASSES and the 14z-81 defect is confirmed fixed. The FAIL row in a sweep log older than that is the pre-fix state.
+test_inp_corpus	mame	release	romset	-	EVERY tracked hand-played recording, no exception ([VSP-20])
+test_inp_crash_merged_m8_01	mame	release	romset	-	the #99 natural-path capture as a gate
+test_pod_black_foot_palette	mame	release	romset	-	#112's black foot, causally located
+test_m2a_stage4_oracle	mame	release	romset	-	ported Donovan vs NATIVE Donovan on vsav2 (dual-oracle, two-game form)
+test_m2a_stage4_xemu	mame	release	romset	-	MAME/FBNeo agreement at the match-start anchor ([VSP-32])
+audit_mask_window_ff42a2	mame	out	romset	-	momentary: a pre/post attribution INSTRUMENT for a select-palette row move; its operands DESCRIBE A CHANGE UNDER INVESTIGATION (a pre-move and a post-move rompath plus the replays it shifted), so there is no standing pair ([VSP-35]). Bare invocation now SKIPs with that reason instead of dying on a raw ${1:?} shell error (14z-128).
+test_down_flash_vanilla	mame	release	romset	-	THE RULED EXCEPTION to the subject discriminator (maintainer, 2026-09-03): its SUBJECT is vanilla vsav's one-frame white-out, but what it protects is the 'vanilla, not ours' verdict on #113 — a closed claim about OUR build that would silently reopen if this went red. 23 s.
+test_down_flash_mechanism	mame	release	romset	-	the vanilla mechanism behind #113 — release-scope with test_down_flash_vanilla by the same 2026-09-03 ruling. 28 s.
+test_m2_repoint	mame	release	romset	-	the M2 slot-repoint mechanism + the superset invariant
+test_select_arrays	mame	release	romset	-	freezes the select-screen record-pointer array
+test_shim_charid	mame	release	romset	-	the init shim can identify which tenant it runs for
+test_tenant_select_records	mame	release	romset	-	a variant-id build carries the tenant's OWN select records
+audit_dispatch_census	mame	release	romset	-	which type indices LEGACY dispatches at the obj_hook sites; frozen observation
+audit_type_dispatch_range	mame	release	romset	-	the dynamic census-gap detector on a MERGED build. RED 14z-128 AND UNRUNNABLE SINCE 14z-91: it scrapes an `obj_hook thunk` address from patch_notes_fragment.md, and 14z-91 DELETED the thunks (the walker is relocated and only caller operands are rewritten). hui30 has 2 such rows, merged1 has ZERO. UPDATE OR DROP — see STATE "Decisions pending".
+audit_type_writes	mame	release	romset	-	which PCs write extended-family type bytes ([VSP-88])
+audit_walker_ghost	mame	release	romset	-	where each walker's jsr (A0) pushes its return address ([VSP-41])
+audit_walker_repoint	mame	release	romset	%MERGED%	does anything still reach the vanilla object-pool walkers. ARGS REQUIRED: it takes <builddir> and has no default, so a bare invocation dies on its usage line (the sweep recorded that as FAIL 0s, 14z-128). The merged build is the right subject — a caller left pointing at the vanilla walker is a wild dispatch for a TENANT type, which only a build carrying tenants can show. VERIFIED 14z-128 with the operand: WALKER REPOINT: PASS — vanilla 54476 and 5e548 never reached (0 hits), the relocated pair reached 1,140 and 39,934 times, and the instrument's own control sees the vanilla walkers on an un-relocated build, so the zeros are real.
+audit_wide_phase_a	mame	out	romset	-	romset: CPS-2 WIDE Phase A measurements on VANILLA vsavj — what the original game does
+audit_objhook_owner_census	mame	out	romset	-	momentary: the 14z-81b vec3-fix DESIGN measurement
+audit_region_movability	mame	out	romset	-	momentary: a design-space measurement (which regions can live in wide_ext). RED 14z-128, and the diagnosis is exact: it INJECTS a `region_space` line into a copy of the manifest, and donovan.toml has carried its OWN since 14z-111 (`x101aca=wide_ext`, twice, lines 56 and 82) — so `_minitoml` correctly refuses the duplicate key and 4 of 6 cases die before measuring. The 2 TENANT cases pass because huitzil/pyron carry none. The 14z-123 tenant path even has the guard (`assert "region_space" not in man, "this probe needs updating"`); the older donovan path never got it. Fix = MERGE into the existing value, never append — dropping `x101aca=wide_ext` would move Donovan's AI block back to hole_a and cascade 56 regions.
+test_m2a_stage1_nullreloc	mame	out	romset	-	dev-ladder: the M2a stage-1 scratch build, not the artifact
+test_m2a_stage2_data	mame	out	romset	-	dev-ladder: the M2a stage-2 scratch build. RED 14z-128: it builds into `build/donovan`, an M2a-era dir the build-dir policy has pruned around, and `pack_build.sh` REFUSES to pack because no program members were copied from its `prg/` — a good refusal, since packing would fingerprint as VANILLA and dispatch to the vanilla expectations. Same root as test_m2a_stage4_oracle's red: the M2a dev dirs are half-gone. Fix = build into a fresh temp dir per run.
+test_m2a_stage3_anim	mame	out	romset	-	dev-ladder: the M2a stage-3 scratch build
+test_m2a_stage4_code	mame	out	romset	-	dev-ladder: the M2a stage-4 scratch build
+test_gfx_menus	mame	release	romset	-	the pixel-level menu/UI regression gate — the only gate that is not RAM-basis ([VSP-42])
+test_wide_render_content	mame	release	romset	-	the WIDE track SERVES the ported tiles, in decoded gfx memory
+test_merged_render_content	mame	release	romset	-	the merged build serves all THREE tenants' tiles
+test_wheel_bank5	mame	release	romset	-	the select wheel serves from group C bank 5
+test_version_string	mame	release	romset	-	the in-game version mark, the naked-eye A/B tell
+audit_empty_tiles	mame	release	romset	%MERGED%	does the build DRAW any blank-tile sprite. ARGS REQUIRED: it takes <builddir> with no default, so a bare invocation dies on its usage line (FAIL 0s in the sweep, 14z-128). The merged build is the subject; its DEFAULT replays are the Huitzil DF / fx / grenade surfaces with the pokes forcing 0x10. [VSP-161] still stands for a NEW effect — the defaults never fire it and would pass vacuously, so a new effect is checked by passing ITS OWN replay, not by this standing row. VERIFIED 14z-128 with the operand: PASS on all three surfaces — every group-C sprite resolves to real art.
+audit_clone_beam_lines	mame	release	romset	-	the #109 lock: DF clone-mode draws the beam-line sprites
+audit_effect_class_rows	mame	release	romset	-	the three deadness measurements the beam port rests on ([VSP-22])
+audit_grenade_ground_tiles	mame	release	romset	-	Huitzil's 214+LP ground explosion draws native vs2 art
+test_beam_anim_walk	mame	release	romset	-	does the build WALK the beam anim nodes; default builddir is a 14z-71 solo build
+test_beam_variants	mame	release	romset	-	the beam variant + gfx-readiness gate; same default
+test_anim_node_walk	mame	release	romset	-	the anim-node decoder as an INSTRUMENT, checked against the emulator
+test_hitbox_encoding	mame	release	romset	-	the hitbox encoding and attack record are what the engine uses
+test_move_naming	mame	release	romset	-	our tenants' chain ids, named on native vs2 as the oracle
+test_reactions	mame	release	romset	-	which chains a TENANT runs as the victim, per reaction class
+test_projectile_census	mame	release	romset	-	which projectile-pool types each TENANT's moves spawn
+test_projectile_params	mame	release	romset	-	the projectile parameter tables, decoded and measured on the live spawn
+audit_df_startup_invuln	mame	release	romset	-	the DF startup window, armed per character — the TENANTS arm their own
+audit_df_accumulator	mame	out	romset	-	romset: +0x161 is SASQUATCH's DF armor — a vanilla-character engine fact
+audit_df_dead_family	mame	out	romset	-	romset: the VS-style DF family is dead in NATIVE vs2
+audit_front_comparator	mame	out	romset	-	romset: what $FF8127 is, on vanilla vsavj — no build dir
+test_advancing_guard	mame	out	romset	-	romset: the advancing guard measured on native vs2 and vsavj
+test_killshread_es	mame	out	romset	-	romset: the ES stance change measured on NATIVE vs2
+test_tick_durations	mame	out	romset	-	romset: vanilla frame data in engine ticks (the community cross-check's arbiter)
+test_vanilla_frame_join	mame	out	romset	-	romset: which chain each VANILLA character's standing normals enter, on vsavj
+test_don_sword	mame	release	romset	-	sword-swing behaviour (frozen anim node)
+test_don_accent	mame	release	romset	-	weapon-accent steadiness + the Victor-accent legacy guard
+test_don_colors	mame	release	romset	-	kick colours + mirror rows + the select sword
+test_don_reactions	mame	release	romset	-	the 421P gameplay lock (multi-hit, no KD)
+test_don_column	mame	release	romset	-	the column-KO crash gate
+test_don_sound	mame	release	romset	-	the sound-ring gate: no vsavj MUSIC-range id ([VSP-44])
+test_don_immortal_native	mame	release	romset	-	421+P against NATIVE vs2, measured in-run; maintainer-ruled mandatory at release
+test_don_throw_mirror	mame	release	romset	-	the base-slot mirror-victim fix
+test_m2a_flavor_selector	mame	release	romset	-	the Start-hold flavor selector
+test_m2b_scroll3	mame	release	romset	-	scroll3-vs-OBJ-band exclusivity
+test_m2b_stage6	mame	release	romset	-	the M2b graphics build gate: build + static verify + guarded soaks + the MASKED LEGACY GATE. RED 14z-128 for ONE reason, shared with test_phasec_image section 1: it builds a stage-6 image from the CURRENT manifests, which now produce the M13 generation (fingerprint e86e1d04 = the M13 stock twin m5_stock14), and M13 IS NOT REGISTERED — so the fingerprint dispatch finds no expectation set. Everything else in it passed: five guarded soaks END-clean, three pixel frames identical. REGISTERING M13 CLEARS THIS AND test_phasec_image TOGETHER.
+test_select_wheel	mame	release	romset	-	the select-cursor mechanism, decoded and measured — a §4 rule lock that runs on every build
+test_oboro_select	mame	release	romset	-	the Oboro select hook (W1)
+test_random_select_tenants	mame	release	romset	-	random select includes the tenants
+test_shadow_tenant	mame	release	romset	-	Shadow morphing into a TENANT
+test_tenant_hud	mame	release	romset	-	the variant-id HUD
+test_tenant_winpal	mame	release	romset	-	the variant-id win-screen palette
+test_tenant_pairings	mame	release	romset	-	two ported characters in one match, every ordering
+test_ladder_tenant_vs_palette	mame	release	romset	-	the arcade-ladder VS palette pool, measured on screen for a tenant
+test_hui_boot	mame	release	romset	-	the Huitzil stage-4 BOOT gate — run after ANY site_thunk addition ([VSP-87])
+test_hui_ladder	mame	release	romset	-	the Huitzil stage 1-3 ladder
+test_hui_soak	mame	release	romset	-	the Huitzil stage-4 soak
+test_hui_air	mame	release	romset	-	float + air dash
+test_hui_ex	mame	release	romset	-	the EX-move gate
+test_hui_grab	mame	release	romset	-	Circuit Scrapper
+test_hui_grab_victim	mame	release	romset	-	the grab-victim placement A/B
+test_hui_walk	mame	release	romset	-	the velocity port
+test_hui_pairs	mame	release	romset	-	Reflect Wall guard-cancel + pair-press; run on ANY change that routes objects ([VSP-85])
+test_hui_oracle	mame	release	romset	-	Huitzil vs2-as-oracle behaviour. RED 14z-128 ("no dump files") because its default was build/hui4 — 19 members, vsw.* without vsw.z01, pre-WIDE-v1.1 and unbootable on current binaries, a rot test_build_ref_rot could not see until the same session. Re-pointed to build/hui52 and it PASSES.
+test_hui_df_style	mame	release	romset	-	Dark Force style, ours vs NATIVE
+test_hui_electrocute	mame	release	romset	-	Phobos as the electrocute victim, ours vs native
+test_pyron_ladder	mame	release	romset	-	the Pyron stage 1-3 ladder. RED 14z-128, same family as test_pyron_soak: it builds its own stage images and the boot probe trips the guard before reaching frame 2600, so the id-hold and load verdicts are NOT statements about the load path (the gate says so itself). Triage the two together.
+test_pyron_soak	mame	release	romset	-	the Pyron stage-4 chaos soak. RED 14z-128 and it is a CRASH — `CRASH 3020 vec4 PC 000000` on the stage-4 image it builds itself (a01c586a). CROSS-CHECK THAT BOUNDS IT: audit_guard_corpus PASSED the same sweep (1727s, the whole corpus x 4 legs under the guard on the MERGED build), so the shipped artifact is not implicated. The soak was clean at 14z-67. Untriaged: needs archaeology, not a 4am guess — and note the select flow it forces id 0x11 through has changed three times since (Oboro 14z-105, wheel separation 14z-115, random select 14z-117).
+test_pyron_cosmo	mame	release	romset	-	the Cosmo Disruption crash gate
+test_pyron_blink	mame	release	romset	-	the sprite/HUD blink gate
+test_pyron_medallion_2p	mame	release	romset	-	the P2-hover half of medallion palette stability
+audit_continue_switch	mame	release	romset	-	the #99 continue+switch lock. RED 14z-128 and SELF-DIAGNOSING: "Donovan-vs-CPU-Phobos not reached — the frozen trajectory moved; re-measure". That is [VSP-132] exactly — a 1P-arcade rig is pinned to the ARCADE DRAW, and any timing change re-rolls its opponent. Re-measure the trajectory; do not re-freeze the verdict.
+audit_don_vs_cpu	mame	release	romset	-	the deterministic Donovan-vs-CPU pairing (#111) — the coverage gap #99 fell through
+audit_don_grab_pose	mame	release	romset	-	the #104 lock: a legacy grab holding a TENANT victim
+audit_don_ko_writer	mame	release	romset	-	the #103 root-cause lock. The header read as if EXPECT_DEFECT still defaulted to 1; MEASURED 14z-128 — the code default was flipped to 0 at the 14z-99 window and only the header was stale (corrected).
+audit_don_lilith_ko	mame	release	romset	-	the #103 stall repro. Same stale-header shape as audit_don_ko_writer; the code default is 0. Its BUILD default names build/m3b_merged11, which no longer exists.
+audit_win_pal_auto	mame	release	romset	-	the #105 lock. Same stale-header shape; the code default is 0 (flipped at 14z-99).
+audit_df_framework	mame	release	romset	-	the ruled DF table: cost 1 stock, durations 360/360/377/360
+audit_df_gold	mame	release	romset	-	Phobos' DF uploads HIS gold block; Bulleta's does not leak it
+audit_down_attack	mame	release	romset	-	hitting a downed opponent, both directions per tenant
+audit_tech_roll	mame	release	romset	-	the tech roll, both directions per tenant
+audit_throw_tech	mame	release	romset	-	the throw tech-hit, both directions per tenant
+audit_tenant_throws	mame	release	romset	-	normal throws, both directions per tenant
+audit_tenant_downwin	mame	release	romset	-	the life-marker transition, every tenant as winner AND victim
+audit_tenant_timeout	mame	release	romset	-	the timeout judge, per tenant
+audit_pursuit_leap	mame	release	romset	-	the leaping pursuit, per tenant both directions
+audit_edge_cases	mame	release	romset	-	deliberate state-transition edges per tenant ([VSP-33])
+audit_stage_sweep	mame	release	romset	-	every tenant on every stage
+audit_projectile_clash	mame	release	romset	-	the pool-vs-pool contact surface, frozen at NATIVE PARITY
+audit_pool_free_byte	mame	release	romset	-	the owner-tag byte (+0x7F), both pools
+audit_tripwire_reach	mame	release	romset	-	do any planted tripwires fire in extended play (~15 min)
+audit_fg_damage	mame	release	romset	-	Phobos' EX Final Guardian damage, frozen
+audit_fg_parity	mame	release	romset	-	the same, against the frozen native staircase
+audit_trap_parity	mame	release	romset	-	the Plasma Trap SOUND parity A/B
+audit_trap_shock	mame	release	romset	-	the Plasma Trap dome inflicts SHOCK
+audit_trap_sound	mame	release	romset	-	the MK Plasma Trap fires, ring live
+audit_hui_grunt	mame	release	romset	-	the electrocute-grunt A/B over five electrocutions
+audit_pyron_ring	mame	release	romset	-	Pyron's merged-vs-solo sound-ring inventory
+audit_qs_voice_batch	mame	release	romset	-	the voice-batch keyon A/B
+audit_qs_voice_wav	mame	release	romset	-	the ear-level voice A/B (-wavwrite). RED 14z-128 on its OWN MUST-FIRE CONTROL, not on the audio: "CONTROL DEAD (last, voice 80): truncated window not flagged" — the FIRST-voice control fires, the LAST-voice one does not, so it is a boundary case in the checker (the last window ends at the log's end, where a truncation may be indistinguishable). The measurement it did produce is clean: 74 sounding windows, 0 suspects. The gate refusing to give a verdict while a control is dead is [VSP-19] working; fix the checker's last-window edge, do not relax the control.
+audit_voice_borrow	mame	release	romset	-	the voice-class borrow mechanism
+audit_continue_ladder	mame	out	romset	-	momentary: the #102 discriminator (does a continue reset the ladder mask ON VANILLA) — the question was answered 14z-98
+audit_hitclass_map_cost	mame	out	romset	-	momentary: what the 14z-82b hit-class map extension fixes and costs. RED 14z-128 on a DEAD MUST-FIRE CONTROL: "the soak did NOT crash on the no-thunk twin, so an END-clean run on the fix build proves nothing about the thunk". The gate says what to do and what NOT to do — section 4 diagnoses why with the map probe, and the control must not be re-pointed at a new address until it has. Second dead control of the sweep (with audit_qs_voice_wav).
+audit_phase_mode_cost	mame	out	romset	-	momentary: what Phobos' phase-gated latch costs Donovan. RED 14z-128 with an ALARMING-LOOKING but hollow symptom — "phase mode reached legacy content", 8,785 of 9,321 frames differing from frame 469. It compares a freshly built phase-mode Donovan's LEGACY replays against `REF_BUILD=build/m5_wide`, which fingerprints 4b7d0dc7 = donovan-m3a, THE 14z-64 FREEZE, and whose registry row is COMMENTED OUT. Legacy behaviour has legitimately moved many times since (the 14z-91 walker relocation rewrote 23 caller operands; #104 repointed 17 capture rows; #99 unparked AI rows), so ~90% divergence says nothing about the latch. The reference must be BUILT FROM CURRENT MANIFESTS WITHOUT THE PHASE FLAG — a freeze 25 generations old cannot answer what this latch costs. Diagnosed, not re-run.
+audit_ladder_selector	mame	out	romset	-	romset: the vanilla arcade-ladder selector, made rerunnable (14z-95)
+audit_id_writers	mame	out	romset	-	romset: which character ids VANILLA ever assigns
+audit_palette_seq_ids	mame	out	romset	-	romset: which palette-seq ids LEGACY ever requests ([VSP-151])
+test_mister_wide_inert	mister	release	bitstream	-	THE FPGA SUPERSET INVARIANT, measured directly ([MSV-27]); ~22 min
+test_mister_sim_anchor	mister	release	bitstream	-	the MiSTer leg of the §4 dual-emulator oracle
+test_mister_tenant_oracle	mister	release	bitstream	-	the §4 dual-emulator oracle on TENANT content
+test_mister_obj_oracle	mister	release	bitstream	-	cross-implementation agreement on a VIDEO-DETERMINING surface; ~65 min
+test_mister_gfxc_fetch	mister	release	romset	--rpl tests/replays/36_pick_tenant_cell.rpl --frames 4400	the core FETCHES a tenant tile. THE ARGS ARE LOAD-BEARING: the gate's own default replay ends at the select screen, so a bare run is red by construction. These are the operands measured PASS in full at 14z-108 (~93 min a leg, two legs).
+test_mister_prg_window	mister	release	bitstream	-	slice D4's own evidence: the 68k and CPU:$400000-$5FFFFF; ~2 x 40 min
+test_mister_qsound_ext	mister	release	bitstream	-	the QSound extension is fetched on the core
+test_mister_sdram_census	mister	release	romset	-	the WIDE romset lands in SDRAM exactly where mister_map.md places it
+audit_sdram_bank_load	mister	out	romset	-	romset: stock vsavj on the STOCK jtcps2 core — the D2 repack's GO measurement, not a verdict on the shipped core

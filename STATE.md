@@ -399,8 +399,46 @@ what a triage is looking at, so those are where the thinking time goes.
   attribute first. Recommendation: attribute first — it is one rig and the
   window has been open five sessions already.
 
-- **THE EMULATOR-TIER RELEASE SCOPE — PROPOSED 14z-128, THE MAINTAINER'S TO
-  RULE.** `tests/ci_emulator.tsv` gives every one of the 164 emulator-tier
+- **THE EMULATOR-TIER RELEASE SCOPE — RULED IN FULL (maintainer, 2026-09-03).
+  141 release / 23 out, and a NEW `cadence` column carries the MiSTer half.**
+  All three judgement calls were ruled and all three are now IN the registry,
+  not in prose:
+  **(a) THE TWO #113 GATES -> `release`**, against the letter of the subject
+  discriminator. Verbatim: *"51s is basically nothing for a release and still
+  not enough cost not to run every time we freeze honestly."* Their rows carry
+  the exception and the measured cost (23 s + 28 s).
+  **(b) THE MiSTer LANE -> release scope KEPT, split onto a BITSTREAM
+  CADENCE.** Verbatim: *"AGREED and given the time, it should be applied
+  ALWAYS on release but not for a freeze, UNLESS explicitly in scope,
+  typically because the changes target MiSTer specifically. If such an
+  automation is unrealistic, the question should be asked at freeze if it
+  should be included."* **THE AUTOMATION WAS REALISTIC, so it was built rather
+  than left as a ritual step** — a ritual step that lives only in prose is the
+  step that gets skipped (14z-126b: three freeze tags were missing for exactly
+  that reason). `cadence` is `romset` (158 rows: runs at every freeze AND
+  release) or `bitstream` (6 rows: runs at every RELEASE, and at a freeze only
+  when the freeze targets MiSTer). `--freeze` (= `--cadence romset`) drops them
+  AND NAMES THEM, printing the question. The two deliberate MiSTer exceptions:
+  `test_mister_sdram_census` and `test_mister_gfxc_fetch` measure where THIS
+  ROMSET lands in SDRAM, so they follow the romset and stay on every freeze.
+  Only a `mister` row may be `bitstream` — enforced, so the concept cannot
+  spread by column edit.
+  **(c) THE FOUR `dev-ladder` GATES -> stay `out`.** `test_m3a_reproducible` is
+  the real pipeline lock on the released artifact and is already release-scope.
+  **AND THE TWO NON-JUDGEMENT OBSERVATIONS WERE AFFIRMED, in the maintainer's
+  words: *"AGREED on both counts and this, again, is keeping ourselves honest
+  and rely on measurements, not inference or likeliness at all stages."***
+  So, recorded as standing readings of the column: **`out` does not mean
+  "resolved"** (`audit_hitclass_map_cost` is `out` AND is one of the two dead
+  must-fire controls — scope and control-health are orthogonal, [VSP-19]), and
+  **`out` does not mean "quietly green"** (`audit_region_movability` and
+  `audit_phase_mode_cost` are red right now with exact diagnoses; `out` is only
+  what keeps them from blocking).
+  Ground truth for the new column: `test_emulator_runner.sh` section 6b (five
+  assertions incl. that the drop is NAMED, plus a romset-cadence control) and
+  section 10's validator, whose three new rules were must-fire checked.
+  **The original proposal follows.** *(Superseded head: PROPOSED 14z-128, THE MAINTAINER'S TO
+  RULE.)* `tests/ci_emulator.tsv` gives every one of the 164 emulator-tier
   gates a `scope` of `release` or `out`, and that column is what
   `tests/run_all_emulator.sh` hard-fails on at release. **139 release, 25
   out.** The discriminator is the maintainer's own (STATE "RELEASE-TIME TEST

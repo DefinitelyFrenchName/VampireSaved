@@ -1110,7 +1110,7 @@ ROMDIR=... tests/run_all_emulator.sh --dry-run        # the resolved command per
 ```
 
 **The registry is `tests/ci_emulator.tsv`** — one row per emulator-tier gate:
-`gate / lane / scope / args / note`. Completeness is enforced BOTH WAYS on
+`gate / lane / scope / cadence / args / note`. Completeness is enforced BOTH WAYS on
 every run (an emulator-tier script with no row is UNREGISTERED, a row whose
 script is gone is DEAD), with the same transitive classifier
 `run_all_static.sh` uses, so a gate cannot fall between the two runners.
@@ -1123,13 +1123,28 @@ that at release ALL tests run and *"anything red, anything skipped is a hard
 fail"* (STATE "RELEASE-TIME TEST SCOPE"). A policy of "all tests" cannot
 operate over a set nobody enumerates.
 
-**`scope` is the release decision and the CLASSIFICATION IS PROPOSED, NOT
-RULED** (STATE "Decisions pending"): `release` = the gate's subject is the
+**`scope` is the release decision and the CLASSIFICATION IS RULED
+(maintainer, 2026-09-03) — 141 release, 23 out**: `release` = the gate's subject is the
 released artifact, legacy content inside it included (an oracle leg on `vsav2`
 or pristine `vsavj` is a REFERENCE, not the subject); `out` = out of release
 scope, and every `out` row leads with its reason keyword — `romset:`,
 `platform:`, `momentary:` or `dev-ladder:`. **`out` never means "do not run":**
-`--scope all` runs them, and the sweep is how they are kept honest.
+`--scope all` runs them, and the sweep is how they are kept honest. **And `out`
+means NEITHER "resolved" NOR "quietly green"** (both affirmed by the maintainer
+at the ruling): `audit_hitclass_map_cost` is `out` AND is one of the two dead
+must-fire controls, and two `out` rows are red right now with exact diagnoses.
+
+**`cadence` is a DIFFERENT question from scope — what moving thing the gate
+FOLLOWS** (ruled 2026-09-03). `romset` (158 rows) = runs at every freeze and
+every release. `bitstream` (6 rows, all MiSTer) = its subject is the core, which
+moves on its own cadence — the `.rbf` has not moved since 14z-108 while the
+romset moved many times — so it runs at every RELEASE and at a freeze ONLY when
+the freeze targets MiSTer. **`--freeze` (= `--cadence romset`) drops them and
+NAMES them**, so the "should this freeze include them?" question is asked by the
+runner instead of remembered. `test_mister_sdram_census` and
+`test_mister_gfxc_fetch` are deliberate exceptions: they measure where THIS
+ROMSET lands in SDRAM, so they follow the romset. Only a `mister` row may be
+`bitstream`, enforced, so the concept cannot spread by column edit.
 
 **The `prereq` lane runs first, sequentially, and a red there STOPS the run.**
 Those gates measure the INSTRUMENTS, and a measurement taken after a moved

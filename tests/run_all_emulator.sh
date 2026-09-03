@@ -44,6 +44,8 @@
 #   ROMDIR=... tests/run_all_emulator.sh                 prereq+fbneo+mame, release scope
 #   ROMDIR=... tests/run_all_emulator.sh --scope all     + the out-of-scope rows
 #   ... --lane prereq|mame|fbneo|mister|all              default: all but mister
+#   ... --cadence romset|bitstream|all                   default: all
+#   ... --freeze                                         = --cadence romset (see below)
 #   ... --only 'glob'                                    a subset (shell glob on the gate name)
 #   ... --jobs N                                         run N gates at once (default 1)
 #   ... --timeout SECS                                   per gate (default 5400 = 90 min)
@@ -57,6 +59,17 @@
 # THE MiSTer LANE IS OPT-IN (--lane mister or --lane all). Its gates are
 # Verilator simulations at ~1 s per simulated frame: two of them are ~2 x 65
 # min on their own. It is a release lane, not an overnight-sweep lane.
+#
+# CADENCE — WHAT MOVING THING A GATE FOLLOWS, which is a different question
+# from whether it gates a release (maintainer-ruled 2026-09-03). Six MiSTer
+# gates follow the BITSTREAM, which moves on its own cadence: the .rbf has not
+# moved since 14z-108 while the romset moved many times. They are release-scope
+# — a release always pays them — but a FREEZE should only pay them when the
+# freeze targets MiSTer. `--freeze` selects cadence=romset and NAMES the gates
+# it dropped, so the "should this freeze include them?" question is asked by
+# the runner rather than remembered. Same rule the maintainer already made for
+# the stock control MRA: run once per new .rbf, not per romset release.
+# THE DEFAULT IS `all`, so no existing invocation changes behaviour.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 
@@ -71,11 +84,13 @@ fi
 cd "$REPO"
 
 REG=tests/ci_emulator.tsv
-SCOPE=release; LANES="prereq fbneo mame"; LANES_SET=""; ONLY=""; JOBS=1; TMO=5400
+SCOPE=release; CADENCE=all; LANES="prereq fbneo mame"; LANES_SET=""; ONLY=""; JOBS=1; TMO=5400
 LOGDIR=""; RESUME=0; STRICT=0; KEEPGOING=0; DRY=0; LIST=0
 while [ $# -gt 0 ]; do
     case "$1" in
     --scope)   shift; SCOPE="${1:?--scope needs release|all}" ;;
+    --cadence) shift; CADENCE="${1:?--cadence needs romset|bitstream|all}" ;;
+    --freeze)  CADENCE=romset ;;
     # --lane ACCUMULATES. It used to assign, so `--lane fbneo --lane mame`
     # silently ran only the mame lane — six gates skipped without a word, in
     # the runner whose whole point is that nothing goes unasked. Caught on its
@@ -96,7 +111,7 @@ while [ $# -gt 0 ]; do
     --keep-going) KEEPGOING=1 ;;
     --dry-run) DRY=1 ;;
     --list)    LIST=1 ;;
-    -h|--help) sed -n '2,60p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,72p' "$0"; exit 0 ;;
     *) echo "unknown argument '$1' (try --help)" >&2; exit 2 ;;
     esac
     shift
@@ -129,10 +144,11 @@ expand() {  # expand <string> — the %PLACEHOLDER% vocabulary
 # ── THE REGISTRY ────────────────────────────────────────────────────────────
 rows() { sed 's/\r$//' "$REG" | awk -F'\t' 'NF>=3 && $0 !~ /^#/ && $1 != ""'; }
 
-selected() {  # rows matching --lane / --scope / --only, in lane order
+selected() {  # rows matching --lane / --scope / --cadence / --only, in lane order
     for _l in $LANES; do
-        rows | awk -F'\t' -v lane="$_l" -v scope="$SCOPE" '
-            $2 == lane && (scope == "all" || $3 == "release")'
+        rows | awk -F'\t' -v lane="$_l" -v scope="$SCOPE" -v cad="$CADENCE" '
+            $2 == lane && (scope == "all" || $3 == "release") \
+                       && (cad == "all"   || $4 == cad)'
     done | while IFS= read -r line; do
         _g="${line%%	*}"
         if [ -n "$ONLY" ]; then
@@ -144,12 +160,12 @@ selected() {  # rows matching --lane / --scope / --only, in lane order
 }
 
 if [ "$LIST" = 1 ]; then
-    printf '%-34s %-7s %-8s %s\n' GATE LANE SCOPE ARGS
-    selected | while IFS="$(printf '\t')" read -r g lane scope args note; do
-        printf '%-34s %-7s %-8s %s\n' "$g" "$lane" "$scope" "$(expand "${args:--}")"
+    printf '%-34s %-7s %-8s %-9s %s\n' GATE LANE SCOPE CADENCE ARGS
+    selected | while IFS="$(printf '\t')" read -r g lane scope cadence args note; do
+        printf '%-34s %-7s %-8s %-9s %s\n' "$g" "$lane" "$scope" "$cadence" "$(expand "${args:--}")"
     done
     echo
-    echo "lanes=$LANES scope=$SCOPE only=${ONLY:-*}  ($(selected | wc -l | tr -d ' ') gates)"
+    echo "lanes=$LANES scope=$SCOPE cadence=$CADENCE only=${ONLY:-*}  ($(selected | wc -l | tr -d ' ') gates)"
     exit 0
 fi
 
@@ -168,6 +184,7 @@ echo "== the emulator-tier sweep =="
 echo "  registry   $REG"
 echo "  lanes      $LANES"
 echo "  scope      $SCOPE${ONLY:+   only=$ONLY}"
+echo "  cadence    $CADENCE"
 echo "  jobs       $JOBS   timeout ${TMO}s"
 echo "  log        $LOGDIR"
 echo "  ROMDIR     $ROMDIR"
@@ -186,6 +203,28 @@ for pair in "MERGED=$MERGED" "DON=$DON" "HUI=$HUI" "PYR=$PYR" "STOCK=$STOCK"; do
     _fp="$(python3 tools/build_fingerprint.py "$_d/rompath" --set "$_set" --sha-only 2>/dev/null | cut -c1-8)"
     printf '    %-7s %-24s %-6s %s\n' "$_n" "$_d" "$_set" "${_fp:-?}"
 done
+
+# THE CADENCE QUESTION, ASKED BY THE RUNNER RATHER THAN REMEMBERED.
+# The maintainer's ruling (2026-09-03) is that a freeze pays the bitstream
+# gates only when it TARGETS MiSTer, and that if the automation were
+# unrealistic the question should be asked at freeze. It is not unrealistic —
+# so the runner names exactly what it dropped and asks. A ritual step that
+# lives only in prose is the step that gets skipped (14z-126b: three freeze
+# tags were missing because "the tagging step of the ritual was simply
+# skipped").
+if [ "$CADENCE" = romset ]; then
+    _dropped="$(rows | awk -F'\t' '$4 == "bitstream" { printf "%s ", $1 }')"
+    if [ -n "$_dropped" ]; then
+        echo
+        echo "  ── CADENCE: bitstream gates DROPPED ──────────────────────────────"
+        echo "     $_dropped"
+        echo "     These follow the .rbf, not the romset (ruled 2026-09-03). A"
+        echo "     RELEASE always runs them; this run does not."
+        echo "     >> IS THIS FREEZE TARGETING MiSTer? If yes, re-run with"
+        echo "        --cadence all --lane mister. If no, this is correct."
+        echo "  ──────────────────────────────────────────────────────────────────"
+    fi
+fi
 
 # The instruments, identified the same way. Gates resolve these themselves;
 # printing them here is what makes a log readable six months later.
@@ -289,7 +328,7 @@ for _l in $LANES; do
     # lane, and its result landed under the wrong heading. Reading from a file
     # keeps the loop — and `wait`, and `_running` — in the main shell.
     printf '%s\n' "$_rows" > "$LOGDIR/.lane_$_l"
-    while IFS="$(printf '\t')" read -r g lane scope args note; do
+    while IFS="$(printf '\t')" read -r g lane scope cadence args note; do
         [ -n "$g" ] || continue
         if already_done "$g"; then
             printf '  %-34s %-7s        (resumed: already in results.tsv)\n' "$g" "-"

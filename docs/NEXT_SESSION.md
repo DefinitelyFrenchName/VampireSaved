@@ -41,7 +41,7 @@
 > ##
 > ## `tests/run_all_emulator.sh` is `run_all_static.sh`'s twin for the tier that
 > ## needs MAME, FBNeo or the simulator; `tests/ci_emulator.tsv` is its registry,
-> ## one row per gate (`gate / lane / scope / args / note`), completeness enforced
+> ## one row per gate (`gate / lane / scope / cadence / args / note`), completeness enforced
 > ## BOTH ways on every run. Lanes: `prereq` (instruments — runs FIRST,
 > ## sequentially, and a red there STOPS the run, [CPE-24]), `fbneo`, `mame`,
 > ## `mister` (opt-in, HOURS). `--scope all` adds the out-of-release-scope rows.
@@ -185,7 +185,7 @@
 > ## `boot_title_saved_*` rows per tenant, already reviewed at 14z-127).
 > ## **(c) NO RELEASE** — still deliberately held back.
 > ##
-> ## # DECISIONS — ONE RULED 2026-09-03, ONE STILL WAITING (STATE "Decisions pending")
+> ## # DECISIONS — BOTH RULED 2026-09-03 (STATE "Decisions pending")
 > ##
 > ## **THE `gap_be27a` BANK-MAP ROW — RULED: FOLD IT INTO (b).** The maintainer,
 > ## 2026-09-03: *"if folding it in allows us to pay only once, that's an easy
@@ -199,12 +199,22 @@
 > ## `patch.json` FIRST: a named op delta gets understood before the ~5 h freeze
 > ## suite runs, not after.
 > ##
-> ## **STILL WAITING — THE RELEASE SCOPE** — `ci_emulator.tsv` marks 139 gates `release` and 25
-> ## `out`, each `out` row leading with the reason keyword. That column is what a
-> ## release hard-fails on, so it is a ruling, not a preference. Three judgement
-> ## calls are named in the entry.
-> ## (The `gap_be27a` entry that stood here is RULED — see the top of this
-> ## section. What it models and why `kind` is load-bearing stays in STATE.)
+> ## **THE RELEASE SCOPE — RULED IN FULL, AND IMPLEMENTED.** 141 release / 23
+> ## out, plus a NEW `cadence` column in `ci_emulator.tsv`. (a) The two #113
+> ## gates -> `release` ("51s is basically nothing for a release"). (b) The
+> ## MiSTer lane keeps release scope but splits onto a BITSTREAM cadence: it
+> ## runs at every release, and at a freeze only when the freeze targets MiSTer
+> ## — `tests/run_all_emulator.sh --freeze` drops the six and NAMES them, so
+> ## the question is asked by the runner rather than remembered.
+> ## `test_mister_sdram_census` and `test_mister_gfxc_fetch` follow the ROMSET
+> ## and stay on every freeze. (c) The four `dev-ladder` gates stay `out`.
+> ## Ground truth: `test_emulator_runner.sh` 6b + the section-10 validator.
+> ## **TWO STANDING READINGS OF THE COLUMN, affirmed by the maintainer:** `out`
+> ## is NOT "resolved" (`audit_hitclass_map_cost` is `out` and is a DEAD
+> ## must-fire control) and `out` is NOT "quietly green"
+> ## (`audit_region_movability`, `audit_phase_mode_cost` are red with exact
+> ## diagnoses). *"keeping ourselves honest and rely on measurements, not
+> ## inference or likeliness at all stages."*
 > ##
 > ## # OPERATIONAL, and each was paid for tonight
 > ##

@@ -91,7 +91,9 @@ reg() {  # reg <rows...> — write the fakerepo's registry
     { echo "# fake registry"
       for r in "$@"; do printf '%s\n' "$r"; done; } > "$FR/tests/ci_emulator.tsv"
 }
-row() { printf '%s\t%s\t%s\t%s\t%s' "$1" "$2" "$3" "$4" "$5"; }
+row()  { printf '%s\t%s\t%s\tromset\t%s\t%s' "$1" "$2" "$3" "$4" "$5"; }
+# rowc = the same with an EXPLICIT cadence (gate lane scope cadence args note).
+rowc() { printf '%s\t%s\t%s\t%s\t%s\t%s' "$1" "$2" "$3" "$4" "$5" "$6"; }
 
 run() {  # run <args...> — the real runner inside the fakerepo
     (cd "$FR" && ROMDIR="$T/roms" MERGED=build/fake_merged \
@@ -189,6 +191,32 @@ printf '%s\n' "$out8" | grep -q "g_out .*PASS" \
     && ok "--scope all ran the out-of-scope row" \
     || fail "--scope all did not run the out-of-scope row"
 
+echo "6b. CADENCE selects independently of scope, and --freeze ASKS the question"
+# The maintainer's 2026-09-03 ruling: the bitstream gates are RELEASE-scope but
+# a freeze pays them only when it targets MiSTer. Both halves are asserted —
+# that the rows are dropped, AND that the runner NAMES them, because a silent
+# drop is the same failure as a skipped ritual step.
+reg "$(row  g_pass  mame   release   -  '')" \
+    "$(rowc g_bits  mister release bitstream - 'a bitstream-cadence gate')"
+outc="$(run --lane mame --lane mister --log "$T/lc" || true)"
+printf '%s\n' "$outc" | grep -q "g_bits" \
+    && ok "cadence=all (the default) runs the bitstream row" \
+    || fail "the default cadence did NOT run the bitstream row"
+outf="$(run --lane mame --lane mister --freeze --log "$T/lf" || true)"
+printf '%s\n' "$outf" | grep -q "g_bits .*PASS" \
+    && fail "--freeze RAN a bitstream-cadence gate" \
+    || ok "--freeze excluded the bitstream-cadence gate"
+printf '%s\n' "$outf" | grep -q "bitstream gates DROPPED" \
+    && ok "--freeze NAMED what it dropped (the question is asked, not remembered)" \
+    || fail "--freeze dropped a gate SILENTLY — the ruling's whole point"
+printf '%s\n' "$outf" | grep -q "g_bits" \
+    && ok "the dropped gate is named by name" \
+    || fail "--freeze did not name the dropped gate"
+# and the control: a romset-cadence gate is NOT dropped by --freeze
+printf '%s\n' "$outf" | grep -q "g_pass .*PASS" \
+    && ok "--freeze kept the romset-cadence gate (it drops by cadence, not by lane)" \
+    || fail "--freeze dropped a ROMSET-cadence gate"
+
 echo "7. a gate that overruns --timeout is TIMEOUT, not PASS"
 if command -v timeout >/dev/null 2>&1 || command -v gtimeout >/dev/null 2>&1; then
     reg "$(row g_slow mame release - '')"
@@ -249,15 +277,22 @@ for line in open("tests/ci_emulator.tsv"):
     if line.startswith("#") or not line.strip():
         continue
     c = line.rstrip("\n").split("\t")
-    if len(c) < 5:
-        print(f"  FAIL: registry row has {len(c)} columns, needs 5: {c[0] if c else line!r}")
+    if len(c) < 6:
+        print(f"  FAIL: registry row has {len(c)} columns, needs 6: {c[0] if c else line!r}")
         sys.exit(1)
     if c[1] not in ("prereq", "mame", "fbneo", "mister"):
         print(f"  FAIL: unknown lane {c[1]!r} for {c[0]}"); sys.exit(1)
     if c[2] not in ("release", "out"):
         print(f"  FAIL: unknown scope {c[2]!r} for {c[0]}"); sys.exit(1)
-    if c[2] == "out" and c[4].split(":")[0] not in ("romset", "platform", "momentary", "dev-ladder"):
-        print(f"  FAIL: out-of-scope row {c[0]} needs a reason keyword, got {c[4][:40]!r}")
+    if c[3] not in ("romset", "bitstream"):
+        print(f"  FAIL: unknown cadence {c[3]!r} for {c[0]}"); sys.exit(1)
+    # Cadence was ruled 2026-09-03 for the MiSTer bitstream specifically. If it
+    # ever spreads to another lane that is a DECISION, not a column edit.
+    if c[3] == "bitstream" and c[1] != "mister":
+        print(f"  FAIL: bitstream cadence on lane {c[1]!r} for {c[0]} — only the"
+              f" mister lane may be bitstream-cadence (ruled 2026-09-03)"); sys.exit(1)
+    if c[2] == "out" and c[5].split(":")[0] not in ("romset", "platform", "momentary", "dev-ladder"):
+        print(f"  FAIL: out-of-scope row {c[0]} needs a reason keyword, got {c[5][:40]!r}")
         sys.exit(1)
     if c[0] in rows:
         print(f"  FAIL: duplicate row {c[0]}"); sys.exit(1)
