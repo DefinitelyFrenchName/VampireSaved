@@ -561,7 +561,7 @@ build drives inputs through the 0001 harness instead), so record on MAME.
 
 ```sh
 export ROMDIR=/path/to/reference/sets
-tools/run_wide.sh build/m3b_merged21 fbneo # THE 3-TENANT BUILD (all 18
+tools/run_wide.sh build/m3b_merged22 fbneo # THE 3-TENANT BUILD (all 18
                                            # (14z-97: the build argument is
                                            # now REQUIRED. It used to default
                                            # to build/m5w — the known-bad
@@ -571,15 +571,20 @@ tools/run_wide.sh build/m3b_merged21 fbneo # THE 3-TENANT BUILD (all 18
                                            # newest first; m5w and merged1 are
                                            # refused by name.)
                                            # selectable, art included) =
-                                           # merged-m14, FROZEN 14z-119 (THE
-                                           # PHYSICS PORT: Donovan walks and
-                                           # jumps with VS2's values, not
-                                           # Victor's; carries the M11 random
-                                           # select + the M10 medallion fix;
-                                           # program fingerprint 6649523a).
+                                           # merged-m15, FROZEN 14z-130 (THE
+                                           # BOOT TITLE: the name screen reads
+                                           # VAMPIRE SAVED, Japan entry only;
+                                           # carries the M12 physics port, the
+                                           # M11 random select and the M10
+                                           # medallion fix; program
+                                           # fingerprint f42f7569).
                                            # WHAT TO LOOK AT FIRST:
+                                           # (0) the BOOT NAME SCREEN reads
+                                           # "VAMPIRE SAVED" — the second
+                                           # naked-eye tell, and the first
+                                           # thing on screen;
                                            # (1) the select screen shows
-                                           # "M12" bottom-right — THE NAKED-
+                                           # "M13" bottom-right — THE NAKED-
                                            # EYE A/B TELL (CLAUDE.md §5,
                                            # finally implemented; the text
                                            # names the freeze generation and
@@ -591,12 +596,12 @@ tools/run_wide.sh build/m3b_merged21 fbneo # THE 3-TENANT BUILD (all 18
                                            # "Bishamon" — aliased rows).
                                            # Works for P1 and P2. Without
                                            # Start it is plain Bishamon.
-tools/run_wide.sh build/don_m18 fbneo      # or the solo builds (hui52,
-                                           # pyron36); ... mame
+tools/run_wide.sh build/don_m19 fbneo      # or the solo builds (hui53,
+                                           # pyron37); ... mame
                                            # (registry rows name the CURRENT
-                                           # fingerprints — donovan-m18/
-                                           # huitzil-m25/pyron-m19 since the
-                                           # 14z-119 physics-port freeze)
+                                           # fingerprints — donovan-m19/
+                                           # huitzil-m26/pyron-m20 since the
+                                           # 14z-130 M13 boot-title freeze)
 ```
 
 **The Oboro path in (2) is OURS and the Dark Gallon one beside it is
@@ -611,23 +616,30 @@ vanilla path anywhere writes `0x18` (STATE "THE ARCADE HIDDEN-CHARACTER
 ROSTER"). Detail: `docs/game/atlas/select_screen.md`,
 `docs/project/patch_index.md` W1.
 
-**Current WIDE builds — THE 14z-119 PHYSICS-PORT FREEZE (maintainer-ruled
-2026-08-29 "use VS2 parameters and not the shell character's"; mark M12):
-donovan-m18 / huitzil-m25 / pyron-m19 / merged-m14.**
-`build/don_m18` (`7109f835`, 339 ops — program identical to the validated
-probe `build/don_phys_probe`), `build/hui52` (`ae953657`, 370 — program
-UNCHANGED from huitzil-m24, only the M12 glyph tiles moved), `build/pyron36`
-(`1222df18`, 307 — likewise), `build/m3b_merged21` (program fingerprint
-`6649523a`, 826 ops = merged-m13 + exactly Donovan's three physics value ops,
-no address moved), stock twin `build/m5_stock13` (`38e9cb2c`, **MOVED** from
-`d29fd062` — `port_param32` is a per-row data_port, not profile-gated, so the
-substituted track writes his VS2 physics onto stock slot `0x0F` too: six data
-ops, member `vm3j.04d` only, no legacy row written). The naked-eye tell is the
-**M12** mark; Donovan walks 3.0/−2.625 and jumps with VS2's parameters.
-**FIELD VERDICT GREEN 2026-08-30 (maintainer, MiSTer, 14z-121): "all green"** on bundle `../mister_fieldtest_14z119/`. **RE-VERIFIED GREEN 2026-09-01 (maintainer, MiSTer): "my tests on M14 on MiSTer are all green" — a SECOND independent field pass on the same unchanged build** (`merged-m14`; the naked-eye tell reads **M12**, the mark — "M14" names the BUILD, [VSP-162]'s three namespaces).
-Detail: patch_notes 14z-119 / 14z-118 (charmap, 2), STATE 14z-119; the
-registry row below. Previous freeze (merged-m13, M11): FIELD VERDICT GREEN
-2026-08-29 (STATE 14z-118).**
+**Current WIDE builds — THE 14z-130 M13 BOOT-TITLE FREEZE (maintainer-ruled
+2026-09-02, JAPAN entry only, "minimal change ... is perfect for me"; mark
+M13): donovan-m19 / huitzil-m26 / pyron-m20 / merged-m15.**
+`build/don_m19` (`8065bc92`, 342 ops), `build/hui53` (`08944a7e`, 373),
+`build/pyron37` (`a43da974`, 310), `build/m3b_merged22` (program fingerprint
+`f42f7569`, 829 ops), stock twin `build/m5_stock14` (`e86e1d04`, **MOVED**
+from `38e9cb2c` — the boot title is an `[[aux_poke]]`, not profile-gated, so
+the substituted track carries it too; attributed by op diff against
+`build/m5_stock13`: exactly the three `poke16` at `0x1c822/24/26` added,
+249 -> 252 ops, nothing else). The naked-eye tell is the **M13** mark, and
+the second one is the BOOT NAME SCREEN — it now reads **VAMPIRE SAVED**
+(Japan entry only; the title screen and the staff-roll strings are untouched
+by standing ruling). This freeze also carries the `gap_be27a` bank-map
+correction, which is BYTE-NEUTRAL on all five tracks by rebuild — see
+patch_notes 14z-130 and `tests/test_capture_kf_ownership.sh`.
+**FIELD VERDICT: NOT YET — this freeze has not been to the board.** The
+previous freeze (merged-m14, mark M12) was FIELD VERDICT GREEN twice:
+2026-08-30 (maintainer, MiSTer, 14z-121) "all green" on bundle
+`../mister_fieldtest_14z119/`, and RE-VERIFIED GREEN 2026-09-01 "my tests on
+M14 on MiSTer are all green" — a second independent pass on the same
+unchanged build (`merged-m14`; its naked-eye tell reads **M12**, the mark —
+"M14" names the BUILD, [VSP-162]'s three namespaces).
+Detail: patch_notes 14z-130 / 14z-127, STATE 14z-130; the registry row
+below. Previous freeze (merged-m14, M12): patch_notes 14z-119.**
 
 **Every superseded freeze is a ROW, not a paragraph.** The eight
 `Previous batch (14z-N…)` blocks this section carried until 14z-126b are
@@ -1315,6 +1327,7 @@ entry and STATE close. Newest first; the top row is the CURRENT freeze.**
 
 | build (mark) | fingerprint(s) | dir · tag | what changed | detail |
 |---|---|---|---|---|
+| THE 14z-130 M13 BOOT-TITLE FREEZE | donovan-m19 `8065bc92` (`build/don_m19`, 342 ops), huitzil-m26 `08944a7e` (`build/hui53`, 373), pyron-m20 `a43da974` (`build/pyron37`, 310), merged-m15 `f42f7569` (`build/m3b_merged22`, 829); stock twin **MOVED** to `e86e1d04` (donovan-m19-stock); stage-4 target UNCHANGED at `108f7523` (donovan-m19-stage4) | tags `freeze/donovan-m19`, `freeze/huitzil-m26`, `freeze/pyron-m20`, `freeze/merged-m15` | THE BOOT NAME SCREEN reads VAMPIRE SAVED (three `aux_poke poke16` at `PRG:0x01C822/24/26`, Japan entry only, maintainer-ruled 2026-09-02); mark M13. PLUS the `gap_be27a` -> `capture_kf_ptr` bank-map correction folded in by ruling — BYTE-NEUTRAL on all five tracks by rebuild, with the table's hand-ownership made explicit in the generator so the generic repoint cannot silently revert the 14z-64 mirror-victim fix | patch_notes 14z-130; `tests/test_capture_kf_ownership.sh`; STATE 14z-130 |
 | THE 14z-119 PHYSICS-PORT FREEZE | donovan-m18 `7109f835` (`build/don_m18`, 339 ops — program identical to the validated probe `build/don_phys_probe`), huitzil-m25 `ae953657` (`build… | tags `freeze/donovan-m18`, `freeze/huitzil-m25`, `freeze/pyron-m19`, `freeze/merged-m14` | donovan-m18 / huitzil-m25 / pyron-m19 / merged-m14 (stock twin MOVED = donovan-m18-stock). Maintainer-ruled 2026-08-2… | history §Build registry narratives; `docs/project/patch_notes.md`; STATE close |
 | THE 14z-117b RANDOM-SELECT FREEZE | `90a225ce` / `ae953657` / `1222df18` / merged program fingerprint `a1b7cb82`; stock twin `d29fd062` UNCHANGED (whole-artifact manifest identical) | `build/don_m17`, `build/hui51`, `build/pyron35` … · tags `freeze/donovan-m17`, `freeze/huitzil-m24`, `freeze/pyron-m18`, `freeze/merged-m13` | donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13 (stock twin UNCHANGED = donovan-m13-stock). Maintainer-directed th… | history §Build registry narratives; `docs/project/patch_notes.md`; STATE close |
 | THE 14z-117 PYRON-MEDALLION FREEZE | `7950c844` / `7ade3180` / `01b39c39` / merged program fingerprint `cde712e1`; stock twin `d29fd062` UNCHANGED (`only_variant_slot`, measured by reb… | `build/don_m16`, `build/hui50`, `build/pyron34` … · tags `freeze/donovan-m16`, `freeze/huitzil-m23`, `freeze/pyron-m17`, `freeze/merged-m12` | donovan-m16 / huitzil-m23 / pyron-m17 / merged-m12 (stock twin UNCHANGED = donovan-m13-stock). The 14z-116 fix, FIELD… | history §Build registry narratives; `docs/project/patch_notes.md`; STATE close |

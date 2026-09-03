@@ -3,7 +3,14 @@
 ## 14z-130 — THE M13 BOOT-TITLE FREEZE (donovan-m19 / huitzil-m26 / pyron-m20 / merged-m15, mark M13), and the `gap_be27a` bank-map correction folded into it
 
 **NO NEW SHIPPED BYTE BEYOND 14z-127's.** The boot-title bytes are the three
-`aux_poke poke16` of the 14z-127 entry below, unchanged. What this session
+`aux_poke poke16` of the 14z-127 entry below, unchanged. **ONE CORRECTION TO
+THAT ENTRY, measured here:** the program member they land in is **`vm3j.03d`**,
+not `vm3j.10b`. Member diff across all three tracks (merged-m14 -> merged-m15,
+donovan-m18 -> donovan-m19, and the stock twin) returns `vm3j.03d` every time,
+and it could not be otherwise — the three differing bytes sit at ODD addresses
+(`0x01C823/25/27`) and `vm3j.03d` is the odd half of the first program pair.
+The full member delta merged-m14 -> merged-m15 is exactly three files:
+`vm3j.03d` + `vsw.33m` + `vsw.37m` (the last two are the M13 glyph tiles). What this session
 added is the bank-map correction the maintainer ruled into this window
 (2026-09-03: *"if folding it in allows us to pay only once, that's an easy
 choice: fold it in!"*), and it is **byte-neutral on every track** — proven by

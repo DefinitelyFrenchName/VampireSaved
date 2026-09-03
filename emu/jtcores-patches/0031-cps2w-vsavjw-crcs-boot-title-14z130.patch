@@ -1,0 +1,52 @@
+From 662d076ccc633ca65376b3dedf02a94ef62bc464 Mon Sep 17 00:00:00 2001
+From: Chaton <definitelyfrenchname@gmail.com>
+Date: Fri, 4 Sep 2026 01:22:20 +0200
+Subject: [PATCH] =?UTF-8?q?cps2w:=20vsavjw=20catalogue=20=E2=80=94=20the?=
+ =?UTF-8?q?=20M13=20boot-title=20freeze=20(VampireSaved=2014z-130,=20merge?=
+ =?UTF-8?q?d-m15):=20the=20boot=20name=20screen=20reads=20VAMPIRE=20SAVED?=
+ =?UTF-8?q?=20(vm3j.03d)=20and=20the=20M13=20mark=20in=20group=20C=20(vsw.?=
+ =?UTF-8?q?33m/37m)?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Member delta merged-m14 -> merged-m15, measured by member diff and complete
+at three files: vm3j.03d (the boot title's three odd bytes at PRG:0x01C823/
+25/27) plus vsw.33m and vsw.37m (the M13 glyph tiles).
+
+jtframe resolves zip members by CRC32 alone, so this entry has to name the
+CRCs of the build actually shipped; tools/gen_vsavjw_xml.py --check is the
+gate (tests/test_mister_mra_map.sh), and it is green against
+build/m3b_merged22 with this commit.
+---
+ doc/mame.xml | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/doc/mame.xml b/doc/mame.xml
+index 9dbe3cfc4..d4c6e9d23 100644
+--- a/doc/mame.xml
++++ b/doc/mame.xml
+@@ -147713,7 +147713,7 @@
+ 		<description>Vampire Saved - CPS-2 WIDE (Japan 970519)</description>
+ 		<year>1997</year>
+ 		<manufacturer>Capcom</manufacturer>
+-		<rom name="vm3j.03d" size="524288" crc="2acc5d6d" sha1="c1f1e1c7ae017564c975a12da740ed983ad3a0ee" region="maincpu" offset="0"/>
++		<rom name="vm3j.03d" size="524288" crc="5f66c22f" sha1="451486ba13ee66e02f9d690384f66903709091b1" region="maincpu" offset="0"/>
+ 		<rom name="vm3j.04d" size="524288" crc="a8e43db3" sha1="52e02ba355e315387865ce2655c89a8571692bea" region="maincpu" offset="80000"/>
+ 		<rom name="vm3j.05a" size="524288" crc="95ce88d5" sha1="ba5e64c2551d97a71d2f4d7a78663aede4b722e8" region="maincpu" offset="100000"/>
+ 		<rom name="vm3j.06b" size="524288" crc="2c4297e0" sha1="3a7103456ba3937f63c28dd42020cac1955b5741" region="maincpu" offset="180000"/>
+@@ -147734,9 +147734,9 @@
+ 		<rom name="vm3.18m" merge="vm3.18m" size="4194304" crc="df9a9f47" sha1="ce29ff00cf4b6fdd9b3b1ed87823534f1d364eab" region="gfx" offset="1000004"/>
+ 		<rom name="vm3.20m" merge="vm3.20m" size="4194304" crc="c22fc3d9" sha1="df7538c05b03a4ad94d369f8083799979e6fac42" region="gfx" offset="1000006"/>
+ 		<rom name="vsw.31m" size="4194304" crc="d75f7a69" sha1="f448504e1f71fabbb6bbecd12628b8358f157ce9" region="gfx" offset="2000000"/>
+-		<rom name="vsw.33m" size="4194304" crc="26c7c302" sha1="7b4739e58a4f138acdf4e661e155a60a2892664c" region="gfx" offset="2000002"/>
++		<rom name="vsw.33m" size="4194304" crc="059ae2af" sha1="6bd796631f5d78f7990aaeae86abb8fc4a17d9e5" region="gfx" offset="2000002"/>
+ 		<rom name="vsw.35m" size="4194304" crc="4eae3882" sha1="dbe0276c8c8427d5c90eab1d0130674ed3728aa6" region="gfx" offset="2000004"/>
+-		<rom name="vsw.37m" size="4194304" crc="31709fe8" sha1="20b9847387ee3f2fac0e4950ac1bd9a11309b6c8" region="gfx" offset="2000006"/>
++		<rom name="vsw.37m" size="4194304" crc="ba9c8871" sha1="1e5dc16e861f3b8d42557b3acdf71570d01d7847" region="gfx" offset="2000006"/>
+ 		<rom name="vsw.z01" size="131072" crc="153600b9" sha1="255e3523b5fc49b63d420c04547a69784eb5171f" region="audiocpu" offset="0"/>
+ 		<rom name="vsw.z02" size="131072" crc="26b6ecc5" sha1="9f113542d7bc75de01d62743af489e8ccc0559d8" region="audiocpu" offset="28000"/>
+ 		<rom name="vm3.11m" merge="vm3.11m" size="4194304" crc="e80e956e" sha1="74181fca4b764fb3c56ceef2cb4c6fd6c18ec4b6" region="qsound" offset="0"/>
+-- 
+2.50.1 (Apple Git-155)
+

@@ -310,6 +310,39 @@ what a triage is looking at, so those are where the thinking time goes.
 
 ## Decisions pending (human)
 
+- **PYRON'S CAPTURE-KEYFRAME ATTACKER ROW `0x11` IS NOT PORTED — a
+  throw/capture surface, so [VSP-10] (found 14z-130 while folding in the
+  `gap_be27a` correction; NOT a regression, this is the state as shipped since
+  the #104 work).** The capture-pose installer resolves the ATTACKER's keyframe
+  block through `PRG:0x0BE27A[attacker id]`. Every legacy attacker row
+  (`0x00-0x0F`, `0x0B`, `0x18`) is ported, and so are Donovan's `0x13`
+  (`throw_victim_keyframes`) and Huitzil's `0x10` (`grab_hold_keyframes`).
+  **Pyron's `0x11` is not**: vsavj aliases it to `0x00094954` = DEMITRI's
+  block, so when PYRON throws, the capture poses are Demitri's. donovan.toml's
+  own comment records it as "the recorded Pyron-as-attacker observation".
+  **HOW IT SURFACED:** correcting the bank-map row made the generic
+  per-character repoint want to write `0x0BE2BE <- 0x004af226`, i.e. to point
+  the row at Pyron's own vs2 block (`vs2 0x000C7F98`, inside his extracted
+  `hitbox` region). That write is SUPPRESSED in the shipped build — the table
+  is hand-owned and the freeze had to be byte-neutral — but it is exactly the
+  fix, and the generator would have made it silently.
+  **WHAT IS AND IS NOT KNOWN.** Known: the source block exists in vs2 and
+  vhunt2 with the uniform `0x76E` sibling delta, it lies inside a region the
+  build already extracts and places, and the mechanism to repoint the row is
+  the same `slot_ptr_table` one the other 17 rows use. NOT known: whether
+  Pyron's throws actually LOOK wrong with Demitri's capture poses — nobody has
+  compared them, and the #104 report named Donovan and Phobos precisely
+  because Pyron's fold was not noticed. So this is a defect by construction,
+  not by observation.
+  **OPTIONS:** (a) port it, as a `capture_kf_pyron`-style row with an `orc`
+  oracle and a `dst_old_head` — mechanically identical to the fifteen legacy
+  rows, one freeze; (b) leave it, and record that Pyron borrows Demitri's
+  capture poses as accepted. **RECOMMENDATION: measure before deciding** —
+  a hand-played or scripted Pyron throw beside a native vs2 Pyron throw
+  ([VSP-123] makes the native leg reachable with an ordinary poke), which
+  turns "a row is unported" into "here is what it looks like". Half a session,
+  and it is the cheap half of (a).
+
 - **~~`audit_type_dispatch_range` PROBES A MECHANISM THAT NO LONGER EXISTS —
   UPDATE OR DROP~~ DECIDED (maintainer, 2026-09-03): DROP. Verbatim:
   *"better no test than a bad one. Let's drop"*.** EXECUTED 14z-129 — the
@@ -410,7 +443,15 @@ what a triage is looking at, so those are where the thinking time goes.
   runs:  889-2491   2713-2713   5868-5868
   proposed: composite vsavj/masked-v2 2713,5868 889-2491
   ```
-  **WHY IT IS NOT AUTHORED YET.** `composite` is a non-exact class, and
+  **~~WHY IT IS NOT AUTHORED YET~~ AUTHORED AND CLOSED 14z-128 (19) — THIS
+  ENTRY WAS LEFT LOOKING OPEN, corrected 14z-130.** The two flicker frames
+  WERE attributed and the spec WAS authored, in commit `9ae00420` ("the two
+  flicker frames ATTRIBUTED, and the spec authored — the five-session hole is
+  closed"); `tests/expected/{donovan-m18,huitzil-m25,pyron-m19}/105_legacy_2pwin_auto.masked`
+  each carry `composite vsavj/masked-v2 2713,5868 889-2491` and the M13 sets
+  inherit them. The paragraph below is the state BEFORE that, kept because its
+  reasoning is why the attribution was done first. Original text:
+  `composite` is a non-exact class, and
   [VSP-27]/[VSP-29] require every non-exact class to be MECHANISM-ATTRIBUTED,
   with the standing watch ([VSP-31]) that flickers appearing outside a frozen
   inventory mean stop and root-cause. The WINDOW half is already attributed:
@@ -506,10 +547,31 @@ what a triage is looking at, so those are where the thinking time goes.
   locks. No change is needed for the arc to proceed; the ruling decides what a
   release hard-fails on.
 
-- **THE `gap_be27a` / `gap_be2ba` BANK-MAP ROWS ARE WRONG, AND CORRECTING THEM
-  CAN MOVE BUILD OUTPUT (found 14z-128). DECIDED (maintainer, 2026-09-03):
-  FOLD THE CORRECTION INTO THE M13 REGISTRATION — *"if folding it in allows us
-  to pay only once, that's an easy choice: fold it in!"*.** The three couplings
+- **~~THE `gap_be27a` / `gap_be2ba` BANK-MAP ROWS ARE WRONG~~ DECIDED
+  (maintainer, 2026-09-03) AND **EXECUTED 14z-130** — folded into the M13
+  registration, *"if folding it in allows us to pay only once, that's an easy
+  choice: fold it in!"*.** **WHAT SHIPPED:** the two rows became ONE
+  `capture_kf_ptr` (`0x0BE27A`, `data_ptr`, `stride 0x80`, `region auto`) and
+  the table's hand-ownership was made explicit in the generator, so the
+  generic repoint is suppressed. **BYTE-NEUTRAL on all five M13 tracks by
+  rebuild** (fingerprint and `patch.json` sha1 identical either side).
+  **THE [VSP-10] QUESTION THIS ENTRY RAISED DOES NOT ARISE**, because the two
+  candidate pointers are not equivalent: the shipped `0x004010e0` carries
+  `0x0d88` at `+0x1E` and the block the generic repoint would have chosen
+  (`0x003fbda2`, the hitbox-region copy) carries the UNFIXED `0x0b30` — i.e.
+  letting the generic path win would have silently reverted the 14z-64
+  mirror-victim fix. Preserving today's bytes is the answer, and it is a
+  preservation decision rather than a gameplay one.
+  **ONE FIGURE IN THE ENTRY BELOW IS WRONG AND IS CORRECTED HERE:** it says
+  "the ~9 writes per tenant that the `auto` containment currently leaves
+  unexempted come back under exemption". **Measured: only ONE does** — row
+  `0x18` (Oboro) — plus each tenant's OWN row where it has one (`0x13`
+  donovan, `0x10` huitzil; pyron has none). Rows `0x08-0x0F` STAY in the
+  inventory, correctly: they are LEGACY attacker rows. The root fix NARROWS
+  the exemption; it does not restore the hole. Inventory counts D/H/P
+  114/112/100 -> 115/113/102 (the +3 each is the M13 boot title).
+  Detail: patch_notes 14z-130; gate `tests/test_capture_kf_ownership.sh`.
+  Original entry follows. The three couplings
   that make one window cheaper than two, each verified 14z-129 rather than
   argued: (1) `charmap_gen.py` reads `bank_map.toml` directly (`--bank-map`,
   :364) and emits every table's tenant row, and those pages are hash-locked by
@@ -601,7 +663,13 @@ what a triage is looking at, so those are where the thinking time goes.
   space instead of i, o, r) is perfect for me"):**
   one `data` op, **`PRG:0x01C822`, 6 bytes word-aligned, `" I O R"` ->
   `" E D  "`** — 3 bytes actually differ (`0x01C823` I->E, `0x01C825` O->D,
-  `0x01C827` R->space). One program member (`vm3j.10b`). The start-COLUMN byte
+  `0x01C827` R->space). One program member — **`vm3j.03d`**, ~~`vm3j.10b`~~
+  **CORRECTED 14z-130**: measured by member diff on all three tracks at the
+  M13 freeze (merged-m14 -> merged-m15, donovan-m18 -> m19, and the stock
+  twin), the changed program member is `vm3j.03d` every time. The three
+  differing bytes are at ODD addresses (0x01C823/25/27) and vm3j.03d is the
+  odd half of the first program pair, so it could not have been anything
+  else. The start-COLUMN byte
   is NOT touched: the shorter title simply ends one character earlier and sits
   marginally left of where it did. **Verified: the minimal-span build is
   BYTE-IDENTICAL to the 30-byte-span build that was booted and photographed.**

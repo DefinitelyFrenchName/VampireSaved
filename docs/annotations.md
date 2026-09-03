@@ -23,13 +23,13 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 2956 |
-| named by a document or manifest only | 2048 |
+| distinct program-space addresses named | 2957 |
+| named by a document or manifest only | 2049 |
 | named by both a document/manifest and code | 598 |
 | named by CODE ONLY (the gap list below) | 310 |
 | carried by atlas | 473 |
 | carried by engine_internals | 535 |
-| carried by other docs | 945 |
+| carried by other docs | 946 |
 | carried by manifests | 1780 |
 | carried by code | 908 |
 
@@ -550,6 +550,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01C68E` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; build/manifest/donovan.toml — hit_class_props_ext_lo |
 | `PRG:0x01C806` | docs/game/gotchas.md — THE BOOT NAME SCREEN'S DISPLAY SCRIPT TAKES AN EVEN COLUMN — an odd one is a 68k ADDRESS ERROR that soft-boots the machine (paid: 14z-127); docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-127 — THE BOOT NAME SCREEN: "VAMPIRE SAVIOR" -> "VAMPIRE SAVED"; build/manifest/donovan.toml — random_select_roster; build/manifest/huitzil.toml — random_select_roster; build/manifest/pyron.toml — random_select_roster; +3 more |
 | `PRG:0x01C822` | HANDOFF.md — Build registry; HANDOFF.md — Running a CPS-2 WIDE build (playtest); docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-127 — THE BOOT NAME SCREEN: "VAMPIRE SAVIOR" -> "VAMPIRE SAVED"; build/manifest/donovan.toml — boot_title_saved_1; build/manifest/huitzil.toml — boot_title_saved_1; +9 more |
+| `PRG:0x01C823` | docs/project/patch_notes.md — 14z-130 — THE M13 BOOT-TITLE FREEZE (donovan-m19 / huitzil-m26 / pyron-m20 / merged-m15, mark M13), and the 'gap_be27a' bank-map correction folded into it |
 | `PRG:0x01C824` | docs/project/patch_notes.md — 14z-127 — THE BOOT NAME SCREEN: "VAMPIRE SAVIOR" -> "VAMPIRE SAVED"; build/manifest/donovan.toml — boot_title_saved_2; build/manifest/huitzil.toml — boot_title_saved_2; build/manifest/pyron.toml — boot_title_saved_2; build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; +1 more |
 | `PRG:0x01C826` | docs/project/patch_notes.md — 14z-127 — THE BOOT NAME SCREEN: "VAMPIRE SAVIOR" -> "VAMPIRE SAVED"; build/manifest/donovan.toml — boot_title_saved_3; build/manifest/huitzil.toml — boot_title_saved_3; build/manifest/pyron.toml — boot_title_saved_3; build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; +1 more |
 | `PRG:0x01D160` | docs/project/gotchas.md — A pointer-shaped heuristic is placement-dependent — merged5 passed by luck (14z-92); tools/obj_records.py |
