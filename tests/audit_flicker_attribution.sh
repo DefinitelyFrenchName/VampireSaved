@@ -24,6 +24,23 @@
 # ever move OUTSIDE the named windows, the specs are describing something
 # else and must be re-opened.
 #
+# EXTENDED 14z-128 with the two frames of `105_legacy_2pwin_auto`, the replay
+# the emulator-tier sweep found sitting in the corpus FIVE SESSIONS with no
+# expectation at all. Its spec is `composite ... 2713,5868 889-2491`, so both
+# frames are load-bearing in exactly the sense above, and both were attributed
+# by an ours-vs-vanilla dump diff before the spec was authored:
+#   +2713 -> 4 bytes at $FF408E-$FF4091 = staging row 0x0C, the window this
+#            gate ALREADY names and already enforces on 41 (same window, same
+#            byte count) — so it is not a new mechanism, it is this one.
+#   +5868 -> 3 bytes at $FF06D8-$FF06D9 and $FF06E1 = the OBJ-BUILDER
+#            SECONDARY STACK, `docs/game/atlas/ram.md`'s $FF06D0-$FF06EF row:
+#            execution POSITION, not state, one bsr further along, identical
+#            the next frame. That window had no NAME here, which is why one
+#            was added (`obj-builder-stack`) rather than the frame being
+#            waved through. It is disjoint from `dead-stack` ($FF7F00-$FF7FFF)
+#            and cannot reclassify a byte in the two older cases.
+# Cost: 105 is 9,620 frames, so the gate goes from seconds to a few minutes.
+#
 # THE WINDOWS ARE NAMED, WHICH IS THE POINT. "The two builds differ, and
 # that's expected" is the absence of a verdict. Every differing byte must
 # fall in a window someone can name, and tools/attribute_ramdiff.py prints
@@ -74,11 +91,14 @@ WINDOWS="--window 043C-043D:qsound-handshake-latch
          --window 4222-4262:masked-staging-rows-0x18-0x19
          --window 7F00-7FFF:dead-stack
          --window 4042-4061:staging-row-0x0A
-         --window 4082-40A1:staging-row-0x0C"
+         --window 4082-40A1:staging-row-0x0C
+         --window 06D0-06EF:obj-builder-stack"
 
 # frozen (replay, frame, which row it must land in)
 CASES="41_don_altcolor_vsavj:2313:staging-row-0x0C
-       37_victor_ko_vsavj:7168:staging-row-0x0A"
+       37_victor_ko_vsavj:7168:staging-row-0x0A
+       105_legacy_2pwin_auto:2713:staging-row-0x0C
+       105_legacy_2pwin_auto:5868:obj-builder-stack"
 
 for c in $CASES; do
     rpl="${c%%:*}"; rest="${c#*:}"; frame="${rest%%:*}"; want="${rest##*:}"
