@@ -112,7 +112,7 @@ test_wide_render_content	mame	release	-	the WIDE track SERVES the ported tiles, 
 test_merged_render_content	mame	release	-	the merged build serves all THREE tenants' tiles
 test_wheel_bank5	mame	release	-	the select wheel serves from group C bank 5
 test_version_string	mame	release	-	the in-game version mark, the naked-eye A/B tell
-audit_empty_tiles	mame	release	%MERGED%	does the build DRAW any blank-tile sprite. ARGS REQUIRED: it takes <builddir> with no default, so a bare invocation dies on its usage line (FAIL 0s in the sweep, 14z-128). The merged build is the subject; its DEFAULT replays are the Huitzil DF / fx / grenade surfaces with the pokes forcing 0x10. [VSP-161] still stands for a NEW effect — the defaults never fire it and would pass vacuously, so a new effect is checked by passing ITS OWN replay, not by this standing row.
+audit_empty_tiles	mame	release	%MERGED%	does the build DRAW any blank-tile sprite. ARGS REQUIRED: it takes <builddir> with no default, so a bare invocation dies on its usage line (FAIL 0s in the sweep, 14z-128). The merged build is the subject; its DEFAULT replays are the Huitzil DF / fx / grenade surfaces with the pokes forcing 0x10. [VSP-161] still stands for a NEW effect — the defaults never fire it and would pass vacuously, so a new effect is checked by passing ITS OWN replay, not by this standing row. VERIFIED 14z-128 with the operand: PASS on all three surfaces — every group-C sprite resolves to real art.
 audit_clone_beam_lines	mame	release	-	the #109 lock: DF clone-mode draws the beam-line sprites
 audit_effect_class_rows	mame	release	-	the three deadness measurements the beam port rests on ([VSP-22])
 audit_grenade_ground_tiles	mame	release	-	Huitzil's 214+LP ground explosion draws native vs2 art
