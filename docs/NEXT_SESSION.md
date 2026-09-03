@@ -80,6 +80,27 @@
 > ## `A0` directly. Parses by field name now; PASSES, and confirms the 14z-81
 > ## satellite defect stays fixed. Its FAIL row in the sweep log is pre-fix.
 > ##
+> ## # THE PATTERN IN THE SWEEP'S REDS, so the next batch is quick
+> ##
+> ## Ten reds by the time the lane was a third done, and **every one was the
+> ## suite, not the build**. Four shapes, in falling frequency:
+> ## 1. **A STALE DEFAULT BUILD** — the gate names an M2a-era dir nothing has
+> ##    maintained (`test_m2a_stage4_oracle`, `test_m2a_stage2_data`). Re-point,
+> ##    or give it `args` in the registry, then RE-RUN before believing it.
+> ## 2. **A REQUIRED OPERAND WITH NO DEFAULT** — dies on its own usage line in
+> ##    0 s (`audit_walker_repoint`, `audit_empty_tiles`). **That class is now
+> ##    CLOSED**: a census found exactly two and both have `args`.
+> ## 3. **A PARSER OR AN INJECTION THE TREE OUTGREW** — `audit_merged_vec3`
+> ##    (PROBE line gained registers at 14z-109), `audit_region_movability`
+> ##    (injects a `region_space` key donovan.toml has carried since 14z-111),
+> ##    `audit_type_dispatch_range` (scrapes a thunk 14z-91 deleted).
+> ## 4. **A FROZEN CONSTANT THE RULING MOVED** — `test_phasec_image`'s
+> ##    donovan-m2c stock fingerprint, against a stock twin that legitimately
+> ##    moves at every freeze ([VSP-94]).
+> ## **A 0-SECOND FAIL IS ALWAYS SHAPE 1 OR 2**, and a fail far shorter than the
+> ## gate's own quoted runtime means it bailed before measuring — read that
+> ## number first, it is the cheapest triage signal in the log.
+> ##
 > ## # THEN, IN ORDER
 > ##
 > ## **(a) FINISH THE SWEEP** and triage what it finds. Adjudicate, never
