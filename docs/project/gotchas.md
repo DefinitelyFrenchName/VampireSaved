@@ -1946,9 +1946,18 @@ repair is structural, not procedural: on a leg-1 crash the gate now runs
 the reference leg anyway and prints MERGE-SPECIFIC vs LATENT IN THE
 FROZEN BUILD — the attribution is part of the verdict, not homework left
 to the reader. Related gap, same lesson: the only gate that ran the
-crashing replay at all (`test_pyron_soak.sh`) builds STAGE 4, so the
+crashing replay at all (`test_pyron_soak.sh`) built STAGE 4, so the
 frozen stage-6 artifact was never soaked — a covering gate that rebuilds
 at a different stage covers a DIFFERENT build.
+**CLOSED 14z-129 (maintainer-approved): that gate now builds STAGE 6.** It
+was forced there by its own red — at stage 4 a forced tenant pick crashes,
+because STAGE 5 is the select plumbing and a stage-4 image has nothing that
+makes id 0x11 loadable (measured: same build, id 0x11 CRASH 3020 / no pokes
+END 11017 / id 0x03 END 11017 / stage 6 END 11017). No stage-4 coverage was
+lost — `test_pyron_ladder.sh` builds and checks stages 1-4 and 6 — and the
+gate's round-2 satellite expectation was RE-MEASURED, not re-frozen
+(`0000d480`, still `0000d4xx`). The lesson in the sentence above stands and
+is why the move was the right fix rather than a re-point.
 
 ## A hit-path defect fires per COLLISION, not per frame — soak length is not coverage (14z-82b)
 

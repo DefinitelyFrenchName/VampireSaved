@@ -303,7 +303,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 | `tests/test_pyron_cosmo.sh` | test | emulator | a build dir | the Cosmo Disruption crash gate (rewritten 14z-75). | 14z-75 |
 | `tests/test_pyron_ladder.sh` | test | emulator | a build dir | test_pyr_ladder.sh — the Pyron stage 1-3 ladder gate (14z-67, M3b Phase 5). | 14z-67 |
 | `tests/test_pyron_medallion_2p.sh` | test | emulator | MAME, a build dir, ~5 min | the P2-HOVER half of medallion palette stability (14z-116). EMULATOR gate, ~5 min, two MAME runs. NOT in ci_static; indexed in HANDOFF. | 14z-116 |
-| `tests/test_pyron_soak.sh` | test | emulator | emulator | the Pyron stage-4 chaos soak (14z-67, the moveset arc opener). The full behavioral chain, guarded, on the real packed set: | 14z-67 |
+| `tests/test_pyron_soak.sh` | test | emulator | emulator | the Pyron STAGE-6 chaos soak (14z-67 as stage 4; MOVED TO STAGE 6 at 14z-129, maintainer-approved). The full behavioral chain, guarded, on the real packed set: | 14z-67 |
 | `tests/test_random_select_tenants.sh` | test | emulator | MAME, a build dir, ~12 min | RANDOM SELECT INCLUDES THE TENANTS (14z-117, the maintainer's own list item, added 2026-08-28). | 14z-117 |
 | `tests/test_select_wheel.sh` | test | emulator | MAME | the character-select cursor mechanism: decoded from the ROM, and MEASURED in the emulator. | 14z-123 |
 | `tests/test_shadow_tenant.sh` | test | emulator | MAME, a build dir, ~6 min | SHADOW morphing into a TENANT (14z-116). EMULATOR gate, ~6 min, two MAME runs. NOT in ci_static (see the registry check in run_all_static.sh); indexed in HANDOFF. | 14z-116 |
