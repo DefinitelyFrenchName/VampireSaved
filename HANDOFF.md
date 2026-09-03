@@ -1147,7 +1147,32 @@ never just its name).
 Ground truth for this runner: `tests/test_emulator_runner.sh` (ROM-free, in
 `ci_portable`) — the three verdicts counted separately, SKIP-in-prose,
 MISSING, TIMEOUT, both anti-orphan directions, `--strict`, the prereq stop,
-scope selection and placeholder expansion.
+scope selection, lane accumulation and placeholder expansion.
+
+### **[VSP-165]** WHERE A FROZEN EXPECTATION'S NUMBERS CAME FROM (since 14z-128)
+
+**`tests/expected/PROVENANCE.md`** — one row per file directly under
+`tests/expected/`: what the numbers DESCRIBE, what evidence they REST ON, and
+the invocation that re-freezes them. It exists because of the maintainer's
+rule for adjudicating a red gate — a red gate is a QUESTION, and its first
+question is which side rests on a measurement. The evidence classes are
+defined and enforced: `in-emulator`, `derived`, `static`, `hash-lock`,
+`registry`. **`hash-lock` locks CURRENCY, never correctness**, and `derived`
+is only as good as the reader — both 14z-125 defects were interpretation
+defects a regenerated page would have reproduced.
+Gate: `tests/test_expectation_provenance.sh` (ci_portable), complete both
+ways with two must-fire controls. The per-build expectation DIRECTORIES are
+out of its scope: their provenance is `registry.tsv` + the `freeze/<name>` tag.
+
+**And a gate's HEADER must state the default its CODE uses** —
+`tests/test_header_defaults.sh` + `tools/audit_header_defaults.py --fix`
+(ci_portable). The twin of `test_build_ref_rot.sh`, which locks the CODE
+default: measured 14z-128, 37 lines across 37 gates told a reader to pass
+`BUILD=build/m3b_merged11` while the code defaulted to `m3b_merged21`. Two
+exemptions, both paid for on the first sweep: a BACKTICKED token is code being
+discussed, and a `(verbatim; …)` block is an ARCHIVE (most gate headers carry
+HANDOFF's old gate-index note, moved in at 14z-123 — rewriting a default
+inside one falsifies the quote).
 
 ### Individual gates — the index
 

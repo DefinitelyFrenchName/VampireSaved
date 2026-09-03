@@ -9,6 +9,7 @@
 09_mirror_pick	LEGACY	masked
 103_tenant_2pwin_auto	TENANT	sha1
 104_1p_auto_ko_win	LEGACY	masked
+105_legacy_2pwin_auto	LEGACY	none
 105_projectile_clash_ctl	LEGACY	masked
 106_pyron_cosmo_clash	LEGACY	masked
 107_four_directions	NO-MATCH	sha1
@@ -16,6 +17,7 @@
 109_2p_don_vs_phobos	TENANT	sha1
 10_midattract_start	NO-MATCH	masked
 110_don_arcade_mash	TENANT	sha1
+111_don_arcade_vs_screen	TENANT	none
 112_don_pod_merged	TENANT	sha1
 113_shadow_vs_tenant	TENANT	sha1
 11_pick_donovan	LEGACY	masked
