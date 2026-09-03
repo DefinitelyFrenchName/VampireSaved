@@ -4,7 +4,9 @@
 ## DEFECTS IN ITSELF BEFORE IT FOUND ANY IN THE SUITE. **164 gates enumerated (132 were
 ## reachable only by typing a filename); the shared-writes guard was EXEMPTING EIGHT LEGACY
 ## ROWS; and a LEGACY replay had sat in the corpus FIVE SESSIONS guarded by NOTHING — found,
-## attributed and closed.** Sweep RUNNING at close.
+## attributed and closed.** Sweep RUNNING at close. Portable tier 65/0/0/0; the STATIC tier
+## was deliberately NOT run — it times out under sweep load and the standing note is never
+## alongside other gates, so it is owed at the next quiet moment.
 
 | | |
 |---|---|
