@@ -13,8 +13,9 @@
 #   mash switch to Pyron, and a TENANT-VS-TENANT CPU match at match 5) ->
 #   guarded to the marathon's END at 40620.
 #
-# WHAT IT LOCKS (measured 2026-08-20 on merged-m4 = build/m3b_merged11,
-# two identical guarded runs):
+# WHAT IT LOCKS (RE-MEASURED 14z-129, 2026-09-03, on merged-m14 =
+# build/m3b_merged21 / 6649523a, two identical guarded runs; first frozen
+# 2026-08-20 on merged-m4, re-measured 14z-110 on merged14):
 #   1. #99 regression lock: the guarded run ENDs at 40620 with ZERO
 #      CRASH/PCWEEDS/SOFTRESET/END-CRASH lines, across two continues and
 #      two character switches.
@@ -26,9 +27,9 @@
 #   4. A tenant-vs-tenant CPU pairing occurs after a continue (both
 #      fighter bases in tenant space) — the #99 context shape.
 #   5. THE LITERAL #99 PAIRING: a post-continue match plays P1=DONOVAN
-#      vs CPU-PHOBOS (f22420 in the frozen trajectory, match 4) — and
-#      the run continues past it. The reported crash context, exercised
-#      and clean.
+#      vs CPU-PHOBOS (f24980 in the 14z-129 trajectory, the FIRST match
+#      after the continue) — and the run continues past it. The reported
+#      crash context, exercised and clean.
 #
 # SELF-UPDATING BASES: fighter identity is checked via +0x60.l against the
 # BUILD'S OWN hitbox-base table (PRG:0x0BD97A, atlas character_tables.md) —
@@ -39,25 +40,31 @@
 # commit). Tenant space test: base >= 0x300000 (wide_ext-relocated blocks;
 # every legacy base is < 0x100000).
 #
-# the switch-poke window (f32040-32220; RE-MEASURED 14z-110 on merged14 by
-#   the phase-1 recipe: forced Phobos WINS 3 — match 3 is naturally
-#   Phobos-vs-CPU-DONOVAN — loses match 4 to Bishamon ~f31860; the
-#   re-select opens ~f31940-32500, next match f32580. The old merged11
-#   schedule was f16100-16280, loss at match 2) is frozen to THIS build's measured loss
-# THIS build's measured loss trajectory (Phobos loses match 2 ~f15540, the
-# re-select opens f16100). A future freeze can move the mash lottery; if
-# assertion 3 then fails, RE-MEASURE the loss/re-select frames with the
-# phase-1 mapping recipe (dumps only, no switch pokes) and re-freeze the
-# schedule — do not widen the assertions.
+# THE SWITCH-POKE WINDOW IS FROZEN TO THIS BUILD'S MEASURED TRAJECTORY, and
+# it moves at every freeze that touches timing. Its history, which is the
+# argument for keeping it derived from named constants rather than typed in:
+#   merged11 (14z-100): loss at match 2, schedule f16100-16280
+#   merged14 (14z-110): forced Phobos WINS 3 — match 3 naturally
+#     Phobos-vs-CPU-DONOVAN — loses match 4 to Bishamon ~f31860; re-select
+#     ~f31940-32500, next match f32580; schedule f31960-32540
+#   merged-m14 (14z-129): loss f24020, mode 8 f24420, next match f24980;
+#     schedule DERIVED from RESELECT_OPEN/NEXT_MATCH below
+# A future freeze can move the mash lottery; if assertion 3 then fails,
+# RE-MEASURE the loss/re-select frames with the phase-1 mapping recipe
+# (dumps only, no switch pokes) and re-freeze the schedule — do not widen
+# the assertions. That is exactly what 14z-129 did.
 #
 # STEERING NOTE: $FF8114 index pokes do NOT select the opponent (measured:
 # two poke sets at f16180-16415 gave bit-identical outcomes — but REMOVING
 # them changed the downstream lottery, so the writes perturb state without
-# steering). The committed poke-free trajectory happens to deliver the
-# LITERAL #99 pairing at match 4 (Donovan vs CPU-Phobos, f22420) — frozen
-# as assertion 5. If a future freeze's lottery loses it, either re-measure
-# a trajectory that reaches the pairing or fall back to the read_tap.lua
-# loader/consumer serialization named on issue #99.
+# steering). The pairing is therefore NOT left to the lottery: since 14z-110
+# the post-continue first draw is VENUE-STEERED (below), and on merged-m14 it
+# delivers the LITERAL #99 pairing as the FIRST post-continue match — f24980,
+# P1=Donovan (0x3fa9d0) vs CPU-Phobos (0x45a770) — frozen as assertion 5.
+# (It was match 4 / f22420 on the 14z-100 merged11 trajectory, when it did
+# depend on the lottery.) If a future freeze loses it even with the steer,
+# either re-measure a trajectory that reaches the pairing or fall back to the
+# read_tap.lua loader/consumer serialization named on issue #99.
 #
 # Kill pokes: NONE (audit_kill_poke_shape: a 2-byte HP poke manufactures
 # the #103 stall shape by instrument; losses here are the mash's own).
@@ -94,16 +101,37 @@ PY
 # Pokes: force PHOBOS (0x10) at the initial select; force DONOVAN (0x13)
 # at the measured post-loss re-select window. No HP pokes.
 PK="1704:ff8782:10;1760:ff8782:10;1900:ff8782:10;2100:ff8782:10;2400:ff8782:10"
-# 14z-110 second measurement: pokes only at f32040-32220 did NOT land (P1
-# came out Bulleta) — the re-select's class read sits elsewhere in the
-# window than the initial select's. Blanket the WHOLE measured re-select
-# window instead (open ~f31940, match f32580): every 40 frames, last write
-# closest to load wins.
-PK="$PK;$(python3 -c "print(';'.join(f'{fr}:ff8782:13' for fr in range(31960,32560,40)))")"
+# 14z-110 second measurement: a NARROW poke set inside the window (then
+# f32040-32220) did NOT land — P1 came out Bulleta, because the re-select's
+# class read sits elsewhere in the window than the initial select's. So
+# blanket the WHOLE measured re-select window; every 40 frames, last write
+# closest to load wins. That rule is what makes the 14z-129 re-point a
+# three-number edit.
+# THE MEASURED TRAJECTORY, one place (RE-MEASURED 14z-129 on merged-m14 /
+# 6649523a). Everything below is derived from these three frames, so the next
+# re-measure edits three numbers and nothing else.
+#   RESELECT_OPEN  the judged loss resolves to mode 8 here
+#   NEXT_MATCH     the post-continue match starts here
+# 14z-129: the loss moved from ~f31860 (14z-110, merged14) to f24020 and the
+# re-select from ~f31940 to f24420 — SEVEN THOUSAND frames earlier, which is
+# why the frozen f31960-32540 window fired long after the select it was meant
+# to catch and P1 came out legacy. [VSP-132]: a 1P-arcade rig is pinned to the
+# ARCADE DRAW, so any timing change re-rolls the trajectory.
+RESELECT_OPEN=24420
+NEXT_MATCH=24980
+export RESELECT_OPEN NEXT_MATCH
+# Blanket the WHOLE re-select window (14z-110): the re-select's class read
+# sits elsewhere in it than the initial select's, so a narrow poke set does
+# not land. Every 40 frames, last write closest to load wins.
+PK="$PK;$(python3 -c "import os
+o=int(os.environ['RESELECT_OPEN']); m=int(os.environ['NEXT_MATCH'])
+print(';'.join(f'{fr}:ff8782:13' for fr in range(o+20, m-20, 40)))")"
 # 14z-110: the post-continue first draw is VENUE-STEERED to Phobos (venue
 # 0x02 on Donovan's row; EVEN values only — game/gotchas.md), so assertion 5
 # no longer depends on the lottery the 14z-100 freeze got lucky with.
-PK="$PK;$(python3 -c "print(';'.join(f'{fr}:ff8121:02' for fr in range(32300,32560,40)))")"
+PK="$PK;$(python3 -c "import os
+m=int(os.environ['NEXT_MATCH'])
+print(';'.join(f'{fr}:ff8121:02' for fr in range(m-280, m-20, 40)))")"
 DF="$(python3 -c "print(';'.join(f'{f}:ff8000-ff8180;{f}:ff8400-ff8470;{f}:ff8800-ff8870' for f in range(2500,40600,80)))")"
 
 echo "== guarded marathon (Phobos -> loss -> continue -> switch to Donovan)"
