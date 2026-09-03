@@ -53,6 +53,12 @@ Entry points at this level, deliberately not in a bucket:
   (`tools/gen_gate_index.py`, 14z-123): every script under `tests/` with its
   kind, tier, family, needs and its own header sentence. Replaces HANDOFF's
   hand-written gate fence; a gate's WHY lives in the gate.
+- [`project/harness_hardening_history.md`](project/harness_hardening_history.md) —
+  HIST (14z-128): one entry per pass that hardened the TEST HARNESS itself,
+  newest first, and the standing list of THE CLASSES of harness rot — the
+  orphan, the silent downgrade, the dead control, the stale reference, the
+  outgrown parser, the deleted mechanism, the missing operand. Read the
+  classes before triaging a red gate; each one was paid for.
 - `checksums.txt` — machine-read by `tools/audit_roms.py`. A data
   manifest, not documentation; its path is deliberately stable.
 
