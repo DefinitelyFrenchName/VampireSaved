@@ -14,7 +14,14 @@
 > ## **RESUME IT** (it skips everything already recorded):
 > ##
 > ##     ROMDIR=... tests/run_all_emulator.sh --lane fbneo --lane mame \
-> ##         --scope all --jobs 3 --resume --log build/emu_sweep_14z128
+> ##         --scope all --jobs 3 --resume --timeout 14400 \
+> ##         --log build/emu_sweep_14z128
+> ##
+> ## **`--timeout 14400` IS NOT OPTIONAL for this lane.** The 5400 s default is
+> ## too low for the corpus soaks — `audit_guard_corpus` alone is 79 replays x 4
+> ## legs = 316 guarded MAME runs, ~2 h at `JOBS=2`. A TIMEOUT row there means
+> ## the runner's default, not the build. A per-row timeout in
+> ## `ci_emulator.tsv` would be the real fix.
 > ##
 > ## Per-gate logs are `build/emu_sweep_14z128/<gate>.log`. Nothing is red that
 > ## was not adjudicated below. No build byte moved this session.
