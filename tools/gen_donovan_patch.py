@@ -1605,8 +1605,13 @@ def main():
     # per-tenant entry resolving to that tenant's copy. The FIRST resolver
     # keeps the original numbers (maintainer-decided scope, 14z-82): the
     # guard-clean tenant's bytes stay untouched, and the census-gap
-    # detector is dynamic instead (tests/audit_type_dispatch_range.sh:
-    # zero original-range dispatches on later tenants' replays).
+    # detector was dynamic instead (audit_type_dispatch_range.sh: zero
+    # original-range dispatches on later tenants' replays). THAT GATE WAS
+    # DROPPED 14z-129 — its probe site survived 14z-91's walker relocation
+    # but its verdict control did not, and a gate that cannot prove it sees
+    # what it claims is absent is worse than none ([VSP-166]). The claim
+    # below is therefore UNGATED dynamically; the static half is
+    # tests/test_type_stamp_census.sh.
     #
     # Scope: site 0x5E542's extension (types 114-120) ONLY. Site 0x54470's
     # 64-75 stay FIRST-WINS with their loud notes — deferred WITH a
@@ -6676,8 +6681,9 @@ def main():
     (out / "tenant.json").write_text(json.dumps(_tenant_row(_tp), indent=1))
     (out / "tenants.json").write_text(json.dumps(
         [_tenant_row(t) for t in _tenant_list], indent=1))
-    # 14z-82: the type-renumber map, for the gates (audit_type_dispatch_range
-    # reads the renumbered index range) and the atlas. Written ONLY when
+    # 14z-82: the type-renumber map, for the gates and the atlas. (Its one
+    # dynamic reader, audit_type_dispatch_range, was dropped 14z-129; the
+    # file stays — the atlas and the static census use it.) Written ONLY when
     # non-empty, so every single-tenant build's file set is unchanged.
     if TYPE_RENUMBER_ORDER:
         (out / "type_map.json").write_text(json.dumps(

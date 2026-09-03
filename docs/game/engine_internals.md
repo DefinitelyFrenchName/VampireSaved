@@ -2206,7 +2206,7 @@ controls) and `tools/audit_quote_font.py` compares the glyphs.
 pool), `atlas/character_tables.md` (the `[[obj_hook]]` table rows).
 **Gates:** `tests/test_obj_walker_relocation.sh`, `tests/audit_walker_ghost.sh`,
 `tests/audit_walker_repoint.sh`, `tests/test_type_stamp_census.sh`,
-`tests/audit_type_dispatch_range.sh`, `tests/audit_type_writes.sh`,
+`tests/audit_type_writes.sh`,
 `tests/audit_pool_free_byte.sh`, `tests/test_hitclass_map_thunk.sh`,
 `tests/audit_hitclass_map_cost.sh`, `tests/test_classify_pool_spawns.sh`.
 
@@ -2400,12 +2400,25 @@ copy. Side file: `patch/tag_map.json`. NOTE the register asymmetry:
 the tag WRITE is `(0x7F,A4)` (A4 = slot pointer at every stamp site);
 the tag READ is `(0x7F,A6)` (A6 = object at walker dispatch).
 
-Dynamic gate: tests/audit_type_dispatch_range.sh — on the merged build,
-ZERO dispatches in the original range [0x1C8,0x1E4) during later
-tenants' replays (a census-missed stamp would land there), renumbered
-range live for Huitzil, originals still serving tenant-0; and (14z-85)
-0x54470 family dispatch live on H and P legs with the tag-stub
-tripwire SILENT. The tag bytes themselves: tests/audit_pool_free_byte.sh
+Dynamic gate: ~~tests/audit_type_dispatch_range.sh~~ **DROPPED 14z-129
+(maintainer-ruled: "better no test than a bad one")** — it probed an
+`obj_hook thunk` that 14z-91 deleted, and could not be re-targeted
+HONESTLY: the site still exists (the relocated walker's base+0x18, where
+D0 carries the index — at its `jsr (A0)`, base+0x1E, D0 is ZERO and a probe
+there would report a permanent false green), but its VERDICT CONTROL cannot
+be rebuilt. Measured 14z-129 on `hui/70_hui_mash`: `build/hui30` (14z-82c)
+fires 5,862 times in [0x1C8,0x1E4) (D0 = 0x1cc/0x1d4/0x1dc, types
+115/117/119), while a current-manifest single-tenant vertical fires 8,990
+times with ZERO in that window. Without a build that DOES dispatch originals
+the gate cannot prove it can see what it claims is absent ([VSP-166]).
+WHAT IT USED TO ASSERT, kept because the CLAIM is still true of the design:
+on the merged build, ZERO dispatches in the original range [0x1C8,0x1E4)
+during later tenants' replays (a census-missed stamp would land there),
+renumbered range live for Huitzil, originals still serving tenant-0; and
+(14z-85) 0x54470 family dispatch live on H and P legs with the tag-stub
+tripwire SILENT. It is now UNGATED — the static half is
+`tests/test_type_stamp_census.sh` and the write half `audit_type_writes.sh`,
+neither of which covers the DISPATCH question (STATE, the dropped entry). The tag bytes themselves: tests/audit_pool_free_byte.sh
 (post-tag mode — family slots carry the stamper's tag, +0x7F writer PCs
 are exactly the emitted thunks).
 

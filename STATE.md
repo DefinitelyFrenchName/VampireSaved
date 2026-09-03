@@ -322,8 +322,17 @@ what a triage is looking at, so those are where the thinking time goes.
 
 ## Decisions pending (human)
 
-- **`audit_type_dispatch_range` PROBES A MECHANISM THAT NO LONGER EXISTS —
-  UPDATE OR DROP (found 14z-128, the maintainer's own phrase for this arc).**
+- **~~`audit_type_dispatch_range` PROBES A MECHANISM THAT NO LONGER EXISTS —
+  UPDATE OR DROP~~ DECIDED (maintainer, 2026-09-03): DROP. Verbatim:
+  *"better no test than a bad one. Let's drop"*.** EXECUTED 14z-129 — the
+  script deleted, its `ci_emulator.tsv` and `gate_index.tsv` rows removed, and
+  every live carrier marked in place (`engine_internals.md` keeps WHAT IT USED
+  TO ASSERT, since the claim is still true of the design and is now simply
+  UNGATED dynamically; `patch_index.md`, `harness_hardening_history.md` class
+  6, `gen_donovan_patch.py`'s two comments, NEXT_SESSION). The ground is the
+  measured one below — the verdict control cannot be rebuilt — NOT the
+  superseded-by-`audit_type_writes` ground, which was measured FALSE.
+  The measurement that produced [VSP-166] is kept in full. Original entry:
   The gate scrapes an `obj_hook thunk` address out of the build's
   `patch_notes_fragment.md` and probes it to see which type indices the merged
   build dispatches — "the dynamic census-gap detector for the 14z-82

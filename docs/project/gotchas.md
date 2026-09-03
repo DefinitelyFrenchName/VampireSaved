@@ -3563,3 +3563,20 @@ believe is equivalent is neither.
 This is [VSP-19] one level up: that rule says a verdict's CLASSIFIER must be
 validated against ground truth; this one says WHERE THE CLASSIFIER LOOKS must
 be too, and neither may be established by reading our own generator.
+
+**THE OUTCOME, and it is the rule paying for itself within the hour.** The
+measurement the rule demanded was run, and the site I had proposed —
+`audit_walker_repoint`'s relocated `jsr (A0)` at walker+0x1E — fires 8,990
+times with **`D0` = 0 EVERY TIME**: the index is already consumed into A0
+there. Shipping that re-target would have produced a gate reporting "zero
+original-range dispatches" forever. The index lives at walker+0x18, the site
+the gate always probed. **But the VERDICT CONTROL could not be rebuilt**: on
+`hui/70_hui_mash`, `build/hui30` fires 5,862 times inside [0x1C8,0x1E4)
+(`D0` = 0x1cc/0x1d4/0x1dc, types 115/117/119) while a current-manifest
+single-tenant vertical fires 8,990 times with ZERO in that window — the
+phenomenon the control depends on does not occur on modern builds.
+**MAINTAINER-RULED 2026-09-03: DROP** — *"better no test than a bad one"*.
+The gate is deleted; `engine_internals.md` keeps what it used to assert,
+now explicitly UNGATED. Corroboration that the probe site was right: the
+14z-82 patch note records 5,862 RENUMBERED dispatches on the merged build for
+the same replay — the same stream, relabelled.

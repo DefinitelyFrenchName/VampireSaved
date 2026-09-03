@@ -68,7 +68,6 @@ tests/audit_trap_parity.sh	tenant
 tests/audit_trap_shock.sh	tenant
 tests/audit_trap_sound.sh	tenant
 tests/audit_tripwire_reach.sh	tenant
-tests/audit_type_dispatch_range.sh	pipeline
 tests/audit_type_writes.sh	pipeline
 tests/audit_voice_borrow.sh	tenant
 tests/audit_walker_ghost.sh	tenant

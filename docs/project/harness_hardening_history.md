@@ -89,7 +89,7 @@ The nineteen, by class:
 | 3 dead control | `audit_qs_voice_wav` (last-window boundary), `audit_hitclass_map_cost` (the no-thunk twin stopped crashing) |
 | 4 stale reference | `test_wide_profile` (reference binary 3 days older than the harness patch), `test_m2a_stage4_oracle` + `test_m2a_stage2_data` (M2a-era dirs), `test_hui_oracle` (`build/hui4`, pre-WIDE-v1.1), `test_phasec_image` + `test_m2b_stage6` (one cause: M13 built and unregistered), `audit_phase_mode_cost` (a reference 25 freezes old) |
 | 5 outgrown parser | `audit_merged_vec3` — `A1`/`A3` were added to the PROBE line at 14z-109 and its extractor required `A6` to follow `A0` directly, so for NINETEEN sessions it reported "rig dead — the replay or pokes moved" at a rig that was fine |
-| 6 deleted mechanism | `audit_type_dispatch_range` — scrapes an `obj_hook thunk` that 14z-91 removed |
+| 6 deleted mechanism | `audit_type_dispatch_range` — scrapes an `obj_hook thunk` that 14z-91 removed. **RESOLVED 14z-129 by DELETION** (maintainer: "better no test than a bad one"): the probe site was re-findable but the VERDICT CONTROL was not, and a re-target would have shipped a gate that cannot fail ([VSP-166]) |
 | 7 missing operand | `audit_walker_repoint`, `audit_empty_tiles` (both PASS once given one), `audit_mask_window_ff42a2` (an instrument; now skips) |
 | — | `audit_region_movability` (injects a `region_space` key `donovan.toml` has carried since 14z-111), `test_pyron_soak` + `test_pyron_ladder` (the only CRASH class, on self-built stage images; `audit_guard_corpus` PASSED on the merged build, so the artifact is not implicated), `audit_continue_switch` (a frozen arcade trajectory, [VSP-132]) |
 

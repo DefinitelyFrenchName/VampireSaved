@@ -133,8 +133,9 @@
 > ##   so an END-clean run proves nothing about the thunk — and its own message
 > ##   forbids re-pointing the control until section 4's map probe says why.
 > ##   **Neither is fixed by relaxing the control.**
-> ## * `audit_type_dispatch_range` — probes a mechanism 14z-91 deleted; the
-> ##   update-or-drop decision in STATE.
+> ## * ~~`audit_type_dispatch_range`~~ — **DROPPED 14z-129** (maintainer:
+> ##   "better no test than a bad one"). Its probe site survived 14z-91's
+> ##   walker relocation; its VERDICT CONTROL did not. [VSP-166].
 > ## * `audit_region_movability`, `test_m2a_stage2_data` — `out` scope; a
 > ##   duplicate manifest key and a half-pruned M2a dir, both diagnosed in the
 > ##   registry rows.
@@ -158,7 +159,8 @@
 > ## 3. **A PARSER OR AN INJECTION THE TREE OUTGREW** — `audit_merged_vec3`
 > ##    (PROBE line gained registers at 14z-109), `audit_region_movability`
 > ##    (injects a `region_space` key donovan.toml has carried since 14z-111),
-> ##    `audit_type_dispatch_range` (scrapes a thunk 14z-91 deleted).
+> ##    `audit_type_dispatch_range` (scraped a thunk 14z-91 deleted; DROPPED
+> ##    14z-129 once the control proved unrebuildable).
 > ## 4. **A FROZEN CONSTANT THE RULING MOVED** — `test_phasec_image`'s
 > ##    donovan-m2c stock fingerprint, against a stock twin that legitimately
 > ##    moves at every freeze ([VSP-94]).
