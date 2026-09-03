@@ -160,15 +160,15 @@ test_hui_grab	mame	release	-	Circuit Scrapper
 test_hui_grab_victim	mame	release	-	the grab-victim placement A/B
 test_hui_walk	mame	release	-	the velocity port
 test_hui_pairs	mame	release	-	Reflect Wall guard-cancel + pair-press; run on ANY change that routes objects ([VSP-85])
-test_hui_oracle	mame	release	-	Huitzil vs2-as-oracle behaviour
+test_hui_oracle	mame	release	-	Huitzil vs2-as-oracle behaviour. RED 14z-128 ("no dump files") because its default was build/hui4 — 19 members, vsw.* without vsw.z01, pre-WIDE-v1.1 and unbootable on current binaries, a rot test_build_ref_rot could not see until the same session. Re-pointed to build/hui52 and it PASSES.
 test_hui_df_style	mame	release	-	Dark Force style, ours vs NATIVE
 test_hui_electrocute	mame	release	-	Phobos as the electrocute victim, ours vs native
-test_pyron_ladder	mame	release	-	the Pyron stage 1-3 ladder
-test_pyron_soak	mame	release	-	the Pyron stage-4 chaos soak
+test_pyron_ladder	mame	release	-	the Pyron stage 1-3 ladder. RED 14z-128, same family as test_pyron_soak: it builds its own stage images and the boot probe trips the guard before reaching frame 2600, so the id-hold and load verdicts are NOT statements about the load path (the gate says so itself). Triage the two together.
+test_pyron_soak	mame	release	-	the Pyron stage-4 chaos soak. RED 14z-128 and it is a CRASH — `CRASH 3020 vec4 PC 000000` on the stage-4 image it builds itself (a01c586a). CROSS-CHECK THAT BOUNDS IT: audit_guard_corpus PASSED the same sweep (1727s, the whole corpus x 4 legs under the guard on the MERGED build), so the shipped artifact is not implicated. The soak was clean at 14z-67. Untriaged: needs archaeology, not a 4am guess — and note the select flow it forces id 0x11 through has changed three times since (Oboro 14z-105, wheel separation 14z-115, random select 14z-117).
 test_pyron_cosmo	mame	release	-	the Cosmo Disruption crash gate
 test_pyron_blink	mame	release	-	the sprite/HUD blink gate
 test_pyron_medallion_2p	mame	release	-	the P2-hover half of medallion palette stability
-audit_continue_switch	mame	release	-	the #99 continue+switch lock
+audit_continue_switch	mame	release	-	the #99 continue+switch lock. RED 14z-128 and SELF-DIAGNOSING: "Donovan-vs-CPU-Phobos not reached — the frozen trajectory moved; re-measure". That is [VSP-132] exactly — a 1P-arcade rig is pinned to the ARCADE DRAW, and any timing change re-rolls its opponent. Re-measure the trajectory; do not re-freeze the verdict.
 audit_don_vs_cpu	mame	release	-	the deterministic Donovan-vs-CPU pairing (#111) — the coverage gap #99 fell through
 audit_don_grab_pose	mame	release	-	the #104 lock: a legacy grab holding a TENANT victim
 audit_don_ko_writer	mame	release	-	the #103 root-cause lock. The header read as if EXPECT_DEFECT still defaulted to 1; MEASURED 14z-128 — the code default was flipped to 0 at the 14z-99 window and only the header was stale (corrected).
