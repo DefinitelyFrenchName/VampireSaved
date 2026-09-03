@@ -74,6 +74,12 @@
 > ## 889-2491` authored in all three sets. A census says it was the only such hole
 > ## of 88 replays.
 > ##
+> ## **(4) `audit_merged_vec3` — FIXED, and it was never the game.** It reported
+> ## "rig dead — the replay or pokes moved" since 14z-109, when `A1`/`A3` were
+> ## added to the PROBE line and its A0 extractor still required `A6` to follow
+> ## `A0` directly. Parses by field name now; PASSES, and confirms the 14z-81
+> ## satellite defect stays fixed. Its FAIL row in the sweep log is pre-fix.
+> ##
 > ## # THEN, IN ORDER
 > ##
 > ## **(a) FINISH THE SWEEP** and triage what it finds. Adjudicate, never
