@@ -335,6 +335,37 @@ what a triage is looking at, so those are where the thinking time goes.
 
 ## Decisions pending (human)
 
+- **`audit_type_dispatch_range` PROBES A MECHANISM THAT NO LONGER EXISTS —
+  UPDATE OR DROP (found 14z-128, the maintainer's own phrase for this arc).**
+  The gate scrapes an `obj_hook thunk` address out of the build's
+  `patch_notes_fragment.md` and probes it to see which type indices the merged
+  build dispatches — "the dynamic census-gap detector for the 14z-82
+  type-renumber fix". **MEASURED: `build/hui30` (14z-82c) has 2 such rows;
+  `build/merged1` has ZERO**, so the scrape returns empty and the gate exits
+  with `FAIL: could not scrape an obj_hook thunk address` before measuring
+  anything.
+  **WHY THERE ARE NONE: 14z-91 DELETED THE THUNKS.** The legacy-regression fix
+  left "the obj_hook dispatch sites VANILLA — each 0x2C-byte object-pool walker
+  relocated with its union table at copy+0x2C and only the 23 caller OPERANDS
+  rewritten". No thunk is emitted any more, so no post-14z-91 build can satisfy
+  this gate. Its reference leg still works only because `hui30` predates the
+  change. **It has been unrunnable for ~37 sessions**, and like the others in
+  this arc, unheard because no runner called it.
+  **THE OPTIONS:**
+  **(a) RE-TARGET** it at the shipped mechanism — probe the RELOCATED walker's
+  union table instead of a thunk. The question it asks (which type indices does
+  a merged build actually dispatch?) is still live and still worth a dynamic
+  answer.
+  **(b) DROP IT** as superseded, if `audit_type_writes` (the "DYNAMIC half of
+  the 14z-82 type-stamp census", which maps observed family writes to the
+  frozen static inventory) already covers the gap. **I have NOT established
+  that it does** — the two ask different questions (which PCs WRITE a type byte
+  vs which indices are DISPATCHED), and answering it is the first step either
+  way.
+  **No recommendation without that check**, which is why this is a decision and
+  not a fix. Half a session for (a); an afternoon of reading for the (b)
+  determination. Meanwhile the row stays `release` scope and RED, honestly.
+
 - **REPLAY `105_legacy_2pwin_auto` — THE SPEC IS MEASURED AND READY TO AUTHOR;
   WHAT IS MISSING IS THE ATTRIBUTION OF TWO FRAMES (14z-128).** The replay
   entered the corpus at 14z-123 as LEGACY content and has been guarded by

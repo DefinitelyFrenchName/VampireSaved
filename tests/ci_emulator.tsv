@@ -96,10 +96,10 @@ test_select_arrays	mame	release	-	freezes the select-screen record-pointer array
 test_shim_charid	mame	release	-	the init shim can identify which tenant it runs for
 test_tenant_select_records	mame	release	-	a variant-id build carries the tenant's OWN select records
 audit_dispatch_census	mame	release	-	which type indices LEGACY dispatches at the obj_hook sites; frozen observation
-audit_type_dispatch_range	mame	release	-	the dynamic census-gap detector on a MERGED build
+audit_type_dispatch_range	mame	release	-	the dynamic census-gap detector on a MERGED build. RED 14z-128 AND UNRUNNABLE SINCE 14z-91: it scrapes an `obj_hook thunk` address from patch_notes_fragment.md, and 14z-91 DELETED the thunks (the walker is relocated and only caller operands are rewritten). hui30 has 2 such rows, merged1 has ZERO. UPDATE OR DROP — see STATE "Decisions pending".
 audit_type_writes	mame	release	-	which PCs write extended-family type bytes ([VSP-88])
 audit_walker_ghost	mame	release	-	where each walker's jsr (A0) pushes its return address ([VSP-41])
-audit_walker_repoint	mame	release	-	does anything still reach the vanilla object-pool walkers
+audit_walker_repoint	mame	release	%MERGED%	does anything still reach the vanilla object-pool walkers. ARGS REQUIRED: it takes <builddir> and has no default, so a bare invocation dies on its usage line (the sweep recorded that as FAIL 0s, 14z-128). The merged build is the right subject — a caller left pointing at the vanilla walker is a wild dispatch for a TENANT type, which only a build carrying tenants can show.
 audit_wide_phase_a	mame	out	-	romset: CPS-2 WIDE Phase A measurements on VANILLA vsavj — what the original game does
 audit_objhook_owner_census	mame	out	-	momentary: the 14z-81b vec3-fix DESIGN measurement
 audit_region_movability	mame	out	-	momentary: a design-space measurement (which regions can live in wide_ext); it rebuilds a case set
