@@ -112,8 +112,16 @@
 > ##   changed three times since the soak was last clean (14z-67).
 > ## * `audit_continue_switch` — the frozen arcade trajectory moved ([VSP-132]);
 > ##   re-measure it, do not re-freeze the verdict.
-> ## * `audit_qs_voice_wav` — its LAST must-fire control is dead (a last-window
-> ##   boundary in the checker). Audio itself clean: 74 windows, 0 suspects.
+> ## * **TWO DEAD MUST-FIRE CONTROLS, and this is the class to take most
+> ##   seriously** — a dead control is how a gate goes GREEN while asserting
+> ##   nothing, which is the failure [VSP-19] exists for. Both gates caught
+> ##   their own and refused to give a verdict, which is the system working.
+> ##   `audit_qs_voice_wav`: the LAST-voice control does not fire (a last-window
+> ##   boundary in the checker; the audio itself is clean, 74 windows 0
+> ##   suspects). `audit_hitclass_map_cost`: the no-thunk twin does NOT crash,
+> ##   so an END-clean run proves nothing about the thunk — and its own message
+> ##   forbids re-pointing the control until section 4's map probe says why.
+> ##   **Neither is fixed by relaxing the control.**
 > ## * `audit_type_dispatch_range` — probes a mechanism 14z-91 deleted; the
 > ##   update-or-drop decision in STATE.
 > ## * `audit_region_movability`, `test_m2a_stage2_data` — `out` scope; a
