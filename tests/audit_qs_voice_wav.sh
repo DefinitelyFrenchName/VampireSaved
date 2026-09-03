@@ -87,6 +87,22 @@ python3 "$REPO/tools/check_qs_voice_wav.py" "$W/ours/voices.wav" \
 # this control would still have gone green. The window maths now comes from
 # check_qs_voice_wav.window() rather than a second copy of the constants,
 # so the control cannot compute a different window than the checker.
+#
+# BOTH ENDS ARE THE LAST *SOUNDING* WINDOWS, NOT THE LAST INDICES (fixed
+# 14z-129 — the control had been DEAD at the late end and said so).
+# THE MEASUREMENT: the checker skips any window both legs leave silent
+# (`mo[0] < 50 and mn[0] < 50`), because there is nothing there to compare.
+# Zeroing such a window therefore changes nothing and no suspect can fire.
+# Voice 80 — the last index, vs2 id 0x733 — is RMS **1.0 on BOTH legs**, and
+# it is not alone: 7 of the 81 windows are silent that way (indices 3, 11,
+# 64, 65, 68, 69, 80). So the control was asking the checker to notice the
+# truncation of silence. NOT A PORT DEFECT: ours equals native to the decimal
+# in every window, silent ones included — the ids simply do not sound in this
+# sweep. The control now picks the last index that actually SOUNDS (79 today)
+# and asserts it is still LATE in the sweep, because "late" is the whole
+# point of the second end ([VSP-19]: a control that cannot fail asserts
+# nothing, and one that quietly moved to the near end asserts the wrong
+# thing).
 python3 - "$W" <<'PY' || exit 1
 import json, os, subprocess, sys, wave
 w = sys.argv[1]
@@ -102,8 +118,33 @@ base = bytearray(src.readframes(src.getnframes()))
 rate, nch = params.framerate, params.nchannels
 print(f"  (control at {CPS_HZ:.4f} Hz; sweep has {n} voices)")
 
+# WHICH WINDOWS CAN THE CHECKER EVEN SEE? Exactly the ones it does not skip,
+# so the test uses the checker's own rule rather than a second copy of it.
+from check_qs_voice_wav import load as _load, metrics as _metrics
+_ro, _so = _load(f"{w}/ours/voices.wav")
+_rn, _sn = _load(f"{w}/native/voices.wav")
+sounding = []
+for _i in range(n):
+    _a, _b = window(_i, _ro)
+    if not (_metrics(_so, _a, _b)[0] < 50 and _metrics(_sn, _a, _b)[0] < 50):
+        sounding.append(_i)
+if not sounding:
+    print("  CONTROL UNRUNNABLE: no window sounds on either leg — the capture"
+          " is not of the sweep it claims to be")
+    sys.exit(1)
+print(f"  ({len(sounding)} of {n} windows sound; the checker skips the rest)")
+
+# The late end must stay LATE, or the second control silently becomes a
+# duplicate of the first (GitHub #85 is exactly that failure).
+LATE = sounding[-1]
+if LATE < int(n * 0.9):
+    print(f"  CONTROL DEGRADED: the last SOUNDING window is index {LATE} of"
+          f" {n} — too early to exercise late-window drift. Something changed"
+          f" the sweep; re-measure before touching this threshold.")
+    sys.exit(1)
+
 bad = 0
-for tag, i in (("first", 0), ("last", n - 1)):
+for tag, i in (("first", sounding[0]), ("last", LATE)):
     raw = bytearray(base)
     a, b = window(i, rate, frames=160)
     a, b = a * nch * 2, b * nch * 2
