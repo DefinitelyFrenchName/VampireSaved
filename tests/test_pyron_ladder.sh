@@ -200,7 +200,20 @@ done
 # THE BOOT PROBE RUNS ON THE STAGE-6 RUNG (14z-93, GitHub #90) — the rung
 # that carries Pyron's port, and the one that corresponds to what ships.
 echo "== stage-6 boot probe (forced pick, id 0x11)"
-SET=vsavjw tools/force_pick_probe.sh "$WORK/pyr6/rompath" 11 "$WORK/probe" > "$WORK/probe.txt" 2>&1 || {
+# THE WIDE BINARY IS REQUIRED AND IS NAMED HERE (14z-129). Stage 6 packs
+# `vsavjw.zip`, and only the profile-carrying MAME knows that set — a stock
+# binary exits "Unknown system" before the machine ever runs, which this probe
+# used to report as "never reached frame 2600 / guard TRIPPED", i.e. as a
+# crash in the build ([CPE-40], NEXT_SESSION's "name MAME_BIN for a vsavjw
+# run"). That is exactly how this gate went red in the 14z-128 sweep while the
+# build was perfect. force_pick_probe.sh now refuses the mismatch itself; this
+# line is what makes the gate right rather than merely loud.
+# Release-scope gates FAIL on a missing prerequisite, they do not self-skip
+# (STATE "RELEASE-TIME TEST SCOPE").
+WIDE_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
+[ -x "$WIDE_BIN" ] || { echo "FAIL: no WIDE MAME binary at $WIDE_BIN"; \
+    echo "      build it: tools/setup_mame.sh"; exit 1; }
+MAME_BIN="$WIDE_BIN" SET=vsavjw tools/force_pick_probe.sh "$WORK/pyr6/rompath" 11 "$WORK/probe" > "$WORK/probe.txt" 2>&1 || {
     cat "$WORK/probe.txt"; echo "FAIL: boot probe errored"; exit 1; }
 grep -q 'id-hold @2600: \$FF8782 = 0x11' "$WORK/probe.txt" || {
     cat "$WORK/probe.txt"; echo "FAIL: forced id did not hold"; exit 1; }

@@ -26,6 +26,29 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 mkdir -p "$OUT"
 
+# THE BINARY MUST KNOW THE SET, ASSERTED BEFORE THE RUN (14z-129).
+# Without this the probe reports "NO DUMP — the run never reached frame 2600"
+# and "guard: TRIPPED", which reads as a CRASH IN THE BUILD. The real cause
+# can be that MAME never started: a stock binary does not know `vsavjw` and
+# exits with "Unknown system", which the guard cannot distinguish from a
+# machine that died ([CPE-40]). That misread cost a release-scope red in the
+# 14z-128 sweep (`test_pyron_ladder`), where the stage-6 build was in fact
+# perfect — measured: with MAME_BIN set the SAME build reports id-hold, char
+# LOADED and guard clean.
+_BIN="${MAME_BIN:-mame}"
+if ! command -v "$_BIN" >/dev/null 2>&1 && [ ! -x "$_BIN" ]; then
+    echo "FAIL: MAME binary '$_BIN' not found — set MAME_BIN" >&2; exit 2
+fi
+if ! "$_BIN" -listfull "${SET:-vsavj}" >/dev/null 2>&1; then
+    echo "FAIL: the MAME binary does not know the set '${SET:-vsavj}'." >&2
+    echo "      This is an EMULATOR problem, not a ROM problem ([CPE-40])." >&2
+    echo "      binary: $_BIN" >&2
+    echo "      For a WIDE set, pass the profile-carrying build:" >&2
+    echo "        MAME_BIN=\$HOME/.cache/vampire-saved/mame/cps2" >&2
+    echo "      (build it with tools/setup_mame.sh)" >&2
+    exit 2
+fi
+
 cat > "$OUT/pick.rpl" <<'RPL'
 300-305 sys=C1
 800-803 sys=S1
