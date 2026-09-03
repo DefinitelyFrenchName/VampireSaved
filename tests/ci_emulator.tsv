@@ -82,7 +82,7 @@ audit_roster_pairings	mame	release	-	EVERY tenant against EVERY character, both 
 audit_guard_corpus	mame	release	-	the whole replay corpus x 4 legs under the crash guard
 audit_flicker_attribution	mame	release	-	re-derives WHY each frozen flicker frame is there; BUILD default is a 14z-91 build
 audit_mask_window_ff4182	mame	release	-	the third masked window
-audit_merged_vec3	mame	release	-	the merged Huitzil satellite anim-base regression gate
+audit_merged_vec3	mame	release	-	the merged Huitzil satellite anim-base regression gate. RED in the sweep and it was its OWN PARSER: the A0 extractor required A6 to follow A0 directly, which stopped being true at 14z-109 when A1/A3 were added to the PROBE line. Fixed to parse by field name 14z-128; the gate then PASSES and the 14z-81 defect is confirmed fixed. The FAIL row in a sweep log older than that is the pre-fix state.
 test_inp_corpus	mame	release	-	EVERY tracked hand-played recording, no exception ([VSP-20])
 test_inp_crash_merged_m8_01	mame	release	-	the #99 natural-path capture as a gate
 test_pod_black_foot_palette	mame	release	-	#112's black foot, causally located

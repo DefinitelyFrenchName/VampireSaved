@@ -82,7 +82,27 @@ probe() {  # probe <build> <out>
         tools/run_replay_guarded.sh vsavjw tests/replays/hui/70_hui_mash.rpl \
         "$2" "$W/box_$(basename "$2")" >/dev/null 2>&1 || true
 }
-a0_at_2886() { sed -n 's/^PROBE 2886 .*A0=\([0-9a-f]*\) A6=00ffb800.*/\1/p' "$1" | head -1; }
+# Parse BY FIELD NAME, never by position (corrected 14z-128). This read
+#   sed 's/^PROBE 2886 .*A0=\(...\) A6=00ffb800.*/\1/p'
+# which requires A6 to follow A0 DIRECTLY — true of the PROBE line until
+# 14z-109 added A1 and A3 to it ("object + node regs", replay_guard.lua:307,
+# commit c7a14aad). From that day this extractor returned nothing, and the
+# gate reported "rig dead — the replay or pokes moved". The rig was fine: the
+# probe fires at 2886 and reads A0=0x000E456C, the exact value this header
+# documents as healthy. NINETEEN SESSIONS of a gate blaming the game for its
+# own parser, and the message's guess at the cause was WRONG — which is why
+# a failure message may carry a hypothesis but the verdict must carry what
+# was measured ([VSP-116]).
+a0_at_2886() {   # A0 of the first frame-2886 PROBE whose A6 is the satellite
+    awk '$1=="PROBE" && $2==2886 {
+            a0 = ""; want = 0
+            for (i = 3; i <= NF; i++) {
+                if ($i ~ /^A0=/)          a0 = substr($i, 4)
+                if ($i == "A6=00ffb800")  want = 1
+            }
+            if (want && a0 != "") { print a0; exit }
+         }' "$1"
+}
 
 echo "== the healthy reference (hui29) =="
 probe "$REF" "$W/ref.log"
