@@ -196,7 +196,7 @@ audit_trap_sound	mame	release	-	the MK Plasma Trap fires, ring live
 audit_hui_grunt	mame	release	-	the electrocute-grunt A/B over five electrocutions
 audit_pyron_ring	mame	release	-	Pyron's merged-vs-solo sound-ring inventory
 audit_qs_voice_batch	mame	release	-	the voice-batch keyon A/B
-audit_qs_voice_wav	mame	release	-	the ear-level voice A/B (-wavwrite)
+audit_qs_voice_wav	mame	release	-	the ear-level voice A/B (-wavwrite). RED 14z-128 on its OWN MUST-FIRE CONTROL, not on the audio: "CONTROL DEAD (last, voice 80): truncated window not flagged" — the FIRST-voice control fires, the LAST-voice one does not, so it is a boundary case in the checker (the last window ends at the log's end, where a truncation may be indistinguishable). The measurement it did produce is clean: 74 sounding windows, 0 suspects. The gate refusing to give a verdict while a control is dead is [VSP-19] working; fix the checker's last-window edge, do not relax the control.
 audit_voice_borrow	mame	release	-	the voice-class borrow mechanism
 audit_continue_ladder	mame	out	-	momentary: the #102 discriminator (does a continue reset the ladder mask ON VANILLA) — the question was answered 14z-98
 audit_hitclass_map_cost	mame	out	-	momentary: what the 14z-82b hit-class map extension fixes and costs — the adoption measurement
