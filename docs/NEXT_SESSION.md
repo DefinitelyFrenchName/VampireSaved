@@ -19,7 +19,7 @@
 > ## scope the 14z-129 ruling makes mandatory at every freeze. Its log is
 > ## `<scratch>/emu_m13.log` and it will be GONE (scratch is session-local),
 > ## so **re-run it and read the result before anything else** — a freeze whose
-> ## emulator tier was never adjudicated is not a finished freeze. Expect it to
+> ## emulator tier was never adjudicated is not a finished freeze.
 > ## **THE CADENCE QUESTION WAS ASKED AND ANSWERED AT THIS FREEZE: NO.** The
 > ## runner dropped the six `bitstream` gates and printed "IS THIS FREEZE
 > ## TARGETING MiSTer?". It is not — the `.rbf` has not moved since 14z-108
