@@ -100,6 +100,12 @@
 > ##   minutes under load. Batch static work, run it when the machine is quiet.
 > ## * **Name `MAME_BIN` for a `vsavjw` run.** A bare `run_replay_mame.sh vsavjw`
 > ##   with the default binary produces NO dumps and NO error.
+> ## * **Name the SET for `run_suite.sh`, and READ THE DISPATCH LINE it prints.**
+> ##   `tests/run_suite.sh` with no `[set]` argument defaults to `vsavj`, so a
+> ##   WIDE rompath chain falls through to the pristine set in `$ROMDIR` and it
+> ##   dispatches to the `vsavj` expectation set — [VSP-58] in a new tool. It
+> ##   SAYS SO (`build fingerprint -> expectation set '...'`); that line is the
+> ##   check.
 > ## * The runner batches `--jobs` gates and waits for ALL of them before the next
 > ##   batch, so one slow gate idles the other slots. A proper slot loop would help
 > ##   throughput; it is not a correctness problem.
