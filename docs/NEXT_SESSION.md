@@ -139,6 +139,12 @@
 > ##   duplicate manifest key and a half-pruned M2a dir, both diagnosed in the
 > ##   registry rows.
 > ##
+> ## **THE CLASSES OF HARNESS ROT ARE NOW A DOCUMENT:**
+> ## `docs/project/harness_hardening_history.md` (HIST) — seven classes, the
+> ## runtime-vs-header diagnostic, and one entry per hardening pass back to
+> ## 14z-94. **Read the classes before triaging a red gate.** The section
+> ## below is this sweep's instance of them.
+> ##
 > ## # THE PATTERN IN THE SWEEP'S REDS, so the next batch is quick
 > ##
 > ## Ten reds by the time the lane was a third done, and **every one was the

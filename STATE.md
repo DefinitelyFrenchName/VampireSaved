@@ -27,29 +27,11 @@
 | not done, by design | the M13 freeze REGISTRATION (which clears two of the nineteen); the MiSTer lane (opt-in, hours); the eleven open reds, each recorded with its remedy |
 | **the standing lesson** | **every defect tonight was something SILENTLY NOT HAPPENING** — a lane dropped, a failure downgraded, a boundary crossed, eight legacy rows exempted, a replay compared against nothing. None was visible by reading; all five came from running the thing and looking at what it actually did |
 
-## Session 14z-127 CLOSE — ONE DAY, TWO OPEN QUESTIONS ANSWERED "THE PORT IS FINE", AND THE
-## INSTRUMENTS THAT PROVE IT. **#114 REFUTED THEN PROPERLY SCOPED (its evidence was JEDAH; the
-## cadence is the HOST ENGINE; the mash ceilings MATCH); the boot title SAVIOR -> SAVED BUILT on
-## all five tracks; and `test_shared_writes` FOUND GREEN AGAINST 14z-91 BUILDS FOR TEN FREEZES.**
-## Ten commits, all pushed. Strict static 126/0/0/0.
-
-| | |
-|---|---|
-| opened with | the three session documents, then two maintainer rulings (#112 = (C) with (B) kept open; the session series stays `14z-`), then "let's continue #114" |
-| **#114, and it took four corrections** | the issue's "ours" leg was **JEDAH** — replay 48's substituted-wheel path on the separated WIDE wheel; a POSITION confound-check passed because Jedah and Donovan stand at the same x. Then: the 3-frame cadence is the **host engine** (four vanilla characters drain `+0x5C`=11 in 9 frames on vsav2, 10 on vsavj); and the mash "defects" were **measured at half the ceiling** — at the true ceiling MP/HP/ES EQUAL native (8/12, 10/14, 15/19), LP is one hit short by hit PHASE. CLOSED by the maintainer with a gameplay verdict that REFRAMES the numbers: ours saturating at a slightly lower mash rate is *"not a bad thing"*, VS2's max being *"legitimately very hard"* |
-| **the mash mechanism, measured** | accumulator `+0x0A` >= 7 spends one unit of the ITERATION BUDGET `+0x27` — **the per-strength cap, DATA, 2/3/3/4, identical in both games**. Verified identical at three levels: 94 chain nodes, the deciding code (vs2 `0x059EEA` / ours `0x0C00FA`, instruction for instruction), and the cap values |
-| **the boot title, BUILT** | `SAVIOR` -> `SAVED`: three `aux_poke poke16` at `PRG:0x01C822/24/26`, declared in all three manifests and **deduped to ONE shared row** (confirmed by three independent gates). Five tracks rebuilt; `merged-m15` `f42f7569` shows **VAMPIRE SAVED**. Legacy untouched three ways: `audit_merged_legacy` 96/0 with attract BIT-IDENTICAL, work RAM identical over 1,621 frames, and the whole-artifact manifests moving only `vm3j.03d` + the M13 glyph members. **NOT REGISTERED** — the expectation sets are the ~5h battery |
-| **the finding that outranks the day** | **`test_shared_writes.sh` has been green against `don_m7`/`hui41`/`pyron26` (14z-91) FOR TEN FREEZES.** Current builds: 18/19/18 NEW shared-surface writes, only 3 of them 14z-127's; the rest is shipped work nobody was forced to review. Marked STALE in place and deliberately NOT re-pointed ([VSP-97]) |
-| four reds, each REVIEWED not blind-refrozen | `test_charmap_current` (3 provenance leaves, zero character bytes), `test_phasec_spaces`, `test_manifest_merge` (+3/+3/+3), `test_m3a_reproducible` (member deltas NAMED) |
-| gates / rules added | `test_don_immortal_native.sh` (native measured in-run, 4 strengths, no-mash AND ceiling, + the Jedah must-fire control, the vanilla engine-clock licence, the saturation control); `test_don_reactions` tightened TWO-SIDED; `test_don_sound`'s void `SET=vsavjw` now REFUSES; `run_all_static`'s classifier taught the `.inp` wrappers; skill rules [VSE-84] [VSE-85] [VSP-163] |
-| rulings recorded | release scope ("at release ALL tests run"), the hard-fail absolute, how a red is adjudicated, the engine-takes-precedence principle, the Capcom-attribution principle |
-| **the standing lesson** | **I was wrong four times and every correction came from a CONTROL, never from reasoning harder** — one cell generalised to "reproduces native"; the residue called a defect before the vanilla control; a mash matrix shown unchecked; "p2 is the ceiling" when it was half of it. Two caught by the maintainer, two by checks I had proposed |
-| not done, by design | freeze REGISTRATION (the ~5h battery, scheduling call pending); the shared-writes review (handed to the emulator-tier arc); the one-byte row/col identification (see NEXT_SESSION) |
-| push | **PUSHED** (ten commits, `a9f798e`) |
-
-**Ledger rollover:** the 14z-126b group (CLOSE (3) and CLOSE (2)) moved verbatim
-to STATE_HISTORY.md at this close — STATE had crossed the rule's ~150 KB line
-again (164 KB). STATE now holds the 14z-127 close.
+**Ledger rollover:** the 14z-127 group moved verbatim to STATE_HISTORY.md at this
+close — STATE had crossed the rule's ~150 KB line again (160 KB). STATE now holds
+the 14z-128 close only; four RESOLVED decisions also moved to DECISIONS_HISTORY.md
+earlier in the session. What is left above the ledger is one group, so the file's
+remaining size is THE LEDGER plus the standing sections, not session records.
 
 **SPLIT 2026-08-20 (14z-99 post-freeze close, maintainer-approved): this
 file holds the RECENT session groups + THE LEDGER; the full detail of every
@@ -80,6 +62,7 @@ Full detail for every line: `STATE_HISTORY.md` (verbatim; grep the session
 tag or any phrase below). `[+N more entries]` = the group has N further
 session records in the archive beyond the headline shown.
 
+- Session 14z-127 CLOSE — ONE DAY, TWO OPEN QUESTIONS ANSWERED "THE PORT IS FINE", AND THE INSTRUMENTS THAT PROVE IT: #114 REFUTED then properly scoped (its evidence was JEDAH; the cadence is the HOST ENGINE; the mash ceilings MATCH), the boot title SAVIOR -> SAVED BUILT on all five tracks, and `test_shared_writes` FOUND GREEN AGAINST 14z-91 BUILDS FOR TEN FREEZES. Ten commits, all pushed; strict static 126/0/0/0  [rolled 14z-128 close — STATE was 160 KB]
 - Session 14z-126b CLOSE (3) — ritual complete for the LONG CONTINUED session: NINE ARCS — a maintainer correction to a rule I had overstated, the `14z-N` key documented as law, #113 CLOSED then MECHANISED, the MiSTer core-list name + main-MRA fix, a corpus gate that could pass while asserting nothing, #112 ROOT-CAUSED, Jedah ARBITRATED, the aerials part-resolved, and #114 opened on 421+P. No build byte moved; strict static 126/0/0/0  [rolled 14z-127 close, early — STATE was 164 KB]
 - Session 14z-126b CLOSE (2) — FIVE ARCS AFTER THE FIRST CLOSE: the three grandfathered tags amended and force-pushed, a red root-caused to the macOS tmp reaper, #112 picked up and its premise refuted, the black foot found by searching the INPUTS, and two gotchas + a gate that came out of it. No build changed; strict static 126/0/0/0  [rolled 14z-127 close]
 
