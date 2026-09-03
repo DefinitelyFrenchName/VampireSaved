@@ -1,93 +1,87 @@
-# NEXT SESSION — orientation (rewritten at the 14z-129 CLOSE, 2026-09-03)
+# NEXT SESSION — orientation (rewritten at the 14z-130 CLOSE, 2026-09-04)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-> ## **START HERE. THE NEXT TASK IS THE M13 REGISTRATION, AND IT IS THE ONLY
-> ## THING LEFT.** Everything the 14z-128 sweep left open is closed: five gates
-> ## triaged red -> green, one deleted on measured ground, both pending
-> ## decisions ruled and implemented. **No build byte has moved since 14z-127.**
+> ## **START HERE. M13 IS FROZEN, REGISTERED AND TAGGED.** donovan-m19 /
+> ## huitzil-m26 / pyron-m20 / merged-m15, mark **M13**, the boot name screen
+> ## reading **VAMPIRE SAVED**. Registry rows, `freeze/*` tags, expectation
+> ## sets, the 137-file re-point sweep, the pointer-flow baselines and the
+> ## MiSTer CRC tail are all done. Static tier **130/0/0/0 strict**.
 > ##
-> ## THE SESSION WAS DELIBERATELY CLOSED BEFORE STARTING M13 — a freeze is a
-> ## RITUAL and a half-finished one is the worst state to be in (14z-126b spent
-> ## a session on three tags a skipped step had left unwritten). M13 needs a
-> ## full tank: the ~5 h suite, five tracks, registry rows, tags, and a docs
-> ## sweep.
+> ## # THE TWO THINGS THAT ARE NOT DONE
 > ##
-> ## # M13, IN ORDER — AND STEP 1 IS ALREADY MEASURED
+> ## **(1) THE EMULATOR-TIER FREEZE SWEEP WAS STILL RUNNING AT THE CLOSE.**
+> ## `ROMDIR=... MAME_BIN=~/.cache/vampire-saved/mame/cps2
+> ## tests/run_all_emulator.sh --freeze` — 132 gates at romset cadence, the
+> ## scope the 14z-129 ruling makes mandatory at every freeze. Its log is
+> ## `<scratch>/emu_m13.log` and it will be GONE (scratch is session-local),
+> ## so **re-run it and read the result before anything else** — a freeze whose
+> ## emulator tier was never adjudicated is not a finished freeze. Expect it to
+> ## **THE CADENCE QUESTION WAS ASKED AND ANSWERED AT THIS FREEZE: NO.** The
+> ## runner dropped the six `bitstream` gates and printed "IS THIS FREEZE
+> ## TARGETING MiSTer?". It is not — the `.rbf` has not moved since 14z-108
+> ## (seed 18269). What this freeze touched on the MiSTer side is the fork's
+> ## CRC CATALOGUE, which follows the ROMSET, and its gate
+> ## (`test_mister_mra_map`) is romset-cadence and already GREEN. If a future
+> ## freeze moves the bitstream, the answer flips and the re-run is
+> ## `--cadence all --lane mister`.
 > ##
-> ## **(1) THE `gap_be27a` FOLD-IN IS NOT A MANIFEST TIDY. PROBED 14z-129 so
-> ## you do not meet it cold** (full detail: STATE "Decisions pending"):
-> ##   * `kind = "data_ptr"` + `stride = 0x80` **DOES NOT BUILD** — a `data_ptr`
-> ##     row also needs `region`, and `extract_char.py:1291` dies
-> ##     `KeyError: 'region'`. `region = "auto"` is the right value.
-> ##   * With it: ops 342 -> 343 and the builder catches
-> ##     `OP OVERLAP at 0x0BE2C6` — longword row **0x13, DONOVAN's slot** —
-> ##     written by BOTH the corrected table and `donovan.toml`'s
-> ##     `throw_victim_keyframes` (`slot_ptr_table = 0xBE27A`, :831). The two
-> ##     values disagree: `0x003fbda2` vs `0x004010e0`.
-> ##   * **So it needs an explicit OWNERSHIP rule**, and which pointer his
-> ##     capture keyframes use may be a [VSP-10] call rather than a generator
-> ##     detail. Settle that BEFORE the freeze suite runs, not five hours in.
-> ##   * The tree is UNCHANGED — bank_map.toml was reverted and verified
-> ##     byte-identical.
+> ## Expect the sweep to
+> ## be mostly green: the four `run_suite` tracks were 8/8 and every
+> ## expectation set is a pure carry, so anything red is far more likely to be
+> ## an instrument that rotted around a healthy artifact (the 14z-129 lesson)
+> ## than a defect in M13.
 > ##
-> ## **(2) THEN REGISTER.** `don_m19` / `hui53` / `pyron37` / `m5_stock14` /
-> ## `m3b_merged22` (boot title SAVED, built 14z-127, on disk, NOT registered):
-> ## `run_suite.sh --freeze` per track (~5 h), registry rows, `freeze/*` tags,
-> ## HANDOFF's build-registry row and "Current WIDE builds", the shared-writes
-> ## re-point (three `boot_title_saved_*` rows per tenant, reviewed 14z-127)
-> ## plus whatever `gap_be27a` moves, and a charmap re-freeze (charmap_gen reads
-> ## bank_map, and those pages are hash-locked).
-> ## **IT CLEARS THE LAST TWO REDS**: `test_m2b_stage6` and `test_phasec_image`
-> ## §1 fail for ONE reason — M13 is not in `registry.tsv`, so the fingerprint
-> ## dispatch finds no expectation set. (`test_phasec_image` §4 is a SEPARATE
-> ## stale premise that registration does NOT fix — it zeroes CPU:$400010
-> ## expecting the Phase-C sound table, but wide_ext's first placement is now
-> ## Donovan's AI script block, which `12_donovan_vs_cpu` never reads because
-> ## Donovan is the PLAYER there.)
+> ## **(2) NO RELEASE, and NO FIELD TEST YET.** M13 has not been to the board.
+> ## The M12 predecessor was field-verified GREEN twice; M13 changes only the
+> ## boot name screen and the M13 glyph tiles on top of it. A bundle is the
+> ## maintainer's call.
 > ##
-> ## **(3) NO RELEASE** — still deliberately held back.
+> ## # WHAT M13 ACTUALLY CHANGED, in one line each
 > ##
-> ## # THE STATE OF THE SUITE
+> ## * **The boot name screen reads VAMPIRE SAVED** (Japan entry only) — three
+> ##   `aux_poke poke16` at `PRG:0x01C822/24/26`, in member **`vm3j.03d`**
+> ##   (STATE 14z-127 said `vm3j.10b`; corrected 14z-130 by member diff).
+> ## * **The `gap_be27a` bank-map correction**, folded in by ruling and
+> ##   **BYTE-NEUTRAL on all five tracks by rebuild**.
+> ## * Member delta merged-m14 -> merged-m15 is exactly three files:
+> ##   `vm3j.03d` + `vsw.33m` + `vsw.37m`.
+> ## * **Every expectation set is a PURE CARRY** — M13 is RAM-identical to M12
+> ##   across the whole replay corpus, measured twice per track.
 > ##
-> ## Strict static **65/0/0 portable** (run it with ROMDIR for the static tier).
-> ## Emulator-tier registry **163 rows** (was 164; `audit_type_dispatch_range`
-> ## dropped), anti-orphan clean both ways. All five triaged gates verified
-> ## green by running them, not by reading them.
+> ## # THE ONE NEW DECISION WAITING (STATE "Decisions pending")
 > ##
-> ## # THE LAW THIS SESSION ADDED — READ IT BEFORE TOUCHING ANY INSTRUMENT
+> ## **PYRON'S CAPTURE-KEYFRAME ATTACKER ROW `0x11` IS NOT PORTED** — when
+> ## Pyron throws, the capture poses are DEMITRI's. Not a regression; it has
+> ## been so since the #104 work, and donovan.toml records it as "the recorded
+> ## Pyron-as-attacker observation". It surfaced because the corrected bank-map
+> ## row made the generator WANT to fix it (`0x0BE2BE <- 0x004af226`), and the
+> ## ownership claim suppressed it so the freeze stayed byte-neutral.
+> ## **Recommendation: measure before deciding** — a Pyron throw beside a
+> ## native vs2 Pyron throw ([VSP-123] reaches the native leg with an ordinary
+> ## poke). Nobody has ever looked at whether it is visibly wrong.
 > ##
-> ## [VSP-166] (`docs/project/gotchas.md`, distilled into the
-> ## `vampire-saved-port` skill): re-targeting an instrument from the build's
-> ## own metadata is writing the test from the algorithm. Before re-pointing a
-> ## probe, state what the new expectation is ANCHORED to and check the anchor
-> ## sits OUTSIDE the artifact under test. The maintainer's words: *"we don't
-> ## write that what we coded is indeed what we coded."*
-> ## It caught a re-target of mine before it was built, and the measurement
-> ## then proved it would have been a permanent false green (D0 = 0 at the site
-> ## I proposed, 8,990 times). **NOT promoted into CLAUDE.md — the law is not
-> ## edited unprompted; if it belongs beside [VSP-19] in §4 that is the
-> ## maintainer's call, and it is still open.**
+> ## # THE TRAPS THIS SESSION PAID FOR — read before the next freeze
 > ##
-> ## # OPERATIONAL, each paid for this session
-> ##
-> ## * **`GUARD_DEBUG=0` INSTALLS NO EXCEPTION BREAKPOINTS.** A crash is
-> ##   INVISIBLE in cheap mode — both legs of an A/B reported END clean while
-> ##   the twin was faulting. Name `GUARD_DEBUG=1` for any crash question.
-> ## * **Name `MAME_BIN` for a `vsavjw` run.** A stock binary exits "Unknown
-> ##   system" before the machine starts, and the guard reports that as a trip —
-> ##   i.e. as a crash in YOUR build. `force_pick_probe.sh` now refuses it.
-> ## * **Poll the process, never the notification.** A `nohup`'d gate returns
-> ##   immediately and the completion notice fires for the WRAPPER; `pgrep` is
-> ##   the truth. Prefer `run_in_background` on the gate itself.
-> ## * **The hit-class map lives in the OPCODE view.** Reading it from the data
-> ##   view gives `map[64] = 0xf4` and a confident wrong answer; the opcode view
-> ##   gives `0x4e`, which is what 14z-82b measured.
-> ## * A gate's corpus is an EXPLICIT TABLE, not a glob — a new rig is invisible
-> ##   to it until listed, however true its verdict line sounds.
+> ## * **THE RE-POINT SWEEP REWRITES HISTORY.** It is cut 2 of the gotcha "A
+> ##   RE-POINT SWEEP STAMP ON A TOML SECTION HEADER…", paid at 14z-119 and hit
+> ##   again here: the blind sweep rewrote the 14z-119 patch_notes entry to
+> ##   claim donovan-m18 lives in `build/don_m19`. **Follow that entry's rule
+> ##   (2) every time**: after the sweep, list the comment-line hits and read
+> ##   each one. 13 dated records had to be restored — one of them in a
+> ##   registry row written the same hour.
+> ## * **`run_suite --freeze` AGAINST A BATTERY-SCOPED SET MANUFACTURES
+> ##   EXPECTATIONS.** The stock set carries 14 authored `.masked` specs and no
+> ##   `.sha1` at all; a full-corpus `--freeze` wrote 79. Diff every new set
+> ##   against its predecessor before committing — "SUITE GREEN" does not tell
+> ##   you what the freeze CREATED.
+> ## * **A gate can be the only thing that can see a defect.** The merged
+> ##   ownership bug was invisible to the merged BUILD (its pinned extracts
+> ##   predate the row) and visible only to `test_merged_inputs` section 2,
+> ##   which regenerates them.
 > ##
 > ## **IF A DOC IS TOUCHED:** census `--check` + `checkdocshape --no-pending` +
 > ## checkdocs + checkskills + `gen_annotations --check` + `gen_gate_index
