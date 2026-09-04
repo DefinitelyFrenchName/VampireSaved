@@ -29,7 +29,22 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-STOCK_FP="${STOCK_FP:-ae701ffb06d0cbf3462cad1a9faa47534a3c00e4}"
+# THE STOCK PIN IS RESOLVED FROM registry.tsv, NOT CARRIED AS A LITERAL
+# (14z-130). It was `ae701ffb…` — the donovan-m2c stock twin, 14z-64 — and by
+# the time it was read again the stock twin had MOVED FOUR TIMES, each move
+# RULED and attributed in its own registry row: cf455760 (14z-110, the #99 fix
+# is not profile-gated), d29fd062 (14z-110b, the remap), 38e9cb2c (14z-119,
+# port_param32) and e86e1d04 (14z-130, the boot title). So section 1 had been
+# asserting a constant with no expiry against a value the project deliberately
+# moves ([VSP-95] for fingerprints). The invariant it is actually defending is
+# not "byte-identical to donovan-m2c" but "the stock build is the REGISTERED
+# stock twin, and any move of it went through the freeze ritual" — which is
+# exactly what registry.tsv records. Resolving it here means the anchor is the
+# REVIEWED row and not this build's own output ([VSP-166]); STOCK_FP= still
+# overrides for a deliberate one-off.
+_reg="$REPO/tests/expected/registry.tsv"
+STOCK_FP="${STOCK_FP:-$(awk -F'\t' '$1 !~ /^#/ && $2 ~ /-stock$/ {fp=$1} END{print fp}' "$_reg")}"
+[ -n "$STOCK_FP" ] || { echo "no *-stock row in $_reg — cannot resolve the stock twin"; exit 1; }
 WIDE_SET="${WIDE_ROMSET:-build/wide0/rompath/vsavjw.zip}"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
@@ -45,7 +60,10 @@ got=$(sed -n 's/.*build fingerprint: \([0-9a-f]\{40\}\).*/\1/p' "$WORK/stock.log
 if [ "$got" = "$STOCK_FP" ]; then
     echo "  ok: $got"
 else
-    echo "  FAIL: stock fingerprint $got != $STOCK_FP — pipeline change leaked"; fail=1
+    echo "  FAIL: stock fingerprint $got != $STOCK_FP (the newest *-stock row"
+    echo "        in tests/expected/registry.tsv) — either a pipeline change"
+    echo "        leaked into the stock track, or the stock twin MOVED and the"
+    echo "        freeze ritual has not registered it yet. Check which."; fail=1
 fi
 [ -f "$WORK/stock/rompath/vsavj.zip" ] && echo "  ok: packed as vsavj (stock set)" || {
     echo "  FAIL: stock build did not pack vsavj.zip"; fail=1; }

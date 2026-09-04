@@ -313,6 +313,44 @@ what a triage is looking at, so those are where the thinking time goes.
 
 ## Decisions pending (human)
 
+- **`test_phasec_image` SECTION 4 — ITS NEGATIVE CONTROL HAS BEEN DEAD SINCE
+  14z-111, MEASURED 14z-130. RE-TARGET OR DROP — and [VSP-166] says I may not
+  just re-point it.** Section 4 is the B4 lesson made permanent: it zeroes the
+  0x160-byte block at `CPU:$400010`, replays `12_donovan_vs_cpu`, and requires
+  behaviour to CHANGE — because "a relocation that passes without a control
+  proves nothing, the data may simply never be read".
+  **WHY IT IS DEAD, measured rather than inferred:** `build/don_m19`'s
+  `placements.json` puts region **`x101aca` at `0x400010`** — Donovan's AI
+  SCRIPT BLOCK, moved there by the 14z-111 #99 fix — where the control was
+  written for the Phase-C SOUND TABLE. And the replay cannot read it:
+  `12_donovan_vs_cpu` has Donovan as the PLAYER, so it is the CPU opponent's
+  AI script that is read, never his ([VSE-75]: 2P versus never reads them at
+  all). So zeroing it correctly changes nothing. Nineteen sessions.
+  **SECTION 1 OF THE SAME GATE IS FIXED** (14z-130) and is a separate story:
+  it pinned the stock fingerprint to `ae701ffb…`, the donovan-m2c twin from
+  14z-64, while the stock twin has since MOVED FOUR TIMES, every move ruled
+  and attributed in its own registry row. It now RESOLVES the expected value
+  from the newest `*-stock` row in `registry.tsv`, so the anchor is the
+  reviewed record and it cannot rot again.
+  **THE OPTIONS FOR SECTION 4:**
+  **(a) RE-TARGET at content the replay genuinely reads.** The honest
+  candidate is the CAPTURE-KEYFRAME BLOB — Donovan's row 0x13 points at
+  `0x004010e0`, which IS in `wide_ext` and IS read whenever he throws, on a
+  path `audit_don_grab_pose.sh` already locks independently. That gives the
+  control an anchor OUTSIDE the build's own placement metadata, which is what
+  [VSP-166] requires; it needs a throw replay and a liveness check that the
+  unzeroed run really does reach the capture pose.
+  **(b) DROP section 4**, the `audit_type_dispatch_range` precedent
+  ("better no test than a bad one") — but note this control defends a
+  principle the project paid for at B4, and dropping it leaves "the extension
+  is genuinely read" ungated dynamically.
+  **RECOMMENDATION: (a)**, because unlike the dispatch-range case the liveness
+  control here is CONSTRUCTIBLE — a throw either reaches the capture pose or
+  it does not, and that is measurable without asking the build what it wrote.
+  Cost: half a session. **Meanwhile the gate stays RED and honest**; it is not
+  a regression from M13 (section 4 has failed since 14z-111 and section 1
+  since 14z-110), and the M13 freeze itself is green on every other gate.
+
 - **PYRON'S CAPTURE-KEYFRAME ATTACKER ROW `0x11` IS NOT PORTED — a
   throw/capture surface, so [VSP-10] (found 14z-130 while folding in the
   `gap_be27a` correction; NOT a regression, this is the state as shipped since
