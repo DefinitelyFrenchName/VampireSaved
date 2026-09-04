@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-286 entries (40 game / 88 platform / 158 project), counted from the buckets at generation.
+289 entries (40 game / 88 platform / 161 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 40 entries
 
@@ -156,7 +156,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - MAME palette RAM ($90C000) takes Lua pokes for READBACK but not for RENDERING (14z-102)
 - two -debug INSTRUMENT-grammar traps from the #103 close — both misread a measurement for a full round each (paid: 14z-98)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 158 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 161 entries
 
 - A gate that prints `SKIP:` AND exits NON-ZERO is a FAILURE, not a skip (paid: 14z-128)
 - `... | while read` puts the loop in a SUBSHELL, so the `wait` after it waits for nothing (paid: 14z-128)
@@ -197,6 +197,9 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A build-fingerprint call without `--set` silently fingerprints the PRISTINE reference ROM (paid: 2026-08-04, 14z-59i)
 - `_PRG_RE` did not match the WIDE extension members, so extension content was invisible to the build fingerprint
 - `sed -i '' '0,/re/s///'` is a NO-OP on macOS — and a silent no-op CONTROL reads exactly like "the rule is not enforced" (paid: 14z-132)
+- A gate that `cd`s and then uses a RELATIVE `$ROMDIR` finds no ROMs, and the liveness check reports it as a defect in the ARTIFACT (paid: 14z-132)
+- A BUILD DIR IN A GATE IS ONE OF THREE THINGS, and only one makes the gate a question about that build (paid: 14z-132, twice)
+- A HYPOTHESIS THAT FITS THE FACTS **AND** MATCHES THE MAINTAINER'S STATED BELIEF IS THE MOST DANGEROUS KIND (paid: 14z-132)
 - A gfx-only freeze gives two builds ONE dispatch key, and the resolver SILENTLY serves the older one's expectations (paid: 14z-132)
 - The `--full` whole-set fingerprint is ROMPATH-CHAIN DEPENDENT — not an identity unless the chain is pinned (paid: 14z-132)
 - The sfx helper and the record array must be impossible to enable separately

@@ -827,6 +827,55 @@ before and after. [VSP-22] says a blind instrument and a real zero look
 identical — this is that, with the instrument being the control itself.
 
 
+## A gate that `cd`s and then uses a RELATIVE `$ROMDIR` finds no ROMs, and the
+## liveness check reports it as a defect in the ARTIFACT (paid: 14z-132)
+`test_phasec_image` section 4 runs each leg from inside its own temp dir
+(`cd "$WORK/$leg"`) with `MAME_ROMPATH="$WORK/wide/rompath;$ROMDIR"`. Every
+runner invokes gates as `ROMDIR=../ROMS`, so that second component resolves
+against the LEG dir, MAME finds no reference members, the run produces NO
+DUMPS, and the [VSP-137] liveness check says *"the clean leg held the victim
+on only 0 frames"* — which reads as "the port is broken" and is nothing of
+the kind.
+
+**Normalise at the point ROMDIR is first read, never later:** putting it in
+`run_mame.sh` resolves against the ALREADY-CHANGED directory and faithfully
+reproduces the bug. Swept across 182 gates at 14z-132 as
+`if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi` — guarded so a
+gate that means to SKIP on a missing ROMDIR still does, and leaving the value
+a VARIABLE so a fork sets its own.
+
+## A BUILD DIR IN A GATE IS ONE OF THREE THINGS, and only one makes the gate a
+## question about that build (paid: 14z-132, twice)
+It can be a `rompath` the gate BOOTS (the build is the SUBJECT), an `extract/`
+a decoder reads while the only emulator leg runs a REFERENCE (the build is a
+DATA SOURCE), or a fixture. An inventory built by grepping for `build/` cannot
+tell them apart: it classified five native-vs2 gates — `test_reactions`,
+`test_move_naming`, `test_anim_node_walk`, `test_hitbox_encoding`,
+`test_projectile_params` — as "runs on a solo build" when not one of them runs
+our build at all.
+
+**Classify by WHAT THE GATE RUNS (`run_mame.sh <set>`), not by what it
+mentions.** And two classifier traps paid for in the same hour: a
+literal-filename regex misses every gate that builds its expectation path from
+a variable (`EXP="tests/expected/reactions_$TENANT.txt"`), and a keyword
+classifier misses rows that inherit their meaning by reference ("the same for
+Huitzil/Phobos"). At n≈10, read them.
+
+## A HYPOTHESIS THAT FITS THE FACTS **AND** MATCHES THE MAINTAINER'S STATED
+## BELIEF IS THE MOST DANGEROUS KIND (paid: 14z-132)
+`test_phasec_image` went red with "0 held frames". The maintainer had just
+ruled that solo and merged builds differ with non-zero probability; the gate
+builds a SINGLE-TENANT track while the control had been measured on MERGED at
+14z-131. The hypothesis was coherent, mechanism-shaped, and confirmed the
+belief. **It was wrong** — solo and merged both produce 47 held frames with
+byte-identical offsets, and the cause was a relative `$ROMDIR`.
+
+Nothing about "it fits" is evidence. What made it cheap was writing it into
+STATE **as a hypothesis** ([VSP-116]) and running the discriminator before
+touching anything — the fix would otherwise have been applied to the half that
+was never broken.
+
+
 ## A gfx-only freeze gives two builds ONE dispatch key, and the resolver
 ## SILENTLY serves the older one's expectations (paid: 14z-132)
 `build_fingerprint.py`'s dispatch key covers PROGRAM members only, so a
