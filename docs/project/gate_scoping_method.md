@@ -151,6 +151,61 @@ unresolved count went to zero and every tenant matched. `audit_don_grab_pose`
 had already written that rule down; the cost of not reading it first was one
 alarming and entirely false result.
 
+## 9. Which BUILD a gate runs on is a scoping decision, not a rig detail
+
+**[VSP-175]** **A gate is SOLO-SPECIFIC only if a single-tenant build is the
+SUBJECT of its assertion. A single-tenant build appearing as a REFERENCE LEG,
+a fixture or a rig convenience does not qualify — and every gate that is not
+solo-specific runs on the MERGED build at release, because the merged build is
+what ships.** (Maintainer-ruled 2026-09-04, 14z-132.) The maintainer's own
+statement of the belief: *"regardless of how low the odds of a change between
+a solo build and the merged build are for a given test, these odds are not
+zero, so the test is brittle intrinsically. However, unless they are specific
+to solo builds, tests on solo builds are likely to hold value even now,
+therefore they likely should be run but on the merged build."*
+
+**The premise is measured, not assumed.** `tests/expected/merged1/` exists as
+its own comparison-class table because at 14z-91 the merged image deviated
+from the single-tenant builds in **eight** places — which fired the question
+`audit_merged_legacy.sh` had pre-registered ("a fourth should prompt: does the
+merged build want its own class table?") and the maintainer ruled that it
+does. The mechanism is named in that gate's own header: merged hook chains are
+longer (N=3 concatenation), so cycle skew can shift a flicker frame or a
+window end. So "solo behaves like merged" is a claim this project has already
+tested and found false at the byte level.
+
+**The two consequences, both ruled the same day.** A solo-specific gate is
+**out of release scope** — it is not measuring the released artifact. And if
+there is no meaningful version of that gate on the merged build, it is
+**deprecated permanently and kept as a historical artifact** rather than
+carried as a live gate nobody can act on.
+
+**THE WORKED INSTANCE IS AN ERROR OF MINE, which is why the rule is phrased
+around the SUBJECT.** `test_dualtrack` compares the stock/substituted twin
+against a WIDE build, and I first classified its stock leg as "genuinely
+solo-specific" on the grounds that a stock-size ROM can hold a tenant only by
+SUBSTITUTING over someone — true, and irrelevant. The stock twin is the gate's
+**reference leg**; the subject of the assertion is the WIDE build's superset
+property. The project's own release-scope discriminator already settles that
+case — *"a gate that uses `vsav2` or pristine `vsavj` as an ORACLE is in
+scope: the reference leg is not the subject"* (STATE "RELEASE-TIME TEST
+SCOPE") — and reading it as solo-specific would have wrongly pulled a
+release-scope gate out of the release. Ask what the gate ASSERTS, never what
+it is measured against.
+
+**THE ONE STRUCTURAL BLOCKER, and it is not a rig question.** A gate that
+resolves a frozen expectation SET by fingerprint cannot simply be re-pointed:
+`build_fingerprint.py` hard-fails `FAIL: <dir> has no registry row`, and the
+merged build deliberately has none (`registry.tsv`'s header gives the reason —
+`build/merged1`, the blanks-only legacy instrument, shares the shipped merged
+image's program fingerprint, so a row would silently green-light the
+instrument). Moving such a gate to merged therefore depends on the merged
+build becoming registrable, which is a dispatch-key question, not a scoping
+one. The header itself names the fix, and it measures out: a whole-set
+fingerprint separates all three artifacts where the program key collapses them
+(see `docs/project/gotchas.md`, "The `--full` whole-set fingerprint is
+ROMPATH-CHAIN DEPENDENT" for the definition that makes such a key stable).
+
 ---
 
 ## The order that falls out of all this
@@ -167,3 +222,6 @@ alarming and entirely false result.
 6. Compare ordered structure; report timing.
 7. Measure the cost of widening, then widen; re-check every constant.
 8. Diff the strengthened gate against what it replaced.
+9. And as a PRECONDITION to all of it: decide which BUILD the gate runs
+   on. The merged build — the one that ships — unless a single-tenant
+   build is the SUBJECT of the assertion ([VSP-175]).

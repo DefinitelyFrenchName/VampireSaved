@@ -444,3 +444,4 @@ VSP-171	docs/project/gate_scoping_method.md	5. Widening is a measurement, not a 
 VSP-172	docs/project/gate_scoping_method.md	6. Do not lose a check while strengthening one	IN-LIST
 VSP-173	docs/project/gate_scoping_method.md	7. Look before you characterise	IN-LIST
 VSP-174	docs/project/gate_scoping_method.md	8. When the instrument and the artifact both look wrong, suspect the instrument	IN-LIST
+VSP-175	docs/project/gate_scoping_method.md	9. Which BUILD a gate runs on is a scoping decision, not a rig detail	IN-LIST

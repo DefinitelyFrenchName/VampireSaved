@@ -1,74 +1,76 @@
-# NEXT SESSION — orientation (rewritten at the 14z-131 CLOSE, 2026-09-04)
+# NEXT SESSION — orientation (rewritten mid-session 14z-132, 2026-09-04)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-> ## **START HERE. NOTHING IS HALF-DONE AND NOTHING IS OWED.** M13 is frozen,
-> ## registered, tagged and pushed; the emulator tier was adjudicated 131/1
-> ## with that red now green; static is **130/0/0/0 strict**. No ritual step is
-> ## outstanding and there is no red anywhere.
+> ## **WORK IS IN FLIGHT. THIS IS NOT A CLEAN OPENER.** Written mid-session
+> ## against context pressure, so a cold start loses nothing. Three threads,
+> ## none finished, none blocked on anything but sequence.
 > ##
-> ## # THE TWO THINGS THE MAINTAINER HAS NOT YET HAD
+> ## **STATE.md IS 204 KB AND OWES A ROLLOVER AT CLOSE** (~150 KB threshold;
+> ## the slice boundary is the `**SPLIT 2026-08-20` paragraph, ledger between).
 > ##
-> ## **(1) NO FIELD TEST OF M13, AND NO RELEASE.** M13 has never been to the
-> ## board. Its predecessor M12 was field-verified GREEN twice; M13 adds only
-> ## the boot name screen (VAMPIRE SAVED, Japan entry) and the M13 glyph tiles
-> ## on top of it, and the member delta is exactly three files. A bundle is the
-> ## maintainer's call, and so is the release — deliberately held back.
+> ## # THREAD 1 — M16 IS BUILT, MEASURED AND UNREGISTERED
 > ##
-> ## **(2) THE +/-1 DAMAGE RESIDUE — KNOWLEDGE, NOT A BUG.** 5 of 54
-> ## victim/throw cells on Phobos's throws differ by exactly one point of total
-> ## damage from native vsav2 (`0x10` +1 on all three throws, `0x13` -1 on all
-> ## three, `0x0A` -1 on Circuit Scrapper only). **RULED WITHIN TOLERANCE
-> ## (maintainer, 2026-09-04)** — *"interesting to root-cause it to deepen our
-> ## understanding of the engines though so let's keep that open for a future
-> ## session."* It is FROZEN in `audit_tenant_throw_geometry` with its exact
-> ## deltas, so a red there means THE RESIDUE MOVED, not that damage is broken.
-> ## **Start from the eliminations, do not re-derive them** (STATE has them in
-> ## full): starting HP is 288 on both legs for every victim; it is TOTAL
-> ## damage, not a split artifact; `bank_map` models no per-character defence
-> ## table; the sign is stable per victim across all three throws.
-> ## **Cheapest first step, the discriminator:** `0x0A` is a LEGACY victim
-> ## (ours is VS's Sasquatch, native is VS2's), so if Capcom retuned him
-> ## between the games that cell is CROSS-GENERATION and the residue splits
-> ## into two unrelated causes. Then PC-attribute the writes to `$FF8850` with
-> ## `tap_writes.lua`'s `REGLOG`.
+> ## The version-numbering ruling (option A: the wheel mark IS the merged build
+> ## number) is EXECUTED as far as building. Five tracks on disk:
+> ## `don_m20` / `hui54` / `pyron38` / `m5_stock15` / `m3b_merged23`.
+> ## **Delta measured: exactly `vsw.33m` + `vsw.37m` on the four WIDE tracks and
+> ## ZERO members on the stock twin.** Every program fingerprint UNCHANGED.
+> ## `test_version_string` PASS on all four WIDE tracks (pixel-exact snapshot,
+> ## both verdict controls fired). Static tier **128/0/2** — both reds
+> ## (`test_m3a_reproducible`, `test_charmap_current`) are freeze bookkeeping
+> ## owed by the registration, both predicted, neither a defect.
+> ## **STILL OWED:** the version-mark gate (anchor RULED: the newest annotated
+> ## `freeze/merged-m<N>` tag); registration; freeze suite; MiSTer CRC tail
+> ## (the two glyph members moved, so the fork catalogue needs a new `vsavjw`
+> ## entry or no `.rom` builds); `release/merged-m16/`; the card bundle.
+> ## **The maintainer is waiting to field-test and asked to be unblocked** —
+> ## the bundle needs only the MiSTer tail, NOT registration and NOT thread 2.
 > ##
-> ## # WHAT THIS SESSION LEFT BEHIND THAT CHANGES HOW YOU WORK
+> ## # THREAD 2 — THE DISPATCH KEY (B1 then B2), RULED, NOT STARTED
 > ##
-> ## **`docs/project/gate_scoping_method.md` — READ IT BEFORE BUILDING ANY
-> ## COMPARISON GATE.** Eight rules, [VSP-167]..[VSP-174], distilled into the
-> ## `vampire-saved-port` skill. Every one is something that went wrong in
-> ## 14z-131 first, which is the only reason to trust them: the reference is
-> ## the SOURCE GAME and a second leg is an INSTRUMENT CHECK, not a baseline;
-> ## check the mechanism can PRODUCE the observable and exclude
-> ## cross-generation confounds (a legacy character's art differs between VS
-> ## and VS2 — pixels are never evidence about the port); compare ORDERED
-> ## structure and REPORT timing; refuse to judge a leg that did not produce
-> ## the event and assert the RESOURCE it consumes; measure the cost of
-> ## widening and re-check every constant the narrow version froze; diff a
-> ## strengthened gate against what it REPLACED; capture before
-> ## characterising; and a divergence on exactly the rows with a special
-> ## resolution rule is the RESOLVER.
+> ## Forward-only promotion of the whole-set fingerprint, merged rows
+> ## FULL-SET-KEYED ONLY. Full spec, measurements and the plan split:
+> ## STATE "THE DISPATCH KEY". **B1 is mechanism-only and its acceptance is
+> ## "everything resolves exactly as today"; B2 re-points three gates and is
+> ## open-ended. B1 goes BEFORE M16's registration** so M16 lands natively
+> ## instead of needing a fourth comment-out row.
+> ## **The one detail that will bite if forgotten: the key is computed over the
+> ## BUILD'S OWN rompath directory and a `;` chain is REFUSED** — `--full` is
+> ## chain-dependent (`fcc83fc3` vs `544990c4` for one build).
 > ##
-> ## # OPERATIONAL, each paid for this session
+> ## # THREAD 3 — THE MERGED/SOLO WALK, 2 OF 25
 > ##
-> ## * **An ES move with no meter degrades SILENTLY to its normal version** —
-> ##   same offsets, same poses, same damage, a healthy-looking run measuring
-> ##   the wrong move. Poke the stock and assert it DROPS.
-> ## * **`${=var}` is zsh-only.** A gate is `#!/bin/sh`, where a bare `$var`
-> ##   DOES word-split; an interactive Bash-tool command is zsh, where it does
-> ##   NOT. This fired TWICE in one session — once silently reducing an
-> ##   18-victim sweep to a single iteration that still printed a verdict.
-> ## * **Time a sweep before arguing about its scope.** "All 18 victims" was
-> ##   assumed expensive and measured at 186 s against 27.7 s for one.
-> ## * **A gate's own header runtime can be wildly wrong** — this one claimed
-> ##   "~12 min" for something that takes 27.7 s. Measure, then write it.
+> ## The general rule is ruled and is now [VSP-175] +
+> ## `docs/project/gate_scoping_method.md` §9: a gate is solo-specific only if a
+> ## single-tenant build is the SUBJECT of its assertion. Solo-specific => out
+> ## of release scope; no meaningful merged form => deprecate permanently, keep
+> ## as history. **Gate 1 `test_dualtrack` RULED stock-vs-merged. Gate 2
+> ## `audit_legacy_pairings` is NOT a re-point** — it and the other two
+> ## legacy-oracle gates resolve their expectation set by fingerprint and wait
+> ## on thread 2. The inventory, the groups and the standing prediction (the
+> ## exception clause may have ZERO members) are in STATE "MERGED-VS-SOLO TEST
+> ## SCOPING". **The maintainer wants this walked ONE GATE AT A TIME, with the
+> ## analysis put in front of them before anything is touched — they expect to
+> ## catch errors I cannot see, and did so on gate 1.**
+> ## **Flagged, not yet walked:** `audit_trap_sound` is release-scope and
+> ## defaults to `build/hui30`, a 14z-82c build — a release gate asserting about
+> ## something we do not ship, independent of the merged question.
+> ##
+> ## # OPEN, OPTIONAL, ONE LINE TO ADOPT
+> ##
+> ## Call a freeze by a single GENERATION number equal to the merged build's, so
+> ## one number resolves to all five tracks. Offered 14z-132, not ruled. The
+> ## build-directory counter runs at four different offsets from the freeze name
+> ## (donovan +0, merged +7, pyron +17, huitzil +27, verified over six freezes);
+> ## renaming dirs is REFUSED (~55 gates reference the paths).
 > ##
 > ## **IF A DOC IS TOUCHED:** census `--check` + `checkdocshape --no-pending` +
 > ## checkdocs + checkskills + `gen_annotations --check` + `gen_gate_index
 > ## --check` + `gen_gotchas_index --check` + `doc_anchor_census --check`,
-> ## exit statuses captured directly. Regenerate the GENERATED indexes in the
-> ## commit that changes what they index, and AFTER the prose.
+> ## exit statuses captured directly. **Adding an anchored `**[VSP-N]**` obliges
+> ## the skill to DEFINE it — checkskills fails otherwise, and the census must be
+> ## re-frozen (`doc_anchor_census.py --freeze`).**

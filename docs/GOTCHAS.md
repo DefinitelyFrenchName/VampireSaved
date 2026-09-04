@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-283 entries (40 game / 88 platform / 155 project), counted from the buckets at generation.
+285 entries (40 game / 88 platform / 157 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 40 entries
 
@@ -156,7 +156,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - MAME palette RAM ($90C000) takes Lua pokes for READBACK but not for RENDERING (14z-102)
 - two -debug INSTRUMENT-grammar traps from the #103 close — both misread a measurement for a full round each (paid: 14z-98)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 155 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 157 entries
 
 - A gate that prints `SKIP:` AND exits NON-ZERO is a FAILURE, not a skip (paid: 14z-128)
 - `... | while read` puts the loop in a SUBSHELL, so the `wait` after it waits for nothing (paid: 14z-128)
@@ -196,6 +196,8 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - An A/B reference binary must differ by exactly one thing
 - A build-fingerprint call without `--set` silently fingerprints the PRISTINE reference ROM (paid: 2026-08-04, 14z-59i)
 - `_PRG_RE` did not match the WIDE extension members, so extension content was invisible to the build fingerprint
+- A gfx-only freeze gives two builds ONE dispatch key, and the resolver SILENTLY serves the older one's expectations (paid: 14z-132)
+- The `--full` whole-set fingerprint is ROMPATH-CHAIN DEPENDENT — not an identity unless the chain is pinned (paid: 14z-132)
 - The sfx helper and the record array must be impossible to enable separately
 - "Unknown system: vsavjw" is an EMULATOR problem, not a ROM problem — and renaming the zip to force it is actively harmful
 - A worktree branched from a STALE `origin/main` silently changes the instrument (paid: 2026-08-04, 14z-60)

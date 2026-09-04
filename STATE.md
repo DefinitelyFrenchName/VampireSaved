@@ -23,6 +23,31 @@ older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
   VERBATIM to `DECISIONS_HISTORY.md`** (grep there by topic; the §5
   retraction grep covers it).
 
+## Session 14z-132 — **THE RELEASE WINDOW OPENED, AND THE MAINTAINER RULED FOUR
+## TIMES.** The version-numbering mess named and fixed at its root (the wheel mark is
+## the merged build number, M16, and a gate will hold it there); the M16 tracks built and
+## measured at a two-member delta; and the merged-vs-solo test-scoping question opened,
+## given a general rule that is now [VSP-175], and walked two gates deep — where it hit a
+## structural blocker and turned into a dispatch-key decision. **No gate re-pointed yet;
+## M16 not registered.** Static 128/0/2 (both reds owed by the registration).
+
+| | |
+|---|---|
+| opened with | the maintainer's four questions: field-test scope, what is left before release, "can we make the versioning easier", and what the solo builds are for |
+| **the versioning mess, measured** | the wheel mark started EQUAL to the merged build number at merged-m6 and drifted by exactly the two freezes where it was not bumped (m7 kept M6, m10 kept M8). Today: build `merged-m15`, wheel `M13`, session `14z-130`, milestone namespace `M0..M12` — four numbers, two of them colliding. **RULED: option (A)** — the mark IS the merged build number, plus a gate. The conditional the maintainer attached answered itself: changing the mark changes the glyph tiles, which changes the artifact, so the bump is forced. **Landing: merged-m16 / wheel M16** |
+| **and a fifth number nobody had named** | the build DIRECTORY counter, with four different offsets from the freeze name — donovan +0, merged +7, pyron +17, huitzil +27 (verified over six freezes). Not renamed (55 gates reference the paths); recorded so the "generation N" option has its evidence |
+| **M16 built and measured** | five tracks. Delta is **exactly two members** (`vsw.33m`, `vsw.37m`) on each of the four WIDE tracks and **ZERO on the stock twin** — the standing prediction from `gen_donovan_patch.py:4999` (version_text is skipped when bank5 is inactive), confirmed by rebuild rather than asserted. `test_version_string` PASS on all four WIDE tracks incl. a pixel-exact snapshot and both verdict controls |
+| **every program fingerprint UNCHANGED** | `8065bc92` / `08944a7e` / `a43da974` / `f42f7569` — the documented gfx blind spot. So M16's registration would have needed a FOURTH comment-out, and `build/don_m20` today resolves silently as `donovan-m19` |
+| **the maintainer's core belief, and it was already measured** | *"regardless of how low the odds ... these odds are not zero, so the test is brittle intrinsically ... unless they are specific to solo builds, tests on solo builds ... should be run but on the merged build."* The premise is not a prior: `tests/expected/merged1/` exists BECAUSE merged deviated from the single-tenant builds in eight places at 14z-91 |
+| **the general rule, ruled CORRECT** | [VSP-175]: a gate is solo-specific only if a single-tenant build is the SUBJECT of its assertion; a reference leg, fixture or rig convenience does not qualify. Consequences ruled the same day: solo-specific => OUT of release scope; no meaningful merged form => deprecate permanently, keep as history |
+| the inventory | of 142 release-scope emulator gates: **46 merged, 25 solo-only, 3 both, 36 other build, 31 no build reference** (bound: static read of defaults + hard-wired assignments; the 31 are unopened). One correction found on the way — `audit_walker_repoint` looks solo but its `ci_emulator.tsv` row supplies `%MERGED%` |
+| **gate 1 — `test_dualtrack`** | RULED stock vs merged. **And my framing of it was wrong**: I called its stock leg "solo-specific"; the stock twin is the REFERENCE LEG, which the release-scope discriminator already excludes from being the subject. Corrected in [VSP-175] as the worked instance |
+| **gate 2 — `audit_legacy_pairings`, and it is not a re-point** | it resolves its expectation SET by fingerprint and hard-fails `FAIL: <dir> has no registry row`; the merged build deliberately has none. Exactly 3 of the 25 do this, all of them the legacy-oracle group |
+| **so the walk turned into a dispatch-key decision** | measured: program key collapses `build/merged1`, merged-m15 and merged-m16 onto ONE value (`f42f7569`); `--full` separates all three. **(i) approved, then found NOT EXECUTABLE as stated** — only 20 of 58 live registry rows are recomputable, the other 38 having been pruned under the N-2 policy. **RULED instead: forward-only promotion, merged rows full-set-keyed ONLY** (so the fallback can never reach one) |
+| **and a measurement that nearly shipped a bad key** | `--full` is ROMPATH-CHAIN DEPENDENT: `m3b_merged23/rompath` -> `fcc83fc3`, `...;../ROMS` -> `544990c4`. Callers pass both forms. The key must be defined over the build's OWN rompath only — the rule `artifact_manifest.py` already enforces for the same reason. Cost measured and irrelevant: 0.10 s -> 0.35 s |
+| my own errors, corrected in-session | the `test_dualtrack` misclassification (caught by applying the maintainer's own discriminator); proposing "recompute the registry" without checking that the builds still exist (38 do not) |
+| written down | two gotchas (the gfx-only-freeze key collision; the `--full` chain dependence), [VSP-175] + section 9 of `gate_scoping_method.md`, and the skill rule. Doc-touch checklist all green |
+
 ## Session 14z-131 — **THE MAINTAINER CHALLENGED A GATE AND WAS RIGHT THREE TIMES
 ## RUNNING.** Two rulings executed (Pyron measured, `test_phasec_image` §4 re-targeted
 ## and green), then Phobos's three historically-corrected throws MEASURED AGAINST NATIVE
@@ -312,6 +337,152 @@ FILE — several have it in their gate header or a STATE entry — but the file 
 what a triage is looking at, so those are where the thinking time goes.
 
 ## Decisions pending (human)
+
+- **THE VERSION-NUMBERING SCHEME — DECIDED (maintainer, 2026-09-04, 14z-132):
+  option (A), the in-game mark IS the merged build number, plus a gate that
+  fails a freeze whose `version_text` does not match its registry name.
+  BUILT, NOT REGISTERED.** The maintainer's complaint, verbatim in substance:
+  *"It's very disturbing to have a M13 based on a merged-m14 with M14
+  appearing on the character wheel (and I'm not touching on possibly other
+  numbering elsewhere)."*
+  **THE DRIFT, MEASURED from the tags:** the mark started EQUAL to the merged
+  number (merged-m6 = M6) and drifted by exactly the two freezes where it was
+  not bumped — merged-m7 kept `M6`, merged-m10 kept `M8`. Since merged-m11 the
+  mark has been the build number minus two.
+  **THE CONDITIONAL ANSWERED ITSELF.** The ruling attached *"we might need to
+  update the merged build number for the current release if and only if the
+  previous one does not reflect all the changes"*: changing the mark changes
+  the glyph tiles, which changes the artifact, so by the project's own rule
+  it is a new freeze name. `merged-m15` therefore CANNOT carry `M15`.
+  **LANDING: merged-m16 / wheel `M16`**, with donovan-m20 / huitzil-m27 /
+  pyron-m21 and the stock twin CARRIED (measured unchanged).
+  **BUILT AND MEASURED 14z-132:** delta is exactly `vsw.33m` + `vsw.37m` on
+  each of the four WIDE tracks, ZERO members on the stock twin (the
+  `bank5_active` prediction, confirmed by rebuild); every program fingerprint
+  unchanged; `test_version_string` PASS on all four incl. pixel-exact
+  snapshot and both verdict controls. Dirs `don_m20` / `hui54` / `pyron38` /
+  `m5_stock15` / `m3b_merged23`.
+  **THE GATE'S ANCHOR — DECIDED the same day: the newest annotated
+  `freeze/merged-m<N>` git tag**, chosen over HANDOFF's registry row and over
+  a new manifest field because it anchors on the reviewed record rather than
+  on anything the build says about itself ([VSP-166]). Accepted consequence:
+  the gate is RED for the whole freeze window until tagging, which is correct
+  signalling. Deliberately NOT tolerant of "N or N+1" — that tolerance would
+  have accepted the exact bug being fixed (merged-m7 carrying M6, drift 1).
+  **A FIFTH NUMBER, recorded but NOT changed:** the build DIRECTORY counter
+  runs at four different offsets from the freeze name — donovan +0, merged +7,
+  pyron +17, huitzil +27 (verified over six freezes). Renaming is refused
+  (~55 gates reference the paths, re-pointed each freeze). **OPEN, OPTIONAL,
+  ONE LINE TO ADOPT:** call a freeze by a single GENERATION number equal to
+  the merged build's, so one number resolves to all five tracks. Offered at
+  14z-132, not yet ruled.
+
+- **MERGED-VS-SOLO TEST SCOPING — THE GENERAL RULE IS RULED AND IS NOW
+  [VSP-175] (maintainer, 2026-09-04, 14z-132). THE WALK IS 2 OF 25 DONE;
+  NOTHING RE-POINTED YET.** The maintainer's core belief, verbatim:
+  *"regardless of how low the odds of a change between a solo build and the
+  merged build are for a given test, these odds are not zero, so the test is
+  brittle intrinsically. However, unless they are specific to solo builds,
+  tests on solo builds are likely to hold value even now, therefore they
+  likely should be run but on the merged build."* Plus: a solo-specific gate
+  is OUT of the release "run all tests", and *"there's a strong argument for
+  keeping the test as a historical artifact but deprecating it permanently if
+  there is not meaning in having that test on the merged build."*
+  **THE RULE, ruled CORRECT: a gate is solo-specific only if a single-tenant
+  build is the SUBJECT of its assertion.** A solo build as a reference leg, a
+  fixture or a rig convenience does not qualify. Spec: [VSP-175] +
+  `docs/project/gate_scoping_method.md` §9.
+  **THE PREDICTION ON RECORD (mine; the maintainer believes it correct but
+  declined to make it absolute): the exception clause may have ZERO members** —
+  no gate in the 25 has a solo build as its subject. If it holds, the walk is
+  24 re-points with costs, not a classification exercise, and the
+  "deprecate permanently" branch is empty too.
+  **THE INVENTORY (measured 14z-132; BOUND: a static read of each script's
+  defaults and hard-wired assignments — the 31 "no build reference" gates are
+  UNOPENED, so 25 is a floor).** Of 142 release-scope emulator rows:
+  46 merged · **25 solo-only** · 3 both · 36 other build · 31 no build ref.
+  `audit_walker_repoint` looks solo but its `ci_emulator.tsv` row supplies
+  `%MERGED%` — the `args` column can re-point a gate without touching it,
+  and only 3 rows use it today.
+  **THE 25, grouped as offered for challenge:** legacy oracle on `don_m19` (4)
+  `audit_legacy_pairings` `audit_flicker_attribution` `test_fbneo_legacy_oracle`
+  `test_dualtrack`; three-tenant data map (3) `test_move_naming`
+  `test_projectile_params` `test_reactions`; harness self-checks using a build
+  as a fixture (3) `test_guard_integrity` `test_mask_ranges_reader`
+  `test_record_window`; per-tenant subject (15) `audit_df_gold`
+  `audit_trap_parity` `audit_trap_shock` `audit_trap_sound`
+  `audit_tripwire_reach` `audit_voice_borrow` `test_anim_node_walk`
+  `test_beam_anim_walk` `test_beam_variants` `test_hitbox_encoding`
+  `test_hui_df_style` `test_hui_grab_victim` `test_hui_oracle`
+  `test_pyron_blink` `test_pyron_cosmo`.
+  **GATE 1 — `test_dualtrack`: RULED stock vs MERGED.** Not solo-specific:
+  its subject is the WIDE build's superset property and the stock twin is the
+  reference leg. What a re-point re-measures: §1's frozen per-replay onsets
+  (890 / 3190 / none for `06_test_mode`) and §3's onset (frame 4267,
+  `$FF87A4-$FF87A7`, same writer PC both legs); §2 should be unaffected.
+  **Whether pre-select bit-identity survives three tenants' hooks is UNKNOWN
+  and is itself worth knowing.**
+  **GATE 2 — `audit_legacy_pairings`: NOT A RE-POINT.** It resolves its
+  expectation SET by fingerprint and hard-fails `FAIL: <dir> has no registry
+  row`; the merged build deliberately has none. Exactly 3 of the 25 do this
+  (this, `audit_flicker_attribution`, `test_fbneo_legacy_oracle`) — the whole
+  legacy-oracle group — so all three wait on the dispatch-key entry below.
+  **ONE FLAGGED, NOT YET WALKED:** `audit_trap_sound` is release-scope and
+  defaults to `build/hui30`, a build frozen at 14z-82c — a release gate
+  asserting about a build we do not ship, regardless of the merged question.
+
+- **THE DISPATCH KEY — DECIDED (maintainer, 2026-09-04, 14z-132): FORWARD-ONLY
+  promotion of the whole-set fingerprint, with MERGED ROWS FULL-SET-KEYED
+  ONLY. NOT YET IMPLEMENTED.** Why it came up: the three legacy-oracle gates
+  cannot run on the merged build until the merged build is registrable.
+  **THE MEASUREMENT:** the program key collapses `build/merged1` (the
+  blanks-only legacy instrument), merged-m15 and merged-m16 onto ONE value
+  (`f42f7569`); `--full` separates all three (`ca7ba8ac` / `033d68cd` /
+  `fcc83fc3`). That is exactly the objection `registry.tsv`'s header raises
+  against a merged row, so `--full` dissolves it rather than overriding it.
+  **(i) "RECOMPUTE EVERY ROW" WAS APPROVED AND IS NOT EXECUTABLE — measured:
+  only 20 of 58 live rows are recomputable**, the other 38 having had their
+  build dirs pruned under the N-2 policy (donovan-m2b..m16, huitzil-m16..m23,
+  pyron-m10..m17 and their stock/stage-4 legs). Those rows are INERT — nothing
+  can dispatch on a build that no longer exists — so re-keying them buys
+  nothing and would cost 38 tag checkouts and rebuilds at an unknown failure
+  rate. The maintainer's ruling on that: *"the rest is valuable history but
+  just legacy, we don't lose anything."*
+  **THE SHAPE THAT SHIPPED THE DECISION.** No registry FORMAT change: a row's
+  key is just a sha1, and the resolver computes BOTH keys and matches a row
+  against either — full-set first, program second. New rows carry the full-set
+  sha; historical rows keep the program sha; the two spaces are disjoint.
+  **Merged rows carry ONLY the full-set sha**, so the program-key fallback can
+  never resolve the blanks instrument onto a merged expectation set.
+  **THE KEY'S DEFINITION, and it is load-bearing: computed over the BUILD's
+  OWN rompath directory, a `;` chain REFUSED.** `--full` is rompath-chain
+  dependent (`m3b_merged23/rompath` -> `fcc83fc3`; `...;../ROMS` ->
+  `544990c4`), and callers pass both forms, so without this the key depends on
+  who asked. `tools/artifact_manifest.py` already refuses a `;` chain for the
+  same reason. Cost measured: 0.10 s -> 0.35 s per dispatch call.
+  **TWO WARTS, both accepted by the maintainer:** the registry carries two key
+  kinds permanently (*"fair"*); and the fallback still cannot disambiguate a
+  future program-keyed collision — though after the promotion the
+  program-keyed space STOPS GROWING, so a new row-vs-row collision is
+  impossible by construction. What remains possible, and is live today, is a
+  NEW BUILD colliding with an EXISTING row: `build/don_m20` resolves silently
+  as `donovan-m19`. Hence the loud note below.
+  **THE PLAN, split so the risky half is separable:**
+  **B1 (mechanism only)** — dual lookup, the key defined as above, a LOUD note
+  whenever a program-key match fires (after the promotion that always means
+  "not registered under a whole-set key"), `test_suite_dispatch_selftest`
+  extended over both spaces with a must-fire control.
+  **Acceptance: everything resolves exactly as it does today.** Reversible.
+  **B2** — the three legacy-oracle gates re-pointed to merged, only after B1
+  is green; open-ended, because it re-measures their expectations on merged
+  and may surface real differences.
+  **Ordering: B1 before M16's registration**, so M16 lands natively in the new
+  scheme instead of needing a fourth comment-out row.
+  **WHY NOW, in the maintainer's words:** *"our current builds are extremely
+  solid and have been for some time. Were it not the case I would still agree
+  but I would strengthen my rigor regarding testing even more as I wouldn't
+  want side-effects invalidating or, worse, validating tests while I already
+  have a flaky build."*
 
 - **~~PYRON AS THROWER~~ RULED (maintainer, 2026-09-04): NOT A CONCERN, BUT
   KEEP THE TEST.** Verbatim: *"from a historical and practical point of view

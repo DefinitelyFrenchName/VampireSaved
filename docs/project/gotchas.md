@@ -812,6 +812,44 @@ after `int("10")`, which is the load order. Verified the alternation does
 not accidentally catch gfx/QSound names (`.11m`, `.14m`, `.21m`, `.31m` all
 still excluded).
 
+## A gfx-only freeze gives two builds ONE dispatch key, and the resolver
+## SILENTLY serves the older one's expectations (paid: 14z-132)
+`build_fingerprint.py`'s dispatch key covers PROGRAM members only, so a
+freeze that moves only gfx produces two builds carrying the same key. The
+resolver is a FIRST-MATCH scan of `registry.tsv` and does NOT warn on the
+hit. Measured 14z-132: `build/don_m20` (the M16 mark rebuild, which differs
+from `build/don_m19` by two glyph tiles and nothing else) resolves as
+**`donovan-m19`** — both `8065bc92` — so a gate run against it compares
+silently against donovan-m19's expectation set.
+
+**This is produced BY following the rules, not by breaking them.** A
+gfx-only freeze is legitimate and the project has shipped two (M12, M13).
+The standing workaround has been to COMMENT OUT the older row so the newer
+name resolves — `huitzil-m24`, `pyron-m18` and `donovan-m18-stage4` all
+carry that note today — which also means the older build, if you still have
+it, now answers to the NEWER name.
+
+Related but NOT the same fact: [VSP-118] and the 14z-54 blind spot record
+that the key cannot SEE gfx/QSound/extension content. This entry records
+what the resolver then DOES about it, which is resolve anyway.
+
+## The `--full` whole-set fingerprint is ROMPATH-CHAIN DEPENDENT — not an
+## identity unless the chain is pinned (paid: 14z-132)
+Measured on one build, two commands apart:
+
+    build/m3b_merged23/rompath          -> fcc83fc3...
+    build/m3b_merged23/rompath;../ROMS  -> 544990c4...
+
+`--full` hashes the union of the RESOLVED zips, so a `;` chain folds
+`$ROMDIR`'s members into the digest. Callers pass both forms throughout the
+tree, so used naively as a dispatch key it depends on who asked.
+
+`tools/artifact_manifest.py` already REFUSES a `;` rompath chain for exactly
+this reason, and that is the rule to copy: **a whole-set identity is computed
+over the BUILD's OWN rompath directory only.** Since 14z-112 a build packs
+only its own `vsavjw.zip`, so that digest is exactly "what this build
+authored" — which is the thing a dispatch key should name.
+
 ## **[VSP-44]** The sfx helper and the record array must be impossible to enable separately
 Un-stubbing the per-node sfx helper (vs2 `0x5122` -> vsavj `0x4CE2`) while
 slot 0x0F's pointer row still resolves to JEDAH's array means reading PAST
