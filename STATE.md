@@ -337,18 +337,34 @@ what a triage is looking at, so those are where the thinking time goes.
   versions... these throws involve mostly POSITION of the victim."*
   **RESULT, ours (merged-m15) vs NATIVE vsav2, victim pinned to Victor:**
 
-  | throw | hold offsets | pose | arc peak |
-  |---|---|---|---|
-  | standard 6+HP | **18/18 exact** | ours +1 trailing pose | 64 == 64 |
-  | circuit scrapper 63214+MP | **16/16 exact** | identical | 278 == 278 |
-  | ES circuit scrapper 63214+2P | 22 of 23 | identical | 380 == 380 |
+  **STRENGTHENED the same session after the maintainer's critique** — *"we
+  have but 5 frames for moves that last many tens of frames... it might be a
+  sample bias"* — from a comparison of SETS (blind to order and dwell) to the
+  ORDERED sequence of `(pose, dx, dy)` states with dwell, over EVERY held
+  frame, plus damage as `(amount, pose)`:
 
-  **The two deltas are both at the HOLD'S END BOUNDARY and point opposite
-  ways** — standard: ours reaches one more pose and holds 89 frames to 82;
-  ES: ours is a STRICT SUBSET missing only native's FINAL hold frame
-  `(4,100)` while holding 130 to 120. Consistent with the ruled host-engine
-  cadence (#114), though NOT established as that cause; frozen as the
-  measured shape so a real geometry change cannot hide behind them.
+  | throw | ordered states | damage (amt @ pose) | arc peak |
+  |---|---|---|---|
+  | standard 6+HP | 29 vs 28, ours +1 tail | 14 @ 13 both | 64 == 64 |
+  | circuit scrapper | **23 vs 23, IDENTICAL** | 19 @ 19 both | 278 == 278 |
+  | ES circuit scrapper | 46 vs 47, native +1 tail | 2@21 2@21 15@19 both | 380 == 380 |
+
+  **The trajectories traverse the SAME STATES IN THE SAME ORDER, and every
+  damage event lands for the same amount at the same POSE.** The only
+  structural differences are ONE end-of-hold state, in OPPOSITE directions.
+  **AND THE CADENCE WAS MEASURED INDEPENDENTLY, three times, which is what
+  turns "consistent with #114" into evidence:** the hold runs +8.5% / +9.1% /
+  +8.3% longer than native across the three throws, against #114's documented
+  ~1 video frame per ~11 engine ticks = 9.1% — Circuit Scrapper lands exactly
+  on it. On ES the damage offsets GROW through the move (+5, +7, +10 frames),
+  the signature of a RATE difference rather than a port defect. Dwell and
+  frame numbers are therefore REPORTED by the gate and never gated.
+  **DELIBERATELY NOT COMPARED: the victim's PIXELS.** Victor in our build is
+  VS's Victor; in native vsav2 he is VS2's Victor — different generations of
+  his art. A pixel difference in the victim is a cross-game fact, not evidence
+  about our port (the maintainer's own second point). The pose INDEX resolves
+  through each game's own `anim_index_c`, so a match means the same LOGICAL
+  pose slot, which is the comparable thing.
   **A STALE CLAIM REFUTED ON THE WAY:** `80_hui_grab_2p.rpl`'s header said
   *"only the victim throw-arc HEIGHT differs (alias physics, queued)"*. It
   does not — the arcs are identical on all three throws. The claim predates
