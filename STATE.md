@@ -313,6 +313,57 @@ what a triage is looking at, so those are where the thinking time goes.
 
 ## Decisions pending (human)
 
+- **~~PYRON AS THROWER~~ RULED (maintainer, 2026-09-04): NOT A CONCERN, BUT
+  KEEP THE TEST.** Verbatim: *"from a historical and practical point of view
+  Pyron as thrower I don't really care about because we never had any issue
+  with him. But if we have the test, might as well keep it because it is a
+  good regression marker."* So `tests/audit_pyron_capture_block.sh` STAYS at
+  `EXPECT_MATCH=0`, freezing the observed ours-vs-native difference as a
+  regression marker; **the pose mechanism (the `PRG:0x27FAA` four-sibling
+  question) is NOT to be chased** and no port of row 0x11 is scheduled.
+  The maintainer's own scoping caution, recorded because it is the right
+  question for any widening: *"the question becomes: do we test all victims
+  or only a sample and if it's a sample how to determine it"* — today the gate
+  uses ONE victim (Victor), and the per-victim axis is what
+  `audit_don_grab_pose` already sweeps from the other side.
+
+- **~~PHOBOS'S THREE THROWS — historically problematic, never compared to VS2
+  on geometry~~ MEASURED 14z-131 AND THEY MATCH. Maintainer-directed the same
+  day; no defect found.** The ask: *"there are throws that have been
+  historically problematic with the VS2 tenants as THROWERS, not victims,
+  namely Phobos' throws... these have all had their share of corrections,
+  especially circuit scrapper and ES circuit scrapper, and even now I am not
+  100% sure they are identical both mechanically and visually to their VS2
+  versions... these throws involve mostly POSITION of the victim."*
+  **RESULT, ours (merged-m15) vs NATIVE vsav2, victim pinned to Victor:**
+
+  | throw | hold offsets | pose | arc peak |
+  |---|---|---|---|
+  | standard 6+HP | **18/18 exact** | ours +1 trailing pose | 64 == 64 |
+  | circuit scrapper 63214+MP | **16/16 exact** | identical | 278 == 278 |
+  | ES circuit scrapper 63214+2P | 22 of 23 | identical | 380 == 380 |
+
+  **The two deltas are both at the HOLD'S END BOUNDARY and point opposite
+  ways** — standard: ours reaches one more pose and holds 89 frames to 82;
+  ES: ours is a STRICT SUBSET missing only native's FINAL hold frame
+  `(4,100)` while holding 130 to 120. Consistent with the ruled host-engine
+  cadence (#114), though NOT established as that cause; frozen as the
+  measured shape so a real geometry change cannot hide behind them.
+  **A STALE CLAIM REFUTED ON THE WAY:** `80_hui_grab_2p.rpl`'s header said
+  *"only the victim throw-arc HEIGHT differs (alias physics, queued)"*. It
+  does not — the arcs are identical on all three throws. The claim predates
+  the 14z-67 `throw_arc_tables` fix and was never retracted; it is now.
+  **AND A RIG TRAP WORTH THE SESSION ON ITS OWN:** the ES version needs
+  METER. With an empty stock the ES input degrades SILENTLY to the ordinary
+  MP grab and returns numbers byte-identical to replay 80 — same 16 offsets,
+  same poses, same 19 damage. The discriminator is P1's stock dropping 9 -> 8
+  at the grab frame, which replay 80 under the same poke never does
+  ([VSP-131], [VSP-123]). Documented in the new replay's header and asserted
+  by the gate.
+  Gate: `tests/audit_tenant_throw_geometry.sh`; new replay
+  `tests/replays/hui/97_hui_grab_es_2p.rpl` (replay 80 with one token
+  changed, so a difference between them is the ES button and nothing else).
+
 - **~~`test_phasec_image` SECTION 4 — ITS NEGATIVE CONTROL HAS BEEN DEAD SINCE
   14z-111~~ DECIDED (maintainer, 2026-09-04) AND **DONE 14z-131: OPTION (a)
   WORKED, SO THE GATE IS UPDATED, NOT DROPPED.** The ruling was *"I agree with

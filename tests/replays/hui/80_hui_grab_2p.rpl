@@ -4,7 +4,14 @@
 # dummy (cursor RR), no P2 inputs. P1 walks point-blank, 63214+MP x2.
 # Native A/B on this exact replay: sub-state progression
 # 0e04->0e08->0e0a->0e0c at IDENTICAL frames, damage 0x13 identical;
-# only the victim throw-arc HEIGHT differs (alias physics, queued).
+# ~~only the victim throw-arc HEIGHT differs (alias physics, queued)~~
+# **THE ARC CLAIM IS REFUTED, MEASURED 14z-131 on merged-m15 vs native
+# vsav2 with the victim pinned (Victor, early-window pokes): the victim's
+# post-release arc is IDENTICAL — y 40..318, peak height 278 on BOTH legs —
+# and the HOLD positions match 16 of 16 distinct offsets with an identical
+# pose sequence.** The claim presumably predates the 14z-67 throw_arc_tables
+# fix ("measured launch yv 16.0 == native") and was never retracted here.
+# Gate: tests/audit_tenant_throw_geometry.sh.
 300-305 sys=C1
 420-425 sys=C2
 800-803 sys=S1
