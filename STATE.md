@@ -477,6 +477,39 @@ what a triage is looking at, so those are where the thinking time goes.
   **SO THE PREDICTION "it probably generalises" IS RETRACTED TWICE OVER** —
   once by measurement (4 candidates, not many), once by this correction (0).
 
+  **GATE 4 — THE INVENTORY ITSELF WAS MEASURED ON THE WRONG AXIS (14z-132).**
+  The original 25 classified by "the script names a build dir". A build dir is
+  one of THREE things and only one makes a gate a merged/solo question:
+  a `rompath` the gate BOOTS as vsavjw (the build is the subject, ~18 gates);
+  an `extract/` a decoder reads while the only emulator leg runs NATIVE vs2
+  (the build is a DATA SOURCE, not a subject — 5 gates); or both.
+  **THE FIVE THAT DISSOLVE, each confirmed by reading its invocations:**
+  `test_anim_node_walk`, `test_hitbox_encoding`, `test_move_naming`,
+  `test_reactions`, `test_projectile_params` — every one runs
+  `run_mame.sh vsav2` and nothing else (`projectile_params` touches no rompath
+  at all). Gate 3 was the first instance of this class, not a one-off.
+  **SO THE WALK IS 25 -> ~16 genuine candidates**, and they are HOMOGENEOUS:
+  they boot our build as vsavjw, so [VSP-175] applies uniformly and the only
+  per-gate work is what each re-point re-measures.
+
+  **AND THE BELIEF CAME IN, MEASURED — `test_phasec_image` SECTION 4
+  (14z-132).** RED on the M16 freeze sweep and reproducible standalone:
+  *"the clean leg held the victim on only 0 frames"*. **NOT caused by the
+  re-point sweep** (no commit of 14z-132 touches that file) and not a memory
+  artifact. **THE MECHANISM, stated as a HYPOTHESIS ([VSP-116]):** 14z-131
+  measured this control's hold window — frames 3010-3056, 47 of 47 moving — on
+  `build/m3b_merged22`, the MERGED build; but the gate BUILDS ITS OWN
+  SINGLE-TENANT DONOVAN WIDE track (`build_donovan.sh 6`, no
+  TENANT_MANIFEST, :72) and runs the rig there. A control validated on merged
+  and deployed on solo. **The liveness refusal [VSP-137] that 14z-131 added is
+  what turned this into a red instead of a vacuous green** — the gate declines
+  to judge a leg that produced no event.
+  **THE CHEAP DISCRIMINATOR, not yet run:** put section 4's rig on
+  `build/m3b_merged23` and see whether the hold appears at 3010-3056. If it
+  does, the fix is gate 1's ruling applied here — the subject is "the
+  extension is genuinely READ" on the SHIPPED artifact, so the leg belongs on
+  merged.
+
   **ONE FLAGGED, NOT YET WALKED:** `audit_trap_sound` is release-scope and
   defaults to `build/hui30`, a build frozen at 14z-82c — a release gate
   asserting about a build we do not ship, regardless of the merged question.
