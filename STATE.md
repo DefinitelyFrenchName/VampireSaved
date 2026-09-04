@@ -431,9 +431,32 @@ what a triage is looking at, so those are where the thinking time goes.
   victims, so ~`0x2040`; `test_capture_pose_sources` already has the length
   rule for the other fifteen), and the signed-16-bit `lea (a0,d0.w)` bound
   that section 6 of that gate checks. One freeze.
-  **RECOMMENDATION: PORT IT.** It is a measured 2P defect, the mechanism is
-  routine and already gated, and leaving it means Pyron's throw stays visibly
-  wrong while every other attacker in the game is right. Original
+  **STOP — THE MECHANISM IS NOT ESTABLISHED, AND THE PORT IS NOT YET THE
+  RECOMMENDATION (corrected 14z-131 after the maintainer challenged the
+  test's premise).** What is solid: Pyron's row 0x11 IS unported (static, from
+  the manifests and the ROM), and ours-vs-native with attacker AND victim both
+  held fixed differs while the Demitri control is identical. What is NOT
+  solid is that the capture block CAUSES what is on screen:
+  * **The victim's POSE RECORD also differs**, and the positioner cannot do
+    that — it writes only `+0x10/+0x14`. Measured, victim pose-record indices
+    through the hold: Demitri control ours `[6,5,2,14,23,13]` == native
+    `[6,5,2,14,23,13]`; **Pyron ours `[6,5,2]` vs native
+    `[2,1,0,3,11,10,29]`**. So a second mechanism is in play and it may be the
+    dominant visible effect.
+  * **The obvious big hypothesis is REFUTED**: our Pyron is NOT running
+    Demitri's throw. His attacker records are his own — 12 distinct, span
+    `0x288`, against native's 12 distinct, span `0x288` (relocated, same
+    structure); Demitri's throw walks 8 records, span `0x2D8`.
+  **THE NEXT MEASUREMENT, named so it is not re-derived:** the pose installer
+  at `PRG:0x27FAA` selects one of FOUR sibling tables
+  (`andi.w #$c,d1; movea.l $27fee(pc,d1.w),a0`) before indexing by the
+  victim's id, and the requested pose id `d0` comes from the ATTACKER's side.
+  So the question is whether our Pyron requests different pose ids, or the
+  same ids through a different sibling table. That decides whether row 0x11 is
+  the whole story, a part of it, or a red herring.
+  **NO PORT RECOMMENDATION UNTIL THAT IS ANSWERED** — porting row 0x11 on the
+  strength of a position measurement, while an unexplained pose difference
+  sits beside it, would be fixing the half I happened to measure. Original
   entry — a throw/capture surface, so [VSP-10] (found 14z-130 while folding in the
   `gap_be27a` correction; NOT a regression, this is the state as shipped since
   the #104 work).** The capture-pose installer resolves the ATTACKER's keyframe

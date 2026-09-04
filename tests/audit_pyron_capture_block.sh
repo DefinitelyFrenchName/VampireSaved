@@ -20,11 +20,22 @@
 # is the fourth independent proof of the entry size) decides where a held
 # victim is drawn, every frame of the hold.
 #
-# THE DEFECT. Every legacy attacker row is ported (the fifteen `capture_kf_*`
-# data_port rows, GitHub #104), and so are Donovan's 0x13
+# THE STATIC FACT. Every legacy attacker row is ported (the fifteen
+# `capture_kf_*` data_port rows, GitHub #104), and so are Donovan's 0x13
 # (`throw_victim_keyframes`) and Huitzil's 0x10 (`grab_hold_keyframes`).
-# PYRON'S ROW 0x11 IS NOT. vsavj aliases it to 0x00094954 — DEMITRI's block —
-# so when Pyron throws, the victim is placed by Demitri's geometry.
+# PYRON'S ROW 0x11 IS NOT. vsavj aliases it to 0x00094954 — DEMITRI's block.
+#
+# *** WHAT THIS GATE DOES AND DOES NOT CLAIM (14z-131). It LOCKS AN OBSERVED
+# *** DIFFERENCE. It does NOT establish that the unported row is its CAUSE.
+# The victim's POSE RECORD differs too (ours [6,5,2] vs native
+# [2,1,0,3,11,10,29] while the Demitri control is identical on both legs),
+# and the positioner CANNOT do that — it writes only +0x10/+0x14. A second
+# mechanism is in play. The big hypothesis is already refuted: our Pyron runs
+# HIS OWN records (12 distinct, span 0x288, same as native), not Demitri's
+# (8, span 0x2D8). Open question, named in STATE: the pose installer at
+# PRG:0x27FAA picks one of FOUR sibling tables before indexing by victim id,
+# so does our Pyron request different pose ids, or the same ids through a
+# different sibling? Do not read a PASS here as "row 0x11 is the bug".
 #
 # MEASURED TWO INDEPENDENT WAYS, and they agree (they share no premise: one
 # reads reference-ROM bytes, the other reads work RAM in a running game).
