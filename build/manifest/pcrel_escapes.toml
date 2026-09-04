@@ -49,7 +49,7 @@
 # RE-POINTED 14z-119 (the physics-port freeze): hui51/pyron35/don_m17 ->
 # hui53/pyron37/don_m19, merged m3b_merged20 -> m3b_merged22. Donovan's three
 # physics value ops moved NO address; inventories identical (test_pcrel_escapes PASS).
-[hui53]
+[hui54]
 unresolved = 69
 resolved = 0
 escapes = [
@@ -125,7 +125,7 @@ escapes = [
 ]
 
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-[pyron37]
+[pyron38]
 unresolved = 10
 resolved = 0
 escapes = [
@@ -145,7 +145,7 @@ escapes = [
 # same lea->table pairs — the d2 window + the remap touch neither region). The section is keyed by
 # build dir, so a re-point with no re-key reads as "10 NEW" (paid for 14z-111).
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-[don_m19]
+[don_m20]
 unresolved = 10
 resolved = 0
 escapes = [
@@ -181,7 +181,7 @@ build = "m3b_merged22"
 extract = "build/don_m19/extract"
 placement_suffix = ""
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-same_as = "don_m19"
+same_as = "don_m20"
 
 [merged_hui]
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
@@ -190,7 +190,7 @@ build = "m3b_merged22"
 extract = "build/hui53/extract"
 placement_suffix = "@huitzil"
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-same_as = "hui53"
+same_as = "hui54"
 
 [merged_pyr]
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
@@ -199,4 +199,4 @@ build = "m3b_merged22"
 extract = "build/pyron37/extract"
 placement_suffix = "@pyron"
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-same_as = "pyron37"
+same_as = "pyron38"

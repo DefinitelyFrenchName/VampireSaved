@@ -69,13 +69,13 @@
 # Kill pokes: NONE (audit_kill_poke_shape: a 2-byte HP poke manufactures
 # the #103 stall shape by instrument; losses here are the mash's own).
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged22] tests/audit_continue_switch.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged23] tests/audit_continue_switch.sh
 # ~18 min (one guarded 40,620-frame MAME marathon). On-demand.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
-BUILD="${BUILD:-build/m3b_merged22}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged23}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no build at $BUILD"; exit 0; }
 [ -f "$BUILD/prg/vm3j.04d" ] || { echo "SKIP: no prg/vm3j.04d in $BUILD (need the decoded member for the base table)"; exit 0; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"

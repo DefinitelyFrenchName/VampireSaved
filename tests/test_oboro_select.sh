@@ -33,7 +33,7 @@
 # produced the CHARACTER, not just a byte.
 #
 # Usage: ROMDIR=... tests/test_oboro_select.sh [wide_rompath] [stock_rompath]
-#   defaults: build/m3b_merged22/rompath, build/m5_stock14/rompath
+#   defaults: build/m3b_merged23/rompath, build/m5_stock15/rompath
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -47,8 +47,8 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-WIDE="${1:-build/m3b_merged22/rompath}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-STOCK="${2:-build/m5_stock14/rompath}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+WIDE="${1:-build/m3b_merged23/rompath}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+STOCK="${2:-build/m5_stock15/rompath}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
 for d in "$WIDE" "$STOCK"; do

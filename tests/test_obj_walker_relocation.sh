@@ -28,7 +28,7 @@
 # at any address and `data` is right at none. The old design could use
 # `data` only because its thunk read the table An-relatively.
 #
-# Usage: tests/test_obj_walker_relocation.sh [builddir]   (default build/don_m19)
+# Usage: tests/test_obj_walker_relocation.sh [builddir]   (default build/don_m20)
 #        No emulator, no ROMDIR beyond the decrypted view. Seconds.
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -48,7 +48,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 # pyron17 (test_pyron_blink); see docs/project/gotchas.md "A frozen build
 # stops being a usable REFERENCE". RE-POINT THIS ON THE NEXT DONOVAN
 # RE-FREEZE.
-BUILD="${1:-build/don_m19}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${1:-build/don_m20}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -f "$BUILD/patch/patch.json" ] || { echo "SKIP: no $BUILD/patch/patch.json"; exit 0; }
 [ -f build/out/vsavj_opcodes.bin ] || { echo "SKIP: no build/out/vsavj_opcodes.bin"; exit 0; }
 

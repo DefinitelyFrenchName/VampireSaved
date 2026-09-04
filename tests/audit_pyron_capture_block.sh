@@ -77,13 +77,13 @@
 # are locked by audit_don_grab_pose / test_hui_grab_victim.
 #
 # Static? No — 4 MAME runs, 2 at a time, ~4 min.
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged22] [EXPECT_MATCH=0]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged23] [EXPECT_MATCH=0]
 #        tests/audit_pyron_capture_block.sh
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
-BUILD="${BUILD:-build/m3b_merged22}"
+BUILD="${BUILD:-build/m3b_merged23}"
 EXPECT_MATCH="${EXPECT_MATCH:-0}"   # 0 = the defect is present (today)
 VICTIM="${VICTIM:-03}"              # Victor: a legacy dummy, no-input
 

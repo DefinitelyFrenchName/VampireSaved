@@ -30,7 +30,7 @@
 # attempt 4 ever GAINS an id while 2 keeps one, re-measure before
 # re-freezing: that would be the alternation phase moving, not noise.
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged22] tests/audit_hui_grunt.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged23] tests/audit_hui_grunt.sh
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -52,7 +52,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 ROMDIR="$(CDPATH= cd "$ROMDIR" && pwd)"
-BUILD="${BUILD:-build/m3b_merged22}"   # merged-m7 since the 14z-110 freeze  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged23}"   # merged-m7 since the 14z-110 freeze  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no build at $BUILD"; exit 0; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary"; exit 0; }
@@ -97,7 +97,7 @@ OURS_BY_BUILD = {
     "m3b_merged11": [None, "02a2", None, None, None],
     "m3b_merged13": [None, "02a2", None, None, None],   # 14z-105 (kernel rows untouched by the window)
     "m3b_merged16": [None, "02a2", None, None, None],   # 14z-111 (d2 window + remap are Donovan-owned; kernel rows untouched)
-    "m3b_merged22": [None, "02a2", None, None, None],   # 14z-113 merged-m10: same program as merged16 (one-zip repackaging)  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+    "m3b_merged23": [None, "02a2", None, None, None],   # 14z-113 merged-m10: same program as merged16 (one-zip repackaging)  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 }
 if ours_a2:
     ours = [None, ours_a2, None, None, None]

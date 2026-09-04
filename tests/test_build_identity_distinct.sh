@@ -39,7 +39,7 @@ cd "$REPO"
 rc=0
 fail() { echo "  FAIL: $*"; rc=1; }
 
-PLAY="build/m3b_merged22"     # the frozen merged playtest build (re-pointed 14z-111; 14z-117 -> merged-m12)  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+PLAY="build/m3b_merged23"     # the frozen merged playtest build (re-pointed 14z-111; 14z-117 -> merged-m12)  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 INSTR="build/merged1"         # the legacy-only instrument that shares its fp
 
 for d in "$PLAY" "$INSTR"; do

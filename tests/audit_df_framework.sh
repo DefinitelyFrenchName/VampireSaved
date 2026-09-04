@@ -33,7 +33,7 @@
 # the MAINTAINER'S to research from period sources (the ruling); this
 # audit freezes what ships, it does not retune.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged22] [JOBS=4]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged23] [JOBS=4]
 #        tests/audit_df_framework.sh          (~4 legs x ~2 min)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -41,7 +41,7 @@ cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged22}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged23}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 RPL="$REPO/tests/replays/df/97_df_mech.rpl"

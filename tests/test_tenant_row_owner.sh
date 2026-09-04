@@ -63,7 +63,7 @@ EXTRACT="${1:-build/m5_wide/extract}"
 if [ ! -d "$EXTRACT" ]; then
     echo "SKIP: no extract dir at $EXTRACT (build dirs are untracked)."
     echo "      Make one with:  GEN_FLAGS=\"--allow-plausible --tripwire-open\" \\"
-    echo "                      tools/build_donovan.sh 6 build/m5_stock14"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+    echo "                      tools/build_donovan.sh 6 build/m5_stock15"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
     exit 0
 fi
 

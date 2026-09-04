@@ -42,7 +42,7 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD="${1:-build/m3b_merged22}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${1:-build/m3b_merged23}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 RPL="$REPO/tests/replays/36_pick_tenant_cell.rpl"
 FRAME=2886                     # the frozen tenant-oracle MAME anchor
 TOOL="$REPO/tools/oram_obj_records.py"

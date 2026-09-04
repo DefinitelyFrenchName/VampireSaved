@@ -59,7 +59,7 @@
 #   frozen value must FAIL the trace compare, and the contact verdict must
 #   FAIL when the expectation is inverted on the same data.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged22] [JOBS=4]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged23] [JOBS=4]
 #        [SECTION=trace|contact|all] [FREEZE=1] [KEEP_DIR=dir [REUSE=1]]
 #        tests/audit_df_startup_invuln.sh
 #        (~3 min at MAME's headless speed: 22 trace legs + 4 contact legs, JOBS
@@ -70,7 +70,7 @@ cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged22}"
+BUILD="${BUILD:-build/m3b_merged23}"
 JOBS="${JOBS:-4}"
 SECTION="${SECTION:-all}"
 FREEZE="${FREEZE:-0}"

@@ -55,7 +55,7 @@
 #
 # Usage: ROMDIR=... [DF_STYLE_EXPECT=differs|matches] \
 #            tests/test_hui_df_style.sh [wide-builddir]
-#        (defaults to build/hui53. NOTE 14z-71: the default USED to be
+#        (defaults to build/hui54. NOTE 14z-71: the default USED to be
 #        build/hui11, which PREDATES the 14z-69p palette fix that the
 #        default expectation `colours-fixed` asserts — so a bare run of
 #        this gate failed for reasons that had nothing to do with the
@@ -85,7 +85,7 @@ trap 'rm -rf "$WORK"' EXIT
    # Its frozen inventory may still describe the OLD build: run it
    # before trusting a green, and re-measure rather than absorb.
 
-BUILD="${1:-build/hui53}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${1:-build/hui54}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 EXPECT="${DF_STYLE_EXPECT:-differs}"   # 14z-79: the 69p fix is WITHDRAWN (see header)
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -f "$BUILD/rompath/vsavjw.zip" ] || {

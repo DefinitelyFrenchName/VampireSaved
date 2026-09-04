@@ -37,7 +37,7 @@
 #   VOICE_BORROW_EXPECT=lottery tests/audit_voice_borrow.sh build/don_m4
 #
 # Usage: ROMDIR=... [MAME_BIN=...] tests/audit_voice_borrow.sh [builddir]
-# Default build: build/don_m19. ~6 min (2 MAME runs).
+# Default build: build/don_m20. ~6 min (2 MAME runs).
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -54,7 +54,7 @@
 #   ground-truth- failing pre-fix pair
 set -eu
 
-BUILD="${1:-build/don_m19}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${1:-build/don_m20}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 EXPECT="${VOICE_BORROW_EXPECT:-own-class}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

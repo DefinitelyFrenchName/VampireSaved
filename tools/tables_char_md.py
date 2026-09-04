@@ -3,7 +3,7 @@
 behavioral values as the community-reviewable table (CLAUDE.md §2 rule 5).
 
   python3 tools/tables_char_md.py <extract_dir> <out.md> [--bank-map build/manifest/bank_map.toml]
-  python3 tools/tables_char_md.py build/don_m19/extract docs/project/tables/donovan.md  # re-pointed 14z-130 (M13 boot-title freeze) <- 14z-119
+  python3 tools/tables_char_md.py build/don_m20/extract docs/project/tables/donovan.md  # re-pointed 14z-130 (M13 boot-title freeze) <- 14z-119
 
 READS  <extract_dir>/regions.json — what `tools/extract_char.py` wrote for the
        build (source set, oracle set, input SHA-1s, the measured shifts, every

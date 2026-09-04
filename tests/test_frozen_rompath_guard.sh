@@ -46,7 +46,7 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
 
-SRC=build/don_m19/rompath  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+SRC=build/don_m20/rompath  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 if [ ! -f "$SRC/vsavjw.zip" ]; then
     # Never silently green: without a frozen reference to copy, this control
     # would assert nothing at all.

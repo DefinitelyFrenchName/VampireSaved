@@ -561,7 +561,7 @@ build drives inputs through the 0001 harness instead), so record on MAME.
 
 ```sh
 export ROMDIR=/path/to/reference/sets
-tools/run_wide.sh build/m3b_merged22 fbneo # THE 3-TENANT BUILD (all 18
+tools/run_wide.sh build/m3b_merged23 fbneo # THE 3-TENANT BUILD (all 18
                                            # (14z-97: the build argument is
                                            # now REQUIRED. It used to default
                                            # to build/m5w — the known-bad
@@ -596,8 +596,8 @@ tools/run_wide.sh build/m3b_merged22 fbneo # THE 3-TENANT BUILD (all 18
                                            # "Bishamon" — aliased rows).
                                            # Works for P1 and P2. Without
                                            # Start it is plain Bishamon.
-tools/run_wide.sh build/don_m19 fbneo      # or the solo builds (hui53,
-                                           # pyron37); ... mame
+tools/run_wide.sh build/don_m20 fbneo      # or the solo builds (hui54,
+                                           # pyron38); ... mame
                                            # (registry rows name the CURRENT
                                            # fingerprints — donovan-m19/
                                            # huitzil-m26/pyron-m20 since the

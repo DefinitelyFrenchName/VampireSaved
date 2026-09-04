@@ -17,7 +17,7 @@ gates told the reader to run
 
     ROMDIR=... [BUILD=build/m3b_merged11] tests/audit_don_grab_pose.sh
 
-while the code said `BUILD="${BUILD:-build/m3b_merged22}"`. The dir named in
+while the code said `BUILD="${BUILD:-build/m3b_merged23}"`. The dir named in
 the header had been pruned three freezes earlier. Nothing breaks — the code
 default is right — but the maintainer ruled at 14z-122 that a gate's WHY lives
 in its header, and the gate index (`docs/project/gate_index.md`) is generated

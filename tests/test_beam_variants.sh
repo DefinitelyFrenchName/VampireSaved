@@ -28,7 +28,7 @@
 #   3. GFX READY — 0 of the tiles they draw are missing from group C.
 #
 # Usage: ROMDIR=... tests/test_beam_variants.sh [wide-builddir]
-#        (defaults to build/hui53)
+#        (defaults to build/hui54)
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -47,7 +47,7 @@ WORK="$(mktemp -d)"; trap 'rm -rf "$WORK"' EXIT
    # (19 members, no vsw.z01/z02) — the script could not run at all.
    # Its frozen inventory may still describe the OLD build: run it
    # before trusting a green, and re-measure rather than absorb.
-BUILD="${1:-build/hui53}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD";; esac  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${1:-build/hui54}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD";; esac  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: no $BUILD/rompath/vsavjw.zip"; exit 1; }
 REF_BIN="${MAME_REF_BIN:-$HOME/.cache/vampire-saved/mame-ref/cps2}"
 RPL="$REPO/tests/replays/hui/86_hui_beam_variants.rpl"

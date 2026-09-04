@@ -49,7 +49,7 @@
 # their tables' row 0x11.
 #
 # Usage: ROMDIR=... tests/test_pyron_blink.sh [outbase]
-#        outbase default: build/pyron37 (the current freeze; the dated
+#        outbase default: build/pyron38 (the current freeze; the dated
 #        figure in the verbatim note below is 14z-103's)
 # Env: MAME_BIN, PYRON_BLINK_EXPECT, SKIP_RUNTIME=1 (controls only).
 #
@@ -87,7 +87,7 @@ fail=0
 # DEFAULT RE-POINTED 14z-92 (pyron17, pre-v1.1, MAME-refused) -> pyron26,
 # and 14z-103 -> pyron30 (pyron-m13, the current freeze). Every generation
 # carries the same blink fix pyron17 introduced. Re-point at each freeze.
-BUILD="${1:-build/pyron37}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${1:-build/pyron38}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="${PYRON_BLINK_EXPECT:-fixed}"
 export MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"

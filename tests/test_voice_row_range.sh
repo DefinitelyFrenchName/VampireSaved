@@ -33,7 +33,7 @@
 # The bound is derived from the two tables, not hardcoded, so if the
 # pointer table ever grows the gate follows it.
 #
-# Usage: [BUILDS="build/hui53:0x10 ..."] tests/test_voice_row_range.sh
+# Usage: [BUILDS="build/hui54:0x10 ..."] tests/test_voice_row_range.sh
 # Needs build/out/vsavj_data.bin (the DATA view — these tables are read
 # An-relative and live inside the crypt window; the opcode view is noise).
 #
@@ -78,7 +78,7 @@ cd "$REPO"
 #
 # A build dir that is absent is SKIPPED, not failed, so a fresh checkout does
 # not red (GitHub #29: the skip is reported, never counted as a pass).
-BUILDS="${BUILDS:-build/hui53:0x10 build/pyron37:0x11 build/don_m19:0x13}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILDS="${BUILDS:-build/hui54:0x10 build/pyron38:0x11 build/don_m20:0x13}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 
 _present=""
 for _b in $BUILDS; do

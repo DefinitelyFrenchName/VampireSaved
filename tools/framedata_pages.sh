@@ -43,7 +43,7 @@ OUT="$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$OUT")"
 case "$OUT/" in "$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$REPO")"/*)
     echo "refusing: FRAMEDATA_OUT is inside the repository ($OUT) — per-move frame data stays OUT of the tree"; exit 2;; esac
 mkdir -p "$OUT"
-DON="${DON:-build/don_m19}"; HUI="${HUI:-build/hui53}"; PYR="${PYR:-build/pyron37}"
+DON="${DON:-build/don_m20}"; HUI="${HUI:-build/hui54}"; PYR="${PYR:-build/pyron38}"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 PAGES="$REPO/tests/expected/charmap_pages.sha256"
 sha() { python3 -c 'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1],"rb").read()).hexdigest())' "$1"; }

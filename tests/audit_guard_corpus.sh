@@ -30,7 +30,7 @@
 # line is not a measurement) and a per-run verdict map kept under
 # build/guard_corpus/ for the record.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged22] [JOBS=2]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged23] [JOBS=2]
 #        [LEGS="none 10 11 13"] [ONLY=<replay-stem>]
 #        [PICK_FRAMES="1400 1450 1500 1600 1700"]
 #        tests/audit_guard_corpus.sh
@@ -49,7 +49,7 @@ cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged22}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged23}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 JOBS="${JOBS:-2}"
 LEGS="${LEGS:-none 10 11 13}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary at $MAME_BIN"; exit 0; }

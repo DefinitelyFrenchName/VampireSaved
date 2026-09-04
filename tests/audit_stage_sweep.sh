@@ -25,7 +25,7 @@
 # ASSET side, not only on the readback (palettes are compared for
 # distinctness, never frozen).
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged22] [JOBS=6]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged23] [JOBS=6]
 #        tests/audit_stage_sweep.sh          (~37 legs, ~6 min at JOBS=6)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -33,7 +33,7 @@ cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged22}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged23}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
 JOBS="${JOBS:-6}"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT

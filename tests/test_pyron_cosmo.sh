@@ -34,7 +34,7 @@
 # construction: the byte lives in a region that exists only in this build.
 #
 # Usage: ROMDIR=... tests/test_pyron_cosmo.sh [outbase]
-#        outbase default: build/pyron37 (the current freeze; the dated
+#        outbase default: build/pyron38 (the current freeze; the dated
 #        figure in the verbatim note below is 14z-103's)
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -56,7 +56,7 @@ WORK="$(mktemp -d)"; trap 'rm -rf "$WORK"' EXIT
    # (19 members, no vsw.z01/z02) — the script could not run at all.
    # Its frozen inventory may still describe the OLD build: run it
    # before trusting a green, and re-measure rather than absorb.
-BUILD="${1:-build/pyron37}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${1:-build/pyron38}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 fail=0
 

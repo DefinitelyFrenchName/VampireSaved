@@ -31,7 +31,7 @@
 # and report it — do not keep batching for a completeness number. The matrix
 # below prints as it goes so a stopped run is still evidence.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged22] [JOBS=6]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged23] [JOBS=6]
 #        [ONLY=0x13] [BASES=...] tests/audit_roster_pairings.sh
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -49,7 +49,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
-BUILD="${BUILD:-build/m3b_merged22}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged23}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 JOBS="${JOBS:-6}"
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no merged build at $BUILD"; exit 0; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"

@@ -79,7 +79,7 @@ fail=0; ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }
 
 RPL="$REPO/tests/replays/36_pick_tenant_cell.rpl"
 FIELDS="$REPO/tests/fields_m2a.tsv"
-BUILD="${BUILD:-build/m3b_merged22}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged23}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 FOLLOW="0,60,180"
 SKIP="p2_hitbox_base,p2_ptr64,p2_word132,p2_x,p2_y,p2_attack_id,p2_flip"
 EXP_AM=2886          # frozen MAME anchor

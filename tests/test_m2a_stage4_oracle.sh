@@ -28,7 +28,7 @@
 #         diverge across engines more than an untouched character does).
 #
 # Usage: ROMDIR=... tests/test_m2a_stage4_oracle.sh [rompath_dir]
-#   rompath_dir default: build/m5_stock14/rompath — the current STOCK twin,
+#   rompath_dir default: build/m5_stock15/rompath — the current STOCK twin,
 #   the substituted track this replay pair is authored for (Donovan at slot
 #   0x0F). Re-pointed 14z-128 from build/donovan, an M2a-era build the bare
 #   default still named: the emulator-tier sweep ran it and got FAIL (box ids
@@ -44,7 +44,7 @@ set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-RPDIR="${1:-$REPO/build/m5_stock14/rompath}"  # re-pointed 14z-128 <- build/donovan (M2a-era; the emulator-tier sweep ran the bare default and it FAILED there while PASSING on the current stock twin)
+RPDIR="${1:-$REPO/build/m5_stock15/rompath}"  # re-pointed 14z-128 <- build/donovan (M2a-era; the emulator-tier sweep ran the bare default and it FAILED there while PASSING on the current stock twin)
 [ -d "$RPDIR" ] || { echo "no build at $RPDIR — run tools/build_donovan.sh 4 first"; exit 1; }
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT

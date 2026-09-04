@@ -59,7 +59,7 @@
 #
 # Usage: ROMDIR=... [BEAM_WALK_EXPECT=absent|walks] \
 #            tests/test_beam_anim_walk.sh [wide-builddir]
-#        (defaults to build/hui53; needs a build carrying H's real art)
+#        (defaults to build/hui54; needs a build carrying H's real art)
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -82,7 +82,7 @@ trap 'rm -rf "$WORK"' EXIT
    # Its frozen inventory may still describe the OLD build: run it
    # before trusting a green, and re-measure rather than absorb.
 
-BUILD="${1:-build/hui53}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${1:-build/hui54}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 EXPECT="${BEAM_WALK_EXPECT:-walks}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -f "$BUILD/rompath/vsavjw.zip" ] || {

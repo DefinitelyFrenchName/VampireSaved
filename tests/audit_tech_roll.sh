@@ -32,7 +32,7 @@
 # proves the held requirement and that the roll signature cannot fire
 # from the sweep alone; `ctl` all-legacy (instrument leg).
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged22]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged23]
 #        tests/audit_tech_roll.sh          (~9 legs x ~1 min)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -40,7 +40,7 @@ cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged22}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged23}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 BASE="$REPO/tests/replays/judge/03_down_attack.rpl"

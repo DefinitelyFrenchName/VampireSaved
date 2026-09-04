@@ -58,7 +58,7 @@
 #
 # Cost: five `jtframe mra` runs, ~30 s. Needs the emu/jtcores submodule, `go`
 # and $ROMDIR; the `.rom` checks additionally need a built WIDE romset
-# (build/m3b_merged22 by default, MRA_MAP_BUILD to override). Everything is
+# (build/m3b_merged23 by default, MRA_MAP_BUILD to override). Everything is
 # written to a temp dir OUTSIDE the repo — `.rom` files are ROM content
 # (CLAUDE.md rule 7).
 #
@@ -79,7 +79,7 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD="${MRA_MAP_BUILD:-build/m3b_merged22}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${MRA_MAP_BUILD:-build/m3b_merged23}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 
 [ -f "emu/jtcores/.gitmodules" ] || { echo "SKIP: emu/jtcores not initialised (tools/setup_jtcores.sh)"; exit 0; }
 [ -n "${ROMDIR:-}" ] || { echo "SKIP: ROMDIR not set"; exit 0; }

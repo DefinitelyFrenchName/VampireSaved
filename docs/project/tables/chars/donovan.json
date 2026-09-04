@@ -12,7 +12,7 @@
  },
  "inputs": {
   "bank_map.toml": "bfe42f907b500775af2a064b18391b30dad78d38",
-  "manifest": "8d07908d044387587bb846a63ed8cc8f2ddf6174",
+  "manifest": "8ed8d8f6c53e86a497356bd5974f8fab7ff50456",
   "overrides": "72b9812942192bf348508ddf7473cbb37b2d5275",
   "placements.json": "74b756174c2eac1a4e41919145114e2498d11082",
   "reconciliation.toml": "40528aeb863028d885f868f34368443c460b5ca2",
@@ -25,7 +25,7 @@
  "sources": {
   "ours": {
    "kind": "built",
-   "set": "build/don_m19"
+   "set": "build/don_m20"
   },
   "vh": null,
   "vs2": {
