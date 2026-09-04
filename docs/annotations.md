@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 2957 |
-| named by a document or manifest only | 2049 |
-| named by both a document/manifest and code | 598 |
-| named by CODE ONLY (the gap list below) | 310 |
+| distinct program-space addresses named | 2958 |
+| named by a document or manifest only | 2046 |
+| named by both a document/manifest and code | 601 |
+| named by CODE ONLY (the gap list below) | 311 |
 | carried by atlas | 473 |
 | carried by engine_internals | 535 |
 | carried by other docs | 946 |
 | carried by manifests | 1780 |
-| carried by code | 908 |
+| carried by code | 912 |
 
 ## Addresses
 
@@ -933,7 +933,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x027F78` | build/manifest/pcrel_escapes.toml — don_m19; build/manifest/pcrel_escapes.toml — hui53; build/manifest/pcrel_escapes.toml — pyron37 |
 | `PRG:0x027F88` | docs/game/engine_internals.md — THE ENGINE TICK IS DIRECTLY OBSERVABLE — a write tap on '+0x20' is a TICK-ACCURATE instrument (14z-126b); tools/tick_durations.py |
 | `PRG:0x027FA0` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/project/gotchas.md — two traps from the #104 re-measurement — both produced a CONFIDENT WRONG ANSWER from a working instrument (paid: 14z-99) |
-| `PRG:0x027FAA` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); build/manifest/reconciliation.toml — map |
+| `PRG:0x027FAA` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); build/manifest/reconciliation.toml — map; tests/audit_pyron_capture_block.sh |
 | `PRG:0x027FB2` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab) |
 | `PRG:0x027FCE` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab) |
 | `PRG:0x027FD8` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2]; docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/platform/gotchas.md — encrypted range (14z-68) [vs2]; docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail) [vs2]; +2 more |
@@ -943,7 +943,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x028000` | docs/game/engine_internals.md — The QSound Z80 driver: id table, songs, streams, sample records (measured 14z-86, reader-traced on live vsavj, id 0x119); docs/platform/gotchas.md — A member's REGION layout is not its FILE layout — and the Z80 driver's own address space is a THIRD thing (14z-86) |
 | `PRG:0x028026` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 [vs2]; build/manifest/donovan.toml — hit_class_props_ext_lo |
 | `PRG:0x028028` | build/manifest/donovan.toml — hit_class_props_ext_hi |
-| `PRG:0x02802E` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/project/patch_notes.md — The correction; build/manifest/bank_map.toml — capture_kf_ptr; build/manifest/donovan.toml — pcrel_escape_fix; +9 more |
+| `PRG:0x02802E` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/project/patch_notes.md — The correction; build/manifest/bank_map.toml — capture_kf_ptr; build/manifest/donovan.toml — pcrel_escape_fix; +11 more |
 | `PRG:0x02804C` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — port_patch |
 | `PRG:0x028058` | docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); build/manifest/huitzil.toml — df_seq_entry_10; tests/test_capture_pose_sources.sh |
 | `PRG:0x028072` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab) |
@@ -1903,7 +1903,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x093764` | docs/project/patch_notes.md — 14z-71 — the beam: byte detail; tools/build_donovan.sh |
 | `PRG:0x0938BA` | docs/project/patch_notes.md — 14z-85b — per-tenant sfx records (pyr_sfx_records / hui_sfx_records; maintainer-ruled option (a)) |
 | `PRG:0x093B6A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/project/gotchas.md — A self-frozen '.sha1' cannot see a legacy regression — and a replay's FILENAME does not tell you what it loads (14z-88 paid it, 14z-89 measured the extent); tests/audit_win_pal_auto.sh; tests/test_m2_repoint.sh; tests/test_oboro_select.sh; tests/test_pyron_blink.sh; +1 more |
-| `PRG:0x094954` | build/manifest/donovan.toml — capture_kf_demitri; build/manifest/huitzil.toml — capture_kf_demitri; build/manifest/huitzil.toml — grab_hold_keyframes; build/manifest/pyron.toml — capture_kf_demitri |
+| `PRG:0x094954` | build/manifest/donovan.toml — capture_kf_demitri; build/manifest/huitzil.toml — capture_kf_demitri; build/manifest/huitzil.toml — grab_hold_keyframes; build/manifest/pyron.toml — capture_kf_demitri; tests/audit_pyron_capture_block.sh |
 | `PRG:0x095894` | docs/project/patch_notes.md — 14z-85b — per-tenant sfx records (pyr_sfx_records / hui_sfx_records; maintainer-ruled option (a)) |
 | `PRG:0x0968DE` | build/manifest/donovan.toml — capture_kf_gallon; build/manifest/huitzil.toml — capture_kf_gallon; build/manifest/pyron.toml — capture_kf_gallon |
 | `PRG:0x09769E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question); docs/game/gotchas.md — A REPLAY DOES NOT TRANSFER BETWEEN REGIONAL SETS EITHER — 'vsav''s match starts ~200+ frames after 'vsavj''s (paid: 14z-127); docs/platform/mister.md — The tenant-content measurements: the tenant anchor, both group-C fetches, bank 1 under load, the QSound extension, the OBJ-list oracle, the synthesis fit (measured 14z-108/109, entered 14z-114); docs/project/gotchas.md — A self-frozen '.sha1' cannot see a legacy regression — and a replay's FILENAME does not tell you what it loads (14z-88 paid it, 14z-89 measured the extent); tests/test_mister_obj_oracle.sh; +4 more |
@@ -1924,7 +1924,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0A204E` | build/manifest/donovan.toml — capture_kf_anakaris; build/manifest/huitzil.toml — capture_kf_anakaris; build/manifest/pyron.toml — capture_kf_anakaris |
 | `PRG:0x0A361A` | build/manifest/donovan.toml — capture_kf_demitri; build/manifest/huitzil.toml — capture_kf_demitri; build/manifest/pyron.toml — capture_kf_demitri |
 | `PRG:0x0A3990` | build/manifest/donovan.toml — capture_kf_felicia; build/manifest/huitzil.toml — capture_kf_felicia; build/manifest/pyron.toml — capture_kf_felicia |
-| `PRG:0x0A3D88` | build/manifest/donovan.toml — capture_kf_demitri; build/manifest/huitzil.toml — capture_kf_demitri; build/manifest/pyron.toml — capture_kf_demitri |
+| `PRG:0x0A3D88` | build/manifest/donovan.toml — capture_kf_demitri; build/manifest/huitzil.toml — capture_kf_demitri; build/manifest/pyron.toml — capture_kf_demitri; tests/audit_pyron_capture_block.sh |
 | `PRG:0x0A5A64` | build/manifest/donovan.toml — capture_kf_gallon; build/manifest/huitzil.toml — capture_kf_gallon; build/manifest/pyron.toml — capture_kf_gallon |
 | `PRG:0x0A61D2` | build/manifest/donovan.toml — capture_kf_gallon; build/manifest/huitzil.toml — capture_kf_gallon; build/manifest/pyron.toml — capture_kf_gallon |
 | `PRG:0x0A6418` | docs/game/atlas/select_screen.md — The Oboro select hook (14z-105, the port's own path to '0x18'); docs/project/patch_notes.md — W1 — 'oboro_select_hook' ('[[site_thunk]]', every tenant manifest, deduped); tests/test_oboro_select.sh |
@@ -2023,7 +2023,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0BE1BA` | docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets; build/manifest/bank_map.toml — word_pos_a |
 | `PRG:0x0BE1FA` | docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets; build/manifest/bank_map.toml — word_pos_b; build/manifest/reconciliation.toml — map |
 | `PRG:0x0BE23A` | docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); build/manifest/bank_map.toml — gap_be23a; tools/charmap_gen.py |
-| `PRG:0x0BE27A` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/game/engine_internals.md — vs2/vh2 fill them (named 14z-74; SIX instances and counting); docs/project/patch_index.md — Mechanism inventory (generator vocabulary); +68 more |
+| `PRG:0x0BE27A` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/game/engine_internals.md — vs2/vh2 fill them (named 14z-74; SIX instances and counting); docs/project/patch_index.md — Mechanism inventory (generator vocabulary); +70 more |
 | `PRG:0x0BE27E` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron; tools/audit_shared_writes.py |
 | `PRG:0x0BE282` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
 | `PRG:0x0BE286` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
@@ -2897,6 +2897,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x0C0000` | tests/test_patch_prg.sh; tests/test_pointer_flow.sh |
 | `PRG:0x0C00FA` | tests/test_don_immortal_native.sh |
 | `PRG:0x0C0114` | tests/audit_merged_vec3.sh |
+| `PRG:0x0C7F98` | tests/audit_pyron_capture_block.sh |
 | `PRG:0x0CD286` | tests/audit_don_ko_writer.sh |
 | `PRG:0x0D0000` | tests/test_don_reactions.sh |
 | `PRG:0x0D073C` | tests/lua/index_watch.lua |
