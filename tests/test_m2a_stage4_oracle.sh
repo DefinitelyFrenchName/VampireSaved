@@ -43,6 +43,13 @@
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"
+# 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that
+# still contain $ROMDIR (e.g. MAME_ROMPATH="...;$ROMDIR"); a RELATIVE value —
+# which is how the runners invoke everything (ROMDIR=../ROMS) — then resolves
+# against the WORK dir and silently finds no reference members. Kept as a
+# VARIABLE (forks set their own); only made absolute, and only if it exists,
+# so a gate that means to SKIP on a missing ROMDIR still does.
+if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 RPDIR="${1:-$REPO/build/m5_stock15/rompath}"  # re-pointed 14z-128 <- build/donovan (M2a-era; the emulator-tier sweep ran the bare default and it FAILED there while PASSING on the current stock twin)
 [ -d "$RPDIR" ] || { echo "no build at $RPDIR — run tools/build_donovan.sh 4 first"; exit 1; }

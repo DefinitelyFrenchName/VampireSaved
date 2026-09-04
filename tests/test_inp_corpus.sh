@@ -30,6 +30,13 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
+# 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that
+# still contain $ROMDIR (e.g. MAME_ROMPATH="...;$ROMDIR"); a RELATIVE value —
+# which is how the runners invoke everything (ROMDIR=../ROMS) — then resolves
+# against the WORK dir and silently finds no reference members. Kept as a
+# VARIABLE (forks set their own); only made absolute, and only if it exists,
+# so a gate that means to SKIP on a missing ROMDIR still does.
+if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 BUILD="${BUILD:-build/m3b_merged23}"   # re-point at every merged freeze  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: no WIDE build at $BUILD"; exit 1; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT

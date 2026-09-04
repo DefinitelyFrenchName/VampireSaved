@@ -83,6 +83,13 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
+# 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that
+# still contain $ROMDIR (e.g. MAME_ROMPATH="...;$ROMDIR"); a RELATIVE value —
+# which is how the runners invoke everything (ROMDIR=../ROMS) — then resolves
+# against the WORK dir and silently finds no reference members. Kept as a
+# VARIABLE (forks set their own); only made absolute, and only if it exists,
+# so a gate that means to SKIP on a missing ROMDIR still does.
+if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 BUILD="${BUILD:-build/m3b_merged23}"
 EXPECT_MATCH="${EXPECT_MATCH:-0}"   # 0 = the defect is present (today)
 VICTIM="${VICTIM:-03}"              # Victor: a legacy dummy, no-input

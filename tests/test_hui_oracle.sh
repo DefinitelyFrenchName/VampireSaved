@@ -30,6 +30,13 @@
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"
+# 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that
+# still contain $ROMDIR (e.g. MAME_ROMPATH="...;$ROMDIR"); a RELATIVE value —
+# which is how the runners invoke everything (ROMDIR=../ROMS) — then resolves
+# against the WORK dir and silently finds no reference members. Kept as a
+# VARIABLE (forks set their own); only made absolute, and only if it exists,
+# so a gate that means to SKIP on a missing ROMDIR still does.
+if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 RPDIR="${1:-$REPO/build/hui54/rompath}"  # re-pointed 14z-128 <- build/hui4 (19 members, no vsw.z01 — pre-WIDE-v1.1 and unbootable on current binaries; the sweep found it as "no dump files", and test_build_ref_rot could not see the $REPO/-prefixed form until the same session)
 [ -d "$RPDIR" ] || { echo "no build at $RPDIR — run tools/build_donovan.sh 4 first"; exit 1; }

@@ -32,6 +32,13 @@
 #   shadow tiles. RUN FOR EVERY NEW TENANT
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
+# 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that
+# still contain $ROMDIR (e.g. MAME_ROMPATH="...;$ROMDIR"); a RELATIVE value —
+# which is how the runners invoke everything (ROMDIR=../ROMS) — then resolves
+# against the WORK dir and silently finds no reference members. Kept as a
+# VARIABLE (forks set their own); only made absolute, and only if it exists,
+# so a gate that means to SKIP on a missing ROMDIR still does.
+if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 BUILD="${1:?usage: audit_empty_tiles.sh <builddir> [replay...]}"

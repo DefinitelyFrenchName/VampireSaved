@@ -48,6 +48,13 @@ FREEZE=0
 if [ "${1:-}" = "--freeze" ]; then FREEZE=1; shift; fi
 SET="${1:-vsavj}"
 ROMDIR="${ROMDIR:?set ROMDIR to the reference-set directory}"
+# 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that
+# still contain $ROMDIR (e.g. MAME_ROMPATH="...;$ROMDIR"); a RELATIVE value —
+# which is how the runners invoke everything (ROMDIR=../ROMS) — then resolves
+# against the WORK dir and silently finds no reference members. Kept as a
+# VARIABLE (forks set their own); only made absolute, and only if it exists,
+# so a gate that means to SKIP on a missing ROMDIR still does.
+if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 . "$REPO/tests/lib/masked_compare.sh"   # the §4 comparison vocabulary (14z-97)
 ROMPATH="${MAME_ROMPATH:-$ROMDIR}"
