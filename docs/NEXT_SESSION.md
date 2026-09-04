@@ -11,15 +11,21 @@
 > ## sets, the 137-file re-point sweep, the pointer-flow baselines and the
 > ## MiSTer CRC tail are all done. Static tier **130/0/0/0 strict**.
 > ##
-> ## # THE TWO THINGS THAT ARE NOT DONE
+> ## # WHERE THE FREEZE STANDS
 > ##
-> ## **(1) THE EMULATOR-TIER FREEZE SWEEP WAS STILL RUNNING AT THE CLOSE.**
-> ## `ROMDIR=... MAME_BIN=~/.cache/vampire-saved/mame/cps2
-> ## tests/run_all_emulator.sh --freeze` — 132 gates at romset cadence, the
-> ## scope the 14z-129 ruling makes mandatory at every freeze. Its log is
-> ## `<scratch>/emu_m13.log` and it will be GONE (scratch is session-local),
-> ## so **re-run it and read the result before anything else** — a freeze whose
-> ## emulator tier was never adjudicated is not a finished freeze.
+> ## **(1) THE EMULATOR-TIER FREEZE SWEEP RAN AND WAS ADJUDICATED: 131/1.**
+> ## `run_all_emulator.sh --freeze`, 132 gates at romset cadence, 2h44m —
+> ## **PASS 131 / FAIL 1 / SKIP 0 / TIMEOUT 0 / MISSING 0**. Nothing is owed
+> ## here. The one red is `test_phasec_image`, and neither half of it was a
+> ## defect in M13: section 1's stock-fingerprint pin was `ae701ffb…` from
+> ## 14z-64 while the twin has moved four ruled times (FIXED — it now resolves
+> ## the value from registry.tsv's newest `*-stock` row), and **section 4's
+> ## negative control has been dead since 14z-111** — it zeroes `CPU:$400010`
+> ## expecting the Phase-C sound table, but that address now holds Donovan's
+> ## AI script block, which `12_donovan_vs_cpu` cannot read because he is the
+> ## PLAYER there. **Section 4 is a DECISION, not a chore** — see STATE
+> ## "Decisions pending"; I did not re-point it, because re-targeting a
+> ## control from the build's own placement map is what [VSP-166] forbids.
 > ## **THE CADENCE QUESTION WAS ASKED AND ANSWERED AT THIS FREEZE: NO.** The
 > ## runner dropped the six `bitstream` gates and printed "IS THIS FREEZE
 > ## TARGETING MiSTer?". It is not — the `.rbf` has not moved since 14z-108
@@ -29,13 +35,11 @@
 > ## freeze moves the bitstream, the answer flips and the re-run is
 > ## `--cadence all --lane mister`.
 > ##
-> ## Expect the sweep to
-> ## be mostly green: the four `run_suite` tracks were 8/8 and every
-> ## expectation set is a pure carry, so anything red is far more likely to be
-> ## an instrument that rotted around a healthy artifact (the 14z-129 lesson)
-> ## than a defect in M13.
+> ## That makes THREE sessions running in which every red was an instrument
+> ## that had rotted around a healthy artifact. Read the NUMBERS, not the
+> ## verdict word.
 > ##
-> ## **(2) NO RELEASE, and NO FIELD TEST YET.** M13 has not been to the board.
+> ## **THE ONE THING STILL OWED: NO RELEASE, and NO FIELD TEST YET.** M13 has not been to the board.
 > ## The M12 predecessor was field-verified GREEN twice; M13 changes only the
 > ## boot name screen and the M13 glyph tiles on top of it. A bundle is the
 > ## maintainer's call.
