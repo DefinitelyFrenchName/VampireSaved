@@ -12,7 +12,31 @@
 > ## **STATE.md IS 204 KB AND OWES A ROLLOVER AT CLOSE** (~150 KB threshold;
 > ## the slice boundary is the `**SPLIT 2026-08-20` paragraph, ledger between).
 > ##
-> ## # THREAD 1 — M16 IS BUILT, MEASURED AND HALF-REGISTERED
+> ## # THREAD 1 — M16 IS FROZEN. STATIC IS GREEN. THE EMULATOR TIER IS NOT RUN.
+> ##
+> ## **DONE 14z-132 (1)-(5):** the mark set and measured, B1 shipped, the three
+> ## solo rows registered on WHOLE-SET keys, the 162-line re-point sweep, the
+> ## MiSTer CRC tail (fork `ff5dee9d8`, pushed), the whole-artifact manifests
+> ## re-frozen, all four `freeze/*` tags, patch_notes 14z-132.
+> ## **STATIC TIER 130/0/0/0 GREEN.**
+> ##
+> ## **WHAT M16 IS:** `version_text` M13 -> M16, i.e. ONE CHARACTER of ONE
+> ## authored glyph. Delta measured on all five tracks: exactly `vsw.33m` +
+> ## `vsw.37m` on the four WIDE tracks, **ZERO on the stock twin**, program
+> ## untouched everywhere. Builds `don_m20` / `hui54` / `pyron38` /
+> ## `m3b_merged23` / `m5_stock15`.
+> ##
+> ## **THE THREE THINGS LEFT, none blocked:**
+> ## 1. **THE FREEZE SUITE** — emulator tier, ~2h44m at romset cadence
+> ##    (`tests/run_all_emulator.sh --freeze`). NOT RUN. Expect pure carries:
+> ##    no program byte moved on any track.
+> ## 2. **`release/merged-m16/`** — `tools/package_release_platforms.py`.
+> ## 3. **THE CARD BUNDLE** — `tools/mister_mra.sh --core cps2w --wide
+> ##    build/m3b_merged23 --out <dir outside the repo>` plus the zips. **The
+> ##    maintainer is waiting on this to field-test; the CRC tail it needed is
+> ##    DONE, so nothing else gates it.**
+> ##
+> ## # THREAD 1b (superseded detail) — M16'S REGISTRATION
 > ##
 > ## **DONE 14z-132 (2)/(3): B1 shipped and the three SOLO rows registered.**
 > ## `donovan-m20` / `huitzil-m27` / `pyron-m21` carry WHOLE-SET keys

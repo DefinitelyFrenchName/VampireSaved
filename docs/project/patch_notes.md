@@ -1,5 +1,66 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-132 — THE M16 MARK FREEZE (donovan-m20 / huitzil-m27 / pyron-m21 / merged-m16, mark M16): the in-game mark becomes the merged build number
+
+**THE WHOLE SHIPPED DELTA IS ONE CHARACTER OF ONE AUTHORED GLYPH.**
+`version_text` goes `"M13"` -> `"M16"` in the three tenant manifests
+(`donovan.toml:2288`, `huitzil.toml:855`, `pyron.toml:822`). The string is
+rendered by the `[[select_wheel]]` machinery as one 1x1 glyph sprite per
+character from `build/manifest/version_font.json` (5x7, scaled 2x, pen 15
+transparent) into group C's upper bank at `version_base = 0x1FE40`, drawn at
+screen `(324, 202)` under palette row `0x19`. `M` and `1` are unchanged; only
+the third glyph's tile content differs.
+
+**MEMBER DELTA, MEASURED ON ALL FIVE TRACKS BY SHA-1 PER MEMBER:**
+
+| track | members changed |
+|---|---|
+| `don_m19` -> `don_m20` | 2 — `vsw.33m`, `vsw.37m` |
+| `hui53` -> `hui54` | 2 — the same two |
+| `pyron37` -> `pyron38` | 2 — the same two |
+| `m3b_merged22` -> `m3b_merged23` | 2 — the same two |
+| `m5_stock14` -> `m5_stock15` | **0 — byte-identical** |
+
+The stock twin does not move because `version_text` is SKIPPED when bank5 is
+inactive (`gen_donovan_patch.py:4999` — no group C to hold the glyphs), and the
+stage-4 image does not move because `select_wheel` is gated at `stage >= 6`.
+**Both were confirmed by REBUILD, not by reading the generator** — reading our
+own generator is the anchor class [VSP-166] refuses. So `donovan-m19-stock`
+(`e86e1d04`) and `donovan-m19-stage4` (`108f7523`) CARRY with no new rows.
+
+**EVERY PROGRAM FINGERPRINT IS UNCHANGED** — `8065bc92` / `08944a7e` /
+`a43da974` / `f42f7569` — because the delta is entirely gfx. That is what made
+this freeze the first in four to need **no predecessor row commented out**: the
+three new registry rows are keyed on the WHOLE-SET key (`52756b2f` /
+`e1ed7d9f` / `1264ca1f`), the forward-only promotion landed the same session.
+`huitzil-m24`, `pyron-m18` and `donovan-m18-stage4` each had to be disabled for
+exactly this reason under the old single-key scheme.
+
+**WHY: the numbering was disturbing and the drift had a measured cause.** The
+mark started EQUAL to the merged build number at merged-m6 and fell behind by
+exactly the two freezes where it was not bumped (merged-m7 kept `M6`,
+merged-m10 kept `M8`). Maintainer-ruled 2026-09-04, option A: the mark IS the
+merged build number, held there by a gate anchored on the newest annotated
+`freeze/merged-m<N>` tag. Since changing the mark changes the artifact, the
+bump to m16 is forced rather than chosen.
+
+**VERIFICATION.** `test_version_string` PASS on all four WIDE tracks —
+static record + coordinates, packed tiles byte-identical to the generator's,
+live OBJ entries at the declared position, and a **pixel-exact snapshot**, with
+both verdict controls firing (a 1px shift and a corrupted glyph are both
+refused). Whole-artifact manifests re-frozen (`MANI_STOCK` unchanged, which is
+the measured proof the mark cannot reach the stock track). Static tier
+**130/0/0/0 GREEN**.
+
+**MiSTer:** fork `ff5dee9d8` carries this build's catalogue CRCs — `vsw.33m`
+`059ae2af` -> `4d63bfae`, `vsw.37m` `ba9c8871` -> `9df9677f`, nothing else.
+jtframe resolves members by CRC32 alone, so a stale entry yields no `.rom` at
+all rather than a warning.
+
+**NOT REGISTERED: the merged row**, deferred by ruling to B2 — see
+`freeze/merged-m16`'s tag message and STATE "THE DISPATCH KEY".
+
+
 ## 14z-130 — THE M13 BOOT-TITLE FREEZE (donovan-m19 / huitzil-m26 / pyron-m20 / merged-m15, mark M13), and the `gap_be27a` bank-map correction folded into it
 
 **NO NEW SHIPPED BYTE BEYOND 14z-127's.** The boot-title bytes are the three
