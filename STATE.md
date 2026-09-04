@@ -452,6 +452,31 @@ what a triage is looking at, so those are where the thinking time goes.
   row`; the merged build deliberately has none. Exactly 3 of the 25 do this
   (this, `audit_flicker_attribution`, `test_fbneo_legacy_oracle`) — the whole
   legacy-oracle group — so all three wait on the dispatch-key entry below.
+  **GATE 3 — `test_reactions`: WALKED, AND THE ANSWER WAS A CORRECTION OF MINE.**
+  Analysed 14z-132 as a solo-defaulting gate whose frozen expectation was
+  captured from our own build, and recommended re-anchoring it on vs2.
+  **BOTH HALVES WERE WRONG, found by reading the gate instead of its
+  provenance row:** `test_reactions` has exactly ONE emulator invocation and
+  it runs **`vsav2`** — native. The three build dirs supply
+  `extract/regions.json` to the chain DECODER and nothing more; no leg runs on
+  our build at all. So `reactions_*` was reference-anchored all along, exactly
+  like `move_naming`, and there is nothing to re-anchor.
+  **THE CAUSE, and it is the thing worth keeping:** its PROVENANCE row said
+  only "which chains Donovan runs AS THE VICTIM…" and its re-freeze command is
+  `FREEZE=1 TENANTS=donovan tests/test_reactions.sh`, so a reader (me) inferred
+  "frozen from our run" = "measured on our build". The row was UNDER-DESCRIBED,
+  which is precisely the gap the 14z-132 class split exists to close — filling
+  the column in is what forced the question and exposed the error. Rows
+  corrected, and the description now names the native leg.
+  **CONSEQUENCE FOR THE REFACTOR: the candidate set is EMPTY.** After the
+  correction, every tracked expectation is reference-anchored, correct by
+  construction (`static` / `hash-lock` / `derived`), a ledger, or the ONE
+  deliberate open-defect marker (`ladder_tenant_vs_palette`, the
+  `audit_pyron_capture_block` pattern, which stays). `df_startup_invuln` is
+  honestly labelled `reference + ours` (15 vanilla + three tenants).
+  **SO THE PREDICTION "it probably generalises" IS RETRACTED TWICE OVER** —
+  once by measurement (4 candidates, not many), once by this correction (0).
+
   **ONE FLAGGED, NOT YET WALKED:** `audit_trap_sound` is release-scope and
   defaults to `build/hui30`, a build frozen at 14z-82c — a release gate
   asserting about a build we do not ship, regardless of the merged question.
