@@ -504,11 +504,31 @@ what a triage is looking at, so those are where the thinking time goes.
   and deployed on solo. **The liveness refusal [VSP-137] that 14z-131 added is
   what turned this into a red instead of a vacuous green** — the gate declines
   to judge a leg that produced no event.
-  **THE CHEAP DISCRIMINATOR, not yet run:** put section 4's rig on
-  `build/m3b_merged23` and see whether the hold appears at 3010-3056. If it
-  does, the fix is gate 1's ruling applied here — the subject is "the
-  extension is genuinely READ" on the SHIPPED artifact, so the leg belongs on
-  merged.
+  **DISCRIMINATOR RUN 14z-132, AND BOTH OF MY HYPOTHESES WERE WRONG. ROOT
+  CAUSE: A RELATIVE `$ROMDIR`. FIXED.**
+  1. *"solo vs merged"* — REFUTED by measurement. The rig on `build/don_m20`
+     (solo) and on `build/m3b_merged23` (merged) returns **47 held frames, 9
+     distinct offsets, window 3010-3056, byte-identical offset sets** on both.
+     A single-tenant build produces the hold perfectly well.
+  2. *"the gate never pins MAME_BIN"* — TRUE of the gate and NOT the cause;
+     pinning it changed nothing.
+  3. **THE CAUSE:** section 4 runs each leg from inside its own temp dir
+     (`cd "$WORK/$leg"`) with `MAME_ROMPATH="$WORK/wide/rompath;$ROMDIR"`. A
+     RELATIVE `$ROMDIR` — which is how every runner invokes gates
+     (`ROMDIR=../ROMS`) — then resolves against the LEG dir, finds no
+     reference members, and the run produces NO DUMPS. The liveness check
+     faithfully reports "0 held frames", which READS as a defect in the
+     artifact and is not one. With an absolute ROMDIR: 47/47 held frames
+     move, 9 offsets -> 2, PASS. Fixed by resolving ROMDIR to absolute at the
+     top of the gate; the original failing invocation now passes unchanged.
+  **SO THE M16 SWEEP'S ONE RED WAS A GATE DEFECT, not the artifact** — the
+  same verdict 14z-128/129/130 reached about their own reds.
+  **AND IT IS A CLASS, NOT AN INSTANCE — MAINTAINER'S CALL.** 20+ gates share
+  the shape (they `cd` into a work dir and then use `$ROMDIR`), and none
+  normalises it. They pass today only because their `$ROMDIR` use happens to
+  survive the `cd`, or because nobody has run them from the wrong shape. The
+  systemic fix is a one-line normalisation per gate, or a shared helper in
+  `tests/lib/`. NOT swept unasked.
 
   **ONE FLAGGED, NOT YET WALKED:** `audit_trap_sound` is release-scope and
   defaults to `build/hui30`, a build frozen at 14z-82c — a release gate

@@ -27,6 +27,14 @@
 #   PROVABLY READ (negative control), stock build untouched
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
+# ABSOLUTE, and it is load-bearing (14z-132). Section 4 runs each leg from
+# inside its own temp dir (`cd "$WORK/$leg"`) with
+# MAME_ROMPATH="$WORK/wide/rompath;$ROMDIR", so a RELATIVE $ROMDIR — which is
+# how the runners invoke every gate (`ROMDIR=../ROMS`) — resolves against the
+# leg dir, finds no reference members, and the run produces NO DUMPS. The
+# liveness check then reports "the clean leg held the victim on only 0
+# frames", which reads as a defect in the artifact and is not one.
+ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 # THE STOCK PIN IS RESOLVED FROM registry.tsv, NOT CARRIED AS A LITERAL
