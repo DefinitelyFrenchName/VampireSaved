@@ -391,10 +391,28 @@ what a triage is looking at, so those are where the thinking time goes.
     `{(79,0)(97,0)(65,0)(-82,29)(-58,124)(-100,132)(-116,-4)(-53,116)(12,39)}`
     — **ZERO overlap.** The in-emulator numbers reproduce the static deltas
     exactly, dx sign-flipped by the positioner's own facing `neg.w d0`.
-  **WHAT IT LOOKS LIKE: native hurls the victim ~130 px overhead and drops
-  them BEHIND Pyron; ours holds them on the ground in front of him.** It is
-  the wrong throw entirely from the victim's side. Throws are core 2P, so the
-  standing "cosmetic is optional" scope does NOT cover this.
+  **WHAT IT LOOKS LIKE — AND A CORRECTION TO MY OWN FIRST DESCRIPTION.**
+  ~~"native hurls the victim ~130 px overhead and drops them BEHIND Pyron;
+  ours holds them on the ground in front"~~ **RETRACTED 14z-131, the same
+  session, after the maintainer required CAPTURES before accepting the
+  finding — and they were right to.** That sentence read the raw `dy` sign as
+  "up" and the `dx` sign as "behind" without ever establishing the engine's
+  screen-coordinate convention for `+0x14`; it was an interpretation of two
+  numbers, not an observation.
+  **WHAT THE CAPTURES ACTUALLY SHOW** (PNG snapshots, ours vs native vsav2,
+  frames 3012/3018/3024/3030/3036 of the same rig): the victim is held in a
+  DIFFERENT PLACE and reads at a DIFFERENT ORIENTATION — ours holds Victor
+  low and horizontal beside Pyron's flame; native holds him upright and
+  higher through the same frames. The difference is unmistakable on screen.
+  What is NOT established is any specific "N pixels up / behind" claim.
+  **THE LEGACY CONTROL IS IN THE SAME CAPTURE SET AND IS VISUALLY IDENTICAL
+  between the two legs** (Demitri throwing Victor, same frames), which is what
+  makes the Pyron sheet readable rather than a comparison of two different
+  games' art. Throws are core 2P, so the standing "cosmetic is optional"
+  scope does NOT cover this.
+  **STANDING LESSON, and it is [VSP-153]/[VSP-116] again:** the numbers were
+  right and the sentence about them was not. Send the capture before writing
+  the characterisation, not after.
   **THE RIG IS SOUND, and that is measured too:** the gate's section 0 runs a
   LEGACY attacker (Demitri) on both legs and gets 6 distinct offsets each with
   overlap 6 of 6 — identical. So the pokes, the frame window, the coordinate

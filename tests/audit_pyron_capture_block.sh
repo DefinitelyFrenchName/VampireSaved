@@ -37,10 +37,16 @@
 #     ours   {(63,0) (26,0) (10,32) (-5,32) (-10,32) (5,32)}
 #     native {(79,0) (97,0) (65,0) (-82,29) (-58,124) (-100,132) (-116,-4)
 #             (-53,116) (12,39)}
-#   ZERO overlap. Native lifts the victim ~130px overhead and throws them
-#   BEHIND Pyron; ours holds them on the ground in front. This is not a
-#   subtle cosmetic — it is the wrong throw entirely from the victim's side,
-#   on a 2P-competitive surface.
+#   ZERO overlap.
+#   WHAT THAT LOOKS LIKE, from PNG captures of the same rig (14z-131, taken
+#   because the maintainer required them before accepting the finding): the
+#   victim is held in a DIFFERENT PLACE at a DIFFERENT ORIENTATION — ours low
+#   and horizontal beside Pyron's flame, native upright and higher, through
+#   the same frames. Unmistakable on screen, on a 2P-competitive surface.
+#   NOT ESTABLISHED, and an earlier version of this header claimed it: any
+#   specific "N pixels up / thrown behind" reading. That was the raw dy/dx
+#   signs interpreted without ever fixing the screen-coordinate convention of
+#   +0x14. The OFFSETS are measured; the direction words were not ([VSP-116]).
 #
 # WHAT THIS GATE DOES. Runs the normal-throw rig with a tenant/legacy ATTACKER
 # on ours and on native vsav2 and compares the victim's hold offsets.
