@@ -44,7 +44,7 @@ the suite runners and their own ground truth.
 | `tests/test_emulator_runner.sh` | test | ci_portable | — | ground truth for tests/run_all_emulator.sh (14z-128). ROM-free, ~5 s. | 14z-128 |
 | `tests/test_header_defaults.sh` | test | ci_portable | — | a gate's HEADER must state the default its CODE actually uses (14z-128). ROM-free, ~2 s. | 14z-128 |
 | `tests/test_shell_portability.sh` | test | ci_portable | — | a `#!/bin/sh` script must actually be POSIX sh (14z-90, GitHub issue #15). | 14z-90 |
-| `tests/test_suite_dispatch.sh` | test | emulator | emulator | ground truth for the auto-detecting runner's dispatch pieces (no emulator needed; the emulator-side behaviors they gate are proven by test_m2_repoint.sh and the suite itself): 1. build_fingerprint: vanilla rompath -> 'vsavj'; | — |
+| `tests/test_suite_dispatch.sh` | test | emulator | emulator | ground truth for the auto-detecting runner's dispatch pieces (no emulator needed; the emulator-side behaviors they gate are proven by test_m2_repoint.sh and the suite itself): 1. build_fingerprint: vanilla rompath -> 'vsavj'; | 14z-132 |
 | `tests/test_suite_dispatch_selftest.sh` | test | ci_static | ROMDIR | ground truth for the kind->owner table in tests/test_suite_dispatch.sh (14z-90, GitHub issue #7). | 14z-90 |
 
 ## docs

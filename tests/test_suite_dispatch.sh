@@ -4,6 +4,12 @@
 # are proven by test_m2_repoint.sh and the suite itself):
 #   1. build_fingerprint: vanilla rompath -> 'vsavj'; a patched build ->
 #      loud UNREGISTERED failure (exit 2).
+#   1b. the DUAL KEY (14z-132): a gfx-only delta gives the SAME program key
+#      and a DIFFERENT whole-set key; whole-set resolves silently; the program
+#      key resolves LOUDLY; whole-set wins when both are present; a
+#      whole-set-ONLY row is unreachable by the program fallback (must-fire
+#      control — the merged1-vs-shipped-merged hazard); and the key does not
+#      move with the rompath chain.
 #   2. check_diverge verdicts on synthetic logs: divergence at exactly the
 #      expected frame PASSes; early divergence, no divergence, and a missing
 #      base log all FAIL.
@@ -34,6 +40,75 @@ if [ "$rc" = "2" ]; then
     echo "  ok: unregistered patched build fails loudly (exit 2)"
 else
     echo "FAIL: unregistered build rc=$rc (expected 2)"; fail=1
+fi
+
+# --- 1b. THE DUAL KEY (14z-132, the forward-only whole-set promotion) --------
+# Two builds differing only OUTSIDE the program members share a program key —
+# the M12/M13 gfx-only-freeze shape, synthesised here — which is precisely
+# where the whole-set key has to do its work.
+fpr() { python3 "$REPO/tools/build_fingerprint.py" "$@"; }
+cp -R "$WORK/rompath" "$WORK/rompath_gfx"
+python3 - "$WORK/rompath_gfx/vsavj.zip" <<'PY'
+import sys, zipfile
+with zipfile.ZipFile(sys.argv[1], "a") as z:
+    z.writestr("zz.14m", b"\x00" * 16)   # not a program member: _PRG_RE skips it
+PY
+prog_a=$(fpr "$WORK/rompath" --set vsavj --sha-only)
+prog_b=$(fpr "$WORK/rompath_gfx" --set vsavj --sha-only)
+set_a=$(fpr "$WORK/rompath" --set vsavj --set-key)
+set_b=$(fpr "$WORK/rompath_gfx" --set vsavj --set-key)
+if [ "$prog_a" = "$prog_b" ] && [ "$set_a" != "$set_b" ]; then
+    echo "  ok: gfx-only delta -> SAME program key, DIFFERENT whole-set key"
+else
+    echo "FAIL: program $prog_a/$prog_b whole-set $set_a/$set_b"; fail=1
+fi
+
+REG="$WORK/reg.tsv"; ERR="$WORK/fp.err"
+
+printf '%s\tSETKEY-HIT\n' "$set_a" > "$REG"
+out=$(fpr "$WORK/rompath" --set vsavj --registry "$REG" 2>"$ERR") || out="<rc$?>"
+if [ "$out" = "SETKEY-HIT" ] && ! grep -q 'PROGRAM KEY' "$ERR"; then
+    echo "  ok: whole-set key resolves, and silently (no fallback note)"
+else
+    echo "FAIL: whole-set lookup gave '$out'; err: $(cat "$ERR")"; fail=1
+fi
+
+printf '%s\tPROGKEY-HIT\n' "$prog_a" > "$REG"
+out=$(fpr "$WORK/rompath" --set vsavj --registry "$REG" 2>"$ERR") || out="<rc$?>"
+if [ "$out" = "PROGKEY-HIT" ] && grep -q 'PROGRAM KEY' "$ERR"; then
+    echo "  ok: program key resolves and ANNOUNCES itself on stderr"
+else
+    echo "FAIL: program lookup gave '$out'; err: $(cat "$ERR")"; fail=1
+fi
+
+printf '%s\tPROGKEY-HIT\n%s\tSETKEY-HIT\n' "$prog_a" "$set_a" > "$REG"
+out=$(fpr "$WORK/rompath" --set vsavj --registry "$REG" 2>/dev/null) || out="<rc$?>"
+if [ "$out" = "SETKEY-HIT" ]; then
+    echo "  ok: whole-set key WINS when both are present"
+else
+    echo "FAIL: precedence gave '$out' (expected the whole-set row)"; fail=1
+fi
+
+# MUST-FIRE CONTROL. A whole-set-ONLY row must be unreachable by the program
+# fallback. This is the build/merged1-vs-shipped-merged hazard exactly: same
+# program key, different content. A hit here would be the silent green-light
+# registry.tsv's header refuses, and it is why merged rows are whole-set-only.
+printf '%s\tWHOLESET-ONLY\n' "$set_a" > "$REG"
+rc=0; out=$(fpr "$WORK/rompath_gfx" --set vsavj --registry "$REG" 2>/dev/null) || rc=$?
+if [ "$rc" = "2" ]; then
+    echo "  ok: the program fallback CANNOT reach a whole-set-only row (exit 2)"
+else
+    echo "FAIL: sibling build resolved to '$out' rc=$rc — the fallback reached"
+    echo "      a whole-set-only row, which is the hazard this design forbids"; fail=1
+fi
+
+# The 14z-132 trap: --full is rompath-chain dependent, so the DISPATCH key is
+# defined over the build's own directory and must not move with the chain.
+set_chain=$(fpr "$WORK/rompath;$ROMDIR" --set vsavj --set-key)
+if [ "$set_chain" = "$set_a" ]; then
+    echo "  ok: the whole-set key is rompath-chain INDEPENDENT"
+else
+    echo "FAIL: the chain moved the key: $set_a vs $set_chain"; fail=1
 fi
 
 # --- 2. check_diverge verdicts on synthetic logs -----------------------------

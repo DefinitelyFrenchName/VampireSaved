@@ -71,7 +71,12 @@ for z in sorted(os.listdir(a)):
         n += 1
 print(f"  ok: {n} members byte-identical after the round trip")
 PY
-fp() { python3 tools/build_fingerprint.py "$1" --set vsavjw 2>&1 | grep -oE '\b[0-9a-f]{40}\b' | tail -1; }
+# --sha-only, not a stderr scrape: this assertion is about the PROGRAM
+# fingerprint, and --sha-only prints exactly that and nothing else. The old
+# form piped 2>&1 into a hex grep, which only ever worked while the build was
+# UNREGISTERED (a registered build prints its set NAME, no hex at all) and
+# which the 14z-132 dual-key resolver would have handed the whole-set key.
+fp() { python3 tools/build_fingerprint.py "$1" --set vsavjw --sha-only; }
 fa="$(fp "$RP")"; fb="$(fp "$W/applied")"
 [ -n "$fa" ] && [ "$fa" = "$fb" ] && echo "  ok: program fingerprint $fb reproduced" \
     || { echo "FAIL: fingerprint $fa vs $fb"; fail=1; }
