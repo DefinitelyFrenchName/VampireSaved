@@ -62,7 +62,14 @@ echo "== 2. every row names an evidence class the page defines"
 python3 - "$PAGE" <<'PY' || rc=1
 import re, sys
 page = open(sys.argv[1], encoding="utf-8").read()
-CLASSES = ("in-emulator", "derived", "static", "hash-lock", "registry")
+# 14z-132: `in-emulator` SPLIT. The class said "produced by running the
+# game" without saying WHOSE game, so a number measured on native vs2 and
+# one measured on our own build wore the same label — and under the ruled
+# precedence (ruling > vsavj > vs2; our builds are nowhere in it) those are
+# different kinds of evidence. The bare form is no longer accepted.
+CLASSES = ("in-emulator (reference)", "in-emulator (ours)",
+           "in-emulator (reference + ours)",
+           "derived", "static", "hash-lock", "registry")
 bad = []
 for line in page.splitlines():
     m = re.match(r'^\|\s*`([^`]+)`\s*\|([^|]*)\|([^|]*)\|([^|]*)\|', line)

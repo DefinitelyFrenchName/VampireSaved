@@ -812,6 +812,21 @@ after `int("10")`, which is the load order. Verified the alternation does
 not accidentally catch gfx/QSound names (`.11m`, `.14m`, `.21m`, `.31m` all
 still excluded).
 
+## `sed -i '' '0,/re/s///'` is a NO-OP on macOS — and a silent no-op CONTROL
+## reads exactly like "the rule is not enforced" (paid: 14z-132)
+The `0,/regex/` address form is a **GNU** extension; BSD sed (macOS) does not
+honour it. Used to build a must-fire control — demote one row and assert the
+gate now refuses it — it changed nothing, the gate stayed green, and the
+verdict read as **"the new rule is not enforced"**. The rule was fine; the
+control was blind.
+
+**The fix is the discipline, not the tool:** a control must ASSERT THAT IT
+CHANGED SOMETHING before the gate is re-run. In python, `assert t2 != t,
+"control edit was a NO-OP"`; in shell, diff the file or check `grep -c`
+before and after. [VSP-22] says a blind instrument and a real zero look
+identical — this is that, with the instrument being the control itself.
+
+
 ## A gfx-only freeze gives two builds ONE dispatch key, and the resolver
 ## SILENTLY serves the older one's expectations (paid: 14z-132)
 `build_fingerprint.py`'s dispatch key covers PROGRAM members only, so a
