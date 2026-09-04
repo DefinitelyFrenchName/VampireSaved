@@ -313,9 +313,32 @@ what a triage is looking at, so those are where the thinking time goes.
 
 ## Decisions pending (human)
 
-- **`test_phasec_image` SECTION 4 — ITS NEGATIVE CONTROL HAS BEEN DEAD SINCE
-  14z-111, MEASURED 14z-130. RE-TARGET OR DROP — and [VSP-166] says I may not
-  just re-point it.** Section 4 is the B4 lesson made permanent: it zeroes the
+- **~~`test_phasec_image` SECTION 4 — ITS NEGATIVE CONTROL HAS BEEN DEAD SINCE
+  14z-111~~ DECIDED (maintainer, 2026-09-04) AND **DONE 14z-131: OPTION (a)
+  WORKED, SO THE GATE IS UPDATED, NOT DROPPED.** The ruling was *"I agree with
+  your recommendation. If it works then we'll be able to update, otherwise
+  we'll likely drop."* It works.
+  **THE RE-TARGET:** section 4 now zeroes the 32-word PER-VICTIM OFFSET HEAD of
+  Donovan's capture-keyframe blob in the extension (`capture_kf_ptr[0x13]`,
+  `CPU:$4010E0` on the current freeze) and requires the hold to change.
+  **MEASURED on `build/m3b_merged22`, P1 Donovan vs P2 Victor on
+  `judge/02_throw.rpl`:** the hold runs 3010-3056 and the victim's offsets
+  collapse from NINE distinct values (including a 181 px lift) to `(0,0)` and
+  `(56,0)` — **47 of 47 held frames move**, and nothing crashes. The whole
+  gate is green.
+  **WHY THIS ANCHOR IS LEGITIMATE ([VSP-166], the law that stopped the naive
+  re-point):** the blob's ADDRESS comes from the build's own table, but the
+  ASSERTION does not — it is the victim position the GAME's vanilla positioner
+  computes from those bytes. A wrong pointer makes the control FAIL LOUDLY, it
+  cannot pass vacuously, which is the exact opposite of the dead-probe trap.
+  The gate also asserts the pointer lands in the extension FIRST, so "the
+  extension is read" is the thing under test, and it refuses to judge when the
+  clean leg produced no hold or a single-valued one ([VSP-137]).
+  **AND IT IS A BETTER CONTROL THAN THE ONE IT REPLACES:** the old one rode a
+  CPU-AI read that the chosen replay could never trigger; this one rides a
+  path the game runs every frame of every throw, in 2P as well as 1P.
+  Original entry — measured 14z-130; [VSP-166] says I may not just
+  re-point it.** Section 4 is the B4 lesson made permanent: it zeroes the
   0x160-byte block at `CPU:$400010`, replays `12_donovan_vs_cpu`, and requires
   behaviour to CHANGE — because "a relocation that passes without a control
   proves nothing, the data may simply never be read".
@@ -351,8 +374,49 @@ what a triage is looking at, so those are where the thinking time goes.
   a regression from M13 (section 4 has failed since 14z-111 and section 1
   since 14z-110), and the M13 freeze itself is green on every other gate.
 
-- **PYRON'S CAPTURE-KEYFRAME ATTACKER ROW `0x11` IS NOT PORTED — a
-  throw/capture surface, so [VSP-10] (found 14z-130 while folding in the
+- **PYRON'S CAPTURE-KEYFRAME ATTACKER ROW `0x11` IS NOT PORTED. DECIDED
+  (maintainer, 2026-09-04): MEASURE FIRST — *"Agreed, that's where to
+  start."* **MEASURED 14z-131, AND IT IS A REAL, GROSSLY VISIBLE DEFECT ON A
+  2P SURFACE — NOT A COSMETIC.** The port decision is now the maintainer's;
+  the measurement it was waiting on is done.
+  **MEASURED TWO INDEPENDENT WAYS THAT SHARE NO PREMISE, and they agree:**
+  * **STATIC, from the reference ROMs.** vs2's Pyron block `0x0C7F98` vs the
+    Demitri block `0x0A3D88` our build serves him: for victim Victor the
+    keyframe deltas are `(-79,0) (-97,0) (-65,0) (82,29) (58,124) (100,132)
+    (116,-4)` against Demitri's `(-63,0) (-63,0) (-63,0) (-26,0) (-26,0)
+    (-10,32) (5,32)`. One of eight agrees, and it is the all-zero kf0.
+  * **IN-EMULATOR**, P1 Pyron vs P2 Victor on `judge/02_throw.rpl`, hold
+    frames 3010-3039, ours (vsavjw merged) vs native vsav2:
+    ours `{(63,0)(26,0)(10,32)(-5,32)(-10,32)(5,32)}`, native
+    `{(79,0)(97,0)(65,0)(-82,29)(-58,124)(-100,132)(-116,-4)(-53,116)(12,39)}`
+    — **ZERO overlap.** The in-emulator numbers reproduce the static deltas
+    exactly, dx sign-flipped by the positioner's own facing `neg.w d0`.
+  **WHAT IT LOOKS LIKE: native hurls the victim ~130 px overhead and drops
+  them BEHIND Pyron; ours holds them on the ground in front of him.** It is
+  the wrong throw entirely from the victim's side. Throws are core 2P, so the
+  standing "cosmetic is optional" scope does NOT cover this.
+  **THE RIG IS SOUND, and that is measured too:** the gate's section 0 runs a
+  LEGACY attacker (Demitri) on both legs and gets 6 distinct offsets each with
+  overlap 6 of 6 — identical. So the pokes, the frame window, the coordinate
+  convention and the comparison all work, and the Pyron disjointness is a fact
+  about the data, not the instrument ([VSP-22]).
+  **GATE: `tests/audit_pyron_capture_block.sh`** (mame / release / romset),
+  `EXPECT_MATCH=0` freezing the OPEN defect, flipping to `1` when the row is
+  ported — the same shape `audit_don_grab_pose` used across the #104 fix, so
+  the gate proves the fix rather than being rewritten to suit it.
+  **THE FIX, if wanted, is the 18th instance of a mechanism used 17 times:**
+  a `[[data_port]]` row in `pyron.toml` — `src = 0x0C7F98`, `orc = 0x0C782A`
+  (the uniform `0x76E` sibling delta), `slot_ptr_table = 0xBE27A`,
+  `hole = "wide_ext"`, `only_variant_slot = true`, with `dst`/`dst_old_head`
+  naming the host block it replaces on the base track. Two things to settle
+  first, both cheap: the block's LENGTH (its sub-block stride is `0xA0`, 32
+  victims, so ~`0x2040`; `test_capture_pose_sources` already has the length
+  rule for the other fifteen), and the signed-16-bit `lea (a0,d0.w)` bound
+  that section 6 of that gate checks. One freeze.
+  **RECOMMENDATION: PORT IT.** It is a measured 2P defect, the mechanism is
+  routine and already gated, and leaving it means Pyron's throw stays visibly
+  wrong while every other attacker in the game is right. Original
+  entry — a throw/capture surface, so [VSP-10] (found 14z-130 while folding in the
   `gap_be27a` correction; NOT a regression, this is the state as shipped since
   the #104 work).** The capture-pose installer resolves the ATTACKER's keyframe
   block through `PRG:0x0BE27A[attacker id]`. Every legacy attacker row

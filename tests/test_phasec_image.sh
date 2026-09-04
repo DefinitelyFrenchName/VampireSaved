@@ -98,28 +98,111 @@ else
 fi
 
 echo "== 4. NEGATIVE CONTROL: the extension must actually be READ =="
-cp -r "$WORK/wide/rompath" "$WORK/neg"
-python3 - "$WORK/neg/vsavjw.zip" <<'PY'
-import sys, zipfile
-p = sys.argv[1]
-z = zipfile.ZipFile(p); names = z.namelist(); data = {n: z.read(n) for n in names}; z.close()
-b = bytearray(data["vsw.41"]); b[0x10:0x10+0x160] = b"\x00" * 0x160
-data["vsw.41"] = bytes(b)
-o = zipfile.ZipFile(p, "w", zipfile.ZIP_DEFLATED)
-for n in names: o.writestr(n, data[n])
-o.close()
+# RE-TARGETED 14z-131 (maintainer-ruled: "if it works then we'll be able to
+# update, otherwise we'll likely drop"). The old control zeroed 0x160 bytes at
+# CPU:$400010 and required 12_donovan_vs_cpu's log to change. It had been DEAD
+# since 14z-111: that address stopped holding the Phase-C sound table and now
+# holds region x101aca, Donovan's AI SCRIPT BLOCK, which the replay cannot
+# read because Donovan is the PLAYER there ([VSE-75]: 2P versus never reads
+# them). A control that cannot fire is worse than no control.
+#
+# WHAT IT ZEROES NOW: the 32-WORD PER-VICTIM OFFSET HEAD of Donovan's
+# capture-keyframe blob. The capture POSITIONER at PRG:0x02802E is vanilla
+# engine code that does, every frame a victim is held:
+#     d1 = attacker $382 ; a0 = [0x0BE27A + d1*4]      <- the attacker's blob
+#     d1 = victim   $382 ; a0 = a0 + word[a0 + d1*2]   <- the per-victim head
+#     victim $10/$14 = attacker $10/$14 +/- (dx,dy) from that entry
+# so zeroing the head sends every victim to entry 0 and the victim SNAPS onto
+# the attacker. Measured 14z-131 on build/m3b_merged22, P1 Donovan vs P2
+# Victor on tests/replays/judge/02_throw.rpl: the hold runs 3010-3056 and the
+# offsets collapse from NINE distinct values (including a 181px lift) to
+# (0,0)/(56,0) — all 47 held frames differ, and nothing crashes.
+#
+# WHY THIS IS A LEGITIMATE ANCHOR ([VSP-166]). The blob's ADDRESS is read from
+# the build's own table, but the ASSERTION is not: it is the victim position
+# the GAME's vanilla positioner computes. If the build's pointer were wrong we
+# would zero the wrong bytes and this control would FAIL LOUDLY, never pass
+# vacuously — the opposite of the dead-probe trap. The gate asserts the
+# pointer lands in the extension FIRST, so "the extension is read" is the
+# thing actually under test.
+CAP_RPL="tests/replays/judge/02_throw.rpl"
+CAP_PK="1400:ff8782:13;1450:ff8782:13;1500:ff8782:13;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03"
+CAP_DF="$(python3 -c "print(';'.join(f'{f}:ff8410-ff8418;{f}:ff8810-ff8818;{f}:ff8934-ff8935' for f in range(3005,3060)))")"
+cap_ptr=$(python3 - "$WORK/wide/verify_data.bin" <<'PY'
+import sys, struct
+img = open(sys.argv[1], 'rb').read()
+print("%d" % struct.unpack_from('>I', img, 0x0BE27A + 0x13 * 4)[0])
 PY
-FBNEO_ROMPATH="$WORK/neg" tools/run_replay_fbneo.sh vsavjw \
-    tests/replays/12_donovan_vs_cpu.rpl "$WORK/zero.log" "$WORK/s2" >/dev/null 2>&1 || true
-if [ ! -s "$WORK/zero.log" ]; then
-    echo "  FAIL: control run produced no log"; fail=1
-elif cmp -s "$WORK/real.log" "$WORK/zero.log"; then
-    echo "  FAIL: zeroing the table changed NOTHING — it is never read, so"
-    echo "        placing it in the extension proves nothing (the B4 trap)."
+)
+if [ "$cap_ptr" -lt 4194304 ]; then
+    echo "  FAIL: capture_kf_ptr[0x13] = $(printf '0x%06X' "$cap_ptr") is NOT in the"
+    echo "        extension (CPU \$400000+), so this control cannot test whether"
+    echo "        the extension is read. Re-scope it or drop it — do not widen."
     fail=1
 else
-    fr=$(diff "$WORK/real.log" "$WORK/zero.log" | awk '/^< [0-9]/{print $2; exit}')
-    echo "  ok: diverges at frame $fr — the 68k genuinely reads CPU \$400010"
+  cp -r "$WORK/wide/rompath" "$WORK/neg"
+  python3 - "$WORK/neg/vsavjw.zip" "$cap_ptr" <<'PY'
+import sys, zipfile
+p, ptr = sys.argv[1], int(sys.argv[2])
+z = zipfile.ZipFile(p); infos = z.infolist()
+data = {i.filename: z.read(i.filename) for i in infos}; z.close()
+off = ptr - 0x400000                      # vsw.41 offset == CPU offset - 0x400000
+b = bytearray(data["vsw.41"]); b[off:off + 0x40] = b"\x00" * 0x40
+data["vsw.41"] = bytes(b)
+o = zipfile.ZipFile(p, "w", zipfile.ZIP_DEFLATED)
+for i in infos: o.writestr(i.filename, data[i.filename])
+o.close()
+PY
+  for leg in capclean capzero; do
+      mkdir -p "$WORK/$leg/sbx"
+      if [ "$leg" = capclean ]; then _rp="$WORK/wide/rompath;$ROMDIR"; else _rp="$WORK/neg;$ROMDIR"; fi
+      ( cd "$WORK/$leg" && REPLAY="$REPO/$CAP_RPL" POKES="$CAP_PK" DUMPS="$CAP_DF" \
+        CHECKSUM_OUT="$WORK/$leg/out.log" MAME_SANDBOX="$WORK/$leg/sbx" \
+        MAME_ROMPATH="$_rp" "$REPO/tools/run_mame.sh" vsavjw \
+        -autoboot_script "$REPO/tests/lua/replay.lua" > "$WORK/$leg/mame.log" 2>&1 ) &
+  done
+  wait
+  python3 - "$WORK" <<'PY' || fail=1
+import glob, re, struct, sys
+W = sys.argv[1]
+def traj(leg):
+    rows = []
+    for f in sorted(glob.glob(f"{W}/{leg}/dump_*_ff8810.bin"),
+                    key=lambda p: int(re.search(r'dump_(\d+)_', p).group(1))):
+        fr = int(re.search(r'dump_(\d+)_', f).group(1))
+        cap = open(f"{W}/{leg}/dump_{fr}_ff8934.bin", 'rb').read()
+        if not (cap and cap[0]):
+            continue
+        v = open(f, 'rb').read(); a = open(f"{W}/{leg}/dump_{fr}_ff8410.bin", 'rb').read()
+        rows.append((fr,
+                     struct.unpack_from('>h', v, 0)[0] - struct.unpack_from('>h', a, 0)[0],
+                     struct.unpack_from('>h', v, 4)[0] - struct.unpack_from('>h', a, 4)[0]))
+    return {f: (x, y) for f, x, y in rows}
+c, z = traj("capclean"), traj("capzero")
+# LIVENESS FIRST: a hold that never happened cannot prove anything.
+if len(c) < 10:
+    print(f"  FAIL: the clean leg held the victim on only {len(c)} frames — the"
+          f"\n        rig did not produce a capture, so the control is void"
+          f"\n        (not evidence the extension is unread).")
+    sys.exit(1)
+if len({v for v in c.values()}) < 2:
+    print(f"  FAIL: the clean hold has only {len({v for v in c.values()})} distinct offset(s)"
+          f" — nothing for\n        the control to collapse; re-scope the window.")
+    sys.exit(1)
+common = sorted(set(c) & set(z))
+nd = sum(1 for f in common if c[f] != z[f])
+if not common:
+    print("  FAIL: the two legs share no held frame — cannot compare."); sys.exit(1)
+if nd == 0:
+    print("  FAIL: zeroing the capture-keyframe head changed NOTHING — the"
+          "\n        extension is never read there, so placing data in it proves"
+          "\n        nothing (the B4 trap).")
+    sys.exit(1)
+print(f"  ok: the hold collapses — {nd}/{len(common)} held frames move, "
+      f"{len({v for v in c.values()})} distinct offsets -> "
+      f"{len({v for v in z.values()})}; the 68k genuinely reads the blob at "
+      f"CPU:$4010E0+")
+PY
 fi
 
 echo

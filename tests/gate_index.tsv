@@ -51,6 +51,7 @@ tests/audit_phase_mode_cost.sh	tenant
 tests/audit_pool_free_byte.sh	tenant
 tests/audit_projectile_clash.sh	tenant
 tests/audit_pursuit_leap.sh	tenant
+tests/audit_pyron_capture_block.sh	character-data
 tests/audit_pyron_ring.sh	tenant
 tests/audit_qs_voice_batch.sh	tenant
 tests/audit_qs_voice_wav.sh	tenant
