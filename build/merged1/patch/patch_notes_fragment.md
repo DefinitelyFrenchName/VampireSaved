@@ -246,7 +246,7 @@ data   0x0be88c +0x2  byte15b[0x13] value
 data   0x0bead4 +0x1e  byte2d_a[0x13] value
 data   0x0bee94 +0x1e  byte2d_b[0x13] value
 poke32 0x0bf2e6 <- 0x000bfcec  tail_code_ptr[0x13] donovan code
-# tail_data_ptr: ptr row owned by sound_table don_sfx_records — generic repoint suppressed (14z-65)
+# tail_data_ptr: ptr row owned by sound_table don_sfx_records — generic repoint suppressed (14z-65 sound_table / 14z-130 data_port)
 poke32 0x0bf066 <- 0x00400010  ai_script_0[0x13] donovan x101aca
 poke32 0x0bf0e6 <- 0x0040010e  ai_script_1[0x13] donovan x101aca
 poke32 0x0bf166 <- 0x00400bba  ai_script_2[0x13] donovan x101aca
@@ -872,7 +872,7 @@ data   0x0be88a +0x2  byte15b[0x10] value
 data   0x0bea7a +0x1e  byte2d_a[0x10] value
 data   0x0bee3a +0x1e  byte2d_b[0x10] value
 poke32 0x0bf2da <- 0x00414928  tail_code_ptr[0x10] donovan code
-# tail_data_ptr: ptr row owned by sound_table hui_sfx_records — generic repoint suppressed (14z-65)
+# tail_data_ptr: ptr row owned by sound_table hui_sfx_records — generic repoint suppressed (14z-65 sound_table / 14z-130 data_port)
 poke32 0x0bf05a <- 0x0045e5e0  ai_script_0[0x10] donovan x100000
 poke32 0x0bf0da <- 0x0045e6c0  ai_script_1[0x10] donovan x100000
 poke32 0x0bf15a <- 0x0045eeec  ai_script_2[0x10] donovan x100000
@@ -1246,7 +1246,7 @@ data   0x0be88a +0x2  byte15b[0x11] value
 data   0x0bea98 +0x1e  byte2d_a[0x11] value
 data   0x0bee58 +0x1e  byte2d_b[0x11] value
 poke32 0x0bf2de <- 0x00471e72  tail_code_ptr[0x11] donovan code
-# tail_data_ptr: ptr row owned by sound_table pyr_sfx_records — generic repoint suppressed (14z-65)
+# tail_data_ptr: ptr row owned by sound_table pyr_sfx_records — generic repoint suppressed (14z-65 sound_table / 14z-130 data_port)
 poke32 0x0bf05e <- 0x004b0a80  ai_script_0[0x11] donovan x100e3c
 poke32 0x0bf0de <- 0x004b0b6c  ai_script_1[0x11] donovan x100e3c
 poke32 0x0bf15e <- 0x004b1458  ai_script_2[0x11] donovan x100e3c
