@@ -436,3 +436,11 @@ VSP-163	docs/project/gotchas.md	A TENANT REPLAY AUTHORED FOR THE SUBSTITUTED WHE
 VSP-164	HANDOFF.md	THE EMULATOR-TIER COMMAND — `tests/run_all_emulator.sh` (since 14z-128)	IN-LIST
 VSP-165	HANDOFF.md	WHERE A FROZEN EXPECTATION'S NUMBERS CAME FROM (since 14z-128)	IN-LIST
 VSP-166	docs/project/gotchas.md	RE-TARGETING AN INSTRUMENT FROM THE BUILD'S OWN METADATA IS WRITING THE TEST FROM THE ALGORITHM — na	IN-LIST
+VSP-167	docs/project/gate_scoping_method.md	1. The reference is the SOURCE GAME, and the control is not a baseline	IN-LIST
+VSP-168	docs/project/gate_scoping_method.md	2. Scope the observable to what the mechanism can actually cause	IN-LIST
+VSP-169	docs/project/gate_scoping_method.md	3. Compare ORDER and identity, not sets	IN-LIST
+VSP-170	docs/project/gate_scoping_method.md	4. Prove the rig produced the event — every leg, every run	IN-LIST
+VSP-171	docs/project/gate_scoping_method.md	5. Widening is a measurement, not a judgement call	IN-LIST
+VSP-172	docs/project/gate_scoping_method.md	6. Do not lose a check while strengthening one	IN-LIST
+VSP-173	docs/project/gate_scoping_method.md	7. Look before you characterise	IN-LIST
+VSP-174	docs/project/gate_scoping_method.md	8. When the instrument and the artifact both look wrong, suspect the instrument	IN-LIST

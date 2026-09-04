@@ -74,7 +74,8 @@ _PORT_DOCS = ["CLAUDE.md", "HANDOFF.md", "STATE.md", "docs/project/gotchas.md",
               "docs/project/porting_sprite_lists.md", "docs/project/tenant_manifest.md",
               "docs/project/build_dir_triage.md", "docs/project/hardening_register.md",
               "docs/project/patch_index.md", "docs/project/cps2_wide.md",
-              "docs/project/oracle_classes.md"]   # CLAUDE.md §4's spec of record (pass 2, 14z-124)
+              "docs/project/oracle_classes.md",   # CLAUDE.md §4's spec of record (pass 2, 14z-124)
+              "docs/project/gate_scoping_method.md"]  # the comparison-gate method (14z-131)
 _PORT_LOGS = ["docs/project/gotchas.md", "docs/project/patch_notes.md",
               "docs/project/patch_index.md", "HANDOFF.md", "CLAUDE.md",
               "docs/project/oracle_classes.md",   # the ratified figures moved with the spec (14z-124)

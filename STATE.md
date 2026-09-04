@@ -376,6 +376,38 @@ what a triage is looking at, so those are where the thinking time goes.
   at the grab frame, which replay 80 under the same poke never does
   ([VSP-131], [VSP-123]). Documented in the new replay's header and asserted
   by the gate.
+  **WIDENED TO ALL 18 ROSTER VICTIMS (maintainer asked the cost; it was
+  measured, not argued): Victor alone 27.7 s, all eighteen 186 s at 6-way
+  parallelism** — ~6.7x the time for 18x the coverage, so it was widened.
+  **RESULT: 18/18 victims traverse the SAME states in the SAME order on all
+  three throws**, the end-of-hold tail is UNIFORM across every victim (so it
+  is frozen as ONE shape per throw, not 54 literals — and the uniformity is
+  itself evidence it is a boundary effect rather than per-character data), and
+  the ours/native hold ratio has ZERO spread across victims (1.085 / 1.091 /
+  1.083), which is what an ENGINE rate looks like rather than a data defect.
+  **WIDENING PAID FOR ITSELF TWICE, and both are the argument for doing it:**
+  * it found a residue the narrow gate could not see — **5 of 54 victim/throw
+    cells differ by exactly ±1 TOTAL damage**, sign per VICTIM not per throw:
+    `0x10` +1 on all three throws, `0x13` −1 on all three, `0x0A` −1 on CS
+    only. Ruled out: starting HP is 288 on both legs for every victim, and
+    `bank_map` declares no per-character defence/damage-scaling table. **NOT
+    DIAGNOSED — an OPEN finding**, frozen with its exact deltas so it cannot
+    drift, and the next measurement is to find the per-victim scalar the bank
+    map does not model.
+  * it exposed a frozen constant as victim-specific: the narrow gate froze the
+    post-release arc peak at `278`/`380`, which were VICTOR's numbers — the arc
+    is victim-dependent and spans ELEVEN values. Not wrong for Victor; wrong
+    about what it was freezing, and only a second victim could show it.
+  **AND ONE FALSE ALARM WORTH RECORDING:** the first widened run reported all
+  three TENANT victims diverging, with unresolved pose pointers. That was the
+  RESOLVER — a tenant victim on our leg is held on the PLACED copy of vs2's
+  table, not vsavj's, a rule `audit_don_grab_pose` already documents. Applied,
+  the unresolved count went to zero and every tenant matched.
+  **THE METHOD IS NOW A DOCUMENT** at the maintainer's request (*"I want what
+  we went through together documented because it's a typical example of how to
+  close gaps on tests, strengthen gates, guarantee that tests are properly
+  scoped"*): `docs/project/gate_scoping_method.md`, distilled into the port
+  skill as [VSP-167]..[VSP-174].
   Gate: `tests/audit_tenant_throw_geometry.sh`; new replay
   `tests/replays/hui/97_hui_grab_es_2p.rpl` (replay 80 with one token
   changed, so a difference between them is the ES button and nothing else).

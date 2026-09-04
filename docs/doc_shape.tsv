@@ -31,19 +31,18 @@
 #              atlas file — CLAUDE.md §5 rule 2).
 #
 # --- level 0
-docs/README.md	INDEX	-	-
-docs/GOTCHAS.md	GENERATED	docs/GOTCHAS_history.md	-
-docs/GOTCHAS_history.md	HIST	-	-
-docs/annotations.md	GENERATED	-	-
-docs/NEXT_SESSION.md	ORIENT	docs/NEXT_SESSION_HISTORY.md	-
-docs/NEXT_SESSION_HISTORY.md	HIST	-	-
+# --- game
+# --- platform
+# --- project
+# --- project/tables (chars/ is generated wholesale and excluded from the walk)
 HANDOFF.md	REFERENCE	HANDOFF_HISTORY.md	-
 HANDOFF_HISTORY.md	HIST	-	-
-# --- game
-docs/game/engine_internals.md	REFERENCE	docs/game/engine_internals_history.md	banner,atlas-rows
-docs/game/preserved_data.md	REFERENCE	-	banner
-docs/game/engine_internals_history.md	HIST	-	-
-docs/game/gotchas.md	REGISTER	-	-
+docs/GOTCHAS.md	GENERATED	docs/GOTCHAS_history.md	-
+docs/GOTCHAS_history.md	HIST	-	-
+docs/NEXT_SESSION.md	ORIENT	docs/NEXT_SESSION_HISTORY.md	-
+docs/NEXT_SESSION_HISTORY.md	HIST	-	-
+docs/README.md	INDEX	-	-
+docs/annotations.md	GENERATED	-	-
 docs/game/atlas/README.md	REFERENCE	-	-
 docs/game/atlas/character_tables.md	REFERENCE	-	-
 docs/game/atlas/id_space.md	REFERENCE	-	-
@@ -51,11 +50,13 @@ docs/game/atlas/ram.md	REFERENCE	-	-
 docs/game/atlas/select_screen.md	REFERENCE	-	-
 docs/game/atlas/sprite_lists.md	REFERENCE	-	-
 docs/game/atlas/venue_assets.md	REFERENCE	-	-
-# --- platform
+docs/game/engine_internals.md	REFERENCE	docs/game/engine_internals_history.md	banner,atlas-rows
+docs/game/engine_internals_history.md	HIST	-	-
+docs/game/gotchas.md	REGISTER	-	-
+docs/game/preserved_data.md	REFERENCE	-	banner
 docs/platform/gotchas.md	REGISTER	-	-
 docs/platform/mister.md	REFERENCE	docs/platform/mister_history.md	-
 docs/platform/mister_history.md	HIST	-	-
-# --- project
 docs/project/M1_acceptance.md	HIST	-	-
 docs/project/M2_feasibility.md	HIST	-	-
 docs/project/M3b_plan.md	HIST	-	-
@@ -68,16 +69,18 @@ docs/project/coverage_matrix.md	REFERENCE	-	-
 docs/project/cps2_wide.md	REFERENCE	docs/project/cps2_wide_history.md	banner
 docs/project/cps2_wide_history.md	HIST	-	-
 docs/project/doc_audit_14z118.md	LOG	-	-
-docs/project/harness_hardening_history.md	HIST	-	-
-docs/project/inferred_claims.md	LOG	-	-
+docs/project/gate_index.md	GENERATED	-	-
+docs/project/gate_scoping_method.md	REFERENCE	-	-
 docs/project/gotchas.md	REGISTER	-	-
 docs/project/hardening_register.md	REFERENCE	-	-
+docs/project/harness_hardening_history.md	HIST	-	-
+docs/project/inferred_claims.md	LOG	-	-
 docs/project/mister_core.md	REFERENCE	-	-
 docs/project/mister_field.md	REFERENCE	-	-
 docs/project/mister_fit.md	REFERENCE	-	-
 docs/project/mister_map.md	INDEX	-	-
-docs/project/oracle_classes.md	REFERENCE	-	banner
 docs/project/mister_scope.md	HIST	-	-
+docs/project/oracle_classes.md	REFERENCE	-	banner
 docs/project/patch_index.md	INDEX	-	-
 docs/project/patch_notes.md	LOG	-	-
 docs/project/playtest_m3a_interims.md	HIST	-	-
@@ -86,14 +89,9 @@ docs/project/porting_sprite_lists.md	REFERENCE	-	-
 docs/project/quartus_brief.md	HIST	-	-
 docs/project/release_format.md	REFERENCE	-	-
 docs/project/skills_scope.md	HIST	-	-
-docs/project/tenant_manifest.md	REFERENCE	docs/project/tenant_manifest_history.md	banner
-docs/project/tenant_manifest_history.md	HIST	-	-
-docs/project/visual_smoke_tests.md	REFERENCE	-	-
-# --- project/tables (chars/ is generated wholesale and excluded from the walk)
 docs/project/tables/README.md	REFERENCE	-	-
 docs/project/tables/community_crosscheck.md	GENERATED	-	-
 docs/project/tables/defense_rows.md	REFERENCE	-	-
-docs/project/gate_index.md	GENERATED	-	-
 docs/project/tables/donovan.md	GENERATED	-	-
 docs/project/tables/huitzil.md	GENERATED	-	-
 docs/project/tables/pyron.md	GENERATED	-	-
@@ -101,3 +99,6 @@ docs/project/tables/qs_voice_map.md	REFERENCE	-	-
 docs/project/tables/reconciliation.md	REFERENCE	docs/project/tables/reconciliation_history.md	banner
 docs/project/tables/reconciliation_history.md	HIST	-	-
 docs/project/tables/sfx_records.md	REFERENCE	-	-
+docs/project/tenant_manifest.md	REFERENCE	docs/project/tenant_manifest_history.md	banner
+docs/project/tenant_manifest_history.md	HIST	-	-
+docs/project/visual_smoke_tests.md	REFERENCE	-	-

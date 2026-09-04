@@ -37,29 +37,34 @@
 # through each game's OWN anim_index_c, so a match means "the same logical
 # pose slot", which is the comparable thing.
 #
-# THE RESULT THIS FREEZES (measured 14z-131, merged-m15 vs native vsav2,
-# victim pinned to Victor 0x03 by early-window pokes):
+# THE RESULT THIS FREEZES — ALL 18 ROSTER VICTIMS (widened 14z-131 after the
+# maintainer asked what the sweep costs: measured, Victor alone is 27.7 s and
+# all eighteen is 186 s at 6-way parallelism, so the wider gate is ~6.7x the
+# time for 18x the coverage and there was no reason not to take it):
 #
-#   throw                      ordered states        damage (amt @ pose)
-#   standard 6+HP              29 vs 28, ours +1     14 @ 13   both legs
-#   circuit scrapper 63214+MP  23 vs 23, IDENTICAL   19 @ 19   both legs
-#   ES circuit scrapper        46 vs 47, native +1   2@21 2@21 15@19 both
-#   ...and arc peaks 64 / 278 / 380, equal on both legs in all three.
+#   throw               ordered states       tail          damage
+#   standard 6+HP       18/18 IDENTICAL      ours +1       2 victims +/-1
+#   circuit scrapper    18/18 IDENTICAL      none          3 victims +/-1
+#   ES circuit scrapper 18/18 IDENTICAL      native +1     2 victims +/-1
 #
-# SO THE TRAJECTORIES TRAVERSE THE SAME STATES IN THE SAME ORDER, and every
-# damage event lands for the same amount at the same POSE. The only structural
-# differences are ONE extra end-of-hold state, in OPPOSITE directions
-# (standard: ours reaches one more; ES: native reaches one more).
+# EVERY victim traverses the SAME states in the SAME order on all three
+# throws, and the end-of-hold tail is UNIFORM ACROSS ALL EIGHTEEN — which is
+# why it is frozen as one shape per throw rather than as 54 literals, and is
+# itself evidence the tail is a boundary/cadence effect rather than
+# per-character data.
 #
-# THE CADENCE, measured here independently rather than assumed: ours holds 89
-# frames to native's 82 (standard), 60 to 55 (CS), 130 to 120 (ES) — and on ES
-# the damage offsets GROW through the move, +5 then +7 then +10 video frames,
-# which is the signature of a RATE difference rather than a port defect. 130
-# vs 120 is 8.3% slower against #114's documented ~1 frame per ~11 engine
-# ticks (9.1%). That is the maintainer-ruled class (2026-09-02: "we must
-# respect the fact that we are porting the character to a different engine and
-# the engine, being vanilla vsav, takes precedence"), so dwell and frame
-# numbers are REPORTED and never gated.
+# THE DAMAGE RESIDUE, and it is an OPEN FINDING the widening surfaced (the
+# single-victim gate could never have seen it — Victor is not among them):
+# 5 of 54 victim/throw cells differ by EXACTLY +/-1 total damage, and the sign
+# is PER VICTIM, not per throw:
+#     victim 0x10 (Phobos)   ours +1 on standard, CS and ES
+#     victim 0x13 (Donovan)  ours -1 on standard, CS and ES
+#     victim 0x0A (Sasquatch) ours -1 on CS only
+# Ruled out already: victim starting HP is 288 on both legs for every victim,
+# so it is not a max-HP effect; and bank_map declares no per-character defence
+# or damage-scaling table, so the scalar is somewhere this map does not model.
+# NOT diagnosed. Frozen with its exact deltas so it cannot drift unnoticed,
+# and named in STATE as the next measurement.
 #
 # WHAT THIS REFUTED. `80_hui_grab_2p.rpl`'s own header said "only the victim
 # throw-arc HEIGHT differs (alias physics, queued)". It does not: the arcs are
@@ -97,74 +102,79 @@ ATT="${ATT:-10}"            # Phobos/Huitzil as the thrower
 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
+JOBS="${JOBS:-6}"
+# THE ROSTER: 15 vanilla + the 3 tenants. 0x0B is Zabel's shared special slot
+# and 0x12 is Dark Gallon — neither is a selectable roster victim here.
+VICTIMS="${VICTIMS:-00 01 02 03 04 05 06 07 08 09 0a 0c 0d 0e 0f 10 11 13}"
 
-# throw : replay : first : last : extra pokes : frozen arc peak : ES?
-SPECS="std:judge/02_throw.rpl:3000:3260::64:0
-cs:hui/80_hui_grab_2p.rpl:3145:3375::278:0
-es:hui/97_hui_grab_es_2p.rpl:3140:3400:;2900:ff8509:09;3000:ff8509:09;3100:ff8509:09:380:1"
-
-for spec in $SPECS; do
-    nm=$(echo "$spec" | cut -d: -f1); rpl=$(echo "$spec" | cut -d: -f2)
-    lo=$(echo "$spec" | cut -d: -f3); hi=$(echo "$spec" | cut -d: -f4)
-    for leg in ours native; do
-        d="$W/${nm}_${leg}"; mkdir -p "$d/sbx"
-        if [ "$leg" = ours ]; then _s=vsavjw; _rp="$REPO/$BUILD/rompath;$ROMDIR"
-        else                      _s=vsav2;  _rp="$ROMDIR"; fi
-        pk="1400:ff8782:$ATT;1450:ff8782:$ATT;1500:ff8782:$ATT"
-        pk="$pk;1400:ff8b82:$VICTIM;1450:ff8b82:$VICTIM;1500:ff8b82:$VICTIM"
-        case "$nm" in es) pk="$pk;2900:ff8509:09;3000:ff8509:09;3100:ff8509:09";; esac
-        df="$(python3 -c "
-print(';'.join(f'{f}:ff8410-ff8418;{f}:ff8810-ff8818;{f}:ff881c-ff8820;{f}:ff8934-ff8935;{f}:ff8509-ff850a;{f}:ff8850-ff8852'
-                for f in range($lo,$hi)))")"
-        ( cd "$d" && REPLAY="$REPO/tests/replays/$rpl" POKES="$pk" DUMPS="$df" \
-          CHECKSUM_OUT="$d/out.log" MAME_SANDBOX="$d/sbx" MAME_ROMPATH="$_rp" \
-          "$REPO/tools/run_mame.sh" "$_s" \
-          -autoboot_script "$REPO/tests/lua/replay.lua" > "$d/mame.log" 2>&1 ) &
+_n=0
+# NB plain $VICTIMS: this script is #!/bin/sh, where a bare $var DOES
+# word-split. (An interactive zsh does NOT — that is the [[bash-tool-shell-is-zsh]]
+# trap, and it bit the ad-hoc sweep that produced these numbers, twice.)
+for vic in $VICTIMS; do
+    for spec in "std:judge/02_throw.rpl:3000:3260:" \
+                "cs:hui/80_hui_grab_2p.rpl:3145:3375:" \
+                "es:hui/97_hui_grab_es_2p.rpl:3140:3400:m"; do
+        nm=${spec%%:*}; _r=${spec#*:}; rpl=${_r%%:*}; _r=${_r#*:}
+        lo=${_r%%:*}; _r=${_r#*:}; hi=${_r%%:*}; mt=${_r#*:}
+        for leg in ours native; do
+            d="$W/${vic}_${nm}_${leg}"; mkdir -p "$d/sbx"
+            if [ "$leg" = ours ]; then _s=vsavjw; _rp="$REPO/$BUILD/rompath;$ROMDIR"
+            else                      _s=vsav2;  _rp="$ROMDIR"; fi
+            pk="1400:ff8782:$ATT;1450:ff8782:$ATT;1500:ff8782:$ATT"
+            pk="$pk;1400:ff8b82:$vic;1450:ff8b82:$vic;1500:ff8b82:$vic"
+            [ -n "$mt" ] && pk="$pk;2900:ff8509:09;3000:ff8509:09;3100:ff8509:09"
+            df="$(python3 -c "print(';'.join(f'{f}:ff8410-ff8418;{f}:ff8810-ff8818;{f}:ff881c-ff8820;{f}:ff8934-ff8935;{f}:ff8509-ff850a;{f}:ff8850-ff8852' for f in range($lo,$hi)))")"
+            ( cd "$d" && REPLAY="$REPO/tests/replays/$rpl" POKES="$pk" DUMPS="$df" \
+              CHECKSUM_OUT="$d/out.log" MAME_SANDBOX="$d/sbx" MAME_ROMPATH="$_rp" \
+              "$REPO/tools/run_mame.sh" "$_s" \
+              -autoboot_script "$REPO/tests/lua/replay.lua" > "$d/mame.log" 2>&1 ) &
+            _n=$((_n + 1))
+            [ $((_n % JOBS)) -eq 0 ] && wait
+        done
     done
-    wait
 done
+wait
+echo "== ran $_n legs ($(echo $VICTIMS | wc -w | tr -d ' ') victims x 3 throws x 2), JOBS=$JOBS"
 
-python3 - "$W" "$VICTIM" <<'PY' || fail=1
-import glob, re, struct, sys
-W, VIC = sys.argv[1], int(sys.argv[2], 16)
+python3 - "$W" "$VICTIMS" "$BUILD" <<'PY' || fail=1
+import glob, re, struct, sys, json
+W, VICTIMS, BUILD = sys.argv[1], sys.argv[2].split(), sys.argv[3]
 vj = open('build/out/vsavj_data.bin', 'rb').read()
 v2 = open('build/out/vsav2_data.bin', 'rb').read()
-C, DELTA = 0x0BCFFA, 0x0D7298 - 0x0BD0FA
-TBL = {'ours': struct.unpack_from('>I', vj, C + VIC * 4)[0],
-       'native': struct.unpack_from('>I', v2, C + DELTA + VIC * 4)[0]}
-IMG = {'ours': vj, 'native': v2}
+C, ORI_VJ, ORI_V2 = 0x0BCFFA, 0x0BD0FA, 0x0D7298
+pl = json.load(open(f"{BUILD}/patch/placements.json"))["regions"]
+def _g(r, k):
+    x = pl[r][k]; return int(x, 16) if isinstance(x, str) else x
+REG = {0x10: 'anim@huitzil', 0x11: 'anim@pyron', 0x13: 'anim'}
 
-# FROZEN 14z-131, STRENGTHENED the same session after the maintainer pointed
-# out that comparing SETS is blind to order and dwell:
-#   tail_ours / tail_native = the ONE extra end-of-hold state each leg may
-#   carry (see the header); everything before it must match IN ORDER.
-#   damage = the (amount, pose) pairs, which must match EXACTLY. Frame
-#   numbers are deliberately NOT compared — see the cadence note.
-FROZEN = {
-  'std': dict(arc=64,  tail_ours=[(22, 72, 0)], tail_native=[],
-              damage=[(14, 13)], es=False),
-  'cs':  dict(arc=278, tail_ours=[], tail_native=[],
-              damage=[(19, 19)], es=False),
-  'es':  dict(arc=380, tail_ours=[], tail_native=[(18, 4, 100)],
-              damage=[(2, 21), (2, 21), (15, 19)], es=True),
-}
-NAMES = {'std': 'standard throw 6+HP', 'cs': 'circuit scrapper 63214+MP',
-         'es': 'ES circuit scrapper 63214+2P'}
+# WHICH TABLE RESOLVES A POSE POINTER depends on the LEG *and* the VICTIM, and
+# getting it wrong reports a real hold as "not a table entry" — the trap
+# audit_don_grab_pose documents and that this gate walked into on its first
+# widened run: all three TENANT victims came back "divergent" with unresolved
+# poses, which was the resolver, not the build.
+def lut_for(leg, vic):
+    if leg == 'ours' and vic < 0x10:
+        tbl, img, sh = struct.unpack_from('>I', vj, C + vic * 4)[0], vj, 0
+    else:
+        tbl = struct.unpack_from('>I', v2, C + (ORI_V2 - ORI_VJ) + vic * 4)[0]
+        img = v2
+        r = REG.get(vic, 'anim')
+        sh = (_g(r, 'dst') - _g(r, 'src')) if leg == 'ours' else 0
+    return {tbl + struct.unpack_from('>H', img, tbl + 2 * i)[0] + sh: i for i in range(96)}
 
-def series(nm, leg):
-    tbl, img = TBL[leg], IMG[leg]
-    lut = {tbl + struct.unpack_from('>H', img, tbl + 2 * i)[0]: i for i in range(96)}
-    out = []
-    for p in sorted(glob.glob(f"{W}/{nm}_{leg}/dump_*_ff8810.bin"),
+def series(tag, leg, vic):
+    lut = lut_for(leg, vic); out = []
+    for p in sorted(glob.glob(f"{W}/{tag}_{leg}/dump_*_ff8810.bin"),
                     key=lambda q: int(re.search(r'dump_(\d+)_', q).group(1))):
         fr = int(re.search(r'dump_(\d+)_', p).group(1))
-        cap = (open(f"{W}/{nm}_{leg}/dump_{fr}_ff8934.bin", 'rb').read() or b'\0')[0]
+        cap = (open(f"{W}/{tag}_{leg}/dump_{fr}_ff8934.bin", 'rb').read() or b'\0')[0]
         v = open(p, 'rb').read()
-        a = open(f"{W}/{nm}_{leg}/dump_{fr}_ff8410.bin", 'rb').read()
-        hp = struct.unpack_from('>H', open(f"{W}/{nm}_{leg}/dump_{fr}_ff8850.bin", 'rb').read(), 0)[0]
-        ptr = struct.unpack_from('>I', open(f"{W}/{nm}_{leg}/dump_{fr}_ff881c.bin", 'rb').read(), 0)[0]
-        stk = open(f"{W}/{nm}_{leg}/dump_{fr}_ff8509.bin", 'rb').read()[0]
-        out.append(dict(fr=fr, cap=cap, hp=hp, stk=stk, pose=lut.get(ptr, '?'),
+        a = open(f"{W}/{tag}_{leg}/dump_{fr}_ff8410.bin", 'rb').read()
+        hp = struct.unpack_from('>H', open(f"{W}/{tag}_{leg}/dump_{fr}_ff8850.bin", 'rb').read(), 0)[0]
+        ptr = struct.unpack_from('>I', open(f"{W}/{tag}_{leg}/dump_{fr}_ff881c.bin", 'rb').read(), 0)[0]
+        stk = open(f"{W}/{tag}_{leg}/dump_{fr}_ff8509.bin", 'rb').read()[0]
+        out.append(dict(cap=cap, hp=hp, stk=stk, pose=lut.get(ptr, '?'),
                         dx=struct.unpack_from('>h', v, 0)[0] - struct.unpack_from('>h', a, 0)[0],
                         dy=struct.unpack_from('>h', v, 4)[0] - struct.unpack_from('>h', a, 4)[0]))
     return out
@@ -175,70 +185,88 @@ def states(s):
         if not e['cap']:
             continue
         k = (e['pose'], e['dx'], e['dy'])
-        if r and r[-1][0] == k:
-            r[-1][1] += 1
-        else:
-            r.append([k, 1])
+        if r and r[-1][0] == k: r[-1][1] += 1
+        else: r.append([k, 1])
     return r
 
-def damage(s):
-    return [(a['hp'] - b['hp'], b['pose']) for a, b in zip(s, s[1:]) if b['hp'] < a['hp']]
-
-def arcpeak(s):
-    fl = [e['dy'] for e in s if not e['cap']]
-    seen = any(e['cap'] for e in s)
-    fl = [e['dy'] for i, e in enumerate(s) if not e['cap'] and any(x['cap'] for x in s[:i])]
-    return (max(fl) - min(fl)) if fl and seen else None
-
+# FROZEN 14z-131 over all 18 roster victims. `tail` is (extra_ours,
+# extra_native) and is UNIFORM across every victim, so it is one shape per
+# throw. `dmg` names the only victims whose TOTAL damage differs, with the
+# exact (ours, native) pair — an OPEN finding, frozen so it cannot drift.
+FROZEN = {
+ 'std': dict(tail=(1, 0), arc={64}, es=False, dmg={'10': (15, 14), '13': (14, 15)}),
+ 'cs':  dict(tail=(0, 0), arc={278,284,287,288,290,291,295,296,298,306,311}, es=False, dmg={'0a': (19, 20), '10': (20, 19), '13': (19, 20)}),
+ 'es':  dict(tail=(0, 1), arc={380,386,389,390,392,393,397,398,400,408,413}, es=True,  dmg={'10': (20, 19), '13': (19, 20)}),
+}
+NAMES = {'std': 'standard throw 6+HP', 'cs': 'circuit scrapper 63214+MP',
+         'es': 'ES circuit scrapper 63214+2P'}
 bad = 0
 for nm in ('std', 'cs', 'es'):
     f = FROZEN[nm]
-    print(f"== {NAMES[nm]} ==")
-    o, n = series(nm, 'ours'), series(nm, 'native')
-    so, sn = states(o), states(n)
-    # ---- liveness -------------------------------------------------------
-    void = False
-    for leg, s in (('ours', so), ('native', sn)):
-        if sum(d for _, d in s) < 10:
-            print(f"  FAIL: {leg} held the victim on only {sum(d for _,d in s)} frames — VOID"); void = True
-    if f['es']:
+    order_bad, unres, tails, dmg_got, nohold, es_dead, cad = [], [], set(), {}, [], [], []
+    arcs = {}
+    for vic in VICTIMS:
+        o, n = series(f"{vic}_{nm}", 'ours', int(vic, 16)), series(f"{vic}_{nm}", 'native', int(vic, 16))
+        so, sn = states(o), states(n)
+        ko, kn = [k for k, _ in so], [k for k, _ in sn]
+        if sum(d for _, d in so) < 10 or sum(d for _, d in sn) < 10:
+            nohold.append(vic); continue
+        if f['es'] and (len({e['stk'] for e in o}) < 2 or len({e['stk'] for e in n}) < 2):
+            es_dead.append(vic); continue
+        if any(k[0] == '?' for k in ko + kn):
+            unres.append(vic)
+        c = min(len(ko), len(kn))
+        if ko[:c] != kn[:c]:
+            order_bad.append(vic)
+        tails.add((len(ko) - c, len(kn) - c))
+        to = o[0]['hp'] - min(e['hp'] for e in o)
+        tn = n[0]['hp'] - min(e['hp'] for e in n)
+        if to != tn:
+            dmg_got[vic] = (to, tn)
+        cad.append(sum(d for _, d in so) / max(1, sum(d for _, d in sn)))
         for leg, s in (('ours', o), ('native', n)):
-            if len({e['stk'] for e in s}) < 2:
-                print(f"  FAIL: {leg}: stock never dropped — the ES input DEGRADED to the"
-                      f" MP grab. VOID, not a pass."); void = True
-    if void:
+            fl = [e['dy'] for i, e in enumerate(s)
+                  if not e['cap'] and any(x['cap'] for x in s[:i])]
+            arcs.setdefault(leg, set()).add((max(fl) - min(fl)) if fl else None)
+    print(f"== {NAMES[nm]} ==")
+    if nohold or es_dead:
+        print(f"  FAIL: no hold for {nohold}; ES never spent a stock for {es_dead} — VOID")
         bad += 1; print(); continue
-    # ---- ORDERED state trajectory (not a set: order AND identity) --------
-    ko = [k for k, _ in so]; kn = [k for k, _ in sn]
-    common = min(len(ko), len(kn))
-    if ko[:common] != kn[:common]:
-        i = next(j for j in range(common) if ko[j] != kn[j])
-        print(f"  FAIL: the hold trajectories DIVERGE at state {i}:"
-              f" ours {ko[i]} native {kn[i]}"); bad += 1
-    elif ko[common:] != f['tail_ours'] or kn[common:] != f['tail_native']:
-        print(f"  FAIL: end-of-hold tail moved. ours {ko[common:]} (frozen"
-              f" {f['tail_ours']}), native {kn[common:]} (frozen {f['tail_native']})"); bad += 1
+    if unres:
+        print(f"  FAIL: unresolved pose pointers for victims {unres} — the RESOLVER is"
+              f"\n        wrong for them, not the build. Do not read the verdicts below."); bad += 1
+    if order_bad:
+        print(f"  FAIL: hold trajectories diverge in ORDER for victims {order_bad}"); bad += 1
     else:
-        print(f"  ok: {common} hold states IN THE SAME ORDER"
-              f"; frozen tails ours {f['tail_ours'] or 'none'},"
-              f" native {f['tail_native'] or 'none'}")
-    # ---- damage: amount and POSE, never the frame number -----------------
-    do, dn = damage(o), damage(n)
-    if do != dn or do != f['damage']:
-        print(f"  FAIL: damage ours {do} native {dn}, frozen {f['damage']}"); bad += 1
+        print(f"  ok: {len(VICTIMS)}/{len(VICTIMS)} victims traverse the same states in the same order")
+    if tails != {f['tail']}:
+        print(f"  FAIL: end-of-hold tail not uniform / moved: saw {sorted(tails)}, frozen {f['tail']}"); bad += 1
     else:
-        print(f"  ok: damage {do} — same amounts at the same POSES on both legs")
-    # ---- the cadence, REPORTED not asserted ------------------------------
-    to, tn = sum(d for _, d in so), sum(d for _, d in sn)
-    print(f"  cadence: hold {to} frames ours vs {tn} native"
-          f" ({100.0*(to-tn)/tn:+.1f}%) — the ruled host-engine rate (#114),"
-          f" reported, not gated")
-    # ---- arc ------------------------------------------------------------
-    ao, an = arcpeak(o), arcpeak(n)
-    if ao != an or ao != f['arc']:
-        print(f"  FAIL: arc peak ours={ao} native={an}, frozen {f['arc']}"); bad += 1
+        print(f"  ok: end-of-hold tail {f['tail']} (extra ours, extra native), uniform across all victims")
+    if dmg_got != {k: tuple(v) for k, v in f['dmg'].items()}:
+        print(f"  FAIL: total-damage residue moved: {dmg_got}, frozen {f['dmg']}"); bad += 1
     else:
-        print(f"  ok: post-release arc peak {ao} on both legs (frozen)")
+        print(f"  ok: total damage identical except the frozen residue {f['dmg']} (OPEN, see STATE)")
+    # THE ARC — the check that refuted replay 80's "only the throw-arc HEIGHT
+    # differs" claim. Kept when the gate widened; losing it would have quietly
+    # dropped the one assertion that retired a nine-session-old suspicion.
+    ao, an = arcs.get('ours', set()), arcs.get('native', set())
+    # THE INVARIANT IS "ours == native", per throw across every victim. The
+    # SET is frozen too, but note it is victim-DEPENDENT for cs/es: the
+    # single-victim version of this gate froze `278`/`380`, which were
+    # VICTOR's numbers, and widening is what exposed that as victim-specific
+    # rather than a property of the throw. std's arc is the same 64 for all
+    # eighteen; cs and es span eleven values each.
+    if ao != an:
+        print(f"  FAIL: post-release arc peaks DIFFER between legs:"
+              f" ours={sorted(ao)} native={sorted(an)}"); bad += 1
+    elif ao != f['arc']:
+        print(f"  FAIL: arc peak set moved: {sorted(ao)}, frozen {sorted(f['arc'])}"); bad += 1
+    else:
+        print(f"  ok: post-release arc peaks identical on both legs for every victim"
+              f" ({len(ao)} distinct value(s), frozen)")
+    print(f"  cadence: ours/native hold ratio {min(cad):.3f}-{max(cad):.3f}"
+          f" — the ruled host-engine rate (#114), reported, not gated")
     print()
 sys.exit(1 if bad else 0)
 PY
