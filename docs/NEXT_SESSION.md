@@ -56,6 +56,24 @@
 > ## * **Every expectation set is a PURE CARRY** — M13 is RAM-identical to M12
 > ##   across the whole replay corpus, measured twice per track.
 > ##
+> ## # THE ONE THING CARRIED OPEN — KNOWLEDGE, NOT A BUG
+> ##
+> ## **THE +/-1 DAMAGE RESIDUE ON PHOBOS'S THROWS.** 5 of 54 victim/throw
+> ## cells differ by exactly one point of total damage between ours and native
+> ## vsav2 (`0x10` +1 on all three throws, `0x13` -1 on all three, `0x0A` -1
+> ## on Circuit Scrapper only). **RULED WITHIN TOLERANCE (maintainer,
+> ## 2026-09-04)** — *"interesting to root-cause it to deepen our
+> ## understanding of the engines though so let's keep that open for a future
+> ## session."* It is frozen in `audit_tenant_throw_geometry` with its exact
+> ## deltas, so a red there means THE RESIDUE MOVED, not that damage is broken.
+> ## **Start from the eliminations, do not re-derive them** (STATE has them in
+> ## full): starting HP is 288 on both legs for every victim; it is TOTAL
+> ## damage, not a split artifact; `bank_map` models no per-character defence
+> ## table. **The cheap first step is the discriminator: `0x0A` is a LEGACY
+> ## victim**, so if VS and VS2 simply tuned Sasquatch differently, that cell
+> ## is cross-generation and the residue splits into two unrelated causes.
+> ## Then PC-attribute the writes to `$FF8850` with `tap_writes.lua` REGLOG.
+> ##
 > ## # THE ONE NEW DECISION WAITING (STATE "Decisions pending")
 > ##
 > ## **PYRON'S CAPTURE-KEYFRAME ATTACKER ROW `0x11` IS NOT PORTED** — when

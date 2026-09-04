@@ -63,8 +63,12 @@
 # Ruled out already: victim starting HP is 288 on both legs for every victim,
 # so it is not a max-HP effect; and bank_map declares no per-character defence
 # or damage-scaling table, so the scalar is somewhere this map does not model.
-# NOT diagnosed. Frozen with its exact deltas so it cannot drift unnoticed,
-# and named in STATE as the next measurement.
+# RULED WITHIN TOLERANCE (maintainer, 2026-09-04): "+/- 1 damage is within
+# tolerances... interesting to root-cause it to deepen our understanding of
+# the engines though so let's keep that open for a future session." So a RED
+# on this row is NOT "a damage bug" — it is "the residue moved", which is the
+# thing worth knowing. Frozen with its exact deltas; the mechanism is an open
+# KNOWLEDGE item in STATE, not a defect.
 #
 # WHAT THIS REFUTED. `80_hui_grab_2p.rpl`'s own header said "only the victim
 # throw-arc HEIGHT differs (alias physics, queued)". It does not: the arcs are

@@ -389,11 +389,31 @@ what a triage is looking at, so those are where the thinking time goes.
   * it found a residue the narrow gate could not see — **5 of 54 victim/throw
     cells differ by exactly ±1 TOTAL damage**, sign per VICTIM not per throw:
     `0x10` +1 on all three throws, `0x13` −1 on all three, `0x0A` −1 on CS
-    only. Ruled out: starting HP is 288 on both legs for every victim, and
-    `bank_map` declares no per-character defence/damage-scaling table. **NOT
-    DIAGNOSED — an OPEN finding**, frozen with its exact deltas so it cannot
-    drift, and the next measurement is to find the per-victim scalar the bank
-    map does not model.
+    only. **RULED (maintainer, 2026-09-04): WITHIN TOLERANCE, NOT A DEFECT —
+    *"+/- 1 damage is within tolerances. It is interesting to root-cause it to
+    deepen our understanding of the engines though so let's keep that open for
+    a future session."* So it is a KNOWLEDGE item, not a bug**: frozen with
+    its exact deltas so it cannot drift unnoticed, and carried open for a
+    future session to explain rather than to fix.
+    **WHAT IS ALREADY ELIMINATED, so nobody re-derives it:** victim starting
+    HP is 288 on BOTH legs for every victim (not a max-HP effect); it is TOTAL
+    damage over the window, not a per-event split artifact; `bank_map`
+    declares no per-character defence/damage-scaling table, so the scalar is
+    somewhere that map does not model; and the sign is stable per victim
+    across all three throws, so it is not throw-specific.
+    **THE DISCRIMINATOR THAT MATTERS, and it is a HYPOTHESIS ([VSP-116]) not a
+    finding: `0x0A` IS A LEGACY VICTIM.** Sasquatch is not ported — on our leg
+    he is VS's Sasquatch, on the native leg VS2's. If Capcom retuned him
+    between the games, that cell is a CROSS-GENERATION data difference and
+    nothing to do with our port, which would split the residue into two
+    unrelated causes (0x0A cross-generation; `0x10`/`0x13` something else).
+    Testing that is the cheap first step: compare the two games' per-character
+    damage/defence data for `0x0A` directly.
+    **THE NAMED NEXT MEASUREMENT:** PC-attribute the writes to the victim's HP
+    (`$FF8850`) on both legs with `tests/lua/tap_writes.lua`'s `REGLOG` — the
+    same instrument that resolved #112's `a0` — so the routine AND its
+    operands are named rather than inferred. That says which table the scalar
+    lives in.
   * it exposed a frozen constant as victim-specific: the narrow gate froze the
     post-release arc peak at `278`/`380`, which were VICTOR's numbers — the arc
     is victim-dependent and spans ELEVEN values. Not wrong for Victor; wrong
