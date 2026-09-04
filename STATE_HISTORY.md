@@ -1,5 +1,27 @@
 # STATE_HISTORY — the STATE.md archive
 
+## Session 14z-130 — **M13 IS FROZEN AND REGISTERED**: donovan-m19 / huitzil-m26 /
+## pyron-m20 / merged-m15, mark M13, the boot name screen reading VAMPIRE SAVED. The
+## `gap_be27a` correction folded in by ruling and **BYTE-NEUTRAL on all five tracks by
+## rebuild** — but only after its ownership question turned out to have a measured
+## answer: the generic repoint would have silently reverted the 14z-64 mirror-victim
+## fix. **8/8 SUITE GREEN over 3h05m, and every expectation set is a PURE CARRY** —
+## M13 is RAM-identical to M12 across the whole corpus. Static 130/0/0/0.
+
+| | |
+|---|---|
+| opened with | the three session documents, then step 1 of the planned M13 order |
+| **the fold-in, and why it was not a manifest tidy** | `gap_be27a` + `gap_be2ba` modelled ONE 32-longword table as TWO word tables. Corrected to one `capture_kf_ptr` (`data_ptr`, stride 0x80), measured three ways from the ROMs. But the corrected `kind` enables the generic per-character repoint on a table **already owned row by row by 17 `[[data_port]]` rows** — and letting it fire would have (a) pointed Donovan's row at the hitbox-region copy, which carries the UNFIXED `0x0b30` where the shipped blob carries `0x0d88`, silently reverting the 14z-64 mirror-victim fix; (b) added a NEW write repointing PYRON's attacker row 0x11; (c) on the stock twin, repointed JEDAH's row and broken the base-slot in-place path. Only (a) is loud |
+| **so the [VSP-10] question dissolved** | STATE said "which pointer his capture keyframes use may be a [VSP-10] call". It is not: one of the two candidates is the FIXED block and the other is not. Preserving today's bytes is preservation, not a gameplay choice |
+| **the fix reused a 64-session-old mechanism** | 14z-65's `claimed_ptr_tables`, added after the identical defect on `tail_data_ptr` ("correct only because the sound op was emitted later"). Extended to `slot_ptr_table` with two measured differences: UNGATED (the stock track is where the generic repoint does the most harm) and scoped to the MERGED manifest, not `tenant_rows` |
+| **and the second of those was found by a gate, not by me** | scoped per-iteration first, it shipped a merged build emitting `poke32 0x0be2be <- 0x004af226  capture_kf_ptr[0x11] donovan hitbox` — Pyron's row, written by Donovan's iteration, because `merge_manifests` dedups the identical rows onto ONE iteration. `test_merged_inputs` section 2 caught it, and **only it could have**: the pinned merged extracts predate the row, so the merged BUILD cannot show it |
+| **the freeze** | four tracks × (`--freeze` + verify) = **8/8 SUITE GREEN**, 21:55-01:00. Every self-frozen checksum came out IDENTICAL to the carried one and every authored `.masked` verified against the vanilla basis, so all five sets are byte-identical to their predecessors — a measurement, not a copy |
+| **two things the freeze created that were NOT kept** | 79 self-frozen `.sha1` in the BATTERY-SCOPED stock set (running the full corpus with `--freeze` against a 16-entry set manufactured an expectation per replay), and `111_don_arcade_vs_screen.sha1` on all three tenant sets — a replay unguarded on every predecessor, and on a huitzil/pyron SOLO it walks to a cell those builds do not back. Both deleted: a freeze must not enshrine unreviewed behaviour as a side effect ([VSP-36]) |
+| **the sweep walked into a documented trap** | the 137-file re-point sweep also REWRITES HISTORY in comments — cut 2 of the gotcha paid for at 14z-119. It had rewritten the 14z-119 patch_notes entry to claim donovan-m18 lives in `build/don_m19`. Caught by following that entry's own rule: docs/ reverted wholesale and redone by hand, 13 dated records restored — **including one in a registry row I had written myself that same hour** |
+| the MiSTer CRC tail | `test_mister_mra_map` was the last static red: jtframe resolves members by CRC32 alone. Fork commit `662d076cc` pushed, series `0031`, `PINNED` bumped, submodule re-pointed — fork first, then the pin |
+| a claim corrected on the way | STATE 14z-127's "one program member (`vm3j.10b`)" is **`vm3j.03d`** — member diff on all three tracks, and the differing bytes are all ODD addresses so it could not have been otherwise |
+| **the standing lesson** | **every check that mattered this session compared the artifact against something OUTSIDE it.** The byte-neutrality claim is a rebuild diff, not a reading of the generator; the new gate is anchored in the reference ROM and the shipped image; the sets are proved carries by `diff -rq` against their predecessors; the member delta is a zip diff. The one place I reasoned instead of measured — scoping the ownership claim by iteration — is the one place a gate had to catch me |
+
 ## Session 14z-129 — THE TRIAGE SESSION: FIVE RED GATES TO GREEN, ONE DELETED ON
 ## MEASURED GROUND, AND **NOT ONE WAS A DEFECT IN THE SHIPPED ARTIFACT** — the same
 ## verdict 14z-128's sweep reached about its own nineteen. **Two decisions ruled and
