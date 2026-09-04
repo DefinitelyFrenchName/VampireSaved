@@ -22,6 +22,27 @@
 # change is the discriminator — make the instrument fingerprint-distinct,
 # or dispatch on the whole-set fingerprint (build_fingerprint.py --full) —
 # never to add a row that silently green-lights the instrument.
+# TWO KEY SPACES SINCE 14z-132 (the forward-only whole-set promotion,
+# maintainer-ruled). A row's key is just a sha1 and the resolver matches
+# either: the WHOLE-SET key first (build_fingerprint.py --set-key, computed
+# over the build's OWN rompath dir), then the PROGRAM key, loudly. NEW rows
+# carry the whole-set key; the historical rows below keep their program key
+# and are not migrated -- 38 of them have no build dir left to compute one
+# from (pruned under the N-2 policy) and are inert anyway, since nothing can
+# dispatch on a build that no longer exists. MERGED rows are WHOLE-SET-KEYED
+# ONLY, which is what lets the merged build have a row at all without the
+# program fallback reaching it from `build/merged1`, the blanks-only legacy
+# instrument that shares its program fingerprint (see the block above).
+#
+# A TRACK NUMBER COUNTS THAT TRACK'S OWN FREEZES AND CARRIES WHEN THE TRACK
+# DOES NOT CHANGE, so the numbers of one freeze's four tracks do NOT agree and
+# their offsets DRIFT. Measured: at 14z-113 merged went m9 -> m10 alone (the
+# one-zip repackaging) while donovan-m14 / huitzil-m21 / pyron-m15 carried
+# untouched, moving the offsets from +5/+12/+6 to +4/+11/+5. An offset drift
+# is therefore a SIGNAL that a track carried, never an inconsistency to tidy;
+# a freeze is named in prose by its MARK, which since 14z-132 is the merged
+# build's own number.
+#
 # sha1	expectation-set	notes
 b0eb9ecd8a6fd354f398d4347002b204b784f47c	vsavj	vanilla vsavj (Japan 970519) reference program image
 a02aeefff4c7a053337b10c923c8c328573788fa	donovan-m2	M2a freeze: donovan-m2 stage 5 (hooked build; masked legacy basis per CLAUDE.md §4 v2) — frozen 2026-07-28, STATE.md
@@ -126,3 +147,6 @@ ae953657de8e8e83c71ed72e0bc85259543512d1	huitzil-m25	14z-119 THE PHYSICS-PORT FR
 a43da9741abd0ae0d2272d86c4b5b6ad5214258a	pyron-m20	14z-130 THE M13 BOOT-TITLE FREEZE: same three aux_pokes + the M13 glyph tiles. Carried from pyron-m19.
 e86e1d04aca290c7ab63bcb9416b3fb021df41b2	donovan-m19-stock	14z-130 THE M2 BATTERY'S STAGE-6 TARGET, carried from donovan-m18-stock. THE STOCK TWIN MOVED (was 38e9cb2c since 14z-119): the boot title is an [[aux_poke]], not profile-gated, so the substituted track carries it too. ATTRIBUTED BY OP DIFF against build/m5_stock13, not inferred: EXACTLY the three poke16 at 0x1c822/0x1c824/0x1c826 are added (249 -> 252 ops), nothing removed and no op changed. Not a shipping artifact.
 108f75235f63e8e049f246f992cc1b9d224acbc2	donovan-m19-stage4	14z-130 THE M2a STAGE-4 GATE'S TARGET, carried from donovan-m18-stage4 with the fingerprint UNCHANGED — the M13 boot title is an [[aux_poke]] (stage >= 5) and the bank_map correction is byte-neutral, so the stage-4 image does not move. MEASURED by rebuild (build/don_stage4_m19), not assumed; the m18 row above is commented out so this name resolves. Record row — no gate dispatches on it.
+52756b2f6ab7c22bfc9ecc1b1615523a49753929	donovan-m20	14z-132 THE M16 MARK FREEZE (maintainer-ruled 2026-09-04, option A: the in-game mark IS the merged build number, ending the drift that had the wheel two behind since merged-m11). Delta vs donovan-m19: exactly TWO members, the group-C glyph tiles vsw.33m + vsw.37m, one character of the string ("M13" -> "M16"); the program image is BYTE-IDENTICAL, so the program fingerprint 8065bc92 is UNCHANGED and this row is keyed on the WHOLE-SET key instead (the 14z-132 forward-only promotion). THAT IS THE POINT: donovan-m19's row stays live and program-keyed, build/don_m19 still resolves to it, and no predecessor had to be commented out to make this name resolve — the first freeze in four. Carried from donovan-m19; stock twin and stage-4 image both measured UNCHANGED by rebuild, so donovan-m19-stock and donovan-m19-stage4 CARRY with no new rows.
+e1ed7d9ff3b02e318d61cb524caa0519ea10429b	huitzil-m27	14z-132 THE M16 MARK FREEZE: the same one-character mark change, same two group-C members, program fingerprint 08944a7e UNCHANGED. Whole-set keyed. Carried from huitzil-m26.
+1264ca1fe22f718a3c92264555f71d1f7208defd	pyron-m21	14z-132 THE M16 MARK FREEZE: the same one-character mark change, same two group-C members, program fingerprint a43da974 UNCHANGED. Whole-set keyed. Carried from pyron-m20.

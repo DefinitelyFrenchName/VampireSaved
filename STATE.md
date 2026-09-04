@@ -372,10 +372,35 @@ what a triage is looking at, so those are where the thinking time goes.
   **A FIFTH NUMBER, recorded but NOT changed:** the build DIRECTORY counter
   runs at four different offsets from the freeze name — donovan +0, merged +7,
   pyron +17, huitzil +27 (verified over six freezes). Renaming is refused
-  (~55 gates reference the paths, re-pointed each freeze). **OPEN, OPTIONAL,
-  ONE LINE TO ADOPT:** call a freeze by a single GENERATION number equal to
-  the merged build's, so one number resolves to all five tracks. Offered at
-  14z-132, not yet ruled.
+  (~55 gates reference the paths, re-pointed each freeze).
+  **THE "GENERATION N" OPTION — OFFERED 14z-132 AND DECLINED THE SAME DAY,
+  on my recommendation, maintainer-validated.** The proposal was to call a
+  freeze by a single GENERATION number equal to the merged build's, so one
+  number resolves to all five tracks.
+  **THE MEASUREMENT THAT KILLED IT: the track offsets DRIFT, and the drift is
+  INFORMATION.** At 14z-113 the merged track moved ALONE (m9 -> m10, the
+  one-zip repackaging) while donovan-m14 / huitzil-m21 / pyron-m15 CARRIED
+  untouched, and the offsets shifted +5/+12/+6 -> +4/+11/+5. They have been
+  stable only for the six freezes since.
+  **A TRACK NUMBER COUNTS THAT TRACK'S OWN FREEZES AND CARRIES WHEN THE TRACK
+  DOES NOT CHANGE**, so a single generation number would either lie about a
+  carried track or force a new tag onto a byte-identical artifact — which the
+  project deliberately avoids. It would also be a SIXTH namespace rather than
+  a replacement: the four track names are simultaneously registry row names,
+  expectation-set directories and annotated tags, all cited, so none can be
+  retired.
+  **A CORRECTION TO MY OWN CLAIM, recorded because it is what made the option
+  look attractive:** I reported these offsets as "stable, verified over six
+  freezes" — true of those six, and presented as though it were a property of
+  the scheme. It is not; it is a coincidence of a run in which all four tracks
+  happened to move together. The same caution applies to the build-DIRECTORY
+  offsets in the paragraph above: a carried track mints no new build dir
+  either, so those drift by the same mechanism.
+  **ADOPTED INSTEAD, zero cost:** name a freeze in prose by its MARK (= the
+  merged build number) — "the M16 freeze", which HANDOFF's registry table
+  nearly did already — and write the carry rule where the registry explains
+  itself (`tests/expected/registry.tsv` header), so an offset drift reads as
+  "a track carried" rather than as something to tidy.
 
 - **MERGED-VS-SOLO TEST SCOPING — THE GENERAL RULE IS RULED AND IS NOW
   [VSP-175] (maintainer, 2026-09-04, 14z-132). THE WALK IS 2 OF 25 DONE;

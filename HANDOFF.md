@@ -616,29 +616,32 @@ vanilla path anywhere writes `0x18` (STATE "THE ARCADE HIDDEN-CHARACTER
 ROSTER"). Detail: `docs/game/atlas/select_screen.md`,
 `docs/project/patch_index.md` W1.
 
-**Current WIDE builds — THE 14z-130 M13 BOOT-TITLE FREEZE (maintainer-ruled
-2026-09-02, JAPAN entry only, "minimal change ... is perfect for me"; mark
-M13): donovan-m19 / huitzil-m26 / pyron-m20 / merged-m15.**
-`build/don_m19` (`8065bc92`, 342 ops), `build/hui53` (`08944a7e`, 373),
-`build/pyron37` (`a43da974`, 310), `build/m3b_merged22` (program fingerprint
-`f42f7569`, 829 ops), stock twin `build/m5_stock14` (`e86e1d04`, **MOVED**
-from `38e9cb2c` — the boot title is an `[[aux_poke]]`, not profile-gated, so
-the substituted track carries it too; attributed by op diff against
-`build/m5_stock13`: exactly the three `poke16` at `0x1c822/24/26` added,
-249 -> 252 ops, nothing else). The naked-eye tell is the **M13** mark, and
-the second one is the BOOT NAME SCREEN — it now reads **VAMPIRE SAVED**
-(Japan entry only; the title screen and the staff-roll strings are untouched
-by standing ruling). This freeze also carries the `gap_be27a` bank-map
-correction, which is BYTE-NEUTRAL on all five tracks by rebuild — see
-patch_notes 14z-130 and `tests/test_capture_kf_ownership.sh`.
-**FIELD VERDICT: NOT YET — this freeze has not been to the board.** The
+**Current WIDE builds — THE 14z-132 M16 MARK FREEZE (maintainer-ruled
+2026-09-04, option A: the in-game mark IS the merged build number; mark M16):
+donovan-m20 / huitzil-m27 / pyron-m21 / merged-m16.**
+`build/don_m20`, `build/hui54`, `build/pyron38`, `build/m3b_merged23`, stock
+twin `build/m5_stock15`. **EVERY PROGRAM FINGERPRINT IS UNCHANGED from M13**
+(`8065bc92` / `08944a7e` / `a43da974` / `f42f7569`; stock `e86e1d04`) because
+the whole delta is gfx: the rows are keyed on the WHOLE-SET key instead
+(`--set-key`: `52756b2f` / `e1ed7d9f` / `1264ca1f` / `2c926c5b`).
+**The delta is exactly TWO members on each WIDE track** — the group-C glyph
+tiles `vsw.33m` + `vsw.37m`, one character of one glyph — **and ZERO on the
+stock twin**, which is why `donovan-m19-stock` carries; the stage-4 image is
+likewise unchanged at `108f7523` (both measured by rebuild, not assumed).
+The naked-eye tell is the **M16** mark — since 14z-132 the mark IS the merged
+build number, so wheel and build agree by construction — and the second one
+is the BOOT NAME SCREEN, which reads **VAMPIRE SAVED** (Japan entry only; the
+title screen and the staff-roll strings are untouched by standing ruling).
+Carried from M13, which added that boot title and the `gap_be27a` bank-map
+correction — see patch_notes 14z-130 and `tests/test_capture_kf_ownership.sh`.
+**FIELD VERDICT: NOT YET — neither this freeze nor M13 has been to the board.** The
 previous freeze (merged-m14, mark M12) was FIELD VERDICT GREEN twice:
 2026-08-30 (maintainer, MiSTer, 14z-121) "all green" on bundle
 `../mister_fieldtest_14z119/`, and RE-VERIFIED GREEN 2026-09-01 "my tests on
 M14 on MiSTer are all green" — a second independent pass on the same
 unchanged build (`merged-m14`; its naked-eye tell reads **M12**, the mark —
 "M14" names the BUILD, [VSP-162]'s three namespaces).
-Detail: patch_notes 14z-130 / 14z-127, STATE 14z-130; the registry row
+Detail: patch_notes 14z-132 / 14z-130, STATE 14z-132; the registry row
 below. Previous freeze (merged-m14, M12): patch_notes 14z-119.**
 
 **Every superseded freeze is a ROW, not a paragraph.** The eight
@@ -1327,6 +1330,7 @@ entry and STATE close. Newest first; the top row is the CURRENT freeze.**
 
 | build (mark) | fingerprint(s) | dir · tag | what changed | detail |
 |---|---|---|---|---|
+| THE 14z-132 M16 MARK FREEZE | donovan-m20 whole-set `52756b2f` (`build/don_m20`), huitzil-m27 `e1ed7d9f` (`build/hui54`), pyron-m21 `1264ca1f` (`build/pyron38`), merged-m16 `2c926c5b` (`build/m3b_merged23`) — **every PROGRAM fingerprint UNCHANGED** (`8065bc92` / `08944a7e` / `a43da974` / `f42f7569`), so these rows are keyed on the WHOLE-SET key (14z-132's forward-only promotion); stock twin and stage-4 target both measured UNCHANGED by rebuild, so `donovan-m19-stock` and `donovan-m19-stage4` CARRY | tags `freeze/donovan-m20`, `freeze/huitzil-m27`, `freeze/pyron-m21` | THE IN-GAME MARK IS NOW THE MERGED BUILD NUMBER (maintainer-ruled 2026-09-04, option A) — `version_text` M13 -> M16 in the three tenant manifests, ending the drift that had the wheel two behind the build since merged-m11. Delta measured on all five tracks: exactly TWO members (`vsw.33m`, `vsw.37m`), one character of one glyph, ZERO on the stock twin. **The first freeze in four that needed no predecessor row commented out**, because the whole-set key distinguishes builds a gfx-only freeze leaves program-identical | patch_notes 14z-132; STATE 14z-132; `tests/expected/registry.tsv` header |
 | THE 14z-130 M13 BOOT-TITLE FREEZE | donovan-m19 `8065bc92` (`build/don_m19`, 342 ops), huitzil-m26 `08944a7e` (`build/hui53`, 373), pyron-m20 `a43da974` (`build/pyron37`, 310), merged-m15 `f42f7569` (`build/m3b_merged22`, 829); stock twin **MOVED** to `e86e1d04` (donovan-m19-stock); stage-4 target UNCHANGED at `108f7523` (donovan-m19-stage4) | tags `freeze/donovan-m19`, `freeze/huitzil-m26`, `freeze/pyron-m20`, `freeze/merged-m15` | THE BOOT NAME SCREEN reads VAMPIRE SAVED (three `aux_poke poke16` at `PRG:0x01C822/24/26`, Japan entry only, maintainer-ruled 2026-09-02); mark M13. PLUS the `gap_be27a` -> `capture_kf_ptr` bank-map correction folded in by ruling — BYTE-NEUTRAL on all five tracks by rebuild, with the table's hand-ownership made explicit in the generator so the generic repoint cannot silently revert the 14z-64 mirror-victim fix | patch_notes 14z-130; `tests/test_capture_kf_ownership.sh`; STATE 14z-130 |
 | THE 14z-119 PHYSICS-PORT FREEZE | donovan-m18 `7109f835` (`build/don_m18`, 339 ops — program identical to the validated probe `build/don_phys_probe`), huitzil-m25 `ae953657` (`build… | tags `freeze/donovan-m18`, `freeze/huitzil-m25`, `freeze/pyron-m19`, `freeze/merged-m14` | donovan-m18 / huitzil-m25 / pyron-m19 / merged-m14 (stock twin MOVED = donovan-m18-stock). Maintainer-ruled 2026-08-2… | history §Build registry narratives; `docs/project/patch_notes.md`; STATE close |
 | THE 14z-117b RANDOM-SELECT FREEZE | `90a225ce` / `ae953657` / `1222df18` / merged program fingerprint `a1b7cb82`; stock twin `d29fd062` UNCHANGED (whole-artifact manifest identical) | `build/don_m17`, `build/hui51`, `build/pyron35` … · tags `freeze/donovan-m17`, `freeze/huitzil-m24`, `freeze/pyron-m18`, `freeze/merged-m13` | donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13 (stock twin UNCHANGED = donovan-m13-stock). Maintainer-directed th… | history §Build registry narratives; `docs/project/patch_notes.md`; STATE close |

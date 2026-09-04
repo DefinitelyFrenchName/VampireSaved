@@ -12,7 +12,37 @@
 > ## **STATE.md IS 204 KB AND OWES A ROLLOVER AT CLOSE** (~150 KB threshold;
 > ## the slice boundary is the `**SPLIT 2026-08-20` paragraph, ledger between).
 > ##
-> ## # THREAD 1 — M16 IS BUILT, MEASURED AND UNREGISTERED
+> ## # THREAD 1 — M16 IS BUILT, MEASURED AND HALF-REGISTERED
+> ##
+> ## **DONE 14z-132 (2)/(3): B1 shipped and the three SOLO rows registered.**
+> ## `donovan-m20` / `huitzil-m27` / `pyron-m21` carry WHOLE-SET keys
+> ## (`52756b2f` / `e1ed7d9f` / `1264ca1f`); expectation sets copied from
+> ## m19/m26/m20; `donovan-m19-stock` and `donovan-m19-stage4` CARRY (both
+> ## measured unchanged by rebuild). Old builds still resolve to old names,
+> ## new builds to new names, **and no predecessor row had to be commented
+> ## out — the first freeze in four.**
+> ## **THE RE-POINT SWEEP IS THE NEXT BIG THING AND IT IS NOT STARTED: 134
+> ## files name `don_m19` / `hui53` / `pyron37` / `m3b_merged22` /
+> ## `m5_stock14`** (14z-130's was 137 and it walked into the documented
+> ## history-rewriting trap, needing 13 dated records restored — a dated log
+> ## entry saying "measured on build/don_m18" must NOT be re-pointed).
+> ## **ALSO OUTSTANDING:** the four `freeze/*` tags; patch_notes 14z-132;
+> ## the merged row (see the question below); the freeze suite; the MiSTer
+> ## CRC tail; `release/merged-m16/`; the bundle.
+> ##
+> ## **ONE QUESTION FOR THE MAINTAINER, DELIBERATELY NOT DECIDED:** what
+> ## expectation set does the `merged-m16` row name? `tests/expected/merged1/`
+> ## is the BLANKS-ONLY instrument's class table (47 `.masked`), and pointing
+> ## the shipped merged build at it changes what `run_suite` does with a build
+> ## it currently refuses BY DESIGN — the thing `registry.tsv`'s header warns
+> ## about at length. Options: (a) reuse `merged1`; (b) a new
+> ## `tests/expected/merged-m16/` seeded from it; (c) DEFER the merged row to
+> ## B2, where the three legacy-oracle gates that need it are re-pointed and
+> ## the set can be decided with them. **Recommendation: (c)** — the row's
+> ## whole purpose is to unblock those gates, and registering it now creates a
+> ## row nothing uses while forcing the set question early.
+> ##
+> ## # THREAD 1 (original) — WHAT M16 IS
 > ##
 > ## The version-numbering ruling (option A: the wheel mark IS the merged build
 > ## number) is EXECUTED as far as building. Five tracks on disk:
