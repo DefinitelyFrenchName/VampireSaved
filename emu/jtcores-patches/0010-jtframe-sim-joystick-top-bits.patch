@@ -99,6 +99,3 @@ index dd6452e73..5ed6bb8bc 100644
  #endif
          if( coin_l != (dut.coin&3) && coin_l!=3 ) {
              cout << "\ncoin inserted (sim_inputs.hex line " << line << ")\n";
--- 
-2.50.1 (Apple Git-155)
-

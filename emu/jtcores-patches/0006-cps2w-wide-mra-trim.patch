@@ -226,6 +226,3 @@ index 69ac8224d..b108af5c1 100644
  	<machine name="vsavu" sourcefile="capcom/cps2.cpp" cloneof="vsav" romof="vsav">
  		<description>Vampire Savior: The Lord of Vampire (USA 970519)</description>
  		<year>1997</year>
--- 
-2.50.1 (Apple Git-155)
-

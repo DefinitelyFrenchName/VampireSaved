@@ -61,6 +61,3 @@ index f34eadfd5..584647366 100644
                  if( dump.diff() ) {
                      // converts image to jpg in a different fork
                      // I suppose a thread would be faster...
--- 
-2.50.1 (Apple Git-155)
-

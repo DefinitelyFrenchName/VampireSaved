@@ -142,7 +142,7 @@ i=1
 for name in $NAMES; do
     sha="$(git -C "$SRC" rev-list --reverse "$UP..$PIN" | sed -n "${i}p")"
     if [ -z "$sha" ]; then bad "3 no fork commit $i for $name"; break; fi
-    if git -C "$SRC" format-patch --stdout -1 "$sha" | cmp -s - "$REPO/emu/jtcores-patches/$name"
+    if git -C "$SRC" format-patch --stdout --no-signature -1 "$sha" | cmp -s - "$REPO/emu/jtcores-patches/$name"
     then ok "3.$i $name == format-patch -1 $(echo "$sha" | cut -c1-8)"
     else bad "3.$i $name drifted from commit $(echo "$sha" | cut -c1-8)"; fi
     i=$((i + 1))

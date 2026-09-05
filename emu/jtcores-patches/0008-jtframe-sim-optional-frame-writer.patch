@@ -86,6 +86,3 @@ index ab4139636..184d76b52 100644
              } else {
                  cnth[0]++;
                  if( game.LVBL!=0 ) cnth[1]++;
--- 
-2.50.1 (Apple Git-155)
-

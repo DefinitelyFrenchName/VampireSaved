@@ -1601,6 +1601,3 @@ index 000000000..5a3bef330
 +assign bank = { wide_en & table_y[12], table_y[14:13] };
 +
 +endmodule
--- 
-2.50.1 (Apple Git-155)
-

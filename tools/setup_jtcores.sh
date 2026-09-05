@@ -98,7 +98,7 @@ for name in $PATCH_NAMES; do
         echo "the fork has fewer commits than PATCH_NAMES lists (missing $name)" >&2
         exit 1
     fi
-    git -C "$SRC" format-patch --stdout -1 "$sha" > "$REPO/emu/jtcores-patches/$name"
+    git -C "$SRC" format-patch --stdout --no-signature -1 "$sha" > "$REPO/emu/jtcores-patches/$name"   # --no-signature (14z-133b): the trailer names the generating git ("2.50.1 (Apple Git-155)"), so a byte-for-byte twin failed on every other git
     i=$((i + 1))
 done
 if [ -n "$(git -C "$SRC" rev-list --reverse "$UPSTREAM_TAG_SHA..$PINNED" | sed -n "${i}p")" ]; then

@@ -150,6 +150,3 @@ index e1e674424..082345849 100644
          if( act ) begin
              if( sdram_a == row ) begin
                  cur <= cur + 1;
--- 
-2.50.1 (Apple Git-155)
-

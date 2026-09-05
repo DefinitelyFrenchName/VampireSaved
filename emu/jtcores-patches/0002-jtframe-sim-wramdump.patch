@@ -133,6 +133,3 @@ index 3595ae4ce..0901d4103 100644
  #endif
              if( frame_cnt == _DUMP_START && !dump_ok ) {
                  dump_ok = 1;
--- 
-2.50.1 (Apple Git-155)
-

@@ -101,6 +101,3 @@ index 0901d4103..cec143d8c 100644
                      auto col = ba_addr[k]&0x1ff;
                      auto col_inc = (col+1) & ~burst_mask;
                      col &= burst_mask;
--- 
-2.50.1 (Apple Git-155)
-

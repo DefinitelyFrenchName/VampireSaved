@@ -71,6 +71,3 @@ index 584647366..f9af9b4cc 100644
          v >>= 4;    // directions:
          // ~0xf, not 0xf0: keep EVERY button bit the port has. joystick1 is
          // [9:0] and active low, so masking to 8 bits asserts buttons 5 and 6.
--- 
-2.50.1 (Apple Git-155)
-

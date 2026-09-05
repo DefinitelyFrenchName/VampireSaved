@@ -43,6 +43,3 @@ index 4b3dc1b23..9dbe3cfc4 100644
  		<year>1997</year>
  		<manufacturer>Capcom</manufacturer>
  		<rom name="vm3j.03d" size="524288" crc="2acc5d6d" sha1="c1f1e1c7ae017564c975a12da740ed983ad3a0ee" region="maincpu" offset="0"/>
--- 
-2.50.1 (Apple Git-155)
-

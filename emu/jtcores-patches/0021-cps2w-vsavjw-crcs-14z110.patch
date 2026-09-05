@@ -44,6 +44,3 @@ index b108af5c1..9feeeada0 100644
  		<rom name="vsw.43" size="524288" crc="504bf849" sha1="13a184ec9e176371808938015111f8918cb4df7d" region="maincpu" offset="500000"/>
  		<rom name="vsw.44" size="524288" crc="ceb1784e" sha1="739ad1d33c279d69588cfe8e184ce49ab150684c" region="maincpu" offset="580000"/>
  		<rom name="vm3.13m" merge="vm3.13m" size="4194304" crc="dd2551ff" sha1="969485a0d225d15e5d04b19c9fd12e609b56f712" region="gfx" offset="0"/>
--- 
-2.50.1 (Apple Git-155)
-

@@ -407,7 +407,8 @@ RWCPP
             || bad "11 _exit() children perturbed the read stream ($r_hard) — the fork-commit-9 fix does not hold"
         [ "$b_soft" -gt 0 ] \
             && ok "11c control fired: exit() children REWIND the shared read offset ($b_soft backward steps; the parent ended at line $(echo "$r_soft" | awk '{print $2}') of 3000)" \
-            || bad "11c CONTROL DID NOT FIRE: exit() children did not rewind — re-derive the mechanism before trusting the gotcha"
+            || { if [ "$(uname)" = Darwin ]; then bad "11c CONTROL DID NOT FIRE: exit() children did not rewind — re-derive the mechanism before trusting the gotcha"
+                 else echo "  note 11c: on this libc ($(uname)) exit() children do NOT rewind the shared read offset, so section 11 cannot discriminate here — the rewind is the macOS-libc mechanism measured 14z-107 (7); the _exit() fix holds on both, and the control stays fatal where the mechanism exists (14z-133b, first CI run on Linux)"; fi; }
     else
         echo "  note: the rewind ground-truth program did not build — check 11 not run"
     fi
