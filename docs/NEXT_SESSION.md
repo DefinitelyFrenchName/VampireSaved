@@ -55,6 +55,13 @@
 > ##
 > ## # ALSO OPEN
 > ##
+> ## * **TWO BACKLOG ITEMS (maintainer, 2026-09-05), recorded as DIRECTION in
+> ##   STATE "Decisions pending" (top): (1) a level-0 skill split — what in
+> ##   [CPE]/[CPH]/[MSC] is transferable to MAME/FBNeo or MiSTer work that is
+> ##   not CPS-2; (2) a GENERIC, REUSABLE TEST HARNESS extracted from this
+> ##   project's rules and rulings (CLAUDE.md included), as a separate thing,
+> ##   then its skill. Neither scheduled; both wait behind the field test and
+> ##   the release.
 > ## * **B2** — the merged registry row + re-pointing the three legacy-oracle
 > ##   gates. Deferred by ruling; B1 (the dual-key resolver) IS SHIPPED.
 > ## * **STATE.md is ~210 KB** against ~150 KB. The 14z-131 group rolled early

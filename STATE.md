@@ -367,6 +367,63 @@ what a triage is looking at, so those are where the thinking time goes.
 
 ## Decisions pending (human)
 
+- **TWO BACKLOG ITEMS, RECORDED AS DIRECTION (maintainer, 2026-09-05, 14z-133b)
+  — nothing scheduled; both are multi-session and wait behind the field test
+  and the release.** In the maintainer's words:
+  **(1) A HIGHER-LEVEL SKILL SPLIT FOR EMULATION AND MiSTer.** *"for skills and
+  documentation, look if there an additional split for both emulation and
+  MiSTer at the highest level. Namely: are there skills transferable for
+  MiSTer or MAME/FBNeo projects that are not necessarily CPS-II based."*
+  What exists to start from: the six in-tree skills are cut by the
+  `docs/README.md` question ("would this still be true if we abandoned the
+  roster hack?") into platform / game / port, and the platform pair is
+  CPS-2-SCOPED by name (`cps2-emulation` [CPE], `cps2-hardware` [CPH],
+  `mister-cps2-wide-core` [MSC]); the only board-agnostic skills on this
+  machine are the SMS-era `romhacking-methodology` and `snes-romhacking`,
+  which live OUTSIDE this repo. The candidate cut is one question up: "would
+  this still be true if the board were not CPS-2?" — e.g. MAME/FBNeo AS
+  INSTRUMENTS (what -debug, breakpoints, write taps and Lua observe and miss;
+  CRC-vs-name member resolution; the rompath chain; determinism and the
+  sandbox; two-implementation comparison at anchors) and jtframe/MiSTer AS A
+  PLATFORM (the Verilator lane and its instrument traps, SDRAM tiers, MRA
+  generation by CRC, the fitter seed lottery, the separate-core mechanism).
+  Method: walk every [CPE]/[CPH]/[MSC] rule and classify it CPS-2-specific
+  or transferable; the transferable ones become two new level-0 skills the
+  CPS-2 ones then SIT ON, exactly as `mister-vampire-saved` sits on
+  `mister-cps2-wide-core`. `tools/checkskills.py` and the anchor census are
+  the enforcement, as for every skill so far (`docs/project/skills_scope.md`
+  is the record of the last cut). Cost: T2-T3, one to two sessions.
+  **(2) A GENERIC, REUSABLE TEST HARNESS — extracted, then its skill.** *"go
+  through all our documentation and rules and rulings and principles
+  regarding our test harness (including files up to CLAUDE.md) and extract
+  the harness from the specificities of this project. The goal is not to
+  replace the custom harness of this project but to create a separate, more
+  generic one, able to be reused in other projects, especially such
+  black-box adjacent projects. Then after that is done, distill the skill
+  that goes with that generic harness."* What exists to start from, all of
+  it project-shaped today: CLAUDE.md §4 (the oracle-replay method, the
+  frozen expectation classes, dual-emulator agreement at anchors, the
+  persistent-suite doctrine, verdict logic itself tested, recordings before
+  theories) and §5 (retraction discipline, bug archaeology, the
+  anti-hyperfocus checkpoint); `docs/project/oracle_classes.md` (the class
+  spec of record); `docs/project/gate_scoping_method.md` [VSP-167..174];
+  `tests/run_all_static.sh` / `run_all_emulator.sh` (SKIP is not PASS,
+  anti-orphan registries both ways, prereq lane first, cadence and scope
+  columns, placeholders); `tests/expected/PROVENANCE.md` and its evidence
+  classes; the fingerprint/registry dispatch with the dual key; the
+  header-defaults and build-ref-rot locks; the must-fire-control convention
+  and `tests/lib/shadow_tools.sh`; the generated gate index and gotcha index
+  with their `--check` modes; the replay format and the write-tap /
+  frame-dump instruments. The extraction question for every piece is the
+  same one the docs use, asked of the HARNESS: "would this still be true if
+  the thing under test were not this ROM, not CPS-2, not even a game?" —
+  what survives is the generic harness (a separate repository or a
+  top-level directory with no dependency on `build/manifest` or the atlas),
+  what does not stays here. Deliverable order, in the maintainer's words:
+  the harness FIRST, the skill AFTER (a skill distils something that
+  exists). Not to be confused with a rewrite of this project's harness,
+  which stays as it is. Cost: T3, several sessions; the skill one more.
+
 - **~~WHERE A MiSTer ARTIFACT SHOULD NAME THE MERGED BUILD IT CARRIES~~ DECIDED
   (maintainer, 2026-09-05, 14z-133b): (a) + (c); (b) REFUSED OUTRIGHT — *"I
   absolutely don't want the mark in the MRA name so first and third is
