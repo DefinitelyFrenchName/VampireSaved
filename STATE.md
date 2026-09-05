@@ -365,8 +365,12 @@ what a triage is looking at, so those are where the thinking time goes.
   the M16 release run was in flight, in a worktree ("If item 2 does not
   jeopardize anything ongoing you have my blessing"): `mame-fbneo-instruments`
   `[MFI-1..46]` and `mister-jtframe-core` `[MJC-N]`, 109 of 145 CPS-2 rules
-  lifted with their numbers, every old ID kept as a redirect, three decisions
-  open to veto in `docs/project/skills_scope.md` §7; (2) still waits.** In the
+  lifted with their numbers, every old ID kept as a redirect; the three
+  decisions in `docs/project/skills_scope.md` §7 RULED accepted the same day
+  with one addition — a self-contained GUIDE.md per level-0 skill and a
+  self-contained skill for other projects — DONE: `tools/gen_skill_guide.py`
+  GENERATES the guide from the anchored paragraphs, `test_skill_guides` keeps
+  it current, the skill directory is the portable unit; (2) still waits.** In the
   maintainer's words:
   **(1) A HIGHER-LEVEL SKILL SPLIT FOR EMULATION AND MiSTer — EXECUTED 14z-134.** *"for skills and
   documentation, look if there an additional split for both emulation and

@@ -118,6 +118,12 @@ test_checkdocs
 # forbids anchors in `*_history.md` twins. tools/doc_anchor_census.py; four
 # must-fire controls. ROM-free, ~1 s.
 test_doc_anchor_census
+# 14z-134: the level-0 skills' GUIDE.md (SKILL.md's human rendition — each
+# rule with the incident paragraph it is anchored to) is GENERATED and this
+# is its --check; fails on a hand edit, a changed rule or a changed paragraph
+# until regenerated. tools/gen_skill_guide.py; three must-fire controls.
+# ROM-free, ~1 s.
+test_skill_guides
 # 14z-122: every hand-written doc's SHAPE is declared (docs/doc_shape.tsv:
 # REFERENCE/REGISTER/LOG/HIST/ORIENT/INDEX/GENERATED/EXEMPT/PENDING) and
 # enforced — no session-shaped header may return to a REFERENCE doc, history

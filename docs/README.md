@@ -89,7 +89,10 @@ points above.
   restates it; since 14z-134 two LEVEL-0, board-agnostic skills beneath the
   CPS-2 pair: `mame-fbneo-instruments` `[MFI-N]` and `mister-jtframe-core`
   `[MJC-N]`, each lifted rule keeping its number and the CPS-2 skill keeping
-  the old ID as a redirect; plan and boundaries in
+  the old ID as a redirect; each level-0 directory is SELF-CONTAINED —
+  `SKILL.md` + a GENERATED `GUIDE.md` (the rule with the incident paragraph
+  it is anchored to, `tools/gen_skill_guide.py`, gate `test_skill_guides`) —
+  and is what you copy to another project; plan and boundaries in
   `docs/project/skills_scope.md`, the level-0 cut in its §7).
   Skill = the laws and traps; docs = the facts. Every rule is anchored
   `**[PFX-N]**` in the doc paragraph it distils and `tools/checkskills.py`

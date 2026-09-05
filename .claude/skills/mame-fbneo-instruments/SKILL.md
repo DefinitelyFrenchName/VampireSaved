@@ -5,14 +5,19 @@ description: Hard rules for using MAME and FBNeo as MEASURING INSTRUMENTS on any
 
 # MAME and FBNeo as instruments (level 0, board-agnostic)
 
-Agent-facing rules, IDs `[MFI-NN]`, each ANCHORED `**[MFI-NN]**` at the
-paragraph of `docs/platform/gotchas.md`, `docs/project/gotchas.md`, the
-extended-profile spec or `HANDOFF.md` it distils — the same paragraph that
-anchors the level-1 rule it LIFTS — and locked by `tools/checkskills.py`.
-**Numbering is deliberate: `MFI-N` for N ≤ 42 lifts `[CPE-N]` one level
-down, and `MFI-43..46` lift `[CPH-1]`, `[CPH-12]`, `[CPH-13]`, `[CPH-18]`;
-the level-1 skills named in the frontmatter keep each old ID as a redirect,
-so every citation of the old number still resolves.** The theme, paid for on one board and true on
+Agent-facing rules, IDs `[MFI-NN]`. **This directory is SELF-CONTAINED and
+portable: `SKILL.md` is the rules, `GUIDE.md` beside it is the human
+rendition — the same rules with the INCIDENT that taught each one — and the
+pair is what you copy into `~/.claude/skills/` on any project that drives
+MAME or FBNeo.** In the originating project (an arcade romhack on a 68k
+board) each rule is ANCHORED `**[MFI-NN]**` at the documentation paragraph
+it distils — the same paragraph that anchors the board-level rule it LIFTS
+— locked by that project's `tools/checkskills.py`, and the guide is
+GENERATED from those paragraphs. **Numbering is deliberate: `MFI-N` for
+N ≤ 42 lifts `[CPE-N]` one level down, and `MFI-43..46` lift `[CPH-1]`,
+`[CPH-12]`, `[CPH-13]`, `[CPH-18]`; the level-1 skills named in the
+frontmatter keep each old ID as a redirect, so every citation of the old
+number still resolves.** The theme, paid for on one board and true on
 every board these two emulators run: **an emulator reports success while
 measuring something else.** Every rule below is a way an instrument lied
 while looking healthy, and what proves it did not. The general RE

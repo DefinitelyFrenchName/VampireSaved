@@ -5,13 +5,19 @@ description: Hard rules for extending ANY jotego jtframe arcade core on MiSTer i
 
 # jtframe cores on MiSTer — the platform (level 0, board-agnostic)
 
-Agent-facing rules, IDs `[MJC-NN]`, each ANCHORED `**[MJC-NN]**` at the
-paragraph of the project documentation it distils — the same paragraph that
-anchors the level-1 rule it LIFTS — and locked by `tools/checkskills.py`,
-which also asserts this file names no board, game or build, and that every
-number quoted here appears in a LOG (`docs/platform/mister.md`,
-`docs/project/mister_map.md`, `docs/project/mister_fit.md`, the gotchas,
-`release_format.md`) and never only in a synthesis. **Numbering is
+Agent-facing rules, IDs `[MJC-NN]`. **This directory is SELF-CONTAINED and
+portable: `SKILL.md` is the rules, `GUIDE.md` beside it is the human
+rendition — the same rules with the INCIDENT that taught each one — and the
+pair is what you copy into `~/.claude/skills/` on any project that extends
+a jtframe core.** In the originating project (an arcade romhack on a 68k
+board, with an extended core of its own) each rule is ANCHORED `**[MJC-NN]**`
+at the documentation paragraph it distils — the same paragraph that anchors
+the board-level rule it LIFTS — and locked by that project's
+`tools/checkskills.py`, which also asserts this file names no board, game or
+build, and that every number quoted here appears in a LOG (that project's
+`docs/platform/mister.md`, `docs/project/mister_map.md`,
+`docs/project/mister_fit.md`, the gotchas, `release_format.md`) and never
+only in a synthesis; the guide is GENERATED from those paragraphs. **Numbering is
 deliberate: `MJC-N` lifts `[MSC-N]` one level down; the gaps are the
 board-specific rules that stay in the level-1 skill named in the
 frontmatter, and that skill keeps each lifted ID as a redirect so every
