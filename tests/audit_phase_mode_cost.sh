@@ -67,10 +67,18 @@ if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
 
-REF="${REF_BUILD:-build/m5_wide}"          # donovan-m3a, the frozen reference
+# THE REFERENCE IS BUILT FROM THE CURRENT MANIFESTS WITHOUT THE LATCH
+# (14z-133b). It used to be build/m5_wide = donovan-m3a, the 14z-64 freeze,
+# whose registry row is commented out: legacy behaviour has legitimately
+# moved many times since (the 14z-91 walker relocation, #104's capture rows,
+# #99's AI rows), so ~90% of legacy frames differed for reasons that had
+# nothing to do with the latch — RED 14z-128 on a hollow symptom. Now the
+# ONLY difference between the two legs is `latch_mode = "phase"`. REF_BUILD=
+# still overrides for a deliberate comparison.
+REF="${REF_BUILD:-}"
 WIDE_ZIP="${WIDE_ROMSET:-$PWD/build/wide0/rompath/vsavjw.zip}"
-if [ ! -d "$REF/rompath" ] || [ ! -x "$MAME_BIN" ] || [ ! -f "$WIDE_ZIP" ]; then
-    echo "SKIP: need $REF, the WIDE MAME binary, and a WIDE overlay romset."
+if [ ! -x "$MAME_BIN" ] || [ ! -f "$WIDE_ZIP" ]; then
+    echo "SKIP: need the WIDE MAME binary and a WIDE overlay romset."
     echo "      python3 tools/build_wide_romset.py \"\$ROMDIR\" build/wide0/rompath \\"
     echo "              --qsound 2 --gfx 4 --prg 4"
     exit 0
@@ -95,6 +103,16 @@ tools/build_donovan.sh 6 "$WORK/phase" > "$WORK/build.log" 2>&1 || {
     echo "  FAIL: phase build errored"; tail -15 "$WORK/build.log"; exit 1; }
 echo "  ok: built (fingerprint differs from the reference BY DESIGN — the"
 echo "      phase gate is 12 bytes of added code)"
+if [ -z "$REF" ]; then
+    echo "== build the REFERENCE from the same manifests WITHOUT the latch =="
+    KEY_SET=vsavj TENANT_MANIFEST=build/manifest/donovan.toml TENANT_CHAR=0x13 \
+    WIDE_ROMSET="$WIDE_ZIP" \
+    GEN_FLAGS="--allow-plausible --tripwire-open --profile cps2-wide-v1" \
+    tools/build_donovan.sh 6 "$WORK/ref" > "$WORK/build_ref.log" 2>&1 || {
+        echo "  FAIL: reference build errored"; tail -15 "$WORK/build_ref.log"; exit 1; }
+    REF="$WORK/ref"
+    echo "  ok: reference built — the two legs differ by latch_mode only"
+fi
 
 SHIM="$(sed -n 's/^code *0x0*\([0-9a-f]*\) init shim .*/\1/p' \
         "$WORK/phase/patch/patch_notes_fragment.md" | head -1)"

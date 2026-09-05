@@ -27,7 +27,8 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 . "$REPO/tests/lib/m2a_common.sh"
-WORK="$(mktemp -d)"
+WORK="$(mktemp -d)"   # the stage build lives HERE (14z-133b): build/donovan was an M2a-era dir the
+                      # build-dir policy pruned around, and pack_build.sh rightly refused an empty prg/ (RED 14z-128)
 trap 'rm -rf "$WORK"' EXIT
 fail=0
 
@@ -39,12 +40,12 @@ fail=0
 PICK_DIVERGE=1080
 
 # --- build ---------------------------------------------------------------
-ROMDIR="$ROMDIR" "$REPO/tools/build_donovan.sh" 3 "$REPO/build/donovan" \
+ROMDIR="$ROMDIR" "$REPO/tools/build_donovan.sh" 3 "$WORK/donovan" \
     > "$WORK/build.log" 2>&1 || { tail -15 "$WORK/build.log"; exit 1; }
 tail -2 "$WORK/build.log"
-RP="$REPO/build/donovan/rompath;$ROMDIR"
+RP="$WORK/donovan/rompath;$ROMDIR"
 
-ANIM_RANGE=$(python3 - "$REPO/build/donovan/patch/placements.json" <<'PY'
+ANIM_RANGE=$(python3 - "$WORK/donovan/patch/placements.json" <<'PY'
 import json, sys
 p = json.load(open(sys.argv[1]))["regions"]["anim"]
 print(f"{p['dst']:x} {p['dst'] + p['len']:x}")

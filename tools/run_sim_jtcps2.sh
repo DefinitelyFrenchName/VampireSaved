@@ -307,7 +307,7 @@ say() { echo "[run_sim_jtcps2] $*"; }
 # same PIN source. The `-e` gitfile rule (14z-107 (3)) and the local-first
 # fetch (14z-107 (6)) live there now.
 JTSIM_SCRATCH="$SCRATCH" "$REPO/tools/mister_mra.sh" --ensure-scratch --quiet || exit 1
-[ -f "$SCRATCH/modules/fx68k/hdl/fx68k.sv" ] || \
+[ -f "$SCRATCH/modules/fx68k/fx68k.sv" ] || \   # the module keeps fx68k.sv at its root (path fixed 14z-133b: the hdl/ form never existed, so every run re-ran the init)
     git -C "$SCRATCH" submodule update --init modules/fx68k modules/jt12 modules/jt51 modules/jteeprom modules/jtdsp16
 
 # ------------------------------------------------- 2. ROM access for the MRA tool

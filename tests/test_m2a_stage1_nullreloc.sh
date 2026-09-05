@@ -32,7 +32,8 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 . "$REPO/tests/lib/m2a_common.sh"
-WORK="$(mktemp -d)"
+WORK="$(mktemp -d)"   # the stage build lives HERE (14z-133b): build/donovan was an M2a-era dir the
+                      # build-dir policy pruned around, and pack_build.sh rightly refused an empty prg/ (RED 14z-128)
 trap 'rm -rf "$WORK"' EXIT
 fail=0
 
@@ -40,10 +41,10 @@ RELOC_BASE=000bf7a0      # hitbox_base[0x0F] after stage-1 relocation
 PICK_DIVERGE=2886        # first frame slot-0x0F pointer state hits RAM
 
 # --- build (no pipe: a generator failure must abort the gate) ------------
-ROMDIR="$ROMDIR" "$REPO/tools/build_donovan.sh" 1 "$REPO/build/donovan" \
+ROMDIR="$ROMDIR" "$REPO/tools/build_donovan.sh" 1 "$WORK/donovan" \
     > "$WORK/build.log" 2>&1 || { tail -15 "$WORK/build.log"; exit 1; }
 tail -2 "$WORK/build.log"
-RP="$REPO/build/donovan/rompath;$ROMDIR"
+RP="$WORK/donovan/rompath;$ROMDIR"
 
 # --- 1. live effect ------------------------------------------------------
 DUMPS="3600:ff8460-ff8464" MAME_ROMPATH="$RP" \

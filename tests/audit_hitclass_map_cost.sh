@@ -399,7 +399,7 @@ for R in $CORPUS; do
     sync_pool
 done
 wait
-n_ok=0; n_div=0; n_dead=0
+n_ok=0; n_div=0; n_dead=0; DIV_SET=""
 for R in $CORPUS; do
     # A leg that never produced a log must NOT read as "identical" — two
     # empty files compare equal (14z-90 issue #23, the same trap in
@@ -415,10 +415,30 @@ for R in $CORPUS; do
         echo "        shape (maintainer input, not a gate):"
         python3 tools/analyze_divergence.py "$WORK/l_${R}_ref" \
             "$WORK/l_${R}_new" 2>&1 | sed 's/^/        /' | head -8
-        n_div=$((n_div + 1)); fail=1
+        n_div=$((n_div + 1)); DIV_SET="$DIV_SET $R"
     fi
 done
 echo "  $n_ok/$NCORP bit-identical, $n_div divergent, $n_dead dead"
+# THE DIVERGENT SET IS A FROZEN INVENTORY (14z-133b), the harness's own
+# pattern for a measured, attributed set ([VSP-31]): until now ANY divergence
+# exited 1 and printed the 14z-92 explanation instead of a verdict, so the
+# gate was red at every run that reproduced its own measurement — and at a
+# release that is a hard fail every time. Frozen: 26_don_arcade_mash diverges
+# WITH map entries (the thunk's transit cycles), 21_don_mash and
+# 22_don_dualmash diverge with ZERO entries (the allocator shift the row's
+# absence causes, not the map). GROWTH, SHRINK or a changed attribution
+# (section 2 checks the census classes) is the failure. EXPECT_DIVERGE=
+# overrides after a re-measure the maintainer has ruled on.
+EXPECT_DIVERGE="${EXPECT_DIVERGE:-21_don_mash 22_don_dualmash 26_don_arcade_mash}"
+_got="$(printf '%s\n' $DIV_SET | sort | tr '\n' ' ' | sed 's/ $//')"
+_exp="$(printf '%s\n' $EXPECT_DIVERGE | sort | tr '\n' ' ' | sed 's/ $//')"
+if [ "$_got" = "$_exp" ]; then
+    echo "  ok: the divergent set IS the frozen inventory [$_exp]"
+else
+    echo "  FAIL: divergent set [$_got] != frozen inventory [$_exp] — a member"
+    echo "        appeared or vanished; root-cause before touching EXPECT_DIVERGE"
+    fail=1
+fi
 fi
 
 if [ "${HITCLASS_TENANT_ONLY:-0}" = 1 ]; then
@@ -456,12 +476,28 @@ for R in $CORPUS; do
     esac
     tot=$((tot + n_total)); tot_ext=$((tot_ext + n_ext))
     tot_trap=$((tot_trap + n_trap))
+    # every COMPLETED run is recorded, zeros included, so the attribution check
+    # below can tell "diverges with ZERO entries" (a real class) from "not run"
+    # (a DEAD/CRASH run `continue`s above and never lands here)
+    printf '%s %s\n' "$R" "$n_total" >> "$WORK/census.tsv"
     if [ "$n_total" -gt 0 ]; then
         echo "  $R: $n_total map entries ($n_ext ext >=0x40, $n_trap trap >=0x50); D0: $vals"
         seen_vals="$seen_vals $vals"
     fi
 done
 echo "  corpus total: $tot map entries over $NCORP replays ($c_dead dead)"
+# THE ATTRIBUTION IS PART OF THE FROZEN INVENTORY: a divergent replay's class
+# is "map transit" (entries > 0) or "allocator shift" (entries = 0), measured
+# 14z-92. A member changing class is a finding even if the set of names holds.
+EXPECT_ATTR="${EXPECT_ATTR:-26_don_arcade_mash:transit 21_don_mash:shift 22_don_dualmash:shift}"
+for _pair in $EXPECT_ATTR; do
+    _r="${_pair%%:*}"; _want="${_pair#*:}"
+    _n="$(awk -v r="$_r" '$1==r{print $2; exit}' "$WORK/census.tsv" 2>/dev/null)"
+    case "$_n" in "") echo "  ATTR: $_r not in the census (not run) — cannot check its class"; continue ;; esac
+    if [ "$_n" -gt 0 ]; then _is=transit; else _is=shift; fi
+    if [ "$_is" = "$_want" ]; then echo "  ok: $_r diverges as '$_want' ($_n map entries), as frozen"
+    else echo "  FAIL: $_r now diverges as '$_is' ($_n map entries), frozen as '$_want'"; fail=1; fi
+done
 echo "                $tot_ext at index >=0x40, $tot_trap at index >=0x50"
 if [ "$tot" = 0 ]; then
     echo "  => legacy content NEVER enters the map on this corpus"

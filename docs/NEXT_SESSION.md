@@ -31,8 +31,9 @@
 > ## **THE FIELD TEST.** Bundle `../mister_fieldtest_14z132/` (both MRAs run
 > ## `jtcps2w`; parts resolve 31/31 and 22/22; README lists what is new and the
 > ## two structurally impossible things not to hunt). The `.rbf` has not moved
-> ## since 14z-108 — seed 18269, verify the hash before flashing. Neither M16
-> ## nor M13 has been to the board; M12 was green twice.
+> ## since 14z-108 — seed 18269, verify the hash before flashing. **M16 IS
+> ## FIELD-GREEN (maintainer, 2026-09-05): "Field tests are green." THE RELEASE
+> ## IS ON.** M12 was green twice before it; M13 was never fielded alone.
 > ## **THE RELEASE.** `release/merged-m16/` is packaged for all three platforms.
 > ## A release run is `--scope all` PLUS `--lane mister` (hours); anything red
 > ## or skipped is a hard fail unless approved. **THREE `out`-scope rows are
@@ -43,15 +44,13 @@
 > ## full sweep re-run under it is 134/0/0/0 with the 24 instrument-changed
 > ## gates named in `build/emu_sweep_14z133b/affected_set.txt`.
 > ##
-> ## # THREAD 3 — THE MERGED/SOLO WALK, 25 -> ~16, AND ONE OPEN QUESTION
+> ## # THREAD 3 — THE MERGED/SOLO WALK: DONE (14z-133b), ALL GREEN ON MERGED
 > ##
-> ## The rule is [VSP-175] + `gate_scoping_method.md` §9. Gate 1
-> ## (`test_dualtrack`) RULED stock-vs-merged. Gates 2 + `flicker_attribution`
-> ## + `fbneo_legacy_oracle` wait on B2. FIVE gates DISSOLVED (they run `vsav2`
-> ## only). The remaining ~16 are HOMOGENEOUS: they boot our build as `vsavjw`.
-> ## **THE OPEN QUESTION, asked and not yet answered:** keep walking one gate at
-> ## a time, or re-point the ~16 defaults in one pass and let the RESULTS raise
-> ## the exceptions?
+> ## The open question answered itself: 16 gates = 271 s of runtime, so ONE
+> ## PASS. 14 defaults re-pointed to `build/m3b_merged23`, all PASS on the
+> ## merged build first time — no merged-vs-solo difference in the artifact.
+> ## `audit_tripwire_reach` already ran merged legs ("both"); the three
+> ## legacy-oracle gates still wait on B2. Rule: [VSP-175] + `gate_scoping_method.md` §9.
 > ##
 > ## # ALSO OPEN
 > ##

@@ -55,6 +55,12 @@ runs nothing at all. The only thing its `mra/` tree adds over `_Arcade/` is
 the full REGION catalogue on our core (Euro/USA/Asia/Brazil/Hispanic/Japan/
 Phoenix); no gate covers it and it would need the zips beside it.
 
+**`../mister_fieldtest_14z132/` = merged-m16 (mark M16): verdict GREEN 2026-09-05**
+(maintainer, MiSTer: *"Field tests are green"*), the bundle verified against
+`build/m3b_merged23` by hash first — `vsavjw.zip` sha1 `664b14f8…`, both MRAs
+byte-identical to `release/merged-m16/mister/`, 31/31 + 22/22 parts, pristine
+zips equal to the audited dumps, `.rbf` seed 18269 `46fc74af…` (STATE 14z-133b).
+
 **A BUNDLE IS NAMED BY THE FREEZE SET IT CARRIES, AND ITS MRA SAYS WHICH ONE
 (maintainer-ruled 2026-09-05, 14z-133b).** Forward from merged-m16 a bundle
 directory is `../mister_fieldtest_<freeze set>/` (`mister_fieldtest_merged-m17/`

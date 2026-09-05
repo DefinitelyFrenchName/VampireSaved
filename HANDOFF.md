@@ -639,8 +639,11 @@ is the BOOT NAME SCREEN, which reads **VAMPIRE SAVED** (Japan entry only; the
 title screen and the staff-roll strings are untouched by standing ruling).
 Carried from M13, which added that boot title and the `gap_be27a` bank-map
 correction — see patch_notes 14z-130 and `tests/test_capture_kf_ownership.sh`.
-**FIELD VERDICT: NOT YET — neither this freeze nor M13 has been to the board.** The
-previous freeze (merged-m14, mark M12) was FIELD VERDICT GREEN twice:
+**FIELD VERDICT GREEN (maintainer, MiSTer, 2026-09-05, 14z-133b): "Field tests are
+green" on bundle `../mister_fieldtest_14z132/` = merged-m16 / mark M16, the bundle
+verified against the build by hash the same day (STATE 14z-133b) — the release
+run follows in a fresh session.** M13 (merged-m15) was never fielded on its own;
+M16 carries it. The previous fielded freeze (merged-m14, mark M12) was FIELD VERDICT GREEN twice:
 2026-08-30 (maintainer, MiSTer, 14z-121) "all green" on bundle
 `../mister_fieldtest_14z119/`, and RE-VERIFIED GREEN 2026-09-01 "my tests on
 M14 on MiSTer are all green" — a second independent pass on the same

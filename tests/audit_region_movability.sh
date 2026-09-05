@@ -157,8 +157,21 @@ anchor = 'hole_b_regions = "aux0_4,hitbox"'
 # inject into the FIRST occurrence only.
 n = man.count(anchor)
 assert n >= 1, "manifest shape moved; this probe needs updating"
-pathlib.Path("build/manifest/_movability.toml").write_text(
-    man.replace(anchor, anchor + '\nregion_space = "%s"' % sys.argv[1], 1))
+# MERGE, never append (14z-133b): donovan.toml has carried its OWN
+# region_space since 14z-111 (x101aca=wide_ext, the #99 AI-script root), and
+# a second key made _minitoml refuse the duplicate — 4 of 6 cases died before
+# measuring (RED 14z-128). The generator reads the value as a comma list with
+# later entries winning, so the probe's assignment is appended to the FIRST
+# (the [[tenant]]) occurrence's value; dropping the existing entry would move
+# Donovan's AI script block, which is not this probe's question.
+import re
+m = re.search(r'region_space = "([^"]*)"', man)
+if m:
+    merged = 'region_space = "%s,%s"' % (m.group(1), sys.argv[1]) if m.group(1) else 'region_space = "%s"' % sys.argv[1]
+    out = man[:m.start()] + merged + man[m.end():]
+else:
+    out = man.replace(anchor, anchor + '\nregion_space = "%s"' % sys.argv[1], 1)
+pathlib.Path("build/manifest/_movability.toml").write_text(out)
 PY
     if ! KEY_SET=vsavj TENANT_MANIFEST=build/manifest/_movability.toml \
          TENANT_CHAR=0x13 WIDE_ROMSET="$WIDE_ZIP" \
@@ -223,9 +236,13 @@ import sys, pathlib, re
 man = pathlib.Path(sys.argv[1]).read_text()
 anchor = "\nid = %s\n" % sys.argv[2]
 assert man.count(anchor) == 1, "tenant id line not unique; this probe needs updating"
-assert "region_space" not in man, "manifest already sets region_space; this probe needs updating"
-pathlib.Path("build/manifest/_movability.toml").write_text(
-    man.replace(anchor, anchor + 'region_space = "%s=wide_ext"\n' % sys.argv[3], 1))
+m = re.search(r'region_space = "([^"]*)"', man)      # merge if the tenant carries one (14z-133b)
+if m:
+    merged = 'region_space = "%s,%s=wide_ext"' % (m.group(1), sys.argv[3]) if m.group(1) else 'region_space = "%s=wide_ext"' % sys.argv[3]
+    out = man[:m.start()] + merged + man[m.end():]
+else:
+    out = man.replace(anchor, anchor + 'region_space = "%s=wide_ext"\n' % sys.argv[3], 1)
+pathlib.Path("build/manifest/_movability.toml").write_text(out)
 PY
     if ! TENANT_MANIFEST=build/manifest/_movability.toml TENANT_CHAR="$3" \
          WIDE_ROMSET="$WIDE_ZIP" \

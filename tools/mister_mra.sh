@@ -135,6 +135,19 @@ if [ "${_missing:-1}" != 0 ]; then
         clone_scratch; pin_scratch || { echo "re-clone cannot reach the pin $PIN" >&2; exit 1; }
     fi
 fi
+# The scratch's SUBMODULES (modules/*, initialised by run_sim_jtcps2.sh) are
+# separate checkouts the superproject's ls-files cannot see; the reaper hollows
+# them the same way. Same heal per module: restore from its store, else re-init.
+for _m in "$SCRATCH"/modules/*/; do
+    [ -e "$_m/.git" ] || continue
+    _mm="$(git -C "$_m" ls-files --deleted 2>/dev/null | wc -l | tr -d ' ')"
+    [ "${_mm:-0}" != 0 ] || continue
+    say "submodule $(basename "$_m") is HOLLOW ($_mm files missing); restoring"
+    git -C "$_m" checkout --quiet -- . 2>/dev/null || true
+    if [ "$(git -C "$_m" ls-files --deleted 2>/dev/null | wc -l | tr -d ' ')" != 0 ]; then
+        git -C "$SCRATCH" submodule update --init --force "modules/$(basename "$_m")" >/dev/null 2>&1 || true
+    fi
+done
 if [ "$ENSURE" = 1 ]; then say "scratch clone ready at $PIN"; exit 0; fi
 
 # ------------------------------------------------------- 2. the private HOME
