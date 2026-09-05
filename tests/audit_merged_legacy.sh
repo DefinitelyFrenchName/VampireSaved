@@ -54,7 +54,7 @@
 # deviation from that table still fails loudly with a measured shape and
 # a proposed line, and is a RATIFICATION question, never a re-freeze.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] tests/audit_merged_legacy.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [MERGED_OUT=build/merged1] [MERGED_PREBUILT=0] [MERGED_EXPECT=tests/expected/merged1] tests/audit_merged_legacy.sh
 # On-demand: builds build/merged1 and runs the legs below (~2 h since
 # 14z-89 — leg (a) is a GLOB over tests/expected/merged1/*.masked and
 # that set grew 14 -> 45 .masked with the legacy-pairing promotion; it was
@@ -112,7 +112,7 @@ export MAME_BIN
 OUT="${MERGED_OUT:-build/merged1}"
 PREBUILT="${MERGED_PREBUILT:-0}"
 WIDE_ZIP="${WIDE_ROMSET:-$PWD/build/wide0/rompath/vsavjw.zip}"
-EXPECT="tests/expected/merged1"            # the merged build's OWN class table
+EXPECT="${MERGED_EXPECT:-tests/expected/merged1}"   # the merged build's OWN class table; MERGED_EXPECT= re-targets it (14z-133b: the SHIPPED set, tests/expected/merged-m16, measured with MERGED_PREBUILT=1)
 BASE_LOGS="tests/expected/vsavj/masked-v2/logs"
 
 # The three frozen extract dirs are the generator's inputs, exactly as

@@ -51,7 +51,7 @@
 > ## with it (class v6, `oracle_classes.md`: six frozen offsets, never windows;
 > ## onsets unmoved; must-fire control) — PASS on merged, PASS with zero flickers
 > ## on solo. No merged-vs-solo difference in the artifact; the field verdict
-> ## stands. The three legacy-oracle gates still wait on B2.
+> ## stands. B2 done the same sitting (below).
 > ##
 > ## # ALSO OPEN
 > ##
@@ -68,8 +68,10 @@
 > ##   project's rules and rulings (CLAUDE.md included), as a separate thing,
 > ##   then its skill. Neither scheduled; both wait behind the field test and
 > ##   the release.
-> ## * **B2** — the merged registry row + re-pointing the three legacy-oracle
-> ##   gates. Deferred by ruling; B1 (the dual-key resolver) IS SHIPPED.
+> ## * **B2 — DONE (14z-133b):** `merged-m16` registry row (whole-set key only),
+> ##   `tests/expected/merged-m16/` verified 53/53 on the shipped build, the three
+> ##   legacy-oracle gates on merged and green. The merged-vs-solo question is
+> ##   CLOSED. The release runs every legacy oracle on the build it ships.
 > ## * **STATE.md is ~210 KB** against ~150 KB. The 14z-131 group rolled early
 > ##   (three groups now); the bulk is the standing **Decisions pending**
 > ##   section, so **the `DECISIONS_HISTORY.md` pass** (ruled decisions that no

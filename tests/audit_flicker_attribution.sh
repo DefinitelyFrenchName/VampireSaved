@@ -46,7 +46,7 @@
 # fall in a window someone can name, and tools/attribute_ramdiff.py prints
 # the strays when one does not.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/don_m20] \
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged23] \
 #          tests/audit_flicker_attribution.sh
 # ~3 min (4 MAME runs, 2 legs x 2 replays).
 #
@@ -74,7 +74,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # so a gate that means to SKIP on a missing ROMDIR still does.
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/don_m20}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged23}"  # re-pointed 14z-133b: MERGED (B2, maintainer-ruled; expectation set merged-m16)  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
 # The mask comes from the BUILD's own expectation set, resolved through
 # registry.tsv (the #96 mechanism) — 14z-103: this was pinned to
