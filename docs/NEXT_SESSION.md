@@ -55,12 +55,14 @@
 > ##
 > ## # ALSO OPEN
 > ##
-> ## * **THE CI — repaired 14z-133b, NOT yet seen green on the runner.** It never
-> ##   needed ROMs: BSD `sed -i ''` in four gates, a tagless/submodule-less
-> ##   checkout, three mis-registered gates, and a hand loop that classified
-> ##   unlike the runner. It now runs `run_all_static.sh --tier portable --strict`
-> ##   (64/0/0/0 locally). If the next push is still red, the log names the gate;
-> ##   deactivation was the maintainer's conditional and the condition is false.
+> ## * **THE CI IS GREEN ON THE RUNNER — the first time ever (14z-133b, 62/0/0/0).**
+> ##   It never needed ROMs. Six classes fixed across three pushes: BSD `sed -i ''`,
+> ##   a tagless/submodule-less checkout, five mis-tiered gates, a hand loop that
+> ##   classified unlike the runner, a reference-rot gate misreading force-added
+> ##   side files, the patch series carrying its git's signature, and one libc-
+> ##   specific control made platform-aware. It runs `run_all_static.sh --tier
+> ##   portable --strict` with `FAIL_TAIL=80`. Deactivation was the maintainer's
+> ##   conditional; the condition was false.
 > ## * **TWO BACKLOG ITEMS (maintainer, 2026-09-05), recorded as DIRECTION in
 > ##   STATE "Decisions pending" (top): (1) a level-0 skill split — what in
 > ##   [CPE]/[CPH]/[MSC] is transferable to MAME/FBNeo or MiSTer work that is
