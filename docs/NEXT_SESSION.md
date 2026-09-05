@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-133 CLOSE, 2026-09-05)
+# NEXT SESSION — orientation (rewritten at the 14z-133b CLOSE, 2026-09-05)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
@@ -6,8 +6,9 @@
 > status in STATE.md.
 
 > ## **M16 IS FROZEN, PACKAGED AND PUSHED. THE EMULATOR TIER IS 134/0/0/0
-> ## GREEN (14z-133). NOTHING IS OWED TO THE HARNESS.** Commits of 14z-133 are
-> ## LOCAL — push is the maintainer's call.
+> ## GREEN TWICE (14z-133, and 14z-133b under the new runner-level MAME default,
+> ## row-by-row identical). NOTHING IS OWED TO THE HARNESS.** Commits of
+> ## 14z-133/133b are LOCAL — push is the maintainer's call.
 > ##
 > ## # WHAT 14z-133 WAS, IN ONE LINE
 > ##
@@ -37,10 +38,10 @@
 > ## or skipped is a hard fail unless approved. **THREE `out`-scope rows are
 > ## known problems** — two RED with exact diagnoses, one dead must-fire
 > ## control — and need fixing or explicit approval first.
-> ## **ONE NEW DECISION (STATE "Decisions pending", top):** ~43 stock-set gates
-> ## reach MAME unpinned and so run on Homebrew's binary under the runner —
-> ## verdict-equivalent today by `test_mame_parity`, but an instrument nothing
-> ## pins. Recommendation (c): the runner exports a default. Not swept unasked.
+> ## **DECIDED AND DONE (14z-133b):** the runner exports `MAME_BIN` = the WIDE
+> ## build unless the caller set one (`test_emulator_runner` §11 locks it); the
+> ## full sweep re-run under it is 134/0/0/0 with the 24 instrument-changed
+> ## gates named in `build/emu_sweep_14z133b/affected_set.txt`.
 > ##
 > ## # THREAD 3 — THE MERGED/SOLO WALK, 25 -> ~16, AND ONE OPEN QUESTION
 > ##
@@ -64,8 +65,8 @@
 > ## * **`audit_trap_sound`** passed the sweep — on `build/hui30`, a 14z-82c
 > ##   build we do not ship. Flagged, not walked.
 > ## * **Two normalisations must stay at the point the value is first read:**
-> ##   `$ROMDIR` (182 gates, 14z-132) and now `MAME_BIN` (per gate; a runner
-> ##   default is the pending decision). In a runner they would resolve against
+> ##   `$ROMDIR` (182 gates, 14z-132) and now `MAME_BIN` (per gate for `vsavjw`
+> ##   legs, gated; plus the runner's exported default). In a runner they would resolve against
 > ##   the changed directory / the launching shell and reproduce the bug.
 > ##
 > ## **IF A DOC IS TOUCHED:** `doc_anchor_census --check` + `checkdocshape

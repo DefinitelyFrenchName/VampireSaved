@@ -23,6 +23,24 @@ older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
   VERBATIM to `DECISIONS_HISTORY.md`** (grep there by topic; the §5
   retraction grep covers it).
 
+## Session 14z-133b — **THE RUNNER-LEVEL MAME DEFAULT, RULED, SHIPPED AND VALIDATED BY
+## THE FULL SWEEP: 134/0/0/0 AGAIN**, compared row by row with 14z-133's record — the same
+## 134 gates, no verdict differs but the three reds now green, and the 24 gates whose
+## instrument actually changed (Homebrew's `mame` -> the WIDE build) all pass. No build byte
+## moved.
+
+| | |
+|---|---|
+| opened with | the ruling: *"yes, runner-level default. Then redo the run to validate that the runner-level default is on par with expectations (unless you have a better validator)"* |
+| **what shipped** | `tests/run_all_emulator.sh` exports `MAME_BIN` = the WIDE build (`$MAME_WIDE_BIN`, default `~/.cache/vampire-saved/mame/cps2`) when the caller set nothing, keeps a caller's value, and prints `(runner default)` / `(set by the caller)` beside the instruments. `test_emulator_runner.sh` §11: default delivered, caller wins, and a MUST-FIRE control — a copy of the runner minus its `export MAME_BIN` line leaves the fake gate UNSET. All three fire |
+| **why nothing else moves, checked BEFORE the edit** | a gate's own `${MAME_BIN:-<WIDE>}` default resolves to the same binary; the parity and WIDE prereq gates pass `MAME_BIN=` per leg (SRC / REF / WIDE) and cannot see the export; no gate tests the variable for being unset (grepped, zero). Exactly ONE gate carried a different own default — `test_hui_boot`'s `${MAME_BIN:-mame}` |
+| **the affected set, named mechanically** | of the 134 freeze-sweep gates, **24 change instrument** (brew `mame` -> WIDE): the ~23 unpinned stock-set gates in the freeze scope plus `test_hui_boot`; **110 are unchanged by construction** (own WIDE default, explicit per-call pin, self-pinning `run_inp_*` wrapper, or no MAME at all). List: `build/emu_sweep_14z133b/affected_set.txt` |
+| **the validator: the full sweep, redone** | `--freeze` from a shell with `MAME_BIN` unset, so the export is what every gate saw: **PASS 134 / SKIP 0 / FAIL 0 / TIMEOUT 0**. Row by row against 14z-133's first pass: same gate set; the ONLY verdict differences are the three 14z-133 reds, now PASS (the 14z-133 (1) pins); the 24 affected gates PASS, 1125 s -> 980 s in aggregate (the source build is a little faster than Homebrew's — a curiosity, not a finding); the 110 unchanged gates 9124 s -> 9138 s, noise |
+| **what "on par with expectations" means here** | every gate that changed instrument still produces the verdict its FROZEN expectation demands — those expectations were made on Homebrew's binary, `test_mame_parity` had already shown the reference source build reproduces them bit-for-bit, and this run shows the WIDE build does too, on the 24 gates that actually consume them. The emulator superset invariant on stock content, exercised by the whole tier instead of by one gate |
+| **the better validator, on top of the run** | the run alone would say "green"; the affected-set list says WHERE the change could have shown and that it did not. The two together are the record |
+| **CLOSE** | decision marked DECIDED in place; `docs/NEXT_SESSION.md` updated; doc-touch checklist green; static tier (see the row below). Three 14z-133b-era commits total with 14z-133's two, ALL LOCAL — push is the maintainer's call |
+| **CLOSE — static tier** | `ROMDIR=... tests/run_all_static.sh` **131/0/0/0 GREEN**, tree clean during the run; emulator tier **134/0/0/0** on `build/emu_sweep_14z133b/`. Commits LOCAL |
+
 ## Session 14z-133 — **THE OWED EMULATOR RUN, PAID: 134/0/0/0 GREEN** — after a first
 ## pass of 131/3 whose three reds were ONE class and none of them the artifact. The 14z-132
 ## phase-C fix was HALF: the gate had TWO defects with ONE symptom, and the second — `MAME_BIN`
