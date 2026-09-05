@@ -7,8 +7,8 @@
 
 > ## **M16 IS FROZEN, PACKAGED AND PUSHED. THE EMULATOR TIER IS 134/0/0/0
 > ## GREEN TWICE (14z-133, and 14z-133b under the new runner-level MAME default,
-> ## row-by-row identical). NOTHING IS OWED TO THE HARNESS.** Commits of
-> ## 14z-133/133b are LOCAL — push is the maintainer's call.
+> ## row-by-row identical). NOTHING IS OWED TO THE HARNESS.** All 14z-133/133b
+> ## commits PUSHED 2026-09-05 at the maintainer's word (`0b973956`).
 > ##
 > ## # WHAT 14z-133 WAS, IN ONE LINE
 > ##
