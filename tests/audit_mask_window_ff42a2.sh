@@ -52,7 +52,7 @@
 # (git worktree at e6abaa9^; only wheel_layout_proposed.json cells.11
 # pal_row differs for the program image) — recipe in STATE 14z-88.
 #
-# Usage: ROMDIR=... MAME_BIN=<WIDE cps2> [INFO=1] [SKIP_RAW=1] \
+# Usage: ROMDIR=... [MAME_BIN=<WIDE cps2>] [INFO=1] [SKIP_RAW=1] \
 #   tests/audit_mask_window_ff42a2.sh <pre_rompath_dir> <post_rompath_dir> <replay-name>...
 # (~2-3 min per replay without INFO; the 14z-88 run covered every moved
 #  .sha1 of the three sets — 40/41/42 replays.)
@@ -73,6 +73,12 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # VARIABLE (forks set their own); only made absolute, and only if it exists,
 # so a gate that means to SKIP on a missing ROMDIR still does.
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
+# AND THE MAME BINARY IS PINNED (14z-133): every leg boots vsavjw, which only
+# the WIDE source build knows; a bare `mame` on PATH answers "Unknown system
+# 'vsavjw'" and the legs measure nothing. The Usage line used to REQUIRE
+# MAME_BIN; the default below is the same binary, so a caller who set it sees
+# no change (tests/test_mame_bin_pinned.sh locks this class).
+MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 # THIS IS AN INSTRUMENT, NOT A GATE, and with no operands there is nothing to
 # attribute — so it SKIPS rather than dying on a raw `${1:?...}` shell error

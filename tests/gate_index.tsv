@@ -209,6 +209,7 @@ tests/test_m2a_target_resolution.sh	pipeline
 tests/test_m2b_scroll3.sh	tenant
 tests/test_m2b_stage6.sh	tenant
 tests/test_m3a_reproducible.sh	pipeline
+tests/test_mame_bin_pinned.sh	runner
 tests/test_mame_determinism.sh	platform
 tests/test_mame_mirror_guard.sh	review-triage
 tests/test_mame_parity.sh	platform

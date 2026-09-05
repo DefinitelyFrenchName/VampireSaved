@@ -19,7 +19,7 @@
 #      data may simply never be read. Frame 3121 on 12_donovan_vs_cpu when
 #      this was first established.
 #
-# Usage: ROMDIR=... tests/test_phasec_image.sh
+# Usage: ROMDIR=... [MAME_BIN=...] tests/test_phasec_image.sh
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -35,6 +35,14 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # liveness check then reports "the clean leg held the victim on only 0
 # frames", which reads as a defect in the artifact and is not one.
 ROMDIR="$(cd "$ROMDIR" && pwd)"
+# AND THE MAME BINARY IS PINNED (14z-133). Section 4 is this gate's only MAME
+# leg and it runs vsavjw, which only the WIDE source build knows. run_mame.sh
+# falls back to `mame` on PATH — Homebrew's, which answers "Unknown system
+# 'vsavjw'" — so in any shell that does not export MAME_BIN (the emulator
+# runner exports none) the legs produce NO DUMPS and section 4 reports "held
+# the victim on only 0 frames". That is the M16 sweep's red of 14z-133, one
+# gate after the 14z-132 ROMDIR fix; the two defects have the same symptom.
+MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 # THE STOCK PIN IS RESOLVED FROM registry.tsv, NOT CARRIED AS A LITERAL

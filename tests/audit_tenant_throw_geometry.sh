@@ -106,6 +106,13 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # VARIABLE (forks set their own); only made absolute, and only if it exists,
 # so a gate that means to SKIP on a missing ROMDIR still does.
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
+# AND THE MAME BINARY IS PINNED (14z-133): the "ours" leg boots vsavjw, which
+# only the WIDE source build knows. run_mame.sh falls back to `mame` on PATH
+# (Homebrew's: "Unknown system 'vsavjw'"), so in a shell that does not export
+# MAME_BIN — the emulator runner exports none — the ours leg produced NO
+# DUMPS and the liveness check reported "held frames ours=0". First seen on
+# the M16 freeze sweep, the gate's first run under the runner.
+MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 BUILD="${BUILD:-build/m3b_merged23}"
 VICTIM="${VICTIM:-03}"
 ATT="${ATT:-10}"            # Phobos/Huitzil as the thrower

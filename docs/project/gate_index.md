@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**299 scripts** — 65 ci_portable, 65 ci_static, 169 emulator-tier (run by name).
+**300 scripts** — 66 ci_portable, 65 ci_static, 169 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 9 | the suite runners and their own ground truth |
+| [runner](#runner) | 10 | the suite runners and their own ground truth |
 | [docs](#docs) | 11 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 26 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 51 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -43,6 +43,7 @@ the suite runners and their own ground truth.
 | `tests/run_suite.sh` | run | emulator | MAME | the oracle replay suite (MAME side), auto-detecting runner. | 14z-94 |
 | `tests/test_emulator_runner.sh` | test | ci_portable | — | ground truth for tests/run_all_emulator.sh (14z-128). ROM-free, ~5 s. | 14z-128 |
 | `tests/test_header_defaults.sh` | test | ci_portable | — | a gate's HEADER must state the default its CODE actually uses (14z-128). ROM-free, ~2 s. | 14z-128 |
+| `tests/test_mame_bin_pinned.sh` | test | ci_portable | — | a gate that boots `vsavjw` through a MAME wrapper must PIN the MAME binary (14z-133). ROM-free, ~1 s. | 14z-133 |
 | `tests/test_shell_portability.sh` | test | ci_portable | — | a `#!/bin/sh` script must actually be POSIX sh (14z-90, GitHub issue #15). | 14z-90 |
 | `tests/test_suite_dispatch.sh` | test | emulator | emulator | ground truth for the auto-detecting runner's dispatch pieces (no emulator needed; the emulator-side behaviors they gate are proven by test_m2_repoint.sh and the suite itself): 1. build_fingerprint: vanilla rompath -> 'vsavj'; | 14z-132 |
 | `tests/test_suite_dispatch_selftest.sh` | test | ci_static | ROMDIR | ground truth for the kind->owner table in tests/test_suite_dispatch.sh (14z-90, GitHub issue #7). | 14z-90 |
@@ -90,7 +91,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_mame_parity.sh` | test | emulator | MAME, FBNeo | B5 PREREQUISITE: the pinned MAME source build must be indistinguishable from the binary that froze the oracle, BEFORE any profile patch is applied to it. | session 1 |
 | `tests/test_mame_wide.sh` | test | emulator | MAME, FBNeo | CPS-2 WIDE profile gate, MAME side (B5). | session 14z |
 | `tests/test_null_build.sh` | test | ci_static | ROMDIR | M0 acceptance: the null-patch build reproduces vanilla vsavj bit-identically from reference inputs, deterministically. | M0 |
-| `tests/test_phasec_image.sh` | test | emulator | emulator | Phase C step 2: the program image grows, and the extension is genuinely READ. | 14z-59g |
+| `tests/test_phasec_image.sh` | test | emulator | MAME | Phase C step 2: the program image grows, and the extension is genuinely READ. | 14z-59g |
 | `tests/test_phasec_spaces.sh` | test | ci_static | ROMDIR | the address-space refactor must not move a byte. | 14z-123 |
 | `tests/test_release_roundtrip.sh` | test | ci_static | ROMDIR | THE RELEASE PACKAGE GATE (14z-105). | 14z-105 |
 | `tests/test_replay_stage_census.sh` | test | ci_portable | — | FREEZE the input-staging convention of every replay-driving Lua instrument (14z-93, GitHub issue #10). No ROMs, no emulator, ~1s. | 14z-93 |

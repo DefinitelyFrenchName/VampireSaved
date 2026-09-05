@@ -2193,3 +2193,46 @@ engine) shows whatever the stack last held — measured: `RET 00ff02dc`,
 which is sound-task DATA, chased as "a RAM-resident caller" for a
 round. `GUARD_PROBE_HIST=N` gives the true path; prefer it whenever the
 callee could be branch-reached.
+
+## `run_mame.sh` on `vsavjw` with `MAME_BIN` unset runs HOMEBREW's MAME, which does not know the set — the leg silently measures nothing (paid: 14z-133, three sweep reds)
+
+`tools/run_mame.sh` execs `${MAME_BIN:-mame}`. With the variable unset that
+is `/opt/homebrew/bin/mame`, the stock 0.288 binary, which answers
+`Unknown system 'vsavjw'` and exits in under a second. Every downstream
+wrapper (`run_replay_mame.sh`, `run_replay_guarded.sh`) inherits the same
+fallback. The leg therefore produces NO dumps and no checksum stream; a gate
+with a liveness check ([VSP-137]) reports "the clean leg held the victim on
+only 0 frames" and fails honestly, and a gate without one may read the empty
+leg as a verdict. The native leg beside it (`vsav2`, `vsavj`) keeps working,
+because Homebrew's binary knows those sets — which is why the symptom looks
+like "OUR build produced no hold, native did", i.e. like a defect in the
+artifact.
+
+**When it fires: exactly when a gate runs the way a release runs it.** The
+emulator runner (`tests/run_all_emulator.sh`) prints the instruments it found
+and exports NONE of them; a gate gets the environment of whoever launched the
+sweep. A developer shell that exported `MAME_BIN` earlier in the session hides
+the defect completely — that is how `test_phasec_image`'s 14z-132 discriminator
+concluded "pinning MAME_BIN changed nothing" (it had been pinned by the shell
+all along, and the relative-`$ROMDIR` defect it found instead is REAL and has
+the same symptom), and how `audit_pyron_capture_block` and
+`audit_tenant_throw_geometry` were green standalone at 14z-131 and red on
+their first sweep. The M16 freeze sweep of 14z-133 was the first run of all
+three from a shell with the variable unset.
+
+**The rule, now enforced:** a script that boots `vsavjw` through a MAME wrapper
+carries a real pin — `MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN`,
+the idiom the other ~90 in-class gates already used. A `[MAME_BIN=...]` in the
+Usage line is documentation, not a pin. `tests/test_mame_bin_pinned.sh`
+(ci_portable, `tools/audit_mame_bin_pin.py`, must-fire control) refuses a new
+unpinned member. "Name `MAME_BIN` for a `vsavjw` run" had been an item in two
+session openers (`NEXT_SESSION_HISTORY.md`) and never a rule — the third
+payment is what made it one.
+
+**The recorded, un-gated remainder:** ~43 gates run only STOCK sets through the
+wrappers without pinning, so under the runner they use Homebrew's binary rather
+than the pinned reference build (`~/.cache/vampire-saved/mame-ref/cps2`).
+`test_mame_parity.sh` proves the reference build reproduces the frozen
+expectations bit-for-bit, so the two are verdict-equivalent today; it is an
+instrument variance ([CPE-24]) the maintainer may want closed by the same pin
+or by a runner-level export, and it is not decided here.
