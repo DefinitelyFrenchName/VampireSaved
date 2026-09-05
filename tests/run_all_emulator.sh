@@ -42,6 +42,7 @@
 #
 # Usage:
 #   ROMDIR=... tests/run_all_emulator.sh                 prereq+fbneo+mame, release scope
+#   MAME_BIN=... tests/run_all_emulator.sh              override the exported MAME default (else the WIDE build)
 #   ROMDIR=... tests/run_all_emulator.sh --scope all     + the out-of-scope rows
 #   ... --lane prereq|mame|fbneo|mister|all              default: all but mister
 #   ... --cadence romset|bitstream|all                   default: all
@@ -226,8 +227,8 @@ if [ "$CADENCE" = romset ]; then
     fi
 fi
 
-# The instruments, identified the same way. Gates resolve these themselves;
-# printing them here is what makes a log readable six months later.
+# The instruments, identified the same way. Printing them here is what makes
+# a log readable six months later.
 _MAME_W="${MAME_WIDE_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 _MAME_R="${MAME_REF_BIN:-$HOME/.cache/vampire-saved/mame-ref/cps2}"
 echo "  instruments:"
@@ -236,6 +237,21 @@ for pair in "mame-wide=$_MAME_W" "mame-ref=$_MAME_R" "fbneo=$REPO/emu/fbneo/fbne
     if [ -x "$_b" ]; then printf '    %-10s %s\n' "$_n" "$_b"
     else                  printf '    %-10s %s   MISSING\n' "$_n" "$_b"; fi
 done
+# THE MAME DEFAULT IS EXPORTED (14z-133b, maintainer-ruled option (c)). Until
+# 14z-133 this runner exported NOTHING, so a gate that reaches
+# tools/run_mame.sh without pinning MAME_BIN ran `mame` on PATH — Homebrew's
+# stock binary: "Unknown system 'vsavjw'" for a WIDE leg (the three M16
+# sweep reds), and a different instrument from either pinned build for the
+# ~43 stock-set gates. A developer shell that had exported the variable hid
+# both. The runner now hands every gate the WIDE build unless the CALLER set
+# one — a gate's own `${MAME_BIN:-...}` default therefore resolves to the same
+# binary it always did, an explicit per-call MAME_BIN= (the parity and WIDE
+# prereq gates) is untouched, and a caller's value wins. Ground truth:
+# tests/test_emulator_runner.sh section 11.
+if [ -z "${MAME_BIN:-}" ]; then MAME_BIN="$_MAME_W"; _mame_from="runner default"
+else                            _mame_from="set by the caller"; fi
+export MAME_BIN
+printf '    %-10s %s   (%s)\n' "MAME_BIN" "$MAME_BIN" "$_mame_from"
 command -v timeout >/dev/null 2>&1 || command -v gtimeout >/dev/null 2>&1 || {
     echo "  note: no timeout(1) — gates will run unbounded"; }
 TIMEOUT_BIN="$(command -v timeout 2>/dev/null || command -v gtimeout 2>/dev/null || true)"

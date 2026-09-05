@@ -341,8 +341,17 @@ what a triage is looking at, so those are where the thinking time goes.
 
 ## Decisions pending (human)
 
-- **THE UNPINNED STOCK-SET GATES — WHICH MAME INSTRUMENT DO THEY RUN ON UNDER
-  THE RUNNER? (14z-133, found by the class measurement behind the three M16
+- **~~THE UNPINNED STOCK-SET GATES — WHICH MAME INSTRUMENT DO THEY RUN ON UNDER
+  THE RUNNER?~~ DECIDED (maintainer, 2026-09-05, 14z-133b): OPTION (c), THE
+  RUNNER-LEVEL DEFAULT — *"yes, runner-level default. Then redo the run to
+  validate that the runner-level default is on par with expectations."*
+  SHIPPED the same session: `run_all_emulator.sh` exports `MAME_BIN` = the
+  WIDE build unless the caller set one, prints which applied beside the
+  instruments, and `test_emulator_runner.sh` §11 locks it (default delivered,
+  caller wins, must-fire control with the export line removed). Validation =
+  the full freeze sweep re-run under the default, compared row by row with
+  14z-133's green run, plus the affected set named mechanically — result in
+  STATE 14z-133b. (14z-133, found by the class measurement behind the three M16
   sweep reds; maintainer's call, no gameplay surface.)** `tools/run_mame.sh`
   execs `${MAME_BIN:-mame}`, and `tests/run_all_emulator.sh` exports no
   `MAME_BIN` (it prints the instruments it found and leaves the environment

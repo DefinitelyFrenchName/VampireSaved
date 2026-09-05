@@ -309,6 +309,40 @@ if missing:
 print(f"  ok: {len(rows)} registry rows, all well-formed, no duplicates")
 PY
 
+echo "11. the runner EXPORTS the WIDE MAME default, and a caller's MAME_BIN wins (14z-133b)"
+# Until 14z-133 the runner exported nothing: an unpinned gate ran `mame` on
+# PATH (Homebrew's — three M16 sweep reds on "Unknown system 'vsavjw'"). Now
+# the runner hands every gate the WIDE instrument unless the caller set one.
+printf '#!/bin/sh\necho "mame_bin=${MAME_BIN:-UNSET}"\nexit 0\n' > "$FR/tests/g_mamebin.sh"
+chmod +x "$FR/tests/g_mamebin.sh"
+reg "$(row g_mamebin mame release - '')"
+out11a="$( (unset MAME_BIN; MAME_WIDE_BIN="$T/fake_wide" run --lane mame --only g_mamebin --log "$T/l11a") )"
+if grep -q "mame_bin=$T/fake_wide" "$T/l11a/g_mamebin.log" 2>/dev/null \
+   && printf '%s' "$out11a" | grep -q "MAME_BIN.*(runner default)"; then
+    ok "unset by the caller -> the gate receives the WIDE instrument, and the log says 'runner default'"
+else
+    fail "runner default not delivered: $(grep mame_bin "$T/l11a/g_mamebin.log" 2>/dev/null)"
+fi
+out11b="$( MAME_BIN="$T/caller_mame" MAME_WIDE_BIN="$T/fake_wide" run --lane mame --only g_mamebin --log "$T/l11b" )"
+if grep -q "mame_bin=$T/caller_mame" "$T/l11b/g_mamebin.log" 2>/dev/null \
+   && printf '%s' "$out11b" | grep -q "MAME_BIN.*(set by the caller)"; then
+    ok "set by the caller -> the caller's value wins, and the log says so"
+else
+    fail "caller's MAME_BIN not honoured: $(grep mame_bin "$T/l11b/g_mamebin.log" 2>/dev/null)"
+fi
+# MUST-FIRE CONTROL: a copy of the runner with the export removed must leave
+# the gate UNSET — so the assertion above depends on the export, not on the
+# fakerepo's environment.
+sed '/^export MAME_BIN$/d' "$FR/tests/run_all_emulator.sh" > "$FR/tests/run_all_emulator_noexport.sh"
+(cd "$FR" && unset MAME_BIN && ROMDIR="$T/roms" MERGED=build/fake_merged MAME_WIDE_BIN="$T/fake_wide" \
+    sh tests/run_all_emulator_noexport.sh --lane mame --only g_mamebin --log "$T/l11c" >/dev/null 2>&1) || true
+if grep -q "mame_bin=UNSET" "$T/l11c/g_mamebin.log" 2>/dev/null; then
+    ok "control fires: without the export line the gate reports UNSET"
+else
+    fail "control did not fire: $(grep mame_bin "$T/l11c/g_mamebin.log" 2>/dev/null)"
+fi
+rm -f "$FR/tests/run_all_emulator_noexport.sh" "$FR/tests/g_mamebin.sh"
+
 echo
 [ "$rc" = 0 ] && echo "PASS: run_all_emulator.sh classifies every ground-truth case correctly" \
               || echo "FAIL: see above"
