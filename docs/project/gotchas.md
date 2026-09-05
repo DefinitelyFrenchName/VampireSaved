@@ -746,7 +746,7 @@ blind reruns this session). Symptom to recognize: rc=3 +
 FileNotFoundError on the first expected dump.
 
 ## Sound is invisible to every RAM and pixel gate — it needs its own
-**[CPE-36]** The masked legacy gate, the field oracles and the pixel menu gates were
+**[CPE-36]** **[MFI-36]** The masked legacy gate, the field oracles and the pixel menu gates were
 ALL green while Donovan was completely silent, and equally green when a
 sound path was wired to vsavj's music-track id range (the round-2
 "214P plays music" bug). Sound state lives in a ring the gates mask as
@@ -2894,7 +2894,7 @@ combat audits (timeout/downwin/throws/down_attack) carry that refusal.
 
 ## THE INSTRUMENT PROTOCOL (adopted 14z-107 (11), maintainer-directed)
 
-**[MSC-52]** **Paid for six times in one arc, and the class is older than the arc** (see
+**[MSC-52]** **[MJC-52]** **Paid for six times in one arc, and the class is older than the arc** (see
 "half the Lua instruments stage inputs one frame off" and "success while the
 instrument was not the one being claimed", both above). The maintainer's
 direction, 2026-08-24: tighten how agent-driven instrumentation works, choose
@@ -2963,7 +2963,7 @@ vanilla; Donovan after the M2 port)" — accurate about its own era, on a tree
 now many generations past M2. Build-dependence was documented; the reader
 generalised anyway.
 
-**[MSC-56]** **The rule.** This is the sibling of "identify moves by measured EFFECTS,
+**[MSC-56]** **[MJC-56]** **The rule.** This is the sibling of "identify moves by measured EFFECTS,
 never the script's input name" (14z-102), one level up: **an artifact whose
 meaning depends on the build is a CLAIM about the build, and needs asserting
 like any other.** A replay named for a character is exactly as trustworthy as
@@ -2980,7 +2980,7 @@ tenant one) and `tests/test_select_arrays.sh:85`, which says in words
 
 ## `pgrep -f` WAITERS MATCH THEMSELVES AND NEVER EXIT (paid: 2026-08-24, 14z-107, four times in one task)
 
-**[MSC-55]** `until ! pgrep -f "<pattern>"; do sleep 30; done` **never terminates.** The
+**[MSC-55]** **[MJC-55]** `until ! pgrep -f "<pattern>"; do sleep 30; done` **never terminates.** The
 shell running the loop has the pattern in its OWN command line, so `pgrep -f`
 finds it, and the waiter waits for itself forever. Long MiSTer simulation runs
 are exactly where this is reached for, and exactly where an unbounded hang is

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""checkskills.py — lock the two MiSTer skills to the docs they distil.
+"""checkskills.py — lock the skills to the docs they distil (eight since 14z-134).
 
   python3 tools/checkskills.py            # check the tree, then self-test
   python3 tools/checkskills.py -v         # ...and list every ID and number
@@ -46,6 +46,10 @@ GAME_TOKENS = ["vsav", "vampire", "donovan", "huitzil", "phobos", "pyron", "tena
                "roster", "demitri", "jedah", "victor", "bishamon", "anita", "oboro"]
 BUILD_TOKENS = ["0xEE73", "0xFFDB", "0x8E57F0", "0x5FFF1E", "32007911",
                 "build/", "merged", "m3b_"]
+# level 0 forbids the BOARD as well: a rule that names CPS-2, its sound chip
+# or its core is level 1 ("would this still be true if the board were not
+# CPS-2?" — the same question one level up).
+BOARD_TOKENS = ["cps", "qsound", "jtcps", "vsavjw", "wide_en"]
 _MISTER_DOCS = ["docs/platform/mister.md", "docs/project/mister_core.md",
                 "docs/project/mister_map.md", "docs/project/mister_fit.md",
                 "docs/project/mister_field.md", "docs/project/cps2_wide.md",
@@ -104,6 +108,19 @@ SKILLS = {
     "CPE": dict(path=".claude/skills/cps2-emulation/SKILL.md",
                 docs=_PLATFORM_DOCS, logs=_PLATFORM_LOGS,
                 forbid=GAME_TOKENS + BUILD_TOKENS + ["manifest/", ".toml"]),
+    # LEVEL 0 (14z-134, the maintainer's backlog item "a higher-level skill
+    # split"): the rules of CPE/CPH/MSC that would still be true if the board
+    # were not CPS-2. Each lifted rule keeps its NUMBER (MFI-N lifts CPE-N,
+    # MJC-N lifts MSC-N; MFI-43..46 lift CPH-1/12/13/18) and anchors in the
+    # SAME paragraph as the rule it lifts; the CPS-2 skill keeps the old ID as
+    # a redirect so the 350+ external citations still resolve. Liftability one
+    # level up: no board name either.
+    "MFI": dict(path=".claude/skills/mame-fbneo-instruments/SKILL.md",
+                docs=_PLATFORM_DOCS, logs=_PLATFORM_LOGS,
+                forbid=GAME_TOKENS + BUILD_TOKENS + BOARD_TOKENS + ["manifest/", ".toml"]),
+    "MJC": dict(path=".claude/skills/mister-jtframe-core/SKILL.md",
+                docs=_MISTER_DOCS, logs=_MISTER_LOGS,
+                forbid=GAME_TOKENS + BUILD_TOKENS + BOARD_TOKENS),
 }
 # Cross-references `[PFX-N]` (plain, not bold, not opening a bullet) must
 # resolve to a DEFINED rule of that prefix. RH lives outside the repo.

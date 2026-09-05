@@ -12,12 +12,20 @@ lock both ways, no game/character/build names in this file, every number
 present in a LOG. The rule is the reminder; the anchored paragraph is the
 fact and the incident that paid for it. General discipline is the
 `romhacking-methodology` skill (`[RH-NN]`); what MAME and FBNeo DO to a
-probe is `cps2-emulation` (`[CPE-NN]`); the FPGA core is
-`mister-cps2-wide-core` (`[MSC-NN]`).
+probe is `mame-fbneo-instruments` (`[MFI-NN]`, board-agnostic, level 0 —
+`cps2-emulation` `[CPE-NN]` is its redirect table since 14z-134); the FPGA
+core is `mister-cps2-wide-core` (`[MSC-NN]`) on `mister-jtframe-core`
+(`[MJC-NN]`). **Four rules of this file were lifted to level 0 at 14z-134
+because they are facts about the EMULATORS' loaders, not the board** —
+byte order as the loader sees it, hash-before-name resolution, sentinel
+CRCs, region-vs-file-vs-sound-CPU layout — and stay below as redirects
+(`[CPH-1]`, `[CPH-12]`, `[CPH-13]`, `[CPH-18]` → `[MFI-43..46]`). The other
+26 are the CPS-2 board: the cipher, the gfx interleave and tile codec, the
+OBJ list, QSound, and the WIDE profile.
 
 ## A.1 Bytes, views and the encryption window
 
-- [CPH-1] **ROM FILES are little-endian word pairs; IMAGES (opcode view, data view, emulator dumps) are 68k logical order, big-endian.** Decrypting big-endian "works" (self-consistent, round-trips) and produces garbage that is deceptively half-right — byte-symmetric words survive either way. Symptom: a diff where "every other word matches" in vector/data areas. The decrypt oracle pins the convention against the emulator's opcode space; run it after touching any byte-order code.
+- [CPH-1] → lifted to level 0 as [MFI-43] (`mame-fbneo-instruments`); the anchored paragraph is unchanged.
 - [CPH-2] **The program zips store CODE encrypted; only DATA reads bypass the crypt.** Any static analysis of code — diffing against stock, disassembling, searching for an instruction pattern — uses the DECRYPTED opcode space, never the members. Data tables may be read raw from the members (with the `LOAD16_WORD_SWAP` byte order in mind).
 - [CPH-3] **PC-relative operand reads are PROGRAM-space and DECRYPTED; `(An)`-based reads are DATA-space and raw.** Pick the view by the READ MODE, not by where the table lives. Absolutizing a `(d16,PC,Dn)` read as `lea` + `(a0,dn)` reads CIPHERTEXT (an odd jump target, an address error at the first hit). Fix shape: hook an instruction BEFORE the pc-relative read and `rts` back into the untouched original.
 - [CPH-4] **Anything fetched through the opcode space must be written as CODE wherever it lands — instructions AND every pc-relatively-read table — because the cipher is address-aware**: inside the key range it re-encrypts so the CPU's decryption yields your bytes, outside it passes them through unchanged. `data` is right for An-relative and absolute reads only; embedded data inside a thunk body in crypt space must be `data` or a data read gets ciphertext. The trap has both directions.
@@ -31,8 +39,8 @@ probe is `cps2-emulation` (`[CPE-NN]`); the FPGA core is
 - [CPH-9] **Gfx simms are NOT tile-contiguous**: a tile's 32 bytes are sixteen two-byte pairs at stride 4, the even/odd word streams of each 0x80000 block feeding decoded chunks 1 MB apart. Naive contiguous slicing still MATCHES on sibling comparisons (same wrong neighbours both sides), so a sibling calibration certifies a broken method. Verify any hardware-interleaved layout against the emulator's LOADER SOURCE before bulk analysis, and fact-lock it with a test.
 - [CPH-10] **Compose a tile address the way the hardware does — `code | ((y & 0x6000) << 3)` — BEFORE dumping it, and print the composition.** Dumping the code without its bank bits compared unrelated vanilla data and "exonerated" a broken band for a session. A null result from a dump is only as good as the address that produced it: give the instrument a band that MUST differ as its negative control.
 - [CPH-11] **Within each 8-pixel half of an OBJ tile row, plane bit `i` is pixel `7-i`; the transparent pen is 15, not 0; an OBJ entry at `(x, y)` lands at screen `(x - 64, y - 16)`.** A byte round-trip proves a codec self-consistent, not hardware-correct — verify any SYNTHESIZED tile at the RENDER layer against its intended bitmap (an asymmetric glyph is what caught a 14-session mirror).
-- [CPH-12] **Both emulators resolve a ROM member by HASH before NAME, so a member carrying another member's pristine bytes SHADOWS it — silently, as a "successful" load.** A member's identity in a set is its hash. Rules: no member may carry the pristine bytes of a member the build patched (audit the romset's identity in the build); byte-identical zero-fill PLACEHOLDERS are harmless; 0xFF fill is what you get when NOTHING matches, a wrong file's bytes when something else does.
-- [CPH-13] **Descriptor CRCs: FIXED-content members carry their real CRC; VARIABLE-content members carry SENTINELS and resolve by name** — and no two variable members may share a sentinel, because the shared zero-fill CRC hash-shadows a content-bearing member onto its still-zero sibling. Print the exact descriptor rows (name/size/CRC) from the tool that writes the members.
+- [CPH-12] → lifted to level 0 as [MFI-44] (`mame-fbneo-instruments`); the anchored paragraph is unchanged.
+- [CPH-13] → lifted to level 0 as [MFI-45] (`mame-fbneo-instruments`); the anchored paragraph is unchanged.
 
 ## A.3 The OBJ sprite list
 
@@ -43,7 +51,7 @@ probe is `cps2-emulation` (`[CPE-NN]`); the FPGA core is
 
 ## A.4 QSound and the Z80 driver
 
-- [CPH-18] **A member's REGION layout is not its FILE layout, and the Z80's own address space is a THIRD thing** (split `ROM_LOAD`/`ROM_CONTINUE`; a 4-bit-masked bank register in the `$8000` window). Read the driver's load lines before deriving any file offset from an emulator address; log the DATA, not just the PC, when arbitrating a mapping; "it disassembles as garbage" is evidence of a wrong offset, not of encryption.
+- [CPH-18] → lifted to level 0 as [MFI-46] (`mame-fbneo-instruments`); the anchored paragraph is unchanged.
 - [CPH-19] **A sample window must live in ONE HALF of its 64K bank** — the DSP compares the playback pointer against `end` SIGNED, so a window straddling `0x8000` collapses to its silent loop tail after the attack. Register- and content-level A/Bs were BLIND to it: keep one gate at the OUTPUT level (a WAV capture and a per-window band comparison) when porting content into a player you do not fully model.
 - [CPH-20] **A copied sample window must keep the SOURCE offset's BYTE PARITY** — the members are stored pre-swapped and both emulators byteswap pairs at load, so an odd→even move plays every byte pair exchanged: RMS preserved, high band doubled, "PC-speaker" harshness. File-level comparison is blind (the bytes are equal, the LANES differ); the output-level checker must flag BOTH directions of a band change.
 - [CPH-21] **A sample record's `end` offset PLAYS — copy the INCLUSIVE window**, provably (native windows end at `0xFFFF`, which an exclusive bound could not express). An exclusive copy leaves one foreign byte at every record's end; where the loop tail is silence, one byte turns the sustain into an impulse train — a "pure computer beep".

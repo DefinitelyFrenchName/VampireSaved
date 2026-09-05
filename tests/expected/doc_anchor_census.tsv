@@ -76,6 +76,115 @@ CPH-27	docs/project/cps2_wide.md	Phase A measurements (2026-08-03, vanilla vsavj
 CPH-28	docs/project/cps2_wide.md	Phase B progress (proving the profile inert, one variable per build)	IN-LIST
 CPH-29	docs/project/cps2_wide.md	Governance (Rule 1 v2)	IN-LIST
 CPH-30	docs/project/cps2_wide.md	Emulator change budget (measured, not estimated)	IN-LIST
+MFI-1	docs/platform/gotchas.md	MAME `logerror` output needs `-log`, not `-verbose` (paid: 2026-07-25)	IN-LIST
+MFI-2	docs/platform/gotchas.md	MAME `-debug` perturbs multi-CPU timing — never compare its checksums to non-debug runs (paid: 2026-	IN-LIST
+MFI-3	docs/platform/gotchas.md	two -debug INSTRUMENT-grammar traps from the #103 close — both misread a measurement for a full roun	IN-LIST
+MFI-4	docs/platform/gotchas.md	MAME breakpoint logging is a SAMPLER, not an inventory	IN-LIST
+MFI-5	docs/platform/gotchas.md	Debugger stops DESYNC replay frame counting	IN-LIST
+MFI-6	docs/platform/gotchas.md	screen the replay never left (14z-63)	IN-LIST
+MFI-7	docs/platform/gotchas.md	deterministic INPUT-VIOLATIONs that look like host input (14z-110)	IN-LIST
+MFI-8	docs/platform/gotchas.md	CPS-2 — jump/handler tables need the OPCODES space (14z-71)	IN-LIST
+MFI-9	docs/platform/gotchas.md	regex rejects kills the run and prints a clean-looking zero (14z-71)	IN-LIST
+MFI-10	docs/platform/gotchas.md	on any address reports phantom hits (14z-71)	IN-LIST
+MFI-11	docs/platform/gotchas.md	value off a register snapshot attributed a write to the wrong caller (14z-76)	IN-LIST
+MFI-12	docs/platform/gotchas.md	MAME Lua write taps are silently dropped on handler re-install	IN-LIST
+MFI-13	docs/platform/gotchas.md	MAME write taps must be WORD-ALIGNED	IN-LIST
+MFI-14	docs/platform/gotchas.md	MAME Lua: WRITE taps fire, READ taps do not (14z-112, measured)	IN-LIST
+MFI-15	docs/platform/gotchas.md	host keystrokes are injected into the EMULATED controls	IN-LIST
+MFI-16	docs/platform/gotchas.md	MAME `-aviwrite` is headless-capable but uncompressed (14z-94)	IN-LIST
+MFI-17	docs/platform/gotchas.md	MAME cross-driver VIDEO_OUT checksums are NOT comparable (14z-62d)	IN-LIST
+MFI-18	docs/platform/gotchas.md	A chained rompath makes MAME a LIAR about member identity (14z-62h)	IN-LIST
+MFI-19	docs/platform/gotchas.md	MAME palette RAM ($90C000) takes Lua pokes for READBACK but not for RENDERING (14z-102)	IN-LIST
+MFI-20	docs/platform/gotchas.md	Pre-seeded from the ROM-audit round (2026-07-25, before repo existed)	IN-LIST
+MFI-21	docs/platform/gotchas.md	`git submodule add` stages the DEFAULT BRANCH, not the tag you check out	IN-LIST
+MFI-22	docs/platform/gotchas.md	MAME's build system cannot handle a SPACE anywhere in the source path	IN-LIST
+MFI-23	docs/platform/gotchas.md	MAME 0.288's OSD is SDL3 and it is found ONLY through pkg-config	IN-LIST
+MFI-24	HANDOFF.md	MAME from source — the oracle follows the profile (B5, 2026-08-03)	IN-LIST
+MFI-25	docs/platform/gotchas.md	repo's working tree — and exits 0 (paid: 2026-08-03, B5)	IN-LIST
+MFI-26	docs/platform/gotchas.md	FBNeo fresh builds need `SKIPDEPEND=1` (paid: 2026-07-25)	IN-LIST
+MFI-27	docs/platform/gotchas.md	FBNeo shared EEPROM breaks run-to-run determinism (paid: 2026-07-25, ~45min)	IN-LIST
+MFI-28	docs/platform/gotchas.md	still prints "(OK)"	IN-LIST
+MFI-29	docs/platform/gotchas.md	FBNeo's SDL frontend has NO `-rompath` — the flag is silently ignored	IN-LIST
+MFI-30	docs/platform/gotchas.md	is captured to the sandbox log	IN-LIST
+MFI-31	docs/platform/gotchas.md	SKIPPED applying the profile patch, never reverted it	IN-LIST
+MFI-32	HANDOFF.md	What exists (M0 bench, 2026-07-25)	IN-LIST
+MFI-33	docs/platform/gotchas.md	Cross-emulator replays: same inputs ≠ same content (paid: 2026-07-25, ~2h)	IN-LIST
+MFI-34	docs/platform/gotchas.md	FBNeo/MAME frame indices and object slots do not transfer — a slot-keyed tap chases a different obje	IN-LIST
+MFI-35	docs/platform/gotchas.md	The FBNeo gate never rendered a pixel — RAM checksums are blind to video	IN-LIST
+MFI-36	docs/project/gotchas.md	Sound is invisible to every RAM and pixel gate — it needs its own	IN-LIST
+MFI-37	docs/platform/gotchas.md	A state-dependent value may not be correlated ACROSS runs — serialize read and write in ONE run (14z	IN-LIST
+MFI-38	docs/platform/gotchas.md	A canary must change exactly ONE thing, or it cannot answer anything	IN-LIST
+MFI-39	docs/platform/gotchas.md	A relocation test with no negative control proves nothing	IN-LIST
+MFI-40	HANDOFF.md	If it still will not start, in order	IN-LIST
+MFI-41	HANDOFF.md	Platform / migration notes (14z-59d)	IN-LIST
+MFI-42	docs/platform/gotchas.md	TWO BUILDS CAN SHARE A PROGRAM FINGERPRINT — the merged build and its legacy-only instrument do, del	IN-LIST
+MFI-43	docs/platform/gotchas.md	CPS-2 ROM file byte order is NOT 68k logical order (paid: 2026-07-25, ~1h)	IN-LIST
+MFI-44	docs/platform/gotchas.md	emulators resolve a ROM entry by HASH before NAME	IN-LIST
+MFI-45	docs/project/cps2_wide.md	The profile	IN-LIST
+MFI-46	docs/platform/gotchas.md	A member's REGION layout is not its FILE layout — and the Z80 driver's own address space is a THIRD 	IN-LIST
+MJC-1	docs/project/mister_core.md	1. What we are building	IN-LIST
+MJC-2	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
+MJC-3	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
+MJC-4	docs/platform/mister.md	Where things are	IN-LIST
+MJC-5	docs/platform/mister.md	How the CPS-2 core is put together (read 2026-08-22)	IN-LIST
+MJC-6	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
+MJC-7	docs/project/mister_core.md	4. The one escape, and why it is the fallback	IN-LIST
+MJC-8	docs/platform/mister.md	The runtime profile gate: MRA header byte 41 (slice D1, measured 14z-107)	IN-LIST
+MJC-9	docs/platform/mister.md	The runtime profile gate: MRA header byte 41 (slice D1, measured 14z-107)	IN-LIST
+MJC-10	docs/platform/mister.md	The runtime profile gate: MRA header byte 41 (slice D1, measured 14z-107)	IN-LIST
+MJC-11	docs/platform/mister.md	The runtime profile gate: MRA header byte 41 (slice D1, measured 14z-107)	IN-LIST
+MJC-12	docs/platform/mister.md	The runtime profile gate: MRA header byte 41 (slice D1, measured 14z-107)	IN-LIST
+MJC-13	docs/project/mister_core.md	8. How the profile is switched on, and why it is a runtime bit	IN-LIST
+MJC-14	docs/project/mister_core.md	8. How the profile is switched on, and why it is a runtime bit	IN-LIST
+MJC-15	docs/project/mister_core.md	8. How the profile is switched on, and why it is a runtime bit	IN-LIST
+MJC-16	docs/platform/mister.md	The SDRAM ceiling at our pin: 64 MB is PHYSICAL (measured 14z-107)	IN-LIST
+MJC-17	docs/platform/gotchas.md	`JTFRAME_SDRAM_XL` without `JTFRAME_SDRAM_CACHE` aliases SILENTLY (14z-107)	IN-LIST
+MJC-18	docs/platform/mister.md	The SDRAM ceiling at our pin: 64 MB is PHYSICAL (measured 14z-107)	IN-LIST
+MJC-19	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
+MJC-20	docs/project/mister_map.md	5. THE MAP	IN-LIST
+MJC-22	docs/platform/gotchas.md	A CPS-2 tile code IS its SDRAM address — and the SAME ART HAS THREE SIZES (14z-107, third size added	IN-LIST
+MJC-23	docs/platform/mister.md	The per-bank SDRAM traffic profile (measured 14z-107)	IN-LIST
+MJC-24	docs/project/mister_core.md	Why bank 1 can take the load	IN-LIST
+MJC-26	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
+MJC-29	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
+MJC-30	docs/platform/mister.md	The QSound bank bit IS `dsp_ab[7]` (validated against MAME's LLE device, 14z-107)	IN-LIST
+MJC-31	docs/project/mister_map.md	Everything else `jtcps2_main.v` decodes, and whether it collides	IN-LIST
+MJC-33	docs/project/mister_core.md	8. How the profile is switched on, and why it is a runtime bit	IN-LIST
+MJC-36	docs/project/mister_core.md	11. What would break it	IN-LIST
+MJC-37	docs/platform/mister.md	Recipe: the simulation lane on macOS (measured 14z-106, works)	IN-LIST
+MJC-39	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
+MJC-40	docs/platform/gotchas.md	`JTFRAME_SIM_IODUMP` on CPS-2 dumps the EEPROM, not RAM (14z-107)	IN-LIST
+MJC-41	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
+MJC-42	docs/platform/gotchas.md	`jtsim -setname` re-downloads every run — and on CPS-2 you must download anyway (14z-107)	IN-LIST
+MJC-43	docs/platform/mister.md	The work-RAM oracle: `JTFRAME_SIM_WRAMDUMP` (measured 14z-107)	IN-LIST
+MJC-44	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
+MJC-45	docs/platform/gotchas.md	THE SIM HARNESS'S DIRECTION BITS ARE REVERSED — all four, end for end (measured in full 2026-08-24, 	IN-LIST
+MJC-46	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
+MJC-47	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
+MJC-48	docs/platform/mister.md	THE SDRAM READ PROBE: watching the core FETCH (measured 14z-107, fork commit 12)	IN-LIST
+MJC-49	docs/platform/mister.md	The cheapest proof that the profile bit is live: LOOK AT THE SCREEN	IN-LIST
+MJC-50	docs/platform/mister.md	THE SDRAM IMAGE CENSUS: reading the download back out (measured 14z-107)	IN-LIST
+MJC-51	docs/platform/gotchas.md	The Verilator SDRAM model dropped the TOP address bit — and the obvious fix was wrong (14z-107)	IN-LIST
+MJC-52	docs/project/gotchas.md	THE INSTRUMENT PROTOCOL (adopted 14z-107 (11), maintainer-directed)	IN-LIST
+MJC-53	docs/project/mister_core.md	12. The holes — what has never been tried	IN-LIST
+MJC-54	docs/platform/gotchas.md	Editing a shell script WHILE it runs corrupts the running execution (14z-107)	IN-LIST
+MJC-55	docs/project/gotchas.md	`pgrep -f` WAITERS MATCH THEMSELVES AND NEVER EXIT (paid: 2026-08-24, 14z-107, four times in one tas	IN-LIST
+MJC-56	docs/project/gotchas.md	A REPLAY'S NAME IS A CLAIM ABOUT THE BUILD (paid: 2026-08-24, 14z-107)	IN-LIST
+MJC-57	docs/platform/mister.md	3. build — the CONTROL FIRST, deliberately	IN-LIST
+MJC-58	docs/platform/gotchas.md	`xjtcore.sh` RETRIES UNTIL A SEED PASSES, SO A GREEN BUILD CERTIFIES A PLACEMENT AND NOT A DESIGN (m	IN-LIST
+MJC-59	docs/platform/gotchas.md	`xjtcore.sh` RETRIES UNTIL A SEED PASSES, SO A GREEN BUILD CERTIFIES A PLACEMENT AND NOT A DESIGN (m	IN-LIST
+MJC-60	docs/platform/gotchas.md	`xjtcore.sh` RETRIES UNTIL A SEED PASSES, SO A GREEN BUILD CERTIFIES A PLACEMENT AND NOT A DESIGN (m	IN-LIST
+MJC-61	docs/platform/gotchas.md	A jtcores BITSTREAM CARRIES A BUILD DATESTAMP, SO THE SAME SEED REBUILDS TO A DIFFERENT HASH ON A DI	IN-LIST
+MJC-62	docs/project/release_format.md	The rule	IN-LIST
+MJC-63	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107)	IN-LIST
+MJC-64	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107)	IN-LIST
+MJC-65	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107)	IN-LIST
+MJC-66	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107)	IN-LIST
+MJC-67	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107)	IN-LIST
+MJC-68	docs/platform/mister.md	HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107)	IN-LIST
+MJC-69	docs/project/mister_field.md	2. Before the board: the bundle and its control	IN-LIST
+MJC-72	docs/project/mister_core.md	12. The holes — what has never been tried	IN-LIST
+MJC-73	docs/project/mister_core.md	12. The holes — what has never been tried	IN-LIST
 MSC-1	docs/project/mister_core.md	1. What we are building	IN-LIST
 MSC-2	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST
 MSC-3	docs/platform/gotchas.md	jtframe's RTL plumbing (added 14z-107 (6), slice D1)	IN-LIST

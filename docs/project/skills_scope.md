@@ -211,3 +211,214 @@ from ~5,300 lines with heavy retraction history): A ~35, B ~45, C ~70, D ~80.
    its measurements are inline and instrument-named; the alternative
    (atlas-only) would refuse most of the subsystem laws. Veto → the pass
    moves each quoted figure into an atlas row first.
+
+---
+
+## 7. THE LEVEL-0 CUT (14z-134, 2026-09-05) — the maintainer's backlog item, executed
+
+The maintainer's direction (2026-09-05, STATE "Decisions pending"): *"look if
+there an additional split for both emulation and MiSTer at the highest level.
+Namely: are there skills transferable for MiSTer or MAME/FBNeo projects that
+are not necessarily CPS-II based."* The question of §1 asked one level up —
+**would this still be true if the board were not CPS-2?** — put to every rule
+of the three CPS-2 skills (`[CPE-1..42]`, `[CPH-1..30]`, `[MSC-1..73]`, 145
+rules). The walk was done with the release run in flight, in a worktree, and
+touched no gate the run executes.
+
+### 7.1 The result
+
+| skill | rules | LIFTED to level 0 | STAY at level 1 |
+|---|---|---|---|
+| `cps2-emulation` `[CPE]` | 42 | **42** → `mame-fbneo-instruments` `[MFI-1..42]` | 0 |
+| `cps2-hardware` `[CPH]` | 30 | 4 → `[MFI-43..46]` (`CPH-1`, `-12`, `-13`, `-18`) | 26 |
+| `mister-cps2-wide-core` `[MSC]` | 73 | **63** → `mister-jtframe-core` `[MJC-N]` | 10 |
+
+**The finding that matters: `cps2-emulation` had no CPS-2 content.** Every
+rule in it — `-debug` timing, watchpoint spaces, tap alignment, focus theft,
+hash-before-name resolution, the pinned source builds, the shared EEPROM,
+the two-implementation protocol — is a fact about MAME or FBNeo on any board.
+The CPS-2-SPECIFIC emulator facts were filed elsewhere all along: the
+loaders' shape rules (`[CPH-23]`), the reserved window's per-implementation
+reads (`[CPH-25]`), the complemented key-range word (`[MSC-32]`). The skill
+is kept as a REDIRECT TABLE rather than deleted, for the reason below.
+
+### 7.2 Three decisions, taken under stated assumptions, open to veto
+
+1. **A lifted rule KEEPS ITS NUMBER: `MFI-N` lifts `CPE-N`, `MJC-N` lifts
+   `MSC-N` (gaps where a rule stays); the four CPH rules take `MFI-43..46`.**
+   A reader maps the two without a table. Veto → renumber densely; the
+   redirect stubs make it mechanical.
+2. **Every old ID stays DEFINED in its CPS-2 skill as a one-line redirect,
+   and the doc paragraph carries BOTH anchors (`**[CPE-N]** **[MFI-N]**`).**
+   Measured before choosing: 352 plain citations of the 145 IDs live outside
+   the skill files (gate headers, `ci_emulator.tsv`, docs, both archives).
+   Renaming or deleting an ID would break every one — the same reason a
+   `14z-N` tag is never renamed ([VSP-162]). A new control in
+   `test_checkskills.sh` deletes a redirect and requires the checker to fail
+   on the orphaned anchor. Veto → move the anchors and accept the rot.
+3. **Level 0 anchors into THIS repository's docs**, like every skill so far;
+   the checker's liftability list gains the BOARD tokens (`cps`, `qsound`,
+   `jtcps`, `vsavjw`, `wide_en`). A level-0 skill copied to another project
+   travels without its checker, exactly as the SMS `romhacking-methodology`
+   does; giving each a self-contained `GUIDE.md` (the SMS shape) is the
+   natural next step if one is ever reused and is NOT done here. Veto → write
+   the guides now.
+
+Wording changed only where a rule named the board, a game figure or a
+project measurement: `pal_lut.hex` → "a `$readmemh` file the reference core
+carries", the `wide_en` wire → "one wire", `462 → 659` → "a bigger image has
+a LONGER transfer", the seed spread → "state the SPREAD and MEDIAN", QSound
+→ "a sample player that round-robins channels". Two lifted rules carry the
+14z-133b corrections their MSC originals had not caught up with (`[MJC-4]`
+the patch series is compared without the git signature; `[MJC-37]` the
+scratch clone HEALS rather than `rm -rf`).
+
+### 7.3 The classification, rule by rule
+
+| rule | verdict | where it lives now | why it stays (CPS-2-specific fact) |
+|---|---|---|---|
+| `[CPE-1]` | LIFTED | `[MFI-1]` | — |
+| `[CPE-2]` | LIFTED | `[MFI-2]` | — |
+| `[CPE-3]` | LIFTED | `[MFI-3]` | — |
+| `[CPE-4]` | LIFTED | `[MFI-4]` | — |
+| `[CPE-5]` | LIFTED | `[MFI-5]` | — |
+| `[CPE-6]` | LIFTED | `[MFI-6]` | — |
+| `[CPE-7]` | LIFTED | `[MFI-7]` | — |
+| `[CPE-8]` | LIFTED | `[MFI-8]` | — |
+| `[CPE-9]` | LIFTED | `[MFI-9]` | — |
+| `[CPE-10]` | LIFTED | `[MFI-10]` | — |
+| `[CPE-11]` | LIFTED | `[MFI-11]` | — |
+| `[CPE-12]` | LIFTED | `[MFI-12]` | — |
+| `[CPE-13]` | LIFTED | `[MFI-13]` | — |
+| `[CPE-14]` | LIFTED | `[MFI-14]` | — |
+| `[CPE-15]` | LIFTED | `[MFI-15]` | — |
+| `[CPE-16]` | LIFTED | `[MFI-16]` | — |
+| `[CPE-17]` | LIFTED | `[MFI-17]` | — |
+| `[CPE-18]` | LIFTED | `[MFI-18]` | — |
+| `[CPE-19]` | LIFTED | `[MFI-19]` | — |
+| `[CPE-20]` | LIFTED | `[MFI-20]` | — |
+| `[CPE-21]` | LIFTED | `[MFI-21]` | — |
+| `[CPE-22]` | LIFTED | `[MFI-22]` | — |
+| `[CPE-23]` | LIFTED | `[MFI-23]` | — |
+| `[CPE-24]` | LIFTED | `[MFI-24]` | — |
+| `[CPE-25]` | LIFTED | `[MFI-25]` | — |
+| `[CPE-26]` | LIFTED | `[MFI-26]` | — |
+| `[CPE-27]` | LIFTED | `[MFI-27]` | — |
+| `[CPE-28]` | LIFTED | `[MFI-28]` | — |
+| `[CPE-29]` | LIFTED | `[MFI-29]` | — |
+| `[CPE-30]` | LIFTED | `[MFI-30]` | — |
+| `[CPE-31]` | LIFTED | `[MFI-31]` | — |
+| `[CPE-32]` | LIFTED | `[MFI-32]` | — |
+| `[CPE-33]` | LIFTED | `[MFI-33]` | — |
+| `[CPE-34]` | LIFTED | `[MFI-34]` | — |
+| `[CPE-35]` | LIFTED | `[MFI-35]` | — |
+| `[CPE-36]` | LIFTED | `[MFI-36]` | — |
+| `[CPE-37]` | LIFTED | `[MFI-37]` | — |
+| `[CPE-38]` | LIFTED | `[MFI-38]` | — |
+| `[CPE-39]` | LIFTED | `[MFI-39]` | — |
+| `[CPE-40]` | LIFTED | `[MFI-40]` | — |
+| `[CPE-41]` | LIFTED | `[MFI-41]` | — |
+| `[CPE-42]` | LIFTED | `[MFI-42]` | — |
+| `[CPH-1]` | LIFTED | `[MFI-43]` | — |
+| `[CPH-2]` | STAYS | `[CPH-2]` | the CPS-2 cipher: code encrypted, data reads bypass |
+| `[CPH-3]` | STAYS | `[CPH-3]` | CPS-2 cipher: pc-relative vs (An) views |
+| `[CPH-4]` | STAYS | `[CPH-4]` | CPS-2 cipher is address-aware |
+| `[CPH-5]` | STAYS | `[CPH-5]` | CPS-2 cipher: decode both views |
+| `[CPH-6]` | STAYS | `[CPH-6]` | CPS-2 cipher: relocating a pc-rel dispatcher |
+| `[CPH-7]` | STAYS | `[CPH-7]` | CPS-2 cipher range inclusive |
+| `[CPH-8]` | STAYS | `[CPH-8]` | CPS-2 cipher: raw above the window |
+| `[CPH-9]` | STAYS | `[CPH-9]` | CPS-2 gfx simm interleave |
+| `[CPH-10]` | STAYS | `[CPH-10]` | CPS-2 tile address composition |
+| `[CPH-11]` | STAYS | `[CPH-11]` | CPS-2 OBJ tile codec and screen offset |
+| `[CPH-12]` | LIFTED | `[MFI-44]` | — |
+| `[CPH-13]` | LIFTED | `[MFI-45]` | — |
+| `[CPH-14]` | STAYS | `[CPH-14]` | CPS-2 OBJ terminator bit |
+| `[CPH-15]` | STAYS | `[CPH-15]` | CPS-2 Turbo promote |
+| `[CPH-16]` | STAYS | `[CPH-16]` | CPS-2 OBJ RAM double buffering |
+| `[CPH-17]` | STAYS | `[CPH-17]` | CPS-2 OBJ/tilemap walkers (method worded on CPS-2 structures) |
+| `[CPH-18]` | LIFTED | `[MFI-46]` | — |
+| `[CPH-19]` | STAYS | `[CPH-19]` | QSound sample window half-bank |
+| `[CPH-20]` | STAYS | `[CPH-20]` | QSound byte parity |
+| `[CPH-21]` | STAYS | `[CPH-21]` | QSound inclusive end |
+| `[CPH-22]` | STAYS | `[CPH-22]` | QSound tight-loop beep |
+| `[CPH-23]` | STAYS | `[CPH-23]` | CPS-2 loader shape rules (groups of four, QSound power of two) |
+| `[CPH-24]` | STAYS | `[CPH-24]` | the CPS-2 WIDE profile |
+| `[CPH-25]` | STAYS | `[CPH-25]` | CPS-2 WIDE reserved window |
+| `[CPH-26]` | STAYS | `[CPH-26]` | CPS-2 WIDE extension byte order |
+| `[CPH-27]` | STAYS | `[CPH-27]` | CPS-2 WIDE: measure before widening |
+| `[CPH-28]` | STAYS | `[CPH-28]` | CPS-2 WIDE: inertness vs functionality |
+| `[CPH-29]` | STAYS | `[CPH-29]` | CPS-2 WIDE governance (Rule 1 v2) |
+| `[CPH-30]` | STAYS | `[CPH-30]` | CPS-2 WIDE change budget |
+| `[MSC-1]` | LIFTED | `[MJC-1]` | — |
+| `[MSC-2]` | LIFTED | `[MJC-2]` | — |
+| `[MSC-3]` | LIFTED | `[MJC-3]` | — |
+| `[MSC-4]` | LIFTED | `[MJC-4]` | — |
+| `[MSC-5]` | LIFTED | `[MJC-5]` | — |
+| `[MSC-6]` | LIFTED | `[MJC-6]` | — |
+| `[MSC-7]` | LIFTED | `[MJC-7]` | — |
+| `[MSC-8]` | LIFTED | `[MJC-8]` | — |
+| `[MSC-9]` | LIFTED | `[MJC-9]` | — |
+| `[MSC-10]` | LIFTED | `[MJC-10]` | — |
+| `[MSC-11]` | LIFTED | `[MJC-11]` | — |
+| `[MSC-12]` | LIFTED | `[MJC-12]` | — |
+| `[MSC-13]` | LIFTED | `[MJC-13]` | — |
+| `[MSC-14]` | LIFTED | `[MJC-14]` | — |
+| `[MSC-15]` | LIFTED | `[MJC-15]` | — |
+| `[MSC-16]` | LIFTED | `[MJC-16]` | — |
+| `[MSC-17]` | LIFTED | `[MJC-17]` | — |
+| `[MSC-18]` | LIFTED | `[MJC-18]` | — |
+| `[MSC-19]` | LIFTED | `[MJC-19]` | — |
+| `[MSC-20]` | LIFTED | `[MJC-20]` | — |
+| `[MSC-21]` | STAYS | `[MSC-21]` | a CPS-2 tile code IS its SDRAM address (the CPS-2 download scramble) |
+| `[MSC-22]` | LIFTED | `[MJC-22]` | — |
+| `[MSC-23]` | LIFTED | `[MJC-23]` | — |
+| `[MSC-24]` | LIFTED | `[MJC-24]` | — |
+| `[MSC-25]` | STAYS | `[MSC-25]` | the CPS object pipeline skips on all-ones fetches |
+| `[MSC-26]` | LIFTED | `[MJC-26]` | — |
+| `[MSC-27]` | STAYS | `[MSC-27]` | the CPS-2 core's format caps |
+| `[MSC-28]` | STAYS | `[MSC-28]` | the CPS-2 Turbo promote after the terminator test |
+| `[MSC-29]` | LIFTED | `[MJC-29]` | — |
+| `[MSC-30]` | LIFTED | `[MJC-30]` | — |
+| `[MSC-31]` | LIFTED | `[MJC-31]` | — |
+| `[MSC-32]` | STAYS | `[MSC-32]` | the CPS-2 key's complemented range word |
+| `[MSC-33]` | LIFTED | `[MJC-33]` | — |
+| `[MSC-34]` | STAYS | `[MSC-34]` | data-vs-code above the CPS-2 decryption window |
+| `[MSC-35]` | STAYS | `[MSC-35]` | Rule 1 v2's MiSTer form (the CPS-2 WIDE governance) |
+| `[MSC-36]` | LIFTED | `[MJC-36]` | — |
+| `[MSC-37]` | LIFTED | `[MJC-37]` | — |
+| `[MSC-38]` | STAYS | `[MSC-38]` | CPS-2 latches its key from the download (-load every run) |
+| `[MSC-39]` | LIFTED | `[MJC-39]` | — |
+| `[MSC-40]` | LIFTED | `[MJC-40]` | — |
+| `[MSC-41]` | LIFTED | `[MJC-41]` | — |
+| `[MSC-42]` | LIFTED | `[MJC-42]` | — |
+| `[MSC-43]` | LIFTED | `[MJC-43]` | — |
+| `[MSC-44]` | LIFTED | `[MJC-44]` | — |
+| `[MSC-45]` | LIFTED | `[MJC-45]` | — |
+| `[MSC-46]` | LIFTED | `[MJC-46]` | — |
+| `[MSC-47]` | LIFTED | `[MJC-47]` | — |
+| `[MSC-48]` | LIFTED | `[MJC-48]` | — |
+| `[MSC-49]` | LIFTED | `[MJC-49]` | — |
+| `[MSC-50]` | LIFTED | `[MJC-50]` | — |
+| `[MSC-51]` | LIFTED | `[MJC-51]` | — |
+| `[MSC-52]` | LIFTED | `[MJC-52]` | — |
+| `[MSC-53]` | LIFTED | `[MJC-53]` | — |
+| `[MSC-54]` | LIFTED | `[MJC-54]` | — |
+| `[MSC-55]` | LIFTED | `[MJC-55]` | — |
+| `[MSC-56]` | LIFTED | `[MJC-56]` | — |
+| `[MSC-57]` | LIFTED | `[MJC-57]` | — |
+| `[MSC-58]` | LIFTED | `[MJC-58]` | — |
+| `[MSC-59]` | LIFTED | `[MJC-59]` | — |
+| `[MSC-60]` | LIFTED | `[MJC-60]` | — |
+| `[MSC-61]` | LIFTED | `[MJC-61]` | — |
+| `[MSC-62]` | LIFTED | `[MJC-62]` | — |
+| `[MSC-63]` | LIFTED | `[MJC-63]` | — |
+| `[MSC-64]` | LIFTED | `[MJC-64]` | — |
+| `[MSC-65]` | LIFTED | `[MJC-65]` | — |
+| `[MSC-66]` | LIFTED | `[MJC-66]` | — |
+| `[MSC-67]` | LIFTED | `[MJC-67]` | — |
+| `[MSC-68]` | LIFTED | `[MJC-68]` | — |
+| `[MSC-69]` | LIFTED | `[MJC-69]` | — |
+| `[MSC-70]` | STAYS | `[MSC-70]` | this core's unmeasured pixels/audio (project state) |
+| `[MSC-71]` | STAYS | `[MSC-71]` | real CPS-2 silicon's decryption window is inferred |
+| `[MSC-72]` | LIFTED | `[MJC-72]` | — |
+| `[MSC-73]` | LIFTED | `[MJC-73]` | — |

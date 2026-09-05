@@ -52,7 +52,7 @@ release/<name>/
   binary** (ruled). The patch is the reviewable trust surface
   (`emu/fbneo-patches/0002`, `emu/mame-patches/0002` — one profile expressed
   twice); the recipe names the pinned upstream commit.
-* **[MSC-62]** **MiSTer ships the MRAs the release was verified with, the `.rbf` itself
+* **[MSC-62]** **[MJC-62]** **MiSTer ships the MRAs the release was verified with, the `.rbf` itself
   and its RECORD (`BITSTREAM.txt`: seed, slack, sha256, build date, fork
   pin, field history)** — ruled tracked in-tree, "as would any BPS or
   xdelta". **The bitstream is a BUILD RESOURCE with its own cadence**

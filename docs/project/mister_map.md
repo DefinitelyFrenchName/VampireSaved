@@ -471,7 +471,7 @@ redirect condition mis-fired, and its condition is `gfx_addr[25]`, which is
 
 ## 5. THE MAP
 
-**[MSC-20]** Offsets in the RTL are 23-bit **word** constants (`jtcps1_sdram.v:158-164`
+**[MSC-20]** **[MJC-20]** Offsets in the RTL are 23-bit **word** constants (`jtcps1_sdram.v:158-164`
 for bank 0's family, per-slot `SLOTn_OFFSET` for the read side); the tables
 below give bytes and the word constant. jtframe applies offsets as an ADD,
 not an OR — `jtframe_romrq_bcache.v:74`
@@ -817,7 +817,7 @@ WIDE v1 needs `CPU:$000000-$5FFFFF`, i.e. one more megabyte-pair.
 | `:185` | `pre_ram_cs` | `$FF0000-$FFFFFF` | no |
 | — | (nothing) | `$500000-$5FFFFF` | window is entirely undecoded |
 
-**[MSC-31]** **The objcfg port decodes a whole megabyte, not sixteen bytes** — the RTL is
+**[MSC-31]** **[MJC-31]** **The objcfg port decodes a whole megabyte, not sixteen bytes** — the RTL is
 looser than the hardware here — but because it is qualified with `!RnW`, a
 *read* anywhere in `$400000-$4FFFFF` asserts nothing today and would assert
 only `rom_cs` after the change. So there is no read collision at all, and a

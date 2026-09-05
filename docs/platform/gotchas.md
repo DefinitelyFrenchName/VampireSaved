@@ -29,7 +29,7 @@ or to survey the enclosing structure once before trusting a zero.
 
 ## CPS-2 ROM file byte order is NOT 68k logical order (paid: 2026-07-25, ~1h)
 
-**[CPH-1]** The 16-bit words in the dumped program ROM files are stored **low-byte-first**.
+**[CPH-1]** **[MFI-43]** The 16-bit words in the dumped program ROM files are stored **low-byte-first**.
 MAME's `cps2_decrypt` operates on the `uint16` values you get from reading the
 file little-endian (that's what the region layout gives it on a little-endian
 host), NOT on big-endian words. Interpreting the files big-endian and
@@ -49,14 +49,14 @@ Project conventions locked in after this (see tools/cps2_decrypt.py header):
 
 ## MAME `logerror` output needs `-log`, not `-verbose` (paid: 2026-07-25)
 
-**[CPE-1]** `-verbose` only shows OSD chatter. Driver `logerror()` lines (e.g. cps2's
+**[CPE-1]** **[MFI-1]** `-verbose` only shows OSD chatter. Driver `logerror()` lines (e.g. cps2's
 `cps2 decrypt <key0>,<key1>,<lower>,<upper>`) go to `error.log` in the
 working directory only when `-log` is passed. That line is the fastest way to
 get the authoritative key/range for a set.
 
 ## FBNeo fresh builds need `SKIPDEPEND=1` (paid: 2026-07-25)
 
-**[CPE-26]** `make sdl2` on a fresh clone dies with `No rule to make target 'driverlist.h',
+**[CPE-26]** **[MFI-26]** `make sdl2` on a fresh clone dies with `No rule to make target 'driverlist.h',
 needed by 'burn.d'` — the depend-generation path (DEPEND=1 default) wants the
 generated `driverlist.h` via a bare-name prerequisite that vpath can't resolve
 before the file exists. FBNeo's own CI never builds that path: every workflow
@@ -66,7 +66,7 @@ the affected .cpp files.)
 
 ## FBNeo shared EEPROM breaks run-to-run determinism (paid: 2026-07-25, ~45min)
 
-**[CPE-27]** Symptom: consecutive scripted FBNeo runs of vsavj diverged from frame ~75 by
+**[CPE-27]** **[MFI-27]** Symptom: consecutive scripted FBNeo runs of vsavj diverged from frame ~75 by
 exactly ONE work-RAM byte (`RAM:$FF0CC9`) whose value differed by 1 — the
 game's EEPROM bootup counter. Cause chain: (a) `$HOME` overrides do NOT
 sandbox FBNeo on macOS — the user config ini (loaded from the real
@@ -81,7 +81,7 @@ full work-RAM dumps from two runs, diffed → first divergent frame + address
 
 ## MAME `-debug` perturbs multi-CPU timing — never compare its checksums to non-debug runs (paid: 2026-07-25, ~1.5h)
 
-**[CPE-2]** A vsavj replay run under `-debug -debugger none` produces a checksum log that
+**[CPE-2]** **[MFI-2]** A vsavj replay run under `-debug -debugger none` produces a checksum log that
 diverges from the identical non-debug run at frame 12: `RAM:$FF1CF0.l` (a
 latch toggling 0x00000000/0xFFFFFFFF) is phase-shifted by one frame, with
 ±1 knock-on counters later ($FF8080, $FFE420...). It is fully deterministic
@@ -164,7 +164,7 @@ understanding gets a fact-lock test (tests/test_gfx_tiles.sh).
 
 ## MAME breakpoint logging is a SAMPLER, not an inventory
 
-**[CPE-4]** The Lua breakpoint pump (periodic callback resuming `debugger.
+**[CPE-4]** **[MFI-4]** The Lua breakpoint pump (periodic callback resuming `debugger.
 execution_state`) drops hits: with six handler breakpoints live during
 frames 2596-2600, four record draws were logged while a write-watch
 proved at least five occurred (obj $FFBC00's draw never appeared).
@@ -177,7 +177,7 @@ member.
 
 ## Debugger stops DESYNC replay frame counting
 
-**[CPE-5]** While a Lua breakpoint/watchpoint holds the CPU, MAME keeps emitting
+**[CPE-5]** **[MFI-5]** While a Lua breakpoint/watchpoint holds the CPU, MAME keeps emitting
 video frames: `emu.register_frame_done` fires, the script's frame
 counter inflates past emulated time, and replay INPUT PLAYBACK (keyed
 by that counter) drifts — so every high-frequency breakpoint trace
@@ -203,7 +203,7 @@ patch_prg re-encrypts; that's why plaintext jsr bytes are never found in
 the members.
 
 ## MAME Lua write taps are silently dropped on handler re-install
-**[CPE-12]** `space:install_write_tap` dies (no error) whenever anything re-installs
+**[CPE-12]** **[MFI-12]** `space:install_write_tap` dies (no error) whenever anything re-installs
 handlers over the space — CPS-2 does this right after boot. Symptom: tap
 logs boot writes only, reads as "nobody writes this field," which is a
 WRONG conclusion. `tests/lua/tap_writes.lua` carries the fix (re-install
@@ -280,7 +280,7 @@ grown region that measures exactly like the stock one.
 
 ## FBNeo harness: no video means the sprite path never runs, and stdout
 ## is captured to the sandbox log
-**[CPE-30]** Two ways to waste an hour while instrumenting FBNeo. (1) The harness only
+**[CPE-30]** **[MFI-30]** Two ways to waste an hour while instrumenting FBNeo. (1) The harness only
 renders when `FBNEO_HVIDEO` is set; without it `pBurnDraw` is NULL and
 `Cps2ObjDraw` is never called, so a printf in the sprite path produces
 NOTHING — which reads exactly like "my feature flag is not being set".
@@ -292,7 +292,7 @@ confirm a descriptor change actually took effect.
 
 ## FBNeo matches zip members by CRC — a mismatch loads 0xFF FILL and
 ## still prints "(OK)"
-**[CPE-28]** This is the single nastiest trap found in the WIDE work, and it
+**[CPE-28]** **[MFI-28]** This is the single nastiest trap found in the WIDE work, and it
 CONTRADICTS an earlier note in this repo ("FBNeo verified to load
 CRC-changed patched zips (no descriptor change needed)"). That note is
 true only in the narrow sense that FBNeo does not refuse to RUN. What it
@@ -328,7 +328,7 @@ Rules that follow:
 
 ## MAME's build system cannot handle a SPACE anywhere in the source path
 (paid: 2026-08-03, B5 — ~30 min)
-**[CPE-22]** This repository lives under `.../Vampire Saved/...`. MAME's GENie build
+**[CPE-22]** **[MFI-22]** This repository lives under `.../Vampire Saved/...`. MAME's GENie build
 dies on that. `scripts/genie.lua:18` carries the escaping line
 **commented out upstream**, and `SOURCES=` builds shell out to
 `makedep.py` with `MAME_DIR` unquoted, so genie reports the useless
@@ -356,7 +356,7 @@ found. Anchor mirror excludes: `--exclude '/build/'`.
 
 ## MAME 0.288's OSD is SDL3 and it is found ONLY through pkg-config
 (paid: same session, ~8 min of wasted compile)
-**[CPE-23]** `scripts/src/osd/sdl3.lua` decides between framework and library linkage
+**[CPE-23]** **[MFI-23]** `scripts/src/osd/sdl3.lua` decides between framework and library linkage
 by asking pkg-config. With pkg-config absent it silently picks framework
 linkage, and the build then dies **several minutes in** with
 `fatal error: 'SDL3/SDL.h' file not found`. Having the sdl3 library
@@ -385,7 +385,7 @@ docs/project/patch_index.md instead.
 ## host keystrokes are injected into the EMULATED controls
 (mechanism supplied by the maintainer, 2026-08-03; implicated in the two
 unexplained 14z-59 divergences)
-**[CPE-15]** MAME has no true headless mode the way some emulators do. Even with
+**[CPE-15]** **[MFI-15]** MAME has no true headless mode the way some emulators do. Even with
 `-video none` it creates a window, and that window can steal focus. Any
 key pressed while it has focus goes to MAME's default keyboard map, which
 covers **P1 directions, buttons 1-6, coins and start**. The harness runs on
@@ -455,7 +455,7 @@ ever fails, ported code above 1MB becomes executable garbage rather than a
 loud failure — so it fails the build rather than warning.
 
 ## MAME write taps must be WORD-ALIGNED
-**[CPE-13]** `install_write_tap` on `ff8403,1` dies with "start address has low bits
+**[CPE-13]** **[MFI-13]** `install_write_tap` on `ff8403,1` dies with "start address has low bits
 set, did you mean ff8402?" — and it is a hard error that kills the script
 after a full boot. Tap the containing word (`ff8402,2`) and filter on the
 logged mask/offset. Byte writes arrive with the value replicated across
@@ -463,7 +463,7 @@ the word (`data 00000303` for a byte `0x03`), so mask the low byte.
 
 ## FBNeo's SDL frontend has NO `-rompath` — the flag is silently ignored
 (paid: 2026-08-05, 14z-60m — cost the maintainer several failed launches)
-**[CPE-29]** `tools/run_wide.sh` launched FBNeo as
+**[CPE-29]** **[MFI-29]** `tools/run_wide.sh` launched FBNeo as
 `fbneo vsavjw -rompath "<build>;$ROMDIR"`. MAME supports `-rompath`; **FBNeo
 does not**. Rom paths live in `szAppRomPaths[]`, defaulting to
 `/usr/local/share/roms/` and **`roms/` relative to the CWD**
@@ -521,7 +521,7 @@ if (ri.nCrc) {                      // Search by crc first
 for (int nAka = 0; ...) {           // Failing that, search for possible names
 ```
 
-**[CPH-12]** So the name is the FALLBACK in both emulators, not the identity. A member's
+**[CPH-12]** **[MFI-44]** So the name is the FALLBACK in both emulators, not the identity. A member's
 identity in a set is its HASH, and two files with the same bytes are the
 same member as far as the loader is concerned.
 
@@ -570,7 +570,7 @@ Rules:
 
 ## MAME cross-driver VIDEO_OUT checksums are NOT comparable (14z-62d)
 
-**[CPE-17]** Comparing replay.lua VIDEO_OUT streams between the `vsav`/`vsavj` machine
+**[CPE-17]** **[MFI-17]** Comparing replay.lua VIDEO_OUT streams between the `vsav`/`vsavj` machine
 and the `vsavjw` (cps2wide) machine flags THOUSANDS of "divergent" frames
 whose actual bitmaps are pixel-identical — verified by decoding
 `video:snapshot()` PNGs at four frames inside "divergent" runs (raw
@@ -587,7 +587,7 @@ config perturbs (timing/sampling nuance), not the final picture. Rules:
 
 ## A chained rompath makes MAME a LIAR about member identity (14z-62h)
 
-**[CPE-18]** The same bug was invisible to every MAME-side measurement: with
+**[CPE-18]** **[MFI-18]** The same bug was invisible to every MAME-side measurement: with
 `MAME_ROMPATH="<build>;$ROMDIR"`, MAME resolved the stale (CRC-mismatched)
 group-B members by HASH to the PRISTINE copies in ROMDIR's vsav.zip and
 rendered Jedah perfectly — while FBNeo (name-resolution inside its overlay,
@@ -605,7 +605,7 @@ Rules:
 ## Unconditioned breakpoints DESYNC replay input — the trace measures a
 ## screen the replay never left (14z-63)
 
-**[CPE-6]** `obj_record_full_trace.lua` with breakpoints on the hot OBJ format
+**[CPE-6]** **[MFI-6]** `obj_record_full_trace.lua` with breakpoints on the hot OBJ format
 handlers (thousands of stops per second) produced a trace whose frame
 counter said "select screen" while the machine was still in ATTRACT: the
 frame counter advances on `frame_done`, which keeps firing for UI frames
@@ -643,7 +643,7 @@ session down a false trail.
 ## A `wpset` watchpoint is SILENTLY BLIND to every pc-relative read on
 ## CPS-2 — jump/handler tables need the OPCODES space (14z-71)
 
-**[CPE-8]** MAME's m68k serves pc-relative reads through `m68k_read_pcrelative_*`
+**[CPE-8]** **[MFI-8]** MAME's m68k serves pc-relative reads through `m68k_read_pcrelative_*`
 -> `m_readimm16` -> **AS_OPCODES**, not the program space. So a plain
 `wpset` on any table the engine indexes with `move.w (d16,pc,Dn),Dm` or
 `movea.l (d16,pc,Dn),An` — which is *most* dispatch tables in this
@@ -668,7 +668,7 @@ Rules:
 ## MAME parses a watchpoint LENGTH as HEX — and a length the harness
 ## regex rejects kills the run and prints a clean-looking zero (14z-71)
 
-**[CPE-9]** `wpset addr,len,type` takes `len` in HEX, so `10` is sixteen bytes and
+**[CPE-9]** **[MFI-9]** `wpset addr,len,type` takes `len` in HEX, so `10` is sixteen bytes and
 ten bytes is `a`. `tests/lua/trace_writes.lua` matched the WATCH length
 with `%d+`, so any hex-lettered length failed the pattern, the `assert`
 killed the run **before the replay started**, and the trace file came out
@@ -692,7 +692,7 @@ Rules:
 ## The boot RAM test writes EVERY byte of work RAM — a bare write-count
 ## on any address reports phantom hits (14z-71)
 
-**[CPE-10]** vsav's POST walks all of work RAM (frames ~5-72, PCs `0x000D34`-`0x000DDC`,
+**[CPE-10]** **[MFI-10]** vsav's POST walks all of work RAM (frames ~5-72, PCs `0x000D34`-`0x000DDC`,
 plus per-venue clears out to ~f824). So a watchpoint on any RAM address
 returns a non-zero write count on a perfectly clean run.
 
@@ -714,7 +714,7 @@ Rules:
 ## A MAME watchpoint logs REGISTERS, not the VALUE WRITTEN — reading the
 ## value off a register snapshot attributed a write to the wrong caller (14z-76)
 
-**[CPE-11]** `tests/lua/trace_writes.lua` logs `frame PC D0 D1 A0..A6` at each hit. It does
+**[CPE-11]** **[MFI-11]** `tests/lua/trace_writes.lua` logs `frame PC D0 D1 A0..A6` at each hit. It does
 **not** log the datum. On a `move.l a1,$30(a4)` it is tempting to read A1 as
 "the value written" — and that is right only if the sample came from the call
 you care about. In 14z-76 the win-quote installer was sampled on a *different*
@@ -745,7 +745,7 @@ keep MAME's for "which code ran".
 
 ## FBNeo/MAME frame indices and object slots do not transfer — a slot-keyed tap chases a different object (14z-81)
 
-**[CPE-34]** The merged Huitzil crash is deterministic on MAME at frame 2886, object
+**[CPE-34]** **[MFI-34]** The merged Huitzil crash is deterministic on MAME at frame 2886, object
 `$FFB800`. An `FBNEO_HTAP` on that slot showed healthy writes on BOTH builds
 — and the merged build survived the whole 11,017-frame replay on FBNeo. Not
 a contradiction: the emulators traverse the same states on different frame
@@ -776,7 +776,7 @@ made before 14z-85.
 
 ## A member's REGION layout is not its FILE layout — and the Z80 driver's own address space is a THIRD thing (14z-86)
 
-**[CPH-18]** MAME loads CPS2's `vm3.01` split (`ROM_LOAD` 0x8000 at region 0, then
+**[CPH-18]** **[MFI-46]** MAME loads CPS2's `vm3.01` split (`ROM_LOAD` 0x8000 at region 0, then
 `ROM_CONTINUE` at region 0x10000; `vm3.02` at region 0x28000). A session of
 Z80-driver RE (14z-85d) assumed region==file above the fixed window and read
 every table at region-derived offsets: the id table "at FILE 0x11006", entry
@@ -850,7 +850,7 @@ not read taps on device ROM spaces.
 
 ## A state-dependent value may not be correlated ACROSS runs — serialize read and write in ONE run (14z-87)
 
-**[CPE-37]** The sword-plant "ding" hunt spent most of a session on a phantom
+**[CPE-37]** **[MFI-37]** The sword-plant "ding" hunt spent most of a session on a phantom
 "invisible write": a write tap on `$FF8782` said the last mid-match write
 was 0x06, a debugger bp said the dispatcher later READ 0x0C from that
 byte, both instruments were provably live — and no mechanism on either
@@ -959,7 +959,7 @@ every 3-tenant merge fail to generate, because hole_a is full.
 
 ## MAME `-aviwrite` is headless-capable but uncompressed (14z-94)
 
-**[CPE-16]** Recording from inside MAME is the right instrument for dating a visual
+**[CPE-16]** **[MFI-16]** Recording from inside MAME is the right instrument for dating a visual
 event — the captured frames are EMULATED frames, so window frame k is
 replay frame START+k by construction, and the file is reproducible run to
 run. A host screen recorder gives neither.
@@ -984,7 +984,7 @@ blanks frames still produces a file that plays.
 
 ## TWO BUILDS CAN SHARE A PROGRAM FINGERPRINT — the merged build and its legacy-only instrument do, deliberately (paid: 14z-94)
 
-**[CPE-42]** The maintainer asked to confirm which merged build to playtest, fearing they
+**[CPE-42]** **[MFI-42]** The maintainer asked to confirm which merged build to playtest, fearing they
 had tested the wrong one. They were right to ask, and the fingerprint would
 NOT have settled it:
 
@@ -1087,7 +1087,7 @@ LVBL fall from t=0, download frames included, while the core is held in reset
 transfer unless the script is shifted by the download length
 (`rpl2siminputs.py --offset 462`).
 
-**[MSC-42]** **THE NEAR-MISS WORTH RECORDING:** the preloaded run's all-zero dumps agreed
+**[MSC-42]** **[MJC-42]** **THE NEAR-MISS WORTH RECORDING:** the preloaded run's all-zero dumps agreed
 with MAME's work RAM on **99.2% of sampled bytes**, because most of a 64 KB
 work-RAM image is zero. "High agreement" is not evidence of a live oracle;
 the first check on any new dump path is **is it non-constant** — two frames
@@ -1111,7 +1111,7 @@ is not: it exists only inside the **Verilog** SDRAM model
 never instantiates — there the C++ `SDRAM` class IS the SDRAM, and its
 `dump()` fires exactly once, right after a full ROM download.
 
-**[MSC-40]** Reading emulated work RAM out of a Verilator run therefore needs a harness
+**[MSC-40]** **[MJC-40]** Reading emulated work RAM out of a Verilator run therefore needs a harness
 hook, not a macro that already exists (ours: `JTFRAME_SIM_WRAMDUMP`, fork
 commit `553dd56`, `docs/platform/mister.md`). The general lesson is the
 14z-71 one in a new place: **a macro named for what you want is not evidence
@@ -1119,7 +1119,7 @@ that it does it — read the module that consumes it.**
 
 ## Editing a shell script WHILE it runs corrupts the running execution (14z-107)
 
-**[MSC-54]** `sh` reads a script incrementally and keeps a BYTE OFFSET into the file. Edit
+**[MSC-54]** **[MJC-54]** `sh` reads a script incrementally and keeps a BYTE OFFSET into the file. Edit
 the file while it is executing and the offset now points into the middle of a
 different line: the still-running shell resumes at a token boundary that never
 existed. Paid for here on a 55-minute gate — `tools/run_sim_jtcps2.sh` had run
@@ -1141,7 +1141,7 @@ hour of waiting with the file open).
 
 ## `JTFRAME_SDRAM_XL` without `JTFRAME_SDRAM_CACHE` aliases SILENTLY (14z-107)
 
-**[MSC-17]** Upstream jtframe's 128 MB tier is real (`SDRAMW=24`,
+**[MSC-17]** **[MJC-17]** Upstream jtframe's 128 MB tier is real (`SDRAMW=24`,
 `modules/jtframe/target/mister/hdl/jtframe_emu.sv:175-181`), but the
 controller that KNOWS about it exists only on one side of a fork.
 `hdl/jtframe_board_sdram.v:158` branches on `JTFRAME_SDRAM_CACHE`: the
@@ -1186,7 +1186,7 @@ so a Verilator run rendered from a corrupt tile map. Bank 0 (PRG 0-4 MB, VRAM
 but "the frames showed sprites" was NOT evidence that GFX addressing was
 faithful.
 
-**[MSC-51]** **THE TRAP, and it is the general lesson: the missing bit was NOT the one the
+**[MSC-51]** **[MJC-51]** **THE TRAP, and it is the general lesson: the missing bit was NOT the one the
 size arithmetic points at.** "13 row + 9 column = 22 bits, so widen the column
 to 10 bits (`<< 10`, `& 0x7fffff`, `0x3ff`)" is the natural reading, and it
 would have folded the TOP address bit onto `addr[9]` and produced a
@@ -1311,7 +1311,7 @@ Two consequences that are easy to get wrong, and both were:
    address map is worth nothing until it reproduces a number somebody already
    measured.** Run the known census first, then trust the derivation.
 
-3. **[MSC-22]** **And the size SDRAM actually SPENDS is a THIRD number: the DECLARED
+3. **[MSC-22]** **[MJC-22]** **And the size SDRAM actually SPENDS is a THIRD number: the DECLARED
    REGION** (added 14z-107 (9), found by the whole-image census). The MRA
    downloads the whole `[rom]` region the machine entry declares, so each
    8 MB group-C obj bank reserves its full 8 MB whatever the art does inside
@@ -1390,7 +1390,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
 
 ## jtframe's RTL plumbing (added 14z-107 (6), slice D1)
 
-- **[MSC-19]** **An 8-bit SDRAM slot CANNOT be widened past `SDRAMW`, and the failure is
+- **[MSC-19]** **[MJC-19]** **An 8-bit SDRAM slot CANNOT be widened past `SDRAMW`, and the failure is
   a BUILD failure.** `modules/jtframe/hdl/sdram/jtframe_romrq_bcache.v:74` is
 
       assign sdram_addr = offset + { {SDRAMW-AW{1'b0}}, addr_req>>(DW==8)};
@@ -1415,7 +1415,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   `get:` (e.g. cps15's `qsound.yaml`) brings the shared file WITH it, so a
   core that overrides a file inside such a yaml cannot pull that yaml at all
   — inline what it provides, minus the override.
-- **[MSC-6]** **A NEW CORE WITHOUT `hdl/pal_lut.hex` RENDERS A BLACK SCREEN, AND
+- **[MSC-6]** **[MJC-6]** **A NEW CORE WITHOUT `hdl/pal_lut.hex` RENDERS A BLACK SCREEN, AND
   NOTHING WARNS.** `cores/cps2w` shipped without it and cost four
   50-minute simulation runs to find. The chain: `jtcps1_pal.v:62`
   instantiates `jtframe_ram #(.SYNFILE("pal_lut.hex"))`; `jtframe_ram`
@@ -1430,7 +1430,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   silently — the file must be force-added. Gate:
   `tests/test_mister_wide_gate.sh` 3g requires every `hdl/*.hex` the
   reference cores carry to exist in the new core's `hdl/`, byte-identical.
-- **[MSC-46]** **A FORKED CHILD THAT CALLS `exit()` REWINDS ITS PARENT'S INPUT FILE —
+- **[MSC-46]** **[MJC-46]** **A FORKED CHILD THAT CALLS `exit()` REWINDS ITS PARENT'S INPUT FILE —
   and that is how a Verilator core's PICTURE moved its simulated CPU
   state.** RESOLVED 14z-107 (7); this entry used to say the path was open.
   `exit()` runs the C stdio cleanup, which `fclose()`s every open C stream;
@@ -1475,7 +1475,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   (`tests/test_mister_wide_inert.sh`) before anything is blamed on RTL, and
   `test_mister_sim_anchor.sh` is a cross-IMPLEMENTATION oracle, not an
   inertness instrument.
-- **[MSC-47]** **The same cleanup DUPLICATES LOG LINES.** `exit()` in the child also
+- **[MSC-47]** **[MJC-47]** **The same cleanup DUPLICATES LOG LINES.** `exit()` in the child also
   flushes a COPY of the parent's buffered `stdout`, so a `$display` line
   appears once per child (measured: 212 copies in a fork-mode jtsim log
   against one with frame output off). Anything that PARSES a jtsim log has
@@ -1495,7 +1495,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   last. Only EOF released P1's (`next()`'s else-branch restores `0x3ff`),
   which meant a SHORTER input file changed the inputs — the opposite of
   what a truncation should do; P2's were never released at all.
-  **[MSC-44]** **THE GENERAL LESSON: a harness that DRIVES a port is asserting every bit
+  **[MSC-44]** **[MJC-44]** **THE GENERAL LESSON: a harness that DRIVES a port is asserting every bit
   of it, including the ones it does not model — and an active-low port
   defaults to PRESSED.** "The harness has 4 buttons" was the natural
   reading and it was wrong by two buttons per player.
@@ -1517,7 +1517,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   moved when the inputs were corrected. The COVERAGE half (making buttons
   5/6 and P2 SCRIPTABLE) stays deferred by maintainer ruling;
   `tools/rpl2siminputs.py` still refuses them loudly.
-- **[MSC-2]** **OVERRIDING ONE SHARED FILE COSTS YOU THE WHOLE `.yaml` THAT PULLED IT,
+- **[MSC-2]** **[MJC-2]** **OVERRIDING ONE SHARED FILE COSTS YOU THE WHOLE `.yaml` THAT PULLED IT,
   AND IT COMPOUNDS (14z-107 (6) and (9)).** `jtframe files` deduplicates by
   FULL PATH, so a core cannot both `get:` a yaml and override a file that
   yaml pulls: the two copies of the module would both compile and the
@@ -1535,7 +1535,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   frozen line-by-line delta against the original is the thing you want to
   review; a renamed module would avoid the yaml surgery entirely and lose
   that.
-- **[MSC-3]** **ADDING A MODULE TO jtframe: pull it from the CORE, never from jtframe's
+- **[MSC-3]** **[MJC-3]** **ADDING A MODULE TO jtframe: pull it from the CORE, never from jtframe's
   own shared list (14z-107 (9)).** `modules/jtframe/hdl/sdram/
   jtframe_sdram64.yaml` enumerates the `ram1_Nslots` / `rom_Nslots` family
   and is included by every core that uses the 64 MB SDRAM front end. Adding
@@ -1547,7 +1547,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   same way `cores/cps1/cfg/common.yaml` pulls `jtframe_romrq.v`. Assert the
   absence, not just the presence: `test_mister_wide_gate` 5b greps the
   REFERENCE core's file list for the new module and fails if it is there.
-- **[MSC-26]** **A DOWNLOAD-SIDE `?:` CHAIN HAS A FALL-THROUGH ARM THAT MORE REGIONS
+- **[MSC-26]** **[MJC-26]** **A DOWNLOAD-SIDE `?:` CHAIN HAS A FALL-THROUGH ARM THAT MORE REGIONS
   REACH THAN YOU THINK (14z-107 (9)).** `jtcps1_prom_we.v`'s `prog_ba` ends
   in a bare `2'd1`, which is reached by the QSound region AND by the CPS-2
   firmware region (`is_qsnd`). The region-relative addresses it computes are
@@ -1558,7 +1558,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   observable. Qualify the condition with its own region's `is_*` anyway:
   **a signal that is correct only because its write-enable happens to be low
   is a defect waiting for a refactor**, and the census cannot see it.
-- **[MSC-41]** **THE SIM's RAM-DUMP HOOK ADDRESSES *SDRAM*, NOT THE 68k BUS — AND SLICE D2
+- **[MSC-41]** **[MJC-41]** **THE SIM's RAM-DUMP HOOK ADDRESSES *SDRAM*, NOT THE 68k BUS — AND SLICE D2
   MOVED WORK RAM (14z-107 (9)).** `JTFRAME_SIM_WRAMDUMP_OFF` is a BANK BYTE
   OFFSET. On the reference core `RAM:$FF0000-$FFFFFF` is bank 0 byte
   `0x600000`; on `cores/cps2w` the D2 bank-0 re-pack put it at `0x648000`,
@@ -1599,7 +1599,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   '+refs/heads/*:refs/remotes/local/*'`). It only bites when fork commits are
   held back from a push — which is exactly when RTL is being developed.
 
-- **[MSC-29]** **A WIDENED BUS IS ONLY AS WIDE AS ITS NARROWEST PORT, AND VERILOG SAYS
+- **[MSC-29]** **[MJC-29]** **A WIDENED BUS IS ONLY AS WIDE AS ITS NARROWEST PORT, AND VERILOG SAYS
   NOTHING (14z-107 (10), MiSTer slice D3).** The CPS-2 object bank goes from
   2 bits to 3 in `jtcps2_obj_scan`, but the value crosses FOUR module
   boundaries on its way to SDRAM — `jtcps2_obj_scan` -> `jtcps2_obj` ->
@@ -1611,7 +1611,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   content bug and sends you to the romset. Three of slice D3's four override
   files exist for nothing but this, and
   `tests/test_mister_wide_gate.sh` 8c asserts all six declarations by name.
-- **[MSC-39]** **THE WIDE DOWNLOAD IS 197 FRAMES LONGER THAN THE STOCK ONE, AND EVERY
+- **[MSC-39]** **[MJC-39]** **THE WIDE DOWNLOAD IS 197 FRAMES LONGER THAN THE STOCK ONE, AND EVERY
   ABSOLUTE FRAME NUMBER IN THE LANE MOVES WITH IT (14z-107 (10)).**
   `sim_inputs.hex` advances on every LVBL fall, download frames INCLUDED,
   so a replay is shifted by the transfer length: 462 frames for `vsavj.rom`
@@ -1690,7 +1690,7 @@ Verilator, both dump sets integrity-checked:
 same 20 nonzero frames as before, which is what shows the fix re-ordered the
 bits rather than losing or doubling a press.
 
-**[MSC-45]** **THE TRAP IS NOT THE BUG, IT IS THE HALF-MEASUREMENT.** 14z-107 (12) saw only
+**[MSC-45]** **[MJC-45]** **THE TRAP IS NOT THE BUG, IT IS THE HALF-MEASUREMENT.** 14z-107 (12) saw only
 Left and Down (they are the only directions `36_pick_tenant_cell` presses) and
 inferred a two-bit SWAP leaving Up and Right untouched, from the translator's
 docstring. That inference fitted both data points and was WRONG: Up arrives as
@@ -1784,7 +1784,7 @@ tree you checked out, not of the clone command you typed.
 `xjtcore.sh` calls **`jtseed 4`**, which loops `jtcore --seed $RANDOM` and
 **BREAKS ON FIRST SUCCESS**.
 
-**[MSC-59]** **BE PRECISE ABOUT WHAT THAT HIDES — the first draft of this entry was
+**[MSC-59]** **[MJC-59]** **BE PRECISE ABOUT WHAT THAT HIDES — the first draft of this entry was
 stronger than the evidence.** It does NOT mean the flow ships failing
 bitstreams. At the measured per-seed failure rate the chance all four draws
 fail is about 1%, so **roughly 99% of invocations produce a gate-passing
@@ -1819,14 +1819,14 @@ the honest phrasing is "commonly, between about one seed in seven and three
 in five", NOT "exactly a third". The DIRECTION is not in doubt.
 
 **RULES.**
-1. **[MSC-58]** **Never report a jtcores build as "closes timing" from one run.** Sweep
+1. **[MSC-58]** **[MJC-58]** **Never report a jtcores build as "closes timing" from one run.** Sweep
    seeds and state the SPREAD and the MEDIAN, not the draw you got.
 2. **Always build the reference core on the same toolchain.** Here `cps2`
    passed 5 of 5, which is what makes the finding attributable at all.
 3. **A FAILING SEED STILL EMITS AN `.rbf`** that looks exactly like a good
    one, and a sweep OVERWRITES `release/<core>.rbf` with whatever ran last.
    **Verify the hash before flashing anything.**
-4. **[MSC-60]** Failing paths that RESHUFFLE between seeds indicate a marginal CONE, not
+4. **[MSC-60]** **[MJC-60]** Failing paths that RESHUFFLE between seeds indicate a marginal CONE, not
    a slow path. At n=12 the worst path was a different register on nearly
    every seed (`post_act`, `in_busy`, `br`, `st[0]`, `actd`, `rfsh|help`)
    landing on `sdram_a[7]`, `[8]` or `[11]`, and **the number of failing
@@ -1847,7 +1847,7 @@ the SAME seed reproduces the PLACEMENT and the TIMING exactly, and produces a
 **different bitstream and a different sha256**, purely because the macro moved.
 A same-day rebuild plausibly IS bit-identical; a next-day one certainly is not.
 
-**[MSC-61]** **THE RULE THAT FOLLOWS: THE HASH IDENTIFIES THE ARTIFACT, THE SEED
+**[MSC-61]** **[MJC-61]** **THE RULE THAT FOLLOWS: THE HASH IDENTIFIES THE ARTIFACT, THE SEED
 IDENTIFIES THE RESULT.** Never read a hash mismatch as a failed reproduction
 — check the SEED and the reported SLACK instead. This is the same shape as
 the green-build trap above: two different claims that look like one.
@@ -1861,7 +1861,7 @@ and the hash not to, unless it is the same calendar day.
 ## An ARMED DEBUGGER BREAKPOINT skews the Lua harness's input application —
 ## deterministic INPUT-VIOLATIONs that look like host input (14z-110)
 
-**[CPE-7]** Any MAME `-debug` breakpoint stop delays `emu.register_frame_done`'s input
+**[CPE-7]** **[MFI-7]** Any MAME `-debug` breakpoint stop delays `emu.register_frame_done`'s input
 application by a beat when the stop lands inside the frame the replay layer
 was about to write — the input-integrity check then reads the PREVIOUS
 chord and flags INPUT-VIOLATION. The tell that it is NOT host input: the
@@ -1934,7 +1934,7 @@ does NOT touch the scratch.
 
 ## MAME Lua: WRITE taps fire, READ taps do not (14z-112, measured)
 
-**[CPE-14]** `space:install_write_tap()` works and is what `tests/lua/inp_guard.lua` relies
+**[CPE-14]** **[MFI-14]** `space:install_write_tap()` works and is what `tests/lua/inp_guard.lua` relies
 on (the #99 capture taps the game's own `$FF0000` exception store).
 **`space:install_read_tap()` never fires on this driver** — not for ROM and
 not for work RAM. Measured 14z-112 with a positive control: a tap on
@@ -1953,7 +1953,7 @@ Verbatim moves; the `(paid: …)` dates and session tags are the originals. Anch
 
 ## Pre-seeded from the ROM-audit round (2026-07-25, before repo existed)
 
-**[CPE-20]** - **MAME audits the whole board, not just the game:** FBNeo has decryption
+**[CPE-20]** **[MFI-20]** - **MAME audits the whole board, not just the game:** FBNeo has decryption
   keys compiled in and synthesizes QSound (HLE) without the DSP dump; modern
   MAME requires per-set `.key` files AND the shared device romset
   `qsound_hle.zip` (`dl-1425.bin` — one copy in the rompath serves every
@@ -1971,7 +1971,7 @@ Verbatim moves; the `(paid: …)` dates and session tags are the originals. Anch
 
 ## Cross-emulator replays: same inputs ≠ same content (paid: 2026-07-25, ~2h)
 
-**[CPE-33]** The MAME↔FBNeo frame offset (a few frames at boot) does more than shift
+**[CPE-33]** **[MFI-33]** The MAME↔FBNeo frame offset (a few frames at boot) does more than shift
 frame indices — near any screen transition it changes WHICH content runs.
 Three measured mechanisms, all found while validating `tools/compare_fields.py`:
 
@@ -2001,7 +2001,7 @@ screens; input-neutral after the picks. Within-emulator oracles are
 unaffected (whole-RAM frame-exact remains the standard there).
 
 ## The FBNeo gate never rendered a pixel — RAM checksums are blind to video
-**[CPE-35]** The FBNeo harness ran every frame with `pBurnDraw = NULL`. That is correct
+**[CPE-35]** **[MFI-35]** The FBNeo harness ran every frame with `pBurnDraw = NULL`. That is correct
 for speed and for a work-RAM oracle, but it means the emulator-side gate
 could not see the video path AT ALL: a change to sprite/tile rendering
 produces byte-identical RAM logs whether it works or draws garbage. This
@@ -2014,7 +2014,7 @@ change, confirm the gate's instrumentation actually EXECUTES the code path
 you changed.
 
 ## A canary must change exactly ONE thing, or it cannot answer anything
-**[CPE-38]** The first CPS-2 WIDE B4 canary tried to prove the new 19-bit gfx banks
+**[CPE-38]** **[MFI-38]** The first CPS-2 WIDE B4 canary tried to prove the new 19-bit gfx banks
 were reachable by remapping 15 characters' bank-table rows to the new
 banks and requiring pixel-identical output. It failed — and the failure
 was uninterpretable, because the same edit ALSO changed game logic (see
@@ -2030,7 +2030,7 @@ under a test-only flag over changing the ROM when the ROM change has
 side effects.
 
 ## A relocation test with no negative control proves nothing
-**[CPE-39]** The CPS-2 WIDE PRG canary relocated one character's sound table into the
+**[CPE-39]** **[MFI-39]** The CPS-2 WIDE PRG canary relocated one character's sound table into the
 extension and came back RAM-identical — apparently proving the 68k could
 read above 4MB. It proved nothing: pointing the same table at ZERO FILL
 was *also* RAM-identical, because that row is never read in those
@@ -2052,7 +2052,7 @@ RAM log stays bit-identical to the frozen expectation with it enabled.
 
 ## `git apply` SILENTLY SKIPS the patch when the target is inside another
 ## repo's working tree — and exits 0 (paid: 2026-08-03, B5)
-**[CPE-25]** `tools/setup_mame.sh` builds from a mirror under `~/.cache/vampire-saved/`.
+**[CPE-25]** **[MFI-25]** `tools/setup_mame.sh` builds from a mirror under `~/.cache/vampire-saved/`.
 On this machine **`$HOME` is itself a git repository**, so the mirror sits
 at prefix `.cache/vampire-saved/mame/` inside it. `git -C <mirror> apply
 0002-cps2-wide-v1.patch` therefore read the diff's paths
@@ -2083,7 +2083,7 @@ The sequence
     git -C emu/mame fetch --depth 1 origin tag mame0288
     git -C emu/mame checkout mame0288          # working tree only!
 
-**[CPE-21]** leaves the SUPERPROJECT INDEX pointing at the default branch head — the
+**[CPE-21]** **[MFI-21]** leaves the SUPERPROJECT INDEX pointing at the default branch head — the
 `add` staged it before the checkout, and the checkout never re-staged.
 Everything looks right (`git -C emu/mame log -1` shows the tag's commit)
 until something runs `git submodule update`, which dutifully restores the
@@ -2126,7 +2126,7 @@ shipped silent-but-wrong in the other direction, it would have been worse.
 ## SKIPPED applying the profile patch, never reverted it
 (paid: 2026-08-03, B5b — the FBNeo emulator superset invariant may never
 have actually been tested)
-**[CPE-31]** `setup_fbneo.sh` applies the CPS-2 WIDE patch to the submodule WORKING TREE
+**[CPE-31]** **[MFI-31]** `setup_fbneo.sh` applies the CPS-2 WIDE patch to the submodule WORKING TREE
 and leaves it there. On the next invocation with `WIDE=0` the script took
 the "skip" branch, printed **"WIDE=0: harness-only build (reference binary
 for the superset invariant)"** — and built a binary that still **carried the
@@ -2165,7 +2165,7 @@ The same session's second instance: the hitclass-map probe only became
 meaningful after the Demitri-vs-Demitri control proved 468 fires — a
 probe with no must-fire control is not an instrument.
 
-## **[CPE-19]** MAME palette RAM ($90C000) takes Lua pokes for READBACK but not for RENDERING (14z-102)
+## **[CPE-19]** **[MFI-19]** MAME palette RAM ($90C000) takes Lua pokes for READBACK but not for RENDERING (14z-102)
 Poking palette rows from a frame_done hook (POKES or space:write) lands
 in the bytes — a later DUMPS readback shows the poked values sticking —
 but the rendered frame never changes; only the GAME's own writes
@@ -2177,7 +2177,7 @@ BUILD (or poke the game's staging buffer, once its per-frame copy source
 is measured), and treat any poke-based "no visual change" as
 unmeasured.
 
-## **[CPE-3]** two -debug INSTRUMENT-grammar traps from the #103 close — both misread a measurement for a full round each (paid: 14z-98)
+## **[CPE-3]** **[MFI-3]** two -debug INSTRUMENT-grammar traps from the #103 close — both misread a measurement for a full round each (paid: 14z-98)
 
 **Every -debug watch configuration is its own TIMELINE, not just
 "different from non-debug".** Three trace_writes runs on the SAME rig

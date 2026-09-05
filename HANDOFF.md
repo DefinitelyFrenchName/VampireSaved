@@ -19,7 +19,7 @@ session has rolled off.)
 | MAME headless runner | `tools/run_mame.sh <set> [args]` | MAME 0.288 (brew), fresh sandbox per run |
 | Attract determinism | `tests/test_attract_determinism.sh` | PASS 3600 frames |
 | Decrypt oracle test | `tests/test_decrypt_oracle.sh` | PASS (python == MAME opcode space) |
-**[CPE-32]** | FBNeo | `emu/fbneo` submodule + `tools/setup_fbneo.sh` | built (SDL2); TWO patches: `0001` harness (frontend-only: `-hinput/-hout/-hframes/-hdump`, plus `FBNEO_HVIDEO` framebuffer checksums, `FBNEO_HGFX` gfx-buffer dumps, and the B5b set — `FBNEO_HTAP` write tap with PC attribution, `FBNEO_HPOKE` frame-scheduled pokes, address-resolved dumps reaching OBJ/palette RAM) and `0002` the CPS-2 WIDE profile (driver descriptor + TWO gated blocks in `Cps2ObjDraw` — the promote and the canary control; "one gated core line" until 14z-114, corrected per 14z-90). **CRC WARNING:** FBNeo matches zip members by CRC — a mismatched gfx/QSound member is silently replaced by 0xFF fill while still logging `(OK)` (docs/GOTCHAS.md) |
+**[CPE-32]** **[MFI-32]** | FBNeo | `emu/fbneo` submodule + `tools/setup_fbneo.sh` | built (SDL2); TWO patches: `0001` harness (frontend-only: `-hinput/-hout/-hframes/-hdump`, plus `FBNEO_HVIDEO` framebuffer checksums, `FBNEO_HGFX` gfx-buffer dumps, and the B5b set — `FBNEO_HTAP` write tap with PC attribution, `FBNEO_HPOKE` frame-scheduled pokes, address-resolved dumps reaching OBJ/palette RAM) and `0002` the CPS-2 WIDE profile (driver descriptor + TWO gated blocks in `Cps2ObjDraw` — the promote and the canary control; "one gated core line" until 14z-114, corrected per 14z-90). **CRC WARNING:** FBNeo matches zip members by CRC — a mismatched gfx/QSound member is silently replaced by 0xFF fill while still logging `(OK)` (docs/GOTCHAS.md) |
 | `tools/audit_mame_bin_pin.py` (14z-133) | every script under `tests/` that boots `vsavjw` through a MAME wrapper (`run_mame` / `run_replay_mame` / `run_replay_guarded`) must carry a real `MAME_BIN` pin — `run_mame.sh` falls back to Homebrew's `mame`, which does not know the set, so the leg measures nothing (three M16-sweep reds). `--selftest` is the must-fire control; gate `tests/test_mame_bin_pinned.sh` (ci_portable). A `[MAME_BIN=...]` in a Usage line is not a pin | live |
 | `tools/freeze_masked_basis.sh` (from the gate fence, 14z-123) | 14z-88: (re)generate a vanilla masked basis (logs+sha1, double-run determinism) under a given MASK_RANGES — masked bytes are SKIPPED from the checksum, so every window addition needs a NEW basis dir (masked / masked-v2 / masked-v3) | live |
 | `tools/audit_walker_callers.py` (from the gate fence, 14z-123) | 14z-91: every reference that can reach a walker, enumerated BY FORM (abs.l operand / data longword / pc-relative / branch). Found 23 jsr.l and nothing else. Prints decode noise with context rather than filtering it silently. --toml emits the frozen manifest rows | live |
@@ -151,7 +151,7 @@ ROMDIR=... tests/test_mame_parity.sh          # RUN THIS FIRST (see below)
 ROMDIR=... tests/test_mame_wide.sh            # superset invariant + inertness + B4 canary
 ```
 
-**[CPE-24]** **Order is not optional.** `test_mame_parity.sh` proves the UNPATCHED
+**[CPE-24]** **[MFI-24]** **Order is not optional.** `test_mame_parity.sh` proves the UNPATCHED
 source build reproduces every frozen oracle log bit-for-bit before the
 profile patch is allowed near it — swapping the binary changes the
 INSTRUMENT, and an instrument that moved invalidates every MAME finding
@@ -912,7 +912,7 @@ place and reports the set as missing.
    0xFF fill on a CRC mismatch while still printing `(OK)` (GOTCHAS) — but
    a *missing* line or a wrong region size localises the problem fast.
 
-**[CPE-40]** **"Unknown system: vsavjw" is an EMULATOR problem, not a ROM problem, and
+**[CPE-40]** **[MFI-40]** **"Unknown system: vsavjw" is an EMULATOR problem, not a ROM problem, and
 renaming `vsavjw.zip` to `vsavj.zip` to force it is actively harmful** — it
 boots under the stock 4MB descriptor with the sfx helper live and the sound
 pointer aimed at the CPS2 register window, re-creating the music bug while
@@ -1031,7 +1031,7 @@ nothing to SDL). Combined with the input-provider isolation and the
 per-frame integrity assertion, a migration is now a *choice*, not a
 necessity.
 
-**[CPE-41]** **What is actually at risk in a move: only the MAME expectations.**
+**[CPE-41]** **[MFI-41]** **What is actually at risk in a move: only the MAME expectations.**
 - `tests/expected/**` are ABSOLUTE frozen values, and they are **MAME-only**
   — `run_suite.sh` drives MAME.
 - Every FBNeo gate (`test_wide_profile.sh`, `test_fbneo_replay_determinism.sh`,

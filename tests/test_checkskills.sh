@@ -1,6 +1,15 @@
 #!/bin/sh
-# test_checkskills.sh — the two MiSTer skills are locked to the docs they
-# distil (14z-114). ci_portable: no ROM, no build dir, no emulator, ~1 s.
+# test_checkskills.sh — the eight skills are locked to the docs they distil
+# (14z-114; level 0 added 14z-134). ci_portable: no ROM, no build dir, no
+# emulator, ~1 s.
+#
+# LEVEL 0 (14z-134): `mame-fbneo-instruments` [MFI] and `mister-jtframe-core`
+# [MJC] carry the rules of CPE/CPH/MSC that would still be true if the board
+# were not CPS-2. A lifted rule KEEPS ITS NUMBER and anchors in the SAME
+# paragraph as the CPS-2 rule it lifts; the CPS-2 skill keeps the old ID as a
+# one-line redirect, because 350+ citations outside the skills name the old
+# IDs. Three controls below: an unanchored level-0 rule, a board name in
+# level 0, and a redirect stub deleted (its anchor goes orphan).
 #
 # WHAT IT HOLDS. `tools/checkskills.py` asserts, on the real tree:
 #   1. every `- [PFX-N]` rule in .claude/skills/*/SKILL.md (MSC/MSV the MiSTer
@@ -108,5 +117,18 @@ control "port token in the game skill" "$W/g" "level-1 skill names 'tenant'"
 mkcopy "$W/h"; printf -- '- [VSP-999] a port rule anchored where STATE rolls over\n' >> "$W/h/.claude/skills/vampire-saved-port/SKILL.md"
 printf -- '\n**[VSP-999]** an anchor appended outside the two standing sections.\n' >> "$W/h/STATE.md"
 control "STATE anchor outside the standing sections" "$W/h" "VSP-999 anchored in STATE.md OUTSIDE"
+
+# level 0 (14z-134): the two board-agnostic skills are locked the same way,
+# and their liftability test is one level stricter — naming the BOARD fails.
+mkcopy "$W/i"; printf -- '- [MFI-999] an instrument rule nobody anchored\n' >> "$W/i/.claude/skills/mame-fbneo-instruments/SKILL.md"
+control "unanchored level-0 rule" "$W/i" "ANCHORED NOWHERE: MFI-999"
+
+mkcopy "$W/j"; printf -- '\nA note that says this is true on CPS-2 only.\n' >> "$W/j/.claude/skills/mister-jtframe-core/SKILL.md"
+control "board name in level 0" "$W/j" "level-1 skill names 'cps'"
+
+# a redirect stub must keep the old ID DEFINED: stripping one leaves its
+# anchor orphaned, which is exactly the failure that would break a citation.
+mkcopy "$W/k"; sed -i.bak '/^- \[CPE-24\] /d' "$W/k/.claude/skills/cps2-emulation/SKILL.md"
+control "a lifted rule's redirect removed" "$W/k" "NOT DEFINED in the skill: CPE-24"
 
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

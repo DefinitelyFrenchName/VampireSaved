@@ -96,7 +96,7 @@ assembled by hand again, the README is part of it.
    indistinguishable bitstream (`platform/gotchas.md`). The record is
    `BITSTREAM.txt`: seed 18269, sha256 `46fc74af…`, 3,111,944 B.
 2. **[MSV-21]** **Every MRA part must resolve against the EXACT zips on the card.**
-   **[MSC-69]** jtframe fills an unresolved part with `0xFF` rather than refusing, so a
+   **[MSC-69]** **[MJC-69]** jtframe fills an unresolved part with `0xFF` rather than refusing, so a
    half-resolved set "runs" and shows nonsense. `tools/check_mra_parts.py`
    / `tests/test_mra_parts.sh`: WIDE 31 of 31 parts, STOCK CONTROL 22 of 22,
    both against the pristine `vsav.zip` (since 14z-112 the build packs no
