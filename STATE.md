@@ -363,6 +363,49 @@ what a triage is looking at, so those are where the thinking time goes.
 
 ## Decisions pending (human)
 
+- **WHERE A MiSTer ARTIFACT SHOULD NAME THE MERGED BUILD IT CARRIES (maintainer,
+  2026-09-05, mid-field-test on M16: *"in the future it might be nicer to have
+  the merged build referenced somewhere in the mister builds"*). OPEN — the
+  surface is the card and the MiSTer menu, so the choice is theirs.**
+  **TODAY, measured on `../mister_fieldtest_14z132/`:** the merged build is
+  named ONLY in the bundle README's first line and in
+  `release/merged-m16/mister/MISTER.md`'s title; the MRA carries no build
+  name (its `<name>` is jtframe's from the fork's `mame.xml` description,
+  its comment header is OUR `tools/mra_header.py` text, fixed); the bundle
+  directory is named by SESSION (`14z132`), which is the naming the recordings
+  law [VSP-20] explicitly rejects for recordings ("the freeze the recording was
+  PLAYED on, never the mark or the session"). Answering "is this bundle M16?"
+  took five hash comparisons (STATE 14z-133b).
+  **OPTIONS, each costed:**
+  **(a) A BUILD LINE IN THE MRA's COMMENT HEADER** — `mister_mra.sh --wide
+  <build>` already knows the build dir, so `mra_header.py` can emit
+  `BUILD merged-m16 (mark M16) · vsavjw.zip sha1 664b14f8…` resolved from
+  `registry.tsv` by the whole-set key (falls back to `UNREGISTERED <key>`
+  before registration). Zero fork cost, no menu or filename change, travels
+  with the card; invisible until someone opens the file. ~1 hour incl. a
+  must-fire control in `test_mister_mra_map` (a header naming the wrong
+  build must fail).
+  **(b) THE MARK IN THE MRA `<name>`** — `Vampire Saved M16 - CPS-2 WIDE
+  (Japan 970519)` from the fork's `mame.xml` description: shows in the
+  MiSTer MENU, which is the one place a tester picks the artifact, so it is
+  the field's naked-eye tell BEFORE boot (the wheel mark is the one after).
+  Cost: the description is fork content, so a fork commit per freeze — but
+  the CRC tail is already one — AND the `.mra` FILENAME changes per freeze,
+  so stale MRAs must be deleted from the card and every path that names the
+  file (`package_release_platforms.py`, `test_release_roundtrip` §4,
+  `mister_field.md`) is re-pointed per freeze, or made to glob. ~half a
+  session.
+  **(c) BUNDLE DIRECTORIES NAMED BY FREEZE SET** — `../mister_fieldtest_merged-m16/`,
+  the recordings law applied to bundles; forward-only (the 14z11x/14z132
+  names are cited in docs and stay). Zero cost; a convention line in
+  `mister_field.md`.
+  **RECOMMENDATION: (a) + (c) now, and (b) if the menu name is wanted** — (a)
+  makes the artifact self-describing for free and is checkable by a gate;
+  (c) costs nothing; (b) is the only one visible without opening a file,
+  and its per-freeze filename churn is the price of that, which is the
+  maintainer's trade to make. Nothing built; the current bundle is not
+  touched while it is on the board.
+
 - **~~THE UNPINNED STOCK-SET GATES — WHICH MAME INSTRUMENT DO THEY RUN ON UNDER
   THE RUNNER?~~ DECIDED (maintainer, 2026-09-05, 14z-133b): OPTION (c), THE
   RUNNER-LEVEL DEFAULT — *"yes, runner-level default. Then redo the run to
