@@ -23,6 +23,21 @@ older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
   VERBATIM to `DECISIONS_HISTORY.md`** (grep there by topic; the §5
   retraction grep covers it).
 
+## Session 14z-134 — **THE M16 RELEASE RUN LAUNCHED (165 gates, four lanes, strict), AND THE
+## WORK DONE BESIDE IT IN A WORKTREE: the DECISIONS_HISTORY pass (STATE 249 -> 134 KB), the
+## LEVEL-0 SKILL CUT (two board-agnostic skills, 109 of 145 rules lifted, every old ID a
+## redirect, a GENERATED guide per skill), and the RELEASE-DAY PREP — which found the M16
+## release directory PRODUCED BUT NEVER TRACKED.** IN PROGRESS: the run is in flight.
+
+| | |
+|---|---|
+| opened with | the opener read (CLAUDE.md, STATE, HANDOFF, NEXT_SESSION), then the maintainer: *"start the release run"* |
+| **THE RELEASE RUN** | preflight: ROM audit 76/76, all five M16 build dirs on disk, both MAME source builds + both FBNeo binaries present, no competing emulator process, jtsim scratch present, 193 GB free. Launched detached from a shell with `MAME_BIN` UNSET so the runner's own default applies: `env -u MAME_BIN ROMDIR=../ROMS tests/run_all_emulator.sh --scope all --lane all --strict --log build/emu_release_m16` (PID in `build/emu_release_m16/LAUNCH_PID`). **One correction to the opener's wording: `--lane mister` ALONE selects only that lane (the flag accumulates); the release-shaped flag is `--lane all`** — the dry run resolved 165 gates (142 release + 23 out) across prereq/fbneo/mame/mister. Expected ~12-13 h at one job. A persistent monitor emits every non-PASS row and the final verdict; the runner's tree check is on the MAIN tree, so every edit of this session lives in the worktree `.claude/worktrees/decisions-pass` (branch `worktree-decisions-pass`) and fast-forwards into `main` after the run |
+| **item 1 — the DECISIONS_HISTORY pass (owed since 14z-133)** | thirty ruled entries moved byte-verbatim to `DECISIONS_HISTORY.md` "Moved 14z-134"; STATE 249 KB -> 134 KB (under the 150 KB target). Two stale headers corrected IN PLACE first ([VSP-13]): the version-numbering scheme said "BUILT, NOT REGISTERED" (registered 14z-132/133b), the boot name screen said "NOT YET REGISTERED" (frozen 14z-130). Seven entries stay: the two backlog directions, the living-documentation direction, Pyron's row 0x11, the Phobos-throw ±1 residue, the community cross-check, the Zabel j.LK session. Commit `4f139744` |
+| **item 2 — THE LEVEL-0 SKILL CUT (the maintainer's backlog item (1), blessed: *"If item 2 does not jeopardize anything ongoing you have my blessing"*)** | every rule of the three CPS-2 skills asked "would this still be true if the board were not CPS-2?": **cps2-emulation 42/42 lifted, cps2-hardware 4/30, mister-cps2-wide-core 63/73** — 109 of 145. New skills `mame-fbneo-instruments` `[MFI-1..46]` and `mister-jtframe-core` `[MJC-N]`. **THE FINDING: cps2-emulation had NO CPS-2 content**; the CPS-2 emulator facts were always `[CPH-23]`/`[CPH-25]`/`[MSC-32]`. Three decisions taken under stated assumptions (a lifted rule KEEPS ITS NUMBER; every old ID stays DEFINED as a redirect with both anchors on one paragraph — measured 352 external citations of the 145 IDs; level 0 anchors into this repo's docs) — **ALL THREE RULED ACCEPTED by the maintainer the same day** (*"I am fine with them"*), with one addition: a self-contained GUIDE per level-0 skill and a self-contained skill for other projects. Checker: `BOARD_TOKENS` liftability at level 0; gate: three new must-fire controls incl. "a redirect deleted -> orphaned anchor". Record: `docs/project/skills_scope.md` §7 (rule-by-rule table). Commits `2d0019de`, `f631c4a4` |
+| **the GUIDES — a projection of the docs, not a second text** | `tools/gen_skill_guide.py` GENERATES `GUIDE.md` beside each level-0 `SKILL.md`: the rule, then the INCIDENT — exactly the doc paragraph the rule is anchored to (the SMS project hand-wrote its guide; here the anchoring pays for itself), quoted as its own paragraph / list item / table row, windowed to ~1,800 chars where the paragraph is a run-on (HANDOFF's 15 KB MiSTer paragraph). MFI 46 rules / 53 KB, MJC 63 / 73 KB. Gate `tests/test_skill_guides.sh` (ci_portable): `--check` fails on a changed rule, a changed paragraph or a hand-edited guide until regenerated; three controls fire. The SKILL.md intros made portable — **the skill DIRECTORY is the self-contained unit; copy it into `~/.claude/skills/<name>/`**. Commit `94627b30` |
+| **RELEASE-DAY PREP (the maintainer: *"let's do only Release-day prep (1)"*) — WHAT IT FOUND** | (1) **`release/merged-m16/` EXISTS ON DISK IN THE MAIN TREE BUT IS UNTRACKED** (`git status`: `?? release/merged-m16/`). Every earlier release directory (m6..m14) was committed IN ITS FREEZE COMMIT (`5672291c` merged-m14, `ac17521c` merged-m10); the 14z-132 freeze commit omitted this one, so the STATE_HISTORY 14z-132 close row's "packaged (`release/merged-m16/`, three platforms) … Eleven commits, all pushed" is true of the commits and FALSE of the package — marked in place there and in NEXT_SESSION. **Tracking it is a release-day step, after the run** (a `git add` would show in the runner's tree check). (2) The package itself is COMPLETE and CONSISTENT, verified read-only: three platform dirs, 20 xdelta patches each, the three `manifest.json` byte-identical (`build_fingerprint f42f7569`, `version_string M16`, one zip `vsavjw.zip`), `mister/BITSTREAM.txt` byte-identical to the canonical `release/bitstreams/18269/`, the `.rbf` sha256 `46fc74af…` equal to the record, both MRAs' CRC parts resolve against `build/m3b_merged23/rompath` + `$ROMDIR` (31/31 WIDE, 22/22 stock control), and both MRAs BYTE-IDENTICAL to the field-tested bundle `../mister_fieldtest_14z132/`. (3) **`tests/test_release_roundtrip.sh` has never gated the M16 layout**: its code default is `NAME=merged-m14` while its header says `merged-m15` (a header/code mismatch `test_header_defaults` does not cover — positional `[name]`, not `BUILD=`); section 4 therefore locked m14's directory on every green static tier since 14z-119. Re-point + run on m16 is a release-day step. (4) The release MRAs predate the 14z-133b BUILD block (0 occurrences); the maintainer's ruling then was "the current bundle on the board is untouched; the next freeze's MRAs carry it" — whether the RELEASE copy (not yet shipped) should carry it is put to the maintainer in the checklist. (5) `release/merged-m15/` (M13) was never packaged — superseded by M16 before any release; recorded, not owed. **The checklist is in `docs/NEXT_SESSION.md` "RELEASE DAY (M16)"; the one approval item is the entry at the top of "Decisions pending".** |
+
 ## Session 14z-133b — **THE RUNNER-LEVEL MAME DEFAULT, RULED, SHIPPED AND VALIDATED BY
 ## THE FULL SWEEP: 134/0/0/0 AGAIN**, compared row by row with 14z-133's record — the same
 ## 134 gates, no verdict differs but the three reds now green, and the 24 gates whose
@@ -358,6 +373,44 @@ FILE — several have it in their gate header or a STATE entry — but the file 
 what a triage is looking at, so those are where the thinking time goes.
 
 ## Decisions pending (human)
+
+- **THE M16 RELEASE RUN'S ONE EXPECTED NON-GREEN — `audit_mask_window_ff42a2`
+  SKIPs — NEEDS THE MAINTAINER'S APPROVAL AT RELEASE TIME (14z-134; the
+  policy: "RELEASE-TIME TEST SCOPE", *"unless explicitly approved AT release
+  time, anything red, anything skipped is a hard fail"*).**
+  **WHAT THE GATE IS:** the pre/post ATTRIBUTION INSTRUMENT for a
+  select-palette row move ([VSP-35]) — it A/Bs a PRE-move build against a
+  POST-move build on the replays whose self-frozen `.sha1` the move shifted,
+  and requires every differing byte to fall inside the ratified staging
+  family. It is what caught the 14z-88 `38_victor_p1_vsavj` superset
+  regression (the medallion row move cost the select->VS fade one main-loop
+  iteration), and it is kept for the next such move.
+  **WHY IT SKIPS, by construction:** its operands DESCRIBE A CHANGE UNDER
+  INVESTIGATION — a pre-move rompath, a post-move rompath and the replay names
+  the change shifted. There is no default pair because there is no default
+  change; invoked bare it prints `SKIP: no operands — this is the pre/post
+  attribution INSTRUMENT …` and exits 0 (14z-128, after the sweep recorded a
+  shell error as a FAIL). The registry marks it `out` / `momentary:` for that
+  reason (ruled 2026-09-03). Under `--strict` the runner counts the SKIP as a
+  failure, so **the run's expected end state is PASS 164 / SKIP 1 / FAIL 0
+  with the strict verdict RED on that one row.**
+  **WHAT APPROVING MEANS:** the SKIP is not a missing measurement of the
+  artifact. No select-palette row moved in M16 (the delta is two glyph
+  members, `vsw.33m`/`vsw.37m`, and the program fingerprint is unchanged), and
+  the merged build's select-screen state IS measured by the gates that ran:
+  the frozen masked legacy classes on merged (B2, 53/53), `audit_legacy_pairings`,
+  `audit_flicker_attribution`, the pixel gates. Approval says "this instrument
+  has nothing to attribute today", not "we did not look".
+  **OPTIONS:** **(a) approve the SKIP and RECORD it as a STANDING release
+  exception** in the gate's `ci_emulator.tsv` note (e.g. `release: SKIP
+  approved 2026-09-05 — an instrument with no default subject`) so the next
+  release run does not re-ask — a `tests/` edit, after the run. **(b) give it
+  a standing pair** (last freeze vs this freeze, the moved `.sha1` list) — but
+  with no row move between them the pair is bit-identical and the audit
+  REFUSES to attribute a move that did not happen; a synthetic pair measures
+  nothing. **(c) drop it from the registry** — refused by the project's own
+  history: it is the instrument that caught the 38 regression. **RECOMMENDATION:
+  (a).** One line; the exception is then a reviewed row, not a ritual step.
 
 - **TWO BACKLOG ITEMS, RECORDED AS DIRECTION (maintainer, 2026-09-05, 14z-133b)
   — ~~nothing scheduled; both are multi-session and wait behind the field test

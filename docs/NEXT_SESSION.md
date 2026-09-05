@@ -5,6 +5,62 @@
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
+## RELEASE DAY (M16) — the checklist (written 14z-134 while the run was in flight)
+
+The run: `env -u MAME_BIN ROMDIR=../ROMS tests/run_all_emulator.sh --scope all
+--lane all --strict --log build/emu_release_m16` (165 gates; `--lane all`, NOT
+`--lane mister`, which would select only that lane). Everything below happens
+AFTER it exits, in this order; steps 2-5 are `tests/`/`release/` edits the
+runner's tree check would have flagged mid-run.
+
+0. **READ THE VERDICT, NOT THE EXIT STATUS.** `build/emu_release_m16/runner.out`
+   tail: PASS/SKIP/FAIL/TIMEOUT counts, the `== working tree ==` line must say
+   `ok: no tracked file changed during the run`, and `results.tsv` is the record.
+   **Expected: PASS 164 / SKIP 1 / FAIL 0** — the one SKIP is
+   `audit_mask_window_ff42a2`, an instrument with no default subject, and under
+   `--strict` it reads RED. Its approval is the entry at the top of STATE
+   "Decisions pending" (recommendation (a): approve + record as a standing
+   exception in its `ci_emulator.tsv` note). Anything ELSE non-green is a
+   question, not an answer (STATE "HOW A RED IS ADJUDICATED"): which side rests
+   on a measurement?
+1. **STATIC TIER in the worktree, then fast-forward.** `ROMDIR=../ROMS
+   tests/run_all_static.sh --strict` in `.claude/worktrees/decisions-pass`;
+   gate on its GREEN line. Then `git merge --ff-only worktree-decisions-pass`
+   on `main`, `git worktree remove .claude/worktrees/decisions-pass`,
+   `git branch -d worktree-decisions-pass`.
+2. **`tests/test_release_roundtrip.sh`: re-point the default `NAME` to
+   `merged-m16`** (code says `merged-m14`, header says `merged-m15` — both
+   stale; the M16 layout has NEVER been gated) and run it explicitly:
+   `ROMDIR=../ROMS tests/test_release_roundtrip.sh build/m3b_merged23/rompath
+   merged-m16` — sections 1-3 (round trip, applier refusals, the rule-7 chunk
+   scan) and section 4 (the per-platform layout of the tree's
+   `release/merged-m16/`). Verified read-only 14z-134 already: 3 platforms ×
+   20 patches, manifests byte-identical (`f42f7569`, `M16`), BITSTREAM.txt
+   canonical, `.rbf` sha256 matches, MRA parts 31/31 + 22/22, MRAs
+   byte-identical to the field-tested bundle.
+3. **MAINTAINER'S CALL — the release MRAs and the BUILD block.** The release
+   copy predates the 14z-133b build line (0 occurrences). The ruling then:
+   *"the current bundle on the board is untouched; the next freeze's MRAs and
+   bundle carry it."* The RELEASE copy has not shipped. Options: keep it
+   byte-identical to the field-tested bundle (as today), or regenerate the WIDE
+   MRA with `tools/mister_mra.sh --no-rom --wide build/m3b_merged23 --out
+   <tmp>` and copy it in (parts unchanged — the block is an XML comment;
+   re-check 31/31 and `test_mra_build_line`). Recommendation: regenerate — a
+   release MRA that names its build is what the build line was for, and the
+   field verdict is about the parts, which do not move.
+4. **TRACK THE RELEASE:** `git add release/merged-m16` and commit
+   (`14z-134 RELEASE: merged-m16 …`, the run's counts and log dir in the
+   message). Add `RELEASED 14z-134 (run 164/1/0 …)` to the M16 row of HANDOFF
+   "Build registry" — release_format.md: the registry row, the tag and
+   STATE's entry ARE the release's history.
+5. **PUSH at the maintainer's word** (never unasked). `release/merged-m15`
+   (M13) was never packaged — superseded before release; recorded, not owed.
+6. **THE CLOSE RITUAL:** STATE 14z-134 entry completed (the run's row), this
+   file rewritten, rollover check (STATE is ~135 KB), the doc-touch checklist,
+   static tier. Stop the monitor; keep `build/emu_release_m16/` as the
+   evidence log (the 14z-133b sweep dir is the precedent); sweep leftover
+   emulator processes.
+
 > ## **M16 IS FROZEN, PACKAGED AND PUSHED. THE EMULATOR TIER IS 134/0/0/0
 > ## GREEN TWICE (14z-133, and 14z-133b under the new runner-level MAME default,
 > ## row-by-row identical). NOTHING IS OWED TO THE HARNESS.** All 14z-133/133b
@@ -34,7 +90,10 @@
 > ## since 14z-108 — seed 18269, verify the hash before flashing. **M16 IS
 > ## FIELD-GREEN (maintainer, 2026-09-05): "Field tests are green." THE RELEASE
 > ## IS ON.** M12 was green twice before it; M13 was never fielded alone.
-> ## **THE RELEASE.** `release/merged-m16/` is packaged for all three platforms.
+> ## **THE RELEASE.** `release/merged-m16/` is packaged for all three platforms
+> ## — ~~and~~ **BUT UNTRACKED (found 14z-134): it sits `??` in the main tree, never
+> ## `git add`ed, unlike every earlier release directory; tracking it is step 4 of
+> ## the RELEASE DAY checklist below.**
 > ## A release run is `--scope all` PLUS `--lane mister` (hours); anything red
 > ## or skipped is a hard fail unless approved. **THREE `out`-scope rows are
 > ## known problems** — two RED with exact diagnoses, one dead must-fire
