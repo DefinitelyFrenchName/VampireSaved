@@ -1,5 +1,29 @@
 # STATE_HISTORY — the STATE.md archive
 
+## Session 14z-131 — **THE MAINTAINER CHALLENGED A GATE AND WAS RIGHT THREE TIMES
+## RUNNING.** Two rulings executed (Pyron measured, `test_phasec_image` §4 re-targeted
+## and green), then Phobos's three historically-corrected throws MEASURED AGAINST NATIVE
+## VS2 and found MATCHING — but only after captures refuted my own description of the
+## first result, a set-comparison was replaced by an ordered one, and widening to all 18
+## victims exposed a frozen constant as victim-specific. **The method is now a document.**
+## No build byte moved; static 130/0/0/0.
+
+| | |
+|---|---|
+| opened with | the two decisions the maintainer ruled overnight |
+| **§4 re-targeted, and it WORKED** | the dead control (zeroing `CPU:$400010`, which has held Donovan's AI script since 14z-111, in a replay where he is the PLAYER) replaced by zeroing the capture-keyframe blob's victim-offset head: the hold collapses from NINE distinct offsets to `(0,0)`, **47 of 47 held frames move**. `test_phasec_image` green for the first time since 14z-110 — §1's stock pin (`ae701ffb`, four ruled twin-moves stale) now resolves from `registry.tsv` |
+| **Pyron measured, then the story withdrawn** | zero-overlap hold offsets vs native, confirmed statically AND in-emulator. Then the maintainer demanded captures: they confirmed the FINDING and refuted my SENTENCE ("~130 px overhead") — raw dy/dx signs read as up/behind without ever fixing the screen convention. Then the victim's POSE was found to differ too, which the positioner CANNOT cause. **Mechanism withdrawn, port recommendation withdrawn**; ruled a keep-as-regression-marker |
+| **the redirect that mattered** | *"Pyron as thrower I don't really care about... but there are throws that have been historically problematic with the VS2 tenants as THROWERS: Phobos'."* Correct target, and the observable he named — position, not sprite — is exactly what the rig measures |
+| **PHOBOS'S THREE THROWS MATCH** | standard 6+HP, Circuit Scrapper, ES — **18/18 victims traverse the SAME states in the SAME order** on all three; damage identical in amount and in the POSE it lands at; arcs identical for every victim. The ES rig needed METER or it degrades SILENTLY to the MP grab (measured: byte-identical numbers to replay 80) |
+| **a nine-session-old claim refuted** | replay 80's own header said "only the victim throw-arc HEIGHT differs (alias physics, queued)". It does not — arcs identical on all three throws. It predated the 14z-67 fix and was never retracted |
+| **three challenges, three corrections** | (1) sets are blind to order/dwell -> replaced by the ORDERED state sequence; (2) the victim's PIXELS are cross-generation (VS's Victor vs VS2's) and are not evidence about the port -> excluded and said so; (3) damage timing unmeasured -> measured, same amount at the same POSE, offset growing +5/+7/+10, i.e. a RATE not a defect |
+| **widening: cost MEASURED, not argued** | 27.7 s for Victor, 186 s for all eighteen. It then paid twice: found the ±1 damage residue the narrow gate could not see, and **exposed the frozen arc constant as VICTOR's number** rather than the throw's. Ruled within tolerance, carried open as knowledge |
+| my own errors, corrected in-session | the "130 px" characterisation; a set comparison; using vsavj's pose table for TENANT victims (all three "diverged" — it was the resolver, a rule `audit_don_grab_pose` already documents); silently dropping the arc check while strengthening the gate; and the zsh no-word-split trap TWICE in one session |
+| **CLOSE — what shipped** | M16 FROZEN, registered on WHOLE-SET keys, tagged (4), packaged (`release/merged-m16/`, three platforms), MiSTer CRC tail (fork `ff5dee9d8`, pushed), card bundle `../mister_fieldtest_14z132/` (31/31 + 22/22 MRA parts resolve). Eleven commits, all pushed. Static tier **130/0/0 GREEN**, measured twice |
+| **CLOSE — what is OWED** | **the emulator tier owes a CLEAN RUN.** The freeze sweep reached 62 of 132 gates (61 PASS / 1 FAIL) before the system killed it for memory — *I caused that* by running five track builds, an m3a REFREEZE and a static tier alongside it. It must own the machine. Its one red is since root-caused and fixed, so the re-run starts one lighter. **CORRECTED 14z-133: HALF-FIXED.** The gate had TWO defects with ONE symptom; the relative-`$ROMDIR` one was real and is fixed, and the second — `MAME_BIN` unpinned, so the section-4 leg ran Homebrew's `mame`, which does not know `vsavjw` — was masked because the discriminator ran in a shell that exported the variable. The re-run went RED on it, plus two 14z-131 gates of the same class; all fixed and the class gated 14z-133 |
+| **CLOSE — the rollover NOT done, and why** | STATE is 211 KB against the ~150 KB threshold, but there are only TWO session groups, so "beyond the newest three" does not trigger. Rolling one would save ~10 KB of a file whose bulk is the standing **Decisions pending** section — which by rule never rolls to STATE_HISTORY. **The applicable mechanism is the DECISIONS_HISTORY.md pass** (ruled decisions that no longer shape work move there verbatim, 14z-109). Owed, and deliberately not half-done at the end of a window |
+| **the standing lesson, and it is the document** | `docs/project/gate_scoping_method.md`, [VSP-167]..[VSP-174]. **Every rule in it is something that went wrong here first** — which is the only reason to trust it |
+
 ## Session 14z-130 — **M13 IS FROZEN AND REGISTERED**: donovan-m19 / huitzil-m26 /
 ## pyron-m20 / merged-m15, mark M13, the boot name screen reading VAMPIRE SAVED. The
 ## `gap_be27a` correction folded in by ruling and **BYTE-NEUTRAL on all five tracks by
