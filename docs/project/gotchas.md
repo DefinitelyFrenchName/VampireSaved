@@ -3682,3 +3682,34 @@ The gate is deleted; `engine_internals.md` keeps what it used to assert,
 now explicitly UNGATED. Corroboration that the probe site was right: the
 14z-82 patch note records 5,862 RENUMBERED dispatches on the merged build for
 the same replay — the same stream, relabelled.
+
+## A `${VAR:?msg}` abort AFTER an EXIT trap exits 0 on macOS `/bin/sh` — a gate that never ran reads as PASS to any exit-status classifier (14z-134, the first MiSTer gate the release runner ever executed)
+
+`test_mister_obj_oracle.sh` demands `: "${JTSIM_SCRATCH:?set JTSIM_SCRATCH …}"`
+at line 87, eight lines AFTER `trap 'rm -rf "$W"' EXIT`. Under the release
+runner the variable was unset (every sibling MiSTer gate DEFAULTS it to
+`${TMPDIR:-/tmp}/vampire-saved-jtsim`; this one alone insists on it), the
+shell printed `line 87: JTSIM_SCRATCH: set JTSIM_SCRATCH …` and exited —
+**with status 0**, so `run_all_emulator.sh` — whose classifier is
+exit-status-first, by design and for a good reason (a `SKIP:` line plus a
+non-zero exit is a FAILURE) — recorded **`PASS 0s`** for a 65-minute
+Verilator gate that measured nothing. Measured on this host (bash 3.2.57 as
+`/bin/sh` AND `/bin/bash`): `sh -c 'set -eu; : "${U:?m}"'` → rc 1;
+`sh -c 'set -eu; trap "rm -rf /x" EXIT; : "${U:?m}"'` → rc **0**; and a trap
+written as `rc=$?; …; exit $rc` STILL returns 0 — `$?` is already 0 when the
+trap runs after a parameter-expansion abort, so the status is not merely
+overwritten by the trap body, it is gone. **The class (census 14z-134): five
+gates carry a `${…:?}` demand AFTER their EXIT trap** — `test_mister_obj_oracle`
+(JTSIM_SCRATCH), `test_projectile_params` and `test_tenant_row_owner`
+(`${ROMDIR:?}` — the usual top-of-file demand, placed late), and two
+`rm -rf "${VAR:?}/…"` safety guards (`test_basis_publish_atomic`,
+`test_mame_mirror_guard`) whose abort would itself be a defect. 200 other
+gates demand `${ROMDIR:?}` BEFORE the trap, where it exits 1 correctly. Rules:
+(1) a demand is an explicit test — `[ -n "${X:-}" ] || { echo "FAIL: set X";
+exit 1; }` — never `${X:?}` once a trap is armed; (2) a MiSTer gate DEFAULTS
+`JTSIM_SCRATCH` like its siblings; (3) a PASS with no `PASS`/`ok` line of the
+gate's own and a `.sh: line N:` shell error in its log is a crash, not a
+verdict — the runner should say so. The other four `.sh: line N:` lines in
+this run's 158 logs are MAME `Segmentation fault: 11` at TEARDOWN, after the
+instrument's summary line — the known [MFI-12] class those gates already
+assert around.

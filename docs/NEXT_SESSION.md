@@ -23,6 +23,20 @@ runner's tree check would have flagged mid-run.
    exception in its `ci_emulator.tsv` note). Anything ELSE non-green is a
    question, not an answer (STATE "HOW A RED IS ADJUDICATED"): which side rests
    on a measurement?
+0b. **ONE PASS IS A HOLE — RE-RUN IT BEFORE READING THE RUN AS GREEN.**
+   `test_mister_obj_oracle` recorded `PASS 0s`: it died at its
+   `${JTSIM_SCRATCH:?}` demand (unset under the runner; siblings default it)
+   and macOS bash 3.2 returns exit 0 for a `:?` abort after an EXIT trap
+   (gotcha, `docs/project/gotchas.md`; STATE 14z-134). After the run: (i) the
+   gate defaults `JTSIM_SCRATCH="${JTSIM_SCRATCH:-${TMPDIR:-/tmp}/vampire-saved-jtsim}"`
+   like its siblings and every `${…:?}` demand after a trap in the five-gate
+   class becomes an explicit `[ -n … ] || { echo FAIL; exit 1; }`; (ii) the
+   runner treats a log carrying a `.sh: line N:` shell error and NO verdict
+   line as FAIL, with a `test_emulator_runner` control; (iii) delete that one
+   row from `results.tsv` and `--resume` under the runner's shape (~65 min);
+   (iv) only then read the totals. The four other shell-error lines in this
+   run's logs are MAME teardown segfaults after the summary line — known,
+   benign ([MFI-12]).
 1. **STATIC TIER in the worktree, then fast-forward.** `ROMDIR=../ROMS
    tests/run_all_static.sh --strict` in `.claude/worktrees/decisions-pass`;
    gate on its GREEN line. Then `git merge --ff-only worktree-decisions-pass`
