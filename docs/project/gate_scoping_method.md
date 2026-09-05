@@ -196,7 +196,7 @@ it is measured against.
 **THE ONE STRUCTURAL BLOCKER, and it is not a rig question.** A gate that
 resolves a frozen expectation SET by fingerprint cannot simply be re-pointed:
 `build_fingerprint.py` hard-fails `FAIL: <dir> has no registry row`, and the
-merged build deliberately has none (`registry.tsv`'s header gives the reason —
+merged build deliberately had none until 14z-133b, when B2 gave it a WHOLE-SET-keyed row (`registry.tsv`'s header gives the original reason —
 `build/merged1`, the blanks-only legacy instrument, shares the shipped merged
 image's program fingerprint, so a row would silently green-light the
 instrument). Moving such a gate to merged therefore depends on the merged
@@ -225,3 +225,18 @@ ROMPATH-CHAIN DEPENDENT" for the definition that makes such a key stable).
 9. And as a PRECONDITION to all of it: decide which BUILD the gate runs
    on. The merged build — the one that ships — unless a single-tenant
    build is the SUBJECT of the assertion ([VSP-175]).
+
+## 10. Time the walk before choosing the method (14z-133b)
+
+The 14z-132 question — walk the ~16 homogeneous gates one at a time, or
+re-point them in one pass and let the results raise the exceptions — was
+answered by ONE NUMBER: their combined runtime in the sweep was 271 s. The
+one-at-a-time method's value had been in the "what is this gate?" errors it
+caught, and that classification was already done for all 16 at once; what
+remained per gate was a re-measure that cost seconds. One pass, 16/16 green
+on the merged build, and the one gate that needed a ruling (`test_dualtrack`,
+§v6 of `oracle_classes.md`) surfaced by its own red, exactly as "let the
+results raise the exceptions" predicted. Rule: before choosing a walking
+method, sum the runtimes; when the measurement is cheap, measure everything
+and read the reds.
+

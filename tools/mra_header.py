@@ -88,7 +88,7 @@ def tag_lookup(repo, wkey, pkey):
             n, _, body = chunk.partition("\t"); tags[n[len("freeze/"):]] = body
     hit = [n for n, b in tags.items() if wkey in b]
     if len(hit) == 1:
-        return hit[0], "whole-set key, annotated tag freeze/%s (merged builds have no registry row by design)" % hit[0]
+        return hit[0], "whole-set key, annotated tag freeze/%s (a merged build not yet registered)" % hit[0]
     hit = sorted(n for n, b in tags.items() if pkey in b)
     if len(hit) == 1:
         return hit[0], "program key ONLY, annotated tag freeze/%s (not under a whole-set key)" % hit[0]
@@ -116,8 +116,8 @@ def build_block(build):
         name = next((n for k, n in rows if k == pkey), None)
         how = "program key, tests/expected/registry.tsv (NOT registered under a whole-set key)"
     if name is None:
-        # THE MERGED BUILD HAS NO REGISTRY ROW BY DESIGN (registry.tsv's header;
-        # B2 deferred 14z-132): its reviewed record is the annotated
+        # A MERGED BUILD NOT YET REGISTERED (B2 gave merged-m16 a whole-set row at
+        # 14z-133b; a later freeze is unregistered until its own): its record is the annotated
         # freeze/merged-mN tag, whose message carries the keys -- the anchor the
         # version-string gate was ruled to use ([VSP-166]). Whole-set key first;
         # a program-key-only match is named only when it is UNIQUE (merged-m15

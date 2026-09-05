@@ -3,7 +3,11 @@
 # Every row also has an annotated git tag freeze/<expectation-set> at the
 # commit that froze it — the way back to a tree that reproduces it.
 #
-# THE MERGED BUILD IS FROZEN AND DELIBERATELY HAS NO ROW HERE (merged-m1,
+# UNTIL 14z-133b THE MERGED BUILD DELIBERATELY HAD NO ROW HERE — the reasoning
+# below stands, and B2 (14z-133b) answered it: merged rows are keyed on the
+# WHOLE-SET fingerprint ONLY (build_fingerprint.py --set-key), which the
+# blanks-only instrument build/merged1 cannot share, so the first merged row
+# (merged-m16) is safe. The original reasoning (merged-m1,
 # 14z-92, maintainer-decided). Do not "fix" this by adding one.
 # The dispatch fingerprint covers PROGRAM members only (the blind spot
 # build_fingerprint.py documents), and `build/merged1` — the LEGACY-ONLY

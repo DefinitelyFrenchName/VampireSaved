@@ -125,7 +125,10 @@ run_tier() {  # run_tier <label> <names>
         # classifier called it a skip. SKIP is exit 0 plus the marker, only.
         if [ "$_st" != 0 ]; then
             printf '  %-34s FAIL  %3ss  (exit %s)\n' "$g" "$_dur" "$_st"
-            printf '%s\n' "$_out" | tail -4 | sed 's/^/        | /'
+            # FAIL_TAIL: how much of a failing gate's output to show (default 4;
+            # the CI sets 80 — a red read remotely needs the section that failed,
+            # not the last four lines of its controls; 14z-133b).
+            printf '%s\n' "$_out" | tail -"${FAIL_TAIL:-4}" | sed 's/^/        | /'
             n_fail=$((n_fail + 1)); failed="$failed $g"
         elif printf '%s' "$_out" | grep -qE '^ *SKIP'; then
             _why="$(printf '%s' "$_out" | grep -E '^ *SKIP' | head -1 | cut -c1-58)"

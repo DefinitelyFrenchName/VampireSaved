@@ -53,7 +53,6 @@ test_freeze_retires_diverge
 test_freeze_tag_coverage
 test_gfx_collision_gate
 test_gfx_layout_fields_live
-test_harness_frame_bound
 test_header_defaults
 test_hex_lengths
 test_masked_compare
@@ -93,7 +92,6 @@ test_mister_wide_gate
 # occupancy census and re-reads the palette when the build and the decrypted
 # image are present, and SKIPs those two otherwise. Three must-fire controls.
 # ROM-free, no emulator, ~5 s. tools/mk_mister_page.py --check
-test_mister_page
 
 # 14z-114: the two MiSTer SKILLS (.claude/skills/mister-cps2-wide-core,
 # mister-vampire-saved) are LOCKED to the docs they distil — every rule

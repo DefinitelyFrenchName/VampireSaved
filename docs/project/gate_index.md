@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**302 scripts** — 64 ci_portable, 69 ci_static, 169 emulator-tier (run by name).
+**302 scripts** — 62 ci_portable, 71 ci_static, 169 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -355,7 +355,7 @@ the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guar
 | `tests/test_freeze_retires_diverge.sh` | test | ci_portable | — | freezing a replay must actually govern it (14z-94, GitHub #88). ROM-free, no MAME, ~2 s. | 14z-94 |
 | `tests/test_gfx_layout_fields_live.sh` | test | ci_portable | — | gfx_layout3.toml's profile and scatter fields must MEAN something (14z-94, GitHub #87). ROM-free, ~2 s. | 14z-94 |
 | `tests/test_guard_integrity.sh` | test | emulator | MAME, ~2 min | the crash guard must carry the input-integrity assertion, and must refuse env vars it does not implement (14z-94, GitHub #31). Needs ROMDIR + a WIDE build; ~2 min. | 14z-94 |
-| `tests/test_harness_frame_bound.sh` | test | ci_portable | — | the FBNeo harness must bound replay frame numbers (14z-94, GitHub #77). ROM-free structurally; the functional half runs only if a built binary and ROMDIR are present. ~5 s. | 14z-94 |
+| `tests/test_harness_frame_bound.sh` | test | ci_static | ROMDIR | the FBNeo harness must bound replay frame numbers (14z-94, GitHub #77). ROM-free structurally; the functional half runs only if a built binary and ROMDIR are present. ~5 s. | 14z-94 |
 | `tests/test_hex_lengths.sh` | test | ci_portable | — | ground truth for tools/audit_hex_lengths.py, the balanced-byte-edit check (14z-94, GitHub #20). ROM-free, ~1 s. | 14z-94 |
 | `tests/test_mame_mirror_guard.sh` | test | ci_portable | — | setup_mame.sh must never run `rsync --delete` into a directory it does not own (14z-94, GitHub #80). ROM-free, ~3 s. | 14z-94 |
 | `tests/test_mask_ranges_reader.sh` | test | emulator | ~1 min | the MASK_RANGES reader must mask exactly what the spec says (14z-94, GitHub #61). ~1 min, needs ROMDIR + a WIDE build. | 14z-94 |
@@ -389,7 +389,7 @@ the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generatio
 | `tests/test_mister_gfxc_fetch.sh` | test | emulator | Verilator, a build dir | THE PAYOFF GATE: it goes green the day the core FETCHES a tenant tile. IT HAS BEEN GREEN — with the right replay (see STATUS). Its DEFAULT replay cannot reach a match, so a bare run is red by construction; pass the measured-green operands. | 14z-107 (10) |
 | `tests/test_mister_mra_map.sh` | test | ci_static | ROMDIR | the MiSTer download image is EXACTLY the placement map, the trim that makes it downloadable is real, and the stock reference leg did not move. (14z-107 (5), MiSTer slice D0; docs/project/mister_map.md §3 is the design this gate defends.) | 14z-107 (5) |
 | `tests/test_mister_obj_oracle.sh` | test | emulator | MAME, ~65 min | the FIRST cross-implementation agreement this project has on a VIDEO-DETERMINING surface, and it is on the content the port exists to add. | 14z-108 |
-| `tests/test_mister_page.sh` | test | ci_portable | — | the MiSTer synthesis page still draws the map that is actually there. (14z-107 (10); docs/project/mister_core.md + tools/mk_mister_page.py.) | 14z-107 (10) |
+| `tests/test_mister_page.sh` | test | ci_static | ROMDIR | the MiSTer synthesis page still draws the map that is actually there. (14z-107 (10); docs/project/mister_core.md + tools/mk_mister_page.py.) | 14z-107 (10) |
 | `tests/test_mister_prg_probe.sh` | test | ci_portable | — | the ROM-free half of the slice D4 discriminator (14z-107 (11)). It locks the CONTRACT of the 68k program-ROM read probe and of the tool that reads it, without a ROM, an emulator or 40 minutes of Verilator. | 14z-107 (11) |
 | `tests/test_mister_prg_window.sh` | test | emulator | Verilator, a build dir | SLICE D4's OWN EVIDENCE: what the 68k does with CPU:$400000-$5FFFFF on the core. 14z-107 (11). Emulator tier: ROMDIR + Verilator + ~2 x 40 min. NOT ci_portable, NOT ci_static. | 14z-107 (11) |
 | `tests/test_mister_qsound_ext.sh` | test | emulator | ~75 min | THE QSOUND EXTENSION IS FETCHED ON THE CORE (14z-108). The roster's own voices live in DSP sample banks 0x80-0x8E, which stock CPS-2 cannot address at all: | 14z-108 |

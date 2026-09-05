@@ -18,6 +18,12 @@ SET="${1:?usage: run_replay_fbneo.sh <set> <replay.rpl> <out.log> [sandbox]}"
 RPL="${2:?replay path required}"
 OUT="${3:?output log path required}"
 SANDBOX="${4:-}"
+# ABSOLUTE (14z-133b, measured): the emulator runs from inside the overlay/
+# sandbox, so a RELATIVE sandbox argument produced NO checksum log at all —
+# 0 lines vs 3,120 on the same replay with an absolute one — and the caller
+# read an empty file as "no dumps". Same class as the relative FBNEO_ROMPATH
+# note below and the gates' $ROMDIR normalisation (14z-132).
+if [ -n "$SANDBOX" ]; then mkdir -p "$SANDBOX"; SANDBOX="$(cd "$SANDBOX" && pwd)"; fi
 ROMDIR="${ROMDIR:?set ROMDIR to the reference-set directory}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 # FBNEO_BIN overrides the binary — used by the WIDE emulator superset

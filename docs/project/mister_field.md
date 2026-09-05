@@ -68,8 +68,8 @@ next) — the recordings rule [VSP-20] applied to bundles: the freeze, never the
 session or the mark; the `14z11x`/`14z132` names already cited stay. And the
 WIDE MRA's comment header ends with a BUILD block — the freeze name (the
 registry row, or for a merged build the annotated `freeze/merged-mN` tag whose
-message carries the whole-set key, since merged builds have no registry row by
-design), the mark,
+message carries the whole-set key — the fallback for a merged build not yet
+registered; since B2, 14z-133b, `merged-m16` has a whole-set-keyed row), the mark,
 the `vsavjw.zip` sha1 and both dispatch keys — written by `tools/mra_header.py`
 only after every CRC part of the MRA resolves against that build's zips
 (`tests/test_mra_build_line.sh`, must-fire control). **The mark is NOT in the

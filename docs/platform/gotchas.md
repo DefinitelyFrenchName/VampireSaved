@@ -2256,3 +2256,17 @@ entry (`NNNN:ff0000-ffffff;`) is ~19 characters, so a spec naming more than
 complete, so nothing looks wrong until a frame count is checked. Batch the
 spec (≤400 frames per run) and ASSERT the dumped count against the requested
 one — `tools/check_wram_dumps.py` exists for exactly that on the MAME side.
+
+## `run_replay_fbneo.sh` with a RELATIVE sandbox argument writes NO log — 0 frames, silently (paid: 14z-133b)
+
+The wrapper already resolved the replay and the output-log paths to absolute
+(the emulator cds into its rom overlay), but not the optional SANDBOX
+argument. Measured on `06_test_mode`: a relative sandbox -> the log file is
+never written (0 lines, only the sandbox dir appears); the same call with an
+absolute sandbox -> 3,120 frames. Two dual-track dump runs on 14z-133b came
+back "dump missing" this way before the cause was isolated by changing ONE
+argument. Fixed in the wrapper (the sandbox is now made absolute). The
+general rule stands: every path a wrapper hands to something that `cd`s must
+be absolute at the point it is first read ([VSP-101]-era `$ROMDIR` lesson,
+14z-132; the same class as the relative `FBNEO_ROMPATH` note in the script).
+

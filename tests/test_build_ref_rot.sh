@@ -54,7 +54,7 @@
 #         its family (donovan-mN / huitzil-mN / pyron-mN).
 #       - family disagreement: when several gates name different dirs for the
 #         same role, at most one can be current. This is what catches the
-#         MERGED build, which has no registry row by design.
+#         MERGED build, which had no registry row by design until B2 (14z-133b: whole-set-keyed).
 #
 #     IT REPORTS AND DOES NOT FAIL, deliberately. A superseded reference is
 #     often CORRECT — the pre-fix build in an A/B audit, a known-bad
@@ -125,13 +125,21 @@ for path in sorted(glob.glob("tests/*.sh")):
         elif f'${var}/rompath' not in body and f'${{{var}}}/rompath' not in body:
             skipped.append((os.path.basename(path), var, bdir, "not read as a romset"))
             continue
-        if not os.path.isdir(bdir):
+        # ABSENT IS NOT ROTTED — and a build dir can EXIST on a clean checkout
+        # with no rompath at all: build/don_m5, build/hui30 and build/merged1
+        # carry force-added extract files or a README. That is "unbuilt here",
+        # exactly like a missing dir (the CI runner reported 11 ROTTED on a
+        # clean checkout this way, 14z-133b). ROTTED means a rompath that exists
+        # and holds no usable zip, or one too old to carry the members.
+        if not os.path.isdir(bdir) or not os.path.isdir(f"{bdir}/rompath"):
             absent.append((os.path.basename(path), var, bdir))
             continue
         zips = [z for z in glob.glob(f"{bdir}/rompath/*.zip") if "vsavjw" in z] \
                or glob.glob(f"{bdir}/rompath/*.zip")
         if not zips:
-            rotted.append((os.path.basename(path), var, bdir, "no romset zip"))
+            # a rompath with NO zip is unbuilt too: force-added side files
+            # (vsavjw.zip.ledger.json) put a rompath dir on a clean checkout
+            absent.append((os.path.basename(path), var, bdir))
             continue
         names = zipfile.ZipFile(zips[0]).namelist()
         wide = [n for n in names if n.startswith("vsw.")]
@@ -201,7 +209,7 @@ try:
 
       # signal 2: several gates naming DIFFERENT dirs of the same family. At most
       # one can be current, and this is what catches the merged build, which has
-      # no registry row by design.
+      # no registry row by design (merged: none until B2, 14z-133b).
       fam_dirs = {}
       for bdir in sorted(seen):
           fam_dirs.setdefault(re.sub(r"\d+$", "", bdir), set()).add(bdir)
@@ -215,7 +223,7 @@ try:
               # design (registry.tsv says so at the top), while an old solo is
               # unregistered because its set was carried-renamed away at a later
               # freeze. Both are "not a named generation"; neither is a verdict.
-              note = "no registry row (by design for merged/instrument, or a pre-freeze build)"
+              note = "no registry row (by design for the blanks instrument; a merged build has one since B2; else a pre-freeze build)"
           else:
               m = re.match(r"^([a-z]+)-m(\d+)$", expset)
               newest = fam_newest.get(m.group(1), (None, None))[1] if m else None

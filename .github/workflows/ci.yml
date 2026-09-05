@@ -176,7 +176,7 @@ jobs:
       - name: ROM-free ground-truth gates (tests/run_all_static.sh --tier portable --strict)
         run: |
           set -eu
-          tests/run_all_static.sh --tier portable --strict </dev/null | tee /tmp/static.log
+          FAIL_TAIL=80 tests/run_all_static.sh --tier portable --strict </dev/null | tee /tmp/static.log
           grep -q '^GREEN' /tmp/static.log || { echo "::error::the portable tier is not GREEN"; exit 1; }
           n="$(sed -n 's/^PASS \([0-9]*\).*/\1/p' /tmp/static.log | tail -1)"
           echo "ran $n gates"

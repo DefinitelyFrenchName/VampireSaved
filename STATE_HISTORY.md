@@ -1,5 +1,30 @@
 # STATE_HISTORY — the STATE.md archive
 
+## Session 14z-132 — **THE RELEASE WINDOW OPENED, AND THE MAINTAINER RULED FOUR
+## TIMES.** The version-numbering mess named and fixed at its root (the wheel mark is
+## the merged build number, M16, and a gate will hold it there); the M16 tracks built and
+## measured at a two-member delta; and the merged-vs-solo test-scoping question opened,
+## given a general rule that is now [VSP-175], and walked two gates deep — where it hit a
+## structural blocker and turned into a dispatch-key decision. **No gate re-pointed yet;
+## M16 not registered.** Static 128/0/2 (both reds owed by the registration).
+
+| | |
+|---|---|
+| opened with | the maintainer's four questions: field-test scope, what is left before release, "can we make the versioning easier", and what the solo builds are for |
+| **the versioning mess, measured** | the wheel mark started EQUAL to the merged build number at merged-m6 and drifted by exactly the two freezes where it was not bumped (m7 kept M6, m10 kept M8). Today: build `merged-m15`, wheel `M13`, session `14z-130`, milestone namespace `M0..M12` — four numbers, two of them colliding. **RULED: option (A)** — the mark IS the merged build number, plus a gate. The conditional the maintainer attached answered itself: changing the mark changes the glyph tiles, which changes the artifact, so the bump is forced. **Landing: merged-m16 / wheel M16** |
+| **and a fifth number nobody had named** | the build DIRECTORY counter, with four different offsets from the freeze name — donovan +0, merged +7, pyron +17, huitzil +27 (verified over six freezes). Not renamed (55 gates reference the paths); recorded so the "generation N" option has its evidence |
+| **M16 built and measured** | five tracks. Delta is **exactly two members** (`vsw.33m`, `vsw.37m`) on each of the four WIDE tracks and **ZERO on the stock twin** — the standing prediction from `gen_donovan_patch.py:4999` (version_text is skipped when bank5 is inactive), confirmed by rebuild rather than asserted. `test_version_string` PASS on all four WIDE tracks incl. a pixel-exact snapshot and both verdict controls |
+| **every program fingerprint UNCHANGED** | `8065bc92` / `08944a7e` / `a43da974` / `f42f7569` — the documented gfx blind spot. So M16's registration would have needed a FOURTH comment-out, and `build/don_m20` today resolves silently as `donovan-m19` |
+| **the maintainer's core belief, and it was already measured** | *"regardless of how low the odds ... these odds are not zero, so the test is brittle intrinsically ... unless they are specific to solo builds, tests on solo builds ... should be run but on the merged build."* The premise is not a prior: `tests/expected/merged1/` exists BECAUSE merged deviated from the single-tenant builds in eight places at 14z-91 |
+| **the general rule, ruled CORRECT** | [VSP-175]: a gate is solo-specific only if a single-tenant build is the SUBJECT of its assertion; a reference leg, fixture or rig convenience does not qualify. Consequences ruled the same day: solo-specific => OUT of release scope; no meaningful merged form => deprecate permanently, keep as history |
+| the inventory | of 142 release-scope emulator gates: **46 merged, 25 solo-only, 3 both, 36 other build, 31 no build reference** (bound: static read of defaults + hard-wired assignments; the 31 are unopened). One correction found on the way — `audit_walker_repoint` looks solo but its `ci_emulator.tsv` row supplies `%MERGED%` |
+| **gate 1 — `test_dualtrack`** | RULED stock vs merged. **And my framing of it was wrong**: I called its stock leg "solo-specific"; the stock twin is the REFERENCE LEG, which the release-scope discriminator already excludes from being the subject. Corrected in [VSP-175] as the worked instance |
+| **gate 2 — `audit_legacy_pairings`, and it is not a re-point** | it resolves its expectation SET by fingerprint and hard-fails `FAIL: <dir> has no registry row`; the merged build deliberately has none. Exactly 3 of the 25 do this, all of them the legacy-oracle group |
+| **so the walk turned into a dispatch-key decision** | measured: program key collapses `build/merged1`, merged-m15 and merged-m16 onto ONE value (`f42f7569`); `--full` separates all three. **(i) approved, then found NOT EXECUTABLE as stated** — only 20 of 58 live registry rows are recomputable, the other 38 having been pruned under the N-2 policy. **RULED instead: forward-only promotion, merged rows full-set-keyed ONLY** (so the fallback can never reach one) |
+| **and a measurement that nearly shipped a bad key** | `--full` is ROMPATH-CHAIN DEPENDENT: `m3b_merged23/rompath` -> `fcc83fc3`, `...;../ROMS` -> `544990c4`. Callers pass both forms. The key must be defined over the build's OWN rompath only — the rule `artifact_manifest.py` already enforces for the same reason. Cost measured and irrelevant: 0.10 s -> 0.35 s |
+| my own errors, corrected in-session | the `test_dualtrack` misclassification (caught by applying the maintainer's own discriminator); proposing "recompute the registry" without checking that the builds still exist (38 do not) |
+| written down | two gotchas (the gfx-only-freeze key collision; the `--full` chain dependence), [VSP-175] + section 9 of `gate_scoping_method.md`, and the skill rule. Doc-touch checklist all green |
+
 ## Session 14z-131 — **THE MAINTAINER CHALLENGED A GATE AND WAS RIGHT THREE TIMES
 ## RUNNING.** Two rulings executed (Pyron measured, `test_phasec_image` §4 re-targeted
 ## and green), then Phobos's three historically-corrected throws MEASURED AGAINST NATIVE

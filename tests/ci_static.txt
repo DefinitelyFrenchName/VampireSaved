@@ -173,3 +173,5 @@ test_tenant_anim_relocation
 test_build_identity_distinct
 test_decrypt_cache
 test_charmap_overrides
+test_harness_frame_bound
+test_mister_page
