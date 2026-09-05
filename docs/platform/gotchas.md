@@ -2244,3 +2244,15 @@ than the pinned reference build (`~/.cache/vampire-saved/mame-ref/cps2`).
 expectations bit-for-bit, so the two are verdict-equivalent today; it is an
 instrument variance ([CPE-24]) the maintainer may want closed by the same pin
 or by a runner-level export, and it is not decided here.
+
+## FBNeo `-hdump`'s specification buffer is 8,192 characters — entries past ~430 frames are DROPPED SILENTLY (paid: 14z-133b)
+
+`FBNEO_DUMPS` is copied into a `char dumps[8192]` in the 0001 harness
+(`emu/fbneo-patches/0001-vampire-saved-harness.patch`). A whole-work-RAM spec
+entry (`NNNN:ff0000-ffffff;`) is ~19 characters, so a spec naming more than
+~430 frames is truncated at the buffer and the run writes dumps for the first
+~430 only, with no message. Measured 14z-133b: 1,181 frames requested on
+`01_attract_long`, 431 dumped. The run itself succeeds and the checksum log is
+complete, so nothing looks wrong until a frame count is checked. Batch the
+spec (≤400 frames per run) and ASSERT the dumped count against the requested
+one — `tools/check_wram_dumps.py` exists for exactly that on the MAME side.

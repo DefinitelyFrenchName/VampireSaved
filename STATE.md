@@ -47,6 +47,7 @@ older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
 | **RELEASE PREP: THE OUT-SCOPE REDS, FIXED WHILE THE BOARD WAS BUSY** | a release run is `--scope all` + `--lane mister` (165 gates), red-or-skipped = hard fail unless approved. Four `out` rows had been red or dead since 14z-128 with exact diagnoses and no owner, because they block no freeze. Three were gate defects and are FIXED and GREEN on first run: `audit_region_movability` (the probe now MERGES its `region_space` into donovan.toml's existing value instead of adding a duplicate key — PASS 311 s, all six cases measure), `test_m2a_stage2_data` (+ stage 1 and 3: build into the gate's own temp dir, not the pruned M2a-era `build/donovan` — PASS 119/118/120 s), `audit_phase_mode_cost` (the reference is BUILT from the current manifests without the latch, so the two legs differ by `latch_mode` alone — PASS 231 s, legacy bit-identical, which is the finding the 14z-64 reference could never have shown) |
 | **the release run, sized, and what will need APPROVAL** | release scope 2.8 h (measured twice today), the 23 `out` rows ~2.5 h (headers), the MiSTer lane ~7 h (headers, sequential): ~12-13 h at one job. Known non-green by construction: `audit_mask_window_ff42a2` SKIPs loudly — an instrument with no default subject ([VSP-35]), approval item. `audit_hitclass_map_cost` (dead must-fire control): see the next row. The scratch clone's five modules are fetched NOW so the first MiSTer gate does not wait on the network, and the reaper heal covers submodules (verified by hand: jt51 hollowed, 38 files restored). `run_sim_jtcps2.sh`'s module check named a path that never existed (`hdl/fx68k.sv`), so it re-ran the init on every run — fixed |
 | **THREAD 3 — THE MERGED/SOLO WALK, FINISHED IN ONE PASS, ALL GREEN** | the maintainer, after the field verdict: *"should we finish walking thread 3 before releasing?"* — yes, and the 14z-132 open question (one gate at a time vs one pass) answered itself once the 16 were timed: **271 s of runtime in total**, so the re-point is cheap and the classification work the one-at-a-time method was good for was already done for all 16 at once. **14 defaults re-pointed to `build/m3b_merged23`** (`test_guard_integrity` `test_mask_ranges_reader` `test_record_window` — fixtures, harmless; `audit_df_gold` `audit_trap_parity` `audit_trap_shock` `audit_trap_sound` `audit_voice_borrow` `test_beam_anim_walk` `test_beam_variants` `test_hui_df_style` `test_hui_grab_victim` `test_pyron_blink` `test_pyron_cosmo` `test_hui_oracle`), Usage lines re-synced by `audit_header_defaults.py --fix`. NOT re-pointed, with reason: `audit_tripwire_reach` already runs merged legs beside the solo ones ("both"); the three legacy-oracle gates wait on B2 by ruling, and the merged build's legacy behaviour is covered by `audit_merged_legacy` meanwhile |
+| **and the sixteenth, `test_dualtrack`, MEASURED on merged — the one open item** | ruled stock-vs-merged at 14z-132, never re-pointed; on merged it fails: every onset EARLIER (890 -> 830, 3190/4267 -> 1672). Dumped and diffed over EVERY checksum-differing frame before each frozen onset, all ten legacy replays + attract: **six offsets total, `$FF055B-D` (sound-driver phase, [VSP-26]) and `$FF7FF3-5` (dead stack), zero bytes outside, and the frozen onsets themselves unchanged** — execution-position flickers in ratified classes, read as onsets by an unmasked checksum compare. A re-ratification, so it is in "Decisions pending" with the inventory and recommendation (a); the gate stays green on its solo default meanwhile. Found on the way: the FBNeo `-hdump` spec buffer is 8,192 chars (~430 frames) and truncates SILENTLY — gotcha filed, batching is the fix |
 | **the result: NO merged-vs-solo difference in the artifact** | all 15 re-pointed gates PASS on the merged build on their first run, in the runner's shell shape (`build/thread3_14z133b/`): the harness fixtures 13/11/15 s; DF gold 12 s; trap parity/shock/sound 5/7/9 s (`audit_trap_sound` finally asserting about a SHIPPED build, not hui30 of 14z-82c); voice borrow 7 s; beam anim/variants 6/4 s; Huitzil DF style 18 s, grab victim, oracle 27 s; Pyron blink 12 s, cosmo 7 s. So the maintainer's prior — *"these odds are not zero, so the test is brittle intrinsically"* — was right about the brittleness and the artifact happened to be clean; both are now on the record instead of assumed, and the release runs these 15 on what it ships. **The field verdict stands: no build byte moved** |
 | **the fourth red, `audit_hitclass_map_cost`: NOT a dead control, and now GREEN** | its first run this sitting exited 1 as since 14z-128 — but section 0 FIRED (the no-thunk twin crashes on the clash: the control has been alive since 14z-129 moved it to `pyron/84_pyron_clash_type64`; the registry note was stale, corrected). What failed it was section 1 exiting on ANY divergence by design and printing the 14z-92 explanation instead of a verdict, while today's three divergences reproduce that measurement exactly (`26_don_arcade_mash` with 228 map entries = transit cycles; `21_don_mash` / `22_don_dualmash` with zero = the allocator shift). They are now a FROZEN INVENTORY with their census attribution ([VSP-31]'s pattern): PASS when the set and classes hold, FAIL on growth, shrink or a class change; `EXPECT_DIVERGE=` / `EXPECT_ATTR=` override after a ruled re-measure. Two runs: the first passed with the attribution check blind to the two zero-entry members (the census recorded only replays with entries — fixed: every completed run is recorded, zeros included); the second proves all three classes. ~12.5 min each |
 | **so the release run's expected non-green set is ONE row** | `audit_mask_window_ff42a2` SKIPs loudly, an instrument with no default subject — the approval item. Everything else in the 165 either passed today on the artifact we ship or was fixed and re-run green |
@@ -374,6 +375,50 @@ FILE — several have it in their gate header or a STATE entry — but the file 
 what a triage is looking at, so those are where the thinking time goes.
 
 ## Decisions pending (human)
+
+- **THE DUAL-TRACK GATE ON THE MERGED BUILD — MEASURED IN FULL, RULING NEEDED
+  (14z-133b; the ONE open item of thread 3). [VSP-25] froze the stock-vs-WIDE
+  onsets on the SOLO Donovan track (890 per select-reaching replay, 3190 for
+  `10_midattract_start`, 4267 for `01_attract_long`) and made "an onset moving
+  EARLIER" the failure. `test_dualtrack` was RULED stock-vs-MERGED at 14z-132
+  and never re-pointed; run against `build/m3b_merged23` it reports every
+  onset EARLIER (890 -> 830, 3190 -> 1672, 4267 -> 1672) and FAILS.**
+  **WHAT THE EARLIER "ONSET" IS, dumped and diffed byte by byte over EVERY
+  checksum-differing frame before each frozen onset (not sampled;
+  `build/dualtrack_merged_14z133b/`):**
+  * the nine plain select-reaching replays (`02 03 04 05 07 08 09 29 30`):
+    exactly ONE frame each, 830, THREE bytes `$FF7FF3-$FF7FF5` — the
+    dead-stack window (`$FF7F00-$FF7FFF`, the MAME masked basis's window);
+    frames 831-889 bit-identical again; the real divergence at 890 in the
+    same offsets as on solo (`$FF06D4/D5/DB-DD`, `$FF80B5`, `$FFB818`).
+  * `01_attract_long`: 1,181 differing frames before 4267, all 1,181 dumped:
+    3,543 byte-diffs, EVERY ONE at `$FF055B-$FF055D` — the sound-driver work
+    area, the [VSP-26] FBNeo-only phase class whose frozen inventory is
+    exactly those three offsets; zero bytes anywhere else; at 4267 the
+    divergence starts in the effect-channel pointer `$FF87A5-$FF87A7`
+    exactly as frozen.
+  * `10_midattract_start`: 569 differing frames before 3190, all dumped: the
+    same six offsets (`$FF055B-D`, `$FF7FF3-5`), zero outside.
+  **So the merged build is bit-identical to stock up to select entry EXCEPT
+  for execution-position flickers inside two classes already ratified for
+  exactly this mechanism** (CLAUDE.md §4: hooks cost cycles, interrupts land
+  at skewed instruction boundaries; three tenants' hooks skew more than one
+  tenant's), and the FROZEN ONSETS DID NOT MOVE. The gate compares raw
+  whole-RAM checksums with no mask, so it reads a flicker as an onset.
+  **OPTIONS:** **(a) re-point to merged and freeze the merged inventory
+  EXACTLY** — the pre-select comparison ignores the six measured offsets
+  (never the windows: [VSP-26] "the window is NOT the tolerance", a byte
+  inside a window but outside the inventory fails as GROWTH), the onsets stay
+  890/3190/4267, and `05_timeout_idle`'s one-frame `$FF7FF3-5` shape is the
+  frozen dead-stack flicker. A stock-vs-solo control leg can stay as a
+  second assertion. Half a session, mostly the ground-truth control (a byte
+  outside the six must fail). **(b) keep the solo default** — green today,
+  asserting about a track we do not ship; the [VSP-175] brittleness in its
+  purest form. **RECOMMENDATION: (a).** The inventory is measured whole, its
+  mechanism is the ratified one, and the artifact's pre-select state is
+  proven identical to stock; the release does not wait on this (the gate is
+  green on solo at release), but the merged form is the honest one. Not
+  changed unasked: the onsets are maintainer-ratified ([VSP-25]).
 
 - **TWO BACKLOG ITEMS, RECORDED AS DIRECTION (maintainer, 2026-09-05, 14z-133b)
   — nothing scheduled; both are multi-session and wait behind the field test
