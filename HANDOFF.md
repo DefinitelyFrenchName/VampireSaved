@@ -415,6 +415,10 @@ and only warn (which is why the WIDE members carry sentinel hashes there).
 `tools/gen_vsavjw_xml.py <zip> --check emu/jtcores/doc/mame.xml` says whether
 the fork's entry is the current build's; a rebuild that moves a CRC needs a
 new fork commit.
+**And since 14z-133b the WIDE MRA NAMES ITS FREEZE**: with `--wide` the comment
+header ends with a BUILD block (registry row, mark, `vsavjw.zip` sha1, both
+keys), written only after the MRA's CRC parts resolve against that build —
+`tests/test_mra_build_line.sh`. Not in the `<name>`, by ruling.
 
 **THE MEMORY MAP, corrected 14z-107 (2) — read this before sizing any RTL.**
 The PROFILE ruling (WIDE v1 verbatim, one romset) stands; the implementation

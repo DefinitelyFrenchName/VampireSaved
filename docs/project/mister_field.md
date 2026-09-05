@@ -55,6 +55,23 @@ runs nothing at all. The only thing its `mra/` tree adds over `_Arcade/` is
 the full REGION catalogue on our core (Euro/USA/Asia/Brazil/Hispanic/Japan/
 Phoenix); no gate covers it and it would need the zips beside it.
 
+**A BUNDLE IS NAMED BY THE FREEZE SET IT CARRIES, AND ITS MRA SAYS WHICH ONE
+(maintainer-ruled 2026-09-05, 14z-133b).** Forward from merged-m16 a bundle
+directory is `../mister_fieldtest_<freeze set>/` (`mister_fieldtest_merged-m17/`
+next) — the recordings rule [VSP-20] applied to bundles: the freeze, never the
+session or the mark; the `14z11x`/`14z132` names already cited stay. And the
+WIDE MRA's comment header ends with a BUILD block — the freeze name (the
+registry row, or for a merged build the annotated `freeze/merged-mN` tag whose
+message carries the whole-set key, since merged builds have no registry row by
+design), the mark,
+the `vsavjw.zip` sha1 and both dispatch keys — written by `tools/mra_header.py`
+only after every CRC part of the MRA resolves against that build's zips
+(`tests/test_mra_build_line.sh`, must-fire control). **The mark is NOT in the
+MRA `<name>` and never will be** (maintainer: *"I absolutely don't want the mark
+in the MRA name"*) — the menu name stays stable across freezes by ruling. So
+the first currency check is now `grep BUILD _Arcade/*.mra`; the hash check
+below remains the proof.
+
 **CHECK A BUNDLE'S CURRENCY BY HASH, NOT BY ITS NAME.** A bundle is current
 iff its `games/mame/vsavjw.zip` matches the freeze's
 `build/<dir>/rompath/vsavjw.zip`; the other three zips are the pristine

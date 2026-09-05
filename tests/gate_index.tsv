@@ -225,6 +225,7 @@ tests/test_meter_in_field_map.sh	review-triage
 tests/test_minitoml_subset.sh	review-triage
 tests/test_mister_gfxc_fetch.sh	mister
 tests/test_mister_mra_map.sh	mister
+tests/test_mra_build_line.sh	mister
 tests/test_mister_obj_oracle.sh	mister
 tests/test_mister_page.sh	mister
 tests/test_mister_prg_probe.sh	mister

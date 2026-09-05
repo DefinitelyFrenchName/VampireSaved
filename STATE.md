@@ -43,7 +43,11 @@ older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
 | **the red, root-caused: THE macOS TMP REAPER, AGAIN** | `test_mister_mra_map` died in 0 s at "generating MRAs": the generator's scratch clone under `$TMPDIR/vampire-saved-jtsim` had **4,099 of 4,244 tracked files gone** with `.git` and the pack intact — directory mtimes 03:35, the daily maintenance hour, between the green static run (~02:00) and this one (~09:30). Paid once before (14z-111, gotcha), where the remedy recorded was a MANUAL `rm -rf` — which is exactly why it recurred. The tools checked `.git` EXISTS, not that the clone is WHOLE |
 | **the fix: the tools HEAL** | `mister_mra.sh --ensure-scratch` (new, ROM-free) clones / pins / and now asks `git ls-files --deleted`; restores from the clone's own store (`git checkout -- .`, the store survives the reaper) and re-clones only if the store is hollow too; a pin the clone cannot reach also re-clones instead of printing "delete and rerun". `run_sim_jtcps2.sh` DELEGATES its duplicated clone-and-pin block to that mode (its `-e` gitfile and local-first-fetch knowledge carried across). Gotcha corrected in place |
 | **ground truth, and the real path** | `tests/test_jtsim_scratch_heal.sh` (ci_portable, 4 s): fresh scratch at the pin; the reaper's shape (201 tracked files deleted, macros.def among them) healed IN PLACE with the reflog untouched; the store hollowed too -> re-clone at the pin; MUST-FIRE control on a shadow copy of the tool with the heal stripped — 201 stay missing. Then the LIVE scratch hollowed by hand (301 missing) and `test_mister_mra_map` run through its NORMAL path: heals, PASS, 15 s. `run_sim_jtcps2.sh`'s delegation is syntax-checked and exercises the same function; the Verilator lane itself was not run |
+| **THE BUILD LINE IN THE MRA, RULED AND BUILT** | maintainer, mid-field-test: *"nicer to have the merged build referenced somewhere in the mister builds"*, then *"I absolutely don't want the mark in the MRA name so first and third is perfect"*. Shipped: `tools/mra_header.py --build` ends the WIDE MRA's comment with a BUILD block — freeze name, mark, `vsavjw.zip` sha1, both dispatch keys, and WHICH RECORD it resolved from — and `mister_mra.sh --wide` passes the build and fails loudly instead of swallowing. The stock control MRA stays jtframe's. Bundle convention: `../mister_fieldtest_<freeze set>/` forward from here (`mister_field.md`) |
+| **the block is SELF-VERIFYING, and that found the merged build's real record** | it is written only after every CRC part of the MRA resolves against the build's zips PLUS `$ROMDIR` (the parents), with at least one part served by the build's own zip; else it REFUSES. And the merged build has NO registry row by design (B2 deferred), so a registry-only lookup would have stamped the very artifact this is for as UNREGISTERED — the block resolves through the annotated `freeze/merged-mN` TAG (whose message carries the whole-set key; the same anchor the version-string gate was ruled to use), names a program-key-only tag hit only when unique (merged-m15 and m16 share one), and says so |
+| **gate `tests/test_mra_build_line.sh` (static tier, ~5 s), and what it caught on its first run** | four sections: names merged-m16 + sha1 + mark by an INDEPENDENT resolution; no build -> "not stated"; MUST-FIRE: a rompath with one byte of `vsw.37m` flipped is REFUSED and no block is written; idempotent. First run caught TWO defects in my tool (a `--` in the not-stated text, illegal in an XML comment; parts resolved against the build alone, which lacks the parent members) and two in the gate itself (the expectation took the first word of a tag-message line; the stock MRA lives under `_alternatives/`). All four fixed before anything shipped — which is the order the harness exists to enforce |
 | **CLOSE — static tier, measured properly** | `ROMDIR=... tests/run_all_static.sh` -> `PASS 132 SKIP 0 FAIL 0 MISSING 0` **GREEN** (132 = 131 + the heal gate), the commit gated on the runner's GREEN line, not its exit status; tree clean during the run. The first gated attempt was refused by its own gate — a stale generated gate index after a header edit — and the refusal is the mechanism working. Commits PUSHED 2026-09-05 (`0b973956`) |
+| **CLOSE — static tier after the build line** | `ROMDIR=... tests/run_all_static.sh` -> `PASS 133 SKIP 0 FAIL 0 MISSING 0` **GREEN** (133 = 132 + `test_mra_build_line`), gated on the GREEN line, tree clean during the run. Commits LOCAL |
 
 ## Session 14z-133 — **THE OWED EMULATOR RUN, PAID: 134/0/0/0 GREEN** — after a first
 ## pass of 131/3 whose three reds were ONE class and none of them the artifact. The 14z-132
@@ -363,10 +367,17 @@ what a triage is looking at, so those are where the thinking time goes.
 
 ## Decisions pending (human)
 
-- **WHERE A MiSTer ARTIFACT SHOULD NAME THE MERGED BUILD IT CARRIES (maintainer,
-  2026-09-05, mid-field-test on M16: *"in the future it might be nicer to have
-  the merged build referenced somewhere in the mister builds"*). OPEN — the
-  surface is the card and the MiSTer menu, so the choice is theirs.**
+- **~~WHERE A MiSTer ARTIFACT SHOULD NAME THE MERGED BUILD IT CARRIES~~ DECIDED
+  (maintainer, 2026-09-05, 14z-133b): (a) + (c); (b) REFUSED OUTRIGHT — *"I
+  absolutely don't want the mark in the MRA name so first and third is
+  perfect."* BUILT the same sitting: `tools/mra_header.py --build` writes the
+  self-verifying BUILD block, `mister_mra.sh --wide` passes the build and
+  fails loudly, gate `tests/test_mra_build_line.sh` (static tier) with the
+  wrong-build must-fire control, the bundle convention in `mister_field.md`.
+  The current bundle on the board is untouched; the next freeze's MRAs and
+  bundle carry it. (Original ask, mid-field-test on M16: *"in the future it
+  might be nicer to have the merged build referenced somewhere in the mister
+  builds"*.) The options as costed follow.**
   **TODAY, measured on `../mister_fieldtest_14z132/`:** the merged build is
   named ONLY in the bundle README's first line and in
   `release/merged-m16/mister/MISTER.md`'s title; the MRA carries no build

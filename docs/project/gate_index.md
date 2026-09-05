@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**301 scripts** — 67 ci_portable, 65 ci_static, 169 emulator-tier (run by name).
+**302 scripts** — 67 ci_portable, 66 ci_static, 169 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -29,7 +29,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [tenant](#tenant) | 82 | tenant content — per-character gates and on-demand audits on the ported characters |
 | [character-data](#character-data) | 18 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 30 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
-| [mister](#mister) | 19 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
+| [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
 ## runner
 
@@ -398,6 +398,7 @@ the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generatio
 | `tests/test_mister_tenant_oracle.sh` | test | emulator | Verilator, MAME, FBNeo, ~1 s | THE §4 DUAL-EMULATOR ORACLE ON TENANT CONTENT (14z-108). MAME and jtcps2w run the same TENANT-PICKING replay on the same WIDE romset, and the mapped gameplay fields must agree at the round-1 match-start anchor. | 14z-108 |
 | `tests/test_mister_wide_gate.sh` | test | ci_portable | — | THE CPS-2 WIDE RUNTIME PROFILE GATE, on MiSTer. 14z-107 (6), slice D1; EXTENDED 14z-107 (9) for slice D2. ROM-free; seconds without Verilator, ~30 s with it. | 14z-107 (6) |
 | `tests/test_mister_wide_inert.sh` | test | emulator | Verilator, MAME, ~11 min | THE FPGA SUPERSET INVARIANT, MEASURED DIRECTLY. 14z-107 (6), slice D1. | 14z-107 (6) |
+| `tests/test_mra_build_line.sh` | test | ci_static | ROMDIR | the WIDE MRA names the FREEZE it was generated for, and can never name the wrong one (14z-133b). Static tier: ROMDIR + the merged build + emu/jtcores; ~1 min (three ROM-free MRA generations). | 14z-133b |
 | `tests/test_mra_parts.sh` | test | ci_portable | — | ground-truth for tools/check_mra_parts.py's VERDICT LOGIC. | — |
 | `tests/test_rpl2siminputs.sh` | test | ci_portable | — | the .rpl -> jtframe sim_inputs.hex translator (14z-106): bit mapping locked against test.cpp's parse_inputs, a frozen translation of a real replay, and the refusals must FIRE (P2, button 4, service). ROM-free, seconds, ci_portable. | 14z-106 |
 | `tests/test_sim_wram_contract.sh` | test | ci_portable | — | the ROM-free half of the MiSTer simulation oracle (14z-107). It locks the CONTRACT between the fork's Verilator work-RAM hook and tools/compare_fields.py, without a ROM, an emulator or an hour of simulation (the live end-to-end run is tests… | 14z-107 |

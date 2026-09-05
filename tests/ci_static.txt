@@ -142,6 +142,7 @@ audit_mister_map_fit
 # breaks). Needs emu/jtcores, go and ROMDIR; ~15 s.
 # docs/project/mister_map.md §3, docs/platform/mister.md
 test_mister_mra_map
+test_mra_build_line
 # 14z-118: docs/project/tables/{donovan,huitzil,pyron}.md are GENERATED from the
 # current solo builds' extract/regions.json (tools/tables_char_md.py) and must
 # match a regeneration — the community-facing tunables follow the build

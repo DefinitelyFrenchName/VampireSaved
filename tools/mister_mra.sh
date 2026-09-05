@@ -204,7 +204,14 @@ rm -rf "$RLS" "$ROM"
 ARGS=""; if [ "$NOROM" = 1 ]; then ARGS="-n"; fi
 # THE WIDE MRA'S HEADER IS OURS, the stock leg's is jtframe's (see
 # tools/mra_header.py for why this is a post-process and not a config knob).
-rewrite_wide_header() { python3 "$REPO/tools/mra_header.py" "$MRA" || true; }
+# Since 14z-133b it ends with the BUILD BLOCK naming the freeze the MRA was
+# generated for (--wide), verified against that build's zips first — so a
+# failure here is a hard error, never swallowed: an MRA naming the wrong
+# build is worse than no MRA.
+rewrite_wide_header() {
+    if [ -n "$WIDE" ]; then python3 "$REPO/tools/mra_header.py" "$MRA" --build "$WIDE" || exit 1
+    else                    python3 "$REPO/tools/mra_header.py" "$MRA" || exit 1; fi
+}
 say "jtframe mra $ARGS $CORE  (HOME=$STAGE)"
 if [ "$QUIET" = 1 ]; then
     ( cd "$JTROOT" && env HOME="$STAGE" "$JTF" mra $ARGS "$CORE" >/dev/null 2>&1 )
