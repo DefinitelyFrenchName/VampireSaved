@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**302 scripts** — 67 ci_portable, 66 ci_static, 169 emulator-tier (run by name).
+**302 scripts** — 64 ci_portable, 69 ci_static, 169 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -56,7 +56,7 @@ the documentation locks — docs, skills, indexes, tables follow the tree.
 |---|---|---|---|---|---|
 | `tests/test_annotations_current.sh` | test | ci_portable | — | docs/annotations.md FOLLOWS its carriers (14z-123, the documentation rationalization pass). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-123 |
 | `tests/test_charmap_current.sh` | test | ci_static | ROMDIR | THE CHARACTER-DATA MAP follows the builds (14z-118). docs/project/tables/chars/{donovan,huitzil,pyron}.{json,md} are GENERATED from each current solo build (extract + built image + placements + manifest) by tools/charmap_gen.py -> tools/cha… | 14z-118 |
-| `tests/test_charmap_overrides.sh` | test | ci_portable | — | the character-data OVERRIDE channel round-trips (14z-118). build/manifest/charmap_<tenant>.toml (hand-written) compiles, via tools/charmap_compile.py, into the "# BEGIN charmap … # END charmap" block of build/manifest/<tenant>.toml; | 14z-118 |
+| `tests/test_charmap_overrides.sh` | test | ci_static | ROMDIR | the character-data OVERRIDE channel round-trips (14z-118). build/manifest/charmap_<tenant>.toml (hand-written) compiles, via tools/charmap_compile.py, into the "# BEGIN charmap … # END charmap" block of build/manifest/<tenant>.toml; | 14z-118 |
 | `tests/test_checkdocs.sh` | test | ci_portable | — | the load-bearing numbers the docs share are LOCKED across documents (14z-118, the documentation audit). ci_portable: no ROM, no build dir, no emulator, ~0.2 s. | 14z-118 |
 | `tests/test_checkskills.sh` | test | ci_portable | — | the two MiSTer skills are locked to the docs they distil (14z-114). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-114 |
 | `tests/test_doc_anchor_census.sh` | test | ci_portable | — | every skill anchor's FILE and SECTION are frozen (14z-122, the documentation rationalization pass). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-122 |
@@ -112,7 +112,7 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 | `tests/test_accent_census.sh` | test | ci_static | ROMDIR | the accent/march census (14z-63, phase 3 item 6, the 62k-class audit): every path that can resolve a weapon-accent from the march family must be thunked on a variant-id build. | 14z-63 |
 | `tests/test_audit_merged_dispatch.sh` | test | ci_portable | — | ground truth for the expectation enumeration that tests/audit_merged_legacy.sh now runs before its leg-(a) glob (14z-90, GitHub issue #17). | 14z-90 |
 | `tests/test_build_gate_status.sh` | test | ci_portable | — | ground truth for "a rejected build must abort the gate" (14z-90, GitHub issue #1). | 14z-90 |
-| `tests/test_build_identity_distinct.sh` | test | ci_portable | — | a playtest build must be distinguishable from its legacy-only instrument (14z-94). ROM-free, ~2 s. | 14z-94 |
+| `tests/test_build_identity_distinct.sh` | test | ci_static | ROMDIR | a playtest build must be distinguishable from its legacy-only instrument (14z-94). ROM-free, ~2 s. | 14z-94 |
 | `tests/test_capture_kf_ownership.sh` | test | ci_static | ROMDIR | THE CAPTURE-KEYFRAME POINTER TABLE IS HAND-OWNED, AND NO GENERIC bank_map REPOINT MAY WRITE IT (14z-130). | 14z-130 |
 | `tests/test_capture_pose_sources.sh` | test | ci_static | ROMDIR | THE #104 FIX PREMISES (14z-99). The maintainer ruled the fix scope: option (a), full, "measure first: if option (a) is not feasible, then we reassess". | 14z-99 |
 | `tests/test_census_regions.sh` | test | ci_static | ROMDIR | ground truth for tools/census_regions.py (the 14z-66 data_in_code + pcrel-escape censuses, promoted to a tool for the D4 step-2 Pyron early warning, 14z-67). | 14z-66 |
@@ -351,7 +351,7 @@ the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guar
 | `tests/test_build_ref_rot.sh` | test | ci_portable | — | a hardcoded build/<name> default must not have rotted (14z-94, GitHub #94). ROM-free, ~2 s. | 14z-94 |
 | `tests/test_builder_rom_audit.sh` | test | ci_static | ROMDIR | every builder that reads $ROMDIR must run the mandatory checksum gate first (14z-94, GitHub #28). ~5 s, no emulator. | 14z-94 |
 | `tests/test_decode_stage_banners.sh` | test | ci_static | ROMDIR | ground truth for tools/decode_stage_banners.py, the decoder that turns the #92 value space into NAMES (14z-94, GitHub #92). | 14z-94 |
-| `tests/test_decrypt_cache.sh` | test | ci_portable | — | ground truth for tests/lib/decrypt_cache.sh (14z-94, GitHub #69). ~1 s warm; no ROMDIR needed when the cache is present. | 14z-94 |
+| `tests/test_decrypt_cache.sh` | test | ci_static | ROMDIR | ground truth for tests/lib/decrypt_cache.sh (14z-94, GitHub #69). ~1 s warm; no ROMDIR needed when the cache is present. | 14z-94 |
 | `tests/test_freeze_retires_diverge.sh` | test | ci_portable | — | freezing a replay must actually govern it (14z-94, GitHub #88). ROM-free, no MAME, ~2 s. | 14z-94 |
 | `tests/test_gfx_layout_fields_live.sh` | test | ci_portable | — | gfx_layout3.toml's profile and scatter fields must MEAN something (14z-94, GitHub #87). ROM-free, ~2 s. | 14z-94 |
 | `tests/test_guard_integrity.sh` | test | emulator | MAME, ~2 min | the crash guard must carry the input-integrity assertion, and must refuse env vars it does not implement (14z-94, GitHub #31). Needs ROMDIR + a WIDE build; ~2 min. | 14z-94 |

@@ -3,9 +3,10 @@
 # (14z-118). build/manifest/charmap_<tenant>.toml (hand-written) compiles, via
 # tools/charmap_compile.py, into the "# BEGIN charmap … # END charmap" block of
 # build/manifest/<tenant>.toml; the committed block must equal a fresh compile.
-# ci_portable: no ROM, no build dir, no emulator, ~1 s (uses the committed map JSON
-# and the freeze dirs' extracts only through the map's recorded extract path —
-# SKIPs if that extract is absent).
+# ci_static (moved from ci_portable 14z-133b): no ROM, no emulator, ~1 s — but it
+# reads the freeze dirs' EXTRACTS through the map's recorded extract path, and a
+# clean checkout has no build dirs, so on the CI runner it could only SKIP (which
+# the portable tier rightly counts as failure).
 #
 # MUST-FIRE CONTROLS (RH-9): (a) an override whose `expect` does not match the
 # vs2 bytes is REFUSED; (b) an expect/value length mismatch is REFUSED; (c) a

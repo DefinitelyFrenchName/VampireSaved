@@ -74,7 +74,7 @@ control() {  # control <label> <dir> <expected substring>
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 
 # a: engine_internals stops quoting the OBJ bank table address
-mkcopy "$W/a"; sed -i '' 's/PRG:0x282D4/PRG:0x2XXXX4/g' "$W/a/docs/game/engine_internals.md"
+mkcopy "$W/a"; sed -i.bak 's/PRG:0x282D4/PRG:0x2XXXX4/g' "$W/a/docs/game/engine_internals.md"
 control "dropped number (PRESENCE)" "$W/a" "engine_internals.md does not quote PRG:0x282D4 (PRESENCE)"
 
 # b: engine_internals gains a line quoting a DIFFERENT address beside the same label
@@ -92,7 +92,7 @@ control "lock names a missing file (MISSING)" "$W/c" "file MISSING: docs/game/at
 # canonical address stays, so only key-liveness can fire.
 mkcopy "$W/d"
 for f in docs/game/atlas/character_tables.md docs/game/engine_internals.md docs/game/gotchas.md docs/project/cps2_wide.md; do
-    sed -i '' 's/OBJ bank table/OBJ bank chart/g' "$W/d/$f"
+    sed -i.bak 's/OBJ bank table/OBJ bank chart/g' "$W/d/$f"
 done
 control "key matches nothing (NO-RIVAL disarmed)" "$W/d" "matches NOTHING"
 

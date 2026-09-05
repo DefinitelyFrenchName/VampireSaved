@@ -106,7 +106,7 @@ control "dead allow row" "$W/d" "dead allow row"
 
 # e: a required banner absent (perturb the TSV, not the doc)
 mkcopy "$W/e"
-sed -i '' 's|^docs/game/atlas/id_space.md\tREFERENCE\t-\t-$|docs/game/atlas/id_space.md\tREFERENCE\t-\tbanner|' "$W/e/docs/doc_shape.tsv"
+sed -i.bak 's|^docs/game/atlas/id_space.md\tREFERENCE\t-\t-$|docs/game/atlas/id_space.md\tREFERENCE\t-\tbanner|' "$W/e/docs/doc_shape.tsv"
 grep -q 'id_space.md	REFERENCE	-	banner' "$W/e/docs/doc_shape.tsv" || bad "control e: the TSV perturbation did not apply"
 control "required banner absent" "$W/e" "NO STATUS BANNER"
 
@@ -120,7 +120,7 @@ control "citation of a nonexistent section" "$W/g" "SECTION THAT DOES NOT EXIST"
 
 # h: a PENDING row fails the end-state mode the gate runs (since 14z-124)
 mkcopy "$W/h"
-sed -i '' 's|^docs/game/atlas/id_space.md\tREFERENCE\t-\t-$|docs/game/atlas/id_space.md\tPENDING\t-\t-|' "$W/h/docs/doc_shape.tsv"
+sed -i.bak 's|^docs/game/atlas/id_space.md\tREFERENCE\t-\t-$|docs/game/atlas/id_space.md\tPENDING\t-\t-|' "$W/h/docs/doc_shape.tsv"
 grep -q 'id_space.md	PENDING' "$W/h/docs/doc_shape.tsv" || bad "control h: the TSV perturbation did not apply"
 if python3 tools/checkdocshape.py --root "$W/h" --no-pending --no-selftest >"$W/h/log" 2>&1; then
     bad "PENDING row under --no-pending: the perturbed copy PASSED — the end state is not enforced"

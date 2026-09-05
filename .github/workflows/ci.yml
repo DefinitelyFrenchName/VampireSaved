@@ -33,6 +33,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # TAGS: test_freeze_tag_coverage asserts every frozen build is an
+          # annotated freeze/* tag — a tagless shallow clone can only SKIP,
+          # and this tier counts a SKIP as failure (14z-133b).
+          fetch-depth: 0
+          fetch-tags: true
+
+      # SUBMODULES, top level only. test_harness_frame_bound reads the FBNeo
+      # harness source; test_jtcores_twin, test_jtsim_scratch_heal and
+      # test_sim_wram_contract read the jtcores fork. NEVER --recursive:
+      # emu/jtcores carries a PRIVATE ssh submodule (modules/jtframe/target/
+      # pocket) that aborts a recursive init (tools/setup_jtcores.sh). No ROM
+      # is involved — both are public source repositories.
+      - name: submodules the ROM-free gates read (top level, not recursive)
+        run: |
+          set -eu
+          git submodule update --init emu/fbneo emu/jtcores
+          git -C emu/jtcores submodule update --init modules/fx68k modules/jt12 modules/jt51 modules/jteeprom modules/jtdsp16
 
       - name: Shells present
         run: |
@@ -145,28 +163,27 @@ jobs:
       # The list is tests/ci_portable.txt, which also records WHICH gates
       # are excluded and why (they need $ROMDIR, decrypted images, or build
       # directories a clean checkout does not have).
-      - name: ROM-free ground-truth gates (fail on SKIP)
+      # THE PRE-COMMIT COMMAND ITSELF, in strict mode (14z-133b). Until now this
+      # step was its own loop over tests/ci_portable.txt, and it classified
+      # differently from tests/run_all_static.sh in two ways the project had
+      # already paid for elsewhere: it grepped a gate's WHOLE output for "SKIP",
+      # so a ground-truth gate that prints a fake gate's "SKIP:" line
+      # (test_emulator_runner) read as skipped; and it fed the list on stdin,
+      # which a gate that reads stdin swallows (HANDOFF "close stdin"). One
+      # classifier for CI and the developer's desk: without ROMDIR the runner
+      # selects the portable tier only, --strict makes a SKIP fatal, and its
+      # registry-coverage check names any ROM-free gate in neither list.
+      - name: ROM-free ground-truth gates (tests/run_all_static.sh --tier portable --strict)
         run: |
           set -eu
-          fail=0; n=0
-          while read -r t; do
-            case "$t" in ''|\#*) continue ;; esac
-            n=$((n+1))
-            if ! out="$(sh "tests/$t.sh" 2>&1)"; then
-              echo "::error::FAIL $t"; printf '%s\n' "$out" | tail -20; fail=1; continue
-            fi
-            if printf '%s\n' "$out" | grep -q '^SKIP\|: SKIP'; then
-              echo "::error::SKIP $t — a skipped gate is not a passing gate"
-              printf '%s\n' "$out" | tail -10; fail=1; continue
-            fi
-            echo "PASS $t"
-          done < tests/ci_portable.txt
+          tests/run_all_static.sh --tier portable --strict </dev/null | tee /tmp/static.log
+          grep -q '^GREEN' /tmp/static.log || { echo "::error::the portable tier is not GREEN"; exit 1; }
+          n="$(sed -n 's/^PASS \([0-9]*\).*/\1/p' /tmp/static.log | tail -1)"
           echo "ran $n gates"
           # FLOOR: 61 registered at 14z-124 (the documentation pass's close, G7);
           # it was 15 from 14z-93. Raise it when the list grows; never lower it
           # to make a shrunken list green.
-          [ "$n" -ge 60 ] || { echo "::error::only $n gates ran — the list shrank"; exit 1; }
-          exit "$fail"
+          [ "${n:-0}" -ge 60 ] || { echo "::error::only $n gates ran — the list shrank"; exit 1; }
 
       # Advisory, not blocking: shellcheck has never run on this repo, so
       # the first run is expected to produce findings. Blocking on it would

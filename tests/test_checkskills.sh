@@ -86,7 +86,7 @@ control "unanchored rule" "$W/a" "ANCHORED NOWHERE"
 mkcopy "$W/b"
 BID="$(grep -o '\*\*\[MSV-[0-9]*\]\*\*' "$W/b/docs/project/mister_map.md" | head -1 | tr -d '*[]')"
 [ -n "$BID" ] || bad "control b: mister_map.md carries no MSV anchor to strip"
-sed -i '' "s/\*\*\[$BID\]\*\* //" "$W/b/docs/project/mister_map.md"
+sed -i.bak "s/\*\*\[$BID\]\*\* //" "$W/b/docs/project/mister_map.md"
 grep -q "\*\*\[$BID\]\*\*" "$W/b/docs/project/mister_map.md" && bad "control b: the anchor was not stripped"
 control "stripped anchor" "$W/b" "ANCHORED NOWHERE: $BID"
 

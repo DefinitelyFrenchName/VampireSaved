@@ -170,3 +170,6 @@ test_charmap_current
 test_community_crosscheck
 test_df_startup_provenance
 test_tenant_anim_relocation
+test_build_identity_distinct
+test_decrypt_cache
+test_charmap_overrides

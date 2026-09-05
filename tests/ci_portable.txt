@@ -37,14 +37,12 @@ test_baseset_mask_invariant
 test_basis_publish_atomic
 test_battery_accounting
 test_build_gate_status
-test_build_identity_distinct
 test_build_ref_rot
 test_classify_hitclass_probe
 test_classify_pool_spawns
 test_compare_composite
 test_compare_flicker
 test_compare_window
-test_decrypt_cache
 test_describe_masked_shape
 test_emulator_runner
 test_expectation_provenance
@@ -167,4 +165,3 @@ test_mra_parts
 # compiles (tools/charmap_compile.py) into the marked [[region_fix]] block of the
 # tenant manifest; the committed block must equal a fresh compile. Three
 # must-fire controls (wrong expect, length mismatch, stale block). ~1 s.
-test_charmap_overrides

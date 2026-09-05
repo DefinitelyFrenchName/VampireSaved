@@ -77,7 +77,7 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 mkcopy "$W/a"
 ID="$(grep -o '\*\*\[MSV-[0-9]*\]\*\*' "$W/a/docs/project/mister_map.md" | head -1 | tr -d '*[]')"
 [ -n "$ID" ] || bad "control A: no MSV anchor in mister_map.md to move"
-sed -i '' "s/\*\*\[$ID\]\*\* //" "$W/a/docs/project/mister_map.md"
+sed -i.bak "s/\*\*\[$ID\]\*\* //" "$W/a/docs/project/mister_map.md"
 printf '\n**[%s]** moved here by the control.\n' "$ID" >> "$W/a/docs/platform/mister.md"
 if python3 tools/checkskills.py --root "$W/a" --no-selftest >"$W/a/cs.log" 2>&1; then
     ok "control A premise: checkskills PASSES the between-file move (the blind spot is real)"
@@ -89,7 +89,7 @@ control "A: anchor moved between two files of one list" "$W/a" "$ID"
 # B: a header inserted directly above the first anchored line of engine_internals
 mkcopy "$W/b"
 LN="$(grep -n '\*\*\[VSE-[0-9]*\]\*\*' "$W/b/docs/game/engine_internals.md" | head -1 | cut -d: -f1)"
-sed -i '' "${LN}i\\
+sed -i.bak "${LN}i\\
 ## A synthetic section inserted by control B
 " "$W/b/docs/game/engine_internals.md"
 control "B: a section move (header inserted above an anchor)" "$W/b" "A synthetic section inserted by control B"
