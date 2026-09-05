@@ -64,6 +64,10 @@
 > ##   matters. Still owed.
 > ## * **`audit_trap_sound`** passed the sweep — on `build/hui30`, a 14z-82c
 > ##   build we do not ship. Flagged, not walked.
+> ## * **THE TMP REAPER NOW HEALS ITSELF** (14z-133b): a hollowed jtsim scratch
+> ##   clone is restored by `mister_mra.sh --ensure-scratch` (gate
+> ##   `test_jtsim_scratch_heal`). If a MiSTer gate dies in 0 s at "generating
+> ##   MRAs" again, that is a NEW mechanism — do not reach for `rm -rf` first.
 > ## * **Two normalisations must stay at the point the value is first read:**
 > ##   `$ROMDIR` (182 gates, 14z-132) and now `MAME_BIN` (per gate for `vsavjw`
 > ##   legs, gated; plus the runner's exported default). In a runner they would resolve against

@@ -300,28 +300,13 @@ PIN="$(sed -n 's/^PINNED="\([0-9a-f]*\)".*/\1/p' "$REPO/tools/setup_jtcores.sh")
 say() { echo "[run_sim_jtcps2] $*"; }
 
 # ---------------------------------------------------------------- 1. clone
-if [ ! -d "$SCRATCH/.git" ]; then
-    say "cloning the fork into $SCRATCH (from emu/jtcores)"
-    # -e, not -d: in an initialised SUBMODULE .git is a gitfile, not a
-    # directory (measured 14z-107 (3) — the -d form refused a perfectly good
-    # checkout and only ever passed because a scratch clone already existed).
-    [ -e "$REPO/emu/jtcores/.git" ] || { echo "emu/jtcores not initialised — run tools/setup_jtcores.sh" >&2; exit 1; }
-    git clone --quiet "$REPO/emu/jtcores" "$SCRATCH"
-    git -C "$SCRATCH" remote set-url origin "$(git -C "$REPO/emu/jtcores" remote get-url origin)"
-fi
-if [ "$(git -C "$SCRATCH" rev-parse HEAD)" != "$PIN" ]; then
-    say "checking out the pin $PIN in the scratch clone"
-    # THE LOCAL SUBMODULE IS FETCHED FIRST, and it has to be: fork commits are
-    # LOCAL-ONLY until the maintainer authorises a push, while `origin` here is
-    # the public GitHub URL the clone is re-pointed at (so `jtsim` reports a
-    # sane remote). Fetching only origin would leave the scratch clone unable
-    # to reach a pin that exists nowhere but emu/jtcores — measured 14z-107 (6).
-    git -C "$SCRATCH" fetch --quiet "$REPO/emu/jtcores" \
-        '+refs/heads/*:refs/remotes/local/*' 2>/dev/null || true
-    git -C "$SCRATCH" fetch --quiet origin 2>/dev/null || true
-    git -C "$SCRATCH" checkout --quiet "$PIN" || {
-        echo "scratch clone cannot reach the pin $PIN — delete $SCRATCH and rerun" >&2; exit 1; }
-fi
+# Clone / pin / HEAL are DELEGATED to mister_mra.sh --ensure-scratch (14z-133b):
+# one implementation of the block both tools used to duplicate, and the one
+# place that knows the tmp-reaper heal (a scratch clone with .git present and
+# most tracked files reaped — docs/platform/gotchas.md). Same JTSIM_SCRATCH,
+# same PIN source. The `-e` gitfile rule (14z-107 (3)) and the local-first
+# fetch (14z-107 (6)) live there now.
+JTSIM_SCRATCH="$SCRATCH" "$REPO/tools/mister_mra.sh" --ensure-scratch --quiet || exit 1
 [ -f "$SCRATCH/modules/fx68k/hdl/fx68k.sv" ] || \
     git -C "$SCRATCH" submodule update --init modules/fx68k modules/jt12 modules/jt51 modules/jteeprom modules/jtdsp16
 

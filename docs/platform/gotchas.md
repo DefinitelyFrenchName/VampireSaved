@@ -1920,9 +1920,17 @@ is absent. macOS purges files older than a few days from `$TMPDIR`
 piecemeal, so the clone survives with `.git` intact and random tracked
 files missing (`cores/cps2/cfg/macros.def` this time). Symptom:
 `test_mister_mra_map` fails in 0 s at "generating MRAs" with `Cannot open
-.../macros.def` — nothing in the tree changed. Fix: `rm -rf` the scratch
-dir; the tool re-clones at the pin. `tools/setup_jtcores.sh` does NOT
-touch the scratch.
+.../macros.def` — nothing in the tree changed. ~~Fix: `rm -rf` the scratch
+dir; the tool re-clones at the pin.~~ **THAT REMEDY WAS MANUAL, AND IT
+RECURRED (14z-133b, 2026-09-05): 4,099 of 4,244 tracked files reaped between
+two static runs two hours apart, straddling the 03:35 daily maintenance —
+`test_mister_mra_map` red in 0 s with the object store intact.** Since
+14z-133b the tools HEAL: `mister_mra.sh --ensure-scratch` (which
+`run_sim_jtcps2.sh` delegates to) asks `git ls-files --deleted`, restores
+from the clone's own store, and re-clones only if the store is hollow too.
+Ground truth `tests/test_jtsim_scratch_heal.sh` (ci_portable; the control
+runs a shadow copy with the heal stripped). `tools/setup_jtcores.sh` still
+does NOT touch the scratch.
 
 ## MAME Lua: WRITE taps fire, READ taps do not (14z-112, measured)
 

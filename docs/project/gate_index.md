@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**300 scripts** — 66 ci_portable, 65 ci_static, 169 emulator-tier (run by name).
+**301 scripts** — 67 ci_portable, 65 ci_static, 169 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -29,7 +29,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [tenant](#tenant) | 82 | tenant content — per-character gates and on-demand audits on the ported characters |
 | [character-data](#character-data) | 18 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 30 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
-| [mister](#mister) | 18 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
+| [mister](#mister) | 19 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
 ## runner
 
@@ -385,6 +385,7 @@ the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generatio
 | `tests/audit_mister_map_fit.sh` | audit | ci_static | ROMDIR | the MiSTer SDRAM placement map FITS, and the four content extents it depends on have not moved. (14z-107 (4); docs/project/mister_map.md is the design this gate defends.) | 14z-107 (4) |
 | `tests/audit_sdram_bank_load.sh` | audit | emulator | Verilator, a build dir, ~50 min | MEASURE the per-bank SDRAM load of stock vsavj on the stock jtcps2 core, phase by phase (14z-107 (3)). | 14z-107 (3) |
 | `tests/test_jtcores_twin.sh` | test | ci_portable | — | the MiSTer core scaffold is a TWIN of the reference core, and the three copies of its delta agree (14z-106). | 14z-106 |
+| `tests/test_jtsim_scratch_heal.sh` | test | ci_portable | — | a jtsim scratch clone hollowed by the macOS tmp reaper is HEALED, not trusted (14z-133b). ROM-free, ~5 s (three local clones of emu/jtcores, hardlinked). | 14z-133b |
 | `tests/test_mister_gfxc_fetch.sh` | test | emulator | Verilator, a build dir | THE PAYOFF GATE: it goes green the day the core FETCHES a tenant tile. IT HAS BEEN GREEN — with the right replay (see STATUS). Its DEFAULT replay cannot reach a match, so a bare run is red by construction; pass the measured-green operands. | 14z-107 (10) |
 | `tests/test_mister_mra_map.sh` | test | ci_static | ROMDIR | the MiSTer download image is EXACTLY the placement map, the trim that makes it downloadable is real, and the stock reference leg did not move. (14z-107 (5), MiSTer slice D0; docs/project/mister_map.md §3 is the design this gate defends.) | 14z-107 (5) |
 | `tests/test_mister_obj_oracle.sh` | test | emulator | MAME, ~65 min | the FIRST cross-implementation agreement this project has on a VIDEO-DETERMINING surface, and it is on the content the port exists to add. | 14z-108 |

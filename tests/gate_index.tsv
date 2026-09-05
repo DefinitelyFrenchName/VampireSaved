@@ -190,6 +190,7 @@ tests/test_index_window_thunk.sh	pipeline
 tests/test_inp_corpus.sh	oracle
 tests/test_inp_crash_merged_m8_01.sh	oracle
 tests/test_input_integrity.sh	platform
+tests/test_jtsim_scratch_heal.sh	mister
 tests/test_jtcores_twin.sh	mister
 tests/test_kernel_voice_tables.sh	pipeline
 tests/test_killshread_es.sh	character-data

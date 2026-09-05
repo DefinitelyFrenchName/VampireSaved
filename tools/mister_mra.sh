@@ -56,14 +56,17 @@
 #     --xml FILE           likewise for doc/mame.xml.
 #     --quiet              suppress jtframe's own output
 #   env ROMDIR=...         the reference-set directory (required)
+#   --ensure-scratch       clone / pin / HEAL the scratch clone and exit — ROM-free;
+#                          what run_sim_jtcps2.sh calls, and the reaper ground truth
 #   env JTSIM_SCRATCH=...  where the scratch clone lives (default
 #                          ${TMPDIR:-/tmp}/vampire-saved-jtsim)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 
-CORE=cps2w; WIDE=""; NOROM=0; OUT=""; TOML=""; XML=""; QUIET=0
+CORE=cps2w; WIDE=""; NOROM=0; OUT=""; TOML=""; XML=""; QUIET=0; ENSURE=0
 while [ $# -gt 0 ]; do
     case "$1" in
+    --ensure-scratch) ENSURE=1 ;;   # clone / pin / HEAL the scratch, then exit (ROM-free)
     --core)    shift; CORE="${1:?--core needs a name}" ;;
     --wide)    shift; WIDE="${1:?--wide needs a build dir}" ;;
     --no-rom)  NOROM=1 ;;
@@ -76,8 +79,10 @@ while [ $# -gt 0 ]; do
     esac
     shift
 done
+if [ "$ENSURE" = 1 ]; then ROMDIR="${ROMDIR:-}"; else
 ROMDIR="${ROMDIR:?set ROMDIR to the reference-set directory}"
 ROMDIR="$(CDPATH= cd "$ROMDIR" && pwd)"
+fi
 say() { [ "$QUIET" = 1 ] || echo "[mister_mra] $*"; }
 
 SCRATCH="${JTSIM_SCRATCH:-${TMPDIR:-/tmp}/vampire-saved-jtsim}"
@@ -89,22 +94,48 @@ PIN="$(sed -n 's/^PINNED="\([0-9a-f]*\)".*/\1/p' "$REPO/tools/setup_jtcores.sh")
 [ -n "$PIN" ] || { echo "cannot read PINNED from tools/setup_jtcores.sh" >&2; exit 1; }
 
 # ------------------------------------------------------------------ 1. clone
-if [ ! -d "$SCRATCH/.git" ]; then
+# (`-e`, not `-d`, for the submodule: in an initialised SUBMODULE .git is a
+# gitfile, not a directory — measured 14z-107 (3).)
+clone_scratch() {
     [ -e "$REPO/emu/jtcores/.git" ] || {
         echo "emu/jtcores not initialised — run tools/setup_jtcores.sh" >&2; exit 1; }
     say "cloning the fork into $SCRATCH"
+    rm -rf "$SCRATCH"
     git clone --quiet "$REPO/emu/jtcores" "$SCRATCH"
     git -C "$SCRATCH" remote set-url origin \
         "$(git -C "$REPO/emu/jtcores" remote get-url origin)"
+}
+pin_scratch() {  # the LOCAL submodule is fetched first: fork commits are local-only
+                 # until the maintainer authorises a push (measured 14z-107 (6))
+    if [ "$(git -C "$SCRATCH" rev-parse HEAD 2>/dev/null)" != "$PIN" ]; then
+        say "checking out the pin $PIN in the scratch clone"
+        git -C "$SCRATCH" fetch --quiet "$REPO/emu/jtcores" \
+            '+refs/heads/*:refs/remotes/local/*' 2>/dev/null || true
+        git -C "$SCRATCH" fetch --quiet origin 2>/dev/null || true
+        git -C "$SCRATCH" checkout --quiet "$PIN" 2>/dev/null
+    fi
+}
+[ -d "$SCRATCH/.git" ] || clone_scratch
+pin_scratch || { say "scratch clone cannot reach the pin $PIN — re-cloning"; clone_scratch; pin_scratch || {
+    echo "scratch clone cannot reach the pin $PIN even after a re-clone" >&2; exit 1; }; }
+# ---------------------------------------------------- 1b. HEAL (14z-133b)
+# The macOS tmp reaper deletes files under $TMPDIR piecemeal by age, so a
+# scratch clone can keep its .git and lose most of its TRACKED FILES (4,099 of
+# 4,244 on 2026-09-05; `cores/cps2/cfg/macros.def` at 14z-111). `.git` present
+# is therefore not "clone usable". Git knows exactly which tracked files are
+# missing and the object store usually survives, so restore from it; if the
+# store was reaped too, re-clone. docs/platform/gotchas.md "the macOS tmp
+# reaper hollows out the jtsim scratch clone"; tests/test_jtsim_scratch_heal.sh.
+_missing="$(git -C "$SCRATCH" ls-files --deleted 2>/dev/null | wc -l | tr -d ' ')"
+if [ "${_missing:-1}" != 0 ]; then
+    say "scratch clone is HOLLOW ($_missing tracked files missing — the tmp reaper); restoring from its object store"
+    git -C "$SCRATCH" checkout --quiet -- . 2>/dev/null || true
+    if [ "$(git -C "$SCRATCH" ls-files --deleted 2>/dev/null | wc -l | tr -d ' ')" != 0 ]; then
+        say "the object store is hollow too — re-cloning"
+        clone_scratch; pin_scratch || { echo "re-clone cannot reach the pin $PIN" >&2; exit 1; }
+    fi
 fi
-if [ "$(git -C "$SCRATCH" rev-parse HEAD)" != "$PIN" ]; then
-    say "checking out the pin $PIN in the scratch clone"
-    git -C "$SCRATCH" fetch --quiet "$REPO/emu/jtcores" 2>/dev/null || true
-    git -C "$SCRATCH" fetch --quiet origin 2>/dev/null || true
-    git -C "$SCRATCH" checkout --quiet "$PIN" 2>/dev/null || {
-        echo "scratch clone cannot reach the pin $PIN — delete $SCRATCH and rerun" >&2
-        exit 1; }
-fi
+if [ "$ENSURE" = 1 ]; then say "scratch clone ready at $PIN"; exit 0; fi
 
 # ------------------------------------------------------- 2. the private HOME
 STAGE="$SCRATCH/.mrahome"

@@ -82,6 +82,7 @@ test_shell_portability
 test_static_runner
 test_tenant_id
 test_gfx_tile_codec
+test_jtsim_scratch_heal
 test_jtcores_twin
 test_rpl2siminputs
 test_sim_wram_contract
