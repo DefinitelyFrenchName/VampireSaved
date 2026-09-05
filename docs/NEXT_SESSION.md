@@ -75,8 +75,8 @@
 > ##   section, so **the `DECISIONS_HISTORY.md` pass** (ruled decisions that no
 > ##   longer shape work move there verbatim, 14z-109) is the mechanism that
 > ##   matters. Still owed.
-> ## * **`audit_trap_sound`** passed the sweep — on `build/hui30`, a 14z-82c
-> ##   build we do not ship. Flagged, not walked.
+> ## * **`audit_trap_sound`** — was asserting about `build/hui30` (14z-82c); re-pointed
+> ##   to the merged build in thread 3 (14z-133b), PASS. Closed.
 > ## * **THE TMP REAPER NOW HEALS ITSELF** (14z-133b): a hollowed jtsim scratch
 > ##   clone is restored by `mister_mra.sh --ensure-scratch` (gate
 > ##   `test_jtsim_scratch_heal`). If a MiSTer gate dies in 0 s at "generating
