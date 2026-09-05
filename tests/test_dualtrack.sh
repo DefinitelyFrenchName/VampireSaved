@@ -130,7 +130,7 @@ if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 STOCK="${1:-$REPO/build/m5_stock15/rompath}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-WIDE="${2:-$REPO/build/don_m20/rompath}"    # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+WIDE="${2:-$REPO/build/m3b_merged23/rompath}"  # re-pointed 14z-133b: MERGED (thread 3, maintainer-ruled with the frozen-offset instrument below)    # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -f "$STOCK/vsavj.zip"  ] || { echo "no stock build at $STOCK";  exit 1; }
 [ -f "$WIDE/vsavjw.zip" ] || { echo "no WIDE build at $WIDE";     exit 1; }
 WORK="$(mktemp -d)"
@@ -155,18 +155,95 @@ run() {  # run <tag> <set> <rompath> <replay>
         "$REPO/tests/replays/$4.rpl" "$WORK/$1.log" "$WORK/sb_$1" >/dev/null 2>&1
 }
 
+# THE INSTRUMENT, BROUGHT IN LINE WITH THE RULING (maintainer, 2026-09-05,
+# 14z-133b: "it has value so we keep it by bringing it in line with the
+# ruling"). "Bit-identical up to select entry" is measured the way the other
+# oracles already define identical: whole-RAM checksums, and for any frame
+# BEFORE the frozen onset whose checksum differs, a byte-level dump of both
+# legs in which every differing byte must be one of SIX FROZEN OFFSETS —
+# execution position, not state, in the two classes the project ratified for
+# exactly this mechanism (hooks cost cycles; interrupts land one instruction
+# later; three tenants' hooks skew more than one):
+#   $FF055B-$FF055D  the sound-driver work area, the [VSP-26] FBNeo phase
+#                    inventory the sampled legacy oracle already freezes;
+#   $FF7FF3-$FF7FF5  the dead-stack return address, inside the $FF7F00-$FF7FFF
+#                    window every ratified MAME masked basis already ignores.
+# Measured whole on the merged build (STATE 14z-133b, build/dualtrack_merged_
+# 14z133b/): all ten legacy replays and both attract-based ones, every
+# checksum-differing frame before its frozen onset dumped and diffed — every
+# differing byte at these six offsets, none anywhere else, the onsets
+# themselves unmoved. THE OFFSETS ARE THE INVENTORY, NEVER THE WINDOWS
+# ([VSP-26]): a seventh byte anywhere, a window included, is GROWTH and
+# fails. The STATE ONSET of a replay is the first frame with any byte outside
+# the six; it must equal the frozen onset. Section 1b is the must-fire
+# control. The FBNeo dump spec is capped at 8,192 chars (~430 frames;
+# docs/platform/gotchas.md), so dumps are batched by 400.
+FROZEN_FLICKER="${FROZEN_FLICKER:-055b 055c 055d 7ff3 7ff4 7ff5}"
+cat > "$WORK/classify.py" <<'PYC'
+import sys, glob
+# classify.py <work> <tag_s> <tag_w> <frozen offsets csv> <frames file>
+# prints: STATE_ONSET <frame|none> / FLICKER <n frames> <offsets> / STRAY <frame> <offsets>
+W, ts, tw, frozen, ff = sys.argv[1:6]
+frozen = {int(x, 16) for x in frozen.split(",") if x}
+frames = [int(x) for x in open(ff).read().split()]
+def dump(tag, fr):
+    c = glob.glob(f"{W}/d_{tag}_*.log.dump_{fr}_ff0000.bin")
+    return open(c[0], "rb").read() if c else None
+onset = None; flick = 0; seen = set(); stray = None
+for fr in frames:
+    a, b = dump(ts, fr), dump(tw, fr)
+    if a is None or b is None:
+        print(f"MISSING {fr}"); sys.exit(2)
+    d = [i for i in range(min(len(a), len(b))) if a[i] != b[i]]
+    out = [i for i in d if i not in frozen]
+    if out:
+        onset = fr; stray = (fr, out); break
+    flick += 1; seen |= set(d)
+print("STATE_ONSET", onset if onset is not None else "none")
+print("FLICKER", flick, ",".join(f"{o:04x}" for o in sorted(seen)))
+if stray: print("STRAY", stray[0], ",".join(f"{o:04x}" for o in stray[1][:8]))
+PYC
+dump_batch() {  # dump_batch <spec> <tag_s> <set_s> <rp_s> <tag_w> <set_w> <rp_w> <replay> <k>
+    FBNEO_DUMPS="$1" FBNEO_ROMPATH="$4" tools/run_replay_fbneo.sh "$3" \
+        "$REPO/tests/replays/$8.rpl" "$WORK/d_$2_$9.log" "$WORK/sbd_$2_$9" >/dev/null 2>&1
+    FBNEO_DUMPS="$1" FBNEO_ROMPATH="$7" tools/run_replay_fbneo.sh "$6" \
+        "$REPO/tests/replays/$8.rpl" "$WORK/d_$5_$9.log" "$WORK/sbd_$5_$9" >/dev/null 2>&1
+}
+state_onset() {  # state_onset <tag_s> <tag_w> <set_s> <rp_s> <set_w> <rp_w> <replay> <limit|none>
+    # frames whose checksums differ, up to and including the frozen onset
+    diff "$WORK/$1.log" "$WORK/$2.log" | awk '/^< [0-9]/{print $2}' > "$WORK/$1.diffs"
+    if [ "$8" = none ]; then cp "$WORK/$1.diffs" "$WORK/$1.cand"
+    else awk -v L="$8" '$1 <= L' "$WORK/$1.diffs" > "$WORK/$1.cand"; fi
+    if [ ! -s "$WORK/$1.cand" ]; then
+        # nothing differs up to the frozen onset: the state onset is the first
+        # later differing frame (a LATER onset is itself a failure), or none
+        so="$(head -1 "$WORK/$1.diffs")"; echo "STATE_ONSET ${so:-none}"; echo "FLICKER 0 "; return
+    fi
+    k=0; spec=""; n=0
+    while IFS= read -r fr; do
+        spec="$spec$fr:ff0000-ffffff;"; n=$((n + 1))
+        if [ "$n" -ge 400 ]; then
+            dump_batch "$spec" "$1" "$3" "$4" "$2" "$5" "$6" "$7" "$k"; k=$((k + 1)); spec=""; n=0
+        fi
+    done < "$WORK/$1.cand"
+    [ -n "$spec" ] && dump_batch "$spec" "$1" "$3" "$4" "$2" "$5" "$6" "$7" "$k"
+    python3 "$WORK/classify.py" "$WORK" "$1" "$2" "$(printf '%s' "$FROZEN_FLICKER" | tr ' ' ',')" "$WORK/$1.cand"
+}
+
 echo "== 1. LEGACY must be identical UP TO select entry =="
 for spec in $LEGACY_ONSETS; do
     rp="${spec%%:*}"; want="${spec##*:}"
     run "s_$rp" vsavj  "$STOCK" "$rp"
     run "w_$rp" vsavjw "$WIDE"  "$rp"
-    got=$(diff "$WORK/s_$rp.log" "$WORK/w_$rp.log" | awk '/^< [0-9]/{print $2; exit}')
-    [ -z "$got" ] && got=none
+    state_onset "s_$rp" "w_$rp" vsavj "$STOCK" vsavjw "$WIDE" "$rp" "$want" > "$WORK/so_$rp.txt" || { echo "  FAIL: $rp — dump/classify error"; cat "$WORK/so_$rp.txt"; fail=1; continue; }
+    got="$(awk '$1=="STATE_ONSET"{print $2}' "$WORK/so_$rp.txt")"
+    nfl="$(awk '$1=="FLICKER"{print $2}' "$WORK/so_$rp.txt")"; ofl="$(awk '$1=="FLICKER"{print $3}' "$WORK/so_$rp.txt")"
+    fltxt=""; [ "${nfl:-0}" != 0 ] && fltxt=" (+$nfl flicker frame(s) at frozen offsets ${ofl} before it)"
     if [ "$got" = "$want" ]; then
         if [ "$want" = none ]; then
-            echo "  ok: $rp identical throughout (never reaches select)"
+            echo "  ok: $rp identical throughout (never reaches select)$fltxt"
         else
-            echo "  ok: $rp identical through frame $((want - 1)); diverges at $want"
+            echo "  ok: $rp state-identical through frame $((want - 1)); diverges at $want$fltxt"
         fi
     elif [ "$want" = none ]; then
         echo "  FAIL: $rp now diverges at frame $got — it reached select where it"
@@ -178,12 +255,41 @@ for spec in $LEGACY_ONSETS; do
         echo "        here means one of the builds is not what it claims to be"
         fail=1
     else
-        echo "  FAIL: $rp onset moved $want -> $got. Anything before select"
-        echo "        entry is boot/attract/engine init, where the WIDE profile"
-        echo "        must not reach. Root-cause it; do not re-freeze."
+        echo "  FAIL: $rp STATE onset moved $want -> $got: $(awk '$1=="STRAY"{print "bytes outside the six frozen offsets at $FF"toupper($3)}' "$WORK/so_$rp.txt")"
+        echo "        Anything before select entry is boot/attract/engine init, where"
+        echo "        the WIDE profile must not reach. Root-cause it; do not re-freeze,"
+        echo "        and never widen FROZEN_FLICKER to a window."
         fail=1
     fi
 done
+
+echo "== 1b. MUST-FIRE CONTROL: a seventh byte before the onset is GROWTH =="
+# A real dumped pair from section 1 (the merged build produces one at frame 830
+# on every select-reaching replay), or, when the build under test produced
+# none, a stock dump of a pre-onset frame paired with itself. The WIDE side gets
+# ONE byte outside the six offsets flipped; the classifier must name a STATE
+# onset there, not a flicker.
+ctl="$(ls "$WORK"/d_s_*.log.dump_*_ff0000.bin 2>/dev/null | head -1)"
+if [ -n "$ctl" ]; then
+    cfr="$(basename "$ctl" | sed 's/.*dump_\([0-9]*\)_.*/\1/')"
+    cp "$ctl" "$WORK/d_cs_0.log.dump_${cfr}_ff0000.bin"
+    cp "$ctl" "$WORK/d_cw_0.log.dump_${cfr}_ff0000.bin"
+else
+    cfr=880
+    FBNEO_DUMPS="$cfr:ff0000-ffffff" FBNEO_ROMPATH="$STOCK" tools/run_replay_fbneo.sh vsavj \
+        "$REPO/tests/replays/05_timeout_idle.rpl" "$WORK/d_cs_0.log" "$WORK/sb_cs" >/dev/null 2>&1
+    cp "$WORK/d_cs_0.log.dump_${cfr}_ff0000.bin" "$WORK/d_cw_0.log.dump_${cfr}_ff0000.bin"
+fi
+python3 - "$WORK/d_cw_0.log.dump_${cfr}_ff0000.bin" <<'PYC'
+import sys; p = sys.argv[1]; b = bytearray(open(p, 'rb').read()); b[0x8000] ^= 0x01; open(p, 'wb').write(bytes(b))   # $FF8000: outside every frozen offset
+PYC
+echo "$cfr" > "$WORK/ctl.frames"
+python3 "$WORK/classify.py" "$WORK" cs cw "$(printf '%s' "$FROZEN_FLICKER" | tr ' ' ',')" "$WORK/ctl.frames" > "$WORK/ctl.out" || true
+if grep -q "^STATE_ONSET $cfr" "$WORK/ctl.out" && grep -q "^STRAY $cfr 8000" "$WORK/ctl.out"; then
+    echo "  ok: control fires — one flipped byte at \$FF8000 is a STATE onset, not a flicker"
+else
+    echo "  FAIL: control did not fire:"; sed 's/^/        /' "$WORK/ctl.out"; fail=1
+fi
 
 echo "== 2. patched-slot content must differ (else it does nothing) =="
 for rp in $DONOVAN; do
@@ -193,8 +299,11 @@ for rp in $DONOVAN; do
         echo "  FAIL: $rp identical — the live sfx helper changes NOTHING"
         fail=1
     else
-        fr=$(diff "$WORK/sd_$rp.log" "$WORK/wd_$rp.log" | awk '/^< [0-9]/{print $2; exit}')
-        echo "  ok: $rp diverges from frame $fr (sfx helper live on WIDE)"
+        # the STATE onset (frozen offsets before it are flickers, not the helper)
+        lim=none; [ "$rp" = 01_attract_long ] && lim=4267
+        state_onset "sd_$rp" "wd_$rp" vsavj "$STOCK" vsavjw "$WIDE" "$rp" "$lim" > "$WORK/so2_$rp.txt" || true
+        fr="$(awk '$1=="STATE_ONSET"{print $2}' "$WORK/so2_$rp.txt")"; nfl="$(awk '$1=="FLICKER"{print $2}' "$WORK/so2_$rp.txt")"
+        echo "  ok: $rp diverges from frame $fr (sfx helper live on WIDE; $nfl flicker frame(s) at frozen offsets before it)"
     fi
 done
 
@@ -209,8 +318,7 @@ ONSET_WINDOW_HI=0x87A7
 echo "== 3. the attract divergence must START in the effect channel =="
 # The onset comes from the per-frame checksums section 2 already produced, so
 # no extra emulator run is needed to find it.
-onset=$(diff "$WORK/sd_01_attract_long.log" "$WORK/wd_01_attract_long.log" \
-        | awk '/^< [0-9]/{print $2; exit}')
+onset="$(awk '$1=="STATE_ONSET"{print $2}' "$WORK/so2_01_attract_long.txt")"; [ "$onset" = none ] && onset=""
 if [ -z "$onset" ]; then
     echo "  FAIL: the two tracks never diverge on 01_attract_long — section 2"
     echo "        should already have caught that"
@@ -231,9 +339,10 @@ if [ -n "$onset" ]; then
     FBNEO_DUMPS="$onset:ff0000-ffffff" FBNEO_ROMPATH="$WIDE" \
         tools/run_replay_fbneo.sh vsavjw "$REPO/tests/replays/01_attract_long.rpl" \
         "$WORK/on_w.log" "$WORK/sb_on_w" >/dev/null 2>&1
-    python3 - "$WORK" "$onset" "$ONSET_WINDOW_LO" "$ONSET_WINDOW_HI" <<'PY' || fail=1
+    python3 - "$WORK" "$onset" "$ONSET_WINDOW_LO" "$ONSET_WINDOW_HI" "$(printf '%s' "$FROZEN_FLICKER" | tr ' ' ',')" <<'PY' || fail=1
 import sys
 W, fr, lo, hi = sys.argv[1], int(sys.argv[2]), int(sys.argv[3], 16), int(sys.argv[4], 16)
+FROZEN = {int(x, 16) for x in sys.argv[5].split(",") if x}   # execution-position offsets, not state (14z-133b)
 try:
     a = open(f"{W}/on_s.log.dump_{fr}_ff0000.bin", "rb").read()
     b = open(f"{W}/on_w.log.dump_{fr}_ff0000.bin", "rb").read()
@@ -244,7 +353,7 @@ if not d:
     print(f"  FAIL: the dumps at the onset frame are IDENTICAL, so this"
           f"        section is not measuring the divergence it named")
     sys.exit(1)
-stray = [i for i in d if not (lo <= i <= hi)]
+stray = [i for i in d if not (lo <= i <= hi) and i not in FROZEN]
 print(f"  {len(d)} byte(s) differ at the onset: "
       + ", ".join(f"$FF{i:04X} {a[i]:02x}->{b[i]:02x}" for i in d))
 if stray:

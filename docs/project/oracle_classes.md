@@ -86,6 +86,40 @@ is to measure the real minimum, not to lengthen this list. (No current spec
 exercises the boundary: the flicker that opened the question, frame 829,
 was the obj_hook cycle-skew removed at 14z-91.)
 
+## v6 — the dual-track FROZEN OFFSETS (ruled 2026-09-05)
+
+**v6 (2026-09-05, maintainer-ruled, 14z-133b): THE DUAL-TRACK GATE'S
+"BIT-IDENTICAL UP TO SELECT ENTRY" IS MEASURED OUTSIDE SIX FROZEN
+EXECUTION-POSITION OFFSETS, NEVER OUTSIDE A WINDOW.** `test_dualtrack.sh`
+compares the stock-size and WIDE builds of the SAME content on FBNeo, so only
+profile-gated changes can separate its legs; its target is profile inertness
+before the roster is reached, with the select-entry onsets frozen per replay
+([VSP-25]: 890, 3190 for the mid-attract replay, 4267 for the attract
+divergence). Re-pointed to the MERGED build, three tenants' hooks skew
+interrupt timing enough that raw checksums differ before the onsets. Measured
+whole (every checksum-differing frame before every frozen onset, on all ten
+legacy replays and both attract-based ones, dumped and diffed byte by byte;
+`build/dualtrack_merged_14z133b/`, STATE 14z-133b): every differing byte is
+one of SIX offsets and the onsets themselves are unmoved —
+`$FF055B-$FF055D`, the sound-driver work area, the FBNeo phase inventory
+[VSP-26] already freezes for the sampled legacy oracle; and
+`$FF7FF3-$FF7FF5`, the dead-stack return address inside the `$FF7F00-$FF7FFF`
+window every ratified MAME masked basis already ignores. So the class adds no
+tolerance the project does not already carry: the six bytes were invisible to
+both other oracles before this ruling. **The STATE ONSET is the first frame
+with any byte outside the six, and it must equal the frozen onset**; frames
+before it that differ only in the six are reported as flickers with their
+offsets. **The offsets are the inventory, never the windows** — a seventh byte
+anywhere, inside a window included, is GROWTH and fails; `FROZEN_FLICKER=` may
+override only after a measured re-ratification. Ground truth is inside the
+gate: section 1b flips ONE byte outside the six in a dumped pair and requires
+a state onset there. Sections 2-4 (the profile is live; the attract
+divergence starts in the effect-channel pointer; same writer set on both legs)
+are unchanged. The maintainer's rationale for keeping the gate, recorded in
+STATE "Decisions pending": parallel runs compare things known to be the same,
+and these two are the same by construction except for the profile — which is
+exactly the claim worth a gate.
+
 ## Checkers and their ground truth
 
 | class | expectation kind | checker | ground truth |
@@ -96,6 +130,7 @@ was the obj_hook cycle-skew removed at 14z-91.)
 | bounded re-convergent window (v3) | `.masked` window | `tools/compare_window.py` | `tests/test_compare_window.sh` |
 | composite (v4) | `.masked` composite | `tools/compare_composite.py` | `tests/test_compare_composite.sh` |
 | v5 (`--min-converge-flicker`, default OFF) | — | `tools/compare_composite.py` | `tests/test_compare_composite.sh` |
+| dual-track frozen offsets (v6) | `FROZEN_FLICKER` in the gate | `tests/test_dualtrack.sh` (`classify.py`, generated per run) | `tests/test_dualtrack.sh` §1b (must-fire) |
 
 A PROPOSED expectation line in this vocabulary comes from
 `tools/describe_masked_shape.py` / `tools/propose_masked_specs.sh`; the frozen

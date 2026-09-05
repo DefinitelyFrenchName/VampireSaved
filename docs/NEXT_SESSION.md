@@ -44,19 +44,23 @@
 > ## full sweep re-run under it is 134/0/0/0 with the 24 instrument-changed
 > ## gates named in `build/emu_sweep_14z133b/affected_set.txt`.
 > ##
-> ## # THREAD 3 — THE MERGED/SOLO WALK: 15 OF 16 DONE, ONE AWAITS A RULING
+> ## # THREAD 3 — THE MERGED/SOLO WALK: DONE, 16/16 GREEN ON THE MERGED BUILD
 > ##
-> ## One pass (16 gates = 271 s). 15 defaults re-pointed to `build/m3b_merged23`,
-> ## all PASS on merged first time; `audit_tripwire_reach` already ran merged
-> ## legs. **`test_dualtrack` on merged FAILS by [VSP-25]'s letter — every
-> ## onset earlier — and the FULL byte inventory says why: six offsets, all in
-> ## the two ratified execution-position classes, onsets unchanged.** That is a
-> ## re-ratification: STATE "Decisions pending" (top), recommendation (a).
-> ## The gate stays green on solo meanwhile; the release does not wait on it.
-> ## The three legacy-oracle gates still wait on B2.
+> ## One pass (16 gates = 271 s). 15 defaults re-pointed; `audit_tripwire_reach`
+> ## already ran merged legs; `test_dualtrack` kept by ruling and brought in line
+> ## with it (class v6, `oracle_classes.md`: six frozen offsets, never windows;
+> ## onsets unmoved; must-fire control) — PASS on merged, PASS with zero flickers
+> ## on solo. No merged-vs-solo difference in the artifact; the field verdict
+> ## stands. The three legacy-oracle gates still wait on B2.
 > ##
 > ## # ALSO OPEN
 > ##
+> ## * **THE CI — repaired 14z-133b, NOT yet seen green on the runner.** It never
+> ##   needed ROMs: BSD `sed -i ''` in four gates, a tagless/submodule-less
+> ##   checkout, three mis-registered gates, and a hand loop that classified
+> ##   unlike the runner. It now runs `run_all_static.sh --tier portable --strict`
+> ##   (64/0/0/0 locally). If the next push is still red, the log names the gate;
+> ##   deactivation was the maintainer's conditional and the condition is false.
 > ## * **TWO BACKLOG ITEMS (maintainer, 2026-09-05), recorded as DIRECTION in
 > ##   STATE "Decisions pending" (top): (1) a level-0 skill split — what in
 > ##   [CPE]/[CPH]/[MSC] is transferable to MAME/FBNeo or MiSTer work that is
