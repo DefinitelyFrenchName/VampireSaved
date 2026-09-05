@@ -128,7 +128,14 @@ legacy behavior is a failed change.
   stock and WIDE builds carry DIFFERENT ROSTERS by construction — a
   stock-size ROM can only hold Donovan by substituting over someone, which is
   why WIDE exists — so every select-reaching replay must differ. Onsets are
-  frozen per replay; an onset moving EARLIER is the failure.
+  frozen per replay; an onset moving EARLIER is the failure. **Amended
+  2026-09-05 (14z-133b, maintainer-ruled): "bit-identical" is measured
+  OUTSIDE six frozen execution-position offsets — `$FF055B-$FF055D`, the
+  [VSP-26] sound-driver phase inventory, and `$FF7FF3-$FF7FF5`, the
+  dead-stack return address every ratified masked basis already ignores —
+  never outside a window; the STATE onset, the first frame with any other
+  byte, is what must equal the frozen onset. Class v6,
+  `docs/project/oracle_classes.md`.**
 
   **[VSP-26]** **The two FBNeo-only phase classes** (ratified 2026-08-16,
   GitHub #78): the sound-driver work area `$FF0500-$FF05FF` and the

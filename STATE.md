@@ -1212,8 +1212,10 @@ what a triage is looking at, so those are where the thinking time goes.
   starts with the WHY above. Meanwhile the row stays `release` scope and RED,
   honestly.
 
-- **REPLAY `105_legacy_2pwin_auto` — THE SPEC IS MEASURED AND READY TO AUTHOR;
-  WHAT IS MISSING IS THE ATTRIBUTION OF TWO FRAMES (14z-128).** The replay
+- **~~REPLAY `105_legacy_2pwin_auto` — THE SPEC IS MEASURED AND READY TO AUTHOR;
+  WHAT IS MISSING IS THE ATTRIBUTION OF TWO FRAMES (14z-128).~~ AUTHORED AND
+  CLOSED 14z-128 (19), commit `9ae00420`; header corrected 14z-133b at the
+  maintainer's word — the body below already said so, the header did not.** The replay
   entered the corpus at 14z-123 as LEGACY content and has been guarded by
   NOTHING since — no `.masked` spec, no self-frozen `.sha1`, in any of the
   three tenant sets. `audit_legacy_pairings` has been saying so for five
