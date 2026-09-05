@@ -360,9 +360,15 @@ what a triage is looking at, so those are where the thinking time goes.
 ## Decisions pending (human)
 
 - **TWO BACKLOG ITEMS, RECORDED AS DIRECTION (maintainer, 2026-09-05, 14z-133b)
-  — nothing scheduled; both are multi-session and wait behind the field test
-  and the release.** In the maintainer's words:
-  **(1) A HIGHER-LEVEL SKILL SPLIT FOR EMULATION AND MiSTer.** *"for skills and
+  — ~~nothing scheduled; both are multi-session and wait behind the field test
+  and the release~~ (1) EXECUTED 14z-134 with the maintainer's blessing while
+  the M16 release run was in flight, in a worktree ("If item 2 does not
+  jeopardize anything ongoing you have my blessing"): `mame-fbneo-instruments`
+  `[MFI-1..46]` and `mister-jtframe-core` `[MJC-N]`, 109 of 145 CPS-2 rules
+  lifted with their numbers, every old ID kept as a redirect, three decisions
+  open to veto in `docs/project/skills_scope.md` §7; (2) still waits.** In the
+  maintainer's words:
+  **(1) A HIGHER-LEVEL SKILL SPLIT FOR EMULATION AND MiSTer — EXECUTED 14z-134.** *"for skills and
   documentation, look if there an additional split for both emulation and
   MiSTer at the highest level. Namely: are there skills transferable for
   MiSTer or MAME/FBNeo projects that are not necessarily CPS-II based."*
