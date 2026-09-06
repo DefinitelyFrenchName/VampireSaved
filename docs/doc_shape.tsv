@@ -73,8 +73,10 @@ docs/project/gate_index.md	GENERATED	-	-
 docs/project/gate_scoping_method.md	REFERENCE	-	-
 docs/project/gotchas.md	REGISTER	-	-
 docs/project/hardening_register.md	REFERENCE	-	-
+docs/project/harness_scope.md	REFERENCE	-	banner
 docs/project/harness_hardening_history.md	HIST	-	-
 docs/project/inferred_claims.md	LOG	-	-
+docs/project/living_docs_scope.md	REFERENCE	-	banner
 docs/project/mister_core.md	REFERENCE	-	-
 docs/project/mister_field.md	REFERENCE	-	-
 docs/project/mister_fit.md	REFERENCE	-	-

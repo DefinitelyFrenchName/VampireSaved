@@ -502,7 +502,15 @@ what a triage is looking at, so those are where the thinking time goes.
   with one addition — a self-contained GUIDE.md per level-0 skill and a
   self-contained skill for other projects — DONE: `tools/gen_skill_guide.py`
   GENERATES the guide from the anchored paragraphs, `test_skill_guides` keeps
-  it current, the skill directory is the portable unit; (2) still waits.** In the
+  it current, the skill directory is the portable unit; (2) STARTED 14z-135
+  (2026-09-06, the maintainer: *"I need the generic reusable test harness and
+  the living documentation effort. After that we'll tackle the open items"*):
+  the scope is `docs/project/harness_scope.md` — the four bins, the slices
+  H1-H9, the fidelity contract — and two things were RULED at the plan stage
+  the same day: a SEPARATE repository, `~/Developer/blackbox-harness`
+  (git-initialised locally; GitHub and any push the maintainer's), and this
+  tree gains exactly ONE read-only fidelity gate. Slice H1 opened the same
+  session (STATE 14z-135).** In the
   maintainer's words:
   **(1) A HIGHER-LEVEL SKILL SPLIT FOR EMULATION AND MiSTer — EXECUTED 14z-134.** *"for skills and
   documentation, look if there an additional split for both emulation and
@@ -938,8 +946,13 @@ the archive once they stop shaping active work.)*
   a record flag) if the difference is in his data; a code-side change only if
   the engine special-cases the move. Nothing decided beyond "its own session".
 - **THE LIVING-DOCUMENTATION EFFORT, and the option it creates (maintainer
-  direction, 2026-08-24).** Recorded as DIRECTION, not as a task — nothing is
-  scheduled and MiSTer stays the current arc. In their words: an important
+  direction, 2026-08-24). STARTED 14z-135 (2026-09-06): scope
+  `docs/project/living_docs_scope.md`; RULED at the plan stage the same day
+  that it takes ALL THREE forms put to the maintainer — a rendered navigable
+  site, routing enforcement in the markdown, fact tables with provenance —
+  in the order L1 routing → L4 site → L2 fact census → L3 ROM re-derivation,
+  AFTER the harness slices and the harness skill.** ~~Recorded as DIRECTION,
+  not as a task — nothing is scheduled and MiSTer stays the current arc.~~ In their words: an important
   documentation effort is coming, "not replacing your logs, but creating a
   living documentation that can easily be referenced by you or me, doesn't go
   stale or lost in a statistically never read file." The SailorMoonS project's

@@ -33,6 +33,8 @@ than guessing a filename):
 | **the port's own discipline before touching a manifest, a tool, a gate, a freeze, a release or a field report** | the skill `.claude/skills/vampire-saved-port/SKILL.md` (`[VSP-NN]`, 161 rules: CLAUDE.md by citation, the oracle classes and what may never loosen them, the extraction/reconciliation/generation law, freezes and build-dir policy, the pre-commit suite, every rig and probe and how each has lied) — anchored in CLAUDE.md, `project/oracle_classes.md`, HANDOFF, `project/gotchas.md`, `game/gotchas.md`, the two porting method docs, `tenant_manifest.md`, `build_dir_triage.md`, `hardening_register.md`, `patch_index.md` and the two standing STATE sections |
 | what the extended hardware profile is and what rule 1 v2 permits | [`project/cps2_wide.md`](project/cps2_wide.md) |
 | **the frozen legacy-oracle CLASSES** — exact / flicker-tolerated / first-divergence constant / bounded window / composite / the v5 intra-mechanism rule — their definitions, dates, exemptions, checkers and ground truth | [`project/oracle_classes.md`](project/oracle_classes.md) — the spec of record; CLAUDE.md §4 names the classes and points here |
+| **what of the test harness is GENERIC — reusable on any black-box system — and how it is being extracted into `~/Developer/blackbox-harness`** | [`project/harness_scope.md`](project/harness_scope.md) — the four bins (code / config / machine profile / stays), every piece classified with its parameterisation, the repository layout, the slices H1-H9 with their status, and the FIDELITY contract (the generic harness on this tree reproduces its verdicts; `tests/test_bbh_fidelity.sh` once H9 lands) |
+| **what "living documentation" is being built — routing enforcement, a rendered site, fact tables with provenance, ROM re-derivation — and in what order** | [`project/living_docs_scope.md`](project/living_docs_scope.md) — what enforcement and routing already exist (§2), the one thing the SMS reference has that we do not (re-derivation FROM the image), the slices L1-L4 with their status, and the rule-5 census behind the rebuild option |
 | what a change did, byte by byte | `project/patch_notes.md`; the registry is `project/patch_index.md` |
 | why something that "should work" does not | [`GOTCHAS.md`](GOTCHAS.md) — always check before re-deriving |
 
@@ -127,7 +129,9 @@ history twins and are listed last. Level-0 files are the entry points above.
 - [`gate_index.md`](project/gate_index.md) — **GENERATED** · The gate index (GENERATED) · generated (do not edit)
 - [`gotchas.md`](project/gotchas.md) — **REGISTER** · traps in our pipeline and method
 - [`hardening_register.md`](project/hardening_register.md) — **REFERENCE** · THE HARDENING REGISTER — crash-candidate inventory of the merged build
+- [`harness_scope.md`](project/harness_scope.md) — **REFERENCE** · HARNESS SCOPE — extracting the generic black-box harness (`blackbox-harness`) from this project: the four bins, the slices H1-H9, the fidelity contract
 - [`inferred_claims.md`](project/inferred_claims.md) — **LOG** · inferred_claims — the LIVE worklist of the documentation rationalization pass (14z-122)
+- [`living_docs_scope.md`](project/living_docs_scope.md) — **REFERENCE** · LIVING DOCUMENTATION SCOPE — what "referenced, never stale, never lost" means here, and the slices L1-L4 that deliver it
 - [`mister_core.md`](project/mister_core.md) — **REFERENCE** · the MiSTer SYNTHESIS: what is TRUE about the core and why each fact follows from the one before it
 - [`mister_field.md`](project/mister_field.md) — **REFERENCE** · the MiSTer FIELD TEST and TRIAGE, in-tree
 - [`mister_fit.md`](project/mister_fit.md) — **REFERENCE** · what merged-m6 needs vs what jtcps2 offers, per region
