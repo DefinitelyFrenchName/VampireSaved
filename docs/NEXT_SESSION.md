@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-135b CLOSE, 2026-09-06)
+# NEXT SESSION — orientation (rewritten at the 14z-136 CLOSE, 2026-09-06)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
@@ -9,64 +9,69 @@
 
 *"I need the generic reusable test harness and the living documentation
 effort. After that we'll tackle the open items lined up."* Both are SCOPED
-(`docs/project/harness_scope.md`, `docs/project/living_docs_scope.md`) and
-the harness's first two slices are LANDED. Nothing in this tree's own harness
+(`docs/project/harness_scope.md`, `docs/project/living_docs_scope.md`);
+harness slices H1-H3 are LANDED. Nothing in this tree's own harness
 changes; it "stays as it is".
 
-## WHERE THE HARNESS IS: H1 + H2 LANDED (`803f372`, `ef7e899`)
+## WHERE THE HARNESS IS: H1 + H2 + H3 LANDED (`803f372`, `ef7e899`, `c26ba45`)
 
 `~/Developer/blackbox-harness` (`bbh`), a SEPARATE repository, PUBLIC at
 https://github.com/DefinitelyFrenchName/blackbox-harness (branch `main`;
-pushing it is standing-authorised since 14z-135b — clone or fork it from
-there). `bin/bbh run-static | classify | tier | config | demand-after-trap |
-compare-flicker | compare-window | compare-composite | check-diverge |
-describe-shape | doctor | selftest`. Read its `README.md`,
-`docs/gate_contract.md`, `docs/config.md`, `docs/method/oracle_classes.md`;
-the consumer config for THIS tree is `example/consumers/bbh.vampire.toml`
-(kept there by decision 8 of the scope). `bbh selftest` is 13 gates, 13 PASS
-(~1 min; `BBH_FIDELITY_F5=1` runs F5 over all 1,891 masked specs, ~4 min —
-do that at every slice's pre-commit). Fidelity so far: F1 identical, F3
-exact, F5 exact (1,891/1,891), all in `selftest/test_fidelity_vampire.sh`,
-which runs against this tree at every selftest run; F2 (the whole portable
-tier through both runners) is opt-in with `BBH_FIDELITY_F2=1` and never
-beside another gate run here.
+pushing it is standing-authorised since 14z-135b). `bin/bbh run-static |
+run-suite | fingerprint | rpl | classify | tier | config | demand-after-trap
+| compare-* | check-diverge | describe-shape | doctor | selftest`. Read its
+`README.md`, `docs/gate_contract.md`, `docs/config.md`, `drivers/README.md`
+(THE DRIVER CONTRACT), `docs/method/oracle_classes.md`, `example/README.md`
+(the fake machine, run green / break a control / freeze); the consumer
+config for THIS tree is `example/consumers/bbh.vampire.toml`. `bbh selftest`
+is 17 gates, 17 PASS (~2 min; the slice pre-commit is
+`BBH_FIDELITY_F5=1 BBH_FIDELITY_F6=all BBH_FIDELITY_F7=all bbh selftest`
+with `ROMDIR` set, ~15 min — do that at every slice). Fidelity so far: F1
+identical, F3 exact, F5 exact (1,891/1,891), F6 exact, F7 exact — all in
+`selftest/test_fidelity_vampire.sh`, which runs against this tree at every
+selftest run; F2 is opt-in (`BBH_FIDELITY_F2=1`) and never beside another
+gate run here.
 
-## NEXT: SLICE H3 — fingerprint, the suite runner, the fake driver
+## NEXT: H4 (the sweep runner), THEN H5 AND H7 — all three depend only on H1
 
-The largest slice; it designs the example MACHINE. Read `harness_scope.md`
-§2.3, §2.4 (I2 the driver contract), §3.4 (fakesys) and §4's H3 row first.
-Lift `tools/build_fingerprint.py` → `fingerprint.py` (`[fingerprint]`: kind,
-set glob, member regex, parent sets, region rules — no `cps2_decrypt`),
-`tests/run_suite.sh` → `bin/bbh-run-suite` (fingerprint → set; every replay
-run `runs_per_replay` times; dispatch `.skip` → `.pending` FAIL → `.masked` →
-`.diverge` → `.sha1` → NO-EXPECTATION FAIL; `--freeze`; the hermetic env
-scrub; the driver named by `[suite].driver`), `drivers/README.md` (THE
-CONTRACT: `<set> <replay.rpl> <out.log> [sandbox]` + env; a driver that
-cannot honour a variable REFUSES), `drivers/fake.sh` + `example/fakesys/
-fakesys.py` (§3.4's env-selected shapes: base / hook / select / both /
-attract / FAKE_NONDET / FAKE_CRASH_AT; MASK_RANGES, DUMPS, POKES, SNAP_FRAMES,
-VIDEO_OUT, INPUT_INJECT_TEST), the example's replays + expected tree
-(registry.tsv, base/{MASK,logs/}, build-a, build-b differing in one
-non-program member — the dual-key case — and an unregistered third).
-Ground truth: `test_suite_dispatch.sh` §1/1b on synthetic zips, §2; NEW
-`test_suite_dispatch` over the fake driver; `test_driver_contract`. Then
-F6 (fingerprint on `$ROMDIR` + every `build/*/rompath`, and the synthetic
-twin) and F7 (suite dispatch over `tests/expected/<set>/` with the fake
-driver via a shadow root). Rule 1 of the fidelity contract still holds:
-`run_suite.sh`'s printed verdict lines are frozen text.
+Read `harness_scope.md` §2.1 R3, §2.5 (E1-E3, E5-E7, R7), §2.2 C6-C7 and
+§4's rows first.
+- **H4** lifts `tests/run_all_emulator.sh` → `bin/bbh-run-sweep`: lanes
+  (order = run order), the prereq lane first and a red there stops the run,
+  scope and cadence columns, `args` with placeholders expanded LONGEST KEY
+  FIRST (`%MERGED_RP%` before `%MERGED%`; F4 proves it), the per-row 7th
+  column timeout, `--jobs` with per-slot scratch, `--resume`, completeness
+  both ways, the precondition and the banner as hooks (empty = off).
+  Ground truth: `test_emulator_runner.sh`'s 13 sections over
+  `example/tests/ci_sweep.tsv` with lanes `prereq fake`; then F4 (`--list`
+  and `--dry-run` diffed against the lineage's runner).
+- **H5** lifts E1 provenance, E2 header defaults, E3 reference rot (the
+  predicate as a hook), E5/E6 `gate_header.py` + `gen_gate_index.py` with
+  the families from config, E7 `shadow_tools.sh`, R7 the accounting rule;
+  their five gates travel; then F9.
+- **H7** lifts C6 `compare_fields.py` (the anchor predicate and the p1/p2
+  bases into `[fields]`) and C7 `check_dumps.py`; the fake machine's
+  `DUMPS` already produce the input.
+Then H6 (the MAME Lua layer + real drivers, F8 on the pinned MAME), H9
+(the fidelity gate HERE, `ci_static`), the harness SKILL, living docs
+L1 → L4 → L2 → L3, then the open items.
 
 ## OPEN, IN ORDER
 
-1. **H3** (above), then H4/H5/H7, H6, H9 (the fidelity gate here,
-   `ci_static`), then the harness SKILL, then living docs L1 → L4 → L2 → L3
+1. **H4, H5, H7** (above), then H6, H9, the skill, living docs
    (`living_docs_scope.md` §4), then the open items below.
-2. The eight defaults of `harness_scope.md` §7 are open to VETO — read them
-   once; none blocks H3.
+2. The eight defaults of `harness_scope.md` §7 are open to VETO — none
+   blocks H4.
 3. **A finding about this tree, not fixed (14z-135):** `run_all_static.sh`
    has no exit-0-after-shell-error branch (the sweep runner has, since
    14z-134); the demand-after-trap lint is what prevents the shape. Fix it
    here only if the maintainer wants the two runners identical.
-4. The standing items unchanged: the deferred `audit_mask_window_ff42a2`
+4. **A second finding about this tree, not fixed (14z-136):**
+   `tests/lib/enumerate_expectations.sh` has no `diverge` case — a live
+   `.diverge` expectation would be reported UNKNOWN-KIND by
+   `audit_legacy_pairings`. Harmless today (zero live `.diverge` files);
+   the harness's copy has the case.
+5. The standing items unchanged: the deferred `audit_mask_window_ff42a2`
    ruling (deprecated or case-specific), `test_header_defaults` and the
    positional `[name]` default, `release/merged-m15` never packaged
    (recorded, not owed), Pyron's row 0x11 (measured; the port decision is
