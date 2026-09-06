@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-135 CLOSE, 2026-09-06)
+# NEXT SESSION — orientation (rewritten at the 14z-135b CLOSE, 2026-09-06)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
@@ -15,8 +15,9 @@ changes; it "stays as it is".
 
 ## WHERE THE HARNESS IS
 
-`~/Developer/blackbox-harness` (`bbh`), a SEPARATE repository, git-initialised
-locally, **NO REMOTE** — creating one and pushing are the maintainer's. H1 is
+`~/Developer/blackbox-harness` (`bbh`), a SEPARATE repository, PUBLIC at
+https://github.com/DefinitelyFrenchName/blackbox-harness (branch `main`; pushing it is
+standing-authorised since 14z-135b — clone or fork it from there). H1 is
 at `803f372`: `bin/bbh run-static | classify | tier | config |
 demand-after-trap | doctor | selftest`; `selftest/run.sh` is its pre-commit
 gate (7/0/0 at the close). Read its `README.md`, `docs/gate_contract.md`,
@@ -27,23 +28,42 @@ F3 (the tier classifier reproduces both registries) against this tree at
 every selftest run; F2 (the whole portable tier through both runners) is
 opt-in with `BBH_FIDELITY_F2=1` and never beside another gate run here.
 
-## NEXT: SLICE H2 — the comparators and the masked vocabulary
+## WHERE THE HARNESS IS NOW: H1 + H2 LANDED (`803f372`, `ef7e899`)
 
-Lift `tools/{compare_flicker,compare_window,compare_composite,check_diverge,
-s4_thresholds}.py` into `lib/py/bbh/` with ONE `logfmt.py` for the three
-private `load()` copies and the thresholds from `[thresholds]`; lift
-`tests/lib/masked_compare.sh` and `enumerate_expectations.sh` with their
-VERDICT STRINGS UNTOUCHED (rule 1 of the fidelity contract — `masked_check`'s
-text is what F5 diffs); bring `test_compare_{flicker,window,composite}.sh`,
-`test_s4_thresholds.sh`, `test_masked_compare.sh` (their fixtures are already
-synthetic). Then F5: every `.masked` spec (1,891) paired with a DIFFERENT
-set's frozen log of the same stem, verdict strings byte for byte. H3 after
-(fingerprint + suite + the fake driver `fakesys.py`); the order and each
-slice's file list are `harness_scope.md` §4.
+`bbh selftest` is 13 gates, 13 PASS (~1 min; `BBH_FIDELITY_F5=1` runs F5
+over all 1,891 masked specs, ~4 min — do that at every slice's pre-commit).
+Fidelity so far: F1 identical, F3 exact, F5 exact (1,891/1,891). The
+comparison classes are `lib/py/bbh/compare_*.py` + `thresholds.py` +
+`logfmt.py`; the vocabulary is `lib/sh/masked_compare.sh`; the method
+document is `docs/method/oracle_classes.md`.
+
+## NEXT: SLICE H3 — fingerprint, the suite runner, the fake driver
+
+The largest slice; it designs the example MACHINE. Read `harness_scope.md`
+§2.3, §2.4 (I2 the driver contract), §3.4 (fakesys) and §4's H3 row first.
+Lift `tools/build_fingerprint.py` → `fingerprint.py` (`[fingerprint]`: kind,
+set glob, member regex, parent sets, region rules — no `cps2_decrypt`),
+`tests/run_suite.sh` → `bin/bbh-run-suite` (fingerprint → set; every replay
+run `runs_per_replay` times; dispatch `.skip` → `.pending` FAIL → `.masked` →
+`.diverge` → `.sha1` → NO-EXPECTATION FAIL; `--freeze`; the hermetic env
+scrub; the driver named by `[suite].driver`), `drivers/README.md` (THE
+CONTRACT: `<set> <replay.rpl> <out.log> [sandbox]` + env; a driver that
+cannot honour a variable REFUSES), `drivers/fake.sh` + `example/fakesys/
+fakesys.py` (§3.4's env-selected shapes: base / hook / select / both /
+attract / FAKE_NONDET / FAKE_CRASH_AT; MASK_RANGES, DUMPS, POKES, SNAP_FRAMES,
+VIDEO_OUT, INPUT_INJECT_TEST), the example's replays + expected tree
+(registry.tsv, base/{MASK,logs/}, build-a, build-b differing in one
+non-program member — the dual-key case — and an unregistered third).
+Ground truth: `test_suite_dispatch.sh` §1/1b on synthetic zips, §2; NEW
+`test_suite_dispatch` over the fake driver; `test_driver_contract`. Then
+F6 (fingerprint on `$ROMDIR` + every `build/*/rompath`, and the synthetic
+twin) and F7 (suite dispatch over `tests/expected/<set>/` with the fake
+driver via a shadow root). Rule 1 of the fidelity contract still holds:
+`run_suite.sh`'s printed verdict lines are frozen text.
 
 ## OPEN, IN ORDER
 
-1. **H2** (above), then H3, then H4/H5/H7, H6, H9 (the fidelity gate here,
+1. **H3** (above), then H4/H5/H7, H6, H9 (the fidelity gate here,
    `ci_static`), then the harness SKILL, then living docs L1 → L4 → L2 → L3
    (`living_docs_scope.md` §4), then the open items below.
 2. The eight defaults of `harness_scope.md` §7 are open to VETO — read them

@@ -7,9 +7,9 @@
 > config reader, the example consumer, seven selftests 7/0/0, F1 and F3
 > green — §4). Two things are already RULED (maintainer, 2026-09-06, at the plan
 > stage): the harness is a SEPARATE repository, `~/Developer/blackbox-harness`
-> (sibling of this tree, git-initialised locally; GitHub creation and any
-> push are the maintainer's call), and this project gains exactly ONE
-> read-only fidelity gate. Everything else in §7 is a default open to veto.
+> (sibling of this tree; PUBLIC on GitHub since 14z-135b at the maintainer's
+> word — https://github.com/DefinitelyFrenchName/blackbox-harness, branch `main`),
+> and this project gains exactly ONE read-only fidelity gate. Everything else in §7 is a default open to veto.
 > Slice status is tracked in STATE (the session entries) and in §4's table,
 > which is updated in place as slices land.
 
@@ -298,7 +298,7 @@ promoted to a whole project.
 | slice | lifts | ground truth that travels | status |
 |---|---|---|---|
 | **H1 core** | R1 (both copies merged, the stronger one wins), R2, R4, R5, E4, `_minitoml`, new `config.py` / `config.sh` / `prologue.sh` / `registry.sh`, `docs/gate_contract.md`, `example/` v1 | `test_static_runner.sh` (7 §), the classifier cases of both runner tests (`test_classify`), `test_demand_after_trap.sh`, new `test_tier` | **LANDED 14z-135**, harness commit `803f372`, 39 files: `bin/bbh`, `bbh-run-static`, `bbh-classify`, `bbh-doctor`; `lib/sh/{classify,config,registry,prologue}.sh`; `lib/py/bbh/{toml_subset,config,tier,demand_after_trap}.py`; `example/` GREEN on both tiers; `selftest/run.sh` 7 PASS / 0 SKIP / 0 FAIL (the tomllib-agreement section reports "not run" on this python 3.9 host). Fidelity: **F1 identical** over a synthetic fake repo (9 stub gates, a MISSING, an orphan, an emulator gate) and, with a shell-crash gate, EXACTLY the known delta (lineage PASS, generic FAIL, 7 diff lines); **F3 exact** — INSTRUMENT − plain registries − `run_` == the 165-row sweep registry, every PLAIN gate registered, every sweep row a real gate. Both rerunnable: `selftest/test_fidelity_vampire.sh` (F2 opt-in, `BBH_FIDELITY_F2=1`). One addition to the plan: `[project].root`, so a consumer config may live outside its tree (`example/consumers/bbh.vampire.toml`) |
-| **H2 comparators** | C1-C5 (`logfmt` unifies the three loaders; thresholds from config; `masked_compare.sh` with its verdict strings untouched) | `test_compare_{flicker,window,composite}.sh`, `test_s4_thresholds.sh`, `test_masked_compare.sh` | — |
+| **H2 comparators** | C1-C5 (`logfmt` unifies the three loaders; thresholds from config; `masked_compare.sh` with its verdict strings untouched) | `test_compare_{flicker,window,composite}.sh`, `test_s4_thresholds.sh`, `test_masked_compare.sh` | **LANDED 14z-135b**, harness commit `ef7e899`: `thresholds.py` (declared once, consumer-overridable via `[thresholds]`, the proposer and the enforcers proved to agree under an override), `logfmt.py` (one reader), the five checkers with verdict text UNTOUCHED, `masked_compare.sh` (text frozen; mask default from `[suite].mask_default`), `enumerate_expectations.sh`, `docs/method/oracle_classes.md`; six selftests (lineage cases verbatim + config must-fire controls), suite 13/0/0. **F5 EXACT: all 1,891 `.masked` specs** (window 1,124 / composite 492 / exact 181 / flicker 49 / diverge 45), each paired with a different set's frozen log of the same stem, through both implementations — verdict text identical to the character, 229 s; in `test_fidelity_vampire.sh` (every 4th spec by default, `BBH_FIDELITY_F5=1` for all at a slice's pre-commit) |
 | **H3 fingerprint + suite + fake driver** | D1, D2, R6, I2, `drivers/fake.sh`, `fakesys.py`, `drivers/README.md` | `test_suite_dispatch.sh` §1/1b (synthetic zips) and §2; NEW `test_suite_dispatch` over the fake driver — the dispatch loop's first ROM-free ground truth | — |
 | **H4 sweep runner** | R3 (precondition, banner, scratch as hooks/config; placeholder expansion longest-key-first) | `test_emulator_runner.sh` (13 §) over `example/tests/ci_sweep.tsv` with lanes `prereq fake` | — |
 | **H5 expectation and gate hygiene** | E1, E2, E3 (predicate hook), E5/E6 (`gate_header.py`, families from config), E7, R7 | their five gates; `test_gate_index_current.sh`'s shape | — |
@@ -405,8 +405,11 @@ Three rules that follow from the contract:
 ## 7. Decisions — taken under stated assumptions, open to veto
 
 1. **RULED (maintainer, 2026-09-06): a SEPARATE repository,
-   `~/Developer/blackbox-harness`.** Git-initialised locally; no remote
-   until the maintainer creates one; pushing is theirs.
+   `~/Developer/blackbox-harness`.** Git-initialised locally 14z-135; PUSHED
+   14z-135b to https://github.com/DefinitelyFrenchName/blackbox-harness (public, `main`) at
+   the maintainer's word — *"push it to its own repo on my github … you
+   clone/fork it when you need it"* — so pushing the harness is standing-
+   authorised from then on.
 2. **RULED (maintainer, 2026-09-06): the name is `blackbox-harness`**, CLI
    prefix `bbh`.
 3. **The fidelity gate finds the harness by `$BBH_HOME` (default
