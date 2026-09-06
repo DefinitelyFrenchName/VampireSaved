@@ -402,7 +402,40 @@ what a triage is looking at, so those are where the thinking time goes.
   **RECOMMENDATION: (b)** — one simulation instead of two, and the re-run is
   what makes it evidence. Sequencing: the edit is a tracked-file change, so
   it lands AFTER the current resume exits (the runner's tree check), then a
-  second `--resume` for this one gate. Not swept unasked.
+  second `--resume` for this one gate. **RULED (maintainer, 2026-09-06):
+  (b)** — *"let's go with option (b) which is the fastest, and then we'll
+  adapt the harness"*. Prepared while the resume ran: the measured pair
+  lines extracted from the log, `tests/expect/` brought into
+  `test_expectation_provenance`'s scope with three rows (worktree). Executed
+  after the resume: see the 14z-134 rows.
+
+- **THE VERILATOR LANE IS SERIAL FOR ONE REASON — ONE SCRATCH CLONE — AND
+  THE MAINTAINER WANTS IT PARALLEL (direction, 2026-09-06; the question:
+  *"we're operating under a tenth of this macbook m2 pro's capacity … can't
+  we have separate instances of the checker?"*).** Measured before answering:
+  every MiSTer gate defaults `JTSIM_SCRATCH` to the one clone and each run
+  writes its `rom.bin` link, `sim_inputs.hex`, bank dumps, `wram/`, probe
+  files and `obj_dir/` INTO that clone's core dir, so two sims in one clone
+  clobber each other; the runner already has `--jobs N` (only prereq is
+  forced serial); jtframe's `jtsim` never passes Verilator a threads flag
+  (the model is single-threaded by construction, and a threaded build would
+  change the instrument); one sim is one core at 99 %, ~97 MB RSS, a clone
+  is 1.4 GB (368 MB the generated `.rom`, 57 MB `obj_dir`); the machine is
+  8 P + 4 E cores, 16 GB, ~196 GB free. **THE SHAPE:** N scratch clones
+  (the heal tool provisions any dir at the pin; the first run per clone pays
+  the Verilator build — UNMEASURED, the one number to establish first), the
+  runner assigning a clone per job slot via `JTSIM_SCRATCH` for the MiSTer
+  lane, optionally the two legs of a gate on two clones. Everything else is
+  already isolated (MAME sandboxes, the private `$HOME` for MRA staging,
+  per-gate temp dirs). Expected: the ~11 h serial lane becomes the longest
+  gate (~3 h) at four clones, ~1.5 h with leg parallelism; the 4-hour cap
+  question mostly dissolves. Harness only — tools and tests, no RTL, no fork
+  commit; ~half a session plus the measurement. **ALSO ON OFFER (maintainer):
+  the Windows box that built the first bitstream (Ryzen 9 3900X, 32 GB) and a
+  coming Linux Ryzen 7 5700G / 64 GB — a MacBook setup and a remote-runner
+  one may both make sense; cost both shapes when scoping, and
+  `test_mame_parity` is the migration gate for any new host ([MFI-41]).**
+  Queued behind the release close; not started.
 
 - **THE RUNNER'S TIMEOUT IS ONE SIZE FOR 165 GATES — HOW SHOULD A GATE'S OWN
   RUNTIME REACH THE RUNNER? (14z-134, from the two release-run TIMEOUTs.)**

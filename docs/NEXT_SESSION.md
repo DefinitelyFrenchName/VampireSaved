@@ -69,6 +69,10 @@ runner's tree check would have flagged mid-run.
    STATE's entry ARE the release's history.
 5. **PUSH at the maintainer's word** (never unasked). `release/merged-m15`
    (M13) was never packaged — superseded before release; recorded, not owed.
+5b. **AFTER THE RELEASE — THE VERILATOR LANE GOES PARALLEL** (maintainer's
+   direction 2026-09-06, STATE "Decisions pending"): N scratch clones, one per
+   runner job slot via `JTSIM_SCRATCH`, measure the per-clone Verilator build
+   first; two other machines are on offer for a remote runner.
 6. **THE CLOSE RITUAL:** STATE 14z-134 entry completed (the run's row), this
    file rewritten, rollover check (STATE is ~135 KB), the doc-touch checklist,
    static tier. Stop the monitor; keep `build/emu_release_m16/` as the

@@ -15,7 +15,8 @@
 # that is gone, is the drift that would make the page worth less than nothing
 # (a register that is confidently incomplete is read as exhaustive).
 #
-# SCOPE: the FILES directly under tests/expected/. The 43 DIRECTORIES are the
+# SCOPE: the FILES directly under tests/expected/, plus tests/expect/ as
+# `expect/<name>` (14z-134). The 43 DIRECTORIES are the
 # per-build expectation sets, whose provenance is registry.tsv plus the
 # freeze/<name> tag ([VSP-94]) — the page says so, and duplicating that here
 # would put two gates on one claim.
@@ -37,6 +38,11 @@ rows = set(re.findall(r'^\|\s*`([^`]+)`\s*\|', page, re.M))
 files = {f for f in os.listdir("tests/expected")
          if os.path.isfile(os.path.join("tests/expected", f))
          and f != "PROVENANCE.md" and not f.startswith(".")}
+# 14z-134: tests/expect/ (the MiSTer lane's three frozen files) joins the
+# scope as `expect/<name>` — its prg_window pair rotted for five freezes
+# with nothing saying what it rested on.
+files |= {"expect/" + f for f in os.listdir("tests/expect")
+          if os.path.isfile(os.path.join("tests/expect", f)) and not f.startswith(".")}
 missing = sorted(files - rows)
 dead = sorted(r for r in rows if r not in files)
 ok = True
@@ -98,6 +104,11 @@ rows = set(re.findall(r'^\|\s*`([^`]+)`\s*\|', page, re.M))
 files = {f for f in os.listdir("tests/expected")
          if os.path.isfile(os.path.join("tests/expected", f))
          and f != "PROVENANCE.md" and not f.startswith(".")}
+# 14z-134: tests/expect/ (the MiSTer lane's three frozen files) joins the
+# scope as `expect/<name>` — its prg_window pair rotted for five freezes
+# with nothing saying what it rested on.
+files |= {"expect/" + f for f in os.listdir("tests/expect")
+          if os.path.isfile(os.path.join("tests/expect", f)) and not f.startswith(".")}
 sys.exit(0 if not (files - rows) else 1)
 PY
 then
@@ -114,6 +125,11 @@ rows = set(re.findall(r'^\|\s*`([^`]+)`\s*\|', page, re.M))
 files = {f for f in os.listdir("tests/expected")
          if os.path.isfile(os.path.join("tests/expected", f))
          and f != "PROVENANCE.md" and not f.startswith(".")}
+# 14z-134: tests/expect/ (the MiSTer lane's three frozen files) joins the
+# scope as `expect/<name>` — its prg_window pair rotted for five freezes
+# with nothing saying what it rested on.
+files |= {"expect/" + f for f in os.listdir("tests/expect")
+          if os.path.isfile(os.path.join("tests/expect", f)) and not f.startswith(".")}
 sys.exit(0 if not [r for r in rows if r not in files] else 1)
 PY
 then
