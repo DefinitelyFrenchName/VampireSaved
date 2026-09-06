@@ -1,92 +1,69 @@
-# NEXT SESSION — orientation (rewritten at the 14z-134 CLOSE, 2026-09-06)
+# NEXT SESSION — orientation (rewritten at the 14z-135 CLOSE, 2026-09-06)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## M16 IS RELEASED — LOCALLY. THE PUSH IS THE MAINTAINER'S WORD.
+## THE ORDER OF WORK IS THE MAINTAINER'S (2026-09-06): THE HARNESS, THEN LIVING DOCS, THEN THE OPEN ITEMS
 
-The release run (`--scope all --lane all --strict`, 165 gates, four lanes)
-ended **PASS 164 / SKIP 1 / FAIL 0 / TIMEOUT 0** in three passes, all kept in
-`build/emu_release_m16/`. The SKIP is `audit_mask_window_ff42a2`, APPROVED by
-the maintainer 2026-09-06 as a standing exception (its registry note says so);
-whether it becomes deprecated or case-specific is a LATER decision. Every
-structural assertion the MiSTer lane makes on merged-m16 passed on every pass.
-`release/merged-m16/` is TRACKED (it had sat untracked since the 14z-132
-freeze), its WIDE MRA regenerated with the BUILD block, `test_release_roundtrip`
-PASS on the m16 layout, HANDOFF's registry row says RELEASED. **14 commits
-sit on `main` ahead of `origin/main`. Push when the maintainer says.**
+*"I need the generic reusable test harness and the living documentation
+effort. After that we'll tackle the open items lined up."* Both are SCOPED
+(`docs/project/harness_scope.md`, `docs/project/living_docs_scope.md`) and
+the harness's first slice is LANDED. Nothing in this tree's own harness
+changes; it "stays as it is".
 
-## WHAT THE RUN COST — five harness defects, none the artifact (STATE 14z-134)
+## WHERE THE HARNESS IS
 
-1. a `${VAR:?}` abort after an EXIT trap EXITS 0 on macOS bash 3.2 — a 65-min
-   Verilator gate read `PASS 0s`; the runner now FAILS an exit-0 log with a
-   shell error, `test_demand_after_trap` (ci_portable) bars the shape;
-2. one 90-min timeout for 165 gates — two 3-hour gates killed; a row's 7th
-   column is now its own timeout, the nine MiSTer rows carry MEASURED values;
-3. a FRESH scratch clone could not simulate (a comment after a
-   line-continuation backslash in the driver, 14z-133b) — fixed, and the
-   fresh-clone census is the control;
-4. `test_mister_prg_window`'s frozen pair was merged-m10's walker address
-   (five freezes stale; cadence was `bitstream`, its pair follows the
-   ROMSET) — re-frozen from the run's own measurement, cadence `romset`,
-   `tests/expect/` now inside `test_expectation_provenance`'s scope;
-5. `test_mister_qsound_ext` read its liveness probe by SLOT number where the
-   driver numbers slots by ORDER — a probe counting 171 M reads read as dead;
-   keyed on the bank now.
-**The gate headers' runtimes were low by 40-140 %; the corrected figures are
-in the headers and the registry.** [MSC-54] was paid AGAIN on a worktree copy:
-a running script is the same file to the process reading it.
+`~/Developer/blackbox-harness` (`bbh`), a SEPARATE repository, git-initialised
+locally, **NO REMOTE** — creating one and pushing are the maintainer's. H1 is
+at `803f372`: `bin/bbh run-static | classify | tier | config |
+demand-after-trap | doctor | selftest`; `selftest/run.sh` is its pre-commit
+gate (7/0/0 at the close). Read its `README.md`, `docs/gate_contract.md`,
+`docs/config.md`; the consumer config for THIS tree is
+`example/consumers/bbh.vampire.toml` (kept there by decision 8 of the scope).
+`selftest/test_fidelity_vampire.sh` proves F1 (identical runner output) and
+F3 (the tier classifier reproduces both registries) against this tree at
+every selftest run; F2 (the whole portable tier through both runners) is
+opt-in with `BBH_FIDELITY_F2=1` and never beside another gate run here.
 
-## THE VERILATOR LANE IS PARALLEL (maintainer-directed, built this session)
+## NEXT: SLICE H2 — the comparators and the masked vocabulary
 
-One scratch clone was the whole constraint. Now: `--jobs N` on the mister lane
-gives each job slot its own clone (`<base>-slotN`, provisioned at the pin on
-first use, under a minute), and the three two-leg gates run their legs at
-once on `<scratch>` and `<scratch>-b` via the driver's `--profile-off` copy
-(the shared `.rom` is never patched in place any more). Measured: four
-clones, four cores at 99-100 %, ~100 MB each; qsound_ext + prg_window in
-1 h 41 against ~4 h 55 serial. `test_emulator_runner` §13 is the ground
-truth. **Two other machines are on offer** (a Windows Ryzen 9 3900X / 32 GB,
-a coming Linux 5700G / 64 GB) — a remote runner is the next shape to cost;
-`test_mame_parity` is the migration gate for any new host ([MFI-41]).
-
-## ALSO THIS SESSION
-
-* **The DECISIONS_HISTORY pass** — STATE 249 -> 134 KB; thirty ruled entries
-  moved verbatim; seven stay (the two backlog directions, the
-  living-documentation direction, Pyron's row 0x11, the Phobos ±1 residue,
-  the community cross-check, the Zabel j.LK session).
-* **The LEVEL-0 SKILL CUT** (backlog item 1, ruled accepted): `mame-fbneo-
-  instruments` [MFI-1..46] and `mister-jtframe-core` [MJC-N], 109 of 145
-  CPS-2 rules lifted with their NUMBERS, every old ID a redirect, a GENERATED
-  `GUIDE.md` per level-0 skill (`tools/gen_skill_guide.py`, gate
-  `test_skill_guides`) — the skill DIRECTORY is the portable unit. The finding:
-  `cps2-emulation` had no CPS-2 content. Record: `skills_scope.md` §7.
-* **Backlog item 2 (the generic harness) still waits**; its scope document is
-  the natural next step (the MiSTer precedent: scope first).
+Lift `tools/{compare_flicker,compare_window,compare_composite,check_diverge,
+s4_thresholds}.py` into `lib/py/bbh/` with ONE `logfmt.py` for the three
+private `load()` copies and the thresholds from `[thresholds]`; lift
+`tests/lib/masked_compare.sh` and `enumerate_expectations.sh` with their
+VERDICT STRINGS UNTOUCHED (rule 1 of the fidelity contract — `masked_check`'s
+text is what F5 diffs); bring `test_compare_{flicker,window,composite}.sh`,
+`test_s4_thresholds.sh`, `test_masked_compare.sh` (their fixtures are already
+synthetic). Then F5: every `.masked` spec (1,891) paired with a DIFFERENT
+set's frozen log of the same stem, verdict strings byte for byte. H3 after
+(fingerprint + suite + the fake driver `fakesys.py`); the order and each
+slice's file list are `harness_scope.md` §4.
 
 ## OPEN, IN ORDER
 
-1. **PUSH** the 14 commits (maintainer's word). Then remove the merged
-   worktree branch if it still exists (`git branch -d worktree-decisions-pass`).
-2. **The deferred ruling**: `audit_mask_window_ff42a2` — deprecated or
-   case-specific (maintainer: *"let's circle back to that later"*).
-3. **The per-row timeout is IN; the runtimes are measured** — the next release
-   run needs no `--timeout` flag; run it `--jobs 4` on the mister lane.
-3b. **A small harness gap:** `test_header_defaults` does not cover a positional
-   `[name]` default (the roundtrip gate's header said m15 while its code said
-   m14 for two freezes). Extend it or accept; not owed.
-4. **`release/merged-m15` was never packaged** — superseded before release,
-   recorded, not owed.
-5. The standing items unchanged: Pyron's row 0x11 (measure-first was done;
-   the port decision is the maintainer's), the Phobos ±1 residue, the
-   community cross-check aerials, the Zabel j.LK session, #112 option (B).
+1. **H2** (above), then H3, then H4/H5/H7, H6, H9 (the fidelity gate here,
+   `ci_static`), then the harness SKILL, then living docs L1 → L4 → L2 → L3
+   (`living_docs_scope.md` §4), then the open items below.
+2. The eight defaults of `harness_scope.md` §7 are open to VETO — read them
+   once; none blocks H2.
+3. **A finding about this tree, not fixed (14z-135):** `run_all_static.sh`
+   has no exit-0-after-shell-error branch (the sweep runner has, since
+   14z-134); the demand-after-trap lint is what prevents the shape. Fix it
+   here only if the maintainer wants the two runners identical.
+4. The standing items unchanged: the deferred `audit_mask_window_ff42a2`
+   ruling (deprecated or case-specific), `test_header_defaults` and the
+   positional `[name]` default, `release/merged-m15` never packaged
+   (recorded, not owed), Pyron's row 0x11 (measured; the port decision is
+   the maintainer's; the pose-installer question first), the Phobos ±1
+   residue, the community cross-check aerials, the Zabel j.LK session, #112
+   option (B).
 
 **IF A DOC IS TOUCHED:** `doc_anchor_census --check` + `checkdocshape
 --no-pending` + `checkdocs` + `checkskills` + `gen_annotations --check` +
 `gen_gate_index --check` + `gen_gotchas_index --check` + `gen_skill_guide
 --check`, exit statuses captured directly — and in zsh, loop with `${=cmd}`.
 **A running script is never edited — not in the main tree, not in a
-worktree** ([MSC-54], paid twice now).
+worktree** ([MSC-54]). **The static tier is never run beside another gate
+run in this tree, and nothing here is edited while it runs.**

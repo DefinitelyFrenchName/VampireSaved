@@ -1,8 +1,11 @@
 # HARNESS SCOPE — extracting the generic black-box harness (`blackbox-harness`) from this project
 
 > **STATUS (written 14z-135, 2026-09-06): THE PLAN BEFORE THE WORK — scope,
-> the four bins, the slices and the fidelity contract. Nothing is extracted
-> yet.** Two things are already RULED (maintainer, 2026-09-06, at the plan
+> the four bins, the slices and the fidelity contract. H1 LANDED the same
+> session** (`~/Developer/blackbox-harness` at `803f372`: the classifier,
+> the static runner, the tier classifier, the demand-after-trap lint, the
+> config reader, the example consumer, seven selftests 7/0/0, F1 and F3
+> green — §4). Two things are already RULED (maintainer, 2026-09-06, at the plan
 > stage): the harness is a SEPARATE repository, `~/Developer/blackbox-harness`
 > (sibling of this tree, git-initialised locally; GitHub creation and any
 > push are the maintainer's call), and this project gains exactly ONE
@@ -294,7 +297,7 @@ promoted to a whole project.
 
 | slice | lifts | ground truth that travels | status |
 |---|---|---|---|
-| **H1 core** | R1 (both copies merged, the stronger one wins), R2, R4, R5, E4, `_minitoml`, new `config.py` / `config.sh` / `prologue.sh` / `registry.sh`, `docs/gate_contract.md`, `example/` v1 | `test_static_runner.sh` (7 §), the classifier cases of both runner tests (`test_classify`), `test_demand_after_trap.sh`, new `test_tier` | opened 14z-135 |
+| **H1 core** | R1 (both copies merged, the stronger one wins), R2, R4, R5, E4, `_minitoml`, new `config.py` / `config.sh` / `prologue.sh` / `registry.sh`, `docs/gate_contract.md`, `example/` v1 | `test_static_runner.sh` (7 §), the classifier cases of both runner tests (`test_classify`), `test_demand_after_trap.sh`, new `test_tier` | **LANDED 14z-135**, harness commit `803f372`, 39 files: `bin/bbh`, `bbh-run-static`, `bbh-classify`, `bbh-doctor`; `lib/sh/{classify,config,registry,prologue}.sh`; `lib/py/bbh/{toml_subset,config,tier,demand_after_trap}.py`; `example/` GREEN on both tiers; `selftest/run.sh` 7 PASS / 0 SKIP / 0 FAIL (the tomllib-agreement section reports "not run" on this python 3.9 host). Fidelity: **F1 identical** over a synthetic fake repo (9 stub gates, a MISSING, an orphan, an emulator gate) and, with a shell-crash gate, EXACTLY the known delta (lineage PASS, generic FAIL, 7 diff lines); **F3 exact** — INSTRUMENT − plain registries − `run_` == the 165-row sweep registry, every PLAIN gate registered, every sweep row a real gate. Both rerunnable: `selftest/test_fidelity_vampire.sh` (F2 opt-in, `BBH_FIDELITY_F2=1`). One addition to the plan: `[project].root`, so a consumer config may live outside its tree (`example/consumers/bbh.vampire.toml`) |
 | **H2 comparators** | C1-C5 (`logfmt` unifies the three loaders; thresholds from config; `masked_compare.sh` with its verdict strings untouched) | `test_compare_{flicker,window,composite}.sh`, `test_s4_thresholds.sh`, `test_masked_compare.sh` | — |
 | **H3 fingerprint + suite + fake driver** | D1, D2, R6, I2, `drivers/fake.sh`, `fakesys.py`, `drivers/README.md` | `test_suite_dispatch.sh` §1/1b (synthetic zips) and §2; NEW `test_suite_dispatch` over the fake driver — the dispatch loop's first ROM-free ground truth | — |
 | **H4 sweep runner** | R3 (precondition, banner, scratch as hooks/config; placeholder expansion longest-key-first) | `test_emulator_runner.sh` (13 §) over `example/tests/ci_sweep.tsv` with lanes `prereq fake` | — |
