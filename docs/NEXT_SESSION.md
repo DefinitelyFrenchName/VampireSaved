@@ -1,177 +1,89 @@
-# NEXT SESSION — orientation (rewritten at the 14z-133b CLOSE, 2026-09-05)
+# NEXT SESSION — orientation (rewritten at the 14z-134 CLOSE, 2026-09-06)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## RELEASE DAY (M16) — the checklist (written 14z-134 while the run was in flight)
+## M16 IS RELEASED — LOCALLY. THE PUSH IS THE MAINTAINER'S WORD.
 
-The run: `env -u MAME_BIN ROMDIR=../ROMS tests/run_all_emulator.sh --scope all
---lane all --strict --log build/emu_release_m16` (165 gates; `--lane all`, NOT
-`--lane mister`, which would select only that lane). Everything below happens
-AFTER it exits, in this order; steps 2-5 are `tests/`/`release/` edits the
-runner's tree check would have flagged mid-run.
+The release run (`--scope all --lane all --strict`, 165 gates, four lanes)
+ended **PASS 164 / SKIP 1 / FAIL 0 / TIMEOUT 0** in three passes, all kept in
+`build/emu_release_m16/`. The SKIP is `audit_mask_window_ff42a2`, APPROVED by
+the maintainer 2026-09-06 as a standing exception (its registry note says so);
+whether it becomes deprecated or case-specific is a LATER decision. Every
+structural assertion the MiSTer lane makes on merged-m16 passed on every pass.
+`release/merged-m16/` is TRACKED (it had sat untracked since the 14z-132
+freeze), its WIDE MRA regenerated with the BUILD block, `test_release_roundtrip`
+PASS on the m16 layout, HANDOFF's registry row says RELEASED. **14 commits
+sit on `main` ahead of `origin/main`. Push when the maintainer says.**
 
-0. **READ THE VERDICT, NOT THE EXIT STATUS.** `build/emu_release_m16/runner.out`
-   tail: PASS/SKIP/FAIL/TIMEOUT counts, the `== working tree ==` line must say
-   `ok: no tracked file changed during the run`, and `results.tsv` is the record.
-   **Expected: PASS 164 / SKIP 1 / FAIL 0** — the one SKIP is
-   `audit_mask_window_ff42a2`, an instrument with no default subject, and under
-   `--strict` it reads RED. Its approval is the entry at the top of STATE
-   "Decisions pending" (recommendation (a): approve + record as a standing
-   exception in its `ci_emulator.tsv` note). Anything ELSE non-green is a
-   question, not an answer (STATE "HOW A RED IS ADJUDICATED"): which side rests
-   on a measurement?
-0b. **ONE PASS IS A HOLE — RE-RUN IT BEFORE READING THE RUN AS GREEN.**
-   `test_mister_obj_oracle` recorded `PASS 0s`: it died at its
-   `${JTSIM_SCRATCH:?}` demand (unset under the runner; siblings default it)
-   and macOS bash 3.2 returns exit 0 for a `:?` abort after an EXIT trap
-   (gotcha, `docs/project/gotchas.md`; STATE 14z-134). After the run: (i) the
-   gate defaults `JTSIM_SCRATCH="${JTSIM_SCRATCH:-${TMPDIR:-/tmp}/vampire-saved-jtsim}"`
-   like its siblings and every `${…:?}` demand after a trap in the five-gate
-   class becomes an explicit `[ -n … ] || { echo FAIL; exit 1; }`; (ii) the
-   runner treats a log carrying a `.sh: line N:` shell error and NO verdict
-   line as FAIL, with a `test_emulator_runner` control; (iii) delete that one
-   row from `results.tsv` and `--resume` under the runner's shape (~65 min);
-   (iv) only then read the totals. The four other shell-error lines in this
-   run's logs are MAME teardown segfaults after the summary line — known,
-   benign ([MFI-12]).
-1. **STATIC TIER in the worktree, then fast-forward.** `ROMDIR=../ROMS
-   tests/run_all_static.sh --strict` in `.claude/worktrees/decisions-pass`;
-   gate on its GREEN line. Then `git merge --ff-only worktree-decisions-pass`
-   on `main`, `git worktree remove .claude/worktrees/decisions-pass`,
-   `git branch -d worktree-decisions-pass`.
-2. **`tests/test_release_roundtrip.sh`: re-point the default `NAME` to
-   `merged-m16`** (code says `merged-m14`, header says `merged-m15` — both
-   stale; the M16 layout has NEVER been gated) and run it explicitly:
-   `ROMDIR=../ROMS tests/test_release_roundtrip.sh build/m3b_merged23/rompath
-   merged-m16` — sections 1-3 (round trip, applier refusals, the rule-7 chunk
-   scan) and section 4 (the per-platform layout of the tree's
-   `release/merged-m16/`). Verified read-only 14z-134 already: 3 platforms ×
-   20 patches, manifests byte-identical (`f42f7569`, `M16`), BITSTREAM.txt
-   canonical, `.rbf` sha256 matches, MRA parts 31/31 + 22/22, MRAs
-   byte-identical to the field-tested bundle.
-3. **MAINTAINER'S CALL — the release MRAs and the BUILD block.** The release
-   copy predates the 14z-133b build line (0 occurrences). The ruling then:
-   *"the current bundle on the board is untouched; the next freeze's MRAs and
-   bundle carry it."* The RELEASE copy has not shipped. Options: keep it
-   byte-identical to the field-tested bundle (as today), or regenerate the WIDE
-   MRA with `tools/mister_mra.sh --no-rom --wide build/m3b_merged23 --out
-   <tmp>` and copy it in (parts unchanged — the block is an XML comment;
-   re-check 31/31 and `test_mra_build_line`). Recommendation: regenerate — a
-   release MRA that names its build is what the build line was for, and the
-   field verdict is about the parts, which do not move.
-4. **TRACK THE RELEASE:** `git add release/merged-m16` and commit
-   (`14z-134 RELEASE: merged-m16 …`, the run's counts and log dir in the
-   message). Add `RELEASED 14z-134 (run 164/1/0 …)` to the M16 row of HANDOFF
-   "Build registry" — release_format.md: the registry row, the tag and
-   STATE's entry ARE the release's history.
-5. **PUSH at the maintainer's word** (never unasked). `release/merged-m15`
-   (M13) was never packaged — superseded before release; recorded, not owed.
-5b. **AFTER THE RELEASE — THE VERILATOR LANE GOES PARALLEL** (maintainer's
-   direction 2026-09-06, STATE "Decisions pending"): N scratch clones, one per
-   runner job slot via `JTSIM_SCRATCH`, measure the per-clone Verilator build
-   first; two other machines are on offer for a remote runner.
-6. **THE CLOSE RITUAL:** STATE 14z-134 entry completed (the run's row), this
-   file rewritten, rollover check (STATE is ~135 KB), the doc-touch checklist,
-   static tier. Stop the monitor; keep `build/emu_release_m16/` as the
-   evidence log (the 14z-133b sweep dir is the precedent); sweep leftover
-   emulator processes.
+## WHAT THE RUN COST — five harness defects, none the artifact (STATE 14z-134)
 
-> ## **M16 IS FROZEN, PACKAGED AND PUSHED. THE EMULATOR TIER IS 134/0/0/0
-> ## GREEN TWICE (14z-133, and 14z-133b under the new runner-level MAME default,
-> ## row-by-row identical). NOTHING IS OWED TO THE HARNESS.** All 14z-133/133b
-> ## commits PUSHED 2026-09-05 at the maintainer's word (origin/main = `98f305bc` + this note).
-> ##
-> ## # WHAT 14z-133 WAS, IN ONE LINE
-> ##
-> ## The owed run was made and went 131/3; the three reds were ONE class and not
-> ## the artifact: a gate that boots `vsavjw` through `run_mame.sh` with
-> ## `MAME_BIN` unset runs HOMEBREW's mame, which does not know the set, so the
-> ## leg measures nothing and the liveness checks refuse. The runner exports no
-> ## `MAME_BIN`; a developer shell that exported it hides the defect — which is
-> ## how 14z-132's phase-C fix (a REAL relative-`$ROMDIR` defect, same symptom)
-> ## came to be called complete. Four gates pinned, the class GATED
-> ## (`test_mame_bin_pinned`, ci_portable), `--resume` re-ran the three under
-> ## the runner: green. STATE 14z-133 has the 2×2 that establishes both defects.
-> ##
-> ## **VERIFY A GATE FIX IN THE RUNNER'S SHAPE: `env -u MAME_BIN ROMDIR=../ROMS
-> ## tests/<gate>.sh`** — a shell with the variable exported proves nothing about
-> ## what a release run will see.
-> ##
-> ## # READY FOR THE MAINTAINER, NOT YET DONE
-> ##
-> ## **THE FIELD TEST.** Bundle `../mister_fieldtest_14z132/` (both MRAs run
-> ## `jtcps2w`; parts resolve 31/31 and 22/22; README lists what is new and the
-> ## two structurally impossible things not to hunt). The `.rbf` has not moved
-> ## since 14z-108 — seed 18269, verify the hash before flashing. **M16 IS
-> ## FIELD-GREEN (maintainer, 2026-09-05): "Field tests are green." THE RELEASE
-> ## IS ON.** M12 was green twice before it; M13 was never fielded alone.
-> ## **THE RELEASE.** `release/merged-m16/` is packaged for all three platforms
-> ## — ~~and~~ **BUT UNTRACKED (found 14z-134): it sits `??` in the main tree, never
-> ## `git add`ed, unlike every earlier release directory; tracking it is step 4 of
-> ## the RELEASE DAY checklist below.**
-> ## A release run is `--scope all` PLUS `--lane mister` (hours); anything red
-> ## or skipped is a hard fail unless approved. **THREE `out`-scope rows are
-> ## known problems** — two RED with exact diagnoses, one dead must-fire
-> ## control — and need fixing or explicit approval first.
-> ## **DECIDED AND DONE (14z-133b):** the runner exports `MAME_BIN` = the WIDE
-> ## build unless the caller set one (`test_emulator_runner` §11 locks it); the
-> ## full sweep re-run under it is 134/0/0/0 with the 24 instrument-changed
-> ## gates named in `build/emu_sweep_14z133b/affected_set.txt`.
-> ##
-> ## # THREAD 3 — THE MERGED/SOLO WALK: DONE, 16/16 GREEN ON THE MERGED BUILD
-> ##
-> ## One pass (16 gates = 271 s). 15 defaults re-pointed; `audit_tripwire_reach`
-> ## already ran merged legs; `test_dualtrack` kept by ruling and brought in line
-> ## with it (class v6, `oracle_classes.md`: six frozen offsets, never windows;
-> ## onsets unmoved; must-fire control) — PASS on merged, PASS with zero flickers
-> ## on solo. No merged-vs-solo difference in the artifact; the field verdict
-> ## stands. B2 done the same sitting (below).
-> ##
-> ## # ALSO OPEN
-> ##
-> ## * **THE CI IS GREEN ON THE RUNNER — the first time ever (14z-133b, 62/0/0/0).**
-> ##   It never needed ROMs. Six classes fixed across three pushes: BSD `sed -i ''`,
-> ##   a tagless/submodule-less checkout, five mis-tiered gates, a hand loop that
-> ##   classified unlike the runner, a reference-rot gate misreading force-added
-> ##   side files, the patch series carrying its git's signature, and one libc-
-> ##   specific control made platform-aware. It runs `run_all_static.sh --tier
-> ##   portable --strict` with `FAIL_TAIL=80`. Deactivation was the maintainer's
-> ##   conditional; the condition was false.
-> ## * **TWO BACKLOG ITEMS (maintainer, 2026-09-05), recorded as DIRECTION in
-> ##   STATE "Decisions pending" (top): (1) a level-0 skill split — what in
-> ##   [CPE]/[CPH]/[MSC] is transferable to MAME/FBNeo or MiSTer work that is
-> ##   not CPS-2; (2) a GENERIC, REUSABLE TEST HARNESS extracted from this
-> ##   project's rules and rulings (CLAUDE.md included), as a separate thing,
-> ##   then its skill. Neither scheduled; both wait behind the field test and
-> ##   the release.
-> ## * **B2 — DONE (14z-133b):** `merged-m16` registry row (whole-set key only),
-> ##   `tests/expected/merged-m16/` verified 53/53 on the shipped build, the three
-> ##   legacy-oracle gates on merged and green. The merged-vs-solo question is
-> ##   CLOSED. The release runs every legacy oracle on the build it ships.
-> ## * **STATE.md is ~210 KB** against ~150 KB. The 14z-131 group rolled early
-> ##   (three groups now); the bulk is the standing **Decisions pending**
-> ##   section, so **the `DECISIONS_HISTORY.md` pass** (ruled decisions that no
-> ##   longer shape work move there verbatim, 14z-109) is the mechanism that
-> ##   matters. Still owed.
-> ## * **`audit_trap_sound`** — was asserting about `build/hui30` (14z-82c); re-pointed
-> ##   to the merged build in thread 3 (14z-133b), PASS. Closed.
-> ## * **THE TMP REAPER NOW HEALS ITSELF** (14z-133b): a hollowed jtsim scratch
-> ##   clone is restored by `mister_mra.sh --ensure-scratch` (gate
-> ##   `test_jtsim_scratch_heal`). If a MiSTer gate dies in 0 s at "generating
-> ##   MRAs" again, that is a NEW mechanism — do not reach for `rm -rf` first.
-> ## * **Two normalisations must stay at the point the value is first read:**
-> ##   `$ROMDIR` (182 gates, 14z-132) and now `MAME_BIN` (per gate for `vsavjw`
-> ##   legs, gated; plus the runner's exported default). In a runner they would resolve against
-> ##   the changed directory / the launching shell and reproduce the bug.
-> ##
-> ## **IF A DOC IS TOUCHED:** `doc_anchor_census --check` + `checkdocshape
-> ## --no-pending` + `checkdocs` + `checkskills` + `gen_annotations --check` +
-> ## `gen_gate_index --check` + `gen_gotchas_index --check`, exit statuses
-> ## captured directly — and in zsh, loop with `${=cmd}` or every one of them
-> ## reports rc=127 (paid again 14z-133). A TEMPORARY script under `tests/`
-> ## trips BOTH generators: delete it before the checks. Adding an anchored
-> ## `**[VSP-N]**` also obliges the SKILL to define it, and the census must be
-> ## re-frozen.
+1. a `${VAR:?}` abort after an EXIT trap EXITS 0 on macOS bash 3.2 — a 65-min
+   Verilator gate read `PASS 0s`; the runner now FAILS an exit-0 log with a
+   shell error, `test_demand_after_trap` (ci_portable) bars the shape;
+2. one 90-min timeout for 165 gates — two 3-hour gates killed; a row's 7th
+   column is now its own timeout, the nine MiSTer rows carry MEASURED values;
+3. a FRESH scratch clone could not simulate (a comment after a
+   line-continuation backslash in the driver, 14z-133b) — fixed, and the
+   fresh-clone census is the control;
+4. `test_mister_prg_window`'s frozen pair was merged-m10's walker address
+   (five freezes stale; cadence was `bitstream`, its pair follows the
+   ROMSET) — re-frozen from the run's own measurement, cadence `romset`,
+   `tests/expect/` now inside `test_expectation_provenance`'s scope;
+5. `test_mister_qsound_ext` read its liveness probe by SLOT number where the
+   driver numbers slots by ORDER — a probe counting 171 M reads read as dead;
+   keyed on the bank now.
+**The gate headers' runtimes were low by 40-140 %; the corrected figures are
+in the headers and the registry.** [MSC-54] was paid AGAIN on a worktree copy:
+a running script is the same file to the process reading it.
+
+## THE VERILATOR LANE IS PARALLEL (maintainer-directed, built this session)
+
+One scratch clone was the whole constraint. Now: `--jobs N` on the mister lane
+gives each job slot its own clone (`<base>-slotN`, provisioned at the pin on
+first use, under a minute), and the three two-leg gates run their legs at
+once on `<scratch>` and `<scratch>-b` via the driver's `--profile-off` copy
+(the shared `.rom` is never patched in place any more). Measured: four
+clones, four cores at 99-100 %, ~100 MB each; qsound_ext + prg_window in
+1 h 41 against ~4 h 55 serial. `test_emulator_runner` §13 is the ground
+truth. **Two other machines are on offer** (a Windows Ryzen 9 3900X / 32 GB,
+a coming Linux 5700G / 64 GB) — a remote runner is the next shape to cost;
+`test_mame_parity` is the migration gate for any new host ([MFI-41]).
+
+## ALSO THIS SESSION
+
+* **The DECISIONS_HISTORY pass** — STATE 249 -> 134 KB; thirty ruled entries
+  moved verbatim; seven stay (the two backlog directions, the
+  living-documentation direction, Pyron's row 0x11, the Phobos ±1 residue,
+  the community cross-check, the Zabel j.LK session).
+* **The LEVEL-0 SKILL CUT** (backlog item 1, ruled accepted): `mame-fbneo-
+  instruments` [MFI-1..46] and `mister-jtframe-core` [MJC-N], 109 of 145
+  CPS-2 rules lifted with their NUMBERS, every old ID a redirect, a GENERATED
+  `GUIDE.md` per level-0 skill (`tools/gen_skill_guide.py`, gate
+  `test_skill_guides`) — the skill DIRECTORY is the portable unit. The finding:
+  `cps2-emulation` had no CPS-2 content. Record: `skills_scope.md` §7.
+* **Backlog item 2 (the generic harness) still waits**; its scope document is
+  the natural next step (the MiSTer precedent: scope first).
+
+## OPEN, IN ORDER
+
+1. **PUSH** the 14 commits (maintainer's word). Then remove the merged
+   worktree branch if it still exists (`git branch -d worktree-decisions-pass`).
+2. **The deferred ruling**: `audit_mask_window_ff42a2` — deprecated or
+   case-specific (maintainer: *"let's circle back to that later"*).
+3. **The per-row timeout is IN; the runtimes are measured** — the next release
+   run needs no `--timeout` flag; run it `--jobs 4` on the mister lane.
+4. **`release/merged-m15` was never packaged** — superseded before release,
+   recorded, not owed.
+5. The standing items unchanged: Pyron's row 0x11 (measure-first was done;
+   the port decision is the maintainer's), the Phobos ±1 residue, the
+   community cross-check aerials, the Zabel j.LK session, #112 option (B).
+
+**IF A DOC IS TOUCHED:** `doc_anchor_census --check` + `checkdocshape
+--no-pending` + `checkdocs` + `checkskills` + `gen_annotations --check` +
+`gen_gate_index --check` + `gen_gotchas_index --check` + `gen_skill_guide
+--check`, exit statuses captured directly — and in zsh, loop with `${=cmd}`.
+**A running script is never edited — not in the main tree, not in a
+worktree** ([MSC-54], paid twice now).

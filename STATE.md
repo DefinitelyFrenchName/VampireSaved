@@ -23,11 +23,14 @@ older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
   VERBATIM to `DECISIONS_HISTORY.md`** (grep there by topic; the §5
   retraction grep covers it).
 
-## Session 14z-134 — **THE M16 RELEASE RUN LAUNCHED (165 gates, four lanes, strict), AND THE
-## WORK DONE BESIDE IT IN A WORKTREE: the DECISIONS_HISTORY pass (STATE 249 -> 134 KB), the
-## LEVEL-0 SKILL CUT (two board-agnostic skills, 109 of 145 rules lifted, every old ID a
-## redirect, a GENERATED guide per skill), and the RELEASE-DAY PREP — which found the M16
-## release directory PRODUCED BUT NEVER TRACKED.** IN PROGRESS: the run is in flight.
+## Session 14z-134 — **M16 RELEASED: the release run PASS 164 / SKIP 1 (approved) / FAIL 0 over
+## 165 gates in three passes, and the run itself found and fixed FIVE harness defects that were
+## never the artifact** — a `${VAR:?}` abort reading PASS 0s, the one-size timeout, a fresh scratch
+## clone unable to simulate, a frozen pair five freezes stale, a liveness probe read by the wrong
+## slot — **while the Verilator lane went PARALLEL (four clones, 1 h 41 for what took ~5 h serial).**
+## Beside it: the DECISIONS_HISTORY pass (STATE 249 -> 134 KB), the LEVEL-0 SKILL CUT (two
+## board-agnostic skills, 109 of 145 rules lifted, every old ID a redirect, a GENERATED guide per
+## skill), and the release directory found UNTRACKED since its freeze and tracked. Not pushed.
 
 | | |
 |---|---|
@@ -92,35 +95,13 @@ older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
 | **CLOSE — static tier after the build line** | `ROMDIR=... tests/run_all_static.sh` -> `PASS 133 SKIP 0 FAIL 0 MISSING 0` **GREEN** (133 = 132 + `test_mra_build_line`), gated on the GREEN line, tree clean during the run. Commits PUSHED 2026-09-05 (`af2b1261`) |
 | **CLOSE — static tier after thread 3 + the release prep** | `ROMDIR=... tests/run_all_static.sh` -> `PASS 133 SKIP 0 FAIL 0 MISSING 0` **GREEN**, gated on the GREEN line, tree clean during the run. Commits PUSHED 2026-09-05 (`af2b1261`) |
 
-## Session 14z-133 — **THE OWED EMULATOR RUN, PAID: 134/0/0/0 GREEN** — after a first
-## pass of 131/3 whose three reds were ONE class and none of them the artifact. The 14z-132
-## phase-C fix was HALF: the gate had TWO defects with ONE symptom, and the second — `MAME_BIN`
-## unpinned, so the `vsavjw` leg ran Homebrew's `mame` and measured nothing — hid behind a
-## developer shell's export; two 14z-131 gates were red for the same reason on their first
-## sweep. Both defects established by a 2×2, the class pinned AND gated, STATE rolled early.
-## No build byte moved.
-
-| | |
-|---|---|
-| opened with | the maintainer's question, *"Do you want me to run the emulator run or are you doing it?"* — I ran it: ROM audit 76/76 first, all five M16 build dirs on disk, no other process on the machine, `tests/run_all_emulator.sh --freeze` detached with a watcher on the PID. It ran end to end this time |
-| **the first pass** | **131 PASS / 3 FAIL / 0 SKIP / 0 TIMEOUT over 134 gates** (the two 14z-131 gates joined the romset cadence since the opener's 132). The reds: `test_phasec_image` (74 s, the SAME "clean leg held the victim on only 0 frames" as 14z-132), `audit_pyron_capture_block` (9 s, "held frames ours=0 native=48"), `audit_tenant_throw_geometry` (165 s, "no hold" for all 18 victims × 3 throws). Every one reads as OUR build producing no event while the native leg did — i.e. exactly like a defect in the artifact |
-| **the mechanism, proved at the instrument** | `tools/run_mame.sh` execs `${MAME_BIN:-mame}`. The runner exports no `MAME_BIN`, my tool shell has none and no profile sets one, so the fallback is `/opt/homebrew/bin/mame` — stock 0.288 — which answers `Unknown system 'vsavjw'` in under a second (reproduced with a one-second wrapper call, no emulation). The native legs boot `vsav2`, which Homebrew's binary knows, so they run; the `vsavjw` leg produces NO dumps and the liveness checks refuse to judge. Sections 1-3 of the phase-C gate use FBNeo and Python, which is why only section 4 failed |
-| **why 14z-132 missed it** | its discriminator ran in a shell that already EXPORTED `MAME_BIN`, so "pinning it changed nothing" was true THERE and every cell had the pin; the only variable left was `$ROMDIR`, and that defect is real. Retracted in place (14z-132's close row and its "DISCRIMINATOR RUN" item 2) — grep-driven, one carrier each |
-| **the 2×2, measured (`build/verify_14z133/`)** | on the HEAD script: `MAME_BIN` unset × `$ROMDIR` {relative, absolute} → FAIL, FAIL; pinned × {relative, absolute} → PASS, PASS — **at HEAD the pin ALONE decides the outcome**. On the PRE-14z-132 script: pinned + relative → FAIL — **the ROMDIR defect confirmed on its own**, not from a commit message. The fixed script, unset + relative (the runner's exact shape) → PASS. `audit_pyron_capture_block` fixed → PASS 15 s (Demitri control overlap 6/6, Pyron 0/15 as frozen); `audit_tenant_throw_geometry` fixed → PASS 156 s (18/18 victims, residue as frozen) |
-| **the fix** | the 118-gate idiom `MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN` pinned in the three reds and in the fourth class member, `audit_mask_window_ff42a2` (out-scope, momentary; needs positional rompaths and a worktree rebuild, so it is SYNTAX-CHECKED ONLY — its Usage line had REQUIRED `MAME_BIN`, and the default is that same binary). Usage lines made honest (`[MAME_BIN=...]`); `test_header_defaults` green |
-| **the enforcement, because prose had failed twice** | *"Name `MAME_BIN` for a `vsavjw` run"* was an item in TWO earlier openers (`NEXT_SESSION_HISTORY.md`) and never a rule. Now `tests/test_mame_bin_pinned.sh` (ci_portable, ~1 s) + `tools/audit_mame_bin_pin.py`: a script that boots `vsavjw` through a MAME wrapper must ASSIGN or EXPORT the variable — a `[MAME_BIN=...]` in a Usage line is not a pin (two of the three reds had exactly that). 93 in-class scripts, 93 pinned; must-fire control (a pinned gate minus its pin lines is reported; the same file on a stock set drops out of the class). The grep patterns live in the tool so the runners' transitive classifier keeps the gate portable |
-| **the class beyond the reds** | ~43 gates reach MAME through the wrappers on STOCK sets without a pin: they RUN, on Homebrew's binary rather than either pinned instrument. Verdict-equivalent today by `test_mame_parity`; an instrument nothing pins. Options and a recommendation ((c) a runner-level default) in "Decisions pending" |
-| **the clean record, on the runner's own accounting** | `results_first_pass.tsv` kept beside `results.tsv`; the three FAIL rows removed and `--freeze --resume` re-ran EXACTLY those three under the runner from a shell with `MAME_BIN` unset: **PASS 134 / SKIP 0 / FAIL 0 / TIMEOUT 0 — GREEN.** The runner's end-of-run tree diff lists my gate edits, made DURING the first pass: every edited gate had already run by then, and the two registry files it lists are read only by the static runner |
-| my own errors, corrected in-session | the zsh no-word-split trap TWICE (a class count and the doc-checklist loop — the memory note exists for a reason); the first class count measured "mentions `MAME_BIN`" instead of "assigns it" and so MISSED both 14z-131 gates until they went red on their own |
-| **CLOSE — housekeeping** | the 14z-131 group rolled EARLY to STATE_HISTORY (three groups and 213 KB, the rule's own trigger; ~4 KB saved — the `DECISIONS_HISTORY.md` pass remains the mechanism that matters and is still OWED); the 14z-132 opener rolled verbatim; gotcha filed in `docs/platform/gotchas.md` and the index regenerated; HANDOFF "What exists" row for the tool; doc-touch checklist all green. Static tier: see the row below |
-| **CLOSE — static tier** | `ROMDIR=... tests/run_all_static.sh` **131/0/0/0 GREEN** (130 + the new pin gate), tree clean during the run. Emulator tier **134/0/0/0 GREEN** on `build/emu_sweep_14z133/`. Two commits, PUSHED 2026-09-05 with 14z-133b's three (`0b973956`) |
-
 # THE LEDGER — archived sessions, one line each (newest first)
 
 Full detail for every line: `STATE_HISTORY.md` (verbatim; grep the session
 tag or any phrase below). `[+N more entries]` = the group has N further
 session records in the archive beyond the headline shown.
 
+- Session 14z-133 CLOSE — **THE OWED EMULATOR RUN, PAID: 134/0/0/0 GREEN** after a first pass of 131/3 whose three reds were ONE class and none of them the artifact: `MAME_BIN` unpinned, so the `vsavjw` leg ran Homebrew's `mame` and measured nothing, hidden behind a developer shell's export; both defects established by a 2×2, the class pinned AND gated, STATE rolled early. No build byte moved  [rolled 14z-134 close, early — STATE was 166 KB]
 - Session 14z-132 CLOSE — **THE RELEASE WINDOW OPENED, AND THE MAINTAINER RULED FOUR TIMES.** The version-numbering mess fixed at its root (the wheel mark IS the merged build number, M16, gated); the M16 tracks built and measured at a two-member delta; the merged-vs-solo scoping question opened, ruled [VSP-175], walked two gates deep into the dispatch-key decision; M16 frozen, registered on whole-set keys, packaged, pushed; static 130/0/0; the emulator tier owed a clean run  [rolled 14z-133b close, early — STATE was 250 KB]
 - Session 14z-131 CLOSE — **THE MAINTAINER CHALLENGED A GATE AND WAS RIGHT THREE TIMES RUNNING.** Two rulings executed (Pyron measured, `test_phasec_image` §4 re-targeted and green), then Phobos's three historically-corrected throws MEASURED AGAINST NATIVE VS2 and found MATCHING — but only after captures refuted my own description of the first result, a set-comparison was replaced by an ordered one, and widening to all 18 victims exposed a frozen constant as victim-specific. The method is now `docs/project/gate_scoping_method.md`. No build byte moved; static 130/0/0/0  [rolled 14z-133 close, early — STATE was 213 KB]
 - Session 14z-130 CLOSE — **M13 FROZEN, REGISTERED AND TAGGED** (donovan-m19 / huitzil-m26 / pyron-m20 / merged-m15, mark M13, the boot name screen reading VAMPIRE SAVED): the `gap_be27a` fold-in BYTE-NEUTRAL on all five tracks after its ownership question turned out to have a measured answer (the generic repoint would have silently reverted the 14z-64 mirror-victim fix); freeze suite 8/8 SUITE GREEN over 3h05m with every expectation set a PURE CARRY; emulator tier 131/1; the 137-file re-point sweep, which walked into the documented history-rewriting trap and needed 13 dated records restored. Static 130/0/0/0  [rolled 14z-131 close, early — STATE was 193 KB]
