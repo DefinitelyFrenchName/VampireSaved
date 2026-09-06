@@ -351,7 +351,7 @@ produced by `jtframe mra cps2w` (byte-identical to stock cps2's except
 SLICE D5.** The boot failure below is the state BEFORE D5; its eliminations
 stand and its trace is still the best description of the symptom. **What it
 did not know:** the 68k EXECUTES from the program extension (ten opcode
-fetches at `CPU:$4BE7C0-$4BE7C8`, simulated frame 1119) and receives the
+fetches at `CPU:$4BE7C0-$4BE7C8`, simulated frame 1119 — the 14z-107 layout's address; it is the relocated OBJ walker, whose placement moves with each freeze, `$4C13D0` on merged-m16 per 14z-134) and receives the
 CPS-2 DECRYPTOR'S OUTPUT, because the key's encrypted-opcode range word is
 stored COMPLEMENTED and `jtcps2_dec_ctrl` reads it straight — the reference
 core decrypts to `CPU:$F03FFF` where MAME and FBNeo stop at `$0FFFFF`. Every

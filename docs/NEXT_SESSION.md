@@ -75,6 +75,9 @@ a coming Linux 5700G / 64 GB) — a remote runner is the next shape to cost;
    case-specific (maintainer: *"let's circle back to that later"*).
 3. **The per-row timeout is IN; the runtimes are measured** — the next release
    run needs no `--timeout` flag; run it `--jobs 4` on the mister lane.
+3b. **A small harness gap:** `test_header_defaults` does not cover a positional
+   `[name]` default (the roundtrip gate's header said m15 while its code said
+   m14 for two freezes). Extend it or accept; not owed.
 4. **`release/merged-m15` was never packaged** — superseded before release,
    recorded, not owed.
 5. The standing items unchanged: Pyron's row 0x11 (measure-first was done;

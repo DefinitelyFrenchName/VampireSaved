@@ -2562,6 +2562,8 @@ The real scenario it guards — a host key physically held before the run — IS
 in that read, because MAME samples host input ahead of the frame. Reachable
 in the field, not from the harness.
 
+**A sixth, paid 14z-134:** a redirection `> f` on a command GROUP truncates `f` before any command in the group reads it — `{ grep '^#' f; cat new; } > f` lost the header it meant to keep. Write to a temp file and `mv`.
+
 ## **[VSP-124]** five traps from the #103 hunt — four are RIG grammar, one is a classifier lying by omission (paid: 14z-97b)
 
 **A blanket opponent-class poke window that overlaps a LIVE match kills the
@@ -3685,7 +3687,7 @@ the same replay — the same stream, relabelled.
 
 ## A `${VAR:?msg}` abort AFTER an EXIT trap exits 0 on macOS `/bin/sh` — a gate that never ran reads as PASS to any exit-status classifier (14z-134, the first MiSTer gate the release runner ever executed)
 
-`test_mister_obj_oracle.sh` demands `: "${JTSIM_SCRATCH:?set JTSIM_SCRATCH …}"`
+**[VSP-176]** `test_mister_obj_oracle.sh` demands `: "${JTSIM_SCRATCH:?set JTSIM_SCRATCH …}"`
 at line 87, eight lines AFTER `trap 'rm -rf "$W"' EXIT`. Under the release
 runner the variable was unset (every sibling MiSTer gate DEFAULTS it to
 `${TMPDIR:-/tmp}/vampire-saved-jtsim`; this one alone insists on it), the
@@ -3716,7 +3718,7 @@ assert around.
 
 ## A line-continuation backslash followed by a comment is an EMPTY COMMAND, and it hid that a FRESH jtsim scratch clone could not simulate at all (14z-134)
 
-`tools/run_sim_jtcps2.sh`'s 14z-133b module-init line read
+**[VSP-177]** `tools/run_sim_jtcps2.sh`'s 14z-133b module-init line read
 `[ -f "$SCRATCH/modules/fx68k/fx68k.sv" ] || \   # the module keeps …` with the
 `git submodule update --init …` on the next line. The shell reads `\ ` as an
 escaped SPACE — a word — so the right-hand side of the `||` became a command
@@ -3741,3 +3743,7 @@ once. The driver's `--profile-off` now makes a COPY (`<set>.profile-off.rom`,
 byte 41 asserted 0xFE then written 0xFF) and simulates that; the `.rom` is
 never touched, the legs run concurrently on `<scratch>` and `<scratch>-b`, and
 the gate records which image each leg ran (`rom_path`).
+
+## THE FIRST RUNNER-DRIVEN MiSTer LANE FOUND TWO THINGS THE FREEZE RITUAL HAD NO EYE FOR (14z-134)
+
+**[VSP-178]** **A frozen expectation FOLLOWS whatever moves it, whatever the gate's cadence says.** `test_mister_prg_window` was `bitstream` cadence — run at a release, and at a freeze only when the freeze targets MiSTer — while its frozen pair records the FIRST EXTENSION ADDRESS the 68k executes, which is the relocated OBJ walker's PLACEMENT: the hole allocator moves it whenever a freeze adds extension content before it. Frozen on merged-m10 (14z-107 (11)), stale from merged-m11 (14z-115), and nobody could know for five freezes because the lane is opt-in and the row never ran at a freeze. The M16 release run found it: `first_addr 4be7c0 -> 4c13d0`, every structural assertion green. Cadence follows the EXPECTATION: a bitstream-cadence gate may freeze nothing that a romset freeze can move, or it is `romset`. The same run found `release/merged-m16/` PRODUCED at the 14z-132 freeze and never `git add`ed — every earlier release directory went in with its freeze commit — so the freeze commit is where the release directory lands, and a release run that finds it untracked has found a freeze that was not finished. Both are now in the release-day checklist and `test_expectation_provenance` covers `tests/expect/`.

@@ -1122,7 +1122,7 @@ that it does it — read the module that consumes it.**
 **[MSC-54]** **[MJC-54]** `sh` reads a script incrementally and keeps a BYTE OFFSET into the file. Edit
 the file while it is executing and the offset now points into the middle of a
 different line: the still-running shell resumes at a token boundary that never
-existed. Paid for here on a 55-minute gate — `tools/run_sim_jtcps2.sh` had run
+existed. **Paid AGAIN 14z-134 on a WORKTREE copy of the same driver** — the process reading a file does not care which checkout it lives in; a leg of the fresh-clone census died at `line 496: syntax error` after its simulation because the worktree's `run_sim_jtcps2.sh` had been edited under it. Paid for here on a 55-minute gate — `tools/run_sim_jtcps2.sh` had run
 its 2,880-frame Verilator simulation to completion, and then died on
 
     run_sim_jtcps2.sh: line 242: syntax error near unexpected token `('

@@ -1203,7 +1203,7 @@ what the core READ out of it.
   traffic (the vanilla object banks). Without the second pair a zero on the
   first pair would be ambiguous between "the core did not fetch" and "the
   probe does not count" — and this lane has produced four false verdicts
-  from instruments already.
+  from instruments already. **And a probe is looked up by the BANK it watches, never by slot number** (14z-134): the driver numbers slots in the ORDER the `--rdprobe` windows are given, `test_mister_qsound_ext` armed bank 3 third and read `RDPROBE SUMMARY 3` — a slot that does not exist — so a probe that had counted 171,491,620 reads was reported dead on the release run.
 
 ### The cheapest proof that the profile bit is live: LOOK AT THE SCREEN
 

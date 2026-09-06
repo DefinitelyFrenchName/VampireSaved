@@ -554,3 +554,6 @@ VSP-172	docs/project/gate_scoping_method.md	6. Do not lose a check while strengt
 VSP-173	docs/project/gate_scoping_method.md	7. Look before you characterise	IN-LIST
 VSP-174	docs/project/gate_scoping_method.md	8. When the instrument and the artifact both look wrong, suspect the instrument	IN-LIST
 VSP-175	docs/project/gate_scoping_method.md	9. Which BUILD a gate runs on is a scoping decision, not a rig detail	IN-LIST
+VSP-176	docs/project/gotchas.md	A `${VAR:?msg}` abort AFTER an EXIT trap exits 0 on macOS `/bin/sh` — a gate that never ran reads as	IN-LIST
+VSP-177	docs/project/gotchas.md	A line-continuation backslash followed by a comment is an EMPTY COMMAND, and it hid that a FRESH jts	IN-LIST
+VSP-178	docs/project/gotchas.md	THE FIRST RUNNER-DRIVEN MiSTer LANE FOUND TWO THINGS THE FREEZE RITUAL HAD NO EYE FOR (14z-134)	IN-LIST
