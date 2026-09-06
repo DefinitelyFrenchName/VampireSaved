@@ -10,32 +10,26 @@
 *"I need the generic reusable test harness and the living documentation
 effort. After that we'll tackle the open items lined up."* Both are SCOPED
 (`docs/project/harness_scope.md`, `docs/project/living_docs_scope.md`) and
-the harness's first slice is LANDED. Nothing in this tree's own harness
+the harness's first two slices are LANDED. Nothing in this tree's own harness
 changes; it "stays as it is".
 
-## WHERE THE HARNESS IS
+## WHERE THE HARNESS IS: H1 + H2 LANDED (`803f372`, `ef7e899`)
 
 `~/Developer/blackbox-harness` (`bbh`), a SEPARATE repository, PUBLIC at
-https://github.com/DefinitelyFrenchName/blackbox-harness (branch `main`; pushing it is
-standing-authorised since 14z-135b — clone or fork it from there). H1 is
-at `803f372`: `bin/bbh run-static | classify | tier | config |
-demand-after-trap | doctor | selftest`; `selftest/run.sh` is its pre-commit
-gate (7/0/0 at the close). Read its `README.md`, `docs/gate_contract.md`,
-`docs/config.md`; the consumer config for THIS tree is
-`example/consumers/bbh.vampire.toml` (kept there by decision 8 of the scope).
-`selftest/test_fidelity_vampire.sh` proves F1 (identical runner output) and
-F3 (the tier classifier reproduces both registries) against this tree at
-every selftest run; F2 (the whole portable tier through both runners) is
-opt-in with `BBH_FIDELITY_F2=1` and never beside another gate run here.
-
-## WHERE THE HARNESS IS NOW: H1 + H2 LANDED (`803f372`, `ef7e899`)
-
-`bbh selftest` is 13 gates, 13 PASS (~1 min; `BBH_FIDELITY_F5=1` runs F5
-over all 1,891 masked specs, ~4 min — do that at every slice's pre-commit).
-Fidelity so far: F1 identical, F3 exact, F5 exact (1,891/1,891). The
-comparison classes are `lib/py/bbh/compare_*.py` + `thresholds.py` +
-`logfmt.py`; the vocabulary is `lib/sh/masked_compare.sh`; the method
-document is `docs/method/oracle_classes.md`.
+https://github.com/DefinitelyFrenchName/blackbox-harness (branch `main`;
+pushing it is standing-authorised since 14z-135b — clone or fork it from
+there). `bin/bbh run-static | classify | tier | config | demand-after-trap |
+compare-flicker | compare-window | compare-composite | check-diverge |
+describe-shape | doctor | selftest`. Read its `README.md`,
+`docs/gate_contract.md`, `docs/config.md`, `docs/method/oracle_classes.md`;
+the consumer config for THIS tree is `example/consumers/bbh.vampire.toml`
+(kept there by decision 8 of the scope). `bbh selftest` is 13 gates, 13 PASS
+(~1 min; `BBH_FIDELITY_F5=1` runs F5 over all 1,891 masked specs, ~4 min —
+do that at every slice's pre-commit). Fidelity so far: F1 identical, F3
+exact, F5 exact (1,891/1,891), all in `selftest/test_fidelity_vampire.sh`,
+which runs against this tree at every selftest run; F2 (the whole portable
+tier through both runners) is opt-in with `BBH_FIDELITY_F2=1` and never
+beside another gate run here.
 
 ## NEXT: SLICE H3 — fingerprint, the suite runner, the fake driver
 
@@ -67,7 +61,7 @@ driver via a shadow root). Rule 1 of the fidelity contract still holds:
    `ci_static`), then the harness SKILL, then living docs L1 → L4 → L2 → L3
    (`living_docs_scope.md` §4), then the open items below.
 2. The eight defaults of `harness_scope.md` §7 are open to VETO — read them
-   once; none blocks H2.
+   once; none blocks H3.
 3. **A finding about this tree, not fixed (14z-135):** `run_all_static.sh`
    has no exit-0-after-shell-error branch (the sweep runner has, since
    14z-134); the demand-after-trap lint is what prevents the shape. Fix it
