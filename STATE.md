@@ -48,6 +48,7 @@ older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
 | **THE FRESH-CLONE CONTROL, and a trap paid AGAIN: [MSC-54] holds for a WORKTREE copy** | the first full census on the fresh clone: legs B, C and D produced their bank images and every census/cross-check assertion PASSED (the D2 re-pack confined to bank 0, the redirect's aliasing shown, both maps as expected) — so a fresh clone initialises, builds and simulates. Leg A alone "produced no image": its own tail is `run_sim_jtcps2.sh: line 496: syntax error near unexpected token '('` — the WORKTREE's driver, which I edited (the `--profile-off` block) WHILE leg A was executing it. `sh` reads a script by byte offset; the running leg resumed after its simulation at a shifted position. Legs B-D started after the edit and read the new file whole. The rule *"never edit a running shell script — freeze tests/ and tools/ for the whole of a long run"* ([MSC-54], now [MJC-54]) was written for the main tree; a worktree copy under execution is the same file to the process reading it. Re-launched with nothing in flight for the clean record (~30 min beside the resume's own census, the second concurrent pair): **PASS, 10/10 assertions, 37 min, while the resume's census and then its bank-load audit ran on the base clone** — a fresh clone provisions, initialises, builds and simulates, and two simulations coexist at full speed |
 | **THE THIRD PASS, ON THE PARALLEL LANE: PASS 164 / SKIP 1 / FAIL 0 / TIMEOUT 0 — THE RELEASE RUN'S EXPECTED END STATE** | after the resume exited (162/1/2, tree clean), `main` fast-forwarded to the worktree's 13 commits, static tier **135/0/0 GREEN** (134 + `test_skill_guides`; a first attempt was killed by the background-task memory watchdog mid-gate, not by the tier — re-run clean), the two FAIL rows dropped (`results_second_pass.tsv` kept), and `--scope all --lane all --strict --jobs 2 --resume` launched. FOUR clones, FOUR simulations at 99-100 % each (`base`, `base-b`, `slot1`, `slot1-b`; the two new ones provisioned and built in under a minute). `test_mister_prg_window` PASS 3452 s — the pair MATCHES the re-frozen expectation and every figure equals the second pass's (1,211,302 / 4 reads above `$400000`: deterministic across clones); `test_mister_qsound_ext` PASS 5843 s — the extension fetched (440,896 reads, banks 0x80-0x8E), zero with the profile off, and the bank-3 liveness probe READ CORRECTLY at 171,491,620 / 105,018,872. Wall clock **1 h 41 for both gates together** against ~4 h 55 serial (3452 + 11306 s). Tree check `ok`. The one non-PASS is `audit_mask_window_ff42a2` SKIP — the approval item, unchanged. `test_release_roundtrip` re-pointed to merged-m16 and run on the package: see the next row |
 | **THE RELEASE PACKAGE, GATED FOR THE FIRST TIME** | `tests/test_release_roundtrip.sh` default `NAME` re-pointed `merged-m14` -> `merged-m16` (its header said m15 — a positional-default mismatch `test_header_defaults` does not cover, both corrected) and run explicitly on `build/m3b_merged23/rompath merged-m16`: **PASS, all four sections** — the round trip byte-identical from the pristine dumps, the applier's refusals, the rule-7 chunk scan, and section 4's per-platform layout of the (still untracked) `release/merged-m16/`. Log `build/release_roundtrip_m16.log`. Checklist step 2 done; steps 3 (the MRA build block) and 4 (track the directory) wait on the maintainer's two answers |
+| **THE TWO ANSWERS, AND THE RELEASE TRACKED** | Decision 1 (the SKIP): *"agreed"* — option (a), recorded in the gate's registry note; deprecated-vs-case-specific deferred by the maintainer. Decision 2 (the MRA): *"let's regenerate"* — `tools/mister_mra.sh --no-rom --wide build/m3b_merged23` regenerated the WIDE MRA with its BUILD block (`merged-m16 · mark M16 · vsavjw.zip sha1 664b14f8… · both keys`), IDENTICAL outside the XML comment to the field-tested copy (7 comment lines differ), parts 31/31 against the build + `$ROMDIR`, `test_mra_build_line` PASS, `test_release_roundtrip` section 4 PASS on the updated package; the stock control MRA untouched. **`release/merged-m16/` tracked and committed** — the directory every earlier release had in its freeze commit — with the HANDOFF registry row carrying RELEASED 14z-134 and the run's counts. Push waits on the maintainer's word |
 
 ## Session 14z-133b — **THE RUNNER-LEVEL MAME DEFAULT, RULED, SHIPPED AND VALIDATED BY
 ## THE FULL SWEEP: 134/0/0/0 AGAIN**, compared row by row with 14z-133's record — the same
@@ -463,8 +464,9 @@ what a triage is looking at, so those are where the thinking time goes.
   registry, not in flags; (b) as the stop-gap if (a) waits. Not swept
   unasked; no gameplay surface.
 
-- **THE M16 RELEASE RUN'S ONE EXPECTED NON-GREEN — `audit_mask_window_ff42a2`
-  SKIPs — NEEDS THE MAINTAINER'S APPROVAL AT RELEASE TIME (14z-134; the
+- **~~THE M16 RELEASE RUN'S ONE EXPECTED NON-GREEN — `audit_mask_window_ff42a2`
+  SKIPs — NEEDS THE MAINTAINER'S APPROVAL AT RELEASE TIME~~ APPROVED 2026-09-06,
+  option (a), a standing exception in the registry note (14z-134; the
   policy: "RELEASE-TIME TEST SCOPE", *"unless explicitly approved AT release
   time, anything red, anything skipped is a hard fail"*).**
   **WHAT THE GATE IS:** the pre/post ATTRIBUTION INSTRUMENT for a
@@ -501,6 +503,10 @@ what a triage is looking at, so those are where the thinking time goes.
   history: it is the instrument that caught the 38 regression. **RECOMMENDATION:
   (a).** One line; the exception is then a reviewed row, not a ritual step.
 
+  **DECIDED (maintainer, 2026-09-06): (a), *"agreed"* — recorded in the gate's
+  `ci_emulator.tsv` note the same day. LEFT FOR LATER, in the maintainer's
+  words: *"whether to set the skipped gate as either deprecated or
+  case-specific, as it kind of is but let's circle back to that later."**
 - **TWO BACKLOG ITEMS, RECORDED AS DIRECTION (maintainer, 2026-09-05, 14z-133b)
   — ~~nothing scheduled; both are multi-session and wait behind the field test
   and the release~~ (1) EXECUTED 14z-134 with the maintainer's blessing while
