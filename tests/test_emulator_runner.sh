@@ -343,6 +343,26 @@ else
 fi
 rm -f "$FR/tests/run_all_emulator_noexport.sh" "$FR/tests/g_mamebin.sh"
 
+echo "12. exit 0 after a SHELL ERROR is FAIL; a MAME teardown segfault line is not (14z-134)"
+# The M16 release run recorded test_mister_obj_oracle as PASS 0s: it died at
+# a `${JTSIM_SCRATCH:?}` demand placed after its EXIT trap, and macOS bash 3.2
+# exits 0 for that abort (docs/project/gotchas.md). The classifier now reads
+# the shell's own `<script>.sh: line N: NAME: message` as a crash. The
+# benign look-alike — MAME segfaulting at teardown AFTER the summary line,
+# `line N:  <pid> Segmentation fault: 11` — must still PASS.
+printf '#!/bin/sh\necho "tests/g_shellcrash.sh: line 3: FOO: set FOO to a dir OUTSIDE the repo"\nexit 0\n' > "$FR/tests/g_shellcrash.sh"
+printf '#!/bin/sh\necho "PASS: the summary line"\necho "tests/g_segv.sh: line 64:  2444 Segmentation fault: 11  REPLAY=x"\nexit 0\n' > "$FR/tests/g_segv.sh"
+chmod +x "$FR/tests/g_shellcrash.sh" "$FR/tests/g_segv.sh"
+reg "$(row g_shellcrash mame release - '')" "$(row g_segv mame release - '')"
+run --lane mame --log "$T/l12" >/dev/null 2>&1 || true
+v12a="$(awk -F'\t' '$1=="g_shellcrash"{print $4}' "$T/l12/results.tsv" 2>/dev/null)"
+v12b="$(awk -F'\t' '$1=="g_segv"{print $4}' "$T/l12/results.tsv" 2>/dev/null)"
+[ "$v12a" = FAIL ] && ok "a shell-error line with exit 0 is FAIL (was PASS before 14z-134)" \
+                   || fail "shell-error crash classified '$v12a', expected FAIL"
+[ "$v12b" = PASS ] && ok "a MAME teardown segfault line after the summary stays PASS" \
+                   || fail "the benign segfault shape classified '$v12b', expected PASS"
+rm -f "$FR/tests/g_shellcrash.sh" "$FR/tests/g_segv.sh"
+
 echo
 [ "$rc" = 0 ] && echo "PASS: run_all_emulator.sh classifies every ground-truth case correctly" \
               || echo "FAIL: see above"

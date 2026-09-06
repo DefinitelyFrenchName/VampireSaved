@@ -54,6 +54,11 @@ test_freeze_tag_coverage
 test_gfx_collision_gate
 test_gfx_layout_fields_live
 test_header_defaults
+# 14z-134: no `${VAR:?}` demand AFTER an EXIT trap in any gate — macOS bash
+# 3.2 exits 0 for that abort, so a gate that never ran reads as PASS to an
+# exit-status classifier (the M16 release run recorded a 65-minute Verilator
+# gate as PASS 0s). Explicit tests instead; must-fire control. ROM-free, ~1 s.
+test_demand_after_trap
 test_hex_lengths
 test_masked_compare
 test_m2a_flicker_gate

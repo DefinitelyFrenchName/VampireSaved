@@ -134,6 +134,7 @@ tests/test_down_flash_mechanism.sh	oracle
 tests/test_emulator_runner.sh	runner
 tests/test_expectation_provenance.sh	docs
 tests/test_header_defaults.sh	runner
+tests/test_demand_after_trap.sh	runner
 tests/test_tick_durations.sh	character-data
 tests/test_pod_black_foot_palette.sh	oracle
 tests/test_down_flash_vanilla.sh	oracle

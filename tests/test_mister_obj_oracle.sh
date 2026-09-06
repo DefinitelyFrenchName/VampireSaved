@@ -84,7 +84,12 @@ if [ -z "$SIMDIR" ] || [ -z "$MAMELOG" ]; then
     [ -d "$REPO/$BUILD/rompath" ] || { echo "SKIP: no $BUILD/rompath"; exit 77; }
     : "${MAME_BIN:=$HOME/.cache/vampire-saved/mame/cps2}"
     [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary"; exit 77; }
-    : "${JTSIM_SCRATCH:?set JTSIM_SCRATCH to a dir OUTSIDE the repo}"
+    # 14z-134: DEFAULT the scratch like every sibling MiSTer gate. This line was
+    # a `${JTSIM_SCRATCH:?…}` DEMAND, eight lines after the EXIT trap — and on
+    # macOS bash 3.2 that abort exits 0, so the M16 release run recorded this
+    # 65-minute gate as `PASS 0s` on four lines of log (docs/project/gotchas.md).
+    JTSIM_SCRATCH="${JTSIM_SCRATCH:-${TMPDIR:-/tmp}/vampire-saved-jtsim}"; export JTSIM_SCRATCH
+    case "$JTSIM_SCRATCH" in "$REPO"|"$REPO"/*) echo "FAIL: JTSIM_SCRATCH is inside the repo ($JTSIM_SCRATCH)"; exit 1 ;; esac
 
     echo "== MAME leg (OBJ records at the frozen anchor) =="
     REPLAY="$RPL" DUMP_FRAMES="$EXP_AM" TRACE_OUT="$W/mame_obj.txt" \

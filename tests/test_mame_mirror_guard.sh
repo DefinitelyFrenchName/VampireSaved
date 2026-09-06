@@ -163,7 +163,8 @@ for miss in makefile src/mame src/emu; do
     PART="$T/part_$(echo "$miss" | tr / _)"
     mkdir -p "$PART/src/mame" "$PART/src/emu"; touch "$PART/makefile"
     echo "precious" > "$PART/keepme.txt"
-    rm -rf "${PART:?}/$miss"
+    [ -n "$PART" ] || { echo "FAIL: PART empty before rm -rf"; exit 1; }   # 14z-134: the guard as an explicit test (a ${:?} abort after the EXIT trap exits 0 on macOS bash 3.2)
+    rm -rf "$PART/$miss"
     must_reject "a tree MISSING $miss" "$PART"
 done
 if [ -f "$T/part_makefile/keepme.txt" ]; then

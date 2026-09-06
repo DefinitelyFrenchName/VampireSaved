@@ -309,6 +309,17 @@ run_one() {   # run_one <gate> <lane> <scope> <args> — writes one results row
         _v=TIMEOUT; _d="killed after ${TMO}s"
     elif [ "$_st" != 0 ]; then
         _v=FAIL;    _d="exit $_st: $(grep -aE '^ *(SKIP|PARTIAL)|FAIL|ERROR|Traceback|not found' "$_log" | tail -1 | cut -c1-90)"
+    elif grep -qaE '\.sh: line [0-9]+: [A-Za-z_][A-Za-z0-9_]*: ' "$_log"; then
+        # 14z-134: EXIT 0 AFTER A SHELL ERROR IS A CRASH, NOT A PASS. macOS
+        # bash 3.2 returns 0 for a `${VAR:?}` abort once an EXIT trap is armed
+        # (docs/project/gotchas.md), and the M16 release run recorded a
+        # 65-minute Verilator gate as `PASS 0s` on four lines of log. The
+        # pattern is the shell's own `<script>.sh: line N: NAME: message`
+        # (a parameter abort, `command not found`, a syntax error); MAME's
+        # teardown `line N:  <pid> Segmentation fault` — a known, benign
+        # class the gates assert around ([MFI-12]) — has digits there and
+        # does not match.
+        _v=FAIL;    _d="exit 0 after a shell error: $(grep -aE '\.sh: line [0-9]+: [A-Za-z_][A-Za-z0-9_]*: ' "$_log" | head -1 | cut -c1-90)"
     elif grep -qE '^ *SKIP' "$_log"; then
         _v=SKIP;    _d="$(grep -E '^ *SKIP' "$_log" | head -1 | cut -c1-90)"
     else

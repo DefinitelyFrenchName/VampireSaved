@@ -57,7 +57,7 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-ROMDIR="${ROMDIR:?set ROMDIR}"
+[ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }   # 14z-134: an explicit test, not a ${:?} demand after the EXIT trap (exits 0 on macOS bash 3.2)
 
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that
 # still contain $ROMDIR (e.g. MAME_ROMPATH="...;$ROMDIR"); a RELATIVE value —

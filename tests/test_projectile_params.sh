@@ -91,7 +91,7 @@ PY
 done
 
 [ "${NOLIVE:-0}" = 1 ] && { [ $fail = 0 ] && echo PASS || echo FAIL; exit $fail; }
-: "${ROMDIR:?set ROMDIR}"
+[ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }   # 14z-134: an explicit test, not a ${:?} demand after the EXIT trap (exits 0 on macOS bash 3.2)
 echo "== 3. the live spawns on the census rigs (native vs2)"
 FS="$(python3 -c "
 fs=[]
