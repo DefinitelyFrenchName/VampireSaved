@@ -49,7 +49,10 @@
 #   ... --freeze                                         = --cadence romset (see below)
 #   ... --only 'glob'                                    a subset (shell glob on the gate name)
 #   ... --jobs N                                         run N gates at once (default 1)
-#   ... --timeout SECS                                   per gate (default 5400 = 90 min)
+#   ... --timeout SECS                                   per gate (default 5400 = 90 min); a row's
+#                                                        7th column (seconds) overrides it (14z-134)
+#   ... --jobs N with --lane mister                      N Verilator runs at once, one scratch
+#                                                        clone per job slot (14z-134)
 #   ... --log DIR                                        default build/emu_sweep_<stamp>
 #   ... --resume                                         skip gates already in the log's results.tsv
 #   ... --strict                                         SKIP and UNREGISTERED are failures too
@@ -162,7 +165,7 @@ selected() {  # rows matching --lane / --scope / --cadence / --only, in lane ord
 
 if [ "$LIST" = 1 ]; then
     printf '%-34s %-7s %-8s %-9s %s\n' GATE LANE SCOPE CADENCE ARGS
-    selected | while IFS="$(printf '\t')" read -r g lane scope cadence args note; do
+    selected | while IFS="$(printf '\t')" read -r g lane scope cadence args note tmo; do
         printf '%-34s %-7s %-8s %-9s %s\n' "$g" "$lane" "$scope" "$cadence" "$(expand "${args:--}")"
     done
     echo
@@ -186,7 +189,9 @@ echo "  registry   $REG"
 echo "  lanes      $LANES"
 echo "  scope      $SCOPE${ONLY:+   only=$ONLY}"
 echo "  cadence    $CADENCE"
-echo "  jobs       $JOBS   timeout ${TMO}s"
+echo "  jobs       $JOBS   timeout ${TMO}s (a row's 7th column overrides it)"
+JTSIM_BASE="${JTSIM_SCRATCH:-${TMPDIR:-/tmp}/vampire-saved-jtsim}"
+[ "$JOBS" -gt 1 ] && echo "  scratch    $JTSIM_BASE (mister slot 0), $JTSIM_BASE-slotN (slots 1..$((JOBS-1)))"
 echo "  log        $LOGDIR"
 echo "  ROMDIR     $ROMDIR"
 
@@ -267,6 +272,10 @@ fi
 # ── THE RUN ─────────────────────────────────────────────────────────────────
 run_one() {   # run_one <gate> <lane> <scope> <args> — writes one results row
     _g="$1"; _lane="$2"; _scope="$3"; _args="$4"
+    # 14z-134: the row's OWN timeout (7th column, seconds) beats the global
+    # --timeout. The release run lost two 3-hour Verilator gates to the one
+    # 90-minute cap while their rows' notes documented the runtime in prose.
+    _tmo="${5:-}"; case "$_tmo" in ""|-) _tmo=$TMO ;; esac
     _log="$LOGDIR/$_g.log"
     if [ ! -x "tests/$_g.sh" ]; then
         printf '%s\t%s\t%s\tMISSING\t0\tregistered but not executable\n' \
@@ -286,13 +295,13 @@ run_one() {   # run_one <gate> <lane> <scope> <args> — writes one results row
     {
         echo "### $_g  lane=$_lane scope=$_scope"
         echo "### cmd: env$_env tests/$_g.sh$_pos"
-        echo "### started $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+        echo "### started $(date -u +%Y-%m-%dT%H:%M:%SZ)  timeout ${_tmo}s"
     } > "$_log"
     # </dev/null: a gate that reads stdin otherwise swallows the rest of the
     # queue — paid for once already in run_all_static.sh.
     if [ -n "$TIMEOUT_BIN" ]; then
         # shellcheck disable=SC2086
-        env $_env "$TIMEOUT_BIN" -k 30 "$TMO" "tests/$_g.sh" $_pos </dev/null >> "$_log" 2>&1 && _st=0 || _st=$?
+        env $_env "$TIMEOUT_BIN" -k 30 "$_tmo" "tests/$_g.sh" $_pos </dev/null >> "$_log" 2>&1 && _st=0 || _st=$?
     else
         # shellcheck disable=SC2086
         env $_env "tests/$_g.sh" $_pos </dev/null >> "$_log" 2>&1 && _st=0 || _st=$?
@@ -306,7 +315,7 @@ run_one() {   # run_one <gate> <lane> <scope> <args> — writes one results row
     # justifies modifying an emulator at all read as a benign skip. SKIP is
     # only ever exit 0 plus the marker.
     if [ "$_st" = 124 ] || [ "$_st" = 137 ]; then
-        _v=TIMEOUT; _d="killed after ${TMO}s"
+        _v=TIMEOUT; _d="killed after ${_tmo}s"
     elif [ "$_st" != 0 ]; then
         _v=FAIL;    _d="exit $_st: $(grep -aE '^ *(SKIP|PARTIAL)|FAIL|ERROR|Traceback|not found' "$_log" | tail -1 | cut -c1-90)"
     elif grep -qaE '\.sh: line [0-9]+: [A-Za-z_][A-Za-z0-9_]*: ' "$_log"; then
@@ -355,7 +364,7 @@ for _l in $LANES; do
     # lane, and its result landed under the wrong heading. Reading from a file
     # keeps the loop — and `wait`, and `_running` — in the main shell.
     printf '%s\n' "$_rows" > "$LOGDIR/.lane_$_l"
-    while IFS="$(printf '\t')" read -r g lane scope cadence args note; do
+    while IFS="$(printf '\t')" read -r g lane scope cadence args note tmo; do
         [ -n "$g" ] || continue
         if already_done "$g"; then
             printf '  %-34s %-7s        (resumed: already in results.tsv)\n' "$g" "-"
@@ -367,9 +376,22 @@ for _l in $LANES; do
             continue
         fi
         if [ "$_jobs" -le 1 ]; then
-            run_one "$g" "$lane" "$scope" "${args:--}"
+            run_one "$g" "$lane" "$scope" "${args:--}" "${tmo:-}"
         else
-            run_one "$g" "$lane" "$scope" "${args:--}" &
+            # 14z-134: THE MiSTer LANE IS PARALLEL BY SCRATCH CLONE. A Verilator
+            # run writes its inputs, dumps, probes and compiled model INTO its
+            # scratch clone's core dir, so two runs in one clone clobber each
+            # other — that, and nothing else, is why the lane was serial. Job
+            # slot 0 keeps the base clone (its compiled model is warm); slot N
+            # gets `<base>-slotN`, provisioned at the pin by the driver on first
+            # use (~a Verilator build). A gate's two legs may take `<scratch>`
+            # and `<scratch>-b` (the gates' own MISTER_LEGS=parallel default).
+            _slot_env=""
+            if [ "$_l" = mister ]; then
+                _scr="$JTSIM_BASE"; [ "$_running" -gt 0 ] && _scr="$JTSIM_BASE-slot$_running"
+                _slot_env="JTSIM_SCRATCH=$_scr "
+            fi
+            run_one "$g" "$lane" "$scope" "$_slot_env${args:--}" "${tmo:-}" &
             _running=$((_running + 1))
             if [ "$_running" -ge "$_jobs" ]; then wait; _running=0; fi
         fi

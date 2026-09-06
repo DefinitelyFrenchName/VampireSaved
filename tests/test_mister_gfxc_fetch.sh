@@ -4,7 +4,9 @@
 # STATUS). Its DEFAULT replay cannot reach a match, so a bare run is red
 # by construction; pass the measured-green operands.
 # 14z-107 (10), MiSTer slice D3 (+D4). Emulator tier: ROMDIR + Verilator +
-# ~2 x 65 min. NOT ci_portable, NOT ci_static.
+# MEASURED 14z-108/134: ~93 min a leg (this line said 65); the two legs in PARALLEL
+# on two scratch clones by default (MISTER_LEGS=serial for one), ~1.6 h.
+# NOT ci_portable, NOT ci_static.
 #
 # WHAT IT PROVES, AND WHY IT IS NOT A PICTURE. Slices D0-D2 built the MRA, the
 # runtime profile gate and the SDRAM placement, and every one of them was
@@ -208,37 +210,37 @@ if [ -z "$POSLOG" ] || [ -z "$NEGLOG" ]; then
     POSLOG="$OUTDIR/pos"; NEGLOG="$OUTDIR/neg"
 
     SCRATCH="${JTSIM_SCRATCH:-${TMPDIR:-/tmp}/vampire-saved-jtsim}"
-    echo "== positive leg (cps2w, the WIDE .rom as emitted; ~65 min) =="
-    ( cd "$REPO" && "$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$POSLOG" --core cps2w \
-        --wide "$BUILD" --frames "$FRAMES" $probe_args ) \
-        || { echo "FAIL: the positive leg did not complete"; exit 1; }
-
-    # THE CONTROL IMAGE: the same bytes, byte 41 = 0xFF. It is built by
-    # PATCHING the positive leg's own .rom, so the two legs cannot differ by
-    # anything else — not even by a regeneration.
-    ROMF="$SCRATCH/rom/vsavjw.rom"
-    [ -s "$ROMF" ] || { echo "FAIL: no $ROMF after the positive leg"; exit 1; }
-    python3 - "$ROMF" <<'PY' || exit 1
-import sys
-p = sys.argv[1]
-with open(p, "r+b") as f:
-    f.seek(41); b = f.read(1)
-    if b != b"\xfe":
-        sys.exit("FAIL: header byte 41 is %r, expected 0xFE (the WIDE MRA's)" % b)
-    f.seek(41); f.write(b"\xff")
-print("  control image: header byte 41 0xFE -> 0xFF (CPS-2 WIDE off)")
-PY
-    echo "== control leg (cps2w, the SAME .rom with the profile bit clear) =="
-    ( cd "$REPO" && "$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$NEGLOG" --core cps2w \
-        --wide "$BUILD" --frames "$FRAMES" $probe_args ) \
-        || { echo "FAIL: the control leg did not complete"; exit 1; }
-    # ...and put the image back, so the next run of anything does not silently
-    # inherit a profile-off .rom.
-    python3 - "$ROMF" <<'PY'
-import sys
-with open(sys.argv[1], "r+b") as f:
-    f.seek(41); f.write(b"\xfe")
-PY
+    # 14z-134: THE TWO LEGS RUN AT ONCE, ON TWO SCRATCH CLONES (MISTER_LEGS=serial
+    # keeps one clone and runs them in turn). The control image is the driver's
+    # --profile-off COPY of the SAME .rom (header byte 41 0xFE -> 0xFF, asserted
+    # by the driver), so the legs still differ by nothing else — and the shared
+    # .rom is never patched in place any more, which is what serialised them.
+    LEGS="${MISTER_LEGS:-parallel}"
+    SCRATCH_B="${JTSIM_SCRATCH_B:-${SCRATCH}-b}"; [ "$LEGS" = parallel ] || SCRATCH_B="$SCRATCH"
+    run_leg() {  # run_leg pos|neg
+        if [ "$1" = pos ]; then
+            ( cd "$REPO" && JTSIM_SCRATCH="$SCRATCH" "$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$POSLOG" --core cps2w \
+                --wide "$BUILD" --frames "$FRAMES" $probe_args )
+        else
+            ( cd "$REPO" && JTSIM_SCRATCH="$SCRATCH_B" "$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$NEGLOG" --core cps2w \
+                --wide "$BUILD" --frames "$FRAMES" $probe_args --profile-off )
+        fi
+    }
+    echo "== positive leg (cps2w, the WIDE .rom as emitted) + control leg (the SAME .rom, profile bit clear) — legs: $LEGS =="
+    if [ "$LEGS" = parallel ]; then
+        run_leg pos > "$OUTDIR/pos.out" 2>&1 & _p1=$!
+        run_leg neg > "$OUTDIR/neg.out" 2>&1 & _p2=$!
+        wait "$_p1" && _r1=0 || _r1=$?
+        wait "$_p2" && _r2=0 || _r2=$?
+        sed 's/^/  [pos] /' "$OUTDIR/pos.out"; sed 's/^/  [neg] /' "$OUTDIR/neg.out"
+    else
+        run_leg pos && _r1=0 || _r1=$?
+        run_leg neg && _r2=0 || _r2=$?
+    fi
+    [ "$_r1" = 0 ] || { echo "FAIL: the positive leg did not complete"; exit 1; }
+    [ "$_r2" = 0 ] || { echo "FAIL: the control leg did not complete"; exit 1; }
+    [ -s "$POSLOG/rom_path" ] && [ -s "$NEGLOG/rom_path" ] || { echo "FAIL: a leg recorded no rom_path"; exit 1; }
+    echo "  control image: $(cat "$NEGLOG/rom_path") (a COPY with header byte 41 0xFE -> 0xFF; the .rom untouched)"
 fi
 
 # ── the verdict ────────────────────────────────────────────────────────────

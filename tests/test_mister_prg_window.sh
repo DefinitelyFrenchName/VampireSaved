@@ -1,7 +1,9 @@
 #!/bin/sh
 # test_mister_prg_window.sh — SLICE D4's OWN EVIDENCE: what the 68k does with
 # CPU:$400000-$5FFFFF on the core. 14z-107 (11). Emulator tier: ROMDIR +
-# Verilator + ~2 x 40 min. NOT ci_portable, NOT ci_static.
+# Verilator; MEASURED 14z-134: ~55 min a leg (this line said 40), the two legs in
+# PARALLEL on two scratch clones by default (MISTER_LEGS=serial for one), ~1 h.
+# NOT ci_portable, NOT ci_static.
 #
 # THE QUESTION, AND WHY IT IS THREE-WAY. D4 declares a 6 MB program window.
 # The SDRAM image census proves the CPS-2 WIDE romset's bytes are PLACED above
@@ -97,34 +99,39 @@ if [ -z "$POSLOG" ] || [ -z "$NEGLOG" ]; then
     SCRATCH="${JTSIM_SCRATCH:-${TMPDIR:-/tmp}/vampire-saved-jtsim}"
     probe_args="--prgprobe --rdprobe 0 4194304 6291456 --rdprobe 0 0 4194304"
 
-    echo "== positive leg (cps2w, the WIDE .rom as emitted; ~40 min) =="
-    # shellcheck disable=SC2086
-    "$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$POSLOG" --core cps2w \
-        --wide "$BUILD" --frames "$FRAMES" $probe_args \
-        || { echo "FAIL: the positive leg did not complete"; exit 1; }
-    ROMF="$SCRATCH/rom/vsavjw.rom"
-    [ -s "$ROMF" ] || { echo "FAIL: no $ROMF after the positive leg"; exit 1; }
-    cp "$ROMF" "$POSLOG/rom_used.bin"
-    python3 - "$ROMF" <<'PY' || exit 1
-import sys
-with open(sys.argv[1], "r+b") as f:
-    f.seek(41); b = f.read(1)
-    if b != b"\xfe":
-        sys.exit("FAIL: header byte 41 is %r, expected 0xFE (the WIDE MRA's)" % b)
-    f.seek(41); f.write(b"\xff")
-print("  control image: header byte 41 0xFE -> 0xFF (CPS-2 WIDE off)")
-PY
-    echo "== control leg (cps2w, the SAME .rom with the profile bit clear) =="
-    # shellcheck disable=SC2086
-    "$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$NEGLOG" --core cps2w \
-        --wide "$BUILD" --frames "$FRAMES" $probe_args \
-        || { echo "FAIL: the control leg did not complete"; exit 1; }
-    cp "$ROMF" "$NEGLOG/rom_used.bin"
-    python3 - "$ROMF" <<'PY'
-import sys
-with open(sys.argv[1], "r+b") as f:
-    f.seek(41); f.write(b"\xfe")
-PY
+    # 14z-134: THE TWO LEGS RUN AT ONCE, ON TWO SCRATCH CLONES (MISTER_LEGS=serial
+    # keeps one clone and runs them in turn). The control image is the driver's
+    # --profile-off COPY of the SAME .rom (header byte 41 0xFE -> 0xFF, asserted
+    # by the driver), so the legs still differ by nothing else — and the shared
+    # .rom is never patched in place any more, which is what serialised them.
+    LEGS="${MISTER_LEGS:-parallel}"
+    SCRATCH_B="${JTSIM_SCRATCH_B:-${SCRATCH}-b}"; [ "$LEGS" = parallel ] || SCRATCH_B="$SCRATCH"
+    run_leg() {  # run_leg pos|neg
+        if [ "$1" = pos ]; then
+            ( cd "$REPO" && JTSIM_SCRATCH="$SCRATCH" "$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$POSLOG" --core cps2w \
+                --wide "$BUILD" --frames "$FRAMES" $probe_args )
+        else
+            ( cd "$REPO" && JTSIM_SCRATCH="$SCRATCH_B" "$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$NEGLOG" --core cps2w \
+                --wide "$BUILD" --frames "$FRAMES" $probe_args --profile-off )
+        fi
+    }
+    echo "== positive leg (cps2w, the WIDE .rom as emitted) + control leg (the SAME .rom, profile bit clear) — legs: $LEGS =="
+    if [ "$LEGS" = parallel ]; then
+        run_leg pos > "$OUTDIR/pos.out" 2>&1 & _p1=$!
+        run_leg neg > "$OUTDIR/neg.out" 2>&1 & _p2=$!
+        wait "$_p1" && _r1=0 || _r1=$?
+        wait "$_p2" && _r2=0 || _r2=$?
+        sed 's/^/  [pos] /' "$OUTDIR/pos.out"; sed 's/^/  [neg] /' "$OUTDIR/neg.out"
+    else
+        run_leg pos && _r1=0 || _r1=$?
+        run_leg neg && _r2=0 || _r2=$?
+    fi
+    [ "$_r1" = 0 ] || { echo "FAIL: the positive leg did not complete"; exit 1; }
+    [ "$_r2" = 0 ] || { echo "FAIL: the control leg did not complete"; exit 1; }
+    [ -s "$POSLOG/rom_path" ] && [ -s "$NEGLOG/rom_path" ] || { echo "FAIL: a leg recorded no rom_path"; exit 1; }
+    echo "  control image: $(cat "$NEGLOG/rom_path") (a COPY with header byte 41 0xFE -> 0xFF; the .rom untouched)"
+    cp "$(cat "$POSLOG/rom_path")" "$POSLOG/rom_used.bin"
+    cp "$(cat "$NEGLOG/rom_path")" "$NEGLOG/rom_used.bin"
 fi
 
 # ── the verdict tool on each leg, against the .rom that leg ran ────────────

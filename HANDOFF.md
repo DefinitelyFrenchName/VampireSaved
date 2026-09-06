@@ -455,7 +455,9 @@ gnu-sed xmlstarlet verilator imagemagick`, ~1.0-1.2 s per simulated frame):
 
 ```sh
 export ROMDIR=/path/to/reference/sets
-export JTSIM_SCRATCH=/tmp/vampire-saved-jtsim   # NEVER inside the repo
+export JTSIM_SCRATCH=/tmp/vampire-saved-jtsim   # NEVER inside the repo; one clone = ONE simulation at a time
+                                                 # (it writes inputs, dumps, probes and obj_dir/ into the core dir) —
+                                                 # the runner's --jobs N uses <base>-slotN per slot (14z-134)
 tools/run_sim_jtcps2.sh tests/replays/05_timeout_idle.rpl /tmp/out107 \
     --frames 2880 --wram 2540 2880     # ~47 min; run it detached, poll the PID
 #   host frame output is OFF by default (--frame-output off); `fork` is
@@ -1126,7 +1128,8 @@ Ground truth for the runner itself: `tests/test_static_runner.sh`.
 ```sh
 ROMDIR=... tests/run_all_emulator.sh                  # prereq + fbneo + mame, release scope
 ROMDIR=... tests/run_all_emulator.sh --scope all      # + the out-of-release-scope rows
-ROMDIR=... tests/run_all_emulator.sh --lane mister    # the Verilator lane, HOURS — opt-in
+ROMDIR=... tests/run_all_emulator.sh --lane all       # + the Verilator lane (--lane mister ALONE selects only that lane)
+ROMDIR=... tests/run_all_emulator.sh --lane all --jobs 4   # 14z-134: N Verilator runs at once, one scratch clone per slot
 ROMDIR=... tests/run_all_emulator.sh --strict         # SKIP and UNREGISTERED are failures too
 tests/run_all_emulator.sh --list                      # the registry, as selected
 ROMDIR=... tests/run_all_emulator.sh --dry-run        # the resolved command per gate
@@ -1169,6 +1172,17 @@ runner instead of remembered. `test_mister_sdram_census` and
 `test_mister_gfxc_fetch` are deliberate exceptions: they measure where THIS
 ROMSET lands in SDRAM, so they follow the romset. Only a `mister` row may be
 `bitstream`, enforced, so the concept cannot spread by column edit.
+
+**A row's optional 7th column is the gate's OWN timeout in seconds (14z-134)**,
+overriding `--timeout` (default 90 min): the M16 release run killed two
+3-hour Verilator gates at the one-size cap while their notes said "~93 min a
+leg" in prose. Set it from a MEASURED runtime × ~1.5. **And the MiSTer lane is
+PARALLEL by scratch clone**: `--jobs N` hands slot 0 the base `JTSIM_SCRATCH`
+and slot N `<base>-slotN` (provisioned at the pin on first use, ~3 min for the
+Verilator build); the three two-leg gates run their legs at once on
+`<scratch>` and `<scratch>-b` (`MISTER_LEGS=serial` for one clone). One
+simulation is one core and ~100 MB; the lane that took ~11 h serial fits in
+~3 h at four jobs. Ground truth: `test_emulator_runner.sh` §13.
 
 **The `prereq` lane runs first, sequentially, and a red there STOPS the run.**
 Those gates measure the INSTRUMENTS, and a measurement taken after a moved

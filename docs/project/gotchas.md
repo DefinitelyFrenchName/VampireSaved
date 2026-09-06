@@ -3713,3 +3713,31 @@ verdict — the runner should say so. The other four `.sh: line N:` lines in
 this run's 158 logs are MAME `Segmentation fault: 11` at TEARDOWN, after the
 instrument's summary line — the known [MFI-12] class those gates already
 assert around.
+
+## A line-continuation backslash followed by a comment is an EMPTY COMMAND, and it hid that a FRESH jtsim scratch clone could not simulate at all (14z-134)
+
+`tools/run_sim_jtcps2.sh`'s 14z-133b module-init line read
+`[ -f "$SCRATCH/modules/fx68k/fx68k.sv" ] || \   # the module keeps …` with the
+`git submodule update --init …` on the next line. The shell reads `\ ` as an
+escaped SPACE — a word — so the right-hand side of the `||` became a command
+whose name is a single space, and the real init line became an unconditional
+statement AFTER a `set -e` failure. On the ONE existing clone the file test
+succeeds, the right-hand side never runs, and nothing shows. On a FRESH clone
+(the tmp reaper's re-clone path, or the second clone of a parallel lane) the
+modules are absent, the test fails, the shell prints `line 310:  : command not
+found` and the driver exits before initialising a module — every leg "did not
+complete" in zero seconds. Found by the first measurement of the parallel
+lane (a second clone provisioned in 2 s, then four dead legs); the 14z-133b
+heal gate only ever exercised a HOLLOWED clone, whose modules survive. Rules:
+a comment never follows a line-continuation backslash — put it on the line
+above; and any tool that provisions a scratch from nothing has a control that
+provisions one and RUNS something in it (`test_mister_sdram_census` on a
+fresh `JTSIM_SCRATCH` is the cheap one, ~12 min after a ~3-min build).
+Second finding of the same measurement: **the three two-leg MiSTer gates
+serialised their legs on the shared `.rom` by PATCHING its profile byte in
+place between legs and restoring it after** — a leg that died left a
+profile-off image behind for the next gate, and two legs could never run at
+once. The driver's `--profile-off` now makes a COPY (`<set>.profile-off.rom`,
+byte 41 asserted 0xFE then written 0xFF) and simulates that; the `.rom` is
+never touched, the legs run concurrently on `<scratch>` and `<scratch>-b`, and
+the gate records which image each leg ran (`rom_path`).

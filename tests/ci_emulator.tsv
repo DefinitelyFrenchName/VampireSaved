@@ -11,7 +11,12 @@
 # tests run and "anything red, anything skipped is a hard fail" — a policy that
 # cannot operate over a set nobody enumerates.
 #
-# COLUMNS   gate <TAB> lane <TAB> scope <TAB> cadence <TAB> args <TAB> note
+# COLUMNS   gate <TAB> lane <TAB> scope <TAB> cadence <TAB> args <TAB> note [<TAB> timeout]
+#   timeout (14z-134, OPTIONAL 7th column) seconds for THIS gate, overriding
+#           run_all_emulator.sh --timeout (default 5400). Set from a MEASURED
+#           runtime × ~1.5, rounded up to the hour: the M16 release run killed
+#           two 3-hour Verilator gates at the one-size cap while their notes
+#           said "~93 min a leg, two legs" in prose the runner cannot read.
 #
 #   gate    the script's basename without .sh
 #   lane    prereq | mame | fbneo | mister
@@ -245,12 +250,12 @@ audit_phase_mode_cost	mame	out	romset	-	momentary: what Phobos' phase-gated latc
 audit_ladder_selector	mame	out	romset	-	romset: the vanilla arcade-ladder selector, made rerunnable (14z-95)
 audit_id_writers	mame	out	romset	-	romset: which character ids VANILLA ever assigns
 audit_palette_seq_ids	mame	out	romset	-	romset: which palette-seq ids LEGACY ever requests ([VSP-151])
-test_mister_wide_inert	mister	release	bitstream	-	THE FPGA SUPERSET INVARIANT, measured directly ([MSV-27]); ~22 min
-test_mister_sim_anchor	mister	release	bitstream	-	the MiSTer leg of the §4 dual-emulator oracle
-test_mister_tenant_oracle	mister	release	bitstream	-	the §4 dual-emulator oracle on TENANT content
-test_mister_obj_oracle	mister	release	bitstream	-	cross-implementation agreement on a VIDEO-DETERMINING surface; ~65 min
-test_mister_gfxc_fetch	mister	release	romset	--rpl tests/replays/36_pick_tenant_cell.rpl --frames 4400	the core FETCHES a tenant tile. THE ARGS ARE LOAD-BEARING: the gate's own default replay ends at the select screen, so a bare run is red by construction. These are the operands measured PASS in full at 14z-108 (~93 min a leg, two legs).
-test_mister_prg_window	mister	release	bitstream	-	slice D4's own evidence: the 68k and CPU:$400000-$5FFFFF; ~2 x 40 min
-test_mister_qsound_ext	mister	release	bitstream	-	the QSound extension is fetched on the core
-test_mister_sdram_census	mister	release	romset	-	the WIDE romset lands in SDRAM exactly where mister_map.md places it
-audit_sdram_bank_load	mister	out	romset	-	romset: stock vsavj on the STOCK jtcps2 core — the D2 repack's GO measurement, not a verdict on the shipped core
+test_mister_wide_inert	mister	release	bitstream	-	THE FPGA SUPERSET INVARIANT, measured directly ([MSV-27]); ~22 min	3600
+test_mister_sim_anchor	mister	release	bitstream	-	the MiSTer leg of the §4 dual-emulator oracle	7200
+test_mister_tenant_oracle	mister	release	bitstream	-	the §4 dual-emulator oracle on TENANT content	7200
+test_mister_obj_oracle	mister	release	bitstream	-	cross-implementation agreement on a VIDEO-DETERMINING surface; ~65 min	7200
+test_mister_gfxc_fetch	mister	release	romset	--rpl tests/replays/36_pick_tenant_cell.rpl --frames 4400	the core FETCHES a tenant tile. THE ARGS ARE LOAD-BEARING: the gate's own default replay ends at the select screen, so a bare run is red by construction. These are the operands measured PASS in full at 14z-108 (~93 min a leg, two legs).	14400
+test_mister_prg_window	mister	release	romset	-	slice D4's own evidence: the 68k and CPU:$400000-$5FFFFF; ~55 min a leg measured 14z-134, legs parallel — CADENCE romset since 14z-134: its frozen pair is the relocated OBJ walker's PLACEMENT, which moves with the romset (frozen on merged-m10, stale from merged-m11, caught by the M16 release run)	10800
+test_mister_qsound_ext	mister	release	bitstream	-	the QSound extension is fetched on the core; ~94 min a leg measured 14z-134 (--stats --timing), legs parallel	14400
+test_mister_sdram_census	mister	release	romset	-	the WIDE romset lands in SDRAM exactly where mister_map.md places it	3600
+audit_sdram_bank_load	mister	out	romset	-	romset: stock vsavj on the STOCK jtcps2 core — the D2 repack's GO measurement, not a verdict on the shipped core	7200

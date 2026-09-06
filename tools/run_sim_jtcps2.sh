@@ -192,7 +192,7 @@ DWNLD_FRAMES=462
 # transfer is longer. Measured 14z-107 (9) on the SDRAM image census: "ROM file
 # transfered (frame 659)". A run with --wide asserts the log against this.
 DWNLD_FRAMES_WIDE=659
-RPL=""; OUTDIR=""; FRAMES=""; WFIRST=""; WLAST=""; CORE=cps2; OFFSET=""; LOAD=1
+RPL=""; OUTDIR=""; FRAMES=""; WFIRST=""; WLAST=""; CORE=cps2; OFFSET=""; LOAD=1; PROFILE_OFF=0
 RBANK=""; ROFF=""; RLEN=""; RADDR=""; FRAMEOUT=off; STATS=0
 WIDEBUILD=""; SETNAME=vsavj; POSTFRAMES=""; KEEPBANKS=0
 NPROBE=0; PBANK=""; PLO=""; PHI=""; PRGPROBE=0
@@ -211,6 +211,7 @@ while [ $# -gt 0 ]; do
     --frame-output) shift; FRAMEOUT="${1:?--frame-output needs off|fork|collect}" ;;
     --stats)  STATS=1 ;;
     --prgprobe) PRGPROBE=1 ;;
+    --profile-off) PROFILE_OFF=1 ;;   # 14z-134: simulate the SAME .rom with the CPS-2 WIDE header bit CLEAR, from a COPY
     --wide)   shift; WIDEBUILD="${1:?--wide needs a build dir}"; SETNAME=vsavjw ;;
     --post-frames) shift; POSTFRAMES="${1:?--post-frames needs N}" ;;
     --keep-banks)  KEEPBANKS=1 ;;
@@ -307,7 +308,15 @@ say() { echo "[run_sim_jtcps2] $*"; }
 # same PIN source. The `-e` gitfile rule (14z-107 (3)) and the local-first
 # fetch (14z-107 (6)) live there now.
 JTSIM_SCRATCH="$SCRATCH" "$REPO/tools/mister_mra.sh" --ensure-scratch --quiet || exit 1
-[ -f "$SCRATCH/modules/fx68k/fx68k.sv" ] || \   # the module keeps fx68k.sv at its root (path fixed 14z-133b: the hdl/ form never existed, so every run re-ran the init)
+# The module keeps fx68k.sv at its ROOT (path fixed 14z-133b: the hdl/ form never
+# existed, so every run re-ran the init). 14z-134: that fix put its comment AFTER
+# the line-continuation backslash, which the shell reads as an escaped space —
+# an EMPTY command name. On the existing clone the test succeeds and the broken
+# half never runs; on a FRESH clone (modules absent) it ran, died with
+# ": command not found", and no module was ever initialised — so a re-clone
+# after the tmp reaper hollowed the store, or a second clone for a parallel
+# lane, could not simulate at all. Measured on a second clone (STATE 14z-134).
+[ -f "$SCRATCH/modules/fx68k/fx68k.sv" ] || \
     git -C "$SCRATCH" submodule update --init modules/fx68k modules/jt12 modules/jt51 modules/jteeprom modules/jtdsp16
 
 # ------------------------------------------------- 2. ROM access for the MRA tool
@@ -321,7 +330,12 @@ link_rom() {  # link_rom <name in ~/.mame/roms> <file in ROMDIR>
     elif [ -e "$_at" ]; then
         echo "REFUSING: $_at exists and is not our symlink" >&2; exit 1
     else
-        ln -s "$_want" "$_at"; say "linked $_at -> $_want"
+        # 14z-134: two legs of one gate now run CONCURRENTLY and both link the
+        # same reference zips — the loser of the race sees EEXIST; accept the
+        # link if it is ours.
+        if ln -s "$_want" "$_at" 2>/dev/null; then say "linked $_at -> $_want"
+        elif [ "$(readlink "$_at" 2>/dev/null)" = "$_want" ]; then :
+        else echo "REFUSING: could not link $_at -> $_want" >&2; exit 1; fi
     fi
 }
 link_rom vsavj.zip vsavj.zip
@@ -382,6 +396,30 @@ fi
 [ -s "$ROM/$SETNAME.rom" ] || { echo "no $ROM/$SETNAME.rom was produced" >&2; exit 1; }
 ROMFILE="$ROM/$SETNAME.rom"
 say "rom  $ROMFILE $(wc -c < "$ROMFILE" | tr -d ' ') B sha1 $(shasum "$ROMFILE" | cut -c1-40)"
+# 14z-134: THE CONTROL LEG'S IMAGE IS A COPY, NEVER THE .rom FLIPPED IN PLACE.
+# The three two-leg gates used to patch header byte 41 (0xFE -> 0xFF, the
+# CPS-2 WIDE profile bit) in the shared scratch's .rom between their legs and
+# restore it afterwards — which serialised the legs on ONE clone and left a
+# profile-off image behind if a leg died. With --profile-off the driver makes
+# `<set>.profile-off.rom` beside the .rom, flips the byte THERE, asserts the
+# original value, and simulates that; the .rom stays pristine, so the two
+# legs can run at once on two clones.
+if [ "$PROFILE_OFF" = 1 ]; then
+    [ -n "$WIDEBUILD" ] || { echo "--profile-off needs --wide (the profile byte is the WIDE MRA's)" >&2; exit 2; }
+    OFFROM="$ROM/$SETNAME.profile-off.rom"
+    cp "$ROMFILE" "$OFFROM"
+    python3 - "$OFFROM" <<'PY' || exit 1
+import sys
+with open(sys.argv[1], "r+b") as f:
+    f.seek(41); b = f.read(1)
+    if b != b"\xfe":
+        sys.exit("FAIL: header byte 41 is %r, expected 0xFE (the WIDE MRA's profile bit)" % b)
+    f.seek(41); f.write(b"\xff")
+PY
+    ROMFILE="$OFFROM"
+    say "profile-off image: header byte 41 0xFE -> 0xFF in $OFFROM (the .rom itself untouched)"
+fi
+printf '%s\n' "$ROMFILE" > "$OUTDIR/rom_path"   # which image THIS leg ran (the gates copy it for their verdict tools)
 
 # ------------------------------------------- 5. rom.bin and core.mod, by hand
 # What `-setname` would do, minus the pointless re-link and getset.sh run.

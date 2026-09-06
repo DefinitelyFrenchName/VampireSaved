@@ -34,7 +34,9 @@
 # never played anything. The control leg reading 54 M in the low window is
 # what makes its zero in the high window evidence about `wide_en`.
 #
-# COST: two ~75 min legs. EMULATOR tier.
+# COST: MEASURED 14z-134 ~94 min a leg with --stats --timing (this line said 75);
+# the two legs in PARALLEL on two scratch clones by default (MISTER_LEGS=serial
+# for one), ~1.6 h. EMULATOR tier.
 #
 # HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -115,34 +117,47 @@ if [ -z "$POSLOG" ] || [ -z "$NEGLOG" ]; then
     POSLOG="$OUTDIR/pos"; NEGLOG="$OUTDIR/neg"
     SCRATCH="${JTSIM_SCRATCH:-${TMPDIR:-/tmp}/vampire-saved-jtsim}"
 
-    echo "== positive leg (cps2w, the WIDE .rom as emitted; ~75 min) =="
-    ( cd "$REPO" && "$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$POSLOG" --core cps2w \
-        --wide "$BUILD" --frames "$FRAMES" --stats $probe ) \
-        || { echo "FAIL: the positive leg did not complete"; exit 1; }
-
-    ROMF="$SCRATCH/rom/vsavjw.rom"
-    [ -s "$ROMF" ] || { echo "FAIL: no $ROMF after the positive leg"; exit 1; }
-    python3 - "$ROMF" <<'PY' || exit 1
-import sys
-with open(sys.argv[1], "r+b") as f:
-    f.seek(41); b = f.read(1)
-    if b != b"\xfe": sys.exit("FAIL: header byte 41 is %r, expected 0xFE" % b)
-    f.seek(41); f.write(b"\xff")
-print("  control image: header byte 41 0xFE -> 0xFF (CPS-2 WIDE off)")
-PY
-    echo "== control leg (the SAME .rom, profile bit clear) =="
-    ( cd "$REPO" && "$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$NEGLOG" --core cps2w \
-        --wide "$BUILD" --frames "$FRAMES" --stats $probe ) \
-        || { echo "FAIL: the control leg did not complete"; exit 1; }
-    # put it back, so nothing downstream inherits a profile-off image
-    python3 - "$ROMF" <<'PY'
-import sys
-with open(sys.argv[1], "r+b") as f: f.seek(41); f.write(b"\xfe")
-print("  image restored: header byte 41 -> 0xFE")
-PY
+    # 14z-134: THE TWO LEGS RUN AT ONCE, ON TWO SCRATCH CLONES (MISTER_LEGS=serial
+    # keeps one clone and runs them in turn). The control image is the driver's
+    # --profile-off COPY of the SAME .rom (header byte 41 0xFE -> 0xFF, asserted
+    # by the driver), so the legs still differ by nothing else — and the shared
+    # .rom is never patched in place any more, which is what serialised them.
+    LEGS="${MISTER_LEGS:-parallel}"
+    SCRATCH_B="${JTSIM_SCRATCH_B:-${SCRATCH}-b}"; [ "$LEGS" = parallel ] || SCRATCH_B="$SCRATCH"
+    run_leg() {  # run_leg pos|neg
+        if [ "$1" = pos ]; then
+            ( cd "$REPO" && JTSIM_SCRATCH="$SCRATCH" "$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$POSLOG" --core cps2w \
+                --wide "$BUILD" --frames "$FRAMES" --stats $probe )
+        else
+            ( cd "$REPO" && JTSIM_SCRATCH="$SCRATCH_B" "$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$NEGLOG" --core cps2w \
+                --wide "$BUILD" --frames "$FRAMES" --stats $probe --profile-off )
+        fi
+    }
+    echo "== positive leg (cps2w, the WIDE .rom as emitted) + control leg (the SAME .rom, profile bit clear) — legs: $LEGS =="
+    if [ "$LEGS" = parallel ]; then
+        run_leg pos > "$OUTDIR/pos.out" 2>&1 & _p1=$!
+        run_leg neg > "$OUTDIR/neg.out" 2>&1 & _p2=$!
+        wait "$_p1" && _r1=0 || _r1=$?
+        wait "$_p2" && _r2=0 || _r2=$?
+        sed 's/^/  [pos] /' "$OUTDIR/pos.out"; sed 's/^/  [neg] /' "$OUTDIR/neg.out"
+    else
+        run_leg pos && _r1=0 || _r1=$?
+        run_leg neg && _r2=0 || _r2=$?
+    fi
+    [ "$_r1" = 0 ] || { echo "FAIL: the positive leg did not complete"; exit 1; }
+    [ "$_r2" = 0 ] || { echo "FAIL: the control leg did not complete"; exit 1; }
+    [ -s "$POSLOG/rom_path" ] && [ -s "$NEGLOG/rom_path" ] || { echo "FAIL: a leg recorded no rom_path"; exit 1; }
+    echo "  control image: $(cat "$NEGLOG/rom_path") (a COPY with header byte 41 0xFE -> 0xFF; the .rom untouched)"
 fi
 
-sum_of(){ grep -a "RDPROBE SUMMARY $2 " "$1/jtsim.log" 2>/dev/null | tail -1; }
+# 14z-134: look a probe up by the BANK it watches, never by slot number. The
+# driver numbers slots in the ORDER the --rdprobe windows are given (the bank
+# is the first operand, not the slot), so the bank-3 liveness window armed
+# third is "RDPROBE SUMMARY 2 bank 3 …" — this gate read "SUMMARY 3", found
+# nothing, and reported the probe dead while it had counted 171 M reads
+# (the M16 release run, STATE 14z-134). Bank-keyed, the lookup survives any
+# reordering of the windows.
+sum_of(){ grep -a "RDPROBE SUMMARY [0-9] bank $2 " "$1/jtsim.log" 2>/dev/null | tail -1; }
 field(){ echo "$1" | sed -n "s/.* $2 \([0-9A-Fa-fx]*\).*/\1/p"; }
 
 P0="$(sum_of "$POSLOG" 0)"; P1="$(sum_of "$POSLOG" 1)"; P3="$(sum_of "$POSLOG" 3)"

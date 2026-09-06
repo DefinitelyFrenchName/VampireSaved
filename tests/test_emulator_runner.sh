@@ -277,9 +277,13 @@ for line in open("tests/ci_emulator.tsv"):
     if line.startswith("#") or not line.strip():
         continue
     c = line.rstrip("\n").split("\t")
-    if len(c) < 6:
-        print(f"  FAIL: registry row has {len(c)} columns, needs 6: {c[0] if c else line!r}")
+    if len(c) < 6 or len(c) > 7:
+        print(f"  FAIL: registry row has {len(c)} columns, needs 6 or 7: {c[0] if c else line!r}")
         sys.exit(1)
+    # 14z-134: the optional 7th column is the gate's OWN timeout in seconds
+    # (or `-`), overriding run_all_emulator.sh --timeout.
+    if len(c) == 7 and not (c[6] == "-" or c[6].isdigit()):
+        print(f"  FAIL: timeout column for {c[0]} must be seconds or '-', got {c[6]!r}"); sys.exit(1)
     if c[1] not in ("prereq", "mame", "fbneo", "mister"):
         print(f"  FAIL: unknown lane {c[1]!r} for {c[0]}"); sys.exit(1)
     if c[2] not in ("release", "out"):
@@ -362,6 +366,37 @@ v12b="$(awk -F'\t' '$1=="g_segv"{print $4}' "$T/l12/results.tsv" 2>/dev/null)"
 [ "$v12b" = PASS ] && ok "a MAME teardown segfault line after the summary stays PASS" \
                    || fail "the benign segfault shape classified '$v12b', expected PASS"
 rm -f "$FR/tests/g_shellcrash.sh" "$FR/tests/g_segv.sh"
+
+echo "13. a row's 7th column is its timeout; --jobs N on the mister lane hands each slot its own scratch clone (14z-134)"
+# The M16 release run lost two 3-hour Verilator gates to the single 90-minute
+# cap while their notes said "~93 min a leg" in prose; and the MiSTer lane was
+# serial only because every gate shared ONE scratch clone.
+printf '#!/bin/sh\nsleep 20\necho PASS\n' > "$FR/tests/g_long.sh"; chmod +x "$FR/tests/g_long.sh"
+printf '#!/bin/sh\necho "scratch=${JTSIM_SCRATCH:-UNSET}"\nsleep 2\necho PASS\n' > "$FR/tests/g_slotA.sh"
+cp "$FR/tests/g_slotA.sh" "$FR/tests/g_slotB.sh"; chmod +x "$FR/tests/g_slotA.sh" "$FR/tests/g_slotB.sh"
+reg "$(rowc g_long mame release romset - 'a slow gate')	2" "$(row g_pass mame release - '')"
+run --lane mame --timeout 60 --log "$T/l13a" >/dev/null 2>&1 || true
+v13a="$(awk -F'\t' '$1=="g_long"{print $4}' "$T/l13a/results.tsv" 2>/dev/null)"
+v13b="$(awk -F'\t' '$1=="g_pass"{print $4}' "$T/l13a/results.tsv" 2>/dev/null)"
+[ "$v13a" = TIMEOUT ] && ok "a 2-second 7th column killed a 20-second gate under a 60-second --timeout" \
+                       || fail "per-row timeout not applied: g_long classified '$v13a'"
+[ "$v13b" = PASS ] && ok "a 6-column row still runs under the global --timeout" \
+                    || fail "6-column row classified '$v13b'"
+reg "$(rowc g_slotA mister release romset - 'slot a')" "$(rowc g_slotB mister release romset - 'slot b')"
+(cd "$FR" && ROMDIR="$T/roms" MERGED=build/fake_merged JTSIM_SCRATCH="$T/scratch" \
+    sh tests/run_all_emulator.sh --lane mister --jobs 2 --log "$T/l13b" >/dev/null 2>&1) || true
+sA="$(grep -h '^scratch=' "$T/l13b/g_slotA.log" 2>/dev/null)"; sB="$(grep -h '^scratch=' "$T/l13b/g_slotB.log" 2>/dev/null)"
+if [ "$sA" = "scratch=$T/scratch" ] && [ "$sB" = "scratch=$T/scratch-slot1" ]; then
+    ok "--jobs 2 on the mister lane: slot 0 keeps the base clone, slot 1 gets <base>-slot1"
+else
+    fail "per-slot scratch not delivered: A='$sA' B='$sB'"
+fi
+(cd "$FR" && ROMDIR="$T/roms" MERGED=build/fake_merged JTSIM_SCRATCH="$T/scratch" \
+    sh tests/run_all_emulator.sh --lane mister --jobs 1 --log "$T/l13c" >/dev/null 2>&1) || true
+sC="$(grep -h '^scratch=' "$T/l13c/g_slotB.log" 2>/dev/null)"
+[ "$sC" = "scratch=$T/scratch" ] && ok "--jobs 1: every gate keeps the caller's JTSIM_SCRATCH" \
+                                   || fail "serial mister lane changed the scratch: '$sC'"
+rm -f "$FR/tests/g_long.sh" "$FR/tests/g_slotA.sh" "$FR/tests/g_slotB.sh"
 
 echo
 [ "$rc" = 0 ] && echo "PASS: run_all_emulator.sh classifies every ground-truth case correctly" \
