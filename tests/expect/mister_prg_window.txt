@@ -1,5 +1,9 @@
 # tests/test_mister_prg_window.sh — the frozen pair. One line per leg,
 # the probe's own last per-frame report. Regenerate DELIBERATELY (--freeze):
 # a moved count on a deterministic simulation is a finding.
-pos frame 2900 wide 1 cyc 97520408 cyc_hi_rd 1189750 cyc_hi_wr 10816 rd_hi 1189750 rd_lo 75583151 blocks 8 first_frame 1119 first_addr 4be7c0 min 412ba0 max 4d100e
-neg frame 2900 wide 0 cyc 97337660 cyc_hi_rd 4 cyc_hi_wr 10113 rd_hi 0 rd_lo 75503512 blocks 0 first_frame -1 first_addr 000000 min 7ffffe max 000000
+# Re-frozen 14z-134 on merged-m16 (build/m3b_merged23) from the M16 release run's own
+# measurement (build/emu_release_m16/test_mister_prg_window.log): the first extension
+# address the 68k executes is the relocated OBJ walker's PLACEMENT (4be7c0 on
+# merged-m10 -> 4c13d0 here), which moves with the romset — cadence romset since.
+pos frame 2900 wide 1 cyc 97642730 cyc_hi_rd 1211302 cyc_hi_wr 10816 rd_hi 1211302 rd_lo 75764374 blocks 8 first_frame 1119 first_addr 4c13d0 min 413c70 max 4d3c1e
+neg frame 2900 wide 0 cyc 97337938 cyc_hi_rd 4 cyc_hi_wr 10113 rd_hi 0 rd_lo 75503450 blocks 0 first_frame -1 first_addr 000000 min 7ffffe max 000000
