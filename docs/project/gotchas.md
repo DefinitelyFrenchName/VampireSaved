@@ -4055,6 +4055,25 @@ Related shell trap from the same block: an EMPTY `$(grep ...)` still feeds
 `read` one blank line, so the first version printed a row for every gate in
 the tier with nothing after its name. Guard with `[ -n "$line" ] || continue`.
 
+**IT REPEATED AT THE VERY NEXT NOTE-CLASS GATE (14z-142), which is the part
+worth reading.** `test_checkdocs_rom.sh` captured its tool's output to a file,
+asserted `^NOTE: ` INSIDE that file, and reported the result as `  ok   NOTE:
+…` — so the tool emitted at column 0, the gate's assertion passed, and the
+runner's advisory block still showed only the rule-5 numbers. The gate was
+written by someone who had just read this entry and the NEXT_SESSION line
+quoting it ("Emit at column 0 or the runner cannot see it — that mistake
+shipped once already"), and the knowledge did not transfer, because the
+earlier fix was remembered as being about the TOOL's output when the boundary
+that matters is the GATE's.
+
+So the rule above needs its sharper form: **a gate that CAPTURES a tool's
+output has taken the note off the wire, and must put it back — `echo "$note"`
+at column 0, unindented, outside any `ok`/`FAIL` prefix.** Asserting the note
+exists inside a captured file proves the tool works and says nothing about
+what the runner receives. What catches it is the same thing that caught it
+both times: reading the runner's own NOTE block after a REAL tier run, not the
+gate's exit status.
+
 ## "Is this value documented?" cannot be answered by MATCHING the value (paid: 14z-141)
 
 `audit_rule5.py` first decided IN-TABLE by looking for the value and the key
@@ -4130,3 +4149,42 @@ because one control asserted a probe manifest is IGNORED and it fired.
 EXCLUSIONS must be explicit in the tool, not implied by the primary
 mechanism.** `probe_*.toml` is now an explicit glob, so both paths agree; the
 git listing remains the source of the file set, not of the policy.
+
+## A classifier run over PROSE matches English words as opcodes (paid: 14z-142)
+
+Sizing L3's yield meant asking how many atlas paragraphs quote a 68k
+instruction. The first census used a mnemonic alternation —
+`or|not|tst|ext|swap|clr|neg|add|sub|…` under `re.I` with word boundaries —
+straight over the document text. It reported 77 address-bearing lines
+carrying an instruction, and the number was worthless: `OR` matched
+`PRG:0x020C18`: two **OR** three punches`, `not` matched "are **NOT**
+tables", and `tst`/`ext`/`swap` have the same problem in ordinary sentences.
+Half the 68k mnemonic set is also English.
+
+**Scope the classifier to CODE SPANS before matching, and require operand
+syntax, not just a mnemonic.** Rebuilt to read only backtick-delimited spans
+and to demand a size suffix or a real operand (`#`, `$`, `(a0`, `d1`), the
+same corpus gives 36 instruction spans in 17 paragraphs — a number that
+survived being checked by hand. The rebuilt instrument also has to join a
+paragraph's lines first, because a code span can wrap a line break (the
+14z-140 finding that forced `md_subset.py`'s block-then-inline order).
+
+The general form, and it is [VSP-148]: a classifier over prose that returns a
+plausible number is not evidence until its POSITIVE hits have been read. The
+count looked reasonable, which is exactly why nobody would have checked it.
+
+## `\|` is a LITERAL PIPE to `grep -E`, so an alternation silently matches nothing (paid: 14z-142)
+
+Checking whether L3's fifteen seed claims still existed in the atlas, six of
+the thirteen patterns came back `hits=0` — reading, at a glance, as six claims
+the documentation had lost. Every one of those six was a multi-pattern row
+written `'0x0282D4\|0x028314'` and passed to `grep -rniE`: in BRE `\|` is
+alternation, in ERE it is an escaped literal `|`, so each searched for the
+one string `0x0282D4|0x028314`, which appears nowhere. Re-run with a bare
+`|`, all thirteen hit and all fifteen claims were present.
+
+**A zero from a grep is a claim about the pattern before it is a claim about
+the tree.** The tell was structural and available immediately: every zero was
+a compound pattern and every single-token pattern hit. When a search returns
+"the thing is missing", re-run the same pattern against something it is known
+to match before believing it ([VSP-22]'s positive control, applied to a grep).

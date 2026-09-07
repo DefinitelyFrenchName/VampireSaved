@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-141 CLOSE, 2026-09-07)
+# NEXT SESSION — orientation (rewritten at the 14z-142 CLOSE, 2026-09-07)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
@@ -9,73 +9,71 @@
 
 *"I need the generic reusable test harness and the living documentation
 effort. After that we'll tackle the open items lined up."* **The harness and
-its skill are DONE (14z-135..139). LIVING DOCS IS THREE SLICES OF FOUR: L1 and
-L4 landed 14z-140, L2 landed 14z-141. L3 the ROM re-derivation is the last
-one, and it is next.**
+its skill are DONE (14z-135..139). LIVING DOCS: L1 and L4 landed 14z-140, L2
+landed 14z-141, and L3 — the last slice — is HALF LANDED: its framework
+shipped 14z-142 and its atlas ROM tier finishes next.**
 
-## L3 IS NEXT — scope it first, then STOP for the rulings
+## L3 STEP 3 IS NEXT — no STOP left; the rulings are in
 
-The record is **`docs/project/living_docs_scope.md`**: §4's slice table
-(status in place), §6 the standing decisions, and one plan section per slice —
-**§8 L1, §9 L4, §10 L2, all LANDED**. §11 is L3's and is written at its own
-opener.
+All seven decisions are settled (§11.7, four ruled 2026-09-07 and three taken
+as defaults), so **this one is EXECUTION, not a scoping beat.** The record is
+`docs/project/living_docs_scope.md` §11 — §11.2 the census, §11.3 the six
+findings, §11.5 the seed set, §11.9 the sequencing. Step 3:
 
-**THE EXECUTION PLAN IS STILL THE BRIEF: `build/living_docs_plan_14z139.md`**
-(untracked, a copy of `~/.claude/plans/well-i-m-almost-out-glimmering-koala.md`).
-**Read it in full after this file.** §0 is the standing frame every
-living-docs session runs inside — the opener, the eight-check doc battery with
-exit codes captured directly, the ALONE rule, the four beats (measure → write
-the slice's plan section → **STOP for the rulings** → execute in a fixed
-order), the close, and eleven paid-for traps. §4 is L3's section:
-`tools/checkdocs_rom.py`, quoting an atlas claim and re-deriving it from the
-decrypted image, `--uncovered` as the coverage number. It is scoped as TWO
-sessions for the framework plus the atlas ROM tier.
+1. **Seed checks 9-15** — `id_space.md`'s select-commit site `PRG:0x020A80`
+   and the CPU picker, the attract table `PRG:0x005C08`; `select_screen.md`'s
+   `PRG:0x020A98` and tables A/B (`PRG:0x0211D4` / `PRG:0x0211E4`);
+   `sprite_lists.md`'s drawer entries and a list terminator bit;
+   `venue_assets.md`'s `PRG:0x38C198` (32 longs) and the mugshot/name strides.
+   All fifteen claims were verified PRESENT in the documents at the 14z-142
+   opener, so none needs an atlas fix first — but re-read each before quoting.
+2. **`--uncovered`'s listing** recorded in §11 as the next-work list.
+3. **The frozen covered set** `tests/expected/checkdocs_rom_covered.tsv` with
+   its `PROVENANCE.md` row (evidence class `derived`) — a dropped check or
+   address FAILs, growth re-freezes.
+4. **The [VSP-13] grep** for §2.3's "No tool re-derives an atlas claim from the
+   decrypted image" (S1) and `atlas/README.md`'s "this is the only place it is
+   checked" (S4), then §4's L3 row and §11's STATUS to LANDED, the HANDOFF row
+   amended, static tier ALONE, close.
 
-**RE-MEASURE AT THE OPENER RATHER THAN READING THE SCOPE DOCUMENT. All THREE
-censuses so far disagreed with it** — L1 found four unlisted documents where
-§2.2 said two; L4 found six structural constructs where the plan listed four,
-one of which could not have worked; L2's found the canon has subdirectories
-the plan never names, a kind census counted tree-wide instead of over the
-canon, provenance living in paragraphs rather than on value lines, and a
-GAMEPLAY seed naming keys that do not exist. §0.6 lists what dates.
+## WHAT 14z-142 LEFT THE NEXT SITTING
 
-## WHAT L2 LEFT THE NEXT SLICE
-
-- **The NOTE class exists now** — a gate prints `NOTE: <key> <value>` at
-  COLUMN 0, exits 0 with its usual PASS, and `run_all_static.sh` surfaces it
-  in an advisory block. L3's coverage number is specified NOTE-class, so it
-  plugs straight in. `tests/test_static_runner.sh` §9 is the ground truth, and
-  the convention's one home is `tests/lib/classify.sh`'s header. **Emit at
-  column 0 or the runner cannot see it** — that mistake shipped once already.
-- **`tools/audit_rule5.py` is the precedent for a census tool here**: an
-  explicit KNOWN-pair list so a NEW key FAILS rather than defaulting;
-  exclusions explicit in the tool rather than implied by `git ls-files`; a
-  multiset diff; a progress guard at the TOP of a scan loop.
-- **A change to `run_all_static.sh` or the shared libs will move
-  `test_bbh_fidelity` F1**, which demands byte-identical output against the
-  harness's `bbh run-static`. Mirror the change into `~/Developer/blackbox-harness`
-  (push is standing-authorised) rather than re-baselining, unless it is
-  genuinely lineage-specific.
+- **`tools/checkdocs_rom.py` is live**: 8 checks, 9 table controls, `NOTE:
+  checkdocs_rom.coverage 13/346`. A check QUOTES its claim (`says()`) and
+  DERIVES the fact; a reworded document is a STALE verdict, never a silent
+  pass. Add a check by writing it — **coverage cannot be grown automatically**
+  (of 36 atlas instruction spans, ONE sits in a paragraph naming exactly one
+  address and 27 name none, so the pairing is prose).
+- **`PARAPHRASE` is a declared, printed class.** When an atlas sentence is a
+  faithful SUMMARY rather than a transcription — the palette blitter's `or.l
+  #$F000F000` against the image's `or.l d0,(a1)+` — the check asserts the
+  literal fact it summarises. Never silently skipped; a must-fire control
+  perturbs a paraphrase's literal fact.
+- **All three sets are read** (ruled): `decrypt_view` is set-generic, and the
+  atlas's spine is a three-set comparison table.
+- **The atlas is corrected BEFORE a check is written against it**, in its own
+  commit — the order S3 requires. It happened once already: `id_space.md`'s
+  `PRG:0x04FFA8` range claim had an unstated slot-`0x8` exception.
+- **A classifier over prose lies quietly** (both gotchas of this session): 68k
+  mnemonics are English words, so scope to code spans and demand operand
+  syntax; and `\|` is a literal pipe to `grep -E`, which made six present
+  claims read as missing.
 
 ## OPEN, IN ORDER
 
-1. **L3 the ROM re-derivation** — scoped first, stopping for the rulings.
+1. **L3 step 3** — the atlas ROM tier, then the slice lands and the whole
+   living-docs effort is delivered in all four forms.
 2. Then the open items below.
 
 ## OPEN ITEMS
 
-**NEW, from 14z-141 — `PRG:0x028D50` CARRIES THREE NAMES** and it is a
-gameplay surface, so the call is the maintainer's ([VSP-10]):
-`effect_map_5051` (`huitzil.toml`), `hit_class_props_ext_hi/_lo`
-(`donovan.toml`), and the guard-MASH RNG mask table (`docs/game/atlas/ram.md`
-line 156 — 3: 8/32, 4: 16/32, 5: 24/32, 6+: always), which is what the
-mizuumi corpus calls the Tech-Hit Chance Tables. `audit_rule5.py` classifies
-that band GAMEPLAY conservatively and carries the conflict in
-`AUX_POKE_BANDS`. Establishing which name is right is a measurement, not a
-reading.
-
-Unchanged: the deferred `audit_mask_window_ff42a2` ruling (deprecated or
-case-specific), `test_header_defaults` and the positional `[name]` default,
+Unchanged: `PRG:0x028D50` carries THREE names (`effect_map_5051` in
+`huitzil.toml`, `hit_class_props_ext_hi/_lo` in `donovan.toml`, and the
+guard-MASH RNG mask table at `ram.md` line 156 — mizuumi's Tech-Hit Chance
+Tables); establishing which is right is a measurement on a gameplay surface,
+so the call is the maintainer's ([VSP-10]). Also: the deferred
+`audit_mask_window_ff42a2` ruling (deprecated or case-specific),
+`test_header_defaults` and the positional `[name]` default,
 `release/merged-m15` never packaged, Pyron's row 0x11 (mechanism not
 established; no port recommendation), the Phobos ±1 residue (a knowledge
 item), the community cross-check aerials, the Zabel j.LK session, #112

@@ -1061,10 +1061,31 @@ Cost: one session for the census, the inventory and the first migration.
 
 ## 11. L3 — ROM RE-DERIVATION: scope (the plan before the work)
 
-**STATUS: SCOPED 14z-142 (2026-09-07), AWAITING THE RULINGS of §11.7.** The
-census is measured and it corrected the execution plan in six places, two of
-them load-bearing enough to change what the tool can be asked to do. No tool
-is written yet; §11.8 is the sequencing once the decisions are ruled.
+**STATUS: THE FRAMEWORK LANDED 14z-142 (2026-09-07); the atlas ROM tier
+finishes at `14z-143` (§11.9 step 3), where the slice lands.** The census is
+measured and it corrected the execution plan in six places, two of them
+load-bearing enough to change what the tool can be asked to do. **All four
+open decisions were ruled at the STOP the same sitting (2026-09-07), each as
+recommended; the other three were stated as defaults and not vetoed.**
+
+**SHIPPED IN STEP 2:** `tools/checkdocs_rom.py` (the `Image`/`SETS`/`says`/
+`@check`/`@table`/`PARAPHRASE`/`UNENCODABLE` framework and seed checks 1-8) and
+`tests/test_checkdocs_rom.sh` (ci_static, family `docs`, ~2 s warm / ~35 s
+cold), registered in `ci_static.txt` and `gate_index.tsv`. **Measured on its
+first run: 8 checks, 8 ok, 9 table controls fired, `NOTE:
+checkdocs_rom.coverage 13/346`** — and the four must-fire controls all fire
+(a reworded claim, a flipped ROM byte, a PARAPHRASE claim's literal fact, a
+validator weakened until its own control cannot break it).
+
+**AND IT FOUND SOMETHING ON ITS FIRST RUN, which is the argument for the
+slice.** `id_space.md` said the `PRG:0x04FFA8` table holds "values
+`0x0370-0x03D7`". Measured: true of fifteen rows and false of slot `0x8`,
+which carries its own `0x02A5-0x02AD` block — the same slot that is the
+variant-alias exception in `character_tables.md` (Bishamon). Row `0x0B`'s 24
+bytes are also a byte copy of row `0x4`'s. Neither was written down. The
+document was corrected FIRST, in its own commit, and the check now asserts the
+corrected claim — the order the plan requires (S3): the atlas is fixed before
+a check is written against it, never bent to match a tool.
 
 **THE PREMISE IS PROVEN, not assumed** — both mechanisms were exercised
 against the real image at the opener before any of this was written:
@@ -1237,31 +1258,38 @@ literal fact is perturbed → FAIL (so the class cannot become a silent skip).
 ### 11.7 Decisions — taken under stated assumptions, open to veto
 
 1. **Encoded opcode words are the evidence; capstone is `--disasm`,
-   diagnostic only.** Verified on three claims above.
-   Veto → require capstone, with a loud SKIP where it is absent.
-2. **All three reference sets are REQUIRED, not vsavj-with-siblings-skipped**
-   (finding 3) — the atlas's spine is the three-set table, `decrypt_view` is
-   set-generic, and the opener audits all 76 members anyway.
-   Veto → vsavj only, leaving 41 sibling addresses and 50 comparison rows
-   permanently uncovered, and the largest atlas table unchecked.
-3. **`PARAPHRASE` is a declared, printed class** (finding 4): a summary claim
-   is checked against the literal fact it summarises, never against its own
-   text, and never silently skipped.
-   Veto → (a) treat paraphrases as UNENCODABLE (loses the check), or (b) edit
+   diagnostic only.** Verified on three claims above. **Stated as a default
+   at the STOP and not vetoed — recorded as that, not as a ruling.**
+   ~~Veto → require capstone, with a loud SKIP where it is absent.~~
+2. **RULED (maintainer, 2026-09-07): all three reference sets are REQUIRED,
+   not vsavj-with-siblings-skipped** (finding 3) — the atlas's spine is the
+   three-set table, `decrypt_view` is set-generic, and the opener audits all
+   76 members anyway.
+   ~~Veto → vsavj only, leaving 41 sibling addresses and 50 comparison rows
+   permanently uncovered, and the largest atlas table unchecked.~~
+3. **RULED (maintainer, 2026-09-07): `PARAPHRASE` is a declared, printed
+   class** (finding 4): a summary claim is checked against the literal fact it
+   summarises, never against its own text, and never silently skipped. The
+   documentation is not edited to suit the tool.
+   ~~Veto → (a) treat paraphrases as UNENCODABLE (loses the check), or (b) edit
    the atlas to transcribe literally (changes documentation to suit a tool,
-   and the summary is the more readable sentence).
+   and the summary is the more readable sentence).~~
 4. **`--uncovered`'s buckets are ROM-TIER / RAM-DOCUMENT / SIBLING /
    NOT-AN-ADDRESS** (finding 2), the plan's RAM and OUTSIDE being empty by
-   construction. Veto → keep the plan's three and accept two dead buckets.
-5. **The denominator is 346** and the coverage NOTE is reported against it.
-   Veto → 473 (counting the ram.md-only dataflow claims as uncovered ROM
-   work, which would make the number permanently and misleadingly low).
-6. **Freeze timing: NOTE at this session, freeze the COVERED set at the
-   atlas-tier close**, grow-only after. Veto → NOTE forever.
-7. **`engine_internals.md` second, `ram.md` never** (§6.5) — confirm, with
-   finding 2 noted: the 127 program addresses inside `ram.md` are dataflow
-   claims and stay out of scope, but they are ROM addresses and the coverage
-   line must say so rather than counting them as unchecked.
+   construction. **Stated as a default at the STOP and not vetoed.**
+   ~~Veto → keep the plan's three and accept two dead buckets.~~
+5. **RULED (maintainer, 2026-09-07): the denominator is 346** and the
+   coverage NOTE is reported against it.
+   ~~Veto → 473 (counting the ram.md-only dataflow claims as uncovered ROM
+   work, which would make the number permanently and misleadingly low).~~
+6. **RULED (maintainer, 2026-09-07): NOTE at this session, freeze the
+   COVERED set at the atlas-tier close**, grow-only after — the shape L2
+   shipped. ~~Veto → NOTE forever.~~
+7. **`engine_internals.md` second, `ram.md` never** (§6.5) — with finding 2
+   noted: the 127 program addresses inside `ram.md` are dataflow claims and
+   stay out of scope, but they are ROM addresses and the coverage line says so
+   rather than counting them as unchecked. **Stated as a default at the STOP
+   and not vetoed**, and decision 5 is its arithmetic.
 
 The NOTE class (execution plan §5) is no longer open — ruled at L2's STOP and
 shipped in `run_all_static.sh`; L3 reuses it unchanged.

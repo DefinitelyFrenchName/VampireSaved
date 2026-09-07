@@ -106,6 +106,7 @@ tests/test_census_regions.sh	pipeline
 tests/test_charmap_current.sh	docs
 tests/test_charmap_overrides.sh	docs
 tests/test_checkdocs.sh	docs
+tests/test_checkdocs_rom.sh	docs
 tests/test_checkskills.sh	docs
 tests/test_classify_hitclass_probe.sh	oracle
 tests/test_classify_pool_spawns.sh	oracle

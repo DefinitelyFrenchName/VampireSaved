@@ -16,12 +16,12 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**309 scripts** — 68 ci_portable, 72 ci_static, 169 emulator-tier (run by name).
+**310 scripts** — 68 ci_portable, 73 ci_static, 169 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 12 | the suite runners and their own ground truth |
-| [docs](#docs) | 14 | the documentation locks — docs, skills, indexes, tables follow the tree |
+| [docs](#docs) | 15 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 26 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 52 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
@@ -60,6 +60,7 @@ the documentation locks — docs, skills, indexes, tables follow the tree.
 | `tests/test_charmap_current.sh` | test | ci_static | ROMDIR | THE CHARACTER-DATA MAP follows the builds (14z-118). docs/project/tables/chars/{donovan,huitzil,pyron}.{json,md} are GENERATED from each current solo build (extract + built image + placements + manifest) by tools/charmap_gen.py -> tools/cha… | 14z-118 |
 | `tests/test_charmap_overrides.sh` | test | ci_static | ROMDIR | the character-data OVERRIDE channel round-trips (14z-118). build/manifest/charmap_<tenant>.toml (hand-written) compiles, via tools/charmap_compile.py, into the "# BEGIN charmap … # END charmap" block of build/manifest/<tenant>.toml; | 14z-118 |
 | `tests/test_checkdocs.sh` | test | ci_portable | — | the load-bearing numbers the docs share are LOCKED across documents (14z-118, the documentation audit). ci_portable: no ROM, no build dir, no emulator, ~0.2 s. | 14z-118 |
+| `tests/test_checkdocs_rom.sh` | test | ci_static | ROMDIR | the atlas's ROM-shaped claims are re-derived from the decrypted images, and the checker is proven falsifiable (14z-142, living-docs slice L3). ci_static: | 14z-142 |
 | `tests/test_checkskills.sh` | test | ci_portable | — | the eight skills are locked to the docs they distil (14z-114; level 0 added 14z-134). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-114 |
 | `tests/test_doc_anchor_census.sh` | test | ci_portable | — | every skill anchor's FILE and SECTION are frozen (14z-122, the documentation rationalization pass). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-122 |
 | `tests/test_docs_site.sh` | test | ci_portable | — | the documentation site renders, resolves and is deterministic (14z-140, living-docs slice L4). ci_portable: no ROM, no build dir, no emulator, ~25 s. | 14z-140 |
