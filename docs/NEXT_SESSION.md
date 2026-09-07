@@ -43,6 +43,17 @@ the rulings, §9 the skill).
    L1 starts from a shared vocabulary: the harness's documentation
    convention (lean anchored pages + `_history.md` twins) is the one this
    tree's `doc_shape.tsv` already enforces.
+   **THE EXECUTION PLAN EXISTS (written 14z-139, 2026-09-07, for a fresh
+   session to execute): `build/living_docs_plan_14z139.md`** (untracked,
+   a copy of `~/.claude/plans/well-i-m-almost-out-glimmering-koala.md`).
+   Read it in full after this file. It carries the standing frame every
+   living-docs session runs inside (opener, the doc battery, the ALONE
+   rule, the per-slice beats measure → plan section → STOP for rulings →
+   execute, the close), then one section per slice with the ground truth
+   measured 2026-09-07, the tool and gate shapes, the staleness rows, the
+   decisions for the maintainer, and the sequencing. Its first act is to
+   fold the L1 section into `living_docs_scope.md` as `## 8`. The next
+   session tag is 14z-140.
 2. Then the open items below.
 
 ## OPEN, IN ORDER
