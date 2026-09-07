@@ -4024,3 +4024,109 @@ about a second and it would have caught this on the render that shipped it.
 
 The same question is worth asking of every other generator here: whose output
 is only ever checked for its content?
+
+## A gate that checks its OWN output has not checked that anything downstream can see it (paid: 14z-141)
+
+`tests/run_all_static.sh` gained an advisory block that surfaces `NOTE: <key>
+<value>` lines from any gate. `tests/test_rule5_census.sh` reports three such
+numbers, and its own check — "the census prints three NOTE lines" — was green
+from the first run.
+
+The first real tier run printed:
+
+    == NOTE-class numbers (reported, never fatal) ==
+      (none)
+
+The gate was grepping its OWN log, where the lines sit indented inside its
+output. The runner greps `^NOTE: ` at column 0. Both were internally
+consistent and the mechanism was decorative — a whole advisory block that
+could never fire, behind a passing gate.
+
+**The rule: when a gate produces something for a CONSUMER, the assertion
+belongs on the consumer's side of the boundary.** "I printed it" is not "it
+was received". The fix was one line in the gate (emit the lines at column 0)
+and a ground-truth section in `tests/test_static_runner.sh` that runs the REAL
+runner over a stub gate and greps the BLOCK — not the log, which also contains
+the stub's own result row and will match a gate name in any case (that mistake
+made the must-NOT-fire control dead on its first write, so the control now
+asserts its own liveness too).
+
+Related shell trap from the same block: an EMPTY `$(grep ...)` still feeds
+`read` one blank line, so the first version printed a row for every gate in
+the tier with nothing after its name. Guard with `[ -n "$line" ] || continue`.
+
+## "Is this value documented?" cannot be answered by MATCHING the value (paid: 14z-141)
+
+`audit_rule5.py` first decided IN-TABLE by looking for the value and the key
+name in a hand-written table's rows. It reported 19 gameplay values as
+documented. **All nineteen were false positives.**
+
+Why, and it is not fixable by tightening: the keys are things like `R`, `L`,
+`U`, `D` (wheel adjacency directions) and `id`. A single letter matches almost
+every table row; `id` matches the `ids` column of an unrelated page. The
+values are small integers, which match everywhere too. Normalising both sides
+(`0x08` and `"0x08"` must compare equal) is necessary but nowhere near
+sufficient.
+
+**A value counts as documented when the manifest SAYS which table documents
+it** — `# in-table: tables/<doc>.md` in TOML, `_in_table` in JSON — and that
+table really carries the value. Inference is replaced by a declaration, which
+also makes a migration an explicit, reviewable act rather than something a
+matcher decides. And a pointer whose table does NOT carry the value is a
+PROBLEM, never a silent BAKED: that state is a half-landed migration.
+
+This is the L1 matcher lesson a second time ("a completeness check is only as
+good as its matcher"), and worth stating as the general form: **a check that
+infers a relationship from coincidence of text will find relationships that
+are not there, and its failure mode is silent over-reporting of compliance.**
+
+## A frozen inventory is a MULTISET, and every failure path must PRINT (paid: 14z-141)
+
+`audit_rule5.py --check` compared the frozen file to a fresh census with
+`old == rows`, then computed the difference with `set(old)`. The same
+`(file, kind, key, value)` legitimately occurs many times in one manifest —
+dozens of rows carry `only_variant_slot = true` — so adding one more copy of
+an existing row made the lists differ while the SET difference was empty.
+
+The tool printed **nothing** and exited 1. A gate failing with no diagnosis is
+worse than a gate failing loudly with the wrong one: there is nothing to
+argue with. Found by the gate's own must-fire control, which reported "failed
+for the wrong reason" and had no reason to show.
+
+Two rules out of it: diff a multiset with `Counter(a) - Counter(b)`, and give
+every `return 1` its own message — including the "cannot happen" branch,
+which here is "same rows, different order" and prints a re-freeze instruction.
+
+## A loop-progress guard after the increment is skipped by every `continue` (paid: 14z-141)
+
+`scan_toml` had two branches that `continue`d without consuming a line, and
+both hung. That is the same defect `md_subset.py` paid for in 14z-140, so a
+guard was added — placed after `i += 1`, at the bottom of the loop, where
+every `continue` jumps straight past it. It guarded nothing.
+
+The guard belongs at the TOP of the loop:
+
+    _last = -1
+    while i < n:
+        assert i > _last, "no progress at %s line %d" % (rel, i + 1)
+        _last = i
+
+Then it covers every path by construction. Prove it: re-introduce the bug in a
+copy of the tool and watch the hang become a named failure at an exact line.
+A guard nobody has seen fire is a guess about control flow.
+
+## A tool with two ways to find its inputs measures different things in a test and in production (paid: 14z-141)
+
+`audit_rule5.py` resolves its canon with `git ls-files`, so the untracked
+`probe_*.toml` drop out by construction. Its `--root` mode runs against a
+plain directory copy — not a git checkout — where it falls back to a
+filesystem walk, and the probes came straight back in.
+
+Every one of the gate's controls runs under `--root`. So the controls were
+exercising a canon the real run never has, and the discrepancy surfaced only
+because one control asserted a probe manifest is IGNORED and it fired.
+
+**When a tool has a primary and a fallback path for finding its inputs, the
+EXCLUSIONS must be explicit in the tool, not implied by the primary
+mechanism.** `probe_*.toml` is now an explicit glob, so both paths agree; the
+git listing remains the source of the file set, not of the policy.

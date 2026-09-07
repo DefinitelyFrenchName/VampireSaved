@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-140 CLOSE (2), 2026-09-07)
+# NEXT SESSION — orientation (rewritten at the 14z-141 CLOSE, 2026-09-07)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
@@ -9,78 +9,73 @@
 
 *"I need the generic reusable test harness and the living documentation
 effort. After that we'll tackle the open items lined up."* **The harness and
-its skill are DONE (14z-135..139). LIVING DOCS IS HALF DONE: L1 and L4 landed
-14z-140; L2 the rule-5 census is next, then L3 the ROM re-derivation.**
+its skill are DONE (14z-135..139). LIVING DOCS IS THREE SLICES OF FOUR: L1 and
+L4 landed 14z-140, L2 landed 14z-141. L3 the ROM re-derivation is the last
+one, and it is next.**
 
-## ONE THING WAITS ON YOU: OPEN THE SITE
-
-```sh
-python3 tools/mk_docs_site.py && open docs/site/index.html
-```
-
-**80 pages, 6.6 MB, generated locally and gitignored** — the whole corpus
-cross-linked, an ADDRESS INDEX with all 2,958 addresses and EVERY carrier
-(where `annotations.md` shows six), and a search over 1,639 headings,
-document titles and `**[PFX-N]**` rule IDs — type `VSP-167` and land on the
-rule. That is L4's "ends when": the gate is green, the maintainer opening it
-is what closes the slice.
-
-## WHERE LIVING DOCS IS: L1 AND L4 LANDED, L2 NEXT — scope it first, then STOP for the rulings
+## L3 IS NEXT — scope it first, then STOP for the rulings
 
 The record is **`docs/project/living_docs_scope.md`**: §4's slice table
-(status in place), §6 the standing decisions, and one plan section per slice
-— **§8 L1 and §9 L4, both LANDED 14z-140**; §10 L2 and §11 L3 are written at
-their own slices' openers.
+(status in place), §6 the standing decisions, and one plan section per slice —
+**§8 L1, §9 L4, §10 L2, all LANDED**. §11 is L3's and is written at its own
+opener.
 
 **THE EXECUTION PLAN IS STILL THE BRIEF: `build/living_docs_plan_14z139.md`**
 (untracked, a copy of `~/.claude/plans/well-i-m-almost-out-glimmering-koala.md`).
 **Read it in full after this file.** §0 is the standing frame every
-living-docs session runs inside — the opener, the eight-check doc battery
-with exit codes captured directly, the ALONE rule, the four beats (measure →
-write the slice's plan section into `living_docs_scope.md` → **STOP for the
-rulings** → execute in a fixed order), the close, and eleven paid-for traps.
-§3 is L2's section: the `audit_rule5.py` census, the frozen BAKED inventory,
-the ledger, seven decisions.
+living-docs session runs inside — the opener, the eight-check doc battery with
+exit codes captured directly, the ALONE rule, the four beats (measure → write
+the slice's plan section → **STOP for the rulings** → execute in a fixed
+order), the close, and eleven paid-for traps. §4 is L3's section:
+`tools/checkdocs_rom.py`, quoting an atlas claim and re-deriving it from the
+decrypted image, `--uncovered` as the coverage number. It is scoped as TWO
+sessions for the framework plus the atlas ROM tier.
 
-**RE-MEASURE AT THE OPENER RATHER THAN READING THE SCOPE DOCUMENT. Both
-14z-140 censuses disagreed with it** — L1's found FOUR unlisted documents
-where §2.2 said two, and L4's found SIX structural constructs where the plan
-had listed four, one of which (the address index built from the rendered
-`annotations.md`) would not have worked at all. §0.6 lists what dates.
+**RE-MEASURE AT THE OPENER RATHER THAN READING THE SCOPE DOCUMENT. All THREE
+censuses so far disagreed with it** — L1 found four unlisted documents where
+§2.2 said two; L4 found six structural constructs where the plan listed four,
+one of which could not have worked; L2's found the canon has subdirectories
+the plan never names, a kind census counted tree-wide instead of over the
+canon, provenance living in paragraphs rather than on value lines, and a
+GAMEPLAY seed naming keys that do not exist. §0.6 lists what dates.
 
-## WHAT L1 AND L4 LEFT THE NEXT SLICE
+## WHAT L2 LEFT THE NEXT SLICE
 
-- **A new document now needs three things in ONE commit** and the third is
-  enforced: its `docs/doc_shape.tsv` row, its `docs/README.md` `## Contents`
-  line with the declared SHAPE, and — if it is a `_history.md` twin — a
-  mention of its live document, which must mention it back.
-  `tests/test_docshape.sh` carries 15 must-fire controls.
-- **Anything a document writes must parse inside the subset**
-  (`tools/md_subset.py`): h1-h3 only, no raw HTML but `<details>`/`<summary>`,
-  no footnotes/images/task lists/autolinks/reference definitions. A `<word>`
-  in prose is fine; a real tag name outside a code span is not.
-  `tests/test_md_subset.sh` and `tests/test_docs_site.sh` are both
-  ci_portable, so the portable tier catches it in ~30 s.
-- **`tools/_pagestyle.py` is the one definition of the page theme.** Import
-  it; never `import mk_mister_page` (it parses ARGV at module scope).
+- **The NOTE class exists now** — a gate prints `NOTE: <key> <value>` at
+  COLUMN 0, exits 0 with its usual PASS, and `run_all_static.sh` surfaces it
+  in an advisory block. L3's coverage number is specified NOTE-class, so it
+  plugs straight in. `tests/test_static_runner.sh` §9 is the ground truth, and
+  the convention's one home is `tests/lib/classify.sh`'s header. **Emit at
+  column 0 or the runner cannot see it** — that mistake shipped once already.
+- **`tools/audit_rule5.py` is the precedent for a census tool here**: an
+  explicit KNOWN-pair list so a NEW key FAILS rather than defaulting;
+  exclusions explicit in the tool rather than implied by `git ls-files`; a
+  multiset diff; a progress guard at the TOP of a scan loop.
+- **A change to `run_all_static.sh` or the shared libs will move
+  `test_bbh_fidelity` F1**, which demands byte-identical output against the
+  harness's `bbh run-static`. Mirror the change into `~/Developer/blackbox-harness`
+  (push is standing-authorised) rather than re-baselining, unless it is
+  genuinely lineage-specific.
 
 ## OPEN, IN ORDER
 
-1. **L2 the rule-5 census**, then **L3 the ROM re-derivation** — each scoped
-   first, each stopping for the rulings.
-   **The one CROSS-SLICE decision, due at L2's STOP at the latest:** no NOTE
-   verdict exists (`tests/lib/classify.sh` knows PASS / SKIP / FAIL / TIMEOUT
-   and all three runners source it), so the recommendation is a
-   `NOTE: <key> <value>` marker surfaced by an advisory block in
-   `run_all_static.sh` — never a fifth verdict in the shared classifier.
-   Plan §5 has the argument. L4 already produces a number that wants it:
-   `test_md_subset` prints 7 ragged table rows, normalised and never fatal.
+1. **L3 the ROM re-derivation** — scoped first, stopping for the rulings.
 2. Then the open items below.
 
-## OPEN ITEMS, unchanged
+## OPEN ITEMS
 
-The deferred `audit_mask_window_ff42a2` ruling (deprecated or case-specific),
-`test_header_defaults` and the positional `[name]` default,
+**NEW, from 14z-141 — `PRG:0x028D50` CARRIES THREE NAMES** and it is a
+gameplay surface, so the call is the maintainer's ([VSP-10]):
+`effect_map_5051` (`huitzil.toml`), `hit_class_props_ext_hi/_lo`
+(`donovan.toml`), and the guard-MASH RNG mask table (`docs/game/atlas/ram.md`
+line 156 — 3: 8/32, 4: 16/32, 5: 24/32, 6+: always), which is what the
+mizuumi corpus calls the Tech-Hit Chance Tables. `audit_rule5.py` classifies
+that band GAMEPLAY conservatively and carries the conflict in
+`AUX_POKE_BANDS`. Establishing which name is right is a measurement, not a
+reading.
+
+Unchanged: the deferred `audit_mask_window_ff42a2` ruling (deprecated or
+case-specific), `test_header_defaults` and the positional `[name]` default,
 `release/merged-m15` never packaged, Pyron's row 0x11 (mechanism not
 established; no port recommendation), the Phobos ±1 residue (a knowledge
 item), the community cross-check aerials, the Zabel j.LK session, #112
@@ -91,5 +86,8 @@ option (B).
 `gen_gate_index --check` + `gen_gotchas_index --check` + `gen_skill_guide
 --check`, exit statuses captured directly — and in zsh, loop with `${=cmd}`.
 **A running script is never edited — not in the main tree, not in a
-worktree** ([MSC-54]). **The static tier is never run beside another gate
-run in this tree, and nothing here is edited while it runs.**
+worktree** ([MSC-54]). **The static tier is never run beside another gate run
+in this tree, and nothing here is edited while it runs** — and it can be
+KILLED by the OS under memory pressure, which shows up as a gate FAILing with
+`exit 143` (SIGTERM) and NO `GREEN`/`NOT GREEN` line: that run is worth
+nothing, re-run it.
