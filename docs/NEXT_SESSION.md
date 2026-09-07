@@ -41,27 +41,32 @@ the real emulators — `selftest/test_fidelity_mame.sh`, opt-in). **In THIS
 tree: `ROMDIR=... tests/test_bbh_fidelity.sh`** (`ci_static`, ~65 s alone;
 `BBH_MAME_FIDELITY=1` adds F8, ~1 min, never beside another gate run here).
 
-## NEXT: THE HARNESS SKILL — SCOPED 14z-139 (3), AWAITING THE RULINGS — then living docs
+## NEXT: LIVING DOCS — L1 routing, then L4 site, L2 fact census, L3 ROM re-derivation
 
-1. **The skill** — **SCOPED: `docs/project/harness_scope.md` §9** (read it
-   first: the eight sections and their sources, ~75-80 rules; the lock
-   TRAVELS — RULED at the plan stage — as `bbh check-skills` /
-   `bbh skill-guide` under `[skills]` + `[skill_<PFX>]` config with fidelity
-   F11; the staleness pass S1-S7 incl. the missing `docs/doctrine.md`;
-   sequencing: pass → H10 the lock → the distillation → this tree's close).
-   **RULED (maintainer, 2026-09-07): the work waits for the rulings on
-   §9.7's decisions 2-7** (name/prefix, level-0 + lineage tokens, no
-   cross-references enforced by `forbid`, the docs as their own LOG,
-   `doctrine.md` written in the pass, user-level install). Then execute §9.6
-   in order; the harness commits are pushed at slice boundaries, this tree
-   changes only at the close. The lineage citation that dangles in the
-   harness is ONE ID (`[CPE-24]`, `prereq_cite`'s default, four places).
-2. Then living docs L1 → L4 → L2 → L3 (`living_docs_scope.md` §4).
-3. Then the open items below.
+**The harness and its skill are DONE (14z-139).** The harness at
+`~/Developer/blackbox-harness` (`../../blackbox-harness` from here) is
+complete through H10; its skill `blackbox-harness` (`[BBH-1..87]`,
+`skill/blackbox-harness/`, locked by `bbh check-skills`, the guide
+generated) is installed as the symlink `~/.claude/skills/blackbox-harness`
+and loads in every session on this machine — load it before any work ON the
+harness. Its defaults are ruled and registered (`docs/conventions.md`
+there); a verdict-text change is LOUD (`docs/rebaselines.md` there, its
+newest line printed by every fidelity run); its docs are lean and anchored
+with `_history.md` twins as the complete log. This tree's one gate,
+`tests/test_bbh_fidelity.sh`, now carries F11 through the harness's own
+fidelity test.
+
+1. **Living docs** — `docs/project/living_docs_scope.md` §4, in the ruled
+   order L1 routing → L4 site → L2 fact census → L3 ROM re-derivation.
+   Scope each slice first, as every harness slice was; the harness's
+   documentation convention (lean anchored pages + `_history.md` twins,
+   `docs/doctrine.md` §3 there) is the same convention this tree's
+   `doc_shape.tsv` enforces, so L1 starts from a shared vocabulary.
+2. Then the open items below.
 
 ## OPEN, IN ORDER
 
-1. The skill (above), then living docs, then the open items.
+1. ~~The skill (above), then living docs~~ living docs (above), then the open items.
 2. ~~The eight defaults of `harness_scope.md` §7 are open to VETO~~ **ALL
    EIGHT RULED (maintainer, 2026-09-07, 14z-139 (2)), each DECIDED in place in
    §7**: keep 3/5/6/7/9/10 (9 resolved, 10 replaced by the LOUD re-baseline
