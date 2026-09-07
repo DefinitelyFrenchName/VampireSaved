@@ -3747,3 +3747,24 @@ the gate records which image each leg ran (`rom_path`).
 ## THE FIRST RUNNER-DRIVEN MiSTer LANE FOUND TWO THINGS THE FREEZE RITUAL HAD NO EYE FOR (14z-134)
 
 **[VSP-178]** **A frozen expectation FOLLOWS whatever moves it, whatever the gate's cadence says.** `test_mister_prg_window` was `bitstream` cadence — run at a release, and at a freeze only when the freeze targets MiSTer — while its frozen pair records the FIRST EXTENSION ADDRESS the 68k executes, which is the relocated OBJ walker's PLACEMENT: the hole allocator moves it whenever a freeze adds extension content before it. Frozen on merged-m10 (14z-107 (11)), stale from merged-m11 (14z-115), and nobody could know for five freezes because the lane is opt-in and the row never ran at a freeze. The M16 release run found it: `first_addr 4be7c0 -> 4c13d0`, every structural assertion green. Cadence follows the EXPECTATION: a bitstream-cadence gate may freeze nothing that a romset freeze can move, or it is `romset`. The same run found `release/merged-m16/` PRODUCED at the 14z-132 freeze and never `git add`ed — every earlier release directory went in with its freeze commit — so the freeze commit is where the release directory lands, and a release run that finds it untracked has found a freeze that was not finished. Both are now in the release-day checklist and `test_expectation_provenance` covers `tests/expect/`.
+
+## THE TWO CRASH GUARDS CARRIED DIFFERENT CODE WINDOWS FOR FIVE WEEKS — a "ROM-plausible" bound is a per-instrument constant that a profile change must visit (paid: 14z-138)
+
+`tests/lua/replay_guard.lua` kept the stock 4 MB bound (`0x400000`) in its
+`rom_plausible` and in the filter that decides which exception handlers get
+a breakpoint, while `tests/lua/inp_guard.lua`, written after CPS-2 WIDE,
+carried `0x600000`. Consequences, neither ever observed but both real: a
+crash whose return addresses sit in the program extension drew a SHORTER
+STACK sketch under the replay guard than under the recording guard, and a
+handler placed above 4 MB would not have been trapped by the replay guard
+at all (none is — the vectors point into the crypt range — which is why
+nothing fired). Found by the generic harness's extraction, which put every
+board literal of the three scripts side by side in ONE profile table
+(`lua/mame/profiles/cps2.lua`) and had nowhere to hide the disagreement;
+fixed the same session at the maintainer's word — both constants are
+`0x600000`, `test_crash_guard` re-validated (both positive controls trip),
+and the harness's F8 guard comparison runs under its `cps2w` profile. The
+rule: a profile bump (`cps2_wide.md`) has a checklist of descriptors and
+sizes; the INSTRUMENTS' own bounds — every "plausible address" constant in
+`tests/lua/` — belong on it too. Grep `0x400000` under `tests/lua` at the
+next one.

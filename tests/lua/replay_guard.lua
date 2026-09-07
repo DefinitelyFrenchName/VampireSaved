@@ -220,7 +220,12 @@ if debugger then
     debugger:command("focus 0")
     for _, n in ipairs(vecs) do
         local h = program:read_u32(n * 4)
-        if h < 0x400000 and h % 2 == 0 then
+        -- 0x600000, not 0x400000 (14z-138): the CPS-2 WIDE program window is
+        -- 6 MB. This guard kept the stock 4 MB bound after WIDE landed while
+        -- inp_guard.lua carried 0x600000, so the two guards drew different
+        -- STACK sketches of one crash, and a handler placed above 4 MB would
+        -- not have been trapped here at all. One window, both guards.
+        if h < 0x600000 and h % 2 == 0 then
             if not handler_vec[h] then
                 handler_vec[h] = n
                 -- 0x prefix is load-bearing: bare hex like "d0" parses as
@@ -232,7 +237,7 @@ if debugger then
 end
 
 local function rom_plausible(v)
-    return v >= 0x000100 and v < 0x400000 and v % 2 == 0
+    return v >= 0x000100 and v < 0x600000 and v % 2 == 0   -- the WIDE window (14z-138, see above)
 end
 
 local function on_crash(vec)

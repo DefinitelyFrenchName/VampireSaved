@@ -68,16 +68,12 @@ tree: `ROMDIR=... tests/test_bbh_fidelity.sh`** (`ci_static`, ~65 s alone;
    runner has); (14z-136) `tests/lib/enumerate_expectations.sh` has no
    `diverge` case; (14z-137) `tests/test_build_ref_rot.sh` picks its image by
    DIRECTORY ORDER when no `vsavjw` zip is present; (14z-137) `run_battery_m2.sh`'s
-   `bat` reads exit 0 by grep only; **(14z-138) `tests/lua/replay_guard.lua`
-   carries the STOCK code window `0x400000` in `rom_plausible` and the
-   handler filter while `inp_guard.lua` carries the WIDE `0x600000`** — a
-   crash whose return addresses sit in the program extension draws a shorter
-   STACK sketch under the replay guard than under the recording guard, and
-   a handler placed above 4 MB would not be trapped by it at all (none is
-   today: the vectors point into the crypt range). Latent on every replay
-   run so far (F8's positive control crashes at `PRG:0x0BF800`). The
-   harness's `cps2w` profile is the fix shape; here it is one constant in
-   one file, if the maintainer wants the two guards to agree.
+   `bat` reads exit 0 by grep only. ~~(14z-138) `tests/lua/replay_guard.lua`
+   carried the STOCK code window `0x400000` while `inp_guard.lua` carried the
+   WIDE `0x600000`~~ **FIXED 14z-138 (2) at the maintainer's word: both
+   constants are `0x600000`; `test_crash_guard` re-validated (both positive
+   controls trip), F8's guard comparison runs under the harness's `cps2w`
+   profile and stays exact** (`docs/project/gotchas.md`, the guards' window).
 4. The standing items unchanged: the deferred `audit_mask_window_ff42a2`
    ruling, `test_header_defaults` and the positional `[name]` default,
    `release/merged-m15` never packaged, Pyron's row 0x11, the Phobos ±1
