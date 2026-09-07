@@ -37,10 +37,17 @@ fi
 [ -n "${BBH_HOME:-}" ] && [ -x "$BBH_HOME/bin/bbh" ] || { echo "SKIP: no generic harness beside this tree or its parent (set BBH_HOME; clone https://github.com/DefinitelyFrenchName/blackbox-harness)"; exit 0; }
 BBH_HOME="$(cd "$BBH_HOME" && pwd)"; export BBH_HOME
 if [ -n "${ROMDIR:-}" ] && [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; export ROMDIR; fi
-# The harness's consumer config names THIS tree by a relative root; assert
-# it resolves HERE, or the fidelity would be measured against another clone.
-root="$(cd "$BBH_HOME" && PYTHONPATH=lib/py python3 -m bbh.config example/consumers/bbh.vampire.toml root)"
-[ "$root" = "$REPO" ] || { echo "FAIL: the harness's consumer config resolves to $root, not this tree ($REPO)"; exit 1; }
+# The harness's consumer config names THIS tree by a relative root that is
+# ONE host's layout; this gate knows where it is and passes that as the
+# fidelity test's input (harness conventions 6, ruled 2026-09-07 — before
+# it, a clone with a different layout failed here for a reason that was not
+# fidelity). The test derives a private config copy with this absolute root.
+# The assertion is the control that the input reaches the resolver.
+BBH_FIDELITY_ROOT="$REPO"; export BBH_FIDELITY_ROOT
+_cfg="$(mktemp -d)/bbh.vampire.toml"
+sed "s|^root = .*|root = \"$REPO\"|" "$BBH_HOME/example/consumers/bbh.vampire.toml" > "$_cfg"
+root="$(cd "$BBH_HOME" && PYTHONPATH=lib/py python3 -m bbh.config "$_cfg" root)"; rm -rf "$(dirname "$_cfg")"
+[ "$root" = "$REPO" ] || { echo "FAIL: a config copy rooted here resolves to $root, not this tree ($REPO)"; exit 1; }
 echo "== bbh fidelity against this tree ($(cd "$BBH_HOME" && git rev-parse --short HEAD 2>/dev/null || echo 'no git')) =="
 rc=0
 sh "$BBH_HOME/selftest/test_fidelity_vampire.sh" </dev/null || rc=1

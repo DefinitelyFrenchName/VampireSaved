@@ -61,8 +61,13 @@ tree: `ROMDIR=... tests/test_bbh_fidelity.sh`** (`ci_static`, ~65 s alone;
 ## OPEN, IN ORDER
 
 1. The skill (above), then living docs, then the open items.
-2. The eight defaults of `harness_scope.md` §7 are open to VETO; §7.3's
-   default location is now stated as measured (two levels).
+2. ~~The eight defaults of `harness_scope.md` §7 are open to VETO~~ **ALL
+   EIGHT RULED (maintainer, 2026-09-07, 14z-139 (2)), each DECIDED in place in
+   §7**: keep 3/5/6/7/9/10 (9 resolved, 10 replaced by the LOUD re-baseline
+   rule), the license is not a default (4), and 8 amended with the
+   `BBH_FIDELITY_ROOT` input. The harness's `docs/conventions.md` is the
+   register of its defaults. **Carried into the skill (item 1): translate
+   the three dangling `[CPE-N]` references in the harness into words.**
 3. **Findings about this tree — ALL FIVE FIXED (14z-139, the maintainer's
    "let's start with" the four): ~~(14z-135) `run_all_static.sh` has no
    exit-0-after-shell-error branch (the sweep runner has); (14z-137)

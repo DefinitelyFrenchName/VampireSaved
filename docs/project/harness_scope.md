@@ -422,32 +422,79 @@ Three rules that follow from the contract:
    authorised from then on.
 2. **RULED (maintainer, 2026-09-06): the name is `blackbox-harness`**, CLI
    prefix `bbh`.
-3. **The fidelity gate finds the harness by `$BBH_HOME` (default
-   `../blackbox-harness`) and SKIPs when it is absent; no submodule.**
+3. **DECIDED (maintainer, 2026-09-07): keep — *"agreed, keep the default,
+   just document it if it's not already documented (documenting default
+   applies to all other defaults of the bbh)"*. Documented: the harness's
+   `docs/conventions.md` is now the register of every ruled default (the
+   license excepted, per 4); the co-commit rule is its row 8.** The
+   fidelity gate finds the harness by `$BBH_HOME` (default
+   `../blackbox-harness`) and SKIPs when it is absent; no submodule.
    (MEASURED 14z-138: the ruled location `~/Developer/blackbox-harness` is
    beside this tree's PARENT — `../../blackbox-harness` from here — so the
    gate looks at both levels and names the one it found.) A
    submodule pointing at a repository with no remote breaks every fresh
    clone's `git submodule update`. Veto → vendor by `git subtree` once a
    remote exists.
-4. **License GPL-3.0**, this repository's. Veto → MIT for wider reuse.
-5. **Lifted comments keep their `14z-N` and issue citations as history
-   lines** — they are the incident record that makes a guard legible — but
+4. **DECIDED (maintainer, 2026-09-07): keep GPL-3.0 — and it is NOT a
+   default: *"it's a license loadbearing on both legal and type of use
+   scopes, not a tech scope so this one we don't need to document as
+   default."* So it has no row in the harness's conventions register;
+   `README.md` states it.** License GPL-3.0, this repository's. ~~Veto → MIT
+   for wider reuse.~~
+5. **DECIDED (maintainer, 2026-09-07): keep — *"agreed and this aligns with
+   our documentation with anchored keys and history files so the consistency
+   is a nice bonus"*. Measured at the ruling: 33 session and 23 issue
+   citations travelled, zero anchors, and THREE bare `[CPE-N]` references
+   dangle for a reader outside this project — translated into words when the
+   harness skill is written (NEXT_SESSION item 1).** Lifted comments keep
+   their `14z-N` and issue citations as history lines — they are the incident record that makes a guard legible — but
    no `[VSP-N]` / `[MFI-N]` anchor travels (those are this project's skill
    lock, `tools/checkskills.py`). Veto → strip the citations.
-6. **Drivers in the harness: MAME, guarded MAME, FBNeo, fake. The
-   MiSTer/Verilator driver stays here.** Veto → a fourth driver in a later
+6. **DECIDED (maintainer, 2026-09-07): keep — *"Agreed"*. Measured at the
+   ruling: the Verilator lane is 584 lines with 44 board-and-romset
+   couplings, produces per-frame RAM dumps rather than the replay log
+   grammar, needs the jtcores fork and a generated `.rom`; a contract driver
+   is about one session, spent when a SECOND jtframe consumer exists.**
+   Drivers in the harness: MAME, guarded MAME, FBNeo, fake. The
+   MiSTer/Verilator driver stays here. Veto → a fourth driver in a later
    slice.
-7. **The eight doc tools are OUT of the harness** (§2.7). Veto → an H8
-   sibling package `bbh-docs`.
-8. **This project never consumes the harness** (the maintainer: it "stays
-   as it is"). Its consumer config `bbh.vampire.toml` therefore lives in
+7. **DECIDED (maintainer, 2026-09-07): keep out — *"They might be included
+   at a higher level if and only if we extend the bbh with a top-layer that
+   also handles the documentation. This might happen one day but is not the
+   case right now."* Revisit after living-docs L1 at the earliest.** The
+   eight doc tools are OUT of the harness (§2.7). ~~Veto → an H8 sibling
+   package `bbh-docs`.~~
+8. **DECIDED (maintainer, 2026-09-07): keep the ruling, AMENDED the same
+   day — *"agreed"* to the amendment: the consumer config's `[project].root`
+   is ONE host's layout, and `tests/test_bbh_fidelity.sh` hard-FAILED on any
+   clone laid out differently, for a reason that was not fidelity. The gate
+   now passes its own location as `BBH_FIDELITY_ROOT`, and the harness's
+   fidelity test derives a private config copy with that absolute root
+   (harness `docs/conventions.md` 6) — deliberately not a resolver-level
+   environment override, which would leak into every other config the run
+   opens; no file added here.** This project never
+   consumes the harness (the maintainer: it "stays as it is"). Its consumer config `bbh.vampire.toml` therefore lives in
    the harness under `example/consumers/`, and the only file this tree
    gains is `tests/test_bbh_fidelity.sh` with its `ci_static` line and its
    gate-index row. Veto → the config moves here.
-9. **The generic classifier is the stronger copy** (§5 rule 2). Veto →
-   per-tier `shell_error_regex` so F2 is byte-identical.
-10. **No verdict-string change before H9 is green** (§5 rule 1).
+9. **DECIDED (maintainer, 2026-09-07): ratified as RESOLVED — *"i don't
+   master the details but if it is as you claim then I agree"*. The claim,
+   measured: this tree's three runners source one classifier since 14z-139
+   (§5 rule 2), and F2 — the whole live portable tier through both static
+   runners, its first run — is IDENTICAL (65 PASS rows). The veto's
+   per-tier regex already exists as `[classify].shell_error_regex` config.**
+   The generic classifier is the stronger copy (§5 rule 2). ~~Veto →
+   per-tier `shell_error_regex` so F2 is byte-identical.~~
+10. **DECIDED (maintainer, 2026-09-07): EXPIRED by its own terms (H9 green
+   at 14z-138) and REPLACED — *"sounds sensible, I would argue that such a
+   change needs to be loud though, I wouldn't want it to be silent"*. The
+   rule now: a verdict-text or classifier change lands on BOTH sides in one
+   sitting, the fidelity rows it moves re-baselined in the same commits, the
+   harness commit pushed before this tree's — and LOUD: a dated line in the
+   harness's `docs/rebaselines.md` (the 14z-139 F1 re-baseline is its first),
+   whose newest line every fidelity run prints at its head as
+   `LAST RE-BASELINE:`.** ~~No verdict-string change before H9 is green~~
+   (§5 rule 1).
 
 ## 8. Cost
 
