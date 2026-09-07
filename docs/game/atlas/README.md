@@ -14,6 +14,21 @@ in the same commit as the change that affects them.
 Address notation (CLAUDE.md §5): `PRG:0x0F1234` / `CPU:$0F1234` /
 `GFX:tile 0x1A2B3` / `RAM:$FF8000`.
 
+**IF YOU WANT TO KNOW WHAT ADDRESS X IS, READ Y** (the routing table — the
+atlas grew by SUBJECT, so the file to open follows from what the address is,
+not from which romset it is in):
+
+| if the address is… | read |
+|---|---|
+| a work-RAM field — `RAM:$FF8xxx`, the player blocks, the object pools, the mode flags | `ram.md` |
+| a row or field of the per-character bank, in any of the three sets | `character_tables.md` |
+| a character id, a variant slot, or a site that folds the 5-bit id | `id_space.md` |
+| the select wheel, a cell, the cursor, or the select record arrays | `select_screen.md` |
+| a sprite list, a drawer entry, or an OBJ record field | `sprite_lists.md` |
+| a per-slot presentation asset — a venue, a banner, a portrait | `venue_assets.md` |
+| any other `PRG:` address | `docs/annotations.md` (GENERATED): every address the tree names, with the file and section that names it. An index, not a source — grep the address, land in the carrier |
+| named nowhere, and you want the MECHANISM behind it | `docs/game/engine_internals.md` — the subsystem synthesis; each section names the atlas rows it rests on and the gates that lock it |
+
 ## The three sets (measured M0; every figure still current)
 
 All three sets: 4MB program ROM; opcode-encrypted region is
