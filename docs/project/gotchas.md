@@ -3962,3 +3962,35 @@ The rule: **a control gets its own liveness assertion.** This one now checks
 that the fixture collects at least one address before it judges the verdict,
 and says so in the gate. "The generator ACCEPTED it" and "the fixture never
 reached the code" look identical from outside.
+
+## THE [VSP-13] RETRACTION GREP MISSES A CLAIM THAT WRAPS — and this corpus wraps at ~76 columns (paid: 14z-140)
+
+CLAUDE.md §5's standing order is to `grep -rn "<the old claim>"` across the
+tree when a claim changes. Run for *"one rendered page exists"* at the L4
+landing it returned three hits, and the FOURTH — the live one, in
+`living_docs_scope.md` §2 — was invisible: the sentence wraps between
+`one rendered` and `page exists`, and `grep` matches within a line.
+
+That claim happened to have been corrected already, so nothing was published
+wrong. The next one will not be so lucky: hand-written documents here wrap at
+about 76 columns, so ANY quoted phrase of more than four or five words has a
+good chance of straddling a newline somewhere, and the miss is silent — an
+empty result reads as "the pass is done".
+
+The rule: **grep the shortest DISTINCTIVE fragment, not the sentence** — a
+single unusual word or a two-word pair that cannot wrap apart — and when the
+claim is load-bearing, follow it with a wrap-insensitive scan:
+
+    python3 - <<'PY'
+    import re
+    from pathlib import Path
+    pat = re.compile(r"one rendered\s+page exists")     # \s+ crosses the newline
+    for f in list(Path("docs").rglob("*.md")) + [Path("HANDOFF.md"), Path("STATE.md")]:
+        t = f.read_text(errors="replace")
+        for m in pat.finditer(t):
+            print("%s:%d" % (f, t[:m.start()].count("\n") + 1))
+    PY
+
+[VSP-13] step 3 says to re-grep afterwards and show the empty result. An empty
+result from a grep that cannot see the claim is worth nothing, and it is the
+step most likely to be trusted without thought.
