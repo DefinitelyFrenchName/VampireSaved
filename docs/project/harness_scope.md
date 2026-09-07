@@ -7,7 +7,8 @@
 > config reader, the example consumer, seven selftests 7/0/0, F1 and F3
 > green — §4). Two things are already RULED (maintainer, 2026-09-06, at the plan
 > stage): the harness is a SEPARATE repository, `~/Developer/blackbox-harness`
-> (sibling of this tree; PUBLIC on GitHub since 14z-135b at the maintainer's
+> (beside this tree's PARENT `~/Developer/Vampire_Saved/`, not a sibling of the
+> tree — measured 14z-138; PUBLIC on GitHub since 14z-135b at the maintainer's
 > word — https://github.com/DefinitelyFrenchName/blackbox-harness, branch `main`),
 > and this project gains exactly ONE read-only fidelity gate. Everything else in §7 is a default open to veto.
 > Slice status is tracked in STATE (the session entries) and in §4's table,
