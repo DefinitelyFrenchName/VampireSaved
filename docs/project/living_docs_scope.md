@@ -9,11 +9,12 @@
 > generic reusable test harness and the living documentation effort. After
 > that we'll tackle the open items". Slice status is tracked in §4's table,
 > updated in place. **The harness and its skill are DONE and the effort is
-> RUNNING: L1 LANDED 14z-140 (2026-09-07) — its plan, ground truth and
-> rulings are §8 — and L4 the rendered site is next. Each slice writes its
-> own plan section (§8 L1, §9 L4, §10 L2, §11 L3) and STOPS for the
-> maintainer's rulings before any tool is written, as every harness slice
-> did. L4's plan is §9, written 14z-140, its nine decisions OPEN.**
+> RUNNING: L1 AND L4 BOTH LANDED 14z-140 (2026-09-07) — their plans, ground
+> truth and rulings are §8 and §9 — and L2 the rule-5 census is SCOPED
+> 14z-141 (§10), decisions 1-4 ruled and the NOTE class open. L3 is next
+> after it. Each slice writes its own plan section (§8 L1, §9 L4, §10 L2,
+> §11 L3) and STOPS for the maintainer's rulings before any tool is written,
+> as every harness slice did.**
 
 Written 14z-135 as the scope of the maintainer's direction of 2026-08-24
 (STATE "Decisions pending"), in their words: an effort *"not replacing your
@@ -155,7 +156,7 @@ first and moves values into tables second.
 |---|---|---|---|
 | **L1 routing enforcement (markdown)** — **LANDED 14z-140** (2026-09-07), commits `45f116ab` the checks, `a32b9138` HANDOFF's table, `38757605` the atlas README's; the plan and its measured ground truth are §8 | `checkdocshape.py` gains two checks: README COMPLETENESS (every `doc_shape.tsv` row is listed in `docs/README.md` Contents, with its declared shape; a directory-level entry counts for the members it NAMES; a row declared `entry-point` is exempt from Contents but must still be named somewhere in the README) and TWO-WAY TWINS (a HIST twin names its live document and the live document names its twin). Routing tables at the two entry points that lack one: `HANDOFF.md` ("if you want to DO X, read/run Y") and `docs/game/atlas/README.md` ("if you want to know what ADDRESS X is, read Y"). The unlisted documents listed. | 4 unlisted docs (§8.1 — this column said 2 until the 14z-140 census); twins one-way in the table; 2 entry points without routing | the two new checks have must-fire controls on a perturbed copy (`--root`), the static tier is green, and the README lists every declared document |
 | **L4 the rendered site** — **LANDED 14z-140** (2026-09-07); the plan, the census and the rulings are §9 | `tools/mk_docs_site.py`: a generated HTML site under a gitignored directory (the `mister_core.html` precedent — never committed): the landing page IS the routing table; every document rendered with cross-links resolved; an ADDRESS INDEX from `annotations.md` (address → every carrier, one click); the gate index, the gotcha index and the skill guides as pages; the two tracked images; a search box over headings, document titles and the 555 anchor IDs (client-side, no server). Markdown renderer: stdlib-only, the subset this corpus uses (headings, lists, tables, fenced code, bold/italic, links, strikethrough, blockquotes) — **measured 14z-140 over the 74 files that render** (62 hand-written + 10 GENERATED + the 2 skill GUIDEs; this row said 66 documents until then), so the subset is a census and unsupported constructs FAIL the generator rather than render wrong. A portable gate runs the generator over the tree and fails on any unresolved link or unsupported construct; the HTML is the artifact, the generator is what is reviewed. | `mk_mister_page.py` is the pattern; no site exists | `tests/test_docs_site.sh` (ci_portable) green; the maintainer has opened the site |
-| **L2 fact tables with provenance** | `tools/audit_rule5.py`: the census — every behavioural value in `build/manifest/*.toml` and in the generators (damage, timings, meter, variant selection, re-point defaults, thresholds, frozen op counts) classified IN-TABLE (present in `docs/project/tables/` with provenance) / BAKED (in a manifest row or a generator constant only) / DERIVED (computed from a table at build time); the ratio reported as a NOTE-class number in the static tier first (never fatal — "a number that moves in the wrong direction is the signal"), then a gate freezing the BAKED inventory so it can only shrink. Then, value by value where the census says BAKED: a table row with provenance (measured / derived / testimony, the session, the rig), the manifest reading the table rather than carrying the value. | rule 5 honoured to an unmeasured degree; `tables/` has 9 documents | the ratio is measured and frozen; the BAKED inventory shrinks per session with a ledger |
+| **L2 fact tables with provenance** — **SCOPED 14z-141** (2026-09-07); the plan, the census and the rulings are §10 | `tools/audit_rule5.py`: the census — every behavioural value in `build/manifest/*.toml` and in the generators (damage, timings, meter, variant selection, re-point defaults, thresholds, frozen op counts) classified IN-TABLE (present in `docs/project/tables/` with provenance) / BAKED (in a manifest row or a generator constant only) / DERIVED (computed from a table at build time); the ratio reported as a NOTE-class number in the static tier first (never fatal — "a number that moves in the wrong direction is the signal"), then a gate freezing the BAKED inventory so it can only shrink. Then, value by value where the census says BAKED: a table row with provenance (measured / derived / testimony, the session, the rig), the manifest reading the table rather than carrying the value. | rule 5 honoured to an unmeasured degree; `tables/` has 13 declared documents, 7 GENERATED (this column said 9 and 4 until the 14z-141 census — L1 declared the three `chars/` pages) | the ratio is measured and frozen; the BAKED inventory shrinks per session with a ledger |
 | **L3 ROM re-derivation (the SMS `checkdocs` class)** | `tools/checkdocs_rom.py`: for atlas claims with a CHECKABLE SHAPE — the opcode word or instruction at a `PRG:` address (the disassembler already exists), a table's row count / stride / entry values, a pointer's target, a string's bytes — quote the claim from the document (assert it is still there), derive the fact from the decrypted image (`build/out/vsavj_opcodes.bin` / `_data.bin` via `tests/lib/decrypt_cache.sh`), compare; `--uncovered` lists every `annotations.md` tier-0 address no check reaches, as the coverage number. Seeded from the atlas (tier 0) first — `ram.md` claims are RAM and need the emulator, so the ROM tier is `character_tables.md`, `id_space.md`, `select_screen.md`, `sprite_lists.md`, `venue_assets.md` — then `engine_internals.md`. Static tier (needs ROMDIR), NOTE-class coverage first, then frozen. | zero claims re-derived from the image today; 2,970 address rows claimed | the coverage number is measured, reported and frozen; every hand-written check quotes its claim |
 
 Order: **L1 → L4 → L2 → L3.** Enforcement first (STATE's own hold), and L1
@@ -799,3 +800,225 @@ the rendered page (§9.4 — a measured correction, not a choice).
 
 Cost: one to two sessions. **Ends when** `tests/test_docs_site.sh` is green
 in ci_portable and the maintainer has opened the site.
+
+## 10. L2 — FACT TABLES WITH PROVENANCE: scope (the plan before the work)
+
+**STATUS: SCOPED 14z-141 (2026-09-07).** Beat 1 measured, beat 2 written,
+and decisions 1-4 were RULED at the STOP the same sitting — one of them
+(decision 2) after a correction to my own framing that the measurement
+forced. The NOTE class (decision 5, the one cross-slice decision) is open.
+Nothing is built yet; `tools/audit_rule5.py` does not exist.
+
+### 10.1 What it delivers
+
+`tools/audit_rule5.py`: every behavioural value in the canonical manifests
+and in the generators, classified IN-TABLE / BAKED / DERIVED, in three
+columns — `gameplay` (rule 5's obligation), `fact` (what a rebuild needs),
+`code` (the generators' constants). The ratio is a NOTE-class number. A gate
+freezes the BAKED inventory so it can only SHRINK. Values migrate one at a
+time into `docs/project/tables/` rows carrying provenance, with a ledger.
+
+### 10.2 Ground truth — the census (measured 14z-141, 2026-09-07)
+
+Measured by a throwaway scanner at the opener, not read from the plan. The
+figures below are what the tool must reproduce on its first run.
+
+| what | measured |
+|---|---|
+| tracked manifest files | 31 (`git ls-files build/manifest/`, less `.keep` and `moves_TEMPLATE.toml`) |
+| the CANON after the ruled EXCLUDE | **29** — 23 TOML, 6 JSON |
+| scalar literals | 21,218 before the exclude, **11,014 after** (`overlay.wip/` carried 10,204) |
+| table kinds | 31 kinds, 1,242 tables: `map` 370, `move` 145, `port_patch` 102, `stamp` 98, `table` 68, `aux_poke` 68, `reader` 68, `data_port` 67, `site_thunk` 48, `region_fix` 37 |
+| distinct pairs | **389** `(kind, key)` in TOML; 461 including JSON key paths |
+| comment lines | **4,803** in 350 blocks — **4,566 standalone, 237 trailing** |
+| provenance vocabulary in comments | `14z-N` 490, `measured` 211, `maintainer` 115, `ruled` 26, `derived` 8, **`testimony` 0** |
+| a `provenance =` key | 27 rows only: `qs_songs.toml` 18, `vsavj.toml` 9 |
+| keys with a behavioural NAME | **1 of 389** — `[[site]].hits`, a diagnostic count in `walker_ghost.toml` |
+| variant selection | `only_variant_slot` **151** rows (donovan 48 / huitzil 57 / pyron 46); `[[select_records]]` 6-7 per tenant; `[[select_wheel]]`, `[[win_pal_variant]]` one each |
+| the authored-value surface | 68 `[[aux_poke]]` rows — 60 `poke16` / 8 `poke32`; by address band `PRG:0x5F` 45, `0x08` 11, `0x01` 9, `0x02` 3 |
+| `docs/project/tables/` | **13 declared documents, 7 GENERATED** (the three `chars/` pages were declared by L1) |
+| the generators | numeric literals in code: `gen_donovan_patch.py` 1,445, `select_port.py` 429, `build_gfx_donovan.py` 201, `build_qs_songs.py` 140; module-level constants 6 / 3 / 3 / 2 = **14**; lines carrying a literal AND a provenance tag: **3** |
+
+### 10.3 The findings that change the design — five, each measured
+
+**F1. The canon has SUBDIRECTORIES, and one of them is inert.** The plan's
+expected list names the top-level manifests and misses four JSONs under
+`extra_tiles/`, `strip_tiles/` and `overlay.wip/`. One file,
+`overlay.wip/overlay_tiles.json`, is 10,110 scalars — 48% of everything a
+census would scan. Archaeology before theory ([VSP-14]): commit `2b8fd827`
+("round 16: overlay reverted") renamed `overlay/` to `overlay.wip/`, and
+`tools/build_donovan.sh:466` still guards on
+`build/manifest/overlay/overlay_tiles.json`, a path that no longer exists.
+So it is tracked, deliberately inert, and EXCLUDED by ruling — with that
+reason written into the tool, because an exclusion whose reason is not
+stated is how a live file gets excluded later by analogy.
+
+**F2. The plan's kind census is TREE-WIDE; the tool works over the CANON.**
+The untracked `probe_*.toml` inflate six of nine kinds: `port_patch` 102 not
+249, `region_fix` 37 not 240, `aux_poke` 68 not 208, `data_port` 67 not 186,
+`site_thunk` 48 not 163. Only `map`, `move`, `stamp` and `table` agree.
+
+**F3. Provenance is attached to PARAGRAPHS, not to VALUES.** 4,566 standalone
+comment lines against 237 trailing ones; in the generators, 177 tagged lines
+in `gen_donovan_patch.py` but only 3 tree-wide that also carry a numeric
+literal. A scanner reading "the comment on the value's line" sees about 5% of
+the provenance that exists, and would report the tree as roughly twenty times
+less documented than it is. Both the plan and this session's first scan were
+built on that blind instrument — the plan's "`measured` 54x donovan" is
+exactly donovan's TRAILING comment count, and the first census here read
+`measured` as 0. The instrument had to be rebuilt before any number was worth
+recording, which is the same lesson L4 paid for.
+
+**F4. The GAMEPLAY seed names keys that do not exist — and the real gameplay
+surface is elsewhere.** Of 389 pairs, one has a behavioural name. `[[move]]`
+carries `name / input / kind / notes / table / seq`: an IDENTITY record. There
+is no `damage`, `startup`, `active`, `recovery`, `meter` or `cancel` key
+anywhere in the canon. The cause is structural — this port moves behavioural
+values as ROM DATA REGIONS (`[[data_port]]`, `[[region_fix]]`, `[[map]]`), so
+Capcom's bytes travel wholesale and are never re-typed as numbers a manifest
+could carry; frame data is derived from the ROM and lives outside the tree by
+ruling.
+**But "the gameplay column is empty" was too strong, and the correction is
+the finding.** Rule 5 names four categories and the fourth is VARIANT
+SELECTION, which IS in the manifests: `only_variant_slot` appears 151 times
+across the three shipping tenant manifests. That flag decides whether a row
+applies to the tenant slot alone or reaches legacy content — the superset
+invariant expressed per row, and about as consequential as anything in the
+build. It is also a BOOLEAN, so a census hunting numeric literals would skip
+it entirely. Ruled: the `gameplay` column covers variant selection, and
+booleans are in scope.
+
+**F5. The `code` column under the plan's rule reports 3 of 2,215.** The rule
+(a numeric literal in the code AND a provenance word in a same-line comment)
+filters on a commenting convention nobody used consistently, so it measures
+the habit rather than the code. The generators hold 2,215 numeric literals in
+four files, almost all mechanical — opcode bytes, struct offsets, sizes.
+Ruled: count MODULE-LEVEL NAMED CONSTANTS (14) plus any tagged literal (3),
+because that is the shape a tunable takes, and state the blind spot rather
+than paper over it — a gameplay value buried as an inline literal inside a
+function stays invisible, and no cheap rule will find it.
+
+### 10.4 Provenance attribution — the shapes, measured, and the rule they dictate
+
+Ruled at the STOP: measure which shape dominates rather than assume one.
+Over the 23 TOML files of the canon, 350 comment blocks:
+
+| shape | blocks | share | attaches to |
+|---|---|---|---|
+| tight above a table header (no blank line) | 153 | 43.7% | that table |
+| inside a table (next line is a key) | 69 | 19.7% | that table |
+| "other" (see below) | 62 | 17.7% | mixed — see below |
+| GAPPED above a header (blank line between) | 33 | 9.4% | the SECTION, not the table below |
+| file preamble | 31 | 8.9% | the file |
+| trailing at EOF | 2 | 0.6% | the file |
+
+**The gapped class is not ambiguous once read: all 33 are SECTION BANNERS** —
+`---- command normals ----`, `---- specials (+ their ES rows) ----`,
+`-- #104: THE CAPTURE-POSE KEYFRAME BLOCKS --`, `-- M2b gfx integration --`.
+They introduce many tables, not one, so attaching a banner to the single
+table beneath it would credit that table with provenance it does not have.
+They attach to the SECTION: every table until the next banner.
+
+**"Other" is three sub-kinds**, measured: banner blocks split by a blank line
+(the same class as above); comments INSIDE a multi-line array value, which
+attach to the key whose array they sit in; and history blocks.
+
+**THE TRAP, and it must be encoded in the tool: a block can be a RETRACTION.**
+Measured in `donovan.toml` alone: `~~[[data_port.fix]] ... ~~ NEVER APPLIED
+(14z-62c`, `RETIRED 14z-91 (maintainer-decided): the two rows below are
+DELETED.`, `14z-19 REVERT of 14z-18 "statue_accent_rows"`. A scanner that
+attaches "the block above" without reading it would hand a live row the
+provenance of a row that was withdrawn — [VSP-13]'s failure mode reproduced
+inside a tool. A block whose text matches a retraction vocabulary
+(`RETIRED`, `NEVER APPLIED`, `REVERT`, a struck `~~...~~` span) is recorded
+as history and never as a row's provenance.
+
+### 10.5 Architecture
+
+- **A TEXT scanner**, not a TOML parser: comments carry the provenance and no
+  parser returns them (the `audit_hex_lengths.py` rationale, GitHub #42).
+  It walks each file line by line tracking the current `[table]` / `[[kind]]`
+  path, the current SECTION banner, and the pending comment block, and emits
+  one record per scalar literal at `(file, kind, key)` with the attributed
+  provenance block and its classification.
+- **`KEY_CLASS`**, the one judgement table in the tool: `(kind, key)` to
+  GAMEPLAY / FACT / IGNORE, one comment per row, filled from the measured
+  389-pair list and never from memory. GAMEPLAY covers variant selection
+  (`only_variant_slot`, `[[select_records]]`, `[[select_wheel]]`,
+  `[[win_pal_variant]]`) and `[[aux_poke]].val` whose `addr` falls in an
+  atlas-documented gameplay range — classified by ADDRESS, never by key
+  name, with the atlas row cited in the tool. An `[[aux_poke]]` address
+  outside every declared band is UNCLASSIFIED, so a newly authored gameplay
+  poke cannot pass as FACT by reusing an existing key.
+  **Any pair not in `KEY_CLASS` is UNCLASSIFIED** — a third number that must
+  be 0 before the freeze.
+- **The `code` column**: module-level named constants in `gen_donovan_patch.py`,
+  `select_port.py`, `build_gfx_donovan.py`, `build_qs_songs.py`,
+  `gen_anita_bank2.py`, `overlay_port.py`, plus any literal carrying a
+  provenance tag. The stated blind spot is inline literals inside functions.
+- **Classification**: DERIVED if the row has `orc` / `src`, or its attributed
+  block names a computation, or the key is in `DERIVED_KEYS`; IN-TABLE if a
+  pipe row of a hand-written `docs/project/tables/*.md` contains the
+  normalised value AND the key name or the row's `addr` token (value-only
+  matching is rejected — small integers match everywhere), with a
+  `no-provenance` sub-flag when neither the row nor its table header carries
+  a provenance token; else BAKED.
+- **Output**: `--report` (markdown), `--keys`, `--freeze` / `--check` on
+  `tests/expected/rule5_baked.tsv`, and the NOTE lines (decision 5).
+
+### 10.6 The gate `tests/test_rule5_census.sh` (ci_portable, family `pipeline`)
+
+ROM-free: the manifests and the generators are in the tree. FAIL if
+UNCLASSIFIED is above 0; FAIL if any BAKED row is absent from the frozen
+inventory; FAIL if the frozen file is not byte-equal to a fresh `--freeze`.
+`--freeze` refuses to write a LARGER inventory without `--allow-growth
+"<reason>"`. Must-fire controls on a `--root` copy: a new baked value; an
+unknown key; an edited frozen TSV; a `probe_*.toml` created in the copy is
+ignored; a retraction block above a live row does NOT become its provenance;
+and an `[[aux_poke]]` written to an address outside every declared band
+reads UNCLASSIFIED rather than FACT.
+
+### 10.7 Staleness pass
+
+| # | claim | true now? |
+|---|---|---|
+| S1 | `tables/README.md`: "Nothing gameplay-affecting hides in code or manifests" | UNMEASURED when written; the census is what makes it checkable. Reword to the measured number once `audit_rule5.py` exists |
+| S2 | `doc_shape.tsv` calls `qs_voice_map.md` REFERENCE; its own line 4 says "GENERATED from the build ledger" | still true, still contradictory — its own commit: declare GENERATED with a `--check`, or strip the body's claim |
+| S3 | scope section 4's L2 row: "`tables/` has 9 documents" | **13 declared, 7 GENERATED** since L1 declared the `chars/` pages |
+| S4 | the plan's own figures (`build/living_docs_plan_14z139.md` section 3.2) | the kind census is tree-wide not canon (F2); "`measured` 54x donovan" counted trailing comments only (F3); "~40 inline `# measured` literals" is 3 under its own rule (F5). Its claim that `sfx_records.md`'s `evidence` column is the nearest thing to provenance is CORRECT — two of that file's tables carry it |
+
+### 10.8 Decisions — ruled at the STOP (2026-09-07)
+
+1. **`overlay.wip/` in or out of the canon.** RULED: OUT, by an explicit
+   EXCLUDE naming the 14s revert. Including it would make 48% of the census
+   a parked experiment.
+2. **Is the `gameplay` column near-empty by construction?** RULED: the column
+   is defined to INCLUDE variant selection, and booleans are in scope — a
+   small real column beats an empty one that reads clean. This ruling
+   corrected the recommendation it answered.
+3. **Comment-block attribution.** RULED: measure which shape dominates before
+   choosing the rule. Measured in 10.4; the rule follows from it.
+4. **The `code` column.** RULED: option (a) — module-level named constants,
+   with the blind spot stated rather than papered over.
+5. **The NOTE class** (the one cross-slice decision, plan section 5) — OPEN.
+   Recommendation on record: a `NOTE: <key> <value>` line printed by the gate
+   and surfaced by an advisory block in `tests/run_all_static.sh`, never a
+   fifth verdict in `tests/lib/classify.sh` (a verdict is per gate, a NOTE is
+   per number, and L2 prints three).
+
+### 10.9 Sequencing and cost
+
+1. `14z-141 (2)`: this section; the staleness pass S1-S4 (S2 its own commit).
+2. `(3)`: `audit_rule5.py` with `KEY_CLASS` filled from the measured pair
+   list; `--report` over the tree; UNCLASSIFIED brought to 0; the numbers
+   recorded here.
+3. `(4)`: `--freeze`; the TSV, its PROVENANCE row, the gate, its
+   registrations, the ledger document with its `doc_shape.tsv` row and
+   README Contents line (L1 demands both).
+4. `(5)`: the first migration end to end (one value); `tables/README.md`
+   reworded with the measured number (S1); the [VSP-13] grep; section 4's L2
+   row to LANDED; the HANDOFF row; static tier ALONE; close.
+5. Then the ledger: a value or two per later session, never in bulk, each its
+   own commit with a re-freeze.
+
+Cost: one session for the census, the inventory and the first migration.
