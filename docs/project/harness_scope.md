@@ -444,9 +444,11 @@ Three rules that follow from the contract:
 5. **DECIDED (maintainer, 2026-09-07): keep — *"agreed and this aligns with
    our documentation with anchored keys and history files so the consistency
    is a nice bonus"*. Measured at the ruling: 33 session and 23 issue
-   citations travelled, zero anchors, and THREE bare `[CPE-N]` references
-   dangle for a reader outside this project — translated into words when the
-   harness skill is written (NEXT_SESSION item 1).** Lifted comments keep
+   citations travelled, zero anchors, and ~~THREE bare `[CPE-N]` references~~
+   ONE lineage rule ID, `[CPE-24]`, in FOUR places — all of them
+   `[sweep].prereq_cite`'s default (corrected by §9's review the same day;
+   the "three" was a grep count of the same ID) — dangling for a reader
+   outside this project; worded at the skill's staleness pass (§9.5 S2).** Lifted comments keep
    their `14z-N` and issue citations as history lines — they are the incident record that makes a guard legible — but
    no `[VSP-N]` / `[MFI-N]` anchor travels (those are this project's skill
    lock, `tools/checkskills.py`). Veto → strip the citations.
@@ -506,3 +508,188 @@ run on this tree). The skill: one session, after H9. Total: six to seven
 sessions before the living-documentation slices begin. Each slice ends with
 `selftest/run.sh` green in the harness and the static tier green here; no
 slice touches this tree's `tests/` before H9.
+
+---
+
+## 9. THE SKILL — scope (14z-139, the plan before the work; §9.3 RULED at the plan stage, the rest awaiting the maintainer's word)
+
+The maintainer's order (2026-09-06): *"then distill the skill that goes with
+that generic harness"* — a skill distils something that EXISTS, and since
+14z-138 it does: H1-H7 and H9 landed, every default ruled (§7). This
+section is the plan, in the form every slice had. **Ground truth at the
+time of writing:** the harness at `45b5724`; its documentation corpus is
+nine pages, 76 KB — `README.md` 10.2 KB, `docs/gate_contract.md` 5.5,
+`drivers/README.md` 7.3, `docs/config.md` 20.0, `docs/hygiene.md` 5.8,
+`docs/lua.md` 11.0, `docs/method/oracle_classes.md` 5.4,
+`docs/conventions.md` 4.4, `example/README.md` 5.4 (+ `docs/rebaselines.md`
+0.7, and `example/expected/README.md`, unread — read at the pass) — read in
+full this session, then REVIEWED by a second reader against both trees,
+whose eight findings are folded in below; the precedent is `skills_scope.md`
+(four skills, 425 rules, one session each) and the level-0 cut of its §7
+(a self-contained `SKILL.md` + GENERATED `GUIDE.md` per skill, the unit
+that is copied to another machine).
+
+### 9.1 What the skill is
+
+One skill, **`blackbox-harness`**, prefix **`BBH`**, in the harness at
+`skill/blackbox-harness/{SKILL.md, GUIDE.md}` (the placeholder the
+maintainer named). Level 0 by construction — it is the discipline of a
+BLACK-BOX TEST HARNESS on any deterministic system, and its rules may name
+no game, no build, no board and no session of the lineage; the GUIDE, being
+generated from the anchored paragraphs, carries the incidents in the
+harness docs' own words (which name the lineage as "the lineage" and the
+board only where a profile is named). It sits beside
+`romhacking-methodology` `[RH-N]` in `~/.claude/skills/` — the SMS-era
+project-independent precedent, whose shape (rules with stable IDs, a guide
+with the incident behind each) it follows — and cross-references NOTHING:
+a portable skill that cites another project's IDs dangles on the next
+machine (decision 4 below).
+
+### 9.2 The sources, section by section, with the estimated yield
+
+Same method as `skills_scope.md` §2: one `##` section per source, rules
+`- [BBH-N]` anchored `**[BBH-N]**` in the paragraph each distils.
+
+| § | section of the skill | source (read in full) | rules it carries (estimate) |
+|---|---|---|---|
+| 1 | **The doctrine** — no untested change survives; every in-instrument measurement becomes a rerunnable case; verdict logic is itself tested; a field report is a RECORDING before it is a theory; SKIP is not PASS; a red gate is a QUESTION whose first question is which side rests on a measurement; when a claim changes, grep for the claim; the four bins as the extraction test | `README.md` "Doctrine" + "The four bins", and **`docs/doctrine.md` — the long form the README PROMISES and which does not exist** (staleness item S1: written in the pass, it is where these rules anchor) | ~9 |
+| 2 | **The gate contract** — exit status decides first; the three exceptions; the prologue (demand before the trap, an explicit test after); line 2 is an API; one verdict line of the gate's own; the must-fire control in its three shapes; registration is the anti-orphan mechanism; what the harness will NOT do | `docs/gate_contract.md` §1-§7 | ~14 |
+| 3 | **The driver contract** — four arguments, the search path is the driver's own, the replay family and REFUSE-never-ignore, the guard family belongs to guarded drivers, the log grammar, the four exit codes, a removed log before a run, the hermetic scrub | `drivers/README.md` §1-§5 | ~13 |
+| 4 | **The oracle classes** — a mask is a BASIS not a flag; the five classes as measured mechanisms with frozen expectations, never tolerances; a bit-identical pair FAILS a window; FAIL-SHORT is a different finding; the ≥reconverge rule is intra-mechanism; what may never loosen a class (the four); where a class is written and a new KIND is registered once | `docs/method/oracle_classes.md` | ~13 |
+| 5 | **Hygiene** — provenance with a CLOSED vocabulary; headers name the code's default; rot vs currency (absent is not rotted, currency is reported never failed); the index is GENERATED, complete both ways; a battery cannot print GREEN over a skip; a control edits a shadow copy; demand-after-trap | `docs/hygiene.md` | ~9 |
+| 6 | **Config discipline** — every key with a default and its BIN; a missing key with no default is FATAL, never silent; the TOML subset and why; thresholds are ratified policy not tuning knobs; `[machine].profile` has NO default because a board is never implied; a consumer config outside its tree carries one host's layout; and the rules that live in TABLE CELLS — registry rows only at freeze time as a build decision, any run-to-run difference is NONDETERMINISTIC and a failure, the hermetic scrub | `docs/config.md` (the prose AND the rule-carrying cells) | ~10 |
+| 7 | **The instrument layer** — every board literal in ONE profile table, a script never runs on an implied board; one strict grammar, its two copies diffed; input staging is canonical (`held[frame+1]`); a memory tap is dropped on handler re-install; the recording corpus and its liveness predicate; the defaults census's three bins (board / policy / config) | `docs/lua.md` §1-§5 | ~13 |
+| 8 | **Fidelity and conventions** — the extraction is PROVED by text diffs over the same input, never by re-derivation; the stronger classifier wins and a consumer's delta is a finding about the consumer; a re-baseline is LOUD; the ruled defaults (where it lives, what travels, which drivers, one classifier) | `docs/conventions.md`, `docs/rebaselines.md`, `README.md` "What it gives a consumer" (the status column as history) | ~9 |
+
+Estimated total **~75-80 rules** from 76 KB (the level-0 skills yielded 46
+and 63 from corpora of similar density; the harness docs are denser in
+rules because they were written AS the rules' carriers). **THE ONE-ANCHOR
+RULE for a rule several pages carry**: four rules appear on two or three
+pages each — a mask is a BASIS (oracle_classes, the driver contract's
+`MASK_RANGES` row, lua.md's replay row), SKIP is not PASS (README doctrine,
+gate_contract §1, hygiene's accounting row), a driver REFUSES and never
+ignores (drivers README, lua.md §3), no implied board (config.md, lua.md
+§5, conventions 7). Each gets ONE anchor, in the page that DEFINES it; the
+other carriers cite the ID in prose.
+
+### 9.3 The lock — RULED at the plan stage: the checker TRAVELS, config-driven
+
+Three shapes were weighed; the maintainer chose (a) at the plan stage
+(2026-09-07). **(a) The lock travels**: `tools/checkskills.py`
+and `tools/gen_skill_guide.py` lifted into the harness as `bbh check-skills`
+and `bbh skill-guide`, table-driven from config — and the harness's TOML
+subset fixes the shape: dotted headers and inline tables holding arrays
+are REFUSED, so it is `[skills] prefixes = ["BBH"]` (the ORDER, which
+`-v` output follows) plus ONE `[skill_<PFX>]` table per skill (`path`,
+`docs`, `logs`, `forbid` as arrays of scalars; `sections` as an array of
+arrays, file first then its headers). Three lineage names hard-coded in
+the two tools become config too: the history-archive exemptions
+(`STATE_HISTORY.md` / `DECISIONS_HISTORY.md`) and the guide's header
+strings (`ORIGIN`, the generator's name, the session-token phrase) —
+without them the guides cannot render byte-identical. `--root`,
+`--no-selftest` and the synthetic selftest travel; the harness's own skill
+is declared in `skill/skills.toml` (`[project] root = ".."`, since a root
+resolves against the config's directory) and locked by a new
+`selftest/test_skills.sh` carrying the lineage gate's must-fire controls
+on a COPY of the harness tree (an unanchored rule, a stripped anchor, a
+forbidden token, an uncited number, a dangling cross-reference, an anchor
+in a history file, an anchor outside a named section, a stale guide).
+**FIDELITY F11**: the lifted checker with a `[skills]` config equal to this
+tree's table (same order), over THIS tree's eight skills, produces stdout
+and exit identical to `tools/checkskills.py -v` (553 rules across 8
+skills at the time of writing; every message text verbatim, the section
+restriction, the history-anchor rule and the six number patterns with
+their filters travelling as code), and the lifted guide generator renders
+the two committed `GUIDE.md` files byte-identical — the same proof every
+slice gave; this tree keeps its two tools untouched (§7.8: it never
+consumes the harness). **(b) The harness gets its own lock**: a private copy of the
+checker with a hard-coded table — a second checker that drifts, the shape
+§5 rule 2 was written against. **(c) No lock**: a stale skill is a
+confidently wrong instruction loaded BEFORE the work; refused by the
+lineage's own rule. **Recommendation, and the plan below assumes it: (a).**
+A skills lock is a hygiene check of the H5 family — every consumer with a
+skill gets it — and lifting it is the harness's extraction question
+answered "yes" once more.
+
+### 9.4 The rules the checker applies to this skill
+
+1. **Liftability, level 0 and then one more**: the forbidden token set is
+   the lineage's `GAME_TOKENS + BUILD_TOKENS + BOARD_TOKENS` (no game, no
+   build dir, no `cps`/`qsound`/`jtcps`), plus the LINEAGE tokens `14z-`,
+   `vampire`, `vsav`, `mister`. A rule in `SKILL.md` may not name them; the
+   guide may, because it quotes the docs.
+2. **No cross-references** to any other skill's IDs (decision 4) — and
+   the checker does NOT enforce that by itself (a prefix absent from its
+   table is IGNORED, not refused), so the BBH row's `forbid` list carries
+   the bracket tokens `[RH-`, `[VSP-`, `[VSE-`, `[CPE-`, `[CPH-`, `[MFI-`,
+   `[MJC-`, `[MSC-`, `[MSV-`.
+3. **Numbers cite the log**: the harness has no history twins, so its LOG
+   set is its documentation itself — the nine pages plus `rebaselines.md`
+   (the precedent is `skills_scope.md` decision 5, `engine_internals.md`
+   counting as a log because its figures are inline and instrument-named;
+   here every figure in the docs is a measured one — F2's 65 rows, the
+   thresholds, the exit codes).
+4. **Anchors live in the harness docs only**; `README.md` counts (its
+   doctrine and bins), `example/README.md` does not (it is a walkthrough,
+   not a carrier of rules — a rule found only there is moved to
+   `doctrine.md` first).
+
+### 9.5 The staleness pass — MANDATORY before distilling (the ruling of `skills_scope.md` §4, applied)
+
+Read the nine pages in full (done this session; re-read at the pass), list
+every claim the tree contradicts, fix in place, one commit, then distil.
+Known before the pass:
+
+| # | claim | true now |
+|---|---|---|
+| S1 | `README.md` "Doctrine (the short form; `docs/doctrine.md` is the long one)" | no such file exists — the long form is written in this pass: the seven sentences of the short form, each with the incident and the mechanism that enforces it, the four bins, and the extraction question; it becomes the anchor home of skill §1 |
+| S2 | §7.5's "three bare `[CPE-N]` references" — CORRECTED by the review: it is ONE ID, `[CPE-24]`, in FOUR places, all of them `[sweep].prereq_cite`'s default (`config.py`, `docs/config.md`, `selftest/test_run_sweep.sh`, `bbh.toml.example`; the example sets `""`) | the lineage's literal by design (§7.5: citations travel); the config table says so explicitly and names what the ID is, so a reader outside the lineage is not left with a dangling token |
+| S4 | `docs/lua.md` §6 cites `harness_scope.md §7.8` — a path into this tree | cite `docs/conventions.md` 6 (the harness's own register), the lineage path in parentheses |
+| S5 | `docs/hygiene.md` "identical at H5", `README.md` status column `H1..H7`, `docs/gate_contract.md` §6 "(H4)" | history, kept; the README's Quick start figure "~3.5 min" is re-measured (the selftest ran 5-6 min with the lineage present) |
+| S6 | `docs/conventions.md` 7 says F2 "measured identical (65 rows)" — a number with no log line naming its run | `docs/rebaselines.md` gains no row (nothing moved); the F2 figure is entered in `docs/conventions.md` with its date, which is the log for rule 3 above |
+| S7 | `README.md`'s Layout block lists `docs/` without `conventions.md` and `rebaselines.md`, names no `skill/`, and its `selftest/` line omits F2 | brought to the tree |
+
+### 9.6 Sequencing, and what the session carries
+
+1. **The staleness pass + `docs/doctrine.md`** — one harness commit.
+2. **H10: the lock lifted** — `bbh check-skills`, `bbh skill-guide`,
+   `[skills]` config, `selftest/test_skills.sh` with its must-fires, F11 in
+   `test_fidelity_vampire.sh`; harness selftest green; one commit, pushed.
+   Half a session.
+3. **The skill distilled** — anchors placed in the harness docs (never in
+   this tree), `SKILL.md` written section by section from §9.2, `GUIDE.md`
+   generated, the lock green; one commit, pushed. Half a session to one.
+4. **This tree** — §9's status line and §4's row, NEXT_SESSION; nothing
+   under `tests/` changes (F11 reaches `test_bbh_fidelity.sh` through the
+   harness's own fidelity test, as every F row does). The skill directory
+   is copied to `~/.claude/skills/blackbox-harness/` on this machine so
+   the sessions that work ON the harness load it (decision 7).
+
+Cost: one session, one and a half with H10 — §8's estimate held.
+
+### 9.7 Decisions — taken under stated assumptions, open to veto
+
+1. **RULED (maintainer, 2026-09-07): the lock travels** (§9.3 (a)). ~~Veto
+   → (b), a harness-local copy.~~
+2. **Name `blackbox-harness`, prefix `BBH`, location `skill/blackbox-harness/`.**
+   Veto → `bbh-harness` / another prefix; nothing else moves.
+3. **Level 0 plus the lineage tokens forbidden in `SKILL.md`** (§9.4.1).
+   Veto → allow the lineage's name as an example; the checker's list
+   shrinks by four tokens.
+4. **No cross-references to other skills' IDs.** Veto → allow `[RH-N]`
+   (the SMS methodology skill, also outside any repo) and nothing else.
+5. **The harness docs are their own LOG** (§9.4.3). Veto → a
+   `docs/measurements.md` log where every quoted figure is entered first.
+6. **`docs/doctrine.md` is written in the staleness pass** as the carrier
+   of the doctrine rules (S1). Veto → anchor the doctrine rules in the
+   README's short form and delete the promise.
+7. **The skill is installed user-level** (`~/.claude/skills/`), never into
+   this tree's `.claude/skills/` (§7.8: this tree never consumes the
+   harness; its own skills stay the eight). Veto → a symlink here too.
+8. **Fidelity F11 joins the contract** (§5): the lifted lock over this
+   tree's eight skills and two guides, output and bytes identical. Not a
+   veto candidate — it is the contract's own rule 3 applied — recorded so
+   the F-list stays complete.
+
+**RULED (maintainer, 2026-09-07): the session STOPS here** — decisions 2-7
+are ruled before §9.6's steps run, as every slice's scope was.

@@ -41,20 +41,21 @@ the real emulators — `selftest/test_fidelity_mame.sh`, opt-in). **In THIS
 tree: `ROMDIR=... tests/test_bbh_fidelity.sh`** (`ci_static`, ~65 s alone;
 `BBH_MAME_FIDELITY=1` adds F8, ~1 min, never beside another gate run here).
 
-## NEXT: THE HARNESS SKILL, then living docs
+## NEXT: THE HARNESS SKILL — SCOPED 14z-139 (3), AWAITING THE RULINGS — then living docs
 
-1. **The skill** — the maintainer's order: *"then distill the skill that goes
-   with that generic harness"* (a skill distils something that EXISTS; it
-   does now). The precedent is `docs/project/skills_scope.md` and the six
-   in-tree skills (`.claude/skills/<name>/SKILL.md`, rules `[PFX-N]` anchored
-   in the paragraph each distils, locked by `tools/checkskills.py`; the
-   level-0 skills carry a GENERATED guide). The harness's own docs are the
-   paragraphs to anchor in — `docs/gate_contract.md`, `drivers/README.md`,
-   `docs/config.md`, `docs/hygiene.md`, `docs/lua.md`,
-   `docs/method/oracle_classes.md`, the README's doctrine — so the skill's
-   anchors live in the HARNESS repository (its `skill/` placeholder), not
-   here; decide at the plan stage whether `checkskills.py` travels with it
-   or the harness gets its own lock. Scope first, as every slice was.
+1. **The skill** — **SCOPED: `docs/project/harness_scope.md` §9** (read it
+   first: the eight sections and their sources, ~75-80 rules; the lock
+   TRAVELS — RULED at the plan stage — as `bbh check-skills` /
+   `bbh skill-guide` under `[skills]` + `[skill_<PFX>]` config with fidelity
+   F11; the staleness pass S1-S7 incl. the missing `docs/doctrine.md`;
+   sequencing: pass → H10 the lock → the distillation → this tree's close).
+   **RULED (maintainer, 2026-09-07): the work waits for the rulings on
+   §9.7's decisions 2-7** (name/prefix, level-0 + lineage tokens, no
+   cross-references enforced by `forbid`, the docs as their own LOG,
+   `doctrine.md` written in the pass, user-level install). Then execute §9.6
+   in order; the harness commits are pushed at slice boundaries, this tree
+   changes only at the close. The lineage citation that dangles in the
+   harness is ONE ID (`[CPE-24]`, `prereq_cite`'s default, four places).
 2. Then living docs L1 → L4 → L2 → L3 (`living_docs_scope.md` §4).
 3. Then the open items below.
 
@@ -66,8 +67,8 @@ tree: `ROMDIR=... tests/test_bbh_fidelity.sh`** (`ci_static`, ~65 s alone;
    §7**: keep 3/5/6/7/9/10 (9 resolved, 10 replaced by the LOUD re-baseline
    rule), the license is not a default (4), and 8 amended with the
    `BBH_FIDELITY_ROOT` input. The harness's `docs/conventions.md` is the
-   register of its defaults. **Carried into the skill (item 1): translate
-   the three dangling `[CPE-N]` references in the harness into words.**
+   register of its defaults. **Carried into the skill (item 1): word
+   the one dangling lineage ID in the harness (`[CPE-24]`, four places).**
 3. **Findings about this tree — ALL FIVE FIXED (14z-139, the maintainer's
    "let's start with" the four): ~~(14z-135) `run_all_static.sh` has no
    exit-0-after-shell-error branch (the sweep runner has); (14z-137)
