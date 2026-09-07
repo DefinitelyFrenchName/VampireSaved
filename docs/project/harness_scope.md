@@ -671,18 +671,29 @@ Cost: one session, one and a half with H10 — §8's estimate held.
 
 1. **RULED (maintainer, 2026-09-07): the lock travels** (§9.3 (a)). ~~Veto
    → (b), a harness-local copy.~~
-2. **Name `blackbox-harness`, prefix `BBH`, location `skill/blackbox-harness/`.**
-   Veto → `bbh-harness` / another prefix; nothing else moves.
-3. **Level 0 plus the lineage tokens forbidden in `SKILL.md`** (§9.4.1).
-   Veto → allow the lineage's name as an example; the checker's list
-   shrinks by four tokens.
-4. **No cross-references to other skills' IDs.** Veto → allow `[RH-N]`
-   (the SMS methodology skill, also outside any repo) and nothing else.
-5. **The harness docs are their own LOG** (§9.4.3). Veto → a
-   `docs/measurements.md` log where every quoted figure is entered first.
-6. **`docs/doctrine.md` is written in the staleness pass** as the carrier
-   of the doctrine rules (S1). Veto → anchor the doctrine rules in the
-   README's short form and delete the promise.
+2. **RULED (maintainer, 2026-09-07): *"agreed"* — name `blackbox-harness`,
+   prefix `BBH`, location `skill/blackbox-harness/`.**
+3. **RULED (maintainer, 2026-09-07): *"agreed"* — level 0 plus the lineage
+   tokens forbidden in `SKILL.md`** (§9.4.1); the generated guide may name
+   them.
+4. **RULED (maintainer, 2026-09-07): *"agreed"* — no cross-references to
+   other skills' IDs, enforced by the `forbid` bracket tokens** (§9.4.2).
+5. **RULED (maintainer, 2026-09-07): *"agreed"*, WITH AN ADDITION that
+   shapes the pass — the harness docs are their own LOG, and *"to avoid the
+   logging part becoming too big, the harness should use the anchored key
+   system to keep the docs lean and quick to search through and have
+   `_HISTORY` files with the complete LOG separately for completeness of
+   information."*** So the harness adopts this tree's twin convention
+   ([VSP-12]): a reference page stays lean and anchored, its
+   `<name>_history.md` twin carries the complete log (dated measurements,
+   superseded figures, the incident narrative), history carries NO anchor,
+   and the checker's LOG set is the pages PLUS their twins. The pass
+   creates the first twins where a page already carries log matter
+   (`conventions.md`'s F2 figure, `rebaselines.md` stays a LOG by shape,
+   `lua.md` §5's census).
+6. **RULED (maintainer, 2026-09-07): *"agreed"* — `docs/doctrine.md` is
+   written in the staleness pass** as the carrier of the doctrine rules
+   (S1), lean and anchored per 5.
 7. **The skill is installed user-level** (`~/.claude/skills/`), never into
    this tree's `.claude/skills/` (§7.8: this tree never consumes the
    harness; its own skills stay the eight). Veto → a symlink here too.
