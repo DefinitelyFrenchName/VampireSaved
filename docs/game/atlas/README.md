@@ -39,8 +39,11 @@ harness). Decrypted opcode-view images (68k logical order) from
 (`tests/test_decrypt_oracle.sh`). **The SHA-1 column is re-derived by
 `shasum build/out/<set>_opcodes.bin` after `tools/build_donovan.sh` (or
 `tests/lib/decrypt_cache.sh`) has written the views — re-derived 14z-118,
-all three unchanged; it has no second home in the tree, so this is the
-only place it is checked:**
+all three unchanged; it has no second home in the tree, so this document is
+where it is checked — MECHANICALLY since 14z-142 by
+`tests/test_checkdocs_rom.sh`, which hashes the views and compares them with
+the digests below, so a stale row here is a red gate rather than something
+nobody re-derives:**
 
 | Set | Key master | Watchdog (from key block) | Opcode-view SHA-1 |
 |---|---|---|---|

@@ -8,13 +8,18 @@
 # tree: each QUOTES its claim from the atlas (`says()`, so a check cannot
 # outlive the sentence it was written for) and DERIVES the same fact from the
 # decrypted view, then compares. This gate asserts all of them pass, that every
-# `@table` NEGATIVE CONTROL fired, and that the coverage NOTE is printed.
+# `@table` NEGATIVE CONTROL fired, that the coverage NOTE is printed, and that
+# the COVERED SET still equals `tests/expected/checkdocs_rom_covered.tsv` —
+# the shrink-only half, compared as a MULTISET so a hand-added duplicate row
+# fails too (the shape `audit_rule5.py` had to fix at 14z-141).
 #
 # WHY. Nothing in the tree re-derived an atlas claim from the image. Some of
-# those claims have no second home at all — `docs/game/atlas/README.md` says of
+# those claims have no second home at all — `docs/game/atlas/README.md` SAID of
 # its opcode-view SHA-1 column, in the document itself, "it has no second home
 # in the tree, so this is the only place it is checked". A human re-derived it
-# by hand at 14z-118 and nothing would have caught it going stale.
+# by hand at 14z-118 and nothing would have caught it going stale. That
+# sentence now names THIS gate, and the check quotes the amended wording, so
+# the document and its checker moved in one commit.
 #
 # THE COVERAGE NUMBER IS NOTE-CLASS, NEVER FATAL (ruled 2026-09-07, the L2
 # convention): the tool prints `NOTE: checkdocs_rom.coverage <n>/346` at column
@@ -35,7 +40,11 @@
 #     class cannot degrade into a silent skip — the reason it is declared)
 #   4 a @table validator weakened to accept anything -> Vacuous (a validator
 #     its own control cannot break proves nothing)
-# Controls 2 and 3 perturb a COPY of the decrypted view, never the cache.
+#   5 a frozen COVERED row the run does not reach -> "no longer covers"
+#     (0x38C258 is an atlas address the venue check deliberately does not
+#     read: the document itself says it is NOT a table)
+# Controls 2 and 3 perturb a COPY of the decrypted view, never the cache;
+# control 5 perturbs the frozen set and restores it, asserting both.
 set -u
 REPO=$(cd "$(dirname "$0")/.." && pwd)
 cd "$REPO" || exit 1
@@ -60,7 +69,7 @@ ok "vsavj, vsav2 and vhunt2 opcode+data views materialised"
 
 echo "== 2. every check, over the tree"
 out="$W/run.txt"
-python3 tools/checkdocs_rom.py --views "$W/views" > "$out" 2>&1
+python3 tools/checkdocs_rom.py --views "$W/views" --check-covered > "$out" 2>&1
 rc=$?
 [ "$rc" = 0 ] || { sed 's/^/    /' "$out"; bad "checkdocs_rom exited $rc"; }
 grep -q '^MISMATCH' "$out" && bad "a check disagreed with the image"
@@ -70,10 +79,12 @@ echo "    $summary"
 nchecks=$(echo "$summary" | sed -n 's/^\([0-9]*\) checks.*/\1/p')
 nok=$(echo "$summary"    | sed -n 's/.*, \([0-9]*\) ok,.*/\1/p')
 nctl=$(echo "$summary"   | sed -n 's/.*; \([0-9]*\) table controls fired.*/\1/p')
-[ "${nchecks:-0}" -ge 8 ] || bad "only ${nchecks:-0} checks registered (expected at least 8)"
+[ "${nchecks:-0}" -ge 15 ] || bad "only ${nchecks:-0} checks registered (expected at least 15)"
 [ "${nchecks:-0}" = "${nok:-x}" ] || bad "not every check passed"
-[ "${nctl:-0}" -ge 9 ] || bad "only ${nctl:-0} table controls fired (expected at least 9)"
+[ "${nctl:-0}" -ge 12 ] || bad "only ${nctl:-0} table controls fired (expected at least 12)"
 ok "$nchecks checks, all passing, $nctl table controls fired"
+grep -q '^  ok: the covered set equals the frozen inventory' "$out" \
+    || bad "the covered set does not equal tests/expected/checkdocs_rom_covered.tsv"
 
 note=$(grep '^NOTE: checkdocs_rom.coverage ' "$out")
 [ -n "$note" ] || bad "the coverage NOTE is absent from the tool's output"
@@ -166,5 +177,29 @@ if cmp -s "$W/weak.py" tools/checkdocs_rom.py; then
 else
     ctl "a vacuous validator is rejected" "Vacuous" "$W/root" "$W/views" "$W/weak.py"
 fi
+
+# 5 — a frozen covered row the run does not reach (0x38C258 is an atlas
+# address the venue check deliberately does NOT read: the document says it is
+# NOT a table). Compared as a MULTISET, so a duplicated row fails too.
+COV=tests/expected/checkdocs_rom_covered.tsv
+cp "$COV" "$W/cov.bak"
+{ cat "$W/cov.bak"; printf 'venue_pointer_table\tvenue_assets.md\tPRG:0x38C258\n'; } > "$W/cov.new"
+cp "$W/cov.new" "$COV"
+_b=$(wc -l < "$W/cov.bak"); _a=$(wc -l < "$COV")
+if [ "$_a" -ne $((_b + 1)) ]; then
+    bad "control 5: the frozen-set perturbation did not apply"
+else
+    python3 tools/checkdocs_rom.py --views "$W/views" --check-covered > "$W/c5.txt" 2>&1
+    _rc=$?
+    if [ "$_rc" = 0 ]; then
+        bad "control 5: a frozen row the run does not cover still exited 0"
+    elif grep -q 'no longer covers PRG:0x38C258' "$W/c5.txt"; then
+        ok "control fired: a dropped covered address"
+    else
+        sed 's/^/    /' "$W/c5.txt"; bad "control 5: exited $_rc but not for the stated reason"
+    fi
+fi
+cp "$W/cov.bak" "$COV"
+cmp -s "$W/cov.bak" "$COV" || bad "control 5: the frozen set was not restored"
 
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

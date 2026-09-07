@@ -4188,3 +4188,31 @@ the tree.** The tell was structural and available immediately: every zero was
 a compound pattern and every single-token pattern hit. When a search returns
 "the thing is missing", re-run the same pattern against something it is known
 to match before believing it ([VSP-22]'s positive control, applied to a grep).
+
+## Inside the crypt range the VIEW follows the ACCESS MODE, and the wrong one is plausible garbage (paid again: 14z-142)
+
+Writing L3's seed checks, the attract table at `PRG:0x005C08` read out of the
+DATA view as `9F F7 59 84 4E E1 …` against `id_space.md`'s documented
+`P1 0F 02 0C 0E …`. That reads exactly like a stale document, and it is not:
+the table is reached PC-relative (`move.b $5c08(pc,d0.w),$782(a5)`), so inside
+`PRG:0x000000-0x0FFFFF` its truth is the OPCODE image, where the documented
+sequence sits at stride 4. Two hundred bytes away, `select_screen.md`'s tables
+A and B are reached by `lea`/`movea.l` and read `(An,Dn)` — DATA space — and
+read out of the opcode view they are equally plausible garbage.
+
+**So the view is a property of the ACCESS MODE, not of the address**, and
+neither wrong reading announces itself: both return bytes, and only knowing
+the expected values distinguishes them. A doc-checking tool therefore carries
+the view PER CLAIM rather than per address range.
+
+`select_screen.md` states this rule in the paragraph directly above its own
+tables ("**DATA space**. They do not exist in the opcode image; reading them
+there yields plausible garbage"). It was read and still not applied, because
+the reading happened while looking at a DIFFERENT document.
+
+What settled it in one command was [VSP-155], not re-derivation:
+`tests/test_attract_roster.sh` already decodes that table, and the view IT
+opens is the answer. **Before concluding a document is wrong about bytes, grep
+`tests/` for the address — a gate that already froze it has answered the view
+question and probably the stride too** (this one is `8 rows x 4 bytes` of
+`(P1, P2, venue.w)`, which the first reading also had wrong).

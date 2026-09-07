@@ -1,0 +1,44 @@
+# checkdocs_rom_covered.tsv — the atlas ROM-tier addresses each check
+# actually READS from the decrypted image (14z-142, living-docs L3).
+#
+# WHY IT IS FROZEN: coverage is a NOTE-class number and a number can
+# drift down unnoticed. This is the shrink-only half — a check that stops
+# reaching an address it used to, or a check that disappears, FAILS
+# tests/test_checkdocs_rom.sh. GROWTH is expected and re-freezes:
+#   ROMDIR=... python3 tools/checkdocs_rom.py --freeze
+#
+# Rests on: derived (the addresses are read from the image at run time,
+# not transcribed here by hand). Provenance: tests/expected/PROVENANCE.md.
+#
+# check	document	address
+adjacency_table_b	select_screen.md	PRG:0x0211E4
+anim_number_table_04ffa8	id_space.md	PRG:0x04FFA8
+attract_roster_table	id_space.md	PRG:0x005C08
+character_id_writers	id_space.md	PRG:0x00AED8
+character_id_writers	id_space.md	PRG:0x00AEF6
+character_id_writers	id_space.md	PRG:0x020A80
+direction_table_a	select_screen.md	PRG:0x01FE2C
+direction_table_a	select_screen.md	PRG:0x0211D4
+drawer_entries_three_sets	sprite_lists.md	PRG:0x0199D4
+drawer_entries_three_sets	sprite_lists.md	PRG:0x0199DA
+drawer_entries_three_sets	sprite_lists.md	PRG:0x0199DC
+drawer_entries_three_sets	sprite_lists.md	PRG:0x0199E2
+drawer_entries_three_sets	sprite_lists.md	PRG:0x01AFA6
+drawer_entries_three_sets	sprite_lists.md	PRG:0x01AFAE
+id_cycling_selectors	id_space.md	PRG:0x010E2C
+id_cycling_selectors	id_space.md	PRG:0x010E3A
+loader_immediates	character_tables.md	PRG:0x028DD8
+mugshot_and_name_tables	venue_assets.md	PRG:0x089684
+mugshot_and_name_tables	venue_assets.md	PRG:0x089884
+per_set_table_bases	character_tables.md	PRG:0x0BD97A
+per_set_table_bases	character_tables.md	PRG:0x0BD9FA
+per_set_table_bases	character_tables.md	PRG:0x0BE17A
+per_set_table_bases	character_tables.md	PRG:0x0D73AA
+per_set_table_bases	character_tables.md	PRG:0x0D742A
+per_set_table_bases	character_tables.md	PRG:0x0D7B18
+per_set_table_bases	character_tables.md	PRG:0x0D7B98
+per_set_table_bases	character_tables.md	PRG:0x0D7BAA
+per_set_table_bases	character_tables.md	PRG:0x0D8318
+variant_half_aliases_except_slot8	character_tables.md	PRG:0x0BD97A
+venue_pointer_table	venue_assets.md	PRG:0x38C198
+venue_pointer_table	venue_assets.md	PRG:0x38C1D8

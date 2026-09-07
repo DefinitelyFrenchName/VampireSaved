@@ -8,15 +8,19 @@ decrypted reference images, so a documented fact cannot rot in silence.
   python3 tools/checkdocs_rom.py --doc FILE       # every check on one document
   python3 tools/checkdocs_rom.py --uncovered      # what no check reaches
   python3 tools/checkdocs_rom.py --disasm         # capstone beside a mismatch
+  python3 tools/checkdocs_rom.py --freeze         # rewrite the covered-set TSV
+  python3 tools/checkdocs_rom.py --check-covered  # every frozen row still covered
   python3 tools/checkdocs_rom.py --views DIR --root DIR    # controls
 
 WHY THIS EXISTS (14z-142, living-docs slice L3; scope
 `docs/project/living_docs_scope.md` §11). The atlas states hundreds of facts
 about the program image and NOTHING re-derived any of them. Some have no
-second home in the tree at all: `docs/game/atlas/README.md` says of its
+second home in the tree at all: `docs/game/atlas/README.md` said of its
 opcode-view SHA-1 column, in the document itself, "it has no second home in
 the tree, so this is the only place it is checked" — a figure a human
-re-derived by hand at 14z-118 and would have to remember to re-derive again.
+re-derived by hand at 14z-118 and would have had to remember to re-derive
+again. That sentence now names this tool, and the check below quotes the new
+wording, so the document and its checker moved together.
 
 WHAT A CHECK IS, and the two halves matter equally. A check QUOTES its claim
 from the document (`says()`, asserting the sentence is still there) and
@@ -60,7 +64,7 @@ whatever happens to be installed.
 Needs the decrypted views (`tests/lib/decrypt_cache.sh`, ROMDIR on a cache
 miss). Rule 7: prints addresses, words and shapes — never a byte run longer
 than the atlas already quotes.
-ci_static, ~20 s (tests/test_checkdocs_rom.sh).
+ci_static, ~2 s on a warm decrypt cache (tests/test_checkdocs_rom.sh).
 """
 import argparse
 import re
@@ -115,6 +119,8 @@ class Image:
 
     def bytes(self, addr, n, view="op"):
         TOUCHED.update(range(addr, addr + n))
+        if CURRENT[0]:
+            TOUCHED_BY.setdefault(CURRENT[0], set()).update(range(addr, addr + n))
         return self._view(view)[addr:addr + n]
 
     def word(self, addr, view="op"):
@@ -139,12 +145,27 @@ class Image:
 
 
 TOUCHED = set()
+TOUCHED_BY = {}       # check name -> the byte addresses that check read
+CURRENT = [None]      # the check being run, for attribution
+COVERED_TSV = "tests/expected/checkdocs_rom_covered.tsv"
 IMAGES = {}
 DOCS = {}
 CHECKS = []           # (doc, name, fn)
 CONTROLS_FIRED = []   # names of negative controls that fired
 PARAPHRASE = {}       # name -> why the doc's text is not a transcription
 UNENCODABLE = {}      # address -> why no check can reach it
+
+# Decision 4's fourth bucket: the census regex cannot tell an address from a
+# hex literal that looks like one (the `gen_annotations` header says so of
+# itself). These are DECLARED rather than guessed, and they stay INSIDE the
+# ruled 346 denominator — excluding them would silently move a number the
+# maintainer ruled. They are labelled in --uncovered so no later session
+# tries to write a check for a notation example.
+NOT_ADDRESSES = {
+    0x0F1234: "README.md's address-notation EXAMPLE (`PRG:0x0F1234`)",
+    0x01A2B3: "README.md's address-notation EXAMPLE (`GFX:tile 0x1A2B3`)",
+    0x0FFFFF: "the crypt-range BOUNDARY `PRG:0x000000-0x0FFFFF`, not a datum",
+}
 
 
 def img(name):
@@ -224,12 +245,14 @@ def table(name, base, count, stride, read, entry, control=None):
 def _digests():
     """The three decrypted opcode views hash to the digests the atlas prints.
 
-    This is the check the document itself asked for: "it has no second home in
-    the tree, so this is the only place it is checked"."""
+    This is the check the document itself asked for. Its sentence was amended
+    at 14z-142 to name the gate; this check quotes the AMENDED wording, so the
+    two cannot drift apart."""
     import hashlib
     says("README.md",
          "The SHA-1 column is re-derived by",
-         "it has no second home in the tree, so this is the only place it is checked")
+         "it has no second home in the tree, so this document is where it is checked",
+         "MECHANICALLY since 14z-142 by `tests/test_checkdocs_rom.sh`")
     text = _collapsed("README.md")
     for s in SETS:
         row = re.search(r"\|\s*" + s + r"\s*\|[^|]*\|[^|]*\|\s*`([0-9a-f]{40})`\s*\|", text)
@@ -398,6 +421,137 @@ def _animtable():
     eq("slot 0x8's block range", (0x02A5, 0x02AD), (min(slot8), max(slot8)))
 
 
+@check("id_space.md", "attract_roster_table")
+def _attract():
+    """The attract table's eight rows, in the OPCODE view at stride 4.
+
+    THE VIEW IS A PROPERTY OF THE ACCESS MODE, not of the address. This table
+    is read PC-relative (`move.b $5c08(pc,d0.w),$782(a5)`), so inside the
+    crypt range its truth is the OPCODE image; `select_screen.md`'s tables A
+    and B, two hundred bytes away, are `(An,Dn)` reads and live in the DATA
+    image. Reading either in the other view yields plausible garbage rather
+    than an obvious error — measured here while writing this check.
+
+    `tests/test_attract_roster.sh` already freezes the ROM side. What this
+    adds is the DOCUMENT side: that `id_space.md` still quotes the sequence
+    the image holds. A frozen expectation and a documented claim can drift
+    apart, and only this direction catches that."""
+    says("id_space.md",
+         "the writer's FULL range is the 8-row table `PRG:0x005C08`",
+         "(P1 `0F 02 0C 0E 06 01 09 0D`, P2 `03 00 08 04 0A 05 07 06`)",
+         "still not one variant-half id")
+    j = img("vsavj")
+    rows = [j.bytes(0x005C08 + 4 * k, 4) for k in range(8)]
+    eq("the attract table's P1 column", [0x0F, 0x02, 0x0C, 0x0E, 0x06, 0x01, 0x09, 0x0D],
+       [r[0] for r in rows])
+    eq("the attract table's P2 column", [0x03, 0x00, 0x08, 0x04, 0x0A, 0x05, 0x07, 0x06],
+       [r[1] for r in rows])
+    both = [r[0] for r in rows] + [r[1] for r in rows]
+    if max(both) > 0x0F:
+        raise Mismatch("the attract table names a variant-half id: %s" % _fmt(both))
+
+
+@check("id_space.md", "character_id_writers")
+def _writers():
+    """The two id writers the document names are the stores it says they are."""
+    says("id_space.md",
+         "| `PRG:0x020A80` | `00 01 03 05 06 08` | the select commit (cursor cell) |",
+         "| `PRG:0x00AEF6` | `0A 0C 0E` | the CPU-opponent picker |")
+    j = img("vsavj")
+    # move.b d0,$382(a6) — the select commit writes the cell byte
+    eq("0x020A80 move.b d0,$382(a6)", [0x1D40, 0x0382], j.words(0x020A80, 2))
+    # move.b d1,$382(a1) — the picker writes through a1
+    eq("0x00AEF6 move.b d1,$382(a1)", [0x1341, 0x0382], j.words(0x00AEF6, 2))
+    eq("0x00AED8 moveq #$ff,d0 (the picker's head)", 0x70FF, j.word(0x00AED8))
+
+
+@check("select_screen.md", "direction_table_a")
+def _table_a():
+    """Table A's sixteen bytes, quoted verbatim by the document, in BOTH sets.
+
+    The document's own byte string is parsed out of the text and compared to
+    the image, so the check cannot drift from the sentence it verifies."""
+    says("select_screen.md",
+         "Both are reached by `lea`/`movea.l` and then read `(An,Dn)` — **DATA",
+         "space**. They do not exist in the opcode image",
+         "| A — nibble → direction | `PRG:0x0211D4` | `PRG:0x01FE2C` | 16 B |",
+         "Byte-identical in vsavj and vsav2.")
+    text = _collapsed("select_screen.md")
+    m = re.search(r"### TABLE A — `((?:[0-9a-f]{2} ){15}[0-9a-f]{2})`", text)
+    if not m:
+        raise Stale("select_screen.md no longer quotes TABLE A's bytes")
+    want = [int(x, 16) for x in m.group(1).split()]
+    for s, base in (("vsavj", 0x0211D4), ("vsav2", 0x01FE2C)):
+        eq("%s table A at 0x%06X" % (s, base), want,
+           list(img(s).bytes(base, 16, "data")))
+
+
+@check("select_screen.md", "adjacency_table_b")
+def _table_b():
+    """Table B: 8 bytes x 32 rows of cell indices, none outside the base half."""
+    says("select_screen.md",
+         "| B — 8-way adjacency | `PRG:0x0211E4` | `PRG:0x01588E` | 8 B × **32 rows** |")
+    table("vsavj adjacency table B", 0x0211E4, 32, 8,
+          lambda a: img("vsavj").bytes(a, 8, "data"),
+          lambda v, i: len(v) == 8 and max(v) <= 0x0F)
+
+
+@check("sprite_lists.md", "drawer_entries_three_sets")
+def _drawer():
+    """The drawer's three entry addresses, in all three sets, and the
+    PC-relative dispatch target DERIVED from the instruction — which must be
+    the dispatch-table address the document's own column names."""
+    says("sprite_lists.md",
+         "| vsavj | `PRG:0x01AFA6` | `PRG:0x01AFAE` | `PRG:0x01AFBA` |",
+         "| vsav2 | `PRG:0x0199D4` | `PRG:0x0199DC` | `PRG:0x0199E8` |",
+         "| vhunt2 | `PRG:0x0199DA` | `PRG:0x0199E2` | `PRG:0x0199EE` |")
+    for s, head, entry, disp in (("vsavj", 0x01AFA6, 0x01AFAE, 0x01AFBA),
+                                 ("vsav2", 0x0199D4, 0x0199DC, 0x0199E8),
+                                 ("vhunt2", 0x0199DA, 0x0199E2, 0x0199EE)):
+        im = img(s)
+        eq("%s drawer head movea.l $1c(a6),a0" % s, 0x206E, im.word(head))
+        eq("%s node+0x04 -> sprite list" % s, 0x2068, im.word(head + 4))
+        eq("%s recursion entry move.w (a0)+,d0" % s, 0x3018, im.word(entry))
+        eq("%s dispatch move.w (d8,pc,d0.w),d0" % s, 0x303B, im.word(entry + 2))
+        # brief extension word: the low byte is the displacement from PC+2.
+        target = entry + 4 + (im.word(entry + 4) & 0xFF)
+        eq("%s dispatch table resolved from the instruction" % s, disp, target)
+
+
+@check("venue_assets.md", "venue_pointer_table")
+def _venue():
+    """PRG:0x38C198 — 32 rows of longs, every one a ROM-plausible pointer, so
+    a variant id is a first-class row rather than an over-read."""
+    says("venue_assets.md",
+         "`PRG:0x38C198` is **32 rows of longs**, every one a ROM-plausible pointer,",
+         "and the consumer bounds the index against `#$20`")
+    table("vsavj venue pointer table", 0x38C198, 32, 4,
+          lambda a: img("vsavj").long(a, "data"),
+          lambda v, i: 0x001000 <= v <= 0x3FFFFF)
+
+
+@check("venue_assets.md", "mugshot_and_name_tables")
+def _venue_slots():
+    """The two per-slot venue tables and their strides, and the name stager's
+    own `lea` immediate — which must be the table address the document names."""
+    says("venue_assets.md",
+         "mugshot `PRG:0x89884` (word/char, +0x3800 stager base), name",
+         "`PRG:0x898C4` (8B/char)")
+    j = img("vsavj")
+    # The stager computes id*8 then `lea $898c4(pc),a0` — the immediate is
+    # PC-relative, so derive it and compare with the documented address.
+    eq("0x089684 move.b $382(a4),d0", [0x102C, 0x0382], j.words(0x089684, 2))
+    eq("0x08968A lsl.w #$3,d0 (the 8-byte stride, in the code)", 0xE748,
+       j.word(0x08968A))
+    eq("0x08968C lea (d16,pc),a0", 0x41FA, j.word(0x08968C))
+    eq("the name table resolved from the stager's lea",
+       0x898C4, 0x08968C + 2 + j.word(0x08968E))
+    # 16 mugshot words, each a plausible small tile/record index.
+    table("vsavj mugshot table", 0x89884, 16, 2,
+          lambda a: j.word(a, "data"),
+          lambda v, i: 0x0500 <= v <= 0x06FF)
+
+
 # ================================================================== COVERAGE
 
 def atlas_census(root):
@@ -434,6 +588,12 @@ def report_uncovered(root, verbose):
           "of scope (scope §6.5)" % len(ram_doc))
     print("  SIBLING       %4d of the atlas rows name a vs2/vh2 address"
           % len(sibling))
+    na = sorted(a for a in NOT_ADDRESSES if a in rom_tier)
+    if na:
+        print("  NOT-AN-ADDRESS%4d declared hex literals the census cannot "
+              "distinguish (kept in the denominator; see NOT_ADDRESSES):" % len(na))
+        for a in na:
+            print("                     0x%06X  %s" % (a, NOT_ADDRESSES[a]))
     if len(rom_tier) != DENOMINATOR:
         print("  NOTE: the census now returns %d ROM-tier addresses where this "
               "tool declares %d — the corpus moved; re-read scope §11.2 and "
@@ -454,6 +614,86 @@ def report_uncovered(root, verbose):
                 print("      " + marks)
         print("  (* = the atlas names it as a vs2/vh2 address)")
     return len(covered), len(rom_tier)
+
+
+
+# ------------------------------------------------------------- the frozen set
+
+def covered_rows(root):
+    """(check, doc, addr) for every ATLAS ROM-TIER address a check actually
+    read. Byte addresses a check touched incidentally (a table's interior, an
+    instruction's extension words) are not rows — only addresses the atlas
+    itself names, which is what coverage means."""
+    rom_tier, _ram, _sib = atlas_census(root)
+    by_check = {}
+    for doc, name, _fn in CHECKS:
+        by_check[name] = doc
+    rows = []
+    for name, touched in TOUCHED_BY.items():
+        for v in sorted(set(rom_tier) & touched):
+            rows.append((name, by_check.get(name, "?"), v))
+    return sorted(rows)
+
+
+def write_covered(root, path):
+    rows = covered_rows(root)
+    lines = [
+        "# checkdocs_rom_covered.tsv — the atlas ROM-tier addresses each check",
+        "# actually READS from the decrypted image (14z-142, living-docs L3).",
+        "#",
+        "# WHY IT IS FROZEN: coverage is a NOTE-class number and a number can",
+        "# drift down unnoticed. This is the shrink-only half — a check that stops",
+        "# reaching an address it used to, or a check that disappears, FAILS",
+        "# tests/test_checkdocs_rom.sh. GROWTH is expected and re-freezes:",
+        "#   ROMDIR=... python3 tools/checkdocs_rom.py --freeze",
+        "#",
+        "# Rests on: derived (the addresses are read from the image at run time,",
+        "# not transcribed here by hand). Provenance: tests/expected/PROVENANCE.md.",
+        "#",
+        "# check\tdocument\taddress",
+    ]
+    for name, doc, v in rows:
+        lines.append("%s\t%s\tPRG:0x%06X" % (name, doc, v))
+    Path(path).write_text("\n".join(lines) + "\n")
+    return len(rows)
+
+
+def read_covered(path):
+    out = []
+    for line in Path(path).read_text().splitlines():
+        if not line.strip() or line.startswith("#"):
+            continue
+        name, doc, addr = line.split("\t")
+        out.append((name, doc, int(addr.replace("PRG:0x", ""), 16)))
+    return sorted(out)
+
+
+def check_covered(root, path):
+    """A dropped check or a dropped address FAILS; growth is reported.
+
+    COMPARED AS A MULTISET, not by membership. A list `in` test collapses
+    duplicates, so a frozen file that gained a duplicate row would pass in
+    silence — the defect `audit_rule5.py` shipped at 14z-141 and had to fix
+    for exactly this reason (its inventory is a multiset too). Here a
+    duplicate is also a real signal: it means the freeze was hand-edited."""
+    import collections
+    frozen_c = collections.Counter(read_covered(path))
+    now_c = collections.Counter(covered_rows(root))
+    lost = sorted((frozen_c - now_c).elements())
+    gained = sorted((now_c - frozen_c).elements())
+    for name, doc, v in lost:
+        print("MISMATCH  %-32s no longer covers PRG:0x%06X (%s)" % (name, v, doc))
+    if gained:
+        print("  coverage GREW by %d row(s) — re-freeze with --freeze:" % len(gained))
+        for name, doc, v in gained[:12]:
+            print("    + %-30s PRG:0x%06X  %s" % (name, v, doc))
+    if lost or gained:
+        if not lost:
+            print("  (growth only — no frozen row was lost)")
+    else:
+        print("  ok: the covered set equals the frozen inventory (%d rows)"
+              % sum(frozen_c.values()))
+    return len(lost)
 
 
 # ====================================================================== main
@@ -488,6 +728,10 @@ def main():
                     help="list the addresses no check reaches")
     ap.add_argument("--disasm", action="store_true",
                     help="capstone's reading beside a mismatch (diagnostic)")
+    ap.add_argument("--freeze", action="store_true",
+                    help="rewrite the covered-set TSV from this run")
+    ap.add_argument("--check-covered", action="store_true",
+                    help="every frozen covered row must still be covered")
     args = ap.parse_args()
     root = Path(args.root).resolve()
 
@@ -512,6 +756,7 @@ def main():
 
     bad = 0
     for doc, name, fn in selected:
+        CURRENT[0] = name
         try:
             fn()
         except (Stale, Mismatch, Vacuous) as e:
@@ -522,6 +767,7 @@ def main():
         else:
             tag = "  [PARAPHRASE]" if name in PARAPHRASE else ""
             print("ok        %-32s %s%s" % (name, doc, tag))
+    CURRENT[0] = None
 
     print()
     print("%d checks, %d ok, %d mismatched; %d table controls fired (%s)"
@@ -534,6 +780,16 @@ def main():
     covered = total = 0
     if not args.only and not args.doc:
         covered, total = report_uncovered(root, args.uncovered)
+        tsv = root / COVERED_TSV
+        if args.freeze:
+            n = write_covered(root, tsv)
+            print("  froze %d covered rows -> %s" % (n, COVERED_TSV))
+        elif args.check_covered:
+            if not tsv.exists():
+                print("MISMATCH  the frozen covered set %s is absent" % COVERED_TSV)
+                bad += 1
+            else:
+                bad += check_covered(root, tsv)
         print()
         print("NOTE: checkdocs_rom.coverage %d/%d atlas ROM-tier addresses"
               % (covered, total))

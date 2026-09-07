@@ -1,83 +1,91 @@
-# NEXT SESSION — orientation (rewritten at the 14z-142 CLOSE, 2026-09-07)
+# NEXT SESSION — orientation (rewritten at the 14z-142 CLOSE, 2026-09-08)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## THE ORDER OF WORK IS THE MAINTAINER'S (2026-09-06): THE HARNESS, THEN LIVING DOCS, THEN THE OPEN ITEMS
+## THE MAINTAINER'S ORDER IS COMPLETE THROUGH ITS SECOND ITEM: THE OPEN ITEMS ARE NEXT
 
 *"I need the generic reusable test harness and the living documentation
-effort. After that we'll tackle the open items lined up."* **The harness and
-its skill are DONE (14z-135..139). LIVING DOCS: L1 and L4 landed 14z-140, L2
-landed 14z-141, and L3 — the last slice — is HALF LANDED: its framework
-shipped 14z-142 and its atlas ROM tier finishes next.**
+effort. After that we'll tackle the open items lined up."* (2026-09-06)
 
-## L3 STEP 3 IS NEXT — no STOP left; the rulings are in
+**Both are DONE.** The harness and its skill landed 14z-135..139
+(`~/Developer/blackbox-harness`, public, every slice plus `blackbox-harness`).
+**The living-documentation effort landed in ALL FOUR FORMS**: L1 routing
+enforcement and L4 the rendered site (14z-140), L2 the rule-5 fact census
+(14z-141), L3 the ROM re-derivation (14z-142). The record is
+`docs/project/living_docs_scope.md` — §8/§9/§10/§11, one plan section per
+slice, each with its census, its rulings and what execution changed.
 
-All seven decisions are settled (§11.7, four ruled 2026-09-07 and three taken
-as defaults), so **this one is EXECUTION, not a scoping beat.** The record is
-`docs/project/living_docs_scope.md` §11 — §11.2 the census, §11.3 the six
-findings, §11.5 the seed set, §11.9 the sequencing. Step 3:
+**So the next session starts the OPEN ITEMS, and the first question for the
+maintainer is which one.** None is started; none is urgent; several are
+gameplay calls that are theirs ([VSP-10]).
 
-1. **Seed checks 9-15** — `id_space.md`'s select-commit site `PRG:0x020A80`
-   and the CPU picker, the attract table `PRG:0x005C08`; `select_screen.md`'s
-   `PRG:0x020A98` and tables A/B (`PRG:0x0211D4` / `PRG:0x0211E4`);
-   `sprite_lists.md`'s drawer entries and a list terminator bit;
-   `venue_assets.md`'s `PRG:0x38C198` (32 longs) and the mugshot/name strides.
-   All fifteen claims were verified PRESENT in the documents at the 14z-142
-   opener, so none needs an atlas fix first — but re-read each before quoting.
-2. **`--uncovered`'s listing** recorded in §11 as the next-work list.
-3. **The frozen covered set** `tests/expected/checkdocs_rom_covered.tsv` with
-   its `PROVENANCE.md` row (evidence class `derived`) — a dropped check or
-   address FAILs, growth re-freezes.
-4. **The [VSP-13] grep** for §2.3's "No tool re-derives an atlas claim from the
-   decrypted image" (S1) and `atlas/README.md`'s "this is the only place it is
-   checked" (S4), then §4's L3 row and §11's STATUS to LANDED, the HANDOFF row
-   amended, static tier ALONE, close.
+## THE OPEN ITEMS
 
-## WHAT 14z-142 LEFT THE NEXT SITTING
+**Needs a ruling before work, because it is a gameplay surface:**
+- **`PRG:0x028D50` carries THREE names** — `effect_map_5051` (`huitzil.toml`),
+  `hit_class_props_ext_hi/_lo` (`donovan.toml`), and the guard-MASH RNG mask
+  table (`docs/game/atlas/ram.md` line 156), which the mizuumi corpus calls
+  the Tech-Hit Chance Tables. `audit_rule5.py` classifies the band GAMEPLAY
+  conservatively and carries the conflict in `AUX_POKE_BANDS`. Establishing
+  which name is right is a MEASUREMENT, not a reading.
 
-- **`tools/checkdocs_rom.py` is live**: 8 checks, 9 table controls, `NOTE:
-  checkdocs_rom.coverage 13/346`. A check QUOTES its claim (`says()`) and
-  DERIVES the fact; a reworded document is a STALE verdict, never a silent
-  pass. Add a check by writing it — **coverage cannot be grown automatically**
-  (of 36 atlas instruction spans, ONE sits in a paragraph naming exactly one
-  address and 27 name none, so the pairing is prose).
-- **`PARAPHRASE` is a declared, printed class.** When an atlas sentence is a
-  faithful SUMMARY rather than a transcription — the palette blitter's `or.l
-  #$F000F000` against the image's `or.l d0,(a1)+` — the check asserts the
-  literal fact it summarises. Never silently skipped; a must-fire control
-  perturbs a paraphrase's literal fact.
-- **All three sets are read** (ruled): `decrypt_view` is set-generic, and the
-  atlas's spine is a three-set comparison table.
-- **The atlas is corrected BEFORE a check is written against it**, in its own
-  commit — the order S3 requires. It happened once already: `id_space.md`'s
-  `PRG:0x04FFA8` range claim had an unstated slot-`0x8` exception.
-- **A classifier over prose lies quietly** (both gotchas of this session): 68k
-  mnemonics are English words, so scope to code spans and demand operand
-  syntax; and `\|` is a literal pipe to `grep -E`, which made six present
-  claims read as missing.
+**Measured and waiting on a decision:**
+- **Pyron's capture-keyframe row `0x11` is unported** — a real, grossly
+  visible 2P defect (measured 14z-131, two independent ways). But the
+  MECHANISM is not established: the victim's POSE RECORD also differs and the
+  positioner cannot do that, so a second mechanism is in play. The named next
+  measurement is the pose installer at `PRG:0x27FAA`. **No port
+  recommendation until that is answered.**
+- **The Phobos ±1 damage residue** — 5 of 54 victim/throw cells, ruled WITHIN
+  TOLERANCE and kept open as a KNOWLEDGE item, not a bug. The cheap first step
+  is whether `0x0A` (Sasquatch, a legacy victim) is a cross-generation data
+  difference rather than anything of ours.
+- **The community cross-check aerials** — needs a two-direction jump rig;
+  mizuumi distinguishes neutral- from forward-jump variants where our slot map
+  carries one chain per aerial button.
+
+**Its own session by ruling:**
+- **Zabel j.LK proximity guard** — a deliberate LEGACY-content patch, so
+  outside the superset invariant's untouched set: it needs its own ratified
+  expectation class and its own build flag, a hand-played recording FIRST
+  ([VSP-20]), and archaeology before any theory ([VSP-14]).
+
+**Smaller, and none blocking:**
+- the deferred `audit_mask_window_ff42a2` ruling (deprecated or case-specific);
+- `test_header_defaults` and the positional `[name]` default;
+- `release/merged-m15` was never packaged;
+- #112 option (B), explicitly kept open.
+
+## WHAT L3 LEFT, IF COVERAGE IS GROWN
+
+`tools/checkdocs_rom.py`: 15 checks, 12 table controls,
+`NOTE: checkdocs_rom.coverage 30/346`, frozen at
+`tests/expected/checkdocs_rom_covered.tsv` (31 rows, MULTISET-compared).
+`--uncovered` prints the next-work list per document.
+
+- **Add a check by WRITING it.** Coverage cannot be grown automatically: of 36
+  atlas instruction spans, ONE sits in a paragraph naming exactly one address
+  and 27 name none, so the instruction-to-address pairing is prose.
+- **Declare the VIEW per claim.** Inside `PRG:0x000000-0x0FFFFF` a PC-relative
+  read sees the OPCODE image and an `(An,Dn)` read the DATA image; the wrong
+  one returns plausible garbage, not an error. **Grep `tests/` for the address
+  first** — a gate that already froze it has answered the view and usually the
+  stride ([VSP-155]).
+- **The atlas is corrected BEFORE a check quotes it**, in its own commit. Done
+  twice now: `id_space.md`'s `PRG:0x04FFA8` range exception, and
+  `atlas/README.md`'s "only place it is checked" sentence, which the digest
+  check quotes — so document and checker moved in one commit.
+- `engine_internals.md` is the next document by ruling; `ram.md` never.
 
 ## OPEN, IN ORDER
 
-1. **L3 step 3** — the atlas ROM tier, then the slice lands and the whole
-   living-docs effort is delivered in all four forms.
-2. Then the open items below.
-
-## OPEN ITEMS
-
-Unchanged: `PRG:0x028D50` carries THREE names (`effect_map_5051` in
-`huitzil.toml`, `hit_class_props_ext_hi/_lo` in `donovan.toml`, and the
-guard-MASH RNG mask table at `ram.md` line 156 — mizuumi's Tech-Hit Chance
-Tables); establishing which is right is a measurement on a gameplay surface,
-so the call is the maintainer's ([VSP-10]). Also: the deferred
-`audit_mask_window_ff42a2` ruling (deprecated or case-specific),
-`test_header_defaults` and the positional `[name]` default,
-`release/merged-m15` never packaged, Pyron's row 0x11 (mechanism not
-established; no port recommendation), the Phobos ±1 residue (a knowledge
-item), the community cross-check aerials, the Zabel j.LK session, #112
-option (B).
+1. **Ask the maintainer which open item to take** — the `PRG:0x028D50` naming
+   conflict is the one that most needs their call.
+2. Coverage growth on `checkdocs_rom` is available as filler work at a handful
+   of checks per session, with the frozen set growing each time.
 
 **IF A DOC IS TOUCHED:** `doc_anchor_census --check` + `checkdocshape
 --no-pending` + `checkdocs` + `checkskills` + `gen_annotations --check` +
