@@ -126,6 +126,16 @@ test_skill_guides
 # rows are skipped until their document's own commit; --no-pending is the
 # end-state check. tools/checkdocshape.py; seven must-fire controls. ~2 s.
 test_docshape
+
+# 14z-140 (living-docs L4): the markdown SUBSET the corpus writes,
+# parsed strictly. tools/md_subset.py is a second implementation of
+# markdown, so its subset is a CENSUS and not a guess: all 74 declared
+# documents parse, nine constructs deliberately left out raise, and
+# nine shapes the corpus DOES write are accepted (a code span wrapping
+# a line break, `\|`, an optional leading pipe, a pipe inside a code
+# span, a ragged row, a table-shaped prose line, a <word> placeholder,
+# <details>/<summary>, a known tag inside a code span). ~3 s.
+test_md_subset
 # 14z-122: docs/GOTCHAS.md is GENERATED from the three bucket files' ## headers
 # (one line per entry, wrapped headers merged, anchors stripped) — the
 # hand-maintained index had desynced once and accreted ten session digests,

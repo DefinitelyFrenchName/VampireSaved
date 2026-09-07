@@ -477,10 +477,13 @@ subset is a CENSUS rather than a guess. Gate `tests/test_docs_site.sh`
 
 ### 9.2 Ground truth — the construct census (measured 14z-140, 2026-09-07)
 
-Measured by a throwaway block-level parser over every `doc_shape.tsv`
-document plus the two skill GUIDEs — **74 files, 50,705 lines, 3.8 MB of
-markdown**. When `md_subset.py --census` exists the two must AGREE or this
-table is corrected in the same commit.
+Measured over every `doc_shape.tsv` document plus the two skill GUIDEs —
+**74 files, 50,705 lines, 3.8 MB of markdown**. First by a throwaway
+block-level parser, then **RE-MEASURED by `tools/md_subset.py --census`
+itself, which is the authority and which moved several of these numbers** (a
+throwaway counts what it can see; the real parser counts what it renders).
+The table below is the tool's. `tests/test_md_subset.sh` prints it on every
+run, so it cannot go quietly stale.
 
 **The corpus splits three ways** (the renderer sees all of it): 62
 hand-written documents (42,241 lines, 2,902 KB), 10 GENERATED (6,908 lines,
@@ -491,22 +494,22 @@ hand-written documents (42,241 lines, 2,902 KB), 10 GENERATED (6,908 lines,
 
 | construct | measured | rendering decision |
 |---|---|---|
-| headings | **h1 101 / h2 1,146 / h3 307, and NO h4+** | `h1`-`h3`. Consecutive same-level heading lines with no blank between are ONE wrapped header — **122 of them in 9 files** — as `checkdocshape.h2_sections` and `gen_gotchas_index` already merge them |
-| tables | 246 blocks / 2,544 rows hand-written, 92 / 5,784 generated, in 62 files; none nested | header + separator + rows. **See finding 2 and finding 3: a naive cell split is wrong twice** |
+| headings | **h1 100 / h2 1,029 / h3 307, and NO h4+** | `h1`-`h3`. Consecutive same-level heading lines with no blank between are ONE wrapped header — **122 of them** — as `checkdocshape.h2_sections` and `gen_gotchas_index` already merge them |
+| tables | **337 blocks / 7,655 rows**; none nested; **7 ragged rows**, normalised and counted; **ZERO without a delimiter row** | header + delimiter + rows. **Findings 2-6: a naive cell split is wrong four separate ways** |
 | fenced code | 145 blocks in 27 files; info strings `sh` 31, `bash` 11, `verilog` 7, `c` 4, `powershell` 4, `toml` 4, `ini` 1, `json` 1, the rest bare | `<pre><code class="lang-x">`, escaped verbatim (the box-drawing diagrams stay) |
-| lists | ul 1,716 + 53 nested; ol 456 + 9 nested; continuation lines indented 2 | `ul`/`ol`, continuations JOINED, one nesting level |
-| inline | code spans **31,460** (21,249 hand-written + 9,307 generated + 904 guides); bold 6,328; italic 298; strike **120 in 24 files, load-bearing** | precedence code-span > link > strike > bold > italic; everything else escaped. **Code-span content is escaped and never parsed** |
-| links | **138** `[text](target)`, of which 113 `.md`, 2 `https://`, 6 directory targets (`game/`, `platform/`, `project/`, `game/atlas/` ×2, `project/tables/chars/`) | `.md` → `.html`; a directory target → that directory's `README.md` page; `https://` untouched |
-| blockquotes | 116 blocks in 34 files | `<blockquote>` |
+| lists | ul **2,090** + 53 nested; ol **484** + 9 nested; continuation lines indented 2 | `ul`/`ol`, continuations JOINED, one nesting level |
+| inline | code spans **31,658**; bold 7,229; italic 431; strike **137, load-bearing** | precedence code-span > link > strike > bold > italic; everything else escaped. **Code-span content is escaped and never parsed** |
+| links | **138** `[text](target)`, of which 120 `.md`, 2 `https://`, 16 other (directory targets and in-page `#fragments`) | `.md` → `.html`; a directory target → that directory's `README.md` page; `https://` untouched |
+| blockquotes | **225** blocks | `<blockquote>` |
 | `---` rules | 77 in 21 files | `<hr>` |
 | HTML comments | 8 | stripped |
-| **footnotes, images, task lists, autolinks, reference-link definitions, setext headings, 4-space code blocks** | **0 — all of them** | outside the subset → strict FAIL with `file:line:construct` |
-| raw HTML | **42, and they are TWO different things** — see finding 4 and decision 8 | — |
+| **footnotes, images, task lists, autolinks, reference-link definitions, setext headings, 4-space code blocks, h4+** | **0 — all of them** | outside the subset → strict FAIL with `file:line:construct`, each with a must-fire control |
+| raw HTML | **8 `<details>`/`<summary>` blocks** (accepted, decision 7) and **26 `<word>` placeholders in prose** (text, decision 8) — see finding 4 | — |
 | duplicate heading slugs | 3, all in `docs/NEXT_SESSION_HISTORY.md` (`open-in-order` six times) | `-2`, `-3`, … suffixes |
 | tracked images | 2 (`mister_select_cps2w_f2400.jpg`, `mister_select_mame_f1741.png`), 96.5 KB | copied |
 | rendered size | markdown 3.8 MB → HTML ~6 MB, plus the address index | — |
 
-### 9.3 The four structural findings — each one changes the renderer
+### 9.3 The structural findings — six, each one changing the renderer
 
 1. **A CODE SPAN CAN WRAP ACROSS A LINE BREAK, and a line-based scan splits
    it.** The first census was line-based and reported **76 raw-HTML
@@ -536,6 +539,25 @@ hand-written documents (42,241 lines, 2,902 KB), 10 GENERATED (6,908 lines,
    files and 20 distinct words. Escaping renders them correctly; a strict
    FAIL on "a `<` followed by a letter outside a code span" would fail 22
    documents for writing English. Decisions 7 and 8.
+5. **A PIPE INSIDE A CODE SPAN IN A CELL IS CONTENT** — `WATCH=addr,len[,r|w|rw]`,
+   `who ∈ p1|p2|sys`, `|| true`, all written inside a code span inside a table
+   cell. GFM would split there (it demands `\|` even inside a code span) and
+   so did the first strict pass, which is **four of the seven ragged rows it
+   reported**. The splitter is backtick-aware, which renders the author's
+   obvious intent and is the only reading under which those documents are
+   right. **A ragged row is then NORMALISED as GFM does and COUNTED, never
+   fatal** — seven remain, two of them in ARCHIVES that are never rewritten
+   ([VSP-17]), so a hard failure was never available.
+6. **A TABLE NEEDS ITS DELIMITER ROW.** Without that rule, any prose line
+   containing a pipe and ending in one opens a table — which is how a `bbh`
+   subcommand list written inside a WRAPPED code span
+   (`docs/NEXT_SESSION_HISTORY.md:109-112`) became a 7-cell table, and how
+   the first census reported three "tables with no separator row". With the
+   rule, **that count is ZERO over the whole corpus.** Finding 6 also cost
+   the one bug of this slice: requiring the delimiter made a table-shaped
+   line fall through to the paragraph branch, whose loop broke on
+   `is_table_row` before consuming anything — an infinite loop on the first
+   run. The paragraph branch now always consumes its first line.
 
 ### 9.4 The address index — the plan's parse is unsound, and the module is not
 
@@ -567,10 +589,12 @@ The site therefore shows EVERY carrier where the rendered page shows six.
   (fence / comment / heading + wrapped / rule / table / blockquote / list /
   paragraph, continuations joined — finding 1), then `inline(text) -> html`;
   `census(text) -> Counter`; `SubsetError(file, line, construct)` in strict
-  mode (the default; `--lenient` for the census). Selftests: one synthetic
-  document per construct and one per forbidden construct, plus the four
-  findings as regression cases — a wrapped code span, a `\|` cell, a row
-  with no leading pipe, a `<word>` in prose.
+  mode. Selftests: one per supported construct, one per forbidden construct,
+  and one per rule of §9.3 as a regression case. **LANDED 14z-140**, with
+  `tests/test_md_subset.sh` (ci_portable, family `docs`, ~3 s): all 74 files
+  parse, nine forbidden constructs each have a must-fire control, nine shapes
+  the corpus DOES write each have a must-NOT-fire control, and the gate prints
+  the census on every run so it cannot go quietly stale.
 - **`tools/mk_docs_site.py`** (new, ~500 lines): `--root`, `--out` (default
   `docs/site/`), `--check` (parse and resolve, write nothing — the gate's
   mode), `--census`, `--verify DIR`. Reads `docs/doc_shape.tsv` for the
