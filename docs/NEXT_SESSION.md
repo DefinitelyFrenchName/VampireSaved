@@ -14,7 +14,7 @@ effort. After that we'll tackle the open items lined up."* Both are SCOPED
 in this tree's own harness changed; it "stays as it is". The one file it
 gained is `tests/test_bbh_fidelity.sh`.
 
-## WHERE THE HARNESS IS: COMPLETE THROUGH H9 (`803f372` H1, `ef7e899` H2, `c26ba45` H3, `81ad426` H4, `b533715` H5, `8867dbb` H7, `512747b` H6)
+## WHERE THE HARNESS IS: COMPLETE THROUGH H9 (`803f372` H1, `ef7e899` H2, `c26ba45` H3, `81ad426` H4, `b533715` H5, `8867dbb` H7, `512747b` H6, `7d2456d` H6b — the defaults census: no literal in `lua/mame/` is undeclared, `[machine].profile` has NO default)
 
 `~/Developer/blackbox-harness` (`bbh`), a SEPARATE repository, PUBLIC at
 https://github.com/DefinitelyFrenchName/blackbox-harness (branch `main`;
