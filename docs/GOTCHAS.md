@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-305 entries (40 game / 91 platform / 174 project), counted from the buckets at generation.
+306 entries (40 game / 91 platform / 175 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 40 entries
 
@@ -159,7 +159,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - FBNeo `-hdump`'s specification buffer is 8,192 characters — entries past ~430 frames are DROPPED SILENTLY (paid: 14z-133b)
 - `run_replay_fbneo.sh` with a RELATIVE sandbox argument writes NO log — 0 frames, silently (paid: 14z-133b)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 174 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 175 entries
 
 - A gate that prints `SKIP:` AND exits NON-ZERO is a FAILURE, not a skip (paid: 14z-128)
 - `... | while read` puts the loop in a SUBSHELL, so the `wait` after it waits for nothing (paid: 14z-128)
@@ -335,3 +335,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A CHECK ABOUT A LINK MUST READ THE ATTRIBUTE, NOT THE TEXT — three of one gate's own assertions were wrong the same way (paid: 14z-140)
 - A MUST-FIRE CONTROL CAN BE DEAD IN WAYS THE FIXTURE HIDES — two in a row on one check (paid: 14z-140)
 - THE [VSP-13] RETRACTION GREP MISSES A CLAIM THAT WRAPS — and this corpus wraps at ~76 columns (paid: 14z-140)
+- An HTML generator's output can pass every check and still be malformed — nothing was reading its STRUCTURE (paid: 14z-141)

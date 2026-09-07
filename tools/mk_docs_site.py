@@ -291,7 +291,7 @@ def page_html(title, shape, body, site_rel, base):
             '<a href="%saddresses.html">addresses</a>'
             '<span style="position:relative;flex:1">'
             '<input id="q" type="search" placeholder="search headings, titles, rule IDs…" '
-            'autocomplete="off"><span id="hits"></span></span>'
+            'autocomplete="off"><span id="hits"></span></span></header>'
             % (base, base))
     tag = '<span class="shape">%s</span>' % _html.escape(shape) if shape else ""
     return ("<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\">"

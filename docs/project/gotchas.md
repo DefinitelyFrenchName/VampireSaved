@@ -3994,3 +3994,33 @@ claim is load-bearing, follow it with a wrap-insensitive scan:
 [VSP-13] step 3 says to re-grep afterwards and show the empty result. An empty
 result from a grep that cannot see the claim is worth nothing, and it is the
 step most likely to be trusted without thought.
+
+## An HTML generator's output can pass every check and still be malformed — nothing was reading its STRUCTURE (paid: 14z-141)
+
+`tools/mk_docs_site.py`'s `page_html` emitted `<header class="top">…` and never
+closed it. `tests/test_docs_site.sh` was green throughout: `--check` parsed
+every document, the independent href walk resolved all 84 files, nothing loaded
+from the network, and two renders were byte-identical.
+
+**Every one of those reads the page as TEXT.** A page with an unclosed tag is
+perfectly deterministic and perfectly self-consistent, so byte-equality and
+link resolution cannot see it. What the browser does with it is another matter:
+an unclosed `<header>` swallows everything up to `</body>`, so `.wrap` — the
+whole document — became a FLEX ITEM of a sticky `display:flex;
+align-items:center` bar. The nav rendered as a vertically-centred column down
+the LEFT, the content sat beside it as a second column, and the sticky bar was
+invisible except at mid-page, because the header was now as tall as the page it
+contained.
+
+The maintainer found it by opening the site. No gate could have, and the fix
+for that is not a sharper eye:
+
+**A generator that emits a structured format needs a check that reads the
+STRUCTURE, not the bytes.** Section 9 of the gate is a stack-based tag balance
+over the rendered tree (`html.parser`, which reads `<script>` as CDATA so the
+search box's concatenated hrefs are not parsed as markup), with a must-fire
+control that removes one `</header>` from a copy of the real output. It costs
+about a second and it would have caught this on the render that shipped it.
+
+The same question is worth asking of every other generator here: whose output
+is only ever checked for its content?

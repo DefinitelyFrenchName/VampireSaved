@@ -30,11 +30,18 @@
 # two, to an artifact and a GitHub issue) is a content link the reader clicks,
 # not a LOAD — the assertion is that nothing is FETCHED from the network.
 #
-# MUST-FIRE CONTROLS on synthetic roots (section 5), each must fail for its
+# EVERY PAGE CLOSES WHAT IT OPENS (section 9). The other checks all read the
+# page as TEXT — hrefs, loaded origins, byte-equality — and a malformed page is
+# deterministic and self-consistent, so every one of them passed while
+# `page_html` emitted `<header class="top">` and never closed it (paid 14z-141,
+# `docs/project/gotchas.md`). Structure is its own invariant and needs its own
+# reader.
+#
+# MUST-FIRE CONTROLS on synthetic roots (section 7), each must fail for its
 # stated reason: an unsupported construct; an unresolved link; a dangling
-# anchor; an address-index section that is no heading. Section 6 is the
+# anchor; an address-index section that is no heading. Section 8 is the
 # must-NOT-fire side: a `<name>` inside a code span renders and does not trip
-# the tag check.
+# the tag check. Section 9 carries its own control, on the rendered tree.
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
@@ -225,6 +232,81 @@ if python3 "$TOOL" --root "$W/r5" --check > "$W/r5/log" 2>&1; then
     ok "a <name> placeholder inside a code span: accepted (no over-fire)"
 else
     bad "a <name> in a code span was REJECTED:"; sed 's/^/        /' "$W/r5/log" | head -4
+fi
+
+# --- 9. every rendered page CLOSES what it opens ----------------------------
+# A stack-based read of the emitted HTML: every non-void tag must be closed,
+# in order. This is the check that was missing when the site shipped with an
+# unclosed sticky flex <header> — the browser nested the WHOLE page inside it,
+# so the nav rendered as a vertically-centred left column and the sticky bar
+# was visible only mid-page, while --check, the href walk and determinism were
+# all green. Reads <script> as CDATA (HTMLParser does), so the search box's
+# concatenated hrefs are never parsed as markup.
+balance() {   # balance <site dir>; nonzero + a report on any malformed page
+    python3 - "$1" <<'PY'
+import sys, pathlib
+from html.parser import HTMLParser
+VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link",
+        "meta", "param", "source", "track", "wbr"}
+class Reader(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.open, self.err = [], []
+    def handle_starttag(self, tag, attrs):
+        if tag not in VOID:
+            self.open.append(tag)
+    def handle_endtag(self, tag):
+        if tag in VOID:
+            return
+        if not self.open:
+            self.err.append("</%s> closes nothing" % tag)
+        elif self.open[-1] == tag:
+            self.open.pop()
+        elif tag in self.open:
+            while self.open[-1] != tag:
+                self.err.append("<%s> is never closed (</%s> closed it)"
+                                % (self.open.pop(), tag))
+            self.open.pop()
+        else:
+            self.err.append("</%s> closes nothing that is open" % tag)
+site = pathlib.Path(sys.argv[1])
+bad, pages = [], 0
+for p in sorted(site.rglob("*.html")):
+    r = Reader(); r.feed(p.read_text(encoding="utf-8")); r.close(); pages += 1
+    for e in r.err + ["<%s> is never closed" % t for t in r.open]:
+        bad.append("%s: %s" % (p.relative_to(site), e))
+if bad:
+    for b in bad[:10]:
+        print(b)
+    print("%d structural error(s) across %d page(s)" % (len(bad), pages))
+    sys.exit(1)
+print("%d pages, every tag closed in order" % pages)
+PY
+}
+if balance "$W/site" > "$W/bal.log" 2>&1; then
+    ok "$(tail -1 "$W/bal.log")"
+else
+    bad "malformed page(s):"; sed 's/^/        /' "$W/bal.log" | head -8
+fi
+
+# its MUST-FIRE control: the exact defect, reintroduced on a COPY of the real
+# tree. Perturbing the rendered output is the right surface — the check reads
+# rendered output, and a control must prove THE CHECK is alive.
+cp -R "$W/site" "$W/site_bad"
+python3 - "$W/site_bad/index.html" <<'PY'
+import pathlib, sys
+p = pathlib.Path(sys.argv[1])
+t = p.read_text(encoding="utf-8")
+assert "</header>" in t, "the fixture has no </header> to remove"
+p.write_text(t.replace("</header>", "", 1), encoding="utf-8")
+PY
+if balance "$W/site_bad" > "$W/bal_bad.log" 2>&1; then
+    bad "an unclosed <header> was ACCEPTED — the structure check is dead"
+elif grep -q "header" "$W/bal_bad.log"; then
+    ok "must-fire: an unclosed <header> is caught ($(head -1 "$W/bal_bad.log"))"
+else
+    bad "the structure control fired for the wrong reason:"
+    sed 's/^/        /' "$W/bal_bad.log" | head -4
 fi
 
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi
