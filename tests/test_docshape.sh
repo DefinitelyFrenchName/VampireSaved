@@ -5,8 +5,10 @@
 #
 # WHAT IT HOLDS. `tools/checkdocshape.py` reads docs/doc_shape.tsv (one row
 # per document: class, history twin, requirements) and asserts: completeness
-# (every .md under docs/ except the generated tables/chars/, plus HANDOFF.md,
-# is declared); no session-shaped header in a REFERENCE/REGISTER doc (a
+# (every .md under docs/, plus HANDOFF.md, is declared — the generated
+# tables/chars/ pages were excluded by a hard-coded prefix until 14z-140 and
+# are declared GENERATED instead); no session-shaped header in a
+# REFERENCE/REGISTER doc (a
 # trailing provenance parenthetical is stripped first); no BOLD CHRONOLOGY
 # PARAGRAPH in one either (14z-126b — a paragraph-opening bold run that LEADS
 # with a session token or a `Previous batch` announcement AND carries a
@@ -17,7 +19,14 @@
 # header and no (HISTORY header; HIST files carry no anchors; twins exist and
 # are HIST; declared banner/atlas-rows requirements; no dangling doc link in
 # README/HANDOFF/CLAUDE.md; every docs/x.md 'Section' citation in tools/
-# and tests/ names a real header. SINCE 14z-124 (G7, the pass's close at
+# and tests/ names a real header. SINCE 14z-140 (living-docs slice L1) it also
+# asserts ROUTING — that the map REACHES every document: README COMPLETENESS
+# (every shape row listed in docs/README.md's `## Contents` with its declared
+# shape; a directory entry counts for the members its own line NAMES; a row
+# declared `entry-point` is exempt from Contents, which excludes the level-0
+# entry points on purpose, but must still be named somewhere in the README)
+# and TWO-WAY TWINS (the twin names its live document AND the live document
+# names its twin — the TSV declaration is one-way). SINCE 14z-124 (G7, the pass's close at
 # zero PENDING) the gate runs the tool's --no-pending END-STATE mode: a
 # PENDING row FAILS (control h). During the pass (14z-122/123) PENDING was
 # skipped here — a red gate for the whole pass would have been a decayed gate.
@@ -27,10 +36,16 @@
 # defeated by enforcement, not format).
 #
 # MUST-FIRE CONTROLS on a perturbed copy (RH-9), each must FAIL for its
-# stated reason: a chronology header prepended to a REFERENCE doc; an anchor
-# in a HIST-class doc; an undeclared file; a dead allow row; a required
-# banner absent; a dangling link; a citation of a nonexistent section; a bold
-# chronology paragraph. The must-NOT-fire side of the bold rule is the tree
+# stated reason: a-i, a chronology header prepended to a REFERENCE doc; an
+# anchor in a HIST-class doc; an undeclared file; a dead allow row; a required
+# banner absent; a dangling link; a citation of a nonexistent section; a
+# PENDING row; a bold chronology paragraph. j-o, the routing checks: a listed
+# document dropped from Contents; a Contents shape tag flipped; a twin that
+# stops naming its live document; a live document that stops naming its twin
+# (the other direction — a one-way check passes that one); a directory entry
+# that stops naming a member; an entry-point row named nowhere in the README.
+# n and o exist because those two MECHANISMS are the ways a document could
+# otherwise be waved through in silence. The must-NOT-fire side of the bold rule is the tree
 # itself — 619 bold paragraph openers in the REFERENCE/REGISTER docs, 70 of
 # them carrying a session token, and the rule was calibrated to fire on the
 # eight and none of the other 611 (14z-126b).
@@ -136,5 +151,50 @@ fi
 # ~140 lines, unseen through eight freezes.
 mkcopy "$W/i"; printf '\n**Previous batch (14z-999, ruled): don-m9 / merged-m4.**\n' >> "$W/i/docs/game/atlas/id_space.md"
 control "bold chronology paragraph in a REFERENCE doc" "$W/i" "BOLD CHRONOLOGY PARAGRAPH"
+
+# --- ROUTING (14z-140, living-docs slice L1) ---------------------------------
+# Two checks: every declared document is listed in docs/README.md's `## Contents`
+# with its declared shape, and a history twin names its live document AND is
+# named by it. j-o are their must-fire controls; n and o exist because two
+# MECHANISMS could otherwise wave a document through silently — a directory
+# entry, and the entry-point exemption.
+
+# j: a listed document dropped from Contents
+mkcopy "$W/j"
+sed -i.bak '/defense_rows.md/d' "$W/j/docs/README.md"
+grep -q 'defense_rows.md' "$W/j/docs/README.md" && bad "control j: the README perturbation did not apply"
+control "a listed doc dropped from Contents" "$W/j" "README CONTENTS MISSING: docs/project/tables/defense_rows.md"
+
+# k: a Contents shape tag that disagrees with the declaration
+mkcopy "$W/k"
+sed -i.bak 's|(project/coverage_matrix.md) — \*\*REFERENCE\*\*|(project/coverage_matrix.md) — **INDEX**|' "$W/k/docs/README.md"
+grep -q '(project/coverage_matrix.md) — \*\*INDEX\*\*' "$W/k/docs/README.md" || bad "control k: the README perturbation did not apply"
+control "a Contents shape tag flipped" "$W/k" "README CONTENTS SHAPE MISMATCH: docs/project/coverage_matrix.md"
+
+# l: a twin that does not name its live document
+mkcopy "$W/l"
+sed -i.bak 's|cps2_wide\.md|REDACTED_LIVE|g' "$W/l/docs/project/cps2_wide_history.md"
+grep -q 'cps2_wide\.md' "$W/l/docs/project/cps2_wide_history.md" && bad "control l: the twin perturbation did not apply"
+control "a twin not naming its live document" "$W/l" "TWIN BACK-LINK MISSING: docs/project/cps2_wide_history.md does not name cps2_wide.md"
+
+# m: the live document that does not name its twin (the OTHER direction — a
+# one-way check would pass this and the declaration is one-way already)
+mkcopy "$W/m"
+sed -i.bak 's|cps2_wide_history\.md|REDACTED_TWIN|g' "$W/m/docs/project/cps2_wide.md"
+grep -q 'cps2_wide_history\.md' "$W/m/docs/project/cps2_wide.md" && bad "control m: the live-doc perturbation did not apply"
+control "a live doc not naming its twin" "$W/m" "TWIN BACK-LINK MISSING: docs/project/cps2_wide.md does not name cps2_wide_history.md"
+
+# n: a directory entry covers the members its own line NAMES, never the
+# directory — otherwise a new atlas file is listed by a line nobody edited
+mkcopy "$W/n"
+sed -i.bak '/](game\/atlas\/)/ s|`ram\.md`, ||' "$W/n/docs/README.md"
+grep -q '](game/atlas/).*`ram\.md`' "$W/n/docs/README.md" && bad "control n: the README perturbation did not apply"
+control "a directory entry stops naming a member" "$W/n" "README CONTENTS MISSING: docs/game/atlas/ram.md"
+
+# o: an entry-point row is exempt from Contents, never from the map
+mkcopy "$W/o"
+sed -i.bak 's|annotations\.md|REDACTED_EP|g' "$W/o/docs/README.md"
+grep -q 'annotations\.md' "$W/o/docs/README.md" && bad "control o: the README perturbation did not apply"
+control "an entry-point row named nowhere in the README" "$W/o" "README ENTRY POINT NOT ON THE MAP: docs/annotations.md"
 
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

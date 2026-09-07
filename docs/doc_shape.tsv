@@ -28,21 +28,24 @@
 #              chronology; it must exist and be classed HIST.
 # requires:    "-" or comma-separated of: banner (a "**STATUS" line in the
 #              first 40 lines), atlas-rows (every `## ` section names an
-#              atlas file — CLAUDE.md §5 rule 2).
+#              atlas file — CLAUDE.md §5 rule 2), entry-point (a level-0
+#              entry point: exempt from docs/README.md's "## Contents"
+#              list, which excludes them on purpose, but it must still be
+#              NAMED somewhere in docs/README.md — 14z-140, living-docs L1).
 #
 # --- level 0
 # --- game
 # --- platform
 # --- project
-# --- project/tables (chars/ is generated wholesale and excluded from the walk)
-HANDOFF.md	REFERENCE	HANDOFF_HISTORY.md	-
+# --- project/tables
+HANDOFF.md	REFERENCE	HANDOFF_HISTORY.md	entry-point
 HANDOFF_HISTORY.md	HIST	-	-
-docs/GOTCHAS.md	GENERATED	docs/GOTCHAS_history.md	-
+docs/GOTCHAS.md	GENERATED	docs/GOTCHAS_history.md	entry-point
 docs/GOTCHAS_history.md	HIST	-	-
-docs/NEXT_SESSION.md	ORIENT	docs/NEXT_SESSION_HISTORY.md	-
+docs/NEXT_SESSION.md	ORIENT	docs/NEXT_SESSION_HISTORY.md	entry-point
 docs/NEXT_SESSION_HISTORY.md	HIST	-	-
 docs/README.md	INDEX	-	-
-docs/annotations.md	GENERATED	-	-
+docs/annotations.md	GENERATED	-	entry-point
 docs/game/atlas/README.md	REFERENCE	-	-
 docs/game/atlas/character_tables.md	REFERENCE	-	-
 docs/game/atlas/id_space.md	REFERENCE	-	-
@@ -101,6 +104,11 @@ docs/project/tables/qs_voice_map.md	REFERENCE	-	-
 docs/project/tables/reconciliation.md	REFERENCE	docs/project/tables/reconciliation_history.md	banner
 docs/project/tables/reconciliation_history.md	HIST	-	-
 docs/project/tables/sfx_records.md	REFERENCE	-	-
+# --- project/tables/chars (generated wholesale by tools/charmap_gen.py;
+#     declared 14z-140 so the completeness check can see them)
+docs/project/tables/chars/donovan.md	GENERATED	-	-
+docs/project/tables/chars/huitzil.md	GENERATED	-	-
+docs/project/tables/chars/pyron.md	GENERATED	-	-
 docs/project/tenant_manifest.md	REFERENCE	docs/project/tenant_manifest_history.md	banner
 docs/project/tenant_manifest_history.md	HIST	-	-
 docs/project/visual_smoke_tests.md	REFERENCE	-	-

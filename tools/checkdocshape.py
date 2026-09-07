@@ -52,12 +52,38 @@ ALSO CHECKED: ORIENT = one `# ` header, no `(HISTORY` header (the twin holds
 history); HIST = carries no `**[PFX-N]**` anchor; every named history_twin
 exists and is classed HIST; `requires` = banner (a `**STATUS` line in the
 first 40 lines) / atlas-rows (every `## ` section names an atlas file — a
-`## ` line directly after another is the same header WRAPPED, one section);
+`## ` line directly after another is the same header WRAPPED, one section) /
+entry-point (see ROUTING below);
 LINKS — every markdown link or backticked `docs/...md` path in docs/README.md,
 HANDOFF.md and CLAUDE.md resolves; CITATIONS — every `docs/x.md 'Section'`
 quoted-section citation in tools/ and tests/ names a real header of that file
 (the `x.md §N` numeric form is NOT checked — section numbers are too loosely
 written to verify; the quoted-string form is the load-bearing one).
+
+ROUTING (14z-140, living-docs slice L1: a true claim in a file nobody opens
+is the second problem the effort exists to solve, and the map is
+docs/README.md). Two checks:
+
+  README COMPLETENESS — every shape row is listed in docs/README.md's
+  `## Contents` block, with its declared shape. A DIRECTORY-level entry
+  (a `](dir/)` link) counts for the members its OWN LINE names in
+  backticks, and never for the directory: the atlas line is the model, and
+  its single `**SHAPE**` tag must equal EVERY member's declared class.
+  An EXEMPT row is skipped (the class means "out of the pass's scope").
+  A row whose `requires` carries `entry-point` is exempt from Contents —
+  the four level-0 entry points the Contents preamble excludes on purpose —
+  but must still be named SOMEWHERE in docs/README.md, so it stays on the
+  map; docs/README.md itself is exempt from both (a document need not list
+  itself). MEASURED at the slice's opener, and it is why the matcher is
+  link-shaped: accepting any backticked basename anywhere resolved
+  docs/README.md from the atlas line's `README.md` token and GOTCHAS.md /
+  NEXT_SESSION.md from routing-table prose — three rows green that Contents
+  does not list.
+
+  TWO-WAY TWINS — a history twin's text names its live document's basename
+  AND the live document's text names the twin's. The declaration in the TSV
+  is one-way (live -> twin); the prose was two-way on all nine pairs when
+  the check was written, so it costs nothing and catches regressions.
 ROM-free, emulator-free, ~1 s (ci_portable, tests/test_docshape.sh).
 """
 import argparse
@@ -102,6 +128,13 @@ PROVENANCE_OPENER = re.compile(
 ATLAS_NAMES = ("atlas", "ram.md", "character_tables.md", "id_space.md",
                "select_screen.md", "sprite_lists.md", "venue_assets.md")
 LINK_RE = re.compile(r"\]\(([^)#\s]+\.md)\)|`(docs/[\w./-]+\.md)`")
+# ROUTING: any link target in the README (a directory target has no .md), and
+# the backticked path form an `entry-point` row may be named by.
+ANY_LINK_RE = re.compile(r"\]\(([^)#\s]+)\)")
+TICK_RE = re.compile(r"`([^`]+)`")
+SHAPE_TAG_RE = re.compile(r"\*\*([A-Z]+)\*\*")
+README = "docs/README.md"
+CONTENTS_HEADER = "## Contents"
 CITATION_RE = re.compile(r"(docs/[\w./-]+\.md)\s+\"([^\"]{3,90})\"")
 LINK_DOCS = ["docs/README.md", "HANDOFF.md", "CLAUDE.md"]
 CITATION_DIRS = ["tools", "tests"]
@@ -171,12 +204,14 @@ def read_allow(root, path=ALLOW_TSV):
 
 
 def walk_docs(root):
+    # every `.md` under docs/ plus HANDOFF.md. The generated
+    # docs/project/tables/chars/ pages were excluded by a hard-coded prefix
+    # until 14z-140, when they were declared GENERATED instead (L1
+    # decision 2): an exclusion the completeness check cannot see is how a
+    # fourth tenant's page would arrive unclassified.
     rels = {"HANDOFF.md"}
     for p in (root / "docs").rglob("*.md"):
-        rel = p.relative_to(root).as_posix()
-        if rel.startswith("docs/project/tables/chars/"):
-            continue
-        rels.add(rel)
+        rels.add(p.relative_to(root).as_posix())
     return sorted(r for r in rels if (root / r).is_file())
 
 
@@ -321,6 +356,124 @@ def check_links(root):
     return fails
 
 
+def _contents_block(root):
+    """docs/README.md's `## Contents` block: from its header to the next `## `.
+    Returns [] when the README or the block is absent (a synthetic tree)."""
+    p = root / README
+    if not p.is_file():
+        return []
+    lines = p.read_text(errors="replace").splitlines()
+    try:
+        start = next(i for i, l in enumerate(lines) if l.startswith(CONTENTS_HEADER))
+    except StopIteration:
+        return []
+    end = next((i for i in range(start + 1, len(lines))
+                if lines[i].startswith("## ")), len(lines))
+    return lines[start:end]
+
+
+def _readme_rel(target):
+    """A README link/backtick target -> a repo-relative path. Targets are
+    written relative to docs/, and `../HANDOFF.md` climbs out of it.
+    The prefixes are stripped as PREFIXES: `lstrip("./")` strips a character
+    SET, so it turns `../HANDOFF_HISTORY.md` into `HANDOFF_HISTORY.md` and
+    then the `../` test never fires (paid for at 14z-140, on the first run)."""
+    t = target.strip()
+    if t.startswith("../"):
+        return t[3:]
+    if t.startswith("./"):
+        t = t[2:]
+    return "docs/" + t
+
+
+def _listed_in(lines, rel):
+    """(how, shape_tag) if `rel` is listed by these lines, else (None, None).
+    A DIRECTORY entry covers only the members its own line names in
+    backticks — never the directory — so a new member is caught."""
+    base = Path(rel).name
+    for line in lines:
+        ticks = TICK_RE.findall(line)
+        tag = SHAPE_TAG_RE.search(line)
+        for m in ANY_LINK_RE.finditer(line):
+            tgt = m.group(1)
+            if tgt.startswith(("http:", "https:")):
+                continue
+            cand = _readme_rel(tgt)
+            if cand == rel:
+                return "direct", (tag.group(1) if tag else None)
+            if tgt.endswith("/") and rel.startswith(cand) and base in ticks:
+                return "dir:" + cand, (tag.group(1) if tag else None)
+    return None, None
+
+
+def _named_in_readme(root, rel):
+    """An `entry-point` row must still be on the map: a link anywhere in
+    docs/README.md, or a backticked path that resolves to it."""
+    p = root / README
+    if not p.is_file():
+        return False
+    for line in p.read_text(errors="replace").splitlines():
+        for m in ANY_LINK_RE.finditer(line):
+            tgt = m.group(1)
+            if not tgt.startswith(("http:", "https:")) and _readme_rel(tgt) == rel:
+                return True
+        for tk in TICK_RE.findall(line):
+            if _readme_rel(tk) == rel or tk == rel:
+                return True
+    return False
+
+
+def check_readme_completeness(root, shape):
+    """Every declared document is reachable from the map (14z-140, L1)."""
+    fails = []
+    if not (root / README).is_file():
+        return fails
+    lines = _contents_block(root)
+    if not lines:
+        return [f"{README}: no '{CONTENTS_HEADER}' block to check completeness against"]
+    for rel, row in sorted(shape.items()):
+        if rel == README:
+            continue                      # a document need not list itself
+        if row["cls"] == "EXEMPT":
+            continue                      # "out of the pass's scope", by its
+            # own definition — the map does not carry session logs
+        how, tag = _listed_in(lines, rel)
+        if "entry-point" in row["req"]:
+            # exempt from Contents, never from the map
+            if how is None and not _named_in_readme(root, rel):
+                fails.append(f"README ENTRY POINT NOT ON THE MAP: {rel} "
+                             f"(declared entry-point, named nowhere in {README})")
+            continue
+        if how is None:
+            fails.append(f"README CONTENTS MISSING: {rel} (declared {row['cls']})")
+        elif tag is None and row["cls"] != "HIST":
+            # HIST rows sit in the untagged last group by design; every other
+            # entry states the shape, which is what makes the tag checkable
+            fails.append(f"README CONTENTS SHAPE MISSING: {rel} carries no "
+                         f"**{row['cls']}** tag")
+        elif tag and tag != row["cls"]:
+            fails.append(f"README CONTENTS SHAPE MISMATCH: {rel} listed as "
+                         f"{tag}, declared {row['cls']}")
+    return fails
+
+
+def check_twins_two_way(root, shape):
+    """A twin names its live document and the live document names its twin."""
+    fails = []
+    for rel, row in sorted(shape.items()):
+        twin = row["twin"]
+        if not twin or twin not in shape:
+            continue                      # table-level checks own those
+        lp, tp = root / rel, root / twin
+        if not lp.is_file() or not tp.is_file():
+            continue
+        if Path(rel).name not in tp.read_text(errors="replace"):
+            fails.append(f"TWIN BACK-LINK MISSING: {twin} does not name {Path(rel).name}")
+        if Path(twin).name not in lp.read_text(errors="replace"):
+            fails.append(f"TWIN BACK-LINK MISSING: {rel} does not name {Path(twin).name}")
+    return fails
+
+
 def check_citations(root):
     fails = []
     for d in CITATION_DIRS:
@@ -385,6 +538,8 @@ def check(root, only=None, no_pending=False, verbose=False):
                                  f"(matches no header): {a['rx'].pattern}")
         fails += check_links(root)
         fails += check_citations(root)
+        fails += check_readme_completeness(root, shape)
+        fails += check_twins_two_way(root, shape)
     if verbose:
         print(f"  {len(shape)} declared ({len(pending)} PENDING), {len(walked)} walked")
     return fails, pending
@@ -531,6 +686,71 @@ def selftests():
         f, _ = check(root, no_pending=True)
         if not any("still PENDING" in x for x in f):
             bad.append("--no-pending did not fail a PENDING row")
+
+        # ---- ROUTING: README completeness and two-way twins (14z-140, L1) ----
+        # A clean synthetic map: one bucket entry, one DIRECTORY entry, one
+        # entry-point row named outside Contents, and a twin pair.
+        def routing(contents, live="# A\nsee `a_history.md`\n",
+                    twin="# A — HISTORY (moved verbatim from `a.md`)\n"):
+            doc("docs/a.md", live)
+            doc("docs/a_history.md", twin)
+            doc("docs/atlas/one.md", "# one\n")
+            doc("docs/ep.md", "# ep\n")
+            doc("docs/README.md", contents)
+            shape([("HANDOFF.md", "EXEMPT", "-", "-"),
+                   ("docs/README.md", "INDEX", "-", "-"),
+                   ("docs/a.md", "REFERENCE", "docs/a_history.md", "-"),
+                   ("docs/a_history.md", "HIST", "-", "-"),
+                   ("docs/atlas/one.md", "REFERENCE", "-", "-"),
+                   ("docs/ep.md", "REFERENCE", "-", "entry-point")])
+            return check(root)[0]
+
+        CLEAN = ("# idx\nprose naming [`ep.md`](ep.md) outside Contents\n"
+                 "## Contents\n"
+                 "- [`a.md`](a.md) — **REFERENCE** · a\n"
+                 "- [`atlas/`](atlas/) — **REFERENCE** · `one.md`\n"
+                 "- [`a_history.md`](a_history.md) — history\n"
+                 "## Two rules\n")
+        f = routing(CLEAN)
+        if f:
+            bad.append(f"a clean synthetic README fails routing: {f}")
+        # a listed doc dropped from Contents
+        f = routing(CLEAN.replace("- [`a.md`](a.md) — **REFERENCE** · a\n", ""))
+        if not any("README CONTENTS MISSING: docs/a.md" in x for x in f):
+            bad.append("a document missing from Contents was not caught")
+        # the shape tag flipped
+        f = routing(CLEAN.replace("[`a.md`](a.md) — **REFERENCE**",
+                                  "[`a.md`](a.md) — **INDEX**"))
+        if not any("README CONTENTS SHAPE MISMATCH: docs/a.md" in x for x in f):
+            bad.append("a wrong Contents shape tag was not caught")
+        # the shape tag removed from a non-HIST entry
+        f = routing(CLEAN.replace(" — **REFERENCE** · a", " · a"))
+        if not any("README CONTENTS SHAPE MISSING: docs/a.md" in x for x in f):
+            bad.append("a missing Contents shape tag was not caught")
+        # a directory entry covers the members it NAMES, never the directory
+        f = routing(CLEAN.replace("[`atlas/`](atlas/) — **REFERENCE** · `one.md`",
+                                  "[`atlas/`](atlas/) — **REFERENCE** · the atlas"))
+        if not any("README CONTENTS MISSING: docs/atlas/one.md" in x for x in f):
+            bad.append("a directory entry covered a member it does not name")
+        # an entry-point row is exempt from Contents but not from the map
+        f = routing(CLEAN.replace("prose naming [`ep.md`](ep.md) outside Contents\n", ""))
+        if not any("README ENTRY POINT NOT ON THE MAP: docs/ep.md" in x for x in f):
+            bad.append("an entry-point row named nowhere was not caught")
+        # ... and it is not required in Contents while it IS on the map
+        if any("README CONTENTS MISSING: docs/ep.md" in x for x in routing(CLEAN)):
+            bad.append("an entry-point row was demanded in Contents")
+        # twins, both directions
+        f = routing(CLEAN, twin="# A — HISTORY (moved verbatim)\n")
+        if not any("TWIN BACK-LINK MISSING: docs/a_history.md does not name a.md" in x
+                   for x in f):
+            bad.append("a twin not naming its live document was not caught")
+        f = routing(CLEAN, live="# A\nno mention of the twin\n")
+        if not any("TWIN BACK-LINK MISSING: docs/a.md does not name a_history.md" in x
+                   for x in f):
+            bad.append("a live document not naming its twin was not caught")
+        # `../x` climbs OUT of docs/ (the lstrip character-set trap)
+        if _readme_rel("../HANDOFF_HISTORY.md") != "HANDOFF_HISTORY.md":
+            bad.append("_readme_rel does not resolve a ../ target out of docs/")
     return bad
 
 

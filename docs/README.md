@@ -128,6 +128,7 @@ history twins and are listed last. Level-0 files are the entry points above.
 - [`cps2_wide.md`](project/cps2_wide.md) — **REFERENCE** · the extended hardware profile we defined · history: `project/cps2_wide_history.md`
 - [`doc_audit_14z118.md`](project/doc_audit_14z118.md) — **LOG** · THE DOCUMENTATION AUDIT (maintainer-ruled 2026-08-29, opened 14z-118): the inventory of every document in `docs/`, HANDOFF and the six skills with…
 - [`gate_index.md`](project/gate_index.md) — **GENERATED** · The gate index (GENERATED) · generated (do not edit)
+- [`gate_scoping_method.md`](project/gate_scoping_method.md) — **REFERENCE** · how to scope a comparison gate that survives review: what a second leg can and cannot say, what the mechanism can produce, ordered states over sets, refusing a leg that produced no event, and measuring the cost of widening before arguing about the sample. `[VSP-167]`..`[VSP-174]`
 - [`gotchas.md`](project/gotchas.md) — **REGISTER** · traps in our pipeline and method
 - [`hardening_register.md`](project/hardening_register.md) — **REFERENCE** · THE HARDENING REGISTER — crash-candidate inventory of the merged build
 - [`harness_scope.md`](project/harness_scope.md) — **REFERENCE** · HARNESS SCOPE — extracting the generic black-box harness (`blackbox-harness`) from this project: the four bins, the slices H1-H9, the fidelity contract
@@ -148,6 +149,8 @@ history twins and are listed last. Level-0 files are the entry points above.
 
 **`project/tables/`**
 - [`README.md`](project/tables/README.md) — **REFERENCE** · tables — behavioral data tables (community-reviewable)
+- [`chars/`](project/tables/chars/) — **GENERATED** · the per-tenant character-data maps, ours vs VS2, field by field: `donovan.md`, `huitzil.md`, `pyron.md` (with a `.json` beside each for agents) · generated (do not edit)
+- [`community_crosscheck.md`](project/tables/community_crosscheck.md) — **GENERATED** · our frame data vs the best community reverse engineering, classified EXACT / CONSTANT OFFSET / CONSTANT RATIO / INCONSISTENT / UNCOMPARABLE · generated (do not edit)
 - [`defense_rows.md`](project/tables/defense_rows.md) — **REFERENCE** · Tenant DEFENSE-side rows — DECIDED: keep the vanilla vsavj approximation
 - [`donovan.md`](project/tables/donovan.md) — **GENERATED** · Donovan (char id 0x13) — extraction manifest & behavioral values · generated (do not edit)
 - [`huitzil.md`](project/tables/huitzil.md) — **GENERATED** · Huitzil (Phobos) (char id 0x10) — extraction manifest & behavioral values · generated (do not edit)
@@ -157,6 +160,7 @@ history twins and are listed last. Level-0 files are the entry points above.
 - [`sfx_records.md`](project/tables/sfx_records.md) — **REFERENCE** · Per-tenant sfx record tables (the [[sound_table]] rows)
 
 **Superseded records and history twins (HIST — never rewritten, no anchors)**
+- [`../HANDOFF_HISTORY.md`](../HANDOFF_HISTORY.md) — HANDOFF — HISTORY (blocks moved verbatim from `HANDOFF.md`: the gate fence, the build-registry narratives, the M1/M2a inventories)
 - [`GOTCHAS_history.md`](GOTCHAS_history.md) — GOTCHAS — HISTORY (the hand-written index, moved verbatim from `GOTCHAS.md`)
 - [`NEXT_SESSION_HISTORY.md`](NEXT_SESSION_HISTORY.md) — NEXT_SESSION — HISTORY (superseded openers, moved verbatim from `NEXT_SESSION.md`)
 - [`engine_internals_history.md`](game/engine_internals_history.md) — engine_internals — HISTORY (blocks moved verbatim from `engine_internals.md`)
@@ -168,6 +172,7 @@ history twins and are listed last. Level-0 files are the entry points above.
 - [`beam_port_scope.md`](project/beam_port_scope.md) — SCOPE — porting the beam's effect machine (14z-70g)
 - [`build_dir_triage_history.md`](project/build_dir_triage_history.md) — BUILD-DIR TRIAGE — HISTORY (blocks moved verbatim from `build_dir_triage.md`)
 - [`cps2_wide_history.md`](project/cps2_wide_history.md) — CPS-2 WIDE — HISTORY (blocks moved verbatim from `cps2_wide.md`)
+- [`harness_hardening_history.md`](project/harness_hardening_history.md) — one entry per pass that hardened the TEST HARNESS itself, and the standing list of THE CLASSES of harness rot (also an entry point above)
 - [`mister_scope.md`](project/mister_scope.md) — MiSTer SCOPE — what the documentation/skill distillation should carry, and where each boundary falls
 - [`playtest_m3a_interims.md`](project/playtest_m3a_interims.md) — HISTORICAL — playtest guide for build `1464942a` (14z-62f). DO NOT USE AS AN OPEN LIST.
 - [`quartus_brief.md`](project/quartus_brief.md) — BRIEF — Quartus synthesis of jtcps2w (CPS-2 WIDE on MiSTer)
