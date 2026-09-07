@@ -16,14 +16,14 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**308 scripts** — 67 ci_portable, 72 ci_static, 169 emulator-tier (run by name).
+**309 scripts** — 68 ci_portable, 72 ci_static, 169 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 12 | the suite runners and their own ground truth |
 | [docs](#docs) | 14 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 26 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
-| [pipeline](#pipeline) | 51 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
+| [pipeline](#pipeline) | 52 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 82 | tenant content — per-character gates and on-demand audits on the ported characters |
@@ -149,6 +149,7 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 | `tests/test_record_window.sh` | test | emulator | MAME, a build dir, ~40 s | ground truth for tests/lua/record_window.lua, the in-emulator windowed movie recorder (14z-94). ~40 s, needs ROMDIR + a WIDE build; no frozen expectations. | 14z-94 |
 | `tests/test_region_overlap.sh` | test | ci_static | ROMDIR | freeze what the three tenants' regions do together. | M3b |
 | `tests/test_region_overlap_control.sh` | test | ci_static | ROMDIR | ground truth for tests/test_region_overlap.sh (14z-90, GitHub issue #9). | 14z-90 |
+| `tests/test_rule5_census.sh` | test | ci_portable | — | the rule-5 census is complete, classified and frozen (14z-141, living-docs slice L2). ci_portable: no ROM, no build dir, no emulator, ~6 s (measured). | 14z-141 |
 | `tests/test_s4_thresholds.sh` | test | ci_portable | — | the ratified CLAUDE.md §4 thresholds are declared ONCE and every consumer resolves to that one declaration (14z-93, GitHub #44). No ROMs, no emulator, ~1s. | 14z-93 |
 | `tests/test_select_arrays.sh` | test | emulator | ~13 s | freeze the select-screen record-pointer array, the table M3a's tenant move depends on. | M3a |
 | `tests/test_shared_writes.sh` | test | ci_static | ROMDIR | the frozen shared-surface write inventory (14z-79). | 14z-79 |

@@ -10,9 +10,9 @@
 > that we'll tackle the open items". Slice status is tracked in §4's table,
 > updated in place. **The harness and its skill are DONE and the effort is
 > RUNNING: L1 AND L4 BOTH LANDED 14z-140 (2026-09-07) — their plans, ground
-> truth and rulings are §8 and §9 — and L2 the rule-5 census is SCOPED
-> 14z-141 (§10), decisions 1-4 ruled and the NOTE class open. L3 is next
-> after it. Each slice writes its own plan section (§8 L1, §9 L4, §10 L2,
+> truth and rulings are §8 and §9 — and L2 the rule-5 census LANDED
+> 14z-141 (§10) — the census, the gate and the first migration — so L3 the
+> ROM re-derivation is the one slice left. Each slice writes its own plan section (§8 L1, §9 L4, §10 L2,
 > §11 L3) and STOPS for the maintainer's rulings before any tool is written,
 > as every harness slice did.**
 
@@ -156,7 +156,7 @@ first and moves values into tables second.
 |---|---|---|---|
 | **L1 routing enforcement (markdown)** — **LANDED 14z-140** (2026-09-07), commits `45f116ab` the checks, `a32b9138` HANDOFF's table, `38757605` the atlas README's; the plan and its measured ground truth are §8 | `checkdocshape.py` gains two checks: README COMPLETENESS (every `doc_shape.tsv` row is listed in `docs/README.md` Contents, with its declared shape; a directory-level entry counts for the members it NAMES; a row declared `entry-point` is exempt from Contents but must still be named somewhere in the README) and TWO-WAY TWINS (a HIST twin names its live document and the live document names its twin). Routing tables at the two entry points that lack one: `HANDOFF.md` ("if you want to DO X, read/run Y") and `docs/game/atlas/README.md` ("if you want to know what ADDRESS X is, read Y"). The unlisted documents listed. | 4 unlisted docs (§8.1 — this column said 2 until the 14z-140 census); twins one-way in the table; 2 entry points without routing | the two new checks have must-fire controls on a perturbed copy (`--root`), the static tier is green, and the README lists every declared document |
 | **L4 the rendered site** — **LANDED 14z-140** (2026-09-07); the plan, the census and the rulings are §9 | `tools/mk_docs_site.py`: a generated HTML site under a gitignored directory (the `mister_core.html` precedent — never committed): the landing page IS the routing table; every document rendered with cross-links resolved; an ADDRESS INDEX from `annotations.md` (address → every carrier, one click); the gate index, the gotcha index and the skill guides as pages; the two tracked images; a search box over headings, document titles and the 555 anchor IDs (client-side, no server). Markdown renderer: stdlib-only, the subset this corpus uses (headings, lists, tables, fenced code, bold/italic, links, strikethrough, blockquotes) — **measured 14z-140 over the 74 files that render** (62 hand-written + 10 GENERATED + the 2 skill GUIDEs; this row said 66 documents until then), so the subset is a census and unsupported constructs FAIL the generator rather than render wrong. A portable gate runs the generator over the tree and fails on any unresolved link or unsupported construct; the HTML is the artifact, the generator is what is reviewed. | `mk_mister_page.py` is the pattern; no site exists | `tests/test_docs_site.sh` (ci_portable) green; the maintainer has opened the site |
-| **L2 fact tables with provenance** — **SCOPED 14z-141** (2026-09-07); the plan, the census and the rulings are §10 | `tools/audit_rule5.py`: the census — every behavioural value in `build/manifest/*.toml` and in the generators (damage, timings, meter, variant selection, re-point defaults, thresholds, frozen op counts) classified IN-TABLE (present in `docs/project/tables/` with provenance) / BAKED (in a manifest row or a generator constant only) / DERIVED (computed from a table at build time); the ratio reported as a NOTE-class number in the static tier first (never fatal — "a number that moves in the wrong direction is the signal"), then a gate freezing the BAKED inventory so it can only shrink. Then, value by value where the census says BAKED: a table row with provenance (measured / derived / testimony, the session, the rig), the manifest reading the table rather than carrying the value. | rule 5 honoured to an unmeasured degree; `tables/` has 13 declared documents, 7 GENERATED (this column said 9 and 4 until the 14z-141 census — L1 declared the three `chars/` pages) | the ratio is measured and frozen; the BAKED inventory shrinks per session with a ledger |
+| **L2 fact tables with provenance** — **LANDED 14z-141** (2026-09-07); the plan, the census, the rulings and what execution changed are §10 | `tools/audit_rule5.py`: the census — every behavioural value in `build/manifest/*.toml` and in the generators (damage, timings, meter, variant selection, re-point defaults, thresholds, frozen op counts) classified IN-TABLE (present in `docs/project/tables/` with provenance) / BAKED (in a manifest row or a generator constant only) / DERIVED (computed from a table at build time); the ratio reported as a NOTE-class number in the static tier first (never fatal — "a number that moves in the wrong direction is the signal"), then a gate freezing the BAKED inventory so it can only shrink. Then, value by value where the census says BAKED: a table row with provenance (measured / derived / ruled, the session, the rig) and an `in-table` pointer joining the two, CHECKED so they cannot drift — the manifest KEEPS the value (option B, maintainer-ruled 2026-09-07). This column said "the manifest reading the table rather than carrying the value" until then; that is option A, which would make a documentation edit able to move a shipped ROM byte, and it was not taken. | rule 5 honoured to an unmeasured degree; `tables/` has 13 declared documents, 7 GENERATED (this column said 9 and 4 until the 14z-141 census — L1 declared the three `chars/` pages) | the ratio is measured and frozen; the BAKED inventory shrinks per session with a ledger |
 | **L3 ROM re-derivation (the SMS `checkdocs` class)** | `tools/checkdocs_rom.py`: for atlas claims with a CHECKABLE SHAPE — the opcode word or instruction at a `PRG:` address (the disassembler already exists), a table's row count / stride / entry values, a pointer's target, a string's bytes — quote the claim from the document (assert it is still there), derive the fact from the decrypted image (`build/out/vsavj_opcodes.bin` / `_data.bin` via `tests/lib/decrypt_cache.sh`), compare; `--uncovered` lists every `annotations.md` tier-0 address no check reaches, as the coverage number. Seeded from the atlas (tier 0) first — `ram.md` claims are RAM and need the emulator, so the ROM tier is `character_tables.md`, `id_space.md`, `select_screen.md`, `sprite_lists.md`, `venue_assets.md` — then `engine_internals.md`. Static tier (needs ROMDIR), NOTE-class coverage first, then frozen. | zero claims re-derived from the image today; 2,970 address rows claimed | the coverage number is measured, reported and frozen; every hand-written check quotes its claim |
 
 Order: **L1 → L4 → L2 → L3.** Enforcement first (STATE's own hold), and L1
@@ -803,11 +803,41 @@ in ci_portable and the maintainer has opened the site.
 
 ## 10. L2 — FACT TABLES WITH PROVENANCE: scope (the plan before the work)
 
-**STATUS: SCOPED 14z-141 (2026-09-07).** Beat 1 measured, beat 2 written,
-and decisions 1-4 were RULED at the STOP the same sitting — one of them
-(decision 2) after a correction to my own framing that the measurement
-forced. The NOTE class (decision 5, the one cross-slice decision) is open.
-Nothing is built yet; `tools/audit_rule5.py` does not exist.
+**STATUS: LANDED 14z-141 (2026-09-07).** All five decisions ruled at the
+STOP — decision 2 after a correction to my own framing that the measurement
+forced, and the NOTE class approved — then §10.9 executed the same sitting:
+`tools/audit_rule5.py`, the frozen inventory, the gate, the ledger and the
+FIRST MIGRATION. Measured at the close: **gameplay 15 IN-TABLE / 202 BAKED of
+217; fact 511 derived / 7,827 baked of 8,338; code 30 baked of 30**;
+UNCLASSIFIED 0.
+
+**FOUR THINGS THE BUILD CHANGED, each because running it measured something
+the plan could not:**
+- **IN-TABLE is POINTER-DRIVEN, not inferred.** A value-matching pass returned
+  19 gameplay rows IN-TABLE and ALL NINETEEN were false positives (key `R` of
+  an adjacency row matches any table line containing an `r`; `id` matches the
+  `ids` column of `qs_voice_map.md`). Small integers and short key names match
+  everywhere. A value is IN-TABLE only when the manifest SAYS which table
+  documents it — `# in-table:` in TOML, `_in_table` in JSON — and that table
+  really carries the value; a pointer whose table lacks it is a PROBLEM, not a
+  silent BAKED, because that is a half-landed migration.
+- **The FROZEN inventory is `gameplay` + `code` only.** Freezing `fact` made
+  the file 8,059 rows of addresses and hex; ordinary port work adds those
+  every session, so the gate would fail on routine edits and be answered by a
+  reflexive re-freeze. A shrink-only signal that fires on every commit is not
+  a signal. `fact` is a NOTE-class number instead. Frozen: 232 rows.
+- **`KNOWN_PAIRS` restores the UNCLASSIFIED tripwire.** Unknown keys defaulted
+  to `fact`, so a manifest gaining `damage = 12` would have passed in silence
+  — the one thing the census exists to prevent. The 389 measured pairs are
+  embedded; anything else fails until a person classifies it.
+- **`probe_*.toml` is excluded by GLOB, not by `git ls-files`.** Found by the
+  gate's own control: under `--root` the canon falls back to a filesystem
+  walk, so the tool measured something different in a test than in the tree.
+
+**AND ONE DEFECT OF MINE, found by a must-fire control:** `--check` diffed by
+SET while comparing by LIST, so a new row identical to an existing one
+reported nothing and exited 1 in SILENCE. The inventory is a MULTISET — the
+same `(file, kind, key, value)` occurs in many tables of one manifest.
 
 ### 10.1 What it delivers
 
@@ -1000,8 +1030,13 @@ reads UNCLASSIFIED rather than FACT.
    choosing the rule. Measured in 10.4; the rule follows from it.
 4. **The `code` column.** RULED: option (a) — module-level named constants,
    with the blind spot stated rather than papered over.
-5. **The NOTE class** (the one cross-slice decision, plan section 5) — OPEN.
-   Recommendation on record: a `NOTE: <key> <value>` line printed by the gate
+5. **The NOTE class** (the one cross-slice decision, plan section 5). RULED:
+   approved as recommended and SHIPPED the same sitting —
+   `tests/run_all_static.sh` gained the advisory block,
+   `tests/test_static_runner.sh` section 9 is its ground truth (surfaced,
+   tally untouched, exit status untouched, prose containing "note" NOT
+   surfaced, and the empty case says `(none)`), and `tests/lib/classify.sh`
+   carries the convention in its header. The recommendation was: a `NOTE: <key> <value>` line printed by the gate
    and surfaced by an advisory block in `tests/run_all_static.sh`, never a
    fifth verdict in `tests/lib/classify.sh` (a verdict is per gate, a NOTE is
    per number, and L2 prints three).

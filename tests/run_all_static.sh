@@ -264,6 +264,32 @@ else
     fi
 fi
 
+# NOTE-class numbers: measurements a gate REPORTS but never gates on (ruled
+# 2026-09-07, living-docs L2). A NOTE is per NUMBER where a verdict is per
+# GATE, so it is deliberately NOT a fifth verdict in tests/lib/classify.sh —
+# that would have to reach all three runners and their ground truths, and
+# reopen the classifier divergence 14z-139 closed. The convention: a gate
+# prints `NOTE: <key> <value>` at column 0, exits 0 with its usual PASS, and
+# this block surfaces it. A number moving the wrong way is the signal.
+echo
+echo "== NOTE-class numbers (reported, never fatal) =="
+_notes=0
+for _f in "$WORK"/*.out; do
+    [ -f "$_f" ] || continue
+    _g="$(basename "$_f" .out)"
+    while IFS= read -r _line; do
+        # An EMPTY command substitution still feeds `read` one blank line, so
+        # without this guard the block printed a row for every gate in the
+        # tier with nothing after its name (measured on the first run).
+        [ -n "$_line" ] || continue
+        printf '  %-34s %s\n' "$_g" "${_line#NOTE: }"
+        _notes=$((_notes + 1))
+    done <<EOF
+$(grep '^NOTE: ' "$_f" 2>/dev/null || true)
+EOF
+done
+[ "$_notes" = 0 ] && echo "  (none)"
+
 echo
 echo "======================================================================"
 printf 'PASS %-4s  SKIP %-4s  FAIL %-4s  MISSING %s\n' \

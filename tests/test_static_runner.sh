@@ -199,6 +199,41 @@ for r in run_all_static run_all_emulator run_battery_m2; do
     fi
 done
 
+echo "== 9. NOTE-class numbers are SURFACED and are not verdicts (14z-141) =="
+# A NOTE is per NUMBER where a verdict is per GATE, so it must not touch the
+# tally, must not change the exit status, and must be visible without anyone
+# opening a log. The must-NOT-fire half matters as much: prose that merely
+# contains the word "note" is not a NOTE line.
+mk g_note 0 "PASS: fine" "NOTE: rule5.gameplay in-table 15 baked 202"
+mk g_noteprose 0 "PASS: fine" "a note: something" " Note: prose"
+printf 'g_pass\ng_note\ng_noteprose\n' > "$FR/tests/ci_portable.txt"
+: > "$FR/tests/ci_static.txt"
+out="$(cd "$FR" && sh tests/run_all_static.sh 2>&1)" && st=0 || st=$?
+# Read the BLOCK, not the whole log: the tier prints a result row per gate,
+# so a bare grep for a gate name matches its verdict line and any control
+# built on that is dead (measured on the first write, 14z-141).
+noteblock() { printf '%s\n' "$1" | awk '/^== NOTE-class numbers/{f=1;next} /^====/{f=0} f'; }
+printf '%s\n' "$(noteblock "$out")" | grep -q 'g_note  *rule5.gameplay in-table 15 baked 202' \
+    && echo "  ok: the NOTE line is surfaced, named by its gate" \
+    || fail "the NOTE line was not surfaced"
+printf '%s\n' "$out" | grep -q 'PASS 3 ' \
+    && echo "  ok: a NOTE does not disturb the tally (3 PASS)" \
+    || fail "the tally moved: $(printf '%s\n' "$out" | grep '^PASS ')"
+[ "$st" = 0 ] && echo "  ok: a NOTE does not change the exit status" \
+              || fail "a NOTE changed the runner's exit status ($st)"
+printf '%s\n' "$(noteblock "$out")" | grep -q 'g_noteprose' \
+    && fail "prose containing 'note' was surfaced as a NOTE" \
+    || echo "  ok: prose containing the word note is NOT a NOTE line"
+# the control's own LIVENESS: the block reader must really see g_note there
+printf '%s\n' "$(noteblock "$out")" | grep -q 'g_note ' \
+    || fail "the block reader sees nothing - the must-NOT-fire control is dead"
+# and the empty case must say so rather than printing a row per gate
+printf 'g_pass\n' > "$FR/tests/ci_portable.txt"
+out2="$(cd "$FR" && sh tests/run_all_static.sh 2>&1)"
+printf '%s\n' "$(noteblock "$out2")" | grep -q '(none)' \
+    && echo "  ok: with no NOTE anywhere the block says (none)" \
+    || fail "the empty NOTE block printed rows: $(printf '%s\n' "$out2" | grep -A3 'NOTE-class')"
+
 echo
 [ "$rc" = 0 ] && echo "PASS: the runner's verdicts mean what they say." \
              || echo "FAIL: see above."

@@ -40,6 +40,14 @@
 # Ground truth: tests/test_static_runner.sh (§1, §8), test_emulator_runner.sh
 # (§12) and test_battery_accounting.sh (§3-§6) — every runner is exercised
 # against stub gates of each shape, through the shipped code, never a copy.
+#
+# NOTE LINES ARE NOT VERDICTS (14z-141). A gate may print `NOTE: <key> <value>`
+# at column 0 beside its normal output and still exit 0 with its usual PASS: a
+# verdict is per GATE, a NOTE is per NUMBER, and one gate can report several.
+# This classifier deliberately does not know about them - adding a fifth
+# verdict here would have to reach all three runners and their ground truths,
+# reopening the divergence 14z-139 closed. `run_all_static.sh` surfaces them in
+# an advisory block instead; `test_static_runner.sh` section 9 is the proof.
 
 vs_classify() {
     _st="$1"; _log="$2"; _w="${3:-90}"

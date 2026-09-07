@@ -1,9 +1,19 @@
 # tables — behavioral data tables (community-reviewable)
 
 Every tunable a player could feel (damage, timings, meter rules, variant
-selection) lives here in documented table form, extracted by rerunnable
-scripts in `tools/` (CLAUDE.md §2 rule 5). Nothing gameplay-affecting hides
-in code or manifests.
+selection) belongs here in documented table form, extracted by rerunnable
+scripts in `tools/` (CLAUDE.md §2 rule 5).
+
+**How far that holds is now MEASURED, not asserted (14z-141).** This page used
+to end "Nothing gameplay-affecting hides in code or manifests", which was
+never checked and, measured, was not true. `tools/audit_rule5.py` counts it:
+**15 of 217 gameplay values are IN-TABLE, 202 still BAKED** — and the honest
+framing of the remainder is that damage, timings and meter are not here
+because this port moves them as ROM DATA REGIONS rather than authoring them,
+while rule 5's fourth category, VARIANT SELECTION, is authored and is what the
+202 mostly are. The count is a NOTE-class number in the static tier, the BAKED
+inventory is frozen so it can only shrink, and every migration is a row of
+[`rule5_ledger.md`](rule5_ledger.md).
 
 *(Rewritten 14z-118. Until then this README opened with "Empty until a
 ported character exists" over a populated directory and promised

@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 2958 |
+| distinct program-space addresses named | 2965 |
 | named by a document or manifest only | 2045 |
 | named by both a document/manifest and code | 602 |
-| named by CODE ONLY (the gap list below) | 311 |
+| named by CODE ONLY (the gap list below) | 318 |
 | carried by atlas | 473 |
 | carried by engine_internals | 535 |
 | carried by other docs | 946 |
 | carried by manifests | 1780 |
-| carried by code | 913 |
+| carried by code | 920 |
 
 ## Addresses
 
@@ -1003,7 +1003,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x028D34` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x028D48` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x028D4E` | docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — hit_class_props_ext_lo; build/manifest/huitzil.toml — effect_map_4e4f; build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; +1 more |
-| `PRG:0x028D50` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/project/inferred_claims.md — G2/G3 — measurements feeding engine_internals; build/manifest/donovan.toml — hit_class_props_ext_hi; build/manifest/donovan.toml — hit_class_props_ext_lo; build/manifest/huitzil.toml — effect_map_5051; +3 more |
+| `PRG:0x028D50` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/project/inferred_claims.md — G2/G3 — measurements feeding engine_internals; build/manifest/donovan.toml — hit_class_props_ext_hi; build/manifest/donovan.toml — hit_class_props_ext_lo; build/manifest/huitzil.toml — effect_map_5051; +4 more |
 | `PRG:0x028D52` | build/manifest/huitzil.toml — effect_map_5253; build/manifest/shared_writes.toml — huitzil |
 | `PRG:0x028D53` | docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); tools/gen_donovan_patch.py |
 | `PRG:0x028D54` | build/manifest/donovan.toml — hit_class_props_ext_hi; tests/test_advancing_guard.sh |
@@ -2731,6 +2731,8 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x01C186` | tests/test_dualtrack.sh |
 | `PRG:0x01C3BA` | tests/audit_mask_window_ff42a2.sh |
 | `PRG:0x01C424` | tools/gen_donovan_patch.py; tools/select_port.py |
+| `PRG:0x01C800` | tools/audit_rule5.py |
+| `PRG:0x01C830` | tools/audit_rule5.py |
 | `PRG:0x01F620` | tools/select_wheel.py |
 | `PRG:0x01F638` | tools/audit_id_space.py |
 | `PRG:0x01F646` | tools/select_wheel.py |
@@ -2775,6 +2777,8 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x028065` | tests/test_capture_pose_sources.sh |
 | `PRG:0x0282BA` | tools/audit_id_space.py |
 | `PRG:0x0282D8` | tests/test_checkdocs.sh; tools/checkdocs.py |
+| `PRG:0x028D40` | tools/audit_rule5.py |
+| `PRG:0x028D60` | tools/audit_rule5.py |
 | `PRG:0x029AB2` | tests/test_qs_songs.sh |
 | `PRG:0x02AD78` | tests/test_pod_black_foot_palette.sh |
 | `PRG:0x02B674` | tests/test_variant_dispatch.sh |
@@ -2863,6 +2867,9 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x0837D4` | tools/overlay_port.py |
 | `PRG:0x088C58` | tests/test_m2a_stage4_code.sh |
 | `PRG:0x08972C` | tests/test_m2a_stage4_code.sh |
+| `PRG:0x089800` | tools/audit_rule5.py |
+| `PRG:0x089900` | tools/audit_rule5.py |
+| `PRG:0x089980` | tools/audit_rule5.py |
 | `PRG:0x08A362` | tests/test_m2a_stage4_code.sh |
 | `PRG:0x08A49A` | tests/test_m2a_stage4_code.sh |
 | `PRG:0x08A510` | tests/test_m2a_stage4_code.sh |
@@ -2920,7 +2927,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x0FC6AC` | tests/test_pyron_blink.sh |
 | `PRG:0x0FD180` | tests/test_index_window_thunk.sh |
 | `PRG:0x102436` | tests/test_biased_list_inventory.sh |
-| `PRG:0x123456` | tests/test_manifest_merge.sh; tests/test_type_stamp_census.sh; tools/checkskills.py |
+| `PRG:0x123456` | tests/test_manifest_merge.sh; tests/test_rule5_census.sh; tests/test_type_stamp_census.sh; tools/audit_rule5.py; tools/checkskills.py |
 | `PRG:0x13FAA2` | tests/audit_don_grab_pose.sh |
 | `PRG:0x157A50` | tests/audit_don_grab_pose.sh |
 | `PRG:0x157F00` | tests/test_don_reactions.sh |

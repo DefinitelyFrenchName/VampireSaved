@@ -189,3 +189,10 @@ test_mra_parts
 # compiles (tools/charmap_compile.py) into the marked [[region_fix]] block of the
 # tenant manifest; the committed block must equal a fresh compile. Three
 # must-fire controls (wrong expect, length mismatch, stale block). ~1 s.
+test_rule5_census
+# the rule-5 census (living-docs L2, 14z-141): every behavioural value in
+# the canonical manifests and the generators classified IN-TABLE / BAKED /
+# DERIVED, with the GAMEPLAY and CODE inventory frozen so it can only
+# SHRINK. Six must-fire controls on a copy (a new key, a new baked value,
+# an aux_poke outside every declared band, drift, growth refusal) plus the
+# no-fire that a probe_*.toml never reaches the census. ~6 s.

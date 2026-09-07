@@ -84,27 +84,32 @@
   {
    "from": "0x08",
    "dir": "D",
-   "to": "0x10"
+   "to": "0x10",
+   "_in_table": "tables/select_wheel.md"
   },
   {
    "from": "0x09",
    "dir": "D",
-   "to": "0x13"
+   "to": "0x13",
+   "_in_table": "tables/select_wheel.md"
   },
   {
    "from": "0x0B",
    "dir": "D",
-   "to": "0x11"
+   "to": "0x11",
+   "_in_table": "tables/select_wheel.md"
   },
   {
    "from": "0x0B",
    "dir": "DL",
-   "to": "0x10"
+   "to": "0x10",
+   "_in_table": "tables/select_wheel.md"
   },
   {
    "from": "0x0B",
    "dir": "DR",
-   "to": "0x13"
+   "to": "0x13",
+   "_in_table": "tables/select_wheel.md"
   }
  ],
  "_art_note": "tile/attr copied from vsav2's own newcomer wheel record (PRG:0x2A6E52, entries 21-23). The tile CODES are placeholders until the art is placed in our gfx; the palette rows (0x13/0x11/0x05) are vs2 rows that vsavj uses for other characters, so colours will be off until the palette work lands. Maintainer: imperfect medallion art is acceptable, mechanical soundness is not.",
