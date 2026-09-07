@@ -3807,3 +3807,44 @@ moved and not rewritten, and `test_static_runner.sh` §8 locks the sourcing
 LIBRARY, never a block that travels by copy; a fix to a classifier is
 followed by a grep for its siblings.
 
+
+## `lstrip("./")` STRIPS A CHARACTER SET, NOT A PREFIX — `../x.md` came out as `docs/x.md` and the `../` branch never fired (paid: 14z-140)
+
+`checkdocshape.py`'s README-completeness check resolves a link target
+written relative to `docs/` into a repo-relative path, and `../HANDOFF.md`
+has to climb out of `docs/`. The helper read
+
+    t = target.strip().lstrip("./")
+    return t[3:] if t.startswith("../") else "docs/" + t
+
+`str.lstrip(chars)` removes any leading character IN THE SET, so
+`"../HANDOFF_HISTORY.md".lstrip("./")` is `"HANDOFF_HISTORY.md"` — the
+`../` the next line tests for has already been eaten, and the target
+resolves to `docs/HANDOFF_HISTORY.md`, which is not a file anyone declared.
+The check then reported `README CONTENTS MISSING` for a document that WAS
+listed, one line after it had been listed. Found by the gate's own control
+j on its first run, which is the only reason it took a minute rather than a
+theory. The rule: strip prefixes with `startswith` + a slice, or
+`removeprefix` where the Python floor allows it (3.9.6 here, so it does
+not); `lstrip`/`rstrip` take a SET and are for whitespace and padding. Grep
+the class: `lstrip("` or `rstrip("` with more than one character in the
+literal.
+
+## A COMPLETENESS CHECK IS ONLY AS GOOD AS ITS MATCHER — a loose one reported coverage the map did not have (measured 14z-140)
+
+L1's question is "does `docs/README.md` reach every declared document?", and
+the first matcher tried was the generous one: a `](path)` link, OR any
+backticked token that resolves to the path. Measured against the tree, it
+turned THREE rows green that the `## Contents` block does not list —
+`docs/README.md` resolved from the atlas line's `` `README.md` `` token
+(which means `docs/game/atlas/README.md`), and `docs/GOTCHAS.md` and
+`docs/NEXT_SESSION.md` from prose in the routing table above Contents. A
+bare basename is ambiguous across directories, and prose names documents it
+is not listing. The matcher that ships is link-shaped and scoped: a
+`](path)` link target, or a DIRECTORY-level link whose own line names the
+member's basename in backticks — so a directory entry covers the members it
+NAMES and never the directory, which is the must-fire control `n`. The
+general rule: when a check asks "is X covered", measure the matcher against
+the corpus BEFORE trusting its green — a matcher that is loose in the
+direction of PASS reports the coverage you wanted rather than the coverage
+you have.

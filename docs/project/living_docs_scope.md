@@ -3,15 +3,17 @@
 > **STATUS (written 14z-135, 2026-09-06): THE PLAN BEFORE THE WORK.** The
 > maintainer RULED at the plan stage (2026-09-06) that the effort takes ALL
 > THREE forms put to them: a rendered, navigable site; routing enforcement in
-> the markdown; and fact tables with provenance. Nothing is built yet. It
-> starts AFTER the generic harness slices and the harness skill
+> the markdown; and fact tables with provenance. It started AFTER the generic
+> harness slices and the harness skill
 > (`harness_scope.md` §4), by the maintainer's order of 2026-09-06: "the
 > generic reusable test harness and the living documentation effort. After
 > that we'll tackle the open items". Slice status is tracked in §4's table,
-> updated in place. **The harness and its skill are DONE, so the effort is
-> RUNNING: L1's plan is §8, written 14z-140 (2026-09-07), and its six
-> decisions are open. Each slice writes its own plan section — §8 L1, §9 L4,
-> §10 L2, §11 L3 — before any tool is written, as every harness slice did.**
+> updated in place. **The harness and its skill are DONE and the effort is
+> RUNNING: L1 LANDED 14z-140 (2026-09-07) — its plan, ground truth and
+> rulings are §8 — and L4 the rendered site is next. Each slice writes its
+> own plan section (§8 L1, §9 L4, §10 L2, §11 L3) and STOPS for the
+> maintainer's rulings before any tool is written, as every harness slice
+> did.**
 
 Written 14z-135 as the scope of the maintainer's direction of 2026-08-24
 (STATE "Decisions pending"), in their words: an effort *"not replacing your
@@ -77,7 +79,7 @@ rebuild's precondition), the rendered site (3, and the carrier of 2).
 
 | mechanism | what it catches | tool / gate |
 |---|---|---|
-| declared SHAPE per document; a new document must be classified at birth; session-shaped headers barred from reference material; a history twin must exist and be HIST; HIST carries no anchors | chronology re-accreting into a reference; an unclassified document | `tools/checkdocshape.py`, `docs/doc_shape.tsv`, `tests/test_docshape.sh` (`--no-pending`) |
+| declared SHAPE per document; a new document must be classified at birth; session-shaped headers barred from reference material; a history twin must exist and be HIST; HIST carries no anchors; **and since 14z-140 (L1) ROUTING** — every declared document listed in `docs/README.md`'s `## Contents` with its declared shape (a directory entry counts for the members it NAMES; an `entry-point` row is exempt from Contents but must still be named in the README), and a history twin two-way | chronology re-accreting into a reference; an unclassified document; **a true claim in a document the map does not reach** | `tools/checkdocshape.py`, `docs/doc_shape.tsv`, `tests/test_docshape.sh` (`--no-pending`, 15 must-fire controls) |
 | every skill rule anchored `**[PFX-N]**` at the paragraph it distils, locked both ways; a number a skill quotes must appear in a LOG; level-0/1 skills may not name a game token | a rule whose fact moved; a skill inventing a number | `tools/checkskills.py`, `tests/test_checkskills.sh` |
 | the frozen anchor census (id / file / section / status) — a moved anchor is a reviewed row | an anchored paragraph silently relocated or deleted | `tools/doc_anchor_census.py`, `tests/expected/doc_anchor_census.tsv` |
 | cross-document number LOCKS — every listed file quotes the canonical value; no rival value beside the key | two documents disagreeing on one number | `tools/checkdocs.py`, `docs/doc_locks.tsv` (19 rows) |
@@ -149,7 +151,7 @@ first and moves values into tables second.
 
 | slice | what it delivers | measured start | ends when |
 |---|---|---|---|
-| **L1 routing enforcement (markdown)** | `checkdocshape.py` gains two checks: README COMPLETENESS (every `doc_shape.tsv` row is listed in `docs/README.md` Contents, with its declared shape; a directory-level entry counts for the members it NAMES; a row declared `entry-point` is exempt from Contents but must still be named somewhere in the README) and TWO-WAY TWINS (a HIST twin names its live document and the live document names its twin). Routing tables at the two entry points that lack one: `HANDOFF.md` ("if you want to DO X, read/run Y") and `docs/game/atlas/README.md` ("if you want to know what ADDRESS X is, read Y"). The unlisted documents listed. | 4 unlisted docs (§8.1 — this column said 2 until the 14z-140 census); twins one-way in the table; 2 entry points without routing | the two new checks have must-fire controls on a perturbed copy (`--root`), the static tier is green, and the README lists every declared document |
+| **L1 routing enforcement (markdown)** — **LANDED 14z-140** (2026-09-07), commits `45f116ab` the checks, `a32b9138` HANDOFF's table, `38757605` the atlas README's; the plan and its measured ground truth are §8 | `checkdocshape.py` gains two checks: README COMPLETENESS (every `doc_shape.tsv` row is listed in `docs/README.md` Contents, with its declared shape; a directory-level entry counts for the members it NAMES; a row declared `entry-point` is exempt from Contents but must still be named somewhere in the README) and TWO-WAY TWINS (a HIST twin names its live document and the live document names its twin). Routing tables at the two entry points that lack one: `HANDOFF.md` ("if you want to DO X, read/run Y") and `docs/game/atlas/README.md` ("if you want to know what ADDRESS X is, read Y"). The unlisted documents listed. | 4 unlisted docs (§8.1 — this column said 2 until the 14z-140 census); twins one-way in the table; 2 entry points without routing | the two new checks have must-fire controls on a perturbed copy (`--root`), the static tier is green, and the README lists every declared document |
 | **L4 the rendered site** | `tools/mk_docs_site.py`: a generated HTML site under a gitignored directory (the `mister_core.html` precedent — never committed): the landing page IS the routing table; every document rendered with cross-links resolved; an ADDRESS INDEX from `annotations.md` (address → every carrier, one click); the gate index, the gotcha index and the skill guides as pages; the two tracked images; a search box over headings (client-side, no server). Markdown renderer: stdlib-only, the subset this corpus uses (headings, lists, tables, fenced code, bold/italic, links, strikethrough, blockquotes) — measured over the 66 documents before writing it, so the subset is a census and unsupported constructs FAIL the generator rather than render wrong. A portable gate runs the generator over the tree and fails on any unresolved link or unsupported construct; the HTML is the artifact, the generator is what is reviewed. | `mk_mister_page.py` is the pattern; no site exists | `tests/test_docs_site.sh` (ci_portable) green; the maintainer has opened the site |
 | **L2 fact tables with provenance** | `tools/audit_rule5.py`: the census — every behavioural value in `build/manifest/*.toml` and in the generators (damage, timings, meter, variant selection, re-point defaults, thresholds, frozen op counts) classified IN-TABLE (present in `docs/project/tables/` with provenance) / BAKED (in a manifest row or a generator constant only) / DERIVED (computed from a table at build time); the ratio reported as a NOTE-class number in the static tier first (never fatal — "a number that moves in the wrong direction is the signal"), then a gate freezing the BAKED inventory so it can only shrink. Then, value by value where the census says BAKED: a table row with provenance (measured / derived / testimony, the session, the rig), the manifest reading the table rather than carrying the value. | rule 5 honoured to an unmeasured degree; `tables/` has 9 documents | the ratio is measured and frozen; the BAKED inventory shrinks per session with a ledger |
 | **L3 ROM re-derivation (the SMS `checkdocs` class)** | `tools/checkdocs_rom.py`: for atlas claims with a CHECKABLE SHAPE — the opcode word or instruction at a `PRG:` address (the disassembler already exists), a table's row count / stride / entry values, a pointer's target, a string's bytes — quote the claim from the document (assert it is still there), derive the fact from the decrypted image (`build/out/vsavj_opcodes.bin` / `_data.bin` via `tests/lib/decrypt_cache.sh`), compare; `--uncovered` lists every `annotations.md` tier-0 address no check reaches, as the coverage number. Seeded from the atlas (tier 0) first — `ram.md` claims are RAM and need the emulator, so the ROM tier is `character_tables.md`, `id_space.md`, `select_screen.md`, `sprite_lists.md`, `venue_assets.md` — then `engine_internals.md`. Static tier (needs ROMDIR), NOTE-class coverage first, then frozen. | zero claims re-derived from the image today; 2,970 address rows claimed | the coverage number is measured, reported and frozen; every hand-written check quotes its claim |
@@ -218,10 +220,12 @@ the harness.
 
 ## 8. L1 — ROUTING ENFORCEMENT: scope (the plan before the work)
 
-**STATUS: ALL SIX DECISIONS SETTLED AT THE STOP (14z-140, 2026-09-07) —
-three RULED by the maintainer, three taken as the stated default and not
-vetoed; §8.8 executed under them.** The rest of this section is the plan as
-ruled — the per-slice shape every harness slice ran under
+**STATUS: LANDED 14z-140 (2026-09-07).** All six decisions were settled at
+the STOP — three RULED by the maintainer, three taken as the stated default
+and not vetoed — and §8.8 executed under them the same sitting: the
+staleness pass, the two checks with six new must-fire controls, the seven
+documents listed, and both routing tables. The rest of this section is the
+plan as ruled — the per-slice shape every harness slice ran under
 (`harness_scope.md` §9): measure, write the plan, STOP for the rulings,
 execute in a fixed order.
 

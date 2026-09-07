@@ -1009,7 +1009,20 @@ the entries live in `docs/{game,platform,project}/gotchas.md`. Every
 existing citation of `docs/GOTCHAS.md` still lands there.
 
 Looking for whether we already know something? The index is the fastest
-topic list; `docs/game/atlas/ram.md` is the fastest address lookup.
+topic list; `docs/game/atlas/ram.md` is the fastest address lookup, and
+each of those two files now opens with a routing table — this one's is at
+the top, the atlas README's answers "what IS this address".
+
+**A NEW DOCUMENT NEEDS THREE THINGS IN ONE COMMIT, and since the living-docs
+routing slice the third is enforced:** its `docs/doc_shape.tsv` row (class,
+history twin, requirements), its line in `docs/README.md`'s `## Contents`
+with its declared SHAPE, and — if it is a `<name>_history.md` twin — a
+mention of its live document, which must mention it back.
+`tools/checkdocshape.py` fails on any of the three; a level-0 entry point
+that belongs outside Contents declares `entry-point` in its `requires`
+column and must still be named somewhere in `docs/README.md`. A directory
+entry (the `atlas/` line) covers the members its own line NAMES in
+backticks, never the directory, so a new atlas file is caught too.
 
 ## **[VSP-155]** PRIOR ART FIRST — check the subsystem doc before re-deriving (14z-68m)
 
