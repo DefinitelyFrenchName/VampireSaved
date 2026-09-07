@@ -6,6 +6,29 @@ the recent session groups + a ledger; the full session archive is
 `STATE_HISTORY.md` — "STATE 14z-XX" references resolve there when the
 session has rolled off.)
 
+**IF YOU WANT TO DO X, READ/RUN Y** (the routing table — this file is long,
+and every row below names the section or the command, so nobody has to guess
+a heading):
+
+| if you want to… | read / run |
+|---|---|
+| build a romset from the reference dumps | "How to build" — `tools/audit_roms.py` first, always |
+| build the four tracks the way the reproducibility gate does | the four-track recipe in "Running a CPS-2 WIDE build (playtest)" |
+| PLAY the current build | `tools/run_wide.sh <build> fbneo\|mame` — "Running a CPS-2 WIDE build (playtest)"; the current freeze and what to look at first are in the same section |
+| run the pre-commit checks | `tests/run_all_static.sh` — "THE PRE-COMMIT COMMAND" ([VSP-101]). Never a filename |
+| run the emulator tier, or decide what a release runs | `tests/run_all_emulator.sh` and `tests/ci_emulator.tsv` — "THE EMULATOR-TIER COMMAND" ([VSP-164]) |
+| find a gate, or see what one holds | `docs/project/gate_index.md` (GENERATED) — "Individual gates — the index"; a gate's WHY is in its own header |
+| find a tool | the "What exists" table at the top of this file |
+| know where a frozen expectation's numbers came from | `tests/expected/PROVENANCE.md` — "WHERE A FROZEN EXPECTATION'S NUMBERS CAME FROM" ([VSP-165]) |
+| freeze a build | "Build registry" — the tag, the row, the re-point sweep; the skill `vampire-saved-port` D.4 is the ritual |
+| package a release | `tools/package_release_platforms.py` — "RELEASE PACKAGING"; the format is `docs/project/release_format.md` |
+| report a crash, or reproduce one | RECORD IT FIRST: `WIDE_RECORD=<name> tools/run_wide.sh <build> mame` — "Running a CPS-2 WIDE build (playtest)" ([VSP-119], [VSP-20]) |
+| rebuild the reference emulators | `tools/setup_fbneo.sh` / `tools/setup_mame.sh` — "CPS-2 WIDE" and "MAME from source"; `WIDE=0` builds the reference binary, and the order is not optional ([CPE-24]) |
+| run the MiSTer simulation lane | `tools/run_sim_jtcps2.sh` — "MiSTer — the jtcps2w core"; read `docs/project/mister_core.md` first |
+| regenerate a GENERATED index | `tools/gen_annotations.py` / `gen_gate_index.py` / `gen_gotchas_index.py` / `gen_skill_guide.py`, in the commit that changes what they index |
+| know what an address IS, or how a subsystem works | `docs/README.md` — the map; `docs/game/atlas/` for addresses, `docs/game/engine_internals.md` for mechanisms |
+| know why something that "should work" does not | `docs/GOTCHAS.md` — always before re-deriving |
+
 ## What exists (M0 bench, 2026-07-25)
 
 | Piece | Where | Status |
