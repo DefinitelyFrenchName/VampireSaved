@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-138 CLOSE, 2026-09-07)
+# NEXT SESSION — orientation (rewritten at the 14z-139 CLOSE, 2026-09-07)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
@@ -8,93 +8,59 @@
 ## THE ORDER OF WORK IS THE MAINTAINER'S (2026-09-06): THE HARNESS, THEN LIVING DOCS, THEN THE OPEN ITEMS
 
 *"I need the generic reusable test harness and the living documentation
-effort. After that we'll tackle the open items lined up."* Both are SCOPED
-(`docs/project/harness_scope.md`, `docs/project/living_docs_scope.md`);
-**every harness slice is LANDED — H1-H7 and H9 (H8 was decided out).** Nothing
-in this tree's own harness changed; it "stays as it is". The one file it
-gained is `tests/test_bbh_fidelity.sh`.
+effort. After that we'll tackle the open items lined up."* **The harness
+and its skill are DONE (14z-135..139). Living docs is next, in a fresh
+session, scoped first.**
 
-## WHERE THE HARNESS IS: COMPLETE THROUGH H9 (`803f372` H1, `ef7e899` H2, `c26ba45` H3, `81ad426` H4, `b533715` H5, `8867dbb` H7, `512747b` H6, `7d2456d` H6b — the defaults census: no literal in `lua/mame/` is undeclared, `[machine].profile` has NO default)
+## WHERE THE HARNESS IS: COMPLETE THROUGH H10, WITH ITS SKILL
 
-`~/Developer/blackbox-harness` (`bbh`), a SEPARATE repository, PUBLIC at
-https://github.com/DefinitelyFrenchName/blackbox-harness (branch `main`;
-pushing it is standing-authorised since 14z-135b). **It sits beside
-`~/Developer/Vampire_Saved/`, the PARENT of this tree** — `../../blackbox-harness`
-from here, not `../` (the scope's "sibling" default was one level short;
-the gate searches both). `bin/bbh run-static | run-sweep | run-suite |
-fingerprint | rpl | classify | tier | config | demand-after-trap | compare-* |
-check-diverge | describe-shape | gate-index | header-defaults | ref-rot |
-provenance | compare-fields | check-dumps | inp-play | inp-corpus | doctor |
-selftest`; the drivers `drivers/{fake,mame,mame_guarded,fbneo}.sh`; the Lua
-layer `lua/mame/` under `profiles/{cps2,cps2w,TEMPLATE}.lua`. Read its
-`README.md`, `docs/gate_contract.md`, `docs/config.md`, `docs/hygiene.md`,
-`docs/lua.md` (the Lua layer and the machine profile), `drivers/README.md`
-(THE DRIVER CONTRACT), `docs/method/oracle_classes.md`, `example/README.md`;
-the consumer config for THIS tree is `example/consumers/bbh.vampire.toml`.
-`bbh selftest` is 31 gates: 30 PASS / 1 SKIP on this host (`test_rpl_lua`
-needs a standalone `lua`; the same equality runs under MAME in F8), ~4 min;
-the slice pre-commit is `BBH_MAME_FIDELITY=1 BBH_FIDELITY_F8=all
-BBH_FIDELITY_F5=1 BBH_FIDELITY_F6=all BBH_FIDELITY_F7=all bbh selftest` with
-`ROMDIR`, ~20 min. Fidelity: F1 identical, F3-F7, F9, F10 exact (ROM-free
-but F6), **F8 exact** (the Lua layer, the drivers and the recording tools on
-the real emulators — `selftest/test_fidelity_mame.sh`, opt-in). **In THIS
-tree: `ROMDIR=... tests/test_bbh_fidelity.sh`** (`ci_static`, ~65 s alone;
-`BBH_MAME_FIDELITY=1` adds F8, ~1 min, never beside another gate run here).
+`~/Developer/blackbox-harness` (`bbh`), a SEPARATE public repository
+(pushing it is standing-authorised), beside this tree's PARENT —
+`../../blackbox-harness` from here. Every slice landed (H1-H7, H9, H10; H8
+decided out); fidelity F1-F11 exact (F8 opt-in on the real emulators); the
+eight defaults RULED and registered in its `docs/conventions.md`; a
+verdict-text change is LOUD (`docs/rebaselines.md` there, its newest line
+printed by every fidelity run); its docs are lean and anchored with
+`_history.md` twins as the complete log (`docs/doctrine.md` §3 there).
+**The skill `blackbox-harness` (`[BBH-1..87]`, `skill/blackbox-harness/`,
+locked by `bbh check-skills --config skill/skills.toml`, `GUIDE.md`
+generated) is installed as the symlink `~/.claude/skills/blackbox-harness`
+and loads in every session on this machine — load it before any work ON
+the harness.** Its pre-commit: `bbh selftest` with `ROMDIR` (~6 min, 30
+PASS / 2 SKIP); never beside a gate run in this tree. This tree never
+consumes it; its one gate is `tests/test_bbh_fidelity.sh` (`ci_static`),
+which passes its location as `BBH_FIDELITY_ROOT`. The whole record:
+`docs/project/harness_scope.md` (§4 the slices, §5 the fidelity rows, §7
+the rulings, §9 the skill).
 
 ## NEXT: LIVING DOCS — L1 routing, then L4 site, L2 fact census, L3 ROM re-derivation
 
-**The harness and its skill are DONE (14z-139).** The harness at
-`~/Developer/blackbox-harness` (`../../blackbox-harness` from here) is
-complete through H10; its skill `blackbox-harness` (`[BBH-1..87]`,
-`skill/blackbox-harness/`, locked by `bbh check-skills`, the guide
-generated) is installed as the symlink `~/.claude/skills/blackbox-harness`
-and loads in every session on this machine — load it before any work ON the
-harness. Its defaults are ruled and registered (`docs/conventions.md`
-there); a verdict-text change is LOUD (`docs/rebaselines.md` there, its
-newest line printed by every fidelity run); its docs are lean and anchored
-with `_history.md` twins as the complete log. This tree's one gate,
-`tests/test_bbh_fidelity.sh`, now carries F11 through the harness's own
-fidelity test.
-
-1. **Living docs** — `docs/project/living_docs_scope.md` §4, in the ruled
-   order L1 routing → L4 site → L2 fact census → L3 ROM re-derivation.
-   Scope each slice first, as every harness slice was; the harness's
-   documentation convention (lean anchored pages + `_history.md` twins,
-   `docs/doctrine.md` §3 there) is the same convention this tree's
-   `doc_shape.tsv` enforces, so L1 starts from a shared vocabulary.
+1. **Living docs** — `docs/project/living_docs_scope.md`, all three forms
+   ruled (a rendered site, routing enforcement in the markdown, fact tables
+   with provenance), in the order L1 routing → L4 site → L2 fact census →
+   L3 ROM re-derivation (§4 argues the order). **Scope each slice first, as
+   every harness slice was**, then the maintainer rules, then the work.
+   L1 starts from a shared vocabulary: the harness's documentation
+   convention (lean anchored pages + `_history.md` twins) is the one this
+   tree's `doc_shape.tsv` already enforces.
 2. Then the open items below.
 
 ## OPEN, IN ORDER
 
-1. ~~The skill (above), then living docs~~ living docs (above), then the open items.
-2. ~~The eight defaults of `harness_scope.md` §7 are open to VETO~~ **ALL
-   EIGHT RULED (maintainer, 2026-09-07, 14z-139 (2)), each DECIDED in place in
-   §7**: keep 3/5/6/7/9/10 (9 resolved, 10 replaced by the LOUD re-baseline
-   rule), the license is not a default (4), and 8 amended with the
-   `BBH_FIDELITY_ROOT` input. The harness's `docs/conventions.md` is the
-   register of its defaults. **Carried into the skill (item 1): word
-   the one dangling lineage ID in the harness (`[CPE-24]`, four places).**
-3. **Findings about this tree — ALL FIVE FIXED (14z-139, the maintainer's
-   "let's start with" the four): ~~(14z-135) `run_all_static.sh` has no
-   exit-0-after-shell-error branch (the sweep runner has); (14z-137)
-   `run_battery_m2.sh`'s `bat` reads exit 0 by grep only~~ → ONE classifier,
-   `tests/lib/classify.sh`, sourced by all three runners (`test_static_runner`
-   §8, `test_battery_accounting` §5-6); ~~(14z-136)
-   `tests/lib/enumerate_expectations.sh` has no `diverge` case~~ → added
-   (`test_audit_merged_dispatch` §1); ~~(14z-137) `tests/test_build_ref_rot.sh`
-   picks its image by DIRECTORY ORDER when no `vsavjw` zip is present~~ → a
-   named ordered preference over a sorted glob, ground truth
-   `tests/test_ref_rot_image_pick.sh` with its must-fire. ~~(14z-138) `tests/lua/replay_guard.lua`
-   carried the STOCK code window `0x400000` while `inp_guard.lua` carried the
-   WIDE `0x600000`~~ **FIXED 14z-138 (2) at the maintainer's word: both
-   constants are `0x600000`; `test_crash_guard` re-validated (both positive
-   controls trip), F8's guard comparison runs under the harness's `cps2w`
-   profile and stays exact** (`docs/project/gotchas.md`, the guards' window).
+1. Living docs (above), then the open items.
+2. ~~The eight defaults of `harness_scope.md` §7 are open to VETO~~ ALL
+   RULED 14z-139 (2), each DECIDED in place in §7.
+3. ~~The findings about this tree recorded at 14z-135..138~~ ALL FIXED
+   14z-139 (one classifier `tests/lib/classify.sh` for the three runners;
+   the enumerator's `.diverge` case; `test_build_ref_rot`'s named image
+   preference with `test_ref_rot_image_pick`; the battery's stop; the
+   guards' code window).
 4. The standing items unchanged: the deferred `audit_mask_window_ff42a2`
-   ruling, `test_header_defaults` and the positional `[name]` default,
-   `release/merged-m15` never packaged, Pyron's row 0x11, the Phobos ±1
-   residue, the community cross-check aerials, the Zabel j.LK session, #112
-   option (B).
+   ruling (deprecated or case-specific), `test_header_defaults` and the
+   positional `[name]` default, `release/merged-m15` never packaged,
+   Pyron's row 0x11 (mechanism not established; no port recommendation),
+   the Phobos ±1 residue (a knowledge item), the community cross-check
+   aerials, the Zabel j.LK session, #112 option (B).
 
 **IF A DOC IS TOUCHED:** `doc_anchor_census --check` + `checkdocshape
 --no-pending` + `checkdocs` + `checkskills` + `gen_annotations --check` +
