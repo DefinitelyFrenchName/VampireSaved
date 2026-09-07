@@ -694,13 +694,22 @@ Cost: one session, one and a half with H10 — §8's estimate held.
 6. **RULED (maintainer, 2026-09-07): *"agreed"* — `docs/doctrine.md` is
    written in the staleness pass** as the carrier of the doctrine rules
    (S1), lean and anchored per 5.
-7. **The skill is installed user-level** (`~/.claude/skills/`), never into
-   this tree's `.claude/skills/` (§7.8: this tree never consumes the
-   harness; its own skills stay the eight). Veto → a symlink here too.
+7. **RULED (maintainer, 2026-09-07): *"I agree with your version improved
+   with the symbolic link"* — the skill is installed user-level as a
+   SYMLINK `~/.claude/skills/blackbox-harness` → the harness repository's
+   `skill/blackbox-harness/`**, so every session on this machine (this
+   tree's included) loads whatever the harness's lock last passed and
+   nothing drifts; a COPY of the directory is the fallback on a machine
+   with no clone (the portable unit, as for the level-0 skills); never a
+   file in this tree's `.claude/skills/` (§7.8: this tree never consumes
+   the harness; its own skills stay the eight). Claude Code loads a skill
+   only from `~/.claude/skills/` or a project's `.claude/skills/` — the
+   harness's `skill/` directory is the SOURCE, not a load path.
 8. **Fidelity F11 joins the contract** (§5): the lifted lock over this
    tree's eight skills and two guides, output and bytes identical. Not a
    veto candidate — it is the contract's own rule 3 applied — recorded so
    the F-list stays complete.
 
-**RULED (maintainer, 2026-09-07): the session STOPS here** — decisions 2-7
-are ruled before §9.6's steps run, as every slice's scope was.
+**RULED (maintainer, 2026-09-07): the session STOPPED here for the
+rulings, as every slice's scope did — and all seven arrived the same day;
+§9.6's steps run under them.**
