@@ -11,8 +11,9 @@
 > updated in place. **The harness and its skill are DONE and the effort is
 > RUNNING: L1 AND L4 BOTH LANDED 14z-140 (2026-09-07) — their plans, ground
 > truth and rulings are §8 and §9 — and L2 the rule-5 census LANDED
-> 14z-141 (§10) — the census, the gate and the first migration — so L3 the
-> ROM re-derivation is the one slice left. Each slice writes its own plan section (§8 L1, §9 L4, §10 L2,
+> 14z-141 (§10) — the census, the gate and the first migration. **L3 the ROM
+> re-derivation, the last slice, is SCOPED (§11, 14z-142) and STOPPED at its
+> rulings.** Each slice writes its own plan section (§8 L1, §9 L4, §10 L2,
 > §11 L3) and STOPS for the maintainer's rulings before any tool is written,
 > as every harness slice did.**
 
@@ -157,7 +158,7 @@ first and moves values into tables second.
 | **L1 routing enforcement (markdown)** — **LANDED 14z-140** (2026-09-07), commits `45f116ab` the checks, `a32b9138` HANDOFF's table, `38757605` the atlas README's; the plan and its measured ground truth are §8 | `checkdocshape.py` gains two checks: README COMPLETENESS (every `doc_shape.tsv` row is listed in `docs/README.md` Contents, with its declared shape; a directory-level entry counts for the members it NAMES; a row declared `entry-point` is exempt from Contents but must still be named somewhere in the README) and TWO-WAY TWINS (a HIST twin names its live document and the live document names its twin). Routing tables at the two entry points that lack one: `HANDOFF.md` ("if you want to DO X, read/run Y") and `docs/game/atlas/README.md` ("if you want to know what ADDRESS X is, read Y"). The unlisted documents listed. | 4 unlisted docs (§8.1 — this column said 2 until the 14z-140 census); twins one-way in the table; 2 entry points without routing | the two new checks have must-fire controls on a perturbed copy (`--root`), the static tier is green, and the README lists every declared document |
 | **L4 the rendered site** — **LANDED 14z-140** (2026-09-07); the plan, the census and the rulings are §9 | `tools/mk_docs_site.py`: a generated HTML site under a gitignored directory (the `mister_core.html` precedent — never committed): the landing page IS the routing table; every document rendered with cross-links resolved; an ADDRESS INDEX from `annotations.md` (address → every carrier, one click); the gate index, the gotcha index and the skill guides as pages; the two tracked images; a search box over headings, document titles and the 555 anchor IDs (client-side, no server). Markdown renderer: stdlib-only, the subset this corpus uses (headings, lists, tables, fenced code, bold/italic, links, strikethrough, blockquotes) — **measured 14z-140 over the 74 files that render** (62 hand-written + 10 GENERATED + the 2 skill GUIDEs; this row said 66 documents until then), so the subset is a census and unsupported constructs FAIL the generator rather than render wrong. A portable gate runs the generator over the tree and fails on any unresolved link or unsupported construct; the HTML is the artifact, the generator is what is reviewed. | `mk_mister_page.py` is the pattern; no site exists | `tests/test_docs_site.sh` (ci_portable) green; the maintainer has opened the site |
 | **L2 fact tables with provenance** — **LANDED 14z-141** (2026-09-07); the plan, the census, the rulings and what execution changed are §10 | `tools/audit_rule5.py`: the census — every behavioural value in `build/manifest/*.toml` and in the generators (damage, timings, meter, variant selection, re-point defaults, thresholds, frozen op counts) classified IN-TABLE (present in `docs/project/tables/` with provenance) / BAKED (in a manifest row or a generator constant only) / DERIVED (computed from a table at build time); the ratio reported as a NOTE-class number in the static tier first (never fatal — "a number that moves in the wrong direction is the signal"), then a gate freezing the BAKED inventory so it can only shrink. Then, value by value where the census says BAKED: a table row with provenance (measured / derived / ruled, the session, the rig) and an `in-table` pointer joining the two, CHECKED so they cannot drift — the manifest KEEPS the value (option B, maintainer-ruled 2026-09-07). This column said "the manifest reading the table rather than carrying the value" until then; that is option A, which would make a documentation edit able to move a shipped ROM byte, and it was not taken. | rule 5 honoured to an unmeasured degree; `tables/` has 13 declared documents, 7 GENERATED (this column said 9 and 4 until the 14z-141 census — L1 declared the three `chars/` pages) | the ratio is measured and frozen; the BAKED inventory shrinks per session with a ledger |
-| **L3 ROM re-derivation (the SMS `checkdocs` class)** | `tools/checkdocs_rom.py`: for atlas claims with a CHECKABLE SHAPE — the opcode word or instruction at a `PRG:` address (the disassembler already exists), a table's row count / stride / entry values, a pointer's target, a string's bytes — quote the claim from the document (assert it is still there), derive the fact from the decrypted image (`build/out/vsavj_opcodes.bin` / `_data.bin` via `tests/lib/decrypt_cache.sh`), compare; `--uncovered` lists every `annotations.md` tier-0 address no check reaches, as the coverage number. Seeded from the atlas (tier 0) first — `ram.md` claims are RAM and need the emulator, so the ROM tier is `character_tables.md`, `id_space.md`, `select_screen.md`, `sprite_lists.md`, `venue_assets.md` — then `engine_internals.md`. Static tier (needs ROMDIR), NOTE-class coverage first, then frozen. | zero claims re-derived from the image today; 2,970 address rows claimed | the coverage number is measured, reported and frozen; every hand-written check quotes its claim |
+| **L3 ROM re-derivation (the SMS `checkdocs` class)** | `tools/checkdocs_rom.py`: for atlas claims with a CHECKABLE SHAPE — the opcode word or instruction at a `PRG:` address (the disassembler already exists), a table's row count / stride / entry values, a pointer's target, a string's bytes — quote the claim from the document (assert it is still there), derive the fact from the decrypted image (`build/out/vsavj_opcodes.bin` / `_data.bin` via `tests/lib/decrypt_cache.sh`), compare; `--uncovered` lists every `annotations.md` tier-0 address no check reaches, as the coverage number. Seeded from the atlas (tier 0) first — `ram.md`'s CLAIMS are RAM and need the emulator — though 127 of its rows are PROGRAM addresses, the PC-attributed writers of those fields (§11.3 finding 2) — so the ROM tier is `character_tables.md`, `id_space.md`, `select_screen.md`, `sprite_lists.md`, `venue_assets.md` — then `engine_internals.md`. Static tier (needs ROMDIR), NOTE-class coverage first, then frozen. | zero claims re-derived from the image today; **2,965** address rows claimed, **473 carried by the atlas and 346 of those the ROM tier** — this column said "2,970 address rows" until the 14z-142 census, and the ROM-tier denominator was estimated at ~440 on a count of `PRG:0x`-FORM tokens rather than of rows (§11.3) | the coverage number is measured, reported and frozen; every hand-written check quotes its claim |
 
 Order: **L1 → L4 → L2 → L3.** Enforcement first (STATE's own hold), and L1
 is cheap; L4 next because it is what makes every document REFERENCED — the
@@ -1057,3 +1058,238 @@ reads UNCLASSIFIED rather than FACT.
    own commit with a re-freeze.
 
 Cost: one session for the census, the inventory and the first migration.
+
+## 11. L3 — ROM RE-DERIVATION: scope (the plan before the work)
+
+**STATUS: SCOPED 14z-142 (2026-09-07), AWAITING THE RULINGS of §11.7.** The
+census is measured and it corrected the execution plan in six places, two of
+them load-bearing enough to change what the tool can be asked to do. No tool
+is written yet; §11.8 is the sequencing once the decisions are ruled.
+
+**THE PREMISE IS PROVEN, not assumed** — both mechanisms were exercised
+against the real image at the opener before any of this was written:
+- All three opcode-view SHA-1s in `docs/game/atlas/README.md` reproduce
+  EXACTLY from the cached views. That document says of them: *"it has no
+  second home in the tree, so this is the only place it is checked."* L3 is
+  what makes that sentence mechanical instead of aspirational.
+- Three transcribed instructions decode byte-exact at the addresses the atlas
+  names: `andi.b #$0f,$382(a4)` at `PRG:0x010E2C` = words `022C 000F 0382`;
+  `cmpi.b #$b,$3(a6)` at `PRG:0x020A98` = `0C2E 000B 0003`; `cmpi.b
+  #$2,$382(a6)` at `PRG:0x020B9C` = `0C2E 0002 0382` — the last exactly the
+  encoding §4.3 of the execution plan predicted, so the no-capstone design
+  holds.
+
+### 11.1 What it delivers
+
+`tools/checkdocs_rom.py`: for atlas claims with a checkable shape — the
+opcode words at a `PRG:` address, a table's row count / stride / entry
+values, a pointer's target — QUOTE the claim from the document (assert the
+sentence is still there), DERIVE the fact from the decrypted image, COMPARE.
+`--uncovered` lists every atlas ROM-tier address no check reaches, as a
+NOTE-class coverage number first and a frozen inventory second. Static tier
+(needs ROMDIR), seeded from the atlas ROM tier, `engine_internals.md`
+second.
+
+### 11.2 Ground truth — the census (measured 14z-142, 2026-09-07)
+
+Measured by a throwaway scanner importing `gen_annotations.collect()`, at the
+opener, not read from the plan. What the tool must reproduce on its first run:
+
+| what | measured |
+|---|---|
+| distinct program addresses in the whole corpus | **2,965** (2,958 at the 14z-140 close; L2's two new documents added 7) |
+| carried by the atlas (tier 0) | **473** — the execution plan's figure, confirmed |
+| carried by `ram.md` | **150**, of which **127 EXCLUSIVELY** |
+| **the ROM-tier denominator** | **346** — atlas minus the ram.md-only rows |
+| per file (distinct) | character_tables 141 · select_screen 131 · id_space 43 · sprite_lists 26 · venue_assets 21 · README 3 |
+| address-bearing paragraphs, ROM tier | **103**: 17 quote an INSTRUCTION (68 addresses), 61 state a SHAPE (231), 25 name a label only (51) |
+| distinct 68k instruction spans in the ROM tier | **36** |
+| sibling-set addresses in the atlas | **41 of 473** carry a vs2/vh2 hint |
+| markdown table rows carrying 2+ program addresses | **50 rows, 116 distinct addresses** |
+| environment | capstone 5.0.7 present; all three sets cached in `build/out/` (opcodes + data); `decrypt_view` is set-generic |
+
+### 11.3 The findings that change the design — six, each measured
+
+1. **THE DENOMINATOR IS 346, NOT ~440.** The plan's "473 addresses carried by
+   atlas, ~30 of them `ram.md`'s" is wrong: `ram.md` carries **150** program
+   addresses, 127 of them exclusively. Thirty is the count of `PRG:0x`-FORM
+   tokens in `ram.md` — measured, exactly 30 — so the figure counted the
+   NOTATION and not the rows. The atlas writes most of its addresses in the
+   bare `0x…` form, which is why every per-file token count in the plan
+   undercounts by two to three times (character_tables: 62 `PRG:0x` tokens,
+   141 distinct addresses).
+2. **THE 127 `ram.md`-ONLY ADDRESSES ARE PROGRAM ADDRESSES IN A RAM
+   DOCUMENT** — the PC-attributed writers and consumers of RAM fields
+   ("Combat struct" 63, "Player blocks" 19, "Object physics" 14). §6.5's
+   "`ram.md` never" is right about the RAM claims, but these are ROM
+   addresses and the plan's ROM / RAM / OUTSIDE split has no bucket for them.
+   **And the other two buckets are EMPTY BY CONSTRUCTION:**
+   `gen_annotations` bounds every row to `0x001000-0x3FFFFF`, so no RAM
+   address and nothing above 4 MB can ever appear in this census. The
+   classifier `--uncovered` needs is not the plan's.
+3. **THE ATLAS'S SPINE IS A THREE-SET COMPARISON, so the sibling question is
+   structural rather than incidental.** 41 atlas addresses carry a vs2/vh2
+   hint and 50 table rows carry two or more program addresses (116 distinct)
+   — the `| Table | vsavj | vsav2 | vhunt2 |` rows of `character_tables.md`.
+   Plan decision 4 ("vsavj required, siblings SKIP their half") would leave
+   the single largest class of atlas claims unchecked. **And there is no cost
+   to requiring all three:** `decrypt_view` takes the set as an argument and
+   resolves `$ROMDIR/<set>.zip`, all three are already cached, and the ROM
+   audit that opens every session verifies all 76 members.
+4. **AN ATLAS "QUOTED INSTRUCTION" MAY BE A SEMANTIC PARAPHRASE, AND THE
+   DOCUMENTATION IS STILL CORRECT.** `character_tables.md:173` describes the
+   palette blitter at `PRG:0x000EF2` as `move.l (a0)+,(a1); or.l
+   #$F000F000`. The image holds `move.l (a0)+,(a1)` then `or.l d0,(a1)+`,
+   with `move.l #$f000f000,d0` two instructions earlier — the sentence is a
+   faithful summary and an encoded-word check on its text would FAIL it.
+   This is the class that decides whether L3 is trustworthy: a checker that
+   reports correct documentation as stale trains its reader to ignore it.
+5. **THE ATLAS DOES NOT PAIR INSTRUCTION TO ADDRESS MACHINE-RECOVERABLY, so
+   the checks MUST be hand-written.** Of the 36 instruction spans, exactly
+   ONE sits in a paragraph naming exactly one address; 27 sit in paragraphs
+   naming none (the address is in the heading or a neighbouring sentence).
+   The plan's `@check` registry already assumes hand-written checks — this is
+   the measured REASON, and it also means no future session may "grow
+   coverage automatically" from the census.
+6. **SEED CHECK 3 CANNOT BE WRITTEN AS SPECIFIED.** The plan asks for "each
+   key master's watchdog instruction at its address"; the atlas gives the
+   watchdog as a property of the KEY BLOCK and names no address for it.
+   Measured, `cmpi.l #$726A4BAF,d0` occurs **53 times** in vsavj's opcode
+   view (and `#$06920760` 53 times in vsav2's — the sibling symmetry the
+   README's own sentence predicts). Two checkable forms exist instead: the
+   OCCURRENCE COUNT, and the one placement the atlas does assert —
+   `character_tables.md:173`'s "lives inside this loop", which is TRUE
+   (the instruction is at `PRG:0x000EFA`, inside the `PRG:0x000EF2` loop).
+
+### 11.4 Architecture
+
+As the execution plan's §4.3, with the four changes findings 2-4 and 6 force:
+
+- **`Image(op_path, data_path)`** with `word/long/bytes(addr)`, each logging
+  into `TOUCHED`; the gate materialises views with `decrypt_view` and the
+  SKIP logic stays in sh (`SKIP: set ROMDIR` on a cache miss).
+- **`SETS`** — `vsavj`, `vsav2`, `vhunt2`, each an `Image`; a check declares
+  which set it reads. Not vsavj-only (finding 3).
+- **`says(doc, *fragments)`** asserting each fragment in the
+  whitespace-collapsed text so a re-wrapped line is not a false FAIL,
+  raising `Stale`.
+- **`@check(doc, name)`** registry, `eq(label, doc_value, rom_value)`, and
+  **`@table(doc, name, base, count, stride, view, entry=…, control=…)`**
+  running the validator over every entry and then at `control`, where at
+  least one entry MUST fail — a validator whose control does not fire is
+  itself a FAIL (`vacuous validator`).
+- **`PARAPHRASE`** (new, finding 4): a declared set of claims whose text is a
+  faithful SUMMARY rather than a transcription, each with the literal fact it
+  summarises and the check written against THAT. Never a silent skip: the
+  tool prints them, and `--list` shows them, so the class stays visible and
+  small.
+- **`UNENCODABLE = {addr: reason}`** for dataflow claims ("the only writer of
+  `$382` in the ROM" is `audit_id_space.py`'s job, not this tool's).
+- **`--uncovered`** importing `gen_annotations.collect()`, keeping tier-0
+  rows, and classifying by the buckets that actually exist (finding 2):
+  **ROM-TIER** (checkable), **RAM-DOCUMENT** (a program address carried only
+  by `ram.md` — a dataflow claim, out of scope by §6.5), **SIBLING** (a
+  vs2/vh2 address), **NOT-AN-ADDRESS** (a size or count the regex cannot
+  distinguish — the `gen_annotations` header's own caveat). Prints per doc
+  and the line `NOTE: checkdocs_rom.coverage <touched>/346 atlas ROM-tier
+  addresses`.
+- **No capstone dependency**: checks carry the expected OPCODE WORDS with the
+  mnemonic beside them in a comment (verified above for three of them);
+  capstone is `--disasm`, diagnostic only, never a SKIP.
+
+### 11.5 The seed set (~15, revised by the census)
+
+Every address and every word is read from the documents when the check is
+written, never from this list. Revisions: seed 3 becomes the count-and-site
+pair of finding 6; the three-set table rows (seed 5) are checked on all three
+images; the blitter paragraph enters as the first `PARAPHRASE` entry.
+
+1. `atlas/README.md` — the three opcode-view SHA-1s (verified above).
+2. `atlas/README.md` — each set's watchdog constant: occurrence count and the
+   `PRG:0x000EFA` placement inside the `PRG:0x000EF2` loop.
+3. `character_tables.md` — the loader at `PRG:0x028DD8`, first four words.
+4. `character_tables.md` — the per-set table bases (`hitbox base`,
+   `struct+0x64`, `struct+0x132`) as a `@table` on ALL THREE images.
+5. `character_tables.md` — the 32-row / `0x80`-stride bank claim.
+6. `character_tables.md` — the palette blitter, as `PARAPHRASE`.
+7. `id_space.md` — `PRG:0x010E2C` `andi.b #$0f,$382(a4)` (verified).
+8. `id_space.md` — `PRG:0x04FFA8`, 32 rows × 24 bytes, rows `0x10-0x1F`
+   byte-identical to `0x00-0x0F`.
+9. `id_space.md` — the select-commit site `PRG:0x020A80` and the CPU picker.
+10. `id_space.md` — the attract table `PRG:0x005C08`.
+11. `select_screen.md` — `PRG:0x020A98` `cmpi.b #$b,$3(a6)` (verified).
+12. `select_screen.md` — tables A `PRG:0x0211D4` and B `PRG:0x0211E4` shapes.
+13. `sprite_lists.md` — the drawer entry addresses and a list's terminator bit.
+14. `venue_assets.md` — `PRG:0x38C198` is 32 longs, each inside the ROM window.
+15. `venue_assets.md` — the mugshot and name tables' strides.
+
+### 11.6 The gate `tests/test_checkdocs_rom.sh` (ci_static, family `docs`, ~20 s)
+
+§1 `decrypt_view` for the three sets, or `SKIP: set ROMDIR`. §2 the tool over
+the tree: every check PASS, `N negative controls fired`, the coverage NOTE.
+§3 must-fire controls, each proven to have applied before its assertion:
+a `--root` copy with one claim's sentence edited → `claim not in doc`; a copy
+of `op.bin` with one byte flipped at a checked address → FAIL (proving the
+check reads the ROM, not the doc); a `@table` `control=` pointed at a valid
+base → rejected as `vacuous validator`; and a `PARAPHRASE` entry whose
+literal fact is perturbed → FAIL (so the class cannot become a silent skip).
+
+### 11.7 Decisions — taken under stated assumptions, open to veto
+
+1. **Encoded opcode words are the evidence; capstone is `--disasm`,
+   diagnostic only.** Verified on three claims above.
+   Veto → require capstone, with a loud SKIP where it is absent.
+2. **All three reference sets are REQUIRED, not vsavj-with-siblings-skipped**
+   (finding 3) — the atlas's spine is the three-set table, `decrypt_view` is
+   set-generic, and the opener audits all 76 members anyway.
+   Veto → vsavj only, leaving 41 sibling addresses and 50 comparison rows
+   permanently uncovered, and the largest atlas table unchecked.
+3. **`PARAPHRASE` is a declared, printed class** (finding 4): a summary claim
+   is checked against the literal fact it summarises, never against its own
+   text, and never silently skipped.
+   Veto → (a) treat paraphrases as UNENCODABLE (loses the check), or (b) edit
+   the atlas to transcribe literally (changes documentation to suit a tool,
+   and the summary is the more readable sentence).
+4. **`--uncovered`'s buckets are ROM-TIER / RAM-DOCUMENT / SIBLING /
+   NOT-AN-ADDRESS** (finding 2), the plan's RAM and OUTSIDE being empty by
+   construction. Veto → keep the plan's three and accept two dead buckets.
+5. **The denominator is 346** and the coverage NOTE is reported against it.
+   Veto → 473 (counting the ram.md-only dataflow claims as uncovered ROM
+   work, which would make the number permanently and misleadingly low).
+6. **Freeze timing: NOTE at this session, freeze the COVERED set at the
+   atlas-tier close**, grow-only after. Veto → NOTE forever.
+7. **`engine_internals.md` second, `ram.md` never** (§6.5) — confirm, with
+   finding 2 noted: the 127 program addresses inside `ram.md` are dataflow
+   claims and stay out of scope, but they are ROM addresses and the coverage
+   line must say so rather than counting them as unchecked.
+
+The NOTE class (execution plan §5) is no longer open — ruled at L2's STOP and
+shipped in `run_all_static.sh`; L3 reuses it unchanged.
+
+### 11.8 Staleness pass — before the tool lands, one commit
+
+| # | claim | true now? | action |
+|---|---|---|---|
+| S1 | §2.3 "No tool re-derives an atlas claim from the decrypted image" | true until this slice lands | reword at landing, with the [VSP-13] grep |
+| S2 | §4's L3 row "2,970 address rows claimed" | **2,965**, of which 473 atlas / 346 ROM tier | correct the row in place |
+| S3 | §4's L3 row "zero claims re-derived from the image today" | true today | flips at landing |
+| S4 | `atlas/README.md` "it has no second home in the tree, so this is the only place it is checked" | true today | amend at landing to name the gate |
+| S5 | every atlas fragment the seed set quotes | **all 15 present**, measured at this opener | none |
+
+### 11.9 Sequencing and cost
+
+1. `14z-142 (1)`: this section; the census; S1-S5 recorded. **STOP for the
+   rulings of §11.7.**
+2. `(2)`: the framework — `Image`, `SETS`, `says`, `@check`, `@table`,
+   `PARAPHRASE`, `UNENCODABLE` — plus seed checks 1-8, the gate and its
+   registrations (`ci_static.txt`, `gate_index.tsv` + regenerate, the header
+   sentence); commit.
+3. `(3)` / `14z-143`: seed checks 9-15; `--uncovered` with its four buckets;
+   the coverage NOTE live in a real static-tier run; the frozen COVERED set
+   with its `PROVENANCE.md` row; the [VSP-13] grep for S1 and S4; §4's L3 row
+   to LANDED; the HANDOFF "What exists" row; the gotchas paid for; the static
+   tier ALONE green; close.
+4. Then coverage growth: `engine_internals.md` next, a handful of
+   hand-written checks per later session, the frozen set growing each time.
+
+Cost: two sessions for the framework and the atlas ROM tier, as scoped.
