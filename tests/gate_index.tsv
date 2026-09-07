@@ -91,6 +91,7 @@ tests/test_audit_merged_dispatch.sh	pipeline
 tests/test_baseset_mask_invariant.sh	review-triage
 tests/test_basis_publish_atomic.sh	review-triage
 tests/test_battery_accounting.sh	review-triage
+tests/test_bbh_fidelity.sh	runner
 tests/test_beam_anim_walk.sh	gfx
 tests/test_beam_list_type6.sh	gfx
 tests/test_beam_variants.sh	gfx

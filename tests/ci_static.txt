@@ -175,3 +175,4 @@ test_decrypt_cache
 test_charmap_overrides
 test_harness_frame_bound
 test_mister_page
+test_bbh_fidelity

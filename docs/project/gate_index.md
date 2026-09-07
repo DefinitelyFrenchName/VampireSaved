@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**304 scripts** — 64 ci_portable, 71 ci_static, 169 emulator-tier (run by name).
+**305 scripts** — 64 ci_portable, 72 ci_static, 169 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 11 | the suite runners and their own ground truth |
+| [runner](#runner) | 12 | the suite runners and their own ground truth |
 | [docs](#docs) | 12 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 26 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 51 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -41,6 +41,7 @@ the suite runners and their own ground truth.
 | `tests/run_all_static.sh` | run | emulator | FBNeo, a build dir | THE PRE-COMMIT GATE CHAIN. One command, every gate that does not need an emulator. (14z-94, GitHub #30.) | 14z-94 |
 | `tests/run_battery_m2.sh` | run | emulator | MAME, FBNeo, a build dir, ~15 min | the M2 deliverable battery: the EXACT gate chain a stage-6 dev build must pass before any commit that touches the build (CLAUDE.md rule 2 / persistent-suite doctrine). One command, no chat-memory chain. Sections: 0. | M2 |
 | `tests/run_suite.sh` | run | emulator | MAME | the oracle replay suite (MAME side), auto-detecting runner. | 14z-94 |
+| `tests/test_bbh_fidelity.sh` | test | ci_static | ROMDIR | the generic black-box harness (`bbh`, the SEPARATE repository extracted from this tree, docs/project/harness_scope.md) reproduces THIS tree's verdicts: its fidelity gate is run against this tree and must be green. | 2026-09-06 |
 | `tests/test_demand_after_trap.sh` | test | ci_portable | — | no gate carries a `${VAR:?msg}` DEMAND after its EXIT trap (14z-134). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-134 |
 | `tests/test_emulator_runner.sh` | test | ci_portable | — | ground truth for tests/run_all_emulator.sh (14z-128). ROM-free, ~5 s. | 14z-128 |
 | `tests/test_header_defaults.sh` | test | ci_portable | — | a gate's HEADER must state the default its CODE actually uses (14z-128). ROM-free, ~2 s. | 14z-128 |
