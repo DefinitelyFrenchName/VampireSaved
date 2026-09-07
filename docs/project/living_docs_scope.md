@@ -617,11 +617,24 @@ The site therefore shows EVERY carrier where the rendered page shows six.
   emits `id="PFX-N"` so a skill citation deep-links. A wrapped header emits
   the merged slug AND one empty `<a id>` per constituent line, because
   `gen_annotations.HDR_RE` records a single constituent as the section name.
-- **Theme**: `mk_mister_page.py` **executes at import** (`ARGV =
-  sys.argv[1:]` at line 90), so the palette and `css()` (line 1351) are
-  MOVED into `tools/_pagestyle.py` and both generators import that — never
-  `import mk_mister_page`. `test_mister_page.sh` must be green before and
-  after the move.
+- **Theme — LANDED 14z-140.** `mk_mister_page.py` **executes at import**
+  (`ARGV = sys.argv[1:]`), so the shared layer MOVED into
+  `tools/_pagestyle.py` and both generators import that — never
+  `import mk_mister_page`. **What moved is the VALUES, not the CSS text**:
+  the palette, the colour maths (`mix` / `desat` / `contrast` / `label_ink`)
+  and two theme dicts. Each generator keeps its own stylesheet, because the
+  MiSTer page interleaves one custom property per region ROLE and a doc site
+  has no roles — and `--warn` is the case that proves the split is real
+  (`FLAME` on light, `WARM_L` on dark, since red on a dark ground is
+  unreadable), so a page that copied the light block and swapped a few values
+  would get it wrong silently. **Proof the lift is neutral: the gate is green
+  before and after, and the drawn page is BYTE-IDENTICAL to the one the
+  pre-move script produced.** Two things it cost: the gate COPIES the
+  generator to a temp dir for its controls, so the module is resolved from
+  `--repo`'s `tools/` as well as from beside the file; and `_pagestyle`'s own
+  self-tests run from `test_mister_page.sh` section 0, the theme's oldest
+  consumer, where they also assert the two themes define the SAME properties
+  (one defined only in light is how a page borrows its host's theme).
 - **Reuse**: `gen_annotations.ADDR_RE / CARRIERS / collect / scan_doc /
   HDR_RE`; `checkdocshape.read_shape` for the TSV.
 

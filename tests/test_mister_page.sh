@@ -44,7 +44,10 @@
 # real repo with --repo, so the tree is never touched.
 #
 # ROM-free, no emulator, ~3 s (or ~5 s with the WIDE build present, which adds
-# the real census). **ci_static, NOT ci_portable — corrected 14z-140.**
+# the real census). SINCE 14z-140 it also runs the self-tests of
+# tools/_pagestyle.py, the SHARED page theme this generator and the
+# documentation site both import (section 0).
+# **ci_static, NOT ci_portable — corrected 14z-140.**
 # The header said ci_portable while the row sat in tests/ci_static.txt, and
 # MEASURED in a real clean checkout (`git archive HEAD`), the registration
 # is the one that is right: the two sub-checks above SKIP when the WIDE
@@ -78,6 +81,20 @@ fail() { echo "  FAIL: $*"; rc=1; }
 [ -f "$DOC" ] || { echo "SKIP: $DOC is absent"; exit 0; }
 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+
+echo "== 0. the SHARED page theme (tools/_pagestyle.py) =="
+# The palette, the colour maths and the two theme dicts moved there at
+# 14z-140 so the documentation site could not carry a second copy. Its
+# self-tests run HERE because this gate is the theme's oldest consumer:
+# they lock mix()/contrast()/label_ink() and assert the two themes define
+# the SAME properties (a property defined only in light is how a page ends
+# up borrowing its host's theme).
+if python3 tools/_pagestyle.py > "$W/style.log" 2>&1; then
+    echo "  ok: _pagestyle.py self-tests pass"
+else
+    fail "_pagestyle.py self-tests FAIL:"
+    sed 's/^/      /' "$W/style.log" | head -10
+fi
 
 echo "== 1. the page re-derives every number it draws =="
 if python3 "$GEN" --check --verbose > "$W/check.log" 2>&1; then

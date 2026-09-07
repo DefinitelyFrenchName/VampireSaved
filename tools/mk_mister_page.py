@@ -93,6 +93,12 @@ if "--repo" in ARGV:
     i = ARGV.index("--repo")
     REPO = pathlib.Path(ARGV[i + 1]).resolve()
     del ARGV[i:i + 2]
+# `_pagestyle` is resolved the same two ways the DOCUMENTS are: beside this
+# file normally, and under --repo's tools/ when the gate has COPIED this script
+# to a temp directory to perturb a constant (tests/test_mister_page.sh line
+# ~140 does exactly that, and a bare copy has no sibling module).
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+sys.path.insert(1, str(REPO / "tools"))
 CHECK = "--check" in ARGV
 VERBOSE = "--verbose" in ARGV
 STANDALONE_MODE = "--standalone" in ARGV
@@ -107,40 +113,22 @@ CORE_DOC = REPO / "docs" / "project" / "mister_core.md"
 FIT_GATE = REPO / "tests" / "audit_mister_map_fit.sh"
 
 # ---------------------------------------------------------------- palette ----
-# Demitri's sprite palette, row 0, PRG:0x38C7A0 — see the module docstring.
+# THE PALETTE AND THE COLOUR MATHS LIVE IN tools/_pagestyle.py (moved 14z-140,
+# ruled: living_docs_scope.md §9.8 decision 3). The documentation site wants
+# the same theme, and a second copy is how one logic becomes two that
+# disagree — the class 14z-139 closed for verdict classifiers. Only the parts
+# that know what is being DRAWN stay here: the ROLE table below and the fills
+# and label inks generated from it are facts about the MiSTer SDRAM map.
+# `_pagestyle` is import-safe by construction; THIS file is not (it parses
+# ARGV at module scope), which is why the shared layer moved rather than the
+# site importing this one.
 PAL_TABLE = 0x38C198          # the 32-row sprite-palette pointer table
 PAL_CHAR_ID = 0x01            # Demitri
 PAL_ROW = 0                   # row 0 of his 0x500-byte block
-DEMITRI = ["#443333", "#ffeeaa", "#ffbb99", "#ee9977",
-           "#cc8866", "#ffdd00", "#ff0000", "#995511",
-           "#550000", "#334455", "#446677", "#668899",
-           "#88aabb", "#bbccdd", "#ffffff", "#000000"]
-
-
-def _rgb(c):
-    return int(c[1:3], 16), int(c[3:5], 16), int(c[5:7], 16)
-
-
-def mix(a, b, t):
-    """Blend two hex colours; t=0 is all a, t=1 is all b."""
-    ra, ga, ba = _rgb(a)
-    rb, gb, bb = _rgb(b)
-    return "#%02x%02x%02x" % (round(ra + (rb - ra) * t),
-                              round(ga + (gb - ga) * t),
-                              round(ba + (bb - ba) * t))
-
-
-def desat(c, t):
-    """Pull a colour toward its own luminance. Used only for 'free space',
-    which must read as absence rather than as another category."""
-    r, g, b = _rgb(c)
-    y = round(0.299 * r + 0.587 * g + 0.114 * b)
-    return mix(c, "#%02x%02x%02x" % (y, y, y), t)
-
-
-COOL_D, COOL_M, COOL_L = DEMITRI[9], DEMITRI[11], DEMITRI[13]   # 334455/668899/bbccdd
-WARM_D, WARM_M, WARM_L = DEMITRI[7], DEMITRI[4], DEMITRI[2]     # 995511/cc8866/ffbb99
-GOLD, FLAME, CREAM = DEMITRI[5], DEMITRI[6], DEMITRI[1]         # ffdd00/ff0000/ffeeaa
+from _pagestyle import (DEMITRI, mix, desat, contrast, label_ink,   # noqa: E402
+                        COOL_D, COOL_M, COOL_L, WARM_D, WARM_M, WARM_L,
+                        GOLD, FLAME, CREAM, INK_LIGHT, INK_DARK,
+                        THEME_LIGHT, THEME_DARK)
 
 # role -> (light-theme fill, dark-theme fill). COOL = stock, WARM = ours.
 #
@@ -163,31 +151,10 @@ ROLE = {
 }
 
 
-def _lum(c):
-    def ch(v):
-        v /= 255
-        return v / 12.92 if v <= 0.04045 else ((v + 0.055) / 1.055) ** 2.4
-    r, g, b = _rgb(c)
-    return 0.2126 * ch(r) + 0.7152 * ch(g) + 0.0722 * ch(b)
-
-
-def contrast(a, b):
-    la, lb = sorted((_lum(a), _lum(b)))
-    return (lb + 0.05) / (la + 0.05)
-
-
-# The two inks a label inside a filled region may use. Which one each role gets
-# is DECIDED BY MEASUREMENT, not by eye: label_ink() picks whichever of the two
-# has the higher WCAG contrast against the fill, per theme, so no label can end
-# up as pale text on a pale block. That is what frees the role fills to be
-# chosen for TELLING APART — three cool steps and three warm ones off Demitri's
-# own ramps — instead of for happening to carry white text.
-INK_LIGHT = "#ffffff"
-INK_DARK = mix(COOL_D, "#000000", .70)
-
-
-def label_ink(fill):
-    return max((INK_LIGHT, INK_DARK), key=lambda c: contrast(fill, c))
+# `contrast()`, `label_ink()` and the two inks are _pagestyle's: which ink each
+# role gets is DECIDED BY MEASUREMENT, not by eye, which is what frees the role
+# fills below to be chosen for TELLING APART rather than for carrying white
+# text.
 
 # ---------------------------------------------------------------------------
 # THE DECLARED DATA. Everything below is bytes, read from
@@ -1367,21 +1334,24 @@ def css():
         f".sw.r-{k}{{background:var(--c-{k})}}" for k in ROLE) + "\n" + inks(0)
     fills_d_media = inks(1, ':root:not([data-theme="light"]) ')
     fills_d_theme = inks(1, ':root[data-theme="dark"] ')
+    # THE VALUES COME FROM _pagestyle (moved 14z-140); only the TEMPLATE is
+    # this page's, because it interleaves one custom property per region role
+    # and the documentation site has no roles. Sharing the numbers and not the
+    # CSS text is what lets both pages keep the shape they need while a colour
+    # has exactly one definition.
+    L, D = THEME_LIGHT, THEME_DARK
     return CSS_TEMPLATE % {
-        "paper_l": mix(CREAM, "#ffffff", .90), "surface_l": mix(CREAM, "#ffffff", .965),
-        "sunken_l": mix(COOL_L, "#ffffff", .60), "ink_l": mix(COOL_D, "#000000", .55),
-        "ink2_l": mix(COOL_D, "#000000", .18), "ink3_l": mix(COOL_D, "#ffffff", .34),
-        "rule_l": mix(COOL_L, "#ffffff", .28), "accent_l": mix(WARM_D, "#000000", .10),
-        "accsoft_l": mix(WARM_L, "#ffffff", .72), "onfill_l": "#ffffff",
-        "paper_d": mix(COOL_D, "#000000", .80), "surface_d": mix(COOL_D, "#000000", .66),
-        "sunken_d": mix(COOL_D, "#000000", .74), "ink_d": mix(COOL_L, "#ffffff", .55),
-        "ink2_d": COOL_L, "ink3_d": mix(COOL_M, "#ffffff", .10),
-        "rule_d": mix(COOL_D, "#000000", .42), "accent_d": WARM_L,
-        "accsoft_d": mix(WARM_D, "#000000", .62),
-        "onfill_d": mix(COOL_D, "#000000", .74),
+        "paper_l": L["paper"], "surface_l": L["surface"], "sunken_l": L["sunken"],
+        "ink_l": L["ink"], "ink2_l": L["ink-2"], "ink3_l": L["ink-3"],
+        "rule_l": L["rule"], "accent_l": L["accent"], "accsoft_l": L["accent-soft"],
+        "onfill_l": L["on-fill"],
+        "paper_d": D["paper"], "surface_d": D["surface"], "sunken_d": D["sunken"],
+        "ink_d": D["ink"], "ink2_d": D["ink-2"], "ink3_d": D["ink-3"],
+        "rule_d": D["rule"], "accent_d": D["accent"], "accsoft_d": D["accent-soft"],
+        "onfill_d": D["on-fill"],
         "roles_l": roles_l, "roles_d": roles_d,
-        "flame": FLAME, "warm_l": WARM_L, "fills": fills, "fills_d_media": fills_d_media,
-        "fills_d_theme": fills_d_theme,
+        "flame": L["warn"], "warm_l": D["warn"], "fills": fills,
+        "fills_d_media": fills_d_media, "fills_d_theme": fills_d_theme,
     }
 
 

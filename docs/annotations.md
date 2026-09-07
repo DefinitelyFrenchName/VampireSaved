@@ -2984,7 +2984,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x32D2F0` | tests/test_win_quote_decode.sh |
 | `PRG:0x361000` | tests/test_gfx_layout3.sh; tools/audit_gfx_merged.py; tools/build_donovan.sh; tools/build_merged.sh; tools/gen_donovan_patch.py; tools/overlay_port.py |
 | `PRG:0x38C19C` | tools/mk_mister_page.py |
-| `PRG:0x38C7A0` | tools/mk_mister_page.py |
+| `PRG:0x38C7A0` | tools/_pagestyle.py; tools/mk_mister_page.py |
 | `PRG:0x390CD0` | tests/audit_mask_window_ff42a2.sh |
 | `PRG:0x391BA0` | tests/test_effect_palette_table.sh |
 | `PRG:0x39A7E0` | tools/gen_donovan_patch.py |
