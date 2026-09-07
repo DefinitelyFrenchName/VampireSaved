@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-300 entries (40 game / 91 platform / 169 project), counted from the buckets at generation.
+301 entries (40 game / 91 platform / 170 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 40 entries
 
@@ -159,7 +159,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - FBNeo `-hdump`'s specification buffer is 8,192 characters — entries past ~430 frames are DROPPED SILENTLY (paid: 14z-133b)
 - `run_replay_fbneo.sh` with a RELATIVE sandbox argument writes NO log — 0 frames, silently (paid: 14z-133b)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 169 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 170 entries
 
 - A gate that prints `SKIP:` AND exits NON-ZERO is a FAILURE, not a skip (paid: 14z-128)
 - `... | while read` puts the loop in a SUBSHELL, so the `wait` after it waits for nothing (paid: 14z-128)
@@ -330,3 +330,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - THE PRE-COMMIT RUNNER AND THE BATTERY READ AN EXIT-0 SHELL CRASH AS PASS FOR FIVE SESSIONS AFTER THE SWEEP LEARNED NOT TO — a classifier copied into three runners is three classifiers (found 14z-135/137, fixed 14z-139)
 - `lstrip("./")` STRIPS A CHARACTER SET, NOT A PREFIX — `../x.md` came out as `docs/x.md` and the `../` branch never fired (paid: 14z-140)
 - A COMPLETENESS CHECK IS ONLY AS GOOD AS ITS MATCHER — a loose one reported coverage the map did not have (measured 14z-140)
+- QUOTING A `**[PFX-N]**` ANCHOR MARKER IN PROSE CREATES A PHANTOM ANCHOR — the census reads the marker, not the intent (paid: 14z-140)

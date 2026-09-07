@@ -3848,3 +3848,27 @@ general rule: when a check asks "is X covered", measure the matcher against
 the corpus BEFORE trusting its green — a matcher that is loose in the
 direction of PASS reports the coverage you wanted rather than the coverage
 you have.
+
+## QUOTING A `**[PFX-N]**` ANCHOR MARKER IN PROSE CREATES A PHANTOM ANCHOR — the census reads the marker, not the intent (paid: 14z-140)
+
+`docs/project/living_docs_scope.md` §9 documents a table row in `HANDOFF.md`
+whose first cell opens with two bold anchor markers before the leading pipe,
+and quoted the row verbatim to show the shape. `tools/doc_anchor_census.py`
+scans every document for `**[PFX-N]**` and freezes `id / file / section`, so
+the quote registered two NEW anchors for `CPE-32` and `MFI-32` in a document
+that anchors nothing — `+CPE-32 … OUT-OF-LIST`, twice each, on the very next
+`--check`. Nothing was broken, but the census would have carried a false
+claim about where those two rules live, and `tools/checkskills.py` locks a
+skill rule to the paragraph its anchor sits in — a second copy is exactly
+the drift the lock exists to prevent.
+
+The rule: **an ID being DISCUSSED is backticked (`` `[CPE-32]` ``); an ID
+being ANCHORED carries the bold `**[PFX-N]**` form, and it carries it in
+exactly one place.** (This paragraph cannot show the bold form with a real
+ID in it — writing one here is the defect, and it tripped the census a
+second time while this entry was being written.) `docs/README.md` already writes every ID it merely names in
+backticks — follow it. If a quotation genuinely needs the bold form,
+describe the shape in words instead, and if it truly cannot, the census row
+is reviewed and frozen deliberately rather than by accident. The check is
+free: the anchor census is in the eight-check doc battery, so it fires on
+the same edit that creates the phantom.
