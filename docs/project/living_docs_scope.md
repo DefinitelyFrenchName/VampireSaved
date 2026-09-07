@@ -92,13 +92,19 @@ rebuild's precondition), the rendered site (3, and the carrier of 2).
 rows), "The documents, by role", and the Contents list with each shape;
 CLAUDE.md §5 points at the README as the map; every `engine_internals.md`
 section names its atlas rows and gates; `_history.md` twins are declared
-one way (live → twin) in `doc_shape.tsv`. **Measured gaps:** the Contents
-list is a CONVENTION — `checkdocshape` verifies only that its links resolve,
-not that every declared document is listed; two are not
-(`docs/project/gate_scoping_method.md`, the method document the port skill
-cites for eight rules, and `docs/project/tables/community_crosscheck.md`).
+one way (live → twin) in `doc_shape.tsv`. **Measured gaps (14z-135, the
+count CORRECTED 14z-140):** the Contents list was a CONVENTION —
+`checkdocshape` verified only that its links resolve, not that every
+declared document is listed. **FOUR were not, where this paragraph said two
+until 14z-140** (§8.1 has the census): `docs/project/gate_scoping_method.md`
+(the method document the port skill cites for eight rules, named NOWHERE in
+`docs/README.md`), `docs/project/tables/community_crosscheck.md`,
+`HANDOFF_HISTORY.md` and `docs/project/harness_hardening_history.md` — the
+two HIST rows were missed because the first census looked at the buckets and
+not at the HIST group. L1 lists all four and makes the completeness a CHECK.
 The twin declaration is one-way in the table, though every twin's text
-does name its live document today (measured: zero missing back-links).
+does name its live document today (measured: zero missing back-links, still
+true at 14z-140).
 `HANDOFF.md` and `docs/game/atlas/README.md` carry no routing table of
 their own.
 
@@ -143,7 +149,7 @@ first and moves values into tables second.
 
 | slice | what it delivers | measured start | ends when |
 |---|---|---|---|
-| **L1 routing enforcement (markdown)** | `checkdocshape.py` gains two checks: README COMPLETENESS (every `doc_shape.tsv` row that is not GENERATED-wholesale is listed in `docs/README.md` Contents, with its declared shape, and a directory-level entry counts for its members) and TWO-WAY TWINS (a HIST twin names its live document and the live document names its twin). Routing tables at the two entry points that lack one: `HANDOFF.md` ("if you want to DO X, read/run Y") and `docs/game/atlas/README.md` ("if you want to know what ADDRESS X is, read Y"). The two unlisted documents listed. | 2 unlisted docs; twins one-way in the table; 2 entry points without routing | the two new checks have must-fire controls on a perturbed copy (`--root`), the static tier is green, and the README lists every declared document |
+| **L1 routing enforcement (markdown)** | `checkdocshape.py` gains two checks: README COMPLETENESS (every `doc_shape.tsv` row is listed in `docs/README.md` Contents, with its declared shape; a directory-level entry counts for the members it NAMES; a row declared `entry-point` is exempt from Contents but must still be named somewhere in the README) and TWO-WAY TWINS (a HIST twin names its live document and the live document names its twin). Routing tables at the two entry points that lack one: `HANDOFF.md` ("if you want to DO X, read/run Y") and `docs/game/atlas/README.md` ("if you want to know what ADDRESS X is, read Y"). The unlisted documents listed. | 4 unlisted docs (§8.1 — this column said 2 until the 14z-140 census); twins one-way in the table; 2 entry points without routing | the two new checks have must-fire controls on a perturbed copy (`--root`), the static tier is green, and the README lists every declared document |
 | **L4 the rendered site** | `tools/mk_docs_site.py`: a generated HTML site under a gitignored directory (the `mister_core.html` precedent — never committed): the landing page IS the routing table; every document rendered with cross-links resolved; an ADDRESS INDEX from `annotations.md` (address → every carrier, one click); the gate index, the gotcha index and the skill guides as pages; the two tracked images; a search box over headings (client-side, no server). Markdown renderer: stdlib-only, the subset this corpus uses (headings, lists, tables, fenced code, bold/italic, links, strikethrough, blockquotes) — measured over the 66 documents before writing it, so the subset is a census and unsupported constructs FAIL the generator rather than render wrong. A portable gate runs the generator over the tree and fails on any unresolved link or unsupported construct; the HTML is the artifact, the generator is what is reviewed. | `mk_mister_page.py` is the pattern; no site exists | `tests/test_docs_site.sh` (ci_portable) green; the maintainer has opened the site |
 | **L2 fact tables with provenance** | `tools/audit_rule5.py`: the census — every behavioural value in `build/manifest/*.toml` and in the generators (damage, timings, meter, variant selection, re-point defaults, thresholds, frozen op counts) classified IN-TABLE (present in `docs/project/tables/` with provenance) / BAKED (in a manifest row or a generator constant only) / DERIVED (computed from a table at build time); the ratio reported as a NOTE-class number in the static tier first (never fatal — "a number that moves in the wrong direction is the signal"), then a gate freezing the BAKED inventory so it can only shrink. Then, value by value where the census says BAKED: a table row with provenance (measured / derived / testimony, the session, the rig), the manifest reading the table rather than carrying the value. | rule 5 honoured to an unmeasured degree; `tables/` has 9 documents | the ratio is measured and frozen; the BAKED inventory shrinks per session with a ledger |
 | **L3 ROM re-derivation (the SMS `checkdocs` class)** | `tools/checkdocs_rom.py`: for atlas claims with a CHECKABLE SHAPE — the opcode word or instruction at a `PRG:` address (the disassembler already exists), a table's row count / stride / entry values, a pointer's target, a string's bytes — quote the claim from the document (assert it is still there), derive the fact from the decrypted image (`build/out/vsavj_opcodes.bin` / `_data.bin` via `tests/lib/decrypt_cache.sh`), compare; `--uncovered` lists every `annotations.md` tier-0 address no check reaches, as the coverage number. Seeded from the atlas (tier 0) first — `ram.md` claims are RAM and need the emulator, so the ROM tier is `character_tables.md`, `id_space.md`, `select_screen.md`, `sprite_lists.md`, `venue_assets.md` — then `engine_internals.md`. Static tier (needs ROMDIR), NOTE-class coverage first, then frozen. | zero claims re-derived from the image today; 2,970 address rows claimed | the coverage number is measured, reported and frozen; every hand-written check quotes its claim |
@@ -212,10 +218,12 @@ the harness.
 
 ## 8. L1 — ROUTING ENFORCEMENT: scope (the plan before the work)
 
-**STATUS: THE PLAN, WRITTEN 14z-140 (2026-09-07). The six decisions of §8.7
-are OPEN and the work waits on them** — the per-slice shape every harness
-slice ran under (`harness_scope.md` §9): measure, write the plan, STOP for
-the rulings, execute in a fixed order.
+**STATUS: ALL SIX DECISIONS SETTLED AT THE STOP (14z-140, 2026-09-07) —
+three RULED by the maintainer, three taken as the stated default and not
+vetoed; §8.8 executed under them.** The rest of this section is the plan as
+ruled — the per-slice shape every harness slice ran under
+(`harness_scope.md` §9): measure, write the plan, STOP for the rulings,
+execute in a fixed order.
 
 L1 is §4's first row: two new checks in `tools/checkdocshape.py`, routing
 tables at the two entry points that lack one, and the documents the map does
@@ -379,36 +387,39 @@ L1 edits, none of them re-derived by anything.
 
 ### 8.7 Decisions — taken under stated assumptions, open to veto
 
-1. **The level-0 exemption is DECLARED in `doc_shape.tsv`** (§8.3 (a)): an
-   `entry-point` token in the `requires` column exempts a row from Contents
-   but still demands it be named somewhere in `docs/README.md`;
-   `docs/README.md` itself is exempt in code. Veto → (b), accept a listing
-   anywhere in the README (weaker, and still needs exemptions for five
-   rows), or (c), list all 69 in Contents (five files described twice).
-2. **`docs/project/tables/chars/*.md` get declared**: one `doc_shape.tsv`
-   row each as GENERATED, and one Contents directory entry under
-   `project/tables/` naming the three in backticks (the atlas model), which
-   removes a hard-coded path exclusion from `walk_docs()` and makes a fourth
-   tenant's page fail until it is listed. The `.json` files are machine
-   files, not documents. Veto → keep the `walk_docs()` exclusion and record
-   the reason in the TSV header (cost: the exclusion stays invisible to the
-   completeness check).
-3. **A directory entry's `**<SHAPE>**` tag must equal EVERY member's
-   declared class**, so a directory entry cannot smuggle a differently
-   classed document in. Satisfiable today (all seven atlas members are
-   REFERENCE). Veto → tag the directory entry only for uniform directories
-   and skip the check otherwise.
-4. **Two-way twins are a HARD failure**, not advisory: zero missing today,
-   so the check costs nothing and only catches regressions. Veto →
-   advisory.
-5. **The three uncheckable counts of S3-S5 are DROPPED from
-   `docs/README.md`**, not re-derived — the rule-count is a `grep` away and
-   the gotcha count already has its recipe in the same sentence
-   (`grep -c '^## '`). Veto → make them generated (a fourth `--check`
-   generator over the README, which is the L4 site's job, not L1's).
-6. **The routing tables' WORDING is the maintainer's to amend** — the
-   executor drafts both from §8.4 and the maintainer edits. Veto → the
-   maintainer dictates the rows.
+1. **RULED (maintainer, 2026-09-07): (a) — the level-0 exemption is
+   DECLARED in `doc_shape.tsv`** (§8.3): an `entry-point` token in the
+   `requires` column exempts a row from Contents but still demands it be
+   named somewhere in `docs/README.md`; `docs/README.md` itself is exempt in
+   code. ~~Veto → (b), accept a listing anywhere in the README (weaker, and
+   still needs exemptions for five rows), or (c), list all 69 in Contents
+   (five files described twice).~~
+2. **RULED (maintainer, 2026-09-07): `docs/project/tables/chars/*.md` get
+   declared** — one `doc_shape.tsv` row each as GENERATED, and one Contents
+   directory entry under `project/tables/` naming the three in backticks
+   (the atlas model), which removes a hard-coded path exclusion from
+   `walk_docs()` and makes a fourth tenant's page fail until it is listed.
+   The `.json` files are machine files, not documents. ~~Veto → keep the
+   `walk_docs()` exclusion and record the reason in the TSV header.~~
+3. **TAKEN AS THE STATED DEFAULT at the STOP (2026-09-07, not vetoed): a
+   directory entry's shape tag must equal EVERY member's declared class**,
+   so a directory entry cannot smuggle a differently classed document in.
+   Satisfiable today (all seven atlas members are REFERENCE). Veto → tag the
+   directory entry only for uniform directories and skip the check
+   otherwise.
+4. **TAKEN AS THE STATED DEFAULT at the STOP (2026-09-07, not vetoed):
+   two-way twins are a HARD failure**, not advisory — zero missing today, so
+   the check costs nothing and only catches regressions. Veto → advisory.
+5. **RULED (maintainer, 2026-09-07): the three uncheckable counts of
+   S3-S5 are DROPPED from `docs/README.md`**, not re-derived — the rule
+   count is a `grep` away and the gotcha count already has its recipe in the
+   same sentence (`grep -c '^## '`). ~~Veto → make them generated (a fourth
+   `--check` generator over the README, which is the L4 site's job, not
+   L1's).~~
+6. **TAKEN AS THE STATED DEFAULT at the STOP (2026-09-07, not vetoed):
+   the routing tables' WORDING is the maintainer's to amend** — both are
+   drafted from §8.4 and the maintainer edits. Veto → the maintainer
+   dictates the rows.
 
 Defaults taken WITHOUT a ruling (CLAUDE.md, §6 above, or the harness's
 ruled conventions already decide them): the two checks and their six
