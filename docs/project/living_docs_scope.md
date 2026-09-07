@@ -48,7 +48,9 @@ census 31 REFERENCE / 3 REGISTER / 3 LOG / 19 HIST / 3 INDEX / 7 GENERATED
 `docs/doc_locks.tsv`; 31 manifests under `build/manifest/` (30,406 lines);
 `docs/project/tables/` holds 9 documents, 4 of them GENERATED; one rendered
 page exists (`mister_core.html`, gitignored, 17 figures re-derived by its
-generator's `--check`).
+generator's `--check`) — and it stays the only DRAWN page after L4, which
+renders the markdown corpus and deliberately does not absorb it (§9.8
+decision 4).
 
 ---
 
@@ -152,7 +154,7 @@ first and moves values into tables second.
 | slice | what it delivers | measured start | ends when |
 |---|---|---|---|
 | **L1 routing enforcement (markdown)** — **LANDED 14z-140** (2026-09-07), commits `45f116ab` the checks, `a32b9138` HANDOFF's table, `38757605` the atlas README's; the plan and its measured ground truth are §8 | `checkdocshape.py` gains two checks: README COMPLETENESS (every `doc_shape.tsv` row is listed in `docs/README.md` Contents, with its declared shape; a directory-level entry counts for the members it NAMES; a row declared `entry-point` is exempt from Contents but must still be named somewhere in the README) and TWO-WAY TWINS (a HIST twin names its live document and the live document names its twin). Routing tables at the two entry points that lack one: `HANDOFF.md` ("if you want to DO X, read/run Y") and `docs/game/atlas/README.md` ("if you want to know what ADDRESS X is, read Y"). The unlisted documents listed. | 4 unlisted docs (§8.1 — this column said 2 until the 14z-140 census); twins one-way in the table; 2 entry points without routing | the two new checks have must-fire controls on a perturbed copy (`--root`), the static tier is green, and the README lists every declared document |
-| **L4 the rendered site** | `tools/mk_docs_site.py`: a generated HTML site under a gitignored directory (the `mister_core.html` precedent — never committed): the landing page IS the routing table; every document rendered with cross-links resolved; an ADDRESS INDEX from `annotations.md` (address → every carrier, one click); the gate index, the gotcha index and the skill guides as pages; the two tracked images; a search box over headings (client-side, no server). Markdown renderer: stdlib-only, the subset this corpus uses (headings, lists, tables, fenced code, bold/italic, links, strikethrough, blockquotes) — measured over the 66 documents before writing it, so the subset is a census and unsupported constructs FAIL the generator rather than render wrong. A portable gate runs the generator over the tree and fails on any unresolved link or unsupported construct; the HTML is the artifact, the generator is what is reviewed. | `mk_mister_page.py` is the pattern; no site exists | `tests/test_docs_site.sh` (ci_portable) green; the maintainer has opened the site |
+| **L4 the rendered site** | `tools/mk_docs_site.py`: a generated HTML site under a gitignored directory (the `mister_core.html` precedent — never committed): the landing page IS the routing table; every document rendered with cross-links resolved; an ADDRESS INDEX from `annotations.md` (address → every carrier, one click); the gate index, the gotcha index and the skill guides as pages; the two tracked images; a search box over headings, document titles and the 555 anchor IDs (client-side, no server). Markdown renderer: stdlib-only, the subset this corpus uses (headings, lists, tables, fenced code, bold/italic, links, strikethrough, blockquotes) — **measured 14z-140 over the 74 files that render** (62 hand-written + 10 GENERATED + the 2 skill GUIDEs; this row said 66 documents until then), so the subset is a census and unsupported constructs FAIL the generator rather than render wrong. A portable gate runs the generator over the tree and fails on any unresolved link or unsupported construct; the HTML is the artifact, the generator is what is reviewed. | `mk_mister_page.py` is the pattern; no site exists | `tests/test_docs_site.sh` (ci_portable) green; the maintainer has opened the site |
 | **L2 fact tables with provenance** | `tools/audit_rule5.py`: the census — every behavioural value in `build/manifest/*.toml` and in the generators (damage, timings, meter, variant selection, re-point defaults, thresholds, frozen op counts) classified IN-TABLE (present in `docs/project/tables/` with provenance) / BAKED (in a manifest row or a generator constant only) / DERIVED (computed from a table at build time); the ratio reported as a NOTE-class number in the static tier first (never fatal — "a number that moves in the wrong direction is the signal"), then a gate freezing the BAKED inventory so it can only shrink. Then, value by value where the census says BAKED: a table row with provenance (measured / derived / testimony, the session, the rig), the manifest reading the table rather than carrying the value. | rule 5 honoured to an unmeasured degree; `tables/` has 9 documents | the ratio is measured and frozen; the BAKED inventory shrinks per session with a ledger |
 | **L3 ROM re-derivation (the SMS `checkdocs` class)** | `tools/checkdocs_rom.py`: for atlas claims with a CHECKABLE SHAPE — the opcode word or instruction at a `PRG:` address (the disassembler already exists), a table's row count / stride / entry values, a pointer's target, a string's bytes — quote the claim from the document (assert it is still there), derive the fact from the decrypted image (`build/out/vsavj_opcodes.bin` / `_data.bin` via `tests/lib/decrypt_cache.sh`), compare; `--uncovered` lists every `annotations.md` tier-0 address no check reaches, as the coverage number. Seeded from the atlas (tier 0) first — `ram.md` claims are RAM and need the emulator, so the ROM tier is `character_tables.md`, `id_space.md`, `select_screen.md`, `sprite_lists.md`, `venue_assets.md` — then `engine_internals.md`. Static tier (needs ROMDIR), NOTE-class coverage first, then frozen. | zero claims re-derived from the image today; 2,970 address rows claimed | the coverage number is measured, reported and frozen; every hand-written check quotes its claim |
 
@@ -457,9 +459,11 @@ tier is green, and `docs/README.md` reaches every declared document.
 
 ## 9. L4 — THE RENDERED SITE: scope (the plan before the work)
 
-**STATUS: THE PLAN, WRITTEN 14z-140 (2026-09-07). The nine decisions of §9.8
-are OPEN and the work waits on them.** Same four beats as L1 (§8): measure,
-write the plan, STOP for the rulings, execute in a fixed order.
+**STATUS: ALL NINE DECISIONS RULED AT THE STOP (14z-140, 2026-09-07) — seven
+as recommended, decision 4 STRICTER (no link to the drawn MiSTer page, so the
+gate's href walk stays absolute) and decision 5 WIDER (the search indexes the
+555 anchor IDs too). §9.9 executes under them.** Same four beats as L1 (§8):
+measure, write the plan, STOP for the rulings, execute in a fixed order.
 
 ### 9.1 What it delivers
 
@@ -573,7 +577,16 @@ The site therefore shows EVERY carrier where the rendered page shows six.
   document set and shapes; builds `index.html` from the README,
   `addresses.html` from `collect()`, pages for `gate_index.md`,
   `GOTCHAS.md` and the two GUIDEs; copies the two images; one CSS file;
-  refuses to write into any tracked path.
+  refuses to write into any tracked path. **The page for
+  `project/mister_core.md` opens with a note naming
+  `tools/mk_mister_page.py` and the drawn page it produces — a NOTE, never a
+  link (decision 4), so every `href` the site emits is a file the site
+  wrote.**
+- **Search**: `search.json` carries every h1-h3, one entry per document
+  title, and one per `**[PFX-N]**` anchor (1,554 + 74 + 555, decision 5), and
+  one inline `<script>` per page does a substring filter over it — no `src=`,
+  no URL. A query matching `ADDR_RE` jumps to that address's row in the
+  index; a query matching an anchor ID jumps to the rule's paragraph.
 - **Slugs**: one function shared by the renderer and the address index —
   strip inline markup and `**[PFX-N]**` tokens, lower-case, non-alnum → `-`,
   collapse, trim; duplicates get `-2`, `-3`. A `**[PFX-N]**` anchor also
@@ -594,7 +607,8 @@ The census printed; `--check` exits 0; a render into `$WORK/site` asserting
 the page set, the image set, the extension set (`.html .css .json .png
 .jpg`), no `http://`, no `<script src`, no external `<link`, no reference to
 `build/out`, and — by an INDEPENDENT walk, not the generator's own check —
-every in-tree `href` resolving to a written file. Determinism is the
+every in-tree `href` resolving to a written file, **with no exemptions: that
+is what decision 4 bought by declining to link the drawn MiSTer page.** Determinism is the
 hand-edit invariant's real form: two renders into two temp dirs, `diff -r`
 empty. `git check-ignore -q docs/site` (guarded like the runner's
 not-a-checkout branch) is decision 1's tripwire.
@@ -613,57 +627,84 @@ corpus**: a code span wrapped across a line break → PASS; a cell containing
 
 | # | claim | true now |
 |---|---|---|
-| S1 | §2 of this document: "one rendered page exists (`mister_core.html`, gitignored, 17 figures)" | true until L4 lands; reworded at landing |
-| S2 | `tests/test_mister_page.sh`'s header says **ci_portable** (twice) while it is registered in `tests/ci_static.txt` | **MEASURED 14z-140: it passes with no `ROMDIR` (`env -u ROMDIR`, rc=0), so the header is right and the registration is wrong.** Move the row to `ci_portable.txt`, regenerate the gate index, its own commit |
-| S3 | §4's L4 row: "measured over the 66 documents" | 74 files render — 62 hand-written + 10 GENERATED + 2 skill GUIDEs. Corrected here and in §4 |
+| S1 | §2 of this document: "one rendered page exists (`mister_core.html`, gitignored, 17 figures)" | true until L4 lands, and it stays true in a narrower sense after: decision 4 keeps the DRAWN page separate and UNLINKED, so the site renders the markdown corpus without absorbing it. Dated in §2 |
+| S2 | `tests/test_mister_page.sh`'s header says **ci_portable** (twice) while it is registered in `tests/ci_static.txt`, and its comment block sits ORPHANED in `ci_portable.txt` beside no row | **FIXED 14z-140 — and the measurement INVERTED the plan's assumption.** The first reading, `env -u ROMDIR` on this machine, returned rc=0 and said the header was right. That is the "the verdict never changed on the machine it ran on" trap: this host HAS the build dirs. Re-measured in a REAL clean checkout (`git archive HEAD`), the gate exits 0 and re-derives 15 figures, **but prints the generator's two `  SKIP:` lines** (no WIDE romset, no decrypted image) — and `tests/lib/classify.sh` matches `^ *SKIP`, so the whole gate classifies SKIP, which `ci_portable` treats as a FAILURE by design (*"a gate that SKIPs for want of `build/out/vsavj_opcodes.bin` is not portable, it is silent"*). **So the REGISTRATION was right and the HEADER was wrong**: the header now says ci_static with the reason, and the orphaned comment block moved to `ci_static.txt` beside its row |
+| S3 | §4's L4 row: "measured over the 66 documents" | **FIXED 14z-140**: 74 files render — 62 hand-written + 10 GENERATED + the 2 skill GUIDEs. Corrected in §4's row |
 | S4 | §5.2: "a construct outside the subset fails the generator loudly rather than rendering wrong" | still the rule, but the census found TWO constructs the corpus actually uses that the plan listed as absent (raw HTML, and the table shapes of findings 2-3). The sentence stands; the subset is what changes |
 
 ### 9.8 Decisions — taken under stated assumptions, open to veto
 
-1. **Output directory `docs/site/`, gitignored as a directory**, with a
-   short rationale beside `.gitignore:143`'s `docs/project/mister_core.html`
-   — the only precedent, and it puts rendered docs beside the docs. Veto →
-   `build/docs_site/` (which is the ROM-artefact swamp the triage prunes).
-2. **The two auto-links ON by default, but SCOPED** — a backticked `*.md`
-   token links only when it resolves UNAMBIGUOUSLY to one rendered document
+1. **RULED (maintainer, 2026-09-07): output directory `docs/site/`, gitignored as a
+   directory**, with a short rationale beside `.gitignore:143`'s
+   `docs/project/mister_core.html` — the only precedent, and it puts rendered
+   docs beside the docs. ~~Veto → `build/docs_site/` (the ROM-artefact swamp
+   the triage prunes).~~
+2. **RULED (maintainer, 2026-09-07): the two auto-links ON, but SCOPED** — a backticked
+   `*.md` token links only when it resolves UNAMBIGUOUSLY to one rendered
+   document
    (repo-relative or `docs/`-relative); a bare basename with more than one
    candidate stays a code span. Measured: **1,568 backticked `*.md` code
    spans against 138 markdown links**, so this is how the corpus actually
    routes — and **777 resolve as written**, so half do not, which is the
    same ambiguity that made L1's matcher unsound. Address tokens (**4,052**)
-   link to their address-index row. Veto → markdown links only, and the site
-   loses most of its cross-linking.
-3. **Theme by MOVING the palette and `css()` into `tools/_pagestyle.py`**,
-   imported by both generators — `mk_mister_page.py` executes at import, so
-   importing it is not an option. `test_mister_page.sh` green before and
-   after. Veto → copy the ~30 variable lines with a `# lifted from` note.
-4. **`mister_core.html` is LINKED from the site and stays generated by its
-   own tool**, never re-implemented. Veto → embed it.
-5. **Search over headings only** (1,554 headings + 72 document titles).
-   Veto → headings plus each document's first line.
-6. **Publishing the site as a claude.ai artifact stays a SEPARATE decision
-   each time** (§5.1); the maintainer opens the local site. Veto → publish
-   at every landing.
-7. **`tables/chars/*.md` are rendered** (they gained shape rows at L1), and
-   their `<details><summary>` folds are handled by **teaching the subset
-   that ONE pair** — `<details>`/`<summary>`, the only real HTML in the
-   corpus, emitted by a generator we own. Veto (a) → change
-   `tools/charmap_md.py` to emit a heading plus the table, which re-freezes
-   `tests/expected/charmap_pages.sha256`; veto (b) → skip the chars pages,
-   and the character-data maps are absent from the site.
-8. **A `<word>` in prose is TEXT, not a construct**: the renderer escapes
-   `<…>` and FAILS only on a KNOWN HTML tag name outside a code span (the
-   list being the pair of decision 7 plus the tags a browser would act on).
+   link to their address-index row. ~~Veto → markdown links only, and the
+   site loses most of its cross-linking.~~
+3. **RULED (maintainer, 2026-09-07): the palette and `css()` MOVE into
+   `tools/_pagestyle.py`**, imported by both generators — `mk_mister_page.py`
+   executes at import, so importing IT is not an option. One definition of
+   the theme, so the site and the drawn page cannot drift;
+   `test_mister_page.sh` green before and after is the proof. ~~Veto → copy
+   the ~30 variable lines with a `# lifted from` note.~~
+4. **RULED (maintainer, 2026-09-07), against the recommendation, and the stricter
+   answer): the site does NOT link `mister_core.html`.** It renders
+   `mister_core.md` as an ordinary page whose top note names the command that
+   draws the 17-figure version. **The reason is the gate's own invariant:**
+   `mister_core.html` is gitignored and built on demand, so on a fresh
+   checkout it does not exist — linking it means either weakening the href
+   walk (*every in-tree `href` resolves to a written file*, §9.6, the one
+   assertion that catches a broken site) or carving a named exemption into
+   it. The walk stays ABSOLUTE and there are no exemptions; the cost is one
+   command to see the diagrams. ~~Recommendation was a link with a named,
+   must-fire-controlled exemption; embedding via subprocess was refused for
+   the two-producers risk — a second invocation path to an artefact
+   `test_mister_page.sh` locks, which is the class 14z-139 closed for verdict
+   classifiers.~~
+5. **RULED (maintainer, 2026-09-07), EXTENDING the recommendation): search over headings,
+   document titles AND every `**[PFX-N]**` anchor ID** — 1,554 headings + 74
+   titles + **555 anchors**, negligible extra size. Typing `VSP-167` or
+   `MSC-32` lands on the rule's paragraph, which is how the skills cite and
+   therefore how a reader arrives. ~~Veto → headings plus each document's
+   first line (a full-text index the browser's own Ctrl-F already gives per
+   page).~~
+6. **RULED (maintainer, 2026-09-07): publishing stays a SEPARATE decision each time**
+   (§5.1); the maintainer opens the local site, and building never implies
+   publishing. ~~Veto → publish at every landing, which would make a rule-7
+   judgement standing rather than per-artefact.~~
+7. **RULED (maintainer, 2026-09-07): `tables/chars/*.md` are rendered, and the subset is
+   taught ONE pair** — `<details>`/`<summary>`, the only real HTML in the
+   corpus, emitted by a generator we own and serving a purpose the site wants
+   (folding a 2,000-row table). Every other tag stays a strict FAIL.
+   ~~Veto (a) → change `tools/charmap_md.py` to emit a heading plus the
+   table, which re-freezes `tests/expected/charmap_pages.sha256` and would
+   introduce the corpus's first `####`; veto (b) → skip the chars pages.~~
+8. **RULED (maintainer, 2026-09-07): a `<word>` in prose is TEXT, not a construct** — the
+   renderer escapes `<…>` and FAILS only on a KNOWN HTML tag name outside a
+   code span (decision 7's pair, plus the tags a browser would act on).
    Measured: 26 placeholders across 22 files and 20 distinct words, so the
    plan's "`<` followed by a letter outside a code span is a strict FAIL"
-   would fail 22 documents for writing English. Veto → FAIL on all of them
-   and backtick the 26 sites (a 22-document edit, and the anchored ones need
-   the census re-frozen).
-9. **A table row's LEADING PIPE is optional**, as it is on GitHub — 22 rows
-   in 4 files rely on it, including `HANDOFF.md:45`, whose row opens with
-   its two bold anchor markers before the first pipe. Veto → fix
-   the four documents instead, which moves two anchor markers inside a cell
-   and needs `doc_anchor_census.py --freeze` in the same commit.
+   would fail 22 documents for writing English. ~~Veto → FAIL on all and
+   backtick the 26 sites (a 22-document edit reaching two GENERATED GUIDEs,
+   whose real sites are their source paragraphs); or escape everything and
+   never fail, which makes a real `<script>` render as visible text with
+   nobody told.~~
+9. **RULED (maintainer, 2026-09-07): a table row's LEADING PIPE is optional**, as it is on
+   GitHub — 22 rows in 4 files rely on it, including `HANDOFF.md:45`, whose
+   row opens with its two bold anchor markers before the first pipe.
+   ~~Veto → fix the four documents, which moves two anchor markers inside a
+   cell and needs `doc_anchor_census.py --freeze` in the same commit — and
+   could not be uniform anyway: 16 of the 22 rows are in
+   `docs/NEXT_SESSION_HISTORY.md`, an ARCHIVE that is never rewritten
+   ([VSP-17]).~~
 
 Defaults (no ruling): the subset census as the source of truth over the
 plan's table, strict FAIL for a genuinely unsupported construct, the gate's

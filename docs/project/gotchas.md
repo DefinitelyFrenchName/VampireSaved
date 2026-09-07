@@ -3872,3 +3872,34 @@ describe the shape in words instead, and if it truly cannot, the census row
 is reviewed and frozen deliberately rather than by accident. The check is
 free: the anchor census is in the eight-check doc battery, so it fires on
 the same edit that creates the phantom.
+
+## A GATE'S TIER CANNOT BE MEASURED ON A DEVELOPER'S MACHINE — the SKIP that decides it only appears in a clean checkout (paid: 14z-140)
+
+`tests/test_mister_page.sh`'s header said `ci_portable` while its row sat in
+`tests/ci_static.txt`, and its comment block sat orphaned in
+`ci_portable.txt` beside no row at all. Which one was wrong looked like a
+one-command question: `env -u ROMDIR bash tests/test_mister_page.sh` returned
+**rc=0**, so the header was right and the registration was the error.
+
+It was the other way round, and the first measurement could not have shown
+it. `ci_portable` means a CLEAN CHECKOUT can run the gate — no `$ROMDIR`, no
+`build/out/`, no build directories — and its bar is stricter than exiting 0:
+*the runner asserts each line exits 0 AND does not print SKIP*. Two of this
+gate's sub-checks need the WIDE romset and the decrypted image; when those
+are absent `mk_mister_page.py --check` emits `  SKIP: …` and the gate PRINTS
+those lines. `tests/lib/classify.sh` matches `^ *SKIP`, so the whole gate
+classifies **SKIP**, which `ci_portable` treats as a failure by design. On a
+developer's machine the build dirs exist, the SKIPs never appear, and the
+verdict is PASS every time.
+
+Re-measured with **`git archive HEAD | tar -x -C "$W"`** — a real
+tracked-files checkout, not a hand-rolled `cp` loop (the first attempt at one
+silently dropped files and produced a nonsense `FileNotFoundError`). There
+the gate exits 0, re-derives 15 figures, fires all three controls — and
+prints two SKIP lines. Registration right, header wrong.
+
+The rule: **to decide a gate's tier, run it in `git archive HEAD`, not in
+your tree**, and read the gate's OUTPUT for `^ *SKIP` rather than its exit
+status. This is the same shape as the 14z-139 reference-rot finding — *"the
+verdict never changed on the machine it ran on"* — and the same shape as
+[VSP-101]'s reason for counting SKIP separately at all.

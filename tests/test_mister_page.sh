@@ -44,7 +44,16 @@
 # real repo with --repo, so the tree is never touched.
 #
 # ROM-free, no emulator, ~3 s (or ~5 s with the WIDE build present, which adds
-# the real census). ci_portable.
+# the real census). **ci_static, NOT ci_portable — corrected 14z-140.**
+# The header said ci_portable while the row sat in tests/ci_static.txt, and
+# MEASURED in a real clean checkout (`git archive HEAD`), the registration
+# is the one that is right: the two sub-checks above SKIP when the WIDE
+# romset and the decrypted image are absent, this script PRINTS those
+# `  SKIP:` lines, and tests/lib/classify.sh matches `^ *SKIP` — so a clean
+# checkout classifies the whole gate SKIP, which ci_portable treats as a
+# FAILURE by design ("a gate that SKIPs for want of build/out is not
+# portable, it is silent"). It exits 0 and re-derives 15 figures there, so
+# nothing is broken; it simply is not a CLEAN-CHECKOUT gate.
 #
 # HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
