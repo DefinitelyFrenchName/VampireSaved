@@ -141,4 +141,10 @@ replay_checksums.txt
 # generator tools/mk_mister_page.py, because a hand-copied artifact goes
 # stale silently and this one draws a memory map whose slack is 0.2%.
 docs/project/mister_core.html
+# the rendered documentation site (tools/mk_docs_site.py, 14z-140): generated
+# locally and never committed, the same rule as the drawn page above — the
+# markdown is the source and the site is a projection of it. Regenerate with
+# `python3 tools/mk_docs_site.py`; `--verify docs/site` says whether a
+# directory is what a fresh render produces.
+docs/site/
 build/gfx_hashes/

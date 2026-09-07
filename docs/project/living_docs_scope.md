@@ -154,7 +154,7 @@ first and moves values into tables second.
 | slice | what it delivers | measured start | ends when |
 |---|---|---|---|
 | **L1 routing enforcement (markdown)** — **LANDED 14z-140** (2026-09-07), commits `45f116ab` the checks, `a32b9138` HANDOFF's table, `38757605` the atlas README's; the plan and its measured ground truth are §8 | `checkdocshape.py` gains two checks: README COMPLETENESS (every `doc_shape.tsv` row is listed in `docs/README.md` Contents, with its declared shape; a directory-level entry counts for the members it NAMES; a row declared `entry-point` is exempt from Contents but must still be named somewhere in the README) and TWO-WAY TWINS (a HIST twin names its live document and the live document names its twin). Routing tables at the two entry points that lack one: `HANDOFF.md` ("if you want to DO X, read/run Y") and `docs/game/atlas/README.md` ("if you want to know what ADDRESS X is, read Y"). The unlisted documents listed. | 4 unlisted docs (§8.1 — this column said 2 until the 14z-140 census); twins one-way in the table; 2 entry points without routing | the two new checks have must-fire controls on a perturbed copy (`--root`), the static tier is green, and the README lists every declared document |
-| **L4 the rendered site** | `tools/mk_docs_site.py`: a generated HTML site under a gitignored directory (the `mister_core.html` precedent — never committed): the landing page IS the routing table; every document rendered with cross-links resolved; an ADDRESS INDEX from `annotations.md` (address → every carrier, one click); the gate index, the gotcha index and the skill guides as pages; the two tracked images; a search box over headings, document titles and the 555 anchor IDs (client-side, no server). Markdown renderer: stdlib-only, the subset this corpus uses (headings, lists, tables, fenced code, bold/italic, links, strikethrough, blockquotes) — **measured 14z-140 over the 74 files that render** (62 hand-written + 10 GENERATED + the 2 skill GUIDEs; this row said 66 documents until then), so the subset is a census and unsupported constructs FAIL the generator rather than render wrong. A portable gate runs the generator over the tree and fails on any unresolved link or unsupported construct; the HTML is the artifact, the generator is what is reviewed. | `mk_mister_page.py` is the pattern; no site exists | `tests/test_docs_site.sh` (ci_portable) green; the maintainer has opened the site |
+| **L4 the rendered site** — **LANDED 14z-140** (2026-09-07); the plan, the census and the rulings are §9 | `tools/mk_docs_site.py`: a generated HTML site under a gitignored directory (the `mister_core.html` precedent — never committed): the landing page IS the routing table; every document rendered with cross-links resolved; an ADDRESS INDEX from `annotations.md` (address → every carrier, one click); the gate index, the gotcha index and the skill guides as pages; the two tracked images; a search box over headings, document titles and the 555 anchor IDs (client-side, no server). Markdown renderer: stdlib-only, the subset this corpus uses (headings, lists, tables, fenced code, bold/italic, links, strikethrough, blockquotes) — **measured 14z-140 over the 74 files that render** (62 hand-written + 10 GENERATED + the 2 skill GUIDEs; this row said 66 documents until then), so the subset is a census and unsupported constructs FAIL the generator rather than render wrong. A portable gate runs the generator over the tree and fails on any unresolved link or unsupported construct; the HTML is the artifact, the generator is what is reviewed. | `mk_mister_page.py` is the pattern; no site exists | `tests/test_docs_site.sh` (ci_portable) green; the maintainer has opened the site |
 | **L2 fact tables with provenance** | `tools/audit_rule5.py`: the census — every behavioural value in `build/manifest/*.toml` and in the generators (damage, timings, meter, variant selection, re-point defaults, thresholds, frozen op counts) classified IN-TABLE (present in `docs/project/tables/` with provenance) / BAKED (in a manifest row or a generator constant only) / DERIVED (computed from a table at build time); the ratio reported as a NOTE-class number in the static tier first (never fatal — "a number that moves in the wrong direction is the signal"), then a gate freezing the BAKED inventory so it can only shrink. Then, value by value where the census says BAKED: a table row with provenance (measured / derived / testimony, the session, the rig), the manifest reading the table rather than carrying the value. | rule 5 honoured to an unmeasured degree; `tables/` has 9 documents | the ratio is measured and frozen; the BAKED inventory shrinks per session with a ledger |
 | **L3 ROM re-derivation (the SMS `checkdocs` class)** | `tools/checkdocs_rom.py`: for atlas claims with a CHECKABLE SHAPE — the opcode word or instruction at a `PRG:` address (the disassembler already exists), a table's row count / stride / entry values, a pointer's target, a string's bytes — quote the claim from the document (assert it is still there), derive the fact from the decrypted image (`build/out/vsavj_opcodes.bin` / `_data.bin` via `tests/lib/decrypt_cache.sh`), compare; `--uncovered` lists every `annotations.md` tier-0 address no check reaches, as the coverage number. Seeded from the atlas (tier 0) first — `ram.md` claims are RAM and need the emulator, so the ROM tier is `character_tables.md`, `id_space.md`, `select_screen.md`, `sprite_lists.md`, `venue_assets.md` — then `engine_internals.md`. Static tier (needs ROMDIR), NOTE-class coverage first, then frozen. | zero claims re-derived from the image today; 2,970 address rows claimed | the coverage number is measured, reported and frozen; every hand-written check quotes its claim |
 
@@ -459,10 +459,13 @@ tier is green, and `docs/README.md` reaches every declared document.
 
 ## 9. L4 — THE RENDERED SITE: scope (the plan before the work)
 
-**STATUS: ALL NINE DECISIONS RULED AT THE STOP (14z-140, 2026-09-07) — seven
-as recommended, decision 4 STRICTER (no link to the drawn MiSTer page, so the
-gate's href walk stays absolute) and decision 5 WIDER (the search indexes the
-555 anchor IDs too). §9.9 executes under them.** Same four beats as L1 (§8):
+**STATUS: LANDED 14z-140 (2026-09-07).** All nine decisions were ruled at the
+STOP — seven as recommended, decision 4 STRICTER (no link to the drawn MiSTer
+page, so the gate's href walk stays absolute) and decision 5 WIDER (the search
+indexes the 555 anchor IDs too) — and §9.9 executed under them the same
+sitting: the staleness pass, `md_subset.py` + its gate, the `_pagestyle` move,
+and `mk_docs_site.py` + `tests/test_docs_site.sh`. **The site is 80 pages and
+6.6 MB, with 2,958 address rows and 1,639 search entries.** Same four beats as L1 (§8):
 measure, write the plan, STOP for the rulings, execute in a fixed order.
 
 ### 9.1 What it delivers
@@ -595,7 +598,8 @@ The site therefore shows EVERY carrier where the rendered page shows six.
   parse, nine forbidden constructs each have a must-fire control, nine shapes
   the corpus DOES write each have a must-NOT-fire control, and the gate prints
   the census on every run so it cannot go quietly stale.
-- **`tools/mk_docs_site.py`** (new, ~500 lines): `--root`, `--out` (default
+- **`tools/mk_docs_site.py`** — **LANDED 14z-140**, 80 pages / 6.6 MB, gate
+  `tests/test_docs_site.sh` (ci_portable, family `docs`, ~25 s): `--root`, `--out` (default
   `docs/site/`), `--check` (parse and resolve, write nothing — the gate's
   mode), `--census`, `--verify DIR`. Reads `docs/doc_shape.tsv` for the
   document set and shapes; builds `index.html` from the README,
@@ -649,6 +653,30 @@ is what decision 4 bought by declining to link the drawn MiSTer page.** Determin
 hand-edit invariant's real form: two renders into two temp dirs, `diff -r`
 empty. `git check-ignore -q docs/site` (guarded like the runner's
 not-a-checkout branch) is decision 1's tripwire.
+
+**MEASURED at the landing:** 82 written files (80 pages + `search.json` +
+`style.css`) and 2 images, 6.6 MB; **0 unresolved in-tree hrefs**, **0
+external loads**, two renders byte-identical, 2,958 address rows and 1,639
+search entries. Two content links to the outside world survive, both written
+by documents on purpose (a claude.ai artifact and a GitHub issue) — a link a
+reader clicks is not a LOAD, and the assertion is that the page fetches
+nothing.
+
+**Three of this gate's own checks were wrong before they were right, all the
+same mistake — reading TEXT where the invariant is about an ATTRIBUTE:** a
+`no http://` grep fired on escaped prose and on this document's own control
+examples; a `no build/out` grep fired on HANDOFF and the atlas README for
+QUOTING a filename in a command; and the href walk read the search box's
+`'<a href="'+BASE+…` string concatenation as 80 broken links. The walk strips
+`<script>` first, and the other two ask about `src=`/`href=`. **And the
+address-index control was dead twice** before it fired: its fixture sat where
+`gen_annotations.CARRIERS` does not look (`collect()` returned nothing), and
+an address in a document's preamble does not give section `(top)` — the `# `
+title has already set it. What finally fires it is a real parser
+disagreement: an UNCLOSED CODE SPAN swallows the headings after it, so
+`md_subset` emits no heading while `gen_annotations`' line-based `HDR_RE`
+records one and files the address under it. Nothing else in the tree catches
+that.
 
 **Must-fire controls** on `mkcopy` + `--root`, each with its `sed` proven to
 have applied: `#### h4` → unsupported construct; `[x](nope.md)` →

@@ -62,6 +62,10 @@ Entry points at this level, deliberately not in a bucket:
   orphan, the silent downgrade, the dead control, the stale reference, the
   outgrown parser, the deleted mechanism, the missing operand. Read the
   classes before triaging a red gate; each one was paid for.
+- **The whole of this, RENDERED**: `python3 tools/mk_docs_site.py` then
+  open `docs/site/index.html` — every document cross-linked, an address
+  index over every carrier, and a search across headings and rule IDs.
+  Generated locally and gitignored; the markdown here is the source.
 - `checksums.txt` — machine-read by `tools/audit_roms.py`. A data
   manifest, not documentation; its path is deliberately stable.
 

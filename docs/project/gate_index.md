@@ -16,12 +16,12 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**307 scripts** — 66 ci_portable, 72 ci_static, 169 emulator-tier (run by name).
+**308 scripts** — 67 ci_portable, 72 ci_static, 169 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 12 | the suite runners and their own ground truth |
-| [docs](#docs) | 13 | the documentation locks — docs, skills, indexes, tables follow the tree |
+| [docs](#docs) | 14 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 26 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 51 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
@@ -62,6 +62,7 @@ the documentation locks — docs, skills, indexes, tables follow the tree.
 | `tests/test_checkdocs.sh` | test | ci_portable | — | the load-bearing numbers the docs share are LOCKED across documents (14z-118, the documentation audit). ci_portable: no ROM, no build dir, no emulator, ~0.2 s. | 14z-118 |
 | `tests/test_checkskills.sh` | test | ci_portable | — | the eight skills are locked to the docs they distil (14z-114; level 0 added 14z-134). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-114 |
 | `tests/test_doc_anchor_census.sh` | test | ci_portable | — | every skill anchor's FILE and SECTION are frozen (14z-122, the documentation rationalization pass). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-122 |
+| `tests/test_docs_site.sh` | test | ci_portable | — | the documentation site renders, resolves and is deterministic (14z-140, living-docs slice L4). ci_portable: no ROM, no build dir, no emulator, ~25 s. | 14z-140 |
 | `tests/test_docshape.sh` | test | ci_portable | — | every hand-written doc's SHAPE is declared and enforced (14z-122, the documentation rationalization pass). ci_portable: no ROM, no build dir, no emulator, ~2 s. | 14z-122 |
 | `tests/test_expectation_provenance.sh` | test | ci_portable | — | every frozen expectation file says WHERE ITS NUMBERS CAME FROM (14z-128). ROM-free, ~1 s. | 14z-128 |
 | `tests/test_gate_index_current.sh` | test | ci_portable | — | docs/project/gate_index.md FOLLOWS the tree (14z-123, the documentation rationalization pass, G6). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-123 |

@@ -136,6 +136,17 @@ test_docshape
 # span, a ragged row, a table-shaped prose line, a <word> placeholder,
 # <details>/<summary>, a known tag inside a code span). ~3 s.
 test_md_subset
+
+# 14z-140 (living-docs L4): the rendered documentation SITE. Every
+# declared document plus the two skill GUIDEs render; every markdown
+# link, every auto-linked backticked path and every `#fragment`
+# RESOLVES; the address index (built from gen_annotations.collect(),
+# not from the rendered page) links only to headings that exist; the
+# site loads nothing from the network and links into no build dir; every
+# in-tree href points at a file the render wrote, by an INDEPENDENT
+# walk; two renders are byte-identical; and docs/site is gitignored.
+# Four must-fire controls on synthetic roots, one must-NOT-fire. ~25 s.
+test_docs_site
 # 14z-122: docs/GOTCHAS.md is GENERATED from the three bucket files' ## headers
 # (one line per entry, wrapped headers merged, anchors stripped) — the
 # hand-maintained index had desynced once and accreted ten session digests,

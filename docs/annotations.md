@@ -24,14 +24,14 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | figure | count |
 |---|---|
 | distinct program-space addresses named | 2958 |
-| named by a document or manifest only | 2046 |
-| named by both a document/manifest and code | 601 |
+| named by a document or manifest only | 2045 |
+| named by both a document/manifest and code | 602 |
 | named by CODE ONLY (the gap list below) | 311 |
 | carried by atlas | 473 |
 | carried by engine_internals | 535 |
 | carried by other docs | 946 |
 | carried by manifests | 1780 |
-| carried by code | 912 |
+| carried by code | 913 |
 
 ## Addresses
 
@@ -2203,7 +2203,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0E4A48` | docs/platform/gotchas.md — PC-relative reads are DECRYPTED reads on CPS-2 (paid: 2026-07-25, ~45min); build/manifest/huitzil.toml — port_patch; tools/gen_index_window_thunk.py |
 | `PRG:0x0E57F0` | docs/project/mister_fit.md — 2. QSound samples; docs/project/mister_map.md — The QSound trim, concretely — **AS BUILT, slice D0 landed 14z-107 (5)** |
 | `PRG:0x0F0000` | docs/project/mister_core.md — 6. Where every byte goes; docs/project/mister_map.md — As mapped (the proposal); docs/project/mister_map.md — Bank 0 — 16 MB, the only read/**write** bank ('ba_wr[3:1] = 0', ':215'); docs/project/mister_map.md — The QSound trim, concretely — **AS BUILT, slice D0 landed 14z-107 (5)**; tests/test_jtcores_twin.sh; tests/test_mister_mra_map.sh; +1 more |
-| `PRG:0x0F1234` | docs/game/atlas/README.md — atlas — the verified ROM/RAM map (project bible) |
+| `PRG:0x0F1234` | docs/game/atlas/README.md — atlas — the verified ROM/RAM map (project bible); tests/test_docs_site.sh |
 | `PRG:0x0F404E` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x0F420C` | build/manifest/donovan.toml — throw_victim_keyframes |
 | `PRG:0x0F619C` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tools/gen_anita_bank2.py |

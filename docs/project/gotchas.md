@@ -3903,3 +3903,62 @@ your tree**, and read the gate's OUTPUT for `^ *SKIP` rather than its exit
 status. This is the same shape as the 14z-139 reference-rot finding — *"the
 verdict never changed on the machine it ran on"* — and the same shape as
 [VSP-101]'s reason for counting SKIP separately at all.
+
+## A CHECK ABOUT A LINK MUST READ THE ATTRIBUTE, NOT THE TEXT — three of one gate's own assertions were wrong the same way (paid: 14z-140)
+
+`tests/test_docs_site.sh` asserts three things about the rendered site: that
+it loads nothing from the network, that it references no ROM-derived build
+artefact, and that every in-tree `href` points at a file the render wrote. All
+three were written as greps over the page TEXT, and all three were wrong on
+their first run:
+
+- **`no http://`** fired on `living_docs_scope.html`, `id_space.html` and
+  `sprite_lists.html` — escaped PROSE, including this project's own gate
+  control examples. A document may write a URL without the page fetching one.
+- **`no build/out`** fired on `HANDOFF.html` and the atlas README for QUOTING
+  `build/out/vsavj_data.bin` inside a command. The corpus names that path
+  constantly; naming it is not referencing it.
+- **the href walk** reported **80 broken links**, every one of them the search
+  box's own JavaScript: `'<a href="'+BASE+e.d+…` is a string being built, not
+  an attribute.
+
+The invariants were right and the readings were wrong. What rule 7 bars is the
+site LINKING to or EMBEDDING a ROM-derived artefact — an `href`/`src`, not a
+word. What "no external loads" means is `<script src=`, `<link href=`,
+`<img src=` to another host — an external link a document deliberately writes
+is a content link the reader clicks. And an href walk strips `<script>` blocks
+before it scans, because a page that builds links at runtime will otherwise
+report as many broken links as it has pages.
+
+The rule: **when a check is about what a page DOES, match the attribute; when
+it is about what a page SAYS, match the text — and say which one you meant in
+the assertion's own message.** A grep that reads prose as markup produces a
+red that looks exactly like a real one, and the first instinct is to "fix" the
+documents.
+
+## A MUST-FIRE CONTROL CAN BE DEAD IN WAYS THE FIXTURE HIDES — two in a row on one check (paid: 14z-140)
+
+The address-index check in `mk_docs_site.py` fails a carrier whose section
+resolves to no heading. Proving it fires took three attempts, and the first
+two PASSED BY NOT FIRING:
+
+1. The fixture document sat at `docs/a.md`. `gen_annotations.CARRIERS` is a
+   list of EXPLICIT patterns — `docs/game/atlas/*.md`, `docs/project/*.md`,
+   `HANDOFF.md`, `build/manifest/*.toml`, `tools/*.py` — and `docs/a.md`
+   matches none of them, so `collect()` returned ZERO addresses and there was
+   nothing for the check to judge.
+2. Moved to `docs/project/a.md`, the address was written in the document's
+   preamble on the theory that its section would be `(top)`. It is not: the
+   `# ` title has already set the section by the time the address line is
+   read.
+
+What finally fires it is a genuine disagreement between the two parsers: an
+UNCLOSED CODE SPAN swallows the headings that follow it, so `md_subset` joins
+them into the paragraph and emits no heading, while `gen_annotations`'
+line-based `HDR_RE` records one and files the address under it. That is a real
+authoring hazard nothing else in the tree catches, which is the check's value.
+
+The rule: **a control gets its own liveness assertion.** This one now checks
+that the fixture collects at least one address before it judges the verdict,
+and says so in the gate. "The generator ACCEPTED it" and "the fixture never
+reached the code" look identical from outside.
