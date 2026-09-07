@@ -109,6 +109,26 @@ DEF = re.compile(r'^\s*([A-Za-z_][A-Za-z0-9_]*)='
                  r'(?:\$\{?REPO\}?/)?(?P<sub>build/[a-z0-9_]+)(?P<subtail>/rompath)?\}"'
                  r'|"?(?P<plain>build/[a-z0-9_]+)"?\s*(?:#.*)?$)', re.M)
 
+# WHICH IMAGE A ROMPATH IS JUDGED BY (14z-139). Until now: the `vsavjw` zip,
+# else DIRECTORY ORDER (`glob.glob` is unsorted). A stock build's rompath
+# holds `vsavj.zip` beside the pristine parent `vsav.zip`; on this host the
+# filesystem happened to list `vsavj.zip` first, so the stock twins were
+# judged by their own image — on another filesystem the same dirs would have
+# been judged by the parent and the currency report would have read `no
+# registry row` for them (found 14z-137 when the harness lifted this gate).
+# The preference is now NAMED, in order, and the fallback is name order, so
+# the verdict is a property of the tree and not of the filesystem.
+# Ground truth: tests/test_ref_rot_image_pick.sh.
+IMAGE_PREFER = ("vsavjw", "vsavj")
+
+def images_of(bdir):
+    zs = sorted(glob.glob(f"{bdir}/rompath/*.zip"))
+    for sub in IMAGE_PREFER:
+        pref = [z for z in zs if sub in os.path.basename(z)]
+        if pref:
+            return pref
+    return zs
+
 rotted, absent, ok, skipped = [], [], [], []
 for path in sorted(glob.glob("tests/*.sh")):
     src = open(path, errors="replace").read()
@@ -134,8 +154,7 @@ for path in sorted(glob.glob("tests/*.sh")):
         if not os.path.isdir(bdir) or not os.path.isdir(f"{bdir}/rompath"):
             absent.append((os.path.basename(path), var, bdir))
             continue
-        zips = [z for z in glob.glob(f"{bdir}/rompath/*.zip") if "vsavjw" in z] \
-               or glob.glob(f"{bdir}/rompath/*.zip")
+        zips = images_of(bdir)
         if not zips:
             # a rompath with NO zip is unbuilt too: force-added side files
             # (vsavjw.zip.ledger.json) put a rompath dir on a clean checkout
@@ -199,8 +218,7 @@ try:
           if not os.path.isdir(bdir):
               continue
           if bdir not in seen:
-              zs = ([z for z in glob.glob(f"{bdir}/rompath/*.zip") if "vsavjw" in z]
-                    or glob.glob(f"{bdir}/rompath/*.zip"))
+              zs = images_of(bdir)
               try:
                   seen[bdir] = reg.get(_bf.program_sha1(zs[0]), None)
               except Exception:

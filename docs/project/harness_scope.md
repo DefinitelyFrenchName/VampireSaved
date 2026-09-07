@@ -349,9 +349,13 @@ Three rules that follow from the contract:
    then an explicit re-baseline of the fidelity gate.
 2. **The generic classifier is the STRONGER copy** (the sweep runner's: it
    has the TIMEOUT and the exit-0-after-shell-error branches; the static
-   runner today lacks both). A static-tier delta on a gate that exits 0
-   after a shell error is a FINDING about this tree, recorded, never a
-   fidelity failure — and never fixed by weakening the generic classifier.
+   runner lacked both until 14z-139). A static-tier delta on a gate that
+   exits 0 after a shell error was a FINDING about this tree, recorded at
+   14z-135, never a fidelity failure — and never fixed by weakening the
+   generic classifier. **RESOLVED 14z-139 on this tree's side**: the three
+   runners now source ONE classifier, `tests/lib/classify.sh` (the sweep's
+   lines, moved), so F1 is identical on the shell-crash gate too and the
+   harness's F1 asserts identity instead of the known delta.
 3. **Comparison is of TEXT, not of a re-implementation's opinion.** Where
    the project tool prints a number, the generic tool prints the same
    number in the same place, or the diff is not empty.

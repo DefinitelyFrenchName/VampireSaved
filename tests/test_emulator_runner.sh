@@ -44,6 +44,9 @@ T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
 FR="$T/fakerepo"
 mkdir -p "$FR/tests/lib" "$FR/tools" "$FR/build/fake_merged/rompath" "$T/roms"
 ln -s "$RUNNER" "$FR/tests/run_all_emulator.sh"
+# the runner sources THE ONE classifier relative to its repo (14z-139), so
+# the synthetic repo carries it too — the shipped lib, never a copy
+mkdir -p "$FR/tests/lib"; ln -s "$REPO/tests/lib/classify.sh" "$FR/tests/lib/classify.sh"
 
 # Stub tools so the runner's preconditions execute for real.
 printf '#!/usr/bin/env python3\nimport sys\n' > "$FR/tools/audit_roms.py"

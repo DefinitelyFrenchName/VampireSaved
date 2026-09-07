@@ -36,6 +36,9 @@ T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
 FR="$T/fakerepo"
 mkdir -p "$FR/tests"
 ln -s "$RUNNER" "$FR/tests/run_all_static.sh"
+# the runner sources THE ONE classifier relative to its repo (14z-139), so
+# the synthetic repo carries it too — the shipped lib, never a copy
+mkdir -p "$FR/tests/lib"; ln -s "$REPO/tests/lib/classify.sh" "$FR/tests/lib/classify.sh"
 
 mk() {  # mk <name> <exit> <output...>
     n="$1"; st="$2"; shift 2
@@ -156,6 +159,45 @@ for f in tests/ci_portable.txt tests/ci_static.txt; do
     echo "  ok: $f — $n entries, all present"
 done
 [ "$bad" = 0 ] || rc=1
+
+echo "== 8. exit 0 after a SHELL ERROR is FAIL; a MAME teardown segfault line is not (14z-139) =="
+# The sweep runner has read this shape as FAIL since 14z-134 (a 65-minute
+# Verilator gate recorded `PASS 0s` after a `${VAR:?}` abort behind an EXIT
+# trap, [VSP-176]); THIS runner kept its own classifier copy and lacked the
+# branch, so the pre-commit command said PASS where the sweep said FAIL for
+# the same log. Both now source tests/lib/classify.sh. The benign look-alike
+# — MAME segfaulting at teardown AFTER the summary line, digits where the
+# NAME would be — must still PASS.
+mk g_shellcrash 0 "tests/g_shellcrash.sh: line 3: FOO: set FOO to a dir OUTSIDE the repo"
+mk g_segv 0 "PASS: the summary line" "tests/g_segv.sh: line 64:  2444 Segmentation fault: 11  REPLAY=x"
+printf 'g_pass\ng_shellcrash\ng_segv\n' > "$FR/tests/ci_portable.txt"
+o8="$(cd "$FR" && sh tests/run_all_static.sh --tier portable 2>&1)" && s8=0 || s8=$?
+if printf '%s' "$o8" | grep -qE '^  g_shellcrash +FAIL .*\(exit 0 after a shell error\)'; then
+    echo "  ok: a shell-error line with exit 0 is FAIL, and the row says why"
+else
+    fail "shell-error crash not classified FAIL (was PASS before 14z-139):"
+    printf '%s' "$o8" | grep -E '^  g_shellcrash' | sed 's/^/        /'
+fi
+printf '%s' "$o8" | grep -qE '^  g_segv +PASS' \
+    && echo "  ok: a MAME teardown segfault line after the summary stays PASS" \
+    || fail "the benign segfault shape was not PASS"
+printf '%s' "$o8" | grep -q "PASS 2 .*SKIP 0 .*FAIL 1" \
+    && echo "  ok: tally PASS 2  SKIP 0  FAIL 1" \
+    || fail "wrong tally: $(printf '%s' "$o8" | grep -E '^PASS ' || echo '(none printed)')"
+[ "$s8" != 0 ] && echo "  ok: and the runner exits nonzero ($s8)" \
+    || fail "the runner exited 0 with an exit-0 crash in the tier"
+# THE LOCK on the cause: one classifier, sourced by all three runners. The
+# 14z-135 census found two DIFFERING copies; a third copy is how it recurs.
+for r in run_all_static run_all_emulator run_battery_m2; do
+    grep -q '^\. "\$REPO/tests/lib/classify.sh"' "tests/$r.sh" \
+        && echo "  ok: $r.sh sources tests/lib/classify.sh" \
+        || fail "$r.sh does not source tests/lib/classify.sh — a second classifier copy"
+done
+for r in run_all_static run_all_emulator run_battery_m2; do
+    if grep -v '^\s*#' "tests/$r.sh" | grep -q 'line \[0-9\]+: \[A-Za-z_\]'; then
+        fail "$r.sh carries its own copy of the shell-error regex beside the lib's"
+    fi
+done
 
 echo
 [ "$rc" = 0 ] && echo "PASS: the runner's verdicts mean what they say." \

@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**305 scripts** — 64 ci_portable, 72 ci_static, 169 emulator-tier (run by name).
+**306 scripts** — 65 ci_portable, 72 ci_static, 169 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -28,7 +28,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 82 | tenant content — per-character gates and on-demand audits on the ported characters |
 | [character-data](#character-data) | 18 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
-| [review-triage](#review-triage) | 30 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
+| [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
 ## runner
@@ -375,6 +375,7 @@ the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guar
 | `tests/test_qs_wav_timebase.sh` | test | ci_portable | — | the WAV audit's frame->time conversion must use CPS timing, not 60 Hz (14z-94, GitHub #85). ROM-free, no MAME, ~2 s. | 14z-94 |
 | `tests/test_reconcile_matcher.sh` | test | ci_static | ROMDIR | ONE matcher, two callers, and the parameters that separate them (14z-95, GitHub #43(a), maintainer-ruled 2026-08-18). | 14z-95 |
 | `tests/test_record_walk_bounds.sh` | test | ci_portable | — | the record walkers must examine the LAST long that fits in their range (14z-94, GitHub #51). ROM-free, ~1 s. | 14z-94 |
+| `tests/test_ref_rot_image_pick.sh` | test | ci_portable | — | ground truth for WHICH IMAGE test_build_ref_rot.sh judges a rompath by: the named preference (vsavjw, then vsavj, then name order), never directory order (14z-139). ROM-free, ~2 s. | 14z-139 |
 | `tests/test_romset_path_guard.sh` | test | ci_portable | — | build_wide_romset must never write into, or delete, the reference set (14z-94, GitHub #76). ROM-free, ~2 s: the fixture builds its own fake romdir, so no real dump is ever at risk in this test. | 14z-94 |
 | `tests/test_select_port_hygiene.sh` | test | ci_portable | — | select_port.py must be chainable, idempotent and free of unreachable statements (14z-94, GitHub #46). ROM-free-ish, ~2 s. | 14z-94 |
 | `tests/test_static_runner.sh` | test | ci_portable | — | ground truth for tests/run_all_static.sh (14z-94, GitHub #30). ROM-free, ~3 s. | 14z-94 |

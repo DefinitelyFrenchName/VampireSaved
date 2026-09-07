@@ -1123,7 +1123,11 @@ Emulator gates, soaks and one-off rigs are deliberately NOT here — they have
 their own runner since 14z-128 (below). This is also not `run_battery_m2.sh`,
 which builds a ROM and is the stage-6 dev-build chain.
 
-Ground truth for the runner itself: `tests/test_static_runner.sh`.
+Ground truth for the runner itself: `tests/test_static_runner.sh`. **Its
+verdict classifier is `tests/lib/classify.sh` (14z-139), THE ONE copy that
+`run_all_emulator.sh` and `run_battery_m2.sh` source too** — until then the
+static runner and the battery read an exit-0 shell crash ([VSP-176]) as PASS
+while the sweep read it as FAIL.
 
 ### **[VSP-164]** THE EMULATOR-TIER COMMAND — `tests/run_all_emulator.sh` (since 14z-128)
 

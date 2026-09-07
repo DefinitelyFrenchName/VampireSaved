@@ -69,26 +69,28 @@ cd "$REPO"
 # rule 2, so it must not be printable when a third of the battery self-skipped.
 #
 # `bat` runs a gate, prints its output, and classifies it. A FAIL still stops
-# the battery immediately, exactly as `set -e` did.
+# the battery immediately, exactly as `set -e` did — and since 14z-139 the
+# verdict comes from THE ONE classifier, tests/lib/classify.sh (sourced above
+# the accounting block, where test_battery_accounting extracts it from), so a
+# gate that exits 0 after the shell's own error line ([VSP-176]) stops it
+# too. Until then `bat` read exit 0 by the SKIP grep alone, and such a crash
+# counted as a PASS toward "BATTERY GREEN".
+. "$REPO/tests/lib/classify.sh"
 _bat_pass=0; _bat_skip=0; _bat_skipped=""
 _BAT_TMP="$(mktemp -d)"; trap 'rm -rf "$_BAT_TMP"' EXIT INT TERM
 
 bat() {   # bat <gate.sh> [args...]
     _bat_name="$(basename "$1" .sh)"
-    if "$@" > "$_BAT_TMP/out" 2>&1; then
-        cat "$_BAT_TMP/out"
-        if grep -qE '^ *SKIP' "$_BAT_TMP/out"; then
-            _bat_skip=$((_bat_skip + 1))
-            _bat_skipped="$_bat_skipped $_bat_name"
-        else
-            _bat_pass=$((_bat_pass + 1))
-        fi
-    else
-        _bat_st=$?
-        cat "$_BAT_TMP/out"
-        echo "BATTERY FAILED at $_bat_name (exit $_bat_st)"
-        exit "$_bat_st"
-    fi
+    "$@" > "$_BAT_TMP/out" 2>&1 && _bat_st=0 || _bat_st=$?
+    cat "$_BAT_TMP/out"
+    vs_classify "$_bat_st" "$_BAT_TMP/out"
+    case "$VS_VERDICT" in
+    PASS) _bat_pass=$((_bat_pass + 1)) ;;
+    SKIP) _bat_skip=$((_bat_skip + 1)); _bat_skipped="$_bat_skipped $_bat_name" ;;
+    *)    echo "BATTERY FAILED at $_bat_name (exit $_bat_st${VS_DETAIL:+: $VS_DETAIL})"
+          # an exit-0 crash must not exit 0 here either
+          exit "$([ "$_bat_st" = 0 ] && echo 1 || echo "$_bat_st")" ;;
+    esac
 }
 
 # For the `if [ -x <mame> ]` / `else note:` branches, which skip whole GROUPS

@@ -65,8 +65,18 @@ mk() { printf '#!/bin/sh\n%s\nexit %s\n' "$2" "$3" > "$T/$1"; chmod +x "$T/$1"; 
 mk g_pass.sh 'echo "PASS: fine"' 0
 mk g_skip.sh 'echo "SKIP: no build dir"' 0
 mk g_fail.sh 'echo "FAIL: broken"' 1
+# The 14z-139 shapes: a gate that dies at a `${VAR:?}` demand behind an EXIT
+# trap exits 0 on macOS bash 3.2 ([VSP-176]) — the battery read that as PASS
+# until `bat` took its verdict from tests/lib/classify.sh — and the benign
+# look-alike, MAME segfaulting at teardown after the summary line.
+mk g_shellcrash.sh 'echo "tests/g_shellcrash.sh: line 3: FOO: set FOO to a dir OUTSIDE the repo"' 0
+mk g_segv.sh 'echo "PASS: the summary line"; echo "tests/g_segv.sh: line 64:  2444 Segmentation fault: 11  REPLAY=x"' 0
+# The extracted block starts at `_bat_pass=0`, below the battery's own
+# `. "$REPO/tests/lib/classify.sh"`; the stubs source the SAME lib.
+CLASSIFY="$REPO/tests/lib/classify.sh"; export CLASSIFY
 
 out="$( cd "$T" && sh -c '
+    . "$CLASSIFY"
     . ./acct.sh
     bat ./g_pass.sh
     bat ./g_skip.sh
@@ -84,7 +94,7 @@ printf '%s' "$out" | grep -q "wide-mame(x5)" \
 
 echo "== 4. a FAIL still stops the battery immediately =="
 # The wrapper must not soften set -e: a failing gate has to abort, not tally.
-if ( cd "$T" && sh -c '. ./acct.sh; bat ./g_fail.sh; echo "REACHED-AFTER-FAIL"' \
+if ( cd "$T" && sh -c '. "$CLASSIFY"; . ./acct.sh; bat ./g_fail.sh; echo "REACHED-AFTER-FAIL"' \
         > "$T/f.out" 2>&1 ); then
     fail "a failing gate did not stop the battery"
 else
@@ -96,16 +106,35 @@ else
         || fail "the abort does not name the failing gate"
 fi
 
-echo "== 5. CONTROL — a clean battery still reports GREEN =="
-# Without this, "never print GREEN" would pass every section above.
+echo "== 5. exit 0 after a SHELL ERROR stops the battery too (14z-139) =="
+# Before 14z-139 this stub counted as a PASS toward BATTERY GREEN: `bat`
+# read exit 0 by the SKIP grep alone. The sweep runner had read the same
+# log as FAIL since 14z-134; the battery now takes the same classifier.
+if ( cd "$T" && sh -c '. "$CLASSIFY"; . ./acct.sh; bat ./g_shellcrash.sh; echo "REACHED-AFTER-CRASH"' \
+        > "$T/c.out" 2>&1 ); then
+    fail "an exit-0 shell crash did not stop the battery (it read as PASS)"
+else
+    grep -q "REACHED-AFTER-CRASH" "$T/c.out" \
+        && fail "execution continued past the exit-0 crash" \
+        || echo "  ok: aborted at the crash, with a non-zero exit"
+    grep -q "BATTERY FAILED at g_shellcrash (exit 0: exit 0 after a shell error" "$T/c.out" \
+        && echo "  ok: and it names the gate and the reason" \
+        || { fail "the abort does not name the exit-0 crash:"; sed 's/^/        /' "$T/c.out"; }
+fi
+
+echo "== 6. CONTROL — a clean battery still reports GREEN, segfault-at-teardown included =="
+# Without this, "never print GREEN" would pass every section above; and the
+# benign `line N:  <pid> Segmentation fault` shape must not trip the new rule.
 out2="$( cd "$T" && sh -c '
+    . "$CLASSIFY"
     . ./acct.sh
     bat ./g_pass.sh
+    bat ./g_segv.sh
     if [ "$_bat_skip" = 0 ]; then echo "BATTERY GREEN — $_bat_pass gates, 0 skipped"; fi
 ' 2>&1 )"
-printf '%s' "$out2" | grep -q "BATTERY GREEN" \
-    && echo "  ok: an all-pass run still prints GREEN" \
-    || fail "a clean battery no longer reports GREEN"
+printf '%s' "$out2" | grep -q "BATTERY GREEN — 2 gates" \
+    && echo "  ok: an all-pass run (incl. the teardown-segfault shape) still prints GREEN" \
+    || { fail "a clean battery no longer reports GREEN:"; printf '%s\n' "$out2" | sed 's/^/        /'; }
 
 echo
 [ "$rc" = 0 ] && echo "PASS: the battery cannot call itself green while skipping." \

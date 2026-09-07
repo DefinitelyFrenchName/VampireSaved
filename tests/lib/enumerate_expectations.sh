@@ -31,6 +31,13 @@ enumerate_expectations() {
             # self-frozen to a SINGLE-TENANT image; a merged program image
             # differs by construction, so these are never a legacy leg.
             sha1)    echo "$_ee_stem|sha1|N/A" ;;
+            # the frozen first-divergence constant against a FULL base log
+            # (run_suite.sh dispatches it before .sha1; audit_merged_legacy
+            # evaluates it). This case was MISSING until 14z-139 — the tree
+            # carries zero live .diverge files, so the first one ratified would
+            # have been reported UNKNOWN-KIND and failed the merged audit
+            # (found 14z-136 when the harness lifted this file).
+            diverge) echo "$_ee_stem|diverge|EVAL" ;;
             pending) echo "$_ee_stem|pending|NOT-EVALUATED"; _ee_bad=1 ;;
             *)       echo "$_ee_stem|$_ee_ext|UNKNOWN-KIND"; _ee_bad=1 ;;
         esac

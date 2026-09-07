@@ -76,6 +76,7 @@ test_qs_ledger_binding
 test_qs_wav_timebase
 test_qs_window_law
 test_record_walk_bounds
+test_ref_rot_image_pick
 test_replay_stage_census
 test_romset_path_guard
 test_s4_thresholds

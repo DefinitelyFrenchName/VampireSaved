@@ -3768,3 +3768,42 @@ rule: a profile bump (`cps2_wide.md`) has a checklist of descriptors and
 sizes; the INSTRUMENTS' own bounds — every "plausible address" constant in
 `tests/lua/` — belong on it too. Grep `0x400000` under `tests/lua` at the
 next one.
+## A VERDICT THAT DEPENDS ON WHICH FILE THE FILESYSTEM LISTS FIRST IS A VERDICT ABOUT THE FILESYSTEM — `glob.glob` is unsorted, and the ref-rot gate judged a stock build by whichever of two zips came first (found 14z-137, fixed 14z-139)
+
+`tests/test_build_ref_rot.sh` judged a rompath by its `vsavjw` zip, else by
+the FIRST result of `glob.glob("<dir>/rompath/*.zip")`. A stock build's
+rompath holds `vsavj.zip` beside the pristine parent `vsav.zip`, and
+`glob.glob` returns directory order, which is not name order and not
+creation order — on this host `vsavj.zip` happened to list first, so the
+stock twins were judged by their own image and found in the registry; on
+another filesystem the same directories would have been judged by the
+parent's members and read `no registry row`. Nobody saw it because the
+verdict never changed on the machine it ran on — it was found only when the
+generic harness lifted the gate and had to NAME the choice to reproduce the
+output (`[ref_rot].image_prefer` there). The rule: any pick among several
+files is `sorted(...)` first and then an ORDERED, NAMED preference
+(`IMAGE_PREFER = ("vsavjw", "vsavj")` in the gate; name order as the
+fallback), and the preference has a must-fire — a copy of the gate that
+prefers the adversary must flip the verdict (`tests/test_ref_rot_image_pick.sh`).
+Grep for the class: `glob.glob(` followed by `[0]` or `or glob.glob(` with
+no `sorted` — a bare `glob.glob(...)[0]` is this defect waiting for a
+different disk.
+
+## THE PRE-COMMIT RUNNER AND THE BATTERY READ AN EXIT-0 SHELL CRASH AS PASS FOR FIVE SESSIONS AFTER THE SWEEP LEARNED NOT TO — a classifier copied into three runners is three classifiers (found 14z-135/137, fixed 14z-139)
+
+[VSP-176]'s fix landed in `run_all_emulator.sh` at 14z-134: exit 0 with
+the shell's own `<script>.sh: line N: NAME: message` in the log is FAIL.
+It landed THERE, because that is where the M16 release run had recorded a
+65-minute gate as `PASS 0s`. `run_all_static.sh` carried its own copy of
+the PASS/SKIP/FAIL logic and never got the branch, so the same log read
+PASS under the pre-commit command; `run_battery_m2.sh`'s `bat` read exit 0
+by the SKIP grep alone, so it read PASS there too and counted toward
+"BATTERY GREEN". The 14z-135 harness census found the two runner copies
+DIFFERING and recorded it; the harness resolved it by lifting the STRONGER
+copy as its one classifier; this tree resolved it at 14z-139 the same way —
+`tests/lib/classify.sh` is sourced by all three runners, the sweep's lines
+moved and not rewritten, and `test_static_runner.sh` §8 locks the sourcing
+(a third copy is how it recurs). The rule: a verdict classifier is a
+LIBRARY, never a block that travels by copy; a fix to a classifier is
+followed by a grep for its siblings.
+

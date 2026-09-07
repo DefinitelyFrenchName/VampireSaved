@@ -56,6 +56,12 @@ if [ -n "${ROMDIR:-}" ]; then
     export ROMDIR
 fi
 cd "$REPO"
+# THE ONE CLASSIFIER (14z-139). This runner carried its own copy of the
+# PASS/SKIP/FAIL logic, and it DIFFERED from the sweep's: no branch for a
+# gate that exits 0 after the shell's own error line ([VSP-176]), so the
+# pre-commit command read such a crash as PASS while run_all_emulator.sh
+# read it as FAIL. Sourced, not copied, so the two cannot drift again.
+. "$REPO/tests/lib/classify.sh"
 
 STRICT=0; TIER=all; LIST=0
 while [ $# -gt 0 ]; do
@@ -114,30 +120,37 @@ run_tier() {  # run_tier <label> <names>
         _t0=$(date +%s)
         # </dev/null: a gate that reads stdin otherwise swallows the rest of
         # this loop's input. Paid for once — a 32-entry run became 28 silently.
-        _out="$(tests/"$g".sh </dev/null 2>&1)" && _st=0 || _st=$?
+        tests/"$g".sh </dev/null > "$WORK/$g.out" 2>&1 && _st=0 || _st=$?
         _t1=$(date +%s)
         _dur=$((_t1 - _t0))
-        # EXIT STATUS DECIDES FIRST (corrected 14z-128). A gate that prints
-        # `SKIP:` AND exits non-zero is a FAILURE: it ran, could not complete,
-        # and said so. Found in the emulator twin of this runner, where
-        # test_wide_profile.sh printed "SKIPPED: set FBNEO_REF" and exited 2
-        # with "PARTIAL: the emulator superset invariant was NOT run" — the
-        # classifier called it a skip. SKIP is exit 0 plus the marker, only.
-        if [ "$_st" != 0 ]; then
-            printf '  %-34s FAIL  %3ss  (exit %s)\n' "$g" "$_dur" "$_st"
+        # EXIT STATUS DECIDES FIRST (corrected 14z-128): a gate that prints
+        # `SKIP:` AND exits non-zero is a FAILURE; exit 0 after the shell's own
+        # error line is a FAILURE too (14z-139, the branch this runner lacked).
+        # The rules and their history: tests/lib/classify.sh.
+        vs_classify "$_st" "$WORK/$g.out" 58
+        case "$VS_VERDICT" in
+        TIMEOUT)
+            # no timeout wrapper here; kept so the verdict set is the sweep's
+            printf '  %-34s TIMEOUT %3ss  (exit %s)\n' "$g" "$_dur" "$_st"
+            n_fail=$((n_fail + 1)); failed="$failed $g" ;;
+        FAIL)
+            if [ "$_st" != 0 ]; then
+                printf '  %-34s FAIL  %3ss  (exit %s)\n' "$g" "$_dur" "$_st"
+            else
+                printf '  %-34s FAIL  %3ss  (exit 0 after a shell error)\n' "$g" "$_dur"
+            fi
             # FAIL_TAIL: how much of a failing gate's output to show (default 4;
             # the CI sets 80 — a red read remotely needs the section that failed,
             # not the last four lines of its controls; 14z-133b).
-            printf '%s\n' "$_out" | tail -"${FAIL_TAIL:-4}" | sed 's/^/        | /'
-            n_fail=$((n_fail + 1)); failed="$failed $g"
-        elif printf '%s' "$_out" | grep -qE '^ *SKIP'; then
-            _why="$(printf '%s' "$_out" | grep -E '^ *SKIP' | head -1 | cut -c1-58)"
-            printf '  %-34s SKIP  %3ss  %s\n' "$g" "$_dur" "$_why"
-            n_skip=$((n_skip + 1)); skipped="$skipped $g"
-        else
+            tail -"${FAIL_TAIL:-4}" "$WORK/$g.out" | sed 's/^/        | /'
+            n_fail=$((n_fail + 1)); failed="$failed $g" ;;
+        SKIP)
+            printf '  %-34s SKIP  %3ss  %s\n' "$g" "$_dur" "$VS_DETAIL"
+            n_skip=$((n_skip + 1)); skipped="$skipped $g" ;;
+        *)
             printf '  %-34s PASS  %3ss\n' "$g" "$_dur"
-            n_pass=$((n_pass + 1))
-        fi
+            n_pass=$((n_pass + 1)) ;;
+        esac
     done
 }
 

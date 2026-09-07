@@ -275,6 +275,7 @@ tests/test_reactions.sh	character-data
 tests/test_reconcile_matcher.sh	review-triage
 tests/test_record_walk_bounds.sh	review-triage
 tests/test_record_window.sh	pipeline
+tests/test_ref_rot_image_pick.sh	review-triage
 tests/test_region_overlap.sh	pipeline
 tests/test_region_overlap_control.sh	pipeline
 tests/test_release_roundtrip.sh	platform

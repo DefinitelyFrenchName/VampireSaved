@@ -35,7 +35,7 @@ fail=0
 # --- 1. every kind is dispatched, and unknown kinds are loud -------------
 echo "== 1. synthetic fixture, one of each kind =="
 F="$WORK/expect"; mkdir -p "$F" "$WORK/repo/tests/replays"
-for s in aa_masked bb_skip cc_sha1 dd_pending ee_bogus; do
+for s in aa_masked bb_skip cc_sha1 dd_pending ee_bogus ff_diverge; do
     : > "$WORK/repo/tests/replays/$s.rpl"
 done
 echo "composite vsavj/masked-v2 829 889-1802" > "$F/aa_masked.masked"
@@ -43,11 +43,17 @@ echo "reason"                                  > "$F/bb_skip.skip"
 echo "deadbeef"                                > "$F/cc_sha1.sha1"
 echo "shape: does not re-converge"             > "$F/dd_pending.pending"
 echo "junk"                                    > "$F/ee_bogus.bogus"
+# .diverge is a ratified kind (run_suite.sh dispatches it before .sha1 and
+# audit_merged_legacy evaluates it) that the enumerator had NO case for until
+# 14z-139: the tree carries zero live .diverge files, so the first one ratified
+# would have read UNKNOWN-KIND and failed the merged audit (found 14z-136).
+echo "vsavj 900"                               > "$F/ff_diverge.diverge"
 # a file whose stem is NOT a replay must be ignored entirely
 echo "x" > "$F/not_a_replay.masked"
 set +e; got=$(enumerate_expectations "$F" "$WORK/repo"); rc=$?; set -e
 for want in "aa_masked|masked|EVAL" "bb_skip|skip|SKIP" "cc_sha1|sha1|N/A" \
-            "dd_pending|pending|NOT-EVALUATED" "ee_bogus|bogus|UNKNOWN-KIND"; do
+            "dd_pending|pending|NOT-EVALUATED" "ee_bogus|bogus|UNKNOWN-KIND" \
+            "ff_diverge|diverge|EVAL"; do
     if printf '%s\n' "$got" | grep -qx "$want"; then
         echo "  ok: $want"
     else

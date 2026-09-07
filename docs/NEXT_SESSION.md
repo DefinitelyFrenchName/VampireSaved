@@ -63,12 +63,17 @@ tree: `ROMDIR=... tests/test_bbh_fidelity.sh`** (`ci_static`, ~65 s alone;
 1. The skill (above), then living docs, then the open items.
 2. The eight defaults of `harness_scope.md` §7 are open to VETO; §7.3's
    default location is now stated as measured (two levels).
-3. **Findings about this tree, recorded, not fixed:** (14z-135)
-   `run_all_static.sh` has no exit-0-after-shell-error branch (the sweep
-   runner has); (14z-136) `tests/lib/enumerate_expectations.sh` has no
-   `diverge` case; (14z-137) `tests/test_build_ref_rot.sh` picks its image by
-   DIRECTORY ORDER when no `vsavjw` zip is present; (14z-137) `run_battery_m2.sh`'s
-   `bat` reads exit 0 by grep only. ~~(14z-138) `tests/lua/replay_guard.lua`
+3. **Findings about this tree — ALL FIVE FIXED (14z-139, the maintainer's
+   "let's start with" the four): ~~(14z-135) `run_all_static.sh` has no
+   exit-0-after-shell-error branch (the sweep runner has); (14z-137)
+   `run_battery_m2.sh`'s `bat` reads exit 0 by grep only~~ → ONE classifier,
+   `tests/lib/classify.sh`, sourced by all three runners (`test_static_runner`
+   §8, `test_battery_accounting` §5-6); ~~(14z-136)
+   `tests/lib/enumerate_expectations.sh` has no `diverge` case~~ → added
+   (`test_audit_merged_dispatch` §1); ~~(14z-137) `tests/test_build_ref_rot.sh`
+   picks its image by DIRECTORY ORDER when no `vsavjw` zip is present~~ → a
+   named ordered preference over a sorted glob, ground truth
+   `tests/test_ref_rot_image_pick.sh` with its must-fire. ~~(14z-138) `tests/lua/replay_guard.lua`
    carried the STOCK code window `0x400000` while `inp_guard.lua` carried the
    WIDE `0x600000`~~ **FIXED 14z-138 (2) at the maintainer's word: both
    constants are `0x600000`; `test_crash_guard` re-validated (both positive
