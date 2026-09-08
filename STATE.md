@@ -48,6 +48,10 @@ older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
 | **(5) THE FROZEN COVERED SET, and the multiset defect arrived independently** | `tests/expected/checkdocs_rom_covered.tsv` (31 rows: check, document, address) with its `PROVENANCE.md` row, evidence class `derived`. **The first `--check-covered` compared by LIST MEMBERSHIP, so a duplicated frozen row passed in silence** — the exact defect `audit_rule5.py` shipped at 14z-141, reached here by a different route. Now a `collections.Counter` difference both ways, where a duplicate is itself the signal that the file was hand-edited. **And my first attempt at its control was invalid twice over**: it named an address the venue check genuinely covers, and then `grep file >> file` appended nothing at all (44 lines before and after). The control only became evidence once the perturbation was asserted — the rule the plan already carries |
 | **(6) `--uncovered`, and decision 4's fourth bucket** | Per document, sibling addresses starred: `character_tables.md` 129 uncovered, `select_screen.md` 124, `id_space.md` 34, `ram.md` 19 (addresses it shares with a ROM-tier document), `README.md` 3. Those three README rows are `0x0F1234`, `0x01A2B3` and `0x0FFFFF` — the address-NOTATION EXAMPLES and the crypt-range boundary, not data. They are now a declared `NOT_ADDRESSES` list, printed and labelled, and deliberately **kept inside the ruled 346** so a documentation refinement cannot silently move a number the maintainer ruled |
 | **(7) the retraction pass** | [VSP-13] on the two claims this slice retires. S1 (§2.3 "No tool re-derives an atlas claim from the decrypted image") reworded. **S4 is the interesting one: `atlas/README.md`'s "this is the only place it is checked" is a sentence my own check QUOTES**, so the document and the check had to move in one commit — the README now names `tests/test_checkdocs_rom.sh` and the check quotes the amended wording. Re-grep shown: every surviving instance is a marked historical quotation (`SAID of`), including the two in the tool's and the gate's own headers |
+| **(8) THE PYRON ARC OPENED — and its blocker came off on static evidence** | The maintainer's *"we absolutely need to get on that"*. **[VSP-14] first, and it corrected the credit**: row `0x11` was found 14z-130 and measured 14z-131, and the maintainer ruled on it twice — not a catch of this session. **THE NAMED QUESTION IS ANSWERED, and the answer was already in the tree**: `engine_internals.md` "THE CAPTURE-POSE INSTALLER" measured at 14z-98/99 that `PRG:0x27FAA` is NEVER EXECUTED (0 hits vs 904 at the live entry `PRG:0x27FA0`, which hardcodes `moveq #$0,d1 ; movea.l #$bcffa,a0` — always `anim_index_c`). A 14z-142 probe reproduced that zero independently on vsavj AND on vs2's twin `0x271FE`. So "a different sibling table" was never possible and `d0` is the only free variable. **AND `d0` COMES FROM THE SAME STREAM AS THE POSITION**: `PRG:0x028072` is one straight line out of one `A0` — position, then the facing from `(a0)+`, then `move.w (a0),d0` (the POSE INDEX), then `bra.w $27fa0` into the installer. **So it is ONE mechanism, the 14z-131 "second mechanism" reading is RETRACTED, and the port recommendation is REINSTATED** |
+| **the instrument that could not confirm it, said plainly** | A probe A/B at `0x27FA0` across the two builds does NOT produce comparable legs: native fired 38 times in the hold (D0=2 throughout) but took an `INPUT-VIOLATION` at frame 3015 — debugger stops delay input application — and the ours leg produced no hits at all. **That is [VSP-129] exactly as documented, not a fact about either build.** The confirming measurement is NAMED rather than faked: extend the gate's own probe-free `DUMPS` rig to read the victim's `+0x1C` node pointer. Three instrument faults were paid on the way and every one is an already-written rule — `$PWD` inside a subshell after `cd` ([VSP-108]), the unpinned `MAME_BIN` the gate's own header warns about ([VSP-95]), and `grep -c ... || echo 0` double-printing ([VSP-112]) |
+| **[VSP-155] applied to myself, late** | I cited PRIOR ART FIRST earlier in this same session and then built a rig before reading the subsystem document the STATE entry NAMES. `engine_internals.md`'s capture-pose section already held the `0x27FAA` answer. Reading it first would have saved the emulator work; what the probe was worth in the end was reproducing a 14z-98/99 measurement on a second set |
+| **a lead recorded, NOT a defect** | Two per-character pose-id LUTs — `PRG:0x373CA` and `PRG:0x3A5EA` (vs2 `0x37842`, `0x3AD6A`), indexed by the VICTIM's id, whose variant halves **vsavj ALIASES and vs2 does not** (Pyron-as-victim: vsavj `0x2D` vs vs2 `0x32`; Donovan `0x23` vs `0x30`; Huitzil `0x2D` vs `0x36`). Named by NO manifest, doc or gate. **But both are reached only through the dead `0x27FAA` entry**, so they sit off the live path — a curiosity until something is shown to reach them, recorded so the next session does not re-derive them as a finding |
 | **CLOSE** | ROM audit **76/76** at the opener. The eight doc checks green after every doc edit, exit statuses captured directly. **Static tier ALONE, `--strict`, THREE times**: 141/0/0 GREEN (`build/static_14z142_close.log`) — the run that surfaced the missing NOTE; 141/0/0 GREEN after that fix (`_close2.log`), whose advisory block carried the coverage number for the first time; and **141/0/0 GREEN** after step 3 (`_close3.log`), whose advisory block reads `test_checkdocs_rom  checkdocs_rom.coverage 30/346 atlas ROM-tier addresses`. Tree clean during every one, nothing edited while any ran. 141 = 14z-141's 140 + this gate. STATE **rolled early** (153.7 KB): the 14z-140 group verbatim to `STATE_HISTORY.md` with its LEDGER line. **L3 LANDED, and with it the living-documentation effort in all four forms** — routing enforced (L1), the corpus rendered (L4), the fact census frozen (L2), the atlas's ROM claims re-derived (L3). **No build byte moved.** Committed to main, NOT pushed (the maintainer's word, as always) |
 
 ## Session 14z-141 — **THE SITE'S `<header>` WAS NEVER CLOSED — THE MAINTAINER FOUND IT BY OPENING THE PAGE —
@@ -767,19 +771,49 @@ what a triage is looking at, so those are where the thinking time goes.
     that — it writes only `+0x10/+0x14`. Measured, victim pose-record indices
     through the hold: Demitri control ours `[6,5,2,14,23,13]` == native
     `[6,5,2,14,23,13]`; **Pyron ours `[6,5,2]` vs native
-    `[2,1,0,3,11,10,29]`**. So a second mechanism is in play and it may be the
-    dominant visible effect.
+    `[2,1,0,3,11,10,29]`**. ~~So a second mechanism is in play and it may be
+    the dominant visible effect.~~ **RETRACTED 14z-142, on byte-exact static
+    evidence: there is ONE mechanism.** The capture positioner at
+    `PRG:0x028072` is a single straight-line stream out of one `A0` — it
+    writes the victim's POSITION, then reads the FACING from `(a0)+`, then
+    `move.w (a0),d0` (the POSE INDEX) and `bra.w $27fa0` into the installer.
+    So the same keyframe stream supplies position, facing and pose; an
+    attacker whose capture-keyframe block is wrong produces all three wrong
+    at once. The positioner does not write `$1c(a4)` itself — it chooses what
+    the installer writes there, one instruction before branching into it.
+    `docs/game/engine_internals.md` "THE CAPTURE-POSE INSTALLER".
   * **The obvious big hypothesis is REFUTED**: our Pyron is NOT running
     Demitri's throw. His attacker records are his own — 12 distinct, span
     `0x288`, against native's 12 distinct, span `0x288` (relocated, same
     structure); Demitri's throw walks 8 records, span `0x2D8`.
-  **THE NEXT MEASUREMENT, named so it is not re-derived:** the pose installer
-  at `PRG:0x27FAA` selects one of FOUR sibling tables
-  (`andi.w #$c,d1; movea.l $27fee(pc,d1.w),a0`) before indexing by the
-  victim's id, and the requested pose id `d0` comes from the ATTACKER's side.
-  So the question is whether our Pyron requests different pose ids, or the
-  same ids through a different sibling table. That decides whether row 0x11 is
-  the whole story, a part of it, or a red herring.
+  **~~THE NEXT MEASUREMENT~~ ANSWERED 14z-142, and the answer was already in
+  the tree — [VSP-155] applied to myself, late.** The question was whether our
+  Pyron requests different pose ids or the same ids through a different
+  SIBLING TABLE. **It cannot be the sibling table:** `engine_internals.md`
+  measured at 14z-98/99 that **`PRG:0x27FAA` is never executed** — 0 probe
+  hits against 904 at `PRG:0x27FA0`, the live entry, which HARDCODES
+  `moveq #$0,d1 ; movea.l #$bcffa,a0` (always `anim_index_c`). A 14z-142
+  probe independently reproduced the zero on both `vsavj` and `vsav2`'s twin
+  `0x271FE`. So there is one sibling in play, always, and `d0` is the only
+  free variable — and `d0` comes from the attacker's own keyframe stream (the
+  retraction above). **Row 0x11 is therefore the whole story, not a part of
+  it.**
+  **THE PORT RECOMMENDATION IS REINSTATED** on that ground: the `[[data_port]]`
+  row described above, one freeze. What is still owed is the IN-EMULATOR
+  confirmation, and the honest reason it is not here: a probe A/B at
+  `0x27FA0` across the two builds does not produce comparable legs — the
+  native leg fired 38 times in the hold but took an `INPUT-VIOLATION` at frame
+  3015 (debugger stops delay input application) and the ours leg produced no
+  hits at all. That is [VSP-129] as documented. The confirming measurement
+  needs a probe-free instrument — the gate's own `DUMPS` rig extended to read
+  the victim's `+0x1C` node pointer, not a breakpoint.
+  **A LEAD RECORDED, NOT A DEFECT:** two per-character pose-id LUTs
+  (`PRG:0x373CA`, `PRG:0x3A5EA`; vs2 `0x37842`, `0x3AD6A`) are indexed by the
+  VICTIM's id and vsavj ALIASES their variant halves where vs2 does not
+  (Pyron-as-victim: vsavj `0x2D` vs vs2 `0x32`). Neither is named by any
+  manifest, doc or gate. **But both are reached only through the dead
+  `0x27FAA` entry**, so they are off the live path and are a curiosity until
+  something is shown to reach them.
   **NO PORT RECOMMENDATION UNTIL THAT IS ANSWERED** — porting row 0x11 on the
   strength of a position measurement, while an unexplained pose difference
   sits beside it, would be fixing the half I happened to measure. Original

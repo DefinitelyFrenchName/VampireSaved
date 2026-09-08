@@ -2598,6 +2598,36 @@ Two facts, both measured [M: 14z-98/99]:
   tail-branches `move.w (A0),D0 ; bra $27fa0`. So one node supplies BOTH
   the victim's offset and its pose index.
 
+**AND THAT IS WHY POSITION AND POSE CANNOT BE TWO SEPARATE DEFECTS
+[M: 14z-142, static, byte-exact].** The positioner is one straight-line
+stream out of a single `A0`:
+
+```
+028072  add.w $10(a6),d0 ; add.w $14(a6),d1      ; the victim's POSITION
+02807A  move.w d0,$10(a4) ; move.w d1,$14(a4)
+028082  move.b $381(a6),$127(a5)
+028088  move.b (a0)+,d0 ; eor.b d0,$127(a5)      ; from the SAME stream
+02808E  move.b (a0)+,d0 ; ... eor.b d0,d1
+02809A  move.b d1,$b(a4)                          ; the victim's FACING
+02809E  move.w (a0),d0                            ; the victim's POSE INDEX
+0280A0  bra.w $27fa0                              ; -> install it
+```
+
+**One keyframe stream supplies the position, the facing AND the pose
+index.** So an attacker whose capture-keyframe block is wrong produces a
+wrong position AND a wrong pose by ONE mechanism, and a pose difference
+observed beside a position difference is not evidence of a second one.
+This retires the 14z-131 reading that "the positioner CANNOT do that — a
+second mechanism is in play": the positioner does not write `$1c(a4)`
+itself, but it CHOOSES what the installer writes there, one instruction
+before branching into it.
+**What is NOT re-measured in-emulator**: a 14z-142 probe A/B at `0x27FA0`
+across the two builds did not produce comparable legs — the native leg
+fired 38 times in the hold but took an `INPUT-VIOLATION` at frame 3015 (the
+debugger stops delay input application), and the ours leg produced no hits
+at all. That is [VSP-129] operating exactly as documented, not a fact about
+either build; a confirming measurement needs a probe-free instrument.
+
 **The index is per VICTIM and the convention is SHARED between the
 engines** — this is the load-bearing measurement, and it is what refutes
 the "reaction-index generation drift" reading (STATE 14z-98 (9),

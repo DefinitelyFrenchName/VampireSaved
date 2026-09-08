@@ -28,14 +28,20 @@
 # *** WHAT THIS GATE DOES AND DOES NOT CLAIM (14z-131). It LOCKS AN OBSERVED
 # *** DIFFERENCE. It does NOT establish that the unported row is its CAUSE.
 # The victim's POSE RECORD differs too (ours [6,5,2] vs native
-# [2,1,0,3,11,10,29] while the Demitri control is identical on both legs),
-# and the positioner CANNOT do that — it writes only +0x10/+0x14. A second
-# mechanism is in play. The big hypothesis is already refuted: our Pyron runs
-# HIS OWN records (12 distinct, span 0x288, same as native), not Demitri's
-# (8, span 0x2D8). Open question, named in STATE: the pose installer at
-# PRG:0x27FAA picks one of FOUR sibling tables before indexing by victim id,
-# so does our Pyron request different pose ids, or the same ids through a
-# different sibling? Do not read a PASS here as "row 0x11 is the bug".
+# [2,1,0,3,11,10,29] while the Demitri control is identical on both legs).
+# *** UPDATED 14z-142: that is NOT a second mechanism. *** The header used to
+# say "the positioner CANNOT do that — it writes only +0x10/+0x14", and that
+# is wrong about what the positioner DECIDES. PRG:0x028072 is one
+# straight-line stream out of one A0: position, then the facing from (a0)+,
+# then `move.w (a0),d0` — the POSE INDEX — then `bra.w $27fa0` into the
+# installer. One keyframe stream supplies all three, so a wrong capture block
+# produces a wrong position AND a wrong pose by ONE mechanism. The sibling
+# table cannot be the variable either: PRG:0x27FAA is never executed (14z-98/99,
+# 0 hits vs 904 at the live entry PRG:0x27FA0, which hardcodes anim_index_c;
+# reproduced 14z-142 on both sets). The big hypothesis stays refuted — our
+# Pyron runs HIS OWN records (12 distinct, span 0x288), not Demitri's.
+# So row 0x11 IS the story, and a PASS here still only locks the OBSERVED
+# difference; the port is what would flip EXPECT_MATCH to 1.
 #
 # MEASURED TWO INDEPENDENT WAYS, and they agree (they share no premise: one
 # reads reference-ROM bytes, the other reads work RAM in a running game).

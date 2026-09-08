@@ -24,14 +24,14 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | figure | count |
 |---|---|
 | distinct program-space addresses named | 2974 |
-| named by a document or manifest only | 2028 |
-| named by both a document/manifest and code | 620 |
+| named by a document or manifest only | 2026 |
+| named by both a document/manifest and code | 622 |
 | named by CODE ONLY (the gap list below) | 326 |
 | carried by atlas | 473 |
 | carried by engine_internals | 535 |
 | carried by other docs | 952 |
 | carried by manifests | 1780 |
-| carried by code | 946 |
+| carried by code | 948 |
 
 ## Addresses
 
@@ -933,7 +933,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x027F70` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/game/engine_internals.md — THE ENGINE TICK IS DIRECTLY OBSERVABLE — a write tap on '+0x20' is a TICK-ACCURATE instrument (14z-126b); build/manifest/reconciliation.toml — map; tests/test_tick_durations.sh; tools/crosscheck_framedata.py; tools/tick_durations.py |
 | `PRG:0x027F78` | build/manifest/pcrel_escapes.toml — don_m20; build/manifest/pcrel_escapes.toml — hui54; build/manifest/pcrel_escapes.toml — pyron38 |
 | `PRG:0x027F88` | docs/game/engine_internals.md — THE ENGINE TICK IS DIRECTLY OBSERVABLE — a write tap on '+0x20' is a TICK-ACCURATE instrument (14z-126b); tools/tick_durations.py |
-| `PRG:0x027FA0` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/project/gotchas.md — two traps from the #104 re-measurement — both produced a CONFIDENT WRONG ANSWER from a working instrument (paid: 14z-99) |
+| `PRG:0x027FA0` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/project/gotchas.md — two traps from the #104 re-measurement — both produced a CONFIDENT WRONG ANSWER from a working instrument (paid: 14z-99); tests/audit_pyron_capture_block.sh |
 | `PRG:0x027FAA` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); build/manifest/reconciliation.toml — map; tests/audit_pyron_capture_block.sh |
 | `PRG:0x027FB2` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab) |
 | `PRG:0x027FCE` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab) |
@@ -947,7 +947,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02802E` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/project/gate_scoping_method.md — 2. Scope the observable to what the mechanism can actually cause; docs/project/patch_notes.md — The correction; build/manifest/bank_map.toml — capture_kf_ptr; +13 more |
 | `PRG:0x02804C` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — port_patch |
 | `PRG:0x028058` | docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); build/manifest/huitzil.toml — df_seq_entry_10; tests/test_capture_pose_sources.sh |
-| `PRG:0x028072` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab) |
+| `PRG:0x028072` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); tests/audit_pyron_capture_block.sh |
 | `PRG:0x0280B8` | docs/game/atlas/character_tables.md — The loader (per-character struct fill) [vs2]; docs/project/doc_audit_14z118.md — 2. Cross-document numbers to lock (candidates for the script); tools/find_equiv.py |
 | `PRG:0x0280C4` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — port_patch |
 | `PRG:0x0280C6` | docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); docs/project/patch_notes.md — The correction; build/manifest/bank_map.toml — capture_kf_ptr; tests/test_capture_kf_ownership.sh; tests/test_capture_pose_sources.sh |

@@ -33,12 +33,22 @@ gameplay calls that are theirs ([VSP-10]).
   which name is right is a MEASUREMENT, not a reading.
 
 **Measured and waiting on a decision:**
-- **Pyron's capture-keyframe row `0x11` is unported** — a real, grossly
-  visible 2P defect (measured 14z-131, two independent ways). But the
-  MECHANISM is not established: the victim's POSE RECORD also differs and the
-  positioner cannot do that, so a second mechanism is in play. The named next
-  measurement is the pose installer at `PRG:0x27FAA`. **No port
-  recommendation until that is answered.**
+- **Pyron's capture-keyframe row `0x11` is unported — a real, grossly visible
+  2P defect (measured 14z-131), and since 14z-142 THE MECHANISM IS
+  ESTABLISHED: it is ONE mechanism, and the port is the fix.** The capture
+  positioner `PRG:0x028072` is one stream out of one `A0` — position, facing,
+  then `move.w (a0),d0` (the pose index) and `bra $27fa0` into the installer —
+  so a wrong capture block produces the wrong position AND the wrong pose
+  together. The sibling-table alternative is dead: `PRG:0x27FAA` is never
+  executed (14z-98/99, reproduced 14z-142 on both sets); the live entry
+  hardcodes `anim_index_c`. **The port recommendation is reinstated**: a
+  `[[data_port]]` row in `pyron.toml` (`src = 0x0C7F98`, `orc = 0x0C782A`,
+  `slot_ptr_table = 0xBE27A`, `hole = "wide_ext"`, `only_variant_slot`), one
+  freeze, with `EXPECT_MATCH=1` flipping `audit_pyron_capture_block.sh`.
+  **Still owed: the in-emulator confirmation**, and it needs a PROBE-FREE
+  instrument — a breakpoint A/B at `0x27FA0` does not produce comparable legs
+  ([VSP-129]; measured 14z-142). Extend the gate's own `DUMPS` rig to read the
+  victim's `+0x1C` node pointer instead.
 - **The Phobos ±1 damage residue** — 5 of 54 victim/throw cells, ruled WITHIN
   TOLERANCE and kept open as a KNOWLEDGE item, not a bug. The cheap first step
   is whether `0x0A` (Sasquatch, a legacy victim) is a cross-generation data
