@@ -50,7 +50,7 @@ if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 RP="${1:-build/m3b_merged25/rompath}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-NAME="${2:-merged-m16}"  # re-pointed 14z-134 (the M16 release: the m16 layout had NEVER been gated — code said m14, header m15) <- 14z-119 <- 14z-117b
+NAME="${2:-merged-m17}"  # re-pointed 14z-134 (the M16 release: the m16 layout had NEVER been gated — code said m14, header m15) <- 14z-119 <- 14z-117b
 [ -d "$RP" ] || { echo "SKIP: $RP missing"; exit 77; }
 command -v xdelta3 >/dev/null || { echo "SKIP: xdelta3 not installed"; exit 77; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
