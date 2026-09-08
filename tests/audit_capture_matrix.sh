@@ -115,6 +115,10 @@ KNOWN = {
     # the fix is the maintainer's call ([VSP-10]) — see STATE "Decisions
     # pending". Shape if ruled: gate the `fixes=` row to the base-slot track
     # so the WIDE blob keeps vs2's own [0x0F].
+    # CONFIRMED IN-EMULATOR 14z-143 (`tools/capture_sheet.sh 13 0f`): hold-offset
+    # overlap 0 of union 19, ours reproducing the Donovan-victim magnitudes and
+    # native Jedah's — the static read predicted the running game exactly, which
+    # is the second such agreement and is what licenses this gate ([VSP-180]).
     (0x13, 0x0f),
 }
 

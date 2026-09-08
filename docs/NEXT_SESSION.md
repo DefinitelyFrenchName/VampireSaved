@@ -30,14 +30,19 @@ differ; the last keyframe is `(-61,166)` against Jedah's `(-76,32)`.
 Full entry with options in STATE "Decisions pending"; the cell is frozen as a
 KNOWN-OPEN divergence in `audit_capture_matrix.sh`, so it cannot rot.
 
-**RECOMMENDED FIRST STEP, ~4 minutes:** run the existing rig with attacker
-`0x13` and victim `0x0F` —
-`BUILD=build/m3b_merged25 VICTIM=0f tests/audit_pyron_capture_block.sh` needs
-an attacker override, or copy its `run_pair` with `a=13`. The numbers above are
-ROM bytes ([VSP-116]); the static read predicted the in-emulator result exactly
-for Pyron, which is the licence to quote them, but the confirming run has not
-been done. Then the fix is a one-line manifest change (gate the `fixes=` row to
-the base-slot track) — and it MOVES SHIPPED BYTES, so it is another freeze.
+**~~RECOMMENDED FIRST STEP~~ DONE at the 14z-143 close** —
+`ROMDIR=... tools/capture_sheet.sh 13 0f` (the new tool below):
+**offset-set overlap 0 of union 19**, ours reproducing the DONOVAN-victim
+sub-block's magnitudes and native reproducing JEDAH's, exactly as the static
+read predicted. Sheet shown to the maintainer. **So the measurement is no
+longer what this item is waiting on — only the RULING is.**
+
+**The fix, when ruled:** gate the `fixes=` row to the base-slot track (a
+`fixes` twin keyed like `only_base_slot`, or an empty variant twin) so the WIDE
+blob keeps vs2's own `[0x0F]`. One line in `donovan.toml` — but it MOVES
+SHIPPED BYTES on all three WIDE tracks, so it is another freeze with the
+battery. `audit_capture_matrix.sh`'s `KNOWN` set is what proves it landed:
+remove the `(0x13, 0x0f)` row and the gate must go green on its own.
 
 ## THE REST OF THE OPEN ITEMS, unchanged
 

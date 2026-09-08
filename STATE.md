@@ -347,11 +347,17 @@ what a triage is looking at, so those are where the thinking time goes.
   early deltas are close (`-60,0` vs `-56,0`) but the last keyframe is
   `(-61,166)` where Jedah's is `(-76,32)` — 134 px of vertical difference —
   and the poses differ (`0,8,6,0,1,0,8,17` vs `0,8,7,1,0,0,9,20`).
-  **NOT MEASURED IN-EMULATOR YET** ([VSP-116]): the numbers above are ROM
-  bytes. The static read predicted the in-emulator result exactly for the
-  Pyron cell (14z-142/143), which is the licence for quoting them, but the
-  confirming run is `audit_pyron_capture_block`'s rig with attacker `0x13`
-  and victim `0x0F` and has not been done.
+  **MEASURED IN-EMULATOR 14z-143, and it confirms the static read exactly**
+  (`tools/capture_sheet.sh 13 0f`, merged-m25 vs native `vsav2`):
+  **offset-set overlap 0 of union 19** — ours `(56,0) (48,0) (56,0) (74,9)
+  (81,15) (61,166) (39,204) (80,211) (97,187) (108,42) (95,0)`, native
+  `(60,0) (84,8) (86,16) (76,32) (84,56) (88,72) (94,72) (91,42) (80,0)`.
+  Ours reproduces the DONOVAN-victim sub-block's magnitudes (56, 48, 56,
+  74/9, 81/15, 61/166) and native reproduces JEDAH's (60, 84/8, 86/16,
+  76/32) — the two blocks read statically from vs2's Donovan block. **So
+  this is the SECOND cell measured both ways with no shared premise and
+  agreeing**, which strengthens [VSP-180]'s anchor rather than merely using
+  it. Sheet shown to the maintainer 2026-09-08.
   **OPTIONS:** **(a)** gate the `fixes=` row to the base-slot track (a
   `fixes` twin keyed like `only_base_slot`, or a `fixes_variant = ""`), so
   the WIDE blob keeps vs2's own `[0x0F]` = the Jedah-victim sub-block —
