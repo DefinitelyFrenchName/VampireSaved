@@ -5,5 +5,15 @@
 # measurement (build/emu_release_m16/test_mister_prg_window.log): the first extension
 # address the 68k executes is the relocated OBJ walker's PLACEMENT (4be7c0 on
 # merged-m10 -> 4c13d0 here), which moves with the romset — cadence romset since.
-pos frame 2900 wide 1 cyc 97642730 cyc_hi_rd 1211302 cyc_hi_wr 10816 rd_hi 1211302 rd_lo 75764374 blocks 8 first_frame 1119 first_addr 4c13d0 min 413c70 max 4d3c1e
+# RE-FROZEN 14z-144 on merged-m17 (build/m3b_merged25) from the M17 sweep's own
+# measurement (build/emu_sweep_14z144/test_mister_prg_window.log), the same
+# maintainer-ruled option (b) as 14z-134. ONLY THE pos LINE MOVED (diff said 1c1);
+# neg is carried byte-identical. Three fields: cyc -192, rd_lo -121, and
+# max 4d3c1e -> 4d479e = EXACTLY +0xB80, the length of pyron.toml's ported
+# capture block (14z-143). first_addr 4c13d0 / first_frame 1119 / min 413c70 are
+# UNCHANGED, which is the confirmation: the walker sits below the 0xB80
+# insertion point at 0x4c16e0 and the read ceiling sits above it.
+# Every structural assertion in that run PASSED — the decode stayed gated (control
+# leg 0 reads above $400000) and the profile-ON leg completed 1,211,302.
+pos frame 2900 wide 1 cyc 97642538 cyc_hi_rd 1211302 cyc_hi_wr 10816 rd_hi 1211302 rd_lo 75764253 blocks 8 first_frame 1119 first_addr 4c13d0 min 413c70 max 4d479e
 neg frame 2900 wide 0 cyc 97337938 cyc_hi_rd 4 cyc_hi_wr 10113 rd_hi 0 rd_lo 75503450 blocks 0 first_frame -1 first_addr 000000 min 7ffffe max 000000
