@@ -557,3 +557,5 @@ VSP-175	docs/project/gate_scoping_method.md	9. Which BUILD a gate runs on is a s
 VSP-176	docs/project/gotchas.md	A `${VAR:?msg}` abort AFTER an EXIT trap exits 0 on macOS `/bin/sh` — a gate that never ran reads as	IN-LIST
 VSP-177	docs/project/gotchas.md	A line-continuation backslash followed by a comment is an EMPTY COMMAND, and it hid that a FRESH jts	IN-LIST
 VSP-178	docs/project/gotchas.md	THE FIRST RUNNER-DRIVEN MiSTer LANE FOUND TWO THINGS THE FREEZE RITUAL HAD NO EYE FOR (14z-134)	IN-LIST
+VSP-179	docs/project/gate_scoping_method.md	11. When the defect class is an OMISSION, enumerate — targeted testing cannot reach it (14z-143)	IN-LIST
+VSP-180	docs/project/gate_scoping_method.md	11. When the defect class is an OMISSION, enumerate — targeted testing cannot reach it (14z-143)	IN-LIST

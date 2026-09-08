@@ -240,3 +240,47 @@ results raise the exceptions" predicted. Rule: before choosing a walking
 method, sum the runtimes; when the measurement is cheap, measure everything
 and read the reds.
 
+
+## 11. When the defect class is an OMISSION, enumerate — targeted testing cannot reach it (14z-143)
+
+**[VSP-179]** **A defect that is a MISSING or MIS-SCOPED table row has no
+symptom to steer toward, so no amount of targeted testing finds it.** Both of
+the capture-geometry defects this project has found are omissions, and neither
+was found by play or by a rig: Pyron's attacker row `0x11` was a row nobody
+claimed (surfaced 14z-130 by the `bank_map` ownership audit — an INVENTORY —
+and measured 14z-131), and Donovan's victim entry `[0x0F]` is a correct fix
+applied at the wrong scope (surfaced 14z-143 by `audit_capture_matrix.sh` on
+its first run, after seventeen sessions of throw work had not). Nothing
+crashes, nothing renders obviously wrong, and the cell is only reachable in one
+matchup — so a symptom-driven test never points there. **For any table the port
+claims to own row by row, the gate is the FULL CROSS-PRODUCT against the
+reference, not a sample.** The corollary for reading a green targeted gate:
+`audit_pyron_capture_block` was green for its entire life while Pyron's row was
+unported, because it asserted the OBSERVED difference; a gate that covers three
+cells says nothing about the other 637.
+
+**[VSP-180]** **ANCHOR, THEN ENUMERATE: pay the expensive measurement once to
+prove the cheap one predicts it, then run the cheap one over everything.** The
+behavioural comparison for ONE capture cell is ~4 minutes of emulator; the
+static comparison for **640** cells is ~2 seconds. What licenses substituting
+the second for the first is that one cell was measured BOTH ways with no shared
+premise — work RAM in a running game (14z-131) and ROM bytes (14z-142) — and
+they agreed exactly, deltas and poses. State the anchor in the gate's header
+and keep the behavioural gates alive as the thing that keeps the licence
+honest; the static gate must say what it does NOT claim. This generalises past
+keyframes: it is the shape for any claim of the form "our table equals the
+reference's", where the data is cheap to compare and the behaviour is not.
+
+**A fix that is SCOPED — by track, profile or slot — must be checked against
+everyone else who indexes what it rewrites**, and a comment asserting
+harmlessness is a claim to test, not a reason to skip a cell. Donovan's
+`fixes = "0x1E:0b30:0d88"` is right on the stock track and wrong on WIDE, and
+its own note argued it was harmless there because `[0x0F]` "is never a TENANT
+victim" — true, and irrelevant: it is a reachable LEGACY victim.
+
+**And an ALARMING result is as much a bug report about the instrument as a
+clean null is** ([VSP-148]'s mirror). The first run of this matrix compared a
+FIXED 20 records per cell and reported four differing attackers — which were
+exactly the four whose sub-block spacing is under 20 records. The gate now
+carries that as a must-fire control: the naive comparison must keep inventing
+differences at exactly those four, or the gate fails.
