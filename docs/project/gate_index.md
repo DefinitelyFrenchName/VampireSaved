@@ -16,14 +16,14 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**310 scripts** — 68 ci_portable, 73 ci_static, 169 emulator-tier (run by name).
+**311 scripts** — 68 ci_portable, 74 ci_static, 169 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 12 | the suite runners and their own ground truth |
 | [docs](#docs) | 15 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 26 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
-| [pipeline](#pipeline) | 52 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
+| [pipeline](#pipeline) | 53 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 82 | tenant content — per-character gates and on-demand audits on the ported characters |
@@ -111,6 +111,7 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 
 | gate | kind | tier | needs | locks (the script's own header) | since |
 |---|---|---|---|---|---|
+| `tests/audit_capture_matrix.sh` | audit | ci_static | ROMDIR | THE WHOLE CAPTURE-GEOMETRY MATRIX, ours vs native vsav2, every reachable (ATTACKER, VICTIM) cell (14z-143, maintainer-directed). | 14z-143 |
 | `tests/audit_dispatch_census.sh` | audit | emulator | MAME, a build dir, ~2 min | WHICH type indices does LEGACY ever dispatch at the two obj_hook sites, and is the frozen observation still complete? | 14z-89 |
 | `tests/audit_objhook_owner_census.sh` | audit | emulator | MAME, a build dir, ~6 min | which OWNER does each extended obj_hook type carry at DISPATCH TIME? (14z-81b; the vec3-fix design measurement.) | 14z-81b |
 | `tests/audit_region_movability.sh` | audit | emulator | MAME, ~10 min | which regions can actually live in wide_ext? | M3b |

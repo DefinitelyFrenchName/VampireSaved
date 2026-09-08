@@ -819,7 +819,7 @@ march_retarget_mid = true
 # same-source-or-fail names any future collision). Screen position =
 # the empty bottom-right corner (measured on merged-m5 snapshots, 14z-105).
 # THE TEXT NAMES THE FREEZE GENERATION — change it at every freeze.
-version_text = "M16"
+version_text = "M17"
 version_font = "build/manifest/version_font.json"
 version_x = 324
 version_y = 202
@@ -1367,8 +1367,11 @@ val = 0x3316
 # row:pointer pairs. only_variant_slot: the stock twin skips these by
 # construction. The signed-16-bit constraint (offsets consumed by
 # `lea (a0,d0.w)`) is why the whole block moves rather than sub-blocks
-# being pointed at. Rows 0x10/0x13 are already tenant-ported; 0x11 is the
-# recorded Pyron-as-attacker observation; 0x18 (Oboro) follows 0x08.
+# being pointed at. ALL THREE tenant rows are now ported — 0x10 huitzil's
+# `grab_hold_keyframes`, 0x13 donovan's `throw_victim_keyframes`, and
+# 0x11 pyron's `pyron_capture_keyframes` (14z-143; it was the recorded
+# Pyron-as-attacker observation until then, see pyron.toml's row for the
+# measurement); 0x18 (Oboro) follows 0x08.
 
 [[data_port]]
 stage = 6
@@ -1564,6 +1567,68 @@ slot_ptr_table = 0xBE27A
 slot_rows = "0x0f:0x0b19f8"
 hole = "wide_ext"
 only_variant_slot = true
+
+# ── PYRON'S OWN ATTACKER ROW 0x11 — the third tenant's twin of Donovan's
+# `throw_victim_keyframes` and Huitzil's `grab_hold_keyframes` (measured
+# 14z-131, mechanism established 14z-142, ported 14z-143) ─────────────────
+#
+# THE DEFECT, on a 2P-competitive surface. vsavj's capture_kf_ptr row 0x11
+# ALIASES row 0x01 (0x00094954 = DEMITRI's block), so every victim Pyron
+# captures is placed — and posed — by Demitri's geometry. Measured two ways
+# that share no premise (14z-131 in-emulator, 14z-142 from ROM bytes) and
+# they agree exactly: at victim 0x03, vs2's Pyron block gives deltas
+# (0,0)(-79,0)(-97,0)(-65,0)(82,29)(58,124)(100,132) with poses
+# 0,2,1,0,3,11,10, while the Demitri block ours serves gives
+# (0,0)(-63,0)(-63,0)(-63,0)(-26,0)(-26,0)(-10,32) with poses 0,6,6,6,6,5,2.
+# ZERO overlap in the hold offsets. Gate: tests/audit_pyron_capture_block.sh.
+#
+# ONE MECHANISM, not two (14z-142 — the 14z-131 "second mechanism" reading is
+# RETRACTED). PRG:0x028072 is one straight line out of one A0: position, the
+# facing from (a0)+, then `move.w (a0),d0` — the POSE INDEX — then
+# `bra.w $27fa0` into the installer. Position and pose come out of the SAME
+# 8-byte record, so a wrong capture block produces both. The sibling-table
+# alternative is dead: PRG:0x27FAA is NEVER EXECUTED (14z-98/99, 0 hits vs
+# 904 at the live entry 0x27FA0, which hardcodes anim_index_c; reproduced
+# 14z-142 on vsavj AND on vs2's twin 0x271FE).
+#
+# THE EXTENT, measured 14z-143 rather than estimated — the earlier ~0x2040
+# sketch was wrong by 2.8x. The block is a 32-word VICTIM OFFSET TABLE then
+# 8-byte records [dx][dy][flags][pose]. The offsets ALIAS: 32 entries but 18
+# DISTINCT sub-blocks, uniformly spaced 0xA0, first at +0x40 (immediately
+# after the head), last at +0x0AE0 — so the extent is exactly
+# 0x40 + 18*0xA0 = 0xB80, and the last record ends precisely there. (An
+# earlier note said "zeros after"; measured, a DIFFERENT table begins at
+# +0xB80 — the length is unaffected, its derivation is the tiling above.)
+# Sibling identity vs2==vh2 runs to +0x30DD, far past the structural end, so
+# `orc` bounds nothing here — the tiling does.
+#
+# RELOCATION-SAFE. The `lea (a0,d0.w)` displacement is an offset WITHIN the
+# block (max 0x0AE0 + 0xA0 = 0xB80, last record start 0xB78), so moving the
+# block cannot move it and the signed-word bound has enormous margin.
+#
+# SUPERSET-SAFE BY CONSTRUCTION. Only the VARIANT row 0x11 is repointed; the
+# vanilla row 0x01 and Demitri's block at 0x094954 are untouched, and no
+# legacy attacker can reach row 0x11 (the base half is what vanilla indexes).
+# `dst`/`dst_old_head` are the CONTENT ANCHOR of the vanilla block this row
+# supersedes — the generator's owner-row mode writes nothing there — and they
+# are deliberately the same pair `capture_kf_demitri` anchors, because that
+# is the block vsavj's alias points at. The two rows do not collide: the
+# span-collision scan keys a slot_rows row by dst+slot_rows and this one by
+# dst alone, exactly as capture_kf_jedah and throw_victim_keyframes coexist
+# at 0x0B19F8.
+[[data_port]]
+stage = 6
+name = "pyron_capture_keyframes"
+src = 0x0C7F98
+len = 0x0B80
+orc = 0x0C782A
+dst = 0x094954
+dst_end = 0x0968DE
+dst_old_head = "00400140024003400440054006400740"
+slot_ptr_table = 0xBE27A
+hole = "wide_ext"
+only_variant_slot = true
+note = "capture-pose keyframes: attacker row 0x11 <- Pyron's own block (vs2 0x0C7F98), was the char-0x01 alias 0x094954 (Demitri)"
 
 # ══════════════════════════════════════════════════════════════════════
 

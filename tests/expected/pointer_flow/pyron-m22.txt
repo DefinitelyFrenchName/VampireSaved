@@ -1,0 +1,12 @@
+# pointer-flow baseline for pyron-m22 (build/pyron40), frozen 14z-143 — the M17 pyron-capture freeze.
+# vs the 14z-130 baseline (pyron-m20): ONE line moves, `data:long` 843 -> 859 (+16), and it is
+# REVIEWED, not accepted: the freeze places `pyron_capture_keyframes`, a 0xB80 blob of 8-byte
+# capture-keyframe records [dx][dy][flags][pose], in wide_ext. Those bytes are DATA, and 16 of the
+# 2,944 happen to read as 4-byte-aligned WIDE-HOLE-range longs — the WEAK class's documented noise.
+# No STRONG finding appears, disappears or changes class, and `code:move_imm` is unchanged at 1:
+# the port adds ONE poke32 on an existing table word and allocates one blob, so it introduces no
+# pointer-shaped code operand at all (patch_notes 14z-143).
+# STRONG lines are REVIEWED findings (see hardening_register.md);
+# WEAK-COUNT lines freeze the noise volume — growth = investigate.
+WEAK-COUNT	code:move_imm	1
+WEAK-COUNT	data:long	859

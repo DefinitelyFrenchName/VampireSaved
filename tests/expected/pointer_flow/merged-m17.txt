@@ -1,0 +1,19 @@
+# pointer-flow baseline for merged-m17 (build/m3b_merged25), frozen 14z-143 — the M17 pyron-capture freeze.
+# vs the 14z-130 baseline (merged-m15): the two STRONG `code:movea_imm` findings are the SAME two,
+# RELOCATED BY EXACTLY 0xB80 — site 0x4d39a0 -> 0x4d4520 and targets 0x4c6f20 -> 0x4c7aa0 and
+# 0x4ccec0 -> 0x4cda40, each +0xB80, which is the size of the `pyron_capture_keyframes` blob this
+# freeze places ahead of them in wide_ext. Same class (WIDE-HOLE), same count, same operands: an
+# allocation shift, not a new finding. `data:long` 1182 -> 1188 (+6) is the WEAK class's documented
+# noise over the placed blob's own bytes. No STRONG finding appears or disappears.
+# AND `code:move_imm` 3 -> 0 is a SHRINK, ROOT-CAUSED rather than accepted: all three named the
+# same immediate 0x004c223b, which is BYTE-IDENTICAL in merged23 and merged25 (verified at all
+# three sites). What changed is the classifier's verdict, not the artifact — `WIDE-HOLE` means
+# "in 0x400000..0x5FFFFF and NOT written by the patch", and on merged25 that address IS written,
+# by a `data` op at 0x4c21a0 +0xb8 that the 0xB80 blob pushed up over it. So an immediate that
+# used to point at unwritten hole space now points at placed content: the finding is RESOLVED,
+# not lost. Same 0xB80 shift as the two STRONG relocations above.
+# STRONG lines are REVIEWED findings (see hardening_register.md);
+# WEAK-COUNT lines freeze the noise volume — growth = investigate.
+STRONG	code:movea_imm	0x4d4520+0x16	0x4c7aa0	WIDE-HOLE
+STRONG	code:movea_imm	0x4d4520+0x24	0x4cda40	WIDE-HOLE
+WEAK-COUNT	data:long	1188

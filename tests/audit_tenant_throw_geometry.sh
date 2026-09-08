@@ -93,7 +93,7 @@
 # would quadruple a ~12 min run to re-measure an axis already gated.
 #
 # 6 MAME runs, 2 at a time, ~12 min.
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged23] [VICTIM=03]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged25] [VICTIM=03]
 #        tests/audit_tenant_throw_geometry.sh
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -113,7 +113,7 @@ if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 # DUMPS and the liveness check reported "held frames ours=0". First seen on
 # the M16 freeze sweep, the gate's first run under the runner.
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged23}"
+BUILD="${BUILD:-build/m3b_merged25}"
 VICTIM="${VICTIM:-03}"
 ATT="${ATT:-10}"            # Phobos/Huitzil as the thrower
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }

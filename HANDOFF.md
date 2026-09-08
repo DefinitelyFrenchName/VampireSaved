@@ -599,7 +599,7 @@ build drives inputs through the 0001 harness instead), so record on MAME.
 
 ```sh
 export ROMDIR=/path/to/reference/sets
-tools/run_wide.sh build/m3b_merged23 fbneo # THE 3-TENANT BUILD (all 18
+tools/run_wide.sh build/m3b_merged25 fbneo # THE 3-TENANT BUILD (all 18
                                            # (14z-97: the build argument is
                                            # now REQUIRED. It used to default
                                            # to build/m5w — the known-bad
@@ -634,8 +634,8 @@ tools/run_wide.sh build/m3b_merged23 fbneo # THE 3-TENANT BUILD (all 18
                                            # "Bishamon" — aliased rows).
                                            # Works for P1 and P2. Without
                                            # Start it is plain Bishamon.
-tools/run_wide.sh build/don_m20 fbneo      # or the solo builds (hui54,
-                                           # pyron38); ... mame
+tools/run_wide.sh build/don_m21 fbneo      # or the solo builds (hui55,
+                                           # pyron40); ... mame
                                            # (registry rows name the CURRENT
                                            # fingerprints — donovan-m19/
                                            # huitzil-m26/pyron-m20 since the
@@ -654,11 +654,22 @@ vanilla path anywhere writes `0x18` (STATE "THE ARCADE HIDDEN-CHARACTER
 ROSTER"). Detail: `docs/game/atlas/select_screen.md`,
 `docs/project/patch_index.md` W1.
 
-**Current WIDE builds — THE 14z-132 M16 MARK FREEZE (maintainer-ruled
+**Current WIDE builds — THE 14z-143 M17 PYRON-CAPTURE FREEZE (mark M17, the
+merged build number per the 14z-132 option-A ruling):
+donovan-m21 / huitzil-m28 / pyron-m22 / merged-m17.**
+`build/don_m21`, `build/hui55`, `build/pyron40`, `build/m3b_merged25`, stock
+twin `build/m5_stock16` (byte-identical to `m5_stock16` by rebuild, so
+`donovan-m19-stock` carries).
+**WHAT TO LOOK AT FIRST ON THIS ONE:** the wheel reads **M17**, and *Pyron's
+throws now hold the victim with HIS geometry* — his capture row `0x11` was
+serving Demitri's block until this freeze (patch_notes 14z-143). The previous
+freeze's paragraph follows.
+
+**Previous: THE 14z-132 M16 MARK FREEZE (maintainer-ruled
 2026-09-04, option A: the in-game mark IS the merged build number; mark M16):
 donovan-m20 / huitzil-m27 / pyron-m21 / merged-m16.**
-`build/don_m20`, `build/hui54`, `build/pyron38`, `build/m3b_merged23`, stock
-twin `build/m5_stock15`. **EVERY PROGRAM FINGERPRINT IS UNCHANGED from M13**
+`build/don_m21`, `build/hui55`, `build/pyron40`, `build/m3b_merged25`, stock
+twin `build/m5_stock16`. **EVERY PROGRAM FINGERPRINT IS UNCHANGED from M13**
 (`8065bc92` / `08944a7e` / `a43da974` / `f42f7569`; stock `e86e1d04`) because
 the whole delta is gfx: the rows are keyed on the WHOLE-SET key instead
 (`--set-key`: `52756b2f` / `e1ed7d9f` / `1264ca1f` / `2c926c5b`).
@@ -1373,7 +1384,32 @@ before session end (persistent suite doctrine, CLAUDE.md §4).
 
 **[VSP-94]** **Every frozen build is git-tagged `freeze/<name>`** (annotated; the tag
 message carries the fingerprint and how to reproduce). `git tag -l 'freeze/*'`
-lists them. This matters most for SUPERSEDED builds — `pyron-m1` and
+lists them.
+
+**FREEZING AN EXPECTATION SET: CARRY THE AUTHORED CLASSES, THEN FREEZE — in
+that order, or the legacy oracle is replaced by a tautology (14z-143).**
+`run_suite.sh --freeze` self-freezes any replay that has no `.masked` in the
+target dir, so freezing into an EMPTY new set writes a `.sha1` for the whole
+legacy corpus and prints `frozen <sha>` for each, exit 0 ([VSP-36]; the
+mechanism and the tell are in `docs/GOTCHAS.md`). The order is:
+
+```sh
+# 1. the registry row FIRST (run_suite resolves the set name from the fingerprint)
+# 2. CARRY the authored classes — never *.sha1, never logs/
+mkdir -p tests/expected/<new>
+cp tests/expected/<old>/*.masked tests/expected/<old>/*.skip \
+   tests/expected/<old>/mask tests/expected/<new>/
+# 3. freeze, then verify (the second run is what makes it evidence)
+MAME_ROMPATH="$PWD/build/<dir>/rompath;$ROMDIR" tests/run_suite.sh --freeze vsavjw
+MAME_ROMPATH="$PWD/build/<dir>/rompath;$ROMDIR" tests/run_suite.sh vsavjw
+```
+
+The freeze log must print `authored .masked expectation — not self-frozen`
+for ~52 of the 88 replays; if `01_attract_long` reads `frozen <sha>`, the
+carry was missed. Acceptance: the new set's `.masked` count EQUALS its
+predecessor's. Tracks run in parallel safely — every MAME run takes a fresh
+sandbox — but launch them from a wrapper that ends in `wait`, or the shell
+that started them exits and orphans them mid-corpus. This matters most for SUPERSEDED builds — `pyron-m1` and
 `huitzil-m1` cannot be produced from today's tree because their manifests
 moved on, and their tag is the only way back to a tree that does.
 NOTE: the tags mark the commit at which each build was frozen and was
@@ -1400,6 +1436,7 @@ entry and STATE close. Newest first; the top row is the CURRENT freeze.**
 
 | build (mark) | fingerprint(s) | dir · tag | what changed | detail |
 |---|---|---|---|---|
+| THE 14z-143 M17 PYRON-CAPTURE FREEZE | donovan-m21 whole-set `15df9b90` (`build/don_m21`), huitzil-m28 `e8aa4131` (`build/hui55`), pyron-m22 `b258c087` (`build/pyron40`), merged-m17 `50049b73` (`build/m3b_merged25`). **Program fingerprints: donovan `8065bc92` and huitzil `08944a7e` UNCHANGED (the mark is gfx), PYRON MOVED `a43da974` -> `65bf5622`** (the capture row is a program+data change), merged `4a7c02fb`. Stock twin **UNCHANGED and byte-identical by rebuild** — `donovan-m19-stock` (`e86e1d04`) and `donovan-m19-stage4` (`108f7523`) CARRY. Rows are whole-set keyed | tags `freeze/donovan-m21`, `freeze/huitzil-m28`, `freeze/pyron-m22`, `freeze/merged-m17` | **PYRON'S CAPTURE ROW `0x11` PORTED** — `pyron.toml` `[[data_port]] pyron_capture_keyframes` places vs2's own block (`0x0C7F98`, `len 0xB80`) in `wide_ext` and repoints `PRG:0x0BE2BE` off vsavj's Demitri alias: ONE word, +2 ops (pyron 310 -> 312). Measured against native `vsav2`: hold-offset overlap **9 of 9**, was 0 of 15; maintainer-confirmed on captures 2026-09-08. Plus the mark `M16` -> `M17` under the 14z-132 option-A ruling. Member delta measured by rebuild: donovan 2 (`vsw.33m`, `vsw.37m`), huitzil 2 (same), pyron 5 (+`vm3j.04d`, `vm3j.07b`, `vsw.41`), merged 6, **stock 0** | patch_notes 14z-143; `tests/audit_pyron_capture_block.sh` (EXPECT_MATCH=1), `tests/test_capture_kf_ownership.sh`; STATE 14z-143 |
 | THE 14z-132 M16 MARK FREEZE | donovan-m20 whole-set `52756b2f` (`build/don_m20`), huitzil-m27 `e1ed7d9f` (`build/hui54`), pyron-m21 `1264ca1f` (`build/pyron38`), merged-m16 `2c926c5b` (`build/m3b_merged23`) — **every PROGRAM fingerprint UNCHANGED** (`8065bc92` / `08944a7e` / `a43da974` / `f42f7569`), so these rows are keyed on the WHOLE-SET key (14z-132's forward-only promotion); stock twin and stage-4 target both measured UNCHANGED by rebuild, so `donovan-m19-stock` and `donovan-m19-stage4` CARRY | tags `freeze/donovan-m20`, `freeze/huitzil-m27`, `freeze/pyron-m21` | THE IN-GAME MARK IS NOW THE MERGED BUILD NUMBER (maintainer-ruled 2026-09-04, option A) — `version_text` M13 -> M16 in the three tenant manifests, ending the drift that had the wheel two behind the build since merged-m11. Delta measured on all five tracks: exactly TWO members (`vsw.33m`, `vsw.37m`), one character of one glyph, ZERO on the stock twin. **The first freeze in four that needed no predecessor row commented out**, because the whole-set key distinguishes builds a gfx-only freeze leaves program-identical. **RELEASED 14z-134 (2026-09-06): the release run — 165 gates, four lanes, `--scope all --lane all --strict` — PASS 164 / SKIP 1 (`audit_mask_window_ff42a2`, approved by the maintainer as a standing exception) / FAIL 0 / TIMEOUT 0 in three passes (`build/emu_release_m16/`, first and second pass kept beside the final); `release/merged-m16/` TRACKED (it had sat untracked since the freeze) with the WIDE MRA regenerated to carry its BUILD block, parts 31/31; `test_release_roundtrip` on the m16 layout PASS** | patch_notes 14z-132; STATE 14z-132 and 14z-134; `tests/expected/registry.tsv` header |
 | THE 14z-130 M13 BOOT-TITLE FREEZE | donovan-m19 `8065bc92` (`build/don_m19`, 342 ops), huitzil-m26 `08944a7e` (`build/hui53`, 373), pyron-m20 `a43da974` (`build/pyron37`, 310), merged-m15 `f42f7569` (`build/m3b_merged22`, 829); stock twin **MOVED** to `e86e1d04` (donovan-m19-stock); stage-4 target UNCHANGED at `108f7523` (donovan-m19-stage4) | tags `freeze/donovan-m19`, `freeze/huitzil-m26`, `freeze/pyron-m20`, `freeze/merged-m15` | THE BOOT NAME SCREEN reads VAMPIRE SAVED (three `aux_poke poke16` at `PRG:0x01C822/24/26`, Japan entry only, maintainer-ruled 2026-09-02); mark M13. PLUS the `gap_be27a` -> `capture_kf_ptr` bank-map correction folded in by ruling — BYTE-NEUTRAL on all five tracks by rebuild, with the table's hand-ownership made explicit in the generator so the generic repoint cannot silently revert the 14z-64 mirror-victim fix | patch_notes 14z-130; `tests/test_capture_kf_ownership.sh`; STATE 14z-130 |
 | THE 14z-119 PHYSICS-PORT FREEZE | donovan-m18 `7109f835` (`build/don_m18`, 339 ops — program identical to the validated probe `build/don_phys_probe`), huitzil-m25 `ae953657` (`build… | tags `freeze/donovan-m18`, `freeze/huitzil-m25`, `freeze/pyron-m19`, `freeze/merged-m14` | donovan-m18 / huitzil-m25 / pyron-m19 / merged-m14 (stock twin MOVED = donovan-m18-stock). Maintainer-ruled 2026-08-2… | history §Build registry narratives; `docs/project/patch_notes.md`; STATE close |

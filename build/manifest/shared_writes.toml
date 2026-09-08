@@ -40,7 +40,8 @@
 # ** All five M13 builds rebuilt BIT-IDENTICAL under the correction      **
 # ** (patch.json sha1 + fingerprint) — the generic repoint the corrected **
 # ** `kind` enables is suppressed by the ownership claim, because the    **
-# ** table is hand-owned by 17 [[data_port]] rows. Gate:                 **
+# ** table is hand-owned by 18 [[data_port]] rows (17 until 14z-143).    **
+# ** Gate:                                                               **
 # ** tests/test_capture_kf_ownership.sh.                                 **
 # **                                                                     **
 # ** ONE CORRECTION carried from the 14z-127 note: 0x0BE27A..0x0BE296 is **

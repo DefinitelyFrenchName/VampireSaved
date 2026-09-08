@@ -133,11 +133,11 @@ done
 # huitzil-m25 / pyron-m19, mark M12, 14z-119). Deliberately not the newest
 # built tracks: an UNREGISTERED image makes run_suite.sh refuse, so a sweep
 # against one would report dispatch failures instead of gate verdicts.
-MERGED="${MERGED:-build/m3b_merged23}"
-DON="${DON:-build/don_m20}"
-HUI="${HUI:-build/hui54}"
-PYR="${PYR:-build/pyron38}"
-STOCK="${STOCK:-build/m5_stock15}"
+MERGED="${MERGED:-build/m3b_merged25}"
+DON="${DON:-build/don_m21}"
+HUI="${HUI:-build/hui55}"
+PYR="${PYR:-build/pyron40}"
+STOCK="${STOCK:-build/m5_stock16}"
 
 expand() {  # expand <string> — the %PLACEHOLDER% vocabulary
     printf '%s' "$1" \

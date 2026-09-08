@@ -952,7 +952,7 @@ runner's tree check would have flagged mid-run.
 2. **`tests/test_release_roundtrip.sh`: re-point the default `NAME` to
    `merged-m16`** (code says `merged-m14`, header says `merged-m15` — both
    stale; the M16 layout has NEVER been gated) and run it explicitly:
-   `ROMDIR=../ROMS tests/test_release_roundtrip.sh build/m3b_merged23/rompath
+   `ROMDIR=../ROMS tests/test_release_roundtrip.sh build/m3b_merged25/rompath
    merged-m16` — sections 1-3 (round trip, applier refusals, the rule-7 chunk
    scan) and section 4 (the per-platform layout of the tree's
    `release/merged-m16/`). Verified read-only 14z-134 already: 3 platforms ×
@@ -964,7 +964,7 @@ runner's tree check would have flagged mid-run.
    *"the current bundle on the board is untouched; the next freeze's MRAs and
    bundle carry it."* The RELEASE copy has not shipped. Options: keep it
    byte-identical to the field-tested bundle (as today), or regenerate the WIDE
-   MRA with `tools/mister_mra.sh --no-rom --wide build/m3b_merged23 --out
+   MRA with `tools/mister_mra.sh --no-rom --wide build/m3b_merged25 --out
    <tmp>` and copy it in (parts unchanged — the block is an XML comment;
    re-check 31/31 and `test_mra_build_line`). Recommendation: regenerate — a
    release MRA that names its build is what the build line was for, and the
@@ -1109,8 +1109,8 @@ runner's tree check would have flagged mid-run.
 > ## IS the merged build number from here on (maintainer-ruled, option A), so
 > ## wheel and build agree by construction. Delta measured on all five tracks:
 > ## exactly `vsw.33m` + `vsw.37m` on the four WIDE tracks, **ZERO on the stock
-> ## twin**. Builds `don_m20` / `hui54` / `pyron38` / `m3b_merged23` /
-> ## `m5_stock15`; freeze names donovan-m20 / huitzil-m27 / pyron-m21 /
+> ## twin**. Builds `don_m21` / `hui55` / `pyron40` / `m3b_merged25` /
+> ## `m5_stock16`; freeze names donovan-m20 / huitzil-m27 / pyron-m21 /
 > ## merged-m16. **The first freeze in four needing NO comment-out row**, thanks
 > ## to the whole-set dispatch key.
 > ##
@@ -1192,8 +1192,8 @@ runner's tree check would have flagged mid-run.
 > ## **WHAT M16 IS:** `version_text` M13 -> M16, i.e. ONE CHARACTER of ONE
 > ## authored glyph. Delta measured on all five tracks: exactly `vsw.33m` +
 > ## `vsw.37m` on the four WIDE tracks, **ZERO on the stock twin**, program
-> ## untouched everywhere. Builds `don_m20` / `hui54` / `pyron38` /
-> ## `m3b_merged23` / `m5_stock15`.
+> ## untouched everywhere. Builds `don_m21` / `hui55` / `pyron40` /
+> ## `m3b_merged25` / `m5_stock16`.
 > ##
 > ## **THE THREE THINGS LEFT, none blocked:**
 > ## 1. **THE FREEZE SUITE** — emulator tier, ~2h44m at romset cadence
@@ -1201,7 +1201,7 @@ runner's tree check would have flagged mid-run.
 > ##    no program byte moved on any track.
 > ## 2. **`release/merged-m16/`** — `tools/package_release_platforms.py`.
 > ## 3. **THE CARD BUNDLE** — `tools/mister_mra.sh --core cps2w --wide
-> ##    build/m3b_merged23 --out <dir outside the repo>` plus the zips. **The
+> ##    build/m3b_merged25 --out <dir outside the repo>` plus the zips. **The
 > ##    maintainer is waiting on this to field-test; the CRC tail it needed is
 > ##    DONE, so nothing else gates it.**
 > ##
@@ -1239,7 +1239,7 @@ runner's tree check would have flagged mid-run.
 > ##
 > ## The version-numbering ruling (option A: the wheel mark IS the merged build
 > ## number) is EXECUTED as far as building. Five tracks on disk:
-> ## `don_m20` / `hui54` / `pyron38` / `m5_stock15` / `m3b_merged23`.
+> ## `don_m21` / `hui55` / `pyron40` / `m5_stock16` / `m3b_merged25`.
 > ## **Delta measured: exactly `vsw.33m` + `vsw.37m` on the four WIDE tracks and
 > ## ZERO members on the stock twin.** Every program fingerprint UNCHANGED.
 > ## `test_version_string` PASS on all four WIDE tracks (pixel-exact snapshot,

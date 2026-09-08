@@ -43,7 +43,7 @@ for n in donovan huitzil pyron; do
     fi
 done
 
-m="docs/project/tables/chars/donovan.json"; ex="build/don_m20/extract"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+m="docs/project/tables/chars/donovan.json"; ex="build/don_m21/extract"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 if [ -f "$m" ] && [ -d "$ex" ]; then
     real="$(python3 -c "b=open('$ex/region_hitbox.bin','rb').read(); print(b[0x100:0x101].hex())")"
     cp build/manifest/donovan.toml "$W/don.toml"

@@ -57,7 +57,7 @@ older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
 | **[VSP-155] applied to myself, late** | I cited PRIOR ART FIRST earlier in this same session and then built a rig before reading the subsystem document the STATE entry NAMES. `engine_internals.md`'s capture-pose section already held the `0x27FAA` answer. Reading it first would have saved the emulator work; what the probe was worth in the end was reproducing a 14z-98/99 measurement on a second set |
 | **a lead recorded, NOT a defect** | Two per-character pose-id LUTs — `PRG:0x373CA` and `PRG:0x3A5EA` (vs2 `0x37842`, `0x3AD6A`), indexed by the VICTIM's id, whose variant halves **vsavj ALIASES and vs2 does not** (Pyron-as-victim: vsavj `0x2D` vs vs2 `0x32`; Donovan `0x23` vs `0x30`; Huitzil `0x2D` vs `0x36`). Named by NO manifest, doc or gate. **But both are reached only through the dead `0x27FAA` entry**, so they sit off the live path — a curiosity until something is shown to reach them, recorded so the next session does not re-derive them as a finding |
 | **(9) THE CONFIRMATION, and it needed no new emulator run** | The probe A/B was the wrong instrument, but the right one was static. Reading BOTH keyframe blocks at victim `0x03` reproduces 14z-131's in-emulator numbers EXACTLY: vs2's Pyron block gives deltas `(0,0)(-79,0)(-97,0)(-65,0)(82,29)(58,124)(100,132)` with poses `0,2,1,0,3,11,10`; the Demitri block ours serves gives `(0,0)(-63,0)(-63,0)(-63,0)(-26,0)(-26,0)(-10,32)` with poses `0,6,6,6,6,5,2`. The measured RAM sequences were `[2,1,0,3,11,10,29]` native and `[6,5,2]` ours. **Two measurements sharing no premise — one work RAM in a running game, one ROM bytes — and the positions and poses come out of the SAME 8-byte records.** The mechanism is proven end to end |
-| **(9) BOTH PORT PREREQUISITES SETTLED, and the length estimate was WRONG** | Disassembling how the positioner builds `A0` (`PRG:0x02803A`-`0x028062`) shows a block is **a 32-word victim OFFSET TABLE then 8-byte records** `[dx][dy][flags][pose]`, indexed by the attacker node's `+0x12` keyframe index — not a flat array. The victim offsets **ALIAS**: vs2's Pyron block has 32 entries but **18 distinct** sub-blocks, uniformly spaced `0xA0`, last at `+0x0AE0`, zeros after. **Extent `0xB80` (2,944 B), not the ~`0x2040` the sketch assumed** — which matters for hole allocation. And the `lea (a0,d0.w)` displacement is an offset WITHIN the block (max `0xB78`), so relocation cannot move it and the signed-word bound has enormous margin. The port spec is complete in `docs/NEXT_SESSION.md` |
+| **(9) BOTH PORT PREREQUISITES SETTLED, and the length estimate was WRONG** | Disassembling how the positioner builds `A0` (`PRG:0x02803A`-`0x028062`) shows a block is **a 32-word victim OFFSET TABLE then 8-byte records** `[dx][dy][flags][pose]`, indexed by the attacker node's `+0x12` keyframe index — not a flat array. The victim offsets **ALIAS**: vs2's Pyron block has 32 entries but **18 distinct** sub-blocks, uniformly spaced `0xA0`, last at `+0x0AE0`, zeros after *(CORRECTED IN PLACE 14z-143: "zeros after" is wrong — a DIFFERENT table begins at `+0xB80`. The extent is unchanged and rests on the tiling `0x40 + 18*0xA0 = 0xB80`)*. **Extent `0xB80` (2,944 B), not the ~`0x2040` the sketch assumed** — which matters for hole allocation. And the `lea (a0,d0.w)` displacement is an offset WITHIN the block (max `0xB78`), so relocation cannot move it and the signed-word bound has enormous margin. The port spec is complete in `docs/NEXT_SESSION.md` |
 | **CLOSE** | ROM audit **76/76** at the opener. The eight doc checks green after every doc edit, exit statuses captured directly. **Static tier ALONE, `--strict`, SIX times, 141/0/0 GREEN every time**: `_close.log` — the run that surfaced the missing NOTE; `_close2.log` after that fix, whose advisory block carried the coverage number for the first time; `_close3.log` after step 3, reading `test_checkdocs_rom  checkdocs_rom.coverage 30/346 atlas ROM-tier addresses`; `_pyron.log` and `_pyron2.log` over the Pyron arc's documentation; and `_ritual.log` at the close, after the ritual audit's four corrections and the second rollover. Tree clean during every one, nothing edited while any ran. 141 = 14z-141's 140 + this gate. STATE **rolled TWICE, both early**: the 14z-140 group at 153.7 KB and, in the close ritual, the 14z-141 group at 150.6 KB — each verbatim to `STATE_HISTORY.md` with its LEDGER line, leaving STATE at **141.5 KB** and the one group the next session needs (14z-141's L2 content is superseded by L3 landing). **L3 LANDED, and with it the living-documentation effort in all four forms** — routing enforced (L1), the corpus rendered (L4), the fact census frozen (L2), the atlas's ROM claims re-derived (L3). **No build byte moved.** Committed to main, NOT pushed (the maintainer's word, as always) |
 
 # THE LEDGER — archived sessions, one line each (newest first)
@@ -341,6 +341,62 @@ FILE — several have it in their gate header or a STATE entry — but the file 
 what a triage is looking at, so those are where the thinking time goes.
 
 ## Decisions pending (human)
+
+- **DONOVAN THROWING JEDAH USES DONOVAN'S OWN VICTIM KEYFRAMES ON EVERY WIDE
+  BUILD — found 14z-143 by the new full-matrix audit, PRE-EXISTING since
+  14z-64, and the fix is a gameplay call.** Not a regression from the M17
+  freeze: measured identical on `merged23`.
+  **THE MECHANISM, measured.** `donovan.toml`'s `throw_victim_keyframes`
+  carries `fixes = "0x1E:0b30:0d88"` — the 14z-64 mirror-victim correction,
+  which rewrites the blob's VICTIM offset word `[0x0F]` from the
+  Jedah-victim sub-block to the DONOVAN-victim one. That is RIGHT on the
+  STOCK track, where Donovan substitutes Jedah at slot `0x0F` and victim
+  `0x0F` genuinely IS Donovan (the mirror flavour the fix was written for).
+  **On a WIDE build Donovan is at `0x13` and `0x0F` is JEDAH, restored** — so
+  the rewrite redirects a reachable LEGACY victim's keyframes. The manifest's
+  own note calls the fix "harmless" at a variant id because its `[0x0F]`
+  entry "is never a TENANT victim there"; that is true, and it is not the
+  question — `0x0F` is a legacy victim and an ordinary 2P matchup.
+  **MAGNITUDE:** the two sub-blocks differ in **225 of 408 bytes (55%)**;
+  early deltas are close (`-60,0` vs `-56,0`) but the last keyframe is
+  `(-61,166)` where Jedah's is `(-76,32)` — 134 px of vertical difference —
+  and the poses differ (`0,8,6,0,1,0,8,17` vs `0,8,7,1,0,0,9,20`).
+  **NOT MEASURED IN-EMULATOR YET** ([VSP-116]): the numbers above are ROM
+  bytes. The static read predicted the in-emulator result exactly for the
+  Pyron cell (14z-142/143), which is the licence for quoting them, but the
+  confirming run is `audit_pyron_capture_block`'s rig with attacker `0x13`
+  and victim `0x0F` and has not been done.
+  **OPTIONS:** **(a)** gate the `fixes=` row to the base-slot track (a
+  `fixes` twin keyed like `only_base_slot`, or a `fixes_variant = ""`), so
+  the WIDE blob keeps vs2's own `[0x0F]` = the Jedah-victim sub-block —
+  section 2 of `audit_capture_matrix` proves vs2's legacy victim data is
+  byte-identical to vsavj's, so that IS Jedah's real geometry; **(b)** leave
+  it and record that Donovan's throw of Jedah uses his own victim geometry as
+  accepted; **(c)** measure first with the rig above, then decide.
+  **RECOMMENDATION: (c) then (a)** — the measurement is ~4 minutes on an
+  existing rig and turns "a row is mis-scoped" into "here is what it looks
+  like", exactly as it did for Pyron. (a) is a one-line manifest change but
+  it MOVES SHIPPED BYTES on the WIDE tracks, so it is a freeze.
+  **LOCKED MEANWHILE:** the cell is frozen as a KNOWN-OPEN divergence in
+  `tests/audit_capture_matrix.sh`, so it cannot rot; removing that row is
+  what proves a fix landed.
+
+- **THE CAPTURE-GEOMETRY MATRIX IS NOW SWEPT STATICALLY, and the maintainer
+  asked for exactly this (2026-09-08).** Their words: *"that makes a strong
+  argument for checking the whole combination of VS2 tenants thrown ... as
+  well as our VS2 tenants throwing others"*, noting *"some of it has been
+  done already but only in targeted cases known to be wrong"*.
+  **DONE, and it is CHEAP because the comparison is ROM bytes:**
+  `tests/audit_capture_matrix.sh` (ci_static, ~2 s) compares **640
+  (attacker, victim) cells over 20 reachable attackers** against native
+  `vsav2`, where the three in-emulator gates covered three. It found the
+  Donovan/Jedah cell above on its first run.
+  **WHAT IT DOES NOT CLAIM:** behaviour. It compares the DATA the engine
+  reads; that the engine reads it identically in both games is what
+  `audit_don_grab_pose`, `test_hui_grab_victim` and
+  `audit_pyron_capture_block` anchor. **OPEN, and cheap:** widen the
+  in-emulator anchors from 3 cells to a sampled row per tenant, now that the
+  static pass says which cells are worth an emulator run.
 
 - **THE RELEASE RESUME'S ONE REAL RED — `test_mister_prg_window`'s FROZEN
   PAIR IS STALE (frozen on merged-m10, five freezes ago) — HOW TO CLOSE IT
@@ -690,10 +746,26 @@ what a triage is looking at, so those are where the thinking time goes.
   `tests/replays/hui/97_hui_grab_es_2p.rpl` (replay 80 with one token
   changed, so a difference between them is the ES button and nothing else).
 
-- **PYRON'S CAPTURE-KEYFRAME ATTACKER ROW `0x11` IS NOT PORTED. DECIDED
-  (maintainer, 2026-09-04): MEASURE FIRST — *"Agreed, that's where to
-  start."* **MEASURED 14z-131, AND IT IS A REAL, GROSSLY VISIBLE DEFECT ON A
-  2P SURFACE — NOT A COSMETIC.** The port decision is now the maintainer's;
+- **~~PYRON'S CAPTURE-KEYFRAME ATTACKER ROW `0x11` IS NOT PORTED~~ PORTED
+  14z-143 (option (a)), AND CONFIRMED THREE WAYS — the entry stays for the
+  measurement trail.** The maintainer took this item at the 14z-143 opener
+  from the open-items list. **RESULT: `pyron.toml`'s `[[data_port]]
+  pyron_capture_keyframes` places vs2's own block (`0x0C7F98`, `len 0xB80`)
+  in `wide_ext` and repoints row `0x11` at `PRG:0x0BE2BE` — ONE word, +2 ops,
+  Pyron only.** Confirmed by (1) the shipped image, where the placed block is
+  byte-identical to vs2's and the repoint inventory is exactly the frozen set;
+  (2) `audit_pyron_capture_block.sh` in-emulator against native `vsav2` —
+  hold-offset overlap **9 of union 9**, where 14z-131 measured **0 of 15**,
+  legacy control 6/6, `EXPECT_MATCH` default flipped 0 -> 1; and (3) the
+  maintainer, on a before/after/native capture sheet at six matched keyframes
+  (2026-09-08): *"After and Native look identical or at least consistent,
+  whereas before was inconsistent with native"*. Byte detail: patch_notes
+  14z-143. Builds `build/pyron39` (`65bf5622`) / `build/m3b_merged24`
+  (`4a7c02fb`) — NOT yet frozen.
+  *(Original entry follows, unrewritten.)*
+  **DECIDED (maintainer, 2026-09-04): MEASURE FIRST — *"Agreed, that's where
+  to start."* **MEASURED 14z-131, AND IT IS A REAL, GROSSLY VISIBLE DEFECT ON
+  A 2P SURFACE — NOT A COSMETIC.** The port decision is now the maintainer's;
   the measurement it was waiting on is done.
   **MEASURED TWO INDEPENDENT WAYS THAT SHARE NO PREMISE, and they agree:**
   * **STATIC, from the reference ROMs.** vs2's Pyron block `0x0C7F98` vs the
@@ -749,7 +821,9 @@ what a triage is looking at, so those are where the thinking time goes.
   32-word victim OFFSET TABLE then 8-byte records `[dx][dy][flags][pose]`; the
   victim offsets ALIAS, so vs2's Pyron block has 32 entries but **18 distinct**
   sub-blocks spaced `0xA0`, last at `+0x0AE0`. **Extent = `0xB80` (2,944 B),
-  not ~`0x2040`** — zeros follow it. And the `lea (a0,d0.w)` displacement is an
+  not ~`0x2040`** — *(CORRECTED 14z-143: this said "zeros follow it";
+  measured, a DIFFERENT table begins at `+0xB80`. The extent is unchanged and
+  now rests on the tiling `0x40 + 18*0xA0 = 0xB80`, not on a tail of zeros.)* And the `lea (a0,d0.w)` displacement is an
   offset WITHIN the block (measured max `0xB78`), so relocation cannot move it
   and the signed-word bound has enormous margin. Mechanism + structure:
   `engine_internals.md` "THE CAPTURE-POSE INSTALLER". One freeze.
@@ -840,6 +914,10 @@ what a triage is looking at, so those are where the thinking time goes.
   ([VSP-123] makes the native leg reachable with an ordinary poke), which
   turns "a row is unported" into "here is what it looks like". Half a session,
   and it is the cheap half of (a).
+  **-> (a) EXECUTED 14z-143.** The measurement recommended here was done at
+  14z-131/142; the port itself cost one manifest row, two rebuilds and three
+  gate moves (`test_tenant_loop` op counts, `test_capture_kf_ownership`
+  frozen sets, `audit_pyron_capture_block` EXPECT_MATCH).
 
 *(Cleaned 14z-109, maintainer-directed, and again 14z-134: resolved and
 no-longer-shaping entries moved VERBATIM to `DECISIONS_HISTORY.md` — grep there by topic.

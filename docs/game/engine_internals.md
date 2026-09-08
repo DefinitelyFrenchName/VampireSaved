@@ -2636,10 +2636,25 @@ it before sizing any port of a `PRG:0x0BE27A` row. The positioner computes its
 So a block is **a 32-word victim OFFSET TABLE at +0x00, then 8-byte records**
 `[dx.w][dy.w][flags.w][pose.w]`, and the victim offsets ALIAS (vs2's Pyron
 block: 32 entries, **18 distinct**, uniformly spaced `0xA0` = 20 records).
-Measured extent of vs2's Pyron block `0x0C7F98`: last sub-block at `+0x0AE0`,
-so **`0xB80` bytes**, with zeros after it. The `lea (a0,d0.w)` displacement is
-an offset WITHIN the block (max `0xB78`), so it is unaffected by relocating
-the block and sits far under the signed-word bound.
+Measured extent of vs2's Pyron block `0x0C7F98`: the head is `0x40`, the
+first sub-block sits at `+0x40` and the last at `+0x0AE0`, so the block TILES
+exactly — `0x40 + 18*0xA0 =` **`0xB80` bytes**, and its last record ends
+precisely there. *(CORRECTED 14z-143: this sentence said "with zeros after
+it". Measured on the image, a DIFFERENT table begins at `+0xB80` —
+`0000000000000000`, `0110011000000000`, `031b031b00000000`. The LENGTH is
+unchanged; what was wrong was its justification, and a port sized by looking
+for a run of zeros would have gone too far. The tiling is the derivation.)*
+Sibling identity `vsav2 == vhunt2` from these bases runs to `+0x30DD`, far
+past the structural end, so an `orc` bounds such a row not at all — the tiling
+does. The `lea (a0,d0.w)` displacement is an offset WITHIN the block (max
+`0x0AE0 + 0xA0 = 0xB80`, last record start `0xB78`), so it is unaffected by
+relocating the block and sits far under the signed-word bound.
+
+**PORTED 14z-143** — `pyron.toml`'s `[[data_port]] pyron_capture_keyframes`
+places that block in `wide_ext` and repoints row `0x11` (`PRG:0x0BE2BE`) off
+vsavj's Demitri alias. Confirmed in-emulator against native `vsav2`: hold-offset
+overlap **9 of 9**, where 14z-131 measured 0 of 15 (`audit_pyron_capture_block.sh`,
+`EXPECT_MATCH=1` since). All three tenant attacker rows are now ported.
 
 **What is NOT re-measured in-emulator**: a 14z-142 probe A/B at `0x27FA0`
 across the two builds did not produce comparable legs — the native leg

@@ -1,5 +1,90 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-143 — PYRON'S CAPTURE ROW `0x11` PORTED: he throws with his own geometry, not Demitri's
+
+**THE DEFECT.** `capture_kf_ptr` (`PRG:0x0BE27A`, 32 longwords indexed by the
+ATTACKER's char id) has its rows `0x10-0x1F` aliasing `0x00-0x0F` in vsavj.
+Row `0x11` therefore held `0x00094954` — **row `0x01`, Demitri's block** — so
+every victim Pyron captured was positioned AND posed by Demitri's keyframes.
+Measured 14z-131 in-emulator (zero overlap in the hold offsets against native
+`vsav2`); mechanism established 14z-142; ported here. Donovan's row `0x13` and
+Huitzil's row `0x10` have been ported since 14z-62c / 14z-71 — Pyron's was the
+last tenant attacker row still on the vanilla alias.
+
+**ONE MECHANISM, NOT TWO.** `PRG:0x028072` is one straight line out of one
+`A0`: position, the facing from `(a0)+`, then `move.w (a0),d0` — the POSE
+INDEX — then `bra.w $27fa0` into the installer. Position and pose come out of
+the SAME 8-byte record, so one wrong block produces both. (The 14z-131 reading
+of a "second mechanism" was retracted 14z-142. The sibling-table alternative
+is dead: `PRG:0x27FAA` is never executed — 0 hits against 904 at the live
+entry `0x27FA0`, which hardcodes `anim_index_c`.)
+
+**THE ROW.** `build/manifest/pyron.toml`, `[[data_port]] pyron_capture_keyframes`
+— the third tenant's twin of donovan's `throw_victim_keyframes` and huitzil's
+`grab_hold_keyframes`, through the same `slot_ptr_table`:
+
+| key | value | how it was established |
+|---|---|---|
+| `src` | `0x0C7F98` | vsav2's own `capture_kf_ptr` (base `0x0D8418`) row `0x11` |
+| `orc` | `0x0C782A` | vhunt2's table (base `0x0D7CAA`) row `0x11`; sibling delta `0x76E`, uniform |
+| `len` | **`0x0B80`** | STRUCTURAL: a 32-word victim offset table (`0x40`) then 8-byte records `[dx][dy][flags][pose]`. The offsets ALIAS — 32 entries, **18 distinct** sub-blocks spaced `0xA0`, first `+0x40`, last `+0x0AE0` — so `0x40 + 18*0xA0 = 0xB80` exactly, and the last record ends precisely there |
+| `dst` / `dst_old_head` | `0x094954` / `00400140024003400440054006400740` | the CONTENT ANCHOR: the vanilla block vsavj's alias points at. Nothing is written there — the owner-row mode places and repoints |
+| `slot_ptr_table` | `0xBE27A` | asserted: vsavj row `0x11` aliases row `0x01`, and `dst` is a base-half row's pointer |
+| `hole` | `wide_ext` | placed; `only_variant_slot = true` (Pyron exists only at a variant id) |
+
+**THE LENGTH ESTIMATE WAS WRONG BY 2.8x, AND ONE JUSTIFICATION WAS WRONG TOO.**
+The pre-14z-143 sketch assumed `~0x2040` — the distance to the next block in
+vs2's table (`0x0CA1CA`, row `0x13`) — which is the room available, not the
+extent. And `docs/NEXT_SESSION.md` said "zeros after `+0x0AE0`": measured, a
+DIFFERENT table begins at `+0xB80` (`0000…`, `01100110…`, `031b031b…`). The
+LENGTH is unaffected and now rests on the tiling above rather than on a tail
+of zeros. Sibling identity `vsav2 == vhunt2` runs to `+0x30DD`, far past the
+structural end, so `orc` bounds nothing here — the tiling does.
+
+**RELOCATION-SAFE.** The `lea (a0,d0.w)` displacement is an offset WITHIN the
+block (max `0x0AE0 + 0xA0 = 0xB80`, last record start `0xB78`), so moving the
+block cannot move it and the signed-word bound has enormous margin.
+
+**SUPERSET-SAFE BY CONSTRUCTION.** Exactly one word moves: `poke32` at
+`PRG:0x0BE2BE` (row `0x11`). The vanilla row `0x01` and Demitri's block at
+`0x094954` are untouched (asserted on the shipped image), and no legacy
+attacker can reach a variant row. `test_shared_writes` is UNCHANGED at
+D 115 / H 113 / P 102 — the write falls inside the measured variant-row
+exemption window (`0xBE2BA-0xBE2FA`, entry size 4), so it adds no
+shared-surface row.
+
+**OP DELTA: +2, PYRON ONLY** — the placed `0xB80` blob and the one `poke32`.
+Declared by `pyron.toml` alone, so nothing dedupes: pyron `310 -> 312`, the
+3-tenant merge `829 -> 831` (sum declared `944 -> 946`), donovan `342` and
+huitzil `373` and the 2-tenant leg `618` all UNCHANGED. Re-frozen in
+`tests/test_tenant_loop.sh`.
+
+**MEASURED, TWO WAYS THAT SHARE NO PREMISE.**
+- STATIC, on the shipped image: row `0x11` -> `0x00411BF0` (solo) /
+  `0x004C1620` (merged), and the `0xB80` there is byte-identical to
+  `vsav2[0x0C7F98]`. The repoint inventory is exactly `0x00-0x0F, 0x11, 0x18`
+  (solo) and `+0x10, 0x13` (merged) — `test_capture_kf_ownership`, whose
+  frozen sets were moved in this commit and whose four controls all fire.
+- IN-EMULATOR, `audit_pyron_capture_block.sh` on `build/m3b_merged24`, ours vs
+  native `vsav2`, victim Victor: **hold-offset overlap 9 of union 9**, where
+  14z-131 measured **0 of 15**. The legacy control (Demitri attacker) agrees
+  6 of 6, so the rig, the pokes and the coordinate convention hold.
+  `EXPECT_MATCH` default flipped `0 -> 1` in the same commit — the gate
+  PROVED the fix rather than being rewritten to suit it.
+
+**MAINTAINER VERDICT ON THE CAPTURES (2026-09-08), from the three-column
+before/after/native sheet at six matched keyframes:** *"After and Native look
+identical or at least consistent, whereas before was inconsistent with
+native"*. So the fix is confirmed by eye on the surface it was reported on,
+independently of the offset arithmetic.
+
+**TIMING IS NOT ASSERTED, AND THAT IS DELIBERATE.** The offset SEQUENCE is
+identical; ours dwells one video frame longer at most keyframes (30 held
+frames against native's 28). That is the ruled host-clock cadence — vsavj runs
+fewer engine double-ticks per video frame than vsav2 ([VSE-83]; maintainer,
+2026-09-02: *"the engine, being vanilla vsav, takes precedence"*) — and
+[VSP-169] says assert structure, report timing. The gate compares offset SETS.
+
 ## 14z-132 — THE M16 MARK FREEZE (donovan-m20 / huitzil-m27 / pyron-m21 / merged-m16, mark M16): the in-game mark becomes the merged build number
 
 **THE WHOLE SHIPPED DELTA IS ONE CHARACTER OF ONE AUTHORED GLYPH.**
@@ -15,11 +100,11 @@ the third glyph's tile content differs.
 
 | track | members changed |
 |---|---|
-| `don_m19` -> `don_m20` | 2 — `vsw.33m`, `vsw.37m` |
-| `hui53` -> `hui54` | 2 — the same two |
-| `pyron37` -> `pyron38` | 2 — the same two |
-| `m3b_merged22` -> `m3b_merged23` | 2 — the same two |
-| `m5_stock14` -> `m5_stock15` | **0 — byte-identical** |
+| `don_m19` -> `don_m21` | 2 — `vsw.33m`, `vsw.37m` |
+| `hui53` -> `hui55` | 2 — the same two |
+| `pyron37` -> `pyron40` | 2 — the same two |
+| `m3b_merged22` -> `m3b_merged25` | 2 — the same two |
+| `m5_stock14` -> `m5_stock16` | **0 — byte-identical** |
 
 The stock twin does not move because `version_text` is SKIPPED when bank5 is
 inactive (`gen_donovan_patch.py:4999` — no group C to hold the glyphs), and the

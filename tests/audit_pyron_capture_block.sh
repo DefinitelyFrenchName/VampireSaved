@@ -23,7 +23,10 @@
 # THE STATIC FACT. Every legacy attacker row is ported (the fifteen
 # `capture_kf_*` data_port rows, GitHub #104), and so are Donovan's 0x13
 # (`throw_victim_keyframes`) and Huitzil's 0x10 (`grab_hold_keyframes`).
-# PYRON'S ROW 0x11 IS NOT. vsavj aliases it to 0x00094954 — DEMITRI's block.
+# PYRON'S ROW 0x11 WAS NOT, until 14z-143: vsavj aliases it to 0x00094954 —
+# DEMITRI's block. It is now ported (`pyron_capture_keyframes` in pyron.toml,
+# vs2's own block 0x0C7F98 placed in wide_ext, one poke32 on PRG:0x0BE2BE),
+# and THIS GATE IS WHAT PROVED IT LANDED — see EXPECT_MATCH below.
 #
 # *** WHAT THIS GATE DOES AND DOES NOT CLAIM (14z-131). It LOCKS AN OBSERVED
 # *** DIFFERENCE. It does NOT establish that the unported row is its CAUSE.
@@ -41,7 +44,7 @@
 # reproduced 14z-142 on both sets). The big hypothesis stays refuted — our
 # Pyron runs HIS OWN records (12 distinct, span 0x288), not Demitri's.
 # So row 0x11 IS the story, and a PASS here still only locks the OBSERVED
-# difference; the port is what would flip EXPECT_MATCH to 1.
+# difference; the port is what flipped EXPECT_MATCH to 1 (14z-143).
 #
 # MEASURED TWO INDEPENDENT WAYS, and they agree (they share no premise: one
 # reads reference-ROM bytes, the other reads work RAM in a running game).
@@ -73,17 +76,20 @@
 #     legs, that the poke path and frame window are right, and that the
 #     coordinate convention is shared. If it disagrees, every verdict below
 #     is meaningless and the gate says so instead of reporting them.
-#   SECTION 1 — PYRON. `EXPECT_MATCH=0` (the default) asserts the MEASURED
-#     defect: the two legs must DISAGREE. Flip to `EXPECT_MATCH=1` when row
-#     0x11 is ported — the same shape audit_don_grab_pose used across the
-#     #104 fix, so the gate proves the fix landed rather than being rewritten
-#     to suit it.
+#   SECTION 1 — PYRON. `EXPECT_MATCH=1` (the default SINCE 14z-143) asserts
+#     that the two legs AGREE. It was `0` — the two legs must DISAGREE —
+#     from 14z-131, when the defect was measured, until the row was ported;
+#     the flip is the same shape audit_don_grab_pose used across the #104
+#     fix, so the gate PROVED the fix landed rather than being rewritten to
+#     suit it. MEASURED at the flip, on build/m3b_merged24: overlap 9 of
+#     union 9 (it was ZERO of 15), legacy control 6 of 6. Set
+#     `EXPECT_MATCH=0` to re-assert the pre-port state on an old build.
 #
 # NOT A CLAIM ABOUT DONOVAN OR HUITZIL: their rows are ported and their holds
 # are locked by audit_don_grab_pose / test_hui_grab_victim.
 #
 # Static? No — 4 MAME runs, 2 at a time, ~4 min.
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged23] [EXPECT_MATCH=0]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged25] [EXPECT_MATCH=1]
 #        tests/audit_pyron_capture_block.sh
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -103,8 +109,8 @@ if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 # DUMPS and the liveness check reported "held frames ours=0". First seen on
 # the M16 freeze sweep, the gate's first run under the runner.
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged23}"
-EXPECT_MATCH="${EXPECT_MATCH:-0}"   # 0 = the defect is present (today)
+BUILD="${BUILD:-build/m3b_merged25}"
+EXPECT_MATCH="${EXPECT_MATCH:-1}"   # 1 = ported (14z-143); 0 = the pre-port defect
 VICTIM="${VICTIM:-03}"              # Victor: a legacy dummy, no-input
 
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }

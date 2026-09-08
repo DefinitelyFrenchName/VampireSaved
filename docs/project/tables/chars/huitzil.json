@@ -11,8 +11,8 @@
   "relocated_bad": 9
  },
  "inputs": {
-  "bank_map.toml": "bfe42f907b500775af2a064b18391b30dad78d38",
-  "manifest": "a263151a9e7dfbd9222baf3fc4252fa7404451fb",
+  "bank_map.toml": "ece2b13bfbddaf6fea14e56baf65502945ba52dd",
+  "manifest": "1ba49d8dcd93f1e4d719de6af4188904af7b5f9a",
   "overrides": "be0e9b96c8414532cc7a1d60f7a4a235a7d6362d",
   "placements.json": "913270ce40f1e46e11e9b6daa7ff4346771009c3",
   "reconciliation.toml": "40528aeb863028d885f868f34368443c460b5ca2",
@@ -25,7 +25,7 @@
  "sources": {
   "ours": {
    "kind": "built",
-   "set": "build/hui54"
+   "set": "build/hui55"
   },
   "vh": null,
   "vs2": {

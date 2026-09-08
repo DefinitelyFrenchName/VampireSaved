@@ -901,8 +901,8 @@ what the resolver then DOES about it, which is resolve anyway.
 ## identity unless the chain is pinned (paid: 14z-132)
 Measured on one build, two commands apart:
 
-    build/m3b_merged23/rompath          -> fcc83fc3...
-    build/m3b_merged23/rompath;../ROMS  -> 544990c4...
+    build/m3b_merged25/rompath          -> fcc83fc3...
+    build/m3b_merged25/rompath;../ROMS  -> 544990c4...
 
 `--full` hashes the union of the RESOLVED zips, so a `;` chain folds
 `$ROMDIR`'s members into the digest. Callers pass both forms throughout the
@@ -4216,3 +4216,60 @@ opens is the answer. **Before concluding a document is wrong about bytes, grep
 `tests/` for the address — a gate that already froze it has answered the view
 question and probably the stride too** (this one is `8 rows x 4 bytes` of
 `(P1, P2, venue.w)`, which the first reading also had wrong).
+
+## `run_suite.sh --freeze` INTO AN EMPTY EXPECTATION DIR SELF-FREEZES THE WHOLE LEGACY CORPUS — the freeze's CARRY step is load-bearing and was written down nowhere (paid: 14z-143)
+
+A freeze creates a NEW expectation set (`tests/expected/<name>/`). The obvious
+move — add the registry row, point `MAME_ROMPATH` at the new build, run
+`tests/run_suite.sh --freeze vsavjw` — produces a set that is **catastrophically
+weaker than its predecessor, silently and greenly.**
+
+The mechanism is one branch in `run_suite.sh`:
+
+```sh
+if [ "$FREEZE" = 1 ] && [ -n "$RUNMASK" ]; then
+    echo "authored .masked expectation — not self-frozen"
+elif [ "$FREEZE" = 1 ]; then
+    echo "$sha" > "$EXPDIR/$name.sha1"
+```
+
+`RUNMASK` is non-empty only when the replay ALREADY HAS a `.masked` file in
+the expectation dir. In a fresh dir nothing does, so every legacy replay falls
+into the `else` and is **self-frozen from the build under test**. Measured on
+the first 14z-143 attempt: the three new sets came out `sha1=8 masked=0
+skip=0` against predecessors carrying `masked=52..53, skip=18..19`. The run
+prints `frozen <sha>` for each one and exits 0.
+
+That is [VSP-36] exactly — *"a self-frozen `.sha1` cannot see a legacy
+regression; it answers 'did this build change since I froze it', and
+re-freezing makes any behaviour correct by definition"* — reached not by
+editing an expectation but by **omitting a step**. The whole vanilla-oracle
+half of the suite would have been replaced by a tautology, and every later
+session would have read SUITE GREEN.
+
+**THE STEP: carry the AUTHORED classes from the predecessor set FIRST, then
+freeze.**
+
+```sh
+mkdir -p tests/expected/<new>
+cp tests/expected/<old>/*.masked tests/expected/<old>/*.skip \
+   tests/expected/<old>/mask tests/expected/<new>/
+# THEN: MAME_ROMPATH="build/<dir>/rompath;$ROMDIR" tests/run_suite.sh --freeze vsavjw
+```
+
+Never carry `*.sha1` or `logs/` — those are what the freeze is FOR, and
+carrying them would compare the new build against the old build's checksums
+under a new name. This is what STATE 14z-130 means by *"every self-frozen
+checksum came out IDENTICAL to the carried one and every authored `.masked`
+verified against the vanilla basis"*: the `.masked` specs are CARRIED, the
+`.sha1` files are RE-MEASURED.
+
+**THE TELL, and check it before letting a freeze run to completion:** a
+correct freeze prints `authored .masked expectation — not self-frozen` for
+~52 of the 88 replays. If the log shows `frozen <sha>` for `01_attract_long`
+or `02_demitri_vs_cpu`, the carry was missed — kill it and start over. Ninety
+minutes of MAME is cheaper than a tautological oracle.
+
+**AND THE COUNT IS THE ACCEPTANCE CHECK:** compare
+`ls tests/expected/<new>/*.masked | wc -l` against the predecessor's before
+committing. Equal, or the sweep lost a class.

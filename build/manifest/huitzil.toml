@@ -852,7 +852,7 @@ march_retarget_mid = true
 # same-source-or-fail names any future collision). Screen position =
 # the empty bottom-right corner (measured on merged-m5 snapshots, 14z-105).
 # THE TEXT NAMES THE FREEZE GENERATION — change it at every freeze.
-version_text = "M16"
+version_text = "M17"
 version_font = "build/manifest/version_font.json"
 version_x = 324
 version_y = 202
@@ -2497,8 +2497,11 @@ val = 0x3316
 # row:pointer pairs. only_variant_slot: the stock twin skips these by
 # construction. The signed-16-bit constraint (offsets consumed by
 # `lea (a0,d0.w)`) is why the whole block moves rather than sub-blocks
-# being pointed at. Rows 0x10/0x13 are already tenant-ported; 0x11 is the
-# recorded Pyron-as-attacker observation; 0x18 (Oboro) follows 0x08.
+# being pointed at. ALL THREE tenant rows are now ported — 0x10 huitzil's
+# `grab_hold_keyframes`, 0x13 donovan's `throw_victim_keyframes`, and
+# 0x11 pyron's `pyron_capture_keyframes` (14z-143; it was the recorded
+# Pyron-as-attacker observation until then, see pyron.toml's row for the
+# measurement); 0x18 (Oboro) follows 0x08.
 
 [[data_port]]
 stage = 6

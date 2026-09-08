@@ -2,10 +2,11 @@
 # columns, frozen so it can only SHRINK. `fact` is deliberately
 # NOT frozen (see FROZEN_COLUMNS in tools/audit_rule5.py) and is
 # reported as a NOTE instead; at this freeze it stood at
-# 7812 baked / 511 derived of 8323.
+# 7819 baked / 513 derived of 8332.
 # Produced by `python3 tools/audit_rule5.py --freeze
 # tests/expected/rule5_baked.tsv`. Provenance: static (the tree
 # itself). Columns: column file kind key value class note.
+# growth allowed: 14z-143: +1 gameplay BAKED — pyron.toml's new [[data_port]] pyron_capture_keyframes carries only_variant_slot = true, the 144th instance of a build-gating flag already baked 143 times (it selects WHICH TRACK a row applies to, not a value a player feels). No migration: a table row for one of 144 identical gate flags would be inconsistent with the other 143 and would not make anything reviewable.
 code	tools/build_gfx_donovan.py	(module)	DELTA	0x2750	BAKED	
 code	tools/build_gfx_donovan.py	(module)	DST_BANK	2	BAKED	
 code	tools/build_gfx_donovan.py	(module)	SRC_BANK	3	BAKED	
@@ -188,6 +189,7 @@ gameplay	build/manifest/pyron.toml	code_word	only_variant_slot	true	BAKED
 gameplay	build/manifest/pyron.toml	code_word	only_variant_slot	true	BAKED	
 gameplay	build/manifest/pyron.toml	code_word	only_variant_slot	true	BAKED	
 gameplay	build/manifest/pyron.toml	code_word	only_variant_slot	true	BAKED	
+gameplay	build/manifest/pyron.toml	data_port	only_variant_slot	true	BAKED	
 gameplay	build/manifest/pyron.toml	data_port	only_variant_slot	true	BAKED	
 gameplay	build/manifest/pyron.toml	data_port	only_variant_slot	true	BAKED	
 gameplay	build/manifest/pyron.toml	data_port	only_variant_slot	true	BAKED	

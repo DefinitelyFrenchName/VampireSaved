@@ -15,12 +15,17 @@
 # generated character-data pages read the tenant row at the wrong address.
 # Correcting the row to `kind = "data_ptr"` makes the GENERIC per-character
 # repoint in gen_donovan_patch.py fire on a table that is ALREADY owned row by
-# row by 17 `[[data_port]]` rows. Measured 14z-130 on the M13 tracks, that
+# row by 18 `[[data_port]]` rows (17 until pyron's own row 0x11 was ported
+# 14z-143). Measured 14z-130 on the M13 tracks, that
 # generic repoint would have done three things, only the first of them loud:
 #   * donovan: overwrite the wide_ext blob pointer with the hitbox-region
 #     copy, silently DISCARDING the 14z-64 mirror-victim fix (section 3);
 #   * pyron:   a NEW write repointing his attacker row 0x11 off Demitri's
-#     block — a throw surface nobody ruled ([VSP-10], recorded in STATE);
+#     block. That surface was RULED and PORTED 14z-143 (the row is now
+#     `pyron_capture_keyframes`, vs2's own block 0x0C7F98), which SHARPENS
+#     this hazard rather than retiring it: the generic repoint would aim
+#     row 0x11 at the extraction's hitbox-region copy and so DISCARD the
+#     port, exactly as it would discard donovan's 14z-64 fix above;
 #   * stock:   a write repointing JEDAH's row into Donovan's placed hitbox
 #     copy, breaking the base-slot in-place path.
 # The generator suppresses it via the 14z-65 `claimed_ptr_tables` mechanism,
@@ -57,22 +62,25 @@
 #   donovan 0x00-0x0F, 0x13, 0x18    — 15 capture_kf_* slot_rows + Oboro
 #                                      + throw_victim_keyframes (his own row)
 #   huitzil 0x00-0x0F, 0x10, 0x18    — same, + grab_hold_keyframes
-#   pyron   0x00-0x0F, 0x18          — same; his own row 0x11 is NOT ported
-#   merged  0x00-0x0F, 0x10, 0x13, 0x18
+#   pyron   0x00-0x0F, 0x11, 0x18    — same, + pyron_capture_keyframes
+#                                      (his own row, ported 14z-143)
+#   merged  0x00-0x0F, 0x10, 0x11, 0x13, 0x18
+#   (the pyron and merged rows re-measured 14z-143 on the tracks that first
+#    carried the port; the other three are unchanged from 14z-130)
 #
 # Static, no emulator, ~2 s. Needs $ROMDIR and the build dirs.
 # Usage: ROMDIR=... tests/test_capture_kf_ownership.sh
-# Build dirs (code defaults, [VSP-165]): DON=build/don_m20 HUI=build/hui54
+# Build dirs (code defaults, [VSP-165]): DON=build/don_m21 HUI=build/hui55
 #   PYR=build/pyron37 STOCK=build/m5_stock14 MERGED=build/m3b_merged22
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; export REPO
 cd "$REPO"
 
-DON="${DON:-build/don_m20}"
-HUI="${HUI:-build/hui54}"
-PYR="${PYR:-build/pyron38}"
-STOCK="${STOCK:-build/m5_stock15}"
-MERGED="${MERGED:-build/m3b_merged23}"
+DON="${DON:-build/don_m21}"
+HUI="${HUI:-build/hui55}"
+PYR="${PYR:-build/pyron40}"
+STOCK="${STOCK:-build/m5_stock16}"
+MERGED="${MERGED:-build/m3b_merged25}"
 
 : "${ROMDIR:?set ROMDIR}"
 
@@ -155,8 +163,8 @@ FROZEN = {
     "stock":   set(),
     "donovan": set(range(0x10)) | {0x13, 0x18},
     "huitzil": set(range(0x10)) | {0x10, 0x18},
-    "pyron":   set(range(0x10)) | {0x18},
-    "merged":  set(range(0x10)) | {0x10, 0x13, 0x18},
+    "pyron":   set(range(0x10)) | {0x11, 0x18},
+    "merged":  set(range(0x10)) | {0x10, 0x11, 0x13, 0x18},
 }
 BUILDS = {"donovan": os.environ["DON"], "huitzil": os.environ["HUI"],
           "pyron": os.environ["PYR"], "stock": os.environ["STOCK"],

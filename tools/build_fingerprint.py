@@ -109,7 +109,7 @@ def wholeset_key(zpath):
     hashes the union of the RESOLVED zips, so a ';' rompath folds $ROMDIR's
     members into the digest and one build hashes differently depending on
     which caller asked (measured 14z-132: `fcc83fc3` over
-    `build/m3b_merged23/rompath`, `544990c4` over the same with `;../ROMS`).
+    `build/m3b_merged25/rompath`, `544990c4` over the same with `;../ROMS`).
     `tools/artifact_manifest.py` REFUSES a ';' chain for exactly that reason;
     this key achieves the same end by ignoring the chain instead.
 
@@ -209,7 +209,7 @@ def main():
         if key == sha:
             # LOUD BY DESIGN. After the promotion a program-key hit always
             # means "not registered under a whole-set key", and a silent hit
-            # here is how build/don_m20 resolves as donovan-m19 (both
+            # here is how build/don_m21 resolves as donovan-m19 (both
             # 8065bc92) — docs/project/gotchas.md, "A gfx-only freeze gives
             # two builds ONE dispatch key". stderr, so callers capturing
             # stdout for the set name are unaffected.

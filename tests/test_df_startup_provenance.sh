@@ -30,7 +30,7 @@
 #      at arm the same three values (the port carried them unchanged);
 #   4. must-fire control: a perturbed expected value is caught.
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged23] tests/test_df_startup_provenance.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged25] tests/test_df_startup_provenance.sh
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
@@ -42,7 +42,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # VARIABLE (forks set their own); only made absolute, and only if it exists,
 # so a gate that means to SKIP on a missing ROMDIR still does.
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
-BUILD="${BUILD:-build/m3b_merged23}"
+BUILD="${BUILD:-build/m3b_merged25}"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 . "$REPO/tests/lib/decrypt_cache.sh"
 for s in vsavj vsav2 vhunt2; do decrypt_view "$s" "$W/${s}_op.bin" "$W/${s}_data.bin"; done

@@ -57,7 +57,7 @@ Phoenix); no gate covers it and it would need the zips beside it.
 
 **`../mister_fieldtest_14z132/` = merged-m16 (mark M16): verdict GREEN 2026-09-05**
 (maintainer, MiSTer: *"Field tests are green"*), the bundle verified against
-`build/m3b_merged23` by hash first — `vsavjw.zip` sha1 `664b14f8…`, both MRAs
+`build/m3b_merged25` by hash first — `vsavjw.zip` sha1 `664b14f8…`, both MRAs
 byte-identical to `release/merged-m16/mister/`, 31/31 + 22/22 parts, pristine
 zips equal to the audited dumps, `.rbf` seed 18269 `46fc74af…` (STATE 14z-133b).
 

@@ -120,6 +120,7 @@ test_capture_pose_sources
 # must never write it. Anchored in the reference ROMs and the shipped image,
 # never in patch.json ([VSP-166]). Needs the build dirs; SKIPs without them.
 test_capture_kf_ownership
+audit_capture_matrix
 test_pointer_flow
 test_escape_triage
 

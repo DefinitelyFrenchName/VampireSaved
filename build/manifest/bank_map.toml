@@ -362,9 +362,10 @@ note = "REAL per-char WORD table (14z-121): the MINIMUM AIR-ATTACK HEIGHT, vsavj
 # `auto` was also wrong by this file's own vocabulary — it means "gap table
 # with NO DOCUMENTED CONSUMER", and this table's consumers are named below.
 # THE ROWS ARE HAND-OWNED, WHICH IS WHY THE GENERIC REPOINT MUST NOT FIRE:
-# 17 `[[data_port]]` rows claim them individually (15 `capture_kf_*` with
+# 18 `[[data_port]]` rows claim them individually (15 `capture_kf_*` with
 # `slot_rows` for 0x00-0x0F/0x0B/0x18, donovan's `throw_victim_keyframes` for
-# 0x13, huitzil's `grab_hold_keyframes` for 0x10), each with a vhunt2 oracle,
+# 0x13, huitzil's `grab_hold_keyframes` for 0x10, and — since 14z-143 —
+# pyron's `pyron_capture_keyframes` for 0x11), each with a vhunt2 oracle,
 # a measured `dst_old_head` and — for Donovan — the 14z-64 mirror-victim
 # `fixes=` correction that lives ONLY in the ported blob. The generator
 # suppresses the generic repoint for any table a `slot_ptr_table` claims

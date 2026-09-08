@@ -39,7 +39,7 @@
 # it must deal NO down-attack damage, proving the connect signal is
 # time-gated and cannot pass on any contact.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged23]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged25]
 #        tests/audit_down_attack.sh          (~9 legs x ~1 min)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -54,7 +54,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged23}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged25}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 RPL="$REPO/tests/replays/judge/03_down_attack.rpl"
