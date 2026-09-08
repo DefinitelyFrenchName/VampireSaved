@@ -132,8 +132,10 @@ number that moves in the wrong direction is the signal".
 
 Ours has the health command (`tests/run_all_static.sh`), the generators'
 `--check` modes, the shape lint and the locks — and the locks are the
-difference: `checkdocs.py` here verifies documents AGAINST EACH OTHER. No
-no tool re-derived an atlas claim from the decrypted image until L3 landed (14z-142: `tools/checkdocs_rom.py`, 15 checks over the three reference images, `NOTE: checkdocs_rom.coverage 30/346`). The 2,965 rows of
+difference: `checkdocs.py` here verifies documents AGAINST EACH OTHER.
+**No tool re-derived an atlas claim from the decrypted image until L3 landed**
+(14z-142: `tools/checkdocs_rom.py`, 15 checks over the three reference
+images, `NOTE: checkdocs_rom.coverage 30/346`). The 2,965 rows of
 `annotations.md` are a census of where addresses are CLAIMED, not of which
 claims are CHECKED. That is the enforcement gap this effort closes (§4, L3).
 
