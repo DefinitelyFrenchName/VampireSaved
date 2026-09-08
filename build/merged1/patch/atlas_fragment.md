@@ -397,35 +397,36 @@
 | `PRG:0x021DEC` | 0x4 | GEN | obj_walker caller repoint |
 | `PRG:0x00B6A8` | 0x40 | VS2 | data_port voice_borrow_candidates_a (vsav2 0x9f6a) |
 | `PRG:0x00BFA8` | 0x40 | VS2 | data_port voice_borrow_voicenums_b (vsav2 0xa86a) |
-| `PRG:0x4C1620` | 0xB8 | VS2 | sound_table pyr_sfx_records (vsav2 0xc8b18, id-allowlisted) |
-| `PRG:0x4C16E0` | 0x20 | VS2 | select_records portrait/p1 coord list |
-| `PRG:0x4C1700` | 0x2A | VS2 | select_records portrait/p1 record |
-| `PRG:0x4C1730` | 0x20 | VS2 | select_records portrait/p2 coord list |
-| `PRG:0x4C1750` | 0x2A | VS2 | select_records portrait/p2 record |
-| `PRG:0x4C1780` | 0x4 | VS2 | select_records name_banner/p1 coord list |
-| `PRG:0x4C1790` | 0xE | VS2 | select_records name_banner/p1 record |
-| `PRG:0x4C17A0` | 0x8 | VS2 | select_records name_banner/p2 coord list |
-| `PRG:0x4C17B0` | 0x12 | VS2 | select_records name_banner/p2 record |
-| `PRG:0x4C17D0` | 0x14 | VS2 | select_records splash_p1/p1 coord list |
-| `PRG:0x4C17F0` | 0x1E | VS2 | select_records splash_p1/p1 record |
-| `PRG:0x4C1810` | 0x14 | VS2 | select_records splash_p2/p1 coord list |
-| `PRG:0x4C1830` | 0x1E | VS2 | select_records splash_p2/p1 record |
-| `PRG:0x4C1850` | 0x38 | VS2 | select_records win_quote/p1 coord list |
-| `PRG:0x4C1890` | 0x42 | VS2 | select_records win_quote/p1 record |
-| `PRG:0x4C18E0` | 0x6040 | VS2 | win_pal_variant don_win_pal sparse block |
-| `PRG:0x4C7920` | 0x6040 | VS2 | win_pal_variant hui_win_pal sparse block |
-| `PRG:0x4CD960` | 0x6040 | VS2 | win_pal_variant pyr_win_pal sparse block |
-| `PRG:0x4D39A0` | 0x32 | NEW | win_pal_variant 3-way thunk |
-| `PRG:0x4D39E0` | 0x140 | VS2 | site_thunk select_pal_variant_id data block |
-| `PRG:0x4D3B20` | 0x7C | GEN | site_thunk 3-way chain |
+| `PRG:0x4C1620` | 0xB80 | VS2 | data_port pyron_capture_keyframes placed block (vsav2 0xc7f98) |
+| `PRG:0x4C21A0` | 0xB8 | VS2 | sound_table pyr_sfx_records (vsav2 0xc8b18, id-allowlisted) |
+| `PRG:0x4C2260` | 0x20 | VS2 | select_records portrait/p1 coord list |
+| `PRG:0x4C2280` | 0x2A | VS2 | select_records portrait/p1 record |
+| `PRG:0x4C22B0` | 0x20 | VS2 | select_records portrait/p2 coord list |
+| `PRG:0x4C22D0` | 0x2A | VS2 | select_records portrait/p2 record |
+| `PRG:0x4C2300` | 0x4 | VS2 | select_records name_banner/p1 coord list |
+| `PRG:0x4C2310` | 0xE | VS2 | select_records name_banner/p1 record |
+| `PRG:0x4C2320` | 0x8 | VS2 | select_records name_banner/p2 coord list |
+| `PRG:0x4C2330` | 0x12 | VS2 | select_records name_banner/p2 record |
+| `PRG:0x4C2350` | 0x14 | VS2 | select_records splash_p1/p1 coord list |
+| `PRG:0x4C2370` | 0x1E | VS2 | select_records splash_p1/p1 record |
+| `PRG:0x4C2390` | 0x14 | VS2 | select_records splash_p2/p1 coord list |
+| `PRG:0x4C23B0` | 0x1E | VS2 | select_records splash_p2/p1 record |
+| `PRG:0x4C23D0` | 0x38 | VS2 | select_records win_quote/p1 coord list |
+| `PRG:0x4C2410` | 0x42 | VS2 | select_records win_quote/p1 record |
+| `PRG:0x4C2460` | 0x6040 | VS2 | win_pal_variant don_win_pal sparse block |
+| `PRG:0x4C84A0` | 0x6040 | VS2 | win_pal_variant hui_win_pal sparse block |
+| `PRG:0x4CE4E0` | 0x6040 | VS2 | win_pal_variant pyr_win_pal sparse block |
+| `PRG:0x4D4520` | 0x32 | NEW | win_pal_variant 3-way thunk |
+| `PRG:0x4D4560` | 0x140 | VS2 | site_thunk select_pal_variant_id data block |
+| `PRG:0x4D46A0` | 0x7C | GEN | site_thunk 3-way chain |
 | `PRG:0x05F146` | 0x6 | GEN | site_thunk chain engine site |
-| `PRG:0x4D3BA0` | 0x32 | GEN | site_thunk 3-way chain |
+| `PRG:0x4D4720` | 0x32 | GEN | site_thunk 3-way chain |
 | `PRG:0x05F328` | 0x6 | GEN | site_thunk chain engine site |
-| `PRG:0x4D3BE0` | 0x3E | GEN | site_thunk 3-way chain |
+| `PRG:0x4D4760` | 0x3E | GEN | site_thunk 3-way chain |
 | `PRG:0x05FCE0` | 0x6 | GEN | site_thunk chain engine site |
-| `PRG:0x4D3C20` | 0x3E | GEN | site_thunk 3-way chain |
+| `PRG:0x4D47A0` | 0x3E | GEN | site_thunk 3-way chain |
 | `PRG:0x06C0E0` | 0x6 | GEN | site_thunk chain engine site |
-| `PRG:0x4D3C70` | 0x94 | GEN | merged pool-seed + flavor init shim (F2) |
+| `PRG:0x4D47F0` | 0x94 | GEN | merged pool-seed + flavor init shim (F2) |
 | `PRG:0x0282F6` | 0x2 | GEN | code_word obj_bank_word_slot |
 | `PRG:0x05F244` | 0x2 | GEN | code_word win_pos_x_slot |
 | `PRG:0x05F246` | 0x2 | GEN | code_word win_pos_y_slot |
