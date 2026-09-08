@@ -2621,12 +2621,40 @@ This retires the 14z-131 reading that "the positioner CANNOT do that — a
 second mechanism is in play": the positioner does not write `$1c(a4)`
 itself, but it CHOOSES what the installer writes there, one instruction
 before branching into it.
+**THE CAPTURE-KEYFRAME BLOCK'S STRUCTURE [M: 14z-142, from the ROM]** — read
+it before sizing any port of a `PRG:0x0BE27A` row. The positioner computes its
+`A0` like this (`PRG:0x02803A`-`0x028062`):
+
+```
+02803A  movea.l $1c(a6),a0 ; move.b $12(a0),d0 ; lsl.w #$3,d0   ; kf index * 8
+028046  move.b $382(a6),d1 ; lsl.w #$2,d1                        ; ATTACKER id * 4
+02804C  movea.l #$be27a,a0 ; movea.l (a0,d1.w),a0                ; -> the block
+028058  move.b $382(a4),d1 ; add.w d1,d1 ; add.w (a0,d1.w),d0    ; + VICTIM word offset
+028062  lea.l (a0,d0.w),a0                                       ; -> the record
+```
+
+So a block is **a 32-word victim OFFSET TABLE at +0x00, then 8-byte records**
+`[dx.w][dy.w][flags.w][pose.w]`, and the victim offsets ALIAS (vs2's Pyron
+block: 32 entries, **18 distinct**, uniformly spaced `0xA0` = 20 records).
+Measured extent of vs2's Pyron block `0x0C7F98`: last sub-block at `+0x0AE0`,
+so **`0xB80` bytes**, with zeros after it. The `lea (a0,d0.w)` displacement is
+an offset WITHIN the block (max `0xB78`), so it is unaffected by relocating
+the block and sits far under the signed-word bound.
+
 **What is NOT re-measured in-emulator**: a 14z-142 probe A/B at `0x27FA0`
 across the two builds did not produce comparable legs — the native leg
 fired 38 times in the hold but took an `INPUT-VIOLATION` at frame 3015 (the
 debugger stops delay input application), and the ours leg produced no hits
 at all. That is [VSP-129] operating exactly as documented, not a fact about
 either build; a confirming measurement needs a probe-free instrument.
+**But the mechanism IS confirmed, by two measurements sharing no premise.**
+Reading both blocks at victim `0x03` (Victor) reproduces the 14z-131
+in-emulator numbers exactly: vs2's Pyron block gives deltas `(0,0) (-79,0)
+(-97,0) (-65,0) (82,29) (58,124) (100,132)` with poses `0,2,1,0,3,11,10`, and
+the Demitri block vsavj serves Pyron gives `(0,0) (-63,0) (-63,0) (-63,0)
+(-26,0) (-26,0) (-10,32)` with poses `0,6,6,6,6,5,2`. The measured RAM
+sequences were poses **[2,1,0,3,11,10,29]** native and **[6,5,2]** ours. The
+positions and the poses come out of the SAME records — which is the claim.
 
 **The index is per VICTIM and the convention is SHARED between the
 engines** — this is the load-bearing measurement, and it is what refutes

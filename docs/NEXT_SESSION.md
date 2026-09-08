@@ -45,10 +45,26 @@ gameplay calls that are theirs ([VSP-10]).
   `[[data_port]]` row in `pyron.toml` (`src = 0x0C7F98`, `orc = 0x0C782A`,
   `slot_ptr_table = 0xBE27A`, `hole = "wide_ext"`, `only_variant_slot`), one
   freeze, with `EXPECT_MATCH=1` flipping `audit_pyron_capture_block.sh`.
-  **Still owed: the in-emulator confirmation**, and it needs a PROBE-FREE
-  instrument — a breakpoint A/B at `0x27FA0` does not produce comparable legs
-  ([VSP-129]; measured 14z-142). Extend the gate's own `DUMPS` rig to read the
-  victim's `+0x1C` node pointer instead.
+  **CONFIRMED 14z-142 by two measurements sharing no premise**: reading both
+  keyframe blocks at victim `0x03` reproduces 14z-131's in-emulator numbers
+  exactly — vs2's Pyron block gives poses `0,2,1,0,3,11,10` beside deltas
+  `(0,0)(-79,0)(-97,0)(-65,0)(82,29)(58,124)(100,132)`, and the Demitri block
+  ours serves gives poses `0,6,6,6,6,5,2`. The RAM measurement was `[2,1,0,3,
+  11,10,29]` native and `[6,5,2]` ours. Positions and poses come out of the
+  SAME 8-byte records.
+  **THE PORT SPEC, both prerequisites settled:** `[[data_port]]` in
+  `pyron.toml` — `src = 0x0C7F98`, **`len = 0xB80`** (measured: a 32-word
+  victim offset table then 8-byte records `[dx][dy][flags][pose]`; the offsets
+  ALIAS, so 32 entries but 18 distinct sub-blocks spaced `0xA0`, last at
+  `+0x0AE0`, zeros after — **NOT the ~`0x2040` the old sketch assumed**),
+  `orc = 0x0C782A`, `slot_ptr_table = 0xBE27A`, `hole = "wide_ext"`,
+  `only_variant_slot = true`, plus `dst`/`dst_old_head`. The
+  `lea (a0,d0.w)` displacement is an offset WITHIN the block (max `0xB78`), so
+  relocation cannot move it and the signed-word bound has huge margin.
+  **This is a BUILD change: a manifest row, a rebuild, the freeze battery
+  (~5 h) and the registry/tag ritual — a fresh session's work**, ending with
+  `EXPECT_MATCH=1` on `audit_pyron_capture_block.sh` and ours-vs-native
+  captures for the maintainer to eyeball before the board test.
 - **The Phobos ±1 damage residue** — 5 of 54 victim/throw cells, ruled WITHIN
   TOLERANCE and kept open as a KNOWLEDGE item, not a bug. The cheap first step
   is whether `0x0A` (Sasquatch, a legacy victim) is a cross-generation data

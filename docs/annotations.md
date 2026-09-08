@@ -23,12 +23,12 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 2974 |
-| named by a document or manifest only | 2026 |
-| named by both a document/manifest and code | 622 |
-| named by CODE ONLY (the gap list below) | 326 |
+| distinct program-space addresses named | 2976 |
+| named by a document or manifest only | 2028 |
+| named by both a document/manifest and code | 623 |
+| named by CODE ONLY (the gap list below) | 325 |
 | carried by atlas | 473 |
-| carried by engine_internals | 535 |
+| carried by engine_internals | 538 |
 | carried by other docs | 952 |
 | carried by manifests | 1780 |
 | carried by code | 948 |
@@ -945,8 +945,10 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x028026` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 [vs2]; build/manifest/donovan.toml — hit_class_props_ext_lo |
 | `PRG:0x028028` | build/manifest/donovan.toml — hit_class_props_ext_hi |
 | `PRG:0x02802E` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/project/gate_scoping_method.md — 2. Scope the observable to what the mechanism can actually cause; docs/project/patch_notes.md — The correction; build/manifest/bank_map.toml — capture_kf_ptr; +13 more |
+| `PRG:0x02803A` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab) |
 | `PRG:0x02804C` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — port_patch |
 | `PRG:0x028058` | docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); build/manifest/huitzil.toml — df_seq_entry_10; tests/test_capture_pose_sources.sh |
+| `PRG:0x028062` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab) |
 | `PRG:0x028072` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); tests/audit_pyron_capture_block.sh |
 | `PRG:0x0280B8` | docs/game/atlas/character_tables.md — The loader (per-character struct fill) [vs2]; docs/project/doc_audit_14z118.md — 2. Cross-document numbers to lock (candidates for the script); tools/find_equiv.py |
 | `PRG:0x0280C4` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — port_patch |
@@ -2111,6 +2113,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0C6E90` | docs/game/atlas/character_tables.md — THE PORTED THREE — located (2026-07-25, pick-verified on vsav2 AND vhunt2) |
 | `PRG:0x0C742A` | docs/project/patch_notes.md — 14z-85b — per-tenant sfx records (pyr_sfx_records / hui_sfx_records; maintainer-ruled option (a)) [vs2]; docs/project/tables/sfx_records.md — huitzil/phobos — 'hui_sfx_records' (24 entries, vs2 '0x0C742A'; 14z-85) [vs2]; build/manifest/huitzil.toml — hitclass_map_extend [vs2]; build/manifest/huitzil.toml — hui_sfx_records |
 | `PRG:0x0C75FE` | docs/game/atlas/character_tables.md — THE PORTED THREE — located (2026-07-25, pick-verified on vsav2 AND vhunt2); tests/test_pyron_blink.sh; tools/extract_char.py |
+| `PRG:0x0C7F98` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab) [vs2]; tests/audit_pyron_capture_block.sh |
 | `PRG:0x0C8156` | docs/project/patch_notes.md — crypt-placed code (data_in_code mechanism + census) |
 | `PRG:0x0C868A` | docs/game/atlas/character_tables.md — THE PORTED THREE — located (2026-07-25, pick-verified on vsav2 AND vhunt2) |
 | `PRG:0x0C8B18` | docs/project/patch_notes.md — 14z-85b — per-tenant sfx records (pyr_sfx_records / hui_sfx_records; maintainer-ruled option (a)) [vs2]; docs/project/tables/sfx_records.md — pyron — 'pyr_sfx_records' (23 entries, vs2 '0x0C8B18'; 14z-85) [vs2]; build/manifest/pyron.toml — hitclass_map_extend [vs2]; build/manifest/pyron.toml — pyr_sfx_records |
@@ -2913,7 +2916,6 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x0C0000` | tests/test_patch_prg.sh; tests/test_pointer_flow.sh |
 | `PRG:0x0C00FA` | tests/test_don_immortal_native.sh |
 | `PRG:0x0C0114` | tests/audit_merged_vec3.sh |
-| `PRG:0x0C7F98` | tests/audit_pyron_capture_block.sh |
 | `PRG:0x0CD286` | tests/audit_don_ko_writer.sh |
 | `PRG:0x0D0000` | tests/test_don_reactions.sh |
 | `PRG:0x0D073C` | tests/lua/index_watch.lua |
