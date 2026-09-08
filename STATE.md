@@ -383,6 +383,53 @@ what a triage is looking at, so those are where the thinking time goes.
   `test_expectation_provenance`'s scope with three rows (worktree). Executed
   after the resume: see the 14z-134 rows.
 
+- **THE LIVING-DOCUMENTATION FRAMEWORK'S GENERALIZATION — RULED AT THE PLAN
+  STAGE (maintainer, 2026-09-08), NOT SCHEDULED.** Asked after L3 landed:
+  *"Can this living documentation be generalized as a basic structure +
+  self-test + claude skill like we have done with the BBH?"* The answer is
+  yes, and `harness_scope.md` §2.7 had already parked exactly this question —
+  the eight doc tools were decided OUT of bbh with the words *"a sibling
+  package later if that effort wants one"*, conditioned on L1-L4 finishing,
+  which they now have. **Three of the eight already lifted and are the proof
+  the pattern works**: `bbh gate-index` (H5), `bbh check-skills` and `bbh
+  skill-guide` (H10), each with fidelity exact.
+  **SEQUENCING RULED THE SAME DAY: the OPEN ITEMS COME FIRST** (maintainer:
+  *"Agreed"* to the recommendation that extracting a second package is
+  infrastructure built on infrastructure, and that bbh's usefulness is still
+  untested by a second consumer).
+  **THE THREE DESIGN RULINGS, in the maintainer's words:**
+  1. **INDEPENDENT BUT COMPATIBLE** — *"living documentation framework should
+     be useable independently but fully compatible with BBH and relies on
+     mostly the same principles."* So: NOT a bbh subpackage and NOT a
+     dependency on it, but the same shape (one entry point, config-driven,
+     a fake corpus, selftests, a skill) and the same principles. This settles
+     the three-way question about `check-skills` / `skill-guide` /
+     `gate-index` in the direction of compatibility rather than reclamation —
+     the two packages may both carry a mechanism as long as they agree.
+  2. **THE SITE GENERATOR IS IN SCOPE** — *"only a visualisation for humans
+     but it's basically a free really-nice-to-have."* `mk_docs_site.py` +
+     `md_subset.py` + `_pagestyle.py`, ~1,500 lines, measured at 2-4
+     project-noun hits each: the most portable piece in the set.
+  3. **FIDELITY: THE PRINCIPLE YES, THE FORM OPEN** — *"I don't know if
+     byte-identical is warranted for the living documentation scope but on
+     principle I agree."* So the extraction must be PROVEN against this
+     tree, but the comparison class is a scoping question, not a given.
+     Recorded so the scope document argues it rather than inheriting bbh's
+     F-series by reflex: a renderer's HTML may reasonably be compared
+     structurally where a checker's verdicts must be exact.
+  **MEASURED at the ask (2026-09-08), the coupling census over 13 tools /
+  ~5,800 lines:** near-zero coupling `doc_anchor_census` 0, `gen_skill_guide`
+  1, `_pagestyle` 2, `md_subset` 3, `mk_docs_site` 4, `gen_gotchas_index` 4;
+  config-driven `gen_gate_index` 5, `checkdocs` 18, `gen_annotations` 20,
+  `checkskills` 21, `checkdocshape` 26; content-bound `audit_rule5` 24 (its
+  389 measured pairs) and `checkdocs_rom` **99** (the checks ARE the claims —
+  only the `Image`/`says`/`@check`/`@table`/`PARAPHRASE`/`--uncovered`
+  framework is generic). **And it is CHEAPER than bbh was**: bbh needed a
+  FAKE MACHINE so every class had a ROM-free producer; this needs a FAKE
+  CORPUS, which is a directory of markdown. Cost: 2-3 sessions plus one for
+  the skill. Deliverable when scheduled: `docs/project/<name>_scope.md` in
+  the form of the other three scope documents.
+
 - **THE VERILATOR LANE IS SERIAL FOR ONE REASON — ONE SCRATCH CLONE — AND
   THE MAINTAINER WANTS IT PARALLEL (direction, 2026-09-06; the question:
   *"we're operating under a tenth of this macbook m2 pro's capacity … can't
