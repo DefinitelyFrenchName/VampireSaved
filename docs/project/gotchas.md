@@ -4273,3 +4273,43 @@ minutes of MAME is cheaper than a tautological oracle.
 **AND THE COUNT IS THE ACCEPTANCE CHECK:** compare
 `ls tests/expected/<new>/*.masked | wc -l` against the predecessor's before
 committing. Equal, or the sweep lost a class.
+
+## A `fixes =` STRING ON A `data_port` ROW IS UNCONDITIONAL, AND THE BLOB IT EDITS IS SHARED BY BOTH TRACKS (paid: 14z-143)
+
+The manifest vocabulary has `only_base_slot` and `only_variant_slot` to scope a
+ROW to a track ([VSP-92], `row_applies()`), and it has **nothing to scope a
+`fixes =` string**. The generator applies every `off:old:new` to the blob
+before placing it, and on a `slot_ptr_table` row the SAME placed blob serves
+whichever track is being built. So a fix that is correct for one track ships on
+both.
+
+**The instance, and it went unnoticed for eighty sessions.** `donovan.toml`'s
+`throw_victim_keyframes` carries `fixes = "0x1E:0b30:0d88"` — the 14z-64
+mirror-victim correction, which rewrites the blob's VICTIM offset word `[0x0F]`
+from the Jedah-victim sub-block to the Donovan-victim one. On the STOCK track
+that is right: Donovan substitutes Jedah at slot `0x0F`, so victim `0x0F` IS
+Donovan. On a WIDE build Donovan is at `0x13` and `0x0F` is JEDAH, restored —
+so Donovan throwing Jedah is placed and posed by Donovan's own victim records
+(225 of 408 bytes differ; the last keyframe is `(-61,166)` against Jedah's
+`(-76,32)`).
+
+**THE REASONING THAT HID IT IS THE REUSABLE PART.** The row's own comment said
+the fix was harmless at a variant id because its `[0x0F]` entry "is never a
+TENANT victim there". That is TRUE — and irrelevant, because `0x0F` is a
+reachable LEGACY victim. **A comment asserting harmlessness is a claim to
+test, not a reason to skip a cell**, and the test is: enumerate everyone who
+INDEXES the thing the fix rewrites, not just the party the fix was written
+about. The neighbouring note made the same slip in the other direction — it
+correctly said the fix is "unnecessary by construction" at a variant id, and
+then treated unnecessary as harmless.
+
+**Rule:** before adding or carrying a `fixes =` entry, state which TRACKS the
+edited blob reaches and what the edited index means on each. If they disagree,
+the row needs a track-scoped fix (a `fixes` twin keyed like the row gates), not
+a comment. And when auditing an existing one, `grep` the manifest for
+`fixes = ` and re-ask the question per track — the generator will not.
+
+**What found it:** `tests/audit_capture_matrix.sh`, the full-cross-product
+comparison, on its first run — never a playtest and never a targeted gate,
+because a mis-scoped row is an OMISSION and omissions have no symptom to steer
+toward ([VSP-179]).

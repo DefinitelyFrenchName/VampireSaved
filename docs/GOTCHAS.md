@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-315 entries (40 game / 91 platform / 184 project), counted from the buckets at generation.
+316 entries (40 game / 91 platform / 185 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 40 entries
 
@@ -159,7 +159,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - FBNeo `-hdump`'s specification buffer is 8,192 characters — entries past ~430 frames are DROPPED SILENTLY (paid: 14z-133b)
 - `run_replay_fbneo.sh` with a RELATIVE sandbox argument writes NO log — 0 frames, silently (paid: 14z-133b)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 184 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 185 entries
 
 - A gate that prints `SKIP:` AND exits NON-ZERO is a FAILURE, not a skip (paid: 14z-128)
 - `... | while read` puts the loop in a SUBSHELL, so the `wait` after it waits for nothing (paid: 14z-128)
@@ -345,3 +345,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - `\|` is a LITERAL PIPE to `grep -E`, so an alternation silently matches nothing (paid: 14z-142)
 - Inside the crypt range the VIEW follows the ACCESS MODE, and the wrong one is plausible garbage (paid again: 14z-142)
 - `run_suite.sh --freeze` INTO AN EMPTY EXPECTATION DIR SELF-FREEZES THE WHOLE LEGACY CORPUS — the freeze's CARRY step is load-bearing and was written down nowhere (paid: 14z-143)
+- A `fixes =` STRING ON A `data_port` ROW IS UNCONDITIONAL, AND THE BLOB IT EDITS IS SHARED BY BOTH TRACKS (paid: 14z-143)

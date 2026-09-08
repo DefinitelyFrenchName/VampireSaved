@@ -12,7 +12,7 @@
  },
  "inputs": {
   "bank_map.toml": "ece2b13bfbddaf6fea14e56baf65502945ba52dd",
-  "manifest": "74bac18216d2cb7179275a272e7a7c0fd0d4abbf",
+  "manifest": "56c41eb3de7000e797ef077a87508fa101555fdd",
   "overrides": "72b9812942192bf348508ddf7473cbb37b2d5275",
   "placements.json": "74b756174c2eac1a4e41919145114e2498d11082",
   "reconciliation.toml": "40528aeb863028d885f868f34368443c460b5ca2",

@@ -833,10 +833,28 @@ hole = "wide_ext"
 # 14z-64 (the 14z-2 mirror-victim fix, parked since 14z-62c): victim
 # entry [0x0F] inside the blob — Jedah-victim block 0x0B30 -> the
 # Donovan-victim block 0x0D88 (in the mirror flavor victim id 0x0F IS
-# Donovan). Base-slot track only by construction (on variant builds the
-# fix is inert for the host: his block stays vanilla; the placed tenant
-# blob carries the fix harmlessly — its [0x0F] entry is never a tenant
-# victim there).
+# Donovan).
+#
+# *** OPEN DEFECT ON THE WIDE TRACK — THIS ROW IS MIS-SCOPED (14z-143). ***
+# ~~Base-slot track only by construction (on variant builds the fix is
+# inert for the host: his block stays vanilla; the placed tenant blob
+# carries the fix harmlessly — its [0x0F] entry is never a tenant victim
+# there).~~ **RETRACTED 14z-143.** The first half is true — the HOST's
+# block does stay vanilla — and the second half is the error: "never a
+# TENANT victim" is true and IRRELEVANT, because on a WIDE build victim
+# 0x0F is JEDAH, restored and perfectly reachable. `fixes` is applied to
+# the blob UNCONDITIONALLY and the SAME blob is placed on both tracks, so
+# at a variant id Donovan throwing Jedah is positioned and posed by the
+# DONOVAN-victim sub-block. Measured: the two sub-blocks differ in 225 of
+# 408 bytes, and the last keyframe is (-61,166) against Jedah's (-76,32).
+# PRE-EXISTING since 14z-64 and identical on merged23, so it is not a
+# regression — it has simply never been looked for. Found by
+# tests/audit_capture_matrix.sh, which freezes the (0x13,0x0F) cell as a
+# KNOWN-OPEN divergence; STATE "Decisions pending" carries the options and
+# the recommendation (measure on the rig first, then gate this row to the
+# base-slot track), and it is a GAMEPLAY surface, so the fix is the
+# maintainer's call ([VSP-10]). DO NOT "tidy" this row away: on the STOCK
+# track the fix is CORRECT and load-bearing.
 fixes = "0x1E:0b30:0d88"
 
 # ~~[[data_port.fix]] off=0x1E 0b30->0d88~~ NEVER APPLIED (14z-62c
@@ -848,8 +866,12 @@ fixes = "0x1E:0b30:0d88"
 # hard-fails) and fixes are flat.
 #   At a VARIANT tenant id the fix is unnecessary by construction: vs2's
 #   table is indexed by native ids, so victim-entry [0x13] already points
-#   at the Donovan-victim block and [0x0F] correctly serves a Jedah
-#   victim.
+#   at the Donovan-victim block and [0x0F] ~~correctly serves a Jedah
+#   victim~~ **WOULD serve a Jedah victim IF THE FIX WERE NOT APPLIED —
+#   corrected 14z-143.** It is applied, unconditionally, to the one blob
+#   both tracks share, so on WIDE [0x0F] serves the DONOVAN-victim block
+#   instead. "Unnecessary" was right; "harmless" did not follow from it.
+#   See the OPEN DEFECT note on the `fixes` row above.
 #   At the BASE slot 0x0F the mirror-flavor (Donovan vs Donovan) victim
 #   still mis-indexes Jedah-victim keyframes — the defect 14z-2 meant to
 #   fix, shipped in ae701ffb/9bac6ee3/b91647c7. Applying it changes
