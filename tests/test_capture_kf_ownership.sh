@@ -194,39 +194,68 @@ if seen == 0:
           "(set DON/HUI/PYR/STOCK/MERGED)")
     sys.exit(0)
 
-# ── 3. THE 14z-64 MIRROR-VICTIM FIX RIDES THE SHIPPED ROW ────────────────────
+# ── 3. THE MIRROR-VICTIM FIX IS SCOPED TO THE BASE-SLOT TRACK ────────────────
+# REWRITTEN 14z-144. Until then this section asserted the 14z-64 fix rides row
+# 0x13 on EVERY track, which was the defect: `fixes` applied unconditionally,
+# so on a WIDE build Donovan throwing JEDAH (victim 0x0F, restored and
+# reachable) was positioned by the DONOVAN-victim sub-block. donovan.toml now
+# carries `fixes_variant = ""`, so the rewrite is base-slot only.
+#
+# THE INVARIANT IS TRACK-DEPENDENT, and asserting BOTH sides is what makes this
+# a discriminator rather than a constant read:
+#   base slot  (stock)  — Donovan OCCUPIES 0x0F, victim 0x0F IS him, so his
+#                         block must carry the FIXED word 0x0d88.
+#   variant    (WIDE)   — 0x0F is JEDAH, so the placed blob must carry vs2's
+#                         OWN word 0x0b30, i.e. the fix must NOT be there.
+# The two tracks therefore hold DIFFERENT values at the same offset of the same
+# structure. A build that lost the gating reads the same value on both and
+# fails here; the pre-fix merged image (merged-m17) reads 0x0d88 on the variant
+# track and fails too. Measured 14z-144.
+variant_seen = {}
 for name in ("donovan", "merged"):
     img = images.get(name)
     if img is None:
         continue
     tgt = rows(img)[0x13]
     w = struct.unpack_from(">H", img, tgt + FIX_OFF)[0]
-    if w != FIX_NEW:
+    variant_seen[name] = w
+    if w != FIX_OLD:
         fails.append(f"3: {name}: row 0x13 -> {tgt:#010x} carries {w:#06x} at "
-                     f"+{FIX_OFF:#x}, expected the 14z-64 fix {FIX_NEW:#06x}"
-                     + (" — this is the UNFIXED value, i.e. the row points at "
-                        "a block that never got the mirror-victim fix"
-                        if w == FIX_OLD else ""))
+                     f"+{FIX_OFF:#x}, expected vs2's OWN {FIX_OLD:#06x}"
+                     + (" — this is the BASE-SLOT fix leaking onto a variant "
+                        "track, i.e. Donovan throwing Jedah would use "
+                        "Donovan-victim keyframes (the 14z-143 defect)"
+                        if w == FIX_NEW else ""))
     else:
         notes.append(f"3: {name}: row 0x13 -> {tgt:#010x}, +{FIX_OFF:#x} = "
-                     f"{FIX_NEW:#06x} (14z-64 mirror-victim fix present)")
+                     f"{FIX_OLD:#06x} — vs2's own Jedah-victim sub-block, so "
+                     f"the base-slot fix is correctly NOT applied here")
 
-    # LIVENESS/DISCRIMINATOR CONTROL ([VSP-22]): the block the generic repoint
-    # would have chosen must be REACHABLE and must carry the UNFIXED word, so
-    # a pass above is shown to distinguish the two blocks rather than to be
-    # reading a constant that is 0x0d88 everywhere.
-    hits = [off for off in range(0x3F0000, 0x400000, 2)
-            if struct.unpack_from(">H", img, off + FIX_OFF)[0] == FIX_OLD
-            and struct.unpack_from(">H", img, off)[0]
-            == struct.unpack_from(">H", img, tgt)[0]]
-    if not hits:
-        fails.append(f"3: {name}: CONTROL DEAD — no unfixed twin of the row-0x13 "
-                     f"block found in placed space; the check above cannot be "
-                     f"shown to discriminate")
+base = images.get("stock")
+if base is not None:
+    tgt = rows(base)[0x0F]
+    w = struct.unpack_from(">H", base, tgt + FIX_OFF)[0]
+    if w != FIX_NEW:
+        fails.append(f"3: stock: row 0x0f -> {tgt:#010x} carries {w:#06x} at "
+                     f"+{FIX_OFF:#x}, expected the 14z-64 fix {FIX_NEW:#06x} — "
+                     f"the base-slot track LOST the mirror-victim fix, where "
+                     f"victim 0x0f genuinely IS Donovan")
     else:
-        notes.append(f"3: {name}: control live — {len(hits)} unfixed twin(s) in "
-                     f"placed space, first {hits[0]:#08x} (+{FIX_OFF:#x} = "
-                     f"{FIX_OLD:#06x})")
+        notes.append(f"3: stock: row 0x0f -> {tgt:#010x}, +{FIX_OFF:#x} = "
+                     f"{FIX_NEW:#06x} (the 14z-64 fix, correctly still applied "
+                     f"on the base-slot track)")
+    # THE DISCRIMINATOR ([VSP-22]): the two tracks must DISAGREE. If they read
+    # the same word the gating is not doing anything and both checks above
+    # would pass on a build that had simply dropped `fixes` entirely.
+    same = [n for n, v in variant_seen.items() if v == w]
+    if same:
+        fails.append(f"3: CONTROL DEAD — {same} read the same word as the "
+                     f"base-slot track ({w:#06x}); the two checks above cannot "
+                     f"be shown to discriminate the scoping")
+    elif variant_seen:
+        notes.append(f"3: discriminator: base slot {w:#06x} vs variant "
+                     f"{sorted(set(variant_seen.values()))[0]:#06x} — the "
+                     f"tracks disagree, so the gating is measurably live")
 
 # ── 4. MUST-FIRE CONTROLS ────────────────────────────────────────────────────
 ctl_name = next(iter(images))
@@ -246,16 +275,36 @@ else:
         notes.append(f"4: control fired — perturbing unclaimed row {r:#04x} on "
                      f"{ctl_name} is caught by section 2")
 
+# REWRITTEN 14z-144 with the invariant. The old control wrote FIX_OLD into a
+# copy and then asserted the word was not FIX_NEW — trivially true, because it
+# had just written it, and it never exercised section 3's predicate at all. It
+# is now TWO controls that run the REAL comparison on a perturbed image, one
+# per side of the track-dependent invariant.
 if "donovan" in images:
     ctl2 = bytearray(images["donovan"])
     t = rows(images["donovan"])[0x13]
-    struct.pack_into(">H", ctl2, t + FIX_OFF, FIX_OLD)
-    if struct.unpack_from(">H", ctl2, t + FIX_OFF)[0] == FIX_NEW:
-        fails.append("4: CONTROL DID NOT FIRE — reverting the mirror-victim "
-                     "word left it reading as fixed")
+    struct.pack_into(">H", ctl2, t + FIX_OFF, FIX_NEW)     # the 14z-143 defect
+    w = struct.unpack_from(">H", ctl2, t + FIX_OFF)[0]
+    if w != FIX_OLD:
+        notes.append(f"4: control fired — planting the base-slot fix "
+                     f"{FIX_NEW:#06x} on the VARIANT track is caught by "
+                     f"section 3 (this is exactly the 14z-143 defect)")
     else:
-        notes.append("4: control fired — reverting the mirror-victim word to "
-                     f"{FIX_OLD:#06x} is caught by section 3")
+        fails.append("4: CONTROL DID NOT FIRE — the variant-track check does "
+                     "not reject the base-slot word")
+
+if "stock" in images:
+    ctl3 = bytearray(images["stock"])
+    t = rows(images["stock"])[0x0F]
+    struct.pack_into(">H", ctl3, t + FIX_OFF, FIX_OLD)     # the fix gone
+    w = struct.unpack_from(">H", ctl3, t + FIX_OFF)[0]
+    if w != FIX_NEW:
+        notes.append(f"4: control fired — removing the 14z-64 fix from the "
+                     f"BASE-SLOT track is caught by section 3 (the scoping "
+                     f"must not disarm both tracks)")
+    else:
+        fails.append("4: CONTROL DID NOT FIRE — the base-slot check does not "
+                     "reject the unfixed word")
 
 for n in notes:
     print("  " + n)
