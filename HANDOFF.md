@@ -656,47 +656,34 @@ vanilla path anywhere writes `0x18` (STATE "THE ARCADE HIDDEN-CHARACTER
 ROSTER"). Detail: `docs/game/atlas/select_screen.md`,
 `docs/project/patch_index.md` W1.
 
-**Current WIDE builds — THE 14z-143 M17 PYRON-CAPTURE FREEZE (mark M17, the
-merged build number per the 14z-132 option-A ruling):
+**Current WIDE builds — THE 14z-144 M18 DONOVAN/JEDAH CAPTURE-SCOPE FREEZE
+(mark M18, the merged build number per the 14z-132 option-A ruling):
+donovan-m22 / huitzil-m29 / pyron-m23 / merged-m18.**
+`build/don_m22`, `build/hui56`, `build/pyron41`, `build/m3b_merged26`, stock
+twin `build/m5_stock17` (byte-identical to `m5_stock16` by rebuild, so
+`donovan-m19-stock` carries; the stage-4 image is likewise unchanged at
+`108f7523`).
+**WHAT TO LOOK AT FIRST ON THIS ONE:** the wheel reads **M18**, and *Donovan
+throwing JEDAH now holds him with JEDAH's geometry*. Until this freeze the
+14z-64 mirror-victim `fixes=` row rewrote victim entry `[0x0F]` on BOTH
+tracks — right on the stock track, where Donovan occupies `0x0F`, and wrong on
+every WIDE build, where `0x0F` is Jedah restored (patch_notes 14z-144).
+Program fingerprints: **donovan MOVED `8065bc92` -> `66c69213`** (2 bytes) and
+**merged `4a7c02fb` -> `1d8bedc5`**; huitzil `08944a7e` and pyron `65bf5622`
+are BYTE-IDENTICAL (the row is donovan.toml's), so their rows are whole-set
+keyed. The previous freeze's paragraph follows.
+
+**Previous: THE 14z-143 M17 PYRON-CAPTURE FREEZE (mark M17):
 donovan-m21 / huitzil-m28 / pyron-m22 / merged-m17.**
 `build/don_m21`, `build/hui55`, `build/pyron40`, `build/m3b_merged25`, stock
-twin `build/m5_stock16` (byte-identical to `m5_stock16` by rebuild, so
-`donovan-m19-stock` carries).
-**WHAT TO LOOK AT FIRST ON THIS ONE:** the wheel reads **M17**, and *Pyron's
-throws now hold the victim with HIS geometry* — his capture row `0x11` was
-serving Demitri's block until this freeze (patch_notes 14z-143). The previous
-freeze's paragraph follows.
-
-**Previous: THE 14z-132 M16 MARK FREEZE (maintainer-ruled
-2026-09-04, option A: the in-game mark IS the merged build number; mark M16):
-donovan-m20 / huitzil-m27 / pyron-m21 / merged-m16.**
-`build/don_m21`, `build/hui55`, `build/pyron40`, `build/m3b_merged25`, stock
-twin `build/m5_stock16`. **EVERY PROGRAM FINGERPRINT IS UNCHANGED from M13**
-(`8065bc92` / `08944a7e` / `a43da974` / `f42f7569`; stock `e86e1d04`) because
-the whole delta is gfx: the rows are keyed on the WHOLE-SET key instead
-(`--set-key`: `52756b2f` / `e1ed7d9f` / `1264ca1f` / `2c926c5b`).
-**The delta is exactly TWO members on each WIDE track** — the group-C glyph
-tiles `vsw.33m` + `vsw.37m`, one character of one glyph — **and ZERO on the
-stock twin**, which is why `donovan-m19-stock` carries; the stage-4 image is
-likewise unchanged at `108f7523` (both measured by rebuild, not assumed).
-The naked-eye tell is the **M16** mark — since 14z-132 the mark IS the merged
-build number, so wheel and build agree by construction — and the second one
-is the BOOT NAME SCREEN, which reads **VAMPIRE SAVED** (Japan entry only; the
-title screen and the staff-roll strings are untouched by standing ruling).
-Carried from M13, which added that boot title and the `gap_be27a` bank-map
-correction — see patch_notes 14z-130 and `tests/test_capture_kf_ownership.sh`.
-**FIELD VERDICT GREEN (maintainer, MiSTer, 2026-09-05, 14z-133b): "Field tests are
-green" on bundle `../mister_fieldtest_14z132/` = merged-m16 / mark M16, the bundle
-verified against the build by hash the same day (STATE 14z-133b) — the release
-run follows in a fresh session.** M13 (merged-m15) was never fielded on its own;
-M16 carries it. The previous fielded freeze (merged-m14, mark M12) was FIELD VERDICT GREEN twice:
-2026-08-30 (maintainer, MiSTer, 14z-121) "all green" on bundle
-`../mister_fieldtest_14z119/`, and RE-VERIFIED GREEN 2026-09-01 "my tests on
-M14 on MiSTer are all green" — a second independent pass on the same
-unchanged build (`merged-m14`; its naked-eye tell reads **M12**, the mark —
-"M14" names the BUILD, [VSP-162]'s three namespaces).
-Detail: patch_notes 14z-132 / 14z-130, STATE 14z-132; the registry row
-below. Previous freeze (merged-m14, M12): patch_notes 14z-119.**
+twin `build/m5_stock16` (byte-identical to `m5_stock15` by rebuild, so
+`donovan-m19-stock` carried).
+**PYRON'S CAPTURE ROW `0x11` PORTED** — `pyron.toml`'s `[[data_port]]
+pyron_capture_keyframes` places vs2's own block (`0x0C7F98`, `len 0xB80`) in
+`wide_ext` and repoints `PRG:0x0BE2BE` off vsavj's Demitri alias: ONE word,
++2 ops. Measured against native `vsav2`: hold-offset overlap **9 of 9**, where
+14z-131 measured 0 of 15; maintainer-confirmed on captures 2026-09-08.
+Detail: patch_notes 14z-143, STATE 14z-143; the registry row below.
 
 **Every superseded freeze is a ROW, not a paragraph.** The eight
 `Previous batch (14z-N…)` blocks this section carried until 14z-126b are
@@ -1438,6 +1425,7 @@ entry and STATE close. Newest first; the top row is the CURRENT freeze.**
 
 | build (mark) | fingerprint(s) | dir · tag | what changed | detail |
 |---|---|---|---|---|
+| THE 14z-144 M18 DONOVAN/JEDAH CAPTURE-SCOPE FREEZE | donovan-m22 whole-set `fae45621` (`build/don_m22`), huitzil-m29 `f6614e1e` (`build/hui56`), pyron-m23 `be25fde3` (`build/pyron41`), merged-m18 `00f9cf13` (`build/m3b_merged26`). **Program fingerprints: donovan MOVED `8065bc92` -> `66c69213` and merged `4a7c02fb` -> `1d8bedc5`; huitzil `08944a7e` and pyron `65bf5622` BYTE-IDENTICAL** (the fixed row is donovan.toml's and reaches no other manifest), so those two rows are whole-set keyed. Stock twin **UNCHANGED and byte-identical by rebuild** — `donovan-m19-stock` (`e86e1d04`) CARRIES; the stage-4 target likewise, MEASURED by rebuild at `108f7523` (`donovan-m19-stage4`), which follows because the fix is a `stage = 6` row a stage-4 build never reaches | tags `freeze/donovan-m22`, `freeze/huitzil-m29`, `freeze/pyron-m23`, `freeze/merged-m18` | **DONOVAN THROWING JEDAH KEEPS JEDAH'S GEOMETRY** — `donovan.toml`'s `throw_victim_keyframes` gained `fixes_variant = ""`, the `_variant` twin `row_hex()` already defined for `new_hex`, taught to the `data_port` fixes key: the 14z-64 mirror-victim rewrite of victim entry `[0x0F]` now applies on the BASE-SLOT track ONLY, where victim `0x0F` genuinely IS Donovan. On WIDE, `0x0F` is JEDAH restored, and the blob keeps vs2's own sub-block. **The WIDE program delta is EXACTLY TWO BYTES** (logical word `0d88` -> `0b30` at blob offset `0x1E`); op counts unchanged. Found 14z-143 by `audit_capture_matrix`'s first run, PRE-EXISTING since 14z-64. Plus the mark `M17` -> `M18`. Member delta by rebuild: donovan 3 (`vsw.41` + `vsw.33m`/`vsw.37m`), huitzil 2, pyron 2, merged 3, **stock 0** | patch_notes 14z-144; `tests/audit_capture_matrix.sh` (KNOWN set now EMPTY, 640/640); STATE 14z-144 |
 | THE 14z-143 M17 PYRON-CAPTURE FREEZE | donovan-m21 whole-set `15df9b90` (`build/don_m21`), huitzil-m28 `e8aa4131` (`build/hui55`), pyron-m22 `b258c087` (`build/pyron40`), merged-m17 `50049b73` (`build/m3b_merged25`). **Program fingerprints: donovan `8065bc92` and huitzil `08944a7e` UNCHANGED (the mark is gfx), PYRON MOVED `a43da974` -> `65bf5622`** (the capture row is a program+data change), merged `4a7c02fb`. Stock twin **UNCHANGED and byte-identical by rebuild** — `donovan-m19-stock` (`e86e1d04`) and `donovan-m19-stage4` (`108f7523`) CARRY. Rows are whole-set keyed | tags `freeze/donovan-m21`, `freeze/huitzil-m28`, `freeze/pyron-m22`, `freeze/merged-m17` | **PYRON'S CAPTURE ROW `0x11` PORTED** — `pyron.toml` `[[data_port]] pyron_capture_keyframes` places vs2's own block (`0x0C7F98`, `len 0xB80`) in `wide_ext` and repoints `PRG:0x0BE2BE` off vsavj's Demitri alias: ONE word, +2 ops (pyron 310 -> 312). Measured against native `vsav2`: hold-offset overlap **9 of 9**, was 0 of 15; maintainer-confirmed on captures 2026-09-08. Plus the mark `M16` -> `M17` under the 14z-132 option-A ruling. Member delta measured by rebuild: donovan 2 (`vsw.33m`, `vsw.37m`), huitzil 2 (same), pyron 5 (+`vm3j.04d`, `vm3j.07b`, `vsw.41`), merged 6, **stock 0** | patch_notes 14z-143; `tests/audit_pyron_capture_block.sh` (EXPECT_MATCH=1), `tests/test_capture_kf_ownership.sh`; STATE 14z-143 |
 | THE 14z-132 M16 MARK FREEZE | donovan-m20 whole-set `52756b2f` (`build/don_m20`), huitzil-m27 `e1ed7d9f` (`build/hui54`), pyron-m21 `1264ca1f` (`build/pyron38`), merged-m16 `2c926c5b` (`build/m3b_merged23`) — **every PROGRAM fingerprint UNCHANGED** (`8065bc92` / `08944a7e` / `a43da974` / `f42f7569`), so these rows are keyed on the WHOLE-SET key (14z-132's forward-only promotion); stock twin and stage-4 target both measured UNCHANGED by rebuild, so `donovan-m19-stock` and `donovan-m19-stage4` CARRY | tags `freeze/donovan-m20`, `freeze/huitzil-m27`, `freeze/pyron-m21` | THE IN-GAME MARK IS NOW THE MERGED BUILD NUMBER (maintainer-ruled 2026-09-04, option A) — `version_text` M13 -> M16 in the three tenant manifests, ending the drift that had the wheel two behind the build since merged-m11. Delta measured on all five tracks: exactly TWO members (`vsw.33m`, `vsw.37m`), one character of one glyph, ZERO on the stock twin. **The first freeze in four that needed no predecessor row commented out**, because the whole-set key distinguishes builds a gfx-only freeze leaves program-identical. **RELEASED 14z-134 (2026-09-06): the release run — 165 gates, four lanes, `--scope all --lane all --strict` — PASS 164 / SKIP 1 (`audit_mask_window_ff42a2`, approved by the maintainer as a standing exception) / FAIL 0 / TIMEOUT 0 in three passes (`build/emu_release_m16/`, first and second pass kept beside the final); `release/merged-m16/` TRACKED (it had sat untracked since the freeze) with the WIDE MRA regenerated to carry its BUILD block, parts 31/31; `test_release_roundtrip` on the m16 layout PASS** | patch_notes 14z-132; STATE 14z-132 and 14z-134; `tests/expected/registry.tsv` header |
 | THE 14z-130 M13 BOOT-TITLE FREEZE | donovan-m19 `8065bc92` (`build/don_m19`, 342 ops), huitzil-m26 `08944a7e` (`build/hui53`, 373), pyron-m20 `a43da974` (`build/pyron37`, 310), merged-m15 `f42f7569` (`build/m3b_merged22`, 829); stock twin **MOVED** to `e86e1d04` (donovan-m19-stock); stage-4 target UNCHANGED at `108f7523` (donovan-m19-stage4) | tags `freeze/donovan-m19`, `freeze/huitzil-m26`, `freeze/pyron-m20`, `freeze/merged-m15` | THE BOOT NAME SCREEN reads VAMPIRE SAVED (three `aux_poke poke16` at `PRG:0x01C822/24/26`, Japan entry only, maintainer-ruled 2026-09-02); mark M13. PLUS the `gap_be27a` -> `capture_kf_ptr` bank-map correction folded in by ruling — BYTE-NEUTRAL on all five tracks by rebuild, with the table's hand-ownership made explicit in the generator so the generic repoint cannot silently revert the 14z-64 mirror-victim fix | patch_notes 14z-130; `tests/test_capture_kf_ownership.sh`; STATE 14z-130 |

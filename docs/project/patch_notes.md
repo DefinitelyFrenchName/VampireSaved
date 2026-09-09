@@ -1,5 +1,83 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-144 — DONOVAN THROWING JEDAH KEEPS JEDAH'S GEOMETRY: the mirror-victim fix gated to the base-slot track
+
+**THE DEFECT, and it had been shipping since 14z-64.** `donovan.toml`'s
+`[[data_port]] throw_victim_keyframes` carries `fixes = "0x1E:0b30:0d88"` —
+the 14z-2/14z-64 mirror-victim correction. It rewrites the VICTIM offset word
+`[0x0F]` inside the placed blob from the Jedah-victim sub-block (`0x0B30`) to
+the Donovan-victim one (`0x0D88`).
+
+That is CORRECT on the STOCK track. There Donovan SUBSTITUTES Jedah at slot
+`0x0F`, so victim id `0x0F` genuinely IS Donovan and the mirror match needs
+Donovan-victim keyframes.
+
+On a WIDE build it is wrong. Donovan sits at `0x13` and `0x0F` is **JEDAH,
+restored** — a reachable legacy character and an ordinary 2P matchup. But
+`fixes` was applied to the blob UNCONDITIONALLY, and the SAME blob is placed on
+both tracks, so Donovan throwing Jedah was positioned AND posed by the
+Donovan-victim data. The manifest's own note called the row harmless at a
+variant id because its `[0x0F]` entry "is never a TENANT victim there": true,
+and not the question.
+
+**MAGNITUDE.** The two sub-blocks differ in **225 of 408 bytes (55%)**. Early
+keyframes are close (`-60,0` vs `-56,0`) and the last is `(-61,166)` against
+Jedah's `(-76,32)` — 134 px of vertical difference — with different poses
+(`0,8,6,0,1,0,8,17` vs `0,8,7,1,0,0,9,20`).
+
+**FOUND BY ENUMERATION, not by play** ([VSP-179]). `tests/audit_capture_matrix.sh`
+was written at 14z-143 at the maintainer's request to sweep the WHOLE
+cross-product instead of the three cells the behavioural gates cover; it found
+this on its first run, after seventeen sessions of throw work. A missing or
+mis-scoped table row produces no symptom to steer toward, so no amount of
+symptom-driven testing reaches it.
+
+**THE FIX — one manifest key, in an idiom that already existed.**
+`row_hex()` has resolved a `_variant` twin for `new_hex` since 14z-62d. This
+teaches the same twin to the `data_port` `fixes` key, resolved against the
+row's OWNER:
+
+```
+    _fixes = dp.get("fixes", "")
+    if _ovar and "fixes_variant" in dp:
+        _fixes = dp["fixes_variant"]
+```
+
+`donovan.toml` gains `fixes_variant = ""`. Empty means "place vs2's block
+VERBATIM", so on every WIDE track victim `[0x0F]` keeps vs2's own Jedah-victim
+sub-block. That IS Jedah's real geometry: `audit_capture_matrix` section 2
+measures vs2's legacy victim data byte-identical to vsavj's, all 16x16.
+
+**THE BYTES.** WIDE program delta = **2 bytes**, file offsets `0x10fe/0x10ff`
+of `vsw.41`, the logical word going `0d88 -> 0b30` at blob offset `0x1E`.
+Op count UNCHANGED (donovan 342, merged 831) — the fix moves bytes, not ops,
+so nothing re-allocated and no address moved.
+
+**THE CONTROL THAT MATTERS.** The stock twin rebuilt **BYTE-IDENTICAL**
+(`e86e1d04`, `m5_stock17` == `m5_stock16` at member level). That is what says
+this is a SCOPE change and not a disarm: the base-slot track still applies the
+14z-64 fix. Huitzil (`08944a7e`) and Pyron (`65bf5622`) rebuilt
+program-identical too — the row is donovan.toml's and reaches no other
+manifest.
+
+**EVIDENCE.** `audit_capture_matrix` PASSES **640/640** (attacker, victim)
+cells against native `vsav2` on `merged-m18` with its `KNOWN` set EMPTY, while
+`merged-m17` still FAILS the `(0x13,0x0f)` cell — same gate, same day, both
+legs run. Suite GREEN 88/88 on all three solo tracks over the freeze AND the
+verify pass, `.masked` counts equal to their predecessors (53/52/52).
+Pointer flow did NOT move (all four baselines still match — a changed byte
+inside a placed data blob introduces no new address). Charmap tables carry no
+frame-data change.
+
+**PLUS the mark `M17` -> `M18`** on the three tenant manifests, under the
+14z-132 option-A ruling that the in-game mark IS the merged build number.
+Member delta by rebuild: donovan **3** (`vsw.41` + `vsw.33m`/`vsw.37m`),
+huitzil **2**, pyron **2**, merged **3**, **stock 0**.
+
+Maintainer-ruled option (a), 2026-09-09. Builds `don_m22` / `hui56` /
+`pyron41` / `m3b_merged26` / `m5_stock17`, frozen as donovan-m22 /
+huitzil-m29 / pyron-m23 / merged-m18.
+
 ## 14z-143 — PYRON'S CAPTURE ROW `0x11` PORTED: he throws with his own geometry, not Demitri's
 
 **THE DEFECT.** `capture_kf_ptr` (`PRG:0x0BE27A`, 32 longwords indexed by the

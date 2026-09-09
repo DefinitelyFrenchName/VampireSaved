@@ -4,7 +4,7 @@ CARRIED VERBATIM from `merged-m16` (53 `.masked`, 19 `.skip`, the mask): the M17
 freeze changes Pyron's capture-keyframe row `0x11` and the wheel mark, neither of
 which is legacy surface, so every authored class carries. Registry row keyed on
 the WHOLE-SET fingerprint `50049b73…` only (never the program key `4a7c02fb`,
-which `build/merged1` shares). Verified on `build/m3b_merged25`.
+which `build/merged1` shares). Verified on `build/m3b_merged26`.
 
 **The carry is the point, not a shortcut** — see `docs/GOTCHAS.md`, "`run_suite.sh
 --freeze` INTO AN EMPTY EXPECTATION DIR SELF-FREEZES THE WHOLE LEGACY CORPUS":
