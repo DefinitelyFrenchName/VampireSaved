@@ -55,8 +55,8 @@ cd "$REPO"
 # after which a mash rig is playing two different fights, so the whole-run
 # id-SET comparison was invalid rather than failing. The comparison is now
 # event-stream-with-a-frozen-onset; see the block below for the measurements.
-MERGED="${1:-build/m3b_merged25}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-SOLO="${2:-build/pyron40}"    # pyron-m15 (14z-105; was pyron-m13, the shipping solo (carries  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+MERGED="${1:-build/m3b_merged26}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+SOLO="${2:-build/pyron41}"    # pyron-m15 (14z-105; was pyron-m13, the shipping solo (carries  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
                               # pyr_sfx_records, as pyron-m4 did at 14z-85b)
 [ -f "$MERGED/rompath/vsavjw.zip" ] || { echo "SKIP: no $MERGED"; exit 0; }
 [ -f "$SOLO/rompath/vsavjw.zip" ] || { echo "SKIP: no $SOLO"; exit 0; }

@@ -25,7 +25,7 @@
 # <pc6>" — the gate then asserts that exact crash instead (so the capture
 # cannot rot) and lists it loudly as OPEN.
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged25] [ONLY=name] tests/test_inp_corpus.sh  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+# Usage: ROMDIR=... [BUILD=build/m3b_merged26] [ONLY=name] tests/test_inp_corpus.sh  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 # Emulator tier (MAME, ~1 min per recording). NOT ci_static.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
@@ -37,7 +37,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # VARIABLE (forks set their own); only made absolute, and only if it exists,
 # so a gate that means to SKIP on a missing ROMDIR still does.
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
-BUILD="${BUILD:-build/m3b_merged25}"   # re-point at every merged freeze  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged26}"   # re-point at every merged freeze  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: no WIDE build at $BUILD"; exit 1; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 mkdir -p "$W/inp" "$W/.cache/vampire-saved"; ln -s "$W/inp" "$W/.cache/vampire-saved/inp"

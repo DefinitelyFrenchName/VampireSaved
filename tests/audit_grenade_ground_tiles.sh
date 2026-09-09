@@ -31,7 +31,7 @@
 # (ours-only == 0 AND native-only == 0). A non-empty ours-only tile is a
 # REAL divergence (our build drawing art native does not) and fails.
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged25] tests/audit_grenade_ground_tiles.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged26] tests/audit_grenade_ground_tiles.sh
 #        2 MAME runs (~4 min). Needs the WIDE MAME binary and a gfx build.
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -52,7 +52,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD="${BUILD:-build/m3b_merged25}"
+BUILD="${BUILD:-build/m3b_merged26}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 RPL="tests/replays/hui/83d_hui_grenade_ground.rpl"

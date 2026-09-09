@@ -65,7 +65,7 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD="${MAP_FIT_BUILD:-build/m3b_merged25}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${MAP_FIT_BUILD:-build/m3b_merged26}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -f "$BUILD/rompath/vsavjw.zip" ] || {
     echo "SKIP: no WIDE romset at $BUILD/rompath/vsavjw.zip"; exit 0; }
 [ -f "$BUILD/patch/effect_map.json" ] || {

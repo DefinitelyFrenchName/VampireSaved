@@ -37,7 +37,7 @@
 # The forced pick 0x0A on vsav2 loads whatever that engine keeps in the slot
 # and armed nothing (14z-123 leg r2_v2_armor) — not a Sasquatch measurement.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged25] [FREEZE=1]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged26] [FREEZE=1]
 #        tests/audit_df_accumulator.sh          (~3 min, four legs in parallel)
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -59,7 +59,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # VARIABLE (forks set their own); only made absolute, and only if it exists,
 # so a gate that means to SKIP on a missing ROMDIR still does.
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
-BUILD="${BUILD:-build/m3b_merged25}"
+BUILD="${BUILD:-build/m3b_merged26}"
 WIDE_MAME="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 EXP="tests/expected/df_accumulator.txt"
 RPL="$REPO/tests/replays/df/105_df_sas_armor.rpl"

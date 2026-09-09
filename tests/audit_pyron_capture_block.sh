@@ -89,7 +89,7 @@
 # are locked by audit_don_grab_pose / test_hui_grab_victim.
 #
 # Static? No — 4 MAME runs, 2 at a time, ~4 min.
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged25] [EXPECT_MATCH=1]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged26] [EXPECT_MATCH=1]
 #        tests/audit_pyron_capture_block.sh
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -109,7 +109,7 @@ if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 # DUMPS and the liveness check reported "held frames ours=0". First seen on
 # the M16 freeze sweep, the gate's first run under the runner.
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged25}"
+BUILD="${BUILD:-build/m3b_merged26}"
 EXPECT_MATCH="${EXPECT_MATCH:-1}"   # 1 = ported (14z-143); 0 = the pre-port defect
 VICTIM="${VICTIM:-03}"              # Victor: a legacy dummy, no-input
 

@@ -80,7 +80,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # so a gate that means to SKIP on a missing ROMDIR still does.
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-RPDIR="${1:-$REPO/build/m5_stock16/rompath}"
+RPDIR="${1:-$REPO/build/m5_stock17/rompath}"
 # A MISSING PREREQUISITE IS LOUD, NEVER A SILENT exit 0. This gate is a
 # FREEZE-BATTERY LEG (run_battery_m2.sh 3f) and `bat` invokes it as a bare
 # command, so an exit 0 would be counted as PASS and "BATTERY GREEN" would be

@@ -57,11 +57,11 @@
 #
 # Static, no emulator, ~2 s. Needs $ROMDIR and a build dir.
 # Usage: ROMDIR=... tests/audit_capture_matrix.sh
-# Build dir (code default, [VSP-165]): MERGED=build/m3b_merged25
+# Build dir (code default, [VSP-165]): MERGED=build/m3b_merged26
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; export REPO
 cd "$REPO"
-MERGED="${MERGED:-build/m3b_merged25}"
+MERGED="${MERGED:-build/m3b_merged26}"
 : "${ROMDIR:?set ROMDIR}"
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 [ -f "$MERGED/verify_data.bin" ] || { echo "FAIL: no $MERGED/verify_data.bin (set MERGED=)"; exit 1; }

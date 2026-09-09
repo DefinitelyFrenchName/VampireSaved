@@ -30,7 +30,7 @@
 #      shapes and must simply produce an action without a stock spend
 #      (measured 14z-104 (4)); Phobos and Pyron fire theirs.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged25]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged26]
 #        tests/audit_edge_cases.sh          (~14 legs x ~1 min)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -45,7 +45,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged25}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged26}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 FIELDS="ff8450:w:p1hp,ff8850:w:p2hp,ff8120:b:winner,ff810e:b:rounds,ff8509:b:stk,ff8406:b:p1seq"

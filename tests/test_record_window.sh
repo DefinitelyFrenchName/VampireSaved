@@ -24,7 +24,7 @@
 #   4 CONTROLS    an inverted window must abort, and a window still open at
 #                 FRAMES must report a FORCED stop rather than a clean one.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [REC_BUILD=build/hui55] tests/test_record_window.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [REC_BUILD=build/hui56] tests/test_record_window.sh
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -59,7 +59,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
-BUILD="${REC_BUILD:-build/hui55}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${REC_BUILD:-build/hui56}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 RPL="${REC_REPLAY:-tests/replays/26_don_arcade_mash.rpl}"  # truncated in section 0
 
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary at $MAME_BIN"; exit 0; }

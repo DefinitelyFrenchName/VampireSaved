@@ -18,7 +18,7 @@
 # MUST-FIRE CONTROL (RH-9): a copy of one extract with a single value byte
 # changed must regenerate DIFFERENTLY from the committed page.
 #
-# Usage: tests/test_tables_current.sh   [DON=build/don_m21 HUI=build/hui55 PYR=build/pyron40]  # re-pointed 14z-130 (M13 boot-title freeze) <- 14z-119
+# Usage: tests/test_tables_current.sh   [DON=build/don_m22 HUI=build/hui56 PYR=build/pyron41]  # re-pointed 14z-130 (M13 boot-title freeze) <- 14z-119
 #
 # HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -35,9 +35,9 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-DON="${DON:-build/don_m21}"  # re-pointed 14z-130 (M13 boot-title freeze) <- 14z-119
-HUI="${HUI:-build/hui55}"  # re-pointed 14z-130 (M13 boot-title freeze) <- 14z-119
-PYR="${PYR:-build/pyron40}"  # re-pointed 14z-130 (M13 boot-title freeze) <- 14z-119
+DON="${DON:-build/don_m22}"  # re-pointed 14z-130 (M13 boot-title freeze) <- 14z-119
+HUI="${HUI:-build/hui56}"  # re-pointed 14z-130 (M13 boot-title freeze) <- 14z-119
+PYR="${PYR:-build/pyron41}"  # re-pointed 14z-130 (M13 boot-title freeze) <- 14z-119
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }

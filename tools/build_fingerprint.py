@@ -209,7 +209,7 @@ def main():
         if key == sha:
             # LOUD BY DESIGN. After the promotion a program-key hit always
             # means "not registered under a whole-set key", and a silent hit
-            # here is how build/don_m21 resolves as donovan-m19 (both
+            # here is how build/don_m22 resolves as donovan-m19 (both
             # 8065bc92) — docs/project/gotchas.md, "A gfx-only freeze gives
             # two builds ONE dispatch key". stderr, so callers capturing
             # stdout for the set name are unaffected.

@@ -70,17 +70,17 @@
 #
 # Static, no emulator, ~2 s. Needs $ROMDIR and the build dirs.
 # Usage: ROMDIR=... tests/test_capture_kf_ownership.sh
-# Build dirs (code defaults, [VSP-165]): DON=build/don_m21 HUI=build/hui55
+# Build dirs (code defaults, [VSP-165]): DON=build/don_m22 HUI=build/hui56
 #   PYR=build/pyron37 STOCK=build/m5_stock14 MERGED=build/m3b_merged22
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; export REPO
 cd "$REPO"
 
-DON="${DON:-build/don_m21}"
-HUI="${HUI:-build/hui55}"
-PYR="${PYR:-build/pyron40}"
-STOCK="${STOCK:-build/m5_stock16}"
-MERGED="${MERGED:-build/m3b_merged25}"
+DON="${DON:-build/don_m22}"
+HUI="${HUI:-build/hui56}"
+PYR="${PYR:-build/pyron41}"
+STOCK="${STOCK:-build/m5_stock17}"
+MERGED="${MERGED:-build/m3b_merged26}"
 
 : "${ROMDIR:?set ROMDIR}"
 

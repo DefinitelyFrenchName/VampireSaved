@@ -29,13 +29,13 @@
 #     FAIL and write NO block;
 #  4. idempotent: rewriting the same header again changes no byte.
 #
-# Usage: ROMDIR=... [MRA_LINE_BUILD=build/m3b_merged25] tests/test_mra_build_line.sh
+# Usage: ROMDIR=... [MRA_LINE_BUILD=build/m3b_merged26] tests/test_mra_build_line.sh
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 ROMDIR="$(cd "$ROMDIR" && pwd)"
-BUILD="${MRA_LINE_BUILD:-build/m3b_merged25}"
+BUILD="${MRA_LINE_BUILD:-build/m3b_merged26}"
 [ -f "emu/jtcores/.gitmodules" ] || { echo "SKIP: emu/jtcores not initialised (tools/setup_jtcores.sh)"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
 WORK="$(mktemp -d "${TMPDIR:-/tmp}/mra_build_line.XXXXXX")"
