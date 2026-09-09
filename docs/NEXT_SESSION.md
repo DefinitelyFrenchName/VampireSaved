@@ -31,10 +31,16 @@ if it is green the release run is COMPLETE.
   at `--jobs 4`, and `--jobs 8` would actually pay. The design (a FIFO token
   semaphore whose TOKEN IS THE CLONE NAME) and the two things to establish
   first are in STATE "Decisions pending". Harness only; ~half a session.
-- **The [VSP-178] recurrence** — two consecutive freezes shipped a stale
-  romset-following artifact. The cadence column tells the RUNNER what to run and
-  says nothing to the FREEZE about what to refresh. A static freeze-ritual check
-  would have caught both. STATE "Decisions pending".
+- **The [VSP-178] recurrence — ON THE LIST by the maintainer's word
+  (2026-09-09)**, agreed as a work item. Two consecutive freezes shipped a stale
+  romset-following artifact; the cadence column tells the RUNNER what to run and
+  says nothing to the FREEZE about what to refresh, so the 14z-134 remedy could
+  not have prevented the recurrence. The two known members are the two whose
+  gates sit OUTSIDE the static tier (`tests/expect/mister_prg_window.txt`, a ~1h
+  Verilator gate; `build/merged1/`, which rebuilds itself and shows only as
+  working-tree churn) — every artifact a ci_static gate already covers has never
+  rotted, and that is the discriminator the check would key on. Small, static,
+  no gameplay surface. STATE "Decisions pending" has the shape.
 - **The Phobos ±1 damage residue** — 5 of 54 cells, WITHIN TOLERANCE, a
   KNOWLEDGE item. Cheap first step: is `0x0A` (Sasquatch) a cross-generation
   data difference rather than ours?

@@ -393,7 +393,9 @@ what a triage is looking at, so those are where the thinking time goes.
   only, no RTL.
 
 - **[VSP-178]'s CLASS HAS NOW BITTEN AT TWO CONSECUTIVE FREEZES, and the
-  cadence column cannot fix it (14z-144).** M17 shipped with
+  cadence column cannot fix it (14z-144). ON THE OPEN-ITEMS LIST
+  (maintainer, 2026-09-09: *"let's add it to the todo list"*) — AGREED as a
+  work item, not merely recorded; not yet scheduled against a session.** M17 shipped with
   `tests/expect/mister_prg_window.txt` frozen on merged-m16 and `build/merged1`
   two ops stale; both are tracked artifacts that FOLLOW THE ROMSET. 14z-134
   responded to the first instance by changing that gate's cadence to `romset` —
@@ -407,7 +409,19 @@ what a triage is looking at, so those are where the thinking time goes.
   **SHAPE IF WANTED:** a freeze-ritual check that enumerates tracked artifacts
   whose content is derived from the build set and asserts each was regenerated
   since the current freeze's commit — cheap, static, and it would have caught
-  both. Not a new rule; a rule that runs. Not started, no gameplay surface.
+  both. Not a new rule; a rule that runs.
+  **THE TWO KNOWN MEMBERS, as the starting inventory:**
+  `tests/expect/mister_prg_window.txt` (frozen pair; its gate is a ~1h
+  Verilator run, so nothing in the static tier can see it rot) and
+  `build/merged1/` (the merged-legacy instrument, which REBUILDS itself and
+  therefore surfaces only as working-tree churn a human has to notice).
+  **THE DISCRIMINATOR that makes the check writable:** an artifact belongs in
+  it when its content is derived from the build set AND no ci_static gate
+  already fails on staleness — pointer_flow, charmap, the artifact manifests
+  and bases.tsv are all covered today and would be excluded, which is why they
+  have never rotted.
+  **COST:** small — a static gate plus its must-fire control; no gameplay
+  surface, no build byte. Agreed to the list 2026-09-09; not scheduled.
 
 - **~~DONOVAN THROWING JEDAH USES DONOVAN'S OWN VICTIM KEYFRAMES ON EVERY WIDE
   BUILD~~ RULED AND SHIPPED 14z-144 AS M18 (maintainer, 2026-09-09: option (a),
