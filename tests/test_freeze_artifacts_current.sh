@@ -32,6 +32,16 @@
 # ADD A ROW when an artifact is (a) tracked, (b) derived from the build set, and
 # (c) not already covered by a ci_static gate that fails on its staleness.
 #
+# THE THIRD ROW (14z-145): docs/project/patch_index.md's REGISTRATION CELLS —
+# the "current generation … = `build/<dir>`" / "**CURRENT `<fp>`**" cells of the
+# romset-bundles table. Measured before the row existed (2026-09-10, git log
+# -S): those cells last moved at the 14z-119 freeze and named don_m18 / hui52 /
+# pyron36 / m5_stock13 through 14z-130, 14z-132, 14z-143 AND 14z-144 — FOUR
+# freezes stale — while the 14z-144 close edited OTHER cells of the same rows.
+# Plus the two "UNREGISTERED … NOT yet frozen" instances the table records
+# about itself (14z-127..132, 14z-143..144). Same discriminator: derived from
+# the build set, read by no ci_static gate. Section 4 below.
+#
 # THE BUILD SET comes from tests/run_all_emulator.sh's placeholder defaults —
 # the one machine-readable statement of "the current freeze" that is already
 # re-pointed every freeze and already watched by test_build_ref_rot. Reading it
@@ -46,9 +56,18 @@ cd "$REPO"
 
 MERGED="$(sed -n 's/^MERGED="${MERGED:-\([^}]*\)}".*/\1/p' tests/run_all_emulator.sh | head -1)"
 [ -n "$MERGED" ] || { echo "FAIL: could not read the MERGED default from tests/run_all_emulator.sh"; exit 1; }
-echo "== the current freeze, per tests/run_all_emulator.sh: $MERGED"
+# The four other tracks, same source (section 4 checks every track's cells).
+DON="$(sed -n 's/^DON="${DON:-\([^}]*\)}".*/\1/p' tests/run_all_emulator.sh | head -1)"
+HUI="$(sed -n 's/^HUI="${HUI:-\([^}]*\)}".*/\1/p' tests/run_all_emulator.sh | head -1)"
+PYR="$(sed -n 's/^PYR="${PYR:-\([^}]*\)}".*/\1/p' tests/run_all_emulator.sh | head -1)"
+STOCK="$(sed -n 's/^STOCK="${STOCK:-\([^}]*\)}".*/\1/p' tests/run_all_emulator.sh | head -1)"
+for v in DON HUI PYR STOCK; do
+    eval "x=\$$v"
+    [ -n "$x" ] || { echo "FAIL: could not read the $v default from tests/run_all_emulator.sh"; exit 1; }
+done
+echo "== the current freeze, per tests/run_all_emulator.sh: $MERGED (don $DON, hui $HUI, pyr $PYR, stock $STOCK)"
 
-MERGED="$MERGED" python3 - <<'PY'
+MERGED="$MERGED" DON="$DON" HUI="$HUI" PYR="$PYR" STOCK="$STOCK" python3 - <<'PY'
 import json, os, re, sys
 from pathlib import Path
 merged = os.environ["MERGED"]
@@ -134,6 +153,185 @@ if re.findall(r"\(build/([A-Za-z0-9_]+)\)", hdr_txt)[0] == merged.split("/", 1)[
 else:
     notes.append("3: control fired — a header naming a non-current build dir is "
                  "caught by section 2")
+
+# ── 4. docs/project/patch_index.md — the REGISTRATION CELLS ─────────────────
+# The romset-bundles table carries, per track, "current generation **<name>** =
+# `build/<dir>`" / "current twin `build/<dir>`" and "**CURRENT `<fp>`** (<name>,
+# …)". Those are CLAIMS about the current freeze and rot exactly like the two
+# artifacts above (header: four freezes stale when this section was written).
+#
+# WHAT IS A CLAIM AND WHAT IS HISTORY — the 14z-144 re-point-sweep trap, [VSP-13]:
+# only text after the word "current" is a claim, and of it only the FIRST build
+# dir, the FIRST freeze name and the FIRST backticked fingerprint, up to the
+# first ";", "prior" or cell boundary. Struck (~~…~~) and italic-parenthetical
+# (*(…)*) spans are removed first: that is where the table quotes its own past
+# wording. A "<name> (build/<dir>)" pairing in a prior clause is a dated fact
+# and is never read. A cell saying UNREGISTERED / NOT yet frozen is checked the
+# other way round: if it names a CURRENT build dir or fingerprint that the
+# registry holds, it is stale.
+#
+# THE TRUTH is the runner's build set (dirs) + tools/build_fingerprint.py over
+# each dir (program key and whole-set key) + tests/expected/registry.tsv (the
+# names). Whole-set matches WIN: huitzil's program key 08944a7e has carried
+# since huitzil-m26, so a cell saying "huitzil-m26" would pass a program-key
+# lookup while the whole-set key says huitzil-m29 (control 4e).
+import subprocess
+tracks = {"DON": os.environ["DON"], "HUI": os.environ["HUI"], "PYR": os.environ["PYR"],
+          "MERGED": merged, "STOCK": os.environ["STOCK"]}
+FREEZE_RE = r"\b(?:donovan|huitzil|pyron|merged)-m\d+(?:-stock|-stage4)?\b"
+
+def track_of_dir(d):
+    for pre, t in (("m5_stock", "STOCK"), ("don_", "DON"), ("hui", "HUI"),
+                   ("pyron", "PYR"), ("m3b_merged", "MERGED")):
+        if d.startswith(pre):
+            return t
+    return None
+
+def track_of_name(n):
+    if n.endswith("-stock"):
+        return "STOCK"
+    if n.endswith("-stage4"):
+        return "STAGE4"
+    return {"donovan": "DON", "huitzil": "HUI", "pyron": "PYR", "merged": "MERGED"}[n.split("-")[0]]
+
+def fingerprint(d, flag):
+    rp = Path(d) / "rompath"
+    setn = "vsavjw" if (rp / "vsavjw.zip").exists() else "vsavj"
+    r = subprocess.run([sys.executable, "tools/build_fingerprint.py", str(rp),
+                        "--set", setn, flag], capture_output=True, text=True)
+    hits = [l.strip() for l in r.stdout.splitlines() if re.fullmatch(r"[0-9a-f]{40}", l.strip())]
+    return hits[-1] if hits else None
+
+registry = []
+for l in Path("tests/expected/registry.tsv").read_text().splitlines():
+    if l.startswith("#") or not l.strip():
+        continue
+    k, name = l.split("\t")[:2]
+    registry.append((k.strip(), name.strip()))
+
+truth = {}
+for t, d in tracks.items():
+    dname = d.split("/", 1)[1]
+    if not (Path(d) / "rompath").is_dir():
+        notes.append(f"4: {t} = {d} has no rompath on disk — its dir claims are "
+                     f"checked, fingerprint/name claims UNVERIFIED")
+        truth[t] = {"dir": dname, "prog": None, "set": None, "names": None}
+        continue
+    prog, sk = fingerprint(d, "--sha-only"), fingerprint(d, "--set-key")
+    if not prog:
+        fails.append(f"4: build_fingerprint.py returned no key for {d}")
+        continue
+    by_set = {n for k, n in registry if sk and k == sk}
+    by_prog = {n for k, n in registry if k == prog}
+    truth[t] = {"dir": dname, "prog": prog[:8], "set": sk[:8] if sk else None,
+                "names": by_set or by_prog}
+    if not truth[t]["names"]:
+        fails.append(f"4: {d} ({prog[:8]} / {sk[:8] if sk else '-'}) is in NO registry "
+                     f"row — the runner names an unregistered build as current")
+
+def strip_history(s):
+    s = re.sub(r"~~.*?~~", " ", s)
+    s = re.sub(r"\*\(.*?\)\*", " ", s)
+    return s
+
+def claims(row):
+    out = []
+    s = strip_history(row)
+    for m in re.finditer(r"\bcurrent\b", s, re.I):
+        w = s[m.end(): m.end() + 300]
+        cut = re.search(r";|\bprior\b|\|", w)
+        if cut:
+            w = w[:cut.start()]
+        d = re.search(r"`build/([A-Za-z0-9_]+)`", w)
+        n = re.search(FREEZE_RE, w)
+        f = re.search(r"`([0-9a-f]{8})[0-9a-f]*`", w)
+        if d or n or f:
+            out.append((d and d.group(1), n and n.group(0), f and f.group(1),
+                        re.sub(r"\s+", " ", (s[m.start(): m.end()] + w).strip())[:90]))
+    return out
+
+def check_rows(rows):
+    fs, seen = [], 0
+    for row in rows:
+        for d, n, f, ctx in claims(row):
+            t = (d and track_of_dir(d)) or (n and track_of_name(n))
+            if t is None:
+                fs.append(f"4: a CURRENT claim names an unrecognised build dir "
+                          f"`build/{d}` — «{ctx}»")
+                continue
+            if t == "STAGE4" or t not in truth:
+                continue
+            tr = truth[t]
+            seen += 1
+            if n and track_of_name(n) != t:
+                fs.append(f"4: CURRENT claim mixes the {t} dir with the freeze name "
+                          f"{n} — «{ctx}»")
+            if d and d != tr["dir"]:
+                fs.append(f"4: STALE — names build/{d} as current for the {t} track; "
+                          f"the current freeze is build/{tr['dir']} — «{ctx}»")
+            if n and tr["names"] is not None and n not in tr["names"]:
+                fs.append(f"4: STALE — names {n} as current for the {t} track; "
+                          f"build/{tr['dir']} is registered as "
+                          f"{'/'.join(sorted(tr['names']))} — «{ctx}»")
+            if f and tr["prog"] is not None and f not in (tr["prog"], tr["set"]):
+                fs.append(f"4: STALE — names fingerprint {f} as current for the {t} "
+                          f"track; build/{tr['dir']} is {tr['prog']} (program) / "
+                          f"{tr['set']} (whole-set) — «{ctx}»")
+        s = strip_history(row)
+        if re.search(r"\bUNREGISTERED\b|NOT yet frozen", s):
+            named = set(re.findall(r"`build/([A-Za-z0-9_]+)`", s))
+            fps = set(re.findall(r"`([0-9a-f]{8})[0-9a-f]*`", s))
+            for t, tr in truth.items():
+                if tr["names"] and (tr["dir"] in named or tr["prog"] in fps or tr["set"] in fps):
+                    fs.append(f"4: STALE — a cell says UNREGISTERED / NOT yet frozen "
+                              f"but names build/{tr['dir']}, registered as "
+                              f"{'/'.join(sorted(tr['names']))}")
+    return fs, seen
+
+doc = Path("docs/project/patch_index.md")
+lines = doc.read_text().splitlines()
+rows, inside = [], False
+for l in lines:
+    if l.startswith("## "):
+        inside = l.startswith("## Romset patch bundles")
+        continue
+    if inside and l.startswith("|") and not re.match(r"^\|\s*(Patch|-+)\s*\|", l):
+        rows.append(l)
+if not rows:
+    fails.append("4: the 'Romset patch bundles' table was not found in patch_index.md")
+else:
+    f4, seen = check_rows(rows)
+    if seen == 0:
+        fails.append("4: no CURRENT-marked claim found in the bundles table — the "
+                     "table or this parser changed shape; nothing was checked")
+    fails.extend(f4)
+    if not f4 and seen:
+        notes.append(f"4: patch_index.md bundles table — {seen} CURRENT claim(s) over "
+                     f"{len(rows)} rows all name the current freeze")
+
+# ── 4c. MUST-FIRE CONTROLS — synthetic rows against the REAL truth ──────────
+def ctl(name, row, want_fail, must_contain=None):
+    fs, _ = check_rows([row])
+    hit = any((must_contain or "") in f for f in fs) if want_fail else not fs
+    if hit:
+        notes.append(f"4c: control {name} " + ("fired" if want_fail else "stayed quiet"))
+    else:
+        fails.append(f"4c: CONTROL {name} DID NOT " + ("FIRE" if want_fail else "STAY QUIET")
+                     + f" — {fs[:2]}")
+
+if truth.get("DON", {}).get("names"):
+    ctl("a (stale dir)", "| x | current generation **donovan-m3** = `build/don_m3` | - |", True, "names build/don_m3")
+    ctl("b (stale fingerprint)", f"| x | **CURRENT `deadbeef`** (donovan-m22, `build/{truth['DON']['dir']}`) | - |", True, "fingerprint deadbeef")
+    ctl("c (history is not a target)",
+        "| x | ~~current generation **donovan-m3** = `build/don_m3`~~ *(this cell read "
+        "\"current twin `build/don_m3`\")* — prior donovan-m3 `build/don_m3` | - |", False)
+    ctl("d (UNREGISTERED but registered)",
+        f"| x | **UNREGISTERED** — `build/{truth['DON']['dir']}` expectation sets NOT yet frozen | - |",
+        True, "UNREGISTERED")
+if truth.get("HUI", {}).get("names") and "huitzil-m26" not in truth["HUI"]["names"]:
+    ctl("e (program-key alias: whole-set wins)",
+        f"| x | current generation **huitzil-m26** = `build/{truth['HUI']['dir']}` | - |",
+        True, "names huitzil-m26")
 
 for n in notes:
     print("  " + n)

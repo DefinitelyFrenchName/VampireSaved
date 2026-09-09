@@ -23,6 +23,18 @@ older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
   VERBATIM to `DECISIONS_HISTORY.md`** (grep there by topic; the §5
   retraction grep covers it).
 
+## Session 14z-145 — **THE OPEN-ITEMS LIST, IN THE MAINTAINER'S ORDER (1, 2, 4): the freeze-artifact check EXTENDED to
+## patch_index's registration cells and it caught FOUR freezes of rot on its first run — cells the 14z-144 close had
+## edited around; then `PRG:0x028D50`'s three names MEASURED.**
+
+| | |
+|---|---|
+| opened with | the opener read, ROM audit **76/76**, the skill `vampire-saved-port`; the M18 release sweep verified COMPLETE (`build/emu_release_m18/results.tsv` 165 rows, the one FAIL re-run to PASS in `build/emu_release_m18_prgwin/`), `main` == `origin/main` (NEXT_SESSION's "NOT pushed" was stale). The maintainer: *"let's tackle open items 1, 2 and 4, in that order"* |
+| **(1) patch_index's REGISTRATION CELLS, and what they said before the check existed** | `git log -S` dated the four track rows' "current generation … = `build/<dir>`" / "**CURRENT `<fp>`**" cells to the **14z-119 freeze** (`5672291c`): `don_m18` / `hui52` / `pyron36` / `m5_stock13` sat through 14z-130, 14z-132, 14z-143 AND 14z-144 — **four freezes stale, not the "twice" the opener counted** — while the 14z-144 close edited OTHER cells of the same rows (the pyron row, the Donovan defect note). Exactly [VSP-13]'s header case: a reader of that table on 2026-09-10 would have acted on donovan-m18 |
+| **the check** | `tests/test_freeze_artifacts_current.sh` section 4 (the third row of the same gate, per its own "add a row" rule). TRUTH = the runner's five placeholder defaults, `build_fingerprint.py` over each dir (program key AND whole-set key, ~0.06 s each), `registry.tsv` for the names — **whole-set matches WIN**, because huitzil's program key `08944a7e` has carried since huitzil-m26 and a program-key lookup would bless "huitzil-m26" today (control 4e). CLAIM = only text after the word "current", only the FIRST dir / freeze name / backticked fingerprint after it, cut at `;` / `prior` / the cell boundary, after stripping `~~…~~` and `*(…)*` (where the table quotes its own past wording). UNREGISTERED cells checked the other way round. **Ground-truthed on the real stale state: 14 failures, every one the right diagnosis; then PASS on the corrected table**; five must-fire controls incl. the negative one — a struck/parenthetical/`prior` mention of a stale dir must stay QUIET, the 14z-144 re-point-sweep trap |
+| **the cells, corrected** | each old "current" pushed into its row's prior chain, no dated pairing rewritten: donovan-m22 `66c69213` / `fae45621` 342 ops, huitzil-m29 `08944a7e` / `f6614e1e` 373, pyron-m23 `65bf5622` / `be25fde3` 312, stock `e86e1d04` donovan-m19-stock (MOVED 14z-130, carried `m5_stock14..17`). Doc checks 8/8 green, portable tier **68/0/0** |
+| **(2) `PRG:0x028D50` — THREE NAMES, ONE ADDRESS, TWO TABLES THAT OVERLAP BY CAPCOM'S OWN LAYOUT** | *(in progress — see the rows below as they land)* |
+
 ## Session 14z-144 — **THE MAINTAINER RULED THE DONOVAN/JEDAH CELL AND IT SHIPPED AS M18 — a 2-BYTE fix whose whole
 ## difficulty was SCOPE, not bytes. Then the M17 emulator tier ran green (158/1/0), the sweep's one red was the stale
 ## prg_window pair [VSP-178] warned about TWO FREEZES RUNNING, and a gate that "caught the change" turned out to have
@@ -327,6 +339,7 @@ what a triage is looking at, so those are where the thinking time goes.
 
 ## Decisions pending (human)
 
+- **~~EXTEND THE FREEZE-ARTIFACT CHECK TO `patch_index.md`'s REGISTRATION CELLS~~ DONE 14z-145** — section 4 of `tests/test_freeze_artifacts_current.sh`; ground-truthed on the REAL stale state, which was worse than this entry says: the four track rows' CURRENT cells had last moved at the 14z-119 freeze (`git log -S`), FOUR freezes stale, edited around by the 14z-144 close. Five controls incl. the history-is-not-a-target negative. STATE 14z-145. *(Original entry follows.)*
 - **EXTEND THE FREEZE-ARTIFACT CHECK TO `patch_index.md`'s REGISTRATION CELLS
   (added to the opener at the maintainer's word, 2026-09-09). Not started.**
   `tests/test_freeze_artifacts_current.sh` (14z-144) covers the two artifacts
