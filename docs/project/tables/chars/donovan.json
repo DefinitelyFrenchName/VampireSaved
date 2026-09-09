@@ -12,20 +12,20 @@
  },
  "inputs": {
   "bank_map.toml": "ece2b13bfbddaf6fea14e56baf65502945ba52dd",
-  "manifest": "56c41eb3de7000e797ef077a87508fa101555fdd",
+  "manifest": "71dcf014b7f27daec56247eecd7c8f8f77c41818",
   "overrides": "72b9812942192bf348508ddf7473cbb37b2d5275",
   "placements.json": "74b756174c2eac1a4e41919145114e2498d11082",
   "reconciliation.toml": "40528aeb863028d885f868f34368443c460b5ca2",
   "reconciliation_donovan.toml": "242368518282f41a728d879e0714380f621aaf49",
   "regions.json": "a819047aa0b2491e3bc5e72149608639854a813d",
-  "verify_data.bin": "f69d4e0ed6396dae7bc0a88e6ae0610e391a7e13"
+  "verify_data.bin": "1fbdfac35b7dc3cae8085867f9582007b12db5fe"
  },
  "overrides": [],
  "schema": 1,
  "sources": {
   "ours": {
    "kind": "built",
-   "set": "build/don_m21"
+   "set": "build/don_m22"
   },
   "vh": null,
   "vs2": {
