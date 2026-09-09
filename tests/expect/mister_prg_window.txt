@@ -2,18 +2,29 @@
 # the probe's own last per-frame report. Regenerate DELIBERATELY (--freeze):
 # a moved count on a deterministic simulation is a finding.
 # Re-frozen 14z-134 on merged-m16 (build/m3b_merged23) from the M16 release run's own
-# measurement (build/emu_release_m16/test_mister_prg_window.log): the first extension
-# address the 68k executes is the relocated OBJ walker's PLACEMENT (4be7c0 on
-# merged-m10 -> 4c13d0 here), which moves with the romset — cadence romset since.
+# measurement: the first extension address the 68k executes is the relocated OBJ
+# walker's PLACEMENT (4be7c0 on merged-m10 -> 4c13d0 there), which moves with the
+# romset — cadence romset since.
 # RE-FROZEN 14z-144 on merged-m17 (build/m3b_merged25) from the M17 sweep's own
-# measurement (build/emu_sweep_14z144/test_mister_prg_window.log), the same
-# maintainer-ruled option (b) as 14z-134. ONLY THE pos LINE MOVED (diff said 1c1);
-# neg is carried byte-identical. Three fields: cyc -192, rd_lo -121, and
-# max 4d3c1e -> 4d479e = EXACTLY +0xB80, the length of pyron.toml's ported
-# capture block (14z-143). first_addr 4c13d0 / first_frame 1119 / min 413c70 are
-# UNCHANGED, which is the confirmation: the walker sits below the 0xB80
-# insertion point at 0x4c16e0 and the read ceiling sits above it.
-# Every structural assertion in that run PASSED — the decode stayed gated (control
-# leg 0 reads above $400000) and the profile-ON leg completed 1,211,302.
-pos frame 2900 wide 1 cyc 97642538 cyc_hi_rd 1211302 cyc_hi_wr 10816 rd_hi 1211302 rd_lo 75764253 blocks 8 first_frame 1119 first_addr 4c13d0 min 413c70 max 4d479e
+# measurement; then AGAIN, SAME DAY, on merged-m18 (build/m3b_merged26) from the
+# M18 RELEASE sweep's own measurement (build/emu_release_m18/, option (b) both
+# times). TWICE IN ONE SESSION is the point: this pair follows the ROMSET, and
+# nothing in the freeze ritual asks which tracked artifacts do — see STATE
+# "Decisions pending", the [VSP-178] freeze-ritual check, on the open-items list
+# at the maintainer's word 2026-09-09.
+#
+# WHAT MOVED M17 -> M18, and it is NOT what moved M16 -> M17. `max` did NOT move
+# (4d479e both), because the M18 Donovan/Jedah fix changes a VALUE inside an
+# already-placed blob rather than moving a placement — where M17's Pyron port
+# appended 0xB80 and pushed the read ceiling up by exactly that. Only `cyc` and
+# `rd_lo` moved, and they moved BACK to their merged-m16 values exactly
+# (97642730 / 75764374). Two independent counters landing on prior values is not
+# chance. RECORDED AS MEASURED, NOT EXPLAINED ([VSP-116]). The candidate
+# mechanism, untested: object timing on this core is a function of GFX CONTENT
+# (jtcps1_obj_draw.v:137 skips a tile whose fetched word is all-ones) and the
+# only gfx delta across these three freezes is one character of the mark glyph,
+# 6 -> 7 -> 8; a sparse 7 differing from a dense 6 and 8 would produce this.
+# first_addr 4c13d0, first_frame 1119, min 413c70, blocks 8, cyc_hi_rd/wr and
+# rd_hi are all UNCHANGED, and every structural assertion PASSED in that run.
+pos frame 2900 wide 1 cyc 97642730 cyc_hi_rd 1211302 cyc_hi_wr 10816 rd_hi 1211302 rd_lo 75764374 blocks 8 first_frame 1119 first_addr 4c13d0 min 413c70 max 4d479e
 neg frame 2900 wide 0 cyc 97337938 cyc_hi_rd 4 cyc_hi_wr 10113 rd_hi 0 rd_lo 75503450 blocks 0 first_frame -1 first_addr 000000 min 7ffffe max 000000
