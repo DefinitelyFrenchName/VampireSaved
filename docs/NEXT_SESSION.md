@@ -43,6 +43,23 @@ if it is green the release run is COMPLETE.
   `tests/test_freeze_artifacts_current.sh`, ground-truthed on the three real
   historical stale states. Add a row when an artifact is tracked, derived from
   the build set, and not already covered by a ci_static staleness gate.
+- **EXTEND the freeze-artifact check to `docs/project/patch_index.md`'s
+  registration cells** — a NAMED candidate, small, and it has evidence rather
+  than a hunch. That table has now gone stale in the same way TWICE: it says of
+  itself that a cell read "UNREGISTERED … expectation sets NOT yet frozen" from
+  14z-127 until 14z-132, and the Pyron capture row did exactly the same from
+  14z-143 until 14z-144, when the close-ritual audit caught it. The Donovan WIDE
+  cell was worse — it still read "KNOWN OPEN DEFECT ON THIS TRACK" hours after
+  the defect was fixed, frozen, released and pushed, which is [VSP-13]'s worst
+  case: a header asserting the opposite of reality is what the next session acts
+  on. **It fits the discriminator exactly**: the cells are derived from the build
+  set (fingerprints, build dirs, freeze names, registration status) and NO
+  ci_static gate checks them. **Shape:** parse the fingerprints and `build/<dir>`
+  tokens out of the table and require the ones marked CURRENT to be the current
+  freeze's — the registry and `run_all_emulator.sh`'s defaults already say what
+  that is. **Beware** the same trap the re-point sweep hit: a `<freeze-name>
+  (build/<dir>)` pairing and a `prior …` clause are HISTORY, never targets, so
+  the check must key on the CURRENT-marked cells only.
 - **The Phobos ±1 damage residue** — 5 of 54 cells, WITHIN TOLERANCE, a
   KNOWLEDGE item. Cheap first step: is `0x0A` (Sasquatch) a cross-generation
   data difference rather than ours?

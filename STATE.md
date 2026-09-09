@@ -327,6 +327,31 @@ what a triage is looking at, so those are where the thinking time goes.
 
 ## Decisions pending (human)
 
+- **EXTEND THE FREEZE-ARTIFACT CHECK TO `patch_index.md`'s REGISTRATION CELLS
+  (added to the opener at the maintainer's word, 2026-09-09). Not started.**
+  `tests/test_freeze_artifacts_current.sh` (14z-144) covers the two artifacts
+  that rotted; this is the next named member of the same class, and it has
+  MEASURED evidence rather than a hunch — the table has gone stale the same way
+  TWICE, and says so about itself:
+    * a registration cell read "UNREGISTERED … expectation sets NOT yet frozen"
+      from 14z-127 until 14z-132 (the table's own parenthetical records it)
+    * the pyron capture row did exactly that from 14z-143 until 14z-144
+    * and the donovan WIDE cell carried "KNOWN OPEN DEFECT ON THIS TRACK" for
+      hours AFTER the defect was fixed, frozen, released and pushed — [VSP-13]'s
+      worst case, a header asserting the opposite of reality
+  **IT FITS THE DISCRIMINATOR:** the cells are derived from the build set
+  (fingerprints, build dirs, freeze names, registration status) and no
+  ci_static gate checks them, which is exactly why they rot while
+  pointer_flow/charmap/bases.tsv never have.
+  **SHAPE:** parse the fingerprints and `build/<dir>` tokens from the table and
+  require CURRENT-marked cells to name the current freeze — `registry.tsv` and
+  `run_all_emulator.sh`'s placeholder defaults already state what that is.
+  **THE TRAP TO AVOID, paid for in the 14z-144 re-point sweep:** a
+  `<freeze-name> (build/<dir>)` pairing and every `prior …` clause are HISTORY,
+  never targets. The check keys on CURRENT cells only, or it will demand the
+  falsification of dated records.
+  Cost: small, static, no gameplay surface, no build byte.
+
 - **~~THE EMULATOR RUNNER PARALLELISES BY BARRIER, NOT BY QUEUE~~ IMPLEMENTED
   14z-144 (maintainer: *"We need to implement according to both items to
   indeed carry forward"*).** `run_all_emulator.sh` now uses a FIFO token
