@@ -41,7 +41,7 @@ older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
 | **(5) THE M18 FREEZE** | donovan-m22 / huitzil-m29 / pyron-m23 / merged-m18, mark **M18**. Four tags at `501cb618`, four whole-set-keyed registry rows, expectation sets CARRIED then frozen, `audit_legacy_pairings` PASS on merged26, release packaged for three platforms with roundtrip PASS on all four sections, MiSTer catalogue re-pointed (fork `ee1d6227` pushed FIRST, then the pin; series 0034; twin gate PASS). Static **142/0/0 GREEN strict** |
 | **(6) THE M18 RELEASE RUN** | `--scope all --lane all --cadence all --strict`, **165 gates, 6h37m: 163 PASS / 1 SKIP / 1 FAIL**, `ok: no tracked file changed during the run`. All NINE MiSTer gates ran — the five bitstream-cadence ones a freeze skips and only a release pays (`wide_inert` the FPGA superset invariant, both dual-emulator oracles, `obj_oracle`, `qsound_ext`) are GREEN. The SKIP is the standing approved `audit_mask_window_ff42a2`, and its reasoning holds for M18 specifically: it attributes a select-palette ROW move, and M18 moved no palette row (two program bytes + the mark's group-C glyph TILES) |
 | **the one red, and it was the same pair AGAIN** | `test_mister_prg_window`, re-frozen on merged-m17 THIS MORNING and stale again by the evening's freeze. Re-frozen on merged-m18 from the release run's own measured line (option (b) both times) and re-run under the runner: **PASS 1/0/0 GREEN**. **`max` did NOT move this time** (`4d479e` both) — the M18 fix changes a VALUE inside an already-placed blob where M17's Pyron port appended `0xB80` and pushed the ceiling by exactly that. Only `cyc` and `rd_lo` moved, and they moved BACK to their merged-m16 values EXACTLY (97642730 / 75764374). Recorded as MEASURED, NOT EXPLAINED ([VSP-116]); candidate mechanism, untested: object timing on this core is a function of GFX CONTENT (`jtcps1_obj_draw.v:137`) and the only gfx delta across M16/M17/M18 is one character of the mark glyph, `6` -> `7` -> `8` |
-| **CLOSE** | **M18 RELEASED.** 165-gate run 163/1/1 with the FAIL resolved to a runner-produced PASS on re-run; static 142/0/0 strict; ROM audit 76/76. The [VSP-178] class bit **FOUR times in this one session** and the fourth was PREDICTED IN ADVANCE and still not prevented — the freeze-ritual check is on the open-items list at the maintainer's word. Fifteen commits |
+| **CLOSE** | **M18 RELEASED.** 165-gate run 163/1/1 with the FAIL resolved to a runner-produced PASS on re-run; static **143/0/0 strict** (the new gate included); ROM audit 76/76. **BOTH CARRY-FORWARD ITEMS IMPLEMENTED THE SAME SESSION at the maintainer's word** — the freeze-artifact currency gate (ground-truthed on three real stale states) and the runner's PULL QUEUE (130/130 verdicts agree under a different pairing; 3.48x, 41 min saved per sweep, and the measurement corrected my own optimistic absolute). The [VSP-178] class bit **FOUR times in this one session** and the fourth was PREDICTED IN ADVANCE and still not prevented — the freeze-ritual check is on the open-items list at the maintainer's word. Fifteen commits |
 
 ## Session 14z-143 — **THE MAINTAINER'S OPEN-ITEMS LIST OPENS AND ITS FIRST ITEM SHIPS: PYRON'S CAPTURE ROW 0x11 IS
 ## PORTED AND FROZEN AS M17 — 9-of-9 hold-offset agreement with native where 14z-131 measured 0 of 15, confirmed by the
@@ -348,6 +348,24 @@ what a triage is looking at, so those are where the thinking time goes.
 
 ## Decisions pending (human)
 
+- **~~THE EMULATOR RUNNER PARALLELISES BY BARRIER, NOT BY QUEUE~~ IMPLEMENTED
+  14z-144 (maintainer: *"We need to implement according to both items to
+  indeed carry forward"*).** `run_all_emulator.sh` now uses a FIFO token
+  semaphore whose TOKEN IS THE SLOT NUMBER, so taking work and acquiring a
+  scratch clone are one atomic act; serial lanes open no FIFO, so `--jobs 1`
+  and the prereq lane are byte-for-byte the old path. **CO-RESIDENCY
+  ESTABLISHED, NOT ASSUMED:** the full 130-gate mame lane re-run under the
+  queue, every verdict compared against the same gate under the barrier —
+  **130/130 agree, 0 disagree**. **MEASURED 3.48x (1.90h -> 1.21h, 41 min
+  saved per sweep)** — the RATIO is exactly what the barrier model predicted,
+  the ABSOLUTE is not: the same 130 gates sum to 4.23h serial under the queue
+  against 3.13h under the barrier, because sustained four-way concurrency
+  makes each gate ~35% slower where the barrier left slots idle. **The model
+  assumed per-gate cost is independent of load and it is not** — the 0.90h I
+  quoted twice was optimistic; 41 min is the honest figure. Three defects in
+  my own code were found by reading it before running it (two `[ … ] && x=y`
+  set -e aborts, and the gate inheriting the token fd). *(Original entry
+  follows, unrewritten.)*
 - **THE EMULATOR RUNNER PARALLELISES BY BARRIER, NOT BY QUEUE — MEASURED, AND
   THE MAINTAINER PREFERS THE PULL MODEL (direction, 2026-09-09).** Their words
   on the barrier: *"that's to be expected since it's pushed batching system and
@@ -394,6 +412,16 @@ what a triage is looking at, so those are where the thinking time goes.
   ones and `--jobs` above 4 would pay on that lane too. Not started; harness
   only, no RTL.
 
+- **~~[VSP-178]'s CLASS HAS NOW BITTEN AT TWO CONSECUTIVE FREEZES~~ FOUR TIMES,
+  AND THE CHECK IS BUILT (14z-144).** `tests/test_freeze_artifacts_current.sh`
+  (ci_static, family pipeline): two rows chosen by a stated discriminator —
+  tracked, derived from the build set, and NOT already covered by a ci_static
+  gate that fails on staleness. GROUND-TRUTHED ON THE REAL HISTORICAL STALE
+  STATES: merged1 at 829 ops, merged1 at 831 ops with one value differing
+  (which is why it compares op CONTENT, not count), and the pair recording
+  merged-m16 — all three caught with accurate diagnoses. The build set is READ
+  from the runner's own placeholder defaults so the gate cannot disagree with
+  it about which build is current. *(Original entry follows, unrewritten.)*
 - **[VSP-178]'s CLASS HAS NOW BITTEN AT TWO CONSECUTIVE FREEZES, and the
   cadence column cannot fix it (14z-144). ON THE OPEN-ITEMS LIST
   (maintainer, 2026-09-09: *"let's add it to the todo list"*) — AGREED as a

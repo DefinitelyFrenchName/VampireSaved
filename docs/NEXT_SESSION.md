@@ -22,25 +22,21 @@ if it is green the release run is COMPLETE.
 
 ## START HERE — pick from the open items; none is blocked on a measurement
 
+*(The two carry-forward items are DONE — see the struck rows below.)*
+
 - **`PRG:0x028D50` carries THREE names** — `effect_map_5051` (`huitzil.toml`),
   `hit_class_props_ext_hi/_lo` (`donovan.toml`), and the guard-MASH RNG mask
   table (`atlas/ram.md:156`). Establishing which is right is a MEASUREMENT.
   Still the item that most needs a ruling.
-- **The runner's barrier vs a pull queue** — the maintainer's stated preference,
-  agreed in shape, NOT built. Measured: the mame lane would go **1.90h -> 0.90h**
-  at `--jobs 4`, and `--jobs 8` would actually pay. The design (a FIFO token
-  semaphore whose TOKEN IS THE CLONE NAME) and the two things to establish
-  first are in STATE "Decisions pending". Harness only; ~half a session.
-- **The [VSP-178] recurrence — ON THE LIST by the maintainer's word
-  (2026-09-09)**, agreed as a work item. Two consecutive freezes shipped a stale
-  romset-following artifact; the cadence column tells the RUNNER what to run and
-  says nothing to the FREEZE about what to refresh, so the 14z-134 remedy could
-  not have prevented the recurrence. The two known members are the two whose
-  gates sit OUTSIDE the static tier (`tests/expect/mister_prg_window.txt`, a ~1h
-  Verilator gate; `build/merged1/`, which rebuilds itself and shows only as
-  working-tree churn) — every artifact a ci_static gate already covers has never
-  rotted, and that is the discriminator the check would key on. Small, static,
-  no gameplay surface. STATE "Decisions pending" has the shape.
+- ~~**The runner's barrier vs a pull queue**~~ **DONE 14z-144.** A FIFO token
+  semaphore; co-residency established over 130/130 gates under a different
+  pairing; measured **3.48x, 1.90h -> 1.21h, 41 min saved per sweep**. Note the
+  absolute, not just the ratio: sustained four-way concurrency makes each gate
+  ~35% slower, so a model assuming constant per-gate cost over-promises.
+- ~~**The [VSP-178] recurrence**~~ **DONE 14z-144** —
+  `tests/test_freeze_artifacts_current.sh`, ground-truthed on the three real
+  historical stale states. Add a row when an artifact is tracked, derived from
+  the build set, and not already covered by a ci_static staleness gate.
 - **The Phobos ±1 damage residue** — 5 of 54 cells, WITHIN TOLERANCE, a
   KNOWLEDGE item. Cheap first step: is `0x0A` (Sasquatch) a cross-generation
   data difference rather than ours?
