@@ -304,10 +304,10 @@ run_one() {   # run_one <gate> <lane> <scope> <args> — writes one results row
     # queue — paid for once already in run_all_static.sh.
     if [ -n "$TIMEOUT_BIN" ]; then
         # shellcheck disable=SC2086
-        env $_env "$TIMEOUT_BIN" -k 30 "$_tmo" "tests/$_g.sh" $_pos </dev/null >> "$_log" 2>&1 && _st=0 || _st=$?
+        env $_env "$TIMEOUT_BIN" -k 30 "$_tmo" "tests/$_g.sh" $_pos </dev/null 8>&- >> "$_log" 2>&1 && _st=0 || _st=$?
     else
         # shellcheck disable=SC2086
-        env $_env "tests/$_g.sh" $_pos </dev/null >> "$_log" 2>&1 && _st=0 || _st=$?
+        env $_env "tests/$_g.sh" $_pos </dev/null 8>&- >> "$_log" 2>&1 && _st=0 || _st=$?
     fi
     _t1=$(date +%s); _dur=$((_t1 - _t0))
     # EXIT STATUS DECIDES FIRST. A gate that prints `SKIP:` AND exits non-zero
@@ -346,7 +346,17 @@ for _l in $LANES; do
     # measure the instruments, and an instrument measured under contention is
     # a different instrument.
     _jobs=$JOBS; [ "$_l" = prereq ] && _jobs=1
-    _running=0
+    # THE SLOT SEMAPHORE (14z-144). One FIFO per lane, pre-filled with $_jobs
+    # tokens whose VALUE is the slot number; fd 8 is both ends so a worker can
+    # give its token back without reopening. Serial lanes use no FIFO at all,
+    # which keeps --jobs 1 and the prereq lane byte-for-byte the old path.
+    SLOTFIFO=""
+    if [ "$_jobs" -gt 1 ]; then
+        SLOTFIFO="$LOGDIR/.slots_$_l"
+        rm -f "$SLOTFIFO"; mkfifo "$SLOTFIFO"
+        exec 8<>"$SLOTFIFO"
+        _s=0; while [ "$_s" -lt "$_jobs" ]; do printf '%s\n' "$_s" >&8; _s=$((_s + 1)); done
+    fi
     # THE LANE'S ROWS GO THROUGH A FILE, NOT A PIPE. A `... | while read` loop
     # runs in a SUBSHELL: the background gates it starts belong to the
     # subshell, so the main shell's `wait` had nothing of its own to wait for
@@ -378,17 +388,56 @@ for _l in $LANES; do
             # gets `<base>-slotN`, provisioned at the pin by the driver on first
             # use (~a Verilator build). A gate's two legs may take `<scratch>`
             # and `<scratch>-b` (the gates' own MISTER_LEGS=parallel default).
+            # 14z-144: A PULL QUEUE, NOT A PUSH BATCH. Until now this was a
+            # BARRIER: `_running` counted up to $_jobs and then `wait` blocked
+            # for ALL of them, so every batch cost its SLOWEST member and up to
+            # N-1 slots idled. Measured on the 14z-144 M17 sweep, with the
+            # barrier model reproducing the observed wall-clock to two decimals
+            # (1.90 h predicted, 1.90 h actual): the mame lane ran 3.13 h of
+            # work in 1.90 h at --jobs 4 — 1.65x, where a queue gives 0.90 h
+            # (3.48x). At --jobs 8 it was 2.47x against a queue's 6.05x, so the
+            # extra cores were mostly wasted.
+            #
+            # WHY IT WAS A BARRIER, and it was never a trade-off anyone weighed:
+            # this script is #!/bin/sh, which on macOS is bash 3.2, where
+            # `wait -n` DOES NOT EXIST ("wait: -n: invalid option"). POSIX
+            # `wait` waits for every child. So "wake when any one slot frees"
+            # is not directly expressible — and the MiSTer slot->clone binding
+            # added at 14z-134 used `_running` as its index, which the barrier
+            # is what reset.
+            #
+            # THE MECHANISM: a FIFO used as a token semaphore, where THE TOKEN
+            # IS THE SLOT NUMBER. A worker BLOCKS reading a token, runs its
+            # gate, and writes the token back. That is the pull, and it also
+            # dissolves the positional clone binding rather than working around
+            # it: the slot a gate gets is the slot it took, so <base>-slotN
+            # follows the token. Token lines are single short writes, atomic
+            # under PIPE_BUF; the loop stays in the MAIN shell so the 14z-128
+            # orphaning scar does not reopen; results.tsv is already appended
+            # concurrently and --resume keys on gate NAME, so the row order
+            # going non-deterministic costs nothing.
+            _slot=""
+            if [ -n "$SLOTFIFO" ]; then
+                read -r _slot <&8                  # BLOCKS until a slot frees
+            fi
             _slot_env=""
             if [ "$_l" = mister ]; then
-                _scr="$JTSIM_BASE"; [ "$_running" -gt 0 ] && _scr="$JTSIM_BASE-slot$_running"
+                # `[ … ] && x=y` as a STANDALONE statement is a set -e abort
+                # when the test fails ([VSP-176]'s family). An `if` is not.
+                _scr="$JTSIM_BASE"
+                if [ -n "${_slot:-}" ] && [ "${_slot:-0}" != 0 ]; then
+                    _scr="$JTSIM_BASE-slot$_slot"
+                fi
                 _slot_env="JTSIM_SCRATCH=$_scr "
             fi
-            run_one "$g" "$lane" "$scope" "$_slot_env${args:--}" "${tmo:-}" &
-            _running=$((_running + 1))
-            if [ "$_running" -ge "$_jobs" ]; then wait; _running=0; fi
+            (
+                run_one "$g" "$lane" "$scope" "$_slot_env${args:--}" "${tmo:-}"
+                if [ -n "$SLOTFIFO" ]; then printf '%s\n' "${_slot:-0}" >&8; fi
+            ) &
         fi
     done < "$LOGDIR/.lane_$_l"
     wait                       # the lane is not finished until its gates are
+    if [ -n "$SLOTFIFO" ]; then exec 8>&-; rm -f "$SLOTFIFO"; SLOTFIFO=""; fi
     rm -f "$LOGDIR/.lane_$_l"
     # THE INSTRUMENT GATE. A red prereq means every later measurement is
     # measured with a moved instrument, so the run stops by default.

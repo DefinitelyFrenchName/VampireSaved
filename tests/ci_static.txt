@@ -196,3 +196,12 @@ test_bbh_fidelity
 # ci_static and not ci_portable: it reads the three decrypted reference views
 # (ROMDIR on a cache miss). ~2 s warm, ~35 s cold.
 test_checkdocs_rom
+
+# test_freeze_artifacts_current.sh — TRACKED ARTIFACTS THAT FOLLOW THE ROMSET
+# must have been refreshed at the current freeze (14z-144, [VSP-178]). The
+# class bit FOUR times on 2026-09-09, the fourth having been predicted in
+# advance that morning and still not prevented — because a cadence column tells
+# the RUNNER what to run and says nothing to the FREEZE about what to refresh.
+# ci_static and not ci_portable: it compares against the current merged build
+# dir. Scope discriminator and how to add a row are in its header.
+test_freeze_artifacts_current

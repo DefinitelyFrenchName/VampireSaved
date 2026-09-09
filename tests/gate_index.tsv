@@ -98,6 +98,7 @@ tests/test_beam_variants.sh	gfx
 tests/test_biased_list_inventory.sh	gfx
 tests/test_build_gate_status.sh	pipeline
 tests/test_build_identity_distinct.sh	pipeline
+tests/test_freeze_artifacts_current.sh	pipeline
 tests/test_build_ref_rot.sh	review-triage
 tests/test_builder_rom_audit.sh	review-triage
 tests/test_capture_kf_ownership.sh	pipeline
