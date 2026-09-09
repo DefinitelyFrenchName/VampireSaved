@@ -23,6 +23,24 @@ older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
   VERBATIM to `DECISIONS_HISTORY.md`** (grep there by topic; the §5
   retraction grep covers it).
 
+## Session 14z-144 — **THE MAINTAINER RULED THE DONOVAN/JEDAH CELL AND IT SHIPPED AS M18 — a 2-BYTE fix whose whole
+## difficulty was SCOPE, not bytes. Then the M17 emulator tier ran green (158/1/0), the sweep's one red was the stale
+## prg_window pair [VSP-178] warned about TWO FREEZES RUNNING, and a gate that "caught the change" turned out to have
+## the DEFECT ITSELF written into its expectation. Four of my own mistakes are in here, all caught by instruments.**
+
+| | |
+|---|---|
+| opened with | the opener read (CLAUDE.md, STATE, HANDOFF, `docs/NEXT_SESSION.md`), ROM audit **76/76**, the skill `vampire-saved-port`. The maintainer asked for the M17 emulator sweep, then ruled the Donovan/Jedah fix and the release |
+| **(1) THE M17 SWEEP — the question the session opened with, answered** | `--scope all --lane all --freeze --strict`, **160 gates, 4h17m: 158 PASS / 1 SKIP / 1 FAIL.** Nothing whose subject is the shipped artifact failed. The SKIP is the standing approved `audit_mask_window_ff42a2`. Lane wall-clocks measured for the first time at `--jobs 4`: prereq 0.55h (serial by design), fbneo 0.20h, mame **1.90h**, mister **1.64h** |
+| **the one red, and it was the expectation** | `test_mister_prg_window`: the pair was frozen on merged-m16 and [VSP-178] had made its cadence `romset` at 14z-134 SO THAT it would re-freeze every freeze — 14z-143 did not, so M17 shipped with it stale. **Predicted before the gate ran**, from a static read of the two builds' patch ops: `max 4d3c1e -> 4d479e` = **+0xB80 exactly**, the ported Pyron block's length, while `first_addr 4c13d0` held because the walker sits BELOW the insertion point. Every structural assertion passed. Re-frozen from the run's own measured line (option (b), the 14z-134 precedent), re-run under the runner: **PASS**. `build/merged1` was stale the same way (829 -> 831 ops) |
+| **(2) THE FIX, and the prediction made BEFORE the build** | `row_hex()` has resolved a `_variant` twin for `new_hex` since 14z-62d; this teaches the same twin to the `data_port` `fixes` key. `donovan.toml` gains `fixes_variant = ""` — "place vs2's block VERBATIM". **Predicted: 2 program bytes on WIDE, stock byte-identical, hui/pyron program-identical. Measured: exactly that** — `vsw.41` differs in 2 bytes, logical word `0d88 -> 0b30` at blob offset `0x1E`; stock `e86e1d04` unchanged, which is the control that says this is a SCOPE change and not a disarm |
+| **the evidence, both legs run the same day** | `audit_capture_matrix` **640/640 with its KNOWN set EMPTY** on merged-m18, and merged-m17 **still FAILS** the `(0x13,0x0f)` cell. Suite GREEN 88/88 x 3 tracks x 2 passes, `.masked` counts equal to predecessors (53/52/52). Pointer flow **measured unchanged** — not re-frozen, because a changed byte inside a placed blob introduces no new address |
+| **(3) THE GATE WHOSE EXPECTATION WAS THE BUG** | `test_capture_kf_ownership` went red — and its section 3 asserted the 14z-64 fix rides row `0x13` on EVERY track, which IS the unconditional application that caused the defect. Rewritten as a TWO-SIDED, track-dependent invariant (`0x0d88` base slot, `0x0b30` variant) that asserts the tracks DISAGREE, so a build losing the gating reports CONTROL DEAD. **Its must-fire control was vacuous** — it wrote a value then asserted the value was not something else, never running the predicate; replaced by two that perturb a real image and evaluate the real comparison. Ground-truthed BOTH ways: PASS on M18, FAIL on the pre-fix M17 pair with the correct diagnosis |
+| **(4) THE RE-POINT SWEEP, and what it taught** | 126 files + the harness repo. **Build references exist in FOUR forms** and my first pass matched one: `${VAR:-…}`, positional `${1:-…}`, bare `$REPO/build/…`, and a **python literal list** inside an embedded script — the last is why `test_pcrel_escapes` reported "69 NEW escapes". A coupling was caught by its own control (`test_region_overlap_control`'s sed pattern must match the live `CUR_BUILDS`). `pcrel_escapes.toml`'s merged `build`/`extract` keys had sat at 14z-119 values through three freezes |
+| **MY OWN MISTAKES, all four caught by instruments not by me** | (a) I ran `audit_capture_matrix` with `BUILD=` when its variable is `MERGED=`, so my first "FAIL" measured the pre-fix build — [VSP-107] exactly; (b) my sweep scoped `(verbatim; …)` suppression per FILE instead of per comment BLOCK, silencing ~40 replacements; (c) it tried to falsify three dated records into the self-contradictory "merged-m17 (build/m3b_merged26)" — never staged, reverted, and the 14z-130 trap precisely; (d) I wrote "the stage-4 image is likewise unchanged" into HANDOFF **before measuring it** ([VSP-116]), then rebuilt it: `108f7523`, matching |
+| **(5) THE M18 FREEZE** | donovan-m22 / huitzil-m29 / pyron-m23 / merged-m18, mark **M18**. Four tags at `501cb618`, four whole-set-keyed registry rows, expectation sets CARRIED then frozen, `audit_legacy_pairings` PASS on merged26, release packaged for three platforms with roundtrip PASS on all four sections, MiSTer catalogue re-pointed (fork `ee1d6227` pushed FIRST, then the pin; series 0034; twin gate PASS). Static **142/0/0 GREEN strict** |
+| **CLOSE** | (pending: the 165-gate release sweep) |
+
 ## Session 14z-143 — **THE MAINTAINER'S OPEN-ITEMS LIST OPENS AND ITS FIRST ITEM SHIPS: PYRON'S CAPTURE ROW 0x11 IS
 ## PORTED AND FROZEN AS M17 — 9-of-9 hold-offset agreement with native where 14z-131 measured 0 of 15, confirmed by the
 ## maintainer on captures. THEN THE MAINTAINER ASKED FOR THE WHOLE MATRIX AND IT FOUND A SECOND DEFECT ON ITS FIRST RUN:
@@ -328,6 +346,82 @@ what a triage is looking at, so those are where the thinking time goes.
 
 ## Decisions pending (human)
 
+- **THE EMULATOR RUNNER PARALLELISES BY BARRIER, NOT BY QUEUE — MEASURED, AND
+  THE MAINTAINER PREFERS THE PULL MODEL (direction, 2026-09-09).** Their words
+  on the barrier: *"that's to be expected since it's pushed batching system and
+  not 4 separate queues acting as a pulled system (which would have my
+  preference by far)"*, and on the shared-queue shape: *"agreed, I just didn't
+  think it was on the table"*.
+  **MEASURED on the 14z-144 M17 sweep**, and the barrier model reproduces the
+  observed wall-clock to two decimals (1.90h predicted, 1.90h actual), which is
+  what makes the counterfactuals credible rather than arithmetic:
+
+  | mame lane, 130 gates, 3.13h serial | wall | speedup |
+  |---|---|---|
+  | barrier, registry order (today) | **1.90h** | 1.65x |
+  | barrier, longest-first (reorder only) | 1.00h | 3.13x |
+  | true work queue | **0.90h** | 3.48x |
+
+  At `--jobs 8` the gap widens: barrier 2.47x, queue 6.05x — so the 12-core
+  machine is largely wasted today.
+  **WHY IT IS A BARRIER, established by archaeology rather than guessed:** the
+  runner is `#!/bin/sh` = bash 3.2 on macOS, where `wait -n` does not exist
+  (checked: `invalid option`), so "wake when any slot frees" is not expressible;
+  and the slot->clone binding added at 14z-134 uses `_running` as the index,
+  which the barrier is what resets. It was never a trade-off weighed against a
+  pull model — it is what falls out of the shell. The one scar in that code is
+  14z-128's orphaned background jobs (the lane loop ran in a subshell so `wait`
+  had nothing of its own), which is why the rows go through a file.
+  **THE SHAPE, and it IS available in this shell:** a FIFO token semaphore
+  where THE TOKEN IS THE SCRATCH CLONE NAME, so pulling the next gate and
+  acquiring a free clone are one atomic act — which dissolves the positional
+  `_running` binding rather than working around it. Token writes are single
+  short lines (atomic under PIPE_BUF); the loop stays in the main shell so the
+  14z-128 scar does not reopen; `results.tsv` is already appended concurrently
+  and `--resume` keys on gate name, so non-deterministic row order costs
+  nothing. ONE shared queue with N pullers, not four static queues — static
+  per-worker queues reintroduce head-of-line blocking at finer grain.
+  **TWO THINGS TO ESTABLISH, not assume:** that gate co-residency is safe under
+  a DIFFERENT pairing (the suite's contract says self-contained; that is a claim
+  wanting a control, not a given), and that the two-leg gates' `-b` clones
+  compose with a token pool rather than fight it.
+  **ALSO MEASURED 14z-144, and it revises an earlier warning of mine:** the
+  MiSTer gates are NOT core-bound — `test_mister_gfxc_fetch` ran **-46.6%**
+  against its M16 figure while sharing the machine with three other sims, and
+  the others moved +3.4% / +3.7% / +0.2%. So M16's numbers are the CONTENDED
+  ones and `--jobs` above 4 would pay on that lane too. Not started; harness
+  only, no RTL.
+
+- **[VSP-178]'s CLASS HAS NOW BITTEN AT TWO CONSECUTIVE FREEZES, and the
+  cadence column cannot fix it (14z-144).** M17 shipped with
+  `tests/expect/mister_prg_window.txt` frozen on merged-m16 and `build/merged1`
+  two ops stale; both are tracked artifacts that FOLLOW THE ROMSET. 14z-134
+  responded to the first instance by changing that gate's cadence to `romset` —
+  which tells the RUNNER what to run, and says nothing to the FREEZE about what
+  to refresh. So the same thing happened again one freeze later.
+  **THE OBSERVATION:** every other romset-following artifact IS refreshed,
+  because a gate fails loudly in the static tier when it is not (pointer_flow,
+  charmap, the artifact manifests, bases.tsv). The two that rotted are the two
+  whose gates are NOT in the static tier — one is a ~1h Verilator gate, the
+  other rebuilds itself and only shows up as working-tree churn.
+  **SHAPE IF WANTED:** a freeze-ritual check that enumerates tracked artifacts
+  whose content is derived from the build set and asserts each was regenerated
+  since the current freeze's commit — cheap, static, and it would have caught
+  both. Not a new rule; a rule that runs. Not started, no gameplay surface.
+
+- **~~DONOVAN THROWING JEDAH USES DONOVAN'S OWN VICTIM KEYFRAMES ON EVERY WIDE
+  BUILD~~ RULED AND SHIPPED 14z-144 AS M18 (maintainer, 2026-09-09: option (a),
+  *"Do the Donovan throwing Jedah fix then finish the release"*). The entry stays
+  for the measurement trail. THE FIX: `donovan.toml`'s `throw_victim_keyframes`
+  gained `fixes_variant = ""` — the `_variant` twin `row_hex()` already defined
+  for `new_hex`, taught to the `data_port` fixes key — so the 14z-64 rewrite
+  applies on the BASE-SLOT track only. WIDE program delta EXACTLY TWO BYTES
+  (`0d88 -> 0b30` at blob offset `0x1E`); stock twin byte-identical, which is the
+  control that the base-slot track kept the fix. `audit_capture_matrix` 640/640
+  with its KNOWN set EMPTY on merged-m18 while merged-m17 still fails the cell.
+  `test_capture_kf_ownership` rewritten to the two-sided invariant and
+  ground-truthed both ways. Detail: patch_notes 14z-144, STATE 14z-144.
+  *(Original entry follows, unrewritten.)*
 - **DONOVAN THROWING JEDAH USES DONOVAN'S OWN VICTIM KEYFRAMES ON EVERY WIDE
   BUILD — found 14z-143 by the new full-matrix audit, PRE-EXISTING since
   14z-64, and the fix is a gameplay call.** Not a regression from the M17

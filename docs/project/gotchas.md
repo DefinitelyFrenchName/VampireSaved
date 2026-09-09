@@ -4313,3 +4313,63 @@ a comment. And when auditing an existing one, `grep` the manifest for
 comparison, on its first run — never a playtest and never a targeted gate,
 because a mis-scoped row is an OMISSION and omissions have no symptom to steer
 toward ([VSP-179]).
+
+## A re-point sweep: build references come in FOUR forms, and a `(verbatim)` block scopes to the COMMENT BLOCK (14z-144)
+
+**FOUR FORMS, and matching one of them looks like a finished sweep.** The M18
+re-point pass matched `${VAR:-build/<dir>}` and reported 83 replacements, which
+felt complete. It was not. The other three:
+
+  * `${1:-build/<dir>}` — POSITIONAL defaults; the variable name is a digit, so
+    an `[A-Z_]+` pattern skips them. NEXT_SESSION already carried this as a
+    known blind spot.
+  * bare `$REPO/build/<dir>/rompath` — no parameter expansion at all.
+  * **python literal lists inside embedded scripts** —
+    `BUILDS = ["hui55", "pyron40", "don_m21"]` in `tests/test_pcrel_escapes.sh`.
+
+The last one is the expensive one: re-keying that gate's TOML sections while
+its hardcoded list still named the old dirs made it measure the old builds
+against no frozen inventory and report **"69 NEW escapes"**. An alarming result
+that was entirely the sweep's own doing ([VSP-148]'s mirror).
+
+**AND THE SUPPRESSION SCOPE.** `(verbatim; …)` blocks must not be rewritten
+([VSP-165]). Scoping that suppression PER FILE — setting a flag on the first
+match and resetting only on a line that is exactly `#` — silences every
+replacement below the first archive block, because that reset almost never
+fires. Most gate headers carry HANDOFF's old gate-index note in such a block,
+so ~40 lines survived a pass that reported success. **The scope is ONE
+CONTIGUOUS COMMENT BLOCK: end it at the first non-comment line.**
+
+**Rule:** a sweep reports what it SKIPPED as well as what it changed, and the
+residue is re-grepped and shown empty. If the residue is not exactly the known
+backticked-prose citations, the pattern is wrong.
+
+## NEVER re-point a `<freeze-name> (build/<dir>)` pairing — it is a dated FACT (14z-144)
+
+A mechanical rename turned `merged-m17 (build/m3b_merged25)` into
+`merged-m17 (build/m3b_merged26)` in three frozen records — the prg_window
+pair's provenance header and two `pointer_flow` baselines. Those sentences are
+not references to "the current build"; they say WHICH BUILD a frozen number was
+measured on, and the rewrite makes them self-contradictory: merged-m17 IS
+m3b_merged25.
+
+This is the 14z-130 history-rewriting trap, hit again by a different route (that
+session had to restore 13 dated records). The files were caught before staging
+because `git status` still listed them, not because the sweep knew better.
+
+**Rule:** exclude `tests/expect*/` and `tests/expected/` from any mechanical
+re-point, and before committing, grep the swept set for
+`(donovan|huitzil|pyron|merged)-m[0-9]+ *\(build/` — a freeze name paired with a
+build dir in the same breath is history, never a target.
+
+## `build_fingerprint.py --sha-only` SHORT-CIRCUITS `--set-key` (14z-144)
+
+`--sha-only` prints the PROGRAM sha and returns before `--set-key` is read, so
+`--sha-only --set-key` silently yields the program key with no warning. Asking
+for the whole-set keys of five M18 builds that way returned five program keys —
+caught only because two of them were known to differ at M16.
+
+**Rule:** `--set-key` WITHOUT `--sha-only`. And a registry row keyed on a value
+that equals the program fingerprint is a bug until proven otherwise — the whole
+point of the whole-set key is to distinguish builds a gfx-only freeze leaves
+program-identical ([VSP-106]'s sibling).
