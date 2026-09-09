@@ -32,7 +32,13 @@ if it is green the release run is COMPLETE.
   semaphore; co-residency established over 130/130 gates under a different
   pairing; measured **3.48x, 1.90h -> 1.21h, 41 min saved per sweep**. Note the
   absolute, not just the ratio: sustained four-way concurrency makes each gate
-  ~35% slower, so a model assuming constant per-gate cost over-promises.
+  ~35% slower on THIS host, so a model assuming constant per-gate cost
+  over-promises. **That 35% is the MacBook's (8P+4E, 16 GB), not the queue's** —
+  on a wider host the penalty shrinks and the queue's advantage GROWS, and
+  `--jobs` above 4 starts paying. The number to RE-MEASURE on a new host is the
+  mame lane's serial sum at N-way: if it stays near 3.13h where this one
+  inflated to 4.23h, the contention was ours. Hosts on offer: the Ryzen 9 3900X
+  (12c/24t) and the coming 5700G / 64 GB; `test_mame_parity` gates any move.
 - ~~**The [VSP-178] recurrence**~~ **DONE 14z-144** —
   `tests/test_freeze_artifacts_current.sh`, ground-truthed on the three real
   historical stale states. Add a row when an artifact is tracked, derived from
@@ -64,6 +70,11 @@ then asserted the value was not something else, never running the predicate.
 
 ## FOUR TRAPS PAID FOR HERE — read before the next freeze or sweep
 
+0. **Never edit `tests/` or `tools/` while a tier runs.** The runner detected
+   this on 2026-09-09 and named the file, and the wrong conclusion was drawn
+   anyway — so it now offers BOTH causes, marks the affected failures
+   **SUSPECT** by name, and puts that in the SUMMARY. If a run says SUSPECT,
+   re-run on a quiet tree before treating anything as a finding.
 1. **Build references exist in FOUR forms**, and a sweep matching only
    `${VAR:-…}` misses three: positional `${1:-…}`, bare `$REPO/build/…`, and
    **python literal lists inside embedded scripts**. The last is why

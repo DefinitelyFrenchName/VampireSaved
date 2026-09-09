@@ -4373,3 +4373,71 @@ caught only because two of them were known to differ at M16.
 that equals the program fingerprint is a bug until proven otherwise — the whole
 point of the whole-set key is to distinguish builds a gfx-only freeze leaves
 program-identical ([VSP-106]'s sibling).
+
+## EDITING THE TREE WHILE A RUN READS IT — detection existed and was not enough (14z-144)
+
+On 2026-09-09 the static tier came back with two failures, `test_emulator_runner`
+and `test_bbh_fidelity`. Both were VOID: `tests/run_all_emulator.sh` was being
+edited while the run read it. Both pass on a quiet tree.
+
+**The runner had already detected it.** Its working-tree check fired and printed
+the exact file:
+
+    DIRTIED by the run — these gates write into TRACKED paths
+    instead of a temp dir; restore with 'git checkout --' on them:
+        >  M tests/run_all_emulator.sh
+
+**So detection was never the gap. THREE other things were, and all three are now
+fixed** rather than left as something to remember:
+
+  1. **The message ASSERTED A CAUSE, and the wrong one.** "these gates write
+     into TRACKED paths" tells the reader a GATE dirtied the tree. It never
+     offered the other cause — a human editing during the run — so even when
+     read it pointed away from the truth. It now states the fact and offers
+     BOTH causes, saying plainly that it cannot tell them apart.
+  2. **It did not ATTRIBUTE the change to the verdicts it invalidated.** The
+     runner now cross-references each FAILED gate against the changed files
+     (the gate's own script, or any changed path its script references) and
+     marks those verdicts **SUSPECT** by name — "these failures read a file
+     that changed during the run".
+  3. **It printed BELOW the verdict summary.** `failed:` is what a reader acts
+     on and the eye stops there. The SUSPECT line is now in the summary itself,
+     immediately after `failed:`.
+
+**Rule:** never edit `tests/` or `tools/` while a tier is running — and when a
+run reports SUSPECT, re-run on a quiet tree BEFORE treating anything as a
+finding. Ground truth: `tests/test_static_runner.sh` section 10, with a
+must-not-fire control so a clean run never cries suspect (a caveat that always
+fires is not read, which is how the original message failed).
+
+**The general lesson, and it is the same one [VSP-178] carries:** a rule that
+lives only in prose is obeyed until the moment it matters. Knowing about this
+trap did not prevent falling into it — in the same session in which it was
+written down. The fix is not a firmer rule, it is a mechanism that names the
+consequence at the moment of the mistake.
+
+## `[ … ] && x=y` AS A STANDALONE STATEMENT IS A `set -e` ABORT (14z-144)
+
+Under `set -e`, an `a && b` list used as a STATEMENT (not as a condition) takes
+the whole list's exit status — so when `a` is false the statement is non-zero
+and the shell exits. This is the sibling of [VSP-176]'s `${VAR:?}`-after-a-trap
+and it is easy to write while quoting the rule against it: three defects of this
+family went into the 14z-144 pull-queue change and were caught by READING the
+diff before running it, not by any test.
+
+    [ "$x" -gt 0 ] && y="$z"          # ABORTS the script when x is 0
+    if [ "$x" -gt 0 ]; then y="$z"; fi  # correct
+
+Two neighbours from the same review, both in the same change:
+
+  * **closing a file descriptor twice** — `exec 8>&-; exec 8<&-` on a single
+    `exec 8<>fifo` is a close of an already-closed fd, which under `set -e` can
+    abort. One close.
+  * **a child inheriting a control fd.** The pull queue's slot semaphore lives
+    on fd 8; a gate that inherited it could write a token and mint a slot that
+    does not exist. Gates now run with `8>&-`.
+
+**Rule:** in any `set -eu` script, `&&` belongs in an `if`, not at statement
+level; close a descriptor once; and close control descriptors for children.
+Read the diff for these three before running it — none of them is visible in a
+green test run, because the abort path is the one nothing exercises.

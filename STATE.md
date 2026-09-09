@@ -364,8 +364,25 @@ what a triage is looking at, so those are where the thinking time goes.
   assumed per-gate cost is independent of load and it is not** — the 0.90h I
   quoted twice was optimistic; 41 min is the honest figure. Three defects in
   my own code were found by reading it before running it (two `[ … ] && x=y`
-  set -e aborts, and the gate inheriting the token fd). *(Original entry
-  follows, unrewritten.)*
+  set -e aborts, and the gate inheriting the token fd).
+  **AND THE 35% IS A PROPERTY OF THIS HOST, NOT OF THE QUEUE (maintainer,
+  2026-09-09: *"on a machine with more cores/threads, the improvement may
+  improve because the price of parallel processing would be lessened"*).** The
+  measurement was taken on the MacBook — 8P+4E, 16 GB — at 4-way, where four
+  concurrent MAME runs contend for memory bandwidth and cache. On a wider host
+  the per-gate penalty shrinks and the queue's advantage GROWS toward the ideal
+  3.13h/N, and `--jobs` above 4 starts paying where today it mostly does not
+  (barrier 2.47x vs queue 6.05x at 8, both modelled on the OLD per-gate costs
+  and therefore both optimistic on this machine, but the RATIO between them is
+  the part that holds). **THE HOSTS ALREADY ON OFFER** (STATE "the Verilator
+  lane is serial for one reason"): the Windows Ryzen 9 3900X / 32 GB that built
+  the first bitstream (12c/24t) and the coming Linux Ryzen 7 5700G / 64 GB.
+  **SO THE NUMBER TO RE-MEASURE, NOT RE-DERIVE, when a wider host is set up:**
+  the mame lane's serial sum at N-way on that machine. If it stays near 3.13h
+  where this one inflated to 4.23h, the contention was ours and the queue is
+  worth substantially more than 41 min there. `test_mame_parity` is the
+  migration gate for any new host ([MFI-41]).
+  *(Original entry follows, unrewritten.)*
 - **THE EMULATOR RUNNER PARALLELISES BY BARRIER, NOT BY QUEUE — MEASURED, AND
   THE MAINTAINER PREFERS THE PULL MODEL (direction, 2026-09-09).** Their words
   on the barrier: *"that's to be expected since it's pushed batching system and

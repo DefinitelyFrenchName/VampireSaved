@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-319 entries (40 game / 91 platform / 188 project), counted from the buckets at generation.
+321 entries (40 game / 91 platform / 190 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 40 entries
 
@@ -159,7 +159,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - FBNeo `-hdump`'s specification buffer is 8,192 characters — entries past ~430 frames are DROPPED SILENTLY (paid: 14z-133b)
 - `run_replay_fbneo.sh` with a RELATIVE sandbox argument writes NO log — 0 frames, silently (paid: 14z-133b)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 188 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 190 entries
 
 - A gate that prints `SKIP:` AND exits NON-ZERO is a FAILURE, not a skip (paid: 14z-128)
 - `... | while read` puts the loop in a SUBSHELL, so the `wait` after it waits for nothing (paid: 14z-128)
@@ -349,3 +349,5 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A re-point sweep: build references come in FOUR forms, and a `(verbatim)` block scopes to the COMMENT BLOCK (14z-144)
 - NEVER re-point a `<freeze-name> (build/<dir>)` pairing — it is a dated FACT (14z-144)
 - `build_fingerprint.py --sha-only` SHORT-CIRCUITS `--set-key` (14z-144)
+- EDITING THE TREE WHILE A RUN READS IT — detection existed and was not enough (14z-144)
+- `[ … ] && x=y` AS A STANDALONE STATEMENT IS A `set -e` ABORT (14z-144)

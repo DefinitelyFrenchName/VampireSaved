@@ -234,6 +234,71 @@ printf '%s\n' "$(noteblock "$out2")" | grep -q '(none)' \
     && echo "  ok: with no NOTE anywhere the block says (none)" \
     || fail "the empty NOTE block printed rows: $(printf '%s\n' "$out2" | grep -A3 'NOTE-class')"
 
+# ── THE MID-RUN EDIT: A FAILURE UNDER A CHANGING FILE IS SUSPECT, NOT A FINDING
+# (14z-144). The runner has always DETECTED that tracked files changed during a
+# run — and on 2026-09-09 it detected exactly that, named
+# tests/run_all_emulator.sh, and the reader still drew the wrong conclusion,
+# because the message asserted the wrong CAUSE ("these gates write into tracked
+# paths") and never connected the changed file to the two gates that failed
+# BECAUSE of it. Detection without attribution is a message people skip.
+echo "== 10. a gate that FAILS while a file it reads changes is SUSPECT =="
+# The tree check only runs in a GIT CHECKOUT — the synthetic repo is not one
+# by default, so without this the section asserts against a message that can
+# never appear (paid for while writing it, 14z-144).
+printf 'original\n' > "$FR/shared_input.txt"
+mk g_reader 1 "FAIL: I read shared_input.txt and did not like it"
+( cd "$FR" \
+  && git init -q . >/dev/null 2>&1 \
+  && git -c user.email=t@t -c user.name=t add -A >/dev/null 2>&1 \
+  && git -c user.email=t@t -c user.name=t commit -qm fixture >/dev/null 2>&1 ) || true
+if ! ( cd "$FR" && git rev-parse --git-dir >/dev/null 2>&1 ); then
+    echo "  SKIP: could not git-init the synthetic repo — the tree check is"
+    echo "        a no-op outside a checkout, so this section cannot run"
+else
+# change it AFTER the snapshot is taken: run the runner with a gate that
+# mutates the tracked file, which is indistinguishable to the runner from a
+# human editing it — and that is the point, since it cannot tell them apart.
+# NOT via mk(): mk ends the stub with `exit $st`, so an APPENDED line is dead
+# code after the exit and the fixture silently does nothing (paid for while
+# writing this section — the assertions failed against a scenario that never
+# happened, which is the same shape as the defect being tested).
+{ echo "#!/bin/sh"
+  echo "echo 'PASS: and I edited a tracked file'"
+  echo 'echo changed > "$(dirname "$0")/../shared_input.txt"'
+  echo "exit 0"; } > "$FR/tests/g_editor.sh"
+chmod +x "$FR/tests/g_editor.sh"
+printf 'g_editor\ng_reader\n' > "$FR/tests/ci_portable.txt"
+o10="$(cd "$FR" && sh tests/run_all_static.sh --tier portable 2>&1)" || true
+if printf '%s' "$o10" | grep -q 'TRACKED FILES CHANGED DURING THE RUN'; then
+    echo "  ok: the tree change is reported as a FACT with both causes offered"
+else
+    fail "the reworded tree-change message did not appear"
+fi
+if printf '%s' "$o10" | grep -q 'a GATE wrote into a tracked path' \
+   && printf '%s' "$o10" | grep -q 'the TREE WAS EDITED while the run'; then
+    echo "  ok: BOTH causes are offered — the message no longer asserts one"
+else
+    fail "the message still asserts a single cause; the mid-run-edit cause is"
+    fail "      the one that cost a run on 2026-09-09"
+fi
+if printf '%s' "$o10" | grep -q 'SUSPECT'; then
+    echo "  ok: the failing gate's verdict is marked SUSPECT"
+else
+    fail "a gate failed while a tracked file changed and its verdict was"
+    fail "      presented as a finding — this is the 14z-144 defect"
+fi
+# THE MUST-NOT-FIRE CONTROL: a clean run must NOT cry suspect, or the caveat
+# becomes noise and gets skipped exactly like the message it replaces.
+printf 'g_pass\ng_fail\n' > "$FR/tests/ci_portable.txt"
+o11="$(cd "$FR" && sh tests/run_all_static.sh --tier portable 2>&1)" || true
+if printf '%s' "$o11" | grep -q 'SUSPECT'; then
+    fail "a run that changed NOTHING reported SUSPECT — the caveat would be"
+    fail "      noise, and a caveat that always fires is not read"
+else
+    echo "  ok: control — a failure on a QUIET tree is NOT marked suspect"
+fi
+fi
+
 echo
 [ "$rc" = 0 ] && echo "PASS: the runner's verdicts mean what they say." \
              || echo "FAIL: see above."

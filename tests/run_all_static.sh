@@ -103,6 +103,7 @@ failed=""; skipped=""
 # ignored, so the run reports it. Reported, not failed: the gates are correct,
 # their output location is not, and that is its own fix.
 tree_before=""
+TREE_SUSPECT=""
 if git rev-parse --git-dir >/dev/null 2>&1; then
     tree_before="$(git status --porcelain -- . 2>/dev/null | grep -v '^??' || true)"
 fi
@@ -255,12 +256,51 @@ else
         # reads as a mystery rather than a finding.
         printf '%s\n' "$tree_before" | awk 'NF' > "$WORK/tree_before.txt"
         printf '%s\n' "$tree_after"  | awk 'NF' > "$WORK/tree_after.txt"
-        echo "  DIRTIED by the run — these gates write into TRACKED paths"
-        echo "  instead of a temp dir; restore with 'git checkout --' on them:"
+        # THE MESSAGE USED TO ASSERT A CAUSE, and it was the wrong one
+        # (14z-144). "these gates write into TRACKED paths" assumes a GATE
+        # dirtied the tree. The other cause is a human EDITING the tree while
+        # the run reads it — which happened on 2026-09-09, produced two FAILs
+        # that were void rather than real, and cost a wasted run plus a
+        # misdiagnosis BECAUSE this block named the file and the reader still
+        # concluded the wrong thing. State the fact; offer both causes; and
+        # ATTRIBUTE it to the verdicts it may have invalidated.
+        echo "  TRACKED FILES CHANGED DURING THE RUN. Two causes, and this"
+        echo "  check cannot tell them apart — decide which before trusting"
+        echo "  any verdict below:"
+        echo "    (a) a GATE wrote into a tracked path instead of a temp dir"
+        echo "        -> restore with 'git checkout --' on it and fix the gate"
+        echo "    (b) the TREE WAS EDITED while the run was reading it"
+        echo "        -> every verdict here is suspect; re-run before acting"
         diff "$WORK/tree_before.txt" "$WORK/tree_after.txt" \
             | grep '^[<>]' | sed 's/^/      /' | head -12
         echo "      (before: $(wc -l < "$WORK/tree_before.txt" | tr -d ' ') entries," \
              "after: $(wc -l < "$WORK/tree_after.txt" | tr -d ' '))"
+        # ATTRIBUTION: a gate that FAILED while a file it reads was changing
+        # has a SUSPECT verdict, not a finding. Naming the pair is the whole
+        # difference between "two gates are red" and "two gates read a file I
+        # was editing".
+        diff "$WORK/tree_before.txt" "$WORK/tree_after.txt" \
+            | grep '^[<>]' | sed 's/^[<>] *//' | awk '{print $NF}' | sort -u \
+            > "$WORK/tree_changed.txt"
+        _susp=""
+        for _cg in $failed; do
+            _cs="tests/$_cg.sh"
+            while IFS= read -r _cf; do
+                [ -n "$_cf" ] || continue
+                if [ "$_cf" = "$_cs" ] || grep -qF "$_cf" "$_cs" 2>/dev/null; then
+                    _susp="$_susp $_cg($_cf)"
+                    break
+                fi
+            done < "$WORK/tree_changed.txt"
+        done
+        if [ -n "$_susp" ]; then
+            echo
+            echo "  >> SUSPECT VERDICTS — these FAILED gates read a file that"
+            echo "     changed during the run. Re-run them on a quiet tree"
+            echo "     BEFORE treating any of it as a finding:"
+            for _e in $_susp; do echo "       $_e"; done
+            TREE_SUSPECT="$_susp"
+        fi
     fi
 fi
 
@@ -296,6 +336,15 @@ printf 'PASS %-4s  SKIP %-4s  FAIL %-4s  MISSING %s\n' \
     "$n_pass" "$n_skip" "$n_fail" "$n_miss"
 [ -n "$skipped" ] && echo "skipped:$skipped"
 [ -n "$failed" ]  && echo "failed: $failed"
+# THE CAVEAT BELONGS IN THE SUMMARY, not only in a section above it (14z-144).
+# The failure list is what a reader acts on; on 2026-09-09 the tree-change
+# section printed the offending file and was skipped over, because the eye goes
+# to `failed:` and stops.
+if [ -n "${TREE_SUSPECT:-}" ]; then
+    echo "SUSPECT: tracked files changed DURING this run and these failures read"
+    echo "         them —$TREE_SUSPECT"
+    echo "         Re-run on a quiet tree before treating them as findings."
+fi
 
 rc=0
 [ "$n_fail" = 0 ] && [ "$n_miss" = 0 ] || rc=1
