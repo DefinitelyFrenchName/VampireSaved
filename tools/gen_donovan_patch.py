@@ -4578,7 +4578,21 @@ def main():
                     continue
                 ok = True
                 nfix = 0
-                for _fx in str(dp.get("fixes", "")).split(","):
+                # THE `_variant` TWIN (14z-144), resolved against the row's
+                # OWNER exactly as row_hex() does for new_hex. An in-blob fix
+                # can be RIGHT on the base-slot track and WRONG at a variant
+                # id: throw_victim_keyframes' 14z-64 mirror-victim fix rewrites
+                # victim entry [0x0F] to the DONOVAN-victim sub-block, correct
+                # while Donovan OCCUPIES slot 0x0F and wrong on WIDE, where
+                # 0x0F is JEDAH — restored, reachable, and an ordinary 2P
+                # matchup (found 14z-143 by audit_capture_matrix, ruled and
+                # fixed 14z-144). An EMPTY `fixes_variant` means "place the
+                # source block VERBATIM", which is what a restored legacy
+                # victim needs: vs2's own [0x0F] IS Jedah's real geometry.
+                _fixes = dp.get("fixes", "")
+                if _ovar and "fixes_variant" in dp:
+                    _fixes = dp["fixes_variant"]
+                for _fx in str(_fixes).split(","):
                     if not _fx.strip():
                         continue
                     _off_s, _old_s, _new_s = _fx.strip().split(":")

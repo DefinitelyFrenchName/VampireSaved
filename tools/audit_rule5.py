@@ -140,7 +140,13 @@ KNOWN_PAIRS = {
         "table_len"
     },
     "data_port": {
-        "dst", "dst_end", "dst_old_head", "fixes", "hole", "len", "name",
+        "dst", "dst_end", "dst_old_head", "fixes",
+        # `fixes_variant` (14z-144): the `_variant` twin of `fixes`, resolved
+        # against the row's OWNER exactly as row_hex() resolves new_hex. Same
+        # CLASS as `fixes` — an in-blob byte correction, a fact about where a
+        # sub-block lives, not a tunable a player feels — so it classifies
+        # with it and not into GAMEPLAY_KEYS.
+        "fixes_variant", "hole", "len", "name",
         "note", "only_base_slot", "only_variant_slot", "orc",
         "slot_ptr_table", "slot_rows", "src", "stage"
     },

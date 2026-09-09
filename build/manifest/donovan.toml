@@ -835,7 +835,10 @@ hole = "wide_ext"
 # Donovan-victim block 0x0D88 (in the mirror flavor victim id 0x0F IS
 # Donovan).
 #
-# *** OPEN DEFECT ON THE WIDE TRACK — THIS ROW IS MIS-SCOPED (14z-143). ***
+# *** ~~OPEN DEFECT ON THE WIDE TRACK — THIS ROW IS MIS-SCOPED~~ FIXED
+# 14z-144 by `fixes_variant = ""` below (maintainer-ruled option (a),
+# 2026-09-09). The analysis that follows STANDS and is kept: it is why the
+# variant twin is empty. ***
 # ~~Base-slot track only by construction (on variant builds the fix is
 # inert for the host: his block stays vanilla; the placed tenant blob
 # carries the fix harmlessly — its [0x0F] entry is never a tenant victim
@@ -856,6 +859,17 @@ hole = "wide_ext"
 # maintainer's call ([VSP-10]). DO NOT "tidy" this row away: on the STOCK
 # track the fix is CORRECT and load-bearing.
 fixes = "0x1E:0b30:0d88"
+# THE FIX (14z-144, maintainer-ruled option (a)). `fixes_variant` is the
+# `_variant` twin row_hex() already defines for new_hex, taught to the
+# data_port fixes key: the generator uses it when the row's OWNER sits at a
+# variant id. EMPTY means "place vs2's block VERBATIM", so on every WIDE
+# track victim entry [0x0F] keeps vs2's own Jedah-victim sub-block — which
+# IS Jedah's real geometry, because audit_capture_matrix section 2 measures
+# vs2's legacy victim data byte-identical to vsavj's (16x16). The base-slot
+# track is UNTOUCHED and keeps the 14z-64 fix, where victim 0x0F genuinely
+# is Donovan. Lock: audit_capture_matrix.sh — remove the (0x13,0x0f) row
+# from its KNOWN set and the gate must go green on its own.
+fixes_variant = ""
 
 # ~~[[data_port.fix]] off=0x1E 0b30->0d88~~ NEVER APPLIED (14z-62c
 # discovery): the nested [[data_port.fix]] shape parses only on tomllib
@@ -2307,7 +2321,7 @@ march_retarget_mid = true
 # same-source-or-fail names any future collision). Screen position =
 # the empty bottom-right corner (measured on merged-m5 snapshots, 14z-105).
 # THE TEXT NAMES THE FREEZE GENERATION — change it at every freeze.
-version_text = "M17"
+version_text = "M18"
 version_font = "build/manifest/version_font.json"
 version_x = 324
 version_y = 202

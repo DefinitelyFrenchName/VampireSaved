@@ -99,7 +99,9 @@ def cell(buf, base, v, n):
 # audit_pyron_capture_block EXPECT_MATCH pattern: the gate records a defect
 # that is measured and unruled rather than going red forever, and REMOVING a
 # row here is what proves a fix landed.
-KNOWN = {
+KNOWN = set()   # EMPTY since 14z-144. `set()` not `{}`:
+                # a braced literal with no members is a DICT.
+# The retired rows, kept as the record of what this gate caught:
     # Donovan (0x13) throwing JEDAH (0x0F) uses the DONOVAN-victim sub-block,
     # not Jedah's. Cause, measured 14z-143: donovan.toml's `throw_victim_keyframes`
     # carries the 14z-64 mirror-victim `fixes = "0x1E:0b30:0d88"`, which rewrites
@@ -119,8 +121,16 @@ KNOWN = {
     # overlap 0 of union 19, ours reproducing the Donovan-victim magnitudes and
     # native Jedah's — the static read predicted the running game exactly, which
     # is the second such agreement and is what licenses this gate ([VSP-180]).
-    (0x13, 0x0f),
-}
+    # ~~(0x13, 0x0f)~~ **FIXED AND REMOVED 14z-144** (maintainer-ruled option
+    # (a), 2026-09-09): donovan.toml's row gained `fixes_variant = ""`, the
+    # `_variant` twin row_hex() already defined for new_hex, taught to the
+    # data_port fixes key — so the mirror-victim rewrite applies on the
+    # base-slot track ONLY and every WIDE blob keeps vs2's own [0x0F].
+    # Measured on the rebuild: the WIDE program delta is EXACTLY TWO BYTES,
+    # the logical word at blob offset 0x1E going 0d88 -> 0b30; the stock twin
+    # rebuilt BYTE-IDENTICAL (e86e1d04), which is the control that the
+    # base-slot track kept the fix. The analysis above is KEPT, not deleted:
+    # it is why the variant twin is empty ([VSP-13]).
 
 fails, notes = [], []
 
