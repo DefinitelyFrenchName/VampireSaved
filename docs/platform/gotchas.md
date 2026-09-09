@@ -2270,3 +2270,17 @@ general rule stands: every path a wrapper hands to something that `cd`s must
 be absolute at the point it is first read ([VSP-101]-era `$ROMDIR` lesson,
 14z-132; the same class as the relative `FBNEO_ROMPATH` note in the script).
 
+## A Lua space read through a MAME read-watchpoint range IS a watched read — `DUMPS` logs a hit at dump-frame+1 with the CPU's incidental PC (paid: 14z-145)
+
+`tests/lua/trace_writes.lua`'s `DUMPS` reads its bytes with `space:read_u8`, and
+with `wpset …,r` armed over the same range the debugger stops on that read
+exactly as it would on the 68k's own: one `frame N+1 PC <wherever the CPU
+was>` line. Measured on `tests/audit_guard_mask_reads.sh`: `DUMPS="2000:28d50-
+28d70"` produced a hit at frame 2001, PC `0x122C` (the main loop), A0 and D0
+arbitrary — which the first reducer reported as "another reader touches the
+table IN PLAY". The self-test's boot sweep produces the same shape at frame 1
+(PC `0x926`). Rule: with a read watch armed, take any `DUMPS` of the watched
+bytes INSIDE the window the reducer already discards (boot, before the pokes),
+and classify hits by the READER's PC before judging registers — a foreign PC's
+D0 is not an offset. (The watchpoint's reported PC is the POST-instruction one:
+`0x02761E` for the access at `0x02761A`.)

@@ -820,7 +820,14 @@ the victim".
   adds a weight per press (light 1 / medium 2 / heavy 3) and fires at >= 10 —
   a light-only mash cannot make it inside the window; vsavj adds 1 per press
   and below 8 rolls the RNG `0x14E8A` against the per-count mask table
-  `PRG:0x028D50` (count 3: 8/32, 4: 16/32, 5: 24/32, 6+: always). Anakaris
+  `PRG:0x028D50` (count 3: 8/32, 4: 16/32, 5: 24/32, 6+: always) — EIGHT
+  LONGWORDS indexed by count×4, the one reader `0x027616 lea $28d50(pc),a0 ;
+  move.l (a0,d0.w),d2 ; btst d0,d2`; **its longword 0 IS entries 0x50-0x53 of
+  the reaction byte map at `PRG:0x028D00`** (the two tables overlap by
+  Capcom's own layout; vs2 carries the identical bytes and no reader), which
+  is where the port's six map bytes land — inert, because the count is
+  pre-incremented and the index is 1..7 [M: `tests/audit_guard_mask_reads.sh`,
+  14z-145: read watch, ours == vanilla, offsets +4..+0x10 only]. Anakaris
   (id `0x06`) is skipped by both games. Push routine and lists are
   byte-identical twins (vsavj `PRG:0x027E2E` / `PRG:0x02871C`). Measured returns to a stand
   chain are the same on all three tenants — light 19-20 f, medium 23-24,
@@ -1917,7 +1924,9 @@ lightning, explosions):
    0x80 stride: +0x54 effect id, +0x56 sub-id, +0x30 owner link,
    +0x1C record chain) run a state machine whose entry stub maps
    id -> handler index via a BYTE MAP (vj DATA 0x28D00 / vs2
-   0x27FD8; identical through id 0x4A, vs2 adds ids 0x4E-0x53) and
+   0x27FD8; identical through id 0x4A, vs2 adds ids 0x4E-0x53 — on vsavj
+   entries 0x50-0x53 sit INSIDE the guard-mash mask table `0x28D50`, its
+   never-indexed longword 0; measured 14z-145, the advancing-guard section) and
    installs records via three per-char record-table entries (movea
    heads: vj 0x27EB4/BC/C4 reading 0xBCE7A/EFA/F7A rows — the
    bank_map anim_index family). BOTH games carry TWO copies of the

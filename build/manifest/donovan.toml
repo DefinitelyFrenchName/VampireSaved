@@ -1241,6 +1241,11 @@ thunk_hex = "0c2e00TT000a67064ef900015084326e0030137c0008003c303c010b4ef90001508
 # per-consumer extension lands — full map in STATE 14z-28). Only
 # classes 0x50-0x53 stay ported (future-proofing, currently
 # unreferenced by any attack).
+# 14z-145 — dst 0x28D50-0x28D53 is ALSO longword 0 of vsavj's LIVE guard-mash
+# RNG mask table (PRG:0x028D50, read by PRG:0x027616 at press count*4, count
+# 1..7 by construction — mask[0] never read, measured both legs by
+# tests/audit_guard_mask_reads.sh). Same bytes as huitzil.toml's
+# effect_map_5051/5253 (vs2's own), so the merged build carries ONE op.
 [[data_port]]
 stage = 6
 name = "hit_class_props_ext_hi"

@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 2977 |
-| named by a document or manifest only | 2029 |
-| named by both a document/manifest and code | 624 |
-| named by CODE ONLY (the gap list below) | 324 |
+| distinct program-space addresses named | 2985 |
+| named by a document or manifest only | 2027 |
+| named by both a document/manifest and code | 629 |
+| named by CODE ONLY (the gap list below) | 329 |
 | carried by atlas | 473 |
-| carried by engine_internals | 539 |
-| carried by other docs | 959 |
-| carried by manifests | 1784 |
-| carried by code | 948 |
+| carried by engine_internals | 540 |
+| carried by other docs | 961 |
+| carried by manifests | 1786 |
+| carried by code | 958 |
 
 ## Addresses
 
@@ -895,6 +895,9 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x027582` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2] |
 | `PRG:0x0275CE` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); tests/test_advancing_guard.sh |
 | `PRG:0x0275E4` | docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds) [vs2]; docs/game/engine_internals.md — Throw / physics-arc tables (14z-67, measured on the command grab) [vs2]; build/manifest/huitzil.toml — effect_map_5253 [vs2] |
+| `PRG:0x027616` | docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); build/manifest/donovan.toml — select_companion_resolve_s2; build/manifest/huitzil.toml — port_patch; tests/audit_guard_mask_reads.sh |
+| `PRG:0x02761A` | docs/platform/gotchas.md — A Lua space read through a MAME read-watchpoint range IS a watched read — 'DUMPS' logs a hit at dump-frame+1 with the CPU's incidental PC (paid: 14z-145); tests/audit_guard_mask_reads.sh |
+| `PRG:0x02761E` | docs/platform/gotchas.md — A Lua space read through a MAME read-watchpoint range IS a watched read — 'DUMPS' logs a hit at dump-frame+1 with the CPU's incidental PC (paid: 14z-145); tests/audit_guard_mask_reads.sh; tests/test_advancing_guard.sh |
 | `PRG:0x027694` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x027774` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x0277A2` | build/manifest/reconciliation_huitzil.toml — map |
@@ -937,7 +940,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x027FAA` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/project/patch_notes.md — 14z-143 — PYRON'S CAPTURE ROW '0x11' PORTED: he throws with his own geometry, not Demitri's; build/manifest/pyron.toml — capture_kf_jedah; build/manifest/reconciliation.toml — map; tests/audit_pyron_capture_block.sh |
 | `PRG:0x027FB2` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab) |
 | `PRG:0x027FCE` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab) |
-| `PRG:0x027FD8` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2]; docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/platform/gotchas.md — encrypted range (14z-68) [vs2]; docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail) [vs2]; +2 more |
+| `PRG:0x027FD8` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2]; docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/platform/gotchas.md — encrypted range (14z-68) [vs2]; docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail) [vs2]; +3 more |
 | `PRG:0x027FDA` | build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x027FEE` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab) |
 | `PRG:0x027FFE` | build/manifest/reconciliation.toml — map |
@@ -1001,14 +1004,14 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x028B7E` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x028C76` | build/manifest/pcrel_escapes.toml — don_m22; build/manifest/pcrel_escapes.toml — hui56; build/manifest/pcrel_escapes.toml — pyron41 |
 | `PRG:0x028C98` | build/manifest/pcrel_escapes.toml — don_m22; build/manifest/pcrel_escapes.toml — hui56; build/manifest/pcrel_escapes.toml — pyron41 |
-| `PRG:0x028D00` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured); docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/platform/gotchas.md — absolutizing a pc-relative table read on CPS-2 reads CIPHERTEXT; docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; +4 more |
+| `PRG:0x028D00` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured); docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/platform/gotchas.md — absolutizing a pc-relative table read on CPS-2 reads CIPHERTEXT; docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); +6 more |
 | `PRG:0x028D02` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x028D34` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x028D48` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); build/manifest/reconciliation.toml — map [vs2] |
-| `PRG:0x028D4E` | docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — hit_class_props_ext_lo; build/manifest/huitzil.toml — effect_map_4e4f; build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; +1 more |
-| `PRG:0x028D50` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/project/inferred_claims.md — G2/G3 — measurements feeding engine_internals; build/manifest/donovan.toml — hit_class_props_ext_hi; build/manifest/donovan.toml — hit_class_props_ext_lo; build/manifest/huitzil.toml — effect_map_5051; +4 more |
+| `PRG:0x028D4E` | docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — hit_class_props_ext_lo; build/manifest/huitzil.toml — effect_map_4e4f; build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; +2 more |
+| `PRG:0x028D50` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds); docs/project/inferred_claims.md — G2/G3 — measurements feeding engine_internals; build/manifest/donovan.toml — hit_class_props_ext_hi; build/manifest/donovan.toml — hit_class_props_ext_lo; +8 more |
 | `PRG:0x028D52` | build/manifest/huitzil.toml — effect_map_5253; build/manifest/shared_writes.toml — huitzil |
-| `PRG:0x028D53` | docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); tools/gen_donovan_patch.py |
+| `PRG:0x028D53` | docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); build/manifest/donovan.toml — select_companion_resolve_s2; tests/audit_guard_mask_reads.sh; tools/gen_donovan_patch.py |
 | `PRG:0x028D54` | build/manifest/donovan.toml — hit_class_props_ext_hi; tests/test_advancing_guard.sh |
 | `PRG:0x028DD8` | docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets; docs/game/atlas/character_tables.md — The loader (per-character struct fill); docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question); docs/project/doc_audit_14z118.md — 1.1 'docs/game/' — the game itself (surveyed 14z-118); docs/project/doc_audit_14z118.md — 2. Cross-document numbers to lock (candidates for the script); docs/project/living_docs_scope.md — 11.5 The seed set (~15, revised by the census); +2 more |
 | `PRG:0x028E42` | docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-99 — the window (#43(b) + #103 + #104 + #105): byte detail; build/manifest/reconciliation.toml — map |
@@ -2755,8 +2758,12 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x02249C` | tests/test_advancing_guard.sh |
 | `PRG:0x0224A2` | tests/test_advancing_guard.sh |
 | `PRG:0x0224A8` | tests/test_advancing_guard.sh |
+| `PRG:0x02392A` | tests/audit_guard_mask_reads.sh |
+| `PRG:0x024AF2` | tests/audit_guard_mask_reads.sh |
+| `PRG:0x024B1A` | tests/audit_guard_mask_reads.sh |
 | `PRG:0x025936` | tools/build_donovan.sh |
 | `PRG:0x025D80` | tools/build_donovan.sh |
+| `PRG:0x025F16` | tests/audit_guard_mask_reads.sh |
 | `PRG:0x0267BE` | tests/test_advancing_guard.sh |
 | `PRG:0x0267F0` | tests/test_advancing_guard.sh |
 | `PRG:0x0267F4` | tests/test_advancing_guard.sh |
@@ -2768,22 +2775,23 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x027090` | tests/test_advancing_guard.sh |
 | `PRG:0x027532` | tests/test_gfx_layout3.sh |
 | `PRG:0x0275D4` | tests/test_advancing_guard.sh |
-| `PRG:0x027606` | tests/test_advancing_guard.sh |
+| `PRG:0x027606` | tests/audit_guard_mask_reads.sh; tests/test_advancing_guard.sh |
 | `PRG:0x02760A` | tests/test_advancing_guard.sh |
 | `PRG:0x02760E` | tests/test_advancing_guard.sh |
 | `PRG:0x027612` | tests/test_advancing_guard.sh |
-| `PRG:0x02761E` | tests/test_advancing_guard.sh |
 | `PRG:0x027624` | tests/test_advancing_guard.sh |
 | `PRG:0x027648` | tests/test_advancing_guard.sh |
 | `PRG:0x02764E` | tests/test_advancing_guard.sh |
 | `PRG:0x027E3C` | tests/test_advancing_guard.sh |
 | `PRG:0x027F1A` | tests/audit_voice_borrow.sh |
+| `PRG:0x02802C` | tests/audit_guard_mask_reads.sh |
 | `PRG:0x02804E` | tests/test_capture_pose_sources.sh |
 | `PRG:0x028065` | tests/test_capture_pose_sources.sh |
 | `PRG:0x0282BA` | tools/audit_id_space.py |
 | `PRG:0x0282D8` | tests/test_checkdocs.sh; tools/checkdocs.py |
 | `PRG:0x028D40` | tools/audit_rule5.py |
 | `PRG:0x028D60` | tools/audit_rule5.py |
+| `PRG:0x028D6F` | tests/audit_guard_mask_reads.sh |
 | `PRG:0x028DDA` | tools/checkdocs_rom.py |
 | `PRG:0x028DDC` | tools/checkdocs_rom.py |
 | `PRG:0x028DDE` | tools/checkdocs_rom.py |

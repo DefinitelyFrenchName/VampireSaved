@@ -914,6 +914,14 @@ note = "companion-piece bank setter: effect page bank 1 -> WIDE bank 5 (native c
 # repointed by the bank map — these six bytes are the missing link.
 # Vanilla never emits ids >= 0x4B (dead zero entries by construction);
 # the masked legacy gates arbitrate.
+# 14z-145 — THE SAME ADDRESS IS ALSO A LIVE VANILLA TABLE: vsavj's guard-mash
+# RNG mask table starts at 0x28D50 (eight longwords, index = press count*4,
+# the one reader `lea $28d50(pc),a0 ; move.l (a0,d0.w),d2` at PRG:0x027616),
+# so map entries 0x50-0x53 ARE mask[0]. vs2 ships these exact bytes there
+# too. mask[0] is unreachable — the count is pre-incremented, index 1..7 —
+# MEASURED on ours and vanilla by tests/audit_guard_mask_reads.sh (read
+# watch: offsets 4..16 only). donovan.toml's hit_class_props_ext_hi/_lo
+# write the same six bytes under its own name; one op on a merged build.
 [[aux_poke]]
 name = "effect_map_4e4f"
 addr = 0x028D4E

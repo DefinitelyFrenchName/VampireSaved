@@ -158,6 +158,7 @@ test_wheel_bank5	mame	release	romset	-	the select wheel serves from group C bank
 test_version_string	mame	release	romset	-	the in-game version mark, the naked-eye A/B tell
 audit_empty_tiles	mame	release	romset	%MERGED%	does the build DRAW any blank-tile sprite. ARGS REQUIRED: it takes <builddir> with no default, so a bare invocation dies on its usage line (FAIL 0s in the sweep, 14z-128). The merged build is the subject; its DEFAULT replays are the Huitzil DF / fx / grenade surfaces with the pokes forcing 0x10. [VSP-161] still stands for a NEW effect — the defaults never fire it and would pass vacuously, so a new effect is checked by passing ITS OWN replay, not by this standing row. VERIFIED 14z-128 with the operand: PASS on all three surfaces — every group-C sprite resolves to real art.
 audit_clone_beam_lines	mame	release	romset	-	the #109 lock: DF clone-mode draws the beam-line sprites
+audit_guard_mask_reads	mame	release	romset	-	PRG:0x028D50 is TWO overlapping tables (the per-id byte map's entries 0x50-0x53 = the guard-mash mask table's longword 0); the port fills mask[0] and the check's pre-incremented count never indexes it — read watch, ours vs vanilla (14z-145)
 audit_effect_class_rows	mame	release	romset	-	the three deadness measurements the beam port rests on ([VSP-22])
 audit_grenade_ground_tiles	mame	release	romset	-	Huitzil's 214+LP ground explosion draws native vs2 art
 test_beam_anim_walk	mame	release	romset	-	does the build WALK the beam anim nodes; default builddir is a 14z-71 solo build
