@@ -46,6 +46,11 @@ pushed" of commits that were).
   jump is a hover that takes no normal — declared and asserted, not
   explained. And BI's startup column stays INCONSISTENT 17/18 (one move,
   spread +0..+1).
+- **The must-fire run-time contract (step two) — RULED in shape 2026-09-10, waits on
+  BBX's R10 for the line and env name.** Step one (`test_must_fire_census`) is in;
+  the ten header-only gates are the named debt. When R10 settles: executable
+  controls (`CONTROL=<name> gate` must FAIL), identity as the acceptance bar,
+  no fourth verdict. STATE "Decisions pending" has the four points.
 - Smaller: the deferred `audit_mask_window_ff42a2` deprecated-vs-case-specific
   ruling; `release/merged-m15` never packaged; #112 option (B) kept open; the
   living-docs generalisation (ruled, not scheduled).
