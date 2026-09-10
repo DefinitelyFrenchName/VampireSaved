@@ -3,6 +3,9 @@
 # (14z-123, the documentation rationalization pass). ci_portable: no ROM,
 # no build dir, no emulator, ~1 s.
 #
+# MUST-FIRE: perturbed-copy: new-carrier-address — a carrier gaining a program address must fail --check until the index is regenerated (mode: a copy of the real carriers with one address added to the atlas)
+# MUST-FIRE: perturbed-copy: hand-edited-index — a row hand-added to annotations.md must fail the cmp, or the index stops being generated
+#
 # WHAT IT HOLDS. `tools/gen_annotations.py --check` regenerates the address
 # -> label/comment stream from every live carrier (the atlas, engine_internals,
 # the other reference docs, build/manifest/*.toml, tools/ and tests/) and
@@ -39,18 +42,29 @@ cd "$REPO"
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+
+# THE EXECUTABLE FORM: under CONTROL=<name> the perturbation is applied to a
+# COPY OF THE REAL CARRIERS and the main check runs on that copy — it must FAIL.
+ROOT="$REPO"
+if [ -n "$VS_CTL" ]; then
+    mkdir -p "$W/mode/build"; cp -R docs tools tests "$W/mode/"; cp -R build/manifest "$W/mode/build/"
+    case "$VS_CTL" in
+    new-carrier-address) printf '\n## A synthetic section\n\nand `PRG:0x0FFFFE` too\n' >> "$W/mode/docs/game/atlas/ram.md" ;;
+    hand-edited-index)   printf '| `PRG:0x0FFFFE` | hand-written |\n' >> "$W/mode/docs/annotations.md" ;;
+    esac
+    ROOT="$W/mode"
+fi
 
 echo "== test_annotations_current: the index follows its carriers =="
-LOG="$(mktemp)"
-if python3 tools/gen_annotations.py --check >"$LOG" 2>&1; then
+LOG="$W/tree.log"
+if python3 tools/gen_annotations.py --root "$ROOT" --check >"$LOG" 2>&1; then
     ok "$(head -1 "$LOG")"
 else
     bad "gen_annotations.py --check FAILS (regenerate: python3 tools/gen_annotations.py):"
     sed 's/^/        /' "$LOG" | head -20
 fi
-rm -f "$LOG"
-
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 mkdir -p "$W/docs/game/atlas" "$W/build/manifest"
 printf '# doc_shape\n' > "$W/docs/doc_shape.tsv"
 printf '# atlas\n\n## A section\n\nthe routine at `PRG:0x012345` reads it\n' > "$W/docs/game/atlas/ram.md"
@@ -67,9 +81,9 @@ fi
 # b: a doc gaining an address fails --check, and regenerating clears it
 printf '\n## Another section\n\nand `PRG:0x023456` too\n' >> "$W/docs/game/atlas/ram.md"
 if python3 tools/gen_annotations.py --root "$W" --check >/dev/null 2>&1; then
-    bad "control b: a new address in a carrier did NOT fail --check"
+    vs_ctl_dead new-carrier-address "a new address in a carrier did NOT fail --check"; bad "control b"
 else
-    ok "control b: a new address in a carrier fails --check"
+    vs_ctl_fired new-carrier-address "a new address in a carrier fails --check"; ok "control b: a new address in a carrier fails --check"
 fi
 python3 tools/gen_annotations.py --root "$W" >/dev/null 2>&1
 if grep -q 'PRG:0x023456.*Another section' "$W/docs/annotations.md"; then
@@ -81,9 +95,9 @@ fi
 # c: a hand-edit to a current index fails the cmp
 printf '| `PRG:0x0FFFFE` | hand-written |\n' >> "$W/docs/annotations.md"
 if python3 tools/gen_annotations.py --root "$W" --check >/dev/null 2>&1; then
-    bad "control c: a hand-edited index passed --check"
+    vs_ctl_dead hand-edited-index "a hand-edited index passed --check"; bad "control c"
 else
-    ok "control c: a hand-edited index fails --check"
+    vs_ctl_fired hand-edited-index "a hand-edited index fails --check"; ok "control c: a hand-edited index fails --check"
 fi
 
 # d: a code-only address lands in the gap section, not the main table

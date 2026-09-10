@@ -200,3 +200,7 @@ test_rule5_census
 # SHRINK. Six must-fire controls on a copy (a new key, a new baked value,
 # an aux_poke outside every declared band, drift, growth refusal) plus the
 # no-fire that a probe_*.toml never reaches the census. ~6 s.
+# test_controls_contract.sh — the must-fire contract's READER (14z-147): the four R10
+# regexes, the leading comment block, declared-vs-fired -> FAIL, the CONTROL=<name>
+# mode and its REFUSED exit. ROM-free, ~1 s.
+test_controls_contract

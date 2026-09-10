@@ -5,6 +5,10 @@
 # an hour of simulation (the live end-to-end run is
 # tests/test_mister_sim_anchor.sh, emulator tier).
 #
+# MUST-FIRE: known-bad: byte-swapped-side — a dump set written in the wrong byte order must be rejected by the anchor predicate (mode: check 3 compares against it and must fail)
+# MUST-FIRE: known-bad: perturbed-field — one non-predicate field wrong at the anchor must be REPORTED as a mismatch (mode: check 3 compares against it and must fail)
+# MUST-FIRE: known-bad: unguarded-line — the harness patch with one added code line hoisted above the #ifdef must fail the guard checker (mode: check 6 reads that patch)
+#
 # WHAT IT LOCKS:
 #  1. The dump NAMING contract: wram/dump_<frame>_ff0000.bin is exactly what
 #     compare_fields.py's DUMP_RE consumes, and a 64 KB $FF0000 window covers
@@ -83,6 +87,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 T="$(mktemp -d)"; fail=0
 ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }
 cd "$REPO"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 
 python3 - "$T" <<'PY'
 import sys, pathlib
@@ -125,6 +130,11 @@ PY
 
 CF="python3 $REPO/tools/compare_fields.py"
 F="$REPO/tests/fields_m2a.tsv"
+# THE EXECUTABLE FORM: under CONTROL=<name> the known-bad side (or patch) is
+# what the POSITIVE check compares against — and this run must FAIL.
+SIDE_B="$T/b"
+vs_ctl_is byte-swapped-side && SIDE_B="$T/swap"
+vs_ctl_is perturbed-field   && SIDE_B="$T/bad"
 
 # 1 naming + coverage: the anchor is found in a 64 KB $FF0000 window
 A="$($CF "$T/a" --list-anchors --fields "$F" 2>/dev/null | tr '\n' ' ')"
@@ -132,19 +142,19 @@ A="$($CF "$T/a" --list-anchors --fields "$F" 2>/dev/null | tr '\n' ' ')"
                   || bad "1 anchors were [$A], expected [100 ]"
 
 # 3 anchor mode absorbs skew (7 frames here)
-if $CF "$T/a" "$T/b" --fields "$F" --follow 0,10 --label-a mame --label-b sim > "$T/o1" 2>&1
+if $CF "$T/a" "$SIDE_B" --fields "$F" --follow 0,10 --label-a mame --label-b sim > "$T/o1" 2>&1
 then ok "3 skewed sides agree at the anchor"; else bad "3 skewed sides disagreed:"; sed 's/^/      /' "$T/o1"; fi
 
 # 2 must-fire: a byte-swapped side is not 68k order, so the predicate dies
 if $CF "$T/a" "$T/swap" --fields "$F" --follow 0 > "$T/o2" 2>&1
-then bad "2 CONTROL DID NOT FIRE: byte-swapped side compared equal"
-else ok "2 control fired: byte-swapped side rejected ($(head -1 "$T/o2" | cut -c1-46))"; fi
+then vs_ctl_dead byte-swapped-side "byte-swapped side compared equal"; bad "2"
+else vs_ctl_fired byte-swapped-side "byte-swapped side rejected ($(head -1 "$T/o2" | cut -c1-46))"; ok "2 control fired"; fi
 
 # 4 must-fire: one perturbed field is reported
 if $CF "$T/a" "$T/bad" --fields "$F" --follow 0 > "$T/o3" 2>&1
-then bad "4 CONTROL DID NOT FIRE: perturbed timer compared equal"
-else grep -q "MISMATCH.*timer" "$T/o3" && ok "4 control fired: timer mismatch reported" \
-                                       || { bad "4 wrong failure:"; sed 's/^/      /' "$T/o3"; }; fi
+then vs_ctl_dead perturbed-field "perturbed timer compared equal"; bad "4"
+else grep -q "MISMATCH.*timer" "$T/o3" && { vs_ctl_fired perturbed-field "timer mismatch reported"; ok "4 control fired"; } \
+                                       || { vs_ctl_dead perturbed-field "wrong failure"; bad "4 wrong failure:"; sed 's/^/      /' "$T/o3"; }; fi
 
 # 5 the runner's rule-7 / scratch refusals
 out="$(ROMDIR="$T" "$REPO/tools/run_sim_jtcps2.sh" "$REPO/tests/replays/05_timeout_idle.rpl" \
@@ -216,17 +226,18 @@ for b in bad: print("      unguarded:", b)
 sys.exit(1 if bad else 0)
 GUARDPY
 PATCH="$REPO/emu/jtcores-patches/0002-jtframe-sim-wramdump.patch"
-if python3 "$T/guardcheck.py" "$PATCH"; then
+# the control: hoist one added line above the guard
+awk '{ if (!done && $0 ~ /^\+#ifdef _JTFRAME_SIM_WRAMDUMP$/) { print "+    int leak=1;"; done=1 } print }' \
+    "$PATCH" > "$T/leak.patch"
+CHECK_PATCH="$PATCH"; vs_ctl_is unguarded-line && CHECK_PATCH="$T/leak.patch"
+if python3 "$T/guardcheck.py" "$CHECK_PATCH"; then
     ok "6 every added code line is inside #ifdef _JTFRAME_SIM_WRAMDUMP"
 else
     bad "6 the harness patch adds code OUTSIDE the macro guard"
 fi
-# the control: hoist one added line above the guard
-awk '{ if (!done && $0 ~ /^\+#ifdef _JTFRAME_SIM_WRAMDUMP$/) { print "+    int leak=1;"; done=1 } print }' \
-    "$PATCH" > "$T/leak.patch"
 if python3 "$T/guardcheck.py" "$T/leak.patch" > "$T/o6" 2>&1
-then bad "6c CONTROL DID NOT FIRE: an unguarded line passed the checker"
-else ok "6c control fired: an unguarded added line is rejected"; fi
+then vs_ctl_dead unguarded-line "an unguarded line passed the checker"; bad "6c"
+else vs_ctl_fired unguarded-line "an unguarded added line is rejected"; ok "6c control fired"; fi
 
 # 7 the CPS-2 constants agree with the pinned RTL
 SRC="$REPO/emu/jtcores"

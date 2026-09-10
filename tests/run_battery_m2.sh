@@ -40,6 +40,8 @@
 #   5. test_m2a_stage4_xemu.sh   — MAME/FBNeo dual-emulator agreement
 #   6. test_m2a_flavor_selector.sh — Start-hold latch
 #
+# MUST-FIRE: none — the stage-6 dev-build chain asserts through the gates it wraps; its accounting is tested by tests/test_battery_accounting.sh
+#
 # Usage: ROMDIR=... tests/run_battery_m2.sh [outbase]   (default build/donovan6)
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -83,7 +85,9 @@ bat() {   # bat <gate.sh> [args...]
     _bat_name="$(basename "$1" .sh)"
     "$@" > "$_BAT_TMP/out" 2>&1 && _bat_st=0 || _bat_st=$?
     cat "$_BAT_TMP/out"
-    vs_classify "$_bat_st" "$_BAT_TMP/out"
+    # the 4th argument is the gate script: its MUST-FIRE declarations are
+    # read against the log (14z-147; tests/lib/controls.sh)
+    vs_classify "$_bat_st" "$_BAT_TMP/out" 90 "$1"
     case "$VS_VERDICT" in
     PASS) _bat_pass=$((_bat_pass + 1)) ;;
     SKIP) _bat_skip=$((_bat_skip + 1)); _bat_skipped="$_bat_skipped $_bat_name" ;;

@@ -4468,3 +4468,29 @@ an engine paradox; it was a join slip — the chain the rig entered is in the
 trace (`node_map`), and `tools/rehit_ring.py` now prints it on every EVENT
 line. Rule: a rig's measurement is joined to the chain the trace says P1
 entered, never to the chain the move NAME suggests.
+
+## A `#!/bin/sh` GATE THAT WRITES A BASHISM STUB CARRIES THE BASHISM — assemble the token from pieces (paid: 14z-147)
+
+`test_shell_portability.sh` gained a control whose known-bad input is a
+`#!/bin/sh` stub using `[[ ]]`, written by a `printf` in the gate itself. The
+gate's own scanner then flagged the GATE: the `[[` sits on a code line of a
+`#!/bin/sh` script, which is exactly the class it exists to catch, and the
+plain run went red on its first execution. Rule: a fixture that must contain
+a forbidden token is assembled at run time from pieces the scanner does not
+match (`printf '… %s -n "$1" %s …' '[[' ']]'`), never spelled out in the
+source. The same shape waits for any lint gate whose fixture carries its own
+trigger — the demand-after-trap scanner already skips its own file by name
+for the same reason.
+
+## THE MUST-FIRE RETROFIT'S TWO SHELL TRAPS — a `[ ] && f` as a loop's last statement under `set -e`, and a text edit that read a comment-stripped copy (paid: 14z-147)
+
+Two mechanical traps from wiring `# MUST-FIRE:` into twenty-seven gates:
+(1) `[ "$n" != 0 ] && exec_controls …` as the LAST command of a `case` branch
+that is the last command of a `for` loop makes the enclosing function return
+1 when the test is false, and a `set -e` runner exits the tier there — write
+it as an `if` ([VSP-176]'s cousin, the 14z-144 `[ … ] && x=y` abort);
+(2) editing a script from a `grep -v '^ *#'` READ of it: the anchor text
+handed to the editor lacked the comment lines between two code lines, every
+exact-match replacement missed, and the fix was to anchor on single lines or
+re-read the region verbatim. A read that filters is not the file.
+

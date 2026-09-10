@@ -3,6 +3,16 @@
 # and every construct outside it FAILS (14z-140, living-docs slice L4).
 # ci_portable: no ROM, no build dir, no emulator, ~3 s.
 #
+# MUST-FIRE: known-bad: h4-heading — an h4 heading must be rejected as outside the subset (mode: appended to a copy of one corpus file, which the corpus parse must then fail)
+# MUST-FIRE: known-bad: raw-html-div — raw HTML <div> must be rejected as outside the subset (mode: appended to a copy of one corpus file, which the corpus parse must then fail)
+# MUST-FIRE: known-bad: raw-html-b — raw HTML <b> must be rejected as outside the subset (mode: appended to a copy of one corpus file, which the corpus parse must then fail)
+# MUST-FIRE: known-bad: footnote — a footnote must be rejected as outside the subset (mode: appended to a copy of one corpus file, which the corpus parse must then fail)
+# MUST-FIRE: known-bad: image — an image must be rejected as outside the subset (mode: appended to a copy of one corpus file, which the corpus parse must then fail)
+# MUST-FIRE: known-bad: autolink — an autolink must be rejected as outside the subset (mode: appended to a copy of one corpus file, which the corpus parse must then fail)
+# MUST-FIRE: known-bad: task-list — a task list item must be rejected as outside the subset (mode: appended to a copy of one corpus file, which the corpus parse must then fail)
+# MUST-FIRE: known-bad: reference-link-def — a reference-link def must be rejected as outside the subset (mode: appended to a copy of one corpus file, which the corpus parse must then fail)
+# MUST-FIRE: known-bad: unclosed-fence — an unclosed fence must be rejected as outside the subset (mode: appended to a copy of one corpus file, which the corpus parse must then fail)
+#
 # WHAT IT HOLDS. `tools/md_subset.py` is a second implementation of markdown,
 # which is only safe if its subset is a CENSUS of what this corpus actually
 # writes rather than a guess. This gate asserts three things: the tool's own
@@ -42,6 +52,33 @@ fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 TOOL=tools/md_subset.py
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+construct() {  # construct <name> -> the known-bad construct, printf %b escapes
+    case "$1" in
+    h4-heading) printf '%s' '#### x\n' ;;
+    raw-html-div) printf '%s' 'a <div>x</div> b\n' ;;
+    raw-html-b) printf '%s' 'a <b>x</b> b\n' ;;
+    footnote) printf '%s' 'a[^1] b\n' ;;
+    image) printf '%s' '![alt](x.png)\n' ;;
+    autolink) printf '%s' 'see <https://x.example> ok\n' ;;
+    task-list) printf '%s' '- [ ] a\n' ;;
+    reference-link-def) printf '%s' '[x]: http://e.example\n' ;;
+    unclosed-fence) printf '%s' '```\nx\n' ;;
+    esac
+}
+expect() {  # expect <name> -> the substring the rejection must carry
+    case "$1" in
+    h4-heading) echo 'h4 heading' ;;
+    raw-html-div) echo 'raw HTML <div>' ;;
+    raw-html-b) echo 'raw HTML <b>' ;;
+    footnote) echo 'footnote' ;;
+    image) echo 'image' ;;
+    autolink) echo 'autolink' ;;
+    task-list) echo 'task list' ;;
+    reference-link-def) echo 'reference-link definition' ;;
+    unclosed-fence) echo 'unclosed fenced code block' ;;
+    esac
+}
 
 echo "== test_md_subset: the corpus parses inside the declared subset =="
 [ -f "$TOOL" ] || { echo "FAIL: $TOOL is absent"; exit 1; }
@@ -65,6 +102,14 @@ for line in Path("docs/doc_shape.tsv").read_text().splitlines():
 rows += [str(p) for p in sorted(Path(".claude/skills").glob("*/GUIDE.md"))]
 print("\n".join(r for r in rows if Path(r).is_file()))
 PY
+# THE EXECUTABLE FORM: under CONTROL=<name> the construct is appended to a
+# COPY of the first corpus file and that copy replaces it in the corpus parse —
+# which must FAIL.
+if [ -n "$VS_CTL" ]; then
+    first="$(head -1 "$W/paths")"; cp "$first" "$W/mode.md"
+    printf '\n%b' "$(construct "$VS_CTL")" >> "$W/mode.md"
+    { echo "$W/mode.md"; tail -n +2 "$W/paths"; } > "$W/paths.mode"; mv "$W/paths.mode" "$W/paths"
+fi
 N=$(wc -l < "$W/paths" | tr -d ' ')
 # shellcheck disable=SC2046
 if python3 "$TOOL" --no-selftest $(cat "$W/paths") > "$W/parse.log" 2>&1; then
@@ -89,25 +134,18 @@ RG="$(n_of table.ragged)"
 ok "ragged rows normalised and counted: ${RG:-0} (never fatal, rule 5)"
 
 # --- 3. MUST-FIRE: every construct outside the subset ------------------------
-must_fire() {  # must_fire <label> <file body> <expected substring>
-    printf '%b' "$2" > "$W/case.md"
+must_fire() {  # must_fire <name>
+    printf '%b' "$(construct "$1")" > "$W/case.md"
+    exp="$(expect "$1")"
     if python3 "$TOOL" --no-selftest "$W/case.md" > "$W/case.log" 2>&1; then
-        bad "$1: the tool ACCEPTED it — the check is not checking"
-    elif grep -q "$3" "$W/case.log"; then
-        ok "$1: fires ($3)"
+        vs_ctl_dead "$1" "the tool ACCEPTED it — the check is not checking"; bad "$1"
+    elif grep -q "$exp" "$W/case.log"; then
+        vs_ctl_fired "$1" "$exp"; ok "$1: fires ($exp)"
     else
-        bad "$1: failed for the wrong reason:"; sed 's/^/        /' "$W/case.log" | head -4
+        vs_ctl_dead "$1" "failed for the wrong reason"; bad "$1:"; sed 's/^/        /' "$W/case.log" | head -4
     fi
 }
-must_fire "an h4 heading"          '#### x\n'                    "h4 heading"
-must_fire "raw HTML <div>"         'a <div>x</div> b\n'          "raw HTML <div>"
-must_fire "raw HTML <b>"           'a <b>x</b> b\n'              "raw HTML <b>"
-must_fire "a footnote"             'a[^1] b\n'                   "footnote"
-must_fire "an image"               '![alt](x.png)\n'             "image"
-must_fire "an autolink"            'see <https://x.example> ok\n' "autolink"
-must_fire "a task list item"       '- [ ] a\n'                   "task list"
-must_fire "a reference-link def"   '[x]: http://e.example\n'     "reference-link definition"
-must_fire "an unclosed fence"      '```\nx\n'                    "unclosed fenced code block"
+for n in $(vs_ctl_declared "$0"); do must_fire "$n"; done
 
 # --- 4. MUST-NOT-FIRE: the six shapes the corpus writes ----------------------
 accepts() {  # accepts <label> <file body>

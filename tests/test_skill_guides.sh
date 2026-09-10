@@ -3,6 +3,10 @@
 # against SKILL.md and the docs they quote (14z-134). ci_portable: no ROM, no
 # build dir, no emulator, ~1 s.
 #
+# MUST-FIRE: perturbed-copy: rule-text-changed — a rule's text edited in SKILL.md must leave the generated guide STALE
+# MUST-FIRE: perturbed-copy: incident-changed — an incident paragraph edited in the doc must leave the guide STALE
+# MUST-FIRE: perturbed-copy: guide-hand-edited — a line hand-added to a GUIDE.md must fail --check, or the guide stops being generated
+#
 # WHAT IT HOLDS. `mame-fbneo-instruments` [MFI] and `mister-jtframe-core`
 # [MJC] are meant to be copied to other projects, so each ships the SMS shape:
 # SKILL.md (the rules) + GUIDE.md (the human rendition — each rule followed by
@@ -23,14 +27,8 @@ cd "$REPO"
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
-
-echo "== test_skill_guides: level-0 guides current =="
-if python3 tools/gen_skill_guide.py --check >/tmp/skill_guides.$$.log 2>&1; then
-    ok "gen_skill_guide.py --check PASS on the tree"; sed 's/^/        /' /tmp/skill_guides.$$.log
-else
-    bad "gen_skill_guide.py --check FAILS on the tree:"; sed 's/^/        /' /tmp/skill_guides.$$.log
-fi
-rm -f /tmp/skill_guides.$$.log
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 
 # the files the generator reads: the two skill dirs + every doc the checker
 # lists for MFI/MJC (derived from the tool, never hard-coded here)
@@ -47,32 +45,46 @@ for p in ("MFI", "MJC"):
 EOF
 )"
 mkcopy() { for f in $FILES; do [ -f "$f" ] || continue; mkdir -p "$1/$(dirname "$f")"; cp "$f" "$1/$f"; done; mkdir -p "$1/tools"; cp tools/checkskills.py tools/gen_skill_guide.py "$1/tools/"; }
-control() {  # control <label> <dir>
-    if python3 tools/gen_skill_guide.py --root "$2" --check >"$2/log" 2>&1; then
-        bad "$1: the perturbed copy PASSED — the check is not checking"
-    elif grep -q "STALE" "$2/log"; then
-        ok "$1: fires (STALE)"
-    else
-        bad "$1: failed for the wrong reason:"; sed 's/^/        /' "$2/log"
-    fi
-}
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
-
-mkcopy "$W/a"
-sed -i.bak 's/^- \[MFI-9\] \*\*Watchpoint LENGTH/- [MFI-9] **Watchpoint WIDTH/' "$W/a/.claude/skills/mame-fbneo-instruments/SKILL.md"
-grep -q 'Watchpoint WIDTH' "$W/a/.claude/skills/mame-fbneo-instruments/SKILL.md" || bad "control a: the rule was not edited"
-control "a rule's text changed in SKILL.md" "$W/a"
-
-mkcopy "$W/b"
-python3 - "$W/b/docs/platform/gotchas.md" <<'EOF'
+perturb() {  # perturb <name> <dir>
+    case "$1" in
+    rule-text-changed)
+        sed -i.bak 's/^- \[MFI-9\] \*\*Watchpoint LENGTH/- [MFI-9] **Watchpoint WIDTH/' "$2/.claude/skills/mame-fbneo-instruments/SKILL.md"
+        grep -q 'Watchpoint WIDTH' "$2/.claude/skills/mame-fbneo-instruments/SKILL.md" || bad "$1: the rule was not edited" ;;
+    incident-changed)
+        python3 - "$2/docs/platform/gotchas.md" <<'EOF'
 import sys, pathlib
 p = pathlib.Path(sys.argv[1]); t = p.read_text()
 i = t.index("**[MJC-2]**"); j = t.index("\n", i)
 p.write_text(t[:j] + " (a word added to the incident)" + t[j:])
 EOF
-control "an incident paragraph changed in the doc" "$W/b"
+        ;;
+    guide-hand-edited) printf '\nA line hand-added to the guide.\n' >> "$2/.claude/skills/mister-jtframe-core/GUIDE.md" ;;
+    *) echo "no such perturbation: $1"; exit 3 ;;
+    esac
+}
 
-mkcopy "$W/c"; printf '\nA line hand-added to the guide.\n' >> "$W/c/.claude/skills/mister-jtframe-core/GUIDE.md"
-control "the guide hand-edited" "$W/c"
+# THE EXECUTABLE FORM: under CONTROL=<name> the perturbed copy IS the tree
+# the main check reads, and this run must FAIL.
+ROOT="$REPO"
+if [ -n "$VS_CTL" ]; then mkcopy "$W/mode"; perturb "$VS_CTL" "$W/mode"; ROOT="$W/mode"; fi
+
+echo "== test_skill_guides: level-0 guides current =="
+if python3 tools/gen_skill_guide.py --root "$ROOT" --check >"$W/tree.log" 2>&1; then
+    ok "gen_skill_guide.py --check PASS on the tree"; sed 's/^/        /' "$W/tree.log"
+else
+    bad "gen_skill_guide.py --check FAILS on the tree:"; sed 's/^/        /' "$W/tree.log"
+fi
+
+control() {  # control <name>
+    d="$W/$1"; mkcopy "$d"; perturb "$1" "$d"
+    if python3 tools/gen_skill_guide.py --root "$d" --check >"$d/log" 2>&1; then
+        vs_ctl_dead "$1" "the perturbed copy PASSED — the check is not checking"; bad "$1"
+    elif grep -q "STALE" "$d/log"; then
+        vs_ctl_fired "$1" "STALE"; ok "$1: fires (STALE)"
+    else
+        vs_ctl_dead "$1" "failed for the wrong reason"; bad "$1:"; sed 's/^/        /' "$d/log"
+    fi
+}
+for n in $(vs_ctl_declared "$0"); do control "$n"; done
 
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

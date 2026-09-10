@@ -2,6 +2,9 @@
 # test_freeze_tag_coverage.sh — EVERY FROZEN BUILD IS GIT-TAGGED (14z-126b).
 # ci_portable: no ROM, no build dir, no emulator, ~1 s. Needs git tags.
 #
+# MUST-FIRE: perturbed-copy: untagged-row — a registry copy with a build row that has no freeze tag must fail section 1
+# MUST-FIRE: perturbed-copy: fingerprint-not-in-tag — a registry copy with one fingerprint perturbed must fail section 3 (the tag message cannot name it)
+#
 # WHAT IT HOLDS. `tests/expected/registry.tsv` states the invariant in its own
 # header: "Rows added only at freeze time... Every row also has an annotated
 # git tag freeze/<expectation-set> at the commit that froze it — the way back
@@ -56,6 +59,18 @@ REGISTRY="${REGISTRY:-tests/expected/registry.tsv}"
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
+. "$(dirname "$0")/lib/controls.sh"; vs_ctl_mode "$0"
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+perturb() {  # perturb <name> <out> — a COPY of the registry
+    case "$1" in
+    untagged-row) cp "$REGISTRY" "$2"; printf 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeef\tdonovan-m99\tsynthetic control row\n' >> "$2" ;;
+    fingerprint-not-in-tag) awk -F'\t' 'BEGIN{OFS="\t"} $2=="donovan-m18"{$1="0123456789abcdef0123456789abcdef01234567"} {print}' "$REGISTRY" > "$2" ;;
+    esac
+}
+# THE EXECUTABLE FORM: under CONTROL=<name> the perturbed copy IS the registry
+# the sections read — and this run must FAIL. The control sub-runs below are
+# skipped under the mode (the mode is the control).
+if [ -n "$VS_CTL" ]; then perturb "$VS_CTL" "$W/mode.tsv"; REGISTRY="$W/mode.tsv"; FTC_CONTROLS=0; fi
 
 echo "== test_freeze_tag_coverage: every frozen build is git-tagged =="
 
@@ -113,25 +128,22 @@ fi
 # --- must-fire controls, on COPIES; no tag is ever created/moved/deleted ---
 # FTC_CONTROLS=0 marks the sub-runs so they do not recurse.
 if [ "${FTC_CONTROLS:-1}" = 1 ]; then
-    W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
-    cp "$REGISTRY" "$W/reg.tsv"
-    printf 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeef\tdonovan-m99\tsynthetic control row\n' >> "$W/reg.tsv"
-    if FTC_CONTROLS=0 REGISTRY="$W/reg.tsv" sh "$SELF" >"$W/a.log" 2>&1; then
-        bad "control a: an untagged build row PASSED — section 1 is not checking"
+    perturb untagged-row "$W/reg.tsv"
+    if CONTROL= FTC_CONTROLS=0 REGISTRY="$W/reg.tsv" sh "$SELF" >"$W/a.log" 2>&1; then
+        vs_ctl_dead untagged-row "an untagged build row PASSED — section 1 is not checking"; bad "control a"
     elif grep -q "NO FREEZE TAG for registry row 'donovan-m99'" "$W/a.log"; then
-        ok "control a: an untagged build row fires"
+        vs_ctl_fired untagged-row "an untagged build row fails section 1"; ok "control a: an untagged build row fires"
     else
-        bad "control a: fired for the wrong reason:"; sed 's/^/        /' "$W/a.log" | head -6
+        vs_ctl_dead untagged-row "fired for the wrong reason"; bad "control a:"; sed 's/^/        /' "$W/a.log" | head -6
     fi
     # a tagged build whose registry fingerprint its tag message cannot contain
-    awk -F'\t' 'BEGIN{OFS="\t"} $2=="donovan-m18"{$1="0123456789abcdef0123456789abcdef01234567"} {print}' \
-        "$REGISTRY" > "$W/reg_b.tsv"
-    if FTC_CONTROLS=0 REGISTRY="$W/reg_b.tsv" sh "$SELF" >"$W/b.log" 2>&1; then
-        bad "control b: a fingerprint the tag message lacks PASSED — section 3 is vacuous"
+    perturb fingerprint-not-in-tag "$W/reg_b.tsv"
+    if CONTROL= FTC_CONTROLS=0 REGISTRY="$W/reg_b.tsv" sh "$SELF" >"$W/b.log" 2>&1; then
+        vs_ctl_dead fingerprint-not-in-tag "a fingerprint the tag message lacks PASSED — section 3 is vacuous"; bad "control b"
     elif grep -q "TAG MESSAGE NAMES NO FINGERPRINT.*donovan-m18" "$W/b.log"; then
-        ok "control b: a tag whose message lacks its fingerprint fires"
+        vs_ctl_fired fingerprint-not-in-tag "a tag whose message lacks its fingerprint fails section 3"; ok "control b: fires"
     else
-        bad "control b: fired for the wrong reason:"; sed 's/^/        /' "$W/b.log" | head -6
+        vs_ctl_dead fingerprint-not-in-tag "fired for the wrong reason"; bad "control b:"; sed 's/^/        /' "$W/b.log" | head -6
     fi
 fi
 

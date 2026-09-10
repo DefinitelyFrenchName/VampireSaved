@@ -2,6 +2,9 @@
 # test_emulator_runner.sh — ground truth for tests/run_all_emulator.sh
 # (14z-128). ROM-free, ~5 s.
 #
+# MUST-FIRE: shadow-tool: export-removed — a copy of the runner without `export MAME_BIN` must leave the gate's MAME_BIN UNSET (mode: that copy is the runner every section drives; section 11 must fail)
+# MUST-FIRE: shadow-tool: reader-unplugged — a copy that hands the classifier no gate script must let a declared-but-unfired control read PASS (mode: section 14 must fail)
+#
 # WHY A GATE FOR THE RUNNER, again. CLAUDE.md §4: "Verdict logic is itself
 # tested." tests/test_static_runner.sh states the reason for its twin and it
 # holds here with more force, because this runner is the one the RELEASE
@@ -39,14 +42,28 @@ ok()   { echo "  ok: $*"; }
 
 RUNNER="$REPO/tests/run_all_emulator.sh"
 [ -x "$RUNNER" ] || { echo "FAIL: $RUNNER is not executable"; exit 1; }
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
 FR="$T/fakerepo"
 mkdir -p "$FR/tests/lib" "$FR/tools" "$FR/build/fake_merged/rompath" "$T/roms"
-ln -s "$RUNNER" "$FR/tests/run_all_emulator.sh"
+# THE SHADOW TOOLS (built from the real runner, never through the symlink):
+# the export line removed; the classifier's gate-script argument removed.
+# Under CONTROL=<name> the named copy is the runner every section drives.
+sed '/^export MAME_BIN$/d' "$RUNNER" > "$T/runner_noexport.sh"
+cmp -s "$RUNNER" "$T/runner_noexport.sh" && fail "could not remove the export line — it moved"
+sed 's|vs_classify "$_st" "$_log" 90 "tests/$_g.sh"|vs_classify "$_st" "$_log" 90|' "$RUNNER" > "$T/runner_unplugged.sh"
+cmp -s "$RUNNER" "$T/runner_unplugged.sh" && fail "could not unplug the reader — the vs_classify call moved"
+chmod +x "$T/runner_noexport.sh" "$T/runner_unplugged.sh"
+case "$VS_CTL" in
+export-removed)   ln -s "$T/runner_noexport.sh" "$FR/tests/run_all_emulator.sh" ;;
+reader-unplugged) ln -s "$T/runner_unplugged.sh" "$FR/tests/run_all_emulator.sh" ;;
+*)                ln -s "$RUNNER" "$FR/tests/run_all_emulator.sh" ;;
+esac
 # the runner sources THE ONE classifier relative to its repo (14z-139), so
 # the synthetic repo carries it too — the shipped lib, never a copy
 mkdir -p "$FR/tests/lib"; ln -s "$REPO/tests/lib/classify.sh" "$FR/tests/lib/classify.sh"
+ln -s "$REPO/tests/lib/controls.sh" "$FR/tests/lib/controls.sh"   # the controls reader beside it (14z-147)
 
 # Stub tools so the runner's preconditions execute for real.
 printf '#!/usr/bin/env python3\nimport sys\n' > "$FR/tools/audit_roms.py"
@@ -340,13 +357,13 @@ fi
 # MUST-FIRE CONTROL: a copy of the runner with the export removed must leave
 # the gate UNSET — so the assertion above depends on the export, not on the
 # fakerepo's environment.
-sed '/^export MAME_BIN$/d' "$FR/tests/run_all_emulator.sh" > "$FR/tests/run_all_emulator_noexport.sh"
+ln -s "$T/runner_noexport.sh" "$FR/tests/run_all_emulator_noexport.sh"
 (cd "$FR" && unset MAME_BIN && ROMDIR="$T/roms" MERGED=build/fake_merged MAME_WIDE_BIN="$T/fake_wide" \
     sh tests/run_all_emulator_noexport.sh --lane mame --only g_mamebin --log "$T/l11c" >/dev/null 2>&1) || true
 if grep -q "mame_bin=UNSET" "$T/l11c/g_mamebin.log" 2>/dev/null; then
-    ok "control fires: without the export line the gate reports UNSET"
+    vs_ctl_fired export-removed "without the export line the gate reports UNSET"; ok "control fires"
 else
-    fail "control did not fire: $(grep mame_bin "$T/l11c/g_mamebin.log" 2>/dev/null)"
+    vs_ctl_dead export-removed "$(grep mame_bin "$T/l11c/g_mamebin.log" 2>/dev/null)"; fail "control did not fire"
 fi
 rm -f "$FR/tests/run_all_emulator_noexport.sh" "$FR/tests/g_mamebin.sh"
 
@@ -400,6 +417,57 @@ sC="$(grep -h '^scratch=' "$T/l13c/g_slotB.log" 2>/dev/null)"
 [ "$sC" = "scratch=$T/scratch" ] && ok "--jobs 1: every gate keeps the caller's JTSIM_SCRATCH" \
                                    || fail "serial mister lane changed the scratch: '$sC'"
 rm -f "$FR/tests/g_long.sh" "$FR/tests/g_slotA.sh" "$FR/tests/g_slotB.sh"
+
+echo "14. the must-fire controls are READ every run, and EXECUTED under --controls (14z-147)"
+# READ: a gate whose header declares a control and whose log lacks the FIRED
+# line is FAIL; EXECUTED: `<gate>@<name>` rows, PASS when the mode reaches the
+# gate's own FAIL, FAIL when it LIES (exit 0), REFUSES or DIES.
+mkc() {  # mkc <name> <mode-body> <output lines...>
+    n="$1"; body="$2"; shift 2
+    { echo "#!/bin/sh"; echo "# $n.sh — a stub"
+      echo "# MUST-FIRE: perturbed-copy: flip — a flipped byte must fail"
+      echo ': "${MAME_BIN:-}"'
+      echo 'if [ "${CONTROL:-}" = flip ]; then'; echo "$body"; echo 'fi'
+      for l in "$@"; do echo "echo '$l'"; done; echo "exit 0"; } > "$FR/tests/$n.sh"
+    chmod +x "$FR/tests/$n.sh"
+}
+mkc g_cfired   'echo "FAIL: caught"; exit 1'          "PASS: fine" "CONTROL FIRED: flip — caught"
+mkc g_cmissing 'echo "FAIL: caught"; exit 1'          "PASS: fine"
+mkc g_clies    'echo "PASS: nothing changed"; exit 0' "PASS: fine" "CONTROL FIRED: flip — caught"
+mkc g_cref     'echo "REFUSED: CONTROL=flip is not a mode of this gate"; exit 3' "PASS: fine" "CONTROL FIRED: flip — caught"
+reg "$(row g_cfired mame release - '')" "$(row g_cmissing mame release - '')" \
+    "$(row g_clies mame release - '')" "$(row g_cref mame release - '')"
+run --lane mame --log "$T/l14a" >/dev/null 2>&1 || true
+v14a="$(awk -F'\t' '$1=="g_cfired"{print $4}' "$T/l14a/results.tsv")"; v14b="$(awk -F'\t' '$1=="g_cmissing"{print $4}' "$T/l14a/results.tsv")"
+[ "$v14a" = PASS ] && ok "a declared control that FIRED keeps its gate PASS" || fail "g_cfired classified '$v14a'"
+[ "$v14b" = FAIL ] && ok "a declared control with no FIRED line is FAIL (read on every run, no flag)" || fail "g_cmissing classified '$v14b', expected FAIL"
+n14="$(awk -F'\t' 'NR>1 && $1 ~ /@/' "$T/l14a/results.tsv" | wc -l | tr -d ' ')"
+[ "$n14" = 0 ] && ok "without --controls no control was executed (no @ rows)" || fail "$n14 control rows without --controls"
+out14="$(run --lane mame --controls --log "$T/l14b" || true)"
+x14() {  # x14 <row> <verdict> <detail substring>
+    v="$(awk -F'\t' -v r="$1" '$1==r{print $4}' "$T/l14b/results.tsv")"; d="$(awk -F'\t' -v r="$1" '$1==r{print $6}' "$T/l14b/results.tsv")"
+    [ "$v" = "$2" ] && printf '%s' "$d" | grep -q "$3" && ok "$1 -> $2 ($3)" || fail "$1 -> '$v' '$d', expected $2 / $3"
+}
+x14 g_cfired@flip PASS "honoured"
+x14 g_clies@flip  FAIL "LIES"
+x14 g_cref@flip   FAIL "REFUSED"
+[ -z "$(awk -F'\t' '$1=="g_cmissing@flip"' "$T/l14b/results.tsv")" ] && ok "a gate that FAILED its own run gets no control row (nothing to execute)" \
+    || fail "a control was executed for a gate whose own run failed"
+# PASS 4 = three gates that passed their own run + the honoured @ row; FAIL 3 =
+# g_cmissing (its FIRED line missing) + the LIES row + the REFUSED row
+printf '%s' "$out14" | grep -q 'PASS 4 .*FAIL 3' && ok "tally PASS 4 / FAIL 3: the @ rows count like gates" \
+    || fail "tally: $(printf '%s' "$out14" | grep -E '^PASS ' || echo '(none)')"
+printf '%s' "$out14" | grep -q 'read:     fired 3 / declared 4' && ok "readout: fired 3 / declared 4" \
+    || fail "readout: $(printf '%s' "$out14" | grep 'read:' || echo '(none)')"
+# MUST-FIRE: the same stub through the reader-unplugged copy reads PASS
+ln -s "$T/runner_unplugged.sh" "$FR/tests/run_all_emulator_unplugged.sh"
+reg "$(row g_cmissing mame release - '')"
+(cd "$FR" && ROMDIR="$T/roms" MERGED=build/fake_merged sh tests/run_all_emulator_unplugged.sh --lane mame --log "$T/l14c" >/dev/null 2>&1) || true
+v14c="$(awk -F'\t' '$1=="g_cmissing"{print $4}' "$T/l14c/results.tsv" 2>/dev/null)"
+[ "$v14c" = PASS ] && vs_ctl_fired reader-unplugged "with no gate script handed to the classifier, the declared-but-unfired control reads PASS" \
+                   || { vs_ctl_dead reader-unplugged "the unplugged runner classified g_cmissing '$v14c'"; fail "reader-unplugged"; }
+rm -f "$FR/tests/run_all_emulator_unplugged.sh"
+rm -f "$FR/tests/g_cfired.sh" "$FR/tests/g_cmissing.sh" "$FR/tests/g_clies.sh" "$FR/tests/g_cref.sh"
 
 echo
 [ "$rc" = 0 ] && echo "PASS: run_all_emulator.sh classifies every ground-truth case correctly" \

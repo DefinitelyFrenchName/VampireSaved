@@ -4,6 +4,10 @@
 # translation of a real replay, and the refusals must FIRE (P2, button 4,
 # service). ROM-free, seconds, ci_portable.
 #
+# MUST-FIRE: shadow-tool: reversed-map — a copy of the translator with the pre-14z-108 REVERSED direction map must be rejected by check 5 (mode: every check runs that copy)
+# MUST-FIRE: known-bad: direction-counter — check 6's counter must COUNT a direction bit (mode: direction lines appended to the anchor translation, check 6 must fail)
+# MUST-FIRE: known-bad: p2-counter — check 7c's counter must count a P2 bit (mode: a P2 line appended to the no-p2 translation, 7c must fail)
+#
 # THE DIRECTION NIBBLE WAS REVERSED FROM BIRTH, AND THIS GATE FROZE THE
 # REVERSAL (found 14z-107 (12), MEASURED IN FULL AND FIXED 14z-108).
 # `test.cpp:380` copies the file's bits 4-7 straight onto `joystick1[3:0]`,
@@ -59,7 +63,15 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; T="$(mktemp -d)"; fail=0
 ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 P="python3 $REPO/tools/rpl2siminputs.py"
+# THE SHADOW TOOL: the PRE-14z-108 reversed map
+sed 's/^DIRS = .*/DIRS = {"U": 1 << 4, "D": 1 << 5, "L": 1 << 6, "R": 1 << 7}/' \
+    "$REPO/tools/rpl2siminputs.py" > "$T/reversed.py"
+grep -q '"U": 1 << 4' "$T/reversed.py" || bad "5b control could not be built (DIRS line moved)"
+# THE EXECUTABLE FORM: under CONTROL=reversed-map every check runs the shadow
+# copy — and this run must FAIL (check 5 rejects it).
+vs_ctl_is reversed-map && P="python3 $T/reversed.py"
 
 # 1 bit mapping (test.cpp: coin1 b0, start1 b2, R b4 L b5 D b6 U b7, btn1-3 b8-b10)
 printf '1 p1=U1 sys=C1\n2 p1=DLR23 sys=S1S2C2\n3 wait\n5 p1=R\n' > "$T/a.rpl"
@@ -108,15 +120,12 @@ fi
 
 # 5b MUST-FIRE CONTROL: check 5 has to REJECT the defect it was written for.
 # A check that has never failed is a check nobody has proven can fail (THE
-# INSTRUMENT PROTOCOL, docs/project/gotchas.md). Rebuild the PRE-14z-108
-# reversed map and require check 5 to catch it.
-sed 's/^DIRS = .*/DIRS = {"U": 1 << 4, "D": 1 << 5, "L": 1 << 6, "R": 1 << 7}/' \
-    "$REPO/tools/rpl2siminputs.py" > "$T/reversed.py"
-grep -q '"U": 1 << 4' "$T/reversed.py" || bad "5b control could not be built (DIRS line moved)"
+# INSTRUMENT PROTOCOL, docs/project/gotchas.md). The reversed map is built at
+# the top; require check 5 to catch it.
 if check_dirs "$T/reversed.py" "control" >/dev/null 2>&1; then
-    bad "5b CONTROL DID NOT FIRE: check 5 passes the pre-14z-108 REVERSED map"
+    vs_ctl_dead reversed-map "check 5 passes the pre-14z-108 REVERSED map"; bad "5b"
 else
-    ok "5b control fired: the reversed map is rejected"
+    vs_ctl_fired reversed-map "the reversed map is rejected by check 5"; ok "5b control fired"
 fi
 
 # 6 THE ANCHOR REPLAY CARRIES NO DIRECTION BIT — the mechanism behind check
@@ -130,6 +139,7 @@ dirbits_in(){   # count lines with any of bits 4-7 set
     python3 -c 'import sys; print(sum(1 for l in open(sys.argv[1]) if int(l,16) & 0xf0))' "$1"
 }
 $P "$REPO/tests/replays/05_timeout_idle.rpl" "$T/e.hex" >/dev/null
+vs_ctl_is direction-counter && printf '080\n010\n' >> "$T/e.hex"   # the mode: direction lines appended
 n="$(dirbits_in "$T/e.hex")"
 [ "$n" = "0" ] && ok "6 05_timeout_idle sets no direction bit (so the frozen sim anchor cannot move with the map)" \
                 || bad "6 05_timeout_idle sets a direction bit on $n lines — check 3's sha1 is not direction-independent"
@@ -137,8 +147,8 @@ n="$(dirbits_in "$T/e.hex")"
 # 6b POSITIVE CONTROL for check 6's counter: it must COUNT a direction bit.
 printf '080\n000\n010\n' > "$T/f.hex"
 n="$(dirbits_in "$T/f.hex")"
-[ "$n" = "2" ] && ok "6b control fired: the direction-bit counter counts (2 of 3)" \
-                || bad "6b CONTROL DID NOT FIRE: counter returned $n on a file with 2 direction lines"
+[ "$n" = "2" ] && { vs_ctl_fired direction-counter "the direction-bit counter counts (2 of 3)"; ok "6b control fired"; } \
+                || { vs_ctl_dead direction-counter "counter returned $n on a file with 2 direction lines"; bad "6b"; }
 
 # 7 PLAYER 2 IS SCRIPTABLE (14z-109), AND IT DID NOT MOVE PLAYER 1.
 # The COVERAGE half deferred since 14z-107 (8). P2 went into file bits 12+
@@ -169,13 +179,14 @@ fi
 # 7c BACKWARD COMPATIBILITY asserted directly, not inferred from check 3:
 # a replay scripting no p2 must set no P2 bit at all.
 $P "$REPO/tests/replays/05_timeout_idle.rpl" "$T/nop2.hex" >/dev/null
+vs_ctl_is p2-counter && printf '8000\n' >> "$T/nop2.hex"   # the mode: a P2 line appended
 n2="$(p2bits_in "$T/nop2.hex")"
 [ "$n2" = "0" ] && ok "7c a replay scripting no p2 sets ZERO P2 bits — old files are byte-identical" \
                 || bad "7c 05_timeout_idle sets a P2 bit on $n2 lines — backward compatibility is broken"
 # 7d MUST-FIRE CONTROL: 7c has to be able to fail.
 n3="$(p2bits_in "$T/p2.hex")"
-[ "$n3" = "0" ] && bad "7d CONTROL DID NOT FIRE: the P2-bit counter reads 0 on a replay that scripts P2" \
-                || ok "7d control fired: the P2-bit counter counts ($n3 of 7)"
+[ "$n3" = "0" ] && { vs_ctl_dead p2-counter "the P2-bit counter reads 0 on a replay that scripts P2"; bad "7d"; } \
+                || { vs_ctl_fired p2-counter "the P2-bit counter counts ($n3 of 7)"; ok "7d control fired"; }
 
 rm -rf "$T"
 [ $fail = 0 ] && echo "PASS test_rpl2siminputs" || { echo "FAIL test_rpl2siminputs"; exit 1; }

@@ -2,6 +2,8 @@
 # test_header_defaults.sh — a gate's HEADER must state the default its CODE
 # actually uses (14z-128). ROM-free, ~2 s.
 #
+# MUST-FIRE: known-bad: stale-usage-dir — a Usage line naming a build dir the code does not default to must be caught (mode: that stub added to a copy of every real header)
+#
 # THE CLASS, and it is the twin of test_build_ref_rot.sh's. That gate closed
 # the case where a gate's CODE default names a build dir that has been pruned;
 # the freeze ritual's re-point sweep has kept those honest. Nobody was
@@ -32,9 +34,27 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 rc=0
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+mkdir -p "$T/tests" "$T/tools"
+cp tools/audit_header_defaults.py "$T/tools/"
+mk_stale() {  # mk_stale <dir> — the known-bad stub: a Usage line naming a non-default dir
+    { echo '#!/bin/sh'
+      echo '# g_a.sh — a stub.'
+      echo '# Usage: ROMDIR=... [BUILD=build/old_dir] tests/g_a.sh'
+      echo 'BUILD="${BUILD:-build/new_dir}"'; } > "$1/g_a.sh"
+}
+
+# THE EXECUTABLE FORM: under CONTROL=stale-usage-dir the stub joins a COPY of
+# every real gate header and the audit runs on that copy — it must FAIL.
+ROOT_ARGS=""
+if vs_ctl_is stale-usage-dir; then
+    mkdir -p "$T/mode/tests" "$T/mode/tools"; cp tests/*.sh "$T/mode/tests/"; cp tools/audit_header_defaults.py "$T/mode/tools/"
+    mk_stale "$T/mode/tests"; ROOT_ARGS="--root $T/mode"
+fi
 
 echo "== 1. the tree"
-if out="$(python3 tools/audit_header_defaults.py 2>&1)"; then
+if out="$(python3 tools/audit_header_defaults.py $ROOT_ARGS 2>&1)"; then
     echo "  ok: $out"
 else
     printf '%s\n' "$out" | sed 's/^/  /'
@@ -44,15 +64,8 @@ else
 fi
 
 echo "== 2. must-fire controls (each MUST be caught)"
-T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
-mkdir -p "$T/tests" "$T/tools"
-cp tools/audit_header_defaults.py "$T/tools/"
-
 # A: a Usage line naming a dir the code does not default to -> CAUGHT
-{ echo '#!/bin/sh'
-  echo '# g_a.sh — a stub.'
-  echo '# Usage: ROMDIR=... [BUILD=build/old_dir] tests/g_a.sh'
-  echo 'BUILD="${BUILD:-build/new_dir}"'; } > "$T/tests/g_a.sh"
+mk_stale "$T/tests"
 # B: the same line, but agreeing with the code -> NOT caught
 { echo '#!/bin/sh'
   echo '# g_b.sh — a stub.'
@@ -87,6 +100,8 @@ check() {  # check <gate> <expect caught|clean> <why>
     fi
 }
 check g_a caught "a Usage line naming a non-default dir"
+if printf '%s\n' "$out" | grep -q "tests/g_a.sh"; then vs_ctl_fired stale-usage-dir "a Usage line naming a non-default build dir is caught"
+else vs_ctl_dead stale-usage-dir "the stale Usage line was not caught"; fi
 check g_b clean  "the same line, agreeing with the code"
 check g_c clean  "a stale dir cited in prose is a measurement, not an instruction"
 check g_d clean  "a stale dir inside a (verbatim) archive block"

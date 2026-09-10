@@ -3,6 +3,11 @@
 # (14z-141, living-docs slice L2).
 # ci_portable: no ROM, no build dir, no emulator, ~6 s (measured).
 #
+# MUST-FIRE: perturbed-copy: new-kind-key — a manifest copy with a (kind, key) pair the census has never classified must fail --check as UNCLASSIFIED
+# MUST-FIRE: perturbed-copy: aux-poke-no-band — an aux_poke outside every declared band must fail --check
+# MUST-FIRE: perturbed-copy: new-baked-value — a NEW baked gameplay value must fail --check (the inventory can only shrink)
+# MUST-FIRE: perturbed-copy: edited-inventory — the frozen inventory with its last row deleted must fail --check (it is not hand-editable)
+#
 # WHAT IT HOLDS. CLAUDE.md rule 5 says behavioural values live in documented
 # tables, not in code. `tools/audit_rule5.py` measures how far that holds over
 # the canonical manifests and the generators. This gate asserts that the
@@ -32,6 +37,29 @@ echo "== test_rule5_census: the rule-5 census is classified and frozen =="
 [ -f "$TOOL" ]   || { echo "FAIL: $TOOL is absent"; exit 1; }
 [ -f "$FROZEN" ] || { echo "FAIL: $FROZEN is absent — run --freeze"; exit 1; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+
+# The copy lives outside the repo on purpose: `git ls-files` inside the tree
+# would list the REAL canon and the perturbation would never be scanned.
+# build/ is 4.2 GB of build directories and the census reads exactly one
+# subdirectory of it. Copy that, never the parent.
+mkcopy() { rm -rf "$1"; mkdir -p "$1/build"
+           cp -R build/manifest "$1/build/"; cp -R docs tools "$1/"; }
+perturb() {  # perturb <name> <copy dir>; EXPECT = the failure's substring
+    case "$1" in
+    new-kind-key)     printf '\n[[data_port]]\ndamage = 12\n' >> "$2/build/manifest/donovan.toml"; EXPECT="NEW (kind, key) pair" ;;
+    aux-poke-no-band) printf '\n[[aux_poke]]\nname = "x"\naddr = 0x123456\nop = "poke16"\nval = 0x1\n' >> "$2/build/manifest/donovan.toml"; EXPECT="no declared band" ;;
+    new-baked-value)  printf '\n[[site_thunk]]\nname = "z"\nonly_variant_slot = true\n' >> "$2/build/manifest/donovan.toml"; EXPECT="NEW baked value" ;;
+    esac
+}
+# THE EXECUTABLE FORM: under CONTROL=<name> the perturbed copy IS what the
+# main --check reads (or the perturbed inventory is) — and this run must FAIL.
+ROOT_ARGS=""
+case "$VS_CTL" in
+"") ;;
+edited-inventory) cp "$FROZEN" "$W/mode.tsv"; sed -i '' '$d' "$W/mode.tsv" 2>/dev/null || sed -i '$d' "$W/mode.tsv"; FROZEN="$W/mode.tsv" ;;
+*) mkcopy "$W/mode"; perturb "$VS_CTL" "$W/mode"; ROOT_ARGS="--root $W/mode" ;;
+esac
 
 # --- 1. the tool's own ground truth ----------------------------------------
 if python3 "$TOOL" --selftest > "$W/self.log" 2>&1; then
@@ -41,7 +69,7 @@ else
 fi
 
 # --- 2. the census runs clean over the tree --------------------------------
-if python3 "$TOOL" --check "$FROZEN" > "$W/check.log" 2>&1; then
+if python3 "$TOOL" $ROOT_ARGS --check "$FROZEN" > "$W/check.log" 2>&1; then
     ok "the census matches the frozen inventory: $(tail -1 "$W/check.log" | sed 's/^ok *//')"
 else
     bad "the census does not match the frozen inventory:"
@@ -63,35 +91,22 @@ fi
 grep '^NOTE: rule5\.' "$W/report.log"
 
 # --- 4. MUST-FIRE controls, each on a COPY of the tree ---------------------
-# The copy lives outside the repo on purpose: `git ls-files` inside the tree
-# would list the REAL canon and the perturbation would never be scanned.
-# build/ is 4.2 GB of build directories and the census reads exactly one
-# subdirectory of it. Copy that, never the parent.
-mkcopy() { rm -rf "$W/c"; mkdir -p "$W/c/build"
-           cp -R build/manifest "$W/c/build/"; cp -R docs tools "$W/c/"; }
-control() {  # control <label> <expected substring>
+control() {  # control <name>
+    mkcopy "$W/c"; perturb "$1" "$W/c"
     if python3 "$TOOL" --root "$W/c" --check "$FROZEN" > "$W/c.log" 2>&1; then
-        bad "$1: the census ACCEPTED it — the check is not checking"
-    elif grep -q "$2" "$W/c.log"; then
-        ok "$1: fires"
+        vs_ctl_dead "$1" "the census ACCEPTED it — the check is not checking"; bad "$1"
+    elif grep -q "$EXPECT" "$W/c.log"; then
+        vs_ctl_fired "$1" "$EXPECT"; ok "$1: fires"
     else
-        bad "$1: failed for the wrong reason:"; sed 's/^/        /' "$W/c.log" | head -4
+        vs_ctl_dead "$1" "failed for the wrong reason"; bad "$1:"; sed 's/^/        /' "$W/c.log" | head -4
     fi
 }
-
-mkcopy; printf '\n[[data_port]]\ndamage = 12\n' >> "$W/c/build/manifest/donovan.toml"
-control "a NEW (kind, key) pair is UNCLASSIFIED" "NEW (kind, key) pair"
-
-mkcopy; printf '\n[[aux_poke]]\nname = "x"\naddr = 0x123456\nop = "poke16"\nval = 0x1\n' \
-    >> "$W/c/build/manifest/donovan.toml"
-control "an aux_poke outside every declared band" "no declared band"
-
-mkcopy; printf '\n[[site_thunk]]\nname = "z"\nonly_variant_slot = true\n' \
-    >> "$W/c/build/manifest/donovan.toml"
-control "a NEW baked gameplay value" "NEW baked value"
+control new-kind-key
+control aux-poke-no-band
+control new-baked-value
 
 # a probe_*.toml is UNTRACKED and must never reach the census
-mkcopy; printf '[[data_port]]\ndamage = 99\n' > "$W/c/build/manifest/probe_zz.toml"
+mkcopy "$W/c"; printf '[[data_port]]\ndamage = 99\n' > "$W/c/build/manifest/probe_zz.toml"
 if python3 "$TOOL" --root "$W/c" --check "$FROZEN" > "$W/c.log" 2>&1; then
     ok "a probe_*.toml in the copy is ignored (no-fire: the canon is git-tracked)"
 else
@@ -99,7 +114,7 @@ else
 fi
 
 # --- 5. growth is refused without a stated reason --------------------------
-mkcopy; printf '\n[[site_thunk]]\nname = "z"\nonly_variant_slot = true\n' \
+mkcopy "$W/c"; printf '\n[[site_thunk]]\nname = "z"\nonly_variant_slot = true\n' \
     >> "$W/c/build/manifest/donovan.toml"
 cp "$FROZEN" "$W/grow.tsv"
 if python3 "$TOOL" --root "$W/c" --freeze "$W/grow.tsv" > "$W/grow.log" 2>&1; then
@@ -122,9 +137,9 @@ fi
 cp "$FROZEN" "$W/drift.tsv"
 sed -i '' '$d' "$W/drift.tsv" 2>/dev/null || sed -i '$d' "$W/drift.tsv"
 if python3 "$TOOL" --check "$W/drift.tsv" > "$W/drift.log" 2>&1; then
-    bad "an edited inventory was ACCEPTED"
+    vs_ctl_dead edited-inventory "an edited inventory was ACCEPTED"; bad "edited-inventory"
 else
-    ok "an edited inventory is caught ($(head -1 "$W/drift.log" | cut -c1-56))"
+    vs_ctl_fired edited-inventory "an edited inventory is caught ($(head -1 "$W/drift.log" | cut -c1-56))"; ok "edited-inventory: fires"
 fi
 
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

@@ -3,6 +3,14 @@
 # 14z-107 (6), slice D1; EXTENDED 14z-107 (9) for slice D2. ROM-free; seconds
 # without Verilator, ~30 s with it.
 #
+# MUST-FIRE: perturbed-copy: override-perturbed — an override file changed by one width must break the frozen RTL delta (check 1)
+# MUST-FIRE: perturbed-copy: bank-gate-bypassed — the QSound bank latch with `wide_en ?` replaced by the wide arm must fail the wide_en-low leg of its bench (needs Verilator)
+# MUST-FIRE: perturbed-copy: profile-byte-40 — the profile decoder pointed at header byte 40 (jtframe's JOY_BYTE) must fail its bench (needs Verilator)
+# MUST-FIRE: perturbed-copy: polarity-flipped — the profile decoder with the polarity flipped must fail its bench: a 0xFF-filled stock header would arm the profile (needs Verilator)
+# MUST-FIRE: perturbed-copy: promote-gate-bypassed — the object promote with `wide_en &` removed must fail the wide_en-low leg — the superset-invariant failure (needs Verilator)
+# MUST-FIRE: perturbed-copy: promote-bit-15 — the promote reading bank bit 2 from y[15] instead of y[12] must fail its bench (needs Verilator)
+# MUST-FIRE: perturbed-copy: range-fix-ungated — the decryption-range fix with wide_en removed must change the frozen delta (check 9a reads the gated expression)
+#
 # WHAT THIS GATE IS FOR. Slice D1 is the first time `cores/cps2w` carries RTL,
 # so it is the first time the MiSTer leg has a trust surface at all. Rule 1 v2
 # asks that such a change be BOUNDED, DECLARATIVE, PROFILE-GATED, REVIEWABLE
@@ -117,6 +125,7 @@ cd "$REPO"
 SRC="$REPO/emu/jtcores"
 fail=0; ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }
 note(){ echo "  note: $1"; }
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 
 [ -f "$SRC/.gitmodules" ] || { echo "SKIP: emu/jtcores not initialised (tools/setup_jtcores.sh)"; exit 77; }
 HDL="$SRC/cores/cps2w/hdl"
@@ -141,11 +150,17 @@ for line in difflib.unified_diff(a, b, n=0):
         sys.stdout.write(line if line.endswith("\n") else line + "\n")
 PYD
 }
+# control D's perturbation, built before check 1: the SAME override file with
+# one width changed. Under CONTROL=override-perturbed it IS the file check 1
+# reads, and this run must FAIL.
+sed 's/wire \[23:0\] qsnd_addr;/wire [22:0] qsnd_addr;/' "$HDL/jtcps2_game.v" > "$W/perturbed.v"
+cmp -s "$HDL/jtcps2_game.v" "$W/perturbed.v" && { vs_ctl_dead override-perturbed "could not perturb jtcps2_game.v (the qsnd_addr line moved)"; fail=1; }
+GAME_V="$HDL/jtcps2_game.v"; vs_ctl_is override-perturbed && GAME_V="$W/perturbed.v"
 {
     echo "# FROZEN RTL DELTA — cores/cps2w/hdl vs the SHARED files it overrides."
     echo "# Regenerate deliberately; tests/test_mister_wide_gate.sh compares against it."
     echo "=== jtcps2_game.v : cores/cps2/hdl -> cores/cps2w/hdl ==="
-    delta "$SRC/cores/cps2/hdl/jtcps2_game.v"    "$HDL/jtcps2_game.v"
+    delta "$SRC/cores/cps2/hdl/jtcps2_game.v"    "$GAME_V"
     echo "=== jtcps15_sound.v : cores/cps15/hdl -> cores/cps2w/hdl ==="
     delta "$SRC/cores/cps15/hdl/jtcps15_sound.v" "$HDL/jtcps15_sound.v"
     echo "=== jtcps1_sdram.v : cores/cps1/hdl -> cores/cps2w/hdl ==="
@@ -174,7 +189,6 @@ fi
 # control D: rebuild the SAME frozen-delta document with one override file
 # perturbed by a single width, and it must stop matching. Without this, check 1
 # could be comparing a document to itself in every way that matters.
-sed 's/wire \[23:0\] qsnd_addr;/wire [22:0] qsnd_addr;/' "$HDL/jtcps2_game.v" > "$W/perturbed.v"
 if cmp -s "$HDL/jtcps2_game.v" "$W/perturbed.v"; then
     bad "1D control could not perturb the file"
 else
@@ -202,8 +216,8 @@ else
         delta "$SRC/cores/cps2/hdl/jtcps2_decrypt.v"  "$HDL/jtcps2_decrypt.v"
     } > "$W/delta_ctlD.txt"
     cmp -s "$W/delta_ctlD.txt" "$REPO/tests/expect/cps2w_rtl_delta.txt" \
-        && bad "1D control did NOT fire: a one-width perturbation still matched the frozen delta" \
-        || ok "1D control fired (a perturbed override breaks the frozen delta)"
+        && { vs_ctl_dead override-perturbed "a one-width perturbation still matched the frozen delta"; bad "1D"; } \
+        || { vs_ctl_fired override-perturbed "a perturbed override breaks the frozen delta"; ok "1D control fired"; }
 fi
 
 # ── 2. the profile byte agrees in all three copies ─────────────────────────
@@ -334,8 +348,8 @@ fi
 
 # ── 6. the gated modules, simulated ────────────────────────────────────────
 if command -v verilator >/dev/null 2>&1; then
-    run_tb() {   # run_tb <name> <tb.v> <dut.v> <expect pass|fail>
-        _n="$1"; _tb="$2"; _dut="$3"; _want="$4"
+    run_tb() {   # run_tb <name> <tb.v> <dut.v> <expect pass|fail> [control-name]
+        _n="$1"; _tb="$2"; _dut="$3"; _want="$4"; _ctl="${5:-}"
         if ! ( cd "$W" && verilator --binary --timing -Wno-fatal -Wno-TIMESCALEMOD \
                --top-module "$(basename "$_tb" .v)" -Mdir "obj_$_n" -o "$_n" \
                "$_tb" "$_dut" >"$W/$_n.build" 2>&1 ); then
@@ -347,50 +361,53 @@ if command -v verilator >/dev/null 2>&1; then
             if [ "$_want" = pass ]; then
                 ok "6 $_n: $(grep -E '^(checked|PASS)' "$W/$_n.out" | tr '\n' ' ')"
             else
-                ok "6 $_n control fired: $(grep -m1 '^FAIL' "$W/$_n.out")"
+                vs_ctl_fired "$_ctl" "$(grep -m1 '^FAIL' "$W/$_n.out")"; ok "6 $_n control fired"
             fi
         else
+            [ -n "$_ctl" ] && vs_ctl_dead "$_ctl" "expected $_want, got $_got"
             bad "6 $_n: expected $_want, got $_got"
             grep -m4 '^FAIL' "$W/$_n.out" | sed 's/^/       /'
         fi
     }
-    run_tb bank    "$REPO/tests/rtl/tb_qsnd_bank.v" "$HDL/jtcps2w_qsnd_bank.v" pass
-    run_tb profile "$REPO/tests/rtl/tb_profile.v"   "$HDL/jtcps2w_profile.v"   pass
-    run_tb objbank "$REPO/tests/rtl/tb_obj_bank.v"  "$HDL/jtcps2w_obj_bank.v"  pass
-    # control A: bypass the gate
-    sed "s/bank <= wide_en ? dsp_ab\[7:0\]/bank <= 1'b1 ? dsp_ab[7:0]/" \
-        "$HDL/jtcps2w_qsnd_bank.v" > "$W/ctlA.v"
-    cmp -s "$HDL/jtcps2w_qsnd_bank.v" "$W/ctlA.v" \
-        && bad "6A control could not perturb the gate" \
-        || run_tb ctlA "$REPO/tests/rtl/tb_qsnd_bank.v" "$W/ctlA.v" fail
-    # control B: the byte-40 off-by-one (jtframe's JOY_BYTE)
-    sed "s/PROFILE_BYTE = 6'd41/PROFILE_BYTE = 6'd40/" "$HDL/jtcps2w_profile.v" > "$W/ctlB.v"
-    cmp -s "$HDL/jtcps2w_profile.v" "$W/ctlB.v" \
-        && bad "6B control could not move the profile byte" \
-        || run_tb ctlB "$REPO/tests/rtl/tb_profile.v" "$W/ctlB.v" fail
-    # control C: the polarity flip — the superset-invariant failure
-    sed "s/assign wide_en = ~profile\[0\];/assign wide_en = profile[0];/" \
-        "$HDL/jtcps2w_profile.v" > "$W/ctlC.v"
-    cmp -s "$HDL/jtcps2w_profile.v" "$W/ctlC.v" \
-        && bad "6C control could not flip the polarity" \
-        || run_tb ctlC "$REPO/tests/rtl/tb_profile.v" "$W/ctlC.v" fail
-    # control E (D3): the promote with the gate bypassed — the same
-    # superset-invariant failure, in the object path
-    sed "s/{ wide_en & table_y\[12\], table_y\[14:13\] }/{ table_y[12], table_y[14:13] }/" \
-        "$HDL/jtcps2w_obj_bank.v" > "$W/ctlE.v"
-    cmp -s "$HDL/jtcps2w_obj_bank.v" "$W/ctlE.v" \
-        && bad "6E control could not bypass the promote's gate" \
-        || run_tb ctlE "$REPO/tests/rtl/tb_obj_bank.v" "$W/ctlE.v" fail
-    # control F (D3): THE FIRST DRAFT. Reading bank bit 2 from y[15] rather
-    # than promoting y[12] is the mistake Correction A2 exists to record: y[15]
-    # is the sprite-list terminator, so bank 4 would end the list at the first
+    # THE PERTURBED DUTs, built first: under CONTROL=<name> the named one is
+    # what the POSITIVE bench simulates, and this run must FAIL.
+    perturb_dut() {  # perturb_dut <name> <sed expr> <src> <out> <what>
+        sed "$2" "$3" > "$4"
+        cmp -s "$3" "$4" && { vs_ctl_dead "$1" "could not perturb: $5"; bad "6 $1: $5"; }
+    }
+    # A: the gate bypassed; B: the byte-40 off-by-one (jtframe's JOY_BYTE);
+    # C: the polarity flip — the superset-invariant failure; E (D3): the
+    # promote with the gate bypassed — the same failure in the object path;
+    # F (D3): THE FIRST DRAFT. Reading bank bit 2 from y[15] rather than
+    # promoting y[12] is the mistake Correction A2 exists to record: y[15] is
+    # the sprite-list terminator, so bank 4 would end the list at the first
     # tenant sprite. It must break the encoding contract with gfx_tiles.py.
-    sed "s/{ wide_en & table_y\[12\], table_y\[14:13\] }/{ wide_en \& table_y[15], table_y[14:13] }/" \
-        "$HDL/jtcps2w_obj_bank.v" > "$W/ctlF.v"
-    cmp -s "$HDL/jtcps2w_obj_bank.v" "$W/ctlF.v" \
-        && bad "6F control could not move the promoted bit to y[15]" \
-        || run_tb ctlF "$REPO/tests/rtl/tb_obj_bank.v" "$W/ctlF.v" fail
+    perturb_dut bank-gate-bypassed    "s/bank <= wide_en ? dsp_ab\[7:0\]/bank <= 1'b1 ? dsp_ab[7:0]/" "$HDL/jtcps2w_qsnd_bank.v" "$W/ctlA.v" "the gate line moved"
+    perturb_dut profile-byte-40       "s/PROFILE_BYTE = 6'd41/PROFILE_BYTE = 6'd40/"                   "$HDL/jtcps2w_profile.v"   "$W/ctlB.v" "the profile byte line moved"
+    perturb_dut polarity-flipped      "s/assign wide_en = ~profile\[0\];/assign wide_en = profile[0];/" "$HDL/jtcps2w_profile.v"  "$W/ctlC.v" "the polarity line moved"
+    perturb_dut promote-gate-bypassed "s/{ wide_en & table_y\[12\], table_y\[14:13\] }/{ table_y[12], table_y[14:13] }/" "$HDL/jtcps2w_obj_bank.v" "$W/ctlE.v" "the promote's gate line moved"
+    perturb_dut promote-bit-15        "s/{ wide_en & table_y\[12\], table_y\[14:13\] }/{ wide_en \& table_y[15], table_y[14:13] }/" "$HDL/jtcps2w_obj_bank.v" "$W/ctlF.v" "the promote's bit line moved"
+    QSND_V="$HDL/jtcps2w_qsnd_bank.v"; PROFILE_V="$HDL/jtcps2w_profile.v"; OBJBANK_V="$HDL/jtcps2w_obj_bank.v"
+    case "$VS_CTL" in
+    bank-gate-bypassed)    QSND_V="$W/ctlA.v" ;;
+    profile-byte-40)       PROFILE_V="$W/ctlB.v" ;;
+    polarity-flipped)      PROFILE_V="$W/ctlC.v" ;;
+    promote-gate-bypassed) OBJBANK_V="$W/ctlE.v" ;;
+    promote-bit-15)        OBJBANK_V="$W/ctlF.v" ;;
+    esac
+    run_tb bank    "$REPO/tests/rtl/tb_qsnd_bank.v" "$QSND_V"    pass
+    run_tb profile "$REPO/tests/rtl/tb_profile.v"   "$PROFILE_V" pass
+    run_tb objbank "$REPO/tests/rtl/tb_obj_bank.v"  "$OBJBANK_V" pass
+    run_tb ctlA "$REPO/tests/rtl/tb_qsnd_bank.v" "$W/ctlA.v" fail bank-gate-bypassed
+    run_tb ctlB "$REPO/tests/rtl/tb_profile.v"   "$W/ctlB.v" fail profile-byte-40
+    run_tb ctlC "$REPO/tests/rtl/tb_profile.v"   "$W/ctlC.v" fail polarity-flipped
+    run_tb ctlE "$REPO/tests/rtl/tb_obj_bank.v"  "$W/ctlE.v" fail promote-gate-bypassed
+    run_tb ctlF "$REPO/tests/rtl/tb_obj_bank.v"  "$W/ctlF.v" fail promote-bit-15
 else
+    case "$VS_CTL" in
+    bank-gate-bypassed|profile-byte-40|polarity-flipped|promote-gate-bypassed|promote-bit-15)
+        echo "REFUSED: CONTROL=$VS_CTL is not a mode of this gate (verilator absent — the bench cannot run)"; exit 3 ;;
+    esac
     note "6 verilator not installed; the gated modules were not simulated"
 fi
 
@@ -526,7 +543,12 @@ DEC="$HDL/jtcps2_decrypt.v"
 if [ ! -f "$DEC" ]; then
     bad "9 no $DEC — slice D5's override is missing"
 else
-    grep -q 'wire \[15:0\] rng_eff = wide_en ? { addr_rng\[15:10\], ~addr_rng\[9:0\] } : addr_rng;' "$DEC" \
+    # control 9G's perturbation: the range fix with wide_en removed. Under
+    # CONTROL=range-fix-ungated it is what 9a reads, and this run must FAIL.
+    sed 's/wide_en ? { addr_rng\[15:10\], ~addr_rng\[9:0\] } : addr_rng/{ addr_rng[15:10], ~addr_rng[9:0] }/' \
+        "$DEC" > "$W/dec_ungated.v"
+    DEC_9A="$DEC"; vs_ctl_is range-fix-ungated && DEC_9A="$W/dec_ungated.v"
+    grep -q 'wire \[15:0\] rng_eff = wide_en ? { addr_rng\[15:10\], ~addr_rng\[9:0\] } : addr_rng;' "$DEC_9A" \
       && ok "9a the range word is complemented ONLY with the profile on (rng_eff)" \
       || bad "9a jtcps2_decrypt's gated range expression is not the frozen one"
     grep -q '\.range     ( rng_eff       ),' "$DEC" \
@@ -550,16 +572,14 @@ else
       && ok "9f the reference comparison is still the UNcomplemented one D5 corrects for" \
       || bad "9f cores/cps2/hdl/jtcps2_dec_ctrl.v changed — re-derive D5 before trusting it"
     # 9G MUST-FIRE: strip wide_en from the range fix and the frozen delta must move.
-    sed 's/wide_en ? { addr_rng\[15:10\], ~addr_rng\[9:0\] } : addr_rng/{ addr_rng[15:10], ~addr_rng[9:0] }/' \
-        "$DEC" > "$W/dec_ungated.v"
     if cmp -s "$DEC" "$W/dec_ungated.v"; then
-        bad "9G control could not perturb the gated expression"
+        vs_ctl_dead range-fix-ungated "could not perturb the gated expression"; bad "9G"
     else
         delta "$SRC/cores/cps2/hdl/jtcps2_decrypt.v" "$W/dec_ungated.v" > "$W/dec_ungated.delta"
         delta "$SRC/cores/cps2/hdl/jtcps2_decrypt.v" "$DEC" > "$W/dec_real.delta"
         cmp -s "$W/dec_ungated.delta" "$W/dec_real.delta" \
-          && bad "9G control did NOT fire: an UNGATED range fix produced the same delta" \
-          || ok "9G control fired (removing wide_en from the range fix changes the frozen delta)"
+          && { vs_ctl_dead range-fix-ungated "an UNGATED range fix produced the same delta"; bad "9G"; } \
+          || { vs_ctl_fired range-fix-ungated "removing wide_en from the range fix changes the frozen delta"; ok "9G control fired"; }
     fi
 fi
 

@@ -3,6 +3,9 @@
 # files (14z-122, the documentation rationalization pass). ci_portable: no
 # ROM, no build dir, no emulator, ~1 s.
 #
+# MUST-FIRE: perturbed-copy: new-bucket-entry — a `## ` entry appended to a bucket must fail --check and be NAMED in the diff, or a new gotcha can miss the index silently
+# MUST-FIRE: perturbed-copy: hand-edited-index — a bullet hand-added to the committed index must fail the cmp, or the index stops being generated
+#
 # WHAT IT HOLDS. `tools/gen_gotchas_index.py --check` regenerates the index
 # (one line per bucket `## ` entry — consecutive `## ` lines are one wrapped
 # header — with anchor tokens stripped) and cmp's it against the committed
@@ -33,35 +36,41 @@ cd "$REPO"
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
-
-echo "== test_gotchas_index_current: the index follows the buckets =="
-if python3 tools/gen_gotchas_index.py --check >/tmp/gotchas_idx.$$.log 2>&1; then
-    ok "index matches a regeneration from the three buckets"
-else
-    bad "gen_gotchas_index.py --check FAILS:"; sed 's/^/        /' /tmp/gotchas_idx.$$.log | head -20
-fi
-rm -f /tmp/gotchas_idx.$$.log
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 
 FILES="docs/GOTCHAS.md docs/game/gotchas.md docs/platform/gotchas.md docs/project/gotchas.md"
 mkcopy() { for f in $FILES; do mkdir -p "$1/$(dirname "$f")"; cp "$f" "$1/$f"; done; }
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+perturb() {  # perturb <name> <dir>; EXPECT = the failure's substring
+    case "$1" in
+    new-bucket-entry)  printf '\n## A synthetic trap for the control (paid: 14z-999)\nbody\n' >> "$2/docs/game/gotchas.md"; EXPECT="A synthetic trap for the control" ;;
+    hand-edited-index) printf -- '- a bullet somebody hand-added\n' >> "$2/docs/GOTCHAS.md"; EXPECT="" ;;
+    *) echo "no such perturbation: $1"; exit 3 ;;
+    esac
+}
 
-# a: a new bucket entry changes the render and appears in it
-mkcopy "$W/a"; printf '\n## A synthetic trap for the control (paid: 14z-999)\nbody\n' >> "$W/a/docs/game/gotchas.md"
-if python3 tools/gen_gotchas_index.py --root "$W/a" --check --no-selftest >"$W/a/log" 2>&1; then
-    bad "control a: a new bucket entry did not fail --check"
-elif grep -q 'A synthetic trap for the control' "$W/a/log"; then
-    ok "control a: a new bucket entry fires and is named in the diff"
+# THE EXECUTABLE FORM: under CONTROL=<name> the perturbed copy IS the tree
+# the main check reads, and this run must FAIL.
+ROOT="$REPO"; SELFTEST=""
+if [ -n "$VS_CTL" ]; then mkcopy "$W/mode"; perturb "$VS_CTL" "$W/mode"; ROOT="$W/mode"; SELFTEST="--no-selftest"; fi
+
+echo "== test_gotchas_index_current: the index follows the buckets =="
+if python3 tools/gen_gotchas_index.py --root "$ROOT" --check $SELFTEST >"$W/tree.log" 2>&1; then
+    ok "index matches a regeneration from the three buckets"
 else
-    bad "control a: failed for the wrong reason:"; sed 's/^/        /' "$W/a/log" | head -8
+    bad "gen_gotchas_index.py --check FAILS:"; sed 's/^/        /' "$W/tree.log" | head -20
 fi
 
-# b: a hand-edit to the committed index fails the cmp
-mkcopy "$W/b"; printf -- '- a bullet somebody hand-added\n' >> "$W/b/docs/GOTCHAS.md"
-if python3 tools/gen_gotchas_index.py --root "$W/b" --check --no-selftest >"$W/b/log" 2>&1; then
-    bad "control b: a hand-edited index passed --check"
-else
-    ok "control b: a hand-edited index fires"
-fi
+control() {  # control <name>
+    d="$W/$1"; mkcopy "$d"; perturb "$1" "$d"
+    if python3 tools/gen_gotchas_index.py --root "$d" --check --no-selftest >"$d/log" 2>&1; then
+        vs_ctl_dead "$1" "the perturbed copy PASSED — the check is not checking"; bad "$1"
+    elif [ -z "$EXPECT" ] || grep -q "$EXPECT" "$d/log"; then
+        vs_ctl_fired "$1" "${EXPECT:-the perturbed copy fails --check}"; ok "$1: fires"
+    else
+        vs_ctl_dead "$1" "failed for the wrong reason"; bad "$1:"; sed 's/^/        /' "$d/log" | head -8
+    fi
+}
+for n in $(vs_ctl_declared "$0"); do control "$n"; done
 
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

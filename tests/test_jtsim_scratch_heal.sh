@@ -3,6 +3,8 @@
 # reaper is HEALED, not trusted (14z-133b). ROM-free, ~5 s (three local
 # clones of emu/jtcores, hardlinked).
 #
+# MUST-FIRE: shadow-tool: heal-removed — a copy of mister_mra.sh with the 1b HEAL block cut must leave a hollowed clone hollow (mode: section 2 runs that copy, and must fail)
+#
 # THE CLASS. tools/mister_mra.sh and tools/run_sim_jtcps2.sh keep a clone of
 # the jtcores fork under ${JTSIM_SCRATCH:-$TMPDIR/vampire-saved-jtsim} and
 # used to re-clone only when `.git` was ABSENT. macOS purges $TMPDIR by file
@@ -33,6 +35,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 [ -f "emu/jtcores/.gitmodules" ] || { echo "SKIP: emu/jtcores not initialised (tools/setup_jtcores.sh)"; exit 77; }
 . "$REPO/tests/lib/shadow_tools.sh"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 PIN="$(sed -n 's/^PINNED="\([0-9a-f]*\)".*/\1/p' tools/setup_jtcores.sh)"
 WORK="$(mktemp -d "${TMPDIR:-/tmp}/jtsim_heal.XXXXXX")"
 trap 'rm -rf "$WORK"' EXIT
@@ -44,6 +47,20 @@ hollow() {  # delete the first N tracked files, macros.def among them — the re
     echo "cores/cps2w/cfg/macros.def" >> "$WORK/victims"
     (cd "$S" && xargs rm -f < "$WORK/victims")
 }
+# THE SHADOW TOOL: mister_mra.sh with the heal block cut out
+CTL="$(shadow_tool "$WORK" mister_mra.sh)"
+python3 - "$CTL" <<'PY'
+import re, sys
+p = sys.argv[1]; s = open(p).read()
+a = s.index("# ---------------------------------------------------- 1b. HEAL")
+b = s.index('if [ "$ENSURE" = 1 ]; then', a)
+open(p, "w").write(s[:a] + s[b:])
+PY
+grep -q "1b. HEAL" "$CTL" && { echo "  FAIL: the control still carries the heal"; fail=1; }
+# THE EXECUTABLE FORM: under CONTROL=heal-removed section 2 runs the shadow
+# tool — and must FAIL (the clone stays hollow).
+TOOL=tools/mister_mra.sh
+vs_ctl_is heal-removed && TOOL="sh $CTL"
 
 echo "== 1. a fresh scratch is cloned and pinned =="
 JTSIM_SCRATCH="$S" tools/mister_mra.sh --ensure-scratch --quiet || { echo "  FAIL: ensure on a fresh dir"; fail=1; }
@@ -55,7 +72,7 @@ hollow
 n="$(missing)"; [ "$n" -gt 100 ] && echo "  ok: hollowed — $n tracked files missing, macros.def among them" \
                                  || { echo "  FAIL: could not hollow the clone"; fail=1; }
 reflog_before="$(git -C "$S" reflog | wc -l | tr -d ' ')"
-JTSIM_SCRATCH="$S" tools/mister_mra.sh --ensure-scratch --quiet || { echo "  FAIL: ensure on a hollow clone"; fail=1; }
+JTSIM_SCRATCH="$S" $TOOL --ensure-scratch --quiet || { echo "  FAIL: ensure on a hollow clone"; fail=1; }
 [ "$(missing)" = 0 ] && [ -f "$S/cores/cps2w/cfg/macros.def" ] \
     && echo "  ok: healed — 0 missing, macros.def back" || { echo "  FAIL: $(missing) still missing"; fail=1; }
 [ "$(git -C "$S" reflog | wc -l | tr -d ' ')" = "$reflog_before" ] \
@@ -68,21 +85,12 @@ JTSIM_SCRATCH="$S" tools/mister_mra.sh --ensure-scratch --quiet || { echo "  FAI
     && echo "  ok: re-cloned — complete and at the pin" || { echo "  FAIL: not recovered from a hollow store"; fail=1; }
 
 echo "== 4. MUST-FIRE CONTROL: the tool WITHOUT the heal leaves the hollow clone hollow =="
-CTL="$(shadow_tool "$WORK" mister_mra.sh)"
-python3 - "$CTL" <<'PY'
-import re, sys
-p = sys.argv[1]; s = open(p).read()
-a = s.index("# ---------------------------------------------------- 1b. HEAL")
-b = s.index('if [ "$ENSURE" = 1 ]; then', a)
-open(p, "w").write(s[:a] + s[b:])
-PY
-grep -q "1b. HEAL" "$CTL" && { echo "  FAIL: the control still carries the heal"; fail=1; }
 hollow
 n="$(missing)"
 JTSIM_SCRATCH="$S" sh "$CTL" --ensure-scratch --quiet || true
 [ "$(missing)" = "$n" ] && [ "$n" -gt 100 ] \
-    && echo "  ok: control fires — without the heal, $n files stay missing" \
-    || { echo "  FAIL: control did not fire ($(missing) missing after a heal-less ensure)"; fail=1; }
+    && vs_ctl_fired heal-removed "without the heal, $n files stay missing" \
+    || { vs_ctl_dead heal-removed "$(missing) missing after a heal-less ensure"; fail=1; }
 
 if [ "$fail" -eq 0 ]; then echo "PASS: a hollowed jtsim scratch clone is healed, re-cloned when its store is gone, and the control fires"
 else echo "FAIL: jtsim scratch heal"; exit 1; fi

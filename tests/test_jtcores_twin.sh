@@ -2,6 +2,9 @@
 # test_jtcores_twin.sh — the MiSTer core scaffold is a TWIN of the reference
 # core, and the three copies of its delta agree (14z-106).
 #
+# MUST-FIRE: perturbed-copy: undeclared-hdl-file — an extra file in the cores/cps2w/hdl listing must fail check 2a (the override set is enumerated)
+# MUST-FIRE: perturbed-copy: undeclared-yaml-pull — a game.yaml copy pulling one undeclared module must fail check 2a2 (the frozen delta)
+#
 # WHAT IT LOCKS (ROM-free, no emulator, seconds; ci_portable):
 #  1. emu/jtcores sits at the pin tools/setup_jtcores.sh names.
 #  2. cores/cps2w is cores/cps2 modulo EXACTLY the delta the core is DECLARED
@@ -47,6 +50,7 @@ set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$REPO/emu/jtcores"
 fail=0; ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 [ -f "$SRC/.gitmodules" ] || { echo "SKIP: emu/jtcores not initialised (tools/setup_jtcores.sh)"; exit 77; }
 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
@@ -61,11 +65,16 @@ A="$SRC/cores/cps2/cfg"; B="$SRC/cores/cps2w/cfg"
 # together"), and the two halves below have to agree: what is on disk, and
 # what game.yaml pulls. An undeclared file in either place fails here.
 hdl="$(ls "$SRC/cores/cps2w/hdl" 2>/dev/null | tr '\n' ' ')"
+B_YAML="$B/game.yaml"
+# THE EXECUTABLE FORM: under CONTROL=<name> the perturbed listing / yaml copy
+# IS what 2a / 2a2 read — and this run must FAIL.
+if vs_ctl_is undeclared-hdl-file; then hdl="$(printf '%s\n' "$hdl" | sed 's/$/jtcps2w_extra.v /')"; fi
+if vs_ctl_is undeclared-yaml-pull; then { cat "$B/game.yaml"; echo "      - jtcps2w_extra.v"; } > "$W/mode_game.yaml"; B_YAML="$W/mode_game.yaml"; fi
 want='jtcps15_sound.v jtcps1_obj_draw.v jtcps1_prom_we.v jtcps1_sdram.v jtcps1_video.v jtcps2_decrypt.v jtcps2_game.v jtcps2_main.v jtcps2_obj.v jtcps2_obj_scan.v jtcps2w_obj_bank.v jtcps2w_profile.v jtcps2w_qsnd_bank.v pal_lut.hex '
 [ "$hdl" = "$want" ] && ok "2a cores/cps2w/hdl holds exactly the declared override set" \
                      || bad "2a cores/cps2w/hdl holds [$hdl], declared [$want]"
 EXP="$REPO/tests/expect/cps2w_game_yaml_delta.txt"
-diff "$A/game.yaml" "$B/game.yaml" | grep '^[<>]' | grep -v '^> *#' | grep -v '^> *$' > "$W/yaml.txt"
+diff "$A/game.yaml" "$B_YAML" | grep '^[<>]' | grep -v '^> *#' | grep -v '^> *$' > "$W/yaml.txt"
 if cmp -s "$W/yaml.txt" "$EXP"; then
     ok "2a2 game.yaml delta is exactly the declared D1+D2 override list ($(wc -l < "$EXP" | tr -d ' ') lines)"
 else
@@ -159,13 +168,13 @@ want="$(printf '%s ' $NAMES)"
 # file must fail whether it appears on disk or only in the pull list. This is
 # the property check 2a inherited from the "game.yaml identical" era and the
 # one that must survive every future slice.
-extra="$(printf '%s\n' "$hdl" | sed 's/$/jtcps2w_extra.v /')"
+extra="$(ls "$SRC/cores/cps2w/hdl" 2>/dev/null | tr '\n' ' ' | sed 's/$/jtcps2w_extra.v /')"
 [ "$extra" = "$want" ] \
-    && bad "4a control: an extra hdl file compared equal to the declared set" \
-    || ok "4a control fired (an undeclared cores/cps2w/hdl file fails 2a)"
+    && { vs_ctl_dead undeclared-hdl-file "an extra hdl file compared equal to the declared set"; bad "4a"; } \
+    || { vs_ctl_fired undeclared-hdl-file "an undeclared cores/cps2w/hdl file fails 2a"; ok "4a control fired"; }
 T="$(mktemp)"; { cat "$B/game.yaml"; echo "      - jtcps2w_extra.v"; } > "$T"
 diff "$A/game.yaml" "$T" | grep '^[<>]' | grep -v '^> *#' | grep -v '^> *$' > "$W/yaml_ctl.txt"
-cmp -s "$W/yaml_ctl.txt" "$EXP" && bad "4b control: a perturbed game.yaml matched the frozen delta" \
-                                || ok "4b control fired (an undeclared pull fails 2a2)"
+cmp -s "$W/yaml_ctl.txt" "$EXP" && { vs_ctl_dead undeclared-yaml-pull "a perturbed game.yaml matched the frozen delta"; bad "4b"; } \
+                                || { vs_ctl_fired undeclared-yaml-pull "an undeclared pull fails 2a2"; ok "4b control fired"; }
 rm -f "$T"
 [ $fail = 0 ] && echo "PASS test_jtcores_twin" || { echo "FAIL test_jtcores_twin"; exit 1; }

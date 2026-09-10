@@ -559,3 +559,4 @@ VSP-177	docs/project/gotchas.md	A line-continuation backslash followed by a comm
 VSP-178	docs/project/gotchas.md	THE FIRST RUNNER-DRIVEN MiSTer LANE FOUND TWO THINGS THE FREEZE RITUAL HAD NO EYE FOR (14z-134)	IN-LIST
 VSP-179	docs/project/gate_scoping_method.md	11. When the defect class is an OMISSION, enumerate — targeted testing cannot reach it (14z-143)	IN-LIST
 VSP-180	docs/project/gate_scoping_method.md	11. When the defect class is an OMISSION, enumerate — targeted testing cannot reach it (14z-143)	IN-LIST
+VSP-181	HANDOFF.md	THE PRE-COMMIT COMMAND — run this, not a filename (since 14z-94, GitHub #30)	IN-LIST

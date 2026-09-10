@@ -2,6 +2,8 @@
 # run_all_emulator.sh — THE EMULATOR-TIER GATE CHAIN. One command, every gate
 # that needs MAME, FBNeo or the Verilator simulator. (14z-128.)
 #
+# MUST-FIRE: none — a RUNNER asserts no property of the artifact; its verdict logic is tested by tests/test_emulator_runner.sh
+#
 # WHY THIS EXISTS. tests/run_all_static.sh ended the same failure for the
 # emulator-FREE set in 14z-94 and said so in its own header: "Emulator gates,
 # soaks and one-off rigs are deliberately NOT here — they stay manual, and
@@ -58,6 +60,23 @@
 #   ... --strict                                         SKIP and UNREGISTERED are failures too
 #   ... --keep-going                                     do not stop when the prereq lane fails
 #   ... --dry-run                                        print the resolved command per gate
+#   ... --controls                                       EXECUTE every declared must-fire control
+#                                                        (`CONTROL=<name> tests/<g>.sh` after a PASS;
+#                                                        one results row per control; off by default —
+#                                                        it re-runs each gate once per control)
+#
+# THE MUST-FIRE CONTROLS ARE READ ON EVERY RUN (14z-147, step two of the
+# maintainer's ruling, STATE 14z-145): the classifier is handed the gate
+# SCRIPT, so a gate whose header declares `# MUST-FIRE:` controls and whose
+# log lacks the matching `CONTROL FIRED:` lines — or carries a `CONTROL DEAD:`
+# — is plain FAIL (tests/lib/controls.sh, the one reader). `--controls` adds
+# the EXECUTABLE form: each declared name is a MODE the gate must honour by
+# applying the perturbation to its real input and reaching its own FAIL. Its
+# rows are `<gate>@<name>` with verdict PASS (honoured) or FAIL (LIES = exit 0,
+# REFUSED = not a mode of the gate, DIED = a crash), so they land in the tally
+# and under --strict like any gate. Off by default because it multiplies the
+# tier's runtime by the control count; the release checklist decides its
+# cadence (STATE "Decisions pending", 14z-147).
 #   ... --list                                           print the registry and exit
 #
 # THE MiSTer LANE IS OPT-IN (--lane mister or --lane all). Its gates are
@@ -92,7 +111,7 @@ cd "$REPO"
 
 REG=tests/ci_emulator.tsv
 SCOPE=release; CADENCE=all; LANES="prereq fbneo mame"; LANES_SET=""; ONLY=""; JOBS=1; TMO=5400
-LOGDIR=""; RESUME=0; STRICT=0; KEEPGOING=0; DRY=0; LIST=0
+LOGDIR=""; RESUME=0; STRICT=0; KEEPGOING=0; DRY=0; LIST=0; CONTROLS=0
 while [ $# -gt 0 ]; do
     case "$1" in
     --scope)   shift; SCOPE="${1:?--scope needs release|all}" ;;
@@ -117,6 +136,7 @@ while [ $# -gt 0 ]; do
     --strict)  STRICT=1 ;;
     --keep-going) KEEPGOING=1 ;;
     --dry-run) DRY=1 ;;
+    --controls) CONTROLS=1 ;;
     --list)    LIST=1 ;;
     -h|--help) sed -n '2,72p' "$0"; exit 0 ;;
     *) echo "unknown argument '$1' (try --help)" >&2; exit 2 ;;
@@ -323,11 +343,37 @@ run_one() {   # run_one <gate> <lane> <scope> <args> — writes one results row
     # SKIP marker last — lived inline here until 14z-139 and are now THE ONE
     # classifier every runner sources, tests/lib/classify.sh. Only the
     # TIMEOUT detail is this runner's own: it names the cap that killed.
-    vs_classify "$_st" "$_log" 90
+    # The 4th argument is the gate SCRIPT: its MUST-FIRE declarations are
+    # read against the log (14z-147; tests/lib/controls.sh).
+    vs_classify "$_st" "$_log" 90 "tests/$_g.sh"
     _v="$VS_VERDICT"; _d="$VS_DETAIL"
     [ "$_v" = TIMEOUT ] && _d="killed after ${_tmo}s"
     printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$_g" "$_lane" "$_scope" "$_v" "$_dur" "$_d" >> "$RESULTS"
     printf '  %-34s %-7s %4ss  %s\n' "$_g" "$_v" "$_dur" "$_d"
+    # THE EXECUTABLE CONTROLS (--controls): one more run per declared name.
+    if [ "$CONTROLS" = 1 ] && [ "$_v" = PASS ] && [ "${VS_CTL_DECLARED:-0}" != 0 ]; then
+        for _cn in $(vs_ctl_declared "tests/$_g.sh"); do
+            _clog="$LOGDIR/$_g@$_cn.log"; _c0=$(date +%s)
+            { echo "### $_g@$_cn  CONTROL=$_cn (the executable must-fire control; this run must FAIL)"
+              echo "### cmd: env$_env CONTROL=$_cn tests/$_g.sh$_pos"; } > "$_clog"
+            if [ -n "$TIMEOUT_BIN" ]; then
+                # shellcheck disable=SC2086
+                env $_env CONTROL="$_cn" "$TIMEOUT_BIN" -k 30 "$_tmo" "tests/$_g.sh" $_pos </dev/null 8>&- >> "$_clog" 2>&1 && _cs=0 || _cs=$?
+            else
+                # shellcheck disable=SC2086
+                env $_env CONTROL="$_cn" "tests/$_g.sh" $_pos </dev/null 8>&- >> "$_clog" 2>&1 && _cs=0 || _cs=$?
+            fi
+            _c1=$(date +%s); _cdur=$((_c1 - _c0))
+            vs_classify_control "$_cs" "$_clog"
+            case "$VS_CTL_EXEC" in
+            HONOURED) _cv=PASS; _cd="control honoured: $_cn $VS_CTL_EXEC_DETAIL" ;;
+            TIMEOUT)  _cv=TIMEOUT; _cd="control $_cn killed after ${_tmo}s" ;;
+            *)        _cv=FAIL; _cd="control $VS_CTL_EXEC: $_cn — $VS_CTL_EXEC_DETAIL" ;;
+            esac
+            printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$_g@$_cn" "$_lane" "$_scope" "$_cv" "$_cdur" "$_cd" >> "$RESULTS"
+            printf '  %-34s %-7s %4ss  %s\n' "$_g@$_cn" "$_cv" "$_cdur" "$_cd"
+        done
+    fi
 }
 
 already_done() {  # already_done <gate>
@@ -550,6 +596,22 @@ n_skip=$(awk -F'\t' 'NR>1 && $4=="SKIP"'    "$RESULTS" | wc -l | tr -d ' ')
 n_fail=$(awk -F'\t' 'NR>1 && $4=="FAIL"'    "$RESULTS" | wc -l | tr -d ' ')
 n_tmo=$(awk  -F'\t' 'NR>1 && $4=="TIMEOUT"' "$RESULTS" | wc -l | tr -d ' ')
 n_miss=$(awk -F'\t' 'NR>1 && $4=="MISSING"' "$RESULTS" | wc -l | tr -d ' ')
+# THE CONTROLS READOUT (14z-147): fired / declared over the gates that ran,
+# from the same reader the classifier used; the executable rows (if --controls)
+# are already in the tally as <gate>@<name>.
+_cd=0; _cf=0; _cu=0; _cx=0
+for _rg in $(awk -F'\t' 'NR>1 && $1 !~ /@/ && ($4=="PASS"||$4=="FAIL") {print $1}' "$RESULTS"); do
+    [ -f "tests/$_rg.sh" ] && [ -f "$LOGDIR/$_rg.log" ] || continue
+    vs_ctl_read "tests/$_rg.sh" "$LOGDIR/$_rg.log"
+    _cd=$((_cd + VS_CTL_DECLARED)); _cf=$((_cf + VS_CTL_FIRED))
+    [ "$VS_CTL_VERDICT" = UNDECLARED ] && _cu=$((_cu + 1))
+done
+_cx=$(awk -F'\t' 'NR>1 && $1 ~ /@/' "$RESULTS" | wc -l | tr -d ' ')
+echo
+echo "== must-fire controls (tests/lib/controls.sh) =="
+echo "  read:     fired $_cf / declared $_cd  (undeclared gates: $_cu)"
+[ "$CONTROLS" = 1 ] && echo "  executed: $_cx control run(s) as <gate>@<name> rows, in the tally below"                     || echo "  executed: (off — pass --controls to run each declared control as a mode)"
+
 echo
 echo "======================================================================"
 printf 'PASS %-4s  SKIP %-4s  FAIL %-4s  TIMEOUT %-4s  MISSING %s\n' \

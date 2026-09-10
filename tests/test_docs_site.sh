@@ -3,6 +3,12 @@
 # deterministic (14z-140, living-docs slice L4).
 # ci_portable: no ROM, no build dir, no emulator, ~25 s.
 #
+# MUST-FIRE: perturbed-copy: unsupported-construct — a REFERENCE doc gaining an h4 heading must fail --check (mode: on a copy of the real corpus)
+# MUST-FIRE: perturbed-copy: unresolved-link — a README link to a page that is not there must fail --check
+# MUST-FIRE: perturbed-copy: dangling-anchor — a link to a heading no page has must fail --check
+# MUST-FIRE: perturbed-copy: address-index-no-heading — an unclosed code span that swallows the heading an address sits under must fail the address index (the two parsers disagree; nothing else catches it)
+# MUST-FIRE: perturbed-copy: unclosed-header — the rendered index.html with its </header> removed must fail the tag-balance check (the defect the maintainer found by opening the page, 14z-141)
+#
 # WHAT IT HOLDS. `tools/mk_docs_site.py` renders every document declared in
 # docs/doc_shape.tsv plus the two skill GUIDEs, an ADDRESS INDEX built from
 # `gen_annotations.collect()`, and a search index. This gate asserts that the
@@ -49,13 +55,31 @@ fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 TOOL=tools/mk_docs_site.py
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 
 echo "== test_docs_site: the corpus renders, resolves and is deterministic =="
 [ -f "$TOOL" ] || { echo "FAIL: $TOOL is absent"; exit 1; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 
 # --- 1. everything parses and every reference resolves ----------------------
-if python3 "$TOOL" --check > "$W/check.log" 2>&1; then
+# THE EXECUTABLE FORM: under CONTROL=<name> the perturbation is applied to a
+# COPY OF THE REAL CORPUS (every carrier the renderer reads) and --check runs
+# on the copy — it must FAIL. unclosed-header perturbs the RENDERED site below.
+ROOT_ARGS=""
+case "$VS_CTL" in
+""|unclosed-header) ;;
+*)  mkdir -p "$W/mode/build" "$W/mode/.claude"
+    cp -R docs tools tests "$W/mode/"; cp -R build/manifest "$W/mode/build/"; cp -R .claude/skills "$W/mode/.claude/"
+    case "$VS_CTL" in
+    unsupported-construct)     printf '\n#### an h4 nobody may write\n' >> "$W/mode/docs/game/atlas/id_space.md" ;;
+    unresolved-link)           printf '\nsee [x](game/atlas/nope_file.md)\n' >> "$W/mode/docs/README.md" ;;
+    dangling-anchor)           printf '\nsee [sec](game/atlas/id_space.md#no-such-heading-anywhere)\n' >> "$W/mode/docs/README.md" ;;
+    address-index-no-heading)  printf '\nrun `bbh one\n## Topic none\ntwo` and stop\n\nfacts about `PRG:0x0F1234`\n' >> "$W/mode/docs/project/mister_fit.md" ;;
+    esac
+    ROOT_ARGS="--root $W/mode" ;;
+esac
+
+if python3 "$TOOL" $ROOT_ARGS --check > "$W/check.log" 2>&1; then
     ok "--check: $(tail -1 "$W/check.log")"
 else
     bad "--check FAILS:"; sed 's/^/        /' "$W/check.log" | head -20
@@ -170,13 +194,13 @@ mkroot() {  # mkroot <dir> <README body> <a.md body>
     printf '%b' "$2" > "$1/docs/README.md"
     printf '%b' "$3" > "$1/docs/a.md"
 }
-control() {  # control <label> <root> <expected substring>
+control() {  # control <name> <root> <expected substring>
     if python3 "$TOOL" --root "$2" --check > "$2/log" 2>&1; then
-        bad "$1: the generator ACCEPTED it — the check is not checking"
+        vs_ctl_dead "$1" "the generator ACCEPTED it — the check is not checking"; bad "$1"
     elif grep -q "$3" "$2/log"; then
-        ok "$1: fires ($3)"
+        vs_ctl_fired "$1" "$3"; ok "$1: fires ($3)"
     else
-        bad "$1: failed for the wrong reason:"; sed 's/^/        /' "$2/log" | head -4
+        vs_ctl_dead "$1" "failed for the wrong reason"; bad "$1:"; sed 's/^/        /' "$2/log" | head -4
     fi
 }
 CLEAN_README='# idx\n\nsee [a](a.md) and [sec](a.md#topic-one)\n'
@@ -190,13 +214,13 @@ else
 fi
 
 mkroot "$W/r1" "$CLEAN_README" '# A file\n\n#### an h4\n'
-control "an unsupported construct" "$W/r1" "unsupported construct"
+control unsupported-construct "$W/r1" "unsupported construct"
 
 mkroot "$W/r2" '# idx\n\nsee [x](nope.md)\n' "$CLEAN_A"
-control "an unresolved link" "$W/r2" "unresolved link"
+control unresolved-link "$W/r2" "unresolved link"
 
 mkroot "$W/r3" '# idx\n\nsee [sec](a.md#no-such-heading)\n' "$CLEAN_A"
-control "a dangling anchor" "$W/r3" "dangling anchor"
+control dangling-anchor "$W/r3" "dangling anchor"
 
 # THE ADDRESS INDEX refuses a carrier whose section resolves to no heading —
 # a link into a page that would land nowhere. Reaching it takes a real
@@ -221,9 +245,9 @@ printf '# A file\n\nrun `bbh one\n## Topic one\ntwo` and stop\n\nfacts about `PR
     > "$W/r4/docs/project/a.md"
 # the control's own liveness: the address must actually be collected
 if [ "$(python3 -c "import sys;sys.path.insert(0,'tools');import gen_annotations as g;from pathlib import Path;print(len(g.collect(Path('$W/r4'))))")" = "0" ]; then
-    bad "an address-index section that is no heading: the fixture collects NO address — the control is dead"
+    vs_ctl_dead address-index-no-heading "the fixture collects NO address — the control is dead"; bad "address-index-no-heading"
 else
-    control "an address-index section that is no heading" "$W/r4" "address index"
+    control address-index-no-heading "$W/r4" "address index"
 fi
 
 # --- 8. MUST-NOT-FIRE: a placeholder inside a code span ---------------------
@@ -283,15 +307,11 @@ if bad:
 print("%d pages, every tag closed in order" % pages)
 PY
 }
-if balance "$W/site" > "$W/bal.log" 2>&1; then
-    ok "$(tail -1 "$W/bal.log")"
-else
-    bad "malformed page(s):"; sed 's/^/        /' "$W/bal.log" | head -8
-fi
-
-# its MUST-FIRE control: the exact defect, reintroduced on a COPY of the real
-# tree. Perturbing the rendered output is the right surface — the check reads
-# rendered output, and a control must prove THE CHECK is alive.
+# its MUST-FIRE control: the exact defect, reintroduced on a COPY of the
+# rendered site. Perturbing the rendered output is the right surface — the
+# check reads rendered output, and a control must prove THE CHECK is alive.
+# Under CONTROL=unclosed-header the perturbed copy IS the site the positive
+# check reads, and this run must FAIL.
 cp -R "$W/site" "$W/site_bad"
 python3 - "$W/site_bad/index.html" <<'PY'
 import pathlib, sys
@@ -300,12 +320,18 @@ t = p.read_text(encoding="utf-8")
 assert "</header>" in t, "the fixture has no </header> to remove"
 p.write_text(t.replace("</header>", "", 1), encoding="utf-8")
 PY
-if balance "$W/site_bad" > "$W/bal_bad.log" 2>&1; then
-    bad "an unclosed <header> was ACCEPTED — the structure check is dead"
-elif grep -q "header" "$W/bal_bad.log"; then
-    ok "must-fire: an unclosed <header> is caught ($(head -1 "$W/bal_bad.log"))"
+SITE="$W/site"; vs_ctl_is unclosed-header && SITE="$W/site_bad"
+if balance "$SITE" > "$W/bal.log" 2>&1; then
+    ok "$(tail -1 "$W/bal.log")"
 else
-    bad "the structure control fired for the wrong reason:"
+    bad "malformed page(s):"; sed 's/^/        /' "$W/bal.log" | head -8
+fi
+if balance "$W/site_bad" > "$W/bal_bad.log" 2>&1; then
+    vs_ctl_dead unclosed-header "an unclosed <header> was ACCEPTED — the structure check is dead"; bad "unclosed-header"
+elif grep -q "header" "$W/bal_bad.log"; then
+    vs_ctl_fired unclosed-header "an unclosed <header> is caught ($(head -1 "$W/bal_bad.log"))"
+else
+    vs_ctl_dead unclosed-header "the structure control fired for the wrong reason"; bad "unclosed-header:"
     sed 's/^/        /' "$W/bal_bad.log" | head -4
 fi
 

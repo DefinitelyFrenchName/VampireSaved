@@ -3,6 +3,10 @@
 # (14z-123, the documentation rationalization pass, G6). ci_portable: no ROM,
 # no build dir, no emulator, ~1 s.
 #
+# MUST-FIRE: perturbed-copy: no-family-row — a script with no tests/gate_index.tsv row must fail --check, or a new gate goes unclassified
+# MUST-FIRE: perturbed-copy: dead-tsv-row — a TSV row whose script is gone must fail --check
+# MUST-FIRE: perturbed-copy: hand-edited-index — a row hand-added to the committed index must fail the cmp
+#
 # WHAT IT HOLDS. `tools/gen_gate_index.py --check` regenerates the gate index
 # — one row per tests/*.sh: kind, tier (from the ci registries), family (from
 # tests/gate_index.tsv, the one hand-maintained input), needs, the script's
@@ -23,18 +27,33 @@ cd "$REPO"
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+
+# THE EXECUTABLE FORM: under CONTROL=<name> the perturbation is applied to a
+# COPY OF THE REAL INPUTS (every script header, the family TSV, the registries,
+# the committed index) and the main check runs on that copy — it must FAIL.
+ROOT="$REPO"
+if [ -n "$VS_CTL" ]; then
+    mkdir -p "$W/mode/tests" "$W/mode/docs/project"
+    GI=docs/project/gate_index.md   # (a variable: `cp <doc> "<dir>"` reads as a section citation to checkdocshape)
+    cp tests/*.sh tests/*.tsv tests/*.txt "$W/mode/tests/"; cp "$GI" "$W/mode/docs/project/"
+    case "$VS_CTL" in
+    no-family-row)     printf '#!/bin/sh\n# audit_zz_synthetic.sh — no family row.\n#\necho PASS\n' > "$W/mode/tests/audit_zz_synthetic.sh" ;;
+    dead-tsv-row)      printf 'tests/test_gone.sh\tdocs\n' >> "$W/mode/tests/gate_index.tsv" ;;
+    hand-edited-index) printf '| `tests/hand.sh` | test | x | x | x | x |\n' >> "$W/mode/docs/project/gate_index.md" ;;
+    esac
+    ROOT="$W/mode"
+fi
 
 echo "== test_gate_index_current: the gate index follows the tree =="
-LOG="$(mktemp)"
-if python3 tools/gen_gate_index.py --check >"$LOG" 2>&1; then
+LOG="$W/tree.log"
+if python3 tools/gen_gate_index.py --root "$ROOT" --check >"$LOG" 2>&1; then
     ok "$(tail -1 "$LOG")"
 else
     bad "gen_gate_index.py --check FAILS (regenerate: python3 tools/gen_gate_index.py; add rows to tests/gate_index.tsv):"
     sed 's/^/        /' "$LOG" | head -20
 fi
-rm -f "$LOG"
-
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 mkdir -p "$W/tests" "$W/docs/project"
 printf '#!/bin/sh\n# test_alpha.sh — a synthetic gate that locks the alpha law (14z-999).\n#\necho PASS\n' > "$W/tests/test_alpha.sh"
 printf 'test_alpha\n' > "$W/tests/ci_portable.txt"; : > "$W/tests/ci_static.txt"
@@ -50,9 +69,9 @@ fi
 # b: a script without a family row fails; the row clears it
 printf '#!/bin/sh\n# audit_beta.sh — a synthetic audit with no family row.\n#\necho PASS\n' > "$W/tests/audit_beta.sh"
 if python3 tools/gen_gate_index.py --root "$W" --check >/dev/null 2>&1; then
-    bad "control b: a script with NO family row passed --check"
+    vs_ctl_dead no-family-row "a script with NO family row passed --check"; bad "control b"
 else
-    ok "control b: a script with no family row fails --check"
+    vs_ctl_fired no-family-row "a script with no family row fails --check"; ok "control b: a script with no family row fails --check"
 fi
 printf 'tests/audit_beta.sh\tplatform\n' >> "$W/tests/gate_index.tsv"
 python3 tools/gen_gate_index.py --root "$W" >/dev/null 2>&1
@@ -64,17 +83,17 @@ fi
 # c: a dead TSV row fails
 printf 'tests/test_gone.sh\tdocs\n' >> "$W/tests/gate_index.tsv"
 if python3 tools/gen_gate_index.py --root "$W" --check >/dev/null 2>&1; then
-    bad "control c: a TSV row for a missing script passed --check"
+    vs_ctl_dead dead-tsv-row "a TSV row for a missing script passed --check"; bad "control c"
 else
-    ok "control c: a TSV row whose script is gone fails --check"
+    vs_ctl_fired dead-tsv-row "a TSV row whose script is gone fails --check"; ok "control c: a TSV row whose script is gone fails --check"
 fi
 sed -i.bak '$d' "$W/tests/gate_index.tsv"; rm -f "$W/tests/gate_index.tsv.bak"
 # d: a hand-edit fails the cmp
 printf '| `tests/hand.sh` | test | x | x | x | x |\n' >> "$W/docs/project/gate_index.md"
 if python3 tools/gen_gate_index.py --root "$W" --check >/dev/null 2>&1; then
-    bad "control d: a hand-edited index passed --check"
+    vs_ctl_dead hand-edited-index "a hand-edited index passed --check"; bad "control d"
 else
-    ok "control d: a hand-edited index fails --check"
+    vs_ctl_fired hand-edited-index "a hand-edited index fails --check"; ok "control d: a hand-edited index fails --check"
 fi
 
 [ "$fail" -eq 0 ] && echo "PASS test_gate_index_current" || echo "FAIL test_gate_index_current"

@@ -2,6 +2,8 @@
 # test_demand_after_trap.sh — no gate carries a `${VAR:?msg}` DEMAND after its
 # EXIT trap (14z-134). ci_portable: no ROM, no build dir, no emulator, ~1 s.
 #
+# MUST-FIRE: known-bad: demand-after-trap — a script with a `${VAR:?}` demand after its EXIT trap must be reported (mode: that script added to a copy of tests/)
+#
 # WHY. On macOS bash 3.2 — /bin/sh AND /bin/bash — a parameter-expansion
 # abort (`${VAR:?}` on an unset VAR) exits the shell with status 0 once an
 # EXIT trap is armed; without the trap it exits 1, and a trap written to
@@ -29,6 +31,17 @@ cd "$REPO"
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+BAD_STUB='#!/bin/sh\nset -eu\nW=$(mktemp -d); trap '"'"'rm -rf "$W"'"'"' EXIT\n: "${FOO:?set FOO}"\n'
+
+# THE EXECUTABLE FORM: under CONTROL=demand-after-trap the known-bad script is
+# added to a COPY of tests/ and the scan runs on the copy — it must FAIL.
+SCAN=tests
+if vs_ctl_is demand-after-trap; then
+    mkdir -p "$W/mode/lib"; cp tests/*.sh "$W/mode/"; cp tests/lib/*.sh "$W/mode/lib/"
+    printf "$BAD_STUB" > "$W/mode/zz_synthetic_demand.sh"; SCAN="$W/mode"
+fi
 
 scan() {  # scan <dir> — prints "file:line: text" for every demand after the first EXIT trap
 python3 - "$1" <<'EOF'
@@ -61,17 +74,16 @@ EOF
 }
 
 echo "== test_demand_after_trap: no \${VAR:?} demand after an EXIT trap =="
-if out="$(scan tests)"; then
+if out="$(scan "$SCAN")"; then
     ok "no gate carries a demand after its EXIT trap"
 else
     bad "demand(s) after an EXIT trap — write them as explicit tests:"; printf '%s\n' "$out" | sed 's/^/        /'
 fi
 
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 mkdir -p "$W/a/lib" "$W/b/lib"
-printf '#!/bin/sh\nset -eu\nW=$(mktemp -d); trap '"'"'rm -rf "$W"'"'"' EXIT\n: "${FOO:?set FOO}"\n' > "$W/a/g.sh"
+printf "$BAD_STUB" > "$W/a/g.sh"
 printf '#!/bin/sh\nset -eu\n: "${FOO:?set FOO}"\nW=$(mktemp -d); trap '"'"'rm -rf "$W"'"'"' EXIT\ncat <<EOS\nstub ${BAR:?} in a heredoc is fine\nEOS\n' > "$W/b/g.sh"
-if scan "$W/a" >/dev/null; then bad "control: a demand AFTER the trap was not reported"; else ok "control fires: a demand after the trap is reported"; fi
+if scan "$W/a" >/dev/null; then vs_ctl_dead demand-after-trap "a demand AFTER the trap was not reported"; bad "control"; else vs_ctl_fired demand-after-trap "a demand after the trap is reported"; ok "control fires"; fi
 if scan "$W/b" >/dev/null; then ok "control: a demand BEFORE the trap, and one inside a heredoc, are allowed"; else bad "control: the allowed shapes were reported"; fi
 
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

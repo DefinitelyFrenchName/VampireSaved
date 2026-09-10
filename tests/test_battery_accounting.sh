@@ -2,6 +2,8 @@
 # test_battery_accounting.sh — "BATTERY GREEN" must not be printable when
 # gates self-skipped (14z-94, GitHub #24). ROM-free, ~1 s.
 #
+# MUST-FIRE: shadow-tool: reader-unplugged — the extracted accounting with the classifier's gate-script argument removed must let a declared-but-unfired control pass (mode: section 7 drives that copy, and must fail)
+#
 # WHY. run_battery_m2.sh is `set -eu` and invoked each gate as a bare command,
 # so exit 0 was indistinguishable from PASS. At least four gates `exit 0` when
 # a prerequisite is absent, and FIVE more are skipped wholesale by the
@@ -56,6 +58,12 @@ T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
 sed -n '/^_bat_pass=0/,/^}$/p' "$B" > "$T/acct.sh"
 # the second function too
 sed -n '/^bat_group_skip()/,/^}$/p' "$B" >> "$T/acct.sh"
+# THE SHADOW: the same accounting with the gate-script argument dropped from
+# the classifier call — the controls reader unplugged (14z-147).
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+sed 's|vs_classify "$_bat_st" "$_BAT_TMP/out" 90 "$1"|vs_classify "$_bat_st" "$_BAT_TMP/out" 90|' "$T/acct.sh" > "$T/acct_unplugged.sh"
+cmp -s "$T/acct.sh" "$T/acct_unplugged.sh" && fail "could not unplug the reader — the vs_classify call moved"
+ACCT=acct.sh; vs_ctl_is reader-unplugged && ACCT=acct_unplugged.sh
 if ! grep -q "bat()" "$T/acct.sh" || ! grep -q "bat_group_skip()" "$T/acct.sh"; then
     echo "  FAIL: could not extract the accounting functions — this section"
     echo "        would prove nothing"; exit 1
@@ -135,6 +143,31 @@ out2="$( cd "$T" && sh -c '
 printf '%s' "$out2" | grep -q "BATTERY GREEN — 2 gates" \
     && echo "  ok: an all-pass run (incl. the teardown-segfault shape) still prints GREEN" \
     || { fail "a clean battery no longer reports GREEN:"; printf '%s\n' "$out2" | sed 's/^/        /'; }
+
+echo "== 7. a declared must-fire control that did not fire stops the battery (14z-147) =="
+# `bat` hands the classifier the gate script, so the header's `# MUST-FIRE:`
+# declarations are read against the log through tests/lib/controls.sh — the
+# reader classify.sh sources when REPO names this tree.
+{ printf '#!/bin/sh\n# g_ctl.sh — a stub\n# MUST-FIRE: perturbed-copy: flip — a flipped byte must fail\necho "PASS: fine"\nexit 0\n'; } > "$T/g_ctl.sh"
+{ printf '#!/bin/sh\n# g_ctlok.sh — a stub\n# MUST-FIRE: perturbed-copy: flip — a flipped byte must fail\necho "PASS: fine"\necho "CONTROL FIRED: flip — caught"\nexit 0\n'; } > "$T/g_ctlok.sh"
+chmod +x "$T/g_ctl.sh" "$T/g_ctlok.sh"
+if ( cd "$T" && REPO="$REPO" ACCT="$ACCT" sh -c '. "$CLASSIFY"; . "./$ACCT"; bat ./g_ctlok.sh; bat ./g_ctl.sh; echo "REACHED-AFTER-DEAD"' \
+        > "$T/g.out" 2>&1 ); then
+    fail "a declared-but-unfired control did not stop the battery"
+else
+    grep -q "REACHED-AFTER-DEAD" "$T/g.out" && fail "execution continued past the dead control" \
+        || echo "  ok: aborted at the gate whose control did not fire"
+    grep -q "BATTERY FAILED at g_ctl (exit 0: controls RED: flip(not fired)" "$T/g.out" \
+        && echo "  ok: and it names the control" || { fail "the abort does not name the dead control:"; sed 's/^/        /' "$T/g.out"; }
+fi
+
+echo "== 8. MUST-FIRE: the unplugged accounting lets the dead-control stub through =="
+if ( cd "$T" && REPO="$REPO" sh -c '. "$CLASSIFY"; . ./acct_unplugged.sh; bat ./g_ctl.sh; echo "REACHED-AFTER-DEAD"' \
+        > "$T/u.out" 2>&1 ) && grep -q "REACHED-AFTER-DEAD" "$T/u.out"; then
+    vs_ctl_fired reader-unplugged "with no gate script handed to the classifier, the declared-but-unfired control passes the battery"
+else
+    vs_ctl_dead reader-unplugged "the unplugged accounting still stopped at the stub"; fail "reader-unplugged"
+fi
 
 echo
 [ "$rc" = 0 ] && echo "PASS: the battery cannot call itself green while skipping." \

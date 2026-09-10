@@ -32,6 +32,7 @@ a heading):
 | know whether an atlas claim still matches the ROM | `python3 tools/checkdocs_rom.py` — every check quotes its claim from the document and re-derives it from the decrypted image; `--uncovered` lists what no check reaches |
 | SEE what a capture/throw looks like, ours vs native | `tools/capture_sheet.sh <att> <vic>` — the "What exists" row; matched by KEYFRAME, never by frame |
 | know why something that "should work" does not | `docs/GOTCHAS.md` — always before re-deriving |
+| declare a gate's must-fire control, run one as a mode, or read the controls readout | `docs/project/must_fire_contract.md` — the grammar, `CONTROL=<name> tests/<gate>.sh`, the runners' verdicts ([VSP-181]); the census is `tests/test_must_fire_census.sh` |
 
 ## What exists (M0 bench, 2026-07-25)
 
@@ -1137,6 +1138,8 @@ tests/run_all_static.sh                    # portable tier: ROM-free, ~1 min
 ROMDIR=... tests/run_all_static.sh         # + the static tier, ~8 min
 ROMDIR=... tests/run_all_static.sh --strict   # SKIP counts as failure too
 tests/run_all_static.sh --list             # what is registered
+tests/run_all_static.sh --exec-controls none  # skip the executable must-fire controls ([VSP-181]; default all)
+CONTROL=<name> tests/<gate>.sh             # one declared control as a MODE — must reach the gate's own FAIL
 ROMDIR=... tests/test_inp_corpus.sh        # EMULATOR tier: every tracked hand-played recording, no exception (14z-111)
 ROMDIR=... tests/test_down_flash_vanilla.sh  # EMULATOR tier: the one-frame white-out at a down is VANILLA (#113 ground truth, 14z-112)
 ROMDIR=... [SNAP_FRAMES=a,b DUMP_FRAMES=..] tools/run_inp_probe.sh <build> <inp>   # per-frame video hash + HP/death/OBJ counts, snapshots, OBJ dumps (also REPLAY= driven)
@@ -1170,6 +1173,29 @@ verdict classifier is `tests/lib/classify.sh` (14z-139), THE ONE copy that
 `run_all_emulator.sh` and `run_battery_m2.sh` source too** — until then the
 static runner and the battery read an exit-0 shell crash ([VSP-176]) as PASS
 while the sweep read it as FAIL.
+
+**[VSP-181]** **THE MUST-FIRE CONTRACT (14z-147, step two of the maintainer's
+ruling on the BBX finding — spec of record `docs/project/must_fire_contract.md`,
+the tree's COPY of BBX's R10/R29/R30, independent but compatible): a control is
+DECLARED in the gate's leading comment block as `# MUST-FIRE: <shape>: <name> —
+<what must fail>` (shape `perturbed-copy` | `shadow-tool` | `known-bad`, a bare
+`#` continues the block; `# MUST-FIRE: none — <why>` for a gate that asserts no
+property); FIRED at run time as `CONTROL FIRED: <name> — <evidence>` or
+`CONTROL DEAD: <name> — <what happened>` at column 0; and EXECUTABLE as a
+mode — `CONTROL=<name> tests/<gate>.sh` applies the perturbation to the REAL
+input and must reach the gate's own FAIL (exit 0 is LIES, a `REFUSED:` line
+with exit 3 is a dead mode, a crash is DIED).** Every runner hands
+`vs_classify` the gate script, and a declared control that did not fire, a
+DEAD line or a firing no header declares is plain FAIL — no fourth verdict.
+`tests/run_all_static.sh` executes every declared control after a PASS
+(`--exec-controls all|portable|none`) and prints `fired N / declared N` plus
+the executed tally; `run_all_emulator.sh` reads every block and executes under
+`--controls` (rows `<gate>@<name>`). The reader is `tests/lib/controls.sh`
+(ground truth `tests/test_controls_contract.sh`); the retrofit's status is the
+census's three frozen classes (`declares` grows only, `header-only` and
+`retrofit-debt` shrink only). Write each perturbation as ONE function the
+control section and the mode both call, so what the mode proves is what the
+control claims.
 
 ### **[VSP-164]** THE EMULATOR-TIER COMMAND — `tests/run_all_emulator.sh` (since 14z-128)
 

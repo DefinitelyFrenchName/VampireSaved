@@ -3,6 +3,18 @@
 # (14z-114; level 0 added 14z-134). ci_portable: no ROM, no build dir, no
 # emulator, ~1 s.
 #
+# MUST-FIRE: perturbed-copy: unanchored-rule — a rule appended to a level-1 skill with no anchor in any doc must be reported ANCHORED NOWHERE
+# MUST-FIRE: perturbed-copy: stripped-anchor — the first MSV anchor stripped from mister_map.md must leave its rule ANCHORED NOWHERE
+# MUST-FIRE: perturbed-copy: game-name-in-level1 — a level-1 (board) skill naming a character must fail the liftability test
+# MUST-FIRE: perturbed-copy: number-in-no-log — a figure a skill quotes that no LOG carries must be reported
+# MUST-FIRE: perturbed-copy: unanchored-cph-rule — the same for the hardware skill's prefix
+# MUST-FIRE: perturbed-copy: dangling-crossref — a rule citing an ID no skill defines must be reported
+# MUST-FIRE: perturbed-copy: port-token-in-game-skill — the game skill naming a tenant must fail its liftability test
+# MUST-FIRE: perturbed-copy: state-anchor-outside — a VSP anchor in STATE.md outside the two standing sections must be reported (it would roll to the archive)
+# MUST-FIRE: perturbed-copy: unanchored-level0-rule — the level-0 skills are locked the same way
+# MUST-FIRE: perturbed-copy: board-name-in-level0 — a level-0 skill naming the board must fail the stricter liftability test
+# MUST-FIRE: perturbed-copy: redirect-removed — a lifted rule's redirect stub deleted leaves its old ID undefined, which must be reported
+#
 # LEVEL 0 (14z-134): `mame-fbneo-instruments` [MFI] and `mister-jtframe-core`
 # [MJC] carry the rules of CPE/CPH/MSC that would still be true if the board
 # were not CPS-2. A lifted rule KEEPS ITS NUMBER and anchors in the SAME
@@ -58,16 +70,9 @@ cd "$REPO"
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 
-echo "== test_checkskills: skills locked to docs =="
-if python3 tools/checkskills.py >/tmp/checkskills.$$.log 2>&1; then
-    ok "checkskills.py PASS on the tree ($(grep -o '[0-9]* rules' /tmp/checkskills.$$.log | head -1))"
-else
-    bad "checkskills.py FAILS on the tree:"; sed 's/^/        /' /tmp/checkskills.$$.log
-fi
-rm -f /tmp/checkskills.$$.log
-
-# --- must-fire controls on a perturbed copy -------------------------------
 # FILES is DERIVED (14z-122): the union of every path checkskills.py and
 # doc_anchor_census.py read, printed by the census tool — the hard-coded copy
 # of checkskills' own lists drifted whenever a list changed, and a missing
@@ -76,59 +81,61 @@ FILES="$(python3 tools/doc_anchor_census.py --list-files)"
 mkcopy() {  # mkcopy <dir>
     for f in $FILES; do mkdir -p "$1/$(dirname "$f")"; cp "$f" "$1/$f"; done
 }
-control() {  # control <label> <dir> <expected substring>
-    if python3 tools/checkskills.py --root "$2" --no-selftest >"$2/log" 2>&1; then
-        bad "$1: the perturbed copy PASSED — the check is not checking"
-    elif grep -q "$3" "$2/log"; then
-        ok "$1: fires ($3)"
+# control stripped-anchor picks the FIRST MSV anchor mister_map.md carries
+# (14z-122: the hard-coded MSV-6 broke the control whenever that paragraph
+# moved file) — read from the REAL file, before any copy
+BID="$(grep -o '\*\*\[MSV-[0-9]*\]\*\*' docs/project/mister_map.md | head -1 | tr -d '*[]')"
+[ -n "$BID" ] || bad "stripped-anchor: mister_map.md carries no MSV anchor to strip"
+# THE PERTURBATIONS, one per declared control; the control section and the
+# CONTROL=<name> mode call the same function. EXPECT = the failure's substring.
+perturb() {  # perturb <name> <dir>
+    case "$1" in
+    unanchored-rule)   printf -- '- [MSC-999] a rule nobody anchored\n' >> "$2/.claude/skills/mister-cps2-wide-core/SKILL.md"; EXPECT="ANCHORED NOWHERE" ;;
+    stripped-anchor)   sed -i.bak "s/\*\*\[$BID\]\*\* //" "$2/docs/project/mister_map.md"
+                       grep -q "\*\*\[$BID\]\*\*" "$2/docs/project/mister_map.md" && bad "stripped-anchor: the anchor was not stripped"
+                       EXPECT="ANCHORED NOWHERE: $BID" ;;
+    game-name-in-level1) printf -- '\nA note that names Donovan by name.\n' >> "$2/.claude/skills/mister-cps2-wide-core/SKILL.md"; EXPECT="level-1 skill names 'donovan'" ;;
+    number-in-no-log)  printf -- '\nThe magic figure is 0xDEADBEEF1.\n' >> "$2/.claude/skills/mister-vampire-saved/SKILL.md"; EXPECT="in NO log: 0xDEADBEEF1" ;;
+    unanchored-cph-rule) printf -- '- [CPH-999] a hardware rule nobody anchored\n' >> "$2/.claude/skills/cps2-hardware/SKILL.md"; EXPECT="ANCHORED NOWHERE: CPH-999" ;;
+    dangling-crossref) printf -- '- [CPE-999] a rule with a dangling reference to [CPH-998]\n' >> "$2/.claude/skills/cps2-emulation/SKILL.md"; EXPECT="cross-reference \[CPH-998\]" ;;
+    port-token-in-game-skill) printf -- '\nA line about the tenant build/m3b_merged17.\n' >> "$2/.claude/skills/vampire-savior-engine/SKILL.md"; EXPECT="level-1 skill names 'tenant'" ;;
+    state-anchor-outside) printf -- '- [VSP-999] a port rule anchored where STATE rolls over\n' >> "$2/.claude/skills/vampire-saved-port/SKILL.md"
+                       printf -- '\n**[VSP-999]** an anchor appended outside the two standing sections.\n' >> "$2/STATE.md"
+                       EXPECT="VSP-999 anchored in STATE.md OUTSIDE" ;;
+    # level 0 (14z-134): the two board-agnostic skills are locked the same way,
+    # and their liftability test is one level stricter — naming the BOARD fails.
+    unanchored-level0-rule) printf -- '- [MFI-999] an instrument rule nobody anchored\n' >> "$2/.claude/skills/mame-fbneo-instruments/SKILL.md"; EXPECT="ANCHORED NOWHERE: MFI-999" ;;
+    board-name-in-level0) printf -- '\nA note that says this is true on CPS-2 only.\n' >> "$2/.claude/skills/mister-jtframe-core/SKILL.md"; EXPECT="level-1 skill names 'cps'" ;;
+    # a redirect stub must keep the old ID DEFINED: stripping one leaves its
+    # anchor orphaned, which is exactly the failure that would break a citation.
+    redirect-removed)  sed -i.bak '/^- \[CPE-24\] /d' "$2/.claude/skills/cps2-emulation/SKILL.md"; EXPECT="NOT DEFINED in the skill: CPE-24" ;;
+    *) echo "no such perturbation: $1"; exit 3 ;;
+    esac
+}
+
+# THE EXECUTABLE FORM: under CONTROL=<name> the perturbed copy IS the tree
+# the main check reads, and this run must FAIL.
+ROOT="$REPO"; SELFTEST=""
+if [ -n "$VS_CTL" ]; then mkcopy "$W/mode"; perturb "$VS_CTL" "$W/mode"; ROOT="$W/mode"; SELFTEST="--no-selftest"; fi
+
+echo "== test_checkskills: skills locked to docs =="
+if python3 tools/checkskills.py --root "$ROOT" $SELFTEST >"$W/tree.log" 2>&1; then
+    ok "checkskills.py PASS on the tree ($(grep -o '[0-9]* rules' "$W/tree.log" | head -1))"
+else
+    bad "checkskills.py FAILS on the tree:"; sed 's/^/        /' "$W/tree.log"
+fi
+
+# --- must-fire controls on a perturbed copy -------------------------------
+control() {  # control <name>
+    d="$W/$1"; mkcopy "$d"; perturb "$1" "$d"
+    if python3 tools/checkskills.py --root "$d" --no-selftest >"$d/log" 2>&1; then
+        vs_ctl_dead "$1" "the perturbed copy PASSED — the check is not checking"; bad "$1"
+    elif grep -q "$EXPECT" "$d/log"; then
+        vs_ctl_fired "$1" "$EXPECT"; ok "$1: fires"
     else
-        bad "$1: failed for the wrong reason:"; sed 's/^/        /' "$2/log"
+        vs_ctl_dead "$1" "failed for the wrong reason"; bad "$1:"; sed 's/^/        /' "$d/log"
     fi
 }
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
-
-mkcopy "$W/a"; printf -- '- [MSC-999] a rule nobody anchored\n' >> "$W/a/.claude/skills/mister-cps2-wide-core/SKILL.md"
-control "unanchored rule" "$W/a" "ANCHORED NOWHERE"
-
-# control b picks the FIRST MSV anchor mister_map.md carries (14z-122: the
-# hard-coded MSV-6 broke the control whenever that one paragraph moved file).
-mkcopy "$W/b"
-BID="$(grep -o '\*\*\[MSV-[0-9]*\]\*\*' "$W/b/docs/project/mister_map.md" | head -1 | tr -d '*[]')"
-[ -n "$BID" ] || bad "control b: mister_map.md carries no MSV anchor to strip"
-sed -i.bak "s/\*\*\[$BID\]\*\* //" "$W/b/docs/project/mister_map.md"
-grep -q "\*\*\[$BID\]\*\*" "$W/b/docs/project/mister_map.md" && bad "control b: the anchor was not stripped"
-control "stripped anchor" "$W/b" "ANCHORED NOWHERE: $BID"
-
-mkcopy "$W/c"; printf -- '\nA note that names Donovan by name.\n' >> "$W/c/.claude/skills/mister-cps2-wide-core/SKILL.md"
-control "game name in level 1" "$W/c" "level-1 skill names 'donovan'"
-
-mkcopy "$W/d"; printf -- '\nThe magic figure is 0xDEADBEEF1.\n' >> "$W/d/.claude/skills/mister-vampire-saved/SKILL.md"
-control "number in no log" "$W/d" "in NO log: 0xDEADBEEF1"
-
-mkcopy "$W/e"; printf -- '- [CPH-999] a hardware rule nobody anchored\n' >> "$W/e/.claude/skills/cps2-hardware/SKILL.md"
-control "unanchored CPH rule" "$W/e" "ANCHORED NOWHERE: CPH-999"
-
-mkcopy "$W/f"; printf -- '- [CPE-999] a rule with a dangling reference to [CPH-998]\n' >> "$W/f/.claude/skills/cps2-emulation/SKILL.md"
-control "dangling cross-reference" "$W/f" "cross-reference \[CPH-998\]"
-
-mkcopy "$W/g"; printf -- '\nA line about the tenant build/m3b_merged17.\n' >> "$W/g/.claude/skills/vampire-savior-engine/SKILL.md"
-control "port token in the game skill" "$W/g" "level-1 skill names 'tenant'"
-
-mkcopy "$W/h"; printf -- '- [VSP-999] a port rule anchored where STATE rolls over\n' >> "$W/h/.claude/skills/vampire-saved-port/SKILL.md"
-printf -- '\n**[VSP-999]** an anchor appended outside the two standing sections.\n' >> "$W/h/STATE.md"
-control "STATE anchor outside the standing sections" "$W/h" "VSP-999 anchored in STATE.md OUTSIDE"
-
-# level 0 (14z-134): the two board-agnostic skills are locked the same way,
-# and their liftability test is one level stricter — naming the BOARD fails.
-mkcopy "$W/i"; printf -- '- [MFI-999] an instrument rule nobody anchored\n' >> "$W/i/.claude/skills/mame-fbneo-instruments/SKILL.md"
-control "unanchored level-0 rule" "$W/i" "ANCHORED NOWHERE: MFI-999"
-
-mkcopy "$W/j"; printf -- '\nA note that says this is true on CPS-2 only.\n' >> "$W/j/.claude/skills/mister-jtframe-core/SKILL.md"
-control "board name in level 0" "$W/j" "level-1 skill names 'cps'"
-
-# a redirect stub must keep the old ID DEFINED: stripping one leaves its
-# anchor orphaned, which is exactly the failure that would break a citation.
-mkcopy "$W/k"; sed -i.bak '/^- \[CPE-24\] /d' "$W/k/.claude/skills/cps2-emulation/SKILL.md"
-control "a lifted rule's redirect removed" "$W/k" "NOT DEFINED in the skill: CPE-24"
+for n in $(vs_ctl_declared "$0"); do control "$n"; done
 
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

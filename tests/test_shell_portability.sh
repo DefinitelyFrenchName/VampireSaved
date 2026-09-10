@@ -2,6 +2,9 @@
 # test_shell_portability.sh — a `#!/bin/sh` script must actually be POSIX sh
 # (14z-90, GitHub issue #15).
 #
+# MUST-FIRE: known-bad: bashism-in-sh — a `#!/bin/sh` script using `[[ ]]` must be reported (mode: that stub joins the real file list and the scan must fail)
+# MUST-FIRE: known-bad: assignment-chain — the real #84 shape, a continuation chain of assignments reaching no command, must be flagged (mode: a stub carrying it joins the real file list)
+#
 # WHY. tools/build_donovan.sh carried `#!/bin/sh` and `set -o pipefail`. Under
 # dash — /bin/sh on Debian, Ubuntu and WSL2 — it died at line 12 before
 # touching anything:
@@ -36,12 +39,25 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+# THE EXECUTABLE FORM: under CONTROL=<name> a known-bad stub JOINS the real
+# file list (VSP_EXTRA_SH) — and the scan below must FAIL.
+VSP_EXTRA_SH=""
+if vs_ctl_is bashism-in-sh; then
+    # the [[ is assembled from pieces so THIS #!/bin/sh script does not carry it
+    printf '#!/bin/sh\nif %s -n "$1" %s; then echo yes; fi\n' '[[' ']]' > "$W/bashism.sh"; VSP_EXTRA_SH="$W/bashism.sh"
+elif vs_ctl_is assignment-chain; then
+    printf '#!/bin/sh\nTENANT_MANIFEST=build/manifest/pyron.toml TENANT_CHAR=0x11 \\\n    GF="--profile cps2-wide-v1"\necho done\n' > "$W/chain.sh"; VSP_EXTRA_SH="$W/chain.sh"
+fi
+export VSP_EXTRA_SH
 
 python3 - <<'PY'
-import re, subprocess, sys
+import os, re, subprocess, sys
 
 files = subprocess.run(["git", "ls-files", "*.sh"], capture_output=True,
                        text=True).stdout.split()
+files += [p for p in os.environ.get("VSP_EXTRA_SH", "").split() if p]   # the control mode's stub
 # Shell-context bashisms that dash rejects or silently mis-evaluates.
 BASHISM = [
     (re.compile(r"^\s*set\s+-o\s+pipefail"), "set -o pipefail"),
@@ -184,8 +200,18 @@ for _name, _txt, _want in (("the real #84 shape", _bad, True),
     _got = bool(_scan(_txt))
     _v = "ok" if _got == _want else "WRONG"
     print(f"  control: {_name}: {'flagged' if _got else 'silent'} [{_v}]")
+    if _want:
+        print("CONTROL FIRED: assignment-chain — the real #84 shape is flagged" if _got
+              else "CONTROL DEAD: assignment-chain — the real #84 shape was not flagged")
     if _got != _want:
         sys.exit(1)
+# the bashism detector's own control: a [[ ]] test in a #!/bin/sh script must be caught
+_stub = 'if [[ -n "$1" ]]; then echo yes; fi'
+_hit = any(rx.search(_stub) for rx, _ in BASHISM)
+print("CONTROL FIRED: bashism-in-sh — a [[ ]] test in a #!/bin/sh script is flagged" if _hit
+      else "CONTROL DEAD: bashism-in-sh — the [[ ]] test was not flagged")
+if not _hit:
+    sys.exit(1)
 PY
 
 echo "PASS: shell portability (no #!/bin/sh script uses a bash-only

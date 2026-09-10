@@ -1,6 +1,9 @@
 #!/bin/sh
 # test_mra_parts.sh — ground-truth for tools/check_mra_parts.py's VERDICT LOGIC.
 #
+# MUST-FIRE: known-bad: bogus-crc — an MRA whose second part carries a CRC no zip member has must fail the resolver, naming the one bad part
+# MUST-FIRE: known-bad: missing-zip — an MRA resolved against a directory holding no zip at all must fail with every part unresolved
+#
 # WHY THIS GATE EXISTS. jtframe resolves zip members by CRC32 ALONE, and a part
 # it cannot resolve is FILLED WITH 0xFF rather than refused (docs/GOTCHAS.md).
 # So an MRA can look complete, "run", and hand the machine a ROM with holes in
@@ -25,6 +28,7 @@ fail=0
 
 pass() { echo "  PASS $1"; }
 bad()  { echo "  FAIL $1"; fail=1; }
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 
 # ---------------------------------------------------------------------------
 # Fixtures. Two members with CRCs we compute rather than assert, so the
@@ -62,9 +66,17 @@ mra() {  # mra <path> <crc1> <crc2>
 EOF
 }
 
-echo "== 1 both parts resolve =="
 mra "$WORK/good.mra" "$CRC_A" "$CRC_B"
-if python3 "$TOOL" "$WORK/good.mra" "$WORK/zips" > "$WORK/o1" 2>&1; then
+mra "$WORK/bad1.mra" "$CRC_A" "deadbeef"
+mkdir -p "$WORK/empty"
+# THE EXECUTABLE FORM: under CONTROL=<name> section 1 resolves the known-bad
+# input instead of the good one — and must FAIL.
+MRA1="$WORK/good.mra"; ZIPS1="$WORK/zips"
+vs_ctl_is bogus-crc   && MRA1="$WORK/bad1.mra"
+vs_ctl_is missing-zip && ZIPS1="$WORK/empty"
+
+echo "== 1 both parts resolve =="
+if python3 "$TOOL" "$MRA1" "$ZIPS1" > "$WORK/o1" 2>&1; then
     grep -q "all 2 CRC-identified parts resolve" "$WORK/o1" \
         && pass "1a resolves, and says so" || bad "1a wrong wording: $(tail -1 "$WORK/o1")"
 else
@@ -72,26 +84,24 @@ else
 fi
 
 echo "== 2 MUST-FIRE: one part does not resolve =="
-mra "$WORK/bad1.mra" "$CRC_A" "deadbeef"
 if python3 "$TOOL" "$WORK/bad1.mra" "$WORK/zips" > "$WORK/o2" 2>&1; then
-    bad "2a a bogus CRC was accepted — the checker is blind"
+    vs_ctl_dead bogus-crc "a bogus CRC was accepted — the checker is blind"; bad "2a"
 else
     grep -q "1 of 2 parts do not resolve" "$WORK/o2" \
-        && pass "2a control fired: names exactly the one bad part" \
-        || bad "2a fired but miscounted: $(tail -1 "$WORK/o2")"
+        && { vs_ctl_fired bogus-crc "names exactly the one bad part"; pass "2a control fired"; } \
+        || { vs_ctl_dead bogus-crc "fired but miscounted: $(tail -1 "$WORK/o2")"; bad "2a"; }
     grep -q "deadbeef" "$WORK/o2" \
         && pass "2b the failing CRC is reported, not just a count" \
         || bad "2b the bad CRC is not in the report"
 fi
 
 echo "== 3 MUST-FIRE: the zip is absent entirely =="
-mkdir -p "$WORK/empty"
 if python3 "$TOOL" "$WORK/good.mra" "$WORK/empty" > "$WORK/o3" 2>&1; then
-    bad "3a an empty dir was accepted"
+    vs_ctl_dead missing-zip "an empty dir was accepted"; bad "3a"
 else
     grep -q "2 of 2 parts do not resolve" "$WORK/o3" \
-        && pass "3a control fired on a missing zip" \
-        || bad "3a fired but miscounted: $(tail -1 "$WORK/o3")"
+        && { vs_ctl_fired missing-zip "2 of 2 parts unresolved against an empty dir"; pass "3a control fired on a missing zip"; } \
+        || { vs_ctl_dead missing-zip "fired but miscounted: $(tail -1 "$WORK/o3")"; bad "3a"; }
 fi
 
 echo "== 4 a part with NO crc attribute is not counted (header/fill parts) =="

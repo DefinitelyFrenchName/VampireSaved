@@ -2,6 +2,8 @@
 # test_mame_bin_pinned.sh — a gate that boots `vsavjw` through a MAME wrapper
 # must PIN the MAME binary (14z-133). ROM-free, ~1 s.
 #
+# MUST-FIRE: perturbed-copy: stripped-pin — a pinned in-class gate with its MAME_BIN lines removed must be reported UNPINNED (the tool's --selftest; the mode strips the first pinned gate in a copy of tests/ and scans the copy)
+#
 # THE CLASS. tools/run_mame.sh falls back to `mame` on PATH when MAME_BIN is
 # unset — Homebrew's stock build here — which answers "Unknown system 'vsavjw'"
 # and exits. A leg that boots our WIDE build then produces NO DUMPS: a gate
@@ -37,12 +39,32 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 fail=0
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+
+# THE EXECUTABLE FORM: under CONTROL=stripped-pin the first pinned in-class
+# gate loses its pin lines in a COPY of tests/ and section 1 scans the copy —
+# it must FAIL.
+SCAN=tests
+if vs_ctl_is stripped-pin; then
+    python3 - "$W/mode" <<'PY'
+import sys, pathlib, shutil
+sys.path.insert(0, "tools"); import audit_mame_bin_pin as m
+dst = pathlib.Path(sys.argv[1]); dst.mkdir()
+for f in pathlib.Path("tests").glob("*.sh"): shutil.copy(f, dst / f.name)
+src = next(f for f in sorted(dst.glob("*.sh")) if m.verdict(f) == "pinned")
+src.write_text("\n".join(l for l in src.read_text(errors="replace").splitlines() if not m.PIN.search(l)) + "\n")
+print(f"  mode: {src.name} minus its pin lines, in a copy of tests/")
+PY
+    SCAN="$W/mode"
+fi
 
 echo "== 1. every gate that boots vsavjw through a MAME wrapper pins its binary =="
-python3 tools/audit_mame_bin_pin.py tests || fail=1
+python3 tools/audit_mame_bin_pin.py "$SCAN" || fail=1
 
 echo "== 2. MUST-FIRE CONTROL: a removed pin is reported; a stock-set gate is not =="
-python3 tools/audit_mame_bin_pin.py --selftest || fail=1
+if python3 tools/audit_mame_bin_pin.py --selftest; then vs_ctl_fired stripped-pin "a pinned gate minus its pin lines is reported UNPINNED"
+else vs_ctl_dead stripped-pin "the tool's self-test did not fire"; fail=1; fi
 
 if [ "$fail" -eq 0 ]; then
     echo "PASS: every vsavjw-booting gate pins its MAME binary, and the control fires"

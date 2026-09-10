@@ -2,6 +2,8 @@
 # test_static_runner.sh — ground truth for tests/run_all_static.sh
 # (14z-94, GitHub #30). ROM-free, ~3 s.
 #
+# MUST-FIRE: shadow-tool: reader-unplugged — a copy of run_all_static.sh that hands the classifier no gate script must let a stub with a declared-but-unfired control read PASS (mode: that copy is the runner every section drives, and section 11 must fail)
+#
 # WHY A GATE FOR THE RUNNER. CLAUDE.md §4: "Verdict logic is itself tested. A
 # test's classification code must be validated against known ground-truth
 # scenarios before its verdicts are trusted — SMS shipped a wrong conclusion
@@ -32,13 +34,23 @@ rc=0
 fail() { echo "  FAIL: $*"; rc=1; }
 
 RUNNER="$REPO/tests/run_all_static.sh"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
 FR="$T/fakerepo"
 mkdir -p "$FR/tests"
-ln -s "$RUNNER" "$FR/tests/run_all_static.sh"
+# THE SHADOW TOOL: the runner with the classifier's 4th argument (the gate
+# script) removed — the controls reader unplugged. Under
+# CONTROL=reader-unplugged it is the runner every section drives.
+SHADOW="$T/run_all_static_unplugged.sh"
+sed 's|vs_classify "$_st" "$WORK/$g.out" 58 "tests/$g.sh"|vs_classify "$_st" "$WORK/$g.out" 58|' "$RUNNER" > "$SHADOW"
+cmp -s "$RUNNER" "$SHADOW" && fail "could not unplug the reader — the vs_classify call moved"
+chmod +x "$SHADOW"
+if vs_ctl_is reader-unplugged; then ln -s "$SHADOW" "$FR/tests/run_all_static.sh"; else ln -s "$RUNNER" "$FR/tests/run_all_static.sh"; fi
 # the runner sources THE ONE classifier relative to its repo (14z-139), so
 # the synthetic repo carries it too — the shipped lib, never a copy
 mkdir -p "$FR/tests/lib"; ln -s "$REPO/tests/lib/classify.sh" "$FR/tests/lib/classify.sh"
+# ...and the controls reader the classifier sources beside it (14z-147)
+ln -s "$REPO/tests/lib/controls.sh" "$FR/tests/lib/controls.sh"
 
 mk() {  # mk <name> <exit> <output...>
     n="$1"; st="$2"; shift 2
@@ -298,6 +310,104 @@ else
     echo "  ok: control — a failure on a QUIET tree is NOT marked suspect"
 fi
 fi
+
+echo "== 11. the must-fire controls are READ: declared vs fired (14z-147) =="
+# A gate that declares a control in its header and never prints CONTROL FIRED
+# for it is FAIL; a CONTROL DEAD line is FAIL; a firing no header declares is
+# FAIL; a gate with no declaration at all is untouched (identity for the
+# gates that predate the grammar). The stubs are written by hand because mk()
+# cannot carry header lines.
+mkc() {  # mkc <name> <exit> <header-line> <output lines...>
+    n="$1"; st="$2"; hdr="$3"; shift 3
+    { echo "#!/bin/sh"; echo "# $n.sh — a stub"; echo "$hdr"; for l in "$@"; do echo "echo '$l'"; done; echo "exit $st"; } > "$FR/tests/$n.sh"
+    chmod +x "$FR/tests/$n.sh"
+}
+mkc g_cfired   0 "# MUST-FIRE: perturbed-copy: flip — a flipped byte must fail" "PASS: fine" "CONTROL FIRED: flip — caught"
+mkc g_cmissing 0 "# MUST-FIRE: perturbed-copy: flip — a flipped byte must fail" "PASS: fine"
+mkc g_cdead    0 "# MUST-FIRE: perturbed-copy: flip — a flipped byte must fail" "PASS: fine" "CONTROL DEAD: flip — the copy passed"
+mkc g_cghost   0 "# a header with no declaration" "PASS: fine" "CONTROL FIRED: ghost — nobody declared me"
+mkc g_cnone    0 "# MUST-FIRE: none — a lister asserts nothing" "PASS: fine"
+printf 'g_pass\ng_cfired\ng_cmissing\ng_cdead\ng_cghost\ng_cnone\n' > "$FR/tests/ci_portable.txt"
+o11="$(cd "$FR" && sh tests/run_all_static.sh --tier portable --exec-controls none 2>&1)" && s11=0 || s11=$?
+c11() {  # c11 <gate> <verdict>
+    printf '%s' "$o11" | grep -qE "^  $1 +$2( |$)" && echo "  ok: $1 -> $2" \
+        || { fail "$1 not classified $2:"; printf '%s' "$o11" | grep -E "^  $1" | sed 's/^/        /'; }
+}
+c11 g_cfired PASS
+c11 g_cmissing FAIL
+c11 g_cdead FAIL
+c11 g_cghost FAIL
+c11 g_cnone PASS
+c11 g_pass PASS
+printf '%s' "$o11" | grep -q 'read:     fired 1 / declared 3' \
+    && echo "  ok: the readout counts fired 1 / declared 3 (three declaring stubs, one fired)" \
+    || fail "readout wrong: $(printf '%s' "$o11" | grep 'read:' || echo '(none)')"
+printf '%s' "$o11" | grep -q 'gates declaring none: 1; undeclared: 1' \
+    && echo "  ok: one none-declaring gate and one undeclared gate (g_pass) are counted, not failed" \
+    || fail "the none/undeclared counts are wrong: $(printf '%s' "$o11" | grep 'read:' || echo '(none)')"
+printf '%s' "$o11" | grep -q 'PASS 3 .*SKIP 0 .*FAIL 3' \
+    && echo "  ok: tally PASS 3  FAIL 3 — a red controls block is plain FAIL, no fourth verdict" \
+    || fail "wrong tally: $(printf '%s' "$o11" | grep -E '^PASS ' || echo '(none printed)')"
+[ "$s11" != 0 ] && echo "  ok: and the runner exits nonzero ($s11)" || fail "a dead control left the runner green"
+
+echo "== 12. the must-fire controls are EXECUTED: CONTROL=<name> must reach the gate's own FAIL =="
+# Four stubs: one honours the mode (FAIL under it), one LIES (stays green),
+# one REFUSES (declares a name it never reads), one DIES (a shell error under
+# the mode). Only the first is a pass; the rows name the others.
+mkx() {  # mkx <name> <body-under-mode>
+    { echo "#!/bin/sh"; echo "# $1.sh — a stub"
+      echo "# MUST-FIRE: perturbed-copy: flip — a flipped byte must fail"
+      echo 'if [ "${CONTROL:-}" = flip ]; then'; echo "$2"; echo 'fi'
+      echo "echo 'PASS: fine'"; echo "echo 'CONTROL FIRED: flip — caught'"; echo "exit 0"; } > "$FR/tests/$1.sh"
+    chmod +x "$FR/tests/$1.sh"
+}
+mkx g_xhon  'echo "FAIL: the flipped input was caught"; exit 1'
+mkx g_xlies 'echo "PASS: nothing changed"; exit 0'
+mkx g_xref  'echo "REFUSED: CONTROL=flip is not a mode of this gate"; exit 3'
+mkx g_xdied 'echo "tests/g_xdied.sh: line 9: FOO: parameter not set"; exit 0'
+printf 'g_xhon\ng_xlies\ng_xref\ng_xdied\n' > "$FR/tests/ci_portable.txt"
+o12="$(cd "$FR" && sh tests/run_all_static.sh --tier portable 2>&1)" && s12=0 || s12=$?
+for pair in "g_xlies:LIES" "g_xref:REFUSED" "g_xdied:DIED"; do
+    g="${pair%%:*}"; v="${pair##*:}"
+    printf '%s' "$o12" | grep -qE "^  $g +CONTROL $v: flip" && echo "  ok: $g -> CONTROL $v" \
+        || { fail "$g was not reported CONTROL $v:"; printf '%s' "$o12" | grep -E "^  $g" | sed 's/^/        /'; }
+done
+printf '%s' "$o12" | grep -qE "^  g_xhon +CONTROL" && fail "the honoured control printed a red row" || echo "  ok: g_xhon (honoured) prints no red row"
+printf '%s' "$o12" | grep -q 'executed: 4  honoured 1  lies 1  refused 1  died 1' \
+    && echo "  ok: readout — executed 4, honoured 1, lies 1, refused 1, died 1" \
+    || fail "executable readout wrong: $(printf '%s' "$o12" | grep 'executed:' || echo '(none)')"
+printf '%s' "$o12" | grep -q 'PASS 4 .*SKIP 0 .*FAIL 3' \
+    && echo "  ok: tally PASS 4  FAIL 3 — every gate passed its own run, three controls failed theirs" \
+    || fail "wrong tally: $(printf '%s' "$o12" | grep -E '^PASS ' || echo '(none printed)')"
+printf '%s' "$o12" | grep -q 'g_xlies(control:flip:LIES)' && echo "  ok: the failure list names the gate, the control and the verdict" \
+    || fail "the failure list does not name the lying control: $(printf '%s' "$o12" | grep '^failed:' || echo '(none)')"
+[ "$s12" != 0 ] && echo "  ok: and the runner exits nonzero ($s12)" || fail "a lying control left the runner green"
+# the MUST-NOT-FIRE half: --exec-controls none runs nothing and the four stubs are all PASS
+o12b="$(cd "$FR" && sh tests/run_all_static.sh --tier portable --exec-controls none 2>&1)" && s12b=0 || s12b=$?
+[ "$s12b" = 0 ] && printf '%s' "$o12b" | grep -q 'PASS 4 .*FAIL 0' && printf '%s' "$o12b" | grep -q 'executed: (off' \
+    && echo "  ok: control — with --exec-controls none the same four stubs are PASS 4 and the readout says off" \
+    || fail "--exec-controls none still executed or failed something: $(printf '%s' "$o12b" | grep -E '^PASS |executed' || echo '(none)')"
+# and the portable-only selector leaves a STATIC gate's controls unexecuted
+: > "$FR/tests/ci_portable.txt"; printf 'g_xlies\n' > "$FR/tests/ci_static.txt"
+o12c="$(cd "$FR" && ROMDIR="$T" sh tests/run_all_static.sh --tier static --exec-controls portable 2>&1)" && s12c=0 || s12c=$?
+[ "$s12c" = 0 ] && echo "  ok: --exec-controls portable does not execute a static-tier gate's controls" \
+    || fail "--exec-controls portable executed a static gate's control: $(printf '%s' "$o12c" | grep 'CONTROL' || echo '(none)')"
+: > "$FR/tests/ci_static.txt"
+
+echo "== 13. MUST-FIRE: with the controls reader unplugged, section 11's dead-control stub reads PASS =="
+# The shadow runner (built at the top) beside the real one in the fakerepo;
+# the same stub as section 11. If this does not flip g_cmissing to PASS,
+# section 11 was not proving the reader is in the loop.
+ln -s "$SHADOW" "$FR/tests/run_all_static_unplugged.sh"
+mkc g_cmissing 0 "# MUST-FIRE: perturbed-copy: flip — a flipped byte must fail" "PASS: fine"
+printf 'g_cmissing\n' > "$FR/tests/ci_portable.txt"
+o13="$(cd "$FR" && sh tests/run_all_static_unplugged.sh --tier portable --exec-controls none 2>&1)" || true
+if printf '%s' "$o13" | grep -qE '^  g_cmissing +PASS'; then
+    vs_ctl_fired reader-unplugged "with no gate script handed to the classifier, a declared-but-unfired control reads PASS"
+else
+    vs_ctl_dead reader-unplugged "the unplugged runner still failed g_cmissing: $(printf '%s' "$o13" | grep -E '^  g_cmissing')"; rc=1
+fi
+rm -f "$FR/tests/run_all_static_unplugged.sh"
 
 echo
 [ "$rc" = 0 ] && echo "PASS: the runner's verdicts mean what they say." \

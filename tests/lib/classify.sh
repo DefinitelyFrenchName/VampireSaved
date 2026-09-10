@@ -49,7 +49,60 @@
 # reopening the divergence 14z-139 closed. `run_all_static.sh` surfaces them in
 # an advisory block instead; `test_static_runner.sh` section 9 is the proof.
 
+# THE CONTROLS CONTRACT IS READ HERE, NOT AS A FIFTH VERDICT (14z-147, step
+# two of the must-fire ruling, STATE 14z-145 point 4: "NO fourth verdict"). An
+# optional 4th argument names the gate SCRIPT; when given and the verdict is
+# PASS, the header's `# MUST-FIRE:` declarations are compared with the log's
+# `CONTROL FIRED:` / `CONTROL DEAD:` lines (tests/lib/controls.sh, the one
+# reader) and a red block — a declared control that did not fire, a DEAD
+# line, a firing no header declares — turns the verdict into plain FAIL. A
+# gate with no declaration is left alone (UNDECLARED is counted by the
+# runners as a NOTE, never failed here: 236 gates predate the grammar).
+# SKIP and FAIL are never touched: a skipped gate ran nothing, a failed gate
+# is already red.
+[ -n "${REPO:-}" ] && [ -f "$REPO/tests/lib/controls.sh" ] && . "$REPO/tests/lib/controls.sh"
+
 vs_classify() {
+    _st="$1"; _log="$2"; _w="${3:-90}"; _gate="${4:-}"
+    _vs_classify_base "$_st" "$_log" "$_w"
+    [ "$VS_VERDICT" = PASS ] && [ -n "$_gate" ] && [ -f "$_gate" ] || return 0
+    command -v vs_ctl_read >/dev/null 2>&1 || return 0
+    vs_ctl_read "$_gate" "$_log"
+    if [ "$VS_CTL_VERDICT" = RED ]; then
+        VS_VERDICT=FAIL; VS_DETAIL="$(printf '%s' "$VS_CTL_DETAIL" | cut -c1-"$_w")"
+    fi
+    return 0
+}
+
+# THE EXECUTABLE CONTROL'S VERDICT (14z-147) — one copy, here, so the runners
+# carry no second shell-error regex (test_static_runner §8 locks that). A gate
+# run under `CONTROL=<name>` must reach its OWN FAIL:
+#   HONOURED  exit non-zero and no crash — the perturbation was caught
+#   LIES      exit 0 (or a SKIP) — the perturbation left the gate green
+#   REFUSED   the gate printed `REFUSED: CONTROL=` — a declared name it never reads
+#   DIED      the shell's own error line or a Python traceback — a crash is
+#             not a verdict ([VSP-108])
+#   TIMEOUT   the wrapper's exits, as for any gate
+vs_classify_control() {  # vs_classify_control <exit-status> <logfile>
+    _cst="$1"; _clog="$2"
+    if grep -qa '^REFUSED: CONTROL=' "$_clog"; then
+        VS_CTL_EXEC=REFUSED; VS_CTL_EXEC_DETAIL="declared in the header, not a mode of the gate"; return 0
+    fi
+    _vs_classify_base "$_cst" "$_clog" 90
+    case "$VS_VERDICT" in
+    TIMEOUT) VS_CTL_EXEC=TIMEOUT; VS_CTL_EXEC_DETAIL="$VS_DETAIL" ;;
+    PASS|SKIP) VS_CTL_EXEC=LIES; VS_CTL_EXEC_DETAIL="exit $_cst under its own perturbation — the control tests nothing" ;;
+    FAIL)
+        if [ "$_cst" = 0 ] || grep -qa '^Traceback' "$_clog"; then
+            VS_CTL_EXEC=DIED; VS_CTL_EXEC_DETAIL="a crash is not a verdict: $(grep -aE '\.sh: line [0-9]+: [A-Za-z_][A-Za-z0-9_]*: |^Traceback|Error' "$_clog" | head -1 | cut -c1-90)"
+        else
+            VS_CTL_EXEC=HONOURED; VS_CTL_EXEC_DETAIL="reached the gate's own FAIL (exit $_cst)"
+        fi ;;
+    esac
+    return 0
+}
+
+_vs_classify_base() {
     _st="$1"; _log="$2"; _w="${3:-90}"
     if [ "$_st" = 124 ] || [ "$_st" = 137 ]; then
         VS_VERDICT=TIMEOUT; VS_DETAIL="killed (exit $_st)"; return 0

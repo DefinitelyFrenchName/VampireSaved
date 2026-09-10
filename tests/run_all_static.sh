@@ -2,6 +2,8 @@
 # run_all_static.sh — THE PRE-COMMIT GATE CHAIN. One command, every gate that
 # does not need an emulator. (14z-94, GitHub #30.)
 #
+# MUST-FIRE: none — a RUNNER asserts no property of the artifact; its verdict logic is tested by tests/test_static_runner.sh
+#
 # WHY THIS EXISTS. There is no CI in this repo — no .github/, no Makefile, no
 # justfile — and 101 of the then-130 test scripts had no shell caller at all.
 # So running the reproducibility gate, the manifest-merge gate, or the
@@ -33,6 +35,24 @@
 #   ... --strict                            SKIP is a failure too
 #   ... --list                              print the registry and exit
 #   ... --tier portable|static              one tier only
+#   ... --exec-controls all|portable|none  which tier's declared must-fire
+#                                          controls are EXECUTED (default all)
+#
+# THE MUST-FIRE CONTROLS ARE READ AND EXECUTED (14z-147, step two of the
+# maintainer's ruling, STATE 14z-145). Two things, both through
+# tests/lib/controls.sh — the one reader of the `# MUST-FIRE:` grammar:
+#   READ  (free, every gate): a gate whose header DECLARES a control must
+#         print `CONTROL FIRED: <name>` in its run; a declared control that
+#         did not fire, a `CONTROL DEAD:` line, or a firing no header declares
+#         turns the verdict into plain FAIL (tests/lib/classify.sh). A gate
+#         with no declaration is COUNTED as undeclared, never failed.
+#   EXEC  (one extra run per declared control, `CONTROL=<name> tests/<g>.sh`):
+#         the gate applies the perturbation to its REAL input and must reach
+#         its OWN FAIL. Exit 0 is `LIES` (the control tests nothing), a
+#         `REFUSED:` line is a dead mode, a shell error or traceback is
+#         `DIED` — each a failure of the run. Why this is stronger than the
+#         FIRED line: FIRED is the gate's SELF-report, and 14z-144 showed a
+#         control can print it while asserting a value it just wrote.
 #
 # Registries: tests/ci_portable.txt (ROM-free, runs anywhere)
 #             tests/ci_static.txt   (needs ROMDIR and/or build dirs; no emulator)
@@ -63,12 +83,13 @@ cd "$REPO"
 # read it as FAIL. Sourced, not copied, so the two cannot drift again.
 . "$REPO/tests/lib/classify.sh"
 
-STRICT=0; TIER=all; LIST=0
+STRICT=0; TIER=all; LIST=0; EXEC_CTL=all
 while [ $# -gt 0 ]; do
     case "$1" in
     --strict) STRICT=1 ;;
     --list)   LIST=1 ;;
     --tier)   shift; TIER="${1:?--tier needs portable|static|all}" ;;
+    --exec-controls) shift; EXEC_CTL="${1:?--exec-controls needs all|portable|none}" ;;
     -h|--help) sed -n '2,40p' "$0"; exit 0 ;;
     *) echo "unknown argument '$1' (try --help)" >&2; exit 2 ;;
     esac
@@ -94,6 +115,11 @@ fi
 WORK="$(mktemp -d)"; trap 'rm -rf "$WORK"' EXIT INT TERM
 n_pass=0; n_skip=0; n_fail=0; n_miss=0
 failed=""; skipped=""
+# the controls ledger: declared / fired over the tier, the undeclared count,
+# and the executable-control rows (gate, name, verdict, seconds)
+c_decl=0; c_fired=0; c_undecl=0; c_none=0
+x_ok=0; x_lies=0; x_refused=0; x_died=0
+: > "$WORK/controls.tsv"
 
 # WORKING-TREE SNAPSHOT (14z-94). This is the PRE-COMMIT command, so it must
 # not leave the tree dirty — and it did on the first full run: several gates
@@ -128,7 +154,14 @@ run_tier() {  # run_tier <label> <names>
         # `SKIP:` AND exits non-zero is a FAILURE; exit 0 after the shell's own
         # error line is a FAILURE too (14z-139, the branch this runner lacked).
         # The rules and their history: tests/lib/classify.sh.
-        vs_classify "$_st" "$WORK/$g.out" 58
+        # the 4th argument is the gate SCRIPT: the classifier reads its
+        # MUST-FIRE declarations against the log (14z-147)
+        vs_classify "$_st" "$WORK/$g.out" 58 "tests/$g.sh"
+        case "${VS_CTL_VERDICT:-}" in
+        OK|RED)     c_decl=$((c_decl + VS_CTL_DECLARED)); c_fired=$((c_fired + VS_CTL_FIRED)) ;;
+        NONE)       c_none=$((c_none + 1)) ;;
+        UNDECLARED) if [ "$VS_VERDICT" = PASS ]; then c_undecl=$((c_undecl + 1)); fi ;;
+        esac
         case "$VS_VERDICT" in
         TIMEOUT)
             # no timeout wrapper here; kept so the verdict set is the sweep's
@@ -150,8 +183,45 @@ run_tier() {  # run_tier <label> <names>
             n_skip=$((n_skip + 1)); skipped="$skipped $g" ;;
         *)
             printf '  %-34s PASS  %3ss\n' "$g" "$_dur"
-            n_pass=$((n_pass + 1)) ;;
+            n_pass=$((n_pass + 1))
+            # an `if`, not `[ ] &&`: this is the loop's last command and the
+            # runner is set -e — a false test here would end the tier
+            if [ "${VS_CTL_DECLARED:-0}" != 0 ]; then exec_controls "$g" "$_label"; fi ;;
         esac
+    done
+}
+
+# EXECUTABLE CONTROLS. For a PASSING gate with declarations, run it once per
+# declared name under `CONTROL=<name>` and require its OWN FAIL. The verdicts:
+#   HONOURED  exit non-zero, no shell error, no traceback — the gate failed
+#   LIES      exit 0 — the perturbation left the gate green ([VSP-19]'s worst case)
+#   REFUSED   the gate does not honour the mode (a declared name it never reads)
+#   DIED      a shell error line or a traceback — a crash is not a verdict
+#             ([VSP-108]: distinguish "rejected" from "died")
+# Every row lands in the tally as a failure when it is not HONOURED.
+exec_controls() {  # exec_controls <gate> <tier-label>
+    case "$EXEC_CTL" in
+    none) return 0 ;;
+    portable) [ "$2" = portable ] || return 0 ;;
+    all) ;;
+    *) echo "bad --exec-controls '$EXEC_CTL'" >&2; exit 2 ;;
+    esac
+    for _n in $(vs_ctl_declared "tests/$1.sh"); do
+        _c0=$(date +%s)
+        CONTROL="$_n" tests/"$1".sh </dev/null > "$WORK/$1.ctl.$_n.out" 2>&1 && _cs=0 || _cs=$?
+        _c1=$(date +%s); _cd=$((_c1 - _c0))
+        vs_classify_control "$_cs" "$WORK/$1.ctl.$_n.out"; _cv="$VS_CTL_EXEC"
+        printf '%s\t%s\t%s\t%s\n' "$1" "$_n" "$_cv" "$_cd" >> "$WORK/controls.tsv"
+        case "$_cv" in
+        HONOURED) x_ok=$((x_ok + 1)) ;;
+        LIES)     x_lies=$((x_lies + 1)) ;;
+        REFUSED)  x_refused=$((x_refused + 1)) ;;
+        *)        x_died=$((x_died + 1)) ;;
+        esac
+        if [ "$_cv" != HONOURED ]; then
+            n_fail=$((n_fail + 1)); failed="$failed $1(control:$_n:$_cv)"
+            printf '  %-34s CONTROL %s: %s — %s (%ss)\n' "$1" "$_cv" "$_n" "$VS_CTL_EXEC_DETAIL" "$_cd"
+        fi
     done
 }
 
@@ -329,6 +399,29 @@ $(grep '^NOTE: ' "$_f" 2>/dev/null || true)
 EOF
 done
 [ "$_notes" = 0 ] && echo "  (none)"
+
+# THE CONTROLS READOUT (14z-147). `fired / declared` is the number the
+# maintainer asked for; the executable rows are what makes FIRED more than a
+# self-report. Undeclared gates are a NOTE-class count (the grammar postdates
+# most of the suite); a red control is already in the tally above.
+# Printed only when the tier DECLARED or EXECUTED anything: a tree with no
+# `# MUST-FIRE:` line prints nothing here, which keeps this runner's output
+# byte-identical to the generic harness's over its declaration-free fake repo
+# (bbh fidelity F1, `tests/test_bbh_fidelity.sh` — red on the first strict run
+# after this block landed, 14z-147). Lifting the reader into bbh is the
+# follow-up; until then F2 (opt-in, the real tier) carries this known delta.
+_xn=$((x_ok + x_lies + x_refused + x_died))
+if [ $((c_decl + c_none + _xn)) != 0 ]; then
+echo
+echo "== must-fire controls (tests/lib/controls.sh) =="
+echo "  read:     fired $c_fired / declared $c_decl  (gates declaring none: $c_none; undeclared: $c_undecl)"
+if [ "$EXEC_CTL" = none ]; then
+    echo "  executed: (off — --exec-controls none)"
+else
+    echo "  executed: $_xn  honoured $x_ok  lies $x_lies  refused $x_refused  died $x_died  (--exec-controls $EXEC_CTL)"
+    awk -F'\t' '$3 != "HONOURED" {printf "      %-30s %-24s %s\n", $1, $2, $3}' "$WORK/controls.tsv"
+fi
+fi
 
 echo
 echo "======================================================================"

@@ -2,6 +2,8 @@
 # test_tenant_id.sh — the tenant's character id is a BUILD INPUT, and the
 # frozen reference must stay reproducible while a move is in progress.
 #
+# MUST-FIRE: perturbed-copy: no-id-by-profile — a copy of donovan.toml without its `id_by_profile` declaration must resolve the WIDE default to the substituted slot again, failing check 2 and the declaration guard
+#
 # WHY (M3a, 14z-61). De-substitution moves the tenant off a legacy
 # character's slot onto its own variant id. That is roster work, so it
 # belongs to the WIDE track (14z-59g); the stock build is the frozen
@@ -49,16 +51,26 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 fail=0
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+MANIFEST=build/manifest/donovan.toml
+perturb_no_id_by_profile() {  # perturb_no_id_by_profile <out> — the declaration removed
+    grep -v '^id_by_profile = ' "$MANIFEST" > "$1"
+    grep -q '^id_by_profile' "$1" && { echo "  FAIL: the perturbation did not apply"; fail=1; } || true
+}
+# THE EXECUTABLE FORM: under CONTROL=no-id-by-profile the perturbed copy IS
+# the manifest every check reads — check 2 and the guard must FAIL.
+if vs_ctl_is no-id-by-profile; then perturb_no_id_by_profile "$W/donovan.toml"; MANIFEST="$W/donovan.toml"; fi
 
 run() {  # run <profile-or-> <override-or-> -> "id mirror" or "REFUSED"
-    python3 - "$1" "$2" <<'PY'
+    python3 - "$1" "$2" "$MANIFEST" <<'PY'
 import sys
 sys.path.insert(0, "tools")
 from pathlib import Path
 from gen_donovan_patch import normalise_tenants, toml_loads
 prof = None if sys.argv[1] == "-" else sys.argv[1]
 over = None if sys.argv[2] == "-" else int(sys.argv[2], 0)
-doc = toml_loads(Path("build/manifest/donovan.toml").read_text())
+doc = toml_loads(Path(sys.argv[3]).read_text())
 try:
     p = normalise_tenants(dict(doc), prof, over)["port"]
     print("%#04x %s" % (p["dst_slot"], p["mirror_variant"]))
@@ -84,13 +96,23 @@ check "variant id without a profile"   "REFUSED*"   -             0x13
 # The declaration guard, flipped 14z-64: the WIDE default must now BE
 # the de-substituted id — a manifest that lost the declaration would
 # silently rebuild the WIDE track at 0x0F again.
-if grep -q '^id_by_profile = "cps2-wide-v1=0x13"' build/manifest/donovan.toml; then
+if grep -q '^id_by_profile = "cps2-wide-v1=0x13"' "$MANIFEST"; then
     echo "  ok: id_by_profile declares the WIDE default 0x13 (M3a landed)"
 else
     echo "  FAIL: id_by_profile missing/changed — the WIDE track would"
     echo "        silently rebuild at the substituted slot 0x0F"
     fail=1
 fi
+
+# THE MUST-FIRE CONTROL (14z-147): the same perturbation, on a copy, must
+# move the WIDE resolution off 0x13 — or check 2 is not reading the declaration.
+echo "== must-fire control =="
+perturb_no_id_by_profile "$W/ctl.toml"
+ctl="$(MANIFEST="$W/ctl.toml" run cps2-wide-v1 -)"
+case "$ctl" in
+"0x13 False") vs_ctl_dead no-id-by-profile "without id_by_profile the WIDE default still resolved to 0x13"; fail=1 ;;
+*)            vs_ctl_fired no-id-by-profile "without id_by_profile the WIDE default resolves to '$ctl', not 0x13" ;;
+esac
 
 
 # ── row ownership (M3b slice C) ─────────────────────────────────────────

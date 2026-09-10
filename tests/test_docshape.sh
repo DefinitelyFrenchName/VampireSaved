@@ -3,6 +3,22 @@
 # (14z-122, the documentation rationalization pass). ci_portable: no ROM, no
 # build dir, no emulator, ~2 s.
 #
+# MUST-FIRE: perturbed-copy: chronology-header — a session-shaped header appended to a REFERENCE doc must be reported
+# MUST-FIRE: perturbed-copy: anchor-in-hist — a rule anchor in a HIST-class doc must be reported
+# MUST-FIRE: perturbed-copy: undeclared-doc — a markdown file with no doc_shape row must be reported
+# MUST-FIRE: perturbed-copy: dead-allow-row — an allow row matching nothing must be reported, or allowances rot
+# MUST-FIRE: perturbed-copy: banner-absent — a doc the TSV requires a banner of, without one, must be reported
+# MUST-FIRE: perturbed-copy: dangling-link — a README link to a file that is not there must be reported
+# MUST-FIRE: perturbed-copy: nonexistent-section — a tool citing a doc section that does not exist must be reported
+# MUST-FIRE: perturbed-copy: pending-row — a PENDING row under the end-state mode this gate runs must be reported
+# MUST-FIRE: perturbed-copy: bold-chronology — a bold `Previous batch (14z-N)` paragraph in a REFERENCE doc must be reported (the header rule's blind spot)
+# MUST-FIRE: perturbed-copy: dropped-from-contents — a declared doc absent from README Contents must be reported
+# MUST-FIRE: perturbed-copy: shape-tag-flipped — a Contents shape tag disagreeing with the declaration must be reported
+# MUST-FIRE: perturbed-copy: twin-no-backlink — a history twin not naming its live doc must be reported
+# MUST-FIRE: perturbed-copy: live-no-twin-link — a live doc not naming its twin must be reported (the other direction)
+# MUST-FIRE: perturbed-copy: directory-entry-member — a directory entry that stops naming a member must expose that member as missing from Contents
+# MUST-FIRE: perturbed-copy: entry-point-off-map — an entry-point doc named nowhere in the README must be reported
+#
 # WHAT IT HOLDS. `tools/checkdocshape.py` reads docs/doc_shape.tsv (one row
 # per document: class, history twin, requirements) and asserts: completeness
 # (every .md under docs/, plus HANDOFF.md, is declared — the generated
@@ -78,123 +94,80 @@ cd "$REPO"
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
-
-echo "== test_docshape: doc shapes declared and enforced =="
-if python3 tools/checkdocshape.py --no-pending >/tmp/docshape.$$.log 2>&1; then
-    ok "checkdocshape.py PASS on the tree ($(grep -o '[0-9]* still PENDING' /tmp/docshape.$$.log | head -1))"
-else
-    bad "checkdocshape.py FAILS on the tree:"; sed 's/^/        /' /tmp/docshape.$$.log | head -30
-fi
-rm -f /tmp/docshape.$$.log
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 
 FILES="$(python3 tools/checkdocshape.py --list-files)"
 mkcopy() {  # mkcopy <dir>
     for f in $FILES; do mkdir -p "$1/$(dirname "$f")"; cp "$f" "$1/$f"; done
     mkdir -p "$1/tools" "$1/tests"
 }
-control() {  # control <label> <dir> <expected substring>
-    if python3 tools/checkdocshape.py --root "$2" --no-selftest >"$2/log" 2>&1; then
-        bad "$1: the perturbed copy PASSED — the check is not checking"
-    elif grep -q "$3" "$2/log"; then
-        ok "$1: fires ($3)"
-    else
-        bad "$1: failed for the wrong reason:"; sed 's/^/        /' "$2/log" | head -12
-    fi
+applied() { grep -q "$1" "$2" || bad "$3: the perturbation did not apply"; }
+absent()  { grep -q "$1" "$2" && bad "$3: the perturbation did not apply"; }
+# THE PERTURBATIONS, one per declared control; the control section and the
+# CONTROL=<name> mode call the same function. EXPECT = the failure's substring.
+# ROUTING (14z-140, living-docs slice L1): dropped-from-contents .. entry-point-off-map
+# — every declared document is listed in README's `## Contents` with its shape,
+# and a history twin names its live document AND is named by it; the last two
+# exist because two MECHANISMS could otherwise wave a document through silently.
+perturb() {  # perturb <name> <dir>
+    case "$1" in
+    chronology-header) printf '\n### 14z-999: an appended discovery note\n' >> "$2/docs/game/atlas/id_space.md"; EXPECT="SESSION-SHAPED HEADER" ;;
+    anchor-in-hist)    printf '\nold analysis **[VSE-1]** moved here\n' >> "$2/docs/project/mister_scope.md"; EXPECT="ANCHOR IN HISTORY-class doc" ;;
+    undeclared-doc)    printf '# stray\n' > "$2/docs/stray_note.md"; EXPECT="UNDECLARED docs/stray_note.md" ;;
+    dead-allow-row)    printf 'docs/game/atlas/id_space.md\tnever-ever-matches\tstale reason\n' >> "$2/docs/doc_shape_allow.tsv"; EXPECT="dead allow row" ;;
+    banner-absent)     # perturb the TSV, not the doc
+        sed -i.bak 's|^docs/game/atlas/id_space.md\tREFERENCE\t-\t-$|docs/game/atlas/id_space.md\tREFERENCE\t-\tbanner|' "$2/docs/doc_shape.tsv"
+        applied 'id_space.md	REFERENCE	-	banner' "$2/docs/doc_shape.tsv" "$1"; EXPECT="NO STATUS BANNER" ;;
+    dangling-link)     printf '\nsee also [a ghost](game/atlas/ghost_file.md)\n' >> "$2/docs/README.md"; EXPECT="DANGLING LINK" ;;
+    nonexistent-section) printf '# per docs/game/atlas/id_space.md %sA Section Nobody Wrote%s\n' '"' '"' > "$2/tools/synthetic_control.py"; EXPECT="SECTION THAT DOES NOT EXIST" ;;
+    pending-row)       # fails the end-state mode the gate runs (since 14z-124)
+        sed -i.bak 's|^docs/game/atlas/id_space.md\tREFERENCE\t-\t-$|docs/game/atlas/id_space.md\tPENDING\t-\t-|' "$2/docs/doc_shape.tsv"
+        applied 'id_space.md	PENDING' "$2/docs/doc_shape.tsv" "$1"; EXPECT="still PENDING" ;;
+    bold-chronology)   # 14z-126b: barred from headers, the log came back as bold paragraphs —
+                       # HANDOFF carried eight `**Previous batch (14z-N…)**` blocks, unseen through eight freezes
+        printf '\n**Previous batch (14z-999, ruled): don-m9 / merged-m4.**\n' >> "$2/docs/game/atlas/id_space.md"; EXPECT="BOLD CHRONOLOGY PARAGRAPH" ;;
+    dropped-from-contents) sed -i.bak '/defense_rows.md/d' "$2/docs/README.md"
+        absent 'defense_rows.md' "$2/docs/README.md" "$1"; EXPECT="README CONTENTS MISSING: docs/project/tables/defense_rows.md" ;;
+    shape-tag-flipped) sed -i.bak 's|(project/coverage_matrix.md) — \*\*REFERENCE\*\*|(project/coverage_matrix.md) — **INDEX**|' "$2/docs/README.md"
+        applied '(project/coverage_matrix.md) — \*\*INDEX\*\*' "$2/docs/README.md" "$1"; EXPECT="README CONTENTS SHAPE MISMATCH: docs/project/coverage_matrix.md" ;;
+    twin-no-backlink)  sed -i.bak 's|cps2_wide\.md|REDACTED_LIVE|g' "$2/docs/project/cps2_wide_history.md"
+        absent 'cps2_wide\.md' "$2/docs/project/cps2_wide_history.md" "$1"; EXPECT="TWIN BACK-LINK MISSING: docs/project/cps2_wide_history.md does not name cps2_wide.md" ;;
+    live-no-twin-link) sed -i.bak 's|cps2_wide_history\.md|REDACTED_TWIN|g' "$2/docs/project/cps2_wide.md"
+        absent 'cps2_wide_history\.md' "$2/docs/project/cps2_wide.md" "$1"; EXPECT="TWIN BACK-LINK MISSING: docs/project/cps2_wide.md does not name cps2_wide_history.md" ;;
+    directory-entry-member) sed -i.bak '/](game\/atlas\/)/ s|`ram\.md`, ||' "$2/docs/README.md"
+        absent '](game/atlas/).*`ram\.md`' "$2/docs/README.md" "$1"; EXPECT="README CONTENTS MISSING: docs/game/atlas/ram.md" ;;
+    entry-point-off-map) sed -i.bak 's|annotations\.md|REDACTED_EP|g' "$2/docs/README.md"
+        absent 'annotations\.md' "$2/docs/README.md" "$1"; EXPECT="README ENTRY POINT NOT ON THE MAP: docs/annotations.md" ;;
+    *) echo "no such perturbation: $1"; exit 3 ;;
+    esac
 }
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 
-# a: a chronology header in a REFERENCE doc
-mkcopy "$W/a"; printf '\n### 14z-999: an appended discovery note\n' >> "$W/a/docs/game/atlas/id_space.md"
-control "chronology header in a REFERENCE doc" "$W/a" "SESSION-SHAPED HEADER"
+# THE EXECUTABLE FORM: under CONTROL=<name> the perturbed copy IS the tree
+# the main check reads, and this run must FAIL.
+ROOT="$REPO"; SELFTEST=""
+if [ -n "$VS_CTL" ]; then mkcopy "$W/mode"; perturb "$VS_CTL" "$W/mode"; ROOT="$W/mode"; SELFTEST="--no-selftest"; fi
 
-# b: an anchor in a HIST-class doc
-mkcopy "$W/b"; printf '\nold analysis **[VSE-1]** moved here\n' >> "$W/b/docs/project/mister_scope.md"
-control "anchor in a HIST-class doc" "$W/b" "ANCHOR IN HISTORY-class doc"
-
-# c: an undeclared file
-mkcopy "$W/c"; printf '# stray\n' > "$W/c/docs/stray_note.md"
-control "undeclared doc" "$W/c" "UNDECLARED docs/stray_note.md"
-
-# d: a dead allow row
-mkcopy "$W/d"; printf 'docs/game/atlas/id_space.md\tnever-ever-matches\tstale reason\n' >> "$W/d/docs/doc_shape_allow.tsv"
-control "dead allow row" "$W/d" "dead allow row"
-
-# e: a required banner absent (perturb the TSV, not the doc)
-mkcopy "$W/e"
-sed -i.bak 's|^docs/game/atlas/id_space.md\tREFERENCE\t-\t-$|docs/game/atlas/id_space.md\tREFERENCE\t-\tbanner|' "$W/e/docs/doc_shape.tsv"
-grep -q 'id_space.md	REFERENCE	-	banner' "$W/e/docs/doc_shape.tsv" || bad "control e: the TSV perturbation did not apply"
-control "required banner absent" "$W/e" "NO STATUS BANNER"
-
-# f: a dangling doc link in README
-mkcopy "$W/f"; printf '\nsee also [a ghost](game/atlas/ghost_file.md)\n' >> "$W/f/docs/README.md"
-control "dangling link" "$W/f" "DANGLING LINK"
-
-# g: a tool citing a section that does not exist
-mkcopy "$W/g"; printf '# per docs/game/atlas/id_space.md %sA Section Nobody Wrote%s\n' '"' '"' > "$W/g/tools/synthetic_control.py"
-control "citation of a nonexistent section" "$W/g" "SECTION THAT DOES NOT EXIST"
-
-# h: a PENDING row fails the end-state mode the gate runs (since 14z-124)
-mkcopy "$W/h"
-sed -i.bak 's|^docs/game/atlas/id_space.md\tREFERENCE\t-\t-$|docs/game/atlas/id_space.md\tPENDING\t-\t-|' "$W/h/docs/doc_shape.tsv"
-grep -q 'id_space.md	PENDING' "$W/h/docs/doc_shape.tsv" || bad "control h: the TSV perturbation did not apply"
-if python3 tools/checkdocshape.py --root "$W/h" --no-pending --no-selftest >"$W/h/log" 2>&1; then
-    bad "PENDING row under --no-pending: the perturbed copy PASSED — the end state is not enforced"
-elif grep -q "still PENDING" "$W/h/log"; then
-    ok "PENDING row under --no-pending: fires (still PENDING)"
+echo "== test_docshape: doc shapes declared and enforced =="
+if python3 tools/checkdocshape.py --root "$ROOT" --no-pending $SELFTEST >"$W/tree.log" 2>&1; then
+    ok "checkdocshape.py PASS on the tree ($(grep -o '[0-9]* still PENDING' "$W/tree.log" | head -1))"
 else
-    bad "PENDING row under --no-pending: failed for the wrong reason:"; sed 's/^/        /' "$W/h/log" | head -12
+    bad "checkdocshape.py FAILS on the tree:"; sed 's/^/        /' "$W/tree.log" | head -30
 fi
 
-# i: a bold chronology paragraph in a REFERENCE doc (14z-126b). THE HEADER
-# RULE'S BLIND SPOT: barred from headers, the log came back as bold
-# paragraphs — HANDOFF carried eight `**Previous batch (14z-N…)**` blocks,
-# ~140 lines, unseen through eight freezes.
-mkcopy "$W/i"; printf '\n**Previous batch (14z-999, ruled): don-m9 / merged-m4.**\n' >> "$W/i/docs/game/atlas/id_space.md"
-control "bold chronology paragraph in a REFERENCE doc" "$W/i" "BOLD CHRONOLOGY PARAGRAPH"
-
-# --- ROUTING (14z-140, living-docs slice L1) ---------------------------------
-# Two checks: every declared document is listed in docs/README.md's `## Contents`
-# with its declared shape, and a history twin names its live document AND is
-# named by it. j-o are their must-fire controls; n and o exist because two
-# MECHANISMS could otherwise wave a document through silently — a directory
-# entry, and the entry-point exemption.
-
-# j: a listed document dropped from Contents
-mkcopy "$W/j"
-sed -i.bak '/defense_rows.md/d' "$W/j/docs/README.md"
-grep -q 'defense_rows.md' "$W/j/docs/README.md" && bad "control j: the README perturbation did not apply"
-control "a listed doc dropped from Contents" "$W/j" "README CONTENTS MISSING: docs/project/tables/defense_rows.md"
-
-# k: a Contents shape tag that disagrees with the declaration
-mkcopy "$W/k"
-sed -i.bak 's|(project/coverage_matrix.md) — \*\*REFERENCE\*\*|(project/coverage_matrix.md) — **INDEX**|' "$W/k/docs/README.md"
-grep -q '(project/coverage_matrix.md) — \*\*INDEX\*\*' "$W/k/docs/README.md" || bad "control k: the README perturbation did not apply"
-control "a Contents shape tag flipped" "$W/k" "README CONTENTS SHAPE MISMATCH: docs/project/coverage_matrix.md"
-
-# l: a twin that does not name its live document
-mkcopy "$W/l"
-sed -i.bak 's|cps2_wide\.md|REDACTED_LIVE|g' "$W/l/docs/project/cps2_wide_history.md"
-grep -q 'cps2_wide\.md' "$W/l/docs/project/cps2_wide_history.md" && bad "control l: the twin perturbation did not apply"
-control "a twin not naming its live document" "$W/l" "TWIN BACK-LINK MISSING: docs/project/cps2_wide_history.md does not name cps2_wide.md"
-
-# m: the live document that does not name its twin (the OTHER direction — a
-# one-way check would pass this and the declaration is one-way already)
-mkcopy "$W/m"
-sed -i.bak 's|cps2_wide_history\.md|REDACTED_TWIN|g' "$W/m/docs/project/cps2_wide.md"
-grep -q 'cps2_wide_history\.md' "$W/m/docs/project/cps2_wide.md" && bad "control m: the live-doc perturbation did not apply"
-control "a live doc not naming its twin" "$W/m" "TWIN BACK-LINK MISSING: docs/project/cps2_wide.md does not name cps2_wide_history.md"
-
-# n: a directory entry covers the members its own line NAMES, never the
-# directory — otherwise a new atlas file is listed by a line nobody edited
-mkcopy "$W/n"
-sed -i.bak '/](game\/atlas\/)/ s|`ram\.md`, ||' "$W/n/docs/README.md"
-grep -q '](game/atlas/).*`ram\.md`' "$W/n/docs/README.md" && bad "control n: the README perturbation did not apply"
-control "a directory entry stops naming a member" "$W/n" "README CONTENTS MISSING: docs/game/atlas/ram.md"
-
-# o: an entry-point row is exempt from Contents, never from the map
-mkcopy "$W/o"
-sed -i.bak 's|annotations\.md|REDACTED_EP|g' "$W/o/docs/README.md"
-grep -q 'annotations\.md' "$W/o/docs/README.md" && bad "control o: the README perturbation did not apply"
-control "an entry-point row named nowhere in the README" "$W/o" "README ENTRY POINT NOT ON THE MAP: docs/annotations.md"
+# --- must-fire controls on a perturbed copy -------------------------------
+control() {  # control <name>
+    d="$W/$1"; mkcopy "$d"; perturb "$1" "$d"
+    # pending-row is only a failure under the end-state mode this gate runs
+    flag=""; [ "$1" = pending-row ] && flag="--no-pending"
+    if python3 tools/checkdocshape.py --root "$d" $flag --no-selftest >"$d/log" 2>&1; then
+        vs_ctl_dead "$1" "the perturbed copy PASSED — the check is not checking"; bad "$1"
+    elif grep -q "$EXPECT" "$d/log"; then
+        vs_ctl_fired "$1" "$EXPECT"; ok "$1: fires"
+    else
+        vs_ctl_dead "$1" "failed for the wrong reason"; bad "$1:"; sed 's/^/        /' "$d/log" | head -12
+    fi
+}
+for n in $(vs_ctl_declared "$0"); do control "$n"; done
 
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

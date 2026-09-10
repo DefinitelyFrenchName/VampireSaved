@@ -3,6 +3,8 @@
 # judges a rompath by: the named preference (vsavjw, then vsavj, then name
 # order), never directory order (14z-139). ROM-free, ~2 s.
 #
+# MUST-FIRE: shadow-tool: adversary-preference — a copy of test_build_ref_rot.sh whose IMAGE_PREFER names the adversary must judge both rompaths ROTTED (mode: section 1 runs that copy instead of the real gate)
+#
 # WHY. Until 14z-139 that gate took the `vsavjw` zip, else whatever
 # `glob.glob` listed first — and `glob.glob` is unsorted. A stock build's
 # rompath holds `vsavj.zip` beside the pristine parent `vsav.zip`; on the
@@ -31,10 +33,22 @@ rc=0
 fail() { echo "  FAIL: $*"; rc=1; }
 
 GATE="$REPO/tests/test_build_ref_rot.sh"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
 FR="$T/fakerepo"
 mkdir -p "$FR/tests" "$FR/build/stockx/rompath" "$FR/build/widex/rompath" "$FR/build/plainx/rompath"
 ln -s "$GATE" "$FR/tests/test_build_ref_rot.sh"
+# THE SHADOW TOOL: a copy of the gate with the preference rewritten to prefer
+# the adversary. If this does not flip the verdict, the preference is
+# decoration and section 1 proved nothing.
+sed 's/^IMAGE_PREFER = ("vsavjw", "vsavj")$/IMAGE_PREFER = ("vsav.zip",)/' "$GATE" > "$FR/tests/ref_rot_adv.sh"
+grep -q 'IMAGE_PREFER = ("vsav.zip",)' "$FR/tests/ref_rot_adv.sh" \
+    || { fail "could not rewrite the preference — the gate's IMAGE_PREFER line moved"; }
+chmod +x "$FR/tests/ref_rot_adv.sh"
+# THE EXECUTABLE FORM: under CONTROL=adversary-preference section 1 runs the
+# shadow copy as THE gate — and must FAIL (both rompaths read ROTTED).
+RUN=tests/test_build_ref_rot.sh
+vs_ctl_is adversary-preference && RUN=tests/ref_rot_adv.sh
 
 # stub gates that name a build and READ its rompath (the gate only judges
 # defaults that are dereferenced as a romset); written with printf so the
@@ -71,7 +85,7 @@ mkzip "$FR/build/plainx/rompath/b_other.zip" $ROTTED_SHAPE
 mkzip "$FR/build/plainx/rompath/a_other.zip" $STOCK_SHAPE
 
 echo "== 1. the real gate judges each rompath by the NAMED preference =="
-o1="$(cd "$FR" && sh tests/test_build_ref_rot.sh 2>&1)" && s1=0 || s1=$?
+o1="$(cd "$FR" && sh "$RUN" 2>&1)" && s1=0 || s1=$?
 for d in build/stockx build/widex build/plainx; do
     printf '%s' "$o1" | grep -qE "^  ok +$d " \
         && echo "  ok: $d judged by its image, not the adversary" \
@@ -81,19 +95,16 @@ printf '%s' "$o1" | grep -qE '^  ROTTED ' && fail "an adversary was judged (a RO
 [ "$s1" = 0 ] && echo "  ok: exit 0" || fail "the gate exited $s1 on a tree whose every image is current"
 
 echo "== 2. MUST-FIRE — prefer the adversary and both rompaths read ROTTED =="
-# A copy of the gate with the preference rewritten. If this does not flip the
-# verdict, the preference is decoration and section 1 proved nothing.
-sed 's/^IMAGE_PREFER = ("vsavjw", "vsavj")$/IMAGE_PREFER = ("vsav.zip",)/' "$GATE" > "$FR/tests/ref_rot_adv.sh"
-grep -q 'IMAGE_PREFER = ("vsav.zip",)' "$FR/tests/ref_rot_adv.sh" \
-    || { fail "could not rewrite the preference — the gate's IMAGE_PREFER line moved"; }
-chmod +x "$FR/tests/ref_rot_adv.sh"
 o2="$(cd "$FR" && sh tests/ref_rot_adv.sh 2>&1)" && s2=0 || s2=$?
+flipped=0
 for d in build/stockx build/widex; do
     printf '%s' "$o2" | grep -qE "^  ROTTED +$d " \
-        && echo "  ok: $d read ROTTED under the adversarial preference" \
+        && { echo "  ok: $d read ROTTED under the adversarial preference"; flipped=$((flipped + 1)); } \
         || fail "$d did not flip to ROTTED — the preference is not load-bearing"
 done
 [ "$s2" != 0 ] && echo "  ok: and the copy exited $s2" || fail "the adversarial copy exited 0"
+[ "$flipped" = 2 ] && [ "$s2" != 0 ] && vs_ctl_fired adversary-preference "both rompaths read ROTTED under the adversary preference (exit $s2)" \
+                                     || vs_ctl_dead adversary-preference "the adversarial copy did not flip both rompaths to ROTTED"
 
 echo "== 3. the fallback is NAME order, not creation order =="
 # build/plainx has no preferred name; b_other.zip (rotted) was created before
