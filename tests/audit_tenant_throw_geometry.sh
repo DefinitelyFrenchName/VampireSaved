@@ -67,8 +67,16 @@
 # tolerances... interesting to root-cause it to deepen our understanding of
 # the engines though so let's keep that open for a future session." So a RED
 # on this row is NOT "a damage bug" — it is "the residue moved", which is the
-# thing worth knowing. Frozen with its exact deltas; the mechanism is an open
-# KNOWLEDGE item in STATE, not a defect.
+# thing worth knowing. Frozen with its exact deltas. THE MECHANISM, NAMED
+# 14z-145 (tests/audit_defense_row_residue.sh, a read watch on both legs): the
+# defender-side DEFENSE CURVE row the victim's id selects (vsavj 0x0B8940 /
+# vs2 0x0D2ABE, column = the attacker's id) differs between the games on EXACTLY
+# these three roster ids and no other — rows 0x10/0x13 are content-SWAPPED (the
+# port keeps vanilla's rows by ruling, defense_rows.md: Phobos rides Bulleta's
+# curve, Donovan Victor's, hence the opposite signs) and row 0x0A is a
+# CROSS-GENERATION retune of Sasquatch. Ours answers d3 = 0/2/1 where native
+# answers 2/0/0; the control victim answers 2/2. Not a defect; the residue
+# is the observable of the 2026-08-14 defense-row ruling.
 #
 # WHAT THIS REFUTED. `80_hui_grab_2p.rpl`'s own header said "only the victim
 # throw-arc HEIGHT differs (alias physics, queued)". It does not: the arcs are

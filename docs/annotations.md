@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 2985 |
-| named by a document or manifest only | 2027 |
-| named by both a document/manifest and code | 629 |
-| named by CODE ONLY (the gap list below) | 329 |
+| distinct program-space addresses named | 2990 |
+| named by a document or manifest only | 2024 |
+| named by both a document/manifest and code | 632 |
+| named by CODE ONLY (the gap list below) | 334 |
 | carried by atlas | 473 |
 | carried by engine_internals | 540 |
 | carried by other docs | 961 |
 | carried by manifests | 1786 |
-| carried by code | 958 |
+| carried by code | 966 |
 
 ## Addresses
 
@@ -453,7 +453,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x018C08` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f) |
 | `PRG:0x018C1A` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x018C1C` | docs/project/tables/defense_rows.md — What changing to native vs2 values would entail |
-| `PRG:0x018C26` | docs/project/tables/defense_rows.md — What changing to native vs2 values would entail |
+| `PRG:0x018C26` | docs/project/tables/defense_rows.md — What changing to native vs2 values would entail; tests/audit_defense_row_residue.sh |
 | `PRG:0x018C7C` | docs/project/tables/defense_rows.md — What changing to native vs2 values would entail |
 | `PRG:0x018C82` | docs/project/tables/defense_rows.md — What changing to native vs2 values would entail |
 | `PRG:0x018D22` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2] |
@@ -1966,7 +1966,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0B7FB6` | build/manifest/donovan.toml — capture_kf_aulbath; build/manifest/huitzil.toml — capture_kf_aulbath; build/manifest/pyron.toml — capture_kf_aulbath |
 | `PRG:0x0B8140` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/patch_notes.md — (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map |
 | `PRG:0x0B8724` | build/manifest/donovan.toml — capture_kf_aulbath; build/manifest/huitzil.toml — capture_kf_aulbath; build/manifest/pyron.toml — capture_kf_aulbath |
-| `PRG:0x0B8940` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/tables/defense_rows.md — Cross-references; docs/project/tables/defense_rows.md — What this covers; docs/project/tables/defense_rows.md — vsavj d82320a0… / vs2 ac31740c…; re-derive with the snippet below); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map |
+| `PRG:0x0B8940` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/tables/defense_rows.md — Cross-references; docs/project/tables/defense_rows.md — What this covers; docs/project/tables/defense_rows.md — vsavj d82320a0… / vs2 ac31740c…; re-derive with the snippet below); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map; +2 more |
 | `PRG:0x0B8D40` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/tables/defense_rows.md — vsavj d82320a0… / vs2 ac31740c…; re-derive with the snippet below) |
 | `PRG:0x0B9140` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/patch_notes.md — (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map |
 | `PRG:0x0B91C0` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) |
@@ -2149,7 +2149,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0D143E` | docs/project/patch_notes.md — 14z-65 (4) — Huitzil stage 4 BUILDS; the R1 frontier enumerated (2026-08-07); tools/build_donovan.sh |
 | `PRG:0x0D153E` | docs/game/engine_internals.md — Select-screen (portrait/name) pipeline — mapped (session 14c); docs/game/engine_internals.md — Select-screen (portrait/name) pipeline — mapped (session 14c) [vs2]; docs/project/doc_audit_14z118.md — 4. Log of the pass (one line per commit); docs/project/inferred_claims.md — What is NOT known — labelled unknowns that stay labelled (no measurement this pass) |
 | `PRG:0x0D22BE` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/project/patch_notes.md — (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map [vs2] |
-| `PRG:0x0D2ABE` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/project/tables/defense_rows.md — Cross-references; docs/project/tables/defense_rows.md — What this covers; docs/project/tables/defense_rows.md — vsavj d82320a0… / vs2 ac31740c…; re-derive with the snippet below); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); +1 more |
+| `PRG:0x0D2ABE` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/project/tables/defense_rows.md — Cross-references; docs/project/tables/defense_rows.md — What this covers; docs/project/tables/defense_rows.md — vsavj d82320a0… / vs2 ac31740c…; re-derive with the snippet below); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); +3 more |
 | `PRG:0x0D2EBE` | docs/project/tables/defense_rows.md — vsavj d82320a0… / vs2 ac31740c…; re-derive with the snippet below) |
 | `PRG:0x0D3070` | docs/project/patch_notes.md — The two rows; build/manifest/donovan.toml — obj_bank_word_slot; tests/test_don_sword.sh; tests/test_tenant_anim_relocation.sh |
 | `PRG:0x0D32BE` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
@@ -2720,6 +2720,9 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x0170D6` | tests/test_mister_gfxc_fetch.sh |
 | `PRG:0x017452` | tests/test_hitbox_encoding.sh |
 | `PRG:0x017456` | tests/test_hitbox_encoding.sh |
+| `PRG:0x0175C6` | tests/audit_defense_row_residue.sh |
+| `PRG:0x0175CC` | tests/audit_defense_row_residue.sh |
+| `PRG:0x0175D0` | tests/audit_defense_row_residue.sh |
 | `PRG:0x0182B4` | tests/audit_df_accumulator.sh |
 | `PRG:0x01845A` | tests/test_reaction_hook_d2.sh |
 | `PRG:0x01845E` | tests/test_reaction_hook_d2.sh |
@@ -2727,6 +2730,8 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x0184A8` | tests/test_index_space.sh |
 | `PRG:0x01850C` | tests/test_index_window_thunk.sh |
 | `PRG:0x0185D6` | tests/lua/index_watch.lua |
+| `PRG:0x018C20` | tests/audit_defense_row_residue.sh |
+| `PRG:0x018C2A` | tests/audit_defense_row_residue.sh |
 | `PRG:0x0191AA` | tools/gen_hitclass_map_thunk.py |
 | `PRG:0x01A7A0` | tools/gen_hitclass_map_thunk.py |
 | `PRG:0x01AC44` | tests/audit_mask_window_ff42a2.sh |

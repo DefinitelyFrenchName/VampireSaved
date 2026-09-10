@@ -4,6 +4,7 @@
 # class<TAB>gate
 declares	audit_capture_matrix
 declares	audit_clone_beam_lines
+declares	audit_defense_row_residue
 declares	audit_df_accumulator
 declares	audit_df_dead_family
 declares	audit_df_startup_invuln

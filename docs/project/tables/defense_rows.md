@@ -105,6 +105,23 @@ trigger):
    after; plus the standard ladder (solos re-frozen, merged legacy
    audit, run_suite).
 
+## The observable of this ruling, measured (14z-145)
+
+`tests/audit_tenant_throw_geometry.sh` froze 5 of 54 (victim, throw) cells of
+Phobos's three throws differing from native by EXACTLY ±1 total damage — victim
+0x10 ours +1 on all three, 0x13 ours −1 on all three, 0x0A ours −1 on Circuit
+Scrapper only; ruled within tolerance (maintainer, 2026-09-04) and kept as a
+knowledge item. `tests/audit_defense_row_residue.sh` (a `-debug` read watch on
+the defense table, ours vs native, four victims) names the mechanism: each leg
+reads `row[victim id][attacker id]` of this table — the same index on both
+legs — and the byte answered differs on exactly the rows this page lists as
+swapped (0x10: ours 0 / native 2; 0x13: ours 2 / native 0) plus Sasquatch's
+row 0x0A (ours 1 / native 0), a cross-generation retune of a LEGACY character
+that is nothing of the port's; the control victim 0x03 answers 2 / 2. The
+defense byte seeds `d3`, the row of the final 2D damage map, so a one-row
+shift is a ±1 on a throw's damage. Re-ruling option (a) would move the two
+tenant cells and leave Sasquatch's, which is vanilla vsavj's own data.
+
 ## Cross-references
 
 - `docs/game/engine_internals.md` — "The DAMAGE pipeline" (the port

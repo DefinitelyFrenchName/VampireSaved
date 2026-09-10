@@ -2950,7 +2950,12 @@ threshold (vsavj 0x38 vs vs2 0x28 for Huitzil) are vanilla values,
 NOT the characters' native vs2 tuning. Maintainer-ruled KEPT as the
 deliberate vsavj approximation; the values and the would-be change
 recipe live in docs/project/tables/defense_rows.md. (Pyron's rows are
-identical between the games — unaffected either way.)
+identical between the games — unaffected either way.) **Its observable,
+measured 14z-145:** the ±1 damage residue of `audit_tenant_throw_geometry`
+(victims 0x10 +1, 0x13 −1, 0x0A −1) is this row — `d3 =
+defense[victim][attacker]` differs between the games on exactly those ids,
+0x0A being a cross-generation retune of Sasquatch, not the port's
+[M: `tests/audit_defense_row_residue.sh`, read watch both legs].
 
 ## The down-transition WHITE FRAME (14z-112, measured on stock vsavj)
 

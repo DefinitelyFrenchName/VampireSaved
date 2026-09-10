@@ -64,6 +64,7 @@ tests/audit_stage_sweep.sh	tenant
 tests/audit_tech_roll.sh	tenant
 tests/audit_tenant_downwin.sh	tenant
 tests/audit_tenant_throw_geometry.sh	character-data
+tests/audit_defense_row_residue.sh	character-data
 tests/audit_tenant_throws.sh	tenant
 tests/audit_tenant_timeout.sh	tenant
 tests/audit_throw_tech.sh	tenant
