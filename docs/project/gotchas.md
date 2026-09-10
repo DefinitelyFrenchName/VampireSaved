@@ -4441,3 +4441,17 @@ Two neighbours from the same review, both in the same change:
 level; close a descriptor once; and close control descriptors for children.
 Read the diff for these three before running it — none of them is visible in a
 green test run, because the abort path is the one nothing exercises.
+
+## The agent shell's `grep` is ugrep with `--ignore-files` — it SKIPS every gitignored path, so an interactive count over `build/`, `docs/site/` or any ignored file is silently short (paid: 14z-145, via the BBX extraction's gotcha G9)
+
+In Claude Code's Bash tool `grep` is a shell FUNCTION that runs the bundled
+ugrep 7.8 with `-G --ignore-files --hidden -I --exclude-dir=.git`; `which grep`
+prints the function body and `grep --version` says ugrep. `--ignore-files`
+honours `.gitignore`, so a recursive grep from the tool never sees `build/*.log`,
+`docs/site/`, `build/out/` or any other ignored path, and a census produced
+that way reproduces on no other host (the BBX recount, run under a pinned
+environment, found six such counts wrong). Scripts are unaffected: under
+`/bin/sh` `grep` is `/usr/bin/grep` (BSD), which is what every gate runs. Rule:
+a number that must be reproducible comes from a tool under `tools/` or a
+gate, never from an interactive recursive grep; when an interactive grep must
+reach ignored files, call `command grep` (or `/usr/bin/grep`) explicitly.
