@@ -609,7 +609,7 @@ for _rg in $(awk -F'\t' 'NR>1 && $1 !~ /@/ && ($4=="PASS"||$4=="FAIL") {print $1
 done
 _cx=$(awk -F'\t' 'NR>1 && $1 ~ /@/' "$RESULTS" | wc -l | tr -d ' ')
 echo
-echo "== must-fire controls (tests/lib/controls.sh) =="
+echo "== must-fire controls =="
 echo "  read:     fired $_cf / declared $_cd  (undeclared gates: $_cu)"
 [ "$CONTROLS" = 1 ] && echo "  executed: $_cx control run(s) as <gate>@<name> rows, in the tally below"                     || echo "  executed: (off — pass --controls to run each declared control as a mode)"
 

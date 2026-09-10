@@ -170,6 +170,9 @@ run_tier() {  # run_tier <label> <names>
         FAIL)
             if [ "$_st" != 0 ]; then
                 printf '  %-34s FAIL  %3ss  (exit %s)\n' "$g" "$_dur" "$_st"
+            elif [ "${VS_CTL_VERDICT:-}" = RED ]; then
+                # a controls red on an exit-0 run: say so, not "shell error"
+                printf '  %-34s FAIL  %3ss  (%s)\n' "$g" "$_dur" "$VS_DETAIL"
             else
                 printf '  %-34s FAIL  %3ss  (exit 0 after a shell error)\n' "$g" "$_dur"
             fi
@@ -408,12 +411,14 @@ done
 # `# MUST-FIRE:` line prints nothing here, which keeps this runner's output
 # byte-identical to the generic harness's over its declaration-free fake repo
 # (bbh fidelity F1, `tests/test_bbh_fidelity.sh` — red on the first strict run
-# after this block landed, 14z-147). Lifting the reader into bbh is the
-# follow-up; until then F2 (opt-in, the real tier) carries this known delta.
+# after this block landed, 14z-147). The reader was LIFTED into bbh 14z-148
+# (its lib/sh/controls.sh, a copy), so F1 now covers declaring gates too and
+# F2 (opt-in, the real tier) is exact again; the header line below is generic
+# on both sides by construction — it named this file until the lift.
 _xn=$((x_ok + x_lies + x_refused + x_died))
 if [ $((c_decl + c_none + _xn)) != 0 ]; then
 echo
-echo "== must-fire controls (tests/lib/controls.sh) =="
+echo "== must-fire controls =="
 echo "  read:     fired $c_fired / declared $c_decl  (gates declaring none: $c_none; undeclared: $c_undecl)"
 if [ "$EXEC_CTL" = none ]; then
     echo "  executed: (off — --exec-controls none)"

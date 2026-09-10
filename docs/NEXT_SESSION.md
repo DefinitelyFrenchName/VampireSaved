@@ -42,11 +42,14 @@ spanning every shape; two fixes caught (the `CONTROL`-env collision in
   2026-09-10 (14z-148): (a)** — `--controls` is part of every RELEASE run, not
   the freeze sweep; the invocation is in HANDOFF "THE EMULATOR-TIER COMMAND".
   Still to be MEASURED at the next release run (its cost).
-- **Lift the controls reader into bbh** (`~/Developer/blackbox-harness`): bbh's
+- ~~**Lift the controls reader into bbh** (`~/Developer/blackbox-harness`): bbh's
   `run-static` prints no controls block; the lineage's runner prints it only when
   a tier declares or executes something (F1 exact). F2 carries the known delta
   until bbh gains the reader (its `rebaselines.md` is where a re-baseline is
-  declared, loudly).
+  declared, loudly).~~ **DONE 14z-148** — a COPY in bbh (`lib/sh/controls.sh`,
+  `--exec-controls`, `--controls`, [BBH-88..91]); F1 extended and F2 re-measured
+  EXACT (70 rows); the readout header made generic on both sides, re-baselined
+  loudly in bbh's `rebaselines.md`.
 - **Define what is IN a release, and ship the end-user how-to README**
   (maintainer, 2026-09-10): an explicit inventory of what ships and what never
   does (no ROM, no copyrighted asset — the user supplies their own dumps, as with

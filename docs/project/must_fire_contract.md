@@ -97,8 +97,12 @@ declared control after a PASS — `--exec-controls all|portable|none`, default
 `all` — and prints a readout: `fired N / declared N`, the none and undeclared
 counts, and `executed N honoured N lies N refused N died N` — printed only when
 the tier declared or executed anything, so over a declaration-free tree the
-runner's output is byte-identical to bbh's (fidelity F1; lifting the reader into
-bbh is the follow-up, and F2 carries the delta until then). Its ground truth
+runner's output is byte-identical to bbh's. **The reader was LIFTED into bbh
+14z-148 as a copy** (`lib/sh/controls.sh` there, rules [BBH-88..91]): fidelity
+F1 now diffs both runners over nine declaring stubs and F2 over this tree's
+real portable tier, both EXACT (F2 at 70 rows, `--exec-controls none` on both
+sides). The readout's header is the generic `== must-fire controls ==` on both
+sides, and a controls-red FAIL row reads `(controls RED: …)`. Its ground truth
 is `tests/test_static_runner.sh` sections 11-13.
 
 `tests/run_all_emulator.sh` reads every block on every run and executes the
