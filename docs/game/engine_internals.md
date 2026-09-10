@@ -624,9 +624,11 @@ frame by `tests/lua/field_trace.lua`, each pointer mapped onto the graph
   nothing" was true of the slot NUMBERS and vacuous about the chains. Same
   for Huitzil (part 10, all six alias). Pyron (part 6): `0x1b-0x1d` alias,
   `0x19/0x1a` are near-duplicates of `0x13/0x14` (one extra active node on
-  `0x1a`), and `0x18` is a DISTINCT 4-node LP chain — yet his forward-jump
-  LP/MP/HP enter `0x12-0x14`, Zabel's pattern: what enters his `0x18` is
-  unmeasured. On every vanilla character the split is real
+  `0x1a`), and `0x18` is a DISTINCT 4-node LP chain — his forward-jump
+  LP/MP/HP enter `0x12-0x14`, Zabel's pattern, and `0x18-0x1a` ARE his
+  `j.2P` (the maintainer's move list, MEASURED 14z-120: j.2LP/MP/HP ->
+  a2:0x18/0x19/0x1a) — this paragraph said "unmeasured" for a day, [VSP-155]
+  missed. On every vanilla character the split is real
   (`tests/test_vanilla_aerial_join.sh`).* Grapple
   `0x41`. Stance: Killshread LK `0x44`, MK/HK `0x43`, ES `0x46`; summon
   ground `0x47`, air `0x48` (no ES — the pair spends no stock and enters
@@ -775,8 +777,10 @@ it feeds).
   gauge cell off by 6). So the second aerial set means different things per
   character: the forward-jump attack for most, the D+button attack for Zabel.
   The same direction found Aulbath's `J.2HK` at `a2:0x51` and, for Anakaris,
-  D+button leaving the hover into `a:0x36` on every button (a table-a chain,
-  not named); every other character's D+button in the air is the plain
+  D+button in the hover is NOT an attack: `a:0x36` (3 nodes) is the HOVER
+  DROP — he is back on the ground in `a:0x00` four frames later, y restored —
+  on every button; his `J.2K` live off a real (forward) jump, unmeasured by
+  this rig. Every other character's D+button in the air is the plain
   aerial.
 - **Anakaris has NO neutral-jump attacks.** U puts him in a HOVER chain
   (`a:0x12`, +8 px, held ~112 frames) in which every button is ignored; his

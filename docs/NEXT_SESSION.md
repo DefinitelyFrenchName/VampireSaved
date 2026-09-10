@@ -42,10 +42,20 @@ pushed" of commits that were).
 
 ## START HERE — what remains
 
-- **Small residues left by the above, all named:** one Zabel `J.2x` gauge cell
-  (−6, `ZA gauge_hit` 23/24); Anakaris's D+button chain `a:0x36` unnamed; Pyron's
-  distinct `0x18` unentered; BU/FE/LI's remaining single-cell startup/white
-  outliers on the cross-check page.
+- **Small residues left by the above, reviewed the same day (STATE row 9):** Pyron's
+  `0x18-0x1a` are his `j.2P` (measured 14z-120, in his move list — "unentered"
+  retracted); Anakaris's `a:0x36` is the hover DROP, his `J.2K` off a real jump
+  unmeasured; the cross-check page's remaining cells are named per family.
+- **NEW KNOWLEDGE ITEM — THE RE-HIT RULE.** Same-id attack windows land ONCE on
+  SA 5HK (`2(2)3`), THREE times on JE 5HP (`2(5)2(5)2`) and FOUR times on MO 5HK
+  (one window, two id-1 records) — the hit rig's numbers. "A hit id lands once"
+  was tried as a derivation rule and refuted by that same rig in one re-freeze
+  (reverted). Measure the gate `+0x147` and the recent-hit ring's rotation; until
+  then the per-hit sequences and the workbook agree by a shared over-count on
+  SA 5HK/2HP, visible only in the gauge column.
+- **The GAUGE column has no arbiter:** the sheet's `gauge hit − gauge whiff` vs our
+  record `meter` disagree on six cells; a meter-gain rig (P1's stock/meter word
+  read across a connecting hit, the `hit` set's shape) would settle it.
 - **Zabel j.LK proximity guard** — its own session: a LEGACY patch, so its own
   expectation class and build flag, a recording FIRST ([VSP-20]), archaeology
   before theory ([VSP-14]).
