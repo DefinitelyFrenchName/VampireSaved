@@ -15,7 +15,7 @@ BI	startup	INCONSISTENT	18	most common delta +1 on 17/18; spread +0..+1
 BI	active	EXACT	18	18/18
 BI	recovery	CONSTANT OFFSET	12	sheet = ours +2 on all 12
 BI	white	EXACT	18	18/18
-BI	gauge_hit	INCONSISTENT	18	most common delta +0 on 17/18; spread +0..+6
+BI	gauge_hit	INCONSISTENT	18	most common delta +0 on 17/18; spread -18..+0
 BI	red	EXACT	18	18/18
 BU	startup	CONSTANT OFFSET	18	sheet = ours +1 on all 18
 BU	active	EXACT	18	18/18

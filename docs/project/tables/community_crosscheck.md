@@ -190,6 +190,25 @@ quotes the record values to the byte. That is why its `white damage` matches our
 `+9` exactly, and it is the best evidence available about a method the page
 itself never states.
 
+### 2b. The gauge column — ARBITRATED 14z-146: the residue is HITS LANDED, never meter
+
+`tests/test_meter_gain.sh` reads the attacker's meter (+0x10A) frame by frame on
+connecting rigs (P2 idle, HP re-pinned) for the five characters with an
+unarbitrated `gauge_hit` cell. The bar moves in STEPS: the SWING COST on the
+press frame — 0 / 3 / 6 by button strength, whiff or hit alike, equal to the
+workbook's `gauge whiff` on every move read — and ONE on-hit step per LANDED hit,
+equal to the record's `+0x14` (our per-hit value) on every connecting event. So
+neither side's per-hit meter is wrong; what differs is how many windows LAND on
+an idle standing victim at one geometry: SA CL.5HK and 2HP land 1 of their 2
+(the juggle gate, `tests/test_rehit_ring.sh`), LE J.HP 3 of 6, BI 2HK 1 of 2 (its
+sheet cell `24(24)` is a CONDITIONAL second hit and is now read as one). Ours
+counts the chain's WINDOWS — its capacity — and the workbook what its author saw
+land. Two sheet defects fell out: FE 5MP's `guage hit` 5 is a typo for 15 (ours =
+engine = 12), and ZA J.2HK's row carries M-strength numbers (whiff 3, hit 15) on
+an H move (engine: swing 6, on-hit 18 = ours). A whiff twin was tried and
+dropped: it repeats the swing step, and no whiff geometry exists for Zabel's
+dive kicks, which reach across the engine's 336 px separation clamp.
+
 ### 3. Jedah's crouching recovery — CLOSED 2026-09-02: THE RESIDUE IS THE WORKBOOK'S
 
 All six of Jedah's crouching normals (and Lilith's `2MK`) read `+3` where every
@@ -233,7 +252,7 @@ taken from the engine itself.
 
 18 move(s) deviate; the per-move table is on the full page.
 
-### BI Bishamon — `gauge_hit` — most common delta +0 on 17/18; spread +0..+6
+### BI Bishamon — `gauge_hit` — most common delta +0 on 17/18; spread -18..+0
 
 18 move(s) deviate; the per-move table is on the full page.
 

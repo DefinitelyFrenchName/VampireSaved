@@ -179,6 +179,7 @@ test_tick_durations	mame	out	romset	-	romset: vanilla frame data in engine ticks
 test_vanilla_frame_join	mame	out	romset	-	romset: which chain each VANILLA character's standing normals enter, on vsavj
 test_vanilla_aerial_join	mame	out	romset	-	romset: which chain each VANILLA character's jumping normals enter from a NEUTRAL and from a FORWARD jump, on vsavj — a2 0x12-0x17 vs 0x18-0x1D (14z-145)
 test_rehit_ring	mame	out	romset	-	romset: THE MULTI-HIT RE-HIT RULE on vanilla vsavj — the victim's recent-hit slot +0x6C[attacker block], written at contact, cleared every tick the attacker's node has no attack record; JE 5HP 3 contacts / MO CL.5HK 4 / SA CL.5HK 1 + a juggle-gate refusal; write tap + field trace, two must-fire controls (14z-146)
+test_meter_gain	mame	out	romset	-	romset: THE GAUGE COLUMN ARBITRATED on vanilla vsavj — the attacker's meter steps on a connect: the swing cost 0/3/6 by strength (= the workbook's gauge whiff) then the record's +0x14 per LANDED hit; the six unarbitrated cells are hits-landed residues (SA 5HK/2HP 1 of 2, LE J.HP 3 of 6, BI 2HK conditional, ZA J.2HK and FE 5MP sheet errors); one must-fire control (14z-146)
 test_don_sword	mame	release	romset	-	sword-swing behaviour (frozen anim node)
 test_don_accent	mame	release	romset	-	weapon-accent steadiness + the Victor-accent legacy guard
 test_don_colors	mame	release	romset	-	kick colours + mirror rows + the select sword

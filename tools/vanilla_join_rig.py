@@ -70,7 +70,12 @@ SETS = {"far":    ("stand",  300, False),
         "jump_down": ("jump_down", 360, False),  # neutral jump, then D+button (14z-145):
                                                  # what enters ZA's 0x1B-0x1D, and the
                                                  # J.2x rows of the workbook (ZA, AN, QB, AU)
-        "hit":    ("stand",  480, True)}
+        "hit":    ("stand",  480, True),
+        # the CONNECTING twins of the other sets (14z-146, the meter-gain arbitration):
+        # walk in, then the crouching / neutral-jump / D+button recipe at contact range
+        "hit_crouch": ("crouch", 480, True),
+        "hit_jump": ("jump", 480, True),
+        "hit_jump_down": ("jump_down", 480, True)}
 GAP = {k: v[1] for k, v in SETS.items()}
 
 
@@ -90,14 +95,14 @@ def _recipe(kind, b):
             "jump_fwd": _jump_fwd, "jump_down": _jump_down}[kind](b)
 
 
-def gen(cid, dist, out_rpl, out_sched):
-    lines = [f"# vanilla join rig — char {cid:#04x}, {dist} distance",
+def gen(cid, dist, out_rpl, out_sched, pins=None):
+    lines = [f"# vanilla join rig — char {cid:#04x}, {dist} distance" + (f", pins {pins}" if pins else ""),
              "# (tools/vanilla_join_rig.py gen; DO NOT hand-edit, regenerate).",
              "# Select prologue from replay 17 (the character is FORCED by the",
              "# early-window poke, so the cursor path does not matter).",
              name_moves.PROLOGUE.rstrip()]
     kind, gap, walkin = SETS[dist]
-    x1, x2 = name_moves.PIN["far"]
+    x1, x2 = pins or name_moves.PIN["far"]     # pins: a wider pair for a WHIFF leg of a long-reach move (14z-146)
     t = name_moves.FIRST_EVENT
     sched = {"char": f"{cid:#04x}", "distance": dist, "kind": kind, "events": [], "pokes": []}
     pins = []
@@ -116,7 +121,7 @@ def gen(cid, dist, out_rpl, out_sched):
     assert end - name_moves.FIRST_EVENT < 7500, "a part must fit inside one round"
     pokes = [f"{f}:ff8782:{cid:02x}" for f in (1400, 1450, 1500)]
     pokes += [f"{f}:ff8b82:03" for f in (1400, 1450, 1500)]      # P2 = Victor, idle
-    if dist == "hit":
+    if dist.startswith("hit"):
         # re-pin P2's HP just BEFORE each event, never during one: the whole point is to
         # read the drop the move causes ([VSP-125]'s pin, moved off the event windows)
         pokes += [f"{e['frame'] - 20}:ff8850:01200120" for e in sched["events"]]
@@ -228,6 +233,34 @@ def damage(trace, sched, window=200):
     return out
 
 
+def meter(trace, sched):
+    """P1's METER GAIN per event (14z-146): the bar fraction +0x10A (0x90 = one stock)
+    plus 0x90 x the banked stocks +0x109, read at the event's last quiet frame and at
+    the end of its window; the difference is what the swing paid the attacker — on a
+    whiff the swing's own gain, on a connect the swing's plus the record's +0x14 per
+    landed hit. Also the hits (P2 HP drops), so a leg whose event did not connect is
+    never mistaken for one that did."""
+    fr = _samples(trace)
+    out = []
+    for e in sched["events"]:
+        t0, t1 = e["frame"], e["frame"] + e["gap"] - 70
+        def total(f):
+            s = fr.get(f, {})
+            return s["p1meter"] + 0x90 * s["p1stock"] if "p1meter" in s and "p1stock" in s else None
+        a, b = total(t0 - 1), total(t1)
+        drops = 0; prev = None
+        for f in range(t0 - 10, t1):
+            v = fr.get(f, {}).get("p2hp")
+            if v is None:
+                continue
+            if prev is not None and v < prev and prev - v < 200:
+                drops += 1
+            prev = v
+        out.append({"button": e["name"], "gain": None if a is None or b is None else b - a,
+                    "hits": drops, "before": a})
+    return out
+
+
 def analyse(trace, sched, img, cid, window=90):
     nm = node_map(img, cid)
     frames, ys = {}, {}
@@ -280,7 +313,7 @@ def analyse(trace, sched, img, cid, window=90):
 def main():
     a = sys.argv[1:]
     if a and a[0] == "gen":
-        gen(int(a[1], 0), a[2], a[3], a[4])
+        gen(int(a[1], 0), a[2], a[3], a[4], (int(a[5], 0), int(a[6], 0)) if len(a) > 6 else None)
         return
     ap = argparse.ArgumentParser()
     ap.add_argument("mode")
@@ -293,6 +326,7 @@ def main():
     ap.add_argument("--tsv", action="store_true", help="one machine row per event")
     ap.add_argument("--durations", action="store_true", help="MEASURED startup/active/recovery per event")
     ap.add_argument("--damage", action="store_true", help="P2 HP drops per event (the `hit` set)")
+    ap.add_argument("--meter", action="store_true", help="P1 meter gain per event (needs p1meter/p1stock/p2hp fields)")
     ap.add_argument("--airborne", action="store_true", help="append the airborne-at-press column (air/ground/-) to --tsv rows")
     n = ap.parse_args()
     sched = json.loads(n.sched.read_text())
@@ -303,6 +337,11 @@ def main():
                       f"\t{r['startup']}\t{r['active']}\t{r['recovery']}\t{r['frames']}")
             else:
                 print(f"{n.tab or sched['char']}\t{sched['distance']}\t{r['button']}\t{r.get('chain','UNFIRED')}\t-\t-\t-\t-")
+        return
+    if n.meter:
+        for r in meter(n.trace, sched):
+            g = "-" if r["gain"] is None else r["gain"]
+            print(f"{n.tab or sched['char']}\t{sched['distance']}\t{r['button']}\t{g}\t{r['hits']}")
         return
     if n.damage:
         for r in damage(n.trace, sched):

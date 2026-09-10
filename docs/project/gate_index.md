@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**317 scripts** — 69 ci_portable, 75 ci_static, 173 emulator-tier (run by name).
+**318 scripts** — 69 ci_portable, 75 ci_static, 174 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -27,7 +27,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 82 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 22 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 23 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -344,6 +344,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/test_df_startup_provenance.sh` | test | ci_static | ROMDIR | THE TENANTS' DARK FORCE STARTUP WINDOWS ARE CAPCOM'S OWN, CARRIED FROM vs2/vh2 — the three-way ROM agreement that backs the preservation claim, frozen (14z-126). | 14z-126 |
 | `tests/test_hitbox_encoding.sh` | test | emulator | MAME, a build dir, ~4 min | THE HITBOX ENCODING AND THE ATTACK RECORD ARE WHAT THE ENGINE USES (character-data map, PHASE 2; measured 14z-120 (5)). | 14z-120 (5) |
 | `tests/test_killshread_es.sh` | test | emulator | MAME, ~2 min | KILLSHREAD (ES): the maintainer's ruling (14z-121) that the ES stance change's effect plays out DURING THE SUMMON — the returning Killshread attacks going away AND coming back, where the plain summon attacks one way — MEASURED on native vs2… | 14z-121 |
+| `tests/test_meter_gain.sh` | test | emulator | MAME, ~4 min | THE GAUGE COLUMN ARBITRATED: what a vanilla normal pays its attacker in METER, read off the engine on a CONNECT (14z-146). | 14z-146 |
 | `tests/test_move_naming.sh` | test | emulator | MAME, a build dir, ~1 min | THE MOVE LIST'S CHAIN IDS ARE WHAT NATIVE VS2 ENTERS (character-data map, phase 1 naming step; 14z-120). | 14z-120 |
 | `tests/test_projectile_census.sh` | test | emulator | MAME, ~2 min | WHICH PROJECTILE-POOL TYPES EACH TENANT'S MOVES SPAWN (character-data map phase 3, 14z-120 (11)). The naming rigs' specials and meter parts (donovan/pyron/huitzil parts 2 and 4) replayed on native vs2 with the 32 pool slots' type bytes samp… | 14z-120 (11) |
 | `tests/test_projectile_params.sh` | test | emulator | MAME, a build dir, ~3 min | THE PROJECTILE PARAMETERS (character-data map phase 3, 14z-121): every $FF9400-pool projectile type's inline parameter tables, decoded from the type HANDLER (tools/projectile_params.py) and MEASURED on the live spawn. | 14z-121 |

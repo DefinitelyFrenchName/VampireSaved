@@ -144,6 +144,14 @@ def parse_total(s):
     if re.search(r"x\s*n\b|[~\uff5e]|hit|projectile|/\d+f|every", str(s), re.I):
         return None                       # unbounded, a mash range, or prose
     s = _plain(s)
+    # `N(M)` — a number immediately followed by ONE parenthesised number and nothing
+    # else — is a CONDITIONAL second hit (BI 2HK's gauge "24(24)": the 4(12)4 chain's
+    # second window lands only on a victim the first did not launch). MEASURED 14z-146
+    # (tests/test_meter_gain.sh): on an idle victim the engine pays 24 - 6 = 18, one
+    # hit, so the certain part alone is the cell's value; summing it read 42.
+    m = re.fullmatch(r"\s*(\d+)\((\d+)\)\s*", s)
+    if m:
+        return int(m.group(1))
     if not s or not re.fullmatch(r"[0-9+,()x\s]+", s):
         return None
     tot, i = 0, 0
@@ -492,6 +500,25 @@ def render_md(vanilla, cmp_, full=False):
     A("quotes the record values to the byte. That is why its `white damage` matches our")
     A("`+9` exactly, and it is the best evidence available about a method the page")
     A("itself never states.")
+    A("")
+    A("### 2b. The gauge column — ARBITRATED 14z-146: the residue is HITS LANDED, never meter")
+    A("")
+    A("`tests/test_meter_gain.sh` reads the attacker's meter (+0x10A) frame by frame on")
+    A("connecting rigs (P2 idle, HP re-pinned) for the five characters with an")
+    A("unarbitrated `gauge_hit` cell. The bar moves in STEPS: the SWING COST on the")
+    A("press frame — 0 / 3 / 6 by button strength, whiff or hit alike, equal to the")
+    A("workbook's `gauge whiff` on every move read — and ONE on-hit step per LANDED hit,")
+    A("equal to the record's `+0x14` (our per-hit value) on every connecting event. So")
+    A("neither side's per-hit meter is wrong; what differs is how many windows LAND on")
+    A("an idle standing victim at one geometry: SA CL.5HK and 2HP land 1 of their 2")
+    A("(the juggle gate, `tests/test_rehit_ring.sh`), LE J.HP 3 of 6, BI 2HK 1 of 2 (its")
+    A("sheet cell `24(24)` is a CONDITIONAL second hit and is now read as one). Ours")
+    A("counts the chain's WINDOWS — its capacity — and the workbook what its author saw")
+    A("land. Two sheet defects fell out: FE 5MP's `guage hit` 5 is a typo for 15 (ours =")
+    A("engine = 12), and ZA J.2HK's row carries M-strength numbers (whiff 3, hit 15) on")
+    A("an H move (engine: swing 6, on-hit 18 = ours). A whiff twin was tried and")
+    A("dropped: it repeats the swing step, and no whiff geometry exists for Zabel's")
+    A("dive kicks, which reach across the engine's 336 px separation clamp.")
     A("")
     A("### 3. Jedah's crouching recovery — CLOSED 2026-09-02: THE RESIDUE IS THE WORKBOOK'S")
     A("")

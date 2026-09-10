@@ -49,6 +49,7 @@ declares	test_jtcores_twin
 declares	test_jtsim_scratch_heal
 declares	test_mame_bin_pinned
 declares	test_md_subset
+declares	test_meter_gain
 declares	test_mister_mra_map
 declares	test_mister_obj_oracle
 declares	test_mister_page

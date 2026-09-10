@@ -920,7 +920,7 @@ disassembly, `tools/m68dis.py`); a field with no reader there is marked so.
 | `+0xF` | `0x16B44` | → victim `+0x5A` |
 | `+0x10` | `0x16930`, `0x16B38` | the hit id, stored in the victim's ring at `+0x6C` (the multi-hit dedup) |
 | `+0x13` | `0x171FC` | **the HIT-FREEZE class**: → victim `+0x141`, and `+0x13*4` indexes the pairs table `0x17FA4` (hit) / `0x17FA6` (block, class byte negative) — `(a0)+` → the attacker's `+0x5C`, `(a0)` → the victim's; index 0x60 forced when the attacker's `+0x8` is clear and `+0x11A` set. The 11 measured on every normal is this table's entry |
-| `+0x14` | `0x172F6` | the attacker's METER (halved on block, `jsr 0x28D48`); the victim gets 8 while its combo count `+0x144` < 12 |
+| `+0x14` | `0x172F6` | the attacker's METER (halved on block, `jsr 0x28D48`); the victim gets 8 while its combo count `+0x144` < 12. **MEASURED 14z-146 (`tests/test_meter_gain.sh`, 48 connecting events on five characters): the attacker's bar (`+0x10A`) steps by this byte ONCE PER LANDED HIT on the HP-drop frame, after a separate SWING COST of 0/3/6 by strength on the press frame that a whiff pays too — the workbook's `gauge whiff`; its `guage hit` is swing + `+0x14` x the hits its author saw land** |
 | `+0x16` | `0x16FA0` | the special flag: class 4 becomes 5 (+ `+0x117`) |
 | `+0x17` | `0x16F70` and the compares | the REACTION CLASS |
 | `+0x19` | `0x16B3E` | → victim `+0x56` |
