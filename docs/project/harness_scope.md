@@ -9,7 +9,7 @@
 > stage): the harness is a SEPARATE repository, `~/Developer/blackbox-harness`
 > (beside this tree's PARENT `~/Developer/Vampire_Saved/`, not a sibling of the
 > tree — measured 14z-138; PUBLIC on GitHub since 14z-135b at the maintainer's
-> word — https://github.com/DefinitelyFrenchName/blackbox-harness, branch `main`),
+> word — https://github.com/DefinitelyFrenchName/BBH-frame-based (renamed 2026-09-10 from `blackbox-harness`; the old URL redirects), branch `main`),
 > and this project gains exactly ONE read-only fidelity gate. Everything else in §7 is a default open to veto.
 > Slice status is tracked in STATE (the session entries) and in §4's table,
 > which is updated in place as slices land. **AS OF 14z-138 (2026-09-07)
@@ -419,7 +419,7 @@ Three rules that follow from the contract:
 
 1. **RULED (maintainer, 2026-09-06): a SEPARATE repository,
    `~/Developer/blackbox-harness`.** Git-initialised locally 14z-135; PUSHED
-   14z-135b to https://github.com/DefinitelyFrenchName/blackbox-harness (public, `main`) at
+   14z-135b to https://github.com/DefinitelyFrenchName/BBH-frame-based (renamed 2026-09-10 from `blackbox-harness`; the old URL redirects) (public, `main`) at
    the maintainer's word — *"push it to its own repo on my github … you
    clone/fork it when you need it"* — so pushing the harness is standing-
    authorised from then on.
