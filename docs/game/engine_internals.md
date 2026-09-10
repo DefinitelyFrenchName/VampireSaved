@@ -496,11 +496,15 @@ PC 0xCE38A = vs2 0x2713C + port offset):
   -> reaction node. **ENGINE-GENERATION DRIFT: the constants.**
   vsavj (older): victim 0x18, attacker 0x0B, no +0x147 write.
   vs2 (newer): victim 0x0C, attacker 0x04, PLUS victim +0x147=0x0C —
-  and **+0x147 is the multi-hit re-hit gate** (period ~10f with it,
+  and **+0x147 sets vs2's re-hit PERIOD on that handler** (~10f with it,
   ~victim-freeze-length without it: vsavj-constants gave 12f, vs2
   freeze without $147 gave 7f, vs2 full semantics 10f) — because `+0x147`
   is the victim's general INVINCIBILITY TIMER, the gate the hit test at
   `0x18064` refuses on (14z-126; the Dark Force startup window below).
+  **It is not the multi-hit DEDUP** — on vsavj, whose reaction handlers
+  never write it, whether a same-id record lands again is decided by the
+  recent-hit slot `+0x6C` cleared on gap nodes ("Multi-hit accounting",
+  14z-146).
 - **Mash extension:** extends the LOOP-LINK iteration count (3 base
   -> 4 measured with LP/MP-alternating mash on both games; maintainer
   max-mash datums 5/9/11 per strength). The mechanism is
@@ -2959,11 +2963,33 @@ install (vsavj 0x27EC0 ↔ vs2 0x27114). Atlas rows: victim `+0x54`
 class, `+0x5C` freeze, `+0x07` seq sub-state (4 = shock), attacker
 link `+0x32`.
 
-**Multi-hit accounting:** the gate at `PRG:0x18090` dedups by hit id —
-record byte `+0x10` vs the victim's recent-hit ring at `+0x6C`
-(rotating index at attacker context `+0x70`). The combo counter
-(`+0x144`, victim) is incremented by the REACTION handlers (vs2 beam
-reaction `0x56002`: +3/tick), not by the appliers.
+**Multi-hit accounting — THE RE-HIT RULE, MEASURED (14z-146,
+`tests/test_rehit_ring.sh`; atlas rows `+0x6C`, `+0x70`, `+0x08`):** the hit
+test `PRG:0x018064` refuses a record whose hit id (byte `+0x10`) equals the
+VICTIM's recent-hit slot `+0x6C[attacker +0x70]` — one byte per attacking
+fighter block (`+0x70` is the block index, not a rotating cursor; the
+14z-125 "rotating index" was a static misreading). The contact install
+`PRG:0x01827C` writes the landed id into the slot, and **`PRG:0x022268`
+clears the whole ring every engine tick in which the attacker's CURRENT
+anim node carries no attack record** (`node +0x0A == 0`: `clr.l $86c(a5)`
+for P2's ring off P1's node, `clr.l $46c(a5)` the other way). So the slot
+lives only across CONSECUTIVE attack nodes: consecutive attack nodes
+sharing an id land ONCE (the alternative-boxes case), and a same-id record
+lands AGAIN after any gap node. Measured on stock vsavj with a write tap
+and a field trace: JE 5HP `2(5)2(5)2` (three records, all id 1) lands three
+times with the slot cleared between each pair; MO CL.5HK (four consecutive
+attack nodes, records 12-15, ids 1-4) lands four times with no clear
+between; and SA CL.5HK `2(2)3` (both records id 1) lands ONCE — but NOT by
+this rule: its slot is already clear at the second window, and the refusal
+is the JUGGLE gate at `0x018092` (the node's `+0x14` juggle byte 0 is below
+the victim's midair-hit counter `+0x145` = 1 after hit 1, reaction class 4,
+launched him; `+0x1A4` = 0). The derivation in `tools/frame_data.py`
+(segments merge across consecutive attack nodes with one id, a gap node
+re-arms) IS this rule; a victim-state refusal like SA's is outside what a
+chain can say. The attacker's `+0x08` non-zero bypasses the slot entirely
+(the object-hit path). Only two PCs ever write the ring on the normals
+rigs. The combo counter (`+0x144`, victim) is incremented by the REACTION
+handlers (vs2 beam reaction `0x56002`: +3/tick), not by the appliers.
 
 **Port note (defense side, DECIDED 2026-08-14):** tenant ids sit on
 vanilla vsavj defense-table rows — row 0x10's curve and low-HP

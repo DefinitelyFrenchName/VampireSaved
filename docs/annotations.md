@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 2992 |
-| named by a document or manifest only | 2026 |
-| named by both a document/manifest and code | 632 |
-| named by CODE ONLY (the gap list below) | 334 |
-| carried by atlas | 473 |
-| carried by engine_internals | 542 |
+| distinct program-space addresses named | 3001 |
+| named by a document or manifest only | 2031 |
+| named by both a document/manifest and code | 635 |
+| named by CODE ONLY (the gap list below) | 335 |
+| carried by atlas | 481 |
+| carried by engine_internals | 544 |
 | carried by other docs | 961 |
 | carried by manifests | 1786 |
-| carried by code | 966 |
+| carried by code | 970 |
 
 ## Addresses
 
@@ -395,12 +395,17 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x017FA6` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x018018` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); tools/charmap_gen.py; tools/hitbox_records.py |
 | `PRG:0x01801A` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
-| `PRG:0x018064` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured); docs/game/engine_internals.md — The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126); tests/audit_df_startup_invuln.sh |
+| `PRG:0x018064` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured); docs/game/engine_internals.md — The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); tests/audit_df_startup_invuln.sh; tests/test_rehit_ring.sh; +1 more |
 | `PRG:0x01808E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
-| `PRG:0x018090` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) |
+| `PRG:0x018092` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); tests/test_rehit_ring.sh |
+| `PRG:0x0180BC` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
+| `PRG:0x0180C2` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
+| `PRG:0x0180D0` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x018216` | docs/game/engine_internals.md — The SUB-STATE DISPATCHER FAMILY at 0x018460 (14z-79); build/manifest/huitzil.toml — port_patch |
 | `PRG:0x01821A` | docs/game/engine_internals.md — The SUB-STATE DISPATCHER FAMILY at 0x018460 (14z-79); docs/game/gotchas.md — downstream of the handler's rts (14z-79, cost a build); docs/project/patch_notes.md — 14z-79 — (b') the index-window thunk, and a withdrawal; build/manifest/huitzil.toml — port_patch; tools/gen_index_window_thunk.py |
 | `PRG:0x018230` | docs/game/engine_internals.md — The SUB-STATE DISPATCHER FAMILY at 0x018460 (14z-79); build/manifest/huitzil.toml — port_patch |
+| `PRG:0x01826C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
+| `PRG:0x01827C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); tests/test_rehit_ring.sh; tools/rehit_ring.py |
 | `PRG:0x01841A` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x018438` | docs/game/engine_internals.md — The SUB-STATE DISPATCHER FAMILY at 0x018460 (14z-79) |
 | `PRG:0x01843A` | docs/project/gotchas.md — and the engines RENUMBERED families between games (14z-109, the #99 crash); build/manifest/donovan.toml — ls_freeze_vs2_attacker |
@@ -460,6 +465,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x018E46` | docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f) |
 | `PRG:0x018EFC` | docs/game/gotchas.md — In the engine hit-spark spawner, a1 is the VICTIM, a6 the attacker; build/manifest/donovan.toml — throw_victim_keyframes |
 | `PRG:0x018F2E` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — spark_spawn_mark |
+| `PRG:0x018F48` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x018F88` | build/manifest/huitzil.toml — throw_arc_tables |
 | `PRG:0x018F9A` | docs/game/atlas/id_space.md — Which ids vanilla ever assigns (measured over the corpus); tests/audit_id_writers.sh |
 | `PRG:0x01904E` | build/manifest/reconciliation.toml — map |
@@ -600,6 +606,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0209C4` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path |
 | `PRG:0x0209DA` | docs/game/atlas/select_screen.md — The routine |
 | `PRG:0x0209E4` | build/manifest/reconciliation.toml — map [vs2] |
+| `PRG:0x020A12` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x020A34` | docs/game/atlas/select_screen.md — The routine |
 | `PRG:0x020A3E` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path |
 | `PRG:0x020A4A` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path |
@@ -667,6 +674,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x022000` | docs/game/engine_internals.md — The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76); docs/project/patch_index.md — DEFERRED BY MAINTAINER DECISION (14z-76) — the win-quote bank relocation |
 | `PRG:0x022008` | docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds) [vs2]; docs/project/gotchas.md — (14z-68, refutes half of the 14z-67 entry theory) [vs2]; docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/huitzil.toml — pcrel_escape_fix [vs2]; build/manifest/reconciliation_donovan.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map [vs2]; +1 more |
 | `PRG:0x022174` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
+| `PRG:0x022268` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); tests/test_rehit_ring.sh; tools/rehit_ring.py |
 | `PRG:0x02228E` | docs/game/atlas/ram.md — System / match globals; docs/project/doc_audit_14z118.md — 4. Log of the pass (one line per commit); tests/audit_front_comparator.sh; tests/audit_tenant_timeout.sh |
 | `PRG:0x02237A` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; build/manifest/donovan.toml — ls_freeze_vs2_attacker [vs2] |
 | `PRG:0x022388` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/project/patch_notes.md — vs2-licensed class remaps; maintainer-ruled option (a)) [vs2] |
@@ -1450,7 +1458,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x055FC2` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x055FD6` | build/manifest/reconciliation.toml — map |
 | `PRG:0x055FE0` | build/manifest/type_stamps.toml — stamp |
-| `PRG:0x056002` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/patch_notes.md — (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix) [vs2] |
+| `PRG:0x056002` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/project/patch_notes.md — (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix) [vs2] |
 | `PRG:0x056020` | build/manifest/huitzil.toml — data_in_code; tests/test_census_regions.sh |
 | `PRG:0x05604C` | build/manifest/huitzil.toml — data_in_code; tests/test_census_regions.sh |
 | `PRG:0x056064` | docs/project/patch_notes.md — crypt-placed code (data_in_code mechanism + census); build/manifest/huitzil.toml — data_in_code |
@@ -2761,6 +2769,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x020A70` | tools/audit_id_space.py |
 | `PRG:0x020BA4` | tests/test_oboro_select.sh |
 | `PRG:0x020E24` | tests/test_advancing_guard.sh |
+| `PRG:0x022276` | tests/test_rehit_ring.sh |
 | `PRG:0x022496` | tests/test_advancing_guard.sh |
 | `PRG:0x02249C` | tests/test_advancing_guard.sh |
 | `PRG:0x0224A2` | tests/test_advancing_guard.sh |

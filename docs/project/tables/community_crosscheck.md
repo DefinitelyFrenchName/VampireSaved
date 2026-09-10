@@ -163,8 +163,15 @@ this session did not build.
 Every move whose `white` and `red` read about HALF the workbook's has the same
 shape: the chain carries **two or more attack records that share hit id 1**, the
 engine's own multi-hit dedup key (record `+0x10`). Records sharing a hit id are
-alternative boxes for ONE hit — the victim's recent-hit ring refuses the second
-([VSE-43]) — so only one of them can land. We take one; **the workbook sums them**:
+alternative boxes for ONE hit — the victim's recent-hit slot refuses the second
+([VSE-43]) — so only one of them can land. We take one; **the workbook sums them**.
+The rule itself was MEASURED 14z-146 (`tests/test_rehit_ring.sh`): the slot holds the
+last landed id and the engine clears it on every tick the attacker's node has no
+attack record, so consecutive attack nodes sharing an id land once and a same-id
+record lands again after any gap node — JE 5HP `2(5)2(5)2` lands three times, and
+SA CL.5HK `2(2)3` lands once for a different reason (its first hit launches the
+victim and the juggle gate refuses the second: a victim-state effect, not the chain's).
+
 
 Five moves carry it (MO 5HK, QB 2HK, SA 5HP, VI 2HP, JE 5HK — two or more attack
 records sharing hit id 1; the per-record values are on the full page).

@@ -4455,3 +4455,16 @@ environment, found six such counts wrong). Scripts are unaffected: under
 a number that must be reproducible comes from a tool under `tools/` or a
 gate, never from an interactive recursive grep; when an interactive grep must
 reach ignored files, call `command grep` (or `/usr/bin/grep`) explicitly.
+
+## THE HIT RIG STANDS AT NEAR DISTANCE, SO IT MEASURES THE `CL.` VARIANT — read its counts against the CLOSE chain, never the far one (paid: 14z-145, found 14z-146)
+
+`tools/vanilla_join_rig.py`'s `hit` set walks P1 in (the `near` recipe) so the
+normal connects, and where a character has a close-range variant that is the
+chain it enters: MO's rig `HK` is `a2:0x0a` = CL.5HK (four consecutive attack
+records, hit ids 1-4), not the far 5HK the crosscheck page lists with two
+id-1 records. 14z-145 read the far chain's records against the near rig's
+four HP drops and published "ONE window with two id-1 records lands FOUR" as
+an engine paradox; it was a join slip — the chain the rig entered is in the
+trace (`node_map`), and `tools/rehit_ring.py` now prints it on every EVENT
+line. Rule: a rig's measurement is joined to the chain the trace says P1
+entered, never to the chain the move NAME suggests.

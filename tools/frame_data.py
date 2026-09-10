@@ -9,6 +9,14 @@ THE LAW, as measured (tests/test_hitbox_encoding.sh, 14z-120 (5)):
   **a chain's ACTIVE frames are its nodes with hbA != 0**.
   The record's +0x10 is the HIT ID (the multi-hit dedup key), so two adjacent
   attack nodes carrying different hit ids are two HITS, not one longer one.
+  AND THE RE-HIT RULE, MEASURED (14z-146, tests/test_rehit_ring.sh): the
+  victim's recent-hit slot (+0x6C[attacker block]) holds the last landed id
+  and the engine CLEARS it on every tick the attacker's node has no attack
+  record — so consecutive attack nodes sharing an id land ONCE and a same-id
+  record lands AGAIN after any gap node. That is exactly derive()'s segment
+  rule (merge across consecutive attack nodes with one id; a gap re-arms).
+  What a chain cannot say is a VICTIM-STATE refusal: SA CL.5HK's second
+  window is refused by the juggle gate on a victim its first hit launched.
 
 WHY THIS MODULE EXISTS (14z-125). Until now `charmap_md.py` and
 `charmap_html.py` each computed `active = sum(durs[first:last+1])` — the

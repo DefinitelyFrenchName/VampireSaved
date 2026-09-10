@@ -314,6 +314,7 @@ tests/test_tenant_row_owner.sh	pipeline
 tests/test_tenant_select_records.sh	pipeline
 tests/test_tenant_winpal.sh	tenant
 tests/test_thunk_addr_literal.sh	pipeline
+tests/test_rehit_ring.sh	character-data
 tests/test_tick_durations.sh	character-data
 tests/test_type_stamp_census.sh	pipeline
 tests/test_vanilla_frame_join.sh	character-data
