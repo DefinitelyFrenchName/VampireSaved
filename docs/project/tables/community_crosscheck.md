@@ -107,11 +107,11 @@ per MOVE, over all 15 characters:
 
 | column | convention | moves agreeing |
 |---|---|---|
-| `startup` | sheet = ours +1 — the sheet counts the first active frame as startup; ours counts the frames before it | **287/290** (98%) |
+| `startup` | sheet = ours +1 — the sheet counts the first active frame as startup; ours counts the frames before it | **288/291** (98%) |
 | `active` | sheet = ours +0 — identical | **283/286** (98%) |
 | `recovery` | sheet = ours +2 — a 2-frame tail the sheet counts and our last node does not | **190/197** (96%) |
-| `white` | sheet = ours +0 — identical — the record's +9 is the dealt white damage, unscaled | **279/290** (96%) |
-| `gauge_hit` | sheet = ours +0 — identical once the sheet's own `gauge whiff` is subtracted | **284/290** (97%) |
+| `white` | sheet = ours +0 — identical — the record's +9 is the dealt white damage, unscaled | **280/291** (96%) |
+| `gauge_hit` | sheet = ours +0 — identical once the sheet's own `gauge whiff` is subtracted | **285/291** (97%) |
 
 So the two measurements corroborate each other on ~96% of every column we can
 compare, under one stated convention per column. The residue is the worklist below.
@@ -120,7 +120,7 @@ compare, under one stated convention per column. The residue is the worklist bel
 
 | character | joined | startup | active | recovery | white | gauge_hit | red |
 |---|---|---|---|---|---|---|---|
-| **AN** Anakaris `0x06` | 15 | CONSTANT OFFSET (sheet = ours +1 on all 15) · n=15 | EXACT · n=15 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | INCONSISTENT · n=15 | EXACT · n=15 | INCONSISTENT · n=15 |
+| **AN** Anakaris `0x06` | 16 | CONSTANT OFFSET (sheet = ours +1 on all 16) · n=16 | EXACT · n=15 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | INCONSISTENT · n=16 | EXACT · n=16 | INCONSISTENT · n=16 |
 | **AU** Aulbath `0x09` | 20 | INCONSISTENT · n=20 | INCONSISTENT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=20 | EXACT · n=20 | EXACT · n=20 |
 | **BI** Bishamon `0x08` | 19 | INCONSISTENT · n=18 | EXACT · n=18 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=18 | INCONSISTENT · n=18 | EXACT · n=18 |
 | **BU** Bulleta `0x00` | 18 | CONSTANT OFFSET (sheet = ours +1 on all 18) · n=18 | EXACT · n=18 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | EXACT · n=18 | EXACT · n=18 | EXACT · n=18 |
@@ -230,15 +230,31 @@ and the workbook's for those seven moves sits one frame below its own convention
 Measurement is king: a source whose method we cannot see loses to a tick count
 taken from the engine itself.
 
+### 3b. The last three timing cells — ARBITRATED 14z-146, in engine ticks
+
+`tests/test_tick_durations.sh` gained Aulbath's standing and Lei-Lei's jumping
+normals, per node. **AU 5MP**: the sheet's active `6x3` (18) against our `6,3`
+(9) — the attack nodes spend 3+3+3 = 9 ticks; the sheet's cell is a notation
+slip for `6,3`. **AU 5HP**: the sheet's startup 11 against our 9 — node 0 to the
+first attack node is 9 ticks, so under the sheet's own +1 the cell should read
+10; it is one high. **LE J.HP**: the sheet's `2,2,2,2,2,1` (11) against our
+`2,2,2,2,2,2` (12) — the pass LEAVES the chain inside its window at the LANDING
+after 10 of the data's 12 attack ticks (13 of 14 nodes entered): the sheet's 11 is
+a landing-cut figure at its author's jump timing, ours the chain's capacity —
+the aerial-recovery rule (a physics event bounds the chain) applied to active.
+**AN J.2K**: his three D+kick rows join for the first time — a forward jump then
+D+kick enters ONE chain, `a2:0x1e` (`tests/test_vanilla_aerial_join.sh`'s fourth
+direction); startup 8 (+1 = the sheet's 9), red 16 = 8+8, white 8: EXACT.
+
 ## Every INCONSISTENT column — per character (the moves are on the full page)
 
-### AN Anakaris — `white` — most common delta +0 on 14/15; spread +0..+5
+### AN Anakaris — `white` — most common delta +0 on 15/16; spread +0..+5
 
-15 move(s) deviate; the per-move table is on the full page.
+16 move(s) deviate; the per-move table is on the full page.
 
-### AN Anakaris — `red` — most common delta +0 on 14/15; spread +0..+15
+### AN Anakaris — `red` — most common delta +0 on 15/16; spread +0..+15
 
-15 move(s) deviate; the per-move table is on the full page.
+16 move(s) deviate; the per-move table is on the full page.
 
 ### AU Aulbath — `startup` — most common delta +1 on 19/20; spread +1..+2
 

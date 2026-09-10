@@ -234,6 +234,11 @@ def compare(vanilla, sheet_path):
                     inp = "9J." + btn
                 else:
                     inp = "J." + btn
+            # ANAKARIS's J.2K (14z-146, tests/test_vanilla_aerial_join.sh direction jump_fwd_down):
+            # his three D+kick rows are ONE chain (a2:0x1e, named J.2LK on our side) — the
+            # workbook writes three identical rows; each joins to the one chain.
+            if tab == "AN" and inp in ("J.2MK", "J.2HK"):
+                inp = "J.2LK"
             if inp in ours and inp not in rows:      # first row wins; duplicates are reported
                 rows[inp] = r
         per_col, moves = {}, {}
@@ -540,6 +545,22 @@ def render_md(vanilla, cmp_, full=False):
     A("and the workbook's for those seven moves sits one frame below its own convention.")
     A("Measurement is king: a source whose method we cannot see loses to a tick count")
     A("taken from the engine itself.")
+    A("")
+    A("### 3b. The last three timing cells — ARBITRATED 14z-146, in engine ticks")
+    A("")
+    A("`tests/test_tick_durations.sh` gained Aulbath's standing and Lei-Lei's jumping")
+    A("normals, per node. **AU 5MP**: the sheet's active `6x3` (18) against our `6,3`")
+    A("(9) — the attack nodes spend 3+3+3 = 9 ticks; the sheet's cell is a notation")
+    A("slip for `6,3`. **AU 5HP**: the sheet's startup 11 against our 9 — node 0 to the")
+    A("first attack node is 9 ticks, so under the sheet's own +1 the cell should read")
+    A("10; it is one high. **LE J.HP**: the sheet's `2,2,2,2,2,1` (11) against our")
+    A("`2,2,2,2,2,2` (12) — the pass LEAVES the chain inside its window at the LANDING")
+    A("after 10 of the data's 12 attack ticks (13 of 14 nodes entered): the sheet's 11 is")
+    A("a landing-cut figure at its author's jump timing, ours the chain's capacity —")
+    A("the aerial-recovery rule (a physics event bounds the chain) applied to active.")
+    A("**AN J.2K**: his three D+kick rows join for the first time — a forward jump then")
+    A("D+kick enters ONE chain, `a2:0x1e` (`tests/test_vanilla_aerial_join.sh`'s fourth")
+    A("direction); startup 8 (+1 = the sheet's 9), red 16 = 8+8, white 8: EXACT.")
     A("")
     A("## Every INCONSISTENT column" + (", move by move" if full else " — per character (the moves are on the full page)"))
     A("")

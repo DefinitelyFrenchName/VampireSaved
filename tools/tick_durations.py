@@ -130,7 +130,7 @@ def main():
         starts[mv] = int(c["start"], 16)
         fd = c["frame_data"]
         derived[mv] = (fd.get("startup"), fd.get("active"), fd.get("recovery"),
-                       c.get("frames"), c.get("nodes"), fd.get("first"))
+                       c.get("frames"), c.get("nodes"), fd.get("first"), fd.get("last"), fd.get("span"))
     if not starts:
         sys.exit(f"no chains with prefix {a.prefix!r} for {a.char}")
     ev = parse(a.tap, base)
@@ -140,14 +140,19 @@ def main():
     got = durations(ev, starts, {m: derived[m][4] for m in starts})
     print(f"{'move':6} {'derived s/a/r':16} {'total':>6} {'nodes':>5}   measured ticks")
     for mv in sorted(starts):
-        s, act, r, tot, n, first = derived[mv]
+        s, act, r, tot, n, first, last, span = derived[mv]
         seen = got.get(mv, [])
         print(f"  {mv:5} {str(s)+'/'+str(act)+'/'+str(r):16} {str(tot):>6} {str(n):>5}   "
               f"{seen if seen else 'NOT ENTERED'}")
         if a.nodes and seen:
             for pn in durations.per_node.get(mv, []):
                 su = sum(pn[:first]) if first is not None and len(pn) >= first else None
-                print(f"        nodes {pn}  startup-ticks {su} (derived {s})")
+                # SPAN in ticks: the ticks spent from the first to the last attack node (14z-146);
+                # equals the derived span when the pass completed the window, LESS when the chain
+                # was LEFT inside it (an aerial cut by the landing) — the seen-node count says which
+                sp = sum(pn[first:last + 1]) if first is not None and last is not None and len(pn) > first else None
+                cut = "" if last is None or len(pn) > last else f"  LEFT INSIDE THE WINDOW after {len(pn)} of {n} nodes"
+                print(f"        nodes {pn}  startup-ticks {su} (derived {s})  span-ticks {sp} (derived {span}){cut}")
     missing = [m for m in starts if m not in got]
     if missing:
         print("\nNOT ENTERED (the rig never ran these, or the chain start moved): "

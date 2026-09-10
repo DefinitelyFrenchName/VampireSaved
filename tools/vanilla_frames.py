@@ -126,19 +126,28 @@ def aerial_slots(path=AERIAL_TSV):
     for tab, btns in per.items():
         for btn, d in btns.items():
             neu = d.get("jump")
-            for direction, prefix in (("jump_fwd", "9J."), ("jump_down", "J.2")):
+            for direction, prefix in (("jump_fwd", "9J."), ("jump_down", "J.2"), ("jump_fwd_down", "J.2")):
                 c = d.get(direction)
                 if c and c != neu and c.startswith("a2:"):
                     slot = int(c.split(":")[1], 16)
                     if slot in FIXED:      # a forward/down attack that entered a NEUTRAL slot (AN's
                         continue           # forward jump, whose neutral rows are void) keeps that name
+                    # jump_fwd_down (14z-146): a FORWARD jump then D+button — Anakaris's J.2K, whose
+                    # neutral jump is a hover. It names a chain only when that chain is neither the
+                    # neutral nor the forward-jump one (D+punch there is just the forward-jump punch),
+                    # and a slot already named by this direction keeps its FIRST name: AN's three kicks
+                    # enter ONE chain (a2:0x1e), named J.2LK; the join aliases J.2MK/J.2HK onto it.
+                    if direction == "jump_fwd_down":
+                        if c == d.get("jump_fwd") or slot in out.get(tab, {}):
+                            continue
                     out.setdefault(tab, {})[slot] = prefix + btn
     return out
 
 
 SLOT_ROLE = {**{k: "crouching (tenant-measured layout)" for k in range(0x0c, 0x12)},
              **{k: "jumping, NEUTRAL jump (measured on all 15, 14z-145)" for k in range(0x12, 0x18)},
-             **{k: "jumping, the SECOND aerial set (measured on all 15, 14z-145): the FORWARD-jump attack for most characters, ZABEL's D+button attack; aliases the neutral chain where there is no variant" for k in range(0x18, 0x1e)}}
+             **{k: "jumping, the SECOND aerial set (measured on all 15, 14z-145): the FORWARD-jump attack for most characters, ZABEL's D+button attack; aliases the neutral chain where there is no variant" for k in range(0x18, 0x1e)},
+             0x1e: "jumping, ANAKARIS's D+kick from a FORWARD jump (all three kicks, one chain; measured 14z-146)"}
 
 DEFAULT_IMAGE = REPO / "build/out/vsavj_data.bin"
 

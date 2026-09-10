@@ -350,8 +350,8 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/test_projectile_params.sh` | test | emulator | MAME, a build dir, ~3 min | THE PROJECTILE PARAMETERS (character-data map phase 3, 14z-121): every $FF9400-pool projectile type's inline parameter tables, decoded from the type HANDLER (tools/projectile_params.py) and MEASURED on the live spawn. | 14z-121 |
 | `tests/test_reactions.sh` | test | emulator | MAME, a build dir, ~1 min | WHICH CHAINS A TENANT RUNS AS THE VICTIM, PER REACTION CLASS, AND HOW LONG (character-data map, PHASE 3; measured 14z-120 (7)). | 14z-120 (7) |
 | `tests/test_rehit_ring.sh` | test | emulator | MAME, ~4 min | THE MULTI-HIT RE-HIT RULE IS THE RECENT-HIT SLOT, CLEARED ON EVERY GAP NODE (14z-146, measured on stock vsavj). The knowledge item the 14z-145 close left open: | 14z-146 |
-| `tests/test_tick_durations.sh` | test | emulator | MAME, ~16 min | OUR DERIVED FRAME DATA IS THE ENGINE'S, measured in ENGINE TICKS (14z-126b). This is what closed the last open residue of the community cross-check: Jedah's crouching recovery. | 14z-126b |
-| `tests/test_vanilla_aerial_join.sh` | test | emulator | MAME, ~7 min | WHICH ANIM CHAIN EACH VANILLA CHARACTER'S JUMPING NORMALS ENTER FROM A NEUTRAL JUMP AND FROM A FORWARD JUMP, MEASURED ON vsavj (14z-145, the community cross-check's aerial join). | 14z-145 |
+| `tests/test_tick_durations.sh` | test | emulator | MAME, ~22 min | OUR DERIVED FRAME DATA IS THE ENGINE'S, measured in ENGINE TICKS (14z-126b). This is what closed the last open residue of the community cross-check: Jedah's crouching recovery. | 14z-126b |
+| `tests/test_vanilla_aerial_join.sh` | test | emulator | MAME, ~10 min | WHICH ANIM CHAIN EACH VANILLA CHARACTER'S JUMPING NORMALS ENTER FROM A NEUTRAL JUMP AND FROM A FORWARD JUMP, MEASURED ON vsavj (14z-145, the community cross-check's aerial join). | 14z-145 |
 | `tests/test_vanilla_frame_join.sh` | test | emulator | MAME, ~4 min | WHICH ANIM CHAIN EACH VANILLA CHARACTER'S STANDING NORMALS ENTER, MEASURED ON vsavj (14z-125, the community cross-check's join). | 14z-125 |
 
 ## review-triage

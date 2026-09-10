@@ -20,9 +20,9 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-324 entries (40 game / 92 platform / 192 project), counted from the buckets at generation.
+325 entries (41 game / 92 platform / 192 project), counted from the buckets at generation.
 
-## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 40 entries
+## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 41 entries
 
 - (the 14z-90 onset-frame entry that opened this file was RE-FILED to `docs/project/gotchas.md` at 14z-118 — it is a VERIFICATION-CLASS fact, not a game fact; S-C12 flagged it)
 - OBJ record formats differ in ENTRY STRIDE, not just header meaning
@@ -64,6 +64,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A REPLAY DOES NOT TRANSFER BETWEEN REGIONAL SETS EITHER — `vsav`'s match starts ~200+ frames after `vsavj`'s (paid: 14z-127)
 - A "MASH" THAT PRESSES ONE FRAME AND RELEASES ONE FRAME IS HALF THE CEILING — and a saturation claim measured below the ceiling manufactures a difference (paid: 14z-127)
 - THE BOOT NAME SCREEN'S DISPLAY SCRIPT TAKES AN EVEN COLUMN — an odd one is a 68k ADDRESS ERROR that soft-boots the machine (paid: 14z-127)
+- THE ENGINE CLAMPS THE FIGHTERS TO 336 px APART — a wider position poke is pulled back the same frame, and a "whiff" leg for a travelling move does not exist (paid: 14z-146)
 
 ## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 92 entries
 

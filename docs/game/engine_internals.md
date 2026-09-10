@@ -783,9 +783,15 @@ it feeds).
   The same direction found Aulbath's `J.2HK` at `a2:0x51` and, for Anakaris,
   D+button in the hover is NOT an attack: `a:0x36` (3 nodes) is the HOVER
   DROP — he is back on the ground in `a:0x00` four frames later, y restored —
-  on every button; his `J.2K` live off a real (forward) jump, unmeasured by
-  this rig. Every other character's D+button in the air is the plain
-  aerial.
+  on every button; **his `J.2K` live off a real (forward) jump — MEASURED
+  14z-146 by the gate's FOURTH direction (forward jump, then D+button): all
+  three D+kicks enter ONE chain, `a2:0x1e` (5 nodes, startup 8, one 6-tick
+  window, record 32: hit id 1, 8 real + 8 white), outside both aerial sets,
+  and D+punch there is just his forward-jump punch (`a2:0x12-0x14`). The
+  workbook writes it as three identical rows (`J.2LK/MK/HK`: startup 9 under
+  its +1, red 16, white 8), which the join folds onto our `J.2LK`; every
+  cell EXACT under the named conventions.** Every other character's D+button
+  in the air is the plain aerial.
 - **Anakaris has NO neutral-jump attacks.** U puts him in a HOVER chain
   (`a:0x12`, +8 px, held ~112 frames) in which every button is ignored; his
   forward jump (`a:0x10` pre-jump, then the a2 attack at +38 px) fires all

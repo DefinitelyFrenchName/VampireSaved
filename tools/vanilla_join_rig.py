@@ -70,6 +70,9 @@ SETS = {"far":    ("stand",  300, False),
         "jump_down": ("jump_down", 360, False),  # neutral jump, then D+button (14z-145):
                                                  # what enters ZA's 0x1B-0x1D, and the
                                                  # J.2x rows of the workbook (ZA, AN, QB, AU)
+        "jump_fwd_down": ("jump_fwd_down", 360, False),  # FORWARD jump, then D+button (14z-146):
+                                                         # Anakaris's J.2K — his neutral jump is a
+                                                         # hover, so his D+button aerials need a real jump
         "hit":    ("stand",  480, True),
         # the CONNECTING twins of the other sets (14z-146, the meter-gain arbitration):
         # walk in, then the crouching / neutral-jump / D+button recipe at contact range
@@ -90,9 +93,13 @@ def _jump_down(b):
     return name_moves.air_down(b)
 
 
+def _jump_fwd_down(b):
+    return name_moves.jump_fwd_down(b)
+
+
 def _recipe(kind, b):
     return {"stand": name_moves.stand, "crouch": name_moves.crouch, "jump": name_moves.jump,
-            "jump_fwd": _jump_fwd, "jump_down": _jump_down}[kind](b)
+            "jump_fwd": _jump_fwd, "jump_down": _jump_down, "jump_fwd_down": _jump_fwd_down}[kind](b)
 
 
 def gen(cid, dist, out_rpl, out_sched, pins=None):

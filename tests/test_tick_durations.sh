@@ -30,7 +30,7 @@
 #     Counting ticks over a rig window measures the crouch IDLE instead and
 #     reports ~365 for every move -- identical numbers are the tell.
 #
-# Usage: ROMDIR=... tests/test_tick_durations.sh   (~16 min, 4 MAME runs)
+# Usage: ROMDIR=... tests/test_tick_durations.sh   (~22 min, 6 MAME runs)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
@@ -110,6 +110,60 @@ if bad:
 print("  ok BI: 6/6 standing normals -- startup in engine ticks == derived (5MK's node 0 spends the 5 ticks its byte says; the sheet's 5 is one low)")
 PY
 
+# ---- AULBATH'S STANDING NORMALS AND LEI-LEI'S JUMPING NORMALS, PER NODE (14z-146):
+# the cross-check's three unarbitrated timing cells. AU 5MP: the sheet's active
+# reads "6x3" (18) against our "6,3" (9) — the SPAN in ticks over the attack nodes
+# decides. AU 5HP: the sheet's startup 11 against our 9, +2 where the sheet's own
+# convention is +1 — the startup in ticks decides. LE J.HP: the sheet's active
+# "2,2,2,2,2,1" (11) against our "2,2,2,2,2,2" (12) — an AERIAL, so the landing
+# can LEAVE the chain inside its window; the pass's seen-node count and its ticks
+# on the attack nodes say whether the sheet's 11 is a landing cut of the data's 12.
+for pair in "0x09 AU far 5" "0x0d LE jump J."; do
+    set -- $pair; id=$1; ch=$2; st=$3; pfx=$4
+    python3 tools/vanilla_join_rig.py gen "$id" "$st" "$W/$ch.rpl" "$W/$ch.json" >/dev/null
+    P="$(python3 -c "
+import json,sys;d=json.load(open(sys.argv[1]));p=d.get('pokes') or []
+print(';'.join(p) if isinstance(p,list) else p)" "$W/$ch.json")"
+    FR="$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['frames'])" "$W/$ch.json")"
+    MAME_BIN="$BIN" MAME_SANDBOX="$W/sb_$ch" REPLAY="$W/$ch.rpl" POKES="$P" \
+        TAP=ff841c,8 WINDOW=2400,"$FR" FRAMES="$FR" TRACE_OUT="$W/$ch.tap" \
+        tools/run_mame.sh vsavj -autoboot_script "$REPO/tests/lua/tap_writes.lua" \
+        > "$W/$ch.out" 2>&1 || true
+    python3 tools/vanilla_frames.py "$DATA" --char "$ch" --json "$W/${ch}_d.json" >/dev/null
+    python3 tools/tick_durations.py "$W/$ch.tap" "$W/${ch}_d.json" "$ch" --prefix "$pfx" --nodes > "$W/$ch.txt"
+done
+python3 - "$W" <<'PY' || fail=1
+import sys, re
+W = sys.argv[1]
+def rows(ch, pfx):
+    lines = open(f"{W}/{ch}.txt").read().split("\n"); out = {}
+    for i, l in enumerate(lines):
+        if l.startswith("  " + pfx):
+            mv = l.split()[0]; nxt = lines[i + 1] if i + 1 < len(lines) else ""
+            m = re.search(r"startup-ticks (\d+) \(derived (\d+)\)  span-ticks (\d+) \(derived (\d+)\)(.*)$", nxt)
+            out[mv] = (int(m.group(1)), int(m.group(2)), int(m.group(3)), int(m.group(4)), "LEFT INSIDE" in m.group(5)) if m else None
+    return out
+bad = []
+au = rows("AU", "5")
+if len(au) != 6: bad.append(f"AU: expected 6 standing normals, got {sorted(au)}")
+for mv, v in sorted(au.items()):
+    print(f"        AU {mv}: startup-ticks {v[0]} derived {v[1]}; span-ticks {v[2]} derived {v[3]}{'; left inside' if v[4] else ''}" if v else f"        AU {mv}: NOT ENTERED")
+    if v is None or v[0] != v[1]: bad.append(f"AU {mv}: startup in ticks != derived")
+if au.get("5MP") and (au["5MP"][2] != 9 or au["5MP"][4]): bad.append(f"AU 5MP: span-ticks {au['5MP'][2] if au.get('5MP') else '?'} != 9 (the sheet's '6x3' = 18 would be the alternative)")
+if au.get("5HP") and au["5HP"][0] != 9: bad.append("AU 5HP: startup-ticks != 9 (the sheet's 11 is one high under its +1 convention)")
+le = rows("LE", "J.")
+if len(le) != 6: bad.append(f"LE: expected 6 jumping normals, got {sorted(le)}")
+for mv, v in sorted(le.items()):
+    print(f"        LE {mv}: startup-ticks {v[0]} derived {v[1]}; span-ticks {v[2]} derived {v[3]}{'; LEFT INSIDE THE WINDOW (landing)' if v[4] else ''}" if v else f"        LE {mv}: NOT ENTERED")
+    if v is None or v[0] != v[1]: bad.append(f"LE {mv}: startup in ticks != derived")
+hp = le.get("J.HP")
+if not hp or not hp[4] or not (hp[2] < hp[3]): bad.append(f"LE J.HP: expected the pass LEFT INSIDE its attack window with span-ticks < derived 12 (a landing cut), got {hp}")
+if bad:
+    print("  FAIL AU/LE: " + "; ".join(bad)); sys.exit(1)
+print("  ok AU: 6/6 startups equal in ticks (5HP = 9; the sheet's 11 is one high); 5MP spends 9 ticks on its attack nodes (the sheet's '6x3' is a notation slip for '6,3')")
+print(f"  ok LE: 6/6 startups equal in ticks; J.HP is LEFT inside its window by the landing after {hp[2]} of the data's {hp[3]} attack ticks (the sheet's 11 is a landing-cut figure, ours the chain's)")
+PY
+
 # ---- CONTROL: a perturbed total must FAIL the same comparison --------------
 python3 - "$W" <<'PY' || { echo "  FAIL control: a perturbed total was accepted"; fail=1; }
 import json, re, sys
@@ -122,4 +176,4 @@ PY
 echo "  ok control fired: a total off by one does not match the measured ticks"
 
 [ "$fail" -eq 0 ] || { echo "FAIL test_tick_durations"; exit 1; }
-echo "PASS: 18/18 derived totals equal the engine's measured tick counts (JE, LI, DE); BI's six standing startups equal in ticks"
+echo "PASS: 18/18 derived totals equal the engine's measured tick counts (JE, LI, DE); BI's and AU's standing startups and LE's jumping startups equal in ticks; AU 5MP span 9, LE J.HP landing-cut"

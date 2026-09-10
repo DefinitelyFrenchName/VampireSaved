@@ -816,3 +816,20 @@ debug. Shorten a string and leave the column alone, or move it by an EVEN amount
 was measured work-RAM-checksum-IDENTICAL to pristine across 1,621 frames of boot
 and attract, so it moves no RAM-basis expectation at all. The glyphs are an
 existing font in gfx ROM; no tile or font work is involved.
+
+## THE ENGINE CLAMPS THE FIGHTERS TO 336 px APART — a wider position poke is pulled back the same frame, and a "whiff" leg for a travelling move does not exist (paid: 14z-146)
+
+Pinning P1/P2 at `$FF8410`/`$FF8810` any wider than the screen's play width
+(measured: pins of 320, 400, 480 and 560 px all read back 336 — 472/808 — at
+the next sample) is silently corrected by the engine's separation clamp, and a
+sequence of moves that CARRY the attacker (Zabel's dive kicks) drags the
+camera with them so later pins land wherever the camera now is (890/941 after
+three dives). So a whiff leg cannot be manufactured by distance for a move
+whose reach exceeds the clamp; the join's 176 px "far" pin already connects
+BI 2HP, FE 5HK, LE 5HP and the dive kicks. What did not need the whiff at all:
+a quantity that lands in discrete STEPS (the meter, `+0x10A`) decomposes
+inside ONE connecting leg — the swing cost on the press frame, the on-hit
+gain on the HP-drop frame (`tests/test_meter_gain.sh`). Rule: before
+building a whiff twin, ask whether the quantity's steps are already
+separable in the connect leg; and a whiff leg is VOID, never a baseline, the
+moment its victim's HP moved ([VSP-170]).

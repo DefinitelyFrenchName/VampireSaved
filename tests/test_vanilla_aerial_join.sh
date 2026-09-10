@@ -17,12 +17,13 @@
 # during a neutral jump (U) and during a forward jump (UR) and the verdict is
 # the chain the fighter's own node pointer +0x1C entered inside the event
 # window (tests/lua/field_trace.lua), mapped onto tools/anim_nodes.py's graph.
-# 270 rows (15 characters x 3 directions x 6 buttons — neutral, forward, and
-# neutral-then-D+button, the last REPORTED not constrained) frozen in
+# 360 rows (15 characters x 4 directions x 6 buttons — neutral, forward,
+# neutral-then-D+button and forward-then-D+button (14z-146), the last two REPORTED
+# not constrained except Anakaris's, whose J.2K they are) frozen in
 # tests/expected/vanilla_aerial_slots.tsv.
 #
 #   1. the rigs regenerate byte-identically (the schedule is code, not a file);
-#   2. all 30 legs run on vsavj and every event fires (never UNFIRED);
+#   2. all 60 legs run on vsavj and every event fires (never UNFIRED);
 #   3. the measured table equals tests/expected/vanilla_aerial_slots.tsv;
 #   4. STRUCTURE, from the values not the frozen text: a neutral-jump attack
 #      enters 0x12-0x17 only and a forward-jump attack 0x18-0x1D only, or the
@@ -35,7 +36,7 @@
 #   5. MUST-FIRE CONTROL: swapping one character's neutral and forward rows
 #      must FAIL the compare.
 #
-# Usage: ROMDIR=... tests/test_vanilla_aerial_join.sh   # emulator tier (MAME, ~7 min, legs in parallel)
+# Usage: ROMDIR=... tests/test_vanilla_aerial_join.sh   # emulator tier (MAME, ~10 min, legs in parallel)
 #        CHARS="BU VI" to measure a subset; FREEZE=1 to re-freeze; KEEP=dir keeps the traces.
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -59,7 +60,7 @@ fi
 ALL="BU:0x00 DE:0x01 GA:0x02 VI:0x03 ZA:0x04 MO:0x05 AN:0x06 FE:0x07 BI:0x08 AU:0x09 SA:0x0a QB:0x0c LE:0x0d LI:0x0e JE:0x0f"
 WANT="${CHARS:-}"
 FIELDS="ff8410:w:p1x,ff8414:w:p1y,ff840b:b:p1face,ff841c:l:node,ff8420:b:cnt,ff8810:w:p2x,ff8850:w:p2hp,ff8782:b:id,ff8b82:b:p2id"
-DIRS="jump jump_fwd jump_down"
+DIRS="jump jump_fwd jump_down jump_fwd_down"   # jump_fwd_down (14z-146): a FORWARD jump then D+button — Anakaris's J.2K
 
 echo "== test_vanilla_aerial_join: the aerial slot map by jump direction, measured on vsavj =="
 
@@ -116,8 +117,8 @@ done
 # jump_down rows may be UNFIRED where D+button in the air is not an attack at all
 # (a character whose neutral jump takes no normal — AN — or whose down-input is
 # eaten): reported in section 4, never a rig failure.
-if grep -v -E '^AN	jump	|^[A-Z]+	jump_down	' "$W/got.txt" | grep -q UNFIRED; then nope "some events never fired:"; grep -v -E '^AN	jump	|^[A-Z]+	jump_down	' "$W/got.txt" | grep UNFIRED | sed 's/^/        /'
-else ok "every event entered a chain (no UNFIRED outside the declared Anakaris neutral-jump exception; jump_down reported in 4)"; fi
+if grep -v -E '^AN	jump	|^[A-Z]+	jump_down	|^[A-Z]+	jump_fwd_down	' "$W/got.txt" | grep -q UNFIRED; then nope "some events never fired:"; grep -v -E '^AN	jump	|^[A-Z]+	jump_down	|^[A-Z]+	jump_fwd_down	' "$W/got.txt" | grep UNFIRED | sed 's/^/        /'
+else ok "every event entered a chain (no UNFIRED outside the declared Anakaris neutral-jump exception; jump_down and jump_fwd_down reported in 4)"; fi
 
 echo "== 3. against the frozen table"
 if [ "${FREEZE:-0}" = 1 ]; then cp "$W/got.txt" "$EXP"; echo "  FROZE $EXP ($(grep -vc '^#' "$EXP") rows)"; fi
@@ -142,7 +143,20 @@ def chk(c, m):
 def slot(chain):
     m = re.match(r"a2:0x([0-9a-f]+)$", chain); return int(m.group(1), 16) if m else None
 down = [r for r in rows if r[1] == "jump_down"]
-rows = [r for r in rows if r[1] != "jump_down"]
+fwd_down = [r for r in rows if r[1] == "jump_fwd_down"]
+rows = [r for r in rows if r[1] not in ("jump_down", "jump_fwd_down")]
+# jump_fwd_down (14z-146): a FORWARD jump then D+button. ANAKARIS — whose neutral
+# jump is a hover — has D+KICK aerials only from a real jump: all three kicks enter
+# ONE chain, a2:0x1e (outside both aerial sets), and D+punch is his forward-jump
+# punch (a2:0x12-0x14). Asserted for him; REPORTED for everyone else.
+an_fd = {r[2]: r[3] for r in fwd_down if r[0] == "AN"}
+if an_fd:
+    chk(all(an_fd.get(b) == "a2:0x1e" for b in ("LK", "MK", "HK")),
+        f"ANAKARIS's forward-jump D+kicks all enter a2:0x1e (one chain, his J.2K): {an_fd.get('LK')} {an_fd.get('MK')} {an_fd.get('HK')}")
+    chk(all(an_fd.get(b) == c for b, c in (("LP", "a2:0x12"), ("MP", "a2:0x13"), ("HP", "a2:0x14"))),
+        "ANAKARIS's forward-jump D+punches are his forward-jump punches (a2:0x12-0x14)")
+    others = sorted({(r[0], r[2], r[3]) for r in fwd_down if r[0] != "AN" and r[3] != "UNFIRED"})
+    print(f"  note  jump_fwd_down on the other {len({o[0] for o in others})} characters: {len(others)} fired rows, reported not constrained")
 an_neu = [r for r in rows if r[1] == "jump" and r[0] == "AN"]
 chk(not an_neu or all(r[3] == "UNFIRED" for r in an_neu),
     "ANAKARIS neutral-jump attacks are UNFIRED on every button (his neutral jump is a hover that takes no normal)")

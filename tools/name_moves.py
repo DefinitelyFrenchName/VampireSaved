@@ -84,6 +84,7 @@ def jump(b):       return [(0, 2, "U"), (14, 17, B[b])]
 def fwd(b):        return [(0, 3, "R" + B[b])]
 def air_down(b):   return [(0, 2, "U"), (16, 19, "D" + B[b])]
 def jump_fwd(b):   return [(0, 2, "UR"), (14, 17, B[b])]     # FORWARD jump attack (14z-145): a2 0x18-0x1D on vanilla
+def jump_fwd_down(b): return [(0, 2, "UR"), (16, 19, "D" + B[b])]   # FORWARD jump, then D+button (14z-146): Anakaris's J.2K, whose neutral jump is a hover
 def qcf(b):        return [(0, 1, "D"), (2, 3, "DR"), (4, 8, "R"), (5, 9, B[b])]            # 236
 def dp(b):         return [(0, 2, "R"), (4, 6, "D"), (8, 11, "DR" + B[b])]                  # 623 (replay 19)
 def qcb(b):        return [(0, 4, "D"), (5, 9, "DL"), (10, 18, "L"), (14, 20, B[b])]        # 214 (replay 50)

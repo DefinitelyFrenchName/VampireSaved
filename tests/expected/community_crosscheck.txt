@@ -1,10 +1,10 @@
 character	column	verdict	n	detail
-AN	startup	CONSTANT OFFSET	15	sheet = ours +1 on all 15
+AN	startup	CONSTANT OFFSET	16	sheet = ours +1 on all 16
 AN	active	EXACT	15	15/15
 AN	recovery	CONSTANT OFFSET	12	sheet = ours +2 on all 12
-AN	white	INCONSISTENT	15	most common delta +0 on 14/15; spread +0..+5
-AN	gauge_hit	EXACT	15	15/15
-AN	red	INCONSISTENT	15	most common delta +0 on 14/15; spread +0..+15
+AN	white	INCONSISTENT	16	most common delta +0 on 15/16; spread +0..+5
+AN	gauge_hit	EXACT	16	16/16
+AN	red	INCONSISTENT	16	most common delta +0 on 15/16; spread +0..+15
 AU	startup	INCONSISTENT	20	most common delta +1 on 19/20; spread +1..+2
 AU	active	INCONSISTENT	19	most common delta +0 on 17/19; spread -1..+9
 AU	recovery	CONSTANT OFFSET	12	sheet = ours +2 on all 12
