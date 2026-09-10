@@ -75,8 +75,9 @@
 # rows are `<gate>@<name>` with verdict PASS (honoured) or FAIL (LIES = exit 0,
 # REFUSED = not a mode of the gate, DIED = a crash), so they land in the tally
 # and under --strict like any gate. Off by default because it multiplies the
-# tier's runtime by the control count; the release checklist decides its
-# cadence (STATE "Decisions pending", 14z-147).
+# tier's runtime by the control count; RULED 2026-09-10 (STATE "Decisions
+# pending", the must-fire entry): it is part of every RELEASE run, not of
+# the freeze sweep — HANDOFF "THE EMULATOR-TIER COMMAND" carries the invocation.
 #   ... --list                                           print the registry and exit
 #
 # THE MiSTer LANE IS OPT-IN (--lane mister or --lane all). Its gates are

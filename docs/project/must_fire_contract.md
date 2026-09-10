@@ -104,8 +104,9 @@ is `tests/test_static_runner.sh` sections 11-13.
 `tests/run_all_emulator.sh` reads every block on every run and executes the
 controls only under `--controls` (one more run per declared name; its rows are
 `<gate>@<name>` with PASS = honoured, in the tally and under `--strict`). It is
-off by default because it multiplies a tier measured in hours; the release
-checklist decides its cadence (STATE "Decisions pending", 14z-147). Ground
+off by default because it multiplies a tier measured in hours; RULED
+2026-09-10 (maintainer, 14z-148): it is part of every RELEASE run, not of the
+freeze sweep (HANDOFF "THE EMULATOR-TIER COMMAND" carries the invocation). Ground
 truth: `tests/test_emulator_runner.sh` section 14.
 
 `tests/run_battery_m2.sh` reads the block through `bat`

@@ -1205,6 +1205,7 @@ ROMDIR=... tests/run_all_emulator.sh --scope all      # + the out-of-release-sco
 ROMDIR=... tests/run_all_emulator.sh --lane all       # + the Verilator lane (--lane mister ALONE selects only that lane)
 ROMDIR=... tests/run_all_emulator.sh --lane all --jobs 4   # 14z-134: N Verilator runs at once, one scratch clone per slot
 ROMDIR=... tests/run_all_emulator.sh --strict         # SKIP and UNREGISTERED are failures too
+ROMDIR=... tests/run_all_emulator.sh --scope all --lane all --strict --controls   # THE RELEASE RUN (ruled 2026-09-10): every declared must-fire control executed as a `CONTROL=<name>` mode, rows `<gate>@<name>`; a REFUSED mode is a dead mode, not a pass
 tests/run_all_emulator.sh --list                      # the registry, as selected
 ROMDIR=... tests/run_all_emulator.sh --dry-run        # the resolved command per gate
 ```

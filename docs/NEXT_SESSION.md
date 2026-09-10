@@ -36,9 +36,12 @@ spanning every shape; two fixes caught (the `CONTROL`-env collision in
   runner counts it. `test_mister_prg_window`, `test_mister_sdram_census`,
   `test_mister_obj_oracle`, `test_mister_tenant_oracle`, `test_pod_black_foot_palette`,
   `audit_guard_corpus` all REFUSE cleanly when their prereq is absent.
-- **The open decision** (STATE "Decisions pending", the must-fire entry): the
+- ~~**The open decision** (STATE "Decisions pending", the must-fire entry): the
   cadence of `run_all_emulator.sh --controls` at release — recommendation (a),
-  the release checklist, measured first at the next release run.
+  the release checklist, measured first at the next release run.~~ **DECIDED
+  2026-09-10 (14z-148): (a)** — `--controls` is part of every RELEASE run, not
+  the freeze sweep; the invocation is in HANDOFF "THE EMULATOR-TIER COMMAND".
+  Still to be MEASURED at the next release run (its cost).
 - **Lift the controls reader into bbh** (`~/Developer/blackbox-harness`): bbh's
   `run-static` prints no controls block; the lineage's runner prints it only when
   a tier declares or executes something (F1 exact). F2 carries the known delta
