@@ -3,6 +3,8 @@
 # EMULATOR gate, ~6 min, two MAME runs. NOT in ci_static (see the registry
 # check in run_all_static.sh); indexed in HANDOFF.
 #
+# MUST-FIRE: known-bad: four-presses-morph — FOUR START presses must NOT arm the copy, so demanding that the four-press leg morphed must fail (mode: the four-press control leg is asserted to have morphed to the tenant, which it never does, so the gate FAILs)
+#
 # THE QUESTION, in the maintainer's words: the risk with Shadow is not
 # selecting him, it is "whether the game breaks when Shadow faces a tenant"
 # — and "breaks" explicitly includes the QUIET failure, **Shadow taking the
@@ -71,6 +73,7 @@ MORPH_FRAME=7800     # after the round-1 win at ~7400; before the arcade
 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 RPL="$REPO/tests/replays/113_shadow_vs_tenant.rpl"
 [ -f "$RPL" ] || { echo "FAIL: missing $RPL"; exit 1; }
 # The control differs by ONE line: the fifth START press is commented out.
@@ -133,8 +136,17 @@ if run four "$W/four.rpl"; then
     [ "$c3bc" = "0x00" ] && echo "  ok: \$3BC stayed clear" \
         || { echo "FAIL: control \$3BC=$c3bc (want 0x00) — the flag is not gated on the count"; fail=1; }
     cid="$(fld four "$MORPH_FRAME" 0 id)"
-    [ "$cid" != "0x13" ] && echo "  ok: no morph without the flag (P1 id $cid)" \
-        || { echo "FAIL: P1 morphed to $cid WITHOUT the flag — section 1 proves nothing"; fail=1; }
+    # THE EXECUTABLE MODE: demand the four-press leg morphed; it never does, so FAIL.
+    if [ "$MODE" = four-presses-morph ]; then
+        if [ "$cid" = "0x13" ]; then echo "CONTROL DEAD: four-presses-morph — four presses morphed (id $cid)"
+        else echo "four-presses-morph mode: four presses did NOT morph (id $cid), as they must not — the mode demands the forbidden morph so the gate FAILs"; fail=1; fi
+    elif [ "$cid" != "0x13" ]; then
+        echo "  ok: no morph without the flag (P1 id $cid)"
+        vs_ctl_fired four-presses-morph "four presses do NOT morph (P1 id $cid); the mode demands the forbidden morph and the gate FAILs"
+    else
+        echo "CONTROL DEAD: four-presses-morph — P1 morphed to $cid WITHOUT the flag"
+        echo "FAIL: P1 morphed to $cid WITHOUT the flag — section 1 proves nothing"; fail=1
+    fi
 fi
 
 if [ "$fail" -eq 0 ]; then echo "PASS test_shadow_tenant"; else echo "FAIL test_shadow_tenant"; fi

@@ -3,6 +3,8 @@
 # ENGINE TICKS (14z-126b). This is what closed the last open residue of the
 # community cross-check: Jedah's crouching recovery.
 #
+# MUST-FIRE: perturbed-copy: perturbed-total — a crouching move's derived total moved by one in the measured tick table must fail the derived-vs-measured compare (mode: JE's first crouch total is bumped and section 1 must fail)
+#
 # WHAT IT ASSERTS. For three vanilla characters (JE, LI, DE) every crouching
 # normal's derived TOTAL (startup+active+recovery, tools/vanilla_frames.py)
 # equals the number of engine ticks the chain actually consumes on stock
@@ -44,6 +46,22 @@ DATA="$REPO/build/out/vsavj_data.bin"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 export SDL_VIDEODRIVER="${SDL_VIDEODRIVER:-dummy}"
 fail=0
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+# ONE perturbation, called by the executable mode (on JE's real tick table): bump
+# the first crouching move's derived total by one, so the derived-vs-measured
+# compare fails.
+perturb_total() {  # perturb_total <tick_durations txt>
+    python3 - "$1" <<'PY'
+import sys
+p = sys.argv[1]; out = []; done = False
+for l in open(p):
+    if l.startswith("  2") and not done:
+        f = l.split(); f[2] = str(int(f[2]) + 1); out.append("  " + " ".join(f) + "\n"); done = True
+    else:
+        out.append(l)
+open(p, "w").writelines(out)
+PY
+}
 
 for pair in "0x0f JE" "0x0e LI" "0x01 DE"; do
     id=${pair%% *}; ch=${pair##* }
@@ -57,6 +75,8 @@ print(';'.join(p) if isinstance(p,list) else p)" "$W/$ch.json")"
         > "$W/$ch.out" 2>&1 || true
     python3 tools/vanilla_frames.py "$DATA" --char "$ch" --json "$W/${ch}_d.json" >/dev/null
     python3 tools/tick_durations.py "$W/$ch.tap" "$W/${ch}_d.json" "$ch" --prefix 2 > "$W/$ch.txt"
+    # THE EXECUTABLE MODE: bump JE's first crouch total so section 1's compare fails.
+    if [ "$MODE" = perturbed-total ] && [ "$ch" = JE ]; then perturb_total "$W/$ch.txt"; fi
     python3 - "$W/$ch.txt" "$ch" <<'PY' || fail=1
 import sys, re
 rows = [l for l in open(sys.argv[1]) if l.startswith("  2")]
@@ -165,15 +185,16 @@ print(f"  ok LE: 6/6 startups equal in ticks; J.HP is LEFT inside its window by 
 PY
 
 # ---- CONTROL: a perturbed total must FAIL the same comparison --------------
-python3 - "$W" <<'PY' || { echo "  FAIL control: a perturbed total was accepted"; fail=1; }
-import json, re, sys
+if python3 - "$W" <<'PY'
+import re, sys
 W = sys.argv[1]
 lines = [l for l in open(f"{W}/JE.txt") if l.startswith("  2")]
 l = lines[0]; f = l.split()
 total = int(f[2]); meas = int(re.search(r"\[(\d+)\]", l).group(1))
-sys.exit(0 if total + 1 != meas else 1)   # perturbed derived != measured -> control fires
+sys.exit(0 if total + 1 != meas else 1)   # a bumped total would not match measured -> the compare can fail
 PY
-echo "  ok control fired: a total off by one does not match the measured ticks"
+then vs_ctl_fired perturbed-total "a total off by one does not match the measured ticks (section 1 compares the perturbed JE table under the mode)"
+else vs_ctl_dead perturbed-total "a perturbed total was accepted — the derived-vs-measured compare cannot fail"; fail=1; fi
 
 [ "$fail" -eq 0 ] || { echo "FAIL test_tick_durations"; exit 1; }
 echo "PASS: 18/18 derived totals equal the engine's measured tick counts (JE, LI, DE); BI's and AU's standing startups and LE's jumping startups equal in ticks; AU 5MP span 9, LE J.HP landing-cut"

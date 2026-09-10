@@ -3,6 +3,8 @@
 # UNJUDGEABLE STATE ON ANY CHARACTER (14z-98). On-demand, ~7 min
 # (2 MAME runs, parallel). GROUND TRUTH FOR RIG AUTHORS, frozen both ways.
 #
+# MUST-FIRE: known-bad: two-byte-flowed — the 2-byte kill poke must STALL (the judge reads white's sign), so a FLOWED classification of it must fail (mode: the 2-byte leg is classified FLOWED, which the real judge never allows, so the gate FAILs)
+#
 # THE ENGINE PROPERTY (engine_internals "THE ROUND JUDGE"): the round
 # judge kills on THE SIGN OF WHITE HP (+0x52), and the damage pipeline
 # keeps white <= hp so white crosses zero first. A poke that writes ONLY
@@ -69,6 +71,7 @@ export MAME_BIN
 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 
 RPL="$W/marathon_head.rpl"
 awk -F'[- ]' '/^[0-9]/ { if ($1 + 0 > 12000) exit } { print }' \
@@ -113,11 +116,16 @@ PY
 
 A="$(classify "$W/hponly")"; echo "== 2-byte poke (hp only):  $A"
 B="$(classify "$W/both")";   echo "== 4-byte poke (hp+white): $B"
+# THE EXECUTABLE MODE: classify the 2-byte leg as FLOWED, which the real judge
+# never allows, so the gate FAILs.
+if [ "$MODE" = two-byte-flowed ]; then A="FLOWED 600 (mode: forced)"; fi
 
 case "$A" in
-STALL*|UNRESOLVED*) echo "  ok: the 2-byte shape manufactures the unjudgeable state (frozen)" ;;
+STALL*|UNRESOLVED*) echo "  ok: the 2-byte shape manufactures the unjudgeable state (frozen)"
+   vs_ctl_fired two-byte-flowed "the 2-byte shape STALLS ($A) because the judge reads white's sign; the mode forces FLOWED and the gate FAILs" ;;
 NO-KO) echo "FAIL: 2-byte leg produced no KO — the rig did not make the event"; fail=1 ;;
-*) echo "FAIL: the 2-byte leg FLOWED ($A) — the judge no longer reads white's"
+*) echo "CONTROL DEAD: two-byte-flowed — the 2-byte leg FLOWED ($A), so the judge no longer reads white's sign alone"
+   echo "FAIL: the 2-byte leg FLOWED ($A) — the judge no longer reads white's"
    echo "      sign alone; engine_internals \"THE ROUND JUDGE\" needs re-derivation"
    fail=1 ;;
 esac

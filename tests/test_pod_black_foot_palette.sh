@@ -3,6 +3,8 @@
 # (14z-126b, 2026-09-01): the black pixels ARE palette row 0b index 14
 # (RAM:$90C17C) of the OBJ palette page, and nothing else.
 #
+# MUST-FIRE: known-bad: neighbour-poke-disjoint — the neighbour palette entry 0x90C17A moves a DISJOINT non-black pixel set, so treating it as the black-foot set must fail (mode: the neighbour-poke set is substituted for the fix set and the black-pixel assertions fail; REFUSES with exit 3 if the recording is absent)
+#
 # WHY A CAUSAL GATE. The mechanism was first argued from a COLOUR COINCIDENCE
 # -- f111 = rgb(17,17,17) is the commonest colour near the effect -- and from
 # comparing pixel boxes at the same SCREEN coordinates in two frames where the
@@ -29,9 +31,10 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 case "$ROMDIR" in /*) ;; *) ROMDIR="$(cd "$ROMDIR" && pwd)" ;; esac
 export ROMDIR
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 BUILD="${BUILD:-build/m3b_merged26}"
-[ -f "$REPO/$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
-[ -f "$REPO/tests/inp/pod-black-m14-01/pod-black-m14-01.inp" ] || { echo "SKIP: recording absent"; exit 0; }
+[ -f "$REPO/$BUILD/rompath/vsavjw.zip" ] || { if [ -n "$MODE" ]; then echo "REFUSED: CONTROL=$MODE needs a WIDE build at $BUILD (absent)"; exit 3; fi; echo "SKIP: no WIDE build at $BUILD"; exit 0; }
+[ -f "$REPO/tests/inp/pod-black-m14-01/pod-black-m14-01.inp" ] || { if [ -n "$MODE" ]; then echo "REFUSED: CONTROL=$MODE needs the pod-black-m14-01 recording (absent)"; exit 3; fi; echo "SKIP: recording absent"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 mk() { python3 -c "import sys;a=sys.argv[1];print(';'.join('%d:%s:fcff'%(f,a) for f in range(14355,14376)))" "$1"; }
 
@@ -42,10 +45,11 @@ SNAP_FRAMES=14370 MAX_FRAMES=14376 POKES="$(mk 90c17c)" \
 SNAP_FRAMES=14370 MAX_FRAMES=14376 POKES="$(mk 90c17a)" \
   tools/run_inp_probe.sh "$BUILD" pod-black-m14-01 "$W/ctl" >/dev/null 2>&1 || true
 
-python3 - "$W" <<'PY'
+python3 - "$W" "$MODE" <<'PY'
 import sys, os
 from PIL import Image
 W=sys.argv[1]
+MODE=sys.argv[2] if len(sys.argv) > 2 else ""
 def img(d):
     p=os.path.join(d,"snap","vsavjw","0000.png")
     if not os.path.exists(p): sys.exit("FAIL: no snapshot in %s (run did not reach f14370)"%d)
@@ -56,13 +60,22 @@ Wd,Ht=a.size
 fix={(x,y) for y in range(Ht) for x in range(Wd) if pa[x,y]!=pb[x,y]}
 ctl={(x,y) for y in range(Ht) for x in range(Wd) if pa[x,y]!=pc[x,y]}
 err=[]
-srcs={pa[x,y] for x,y in fix}; dsts={pb[x,y] for x,y in fix}
+# THE EXECUTABLE MODE: treat the neighbour-poke set as the black-foot set; its
+# pixels are not the near-black f111, so the black-pixel assertions fail.
+target = ctl if MODE == "neighbour-poke-disjoint" else fix
+srcs={pa[x,y] for x,y in target}; dsts={pb[x,y] for x,y in target}
 if srcs!={(17,17,17)}: err.append("idx14 poke moved pixels that were not the black f111: %s" % sorted(srcs)[:4])
 if dsts!={(204,255,255)}: err.append("idx14 poke did not land on fcff: %s" % sorted(dsts)[:4])
-if len(fix)!=7007: err.append("expected 7007 black pixels, got %d (the foot moved or the recording changed)" % len(fix))
-if not ctl: err.append("CONTROL DID NOT FIRE: poking idx13 changed nothing")
-if fix & ctl: err.append("CONTROL FAILED: idx13 and idx14 share %d pixels — not index-specific" % len(fix&ctl))
-if (17,17,17) in {pa[x,y] for x,y in ctl}: err.append("CONTROL FAILED: idx13 also repaints black pixels")
+if len(target)!=7007: err.append("expected 7007 black pixels, got %d (the foot moved or the recording changed)" % len(target))
+# the must-fire control on the REAL sets (independent of the mode)
+if not ctl:
+    print("CONTROL DEAD: neighbour-poke-disjoint — poking idx13 changed nothing"); err.append("CONTROL DID NOT FIRE: poking idx13 changed nothing")
+elif fix & ctl:
+    print("CONTROL DEAD: neighbour-poke-disjoint — idx13 and idx14 share %d pixels" % len(fix&ctl)); err.append("CONTROL FAILED: idx13 and idx14 share %d pixels — not index-specific" % len(fix&ctl))
+elif (17,17,17) in {pa[x,y] for x,y in ctl}:
+    print("CONTROL DEAD: neighbour-poke-disjoint — idx13 also repaints black pixels"); err.append("CONTROL FAILED: idx13 also repaints black pixels")
+else:
+    print("CONTROL FIRED: neighbour-poke-disjoint — idx13 moves a DISJOINT non-black set (the mode substitutes it for the fix set and the black-pixel assertions fail)")
 if err:
     print("FAIL test_pod_black_foot_palette:"); [print("   "+e) for e in err]; sys.exit(1)
 print("  ok forcing $90C17C=fcff moves exactly %d pixels, all rgb(17,17,17) -> rgb(204,255,255)" % len(fix))

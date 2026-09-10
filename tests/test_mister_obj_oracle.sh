@@ -3,6 +3,8 @@
 # project has on a VIDEO-DETERMINING surface, and it is on the content the
 # port exists to add.
 #
+# MUST-FIRE: known-bad: perturbed-promoted-entry — a one-bit change in a promoted (group-C) tile code must be caught, so a perturbed promoted entry must break section 1's promoted-identical check (mode: one promoted entry is flipped in the REAL core dump and PROMOTED_IDENTICAL goes NO, so the gate FAILs; REFUSES with exit 3 if the sim prerequisites are absent)
+#
 # WHAT IT COMPARES. The OBJ (sprite) list the 68k builds in ORAM, dumped from
 # MAME by address and from the jtcps2w core out of SDRAM bank 0 (D2 maps ORAM
 # to byte 0x640000), walked into records by tools/oram_obj_records.py — which
@@ -77,6 +79,12 @@ ok()  { echo "  PASS $1"; }
 bad() { echo "  FAIL $1"; fail=1; }
 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+# Under a mode a SKIP would read as LIES, so REFUSE when a fresh run's prerequisites
+# are absent and no finished run was supplied via --sim-dir/--mame-log.
+if [ -n "$MODE" ] && [ -z "$SIMDIR" ] && { [ -z "${ROMDIR:-}" ] || ! command -v verilator >/dev/null 2>&1 || [ ! -d "$REPO/$BUILD/rompath" ] || [ ! -x "${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}" ]; }; then
+    echo "REFUSED: CONTROL=$MODE needs ROMDIR, verilator, $BUILD and a WIDE MAME binary (or --sim-dir/--mame-log)"; exit 3
+fi
 
 if [ -z "$SIMDIR" ] || [ -z "$MAMELOG" ]; then
     [ -n "${ROMDIR:-}" ] || { echo "SKIP: ROMDIR unset"; exit 77; }
@@ -114,6 +122,21 @@ python3 "$REPO/tools/check_wram_dumps.py" "$SIMDIR" \
     && ok "0a core dump set COMPLETE over the anchor window" \
     || bad "0a core dump set INCOMPLETE — any anchor would be an artefact"
 
+# THE EXECUTABLE MODE: flip one promoted entry's code in the REAL core dump, so
+# section 1's promoted-identical check goes NO and the gate FAILs.
+if [ "$MODE" = perturbed-promoted-entry ]; then
+    python3 - "$DUMP" <<'PY'
+import sys, struct
+p = sys.argv[1]; d = bytearray(open(p, 'rb').read())
+for i in range(0x400):
+    off = i * 8
+    if off + 8 > len(d): break
+    x, y, c, a = struct.unpack_from(">HHHH", d, off)
+    if y & 0x8000 or a >= 0xFF00: break
+    if y & 0x1000: struct.pack_into(">H", d, off + 4, c ^ 1); break
+open(p, 'wb').write(bytes(d))
+PY
+fi
 python3 - "$DUMP" "$MAMELOG" "$EXP_AM" "$EXP_PROMOTED" "$EXP_A19_LO" "$EXP_A19_HI" <<'PY' > "$W/verdict.txt" 2>&1
 import struct, re, sys
 dump, mlog, am, expn, lo, hi = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4]), int(sys.argv[5],16), int(sys.argv[6],16)
@@ -215,7 +238,7 @@ p=lambda L:[e for e in L if e[1]&0x1000]
 print("PROMOTED_IDENTICAL %s"%("YES" if p(core)==p(mame) else "NO"))
 PY
 grep -q "^PROMOTED_IDENTICAL NO" "$W/bad.txt" \
-    && ok "2a control fired: a one-bit change in a promoted tile code is caught" \
+    && vs_ctl_fired perturbed-promoted-entry "a one-bit change in a promoted tile code is caught (the mode flips one in the real core dump and section 1 disagrees)" \
     || bad "2a a perturbed promoted entry still compared EQUAL — the gate is blind"
 
 if [ -n "$SELSIM" ] && [ -n "$SELMAME" ]; then

@@ -1,6 +1,8 @@
 #!/bin/sh
 # test_dualtrack.sh — the two tracks must differ ONLY where they are meant to.
 #
+# MUST-FIRE: known-bad: stray-byte-growth — a byte differing before a replay's frozen onset OUTSIDE the six frozen execution-position offsets is GROWTH, not a flicker, and must move the STATE onset earlier (mode: such a byte is flipped in a REAL pre-onset WIDE dump so a legacy replay's onset moves earlier and the gate FAILs)
+#
 # The dual-track decision (14z-59g) keeps a stock-size build alongside the
 # CPS-2 WIDE roster build. That is only coherent if the WIDE build is a
 # SUPERSET of the stock one: same ENGINE, and the content the extension made
@@ -136,6 +138,7 @@ WIDE="${2:-$REPO/build/m3b_merged26/rompath}"  # re-pointed 14z-133b: MERGED (th
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 
 # FROZEN SELECT-ENTRY ONSETS (14z-94, GitHub #95). `none` = never reaches the
 # select screen and must be bit-identical for its whole length. See the header
@@ -227,6 +230,18 @@ state_onset() {  # state_onset <tag_s> <tag_w> <set_s> <rp_s> <set_w> <rp_w> <re
         fi
     done < "$WORK/$1.cand"
     [ -n "$spec" ] && dump_batch "$spec" "$1" "$3" "$4" "$2" "$5" "$6" "$7" "$k"
+    # THE EXECUTABLE MODE: flip a byte at $FF8000 (outside the six frozen offsets)
+    # in the WIDE dump of the first pre-onset candidate frame, so the classifier
+    # reports a STATE onset earlier than the frozen one and section 1 FAILs. Done
+    # once, on the first replay that has a candidate frame.
+    if [ "$MODE" = stray-byte-growth ] && [ -z "${STRAY_DONE:-}" ] && [ -s "$WORK/$1.cand" ]; then
+        _sf="$(head -1 "$WORK/$1.cand")"
+        _wd="$(ls "$WORK"/d_"$2"_*.log.dump_"${_sf}"_ff0000.bin 2>/dev/null | head -1)"
+        if [ -n "$_wd" ]; then
+            python3 -c "import sys;p=sys.argv[1];b=bytearray(open(p,'rb').read());b[0x8000]^=1;open(p,'wb').write(bytes(b))" "$_wd"
+            STRAY_DONE=1
+        fi
+    fi
     python3 "$WORK/classify.py" "$WORK" "$1" "$2" "$(printf '%s' "$FROZEN_FLICKER" | tr ' ' ',')" "$WORK/$1.cand"
 }
 
@@ -286,9 +301,9 @@ PYC
 echo "$cfr" > "$WORK/ctl.frames"
 python3 "$WORK/classify.py" "$WORK" cs cw "$(printf '%s' "$FROZEN_FLICKER" | tr ' ' ',')" "$WORK/ctl.frames" > "$WORK/ctl.out" || true
 if grep -q "^STATE_ONSET $cfr" "$WORK/ctl.out" && grep -q "^STRAY $cfr 8000" "$WORK/ctl.out"; then
-    echo "  ok: control fires — one flipped byte at \$FF8000 is a STATE onset, not a flicker"
+    vs_ctl_fired stray-byte-growth "one flipped byte at \$FF8000 (outside the six frozen offsets) is a STATE onset, not a flicker (the mode flips such a byte in a real pre-onset WIDE dump so a legacy onset moves earlier and the gate FAILs)"
 else
-    echo "  FAIL: control did not fire:"; sed 's/^/        /' "$WORK/ctl.out"; fail=1
+    echo "CONTROL DEAD: stray-byte-growth — a stray byte before the onset was not caught:"; sed 's/^/        /' "$WORK/ctl.out"; fail=1
 fi
 
 echo "== 2. patched-slot content must differ (else it does nothing) =="

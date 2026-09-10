@@ -2,6 +2,8 @@
 # test_don_immortal_native.sh — 421+P (Lightning Sword) AGAINST NATIVE vsav2,
 # in the units the comparison is allowed to use (14z-127, GitHub #114).
 #
+# MUST-FIRE: known-bad: jedah-artefact — the #114 artefact (pristine vsavj + replay 48 selects JEDAH, not Donovan) must not be accepted as ours, so treating the Jedah control leg as ours must fail (mode: the control leg is measured and required to match Donovan, which it never does, so the gate FAILs)
+#
 # WHY IT EXISTS. `test_don_reactions.sh` asserts this move on OUR build only:
 # all its legs run `vsavj` and its "native == 10" was testimony, not a
 # measurement (STATE 14z-42c). #114 was opened on that weak provenance. This
@@ -93,6 +95,7 @@ BASES="$REPO/tests/expected/roster_pairings/bases.tsv"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 cd "$REPO"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 
 DSPEC="$(python3 -c "print(';'.join(f'{f}:ff8800-ff8a00' for f in range(2600,2801))+';2600:ff8400-ff8600')")"
 
@@ -171,9 +174,10 @@ for s in LP:1 MP:2 HP:3 ES:13; do
     run "our_${st}_ceil" "$OURS_SET" "$RPDIR;$ROMDIR"  "$WORK/our_${st}_ceil.rpl" "$pk" "$OURS_BIN"
 done
 
-python3 - "$WORK" "$BASES" <<'EOF2'
+python3 - "$WORK" "$BASES" "$MODE" <<'EOF2'
 import sys, os, struct
 work, bases_path = sys.argv[1], sys.argv[2]
+MODE = sys.argv[3] if len(sys.argv) > 3 else ""
 bases = {}
 for line in open(bases_path):
     if line.startswith('#') or not line.strip(): continue
@@ -197,6 +201,15 @@ def measure(leg):
     held = (len({xs[f] for f in range(hits[0][0], hits[-1][0]+1)}) == 1) if hits else None
     return dict(p1=p1, n=len(hits), dmg=sum(d for _,d in hits), held=held,
                 steps=hits, vals=[d for _,d in hits])
+
+# THE EXECUTABLE MODE: treat the Jedah control leg as ours and require it to be
+# Donovan, which it never is, so the gate FAILs (a clean exit, not a traceback).
+if MODE == "jedah-artefact":
+    c = measure('ctl')
+    if c['p1'] == DON:
+        print(f"jedah-artefact mode: the control leg IS Donovan (P1 {c['p1']:#x}) — cannot demonstrate the #114 artefact"); sys.exit(1)
+    print(f"jedah-artefact mode: the pristine-vsavj control leg selects P1 {c['p1']:#x} (Jedah, not Donovan {DON:#x}); accepting it as ours is the #114 artefact, so the gate FAILs")
+    sys.exit(1)
 
 # ── 1. native, measured in-run, against its frozen shape ────────────────
 FROZEN = {'LP': (3,7), 'MP': (5,9), 'HP': (6,10), 'ES': (9,13)}
@@ -229,12 +242,12 @@ for st in FROZEN:
 
 # ── 3. must-fire control: the #114 artefact ─────────────────────────────
 c = measure('ctl')
-assert c['p1'] == JEDAH, (
-    f"control: P1 +0x60 = {c['p1']:#x}, expected vanilla Jedah {JEDAH:#x}")
-assert (c['n'], c['dmg']) != (nat['HP']['n'], nat['HP']['dmg']), (
-    "CONTROL matched Donovan's HP shape — the assertions cannot discriminate")
-print(f"  ok: CONTROL fires — pristine vsavj (Jedah) {c['n']}h/{c['dmg']}d "
-      f"held={c['held']} (the #114 artefact)")
+if c['p1'] != JEDAH:
+    print(f"CONTROL DEAD: jedah-artefact — control P1 +0x60 = {c['p1']:#x}, expected vanilla Jedah {JEDAH:#x}"); sys.exit(1)
+if (c['n'], c['dmg']) == (nat['HP']['n'], nat['HP']['dmg']):
+    print("CONTROL DEAD: jedah-artefact — the control matched Donovan's HP shape, so the assertions cannot discriminate"); sys.exit(1)
+print(f"CONTROL FIRED: jedah-artefact — pristine vsavj selects JEDAH ({c['n']}h/{c['dmg']}d, "
+      f"held={c['held']}); accepted as ours (the mode) the gate FAILs")
 
 # ── 4. the engine clock, on vanilla content: why §2 compares counts ─────
 def drain(leg):

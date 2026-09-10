@@ -2,6 +2,8 @@
 # audit_ladder_selector.sh — THE ARCADE-LADDER SELECTOR, made rerunnable
 # (14z-95, GitHub #99). On-demand, ~12 min (2 marathon runs, parallel).
 #
+# MUST-FIRE: known-bad: mask-not-load-bearing — the in-use mask drives the stage, so a run where saturating it changes no stage must fail section 3 (mode: the saturated stage set is forced equal to the control so section 3 reads the mask as inert and the gate FAILs)
+#
 # WHY IT EXISTS. #99 is a crash reported at the FIFTH arcade match, and the
 # investigation produced a drivable probe for the ladder's state that lived
 # only in a shell history. CLAUDE.md §4: every in-emulator probe becomes a
@@ -67,6 +69,7 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
 ok()  { echo "  ok: $1"; }
 bad() { echo "FAIL: $1"; fail=1; }
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 
 for leg in ctl sat; do
     d="$W/$leg"; mkdir -p "$d/s1"
@@ -86,9 +89,10 @@ for leg in ctl sat; do
     [ "$n" -gt 100 ] || bad "$leg leg produced only $n samples — probe dead"
 done
 
-python3 - "$W" <<'PY' || fail=1
+python3 - "$W" "$MODE" <<'PY' || fail=1
 import glob, sys, struct
 W = sys.argv[1]
+MODE = sys.argv[2] if len(sys.argv) > 2 else ""
 def timeline(leg):
     out, prev = [], None
     for f in sorted(glob.glob(f"{W}/{leg}/dump_*_ff8100.bin"),
@@ -153,13 +157,21 @@ print("\n== 3: the mask is LOAD-BEARING (it decides the stage)")
 # input and every reassurance above would be vacuous.
 ctl_stages = {r[1] for r in ctl}
 sat_stages = {r[1] for r in sat}
+# THE EXECUTABLE MODE: force the saturated set equal to the control, so section 3
+# reads the mask as inert and the gate FAILs.
+if MODE == "mask-not-load-bearing": sat_stages = set(ctl_stages)
 if ctl_stages == sat_stages:
+    if MODE == "mask-not-load-bearing":
+        print("mask-not-load-bearing mode: the mask reads inert (forced equal), so section 3 FAILs")
+    else:
+        print("CONTROL DEAD: mask-not-load-bearing — saturating the mask changed no stage, so the mask is not load-bearing")
     print(f"FAIL: saturating the in-use mask changed no stage ({sorted(map(hex,ctl_stages))}) "
           f"— the mask is not driving selection here, so this audit is vacuous")
     rc = 1
 else:
     print(f"  ok: mask drives the stage — control {sorted(map(hex, ctl_stages))} "
           f"vs saturated {sorted(map(hex, sat_stages))}")
+    print("CONTROL FIRED: mask-not-load-bearing — the in-use mask IS load-bearing (it changes the stage); the mode forces it inert and the gate FAILs")
 sys.exit(rc)
 PY
 

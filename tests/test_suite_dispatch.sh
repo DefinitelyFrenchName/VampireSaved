@@ -14,6 +14,8 @@
 #      expected frame PASSes; early divergence, no divergence, and a missing
 #      base log all FAIL.
 #
+# MUST-FIRE: known-bad: program-fallback-reaches-wholeset — a whole-set-only registry row must be UNREACHABLE by the program-key fallback (the merged1-vs-shipped hazard); the mode demands the forbidden resolution (rc 0) where the design refuses it (rc 2), so the run must FAIL
+#
 # Usage: ROMDIR=... tests/test_suite_dispatch.sh
 set -eu
 
@@ -29,6 +31,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 
 # --- 1. fingerprint dispatch -------------------------------------------------
 got=$(python3 "$REPO/tools/build_fingerprint.py" "$ROMDIR")
@@ -102,11 +105,17 @@ fi
 # registry.tsv's header refuses, and it is why merged rows are whole-set-only.
 printf '%s\tWHOLESET-ONLY\n' "$set_a" > "$REG"
 rc=0; out=$(fpr "$WORK/rompath_gfx" --set vsavj --registry "$REG" 2>/dev/null) || rc=$?
-if [ "$rc" = "2" ]; then
-    echo "  ok: the program fallback CANNOT reach a whole-set-only row (exit 2)"
+# THE EXECUTABLE MODE: the design refuses the program fallback here (rc 2). The
+# mode demands the FORBIDDEN resolution (rc 0), which the real lookup never
+# gives, so the mode reaches the gate's own FAIL.
+want_rc=2
+[ "$MODE" = program-fallback-reaches-wholeset ] && want_rc=0
+if [ "$rc" = "$want_rc" ]; then
+    vs_ctl_fired program-fallback-reaches-wholeset "the program fallback CANNOT reach a whole-set-only row (exit 2)"
+elif [ "$MODE" = program-fallback-reaches-wholeset ]; then
+    echo "FAIL (mode program-fallback-reaches-wholeset): the fallback refused (rc $rc), so the demanded hazard did not occur"; fail=1
 else
-    echo "FAIL: sibling build resolved to '$out' rc=$rc — the fallback reached"
-    echo "      a whole-set-only row, which is the hazard this design forbids"; fail=1
+    vs_ctl_dead program-fallback-reaches-wholeset "sibling build resolved to '$out' rc=$rc — the fallback reached a whole-set-only row"; fail=1
 fi
 
 # The 14z-132 trap: --full is rompath-chain dependent, so the DISPATCH key is

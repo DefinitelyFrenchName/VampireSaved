@@ -4,6 +4,8 @@
 # the same WIDE romset, and the mapped gameplay fields must agree at the
 # round-1 match-start anchor.
 #
+# MUST-FIRE: known-bad: perturbed-field — a perturbed COMPARED field must be caught by the field comparison (mode: the timer byte is perturbed in the REAL sim dump and the anchor comparison must fail; REFUSES with exit 3 if the sim prerequisites are absent)
+#
 # WHY IT EXISTS, and why it is not the same gate as test_mister_sim_anchor.
 # That gate runs LEGACY content on the stock romset: it is the FPGA edition of
 # the emulator superset invariant. This one runs CONTENT THIS PROJECT
@@ -88,6 +90,11 @@ EXP_SKEW=660; SKEW_TOL=30
 MAME_LO=2850; MAME_HI=3150
 SIM_FRAMES=3800; SIM_LO=3450; SIM_HI=3800
 
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+# Under a mode a SKIP would read as LIES, so REFUSE when a prerequisite is absent.
+if [ -n "$MODE" ] && { [ -z "${ROMDIR:-}" ] || ! command -v verilator >/dev/null 2>&1 || [ ! -d "$REPO/$BUILD" ] || [ ! -e "$REPO/emu/jtcores/.git" ]; }; then
+    echo "REFUSED: CONTROL=$MODE needs ROMDIR, verilator, $BUILD and jtcores"; exit 3
+fi
 [ -n "${ROMDIR:-}" ] || { echo "SKIP: ROMDIR unset (this gate runs the real romset)"; exit 77; }
 command -v verilator >/dev/null 2>&1 || { echo "SKIP: verilator not installed"; exit 77; }
 [ -d "$REPO/$BUILD" ] || { echo "SKIP: no $BUILD (build the WIDE romset first)"; exit 77; }
@@ -139,6 +146,17 @@ print('0x%08X' % int.from_bytes(b[o:o+4],'big'))" "$f" 2>/dev/null)"
 done
 
 echo "== the comparison =="
+# THE EXECUTABLE MODE: perturb the timer byte in the REAL sim dumps, so the
+# anchor comparison finds a disagreement and the gate FAILs.
+if [ "$MODE" = perturbed-field ]; then
+    python3 - "$W/sim/wram" <<'PY'
+import pathlib, sys
+for p in pathlib.Path(sys.argv[1]).iterdir():
+    if not p.is_file(): continue
+    b = bytearray(p.read_bytes())
+    if len(b) > 0x8109: b[0x8109] = (b[0x8109] + 1) & 0xFF; p.write_bytes(bytes(b))
+PY
+fi
 if cf "$W/mame" "$W/sim/wram" --fields "$FIELDS" --follow "$FOLLOW" --skip-fields "$SKIP" > "$W/cmp.out" 2>&1
 then ok "every compared field agrees at the anchor and its follow offsets"
 else bad "fields disagree:"; sed 's/^/      /' "$W/cmp.out"; fi
@@ -158,10 +176,10 @@ for p in src.iterdir():
     (dst / p.name).write_bytes(bytes(b))
 PY
 if cf "$W/mame" "$W/tweak" --fields "$FIELDS" --follow "$FOLLOW" --skip-fields "$SKIP" > "$W/ctrl.out" 2>&1
-then bad "CONTROL DID NOT FIRE: a perturbed timer compared equal"
+then echo "CONTROL DEAD: perturbed-field — a perturbed timer compared equal"; fail=1
 else grep -q "timer" "$W/ctrl.out" \
-       && ok "control fired: the perturbed timer is caught and NAMED" \
-       || bad "control failed but did not name the timer — it caught something else"; fi
+       && vs_ctl_fired perturbed-field "the perturbed timer is caught and NAMED (the mode perturbs the real sim dump and the anchor comparison fails)" \
+       || { echo "CONTROL DEAD: perturbed-field — the control failed but did not name the timer"; fail=1; }; fi
 
 echo "== control: the P2 exclusion is LIVE, not vacuous =="
 if cf "$W/mame" "$W/sim/wram" --fields "$FIELDS" --follow 0 > "$W/noskip.out" 2>&1

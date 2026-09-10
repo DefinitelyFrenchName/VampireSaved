@@ -3,6 +3,8 @@
 # `PRG:0x028D50` THE ENGINE READS, ours vs vanilla — and that the port's bytes
 # in its FIRST longword sit behind an index the check never produces. (14z-145.)
 #
+# MUST-FIRE: known-bad: offset-0-read — a read at table offset 0 (mask[0], where the port's bytes sit) must be caught by section 3 (mode: an offset-0 read is injected into the REAL ours leg and the section-3 verdict must fail)
+#
 # WHY: `PRG:0x028D50` carried THREE names — `effect_map_5051` (huitzil.toml),
 # `hit_class_props_ext_hi` (donovan.toml) and the guard-MASH RNG mask table
 # (atlas/ram.md +0x170, engine_internals "advancing guard") — and the open-items
@@ -67,6 +69,7 @@ MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 W="$(mktemp -d "${TMPDIR:-/tmp}/gmask.XXXXXX")"
 if [ -n "${KEEP:-}" ]; then mkdir -p "$KEEP"; trap 'cp -R "$W"/. "$KEEP"/ 2>/dev/null; rm -rf "$W"' EXIT; else trap 'rm -rf "$W"' EXIT; fi
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 RIG=tests/replays/naming/donovan_victim_4
 echo "== build under test: $MERGED  $(python3 tools/build_fingerprint.py "$MERGED/rompath" --set vsavjw --sha-only | cut -c1-8)"
 
@@ -109,9 +112,10 @@ sys.exit(bad)
 PY
 
 echo "== 3. the reads: one reader, offsets 4..28 only, ours == vanilla"
-python3 - "$W" <<'PY' || fail=1
+python3 - "$W" "$MODE" <<'PY' || fail=1
 import sys, collections
 w = sys.argv[1]; bad = 0
+MODE = sys.argv[2] if len(sys.argv) > 2 else ""
 def chk(c, m):
     global bad
     print(("  ok    " if c else "  FAIL  ") + m); bad |= not c
@@ -143,7 +147,11 @@ def reduce(h):
     return fails, offs, boot
 res = {}
 for leg in ("vanilla", "ours"):
-    h = hits(f"{w}/{leg}/t.txt"); fs, offs, boot = reduce(h); res[leg] = (fs, offs)
+    h = hits(f"{w}/{leg}/t.txt")
+    # THE EXECUTABLE MODE: inject an offset-0 read into the REAL ours leg, so
+    # section 3's "mask[0] never read" assertion fails and the gate FAILs.
+    if MODE == "offset-0-read" and leg == "ours": h.append((3000, 0x02761E, 0x028D50, 0))
+    fs, offs, boot = reduce(h); res[leg] = (fs, offs)
     inv = ", ".join(f"+{o:#x}(count {o//4}) x{n}" for o, n in sorted(offs.items()))
     bs = ", ".join(f"PC {pc:#x} x{n}" for pc, n in sorted(boot.items()))
     print(f"  {leg}: {len(h)} hits; the check's inventory: {inv or '-'}; boot-time sweep readers: {bs or '-'}")
@@ -152,7 +160,8 @@ for leg in ("vanilla", "ours"):
 chk(res["vanilla"][1] == res["ours"][1], "ours == vanilla: identical per-offset inventory (legacy pairing, same frames)")
 # 5. must-fire control on the reducer — a synthetic offset-0 hit must FAIL it
 fs, _, _ = reduce([(3000, 0x02761E, 0x028D50, 0)])
-chk(any("OFFSET 0 READ" in f for f in fs), "control: a synthetic read at offset 0 is caught")
+if any("OFFSET 0 READ" in f for f in fs): print("CONTROL FIRED: offset-0-read — a read at table offset 0 is caught (the mode injects one into the real ours leg)")
+else: print("CONTROL DEAD: offset-0-read — a synthetic offset-0 read was not caught"); bad = 1
 fs, _, _ = reduce([])
 chk(any("LIVENESS" in f for f in fs), "control: an empty trace is a FAIL, not a clean null")
 fs, _, _ = reduce([(3000, 0x000926, 0x000000, 0x1234)])

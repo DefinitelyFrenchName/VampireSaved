@@ -3,6 +3,8 @@
 # per tenant, plus the pursuit-vs-roll counter (14z-104 (3); coverage
 # matrix gap 1, maintainer-described mechanic 2026-08-22).
 #
+# MUST-FIRE: known-bad: tap-must-not-roll — a 4-frame tap must NOT register a roll, so demanding the FORBIDDEN roll from the tap leg must fail (mode: the tap leg is asserted to roll >=60px, which the real tap never does, so the gate FAILs)
+#
 # MEASURED (legacy control, 14z-104 (3)): the roll registers as a HELD
 # direction+button through the knockdown landing (a 4-frame tap at the
 # floor frame does NOT register); it is button-independent; the victim
@@ -50,6 +52,7 @@ export MAME_BIN
 BUILD="${BUILD:-build/m3b_merged26}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 BASE="$REPO/tests/replays/judge/03_down_attack.rpl"
 FIELDS="ff8810:w:p2x,ff8814:w:p2y,ff8806:b:p2seq,ff8850:w:p2hp,ff8406:b:p1seq"
 # the roll hold spans every attacker's landing frame (measured 3061-3082
@@ -82,9 +85,10 @@ leg purs 01 03 "$W/pursroll.rpl"
 leg tap  01 03 "$W/tap.rpl"
 wait
 
-python3 - "$W" <<'PY' || { echo "FAIL: tech-roll audit"; exit 1; }
+python3 - "$W" "$MODE" <<'PY' || { echo "FAIL: tech-roll audit"; exit 1; }
 import sys
 W = sys.argv[1]
+MODE = sys.argv[2] if len(sys.argv) > 2 else ""
 LEGS = ["ctl", "rdon", "rhui", "rpyr", "adon", "ahui", "apyr", "purs", "tap"]
 errs = []
 for leg in LEGS:
@@ -102,11 +106,19 @@ for leg in LEGS:
     xs = [rows[fr]["p2x"] for fr in sorted(rows) if 3060 <= fr <= 3150]
     travel = (max(xs) - min(xs)) if xs else 0
     if leg == "tap":
+        if MODE == "tap-must-not-roll":
+            # THE EXECUTABLE MODE: demand the FORBIDDEN roll from the tap; the real
+            # tap does not roll, so this fails and the gate FAILs.
+            if travel >= 60:
+                print(f"CONTROL DEAD: tap-must-not-roll — the tap rolled {travel}px, the held requirement is not real")
+            else:
+                errs.append(f"tap-must-not-roll mode: the tap did NOT roll ({travel}px), as it must not — the mode demands the forbidden roll so the gate FAILs")
+            continue
         if travel >= 60:
-            errs.append(f"tap control: rolled {travel}px on a tap — the "
-                        "held requirement is not real")
+            print(f"CONTROL DEAD: tap-must-not-roll — the tap rolled {travel}px on a 4-frame tap, so the held requirement is not real")
+            errs.append(f"tap control: rolled {travel}px on a tap")
         else:
-            print(f"  ok: tap control — no roll on a tap (travel {travel}px)")
+            print(f"CONTROL FIRED: tap-must-not-roll — no roll on a 4-frame tap (travel {travel}px); the roll requires a held direction")
         continue
     if leg == "purs":
         leap = [fr for fr in sorted(rows) if rows[fr]["p1seq"] == 0x0E and fr > 3068]

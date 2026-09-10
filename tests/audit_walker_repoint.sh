@@ -2,6 +2,8 @@
 # audit_walker_repoint.sh — after the relocation, does ANYTHING still reach
 # the vanilla object-pool walkers?
 #
+# MUST-FIRE: known-bad: vanilla-walker-reached — after the relocation no caller reaches a vanilla walker, so a nonzero hit on one must fail section 1 (mode: a vanilla-walker hit count is forced nonzero so the "still reached" FAIL fires and the gate FAILs)
+#
 # WHY (14z-91). The obj_hook legacy-cycle fix copies each walker into free
 # space and rewrites the operand of every `jsr <walker>`. Completeness is
 # the correctness argument: a caller left pointing at the vanilla walker
@@ -57,6 +59,7 @@ JOBS="${JOBS:-6}"
 REPLAYS="${REPLAYS:-02_demitri_vs_cpu 21_don_mash 24_don_winmash 36_pick_tenant_cell 12_donovan_vs_cpu}"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 
 # the relocated entry points, derived from the BUILD's own patch.json
 NEW=$(BUILD="$BUILD" python3 - <<'PY'
@@ -123,8 +126,13 @@ n=$(complete_for new)
     echo "  FAIL: only $n of $(echo "$REPLAYS" | wc -w | tr -d ' ') runs completed"; fail=1; }
 for s in $(echo "$OLD" | tr ',' ' '); do
     h=$(total_for new "$s")
-    if [ "${h:-0}" = "0" ]; then echo "  ok: vanilla $s never reached ($h hits)"
+    # THE EXECUTABLE MODE: force a vanilla-walker hit so the "still reached" FAIL fires.
+    if [ "$MODE" = vanilla-walker-reached ]; then h=1; fi
+    if [ "${h:-0}" = "0" ]; then
+        echo "  ok: vanilla $s never reached ($h hits)"
+        vs_ctl_fired vanilla-walker-reached "vanilla walker $s is never reached (0 hits); the mode forces a hit and the gate FAILs"
     else
+        echo "CONTROL DEAD: vanilla-walker-reached — vanilla walker $s reached $h time(s)"
         echo "  FAIL: vanilla walker $s still reached $h time(s) — a caller was"
         echo "        MISSED. Legacy stays bit-identical (it is vanilla), but a"
         echo "        tenant object dispatched there over-indexes the vanilla"

@@ -3,6 +3,8 @@
 # vs2: its shared field-setter tail at vs2 PRG:0x02622A takes ZERO hits while
 # the activation body takes exactly one (measured 14z-126).
 #
+# MUST-FIRE: known-bad: candidate-reached — the dead field-setter 0x02622A is never reached, so demanding it WAS reached must fail (mode: the candidate is asserted to have fired, which the real trace never shows, so the gate FAILs)
+#
 # WHY. docs/game/preserved_data.md entry 1: vs2/vh2 carry the VS-style
 # seq-0x16 Dark Force handlers for all 18 characters and never reach them. The
 # listing showed one more member — a vsav-style field setter at vs2 0x02622A
@@ -32,6 +34,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # so a gate that means to SKIP on a missing ROMDIR still does.
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 RPL="$REPO/tests/replays/df/97_df_mech.rpl"
 for leg in don:13 dem:01; do n="${leg%%:*}"; id="${leg#*:}"
     PK="1400:ff8782:$id;1450:ff8782:$id;1500:ff8782:$id;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03;3100:ff8509:03;3120:ff8509:03"
@@ -47,7 +50,15 @@ for n in don dem; do
         grep -q '^END ' "$f" || { echo "  FAIL: $n/$pr: no END line — dead leg"; bad=1; continue; }
         hits="$(grep -c '^PROBE' "$f" || true)"
         if [ "$pr" = 2622a ]; then
-            [ "$hits" = 0 ] && echo "  ok    $n: candidate 0x2622A never reached (0 hits)" || { echo "  FAIL: $n: candidate 0x2622A reached $hits times"; bad=1; }
+            if [ "$MODE" = candidate-reached ]; then
+                if [ "$hits" = 0 ]; then echo "  candidate-reached mode ($n): candidate 0x2622A NOT reached (0 hits), as it never is — the mode demands the forbidden reach, so the gate FAILs"; bad=1
+                else echo "CONTROL DEAD: candidate-reached — candidate 0x2622A was reached $hits times ($n)"; fi
+            elif [ "$hits" = 0 ]; then
+                if [ "$n" = don ]; then vs_ctl_fired candidate-reached "candidate 0x2622A is never reached (0 hits); the mode demands the forbidden reach so the gate FAILs"; fi
+                echo "  ok    $n: candidate 0x2622A never reached (0 hits)"
+            else
+                echo "CONTROL DEAD: candidate-reached — candidate 0x2622A was reached $hits times ($n)"; echo "  FAIL: $n: candidate 0x2622A reached $hits times"; bad=1
+            fi
         else
             fr="$(grep -m1 '^PROBE' "$f" | awk '{print $2}')"
             [ "$hits" = 1 ] && [ "$fr" = 3260 ] && echo "  ok    $n: control 0x2619E fired once, at f3260" || { echo "  FAIL: $n: control 0x2619E fired $hits times (first at ${fr:-never})"; bad=1; }

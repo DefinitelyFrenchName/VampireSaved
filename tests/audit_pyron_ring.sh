@@ -2,6 +2,8 @@
 # audit_pyron_ring.sh — Pyron's merged-vs-solo sound-ring inventory,
 # frozen (14z-85). On-demand, ~10 min (2 replays x merged+solo = 4 runs).
 #
+# MUST-FIRE: known-bad: onset-earlier — the mash divergence onset moving EARLIER than the frozen one must FAIL (mode: PYRON_RING_ONSET is set LATER than the real onset so the real onset reads as moved earlier and the gate must FAIL)
+#
 # WHAT 14z-85 MEASURED (the owner-tag fix's own before/after): the ring
 # inventory is IDENTICAL before and after the owner tag — the music
 # retrigger is NOT the 64-75 dispatch defect. Root cause, measured the
@@ -64,6 +66,10 @@ MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+# THE EXECUTABLE MODE: a frozen mash onset LATER than the real one makes the real
+# onset read as "moved EARLIER" (the load-bearing failure) so the gate FAILs.
+if [ "$MODE" = onset-earlier ]; then PYRON_RING_ONSET=999999; export PYRON_RING_ONSET; fi
 
 PK="1400:ff8782:11;1450:ff8782:11;1500:ff8782:11;3000:ff8509:03;3020:ff8509:03"
 for leg in cosmo:pyron/71_pyron_cosmo:5200 mash:pyron/70_pyron_mash:8400; do
@@ -133,6 +139,7 @@ def events(path):
     return out, end
 
 errs = []
+mash_diverges = False; mash_onset = None
 for name in ("cosmo", "mash"):
     m, m_end = events(f"{W}/{name}_merged/ring.txt")
     s, s_end = events(f"{W}/{name}_solo/ring.txt")
@@ -149,6 +156,9 @@ for name in ("cosmo", "mash"):
         if a != b:
             break
         agree += 1
+    if name == "mash":
+        mash_diverges = agree < len(m) and agree < len(s)
+        mash_onset = m[agree][0] if mash_diverges else None
     want = ONSET[name]
     if want is None:
         if agree != len(m) or len(m) != len(s):
@@ -179,6 +189,10 @@ for name in ("cosmo", "mash"):
     else:
         print(f"  ok: {name} — {agree} events identical, divergence at the "
               f"frozen onset f{onset} (merged one frame ahead)")
+if mash_diverges:
+    print(f"CONTROL FIRED: onset-earlier — the mash stream diverges at f{mash_onset}; a frozen onset set LATER (the mode's PYRON_RING_ONSET) makes it read as moved EARLIER and the gate FAILs")
+else:
+    print("CONTROL DEAD: onset-earlier — the mash stream never diverges, so the onset guard has nothing to protect")
 for e in errs:
     print("FAIL:", e)
 sys.exit(1 if errs else 0)

@@ -1,6 +1,8 @@
 #!/bin/sh
 # audit_voice_borrow.sh — THE VOICE-CLASS BORROW mechanism gate (14z-87).
 #
+# MUST-FIRE: known-bad: foreign-ring-id — a foreign id in the plant-end ring window must be caught by the membership check (mode: a foreign id is injected into the REAL ring and section 2 must fail)
+#
 # Freezes the sword-plant "ding" mechanism as its STABLE invariants. The
 # fired id itself is a LOTTERY (the borrow scan consults the sound-state
 # in-use mask, which moves with the QSound-latch one-frame phase — measured
@@ -66,6 +68,7 @@ RPL=tests/replays/don/90_don_plant.rpl
 PK="1400:ff8782:13;1450:ff8782:13;1500:ff8782:13;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT INT TERM
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 
 fail() { echo "FAIL: $*"; exit 1; }
 
@@ -166,9 +169,10 @@ REPLAY="$RPL" POKES="$PK" FULL=1 FRAMES=4100 TRACE_OUT="$WORK/ring.txt" \
 MAME_SANDBOX="$WORK/sbx2" MAME_ROMPATH="$PWD/$BUILD/rompath;$ROMDIR" \
   tools/run_mame.sh vsavjw -autoboot_script tests/lua/ring_tap.lua \
   > "$WORK/run2.log" 2>&1 || true
-python3 - "$WORK" "$EXPECT" <<'EOF' || exit 1
+python3 - "$WORK" "$EXPECT" "$MODE" <<'EOF' || exit 1
 import re,sys,struct
 work,expect=sys.argv[1],sys.argv[2]
+mode=sys.argv[3] if len(sys.argv)>3 else ""
 def check(path, fam, expect):
     ids=[]
     for ln in open(path):
@@ -190,13 +194,21 @@ def check(path, fam, expect):
         assert not bad, f"non-authored ids in the window: {[hex(i) for i in bad]}"
     return ids
 fam=set(int(x,16) for x in open(work+'/node13_family').read().split())
-ids=check(work+'/ring.txt',fam,expect)
+# THE EXECUTABLE MODE: inject a foreign id into the REAL ring, so the plant-end
+# membership check fails and the gate FAILs (caught cleanly, never a traceback).
+if mode=="foreign-ring-id": open(work+'/ring.txt','a').write("f4000 id 1234 pc 0031ee\n")
+try:
+    ids=check(work+'/ring.txt',fam,expect)
+except AssertionError as e:
+    print(f"FAIL: plant-end window membership: {e}"); sys.exit(1)
 print(f"  window ids {[hex(i) for i in ids]} all in the flavor family. OK")
-# section 3: verdict controls — the checker must FAIL on synthetic bads
+# section 3: verdict control — the checker must FAIL on a synthetic foreign id
 open(work+'/bad_ring.txt','w').write("f4000 id 1234 pc 0031ee\n")
 try:
-    check(work+'/bad_ring.txt',fam,'lottery'); raise SystemExit("CONTROL DEAD: foreign id not caught")
-except AssertionError: print("  verdict control 1 (foreign ring id) fires. OK")
+    check(work+'/bad_ring.txt',fam,'lottery')
+    print("CONTROL DEAD: foreign-ring-id — a foreign ring id was not caught"); sys.exit(1)
+except AssertionError:
+    print("CONTROL FIRED: foreign-ring-id — a foreign ring id is caught by the plant-end membership check (the mode injects one into the real ring)")
 EOF
 
 echo "== section 3b: verdict control — writer census missing 0xAEF6 must fail"
@@ -212,7 +224,8 @@ import re
 W=[(int(m.group(1)),int(m.group(2),16)) for l in open(work+'/rt_bad.txt')
    if (m:=re.match(r'W (\d+) PC (\w+)',l))]
 mid=[(f,p) for f,p in W if f>2000]
-assert not (len(mid)==1 and mid[0][1] in (0xAEF6,0xAEFA)), "CONTROL DEAD"
+if len(mid)==1 and mid[0][1] in (0xAEF6,0xAEFA):
+    print("FAIL: verdict control 2 — a wrong writer PC was not caught"); sys.exit(1)
 print("  verdict control 2 (wrong writer PC) fires. OK")
 EOF
 

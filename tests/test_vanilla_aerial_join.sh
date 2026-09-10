@@ -3,6 +3,8 @@
 # NORMALS ENTER FROM A NEUTRAL JUMP AND FROM A FORWARD JUMP, MEASURED ON vsavj
 # (14z-145, the community cross-check's aerial join).
 #
+# MUST-FIRE: perturbed-copy: swapped-directions — swapping one character's neutral/forward rows in a copy of the frozen aerial map must fail the section-3 compare against the measured map (mode: section 3 compares the measured map against that swapped copy and must fail)
+#
 # WHY IT EXISTS. The cross-check's seven aerial outliers (BI J.HP/J.LP, BU J.MP,
 # VI J.HP, FE J.HK/J.LK, SA J.MP) were the rows the community corpus lists as
 # TWO moves — a neutral-jump `8J.x` and a forward-jump `9J.x` / `J.x` — while
@@ -48,6 +50,15 @@ if [ -n "${KEEP:-}" ]; then mkdir -p "$KEEP"; trap 'cp -R "$W"/. "$KEEP"/ 2>/dev
 bad=0
 ok()  { echo "  ok    $1"; }
 nope() { echo "  FAIL  $1"; bad=$((bad + 1)); }
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+
+# ONE perturbation, called by the section-5 control (on the frozen file) and by
+# the executable mode (on the compare baseline): swap one character's
+# neutral/forward direction labels, preserving file order so a line-for-line
+# compare against the measured map fails.
+swap_dirs() {  # swap_dirs <in> <out>
+    awk -F'\t' 'BEGIN{OFS="\t"} $1=="BU" && ($2=="jump"||$2=="jump_fwd"){$2=($2=="jump")?"jump_fwd":"jump"} {print}' "$1" > "$2"
+}
 
 [ -n "${ROMDIR:-}" ] || { echo "SKIP: ROMDIR unset"; exit 0; }
 if [ ! -f "$IMG" ]; then
@@ -129,6 +140,9 @@ if [ -n "$WANT" ]; then
 else
     grep -v '^#' "$EXP" > "$W/exp.txt"; grep -v '^#' "$W/got.txt" > "$W/g.txt"
 fi
+# THE EXECUTABLE MODE: the compare baseline becomes the SWAPPED table, so the
+# measured map no longer equals it and the gate reaches its own FAIL.
+if [ "$MODE" = swapped-directions ]; then swap_dirs "$W/exp.txt" "$W/exp.txt.sw" && mv "$W/exp.txt.sw" "$W/exp.txt"; fi
 if cmp -s "$W/exp.txt" "$W/g.txt"; then ok "the measured aerial slot map equals $EXP ($(grep -c . "$W/g.txt") rows)"
 else nope "the aerial slot map moved"; diff "$W/exp.txt" "$W/g.txt" | head -20; fi
 
@@ -188,10 +202,12 @@ sys.exit(bad)
 PY
 
 echo "== 5. must-fire control"
-grep -v '^#' "$EXP" | awk -F'\t' 'BEGIN{OFS="\t"} $1=="BU" && ($2=="jump"||$2=="jump_fwd"){$2=($2=="jump")?"jump_fwd":"jump"} {print}' | sort > "$W/swapped.txt"
-grep -v '^#' "$EXP" | sort > "$W/orig.txt"
-if cmp -s "$W/orig.txt" "$W/swapped.txt"; then nope "control did not fire: swapping BU's directions leaves the table unchanged (a vacuous table)"
-else ok "control fires: swapping one character's neutral/forward rows changes the table"; fi
+# Build the swapped copy from the FROZEN file directly (not $W/exp.txt, which the
+# mode above may already have swapped) and prove it differs from the frozen map.
+grep -v '^#' "$EXP" > "$W/orig.txt"
+swap_dirs "$W/orig.txt" "$W/swapped.txt"
+if cmp -s "$W/orig.txt" "$W/swapped.txt"; then vs_ctl_dead swapped-directions "swapping BU's directions leaves the table unchanged (a vacuous table)"; nope "control swapped-directions"
+else vs_ctl_fired swapped-directions "swapping one character's neutral/forward rows changes the table (section 3 compares the measured map against it under the mode)"; fi
 
 [ "$bad" = 0 ] && { echo "PASS: test_vanilla_aerial_join"; exit 0; }
 echo "FAIL: test_vanilla_aerial_join ($bad)"; exit 1

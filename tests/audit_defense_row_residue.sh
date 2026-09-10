@@ -2,6 +2,8 @@
 # audit_defense_row_residue.sh — THE PHOBOS-THROW ±1 DAMAGE RESIDUE IS THE
 # DEFENSE-TABLE ROW THE VICTIM'S ID SELECTS, read watch on both legs (14z-145).
 #
+# MUST-FIRE: known-bad: residue-answers-equal — a residue victim answering the SAME defense byte on both legs must fail section 3 (mode: the real native leg's residue bytes are forced equal to ours and the section-3 verdict must fail)
+#
 # WHY. tests/audit_tenant_throw_geometry.sh froze 5 of 54 (victim, throw) cells
 # differing by EXACTLY ±1 total damage, sign per VICTIM: 0x10 (Phobos) ours +1
 # on all three throws, 0x13 (Donovan) ours -1 on all three, 0x0A (Sasquatch)
@@ -48,6 +50,7 @@ MERGED="${MERGED:-build/m3b_merged26}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 [ -x "$MAME_BIN" ] || { echo "FAIL: MAME_BIN=$MAME_BIN is not executable (tools/setup_mame.sh)"; exit 1; }
 [ -f "$MERGED/rompath/vsavjw.zip" ] || { echo "FAIL: no $MERGED/rompath/vsavjw.zip"; exit 1; }
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 VICTIMS="${VICTIMS:-10 13 0a 03}"     # the three residue victims + Victor (row identical in both games)
 ATT=10                                # Phobos, the attacker of the geometry gate
 W="$(mktemp -d "${TMPDIR:-/tmp}/defrow.XXXXXX")"
@@ -77,9 +80,10 @@ done; done
 [ "$fail" = 0 ] || exit 1
 
 echo "== 2-3. the reads: same index both legs, bytes differ only for the residue victims"
-python3 - "$W" "$VICTIMS" <<'PY' || fail=1
+python3 - "$W" "$VICTIMS" "$MODE" <<'PY' || fail=1
 import sys, collections
 w, victims = sys.argv[1], sys.argv[2].split()
+MODE = sys.argv[3] if len(sys.argv) > 3 else ""
 bad = 0
 def chk(c, m):
     global bad
@@ -125,12 +129,17 @@ for vic in victims:
         if not fs: chk(all(i // 32 == v for i in idx), f"{vic}/{leg}: every read is ROW 0x{v:02x} — the victim's own id selects the row")
     fo, io, bo = res[(vic, "ours")]; fn, inn, bn = res[(vic, "native")]
     if fo or fn: continue
+    # THE EXECUTABLE MODE: force the first residue victim's native bytes equal to
+    # ours, so the section-3 verdict for that victim fails and the gate FAILs.
+    if MODE == "residue-answers-equal" and v == 0x10: bn = bo
     chk(io == inn, f"{vic}: the INDEX sequence is identical on both legs ({len(io)} reads) — the games ask the same question")
     ok_, msg = verdict3(v, bo, bn); chk(ok_, f"{vic}: {msg}")
 # 4. must-fire controls on the reducer — the REAL predicates on synthetic inputs
 fs, _, _ = reduce([], "ours"); chk(any("LIVENESS" in f for f in fs), "control: an empty trace is a FAIL")
 fs, _, _ = reduce([(3200, 0x000926, 0x0B8940, 0x200)], "ours"); chk(any("reader other" in f for f in fs), "control: a foreign reader in play is caught")
-ok_, _ = verdict3(0x13, [2, 2], [2, 2]); chk(not ok_, "control: a residue victim (0x13) answering EQUAL bytes on both legs FAILS section 3")
+ok_, _ = verdict3(0x13, [2, 2], [2, 2])
+if not ok_: print("CONTROL FIRED: residue-answers-equal — a residue victim (0x13) answering EQUAL bytes on both legs fails section 3 (the mode forces this on the real native leg)")
+else: print("CONTROL DEAD: residue-answers-equal — a residue victim answering EQUAL bytes was accepted"); bad = 1
 ok_, _ = verdict3(0x03, [2, 2], [0, 0]); chk(not ok_, "control: a control victim (0x03) answering DIFFERENT bytes FAILS section 3")
 sys.exit(bad)
 PY

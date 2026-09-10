@@ -2,6 +2,8 @@
 # audit_df_accumulator.sh — THE +0x161 ACCUMULATOR IS SASQUATCH'S DARK FORCE
 # ARMOR (measured 14z-123; inferred_claims row 1).
 #
+# MUST-FIRE: perturbed-copy: perturbed-frozen-arm — a perturbed copy of the frozen per-contact table must fail the diff against the measured output (mode: the measured got.txt is compared against that perturbed copy and the gate must FAIL)
+#
 # WHY. 14z-121 decoded the attack record's +0x1C from its one reader (vs2
 # 0x16B70 / vsavj 0x182B4) as "added into the victim's +0x161 while +0x15E is
 # armed, against the bank row byte15b = 60" and, from the DF-table block
@@ -66,6 +68,7 @@ RPL="$REPO/tests/replays/df/105_df_sas_armor.rpl"
 [ -f "$ROMDIR/vsavj.zip" ] || { echo "SKIP: no $ROMDIR/vsavj.zip"; exit 0; }
 command -v mame >/dev/null || { echo "SKIP: no mame on PATH"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 FIELDS="ff802e:b:df,ff855e:w:p1_15e,ff8561:b:p1_161,ff8562:b:p1_162,ff858f:b:p1_18f,ff8454:b:p1_54,ff8450:w:p1_hp,ff8406:b:p1seq,ff8407:b:p1_sub,ff8522:w:p1_122"
 PKB="1400:ff8782:0a;1450:ff8782:0a;1500:ff8782:0a;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03"
 STK=";3100:ff8509:03;3120:ff8509:03"
@@ -100,8 +103,15 @@ if [ "$MERGED" = 1 ]; then
 fi
 if [ "${FREEZE:-0}" = 1 ]; then cp "$W/got.txt" "$EXP"; echo "  FROZE  $EXP ($(wc -l < "$EXP" | tr -d ' ') lines)"; fi
 [ -f "$EXP" ] || { echo "FAIL: no expectation $EXP (run with FREEZE=1 after reviewing the printed lines)"; cat "$W/got.txt"; exit 1; }
-if diff "$EXP" "$W/got.txt" > "$W/diff.txt"; then
+# THE EXECUTABLE MODE: compare the measured output against a PERTURBED copy of
+# the frozen table (its last line dropped), so the diff fails and the gate FAILs.
+EXP_CMP="$EXP"
+if [ "$MODE" = perturbed-frozen-arm ]; then sed '$d' "$EXP" > "$W/exp.mode"; EXP_CMP="$W/exp.mode"; fi
+if diff "$EXP_CMP" "$W/got.txt" > "$W/diff.txt"; then
     echo "  ok    $(wc -l < "$EXP" | tr -d ' ') frozen lines match"; sed 's/^/        /' "$W/got.txt"
+    sed '$d' "$EXP" > "$W/exp_probe"
+    if cmp -s "$EXP" "$W/exp_probe"; then echo "CONTROL DEAD: perturbed-frozen-arm — a perturbed copy of the frozen table is identical to it"
+    else vs_ctl_fired perturbed-frozen-arm "a perturbed copy of the frozen table differs from it, so the diff catches it (the mode compares the measured output against such a copy)"; fi
 else
     echo "  FAIL  frozen expectation differs:"; sed 's/^/        /' "$W/diff.txt"; exit 1
 fi

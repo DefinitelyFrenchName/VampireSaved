@@ -4,6 +4,9 @@
 # 14z-145 close left open: same-id attack windows land ONCE on SA CL.5HK
 # (`2(2)3`), THREE times on JE 5HP (`2(5)2(5)2`), FOUR on MO CL.5HK.
 #
+# MUST-FIRE: perturbed-copy: clear-on-attack-node — a clear inserted on a non-last attack-node frame of JE's real tap must fail the structure check (mode: JE is reduced from that perturbed tap and section 1-4 must fail)
+# MUST-FIRE: perturbed-copy: missing-contact — a contact removed from MO's real tap must fail the contact/derivation check (mode: MO is reduced from that perturbed tap and section 1-4 must fail)
+#
 # THE MECHANISM, static and live (docs/game/engine_internals.md "Multi-hit
 # accounting", atlas/ram.md +0x6C/+0x70): the hit test PRG:0x018064 refuses a
 # record whose hit id (+0x10) equals the VICTIM's slot `+0x6C[attacker +0x70]`;
@@ -47,6 +50,24 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 export SDL_VIDEODRIVER="${SDL_VIDEODRIVER:-dummy}"
 fail=0
 FIELDS="ff841c:l:node,ff8420:b:cnt,ff8850:w:p2hp,ff886c:b:r0,ff8945:b:p2i145,ff89a4:b:p2i1a4"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+
+# The two perturbations, each called by the section-5 control (to print FIRED/DEAD)
+# and by the executable mode (to reduce the character from the perturbed tap):
+perturb_je_clear() {  # insert a clear on a non-last attack-node frame of JE's 5HP window
+    python3 - "$W" <<'PY'
+import re, sys
+W = sys.argv[1]
+ft = {int(m.group(1)): m.group(2) for m in (re.match(r"F (\d+) (.*)", l) for l in open(f"{W}/JE.ft")) if m}
+tap = open(f"{W}/JE.tap").read().splitlines()
+cleared = {int(m.group(1)) for m in (re.match(r"frame (\d+) PC 022276", l) for l in tap) if m}
+cands = [f for f, s in ft.items() if 3560 <= f < 3700 and f not in cleared and "cnt=1 " not in s + " " and re.search(r"cnt=(\d+)", s) and int(re.search(r"cnt=(\d+)", s).group(1)) > 1]
+f = cands[0]
+tap.insert(0, f"frame {f} PC 022276 off ff886c data 00000000 mask 0000ffff")
+open(f"{W}/JEc.tap", "w").write("\n".join(tap) + "\n")
+PY
+}
+perturb_mo_contact() { grep -v "PC 01827c off ff886c data 00000303" "$W/MO.tap" > "$W/MOc.tap"; }
 
 echo "== 0. the six legs (tap + field trace per character)"
 for pair in "0x0a SA" "0x0f JE" "0x05 MO"; do
@@ -65,7 +86,12 @@ wait
 for pair in "0x0a SA" "0x0f JE" "0x05 MO"; do
     id=${pair%% *}; ch=${pair##* }
     [ -s "$W/$ch.tap" ] && [ -s "$W/$ch.ft" ] || { echo "  FAIL $ch: a leg produced no log (see $W/$ch.*.out)"; fail=1; continue; }
-    python3 tools/rehit_ring.py "$W/$ch.tap" "$W/$ch.ft" "$W/$ch.json" "$DATA" "$id" > "$W/$ch.red"
+    # THE EXECUTABLE MODE: reduce the targeted character from the PERTURBED tap,
+    # so its section 1-4 verdict fails and the gate FAILs.
+    TAP="$W/$ch.tap"
+    if [ "$MODE" = clear-on-attack-node ] && [ "$ch" = JE ]; then perturb_je_clear; TAP="$W/JEc.tap"; fi
+    if [ "$MODE" = missing-contact ] && [ "$ch" = MO ]; then perturb_mo_contact; TAP="$W/MOc.tap"; fi
+    python3 tools/rehit_ring.py "$TAP" "$W/$ch.ft" "$W/$ch.json" "$DATA" "$id" > "$W/$ch.red"
     python3 tools/vanilla_frames.py "$DATA" --char "$ch" --json "$W/${ch}_d.json" >/dev/null
     sed 's/^/        /' "$W/$ch.red" | grep -v '^        #'
 done
@@ -117,26 +143,15 @@ done
 
 echo "== 5. must-fire controls on the real reducer"
 # (a) a clear inserted on a NON-LAST attack-node frame of JE's 5HP window -> STRUCT fails
-python3 - "$W" <<'PY'
-import re, sys
-W = sys.argv[1]
-ft = {int(m.group(1)): m.group(2) for m in (re.match(r"F (\d+) (.*)", l) for l in open(f"{W}/JE.ft")) if m}
-# the first HP-window frame where P1 is on an attack node with cnt > 1 and the tap did NOT clear
-tap = open(f"{W}/JE.tap").read().splitlines()
-cleared = {int(m.group(1)) for m in (re.match(r"frame (\d+) PC 022276", l) for l in tap) if m}
-cands = [f for f, s in ft.items() if 3560 <= f < 3700 and f not in cleared and "cnt=1 " not in s + " " and re.search(r"cnt=(\d+)", s) and int(re.search(r"cnt=(\d+)", s).group(1)) > 1]
-f = cands[0]
-tap.insert(0, f"frame {f} PC 022276 off ff886c data 00000000 mask 0000ffff")
-open(f"{W}/JEc.tap", "w").write("\n".join(tap) + "\n")
-PY
+perturb_je_clear
 python3 tools/rehit_ring.py "$W/JEc.tap" "$W/JE.ft" "$W/JE.json" "$DATA" 0x0f > "$W/JEc.red"
-if verdict "$W/JEc.red" JE "$W/JE_d.json" >/dev/null; then echo "  FAIL control (a): a clear on a non-last attack-node frame was accepted"; fail=1
-else echo "  ok control (a) fired: a clear inserted on a non-last attack-node frame fails the structure check"; fi
+if verdict "$W/JEc.red" JE "$W/JE_d.json" >/dev/null; then vs_ctl_dead clear-on-attack-node "a clear on a non-last attack-node frame was accepted"; fail=1
+else vs_ctl_fired clear-on-attack-node "a clear inserted on a non-last attack-node frame fails the structure check (JE is reduced from this tap under the mode)"; fi
 # (b) one contact line removed from MO's tap -> 3 contacts vs 4 derived
-grep -v "PC 01827c off ff886c data 00000303" "$W/MO.tap" > "$W/MOc.tap"
+perturb_mo_contact
 python3 tools/rehit_ring.py "$W/MOc.tap" "$W/MO.ft" "$W/MO.json" "$DATA" 0x05 > "$W/MOc.red"
-if verdict "$W/MOc.red" MO "$W/MO_d.json" >/dev/null; then echo "  FAIL control (b): a missing contact was accepted"; fail=1
-else echo "  ok control (b) fired: a contact removed from MO's log fails the contact/derivation check"; fi
+if verdict "$W/MOc.red" MO "$W/MO_d.json" >/dev/null; then vs_ctl_dead missing-contact "a missing contact was accepted"; fail=1
+else vs_ctl_fired missing-contact "a contact removed from MO's log fails the contact/derivation check (MO is reduced from this tap under the mode)"; fi
 
 [ "$fail" -eq 0 ] || { echo "FAIL test_rehit_ring"; exit 1; }
 echo "PASS: the re-hit rule is the recent-hit slot cleared on gap nodes — JE 5HP 3 contacts (slot cleared between), MO CL.5HK 4 (ids 1-4, consecutive), SA CL.5HK 1 + a juggle-gate refusal; writers and structure as stated"

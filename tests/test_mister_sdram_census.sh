@@ -3,6 +3,8 @@
 # lands in SDRAM exactly where docs/project/mister_map.md section 5 places it.
 # (14z-107 (9).)
 #
+# MUST-FIRE: known-bad: perturbed-map — the WIDE image must NOT match the STOCK map, so comparing leg A against the wrong map must fail (mode: leg A is censused against the STOCK map and the census fails, so the gate FAILs; REFUSES with exit 3 if the sim prerequisites are absent)
+#
 # WHY A CENSUS AND NOT A REPLAY. D2 PLACES the romset; the fetch that READS
 # group C is the obj promote, and that is slice D3. Nothing in D2 changes a
 # single frame of anything, by design — so a replay would prove nothing and a
@@ -77,6 +79,14 @@ set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 fail=0; ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+# Under a mode a SKIP would read as LIES, so REFUSE when a prerequisite is absent.
+if [ -n "$MODE" ]; then
+    _b="${CENSUS_BUILD:-build/m3b_merged26}"
+    if [ -z "${ROMDIR:-}" ] || ! command -v verilator >/dev/null 2>&1 || [ ! -f "$REPO/emu/jtcores/.gitmodules" ] || [ ! -f "$REPO/$_b/rompath/vsavjw.zip" ]; then
+        echo "REFUSED: CONTROL=$MODE needs ROMDIR, verilator, jtcores and the WIDE romset at $_b"; exit 3
+    fi
+fi
 
 [ -n "${ROMDIR:-}" ] || { echo "SKIP: ROMDIR unset (this gate runs the real romset)"; exit 77; }
 command -v verilator >/dev/null 2>&1 || { echo "SKIP: verilator not installed (docs/platform/mister.md Recipe)"; exit 77; }
@@ -142,7 +152,9 @@ done
 
 echo
 echo "== A: THE CENSUS (cps2w + the WIDE romset, against the D2 map) =="
-census pass A wide
+# THE EXECUTABLE MODE: census leg A (the WIDE image) against the STOCK map, which
+# it must not match, so the census fails and the gate FAILs.
+if [ "$MODE" = perturbed-map ]; then census pass A stock; else census pass A wide; fi
 echo "== B: the reference core placing the same image the reference way =="
 census pass B stock
 echo "== B: ...and it must FAIL the WIDE map (no redirect, group C aliases) =="
@@ -191,6 +203,14 @@ echo "== must-fire controls: a 1 KiB perturbation of the expected map =="
 # this control is supposed to demonstrate.
 census pass A wide --perturb z80 --perturb-kib 1
 census pass A wide --perturb pcm_lo --perturb-kib 1
+
+# the declared control's FIRED/DEAD: the census tool rejects a 1 KiB-perturbed map
+if [ -f "$W/A/rom_path.txt" ] && python3 "$REPO/tools/mister_sdram_census.py" "$W/A/sdram" \
+        --rom "$(cat "$W/A/rom_path.txt")" --map wide --perturb z80 --perturb-kib 1 >/dev/null 2>&1; then
+    vs_ctl_fired perturbed-map "the census rejects a 1 KiB-perturbed map (its own control fired); the mode censuses leg A against the STOCK map and the gate FAILs"
+else
+    echo "CONTROL DEAD: perturbed-map — the census did not reject a 1 KiB-perturbed map (or leg A did not run)"; fail=1
+fi
 
 [ $fail = 0 ] && echo "PASS test_mister_sdram_census" \
               || { echo "FAIL test_mister_sdram_census"; exit 1; }

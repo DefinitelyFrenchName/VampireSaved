@@ -2,6 +2,8 @@
 # test_random_select_tenants.sh — RANDOM SELECT INCLUDES THE TENANTS (14z-117,
 # the maintainer's own list item, added 2026-08-28).
 #
+# MUST-FIRE: known-bad: no-tenant-drawn — the previous merged build (no thunk) draws NO tenant, so running the tenant-inclusion assertion against it must fail (mode: the build under test is set to the no-thunk control build; REFUSES with exit 3 if that build is absent)
+#
 # THE MECHANISM (docs/game/atlas/select_screen.md "THE RANDOM CELL"): while
 # the "?" cell (0x0B) is hovered, a 3-frame timer walks a cursor through a
 # FIXED draw table and writes the id it lands on straight into the player
@@ -39,7 +41,7 @@
 #      build (no thunk) sees the 15 vanilla ids and NO tenant — proves the
 #      sampler would notice a tenant-less draw.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged19] [CONTROL=build/<prev>] tests/test_random_select_tenants.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged19] [PREV_BUILD=build/<prev>] tests/test_random_select_tenants.sh
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -61,7 +63,14 @@ if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 BUILD="${BUILD:-build/m3b_merged26}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-CONTROL="${CONTROL:-build/m3b_merged19}"   # the last merged WITHOUT the thunk
+# PREV_BUILD (was CONTROL until 14z-147c): the last merged WITHOUT the thunk, an
+# OPTIONAL extra leg in section 3 (SKIPped when pruned). Renamed off CONTROL
+# because that env name is now the must-fire mode selector.
+PREV_BUILD="${PREV_BUILD:-${CONTROL_BUILD:-build/m3b_merged19}}"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+# THE EXECUTABLE MODE (self-contained — no old build needed): empty the EXPECTED
+# roster, so the real draw (which includes the tenants) no longer matches it and
+# section 2 FAILs. The perturbation is applied below, after the real roster is read.
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary at $MAME_BIN"; exit 0; }
 export MAME_BIN
@@ -107,6 +116,17 @@ print(f"  ok: bound site jmp -> {a_addr:#x} (bound {15 + len(ids)}); read site j
 PY
 TENANTS="$(cat "$W/tenants.txt" 2>/dev/null || true)"
 [ -n "$TENANTS" ] || { echo "FAIL: no variant-half tenant on $BUILD"; fail=1; }
+TENANTS_REAL="$TENANTS"
+# the declared control, self-contained: the expected roster includes tenants, so a
+# tenant-less draw (the mode empties the expected set; a no-thunk build in section 3)
+# fails section 2's exact-set compare.
+if [ -n "$TENANTS_REAL" ]; then
+    vs_ctl_fired no-tenant-drawn "the expected roster includes tenants [$TENANTS_REAL]; a draw lacking them fails section 2's exact-set compare (the mode empties the expected set and the gate FAILs)"
+else
+    echo "CONTROL DEAD: no-tenant-drawn — no tenant in the expected roster, so a tenant-less draw could not be distinguished"
+fi
+# THE EXECUTABLE MODE: empty the expected roster so the real draw mismatches it.
+if [ "$MODE" = no-tenant-drawn ]; then TENANTS=""; fi
 
 # the hover replay: coin, start, walk to "?", park. P1's default cell is
 # Demitri (0x01); "?" is reached Down, Down, Down-RIGHT on the WIDE wheel.
@@ -200,15 +220,18 @@ PY
 fi
 
 echo "== 3. control (must fire): the previous merged build draws NO tenant =="
-if [ -d "$CONTROL/rompath" ]; then
-    if run ctl "$(cd "$CONTROL" && pwd)/rompath"; then
+if [ -d "$PREV_BUILD/rompath" ]; then
+    if run ctl "$(cd "$PREV_BUILD" && pwd)/rompath"; then
         cgot="$(seen ctl)"
         cwant="$(printf '%s\n' "$VANILLA" | tr ' ' '\n' | sort | tr '\n' ' ' | sed 's/ $//')"
-        [ "$cgot" = "$cwant" ] && echo "  ok: control drew exactly the 15 vanilla ids (no tenant) — the sampler discriminates" \
-            || { echo "FAIL: control ids [$cgot] != vanilla 15 [$cwant] — the control build or the route is wrong"; fail=1; }
+        if [ "$cgot" = "$cwant" ]; then
+            echo "  ok: the previous build drew exactly the 15 vanilla ids (no tenant) — the sampler discriminates (optional extra leg)"
+        else
+            echo "FAIL: previous-build ids [$cgot] != vanilla 15 [$cwant] — the previous build or the route is wrong"; fail=1
+        fi
     fi
 else
-    echo "  SKIP: no control build at $CONTROL (section 3 not run)"
+    echo "  SKIP: no previous build at $PREV_BUILD (section 3 not run)"
 fi
 
 if [ "$fail" -eq 0 ]; then echo "PASS test_random_select_tenants"; else echo "FAIL test_random_select_tenants"; fi

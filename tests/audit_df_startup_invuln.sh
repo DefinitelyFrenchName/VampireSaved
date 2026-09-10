@@ -3,6 +3,8 @@
 # ARMED PER CHARACTER BY THE seq-0x16 HANDLER, AND THE TENANTS ARM THEIR OWN
 # (measured 14z-126; STATE "Decisions pending" DF-startup item).
 #
+# MUST-FIRE: perturbed-copy: perturbed-frozen-arm — a perturbed frozen arm value must be caught by the trace compare (mode: the frozen baseline is perturbed and the measured trace no longer matches it, so the gate FAILs)
+#
 # WHY. The maintainer asked (2026-08-31) whether the three tenants get the
 # invulnerable startup window vanilla characters get at Dark Force activation,
 # and if so whether it is a GLOBAL property of the activation or INHERITED FROM
@@ -81,6 +83,7 @@ BUILD="${BUILD:-build/m3b_merged26}"
 JOBS="${JOBS:-4}"
 SECTION="${SECTION:-all}"
 FREEZE="${FREEZE:-0}"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 EXP="$REPO/tests/expected/df_startup_invuln.tsv"
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
@@ -134,10 +137,11 @@ if [ "$SECTION" = contact ] || [ "$SECTION" = all ]; then
 fi
 wait
 
-python3 - "$W" "$EXP" "$SECTION" "$FREEZE" "$REPO" <<'PY' || { echo "FAIL: DF startup invulnerability audit"; exit 1; }
+python3 - "$W" "$EXP" "$SECTION" "$FREEZE" "$REPO" "$MODE" <<'PY' || { echo "FAIL: DF startup invulnerability audit"; exit 1; }
 import sys, os
 from pathlib import Path
 W, EXP, SECTION, FREEZE, REPO = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4] == "1", sys.argv[5]
+MODE = sys.argv[6] if len(sys.argv) > 6 else ""
 sys.path.insert(0, os.path.join(REPO, "tools"))
 NAMES = {0x00:"BU",0x01:"DE",0x02:"GA",0x03:"VI",0x04:"ZA",0x05:"MO",0x06:"AN",0x07:"FE",0x08:"BI",
          0x09:"AU",0x0a:"SA",0x0c:"QB",0x0d:"LE",0x0e:"LI",0x0f:"JE",0x10:"HUI",0x11:"PYR",0x13:"DON"}
@@ -229,14 +233,19 @@ def check_trace():
         errs.append(f"no frozen expectation {EXP} — run with FREEZE=1 and review"); return
     want = {l.split("\t")[0]: l.split("\t") for l in Path(EXP).read_text().splitlines() if l and not l.startswith("#")}
     got = {l.split("\t")[0]: l.split("\t") for l in lines if l and not l.startswith("#")}
+    if MODE == "perturbed-frozen-arm" and got:
+        # THE EXECUTABLE MODE: perturb the frozen baseline so the measured trace
+        # no longer matches it and the gate FAILs.
+        mk = sorted(k for k in want if k in got)[0]
+        want[mk] = want[mk][:2] + ["0x7e"] + want[mk][3:]
     if compare(want, got, errs):
         print(f"  trace: {len(got)} legs match the frozen table")
     # must-fire control: a perturbed frozen value is caught
     bad = dict(want); k = sorted(k for k in bad if k in got)[0]
     bad[k] = bad[k][:2] + ["0x7e"] + bad[k][3:]
     ctl = []
-    if compare(bad, got, ctl): errs.append("CONTROL: a perturbed frozen arm value was NOT caught")
-    else: print("  control: perturbed frozen value caught (must-fire)")
+    if compare(bad, got, ctl): print("CONTROL DEAD: perturbed-frozen-arm — a perturbed frozen arm value was NOT caught"); errs.append("perturbed-frozen-arm not caught")
+    else: print("CONTROL FIRED: perturbed-frozen-arm — a perturbed frozen arm value is caught by the trace compare (the mode perturbs the real baseline)")
 
 def compare(want, got, out):
     ok = True

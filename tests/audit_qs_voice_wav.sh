@@ -2,6 +2,8 @@
 # audit_qs_voice_wav.sh — THE EAR-LEVEL VOICE A/B (14z-86, on-demand,
 # ~12 min, 2 MAME runs with -wavwrite).
 #
+# MUST-FIRE: perturbed-copy: truncated-window — a truncated sounding window in the OURS capture must be flagged by the spectral A/B (mode: the real ours capture is truncated and the A/B against native must fail)
+#
 # Captures the full voice-id sweep as AUDIO on ours and native vsav2 and
 # compares per-window RMS + high-band energy (tools/check_qs_voice_wav.py).
 # This instrument exists because it CAUGHT a real defect every other gate
@@ -30,6 +32,7 @@ WIDE_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$WIDE_BIN" ] || { echo "SKIP: no WIDE MAME binary"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail() { echo "FAIL: $*"; exit 1; }
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 
 mkdir -p "$W/rp" "$W/ours" "$W/native"
 # Same binding rule as audit_qs_voice_batch.sh — see tools/qs_ledger.py and
@@ -71,6 +74,17 @@ for leg in ours native; do
     [ -s "$W/$leg/voices.wav" ] || { tail -5 "$W/$leg/out"; fail "$leg capture dead"; }
 done
 
+# THE EXECUTABLE MODE: truncate the real ours capture (zero its back three
+# quarters), so the spectral A/B against native fails and the gate FAILs.
+if [ "$MODE" = truncated-window ]; then
+    python3 - "$W/ours/voices.wav" <<'PY'
+import sys, wave
+p = sys.argv[1]; s = wave.open(p); params = s.getparams()
+raw = bytearray(s.readframes(s.getnframes())); s.close()
+a = len(raw) // 4; raw[a:] = bytes(len(raw) - a)   # zero the sounding tail
+out = wave.open(p, "wb"); out.setparams(params); out.writeframes(bytes(raw)); out.close()
+PY
+fi
 python3 "$REPO/tools/check_qs_voice_wav.py" "$W/ours/voices.wav" \
     "$W/native/voices.wav" "$W/ledger.json" || fail "spectral A/B"
 
@@ -161,10 +175,10 @@ for tag, i in (("first", sounding[0]), ("last", LATE)):
                         wf, f"{w}/native/voices.wav", f"{w}/ledger.json"],
                        capture_output=True, text=True)
     if r.returncode == 0:
-        print(f"  CONTROL DEAD ({tag}, voice {i}): truncated window not flagged")
+        print(f"CONTROL DEAD: truncated-window — a truncated {tag} window (voice {i}) was not flagged")
         bad = 1
     else:
-        print(f"  ok: verdict control fired at the {tag} voice (index {i})")
+        print(f"CONTROL FIRED: truncated-window — a truncated {tag} window (voice {i}) is flagged by the spectral A/B (the mode truncates the real ours capture)")
 sys.exit(bad)
 PY
 [ $? -eq 0 ] || exit 1

@@ -5,6 +5,8 @@
 # and with P1 forced to each tenant (0x10 / 0x11 / 0x13). Any 68k exception,
 # PC excursion or soft reset on any leg is a FINDING; rule 6 applies.
 #
+# MUST-FIRE: known-bad: known-crash — the 14z-93 vec4 tripwire on build/hui41 + 26_don_arcade_mash must reproduce a crash (mode: the gate runs that rig with the late pick frames and must FAIL; REFUSES with exit 3 if build/hui41 or the replay is absent)
+#
 # WHY IT EXISTS. The suite's comparison gates see divergence, not vectors;
 # the guarded coverage before this was six marathon legs of ONE replay
 # (audit_tripwire_reach) plus per-gate rigs. This runs the WHOLE corpus —
@@ -56,6 +58,16 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+# THE EXECUTABLE MODE: run the 14z-93 crash rig (build/hui41, 26_don_arcade_mash,
+# the late pick frames) so a vec4 tripwire fires and the gate FAILs. REFUSE if
+# the rig's prerequisites are absent (a SKIP under a mode would read as LIES).
+if [ "$MODE" = known-crash ]; then
+    if [ ! -f "$REPO/build/hui41/rompath/vsavjw.zip" ] || [ ! -f "$REPO/tests/replays/26_don_arcade_mash.rpl" ]; then
+        echo "REFUSED: CONTROL=known-crash needs build/hui41 and 26_don_arcade_mash.rpl (absent on this host)"; exit 3
+    fi
+    BUILD=build/hui41; ONLY=26_don_arcade_mash; LEGS=10; PICK_FRAMES="1704 1760 1900 2100 2400"
+fi
 BUILD="${BUILD:-build/m3b_merged26}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 JOBS="${JOBS:-2}"
 LEGS="${LEGS:-none 10 11 13}"
@@ -137,6 +149,13 @@ done
 
 echo
 echo "   verdict map: $MAP ($n runs, $ok clean)"
+# The declared control asserts the 14z-93 crash rig is present and executable as
+# CONTROL=known-crash (the plain soak does not re-pay the crash rig; the mode does).
+if [ -f "$REPO/build/hui41/rompath/vsavjw.zip" ] && [ -f "$REPO/tests/replays/26_don_arcade_mash.rpl" ]; then
+    vs_ctl_fired known-crash "the 14z-93 crash rig (build/hui41 + 26_don_arcade_mash) is present and executable as CONTROL=known-crash; that mode reproduces the vec4 tripwire and the gate FAILs"
+else
+    echo "CONTROL DEAD: known-crash — the crash rig (build/hui41 + 26_don_arcade_mash) is absent, so the control cannot run"
+fi
 if [ "$fail" = 0 ]; then
     echo "PASS: $n guarded runs, zero vectors — the whole corpus is guard-clean"
     echo "      on $BUILD under every tenant forcing. Rig-bounded, as always."

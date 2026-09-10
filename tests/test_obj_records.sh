@@ -1,6 +1,9 @@
 #!/bin/sh
 # test_obj_records.sh — ground truth for tools/oram_obj_records.py.
 #
+# MUST-FIRE: known-bad: flipped-tile-code — a one-bit change in a tile code must change the records, so the python walker on a flipped dump must disagree with the lua walker (mode: a byte of the REAL dump is flipped before the section-1 walk and the walkers disagree, so the gate FAILs)
+# MUST-FIRE: known-bad: wrong-page-geometry — an impossible page offset must be REFUSED, not silently walked (mode: the section-1 walk is given an out-of-range --first-page so it produces no records and section 1 disagrees, so the gate FAILs)
+#
 # WHY. The OBJ list is the surface a cross-implementation VIDEO oracle can
 # actually stand on. VRAM was tried in 14z-108 and RULED OUT: MAME and jtcps2
 # legitimately hold different bytes in the palette and all three scroll
@@ -49,6 +52,7 @@ TOOL="$REPO/tools/oram_obj_records.py"
 fail=0
 ok()  { echo "  PASS $1"; }
 bad() { echo "  FAIL $1"; fail=1; }
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 
 [ -n "${ROMDIR:-}" ] || { echo "SKIP: ROMDIR unset (this gate runs the real romset)"; exit 77; }
 [ -d "$REPO/$BUILD/rompath" ] || { echo "SKIP: no $BUILD/rompath"; exit 77; }
@@ -75,7 +79,14 @@ DUMP="$W/oram/dump_${FRAME}_700000.bin"
 
 echo "== 1 the walkers agree, byte for byte =="
 grep -a "^F$FRAME " "$W/lua.txt" > "$W/lua_f.txt" || true
-python3 "$TOOL" "$DUMP" --frame "$FRAME" > "$W/py_f.txt"
+# THE EXECUTABLE MODE: perturb the REAL section-1 walk so it disagrees with the
+# lua walker and the gate FAILs.
+if [ "$MODE" = flipped-tile-code ]; then
+    python3 -c "import sys;p=sys.argv[1];b=bytearray(open(p,'rb').read());b[0x8000+4*8+4]^=1;open(p,'wb').write(bytes(b))" "$DUMP"
+fi
+PWARGS=""
+if [ "$MODE" = wrong-page-geometry ]; then PWARGS="--first-page 0x40000"; fi
+python3 "$TOOL" "$DUMP" --frame "$FRAME" $PWARGS > "$W/py_f.txt" 2>/dev/null || true
 LN=$(wc -l < "$W/lua_f.txt"); PN=$(wc -l < "$W/py_f.txt")
 [ "$LN" -gt 0 ] || bad "1z the lua produced NO records — the rig is not reaching the list"
 if diff -q "$W/lua_f.txt" "$W/py_f.txt" >/dev/null 2>&1; then
@@ -108,18 +119,18 @@ open(sys.argv[2], 'wb').write(bytes(d))
 PY
 python3 "$TOOL" "$W/bad.bin" --frame "$FRAME" > "$W/py_bad.txt"
 if diff -q "$W/py_f.txt" "$W/py_bad.txt" >/dev/null 2>&1; then
-    bad "3a a flipped code bit produced IDENTICAL output — the walker is blind"
+    vs_ctl_dead flipped-tile-code "a flipped code bit produced IDENTICAL output — the walker is blind" || fail=1
 else
-    ok "3a control fired: a one-bit change in a tile code changes the records"
+    vs_ctl_fired flipped-tile-code "a one-bit change in a tile code changes the records (the mode flips a byte of the real dump and the section-1 walkers disagree)"
 fi
 
 echo "== 4 MUST-FIRE: a wrong page geometry is REFUSED, not silently walked =="
 if python3 "$TOOL" "$DUMP" --frame "$FRAME" --first-page 0x40000 > "$W/py_oob.txt" 2>"$W/py_oob.err"; then
-    bad "4a an out-of-range --first-page was accepted"
+    vs_ctl_dead wrong-page-geometry "an out-of-range --first-page was accepted" || fail=1
+elif grep -q "REFUSING" "$W/py_oob.err"; then
+    vs_ctl_fired wrong-page-geometry "an impossible page offset is refused loudly (the mode gives the section-1 walk that offset, so it produces no records and section 1 disagrees)"
 else
-    grep -q "REFUSING" "$W/py_oob.err" \
-        && ok "4a control fired: an impossible page offset is refused loudly" \
-        || bad "4a it failed, but not with a REFUSING message"
+    vs_ctl_dead wrong-page-geometry "the tool failed but not with a REFUSING message" || fail=1
 fi
 
 echo

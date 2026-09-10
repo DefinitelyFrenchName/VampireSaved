@@ -4,6 +4,8 @@
 # truth under tests/test_kernel_voice_tables.sh (the static half) and the
 # instrument the maintainer's 2026-08-18 grunt report resumes from.
 #
+# MUST-FIRE: known-bad: perturbed-inventory — a WRONG expected attempt-2 kernel voice id must fail the per-attempt comparison (mode: GRUNT_OURS_A2 is set to a wrong id so the measured ring != expected and the gate must FAIL)
+#
 # THE MEASURED MECHANISM (engine_internals "The KERNEL per-class voice
 # tables"): the sound kernel's event-.2 voice fires on EVERY OTHER
 # electrocution (engine-side alternation, both games). The fired id follows
@@ -62,6 +64,10 @@ RPL="$REPO/tests/replays/hui/95_hui_electrocuted_x4.rpl"
 PK="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+# THE EXECUTABLE MODE: a wrong expected attempt-2 id makes the measured ring
+# (02a2) mismatch the expectation, so the gate FAILs.
+if [ "$MODE" = perturbed-inventory ]; then GRUNT_OURS_A2=0001; fi
 
 mkdir -p "$W/ours" "$W/native"
 ( cd "$W/ours" && REPLAY="$RPL" FRAMES=6300 POKES="$PK" TRACE_OUT=ring.txt \
@@ -113,6 +119,7 @@ EXPECT = {
 }
 PREFIX = ["0625", "0419", "0402"]          # the electric burst, every attempt
 rc = 0
+ours_mid1 = None                            # the measured attempt-2 kernel voice on the ours leg
 for leg, want in EXPECT.items():
     ev = []
     for line in open(f"{W}/{leg}/ring.txt"):
@@ -137,6 +144,7 @@ for leg, want in EXPECT.items():
                if a + 30 <= f < a + 110 and i not in PREFIX
                and not i.startswith("010") and i != "00f3"]
         wantk = [] if want[k] is None else [want[k]]
+        if leg == "ours" and k == 1: ours_mid1 = mid
         if mid != wantk:
             print(f"FAIL: {leg} attempt {k+1} kernel-voice slot {mid} != "
                   f"frozen {wantk}")
@@ -149,6 +157,13 @@ for leg, want in EXPECT.items():
     if rc == 0:
         print(f"  ok: {leg} — 5/5 attempts formed; kernel-voice pattern "
               f"matches frozen ({[x or '-' for x in want]})")
+if ours_mid1 is not None and ours_mid1 != ["0001"]:
+    print("CONTROL FIRED: perturbed-inventory — the measured attempt-2 voice "
+          f"{ours_mid1} differs from a wrong expected id, so a perturbed expectation "
+          "(the mode's GRUNT_OURS_A2) fails the comparison and the gate FAILs")
+else:
+    print("CONTROL DEAD: perturbed-inventory — the ours attempt-2 slot was not measured, "
+          "so the perturbation would have nothing to mismatch")
 sys.exit(rc)
 PY
 

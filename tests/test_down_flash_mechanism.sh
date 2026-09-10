@@ -2,6 +2,8 @@
 # test_down_flash_mechanism.sh — THE MECHANISM behind GitHub #113's one-frame
 # white-out, measured 2026-09-01 (14z-126b) and locked here.
 #
+# MUST-FIRE: known-bad: normal-base-satisfies — the normal palette base 0x90c0 must NOT satisfy the 4-write flash shape, so demanding that it does must fail (mode: 0x90c0 is asserted to satisfy the shape, which it never does, so the gate FAILs)
+#
 # WHAT IT ASSERTS. The white frame is a DELIBERATE PALETTE-BASE SWAP, not a
 # palette blank and not a layer register: the game writes CPS-A `0x80410a`
 # (MAME cps1.h `CPS1_PALETTE_BASE = 0x0a/2`) from its normal `0x90c0` to
@@ -45,6 +47,7 @@ BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame-ref/cps2}"
 [ -x "$BIN" ] || { echo "SKIP: no MAME binary"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 export SDL_VIDEODRIVER="${SDL_VIDEODRIVER:-dummy}"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 RPL="$REPO/tests/replays/104_1p_auto_ko_win.rpl"
 
 MAME_BIN="$BIN" MAME_SANDBOX="$W/sb1" REPLAY="$RPL" \
@@ -54,8 +57,9 @@ MAME_BIN="$BIN" MAME_SANDBOX="$W/sb2" REPLAY="$RPL" MAX_FRAMES=6700 \
   CHECKSUM_OUT="$W/probe.log" DUMP_FRAMES=6645 PAL_BASE=924000 PAL_ROWS=00,01,02 \
   tools/run_mame.sh vsavj -autoboot_script "$REPO/tests/lua/inp_probe.lua" > "$W/o2" 2>&1 || true
 
-python3 - "$W/base.txt" "$W/probe.log" <<'PY'
+python3 - "$W/base.txt" "$W/probe.log" "$MODE" <<'PY'
 import sys
+MODE = sys.argv[3] if len(sys.argv) > 3 else ""
 WHITE="eab1fb569cb99b25"
 base={}
 for ln in open(sys.argv[1]):
@@ -85,7 +89,15 @@ if not palrows: err.append("no palette dump at 0x924000")
 for r in palrows:
     if set(r.split())!={"ffff"}: err.append("0x924000 row is not all ffff: %s" % r[:40])
 okc, hc = check("90c0", False)
-if okc: err.append("CONTROL DID NOT FIRE: the normal base 0x90c0 also satisfied the shape")
+if okc:
+    print("CONTROL DEAD: normal-base-satisfies — the normal base 0x90c0 also satisfied the 4-write flash shape")
+    err.append("CONTROL DID NOT FIRE: the normal base 0x90c0 also satisfied the shape")
+else:
+    print("CONTROL FIRED: normal-base-satisfies — the normal base 0x90c0 does NOT satisfy the 4-write flash shape (the mode demands it does and the gate FAILs)")
+# THE EXECUTABLE MODE: demand the normal base satisfy the flash shape, which it
+# never does, so the gate FAILs.
+if MODE == "normal-base-satisfies" and not okc:
+    err.append("normal-base-satisfies mode: 0x90c0 does not satisfy the flash shape, as it must not — the mode demands the forbidden match, so the gate FAILs")
 if err:
     print("FAIL test_down_flash_mechanism:"); [print("   "+e) for e in err]; sys.exit(1)
 print("  ok 0x9240 written exactly 4x (f%s), each followed by an all-white frame" % ",f".join(str(f) for f in hits))

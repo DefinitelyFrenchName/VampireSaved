@@ -2,6 +2,8 @@
 # audit_clone_beam_lines.sh — the GitHub #109 lock: Phobos' DF clone-mode
 # attack must draw the BEAM-LINE sprites (effect-class row 31).
 #
+# MUST-FIRE: known-bad: expect-lines-flip — with the beam lines actually present, asserting the DEFECT signature (EXPECT_LINES=0) must fail (mode: EXPECT_LINES is forced to 0 so "line entries present but EXPECT_LINES=0" fires and the gate FAILs)
+#
 # THE MECHANISM (measured 14z-102, the whole chain on the issue): the
 # clone attack spawns per-frame beam objects into the $FFD400 effect pool
 # with class 31. vs2's effect-class table row 31 (0x0926E4) is the beam
@@ -49,6 +51,10 @@ EXPECT_LINES="${EXPECT_LINES:-1}"  # default flipped 14z-102: the row-31 fix is 
 MIN_LINES="${MIN_LINES:-4}"
 export MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+# THE EXECUTABLE MODE: the beam lines ARE present on the shipped build, so
+# asserting the defect signature (EXPECT_LINES=0) makes the gate FAIL.
+if [ "$MODE" = expect-lines-flip ]; then EXPECT_LINES=0; fi
 
 # rig df/100's own poke set (its header); window = the measured first-attack
 # beam frames on merged-m4 (entries live 3583-3599; dumped with margin)
@@ -97,5 +103,6 @@ else:
     if bad:
         print(f"FAIL: line entries at wrong palette: {bad[:4]}")
         sys.exit(1)
+    print("CONTROL FIRED: expect-lines-flip — beam lines are present, so EXPECT_LINES=0 (the mode) fails the defect-signature check and the gate FAILs")
     print("PASS: beam lines present at pal 05 (fix verified; burst control fired)")
 PYEOF

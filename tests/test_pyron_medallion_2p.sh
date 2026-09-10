@@ -3,6 +3,8 @@
 # stability (14z-116). EMULATOR gate, ~5 min, two MAME runs. NOT in
 # ci_static; indexed in HANDOFF.
 #
+# MUST-FIRE: known-bad: accent-lost — P1's accent must LAND on row 0x17 (not the pre-thunk grey ramp), so demanding the grey ramp must fail (mode: leg 2 is asserted to find the grey ramp on row 0x17, which a good build never has, so the gate FAILs)
+#
 # WHY THIS EXISTS — it closes a COVERAGE GAP, not just a bug.
 # `tests/test_wheel_bank5.sh` section 3b already asserts that all three
 # medallion rows hold the vs2 palettes, but both of its stress protocols
@@ -75,6 +77,7 @@ BUILD="$(cd "$BUILD" && pwd)"
 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 decrypt_view vsav2 "$W/vs2_op.bin" "$W/vs2_data.bin"
 
 # Paths are computed from the MERGED build's own TABLE B, never vanilla's —
@@ -138,22 +141,32 @@ fi
 
 echo "== 2. MUST-FIRE: P1 hovers the tenant — the accent MUST still land on 0x17 =="
 if run p1 "$W/p1.rpl"; then
-    python3 - "$W/p1" <<'PY' || fail=1
+    python3 - "$W/p1" "$MODE" <<'PY' || fail=1
 import sys, glob
+MODE = sys.argv[2] if len(sys.argv) > 2 else ""
 # The init grey ramp the 14z-62k thunk exists to replace (patch_notes 14z-62k).
 GREY = bytes.fromhex("f111f222f333f444")
 files = sorted(glob.glob(sys.argv[1] + "/dump_*.bin"), key=lambda p: int(p.split("_")[-2]))
 assert files, "no dumps"
 late = [f for f in files if int(f.split("_")[-2]) >= 1400]
-bad = [f.split('_')[-2] for f in late
-       if open(f, "rb").read()[0x17 * 0x20:0x17 * 0x20 + 8] == GREY]
+row17 = lambda f: open(f, "rb").read()[0x17 * 0x20:0x17 * 0x20 + 8]
+# THE EXECUTABLE MODE: demand the pre-thunk GREY ramp on row 0x17; a good build
+# has the accent there, not the grey ramp, so the gate FAILs.
+if MODE == "accent-lost":
+    ng = [f.split('_')[-2] for f in late if row17(f) != GREY]
+    if ng:
+        print(f"accent-lost mode: row 0x17 holds the ACCENT (not the grey ramp) at frames {ng}, as it must — the mode demands the grey ramp so the gate FAILs")
+        raise SystemExit(1)
+bad = [f.split('_')[-2] for f in late if row17(f) == GREY]
 if bad:
+    print(f"CONTROL DEAD: accent-lost — row 0x17 still holds the GREY RAMP at frames {bad} (the P1 accent is dead)")
     print(f"FAIL: row 0x17 still holds the GREY RAMP at frames {bad} — the P1 half "
           f"of the sword thunk is dead. Leg 1 would pass with the whole thunk "
           f"removed; this leg is what stops that.")
     raise SystemExit(1)
-head = open(late[0], "rb").read()[0x17 * 0x20:0x17 * 0x20 + 8].hex()
+head = row17(late[0]).hex()
 print(f"  ok: P1's accent still lands on row 0x17 ({len(late)} samples, head {head})")
+print("CONTROL FIRED: accent-lost — P1's accent lands on row 0x17 (not the pre-thunk grey ramp); the mode demands the grey ramp and the gate FAILs")
 PY
 fi
 

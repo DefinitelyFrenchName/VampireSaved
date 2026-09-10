@@ -2,6 +2,8 @@
 # test_vanilla_frame_join.sh — WHICH ANIM CHAIN EACH VANILLA CHARACTER'S STANDING
 # NORMALS ENTER, MEASURED ON vsavj (14z-125, the community cross-check's join).
 #
+# MUST-FIRE: perturbed-copy: swapped-rows — swapping one character's far/near rows in a copy of the frozen slot map must fail the section-3 compare against the measured map (mode: section 3 compares the measured map against that swapped copy and must fail)
+#
 # WHAT IT HOLDS. docs/project/tables/community_crosscheck.md joins the community
 # workbook's rows to our derived chains, and the join is only as good as the
 # claim "button B on character C enters chain a2:S". That claim is NOT inferred
@@ -46,6 +48,22 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 bad=0
 ok()  { echo "  ok    $1"; }
 nope() { echo "  FAIL  $1"; bad=$((bad + 1)); }
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+
+# ONE perturbation, called by the section-5 control (on its own copy) and by
+# the executable mode (on the compare baseline): swap far/near for the first
+# character that has a proximity distinction.
+swap_table() {  # swap_table <in filtered tsv> <out>
+    python3 - "$1" "$2" <<'PY'
+import sys
+rows = [l.rstrip("\n").split("\t") for l in open(sys.argv[1]) if l.strip() and not l.startswith("#")]
+by = {}
+for t, d, b, c in rows: by.setdefault(t, {}).setdefault(b, {})[d] = c
+victim = next(t for t, bs in by.items() if any(v.get("far") != v.get("near") for v in bs.values()))
+out = ["\t".join([t, {"far": "near", "near": "far"}[d] if t == victim else d, b, c]) for t, d, b, c in rows]
+open(sys.argv[2], "w").write("\n".join(out) + "\n")
+PY
+}
 
 [ -n "${ROMDIR:-}" ] || { echo "SKIP: ROMDIR unset"; exit 0; }
 if [ ! -f "$IMG" ]; then
@@ -110,6 +128,9 @@ if [ -n "$WANT" ]; then
 else
     grep -v '^#' "$EXP" > "$W/exp.txt"; grep -v '^#' "$W/got.txt" > "$W/g.txt"
 fi
+# THE EXECUTABLE MODE: the compare baseline becomes the SWAPPED table, so the
+# measured map no longer equals it and the gate reaches its own FAIL.
+if [ "$MODE" = swapped-rows ]; then swap_table "$W/exp.txt" "$W/exp.txt.sw" && mv "$W/exp.txt.sw" "$W/exp.txt"; fi
 if cmp -s "$W/exp.txt" "$W/g.txt"; then ok "the measured slot map equals $EXP ($(grep -c . "$W/g.txt") rows)"
 else nope "the slot map moved"; diff "$W/exp.txt" "$W/g.txt" | head -20; fi
 
@@ -163,20 +184,12 @@ else
 fi
 
 echo "== 5. must-fire control"
-python3 - "$W/exp.txt" "$W/ctl.txt" <<'PY'
-import sys
-rows = [l.rstrip("\n").split("\t") for l in open(sys.argv[1]) if l.strip()]
-# swap far/near for the FIRST character that actually has a distinction
-by = {}
-for t, d, b, c in rows:
-    by.setdefault(t, {}).setdefault(b, {})[d] = c
-victim = next(t for t, bs in by.items() if any(v.get("far") != v.get("near") for v in bs.values()))
-out = [("\t".join([t, {"far": "near", "near": "far"}[d] if t == victim else d, b, c])) for t, d, b, c in rows]
-open(sys.argv[2], "w").write("\n".join(out) + "\n")
-print(f"  (control swaps far/near for {victim})")
-PY
-if cmp -s "$W/exp.txt" "$W/ctl.txt"; then nope "control: the swapped table compares EQUAL — the freeze is vacuous"
-else ok "control: swapping one character's far/near rows fails the compare"; fi
+# Build the swapped copy from the FROZEN file directly (not $W/exp.txt, which the
+# mode above may already have swapped) and prove it differs from the frozen map.
+grep -v '^#' "$EXP" > "$W/exp_frozen.txt"
+swap_table "$W/exp_frozen.txt" "$W/ctl.txt"
+if cmp -s "$W/exp_frozen.txt" "$W/ctl.txt"; then vs_ctl_dead swapped-rows "the swapped table compares EQUAL — the freeze is vacuous"; nope "control swapped-rows"
+else vs_ctl_fired swapped-rows "swapping one character's far/near rows changes the table (section 3 compares the measured map against it under the mode)"; fi
 
 [ $bad -eq 0 ] && echo "PASS" || echo "FAIL ($bad)"
 exit $bad

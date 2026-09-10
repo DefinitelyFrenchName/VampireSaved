@@ -4,6 +4,8 @@
 # community cross-check's `gauge_hit` column carried six cells no instrument
 # could adjudicate (SA 5HK/2HP, BI 2HK, FE 5MP, ZA J.2HK, LE J.HP).
 #
+# MUST-FIRE: perturbed-copy: perturbed-net — SA 5MP's net meter gain moved by one in a copy of the measured table must fail law A (mode: section A-D runs the real verdict on that perturbed table and must fail)
+#
 # THE INSTRUMENT: tools/vanilla_join_rig.py CONNECTING legs (`hit`, `hit_crouch`,
 # `hit_jump`, `hit_jump_down`; P1 walks in, P2 Victor idle, HP re-pinned) traced
 # for P1's meter (+0x10A, 0x90 = one stock, plus +0x109 stocks) and P2's HP.
@@ -54,6 +56,12 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 export SDL_VIDEODRIVER="${SDL_VIDEODRIVER:-dummy}"
 fail=0
 FIELDS="ff841c:l:node,ff8850:w:p2hp,ff850a:w:p1meter,ff8509:b:p1stock,ff8414:w:p1y"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+# ONE perturbation, called by the section-F control and by the executable mode:
+# SA 5MP's net meter gain (+0x14 column) moved by one, which fails law A.
+perturb_net() {  # perturb_net <in> <out>
+    awk -F'\t' 'BEGIN{OFS="\t"} NR>1 && $1=="SA" && $4=="5MP" {$11=$11+1} {print}' "$1" > "$2"
+}
 
 echo "== 0. eight connecting legs"
 for leg in "SA 0x0a hit" "SA 0x0a hit_crouch" "BI 0x08 hit_crouch" "FE 0x07 hit" \
@@ -113,7 +121,11 @@ PY
 }
 
 echo "== A-D. the verdict"
-if verdict "$W/table.tsv"; then echo "  ok the per-hit law, the swing costs and the six cells hold"
+# THE EXECUTABLE MODE: the verdict runs on the PERTURBED table, so a real
+# perturbation of the measured data reaches the gate's own FAIL.
+MAIN="$W/table.tsv"
+if [ "$MODE" = perturbed-net ]; then perturb_net "$W/table.tsv" "$W/table.mode.tsv"; MAIN="$W/table.mode.tsv"; fi
+if verdict "$MAIN"; then echo "  ok the per-hit law, the swing costs and the six cells hold"
 else echo "  FAIL"; fail=1; fi
 
 echo "== E. the measured table, hash-locked out of tree"
@@ -127,9 +139,9 @@ if [ "$(cut -c1-64 "$HEXP" 2>/dev/null)" = "$HSHA" ]; then echo "  ok the measur
 else echo "  FAIL the meter measurement moved (sha256 $HSHA != frozen) — review $OUTDIR/vanilla_meter_gain.tsv, then FREEZE=1"; fail=1; fi
 
 echo "== F. must-fire control"
-awk -F'\t' 'BEGIN{OFS="\t"} NR>1 && $1=="SA" && $4=="5MP" {$11=$11+1} {print}' "$W/table.tsv" > "$W/perturbed.tsv"
-if verdict "$W/perturbed.tsv" >/dev/null; then echo "  FAIL control: a perturbed net was accepted"; fail=1
-else echo "  ok control fired: SA 5MP's net moved by one fails law A"; fi
+perturb_net "$W/table.tsv" "$W/perturbed.tsv"
+if verdict "$W/perturbed.tsv" >/dev/null; then vs_ctl_dead perturbed-net "a perturbed net was accepted" || true; fail=1
+else vs_ctl_fired perturbed-net "SA 5MP's net moved by one fails law A (section A-D runs the real verdict on it under the mode)"; fi
 
 [ "$fail" -eq 0 ] || { echo "FAIL test_meter_gain"; exit 1; }
 echo "PASS: per landed hit the engine pays the record's +0x14; swing costs 0/3/6 equal the sheet's gauge whiff; the six cells are hits-landed residues, not meter residues"

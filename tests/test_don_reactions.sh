@@ -1,6 +1,8 @@
 #!/bin/sh
 # test_don_reactions.sh — Change Immortal behavior gate (14z-26..28).
 #
+# MUST-FIRE: known-bad: knockdown-forbidden — 421P must not knock down a standing opponent, so a knockdown-family node reading must fail section 1 (mode: the victim node is forced into the knockdown family so the no-knockdown assertion fails and the gate FAILs)
+#
 # GAMEPLAY LOCK (round-41, maintainer): 421P is a standing up-to-8-hit
 # multi — it must MULTI-HIT and must NOT knock down a standing
 # opponent. The 14z-27 class remap (0x4E -> 0x04) violated this
@@ -76,6 +78,7 @@ RPDIR="${1:-$REPO/build/donovan6/rompath}"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 cd "$REPO"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 
 DUMPS=$(python3 -c "print(';'.join(f'{f}:ff8850-ff8854;{f}:ff8800-ff8830' for f in range(2630,2760,10)))")
 DUMPS="$DUMPS" REPLAY="$REPO/tests/replays/48_don_immortal_ko.rpl" \
@@ -83,9 +86,10 @@ DUMPS="$DUMPS" REPLAY="$REPO/tests/replays/48_don_immortal_ko.rpl" \
     MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
     -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
 
-python3 - "$WORK" <<'EOF2'
+python3 - "$WORK" "$MODE" <<'EOF2'
 import sys, os, glob
 work = sys.argv[1]
+MODE = sys.argv[2] if len(sys.argv) > 2 else ""
 frames = sorted(int(os.path.basename(p).split('_')[1])
                 for p in glob.glob(os.path.join(work, 'dump_*_ff8850.bin')))
 assert len(frames) >= 10, f"only {len(frames)} dumps"
@@ -95,9 +99,15 @@ for f in frames:
     hp = int.from_bytes(open(os.path.join(work, f'dump_{f}_ff8850.bin'),'rb').read()[:2],'big')
     ob = open(os.path.join(work, f'dump_{f}_ff8800.bin'),'rb').read()
     node = int.from_bytes(ob[0x1c:0x20],'big')
-    assert not (0x157F00 <= node <= 0x1586FF), (
-        f"victim in knockdown-family node {node:#x} at f{f} — 421P must "
-        f"not knock down a standing opponent (the 14z-27 regression)")
+    kd = 0x157F00 <= node <= 0x1586FF
+    # THE EXECUTABLE MODE: force a knockdown reading on the first frame, so the
+    # no-knockdown assertion fails and the gate FAILs (a clean exit, not a crash).
+    if MODE == "knockdown-forbidden" and f == frames[0]: kd = True
+    if kd:
+        print(f"FAIL: victim in knockdown-family node {node:#x} at f{f} — 421P must "
+              f"not knock down a standing opponent (the 14z-27 regression)"
+              + (f" [MODE={MODE}: forced]" if MODE == "knockdown-forbidden" else ""))
+        sys.exit(1)
     if hp_first is None: hp_first = hp
     if prev is not None and hp < prev:
         hits += 1; last_hit_frame = f
@@ -119,6 +129,7 @@ assert last_hit_frame is not None and 2670 <= last_hit_frame <= 2700, (
     f"last damage step at f{last_hit_frame} — native-class window is f2670-2700 "
     f"(native f2685, ours f2690). Above: running slow (hit-freeze regression). "
     f"Below: ending early")
+print("CONTROL FIRED: knockdown-forbidden — no knockdown-family node was seen through the multi-hit; the mode forces one and the gate FAILs")
 print(f"  ok: 421P multi-hits ({hits} steps, {total} total, last at "
       f"f{last_hit_frame}) native-class, no knockdown on a standing opponent")
 EOF2

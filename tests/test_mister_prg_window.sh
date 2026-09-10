@@ -5,6 +5,8 @@
 # PARALLEL on two scratch clones by default (MISTER_LEGS=serial for one), ~1 h.
 # NOT ci_portable, NOT ci_static.
 #
+# MUST-FIRE: perturbed-copy: frozen-pair-moved — a perturbed copy of the frozen prg-window pair must fail the compare against the measured pair (mode: the measured pair is compared against that perturbed copy; REFUSES with exit 3 if the sim prerequisites or the frozen file are absent)
+#
 # THE QUESTION, AND WHY IT IS THREE-WAY. D4 declares a 6 MB program window.
 # The SDRAM image census proves the CPS-2 WIDE romset's bytes are PLACED above
 # CPU:$400000; nothing proved the 68k could READ them. That gap made the
@@ -86,6 +88,13 @@ while [ $# -gt 0 ]; do
     esac
     shift
 done
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+# Under a mode a SKIP would read as LIES, so REFUSE when a prerequisite is absent.
+if [ -n "$MODE" ]; then
+    if [ -z "${ROMDIR:-}" ] || ! command -v verilator >/dev/null 2>&1 || [ ! -d "$REPO/$BUILD" ] || [ ! -e "$REPO/emu/jtcores/.git" ] || [ ! -f "$EXPECT" ]; then
+        echo "REFUSED: CONTROL=$MODE needs ROMDIR, verilator, $BUILD, jtcores and $EXPECT"; exit 3
+    fi
+fi
 
 if [ -z "$POSLOG" ] || [ -z "$NEGLOG" ]; then
     [ -n "${ROMDIR:-}" ] || { echo "SKIP: ROMDIR unset (this gate runs the real romset)"; exit 77; }
@@ -164,13 +173,21 @@ if [ "$FREEZE" = 1 ]; then
     echo "  FROZE $EXPECT:"; sed 's/^/     /' "$EXPECT"
 elif [ -f "$EXPECT" ]; then
     EW="$(mktemp)"; grep -v '^#' "$EXPECT" > "$EW"
-    if cmp -s "$EW" "$SUM"; then
+    # THE EXECUTABLE MODE: compare the measured pair against a PERTURBED copy of
+    # the frozen pair, so the compare fails and the gate FAILs.
+    CMPBASE="$EW"
+    if [ "$MODE" = frozen-pair-moved ]; then EWM="$(mktemp)"; sed '1s/./X/' "$EW" > "$EWM"; CMPBASE="$EWM"; fi
+    if cmp -s "$CMPBASE" "$SUM"; then
         ok "the pair matches the frozen expectation"
     else
         bad "the pair MOVED:"
-        diff "$EW" "$SUM" | sed 's/^/       /'
+        diff "$CMPBASE" "$SUM" | sed 's/^/       /'
     fi
-    rm -f "$EW"
+    # the control: a perturbed copy of the frozen pair differs from the original
+    EP="$(mktemp)"; sed '1s/./X/' "$EW" > "$EP"
+    if cmp -s "$EW" "$EP"; then echo "CONTROL DEAD: frozen-pair-moved — a perturbed copy of the frozen pair is identical to it"
+    else vs_ctl_fired frozen-pair-moved "a perturbed copy of the frozen pair differs from it, so the pair compare catches a move (the mode compares the measured pair against such a copy)"; fi
+    rm -f "$EW" "$EP"
 else
     bad "no frozen expectation at $EXPECT — run once with --freeze"
 fi
