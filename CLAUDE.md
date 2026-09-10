@@ -241,6 +241,11 @@ legacy behavior is a failed change.
   first, then STATE_HISTORY.md — section names are preserved in the
   archive, and archived entries are never rewritten (corrections are
   marked in place, as always).
+  **THE CLOSE ENDS WITH A PUSH (maintainer-ruled 2026-09-10):** when every
+  check of the close is green and nothing is pending, push `main` to GitHub
+  as the ritual's last step; a red, a SKIP or an unresolved item leaves the
+  commits local and the close says so. Pushing bbh follows the same rule
+  under its standing authorisation.
 - **[VSP-162]** **THE `14z-N` SESSION KEY — a naming convention AND the
   archive's INDEX, which is why it is never re-based.** A tag names ONE
   SITTING (a working session, several per day at times — not a calendar day,

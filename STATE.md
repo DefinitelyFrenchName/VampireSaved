@@ -22,6 +22,10 @@ older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
   once a ruled decision stops shaping active work, its entry moves
   VERBATIM to `DECISIONS_HISTORY.md`** (grep there by topic; the §5
   retraction grep covers it).
+- **THE LAST STEP OF THE CLOSE IS THE PUSH (maintainer-ruled 2026-09-10):**
+  static tier strict green, the doc checks green, nothing pending -> `git push
+  origin main`; anything red or skipped leaves the commits local and the
+  close entry says so.
 
 ## Session 14z-145 — **THE OPEN-ITEMS LIST, IN THE MAINTAINER'S ORDER (1, 2, 4): the freeze-artifact check EXTENDED to
 ## patch_index's registration cells and it caught FOUR freezes of rot on its first run — cells the 14z-144 close had
