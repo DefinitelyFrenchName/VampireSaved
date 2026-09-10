@@ -2,6 +2,9 @@
 # audit_capture_matrix.sh — THE WHOLE CAPTURE-GEOMETRY MATRIX, ours vs native
 # vsav2, every reachable (ATTACKER, VICTIM) cell (14z-143, maintainer-directed).
 #
+# MUST-FIRE: perturbed-copy: perturbed-record-byte — one byte of one record flipped in a copy of our image must break that cell's comparison (mode: section 1 compares that copy and must fail)
+# MUST-FIRE: known-bad: fixed-count-comparison — a FIXED 20-record comparison must invent differences at exactly the small-spacing attackers (mode: section 1 uses the fixed count and must fail — the instrument's own negative control)
+#
 # WHY IT EXISTS. Pyron's attacker row 0x11 was unported for the life of the
 # project and was found by an INVENTORY, not by play: at 14z-130 the bank_map
 # correction enabled the generic per-character repoint on capture_kf_ptr, and
@@ -65,6 +68,8 @@ MERGED="${MERGED:-build/m3b_merged26}"
 : "${ROMDIR:?set ROMDIR}"
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 [ -f "$MERGED/verify_data.bin" ] || { echo "FAIL: no $MERGED/verify_data.bin (set MERGED=)"; exit 1; }
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+CAPM_MODE="${VS_CTL:-}"; export CAPM_MODE
 
 . "$REPO/tests/lib/decrypt_cache.sh"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
@@ -134,11 +139,20 @@ KNOWN = set()   # EMPTY since 14z-144. `set()` not `{}`:
 
 fails, notes = [], []
 
+# THE EXECUTABLE FORM (CAPM_MODE = the CONTROL name): the perturbed copy of
+# our image, or the FIXED-count comparison, is what section 1 runs on.
+MODE = os.environ.get("CAPM_MODE", "")
+FIXED = 20                                   # the 14z-143 trap, encoded
+if MODE == "perturbed-record-byte":
+    _c = bytearray(ours); _pa = u32(ours, TJ+4*0x11); _off = u16(ours, _pa+2*0x03)
+    _c[_pa+_off+8] ^= 0x01; ours = bytes(_c)
+
 # ── 1. THE MATRIX ───────────────────────────────────────────────────────────
 checked = mism = 0
 for a in LEGACY + sorted(TENANTS) + [OBORO]:
     po, p2 = u32(ours, TJ+4*a), u32(v2, T2+4*a)
     n = min(spacing(ours, po), spacing(v2, p2))
+    if MODE == "fixed-count-comparison": n = 8*FIXED
     d = [v for v in range(32) if cell(ours,po,v,n) != cell(v2,p2,v,n)]
     d = [v for v in d if (a,v) not in KNOWN]
     checked += 32
@@ -204,16 +218,17 @@ else:
                  f"vsav2 gives all {want} their own data — the #104 subject")
 
 # ── 4. MUST-FIRE CONTROLS ───────────────────────────────────────────────────
+ours = Path(os.environ["OURS"]).read_bytes()   # the REAL image, whatever the mode swapped in
 ctl = bytearray(ours)
 pa = u32(ours, TJ+4*0x11); off = u16(ours, pa+2*0x03)
 ctl[pa+off+8] ^= 0x01                       # one byte of one record
 n = min(spacing(bytes(ctl),pa), spacing(v2,u32(v2,T2+4*0x11)))
 if cell(bytes(ctl),pa,0x03,n) == cell(v2,u32(v2,T2+4*0x11),0x03,n):
+    print("CONTROL DEAD: perturbed-record-byte — a perturbed record byte still compares equal")
     fails.append("4a: CONTROL DID NOT FIRE — a perturbed record byte still compares equal")
 else:
-    notes.append("4a: control fired — one flipped record byte breaks the cell comparison")
+    print("CONTROL FIRED: perturbed-record-byte — one flipped record byte breaks the cell comparison")
 
-FIXED = 20                                   # the 14z-143 trap, encoded
 naive = []
 for a in LEGACY:
     pj, p2 = u32(vj,TJ+4*a), u32(v2,T2+4*a)
@@ -221,15 +236,17 @@ for a in LEGACY:
         naive.append(a)
 small = [a for a in LEGACY if spacing(vj,u32(vj,TJ+4*a)) < 8*FIXED]
 if not naive:
+    print("CONTROL DEAD: fixed-count-comparison — the fixed-count comparison found no false differences")
     fails.append("4b: CONTROL DID NOT FIRE — the fixed-count comparison found no "
                  "false differences, so this gate cannot show it is avoiding the trap")
 elif sorted(naive) != sorted(small):
+    print("CONTROL DEAD: fixed-count-comparison — the false positives are not exactly the small-spacing attackers")
     fails.append(f"4b: the fixed-count comparison's false positives {[hex(a) for a in naive]} "
                  f"are not exactly the small-spacing attackers {[hex(a) for a in small]}")
 else:
-    notes.append(f"4b: control fired — a FIXED {FIXED}-record comparison invents "
-                 f"differences at exactly the attackers whose spacing is smaller "
-                 f"({[hex(a) for a in naive]}); per-block spacing is what avoids it")
+    print(f"CONTROL FIRED: fixed-count-comparison — a FIXED {FIXED}-record comparison invents "
+          f"differences at exactly the attackers whose spacing is smaller "
+          f"({[hex(a) for a in naive]}); per-block spacing is what avoids it")
 
 for n_ in notes: print("  " + n_)
 if fails:

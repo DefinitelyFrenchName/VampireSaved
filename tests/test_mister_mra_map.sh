@@ -4,6 +4,9 @@
 # leg did not move. (14z-107 (5), MiSTer slice D0;
 # docs/project/mister_map.md §3 is the design this gate defends.)
 #
+# MUST-FIRE: known-bad: untrimmed-mapping — the UNTRIMMED mapping (the QSound extension whole, as MAME declares it) must produce an image past the 26-bit ioctl_addr ceiling needing a firmware start word that does not fit 16 bits (mode: that MRA is what section 2 checks against the frozen table, and must fail)
+# MUST-FIRE: perturbed-copy: trim-perturbed — the trim length moved by 1 KiB must break the frozen region table (mode: that MRA is what section 2 checks)
+#
 # WHY IT EXISTS. `docs/project/mister_map.md` derives the WIDE `.rom` layout
 # on paper and `tests/audit_mister_map_fit.sh` freezes the arithmetic. This
 # gate is the other half: it runs the REAL generator over the REAL romset and
@@ -92,6 +95,8 @@ WORK="$(mktemp -d "${TMPDIR:-/tmp}/mister_mra_map.XXXXXX")"
 trap 'rm -rf "$WORK"' EXIT INT TERM
 MRA="$REPO/tools/mister_mra.sh"
 SRC="$REPO/emu/jtcores"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+MRAMAP_MODE="${VS_CTL:-}"; export MRAMAP_MODE
 
 echo "== generating MRAs (ROM-free) for both cores =="
 "$MRA" --core cps2  --no-rom --quiet --out "$WORK/stockcore" || exit 1
@@ -187,6 +192,11 @@ if not w:
     bad("cores/cps2w did not emit the WIDE MRA at all")
     print("\nFAIL: MiSTer MRA map"); sys.exit(1)
 ok("cores/cps2w emits the WIDE MRA")
+# THE EXECUTABLE FORM (MRAMAP_MODE = the CONTROL name): the known-bad MRA is
+# what section 2 checks against the frozen table, and this run must FAIL.
+MODE = os.environ.get("MRAMAP_MODE", "")
+if MODE == "untrimmed-mapping": w = find(WORK + "/untrimmed", WIDE) or w
+if MODE == "trim-perturbed":    w = find(WORK + "/perturbed", WIDE) or w
 
 # ── 2. the region table, frozen against docs/project/mister_map.md §3 ───────
 # `pos` counts the 20-byte key; bulk_addr (what the RTL sees) is pos - 0x14.
@@ -282,14 +292,14 @@ else:
     fw = starts["firmware"] - KEY_LEN
     words = header_words(u)
     if size <= (1 << 26):
-        bad("control A did not fire: the untrimmed image is %d B, inside the "
-            "26-bit ioctl_addr ceiling" % size)
+        print("CONTROL DEAD: untrimmed-mapping — the untrimmed image is %d B, inside the 26-bit ioctl_addr ceiling" % size)
+        bad("control A did not fire")
     elif (fw >> 10) < (1 << 16):
-        bad("control A half-fired: firmware start %d KiB still fits 16 bits"
-            % (fw >> 10))
+        print("CONTROL DEAD: untrimmed-mapping — half-fired: firmware start %d KiB still fits 16 bits" % (fw >> 10))
+        bad("control A half-fired")
     else:
-        ok("control A fired: untrimmed = %.3f MB (> 64 MB) and needs "
-           "qsnd_start %d KiB (> 65535)" % (size / 2 ** 20, fw >> 10))
+        print("CONTROL FIRED: untrimmed-mapping — untrimmed = %.3f MB (> 64 MB) and needs "
+              "qsnd_start %d KiB (> 65535)" % (size / 2 ** 20, fw >> 10))
         if words["firmware"] == (fw >> 10) & 0xFFFF and words["firmware"] != fw >> 10:
             ok("...and the generator SILENTLY WRITES THE WRAPPED WORD %d — "
                "which is why the trim is a gate, not a preference"
@@ -322,10 +332,10 @@ pert = find(WORK + "/perturbed", WIDE)
 if not pert:
     bad("control B produced no MRA")
 elif not check_table(pert):
-    bad("control B did not fire: the region table still matched after the "
-        "trim length moved by 1 KiB")
+    print("CONTROL DEAD: trim-perturbed — the region table still matched after the trim length moved by 1 KiB")
+    bad("control B did not fire")
 else:
-    ok("control B fired: +0x400 on the trim breaks the frozen table")
+    print("CONTROL FIRED: trim-perturbed — +0x400 on the trim breaks the frozen table")
 
 # ── 5. the real .rom, byte for byte ────────────────────────────────────────
 if ROMRUNS:

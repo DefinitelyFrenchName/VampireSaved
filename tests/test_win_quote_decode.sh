@@ -2,6 +2,9 @@
 # test_win_quote_decode.sh — the win-quote text system's STRUCTURE, frozen
 # (14z-116). ci_static: needs ROMDIR only, no emulator, no build dir.
 #
+# MUST-FIRE: known-bad: perturbed-offset — a copy of the data view with one first-level offset pointing far out of the bank must make the walk malformed (mode: section 3 dumps from that image and must fail)
+# MUST-FIRE: known-bad: overlong-record — a copy with one record's length made absurd must be refused against the renderer's buffer (mode: section 3 dumps from that image and must fail)
+#
 # WHAT THIS LOCKS, and why each line is here rather than in a session log.
 # The 14z-76 decode of the win-quote system lived only in prose, and its two
 # load-bearing numbers turned out to be wrong when finally measured:
@@ -48,6 +51,25 @@ chk() { # label expected actual
 # would then make claims about (GitHub #69).
 decrypt_view vsavj "$W/vsavj_op.bin" "$W/vsavj_data.bin"
 decrypt_view vsav2 "$W/vsav2_op.bin" "$W/vsav2_data.bin"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+# THE KNOWN-BAD IMAGES, built first (section 5 runs them as controls); under
+# CONTROL=<name> the named one is what section 3 walks, and this run must FAIL.
+python3 - "$W/vsavj_data.bin" "$W/bad1.bin" <<'EOF'
+import sys
+d=bytearray(open(sys.argv[1],'rb').read()); B=0x32D28A
+d[B+2*0x10:B+2*0x10+2]=(0x7ffe).to_bytes(2,'big')   # offset far out of the bank
+open(sys.argv[2],'wb').write(bytes(d))
+EOF
+python3 - "$W/vsavj_data.bin" "$W/bad2.bin" <<'EOF'
+import sys
+d=bytearray(open(sys.argv[1],'rb').read())
+# winner 0x00's first string starts at 0x32D2EE; make its length absurd.
+d[0x32D2EE:0x32D2F0]=(0x0100).to_bytes(2,'big')
+open(sys.argv[2],'wb').write(bytes(d))
+EOF
+WALK="$W/vsavj_data.bin"
+vs_ctl_is perturbed-offset && WALK="$W/bad1.bin"
+vs_ctl_is overlong-record && WALK="$W/bad2.bin"
 
 note "1. the root is a 4-entry REGION array"
 banks=$(python3 - "$W/vsavj_data.bin" <<'EOF'
@@ -72,7 +94,7 @@ chk "variant rows alias the base half" "10->00,11->01,13->03" "$al"
 note "3. every reachable line walks clean, all four regions"
 for r in 0 1 2 3; do
     out="$W/dump_$r.txt"
-    python3 "$DEC" dump "$W/vsavj_data.bin" --opcodes "$W/vsavj_op.bin" \
+    python3 "$DEC" dump "$WALK" --opcodes "$W/vsavj_op.bin" \
         --region "$r" > "$out" 2>&1 || { note "  FAIL: dump region $r"; fail=1; continue; }
     n=$(grep -c '^winner' "$out" || true)
     bad=$(grep -c '!!' "$out" || true)
@@ -95,29 +117,16 @@ chk "vs2 tenant blocks" "10:own@09fe24 11:own@0a0184 13:own@0a05e4" "$t"
 
 note "5. verdict controls (each MUST fire)"
 # 5a: a perturbed first-level word must make the walk malformed.
-python3 - "$W/vsavj_data.bin" "$W/bad1.bin" <<'EOF'
-import sys
-d=bytearray(open(sys.argv[1],'rb').read()); B=0x32D28A
-d[B+2*0x10:B+2*0x10+2]=(0x7ffe).to_bytes(2,'big')   # offset far out of the bank
-open(sys.argv[2],'wb').write(bytes(d))
-EOF
 if python3 "$DEC" dump "$W/bad1.bin" --opcodes "$W/vsavj_op.bin" --winner 0x10 --verbose 2>&1 | grep -q '!!'; then
-    note "  ok   control 5a fired (perturbed first-level offset is loud)"
+    vs_ctl_fired perturbed-offset "a perturbed first-level offset is loud"
 else
-    note "  FAIL control 5a did NOT fire — the walker accepts a bad offset"; fail=1
+    vs_ctl_dead perturbed-offset "the walker accepts a bad offset"; fail=1
 fi
 # 5b: an overlong record must be refused against the renderer's buffer.
-python3 - "$W/vsavj_data.bin" "$W/bad2.bin" <<'EOF'
-import sys
-d=bytearray(open(sys.argv[1],'rb').read())
-# winner 0x00's first string starts at 0x32D2EE; make its length absurd.
-d[0x32D2EE:0x32D2F0]=(0x0100).to_bytes(2,'big')
-open(sys.argv[2],'wb').write(bytes(d))
-EOF
 if python3 "$DEC" dump "$W/bad2.bin" --opcodes "$W/vsavj_op.bin" --winner 0x00 2>&1 | grep -q 'buffer'; then
-    note "  ok   control 5b fired (overlong record named against the buffer)"
+    vs_ctl_fired overlong-record "an overlong record is named against the buffer"
 else
-    note "  FAIL control 5b did NOT fire — an overrun would pass"; fail=1
+    vs_ctl_dead overlong-record "an overrun would pass"; fail=1
 fi
 
 if [ "$fail" -eq 0 ]; then note "PASS test_win_quote_decode"; else note "FAIL test_win_quote_decode"; fi

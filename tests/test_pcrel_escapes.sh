@@ -3,6 +3,8 @@
 # SINCE REVIEWED (14z-94, GitHub #22). Needs ROMDIR + the three tenant builds
 # and build/out/vsav2_data.bin; ~2 min.
 #
+# MUST-FIRE: known-bad: wrong-placement-suffix — the merged leg with its placement suffix deliberately wrong must read ZERO escapes and therefore fail the reference comparison (mode: every merged leg runs with the wrong suffix, and this run must fail)
+#
 # THE FINDING BEHIND IT. tools/verify_pcrel_data.py is the instrument that
 # turned "the ported machine carries a live embedded table that reads garbage"
 # into a measured fact (14z-69i, region x06cac0 on build/hui11). #22 observed
@@ -37,6 +39,8 @@ FROZEN="build/manifest/pcrel_escapes.toml"
 [ -f build/out/vsav2_data.bin ] || { echo "SKIP: need build/out/vsav2_data.bin"; exit 0; }
 [ -f "$FROZEN" ] || { echo "FAIL: no frozen inventory at $FROZEN"; exit 1; }
 rc=0
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+PCREL_MODE=0; vs_ctl_is wrong-placement-suffix && PCREL_MODE=1; export PCREL_MODE
 
 python3 - <<'PY' || rc=1
 import os, re, subprocess, sys
@@ -121,7 +125,8 @@ for sec in merged_secs:
            "--src-data", "build/out/vsav2_data.bin",
            "--extract", sec["extract"]]
     if sec.get("placement_suffix"):
-        cmd += ["--placement-suffix", sec["placement_suffix"]]
+        # CONTROL=wrong-placement-suffix: the known-bad suffix on the real merged leg
+        cmd += ["--placement-suffix", "@wrong_on_purpose" if os.environ.get("PCREL_MODE") == "1" else sec["placement_suffix"]]
     out = subprocess.run(cmd, capture_output=True, text=True)
     if "verified NOTHING" in out.stderr or out.returncode == 2:
         print(f"  FAIL {name}: instrument error — {out.stderr.strip()}")
@@ -163,12 +168,11 @@ if ctl is not None:
                          capture_output=True, text=True)
     got = {m.group(0) for m in re.finditer(r"BROKEN \S+", out.stdout)}
     if got or not frozen.get(ctl["same_as"]):
-        print("  FAIL control: the wrong-suffix leg still produced findings — "
-              "the must-fire premise is broken")
+        print("CONTROL DEAD: wrong-placement-suffix — the wrong-suffix leg still produced findings; the must-fire premise is broken")
         rc = 1
     else:
-        print(f"  ok   control: a wrong placement suffix reads 0 escapes vs "
-              f"{len(frozen[ctl['same_as']])} frozen — the comparison would fire")
+        print(f"CONTROL FIRED: wrong-placement-suffix — a wrong placement suffix reads 0 escapes vs "
+              f"{len(frozen[ctl['same_as']])} frozen, so the comparison fires")
 
 if rc == 0:
     print("  ok   x06cac0 absent everywhere — the 14z-69i fix still holds")

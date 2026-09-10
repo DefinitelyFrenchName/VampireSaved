@@ -2,6 +2,8 @@
 # test_reconcile_matcher.sh — ONE matcher, two callers, and the parameters
 # that separate them (14z-95, GitHub #43(a), maintainer-ruled 2026-08-18).
 #
+# MUST-FIRE: perturbed-copy: moved-result — the matcher comparison with its binding perturbed must detect a moved result (mode: section 2's comparison runs under that binding and reads the moved result as the failure it would be)
+#
 # tools/reconcile_batch.py carried a COPY of tools/find_equiv.py's core, and
 # the copy had drifted three ways: no relaxed-anchor fallback, a 64-hit cap
 # applied BEFORE the score sort (so it keeps the first 64 by ADDRESS, not the
@@ -56,6 +58,7 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
 ok()  { echo "  ok: $1"; }
 bad() { echo "FAIL: $1"; fail=1; }
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 
 echo "== 1: there is ONE implementation"
 if grep -q "^def masked_search" tools/find_equiv.py; then
@@ -113,7 +116,16 @@ else
     git show "$BASE:tools/reconcile_batch.py" > "$W/rb_old.py"
     if grep -q "^def masked_search" "$W/rb_old.py"; then
         ok "reconstructed the drifted copy from $(echo "$BASE" | cut -c1-8)"
-        if python3 tests/lib/cmp_matchers.py "$ROMDIR" "$W/rb_old.py"; then
+        if vs_ctl_is moved-result; then
+            # THE EXECUTABLE FORM: the same comparison under the PERTURBED binding
+            # (cmp_matchers --control exits 0 when the results MOVED) is read as
+            # the main result — a moved result is the rule-6 finding, so FAIL
+            if python3 tests/lib/cmp_matchers.py "$ROMDIR" "$W/rb_old.py" --control; then
+                bad "the refactor MOVED a result under the perturbed binding (the mode) — this is a rule-6 finding."
+            else
+                ok "pinned parameters reproduce the drifted copy on every probe"
+            fi
+        elif python3 tests/lib/cmp_matchers.py "$ROMDIR" "$W/rb_old.py"; then
             ok "pinned parameters reproduce the drifted copy on every probe"
         else
             bad "the refactor MOVED a result — this is a rule-6 finding."
@@ -123,9 +135,9 @@ else
         # comparison that cannot detect anything at all. Perturb the binding
         # and require the same comparison to go red.
         if python3 tests/lib/cmp_matchers.py "$ROMDIR" "$W/rb_old.py" --control; then
-            ok "control: the comparison DOES detect a moved result"
+            vs_ctl_fired moved-result "the comparison DOES detect a moved result"
         else
-            bad "control did not fire — section 2's result proves nothing"
+            vs_ctl_dead moved-result "section 2's result proves nothing"; bad "control did not fire"
         fi
     else
         bad "$BASE carries no masked_search — the reference is wrong, so"

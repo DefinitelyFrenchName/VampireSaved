@@ -3,6 +3,10 @@
 # actually there. (14z-107 (10); docs/project/mister_core.md +
 # tools/mk_mister_page.py.)
 #
+# MUST-FIRE: shadow-tool: placement-constant — a copy of the generator with the QSound high window moved must fail --check against the map (mode: section 1 runs that copy)
+# MUST-FIRE: shadow-tool: frozen-extent — a copy with obj bank 4's top code moved must fail the extent check
+# MUST-FIRE: shadow-tool: ascii-figure — a copy with one ASCII glyph changed must fail the committed-markdown check
+#
 # WHY THIS EXISTS. `docs/project/mister_core.md` is a SYNTHESIS: every number
 # in it is a quotation from `mister_map.md`, `mister_fit.md` or a gate, and
 # `tools/mk_mister_page.py` draws those numbers to scale. That is exactly the
@@ -81,6 +85,19 @@ fail() { echo "  FAIL: $*"; rc=1; }
 [ -f "$DOC" ] || { echo "SKIP: $DOC is absent"; exit 0; }
 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+# THE SHADOW GENERATORS, built first (section 3 runs them as controls); under
+# CONTROL=<name> the named copy is what section 1 checks with, and must FAIL.
+shadow() {  # shadow <name> <sed expression>
+    cp "$GEN" "$W/gen_$1.py"; sed -i.bak "$2" "$W/gen_$1.py"
+    if cmp -s "$GEN" "$W/gen_$1.py"; then vs_ctl_dead "$1" "the sed no longer matches — nothing perturbed"; fail "control $1 did not perturb anything"; fi
+    return 0   # an `if`, not `&&`: this is the function's last statement and the gate is set -e
+}
+shadow placement-constant 's/^PCM_HIGH = 0x100000/PCM_HIGH = 0x180000/'
+shadow frozen-extent      's/(4, 1, GROUPC_BANK, 0xEE73, 45736, 0xEE73)/(4, 1, GROUPC_BANK, 0xEE74, 45736, 0xEE73)/'
+shadow ascii-figure       's/(1, 0x800000): "4",/(1, 0x800000): "G",/'
+CHECK_GEN="$GEN"; CHECK_ARGS=""
+[ -n "$VS_CTL" ] && { CHECK_GEN="$W/gen_$VS_CTL.py"; CHECK_ARGS="--repo $REPO"; }
 
 echo "== 0. the SHARED page theme (tools/_pagestyle.py) =="
 # The palette, the colour maths and the two theme dicts moved there at
@@ -97,7 +114,7 @@ else
 fi
 
 echo "== 1. the page re-derives every number it draws =="
-if python3 "$GEN" --check --verbose > "$W/check.log" 2>&1; then
+if python3 "$CHECK_GEN" $CHECK_ARGS --check --verbose > "$W/check.log" 2>&1; then
     sed -n 's/^  ok /  /p' "$W/check.log" | sed 's/^/    /'
     grep -c '^  ok ' "$W/check.log" | sed 's/^/  checks passed: /'
     grep '^  SKIP' "$W/check.log" || true
@@ -153,35 +170,24 @@ else
 fi
 
 echo "== 3. THE CONTROLS — a checker that cannot fail is not a checker =="
-control() {  # control <label> <sed expression> <expected substring in output>
-    cp "$GEN" "$W/gen.py"
-    sed -i.bak "$2" "$W/gen.py"
-    if cmp -s "$GEN" "$W/gen.py"; then
-        fail "control '$1' did not perturb anything — its sed no longer matches"
-        return
-    fi
-    if python3 "$W/gen.py" --repo "$REPO" --check > "$W/ctl.log" 2>&1; then
-        fail "control '$1' DID NOT FIRE: --check still passes with the"
-        fail "      perturbation applied, so it is not testing that number"
-    elif ! grep -q "$3" "$W/ctl.log"; then
-        fail "control '$1' fired but for the wrong reason (no '$3'):"
-        head -4 "$W/ctl.log" | sed 's/^/      /'
+control() {  # control <name> <expected substring in output> — the shadow copy built at the top
+    [ -f "$W/gen_$1.py" ] || return 0
+    if python3 "$W/gen_$1.py" --repo "$REPO" --check > "$W/ctl.log" 2>&1; then
+        vs_ctl_dead "$1" "--check still passes with the perturbation applied, so it is not testing that number"
+        fail "control '$1' DID NOT FIRE"
+    elif ! grep -q "$2" "$W/ctl.log"; then
+        vs_ctl_dead "$1" "fired but for the wrong reason (no '$2')"
+        fail "control '$1' fired for the wrong reason:"; head -4 "$W/ctl.log" | sed 's/^/      /'
     else
-        echo "  ok control $1 fired: $(grep -m1 "$3" "$W/ctl.log" | cut -c1-72)"
+        vs_ctl_fired "$1" "$(grep -m1 "$2" "$W/ctl.log" | cut -c1-72)"
     fi
 }
-
 # A. a placement constant moves (the QSound high window, 1 MB -> 1.5 MB)
-control "A (placement constant)" \
-    's/^PCM_HIGH = 0x100000/PCM_HIGH = 0x180000/' "QSound PCM high"
+control placement-constant "QSound PCM high"
 # B. a frozen content extent moves (obj bank 4's declared top code)
-control "B (frozen extent)" \
-    's/(4, 1, GROUPC_BANK, 0xEE73, 45736, 0xEE73)/(4, 1, GROUPC_BANK, 0xEE74, 45736, 0xEE73)/' \
-    "frozen extent"
+control frozen-extent "frozen extent"
 # C. an ASCII figure changes, so the committed markdown is stale
-control "C (committed ASCII)" \
-    's/(1, 0x800000): "4",/(1, 0x800000): "G",/' \
-    "ASCII figure"
+control ascii-figure "ASCII figure"
 
 if [ "$rc" = 0 ]; then
     echo

@@ -5,6 +5,8 @@
 # committed. ci_static: needs the three solo build dirs, no ROM read, no
 # emulator, ~1 s.
 #
+# MUST-FIRE: perturbed-copy: perturbed-word132 — a copy of donovan's extract with one value byte changed must regenerate a page that differs from the committed one (mode: donovan's page is regenerated from that copy and must fail the cmp)
+#
 # WHY (14z-118, the documentation audit). donovan.md was hand-written on
 # 2026-08-09 and never refreshed: by 14z-117 the shipped param32_a was a rec8
 # `00030000fffd6000` while the page still said `FFFD0000`; Huitzil and Pyron
@@ -42,25 +44,14 @@ fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 
 for b in "$DON" "$HUI" "$PYR"; do
     [ -f "$b/extract/regions.json" ] || { echo "SKIP: no $b/extract/regions.json (build dir absent)"; exit 0; }
 done
 
-echo "== test_tables_current: docs/project/tables/ follow the builds =="
-for pair in "$DON:donovan" "$HUI:huitzil" "$PYR:pyron"; do
-    b="${pair%%:*}"; n="${pair##*:}"
-    python3 tools/tables_char_md.py "$b/extract" "$W/$n.md" >/dev/null 2>&1 \
-        || { bad "$n: generator failed on $b/extract"; continue; }
-    if cmp -s "$W/$n.md" "docs/project/tables/$n.md"; then
-        ok "$n.md matches a regeneration from $b ($(wc -l < "$W/$n.md" | tr -d ' ') lines)"
-    else
-        bad "$n.md DRIFTED from $b — regenerate: python3 tools/tables_char_md.py $b/extract docs/project/tables/$n.md"
-        diff "docs/project/tables/$n.md" "$W/$n.md" | head -8 | sed 's/^/        /'
-    fi
-done
-
-# --- must-fire control: one value byte changed -> a different page --------
+# THE PERTURBATION, built first: donovan's extract with one value byte changed.
+# Under CONTROL=perturbed-word132 it IS donovan's extract in the loop below.
 mkdir -p "$W/ctl"
 python3 - "$DON/extract/regions.json" "$W/ctl/regions.json" <<'PY'
 import json, sys
@@ -73,11 +64,27 @@ else:
     sys.exit("control: no word132 row to perturb")
 json.dump(j, open(sys.argv[2], "w"))
 PY
+DON_EX="$DON/extract"; vs_ctl_is perturbed-word132 && DON_EX="$W/ctl"
+
+echo "== test_tables_current: docs/project/tables/ follow the builds =="
+for pair in "$DON_EX:donovan" "$HUI/extract:huitzil" "$PYR/extract:pyron"; do
+    b="${pair%%:*}"; n="${pair##*:}"
+    python3 tools/tables_char_md.py "$b" "$W/$n.md" >/dev/null 2>&1 \
+        || { bad "$n: generator failed on $b"; continue; }
+    if cmp -s "$W/$n.md" "docs/project/tables/$n.md"; then
+        ok "$n.md matches a regeneration from $b ($(wc -l < "$W/$n.md" | tr -d ' ') lines)"
+    else
+        bad "$n.md DRIFTED from $b — regenerate: python3 tools/tables_char_md.py $b docs/project/tables/$n.md"
+        diff "docs/project/tables/$n.md" "$W/$n.md" | head -8 | sed 's/^/        /'
+    fi
+done
+
+# --- must-fire control: one value byte changed -> a different page --------
 python3 tools/tables_char_md.py "$W/ctl" "$W/ctl.md" >/dev/null 2>&1 || bad "control: generator failed on the perturbed copy"
 if cmp -s "$W/ctl.md" "docs/project/tables/donovan.md"; then
-    bad "control: a perturbed word132 regenerated IDENTICAL — the diff is not checking"
+    vs_ctl_dead perturbed-word132 "a perturbed word132 regenerated IDENTICAL — the diff is not checking"; bad "control"
 else
-    ok "control: a perturbed word132 regenerates differently (the check fires)"
+    vs_ctl_fired perturbed-word132 "a perturbed word132 regenerates differently"; ok "control: the check fires"
 fi
 
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

@@ -2,6 +2,8 @@
 # test_community_crosscheck.sh — OUR DERIVED VANILLA FRAME DATA STILL SAYS WHAT
 # THE COMMUNITY WORKBOOK SAYS (14z-125, the community cross-check).
 #
+# MUST-FIRE: perturbed-copy: perturbed-startup — one derived startup moved by three frames must flip that character's column out of CONSTANT OFFSET (mode: the perturbed derivation is what sections 3-4 classify, and this run must fail)
+#
 # WHAT IT HOLDS. tools/vanilla_frames.py derives startup / active / recovery /
 # white / gauge / damage for all 15 vanilla characters straight out of vsavj's
 # own per-character bank, and tools/crosscheck_framedata.py classifies every
@@ -48,6 +50,21 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 bad=0
 ok()  { echo "  ok    $1"; }
 nope() { echo "  FAIL  $1"; bad=$((bad + 1)); }
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+perturb_startup() {  # perturb_startup <in.json> <out.json> — DE 2LP's startup + 3
+    python3 - "$1" "$2" <<'PY'
+import json, sys
+v = json.load(open(sys.argv[1]))
+ch = v["characters"]["DE"]
+for c in ch["chains"].values():
+    if c.get("move") == "2LP" and "frame_data" in c:
+        c["frame_data"]["startup"] += 3
+        break
+else:
+    sys.exit("no DE 2LP to perturb")
+json.dump(v, open(sys.argv[2], "w"))
+PY
+}
 
 [ -f "$SHEET" ] || { echo "SKIP: no $SHEET (the community workbook is third-party and lives outside the tree)"; exit 0; }
 if [ ! -f "$IMG" ]; then
@@ -106,9 +123,13 @@ PY
 echo "== 2-3. derive all 15 and classify"
 python3 tools/vanilla_frames.py "$IMG" --json "$W/v.json" > "$W/derive.log" 2>&1 \
     || { nope "vanilla_frames failed"; sed 's/^/        /' "$W/derive.log"; }
-python3 tools/crosscheck_framedata.py --sheet "$SHEET" --vanilla "$W/v.json" --tsv "$W/got.txt" --md "$W/page.md" >/dev/null 2>&1 \
+# THE EXECUTABLE FORM: under CONTROL=perturbed-startup the perturbed derivation
+# IS what is classified, and this run must FAIL.
+VJSON="$W/v.json"
+if vs_ctl_is perturbed-startup; then perturb_startup "$W/v.json" "$W/v_mode.json" || nope "could not perturb the derivation"; VJSON="$W/v_mode.json"; fi
+python3 tools/crosscheck_framedata.py --sheet "$SHEET" --vanilla "$VJSON" --tsv "$W/got.txt" --md "$W/page.md" >/dev/null 2>&1 \
     || nope "crosscheck_framedata failed"
-if [ "${FREEZE:-0}" = 1 ]; then
+if [ "${FREEZE:-0}" = 1 ] && [ -z "$VS_CTL" ]; then
     cp "$W/got.txt" "$EXP"; cp "$W/page.md" "$PAGE"
     echo "  FROZE $EXP and $PAGE"
 fi
@@ -120,29 +141,16 @@ if cmp -s "$W/page.md" "$PAGE"; then ok "$PAGE equals a regeneration"
 else nope "$PAGE is stale — regenerate"; diff "$PAGE" "$W/page.md" | head -10; fi
 
 echo "== 5. must-fire controls"
-python3 - "$W" "$SHEET" <<'PY' || nope "control (a) did not fire"
-import json, subprocess, sys
-W = sys.argv[1]
-v = json.load(open(f"{W}/v.json"))
-# perturb ONE derived startup on a character whose startup column is a clean offset
-ch = v["characters"]["DE"]
-for c in ch["chains"].values():
-    if c.get("move") == "2LP" and "frame_data" in c:
-        c["frame_data"]["startup"] += 3
-        break
-else:
-    sys.exit("no DE 2LP to perturb")
-json.dump(v, open(f"{W}/v_bad.json", "w"))
-r = subprocess.run([sys.executable, "tools/crosscheck_framedata.py", "--sheet", sys.argv[2],
-                    "--vanilla", f"{W}/v_bad.json", "--tsv", f"{W}/bad.txt"], capture_output=True)
-if r.returncode:
-    sys.exit(f"comparator failed: {r.stderr.decode()[:300]}")
-line = [l for l in open(f"{W}/bad.txt") if l.startswith("DE\tstartup")][0]
-print("  perturbed ->", line.strip())
-sys.exit(0 if "INCONSISTENT" in line else 1)
-PY
-[ $bad -eq 0 ] && ok "control (a): a perturbed derived startup flips DE out of CONSTANT OFFSET"
-out="$(SHEET=/nonexistent-workbook.xlsx sh "$0" 2>&1 | head -1)"
+# (a) perturb ONE derived startup on a character whose startup column is a clean offset
+perturb_startup "$W/v.json" "$W/v_bad.json" || nope "control (a): could not perturb"
+python3 tools/crosscheck_framedata.py --sheet "$SHEET" --vanilla "$W/v_bad.json" --tsv "$W/bad.txt" >/dev/null 2>&1 || nope "control (a): comparator failed"
+line="$(grep '^DE	startup' "$W/bad.txt" | head -1)"
+echo "  perturbed -> $line"
+case "$line" in
+*INCONSISTENT*) vs_ctl_fired perturbed-startup "a perturbed derived startup flips DE out of CONSTANT OFFSET"; ok "control (a) fires" ;;
+*)              vs_ctl_dead perturbed-startup "DE's startup column did not flip: $line"; nope "control (a)" ;;
+esac
+out="$(CONTROL= SHEET=/nonexistent-workbook.xlsx sh "$0" 2>&1 | head -1)"
 case "$out" in SKIP:*) ok "control (b): a missing workbook SKIPs, never passes vacuously";;
                     *) nope "control (b): a missing workbook did not SKIP (got: $out)";; esac
 

@@ -3,6 +3,8 @@
 # CAPCOM'S OWN, CARRIED FROM vs2/vh2 — the three-way ROM agreement that backs
 # the preservation claim, frozen (14z-126).
 #
+# MUST-FIRE: perturbed-copy: perturbed-expectation — the expected Donovan arm value changed by one must be caught against vs2 and vh2 (mode: the perturbed table is the one section 2 asserts, and this run must fail)
+#
 # WHY. tests/audit_df_startup_invuln.sh measured that each character's
 # seq-0x16 Dark Force handler (the row of dispatch_16, PRG:0x0BF31A) arms the
 # victim's invincibility timer +0x147 with its own value, and that the
@@ -43,6 +45,8 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # so a gate that means to SKIP on a missing ROMDIR still does.
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 BUILD="${BUILD:-build/m3b_merged26}"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+DFSP_MODE=0; vs_ctl_is perturbed-expectation && DFSP_MODE=1; export DFSP_MODE
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 . "$REPO/tests/lib/decrypt_cache.sh"
 for s in vsavj vsav2 vhunt2; do decrypt_view "$s" "$W/${s}_op.bin" "$W/${s}_data.bin"; done
@@ -55,6 +59,9 @@ W, MERGED = sys.argv[1], sys.argv[2]
 ORIG = {"vsavj": 0x0BD0FA, "vsav2": 0x0D7298, "vhunt2": 0x0D6B2A}   # bank_map.toml [origins]
 D16_VSAVJ = 0x0BF31A                                                 # dispatch_16 in vsavj
 TENANT = {0x10: 0x4F, 0x11: 0x29, 0x13: 0x40}                        # Huitzil / Pyron / Donovan
+import os
+if os.environ.get("DFSP_MODE") == "1":                               # CONTROL=perturbed-expectation: the
+    TENANT[0x13] = 0x41                                              # perturbed table IS what is asserted
 SHELL = {0x10: 0x00, 0x11: 0x01, 0x13: 0x03}
 WIN = 0xA0
 errs = []
@@ -118,8 +125,9 @@ else:
 # must-fire control
 ctl = []
 bad = dict(TENANT); bad[0x13] = 0x41
-if check_tenants(bad, ctl): errs.append("CONTROL: a perturbed expected value was NOT caught")
-else: print("  control: perturbed expectation caught (must-fire)")
+bad[0x13] = 0x41 if TENANT[0x13] != 0x41 else 0x40
+if check_tenants(bad, ctl): errs.append("CONTROL: a perturbed expected value was NOT caught"); print("CONTROL DEAD: perturbed-expectation — a perturbed expected value was NOT caught")
+else: print("CONTROL FIRED: perturbed-expectation — a perturbed expected value is caught against vs2 and vh2")
 for e in errs: print("  FAIL:", e)
 sys.exit(1 if errs else 0)
 PY

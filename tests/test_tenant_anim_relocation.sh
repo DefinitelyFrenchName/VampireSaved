@@ -3,6 +3,8 @@
 # PLACED ANIM CHAINS IS RELOCATED (14z-126b). ci_static: needs the tenant
 # build dirs, no ROMDIR, no emulator, ~5 s.
 #
+# MUST-FIRE: perturbed-copy: planted-pointer — a copy of the first tenant's verify_data.bin with ONE node's +4 rewritten to a source-range address must fail section 1 (mode: the loop audits that copy in the tenant's place)
+#
 # THE DEFECT CLASS IT LOCKS. A tenant's animation is extracted from vs2 and
 # PLACED elsewhere in the built image (Donovan: vs2 `PRG:0x27F548` ->
 # `PRG:0x0D3070`, 135,424 bytes). Every node's sprite-record pointer at +4 must be rewritten by
@@ -66,9 +68,21 @@ if [ "$present" = 0 ]; then
 fi
 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+. "$(dirname "$0")/lib/controls.sh"; vs_ctl_mode "$0"
+# THE EXECUTABLE FORM: under CONTROL=planted-pointer the first present tenant is
+# audited on a planted COPY instead of its build dir, and this run must FAIL.
+MODE_B=""
+if vs_ctl_is planted-pointer; then
+    for b in $BUILDS; do [ -f "build/$b/verify_data.bin" ] && { MODE_B="$b"; break; }; done
+    mkdir -p "$W/mode/patch" "$W/mode/extract"
+    cp "build/$MODE_B/patch/placements.json" "$W/mode/patch/"; cp "build/$MODE_B/extract/regions.json" "$W/mode/extract/"
+    python3 tools/anim_reloc_audit.py "build/$MODE_B" --json "$W/mode_real.json" > /dev/null 2>&1 || { echo "FAIL: the audit failed on build/$MODE_B"; exit 1; }
+    python3 tools/plant_anim_reloc_control.py "build/$MODE_B" "$W/mode" "$W/mode_real.json" > "$W/mode.plant.log" 2>&1 \
+        || { echo "FAIL: could not plant the pointer:"; sed 's/^/    /' "$W/mode.plant.log"; exit 1; }
+fi
 
 for b in $BUILDS; do
-    D="build/$b"
+    D="build/$b"; [ "$b" = "$MODE_B" ] && D="$W/mode"
     if [ ! -f "$D/verify_data.bin" ] || [ ! -f "$D/patch/placements.json" ] \
        || [ ! -f "$D/extract/regions.json" ]; then
         echo "  skip  $b (build dir absent or incomplete)"; continue
@@ -108,12 +122,12 @@ if [ -n "$CTL" ]; then
         python3 tools/anim_reloc_audit.py "$W/ctl" --json "$W/ctl.json" >/dev/null 2>&1
         n=$(python3 -c 'import json,sys; print(len(json.load(open(sys.argv[1]))["in_source_range"]))' "$W/ctl.json" 2>/dev/null || echo 0)
         if [ "$n" != 0 ]; then
-            ok "control: a planted source-range pointer is detected ($CTL)"
+            vs_ctl_fired planted-pointer "a planted source-range pointer is detected ($CTL)"; ok "control fires"
         else
-            bad "control: a planted source-range pointer was NOT detected — the check is vacuous"
+            vs_ctl_dead planted-pointer "a planted source-range pointer was NOT detected — the check is vacuous"; bad "control"
         fi
     else
-        bad "control: could not build the perturbed copy:"; sed 's/^/        /' "$W/ctl.plant.log" | head -6
+        vs_ctl_dead planted-pointer "could not build the perturbed copy"; bad "control:"; sed 's/^/        /' "$W/ctl.plant.log" | head -6
     fi
 fi
 

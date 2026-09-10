@@ -2,6 +2,13 @@
 # test_freeze_artifacts_current.sh — TRACKED ARTIFACTS THAT FOLLOW THE ROMSET
 # MUST HAVE BEEN REFRESHED AT THE CURRENT FREEZE. (14z-144.)
 #
+# MUST-FIRE: perturbed-copy: one-value-change — build/merged1's ops with ONE value changed at an unchanged op count must fail section 1 (instance 3's shape; mode: that copy is compared)
+# MUST-FIRE: known-bad: non-current-header — a prg_window header naming a non-current build dir must fail section 2 (mode: that header is what section 2 reads)
+# MUST-FIRE: known-bad: stale-dir — a bundles-table row naming a superseded build dir as current must fail section 4 (mode: the row joins the real table)
+# MUST-FIRE: known-bad: stale-fingerprint — a row naming a wrong fingerprint as CURRENT must fail section 4
+# MUST-FIRE: known-bad: unregistered-but-registered — a row saying UNREGISTERED while naming a registered current build must fail section 4
+# MUST-FIRE: known-bad: program-key-alias — a row naming the program-key alias of the huitzil freeze must fail section 4 (whole-set wins)
+#
 # WHY THIS EXISTS, and it is measured rather than argued. [VSP-178] says "a
 # frozen expectation FOLLOWS whatever moves it, whatever the gate's cadence
 # says". That rule was written at 14z-134 after test_mister_prg_window's pair
@@ -66,12 +73,17 @@ for v in DON HUI PYR STOCK; do
     [ -n "$x" ] || { echo "FAIL: could not read the $v default from tests/run_all_emulator.sh"; exit 1; }
 done
 echo "== the current freeze, per tests/run_all_emulator.sh: $MERGED (don $DON, hui $HUI, pyr $PYR, stock $STOCK)"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+FAC_MODE="${VS_CTL:-}"; export FAC_MODE
 
 MERGED="$MERGED" DON="$DON" HUI="$HUI" PYR="$PYR" STOCK="$STOCK" python3 - <<'PY'
 import json, os, re, sys
 from pathlib import Path
 merged = os.environ["MERGED"]
+MODE = os.environ.get("FAC_MODE", "")   # the CONTROL name: the known-bad input joins / replaces the real one
 fails, notes = [], []
+def fired(n, m): print(f"CONTROL FIRED: {n} — {m}")
+def dead(n, m): print(f"CONTROL DEAD: {n} — {m}"); fails.append(f"CONTROL DID NOT FIRE — {n}")
 
 def ops(p):
     o = json.loads(Path(p).read_text())
@@ -95,6 +107,11 @@ elif not dst.exists():
     notes.append(f"1: SKIP — {dst} absent (no current merged build to compare against)")
 else:
     a, b = ops(src), ops(dst)
+    if MODE == "one-value-change":                 # the mode: instance 3's shape on the real comparison
+        a = [dict(o) for o in a]
+        for o in a:
+            if "hex" in o and isinstance(o["hex"], str) and len(o["hex"]) > 4:
+                o["hex"] = ("0" if o["hex"][0] != "0" else "1") + o["hex"][1:]; break
     ka, kb = set(map(opkey, a)), set(map(opkey, b))
     if ka != kb:
         fails.append(f"1: build/merged1 is STALE against {merged}: "
@@ -113,6 +130,8 @@ if not exp.exists():
     fails.append(f"2: {exp} is missing")
 else:
     hdr = [l for l in exp.read_text().splitlines() if l.startswith("#")]
+    if MODE == "non-current-header":
+        hdr = ["# frozen on merged-m0 (build/definitely_not_the_current_dir)"]
     dirs = re.findall(r"\(build/([A-Za-z0-9_]+)\)", "\n".join(hdr))
     want = merged.split("/", 1)[1]
     if not dirs:
@@ -139,20 +158,15 @@ if src.exists() and dst.exists():
                 o["hex"] = ("0" if o["hex"][0] != "0" else "1") + o["hex"][1:]
                 break
         if set(map(opkey, pert)) == set(map(opkey, ops(dst))):
-            fails.append("3: CONTROL DID NOT FIRE — a one-value perturbation at "
-                         "an unchanged op count is invisible to the comparison")
+            dead("one-value-change", "a one-value perturbation at an unchanged op count is invisible to the comparison")
         else:
-            notes.append("3: control fired — a one-VALUE change at an unchanged "
-                         "op count is caught (this is instance 3, the shape a "
-                         "count-based check would miss)")
+            fired("one-value-change", "a one-VALUE change at an unchanged op count is caught (instance 3, the shape a count-based check would miss)")
 
 hdr_txt = "# frozen on merged-m0 (build/definitely_not_the_current_dir)"
 if re.findall(r"\(build/([A-Za-z0-9_]+)\)", hdr_txt)[0] == merged.split("/", 1)[1]:
-    fails.append("3: CONTROL DID NOT FIRE — a wrong build dir in the header "
-                 "reads as current")
+    dead("non-current-header", "a wrong build dir in the header reads as current")
 else:
-    notes.append("3: control fired — a header naming a non-current build dir is "
-                 "caught by section 2")
+    fired("non-current-header", "a header naming a non-current build dir is caught by section 2")
 
 # ── 4. docs/project/patch_index.md — the REGISTRATION CELLS ─────────────────
 # The romset-bundles table carries, per track, "current generation **<name>** =
@@ -297,6 +311,17 @@ for l in lines:
         continue
     if inside and l.startswith("|") and not re.match(r"^\|\s*(Patch|-+)\s*\|", l):
         rows.append(l)
+CTL_ROWS = {}
+if truth.get("DON", {}).get("names"):
+    CTL_ROWS["stale-dir"] = "| x | current generation **donovan-m3** = `build/don_m3` | - |"
+    CTL_ROWS["stale-fingerprint"] = f"| x | **CURRENT `deadbeef`** (donovan-m22, `build/{truth['DON']['dir']}`) | - |"
+    CTL_ROWS["unregistered-but-registered"] = f"| x | **UNREGISTERED** — `build/{truth['DON']['dir']}` expectation sets NOT yet frozen | - |"
+if truth.get("HUI", {}).get("names") and "huitzil-m26" not in truth["HUI"]["names"]:
+    CTL_ROWS["program-key-alias"] = f"| x | current generation **huitzil-m26** = `build/{truth['HUI']['dir']}` | - |"
+if MODE in ("stale-dir", "stale-fingerprint", "unregistered-but-registered", "program-key-alias"):
+    if MODE not in CTL_ROWS:
+        print(f"REFUSED: CONTROL={MODE} is not a mode of this gate (its build is not on disk / registered)"); sys.exit(3)
+    rows.append(CTL_ROWS[MODE])                  # the mode: the known-bad row joins the REAL table
 if not rows:
     fails.append("4: the 'Romset patch bundles' table was not found in patch_index.md")
 else:
@@ -313,25 +338,21 @@ else:
 def ctl(name, row, want_fail, must_contain=None):
     fs, _ = check_rows([row])
     hit = any((must_contain or "") in f for f in fs) if want_fail else not fs
-    if hit:
-        notes.append(f"4c: control {name} " + ("fired" if want_fail else "stayed quiet"))
+    if want_fail:
+        if hit: fired(name, f"the synthetic row is caught ({must_contain})")
+        else: dead(name, f"the synthetic row passed — {fs[:2]}")
+    elif hit:
+        notes.append(f"4c: must-not-fire {name} stayed quiet")
     else:
-        fails.append(f"4c: CONTROL {name} DID NOT " + ("FIRE" if want_fail else "STAY QUIET")
-                     + f" — {fs[:2]}")
+        fails.append(f"4c: MUST-NOT-FIRE {name} DID NOT STAY QUIET — {fs[:2]}")
 
+for name, row in CTL_ROWS.items():
+    ctl(name, row, True, {"stale-dir": "names build/don_m3", "stale-fingerprint": "fingerprint deadbeef",
+                          "unregistered-but-registered": "UNREGISTERED", "program-key-alias": "names huitzil-m26"}[name])
 if truth.get("DON", {}).get("names"):
-    ctl("a (stale dir)", "| x | current generation **donovan-m3** = `build/don_m3` | - |", True, "names build/don_m3")
-    ctl("b (stale fingerprint)", f"| x | **CURRENT `deadbeef`** (donovan-m22, `build/{truth['DON']['dir']}`) | - |", True, "fingerprint deadbeef")
-    ctl("c (history is not a target)",
+    ctl("history-is-not-a-target",
         "| x | ~~current generation **donovan-m3** = `build/don_m3`~~ *(this cell read "
         "\"current twin `build/don_m3`\")* — prior donovan-m3 `build/don_m3` | - |", False)
-    ctl("d (UNREGISTERED but registered)",
-        f"| x | **UNREGISTERED** — `build/{truth['DON']['dir']}` expectation sets NOT yet frozen | - |",
-        True, "UNREGISTERED")
-if truth.get("HUI", {}).get("names") and "huitzil-m26" not in truth["HUI"]["names"]:
-    ctl("e (program-key alias: whole-set wins)",
-        f"| x | current generation **huitzil-m26** = `build/{truth['HUI']['dir']}` | - |",
-        True, "names huitzil-m26")
 
 for n in notes:
     print("  " + n)

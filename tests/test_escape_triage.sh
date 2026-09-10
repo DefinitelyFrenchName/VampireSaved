@@ -1,6 +1,8 @@
 #!/bin/sh
 # test_escape_triage.sh — H3.1's verdicts, frozen (14z-100 hardening).
 #
+# MUST-FIRE: known-bad: covered-regions-raw — the classifier over COVERED regions (--all-regions) must yield raw LIVE-RISK verdicts by the hundreds, so a zero means it stopped discriminating (mode: that verdict set is compared against the frozen one and must fail)
+#
 # tools/triage_pcrel_escapes.py classifies every UNCOVERED word-form pc-rel
 # branch escape by where it lands on the MERGED placements. The 14z-100
 # sweep closed the class: 25 sites, ZERO live — 22 ADJACENT-OK (the huitzil
@@ -29,18 +31,21 @@ for d in build/don_m22/extract build/hui56/extract build/pyron41/extract \
     [ -e "$d" ] || { echo "SKIP: $d absent"; exit 0; }
 done
 fail=0
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 
 echo "== section 0: must-fire control (covered regions' raw escapes)"
 N="$(python3 tools/triage_pcrel_escapes.py --all-regions 2>/dev/null | grep -c "LIVE RISK" || true)"
 if [ "$N" -ge 100 ]; then
-    echo "   ok: classifier discriminates ($N raw LIVE-RISK verdicts on covered regions)"
+    vs_ctl_fired covered-regions-raw "classifier discriminates ($N raw LIVE-RISK verdicts on covered regions)"
 else
-    echo "FAIL: only $N raw verdicts — the classifier stopped discriminating"; fail=1
+    vs_ctl_dead covered-regions-raw "only $N raw verdicts — the classifier stopped discriminating"; fail=1
 fi
 
 echo "== section 1: the frozen verdict set"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
-python3 tools/triage_pcrel_escapes.py | sort > "$W/got.txt"
+# under CONTROL=covered-regions-raw the raw --all-regions set IS the verdict set: it must not match the freeze
+TRIAGE_ARGS=""; vs_ctl_is covered-regions-raw && TRIAGE_ARGS="--all-regions"
+python3 tools/triage_pcrel_escapes.py $TRIAGE_ARGS | sort > "$W/got.txt"
 if diff -u tests/expected/escape_triage.txt "$W/got.txt" > "$W/diff.txt"; then
     echo "   ok: 25 verdicts unchanged since reviewed (22 ADJACENT-OK + 3 reviewed-FP)"
 else

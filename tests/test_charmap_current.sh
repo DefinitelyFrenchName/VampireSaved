@@ -5,6 +5,9 @@
 # tools/charmap_gen.py -> tools/charmap_md.py and must equal a regeneration.
 # ci_static: needs the three solo build dirs; no ROM read, no emulator, ~20 s.
 #
+# MUST-FIRE: perturbed-copy: changed-built-byte — a copy of donovan's build with ONE value byte changed inside the placed hitbox region must regenerate a different map, its unattributed count up by one (mode: that copy is donovan's build in the main loop)
+# MUST-FIRE: perturbed-copy: added-override — an override row applied to donovan's generation must change the map (mode: the main loop generates donovan with that override file)
+#
 # WHAT IT HOLDS. The map is the maintainer's instrument for "is our tenant
 # VS2-exact, and where not, why?" — every difference carries an attribution
 # and the UNATTRIBUTED counts are frozen by this cmp: a byte that starts to
@@ -45,6 +48,7 @@ fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 
 for b in "$DON" "$HUI" "$PYR"; do
     for f in extract/regions.json verify_data.bin patch/placements.json; do
@@ -52,10 +56,42 @@ for b in "$DON" "$HUI" "$PYR"; do
     done
 done
 
+# THE PERTURBATIONS, built first from the REAL donovan build (the control
+# section below runs them; under CONTROL=<name> the named one is what the
+# main loop generates donovan from, and this run must FAIL).
+REAL_DON="$DON"
+mkdir -p "$W/ctl/extract" "$W/ctl/patch"
+cp "$DON/extract/regions.json" "$W/ctl/extract/"; cp "$DON"/extract/region_*.bin "$W/ctl/extract/"
+cp "$DON/patch/placements.json" "$W/ctl/patch/"; [ -f "$DON/patch/effect_map.json" ] && cp "$DON/patch/effect_map.json" "$W/ctl/patch/"
+[ -f "$DON/patch/patch.json" ] && cp "$DON/patch/patch.json" "$W/ctl/patch/"; [ -f "$DON/patch/effect_lists.bin" ] && cp "$DON/patch/effect_lists.bin" "$W/ctl/patch/"
+python3 - "$DON/verify_data.bin" "$W/ctl/verify_data.bin" "$W/ctl/patch/placements.json" <<'PY'
+import sys, json
+img = bytearray(open(sys.argv[1], "rb").read())
+dst = json.load(open(sys.argv[3]))["regions"]["hitbox"]["dst"]
+img[dst + 0x100] ^= 0x01     # one byte inside the placed hitbox region
+open(sys.argv[2], "wb").write(bytes(img))
+PY
+cat > "$W/ov.toml" <<'EOF'
+[[override]]
+id = "ctl_row"
+path = "region/hitbox/0x100"
+expect = "__EXP__"
+value = "__VAL__"
+stage = 6
+note = "control"
+EOF
+exp="$(python3 -c "import sys; b=open('$DON/extract/region_hitbox.bin','rb').read(); print(b[0x100:0x101].hex())")"
+val="$(python3 -c "print('%02x' % ((0x$exp ^ 1) & 0xff))")"
+sed -i '' "s/__EXP__/$exp/; s/__VAL__/$val/" "$W/ov.toml"
+GEN_DON_ARGS=""
+vs_ctl_is changed-built-byte && DON="$W/ctl"
+vs_ctl_is added-override && GEN_DON_ARGS="--overrides $W/ov.toml"
+
 echo "== test_charmap_current: docs/project/tables/chars/ follow the builds =="
 for pair in "$DON:donovan" "$HUI:huitzil" "$PYR:pyron"; do
     b="${pair%%:*}"; n="${pair##*:}"
-    python3 tools/charmap_gen.py "$b" "$W/$n.json" >"$W/$n.gen.log" 2>&1 \
+    gen_args=""; [ "$n" = donovan ] && gen_args="$GEN_DON_ARGS"
+    python3 tools/charmap_gen.py "$b" "$W/$n.json" $gen_args >"$W/$n.gen.log" 2>&1 \
         || { bad "$n: charmap_gen failed on $b"; sed 's/^/        /' "$W/$n.gen.log" | tail -5; continue; }
     python3 tools/charmap_md.py "$W/$n.json" "$W/$n.md" --anim "$W/${n}_anim.md" >/dev/null 2>&1 \
         || { bad "$n: charmap_md failed"; continue; }
@@ -82,45 +118,26 @@ for pair in "$DON:donovan" "$HUI:huitzil" "$PYR:pyron"; do
 done
 
 # --- control (a): one built byte changed inside the hitbox region -> different map, +1 unattributed
-mkdir -p "$W/ctl/extract" "$W/ctl/patch"
-cp "$DON/extract/regions.json" "$W/ctl/extract/"; cp "$DON"/extract/region_*.bin "$W/ctl/extract/"
-cp "$DON/patch/placements.json" "$W/ctl/patch/"; [ -f "$DON/patch/effect_map.json" ] && cp "$DON/patch/effect_map.json" "$W/ctl/patch/"
-[ -f "$DON/patch/patch.json" ] && cp "$DON/patch/patch.json" "$W/ctl/patch/"; [ -f "$DON/patch/effect_lists.bin" ] && cp "$DON/patch/effect_lists.bin" "$W/ctl/patch/"
-python3 - "$DON/verify_data.bin" "$W/ctl/verify_data.bin" "$W/ctl/patch/placements.json" <<'PY'
-import sys, json
-img = bytearray(open(sys.argv[1], "rb").read())
-dst = json.load(open(sys.argv[3]))["regions"]["hitbox"]["dst"]
-img[dst + 0x100] ^= 0x01     # one byte inside the placed hitbox region
-open(sys.argv[2], "wb").write(bytes(img))
-PY
+# (compared against a generation from the REAL build, whatever the mode swapped in)
+python3 tools/charmap_gen.py "$REAL_DON" "$W/real.json" >/dev/null 2>&1 || bad "control setup: generator failed on the real build"
 python3 tools/charmap_gen.py "$W/ctl" "$W/ctl.json" >/dev/null 2>&1 || bad "control (a): generator failed on the perturbed copy"
-if cmp -s "$W/ctl.json" "$W/donovan.json"; then
-    bad "control (a): a changed built byte regenerated an IDENTICAL map — the check is not checking"
+before="$(grep -o '"region_bytes_unattributed": [0-9]*' "$W/real.json" | grep -o '[0-9]*$')"
+if cmp -s "$W/ctl.json" "$W/real.json"; then
+    vs_ctl_dead changed-built-byte "a changed built byte regenerated an IDENTICAL map — the check is not checking"; bad "control (a)"
 else
-    before="$(grep -o '"region_bytes_unattributed": [0-9]*' "$W/donovan.json" | grep -o '[0-9]*$')"
     after="$(grep -o '"region_bytes_unattributed": [0-9]*' "$W/ctl.json" | grep -o '[0-9]*$')"
-    if [ "$after" -eq "$((before + 1))" ]; then ok "control (a): one changed built byte -> unattributed $before -> $after (fires)"
-    else bad "control (a): unattributed went $before -> $after, expected +1"; fi
+    if [ "$after" -eq "$((before + 1))" ]; then vs_ctl_fired changed-built-byte "one changed built byte -> unattributed $before -> $after"; ok "control (a) fires"
+    else vs_ctl_dead changed-built-byte "unattributed went $before -> $after, expected +1"; bad "control (a)"; fi
 fi
 
-# --- control (b): an override row shows as ours_source override:<id>
-cat > "$W/ov.toml" <<'EOF'
-[[override]]
-id = "ctl_row"
-path = "region/hitbox/0x100"
-expect = "__EXP__"
-value = "__VAL__"
-stage = 6
-note = "control"
-EOF
-exp="$(python3 -c "import sys; b=open('$DON/extract/region_hitbox.bin','rb').read(); print(b[0x100:0x101].hex())")"
-val="$(python3 -c "print('%02x' % ((0x$exp ^ 1) & 0xff))")"
-sed -i '' "s/__EXP__/$exp/; s/__VAL__/$val/" "$W/ov.toml"
+# --- control (b): an override row changes the map and attributes the byte (ours_source override:<id>)
 python3 tools/charmap_gen.py "$W/ctl" "$W/ctl2.json" --overrides "$W/ov.toml" >/dev/null 2>&1 || bad "control (b): generator refused the override"
-if grep -q '"override:ctl_row"' "$W/ctl2.json" && [ "$(grep -o '"region_bytes_unattributed": [0-9]*' "$W/ctl2.json" | grep -o '[0-9]*$')" -eq "$before" ]; then
-    ok "control (b): the override attributes the changed byte (override:ctl_row; unattributed back to $before)"
+if cmp -s "$W/ctl2.json" "$W/ctl.json"; then
+    vs_ctl_dead added-override "the override row left the map IDENTICAL"; bad "control (b)"
+elif grep -q '"override:ctl_row"' "$W/ctl2.json" && [ "$(grep -o '"region_bytes_unattributed": [0-9]*' "$W/ctl2.json" | grep -o '[0-9]*$')" -eq "$before" ]; then
+    vs_ctl_fired added-override "the override changes the map and attributes the byte (override:ctl_row; unattributed back to $before)"; ok "control (b) fires"
 else
-    bad "control (b): the override did not attribute the byte"
+    vs_ctl_dead added-override "the override changed the map but did not attribute the byte"; bad "control (b)"
 fi
 
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

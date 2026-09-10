@@ -3,6 +3,10 @@
 # content extents it depends on have not moved. (14z-107 (4);
 # docs/project/mister_map.md is the design this gate defends.)
 #
+# MUST-FIRE: known-bad: untrimmed-qsound — the UNTRIMMED 16 MB QSound region must overflow both the 26-bit ioctl_addr port and the 16-bit header start word (mode: the fit is computed with it and must fail)
+# MUST-FIRE: known-bad: obj-bank5-plus-1mb — one extra megabyte of the obj-bank-5 REGION must overflow SDRAM bank 0 (mode: the placement is modelled with it and must fail)
+# MUST-FIRE: known-bad: no-scramble — the tile-code-is-its-address identity must FAIL without the CPS-2 scramble (mode: the identity is checked with the scramble removed and must fail)
+#
 # WHY IT EXISTS. The bank-repack map has to fit the 64 MB tier, and the fit is
 # a function of the DECLARED REGION SIZES the MRA downloads. It also freezes
 # four content extents, which bound where content LIVES:
@@ -66,6 +70,8 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 BUILD="${MAP_FIT_BUILD:-build/m3b_merged26}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+MAPFIT_MODE="${VS_CTL:-}"; export MAPFIT_MODE
 [ -f "$BUILD/rompath/vsavjw.zip" ] || {
     echo "SKIP: no WIDE romset at $BUILD/rompath/vsavjw.zip"; exit 0; }
 [ -f "$BUILD/patch/effect_map.json" ] || {
@@ -77,6 +83,7 @@ sys.path.insert(0, "tools")
 import gfx_tiles as G
 
 BUILD = sys.argv[1]
+MODE = os.environ.get("MAPFIT_MODE", "")   # the CONTROL name: the known-bad input replaces the real one
 errs = []
 
 
@@ -195,7 +202,7 @@ def rom_layout(qs_len):
 IOCTL_MAX = 1 << 26          # jtframe_mem_ports.inc:1 — input [25:0] ioctl_addr
 WORD_MAX = 1 << 16           # corerom.go set_header_offset — 16-bit start word
 
-size, words, starts = rom_layout(QS_PLACED)
+size, words, starts = rom_layout(0x1000000 if MODE == "untrimmed-qsound" else QS_PLACED)
 print(f"  .rom size {size} B ({size/2**20:.3f} MB); header words {words}")
 if size > IOCTL_MAX:
     bad(f".rom {size} B exceeds the 26-bit ioctl_addr ceiling {IOCTL_MAX}")
@@ -240,7 +247,7 @@ def bank_tops(rows):
     return top[0], top[1]
 
 
-rows = placement(QS_PLACED)
+rows = placement(QS_PLACED, c5_len=GROUPC_BANK + (1 << 20)) if MODE == "obj-bank5-plus-1mb" else placement(QS_PLACED)
 for i, (n1, b1, o1, l1) in enumerate(rows):
     for n2, b2, o2, l2 in rows[i + 1:]:
         if b1 == b2 and o1 < o2 + l2 and o2 < o1 + l1:
@@ -295,35 +302,35 @@ def identity_holds(f, codes):
 SAMPLE = ([0, 1, 0x3F, 0x1FFF, 0x2000, 0x3FFF, 0x4000, 0x7FFF, 0x8000,
            0xEE73, 0xFFDB, 0xFFFF, 0x10000, 0x1FFFF]
           + list(range(0, 0x20000, 61)))
-if identity_holds(scramble, SAMPLE):
+if identity_holds(wrong_scramble if MODE == "no-scramble" else scramble, SAMPLE):
     print(f"  ok scramble o interleave = identity over {len(SAMPLE)} codes "
           "(SDRAM addr = code*128)")
 else:
     bad("the CPS-2 GFX scramble does NOT cancel the .rom interleave — every "
         "footprint in this gate and in mister_map.md is then wrong")
 if identity_holds(wrong_scramble, SAMPLE):
-    bad("control did not fire: the identity check passes with NO scramble, "
-        "so it is not testing the permutation")
+    print("CONTROL DEAD: no-scramble — the identity check passes with NO scramble, so it is not testing the permutation")
+    bad("control did not fire: no-scramble")
 else:
-    print("  ok scramble control fired (identity fails without the scramble)")
+    print("CONTROL FIRED: no-scramble — the identity fails without the scramble")
 
 # ── 7. controls ────────────────────────────────────────────────────────
 print("== control A: the UNTRIMMED 16 MB QSound region must be rejected ==")
 csize, cwords, _ = rom_layout(0x1000000)
 if csize <= IOCTL_MAX:
-    bad("control A did not fire: untrimmed .rom fits 26-bit ioctl_addr")
+    print("CONTROL DEAD: untrimmed-qsound — the untrimmed .rom fits the 26-bit ioctl_addr"); bad("control A did not fire")
 elif cwords["firmware"] < WORD_MAX:
-    bad("control A half-fired: firmware start word still fits 16 bits")
+    print("CONTROL DEAD: untrimmed-qsound — half-fired: the firmware start word still fits 16 bits"); bad("control A half-fired")
 else:
-    print(f"  ok control A fired ({csize/2**20:.2f} MB > 64 MB, and "
-          f"qsnd_start {cwords['firmware']} KiB > 65535)")
+    print(f"CONTROL FIRED: untrimmed-qsound — {csize/2**20:.2f} MB > 64 MB, and "
+          f"qsnd_start {cwords['firmware']} KiB > 65535")
 
 print("== control B: +1 MB of the obj-bank-5 REGION must overflow bank 0 ==")
 cb0, _ = bank_tops(placement(QS_PLACED, c5_len=GROUPC_BANK + (1 << 20)))
 if cb0 <= BANK:
-    bad(f"control B did not fire: bank 0 still fits at {cb0:#x}")
+    print(f"CONTROL DEAD: obj-bank5-plus-1mb — bank 0 still fits at {cb0:#x}"); bad("control B did not fire")
 else:
-    print(f"  ok control B fired (bank 0 would need {cb0-BANK} B more)")
+    print(f"CONTROL FIRED: obj-bank5-plus-1mb — bank 0 would need {cb0-BANK} B more")
 
 if errs:
     print(f"\nFAIL: MiSTer map fit — {len(errs)} problem(s)")

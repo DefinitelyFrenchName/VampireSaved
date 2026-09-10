@@ -3,6 +3,8 @@
 # and can never name the wrong one (14z-133b). Static tier: ROMDIR + the
 # merged build + emu/jtcores; ~1 min (three ROM-free MRA generations).
 #
+# MUST-FIRE: known-bad: foreign-rompath — a rompath whose vsavjw.zip differs by one member byte (so one CRC part cannot resolve) must make the generator REFUSE and write no block (mode: section 1 generates for that rompath and must fail)
+#
 # WHY. Maintainer, mid-field-test on M16, 2026-09-05: "it might be nicer to
 # have the merged build referenced somewhere in the mister builds" — and,
 # ruled the same hour, NOT in the MRA <name> (no menu churn). Until then the
@@ -43,6 +45,20 @@ trap 'rm -rf "$WORK"' EXIT
 fail=0
 WIDE_MRA="Vampire Saved - CPS-2 WIDE (Japan 970519).mra"
 STOCK_MRA="Vampire Savior The Lord of Vampire (Japan 970519).mra"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+# THE KNOWN-BAD ROMPATH, built first: the current build's zips with one byte
+# of vsw.37m flipped. Under CONTROL=foreign-rompath it IS the build section 1
+# generates for, and this run must FAIL.
+mkdir -p "$WORK/bad/rompath"; cp "$BUILD/rompath/"*.zip "$WORK/bad/rompath/"
+python3 - "$WORK/bad/rompath/vsavjw.zip" <<'PY'
+import sys, zipfile
+p = sys.argv[1]; z = zipfile.ZipFile(p); infos = z.infolist(); data = {i.filename: z.read(i.filename) for i in infos}; z.close()
+b = bytearray(data["vsw.37m"]); b[0] ^= 0xFF; data["vsw.37m"] = bytes(b)
+o = zipfile.ZipFile(p, "w", zipfile.ZIP_DEFLATED)
+for i in infos: o.writestr(i.filename, data[i.filename])
+o.close()
+PY
+GEN_BUILD="$BUILD"; vs_ctl_is foreign-rompath && GEN_BUILD="$WORK/bad"
 
 echo "== 1. --wide $BUILD: the WIDE MRA names the freeze, the stock MRA does not =="
 # THE EXPECTATION, resolved INDEPENDENTLY of the tool: the whole-set key from
@@ -58,7 +74,7 @@ if [ -z "$expect" ]; then
 fi
 [ -n "$expect" ] || { echo "  FAIL: neither registry.tsv nor a freeze tag carries this build's whole-set key $wkey"; fail=1; }
 zsha="$(shasum "$BUILD/rompath/vsavjw.zip" | cut -c1-40)"
-tools/mister_mra.sh --core cps2w --wide "$BUILD" --no-rom --quiet --out "$WORK/a" || { echo "  FAIL: generation with --wide failed"; fail=1; }
+tools/mister_mra.sh --core cps2w --wide "$GEN_BUILD" --no-rom --quiet --out "$WORK/a" || { echo "  FAIL: generation with --wide failed"; fail=1; }
 if grep -q "BUILD  $expect " "$WORK/a/mra/$WIDE_MRA" 2>/dev/null; then echo "  ok: header names $expect (build_fingerprint's own resolution)"
 else echo "  FAIL: header does not name $expect: $(grep -m1 'BUILD' "$WORK/a/mra/$WIDE_MRA" 2>/dev/null)"; fail=1; fi
 grep -q "vsavjw.zip  sha1 $zsha" "$WORK/a/mra/$WIDE_MRA" && echo "  ok: header carries the zip's sha1 $zsha" \
@@ -67,7 +83,7 @@ case "$expect" in merged-m*) grep -q "mark M${expect#merged-m} " "$WORK/a/mra/$W
 stock="$(find "$WORK/a/mra" -name "$STOCK_MRA" | head -1)"   # the non-main set is filed under _alternatives/
 [ -n "$stock" ] || { echo "  FAIL: no stock control MRA emitted"; fail=1; }
 [ -n "$stock" ] && grep -q "BUILD" "$stock" && { echo "  FAIL: the STOCK CONTROL MRA carries a build block"; fail=1; } || echo "  ok: stock control MRA untouched (jtframe's own header)"
-python3 -c "import xml.dom.minidom,sys; xml.dom.minidom.parse(sys.argv[1])" "$WORK/a/mra/$WIDE_MRA" && echo "  ok: still valid XML" || { echo "  FAIL: invalid XML"; fail=1; }
+[ -f "$WORK/a/mra/$WIDE_MRA" ] && python3 -c "import xml.dom.minidom,sys; xml.dom.minidom.parse(sys.argv[1])" "$WORK/a/mra/$WIDE_MRA" && echo "  ok: still valid XML" || { echo "  FAIL: invalid XML (or no MRA emitted)"; fail=1; }
 
 echo "== 2. no --wide: the block says the build is not stated =="
 tools/mister_mra.sh --core cps2w --no-rom --quiet --out "$WORK/b" || { echo "  FAIL: generation without --wide failed"; fail=1; }
@@ -75,27 +91,21 @@ grep -q "BUILD  not stated" "$WORK/b/mra/$WIDE_MRA" && echo "  ok: 'BUILD  not s
     || { echo "  FAIL: an unnamed MRA claims a build: $(grep -m1 BUILD "$WORK/b/mra/$WIDE_MRA")"; fail=1; }
 
 echo "== 3. MUST-FIRE CONTROL: a rompath the MRA was not generated for is REFUSED =="
-mkdir -p "$WORK/bad/rompath"; cp "$BUILD/rompath/"*.zip "$WORK/bad/rompath/"
-python3 - "$WORK/bad/rompath/vsavjw.zip" <<'PY'
-import sys, zipfile
-p = sys.argv[1]; z = zipfile.ZipFile(p); infos = z.infolist(); data = {i.filename: z.read(i.filename) for i in infos}; z.close()
-b = bytearray(data["vsw.37m"]); b[0] ^= 0xFF; data["vsw.37m"] = bytes(b)
-o = zipfile.ZipFile(p, "w", zipfile.ZIP_DEFLATED)
-for i in infos: o.writestr(i.filename, data[i.filename])
-o.close()
-PY
 if tools/mister_mra.sh --core cps2w --wide "$WORK/bad" --no-rom --quiet --out "$WORK/c" > "$WORK/c.log" 2>&1; then
-    echo "  FAIL: the generator ACCEPTED a build whose vsw.37m CRC the MRA does not carry"; fail=1
+    vs_ctl_dead foreign-rompath "the generator ACCEPTED a build whose vsw.37m CRC the MRA does not carry"; fail=1
 else
-    grep -q "REFUSING to name build" "$WORK/c.log" && echo "  ok: control fires — refused: $(grep -o 'REFUSING to name build[^:]*' "$WORK/c.log" | head -1)" \
-        || { echo "  FAIL: generator failed for another reason: $(tail -2 "$WORK/c.log")"; fail=1; }
+    grep -q "REFUSING to name build" "$WORK/c.log" && vs_ctl_fired foreign-rompath "refused: $(grep -o 'REFUSING to name build[^:]*' "$WORK/c.log" | head -1)" \
+        || { vs_ctl_dead foreign-rompath "generator failed for another reason: $(tail -2 "$WORK/c.log")"; fail=1; }
 fi
 [ -f "$WORK/c/mra/$WIDE_MRA" ] && grep -q "BUILD  " "$WORK/c/mra/$WIDE_MRA" && { echo "  FAIL: a build block was written despite the refusal"; fail=1; } || echo "  ok: no build block written"
 
 echo "== 4. idempotent =="
-cp "$WORK/a/mra/$WIDE_MRA" "$WORK/a.before"
-python3 tools/mra_header.py "$WORK/a/mra" --build "$BUILD" >/dev/null 2>&1 || { echo "  FAIL: second rewrite errored"; fail=1; }
-cmp -s "$WORK/a/mra/$WIDE_MRA" "$WORK/a.before" && echo "  ok: a second rewrite changes no byte" || { echo "  FAIL: the rewrite is not idempotent"; fail=1; }
+[ -f "$WORK/a/mra/$WIDE_MRA" ] || { echo "  FAIL: no WIDE MRA from section 1 to rewrite"; fail=1; }
+[ -f "$WORK/a/mra/$WIDE_MRA" ] && cp "$WORK/a/mra/$WIDE_MRA" "$WORK/a.before"
+if [ -f "$WORK/a.before" ]; then
+    python3 tools/mra_header.py "$WORK/a/mra" --build "$BUILD" >/dev/null 2>&1 || { echo "  FAIL: second rewrite errored"; fail=1; }
+    cmp -s "$WORK/a/mra/$WIDE_MRA" "$WORK/a.before" && echo "  ok: a second rewrite changes no byte" || { echo "  FAIL: the rewrite is not idempotent"; fail=1; }
+fi
 
 if [ "$fail" -eq 0 ]; then echo "PASS: the WIDE MRA names its freeze, an unnamed one says so, the wrong build is refused, and the rewrite is idempotent"
 else echo "FAIL: mra build line"; exit 1; fi

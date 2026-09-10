@@ -2,6 +2,10 @@
 # test_capture_kf_ownership.sh — THE CAPTURE-KEYFRAME POINTER TABLE IS
 # HAND-OWNED, AND NO GENERIC bank_map REPOINT MAY WRITE IT (14z-130).
 #
+# MUST-FIRE: perturbed-copy: perturbed-unclaimed-row — an unclaimed row perturbed in a copy of the first image must change the repoint inventory (mode: section 2 reads that copy and must fail)
+# MUST-FIRE: perturbed-copy: fix-on-variant-track — the base-slot fix word planted on donovan's VARIANT-track blob must be caught by section 3 (the 14z-143 defect; mode: section 3 reads that copy)
+# MUST-FIRE: perturbed-copy: fix-gone-on-stock — the 14z-64 fix removed from the base-slot track must be caught by section 3 (mode: section 3 reads that copy)
+#
 # THE TABLE. PRG:0x0BE27A, 32 LONGWORDS indexed by the ATTACKER's char id —
 # the capture-pose installer's block pointer ([VSE-44]; consumers at vsavj
 # 0x02802E / 0x0280C6 / 0x028140, locked by test_capture_pose_sources.sh).
@@ -83,6 +87,8 @@ STOCK="${STOCK:-build/m5_stock17}"
 MERGED="${MERGED:-build/m3b_merged26}"
 
 : "${ROMDIR:?set ROMDIR}"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+KFO_MODE="${VS_CTL:-}"; export KFO_MODE
 
 # the decrypted reference view is ROM-derived (rule 7) and comes from the
 # SHARED CACHE, never a direct decrypt — tests/test_decrypt_cache.sh section 5
@@ -170,7 +176,11 @@ BUILDS = {"donovan": os.environ["DON"], "huitzil": os.environ["HUI"],
           "pyron": os.environ["PYR"], "stock": os.environ["STOCK"],
           "merged": os.environ["MERGED"]}
 
-images, seen = {}, 0
+# THE EXECUTABLE FORM (KFO_MODE = the CONTROL name): the named perturbation is
+# applied to the REAL image as it is loaded, before sections 2/3 read it, and
+# this run must FAIL. Section 4 runs on the REAL images.
+MODE = os.environ.get("KFO_MODE", "")
+images, REAL, seen = {}, {}, 0
 for name, bd in BUILDS.items():
     p = Path(bd) / "verify_data.bin"
     if not p.exists():
@@ -178,6 +188,14 @@ for name, bd in BUILDS.items():
         continue
     seen += 1
     img = p.read_bytes()
+    REAL[name] = img
+    if MODE == "perturbed-unclaimed-row" and not images:          # the first image
+        c = bytearray(img); r = sorted(set(range(NROWS)) - FROZEN[name])[0]
+        struct.pack_into(">I", c, BASE + r * 4, VAN[r] ^ 0x10); img = bytes(c)
+    if MODE == "fix-on-variant-track" and name == "donovan":
+        c = bytearray(img); struct.pack_into(">H", c, rows(img)[0x13] + FIX_OFF, FIX_NEW); img = bytes(c)
+    if MODE == "fix-gone-on-stock" and name == "stock":
+        c = bytearray(img); struct.pack_into(">H", c, rows(img)[0x0F] + FIX_OFF, FIX_OLD); img = bytes(c)
     images[name] = img
     got = {i for i in range(NROWS) if rows(img)[i] != VAN[i]}
     if got != FROZEN[name]:
@@ -193,6 +211,7 @@ if seen == 0:
     print("SKIP: no build dir carries verify_data.bin "
           "(set DON/HUI/PYR/STOCK/MERGED)")
     sys.exit(0)
+
 
 # ── 3. THE MIRROR-VICTIM FIX IS SCOPED TO THE BASE-SLOT TRACK ────────────────
 # REWRITTEN 14z-144. Until then this section asserted the 14z-64 fix rides row
@@ -258,6 +277,7 @@ if base is not None:
                      f"tracks disagree, so the gating is measurably live")
 
 # ── 4. MUST-FIRE CONTROLS ────────────────────────────────────────────────────
+images = REAL                                   # the REAL images, whatever the mode swapped in
 ctl_name = next(iter(images))
 ctl = bytearray(images[ctl_name])
 unclaimed = sorted(set(range(NROWS)) - FROZEN[ctl_name])
@@ -269,11 +289,10 @@ else:
     got = {i for i in range(NROWS)
            if struct.unpack_from(">I", ctl, BASE + i * 4)[0] != VAN[i]}
     if got == FROZEN[ctl_name]:
-        fails.append(f"4: CONTROL DID NOT FIRE — perturbing unclaimed row "
-                     f"{r:#04x} on {ctl_name} left the inventory unchanged")
+        print(f"CONTROL DEAD: perturbed-unclaimed-row — perturbing unclaimed row {r:#04x} on {ctl_name} left the inventory unchanged")
+        fails.append("4: CONTROL DID NOT FIRE — perturbed-unclaimed-row")
     else:
-        notes.append(f"4: control fired — perturbing unclaimed row {r:#04x} on "
-                     f"{ctl_name} is caught by section 2")
+        print(f"CONTROL FIRED: perturbed-unclaimed-row — perturbing unclaimed row {r:#04x} on {ctl_name} is caught by section 2")
 
 # REWRITTEN 14z-144 with the invariant. The old control wrote FIX_OLD into a
 # copy and then asserted the word was not FIX_NEW — trivially true, because it
@@ -286,12 +305,10 @@ if "donovan" in images:
     struct.pack_into(">H", ctl2, t + FIX_OFF, FIX_NEW)     # the 14z-143 defect
     w = struct.unpack_from(">H", ctl2, t + FIX_OFF)[0]
     if w != FIX_OLD:
-        notes.append(f"4: control fired — planting the base-slot fix "
-                     f"{FIX_NEW:#06x} on the VARIANT track is caught by "
-                     f"section 3 (this is exactly the 14z-143 defect)")
+        print(f"CONTROL FIRED: fix-on-variant-track — planting the base-slot fix {FIX_NEW:#06x} on the VARIANT track is caught by section 3 (the 14z-143 defect)")
     else:
-        fails.append("4: CONTROL DID NOT FIRE — the variant-track check does "
-                     "not reject the base-slot word")
+        print("CONTROL DEAD: fix-on-variant-track — the variant-track check does not reject the base-slot word")
+        fails.append("4: CONTROL DID NOT FIRE — fix-on-variant-track")
 
 if "stock" in images:
     ctl3 = bytearray(images["stock"])
@@ -299,12 +316,10 @@ if "stock" in images:
     struct.pack_into(">H", ctl3, t + FIX_OFF, FIX_OLD)     # the fix gone
     w = struct.unpack_from(">H", ctl3, t + FIX_OFF)[0]
     if w != FIX_NEW:
-        notes.append(f"4: control fired — removing the 14z-64 fix from the "
-                     f"BASE-SLOT track is caught by section 3 (the scoping "
-                     f"must not disarm both tracks)")
+        print("CONTROL FIRED: fix-gone-on-stock — removing the 14z-64 fix from the BASE-SLOT track is caught by section 3 (the scoping must not disarm both tracks)")
     else:
-        fails.append("4: CONTROL DID NOT FIRE — the base-slot check does not "
-                     "reject the unfixed word")
+        print("CONTROL DEAD: fix-gone-on-stock — the base-slot check does not reject the unfixed word")
+        fails.append("4: CONTROL DID NOT FIRE — fix-gone-on-stock")
 
 for n in notes:
     print("  " + n)

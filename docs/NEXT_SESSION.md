@@ -1,11 +1,11 @@
-# NEXT SESSION — orientation (rewritten at the 14z-147 CLOSE, 2026-09-10)
+# NEXT SESSION — orientation (rewritten at the 14z-147b CLOSE, 2026-09-10)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## STEP TWO OF THE MUST-FIRE MACHINE, PASS 1 LANDED. NO BUILD BYTE MOVED.
+## STEP TWO OF THE MUST-FIRE MACHINE, PASSES 1 AND 2 LANDED. NO BUILD BYTE MOVED.
 
 M18 (`merged-m18`, `build/m3b_merged26`) is still the current freeze and
 release. `git status -sb` says the push state (the close ends with a push
@@ -17,27 +17,34 @@ Landed this sitting (STATE 14z-147): the contract's READER
 a red controls block into plain FAIL; `run_all_static.sh --exec-controls`
 (every declared control EXECUTED as `CONTROL=<name>` after a PASS — LIES /
 REFUSED / DIED are failures of the run) and `run_all_emulator.sh --controls`;
-the census re-frozen on the grammar with three classes (`declares` 30,
-`header-only` 0, `retrofit-debt` 53); `test_controls_contract.sh`; and the
-whole PORTABLE tier retrofitted — every one of its declaring gates verified
-plain-PASS with every control FIRED and every mode HONOURED.
+the census re-frozen on the grammar with three classes; `test_controls_contract.sh`;
+and the whole PORTABLE tier (pass 1) then the whole STATIC tier (pass 2,
+14z-147b) retrofitted — 49 gates declaring, every one verified plain-PASS with
+every control FIRED and every mode HONOURED. The census now reads `declares`
+49, `header-only` 0, `retrofit-debt` 34 — exactly the emulator tier.
 
 ## START HERE — what is open
 
-- **Must-fire passes 2 and 3**: the `retrofit-debt` class of
-  `tests/expected/must_fire_census.tsv` — 19 static-tier gates, then 34
-  emulator-tier gates (the ten former header-only gates among them: a real
-  control or `# MUST-FIRE: none — <why>` each). The pattern is in the spec:
+- **Must-fire pass 3**: the `retrofit-debt` class of
+  `tests/expected/must_fire_census.tsv` — the 34 emulator-tier gates (the ten
+  former header-only gates among them: a real control or `# MUST-FIRE: none —
+  <why>` each). Each mode costs an emulator run, and the identity bar is the
+  emulator sweep, so it belongs with a freeze or release run. The pattern is in the spec:
   ONE `perturb <name> <copy>` function the control section and the mode both
   call; a copy of the real input under the mode; verify with
   `build/mustfire_14z147/verify_gate.sh`-style loops (plain PASS + every
-  mode HONOURED). One strict run of the tier per pass is the identity bar;
-  the emulator tier's bar is the next release sweep.
+  mode HONOURED); a control the host cannot run REFUSES its mode.
 - **Lift the controls reader into bbh** (`~/Developer/blackbox-harness`): bbh's
   `run-static` prints no controls block, so the lineage's runner prints it only
   when a tier declares or executes something (F1 exact); F2 — opt-in, the real
   portable tier — carries that known delta until bbh gains the reader (its
   `rebaselines.md` is where a re-baseline is declared, loudly).
+- **Define what is IN a release, and ship the end-user how-to README**
+  (maintainer, 2026-09-10): an explicit inventory of what ships and what never
+  does (no ROM, no copyrighted asset — the user supplies their own dumps, as
+  with SMS), a README with the per-platform how-to, and the roundtrip gate
+  asserting both. Start from `docs/project/release_format.md`; present the
+  inventory before writing it (STATE "Decisions pending").
 - **The open decision** (STATE "Decisions pending"): the cadence of
   `run_all_emulator.sh --controls` at release — recommendation (a), the
   release checklist, measured first.
@@ -58,13 +65,12 @@ plain-PASS with every control FIRED and every mode HONOURED.
 3. **An edit anchored on a comment-stripped READ misses every time** — the
    anchor lacked the comment lines between two code lines; anchor on single
    lines or re-read verbatim (project gotcha).
-4. **A background baseline run, then an edit of the runner it was running**
+4. **`cp <doc.md> "<dir>"` reads as a section citation** to checkdocshape —
+   put the doc path in a variable; and `sort -o` on a TSV with a comment
+   header reorders the header — append, never sort, the family TSV.
+5. **A background baseline run, then an edit of the runner it was running**
    voided the baseline — [VSP-110] again; the close's strict run at the same
    commit stood in for "before".
-5. **`cp <doc.md> "<dir>"` reads as a section citation** to checkdocshape —
-   put the doc path in a variable.
-6. **`sort -o` on a TSV with a comment header** reorders the header lines —
-   append, never sort, the family TSV.
 
 **IF A DOC IS TOUCHED:** the eight `--check`s, exit statuses captured directly,
 `${=cmd}` in zsh. **A running script is never edited** ([MSC-54]). **The static

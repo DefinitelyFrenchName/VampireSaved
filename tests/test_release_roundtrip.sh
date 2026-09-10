@@ -1,6 +1,12 @@
 #!/bin/sh
 # test_release_roundtrip.sh — THE RELEASE PACKAGE GATE (14z-105).
 #
+# MUST-FIRE: known-bad: corrupted-patch — a package with one patch byte flipped must be REFUSED by the applier without writing (mode: section 1 applies that package and must fail)
+# MUST-FIRE: known-bad: wrong-target-sha1 — a manifest naming a wrong target sha1 must be refused without writing
+# MUST-FIRE: known-bad: wrong-dump — a reference dump with one byte flipped must be refused without writing (mode: section 1 applies against it)
+# MUST-FIRE: known-bad: planted-reference-chunk — a patch file with a reference-ROM chunk appended must be caught by the rule-7 scan (mode: it sits in the scanned patch set)
+# MUST-FIRE: known-bad: missing-emulator-dir — a release copy without mame/emulator/ must fail the layout check (mode: section 4 checks that copy)
+#
 # A release is a set of xdelta3 patches + a manifest + an applier
 # (tools/package_release.py). This gate is what makes it shippable:
 #   1  ROUND TRIP — package the build, apply the package to the PRISTINE
@@ -55,13 +61,45 @@ NAME="${2:-merged-m18}"  # re-pointed 14z-144 (M18 donovan/jedah freeze) <- 14z-
 command -v xdelta3 >/dev/null || { echo "SKIP: xdelta3 not installed"; exit 77; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 
 echo "== 1. round trip: package -> apply to pristine dumps -> byte-identical =="
 python3 tools/package_release.py "$RP" "$W/rel" --romdir "$ROMDIR" --name "$NAME" \
     --version "$(grep -h '^version_text' build/manifest/donovan.toml | sed 's/.*= *"\(.*\)"/\1/')" \
     > "$W/pack.log" 2>&1 || { echo "FAIL: packager"; tail -5 "$W/pack.log"; exit 1; }
 grep "^packaged" "$W/pack.log"
-python3 "$W/rel/$NAME/apply_release.py" --romdir "$ROMDIR" --out "$W/applied" \
+# THE KNOWN-BAD INPUTS, built right after packaging (section 2 runs them as
+# controls); under CONTROL=<name> the named one is what section 1 APPLIES, and
+# this run must FAIL.
+cp -r "$W/rel/$NAME" "$W/bad_patch"
+pf="$(find "$W/bad_patch/patches" -name '*.xdelta' | head -1)"
+python3 -c "import sys;p=sys.argv[1];b=bytearray(open(p,'rb').read());b[len(b)//2]^=0xFF;open(p,'wb').write(bytes(b))" "$pf"
+cp -r "$W/rel/$NAME" "$W/bad_manifest"
+python3 - "$W/bad_manifest/manifest.json" <<'PY'
+import json, sys
+m = json.load(open(sys.argv[1]))
+for e in m["zips"]["vsavjw.zip"]:
+    if "patch" in e: e["sha1"] = "0" * 40; break
+json.dump(m, open(sys.argv[1], "w"))
+PY
+mkdir -p "$W/bad_roms"
+for z in vsavj vsav vsav2 vhunt2; do ln -s "$ROMDIR/$z.zip" "$W/bad_roms/$z.zip"; done
+rm "$W/bad_roms/vsavj.zip"
+python3 - "$ROMDIR/vsavj.zip" "$W/bad_roms/vsavj.zip" <<'PY'
+import zipfile, sys
+zi, zo = zipfile.ZipFile(sys.argv[1]), zipfile.ZipFile(sys.argv[2], "w")
+for n in zi.namelist():
+    d = bytearray(zi.read(n))
+    if n == "vm3j.05a": d[100] ^= 1
+    zo.writestr(n, bytes(d))
+PY
+APPLY_DIR="$W/rel/$NAME"; APPLY_ROMDIR="$ROMDIR"
+case "$VS_CTL" in
+corrupted-patch)  APPLY_DIR="$W/bad_patch" ;;
+wrong-target-sha1) APPLY_DIR="$W/bad_manifest" ;;
+wrong-dump)       APPLY_ROMDIR="$W/bad_roms" ;;
+esac
+python3 "$APPLY_DIR/apply_release.py" --romdir "$APPLY_ROMDIR" --out "$W/applied" \
     > "$W/apply.log" 2>&1 || { echo "FAIL: applier"; tail -5 "$W/apply.log"; exit 1; }
 python3 - "$RP" "$W/applied" <<'PY' || fail=1
 import sys, zipfile, hashlib, os
@@ -92,43 +130,25 @@ ma="$(python3 tools/artifact_manifest.py "$RP")"; mb="$(python3 tools/artifact_m
     || { echo "FAIL: whole-artifact manifest $ma vs $mb"; fail=1; }
 
 echo "== 2. the applier refuses bad inputs and writes nothing =="
-refuse() { # refuse <label> <reldir> <romdir>
+refuse() { # refuse <name> <reldir> <romdir>
     if python3 "$2/apply_release.py" --romdir "$3" --out "$W/out_$1" > "$W/$1.log" 2>&1; then
-        echo "FAIL: $1 was ACCEPTED"; fail=1
+        vs_ctl_dead "$1" "was ACCEPTED"; fail=1
     elif [ -e "$W/out_$1" ] && ls "$W/out_$1"/*.zip >/dev/null 2>&1; then
-        echo "FAIL: $1 refused but wrote output zips"; fail=1
+        vs_ctl_dead "$1" "refused but wrote output zips"; fail=1
     else
-        echo "  ok: $1 refused ($(tail -1 "$W/$1.log" | cut -c1-70))"
+        vs_ctl_fired "$1" "refused ($(tail -1 "$W/$1.log" | cut -c1-70))"
     fi
 }
-cp -r "$W/rel/$NAME" "$W/bad_patch"
-pf="$(find "$W/bad_patch/patches" -name '*.xdelta' | head -1)"
-python3 -c "import sys;p=sys.argv[1];b=bytearray(open(p,'rb').read());b[len(b)//2]^=0xFF;open(p,'wb').write(bytes(b))" "$pf"
-refuse corrupted_patch "$W/bad_patch" "$ROMDIR"
-cp -r "$W/rel/$NAME" "$W/bad_manifest"
-python3 - "$W/bad_manifest/manifest.json" <<'PY'
-import json, sys
-m = json.load(open(sys.argv[1]))
-for e in m["zips"]["vsavjw.zip"]:
-    if "patch" in e: e["sha1"] = "0" * 40; break
-json.dump(m, open(sys.argv[1], "w"))
-PY
-refuse wrong_target_sha1 "$W/bad_manifest" "$ROMDIR"
-mkdir -p "$W/bad_roms"
-for z in vsavj vsav vsav2 vhunt2; do ln -s "$ROMDIR/$z.zip" "$W/bad_roms/$z.zip"; done
-rm "$W/bad_roms/vsavj.zip"
-python3 - "$ROMDIR/vsavj.zip" "$W/bad_roms/vsavj.zip" <<'PY'
-import zipfile, sys
-zi, zo = zipfile.ZipFile(sys.argv[1]), zipfile.ZipFile(sys.argv[2], "w")
-for n in zi.namelist():
-    d = bytearray(zi.read(n))
-    if n == "vm3j.05a": d[100] ^= 1
-    zo.writestr(n, bytes(d))
-PY
-refuse wrong_dump "$W/rel/$NAME" "$W/bad_roms"
+refuse corrupted-patch   "$W/bad_patch"    "$ROMDIR"
+refuse wrong-target-sha1 "$W/bad_manifest" "$ROMDIR"
+refuse wrong-dump        "$W/rel/$NAME"    "$W/bad_roms"
 
 echo "== 3. rule 7: no verbatim reference-ROM run in any patch file =="
-python3 - "$ROMDIR" "$W/rel/$NAME/patches" "$W/control.xdelta" <<'PY' || fail=1
+# under CONTROL=planted-reference-chunk the scanned set is a COPY of the
+# patches with the control file (a reference chunk appended) inside it
+SCAN_PDIR="$W/rel/$NAME/patches"; PLANT=0
+vs_ctl_is planted-reference-chunk && { cp -r "$W/rel/$NAME/patches" "$W/patches_mode"; SCAN_PDIR="$W/patches_mode"; PLANT=1; }
+PLANT="$PLANT" python3 - "$ROMDIR" "$SCAN_PDIR" "$W/control.xdelta" <<'PY' || fail=1
 import sys, os, zipfile, hashlib
 romdir, pdir, ctrl = sys.argv[1:4]
 WIN = 64
@@ -150,6 +170,10 @@ def scan(path):
             hits += 1
     return len(d), hits
 total = 0; bad = []
+p0 = os.path.join(pdir, sorted(os.listdir(pdir))[0])
+f0 = sorted(os.listdir(p0))[0]
+if os.environ.get("PLANT") == "1":            # the mode: the control file joins the scanned set
+    open(os.path.join(p0, "zz_control.xdelta"), "wb").write(open(os.path.join(p0, f0), "rb").read() + chunk0 + chunk0)
 for root, _, files in os.walk(pdir):
     for f in files:
         n, hits = scan(os.path.join(root, f)); total += n
@@ -158,20 +182,23 @@ if bad:
     print("FAIL: verbatim reference-ROM runs in patches:", bad); sys.exit(1)
 print(f"  ok: {total} patch bytes scanned against {len(idx)} reference chunks — no verbatim run")
 # must-fire control: one reference chunk appended to a copy of a patch
-p0 = os.path.join(pdir, sorted(os.listdir(pdir))[0])
-f0 = sorted(os.listdir(p0))[0]
 open(ctrl, "wb").write(open(os.path.join(p0, f0), "rb").read() + chunk0 + chunk0)
 n, hits = scan(ctrl)
 if not hits:
-    print("FAIL: the rule-7 scan did not fire on a planted reference chunk"); sys.exit(1)
-print(f"  ok: must-fire control — planted reference chunk caught ({hits} hits)")
+    print("CONTROL DEAD: planted-reference-chunk — the rule-7 scan did not fire on a planted reference chunk"); sys.exit(1)
+print(f"CONTROL FIRED: planted-reference-chunk — a planted reference chunk is caught ({hits} hits)")
 PY
 
 echo "== 4. the per-platform layout of the tree's release/$NAME (14z-113, docs/project/release_format.md) =="
 REL="release/$NAME"
 if [ ! -d "$REL" ]; then
+    vs_ctl_is missing-emulator-dir && { echo "REFUSED: CONTROL=missing-emulator-dir is not a mode of this gate (no $REL in the tree)"; exit 3; }
     echo "  (no $REL in the tree — layout check not applicable)"
 else
+    # the known-bad layout, built first; under CONTROL=missing-emulator-dir it
+    # IS the release the checks below read, and this run must FAIL
+    cp -r "$REL" "$W/layout_bad"; rm -rf "$W/layout_bad/mame/emulator"
+    vs_ctl_is missing-emulator-dir && REL="$W/layout_bad"
     for p in fbneo mame mister; do
         for f in manifest.json apply_release.py README.md patches; do
             [ -e "$REL/$p/$f" ] || { echo "FAIL: $REL/$p/$f missing"; fail=1; }
@@ -208,11 +235,10 @@ else
     [ -e "$REL/mister/emulator" ] && { echo "FAIL: emulator patch inside mister/"; fail=1; }
     [ "$fail" = 0 ] && echo "  ok: emulator dirs carry the tree's driver patch + EMULATOR.md; mister/ carries MRAs + BITSTREAM.txt + MISTER.md; no cross-platform leakage"
     # must-fire control: the same checks on a copy with mame/emulator/ removed must FAIL
-    cp -r "$REL" "$W/layout_bad"; rm -rf "$W/layout_bad/mame/emulator"
     if cmp -s "$W/layout_bad/mame/emulator/0002-cps2-wide-v1.patch" "emu/mame-patches/0002-cps2-wide-v1.patch" 2>/dev/null; then
-        echo "FAIL: layout control — a release missing mame/emulator/ was accepted"; fail=1
+        vs_ctl_dead missing-emulator-dir "a release missing mame/emulator/ was accepted"; fail=1
     else
-        echo "  ok: must-fire control — a release missing mame/emulator/ is rejected"
+        vs_ctl_fired missing-emulator-dir "a release missing mame/emulator/ is rejected"
     fi
 fi
 
