@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-327 entries (41 game / 92 platform / 194 project), counted from the buckets at generation.
+328 entries (41 game / 92 platform / 195 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 41 entries
 
@@ -161,7 +161,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - `run_replay_fbneo.sh` with a RELATIVE sandbox argument writes NO log — 0 frames, silently (paid: 14z-133b)
 - A Lua space read through a MAME read-watchpoint range IS a watched read — `DUMPS` logs a hit at dump-frame+1 with the CPU's incidental PC (paid: 14z-145)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 194 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 195 entries
 
 - A gate that prints `SKIP:` AND exits NON-ZERO is a FAILURE, not a skip (paid: 14z-128)
 - `... | while read` puts the loop in a SUBSHELL, so the `wait` after it waits for nothing (paid: 14z-128)
@@ -357,3 +357,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - THE HIT RIG STANDS AT NEAR DISTANCE, SO IT MEASURES THE `CL.` VARIANT — read its counts against the CLOSE chain, never the far one (paid: 14z-145, found 14z-146)
 - A `#!/bin/sh` GATE THAT WRITES A BASHISM STUB CARRIES THE BASHISM — assemble the token from pieces (paid: 14z-147)
 - THE MUST-FIRE RETROFIT'S TWO SHELL TRAPS — a `[ ] && f` as a loop's last statement under `set -e`, and a text edit that read a comment-stripped copy (paid: 14z-147)
+- A GATE THAT USES `CONTROL` AS ITS OWN ENV VAR COLLIDES WITH THE MUST-FIRE MODE SELECTOR (paid: 14z-147c)

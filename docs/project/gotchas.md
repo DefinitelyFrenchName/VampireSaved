@@ -4494,3 +4494,19 @@ handed to the editor lacked the comment lines between two code lines, every
 exact-match replacement missed, and the fix was to anchor on single lines or
 re-read the region verbatim. A read that filters is not the file.
 
+
+## A GATE THAT USES `CONTROL` AS ITS OWN ENV VAR COLLIDES WITH THE MUST-FIRE MODE SELECTOR (paid: 14z-147c)
+
+`CONTROL=<name>` is the must-fire executable-mode selector ([VSP-181]): `vs_ctl_mode`
+reads `$CONTROL`, and REFUSES (exit 3) any value that is not a declared mode name.
+`tests/test_random_select_tenants.sh` used `CONTROL` as its OWN environment variable
+(the previous-build path, `CONTROL="${CONTROL:-build/m3b_merged19}"`), so once the
+gate sourced `controls.sh` its default `CONTROL=build/m3b_merged19` was handed to
+`vs_ctl_mode`, which REFUSED it — the PLAIN run died with `REFUSED: CONTROL=… is not
+a mode of this gate`. Rule: before adding a must-fire control to a gate, grep it for
+any use of `CONTROL` as its own variable and RENAME that variable (it was renamed to
+`PREV_BUILD`). And prefer a SELF-CONTAINED control over one that depends on a second
+build dir: the previous merged build had been pruned (build-dir policy keeps
+current + one back), so a control that ran against it would REFUSE on every host that
+pruned it and read as a control failure in the sweep; the fix made the mode perturb
+the gate's own expected set instead.
