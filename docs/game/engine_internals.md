@@ -767,15 +767,32 @@ it feeds).
   duplicates its content, and the game enters that address (22 of 90 forward
   rows). The split moves are exactly the ones the community names `8J.x` /
   `9J.x`: BU MP/HP/MK, BI LP/HP, FE LK/HK, LI HK, VI HP, SA LP/LK.
-- **Zabel's forward jump enters his NEUTRAL set on all six buttons** although
-  his `0x18-0x1D` hold different chains (`0x1B-0x1D`: 18- and 12-frame
-  actives with no recovery) — so those are not his forward-jump normals, and
-  what enters them is unmeasured.
+- **Zabel's `0x18-0x1D` are his D+BUTTON aerials, not a forward-jump set**
+  [M: the gate's third direction, neutral jump then D+button, 14z-145]: his
+  forward jump enters the neutral set on all six buttons, and D+button enters
+  `0x18-0x1D` one for one — the workbook's `J.2LP`..`J.2HK`, joined by name
+  since 14z-145 (active/red/white EXACT, startup the constant offset; one
+  gauge cell off by 6). So the second aerial set means different things per
+  character: the forward-jump attack for most, the D+button attack for Zabel.
+  The same direction found Aulbath's `J.2HK` at `a2:0x51` and, for Anakaris,
+  D+button leaving the hover into `a:0x36` on every button (a table-a chain,
+  not named); every other character's D+button in the air is the plain
+  aerial.
 - **Anakaris has NO neutral-jump attacks.** U puts him in a HOVER chain
   (`a:0x12`, +8 px, held ~112 frames) in which every button is ignored; his
   forward jump (`a:0x10` pre-jump, then the a2 attack at +38 px) fires all
   six. The community corpus lists one aerial set for him. The gate declares
-  and ASSERTS the six void rows.
+  and ASSERTS the six void rows. **The mechanism, static (14z-145):** the
+  jump state's dispatcher tests his id first — `PRG:0x022A0E cmpi.b #6,$382(a6)
+  ; beq.w $2678C` — and sends him to a PRIVATE jump handler at
+  `PRG:0x02678C` with its own ten-entry sub-state table (`0x0267BA`), so the
+  generic handler at `0x022A24`, whose sub-states carry the aerial attacks,
+  never runs for him; his sub-state 1 installs seq `0x34` (`moveq #$34 ; bsr
+  $27EC8`) and a second dispatcher on his work byte `+0x153` (`0x026804`).
+  Which of those sub-states is the hover, and how his forward jump escapes
+  it into `a:0x10`, is read from the table, not measured; the hover chain and
+  the ignored buttons are measured. (The same id test guards the guard-mash
+  check at `0x0275CE` — Anakaris is special-cased in more than one place.)
 - **Instrument note:** a table-a chain with no terminator walks on into a2's
   region (AU's `a:0x34`, 215 nodes, through the start of `a2:0x12`), so a
   node map that lets the first chain seen own an address mislabels the

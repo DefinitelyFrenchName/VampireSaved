@@ -64,8 +64,13 @@ CHARS = {"BU": (0x00, "Bulleta"), "DE": (0x01, "Demitri"), "GA": (0x02, "Gallon"
 # hover, a:0x12, that takes no normal) — his 0x12-0x17 are derived but never
 # entered from a neutral jump.
 FIXED = {0x0c: "2LP", 0x0d: "2MP", 0x0e: "2HP", 0x0f: "2LK", 0x10: "2MK", 0x11: "2HK",
-         0x12: "J.LP", 0x13: "J.MP", 0x14: "J.HP", 0x15: "J.LK", 0x16: "J.MK", 0x17: "J.HK",
-         0x18: "9J.LP", 0x19: "9J.MP", 0x1a: "9J.HP", 0x1b: "9J.LK", 0x1c: "9J.MK", 0x1d: "9J.HK"}
+         0x12: "J.LP", 0x13: "J.MP", 0x14: "J.HP", 0x15: "J.LK", 0x16: "J.MK", 0x17: "J.HK"}
+# The SECOND aerial set is named per character from the measurement, never as a
+# fixed layout (14z-145, the down direction): for most characters a2 0x18-0x1D is
+# the FORWARD-jump set ("9J.x"), for ZABEL it is his D+button set ("J.2x" — his
+# forward jump uses the neutral chains), and Aulbath's J.2HK is a2:0x51. Where the
+# forward entry aliases the neutral chain no second name is given.
+AERIAL_TSV = REPO / "tests/expected/vanilla_aerial_slots.tsv"
 # The STANDING normals are NOT a fixed layout: which chain a button enters depends on
 # the character AND on proximity, and it was MEASURED per character on vsavj rather
 # than assumed (tools/vanilla_join_rig.py, frozen here). A first model — even = close,
@@ -98,12 +103,42 @@ def measured_slots(path=SLOTS_TSV):
             if near is not None and near != far:
                 m[near] = "CL.5" + btn
         out[tab] = m
+    for tab, m in aerial_slots().items():
+        out.setdefault(tab, dict(FIXED)).update(m)
+    return out
+
+
+def aerial_slots(path=AERIAL_TSV):
+    """{tab: {slot int: move name}} for the SECOND aerial set, from the measured
+    direction table: a forward-jump attack entering a chain other than the neutral
+    one names it "9J.<btn>"; a D+button attack entering a chain other than the
+    neutral one names it "J.2<btn>". Only a2 chains are named (Anakaris's D+button
+    hover exit is a table-a chain)."""
+    per = {}
+    if not Path(path).exists():
+        return {}
+    for ln in Path(path).read_text().splitlines():
+        if not ln.strip() or ln.startswith("#"):
+            continue
+        tab, d, btn, chain = ln.split("\t")[:4]
+        per.setdefault(tab, {}).setdefault(btn, {})[d] = chain
+    out = {}
+    for tab, btns in per.items():
+        for btn, d in btns.items():
+            neu = d.get("jump")
+            for direction, prefix in (("jump_fwd", "9J."), ("jump_down", "J.2")):
+                c = d.get(direction)
+                if c and c != neu and c.startswith("a2:"):
+                    slot = int(c.split(":")[1], 16)
+                    if slot in FIXED:      # a forward/down attack that entered a NEUTRAL slot (AN's
+                        continue           # forward jump, whose neutral rows are void) keeps that name
+                    out.setdefault(tab, {})[slot] = prefix + btn
     return out
 
 
 SLOT_ROLE = {**{k: "crouching (tenant-measured layout)" for k in range(0x0c, 0x12)},
              **{k: "jumping, NEUTRAL jump (measured on all 15, 14z-145)" for k in range(0x12, 0x18)},
-             **{k: "jumping, FORWARD jump (measured on all 15, 14z-145; aliases the neutral chain where there is no variant)" for k in range(0x18, 0x1e)}}
+             **{k: "jumping, the SECOND aerial set (measured on all 15, 14z-145): the FORWARD-jump attack for most characters, ZABEL's D+button attack; aliases the neutral chain where there is no variant" for k in range(0x18, 0x1e)}}
 
 DEFAULT_IMAGE = REPO / "build/out/vsavj_data.bin"
 

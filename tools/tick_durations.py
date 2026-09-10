@@ -81,26 +81,31 @@ def durations(ev, starts, nodes):
     this instrument as it stands.
     """
     out = defaultdict(list)
+    per_node = defaultdict(list)     # 14z-145: [ticks on node 0, node 1, ...] per pass
     rng = {m: (s, s + nodes[m] * NODE_STRIDE) for m, s in starts.items()}
-    cur, ticks, prev = None, 0, None
+    cur, ticks, prev, node_ticks = None, 0, None, []
     for kind, fr, val in ev:
         if kind == "tick":
             if cur is not None:
                 ticks += 1
+                node_ticks[-1] += 1
             continue
         if cur is not None:
             lo, hi = rng[cur]
             if (lo <= val < hi and prev is not None and val < prev) or not (lo <= val < hi):
-                out[cur].append(ticks)
-                cur, ticks = None, 0
+                out[cur].append(ticks); per_node[cur].append(node_ticks)
+                cur, ticks, node_ticks = None, 0, []
+            else:
+                node_ticks.append(0)     # a forward step to the next node of the same pass
         if cur is None:
             for m, st in starts.items():
                 if val == st:
-                    cur, ticks = m, 0
+                    cur, ticks, node_ticks = m, 0, [0]
                     break
         prev = val
     if cur is not None:
-        out[cur].append(ticks)
+        out[cur].append(ticks); per_node[cur].append(node_ticks)
+    durations.per_node = per_node
     return out
 
 
@@ -110,6 +115,9 @@ def main():
     ap.add_argument("tap"); ap.add_argument("derived"); ap.add_argument("char")
     ap.add_argument("--base", default="ff8400", help="fighter block (default P1)")
     ap.add_argument("--prefix", default="2", help="move-name prefix to report")
+    ap.add_argument("--nodes", action="store_true",
+                    help="also print the ticks PER NODE of each pass, and the STARTUP in ticks = the ticks "
+                         "before the chain's first attack node (frame_data.first), beside the derived startup")
     a = ap.parse_args()
     base = int(a.base, 16)
     d = json.load(open(a.derived))
@@ -122,7 +130,7 @@ def main():
         starts[mv] = int(c["start"], 16)
         fd = c["frame_data"]
         derived[mv] = (fd.get("startup"), fd.get("active"), fd.get("recovery"),
-                       c.get("frames"), c.get("nodes"))
+                       c.get("frames"), c.get("nodes"), fd.get("first"))
     if not starts:
         sys.exit(f"no chains with prefix {a.prefix!r} for {a.char}")
     ev = parse(a.tap, base)
@@ -132,10 +140,14 @@ def main():
     got = durations(ev, starts, {m: derived[m][4] for m in starts})
     print(f"{'move':6} {'derived s/a/r':16} {'total':>6} {'nodes':>5}   measured ticks")
     for mv in sorted(starts):
-        s, act, r, tot, n = derived[mv]
+        s, act, r, tot, n, first = derived[mv]
         seen = got.get(mv, [])
         print(f"  {mv:5} {str(s)+'/'+str(act)+'/'+str(r):16} {str(tot):>6} {str(n):>5}   "
               f"{seen if seen else 'NOT ENTERED'}")
+        if a.nodes and seen:
+            for pn in durations.per_node.get(mv, []):
+                su = sum(pn[:first]) if first is not None and len(pn) >= first else None
+                print(f"        nodes {pn}  startup-ticks {su} (derived {s})")
     missing = [m for m in starts if m not in got]
     if missing:
         print("\nNOT ENTERED (the rig never ran these, or the chain start moved): "

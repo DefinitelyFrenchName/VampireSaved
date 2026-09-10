@@ -23,12 +23,12 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 2990 |
-| named by a document or manifest only | 2024 |
+| distinct program-space addresses named | 2992 |
+| named by a document or manifest only | 2026 |
 | named by both a document/manifest and code | 632 |
 | named by CODE ONLY (the gap list below) | 334 |
 | carried by atlas | 473 |
-| carried by engine_internals | 540 |
+| carried by engine_internals | 542 |
 | carried by other docs | 961 |
 | carried by manifests | 1786 |
 | carried by code | 966 |
@@ -708,9 +708,9 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x022994` | build/manifest/pcrel_escapes.toml — hui56 |
 | `PRG:0x0229CE` | build/manifest/pcrel_escapes.toml — hui56 |
 | `PRG:0x0229F8` | build/manifest/pcrel_escapes.toml — hui56 |
-| `PRG:0x022A0E` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/game/gotchas.md — code inside per-char families — hook the LIVE one, found by tracing; build/manifest/huitzil.toml — data_in_code; build/manifest/huitzil.toml — tenant_jump_seq; build/manifest/reconciliation_huitzil.toml — map; +2 more |
+| `PRG:0x022A0E` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — The anim index a2's TWO aerial slot sets — neutral and forward jump (14z-145, MEASURED on all 15 vanilla characters); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/game/gotchas.md — code inside per-char families — hook the LIVE one, found by tracing; build/manifest/huitzil.toml — data_in_code; build/manifest/huitzil.toml — tenant_jump_seq; +3 more |
 | `PRG:0x022A14` | build/manifest/huitzil.toml — data_in_code |
-| `PRG:0x022A24` | docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture) |
+| `PRG:0x022A24` | docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture); docs/game/engine_internals.md — The anim index a2's TWO aerial slot sets — neutral and forward jump (14z-145, MEASURED on all 15 vanilla characters) |
 | `PRG:0x022A42` | build/manifest/pcrel_escapes.toml — hui56 |
 | `PRG:0x022AAA` | build/manifest/pcrel_escapes.toml — hui56 |
 | `PRG:0x022AD2` | build/manifest/pcrel_escapes.toml — hui56 |
@@ -820,8 +820,10 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0266A4` | build/manifest/reconciliation.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x0266B8` | build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x026760` | build/manifest/reconciliation.toml — map [vs2] |
-| `PRG:0x02678C` | docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port) |
+| `PRG:0x02678C` | docs/game/engine_internals.md — The anim index a2's TWO aerial slot sets — neutral and forward jump (14z-145, MEASURED on all 15 vanilla characters); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port) |
 | `PRG:0x0267B8` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); tests/test_advancing_guard.sh |
+| `PRG:0x0267BA` | docs/game/engine_internals.md — The anim index a2's TWO aerial slot sets — neutral and forward jump (14z-145, MEASURED on all 15 vanilla characters) |
+| `PRG:0x026804` | docs/game/engine_internals.md — The anim index a2's TWO aerial slot sets — neutral and forward jump (14z-145, MEASURED on all 15 vanilla characters) |
 | `PRG:0x02686A` | build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x02694A` | build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x026978` | build/manifest/reconciliation_huitzil.toml — map [vs2] |
@@ -893,7 +895,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x027542` | docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/reconciliation_donovan.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map [vs2]; build/manifest/reconciliation_pyron.toml — map [vs2] |
 | `PRG:0x027576` | build/manifest/reconciliation.toml — map |
 | `PRG:0x027582` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2] |
-| `PRG:0x0275CE` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); tests/test_advancing_guard.sh |
+| `PRG:0x0275CE` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/game/engine_internals.md — The anim index a2's TWO aerial slot sets — neutral and forward jump (14z-145, MEASURED on all 15 vanilla characters); tests/test_advancing_guard.sh |
 | `PRG:0x0275E4` | docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds) [vs2]; docs/game/engine_internals.md — Throw / physics-arc tables (14z-67, measured on the command grab) [vs2]; build/manifest/huitzil.toml — effect_map_5253 [vs2] |
 | `PRG:0x027616` | docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); build/manifest/donovan.toml — select_companion_resolve_s2; build/manifest/huitzil.toml — port_patch; tests/audit_guard_mask_reads.sh |
 | `PRG:0x02761A` | docs/platform/gotchas.md — A Lua space read through a MAME read-watchpoint range IS a watched read — 'DUMPS' logs a hit at dump-frame+1 with the CPU's incidental PC (paid: 14z-145); tests/audit_guard_mask_reads.sh |

@@ -90,10 +90,13 @@ LI on HP). The workbook keeps ONE row per aerial button (Lilith's `J.HK` twice);
 variant a row documents is a fact about the workbook, taken from mizuumi's move lists —
 which name the pair `8J.x` / `9J.x` — and never from which chain's numbers fit better
 (`FORWARD_ROWS` in the comparator: BI LP/HP, BU MP/HP/MK/HK, FE LK/HK, VI HP, LI's second
-`J.HK`; Bishamon's `J.HP8` is his neutral HP by its own name; Zabel's rows are his neutral
-chain). The seven aerial outliers of 14z-125 were exactly the split moves joined to the
-wrong variant. Anakaris has no neutral-jump attacks at all: his neutral jump is a hover
-(`a:0x12`) that takes no normal.
+`J.HK`; Bishamon's `J.HP8` is his neutral HP by its own name; Zabel's `J.x` rows are his
+neutral chain). The seven aerial outliers of 14z-125 were exactly the split moves joined to
+the wrong variant. **The second set is not the same thing on every character:** a third
+direction, neutral jump then D+button, showed that Zabel's `0x18-0x1D` are his D+button
+aerials (the workbook's `J.2LP`..`J.2HK`, now joined by name), Aulbath's `J.2HK` is `a2:0x51`,
+and Anakaris's D+button leaves his hover into `a:0x36` on every button. Anakaris has no
+neutral-jump attacks at all: his neutral jump is a hover (`a:0x12`) that takes no normal.
 Specials, supers and the `6`-prefixed command normals are not joined at all.
 
 ## The headline: per-move agreement
@@ -104,11 +107,11 @@ per MOVE, over all 15 characters:
 
 | column | convention | moves agreeing |
 |---|---|---|
-| `startup` | sheet = ours +1 — the sheet counts the first active frame as startup; ours counts the frames before it | **280/283** (98%) |
-| `active` | sheet = ours +0 — identical | **280/283** (98%) |
+| `startup` | sheet = ours +1 — the sheet counts the first active frame as startup; ours counts the frames before it | **287/290** (98%) |
+| `active` | sheet = ours +0 — identical | **283/286** (98%) |
 | `recovery` | sheet = ours +2 — a 2-frame tail the sheet counts and our last node does not | **190/197** (96%) |
-| `white` | sheet = ours +0 — identical — the record's +9 is the dealt white damage, unscaled | **272/283** (96%) |
-| `gauge_hit` | sheet = ours +0 — identical once the sheet's own `gauge whiff` is subtracted | **278/283** (98%) |
+| `white` | sheet = ours +0 — identical — the record's +9 is the dealt white damage, unscaled | **279/290** (96%) |
+| `gauge_hit` | sheet = ours +0 — identical once the sheet's own `gauge whiff` is subtracted | **284/290** (97%) |
 
 So the two measurements corroborate each other on ~96% of every column we can
 compare, under one stated convention per column. The residue is the worklist below.
@@ -118,7 +121,7 @@ compare, under one stated convention per column. The residue is the worklist bel
 | character | joined | startup | active | recovery | white | gauge_hit | red |
 |---|---|---|---|---|---|---|---|
 | **AN** Anakaris `0x06` | 15 | CONSTANT OFFSET (sheet = ours +1 on all 15) · n=15 | EXACT · n=15 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | INCONSISTENT · n=15 | EXACT · n=15 | INCONSISTENT · n=15 |
-| **AU** Aulbath `0x09` | 19 | INCONSISTENT · n=19 | INCONSISTENT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=19 | EXACT · n=19 | EXACT · n=19 |
+| **AU** Aulbath `0x09` | 20 | INCONSISTENT · n=20 | INCONSISTENT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=20 | EXACT · n=20 | EXACT · n=20 |
 | **BI** Bishamon `0x08` | 19 | INCONSISTENT · n=18 | EXACT · n=18 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=18 | INCONSISTENT · n=18 | EXACT · n=18 |
 | **BU** Bulleta `0x00` | 18 | CONSTANT OFFSET (sheet = ours +1 on all 18) · n=18 | EXACT · n=18 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | EXACT · n=18 | EXACT · n=18 | EXACT · n=18 |
 | **DE** Demitri `0x01` | 21 | CONSTANT OFFSET (sheet = ours +1 on all 21) · n=21 | EXACT · n=21 | CONSTANT OFFSET (sheet = ours +2 on all 15) · n=15 | EXACT · n=21 | EXACT · n=21 | EXACT · n=21 |
@@ -131,7 +134,7 @@ compare, under one stated convention per column. The residue is the worklist bel
 | **QB** Q-Bee `0x0c` | 15 | CONSTANT OFFSET (sheet = ours +1 on all 15) · n=15 | EXACT · n=15 | CONSTANT OFFSET (sheet = ours +2 on all 10) · n=10 | INCONSISTENT · n=15 | EXACT · n=15 | INCONSISTENT · n=15 |
 | **SA** Sasquatch `0x0a` | 19 | INCONSISTENT · n=19 | EXACT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | INCONSISTENT · n=19 | INCONSISTENT · n=19 | INCONSISTENT · n=19 |
 | **VI** Victor `0x03` | 23 | CONSTANT OFFSET (sheet = ours +1 on all 23) · n=23 | EXACT · n=23 | CONSTANT OFFSET (sheet = ours +2 on all 17) · n=17 | INCONSISTENT · n=23 | EXACT · n=23 | INCONSISTENT · n=23 |
-| **ZA** Zabel `0x04` | 18 | CONSTANT OFFSET (sheet = ours +1 on all 18) · n=18 | EXACT · n=18 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=18 | EXACT · n=18 | EXACT · n=18 |
+| **ZA** Zabel `0x04` | 24 | CONSTANT OFFSET (sheet = ours +1 on all 24) · n=24 | EXACT · n=21 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=24 | INCONSISTENT · n=24 | EXACT · n=24 |
 
 ## The arbitration — what the emulator said about the residue
 
@@ -211,9 +214,9 @@ taken from the engine itself.
 
 15 move(s) deviate; the per-move table is on the full page.
 
-### AU Aulbath — `startup` — most common delta +1 on 18/19; spread +1..+2
+### AU Aulbath — `startup` — most common delta +1 on 19/20; spread +1..+2
 
-19 move(s) deviate; the per-move table is on the full page.
+20 move(s) deviate; the per-move table is on the full page.
 
 ### AU Aulbath — `active` — most common delta +0 on 17/19; spread -1..+9
 
@@ -310,6 +313,10 @@ taken from the engine itself.
 ### VI Victor — `red` — most common delta +0 on 22/23; spread +0..+22
 
 23 move(s) deviate; the per-move table is on the full page.
+
+### ZA Zabel — `gauge_hit` — most common delta +0 on 23/24; spread -6..+0
+
+24 move(s) deviate; the per-move table is on the full page.
 
 ## What is NOT known
 

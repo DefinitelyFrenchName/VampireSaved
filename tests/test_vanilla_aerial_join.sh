@@ -17,7 +17,8 @@
 # during a neutral jump (U) and during a forward jump (UR) and the verdict is
 # the chain the fighter's own node pointer +0x1C entered inside the event
 # window (tests/lua/field_trace.lua), mapped onto tools/anim_nodes.py's graph.
-# 180 rows (15 characters x 2 directions x 6 buttons) frozen in
+# 270 rows (15 characters x 3 directions x 6 buttons — neutral, forward, and
+# neutral-then-D+button, the last REPORTED not constrained) frozen in
 # tests/expected/vanilla_aerial_slots.tsv.
 #
 #   1. the rigs regenerate byte-identically (the schedule is code, not a file);
@@ -34,7 +35,7 @@
 #   5. MUST-FIRE CONTROL: swapping one character's neutral and forward rows
 #      must FAIL the compare.
 #
-# Usage: ROMDIR=... tests/test_vanilla_aerial_join.sh   # emulator tier (MAME, ~5 min, legs in parallel)
+# Usage: ROMDIR=... tests/test_vanilla_aerial_join.sh   # emulator tier (MAME, ~7 min, legs in parallel)
 #        CHARS="BU VI" to measure a subset; FREEZE=1 to re-freeze; KEEP=dir keeps the traces.
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -58,7 +59,7 @@ fi
 ALL="BU:0x00 DE:0x01 GA:0x02 VI:0x03 ZA:0x04 MO:0x05 AN:0x06 FE:0x07 BI:0x08 AU:0x09 SA:0x0a QB:0x0c LE:0x0d LI:0x0e JE:0x0f"
 WANT="${CHARS:-}"
 FIELDS="ff8410:w:p1x,ff8414:w:p1y,ff840b:b:p1face,ff841c:l:node,ff8420:b:cnt,ff8810:w:p2x,ff8850:w:p2hp,ff8782:b:id,ff8b82:b:p2id"
-DIRS="jump jump_fwd"
+DIRS="jump jump_fwd jump_down"
 
 echo "== test_vanilla_aerial_join: the aerial slot map by jump direction, measured on vsavj =="
 
@@ -112,8 +113,11 @@ done
 # set for him. So his six neutral rows are EXPECTED UNFIRED, declared here and
 # ASSERTED in section 4 (a leg that did not produce the event is VOID, never
 # a pass — [VSP-170]; here the void is the finding).
-if grep -v '^AN	jump	' "$W/got.txt" | grep -q UNFIRED; then nope "some events never fired:"; grep -v '^AN	jump	' "$W/got.txt" | grep UNFIRED | sed 's/^/        /'
-else ok "every event entered a chain (no UNFIRED outside the declared Anakaris neutral-jump exception)"; fi
+# jump_down rows may be UNFIRED where D+button in the air is not an attack at all
+# (a character whose neutral jump takes no normal — AN — or whose down-input is
+# eaten): reported in section 4, never a rig failure.
+if grep -v -E '^AN	jump	|^[A-Z]+	jump_down	' "$W/got.txt" | grep -q UNFIRED; then nope "some events never fired:"; grep -v -E '^AN	jump	|^[A-Z]+	jump_down	' "$W/got.txt" | grep UNFIRED | sed 's/^/        /'
+else ok "every event entered a chain (no UNFIRED outside the declared Anakaris neutral-jump exception; jump_down reported in 4)"; fi
 
 echo "== 3. against the frozen table"
 if [ "${FREEZE:-0}" = 1 ]; then cp "$W/got.txt" "$EXP"; echo "  FROZE $EXP ($(grep -vc '^#' "$EXP") rows)"; fi
@@ -137,15 +141,25 @@ def chk(c, m):
     print(("  ok    " if c else "  FAIL  ") + m); bad |= not c
 def slot(chain):
     m = re.match(r"a2:0x([0-9a-f]+)$", chain); return int(m.group(1), 16) if m else None
+down = [r for r in rows if r[1] == "jump_down"]
+rows = [r for r in rows if r[1] != "jump_down"]
 an_neu = [r for r in rows if r[1] == "jump" and r[0] == "AN"]
 chk(not an_neu or all(r[3] == "UNFIRED" for r in an_neu),
     "ANAKARIS neutral-jump attacks are UNFIRED on every button (his neutral jump is a hover that takes no normal)")
 rows = [r for r in rows if not (r[1] == "jump" and r[0] == "AN")]
 neu = [r for r in rows if r[1] == "jump"]; fwd = [r for r in rows if r[1] == "jump_fwd"]
-chk(len(neu) + len(an_neu) == len(fwd) and neu, f"{len(neu)} neutral + {len(fwd)} forward rows (+{len(an_neu)} Anakaris neutral, void by measurement)")
-chk(all(r[4] == "air" for r in rows), "every attack was performed AIRBORNE (p1y left the ground before the press)")
+chk(len(neu) + len(an_neu) == len(fwd) == len(down) and neu, f"{len(neu)} neutral + {len(fwd)} forward + {len(down)} down rows (+{len(an_neu)} Anakaris neutral, void by measurement)")
+chk(all(r[4] == "air" for r in rows + down if r[3] != "UNFIRED"), "every attack was performed AIRBORNE (p1y left the ground before the press)")
 chk(all(slot(r[3]) is not None and 0x12 <= slot(r[3]) <= 0x17 for r in neu),
     "NEUTRAL jump attacks enter a2 0x12-0x17 only")
+# THE DOWN-ATTACK ROWS (jump_down: U, then D+button): REPORTED against the neutral
+# row, never constrained — most characters have no D+button aerial and enter the
+# plain aerial; the ones with a J.2x move (ZA, AN, QB, AU per the workbook) enter
+# something else, and which slot that is is the finding (ZA's 0x1B-0x1D).
+byn = {(r[0], r[2]): r[3] for r in rows if r[1] == "jump"}
+other = [(r[0], r[2], r[3]) for r in down if r[3] != byn.get((r[0], r[2])) and r[3] != "UNFIRED"]
+print(f"  note  jump_down: {len(down)} rows; {len(other)} enter a chain OTHER than the neutral attack: " +
+      ", ".join(f"{c} {b}->{ch}" for c, b, ch in other))
 by = {(r[0], r[2]): r[3] for r in neu}
 # a forward slot may ALIAS the neutral chain (the same node address in both table
 # entries — BU LP/LK/HK, VI everything but HP, LI HP); the node map names a shared

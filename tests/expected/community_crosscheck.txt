@@ -5,12 +5,12 @@ AN	recovery	CONSTANT OFFSET	12	sheet = ours +2 on all 12
 AN	white	INCONSISTENT	15	most common delta +0 on 14/15; spread +0..+5
 AN	gauge_hit	EXACT	15	15/15
 AN	red	INCONSISTENT	15	most common delta +0 on 14/15; spread +0..+15
-AU	startup	INCONSISTENT	19	most common delta +1 on 18/19; spread +1..+2
+AU	startup	INCONSISTENT	20	most common delta +1 on 19/20; spread +1..+2
 AU	active	INCONSISTENT	19	most common delta +0 on 17/19; spread -1..+9
 AU	recovery	CONSTANT OFFSET	12	sheet = ours +2 on all 12
-AU	white	EXACT	19	19/19
-AU	gauge_hit	EXACT	19	19/19
-AU	red	EXACT	19	19/19
+AU	white	EXACT	20	20/20
+AU	gauge_hit	EXACT	20	20/20
+AU	red	EXACT	20	20/20
 BI	startup	INCONSISTENT	18	most common delta +1 on 17/18; spread +0..+1
 BI	active	EXACT	18	18/18
 BI	recovery	CONSTANT OFFSET	12	sheet = ours +2 on all 12
@@ -83,9 +83,9 @@ VI	recovery	CONSTANT OFFSET	17	sheet = ours +2 on all 17
 VI	white	INCONSISTENT	23	most common delta +0 on 22/23; spread +0..+8
 VI	gauge_hit	EXACT	23	23/23
 VI	red	INCONSISTENT	23	most common delta +0 on 22/23; spread +0..+22
-ZA	startup	CONSTANT OFFSET	18	sheet = ours +1 on all 18
-ZA	active	EXACT	18	18/18
+ZA	startup	CONSTANT OFFSET	24	sheet = ours +1 on all 24
+ZA	active	EXACT	21	21/21
 ZA	recovery	CONSTANT OFFSET	12	sheet = ours +2 on all 12
-ZA	white	EXACT	18	18/18
-ZA	gauge_hit	EXACT	18	18/18
-ZA	red	EXACT	18	18/18
+ZA	white	EXACT	24	24/24
+ZA	gauge_hit	INCONSISTENT	24	most common delta +0 on 23/24; spread -6..+0
+ZA	red	EXACT	24	24/24

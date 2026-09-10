@@ -26,11 +26,26 @@ pushed" of commits that were).
   the split moves are the forward variant and had been joined to the neutral
   chain. BI/BU/FE/VI's active and damage columns are EXACT now.
 
-## START HERE — the open items that remain, plus what this session opened
+## THE SECOND LIST, ALSO CLOSED (the maintainer's "4 first open items", in order)
 
-- **The Phobos ±1 damage residue** — 5 of 54 cells, WITHIN TOLERANCE, a
-  KNOWLEDGE item. Cheap first step: is `0x0A` (Sasquatch) a cross-generation
-  data difference rather than ours?
+- **The tenants' forward-jump set** — measured: Donovan's and Huitzil's `0x18-0x1d`
+  alias their neutral chains; Pyron's `0x18` is a distinct LP chain his forward jump
+  does not enter (`test_move_naming` parts 14/6/10).
+- **The Phobos ±1 residue** — root-caused: the defense-curve row the victim's id
+  selects, swapped for 0x10/0x13 by the 2026-08-14 ruling, retuned for Sasquatch
+  between generations (`tests/audit_defense_row_residue.sh`).
+- **Zabel's `0x18-0x1D`** are his D+button aerials (`J.2x`, now joined); **Anakaris**
+  has a private jump handler at `PRG:0x02678C` (his hover); Aulbath's `J.2HK` is
+  `a2:0x51`. The aerial gate measures THREE directions now (270 rows).
+- **Bishamon's 5MK startup** — the workbook's, not ours: node 0 spends the 5
+  engine ticks its byte says (`test_tick_durations`, BI standing leg, per node).
+
+## START HERE — what remains
+
+- **Small residues left by the above, all named:** one Zabel `J.2x` gauge cell
+  (−6, `ZA gauge_hit` 23/24); Anakaris's D+button chain `a:0x36` unnamed; Pyron's
+  distinct `0x18` unentered; BU/FE/LI's remaining single-cell startup/white
+  outliers on the cross-check page.
 - **Zabel j.LK proximity guard** — its own session: a LEGACY patch, so its own
   expectation class and build flag, a recording FIRST ([VSP-20]), archaeology
   before theory ([VSP-14]).

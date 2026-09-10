@@ -67,6 +67,9 @@ SETS = {"far":    ("stand",  300, False),
         "jump":   ("jump",   360, False),      # NEUTRAL jump (U), 14z-125b
         "jump_fwd": ("jump_fwd", 360, False),  # FORWARD jump (UR), 14z-145: the
                                                # second aerial slot set a2 0x18-0x1D
+        "jump_down": ("jump_down", 360, False),  # neutral jump, then D+button (14z-145):
+                                                 # what enters ZA's 0x1B-0x1D, and the
+                                                 # J.2x rows of the workbook (ZA, AN, QB, AU)
         "hit":    ("stand",  480, True)}
 GAP = {k: v[1] for k, v in SETS.items()}
 
@@ -77,9 +80,14 @@ def _jump_fwd(b):
     return [(a, bb, tok.replace("U", "UR", 1) if tok == "U" else tok) for a, bb, tok in name_moves.jump(b)]
 
 
+def _jump_down(b):
+    # name_moves.air_down: U, then D+button at +16..+19 (the dive/down-attack input)
+    return name_moves.air_down(b)
+
+
 def _recipe(kind, b):
     return {"stand": name_moves.stand, "crouch": name_moves.crouch, "jump": name_moves.jump,
-            "jump_fwd": _jump_fwd}[kind](b)
+            "jump_fwd": _jump_fwd, "jump_down": _jump_down}[kind](b)
 
 
 def gen(cid, dist, out_rpl, out_sched):
@@ -243,7 +251,7 @@ def analyse(trace, sched, img, cid, window=90):
         # refused the table). `before` is everything seen up to the press, the
         # jump chain included; the standing/crouching sets press at +0 and are
         # unchanged by this.
-        press0 = min((a for a, bb, tok in _recipe(sched["kind"], e["name"]) if tok.isdigit()), default=0)
+        press0 = min((a for a, bb, tok in _recipe(sched["kind"], e["name"]) if any(ch.isdigit() for ch in tok)), default=0)
         obs = t0 + press0
         before = {nm.get(frames[f]) for f in range(t0 - 30, obs) if f in frames}
         seen, first = [], None
@@ -256,8 +264,8 @@ def analyse(trace, sched, img, cid, window=90):
         # AIRBORNE at the press: the y position (+0x14, ram.md) differs from the
         # pre-event ground value on every frame of the button window. Only
         # meaningful for the jump sets (the field is traced there); "-" otherwise.
-        press = [f for a, bb, tok in _recipe(sched["kind"], e["name"]) if tok.isdigit()
-                 for f in range(t0 + a, t0 + bb + 1)]     # the button token is the digit
+        press = [f for a, bb, tok in _recipe(sched["kind"], e["name"]) if any(ch.isdigit() for ch in tok)
+                 for f in range(t0 + a, t0 + bb + 1)]     # the button token carries the digit (maybe with a direction: "D4")
         ground = ys.get(t0 - 5)
         if ys and press and ground is not None:
             air = all(ys.get(f, ground) != ground for f in press if f in ys)

@@ -30,7 +30,7 @@
 #     Counting ticks over a rig window measures the crouch IDLE instead and
 #     reports ~365 for every move -- identical numbers are the tell.
 #
-# Usage: ROMDIR=... tests/test_tick_durations.sh   (~12 min, 3 MAME runs)
+# Usage: ROMDIR=... tests/test_tick_durations.sh   (~16 min, 4 MAME runs)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
@@ -74,6 +74,42 @@ print(f"  ok {sys.argv[2]}: 6/6 crouching normals -- derived total == measured e
 PY
 done
 
+# ---- BISHAMON'S STANDING NORMALS, PER NODE (14z-145): the community cross-check's
+# one remaining startup outlier is BI 5MK — the sheet says 5 where every other
+# move reads ours+1 (so 6 expected). Ours derives 5 = node 0's duration byte.
+# The tap sees every tick per node: the STARTUP IN TICKS is the ticks spent
+# before the first attack node (frame_data.first). Asserted equal to the
+# derived startup for all six standing normals — if 5MK's node 0 spends other
+# than 5 ticks, the derivation is what is wrong; if it spends 5, the sheet is.
+python3 tools/vanilla_join_rig.py gen 0x08 far "$W/BI.rpl" "$W/BI.json" >/dev/null
+P="$(python3 -c "
+import json,sys;d=json.load(open(sys.argv[1]));p=d.get('pokes') or []
+print(';'.join(p) if isinstance(p,list) else p)" "$W/BI.json")"
+MAME_BIN="$BIN" MAME_SANDBOX="$W/sb_BI" REPLAY="$W/BI.rpl" POKES="$P" \
+    TAP=ff841c,8 WINDOW=2400,4600 FRAMES=4600 TRACE_OUT="$W/BI.tap" \
+    tools/run_mame.sh vsavj -autoboot_script "$REPO/tests/lua/tap_writes.lua" \
+    > "$W/BI.out" 2>&1 || true
+python3 tools/vanilla_frames.py "$DATA" --char BI --json "$W/BI_d.json" >/dev/null
+python3 tools/tick_durations.py "$W/BI.tap" "$W/BI_d.json" BI --prefix 5 --nodes > "$W/BI.txt"
+python3 - "$W/BI.txt" <<'PY' || fail=1
+import sys, re
+lines = open(sys.argv[1]).read().split("\n")
+rows = {}
+for i, l in enumerate(lines):
+    if l.startswith("  5"):
+        mv = l.split()[0]; nxt = lines[i + 1] if i + 1 < len(lines) else ""
+        m = re.search(r"startup-ticks (\d+) \(derived (\d+)\)", nxt)
+        rows[mv] = (int(m.group(1)), int(m.group(2))) if m else None
+if len(rows) != 6:
+    print(f"  FAIL BI: expected 6 standing normals, got {sorted(rows)}"); sys.exit(1)
+bad = [f"{mv}: {v}" for mv, v in rows.items() if v is None or v[0] != v[1]]
+for mv, v in sorted(rows.items()):
+    print(f"        BI {mv}: startup-ticks {v[0] if v else '?'} derived {v[1] if v else '?'}")
+if bad:
+    print("  FAIL BI: startup in ticks != derived: " + "; ".join(bad)); sys.exit(1)
+print("  ok BI: 6/6 standing normals -- startup in engine ticks == derived (5MK's node 0 spends the 5 ticks its byte says; the sheet's 5 is one low)")
+PY
+
 # ---- CONTROL: a perturbed total must FAIL the same comparison --------------
 python3 - "$W" <<'PY' || { echo "  FAIL control: a perturbed total was accepted"; fail=1; }
 import json, re, sys
@@ -86,4 +122,4 @@ PY
 echo "  ok control fired: a total off by one does not match the measured ticks"
 
 [ "$fail" -eq 0 ] || { echo "FAIL test_tick_durations"; exit 1; }
-echo "PASS: 18/18 derived totals equal the engine's measured tick counts (JE, LI, DE)"
+echo "PASS: 18/18 derived totals equal the engine's measured tick counts (JE, LI, DE); BI's six standing startups equal in ticks"

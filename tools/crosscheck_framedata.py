@@ -212,6 +212,8 @@ def compare(vanilla, sheet_path):
             # numbers fit better — a fit against the source being checked is circular
             # ([VSP-166]; a blanket "the row is the forward one" was tried and put ZA and LI
             # into INCONSISTENT). Bishamon's `J.HP8` is his neutral HP by its own name.
+            # the D+button aerials (ZA's six, AU's J.2HK) are named from the measurement
+            # ("J.2<btn>") and join by their own name when present on our side.
             m = re.fullmatch(r"J\.([LMH][PK])(8?)", inp)
             if m:
                 btn, neutral_tag = m.group(1), m.group(2)
@@ -378,10 +380,13 @@ def render_md(vanilla, cmp_, full=False):
     A("variant a row documents is a fact about the workbook, taken from mizuumi's move lists —")
     A("which name the pair `8J.x` / `9J.x` — and never from which chain's numbers fit better")
     A("(`FORWARD_ROWS` in the comparator: BI LP/HP, BU MP/HP/MK/HK, FE LK/HK, VI HP, LI's second")
-    A("`J.HK`; Bishamon's `J.HP8` is his neutral HP by its own name; Zabel's rows are his neutral")
-    A("chain). The seven aerial outliers of 14z-125 were exactly the split moves joined to the")
-    A("wrong variant. Anakaris has no neutral-jump attacks at all: his neutral jump is a hover")
-    A("(`a:0x12`) that takes no normal.")
+    A("`J.HK`; Bishamon's `J.HP8` is his neutral HP by its own name; Zabel's `J.x` rows are his")
+    A("neutral chain). The seven aerial outliers of 14z-125 were exactly the split moves joined to")
+    A("the wrong variant. **The second set is not the same thing on every character:** a third")
+    A("direction, neutral jump then D+button, showed that Zabel's `0x18-0x1D` are his D+button")
+    A("aerials (the workbook's `J.2LP`..`J.2HK`, now joined by name), Aulbath's `J.2HK` is `a2:0x51`,")
+    A("and Anakaris's D+button leaves his hover into `a:0x36` on every button. Anakaris has no")
+    A("neutral-jump attacks at all: his neutral jump is a hover (`a:0x12`) that takes no normal.")
     A("Specials, supers and the `6`-prefixed command normals are not joined at all.")
     A("")
     A("## The headline: per-move agreement")
