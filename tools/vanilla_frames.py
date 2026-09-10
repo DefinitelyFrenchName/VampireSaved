@@ -49,11 +49,23 @@ CHARS = {"BU": (0x00, "Bulleta"), "DE": (0x01, "Demitri"), "GA": (0x02, "Gallon"
          "AU": (0x09, "Aulbath"), "SA": (0x0A, "Sasquatch"), "QB": (0x0C, "Q-Bee"),
          "LE": (0x0D, "Lei-Lei"), "LI": (0x0E, "Lilith"), "JE": (0x0F, "Jedah")}
 
-# The CROUCHING and JUMPING slots are the layout measured on all three tenants by
+# The CROUCHING slots are the layout measured on all three tenants by
 # tools/name_moves.py (gate tests/test_move_naming.sh) — not re-measured on vanilla
 # characters, and said so on the page.
+# THE JUMPING SLOTS ARE TWO SETS, MEASURED ON ALL 15 VANILLA CHARACTERS (14z-145,
+# tests/test_vanilla_aerial_join.sh, tests/expected/vanilla_aerial_slots.tsv): a
+# NEUTRAL jump attack (8) enters 0x12-0x17 and a FORWARD jump attack (9) enters
+# 0x18-0x1D; where a character has no forward variant the 0x18-0x1D entry ALIASES
+# the neutral chain (VI everything but HP, BU LP/LK/HK, LI HP) and the same
+# address is entered. The community workbook's single `J.x` row is the FORWARD
+# variant wherever the two differ (the seven aerial outliers of 14z-125 were
+# exactly the split moves, joined to the neutral chain); mizuumi names them
+# `8J.x` / `9J.x`. Anakaris has NO neutral-jump attacks (his neutral jump is a
+# hover, a:0x12, that takes no normal) — his 0x12-0x17 are derived but never
+# entered from a neutral jump.
 FIXED = {0x0c: "2LP", 0x0d: "2MP", 0x0e: "2HP", 0x0f: "2LK", 0x10: "2MK", 0x11: "2HK",
-         0x12: "J.LP", 0x13: "J.MP", 0x14: "J.HP", 0x15: "J.LK", 0x16: "J.MK", 0x17: "J.HK"}
+         0x12: "J.LP", 0x13: "J.MP", 0x14: "J.HP", 0x15: "J.LK", 0x16: "J.MK", 0x17: "J.HK",
+         0x18: "9J.LP", 0x19: "9J.MP", 0x1a: "9J.HP", 0x1b: "9J.LK", 0x1c: "9J.MK", 0x1d: "9J.HK"}
 # The STANDING normals are NOT a fixed layout: which chain a button enters depends on
 # the character AND on proximity, and it was MEASURED per character on vsavj rather
 # than assumed (tools/vanilla_join_rig.py, frozen here). A first model — even = close,
@@ -90,7 +102,8 @@ def measured_slots(path=SLOTS_TSV):
 
 
 SLOT_ROLE = {**{k: "crouching (tenant-measured layout)" for k in range(0x0c, 0x12)},
-             **{k: "jumping (tenant-measured layout)" for k in range(0x12, 0x18)}}
+             **{k: "jumping, NEUTRAL jump (measured on all 15, 14z-145)" for k in range(0x12, 0x18)},
+             **{k: "jumping, FORWARD jump (measured on all 15, 14z-145; aliases the neutral chain where there is no variant)" for k in range(0x18, 0x1e)}}
 
 DEFAULT_IMAGE = REPO / "build/out/vsavj_data.bin"
 

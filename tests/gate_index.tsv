@@ -315,6 +315,7 @@ tests/test_thunk_addr_literal.sh	pipeline
 tests/test_tick_durations.sh	character-data
 tests/test_type_stamp_census.sh	pipeline
 tests/test_vanilla_frame_join.sh	character-data
+tests/test_vanilla_aerial_join.sh	character-data
 tests/test_variant_dispatch.sh	pipeline
 tests/test_version_string.sh	gfx
 tests/test_voice_row_range.sh	pipeline

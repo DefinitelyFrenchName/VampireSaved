@@ -177,6 +177,22 @@ def classify(pairs):
     return "INCONSISTENT", f"most common delta {mode:+g} on {agree}/{len(pairs)}; spread {min(deltas):+g}..{max(deltas):+g}"
 
 
+# WHICH WORKBOOK AERIAL ROWS DOCUMENT THE FORWARD-JUMP VARIANT (14z-145). Source:
+# the mizuumi character pages' move lists (../community/, third-party, outside the
+# tree), which name the pair `8J.x` / `9J.x` where a character has two moves on
+# one button; the workbook's row is the `9J` one there, and the `J.x8` row (BI)
+# is the `8J` one by its own name. Characters absent here either have one aerial
+# set (their 0x18-0x1D aliases or duplicates the neutral chain, so the join is
+# indifferent) or, like ZA, are documented on the neutral chain. "second" = the
+# sheet carries the button TWICE and the second row is the forward variant (LI).
+# Measured chain sets: tests/expected/vanilla_aerial_slots.tsv.
+FORWARD_ROWS = {"BI": {"LP": True, "HP": True},
+                "BU": {"MP": True, "HP": True, "MK": True, "HK": True},
+                "FE": {"LK": True, "HK": True},
+                "VI": {"HP": True},
+                "LI": {"HK": "second"}}
+
+
 def compare(vanilla, sheet_path):
     wb = xlsx_read.Workbook(sheet_path)
     result = {"sheet": str(sheet_path), "characters": {}}
@@ -187,6 +203,27 @@ def compare(vanilla, sheet_path):
         rows = {}
         for r in wb.rows(tab):
             inp = str(r.get("input", "")).strip().upper().replace(" ", "")
+            # THE AERIAL JOIN (14z-145, measured by tests/test_vanilla_aerial_join.sh): the
+            # game has TWO aerial chain sets — a NEUTRAL jump attack enters a2 0x12-0x17
+            # (ours "J.x") and a FORWARD jump attack a2 0x18-0x1D (ours "9J.x", aliasing the
+            # neutral chain where the character has no variant). The workbook keeps ONE row
+            # per button; WHICH variant it documents is a fact about the workbook, taken from
+            # the community's own move lists (FORWARD_ROWS below), NEVER from which chain's
+            # numbers fit better — a fit against the source being checked is circular
+            # ([VSP-166]; a blanket "the row is the forward one" was tried and put ZA and LI
+            # into INCONSISTENT). Bishamon's `J.HP8` is his neutral HP by its own name.
+            m = re.fullmatch(r"J\.([LMH][PK])(8?)", inp)
+            if m:
+                btn, neutral_tag = m.group(1), m.group(2)
+                fwd = FORWARD_ROWS.get(tab, {}).get(btn)
+                if neutral_tag:
+                    inp = "J." + btn
+                elif fwd == "second":
+                    inp = "9J." + btn if ("J." + btn) in rows else "J." + btn
+                elif fwd:
+                    inp = "9J." + btn
+                else:
+                    inp = "J." + btn
             if inp in ours and inp not in rows:      # first row wins; duplicates are reported
                 rows[inp] = r
         per_col, moves = {}, {}
@@ -205,7 +242,7 @@ def compare(vanilla, sheet_path):
                     if o["end"] != "hold":
                         uncomparable.append((mv, str(cell), ov, "our chain LOOPS — the tail is the data's, not the move's"))
                         continue
-                    if mv.startswith("J."):
+                    if mv.startswith("J.") or mv.startswith("9J."):
                         # An AERIAL's recovery is bounded by the LANDING, a physics event, not by
                         # the chain's remaining node durations — which is why the workbook writes
                         # those cells as 'until landing' / 'landing 1' where it does not give a
@@ -327,9 +364,24 @@ def render_md(vanilla, cmp_, full=False):
     A("  `0x01` at both distances; **GA, VI** the same with LP at `0x00`; **BU** and **AU**")
     A("  additionally have no close variant for HP (BU none for MK).")
     A("")
-    A("The **crouching** (`0x0c-0x11`) and **jumping** (`0x12-0x17`) slots are the layout")
-    A("measured on the three TENANTS by `tools/name_moves.py` (gate `tests/test_move_naming.sh`),")
-    A("carried over and **not** re-measured per vanilla character — a stated bound, not a claim.")
+    A("The **crouching** (`0x0c-0x11`) slots are the layout measured on the three TENANTS by")
+    A("`tools/name_moves.py` (gate `tests/test_move_naming.sh`), carried over and **not**")
+    A("re-measured per vanilla character — a stated bound, not a claim.")
+    A("")
+    A("**The jumping slots are TWO sets, and the workbook's row is the forward one (measured")
+    A("14z-145).** A NEUTRAL jump attack enters `0x12-0x17` and a FORWARD jump attack")
+    A("`0x18-0x1D`, measured on all 15 characters by the same rig with the jump direction as")
+    A("the variable (`tests/test_vanilla_aerial_join.sh`, `tests/expected/vanilla_aerial_slots.tsv`).")
+    A("Where a character has no forward variant the `0x18-0x1D` entry aliases the neutral")
+    A("chain and the game enters the same address (VI on everything but HP, BU on LP/LK/HK,")
+    A("LI on HP). The workbook keeps ONE row per aerial button (Lilith's `J.HK` twice); WHICH")
+    A("variant a row documents is a fact about the workbook, taken from mizuumi's move lists —")
+    A("which name the pair `8J.x` / `9J.x` — and never from which chain's numbers fit better")
+    A("(`FORWARD_ROWS` in the comparator: BI LP/HP, BU MP/HP/MK/HK, FE LK/HK, VI HP, LI's second")
+    A("`J.HK`; Bishamon's `J.HP8` is his neutral HP by its own name; Zabel's rows are his neutral")
+    A("chain). The seven aerial outliers of 14z-125 were exactly the split moves joined to the")
+    A("wrong variant. Anakaris has no neutral-jump attacks at all: his neutral jump is a hover")
+    A("(`a:0x12`) that takes no normal.")
     A("Specials, supers and the `6`-prefixed command normals are not joined at all.")
     A("")
     A("## The headline: per-move agreement")
@@ -483,7 +535,11 @@ def render_md(vanilla, cmp_, full=False):
     A("- ~~**Jedah's crouching recovery (+3, not +2) is unexplained**~~ **CLOSED 2026-09-02:")
     A("  measured in engine ticks, 18/18 exact — the residue is the WORKBOOK'S, not ours**")
     A("  — see the arbitration section. Lilith's `2MK` behaves the same way.")
-    A("- **The aerial outliers — PART-RESOLVED 2026-09-02, and the likely cause is NAMED**")
+    A("- ~~**The aerial outliers**~~ **RESOLVED 14z-145 — the workbook's aerial row is the")
+    A("  FORWARD-jump variant and our join sent it to the NEUTRAL chain.** Two aerial slot")
+    A("  sets exist (`0x12-0x17` neutral, `0x18-0x1D` forward), measured on every character;")
+    A("  the join above now follows the measurement and the verdict table is what remains.")
+    A("  *(The entry as it stood before, kept for the trail.)* PART-RESOLVED 2026-09-02, and the likely cause is NAMED")
     A("  (BI `J.HP`/`J.LP`, BU `J.MP`, VI `J.HP`, FE `J.HK`/`J.LK`, SA `J.MP`).")
     A("  `tools/tick_durations.py` separates the move from the jump for chains that LOOP:")
     A("  an aerial repeats until landing, back to its start (BI `J.LP`) or to a late node")

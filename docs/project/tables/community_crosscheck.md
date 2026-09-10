@@ -76,9 +76,24 @@ fitting our numbers against this very workbook — which is circular, and wrong:
   `0x01` at both distances; **GA, VI** the same with LP at `0x00`; **BU** and **AU**
   additionally have no close variant for HP (BU none for MK).
 
-The **crouching** (`0x0c-0x11`) and **jumping** (`0x12-0x17`) slots are the layout
-measured on the three TENANTS by `tools/name_moves.py` (gate `tests/test_move_naming.sh`),
-carried over and **not** re-measured per vanilla character — a stated bound, not a claim.
+The **crouching** (`0x0c-0x11`) slots are the layout measured on the three TENANTS by
+`tools/name_moves.py` (gate `tests/test_move_naming.sh`), carried over and **not**
+re-measured per vanilla character — a stated bound, not a claim.
+
+**The jumping slots are TWO sets, and the workbook's row is the forward one (measured
+14z-145).** A NEUTRAL jump attack enters `0x12-0x17` and a FORWARD jump attack
+`0x18-0x1D`, measured on all 15 characters by the same rig with the jump direction as
+the variable (`tests/test_vanilla_aerial_join.sh`, `tests/expected/vanilla_aerial_slots.tsv`).
+Where a character has no forward variant the `0x18-0x1D` entry aliases the neutral
+chain and the game enters the same address (VI on everything but HP, BU on LP/LK/HK,
+LI on HP). The workbook keeps ONE row per aerial button (Lilith's `J.HK` twice); WHICH
+variant a row documents is a fact about the workbook, taken from mizuumi's move lists —
+which name the pair `8J.x` / `9J.x` — and never from which chain's numbers fit better
+(`FORWARD_ROWS` in the comparator: BI LP/HP, BU MP/HP/MK/HK, FE LK/HK, VI HP, LI's second
+`J.HK`; Bishamon's `J.HP8` is his neutral HP by its own name; Zabel's rows are his neutral
+chain). The seven aerial outliers of 14z-125 were exactly the split moves joined to the
+wrong variant. Anakaris has no neutral-jump attacks at all: his neutral jump is a hover
+(`a:0x12`) that takes no normal.
 Specials, supers and the `6`-prefixed command normals are not joined at all.
 
 ## The headline: per-move agreement
@@ -89,11 +104,11 @@ per MOVE, over all 15 characters:
 
 | column | convention | moves agreeing |
 |---|---|---|
-| `startup` | sheet = ours +1 — the sheet counts the first active frame as startup; ours counts the frames before it | **274/281** (97%) |
-| `active` | sheet = ours +0 — identical | **271/281** (96%) |
+| `startup` | sheet = ours +1 — the sheet counts the first active frame as startup; ours counts the frames before it | **280/283** (98%) |
+| `active` | sheet = ours +0 — identical | **280/283** (98%) |
 | `recovery` | sheet = ours +2 — a 2-frame tail the sheet counts and our last node does not | **190/197** (96%) |
-| `white` | sheet = ours +0 — identical — the record's +9 is the dealt white damage, unscaled | **268/281** (95%) |
-| `gauge_hit` | sheet = ours +0 — identical once the sheet's own `gauge whiff` is subtracted | **274/281** (97%) |
+| `white` | sheet = ours +0 — identical — the record's +9 is the dealt white damage, unscaled | **272/283** (96%) |
+| `gauge_hit` | sheet = ours +0 — identical once the sheet's own `gauge whiff` is subtracted | **278/283** (98%) |
 
 So the two measurements corroborate each other on ~96% of every column we can
 compare, under one stated convention per column. The residue is the worklist below.
@@ -104,18 +119,18 @@ compare, under one stated convention per column. The residue is the worklist bel
 |---|---|---|---|---|---|---|---|
 | **AN** Anakaris `0x06` | 15 | CONSTANT OFFSET (sheet = ours +1 on all 15) · n=15 | EXACT · n=15 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | INCONSISTENT · n=15 | EXACT · n=15 | INCONSISTENT · n=15 |
 | **AU** Aulbath `0x09` | 19 | INCONSISTENT · n=19 | INCONSISTENT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=19 | EXACT · n=19 | EXACT · n=19 |
-| **BI** Bishamon `0x08` | 18 | INCONSISTENT · n=17 | INCONSISTENT · n=17 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | INCONSISTENT · n=17 | INCONSISTENT · n=17 | INCONSISTENT · n=17 |
-| **BU** Bulleta `0x00` | 18 | INCONSISTENT · n=18 | INCONSISTENT · n=18 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | EXACT · n=18 | EXACT · n=18 | INCONSISTENT · n=18 |
+| **BI** Bishamon `0x08` | 19 | INCONSISTENT · n=18 | EXACT · n=18 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=18 | INCONSISTENT · n=18 | EXACT · n=18 |
+| **BU** Bulleta `0x00` | 18 | CONSTANT OFFSET (sheet = ours +1 on all 18) · n=18 | EXACT · n=18 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | EXACT · n=18 | EXACT · n=18 | EXACT · n=18 |
 | **DE** Demitri `0x01` | 21 | CONSTANT OFFSET (sheet = ours +1 on all 21) · n=21 | EXACT · n=21 | CONSTANT OFFSET (sheet = ours +2 on all 15) · n=15 | EXACT · n=21 | EXACT · n=21 | EXACT · n=21 |
-| **FE** Felicia `0x07` | 19 | CONSTANT OFFSET (sheet = ours +1 on all 19) · n=19 | INCONSISTENT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | EXACT · n=19 | INCONSISTENT · n=19 | EXACT · n=19 |
+| **FE** Felicia `0x07` | 19 | CONSTANT OFFSET (sheet = ours +1 on all 19) · n=19 | EXACT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | EXACT · n=19 | INCONSISTENT · n=19 | EXACT · n=19 |
 | **GA** Gallon `0x02` | 18 | CONSTANT OFFSET (sheet = ours +1 on all 18) · n=18 | EXACT · n=18 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=18 | EXACT · n=18 | EXACT · n=18 |
 | **JE** Jedah `0x0f` | 18 | CONSTANT OFFSET (sheet = ours +1 on all 18) · n=18 | EXACT · n=18 | INCONSISTENT · n=12 | INCONSISTENT · n=18 | EXACT · n=18 | INCONSISTENT · n=18 |
 | **LE** Lei-Lei `0x0d` | 19 | CONSTANT OFFSET (sheet = ours +1 on all 19) · n=19 | INCONSISTENT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | INCONSISTENT · n=19 | INCONSISTENT · n=19 | INCONSISTENT · n=19 |
-| **LI** Lilith `0x0e` | 21 | CONSTANT OFFSET (sheet = ours +1 on all 21) · n=21 | EXACT · n=21 | INCONSISTENT · n=16 | INCONSISTENT · n=21 | EXACT · n=21 | INCONSISTENT · n=21 |
+| **LI** Lilith `0x0e` | 22 | CONSTANT OFFSET (sheet = ours +1 on all 22) · n=22 | EXACT · n=22 | INCONSISTENT · n=16 | INCONSISTENT · n=22 | EXACT · n=22 | INCONSISTENT · n=22 |
 | **MO** Morrigan `0x05` | 21 | CONSTANT OFFSET (sheet = ours +1 on all 21) · n=21 | EXACT · n=21 | CONSTANT OFFSET (sheet = ours +2 on all 15) · n=15 | INCONSISTENT · n=21 | EXACT · n=21 | INCONSISTENT · n=21 |
 | **QB** Q-Bee `0x0c` | 15 | CONSTANT OFFSET (sheet = ours +1 on all 15) · n=15 | EXACT · n=15 | CONSTANT OFFSET (sheet = ours +2 on all 10) · n=10 | INCONSISTENT · n=15 | EXACT · n=15 | INCONSISTENT · n=15 |
 | **SA** Sasquatch `0x0a` | 19 | INCONSISTENT · n=19 | EXACT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | INCONSISTENT · n=19 | INCONSISTENT · n=19 | INCONSISTENT · n=19 |
-| **VI** Victor `0x03` | 23 | INCONSISTENT · n=23 | INCONSISTENT · n=23 | CONSTANT OFFSET (sheet = ours +2 on all 17) · n=17 | INCONSISTENT · n=23 | EXACT · n=23 | INCONSISTENT · n=23 |
+| **VI** Victor `0x03` | 23 | CONSTANT OFFSET (sheet = ours +1 on all 23) · n=23 | EXACT · n=23 | CONSTANT OFFSET (sheet = ours +2 on all 17) · n=17 | INCONSISTENT · n=23 | EXACT · n=23 | INCONSISTENT · n=23 |
 | **ZA** Zabel `0x04` | 18 | CONSTANT OFFSET (sheet = ours +1 on all 18) · n=18 | EXACT · n=18 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=18 | EXACT · n=18 | EXACT · n=18 |
 
 ## The arbitration — what the emulator said about the residue
@@ -204,41 +219,13 @@ taken from the engine itself.
 
 19 move(s) deviate; the per-move table is on the full page.
 
-### BI Bishamon — `startup` — most common delta +1 on 14/17; spread +0..+5
-
-17 move(s) deviate; the per-move table is on the full page.
-
-### BI Bishamon — `active` — most common delta +0 on 15/17; spread -3..+0
-
-17 move(s) deviate; the per-move table is on the full page.
-
-### BI Bishamon — `white` — most common delta +0 on 15/17; spread -8..+0
-
-17 move(s) deviate; the per-move table is on the full page.
-
-### BI Bishamon — `gauge_hit` — most common delta +0 on 14/17; spread -18..+6
-
-17 move(s) deviate; the per-move table is on the full page.
-
-### BI Bishamon — `red` — most common delta +0 on 15/17; spread -18..+0
-
-17 move(s) deviate; the per-move table is on the full page.
-
-### BU Bulleta — `startup` — most common delta +1 on 17/18; spread -1..+1
+### BI Bishamon — `startup` — most common delta +1 on 17/18; spread +0..+1
 
 18 move(s) deviate; the per-move table is on the full page.
 
-### BU Bulleta — `active` — most common delta +0 on 16/18; spread +0..+1
+### BI Bishamon — `gauge_hit` — most common delta +0 on 17/18; spread +0..+6
 
 18 move(s) deviate; the per-move table is on the full page.
-
-### BU Bulleta — `red` — most common delta +0 on 16/18; spread -1..+0
-
-18 move(s) deviate; the per-move table is on the full page.
-
-### FE Felicia — `active` — most common delta +0 on 17/19; spread -1..+2
-
-19 move(s) deviate; the per-move table is on the full page.
 
 ### FE Felicia — `gauge_hit` — most common delta +0 on 18/19; spread -10..+0
 
@@ -276,13 +263,13 @@ taken from the engine itself.
 
 16 move(s) deviate; the per-move table is on the full page.
 
-### LI Lilith — `white` — most common delta +0 on 18/21; spread -1..+7
+### LI Lilith — `white` — most common delta +0 on 18/22; spread -1..+7
 
-21 move(s) deviate; the per-move table is on the full page.
+22 move(s) deviate; the per-move table is on the full page.
 
-### LI Lilith — `red` — most common delta +0 on 18/21; spread -1..+18
+### LI Lilith — `red` — most common delta +0 on 18/22; spread -1..+18
 
-21 move(s) deviate; the per-move table is on the full page.
+22 move(s) deviate; the per-move table is on the full page.
 
 ### MO Morrigan — `white` — most common delta +0 on 20/21; spread +0..+7
 
@@ -316,19 +303,11 @@ taken from the engine itself.
 
 19 move(s) deviate; the per-move table is on the full page.
 
-### VI Victor — `startup` — most common delta +1 on 22/23; spread +1..+4
+### VI Victor — `white` — most common delta +0 on 22/23; spread +0..+8
 
 23 move(s) deviate; the per-move table is on the full page.
 
-### VI Victor — `active` — most common delta +0 on 22/23; spread +0..+1
-
-23 move(s) deviate; the per-move table is on the full page.
-
-### VI Victor — `white` — most common delta +0 on 21/23; spread -1..+8
-
-23 move(s) deviate; the per-move table is on the full page.
-
-### VI Victor — `red` — most common delta +0 on 21/23; spread -4..+22
+### VI Victor — `red` — most common delta +0 on 22/23; spread +0..+22
 
 23 move(s) deviate; the per-move table is on the full page.
 
@@ -342,7 +321,11 @@ taken from the engine itself.
 - ~~**Jedah's crouching recovery (+3, not +2) is unexplained**~~ **CLOSED 2026-09-02:
   measured in engine ticks, 18/18 exact — the residue is the WORKBOOK'S, not ours**
   — see the arbitration section. Lilith's `2MK` behaves the same way.
-- **The aerial outliers — PART-RESOLVED 2026-09-02, and the likely cause is NAMED**
+- ~~**The aerial outliers**~~ **RESOLVED 14z-145 — the workbook's aerial row is the
+  FORWARD-jump variant and our join sent it to the NEUTRAL chain.** Two aerial slot
+  sets exist (`0x12-0x17` neutral, `0x18-0x1D` forward), measured on every character;
+  the join above now follows the measurement and the verdict table is what remains.
+  *(The entry as it stood before, kept for the trail.)* PART-RESOLVED 2026-09-02, and the likely cause is NAMED
   (BI `J.HP`/`J.LP`, BU `J.MP`, VI `J.HP`, FE `J.HK`/`J.LK`, SA `J.MP`).
   `tools/tick_durations.py` separates the move from the jump for chains that LOOP:
   an aerial repeats until landing, back to its start (BI `J.LP`) or to a late node

@@ -613,10 +613,14 @@ frame by `tests/lua/field_trace.lua`, each pointer mapped onto the graph
   `0x3a` (one chain for LK/MK/HK — the distance is a parameter), Change
   Immortal `0x3b -> 0x3c -> 0x3e -> 0x3f` (`0x3d` = the loop body of `0x3c`:
   `0x3c`'s last node loops onto `0x3d`'s first, so it is walked under
-  `0x3c`'s label — 14z-121 (4)). The ids `0x18-0x1d`, `0x24` and the odd
+  `0x3c`'s label — 14z-121 (4)). The ids `0x24` and the odd
   standing ids are entered by NO normal, 6+button or 3+button input
   (part 13: point-blank 5P/5K, 6LP..6MK, 3P/3K, 1HK all map to the plain
-  chains — 14z-121 (4)). Grapple
+  chains — 14z-121 (4)). *This sentence also listed `0x18-0x1d` — RE-BOUNDED
+  14z-145: part 13 tried GROUND inputs only, and on every VANILLA character
+  `0x18-0x1d` is the FORWARD-JUMP attack set (`0x12-0x17` the neutral one;
+  `tests/test_vanilla_aerial_join.sh`), so for a tenant "entered by nothing"
+  is UNMEASURED until his naming rig performs a forward-jump attack.* Grapple
   `0x41`. Stance: Killshread LK `0x44`, MK/HK `0x43`, ES `0x46`; summon
   ground `0x47`, air `0x48` (no ES — the pair spends no stock and enters
   `0x47`; maintainer-confirmed 14z-121, and the ES effect of the stance
@@ -736,6 +740,39 @@ the per-chain frame data in the out-of-tree `<tenant>_anim.md`.
   Blizzard Sword's record 1 (`+0x17` = 0x14) put 0x14 on the victim.
 - Sizes: Donovan 144 family entries / 200 attack records, Huitzil 72 /
   364, Pyron 63 / 143 (the per-tenant pages).
+
+## The anim index a2's TWO aerial slot sets — neutral and forward jump (14z-145, MEASURED on all 15 vanilla characters)
+
+Depends on atlas rows: `ram.md` `+0x1C` (node), `+0x14` (Y position); the
+anim index tables of `character_tables.md` (`anim_index_a2`). Rig
+`tools/vanilla_join_rig.py` sets `jump` (U) and `jump_fwd` (UR), verdict the
+chain `+0x1C` enters inside the button window, frozen in
+`tests/expected/vanilla_aerial_slots.tsv`.
+**Gates:** `tests/test_vanilla_aerial_join.sh`, `tests/test_vanilla_frame_join.sh`
+(the standing join, same rig), `tests/test_community_crosscheck.sh` (the join
+it feeds).
+
+- **a2 slots `0x12-0x17` are the NEUTRAL-jump attacks and `0x18-0x1D` the
+  FORWARD-jump attacks, LP MP HP LK MK HK in both** [M:
+  `tests/test_vanilla_aerial_join.sh`, 180 rows]. Where a character has no
+  forward variant the `0x18-0x1D` entry ALIASES the neutral chain (the same
+  node address — VI on everything but HP, BU on LP/LK/HK, LI on HP) or
+  duplicates its content, and the game enters that address (22 of 90 forward
+  rows). The split moves are exactly the ones the community names `8J.x` /
+  `9J.x`: BU MP/HP/MK, BI LP/HP, FE LK/HK, LI HK, VI HP, SA LP/LK.
+- **Zabel's forward jump enters his NEUTRAL set on all six buttons** although
+  his `0x18-0x1D` hold different chains (`0x1B-0x1D`: 18- and 12-frame
+  actives with no recovery) — so those are not his forward-jump normals, and
+  what enters them is unmeasured.
+- **Anakaris has NO neutral-jump attacks.** U puts him in a HOVER chain
+  (`a:0x12`, +8 px, held ~112 frames) in which every button is ignored; his
+  forward jump (`a:0x10` pre-jump, then the a2 attack at +38 px) fires all
+  six. The community corpus lists one aerial set for him. The gate declares
+  and ASSERTS the six void rows.
+- **Instrument note:** a table-a chain with no terminator walks on into a2's
+  region (AU's `a:0x34`, 215 nodes, through the start of `a2:0x12`), so a
+  node map that lets the first chain seen own an address mislabels the
+  normal the game entered; the rig's map walks a2 before a.
 
 ## Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED)
 

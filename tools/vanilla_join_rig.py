@@ -27,6 +27,11 @@ all 15 measured):
 So slot 0x00 vs 0x01 for LP is character-dependent, and "even = close" is a
 tendency, not a law. Nothing downstream may assume it.
 
+THE AERIAL DIRECTION (14z-145). `jump` is a NEUTRAL jump (U) and `jump_fwd` a
+FORWARD jump (UR); a2 carries TWO aerial slot sets, 0x12-0x17 and 0x18-0x1D,
+and which direction enters which is what tests/test_vanilla_aerial_join.sh
+measures (`--airborne` reports whether P1 had left the ground at the press).
+
 A scripted input is not the move it names ([VSE-47]), so nothing here trusts
 its own script: the verdict is the chain the fighter entered inside the event
 window, mapped onto the graph `tools/anim_nodes.py` decodes, and a window with
@@ -59,13 +64,22 @@ BUTTONS = ["LP", "MP", "HP", "LK", "MK", "HK"]
 SETS = {"far":    ("stand",  300, False),
         "near":   ("stand",  480, True),
         "crouch": ("crouch", 300, False),
-        "jump":   ("jump",   360, False),
+        "jump":   ("jump",   360, False),      # NEUTRAL jump (U), 14z-125b
+        "jump_fwd": ("jump_fwd", 360, False),  # FORWARD jump (UR), 14z-145: the
+                                               # second aerial slot set a2 0x18-0x1D
         "hit":    ("stand",  480, True)}
 GAP = {k: v[1] for k, v in SETS.items()}
 
 
+def _jump_fwd(b):
+    # name_moves.jump with the jump direction FORWARD (P1 is pinned left of P2 and faces
+    # right, so UR is toward the opponent); the button lands at the same frames.
+    return [(a, bb, tok.replace("U", "UR", 1) if tok == "U" else tok) for a, bb, tok in name_moves.jump(b)]
+
+
 def _recipe(kind, b):
-    return {"stand": name_moves.stand, "crouch": name_moves.crouch, "jump": name_moves.jump}[kind](b)
+    return {"stand": name_moves.stand, "crouch": name_moves.crouch, "jump": name_moves.jump,
+            "jump_fwd": _jump_fwd}[kind](b)
 
 
 def gen(cid, dist, out_rpl, out_sched):
@@ -112,7 +126,12 @@ def node_map(img, cid, detail=False):
     """{node address: 'table:seq'}, or with detail {addr: (chain, index, hbA, dur)}."""
     rows = vanilla_frames.bank_rows(Path(__file__).resolve().parent.parent / "build/manifest/bank_map.toml")
     out = {}
-    for tn in ("a", "a2"):
+    # a2 FIRST (14z-145): a table-a chain without a terminator walks on into a2's
+    # region — AU's a:0x34 ran 215 nodes through the start of a2:0x12 — and with
+    # "first chain seen wins" the neutral-jump LP the game entered read as
+    # `a:0x34`. The named normal chains own their nodes; an overrunning table-a
+    # chain keeps only what nothing in a2 claims.
+    for tn in ("a2", "a"):
         tbl = vanilla_frames.row_ptr(img, rows["anim_index_" + tn], cid)
         w = anim_nodes.walk_table(img, 0, tbl, len(img))
         for seq, c in w["chains"].items():
@@ -203,7 +222,7 @@ def damage(trace, sched, window=200):
 
 def analyse(trace, sched, img, cid, window=90):
     nm = node_map(img, cid)
-    frames = {}
+    frames, ys = {}, {}
     for ln in Path(trace).read_text().splitlines():
         m = re.match(r"F (\d+) (.*)", ln)
         if not m:
@@ -212,18 +231,41 @@ def analyse(trace, sched, img, cid, window=90):
         kv = dict(p.split("=", 1) for p in m.group(2).split() if "=" in p)
         if "node" in kv:
             frames[f] = int(kv["node"]) & 0xFFFFFFFF
+        if "p1y" in kv:
+            ys[f] = int(kv["p1y"])
     out = []
     for e in sched["events"]:
         t0 = e["frame"]
-        before = {nm.get(frames[f]) for f in range(t0 - 30, t0) if f in frames}
+        # OBSERVE FROM THE BUTTON, not from the event's first token (14z-145): a
+        # jump recipe presses U at +0 and the button at +14, and "the first new
+        # chain after +0" is the JUMP itself (a:0x0e on every character — the
+        # first freeze run said so, 180 identical rows, and the must-fire control
+        # refused the table). `before` is everything seen up to the press, the
+        # jump chain included; the standing/crouching sets press at +0 and are
+        # unchanged by this.
+        press0 = min((a for a, bb, tok in _recipe(sched["kind"], e["name"]) if tok.isdigit()), default=0)
+        obs = t0 + press0
+        before = {nm.get(frames[f]) for f in range(t0 - 30, obs) if f in frames}
         seen, first = [], None
-        for f in range(t0, t0 + window):
+        for f in range(obs, obs + window):
             c = nm.get(frames.get(f))
             if c and c not in before and c not in seen:
                 seen.append(c)
                 if first is None:
                     first = c
-        out.append({"button": e["name"], "frame": t0, "entered": first or "UNFIRED", "all": seen})
+        # AIRBORNE at the press: the y position (+0x14, ram.md) differs from the
+        # pre-event ground value on every frame of the button window. Only
+        # meaningful for the jump sets (the field is traced there); "-" otherwise.
+        press = [f for a, bb, tok in _recipe(sched["kind"], e["name"]) if tok.isdigit()
+                 for f in range(t0 + a, t0 + bb + 1)]     # the button token is the digit
+        ground = ys.get(t0 - 5)
+        if ys and press and ground is not None:
+            air = all(ys.get(f, ground) != ground for f in press if f in ys)
+            airborne = "air" if air else "ground"
+        else:
+            airborne = "-"
+        out.append({"button": e["name"], "frame": t0, "entered": first or "UNFIRED", "all": seen,
+                    "airborne": airborne})
     return out
 
 
@@ -243,6 +285,7 @@ def main():
     ap.add_argument("--tsv", action="store_true", help="one machine row per event")
     ap.add_argument("--durations", action="store_true", help="MEASURED startup/active/recovery per event")
     ap.add_argument("--damage", action="store_true", help="P2 HP drops per event (the `hit` set)")
+    ap.add_argument("--airborne", action="store_true", help="append the airborne-at-press column (air/ground/-) to --tsv rows")
     n = ap.parse_args()
     sched = json.loads(n.sched.read_text())
     if n.durations:
@@ -260,7 +303,8 @@ def main():
     res = analyse(n.trace, sched, n.image.read_bytes(), int(n.char, 0), n.window)
     for r in res:
         if n.tsv:
-            print(f"{n.tab or sched['char']}\t{sched['distance']}\t{r['button']}\t{r['entered']}")
+            tail = f"\t{r['airborne']}" if n.airborne else ""
+            print(f"{n.tab or sched['char']}\t{sched['distance']}\t{r['button']}\t{r['entered']}{tail}")
         else:
             extra = (" then " + " ".join(r["all"][1:])) if len(r["all"]) > 1 else ""
             print(f"{sched['distance']:5} {r['button']:3} f{r['frame']:<5} -> {r['entered']}{extra}")
