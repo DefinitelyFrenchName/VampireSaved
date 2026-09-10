@@ -616,11 +616,18 @@ frame by `tests/lua/field_trace.lua`, each pointer mapped onto the graph
   `0x3c`'s label — 14z-121 (4)). The ids `0x24` and the odd
   standing ids are entered by NO normal, 6+button or 3+button input
   (part 13: point-blank 5P/5K, 6LP..6MK, 3P/3K, 1HK all map to the plain
-  chains — 14z-121 (4)). *This sentence also listed `0x18-0x1d` — RE-BOUNDED
-  14z-145: part 13 tried GROUND inputs only, and on every VANILLA character
-  `0x18-0x1d` is the FORWARD-JUMP attack set (`0x12-0x17` the neutral one;
-  `tests/test_vanilla_aerial_join.sh`), so for a tenant "entered by nothing"
-  is UNMEASURED until his naming rig performs a forward-jump attack.* Grapple
+  chains — 14z-121 (4)). *This sentence also listed `0x18-0x1d` — RESOLVED
+  14z-145 by MEASUREMENT (naming part 14, `j.x [9]`, a forward-jump attack
+  per button): Donovan's `0x18-0x1d` entries ALIAS `0x12-0x17` chain for
+  chain (the same node addresses in his vs2 extract), so a forward-jump
+  attack enters the aliased chain and reads as `0x12-0x17` — "entered by
+  nothing" was true of the slot NUMBERS and vacuous about the chains. Same
+  for Huitzil (part 10, all six alias). Pyron (part 6): `0x1b-0x1d` alias,
+  `0x19/0x1a` are near-duplicates of `0x13/0x14` (one extra active node on
+  `0x1a`), and `0x18` is a DISTINCT 4-node LP chain — yet his forward-jump
+  LP/MP/HP enter `0x12-0x14`, Zabel's pattern: what enters his `0x18` is
+  unmeasured. On every vanilla character the split is real
+  (`tests/test_vanilla_aerial_join.sh`).* Grapple
   `0x41`. Stance: Killshread LK `0x44`, MK/HK `0x43`, ES `0x46`; summon
   ground `0x47`, air `0x48` (no ES — the pair spends no stock and enters
   `0x47`; maintainer-confirmed 14z-121, and the ES effect of the stance

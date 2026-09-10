@@ -90,3 +90,9 @@
 5	Cosmo Disruption [63214 PP] far, no dash	a2:0x00
 5	Cosmo Disruption [63214 MP+HP] far, no dash	a2:0x02
 5	Cosmo Disruption [41236 MP+HP] far	a2:0x24 a2:0x3c
+6	j.LP [9]	a2:0x12
+6	j.MP [9]	a2:0x13
+6	j.HP [9]	a2:0x14
+6	j.LK [9]	a2:0x15
+6	j.MK [9]	a2:0x16
+6	j.HK [9]	a2:0x17

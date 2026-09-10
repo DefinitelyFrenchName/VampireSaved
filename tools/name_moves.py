@@ -83,6 +83,7 @@ def crouch(b):     return [(0, 3, "D" + B[b])]
 def jump(b):       return [(0, 2, "U"), (14, 17, B[b])]
 def fwd(b):        return [(0, 3, "R" + B[b])]
 def air_down(b):   return [(0, 2, "U"), (16, 19, "D" + B[b])]
+def jump_fwd(b):   return [(0, 2, "UR"), (14, 17, B[b])]     # FORWARD jump attack (14z-145): a2 0x18-0x1D on vanilla
 def qcf(b):        return [(0, 1, "D"), (2, 3, "DR"), (4, 8, "R"), (5, 9, B[b])]            # 236
 def dp(b):         return [(0, 2, "R"), (4, 6, "D"), (8, 11, "DR" + B[b])]                  # 623 (replay 19)
 def qcb(b):        return [(0, 4, "D"), (5, 9, "DL"), (10, 18, "L"), (14, 20, B[b])]        # 214 (replay 50)
@@ -594,6 +595,19 @@ DONOVAN_VICTIM = {   # P1 = Victor attacks P2 = Donovan; every contact class the
         ("V 5HP, P2 mash HP", stand("HP") + block() + mash("3", 9, 23), 460, "near"),
     ],
 }
+# THE FORWARD-JUMP ATTACKS (14z-145). On every vanilla character a NEUTRAL jump
+# attack enters a2 0x12-0x17 and a FORWARD jump attack a2 0x18-0x1D (or the
+# neutral chain where the slot aliases it) — tests/test_vanilla_aerial_join.sh.
+# Part 1 names the tenants' aerials from a NEUTRAL jump only, and Donovan's
+# part 13 (ground inputs only) had recorded 0x18-0x1d as "entered by nothing".
+# Each event is "<row> [9]" so it is owned by the maintainer's j.x row (a row
+# with several inputs is measured per input); every event is pinned "far"
+# because a forward jump carries P1 toward P2.
+_FWD = [(f"j.{b} [9]", jump_fwd(b), 150, "far") for b in ("LP", "MP", "HP", "LK", "MK", "HK")]
+DONOVAN["14"] = list(_FWD)
+PYRON["6"] = list(_FWD)
+HUITZIL["10"] = list(_FWD)
+
 SCHEDULES = {"donovan": DONOVAN, "pyron": PYRON, "huitzil": HUITZIL,
              "donovan_victim": DONOVAN_VICTIM, "huitzil_victim": DONOVAN_VICTIM, "pyron_victim": DONOVAN_VICTIM}
 NO_POKE_PARTS = {("donovan", "9"), ("donovan", "10"), ("donovan", "11")}   # parts the -debug write tap must be able to replay: no HP pin, no stock poke
