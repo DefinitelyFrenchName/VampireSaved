@@ -59,6 +59,10 @@ test_header_defaults
 # exit-status classifier (the M16 release run recorded a 65-minute Verilator
 # gate as PASS 0s). Explicit tests instead; must-fire control. ROM-free, ~1 s.
 test_demand_after_trap
+# test_must_fire_census.sh — the must-fire doctrine MACHINE-READ (14z-145): the
+# declaring inventory (grows only) and the header-only debt (shrinks only).
+# Step one of the ruling on the BBX finding; step two is the run-time contract.
+test_must_fire_census
 test_hex_lengths
 test_masked_compare
 test_m2a_flicker_gate

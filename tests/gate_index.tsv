@@ -124,6 +124,7 @@ tests/test_decode_stage_banners.sh	review-triage
 tests/test_decrypt_cache.sh	review-triage
 tests/test_decrypt_oracle.sh	platform
 tests/test_demand_after_trap.sh	runner
+tests/test_must_fire_census.sh	runner
 tests/test_describe_masked_shape.sh	oracle
 tests/test_df_startup_provenance.sh	character-data
 tests/test_doc_anchor_census.sh	docs
