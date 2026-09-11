@@ -64,7 +64,7 @@ free of copyrighted content — and a gate scans every patch for verbatim
 reference-ROM bytes before a release is cut.
 
 ## Play on FBNEO
-1. Get the patched emulator — EITHER a prebuilt binary (no prebuilt binary is included for any OS in this release yet — build per the recipe below), OR build it
+1. Get the patched emulator — EITHER a prebuilt binary (prebuilt binaries for: macos-arm64 — download `merged-m18-fbneo-<os-arch>.zip` from the GitHub release on tag `freeze/merged-m18` (https://github.com/DefinitelyFrenchName/VampireSaved/releases/tag/freeze/merged-m18); each zip carries a `BINARY.txt` (also here under `emulator/bin/<os-arch>/`) — verify every file's sha256 against it after unzipping), OR build it
    yourself from the pinned upstream with the driver patch: `EMULATOR.md` has
    the exact commands. Both are the same code; the patch is 0002-cps2-wide-v1.
 2. Put `vsavjw.zip` (from the applier) AND your pristine `vsav.zip` in the

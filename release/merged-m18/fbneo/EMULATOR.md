@@ -32,7 +32,7 @@ keep your pristine `vsav.zip` in the rom path too — the loader resolves the
 unmodified members from it.
 
 ## Prebuilt binaries
-None in this release yet (ruled 2026-09-11: releases ship the recipe AND prebuilt binaries per OS; the binaries are a build resource under `release/emulators/` in the project tree and are added as each host builds them). The recipe above is complete.
+This release ships prebuilt binaries for: macos-arm64 — as ASSETS of the GitHub release on tag `freeze/merged-m18` (https://github.com/DefinitelyFrenchName/VampireSaved/releases/tag/freeze/merged-m18), one `merged-m18-fbneo-<os-arch>.zip` each, never as files in the repository (ruled 2026-09-11). Each zip carries a `BINARY.txt` naming the files with their sha256, the upstream pin and the driver patch they were built from — the same record sits here under `emulator/bin/<os-arch>/`; verify every file after unzipping. They are built from exactly the recipe above (the recipe AND the prebuilt, each user free to choose). Only the latest freeze keeps its assets.
 
 ## If it does not work
 - "Unknown system: vsavjw" — this binary does not carry the driver patch.

@@ -38,7 +38,7 @@ missing FAILS; the must-fires `stray-file` and `readme-missing-section`):
 | `apply_release.py` | the applier; **Python 3 only** since 14z-148 (its own VCDIFF decoder; xdelta3 remains the PACKAGER's encoder) |
 | `README.md` | the END-USER document: what you need, build the romset, play on this platform, if it does not work, the no-ROM statement — the five sections the gate greps for |
 | `EMULATOR.md` + `emulator/0002-cps2-wide-v1.patch` (fbneo, mame) | the driver patch, the upstream pin and the build recipe |
-| `emulator/bin/<os-arch>/…` + `BINARY.txt` (fbneo, mame; **optional**) | **prebuilt binaries — RULED 2026-09-11: the recipe AND the prebuilt, each user free to choose.** A build resource under `release/emulators/<platform>/<os-arch>/` with a record (sha256 per file, pin, patch), hash-verified into the release; absent for an OS until a host builds it (this MacBook builds macOS only; Windows and Linux are the two remote boxes) |
+| `emulator/bin/<os-arch>/…` + `BINARY.txt` (fbneo, mame; **optional**) | **prebuilt binaries — RULED 2026-09-11: the recipe AND the prebuilt, each user free to choose.** A build resource under `release/emulators/<platform>/<os-arch>/` with a record (sha256 per file, pin, patch), hash-verified into the release; absent for an OS until a host builds it (this MacBook builds macOS only; Windows and Linux are the two remote boxes). **THE FILES ARE GITHUB RELEASE ASSETS, NEVER GIT CONTENT (ruled 2026-09-11, 14z-149, option (b))**: the tree tracks every `BINARY.txt`, ignores the files beside it, `tools/upload_release_assets.sh freeze/<name> --prune` attaches `<name>-<platform>-<os-arch>.zip` to the release on the freeze tag and deletes the previous freeze's assets, so GitHub hosts only the latest; the maintainer's web storage may mirror them |
 | `*.mra`, `jtcps2w.rbf`, `BITSTREAM.txt`, `MISTER.md` (mister) | the two MRAs, the bitstream and its record — on top of the patch set, because the WIDE set still has to be rebuilt from the user's dumps (an MRA-only path is NOT reachable: the WIDE gfx members are ~26,000 tile-sized copies each out of `vsav2`/`vhunt2`, measured 2026-09-11) |
 
 **Never ships:** a ROM byte in any form (the rule-7 scan), a build log, a
@@ -74,7 +74,8 @@ release/<name>/
   mame/     patches/ manifest.json apply_release.py README.md
             emulator/0002-cps2-wide-v1.patch  EMULATOR.md
             emulator/bin/<os-arch>/ + BINARY.txt
-release/emulators/<platform>/<os-arch>/                         <- THE BINARY BUILD RESOURCE (files + BINARY.txt: sha256 per file, pin, patch)
+release/emulators/<platform>/<os-arch>/                         <- THE BINARY BUILD RESOURCE (files + BINARY.txt: sha256 per file, pin, patch);
+                                                                   the RECORD is tracked, the files are ignored — they ship as release assets
   mister/   patches/ manifest.json apply_release.py README.md
             *.mra  jtcps2w.rbf  BITSTREAM.txt  MISTER.md        <- the MRAs, the bitstream (hash-verified copy), its record
 ```
@@ -112,6 +113,22 @@ release/emulators/<platform>/<os-arch>/                         <- THE BINARY BU
   record, self-containment, the signature, the profile, no harness, and a
   boot of the current merged set on each binary (MAME reproducing a frozen
   masked expectation of the freeze).
+  **WHERE THE FILES LIVE (ruled 2026-09-11, the maintainer's three questions
+  answered by measurement):** a committed binary lives in every clone's
+  history forever — ~140 MB per release, tripled by three OSes, against a
+  68 MiB pack — and only a history rewrite removes it, so the files are
+  RELEASE ASSETS: `tools/upload_release_assets.sh freeze/<name> [--prune]`
+  verifies each resource dir against its record, writes the `asset` line into
+  the record, zips the directory (`<name>-<platform>-<os-arch>.zip`, 16 + 15
+  MiB for macOS where the directories are 57 + 81 MiB — MAME compresses
+  five-fold), creates the GitHub release on the tag if absent, uploads, then
+  DOWNLOADS the asset back and re-verifies every row against what GitHub
+  serves; `--prune` deletes the previous freeze's `*.zip` assets (release and
+  tag stay — the tree's records say what shipped). The release procedure:
+  freeze, package, `test_release_binaries` green, upload with `--prune`. A
+  fresh clone holds the records only: `test_release_binaries` SKIPs there
+  (red under a strict release run, which is right) and the roundtrip gate
+  notes it.
 * **[MSC-62]** **[MJC-62]** **MiSTer ships the MRAs the release was verified with, the `.rbf` itself
   and its RECORD (`BITSTREAM.txt`: seed, slack, sha256, build date, fork
   pin, field history)** — ruled tracked in-tree, "as would any BPS or

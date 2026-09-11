@@ -289,6 +289,9 @@ else
     for rec in "$REL"/fbneo/emulator/bin/*/BINARY.txt "$REL"/mame/emulator/bin/*/BINARY.txt; do
         [ -f "$rec" ] || continue
         bd="$(dirname "$rec")"
+        # the record is tracked, the files are release assets (ruled 14z-149): record-only is a
+        # fresh clone, not a defect — the packager puts the files beside it on the release host
+        [ "$(ls "$bd" | grep -vc '^BINARY.txt$')" != 0 ] || { echo "  note: $bd holds the record only (the binaries are release assets)"; continue; }
         grep -E '^sha256 +[0-9a-f]{64} +[^ ]+' "$rec" | while read -r _ want fname; do
             [ "$(shasum -a 256 "$bd/$fname" 2>/dev/null | cut -c1-64)" = "$want" ] || echo "BAD $bd/$fname"
         done > "$W/bin_$$.txt"

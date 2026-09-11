@@ -5,7 +5,7 @@
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## THE macOS PREBUILT BINARIES EXIST, ARE GATED, AND SIT IN M18 UNCOMMITTED — ONE DECISION DECIDES WHERE THEY LIVE. NO BUILD BYTE MOVED.
+## THE macOS PREBUILT BINARIES: BUILT, GATED, PUBLISHED AS RELEASE ASSETS ON `freeze/merged-m18` (ruled: assets, never git content). NO BUILD BYTE MOVED.
 
 M18 (`merged-m18`, `build/m3b_merged26`) is still the current freeze and
 release. `git status -sb` says the push state.
@@ -19,22 +19,27 @@ macos-arm64/`, the gate `tests/test_release_binaries.sh` (record,
 self-containment, signature, profile, no harness, a BOOT on each — MAME
 reproducing a frozen masked expectation on the release binary; 74 s, two
 executable must-fires), M18 repackaged with `emulator/bin/macos-arm64/` on
-both emulator sides (150 MB on disk). Two shipped-recipe defects corrected
+both emulator sides. Then the ruling — (b) with pruning — and its mechanism:
+`tools/upload_release_assets.sh` (verify, zip, upload, download back and
+re-verify, prune the previous freeze). Two shipped-recipe defects corrected
 in place: the FBNeo fresh-tree build needs TWO passes ([CPE-26]), and
 `-verifyroms` says "is bad" BY DESIGN on a content set (20 flagged = the
 rewritten/new members) where the recipe said "must say good".
 
 ## START HERE — what is open
 
-- **THE PREBUILT BINARIES — DECIDE WHERE THEY LIVE, then commit** (STATE
-  "Decisions pending", 14z-149): the macOS pair is built, gated and packaged
-  but UNCOMMITTED because committing ~140 MB per release into git history is
-  the maintainer's call — recommendation (b): gitignore the binary files,
-  track `BINARY.txt`, attach the directories as GitHub release assets on the
-  freeze tag. Whatever is ruled: land it, then re-run `test_release_roundtrip`
-  and `test_release_binaries`. **The floor is macOS 26.0 arm64** (Homebrew's
+- ~~**THE PREBUILT BINARIES — DECIDE WHERE THEY LIVE**~~ **RULED AND BUILT
+  14z-149 (2): release assets, never git content** — the records tracked,
+  the files ignored, `tools/upload_release_assets.sh freeze/<name> --prune`
+  after `test_release_binaries` is green; M18's macOS pair is on the release
+  page of `freeze/merged-m18`. **The floor is macOS 26.0 arm64** (Homebrew's
   bottles carry it) — lowering it means SDL from source with an older target,
   a departure from the recipe; not taken, worth a ruling if a Mac user asks.
+- **The release page's auto-generated "Source code" archives are the whole repo
+  and bring nothing** (maintainer, 2026-09-11) — GitHub cannot drop them, so
+  make them irrelevant: attach `release/<name>/` as `<name>-release.zip` (the
+  ruled inventory, the whole subset a user needs) via the upload tool and say so
+  in the notes. Recommendation (a) in STATE "Decisions pending"; waits for the word.
 - **WINDOWS and LINUX on the remote boxes** (Linux under WSL2 is fine — a
   real kernel and userland; the build distro's glibc sets the floor): extend
   `tools/build_release_emulators.sh` with that OS's bundling step (Linux:

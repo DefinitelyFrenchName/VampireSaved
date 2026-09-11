@@ -1,0 +1,41 @@
+fbneo — FBNeo (SDL2 frontend) carrying the CPS-2 WIDE v1 driver patch, prebuilt for macos-arm64
+===============================================================================================
+
+# Every file in this directory, and its sha256 — verify before running:
+#   awk '/^sha256 /{print $2"  "$3}' BINARY.txt | shasum -a 256 -c      (macOS/Linux)
+sha256 034eccceab95065cbf7801c04c38ef7dad8a7deb41c45ab039a2cc66afc574fc fbneo
+sha256 7a757810321233cd96e4a40f7e3a97ec9eff6b4369c417b75f41f9f75f84ef36 libSDL2-2.0.0.dylib
+sha256 1f775b6aeb4d217774c0b9c2fad9fca8b639d746d6ed7c75e1261b9f3ed0d1ca libSDL2_image-2.0.0.dylib
+sha256 b15a4124b6e0abd76f3ff2888d65f91a4265af310ca0f6574e4bfe1b02009dc5 libSDL3.0.dylib
+sha256 843cd71ee24c30ed25559b6eb6a80fa4fa224468beb32b77b6ab2b2a343fc1a5 libSDL3.dylib
+sha256 0c1755590bd5515f4ecfb502fa02a8f13675b9f762762bc03416c66c0144e3b1 libaom.3.dylib
+sha256 5c3a5846046b6b1628c5c3287cf3f7a7a0f25b1ab3702a7e0f037137ab268b30 libavif.16.dylib
+sha256 ade3b8087a6570fa6dbc90422e48b2edb9b930e72a0eac606cff31f20815ff24 libbrotlicommon.1.dylib
+sha256 11ddbf2ffe68ca67725f00fdb79d8d6c747f4e82529a25253c31c2d4eb7924b0 libbrotlidec.1.dylib
+sha256 57787f3a17a1e016ed26c6515dd646fddbbf45a533e9315c0b560952367ceabb libbrotlienc.1.dylib
+sha256 12e71a0df17680a36a91091e7a0cf5a199425e0f138290b01b24232b071c82e4 libdav1d.7.dylib
+sha256 14dc227b7438c55fe7f7db30b38128a40185391df1c7ce98030695d55735acdd libhwy.1.dylib
+sha256 939a0885cba6ba30cb5acc8baa9befdbebfe722e613c8809623c58689a41e1d4 libjpeg.8.dylib
+sha256 55ad78a1942dd6a1b543a8e97d65936ae12d9086ad82f269b719f343bad4d8eb libjxl.0.12.dylib
+sha256 307f96d60cda5474f75f9885e828428b95ab347eb3df6d4a954615c8c2f05ff7 libjxl_cms.0.12.dylib
+sha256 4af168cb81f4c2e44ff29814b0e2c0fedfb7397a5eed2ca3b4c668be6cfd0dcc liblcms2.2.dylib
+sha256 eafc66926de4214eaf77ed3529ad6b8beee515e42841d46cbcc6c47b26269beb liblzma.5.dylib
+sha256 80287a1c6b81bb13f56557b08559a679a7fe629fb95fe6262577f69224245351 libpng16.16.dylib
+sha256 c05dffeab298fc6441cdde9ff960670a9427c3e66b31efaae2bb33439f942a11 libsharpyuv.0.dylib
+sha256 679eb229b4a6e0f5bd66378ff920d616ed8815f99e77c1ae0034a8b393cb52eb libtiff.6.dylib
+sha256 b1a3bdc82836fb9a2164a83fc714b7981921f18f29dfa33bea7d307d170f6252 libvmaf.3.dylib
+sha256 a6d4a6c32d743d065caafa7d4e8be0ed030dbc8934904b537323af3cbfdb5d6e libwebp.7.dylib
+sha256 1a4616e07ab21c70c82e677d3e6d46668349e17766b594d2c96a6dae79d83632 libwebpdemux.2.dylib
+sha256 917136259ea56f42c1f2eb55ae9771c6b0a7018c51eb6bf3dd59ca3c87e1a06d libzstd.1.dylib
+
+upstream   https://github.com/finalburnneo/FBNeo
+pin        79188379cc8442c54712acbe3b7e73dce157985f
+patch      0002-cps2-wide-v1.patch  sha1 17cd7516a25e6198376bc69b88b3392d85122d0e  (the ONLY patch applied; the project's replay-harness patch is a test instrument and is not in this binary)
+recipe     git clone https://github.com/finalburnneo/FBNeo fbneo && cd fbneo && git checkout 79188379cc8442c54712acbe3b7e73dce157985f && git apply 0002-cps2-wide-v1.patch && make sdl2 SKIPDEPEND=1 -j12 -k; make sdl2 SKIPDEPEND=1 -j12   (twice on a fresh clone: the first parallel pass dies on burn.o until the driver list is generated)
+built      2026-09-11 on macOS 26.6.2 (arm64), Apple clang version 21.0.0 (clang-2100.3.34.2), by tools/build_release_emulators.sh fbneo
+requires   macOS 26.0 or later, arm64. Nothing to install: the libraries the recipe links from Homebrew (SDL2 (sdl2-compat over SDL3), SDL2_image and their image codecs) are bundled here with @loader_path install names, all ad-hoc signed.
+run        run it from a directory that has a `roms/` subdirectory holding your built vsavjw.zip AND your pristine vsav.zip (FBNeo has no rom-path option: it reads `roms/` relative to the current directory, or the paths set in its config): `./fbneo vsavjw`. Controls: FBNeo's own menu (Tab).
+gatekeeper the binary is ad-hoc signed, NOT notarized: macOS quarantines a downloaded copy and refuses it on first launch. Either right-click > Open once on the executable, or run `xattr -dr com.apple.quarantine .` inside this directory.
+not works  "Unknown system: vsavjw" means the binary is not this one (no driver patch). A stock emulator fed the set renamed to vsavj.zip STALLS on the legal screen forever (measured 2026-09-11) — renaming is never the fix.
+asset      merged-m18-fbneo-macos-arm64.zip attached to the GitHub release on tag freeze/merged-m18 — https://github.com/DefinitelyFrenchName/VampireSaved/releases/tag/freeze/merged-m18 (verify the rows above after unzipping; the previous freeze's assets are deleted at each release)
+provenance a prebuilt is the recipe above run on one host and nothing else; the reviewable trust surface stays the patch (its sha1 above). Rebuild from the recipe to check: the binary is rebuildable, not byte-reproducible (link order, timestamps).

@@ -148,3 +148,11 @@ docs/project/mister_core.html
 # directory is what a fresh render produces.
 docs/site/
 build/gfx_hashes/
+
+# THE PREBUILT EMULATOR BINARIES are GitHub RELEASE ASSETS, never git content (maintainer-ruled
+# 2026-09-11, 14z-149, option (b)): the records (BINARY.txt) are tracked, the files are not —
+# tools/build_release_emulators.sh builds them, tools/upload_release_assets.sh publishes them.
+release/emulators/*/*/*
+!release/emulators/*/*/BINARY.txt
+release/*/*/emulator/bin/*/*
+!release/*/*/emulator/bin/*/BINARY.txt

@@ -113,6 +113,19 @@ def run_packager(rompath, romdir, name, version, dest):
         shutil.copytree(src, dest)
 
 
+def release_url(name):
+    """The GitHub release page the prebuilt assets attach to (ruled 14z-149): the origin
+    remote's HTTPS form + /releases/tag/freeze/<name>; a placeholder when no remote exists."""
+    out = subprocess.run(["git", "-C", REPO, "remote", "get-url", "origin"],
+                         capture_output=True, text=True).stdout.strip()
+    if not out:
+        return "the project's GitHub release page"
+    out = out[:-4] if out.endswith(".git") else out
+    if out.startswith("git@github.com:"):
+        out = "https://github.com/" + out[len("git@github.com:"):]
+    return f"{out}/releases/tag/freeze/{name}"
+
+
 def pin_of(submodule):
     out = subprocess.run(["git", "-C", REPO, "submodule", "status", submodule],
                          capture_output=True, text=True).stdout.strip()
@@ -167,7 +180,7 @@ def emulator_side(platform, dest, name):
     shutil.copy(os.path.join(REPO, e["patch"]), os.path.join(edir, os.path.basename(e["patch"])))
     pin = pin_of(e["submodule"])
     bins = binaries_side(platform, edir)
-    binline = (f"prebuilt binaries for: {', '.join(bins)} (in `emulator/bin/<os-arch>/`, each with a `BINARY.txt` record — verify the sha256 after copying)"
+    binline = (f"prebuilt binaries for: {', '.join(bins)} — download `{name}-{platform}-<os-arch>.zip` from the GitHub release on tag `freeze/{name}` ({release_url(name)}); each zip carries a `BINARY.txt` (also here under `emulator/bin/<os-arch>/`) — verify every file's sha256 against it after unzipping"
                if bins else "no prebuilt binary is included for any OS in this release yet — build per the recipe below")
     up = platform.upper()
     play = f"""
@@ -202,7 +215,7 @@ unmodified members from it.
 """
     text += f"""
 ## Prebuilt binaries
-{('This release ships prebuilt binaries under `emulator/bin/<os-arch>/` for: ' + ', '.join(bins) + '. Each directory carries a `BINARY.txt` naming the files with their sha256, the upstream pin and the driver patch they were built from; verify the sha256 after copying. They are built from exactly the recipe above (maintainer-ruled 2026-09-11: the recipe AND the prebuilt, each user free to choose).') if bins else 'None in this release yet (ruled 2026-09-11: releases ship the recipe AND prebuilt binaries per OS; the binaries are a build resource under `release/emulators/` in the project tree and are added as each host builds them). The recipe above is complete.'}
+{('This release ships prebuilt binaries for: ' + ', '.join(bins) + ' — as ASSETS of the GitHub release on tag `freeze/' + name + '` (' + release_url(name) + '), one `' + name + '-' + platform + '-<os-arch>.zip` each, never as files in the repository (ruled 2026-09-11). Each zip carries a `BINARY.txt` naming the files with their sha256, the upstream pin and the driver patch they were built from — the same record sits here under `emulator/bin/<os-arch>/`; verify every file after unzipping. They are built from exactly the recipe above (the recipe AND the prebuilt, each user free to choose). Only the latest freeze keeps its assets.') if bins else 'None in this release yet (ruled 2026-09-11: releases ship the recipe AND prebuilt binaries per OS; the binaries are a build resource under `release/emulators/` in the project tree and are added as each host builds them). The recipe above is complete.'}
 
 ## If it does not work
 - "Unknown system: vsavjw" — this binary does not carry the driver patch.

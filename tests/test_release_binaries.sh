@@ -45,6 +45,13 @@ FB="$ROOT/fbneo/$OSARCH"; MM="$ROOT/mame/$OSARCH"
 [ -f "$FB/BINARY.txt" ] || { echo "SKIP: no $FB/BINARY.txt for this host (tools/build_release_emulators.sh fbneo)"; exit 0; }
 [ -f "$MM/BINARY.txt" ] || { echo "SKIP: no $MM/BINARY.txt for this host (tools/build_release_emulators.sh mame)"; exit 0; }
 [ -f "$MERGED/rompath/vsavjw.zip" ] || { echo "SKIP: $MERGED/rompath/vsavjw.zip missing"; exit 0; }
+# the records are tracked, the files are RELEASE ASSETS (ruled 14z-149): a record with no file
+# beside it means this host has neither built nor fetched them — not measured, so SKIP (red
+# under --strict, which is right: a release host must have them)
+for d in "$FB" "$MM"; do
+    [ "$(ls "$d" | grep -vc '^BINARY.txt$')" != 0 ] \
+        || { echo "SKIP: $d holds the record only — build (tools/build_release_emulators.sh) or fetch the release asset"; exit 0; }
+done
 TIMEOUT="$(command -v gtimeout || command -v timeout || true)"
 [ -n "$TIMEOUT" ] || { echo "FAIL: no timeout(1) (brew install coreutils)"; exit 1; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
