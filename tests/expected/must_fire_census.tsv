@@ -71,6 +71,7 @@ declares	test_random_select_tenants
 declares	test_reconcile_matcher
 declares	test_ref_rot_image_pick
 declares	test_rehit_ring
+declares	test_release_binaries
 declares	test_release_roundtrip
 declares	test_rpl2siminputs
 declares	test_rule5_census

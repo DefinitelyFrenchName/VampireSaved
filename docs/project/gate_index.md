@@ -16,13 +16,13 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**320 scripts** — 70 ci_portable, 75 ci_static, 175 emulator-tier (run by name).
+**321 scripts** — 70 ci_portable, 75 ci_static, 176 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 14 | the suite runners and their own ground truth |
 | [docs](#docs) | 15 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 26 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 27 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 55 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
@@ -101,6 +101,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_null_build.sh` | test | ci_static | ROMDIR | M0 acceptance: the null-patch build reproduces vanilla vsavj bit-identically from reference inputs, deterministically. | M0 |
 | `tests/test_phasec_image.sh` | test | emulator | MAME | Phase C step 2: the program image grows, and the extension is genuinely READ. | 14z-59g |
 | `tests/test_phasec_spaces.sh` | test | ci_static | ROMDIR | the address-space refactor must not move a byte. | 14z-123 |
+| `tests/test_release_binaries.sh` | test | emulator | MAME, FBNeo, a build dir, ~2 min | the PREBUILT emulator binaries for THIS host under release/emulators/{fbneo,mame}/<os-arch>/ (the build resource every release's emulator/bin/<os-arch>/ is hash-verified from; maintainer-ruled 2026-09-11: | 2026-09-11 |
 | `tests/test_release_roundtrip.sh` | test | ci_static | ROMDIR | THE RELEASE PACKAGE GATE (14z-105). | 14z-105 |
 | `tests/test_replay_stage_census.sh` | test | ci_portable | — | FREEZE the input-staging convention of every replay-driving Lua instrument (14z-93, GitHub issue #10). No ROMs, no emulator, ~1s. | 14z-93 |
 | `tests/test_replay_video_selfcheck.sh` | test | emulator | MAME, FBNeo | ground truth for replay.lua's VIDEO_OUT, the MAME per-frame framebuffer checksum. | session 14z |

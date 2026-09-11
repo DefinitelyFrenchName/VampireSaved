@@ -374,7 +374,7 @@ into `~/.claude/skills/mame-fbneo-instruments/`. Nothing in it depends on the or
 
 ## 0.3 FBNeo as an instrument
 
-**[MFI-26]** **`make sdl2 SKIPDEPEND=1` is mandatory on a fresh clone — and it hides header AND driver edits**: after editing a driver, `touch` the source or the link silently reuses the old object and the emulator keeps the previous descriptor (a grown region that measures exactly like the stock one). Driver sources are not always valid UTF-8: edit them in byte mode.
+**[MFI-26]** **`make sdl2 SKIPDEPEND=1` is mandatory on a fresh clone, run TWICE there (the parallel first pass, with `-k`, stops on `burn.o` until the driver list is generated) — and it hides header AND driver edits**: after editing a driver, `touch` the source or the link silently reuses the old object and the emulator keeps the previous descriptor (a grown region that measures exactly like the stock one). Driver sources are not always valid UTF-8: edit them in byte mode.
 
 > **Incident** (`docs/platform/gotchas.md` › *FBNeo fresh builds need `SKIPDEPEND=1` (paid: 2026-07-25)*):
 >
@@ -384,7 +384,18 @@ into `~/.claude/skills/mame-fbneo-instruments/`. Nothing in it depends on the or
 > before the file exists. FBNeo's own CI never builds that path: every workflow
 > passes `SKIPDEPEND=1`. Use `make sdl2 SKIPDEPEND=1 -j8`. (Consequence: no
 > header-change tracking — after editing FBNeo headers, `make clean` or touch
-> the affected .cpp files.)
+> the affected .cpp files.) **AND RUN IT TWICE ON A FRESH TREE (measured
+> 14z-149, the first release build from a clean worktree):** with
+> `SKIPDEPEND=1 -j` the same message comes back for `burn.o` — its bare
+> prerequisite `driverlist.h` is satisfiable only after the rule that GENERATES
+> the list has run, and that rule depends on every driver object, so a parallel
+> first pass schedules `burn.o` long before the list exists and stops (a serial
+> `-j1` build compiles the drivers first and never sees it). The dev submodule
+> never showed this because its list has existed since the first build. The
+> recipe that works on any host: `make sdl2 SKIPDEPEND=1 -j8 -k` (everything but
+> `burn.o` builds, the list included), then `make sdl2 SKIPDEPEND=1 -j8` (a
+> no-op on a complete tree). `tools/build_release_emulators.sh` and the shipped
+> EMULATOR.md recipe do exactly that.
 
 **[MFI-27]** **The shared EEPROM breaks run-to-run determinism** — `$HOME` overrides do not sandbox the user config, every run shares one `.nv`, and the boot counter differs by one; runs shorter than the write-back look deterministic. Force the EEPROM/hiscore/cheat paths into the per-run sandbox. Found by the standard bug-report format applied to the emulator: per-frame dumps of two runs, first divergent frame + address.
 

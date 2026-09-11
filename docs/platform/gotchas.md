@@ -62,7 +62,36 @@ generated `driverlist.h` via a bare-name prerequisite that vpath can't resolve
 before the file exists. FBNeo's own CI never builds that path: every workflow
 passes `SKIPDEPEND=1`. Use `make sdl2 SKIPDEPEND=1 -j8`. (Consequence: no
 header-change tracking — after editing FBNeo headers, `make clean` or touch
-the affected .cpp files.)
+the affected .cpp files.) **AND RUN IT TWICE ON A FRESH TREE (measured
+14z-149, the first release build from a clean worktree):** with
+`SKIPDEPEND=1 -j` the same message comes back for `burn.o` — its bare
+prerequisite `driverlist.h` is satisfiable only after the rule that GENERATES
+the list has run, and that rule depends on every driver object, so a parallel
+first pass schedules `burn.o` long before the list exists and stops (a serial
+`-j1` build compiles the drivers first and never sees it). The dev submodule
+never showed this because its list has existed since the first build. The
+recipe that works on any host: `make sdl2 SKIPDEPEND=1 -j8 -k` (everything but
+`burn.o` builds, the list included), then `make sdl2 SKIPDEPEND=1 -j8` (a
+no-op on a complete tree). `tools/build_release_emulators.sh` and the shipped
+EMULATOR.md recipe do exactly that.
+
+## Homebrew dylibs name their siblings through `@rpath` — a closure walk over absolute paths misses them (paid: 14z-149)
+
+Bundling a macOS binary for distribution means copying every non-system
+library it links and rewriting the install names to `@loader_path/<name>`.
+The first walk followed only ABSOLUTE references and skipped everything
+`@`-prefixed; `otool -L` then showed six leftovers — `libjxl` → `@rpath/
+libjxl_cms`, `libwebp`/`libwebpdemux` → `@rpath/libsharpyuv`, the brotli pair
+→ `@rpath/libbrotlicommon` — each resolvable only through the referring
+library's own `LC_RPATH` (its Cellar lib dir), which a user's Mac does not
+have. The walk resolves `@rpath/<name>` through the referrer's rpaths (then
+the directory its content came from), bundles the sibling, rewrites the
+reference and DELETES the rpaths, and the verifier fails on any leftover
+that is not `/usr/lib`, `/System` or `@loader_path` — the assertion is on
+the artifact, and it is what caught this. Also: `sdl2-compat` `dlopen()`s
+SDL3 as `@executable_path/libSDL3.dylib`, which no load command shows
+(`strings` on the library does); it is bundled explicitly under that name.
+`tools/bundle_dylibs.py`.
 
 ## FBNeo shared EEPROM breaks run-to-run determinism (paid: 2026-07-25, ~45min)
 

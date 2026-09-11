@@ -12,7 +12,11 @@ the project's gates were run against).
     git clone https://github.com/mamedev/mame mame && cd mame && git checkout 27a8d9e85b58058965907d1d8a7a92f8ed039348     # tag mame0288
     git apply /path/to/emulator/0002-cps2-wide-v1.patch
     make SOURCES=src/mame/capcom/cps2.cpp SUBTARGET=cps2 -j8    # CPS-2-only build, minutes not hours
-    ./cps2 -verifyroms vsavjw                                   # must say: romset vsavjw [vsav] is good
+    ./cps2 -verifyroms vsavjw -rompath "/your/built/set;/your/dumps"   # says "is bad" BY DESIGN: it lists exactly the
+                                                                 # members inside vsavjw.zip as INCORRECT CHECKSUM (the
+                                                                 # driver carries the stock CRCs for the members the port
+                                                                 # rewrites and sentinel CRCs for the new ones) — nothing
+                                                                 # may be NOT FOUND. "is good" is not reachable on this set.
 
 The patch is 164 lines added and exactly ONE line removed (the sprite
 tile-code composition, gated on `m_cps2_wide`, a driver member only the

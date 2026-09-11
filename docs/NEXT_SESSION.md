@@ -1,37 +1,48 @@
-# NEXT SESSION — orientation (rewritten at the 14z-148 CLOSE, 2026-09-10)
+# NEXT SESSION — orientation (rewritten at the 14z-149 CLOSE, 2026-09-11)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## THE MUST-FIRE MACHINE IS COMPLETE ON BOTH SIDES; THE RELEASE CADENCE IS RULED. NO BUILD BYTE MOVED.
+## THE macOS PREBUILT BINARIES EXIST, ARE GATED, AND SIT IN M18 UNCOMMITTED — ONE DECISION DECIDES WHERE THEY LIVE. NO BUILD BYTE MOVED.
 
 M18 (`merged-m18`, `build/m3b_merged26`) is still the current freeze and
-release. `git status -sb` says the push state (the close ends with a push
-when all is green).
+release. `git status -sb` says the push state.
 
-Landed this sitting (STATE 14z-148): the `--controls` cadence RULED (a) — part
-of every RELEASE run, the invocation in HANDOFF "THE EMULATOR-TIER COMMAND";
-and the must-fire reader LIFTED INTO bbh AS A COPY (harness `02d58f3`,
-`lib/sh/controls.sh`, [BBH-88..91]), F1 extended over declaring stubs and F2
-exact at 70 rows, the readout header and the controls-red FAIL row made the
-same text on both sides and re-baselined loudly. Static strict 145/0/0.
+Landed this sitting (STATE 14z-149): `tools/build_release_emulators.sh`
+(the recipe run on this host, FBNeo from a clean worktree with 0002 only,
+MAME through `setup_mame.sh`'s own mirror), `tools/bundle_dylibs.py` (the
+Homebrew closure flat beside the binary under `@loader_path`, ad-hoc signed,
+verified on the artifact), `BINARY.txt` per `release/emulators/<platform>/
+macos-arm64/`, the gate `tests/test_release_binaries.sh` (record,
+self-containment, signature, profile, no harness, a BOOT on each — MAME
+reproducing a frozen masked expectation on the release binary; 74 s, two
+executable must-fires), M18 repackaged with `emulator/bin/macos-arm64/` on
+both emulator sides (150 MB on disk). Two shipped-recipe defects corrected
+in place: the FBNeo fresh-tree build needs TWO passes ([CPE-26]), and
+`-verifyroms` says "is bad" BY DESIGN on a content set (20 flagged = the
+rewritten/new members) where the recipe said "must say good".
 
 ## START HERE — what is open
 
-- ~~**Define what is IN a release, and ship the end-user how-to README**~~
-  **DONE 14z-148 (2)** — inventory ruled and enforced, README shipped, applier
-  Python-only, the stock-emulator stall measured and locked. **OPEN FROM IT:
-  the PREBUILT EMULATOR BINARIES (ruled 1+2)** — build the 0002-only FBNeo and
-  the CPS-2-subtarget MAME per OS, each into
-  `release/emulators/<platform>/<os-arch>/` with a `BINARY.txt` (sha256 per
-  file, pin, patch sha1); macOS from this MacBook (a CLEAN build without the
-  0001 harness patch — `tools/setup_fbneo.sh` applies 0001 always, so a
-  release build needs its own recipe), Windows and Linux on the two remote
-  boxes; then repackage M18 (or the next freeze) so `emulator/bin/` appears.
-  Also open: the FBNeo half of the stall measurement (needs the WIDE=0
-  reference FBNeo build).
+- **THE PREBUILT BINARIES — DECIDE WHERE THEY LIVE, then commit** (STATE
+  "Decisions pending", 14z-149): the macOS pair is built, gated and packaged
+  but UNCOMMITTED because committing ~140 MB per release into git history is
+  the maintainer's call — recommendation (b): gitignore the binary files,
+  track `BINARY.txt`, attach the directories as GitHub release assets on the
+  freeze tag. Whatever is ruled: land it, then re-run `test_release_roundtrip`
+  and `test_release_binaries`. **The floor is macOS 26.0 arm64** (Homebrew's
+  bottles carry it) — lowering it means SDL from source with an older target,
+  a departure from the recipe; not taken, worth a ruling if a Mac user asks.
+- **WINDOWS and LINUX on the remote boxes** (Linux under WSL2 is fine — a
+  real kernel and userland; the build distro's glibc sets the floor): extend
+  `tools/build_release_emulators.sh` with that OS's bundling step (Linux:
+  `patchelf --set-rpath '$ORIGIN'` over the `ldd` closure, or a static SDL;
+  Windows: the DLLs beside the .exe) and the gate's self-containment check for
+  that OS (it FAILS there today by design, never a silent pass); `test_mame_parity`
+  is the migration gate for any new host ([MFI-41]). Also open: the FBNeo half
+  of the stall measurement (needs the WIDE=0 reference FBNeo build).
 - **At the next freeze/release sweep: the 34 emulator-tier modes HONOURED.**
   `run_all_emulator.sh --scope all --lane all --strict --controls` (the ruled
   release invocation). The ~20 expensive gates' modes were never run; a mode
@@ -59,6 +70,9 @@ same text on both sides and re-baselined loudly. Static strict 145/0/0.
 4. **A verdict-text change is a BOTH-SIDES change** (bbh convention 8): land
    it in this tree and in bbh in one sitting, harness pushed first, a dated
    line in bbh's `rebaselines.md`.
+5. **A re-run of a bundler on a half-rewritten directory proves nothing** —
+   validate on a FRESH copy of the build output (14z-149); and the FBNeo
+   fresh-tree build takes two passes ([CPE-26]).
 
 **IF A DOC IS TOUCHED:** the eight `--check`s, exit statuses captured directly,
 `${=cmd}` in zsh. **A running script is never edited** ([MSC-54]). **The static

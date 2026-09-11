@@ -11,7 +11,9 @@ the project's gates were run against).
 
     git clone https://github.com/finalburnneo/FBNeo fbneo && cd fbneo && git checkout 79188379cc8442c54712acbe3b7e73dce157985f
     git apply /path/to/emulator/0002-cps2-wide-v1.patch
-    make sdl2 SKIPDEPEND=1 -j8        # SKIPDEPEND=1 is mandatory (see the project's docs/GOTCHAS.md)
+    make sdl2 SKIPDEPEND=1 -j8 -k     # SKIPDEPEND=1 is mandatory (see the project's docs/GOTCHAS.md);
+    make sdl2 SKIPDEPEND=1 -j8        # TWICE on a fresh clone: the parallel first pass stops on burn.o
+                                      # until the driver list is generated (-k lets it finish the rest)
 
 The patch adds the `vsavjw` driver (the CPS-2 WIDE profile: 6 MB program,
 48 MB GFX via the CPS-2 Turbo bit-12 tile promote, 16 MB QSound) as a new

@@ -92,6 +92,26 @@ release/emulators/<platform>/<os-arch>/                         <- THE BINARY BU
   (`emu/fbneo-patches/0002`, `emu/mame-patches/0002` — one profile expressed
   twice); the recipe names the pinned upstream commit; a binary is that
   recipe run on one host, and its record says which.
+  **THE RECORD (`BINARY.txt`, written by `tools/build_release_emulators.sh`,
+  14z-149):** one `sha256 <hex> <file>` row per file in the directory (the
+  packager and `test_release_roundtrip` §4 read exactly those rows; every
+  other file present must be named), then `upstream`, `pin`, `patch` (its
+  sha1, and the statement that it is the ONLY patch — the harness patch never
+  ships), `recipe`, `built` (date, host OS, compiler), `requires` (the minimum
+  OS the artifact carries and the arch), `run`, `gatekeeper` (ad-hoc signed,
+  not notarized: right-click > Open once, or clear the quarantine attribute),
+  `not works`, `provenance` (rebuildable, not byte-reproducible).
+  **SELF-CONTAINED by construction:** the recipe links Homebrew's SDL by
+  absolute path, so the build tool bundles every non-system library flat
+  beside the binary under `@loader_path` (`tools/bundle_dylibs.py`, rpaths
+  dropped, all ad-hoc signed) — the inventory admits `emulator/bin/<os-arch>/
+  <file>` and nothing deeper, which is why flat. **macOS today: `macos-arm64`,
+  floor macOS 26.0** (Homebrew's bottles are built per OS release and the
+  linker inherits their minimum; lowering it would mean SDL from source with an
+  older target — not the recipe). Gate `tests/test_release_binaries.sh`: the
+  record, self-containment, the signature, the profile, no harness, and a
+  boot of the current merged set on each binary (MAME reproducing a frozen
+  masked expectation of the freeze).
 * **[MSC-62]** **[MJC-62]** **MiSTer ships the MRAs the release was verified with, the `.rbf` itself
   and its RECORD (`BITSTREAM.txt`: seed, slack, sha256, build date, fork
   pin, field history)** — ruled tracked in-tree, "as would any BPS or

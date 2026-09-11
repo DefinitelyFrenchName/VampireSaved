@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-329 entries (41 game / 92 platform / 196 project), counted from the buckets at generation.
+330 entries (41 game / 93 platform / 196 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 41 entries
 
@@ -66,12 +66,13 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - THE BOOT NAME SCREEN'S DISPLAY SCRIPT TAKES AN EVEN COLUMN — an odd one is a 68k ADDRESS ERROR that soft-boots the machine (paid: 14z-127)
 - THE ENGINE CLAMPS THE FIGHTERS TO 336 px APART — a wider position poke is pulled back the same frame, and a "whiff" leg for a travelling move does not exist (paid: 14z-146)
 
-## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 92 entries
+## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 93 entries
 
 - A 1-BYTE MEMORY TAP MISSES WORD ACCESSES ON THIS 16-BIT BUS — and reads as a clean, meaningless zero (paid: 14z-126b)
 - CPS-2 ROM file byte order is NOT 68k logical order (paid: 2026-07-25, ~1h)
 - MAME `logerror` output needs `-log`, not `-verbose` (paid: 2026-07-25)
 - FBNeo fresh builds need `SKIPDEPEND=1` (paid: 2026-07-25)
+- Homebrew dylibs name their siblings through `@rpath` — a closure walk over absolute paths misses them (paid: 14z-149)
 - FBNeo shared EEPROM breaks run-to-run determinism (paid: 2026-07-25, ~45min)
 - MAME `-debug` perturbs multi-CPU timing — never compare its checksums to non-debug runs (paid: 2026-07-25, ~1.5h)
 - PC-relative reads are DECRYPTED reads on CPS-2 (paid: 2026-07-25, ~45min)

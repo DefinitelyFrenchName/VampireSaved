@@ -58,7 +58,9 @@ EMU = {
         recipe="""\
     git clone {upstream} fbneo && cd fbneo && git checkout {pin}
     git apply /path/to/emulator/0002-cps2-wide-v1.patch
-    make sdl2 SKIPDEPEND=1 -j8        # SKIPDEPEND=1 is mandatory (see the project's docs/GOTCHAS.md)
+    make sdl2 SKIPDEPEND=1 -j8 -k     # SKIPDEPEND=1 is mandatory (see the project's docs/GOTCHAS.md);
+    make sdl2 SKIPDEPEND=1 -j8        # TWICE on a fresh clone: the parallel first pass stops on burn.o
+                                      # until the driver list is generated (-k lets it finish the rest)
 """,
         note="""\
 The patch adds the `vsavjw` driver (the CPS-2 WIDE profile: 6 MB program,
@@ -80,7 +82,11 @@ same romset (the patched build's fingerprint is in ../manifest.json).
     git clone {upstream} mame && cd mame && git checkout {pin}     # tag mame0288
     git apply /path/to/emulator/0002-cps2-wide-v1.patch
     make SOURCES=src/mame/capcom/cps2.cpp SUBTARGET=cps2 -j8    # CPS-2-only build, minutes not hours
-    ./cps2 -verifyroms vsavjw                                   # must say: romset vsavjw [vsav] is good
+    ./cps2 -verifyroms vsavjw -rompath "/your/built/set;/your/dumps"   # says "is bad" BY DESIGN: it lists exactly the
+                                                                 # members inside vsavjw.zip as INCORRECT CHECKSUM (the
+                                                                 # driver carries the stock CRCs for the members the port
+                                                                 # rewrites and sentinel CRCs for the new ones) — nothing
+                                                                 # may be NOT FOUND. "is good" is not reachable on this set.
 """,
         note="""\
 The patch is 164 lines added and exactly ONE line removed (the sprite
