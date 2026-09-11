@@ -209,3 +209,7 @@ test_controls_contract
 # readelf / objdump output, walk a closure, and REFUSE an empty one (the two
 # bundlers ship unrun: this is what proves they cannot come back quiet). ROM-free, ~2 s.
 test_bundle_parsers
+# EVERY PUBLISHED ASSET IS SELF-SUFFICIENT and the two emulator routes never
+# travel together (maintainer-ruled 2026-09-12) — the shape of what
+# upload_release_assets.sh CUTS, over the current release. ROM-free, ~5 s.
+test_release_asset_shape

@@ -15,18 +15,27 @@ without your own dumps.
 Everything ships as ASSETS of the GitHub release on tag `freeze/merged-m18`:
 https://github.com/DefinitelyFrenchName/VampireSaved/releases/tag/freeze/merged-m18
 
+**TAKE EXACTLY ONE.** Every asset below is complete on its own: the README,
+the romset patch set, the applier, and ONE way to get the emulator or core.
+There is nothing to combine and nothing to download twice.
+
 | asset | what it is | who needs it |
 |---|---|---|
-| `merged-m18-fbneo.zip` | the FBNeo package: this README, the romset patch set + applier, the FBNeo driver patch + build recipe (`EMULATOR.md`), and a copy of each prebuilt binary's `BINARY.txt` | FBNeo players |
-| `merged-m18-mame.zip` | the MAME package: the same romset patch set + applier, the MAME driver patch + build recipe (`EMULATOR.md`) | MAME players |
+| `merged-m18-fbneo-<os-arch>.zip` | the FBNeo package for that OS, **ready to play**: this README, the romset patch set + applier, and a prebuilt patched FBNeo with its `BINARY.txt` of sha256s. No build step, nothing to patch (available: macos-arm64) | FBNeo players on a listed OS |
+| `merged-m18-fbneo-recipe.zip` | the same FBNeo package for **any** OS, carrying the driver patch + build recipe (`EMULATOR.md`) instead of a binary: you build the emulator once | FBNeo players on any other OS, or anyone who prefers to build |
+| `merged-m18-mame-<os-arch>.zip` | the MAME package for that OS, ready to play: the same romset patch set + applier, and a prebuilt patched MAME (CPS-2 subtarget) with its `BINARY.txt` (available: macos-arm64) | MAME players on a listed OS |
+| `merged-m18-mame-recipe.zip` | the same MAME package for any OS, with the driver patch + `EMULATOR.md` instead of a binary | MAME players on any other OS, or anyone who prefers to build |
 | `merged-m18-mister.zip` | the MiSTer package: the same romset patch set + applier, the `jtcps2w.rbf` bitstream + its record (`BITSTREAM.txt`), the two `.mra` files, `MISTER.md` | MiSTer owners |
-| `merged-m18-fbneo-<os-arch>.zip` | a prebuilt patched FBNeo for that OS, self-contained, with a `BINARY.txt` of sha256s to verify against (available: macos-arm64) | FBNeo players who would rather not build |
-| `merged-m18-mame-<os-arch>.zip` | a prebuilt patched MAME (CPS-2 subtarget) for that OS, self-contained, with its `BINARY.txt` (available: macos-arm64) | MAME players who would rather not build |
 | "Source code (zip / tar.gz)" | added by GitHub to every release: the whole project repository at the tag — development tooling, logs and all. **NOT needed to play**; nothing above requires it | nobody, unless you want to audit or rebuild the project |
 
+A prebuilt package deliberately carries NO emulator patch and no build
+recipe: your binary already contains them, and a patch you cannot use is a
+patch you might try to apply. If you want to read or rebuild what your binary
+contains, the `-recipe` package of the same platform is where the patch
+lives, and your `BINARY.txt` names its sha1.
+
 Every package rebuilds the SAME `vsavjw.zip` from your own dumps (the three
-copies of the patch set are byte-identical, and a gate asserts it). Take the
-ONE package for the platform you play on, plus at most one prebuilt binary.
+copies of the patch set are byte-identical, and a gate asserts it).
 **You are reading the MiSTer package.** In order: build the romset (below),
 get the emulator or core ("Play on MiSTer" at the end), play.
 

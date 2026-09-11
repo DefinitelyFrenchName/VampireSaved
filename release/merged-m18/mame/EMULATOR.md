@@ -32,8 +32,16 @@ rom path at the output directory. The set is `vsavjw` (a clone of `vsav`);
 keep your pristine `vsav.zip` in the rom path too — the loader resolves the
 unmodified members from it.
 
-## Prebuilt binaries
-This release ships prebuilt binaries for: macos-arm64 — as ASSETS of the GitHub release on tag `freeze/merged-m18` (https://github.com/DefinitelyFrenchName/VampireSaved/releases/tag/freeze/merged-m18), one `merged-m18-mame-<os-arch>.zip` each, never as files in the repository (ruled 2026-09-11). Each zip carries a `BINARY.txt` naming the files with their sha256, the upstream pin and the driver patch they were built from — the same record sits here under `emulator/bin/<os-arch>/`; verify every file after unzipping. They are built from exactly the recipe above (the recipe AND the prebuilt, each user free to choose). Only the latest freeze keeps its assets.
+## Prebuilt binaries — the other route
+
+**You are reading the build route.** If you would rather not build, the
+release on tag `freeze/merged-m18` (https://github.com/DefinitelyFrenchName/VampireSaved/releases/tag/freeze/merged-m18) also publishes
+`merged-m18-mame-<os-arch>.zip`: the SAME package as this one, with a
+prebuilt patched emulator in place of this patch and recipe. It is complete
+too — romset patches and applier included — so it replaces this download
+rather than joining it.
+
+Built so far for: macos-arm64. Each carries a `BINARY.txt` naming every file with its sha256, the upstream pin and the sha1 of the driver patch beside this file — the binary is exactly the recipe above, run on one host, and the record says which. Only the latest freeze keeps its assets; the binaries are never files in the repository (ruled 2026-09-11).
 
 ## If it does not work
 - "Unknown system: vsavjw" — this binary does not carry the driver patch.

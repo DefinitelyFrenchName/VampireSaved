@@ -199,18 +199,27 @@ def insert_deliverables(dest, name, platform):
 Everything ships as ASSETS of the GitHub release on tag `freeze/{name}`:
 {url}
 
+**TAKE EXACTLY ONE.** Every asset below is complete on its own: the README,
+the romset patch set, the applier, and ONE way to get the emulator or core.
+There is nothing to combine and nothing to download twice.
+
 | asset | what it is | who needs it |
 |---|---|---|
-| `{name}-fbneo.zip` | the FBNeo package: this README, the romset patch set + applier, the FBNeo driver patch + build recipe (`EMULATOR.md`), and a copy of each prebuilt binary's `BINARY.txt` | FBNeo players |
-| `{name}-mame.zip` | the MAME package: the same romset patch set + applier, the MAME driver patch + build recipe (`EMULATOR.md`) | MAME players |
+| `{name}-fbneo-<os-arch>.zip` | the FBNeo package for that OS, **ready to play**: this README, the romset patch set + applier, and a prebuilt patched FBNeo with its `BINARY.txt` of sha256s. No build step, nothing to patch (available: {have('fbneo')}) | FBNeo players on a listed OS |
+| `{name}-fbneo-recipe.zip` | the same FBNeo package for **any** OS, carrying the driver patch + build recipe (`EMULATOR.md`) instead of a binary: you build the emulator once | FBNeo players on any other OS, or anyone who prefers to build |
+| `{name}-mame-<os-arch>.zip` | the MAME package for that OS, ready to play: the same romset patch set + applier, and a prebuilt patched MAME (CPS-2 subtarget) with its `BINARY.txt` (available: {have('mame')}) | MAME players on a listed OS |
+| `{name}-mame-recipe.zip` | the same MAME package for any OS, with the driver patch + `EMULATOR.md` instead of a binary | MAME players on any other OS, or anyone who prefers to build |
 | `{name}-mister.zip` | the MiSTer package: the same romset patch set + applier, the `jtcps2w.rbf` bitstream + its record (`BITSTREAM.txt`), the two `.mra` files, `MISTER.md` | MiSTer owners |
-| `{name}-fbneo-<os-arch>.zip` | a prebuilt patched FBNeo for that OS, self-contained, with a `BINARY.txt` of sha256s to verify against (available: {have('fbneo')}) | FBNeo players who would rather not build |
-| `{name}-mame-<os-arch>.zip` | a prebuilt patched MAME (CPS-2 subtarget) for that OS, self-contained, with its `BINARY.txt` (available: {have('mame')}) | MAME players who would rather not build |
 | "Source code (zip / tar.gz)" | added by GitHub to every release: the whole project repository at the tag — development tooling, logs and all. **NOT needed to play**; nothing above requires it | nobody, unless you want to audit or rebuild the project |
 
+A prebuilt package deliberately carries NO emulator patch and no build
+recipe: your binary already contains them, and a patch you cannot use is a
+patch you might try to apply. If you want to read or rebuild what your binary
+contains, the `-recipe` package of the same platform is where the patch
+lives, and your `BINARY.txt` names its sha1.
+
 Every package rebuilds the SAME `vsavjw.zip` from your own dumps (the three
-copies of the patch set are byte-identical, and a gate asserts it). Take the
-ONE package for the platform you play on, plus at most one prebuilt binary.
+copies of the patch set are byte-identical, and a gate asserts it).
 **You are reading the {up} package.** In order: build the romset (below),
 get the emulator or core ("Play on {up}" at the end), play.
 
@@ -235,14 +244,23 @@ def emulator_side(platform, dest, name):
     shutil.copy(os.path.join(REPO, e["patch"]), os.path.join(edir, os.path.basename(e["patch"])))
     pin = pin_of(e["submodule"])
     bins = binaries_side(platform, edir)
-    binline = (f"prebuilt binaries for: {', '.join(bins)} — download `{name}-{platform}-<os-arch>.zip` from the GitHub release on tag `freeze/{name}` ({release_url(name)}); each zip carries a `BINARY.txt` (also here under `emulator/bin/<os-arch>/`) — verify every file's sha256 against it after unzipping"
-               if bins else "no prebuilt binary is included for any OS in this release yet — build per the recipe below")
+    # THE TWO ROUTES NEVER TRAVEL TOGETHER (maintainer-ruled 2026-09-12), so this
+    # step is written for a reader holding EITHER asset and says which files they
+    # will actually see. A prebuilt package has no EMULATOR.md and no patch in it.
+    avail = (f"built for: {', '.join(bins)}" if bins
+             else "none built for any OS in this release yet — take the `-recipe` package")
     up = platform.upper()
     play = f"""
 ## Play on {up}
-1. Get the patched emulator — EITHER a prebuilt binary ({binline}), OR build it
-   yourself from the pinned upstream with the driver patch: `EMULATOR.md` has
-   the exact commands. Both are the same code; the patch is 0002-cps2-wide-v1.
+1. The patched emulator. **You already have it, or you build it once — whichever
+   package you took:**
+   - `{name}-{platform}-<os-arch>.zip` ({avail}): the emulator is in this package
+     under `emulator/bin/<os-arch>/`. Verify every file's sha256 against
+     `BINARY.txt` beside it, then run it. Nothing to build, nothing to patch —
+     this package carries no emulator patch on purpose.
+   - `{name}-{platform}-recipe.zip`: build it once from the pinned upstream with
+     `emulator/0002-cps2-wide-v1.patch`; `EMULATOR.md` has the exact commands.
+   Both are the same code; the patch is 0002-cps2-wide-v1.
 2. Put `vsavjw.zip` (from the applier) AND your pristine `vsav.zip` in the
    emulator's rom directory{' (FBNeo has no rom-path option: it reads `roms/` next to the binary, or the dirs set in its config)' if platform == 'fbneo' else ' — or pass `-rompath "/your/rompath;/your/dumps"`'}.
 3. Start the set `vsavjw`. The boot name screen reads VAMPIRE SAVED and the
@@ -268,9 +286,20 @@ rom path at the output directory. The set is `vsavjw` (a clone of `vsav`);
 keep your pristine `vsav.zip` in the rom path too — the loader resolves the
 unmodified members from it.
 """
+    # THIS FILE SHIPS IN THE `-recipe` ASSET ONLY (ruled 2026-09-12), so it
+    # addresses a reader who is building, and points at the other route rather
+    # than describing a directory their download does not have.
     text += f"""
-## Prebuilt binaries
-{('This release ships prebuilt binaries for: ' + ', '.join(bins) + ' — as ASSETS of the GitHub release on tag `freeze/' + name + '` (' + release_url(name) + '), one `' + name + '-' + platform + '-<os-arch>.zip` each, never as files in the repository (ruled 2026-09-11). Each zip carries a `BINARY.txt` naming the files with their sha256, the upstream pin and the driver patch they were built from — the same record sits here under `emulator/bin/<os-arch>/`; verify every file after unzipping. They are built from exactly the recipe above (the recipe AND the prebuilt, each user free to choose). Only the latest freeze keeps its assets.') if bins else 'None in this release yet (ruled 2026-09-11: releases ship the recipe AND prebuilt binaries per OS; the binaries are a build resource under `release/emulators/` in the project tree and are added as each host builds them). The recipe above is complete.'}
+## Prebuilt binaries — the other route
+
+**You are reading the build route.** If you would rather not build, the
+release on tag `freeze/{name}` ({release_url(name)}) also publishes
+`{name}-{platform}-<os-arch>.zip`: the SAME package as this one, with a
+prebuilt patched emulator in place of this patch and recipe. It is complete
+too — romset patches and applier included — so it replaces this download
+rather than joining it.
+
+{('Built so far for: ' + ', '.join(bins) + '. Each carries a `BINARY.txt` naming every file with its sha256, the upstream pin and the sha1 of the driver patch beside this file — the binary is exactly the recipe above, run on one host, and the record says which. Only the latest freeze keeps its assets; the binaries are never files in the repository (ruled 2026-09-11).') if bins else 'None built for any OS in this release yet (ruled 2026-09-11: a release ships the recipe AND prebuilt binaries per OS, each user free to choose; they are added as each host builds them). The recipe above is complete.'}
 
 ## If it does not work
 - "Unknown system: vsavjw" — this binary does not carry the driver patch.

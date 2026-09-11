@@ -286,6 +286,7 @@ tests/test_region_overlap.sh	pipeline
 tests/test_region_overlap_control.sh	pipeline
 tests/test_release_roundtrip.sh	platform
 tests/test_release_binaries.sh	platform
+tests/test_release_asset_shape.sh	platform
 tests/test_bundle_parsers.sh	platform
 tests/test_replay_stage_census.sh	platform
 tests/test_replay_video_selfcheck.sh	platform

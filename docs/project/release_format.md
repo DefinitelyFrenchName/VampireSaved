@@ -54,6 +54,40 @@ identical to the real run through frame 468, divergent from 469, no crash
 vector, no gameplay. The README says so. (FBNeo, per its CRC-then-0xFF-fill
 loader, is expected not to boot at all; unmeasured.)
 
+## THE SEAM — WHAT EACH PUBLISHED ASSET HOLDS (maintainer-ruled 2026-09-12, 14z-151)
+
+**The rule below was true of the TREE and false of the RELEASE PAGE for one
+release.** The 14z-149 asset cut split a release along the wrong seam: the
+platform zip held the romset tooling AND the driver patch with the binaries
+excluded, the binary zip held a bare executable and nothing else. The
+maintainer, reading the M18 page: the prebuilt packages *"dont include the
+parts and doc to patch the roms, so you have to also download that, but doing
+so makes you download patches for emulators, which you might want to apply
+although you shouldn't since your prebuilt binary is already patched, it's
+very confusing."*
+
+**THE CHOICE PUT AND TAKEN.** Either ship the rom-related and the
+platform-related parts *fully* separately, or *"package per platform and
+regardless of whether it's prebuilt or recipe and patches, the packages
+should include everything needed, rom patcher and patches included."* Ruled:
+**per platform, everything in** — which is what [MSV-20] already said about
+the tree, so the tree did not move; only the cut did. Second question, ruled
+the same day: a prebuilt asset **drops** the driver patch and the recipe.
+
+| asset | romset patch set + applier + README | emulator route |
+|---|---|---|
+| `<name>-<platform>-<os-arch>.zip` | yes | the prebuilt binary + `BINARY.txt`; **no patch, no `EMULATOR.md`** |
+| `<name>-<platform>-recipe.zip` | yes | the driver patch + `EMULATOR.md`; **no binary** |
+| `<name>-mister.zip` | yes | the `.rbf` + `BITSTREAM.txt` + the two `.mra` + `MISTER.md` |
+
+**ONE DOWNLOAD IS PLAYABLE**, and nothing in a download can be misapplied.
+The trust surface is not lost by the drop: `BINARY.txt` names the sha1 of the
+patch its binary was built from, and the `-recipe` asset of the same platform
+is where that patch lives. Gate: `tests/test_release_asset_shape.sh`
+(ci_portable, ~5 s) over the lists the real tool cuts under `--dry-run`,
+with completeness asserted BOTH ways so nothing ruled into a release is
+orphaned by the cut.
+
 ## The rule
 
 **[MSV-20]** `release/<name>/` holds **one subdirectory per platform**, and each one is
@@ -139,12 +173,20 @@ release/emulators/<platform>/<os-arch>/                         <- THE BINARY BU
   DOWNLOADS the asset back and re-verifies every row against what GitHub
   serves; `--prune` deletes the previous freeze's `*.zip` assets (release and
   tag stay — the tree's records say what shipped). The release procedure:
-  freeze, package, `test_release_binaries` green, upload with `--prune`. **The
-  same tool publishes the three PLATFORM PACKAGES first** (14z-149 (4),
-  maintainer: "publish everything available"): `release/<name>/<platform>/`
-  as `<name>-<platform>.zip` (binaries excluded, their records kept), each
-  downloaded back and every served file `cmp`-identical to the committed
-  directory, and then writes the release notes from the assets attached —
+  freeze, package, `test_release_binaries` green, upload with `--prune`.
+  **EVERY ASSET IS SELF-SUFFICIENT — THE SEAM, RE-RULED 2026-09-12 (14z-151;
+  the section below is the ruling).** Each asset is cut from
+  `release/<name>/<platform>/` and carries the README, the romset patch set,
+  the manifest and the applier, PLUS exactly one emulator route:
+  `<name>-<platform>-<os-arch>.zip` adds the prebuilt binary and its
+  `BINARY.txt` and carries NO driver patch and NO `EMULATOR.md`;
+  `<name>-<platform>-recipe.zip` adds the driver patch and `EMULATOR.md` and
+  carries no binary; `<name>-mister.zip` is the whole MiSTer directory, which
+  never had an emulator side. ONE download plus your own dumps is playable.
+  The file list is computed ONCE per asset and drives both the zip and the
+  verification of what GitHub serves back, and an asset that would be empty,
+  a prebuilt with no binary or a recipe with no patch is REFUSED. The tool
+  then writes the release notes from the assets attached —
   so GitHub's auto-added source archives (the whole repository, unremovable)
   are marked "not needed to play" and a player never needs a clone. Every
   platform README opens with **"The deliverables — what to download, and what
