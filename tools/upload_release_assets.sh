@@ -199,6 +199,26 @@ done < "$W/assets.txt"
 
 [ "$n" -gt 0 ] || { echo "nothing to upload" >&2; exit 1; }
 
+# ---- assets on the tag that THIS run did not build: named, never deleted.
+# A stale asset is how a release page ends up serving a shape that no longer
+# exists (the 2026-09-12 re-cut left `<name>-fbneo.zip` and `<name>-mame.zip`
+# behind, and they are exactly the confusing pair the re-cut removed). It is
+# NOT deleted automatically, and that is deliberate: the binaries are built
+# per HOST, so a second machine uploading its own OS would otherwise delete
+# the first one's asset. The operator is told, and decides.
+if [ "$DRY" = 0 ]; then
+    cut -d' ' -f1 "$W/assets.txt" | sort > "$W/built.txt"
+    gh release view "$TAG" --json assets --jq '.assets[].name' </dev/null \
+        | grep -E "^$NAME-.*\.zip$" | sort > "$W/onpage.txt" || true
+    stale="$(comm -13 "$W/built.txt" "$W/onpage.txt")"
+    if [ -n "$stale" ]; then
+        echo "NOTE: $TAG also serves asset(s) this run did not build:"
+        echo "$stale" | sed 's/^/  /'
+        echo "  If they are an older shape, delete them: gh release delete-asset $TAG <name> -y"
+        echo "  If another host built them (a different OS), leave them."
+    fi
+fi
+
 # ---- the release notes: the deliverables, from what is actually attached
 if [ "$DRY" = 0 ]; then
     assets="$(gh release view "$TAG" --json assets --jq '.assets[].name' | sort)"
@@ -215,8 +235,10 @@ if [ "$DRY" = 0 ]; then
             "$NAME"-mister.zip) echo "| \`$a\` | **the MiSTer package** — README, romset patch set + applier, the \`jtcps2w.rbf\` bitstream + record, the two \`.mra\`, \`MISTER.md\` |" ;;
             "$NAME"-fbneo-recipe.zip) echo "| \`$a\` | **FBNeo, build the emulator once** — README, romset patch set + applier, the FBNeo driver patch + \`EMULATOR.md\`. Any OS |" ;;
             "$NAME"-mame-recipe.zip)  echo "| \`$a\` | **MAME, build the emulator once** — README, the same romset patch set + applier, the MAME driver patch + \`EMULATOR.md\`. Any OS |" ;;
-            "$NAME"-fbneo-*.zip) echo "| \`$a\` | **FBNeo for \`${a#"$NAME"-fbneo-}\` (drop the .zip), ready to play** — README, romset patch set + applier, and a prebuilt patched FBNeo; verify it against its \`BINARY.txt\` |" ;;
-            "$NAME"-mame-*.zip)  echo "| \`$a\` | **MAME (CPS-2 subtarget) for \`${a#"$NAME"-mame-}\` (drop the .zip), ready to play** — README, the same romset patch set + applier, and a prebuilt patched MAME; verify it against its \`BINARY.txt\` |" ;;
+            "$NAME"-fbneo-*.zip) oa="${a#"$NAME"-fbneo-}"; oa="${oa%.zip}"
+                                 echo "| \`$a\` | **FBNeo for \`$oa\`, ready to play** — README, romset patch set + applier, and a prebuilt patched FBNeo; verify it against its \`BINARY.txt\` |" ;;
+            "$NAME"-mame-*.zip)  oa="${a#"$NAME"-mame-}"; oa="${oa%.zip}"
+                                 echo "| \`$a\` | **MAME (CPS-2 subtarget) for \`$oa\`, ready to play** — README, the same romset patch set + applier, and a prebuilt patched MAME; verify it against its \`BINARY.txt\` |" ;;
             *) echo "| \`$a\` | (unlisted asset) |" ;;
             esac
         done
