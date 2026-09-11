@@ -126,6 +126,7 @@ history twins and are listed last. Level-0 files are the entry points above.
 - [`mister.md`](platform/mister.md) — **REFERENCE** · the jtcps2 core (jtcores fork, bus widths, the SDRAM ceiling at our pin vs upstream's 128 MB XL tier, the CPS-2 core's own format caps, the simulat… · history: `platform/mister_history.md`
 
 **`project/`**
+- [`WINDOWS_BUILD.md`](project/WINDOWS_BUILD.md) — **REFERENCE** · Building the release emulator binaries on the Windows machine: both tracks (MSYS2 native -> `windows-x86_64`, WSL2 -> `linux-x86_64`), step by step, with the preflight, the one-minute romset from the published release, the gate, and what to send back
 - [`WSL2_SETUP.md`](project/WSL2_SETUP.md) — **REFERENCE** · Setting up the harness on Windows 10 via WSL2
 - [`build_dir_triage.md`](project/build_dir_triage.md) — **REFERENCE** · build_dir_triage — the build-directory policy and its current inventory · history: `project/build_dir_triage_history.md`
 - [`coverage_matrix.md`](project/coverage_matrix.md) — **REFERENCE** · §4 COVERAGE MATRIX — the mandate vs the corpus, measured (14z-104)
