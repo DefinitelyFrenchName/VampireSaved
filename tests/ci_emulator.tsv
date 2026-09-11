@@ -264,3 +264,4 @@ test_mister_prg_window	mister	release	romset	-	slice D4's own evidence: the 68k 
 test_mister_qsound_ext	mister	release	bitstream	-	the QSound extension is fetched on the core; ~94 min a leg measured 14z-134 (--stats --timing), legs parallel	14400
 test_mister_sdram_census	mister	release	romset	-	the WIDE romset lands in SDRAM exactly where mister_map.md places it	3600
 audit_sdram_bank_load	mister	out	romset	-	romset: stock vsavj on the STOCK jtcps2 core — the D2 repack's GO measurement, not a verdict on the shipped core	7200
+audit_stock_emulator_stall	mame	out	romset	-	platform: the STOCK reference MAME (WIDE=0 build, ~/.cache/vampire-saved/mame-ref) is a leg — locks the README diagnostic that the WIDE set forced into an unpatched emulator STALLS on the legal screen (diverges at frame 469, never crashes, never plays; measured 14z-148); ~1 min, three MAME runs

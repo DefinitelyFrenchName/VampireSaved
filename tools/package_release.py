@@ -126,11 +126,16 @@ def main():
                 print(f"  {zname}/{n}: delta {entry['patch_size']} bytes")
             members[zname].append(entry)
 
+    # THE BUILD IDENTITY IS THE WHOLE-SET KEY (14z-148): since the 14z-132
+    # whole-set keying a merged build's PROGRAM key is shared with the
+    # blanks-only legacy instrument, so the registry keys releases on the
+    # whole set — and the old scrape here (`--set` then a hex grep) printed
+    # `?` in every README since then.
     fp = None
     try:
         setname = "vsavjw" if os.path.exists(os.path.join(a.rompath, "vsavjw.zip")) else "vsavj"
         out = subprocess.run([sys.executable, os.path.join(os.path.dirname(__file__),
-                              "build_fingerprint.py"), a.rompath, "--set", setname],
+                              "build_fingerprint.py"), a.rompath, "--set", setname, "--set-key"],
                              capture_output=True, text=True).stdout
         import re
         fp = re.findall(r"\b[0-9a-f]{40}\b", out)[-1]
@@ -154,47 +159,77 @@ def main():
 
 
 def readme(a, m, npatch, ncopy):
+    """THE END-USER README (common part; tools/package_release_platforms.py
+    appends the per-platform "Play on …" section). Written for someone who
+    owns the dumps and has never seen this project; the inventory of what a
+    release is and is not is docs/project/release_format.md (ruled 2026-09-11).
+    The diagnostics in "If it does not work" are MEASURED (STATE 14z-148)."""
     zips = ", ".join(sorted(m["zips"]))
-    return f"""# VAMPIRE SAVED — {m['name']} (in-game mark: "{m['version_string']}")
+    key = (m["build_fingerprint"] or "?")[:8]
+    return f"""# VAMPIRE SAVED — {m['name']} (in-game mark "{m['version_string']}")
 
 Full-roster Vampire Savior on the real CPS-2 engine: the 15+1 of vsavj plus
 Donovan, Huitzil/Phobos and Pyron, and a hand-pickable Oboro Bishamon. Runs
-on the CPS-2 WIDE profile (a patched FBNeo / MAME with the `vsavjw` driver —
-see the project's docs/project/cps2_wide.md).
+on the CPS-2 WIDE profile — an extended CPS-2 board that a patched FBNeo, a
+patched MAME (driver `vsavjw`) or the `jtcps2w` MiSTer core implements.
 
-THIS PACKAGE CONTAINS NO ROM DATA. It is a set of xdelta3 patches computed
-against the four reference dumps you must already own, plus a manifest and
-an applier that rebuilds the romset from YOUR dumps and verifies every byte.
+**THIS PACKAGE CONTAINS NO ROM DATA AND NO COPYRIGHTED ASSET, EVER.** It is a
+set of patches computed against the four reference dumps you must already
+own, a manifest, and an applier that rebuilds the romset from YOUR dumps and
+verifies every byte before writing anything. Nothing in it can be played
+without your own dumps.
 
-## You need
-- Python 3 and `xdelta3` on your PATH (`brew install xdelta`,
-  `apt install xdelta3`, or the Windows build from the xdelta project).
-- A directory holding the four reference zips, unmodified, with these
-  exact names: `vsavj.zip` (Japan 970519), `vsav.zip` (Europe 970519),
-  `vsav2.zip` (Japan 970913), `vhunt2.zip` (Japan 970929). The applier
-  checks every member's SHA-1 against the manifest before doing anything.
+## What is in this package
+- `patches/` — {npatch} VCDIFF patch files (xdelta3 format), one per rebuilt member
+- `manifest.json` — every target member's SHA-1 and size, which members are
+  copied pristine from which dump, the exact source recipe
+- `apply_release.py` — the applier (Python 3, nothing else needed)
+- this README, plus the platform notes beside it
 
-## Apply
+## What you need
+- **Python 3** (3.8 or newer). No other tool: the applier decodes the
+  patches itself.
+- **The four reference dumps, unmodified, with these exact names** in one
+  directory: `vsavj.zip` (Vampire Savior, Japan 970519), `vsav.zip` (Europe
+  970519), `vsav2.zip` (Vampire Savior 2, Japan 970913), `vhunt2.zip`
+  (Vampire Hunter 2, Japan 970929). The applier checks every member's SHA-1
+  against the manifest before doing anything, so a wrong, renamed or
+  modified dump is reported by name, never silently patched over.
+
+## Build the romset (one command)
     python3 apply_release.py --romdir /path/to/your/dumps --out ./rompath
 
-`./rompath/` then holds {zips}. Point your patched emulator's rom path at it
-(the project's `tools/run_wide.sh <build> fbneo|mame` does exactly that).
-The applier refuses to write if any rebuilt member's SHA-1 does not match
-the manifest — a wrong or modified dump produces a clear error, never a
-silently broken set.
+`./rompath/` then holds `{zips}`. The applier refuses to write if any rebuilt
+member's SHA-1 does not match the manifest. Keep your pristine `vsav.zip`
+next to it when you play: the WIDE set is a clone of `vsav` and the emulator
+resolves the unmodified members from the parent.
 
 ## Identify the build
 - In game: the mark `{m['version_string']}` at the bottom-right of the
-  character-select screen.
-- On disk: program fingerprint `{(m['build_fingerprint'] or '?')[:8]}`;
-  every member's SHA-1 is in `manifest.json`.
+  character-select screen, and the boot name screen reads VAMPIRE SAVED.
+- On disk: whole-set key `{key}` (`manifest.json` has every member's SHA-1).
+
+## If it does not work
+- **"Unknown system: vsavjw" / "no such driver"** — the emulator is not the
+  patched one. Use the prebuilt binary or the recipe in `EMULATOR.md`.
+- **The game sits on the QSound / CAPCOM legal screen and never reaches the
+  title** — you renamed the set to force it into an unpatched emulator. The
+  stock 4 MB driver never loads the program extension, the sound driver or
+  the QSound extension, so the boot handshake never completes (measured
+  2026-09-11: no crash, no gameplay, the legal screen forever). It needs the
+  patched emulator; renaming is never the fix.
+- **"reference dumps do not match the manifest"** — a dump is wrong,
+  modified or from another region; the message names the member.
+- **Netplay** — every peer needs the same emulator build AND the same romset
+  (compare the whole-set key above).
 
 ## What is patched
-{npatch} members are patched, {ncopy} are copied pristine from your dumps.
+{npatch} members are rebuilt, {ncopy} are copied pristine from your dumps.
 The patches hold only bytes the port generates or authors (relocated code,
-tables, the version glyphs); everything copied from the original games is
-expressed as a reference into YOUR dumps, which is what keeps this package
-free of copyrighted content.
+tables, the version glyphs); everything that comes from the original games
+is expressed as a reference into YOUR dumps, which is what keeps this package
+free of copyrighted content — and a gate scans every patch for verbatim
+reference-ROM bytes before a release is cut.
 """
 
 

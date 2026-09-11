@@ -27,3 +27,13 @@ Apply `apply_release.py` per `README.md`, then point the patched emulator's
 rom path at the output directory. The set is `vsavjw` (a clone of `vsav`);
 keep your pristine `vsav.zip` in the rom path too — the loader resolves the
 unmodified members from it.
+
+## Prebuilt binaries
+None in this release yet (ruled 2026-09-11: releases ship the recipe AND prebuilt binaries per OS; the binaries are a build resource under `release/emulators/` in the project tree and are added as each host builds them). The recipe above is complete.
+
+## If it does not work
+- "Unknown system: vsavjw" — this binary does not carry the driver patch.
+- The set, RENAMED to `vsavj.zip` to force it into a stock emulator, sits on
+  the QSound / CAPCOM legal screen forever (measured 2026-09-11: the stock 4 MB
+  driver never loads the program extension, the sound driver or the QSound
+  extension; no crash, no gameplay). Renaming is never the fix.

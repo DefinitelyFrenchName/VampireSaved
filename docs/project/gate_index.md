@@ -16,14 +16,14 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**319 scripts** — 70 ci_portable, 75 ci_static, 174 emulator-tier (run by name).
+**320 scripts** — 70 ci_portable, 75 ci_static, 175 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 14 | the suite runners and their own ground truth |
 | [docs](#docs) | 15 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 26 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
-| [pipeline](#pipeline) | 54 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
+| [pipeline](#pipeline) | 55 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 82 | tenant content — per-character gates and on-demand audits on the ported characters |
@@ -117,6 +117,7 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 | `tests/audit_dispatch_census.sh` | audit | emulator | MAME, a build dir, ~2 min | WHICH type indices does LEGACY ever dispatch at the two obj_hook sites, and is the frozen observation still complete? | 14z-89 |
 | `tests/audit_objhook_owner_census.sh` | audit | emulator | MAME, a build dir, ~6 min | which OWNER does each extended obj_hook type carry at DISPATCH TIME? (14z-81b; the vec3-fix design measurement.) | 14z-81b |
 | `tests/audit_region_movability.sh` | audit | emulator | MAME, ~10 min | which regions can actually live in wide_ext? | M3b |
+| `tests/audit_stock_emulator_stall.sh` | audit | emulator | MAME, a build dir, ~1 min | the WIDE romset FORCED into an UNPATCHED MAME (renamed to vsavj.zip) boots, prints WRONG CHECKSUMS, and STALLS on the QSound legal screen without a crash: | 2026-09-11 |
 | `tests/audit_type_writes.sh` | audit | emulator | MAME, ~8 min | the DYNAMIC half of the 14z-82 type-stamp census: which PCs actually write extended-family type bytes on the ground-truth single-tenant builds, and do they all map to the FROZEN static inventory? | 14z-82 |
 | `tests/test_accent_census.sh` | test | ci_static | ROMDIR | the accent/march census (14z-63, phase 3 item 6, the 62k-class audit): every path that can resolve a weapon-accent from the march family must be thunked on a variant-id build. | 14z-63 |
 | `tests/test_audit_merged_dispatch.sh` | test | ci_portable | — | ground truth for the expectation enumeration that tests/audit_merged_legacy.sh now runs before its leg-(a) glob (14z-90, GitHub issue #17). | 14z-90 |

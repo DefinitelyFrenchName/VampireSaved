@@ -328,3 +328,4 @@ tests/test_wide_profile.sh	platform
 tests/test_wide_render_content.sh	gfx
 tests/test_win_quote_decode.sh	pipeline
 tests/test_controls_contract.sh	runner
+tests/audit_stock_emulator_stall.sh	pipeline

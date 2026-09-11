@@ -231,10 +231,13 @@ member is expressed as copies out of vsav2/vhunt2 and only the bytes the
 port GENERATES or AUTHORS are literal), `manifest.json` (every target
 member's sha1/size, which members are copied pristine and from where, the
 source recipe + sha1, the fingerprint, the version string), the community
-applier `apply_release.py` (pure python + xdelta3; verifies every reference
-member, rebuilds the source blob, applies, and refuses to write unless
-EVERY member's sha1 matches), and a README. Secondary compression is OFF so
-the rule-7 scan sees the payload. **Deterministic** (two runs byte-identical).
+applier `apply_release.py` (PURE PYTHON since 14z-148 — its own VCDIFF
+decoder, no xdelta3 on the user's side; verifies every reference member,
+rebuilds the source blob, applies, and refuses to write unless EVERY
+member's sha1 matches), and the END-USER README (the ruled inventory and the
+five sections it must carry: `release_format.md` "WHAT A RELEASE IS",
+2026-09-11). Secondary compression is OFF so the rule-7 scan sees the
+payload (and `xdelta3 printhdr` LIES about it — `docs/project/gotchas.md`). **Deterministic** (two runs byte-identical).
 **`release/merged-m6/`** is the shipped package for the 14z-105 freeze
 (20 patched + 22 pristine members, 2.5 MB, fingerprint 64426955).
 **Gate: `tests/test_release_roundtrip.sh`** (ci_static) — package -> apply to
@@ -250,7 +253,9 @@ the patch artifact does not change shape for it.
 DIRECTORY PER PLATFORM, EACH SELF-SUFFICIENT** — `release/<name>/{fbneo,
 mame,mister}/`, the patch set above COPIED into each (produced by the same
 `package_release.py`, manifests asserted identical), `emulator/0002-*.patch`
-+ `EMULATOR.md` (pin + recipe, never a binary) on the emulator side, the
++ `EMULATOR.md` (pin + recipe) plus, since the 2026-09-11 ruling, prebuilt
+binaries per OS under `emulator/bin/<os-arch>/` as hosts build them (the
+build resource `release/emulators/`; none yet) on the emulator side, the
 `.mra` files + `jtcps2w.rbf` + `BITSTREAM.txt` + `MISTER.md` on the MiSTer
 side; every version releases every platform even if only one changed.
 **The bitstream is a BUILD RESOURCE: canonical at

@@ -30,9 +30,11 @@ itself, so the round-trip / refusal / rule-7 guarantees of that tool hold
 unchanged for every copy, and the three copies are asserted IDENTICAL
 (manifest.json byte-for-byte) by tests/test_release_roundtrip.sh section 4.
 
-The emulator side ships the driver PATCH and a build recipe, never a binary
-(ruled: the patch is the reviewable trust surface; binaries are host-specific
-and MAME's is a SOURCES-filtered build).  The MiSTer side ships the MRAs the
+The emulator side ships the driver PATCH and a build recipe AND, since the
+maintainer's 2026-09-11 ruling (recipe and prebuilt, each user free to
+choose), prebuilt binaries per OS from the build resource
+release/emulators/<platform>/<os-arch>/ (hash-verified against BINARY.txt;
+none for an OS until a host builds it — see binaries_side).  The MiSTer side ships the MRAs the
 release was verified with (from the field bundle or tools/mister_mra.sh
 --no-rom — deterministic XML, no ROM content); the bitstream and its RECORD
 are pulled from release/bitstreams/ and hash-verified, so a stale CURRENT or a
@@ -111,12 +113,68 @@ def pin_of(submodule):
     return out.lstrip(" +-").split()[0] if out else "?"
 
 
+def binaries_side(platform, edir):
+    """THE PREBUILT BINARIES (maintainer-ruled 2026-09-11: recipe AND prebuilt,
+    each user free to choose). A BUILD RESOURCE with its own cadence, like the
+    bitstream: release/emulators/<platform>/<os-arch>/{<files>, BINARY.txt},
+    the record naming every file with its sha256, the upstream pin and the
+    driver-patch sha1 it was built from. Every <os-arch> dir present is
+    hash-verified and copied to emulator/bin/<os-arch>/; NONE present is
+    allowed (the recipe is always there) and said so. Returns the list copied."""
+    import hashlib, re
+    root = os.path.join(REPO, "release", "emulators", platform)
+    copied = []
+    if not os.path.isdir(root):
+        return copied
+    for osarch in sorted(os.listdir(root)):
+        bdir = os.path.join(root, osarch)
+        rec = os.path.join(bdir, "BINARY.txt")
+        if not os.path.isdir(bdir) or not os.path.exists(rec):
+            continue
+        text = open(rec).read()
+        rows = re.findall(r"^sha256\s+([0-9a-f]{64})\s+(\S+)\s*$", text, re.M)
+        if not rows:
+            sys.exit(f"{rec} names no 'sha256 <hex> <file>' row")
+        out = os.path.join(edir, "bin", osarch)
+        os.makedirs(out, exist_ok=True)
+        for want, fname in rows:
+            fp = os.path.join(bdir, fname)
+            got = hashlib.sha256(open(fp, "rb").read()).hexdigest()
+            if got != want:
+                sys.exit(f"REFUSING: {fp} sha256 {got[:12]}… != the record's {want[:12]}…")
+            shutil.copy(fp, os.path.join(out, fname))
+        shutil.copy(rec, os.path.join(out, "BINARY.txt"))
+        copied.append(osarch)
+        print(f"  {platform} prebuilt {osarch}: {len(rows)} file(s), sha256 verified")
+    return copied
+
+
+def append_play(dest, text):
+    with open(os.path.join(dest, "README.md"), "a") as f:
+        f.write(text)
+
+
 def emulator_side(platform, dest, name):
     e = EMU[platform]
     edir = os.path.join(dest, "emulator")
     os.makedirs(edir, exist_ok=True)
     shutil.copy(os.path.join(REPO, e["patch"]), os.path.join(edir, os.path.basename(e["patch"])))
     pin = pin_of(e["submodule"])
+    bins = binaries_side(platform, edir)
+    binline = (f"prebuilt binaries for: {', '.join(bins)} (in `emulator/bin/<os-arch>/`, each with a `BINARY.txt` record — verify the sha256 after copying)"
+               if bins else "no prebuilt binary is included for any OS in this release yet — build per the recipe below")
+    up = platform.upper()
+    play = f"""
+## Play on {up}
+1. Get the patched emulator — EITHER a prebuilt binary ({binline}), OR build it
+   yourself from the pinned upstream with the driver patch: `EMULATOR.md` has
+   the exact commands. Both are the same code; the patch is 0002-cps2-wide-v1.
+2. Put `vsavjw.zip` (from the applier) AND your pristine `vsav.zip` in the
+   emulator's rom directory{' (FBNeo has no rom-path option: it reads `roms/` next to the binary, or the dirs set in its config)' if platform == 'fbneo' else ' — or pass `-rompath "/your/rompath;/your/dumps"`'}.
+3. Start the set `vsavjw`. The boot name screen reads VAMPIRE SAVED and the
+   select screen shows the mark {name.split('-')[-1].upper() if '-' in name else ''}.
+"""
+    append_play(dest, play)
     text = f"""# {name} — {platform.upper()} side
 
 This directory is self-sufficient for {platform.upper()}: the romset patch
@@ -135,6 +193,17 @@ Apply `apply_release.py` per `README.md`, then point the patched emulator's
 rom path at the output directory. The set is `vsavjw` (a clone of `vsav`);
 keep your pristine `vsav.zip` in the rom path too — the loader resolves the
 unmodified members from it.
+"""
+    text += f"""
+## Prebuilt binaries
+{('This release ships prebuilt binaries under `emulator/bin/<os-arch>/` for: ' + ', '.join(bins) + '. Each directory carries a `BINARY.txt` naming the files with their sha256, the upstream pin and the driver patch they were built from; verify the sha256 after copying. They are built from exactly the recipe above (maintainer-ruled 2026-09-11: the recipe AND the prebuilt, each user free to choose).') if bins else 'None in this release yet (ruled 2026-09-11: releases ship the recipe AND prebuilt binaries per OS; the binaries are a build resource under `release/emulators/` in the project tree and are added as each host builds them). The recipe above is complete.'}
+
+## If it does not work
+- "Unknown system: vsavjw" — this binary does not carry the driver patch.
+- The set, RENAMED to `vsavj.zip` to force it into a stock emulator, sits on
+  the QSound / CAPCOM legal screen forever (measured 2026-09-11: the stock 4 MB
+  driver never loads the program extension, the sound driver or the QSound
+  extension; no crash, no gameplay). Renaming is never the fix.
 """
     open(os.path.join(dest, "EMULATOR.md"), "w").write(text)
 
@@ -229,6 +298,15 @@ VERIFY THE BITSTREAM'S sha256 BEFORE FLASHING: a timing-failing fitter seed
 emits an .rbf indistinguishable from a passing one.
 """
     open(os.path.join(dest, "MISTER.md"), "w").write(text)
+    append_play(dest, f"""
+## Play on MiSTer
+1. Copy `jtcps2w.rbf` to `_Arcade/cores/` and the two `.mra` files to
+   `_Arcade/` (verify the bitstream's sha256 against `BITSTREAM.txt` first).
+2. Put `vsavjw.zip` (from the applier), your pristine `vsav.zip` and
+   `vsavj.zip`, and `qsound.zip` in `games/mame/`.
+3. Launch "Vampire Saved - CPS-2 WIDE" from the Arcade menu. `MISTER.md` has
+   the card layout and what the [STOCK CONTROL] entry is for.
+""")
 
 
 def main():

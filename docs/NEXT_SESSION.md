@@ -20,12 +20,18 @@ same text on both sides and re-baselined loudly. Static strict 145/0/0.
 
 ## START HERE — what is open
 
-- **Define what is IN a release, and ship the end-user how-to README**
-  (maintainer, 2026-09-10; STATE "Decisions pending", first entry): an explicit
-  inventory of what ships and what never does (no ROM, no copyrighted asset —
-  the user supplies their own dumps, as with SMS), a README with the
-  per-platform how-to, and the roundtrip gate asserting both. Start from
-  `docs/project/release_format.md`; present the inventory BEFORE writing it.
+- ~~**Define what is IN a release, and ship the end-user how-to README**~~
+  **DONE 14z-148 (2)** — inventory ruled and enforced, README shipped, applier
+  Python-only, the stock-emulator stall measured and locked. **OPEN FROM IT:
+  the PREBUILT EMULATOR BINARIES (ruled 1+2)** — build the 0002-only FBNeo and
+  the CPS-2-subtarget MAME per OS, each into
+  `release/emulators/<platform>/<os-arch>/` with a `BINARY.txt` (sha256 per
+  file, pin, patch sha1); macOS from this MacBook (a CLEAN build without the
+  0001 harness patch — `tools/setup_fbneo.sh` applies 0001 always, so a
+  release build needs its own recipe), Windows and Linux on the two remote
+  boxes; then repackage M18 (or the next freeze) so `emulator/bin/` appears.
+  Also open: the FBNeo half of the stall measurement (needs the WIDE=0
+  reference FBNeo build).
 - **At the next freeze/release sweep: the 34 emulator-tier modes HONOURED.**
   `run_all_emulator.sh --scope all --lane all --strict --controls` (the ruled
   release invocation). The ~20 expensive gates' modes were never run; a mode

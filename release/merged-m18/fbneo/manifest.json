@@ -1,7 +1,7 @@
 {
  "name": "merged-m18",
  "version_string": "M18",
- "build_fingerprint": null,
+ "build_fingerprint": "00f9cf1360c5720f48ff7e33906b97f25bcc48d0",
  "source": {
   "order": [
    "vsavj.zip",

@@ -6,6 +6,9 @@
 # MUST-FIRE: known-bad: wrong-dump — a reference dump with one byte flipped must be refused without writing (mode: section 1 applies against it)
 # MUST-FIRE: known-bad: planted-reference-chunk — a patch file with a reference-ROM chunk appended must be caught by the rule-7 scan (mode: it sits in the scanned patch set)
 # MUST-FIRE: known-bad: missing-emulator-dir — a release copy without mame/emulator/ must fail the layout check (mode: section 4 checks that copy)
+# MUST-FIRE: known-bad: secondary-compressed-patch — a patch re-encoded WITH secondary compression must be REFUSED by the applier's own VCDIFF decoder (it would hide reference bytes from the rule-7 scan); mode: section 1 applies that package and must fail
+# MUST-FIRE: known-bad: stray-file — a release copy with a file outside the ruled inventory must fail section 4 (nothing outside the definition ships; mode: section 4 checks that copy)
+# MUST-FIRE: known-bad: readme-missing-section — a release copy whose README lacks the "If it does not work" section must fail section 4 (mode: section 4 checks that copy)
 #
 # A release is a set of xdelta3 patches + a manifest + an applier
 # (tools/package_release.py). This gate is what makes it shippable:
@@ -32,7 +35,14 @@
 #      record's, the record byte-identical to the canonical
 #      release/bitstreams/<CURRENT>/ one (the build resource every release
 #      packages from); no cross-platform leakage; must-fire: a copy missing
-#      mame/emulator/ is rejected.
+#      mame/emulator/ is rejected. SINCE 14z-148 (the inventory ruled
+#      2026-09-11): every file under each platform dir is in the ruled
+#      inventory and every inventory item is present (a stray file FAILS),
+#      each prebuilt-binary dir's BINARY.txt sha256s match its files, and
+#      README.md carries the end-user sections (what you need, build the
+#      romset, play on <platform>, if it does not work, the no-ROM statement).
+#      The applier needs only Python 3 (its own VCDIFF decoder): section 1's
+#      round trip is what proves that decoder against xdelta3's encoder.
 #
 # Usage: ROMDIR=... tests/test_release_roundtrip.sh [build_rompath] [name]
 #   defaults build/m3b_merged26/rompath, merged-m16. Needs xdelta3.
@@ -58,7 +68,7 @@ cd "$REPO"
 RP="${1:-build/m3b_merged26/rompath}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 NAME="${2:-merged-m18}"  # re-pointed 14z-144 (M18 donovan/jedah freeze) <- 14z-143  # re-pointed 14z-134 (the M16 release: the m16 layout had NEVER been gated — code said m14, header m15) <- 14z-119 <- 14z-117b
 [ -d "$RP" ] || { echo "SKIP: $RP missing"; exit 77; }
-command -v xdelta3 >/dev/null || { echo "SKIP: xdelta3 not installed"; exit 77; }
+command -v xdelta3 >/dev/null || { echo "SKIP: xdelta3 not installed (the PACKAGER encodes with it; the applier needs only python3)"; exit 77; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
@@ -82,6 +92,26 @@ for e in m["zips"]["vsavjw.zip"]:
     if "patch" in e: e["sha1"] = "0" * 40; break
 json.dump(m, open(sys.argv[1], "w"))
 PY
+# a patch RE-ENCODED with secondary compression: same bytes when decoded by
+# xdelta3, but the applier's decoder must REFUSE it (a compressed stream would
+# hide reference bytes from section 3's scan — the whole reason -S none)
+cp -r "$W/rel/$NAME" "$W/bad_lzma"
+pl="$(find "$W/bad_lzma/patches" -name 'd_vsw_43.xdelta' | head -1)"
+python3 - "$W/bad_lzma/manifest.json" "$pl" "$ROMDIR" <<'PY'
+import json, sys, subprocess, tempfile, os, zipfile, hashlib
+mf, pf, romdir = sys.argv[1:4]
+m = json.load(open(mf)); e = next(x for x in m["zips"]["vsavjw.zip"] if x.get("patch", "").endswith("d_vsw_43.xdelta"))
+w = tempfile.mkdtemp()
+src = os.path.join(w, "source.bin")
+with open(src, "wb") as f:
+    for z in m["source"]["order"]:
+        zf = zipfile.ZipFile(os.path.join(romdir, z))
+        for n in sorted(zf.namelist()): f.write(zf.read(n))
+tgt = os.path.join(w, "t.bin"); subprocess.run(["xdelta3", "-d", "-f", "-s", src, pf, tgt], check=True)
+subprocess.run(["xdelta3", "-e", "-S", "lzma", "-f", "-s", src, tgt, pf], check=True)
+e["patch_size"] = os.path.getsize(pf); e["patch_sha1"] = hashlib.sha1(open(pf, "rb").read()).hexdigest()
+json.dump(m, open(mf, "w"))
+PY
 mkdir -p "$W/bad_roms"
 for z in vsavj vsav vsav2 vhunt2; do ln -s "$ROMDIR/$z.zip" "$W/bad_roms/$z.zip"; done
 rm "$W/bad_roms/vsavj.zip"
@@ -98,6 +128,7 @@ case "$VS_CTL" in
 corrupted-patch)  APPLY_DIR="$W/bad_patch" ;;
 wrong-target-sha1) APPLY_DIR="$W/bad_manifest" ;;
 wrong-dump)       APPLY_ROMDIR="$W/bad_roms" ;;
+secondary-compressed-patch) APPLY_DIR="$W/bad_lzma" ;;
 esac
 python3 "$APPLY_DIR/apply_release.py" --romdir "$APPLY_ROMDIR" --out "$W/applied" \
     > "$W/apply.log" 2>&1 || { echo "FAIL: applier"; tail -5 "$W/apply.log"; exit 1; }
@@ -142,6 +173,7 @@ refuse() { # refuse <name> <reldir> <romdir>
 refuse corrupted-patch   "$W/bad_patch"    "$ROMDIR"
 refuse wrong-target-sha1 "$W/bad_manifest" "$ROMDIR"
 refuse wrong-dump        "$W/rel/$NAME"    "$W/bad_roms"
+refuse secondary-compressed-patch "$W/bad_lzma" "$ROMDIR"
 
 echo "== 3. rule 7: no verbatim reference-ROM run in any patch file =="
 # under CONTROL=planted-reference-chunk the scanned set is a COPY of the
@@ -199,6 +231,13 @@ else
     # IS the release the checks below read, and this run must FAIL
     cp -r "$REL" "$W/layout_bad"; rm -rf "$W/layout_bad/mame/emulator"
     vs_ctl_is missing-emulator-dir && REL="$W/layout_bad"
+    # the other two known-bad layouts (14z-148): a file outside the ruled
+    # inventory, and a README without its diagnostics section
+    cp -r "release/$NAME" "$W/layout_stray"; echo "notes" > "$W/layout_stray/mame/notes.bin"
+    vs_ctl_is stray-file && REL="$W/layout_stray"
+    cp -r "release/$NAME" "$W/layout_readme"
+    sed -i '' '/^## If it does not work/d' "$W/layout_readme/fbneo/README.md"
+    vs_ctl_is readme-missing-section && REL="$W/layout_readme"
     for p in fbneo mame mister; do
         for f in manifest.json apply_release.py README.md patches; do
             [ -e "$REL/$p/$f" ] || { echo "FAIL: $REL/$p/$f missing"; fail=1; }
@@ -234,11 +273,52 @@ else
         && { echo "FAIL: MiSTer files inside an emulator platform dir"; fail=1; }
     [ -e "$REL/mister/emulator" ] && { echo "FAIL: emulator patch inside mister/"; fail=1; }
     [ "$fail" = 0 ] && echo "  ok: emulator dirs carry the tree's driver patch + EMULATOR.md; mister/ carries MRAs + BITSTREAM.txt + MISTER.md; no cross-platform leakage"
+    # THE INVENTORY (ruled 2026-09-11, docs/project/release_format.md "What a
+    # release IS"): every file under a platform dir is in the definition and
+    # every item of the definition is present. A file nobody ruled in does
+    # not ship — that is how a ROM byte, a build log or a scratch file would
+    # otherwise ride along.
+    inv_check() {  # inv_check <platform> <allowed-regex> — every file must match
+        find "$REL/$1" -type f | sed "s|^$REL/$1/||" | grep -vE "$2" > "$W/inv_$1.txt" || true
+        if [ -s "$W/inv_$1.txt" ]; then echo "FAIL: $1/ ships files outside the ruled inventory:"; sed 's/^/        /' "$W/inv_$1.txt"; fail=1; fi
+    }
+    EMU_INV='^(manifest\.json|apply_release\.py|README\.md|EMULATOR\.md|patches/vsavjw/d_[a-z0-9_]+\.xdelta|emulator/0002-cps2-wide-v1\.patch|emulator/bin/[a-z0-9-]+/[^/]+)$'
+    inv_check fbneo "$EMU_INV"; inv_check mame "$EMU_INV"
+    inv_check mister '^(manifest\.json|apply_release\.py|README\.md|MISTER\.md|BITSTREAM\.txt|jtcps2w\.rbf|[^/]+\.mra|patches/vsavjw/d_[a-z0-9_]+\.xdelta)$'
+    # every prebuilt-binary dir: BINARY.txt names each file with a matching sha256
+    for rec in "$REL"/fbneo/emulator/bin/*/BINARY.txt "$REL"/mame/emulator/bin/*/BINARY.txt; do
+        [ -f "$rec" ] || continue
+        bd="$(dirname "$rec")"
+        grep -E '^sha256 +[0-9a-f]{64} +[^ ]+' "$rec" | while read -r _ want fname; do
+            [ "$(shasum -a 256 "$bd/$fname" 2>/dev/null | cut -c1-64)" = "$want" ] || echo "BAD $bd/$fname"
+        done > "$W/bin_$$.txt"
+        if [ -s "$W/bin_$$.txt" ]; then cat "$W/bin_$$.txt"; echo "FAIL: a prebuilt binary does not match its BINARY.txt"; fail=1; fi
+        for f in "$bd"/*; do
+            case "$(basename "$f")" in BINARY.txt) ;; *) grep -q " $(basename "$f")\$" "$rec" || { echo "FAIL: $f is not named by its BINARY.txt"; fail=1; } ;; esac
+        done
+    done
+    # THE END-USER README: the sections the ruling asks for, on every platform copy
+    for p in fbneo mame mister; do
+        for h in "## What you need" "## Build the romset" "## Play on " "## If it does not work" "NO ROM DATA"; do
+            grep -q "$h" "$REL/$p/README.md" || { echo "FAIL: $REL/$p/README.md lacks '$h'"; fail=1; }
+        done
+    done
+    [ "$fail" = 0 ] && echo "  ok: every shipped file is in the ruled inventory, every prebuilt binary matches its record, every README carries the five end-user sections"
     # must-fire control: the same checks on a copy with mame/emulator/ removed must FAIL
     if cmp -s "$W/layout_bad/mame/emulator/0002-cps2-wide-v1.patch" "emu/mame-patches/0002-cps2-wide-v1.patch" 2>/dev/null; then
         vs_ctl_dead missing-emulator-dir "a release missing mame/emulator/ was accepted"; fail=1
     else
         vs_ctl_fired missing-emulator-dir "a release missing mame/emulator/ is rejected"
+    fi
+    if find "$W/layout_stray/mame" -type f | sed "s|^$W/layout_stray/mame/||" | grep -vE "$EMU_INV" | grep -q .; then
+        vs_ctl_fired stray-file "mame/notes.bin is outside the inventory and would fail the check"
+    else
+        vs_ctl_dead stray-file "a stray file passed the inventory regex"; fail=1
+    fi
+    if grep -q "^## If it does not work" "$W/layout_readme/fbneo/README.md"; then
+        vs_ctl_dead readme-missing-section "the section is still there in the perturbed copy"; fail=1
+    else
+        vs_ctl_fired readme-missing-section "a README without its diagnostics section would fail the check"
     fi
 fi
 

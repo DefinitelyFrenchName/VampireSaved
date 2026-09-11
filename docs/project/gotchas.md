@@ -4510,3 +4510,16 @@ build dir: the previous merged build had been pruned (build-dir policy keeps
 current + one back), so a control that ran against it would REFUSE on every host that
 pruned it and read as a control failure in the sweep; the fix made the mode perturb
 the gate's own expected set instead.
+
+
+## `xdelta3 printhdr`'s "secondary compressor" line is the BINARY's default, not the file's (paid: 14z-148)
+
+Checking whether the release patches really carry no secondary compression
+(the rule-7 scan's premise, `-S none`), `xdelta3 printhdr` on every patch said
+`VCDIFF secondary compressor: lzma`. It says that for a patch encoded with
+`-S none` too: the line reports what the binary WOULD use. The file's own
+flag is the header indicator — `VCD_SECONDARY` present means compressed;
+the release patches show `VCD_APPHEADER` only. Measured with a synthetic
+pair; the applier's decoder (`tools/apply_release.py`) refuses the
+`VCD_SECONDARY` bit, and `test_release_roundtrip` §2 has the known-bad.
+
