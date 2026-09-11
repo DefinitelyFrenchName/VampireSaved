@@ -52,6 +52,25 @@ jobs:
           git submodule update --init emu/fbneo emu/jtcores
           git -C emu/jtcores submodule update --init modules/fx68k modules/jt12 modules/jt51 modules/jteeprom modules/jtdsp16
 
+      # VERILATOR, because test_mister_wide_gate DECLARES five must-fire
+      # controls that are Verilator benches (bank-gate-bypassed,
+      # profile-byte-40, polarity-flipped, promote-gate-bypassed,
+      # promote-bit-15). Without the tool those five cannot fire, and a
+      # declared control that does not fire is FAIL by [VSP-181] — correctly:
+      # the runner could not assert what the gate claims. That is the second
+      # of the two causes that held CI red from 14z-147c. Ubuntu 24.04 ships
+      # 5.020; the benches need `--binary --timing`, i.e. Verilator >= 5.0,
+      # so the version is ASSERTED here rather than discovered as a confusing
+      # "Verilator build failed" inside the gate. ~35 s of bench builds on top
+      # of the install (measured on the maintainer's Mac, 5.050).
+      - name: verilator (the RTL benches the mister gate's controls need)
+        run: |
+          set -eu
+          sudo apt-get update -qq && sudo apt-get install -y -qq verilator
+          verilator --version
+          v="$(verilator --version | sed -n 's/^Verilator \([0-9]*\)\..*/\1/p')"
+          [ "${v:-0}" -ge 5 ] || { echo "::error::verilator $v is too old — the benches need >= 5.0 (--binary --timing)"; exit 1; }
+
       - name: Shells present
         run: |
           set -eu

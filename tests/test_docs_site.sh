@@ -177,8 +177,15 @@ else
 fi
 
 # --- 6. the output directory is gitignored (decision 1's tripwire) ---------
+# THE TRAILING SLASH IS LOAD-BEARING (14z-151): the pattern is `docs/site/`,
+# which matches directories only, and `check-ignore` cannot know an ABSENT
+# path is a directory — so the bare spelling answers "not ignored" on any
+# checkout where nobody has rendered the site yet. That is a verdict about
+# the HOST, not about .gitignore, and it is what held CI red from 14z-140
+# (43 consecutive runs). Asking about `docs/site/` states the kind in the
+# question and answers the same whether or not the directory exists.
 if git -C "$REPO" rev-parse --git-dir > /dev/null 2>&1; then
-    if git -C "$REPO" check-ignore -q docs/site; then
+    if git -C "$REPO" check-ignore -q docs/site/; then
         ok "docs/site is gitignored — the site can never be committed"
     else
         bad "docs/site is NOT gitignored: the projection can be committed as a source"
