@@ -33,8 +33,13 @@ character class), and `run_all_static.sh` now KEEPS a failing gate's full log.
   exact directory and would otherwise SKIP, which reads as "nothing to check"),
   then the two builds, then `ROMDIR=... tests/test_release_binaries.sh`, then
   `tools/upload_release_assets.sh freeze/merged-m18` or hand the two
-  directories back. The runbook, the prerequisites and the four things most
-  likely to go wrong are `docs/project/WSL2_SETUP.md` §10.
+  directories back. **THE STEP-BY-STEP IS `docs/project/WINDOWS_BUILD.md`** (both
+  tracks, sent to the maintainer as a bundle 2026-09-11 with
+  `tools/preflight_release_build.sh` and `tools/collect_build_report.sh`);
+  `WSL2_SETUP.md` §10 is the shorter form. **The romset costs a minute, not a
+  build:** `release/merged-m18`'s own applier rebuilds `vsavjw.zip` from the
+  three dumps, and the gate was MEASURED green against it here
+  (`MERGED=build/fromrelease`), so NO build pipeline is needed on those hosts.
   **EXPECT TO FIX SOMETHING** — that is the honest state, not pessimism.
   **THE MAINTAINER OFFERED A DEDICATED SESSION ON THE WINDOWS MACHINE (2026-09-11)** — take it:
   Windows is the half most likely to need work (MSYS2 shell, the MINGW64 package set, no
