@@ -302,11 +302,11 @@ else
     done
     # THE END-USER README: the sections the ruling asks for, on every platform copy
     for p in fbneo mame mister; do
-        for h in "## What you need" "## Build the romset" "## Play on " "## If it does not work" "NO ROM DATA"; do
+        for h in "## The deliverables" "## What you need" "## Build the romset" "## Play on " "## If it does not work" "NO ROM DATA"; do
             grep -q "$h" "$REL/$p/README.md" || { echo "FAIL: $REL/$p/README.md lacks '$h'"; fail=1; }
         done
     done
-    [ "$fail" = 0 ] && echo "  ok: every shipped file is in the ruled inventory, every prebuilt binary matches its record, every README carries the five end-user sections"
+    [ "$fail" = 0 ] && echo "  ok: every shipped file is in the ruled inventory, every prebuilt binary matches its record, every README carries the six end-user sections"
     # must-fire control: the same checks on a copy with mame/emulator/ removed must FAIL
     if cmp -s "$W/layout_bad/mame/emulator/0002-cps2-wide-v1.patch" "emu/mame-patches/0002-cps2-wide-v1.patch" 2>/dev/null; then
         vs_ctl_dead missing-emulator-dir "a release missing mame/emulator/ was accepted"; fail=1

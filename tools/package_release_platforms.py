@@ -168,6 +168,61 @@ def binaries_side(platform, edir):
     return copied
 
 
+def bins_available():
+    """Which os-arch dirs under release/emulators/<platform>/ hold binaries (not a record alone) —
+    read-only; binaries_side() is what verifies and copies them. Used by the deliverables table."""
+    out = {}
+    for platform in ("fbneo", "mame"):
+        root = os.path.join(REPO, "release", "emulators", platform)
+        found = []
+        if os.path.isdir(root):
+            for osarch in sorted(os.listdir(root)):
+                d = os.path.join(root, osarch)
+                if os.path.isdir(d) and os.path.exists(os.path.join(d, "BINARY.txt")) \
+                        and [f for f in os.listdir(d) if f != "BINARY.txt"]:
+                    found.append(osarch)
+        out[platform] = found
+    return out
+
+
+def insert_deliverables(dest, name, platform):
+    """THE DELIVERABLES section (maintainer, 2026-09-11: "please make the readme clearly
+    explain what are each deliverable and how to use them") — inserted before "What is in
+    this package" in every platform README: every asset on the release page, what it is,
+    who needs it, and that GitHub's auto-added source archives are not needed to play."""
+    url = release_url(name)
+    b = bins_available()
+    def have(pf):
+        return ", ".join(b[pf]) if b[pf] else "none yet for any OS — build per the recipe in that package's `EMULATOR.md`"
+    up = {"fbneo": "FBNeo", "mame": "MAME", "mister": "MiSTer"}[platform]
+    text = f"""## The deliverables — what to download, and what each is for
+Everything ships as ASSETS of the GitHub release on tag `freeze/{name}`:
+{url}
+
+| asset | what it is | who needs it |
+|---|---|---|
+| `{name}-fbneo.zip` | the FBNeo package: this README, the romset patch set + applier, the FBNeo driver patch + build recipe (`EMULATOR.md`), and a copy of each prebuilt binary's `BINARY.txt` | FBNeo players |
+| `{name}-mame.zip` | the MAME package: the same romset patch set + applier, the MAME driver patch + build recipe (`EMULATOR.md`) | MAME players |
+| `{name}-mister.zip` | the MiSTer package: the same romset patch set + applier, the `jtcps2w.rbf` bitstream + its record (`BITSTREAM.txt`), the two `.mra` files, `MISTER.md` | MiSTer owners |
+| `{name}-fbneo-<os-arch>.zip` | a prebuilt patched FBNeo for that OS, self-contained, with a `BINARY.txt` of sha256s to verify against (available: {have('fbneo')}) | FBNeo players who would rather not build |
+| `{name}-mame-<os-arch>.zip` | a prebuilt patched MAME (CPS-2 subtarget) for that OS, self-contained, with its `BINARY.txt` (available: {have('mame')}) | MAME players who would rather not build |
+| "Source code (zip / tar.gz)" | added by GitHub to every release: the whole project repository at the tag — development tooling, logs and all. **NOT needed to play**; nothing above requires it | nobody, unless you want to audit or rebuild the project |
+
+Every package rebuilds the SAME `vsavjw.zip` from your own dumps (the three
+copies of the patch set are byte-identical, and a gate asserts it). Take the
+ONE package for the platform you play on, plus at most one prebuilt binary.
+**You are reading the {up} package.** In order: build the romset (below),
+get the emulator or core ("Play on {up}" at the end), play.
+
+"""
+    rp = os.path.join(dest, "README.md")
+    t = open(rp).read()
+    marker = "## What is in this package"
+    if marker not in t:
+        sys.exit(f"{rp}: no '{marker}' section to insert the deliverables before")
+    open(rp, "w").write(t.replace(marker, text + marker, 1))
+
+
 def append_play(dest, text):
     with open(os.path.join(dest, "README.md"), "a") as f:
         f.write(text)
@@ -352,6 +407,7 @@ def main():
             emulator_side(p, dest, a.name)
         else:
             mister_side(dest, a.mister_src, a.name, resolve_bitstream(a.bitstream))
+        insert_deliverables(dest, a.name, p)
         n = sum(len(f) for _, _, f in os.walk(dest))
         print(f"  {p}: {n} files -> {dest}")
     print(f"packaged {a.name} for {', '.join(plats)} -> {root}")

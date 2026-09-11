@@ -11,6 +11,25 @@ own, a manifest, and an applier that rebuilds the romset from YOUR dumps and
 verifies every byte before writing anything. Nothing in it can be played
 without your own dumps.
 
+## The deliverables — what to download, and what each is for
+Everything ships as ASSETS of the GitHub release on tag `freeze/merged-m18`:
+https://github.com/DefinitelyFrenchName/VampireSaved/releases/tag/freeze/merged-m18
+
+| asset | what it is | who needs it |
+|---|---|---|
+| `merged-m18-fbneo.zip` | the FBNeo package: this README, the romset patch set + applier, the FBNeo driver patch + build recipe (`EMULATOR.md`), and a copy of each prebuilt binary's `BINARY.txt` | FBNeo players |
+| `merged-m18-mame.zip` | the MAME package: the same romset patch set + applier, the MAME driver patch + build recipe (`EMULATOR.md`) | MAME players |
+| `merged-m18-mister.zip` | the MiSTer package: the same romset patch set + applier, the `jtcps2w.rbf` bitstream + its record (`BITSTREAM.txt`), the two `.mra` files, `MISTER.md` | MiSTer owners |
+| `merged-m18-fbneo-<os-arch>.zip` | a prebuilt patched FBNeo for that OS, self-contained, with a `BINARY.txt` of sha256s to verify against (available: macos-arm64) | FBNeo players who would rather not build |
+| `merged-m18-mame-<os-arch>.zip` | a prebuilt patched MAME (CPS-2 subtarget) for that OS, self-contained, with its `BINARY.txt` (available: macos-arm64) | MAME players who would rather not build |
+| "Source code (zip / tar.gz)" | added by GitHub to every release: the whole project repository at the tag — development tooling, logs and all. **NOT needed to play**; nothing above requires it | nobody, unless you want to audit or rebuild the project |
+
+Every package rebuilds the SAME `vsavjw.zip` from your own dumps (the three
+copies of the patch set are byte-identical, and a gate asserts it). Take the
+ONE package for the platform you play on, plus at most one prebuilt binary.
+**You are reading the FBNeo package.** In order: build the romset (below),
+get the emulator or core ("Play on FBNeo" at the end), play.
+
 ## What is in this package
 - `patches/` — 20 VCDIFF patch files (xdelta3 format), one per rebuilt member
 - `manifest.json` — every target member's SHA-1 and size, which members are

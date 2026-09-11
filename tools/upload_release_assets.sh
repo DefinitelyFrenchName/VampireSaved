@@ -14,6 +14,12 @@
 # The maintainer's own web storage may mirror them later.
 #
 # Usage: tools/upload_release_assets.sh freeze/<name> [--prune] [--dry-run]
+#   FIRST, the PLATFORM PACKAGES (maintainer, 2026-09-11: "publish everything available"):
+#   every release/<name>/<platform>/ directory is zipped as `<name>-<platform>.zip` (the
+#   directory inside), uploaded, downloaded back, and every file inside the served zip is
+#   `cmp`-identical to the committed directory — so GitHub's auto-added "Source code"
+#   archives (the whole repository, unremovable by any API) are irrelevant to a player;
+#   THEN the prebuilt binaries:
 #   for every release/emulators/<platform>/<os-arch>/ holding a BINARY.txt AND its files:
 #     1. every sha256 row verified on disk (a record with NO files is named and skipped —
 #        this host has neither built nor fetched them);
@@ -51,6 +57,36 @@ verify_rows() {  # verify_rows <dir> — every sha256 row's file present and mat
 }
 
 n=0
+# ---- the platform packages
+[ -d "release/$NAME" ] || { echo "no release/$NAME/ in the tree — package it first" >&2; exit 1; }
+for pdir in release/"$NAME"/*/; do
+    platform="$(basename "$pdir")"
+    [ -f "$pdir/README.md" ] && [ -f "$pdir/manifest.json" ] || continue
+    asset="$NAME-$platform.zip"
+    ( cd "release/$NAME" && rm -f "$W/$asset" && zip -q -r -X "$W/$asset" "$platform" -x '*/emulator/bin/*/*' )
+    # the binaries are their own assets; the package carries each one's RECORD only
+    recs="$(cd "release/$NAME" && find "$platform/emulator/bin" -name BINARY.txt 2>/dev/null || true)"
+    [ -z "$recs" ] || ( cd "release/$NAME" && printf '%s\n' "$recs" | zip -q -X "$W/$asset" -@ )
+    echo "built $asset ($(du -h "$W/$asset" | cut -f1)) from $pdir"
+    n=$((n+1))
+    [ "$DRY" = 1 ] && continue
+    if ! gh release view "$TAG" >/dev/null 2>&1; then
+        gh release create "$TAG" --title "$NAME" --verify-tag --notes "(notes follow)" >/dev/null
+        echo "created release $TAG"
+    fi
+    gh release upload "$TAG" "$W/$asset" --clobber >/dev/null
+    mkdir -p "$W/dl" && rm -f "$W/dl/$asset"
+    gh release download "$TAG" -p "$asset" -D "$W/dl" >/dev/null
+    rm -rf "$W/chk"; mkdir -p "$W/chk" && ( cd "$W/chk" && unzip -q "$W/dl/$asset" )
+    # every served file identical to the committed one, and nothing committed missing (binaries excepted)
+    ( cd "release/$NAME" && find "$platform" -type f -not -path '*/emulator/bin/*' -o -type f -name BINARY.txt -path '*/emulator/bin/*' ) | sort > "$W/want.txt"
+    ( cd "$W/chk" && find "$platform" -type f ) | sort > "$W/got.txt"
+    cmp -s "$W/want.txt" "$W/got.txt" || { diff "$W/want.txt" "$W/got.txt" | head; echo "FAIL: the served $asset does not hold exactly the committed files" >&2; exit 1; }
+    while read -r f; do cmp -s "release/$NAME/$f" "$W/chk/$f" || { echo "FAIL: served $f differs from the tree's" >&2; exit 1; }; done < "$W/want.txt"
+    echo "uploaded and re-verified from GitHub: $asset ($(wc -l < "$W/want.txt" | tr -d ' ') files identical) -> $URL"
+done
+
+# ---- the prebuilt binaries
 for rec in release/emulators/*/*/BINARY.txt; do
     [ -f "$rec" ] || continue
     d="$(dirname "$rec")"; osarch="$(basename "$d")"; platform="$(basename "$(dirname "$d")")"
@@ -76,7 +112,7 @@ PY
     [ "$DRY" = 1 ] && continue
     if ! gh release view "$TAG" >/dev/null 2>&1; then
         gh release create "$TAG" --title "$NAME" --verify-tag \
-            --notes "Prebuilt emulator binaries for the $NAME freeze (recipe AND prebuilt, each user free to choose). Verify every file against the BINARY.txt inside each zip. The romset patch set and the end-user README are in the repository under release/$NAME/. No ROM data is distributed, ever." >/dev/null
+            --notes "(notes follow)" >/dev/null
         echo "created release $TAG"
     fi
     gh release upload "$TAG" "$W/$asset" --clobber >/dev/null
@@ -89,7 +125,37 @@ PY
     cmp -s "$W/chk/$osarch/BINARY.txt" "$rec" || { echo "FAIL: the served BINARY.txt differs from the tree's" >&2; exit 1; }
     echo "uploaded and re-verified from GitHub: $asset -> $URL"
 done
-[ "$n" -gt 0 ] || { echo "nothing to upload: no release/emulators/*/*/ holds binaries on this host" >&2; exit 1; }
+[ "$n" -gt 0 ] || { echo "nothing to upload" >&2; exit 1; }
+
+# ---- the release notes: the deliverables, from what is actually attached
+if [ "$DRY" = 0 ]; then
+    assets="$(gh release view "$TAG" --json assets --jq '.assets[].name' | sort)"
+    {
+        echo "# VAMPIRE SAVED — $NAME"
+        echo
+        echo "Full-roster Vampire Savior on the real CPS-2 engine. **No ROM data and no copyrighted asset is distributed, ever**: every package rebuilds the romset from the three reference dumps YOU own (vsavj, vsav, vsav2) and verifies every byte before writing."
+        echo
+        echo "## What to download"
+        echo
+        echo "| asset | what it is |"; echo "|---|---|"
+        for a in $assets; do
+            case "$a" in
+            "$NAME"-fbneo.zip)  echo "| \`$a\` | **the FBNeo package** — README, romset patch set + applier, the FBNeo driver patch + recipe |" ;;
+            "$NAME"-mame.zip)   echo "| \`$a\` | **the MAME package** — README, the same romset patch set + applier, the MAME driver patch + recipe |" ;;
+            "$NAME"-mister.zip) echo "| \`$a\` | **the MiSTer package** — README, the same romset patch set + applier, the \`jtcps2w.rbf\` bitstream + record, the two \`.mra\`, \`MISTER.md\` |" ;;
+            "$NAME"-fbneo-*.zip) echo "| \`$a\` | a **prebuilt patched FBNeo** for \`${a#"$NAME"-fbneo-}\` (drop the .zip), self-contained; verify against its \`BINARY.txt\` |" ;;
+            "$NAME"-mame-*.zip)  echo "| \`$a\` | a **prebuilt patched MAME** (CPS-2 subtarget) for \`${a#"$NAME"-mame-}\` (drop the .zip), self-contained; verify against its \`BINARY.txt\` |" ;;
+            *) echo "| \`$a\` | (unlisted asset) |" ;;
+            esac
+        done
+        echo "| Source code (zip / tar.gz) | added by GitHub automatically: the whole project repository at this tag. **Not needed to play.** |"
+        echo
+        echo "Take the ONE package for the platform you play on, plus at most one prebuilt binary; its README says what to do, in order: build the romset, get the emulator or core, play. All three packages rebuild the same \`vsavjw.zip\`."
+        echo
+        echo "Only the latest freeze keeps its binary assets; the record of every release (\`BINARY.txt\`, \`BITSTREAM.txt\`, \`manifest.json\`) stays in the repository under \`release/$NAME/\`."
+    } > "$W/notes.md"
+    gh release edit "$TAG" --title "$NAME" --notes-file "$W/notes.md" >/dev/null && echo "release notes written ($(echo "$assets" | wc -l | tr -d ' ') assets listed)"
+fi
 
 if [ "$PRUNE" = 1 ] && [ "$DRY" = 0 ]; then
     prev="$(git tag -l 'freeze/merged-m*' | sort -V | awk -v t="$TAG" '$0==t{exit} {p=$0} END{print p}')"

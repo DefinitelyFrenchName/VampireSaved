@@ -5,7 +5,7 @@
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## THE macOS PREBUILT BINARIES: BUILT, GATED, PUBLISHED AS RELEASE ASSETS ON `freeze/merged-m18` (ruled: assets, never git content). NO BUILD BYTE MOVED.
+## M18 IS FULLY PUBLISHED FOR macOS + MiSTer: five assets on `freeze/merged-m18` (three platform packages, two macOS binaries), every README explaining each deliverable; three dumps, not four. WINDOWS/LINUX = A SCRIPT THE MAINTAINER RUNS, ONCE IT EXISTS. NO BUILD BYTE MOVED.
 
 M18 (`merged-m18`, `build/m3b_merged26`) is still the current freeze and
 release. `git status -sb` says the push state.
@@ -38,23 +38,18 @@ rewritten/new members) where the recipe said "must say good".
   page of `freeze/merged-m18`. **The floor is macOS 26.0 arm64** (Homebrew's
   bottles carry it) — lowering it means SDL from source with an older target,
   a departure from the recipe; not taken, worth a ruling if a Mac user asks.
-- M18's assets on the release page are CURRENT after the three-dump repackage
-  (the binaries and their records did not change; the packaged record is
-  `cmp`-identical to the uploaded one). The control MRA stays (maintainer,
-  2026-09-11).
-- **The release page's auto-generated "Source code" archives are the whole repo
-  and bring nothing** (maintainer, 2026-09-11) — GitHub cannot drop them, so
-  make them irrelevant: attach `release/<name>/` as `<name>-release.zip` (the
-  ruled inventory, the whole subset a user needs) via the upload tool and say so
-  in the notes. Recommendation (a) in STATE "Decisions pending"; waits for the word.
-- **WINDOWS and LINUX on the remote boxes** (Linux under WSL2 is fine — a
-  real kernel and userland; the build distro's glibc sets the floor): extend
-  `tools/build_release_emulators.sh` with that OS's bundling step (Linux:
-  `patchelf --set-rpath '$ORIGIN'` over the `ldd` closure, or a static SDL;
-  Windows: the DLLs beside the .exe) and the gate's self-containment check for
-  that OS (it FAILS there today by design, never a silent pass); `test_mame_parity`
-  is the migration gate for any new host ([MFI-41]). Also open: the FBNeo half
-  of the stall measurement (needs the WIDE=0 reference FBNeo build).
+- **WINDOWS and LINUX — make `tools/build_release_emulators.sh` runnable there, then hand
+  the maintainer ONE command per machine** (ruled shape 14z-149 (4): a script they run under
+  WSL2 / MSYS2; no remote session). To add, untestable from this Mac so written for that
+  host's session: the Linux bundling half (`patchelf --set-rpath '$ORIGIN'` over the `ldd`
+  closure, or a static SDL2/SDL3; the floor is the build distro's glibc — build on the oldest
+  Ubuntu LTS to support), the Windows half (MSYS2 `make sdl2` for FBNeo, `make SUBTARGET=cps2`
+  for MAME, the DLLs beside the .exe found by `ldd` under MSYS2), and `test_release_binaries`'
+  self-containment + signature checks for those OSes (it FAILS there by design today; Windows
+  has no ad-hoc signing — the record's sha256 rows are the integrity). Then on each box:
+  `tools/build_release_emulators.sh fbneo && … mame`, `test_release_binaries` green,
+  `tools/upload_release_assets.sh freeze/merged-m18` (gh authenticated) or send the two dirs.
+  `test_mame_parity` is the migration gate for any new host ([MFI-41]). The control MRA stays.
 - **At the next freeze/release sweep: the 34 emulator-tier modes HONOURED.**
   `run_all_emulator.sh --scope all --lane all --strict --controls` (the ruled
   release invocation). The ~20 expensive gates' modes were never run; a mode
