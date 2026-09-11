@@ -15,7 +15,7 @@
 # recipe believed equivalent. mame + fbneo, ~2 min.
 #
 # MUST-FIRE: perturbed-copy: flipped-library-byte — a copy of the fbneo resource dir with one byte of a bundled library flipped must fail the record check (mode: the gate checks that copy in place of the resource)
-# MUST-FIRE: perturbed-copy: absolute-reference — a copy of the mame resource dir whose binary has one install name rewritten back to an absolute Homebrew path (re-signed, record re-hashed so the record check PASSES) must fail the self-containment check (mode: the gate checks that copy)
+# MUST-FIRE: perturbed-copy: absolute-reference — a copy of the mame resource dir carrying a reference that does NOT resolve inside the directory, with the record made consistent so the record check PASSES, must fail the self-containment check (macOS: one install name rewritten back to an absolute Homebrew path, re-signed and re-hashed; Linux/Windows: one bundled library removed together with its sha256 row, so ldd reports it not found) (mode: the gate checks that copy)
 #
 # WHY. A prebuilt built by the EMULATOR.md recipe links Homebrew's SDL by
 # absolute path (measured 14z-149: otool -L on both binaries) and runs only on
@@ -23,9 +23,24 @@
 # regression there is invisible to every other gate because every other gate
 # runs the harness binary from emu/fbneo. The MAME leg's frozen expectation is
 # the strongest claim available: the release binary and the gate instrument
-# traverse the same RAM on a legacy replay. macOS only today (otool/codesign);
-# on another OS the self-containment and signature checks FAIL naming what that
-# host's session must add — never a silent pass.
+# traverse the same RAM on a legacy replay.
+#
+# ALL THREE OSes SINCE ITEM 1 OF THE 14z-149 CLOSE, and the self-containment
+# check is deliberately NOT the bundler's own library allowlist re-read back —
+# it is a RESOLUTION check with the host's own loader tooling, which answers
+# the question that matters ("will this load on a machine that has none of the
+# build host's packages?") rather than the one the bundler already answered:
+#   macOS    otool -L: every reference is /usr/lib, /System or @loader_path,
+#            and codesign --verify --strict (install_name_tool invalidates a
+#            signature, and an unsigned binary does not run on Apple Silicon)
+#   Linux    ldd: every resolved path is inside this directory or a system
+#            path, nothing "not found" — RUNPATH=$ORIGIN is what makes that so
+#   Windows  ldd/objdump: every import resolves beside the .exe or to the
+#            Windows directory. There is NO signature on this platform, so the
+#            record's sha256 rows are the integrity and the gate says so
+#            instead of asserting a signature that cannot exist.
+# An OS this gate does not know still FAILS, naming what must be added — never
+# a silent pass.
 #
 # Usage: ROMDIR=... [MERGED=build/m3b_merged26] [RELEASE_EMULATORS=release/emulators]
 #        tests/test_release_binaries.sh
@@ -38,8 +53,17 @@ ROMDIR="$(cd "$ROMDIR" && pwd)"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 MERGED="${MERGED:-build/m3b_merged26}"
 ROOT="${RELEASE_EMULATORS:-release/emulators}"
-case "$(uname -s)" in Darwin) OS=macos ;; Linux) OS=linux ;; *) OS="$(uname -s | tr 'A-Z' 'a-z')" ;; esac
-case "$(uname -m)" in arm64|aarch64) ARCH=arm64 ;; *) ARCH="$(uname -m)" ;; esac
+# The os-arch spelling MUST match tools/build_release_emulators.sh's, or this
+# gate looks in a directory that builder never wrote (and SKIPs, reading as
+# "nothing to check" instead of "wrong name").
+case "$(uname -s)" in
+Darwin) OS=macos ;;
+Linux)  OS=linux ;;
+MINGW*|MSYS*|CYGWIN*) OS=windows ;;
+*) OS="$(uname -s | tr 'A-Z' 'a-z')" ;;
+esac
+case "$(uname -m)" in arm64|aarch64) ARCH=arm64 ;; x86_64|amd64) ARCH=x86_64 ;; *) ARCH="$(uname -m)" ;; esac
+EXESUF=""; [ "$OS" = windows ] && EXESUF=".exe"
 OSARCH="$OS-$ARCH"
 FB="$ROOT/fbneo/$OSARCH"; MM="$ROOT/mame/$OSARCH"
 [ -f "$FB/BINARY.txt" ] || { echo "SKIP: no $FB/BINARY.txt for this host (tools/build_release_emulators.sh fbneo)"; exit 0; }
@@ -56,23 +80,44 @@ TIMEOUT="$(command -v gtimeout || command -v timeout || true)"
 [ -n "$TIMEOUT" ] || { echo "FAIL: no timeout(1) (brew install coreutils)"; exit 1; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
+sha256_of() {
+    if command -v shasum >/dev/null 2>&1; then shasum -a 256 "$1" | cut -c1-64
+    elif command -v sha256sum >/dev/null 2>&1; then sha256sum "$1" | cut -c1-64
+    else echo "no shasum(1) or sha256sum(1)" >&2; return 1; fi
+}
 
 # ---- the two perturbations, ONE function each (the control section and the mode both call them)
 perturb_flip() {  # flip one byte of the first bundled library
     python3 - "$1" <<'PY'
 import sys, os, glob
 d = sys.argv[1]
-libs = sorted(glob.glob(os.path.join(d, "*.dylib")) + glob.glob(os.path.join(d, "*.so*")))
+libs = sorted(glob.glob(os.path.join(d, "*.dylib")) + glob.glob(os.path.join(d, "*.so*"))
+              + glob.glob(os.path.join(d, "*.dll")) + glob.glob(os.path.join(d, "*.DLL")))
+if not libs:
+    sys.exit("perturb_flip: no bundled library in " + d)
 p = libs[0]; b = bytearray(open(p, "rb").read()); b[len(b)//2] ^= 0x01; open(p, "wb").write(b)
 PY
 }
-perturb_absref() {  # rewrite one install name back to an absolute path, re-sign, re-hash the record
+perturb_absref() {  # a reference that does NOT resolve inside the directory, with
+    # the record left CONSISTENT so the record check passes and the
+    # self-containment check is the only thing that can catch it. The CLAIM is
+    # one; the mechanism is what each OS makes possible.
     d="$1"; exe="$2"
+    if [ "$OS" != macos ]; then
+        # Linux/Windows: one bundled library REMOVED together with its sha256
+        # row. Inventory and record stay consistent, so only a RESOLUTION check
+        # can see that the binary now needs something the directory lacks.
+        victim="$(ls "$d" | grep -E '[.](so[.0-9]*|dll|DLL)$' | head -1)"
+        [ -n "$victim" ] || { echo "perturb_absref: no bundled library in $d"; return 1; }
+        rm -f "$d/$victim"
+        grep -v " $victim\$" "$d/BINARY.txt" > "$d/BINARY.new" && mv "$d/BINARY.new" "$d/BINARY.txt"
+        return 0
+    fi
     ref="$(otool -L "$d/$exe" | awk 'NR>1 && $1 ~ /^@loader_path\//{print $1; exit}')"
     [ -n "$ref" ] || { echo "perturb_absref: $exe has no @loader_path reference"; return 1; }
     install_name_tool -change "$ref" "/opt/homebrew/lib/$(basename "$ref")" "$d/$exe" 2>/dev/null
     codesign -s - -f "$d/$exe" 2>/dev/null
-    new="$(shasum -a 256 "$d/$exe" | cut -c1-64)"
+    new="$(sha256_of "$d/$exe")"
     python3 - "$d/BINARY.txt" "$exe" "$new" <<'PY'
 import sys, re
 p, exe, new = sys.argv[1:]
@@ -82,7 +127,7 @@ open(p, "w").write(t)
 PY
 }
 cp -R "$FB" "$W/fb_flip";   perturb_flip "$W/fb_flip"
-cp -R "$MM" "$W/mm_absref"; perturb_absref "$W/mm_absref" cps2
+cp -R "$MM" "$W/mm_absref"; perturb_absref "$W/mm_absref" "cps2$EXESUF"
 vs_ctl_is flipped-library-byte && FB="$W/fb_flip"
 vs_ctl_is absolute-reference && MM="$W/mm_absref"
 FB="$(cd "$FB" && pwd)"; MM="$(cd "$MM" && pwd)"   # absolute: the boot legs cd elsewhere
@@ -93,7 +138,7 @@ check_dir() {
     grep -E '^sha256 +[0-9a-f]{64} +[^ ]+' "$d/BINARY.txt" > "$W/rows.txt" || true
     [ -s "$W/rows.txt" ] || { echo "FAIL: $d/BINARY.txt has no sha256 rows"; return 1; }
     while read -r _ want fname; do
-        got="$(shasum -a 256 "$d/$fname" 2>/dev/null | cut -c1-64)"
+        got="$(sha256_of "$d/$fname" 2>/dev/null || true)"
         [ "$got" = "$want" ] || { echo "FAIL: $d/$fname sha256 ${got:-<missing>} != record ${want}"; bad=1; }
     done < "$W/rows.txt"
     for f in "$d"/*; do
@@ -105,7 +150,8 @@ check_dir() {
     for k in pin patch recipe requires run; do
         grep -q "^$k " "$d/BINARY.txt" || { echo "FAIL: $d/BINARY.txt lacks the '$k' line"; bad=1; }
     done
-    if [ "$OS" = macos ]; then
+    case "$OS" in
+    macos)
         for f in "$d"/*; do
             case "$(basename "$f")" in BINARY.txt) continue ;; esac
             otool -L "$f" 2>/dev/null | awk 'NR>1{print $1}' | while read -r ref; do
@@ -115,24 +161,89 @@ check_dir() {
             done > "$W/refs.txt"
             [ -s "$W/refs.txt" ] && { cat "$W/refs.txt"; bad=1; }
             codesign --verify --strict "$f" 2>/dev/null || { echo "FAIL: $f does not verify (codesign)"; bad=1; }
+        done ;;
+    linux)
+        # ldd honours the file's own RUNPATH, so this is what the loader will
+        # actually do on a machine with none of the build host's packages:
+        # every resolved path must be INSIDE this directory or a system path,
+        # and nothing may be "not found".
+        command -v ldd >/dev/null 2>&1 || { echo "FAIL: no ldd(1) on this host — cannot check self-containment"; return 1; }
+        for f in "$d"/*; do
+            case "$(basename "$f")" in BINARY.txt) continue ;; esac
+            head -c 4 "$f" 2>/dev/null | grep -q 'ELF' || continue
+            ldd "$f" 2>/dev/null | python3 -c '
+import sys, os
+d = os.path.realpath(sys.argv[1]); name = sys.argv[2]
+SYS = ("/lib/", "/lib64/", "/usr/lib/", "/usr/lib64/", "/usr/local/lib/")
+for line in sys.stdin:
+    line = line.strip()
+    if "=>" not in line:
+        continue
+    soname, right = (x.strip() for x in line.split("=>", 1))
+    if right.startswith("not found"):
+        print(f"FAIL: {name} needs {soname}, NOT FOUND — the directory is not self-contained")
+        continue
+    path = right.rsplit(" (0x", 1)[0].strip()
+    if not path:
+        continue
+    real = os.path.realpath(path)
+    if os.path.dirname(real) == d:
+        continue                      # beside the binary: what $ORIGIN is for
+    if real.startswith(SYS):
+        continue                      # the host runtime, deliberately not bundled
+    print(f"FAIL: {name} resolves {soname} to {path}, outside this directory and outside the system paths")
+' "$d" "$(basename "$f")" > "$W/refs.txt"
+            [ -s "$W/refs.txt" ] && { cat "$W/refs.txt"; bad=1; }
         done
-    else
-        echo "FAIL: the self-containment and signature checks are implemented for macOS only — add this OS's ($OS) checks (ldd/patchelf) before trusting a $OSARCH prebuilt"
-        bad=1
-    fi
+        echo "  (linux: no code signature exists on this platform — the sha256 rows above are the integrity)" ;;
+    windows)
+        command -v ldd >/dev/null 2>&1 || { echo "FAIL: no ldd(1) in this shell — run the gate from an MSYS2 MINGW64/UCRT64 shell"; return 1; }
+        for f in "$d"/*; do
+            case "$(basename "$f")" in BINARY.txt) continue ;; esac
+            head -c 2 "$f" 2>/dev/null | grep -q 'MZ' || continue
+            ldd "$f" 2>/dev/null | python3 -c '
+import sys, os, re
+d = os.path.realpath(sys.argv[1]); name = sys.argv[2]
+WIN = re.compile(r"^(?:[a-zA-Z]:/|/[a-zA-Z]/)?(?:WINDOWS|WinNT)/", re.I)
+for line in sys.stdin:
+    line = line.strip()
+    if "=>" not in line:
+        continue
+    dll, right = (x.strip() for x in line.split("=>", 1))
+    if dll == "???":
+        continue
+    if right.startswith("not found"):
+        print(f"FAIL: {name} imports {dll}, NOT FOUND — the folder is not self-contained")
+        continue
+    path = right.rsplit(" (0x", 1)[0].strip()
+    if not path or path == "???":
+        continue
+    if os.path.dirname(os.path.realpath(path)) == d:
+        continue                      # beside the .exe: where the loader looks first
+    if WIN.match(path.replace("\\", "/").lstrip()):
+        continue                      # Windows itself
+    print(f"FAIL: {name} resolves {dll} to {path}, outside this folder and outside Windows")
+' "$d" "$(basename "$f")" > "$W/refs.txt"
+            [ -s "$W/refs.txt" ] && { cat "$W/refs.txt"; bad=1; }
+        done
+        echo "  (windows: no code signature exists on this platform — the sha256 rows above are the integrity)" ;;
+    *)
+        echo "FAIL: the self-containment check is implemented for macOS, Linux and Windows — add this OS's ($OS) before trusting a $OSARCH prebuilt"
+        bad=1 ;;
+    esac
     return $bad
 }
 
 # ---- section 1: FBNeo
 echo "== 1. fbneo $FB"
-check_dir "$FB" fbneo || fail=1
-strings -a "$FB/fbneo" | grep -q "CPS-2 WIDE v1" || { echo "FAIL: fbneo does not carry the profile"; fail=1; }
-! strings -a "$FB/fbneo" | grep -q -- "-hframes" || { echo "FAIL: fbneo carries the replay HARNESS (patch 0001) — a test instrument shipped"; fail=1; }
+check_dir "$FB" "fbneo$EXESUF" || fail=1
+strings -a "$FB/fbneo$EXESUF" | grep -q "CPS-2 WIDE v1" || { echo "FAIL: fbneo does not carry the profile"; fail=1; }
+! strings -a "$FB/fbneo$EXESUF" | grep -q -- "-hframes" || { echo "FAIL: fbneo carries the replay HARNESS (patch 0001) — a test instrument shipped"; fail=1; }
 mkdir -p "$W/play/roms" "$W/home"
 for z in "$ROMDIR"/*.zip "$REPO/$MERGED/rompath"/*.zip; do ln -sf "$z" "$W/play/roms/$(basename "$z")"; done
 rc=0
 ( cd "$W/play" && HOME="$W/home" SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
-    "$TIMEOUT" 20 "$FB/fbneo" vsavjw > "$W/fb_boot.log" 2>&1 ) || rc=$?
+    "$TIMEOUT" 20 "$FB/fbneo$EXESUF" vsavjw > "$W/fb_boot.log" 2>&1 ) || rc=$?
 oks="$(grep -c '(OK)' "$W/fb_boot.log" || true)"
 if [ "$rc" != 124 ]; then echo "FAIL: fbneo exited rc=$rc within 20 s (expected to be still running):"; tail -5 "$W/fb_boot.log"; fail=1; fi
 grep -q "CPS-2 WIDE v1 profile active" "$W/fb_boot.log" || { echo "FAIL: fbneo boot log lacks 'CPS-2 WIDE v1 profile active'"; fail=1; }
@@ -143,15 +254,15 @@ grep -q "CPS-2 WIDE v1 profile active" "$W/fb_boot.log" || { echo "FAIL: fbneo b
 # ---- section 2: MAME
 echo "== 2. mame $MM"
 f2=0
-check_dir "$MM" cps2 || f2=1
-"$MM/cps2" -listfull vsavjw 2>/dev/null | grep -q vsavjw || { echo "FAIL: cps2 does not know vsavjw"; f2=1; }
+check_dir "$MM" "cps2$EXESUF" || f2=1
+"$MM/cps2$EXESUF" -listfull vsavjw 2>/dev/null | grep -q vsavjw || { echo "FAIL: cps2 does not know vsavjw"; f2=1; }
 # -verifyroms can never say "is good" on a WIDE content set: the descriptor carries the
 # STOCK CRCs for the members the port rewrites and SENTINELS for the new ones ([VSP-75]),
 # so the honest expectation is: exactly the members vsavjw.zip ships that are NOT
 # byte-identical to a pristine twin are flagged INCORRECT CHECKSUM, and nothing is NOT
 # FOUND (measured 14z-149; the shipped
 # recipe's "must say good" line was false since the first content build).
-"$MM/cps2" -verifyroms vsavjw -rompath "$REPO/$MERGED/rompath;$ROMDIR" > "$W/verify.log" 2>&1 || true
+"$MM/cps2$EXESUF" -verifyroms vsavjw -rompath "$REPO/$MERGED/rompath;$ROMDIR" > "$W/verify.log" 2>&1 || true
 python3 - "$W/verify.log" "$MERGED/rompath/vsavjw.zip" "$ROMDIR/vsavj.zip" "$ROMDIR/vsav.zip" <<'PY' || f2=1
 import sys, re, zipfile
 log, z, *pristine = sys.argv[1:]
@@ -172,7 +283,7 @@ print(f"  -verifyroms: {len(flagged)} members flagged = exactly the WIDE zip's {
 sys.exit(0 if ok else 1)
 PY
 if [ "$f2" = 0 ]; then
-    MAME_BIN="$MM/cps2" MAME_ROMPATH="$REPO/$MERGED/rompath;$ROMDIR" SUITE_ONLY=05_timeout_idle \
+    MAME_BIN="$MM/cps2$EXESUF" MAME_ROMPATH="$REPO/$MERGED/rompath;$ROMDIR" SUITE_ONLY=05_timeout_idle \
         tests/run_suite.sh vsavjw > "$W/suite.log" 2>&1 || true
     n="$(grep -c 'PASS masked-\|PASS$' "$W/suite.log" || true)"
     if ! grep -q "SUITE GREEN" "$W/suite.log" || [ "$n" != 1 ]; then
@@ -183,17 +294,19 @@ fi
 [ "$f2" = 0 ] || fail=1
 
 # ---- must-fire controls: the two perturbed copies must FAIL check_dir
-if check_dir "$W/fb_flip" fbneo > "$W/c1.txt" 2>&1; then
+if check_dir "$W/fb_flip" "fbneo$EXESUF" > "$W/c1.txt" 2>&1; then
     vs_ctl_dead flipped-library-byte "a flipped library byte passed the record check"; fail=1
 else
     vs_ctl_fired flipped-library-byte "$(grep -c '^FAIL' "$W/c1.txt") FAIL line(s), first: $(grep -m1 '^FAIL' "$W/c1.txt")"
 fi
-if check_dir "$W/mm_absref" cps2 > "$W/c2.txt" 2>&1; then
+if check_dir "$W/mm_absref" "cps2$EXESUF" > "$W/c2.txt" 2>&1; then
     vs_ctl_dead absolute-reference "an absolute install name passed the self-containment check"; fail=1
 else
-    grep -q 'references /opt/homebrew' "$W/c2.txt" \
-        && vs_ctl_fired absolute-reference "$(grep -m1 'references /opt/homebrew' "$W/c2.txt")" \
-        || { vs_ctl_dead absolute-reference "check_dir failed for another reason: $(grep -m1 '^FAIL' "$W/c2.txt")"; fail=1; }
+    if grep -qE 'references /opt/homebrew|NOT FOUND|outside this (directory|folder)' "$W/c2.txt"; then
+        vs_ctl_fired absolute-reference "$(grep -m1 -E 'references /opt/homebrew|NOT FOUND|outside this' "$W/c2.txt")"
+    else
+        vs_ctl_dead absolute-reference "check_dir failed for another reason: $(grep -m1 '^FAIL' "$W/c2.txt")"; fail=1
+    fi
 fi
 
 [ "$fail" = 0 ] && echo "PASS: test_release_binaries ($OSARCH)" || { echo "FAIL: test_release_binaries ($OSARCH)"; exit 1; }

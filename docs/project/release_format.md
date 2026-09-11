@@ -38,7 +38,7 @@ missing FAILS; the must-fires `stray-file` and `readme-missing-section`):
 | `apply_release.py` | the applier; **Python 3 only** since 14z-148 (its own VCDIFF decoder; xdelta3 remains the PACKAGER's encoder) |
 | `README.md` | the END-USER document: the deliverables (every release asset and who needs it), what you need, build the romset, play on this platform, if it does not work, the no-ROM statement — the six sections the gate greps for |
 | `EMULATOR.md` + `emulator/0002-cps2-wide-v1.patch` (fbneo, mame) | the driver patch, the upstream pin and the build recipe |
-| `emulator/bin/<os-arch>/…` + `BINARY.txt` (fbneo, mame; **optional**) | **prebuilt binaries — RULED 2026-09-11: the recipe AND the prebuilt, each user free to choose.** A build resource under `release/emulators/<platform>/<os-arch>/` with a record (sha256 per file, pin, patch), hash-verified into the release; absent for an OS until a host builds it (this MacBook builds macOS only; Windows and Linux are the two remote boxes). **THE FILES ARE GITHUB RELEASE ASSETS, NEVER GIT CONTENT (ruled 2026-09-11, 14z-149, option (b))**: the tree tracks every `BINARY.txt`, ignores the files beside it, `tools/upload_release_assets.sh freeze/<name> --prune` attaches `<name>-<platform>-<os-arch>.zip` to the release on the freeze tag and deletes the previous freeze's assets, so GitHub hosts only the latest; the maintainer's web storage may mirror them |
+| `emulator/bin/<os-arch>/…` + `BINARY.txt` (fbneo, mame; **optional**) | **prebuilt binaries — RULED 2026-09-11: the recipe AND the prebuilt, each user free to choose.** A build resource under `release/emulators/<platform>/<os-arch>/` with a record (sha256 per file, pin, patch), hash-verified into the release; absent for an OS until a host builds it — the BUILDER runs on all three OSes since 14z-150 (macOS, Linux, Windows/MSYS2), and each os-arch dir appears when that host has run it. **THE FILES ARE GITHUB RELEASE ASSETS, NEVER GIT CONTENT (ruled 2026-09-11, 14z-149, option (b))**: the tree tracks every `BINARY.txt`, ignores the files beside it, `tools/upload_release_assets.sh freeze/<name> --prune` attaches `<name>-<platform>-<os-arch>.zip` to the release on the freeze tag and deletes the previous freeze's assets, so GitHub hosts only the latest; the maintainer's web storage may mirror them |
 | `*.mra`, `jtcps2w.rbf`, `BITSTREAM.txt`, `MISTER.md` (mister) | the two MRAs, the bitstream and its record — on top of the patch set, because the WIDE set still has to be rebuilt from the user's dumps (an MRA-only path is NOT reachable: the WIDE gfx members are ~26,000 tile-sized copies each out of `vsav2`/`vhunt2`, measured 2026-09-11) |
 
 **Never ships:** a ROM byte in any form (the rule-7 scan), a build log, a
@@ -106,13 +106,27 @@ release/emulators/<platform>/<os-arch>/                         <- THE BINARY BU
   absolute path, so the build tool bundles every non-system library flat
   beside the binary under `@loader_path` (`tools/bundle_dylibs.py`, rpaths
   dropped, all ad-hoc signed) — the inventory admits `emulator/bin/<os-arch>/
-  <file>` and nothing deeper, which is why flat. **macOS today: `macos-arm64`,
-  floor macOS 26.0** (Homebrew's bottles are built per OS release and the
-  linker inherits their minimum; lowering it would mean SDL from source with an
-  older target — not the recipe). Gate `tests/test_release_binaries.sh`: the
-  record, self-containment, the signature, the profile, no harness, and a
-  boot of the current merged set on each binary (MAME reproducing a frozen
-  masked expectation of the freeze).
+  <file>` and nothing deeper, which is why flat. **THREE OSes SINCE 14z-150**,
+  each with its own bundling mechanism and its own measured floor:
+  `macos-arm64` bundles with `@loader_path` + an ad-hoc signature and its floor
+  is **macOS 26.0** (Homebrew's bottles are built per OS release and the linker
+  inherits their minimum; lowering it would mean SDL from source with an older
+  target — not the recipe); **linux-x86_64** bundles with
+  `patchelf --set-rpath '$ORIGIN'` and its floor is the BUILD HOST's glibc,
+  measured from the artifact's own version symbols (build on the oldest LTS you
+  mean to support — glibc is backward compatible, never forward), with the GPU,
+  display, device and audio stacks deliberately left to the user's machine;
+  **windows-x86_64** needs no rewriting at all (the loader searches the .exe's
+  own directory first) and has NO signature, so its sha256 rows are the whole
+  integrity story. Gate `tests/test_release_binaries.sh`: the record,
+  self-containment (per OS, by RESOLUTION — `otool` / `ldd` — not by re-reading
+  the bundler's own allowlist), the signature where the platform has one, the
+  profile, no harness, and a boot of the current merged set on each binary
+  (MAME reproducing a frozen masked expectation of the freeze).
+  **THE LINUX AND WINDOWS HALVES HAVE NEVER BEEN RUN** (written 14z-150 on a
+  Mac with no such host): `tests/test_bundle_parsers.sh` proves their parsers
+  and their refusal of an empty closure against stub tools, and the first
+  session on each box is what turns "written" into "measured".
   **WHERE THE FILES LIVE (ruled 2026-09-11, the maintainer's three questions
   answered by measurement):** a committed binary lives in every clone's
   history forever — ~140 MB per release, tripled by three OSes, against a

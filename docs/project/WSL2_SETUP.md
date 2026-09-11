@@ -270,3 +270,95 @@ Everything above transfers as-is — that was the point of choosing WSL2
 over native Windows. Sections 3 through 7 are the entire Linux setup, minus
 the WSL-specific parts (sections 0-2) and the `/mnt/c` caveat. Run the same
 acceptance test there.
+
+## 10. BUILD THE RELEASE BINARIES FOR THIS OS — one command per emulator
+
+Written 14z-150, and **untested on any Linux or Windows host**: the tools
+below were written on the project's Mac, which has neither. The parsers and
+the closure logic they share are proven by `tests/test_bundle_parsers.sh`;
+what happens on real ELF and real PE files is what THIS machine's session
+finds out. Expect to fix something, and record what you fix.
+
+Releases ship **the recipe AND a prebuilt binary, each user free to choose**
+(maintainer-ruled 2026-09-11). macOS is built on the Mac; this section is how
+the Linux and Windows binaries get made, on the machine that has that OS.
+
+**Prerequisites beyond sections 3-6.** On Linux/WSL2 one extra package:
+
+```bash
+sudo apt install -y patchelf zip     # patchelf rewrites RUNPATH; zip is for the upload step
+```
+
+On Windows, work in an **MSYS2 MINGW64** shell (not the plain MSYS one) and
+install the toolchain the recipe needs:
+
+```bash
+pacman -S --needed git make zip mingw-w64-x86_64-{gcc,binutils,SDL2,SDL2_image,python,pkgconf}
+```
+
+**First, see what this host resolves — it builds nothing:**
+
+```bash
+CHECK=1 tools/build_release_emulators.sh fbneo
+```
+
+It prints the os-arch name, the bundler it will use, the executable name and
+the output directory. If the os-arch is not what you expect, stop there: the
+gate looks for that exact directory and would otherwise SKIP, which reads as
+"nothing to check" rather than "wrong name".
+
+**Then the two builds, one command each** (FBNeo minutes, MAME longer):
+
+```bash
+tools/build_release_emulators.sh fbneo
+tools/build_release_emulators.sh mame
+```
+
+Each writes `release/emulators/<kind>/<os-arch>/` with the binary, its
+bundled libraries and a `BINARY.txt` record (sha256 per file, the upstream
+pin, the driver-patch sha1, the recipe, the measured minimum OS, how to run).
+
+**Then the gate — this is what decides whether the binaries are shippable:**
+
+```bash
+ROMDIR=~/roms tests/test_release_binaries.sh
+```
+
+It checks the record, self-containment (on Linux: every library the loader
+resolves is beside the binary or a system path, nothing "not found"; on
+Windows: every import resolves beside the .exe or to Windows itself), the
+profile, the absence of the replay harness, and it BOOTS the merged romset on
+each binary — MAME reproducing a frozen masked expectation, so the shipped
+binary is proven to be the same instrument the project's gates ran.
+
+It needs a merged build to boot: either build one (`tools/build_merged.sh`,
+HANDOFF "How to build") or pass `MERGED=<dir>` for one you have.
+
+**Then either hand the directories back, or publish from here:**
+
+```bash
+tools/upload_release_assets.sh freeze/merged-m18        # needs `gh` authenticated
+```
+
+Or copy `release/emulators/<kind>/<os-arch>/` to the Mac and let that host
+upload. Either way the record travels with the files — it is what makes a
+downloaded asset verifiable.
+
+### What to expect to go wrong the first time
+
+- **`patchelf` missing** — the Linux bundler refuses by name; install it.
+- **An empty closure** — both bundlers REFUSE rather than declare the binary
+  self-contained. That means `ldd`/`readelf`/`objdump` printed something the
+  parser did not recognise: capture the raw output and add its shape to
+  `tests/test_bundle_parsers.sh`'s fixtures, which is where a parser shape is
+  allowed to be learned.
+- **A library that should not have been bundled.** Linux deliberately leaves
+  the GPU stack (libGL/libEGL/libdrm), the X11/Wayland and udev/dbus clients,
+  ALSA/PulseAudio and glibc itself to the user's machine — bundling any of
+  them breaks the driver or the daemon protocol. If the binary fails on a
+  SECOND machine with a missing library, the fix is a line in
+  `tools/bundle_elf_libs.py`'s `SYSTEM_STEMS`, and the second machine is the
+  only instrument that can find it.
+- **The glibc floor is the build host's.** Building on the newest Ubuntu
+  makes a binary that refuses to start on anything older. Build on the oldest
+  LTS you are willing to support; the record states what it measured.

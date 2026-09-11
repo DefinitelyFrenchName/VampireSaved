@@ -23,6 +23,7 @@ declares	audit_voice_borrow
 declares	audit_walker_repoint
 declares	test_annotations_current
 declares	test_battery_accounting
+declares	test_bundle_parsers
 declares	test_capture_kf_ownership
 declares	test_charmap_current
 declares	test_charmap_overrides

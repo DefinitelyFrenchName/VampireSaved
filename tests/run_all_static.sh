@@ -113,6 +113,21 @@ if [ "$LIST" = 1 ]; then
 fi
 
 WORK="$(mktemp -d)"; trap 'rm -rf "$WORK"' EXIT INT TERM
+# A FAILING GATE'S FULL LOG SURVIVES THE RUN (14z-150). $WORK is a mktemp dir
+# the EXIT trap deletes, so until now a red printed its last four lines and the
+# rest went with it — and `FAIL: see above` is what those four lines often are.
+# That cost a diagnosis twice: test_bbh_fidelity went red inside the tier and
+# green alone at 14z-149 and again at 14z-150, both times with NO surviving
+# evidence, and the 14z-149 close named exactly this ("a runner that kept
+# per-gate logs would have said what it saw").
+# The path is RELATIVE to this runner's own root, so tests/test_static_runner.sh
+# — which drives the runner from a throwaway fake root — writes its DELIBERATE
+# failures into that root and never into the shared evidence path ([VSP-104],
+# paid for once by build/gate_failures/ presenting stubbed failures as real).
+# Only this run's logs are kept: stale ones from a previous run reading as
+# current is the same trap wearing a different hat.
+KEEP="${STATIC_FAIL_LOGS:-build/gate_failures_static}"
+rm -f "$KEEP"/*.log 2>/dev/null || true
 n_pass=0; n_skip=0; n_fail=0; n_miss=0
 failed=""; skipped=""
 # the controls ledger: declared / fired over the tier, the undeclared count,
@@ -166,6 +181,9 @@ run_tier() {  # run_tier <label> <names>
         TIMEOUT)
             # no timeout wrapper here; kept so the verdict set is the sweep's
             printf '  %-34s TIMEOUT %3ss  (exit %s)\n' "$g" "$_dur" "$_st"
+            if mkdir -p "$KEEP" 2>/dev/null && cp "$WORK/$g.out" "$KEEP/$g.log" 2>/dev/null; then
+                printf '        | (full log: %s)\n' "$KEEP/$g.log"
+            fi
             n_fail=$((n_fail + 1)); failed="$failed $g" ;;
         FAIL)
             if [ "$_st" != 0 ]; then
@@ -180,6 +198,9 @@ run_tier() {  # run_tier <label> <names>
             # the CI sets 80 — a red read remotely needs the section that failed,
             # not the last four lines of its controls; 14z-133b).
             tail -"${FAIL_TAIL:-4}" "$WORK/$g.out" | sed 's/^/        | /'
+            if mkdir -p "$KEEP" 2>/dev/null && cp "$WORK/$g.out" "$KEEP/$g.log" 2>/dev/null; then
+                printf '        | (full log: %s)\n' "$KEEP/$g.log"
+            fi
             n_fail=$((n_fail + 1)); failed="$failed $g" ;;
         SKIP)
             printf '  %-34s SKIP  %3ss  %s\n' "$g" "$_dur" "$VS_DETAIL"

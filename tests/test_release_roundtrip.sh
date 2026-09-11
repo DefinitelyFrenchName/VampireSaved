@@ -282,7 +282,11 @@ else
         find "$REL/$1" -type f | sed "s|^$REL/$1/||" | grep -vE "$2" > "$W/inv_$1.txt" || true
         if [ -s "$W/inv_$1.txt" ]; then echo "FAIL: $1/ ships files outside the ruled inventory:"; sed 's/^/        /' "$W/inv_$1.txt"; fail=1; fi
     }
-    EMU_INV='^(manifest\.json|apply_release\.py|README\.md|EMULATOR\.md|patches/vsavjw/d_[a-z0-9_]+\.xdelta|emulator/0002-cps2-wide-v1\.patch|emulator/bin/[a-z0-9-]+/[^/]+)$'
+    # the os-arch segment carries an UNDERSCORE on every non-Apple host
+    # (linux-x86_64, windows-x86_64); a [a-z0-9-]+ segment silently rejected
+    # both as "outside the ruled inventory" — found 14z-150 before the first
+    # Linux build rather than during it
+    EMU_INV='^(manifest\.json|apply_release\.py|README\.md|EMULATOR\.md|patches/vsavjw/d_[a-z0-9_]+\.xdelta|emulator/0002-cps2-wide-v1\.patch|emulator/bin/[a-z0-9_-]+/[^/]+)$'
     inv_check fbneo "$EMU_INV"; inv_check mame "$EMU_INV"
     inv_check mister '^(manifest\.json|apply_release\.py|README\.md|MISTER\.md|BITSTREAM\.txt|jtcps2w\.rbf|[^/]+\.mra|patches/vsavjw/d_[a-z0-9_]+\.xdelta)$'
     # every prebuilt-binary dir: BINARY.txt names each file with a matching sha256

@@ -16,13 +16,13 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**321 scripts** — 70 ci_portable, 75 ci_static, 176 emulator-tier (run by name).
+**322 scripts** — 71 ci_portable, 75 ci_static, 176 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 14 | the suite runners and their own ground truth |
 | [docs](#docs) | 15 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 27 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 28 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 55 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
@@ -82,6 +82,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 |---|---|---|---|---|---|
 | `tests/audit_wide_phase_a.sh` | audit | emulator | emulator | CPS-2 WIDE Phase A measurements (no ROM growth, no emulator changes). Each section answers ONE architecture question and prints a decision line. Run on VANILLA vsavj: | 14z-123 |
 | `tests/test_attract_determinism.sh` | test | emulator | emulator | M0 acceptance: a 60-second scripted attract-mode run checksums work RAM identically across two fresh runs. | M0 |
+| `tests/test_bundle_parsers.sh` | test | ci_portable | — | the LINUX and WINDOWS library bundlers (tools/bundle_elf_libs.py, tools/bundle_win_dlls.py) read real `ldd`, `readelf -d` and `objdump -p` output, walk a closure, and REFUSE an empty one. ROM-free, no emulator, ~2 s. | 14z-149 |
 | `tests/test_crash_guard.sh` | test | emulator | MAME | ground truth for the crash guard (verdict-logic doctrine, CLAUDE.md §4: a detector is trusted only after it classifies known-good and known-bad scenarios correctly). | — |
 | `tests/test_crypt_boundary.sh` | test | ci_static | ROMDIR | code in the WIDE extension must be stored RAW. | 14z-123 |
 | `tests/test_decrypt_oracle.sh` | test | emulator | MAME | verify tools/cps2_decrypt.py against MAME's own cps2crypt implementation (dual-implementation agreement). | — |

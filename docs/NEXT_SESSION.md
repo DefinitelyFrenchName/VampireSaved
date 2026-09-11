@@ -1,55 +1,52 @@
-# NEXT SESSION — orientation (rewritten at the 14z-149 CLOSE, 2026-09-11)
+# NEXT SESSION — orientation (rewritten at the 14z-150 CLOSE, 2026-09-11)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## M18 IS FULLY PUBLISHED FOR macOS + MiSTer: five assets on `freeze/merged-m18` (three platform packages, two macOS binaries), every README explaining each deliverable; three dumps, not four. WINDOWS/LINUX = A SCRIPT THE MAINTAINER RUNS, ONCE IT EXISTS. NO BUILD BYTE MOVED.
+## THE PREBUILT-BINARY TOOLING IS THREE-OS NOW, AND THE LINUX/WINDOWS HALVES HAVE NEVER BEEN RUN. That is the next session's first sentence, not a footnote. NO BUILD BYTE MOVED.
 
 M18 (`merged-m18`, `build/m3b_merged26`) is still the current freeze and
 release. `git status -sb` says the push state.
 
-Landed this sitting (STATE 14z-149): `tools/build_release_emulators.sh`
-(the recipe run on this host, FBNeo from a clean worktree with 0002 only,
-MAME through `setup_mame.sh`'s own mirror), `tools/bundle_dylibs.py` (the
-Homebrew closure flat beside the binary under `@loader_path`, ad-hoc signed,
-verified on the artifact), `BINARY.txt` per `release/emulators/<platform>/
-macos-arm64/`, the gate `tests/test_release_binaries.sh` (record,
-self-containment, signature, profile, no harness, a BOOT on each — MAME
-reproducing a frozen masked expectation on the release binary; 74 s, two
-executable must-fires), M18 repackaged with `emulator/bin/macos-arm64/` on
-both emulator sides. Then the ruling — (b) with pruning — and its mechanism:
-`tools/upload_release_assets.sh`; then vhunt2 DROPPED from the release's
-source blob (the oracle, never a source: 0.76 MB of copies byte-identical in
-vsav2) — the user needs THREE dumps, M18 repackaged and round-tripped;
-(verify, zip, upload, download back and re-verify, prune the previous
-freeze). Two shipped-recipe defects corrected
-in place: the FBNeo fresh-tree build needs TWO passes ([CPE-26]), and
-`-verifyroms` says "is bad" BY DESIGN on a content set (20 flagged = the
-rewritten/new members) where the recipe said "must say good".
+Landed this sitting (STATE 14z-150): `tools/bundle_elf_libs.py` (Linux,
+`patchelf --set-rpath '$ORIGIN'`, the glibc floor measured from the artifact)
+and `tools/bundle_win_dlls.py` (Windows/MSYS2, the DLLs beside the .exe,
+nothing to rewrite and no signature to apply); `tools/build_release_emulators.sh`
+made three-OS with a `CHECK=1` mode that resolves and prints a host's plan
+without building; `tests/test_release_binaries.sh` given Linux and Windows
+self-containment checks (RESOLUTION checks through the host's own `ldd`, never
+the bundler's allowlist read back) with its second must-fire control kept ALIVE
+on all three OSes; `tests/test_bundle_parsers.sh` (ci_portable) proving the
+parsers, the closure walk and both bundlers' refusal of an empty closure
+against stub tools; `docs/project/WSL2_SETUP.md` §10, the one-command-per-
+machine runbook. Plus two finds: `test_release_roundtrip`'s inventory regex
+would have REJECTED `linux-x86_64` and `windows-x86_64` (no underscore in the
+character class), and `run_all_static.sh` now KEEPS a failing gate's full log.
 
 ## START HERE — what is open
 
-- ~~**THE PREBUILT BINARIES — DECIDE WHERE THEY LIVE**~~ **RULED AND BUILT
-  14z-149 (2): release assets, never git content** — the records tracked,
-  the files ignored, `tools/upload_release_assets.sh freeze/<name> --prune`
-  after `test_release_binaries` is green; M18's macOS pair is on the release
-  page of `freeze/merged-m18`. **The floor is macOS 26.0 arm64** (Homebrew's
-  bottles carry it) — lowering it means SDL from source with an older target,
-  a departure from the recipe; not taken, worth a ruling if a Mac user asks.
-- **WINDOWS and LINUX — make `tools/build_release_emulators.sh` runnable there, then hand
-  the maintainer ONE command per machine** (ruled shape 14z-149 (4): a script they run under
-  WSL2 / MSYS2; no remote session). To add, untestable from this Mac so written for that
-  host's session: the Linux bundling half (`patchelf --set-rpath '$ORIGIN'` over the `ldd`
-  closure, or a static SDL2/SDL3; the floor is the build distro's glibc — build on the oldest
-  Ubuntu LTS to support), the Windows half (MSYS2 `make sdl2` for FBNeo, `make SUBTARGET=cps2`
-  for MAME, the DLLs beside the .exe found by `ldd` under MSYS2), and `test_release_binaries`'
-  self-containment + signature checks for those OSes (it FAILS there by design today; Windows
-  has no ad-hoc signing — the record's sha256 rows are the integrity). Then on each box:
-  `tools/build_release_emulators.sh fbneo && … mame`, `test_release_binaries` green,
-  `tools/upload_release_assets.sh freeze/merged-m18` (gh authenticated) or send the two dirs.
-  `test_mame_parity` is the migration gate for any new host ([MFI-41]). The control MRA stays.
+- **WINDOWS and LINUX: RUN IT.** Everything is written; nothing is proven on
+  those hosts. On each box: `CHECK=1 tools/build_release_emulators.sh fbneo`
+  first (if the os-arch is not what you expect, stop — the gate looks for that
+  exact directory and would otherwise SKIP, which reads as "nothing to check"),
+  then the two builds, then `ROMDIR=... tests/test_release_binaries.sh`, then
+  `tools/upload_release_assets.sh freeze/merged-m18` or hand the two
+  directories back. The runbook, the prerequisites and the four things most
+  likely to go wrong are `docs/project/WSL2_SETUP.md` §10.
+  **EXPECT TO FIX SOMETHING** — that is the honest state, not pessimism.
+  `test_mame_parity` is the migration gate for any new host ([MFI-41]).
+  The one thing only a SECOND machine can find: a library wrongly left to the
+  host. And the glibc floor is whatever the build host carries, so build on the
+  oldest LTS worth supporting.
+- **`test_bbh_fidelity` WENT RED INSIDE THE STATIC TIER AND GREEN ALONE — TWICE
+  NOW (14z-149, 14z-150), NOT ROOT-CAUSED.** Both times it reported only
+  `FAIL: see above` at ~126 s. The blindness is fixed (the runner now keeps
+  `build/gate_failures_static/<gate>.log`), so the NEXT occurrence carries its
+  own evidence — read that file before theorising. It is not known to be
+  harmful; it is known to be unexplained, and [VSP-31]'s standing watch says a
+  pattern is root-caused, not tolerated.
 - **At the next freeze/release sweep: the 34 emulator-tier modes HONOURED.**
   `run_all_emulator.sh --scope all --lane all --strict --controls` (the ruled
   release invocation). The ~20 expensive gates' modes were never run; a mode
@@ -64,22 +61,22 @@ rewritten/new members) where the recipe said "must say good".
   generalisation (ruled, not scheduled); the wider-host re-measure of the
   pull queue's gain; the `hit` rigs' LP events whiff at contact range.
 
-## TRAPS PAID THIS SITTING — read before running a strict tier or touching bbh
+## TRAPS PAID THIS SITTING — read before writing code for a host you do not have
 
-1. **This MacBook is memory-tight with the apps open**: the session's
-   low-memory guard killed a strict tier mid Verilator control mode and a bbh
-   full selftest mid fidelity. Run a long tier DETACHED (`nohup … & disown`)
-   and poll the log; never two emulator-bearing runs at once.
-2. **`kill <pid>` on a background runner's child leaves the runner alive** —
-   kill the PROCESS GROUP (`kill -- -$pgid`) and `pgrep` before relaunching.
-3. **bbh's pre-commit NEEDS `ROMDIR` exported** or `test_fidelity_mame` SKIPs
-   and F6 runs synthetic only.
-4. **A verdict-text change is a BOTH-SIDES change** (bbh convention 8): land
-   it in this tree and in bbh in one sitting, harness pushed first, a dated
-   line in bbh's `rebaselines.md`.
-5. **A re-run of a bundler on a half-rewritten directory proves nothing** —
-   validate on a FRESH copy of the build output (14z-149); and the FBNeo
-   fresh-tree build takes two passes ([CPE-26]).
+1. **A tool you cannot run needs a REFUSAL, not a hope.** Both bundlers
+   hard-refuse an empty closure: without that, a parser returning nothing makes
+   the bundler "succeed" and its verifier then finds no leftovers — a vacuous
+   green on a binary that runs only on the build host ([VSP-148]).
+2. **A `CONTROL=` mode that echoes FAIL is a LIE.** Mine did, until they were
+   rewritten as shadow-tool perturbations that disable ONE guard in a copy and
+   let the gate fail on its own ([VSP-181]).
+3. **A character class silently narrows an inventory.** `[a-z0-9-]+` admitted
+   `macos-arm64` and rejected every underscore-bearing os-arch.
+4. **An illustrative hex address in a docstring lands in the address index** —
+   `gen_annotations.py` reads `0x00007ffd…` as `PRG:0x007FFD`. Elide sample
+   addresses in tool documentation.
+5. **This MacBook is memory-tight**: run a long tier DETACHED and poll the
+   PROCESS, never two emulator-bearing runs at once.
 
 **IF A DOC IS TOUCHED:** the eight `--check`s, exit statuses captured directly,
 `${=cmd}` in zsh. **A running script is never edited** ([MSC-54]). **The static

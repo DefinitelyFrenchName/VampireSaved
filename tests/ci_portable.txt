@@ -204,3 +204,8 @@ test_rule5_census
 # regexes, the leading comment block, declared-vs-fired -> FAIL, the CONTROL=<name>
 # mode and its REFUSED exit. ROM-free, ~1 s.
 test_controls_contract
+
+# test_bundle_parsers.sh — the LINUX and WINDOWS library bundlers read real ldd /
+# readelf / objdump output, walk a closure, and REFUSE an empty one (the two
+# bundlers ship unrun: this is what proves they cannot come back quiet). ROM-free, ~2 s.
+test_bundle_parsers
