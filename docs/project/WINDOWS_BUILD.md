@@ -44,7 +44,7 @@ the gate passing against it in full.
 
 ## 1. Get the two environments
 
-**Track W — MSYS2.** Install from <https://www.msys2.org>. When it is done,
+**Track W — MSYS2.** Install from [msys2.org](https://www.msys2.org). When it is done,
 open **"MSYS2 MINGW64"** from the Start menu — *not* "MSYS2 MSYS".
 
 > This one detail matters more than any other on Windows. A binary built in the
