@@ -6,11 +6,10 @@
   "order": [
    "vsavj.zip",
    "vsav.zip",
-   "vsav2.zip",
-   "vhunt2.zip"
+   "vsav2.zip"
   ],
-  "sha1": "954d883c988c3196b254f4f260954da3d1aeb401",
-  "size": 143392848,
+  "sha1": "52d4472dacb115698880ef68ecfd411d85191d44",
+  "size": 96993340,
   "recipe": [
    {
     "zip": "vsavj.zip",
@@ -317,132 +316,6 @@
     "member": "vsav2.key",
     "size": 20,
     "sha1": "35779f0284dc15591493c8ec75ecda801148f3e0"
-   },
-   {
-    "zip": "vhunt2.zip",
-    "member": "vh2.01",
-    "size": 131072,
-    "sha1": "3994c65f888004b56ea9f478b1feaa81e306347e"
-   },
-   {
-    "zip": "vhunt2.zip",
-    "member": "vh2.02",
-    "size": 131072,
-    "sha1": "6f61daa162c835165a8aabaf1d0ea8816fbfbd40"
-   },
-   {
-    "zip": "vhunt2.zip",
-    "member": "vh2.11m",
-    "size": 4194304,
-    "sha1": "8cfb36bdce3a524d0a81fec12ca0cba82222fa30"
-   },
-   {
-    "zip": "vhunt2.zip",
-    "member": "vh2.12m",
-    "size": 4194304,
-    "sha1": "b475faf943bec4171ba0130f287e1948743ca273"
-   },
-   {
-    "zip": "vhunt2.zip",
-    "member": "vh2.13m",
-    "size": 4194304,
-    "sha1": "a73b0554afbfc7ace41bdf8e6cafd4c1ef0b0a08"
-   },
-   {
-    "zip": "vhunt2.zip",
-    "member": "vh2.14m",
-    "size": 4194304,
-    "sha1": "e582b20a948ae54f52590496051688dbfae2bc9c"
-   },
-   {
-    "zip": "vhunt2.zip",
-    "member": "vh2.15m",
-    "size": 4194304,
-    "sha1": "e8b80eadffad6070aa04c8ab426311c44e7c5507"
-   },
-   {
-    "zip": "vhunt2.zip",
-    "member": "vh2.16m",
-    "size": 4194304,
-    "sha1": "a924d53ab39f4d85173bdb92a197dde2db0dc3f7"
-   },
-   {
-    "zip": "vhunt2.zip",
-    "member": "vh2.17m",
-    "size": 4194304,
-    "sha1": "7e7be64690663f52d10c8946aabec4250c8a8740"
-   },
-   {
-    "zip": "vhunt2.zip",
-    "member": "vh2.18m",
-    "size": 4194304,
-    "sha1": "8d0cd1c387b4b6ac7f92bb2e5a25983856328cdc"
-   },
-   {
-    "zip": "vhunt2.zip",
-    "member": "vh2.19m",
-    "size": 4194304,
-    "sha1": "afc8e96e6aa3cf1db6dfd8075030a6c50b4419a9"
-   },
-   {
-    "zip": "vhunt2.zip",
-    "member": "vh2.20m",
-    "size": 4194304,
-    "sha1": "99bc27557741527ca678d7b6307164bc04ebedc6"
-   },
-   {
-    "zip": "vhunt2.zip",
-    "member": "vh2j.03a",
-    "size": 524288,
-    "sha1": "f4e3a1b6ae823737d3b18561469f206921b48587"
-   },
-   {
-    "zip": "vhunt2.zip",
-    "member": "vh2j.04a",
-    "size": 524288,
-    "sha1": "78c53f8e984b00245486b751515248879df77437"
-   },
-   {
-    "zip": "vhunt2.zip",
-    "member": "vh2j.05",
-    "size": 524288,
-    "sha1": "60bbbd1765e76839b01c38765da2368c5188ec61"
-   },
-   {
-    "zip": "vhunt2.zip",
-    "member": "vh2j.06",
-    "size": 524288,
-    "sha1": "4f3b37004db8a3d3dde709b51c94c392615134b5"
-   },
-   {
-    "zip": "vhunt2.zip",
-    "member": "vh2j.07",
-    "size": 524288,
-    "sha1": "de4299197600608e83fe50775e3f352f5add844d"
-   },
-   {
-    "zip": "vhunt2.zip",
-    "member": "vh2j.08",
-    "size": 524288,
-    "sha1": "ad9a085b8403801035683b6f63eee33daf4e97ae"
-   },
-   {
-    "zip": "vhunt2.zip",
-    "member": "vh2j.09",
-    "size": 524288,
-    "sha1": "d842a824f0d0adc13a86f780084164c1273c45a4"
-   },
-   {
-    "zip": "vhunt2.zip",
-    "member": "vh2j.10",
-    "size": 524288,
-    "sha1": "2966b80b99ab065614a6ddb546110f482b998e32"
-   },
-   {
-    "zip": "vhunt2.zip",
-    "member": "vhunt2.key",
-    "size": 20,
-    "sha1": "f72cf44837f6d934dd6bc877c3c98db388e72a67"
    }
   ]
  },
@@ -463,48 +336,48 @@
     "size": 4194304,
     "sha1": "969485a0d225d15e5d04b19c9fd12e609b56f712",
     "patch": "patches/vsavjw/d_vm3_13m.xdelta",
-    "patch_size": 16254,
-    "patch_sha1": "1d6779e9079191dfc6fa52473bf57b8bb62cfc7f"
+    "patch_size": 16341,
+    "patch_sha1": "fb71ce3a8b1d9b18e504413bdc3146c928e94f10"
    },
    {
     "member": "vm3.15m",
     "size": 4194304,
     "sha1": "3b2138eaf7866ae6e14cc52b2d63a093e249143a",
     "patch": "patches/vsavjw/d_vm3_15m.xdelta",
-    "patch_size": 11163,
-    "patch_sha1": "f9bacac144963f14676eac2944418ade0f1b62b5"
+    "patch_size": 11306,
+    "patch_sha1": "86289190cc2404ce30a8b13724d836aab7d3e21f"
    },
    {
     "member": "vm3.17m",
     "size": 4194304,
     "sha1": "93171644bfa7219a8197937a54ecb1a3a8be364d",
     "patch": "patches/vsavjw/d_vm3_17m.xdelta",
-    "patch_size": 16289,
-    "patch_sha1": "887e3803d07658983f97b3e3d295fc51b69c20bd"
+    "patch_size": 16360,
+    "patch_sha1": "f3f4274788944111fc013500dfd9edb9481b3de3"
    },
    {
     "member": "vm3.19m",
     "size": 4194304,
     "sha1": "8d4b6106831dbf3096898a302c878ba09148053c",
     "patch": "patches/vsavjw/d_vm3_19m.xdelta",
-    "patch_size": 11160,
-    "patch_sha1": "e15d708312c32dc25156c4e111b2260982490953"
+    "patch_size": 11308,
+    "patch_sha1": "824630c5753031ded9f9d028c736648a4d3fa222"
    },
    {
     "member": "vm3j.03d",
     "size": 524288,
     "sha1": "691efbf63d9c6225bfb0f0f0bd6871fef19b6c79",
     "patch": "patches/vsavjw/d_vm3j_03d.xdelta",
-    "patch_size": 1092,
-    "patch_sha1": "69e9aaca975e7f5fd02bfced5eca01f021cb83e1"
+    "patch_size": 1075,
+    "patch_sha1": "6b18b63b5f47e2d54144b08c8f9bf756fd7938e6"
    },
    {
     "member": "vm3j.04d",
     "size": 524288,
     "sha1": "2bf5426f862d79f60a6646426abcddb899d0fd0a",
     "patch": "patches/vsavjw/d_vm3j_04d.xdelta",
-    "patch_size": 138306,
-    "patch_sha1": "24f3250ae81dd0ef16402b83125528416bc39d5b"
+    "patch_size": 138584,
+    "patch_sha1": "a4ce3326f5361379928471e05f3d0b634f556bf1"
    },
    {
     "member": "vm3j.05a",
@@ -529,8 +402,8 @@
     "size": 524288,
     "sha1": "629d627cc7ebff087f3955eec9a3b9f0e8d07a5a",
     "patch": "patches/vsavjw/d_vm3j_07b.xdelta",
-    "patch_size": 403,
-    "patch_sha1": "a4a0496fa92be864e170f5781481d837fb1b798a"
+    "patch_size": 399,
+    "patch_sha1": "5d84e79afaa27896e70ca1bac234d68c294613e5"
    },
    {
     "member": "vm3j.08a",
@@ -555,8 +428,8 @@
     "size": 524288,
     "sha1": "4df053504e71ef4e3eee4e1336a181b8687c79c4",
     "patch": "patches/vsavjw/d_vm3j_10b.xdelta",
-    "patch_size": 1694,
-    "patch_sha1": "d25f8662872aadc86d3fb62e33bd68fc5e1c9dc1"
+    "patch_size": 1713,
+    "patch_sha1": "1322d5608acd3498a6d5f1318b7397381eef110d"
    },
    {
     "member": "vsavj.key",
@@ -572,8 +445,8 @@
     "size": 4194304,
     "sha1": "6ce098a5ef0d4e03e47ed5b3422fb99f0992152d",
     "patch": "patches/vsavjw/d_vsw_21m.xdelta",
-    "patch_size": 697,
-    "patch_sha1": "2cf997572c03e28b5807303ca1fdc405f671b78b"
+    "patch_size": 691,
+    "patch_sha1": "13e104ce14552f581b038d904f2a1ccc54fe5d9e"
    },
    {
     "member": "vsw.22m",
@@ -581,55 +454,55 @@
     "sha1": "2bccbd2f38f15c13eb7d5a89fd9d85f595e23bc3",
     "patch": "patches/vsavjw/d_vsw_22m.xdelta",
     "patch_size": 192,
-    "patch_sha1": "ad3861d537d1db524632aa0802c3123d7002c161"
+    "patch_sha1": "b241c8588a00c45393cc2279f3d182e334dd8a74"
    },
    {
     "member": "vsw.31m",
     "size": 4194304,
     "sha1": "f448504e1f71fabbb6bbecd12628b8358f157ce9",
     "patch": "patches/vsavjw/d_vsw_31m.xdelta",
-    "patch_size": 644508,
-    "patch_sha1": "b11469e5e0cf1d25a4472787ee8278ce0fce4cc8"
+    "patch_size": 648809,
+    "patch_sha1": "a1c4dd4818c02e47e2de1a5af0abb22f5996f060"
    },
    {
     "member": "vsw.33m",
     "size": 4194304,
     "sha1": "f373c60cdd76ceacc8d5920a5a5812b8b3bcec85",
     "patch": "patches/vsavjw/d_vsw_33m.xdelta",
-    "patch_size": 475000,
-    "patch_sha1": "901bbd506d5a64d79ebeda368a5fc806c93932e5"
+    "patch_size": 481694,
+    "patch_sha1": "4d29db408630a557ae6a3371dedc92b4ac9b6d3b"
    },
    {
     "member": "vsw.35m",
     "size": 4194304,
     "sha1": "dbe0276c8c8427d5c90eab1d0130674ed3728aa6",
     "patch": "patches/vsavjw/d_vsw_35m.xdelta",
-    "patch_size": 644326,
-    "patch_sha1": "416c95f116d0e55d79eeb960c500d2caf287390d"
+    "patch_size": 649377,
+    "patch_sha1": "4288e887f7b9875aeb9ac38df96215f67cb3a6e8"
    },
    {
     "member": "vsw.37m",
     "size": 4194304,
     "sha1": "829d97f1db2f93b453836b22b758f7b69e2c1b49",
     "patch": "patches/vsavjw/d_vsw_37m.xdelta",
-    "patch_size": 474463,
-    "patch_sha1": "eb5afb5249ccea150db9ca65cc01c0c70d431251"
+    "patch_size": 480960,
+    "patch_sha1": "8dfdcc3feff5d69ac75601d18c1f1c3439cbad55"
    },
    {
     "member": "vsw.41",
     "size": 524288,
     "sha1": "b35b174b2c9de461b3eb1788848adea75eed6722",
     "patch": "patches/vsavjw/d_vsw_41.xdelta",
-    "patch_size": 109652,
-    "patch_sha1": "6e51a81ffb4ee9844bc88907841749efca8b573b"
+    "patch_size": 111035,
+    "patch_sha1": "f6ab3607bc353a7efd80c54e83d147779c2f9b90"
    },
    {
     "member": "vsw.42",
     "size": 524288,
     "sha1": "b3eb2c13a3ce24437fe545bb7f7971e5b973b296",
     "patch": "patches/vsavjw/d_vsw_42.xdelta",
-    "patch_size": 49824,
-    "patch_sha1": "5bde5bc71cf1db3bc74fb84b1548c0ac927503f1"
+    "patch_size": 50691,
+    "patch_sha1": "491670a577734fefc30d594cf0bc75a49fbe8e5b"
    },
    {
     "member": "vsw.43",
@@ -637,31 +510,31 @@
     "sha1": "13a184ec9e176371808938015111f8918cb4df7d",
     "patch": "patches/vsavjw/d_vsw_43.xdelta",
     "patch_size": 189,
-    "patch_sha1": "fc163b6124f606b7aca8522f7737031ef1405d91"
+    "patch_sha1": "dc9a205c4e315c502d3c96dc5aa1d0110fa71c10"
    },
    {
     "member": "vsw.44",
     "size": 524288,
     "sha1": "739ad1d33c279d69588cfe8e184ce49ab150684c",
     "patch": "patches/vsavjw/d_vsw_44.xdelta",
-    "patch_size": 232,
-    "patch_sha1": "86753589f9001d0d8174c1719868c70ab6744800"
+    "patch_size": 225,
+    "patch_sha1": "c495bcdc94d69babaeb5cd459903c00f84ceedb4"
    },
    {
     "member": "vsw.z01",
     "size": 131072,
     "sha1": "255e3523b5fc49b63d420c04547a69784eb5171f",
     "patch": "patches/vsavjw/d_vsw_z01.xdelta",
-    "patch_size": 1384,
-    "patch_sha1": "742de2644e454402abd4e31cf9e678331e11206a"
+    "patch_size": 1380,
+    "patch_sha1": "66b53065a004195cc17ee435395993a89507b2b1"
    },
    {
     "member": "vsw.z02",
     "size": 131072,
     "sha1": "9f113542d7bc75de01d62743af489e8ccc0559d8",
     "patch": "patches/vsavjw/d_vsw_z02.xdelta",
-    "patch_size": 445,
-    "patch_sha1": "0719760743d9019cdbc92e02c894fed43de681bd"
+    "patch_size": 430,
+    "patch_sha1": "36c85539d0be679bd6038dc925653144e0e79d57"
    }
   ]
  }

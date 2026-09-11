@@ -233,7 +233,7 @@ rendering change. Ground truth: `tests/test_replay_video_selfcheck.sh`.
 --version M6` turns a frozen build's two zips into a distributable package:
 xdelta3 deltas per modified/new member against ONE source blob (the four
 reference dumps' members concatenated in a fixed order — so a new WIDE
-member is expressed as copies out of vsav2/vhunt2 and only the bytes the
+member is expressed as copies out of vsav2 (the blob is THREE dumps since 14z-149 — vhunt2 is the oracle, not a source) and only the bytes the
 port GENERATES or AUTHORS are literal), `manifest.json` (every target
 member's sha1/size, which members are copied pristine and from where, the
 source recipe + sha1, the fingerprint, the version string), the community

@@ -22,10 +22,15 @@ carries NO ROM CONTENT (CLAUDE.md rule 7):
     README.md                       what it is, what you need, how to apply
 
 THE SOURCE. Every delta is computed against ONE source blob: the
-concatenation, in the fixed order below, of every member of the four named
-reference dumps (vsavj, vsav, vsav2, vhunt2 — all four are in
-docs/checksums.txt). A modified vsavj member is mostly a copy of itself; a
-NEW WIDE member (vsw.31m…) is mostly copies out of vsav2/vhunt2 gfx. xdelta3
+concatenation, in the fixed order below, of every member of the THREE named
+reference dumps (vsavj, vsav, vsav2 — all in docs/checksums.txt). vhunt2 was
+the fourth until 14z-149 (maintainer-ruled 2026-09-11, "asking the user for a
+fourth dump is a lose / lose situation"): it is the port's extraction ORACLE,
+never a content source — no atlas range is tagged VH2 — and the 0.76 MB of
+copy instructions the M18 patches drew from it were runs byte-identical in
+vsav2, the encoder picking one of two equal matches. A modified vsavj member
+is mostly a copy of itself; a NEW WIDE member (vsw.31m…) is mostly copies out
+of vsav2 gfx. xdelta3
 expresses both as source-window copies, so the patch files hold only the
 bytes the PORT generates or authors (relocated code, tables, the glyph
 tiles) plus copy instructions. Secondary compression is OFF (-S none) on
@@ -40,7 +45,7 @@ and requires byte-identity with the build.
 """
 import argparse, hashlib, json, os, shutil, subprocess, sys, zipfile
 
-SOURCE_ORDER = ["vsavj.zip", "vsav.zip", "vsav2.zip", "vhunt2.zip"]
+SOURCE_ORDER = ["vsavj.zip", "vsav.zip", "vsav2.zip"]   # three since 14z-149; vhunt2 is the oracle, not a source
 XDELTA_FLAGS = ["-e", "-S", "none", "-B", str(1 << 28), "-W", str(1 << 23), "-f"]
 
 
@@ -174,7 +179,7 @@ on the CPS-2 WIDE profile — an extended CPS-2 board that a patched FBNeo, a
 patched MAME (driver `vsavjw`) or the `jtcps2w` MiSTer core implements.
 
 **THIS PACKAGE CONTAINS NO ROM DATA AND NO COPYRIGHTED ASSET, EVER.** It is a
-set of patches computed against the four reference dumps you must already
+set of patches computed against the three reference dumps you must already
 own, a manifest, and an applier that rebuilds the romset from YOUR dumps and
 verifies every byte before writing anything. Nothing in it can be played
 without your own dumps.
@@ -189,10 +194,11 @@ without your own dumps.
 ## What you need
 - **Python 3** (3.8 or newer). No other tool: the applier decodes the
   patches itself.
-- **The four reference dumps, unmodified, with these exact names** in one
+- **The three reference dumps, unmodified, with these exact names** in one
   directory: `vsavj.zip` (Vampire Savior, Japan 970519), `vsav.zip` (Europe
-  970519), `vsav2.zip` (Vampire Savior 2, Japan 970913), `vhunt2.zip`
-  (Vampire Hunter 2, Japan 970929). The applier checks every member's SHA-1
+  970519), `vsav2.zip` (Vampire Savior 2, Japan 970913). Vampire Hunter 2 is
+  NOT needed (it is the project's verification oracle, not a source of
+  anything in the set). The applier checks every member's SHA-1
   against the manifest before doing anything, so a wrong, renamed or
   modified dump is reported by name, never silently patched over.
 

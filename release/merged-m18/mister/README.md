@@ -6,7 +6,7 @@ on the CPS-2 WIDE profile — an extended CPS-2 board that a patched FBNeo, a
 patched MAME (driver `vsavjw`) or the `jtcps2w` MiSTer core implements.
 
 **THIS PACKAGE CONTAINS NO ROM DATA AND NO COPYRIGHTED ASSET, EVER.** It is a
-set of patches computed against the four reference dumps you must already
+set of patches computed against the three reference dumps you must already
 own, a manifest, and an applier that rebuilds the romset from YOUR dumps and
 verifies every byte before writing anything. Nothing in it can be played
 without your own dumps.
@@ -21,10 +21,11 @@ without your own dumps.
 ## What you need
 - **Python 3** (3.8 or newer). No other tool: the applier decodes the
   patches itself.
-- **The four reference dumps, unmodified, with these exact names** in one
+- **The three reference dumps, unmodified, with these exact names** in one
   directory: `vsavj.zip` (Vampire Savior, Japan 970519), `vsav.zip` (Europe
-  970519), `vsav2.zip` (Vampire Savior 2, Japan 970913), `vhunt2.zip`
-  (Vampire Hunter 2, Japan 970929). The applier checks every member's SHA-1
+  970519), `vsav2.zip` (Vampire Savior 2, Japan 970913). Vampire Hunter 2 is
+  NOT needed (it is the project's verification oracle, not a source of
+  anything in the set). The applier checks every member's SHA-1
   against the manifest before doing anything, so a wrong, renamed or
   modified dump is reported by name, never silently patched over.
 

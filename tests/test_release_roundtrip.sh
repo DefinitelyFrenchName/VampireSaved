@@ -113,7 +113,7 @@ e["patch_size"] = os.path.getsize(pf); e["patch_sha1"] = hashlib.sha1(open(pf, "
 json.dump(m, open(mf, "w"))
 PY
 mkdir -p "$W/bad_roms"
-for z in vsavj vsav vsav2 vhunt2; do ln -s "$ROMDIR/$z.zip" "$W/bad_roms/$z.zip"; done
+for z in vsavj vsav vsav2; do ln -s "$ROMDIR/$z.zip" "$W/bad_roms/$z.zip"; done   # three dumps since 14z-149
 rm "$W/bad_roms/vsavj.zip"
 python3 - "$ROMDIR/vsavj.zip" "$W/bad_roms/vsavj.zip" <<'PY'
 import zipfile, sys
@@ -186,7 +186,7 @@ romdir, pdir, ctrl = sys.argv[1:4]
 WIN = 64
 MOD = (1 << 61) - 1; B = 257
 idx = set(); chunk0 = None
-for z in ("vsavj.zip", "vsav.zip", "vsav2.zip", "vhunt2.zip"):
+for z in ("vsavj.zip", "vsav.zip", "vsav2.zip", "vhunt2.zip"):   # the rule-7 index keeps vhunt2: a verbatim run of it is a ROM byte whether or not the source blob holds it
     zf = zipfile.ZipFile(os.path.join(romdir, z))
     for n in zf.namelist():
         d = zf.read(n)

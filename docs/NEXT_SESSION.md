@@ -20,8 +20,11 @@ self-containment, signature, profile, no harness, a BOOT on each — MAME
 reproducing a frozen masked expectation on the release binary; 74 s, two
 executable must-fires), M18 repackaged with `emulator/bin/macos-arm64/` on
 both emulator sides. Then the ruling — (b) with pruning — and its mechanism:
-`tools/upload_release_assets.sh` (verify, zip, upload, download back and
-re-verify, prune the previous freeze). Two shipped-recipe defects corrected
+`tools/upload_release_assets.sh`; then vhunt2 DROPPED from the release's
+source blob (the oracle, never a source: 0.76 MB of copies byte-identical in
+vsav2) — the user needs THREE dumps, M18 repackaged and round-tripped;
+(verify, zip, upload, download back and re-verify, prune the previous
+freeze). Two shipped-recipe defects corrected
 in place: the FBNeo fresh-tree build needs TWO passes ([CPE-26]), and
 `-verifyroms` says "is bad" BY DESIGN on a content set (20 flagged = the
 rewritten/new members) where the recipe said "must say good".
@@ -35,6 +38,10 @@ rewritten/new members) where the recipe said "must say good".
   page of `freeze/merged-m18`. **The floor is macOS 26.0 arm64** (Homebrew's
   bottles carry it) — lowering it means SDL from source with an older target,
   a departure from the recipe; not taken, worth a ruling if a Mac user asks.
+- M18's assets on the release page are CURRENT after the three-dump repackage
+  (the binaries and their records did not change; the packaged record is
+  `cmp`-identical to the uploaded one). The control MRA stays (maintainer,
+  2026-09-11).
 - **The release page's auto-generated "Source code" archives are the whole repo
   and bring nothing** (maintainer, 2026-09-11) — GitHub cannot drop them, so
   make them irrelevant: attach `release/<name>/` as `<name>-release.zip` (the
