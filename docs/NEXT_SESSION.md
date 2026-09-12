@@ -27,27 +27,21 @@ character class), and `run_all_static.sh` now KEEPS a failing gate's full log.
 
 ## START HERE — what is open
 
-- **WINDOWS and LINUX: RUN IT.** Everything is written; nothing is proven on
-  those hosts. On each box: `CHECK=1 tools/build_release_emulators.sh fbneo`
-  first (if the os-arch is not what you expect, stop — the gate looks for that
-  exact directory and would otherwise SKIP, which reads as "nothing to check"),
-  then the two builds, then `ROMDIR=... tests/test_release_binaries.sh`, then
-  `tools/upload_release_assets.sh freeze/merged-m18` or hand the two
-  directories back. **THE STEP-BY-STEP IS `docs/project/WINDOWS_BUILD.md`** (both
-  tracks, sent to the maintainer as a bundle 2026-09-11 with
-  `tools/preflight_release_build.sh` and `tools/collect_build_report.sh`);
-  `WSL2_SETUP.md` §10 is the shorter form. **The romset costs a minute, not a
-  build:** `release/merged-m18`'s own applier rebuilds `vsavjw.zip` from the
-  three dumps, and the gate was MEASURED green against it here
-  (`MERGED=build/fromrelease`), so NO build pipeline is needed on those hosts.
-  **EXPECT TO FIX SOMETHING** — that is the honest state, not pessimism.
-  **THE MAINTAINER OFFERED A DEDICATED SESSION ON THE WINDOWS MACHINE (2026-09-11)** — take it:
-  Windows is the half most likely to need work (MSYS2 shell, the MINGW64 package set, no
-  signature to apply), and a session ON that box turns every claim here into a measurement.
-  `test_mame_parity` is the migration gate for any new host ([MFI-41]).
-  The one thing only a SECOND machine can find: a library wrongly left to the
-  host. And the glibc floor is whatever the build host carries, so build on the
-  oldest LTS worth supporting.
+- **WINDOWS and LINUX: BEING RUN NOW (2026-09-12), and it is going exactly as the
+  last opener predicted.** The maintainer has both tracks on the Windows box
+  (MSYS2 native -> `windows-x86_64`, WSL2 -> `linux-x86_64`); a DEDICATED Linux
+  server, 8 cores / 64 GB, comes later and is the better home for the Linux
+  binaries (the glibc floor is the build host's, so build on the oldest LTS
+  worth supporting). **Seven defects so far, every one of them ours and none in
+  a shipped ROM byte** — STATE 14z-151 (6a)-(6f) and five new platform gotchas.
+  **STATUS: FBNeo built on both tracks; MAME built and recorded on MSYS2
+  (`standalone: 16 import(s)`, a `-static` binary); MAME on WSL2 restarted with
+  `JOBS=8` after the memory thrash.** What is still unrun anywhere: the release
+  GATE on either Windows track (`MERGED=build/fromrelease
+  tests/test_release_binaries.sh` — the romset comes from the applier in a
+  minute, no build pipeline), and therefore the upload of those assets.
+  **READ `docs/platform/gotchas.md`'s last five entries before touching a
+  non-macOS host** — they are the whole cost of today in one place.
 - **~~`test_bbh_fidelity` WENT RED INSIDE THE STATIC TIER AND GREEN ALONE~~ ROOT-CAUSED
   2026-09-12 (14z-151): A WALL-CLOCK DURATION INSIDE TEXT COMPARED EXACTLY.** bbh's F1
   diffs the two static runners line for line; the output carries each gate's duration,

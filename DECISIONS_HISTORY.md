@@ -22,6 +22,776 @@ The CLAUDE.md §5 retraction grep covers this file.
 
 ---
 
+## Moved 2026-09-12 (14z-151) — the 14z-133b..14z-149 rulings that stopped shaping work
+
+Fifteen decisions, byte-verbatim, resolutions and their original entries together.
+TWO were marked implemented IN PLACE first, after verifying the implementation
+rather than trusting the entry: the Verilator lane's `--jobs N` scratch clones and
+`ci_emulator.tsv`'s per-gate timeout column, both landed 14z-134 while their entries
+still read "not started" ([VSP-13] — a stale status is what a future session acts on).
+
+- **~~THE RELEASE PAGE'S "SOURCE CODE" ARCHIVES~~ SETTLED 14z-149 (4) by the maintainer's "publish everything available": the three platform packages are release assets and the notes + every README mark the source archives "not needed to play". (Original entry follows.)** the auto-generated
+  source zips are the WHOLE repository — logs, dev tooling and all — and bring nothing a clone does not.**
+  In the maintainer's words: *"the sources in the release should either be the subset needed for the recipe
+  (which is not present yet) or we should remove the sources in my opinion as they bring no value compared to
+  cloning the repo."* FACT that shapes it: GitHub attaches "Source code (zip / tar.gz)" to every release
+  automatically and no API or setting removes them — so "remove" is not reachable; "make them irrelevant" is.
+  **OPTIONS:** **(a)** attach `release/<name>/` itself as an asset, `<name>-release.zip` — exactly the ruled
+  inventory (patch set, applier, end-user README, the driver patch + recipe, the MRAs + bitstream), i.e. the
+  whole subset a user needs; the emulator SOURCES the recipe names are upstream FBNeo/MAME at the pins, not
+  this tree; the release notes then say "take the release zip (and a binary zip for your OS); the source
+  archives are the repository at the tag and are not needed". One more zip in `tools/upload_release_assets.sh`
+  (it already zips, uploads and re-verifies) plus the notes text. **(b)** notes text only, pointing at
+  `release/<name>/` in the repository. **RECOMMENDATION: (a)** — small, and it makes a release usable with no
+  clone at all. Not built this sitting: it adds a public asset, so it waits for the word.
+
+- **~~WHERE DO THE PREBUILT BINARIES LIVE — IN GIT, OR AS RELEASE ASSETS?~~ DECIDED (maintainer, 2026-09-11, 14z-149): (b) WITH PRUNING** — *"indeed it's the best choice and my hosting the files can always be a mirror in the future"*, after three questions answered by measurement: a git-committed binary cannot be deleted from history, only a release asset can (so "host only the latest" is reachable with assets and pruning); the maintainer's own web storage works as a mirror; the sizes are fbneo 57 MiB / 16 MiB zipped, mame 81 MiB / 15 MiB zipped (MAME compresses five-fold), ~31 MiB per OS. BUILT the same sitting: `.gitignore` (records tracked, files ignored, both places), `tools/upload_release_assets.sh` (verify → `asset` line → zip → release on the tag → upload → download back and re-verify → `--prune`), the packager's README/EMULATOR.md paragraphs point at the asset on `freeze/<name>`, both gates read a record-only directory as a fresh clone. *(The original entry follows.)*
+- **WHERE DO THE PREBUILT BINARIES LIVE — IN GIT, OR AS RELEASE ASSETS? (14z-149, opened by item 1.)**
+  Built and verified this session for `macos-arm64`: `release/emulators/fbneo/macos-arm64/` (fbneo + 23 bundled
+  libraries, 58 MB) and `release/emulators/mame/macos-arm64/` (cps2 + libSDL3, 82 MB), each with its `BINARY.txt`;
+  the packager copies them into every `release/<name>/{fbneo,mame}/emulator/bin/macos-arm64/`, so M18 is now 150 MB
+  on disk where it was 11. **Committed as-is, that is ~140 MB into git history PER RELEASE (plus ~140 MB once for the
+  resource dir), against a 68 MiB pack today — and Windows + Linux will triple it.** Nothing binary is committed
+  until ruled. **OPTIONS:** **(a) commit them** — simplest, the tree is the release; the repository grows by ~0.4 GB
+  per release once all three OSes exist, forever (history is not prunable without a rewrite). **(b) gitignore the
+  binary FILES everywhere (`release/emulators/*/*/` and `release/*/*/emulator/bin/`), track only each `BINARY.txt`,
+  and attach the binary directories as GitHub RELEASE ASSETS on the `freeze/merged-mNN` tag** — the record's
+  sha256 rows are what make a downloaded asset verifiable, the packager and both gates keep working on a host that
+  has built or fetched them, and a fresh clone sees no `bin/` (allowed by the inventory: "optional"). Cost: one more
+  step in the release ritual (`gh release upload`), and a fresh clone's `test_release_binaries` SKIPs until the
+  host builds or fetches. **(c) git LFS** — the files stay "in the tree" but every clone pays the LFS quota and
+  GitHub's free tier is 1 GB storage / 1 GB bandwidth per month, which one release would consume.
+  **RECOMMENDATION: (b).** It is what every emulator project does with its binaries, the hash record keeps the
+  trust surface in the tree, and it costs nothing that (a) does not cost more of later.
+
+- **~~DEFINE WHAT IS IN A RELEASE, AND SHIP THE HOW-TO README~~ DONE 14z-148
+  (2026-09-11): the inventory MEASURED then RULED (*"I agree with the
+  inventory"*), enforced as an allow-list in `test_release_roundtrip` §4 with
+  the README's five sections; the applier PURE PYTHON; the stock-emulator
+  stall MEASURED and locked; **RULED for the emulators: recipe AND prebuilt
+  binaries, each user free to choose (1+2)** — the slot and its record exist,
+  the binaries are a FOLLOW-UP (macOS here, Windows/Linux on the remote
+  boxes); MiSTer unchanged (RBF + MRA on top of the patch set). Spec:
+  `docs/project/release_format.md` "WHAT A RELEASE IS". (maintainer, 2026-09-10,
+  14z-147b: *"like with SMS, due to the nature of the deliverables, we should
+  define what is in the releases so that each release is limited to exactly
+  what is needed to be in the release, with a proper README that includes the
+  how-to since we don't provide any ROMS or such copyrighted assets, ever"*).** What exists to start from:
+  `docs/project/release_format.md` (one self-sufficient directory per platform
+  since merged-m10: the patch set, `manifest.json`, `apply_release.py`, a
+  README, the emulator driver patch + `EMULATOR.md`, the MiSTer `.mra` +
+  `.rbf` + `BITSTREAM.txt` + `MISTER.md`), `tools/package_release_platforms.py`
+  (the producer), `tests/test_release_roundtrip.sh` (the layout gate, rule 7's
+  verbatim-chunk scan). What the item asks for beyond that: (1) a DEFINITION
+  of the release contents — an explicit inventory of what belongs in a release
+  and, as importantly, what does not (nothing derived from the reference
+  dumps, nothing a user cannot legally receive; the SMS precedent: the release
+  is patches + tools + instructions, and the user supplies their own dumps);
+  (2) a README written for the END USER — what you need (which reference sets,
+  named by the checksums the applier verifies), how to apply on each platform
+  (FBNeo / MAME with the driver patch and the pinned emulator, MiSTer with the
+  MRA + bitstream), what "success" looks like (the in-game mark, the name
+  screen), and the statement that no ROM or copyrighted asset is ever
+  distributed; (3) the gate: `test_release_roundtrip` §4 should assert the
+  inventory (nothing outside the definition ships, everything in it does) and
+  that the README carries the how-to sections. Cost: T2, one session; no
+  gameplay surface, no build byte — a packaging/documentation change, ruled at
+  the plan stage by the maintainer as usual (present the inventory before
+  writing it).
+
+- **~~THE MUST-FIRE DOCTRINE'S MACHINE READER — STEP TWO AGREED IN SHAPE~~ STEP TWO BUILT 14z-147, PASS 1 (the reader, the runners, the portable tier) LANDED; PASS 2 (the static tier, 19 gates) LANDED 14z-147b; PASS 3 (the emulator tier, 34 gates = the census's `retrofit-debt` class) LANDED 14z-147c — the census is now 83 / 0 / 0, the retrofit COMPLETE across all three tiers; the HONOURED run of the 34 emulator modes is the freeze/release sweep (`run_all_emulator.sh --controls`), not a pre-commit; the last open half RULED (maintainer, 2026-09-10, 14z-148): the cadence of `run_all_emulator.sh --controls` at release is option (a), THE RELEASE RUN — *"I agree with item 2's proposal. We can always adjust later if the need arises."* Recorded in HANDOFF "THE EMULATOR-TIER COMMAND" (the release invocation) and the runner's header.** What landed: `tests/lib/controls.sh` (the four regexes, a COPY of BBX's R10 — and R30 resolved the bare-`#` trap this entry warned about: the header is the leading comment block, a bare `#` continues it), `classify.sh` handing FAIL to a red block (no fourth verdict), `run_all_static.sh --exec-controls` (every declared control run as `CONTROL=<name>` after a PASS; LIES / REFUSED / DIED named), `run_all_emulator.sh --controls` (rows `<gate>@<name>`), the census switched to the grammar with three frozen classes, `test_controls_contract.sh`, and 30 gates declaring under the grammar (every portable declaring gate, each verified plain-PASS with every control FIRED and every mode HONOURED). Spec of record `docs/project/must_fire_contract.md`, rule [VSP-181]. **THE DECISION, two halves — (i) DECIDED 2026-09-10, option (a); (ii) stands at its recommended default, no ruling asked:** (i) the emulator tier's executable controls multiply a tier measured in hours (34 declaring gates, ~2-4 controls each); options (a) `--controls` in the release checklist only, (b) on every freeze sweep, (c) on the mame lane only — RECOMMENDATION (a), measured first at the next release run; (ii) MEASURED 14z-147 on the portable tier: `--exec-controls all` (the default, the agreed shape) makes the pre-commit portable tier ~22 min where the tier alone is ~4 min — keep the default and iterate with `--exec-controls none`, or reserve the executed form for the close and the release? RECOMMENDATION: keep the default (a lying control must not pass a pre-commit); the developer knob exists. *(Original entry follows.)*
+- **THE MUST-FIRE DOCTRINE'S MACHINE READER — RULED (maintainer, 2026-09-10, 14z-145): STEP ONE DONE, STEP TWO AGREED IN SHAPE, waiting on BBX's R10 for the contract's line and env name.** Step one shipped: `tests/test_must_fire_census.sh` (78 declaring gates, grows only; 10 header-only, shrinks only — `audit_guard_corpus audit_hui_grunt audit_kill_poke_shape audit_pyron_ring run_battery_m2 test_don_reactions test_pyron_medallion_2p test_ref_rot_image_pick test_suite_dispatch test_tenant_id`). Step two, agreed point by point: (1) the retrofit's acceptance test is IDENTITY — every gate's verdict on this tree (static tier + the emulator sweep) and bbh's selftests/fidelity unchanged before and after — which catches a badly written retrofit but is BLIND to a vacuous control by construction; so (2) the contract makes each control EXECUTABLE — `CONTROL=<name> tests/<gate>.sh` must exit with the gate's own FAIL — and the runner invokes it, which is [VSP-19] run by machine; (3) one pass on a quiet tree, one strict run per pass; (4) NO fourth verdict: a missing "fired" line and a control that leaves its gate green are both plain FAIL. The maintainer's words: *"agreed with everything you just said"*. Not scheduled; the census does not change when the contract lands.
+  **R10 SETTLED IN BBX (read 2026-09-10 from `~/Developer/generalized-blackbox-harness/BBX/docs/controls.md`, READ-ONLY to me; GitHub `DefinitelyFrenchName/BBX`, private).** THE GRAMMAR: one header line per control, `# MUST-FIRE: <shape>: <name> — <what must fail, and why that proves the gate can fail>`, shape ∈ `perturbed-copy | shadow-tool | known-bad`, name `[a-z0-9-]+`; a non-asserting gate says `# MUST-FIRE: none — <why>`; the gate prints `CONTROL FIRED: <name> — <evidence>` or `CONTROL DEAD: <name> — <what happened>`; the registry is derived from the headers every run; declared-not-fired, DEAD, and fired-not-declared are all RED and refuse the verdict; the readout counts fired / declared; enforcement is a config switch (`[controls] enforce`), off = bbh's output byte for byte. The one reader is four regexes (`lib/py/bbx/controls.py`). R10 says of itself that it does NOT prove a control is right. **AGAINST OUR FOUR POINTS:** (2) partly — R10's DEAD is the gate's SELF-report ("failed for its stated reason"); the executable form (`CONTROL=<name> gate` must FAIL under the runner) is an ADDITION over R10 and compatible with it (the lines stay, the runner also invokes); (4) agrees — no new verdict word (their R13 keeps the four); (1) and (3) are ours, orthogonal. **ONE COMPATIBILITY TRAP for the retrofit here:** R10 reads the header as "line 2 to the first bare `#`", and this tree's gate headers use bare `#` lines as paragraph separators from line 6 on — so every `# MUST-FIRE:` line must sit directly under the title line, before the first bare `#`, or the reader sees nothing. **FOR THIS TREE:** the grammar is now fixed, so step two = (a) 78 gates gain their `# MUST-FIRE:` lines and print `CONTROL FIRED:`/`CONTROL DEAD:` (the 10 header-only ones gain a real control or `none — <why>`), (b) `tests/lib/classify.sh` reads the same four regexes — a COPY, never a dependency on BBX ("independent but compatible") — and turns a red controls block into FAIL, (c) the census gate switches its regex to the R10 declaration, (d) the executable-control check and the identity bar as agreed. Still not scheduled.
+
+- **~~EXTEND THE FREEZE-ARTIFACT CHECK TO `patch_index.md`'s REGISTRATION CELLS~~ DONE 14z-145** — section 4 of `tests/test_freeze_artifacts_current.sh`; ground-truthed on the REAL stale state, which was worse than this entry says: the four track rows' CURRENT cells had last moved at the 14z-119 freeze (`git log -S`), FOUR freezes stale, edited around by the 14z-144 close. Five controls incl. the history-is-not-a-target negative. STATE 14z-145. *(Original entry follows.)*
+- **EXTEND THE FREEZE-ARTIFACT CHECK TO `patch_index.md`'s REGISTRATION CELLS
+  (added to the opener at the maintainer's word, 2026-09-09). Not started.**
+  `tests/test_freeze_artifacts_current.sh` (14z-144) covers the two artifacts
+  that rotted; this is the next named member of the same class, and it has
+  MEASURED evidence rather than a hunch — the table has gone stale the same way
+  TWICE, and says so about itself:
+    * a registration cell read "UNREGISTERED … expectation sets NOT yet frozen"
+      from 14z-127 until 14z-132 (the table's own parenthetical records it)
+    * the pyron capture row did exactly that from 14z-143 until 14z-144
+    * and the donovan WIDE cell carried "KNOWN OPEN DEFECT ON THIS TRACK" for
+      hours AFTER the defect was fixed, frozen, released and pushed — [VSP-13]'s
+      worst case, a header asserting the opposite of reality
+  **IT FITS THE DISCRIMINATOR:** the cells are derived from the build set
+  (fingerprints, build dirs, freeze names, registration status) and no
+  ci_static gate checks them, which is exactly why they rot while
+  pointer_flow/charmap/bases.tsv never have.
+  **SHAPE:** parse the fingerprints and `build/<dir>` tokens from the table and
+  require CURRENT-marked cells to name the current freeze — `registry.tsv` and
+  `run_all_emulator.sh`'s placeholder defaults already state what that is.
+  **THE TRAP TO AVOID, paid for in the 14z-144 re-point sweep:** a
+  `<freeze-name> (build/<dir>)` pairing and every `prior …` clause are HISTORY,
+  never targets. The check keys on CURRENT cells only, or it will demand the
+  falsification of dated records.
+  Cost: small, static, no gameplay surface, no build byte.
+
+- **~~THE EMULATOR RUNNER PARALLELISES BY BARRIER, NOT BY QUEUE~~ IMPLEMENTED
+  14z-144 (maintainer: *"We need to implement according to both items to
+  indeed carry forward"*).** `run_all_emulator.sh` now uses a FIFO token
+  semaphore whose TOKEN IS THE SLOT NUMBER, so taking work and acquiring a
+  scratch clone are one atomic act; serial lanes open no FIFO, so `--jobs 1`
+  and the prereq lane are byte-for-byte the old path. **CO-RESIDENCY
+  ESTABLISHED, NOT ASSUMED:** the full 130-gate mame lane re-run under the
+  queue, every verdict compared against the same gate under the barrier —
+  **130/130 agree, 0 disagree**. **MEASURED 3.48x (1.90h -> 1.21h, 41 min
+  saved per sweep)** — the RATIO is exactly what the barrier model predicted,
+  the ABSOLUTE is not: the same 130 gates sum to 4.23h serial under the queue
+  against 3.13h under the barrier, because sustained four-way concurrency
+  makes each gate ~35% slower where the barrier left slots idle. **The model
+  assumed per-gate cost is independent of load and it is not** — the 0.90h I
+  quoted twice was optimistic; 41 min is the honest figure. Three defects in
+  my own code were found by reading it before running it (two `[ … ] && x=y`
+  set -e aborts, and the gate inheriting the token fd).
+  **AND THE 35% IS A PROPERTY OF THIS HOST, NOT OF THE QUEUE (maintainer,
+  2026-09-09: *"on a machine with more cores/threads, the improvement may
+  improve because the price of parallel processing would be lessened"*).** The
+  measurement was taken on the MacBook — 8P+4E, 16 GB — at 4-way, where four
+  concurrent MAME runs contend for memory bandwidth and cache. On a wider host
+  the per-gate penalty shrinks and the queue's advantage GROWS toward the ideal
+  3.13h/N, and `--jobs` above 4 starts paying where today it mostly does not
+  (barrier 2.47x vs queue 6.05x at 8, both modelled on the OLD per-gate costs
+  and therefore both optimistic on this machine, but the RATIO between them is
+  the part that holds). **THE HOSTS ALREADY ON OFFER** (STATE "the Verilator
+  lane is serial for one reason"): the Windows Ryzen 9 3900X / 32 GB that built
+  the first bitstream (12c/24t) and the coming Linux Ryzen 7 5700G / 64 GB.
+  **SO THE NUMBER TO RE-MEASURE, NOT RE-DERIVE, when a wider host is set up:**
+  the mame lane's serial sum at N-way on that machine. If it stays near 3.13h
+  where this one inflated to 4.23h, the contention was ours and the queue is
+  worth substantially more than 41 min there. `test_mame_parity` is the
+  migration gate for any new host ([MFI-41]).
+  *(Original entry follows, unrewritten.)*
+- **THE EMULATOR RUNNER PARALLELISES BY BARRIER, NOT BY QUEUE — MEASURED, AND
+  THE MAINTAINER PREFERS THE PULL MODEL (direction, 2026-09-09).** Their words
+  on the barrier: *"that's to be expected since it's pushed batching system and
+  not 4 separate queues acting as a pulled system (which would have my
+  preference by far)"*, and on the shared-queue shape: *"agreed, I just didn't
+  think it was on the table"*.
+  **MEASURED on the 14z-144 M17 sweep**, and the barrier model reproduces the
+  observed wall-clock to two decimals (1.90h predicted, 1.90h actual), which is
+  what makes the counterfactuals credible rather than arithmetic:
+
+  | mame lane, 130 gates, 3.13h serial | wall | speedup |
+  |---|---|---|
+  | barrier, registry order (today) | **1.90h** | 1.65x |
+  | barrier, longest-first (reorder only) | 1.00h | 3.13x |
+  | true work queue | **0.90h** | 3.48x |
+
+  At `--jobs 8` the gap widens: barrier 2.47x, queue 6.05x — so the 12-core
+  machine is largely wasted today.
+  **WHY IT IS A BARRIER, established by archaeology rather than guessed:** the
+  runner is `#!/bin/sh` = bash 3.2 on macOS, where `wait -n` does not exist
+  (checked: `invalid option`), so "wake when any slot frees" is not expressible;
+  and the slot->clone binding added at 14z-134 uses `_running` as the index,
+  which the barrier is what resets. It was never a trade-off weighed against a
+  pull model — it is what falls out of the shell. The one scar in that code is
+  14z-128's orphaned background jobs (the lane loop ran in a subshell so `wait`
+  had nothing of its own), which is why the rows go through a file.
+  **THE SHAPE, and it IS available in this shell:** a FIFO token semaphore
+  where THE TOKEN IS THE SCRATCH CLONE NAME, so pulling the next gate and
+  acquiring a free clone are one atomic act — which dissolves the positional
+  `_running` binding rather than working around it. Token writes are single
+  short lines (atomic under PIPE_BUF); the loop stays in the main shell so the
+  14z-128 scar does not reopen; `results.tsv` is already appended concurrently
+  and `--resume` keys on gate name, so non-deterministic row order costs
+  nothing. ONE shared queue with N pullers, not four static queues — static
+  per-worker queues reintroduce head-of-line blocking at finer grain.
+  **TWO THINGS TO ESTABLISH, not assume:** that gate co-residency is safe under
+  a DIFFERENT pairing (the suite's contract says self-contained; that is a claim
+  wanting a control, not a given), and that the two-leg gates' `-b` clones
+  compose with a token pool rather than fight it.
+  **ALSO MEASURED 14z-144, and it revises an earlier warning of mine:** the
+  MiSTer gates are NOT core-bound — `test_mister_gfxc_fetch` ran **-46.6%**
+  against its M16 figure while sharing the machine with three other sims, and
+  the others moved +3.4% / +3.7% / +0.2%. So M16's numbers are the CONTENDED
+  ones and `--jobs` above 4 would pay on that lane too. Not started; harness
+  only, no RTL.
+
+- **~~[VSP-178]'s CLASS HAS NOW BITTEN AT TWO CONSECUTIVE FREEZES~~ FOUR TIMES,
+  AND THE CHECK IS BUILT (14z-144).** `tests/test_freeze_artifacts_current.sh`
+  (ci_static, family pipeline): two rows chosen by a stated discriminator —
+  tracked, derived from the build set, and NOT already covered by a ci_static
+  gate that fails on staleness. GROUND-TRUTHED ON THE REAL HISTORICAL STALE
+  STATES: merged1 at 829 ops, merged1 at 831 ops with one value differing
+  (which is why it compares op CONTENT, not count), and the pair recording
+  merged-m16 — all three caught with accurate diagnoses. The build set is READ
+  from the runner's own placeholder defaults so the gate cannot disagree with
+  it about which build is current. *(Original entry follows, unrewritten.)*
+- **[VSP-178]'s CLASS HAS NOW BITTEN AT TWO CONSECUTIVE FREEZES, and the
+  cadence column cannot fix it (14z-144). ON THE OPEN-ITEMS LIST
+  (maintainer, 2026-09-09: *"let's add it to the todo list"*) — AGREED as a
+  work item, not merely recorded; not yet scheduled against a session.** M17 shipped with
+  `tests/expect/mister_prg_window.txt` frozen on merged-m16 and `build/merged1`
+  two ops stale; both are tracked artifacts that FOLLOW THE ROMSET. 14z-134
+  responded to the first instance by changing that gate's cadence to `romset` —
+  which tells the RUNNER what to run, and says nothing to the FREEZE about what
+  to refresh. So the same thing happened again one freeze later.
+  **THE OBSERVATION:** every other romset-following artifact IS refreshed,
+  because a gate fails loudly in the static tier when it is not (pointer_flow,
+  charmap, the artifact manifests, bases.tsv). The two that rotted are the two
+  whose gates are NOT in the static tier — one is a ~1h Verilator gate, the
+  other rebuilds itself and only shows up as working-tree churn.
+  **SHAPE IF WANTED:** a freeze-ritual check that enumerates tracked artifacts
+  whose content is derived from the build set and asserts each was regenerated
+  since the current freeze's commit — cheap, static, and it would have caught
+  both. Not a new rule; a rule that runs.
+  **THE TWO KNOWN MEMBERS, as the starting inventory:**
+  `tests/expect/mister_prg_window.txt` (frozen pair; its gate is a ~1h
+  Verilator run, so nothing in the static tier can see it rot) and
+  `build/merged1/` (the merged-legacy instrument, which REBUILDS itself and
+  therefore surfaces only as working-tree churn a human has to notice).
+  **THE DISCRIMINATOR that makes the check writable:** an artifact belongs in
+  it when its content is derived from the build set AND no ci_static gate
+  already fails on staleness — pointer_flow, charmap, the artifact manifests
+  and bases.tsv are all covered today and would be excluded, which is why they
+  have never rotted.
+  **COST:** small — a static gate plus its must-fire control; no gameplay
+  surface, no build byte. Agreed to the list 2026-09-09; not scheduled.
+
+- **~~DONOVAN THROWING JEDAH USES DONOVAN'S OWN VICTIM KEYFRAMES ON EVERY WIDE
+  BUILD~~ RULED AND SHIPPED 14z-144 AS M18 (maintainer, 2026-09-09: option (a),
+  *"Do the Donovan throwing Jedah fix then finish the release"*). The entry stays
+  for the measurement trail. THE FIX: `donovan.toml`'s `throw_victim_keyframes`
+  gained `fixes_variant = ""` — the `_variant` twin `row_hex()` already defined
+  for `new_hex`, taught to the `data_port` fixes key — so the 14z-64 rewrite
+  applies on the BASE-SLOT track only. WIDE program delta EXACTLY TWO BYTES
+  (`0d88 -> 0b30` at blob offset `0x1E`); stock twin byte-identical, which is the
+  control that the base-slot track kept the fix. `audit_capture_matrix` 640/640
+  with its KNOWN set EMPTY on merged-m18 while merged-m17 still fails the cell.
+  `test_capture_kf_ownership` rewritten to the two-sided invariant and
+  ground-truthed both ways. Detail: patch_notes 14z-144, STATE 14z-144.
+  *(Original entry follows, unrewritten.)*
+- **DONOVAN THROWING JEDAH USES DONOVAN'S OWN VICTIM KEYFRAMES ON EVERY WIDE
+  BUILD — found 14z-143 by the new full-matrix audit, PRE-EXISTING since
+  14z-64, and the fix is a gameplay call.** Not a regression from the M17
+  freeze: measured identical on `merged23`.
+  **THE MECHANISM, measured.** `donovan.toml`'s `throw_victim_keyframes`
+  carries `fixes = "0x1E:0b30:0d88"` — the 14z-64 mirror-victim correction,
+  which rewrites the blob's VICTIM offset word `[0x0F]` from the
+  Jedah-victim sub-block to the DONOVAN-victim one. That is RIGHT on the
+  STOCK track, where Donovan substitutes Jedah at slot `0x0F` and victim
+  `0x0F` genuinely IS Donovan (the mirror flavour the fix was written for).
+  **On a WIDE build Donovan is at `0x13` and `0x0F` is JEDAH, restored** — so
+  the rewrite redirects a reachable LEGACY victim's keyframes. The manifest's
+  own note calls the fix "harmless" at a variant id because its `[0x0F]`
+  entry "is never a TENANT victim there"; that is true, and it is not the
+  question — `0x0F` is a legacy victim and an ordinary 2P matchup.
+  **MAGNITUDE:** the two sub-blocks differ in **225 of 408 bytes (55%)**;
+  early deltas are close (`-60,0` vs `-56,0`) but the last keyframe is
+  `(-61,166)` where Jedah's is `(-76,32)` — 134 px of vertical difference —
+  and the poses differ (`0,8,6,0,1,0,8,17` vs `0,8,7,1,0,0,9,20`).
+  **MEASURED IN-EMULATOR 14z-143, and it confirms the static read exactly**
+  (`tools/capture_sheet.sh 13 0f`, merged-m25 vs native `vsav2`):
+  **offset-set overlap 0 of union 19** — ours `(56,0) (48,0) (56,0) (74,9)
+  (81,15) (61,166) (39,204) (80,211) (97,187) (108,42) (95,0)`, native
+  `(60,0) (84,8) (86,16) (76,32) (84,56) (88,72) (94,72) (91,42) (80,0)`.
+  Ours reproduces the DONOVAN-victim sub-block's magnitudes (56, 48, 56,
+  74/9, 81/15, 61/166) and native reproduces JEDAH's (60, 84/8, 86/16,
+  76/32) — the two blocks read statically from vs2's Donovan block. **So
+  this is the SECOND cell measured both ways with no shared premise and
+  agreeing**, which strengthens [VSP-180]'s anchor rather than merely using
+  it. Sheet shown to the maintainer 2026-09-08.
+  **OPTIONS:** **(a)** gate the `fixes=` row to the base-slot track (a
+  `fixes` twin keyed like `only_base_slot`, or a `fixes_variant = ""`), so
+  the WIDE blob keeps vs2's own `[0x0F]` = the Jedah-victim sub-block —
+  section 2 of `audit_capture_matrix` proves vs2's legacy victim data is
+  byte-identical to vsavj's, so that IS Jedah's real geometry; **(b)** leave
+  it and record that Donovan's throw of Jedah uses his own victim geometry as
+  accepted; **(c)** measure first with the rig above, then decide.
+  **RECOMMENDATION: (c) then (a)** — the measurement is ~4 minutes on an
+  existing rig and turns "a row is mis-scoped" into "here is what it looks
+  like", exactly as it did for Pyron. (a) is a one-line manifest change but
+  it MOVES SHIPPED BYTES on the WIDE tracks, so it is a freeze.
+  **LOCKED MEANWHILE:** the cell is frozen as a KNOWN-OPEN divergence in
+  `tests/audit_capture_matrix.sh`, so it cannot rot; removing that row is
+  what proves a fix landed.
+
+- **THE RELEASE RESUME'S ONE REAL RED — `test_mister_prg_window`'s FROZEN
+  PAIR IS STALE (frozen on merged-m10, five freezes ago) — HOW TO CLOSE IT
+  (14z-134).** The structural half of the gate passed on merged-m16 (the
+  decode is gated, the control leg reads nothing above `$400000`, the
+  profile-ON leg executes 1.2 M program reads from the extension); the
+  frozen pair failed because the first extension address the 68k executes
+  is the relocated OBJ walker, and the hole allocator moved it from `$4BE7C0`
+  to `$4C13D0` when later freezes added content before it (STATE 14z-134).
+  The numbers measured on merged-m16 are IN THE RUN'S LOG, byte-exact (the
+  `>` lines of the diff are the probe's own summary lines the `--freeze` mode
+  writes). **OPTIONS:** **(a) re-freeze the pair on merged-m16 from a fresh
+  `--freeze` simulation (~108 min) and re-run the gate under the runner** —
+  two more simulations, the cleanest record; **(b) re-freeze from THIS run's
+  measured lines (they are the measurement; the gate would have written the
+  same bytes) and re-run the gate ONCE under `--resume`** (~108 min) so the
+  release record holds a runner-produced PASS on the m16 pair; **(c)** accept
+  the log as the verdict and hand-edit the results row — refused: the runner
+  produces the record. **PLUS, whichever:** the row's cadence becomes
+  `romset` (its pair follows the romset like the two ruled exceptions, so it
+  re-freezes at every freeze instead of rotting silently until a release),
+  and `tests/expect/` joins `test_expectation_provenance`'s scope.
+  **RECOMMENDATION: (b)** — one simulation instead of two, and the re-run is
+  what makes it evidence. Sequencing: the edit is a tracked-file change, so
+  it lands AFTER the current resume exits (the runner's tree check), then a
+  second `--resume` for this one gate. **RULED (maintainer, 2026-09-06):
+  (b)** — *"let's go with option (b) which is the fastest, and then we'll
+  adapt the harness"*. Prepared while the resume ran: the measured pair
+  lines extracted from the log, `tests/expect/` brought into
+  `test_expectation_provenance`'s scope with three rows (worktree). Executed
+  after the resume: see the 14z-134 rows.
+
+- **~~THE VERILATOR LANE IS SERIAL FOR ONE REASON — ONE SCRATCH CLONE~~ IMPLEMENTED 14z-134** (verified 2026-09-12 before archiving: `run_all_emulator.sh --jobs N` gives slot 0 the base `JTSIM_SCRATCH` and slot N `<base>-slotN`, and the lane that took ~11 h serial fits in ~3 h at four jobs). *(Original entry follows.)*
+- **THE VERILATOR LANE IS SERIAL FOR ONE REASON — ONE SCRATCH CLONE — AND
+  THE MAINTAINER WANTS IT PARALLEL (direction, 2026-09-06; the question:
+  *"we're operating under a tenth of this macbook m2 pro's capacity … can't
+  we have separate instances of the checker?"*).** Measured before answering:
+  every MiSTer gate defaults `JTSIM_SCRATCH` to the one clone and each run
+  writes its `rom.bin` link, `sim_inputs.hex`, bank dumps, `wram/`, probe
+  files and `obj_dir/` INTO that clone's core dir, so two sims in one clone
+  clobber each other; the runner already has `--jobs N` (only prereq is
+  forced serial); jtframe's `jtsim` never passes Verilator a threads flag
+  (the model is single-threaded by construction, and a threaded build would
+  change the instrument); one sim is one core at 99 %, ~97 MB RSS, a clone
+  is 1.4 GB (368 MB the generated `.rom`, 57 MB `obj_dir`); the machine is
+  8 P + 4 E cores, 16 GB, ~196 GB free. **THE SHAPE:** N scratch clones
+  (the heal tool provisions any dir at the pin; the first run per clone pays
+  the Verilator build — UNMEASURED, the one number to establish first), the
+  runner assigning a clone per job slot via `JTSIM_SCRATCH` for the MiSTer
+  lane, optionally the two legs of a gate on two clones. Everything else is
+  already isolated (MAME sandboxes, the private `$HOME` for MRA staging,
+  per-gate temp dirs). Expected: the ~11 h serial lane becomes the longest
+  gate (~3 h) at four clones, ~1.5 h with leg parallelism; the 4-hour cap
+  question mostly dissolves. Harness only — tools and tests, no RTL, no fork
+  commit; ~half a session plus the measurement. **ALSO ON OFFER (maintainer):
+  the Windows box that built the first bitstream (Ryzen 9 3900X, 32 GB) and a
+  coming Linux Ryzen 7 5700G / 64 GB — a MacBook setup and a remote-runner
+  one may both make sense; cost both shapes when scoping, and
+  `test_mame_parity` is the migration gate for any new host ([MFI-41]).**
+  Queued behind the release close; not started.
+
+- **~~THE RUNNER'S TIMEOUT IS ONE SIZE FOR 165 GATES~~ OPTION (a) IMPLEMENTED 14z-134** (verified 2026-09-12 before archiving: `ci_emulator.tsv` has the optional 7th column and 10 rows carry a measured per-gate timeout). *(Original entry follows.)*
+- **THE RUNNER'S TIMEOUT IS ONE SIZE FOR 165 GATES — HOW SHOULD A GATE'S OWN
+  RUNTIME REACH THE RUNNER? (14z-134, from the two release-run TIMEOUTs.)**
+  `run_all_emulator.sh` has a single `--timeout` (default 5400 s) while the
+  registry rows already DESCRIBE runtimes in prose (`"~93 min a leg, two
+  legs"`, `"~65 min"`). The release resume runs under `--timeout 14400`, which
+  is correct for the MiSTer lane and eight times too generous for a MAME gate
+  that hangs. **OPTIONS:** (a) a `timeout` COLUMN in `ci_emulator.tsv` (a
+  seventh field, seconds or `-` for the default) — exact per gate, one schema
+  change, the §10 validator and every row touched, the header-defaults rule
+  extended to it; (b) a PER-LANE default in the runner (`mister` × 4, the
+  others as today) — one line, no schema change, but a lane-wide number that
+  a slow MAME soak (the tripwire marathon is ~15 min) cannot use; (c) keep
+  the global flag and a `--timeout` in the release checklist — what happened
+  today, and it is a ritual step, which is the thing that gets skipped.
+  **RECOMMENDATION: (a)**, because the runtime is a property of the GATE (its
+  header states it already) and the runner's other per-gate facts live in the
+  registry, not in flags; (b) as the stop-gap if (a) waits. Not swept
+  unasked; no gameplay surface.
+
+- **~~THE M16 RELEASE RUN'S ONE EXPECTED NON-GREEN — `audit_mask_window_ff42a2`
+  SKIPs — NEEDS THE MAINTAINER'S APPROVAL AT RELEASE TIME~~ APPROVED 2026-09-06,
+  option (a), a standing exception in the registry note (14z-134; the
+  policy: "RELEASE-TIME TEST SCOPE", *"unless explicitly approved AT release
+  time, anything red, anything skipped is a hard fail"*).**
+  **WHAT THE GATE IS:** the pre/post ATTRIBUTION INSTRUMENT for a
+  select-palette row move ([VSP-35]) — it A/Bs a PRE-move build against a
+  POST-move build on the replays whose self-frozen `.sha1` the move shifted,
+  and requires every differing byte to fall inside the ratified staging
+  family. It is what caught the 14z-88 `38_victor_p1_vsavj` superset
+  regression (the medallion row move cost the select->VS fade one main-loop
+  iteration), and it is kept for the next such move.
+  **WHY IT SKIPS, by construction:** its operands DESCRIBE A CHANGE UNDER
+  INVESTIGATION — a pre-move rompath, a post-move rompath and the replay names
+  the change shifted. There is no default pair because there is no default
+  change; invoked bare it prints `SKIP: no operands — this is the pre/post
+  attribution INSTRUMENT …` and exits 0 (14z-128, after the sweep recorded a
+  shell error as a FAIL). The registry marks it `out` / `momentary:` for that
+  reason (ruled 2026-09-03). Under `--strict` the runner counts the SKIP as a
+  failure, so **the run's expected end state is PASS 164 / SKIP 1 / FAIL 0
+  with the strict verdict RED on that one row.**
+  **WHAT APPROVING MEANS:** the SKIP is not a missing measurement of the
+  artifact. No select-palette row moved in M16 (the delta is two glyph
+  members, `vsw.33m`/`vsw.37m`, and the program fingerprint is unchanged), and
+  the merged build's select-screen state IS measured by the gates that ran:
+  the frozen masked legacy classes on merged (B2, 53/53), `audit_legacy_pairings`,
+  `audit_flicker_attribution`, the pixel gates. Approval says "this instrument
+  has nothing to attribute today", not "we did not look".
+  **OPTIONS:** **(a) approve the SKIP and RECORD it as a STANDING release
+  exception** in the gate's `ci_emulator.tsv` note (e.g. `release: SKIP
+  approved 2026-09-05 — an instrument with no default subject`) so the next
+  release run does not re-ask — a `tests/` edit, after the run. **(b) give it
+  a standing pair** (last freeze vs this freeze, the moved `.sha1` list) — but
+  with no row move between them the pair is bit-identical and the audit
+  REFUSES to attribute a move that did not happen; a synthetic pair measures
+  nothing. **(c) drop it from the registry** — refused by the project's own
+  history: it is the instrument that caught the 38 regression. **RECOMMENDATION:
+  (a).** One line; the exception is then a reviewed row, not a ritual step.
+
+  **DECIDED (maintainer, 2026-09-06): (a), *"agreed"* — recorded in the gate's
+  `ci_emulator.tsv` note the same day. LEFT FOR LATER, in the maintainer's
+  words: *"whether to set the skipped gate as either deprecated or
+  case-specific, as it kind of is but let's circle back to that later."**
+- **TWO BACKLOG ITEMS, RECORDED AS DIRECTION (maintainer, 2026-09-05, 14z-133b)
+  — ~~nothing scheduled; both are multi-session and wait behind the field test
+  and the release~~ (1) EXECUTED 14z-134 with the maintainer's blessing while
+  the M16 release run was in flight, in a worktree ("If item 2 does not
+  jeopardize anything ongoing you have my blessing"): `mame-fbneo-instruments`
+  `[MFI-1..46]` and `mister-jtframe-core` `[MJC-N]`, 109 of 145 CPS-2 rules
+  lifted with their numbers, every old ID kept as a redirect; the three
+  decisions in `docs/project/skills_scope.md` §7 RULED accepted the same day
+  with one addition — a self-contained GUIDE.md per level-0 skill and a
+  self-contained skill for other projects — DONE: `tools/gen_skill_guide.py`
+  GENERATES the guide from the anchored paragraphs, `test_skill_guides` keeps
+  it current, the skill directory is the portable unit; (2) STARTED 14z-135
+  (2026-09-06, the maintainer: *"I need the generic reusable test harness and
+  the living documentation effort. After that we'll tackle the open items"*):
+  the scope is `docs/project/harness_scope.md` — the four bins, the slices
+  H1-H9, the fidelity contract — and two things were RULED at the plan stage
+  the same day: a SEPARATE repository, `~/Developer/blackbox-harness`
+  (git-initialised locally; GitHub and any push the maintainer's), and this
+  tree gains exactly ONE read-only fidelity gate. Slice H1 opened the same
+  session (STATE 14z-135).** In the
+  maintainer's words:
+  **(1) A HIGHER-LEVEL SKILL SPLIT FOR EMULATION AND MiSTer — EXECUTED 14z-134.** *"for skills and
+  documentation, look if there an additional split for both emulation and
+  MiSTer at the highest level. Namely: are there skills transferable for
+  MiSTer or MAME/FBNeo projects that are not necessarily CPS-II based."*
+  What exists to start from: the six in-tree skills are cut by the
+  `docs/README.md` question ("would this still be true if we abandoned the
+  roster hack?") into platform / game / port, and the platform pair is
+  CPS-2-SCOPED by name (`cps2-emulation` [CPE], `cps2-hardware` [CPH],
+  `mister-cps2-wide-core` [MSC]); the only board-agnostic skills on this
+  machine are the SMS-era `romhacking-methodology` and `snes-romhacking`,
+  which live OUTSIDE this repo. The candidate cut is one question up: "would
+  this still be true if the board were not CPS-2?" — e.g. MAME/FBNeo AS
+  INSTRUMENTS (what -debug, breakpoints, write taps and Lua observe and miss;
+  CRC-vs-name member resolution; the rompath chain; determinism and the
+  sandbox; two-implementation comparison at anchors) and jtframe/MiSTer AS A
+  PLATFORM (the Verilator lane and its instrument traps, SDRAM tiers, MRA
+  generation by CRC, the fitter seed lottery, the separate-core mechanism).
+  Method: walk every [CPE]/[CPH]/[MSC] rule and classify it CPS-2-specific
+  or transferable; the transferable ones become two new level-0 skills the
+  CPS-2 ones then SIT ON, exactly as `mister-vampire-saved` sits on
+  `mister-cps2-wide-core`. `tools/checkskills.py` and the anchor census are
+  the enforcement, as for every skill so far (`docs/project/skills_scope.md`
+  is the record of the last cut). Cost: T2-T3, one to two sessions.
+  **(2) A GENERIC, REUSABLE TEST HARNESS — extracted, then its skill.** *"go
+  through all our documentation and rules and rulings and principles
+  regarding our test harness (including files up to CLAUDE.md) and extract
+  the harness from the specificities of this project. The goal is not to
+  replace the custom harness of this project but to create a separate, more
+  generic one, able to be reused in other projects, especially such
+  black-box adjacent projects. Then after that is done, distill the skill
+  that goes with that generic harness."* What exists to start from, all of
+  it project-shaped today: CLAUDE.md §4 (the oracle-replay method, the
+  frozen expectation classes, dual-emulator agreement at anchors, the
+  persistent-suite doctrine, verdict logic itself tested, recordings before
+  theories) and §5 (retraction discipline, bug archaeology, the
+  anti-hyperfocus checkpoint); `docs/project/oracle_classes.md` (the class
+  spec of record); `docs/project/gate_scoping_method.md` [VSP-167..174];
+  `tests/run_all_static.sh` / `run_all_emulator.sh` (SKIP is not PASS,
+  anti-orphan registries both ways, prereq lane first, cadence and scope
+  columns, placeholders); `tests/expected/PROVENANCE.md` and its evidence
+  classes; the fingerprint/registry dispatch with the dual key; the
+  header-defaults and build-ref-rot locks; the must-fire-control convention
+  and `tests/lib/shadow_tools.sh`; the generated gate index and gotcha index
+  with their `--check` modes; the replay format and the write-tap /
+  frame-dump instruments. The extraction question for every piece is the
+  same one the docs use, asked of the HARNESS: "would this still be true if
+  the thing under test were not this ROM, not CPS-2, not even a game?" —
+  what survives is the generic harness (a separate repository or a
+  top-level directory with no dependency on `build/manifest` or the atlas),
+  what does not stays here. Deliverable order, in the maintainer's words:
+  the harness FIRST, the skill AFTER (a skill distils something that
+  exists). Not to be confused with a rewrite of this project's harness,
+  which stays as it is. Cost: T3, several sessions; the skill one more.
+
+- **~~PHOBOS'S THREE THROWS — historically problematic, never compared to VS2
+  on geometry~~ MEASURED 14z-131 AND THEY MATCH. Maintainer-directed the same
+  day; no defect found.** The ask: *"there are throws that have been
+  historically problematic with the VS2 tenants as THROWERS, not victims,
+  namely Phobos' throws... these have all had their share of corrections,
+  especially circuit scrapper and ES circuit scrapper, and even now I am not
+  100% sure they are identical both mechanically and visually to their VS2
+  versions... these throws involve mostly POSITION of the victim."*
+  **RESULT, ours (merged-m15) vs NATIVE vsav2, victim pinned to Victor:**
+
+  **STRENGTHENED the same session after the maintainer's critique** — *"we
+  have but 5 frames for moves that last many tens of frames... it might be a
+  sample bias"* — from a comparison of SETS (blind to order and dwell) to the
+  ORDERED sequence of `(pose, dx, dy)` states with dwell, over EVERY held
+  frame, plus damage as `(amount, pose)`:
+
+  | throw | ordered states | damage (amt @ pose) | arc peak |
+  |---|---|---|---|
+  | standard 6+HP | 29 vs 28, ours +1 tail | 14 @ 13 both | 64 == 64 |
+  | circuit scrapper | **23 vs 23, IDENTICAL** | 19 @ 19 both | 278 == 278 |
+  | ES circuit scrapper | 46 vs 47, native +1 tail | 2@21 2@21 15@19 both | 380 == 380 |
+
+  **The trajectories traverse the SAME STATES IN THE SAME ORDER, and every
+  damage event lands for the same amount at the same POSE.** The only
+  structural differences are ONE end-of-hold state, in OPPOSITE directions.
+  **AND THE CADENCE WAS MEASURED INDEPENDENTLY, three times, which is what
+  turns "consistent with #114" into evidence:** the hold runs +8.5% / +9.1% /
+  +8.3% longer than native across the three throws, against #114's documented
+  ~1 video frame per ~11 engine ticks = 9.1% — Circuit Scrapper lands exactly
+  on it. On ES the damage offsets GROW through the move (+5, +7, +10 frames),
+  the signature of a RATE difference rather than a port defect. Dwell and
+  frame numbers are therefore REPORTED by the gate and never gated.
+  **DELIBERATELY NOT COMPARED: the victim's PIXELS.** Victor in our build is
+  VS's Victor; in native vsav2 he is VS2's Victor — different generations of
+  his art. A pixel difference in the victim is a cross-game fact, not evidence
+  about our port (the maintainer's own second point). The pose INDEX resolves
+  through each game's own `anim_index_c`, so a match means the same LOGICAL
+  pose slot, which is the comparable thing.
+  **A STALE CLAIM REFUTED ON THE WAY:** `80_hui_grab_2p.rpl`'s header said
+  *"only the victim throw-arc HEIGHT differs (alias physics, queued)"*. It
+  does not — the arcs are identical on all three throws. The claim predates
+  the 14z-67 `throw_arc_tables` fix and was never retracted; it is now.
+  **AND A RIG TRAP WORTH THE SESSION ON ITS OWN:** the ES version needs
+  METER. With an empty stock the ES input degrades SILENTLY to the ordinary
+  MP grab and returns numbers byte-identical to replay 80 — same 16 offsets,
+  same poses, same 19 damage. The discriminator is P1's stock dropping 9 -> 8
+  at the grab frame, which replay 80 under the same poke never does
+  ([VSP-131], [VSP-123]). Documented in the new replay's header and asserted
+  by the gate.
+  **WIDENED TO ALL 18 ROSTER VICTIMS (maintainer asked the cost; it was
+  measured, not argued): Victor alone 27.7 s, all eighteen 186 s at 6-way
+  parallelism** — ~6.7x the time for 18x the coverage, so it was widened.
+  **RESULT: 18/18 victims traverse the SAME states in the SAME order on all
+  three throws**, the end-of-hold tail is UNIFORM across every victim (so it
+  is frozen as ONE shape per throw, not 54 literals — and the uniformity is
+  itself evidence it is a boundary effect rather than per-character data), and
+  the ours/native hold ratio has ZERO spread across victims (1.085 / 1.091 /
+  1.083), which is what an ENGINE rate looks like rather than a data defect.
+  **WIDENING PAID FOR ITSELF TWICE, and both are the argument for doing it:**
+  * it found a residue the narrow gate could not see — **5 of 54 victim/throw
+    cells differ by exactly ±1 TOTAL damage**, sign per VICTIM not per throw:
+    `0x10` +1 on all three throws, `0x13` −1 on all three, `0x0A` −1 on CS
+    only. **RULED (maintainer, 2026-09-04): WITHIN TOLERANCE, NOT A DEFECT —
+    *"+/- 1 damage is within tolerances. It is interesting to root-cause it to
+    deepen our understanding of the engines though so let's keep that open for
+    a future session."* So it is a KNOWLEDGE item, not a bug**: frozen with
+    its exact deltas so it cannot drift unnoticed, and carried open for a
+    future session to explain rather than to fix.
+    **WHAT IS ALREADY ELIMINATED, so nobody re-derives it:** victim starting
+    HP is 288 on BOTH legs for every victim (not a max-HP effect); it is TOTAL
+    damage over the window, not a per-event split artifact; `bank_map`
+    declares no per-character defence/damage-scaling table, so the scalar is
+    somewhere that map does not model; and the sign is stable per victim
+    across all three throws, so it is not throw-specific.
+    **THE DISCRIMINATOR THAT MATTERS, and it is a HYPOTHESIS ([VSP-116]) not a
+    finding: `0x0A` IS A LEGACY VICTIM.** Sasquatch is not ported — on our leg
+    he is VS's Sasquatch, on the native leg VS2's. If Capcom retuned him
+    between the games, that cell is a CROSS-GENERATION data difference and
+    nothing to do with our port, which would split the residue into two
+    unrelated causes (0x0A cross-generation; `0x10`/`0x13` something else).
+    Testing that is the cheap first step: compare the two games' per-character
+    damage/defence data for `0x0A` directly.
+    **THE NAMED NEXT MEASUREMENT:** PC-attribute the writes to the victim's HP
+    (`$FF8850`) on both legs with `tests/lua/tap_writes.lua`'s `REGLOG` — the
+    same instrument that resolved #112's `a0` — so the routine AND its
+    operands are named rather than inferred. That says which table the scalar
+    **-> DONE 14z-145, by a READ watch on the table instead: it is the defense curve row (`defense_rows.md`), `tests/audit_defense_row_residue.sh`; the `0x0A` hypothesis above CONFIRMED (a cross-generation retune).**
+    lives in.
+  * it exposed a frozen constant as victim-specific: the narrow gate froze the
+    post-release arc peak at `278`/`380`, which were VICTOR's numbers — the arc
+    is victim-dependent and spans ELEVEN values. Not wrong for Victor; wrong
+    about what it was freezing, and only a second victim could show it.
+  **AND ONE FALSE ALARM WORTH RECORDING:** the first widened run reported all
+  three TENANT victims diverging, with unresolved pose pointers. That was the
+  RESOLVER — a tenant victim on our leg is held on the PLACED copy of vs2's
+  table, not vsavj's, a rule `audit_don_grab_pose` already documents. Applied,
+  the unresolved count went to zero and every tenant matched.
+  **THE METHOD IS NOW A DOCUMENT** at the maintainer's request (*"I want what
+  we went through together documented because it's a typical example of how to
+  close gaps on tests, strengthen gates, guarantee that tests are properly
+  scoped"*): `docs/project/gate_scoping_method.md`, distilled into the port
+  skill as [VSP-167]..[VSP-174].
+  Gate: `tests/audit_tenant_throw_geometry.sh`; new replay
+  `tests/replays/hui/97_hui_grab_es_2p.rpl` (replay 80 with one token
+  changed, so a difference between them is the ES button and nothing else).
+
+- **~~PYRON'S CAPTURE-KEYFRAME ATTACKER ROW `0x11` IS NOT PORTED~~ PORTED
+  14z-143 (option (a)), AND CONFIRMED THREE WAYS — the entry stays for the
+  measurement trail.** The maintainer took this item at the 14z-143 opener
+  from the open-items list. **RESULT: `pyron.toml`'s `[[data_port]]
+  pyron_capture_keyframes` places vs2's own block (`0x0C7F98`, `len 0xB80`)
+  in `wide_ext` and repoints row `0x11` at `PRG:0x0BE2BE` — ONE word, +2 ops,
+  Pyron only.** Confirmed by (1) the shipped image, where the placed block is
+  byte-identical to vs2's and the repoint inventory is exactly the frozen set;
+  (2) `audit_pyron_capture_block.sh` in-emulator against native `vsav2` —
+  hold-offset overlap **9 of union 9**, where 14z-131 measured **0 of 15**,
+  legacy control 6/6, `EXPECT_MATCH` default flipped 0 -> 1; and (3) the
+  maintainer, on a before/after/native capture sheet at six matched keyframes
+  (2026-09-08): *"After and Native look identical or at least consistent,
+  whereas before was inconsistent with native"*. Byte detail: patch_notes
+  14z-143. Builds `build/pyron39` (`65bf5622`) / `build/m3b_merged24`
+  (`4a7c02fb`) — NOT yet frozen.
+  *(Original entry follows, unrewritten.)*
+  **DECIDED (maintainer, 2026-09-04): MEASURE FIRST — *"Agreed, that's where
+  to start."* **MEASURED 14z-131, AND IT IS A REAL, GROSSLY VISIBLE DEFECT ON
+  A 2P SURFACE — NOT A COSMETIC.** The port decision is now the maintainer's;
+  the measurement it was waiting on is done.
+  **MEASURED TWO INDEPENDENT WAYS THAT SHARE NO PREMISE, and they agree:**
+  * **STATIC, from the reference ROMs.** vs2's Pyron block `0x0C7F98` vs the
+    Demitri block `0x0A3D88` our build serves him: for victim Victor the
+    keyframe deltas are `(-79,0) (-97,0) (-65,0) (82,29) (58,124) (100,132)
+    (116,-4)` against Demitri's `(-63,0) (-63,0) (-63,0) (-26,0) (-26,0)
+    (-10,32) (5,32)`. One of eight agrees, and it is the all-zero kf0.
+  * **IN-EMULATOR**, P1 Pyron vs P2 Victor on `judge/02_throw.rpl`, hold
+    frames 3010-3039, ours (vsavjw merged) vs native vsav2:
+    ours `{(63,0)(26,0)(10,32)(-5,32)(-10,32)(5,32)}`, native
+    `{(79,0)(97,0)(65,0)(-82,29)(-58,124)(-100,132)(-116,-4)(-53,116)(12,39)}`
+    — **ZERO overlap.** The in-emulator numbers reproduce the static deltas
+    exactly, dx sign-flipped by the positioner's own facing `neg.w d0`.
+  **WHAT IT LOOKS LIKE — AND A CORRECTION TO MY OWN FIRST DESCRIPTION.**
+  ~~"native hurls the victim ~130 px overhead and drops them BEHIND Pyron;
+  ours holds them on the ground in front"~~ **RETRACTED 14z-131, the same
+  session, after the maintainer required CAPTURES before accepting the
+  finding — and they were right to.** That sentence read the raw `dy` sign as
+  "up" and the `dx` sign as "behind" without ever establishing the engine's
+  screen-coordinate convention for `+0x14`; it was an interpretation of two
+  numbers, not an observation.
+  **WHAT THE CAPTURES ACTUALLY SHOW** (PNG snapshots, ours vs native vsav2,
+  frames 3012/3018/3024/3030/3036 of the same rig): the victim is held in a
+  DIFFERENT PLACE and reads at a DIFFERENT ORIENTATION — ours holds Victor
+  low and horizontal beside Pyron's flame; native holds him upright and
+  higher through the same frames. The difference is unmistakable on screen.
+  What is NOT established is any specific "N pixels up / behind" claim.
+  **THE LEGACY CONTROL IS IN THE SAME CAPTURE SET AND IS VISUALLY IDENTICAL
+  between the two legs** (Demitri throwing Victor, same frames), which is what
+  makes the Pyron sheet readable rather than a comparison of two different
+  games' art. Throws are core 2P, so the standing "cosmetic is optional"
+  scope does NOT cover this.
+  **STANDING LESSON, and it is [VSP-153]/[VSP-116] again:** the numbers were
+  right and the sentence about them was not. Send the capture before writing
+  the characterisation, not after.
+  **THE RIG IS SOUND, and that is measured too:** the gate's section 0 runs a
+  LEGACY attacker (Demitri) on both legs and gets 6 distinct offsets each with
+  overlap 6 of 6 — identical. So the pokes, the frame window, the coordinate
+  convention and the comparison all work, and the Pyron disjointness is a fact
+  about the data, not the instrument ([VSP-22]).
+  **GATE: `tests/audit_pyron_capture_block.sh`** (mame / release / romset),
+  `EXPECT_MATCH=0` freezing the OPEN defect, flipping to `1` when the row is
+  ported — the same shape `audit_don_grab_pose` used across the #104 fix, so
+  the gate proves the fix rather than being rewritten to suit it.
+  **THE FIX, if wanted, is the 18th instance of a mechanism used 17 times:**
+  a `[[data_port]]` row in `pyron.toml` — `src = 0x0C7F98`, `orc = 0x0C782A`
+  (the uniform `0x76E` sibling delta), `slot_ptr_table = 0xBE27A`,
+  `hole = "wide_ext"`, `only_variant_slot = true`, with `dst`/`dst_old_head`
+  naming the host block it replaces on the base track. ~~Two things to settle
+  first, both cheap: the block's LENGTH (its sub-block stride is `0xA0`, 32
+  victims, so ~`0x2040`...), and the signed-16-bit `lea (a0,d0.w)` bound~~
+  **BOTH SETTLED 14z-142, and the length estimate was WRONG.** A block is a
+  32-word victim OFFSET TABLE then 8-byte records `[dx][dy][flags][pose]`; the
+  victim offsets ALIAS, so vs2's Pyron block has 32 entries but **18 distinct**
+  sub-blocks spaced `0xA0`, last at `+0x0AE0`. **Extent = `0xB80` (2,944 B),
+  not ~`0x2040`** — *(CORRECTED 14z-143: this said "zeros follow it";
+  measured, a DIFFERENT table begins at `+0xB80`. The extent is unchanged and
+  now rests on the tiling `0x40 + 18*0xA0 = 0xB80`, not on a tail of zeros.)* And the `lea (a0,d0.w)` displacement is an
+  offset WITHIN the block (measured max `0xB78`), so relocation cannot move it
+  and the signed-word bound has enormous margin. Mechanism + structure:
+  `engine_internals.md` "THE CAPTURE-POSE INSTALLER". One freeze.
+  **STOP — THE MECHANISM IS NOT ESTABLISHED, AND THE PORT IS NOT YET THE
+  RECOMMENDATION (corrected 14z-131 after the maintainer challenged the
+  test's premise).** What is solid: Pyron's row 0x11 IS unported (static, from
+  the manifests and the ROM), and ours-vs-native with attacker AND victim both
+  held fixed differs while the Demitri control is identical. What is NOT
+  solid is that the capture block CAUSES what is on screen:
+  * **The victim's POSE RECORD also differs**, and the positioner cannot do
+    that — it writes only `+0x10/+0x14`. Measured, victim pose-record indices
+    through the hold: Demitri control ours `[6,5,2,14,23,13]` == native
+    `[6,5,2,14,23,13]`; **Pyron ours `[6,5,2]` vs native
+    `[2,1,0,3,11,10,29]`**. ~~So a second mechanism is in play and it may be
+    the dominant visible effect.~~ **RETRACTED 14z-142, on byte-exact static
+    evidence: there is ONE mechanism.** The capture positioner at
+    `PRG:0x028072` is a single straight-line stream out of one `A0` — it
+    writes the victim's POSITION, then reads the FACING from `(a0)+`, then
+    `move.w (a0),d0` (the POSE INDEX) and `bra.w $27fa0` into the installer.
+    So the same keyframe stream supplies position, facing and pose; an
+    attacker whose capture-keyframe block is wrong produces all three wrong
+    at once. The positioner does not write `$1c(a4)` itself — it chooses what
+    the installer writes there, one instruction before branching into it.
+    `docs/game/engine_internals.md` "THE CAPTURE-POSE INSTALLER".
+  * **The obvious big hypothesis is REFUTED**: our Pyron is NOT running
+    Demitri's throw. His attacker records are his own — 12 distinct, span
+    `0x288`, against native's 12 distinct, span `0x288` (relocated, same
+    structure); Demitri's throw walks 8 records, span `0x2D8`.
+  **~~THE NEXT MEASUREMENT~~ ANSWERED 14z-142, and the answer was already in
+  the tree — [VSP-155] applied to myself, late.** The question was whether our
+  Pyron requests different pose ids or the same ids through a different
+  SIBLING TABLE. **It cannot be the sibling table:** `engine_internals.md`
+  measured at 14z-98/99 that **`PRG:0x27FAA` is never executed** — 0 probe
+  hits against 904 at `PRG:0x27FA0`, the live entry, which HARDCODES
+  `moveq #$0,d1 ; movea.l #$bcffa,a0` (always `anim_index_c`). A 14z-142
+  probe independently reproduced the zero on both `vsavj` and `vsav2`'s twin
+  `0x271FE`. So there is one sibling in play, always, and `d0` is the only
+  free variable — and `d0` comes from the attacker's own keyframe stream (the
+  retraction above). **Row 0x11 is therefore the whole story, not a part of
+  it.**
+  **THE PORT RECOMMENDATION IS REINSTATED** on that ground: the `[[data_port]]`
+  row described above, one freeze. What is still owed is the IN-EMULATOR
+  confirmation, and the honest reason it is not here: a probe A/B at
+  `0x27FA0` across the two builds does not produce comparable legs — the
+  native leg fired 38 times in the hold but took an `INPUT-VIOLATION` at frame
+  3015 (debugger stops delay input application) and the ours leg produced no
+  hits at all. That is [VSP-129] as documented. The confirming measurement
+  needs a probe-free instrument — the gate's own `DUMPS` rig extended to read
+  the victim's `+0x1C` node pointer, not a breakpoint.
+  **A LEAD RECORDED, NOT A DEFECT:** two per-character pose-id LUTs
+  (`PRG:0x373CA`, `PRG:0x3A5EA`; vs2 `0x37842`, `0x3AD6A`) are indexed by the
+  VICTIM's id and vsavj ALIASES their variant halves where vs2 does not
+  (Pyron-as-victim: vsavj `0x2D` vs vs2 `0x32`). Neither is named by any
+  manifest, doc or gate. **But both are reached only through the dead
+  `0x27FAA` entry**, so they are off the live path and are a curiosity until
+  something is shown to reach them.
+  **NO PORT RECOMMENDATION UNTIL THAT IS ANSWERED** — porting row 0x11 on the
+  strength of a position measurement, while an unexplained pose difference
+  sits beside it, would be fixing the half I happened to measure. Original
+  entry — a throw/capture surface, so [VSP-10] (found 14z-130 while folding in the
+  `gap_be27a` correction; NOT a regression, this is the state as shipped since
+  the #104 work).** The capture-pose installer resolves the ATTACKER's keyframe
+  block through `PRG:0x0BE27A[attacker id]`. Every legacy attacker row
+  (`0x00-0x0F`, `0x0B`, `0x18`) is ported, and so are Donovan's `0x13`
+  (`throw_victim_keyframes`) and Huitzil's `0x10` (`grab_hold_keyframes`).
+  **Pyron's `0x11` is not**: vsavj aliases it to `0x00094954` = DEMITRI's
+  block, so when PYRON throws, the capture poses are Demitri's. donovan.toml's
+  own comment records it as "the recorded Pyron-as-attacker observation".
+  **HOW IT SURFACED:** correcting the bank-map row made the generic
+  per-character repoint want to write `0x0BE2BE <- 0x004af226`, i.e. to point
+  the row at Pyron's own vs2 block (`vs2 0x000C7F98`, inside his extracted
+  `hitbox` region). That write is SUPPRESSED in the shipped build — the table
+  is hand-owned and the freeze had to be byte-neutral — but it is exactly the
+  fix, and the generator would have made it silently.
+  **WHAT IS AND IS NOT KNOWN.** Known: the source block exists in vs2 and
+  vhunt2 with the uniform `0x76E` sibling delta, it lies inside a region the
+  build already extracts and places, and the mechanism to repoint the row is
+  the same `slot_ptr_table` one the other 17 rows use. NOT known: whether
+  Pyron's throws actually LOOK wrong with Demitri's capture poses — nobody has
+  compared them, and the #104 report named Donovan and Phobos precisely
+  because Pyron's fold was not noticed. So this is a defect by construction,
+  not by observation.
+  **OPTIONS:** (a) port it, as a `capture_kf_pyron`-style row with an `orc`
+  oracle and a `dst_old_head` — mechanically identical to the fifteen legacy
+  rows, one freeze; (b) leave it, and record that Pyron borrows Demitri's
+  capture poses as accepted. **RECOMMENDATION: measure before deciding** —
+  a hand-played or scripted Pyron throw beside a native vs2 Pyron throw
+  ([VSP-123] makes the native leg reachable with an ordinary poke), which
+  turns "a row is unported" into "here is what it looks like". Half a session,
+  and it is the cheap half of (a).
+  **-> (a) EXECUTED 14z-143.** The measurement recommended here was done at
+  14z-131/142; the port itself cost one manifest row, two rebuilds and three
+  gate moves (`test_tenant_loop` op counts, `test_capture_kf_ownership`
+  frozen sets, `audit_pyron_capture_block` EXPECT_MATCH).
+
+*(Cleaned 14z-109, maintainer-directed, and again 14z-134: resolved and
+no-longer-shaping entries moved VERBATIM to `DECISIONS_HISTORY.md` — grep there by topic.
+Lifecycle: rulings are still marked DECIDED in place here first; they move to
+the archive once they stop shaping active work.)*
+
+
 ## Rulings from the pre-pending "Decision(s) made" sections (2026-07-31 .. 2026-08-06)
 
 

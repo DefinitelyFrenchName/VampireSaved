@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-330 entries (41 game / 93 platform / 196 project), counted from the buckets at generation.
+335 entries (41 game / 98 platform / 196 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 41 entries
 
@@ -66,7 +66,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - THE BOOT NAME SCREEN'S DISPLAY SCRIPT TAKES AN EVEN COLUMN — an odd one is a 68k ADDRESS ERROR that soft-boots the machine (paid: 14z-127)
 - THE ENGINE CLAMPS THE FIGHTERS TO 336 px APART — a wider position poke is pulled back the same frame, and a "whiff" leg for a travelling move does not exist (paid: 14z-146)
 
-## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 93 entries
+## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 98 entries
 
 - A 1-BYTE MEMORY TAP MISSES WORD ACCESSES ON THIS 16-BIT BUS — and reads as a clean, meaningless zero (paid: 14z-126b)
 - CPS-2 ROM file byte order is NOT 68k logical order (paid: 2026-07-25, ~1h)
@@ -161,6 +161,11 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - FBNeo `-hdump`'s specification buffer is 8,192 characters — entries past ~430 frames are DROPPED SILENTLY (paid: 14z-133b)
 - `run_replay_fbneo.sh` with a RELATIVE sandbox argument writes NO log — 0 frames, silently (paid: 14z-133b)
 - A Lua space read through a MAME read-watchpoint range IS a watched read — `DUMPS` logs a hit at dump-frame+1 with the CPU's incidental PC (paid: 14z-145)
+- THE HOST OS OWNS `$OS`, AND A SHELL ASSIGNMENT TO IT REACHES EVERY BUILD SYSTEM (paid: 2026-09-12, one FBNeo link failure and a MAME misconfiguration that had not happened yet)
+- MSYS AND A NATIVE WINDOWS PROGRAM DO NOT SHARE A FILESYSTEM NAMESPACE — and the error is always "does not exist" (paid: 2026-09-12, three times in one session)
+- MSYS2 SPELLS SDL3 LOWERCASE AND SDL2 CAPITALISED, AND ONE OF THEM IS NOT NEEDED AT ALL (paid: 2026-09-12, the first MSYS2 run, on the first command)
+- MAME'S OSD IS A DIFFERENT ONE PER PLATFORM, so the prerequisite list is too (paid: 2026-09-12, a Linux build dead on a `fontconfig.pc` nothing had asked for)
+- WSL2 GIVES THE VM ALL THE HOST'S CORES AND HALF ITS RAM — a `-j$(nproc)` build then thrashes, and a thrashing build looks busy (paid: 2026-09-12, MAME ~10x slower under WSL2 than native on the same machine)
 
 ## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 196 entries
 

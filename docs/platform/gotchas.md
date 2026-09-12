@@ -2319,3 +2319,103 @@ bytes INSIDE the window the reducer already discards (boot, before the pokes),
 and classify hits by the READER's PC before judging registers — a foreign PC's
 D0 is not an offset. (The watchpoint's reported PC is the POST-instruction one:
 `0x02761E` for the access at `0x02761A`.)
+
+## THE HOST OS OWNS `$OS`, AND A SHELL ASSIGNMENT TO IT REACHES EVERY BUILD SYSTEM (paid: 2026-09-12, one FBNeo link failure and a MAME misconfiguration that had not happened yet)
+
+`OS` is an EXPORTED environment variable on Windows, holding `Windows_NT`. In
+a POSIX shell, assigning to a name that is ALREADY exported keeps the export
+attribute, so a helper script's own `OS=windows` silently REPLACES it in the
+environment of every child. Both emulator build systems key on that exact
+value:
+
+    emu/fbneo/makefile.sdl2   ifeq ($(OS),Windows_NT) -> WINDOWS=1
+    emu/mame/makefile         ifeq ($(OS),Windows_NT) -> OS := windows
+
+FBNeo therefore took its `else` arm and built AS IF FOR LINUX. The visible
+failure was at the link — `cannot find -lGL`, the X11 name, where Windows
+wants `-lopengl32` — but every object had also been compiled without
+`-DSDL_WINDOWS` and the Windows link rule never ran, so a re-link could not
+have saved it. MAME had not been reached; its `else` arm sets `GENIEOS=linux`
+and would have configured a Linux build on a Windows host.
+
+**Demonstrate it rather than argue about it:**
+`sh -c 'OS=windows; env | grep ^OS='` prints `OS=windows` when OS was
+exported beforehand.
+
+**The rule:** a short, obvious variable name is one somebody else already
+owns. Ours is `HOSTOS` now. Same family as the `CONTROL` collision of
+14z-147.
+
+## MSYS AND A NATIVE WINDOWS PROGRAM DO NOT SHARE A FILESYSTEM NAMESPACE — and the error is always "does not exist" (paid: 2026-09-12, three times in one session)
+
+On MSYS2 the shell, `ldd`, `objdump` and their friends live in MSYS's
+namespace — `/home/you/…`, `/mingw64/bin/…`, `/c/WINDOWS/…`. MAME, FBNeo and
+the `mingw-w64-x86_64-python` the recipe installs are NATIVE WINDOWS programs
+that read `/mingw64/bin/x.dll` as the CURRENT DRIVE's `\mingw64\bin\x.dll`,
+find nothing, and report the file as absent while it sits there.
+
+It bites wherever a path crosses the boundary: a library path `ldd` answers
+with, `-rompath`, `-autoboot_script`, MAME's sandbox directories, and the
+environment variables the Lua INSIDE MAME opens by name (that Lua is native
+too). It also bites SYMLINKS: an `ln -s` is an MSYS construct a native program
+cannot follow, so a staged `roms/` directory of links reads as empty.
+
+**The translator is `cygpath -w`** — MSYS2's own answer, so it cannot disagree
+with the MSYS tool that produced the path. One copy lives at
+`tests/lib/native_path.sh` (`native_path`, `native_pathlist`), applied at the
+single `exec` in `tools/run_mame.sh`; off Windows it returns its argument
+untouched, which is what makes the change inert on hosts where the instrument
+already worked ([CPE-24]).
+
+## MSYS2 SPELLS SDL3 LOWERCASE AND SDL2 CAPITALISED, AND ONE OF THEM IS NOT NEEDED AT ALL (paid: 2026-09-12, the first MSYS2 run, on the first command)
+
+`mingw-w64-x86_64-sdl3` (3.4.16) beside `mingw-w64-x86_64-SDL2` (2.32.10).
+`SDL3` capitalised is `error: target not found`, and "correcting" SDL2 to
+lowercase fails the same way. Neither is a typo; it is MSYS2's own naming.
+
+And on Windows MAME needs no SDL at all — see the OSD gotcha below. The SDL2
+packages are FBNeo's.
+
+## MAME'S OSD IS A DIFFERENT ONE PER PLATFORM, so the prerequisite list is too (paid: 2026-09-12, a Linux build dead on a `fontconfig.pc` nothing had asked for)
+
+From `emu/mame/makefile`, "specify OSD layer":
+
+| `TARGETOS` | OSD | needs |
+|---|---|---|
+| `linux` | `sdl` | SDL2, **SDL2_ttf**, **fontconfig** (`scripts/src/osd/sdl.lua` links the first and asks pkg-config for the second) |
+| `windows` | `windows` | nothing from SDL — the native OSD |
+| `macosx` | `sdl3` | SDL3 |
+
+This project built on macOS for its whole life, so the macOS answer had been
+written down as MAME's answer in five places, including a guide that sent
+Linux readers to CLONE AND COMPILE SDL3 FROM SOURCE for a library that build
+never opens.
+
+**And Linux is the one platform where MAME defaults its Qt5 debugger ON**
+(`scripts/src/osd/modules.lua`), so a plain build stops on a missing `moc`.
+The obvious fix — installing `qtbase5-dev` — is the wrong one: it LINKS Qt5
+into a binary that then has to ship it. `tools/setup_mame.sh` passes
+`USE_QTDEBUG=0` there instead, which is already the default on the other two
+platforms, so the three binaries stay the same instrument.
+
+## WSL2 GIVES THE VM ALL THE HOST'S CORES AND HALF ITS RAM — a `-j$(nproc)` build then thrashes, and a thrashing build looks busy (paid: 2026-09-12, MAME ~10x slower under WSL2 than native on the same machine)
+
+Microsoft's documented `.wslconfig` defaults: `processors` = "the same number
+of logical processors on Windows", `memory` = "50% of total memory on
+Windows", `swap` = "25% of memory size". So a 32 GB / 24-thread host gives the
+VM 24 processors and 16 GB, and a build defaulting to one job per core runs 24
+compilers at 0.6 GB each. MAME's larger translation units do not fit; the
+machine pages, the CPU pins, and the wall clock goes 10x. **A pinned CPU is
+what thrashing looks like, not what progress looks like.** FBNeo was
+unaffected on the same host — smaller translation units.
+
+**Confirm in one command:** `vmstat 1 5`, the `si`/`so` columns. Sustained
+non-zero is paging (measured: 1-2 MB/s). `/proc/pressure/memory` says the same
+thing if the kernel has pressure accounting — `avg10/avg60/avg300` are TIME
+WINDOWS and each number is a PERCENTAGE of that window stalled; `full` in
+double digits is a thrashing machine.
+
+**Levers:** fewer jobs (`JOBS=8` for `tools/build_release_emulators.sh`), or
+raise the VM (`[wsl2] memory=24GB swap=8GB` in `%UserProfile%\.wslconfig`,
+then `wsl --shutdown`). A dedicated Linux host has neither problem: `nproc` is
+honest there.
