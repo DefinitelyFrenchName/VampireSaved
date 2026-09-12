@@ -121,6 +121,16 @@ different OSD per platform (`emu/mame/makefile`, "specify OSD layer"):
 pkg-config for `fontconfig`; miss either and the build dies well in, on a
 link error or on `Package fontconfig was not found`.
 
+**And NO Qt packages, despite what the build will ask for if you let it.**
+Linux is the one platform where MAME defaults its Qt5 debugger ON
+(`scripts/src/osd/modules.lua`), so a plain build stops on a missing `moc`
+and the obvious fix is to `apt install qtbase5-dev`. Do not: it would LINK
+Qt5 into a binary we then have to ship, tens of megabytes of GUI for a
+debugger this project never opens — every gate drives `-debug -debugger none`
+and Lua. `tools/setup_mame.sh` passes `USE_QTDEBUG=0` on Linux, which is
+already the default on macOS and Windows, so the three binaries stay the same
+instrument. Measured 2026-09-12, the first Linux build.
+
 **This page used to send you to build SDL3 from source when Ubuntu had no
 `libsdl3-dev`.** That was the macOS requirement written down as everyone's:
 on Linux it is not needed at all, and the detour was pure cost. Confirm what

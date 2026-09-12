@@ -258,7 +258,21 @@ cd "$MIRROR"
 # REGENIE=1 every time: the patch adds a driver to src/mame/mame.lst, and the
 # generated drivlist/project files must be rebuilt from it or the new entry is
 # silently absent from the binary. Cheap next to the compile.
-make SUBTARGET=cps2 SOURCES=src/mame/capcom/cps2.cpp NOWERROR=1 REGENIE=1 -j"$JOBS"
+# USE_QTDEBUG=0 ON LINUX, and the default everywhere else (measured from the
+# pinned source 2026-09-12, `scripts/src/osd/modules.lua` "if not
+# _OPTIONS["USE_QTDEBUG"]"): MAME turns the Qt5 debugger ON for linux and OFF
+# for windows/macosx/solaris/haiku/asmjs/android. On a Linux host the build
+# therefore wants Qt's `moc` and, having found it, would LINK Qt5 into a
+# binary we then have to ship — tens of megabytes of GUI for a debugger this
+# project never opens (every gate drives `-debug -debugger none` and Lua).
+# Turning it off also makes the three platforms' binaries the same instrument,
+# which matters when they are compared. NOT passed on the other hosts: it is
+# already their default, and a flag in a record that changed nothing is a
+# recipe line nobody can verify.
+QTFLAG=""
+if [ "$(uname -s)" = Linux ]; then QTFLAG="USE_QTDEBUG=0"; fi
+# shellcheck disable=SC2086  # QTFLAG is one word or empty, by construction
+make SUBTARGET=cps2 SOURCES=src/mame/capcom/cps2.cpp NOWERROR=1 REGENIE=1 $QTFLAG -j"$JOBS"
 
 # SUBTARGET=cps2 names the binary after the subtarget, not "mame<sub>".
 BIN="$MIRROR/cps2"

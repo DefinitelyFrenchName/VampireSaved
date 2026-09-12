@@ -234,7 +234,11 @@ mame)
     rm -rf "$OUT"; mkdir -p "$OUT"; cp "$BIN" "$OUT/$EXENAME"
     python3 "$REPO/tools/$BUNDLER" "$OUT" "$OUT/$EXENAME"
     UPSTREAM="https://github.com/mamedev/mame"
-    RECIPE="git clone $UPSTREAM mame && cd mame && git checkout $PIN && git apply 0002-cps2-wide-v1.patch && make SUBTARGET=cps2 SOURCES=src/mame/capcom/cps2.cpp NOWERROR=1 REGENIE=1 -j$JOBS"
+    # Linux is the one host where MAME defaults the Qt5 debugger ON, so it is the
+    # one host whose recipe carries the switch that turns it off (tools/setup_mame.sh).
+    QTNOTE=""
+    if [ "$HOSTOS" = linux ]; then QTNOTE=" USE_QTDEBUG=0"; fi
+    RECIPE="git clone $UPSTREAM mame && cd mame && git checkout $PIN && git apply 0002-cps2-wide-v1.patch && make SUBTARGET=cps2 SOURCES=src/mame/capcom/cps2.cpp NOWERROR=1 REGENIE=1$QTNOTE -j$JOBS"
     EXE="$EXENAME"
     TITLE="cps2 — MAME 0.288, CPS-2 subtarget, carrying the CPS-2 WIDE v1 driver patch, prebuilt for $OSARCH"
     RUN='`./'"cps2$EXESUF"' vsavjw -rompath "/path/to/your/built/set;/path/to/your/dumps"` (the built vsavjw.zip and the pristine vsav.zip must both be on the rompath). `./'"cps2$EXESUF"' -verifyroms vsavjw -rompath ...` says `is bad` BY DESIGN and must list exactly the members inside vsavjw.zip as INCORRECT CHECKSUM (stock CRCs for the members the port rewrites, sentinel CRCs for the new ones) — a NOT FOUND line is the real problem. MAME'"'"'s own UI (Tab) maps controls.'
