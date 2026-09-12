@@ -476,8 +476,8 @@ grep -q "jtframe_ram1_7slots" "$SRC/modules/jtframe/hdl/sdram/jtframe_sdram64.ya
 # from it to SDRAM is three bits wide the whole way. A width that stayed at 2
 # anywhere in between would silently drop bank bit 2 and the core would fetch
 # vanilla art for every tenant sprite — a picture bug, not a build error.
-OS="$HDL/jtcps2_obj_scan.v"
-grep -q "st3_bank <= promoted_bank;" "$OS" \
+OBJSCAN_V="$HDL/jtcps2_obj_scan.v"
+grep -q "st3_bank <= promoted_bank;" "$OBJSCAN_V" \
     && ok "8a the obj scanner takes its bank from jtcps2w_obj_bank" \
     || bad "8a jtcps2_obj_scan does not use the gated promote module"
 # THE ORDER IS THE WHOLE RULE. The promote may only be read AFTER the
@@ -485,9 +485,9 @@ grep -q "st3_bank <= promoted_bank;" "$OS" \
 # reference core — if it moved, bit 15 could be consumed as a bank bit and the
 # list would end at the first tenant sprite (cps2_wide.md Correction A2).
 term="if( table_y\[15\] || table_attr\[15:8\]==8'hff || &table_addr ) begin"
-if grep -q "$term" "$OS" && grep -q "$term" "$SRC/cores/cps2/hdl/jtcps2_obj_scan.v"; then
-    a="$(grep -n "$term" "$OS" | cut -d: -f1)"
-    b="$(grep -n "st3_bank <= promoted_bank;" "$OS" | cut -d: -f1)"
+if grep -q "$term" "$OBJSCAN_V" && grep -q "$term" "$SRC/cores/cps2/hdl/jtcps2_obj_scan.v"; then
+    a="$(grep -n "$term" "$OBJSCAN_V" | cut -d: -f1)"
+    b="$(grep -n "st3_bank <= promoted_bank;" "$OBJSCAN_V" | cut -d: -f1)"
     [ "$b" -gt "$a" ] \
         && ok "8b the terminator test is the reference core's, VERBATIM, and the promote is read after it (line $a < $b)" \
         || bad "8b the promote is read at line $b, BEFORE the terminator test at $a"

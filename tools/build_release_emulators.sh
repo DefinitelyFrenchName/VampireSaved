@@ -54,10 +54,22 @@ JOBS="${JOBS:-$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)}"
 # ---- THIS HOST -------------------------------------------------------------
 # One block resolves everything that differs per OS, so the build and record
 # steps below read variables instead of branching in five places.
+#
+# THE VARIABLE IS `HOSTOS` AND MUST NEVER GO BACK TO `OS` (2026-09-12, the
+# maintainer's first real MSYS2 run). `OS` is an EXPORTED Windows environment
+# variable holding `Windows_NT`, and a POSIX assignment to an already-exported
+# name KEEPS the export attribute — so `OS=windows` here silently replaced it
+# in the environment every child inherits. Both build systems key on that exact
+# value: FBNeo's `makefile.sdl2` and MAME's `makefile` each test
+# `ifeq ($(OS),Windows_NT)`. FBNeo therefore built as if for Linux and died at
+# the link with `cannot find -lGL` (the X11 name; Windows wants -lopengl32),
+# having also compiled every object without -DSDL_WINDOWS; MAME would have
+# configured GENIEOS=linux and been worse. Same family as the `CONTROL` env
+# collision of 14z-147: a short, obvious name is one somebody else already owns.
 EXESUF=""; SIGNED=""
 case "$(uname -s)" in
 Darwin)
-    OS=macos
+    HOSTOS=macos
     BUNDLER=bundle_dylibs.py
     HOST="macOS $(sw_vers -productVersion) ($(uname -m)), $(clang --version | head -1)"
     SDL3LIB=libSDL3.dylib
@@ -65,14 +77,14 @@ Darwin)
     FIRSTRUN="gatekeeper the binary is ad-hoc signed, NOT notarized: macOS quarantines a downloaded copy and refuses it on first launch. Either right-click > Open once on the executable, or run \`xattr -dr com.apple.quarantine .\` inside this directory."
     ;;
 Linux)
-    OS=linux
+    HOSTOS=linux
     BUNDLER=bundle_elf_libs.py
     HOST="$( (. /etc/os-release 2>/dev/null && echo "$PRETTY_NAME") || uname -sr ) ($(uname -m)), $( (cc --version 2>/dev/null || gcc --version) | head -1 )"
     SDL3LIB=libSDL3.so.0
     FIRSTRUN="first run  no signature and no quarantine on Linux: \`chmod +x\` the executable if your unzip dropped the bit, then run it from this directory. The sha256 rows above are the integrity check."
     ;;
 MINGW*|MSYS*|CYGWIN*)
-    OS=windows
+    HOSTOS=windows
     BUNDLER=bundle_win_dlls.py
     EXESUF=".exe"
     HOST="Windows via ${MSYSTEM:-MSYS2} ($(uname -m)), $( (cc --version 2>/dev/null || gcc --version) | head -1 )"
@@ -88,7 +100,7 @@ arm64|aarch64) ARCH=arm64 ;;
 x86_64|amd64)  ARCH=x86_64 ;;
 *) echo "unknown arch $(uname -m)" >&2; exit 2 ;;
 esac
-OSARCH="$OS-$ARCH"
+OSARCH="$HOSTOS-$ARCH"
 case "$KIND" in
 fbneo) EXENAME="fbneo$EXESUF" ;;
 mame)  EXENAME="cps2$EXESUF" ;;
@@ -114,7 +126,7 @@ sha1_of() {
 # the macOS LC_BUILD_VERSION minos line on every platform.
 requires_line() {  # requires_line <dir> <exe> <libs description>
     _d="$1"; _e="$2"; _libs="$3"
-    case "$OS" in
+    case "$HOSTOS" in
     macos)
         _min="$(otool -l "$_d/$_e" | awk '/LC_BUILD_VERSION/{f=1} f && /minos/{print $2; exit}')"
         echo "requires   macOS $_min or later, $ARCH. Nothing to install: the libraries the recipe links from Homebrew ($_libs) are bundled here with @loader_path install names,$SIGNED." ;;
