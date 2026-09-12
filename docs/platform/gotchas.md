@@ -383,9 +383,15 @@ on. Symptom is far from the cause: `make: *** No rule to make target
 RULE, because the pattern rule's `complay.py` prerequisite could not be
 found. Anchor mirror excludes: `--exclude '/build/'`.
 
-## MAME 0.288's OSD is SDL3 and it is found ONLY through pkg-config
+## MAME's OSD is a DIFFERENT ONE PER PLATFORM, and it is found ONLY through pkg-config
 (paid: same session, ~8 min of wasted compile)
-**[CPE-23]** **[MFI-23]** `scripts/src/osd/sdl3.lua` decides between framework and library linkage
+**[CPE-23]** **[MFI-23]** **WHICH OSD, measured from the pinned source** (`makefile`, "specify OSD
+layer"): `TARGETOS=macosx` -> `sdl3`, `linux` -> `sdl` (SDL2 + SDL2_ttf +
+fontconfig, `scripts/src/osd/sdl.lua`), `windows` -> `windows`, the native OSD
+needing no SDL at all. The macOS requirement was written down as everyone's
+until 2026-09-12, when a Linux build died on a `fontconfig.pc` nothing had
+asked for and a WSL2 page was sending readers to compile SDL3 from source for
+nothing. ON macOS: `scripts/src/osd/sdl3.lua` decides between framework and library linkage
 by asking pkg-config. With pkg-config absent it silently picks framework
 linkage, and the build then dies **several minutes in** with
 `fatal error: 'SDL3/SDL.h' file not found`. Having the sdl3 library

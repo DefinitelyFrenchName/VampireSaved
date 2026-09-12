@@ -338,10 +338,16 @@ into `~/.claude/skills/mame-fbneo-instruments/`. Nothing in it depends on the or
 
 **[MFI-23]** **The OSD is found ONLY through pkg-config** (`REGENIE=1` after installing it — detection is baked into generated project files, and the failure lands minutes in); **a `SOURCES=`-filtered build silently OMITS any driver missing from the driver list** — assert `-listfull <driver>` before trusting anything else, and the binary is named after the subtarget; **the driver list holds no inline comments** — add the bare name.
 
-> **Incident** (`docs/platform/gotchas.md` › *MAME 0.288's OSD is SDL3 and it is found ONLY through pkg-config*):
+> **Incident** (`docs/platform/gotchas.md` › *MAME's OSD is a DIFFERENT ONE PER PLATFORM, and it is found ONLY through pkg-config*):
 >
 > (paid: same session, ~8 min of wasted compile)
-> `scripts/src/osd/sdl3.lua` decides between framework and library linkage
+> **WHICH OSD, measured from the pinned source** (`makefile`, "specify OSD
+> layer"): `TARGETOS=macosx` -> `sdl3`, `linux` -> `sdl` (SDL2 + SDL2_ttf +
+> fontconfig, `scripts/src/osd/sdl.lua`), `windows` -> `windows`, the native OSD
+> needing no SDL at all. The macOS requirement was written down as everyone's
+> until 2026-09-12, when a Linux build died on a `fontconfig.pc` nothing had
+> asked for and a WSL2 page was sending readers to compile SDL3 from source for
+> nothing. ON macOS: `scripts/src/osd/sdl3.lua` decides between framework and library linkage
 > by asking pkg-config. With pkg-config absent it silently picks framework
 > linkage, and the build then dies **several minutes in** with
 > `fatal error: 'SDL3/SDL.h' file not found`. Having the sdl3 library

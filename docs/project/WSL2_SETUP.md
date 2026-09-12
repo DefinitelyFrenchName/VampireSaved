@@ -95,42 +95,40 @@ in Explorer.
 
 ```bash
 sudo apt update
-sudo apt install -y build-essential python3 git rsync patch pkgconf \
-                    libsdl2-dev libsdl2-image-dev perl
+sudo apt install -y build-essential python3 git rsync patch pkgconf perl \
+                    libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libfontconfig-dev
 ```
 
 What each is for: `build-essential` = compiler + make; `python3` = build
 scripts and all our analysis tools; `rsync` = the space-free build mirror;
-`patch` = applying our emulator patches; `pkgconf` = **how MAME finds
-SDL3** (without it the build dies minutes in on `'SDL3/SDL.h' file not
-found`); the `libsdl2-*` and `perl` packages are FBNeo's requirements.
+`patch` = applying our emulator patches; `pkgconf` = how both recipes find
+their libraries. `libsdl2-dev` + `libsdl2-image-dev` + `perl` are FBNeo's;
+`libsdl2-dev` + `libsdl2-ttf-dev` + `libfontconfig-dev` are MAME's.
 
-### SDL3 — check before assuming
+### Which SDL MAME wants here — SDL2, and NOT SDL3
 
-MAME 0.288's frontend is SDL**3**, which is newer than SDL2 and may not be
-packaged on older Ubuntu releases:
+**Corrected 2026-09-12, measured from the pinned source after the
+maintainer's Linux build died on a missing `fontconfig.pc`.** MAME picks a
+different OSD per platform (`emu/mame/makefile`, "specify OSD layer"):
 
-```bash
-apt-cache policy libsdl3-dev
-```
+| `TARGETOS` | OSD | what it needs |
+|---|---|---|
+| `linux` | `sdl` | **SDL2**, **SDL2_ttf**, **fontconfig** |
+| `windows` | `windows` | nothing from SDL — the native OSD |
+| `macosx` | `sdl3` | SDL3 |
 
-- If it shows a candidate version: `sudo apt install -y libsdl3-dev`
-- If it says `Candidate: (none)`, build SDL3 from source:
+`scripts/src/osd/sdl.lua` is where the Linux OSD links `SDL2_ttf` and asks
+pkg-config for `fontconfig`; miss either and the build dies well in, on a
+link error or on `Package fontconfig was not found`.
 
-```bash
-sudo apt install -y cmake ninja-build
-git clone --depth 1 https://github.com/libsdl-org/SDL.git ~/src-sdl3
-cmake -S ~/src-sdl3 -B ~/src-sdl3/build -G Ninja -DCMAKE_BUILD_TYPE=Release
-cmake --build ~/src-sdl3/build
-sudo cmake --install ~/src-sdl3/build
-sudo ldconfig
-```
-
-Either way, confirm pkg-config can see it — this is the exact check MAME
-performs:
+**This page used to send you to build SDL3 from source when Ubuntu had no
+`libsdl3-dev`.** That was the macOS requirement written down as everyone's:
+on Linux it is not needed at all, and the detour was pure cost. Confirm what
+the build will actually look for:
 
 ```bash
-pkg-config --modversion sdl3      # must print a version, not an error
+pkg-config --modversion fontconfig   # must print a version, not an error
+sdl2-config --version
 ```
 
 ## 4. Get the repository

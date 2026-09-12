@@ -99,18 +99,46 @@ have perl && ok "perl (FBNeo's build scripts)" || bad "perl"
 # ---- the libraries the two recipes link ------------------------------------
 say ""
 say "-- libraries --"
+# MAME'S OSD IS A DIFFERENT ONE PER PLATFORM, and this check demanded the macOS
+# one everywhere until 2026-09-12, when the maintainer's Linux build died on a
+# missing `fontconfig.pc` nothing had asked for. READ FROM THE PINNED SOURCE
+# (`emu/mame/makefile` "specify OSD layer", `scripts/src/osd/sdl.lua`):
+#   windows -> OSD `windows`  the native OSD: NO SDL at all
+#   linux   -> OSD `sdl`      SDL2 + SDL2_ttf + fontconfig (sdl.lua links
+#                             SDL2_ttf and asks pkg-config for fontconfig)
+#   macosx  -> OSD `sdl3`     SDL3
+# So SDL3 is a macOS requirement, not MAME's requirement, and demanding it on
+# the other two hosts would refuse a host that can build perfectly well.
 if have pkg-config || have pkgconf; then
     PKG="$(command -v pkg-config || command -v pkgconf)"
     ok "pkg-config ($PKG)"
-    if "$PKG" --exists sdl3 2>/dev/null; then
-        ok "SDL3 $("$PKG" --modversion sdl3 2>/dev/null) — MAME 0.288's frontend"
-    else
-        bad "SDL3 (pkg-config cannot see it). MAME's OSD is SDL3 and finds it ONLY"
-        say  "          through pkg-config; without it the build dies minutes in on"
-        say  "          'SDL3/SDL.h' file not found."
-    fi
+    case "$ENV" in
+    macos)
+        if "$PKG" --exists sdl3 2>/dev/null; then
+            ok "SDL3 $("$PKG" --modversion sdl3 2>/dev/null) — MAME's OSD on macOS"
+        else
+            bad "SDL3 (pkg-config cannot see it). MAME's OSD on macOS is sdl3 and finds"
+            say  "          it ONLY through pkg-config; the build dies minutes in on"
+            say  "          'SDL3/SDL.h' file not found."
+        fi ;;
+    wsl2|linux)
+        if "$PKG" --exists fontconfig 2>/dev/null; then
+            ok "fontconfig $("$PKG" --modversion fontconfig 2>/dev/null) — MAME's sdl OSD links it"
+        else
+            bad "fontconfig (pkg-config cannot see fontconfig.pc). MAME's OSD on Linux"
+            say  "          is 'sdl' and asks pkg-config for it: sudo apt install -y libfontconfig-dev"
+        fi
+        if [ -f /usr/include/SDL2/SDL_ttf.h ] || "$PKG" --exists SDL2_ttf 2>/dev/null; then
+            ok "SDL2_ttf — MAME's sdl OSD links it on Linux"
+        else
+            bad "SDL2_ttf development files — MAME's sdl OSD links -lSDL2_ttf:"
+            say  "          sudo apt install -y libsdl2-ttf-dev"
+        fi ;;
+    msys2)
+        ok "MAME needs no SDL here — its Windows OSD is the native one (makefile: TARGETOS=windows -> OSD=windows)" ;;
+    esac
 else
-    bad "pkg-config / pkgconf — MAME finds SDL3 only through it"
+    bad "pkg-config / pkgconf — every recipe finds its libraries through it"
 fi
 if have sdl2-config; then
     ok "SDL2 $(sdl2-config --version 2>/dev/null) at $(sdl2-config --prefix 2>/dev/null) — FBNeo's frontend"
@@ -187,16 +215,16 @@ else
     wsl2|linux)
         say "  sudo apt update && sudo apt install -y build-essential python3 git rsync \\"
         say "       patch pkgconf zip unzip perl patchelf binutils coreutils \\"
-        say "       libsdl2-dev libsdl2-image-dev libsdl3-dev"
+        say "       libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libfontconfig-dev"
         say ""
-        say "  If 'libsdl3-dev' has no candidate on your Ubuntu, build SDL3 from source —"
-        say "  docs/project/WSL2_SETUP.md section 3 has the exact commands." ;;
+        say "  NO SDL3 on Linux: MAME's OSD here is 'sdl' (SDL2 + SDL2_ttf + fontconfig)."
+        say "  SDL3 is the macOS OSD only — measured from the pinned source 2026-09-12." ;;
     msys2)
         say "  pacman -S --needed git make patch rsync zip unzip perl coreutils \\"
         say "       mingw-w64-x86_64-gcc mingw-w64-x86_64-binutils mingw-w64-x86_64-python \\"
-        say "       mingw-w64-x86_64-pkgconf mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image \\"
-        say "       mingw-w64-x86_64-sdl3"
-        say "  (SDL3 is LOWERCASE in MSYS2 and SDL2 is not — do not 'fix' either to match the other.)"
+        say "       mingw-w64-x86_64-pkgconf mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image"
+        say "  (SDL2 is CAPITALISED in MSYS2. MAME needs no SDL here at all — its Windows"
+        say "   OSD is the native one; the SDL2 packages are FBNeo's.)"
         say ""
         say "  Run that from the MSYS2 MINGW64 shell, and re-open the shell afterwards." ;;
     esac

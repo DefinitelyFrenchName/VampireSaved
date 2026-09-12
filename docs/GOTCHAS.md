@@ -91,7 +91,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - FBNeo matches zip members by CRC — a mismatch loads 0xFF FILL and still prints "(OK)"
 - MAME's build system cannot handle a SPACE anywhere in the source path
 - rsync `--exclude 'build/'` also excludes `scripts/build/`
-- MAME 0.288's OSD is SDL3 and it is found ONLY through pkg-config
+- MAME's OSD is a DIFFERENT ONE PER PLATFORM, and it is found ONLY through pkg-config
 - A SOURCES-filtered MAME build silently omits drivers missing from mame.lst
 - `src/mame/mame.lst` contains no inline comments — do not add the first
 - MAME's "-video none" STILL creates a window that can take focus — and host keystrokes are injected into the EMULATED controls

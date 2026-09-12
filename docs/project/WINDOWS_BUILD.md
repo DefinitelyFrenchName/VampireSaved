@@ -57,18 +57,17 @@ open **"MSYS2 MINGW64"** from the Start menu — *not* "MSYS2 MSYS".
 pacman -Syu          # then re-open the window if it asks you to
 pacman -S --needed git make patch rsync zip unzip perl coreutils \
     mingw-w64-x86_64-gcc mingw-w64-x86_64-binutils mingw-w64-x86_64-python \
-    mingw-w64-x86_64-pkgconf mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image \
-    mingw-w64-x86_64-sdl3
+    mingw-w64-x86_64-pkgconf mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image
 ```
 
-**THE CASE IS NOT A TYPO AND IT IS NOT YOURS TO TIDY.** MSYS2 spells SDL3
-LOWERCASE and SDL2 CAPITALISED — `mingw-w64-x86_64-sdl3` beside
-`mingw-w64-x86_64-SDL2`. Writing `SDL3` gets `error: target not found`, and
-"correcting" SDL2 to lowercase gets the same. Measured on a real host
-2026-09-12, the first time anyone ran this file: it said `SDL3`, and that is
-what a package list written on a Mac with no MSYS2 to check against looks
-like. (`mingw-w64-sdl3` is the base package; the mingw64 environment's binary
-is `mingw-w64-x86_64-sdl3`, 3.4.16 at the time of writing.)
+**The SDL2 packages are FBNeo's, and MAME needs no SDL here at all** —
+its Windows OSD is the native one (`emu/mame/makefile`, "specify OSD layer":
+`TARGETOS=windows` selects `OSD=windows`, where Linux selects `sdl` and macOS
+`sdl3`). An earlier version of this list asked for `mingw-w64-x86_64-SDL3` and
+was wrong twice over: MSYS2 spells SDL3 lowercase (`SDL3` is `target not
+found`, measured on a real host 2026-09-12) and nothing on this track needs
+it. **SDL2 keeps its capitals** — lowercasing it to match anything fails the
+same way.
 
 **Track L — WSL2.** If WSL2 is not installed yet, `wsl --install` in
 PowerShell; `docs/project/WSL2_SETUP.md` sections 0-2 cover it for someone who
@@ -80,9 +79,11 @@ sudo apt update && sudo apt install -y build-essential python3 git rsync \
     libsdl2-dev libsdl2-image-dev libsdl3-dev
 ```
 
-If `libsdl3-dev` has no candidate on your Ubuntu release, build SDL3 from
-source — `WSL2_SETUP.md` section 3 has the exact commands. MAME 0.288's
-frontend is SDL3 and it is found **only** through pkg-config.
+MAME needs **no SDL3 here**: on Linux its OSD is `sdl` — SDL2, SDL2_ttf and
+fontconfig — and `libfontconfig-dev` plus `libsdl2-ttf-dev` are the two this
+list used to miss. SDL3 is the macOS OSD only (corrected 2026-09-12, measured
+from the pinned source; this page previously sent you to build SDL3 from
+source for nothing).
 
 ---
 

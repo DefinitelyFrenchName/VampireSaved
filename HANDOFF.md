@@ -202,8 +202,10 @@ Three things about the build that will bite otherwise (all in GOTCHAS):
 - it builds from an **rsync'd mirror under `~/.cache/vampire-saved/`**
   because MAME's GENie cannot handle the **space** in this repo's path,
   and a symlink does not help (`getcwd()` resolves through it);
-- prerequisites are `brew install sdl3 pkgconf` — MAME 0.288's OSD is SDL3
-  and it is found ONLY via pkg-config, otherwise the build dies minutes in;
+- prerequisites are `brew install sdl3 pkgconf` — MAME's OSD **on macOS** is
+  `sdl3` and is found ONLY via pkg-config, otherwise the build dies minutes in
+  (per platform: Linux takes the `sdl` OSD — SDL2 + SDL2_ttf + fontconfig — and
+  Windows the native one, needing no SDL; corrected 2026-09-12);
 - it is a `SOURCES=`-filtered CPS-2-only build (minutes, not hours), the
   binary is named `cps2`, and **a driver missing from `src/mame/mame.lst`
   is silently absent from it**.
