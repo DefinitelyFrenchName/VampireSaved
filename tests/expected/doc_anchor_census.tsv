@@ -26,7 +26,7 @@ CPE-19	docs/platform/gotchas.md	MAME palette RAM ($90C000) takes Lua pokes for R
 CPE-20	docs/platform/gotchas.md	Pre-seeded from the ROM-audit round (2026-07-25, before repo existed)	IN-LIST
 CPE-21	docs/platform/gotchas.md	`git submodule add` stages the DEFAULT BRANCH, not the tag you check out	IN-LIST
 CPE-22	docs/platform/gotchas.md	MAME's build system cannot handle a SPACE anywhere in the source path	IN-LIST
-CPE-23	docs/platform/gotchas.md	MAME 0.288's OSD is SDL3 and it is found ONLY through pkg-config	IN-LIST
+CPE-23	docs/platform/gotchas.md	MAME's OSD is a DIFFERENT ONE PER PLATFORM, and it is found ONLY through pkg-config	IN-LIST
 CPE-24	HANDOFF.md	MAME from source — the oracle follows the profile (B5, 2026-08-03)	IN-LIST
 CPE-25	docs/platform/gotchas.md	repo's working tree — and exits 0 (paid: 2026-08-03, B5)	IN-LIST
 CPE-26	docs/platform/gotchas.md	FBNeo fresh builds need `SKIPDEPEND=1` (paid: 2026-07-25)	IN-LIST
@@ -98,7 +98,7 @@ MFI-19	docs/platform/gotchas.md	MAME palette RAM ($90C000) takes Lua pokes for R
 MFI-20	docs/platform/gotchas.md	Pre-seeded from the ROM-audit round (2026-07-25, before repo existed)	IN-LIST
 MFI-21	docs/platform/gotchas.md	`git submodule add` stages the DEFAULT BRANCH, not the tag you check out	IN-LIST
 MFI-22	docs/platform/gotchas.md	MAME's build system cannot handle a SPACE anywhere in the source path	IN-LIST
-MFI-23	docs/platform/gotchas.md	MAME 0.288's OSD is SDL3 and it is found ONLY through pkg-config	IN-LIST
+MFI-23	docs/platform/gotchas.md	MAME's OSD is a DIFFERENT ONE PER PLATFORM, and it is found ONLY through pkg-config	IN-LIST
 MFI-24	HANDOFF.md	MAME from source — the oracle follows the profile (B5, 2026-08-03)	IN-LIST
 MFI-25	docs/platform/gotchas.md	repo's working tree — and exits 0 (paid: 2026-08-03, B5)	IN-LIST
 MFI-26	docs/platform/gotchas.md	FBNeo fresh builds need `SKIPDEPEND=1` (paid: 2026-07-25)	IN-LIST
