@@ -70,7 +70,21 @@ OSARCH="$OS-$ARCH"
 FB="$ROOT/fbneo/$OSARCH"; MM="$ROOT/mame/$OSARCH"
 [ -f "$FB/BINARY.txt" ] || { echo "SKIP: no $FB/BINARY.txt for this host (tools/build_release_emulators.sh fbneo)"; exit 0; }
 [ -f "$MM/BINARY.txt" ] || { echo "SKIP: no $MM/BINARY.txt for this host (tools/build_release_emulators.sh mame)"; exit 0; }
-[ -f "$MERGED/rompath/vsavjw.zip" ] || { echo "SKIP: $MERGED/rompath/vsavjw.zip missing"; exit 0; }
+# A SKIP THAT DOES NOT SAY WHAT TO DO IS A DEAD END (2026-09-12, the first
+# Windows session). The DEFAULT names a build directory, which exists only on a
+# host that runs the build pipeline; a release host has no such thing and gets
+# the romset from the published applier in about a minute. Name that route here,
+# because this line is where a reader finds out they need it.
+if [ ! -f "$MERGED/rompath/vsavjw.zip" ]; then
+    echo "SKIP: no romset at $MERGED/rompath/vsavjw.zip — the gate BOOTS the set on each binary."
+    echo "      This tree ships no ROM data, ever: build it from YOUR dumps with the published"
+    echo "      applier (pure Python, no build pipeline, about a minute), then point the gate at it:"
+    _rel="$(ls -d release/merged-m*/ 2>/dev/null | sort -V | tail -1)"; _rel="${_rel%/}"
+    echo "        mkdir -p build/fromrelease/rompath"
+    echo "        python3 ${_rel:-release/<name>}/fbneo/apply_release.py --romdir \"\$ROMDIR\" --out build/fromrelease/rompath"
+    echo "        ROMDIR=... MERGED=build/fromrelease tests/test_release_binaries.sh"
+    exit 0
+fi
 # the records are tracked, the files are RELEASE ASSETS (ruled 14z-149): a record with no file
 # beside it means this host has neither built nor fetched them — not measured, so SKIP (red
 # under --strict, which is right: a release host must have them)

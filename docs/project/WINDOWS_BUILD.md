@@ -196,8 +196,14 @@ measured either way.
 
 ## 5. The gate — this is what decides whether they ship
 
+**`MERGED=` is not optional and its default will not help you.** The gate
+boots the romset, and its default points at a build directory that exists only
+on a host running the build pipeline — which this one is not. Section 3's
+applier output is what you pass. Without it the gate SKIPs, and a skip asserts
+nothing (the gate now prints the three commands that fix it).
+
 ```bash
-ROMDIR=~/roms MERGED=build/fromrelease tests/test_release_binaries.sh
+MERGED=build/fromrelease tests/test_release_binaries.sh   # $ROMDIR from section 2
 ```
 
 It checks, for this host's `os-arch`:
