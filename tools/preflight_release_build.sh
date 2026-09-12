@@ -195,7 +195,8 @@ else
         say "  pacman -S --needed git make patch rsync zip unzip perl coreutils \\"
         say "       mingw-w64-x86_64-gcc mingw-w64-x86_64-binutils mingw-w64-x86_64-python \\"
         say "       mingw-w64-x86_64-pkgconf mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image \\"
-        say "       mingw-w64-x86_64-SDL3"
+        say "       mingw-w64-x86_64-sdl3"
+        say "  (SDL3 is LOWERCASE in MSYS2 and SDL2 is not — do not 'fix' either to match the other.)"
         say ""
         say "  Run that from the MSYS2 MINGW64 shell, and re-open the shell afterwards." ;;
     esac

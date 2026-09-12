@@ -289,12 +289,13 @@ the Linux and Windows binaries get made, on the machine that has that OS.
 sudo apt install -y patchelf zip     # patchelf rewrites RUNPATH; zip is for the upload step
 ```
 
-On Windows, work in an **MSYS2 MINGW64** shell (not the plain MSYS one) and
-install the toolchain the recipe needs:
-
-```bash
-pacman -S --needed git make zip mingw-w64-x86_64-{gcc,binutils,SDL2,SDL2_image,python,pkgconf}
-```
+On Windows, work in an **MSYS2 MINGW64** shell (not the plain MSYS one). The
+package list is `WINDOWS_BUILD.md` section 2 and is NOT copied here — two
+copies drift, and this one had already lost `sdl3` (MAME's frontend), which
+would have died minutes into its build on a pkg-config miss. Note when you
+read it that **MSYS2 spells SDL3 lowercase and SDL2 capitalised**
+(`mingw-w64-x86_64-sdl3`, `mingw-w64-x86_64-SDL2`); the capitalised SDL3 is
+`target not found`, measured on a real host 2026-09-12.
 
 **First, see what this host resolves — it builds nothing:**
 

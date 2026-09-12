@@ -58,8 +58,17 @@ pacman -Syu          # then re-open the window if it asks you to
 pacman -S --needed git make patch rsync zip unzip perl coreutils \
     mingw-w64-x86_64-gcc mingw-w64-x86_64-binutils mingw-w64-x86_64-python \
     mingw-w64-x86_64-pkgconf mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image \
-    mingw-w64-x86_64-SDL3
+    mingw-w64-x86_64-sdl3
 ```
+
+**THE CASE IS NOT A TYPO AND IT IS NOT YOURS TO TIDY.** MSYS2 spells SDL3
+LOWERCASE and SDL2 CAPITALISED — `mingw-w64-x86_64-sdl3` beside
+`mingw-w64-x86_64-SDL2`. Writing `SDL3` gets `error: target not found`, and
+"correcting" SDL2 to lowercase gets the same. Measured on a real host
+2026-09-12, the first time anyone ran this file: it said `SDL3`, and that is
+what a package list written on a Mac with no MSYS2 to check against looks
+like. (`mingw-w64-sdl3` is the base package; the mingw64 environment's binary
+is `mingw-w64-x86_64-sdl3`, 3.4.16 at the time of writing.)
 
 **Track L — WSL2.** If WSL2 is not installed yet, `wsl --install` in
 PowerShell; `docs/project/WSL2_SETUP.md` sections 0-2 cover it for someone who
