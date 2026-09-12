@@ -48,18 +48,21 @@ character class), and `run_all_static.sh` now KEEPS a failing gate's full log.
   The one thing only a SECOND machine can find: a library wrongly left to the
   host. And the glibc floor is whatever the build host carries, so build on the
   oldest LTS worth supporting.
-- **`test_bbh_fidelity` WENT RED INSIDE THE STATIC TIER AND GREEN ALONE, TWICE,
-  AND THOSE TWO ARE STILL NOT ROOT-CAUSED** (14z-149, and 14z-150's FIRST strict
-  run). Both reported only `FAIL: see above` at ~126 s, with no surviving
-  evidence. **Do not confuse them with 14z-150's THIRD red, which IS explained**
-  — that one was the `(full log: …)` line this session added to the static
-  runner, a verdict-text change bbh's F1 compares line for line, landed on both
-  sides the same sitting. The blindness is fixed: the runner now keeps
-  `build/gate_failures_static/<gate>.log`, and it named that third red in
-  seconds on its first run. So the NEXT occurrence carries its own evidence —
-  read that file before theorising. The two originals are not known to be
-  harmful; they are known to be unexplained, and [VSP-31]'s standing watch says
-  a pattern is root-caused, not tolerated.
+- **~~`test_bbh_fidelity` WENT RED INSIDE THE STATIC TIER AND GREEN ALONE~~ ROOT-CAUSED
+  2026-09-12 (14z-151): A WALL-CLOCK DURATION INSIDE TEXT COMPARED EXACTLY.** bbh's F1
+  diffs the two static runners line for line; the output carries each gate's duration,
+  which is not verdict text, so `norm()` masked it — but only in the COLUMN form
+  (`PASS    1s`). The controls readout appends it as a SUFFIX, `(1s)`, and the regex
+  demanded a space before the digits and a space or end-of-line after the `s`. So when
+  one runner's stub gate straddled a second boundary and the other's did not, two
+  IDENTICAL verdicts differed by one character. Caught by running the gate SIX times
+  with every log kept: 1 red, and the diff above was its whole content. Fixed in the
+  harness (`529f9d2`, pushed) by masking the suffix form, PROVEN deterministically (the
+  two real lines: differ under the old mask, identical under the new) and corroborated
+  8/8 green. **NOT CLAIMED: that the two 2026-09-11 occurrences were this** — their logs
+  are gone; this is the leading and the only measured explanation. The kept-log
+  instrument is what made the third one readable, so read `build/gate_failures_static/`
+  first if anything like it returns.
 - **At the next freeze/release sweep: the 34 emulator-tier modes HONOURED.**
   `run_all_emulator.sh --scope all --lane all --strict --controls` (the ruled
   release invocation). The ~20 expensive gates' modes were never run; a mode
