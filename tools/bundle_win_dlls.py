@@ -92,6 +92,33 @@ def is_pe(path):
         return False
 
 
+def winpath(path):
+    """An MSYS2 POSIX path as the PYTHON RUNNING THIS can open it.
+
+    `ldd` is an MSYS program and answers in MSYS's own namespace —
+    `/mingw64/bin/libwinpthread-1.dll`, `/c/WINDOWS/System32/...`. The Python
+    the recipe installs (`mingw-w64-x86_64-python`) is a NATIVE WINDOWS
+    program with no idea what `/mingw64` is: it reads that as the current
+    drive's `\mingw64\bin\...`, finds nothing, and every resolved library
+    looks absent. Measured on the maintainer's box 2026-09-12 — `fbneo.exe
+    imports libwinpthread-1.dll at /mingw64/bin/libwinpthread-1.dll, which
+    does not exist` — where the file was there the whole time.
+
+    So a leading-slash path is translated by `cygpath -w`, which is MSYS2's
+    own answer and cannot disagree with ldd. Anything already in Windows form
+    is returned untouched, and a host without cygpath keeps the old
+    behaviour rather than failing differently.
+    """
+    if not path or not path.startswith("/"):
+        return path
+    if not shutil.which("cygpath"):
+        return path
+    try:
+        return sh("cygpath", "-w", path).strip() or path
+    except subprocess.CalledProcessError:
+        return path
+
+
 def system_path(path):
     """True when a resolved path is inside the Windows directory."""
     if not path:
@@ -190,11 +217,14 @@ def main(argv):
                 (v for k, v in resolved.items() if k.lower() == name.lower()), None)
             if not real:
                 sys.exit(f"{os.path.basename(p)} imports {name}, which ldd did not resolve")
-            if system_path(real):
+            if system_path(real) or system_path(winpath(real)):
                 continue                      # a Windows DLL under another name
-            if not os.path.exists(real):
-                sys.exit(f"{os.path.basename(p)} imports {name} at {real}, which does not exist")
-            take(os.path.realpath(real), key)
+            realw = winpath(real)
+            if not os.path.exists(realw):
+                sys.exit(f"REFUSING: {os.path.basename(p)} imports {name} at {real}"
+                         + (f" ({realw})" if realw != real else "")
+                         + ", which does not exist — nothing was bundled")
+            take(os.path.realpath(realw), key)
 
     if not bundled:
         sys.exit("REFUSING: the closure is EMPTY — ldd/objdump returned nothing to bundle, "

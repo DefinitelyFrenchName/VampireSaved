@@ -5,6 +5,7 @@
 # one. ROM-free, no emulator, ~2 s.
 #
 # MUST-FIRE: shadow-tool: empty-closure — a stub toolchain that reports NO libraries must make each bundler REFUSE, never report a self-contained binary (mode: a COPY of both bundlers with the refusal removed must make section 2 fail)
+# MUST-FIRE: shadow-tool: msys-path-untranslated — a COPY of the Windows bundler with the MSYS-path translation disabled must FAIL section 4: `ldd` answers in MSYS's namespace (`/mingw64/bin/x.dll`) and the native Windows python cannot open that, so every resolved DLL would read as missing
 # MUST-FIRE: shadow-tool: unbundled-leftover — a stub readelf reporting a NEEDED library that is neither bundled nor a host library must make the Linux bundler's ARTIFACT check fail (mode: a COPY with the artifact check neutered must make the control section fail)
 #
 # WHY THIS GATE EXISTS, and what it does NOT claim. The two bundlers were
@@ -41,22 +42,25 @@ fail=0
 # guard removed — the perturbation is applied to the REAL input and the gate
 # runs to its own verdict, which must be FAIL ([VSP-181]).
 TOOLS="$REPO/tools"
-shadow_tools() {  # shadow_tools <python-expression-to-disable>  -> $W/tools
+shadow_tools() {  # shadow_tools <expression-to-disable> [replacement]  -> $W/tools
     mkdir -p "$W/tools"
     cp "$REPO/tools/bundle_elf_libs.py" "$REPO/tools/bundle_win_dlls.py" "$W/tools/"
-    python3 - "$W/tools" "$1" <<'SPY'
+    python3 - "$W/tools" "$1" "${2:-if False:}" <<'SPY'
 import pathlib, sys
-d, guard = pathlib.Path(sys.argv[1]), sys.argv[2]
+d, guard, repl = pathlib.Path(sys.argv[1]), sys.argv[2], sys.argv[3]
 for f in sorted(d.glob("bundle_*.py")):
     t = f.read_text()
     if guard in t:
-        f.write_text(t.replace(guard, "if False:"))
-        print(f"  mode: {f.name} with `{guard}` disabled")
+        f.write_text(t.replace(guard, repl))
+        print(f"  mode: {f.name} with `{guard}` -> `{repl}`")
 SPY
     TOOLS="$W/tools"
 }
 vs_ctl_is empty-closure     && shadow_tools "if not bundled:"
 vs_ctl_is unbundled-leftover && shadow_tools "if bad:"
+# the translation neutered: winpath() returns its argument, which is what a
+# native-Windows python did with an MSYS path before 2026-09-12
+vs_ctl_is msys-path-untranslated && shadow_tools 'if not path or not path.startswith("/"):' "if True:"
 
 # ---- section 1: the parsers, against RECORDED tool output ------------------
 echo "== 1. parsers vs recorded ldd / readelf / objdump output"
@@ -164,12 +168,21 @@ fbneo|fbneo.exe)
     printf '\tlinux-vdso.so.1 (0x00007ffd00000000)\n'
     printf '\tlibSDL2-2.0.so.0 => %s/libSDL2-2.0.so.0 (0x00007f0000000000)\n' "$W/sys"
     printf '\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f0100000000)\n'
-    printf '\tSDL2.dll => %s/SDL2.dll (0x6fc40000)\n' "$W/sys"
+    if [ "$mode" = msyspath ]; then
+        # MSYS2's OWN namespace, which is what the real ldd answers with
+        printf '\tSDL2.dll => /mingw64/bin/SDL2.dll (0x6fc40000)\n'
+    else
+        printf '\tSDL2.dll => %s/SDL2.dll (0x6fc40000)\n' "$W/sys"
+    fi
     printf '\tKERNEL32.DLL => /c/WINDOWS/System32/KERNEL32.DLL (0x7ffb11110000)\n'
     ;;
 libSDL2-2.0.so.0|SDL2.dll)
     printf '\tlibpng16.so.16 => %s/libpng16.so.16 (0x00007f0200000000)\n' "$W/sys"
-    printf '\tlibpng16.dll => %s/libpng16.dll (0x6f000000)\n' "$W/sys"
+    if [ "$mode" = msyspath ]; then
+        printf '\tlibpng16.dll => /mingw64/bin/libpng16.dll (0x6f000000)\n'
+    else
+        printf '\tlibpng16.dll => %s/libpng16.dll (0x6f000000)\n' "$W/sys"
+    fi
     printf '\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f0100000000)\n'
     ;;
 *)  printf '\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f0100000000)\n' ;;
@@ -213,6 +226,15 @@ case "$1" in
 --set-rpath) echo "$2" > "$(dirname "$3")/.rpath.$(basename "$3")" ;;
 esac
 exit 0
+EOF
+    # MSYS2's own path translator, the only authority on its namespace
+    cat > "$sdir/cygpath" <<EOF
+#!/bin/sh
+# -w <posix> -> the native path; the fixture maps /mingw64/bin onto \$W/sys
+case "\$2" in
+/mingw64/bin/*) printf '%s/%s\n' "$W/sys" "\$(basename "\$2")" ;;
+*)              printf '%s\n' "\$2" ;;
+esac
 EOF
     chmod +x "$sdir"/*
 }
@@ -272,6 +294,38 @@ else
 fi
 [ "$fail" = 0 ] && echo "  ok: both closures walked transitively, host libraries left out, \$ORIGIN requested"
 
+# ---- section 4: MSYS2 answers in ITS OWN namespace --------------------------
+# The blind spot that let a real host find this first: every stub until now
+# handed back a path that already existed, so the translation was never needed
+# and never exercised. The real `ldd` is an MSYS program and answers
+# `/mingw64/bin/x.dll`; the python the recipe installs is a native Windows one
+# that reads that as the current drive's \mingw64\bin and finds nothing.
+echo "== 4. an MSYS2 POSIX path from ldd resolves through cygpath"
+if run_bundler bundle_win_dlls.py fbneo.exe msyspath "$W/msys"; then
+    miss=""
+    for f in SDL2.dll libpng16.dll; do
+        [ -f "$W/msys/$f" ] || miss="$miss $f"
+    done
+    if [ -z "$miss" ]; then
+        echo "  ok    /mingw64/bin/… translated: the closure is bundled ($(ls "$W/msys" | tr '\n' ' '))"
+    else
+        echo "  FAIL  the bundler succeeded but did not bundle:$miss"; fail=1
+    fi
+else
+    echo "  FAIL  the bundler refused a path cygpath can translate:"; sed 's/^/        /' "$W/msys/out.txt" | tail -3; fail=1
+fi
+# and WITHOUT cygpath the same input must REFUSE, never quietly skip the DLL
+make_stubs "$W/stub_msyspath" msyspath; rm -f "$W/stub_msyspath/cygpath"
+rm -rf "$W/msys_nocyg"; mkdir -p "$W/msys_nocyg"
+printf 'stub executable\n' > "$W/msys_nocyg/fbneo.exe"; chmod +x "$W/msys_nocyg/fbneo.exe"
+if ( PATH="$W/stub_msyspath:$PATH" python3 "$TOOLS/bundle_win_dlls.py" "$W/msys_nocyg" "$W/msys_nocyg/fbneo.exe" ) > "$W/msys_nocyg/out.txt" 2>&1; then
+    echo "  FAIL  with no cygpath an unopenable path was accepted — a bundle that is not self-contained"; fail=1
+elif grep -q "REFUSING:.*does not exist" "$W/msys_nocyg/out.txt"; then
+    echo "  ok    with no translator the same path REFUSES, naming the file ($(grep -o 'imports [^ ]*' "$W/msys_nocyg/out.txt" | head -1))"
+else
+    echo "  FAIL  it failed for another reason: $(tail -1 "$W/msys_nocyg/out.txt")"; fail=1
+fi
+
 # ---- must-fire controls ----------------------------------------------------
 # (1) empty-closure is section 2, run above against $TOOLS: under the mode the
 #     refusal is gone from the copy, section 2 reports SUCCESS-on-empty and the
@@ -291,4 +345,13 @@ else
     vs_ctl_dead unbundled-leftover "the bundler failed for another reason: $(tail -1 "$W/ctl2/out.txt")"
     fail=1
 fi
+# (3) msys-path-untranslated: section 4 above runs against $TOOLS, so under the
+#     mode the copy's winpath() is a no-op and section 4's first half fails.
+if run_bundler bundle_win_dlls.py fbneo.exe msyspath "$W/ctl3"; then
+    vs_ctl_fired msys-path-untranslated "an MSYS path resolves only because winpath() translates it (section 4)"
+else
+    vs_ctl_dead msys-path-untranslated "the unmodified bundler could not resolve a translatable path" || true
+    fail=1
+fi
+
 [ "$fail" = 0 ] && echo "PASS: test_bundle_parsers" || { echo "FAIL: test_bundle_parsers"; exit 1; }
