@@ -152,6 +152,18 @@ It must end with `every member verified`. It refuses to write anything at all
 unless every member's checksum matches, so a wrong or damaged dump is caught
 here rather than halfway through the gate.
 
+**You can also just BRING a `vsavjw.zip` you already made elsewhere** — drop it
+in `build/fromrelease/rompath/` and skip this step. The romset is
+platform-independent and that is measured, not assumed: the applier's 25
+members are byte-identical to the frozen build's, and every check in this
+project is member-based (the manifest verifies a sha1 per member, the whole-set
+key hashes members). **What is NOT identical across machines is the ZIP
+CONTAINER**: Python stamps the creating system into every member header — `0`
+on Windows, `3` everywhere else — so the same romset built on two hosts gives
+two different file hashes and the same 25 members. Compare members, never the
+file. (On the FIRST host, run the applier anyway: it is the step that verifies
+your dumps.)
+
 `build/fromrelease` is where section 5 points the gate.
 
 ---
