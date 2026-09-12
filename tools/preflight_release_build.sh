@@ -157,6 +157,36 @@ fi
 
 # ---- the dumps -------------------------------------------------------------
 say ""
+say "-- what this host will throw at the build --"
+# THE 10x SLOWDOWN NOBODY SEES COMING (measured by the maintainer 2026-09-12:
+# FBNeo similar on both tracks, MAME still running in WSL2 after ~10x the
+# native Windows time on a 3900X, CPU pinned). The builders default to
+# `-j$(nproc)`, and under WSL2 `nproc` is the HOST's logical processor count
+# while the VM gets HALF the host's RAM by default — Microsoft's documented
+# defaults: memory "50% of total memory on Windows", processors "the same
+# number of logical processors on Windows", swap "25% of memory size".
+# MAME's translation units are large, so 24 jobs against 16 GB is not a slow
+# build, it is a thrashing one, and the CPU looks busy while it swaps.
+_cores="$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo '?')"
+_memkb="$(awk '/^MemTotal:/{print $2}' /proc/meminfo 2>/dev/null || true)"
+if [ -z "$_memkb" ]; then
+    _memb="$(sysctl -n hw.memsize 2>/dev/null || true)"
+    [ -z "$_memb" ] || _memkb=$((_memb / 1024))
+fi
+if [ -n "$_memkb" ] && [ "$_cores" != "?" ]; then
+    _memgb=$((_memkb / 1024 / 1024))
+    _per10=$(( _memkb * 10 / 1024 / 1024 / _cores ))     # GB per job, tenths
+    say "  $_cores job(s) by default (nproc), ${_memgb} GB visible -> $(( _per10 / 10 )).$(( _per10 % 10 )) GB per job"
+    if [ "$_per10" -lt 12 ]; then
+        warn "under ~1.2 GB per job MAME's larger translation units swap, and a"
+        say  "          swapping build looks like a busy one: the CPU is pinned and the"
+        say  "          wall clock is 10x. Use fewer jobs — MAME_JOBS=8 (or JOBS=8) —"
+        say  "          and on WSL2 consider raising the VM's memory:"
+        say  "            %UserProfile%\\.wslconfig   [wsl2]  memory=24GB  swap=8GB"
+        say  "            then  wsl --shutdown  (the VM keeps HALF your RAM by default)"
+    fi
+fi
+say ""
 say "-- your ROM dumps --"
 if [ -n "${ROMDIR:-}" ] && [ -d "$ROMDIR" ]; then
     _miss=""

@@ -141,6 +141,42 @@ pkg-config --modversion fontconfig   # must print a version, not an error
 sdl2-config --version
 ```
 
+## 3b. WSL2 gives the VM HALF your RAM, and the build asks for all your cores
+
+**Measured 2026-09-12, the first Linux track:** FBNeo built in similar time on
+MSYS2 and WSL2; MAME under WSL2 was still running after roughly TEN TIMES the
+native Windows time on a Ryzen 3900X, with the CPU pinned. A pinned CPU reads
+as "working hard" and is also what thrashing looks like.
+
+The arithmetic, from Microsoft's documented `.wslconfig` defaults:
+
+| setting | default |
+|---|---|
+| `memory` | 50% of total memory on Windows |
+| `processors` | the same number of logical processors on Windows |
+| `swap` | 25% of memory size, rounded up |
+
+So a 32 GB / 24-thread host gives the VM **24 processors and 16 GB**. Our
+builders default to `-j$(nproc)` = 24 parallel compilers, and MAME's larger
+translation units are not small. Native Windows runs the same 24 jobs against
+the whole 32 GB; WSL2 runs them against half.
+
+**Two levers, either one enough:**
+
+```bash
+MAME_JOBS=8 tools/build_release_emulators.sh mame     # fewer, fatter jobs
+```
+
+```ini
+# %UserProfile%\.wslconfig   — then `wsl --shutdown` and reopen
+[wsl2]
+memory=24GB
+swap=8GB
+```
+
+`tools/preflight_release_build.sh` now prints the GB-per-job this host will
+run at and says so when it is under about 1.2 GB.
+
 ## 4. Get the repository
 
 Clone to a path with **no spaces** (the Linux home directory has none,
