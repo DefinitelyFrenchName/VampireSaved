@@ -180,7 +180,8 @@ if [ -n "$_memkb" ] && [ "$_cores" != "?" ]; then
     if [ "$_per10" -lt 12 ]; then
         warn "under ~1.2 GB per job MAME's larger translation units swap, and a"
         say  "          swapping build looks like a busy one: the CPU is pinned and the"
-        say  "          wall clock is 10x. Use fewer jobs — MAME_JOBS=8 (or JOBS=8) —"
+        say  "          wall clock is 10x. Use fewer jobs — JOBS=8 for the release"
+        say  "          builder, MAME_JOBS=8 for tools/setup_mame.sh directly —"
         say  "          and on WSL2 consider raising the VM's memory:"
         say  "            %UserProfile%\\.wslconfig   [wsl2]  memory=24GB  swap=8GB"
         say  "            then  wsl --shutdown  (the VM keeps HALF your RAM by default)"

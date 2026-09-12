@@ -224,7 +224,12 @@ mame)
     PATCH="$REPO/emu/mame-patches/0002-cps2-wide-v1.patch"
     PIN="$(git -C "$REPO" rev-parse HEAD:emu/mame)"
     MIRROR="$SCRATCH/mame-release"
-    MAME_BUILD_ROOT="$MIRROR" MAME_JOBS="$JOBS" "$REPO/tools/setup_mame.sh" > "$SCRATCH/mame-release.log" 2>&1 || {
+    # A CALLER'S OWN MAME_JOBS WINS (2026-09-12). This passed `MAME_JOBS="$JOBS"`
+    # unconditionally, so `MAME_JOBS=8 tools/build_release_emulators.sh mame` —
+    # the spelling this script's own advice and the setup guide both used — was
+    # silently overridden with nproc, which is the opposite of what the person
+    # typing it wanted on a host that is swapping.
+    MAME_BUILD_ROOT="$MIRROR" MAME_JOBS="${MAME_JOBS:-$JOBS}" "$REPO/tools/setup_mame.sh" > "$SCRATCH/mame-release.log" 2>&1 || {
         tail -30 "$SCRATCH/mame-release.log" >&2; echo "mame build FAILED (log: $SCRATCH/mame-release.log)" >&2; exit 1; }
     grep -q "verified: binary carries the vsavjw driver" "$SCRATCH/mame-release.log" || {
         echo "setup_mame.sh did not verify the driver" >&2; exit 1; }

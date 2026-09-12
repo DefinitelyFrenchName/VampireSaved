@@ -164,8 +164,12 @@ the whole 32 GB; WSL2 runs them against half.
 **Two levers, either one enough:**
 
 ```bash
-MAME_JOBS=8 tools/build_release_emulators.sh mame     # fewer, fatter jobs
+JOBS=8 tools/build_release_emulators.sh mame     # fewer, fatter jobs
 ```
+
+(`MAME_JOBS=8` works too since 2026-09-12; before that this entry point
+overrode it with `nproc` and the flag did nothing — the exact spelling this
+page recommended.)
 
 ```ini
 # %UserProfile%\.wslconfig   — then `wsl --shutdown` and reopen
