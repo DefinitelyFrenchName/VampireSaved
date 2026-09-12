@@ -102,10 +102,27 @@ git submodule update --init --depth 1 emu/fbneo emu/mame
 
 Keep the path free of spaces — MAME's build system cannot handle one.
 
+**Where your Windows files are, and it differs between the two shells** (the
+maintainer hit this on the first setup, 2026-09-12):
+
+| shell | `C:\Users\You\roms` is | home is |
+|---|---|---|
+| MSYS2 MINGW64 | `/c/Users/You/roms` | `C:\msys64\home\<user>`, NOT your Windows profile |
+| WSL2 Ubuntu | `/mnt/c/Users/You/roms` | the Linux home, a different filesystem |
+
+`mount` prints the table on either, and `cygpath -u 'C:\path'` /
+`cygpath -w /c/path` convert both ways in MSYS2 — ask the host rather than
+trust this table. **You do not have to copy the dumps at all**: the applier
+only READS them, so `ROMDIR` may point straight at the Windows folder. The
+"never build under `/mnt/c`" rule above is about the TREE, which is written to
+constantly; three zips read once cost nothing.
+
 Then, with your dumps in place:
 
 ```bash
-export ROMDIR=~/roms                      # the folder holding your three zips
+export ROMDIR=/c/Users/You/roms           # MSYS2; WSL2: /mnt/c/Users/You/roms
+                                          # or copy them in: mkdir -p ~/roms &&
+                                          # cp /c/Users/You/roms/*.zip ~/roms/
 tools/preflight_release_build.sh
 ```
 
