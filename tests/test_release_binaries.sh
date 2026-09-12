@@ -64,6 +64,8 @@ MINGW*|MSYS*|CYGWIN*) OS=windows ;;
 esac
 case "$(uname -m)" in arm64|aarch64) ARCH=arm64 ;; x86_64|amd64) ARCH=x86_64 ;; *) ARCH="$(uname -m)" ;; esac
 EXESUF=""; [ "$OS" = windows ] && EXESUF=".exe"
+# the one translator for paths handed to a NATIVE program (a no-op off Windows)
+. "$REPO/tests/lib/native_path.sh"
 OSARCH="$OS-$ARCH"
 FB="$ROOT/fbneo/$OSARCH"; MM="$ROOT/mame/$OSARCH"
 [ -f "$FB/BINARY.txt" ] || { echo "SKIP: no $FB/BINARY.txt for this host (tools/build_release_emulators.sh fbneo)"; exit 0; }
@@ -240,7 +242,13 @@ check_dir "$FB" "fbneo$EXESUF" || fail=1
 strings -a "$FB/fbneo$EXESUF" | grep -q "CPS-2 WIDE v1" || { echo "FAIL: fbneo does not carry the profile"; fail=1; }
 ! strings -a "$FB/fbneo$EXESUF" | grep -q -- "-hframes" || { echo "FAIL: fbneo carries the replay HARNESS (patch 0001) — a test instrument shipped"; fail=1; }
 mkdir -p "$W/play/roms" "$W/home"
-for z in "$ROMDIR"/*.zip "$REPO/$MERGED/rompath"/*.zip; do ln -sf "$z" "$W/play/roms/$(basename "$z")"; done
+# A SYMLINK IS NOT A FILE TO A NATIVE PROGRAM. On MSYS2 an `ln -s` is an MSYS
+# construct the Windows loader and a native FBNeo cannot follow, so the set
+# would read as missing; everywhere else a link is free and a copy is 40 MB.
+for z in "$ROMDIR"/*.zip "$REPO/$MERGED/rompath"/*.zip; do
+    if [ "$VS_NATIVE" = 1 ]; then cp -f "$z" "$W/play/roms/$(basename "$z")"
+    else ln -sf "$z" "$W/play/roms/$(basename "$z")"; fi
+done
 rc=0
 ( cd "$W/play" && HOME="$W/home" SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
     "$TIMEOUT" 20 "$FB/fbneo$EXESUF" vsavjw > "$W/fb_boot.log" 2>&1 ) || rc=$?
@@ -262,7 +270,7 @@ check_dir "$MM" "cps2$EXESUF" || f2=1
 # byte-identical to a pristine twin are flagged INCORRECT CHECKSUM, and nothing is NOT
 # FOUND (measured 14z-149; the shipped
 # recipe's "must say good" line was false since the first content build).
-"$MM/cps2$EXESUF" -verifyroms vsavjw -rompath "$REPO/$MERGED/rompath;$ROMDIR" > "$W/verify.log" 2>&1 || true
+"$MM/cps2$EXESUF" -verifyroms vsavjw -rompath "$(native_pathlist "$REPO/$MERGED/rompath;$ROMDIR")" > "$W/verify.log" 2>&1 || true
 python3 - "$W/verify.log" "$MERGED/rompath/vsavjw.zip" "$ROMDIR/vsavj.zip" "$ROMDIR/vsav.zip" <<'PY' || f2=1
 import sys, re, zipfile
 log, z, *pristine = sys.argv[1:]

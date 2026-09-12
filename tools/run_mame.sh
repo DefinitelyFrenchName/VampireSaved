@@ -52,15 +52,37 @@ export SDL_VIDEODRIVER
 # explanation for the two 14z-59 divergences (STATE.md).
 # Verified non-perturbing: the frozen vanilla suite reproduces bit-for-bit
 # with these flags set.
+# THE ONE BOUNDARY between this shell and a native program. Off Windows every
+# call below returns its argument untouched, so this block is inert on the
+# hosts where the instrument already worked ([CPE-24]).
+. "$(cd "$(dirname "$0")/.." && pwd)/tests/lib/native_path.sh"
+if [ "$VS_NATIVE" = 1 ]; then
+    ROMPATH="$(native_pathlist "$ROMPATH")"
+    # the Lua running INSIDE MAME opens these by name, and it is native too
+    for _v in REPLAY CHECKSUM_OUT VIDEO_OUT INPUT_OUT DUMPS MASK_BASIS; do
+        eval "_cur=\${$_v:-}"
+        [ -z "$_cur" ] || eval "export $_v=\"\$(native_path \"\$_cur\")\""
+    done
+    # and every absolute path in the caller's own arguments (-autoboot_script …)
+    _args=""
+    for _a in "$@"; do
+        case "$_a" in /*) _a="$(native_path "$_a")" ;; esac
+        _args="$_args $(printf '%s' "$_a" | sed "s/'/'\\\\''/g; s/^/'/; s/\$/'/")"
+    done
+    eval "set -- $_args"
+    NSANDBOX="$(native_path "$SANDBOX")"
+else
+    NSANDBOX="$SANDBOX"
+fi
 exec "${MAME_BIN:-mame}" "$SET" \
     -rompath "$ROMPATH" \
     -keyboardprovider none -mouseprovider none \
     -joystickprovider none -lightgunprovider none \
     -video none -sound none -nothrottle -skip_gameinfo \
-    -cfg_directory "$SANDBOX/cfg" \
-    -nvram_directory "$SANDBOX/nvram" \
-    -diff_directory "$SANDBOX/diff" \
-    -snapshot_directory "$SANDBOX/snap" \
-    -state_directory "$SANDBOX/sta" \
-    -homepath "$SANDBOX" \
+    -cfg_directory "$NSANDBOX/cfg" \
+    -nvram_directory "$NSANDBOX/nvram" \
+    -diff_directory "$NSANDBOX/diff" \
+    -snapshot_directory "$NSANDBOX/snap" \
+    -state_directory "$NSANDBOX/sta" \
+    -homepath "$NSANDBOX" \
     "$@"
