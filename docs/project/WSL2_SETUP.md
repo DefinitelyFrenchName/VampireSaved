@@ -177,6 +177,31 @@ swap=8GB
 `tools/preflight_release_build.sh` now prints the GB-per-job this host will
 run at and says so when it is under about 1.2 GB.
 
+**How to tell a slow build from a thrashing one, while it runs:**
+
+```bash
+vmstat 1 5      # the si/so columns: swap IN and OUT, in KB/s
+free -h         # is the Swap line filling up?
+cat /proc/pressure/memory
+```
+
+`vmstat` is the unambiguous one: sustained non-zero `si`/`so` means the
+machine is moving pages instead of compiling, and a compile that swaps is
+the 10x. The pressure file needs reading correctly — `avg10`, `avg60` and
+`avg300` are **time windows**, and each number is a **percentage of that
+window spent stalled**, not a count:
+
+```
+some avg10=31.55 avg60=28.12 avg300=19.03 total=...
+full avg10=18.21 avg60=15.44 avg300=10.87 total=...
+```
+
+`some` = at least one task was waiting on memory; `full` = EVERY task was,
+so nothing useful happened at all. A few percent of `some` under load is
+ordinary. `full` in double digits is a machine that is thrashing, and that
+is the reading that matches a 10x wall clock. (If the file does not exist,
+this kernel was built without pressure accounting — use `vmstat`.)
+
 ## 4. Get the repository
 
 Clone to a path with **no spaces** (the Linux home directory has none,
