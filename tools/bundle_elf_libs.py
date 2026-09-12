@@ -204,6 +204,7 @@ def main(argv):
 
     # 1. the closure, copied flat under the SONAME the loader asks for
     bundled = {}
+    needed_seen = [0]          # how many NEEDED entries the tools reported at all
     todo = list(exes)
 
     def take(real, name):
@@ -226,7 +227,9 @@ def main(argv):
         if missing:
             sys.exit(f"{os.path.basename(p)} needs {', '.join(missing)} which ldd cannot resolve "
                      "here — the build host is missing a package the recipe linked against")
-        for soname in parse_needed(readelf_d(p)):
+        _needed = parse_needed(readelf_d(p))
+        needed_seen[0] += len(_needed)
+        for soname in _needed:
             if is_system(soname) or soname in bundled:
                 continue
             real = resolved.get(soname)
@@ -234,11 +237,21 @@ def main(argv):
                 sys.exit(f"{os.path.basename(p)} needs {soname}, which ldd did not resolve")
             take(os.path.realpath(real), soname)
 
-    # A closure of nothing is a broken instrument, not a self-contained binary:
-    # the recipe links SDL out of the package manager on every platform.
+    # AN EMPTY CLOSURE HAS TWO OPPOSITE CAUSES and only one is a defect (the
+    # discriminator added 2026-09-12, after the Windows twin refused MAME's
+    # genuinely static build): no NEEDED entries AT ALL means the instrument is
+    # broken and "self-contained" would be vacuous; NEEDED entries that are all
+    # host libraries by policy (glibc, the GPU/X11/audio stacks) means there is
+    # honestly nothing to carry. The Linux recipe links SDL dynamically, so the
+    # second is not expected here — but it is REPORTED rather than called a
+    # failure, because the check's job is to tell the two apart.
     if not bundled:
-        sys.exit("REFUSING: the closure is EMPTY — ldd/readelf returned nothing to bundle, "
-                 "which on this recipe means the parse failed, not that the binary is static")
+        if needed_seen[0] == 0:
+            sys.exit("REFUSING: the tools reported NO dependencies at all — ldd/readelf "
+                     "returned nothing, which means the parse failed, not that the "
+                     "binary is static")
+        print(f"nothing to bundle: {needed_seen[0]} dependency entr(ies), every one a host "
+              "library by policy — check that against what this recipe links")
 
     # 2. every file looks beside itself, and nowhere else. $ORIGIN is the
     #    loader's spelling of @loader_path; --force-rpath is deliberate only

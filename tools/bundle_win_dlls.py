@@ -93,7 +93,7 @@ def is_pe(path):
 
 
 def winpath(path):
-    """An MSYS2 POSIX path as the PYTHON RUNNING THIS can open it.
+    r"""An MSYS2 POSIX path as the PYTHON RUNNING THIS can open it.
 
     `ldd` is an MSYS program and answers in MSYS's own namespace —
     `/mingw64/bin/libwinpthread-1.dll`, `/c/WINDOWS/System32/...`. The Python
@@ -185,6 +185,7 @@ def main(argv):
     # 1. the closure, copied flat beside the executable (no rewriting: the
     #    loader searches the .exe's own directory first)
     bundled = {}
+    imports_seen = [0]          # how many import entries the tools reported at all
     todo = list(exes)
 
     def take(real, name):
@@ -208,7 +209,9 @@ def main(argv):
         if missing:
             sys.exit(f"{os.path.basename(p)} imports {', '.join(missing)} which ldd cannot "
                      "resolve here — the build environment is missing a package the recipe linked")
-        for name in parse_imports(sh("objdump", "-p", p)):
+        _imports = parse_imports(sh("objdump", "-p", p))
+        imports_seen[0] += len(_imports)
+        for name in _imports:
             key = os.path.basename(name)
             if is_system_dll(key) or key in bundled:
                 continue
@@ -227,8 +230,19 @@ def main(argv):
             take(os.path.realpath(realw), key)
 
     if not bundled:
-        sys.exit("REFUSING: the closure is EMPTY — ldd/objdump returned nothing to bundle, "
-                 "which on this recipe means the parse failed, not that the .exe is standalone")
+        # THE TWO CAUSES OF AN EMPTY CLOSURE ARE OPPOSITE, and telling them apart is
+        # the whole value of this check (2026-09-12): if the tools reported NO imports
+        # at all, the instrument is broken and a "self-contained" verdict would be
+        # vacuous; if they reported imports and every one was a Windows system DLL,
+        # the binary really is standalone. MAME's Windows build is the second case by
+        # construction — `scripts/genie.lua` adds `-static` for mingw* — and the
+        # earlier flat refusal called that a failure.
+        if imports_seen[0] == 0:
+            sys.exit("REFUSING: the tools reported NO imports at all — ldd/objdump "
+                     "returned nothing, which means the parse failed, not that the "
+                     ".exe is standalone")
+        print(f"standalone: {imports_seen[0]} import(s), every one a Windows system DLL "
+              "— nothing to bundle (a statically linked build)")
 
     # 2. verify on the ARTIFACT: every import of every file is bundled or the OS's
     allfiles = exes + sorted(bundled.values())

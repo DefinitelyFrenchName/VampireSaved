@@ -1,8 +1,9 @@
 #!/bin/sh
 # test_bundle_parsers.sh — the LINUX and WINDOWS library bundlers
 # (tools/bundle_elf_libs.py, tools/bundle_win_dlls.py) read real `ldd`,
-# `readelf -d` and `objdump -p` output, walk a closure, and REFUSE an empty
-# one. ROM-free, no emulator, ~2 s.
+# `readelf -d` and `objdump -p` output, walk a closure, and tell a closure the
+# tools said NOTHING about (refused) from one they described as all-system (a
+# static build, accepted and said). ROM-free, no emulator, ~2 s.
 #
 # MUST-FIRE: shadow-tool: empty-closure — a stub toolchain that reports NO libraries must make each bundler REFUSE, never report a self-contained binary (mode: a COPY of both bundlers with the refusal removed must make section 2 fail)
 # MUST-FIRE: shadow-tool: msys-path-untranslated — a COPY of the Windows bundler with the MSYS-path translation disabled must FAIL section 4: `ldd` answers in MSYS's namespace (`/mingw64/bin/x.dll`) and the native Windows python cannot open that, so every resolved DLL would read as missing
@@ -163,8 +164,14 @@ make_stubs() {  # make_stubs <dir> <mode: full|silent|leftover>
 #!/bin/sh
 # resolve only what the fixture below declares; anything else is "not found"
 case "\$(basename "\$1")" in
-fbneo|fbneo.exe)
+fbneo|fbneo.exe|cps2.exe)
     [ "$mode" = silent ] && exit 0
+    if [ "$mode" = systemonly ]; then
+        printf '\tKERNEL32.DLL => /c/WINDOWS/System32/KERNEL32.DLL (0x7ffb11110000)\n'
+        printf '\tUSER32.dll => /c/WINDOWS/System32/USER32.dll (0x7ffb11120000)\n'
+        printf '\tGDI32.dll => /c/WINDOWS/System32/GDI32.dll (0x7ffb11130000)\n'
+        exit 0
+    fi
     printf '\tlinux-vdso.so.1 (0x00007ffd00000000)\n'
     printf '\tlibSDL2-2.0.so.0 => %s/libSDL2-2.0.so.0 (0x00007f0000000000)\n' "$W/sys"
     printf '\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f0100000000)\n'
@@ -214,7 +221,12 @@ EOF
 f="\$(basename "\$2")"
 [ "$mode" = silent ] && exit 0
 case "\$f" in
-fbneo.exe) printf '\tDLL Name: KERNEL32.dll\n\tDLL Name: SDL2.dll\n' ;;
+fbneo.exe|cps2.exe)
+    if [ "$mode" = systemonly ]; then
+        printf '\tDLL Name: KERNEL32.dll\n\tDLL Name: USER32.dll\n\tDLL Name: GDI32.dll\n'
+    else
+        printf '\tDLL Name: KERNEL32.dll\n\tDLL Name: SDL2.dll\n'
+    fi ;;
 SDL2.dll)  printf '\tDLL Name: libpng16.dll\n' ;;
 esac
 exit 0
@@ -259,8 +271,8 @@ for pair in "bundle_elf_libs.py fbneo" "bundle_win_dlls.py fbneo.exe"; do
     if run_bundler "$tool" "$exe" silent "$W/empty_$tool"; then
         echo "FAIL: $tool reported SUCCESS on an empty closure — a binary that runs only on the build host"
         fail=1
-    elif grep -q 'REFUSING: the closure is EMPTY' "$W/empty_$tool/out.txt"; then
-        echo "  ok: $tool refuses an empty closure"
+    elif grep -q 'REFUSING: the tools reported NO ' "$W/empty_$tool/out.txt"; then
+        echo "  ok: $tool refuses a closure its tools said nothing about"
     else
         echo "FAIL: $tool failed for the wrong reason:"; sed 's/^/        /' "$W/empty_$tool/out.txt"; fail=1
     fi
@@ -293,6 +305,29 @@ else
     echo "FAIL: the windows bundler failed on a resolvable closure:"; sed 's/^/        /' "$W/win/out.txt"; fail=1
 fi
 [ "$fail" = 0 ] && echo "  ok: both closures walked transitively, host libraries left out, \$ORIGIN requested"
+
+# ---- section 3b: a STATICALLY LINKED binary is not a broken instrument ------
+# MAME's Windows build links `-static` (its `scripts/genie.lua`, configuration
+# mingw*), so it imports Windows system DLLs and nothing else. The refusal used
+# to read that as a failed parse and stop a correct build. The discriminator is
+# whether the tools reported ANY imports at all.
+echo "== 3b. an empty closure: told apart from a broken instrument"
+if run_bundler bundle_win_dlls.py cps2.exe systemonly "$W/static"; then
+    if grep -q "^standalone: 3 import(s)" "$W/static/out.txt"; then
+        echo "  ok    a static build is accepted and SAID: $(grep -m1 '^standalone:' "$W/static/out.txt")"
+    else
+        echo "  FAIL  it succeeded without saying the closure was empty on purpose:"; tail -2 "$W/static/out.txt" | sed 's/^/        /'; fail=1
+    fi
+else
+    echo "  FAIL  a statically linked binary was REFUSED:"; tail -2 "$W/static/out.txt" | sed 's/^/        /'; fail=1
+fi
+if run_bundler bundle_win_dlls.py fbneo.exe silent "$W/silent2"; then
+    echo "  FAIL  tools reporting NOTHING were accepted — the vacuous green is back"; fail=1
+elif grep -q "REFUSING: the tools reported NO imports at all" "$W/silent2/out.txt"; then
+    echo "  ok    tools reporting NOTHING still REFUSE, and say which of the two it was"
+else
+    echo "  FAIL  it refused for another reason: $(tail -1 "$W/silent2/out.txt")"; fail=1
+fi
 
 # ---- section 4: MSYS2 answers in ITS OWN namespace --------------------------
 # The blind spot that let a real host find this first: every stub until now
@@ -333,7 +368,7 @@ fi
 if run_bundler bundle_elf_libs.py fbneo silent "$W/ctl1" ; then
     vs_ctl_dead empty-closure "the linux bundler accepted an empty closure"; fail=1
 else
-    vs_ctl_fired empty-closure "both bundlers exit non-zero with 'REFUSING: the closure is EMPTY' (section 2)"
+    vs_ctl_fired empty-closure "both bundlers exit non-zero with 'REFUSING: the tools reported NO …' (section 2)"
 fi
 # (2) unbundled-leftover: the stub readelf reports a NEEDED nobody bundles.
 if run_bundler bundle_elf_libs.py fbneo leftover "$W/ctl2"; then

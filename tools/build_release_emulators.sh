@@ -242,7 +242,17 @@ mame)
     EXE="$EXENAME"
     TITLE="cps2 — MAME 0.288, CPS-2 subtarget, carrying the CPS-2 WIDE v1 driver patch, prebuilt for $OSARCH"
     RUN='`./'"cps2$EXESUF"' vsavjw -rompath "/path/to/your/built/set;/path/to/your/dumps"` (the built vsavjw.zip and the pristine vsav.zip must both be on the rompath). `./'"cps2$EXESUF"' -verifyroms vsavjw -rompath ...` says `is bad` BY DESIGN and must list exactly the members inside vsavjw.zip as INCORRECT CHECKSUM (stock CRCs for the members the port rewrites, sentinel CRCs for the new ones) — a NOT FOUND line is the real problem. MAME'"'"'s own UI (Tab) maps controls.'
-    LIBS="SDL3"
+    # WHAT THE RECORD SAYS IT CARRIES IS PER PLATFORM, like the OSD itself:
+    # macOS links SDL3, Linux the sdl OSD's SDL2 + SDL2_ttf + fontconfig, and
+    # Windows links `-static` (MAME's scripts/genie.lua, configuration mingw*)
+    # so it carries nothing at all. A record naming SDL3 on a host that never
+    # linked it is a claim a reader cannot check.
+    case "$HOSTOS" in
+    macos)   LIBS="SDL3" ;;
+    linux)   LIBS="SDL2, SDL2_ttf and fontconfig (the sdl OSD)" ;;
+    windows) LIBS="nothing — the Windows build links -static and uses the native OSD" ;;
+    *)       LIBS="the OSD's libraries" ;;
+    esac
     ;;
 *)  echo "unknown kind '$KIND' (fbneo|mame)" >&2; exit 2 ;;
 esac
