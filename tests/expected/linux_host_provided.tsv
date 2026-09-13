@@ -1,0 +1,43 @@
+# tests/expected/linux_host_provided.tsv — the sonames a Linux release binary may ask the HOST for.
+# Consumer: tools/check_host_libs.py, run by tests/test_release_binaries.sh on a Linux host.
+# PROVENANCE, never the project's own bundler list ([VSP-166]):
+#   manylinux  = manylinux_2_39 lib_whitelist, auditwheel 6.4.2, auditwheel/policy/manylinux-policy.json
+#                (wheel sha256 4302ae79dcff242e799a37173cfeeae727d0924843eca4b3f622d3bcb28de2db)
+#   ruled      = exceptions RULED by the maintainer 2026-09-13 (14z-152), one reason each
+# soname	source	reason
+libGL.so.1	manylinux	-
+libICE.so.6	manylinux	-
+libSM.so.6	manylinux	-
+libX11.so.6	manylinux	-
+libXext.so.6	manylinux	-
+libXrender.so.1	manylinux	-
+libanl.so.1	manylinux	-
+libatomic.so.1	manylinux	-
+libc.so.6	manylinux	-
+libdl.so.2	manylinux	-
+libexpat.so.1	manylinux	-
+libgcc_s.so.1	manylinux	-
+libglib-2.0.so.0	manylinux	-
+libgobject-2.0.so.0	manylinux	-
+libgthread-2.0.so.0	manylinux	-
+libm.so.6	manylinux	-
+libnsl.so.1	manylinux	-
+libpthread.so.0	manylinux	-
+libresolv.so.2	manylinux	-
+librt.so.1	manylinux	-
+libstdc++.so.6	manylinux	-
+libutil.so.1	manylinux	-
+libz.so.1	manylinux	-
+ld-linux-x86-64.so.2	ruled	the glibc loader: one unit with libc, which the list already allows
+libXcursor.so.1	ruled	X11 client library, sibling of libX11/libXext: talks X protocol to the host display server
+libXfixes.so.3	ruled	X11 client library, sibling of libX11/libXext: talks X protocol to the host display server
+libXi.so.6	ruled	X11 client library, sibling of libX11/libXext: talks X protocol to the host display server
+libXrandr.so.2	ruled	X11 client library, sibling of libX11/libXext: talks X protocol to the host display server
+libXss.so.1	ruled	X11 client library, sibling of libX11/libXext: talks X protocol to the host display server
+libwayland-client.so.0	ruled	Wayland client library: the Wayland counterpart of libX11, talks to the host compositor
+libwayland-cursor.so.0	ruled	Wayland client library: the Wayland counterpart of libX11, talks to the host compositor
+libwayland-egl.so.1	ruled	Wayland client library: the Wayland counterpart of libX11, talks to the host compositor
+libdrm.so.2	ruled	graphics driver entry point: a bundled copy breaks the player's GPU driver
+libgbm.so.1	ruled	graphics driver entry point: a bundled copy breaks the player's GPU driver
+libasound.so.2	ruled	audio client: loads host plugins and talks to the host sound service
+libpulse.so.0	ruled	audio client: loads host plugins and talks to the host sound service

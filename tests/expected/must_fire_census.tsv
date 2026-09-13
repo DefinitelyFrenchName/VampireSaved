@@ -23,6 +23,7 @@ declares	audit_voice_borrow
 declares	audit_walker_repoint
 declares	test_annotations_current
 declares	test_battery_accounting
+declares	test_build_environment_entry
 declares	test_bundle_parsers
 declares	test_capture_kf_ownership
 declares	test_charmap_current
@@ -50,6 +51,7 @@ declares	test_freeze_tag_coverage
 declares	test_gate_index_current
 declares	test_gotchas_index_current
 declares	test_header_defaults
+declares	test_host_libs
 declares	test_jtcores_twin
 declares	test_jtsim_scratch_heal
 declares	test_mame_bin_pinned

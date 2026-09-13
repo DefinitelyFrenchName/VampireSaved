@@ -16,13 +16,13 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**324 scripts** — 73 ci_portable, 75 ci_static, 176 emulator-tier (run by name).
+**326 scripts** — 75 ci_portable, 75 ci_static, 176 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 14 | the suite runners and their own ground truth |
 | [docs](#docs) | 15 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 30 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 32 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 55 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
@@ -82,6 +82,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 |---|---|---|---|---|---|
 | `tests/audit_wide_phase_a.sh` | audit | emulator | emulator | CPS-2 WIDE Phase A measurements (no ROM growth, no emulator changes). Each section answers ONE architecture question and prints a decision line. Run on VANILLA vsavj: | 14z-123 |
 | `tests/test_attract_determinism.sh` | test | emulator | emulator | M0 acceptance: a 60-second scripted attract-mode run checksums work RAM identically across two fresh runs. | M0 |
+| `tests/test_build_environment_entry.sh` | test | ci_portable | — | tools/record_build_environment.py, which composes an entry of docs/project/build_environments.md from a host's BINARY.txt records and the log of a PASSING tests/test_release_binaries.sh, against SYNTHETIC records and logs: | 2026-09-13 |
 | `tests/test_bundle_parsers.sh` | test | ci_portable | — | the LINUX and WINDOWS library bundlers (tools/bundle_elf_libs.py, tools/bundle_win_dlls.py) read real `ldd`, `readelf -d` and `objdump -p` output, walk a closure, and tell a closure the tools said NOTHING about (refused) from one they descr… | 14z-149 |
 | `tests/test_crash_guard.sh` | test | emulator | MAME | ground truth for the crash guard (verdict-logic doctrine, CLAUDE.md §4: a detector is trusted only after it classifies known-good and known-bad scenarios correctly). | — |
 | `tests/test_crypt_boundary.sh` | test | ci_static | ROMDIR | code in the WIDE extension must be stored RAW. | 14z-123 |
@@ -96,6 +97,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_fbneo_tree_integrity.sh` | test | ci_static | ROMDIR | the emu/fbneo working tree must be EXACTLY the pinned upstream commit plus the two tracked patches (14z-90, issue #36). | 14z-90 |
 | `tests/test_fbneo_tree_integrity_control.sh` | test | ci_static | ROMDIR | ground truth for the emu/fbneo tree integrity gate (14z-90, GitHub issue #36). | 14z-90 |
 | `tests/test_frozen_rompath_guard.sh` | test | ci_static | ROMDIR | tools/build_donovan.sh must refuse to rebuild over a FROZEN REFERENCE rompath (14z-90, GitHub issue #26). | 14z-90 |
+| `tests/test_host_libs.sh` | test | ci_portable | — | tools/check_host_libs.py, the rule a Linux release folder is held to (every file's DIRECT NEEDED sonames are shipped in the folder and resolve there, or are on tests/expected/linux_host_provided.tsv; | 2026-09-13 |
 | `tests/test_input_integrity.sh` | test | emulator | MAME | ground truth for the input-integrity check. | session 14z |
 | `tests/test_mame_determinism.sh` | test | emulator | MAME | is MAME actually deterministic, run to run? | session 14z |
 | `tests/test_mame_parity.sh` | test | emulator | MAME, FBNeo | B5 PREREQUISITE: the pinned MAME source build must be indistinguishable from the binary that froze the oracle, BEFORE any profile patch is applied to it. | session 1 |

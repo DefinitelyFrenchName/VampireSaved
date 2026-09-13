@@ -81,13 +81,17 @@ has never used it. Then, inside Ubuntu:
 
 ```bash
 sudo apt update && sudo apt install -y build-essential python3 git rsync \
-    patch pkgconf zip unzip perl patchelf binutils coreutils \
-    libsdl2-dev libsdl2-image-dev libsdl3-dev
+    patch pkgconf zip unzip perl patchelf binutils coreutils diffutils \
+    libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libfontconfig-dev qmake6
 ```
 
 MAME needs **no SDL3 here**: on Linux its OSD is `sdl` — SDL2, SDL2_ttf and
 fontconfig — and `libfontconfig-dev` plus `libsdl2-ttf-dev` are the two this
-list used to miss. SDL3 is the macOS OSD only (corrected 2026-09-12, measured
+list used to miss (until 2026-09-13 the command above still named `libsdl3-dev`
+instead of them). **`qmake6` is required although no Qt is built:** MAME's Linux
+SDL config asks it for Qt's header folder on every build, and without it a bare
+`-I` swallows `-std=c++20` and the build dies on `char8_t` minutes in. It is the
+tool only; no Qt library is linked (`docs/platform/gotchas.md`, 2026-09-13). SDL3 is the macOS OSD only (corrected 2026-09-12, measured
 from the pinned source; this page previously sent you to build SDL3 from
 source for nothing).
 

@@ -140,6 +140,15 @@ if have pkg-config || have pkgconf; then
         else
             bad "SDL2_ttf development files — MAME's sdl OSD links -lSDL2_ttf:"
             say  "          sudo apt install -y libsdl2-ttf-dev"
+        fi
+        # qmake6 even with the Qt debugger OFF (2026-09-13): sdl_cfg.lua asks it for
+        # Qt's header folder on every Linux build, and without it a bare -I swallows
+        # -std=c++20 — the build dies on char8_t minutes in. The tool only, no Qt linked.
+        if have qmake6; then
+            ok "qmake6 $(qmake6 -query QT_VERSION 2>/dev/null) — MAME's sdl OSD queries it for an include path (no Qt is linked)"
+        else
+            bad "qmake6 — MAME's sdl OSD asks it for Qt's header folder on every build; without"
+            say  "          it -std=c++20 is swallowed (char8_t errors minutes in): sudo apt install -y qmake6"
         fi ;;
     msys2)
         ok "MAME needs no SDL here — its Windows OSD is the native one (makefile: TARGETOS=windows -> OSD=windows)" ;;
@@ -253,8 +262,9 @@ else
     wsl2|linux)
         say "  sudo apt update && sudo apt install -y build-essential python3 git rsync \\"
         say "       patch pkgconf zip unzip perl patchelf binutils coreutils diffutils \\"
-        say "       libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libfontconfig-dev"
+        say "       libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libfontconfig-dev qmake6"
         say ""
+        say "  qmake6 is the TOOL only, no Qt is linked: MAME's sdl OSD queries it on every build."
         say "  NO SDL3 on Linux: MAME's OSD here is 'sdl' (SDL2 + SDL2_ttf + fontconfig)."
         say "  SDL3 is the macOS OSD only — measured from the pinned source 2026-09-12." ;;
     msys2)

@@ -343,7 +343,8 @@ into `~/.claude/skills/mame-fbneo-instruments/`. Nothing in it depends on the or
 > (paid: same session, ~8 min of wasted compile)
 > **WHICH OSD, measured from the pinned source** (`makefile`, "specify OSD
 > layer"): `TARGETOS=macosx` -> `sdl3`, `linux` -> `sdl` (SDL2 + SDL2_ttf +
-> fontconfig, `scripts/src/osd/sdl.lua`), `windows` -> `windows`, the native OSD
+> fontconfig, `scripts/src/osd/sdl.lua`, plus the `qmake6` TOOL its config
+> queries on every build — the 2026-09-13 entry), `windows` -> `windows`, the native OSD
 > needing no SDL at all. The macOS requirement was written down as everyone's
 > until 2026-09-12, when a Linux build died on a `fontconfig.pc` nothing had
 > asked for and a WSL2 page was sending readers to compile SDL3 from source for

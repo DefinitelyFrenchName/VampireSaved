@@ -207,12 +207,22 @@ test_controls_contract
 
 # test_bundle_parsers.sh — the LINUX and WINDOWS library bundlers read real ldd /
 # readelf / objdump output, walk a closure, and REFUSE an empty one (the two
-# bundlers ship unrun: this is what proves they cannot come back quiet). ROM-free, ~2 s.
+# bundlers were written without a host to run them — both have run since 2026-09-13 — and
+# this is what proves they cannot come back quiet). ROM-free, ~2 s.
 test_bundle_parsers
 # test_fbneo_boot_log.sh — what a healthy FBNeo WIDE boot log must show, proven
 # against the RECORDED Windows and macOS boots: every vsavjw member (OK), and the
 # profile line wherever the core's messages print (never on Windows). ROM-free, ~1 s.
 test_fbneo_boot_log
+# test_host_libs.sh — the rule a Linux release folder is held to (every file's direct
+# NEEDED sonames shipped and resolving inside, or on the EXTERNAL host-provided list plus
+# ruled exceptions), against stub readelf/ldd so it is proven off Linux. ROM-free, ~1 s.
+test_host_libs
+# test_build_environment_entry.sh — the known-good build environment register's two halves:
+# tests/lib/host_env.sh captures every prerequisite's version from the host's package manager
+# (stub managers, alive under set -e), and tools/record_build_environment.py composes an entry
+# only from a PASSING gate log and records that carry the capture. ROM-free, ~1 s.
+test_build_environment_entry
 # EVERY PUBLISHED ASSET IS SELF-SUFFICIENT and the two emulator routes never
 # travel together (maintainer-ruled 2026-09-12) — the shape of what
 # upload_release_assets.sh CUTS, over the current release. ROM-free, ~5 s.

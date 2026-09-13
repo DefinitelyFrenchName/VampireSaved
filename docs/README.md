@@ -129,6 +129,7 @@ history twins and are listed last. Level-0 files are the entry points above.
 - [`WINDOWS_BUILD.md`](project/WINDOWS_BUILD.md) — **REFERENCE** · Building the release emulator binaries on the Windows machine: both tracks (MSYS2 native -> `windows-x86_64`, WSL2 -> `linux-x86_64`), step by step, with the preflight, the one-minute romset from the published release, the gate, and what to send back
 - [`WSL2_SETUP.md`](project/WSL2_SETUP.md) — **REFERENCE** · Setting up the harness on Windows 10 via WSL2
 - [`build_dir_triage.md`](project/build_dir_triage.md) — **REFERENCE** · build_dir_triage — the build-directory policy and its current inventory · history: `project/build_dir_triage_history.md`
+- [`build_environments.md`](project/build_environments.md) — **INDEX** · Known-good build environments: every host where a release emulator binary was built AND its gate then passed (OS, shell, toolchain, package versions, pins), plus the conditions known to break a build
 - [`coverage_matrix.md`](project/coverage_matrix.md) — **REFERENCE** · §4 COVERAGE MATRIX — the mandate vs the corpus, measured (14z-104)
 - [`cps2_wide.md`](project/cps2_wide.md) — **REFERENCE** · the extended hardware profile we defined · history: `project/cps2_wide_history.md`
 - [`doc_audit_14z118.md`](project/doc_audit_14z118.md) — **LOG** · THE DOCUMENTATION AUDIT (maintainer-ruled 2026-08-29, opened 14z-118): the inventory of every document in `docs/`, HANDOFF and the six skills with…

@@ -16,7 +16,7 @@
 # recipe believed equivalent. mame + fbneo, ~2 min.
 #
 # MUST-FIRE: perturbed-copy: flipped-library-byte — a copy of the fbneo resource dir with one byte of a bundled library flipped must fail the record check (mode: the gate checks that copy in place of the resource)
-# MUST-FIRE: perturbed-copy: absolute-reference — a copy of the mame resource dir carrying a reference that does NOT resolve inside the directory, with the record made consistent so the record check PASSES, must fail the self-containment check (macOS: one install name rewritten back to an absolute Homebrew path, re-signed and re-hashed; Linux/Windows: one bundled library removed together with its sha256 row, so ldd reports it not found) (mode: the gate checks that copy)
+# MUST-FIRE: perturbed-copy: absolute-reference — a copy of the mame resource dir carrying a reference that does NOT resolve inside the directory, with the record made consistent so the record check PASSES, must fail the self-containment check (macOS: one install name rewritten back to an absolute Homebrew path, re-signed and re-hashed; Linux/Windows: one bundled library removed together with its sha256 row, so the folder now needs it from outside — Linux: tools/check_host_libs.py fails it as on no host-provided list; Windows: ldd resolves it outside the folder) (mode: the gate checks that copy)
 #
 # WHY. A prebuilt built by the EMULATOR.md recipe links Homebrew's SDL by
 # absolute path (measured 14z-149: otool -L on both binaries) and runs only on
@@ -34,8 +34,11 @@
 #   macOS    otool -L: every reference is /usr/lib, /System or @loader_path,
 #            and codesign --verify --strict (install_name_tool invalidates a
 #            signature, and an unsigned binary does not run on Apple Silicon)
-#   Linux    ldd: every resolved path is inside this directory or a system
-#            path, nothing "not found" — RUNPATH=$ORIGIN is what makes that so
+#   Linux    tools/check_host_libs.py: every file's direct NEEDED soname is
+#            shipped here AND resolves here (RUNPATH=$ORIGIN), or is on the
+#            EXTERNAL host-provided list tests/expected/linux_host_provided.tsv;
+#            nothing "not found". (A path check is blind on a build host, where
+#            every bundled library also lives under /usr/lib — see the block.)
 #   Windows  ldd/objdump: every import resolves beside the .exe or to the
 #            Windows directory. There is NO signature on this platform, so the
 #            record's sha256 rows are the integrity and the gate says so
@@ -233,38 +236,23 @@ check_dir() {
             codesign --verify --strict "$f" 2>/dev/null || { echo "FAIL: $f does not verify (codesign)"; bad=1; }
         done ;;
     linux)
-        # ldd honours the file's own RUNPATH, so this is what the loader will
-        # actually do on a machine with none of the build host's packages:
-        # every resolved path must be INSIDE this directory or a system path,
-        # and nothing may be "not found".
-        command -v ldd >/dev/null 2>&1 || { echo "FAIL: no ldd(1) on this host — cannot check self-containment"; return 1; }
-        for f in "$d"/*; do
-            case "$(basename "$f")" in BINARY.txt) continue ;; esac
-            head -c 4 "$f" 2>/dev/null | grep -q 'ELF' || continue
-            ldd "$f" 2>/dev/null | python3 -c '
-import sys, os
-d = os.path.realpath(sys.argv[1]); name = sys.argv[2]
-SYS = ("/lib/", "/lib64/", "/usr/lib/", "/usr/lib64/", "/usr/local/lib/")
-for line in sys.stdin:
-    line = line.strip()
-    if "=>" not in line:
-        continue
-    soname, right = (x.strip() for x in line.split("=>", 1))
-    if right.startswith("not found"):
-        print(f"FAIL: {name} needs {soname}, NOT FOUND — the directory is not self-contained")
-        continue
-    path = right.rsplit(" (0x", 1)[0].strip()
-    if not path:
-        continue
-    real = os.path.realpath(path)
-    if os.path.dirname(real) == d:
-        continue                      # beside the binary: what $ORIGIN is for
-    if real.startswith(SYS):
-        continue                      # the host runtime, deliberately not bundled
-    print(f"FAIL: {name} resolves {soname} to {path}, outside this directory and outside the system paths")
-' "$d" "$(basename "$f")" > "$W/refs.txt"
-            [ -s "$W/refs.txt" ] && { cat "$W/refs.txt"; bad=1; }
-        done
+        # NOT A PATH CHECK (2026-09-13, the first Linux run of this gate). This block
+        # accepted any library resolved under /usr/lib as "host runtime", and on a
+        # build host every bundled library also lives there (measured 18 of 18 in
+        # the MAME folder, 17 of 17 in FBNeo's), so the absolute-reference control
+        # removed libSDL2 and PASSED. The anchor the maintainer ruled: every file's
+        # DIRECT NEEDED sonames are shipped here and resolve here, or are on
+        # tests/expected/linux_host_provided.tsv — an EXTERNAL list (manylinux_2_39)
+        # plus exceptions ruled one by one, never the bundler's own policy
+        # ([VSP-166]). One copy of the rule: tools/check_host_libs.py, ground truth
+        # tests/test_host_libs.sh.
+        command -v ldd >/dev/null 2>&1 && command -v readelf >/dev/null 2>&1 \
+            || { echo "FAIL: no ldd(1) or readelf(1) on this host — cannot check self-containment"; return 1; }
+        if python3 "$REPO/tools/check_host_libs.py" "$d" "$REPO/tests/expected/linux_host_provided.tsv" > "$W/refs.txt" 2>&1; then
+            sed 's/^/  /' "$W/refs.txt"
+        else
+            grep -v '^ok:' "$W/refs.txt" | sed 's/^REFUSED:/FAIL: check_host_libs REFUSED:/'; bad=1
+        fi
         echo "  (linux: no code signature exists on this platform — the sha256 rows above are the integrity)" ;;
     windows)
         command -v ldd >/dev/null 2>&1 || { echo "FAIL: no ldd(1) in this shell — run the gate from an MSYS2 MINGW64/UCRT64 shell"; return 1; }
@@ -422,8 +410,8 @@ if [ -z "$ABSREF_SRC" ]; then
 elif check_dir "$W/absref" "$ABSREF_EXE" > "$W/c2.txt" 2>&1; then
     vs_ctl_dead absolute-reference "an unresolvable reference passed the self-containment check" || true; fail=1
 else
-    if grep -qE 'references /opt/homebrew|NOT FOUND|not found|outside this (directory|folder)|not bundled' "$W/c2.txt"; then
-        vs_ctl_fired absolute-reference "on $ABSREF_KIND: $(grep -m1 -E 'references /opt/homebrew|NOT FOUND|not found|outside this|not bundled' "$W/c2.txt")"
+    if grep -qE 'references /opt/homebrew|NOT FOUND|not found|outside this (directory|folder)|not bundled|not in this folder' "$W/c2.txt"; then
+        vs_ctl_fired absolute-reference "on $ABSREF_KIND: $(grep -m1 -E 'references /opt/homebrew|NOT FOUND|not found|outside this|not bundled|not in this folder' "$W/c2.txt")"
     else
         vs_ctl_dead absolute-reference "check_dir failed for another reason: $(grep -m1 '^FAIL' "$W/c2.txt")" || true; fail=1
     fi

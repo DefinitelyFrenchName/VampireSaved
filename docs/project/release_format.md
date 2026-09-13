@@ -153,14 +153,23 @@ release/emulators/<platform>/<os-arch>/                         <- THE BINARY BU
   **windows-x86_64** needs no rewriting at all (the loader searches the .exe's
   own directory first) and has NO signature, so its sha256 rows are the whole
   integrity story. Gate `tests/test_release_binaries.sh`: the record,
-  self-containment (per OS, by RESOLUTION — `otool` / `ldd` — not by re-reading
-  the bundler's own allowlist), the signature where the platform has one, the
-  profile, no harness, and a boot of the current merged set on each binary
-  (MAME reproducing a frozen masked expectation of the freeze).
-  **THE LINUX AND WINDOWS HALVES HAVE NEVER BEEN RUN** (written 14z-150 on a
-  Mac with no such host): `tests/test_bundle_parsers.sh` proves their parsers
-  and their refusal of an empty closure against stub tools, and the first
-  session on each box is what turns "written" into "measured".
+  self-containment (per OS, never by re-reading the bundler's own allowlist:
+  `otool` references on macOS, `ldd` resolution on Windows, and on Linux
+  `tools/check_host_libs.py` — every file's direct NEEDED soname shipped and
+  resolving in the folder, or on the EXTERNAL list
+  `tests/expected/linux_host_provided.tsv` — because a resolution check is blind
+  on a Linux build host, ruled 2026-09-13), the signature where the platform has
+  one, the profile, no harness, and a boot of the current merged set on each
+  binary (MAME reproducing a frozen masked expectation of the freeze).
+  **~~THE LINUX AND WINDOWS HALVES HAVE NEVER BEEN RUN~~ BOTH RAN 2026-09-13
+  (14z-152, the maintainer's Windows box):** the Windows gate PASSES on MSYS2;
+  on WSL2 the Linux binaries passed the boot and MAME checks, and the gate's
+  Linux self-containment rule was replaced after its own control went dead (the
+  new rule passes both folders when run directly). Those Linux binaries are a
+  PROOF run only (Ubuntu 26.04, glibc 2.43 floor); published Linux binaries come
+  from the dedicated server on an older LTS. `tests/test_bundle_parsers.sh` still
+  proves the bundlers' parsers and their refusal of an empty closure against
+  stub tools.
   **WHERE THE FILES LIVE (ruled 2026-09-11, the maintainer's three questions
   answered by measurement):** a committed binary lives in every clone's
   history forever — ~140 MB per release, tripled by three OSes, against a

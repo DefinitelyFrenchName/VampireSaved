@@ -387,7 +387,8 @@ found. Anchor mirror excludes: `--exclude '/build/'`.
 (paid: same session, ~8 min of wasted compile)
 **[CPE-23]** **[MFI-23]** **WHICH OSD, measured from the pinned source** (`makefile`, "specify OSD
 layer"): `TARGETOS=macosx` -> `sdl3`, `linux` -> `sdl` (SDL2 + SDL2_ttf +
-fontconfig, `scripts/src/osd/sdl.lua`), `windows` -> `windows`, the native OSD
+fontconfig, `scripts/src/osd/sdl.lua`, plus the `qmake6` TOOL its config
+queries on every build — the 2026-09-13 entry), `windows` -> `windows`, the native OSD
 needing no SDL at all. The macOS requirement was written down as everyone's
 until 2026-09-12, when a Linux build died on a `fontconfig.pc` nothing had
 asked for and a WSL2 page was sending readers to compile SDL3 from source for
@@ -2384,7 +2385,7 @@ From `emu/mame/makefile`, "specify OSD layer":
 
 | `TARGETOS` | OSD | needs |
 |---|---|---|
-| `linux` | `sdl` | SDL2, **SDL2_ttf**, **fontconfig** (`scripts/src/osd/sdl.lua` links the first and asks pkg-config for the second) |
+| `linux` | `sdl` | SDL2, **SDL2_ttf**, **fontconfig** (`scripts/src/osd/sdl.lua` links the first and asks pkg-config for the second), and the **`qmake6`** tool `sdl_cfg.lua` queries on every build (no Qt linked — the 2026-09-13 entry) |
 | `windows` | `windows` | nothing from SDL — the native OSD |
 | `macosx` | `sdl3` | SDL3 |
 
@@ -2398,7 +2399,11 @@ never opens.
 The obvious fix — installing `qtbase5-dev` — is the wrong one: it LINKS Qt5
 into a binary that then has to ship it. `tools/setup_mame.sh` passes
 `USE_QTDEBUG=0` there instead, which is already the default on the other two
-platforms, so the three binaries stay the same instrument.
+platforms, so the three binaries stay the same instrument. **But the `qmake6`
+TOOL is needed on Linux all the same** (paid 2026-09-13): the sdl OSD's config
+queries it for Qt's header folder on every build, debugger or not, and without
+it `-std=c++20` is swallowed — the `qmake6` entry at the end of this file.
+Install `qmake6` alone; no Qt library is linked.
 
 ## WSL2 GIVES THE VM ALL THE HOST'S CORES AND HALF ITS RAM — a `-j$(nproc)` build then thrashes, and a thrashing build looks busy (paid: 2026-09-12, MAME ~10x slower under WSL2 than native on the same machine)
 
@@ -2458,3 +2463,61 @@ cleanly there. Nothing asserts on it.
 
 Same family as the MAME OSD entry above: a macOS fact — "a healthy start
 prints the profile line" — written down as everyone's.
+
+## A MISSING `qmake6` SILENTLY DROPS `-std=c++20` FROM MAME'S LINUX OSD — a bare `-I` swallows the next word (paid: 2026-09-13, the first WSL2 MAME release build, dead minutes in on `char8_t`)
+
+`scripts/src/osd/sdl_cfg.lua` (lines 138-147 at our pin) adds, for `linux`,
+UNCONDITIONALLY unless `QT_HOME` is set:
+
+    "-I$(shell qmake6 -query QT_INSTALL_HEADERS)",
+
+It is not tied to `USE_QTDEBUG`: the generated `osd_sdl.make` carried it with
+`-DUSE_QTDEBUG=0`. On a host with no `qmake6` the shell expands to nothing and
+the compile line holds a bare `-I` immediately followed by `-std=c++20` —
+measured from the dry-run command, the only `-std` on the line. `g++` takes
+`-std=c++20` as the include directory and compiles in its default dialect
+(gnu++17 on GCC 15), so `src/lib/util/language.h` dies on `char8_t` 167 files
+in, while `libemu`, from a different project file, compiled fine. The tells in
+the log: `make[2]: qmake6: No such file or directory` just before, and
+`warning: identifier 'char8_t' is a keyword in C++20`.
+
+MAME's own Ubuntu prerequisites (`docs/source/initialsetup/compilingmame.rst`)
+list `qt6-base-dev qt6-base-dev-tools`, which is why upstream never meets this;
+ours had dropped Qt entirely to keep it out of the binary. **The fix is the tool
+alone.** On Ubuntu 26.04 `qmake6` is its own package — `qt6-base-dev-tools`
+does NOT ship it, which a listing of the package showed before anything was
+installed — six small packages with Qt Core's runtime and no headers.
+`USE_QTDEBUG=0` still links no Qt: zero Qt libraries in the release binary's
+closure. `tools/setup_mame.sh` and the preflight now refuse a Linux host
+without it.
+
+General lesson: a `$(shell …)` inside a flag is a flag that can become a
+different flag. When a compile warns about a language standard the makefile
+plainly sets, read the ACTUAL command line (`make -n`), not the makefile.
+
+## ON A LINUX BUILD HOST EVERY BUNDLED LIBRARY ALSO RESOLVES SYSTEM-WIDE — a "resolved under /usr/lib" self-containment check is blind there (paid: 2026-09-13, the release gate's absolute-reference control DEAD on its first Linux run)
+
+The bundler copies its libraries OUT of the build host's system directories, so
+on the host that built the folder every one of them still exists there —
+measured 18 of 18 in the MAME folder and 17 of 17 in FBNeo's, with `libSDL2` as
+the positive control (the first count read 0 of 18: `ldconfig -p` puts a TAB
+before each soname and the pattern looked for a space). Remove a bundled library
+and `ldd` quietly resolves the system copy (`libSDL2-2.0.so.0 =>
+/usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0`, package `libsdl2-2.0-0`); a check
+that treats anything under `/usr/lib` as host runtime passes, and a player's
+machine without that package cannot start the binary.
+
+macOS and Windows do not have the hole: what they accept outside the folder
+(`/usr/lib` and `/System`; the Windows directory) is exactly what a player has,
+while the build packages live elsewhere (Homebrew, MSYS2) and get flagged. Only
+on Linux do the build host's packages share the base system's directories.
+
+**The rule that replaced it** (maintainer-ruled 2026-09-13): judge what the
+folder ASKS FOR, not where this host's loader found it — every file's direct
+`NEEDED` sonames are shipped and resolve inside the folder, or are on
+`tests/expected/linux_host_provided.tsv`, an EXTERNAL list (manylinux_2_39 from
+auditwheel 6.4.2) plus exceptions ruled one by one; never the bundler's own
+policy ([VSP-166]). `tools/check_host_libs.py`, ground truth
+`tests/test_host_libs.sh`. The goal the ruling set is that check PLUS a
+resolution on a clean machine at release time, the only answer with no list in
+it.

@@ -271,6 +271,20 @@ cd "$MIRROR"
 # recipe line nobody can verify.
 QTFLAG=""
 if [ "$(uname -s)" = Linux ]; then QTFLAG="USE_QTDEBUG=0"; fi
+# AND qmake6 MUST EXIST ON LINUX with the debugger off (2026-09-13, the first WSL2
+# MAME release build): scripts/src/osd/sdl_cfg.lua adds
+# `-I$(shell qmake6 -query QT_INSTALL_HEADERS)` to the sdl OSD for linux
+# UNCONDITIONALLY (unless QT_HOME is set). With no qmake6 that is a bare `-I`,
+# which takes the next word — `-std=c++20` — as its directory, so the OSD files
+# compile as C++17 and die on char8_t minutes in. The tool adds an include path
+# only: USE_QTDEBUG=0 still links no Qt (measured: zero Qt libraries in the
+# release binary's closure). Inert off Linux.
+if [ "$(uname -s)" = Linux ] && ! command -v qmake6 >/dev/null 2>&1; then
+    echo "REFUSING: no qmake6 on this Linux host. MAME's sdl OSD asks it for Qt's header" >&2
+    echo "  folder on every build, and without it -std=c++20 is swallowed (char8_t errors" >&2
+    echo "  minutes in). The tool only, no Qt is linked:  sudo apt install -y qmake6" >&2
+    exit 1
+fi
 # shellcheck disable=SC2086  # QTFLAG is one word or empty, by construction
 make SUBTARGET=cps2 SOURCES=src/mame/capcom/cps2.cpp NOWERROR=1 REGENIE=1 $QTFLAG -j"$JOBS"
 

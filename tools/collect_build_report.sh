@@ -66,7 +66,7 @@ else
 fi
 
 section "tool versions"
-for t in gcc g++ make python3 git patchelf pkg-config pkgconf sdl2-config ldd objdump readelf strings perl zip; do
+for t in gcc g++ make python3 git patchelf pkg-config pkgconf sdl2-config qmake6 ldd objdump readelf strings perl zip; do
     if command -v "$t" >/dev/null 2>&1; then
         printf '  %-12s %s\n' "$t" "$("$t" --version 2>&1 | head -1)"
     else

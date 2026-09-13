@@ -96,14 +96,16 @@ in Explorer.
 ```bash
 sudo apt update
 sudo apt install -y build-essential python3 git rsync patch pkgconf perl \
-                    libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libfontconfig-dev
+                    libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libfontconfig-dev qmake6
 ```
 
 What each is for: `build-essential` = compiler + make; `python3` = build
 scripts and all our analysis tools; `rsync` = the space-free build mirror;
 `patch` = applying our emulator patches; `pkgconf` = how both recipes find
 their libraries. `libsdl2-dev` + `libsdl2-image-dev` + `perl` are FBNeo's;
-`libsdl2-dev` + `libsdl2-ttf-dev` + `libfontconfig-dev` are MAME's.
+`libsdl2-dev` + `libsdl2-ttf-dev` + `libfontconfig-dev` are MAME's, and so is
+`qmake6` — the TOOL only, no Qt library is linked (see "And NO Qt packages"
+below for why it is needed anyway).
 
 ### Which SDL MAME wants here — SDL2, and NOT SDL3
 
@@ -113,7 +115,7 @@ different OSD per platform (`emu/mame/makefile`, "specify OSD layer"):
 
 | `TARGETOS` | OSD | what it needs |
 |---|---|---|
-| `linux` | `sdl` | **SDL2**, **SDL2_ttf**, **fontconfig** |
+| `linux` | `sdl` | **SDL2**, **SDL2_ttf**, **fontconfig**, and the **`qmake6`** tool (no Qt linked) |
 | `windows` | `windows` | nothing from SDL — the native OSD |
 | `macosx` | `sdl3` | SDL3 |
 
@@ -121,7 +123,15 @@ different OSD per platform (`emu/mame/makefile`, "specify OSD layer"):
 pkg-config for `fontconfig`; miss either and the build dies well in, on a
 link error or on `Package fontconfig was not found`.
 
-**And NO Qt packages, despite what the build will ask for if you let it.**
+**And NO Qt packages except the `qmake6` TOOL, despite what the build will ask for if you let it.**
+The exception first (paid 2026-09-13, the first WSL2 MAME release build): MAME's
+Linux sdl config (`scripts/src/osd/sdl_cfg.lua`) asks `qmake6` for Qt's header
+folder on EVERY build, debugger or not. Without `qmake6` that request leaves a
+bare `-I` on the compile line, which swallows the `-std=c++20` after it, and the
+build dies on `char8_t` minutes in. `qmake6` is its own package on Ubuntu (not
+`qt6-base-dev-tools`), pulls in Qt Core's runtime and no headers, and links
+nothing into the binary. `tools/setup_mame.sh` refuses a Linux host without it.
+The rule below is unchanged:
 Linux is the one platform where MAME defaults its Qt5 debugger ON
 (`scripts/src/osd/modules.lua`), so a plain build stops on a missing `moc`
 and the obvious fix is to `apt install qtbase5-dev`. Do not: it would LINK

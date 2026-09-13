@@ -47,6 +47,9 @@ set -eu
 
 KIND="${1:?usage: [CHECK=1] tools/build_release_emulators.sh fbneo|mame}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+# the build ENVIRONMENT this host records beside `built` — one env line per prerequisite,
+# from its own package manager (docs/project/build_environments.md is composed from it)
+. "$REPO/tests/lib/host_env.sh"
 SCRATCH="${BUILD_SCRATCH:-$HOME/.cache/vampire-saved}"
 ROOT="${RELEASE_EMULATORS:-$REPO/release/emulators}"
 JOBS="${JOBS:-$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)}"
@@ -147,6 +150,10 @@ if [ "${CHECK:-0}" = 1 ]; then
     [ "$KIND" = fbneo ] && echo "sdl3 probe $SDL3LIB   (bundled only when the linked SDL2 is sdl2-compat)"
     echo "out        $OUT"
     echo "jobs       $JOBS      scratch: $SCRATCH"
+    echo "tree       $(git -C "$REPO" rev-parse --short=12 HEAD 2>/dev/null || echo unknown)"
+    # the environment a real build would record — so the capture is exercised on a host
+    # without building anything (tests/lib/host_env.sh)
+    vs_host_env "$HOSTOS"
     echo "(CHECK=1: nothing was built, nothing was written)"
     exit 0
 fi
@@ -281,6 +288,13 @@ PATCH_SHA1="$(sha1_of "$PATCH")"
     echo "patch      0002-cps2-wide-v1.patch  sha1 $PATCH_SHA1  (the ONLY patch applied; the project's replay-harness patch is a test instrument and is not in this binary)"
     echo "recipe     $RECIPE"
     echo "built      $DATE on $HOST, by tools/build_release_emulators.sh $KIND"
+    # THE ENVIRONMENT, 2026-09-13: what docs/project/build_environments.md is composed from —
+    # the commit built from (flagged when the build scripts or patches carry uncommitted
+    # changes), the job count, and every prerequisite's version from this host's own
+    # package manager (tests/lib/host_env.sh; tools/record_build_environment.py reads them).
+    echo "tree       $(git -C "$REPO" rev-parse --short=12 HEAD 2>/dev/null || echo unknown)$(git -C "$REPO" diff --quiet HEAD -- tools tests/lib emu/fbneo-patches emu/mame-patches 2>/dev/null || echo ' (with uncommitted changes to the build scripts or patches)')"
+    echo "jobs       $JOBS"
+    vs_host_env "$HOSTOS"
     requires_line "$OUT" "$EXE" "$LIBS"
     echo "run        $RUN"
     echo "$FIRSTRUN"
