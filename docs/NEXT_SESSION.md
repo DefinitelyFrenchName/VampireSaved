@@ -1,106 +1,90 @@
-# NEXT SESSION — orientation (rewritten at the 14z-151 CLOSE, 2026-09-13)
+# NEXT SESSION — orientation (rewritten at the 14z-152 CLOSE, 2026-09-13)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## THE WINDOWS AND LINUX RELEASE BUILDS ARE BEING RUN BY THE MAINTAINER RIGHT NOW, AND THE LOOP IS LIVE. NO BUILD BYTE MOVED ALL SESSION.
+## ALL THREE PLATFORMS' RELEASE GATES ARE GREEN, THE WINDOWS BOX IS DRIVEN OVER SSH, AND A REGISTER RECORDS WHERE A BUILD IS KNOWN TO WORK. NO SHIPPED ROM BYTE MOVED.
 
 M18 (`merged-m18`, `build/m3b_merged26`) is still the current freeze and
 release. `git status -sb` says the push state.
 
-**THE LOOP, and it is the fastest way back in:** the maintainer runs a command
-on their box, sends the console output, the defect is diagnosed HERE, fixed,
-gated, pushed; they `git pull` and run again. **Twelve defects in one sitting,
-every one ours, none in a shipped ROM byte** — STATE 14z-151 (6a)-(6g) and (8).
-Every durable fact is in `docs/platform/gotchas.md`'s last five entries: READ
-THOSE FIRST before touching any non-macOS host.
+**HOW THE WINDOWS BOX IS WORKED (maintainer-ruled 2026-09-13):** from this Mac,
+over SSH, never a separate Claude session on the box. `ssh musicmaking`, scripts
+on stdin, the `^**` post-quantum banner filtered out:
 
-**WHERE THE MAINTAINER IS, exactly:**
+| route | command | clone | dumps |
+|---|---|---|---|
+| MSYS2 MINGW64 | `ssh musicmaking 'C:\msys64\usr\bin\env.exe MSYSTEM=MINGW64 CHERE_INVOKING=1 /usr/bin/bash -l -s' <<'EOF'` | `/home/alexr/vampire-saved` | `/home/alexr/roms` |
+| WSL2 (Linux user **`koneko`**) | `ssh musicmaking 'wsl.exe -e bash -l -s' <<'EOF'` | `/home/koneko/vampire-saved` | `/home/koneko/roms` |
 
-| | |
-|---|---|
-| MSYS2 native (`windows-x86_64`) | FBNeo + MAME BUILT and recorded; the release gate is mid-loop |
-| WSL2 (`linux-x86_64`) | FBNeo built; MAME restarted with `JOBS=8` after the memory thrash |
-| a dedicated Linux server, 8c/64 GB | coming — the better home for the Linux binaries (glibc floor = the build host's) |
+A WSL2 job survives a disconnect only while the maintainer keeps a WSL window
+open; run MSYS2 jobs inside a live session. The memory note
+`remote-build-machines` has the rest.
 
-**WHAT WINDOWS HAS PROVEN:** both emulators build; MAME's `-verifyroms` passes
-on an applier-built romset (20 members flagged, exactly the rewritten set).
-**WHAT IS STILL UNPROVEN OUTSIDE macOS:** the FBNeo boot leg (it has never
-printed `CPS-2 WIDE v1 profile active` there) and MAME reproducing
-`05_timeout_idle`'s frozen expectation. Those two are the whole remaining
-question, and both now leave evidence: `build/fbneo_boot_<os>.log` is kept
-whatever the verdict.
+**WHERE THE RELEASE BINARIES STAND:**
 
-**THE MAINTAINER'S NEXT THREE COMMANDS** (they were given these at the close):
-`rm -rf release/emulators/fbneo/windows-x86_64/{config,recordings,roms,savestates,screenshots}`
-(one-time cleanup of the pollution the gate itself caused),
-`pacman -S --needed diffutils`, then `git pull && MERGED=build/fromrelease
-tests/test_release_binaries.sh`.
+| os-arch | built | gate | published |
+|---|---|---|---|
+| macos-arm64 | 2026-09-11 | PASS (74 s, 2026-09-13) | yes, `freeze/merged-m18` |
+| windows-x86_64 | 2026-09-12 on the box (MSYS2) | PASS at `8b908cd4` and `32268250` | **awaiting the maintainer's word** |
+| linux-x86_64 | 2026-09-13, rebuilt on WSL2 (Ubuntu 26.04) | PASS at `a145562c` | never — a PROOF run, glibc 2.43 floor |
 
 ## START HERE — what is open
 
-- **WINDOWS and LINUX: BEING RUN NOW (2026-09-12), and it is going exactly as the
-  last opener predicted.** The maintainer has both tracks on the Windows box
-  (MSYS2 native -> `windows-x86_64`, WSL2 -> `linux-x86_64`); a DEDICATED Linux
-  server, 8 cores / 64 GB, comes later and is the better home for the Linux
-  binaries (the glibc floor is the build host's, so build on the oldest LTS
-  worth supporting). **Seven defects so far, every one of them ours and none in
-  a shipped ROM byte** — STATE 14z-151 (6a)-(6f) and five new platform gotchas.
-  **STATUS: FBNeo built on both tracks; MAME built and recorded on MSYS2
-  (`standalone: 16 import(s)`, a `-static` binary); MAME on WSL2 restarted with
-  `JOBS=8` after the memory thrash.** What is still unrun anywhere: the release
-  GATE on either Windows track (`MERGED=build/fromrelease
-  tests/test_release_binaries.sh` — the romset comes from the applier in a
-  minute, no build pipeline), and therefore the upload of those assets.
-  **READ `docs/platform/gotchas.md`'s last five entries before touching a
-  non-macOS host** — they are the whole cost of today in one place.
-- **~~`test_bbh_fidelity` WENT RED INSIDE THE STATIC TIER AND GREEN ALONE~~ ROOT-CAUSED
-  2026-09-12 (14z-151): A WALL-CLOCK DURATION INSIDE TEXT COMPARED EXACTLY.** bbh's F1
-  diffs the two static runners line for line; the output carries each gate's duration,
-  which is not verdict text, so `norm()` masked it — but only in the COLUMN form
-  (`PASS    1s`). The controls readout appends it as a SUFFIX, `(1s)`, and the regex
-  demanded a space before the digits and a space or end-of-line after the `s`. So when
-  one runner's stub gate straddled a second boundary and the other's did not, two
-  IDENTICAL verdicts differed by one character. Caught by running the gate SIX times
-  with every log kept: 1 red, and the diff above was its whole content. Fixed in the
-  harness (`529f9d2`, pushed) by masking the suffix form, PROVEN deterministically (the
-  two real lines: differ under the old mask, identical under the new) and corroborated
-  8/8 green. **NOT CLAIMED: that the two 2026-09-11 occurrences were this** — their logs
-  are gone; this is the leading and the only measured explanation. The kept-log
-  instrument is what made the third one readable, so read `build/gate_failures_static/`
-  first if anything like it returns.
-- **At the next freeze/release sweep: the 34 emulator-tier modes HONOURED.**
-  `run_all_emulator.sh --scope all --lane all --strict --controls` (the ruled
-  release invocation). The ~20 expensive gates' modes were never run; a mode
-  that REFUSES on a pruned prerequisite (a control build, a recording,
-  Verilator/jtcores) is a dead mode, not a pass. Its COST is the number to
-  record — the ruling said "we can always adjust later".
+- **Publishing the Windows binaries — the maintainer's word** (STATE "Decisions
+  pending"). When it comes: REBUILD on MSYS2 with the capturing builder (the
+  2026-09-12 records predate `tree`/`jobs`/`env`), re-run the gate, compose the
+  register entry with `tools/record_build_environment.py`, commit the two
+  `BINARY.txt` records, then `tools/upload_release_assets.sh` from where the files
+  are — check first whether `gh` is authenticated on the box. MAME is the long
+  Windows build.
+- **The Linux clean-machine check (ruled option 3, the goal):** once the dedicated
+  Linux server exists, build the PUBLISHED Linux binaries there on the oldest LTS
+  worth supporting, and add a release-time resolution on a machine with no `-dev`
+  packages. The WSL2 binaries are never published.
+- **OPEN, not root-caused — a red that did not say why.** At 18:10 a strict tier
+  had `test_bbh_fidelity` FAIL (cause: a stale MFI skill guide, fixed), but its
+  kept log lacked the harness's own FAIL reason: 35 lines against 40 on a PASS,
+  missing the F11 guide line, F2 and the harness's final line. Reproduce in a
+  CLEAN tree: make the MFI guide stale in a scratch worktree, run
+  `sh ../../blackbox-harness/selftest/test_fidelity_vampire.sh` directly, keep
+  every line. Either the kept-log copy or the harness script loses its reason.
+- **One CR byte** remains in the Windows gate's output after the UTF-8/LF fix —
+  unlocated; no verdict depends on it.
+- **At the next freeze/release sweep:** the 34 emulator-tier control modes
+  (`run_all_emulator.sh --scope all --lane all --strict --controls`), cost to record.
 - **Zabel j.LK proximity guard** — its own session (recording first).
-- **The community cross-check**: specials/supers/throws still have no naming
-  rigs on vsavj; every cell on the page is arbitrated.
-- Smaller: `audit_mask_window_ff42a2` deprecated-vs-case-specific;
+- **The community cross-check**: specials/supers/throws still have no naming rigs
+  on vsavj.
+- Smaller, carried: `audit_mask_window_ff42a2` deprecated-vs-case-specific;
   `release/merged-m15` never packaged; #112 option (B); the living-docs
-  generalisation (ruled, not scheduled); the wider-host re-measure of the
-  pull queue's gain; the `hit` rigs' LP events whiff at contact range.
+  generalisation (ruled, not scheduled); the wider-host re-measure of the pull
+  queue's gain; the `hit` rigs' LP events whiff at contact range.
 
 ## TRAPS PAID THIS SITTING — read before writing code for a host you do not have
 
-1. **A tool you cannot run needs a REFUSAL, not a hope.** Both bundlers
-   hard-refuse an empty closure: without that, a parser returning nothing makes
-   the bundler "succeed" and its verifier then finds no leftovers — a vacuous
-   green on a binary that runs only on the build host ([VSP-148]).
-2. **A `CONTROL=` mode that echoes FAIL is a LIE.** Mine did, until they were
-   rewritten as shadow-tool perturbations that disable ONE guard in a copy and
-   let the gate fail on its own ([VSP-181]).
-3. **A character class silently narrows an inventory.** `[a-z0-9-]+` admitted
-   `macos-arm64` and rejected every underscore-bearing os-arch.
-4. **An illustrative hex address in a docstring lands in the address index** —
-   `gen_annotations.py` reads `0x00007ffd…` as `PRG:0x007FFD`. Elide sample
-   addresses in tool documentation.
-5. **This MacBook is memory-tight**: run a long tier DETACHED and poll the
-   PROCESS, never two emulator-bearing runs at once.
+1. **A check keyed on one line of output fails wherever that line cannot print.**
+   FBNeo's Windows frontend drops every core message; the proof that stayed was the
+   member loads. Key a check on evidence the host can produce.
+2. **On a Linux build host every bundled library also lives under /usr/lib**, so a
+   resolution check cannot see a missing one. Judge what the folder ASKS FOR.
+3. **A `$(shell …)` inside a flag can become a different flag** — a missing
+   `qmake6` turned `-I` into the eater of `-std=c++20`. Read `make -n`, not the
+   makefile.
+4. **`var=$(cmd)` under `set -e` ends the shell when `cmd` fails** — the
+   environment capture died on an absent package in its own test; every query ends
+   `|| true`.
+5. **Repeat a test with its confounder removed before relying on it** — "WSL2 jobs
+   survive a disconnect" was really the maintainer's open window.
+6. **Editing an anchored paragraph stales its skill GUIDE** —
+   `tools/gen_skill_guide.py --prefix <PFX>` in the same commit; a strict tier went
+   147/0/2 on it.
+7. **Check an instrument with a positive control** — `ldconfig -p` puts a TAB before
+   each soname; "0 of 18" was the pattern, not the host.
+8. **This MacBook kills harness background tasks under memory pressure** — run a
+   strict tier DETACHED (`nohup … &!`) and wait on its PID.
 
 **IF A DOC IS TOUCHED:** the eight `--check`s, exit statuses captured directly,
 `${=cmd}` in zsh. **A running script is never edited** ([MSC-54]). **The static

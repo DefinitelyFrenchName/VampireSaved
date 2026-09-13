@@ -62,17 +62,24 @@ entry made after 2026-09-13 comes from the tool.
 | published | not yet |
 | captured | 2026-09-13, the day after the build, same host |
 
-### linux-x86_64 — PROOF RUN, never published (Ubuntu 26.04 under WSL2)
-
-**Not yet an entry:** the build passed the gate's boot and MAME checks, but the
-gate has not yet PASSED end to end under the replaced Linux self-containment
-rule. What was captured, for when it does:
+### linux-x86_64 — FBNeo + MAME, built 2026-09-13
 
 | | |
 |---|---|
-| host | Ubuntu 26.04 LTS under WSL2 (kernel 6.18.33.2-microsoft-standard-WSL2); glibc 2.43; gcc 15.2.0; GNU Make 4.4.1; `JOBS=8` |
-| packages | dpkg: `build-essential` 12.12ubuntu2.26.04.2, `libsdl2-dev` 2.32.10+dfsg-6, `libsdl2-image-dev` 2.8.8+dfsg-2, `libsdl2-ttf-dev` 2.24.0+dfsg-3, `libfontconfig-dev` 2.17.1-3ubuntu1, `qmake6` 6.10.2+dfsg-7, `pkgconf` 2.5.1-4, `patchelf` 0.18.0-1.4build1, `binutils` 2.46-3ubuntu2, `python3` 3.14.3-0ubuntu2, `git` 1:2.53.0-1ubuntu1, `rsync` 3.4.1+ds1-7ubuntu0.3, `patch` 2.8-2build1, `perl` 5.40.1-7ubuntu0.3, `zip` 3.0-15ubuntu3, `unzip` 6.0-29ubuntu1, `coreutils` 9.5-1ubuntu2, `diffutils` 1:3.12-1ubuntu0.1 |
-| why never published | its glibc floor is the build host's, 2.43: it does not start on Ubuntu 22.04 or 24.04. Published Linux binaries are to come from the dedicated server on an older LTS |
+| host | Ubuntu 26.04 LTS (x86_64), cc (Ubuntu 15.2.0-16ubuntu1) 15.2.0 |
+| system | Ubuntu 26.04 LTS (kernel 6.18.33.2-microsoft-standard-WSL2); ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43 |
+| packages | dpkg `binutils` 2.46-3ubuntu2, dpkg `build-essential` 12.12ubuntu2.26.04.2, dpkg `coreutils` 9.5-1ubuntu2+0.0.0~ubuntu25, dpkg `diffutils` 1:3.12-1ubuntu0.1, dpkg `gcc` 4:15.2.0-5ubuntu1, dpkg `git` 1:2.53.0-1ubuntu1, dpkg `libfontconfig-dev` 2.17.1-3ubuntu1, dpkg `libsdl2-dev` 2.32.10+dfsg-6, dpkg `libsdl2-image-dev` 2.8.8+dfsg-2, dpkg `libsdl2-ttf-dev` 2.24.0+dfsg-3, dpkg `make` 4.4.1-3, dpkg `patch` 2.8-2build1, dpkg `patchelf` 0.18.0-1.4build1, dpkg `perl` 5.40.1-7ubuntu0.3, dpkg `pkgconf` 2.5.1-4, dpkg `python3` 3.14.3-0ubuntu2, dpkg `qmake6` 6.10.2+dfsg-7, dpkg `rsync` 3.4.1+ds1-7ubuntu0.3, dpkg `unzip` 6.0-29ubuntu1, dpkg `zip` 3.0-15ubuntu3 |
+| emulators | FBNeo `79188379cc84`, patch sha1 `17cd7516`; MAME `27a8d9e85b58`, patch sha1 `1d13c9d8` |
+| built from | FBNeo tree `a145562c008e`, jobs 8; MAME tree `a145562c008e`, jobs 8 |
+| gate | `PASS: test_release_binaries (linux-x86_64)` (test_release_binaries-linux-14z152-rebuilt.log) |
+
+The first entry written by `tools/record_build_environment.py` itself (rebuilt
+with the capturing builder on the maintainer's WSL2 box, gate re-run on the
+rebuilt binaries, both must-fire controls firing). **A PROOF RUN, never
+published:** its glibc floor is the build host's, 2.43, so it does not start
+on Ubuntu 22.04 or 24.04; published Linux binaries are to come from the
+dedicated server on an older LTS. The WSL2 build also needs a Windows-side WSL
+window open for its whole run.
 
 ## Conditions known to break a build
 

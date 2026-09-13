@@ -163,9 +163,9 @@ release/emulators/<platform>/<os-arch>/                         <- THE BINARY BU
   binary (MAME reproducing a frozen masked expectation of the freeze).
   **~~THE LINUX AND WINDOWS HALVES HAVE NEVER BEEN RUN~~ BOTH RAN 2026-09-13
   (14z-152, the maintainer's Windows box):** the Windows gate PASSES on MSYS2;
-  on WSL2 the Linux binaries passed the boot and MAME checks, and the gate's
-  Linux self-containment rule was replaced after its own control went dead (the
-  new rule passes both folders when run directly). Those Linux binaries are a
+  on WSL2 the Linux gate PASSES end to end under the replaced self-containment
+  rule (at `a145562c`, both must-fire controls firing; the rule was replaced
+  after the old one's own control went dead). Those Linux binaries are a
   PROOF run only (Ubuntu 26.04, glibc 2.43 floor); published Linux binaries come
   from the dedicated server on an older LTS. `tests/test_bundle_parsers.sh` still
   proves the bundlers' parsers and their refusal of an empty closure against
