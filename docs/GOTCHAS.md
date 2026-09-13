@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-338 entries (41 game / 101 platform / 196 project), counted from the buckets at generation.
+341 entries (41 game / 102 platform / 198 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 41 entries
 
@@ -66,7 +66,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - THE BOOT NAME SCREEN'S DISPLAY SCRIPT TAKES AN EVEN COLUMN — an odd one is a 68k ADDRESS ERROR that soft-boots the machine (paid: 14z-127)
 - THE ENGINE CLAMPS THE FIGHTERS TO 336 px APART — a wider position poke is pulled back the same frame, and a "whiff" leg for a travelling move does not exist (paid: 14z-146)
 
-## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 101 entries
+## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 102 entries
 
 - A 1-BYTE MEMORY TAP MISSES WORD ACCESSES ON THIS 16-BIT BUS — and reads as a clean, meaningless zero (paid: 14z-126b)
 - CPS-2 ROM file byte order is NOT 68k logical order (paid: 2026-07-25, ~1h)
@@ -169,8 +169,9 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - FBNeo'S SDL FRONTEND ON WINDOWS PRINTS NONE OF THE EMULATOR CORE'S MESSAGES — a correct WIDE boot there never says "profile active" (paid: 2026-09-13, the release gate red on a correct Windows boot)
 - A MISSING `qmake6` SILENTLY DROPS `-std=c++20` FROM MAME'S LINUX OSD — a bare `-I` swallows the next word (paid: 2026-09-13, the first WSL2 MAME release build, dead minutes in on `char8_t`)
 - ON A LINUX BUILD HOST EVERY BUNDLED LIBRARY ALSO RESOLVES SYSTEM-WIDE — a "resolved under /usr/lib" self-containment check is blind there (paid: 2026-09-13, the release gate's absolute-reference control DEAD on its first Linux run)
+- A NATIVE WINDOWS PYTHON WRITES `\r\n` FOR EVERY `\n` IT PRINTS — reconfiguring one Python block of a gate leaves the others emitting CRLF (paid: 2026-09-13, one CR byte left in the Windows release gate's output after the first fix)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 196 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 198 entries
 
 - A gate that prints `SKIP:` AND exits NON-ZERO is a FAILURE, not a skip (paid: 14z-128)
 - `... | while read` puts the loop in a SUBSHELL, so the `wait` after it waits for nothing (paid: 14z-128)
@@ -368,3 +369,5 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - THE MUST-FIRE RETROFIT'S TWO SHELL TRAPS — a `[ ] && f` as a loop's last statement under `set -e`, and a text edit that read a comment-stripped copy (paid: 14z-147)
 - A GATE THAT USES `CONTROL` AS ITS OWN ENV VAR COLLIDES WITH THE MUST-FIRE MODE SELECTOR (paid: 14z-147c)
 - `xdelta3 printhdr`'s "secondary compressor" line is the BINARY's default, not the file's (paid: 14z-148)
+- A CAPTURE THAT RECORDS ITS OWN EXIT STATUS UNDER `set -e` ENDS THE SCRIPT — the status and the message both die inside the variable (paid: 14z-152, 14z-153)
+- A FINDER `.DS_Store` IN `release/` TURNS `test_release_asset_shape` RED ON THIS MAC — the gate measured the host, not the artifact (paid: 14z-153)

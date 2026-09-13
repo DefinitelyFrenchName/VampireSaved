@@ -2521,3 +2521,16 @@ policy ([VSP-166]). `tools/check_host_libs.py`, ground truth
 `tests/test_host_libs.sh`. The goal the ruling set is that check PLUS a
 resolution on a clean machine at release time, the only answer with no list in
 it.
+
+## A NATIVE WINDOWS PYTHON WRITES `\r\n` FOR EVERY `\n` IT PRINTS — reconfiguring one Python block of a gate leaves the others emitting CRLF (paid: 2026-09-13, one CR byte left in the Windows release gate's output after the first fix)
+
+MSYS2 MINGW64's `python3` is a native Windows program, so its stdout is in text
+mode: each `\n` goes out as `\r\n`, in the console code page (cp1252). The first
+fix put `sys.stdout.reconfigure(encoding="utf-8", newline="\n")` in the release
+gate's self-containment block; its `-verifyroms` block is a separate heredoc
+with no such line, so its one PASS line kept a CR — one byte, on line 7 of the
+kept log, located 14z-153. The setting is per PROCESS: every `python3` a gate
+starts that prints verdict text needs the line (or its output through
+`tr -d '\r'`). `PYTHONIOENCODING` fixes the encoding and never the newline.
+macOS and Linux are unaffected, and the line is inert there (the macOS gate
+re-run identical, 0 CR).

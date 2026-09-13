@@ -4523,3 +4523,34 @@ the release patches show `VCD_APPHEADER` only. Measured with a synthetic
 pair; the applier's decoder (`tools/apply_release.py`) refuses the
 `VCD_SECONDARY` bit, and `test_release_roundtrip` §2 has the known-bad.
 
+## A CAPTURE THAT RECORDS ITS OWN EXIT STATUS UNDER `set -e` ENDS THE SCRIPT — the status and the message both die inside the variable (paid: 14z-152, 14z-153)
+
+`x="$(cmd 2>&1; echo "exit=$?")"` is written to KEEP a failing status. Under
+errexit on this Mac's `/bin/sh` (bash in POSIX mode) the capture's subshell
+inherits `-e`: a failing `cmd` ends it before the `echo`, the substitution
+returns non-zero, and the assignment ends the WHOLE script — nothing after it
+prints, and with `2>&1` the reason was inside the variable as well. Measured:
+`sh -c 'set -e; a="$(false; echo x)"; echo reached'` prints nothing and
+returns 1. Paid twice in two days: 14z-152's environment capture died on an
+absent package, and at 14z-153 the harness's F11 fidelity step turned a stale
+skill guide into a `test_bbh_fidelity` red with no reason — the kept log had 35
+lines where a PASS has 40, and it was the harness, not the kept-log copy, that
+had lost them (reproduced in a clean worktree, 33 lines against 38). **Rule:**
+run the command inside `( set +e; … )` — `x="$( (set +e; cmd 2>&1; echo "exit=$?") )"`.
+The harness bars the shape in its own scripts (`selftest/test_capture_status.sh`);
+this tree's gates carried no instance at the 14z-153 census.
+
+## A FINDER `.DS_Store` IN `release/` TURNS `test_release_asset_shape` RED ON THIS MAC — the gate measured the host, not the artifact (paid: 14z-153)
+
+Browsing `release/` in Finder writes `.DS_Store` files; they are gitignored, so a
+clone and CI never have them. One at `release/merged-m18/.DS_Store`, written two
+hours AFTER the M18 assets were uploaded, reached no asset and failed §5
+(`left out of every asset: .DS_Store`) in a strict tier whose other 149 gates
+passed. Removed: PASS, both controls fired, both modes FAIL; no published zip
+held it. **Rule:** `find release -name .DS_Store -delete` before a static tier or
+an upload is safe — they hold Finder view settings only. **The case that would
+ship:** `tools/upload_release_assets.sh` lists a platform directory with
+`find -type f`, so a `.DS_Store` INSIDE one would be zipped into its asset;
+`test_release_roundtrip` §4's inventory check enumerates the same way and fails
+it, which is what stands between that and a release.
+

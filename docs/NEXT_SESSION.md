@@ -41,17 +41,18 @@ open; run MSYS2 jobs inside a live session. The memory note
   Linux server exists, build the PUBLISHED Linux binaries there on the oldest LTS
   worth supporting, and add a release-time resolution on a machine with no `-dev`
   packages. The WSL2 binaries are never published.
-- **OPEN, not root-caused — a red that did not say why.** At 18:10 a strict tier
-  had `test_bbh_fidelity` FAIL (cause: a stale MFI skill guide, fixed), but its
-  kept log lacked the harness's own FAIL reason: 35 lines against 40 on a PASS,
-  missing the F11 guide line, F2 and the harness's final line. Reproduce in a
-  CLEAN tree: make the MFI guide stale in a scratch worktree, run
-  `sh ../../blackbox-harness/selftest/test_fidelity_vampire.sh` directly, keep
-  every line. Either the kept-log copy or the harness script loses its reason.
-- **One CR byte** remains in the Windows gate's output after the UTF-8/LF fix —
-  unlocated; no verdict depends on it.
-- **At the next freeze/release sweep:** the 34 emulator-tier control modes
-  (`run_all_emulator.sh --scope all --lane all --strict --controls`), cost to record.
+- ~~**OPEN, not root-caused — a red that did not say why.**~~ **ROOT-CAUSED AND
+  FIXED 14z-153:** the HARNESS lost its reason, not the kept log — F11's four
+  status captures had no `(set +e; …)`, so a stale guide ended the script under
+  errexit before its FAIL line (reproduced in a clean worktree: 33 lines vs 38);
+  bbh fixed and a lint selftest bars the shape. See STATE 14z-153.
+- ~~**One CR byte** remains in the Windows gate's output~~ **LOCATED AND FIXED
+  14z-153:** the `-verifyroms` Python block printed its PASS line through native
+  Windows text-mode stdout; reconfigured like the other block, 0 CR on the box.
+- **At the next RELEASE run** (cadence ruled 14z-148 (a)): the **39 control modes
+  in 36 gates** (`run_all_emulator.sh --scope all --lane all --strict --controls`)
+  — "34" was the pass-3 GATE count. Estimated ~5.5 h serial from M18's runtimes,
+  4.6 h of it the four Verilator gates; measure and record.
 - **Zabel j.LK proximity guard** — its own session (recording first).
 - **The community cross-check**: specials/supers/throws still have no naming rigs
   on vsavj.

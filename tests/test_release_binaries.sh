@@ -367,6 +367,10 @@ check_dir "$MM" "cps2$EXESUF" || f2=1
 "$MM/cps2$EXESUF" -verifyroms vsavjw -rompath "$(native_pathlist "$REPO/$MERGED/rompath;$ROMDIR")" > "$W/verify.log" 2>&1 || true
 python3 - "$W/verify.log" "$MERGED/rompath/vsavjw.zip" "$ROMDIR/vsavj.zip" "$ROMDIR/vsav.zip" <<'PY' || f2=1
 import sys, re, zipfile
+# THE LAST CR OF THE WINDOWS OUTPUT (14z-153): this block prints the gate's one PASS
+# line from Python, and a NATIVE Windows python writes "\r\n" for "\n" — the one CR
+# byte left in the MSYS2 output after 14z-152 reconfigured the other block (above).
+sys.stdout.reconfigure(encoding="utf-8", newline="\n")
 log, z, *pristine = sys.argv[1:]
 text = open(log, errors="replace").read()
 flagged = set(re.findall(r"^vsavjw\s*:\s*(\S+) .* - INCORRECT CHECKSUM", text, re.M))
