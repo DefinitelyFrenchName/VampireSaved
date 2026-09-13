@@ -1,29 +1,43 @@
-# NEXT SESSION — orientation (rewritten at the 14z-150 CLOSE, 2026-09-11)
+# NEXT SESSION — orientation (rewritten at the 14z-151 CLOSE, 2026-09-13)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## THE PREBUILT-BINARY TOOLING IS THREE-OS NOW, AND THE LINUX/WINDOWS HALVES HAVE NEVER BEEN RUN. That is the next session's first sentence, not a footnote. NO BUILD BYTE MOVED.
+## THE WINDOWS AND LINUX RELEASE BUILDS ARE BEING RUN BY THE MAINTAINER RIGHT NOW, AND THE LOOP IS LIVE. NO BUILD BYTE MOVED ALL SESSION.
 
 M18 (`merged-m18`, `build/m3b_merged26`) is still the current freeze and
 release. `git status -sb` says the push state.
 
-Landed this sitting (STATE 14z-150): `tools/bundle_elf_libs.py` (Linux,
-`patchelf --set-rpath '$ORIGIN'`, the glibc floor measured from the artifact)
-and `tools/bundle_win_dlls.py` (Windows/MSYS2, the DLLs beside the .exe,
-nothing to rewrite and no signature to apply); `tools/build_release_emulators.sh`
-made three-OS with a `CHECK=1` mode that resolves and prints a host's plan
-without building; `tests/test_release_binaries.sh` given Linux and Windows
-self-containment checks (RESOLUTION checks through the host's own `ldd`, never
-the bundler's allowlist read back) with its second must-fire control kept ALIVE
-on all three OSes; `tests/test_bundle_parsers.sh` (ci_portable) proving the
-parsers, the closure walk and both bundlers' refusal of an empty closure
-against stub tools; `docs/project/WSL2_SETUP.md` §10, the one-command-per-
-machine runbook. Plus two finds: `test_release_roundtrip`'s inventory regex
-would have REJECTED `linux-x86_64` and `windows-x86_64` (no underscore in the
-character class), and `run_all_static.sh` now KEEPS a failing gate's full log.
+**THE LOOP, and it is the fastest way back in:** the maintainer runs a command
+on their box, sends the console output, the defect is diagnosed HERE, fixed,
+gated, pushed; they `git pull` and run again. **Twelve defects in one sitting,
+every one ours, none in a shipped ROM byte** — STATE 14z-151 (6a)-(6g) and (8).
+Every durable fact is in `docs/platform/gotchas.md`'s last five entries: READ
+THOSE FIRST before touching any non-macOS host.
+
+**WHERE THE MAINTAINER IS, exactly:**
+
+| | |
+|---|---|
+| MSYS2 native (`windows-x86_64`) | FBNeo + MAME BUILT and recorded; the release gate is mid-loop |
+| WSL2 (`linux-x86_64`) | FBNeo built; MAME restarted with `JOBS=8` after the memory thrash |
+| a dedicated Linux server, 8c/64 GB | coming — the better home for the Linux binaries (glibc floor = the build host's) |
+
+**WHAT WINDOWS HAS PROVEN:** both emulators build; MAME's `-verifyroms` passes
+on an applier-built romset (20 members flagged, exactly the rewritten set).
+**WHAT IS STILL UNPROVEN OUTSIDE macOS:** the FBNeo boot leg (it has never
+printed `CPS-2 WIDE v1 profile active` there) and MAME reproducing
+`05_timeout_idle`'s frozen expectation. Those two are the whole remaining
+question, and both now leave evidence: `build/fbneo_boot_<os>.log` is kept
+whatever the verdict.
+
+**THE MAINTAINER'S NEXT THREE COMMANDS** (they were given these at the close):
+`rm -rf release/emulators/fbneo/windows-x86_64/{config,recordings,roms,savestates,screenshots}`
+(one-time cleanup of the pollution the gate itself caused),
+`pacman -S --needed diffutils`, then `git pull && MERGED=build/fromrelease
+tests/test_release_binaries.sh`.
 
 ## START HERE — what is open
 
