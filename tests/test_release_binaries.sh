@@ -257,8 +257,25 @@ for line in sys.stdin:
             case "$(basename "$f")" in BINARY.txt) continue ;; esac
             head -c 2 "$f" 2>/dev/null | grep -q 'MZ' || continue
             ldd "$f" 2>/dev/null | python3 -c '
-import sys, os, re
-d = os.path.realpath(sys.argv[1]); name = sys.argv[2]
+import sys, os, re, subprocess
+# BOTH SIDES IN ONE NAMESPACE (2026-09-13, the first Windows run of this
+# check: every resolved path was reported "outside this folder" while sitting
+# inside it). `ldd` answers in MSYS form and this python is a NATIVE Windows
+# program, so comparing its `realpath` of one against the other compares two
+# different namespaces. cygpath is MSYS2s own translator; the result is cached
+# because a closure asks about the same handful of directories many times.
+_cache = {}
+def nat(p):
+    if not p.startswith("/"):
+        return os.path.realpath(p)
+    if p not in _cache:
+        try:
+            _cache[p] = subprocess.run(["cygpath", "-m", p], capture_output=True,
+                                       text=True).stdout.strip() or p
+        except OSError:
+            _cache[p] = p
+    return os.path.realpath(_cache[p])
+d = nat(sys.argv[1]); name = sys.argv[2]
 WIN = re.compile(r"^(?:[a-zA-Z]:/|/[a-zA-Z]/)?(?:WINDOWS|WinNT)/", re.I)
 for line in sys.stdin:
     line = line.strip()
@@ -273,7 +290,7 @@ for line in sys.stdin:
     path = right.rsplit(" (0x", 1)[0].strip()
     if not path or path == "???":
         continue
-    if os.path.dirname(os.path.realpath(path)) == d:
+    if os.path.dirname(nat(path)) == d:
         continue                      # beside the .exe: where the loader looks first
     if WIN.match(path.replace("\\", "/").lstrip()):
         continue                      # Windows itself
@@ -307,6 +324,9 @@ rc=0
     "$TIMEOUT" 20 "$FB/fbneo$EXESUF" vsavjw > "$W/fb_boot.log" 2>&1 ) || rc=$?
 oks="$(grep -c '(OK)' "$W/fb_boot.log" || true)"
 if [ "$rc" != 124 ]; then echo "FAIL: fbneo exited rc=$rc within 20 s (expected to be still running):"; tail -5 "$W/fb_boot.log"; fail=1; fi
+# WHATEVER THE VERDICT, KEEP THE BOOT LOG READABLE: this ran on a host nobody
+# here has, and "lacks the profile line" without the log is a dead end.
+cp "$W/fb_boot.log" "$REPO/build/fbneo_boot_$OS.log" 2>/dev/null || true
 grep -q "CPS-2 WIDE v1 profile active" "$W/fb_boot.log" || { echo "FAIL: fbneo boot log lacks 'CPS-2 WIDE v1 profile active'"; fail=1; }
 [ "$oks" = 31 ] || { echo "FAIL: fbneo loaded $oks members (OK), expected 31"; fail=1; }
 ! grep -qi 'not found\|error' "$W/fb_boot.log" || { echo "FAIL: fbneo boot log carries an error:"; grep -i 'not found\|error' "$W/fb_boot.log" | head -3; fail=1; }
@@ -344,7 +364,7 @@ print(f"  -verifyroms: {len(flagged)} members flagged = exactly the WIDE zip's {
 sys.exit(0 if ok else 1)
 PY
 if [ "$f2" = 0 ]; then
-    MAME_BIN="$MM/cps2$EXESUF" MAME_ROMPATH="$REPO/$MERGED/rompath;$ROMDIR" SUITE_ONLY=05_timeout_idle \
+    MAME_BIN="$MM/cps2$EXESUF" MAME_ROMPATH="$(native_pathlist "$REPO/$MERGED/rompath;$ROMDIR")" SUITE_ONLY=05_timeout_idle \
         tests/run_suite.sh vsavjw > "$W/suite.log" 2>&1 || true
     n="$(grep -c 'PASS masked-\|PASS$' "$W/suite.log" || true)"
     if ! grep -q "SUITE GREEN" "$W/suite.log" || [ "$n" != 1 ]; then

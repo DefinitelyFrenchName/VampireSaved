@@ -156,3 +156,7 @@ release/emulators/*/*/*
 !release/emulators/*/*/BINARY.txt
 release/*/*/emulator/bin/*/*
 !release/*/*/emulator/bin/*/BINARY.txt
+
+# the release gate keeps FBNeo's boot log where a human can read it after a
+# remote run (14z-151); it is diagnostic output, never a tracked artifact.
+build/fbneo_boot_*.log

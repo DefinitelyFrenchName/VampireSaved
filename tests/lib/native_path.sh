@@ -30,7 +30,13 @@ native_path() {
     if [ "$VS_NATIVE" = 0 ] || [ -z "${1:-}" ]; then printf '%s' "${1:-}"; return 0; fi
     case "$1" in
     /*) if command -v cygpath >/dev/null 2>&1; then
-            cygpath -w "$1" | tr -d '\r\n'
+            # `-m` (MIXED: C:/msys64/home/…), never `-w` (backslashes). Forward
+            # slashes are accepted by native Windows programs AND by this shell,
+            # so ONE spelling survives a path that passes through both; a
+            # backslash form is mangled the moment a shell touches it. Chosen
+            # 2026-09-13, when the rompath had to reach a native python THROUGH
+            # two shell scripts.
+            cygpath -m "$1" | tr -d '\r\n'
         else
             printf '%s' "$1"        # no translator: unchanged, and it will fail LOUDLY
         fi ;;
