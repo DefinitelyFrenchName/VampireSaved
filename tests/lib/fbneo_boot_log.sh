@@ -34,6 +34,10 @@
 vs_fbneo_boot_log() {  # vs_fbneo_boot_log <log> <hostos> <patch>
     python3 - "$1" "$2" "$3" <<'PY'
 import re, sys
+# Native Windows python writes a pipe in cp1252 with CRLF (measured on MSYS2,
+# 2026-09-13: the em dash below came out as byte 0x97, shown as U+FFFD). The
+# verdict text is UTF-8 with LF on every host.
+sys.stdout.reconfigure(encoding="utf-8", newline="\n")
 log, hostos, patch = sys.argv[1:]
 text = open(log, errors="replace").read()
 p = open(patch, errors="replace").read()

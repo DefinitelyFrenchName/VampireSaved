@@ -72,6 +72,10 @@ MINGW*|MSYS*|CYGWIN*) HOSTOS=windows ;;
 esac
 case "$(uname -m)" in arm64|aarch64) ARCH=arm64 ;; x86_64|amd64) ARCH=x86_64 ;; *) ARCH="$(uname -m)" ;; esac
 EXESUF=""; [ "$HOSTOS" = windows ] && EXESUF=".exe"
+# what an `ok:` line may claim about signing: only macOS has a signature this gate
+# verifies (2026-09-13 — the first Windows pass printed "signed" directly under its
+# own "no code signature exists on this platform" note)
+SIGNED="signed"; [ "$HOSTOS" = macos ] || SIGNED="unsigned (no signature exists on $HOSTOS)"
 # the one translator for paths handed to a NATIVE program (a no-op off Windows)
 . "$REPO/tests/lib/native_path.sh"
 # what a healthy FBNeo WIDE boot log must show — ONE copy, ground-truthed over the
@@ -269,6 +273,7 @@ for line in sys.stdin:
             head -c 2 "$f" 2>/dev/null | grep -q 'MZ' || continue
             ldd "$f" 2>/dev/null | python3 -c '
 import sys, os, re, subprocess
+sys.stdout.reconfigure(encoding="utf-8", newline="\n")   # native Windows python pipes cp1252 + CRLF (tests/lib/fbneo_boot_log.sh)
 # BOTH SIDES IN ONE NAMESPACE (2026-09-13, the first Windows run of this
 # check: every resolved path was reported "outside this folder" while sitting
 # inside it). `ldd` answers in MSYS form and this python is a NATIVE Windows
@@ -358,7 +363,7 @@ cp "$W/fb_boot.log" "$REPO/build/fbneo_boot_$HOSTOS.log" 2>/dev/null || true
 # (FBNeo's SDL frontend connects the core's message function only off
 # SDL_WINDOWS), so a check keyed on that one line went red there on a correct boot.
 vs_fbneo_boot_log "$W/fb_boot.log" "$HOSTOS" "$REPO/emu/fbneo-patches/0002-cps2-wide-v1.patch" || fail=1
-[ "$fail" = 0 ] && echo "  ok: record, self-contained, signed, profile, no harness; booted vsavjw headless (every descriptor member (OK), running at 20 s)"
+[ "$fail" = 0 ] && echo "  ok: record, self-contained, $SIGNED, profile, no harness; booted vsavjw headless (every descriptor member (OK), running at 20 s)"
 
 # ---- section 2: MAME
 echo "== 2. mame $MM"
@@ -399,7 +404,7 @@ if [ "$f2" = 0 ]; then
         echo "FAIL: the release MAME did not reproduce 05_timeout_idle's frozen expectation:"; tail -6 "$W/suite.log"; f2=1
     fi
 fi
-[ "$f2" = 0 ] && echo "  ok: record, self-contained, signed, knows vsavjw, -verifyroms flags exactly the WIDE members, reproduced 05_timeout_idle's frozen masked expectation"
+[ "$f2" = 0 ] && echo "  ok: record, self-contained, $SIGNED, knows vsavjw, -verifyroms flags exactly the WIDE members, reproduced 05_timeout_idle's frozen masked expectation"
 [ "$f2" = 0 ] || fail=1
 
 # ---- must-fire controls: the two perturbed copies must FAIL check_dir
