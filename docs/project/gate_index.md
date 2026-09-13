@@ -16,13 +16,13 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**323 scripts** — 72 ci_portable, 75 ci_static, 176 emulator-tier (run by name).
+**324 scripts** — 73 ci_portable, 75 ci_static, 176 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 14 | the suite runners and their own ground truth |
 | [docs](#docs) | 15 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 29 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 30 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 55 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
@@ -86,6 +86,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_crash_guard.sh` | test | emulator | MAME | ground truth for the crash guard (verdict-logic doctrine, CLAUDE.md §4: a detector is trusted only after it classifies known-good and known-bad scenarios correctly). | — |
 | `tests/test_crypt_boundary.sh` | test | ci_static | ROMDIR | code in the WIDE extension must be stored RAW. | 14z-123 |
 | `tests/test_decrypt_oracle.sh` | test | emulator | MAME | verify tools/cps2_decrypt.py against MAME's own cps2crypt implementation (dual-implementation agreement). | — |
+| `tests/test_fbneo_boot_log.sh` | test | ci_portable | — | the verdict logic of tests/lib/fbneo_boot_log.sh (what a healthy FBNeo WIDE boot log must show) against RECORDED boot logs from two real hosts: | 2026-09-13 |
 | `tests/test_fbneo_instruments.sh` | test | emulator | MAME, FBNeo | ground truth for the B5b FBNeo instruments. | 14z-123 |
 | `tests/test_fbneo_overlay_hygiene.sh` | test | ci_portable | — | a non-overlay FBNeo run must not inherit a previous run's overlay (14z-94, GitHub #38). ~2 s, no emulator, no ROMs. | 14z-94 |
 | `tests/test_fbneo_overlay_hygiene_control.sh` | test | ci_portable | — | the ground truth for #38's gate. Reconstructs the PRE-FIX runner (bare `ln -sfn`, no clear) and requires tests/test_fbneo_overlay_hygiene.sh to FAIL against it. | — |

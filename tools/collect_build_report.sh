@@ -23,14 +23,18 @@ set -u
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 
+# HOSTOS, never OS (2026-09-13): `OS` is Windows's own EXPORTED `Windows_NT`, and
+# assigning it here handed `OS=windows` to everything this script runs — the
+# builder and the gate included. tools/build_release_emulators.sh's header has
+# the full story of that collision.
 case "$(uname -s)" in
-Darwin) OS=macos ;;
-Linux)  OS=linux ;;
-MINGW*|MSYS*|CYGWIN*) OS=windows ;;
-*) OS="$(uname -s | tr 'A-Z' 'a-z')" ;;
+Darwin) HOSTOS=macos ;;
+Linux)  HOSTOS=linux ;;
+MINGW*|MSYS*|CYGWIN*) HOSTOS=windows ;;
+*) HOSTOS="$(uname -s | tr 'A-Z' 'a-z')" ;;
 esac
 case "$(uname -m)" in arm64|aarch64) ARCH=arm64 ;; x86_64|amd64) ARCH=x86_64 ;; *) ARCH="$(uname -m)" ;; esac
-OSARCH="$OS-$ARCH"
+OSARCH="$HOSTOS-$ARCH"
 OUT="${1:-build-report-$OSARCH-$(date -u +%Y%m%d-%H%M).txt}"
 
 section() { printf '\n=== %s %s\n' "$1" "$(printf '%0.s-' 1 2 3 4 5 6 7 8 9 0)" ; }

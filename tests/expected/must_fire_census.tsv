@@ -44,6 +44,7 @@ declares	test_dualtrack
 declares	test_emulator_runner
 declares	test_escape_triage
 declares	test_expectation_provenance
+declares	test_fbneo_boot_log
 declares	test_freeze_artifacts_current
 declares	test_freeze_tag_coverage
 declares	test_gate_index_current

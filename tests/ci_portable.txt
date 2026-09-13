@@ -209,6 +209,10 @@ test_controls_contract
 # readelf / objdump output, walk a closure, and REFUSE an empty one (the two
 # bundlers ship unrun: this is what proves they cannot come back quiet). ROM-free, ~2 s.
 test_bundle_parsers
+# test_fbneo_boot_log.sh — what a healthy FBNeo WIDE boot log must show, proven
+# against the RECORDED Windows and macOS boots: every vsavjw member (OK), and the
+# profile line wherever the core's messages print (never on Windows). ROM-free, ~1 s.
+test_fbneo_boot_log
 # EVERY PUBLISHED ASSET IS SELF-SUFFICIENT and the two emulator routes never
 # travel together (maintainer-ruled 2026-09-12) — the shape of what
 # upload_release_assets.sh CUTS, over the current release. ROM-free, ~5 s.

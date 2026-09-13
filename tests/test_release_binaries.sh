@@ -6,7 +6,8 @@
 # file named), SELF-CONTAINED (no absolute non-system library reference —
 # bundled as @loader_path), SIGNED (codesign --verify), carry the profile, and
 # BOOT the current merged romset: FBNeo headless under the SDL dummy drivers for
-# 20 s (the profile line, 31 members "(OK)", still running when killed); MAME
+# 20 s (every vsavjw member "(OK)", the profile line wherever FBNeo prints the
+# emulator core's messages — never on Windows — still running when killed); MAME
 # `-verifyroms vsavjw` flags EXACTLY the WIDE zip's rewritten/new members (it can never say
 # "good" on a content set: stock CRCs for rewritten members, sentinels for new ones,
 # [VSP-75]) AND one frozen masked legacy expectation of the
@@ -56,17 +57,27 @@ ROOT="${RELEASE_EMULATORS:-release/emulators}"
 # The os-arch spelling MUST match tools/build_release_emulators.sh's, or this
 # gate looks in a directory that builder never wrote (and SKIPs, reading as
 # "nothing to check" instead of "wrong name").
+#
+# THE VARIABLE IS `HOSTOS`, NEVER `OS` (2026-09-13, found while reading this gate
+# after its first Windows run). `OS` is Windows's own EXPORTED `Windows_NT`, a
+# POSIX assignment keeps the export, so `OS=windows` here reached every program
+# the gate launches, fbneo.exe and cps2.exe included. It broke nothing on that
+# run; it is the collision the builder paid for first, and its header tells it
+# in full (tools/build_release_emulators.sh).
 case "$(uname -s)" in
-Darwin) OS=macos ;;
-Linux)  OS=linux ;;
-MINGW*|MSYS*|CYGWIN*) OS=windows ;;
-*) OS="$(uname -s | tr 'A-Z' 'a-z')" ;;
+Darwin) HOSTOS=macos ;;
+Linux)  HOSTOS=linux ;;
+MINGW*|MSYS*|CYGWIN*) HOSTOS=windows ;;
+*) HOSTOS="$(uname -s | tr 'A-Z' 'a-z')" ;;
 esac
 case "$(uname -m)" in arm64|aarch64) ARCH=arm64 ;; x86_64|amd64) ARCH=x86_64 ;; *) ARCH="$(uname -m)" ;; esac
-EXESUF=""; [ "$OS" = windows ] && EXESUF=".exe"
+EXESUF=""; [ "$HOSTOS" = windows ] && EXESUF=".exe"
 # the one translator for paths handed to a NATIVE program (a no-op off Windows)
 . "$REPO/tests/lib/native_path.sh"
-OSARCH="$OS-$ARCH"
+# what a healthy FBNeo WIDE boot log must show — ONE copy, ground-truthed over the
+# recorded macOS and Windows logs by tests/test_fbneo_boot_log.sh
+. "$REPO/tests/lib/fbneo_boot_log.sh"
+OSARCH="$HOSTOS-$ARCH"
 FB="$ROOT/fbneo/$OSARCH"; MM="$ROOT/mame/$OSARCH"
 [ -f "$FB/BINARY.txt" ] || { echo "SKIP: no $FB/BINARY.txt for this host (tools/build_release_emulators.sh fbneo)"; exit 0; }
 [ -f "$MM/BINARY.txt" ] || { echo "SKIP: no $MM/BINARY.txt for this host (tools/build_release_emulators.sh mame)"; exit 0; }
@@ -119,7 +130,7 @@ perturb_absref() {  # a reference that does NOT resolve inside the directory, wi
     # self-containment check is the only thing that can catch it. The CLAIM is
     # one; the mechanism is what each OS makes possible.
     d="$1"; exe="$2"
-    if [ "$OS" != macos ]; then
+    if [ "$HOSTOS" != macos ]; then
         # Linux/Windows: one bundled library REMOVED together with its sha256
         # row. Inventory and record stay consistent, so only a RESOLUTION check
         # can see that the binary now needs something the directory lacks.
@@ -205,7 +216,7 @@ check_dir() {
     for k in pin patch recipe requires run; do
         grep -q "^$k " "$d/BINARY.txt" || { echo "FAIL: $d/BINARY.txt lacks the '$k' line"; bad=1; }
     done
-    case "$OS" in
+    case "$HOSTOS" in
     macos)
         for f in "$d"/*; do
             case "$(basename "$f")" in BINARY.txt) continue ;; esac
@@ -300,7 +311,7 @@ for line in sys.stdin:
         done
         echo "  (windows: no code signature exists on this platform — the sha256 rows above are the integrity)" ;;
     *)
-        echo "FAIL: the self-containment check is implemented for macOS, Linux and Windows — add this OS's ($OS) before trusting a $OSARCH prebuilt"
+        echo "FAIL: the self-containment check is implemented for macOS, Linux and Windows — add this OS's ($HOSTOS) before trusting a $OSARCH prebuilt"
         bad=1 ;;
     esac
     return $bad
@@ -309,7 +320,9 @@ for line in sys.stdin:
 # ---- section 1: FBNeo
 echo "== 1. fbneo $FB"
 check_dir "$FB" "fbneo$EXESUF" || fail=1
-strings -a "$FB/fbneo$EXESUF" | grep -q "CPS-2 WIDE v1" || { echo "FAIL: fbneo does not carry the profile"; fail=1; }
+# the FULL message (2026-09-13): `CPS-2 WIDE v1` alone is also in the driver's long
+# name, so it could not tell a binary built without Cps2WideInit from one built with it
+strings -a "$FB/fbneo$EXESUF" | grep -q "CPS-2 WIDE v1 profile active" || { echo "FAIL: fbneo does not carry the profile (no 'CPS-2 WIDE v1 profile active' in the binary)"; fail=1; }
 ! strings -a "$FB/fbneo$EXESUF" | grep -q -- "-hframes" || { echo "FAIL: fbneo carries the replay HARNESS (patch 0001) — a test instrument shipped"; fail=1; }
 # NEVER RUN THE ARTIFACT IN PLACE (2026-09-13, the first Windows run: the boot
 # left `config/ recordings/ roms/ savestates/ screenshots/` INSIDE
@@ -334,15 +347,18 @@ done
 rc=0
 ( cd "$PLAY" && HOME="$W/home" SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
     "$TIMEOUT" 20 "./fbneo$EXESUF" vsavjw > "$W/fb_boot.log" 2>&1 ) || rc=$?
-oks="$(grep -c '(OK)' "$W/fb_boot.log" || true)"
 if [ "$rc" != 124 ]; then echo "FAIL: fbneo exited rc=$rc within 20 s (expected to be still running):"; tail -5 "$W/fb_boot.log"; fail=1; fi
 # WHATEVER THE VERDICT, KEEP THE BOOT LOG READABLE: this ran on a host nobody
-# here has, and "lacks the profile line" without the log is a dead end.
-cp "$W/fb_boot.log" "$REPO/build/fbneo_boot_$OS.log" 2>/dev/null || true
-grep -q "CPS-2 WIDE v1 profile active" "$W/fb_boot.log" || { echo "FAIL: fbneo boot log lacks 'CPS-2 WIDE v1 profile active'"; fail=1; }
-[ "$oks" = 31 ] || { echo "FAIL: fbneo loaded $oks members (OK), expected 31"; fail=1; }
-! grep -qi 'not found\|error' "$W/fb_boot.log" || { echo "FAIL: fbneo boot log carries an error:"; grep -i 'not found\|error' "$W/fb_boot.log" | head -3; fail=1; }
-[ "$fail" = 0 ] && echo "  ok: record, self-contained, signed, profile, no harness; booted vsavjw headless (31 (OK), running at 20 s)"
+# here has, and a red without its log is a dead end — the kept log is what
+# showed, on 2026-09-13, that the Windows boot was CORRECT and the check was not.
+cp "$W/fb_boot.log" "$REPO/build/fbneo_boot_$HOSTOS.log" 2>/dev/null || true
+# THE LOG'S VERDICT is tests/lib/fbneo_boot_log.sh: every vsavjw member loaded
+# (OK) — which only the WIDE init performs — and the profile line wherever the
+# emulator core's messages reach the log at all. They never do on Windows
+# (FBNeo's SDL frontend connects the core's message function only off
+# SDL_WINDOWS), so a check keyed on that one line went red there on a correct boot.
+vs_fbneo_boot_log "$W/fb_boot.log" "$HOSTOS" "$REPO/emu/fbneo-patches/0002-cps2-wide-v1.patch" || fail=1
+[ "$fail" = 0 ] && echo "  ok: record, self-contained, signed, profile, no harness; booted vsavjw headless (every descriptor member (OK), running at 20 s)"
 
 # ---- section 2: MAME
 echo "== 2. mame $MM"

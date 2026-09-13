@@ -971,7 +971,11 @@ place and reports the set as missing.
    `CPS-2 WIDE v1 profile active`, `68K ROM size: 0x00600000`,
    `Graphics data: 0x03000000`, `QSound data: 0x01000000`, then
    `Loading program (vsw.41)... (OK)` through `vsw.44`. **31 members load
-   OK.** A member reading `(OK)` is not proof by itself — FBNeo substitutes
+   OK.** **On WINDOWS only the `(OK)` lines appear, and that is a correct
+   boot:** FBNeo's SDL frontend never connects the emulator core's message
+   function there, so every core line above them is dropped
+   (`docs/platform/gotchas.md`, the 2026-09-13 entry on FBNeo's Windows
+   frontend). A member reading `(OK)` is not proof by itself — FBNeo substitutes
    0xFF fill on a CRC mismatch while still printing `(OK)` (GOTCHAS) — but
    a *missing* line or a wrong region size localises the problem fast.
 

@@ -516,7 +516,9 @@ Two general lessons: **a launcher that wraps two emulators must not assume
 they share a CLI** — the same conceptual argument was supported by one and
 silently dropped by the other; and **assert on the emulator's own load
 output**, not on the process starting. A healthy WIDE start prints
-`CPS-2 WIDE v1 profile active` and 31 `(OK)` member lines.
+`CPS-2 WIDE v1 profile active` and 31 `(OK)` member lines — the profile line
+only where FBNeo's frontend prints the emulator core's messages at all, which
+is NOT Windows (the 2026-09-13 entry on FBNeo's Windows frontend, below).
 
 ## A member carrying another member's PRISTINE bytes SHADOWS it — both
 ## emulators resolve a ROM entry by HASH before NAME
@@ -2419,3 +2421,40 @@ double digits is a thrashing machine.
 raise the VM (`[wsl2] memory=24GB swap=8GB` in `%UserProfile%\.wslconfig`,
 then `wsl --shutdown`). A dedicated Linux host has neither problem: `nproc` is
 honest there.
+
+## FBNeo'S SDL FRONTEND ON WINDOWS PRINTS NONE OF THE EMULATOR CORE'S MESSAGES — a correct WIDE boot there never says "profile active" (paid: 2026-09-13, the release gate red on a correct Windows boot)
+
+`src/burner/sdl/main.cpp` (at our pin) connects the core's message function
+only off Windows:
+
+    #if defined(BUILD_SDL2) && !defined(SDL_WINDOWS)
+        bprintf = AppDebugPrintf;
+    #endif
+
+On an `SDL_WINDOWS` build `bprintf` therefore stays `src/burn/burn.cpp`'s
+`BurnbprintfFiller`, which prints nothing. EVERY line the emulator core prints
+is gone: `*** Starting emulation of …`, the cheat line, the `CPS-2 WIDE v1
+profile active` line patch 0002 adds, and the ROM-size block. What survives is
+what the FRONTEND prints itself: the `Loading … (OK)` member lines
+(`fprintf(stderr, …)` in `src/burner/sdl/bzip.cpp`) and its own `printf`
+lines. Measured on the first Windows boot of the release binary: all 31 member
+lines present and byte-identical to the macOS boot's, no core line, still
+running at 20 s — and `strings` finds the profile message in the Windows
+`.exe` exactly once, as on macOS. The code is there; only its output is not.
+
+The release gate asserted that one line and went red on a correct boot.
+**Assert on what the host can print:** the member loads run inside
+`Cps2Init`, which the vsavjw entry's `Cps2WideInit` calls after setting
+`Cps2Wide = 1`, so every descriptor member loading `(OK)` proves the WIDE init
+ran on any host. Require the profile line wherever the core's
+`*** Starting emulation` line reaches the log — keyed on that EVIDENCE, not on
+the OS name, so a future FBNeo that prints on Windows gets the stronger check
+back by itself. One copy: `tests/lib/fbneo_boot_log.sh`, ground-truthed over
+both recorded logs by `tests/test_fbneo_boot_log.sh`.
+
+The Windows log also ends at `loading state 0 …`, without the macOS log's
+`saving state` and `Doing exit cleanup`: the timeout does not end the process
+cleanly there. Nothing asserts on it.
+
+Same family as the MAME OSD entry above: a macOS fact — "a healthy start
+prints the profile line" — written down as everyone's.

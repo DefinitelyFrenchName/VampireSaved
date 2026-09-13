@@ -238,8 +238,11 @@ It checks, for this host's `os-arch`:
   gate says so rather than asserting a signature that cannot exist;
 - **the profile is present and the test harness is absent** — the replay
   harness is a measuring instrument and must never ship;
-- **a real boot of the romset on each binary** — FBNeo headless for 20 s (the
-  profile line, 31 members loading, still running when killed), and MAME
+- **a real boot of the romset on each binary** — FBNeo headless for 20 s (all
+  31 members loading, still running when killed; plus the `CPS-2 WIDE v1
+  profile active` line on macOS and Linux — on Windows FBNeo prints none of the
+  emulator core's messages, so that line never appears and the member loads
+  are the proof), and MAME
   reproducing a frozen masked expectation of the current freeze, which is the
   strongest claim available: your shipped binary and the project's gate
   instrument traverse the same RAM.
