@@ -41,7 +41,7 @@ prebuilt patched emulator in place of this patch and recipe. It is complete
 too — romset patches and applier included — so it replaces this download
 rather than joining it.
 
-Built so far for: macos-arm64. Each carries a `BINARY.txt` naming every file with its sha256, the upstream pin and the sha1 of the driver patch beside this file — the binary is exactly the recipe above, run on one host, and the record says which. Only the latest freeze keeps its assets; the binaries are never files in the repository (ruled 2026-09-11).
+Built so far for: macos-arm64, windows-x86_64. Each carries a `BINARY.txt` naming every file with its sha256, the upstream pin and the sha1 of the driver patch beside this file — the binary is exactly the recipe above, run on one host, and the record says which. Only the latest freeze keeps its assets; the binaries are never files in the repository (ruled 2026-09-11).
 
 ## If it does not work
 - "Unknown system: vsavjw" — this binary does not carry the driver patch.

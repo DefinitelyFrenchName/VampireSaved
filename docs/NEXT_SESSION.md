@@ -28,18 +28,15 @@ open; run MSYS2 jobs inside a live session. The memory note
 | os-arch | built | gate | published |
 |---|---|---|---|
 | macos-arm64 | 2026-09-11 | PASS (74 s, 2026-09-13) | yes, `freeze/merged-m18` |
-| windows-x86_64 | 2026-09-12 on the box (MSYS2) | PASS at `8b908cd4` and `32268250` | **awaiting the maintainer's word** |
+| windows-x86_64 | 2026-09-13, rebuilt on the box (MSYS2) | PASS at `666b14d9` | yes, `freeze/merged-m18` (14z-153) |
 | linux-x86_64 | 2026-09-13, rebuilt on WSL2 (Ubuntu 26.04) | PASS at `a145562c` | never — a PROOF run, glibc 2.43 floor |
 
 ## START HERE — what is open
 
-- **Publishing the Windows binaries — the maintainer's word** (STATE "Decisions
-  pending"). When it comes: REBUILD on MSYS2 with the capturing builder (the
-  2026-09-12 records predate `tree`/`jobs`/`env`), re-run the gate, compose the
-  register entry with `tools/record_build_environment.py`, commit the two
-  `BINARY.txt` records, then `tools/upload_release_assets.sh` from where the files
-  are — check first whether `gh` is authenticated on the box. MAME is the long
-  Windows build.
+- ~~**Publishing the Windows binaries — the maintainer's word**~~ **DONE 14z-153:**
+  rebuilt on MSYS2 with the capturing builder, gated there, uploaded from the Mac
+  (`gh` is absent on MSYS2); M18 serves seven assets. The route that worked, step
+  by step, is STATE 14z-153.
 - **The Linux clean-machine check (ruled option 3, the goal):** once the dedicated
   Linux server exists, build the PUBLISHED Linux binaries there on the oldest LTS
   worth supporting, and add a release-time resolution on a machine with no `-dev`

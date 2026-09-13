@@ -21,9 +21,9 @@ There is nothing to combine and nothing to download twice.
 
 | asset | what it is | who needs it |
 |---|---|---|
-| `merged-m18-fbneo-<os-arch>.zip` | the FBNeo package for that OS, **ready to play**: this README, the romset patch set + applier, and a prebuilt patched FBNeo with its `BINARY.txt` of sha256s. No build step, nothing to patch (available: macos-arm64) | FBNeo players on a listed OS |
+| `merged-m18-fbneo-<os-arch>.zip` | the FBNeo package for that OS, **ready to play**: this README, the romset patch set + applier, and a prebuilt patched FBNeo with its `BINARY.txt` of sha256s. No build step, nothing to patch (available: macos-arm64, windows-x86_64) | FBNeo players on a listed OS |
 | `merged-m18-fbneo-recipe.zip` | the same FBNeo package for **any** OS, carrying the driver patch + build recipe (`EMULATOR.md`) instead of a binary: you build the emulator once | FBNeo players on any other OS, or anyone who prefers to build |
-| `merged-m18-mame-<os-arch>.zip` | the MAME package for that OS, ready to play: the same romset patch set + applier, and a prebuilt patched MAME (CPS-2 subtarget) with its `BINARY.txt` (available: macos-arm64) | MAME players on a listed OS |
+| `merged-m18-mame-<os-arch>.zip` | the MAME package for that OS, ready to play: the same romset patch set + applier, and a prebuilt patched MAME (CPS-2 subtarget) with its `BINARY.txt` (available: macos-arm64, windows-x86_64) | MAME players on a listed OS |
 | `merged-m18-mame-recipe.zip` | the same MAME package for any OS, with the driver patch + `EMULATOR.md` instead of a binary | MAME players on any other OS, or anyone who prefers to build |
 | `merged-m18-mister.zip` | the MiSTer package: the same romset patch set + applier, the `jtcps2w.rbf` bitstream + its record (`BITSTREAM.txt`), the two `.mra` files, `MISTER.md` | MiSTer owners |
 | "Source code (zip / tar.gz)" | added by GitHub to every release: the whole project repository at the tag — development tooling, logs and all. **NOT needed to play**; nothing above requires it | nobody, unless you want to audit or rebuild the project |

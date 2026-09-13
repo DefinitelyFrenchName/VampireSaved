@@ -33,10 +33,10 @@ and the conditions table lists what has already gone wrong and why.
    another os-arch, and a record without `env` lines, so no entry rests on
    memory. Ground truth: `tests/test_build_environment_entry.sh`.
 
-**The first two entries below predate step 2** — their records were written
-before the capture existed — so they were read on the same hosts the day after
-(or two days after) the build, and each says so in its `captured` row. Every
-entry made after 2026-09-13 comes from the tool.
+**The macOS entry below predates step 2** — its records were written before the
+capture existed — so it was read on the same host two days after the build, and
+says so in its `captured` row. The Windows and Linux entries come from the tool,
+each from a rebuild with the capturing builder.
 
 ## Known-good environments
 
@@ -51,16 +51,25 @@ entry made after 2026-09-13 comes from the tool.
 | published | `merged-m18-fbneo-macos-arm64.zip` and `merged-m18-mame-macos-arm64.zip` on `freeze/merged-m18` |
 | captured | 2026-09-13, after the build: every Homebrew package listed was installed before it (the newest, `pkgconf`, on 2026-08-03), so these are the build-time versions |
 
-### windows-x86_64 — FBNeo + MAME, built 2026-09-12 (MSYS2 MINGW64)
+### windows-x86_64 — FBNeo + MAME, built 2026-09-13
 
 | | |
 |---|---|
-| host | Windows 10.0.19045.7663; MSYS2 runtime 3.6.10; shell **MINGW64** (`MSYSTEM=MINGW64`); gcc 16.2.0 (Rev3, MSYS2) |
-| packages | pacman: `mingw-w64-x86_64-gcc` 16.2.0-3, `mingw-w64-x86_64-binutils` 2.47-3, `mingw-w64-x86_64-python` 3.14.7-1, `mingw-w64-x86_64-pkgconf` 1~3.0.7-1, `mingw-w64-x86_64-SDL2` 2.32.10-1, `mingw-w64-x86_64-SDL2_image` 2.8.12-1, `mingw-w64-x86_64-sdl3` 3.4.16-1; `git` 2.55.0-1, `make` 4.4.1-3, `patch` 2.7.6-3, `rsync` 3.5.0-1, `zip` 3.0-5, `unzip` 6.0-3, `perl` 5.42.3-1, `coreutils` 8.32-5, `diffutils` 3.12-1 |
-| emulators | the same pins and patches as macOS |
-| gate | PASS 2026-09-13 at `8b908cd4`, and again at `32268250` (both must-fire controls fired each time) |
-| published | not yet |
-| captured | 2026-09-13, the day after the build, same host |
+| host | Windows via MINGW64 (x86_64), cc.exe (Rev3, Built by MSYS2 project) 16.2.0 |
+| system | Microsoft Windows [version 10.0.19045.7663]; MSYS2 runtime 3.6.10-da84778c.x86_64; MSYSTEM=MINGW64 |
+| packages | pacman `coreutils` 8.32-5, pacman `diffutils` 3.12-1, pacman `git` 2.55.0-1, pacman `make` 4.4.1-3, pacman `mingw-w64-x86_64-SDL2` 2.32.10-1, pacman `mingw-w64-x86_64-SDL2_image` 2.8.12-1, pacman `mingw-w64-x86_64-binutils` 2.47-3, pacman `mingw-w64-x86_64-gcc` 16.2.0-3, pacman `mingw-w64-x86_64-pkgconf` 1~3.0.7-1, pacman `mingw-w64-x86_64-python` 3.14.7-1, pacman `mingw-w64-x86_64-sdl3` 3.4.16-1, pacman `patch` 2.7.6-3, pacman `perl` 5.42.3-1, pacman `rsync` 3.5.0-1, pacman `unzip` 6.0-3, pacman `zip` 3.0-5 |
+| emulators | FBNeo `79188379cc84`, patch sha1 `17cd7516`; MAME `27a8d9e85b58`, patch sha1 `1d13c9d8` |
+| built from | FBNeo tree `666b14d9e8dc`, jobs 24; MAME tree `666b14d9e8dc`, jobs 24 |
+| gate | `PASS: test_release_binaries (windows-x86_64)` (test_release_binaries-windows-14z153.log) |
+| published | `merged-m18-fbneo-windows-x86_64.zip` (55 files) and `merged-m18-mame-windows-x86_64.zip` (25 files) on `freeze/merged-m18`, 2026-09-13 — each downloaded back from GitHub and compared file for file |
+
+Written by `tools/record_build_environment.py` from a REBUILD with the capturing
+builder on the maintainer's box (MSYS2 MINGW64, driven over SSH, 14z-153), the
+gate re-run on the rebuilt binaries with both must-fire controls firing. These
+rebuilt binaries are the published ones. The first Windows build (2026-09-12)
+predated the environment capture; the versions recorded here are identical to
+the manual capture made of it on 2026-09-13. The upload ran from the Mac,
+because `gh` is not installed on MSYS2 (ruled 2026-09-13).
 
 ### linux-x86_64 — FBNeo + MAME, built 2026-09-13
 

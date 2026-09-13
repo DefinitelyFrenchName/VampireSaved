@@ -27,6 +27,19 @@ older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
   origin main`; anything red or skipped leaves the commits local and the
   close entry says so.
 
+## Session 14z-153 — **THE WINDOWS BINARIES PUBLISHED: rebuilt on the box with the environment capture, gated there, re-verified on the Mac
+## and uploaded from it — M18 now serves seven assets, every one downloaded back and identical. No shipped ROM byte moved.**
+
+| | |
+|---|---|
+| opened with | the opener read (HANDOFF, STATE, NEXT_SESSION in full), ROM audit **76/76**, `main` == `origin/main` at `666b14d9`; the maintainer: *"publish the Windows binaries"* — the one item waiting on their word |
+| **REBUILT, NOT REUSED** | the 2026-09-12 records predated the `tree`/`jobs`/`env` capture, so an entry from them would rest on memory. The box's clone fast-forwarded `a145562c` -> `666b14d9`. Over SSH (MSYS2 MINGW64, the script as ONE `{ …; } </dev/null` block so no child can eat the rest of a stdin script; the ssh detached on the Mac with `nohup … &!`, so the MSYS2 job ran inside a live session): preflight READY (24 jobs, 31 GB, 1.3 GB per job); FBNeo from a clean worktree of the pin in 4 min 39 s (30 DLLs bundled, 83 MB); MAME through its own mirror in 9 min 25 s (static, 16 system imports, nothing bundled, 120 MB). Both records: `tree 666b14d9e8dc`, `jobs 24`, the `env` lines, no uncommitted-changes flag |
+| **THE GATE ON THE BOX** | `MERGED=build/fromrelease tests/test_release_binaries.sh`: **`PASS: test_release_binaries (windows-x86_64)`** in 112 s — FBNeo booted with every descriptor member `(OK)`; MAME's `-verifyroms` flagged exactly the 20 WIDE members and the release binary reproduced `05_timeout_idle`'s frozen masked expectation; both must-fire controls FIRED, each on FBNeo (MAME bundles nothing to perturb). Log kept at `build/test_release_binaries-windows-14z153.log` on both hosts |
+| **ON THE MAC** | the two folders copied with `scp -r musicmaking:C:/msys64/home/alexr/vampire-saved/release/emulators/<kind>/windows-x86_64`, every sha256 row re-verified here (FBNeo 31, MAME 1). `package_release_platforms.py` re-run with the MRAs staged out first (it clears its destination): **5 tracked files, 10 lines — the availability lists in the three READMEs and the two `EMULATOR.md`**, plus the ignored `bin/windows-x86_64/` dirs. `test_release_asset_shape` PASS (2 controls fired), `test_release_roundtrip` PASS (8 controls fired). The four Windows records carry no CR, no U+FFFD, and the build-resource and release copies are identical |
+| **PUBLISHED** | `tools/upload_release_assets.sh freeze/merged-m18` from the Mac, no `--prune` (the previous freeze's assets went at 14z-149): **7 assets, every one downloaded back and compared file for file** — fbneo-recipe 25, fbneo-macos-arm64 48, **fbneo-windows-x86_64 55 (29.5 MB)**, mame-recipe 25, mame-macos-arm64 26, **mame-windows-x86_64 25 (23.8 MB)**, mister 28; no stale asset named; the release notes rewritten listing all seven. The five existing assets were re-cut and re-uploaded because the README inside each changed its availability list |
+| **THE REGISTER** | `docs/project/build_environments.md`'s Windows entry REPLACED by the one `tools/record_build_environment.py` composed from the rebuilt records and the PASS log — package versions identical to the manual capture of 2026-09-13 — with a `published` row. The decision in "Decisions pending" marked DONE in place; HANDOFF's prebuilt row and NEXT_SESSION corrected |
+| **NOTED, NOT FIXED** | `tools/bundle_win_dlls.py`'s console output prints U+FFFD for its em dash on MSYS2 — native python piping cp1252, the class 14z-152 fixed in the gate's verdict text with `sys.stdout.reconfigure`. Build-log cosmetics only: no record and no verdict carries it |
+
 ## Session 14z-152 — **THE LOOP MOVED ONTO THE MAINTAINER'S BOX OVER SSH, AND ALL THREE PLATFORMS' RELEASE GATES WENT GREEN: the Windows FBNeo red was the gate,
 ## the Linux self-containment check was blind on a build host and was re-anchored, qmake6 is a Linux prerequisite, and a register records where a build is known to work. No shipped ROM byte moved.**
 
@@ -387,8 +400,15 @@ what a triage is looking at, so those are where the thinking time goes.
 
 ## Decisions pending (human)
 
-- **PUBLISHING THE windows-x86_64 PREBUILT BINARIES — AWAITING THE MAINTAINER'S WORD
-  (14z-152).** Both are built on the maintainer's box and `test_release_binaries`
+- ~~**PUBLISHING THE windows-x86_64 PREBUILT BINARIES — AWAITING THE MAINTAINER'S WORD
+  (14z-152).**~~ **DECIDED AND DONE 2026-09-13 (14z-153, maintainer: "publish the
+  Windows binaries").** Rebuilt on the box with the capturing builder at
+  `666b14d9`; `test_release_binaries` PASS there on the rebuilt pair, both controls
+  fired; the two folders copied to the Mac and every sha256 row re-verified;
+  `release/merged-m18` repackaged (5 tracked files, the availability lists only);
+  uploaded FROM THE MAC (`gh` is absent on MSYS2, ruled 2026-09-13): 7 assets on
+  `freeze/merged-m18`, each downloaded back and identical. The register entry is the
+  tool's (`docs/project/build_environments.md`). The original entry follows. Both are built on the maintainer's box and `test_release_binaries`
   PASSES there (at `8b908cd4` and again at `32268250`). Publishing adds
   `merged-m18-{fbneo,mame}-windows-x86_64.zip` to `freeze/merged-m18` and commits
   their `BINARY.txt` records; the upload runs where the files are (MSYS2), and
