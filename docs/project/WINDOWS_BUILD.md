@@ -55,10 +55,16 @@ open **"MSYS2 MINGW64"** from the Start menu — *not* "MSYS2 MSYS".
 
 ```bash
 pacman -Syu          # then re-open the window if it asks you to
-pacman -S --needed git make patch rsync zip unzip perl coreutils \
+pacman -S --needed git make patch rsync zip unzip perl coreutils diffutils \
     mingw-w64-x86_64-gcc mingw-w64-x86_64-binutils mingw-w64-x86_64-python \
     mingw-w64-x86_64-pkgconf mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image
 ```
+
+`diffutils` is not optional and not obvious: the replay suite decides
+run-to-run determinism with `cmp` and reports the first divergence with
+`diff`, and MSYS2's base system has neither — the gate fails with
+`cmp: command not found` and calls the run NONDETERMINISTIC, which is a
+verdict about the missing tool (measured 2026-09-13).
 
 **The SDL2 packages are FBNeo's, and MAME needs no SDL here at all** —
 its Windows OSD is the native one (`emu/mame/makefile`, "specify OSD layer":

@@ -95,6 +95,13 @@ if [ "$ENV" != msys2 ]; then
     have patchelf && ok "patchelf (sets RUNPATH=\$ORIGIN)" || bad "patchelf"
 fi
 have perl && ok "perl (FBNeo's build scripts)" || bad "perl"
+# THE SUITE DECIDES DETERMINISM WITH THESE, and MSYS2 ships neither by default:
+# without them the release gate reports NONDETERMINISTIC, a verdict about the
+# missing tool rather than about the build (measured 2026-09-13).
+for _t in cmp diff; do
+    have "$_t" && ok "$_t (the replay suite compares two runs with it)" \
+        || bad "$_t — install diffutils (MSYS2: pacman -S diffutils)"
+done
 
 # ---- the libraries the two recipes link ------------------------------------
 say ""
@@ -245,7 +252,7 @@ else
     case "$ENV" in
     wsl2|linux)
         say "  sudo apt update && sudo apt install -y build-essential python3 git rsync \\"
-        say "       patch pkgconf zip unzip perl patchelf binutils coreutils \\"
+        say "       patch pkgconf zip unzip perl patchelf binutils coreutils diffutils \\"
         say "       libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libfontconfig-dev"
         say ""
         say "  NO SDL3 on Linux: MAME's OSD here is 'sdl' (SDL2 + SDL2_ttf + fontconfig)."

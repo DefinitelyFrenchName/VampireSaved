@@ -311,17 +311,29 @@ echo "== 1. fbneo $FB"
 check_dir "$FB" "fbneo$EXESUF" || fail=1
 strings -a "$FB/fbneo$EXESUF" | grep -q "CPS-2 WIDE v1" || { echo "FAIL: fbneo does not carry the profile"; fail=1; }
 ! strings -a "$FB/fbneo$EXESUF" | grep -q -- "-hframes" || { echo "FAIL: fbneo carries the replay HARNESS (patch 0001) — a test instrument shipped"; fail=1; }
-mkdir -p "$W/play/roms" "$W/home"
-# A SYMLINK IS NOT A FILE TO A NATIVE PROGRAM. On MSYS2 an `ln -s` is an MSYS
-# construct the Windows loader and a native FBNeo cannot follow, so the set
-# would read as missing; everywhere else a link is free and a copy is 40 MB.
+# NEVER RUN THE ARTIFACT IN PLACE (2026-09-13, the first Windows run: the boot
+# left `config/ recordings/ roms/ savestates/ screenshots/` INSIDE
+# release/emulators/fbneo/windows-x86_64/, and the next run's record check
+# flagged all five as files BINARY.txt does not name — the gate polluting the
+# thing it measures). The emulator runs from a COPY, and the copy is where its
+# droppings go.
+#
+# AND FBNeo RESOLVES `roms/` AGAINST ITS OWN DIRECTORY on Windows, not against
+# the working directory: that is why the set was invisible to it and why it
+# created an empty `roms/` of its own. Staging the zips INSIDE the copy serves
+# both facts at once.
+PLAY="$W/play"; mkdir -p "$PLAY" "$W/home"
+cp -R "$FB"/* "$PLAY/" 2>/dev/null || true
+mkdir -p "$PLAY/roms"
 for z in "$ROMDIR"/*.zip "$REPO/$MERGED/rompath"/*.zip; do
-    if [ "$VS_NATIVE" = 1 ]; then cp -f "$z" "$W/play/roms/$(basename "$z")"
-    else ln -sf "$z" "$W/play/roms/$(basename "$z")"; fi
+    # a symlink is not a file to a native program: an MSYS `ln -s` is a construct
+    # the Windows loader cannot follow, so the set would read as missing there
+    if [ "$VS_NATIVE" = 1 ]; then cp -f "$z" "$PLAY/roms/$(basename "$z")"
+    else ln -sf "$z" "$PLAY/roms/$(basename "$z")"; fi
 done
 rc=0
-( cd "$W/play" && HOME="$W/home" SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
-    "$TIMEOUT" 20 "$FB/fbneo$EXESUF" vsavjw > "$W/fb_boot.log" 2>&1 ) || rc=$?
+( cd "$PLAY" && HOME="$W/home" SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
+    "$TIMEOUT" 20 "./fbneo$EXESUF" vsavjw > "$W/fb_boot.log" 2>&1 ) || rc=$?
 oks="$(grep -c '(OK)' "$W/fb_boot.log" || true)"
 if [ "$rc" != 124 ]; then echo "FAIL: fbneo exited rc=$rc within 20 s (expected to be still running):"; tail -5 "$W/fb_boot.log"; fail=1; fi
 # WHATEVER THE VERDICT, KEEP THE BOOT LOG READABLE: this ran on a host nobody
