@@ -142,10 +142,49 @@ t = re.sub(r"^(sha256 +)[0-9a-f]{64}( +%s)$" % re.escape(exe), r"\g<1>%s\2" % ne
 open(p, "w").write(t)
 PY
 }
-cp -R "$FB" "$W/fb_flip";   perturb_flip "$W/fb_flip"
-cp -R "$MM" "$W/mm_absref"; perturb_absref "$W/mm_absref" "cps2$EXESUF"
-vs_ctl_is flipped-library-byte && FB="$W/fb_flip"
-vs_ctl_is absolute-reference && MM="$W/mm_absref"
+# WHICH DIRECTORY EACH CONTROL PERTURBS IS A PROPERTY OF THE HOST, not a
+# constant (2026-09-13, the first Windows run of this gate). Both
+# perturbations need a BUNDLED LIBRARY to work on, and MAME's Windows build
+# links `-static` (its `scripts/genie.lua`, configuration mingw*), so
+# `release/emulators/mame/windows-x86_64/` holds the .exe and its record and
+# nothing else. Pinning the control to MAME made the gate exit at this line,
+# before it asserted anything at all.
+#
+# THE CLAIM IS UNCHANGED — a reference that does not resolve inside the
+# directory must fail the self-containment check — and it is provable on
+# whichever directory actually bundles something. So the subject is CHOSEN:
+# MAME where it bundles (macOS, Linux), FBNeo where MAME does not (Windows).
+# A host where NEITHER bundles cannot prove the property at all, and says so
+# as a DEAD control rather than passing quietly ([VSP-181]).
+bundles() { ls "$1" 2>/dev/null | grep -qE '[.](so[.0-9]*|dll|DLL|dylib)$'; }
+ABSREF_SRC=""; ABSREF_EXE=""; ABSREF_KIND=""
+if bundles "$MM"; then ABSREF_SRC="$MM"; ABSREF_EXE="cps2$EXESUF"; ABSREF_KIND=mame
+elif bundles "$FB"; then ABSREF_SRC="$FB"; ABSREF_EXE="fbneo$EXESUF"; ABSREF_KIND=fbneo
+fi
+# The flip control has the SAME dependency on something being bundled, and the
+# same answer: FBNeo bundles on all three OSes today, so it is the default and
+# MAME the fallback — but a static FBNeo would make this dead rather than
+# abort the gate before it asserts anything.
+FLIP_SRC=""; FLIP_EXE=""; FLIP_KIND=""
+if bundles "$FB"; then FLIP_SRC="$FB"; FLIP_EXE="fbneo$EXESUF"; FLIP_KIND=fbneo
+elif bundles "$MM"; then FLIP_SRC="$MM"; FLIP_EXE="cps2$EXESUF"; FLIP_KIND=mame
+fi
+if [ -n "$FLIP_SRC" ]; then
+    cp -R "$FLIP_SRC" "$W/fb_flip"
+    perturb_flip "$W/fb_flip" || FLIP_SRC=""
+fi
+if [ -n "$ABSREF_SRC" ]; then
+    cp -R "$ABSREF_SRC" "$W/absref"
+    perturb_absref "$W/absref" "$ABSREF_EXE" || ABSREF_SRC=""
+fi
+if vs_ctl_is flipped-library-byte; then
+    [ -n "$FLIP_SRC" ] || { echo "REFUSED: CONTROL=flipped-library-byte — no directory on this host bundles a library to flip"; exit 3; }
+    if [ "$FLIP_KIND" = fbneo ]; then FB="$W/fb_flip"; else MM="$W/fb_flip"; fi
+fi
+if vs_ctl_is absolute-reference; then
+    [ -n "$ABSREF_SRC" ] || { echo "REFUSED: CONTROL=absolute-reference — no directory on this host bundles a library to perturb"; exit 3; }
+    if [ "$ABSREF_KIND" = mame ]; then MM="$W/absref"; else FB="$W/absref"; fi
+fi
 FB="$(cd "$FB" && pwd)"; MM="$(cd "$MM" && pwd)"   # absolute: the boot legs cd elsewhere
 
 # ---- check_dir <dir> <exe>: record, self-containment, signature. Prints FAIL lines; returns 1 on any.
@@ -316,18 +355,24 @@ fi
 [ "$f2" = 0 ] || fail=1
 
 # ---- must-fire controls: the two perturbed copies must FAIL check_dir
-if check_dir "$W/fb_flip" "fbneo$EXESUF" > "$W/c1.txt" 2>&1; then
-    vs_ctl_dead flipped-library-byte "a flipped library byte passed the record check"; fail=1
+if [ -z "$FLIP_SRC" ]; then
+    vs_ctl_dead flipped-library-byte "no directory on this host bundles a library to flip — untestable here, not proven" || true
+    fail=1
+elif check_dir "$W/fb_flip" "$FLIP_EXE" > "$W/c1.txt" 2>&1; then
+    vs_ctl_dead flipped-library-byte "a flipped library byte passed the record check" || true; fail=1
 else
-    vs_ctl_fired flipped-library-byte "$(grep -c '^FAIL' "$W/c1.txt") FAIL line(s), first: $(grep -m1 '^FAIL' "$W/c1.txt")"
+    vs_ctl_fired flipped-library-byte "on $FLIP_KIND: $(grep -c '^FAIL' "$W/c1.txt") FAIL line(s), first: $(grep -m1 '^FAIL' "$W/c1.txt")"
 fi
-if check_dir "$W/mm_absref" "cps2$EXESUF" > "$W/c2.txt" 2>&1; then
-    vs_ctl_dead absolute-reference "an absolute install name passed the self-containment check"; fail=1
+if [ -z "$ABSREF_SRC" ]; then
+    vs_ctl_dead absolute-reference "no directory on this host bundles a library to perturb — the property is untestable here, not proven" || true
+    fail=1
+elif check_dir "$W/absref" "$ABSREF_EXE" > "$W/c2.txt" 2>&1; then
+    vs_ctl_dead absolute-reference "an unresolvable reference passed the self-containment check" || true; fail=1
 else
-    if grep -qE 'references /opt/homebrew|NOT FOUND|outside this (directory|folder)' "$W/c2.txt"; then
-        vs_ctl_fired absolute-reference "$(grep -m1 -E 'references /opt/homebrew|NOT FOUND|outside this' "$W/c2.txt")"
+    if grep -qE 'references /opt/homebrew|NOT FOUND|not found|outside this (directory|folder)|not bundled' "$W/c2.txt"; then
+        vs_ctl_fired absolute-reference "on $ABSREF_KIND: $(grep -m1 -E 'references /opt/homebrew|NOT FOUND|not found|outside this|not bundled' "$W/c2.txt")"
     else
-        vs_ctl_dead absolute-reference "check_dir failed for another reason: $(grep -m1 '^FAIL' "$W/c2.txt")"; fail=1
+        vs_ctl_dead absolute-reference "check_dir failed for another reason: $(grep -m1 '^FAIL' "$W/c2.txt")" || true; fail=1
     fi
 fi
 
