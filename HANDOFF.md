@@ -1246,6 +1246,16 @@ tests/run_all_emulator.sh --list                      # the registry, as selecte
 ROMDIR=... tests/run_all_emulator.sh --dry-run        # the resolved command per gate
 ```
 
+**WHAT THE RELEASE RUN COSTS, MEASURED (14z-153, 2026-09-14, this MacBook,
+`--jobs 4`, the M18 build set):** `--scope all --lane all --strict --controls`
+took **5 h 37 min** wall — 172 gates and 39 control runs, PASS 210 / SKIP 1 (the
+approved `audit_mask_window_ff42a2`) / FAIL 0. Serially that is 13.6 h of gate
+time plus **4.5 h for the controls (+33%)**, and **90% of the controls' cost is
+the four Verilator gates**, where each control is a full re-run of its gate; the
+MAME lane's 30 controls cost 15 min in all, because several stop at their first
+perturbed input (`audit_guard_corpus@known-crash` 21 s against its gate's
+1,830 s). Rows: `build/emu_controls_14z153/results.tsv`.
+
 **The registry is `tests/ci_emulator.tsv`** — one row per emulator-tier gate:
 `gate / lane / scope / cadence / args / note` (163 rows since
 `audit_type_dispatch_range` was dropped 14z-129). Completeness is enforced BOTH WAYS on
