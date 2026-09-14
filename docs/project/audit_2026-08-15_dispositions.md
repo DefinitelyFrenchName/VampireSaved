@@ -2,7 +2,7 @@
 
 > **STATUS (14z-118 audit): HISTORICAL — a closed record.** The 73 dispositions
 > stand as ruled in 14z-90/95; anything still open from them is tracked where
-> live items live (STATE "Open bugs", `hardening_register.md`), not here. The
+> live items live (the ticket index `docs/project/tickets.tsv`, `hardening_register.md`), not here. The
 > "Open"/"awaiting" cells below are the state AT 14z-95.
 
 The 2026-08-15 multi-agent review filed 73 issues (index: GitHub #74). This is

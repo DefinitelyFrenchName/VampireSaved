@@ -567,6 +567,18 @@ TICKS are. Same family as "THE ENGINE RUNS TWO TICKS IN ONE VIDEO FRAME"
 (`gotchas.md`) and the reason `tools/tick_durations.py` exists. [M:
 `tests/test_don_immortal_native.sh` §4, frozen at +1 frame; 14z-127]
 
+**AN INSTANCE, RULED BY THE MAINTAINER (2026-09-14): Final Guardian Beta's pacing.**
+Phobos's EX Final Guardian Beta (pool object `0x46`) long read as lasting too long on our
+build — the STATE item "FG pacing". The maintainer's verdict, closing it: *"The speed value
+wasn't affecting it per se however between the different movement speed due to shell values
+plus the broken gfx created an increased perception of wrong duration. The actual duration is
+correct in terms of ticks, although both VS and VS2 engine have slightly different timing
+values for it so both may be marginally different in milliseconds."* So it was a PERCEPTION:
+the shell character's movement speed (before the alias-physics port, `patch_notes.md` 14z-66)
+and the broken GFX (STATE_HISTORY 14z-73) over a duration that is correct in ticks; the
+millisecond remainder is this paragraph's host-clock difference. A playtest verdict, not a
+measurement. [maintainer, 2026-09-14]
+
 **THE MASH EXTENSION OF 421+P, AND WHAT GATES IT (measured 14z-127).** Mashing
 during the Lightning Sword extends its node loop. The mechanism, read off the
 deciding routine (vs2 `PRG:0x059EEA` and its two branches above it): each call

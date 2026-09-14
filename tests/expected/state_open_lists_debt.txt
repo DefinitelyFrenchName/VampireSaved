@@ -4,16 +4,13 @@
 # a violation not listed here fails, and a listed one that no longer occurs fails until
 # it is removed. Rewritten by --freeze, which is a reviewed diff and REFUSES to grow the
 # list without --allow-growth "<reason>".
-pending:PUBLISHING THE windows-x86_64 PREBUILT BINARIES — AWAITING THE MAINTAI
 pending:THE CAPTURE-GEOMETRY MATRIX IS NOW SWEPT STATICALLY, and the maintaine
 pending:THE COMMUNITY CROSS-CHECK — our data vs the best community reverse
 pending:THE LINUX SELF-CONTAINMENT ANCHOR — DECIDED 2026-09-13: option 1 now, 
 pending:THE LIVING-DOCUMENTATION EFFORT, and the option it creates (maintainer
 pending:THE LIVING-DOCUMENTATION FRAMEWORK'S GENERALIZATION — RULED AT THE PLA
 pending:ZABEL j.LK PROXIMITY GUARD — A LEGACY-CONTENT PATCH, ITS OWN SESSION
-section:Findings log
 section:Integration notes — SMS docs (imported 2026-07-24)
 section:Open bugs
-section:RELEASE-TIME TEST SCOPE (maintainer, 2026-09-02)
 section:THE COSMETIC BACKLOG (parked, 2026-08-27 — the maintainer's own list)
 start-here:FIRST THING — THE STATE.md DISCIPLINE PASS: the law, the skill, a gate

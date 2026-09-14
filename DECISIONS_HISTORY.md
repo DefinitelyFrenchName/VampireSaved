@@ -52,6 +52,135 @@ retraction grep covers this file.
   `--controls` at release runs (ruled 14z-148) and CI's portable run. **REVISIT** if a
   close ever finds a control dead that a mid-session run would have caught.
 
+## Moved 2026-09-14 (14z-154) — the open-list clean-up, verbatim
+
+Moved byte-verbatim from STATE.md's standing sections by the first clean-up under the
+amended lifecycle (CLAUDE.md [VSP-17]); a section moved whole has its heading demoted
+one level. Every ruling here that still constrains work left ONE line under STATE.md
+"Standing rulings".
+
+### From "Decisions pending": the Windows binaries (done 14z-153)
+
+- ~~**PUBLISHING THE windows-x86_64 PREBUILT BINARIES — AWAITING THE MAINTAINER'S WORD
+  (14z-152).**~~ **DECIDED AND DONE 2026-09-13 (14z-153, maintainer: "publish the
+  Windows binaries").** Rebuilt on the box with the capturing builder at
+  `666b14d9`; `test_release_binaries` PASS there on the rebuilt pair, both controls
+  fired; the two folders copied to the Mac and every sha256 row re-verified;
+  `release/merged-m18` repackaged (5 tracked files, the availability lists only);
+  uploaded FROM THE MAC (`gh` is absent on MSYS2, ruled 2026-09-13): 7 assets on
+  `freeze/merged-m18`, each downloaded back and identical. The register entry is the
+  tool's (`docs/project/build_environments.md`). The original entry follows. Both are built on the maintainer's box and `test_release_binaries`
+  PASSES there (at `8b908cd4` and again at `32268250`). Publishing adds
+  `merged-m18-{fbneo,mame}-windows-x86_64.zip` to `freeze/merged-m18` and commits
+  their `BINARY.txt` records; the upload runs where the files are (MSYS2), and
+  whether `gh` is set up there has not been checked. Outward-facing, so not done
+  unasked.
+
+
+### RELEASE-TIME TEST SCOPE (maintainer, 2026-09-02)
+
+**AT RELEASE TIME, ALL TESTS ARE RUN.** Verbatim: *"at release time, ALL tests
+should be run. The only exception would be test whose scope is not applicable
+to what is released, which honestly would be specific tests used momentarily or
+tests on a different romset or platform. So tests that would measure VS2 or
+vsavj for instance are out of scope since we release vsavjw BUT tests on native
+VS within vsavjw are absolutely relevant."*
+
+The discriminator is **THE SUBJECT OF THE TEST, NOT THE ROMSETS IT TOUCHES**:
+- IN SCOPE — anything whose subject is the released artifact, **including its
+  LEGACY / native-VS content**. A gate that uses `vsav2` or pristine `vsavj` as
+  an ORACLE is in scope: the reference leg is not the subject.
+- OUT OF SCOPE — a gate whose SUBJECT is a different romset or platform
+  (a pristine-set rule lock, a stock-twin-only gate, another platform's lane),
+  or a momentary//specific probe.
+
+**THE ABSOLUTE (maintainer, 2026-09-02):** *"there is no approximation in our
+testing discipline both in general and absolutely at release: unless explicitly
+approved AT release time, anything red, anything skipped is a hard fail of the
+release process."* And the asymmetry that makes the cost sane: *"we may not
+need ALL the tests for every small change but how could we not run them when we
+release, since we have them!"* — a subset during development, EVERYTHING at
+release.
+
+**CONSEQUENCE FOR SELF-SKIPPING GATES:** a gate that prints `SKIP:` and exits 0
+because a prerequisite is absent has NOT been run, and in `run_battery_m2.sh`
+`bat` counts a bare exit 0 as PASS — the exact class
+`tests/test_battery_accounting.sh` exists to bar ([VSP-101], SKIP IS NOT PASS).
+Under this policy a release-scope gate must FAIL LOUDLY on a missing
+prerequisite rather than self-skip. `test_don_immortal_native.sh` was corrected
+to that convention when the policy was ruled (it had two silent `exit 0`s).
+
+
+### From "STANDING PRINCIPLE": HOW A RED IS ADJUDICATED
+
+**HOW A RED IS ADJUDICATED — the maintainer's explicit statement of the obvious
+(2026-09-02):** *"to know if we should fix the gate or what it caught, we must
+use data we can trust, and that means measuring or relying on data that is
+known to be true for it was vetted by measurements."* **A RED GATE IS A
+QUESTION, NOT AN ANSWER.** Before choosing fix-the-gate / fix-what-it-caught /
+delete-as-valueless, establish WHICH SIDE'S EXPECTATION RESTS ON MEASUREMENT.
+A frozen expectation whose provenance cannot be named is a claim with a number
+in it. **The worked example is this session:** `test_don_reactions.sh` was
+GREEN on `native == 10`, a constant of playtest-testimony provenance
+(STATE 14z-42c) presented as measured — it happened to be correct, which is
+luck, not method. **MEASURED 14z-127, as input to the emulator-tier arc: 30 of
+45 frozen expectation files declare their provenance in their header; 15 do
+not** (`advancing_guard`, `community_crosscheck`, `df_accumulator`,
+`escape_triage`, `front_comparator`, `killshread_es`,
+`ladder_tenant_vs_palette`, `move_naming_{donovan,huitzil,pyron}`,
+`projectile_census`, `projectile_params`,
+`reactions_{donovan,huitzil,pyron}`). That says the provenance is not IN THE
+FILE — several have it in their gate header or a STATE entry — but the file is
+what a triage is looking at, so those are where the thinking time goes.
+
+
+### From "Open bugs": the declined static substituted-wheel gate
+
+- **DECLINED (maintainer, 2026-09-02): a STATIC "substituted-wheel replay
+  paired with a WIDE set" gate.** *"I don't think the static wheel/track gate
+  is valuable at the moment given your arguments."* The arguments, kept so it
+  is not re-proposed: 26 gates match that pattern and all 26 were checked —
+  most run those replays for LEGACY content where the tenant is irrelevant, and
+  every Donovan-semantic one (`audit_don_ko_writer`, `audit_don_lilith_ko`,
+  `audit_continue_ladder`) FORCES THE PICK with `ff8782` pokes, so the wheel
+  path cannot affect them. No text scan separates those from a real defect, so
+  the gate would be 26 false positives plus an allow-list that rots.
+  `test_don_sound.sh` was the only live instance and it now refuses. **The
+  defence that IS in place: [VSP-163] (assert `+0x60` against `bases.tsv`, or
+  force the pick) and the runtime identity assertion in
+  `test_don_immortal_native.sh`.**
+
+
+### From "THE COSMETIC BACKLOG": Oboro's intro (declined)
+
+| item | status | what is known |
+|---|---|---|
+| **Oboro's intro eats into the round** | **DECLINED by the maintainer 2026-08-28 — do NOT delay round start or cut the intro** | recorded so it is not revived: it would be a match-state TIMING change on a shared path for a cosmetic reason, which is the trade the superset invariant exists to refuse. The maintainer will instead check whether vsavj's Oboro has an alternate SHORT intro |
+
+
+### Copied 2026-09-14 from the #114 entry (the entry itself moved verbatim to `STATE_HISTORY.md` "Session 14z-154 — CLOSED ITEMS MOVED OUT OF STATE.md's STANDING SECTIONS (the open-list clean-up, verbatim)"): its rulings, as lines
+
+- ~~**GitHub #114 — 421+P**~~ **CLOSED BY THE MAINTAINER 2026-09-02T17:53Z.
+  THEIR VERDICT, verbatim, and it is a GAMEPLAY RULING that must not be
+  re-opened as a defect:** *"Ceilings are the same, mash rate required slightly
+  under VS2 for everything but LP, which is not a bad thing given how stringent
+  VS2 is for max damage (max number of hits requires well above average
+  mashing, it is legitimately very hard), LP is short one hit and comparatively
+  slightly nerfed, which is acceptable on the whole, especially given the
+  additional bit of leniency for other punch strengths. Close enough, leverages
+  VS engine, good tradeoff, closing the ticket."*
+
+  **RULING (maintainer, 2026-09-02): "we must respect the fact that we are
+  porting the character to a different engine and the engine, being vanilla
+  vsav, takes precedence."** So the gate asserts HIT COUNT and DAMAGE — the
+  quantities the host clock does not set — and never vsav2's frame numbers.
+
+  node, costing one hitbox window. **RULED (maintainer, 2026-09-02): within
+  "altered by the VS engine", NOT chased** — the alternative is a one-frame
+  phase change on a shared path, the trade the superset invariant exists to
+  refuse. Frozen as §5 of the gate, LP asserted exactly so a move either way
+  fails.
+
 ## Moved 2026-09-12 (14z-151) — the 14z-133b..14z-149 rulings that stopped shaping work
 
 Fifteen decisions, byte-verbatim, resolutions and their original entries together.

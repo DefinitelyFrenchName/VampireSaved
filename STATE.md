@@ -123,39 +123,11 @@ How to work with it:
 One line per ruling that still constrains work; the full entry lives where the line says. A line is deleted when its ruling stops constraining work (CLAUDE.md [VSP-17]).
 
 - **Static-tier controls at the CLOSE (2026-09-14):** a mid-session commit runs `tests/run_all_static.sh --strict --exec-controls none` plus `CONTROL=<name>` for every gate it adds or changes; the session close runs every control (the default). Full entry: `DECISIONS_HISTORY.md` "Ruled 2026-09-14 (14z-154)".
-
-## RELEASE-TIME TEST SCOPE (maintainer, 2026-09-02)
-
-**AT RELEASE TIME, ALL TESTS ARE RUN.** Verbatim: *"at release time, ALL tests
-should be run. The only exception would be test whose scope is not applicable
-to what is released, which honestly would be specific tests used momentarily or
-tests on a different romset or platform. So tests that would measure VS2 or
-vsavj for instance are out of scope since we release vsavjw BUT tests on native
-VS within vsavjw are absolutely relevant."*
-
-The discriminator is **THE SUBJECT OF THE TEST, NOT THE ROMSETS IT TOUCHES**:
-- IN SCOPE — anything whose subject is the released artifact, **including its
-  LEGACY / native-VS content**. A gate that uses `vsav2` or pristine `vsavj` as
-  an ORACLE is in scope: the reference leg is not the subject.
-- OUT OF SCOPE — a gate whose SUBJECT is a different romset or platform
-  (a pristine-set rule lock, a stock-twin-only gate, another platform's lane),
-  or a momentary//specific probe.
-
-**THE ABSOLUTE (maintainer, 2026-09-02):** *"there is no approximation in our
-testing discipline both in general and absolutely at release: unless explicitly
-approved AT release time, anything red, anything skipped is a hard fail of the
-release process."* And the asymmetry that makes the cost sane: *"we may not
-need ALL the tests for every small change but how could we not run them when we
-release, since we have them!"* — a subset during development, EVERYTHING at
-release.
-
-**CONSEQUENCE FOR SELF-SKIPPING GATES:** a gate that prints `SKIP:` and exits 0
-because a prerequisite is absent has NOT been run, and in `run_battery_m2.sh`
-`bat` counts a bare exit 0 as PASS — the exact class
-`tests/test_battery_accounting.sh` exists to bar ([VSP-101], SKIP IS NOT PASS).
-Under this policy a release-scope gate must FAIL LOUDLY on a missing
-prerequisite rather than self-skip. `test_don_immortal_native.sh` was corrected
-to that convention when the policy was ruled (it had two silent `exit 0`s).
+- **Release scope (2026-09-02):** at release every test whose SUBJECT is the released artifact runs, its legacy content included (a reference leg on vsav2 or pristine vsavj is not the subject); anything red or skipped is a hard fail unless approved at release time, so a release-scope gate fails loudly on a missing prerequisite. Full entry: `DECISIONS_HISTORY.md` "Moved 2026-09-14 (14z-154)".
+- **A red gate is a question (2026-09-02):** before fixing the gate, fixing what it caught or deleting it, establish which side's expectation rests on a measurement; a frozen number whose provenance cannot be named is a claim. Full entry: `DECISIONS_HISTORY.md` "Moved 2026-09-14 (14z-154)".
+- **The host engine's clock wins (2026-09-02, #114):** a ported character ticks like vsavj, so a tenant gate asserts hit counts and damage, never vs2's frame numbers; Lightning Sword LP one hit short at the mash ceiling is accepted. Full entry: `DECISIONS_HISTORY.md` "Moved 2026-09-14 (14z-154)".
+- **No static substituted-wheel gate (2026-09-02):** declined — the pattern matches 26 legitimate gates; the defence is [VSP-163] (assert `+0x60` against `bases.tsv`, or force the pick). Full entry: `DECISIONS_HISTORY.md` "Moved 2026-09-14 (14z-154)".
+- **Oboro's intro stays (2026-08-28):** never delay round start or cut the intro for a cosmetic reason. Full entry: `DECISIONS_HISTORY.md` "Moved 2026-09-14 (14z-154)".
 
 ## STANDING PRINCIPLE (maintainer, 2026-08-05): vanilla wins ties
 
@@ -189,42 +161,8 @@ does nothing while three medallions are visible below it, which is the UX
 failure "as long as we can select characters" is meant to exclude. Dropping
 them would reduce the legacy footprint from 5 bytes to 2.
 
-**HOW A RED IS ADJUDICATED — the maintainer's explicit statement of the obvious
-(2026-09-02):** *"to know if we should fix the gate or what it caught, we must
-use data we can trust, and that means measuring or relying on data that is
-known to be true for it was vetted by measurements."* **A RED GATE IS A
-QUESTION, NOT AN ANSWER.** Before choosing fix-the-gate / fix-what-it-caught /
-delete-as-valueless, establish WHICH SIDE'S EXPECTATION RESTS ON MEASUREMENT.
-A frozen expectation whose provenance cannot be named is a claim with a number
-in it. **The worked example is this session:** `test_don_reactions.sh` was
-GREEN on `native == 10`, a constant of playtest-testimony provenance
-(STATE 14z-42c) presented as measured — it happened to be correct, which is
-luck, not method. **MEASURED 14z-127, as input to the emulator-tier arc: 30 of
-45 frozen expectation files declare their provenance in their header; 15 do
-not** (`advancing_guard`, `community_crosscheck`, `df_accumulator`,
-`escape_triage`, `front_comparator`, `killshread_es`,
-`ladder_tenant_vs_palette`, `move_naming_{donovan,huitzil,pyron}`,
-`projectile_census`, `projectile_params`,
-`reactions_{donovan,huitzil,pyron}`). That says the provenance is not IN THE
-FILE — several have it in their gate header or a STATE entry — but the file is
-what a triage is looking at, so those are where the thinking time goes.
-
 ## Decisions pending (human)
 
-- ~~**PUBLISHING THE windows-x86_64 PREBUILT BINARIES — AWAITING THE MAINTAINER'S WORD
-  (14z-152).**~~ **DECIDED AND DONE 2026-09-13 (14z-153, maintainer: "publish the
-  Windows binaries").** Rebuilt on the box with the capturing builder at
-  `666b14d9`; `test_release_binaries` PASS there on the rebuilt pair, both controls
-  fired; the two folders copied to the Mac and every sha256 row re-verified;
-  `release/merged-m18` repackaged (5 tracked files, the availability lists only);
-  uploaded FROM THE MAC (`gh` is absent on MSYS2, ruled 2026-09-13): 7 assets on
-  `freeze/merged-m18`, each downloaded back and identical. The register entry is the
-  tool's (`docs/project/build_environments.md`). The original entry follows. Both are built on the maintainer's box and `test_release_binaries`
-  PASSES there (at `8b908cd4` and again at `32268250`). Publishing adds
-  `merged-m18-{fbneo,mame}-windows-x86_64.zip` to `freeze/merged-m18` and commits
-  their `BINARY.txt` records; the upload runs where the files are (MSYS2), and
-  whether `gh` is set up there has not been checked. Outward-facing, so not done
-  unasked.
 - **THE LINUX SELF-CONTAINMENT ANCHOR — DECIDED 2026-09-13: option 1 now, option 3
   the goal (not scheduled).** The everyday check is `tools/check_host_libs.py`
   against an EXTERNAL list plus five ruled exception groups (DECIDED and
@@ -510,7 +448,7 @@ behaviour or rendering** — before anything else is suspected.
 |---|---|---|---|
 | ~~palette-seq ids 0x1E-0x21 (`0x39ACC0`)~~ **CLAIM FALSE, ROW WITHDRAWN 14z-79 (they are Bulleta's DF block)** | vanilla only ever requests 0x26/0x27 | `tests/audit_palette_seq_ids.sh` (10,504 sampled calls) | none — the palette path never transits work RAM, so the audit is the ONLY guard |
 | effect-class row 16 (`0x080AEC`) | vanilla never dispatches class 16 | `tests/audit_effect_class_rows.sh` §1, 0 reads vs a 1760-hit control | none needed: the row was a stub (`rts`), so a wrong claim costs at most the old no-op |
-| ~~drawer list-type 6 (`0x01B6AA`)~~ **CLAIM FALSE (measured 14z-89) — LEGACY LISTS DO REACH TYPE 6** | vanilla has no type-6 sprite lists | `audit_effect_class_rows.sh` §1/§4 + `tests/test_beam_list_type6.sh` | **THE FALLBACK HELD — this is what a safe-and-loud design buys.** 14z-89 measured the tripwire ARMED on legacy content on huitzil-m13: `21_don_mash` 387 times and `26_don_arcade_mash` 948 times, PC-attributed to inside the thunk body (0x0FD060). Rendering stayed correct throughout (the fallback runs vsav's own type-6 code, reproduced instruction-for-instruction), so nothing rendered wrong and no playtest ever saw it — exactly the outcome the register's "prefer designs where being wrong is safe and loud" rule was written for. WHY IT WAS MISSED: the deadness measurement was sound but its COVERAGE was four replays (`02/07/09/30`), and the gate has always run on that default set; the two replays that arm it are long mash/arcade rigs nobody pointed it at. COST TODAY: `$FF010C/$FF010D` is a live work-RAM counter vanilla does not keep, so both replays diverge permanently from the vanilla masked basis — they are `.pending` on huitzil-m13 pending the maintainer's ruling. OPEN: does the fallback need to stop counting (make the tripwire diagnostic-only / move it out of work RAM), or is the counter acceptable? See "Decisions pending — 14z-89" |
+| ~~drawer list-type 6 (`0x01B6AA`)~~ **CLAIM FALSE (measured 14z-89) — LEGACY LISTS DO REACH TYPE 6** | vanilla has no type-6 sprite lists | `audit_effect_class_rows.sh` §1/§4 + `tests/test_beam_list_type6.sh` | **THE FALLBACK HELD — this is what a safe-and-loud design buys.** 14z-89 measured the tripwire ARMED on legacy content on huitzil-m13: `21_don_mash` 387 times and `26_don_arcade_mash` 948 times, PC-attributed to inside the thunk body (0x0FD060). Rendering stayed correct throughout (the fallback runs vsav's own type-6 code, reproduced instruction-for-instruction), so nothing rendered wrong and no playtest ever saw it — exactly the outcome the register's "prefer designs where being wrong is safe and loud" rule was written for. WHY IT WAS MISSED: the deadness measurement was sound but its COVERAGE was four replays (`02/07/09/30`), and the gate has always run on that default set; the two replays that arm it are long mash/arcade rigs nobody pointed it at. COST TODAY: `$FF010C/$FF010D` is a live work-RAM counter vanilla does not keep, so both replays diverge permanently from the vanilla masked basis — they are `.pending` on huitzil-m13 pending the maintainer's ruling. ~~OPEN: does the fallback need to stop counting (make the tripwire diagnostic-only / move it out of work RAM), or is the counter acceptable? See "Decisions pending — 14z-89"~~ **ANSWERED 14z-91: the counter was REMOVED** — the `beam_list_type6` `RAM:$FF010C` counter deleted, which cleared all six `.pending` legacy replays (`HANDOFF.md` Build registry, the 14z-91 row (C)) |
 
 **[VSP-22]** Rules for adding a row: the claim must be measured with a POSITIVE CONTROL
 on the same instrument and leg (a blind instrument and a real zero look
@@ -520,22 +458,6 @@ wrong is *safe and loud* over designs that are merely well-measured.
 
 ## Open bugs
 
-- ~~**WIDE sprite garble (14z-60y)**~~ **FIXED 2026-08-05 (14z-61).** Not a
-  rendering defect: the shipped WIDE romset carried group C as byte copies
-  of the stock group B, so those copies held group B's CRCs and the loader
-  — which resolves by hash before name — served PRISTINE tiles for the
-  members the build had patched. Fixed in the pipeline (shippable overlay
-  zero-filled, canary romset separated, `tools/audit_romset_identity.py`
-  wired into the build), verified on both emulators with pristine and
-  stock-track controls, and gated by `tests/test_wide_render_content.sh`
-  (pixel A/B vs the stock track + a positive control) and
-  `tests/test_romset_identity.sh`. Full write-up: session 14z-61.
-  **CLOSED — maintainer playtest of `build/m5_wide` (`9bac6ee3`) confirms
-  it**, with and without Donovan: no regression, graphics good, gameplay
-  genuine, sounds good.
-- ~~Minor win-screen palette issues~~ **FIXED 14z-68m** (build/hui11):
-  the palette source is the OPCODE-view remap table, and the portrait
-  position row needed vs2's own values. Gate: `tests/test_hui_winscreen.sh`.
 - **OPEN (cosmetic):** win QUOTE TEXT — **all THREE tenants still show their
   SHELL's quote** (corrected 2026-08-27 by the maintainer; this entry used to
   say "Huitzil's", which understated the scope). Root-caused, not built: the
@@ -550,93 +472,6 @@ wrong is *safe and loud* over designs that are merely well-measured.
   ~330 glyph TILES have to travel. NOTE the
   win-quote ART is already native and complete (14z-62e/62j, group C bank 5) —
   what remains is the TEXT. See the cosmetic backlog below.
-- ~~**GitHub #114 — 421+P**~~ **CLOSED BY THE MAINTAINER 2026-09-02T17:53Z.
-  THEIR VERDICT, verbatim, and it is a GAMEPLAY RULING that must not be
-  re-opened as a defect:** *"Ceilings are the same, mash rate required slightly
-  under VS2 for everything but LP, which is not a bad thing given how stringent
-  VS2 is for max damage (max number of hits requires well above average
-  mashing, it is legitimately very hard), LP is short one hit and comparatively
-  slightly nerfed, which is acceptable on the whole, especially given the
-  additional bit of leniency for other punch strengths. Close enough, leverages
-  VS engine, good tradeoff, closing the ticket."*
-  **SO THE LOWER MASH REQUIREMENT IS AN ACCEPTED POSITIVE, NOT A NEUTRAL
-  FACT** — VS2's maximum is legitimately very hard to reach, and the host
-  clock making ours slightly more forgiving is a good trade. Anyone re-reading
-  the §5 numbers should read them that way. Detail of the investigation
-  follows (PREMISE REFUTED, SCOPE MEASURED, MASH MEASURED — 14z-127,
-  2026-09-02).**
-  **(a) THE ISSUE'S EVIDENCE WAS JEDAH.** Replay 48's P1 path (`U,U,R` → slot
-  `0x0F`) selects Donovan only on the SUBSTITUTED stock track; since the
-  14z-115 wheel separation a WIDE build puts the tenants on their own appended
-  row, so that path lands on vanilla **Jedah** (`+0x60 = 0x000b0d2e`) and the
-  "3 hits / 11 damage, victim pushed 728 → 852" filed as ours was his 421+HP.
-  Pristine `vsavj` reproduces it to the frame and is now the gate's must-fire
-  control. **The confound check in the issue was sound and still could not see
-  it: positions WERE identical until contact, because Jedah and Donovan stand
-  at the same x. A position check establishes SPACING, never IDENTITY.**
-  **(b) MEASURED AGAINST NATIVE, all four strengths, no mash, both tracks:
-  LP 3h/7d · MP 5h/9d · HP 6h/10d · ES 9h/13d — OURS EQUALS NATIVE IN EVERY
-  CELL**, victim held throughout, P1's identity asserted from `bases.tsv` on
-  each. Gate `tests/test_don_immortal_native.sh` (native measured in-run).
-  **(c) THE FRAME-CADENCE GAP IS THE HOST ENGINE'S, NOT THE PORT'S.** Our
-  deity ticks run ~1 video frame slower per ~11 engine ticks. **Controlled on
-  VANILLA content: Victor, Demitri, Morrigan and Bishamon mirrors, forced
-  picks, identical inputs — the hit-freeze `+0x5C` = 11 drains in 9 video
-  frames on vsav2 and 10 on vsavj for ALL FOUR.** vsavj runs fewer engine
-  double-ticks per video frame than vsav2. A ported character cannot tick at
-  vsav2's frame rate without ticking unlike every other character in the game
-  it now lives in. Frozen as section 4 of the gate.
-  **RULING (maintainer, 2026-09-02): "we must respect the fact that we are
-  porting the character to a different engine and the engine, being vanilla
-  vsav, takes precedence."** So the gate asserts HIT COUNT and DAMAGE — the
-  quantities the host clock does not set — and never vsav2's frame numbers.
-  **(d) MASHING — MEASURED AND CLOSED (14z-127).** Mash extends the node loop:
-  each new press adds 1 to the MASH ACCUMULATOR `+0x0A` (gate: `+0x126 &
-  0x770F`), and when the deciding routine finds it at **>= 7** it spends one
-  unit of the ITERATION BUDGET `+0x27` — **the per-strength cap, and it is
-  DATA: 2/3/3/4 for LP/MP/HP/ES, identical in both games.** Verified identical
-  at three levels: the 94 chain nodes (every non-pointer field; every link
-  relocated by the port delta), the deciding code (vs2 `PRG:0x059EEA` vs ours
-  `PRG:0x0C00FA`, instruction for instruction, only the `jmp` relocated), and
-  the budget's start value.
-  **AT THE TRUE INPUT CEILING MP/HP/ES EQUAL NATIVE EXACTLY** (8/12, 10/14,
-  15/19); **LP is ONE HIT SHORT (4 vs 5)** — hit PHASE: ours' last hit lands ON
-  the decision node, its freeze holds that node, and the loop re-entry skips one
-  node, costing one hitbox window. **RULED (maintainer, 2026-09-02): within
-  "altered by the VS engine", NOT chased** — the alternative is a one-frame
-  phase change on a shared path, the trade the superset invariant exists to
-  refuse. Frozen as §5 of the gate, LP asserted exactly so a move either way
-  fails.
-  **THE MEASUREMENT TRAP THAT COST THE MOST, now a gotcha:** a one-frame-on /
-  one-frame-off mash is HALF the ceiling (the release frame is dead);
-  alternating buttons EVERY frame is the ceiling. Below it the two legs sit at
-  different points of the same response curve, because the host clock changes
-  presses-counted-per-check — which manufactured a reading of "ours never
-  extends LP and over-extends HP/ES by 2" that the ceiling erased. Ruled out
-  along the way: `+0x12e` (saturates at 3) and the `$FF8058` input mirrors.
-  **THE GATE IS A FREEZE-BATTERY LEG (3f) — RULED MANDATORY AT RELEASE
-  (maintainer, 2026-09-02): "it's mandatory and cheap whenever we want to
-  release a version."** ~15 min, the longest leg of `run_battery_m2.sh`, and
-  the only one that MEASURES NATIVE instead of asserting a remembered constant.
-  **WHAT THE ISSUE GOT RIGHT:**  **WHAT THE ISSUE GOT RIGHT:** the provenance criticism was fair —
-  `native == 10` did enter `test_don_reactions.sh` as testimony (STATE
-  14z-42c). It is correct, and is now measured in-run. 14z-42's cadence root
-  cause and 14z-43's dispatch fix stand untouched.
-- **OPEN:** FG pacing — untouched.
-
-- **DECLINED (maintainer, 2026-09-02): a STATIC "substituted-wheel replay
-  paired with a WIDE set" gate.** *"I don't think the static wheel/track gate
-  is valuable at the moment given your arguments."* The arguments, kept so it
-  is not re-proposed: 26 gates match that pattern and all 26 were checked —
-  most run those replays for LEGACY content where the tenant is irrelevant, and
-  every Donovan-semantic one (`audit_don_ko_writer`, `audit_don_lilith_ko`,
-  `audit_continue_ladder`) FORCES THE PICK with `ff8782` pokes, so the wheel
-  path cannot affect them. No text scan separates those from a real defect, so
-  the gate would be 26 false positives plus an allow-list that rots.
-  `test_don_sound.sh` was the only live instance and it now refuses. **The
-  defence that IS in place: [VSP-163] (assert `+0x60` against `bases.tsv`, or
-  force the pick) and the runtime identity assertion in
-  `test_don_immortal_native.sh`.**
 
 ### THE COSMETIC BACKLOG (parked, 2026-08-27 — the maintainer's own list)
 
@@ -652,17 +487,8 @@ nice-to-have). Collected so the pass does not start from a blank page:
 | **Arcade ladder OPPONENT-ROULETTE TAG for a tenant opponent** (1P, tenant-plays-1P only — the CPU draws a tenant only on a tenant's ladder row) | measured 14z-123, not fixed | the tag shows the BASE character's name and mini-art (Phobos `0x10` → "BULLETA", a 4-bit-folded consumer, PC not attributed) drawn in pool row `PRG:0x3A3CA0 + id*32`'s own colours (a brown ramp for `0x10`; `0x13` is a grey ramp). The VS screen itself is correct (pixel-identical to the 2P path). Fix shape if ever wanted: author three pool rows (`0x3A3EA0/0x3A3EC0/0x3A3F00`, 32 bytes each, in a table vanilla never indexes past `0x0F` — legacy-invisible by construction) plus un-fold the tag's name/art consumer (its own measurement). Gate `tests/test_ladder_tenant_vs_palette.sh` |
 | **Arcade ladder MAP NAMES and PICTURES** | not investigated | the map screen is the one that follows the win screen (a documented rig trap, STATE_HISTORY 14z-99); stage banners decode via `tools/decode_stage_banners.py`, venue byte `$FF8100` |
 | **Character SELECT WHEEL polish** | not investigated | the wheel is functionally correct and emulator-identical; this is look-and-feel only. Layout facts in `docs/game/atlas/select_screen.md`, the 21-cell roster and its inbound edges |
-| ~~**PYRON'S MEDALLION WHITENS on the select screen**~~ **FIXED 14z-116** | **FIXED and FROZEN 14z-117** as merged-m12 (`build/m3b_merged19` rebuilt with the M10 mark, `cde712e1`; the 14z-116 candidate was `af21bc88` under M9 — same bytes) | **The long-parked residual is closed, and it was never the accent march.** WRITE-TAP ATTRIBUTION (16 word writes, PCs `0x3FFC60-0x3FFCA6`) named **our own 14z-62k sword thunk** at `PRG:0x05F9D0`: its P2 branch wrote `0x90C340` = row `0x1A`, which is also Pyron's medallion row. Not Donovan's portrait (the 14z-87b supposition), and not the marcher — the marcher was already neutralised for `0x16/0x19/0x1A` in 14z-64. **Maintainer chose the fix from three options (2026-08-28): drop the P2 write.** `tst.b $381(a4)` now `bne`s to the pop/rts, two NOPs replace `adda.w #$60,a1` — same byte count, no allocation ripple. **ACCEPTED TRADE, field-observed 2026-08-29 (and NOT what I predicted):** the P2 sword does not revert to grey — it draws with whatever row `0x1A` holds, which is now Pyron's medallion palette, so its pixels go from steel blue-white `(153,170,221)` to orange-gold `(255,136,34)` and, on Donovan's own gold-and-red costume, read as the sword being ABSENT. The grey ramp was the PRE-62k state, before a medallion lived in that row. **A partial fix is IMPOSSIBLE (measured): sword and medallion draw from THE SAME entries of row `0x1A` — 23 shared colours — so the row cannot be split by pen.** **VALIDATED ON THE BOARD (maintainer, 2026-08-29): "Confirmed, the sword is
-actually orange, and only on the select wheel screen, this is a good
-tradeoff. The fix is validated."** The scope confirmation matters as much as
-the verdict: the trade is CONFINED TO THE SELECT SCREEN — no in-match
-surface — which is what the thunk's site (`PRG:0x05F9D0`, the select figure
-uploader) predicts and the board now measures. MEASURED: row `0x1A` holds Pyron's vs2 palette across the whole select with P2 on Donovan; P1's accent on row `0x17` byte-for-byte unchanged; **`38_victor_p1_vsavj`, `05_timeout_idle` and `63_idle_select` BIT-IDENTICAL to merged18** (the changed path runs only on a P2 tenant hover, which no legacy replay does) — note `38` is the exact replay whose one-main-loop slip forced the 14z-88 revert of the previous attempt. Gate: **`tests/test_pyron_medallion_2p.sh`**, two legs, verified to FAIL on merged18 and PASS on merged19. **It closes a real coverage gap:** `test_wheel_bank5` 3b's two protocols are both SINGLE-PLAYER, so it could never see this and stayed green through every freeze. **NOT FROZEN — a freeze is a separate decision** |
 | **#112 Press of Death black foot** (Donovan's EX foot super) | **ROOT-CAUSED 14z-126b; FIX RULED (C) DO-NOTHING (maintainer, 2026-09-02) WITH OPTION (B) EXPLICITLY KEPT OPEN for the future — see the three #112 entries in `DECISIONS_HISTORY.md` (moved 14z-134)**; DECIDED cosmetic, parked; **maintainer 2026-08-28: too risky for a small cosmetic gain** | whole draw path measured VANILLA. ~~why a tenant runs that vanilla sequence is unknown~~ **REFUTED 14z-126b: it does NOT run one** — at every instance on merged-m14 the drawing objects' `+0x1C` point into Donovan's PLACED region and no work-RAM field holds a vsavj record pointer (positive control fired 15/15); `0x28394E` is never stored anywhere (all 7 candidate sites disassembled to instruction-boundary noise); and all 9,755 tenant sprite pointers are relocated (now gated). WHAT REMAINS: the records' TILE CODES — the effect map's coverage, the builder's own "render garbled, never crash" note. The BLACK case does not reproduce on the current build (needs a rebuild from `freeze/merged-m9` or a fresh recording) |
-| ~~**RANDOM SELECT should include the three tenants**~~ — ADDED TO THE LIST by the maintainer 2026-08-28; **BUILT 14z-117 at the maintainer's word ("do the random-select includes the tenants then"), gated (`test_random_select_tenants.sh`: draw = 15 vanilla + this build's tenants; confirm on a tenant frame loads the tenant's own record; must-fire control), frozen as merged-m13 (M11); FIELD VERDICT GREEN on the board (maintainer, MiSTer, 2026-08-29, STATE 14z-118)** | DONE 14z-117 — TWO sites, not one: the walker re-reads the table on its non-tick frames (`select_screen.md` "THE WALKER HAS TWO PATHS"); a bound-only thunk crashed the figure refresh with a code byte as id | the "?" cell walks a FIXED 15-entry table at `PRG:0x020C88` (`04 07 02 0C 05 0F 0A 00 0E 03 08 01 0D 09 06` = the base-half roster minus `0x0B`), 3-frame cursor, wrap `cmpi.b #$f`. Both bounds hard -> a tenant can never come up. **The siblings are the precedent**: vsav2's twin table (`PRG:0x01F8B4`) lists `10 11 13`, vhunt2's too — including the newcomers is what the source games do. FIX SHAPE: 18-entry relocated table + bound `#$f` -> `#$12`; it cannot grow in place (15 bytes + 1 pad, then code at `0x020C98`) and the table is read PC-relative, so it is a `site_thunk` on `PRG:0x020C80` + a `code` op, not a data poke. COST TO WATCH: the added cycles land on the select screen, whose legacy replays are already the bounded-window class — measure the onset before and after |
 | **MARIONETTE — a vs2 character, PARKED UNTIL FURTHER NOTICE (maintainer, 2026-08-28)** | not ported, not planned | **Assets live in VS2, not in VS.** She is not in Vampire Savior at all, so nothing in our romset is missing or broken by her absence. The maintainer's framing, and it is the right one: **Marionette and Shadow are both just MIRROR-MATCH MECHANISMS** — the shared machinery at `PRG:0x009BB2` copies the opponent's id and palette, so "playing as" either is playing the opponent's character. That makes porting her a low-value item: it adds a second route to a mirror match, not a character. **Not before everything else.** If it is ever revisited, note that vs2's arming counter is the SAME single `#$5` check as vsavj's (`PRG:0x01F8D6`), so whatever arms her in vs2 is a different mechanism and has not been located |
-| **Oboro's intro eats into the round** | **DECLINED by the maintainer 2026-08-28 — do NOT delay round start or cut the intro** | recorded so it is not revived: it would be a match-state TIMING change on a shared path for a cosmetic reason, which is the trade the superset invariant exists to refuse. The maintainer will instead check whether vsavj's Oboro has an alternate SHORT intro |
-| ~~(#113 first-down white-out)~~ **CLOSED 2026-09-01** | **not ours** — vanilla in vsavj AND vsav2, and the board agrees | the maintainer's MiSTer check came back consistent and they closed GitHub #113 the same day. Mechanism (palette RAM vs CPS-B layer register) still unmeasured — an honest boundary, not an open item |
 
 **THE ARCADE HIDDEN-CHARACTER ROSTER — CONFIRMED BY THE MAINTAINER
 2026-08-28.** Exactly THREE exist in the arcade game: **Oboro Bishamon,
@@ -759,19 +585,6 @@ alternate anywhere). Status of each on our build, all measured 14z-116:
   presentation on this Japan set is still unestablished — it blocks nothing.
 - **Shadow** — present and vanilla: exactly 5 START presses on the "?" cell then any attack button (`select_screen.md`), which matches the community code instruction for instruction. The mechanism copies the OPPONENT's id and palette **UNMASKED** at `PRG:0x009BB2`, and every table the copied id then indexes is 32 rows with our tenant rows populated, **so Shadow-copying a TENANT is structurally expected to work**. Never run — this is the `coverage_matrix` "morphing INTO a tenant" cell, and it now has a mechanism attached rather than an unknown.
 
-
-## Findings log
-
-- 2026-07-25: key masters — vsavj `0xfa8f4e33a4b881b9` (watchdog
-  `cmpi.l #$726A4BAF, D0`), vsav2 `0xd681e4f460371edf`, vhunt2
-  `0x36c1eba326b10f18` (vsav2/vhunt2 share watchdog
-  `cmpi.l #$06920760, D0` — sibling builds). All three: encrypted range
-  `PRG:0x000000-0x0FFFFF` only (first 1MB of 4MB). Decryption of all three
-  proven bit-identical to MAME (`tests/test_decrypt_oracle.sh <set>`).
-- 2026-07-25: ROM file byte order ≠ 68k logical order; cost ~1h; conventions
-  locked and oracle-tested (docs/GOTCHAS.md).
-- 2026-07-25: MAME 0.288 vsavj boots and runs attract deterministically
-  headless (`-video none -sound none`, fresh sandbox per run).
 
 ## Integration notes — SMS docs (imported 2026-07-24)
 
