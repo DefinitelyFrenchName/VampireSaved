@@ -136,7 +136,13 @@ class Tree:
         return None
 
     def session_resolves(self, key):
-        pat = re.compile(r"(?:Sessions?\s+|\*\*)" + re.escape(key) + r"(?![0-9A-Za-z])")
+        # A record is a `Session <key>` line, a `**<key>` lead, or a `##`/`###`
+        # heading that BEGINS with the key: a session archived as a sub-entry of
+        # another's group has only that last form (THE LEDGER says so of 14z-90,
+        # whose record is `### 14z-90 —` inside the 14z-91 group). Measured when
+        # the heading form was added (2026-09-14): 34 keys resolve only by it,
+        # every one a real record; an invented key still resolves nowhere.
+        pat = re.compile(r"(?:Sessions?\s+|\*\*|^#{2,3} )" + re.escape(key) + r"(?![0-9A-Za-z])", re.M)
         for rel in ("STATE.md", "STATE_HISTORY.md"):
             if (self.root / rel).is_file() and pat.search(self.text(rel)):
                 return True
