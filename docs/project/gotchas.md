@@ -4547,10 +4547,13 @@ clone and CI never have them. One at `release/merged-m18/.DS_Store`, written two
 hours AFTER the M18 assets were uploaded, reached no asset and failed §5
 (`left out of every asset: .DS_Store`) in a strict tier whose other 149 gates
 passed. Removed: PASS, both controls fired, both modes FAIL; no published zip
-held it. **Rule:** `find release -name .DS_Store -delete` before a static tier or
-an upload is safe — they hold Finder view settings only. **The case that would
-ship:** `tools/upload_release_assets.sh` lists a platform directory with
-`find -type f`, so a `.DS_Store` INSIDE one would be zipped into its asset;
-`test_release_roundtrip` §4's inventory check enumerates the same way and fails
-it, which is what stands between that and a release.
+held it. ~~**Rule:** `find release -name .DS_Store -delete` before a static tier or
+an upload~~ **SUPERSEDED THE SAME DAY — IGNORED BY RULING (maintainer, 2026-09-14:
+"they must be ignored"):** `tests/lib/os_metadata.sh` is the one definition of a
+file manager's folder metadata, and the three release listings that can see a
+dotfile pipe their `find` through it: the uploader (which would otherwise have
+zipped a `.DS_Store` INSIDE a platform directory into its asset), the shape gate's
+§5 and `test_release_roundtrip` §4's inventory. Ground truth
+`tests/test_release_os_metadata.sh` runs the real uploader over a release planted
+with them. None was ever committed: both repositories' `.gitignore` carry the rule.
 

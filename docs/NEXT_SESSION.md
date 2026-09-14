@@ -40,20 +40,43 @@ in ONE `{ …; } </dev/null` block (no child can eat the rest of the script); th
 
 ## START HERE — what is open
 
-- **`.DS_Store` in `release/` — a recommendation, not ruled** (STATE 14z-153 (2d)):
-  Finder recreates them whenever `release/` is browsed, and one turned
-  `test_release_asset_shape` red. Teach `tools/upload_release_assets.sh` and that
-  gate to ignore `.DS_Store` (never zipped, never counted), or keep running
-  `find release -name .DS_Store -delete` before a tier or an upload.
+- **FIRST THING — THE STATE.md DISCIPLINE PASS: the law, the skill, a gate, then the
+  clean-up.** The maintainer, 2026-09-14: *"we again have many open items (decisions,
+  bugs, etc.) that are still listed as open with a mention that they are actually
+  closed. This is a bad pattern that we must avoid by actually updating the correct
+  documents, github issues, etc. and removing the closed items from the open ones.
+  This will also shorten considerably STATE.md, limiting the size gymnastics"* — and
+  the discipline must be *"documented and enforced, either in CLAUDE.md or in
+  skills"*, not *"just a mention somewhere that never sees any systematic action"*;
+  *"do it first thing in next session"*.
+  **Measured 14z-153:** STATE.md 146.7 KB = three session groups 41.5 KB + THE LEDGER
+  48.0 KB (184 lines) + standing sections 55.4 KB; at least 11 closed-but-listed
+  entries in the open lists (Decisions pending, Open bugs, the cosmetic backlog, the
+  deadness register); 0 open GitHub issues. **What writes the bad pattern down:**
+  STATE.md's own header (standing entries "are marked DECIDED/FIXED in place, as
+  always"; a decision leaves only once it "stops shaping active work"); the port
+  skill ([VSP-10] "Mark rulings DECIDED in place", [VSP-17] "corrections are marked in
+  place"); CLAUDE.md [VSP-17]/[VSP-10] say nothing of an item's exit. **What enforces
+  it: nothing** — no gate reads STATE's open lists, its ~150 KB budget or its
+  three-group rule, and STATE.md has no `doc_shape.tsv` row.
+  **The order:** (1) the law in CLAUDE.md [VSP-17], its WORDING approved by the
+  maintainer first — an open list holds only what is open; when an item closes, in
+  the same commit its facts go where they belong (doc, register, gate, issue), its
+  entry moves verbatim to its archive, and it is deleted from every open list;
+  (2) STATE.md's header rule, with an archive named per open list; (3) the port
+  skill's [VSP-10]/[VSP-17] (checkskills needs the law paragraph first); (4) a
+  ci_static gate `test_state_open_lists` — a closed-marked entry in an open list
+  fails, plus the size budget and the group count, with a must-fire control on a
+  perturbed copy; (5) the clean-up, the gate's red as the checklist.
+  **Questions to put:** the archive for closed bugs and backlog rows; a "standing
+  rulings" home for decisions that still constrain work; the 48 KB ledger, whose
+  home CLAUDE.md fixes.
 - **The dedicated Linux server, once it exists:** (a) build the PUBLISHED Linux
   binaries there on the oldest LTS worth supporting and add a release-time
   resolution on a machine with no `-dev` packages (ruled option 3); (b) **the
   maintainer's todo** — run the same `--controls` tier there and compare its speed
   with this Mac's (`build/emu_controls_14z153/results.tsv`), at `--jobs 4` like for
   like. The WSL2 binaries are never published.
-- **F11's red path differs between the lineage and bbh** — a stale guide's line
-  names `tools/gen_skill_guide.py` on one side and `bbh skill-guide` on the other.
-  Noted, not changed: say whether fidelity should also hold on that red.
 - **`tools/bundle_win_dlls.py` prints U+FFFD on MSYS2** (its em dash through
   cp1252) — build logs only, no record or verdict carries it.
 - **Zabel j.LK proximity guard** — its own session (recording first).
@@ -71,8 +94,10 @@ in ONE `{ …; } </dev/null` block (no child can eat the rest of the script); th
    It was the whole of 14z-152's red without a reason; bbh now lints the shape.
 2. **A native Windows python writes CRLF per PROCESS** — every python block that
    prints verdict text needs `sys.stdout.reconfigure(encoding="utf-8", newline="\n")`.
-3. **A Finder `.DS_Store` in `release/` turns `test_release_asset_shape` red** on
-   this Mac: the gate measured the host.
+3. **A Finder `.DS_Store` in `release/` turned `test_release_asset_shape` red** on
+   this Mac — the gate measured the host. Ignored by ruling since 2026-09-14
+   (`tests/lib/os_metadata.sh`); a new release listing that uses `find` must pipe
+   through it.
 4. **A pull onto the box refuses when a commit adds files it has UNTRACKED** — move
    them aside, pull, re-verify the committed records there.
 5. **Do not wait on a task that may already have ended** (the maintainer's

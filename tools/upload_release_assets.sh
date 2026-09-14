@@ -62,6 +62,9 @@ TAG="${1:?usage: tools/upload_release_assets.sh freeze/<name> [--prune] [--dry-r
 PRUNE=0; DRY=0
 for a in "$@"; do case "$a" in --prune) PRUNE=1 ;; --dry-run) DRY=1 ;; *) echo "unknown option $a" >&2; exit 2 ;; esac; done
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
+# a file manager's folder metadata (`.DS_Store`) is never shipped — the one definition
+# (maintainer-ruled 2026-09-14); asset_files() pipes its `find` through it
+. "$REPO/tests/lib/os_metadata.sh"
 case "$TAG" in freeze/*) ;; *) echo "the tag must be a freeze tag (freeze/<name>)" >&2; exit 2 ;; esac
 git rev-parse --verify -q "refs/tags/$TAG" >/dev/null || { echo "no such tag: $TAG" >&2; exit 1; }
 NAME="${TAG#freeze/}"
@@ -123,7 +126,7 @@ done
 #      back are THE SAME list, so they cannot disagree.
 asset_files() {   # asset_files <platform> <kind>; kind = recipe | <os-arch> | all
     _p="$1"; _k="$2"
-    ( cd "release/$NAME" && find "$_p" -type f ) | sort | while read -r f; do
+    ( cd "release/$NAME" && find "$_p" -type f ) | vs_drop_os_metadata | sort | while read -r f; do
         case "$f" in
         "$_p"/emulator/bin/*)
             if [ "$_k" != recipe ]; then

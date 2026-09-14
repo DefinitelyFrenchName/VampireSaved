@@ -227,3 +227,7 @@ test_build_environment_entry
 # travel together (maintainer-ruled 2026-09-12) — the shape of what
 # upload_release_assets.sh CUTS, over the current release. ROM-free, ~5 s.
 test_release_asset_shape
+# a file manager's folder metadata (`.DS_Store`) in a release tree is never shipped and
+# never counted (maintainer-ruled 2026-09-14) — the real uploader over a synthetic release
+# planted with them, and the three release listings through tests/lib/os_metadata.sh. ~3 s.
+test_release_os_metadata

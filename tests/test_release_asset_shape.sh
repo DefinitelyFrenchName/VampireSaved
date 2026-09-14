@@ -152,7 +152,11 @@ done
 # ---- 5. completeness, both ways -------------------------------------------
 echo "== 5. every file of every platform directory reaches an asset"
 cat "$W"/lists/*.list | sort -u > "$W/union.txt"
-( cd "release/$NAME" && find . -type f | sed 's|^\./||' ) | sort > "$W/tree.txt"
+# a file manager's folder metadata (`.DS_Store`) is not a file of the release: Finder
+# writes one into any folder a person browses, and it never ships (maintainer-ruled
+# 2026-09-14; the one definition, shared with the uploader and test_release_roundtrip)
+. "$REPO/tests/lib/os_metadata.sh"
+( cd "release/$NAME" && find . -type f | sed 's|^\./||' ) | vs_drop_os_metadata | sort > "$W/tree.txt"
 # THE ONE NAMED EXEMPTION, and a fresh clone is the host that needs it: an
 # os-arch directory whose BINARY.txt has no binaries beside it (the files are
 # release assets, never git content — 14z-149) ships NO asset here, so its

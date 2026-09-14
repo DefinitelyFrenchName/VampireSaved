@@ -42,7 +42,9 @@ missing FAILS; the must-fires `stray-file` and `readme-missing-section`):
 | `*.mra`, `jtcps2w.rbf`, `BITSTREAM.txt`, `MISTER.md` (mister) | the two MRAs, the bitstream and its record — on top of the patch set, because the WIDE set still has to be rebuilt from the user's dumps (an MRA-only path is NOT reachable: the WIDE gfx members are ~26,000 tile-sized copies each out of `vsav2`/`vhunt2`, measured 2026-09-11) |
 
 **Never ships:** a ROM byte in any form (the rule-7 scan), a build log, a
-scratch file, a savestate, a recording, anything derived from the reference
+scratch file, a savestate, a recording, a file manager's folder metadata
+(`.DS_Store` — every release listing ignores it through `tests/lib/os_metadata.sh`,
+maintainer-ruled 2026-09-14), anything derived from the reference
 dumps beyond a delta the applier verifies against them. The user supplies
 the three dumps; the applier refuses a wrong one by name.
 

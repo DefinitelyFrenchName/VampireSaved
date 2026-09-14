@@ -278,8 +278,11 @@ else
     # every item of the definition is present. A file nobody ruled in does
     # not ship — that is how a ROM byte, a build log or a scratch file would
     # otherwise ride along.
+    # a file manager's folder metadata (`.DS_Store`) is not a file of the release and never
+    # ships (maintainer-ruled 2026-09-14): the one definition, shared with the uploader
+    . "$REPO/tests/lib/os_metadata.sh"
     inv_check() {  # inv_check <platform> <allowed-regex> — every file must match
-        find "$REL/$1" -type f | sed "s|^$REL/$1/||" | grep -vE "$2" > "$W/inv_$1.txt" || true
+        find "$REL/$1" -type f | sed "s|^$REL/$1/||" | vs_drop_os_metadata | grep -vE "$2" > "$W/inv_$1.txt" || true
         if [ -s "$W/inv_$1.txt" ]; then echo "FAIL: $1/ ships files outside the ruled inventory:"; sed 's/^/        /' "$W/inv_$1.txt"; fail=1; fi
     }
     # the os-arch segment carries an UNDERSCORE on every non-Apple host
