@@ -14,11 +14,16 @@ dating and ruling inline. Entries are NEVER rewritten here; a decision that is
 later reversed gets its reversal recorded in STATE.md and a marker added
 ABOVE the old entry, pointing forward.
 
-**The lifecycle rule (from this cleanup on):** a decision is born in STATE.md
-"Decisions pending" -> the ruling is marked DECIDED **in place** (unchanged
-practice, `decided-items-leave-pending`) -> at a later cleanup or session
-close, once it stops shaping active work, the whole entry moves HERE verbatim.
-The CLAUDE.md §5 retraction grep covers this file.
+**The lifecycle rule — AMENDED 2026-09-14 (maintainer-ruled, CLAUDE.md
+[VSP-17]):** a decision is born in STATE.md "Decisions pending" -> when it is
+RULED, the whole entry moves HERE verbatim in the commit that records the
+ruling, and STATE.md keeps one line stating the rule under "Standing rulings"
+for as long as it constrains work. Nothing is marked DECIDED in place any more.
+*(The superseded rule, 14z-109 to 2026-09-14: the ruling was marked DECIDED in
+place first, and the entry moved here only once it stopped shaping work. Entries
+moved under it keep their in-place markings verbatim; the rule was replaced
+because rulings marked in place stayed in the open list.)* The CLAUDE.md §5
+retraction grep covers this file.
 
 ---
 

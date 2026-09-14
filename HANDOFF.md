@@ -2,9 +2,11 @@
 
 First read of any session after CLAUDE.md and STATE.md. Keep current in the
 same commit as anything it describes. (Since 2026-08-20 STATE.md holds only
-the recent session groups + a ledger; the full session archive is
-`STATE_HISTORY.md` — "STATE 14z-XX" references resolve there when the
-session has rolled off.)
+the recent session groups and the standing sections; the full session archive
+is `STATE_HISTORY.md`, with THE LEDGER at its head since 2026-09-14 — "STATE
+14z-XX" references resolve there when the session has rolled off. Bugs,
+cosmetic items and evolutions are TICKETS, never listed in STATE: CLAUDE.md
+[VSP-182].)
 
 **IF YOU WANT TO DO X, READ/RUN Y** (the routing table — this file is long,
 and every row below names the section or the command, so nobody has to guess

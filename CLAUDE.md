@@ -230,22 +230,61 @@ legacy behavior is a failed change.
 
 ## 5. Working style
 
-- **[VSP-17]** Sessions begin by reading `STATE.md` (current milestone, open bugs, decisions
-  pending) and end by updating it. STATE.md is the single source of truth for
-  progress; do not rely on chat memory. **SPLIT 2026-08-20
-  (maintainer-approved): STATE.md holds the newest ~3 session groups, THE
-  LEDGER (one line per archived session), and the standing sections;
-  `STATE_HISTORY.md` holds every older session record VERBATIM.** The
-  rollover procedure lives in STATE.md's own header and is part of the
-  session-close ritual. "STATE 14z-XX" references resolve in STATE.md
-  first, then STATE_HISTORY.md — section names are preserved in the
-  archive, and archived entries are never rewritten (corrections are
-  marked in place, as always).
+- **[VSP-17]** Sessions begin by reading `STATE.md` (current milestone, open decisions,
+  standing rulings) and end by updating it. STATE.md is the single source of
+  truth for progress; do not rely on chat memory. **SPLIT 2026-08-20
+  (maintainer-approved), amended 2026-09-14: STATE.md holds the newest ~3
+  session groups and the standing sections; `STATE_HISTORY.md` holds every
+  older session record VERBATIM, under THE LEDGER (one line per archived
+  session) at its head.** The rollover procedure lives in STATE.md's own
+  header and is part of the session-close ritual. "STATE 14z-XX" references
+  resolve in STATE.md first, then STATE_HISTORY.md — section names are
+  preserved in the archive, and archived entries are never rewritten
+  (corrections to them are marked in place).
+  **AN OPEN LIST HOLDS ONLY WHAT IS OPEN (maintainer-ruled 2026-09-14).**
+  STATE.md's "Decisions pending" and NEXT_SESSION's START HERE never carry a
+  closed item, however it is marked — struck through, DONE, FIXED or CLOSED
+  alike. A ruled decision moves VERBATIM to `DECISIONS_HISTORY.md` in the
+  commit that records the ruling, leaving a one-line statement of the rule
+  under STATE.md's "Standing rulings" for as long as it constrains work; the
+  line is deleted when it stops. Bugs, cosmetic items and evolutions are
+  tickets, listed only in the ticket index ([VSP-182]).
+  `tests/test_state_open_lists.sh` enforces this, together with STATE.md's
+  size budget and session-group count.
   **THE CLOSE ENDS WITH A PUSH (maintainer-ruled 2026-09-10):** when every
   check of the close is green and nothing is pending, push `main` to GitHub
   as the ritual's last step; a red, a SKIP or an unresolved item leaves the
   commits local and the close says so. Pushing bbh follows the same rule
   under its standing authorisation.
+- **[VSP-182]** **TICKETS HAVE STRICT SOURCES OF TRUTH (maintainer-ruled
+  2026-09-14).** Every bug, cosmetic item and evolution is a ticket, and each
+  question about one has exactly one source of truth. **The list** — which
+  tickets exist, their kind and status — is `docs/project/tickets.tsv` (its
+  header is the spec of record; the page is generated). **The story** —
+  report, discussion, rulings as given, resolution — is the ticket's GitHub
+  issue whatever its kind, so a change of kind is a label edit, never a
+  move. **The facts** it established live in the subject documents
+  ([VSP-12]); what a session did lives in STATE ([VSP-17]). Live documents
+  name a ticket by its issue number and never restate its status or
+  content.
+  **ENOUGH STAYS LOCAL.** Without GitHub, the tree must answer four questions
+  about every ticket: what it was and how to reproduce it, what was decided,
+  what was learned, and what went wrong. Rulings are decisions, so they are
+  recorded locally whichever channel gave them. What was learned and what
+  went wrong live in a live document — a subject doc, a gotchas bucket or a
+  skill — never only in an archive. Only the conversation, and a third
+  party's report text, may exist on GitHub alone.
+  **CLOSING A TICKET**, in one commit: its facts go where they belong; the
+  issue and the tree are checked against each other, the side that is behind
+  is updated, a closing comment states the resolution, and the issue is
+  closed; its index row records the status and the four answers; any STATE
+  entry for it moves VERBATIM to `STATE_HISTORY.md` under the closing
+  session's key. **Closed means nothing is left to do** — an option kept open
+  becomes its own ticket. **A copy** of past content names its origin and
+  date, and goes only into a source of truth or an archive.
+  `tests/test_tickets.sh` enforces the form: every issue has a row whose
+  state agrees with GitHub's, and each answer is a resolving link or an
+  explicit `none`. Whether an answer is enough is judged at close.
 - **[VSP-162]** **THE `14z-N` SESSION KEY — a naming convention AND the
   archive's INDEX, which is why it is never re-based.** A tag names ONE
   SITTING (a working session, several per day at times — not a calendar day,
