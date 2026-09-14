@@ -36,7 +36,7 @@ How to work with it:
   the group's own banner headers. If this file still exceeds ~150 KB, roll the
   oldest kept group early. The standing sections never roll.
 - **THE LAST STEP OF THE CLOSE IS THE PUSH (maintainer-ruled 2026-09-10):**
-  static tier strict green, the doc checks green, nothing pending -> `git push
+  static tier strict green WITH every control executed (the default `all`), the doc checks green, nothing pending -> `git push
   origin main`; anything red or skipped leaves the commits local and the
   close entry says so.
 
@@ -118,6 +118,12 @@ How to work with it:
 ---
 
 # STANDING SECTIONS (current state — never archived)
+## Standing rulings
+
+One line per ruling that still constrains work; the full entry lives where the line says. A line is deleted when its ruling stops constraining work (CLAUDE.md [VSP-17]).
+
+- **Static-tier controls at the CLOSE (2026-09-14):** a mid-session commit runs `tests/run_all_static.sh --strict --exec-controls none` plus `CONTROL=<name>` for every gate it adds or changes; the session close runs every control (the default). Full entry: `DECISIONS_HISTORY.md` "Ruled 2026-09-14 (14z-154)".
+
 ## RELEASE-TIME TEST SCOPE (maintainer, 2026-09-02)
 
 **AT RELEASE TIME, ALL TESTS ARE RUN.** Verbatim: *"at release time, ALL tests

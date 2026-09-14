@@ -231,3 +231,14 @@ test_release_asset_shape
 # never counted (maintainer-ruled 2026-09-14) — the real uploader over a synthetic release
 # planted with them, and the three release listings through tests/lib/os_metadata.sh. ~3 s.
 test_release_os_metadata
+# 14z-154 (maintainer-ruled 2026-09-14, CLAUDE.md [VSP-17]): AN OPEN LIST HOLDS ONLY
+# WHAT IS OPEN — STATE.md's "Decisions pending" and NEXT_SESSION's START HERE carry no
+# closed marker, the standing sections are the four allowed, the size budget and the
+# group count hold, and every ledger key resolves; the retrofit debt is frozen and
+# shrink-only. tools/check_state_lists.py; five must-fire controls. ~1 s.
+test_state_open_lists
+# 14z-154 (maintainer-ruled 2026-09-14, CLAUDE.md [VSP-182]): THE TICKET INDEX — every
+# saved GitHub issue has exactly one row in docs/project/tickets.tsv, open/closed agrees,
+# each answer link resolves (learned/wrong in live documents), the backfill debt is
+# shrink-only and the generated page is current. tools/tickets.py; six controls. ~1 s.
+test_tickets

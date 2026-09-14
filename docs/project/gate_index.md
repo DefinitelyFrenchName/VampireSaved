@@ -16,12 +16,12 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**327 scripts** — 76 ci_portable, 75 ci_static, 176 emulator-tier (run by name).
+**329 scripts** — 78 ci_portable, 75 ci_static, 176 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 14 | the suite runners and their own ground truth |
-| [docs](#docs) | 15 | the documentation locks — docs, skills, indexes, tables follow the tree |
+| [docs](#docs) | 17 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 33 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 55 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
@@ -72,7 +72,9 @@ the documentation locks — docs, skills, indexes, tables follow the tree.
 | `tests/test_gotchas_index_current.sh` | test | ci_portable | — | docs/GOTCHAS.md FOLLOWS the three bucket files (14z-122, the documentation rationalization pass). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-122 |
 | `tests/test_md_subset.sh` | test | ci_portable | — | the markdown SUBSET the corpus writes is parsed strictly, and every construct outside it FAILS (14z-140, living-docs slice L4). ci_portable: no ROM, no build dir, no emulator, ~3 s. | 14z-140 |
 | `tests/test_skill_guides.sh` | test | ci_portable | — | the level-0 skills' GUIDE.md files are CURRENT against SKILL.md and the docs they quote (14z-134). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-134 |
+| `tests/test_state_open_lists.sh` | test | ci_portable | — | AN OPEN LIST HOLDS ONLY WHAT IS OPEN: STATE.md's open lists, its size budget and session-group count, NEXT_SESSION's START HERE, and THE LEDGER's keys (14z-154; maintainer-ruled 2026-09-14, CLAUDE.md [VSP-17]). ci_portable: | 14z-154 |
 | `tests/test_tables_current.sh` | test | ci_static | ROMDIR | the community-facing behavioral tables (docs/project/tables/{donovan,huitzil,pyron}.md, CLAUDE.md §2 rule 5) are GENERATED from the CURRENT builds' extracts and must match what is committed. ci_static: | 14z-118 |
+| `tests/test_tickets.sh` | test | ci_portable | — | THE TICKET INDEX: every GitHub issue has exactly one row, open/closed agrees with GitHub's, and every row answers the four local questions with links that resolve (14z-154; maintainer-ruled 2026-09-14, CLAUDE.md [VSP-182]). ci_portable: | 14z-154 |
 
 ## platform
 

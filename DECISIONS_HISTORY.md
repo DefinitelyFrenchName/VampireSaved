@@ -27,6 +27,31 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-14 (14z-154) — entered at ruling time, under the amended lifecycle
+
+- **THE STATIC TIER'S MUST-FIRE CONTROLS RUN AT THE SESSION CLOSE, NOT AT EVERY
+  COMMIT (maintainer-ruled 2026-09-14).** The maintainer's words: *"I lean towards
+  running the controls only at session close unless we have a demonstrable history of
+  control going dead mid-session; the rationale being that if the probability is low,
+  at worst we catch it late rather than earlier but we can always either correct or
+  even rollback and redo the work. This might sound bad but our sessions are
+  context-size bound anyway since we don't exactly parallelise work to extremes... so
+  the worst outcome is maybe a couple hours lost to gain more than 15min for each
+  intermediate commit basically"*. **THE CONDITION, MEASURED THE SAME HOUR:** of the
+  106 strict-tier logs kept under `build/`, the 27 that executed controls (since
+  14z-147c) carry not one control verdict other than HONOURED — every executed tally
+  reads `lies 0  refused 0  died 0` — and the dead controls in the archives are
+  emulator-tier or audit gates. **THE COST IT SAVES, MEASURED:** a quiet strict tier is
+  ~37 min wall, ~20 min of gates and ~17 min of executed controls
+  (`build/static_14z153_close.log` 36:57, `build/static_14z152_close.log` 37:23; the
+  runner times each control but deletes the record at exit, so the controls' share is
+  wall minus gates). **WHAT IT CHANGES:** a mid-session commit runs
+  `tests/run_all_static.sh --strict --exec-controls none`, plus `CONTROL=<name>
+  tests/<gate>.sh` for every declared control of a gate the commit ADDS or CHANGES; the
+  session close runs the default, `--exec-controls all`. Unchanged: the emulator tier's
+  `--controls` at release runs (ruled 14z-148) and CI's portable run. **REVISIT** if a
+  close ever finds a control dead that a mid-session run would have caught.
+
 ## Moved 2026-09-12 (14z-151) — the 14z-133b..14z-149 rulings that stopped shaping work
 
 Fifteen decisions, byte-verbatim, resolutions and their original entries together.

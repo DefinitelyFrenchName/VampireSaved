@@ -308,6 +308,7 @@ tests/test_shell_portability.sh	runner
 tests/test_shim_charid.sh	pipeline
 tests/test_sim_wram_contract.sh	mister
 tests/test_skill_guides.sh	docs
+tests/test_state_open_lists.sh	docs
 tests/test_static_runner.sh	review-triage
 tests/test_suite_dispatch.sh	runner
 tests/test_suite_dispatch_selftest.sh	runner
@@ -324,6 +325,7 @@ tests/test_thunk_addr_literal.sh	pipeline
 tests/test_meter_gain.sh	character-data
 tests/test_rehit_ring.sh	character-data
 tests/test_tick_durations.sh	character-data
+tests/test_tickets.sh	docs
 tests/test_type_stamp_census.sh	pipeline
 tests/test_vanilla_frame_join.sh	character-data
 tests/test_vanilla_aerial_join.sh	character-data

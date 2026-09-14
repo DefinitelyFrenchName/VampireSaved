@@ -1,0 +1,182 @@
+# docs/project/tickets.tsv — THE TICKET INDEX. Every bug, cosmetic item and
+# evolution of this project, one row per GitHub issue. THE SOURCE OF TRUTH FOR
+# THE LIST (CLAUDE.md [VSP-182], maintainer-ruled 2026-09-14), and this header is
+# its spec of record. docs/project/tickets.md is GENERATED from it
+# (`python3 tools/tickets.py page`); the gate is tests/test_tickets.sh.
+#
+# ONE SOURCE OF TRUTH PER QUESTION:
+#   the LIST — which tickets exist, their kind and status ...... this file
+#   the STORY — report, discussion, rulings as given, resolution  the GitHub issue
+#   the FACTS a ticket established .............................. the subject documents ([VSP-12])
+#   what a SESSION did .......................................... STATE.md / STATE_HISTORY.md ([VSP-17])
+# Live documents name a ticket by its issue number (#N) and never restate its
+# status or content. A copy of past content names its origin and date, and goes
+# only into a source of truth or an archive.
+#
+# ENOUGH STAYS LOCAL: without GitHub, the tree must answer four questions about
+# every ticket — the four answer columns below. Only the conversation, and a
+# third party's report text, may exist on GitHub alone.
+#
+# repo: DefinitelyFrenchName/VampireSaved
+#
+# COLUMNS (tab-separated; rows ordered newest issue first):
+#   issue     the GitHub issue number, the key. Every issue on GitHub has exactly
+#             one row; a ticket with no issue yet does not exist yet.
+#   kind      bug | cosmetic | evolution. A change of kind is an edit here and a
+#             label on GitHub, never a move.
+#   status    open | parked                                   the issue is OPEN
+#             done | declined | not-ours | invalid | duplicate  the issue is CLOSED
+#               done       fixed, or delivered
+#               declined   ruled not to be done
+#               not-ours   vanilla behaviour, or outside this project
+#               invalid    the premise was refuted
+#               duplicate  another ticket holds it (named in `decided`)
+#             CLOSED MEANS NOTHING IS LEFT TO DO: an option kept open is its own
+#             ticket, linked from this one.
+#   title     one searchable line, in our words
+#   repro     how to reproduce it: a recording, a replay, a rig or a gate
+#   decided   what was decided. Rulings are recorded locally whatever channel
+#             gave them: STATE "Standing rulings", DECISIONS_HISTORY.md, a doc.
+#   learned   what was learned: the mechanism, the measurement
+#   wrong     what went wrong: retracted theories, traps, bad patterns
+#             Each answer is `none`, or links separated by ` ; `. A link is a
+#             repo-relative `path`, which must exist, or `path § text`, where
+#             some line of the file must contain the text. `learned` and `wrong`
+#             link a LIVE document (a subject doc, a gotchas bucket, a skill),
+#             never STATE.md, which rolls, or an archive (`*_HISTORY.md`,
+#             `*_history.md`).
+#   sessions  the session keys that worked on it, comma-separated
+#             (`14z-112,14z-126b`), each resolving in STATE.md or
+#             STATE_HISTORY.md; or `-`
+#
+# BACKFILL DEBT: `?` in any column but issue and title marks a row not yet
+# backfilled (the retrofit that opened this file, 2026-09-14). Only issues listed
+# in tests/expected/tickets_debt.txt may carry `?`, and that list only SHRINKS:
+# the commit that answers a row's last `?` removes the issue from it.
+#
+# THE GITHUB SIDE: docs/project/tickets_github.tsv is GitHub's issue list as
+# saved by `python3 tools/tickets.py refresh` at a session close, and the gate
+# compares open/closed against it offline. A NEW TICKET: create the issue,
+# refresh, add the row. CLOSING ONE (CLAUDE.md [VSP-182]), in one commit: its
+# facts go where they belong; the issue and the tree are reconciled and a closing
+# comment states the resolution; this row records the status and the four
+# answers; any STATE entry for it moves VERBATIM to STATE_HISTORY.md under the
+# closing session's key.
+#
+# WHAT THE GATE DOES NOT CLAIM: that an answer is ENOUGH. That is judged at the
+# close that closes the ticket.
+issue	kind	status	title	repro	decided	learned	wrong	sessions
+114	?	?	421+P (Lighting Sword): ours lands 3 hits and knocks the victim away; native VS2 lands 6 and holds — measured, and the gate cannot see it	?	?	?	?	?
+113	?	?	Whole-screen flash at the first down (photosensitivity) — seen for many builds	?	?	?	?	?
+112	?	?	Press of Death (41236+K): blue/black palette about half the time on merged-m9	?	?	?	?	?
+111	?	?	Coverage rot: the Donovan crash soak picks Jedah, and the continue-switch rig no longer reaches its pairing	?	?	?	?	?
+110	?	?	audit_fg_damage + audit_pool_free_byte red since 14z-87 — rig constants describe the pre-beep-fix platform (bisected to merged6→merged7)	?	?	?	?	?
+109	?	?	Phobos DF clone beams drawn 0xA00 LOW (the 14z-71 bias class through a path the ray fix never covered): per-clone pieces emit at 0x43xx/0x3Dxx where native uses 0x4Dxx — invisible on blank tiles; sound and mechanics fire	?	?	?	?	?
+108	?	?	Pyron cosmo satellites carry collision word 0x1000 (native: 0x6000) and never enter the projectile sweep — spawn-inherited from the fighter's +0x18; writer unidentified (instrument paradox)	?	?	?	?	?
+107	?	?	Plausible reconciliation row 0x0448a6->0x02563e is the WRONG SIBLING (neighbor-anchored answer: 0x04367A); live in all three tenants' dispatch farms, cold on the corpus	?	?	?	?	?
+106	?	?	pcrel-escape verification does not cover the MERGED image (verify_pcrel_data needs extract/; merged builds have none)	?	?	?	?	?
+105	?	?	AUTO mode: tenant win screens render as pure white shapes (correct shapes, no fill) — all three tenants	?	?	?	?	?
+104	?	?	Victor's headbutt grab (6+HP): tenant victim pose garbled (half squished/knocked-down sprites) — Donovan AND Phobos	?	?	?	?	?
+103	?	?	Donovan KO'd by Lilith in arcade: the lose flow stalls ~8,000 frames (~2 min) before the game-over path fires	?	?	?	?	?
+102	?	?	Arcade ladder: later matches land on earlier venues and the chain can exceed the arcade norm, when switching to/from VS2 characters	?	?	?	?	?
+101	?	?	Phobos grunts when electrocuted (every other hit): vsavj's kernel per-class voice tables alias tenant rows to legacy rows	?	?	?	?	?
+100	?	?	Next-stage screen shows Donovan as Victor with a blank portrait (0x13 & 0x0F == 0x03)	?	?	?	?	?
+99	?	?	CRASH-reset: Donovan vs Phobos at fight start, 5th arcade match after continue-with-character-switch (merged-m2 playtest)	?	?	?	?	?
+98	?	?	audit_pyron_ring's frozen ring inventory belongs to superseded builds and needs re-measuring	?	?	?	?	?
+97	?	?	Gates build into TRACKED build/ paths, so the pre-commit chain dirties the working tree	?	?	?	?	?
+96	?	?	test_m2a_stage4_code: 06_test_mode masked first-divergence is NONE, expected 700	?	?	?	?	?
+95	?	?	test_dualtrack compares two build dirs from different generations (732 unattributed bytes)	?	?	?	?	?
+94	?	?	audit_pyron_ring references build/pyron22, which lacks vsw.z01/z02 (4th reference-rot instance)	?	?	?	?	?
+93	?	?	audit_qs_voice_batch fails on the keyon multiset A/B (pre-existing, not #10)	?	?	?	?	?
+92	?	?	Second crash on the Huitzil arcade marathon: vec3 at the vanilla 5-entry dispatcher 0x1afb4 (unmasked by resolving #91's tripwire)	?	?	?	?	?
+91	?	?	A planted ILLEGAL tripwire is REACHABLE on the shipping merged build (unresolved vs2 0x494de, a divide helper vsavj already has)	?	?	?	?	?
+90	?	?	test_pyron_ladder's stage-4 boot probe asserts a clean forced-pick boot on a build with none of Pyron's port	?	?	?	?	?
+89	?	?	Bind QSound audits to the supplied build’s ledger	?	?	?	?	?
+88	?	?	Make run_suite freeze replace stale divergence expectations	?	?	?	?	?
+87	?	?	Consume or remove inert graphics-layout fields	?	?	?	?	?
+86	?	?	Publish masked bases transactionally	?	?	?	?	?
+85	?	?	Align QSound WAV windows with CPS frame timing	?	?	?	?	?
+84	?	?	Pass Pyron tenant selection into every ladder build	?	?	?	?	?
+83	?	?	Add both players’ meter state to the mapped emulator oracle	?	?	?	?	?
+82	?	?	Include the QSound terminal sample byte in batch audits	?	?	?	?	?
+81	?	?	Run generator mutation controls without editing tracked source	?	?	?	?	?
+80	?	?	Guard setup_mame’s destructive mirror target	?	?	?	?	?
+79	?	?	Make graphics safety checks survive optimized Python	?	?	?	?	?
+78	?	?	Add the direct FBNeo hacked-build legacy oracle	?	?	?	?	?
+77	?	?	Bound FBNeo replay frames and check allocation arithmetic	?	?	?	?	?
+76	?	?	Reject aliased input and output directories in build_wide_romset	?	?	?	?	?
+75	?	?	verify_gfx_build --tenant huitzil FAILS on the current merged build (m3b_merged7) — hidden since merged6 by the swallowed exit status of #14	?	?	?	?	?
+74	?	?	Adversarial code review 2026-08-15 — findings index (73 issues)	?	?	?	?	?
+73	?	?	Three tracked PNG goldens are full renders of Capcom title-screen artwork (maintainer decision)	?	docs/project/audit_2026-08-15_dispositions.md § | 73 |	?	?	?
+72	?	?	build/scratch/m68dis.py is a tracked stale twin of the promoted tools/m68dis.py and skips the mandatory SHA-1 print	?	docs/project/audit_2026-08-15_dispositions.md § | 72 |	?	?	?
+71	?	?	Six test scripts copy the same 12-line 'fresh tenant-id 0x13 build' block instead of using tests/lib/	?	docs/project/audit_2026-08-15_dispositions.md § | 71 |	?	?	?
+70	?	?	M2A_MASK/M2A_MASKED_EXP hardcode the v1 basis and never read tests/expected/<set>/mask	?	docs/project/audit_2026-08-15_dispositions.md § | 70 |	?	?	?
+69	?	?	22 test scripts re-run the 10.7 s pure-Python CPS-2 decrypt instead of the identical cached build/out image	?	docs/project/audit_2026-08-15_dispositions.md § | 69 |	?	?	?
+68	?	?	Two tests build their work dir from a predictable /tmp name instead of mktemp -d	?	docs/project/audit_2026-08-15_dispositions.md § | 68 |	?	?	?
+67	?	?	check_qs_voice_batch.py hard-codes the maintainer's home ROM path as the default ROMDIR	?	docs/project/audit_2026-08-15_dispositions.md § | 67 |	?	?	?
+66	?	?	build_merged.sh interpolates a CLI-supplied path into a `python3 -c` source string (injection / quote breakage)	?	docs/project/audit_2026-08-15_dispositions.md § | 66 |	?	?	?
+65	?	?	The harness 'determinism sandbox' does not cover the app config, whose first ROM search path is global	?	docs/project/audit_2026-08-15_dispositions.md § | 65 |	?	?	?
+64	?	?	-hdump's output fopen is unchecked (NULL deref), unlike the identical gfx dump 20 lines below	?	docs/project/audit_2026-08-15_dispositions.md § | 64 |	?	?	?
+63	?	?	The guard protecting the emulator superset invariant uses a binary grep the repo's own gotchas call unreliable	?	docs/project/audit_2026-08-15_dispositions.md § | 63 |	?	?	?
+62	?	?	run_suite.sh states the baseset/mask invariant in prose and never enforces it	?	docs/project/audit_2026-08-15_dispositions.md § | 62 |	?	?	?
+61	?	?	MASK_RANGES reader silently unmasks bytes on a nested window	?	docs/project/audit_2026-08-15_dispositions.md § | 61 |	?	?	?
+60	?	?	scroll3_watch census samples 12 codes in pairs() order, then sorts	?	docs/project/audit_2026-08-15_dispositions.md § | 60 |	?	?	?
+59	?	?	FBNeo applies POKES before the frame, MAME after, while claiming to mirror	?	docs/project/audit_2026-08-15_dispositions.md § | 59 |	?	?	?
+58	?	?	NO_INPUT_CHECK disables the always-on integrity guard, invisibly	?	docs/project/audit_2026-08-15_dispositions.md § | 58 |	?	?	?
+57	?	?	Integrity baseline read from live ports: input stuck from boot is invisible	?	docs/project/audit_2026-08-15_dispositions.md § | 57 |	?	?	?
+56	?	?	run_suite.sh does not scrub harness env vars leaking from the shell	?	docs/project/audit_2026-08-15_dispositions.md § | 56 |	?	?	?
+55	?	?	pack_build.sh swallows a failed copy of the program members and packs a program-less zip	?	docs/project/audit_2026-08-15_dispositions.md § | 55 |	?	?	?
+54	?	?	compare_flicker reports EXACT (exit 0) for two zero-frame logs — zero rows compared is a PASS	?	docs/project/audit_2026-08-15_dispositions.md § | 54 |	?	?	?
+53	?	?	Proposer and enforcer disagree by one frame on the re-convergence floor (tail == 60)	?	docs/project/audit_2026-08-15_dispositions.md § | 53 |	?	?	?
+52	?	?	compare_flicker exempts the last divergent stretch from the >=60 re-convergence requirement entirely	?	docs/project/audit_2026-08-15_dispositions.md § | 52 |	?	?	?
+51	?	?	Record-pointer walkers skip the last long of their range: range(start, end - 4, 2)	?	docs/project/audit_2026-08-15_dispositions.md § | 51 |	?	?	?
+50	?	?	gen_donovan_patch.main() is 5,408 lines holding ~15 independent op-kind handlers, none of them reachable by a test	?	docs/project/audit_2026-08-15_dispositions.md § | 50 |	?	?	?
+49	?	?	overlay_port.py and gen_anita_bank2.py re-implement the program-ROM load and byteswap with hardcoded member names	?	docs/project/audit_2026-08-15_dispositions.md § | 49 |	?	?	?
+48	?	?	Wheel TABLE B address and direction ordering are triplicated; only one copy carries the ground-truth validation	?	docs/project/audit_2026-08-15_dispositions.md § | 48 |	?	?	?
+47	?	?	The CPS-2 sprite-block cell formula is copy-pasted 19 times across 7 files with no shared helper	?	docs/project/audit_2026-08-15_dispositions.md § | 47 |	?	?	?
+46	?	?	select_port.py mutates its input directory in place and hides 40 lines of dead code behind a hardcoded WINPAL_ENABLE=False	?	docs/project/audit_2026-08-15_dispositions.md § | 46 |	?	?	?
+45	?	?	build_wide_romset.py and build_qs_songs.py write zips with wall-clock timestamps, so vsavjw.zip is not byte-reproducible	?	docs/project/audit_2026-08-15_dispositions.md § | 45 |	?	?	?
+44	?	?	The ratified §4 thresholds are four independent literals with a 'must stay in step' comment and no test	?	docs/project/audit_2026-08-15_dispositions.md § | 44 |	?	?	?
+43	?	?	reconcile_batch.masked_search is a drifted copy of find_equiv's core and loses its relaxed-anchor fallback	?	docs/project/audit_2026-08-15_dispositions.md § | 43 |	?	?	?
+42	?	?	_minitoml.loads() silently switches parsers by host Python; the guard exists in 1 of 11 manifest consumers	?	docs/project/audit_2026-08-15_dispositions.md § | 42 |	?	?	?
+41	?	?	No CI at all, though a real ROM-free gate exists and passes in seconds today	?	docs/project/audit_2026-08-15_dispositions.md § | 41 |	?	?	?
+40	?	?	Root-level fbneo/ and mame/ build dirs and .claude/worktrees are unignored: `git add -A` stages 503 MiB	?	docs/project/audit_2026-08-15_dispositions.md § | 40 |	?	?	?
+39	?	?	.gitignore has no rule for the project's own `vsw.*` program members; 8 MiB of ROM-derived build output is already committed	?	docs/project/audit_2026-08-15_dispositions.md § | 39 |	?	?	?
+38	?	?	run_replay_fbneo.sh leaves a stale overlay roms/ dir on the non-overlay branch	?	docs/project/audit_2026-08-15_dispositions.md § | 38 |	?	?	?
+37	?	?	FBNEO_HTAP coalesces all tap ranges into one min..max span, amplifying the tapped region	?	docs/project/audit_2026-08-15_dispositions.md § | 37 |	?	?	?
+36	?	?	Nothing verifies the FBNeo working tree matches the tracked patches; 'already present' accepts any content	?	docs/project/audit_2026-08-15_dispositions.md § | 36 |	?	?	?
+35	?	?	CLAUDE.md rule 1 still forbids the sprite-path change the ratified Rule 1 v2 profile actually makes	?	docs/project/audit_2026-08-15_dispositions.md § | 35 |	?	?	?
+34	?	?	FBNEO_HPOKE reports success for pokes it silently discarded, and logs the wrong address	?	docs/project/audit_2026-08-15_dispositions.md § | 34 |	?	?	?
+33	?	?	A tap on OBJ RAM is silently unmapped by the object-bank switch and records nothing after frame 1	?	docs/project/audit_2026-08-15_dispositions.md § | 33 |	?	?	?
+32	?	?	FBNEO_HTAP silently DROPS every write outside the 3 known RAM regions, corrupting the run	?	docs/project/audit_2026-08-15_dispositions.md § | 32 |	?	?	?
+31	?	?	replay_guard.lua ignores MASK_RANGES and has no input-integrity check	?	docs/project/audit_2026-08-15_dispositions.md § | 31 |	?	?	?
+30	?	?	The reproducibility gate and 50 other test scripts are invoked by nothing; run_battery_m2.sh itself has no caller	?	docs/project/audit_2026-08-15_dispositions.md § | 30 |	?	?	?
+29	?	?	SKIP-as-PASS: ~28 gates exit 0 when their untracked build inputs are absent, and no runner counts skips	?	docs/project/audit_2026-08-15_dispositions.md § | 29 |	?	?	?
+28	?	?	build_merged.sh reads $ROMDIR without the mandatory audit_roms.py checksum gate	?	docs/project/audit_2026-08-15_dispositions.md § | 28 |	?	?	?
+27	?	?	build_merged.sh cannot run from a clean checkout: it requires three untracked build/*/extract dirs	?	docs/project/audit_2026-08-15_dispositions.md § | 27 |	?	?	?
+26	?	?	run_battery_m2.sh [outbase] can validate a stale rompath from a previous build	?	docs/project/audit_2026-08-15_dispositions.md § | 26 |	?	?	?
+25	?	?	audit_wide_phase_a A3 turns a dead measurement run into a `note` and then publishes the permissive decision	?	docs/project/audit_2026-08-15_dispositions.md § | 25 |	?	?	?
+24	?	?	Missing prerequisites `exit 0`; the battery counts that as PASS and still prints BATTERY GREEN	?	docs/project/audit_2026-08-15_dispositions.md § | 24 |	?	?	?
+23	?	?	audit_legacy_pairings: a dead MAME leg drops the replay from the sweep and still reports coverage PASS	?	docs/project/audit_2026-08-15_dispositions.md § | 23 |	?	?	?
+22	?	?	verify_pcrel_data.py is invoked by no test or build script — the pc-rel escape check is unrun	?	docs/project/audit_2026-08-15_dispositions.md § | 22 |	?	?	?
+21	?	?	attribute_ramdiff compares a dump file with ITSELF when two MAME logs share a directory	?	docs/project/audit_2026-08-15_dispositions.md § | 21 |	?	?	?
+20	?	?	port_patch / data_port 'fixes' write new bytes without asserting len(new) == len(old), silently resizing the emitted blob	?	docs/project/audit_2026-08-15_dispositions.md § | 20 |	?	?	?
+19	?	?	_PRG_RE matches gfx members vsw.41m/vsw.43m, which the documented --gfx 8 growth path creates	?	docs/project/audit_2026-08-15_dispositions.md § | 19 |	?	?	?
+18	?	?	patch_prg.py applies every op with no expected-old-bytes and no source-set identity check	?	docs/project/audit_2026-08-15_dispositions.md § | 18 |	?	?	?
+17	?	?	The merged-legacy audit globs *.masked only, silently dropping the .pending replays run_suite fails on	?	docs/project/audit_2026-08-15_dispositions.md § | 17 |	?	?	?
+16	?	?	Two verdict tools still gate on player-block +0x382 as the char id, which 14z-87 retracted	?	docs/project/audit_2026-08-15_dispositions.md § | 16 |	?	?	?
+15	?	?	build_donovan.sh aborts at line 12 on any system where /bin/sh is dash (Debian/Ubuntu/WSL2)	?	docs/project/audit_2026-08-15_dispositions.md § | 15 |	?	?	?
+14	?	?	build_merged.sh verification step can never fail: python exit status eaten by `| sed` (no pipefail)	?	docs/project/audit_2026-08-15_dispositions.md § | 14 |	?	?	?
+13	?	?	WIDE PRG-extension descriptor rows use the real all-zero CRC, not a sentinel — the 14z-62d shadow, re-opened	?	docs/project/audit_2026-08-15_dispositions.md § | 13 |	?	?	?
+12	?	?	Harness failure never reaches the exit code; a stale checksum log then passes the completion check	?	docs/project/audit_2026-08-15_dispositions.md § | 12 |	?	?	?
+11	?	?	harness_mem() ignores the CPS-2 OBJ-RAM bank, so OBJ dumps/pokes hit the wrong buffer half	?	docs/project/audit_2026-08-15_dispositions.md § | 11 |	?	?	?
+10	?	?	10 of 21 replay instruments feed inputs a frame later than replay.lua	?	docs/project/audit_2026-08-15_dispositions.md § | 10 |	?	?	?
+9	?	?	Stale hardcoded build-dir pins: merged builder and 10+ gates point at builds 3-9 freezes behind	?	docs/project/audit_2026-08-15_dispositions.md § | 9 |	?	?	?
+8	?	?	"rebuild bit-exact" gate compares program members only; all tenant gfx + authored music unchecked	?	docs/project/audit_2026-08-15_dispositions.md § | 8 |	?	?	?
+7	?	?	test_suite_dispatch.sh fails today: `.legacy-exempt` markers trip its 'kinds must be handled' check	?	docs/project/audit_2026-08-15_dispositions.md § | 7 |	?	?	?
+6	?	?	The pixel gate hardcodes build/donovan6 and ignores the build the battery just made	?	docs/project/audit_2026-08-15_dispositions.md § | 6 |	?	?	?
+5	?	?	audit_region_movability: a crashed or never-started emulator scores `runs` and the audit PASSes	?	docs/project/audit_2026-08-15_dispositions.md § | 5 |	?	?	?
+4	?	?	compare_composite is LOOSER than compare_flicker: no inter-run re-convergence or max-total check	?	docs/project/audit_2026-08-15_dispositions.md § | 4 |	?	?	?
+3	?	?	compare_window/compare_composite silently truncate to the shorter log — a half-length run PASSES	?	docs/project/audit_2026-08-15_dispositions.md § | 3 |	?	?	?
+2	?	?	Masked flicker gate checks only the exit code, so the frozen inventory can drift silently	?	docs/project/audit_2026-08-15_dispositions.md § | 2 |	?	?	?
+1	?	?	Build failure swallowed by `| tail -3` (no pipefail): rejected build gates GREEN	?	docs/project/audit_2026-08-15_dispositions.md § | 1 |	?	?	?

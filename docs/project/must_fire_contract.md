@@ -103,7 +103,12 @@ F1 now diffs both runners over nine declaring stubs and F2 over this tree's
 real portable tier, both EXACT (F2 at 70 rows, `--exec-controls none` on both
 sides). The readout's header is the generic `== must-fire controls ==` on both
 sides, and a controls-red FAIL row reads `(controls RED: …)`. Its ground truth
-is `tests/test_static_runner.sh` sections 11-13.
+is `tests/test_static_runner.sh` sections 11-13. **WHEN (maintainer-ruled
+2026-09-14):** a mid-session commit runs `--exec-controls none` plus
+`CONTROL=<name> tests/<gate>.sh` for every declared control of a gate the
+commit adds or changes; the session close runs the default `all`. The
+condition, the cost and the revisit clause: `DECISIONS_HISTORY.md` "Ruled
+2026-09-14 (14z-154)".
 
 `tests/run_all_emulator.sh` reads every block on every run and executes the
 controls only under `--controls` (one more run per declared name; its rows are

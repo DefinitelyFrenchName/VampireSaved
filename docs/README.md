@@ -36,6 +36,7 @@ than guessing a filename):
 | **what of the test harness is GENERIC — reusable on any black-box system — and how it is being extracted into `~/Developer/blackbox-harness`** | [`project/harness_scope.md`](project/harness_scope.md) — the four bins (code / config / machine profile / stays), every piece classified with its parameterisation, the repository layout, the slices H1-H9 with their status, and the FIDELITY contract (the generic harness on this tree reproduces its verdicts; `tests/test_bbh_fidelity.sh` once H9 lands) |
 | **what "living documentation" is being built — routing enforcement, a rendered site, fact tables with provenance, ROM re-derivation — and in what order** | [`project/living_docs_scope.md`](project/living_docs_scope.md) — what enforcement and routing already exist (§2), the one thing the SMS reference has that we do not (re-derivation FROM the image), the slices L1-L4 with their status, and the rule-5 census behind the rebuild option |
 | what a change did, byte by byte | `project/patch_notes.md`; the registry is `project/patch_index.md` |
+| **which bugs, cosmetic items and evolutions exist, their status, and where each one's decisions and learnings live** | [`project/tickets.md`](project/tickets.md) — GENERATED from `project/tickets.tsv`, the source of truth for the LIST; each ticket's story is its GitHub issue (CLAUDE.md [VSP-182]) |
 | why something that "should work" does not | [`GOTCHAS.md`](GOTCHAS.md) — always check before re-deriving |
 
 Entry points at this level, deliberately not in a bucket:
@@ -152,6 +153,7 @@ history twins and are listed last. Level-0 files are the entry points above.
 - [`porting_sprite_lists.md`](project/porting_sprite_lists.md) — **REFERENCE** · what a tenant port must do so ported effects DRAW: the class row, the missing list type, the per-game code bias, and which gfx bank the art comes f…
 - [`release_format.md`](project/release_format.md) — **REFERENCE** · the release format (ruled 2026-08-28): one release, one SELF-SUFFICIENT directory per platform (`fbneo/`, `mame/`, `mister/`), the patch set copied…
 - [`tenant_manifest.md`](project/tenant_manifest.md) — **REFERENCE** · Per-tenant manifests — proposed schema · history: `project/tenant_manifest_history.md`
+- [`tickets.md`](project/tickets.md) — **GENERATED** · The ticket index (GENERATED) · generated (do not edit)
 - [`visual_smoke_tests.md`](project/visual_smoke_tests.md) — **REFERENCE** · Visual smoke tests — checking the OUTPUT, not the internal state
 
 **`project/tables/`**

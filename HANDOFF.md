@@ -36,6 +36,7 @@ a heading):
 | SEE what a capture/throw looks like, ours vs native | `tools/capture_sheet.sh <att> <vic>` — the "What exists" row; matched by KEYFRAME, never by frame |
 | know why something that "should work" does not | `docs/GOTCHAS.md` — always before re-deriving |
 | declare a gate's must-fire control, run one as a mode, or read the controls readout | `docs/project/must_fire_contract.md` — the grammar, `CONTROL=<name> tests/<gate>.sh`, the runners' verdicts ([VSP-181]); the census is `tests/test_must_fire_census.sh` |
+| find a bug, cosmetic item or evolution, see what became of one, or file a new one | `docs/project/tickets.md` (GENERATED from `docs/project/tickets.tsv`, whose header is the spec of record); a new ticket is an issue first, then `python3 tools/tickets.py refresh`, then its row — CLAUDE.md [VSP-182] |
 
 ## What exists (M0 bench, 2026-07-25)
 
@@ -1173,10 +1174,10 @@ python3 tools/cps2_decrypt.py "$ROMDIR/vsavj.zip" build/out/vsavj_opcodes.bin --
 
 ```sh
 tests/run_all_static.sh                    # portable tier: ROM-free, ~1 min
-ROMDIR=... tests/run_all_static.sh         # + the static tier, ~8 min
+ROMDIR=... tests/run_all_static.sh         # + the static tier: ~20 min of gates, +~17 min of controls (quiet Mac, measured 2026-09-14)
 ROMDIR=... tests/run_all_static.sh --strict   # SKIP counts as failure too
 tests/run_all_static.sh --list             # what is registered
-tests/run_all_static.sh --exec-controls none  # skip the executable must-fire controls ([VSP-181]; default all)
+tests/run_all_static.sh --exec-controls none  # a MID-SESSION commit (ruled 2026-09-14): skip the executed controls, then run CONTROL= for any gate the commit adds or changes; the CLOSE runs all (the default) ([VSP-181])
 CONTROL=<name> tests/<gate>.sh             # one declared control as a MODE — must reach the gate's own FAIL
 ROMDIR=... tests/test_inp_corpus.sh        # EMULATOR tier: every tracked hand-played recording, no exception (14z-111)
 ROMDIR=... tests/test_down_flash_vanilla.sh  # EMULATOR tier: the one-frame white-out at a down is VANILLA (#113 ground truth, 14z-112)

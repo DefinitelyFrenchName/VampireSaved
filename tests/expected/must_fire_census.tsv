@@ -76,8 +76,8 @@ declares	test_reconcile_matcher
 declares	test_ref_rot_image_pick
 declares	test_rehit_ring
 declares	test_release_asset_shape
-declares	test_release_os_metadata
 declares	test_release_binaries
+declares	test_release_os_metadata
 declares	test_release_roundtrip
 declares	test_rpl2siminputs
 declares	test_rule5_census
@@ -85,12 +85,14 @@ declares	test_shadow_tenant
 declares	test_shell_portability
 declares	test_sim_wram_contract
 declares	test_skill_guides
+declares	test_state_open_lists
 declares	test_static_runner
 declares	test_suite_dispatch
 declares	test_tables_current
 declares	test_tenant_anim_relocation
 declares	test_tenant_id
 declares	test_tick_durations
+declares	test_tickets
 declares	test_vanilla_aerial_join
 declares	test_vanilla_frame_join
 declares	test_win_quote_decode
