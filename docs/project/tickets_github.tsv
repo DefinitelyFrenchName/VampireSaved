@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 136
+# issues: 137
 number	state	reason	closed	labels	title
+137	CLOSED	COMPLETED	2026-09-14	bug	test_wide_profile's reference guard trusts a profile check that nothing in the run proves can see the profile (the #63 residual)
 136	OPEN	-	-	evolution	Tenant move parity vs native VS2: compare Donovan, Phobos and Pyron's moves on the WIDE merged build against vsav2
 135	OPEN	-	-	evolution	The VS-vs-VS2 tick cadence: re-establish its measurement, mechanism and scope, and document it properly
 134	OPEN	-	-	bug	The hit rigs' LP events whiff at contact range
@@ -66,77 +67,77 @@ number	state	reason	closed	labels	title
 77	CLOSED	COMPLETED	2026-08-17	contested	Bound FBNeo replay frames and check allocation arithmetic
 76	CLOSED	COMPLETED	2026-08-17	-	Reject aliased input and output directories in build_wide_romset
 75	CLOSED	COMPLETED	2026-08-16	correctness,revealed-by-audit,severity: high	verify_gfx_build --tenant huitzil FAILS on the current merged build (m3b_merged7) — hidden since merged6 by the swallowed exit status of #14
-74	CLOSED	COMPLETED	2026-08-18	audit-2026-08-15,documentation	Adversarial code review 2026-08-15 — findings index (73 issues)
-73	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,documentation,needs-maintainer-ruling,severity: low	Three tracked PNG goldens are full renders of Capcom title-screen artwork (maintainer decision)
-72	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,duplication,severity: low	build/scratch/m68dis.py is a tracked stale twin of the promoted tools/m68dis.py and skips the mandatory SHA-1 print
-71	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,contested,duplication,severity: low	Six test scripts copy the same 12-line 'fresh tenant-id 0x13 build' block instead of using tests/lib/
-70	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,contested,duplication,severity: low	M2A_MASK/M2A_MASKED_EXP hardcode the v1 basis and never read tests/expected/<set>/mask
-69	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,contested,performance,severity: low	22 test scripts re-run the 10.7 s pure-Python CPS-2 decrypt instead of the identical cached build/out image
-68	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,contested,security,severity: low	Two tests build their work dir from a predictable /tmp name instead of mktemp -d
-67	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,contested,security,severity: low	check_qs_voice_batch.py hard-codes the maintainer's home ROM path as the default ROMDIR
-66	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,contested,security,severity: low	build_merged.sh interpolates a CLI-supplied path into a `python3 -c` source string (injection / quote breakage)
-65	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,severity: low,test-integrity	The harness 'determinism sandbox' does not cover the app config, whose first ROM search path is global
-64	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,correctness,severity: low	-hdump's output fopen is unchecked (NULL deref), unlike the identical gfx dump 20 lines below
-63	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,severity: low,test-integrity	The guard protecting the emulator superset invariant uses a binary grep the repo's own gotchas call unreliable
-62	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,contested,severity: low,test-integrity	run_suite.sh states the baseset/mask invariant in prose and never enforces it
-61	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,contested,correctness,severity: low	MASK_RANGES reader silently unmasks bytes on a nested window
-60	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,contested,correctness,severity: low	scroll3_watch census samples 12 codes in pairs() order, then sorts
-59	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,contested,duplication,severity: low	FBNeo applies POKES before the frame, MAME after, while claiming to mirror
-58	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,severity: low,test-integrity	NO_INPUT_CHECK disables the always-on integrity guard, invisibly
-57	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,contested,severity: low,test-integrity	Integrity baseline read from live ports: input stuck from boot is invisible
-56	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,severity: low,test-integrity	run_suite.sh does not scrub harness env vars leaking from the shell
-55	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,correctness,severity: low	pack_build.sh swallows a failed copy of the program members and packs a program-less zip
-54	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,severity: low,test-integrity	compare_flicker reports EXACT (exit 0) for two zero-frame logs — zero rows compared is a PASS
-53	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,correctness,severity: low	Proposer and enforcer disagree by one frame on the re-convergence floor (tail == 60)
-52	CLOSED	COMPLETED	2026-08-18	audit-2026-08-15,contested,severity: low,test-integrity	compare_flicker exempts the last divergent stretch from the >=60 re-convergence requirement entirely
-51	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,contested,correctness,severity: low	Record-pointer walkers skip the last long of their range: range(start, end - 4, 2)
-50	CLOSED	COMPLETED	2026-08-21	architecture,audit-2026-08-15,contested,deferred-with-reason,severity: low	gen_donovan_patch.main() is 5,408 lines holding ~15 independent op-kind handlers, none of them reachable by a test
-49	CLOSED	COMPLETED	2026-08-19	audit-2026-08-15,contested,duplication,severity: low	overlay_port.py and gen_anita_bank2.py re-implement the program-ROM load and byteswap with hardcoded member names
-48	CLOSED	COMPLETED	2026-08-19	audit-2026-08-15,contested,duplication,severity: low	Wheel TABLE B address and direction ordering are triplicated; only one copy carries the ground-truth validation
-47	CLOSED	COMPLETED	2026-08-19	audit-2026-08-15,contested,duplication,severity: low	The CPS-2 sprite-block cell formula is copy-pasted 19 times across 7 files with no shared helper
-46	CLOSED	COMPLETED	2026-08-17	architecture,audit-2026-08-15,contested,severity: low	select_port.py mutates its input directory in place and hides 40 lines of dead code behind a hardcoded WINPAL_ENABLE=False
-45	CLOSED	NOT_PLANNED	2026-08-16	architecture,audit-2026-08-15,invalid,severity: low	build_wide_romset.py and build_qs_songs.py write zips with wall-clock timestamps, so vsavjw.zip is not byte-reproducible
-44	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,duplication,needs-maintainer-ruling,severity: high	The ratified §4 thresholds are four independent literals with a 'must stay in step' comment and no test
-43	CLOSED	COMPLETED	2026-08-20	audit-2026-08-15,duplication,severity: medium	reconcile_batch.masked_search is a drifted copy of find_equiv's core and loses its relaxed-anchor fallback
-42	CLOSED	COMPLETED	2026-08-17	architecture,audit-2026-08-15,severity: medium	_minitoml.loads() silently switches parsers by host Python; the guard exists in 1 of 11 manifest consumers
-41	CLOSED	COMPLETED	2026-08-16	architecture,audit-2026-08-15,needs-maintainer-ruling,severity: medium	No CI at all, though a real ROM-free gate exists and passes in seconds today
-40	CLOSED	COMPLETED	2026-08-16	architecture,audit-2026-08-15,needs-maintainer-ruling,severity: medium	Root-level fbneo/ and mame/ build dirs and .claude/worktrees are unignored: `git add -A` stages 503 MiB
-39	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,needs-maintainer-ruling,security,severity: medium	.gitignore has no rule for the project's own `vsw.*` program members; 8 MiB of ROM-derived build output is already committed
-38	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,severity: medium,test-integrity	run_replay_fbneo.sh leaves a stale overlay roms/ dir on the non-overlay branch
-37	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,severity: medium,test-integrity	FBNEO_HTAP coalesces all tap ranges into one min..max span, amplifying the tapped region
-36	CLOSED	COMPLETED	2026-08-16	architecture,audit-2026-08-15,severity: medium	Nothing verifies the FBNeo working tree matches the tracked patches; 'already present' accepts any content
-35	CLOSED	COMPLETED	2026-08-16	architecture,audit-2026-08-15,needs-maintainer-ruling,severity: medium	CLAUDE.md rule 1 still forbids the sprite-path change the ratified Rule 1 v2 profile actually makes
-34	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,correctness,severity: medium	FBNEO_HPOKE reports success for pokes it silently discarded, and logs the wrong address
-33	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,severity: medium,test-integrity	A tap on OBJ RAM is silently unmapped by the object-bank switch and records nothing after frame 1
-32	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,severity: medium,test-integrity	FBNEO_HTAP silently DROPS every write outside the 3 known RAM regions, corrupting the run
-31	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,severity: low,test-integrity	replay_guard.lua ignores MASK_RANGES and has no input-integrity check
-30	CLOSED	COMPLETED	2026-08-17	architecture,audit-2026-08-15,needs-maintainer-ruling,severity: medium	The reproducibility gate and 50 other test scripts are invoked by nothing; run_battery_m2.sh itself has no caller
-29	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,severity: low,test-integrity	SKIP-as-PASS: ~28 gates exit 0 when their untracked build inputs are absent, and no runner counts skips
-28	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,correctness,severity: medium	build_merged.sh reads $ROMDIR without the mandatory audit_roms.py checksum gate
-27	CLOSED	COMPLETED	2026-08-18	architecture,audit-2026-08-15,needs-maintainer-ruling,severity: medium	build_merged.sh cannot run from a clean checkout: it requires three untracked build/*/extract dirs
-26	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,severity: medium,test-integrity	run_battery_m2.sh [outbase] can validate a stale rompath from a previous build
-25	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,severity: low,test-integrity	audit_wide_phase_a A3 turns a dead measurement run into a `note` and then publishes the permissive decision
-24	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,duplicate,severity: medium,test-integrity	Missing prerequisites `exit 0`; the battery counts that as PASS and still prints BATTERY GREEN
-23	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,severity: medium,test-integrity	audit_legacy_pairings: a dead MAME leg drops the replay from the sweep and still reports coverage PASS
-22	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,contested,severity: medium,test-integrity	verify_pcrel_data.py is invoked by no test or build script — the pc-rel escape check is unrun
-21	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,severity: medium,test-integrity	attribute_ramdiff compares a dump file with ITSELF when two MAME logs share a directory
-20	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,correctness,severity: low	port_patch / data_port 'fixes' write new bytes without asserting len(new) == len(old), silently resizing the emitted blob
-19	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,correctness,severity: low	_PRG_RE matches gfx members vsw.41m/vsw.43m, which the documented --gfx 8 growth path creates
-18	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,severity: low,test-integrity	patch_prg.py applies every op with no expected-old-bytes and no source-set identity check
-17	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,severity: high,test-integrity	The merged-legacy audit globs *.masked only, silently dropping the .pending replays run_suite fails on
-16	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,contested,correctness,severity: high	Two verdict tools still gate on player-block +0x382 as the char id, which 14z-87 retracted
-15	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,correctness,severity: high	build_donovan.sh aborts at line 12 on any system where /bin/sh is dash (Debian/Ubuntu/WSL2)
-14	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,severity: high,test-integrity	build_merged.sh verification step can never fail: python exit status eaten by `| sed` (no pipefail)
-13	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,contested,correctness,severity: high	WIDE PRG-extension descriptor rows use the real all-zero CRC, not a sentinel — the 14z-62d shadow, re-opened
-12	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,contested,severity: high,test-integrity	Harness failure never reaches the exit code; a stale checksum log then passes the completion check
-11	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,contested,correctness,severity: high	harness_mem() ignores the CPS-2 OBJ-RAM bank, so OBJ dumps/pokes hit the wrong buffer half
-10	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,contested,correctness,deferred-with-reason,severity: high	10 of 21 replay instruments feed inputs a frame later than replay.lua
-9	CLOSED	COMPLETED	2026-08-15	audit-2026-08-15,correctness,severity: high	Stale hardcoded build-dir pins: merged builder and 10+ gates point at builds 3-9 freezes behind
-8	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,severity: high,test-integrity	"rebuild bit-exact" gate compares program members only; all tenant gfx + authored music unchecked
-7	CLOSED	COMPLETED	2026-08-15	audit-2026-08-15,severity: high,test-integrity	test_suite_dispatch.sh fails today: `.legacy-exempt` markers trip its 'kinds must be handled' check
-6	CLOSED	COMPLETED	2026-08-15	audit-2026-08-15,severity: high,test-integrity	The pixel gate hardcodes build/donovan6 and ignores the build the battery just made
-5	CLOSED	COMPLETED	2026-08-15	audit-2026-08-15,severity: high,test-integrity	audit_region_movability: a crashed or never-started emulator scores `runs` and the audit PASSes
-4	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,contested,needs-maintainer-ruling,severity: high,test-integrity	compare_composite is LOOSER than compare_flicker: no inter-run re-convergence or max-total check
-3	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,severity: high,test-integrity	compare_window/compare_composite silently truncate to the shorter log — a half-length run PASSES
-2	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,severity: critical,test-integrity	Masked flicker gate checks only the exit code, so the frozen inventory can drift silently
-1	CLOSED	COMPLETED	2026-08-15	audit-2026-08-15,severity: critical,test-integrity	Build failure swallowed by `| tail -3` (no pipefail): rejected build gates GREEN
+74	CLOSED	COMPLETED	2026-08-18	audit-2026-08-15,documentation,evolution	Adversarial code review 2026-08-15 — findings index (73 issues)
+73	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,documentation,needs-maintainer-ruling,severity: low	Three tracked PNG goldens are full renders of Capcom title-screen artwork (maintainer decision)
+72	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,duplication,severity: low	build/scratch/m68dis.py is a tracked stale twin of the promoted tools/m68dis.py and skips the mandatory SHA-1 print
+71	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,contested,duplication,evolution,severity: low	Six test scripts copy the same 12-line 'fresh tenant-id 0x13 build' block instead of using tests/lib/
+70	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,bug,contested,duplication,severity: low	M2A_MASK/M2A_MASKED_EXP hardcode the v1 basis and never read tests/expected/<set>/mask
+69	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,bug,contested,performance,severity: low	22 test scripts re-run the 10.7 s pure-Python CPS-2 decrypt instead of the identical cached build/out image
+68	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,bug,contested,security,severity: low	Two tests build their work dir from a predictable /tmp name instead of mktemp -d
+67	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,bug,contested,security,severity: low	check_qs_voice_batch.py hard-codes the maintainer's home ROM path as the default ROMDIR
+66	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,bug,contested,security,severity: low	build_merged.sh interpolates a CLI-supplied path into a `python3 -c` source string (injection / quote breakage)
+65	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,severity: low,test-integrity	The harness 'determinism sandbox' does not cover the app config, whose first ROM search path is global
+64	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,correctness,severity: low	-hdump's output fopen is unchecked (NULL deref), unlike the identical gfx dump 20 lines below
+63	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,severity: low,test-integrity	The guard protecting the emulator superset invariant uses a binary grep the repo's own gotchas call unreliable
+62	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,bug,contested,severity: low,test-integrity	run_suite.sh states the baseset/mask invariant in prose and never enforces it
+61	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,bug,contested,correctness,severity: low	MASK_RANGES reader silently unmasks bytes on a nested window
+60	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,bug,contested,correctness,severity: low	scroll3_watch census samples 12 codes in pairs() order, then sorts
+59	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,bug,contested,duplication,severity: low	FBNeo applies POKES before the frame, MAME after, while claiming to mirror
+58	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,severity: low,test-integrity	NO_INPUT_CHECK disables the always-on integrity guard, invisibly
+57	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,bug,contested,severity: low,test-integrity	Integrity baseline read from live ports: input stuck from boot is invisible
+56	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,severity: low,test-integrity	run_suite.sh does not scrub harness env vars leaking from the shell
+55	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,correctness,severity: low	pack_build.sh swallows a failed copy of the program members and packs a program-less zip
+54	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,severity: low,test-integrity	compare_flicker reports EXACT (exit 0) for two zero-frame logs — zero rows compared is a PASS
+53	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,correctness,severity: low	Proposer and enforcer disagree by one frame on the re-convergence floor (tail == 60)
+52	CLOSED	COMPLETED	2026-08-18	audit-2026-08-15,bug,contested,severity: low,test-integrity	compare_flicker exempts the last divergent stretch from the >=60 re-convergence requirement entirely
+51	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,bug,contested,correctness,severity: low	Record-pointer walkers skip the last long of their range: range(start, end - 4, 2)
+50	CLOSED	COMPLETED	2026-08-21	architecture,audit-2026-08-15,contested,deferred-with-reason,evolution,severity: low	gen_donovan_patch.main() is 5,408 lines holding ~15 independent op-kind handlers, none of them reachable by a test
+49	CLOSED	COMPLETED	2026-08-19	audit-2026-08-15,contested,duplication,evolution,severity: low	overlay_port.py and gen_anita_bank2.py re-implement the program-ROM load and byteswap with hardcoded member names
+48	CLOSED	COMPLETED	2026-08-19	audit-2026-08-15,bug,contested,duplication,severity: low	Wheel TABLE B address and direction ordering are triplicated; only one copy carries the ground-truth validation
+47	CLOSED	COMPLETED	2026-08-19	audit-2026-08-15,contested,duplication,evolution,severity: low	The CPS-2 sprite-block cell formula is copy-pasted 19 times across 7 files with no shared helper
+46	CLOSED	COMPLETED	2026-08-17	architecture,audit-2026-08-15,bug,contested,severity: low	select_port.py mutates its input directory in place and hides 40 lines of dead code behind a hardcoded WINPAL_ENABLE=False
+45	CLOSED	NOT_PLANNED	2026-08-16	architecture,audit-2026-08-15,bug,invalid,severity: low	build_wide_romset.py and build_qs_songs.py write zips with wall-clock timestamps, so vsavjw.zip is not byte-reproducible
+44	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,duplication,needs-maintainer-ruling,severity: high	The ratified §4 thresholds are four independent literals with a 'must stay in step' comment and no test
+43	CLOSED	COMPLETED	2026-08-20	audit-2026-08-15,bug,duplication,severity: medium	reconcile_batch.masked_search is a drifted copy of find_equiv's core and loses its relaxed-anchor fallback
+42	CLOSED	COMPLETED	2026-08-17	architecture,audit-2026-08-15,bug,severity: medium	_minitoml.loads() silently switches parsers by host Python; the guard exists in 1 of 11 manifest consumers
+41	CLOSED	COMPLETED	2026-08-16	architecture,audit-2026-08-15,evolution,needs-maintainer-ruling,severity: medium	No CI at all, though a real ROM-free gate exists and passes in seconds today
+40	CLOSED	COMPLETED	2026-08-16	architecture,audit-2026-08-15,bug,needs-maintainer-ruling,severity: medium	Root-level fbneo/ and mame/ build dirs and .claude/worktrees are unignored: `git add -A` stages 503 MiB
+39	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,needs-maintainer-ruling,security,severity: medium	.gitignore has no rule for the project's own `vsw.*` program members; 8 MiB of ROM-derived build output is already committed
+38	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,bug,severity: medium,test-integrity	run_replay_fbneo.sh leaves a stale overlay roms/ dir on the non-overlay branch
+37	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,severity: medium,test-integrity	FBNEO_HTAP coalesces all tap ranges into one min..max span, amplifying the tapped region
+36	CLOSED	COMPLETED	2026-08-16	architecture,audit-2026-08-15,bug,severity: medium	Nothing verifies the FBNeo working tree matches the tracked patches; 'already present' accepts any content
+35	CLOSED	COMPLETED	2026-08-16	architecture,audit-2026-08-15,bug,needs-maintainer-ruling,severity: medium	CLAUDE.md rule 1 still forbids the sprite-path change the ratified Rule 1 v2 profile actually makes
+34	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,correctness,severity: medium	FBNEO_HPOKE reports success for pokes it silently discarded, and logs the wrong address
+33	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,severity: medium,test-integrity	A tap on OBJ RAM is silently unmapped by the object-bank switch and records nothing after frame 1
+32	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,severity: medium,test-integrity	FBNEO_HTAP silently DROPS every write outside the 3 known RAM regions, corrupting the run
+31	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,bug,severity: low,test-integrity	replay_guard.lua ignores MASK_RANGES and has no input-integrity check
+30	CLOSED	COMPLETED	2026-08-17	architecture,audit-2026-08-15,bug,needs-maintainer-ruling,severity: medium	The reproducibility gate and 50 other test scripts are invoked by nothing; run_battery_m2.sh itself has no caller
+29	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,bug,severity: low,test-integrity	SKIP-as-PASS: ~28 gates exit 0 when their untracked build inputs are absent, and no runner counts skips
+28	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,bug,correctness,severity: medium	build_merged.sh reads $ROMDIR without the mandatory audit_roms.py checksum gate
+27	CLOSED	COMPLETED	2026-08-18	architecture,audit-2026-08-15,bug,needs-maintainer-ruling,severity: medium	build_merged.sh cannot run from a clean checkout: it requires three untracked build/*/extract dirs
+26	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,severity: medium,test-integrity	run_battery_m2.sh [outbase] can validate a stale rompath from a previous build
+25	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,bug,severity: low,test-integrity	audit_wide_phase_a A3 turns a dead measurement run into a `note` and then publishes the permissive decision
+24	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,bug,duplicate,severity: medium,test-integrity	Missing prerequisites `exit 0`; the battery counts that as PASS and still prints BATTERY GREEN
+23	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,severity: medium,test-integrity	audit_legacy_pairings: a dead MAME leg drops the replay from the sweep and still reports coverage PASS
+22	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,bug,contested,severity: medium,test-integrity	verify_pcrel_data.py is invoked by no test or build script — the pc-rel escape check is unrun
+21	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,severity: medium,test-integrity	attribute_ramdiff compares a dump file with ITSELF when two MAME logs share a directory
+20	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,bug,correctness,severity: low	port_patch / data_port 'fixes' write new bytes without asserting len(new) == len(old), silently resizing the emitted blob
+19	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,bug,correctness,severity: low	_PRG_RE matches gfx members vsw.41m/vsw.43m, which the documented --gfx 8 growth path creates
+18	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,bug,severity: low,test-integrity	patch_prg.py applies every op with no expected-old-bytes and no source-set identity check
+17	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,severity: high,test-integrity	The merged-legacy audit globs *.masked only, silently dropping the .pending replays run_suite fails on
+16	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,contested,correctness,severity: high	Two verdict tools still gate on player-block +0x382 as the char id, which 14z-87 retracted
+15	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,correctness,severity: high	build_donovan.sh aborts at line 12 on any system where /bin/sh is dash (Debian/Ubuntu/WSL2)
+14	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,severity: high,test-integrity	build_merged.sh verification step can never fail: python exit status eaten by `| sed` (no pipefail)
+13	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,contested,correctness,severity: high	WIDE PRG-extension descriptor rows use the real all-zero CRC, not a sentinel — the 14z-62d shadow, re-opened
+12	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,contested,severity: high,test-integrity	Harness failure never reaches the exit code; a stale checksum log then passes the completion check
+11	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,contested,correctness,severity: high	harness_mem() ignores the CPS-2 OBJ-RAM bank, so OBJ dumps/pokes hit the wrong buffer half
+10	CLOSED	COMPLETED	2026-08-17	audit-2026-08-15,bug,contested,correctness,deferred-with-reason,severity: high	10 of 21 replay instruments feed inputs a frame later than replay.lua
+9	CLOSED	COMPLETED	2026-08-15	audit-2026-08-15,bug,correctness,severity: high	Stale hardcoded build-dir pins: merged builder and 10+ gates point at builds 3-9 freezes behind
+8	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,severity: high,test-integrity	"rebuild bit-exact" gate compares program members only; all tenant gfx + authored music unchecked
+7	CLOSED	COMPLETED	2026-08-15	audit-2026-08-15,bug,severity: high,test-integrity	test_suite_dispatch.sh fails today: `.legacy-exempt` markers trip its 'kinds must be handled' check
+6	CLOSED	COMPLETED	2026-08-15	audit-2026-08-15,bug,severity: high,test-integrity	The pixel gate hardcodes build/donovan6 and ignores the build the battery just made
+5	CLOSED	COMPLETED	2026-08-15	audit-2026-08-15,bug,severity: high,test-integrity	audit_region_movability: a crashed or never-started emulator scores `runs` and the audit PASSes
+4	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,contested,needs-maintainer-ruling,severity: high,test-integrity	compare_composite is LOOSER than compare_flicker: no inter-run re-convergence or max-total check
+3	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,severity: high,test-integrity	compare_window/compare_composite silently truncate to the shorter log — a half-length run PASSES
+2	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,severity: critical,test-integrity	Masked flicker gate checks only the exit code, so the frozen inventory can drift silently
+1	CLOSED	COMPLETED	2026-08-15	audit-2026-08-15,bug,severity: critical,test-integrity	Build failure swallowed by `| tail -3` (no pipefail): rejected build gates GREEN

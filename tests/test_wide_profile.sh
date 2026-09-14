@@ -1,6 +1,9 @@
 #!/bin/sh
 # test_wide_profile.sh — CPS-2 WIDE profile gate (Phase B).
 #
+# MUST-FIRE: known-bad: contaminated-ref — the reference guard must REFUSE the WIDE binary under test, a reference that carries the profile by construction; in-gate it classifies that binary before any negative on FBNEO_REF is trusted, and the mode points FBNEO_REF at it and must FAIL at the guard (#137)
+# MUST-FIRE: shadow-tool: blind-predicate — a `strings` that finds nothing must leave the guard UNPROVEN, so the gate FAILS without trusting any negative on FBNEO_REF; in-gate the stub makes the WIDE binary read as clean, and the mode puts it first on PATH for the run (#137)
+#
 # Two invariants, both required by Rule 1 v2 (docs/project/cps2_wide.md):
 #
 #  1. EMULATOR SUPERSET INVARIANT — the patched FBNeo binary, running the
@@ -44,6 +47,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 WIDE_ROMPATH="${WIDE_ROMPATH:-$REPO/build/wide0/rompath}"
 [ -f "$WIDE_ROMPATH/vsavjw.zip" ] || {
     echo "no WIDE romset at $WIDE_ROMPATH (build it: tools/build_wide_romset.py)"; exit 1; }
@@ -91,8 +95,56 @@ if [ -x "$FBNEO_REF" ] && [ -f "$_HARNESS_PATCH" ] \
     fail=1
     FBNEO_REF=""
 fi
-if [ -n "${FBNEO_REF:-}" ] && [ -x "${FBNEO_REF}" ] \
-   && strings -a "${FBNEO_REF}" 2>/dev/null | grep -q "CPS-2 WIDE v1"; then
+# THE GUARD'S OWN PREDICATE IS PROVEN BEFORE ITS NEGATIVE CLEARS A REFERENCE
+# (#137, maintainer-ruled 2026-09-14 — the residual #63 left open on
+# 2026-08-16). The guard below only ever ACTS on a positive, so a predicate
+# that cannot see the profile at all would report a contaminated reference as
+# CLEAN, and section 1 would compare WIDE against WIDE and pass: `strings`
+# missing or failing (its stderr goes to /dev/null and sh has no pipefail), or
+# a future profile version renaming the driver string — the POSITIVE call sites
+# (tools/setup_fbneo.sh, tools/run_wide.sh) fail loudly on a rename, and this
+# negative one never would. So ONE function classifies both binaries, and the
+# WIDE binary under test, a contaminated reference by construction, must be
+# refused first. Measured when added: 0 matches in the 2026-09-03 reference, 2
+# in emu/fbneo/fbneo, 0.11 s. (`WIDE=0 tools/setup_fbneo.sh` keeps its own
+# source-level check, `Cps2Wide` in cps.h, so a reference the tool builds is
+# defended independently; this covers one that arrives any other way.)
+WIDE_BIN="${FBNEO_BIN:-$REPO/emu/fbneo/fbneo}"
+carries_profile() {  # carries_profile <binary> — the driver title string is compiled in
+    strings -a "$1" 2>/dev/null | grep -q "CPS-2 WIDE v1"
+}
+# A `strings` that finds nothing is the blind predicate itself: the in-gate
+# control shows carries_profile reads the WIDE binary as clean under it, and the
+# mode runs the proof below with it first on PATH, where the gate must FAIL.
+# The PATH change stays inside a subshell ([VSP-110]: `VAR=x func` persists).
+mkdir -p "$WORK/blind"
+printf '#!/bin/sh\nexit 127\n' > "$WORK/blind/strings"
+chmod +x "$WORK/blind/strings"
+if ( PATH="$WORK/blind:$PATH"; carries_profile "$WIDE_BIN" ); then
+    vs_ctl_dead blind-predicate "a strings that finds nothing still reported the profile — the stub is not the one being run" || true
+    fail=1
+else
+    vs_ctl_fired blind-predicate "with a strings that finds nothing, carries_profile reads the WIDE binary under test as clean — the blindness the proof below refuses"
+fi
+vs_ctl_is blind-predicate && PATH="$WORK/blind:$PATH"
+_guard_proven=0
+if [ -x "$WIDE_BIN" ] && carries_profile "$WIDE_BIN"; then
+    _guard_proven=1
+    vs_ctl_fired contaminated-ref "the reference guard refuses the WIDE binary under test ($WIDE_BIN), so its negative on FBNEO_REF is evidence"
+    echo "  ok: the reference guard sees the profile in the WIDE binary under test"
+else
+    vs_ctl_dead contaminated-ref "the reference guard does not see the profile in the WIDE binary under test ($WIDE_BIN) — it would clear any reference" || true
+    echo "  FAIL: the profile check cannot see the CPS-2 WIDE profile in the WIDE"
+    echo "        binary under test ($WIDE_BIN), so it cannot tell a contaminated"
+    echo "        reference from a clean one. Section 1 is NOT run on an unproven guard."
+    fail=1
+    vs_ctl_is blind-predicate && { echo "FAIL: CPS-2 WIDE profile gate"; exit 1; }
+fi
+# THE MODE: the real reference is replaced by the WIDE binary under test.
+vs_ctl_is contaminated-ref && FBNEO_REF="$WIDE_BIN"
+if [ "$_guard_proven" != 1 ]; then
+    :   # reported above; fail is already set
+elif [ -n "${FBNEO_REF:-}" ] && [ -x "${FBNEO_REF}" ] && carries_profile "${FBNEO_REF}"; then
     # Paid for 14z-59e: `WIDE=0 tools/setup_fbneo.sh` used to only SKIP
     # applying the profile patch, never revert it, so a reference built from
     # a tree that already carried it came out WITH the profile. Section 1
@@ -103,6 +155,7 @@ if [ -n "${FBNEO_REF:-}" ] && [ -x "${FBNEO_REF}" ] \
     echo "        pre-patch reference, and this comparison would be vacuous."
     echo "        Rebuild it: WIDE=0 tools/setup_fbneo.sh (now reverts properly)"
     fail=1
+    vs_ctl_is contaminated-ref && { echo "FAIL: CPS-2 WIDE profile gate"; exit 1; }
 elif [ -n "${FBNEO_REF:-}" ] && [ -x "${FBNEO_REF}" ]; then
     for rp in $CORPUS; do
         FBNEO_HVIDEO="$WORK/ref_$rp.vid" FBNEO_BIN="$FBNEO_REF" tools/run_replay_fbneo.sh vsavj \

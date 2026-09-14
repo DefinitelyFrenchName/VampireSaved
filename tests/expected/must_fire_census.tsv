@@ -95,4 +95,5 @@ declares	test_tick_durations
 declares	test_tickets
 declares	test_vanilla_aerial_join
 declares	test_vanilla_frame_join
+declares	test_wide_profile
 declares	test_win_quote_decode
