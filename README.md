@@ -1,10 +1,10 @@
 # Vampire Saved: Full-Roster Vampire Savior (Extended CPS-2 spec, emulator-target, MiSTer as extended scope, EXPLORATORY, NOT FOR COMPETITIVE USE)
 
-### This project is standing on the shoulders of the dedication of the Vampire Savior (and generally the Vampire series) community and the work of the CPS-2 wizards who came before me. Support them, support MAME and FBNeo and support Jotego without whom the MiSTer core for this larger CPS-II spec would have borderline impossible!
+### This project is standing on the shoulders of the dedication of the Vampire Savior community and the work of the CPS-2 wizards who came before me. Support them, support MAME and FBNeo and support Jotego without whom the MiSTer core for this larger CPS-II spec would have borderline impossible!
 
 Disclaimer: This project is not really what it seems. At its core, and unlike my other romhacks, this project is purely an exercise to see if agentic engineering, driven as if addressing a black-box evolutive maintenance project (a domain I know quite a bit about) could deliver a demonstrably correct result. 
 
-So, to be very clear: some of the memory analysis, all the decisions, the automated test harness design and a disgusting amount of testing was made by an organic brain. However all of the code was made by Claude, as was the implementation of the test harness.
+So, to be very clear: some of the memory analysis, all the decisions, the automated test harness entire design and a trully disgusting amount of testing was made by an organic brain. However all of the code was made by AI, as was the implementation of the test harness.
 
 Also, I was pretty much convinced I'd fail. I didn't and I have complicated feelings about it, although this also gives me hope for all the unreadable code we have in various industries because it sure feels as long as the codebase is sliced small enough, complexity is hardly an issue anymore...
 
