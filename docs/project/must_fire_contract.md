@@ -95,7 +95,8 @@ bench needing Verilator) REFUSES the mode there rather than passing it.
 `tests/run_all_static.sh` reads every gate's block for free and EXECUTES each
 declared control after a PASS — `--exec-controls all|portable|none`, default
 `all` — and prints a readout: `fired N / declared N`, the none and undeclared
-counts, and `executed N honoured N lies N refused N died N` — printed only when
+counts, and `executed N honoured N lies N refused N died N` and, when controls ran, `time: gates Ns controls Ns wall Ns (costliest
+controls: …)` (2026-09-14) — printed only when
 the tier declared or executed anything, so over a declaration-free tree the
 runner's output is byte-identical to bbh's. **The reader was LIFTED into bbh
 14z-148 as a copy** (`lib/sh/controls.sh` there, rules [BBH-88..91]): fidelity
