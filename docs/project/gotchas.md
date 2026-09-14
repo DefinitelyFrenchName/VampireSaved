@@ -4622,3 +4622,20 @@ nothing, not a red to chase. **Start the tier from a FOREGROUND call** (`nohup �
 SEPARATE task**, whose death then costs nothing; take the verdict from the log's own line.
 A watcher that leaves its loop when the PID dies must still print what was logged after
 its last poll, or a red run's last FAIL goes unreported (one did).
+
+## THE STATIC TIER'S MUST-FIRE READOUT OVERSTATES `fired / declared` ON A RED RUN — a gate that does not PASS re-adds the previous gate's counts (paid: 14z-155, #140)
+
+The 14z-155 close tier read `fired 175 / declared 175` while the gate headers declare 172.
+`vs_classify` (`tests/lib/classify.sh`) runs the controls reader only on a PASS, and the
+reader is what sets `VS_CTL_DECLARED`, `VS_CTL_FIRED` and `VS_CTL_VERDICT`; after a FAIL,
+a SKIP or a TIMEOUT they still hold the PREVIOUS gate's values, and
+`tests/run_all_static.sh` adds them to the tally again — the failing `test_bbh_fidelity`
+inherited the 3 of `test_mister_page`, the gate before it. The same stale verdict picks a
+failing exit-0 gate's label: after a controls-red gate, a shell-crash gate's row carries
+the shell's line where alone it reads `(exit 0 after a shell error)`. Reproduced in
+seconds on three stub gates (a declaring PASS, a `none` PASS, a plain FAIL: `g_decl g_fail`
+reads `fired 2 / declared 2`), identically on the harness's `bbh-run-static`, which carries
+the same lines; `tests/run_all_emulator.sh` reads afresh for every row and is not
+affected. Verdicts and the PASS / SKIP / FAIL counts are untouched. **On a red run, trust
+the verdict rows, not `fired / declared` or `gates declaring none`** — the readout is
+exact only on a run in which every gate PASSED — until #140 is fixed.

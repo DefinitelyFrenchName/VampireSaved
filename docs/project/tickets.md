@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**139 tickets** — status: open 8 · parked 15 · done 73 · declined 1 · invalid 1 · duplicate 1 · ? 40 · kind: bug 75 · cosmetic 5 · evolution 19 · ? 40 · **backfill debt: 40 rows**.
+**140 tickets** — status: open 9 · parked 15 · done 73 · declined 1 · invalid 1 · duplicate 1 · ? 40 · kind: bug 76 · cosmetic 5 · evolution 19 · ? 40 · **backfill debt: 40 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#140](https://github.com/DefinitelyFrenchName/VampireSaved/issues/140) | bug | open | The static runners' controls readout re-adds the previous gate's must-fire counts for every gate that does not PASS — fired/declared overstated on a red run | `docs/project/gotchas.md § THE STATIC TIER'S MUST-FIRE READOUT OVERSTATES` | none | `docs/project/gotchas.md § THE STATIC TIER'S MUST-FIRE READOUT OVERSTATES` | none | 14z-155 |
 | [#138](https://github.com/DefinitelyFrenchName/VampireSaved/issues/138) | bug | open | A stock-track build directory without its vsavj.zip silently dispatches run_suite to the VANILLA expectations — the reference-row rule nothing enforces (the #55 residual) | `docs/project/gotchas.md § NOTHING ENFORCES THAT SECOND RULE` | none | `docs/project/gotchas.md § NOTHING ENFORCES THAT SECOND RULE` | none | 14z-155 |
 | [#136](https://github.com/DefinitelyFrenchName/VampireSaved/issues/136) | evolution | parked | Tenant move parity vs native VS2: compare Donovan, Phobos and Pyron's moves on the WIDE merged build against vsav2 | `tests/test_hui_oracle.sh` · `tests/test_m2a_stage4_oracle.sh` | `DECISIONS_HISTORY.md § RULING (maintainer, 2026-09-02): "we must respect the fact that we are` | `docs/project/coverage_matrix.md § tenant moves vs native vsav2` · `docs/game/gotchas.md § A DURATION IN VIDEO FRAMES IS NOT COMPARABLE BETWEEN THE SIBLING GAMES` | none | 14z-155 |
 | [#135](https://github.com/DefinitelyFrenchName/VampireSaved/issues/135) | evolution | open | The VS-vs-VS2 tick cadence: re-establish its measurement, mechanism and scope, and document it as foundational engine data | `tests/test_don_immortal_native.sh` | none | none | none | 14z-127,14z-154 |

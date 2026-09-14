@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-345 entries (41 game / 102 platform / 202 project), counted from the buckets at generation.
+346 entries (41 game / 102 platform / 203 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 41 entries
 
@@ -171,7 +171,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - ON A LINUX BUILD HOST EVERY BUNDLED LIBRARY ALSO RESOLVES SYSTEM-WIDE — a "resolved under /usr/lib" self-containment check is blind there (paid: 2026-09-13, the release gate's absolute-reference control DEAD on its first Linux run)
 - A NATIVE WINDOWS PYTHON WRITES `\r\n` FOR EVERY `\n` IT PRINTS — reconfiguring one Python block of a gate leaves the others emitting CRLF (paid: 2026-09-13, one CR byte left in the Windows release gate's output after the first fix)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 202 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 203 entries
 
 - A gate that prints `SKIP:` AND exits NON-ZERO is a FAILURE, not a skip (paid: 14z-128)
 - `... | while read` puts the loop in a SUBSHELL, so the `wait` after it waits for nothing (paid: 14z-128)
@@ -375,3 +375,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A MUST-FIRE CONTROL THAT PLANTS ITS PERTURBATION AT END OF FILE DEPENDS ON WHICH SECTION IS LAST — the STATE.md clean-up killed `test_checkskills`' `state-anchor-outside` (paid: 14z-154)
 - A TEXT LINT MATCHES ITS BANNED PATTERN INSIDE A PRINTED MESSAGE — a new gate's own `ok` line naming `${VAR:?}` turned two gates red (paid: 14z-155)
 - A STRICT TIER STARTED INSIDE A BACKGROUND TASK DIES WITH THE TASK — the harness's low-memory kill takes `nohup … &!` children too (paid: 14z-155)
+- THE STATIC TIER'S MUST-FIRE READOUT OVERSTATES `fired / declared` ON A RED RUN — a gate that does not PASS re-adds the previous gate's counts (paid: 14z-155, #140)
