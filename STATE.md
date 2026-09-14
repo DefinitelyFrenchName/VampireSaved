@@ -120,6 +120,7 @@ One line per ruling that still constrains work; the full entry lives where the l
 - **No legacy character meets a tenant in 1P arcade (2026-08-28):** not a problem, 2P versus is the focus; not built, not scoped. Full entry: `DECISIONS_HISTORY.md` "Moved 2026-09-14 (14z-154)".
 - **The living-docs generalisation, when scheduled (2026-09-08, #119):** independent of bbh but compatible with it and on the same principles; the site generator in scope; fidelity required in principle, its form argued in the scope document; the open items first. Full entry: `DECISIONS_HISTORY.md` "Moved 2026-09-14 (14z-154)".
 - **Linux release binaries (2026-09-13, #121):** self-containment is checked against an external host-provided list plus the ruled exceptions; the WSL2 Linux binaries are never published. Full entry: `DECISIONS_HISTORY.md` "Moved 2026-09-14 (14z-154)".
+- **Generator refactor policy (2026-08-21, #50):** no dedicated refactor of `tools/gen_donovan_patch.py`'s `main()` is ever scheduled absent a new measured cost; a handler moves to module level only when a test needs to drive it, with its unit test in the same change, and byte-identity under `tests/test_m3a_reproducible.sh` and `tests/test_phasec_spaces.sh` is the refactor gate. Full entry: `STATE_HISTORY.md` "Session 14z-102 (post-freeze rulings)".
 
 ## STANDING PRINCIPLE (maintainer, 2026-08-05): vanilla wins ties
 

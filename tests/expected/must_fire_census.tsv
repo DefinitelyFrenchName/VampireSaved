@@ -79,6 +79,7 @@ declares	test_release_asset_shape
 declares	test_release_binaries
 declares	test_release_os_metadata
 declares	test_release_roundtrip
+declares	test_rompath_reject
 declares	test_rpl2siminputs
 declares	test_rule5_census
 declares	test_shadow_tenant

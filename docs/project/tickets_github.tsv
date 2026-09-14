@@ -2,8 +2,10 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 137
+# issues: 139
 number	state	reason	closed	labels	title
+139	CLOSED	COMPLETED	2026-09-14	bug	A rejected build keeps its packed rompath, indistinguishable on disk from a finished build (the #1 residual)
+138	OPEN	-	-	bug	A stock-track build directory without its vsavj.zip silently dispatches run_suite to the VANILLA expectations — the reference-row rule nothing enforces (the #55 residual)
 137	CLOSED	COMPLETED	2026-09-14	bug	test_wide_profile's reference guard trusts a profile check that nothing in the run proves can see the profile (the #63 residual)
 136	OPEN	-	-	evolution	Tenant move parity vs native VS2: compare Donovan, Phobos and Pyron's moves on the WIDE merged build against vsav2
 135	OPEN	-	-	evolution	The VS-vs-VS2 tick cadence: re-establish its measurement, mechanism and scope, and document it properly

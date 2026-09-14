@@ -382,6 +382,10 @@ if [ "$STAGE" -ge 6 ]; then
 fi
 
 rm -rf "$OUTBASE/rompath"
+# A REJECTED BUILD DOES NOT KEEP ITS ROMPATH (14z-155, #139): from here to the
+# final OK line, any exit moves rompath aside to rompath.REJECTED.
+. "$(dirname "$0")/rompath_reject.sh"
+rompath_reject_arm "$OUTBASE/rompath"
 # CPS-2 WIDE builds pack as the vsavjw SET and fold in the profile's appended
 # gfx/QSound members, which this pipeline does not produce itself. Detected
 # from the generator's own output (patch.json carries an "image" block only
@@ -573,4 +577,5 @@ python3 tools/audit_romset_identity.py "$OUTBASE/rompath" || {
 # untouched ROM's fingerprint as the build's. Caught 14z-59i.
 python3 tools/build_fingerprint.py "$OUTBASE/rompath;$ROMDIR" --set "$PACK_SET" --sha-only \
     | sed 's/^/build fingerprint: /'
+rompath_reject_disarm
 echo "OK: stage $STAGE build at $OUTBASE/rompath (fingerprint above; register in tests/expected/registry.tsv at freeze time)"

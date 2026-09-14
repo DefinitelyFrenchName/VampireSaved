@@ -802,6 +802,19 @@ Rules:
 - If a fingerprint ever equals a known reference row, treat that as a bug
   until proven otherwise — a patched build cannot hash to the pristine ROM.
 
+**NOTHING ENFORCES THAT SECOND RULE — measured 2026-09-14 (14z-155, #138).**
+`python3 tools/build_fingerprint.py "<an empty dir>;$ROMDIR" --set vsavj`
+answers `vsavj` (exit 0): the search path falls through to the pristine set,
+whose fingerprint IS the vanilla registry row, while `--set vsavjw` fails
+loudly (exit 1, no such zip in `$ROMDIR`). `tests/run_suite.sh` dispatches
+exactly this way (`ROMPATH="${MAME_ROMPATH:-$ROMDIR}"`, then
+`build_fingerprint.py "$ROMPATH" --set "$SET"`) with no check that a directory
+fronted in `MAME_ROMPATH` holds the set, so on the STOCK track a build
+directory without its `vsavj.zip` runs the VANILLA expectations against vanilla
+and reads green. The tool cannot refuse the vanilla row globally — a plain
+`run_suite.sh` on `$ROMDIR` is how the vanilla oracle itself dispatches — so
+the check belongs to the consumer that fronts a directory.
+
 ## **[VSP-118]** `_PRG_RE` did not match the WIDE extension members, so extension content
 ## was invisible to the build fingerprint
 `\.(0[3-9]|10)[a-z]?$` matches the stock program chips but not `vsw.41-.44`.

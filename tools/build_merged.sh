@@ -174,6 +174,10 @@ PY
 done
 
 echo "== 3: pack (program + LAST link's members) =="
+# A REJECTED BUILD DOES NOT KEEP ITS ROMPATH (14z-155, #139): from here to the
+# final OK line, any exit moves rompath aside to rompath.REJECTED.
+. "$REPO/tools/rompath_reject.sh"
+rompath_reject_arm "$OUT/rompath"
 KEY_SET=vsavj ROMDIR="$ROMDIR" tools/pack_build.sh "$OUT/prg" "$OUT/rompath" \
     --set vsavjw --merge "$WIDE_ZIP" > "$OUT/pack.log" 2>&1 || {
         echo "FAIL: pack"; tail -10 "$OUT/pack.log"; exit 1; }
@@ -270,4 +274,5 @@ for whether this fingerprint is a frozen generation.
 fingerprint: $FP
 EOF
 echo "build fingerprint: $FP"
+rompath_reject_disarm
 echo "OK: merged build with gfx at $OUT/rompath (register at S6 freeze time)"

@@ -242,3 +242,4 @@ test_state_open_lists
 # each answer link resolves (learned/wrong in live documents), the backfill debt is
 # shrink-only and the generated page is current. tools/tickets.py; six controls. ~1 s.
 test_tickets
+test_rompath_reject

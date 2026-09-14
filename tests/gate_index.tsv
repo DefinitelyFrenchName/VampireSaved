@@ -298,6 +298,7 @@ tests/test_romset_identity.sh	platform
 tests/test_romset_path_guard.sh	review-triage
 tests/test_rpl2siminputs.sh	mister
 tests/test_rule5_census.sh	pipeline
+tests/test_rompath_reject.sh	pipeline
 tests/test_s4_thresholds.sh	pipeline
 tests/test_select_arrays.sh	pipeline
 tests/test_select_port_hygiene.sh	review-triage

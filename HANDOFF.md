@@ -967,6 +967,11 @@ place and reports the set as missing.
    build was made without `--profile cps2-wide-v1` and there is nothing
    WIDE to launch — rebuild:
    `KEY_SET=vsavj GEN_FLAGS="--allow-plausible --tripwire-open --profile cps2-wide-v1" tools/build_donovan.sh 6 build/m5w`
+   **A `rompath.REJECTED` in place of `rompath` means the builder REJECTED that
+   build** (since 14z-155, #139: `tools/build_donovan.sh` and
+   `tools/build_merged.sh` move the packed `rompath` aside on any exit before
+   their final OK line). Read the build's own output for why; never rename it
+   back to run it.
 2. **Does the binary carry the profile?**
    FBNeo: `strings -a emu/fbneo/fbneo | grep "CPS-2 WIDE v1"` (plain
    `grep -q` on the binary is unreliable — GOTCHAS).
