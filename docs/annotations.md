@@ -23,21 +23,22 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3001 |
-| named by a document or manifest only | 2031 |
-| named by both a document/manifest and code | 635 |
-| named by CODE ONLY (the gap list below) | 335 |
+| distinct program-space addresses named | 3010 |
+| named by a document or manifest only | 2035 |
+| named by both a document/manifest and code | 638 |
+| named by CODE ONLY (the gap list below) | 337 |
 | carried by atlas | 481 |
-| carried by engine_internals | 544 |
+| carried by engine_internals | 551 |
 | carried by other docs | 961 |
 | carried by manifests | 1786 |
-| carried by code | 970 |
+| carried by code | 975 |
 
 ## Addresses
 
 | address | where named (tier order; file — section) |
 |---|---|
 | `PRG:0x001000` | docs/project/living_docs_scope.md — 11.3 The findings that change the design — six, each measured; tests/test_checkdocs_rom.sh; tests/test_mister_prg_probe.sh; tools/checkdocs_rom.py |
+| `PRG:0x0011A4` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) |
 | `PRG:0x0011DE` | docs/game/atlas/ram.md — Masked windows for hooked-build legacy comparison (CLAUDE.md §4 amendment, 2026-07-25); tests/audit_ff0460_writer.sh |
 | `PRG:0x0011E2` | docs/game/atlas/ram.md — Masked windows for hooked-build legacy comparison (CLAUDE.md §4 amendment, 2026-07-25); tests/audit_ff0460_writer.sh |
 | `PRG:0x00238A` | docs/game/gotchas.md — THE BOOT NAME SCREEN'S DISPLAY SCRIPT TAKES AN EVEN COLUMN — an odd one is a 68k ADDRESS ERROR that soft-boots the machine (paid: 14z-127); docs/project/patch_notes.md — 14z-127 — THE BOOT NAME SCREEN: "VAMPIRE SAVIOR" -> "VAMPIRE SAVED" |
@@ -754,6 +755,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0230A4` | build/manifest/pcrel_escapes.toml — hui56 |
 | `PRG:0x0230EA` | build/manifest/pcrel_escapes.toml — hui56 |
 | `PRG:0x0231AE` | build/manifest/pcrel_escapes.toml — hui56 |
+| `PRG:0x0231D0` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_tick_cadence.sh |
 | `PRG:0x02320A` | build/manifest/pcrel_escapes.toml — hui56 |
 | `PRG:0x023244` | docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/reconciliation_donovan.toml — map; build/manifest/reconciliation_huitzil.toml — map; build/manifest/reconciliation_pyron.toml — map |
 | `PRG:0x023258` | build/manifest/bank_map.toml — tail_data_ptr |
@@ -782,6 +784,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x023AD8` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured); build/manifest/donovan.toml — ls_freeze_vs2_victim; build/manifest/shared_writes.toml — donovan |
 | `PRG:0x023ADE` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured); build/manifest/donovan.toml — ls_freeze_vs2_attacker; build/manifest/shared_writes.toml — donovan |
 | `PRG:0x023AFE` | docs/project/gotchas.md — space — and a window constant is a census, not a fact (14z-65); docs/project/patch_notes.md — 14z-65 (6) — the specials hunt: window widened, alias rule, farm verified (2026-08-07); build/manifest/reconciliation.toml — map [vs2]; tools/gen_donovan_patch.py |
+| `PRG:0x0245AE` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_tick_cadence.sh |
 | `PRG:0x024CBA` | docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/reconciliation.toml — map [vs2]; build/manifest/reconciliation_donovan.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map; build/manifest/reconciliation_huitzil.toml — map [vs2]; build/manifest/reconciliation_pyron.toml — map [vs2] |
 | `PRG:0x024EA4` | docs/project/patch_notes.md — 14z-65 (6) — the specials hunt: window widened, alias rule, farm verified (2026-08-07); build/manifest/reconciliation.toml — map |
 | `PRG:0x024EDA` | build/manifest/bank_map.toml — dispatch_13 [vs2] |
@@ -877,10 +880,11 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02711C` | docs/project/patch_notes.md — 14z-102 — the #107 row flip — FROZEN in donovan-m10 + every tenant + stock (the shared map), #107 CLOSED; build/manifest/reconciliation.toml — map; build/manifest/reconciliation.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map; build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x027122` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x027130` | build/manifest/reconciliation_huitzil.toml — map |
-| `PRG:0x02713C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2]; tests/test_anim_node_walk.sh; tools/anim_nodes.py |
+| `PRG:0x02713C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2]; docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_tick_cadence.sh; tests/test_anim_node_walk.sh; tools/anim_nodes.py |
+| `PRG:0x027140` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_tick_cadence.sh |
 | `PRG:0x0271A8` | docs/project/patch_notes.md — rows 0x10 + the per-tenant VALUE_SKIP default; build/manifest/bank_map.toml — gap_bd8fa |
 | `PRG:0x0271B6` | docs/game/engine_internals.md — The per-node sfx dispatcher and per-char record arrays (14z-52) [vs2]; docs/project/patch_notes.md — donovan-m2 stage 5 — the last two music triggers: engine_data masquerade rows (2026-07-28, playtest round 2) [vs2] |
-| `PRG:0x0271C4` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2]; build/manifest/reconciliation.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map; tests/test_anim_node_walk.sh; tools/anim_nodes.py; tools/gen_donovan_patch.py |
+| `PRG:0x0271C4` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2]; docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); build/manifest/reconciliation.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map; tests/audit_tick_cadence.sh; tests/test_anim_node_walk.sh; +2 more |
 | `PRG:0x0271F2` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2]; tools/anim_nodes.py |
 | `PRG:0x0271F4` | docs/game/engine_internals.md — The chain decoder's table bound, and the "unindexed" lying/wake nodes (14z-121); tools/charmap_gen.py |
 | `PRG:0x0271FE` | build/manifest/pyron.toml — capture_kf_jedah [vs2]; build/manifest/reconciliation.toml — map [vs2] |
@@ -939,14 +943,17 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x027EC0` | docs/game/atlas/character_tables.md — Animation index tables (bank extends below bank[0]); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/patch_notes.md — vs2-licensed class remaps; maintainer-ruled option (a)); build/manifest/reconciliation.toml — map |
 | `PRG:0x027EC4` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x027EC8` | docs/project/patch_notes.md — 14z-102 — the #107 row flip — FROZEN in donovan-m10 + every tenant + stock (the shared map), #107 CLOSED; build/manifest/reconciliation.toml — map |
-| `PRG:0x027EE8` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — THE ENGINE TICK IS DIRECTLY OBSERVABLE — a write tap on '+0x20' is a TICK-ACCURATE instrument (14z-126b); tools/tick_durations.py |
-| `PRG:0x027EEC` | docs/game/engine_internals.md — THE ENGINE TICK IS DIRECTLY OBSERVABLE — a write tap on '+0x20' is a TICK-ACCURATE instrument (14z-126b); tools/tick_durations.py |
+| `PRG:0x027EE0` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) |
+| `PRG:0x027EE8` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — THE ENGINE TICK IS DIRECTLY OBSERVABLE — a write tap on '+0x20' is a TICK-ACCURATE instrument (14z-126b); docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_tick_cadence.sh; tools/tick_durations.py |
+| `PRG:0x027EEC` | docs/game/engine_internals.md — THE ENGINE TICK IS DIRECTLY OBSERVABLE — a write tap on '+0x20' is a TICK-ACCURATE instrument (14z-126b); docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_tick_cadence.sh; tools/tick_durations.py |
+| `PRG:0x027F0E` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) |
 | `PRG:0x027F16` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — THE VOICE-CLASS BORROW: '(0x382,A6)' is the fighter's voice-FLAVOR class (measured 14z-87); docs/game/engine_internals.md — The per-node sfx dispatcher and per-char record arrays (14z-52); docs/game/gotchas.md — +0x382 is the char id only at SELECT — in match it is the VOICE-FLAVOR CLASS, and the engine reassigns it (14z-87); tests/audit_voice_borrow.sh |
 | `PRG:0x027F18` | build/manifest/pcrel_escapes.toml — don_m22; build/manifest/pcrel_escapes.toml — hui56; build/manifest/pcrel_escapes.toml — pyron41 |
-| `PRG:0x027F70` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/game/engine_internals.md — THE ENGINE TICK IS DIRECTLY OBSERVABLE — a write tap on '+0x20' is a TICK-ACCURATE instrument (14z-126b); build/manifest/reconciliation.toml — map; tests/test_tick_durations.sh; tools/crosscheck_framedata.py; tools/tick_durations.py |
+| `PRG:0x027F6E` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) |
+| `PRG:0x027F70` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/game/engine_internals.md — THE ENGINE TICK IS DIRECTLY OBSERVABLE — a write tap on '+0x20' is a TICK-ACCURATE instrument (14z-126b); docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); build/manifest/reconciliation.toml — map; tests/audit_tick_cadence.sh; tests/test_tick_durations.sh; +2 more |
 | `PRG:0x027F78` | build/manifest/pcrel_escapes.toml — don_m22; build/manifest/pcrel_escapes.toml — hui56; build/manifest/pcrel_escapes.toml — pyron41 |
 | `PRG:0x027F88` | docs/game/engine_internals.md — THE ENGINE TICK IS DIRECTLY OBSERVABLE — a write tap on '+0x20' is a TICK-ACCURATE instrument (14z-126b); tools/tick_durations.py |
-| `PRG:0x027FA0` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/project/gotchas.md — two traps from the #104 re-measurement — both produced a CONFIDENT WRONG ANSWER from a working instrument (paid: 14z-99); docs/project/patch_notes.md — 14z-143 — PYRON'S CAPTURE ROW '0x11' PORTED: he throws with his own geometry, not Demitri's; build/manifest/pyron.toml — capture_kf_jedah; tests/audit_pyron_capture_block.sh |
+| `PRG:0x027FA0` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/project/gotchas.md — two traps from the #104 re-measurement — both produced a CONFIDENT WRONG ANSWER from a working instrument (paid: 14z-99); docs/project/patch_notes.md — 14z-143 — PYRON'S CAPTURE ROW '0x11' PORTED: he throws with his own geometry, not Demitri's; build/manifest/pyron.toml — capture_kf_jedah; +1 more |
 | `PRG:0x027FAA` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/project/patch_notes.md — 14z-143 — PYRON'S CAPTURE ROW '0x11' PORTED: he throws with his own geometry, not Demitri's; build/manifest/pyron.toml — capture_kf_jedah; build/manifest/reconciliation.toml — map; tests/audit_pyron_capture_block.sh |
 | `PRG:0x027FB2` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab) |
 | `PRG:0x027FCE` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab) |
@@ -2711,6 +2718,8 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | address | files |
 |---|---|
 | `PRG:0x0011E6` | tests/audit_ff0460_writer.sh |
+| `PRG:0x001204` | tests/audit_tick_cadence.sh |
+| `PRG:0x001218` | tests/audit_tick_cadence.sh |
 | `PRG:0x005C06` | tests/test_attract_roster.sh |
 | `PRG:0x00AEE2` | tests/test_voice_row_range.sh |
 | `PRG:0x00B140` | tools/decode_win_quotes.py |

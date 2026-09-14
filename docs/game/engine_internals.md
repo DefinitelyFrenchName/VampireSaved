@@ -568,6 +568,35 @@ TICKS are. Same family as "THE ENGINE RUNS TWO TICKS IN ONE VIDEO FRAME"
 (`gotchas.md`) and the reason `tools/tick_durations.py` exists. [M:
 `tests/test_don_immortal_native.sh` §4, frozen at +1 frame; 14z-127]
 
+**MEASURED ON THE TICK INSTRUMENT, 14z-156 — #135 IN PROGRESS; the paragraph above is under
+re-examination there (its "four characters" is one Victor mirror in the gate it cites).**
+Write taps on both fighters' `+0x1C..+0x23`, P2's `+0x5C` and the task table over the vanilla
+Victor mirror of that gate's §4, frames 2300-2900, reference MAME, both games:
+- **vs2's tick site is vsavj's minus `0xDAC`.** vsavj ticks at `PRG:0x027F70` (`532E 0020`,
+  `subq.b #1,$20(a6)`) and enters a node at `0x027EE8`/`0x027EEC`; the address-free windows
+  `0x027F6E-0x027FA0` and `0x027EE0-0x027F0E` occur once in vs2, at `-0xDAC`, and vs2's
+  dominant `+0x20` writer on both fighters is `PRG:0x0271C4`, node entry `0x02713C`/`0x027140`.
+- **The double tick is GLOBAL**: both fighters double on the same frames (vs2 112 of 114/116,
+  vsavj 78 of 79/81).
+- **The cadence is what differs**: vs2's double-tick frames fall every THIRD frame (gaps
+  3 ×113, 6 ×2 — the pattern `211`, about 1.33 passes a frame), vsavj's every fourth or fifth
+  (4 ×53, 5 ×26, 9 ×1, about 1.23). Over the window vs2 ticks each fighter 36 more times
+  (P1 501 against 465, P2 651 against 615) with the zero-tick frames equal.
+- **Both passes run inside ONE activation of the game task.** The scheduler (`PRG:0x0011A4`,
+  identical in both games: 16 task slots at `$FF025C`, the frame interrupt counting sleepers
+  down to READY) dispatches the two game-task slots at most once per frame, double-tick frames
+  included, while the slot that spins until the frame flag gets fewer dispatches on them
+  (~31-33 against ~55) — the second pass costs CPU time inside the same activation.
+- **The hit-freeze** `+0x5C` = 11 drains in NINE frames on BOTH games on this instrument (vs2
+  `PRG:0x0231D0` over 2629-2637, vsavj `PRG:0x0245AE` over 2630-2638); the "9 vs 10" above counts
+  frames with `+0x5C > 0` in per-frame dumps from the hit — a different measure, whose extra
+  frame is where the first drain lands after the hit.
+- **What decides the second pass is NOT located.** It is not keyed on the frame counter
+  `RAM:$FF8080` (no modulus predicts it), and no single bit or exact value of `$FF8000-$FF83FF`
+  predicts it; a constant-step accumulator search over all work RAM found nothing but was never
+  shown to find a planted one, so that is not a result.
+[M: `tests/audit_tick_cadence.sh`; 14z-156]
+
 **AN INSTANCE, RULED BY THE MAINTAINER (2026-09-14): Final Guardian Beta's pacing.**
 Phobos's EX Final Guardian Beta (pool object `0x46`) long read as lasting too long on our
 build — the STATE item "FG pacing". The maintainer's verdict, closing it: *"The speed value

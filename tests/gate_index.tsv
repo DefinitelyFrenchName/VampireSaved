@@ -326,6 +326,7 @@ tests/test_thunk_addr_literal.sh	pipeline
 tests/test_meter_gain.sh	character-data
 tests/test_rehit_ring.sh	character-data
 tests/test_tick_durations.sh	character-data
+tests/audit_tick_cadence.sh	character-data
 tests/test_tickets.sh	docs
 tests/test_type_stamp_census.sh	pipeline
 tests/test_vanilla_frame_join.sh	character-data

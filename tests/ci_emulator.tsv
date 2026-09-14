@@ -176,6 +176,7 @@ audit_front_comparator	mame	out	romset	-	romset: what $FF8127 is, on vanilla vsa
 test_advancing_guard	mame	out	romset	-	romset: the advancing guard measured on native vs2 and vsavj
 test_killshread_es	mame	out	romset	-	romset: the ES stance change measured on NATIVE vs2
 test_tick_durations	mame	out	romset	-	romset: vanilla frame data in engine ticks (the community cross-check's arbiter)
+audit_tick_cadence	mame	out	romset	-	romset: the VS-vs-VS2 engine tick cadence on VANILLA content — vsav2 doubles its logic pass every third frame, vsavj every fourth or fifth, globally and inside one game-task activation; the vs2 tick twin live (#135, 14z-156). ~7 min
 test_vanilla_frame_join	mame	out	romset	-	romset: which chain each VANILLA character's standing normals enter, on vsavj
 test_vanilla_aerial_join	mame	out	romset	-	romset: which chain each VANILLA character's jumping normals enter from a NEUTRAL and from a FORWARD jump, on vsavj — a2 0x12-0x17 vs 0x18-0x1D (14z-145)
 test_rehit_ring	mame	out	romset	-	romset: THE MULTI-HIT RE-HIT RULE on vanilla vsavj — the victim's recent-hit slot +0x6C[attacker block], written at contact, cleared every tick the attacker's node has no attack record; JE 5HP 3 contacts / MO CL.5HK 4 / SA CL.5HK 1 + a juggle-gate refusal; write tap + field trace, two must-fire controls (14z-146)
