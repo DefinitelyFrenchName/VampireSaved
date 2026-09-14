@@ -181,6 +181,83 @@ what a triage is looking at, so those are where the thinking time goes.
   refuse. Frozen as §5 of the gate, LP asserted exactly so a move either way
   fails.
 
+### Copied 2026-09-14 from the living-docs generalisation entry (now #119): its design rulings and sequencing, as lines
+
+  **THE THREE DESIGN RULINGS, in the maintainer's words:**
+  1. **INDEPENDENT BUT COMPATIBLE** — *"living documentation framework should
+     be useable independently but fully compatible with BBH and relies on
+     mostly the same principles."* So: NOT a bbh subpackage and NOT a
+     dependency on it, but the same shape (one entry point, config-driven,
+     a fake corpus, selftests, a skill) and the same principles. This settles
+     the three-way question about `check-skills` / `skill-guide` /
+     `gate-index` in the direction of compatibility rather than reclamation —
+     the two packages may both carry a mechanism as long as they agree.
+  2. **THE SITE GENERATOR IS IN SCOPE** — *"only a visualisation for humans
+     but it's basically a free really-nice-to-have."* `mk_docs_site.py` +
+     `md_subset.py` + `_pagestyle.py`, ~1,500 lines, measured at 2-4
+     project-noun hits each: the most portable piece in the set.
+  3. **FIDELITY: THE PRINCIPLE YES, THE FORM OPEN** — *"I don't know if
+     byte-identical is warranted for the living documentation scope but on
+     principle I agree."* So the extraction must be PROVEN against this
+     tree, but the comparison class is a scoping question, not a given.
+     Recorded so the scope document argues it rather than inheriting bbh's
+     F-series by reflex: a renderer's HTML may reasonably be compared
+     structurally where a checker's verdicts must be exact.
+
+
+  **SEQUENCING RULED THE SAME DAY: the OPEN ITEMS COME FIRST** (maintainer:
+  *"Agreed"* to the recommendation that extracting a second package is
+  infrastructure built on infrastructure, and that bbh's usefulness is still
+  untested by a second consumer).
+
+
+### Copied 2026-09-14 from the Linux self-containment anchor entry (now #121): the whole entry
+
+- **THE LINUX SELF-CONTAINMENT ANCHOR — DECIDED 2026-09-13: option 1 now, option 3
+  the goal (not scheduled).** The everyday check is `tools/check_host_libs.py`
+  against an EXTERNAL list plus five ruled exception groups (DECIDED and
+  implemented at `a145562c`). The goal adds a clean-machine resolution at release
+  time, on the dedicated Linux server kept free of `-dev` packages — to be built
+  when that server exists. The WSL2 Ubuntu 26.04 Linux binaries are a PROOF run,
+  never published (DECIDED).
+
+
+### Copied 2026-09-14 from the community cross-check entry (now #117, #118): the rule for community data, as lines
+
+  sessions. **INPUTS RECEIVED 2026-08-31 + THE RULE, maintainer's words:**
+  "measurement is king, not a source that we don't know how it was measured;
+  however, community information is precious: if it aligns perfectly or
+  with a constant offset, then we know the measure is good; if we find an
+  inconsistent pattern, then we must search whether the measurement is
+  correctly done or not." So every column's deltas are classified EXACT /
+
+
+### Copied 2026-09-14 from the hidden-character block: no legacy character meets a tenant in 1P arcade (ruled not a problem)
+
+- **NO LEGACY CHARACTER EVER MEETS A TENANT IN 1P ARCADE — RULED NOT A
+  PROBLEM (maintainer, 2026-08-28): "not a problem since we're way focused
+  on 2p vs". CLOSED, no work planned.** Kept as a measured fact because it
+  explains field observations rather than because it needs fixing.** Rows `0x00-0x0F`
+  contain no reachable tenant candidate at all, so a 1P run as Morrigan (or
+  anyone vanilla) can never be scheduled against Donovan, Phobos or Pyron.
+  The port authored the tenants' OWN rows (what they fight) and never added
+  them to anyone else's. This is the same family as the random-select item
+  and arguably more noticeable in play — a player's whole arcade experience
+  never shows the new characters unless they pick one. **Not built, not
+  scoped, no recommendation without a ruling**, and it is a GAMEPLAY-FEEL
+  change (who you fight, and the ladder is already a lottery), so it is the
+  maintainer's call per CLAUDE.md 5.
+
+
+### Copied 2026-09-14 from THE COSMETIC BACKLOG's introduction: cosmetic is optional
+
+Ruled a single later pass over "the purely cosmetic things that remain related
+to the port", opened when #112 was accepted as cosmetic. Nothing here is
+scheduled, and none of it is competitive-2P surface (see the standing
+"cosmetic is optional" scope: cosmetic + single-player-only surfaces are
+nice-to-have). Collected so the pass does not start from a blank page:
+
+
 ## Moved 2026-09-12 (14z-151) — the 14z-133b..14z-149 rulings that stopped shaping work
 
 Fifteen decisions, byte-verbatim, resolutions and their original entries together.

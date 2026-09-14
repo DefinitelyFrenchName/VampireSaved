@@ -100,7 +100,11 @@ perturb() {  # perturb <name> <dir>
     dangling-crossref) printf -- '- [CPE-999] a rule with a dangling reference to [CPH-998]\n' >> "$2/.claude/skills/cps2-emulation/SKILL.md"; EXPECT="cross-reference \[CPH-998\]" ;;
     port-token-in-game-skill) printf -- '\nA line about the tenant build/m3b_merged17.\n' >> "$2/.claude/skills/vampire-savior-engine/SKILL.md"; EXPECT="level-1 skill names 'tenant'" ;;
     state-anchor-outside) printf -- '- [VSP-999] a port rule anchored where STATE rolls over\n' >> "$2/.claude/skills/vampire-saved-port/SKILL.md"
-                       printf -- '\n**[VSP-999]** an anchor appended outside the two standing sections.\n' >> "$2/STATE.md"
+                       # planted under the title line, in the SESSION-GROUP area that rolls, which is outside the
+                       # two standing sections whatever their order. It used to be APPENDED at the end of the file:
+                       # a section's span runs to the next `## ` or to EOF, so once the 14z-154 clean-up made THE
+                       # DEADNESS REGISTER the last section, the appended anchor sat INSIDE it and the control died.
+                       { head -1 "$2/STATE.md"; printf -- '\n**[VSP-999]** an anchor planted in the rolling session area.\n'; tail -n +2 "$2/STATE.md"; } > "$2/STATE.md.new" && mv "$2/STATE.md.new" "$2/STATE.md"
                        EXPECT="VSP-999 anchored in STATE.md OUTSIDE" ;;
     # level 0 (14z-134): the two board-agnostic skills are locked the same way,
     # and their liftability test is one level stricter — naming the BOARD fails.

@@ -231,7 +231,7 @@ a palette bank indexed from `0x3A3C00` (its 16th word is a running index;
 pen 15 is transparent): row `0x13` is a grey ramp, rows `0x10`/`0x11` are
 unrelated real palettes. The built image ships the pool byte-identical to
 vsavj (no manifest supplies rows). Single-player, tenant-plays-1P only,
-cosmetic — STATE "THE COSMETIC BACKLOG", not fixed.
+cosmetic — ticket #124, not fixed.
 
 ### Gates from the M2b step that still run
 
@@ -327,7 +327,8 @@ None of this is a defect: the port authored the tenants' own rows and never
 edited anyone else's, which is the conservative choice. It is recorded
 because "I played for two hours and never saw it" is otherwise indis-
 tinguishable from bad luck, and because changing it is a gameplay-feel
-decision (STATE "Decisions pending").
+decision — ruled NOT A PROBLEM by the maintainer (2026-08-28: "not a problem
+since we're way focused on 2p vs"; STATE "Standing rulings").
 
 **Legacy rows never reference a tenant class** (0 occurrences over classes
 `0x00-0x0F`), so in arcade mode the fifteen original characters never

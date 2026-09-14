@@ -2,8 +2,29 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 114
+# issues: 135
 number	state	reason	closed	labels	title
+135	OPEN	-	-	evolution	The VS-vs-VS2 tick cadence: re-establish its measurement, mechanism and scope, and document it properly
+134	OPEN	-	-	bug	The hit rigs' LP events whiff at contact range
+133	OPEN	-	-	evolution	Re-measure the emulator runner's pull-queue gain on a wider host
+132	OPEN	-	-	bug	release/merged-m15 was never packaged
+131	OPEN	-	-	evolution	audit_mask_window_ff42a2: deprecate it, or keep it as a case-specific gate?
+130	OPEN	-	-	bug	bundle_win_dlls.py prints a broken character for its em dash on MSYS2 (build logs only)
+129	OPEN	-	-	bug	Tenant CPU AI looks lackluster (unproven; first question: are the ported script blocks complete?)
+128	OPEN	-	-	evolution	Marionette: parked until further notice
+127	OPEN	-	-	cosmetic	#112 option (B): the Press of Death effect owns its palette row (scope first)
+126	OPEN	-	-	cosmetic	Select-wheel look-and-feel polish
+125	OPEN	-	-	cosmetic	Arcade-ladder map names and pictures (not investigated)
+124	OPEN	-	-	cosmetic	Arcade-ladder roulette tag shows the base character for a tenant opponent
+123	OPEN	-	-	cosmetic	Win-quote text for the three tenants (forgone for now; only the clean way, vanilla untouched)
+122	OPEN	-	-	evolution	Run the --controls release tier on the dedicated Linux server and compare its speed with the Mac
+121	OPEN	-	-	evolution	Linux release binaries built on the dedicated server, plus the clean-machine check at release (option 3)
+120	OPEN	-	-	evolution	The rebuild-from-docs option after MiSTer (a possibility to preserve, not a commitment)
+119	OPEN	-	-	evolution	The living-documentation framework as an independent sibling of bbh (ruled at the plan stage, not scheduled)
+118	OPEN	-	-	evolution	Community cross-check: the ~90 unadopted mizuumi player-struct candidates, each adopted only once measured
+117	OPEN	-	-	evolution	Community cross-check: naming rigs on vsavj for specials, supers, throws, the CL. rows and the 6-prefixed rows
+116	OPEN	-	-	evolution	Capture matrix: widen the in-emulator anchors from 3 cells to a sampled row per tenant
+115	OPEN	-	-	evolution	Zabel j.LK proximity guard: a surgical legacy patch for vanilla and WIDE, its own session, recording first
 114	CLOSED	COMPLETED	2026-09-02	bug,correctness,severity: medium	421+P (Lighting Sword): ours lands 3 hits and knocks the victim away; native VS2 lands 6 and holds — measured, and the gate cannot see it
 113	CLOSED	COMPLETED	2026-09-01	bug,severity: low	Whole-screen flash at the first down (photosensitivity) — seen for many builds
 112	CLOSED	COMPLETED	2026-09-04	bug,severity: low	Press of Death (41236+K): blue/black palette about half the time on merged-m9

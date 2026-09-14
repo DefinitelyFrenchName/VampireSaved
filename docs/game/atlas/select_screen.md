@@ -311,6 +311,16 @@ IDENTICAL to vsavj's and also carries only a `#$5`, so whatever arms
 Marionette in vs2 is NOT this counter and has not been located. It is out
 of scope for this port either way — nothing here ports her.
 
+**THE ARCADE HAS EXACTLY THREE HIDDEN CHARACTERS: Oboro Bishamon, Dark Gallon
+and Shadow** (confirmed by the maintainer, 2026-08-28). The alternate Lilith,
+Aulbath and Victor are CONSOLE-PORT ONLY, and the ROMs agree: the only variant
+datasets in any of the three sets are the port's three tenants plus two Oboros —
+no Lilith, Victor or Aulbath alternate exists anywhere (measured 14z-116). On our
+build Oboro `0x18` is reachable only through the port's own select hook (below),
+Dark Gallon `0x12` through vanilla's own path (`character_tables.md`,
+board-confirmed), and Shadow as described in this section. [maintainer 2026-08-28;
+14z-116]
+
 **The copy character is a first-class entity with its own assets**, which is
 why it is not merely "the opponent again": `$3BC` is read at
 `PRG:0x00AF1C` (its own arcade-ladder row base — `$3bd(a0) << 3 + 0x800`,
@@ -392,7 +402,9 @@ group-C render question is ANSWERED for the morph case (the tenant's art
 draws correctly, snapshot above). Still open: what the black-silhouette
 presentation actually requires, since arming `$3BC` alone did not produce
 one on this Japan set, and what the `PRG:0x00C668` values selected by
-`$3BD + 0x20` mean. Neither blocks anything.
+`$3BD + 0x20` mean. Neither blocks anything. **Kept deliberately as a KNOWN UNKNOWN (maintainer, 2026-09-14):** it has
+virtually no impact on the port, and there may come a time we need or want to
+know — the two questions above are where digging starts.
 
 **THE COPY IS AN UNMASKED BYTE MOVE, WHICH IS THE WHOLE ANSWER FOR THIS
 PORT.** `move.b $382(a1),$382(a0)` applies no mask, no bound and no fold,

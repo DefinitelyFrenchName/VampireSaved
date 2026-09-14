@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-341 entries (41 game / 102 platform / 198 project), counted from the buckets at generation.
+343 entries (41 game / 102 platform / 200 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 41 entries
 
@@ -171,7 +171,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - ON A LINUX BUILD HOST EVERY BUNDLED LIBRARY ALSO RESOLVES SYSTEM-WIDE — a "resolved under /usr/lib" self-containment check is blind there (paid: 2026-09-13, the release gate's absolute-reference control DEAD on its first Linux run)
 - A NATIVE WINDOWS PYTHON WRITES `\r\n` FOR EVERY `\n` IT PRINTS — reconfiguring one Python block of a gate leaves the others emitting CRLF (paid: 2026-09-13, one CR byte left in the Windows release gate's output after the first fix)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 198 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 200 entries
 
 - A gate that prints `SKIP:` AND exits NON-ZERO is a FAILURE, not a skip (paid: 14z-128)
 - `... | while read` puts the loop in a SUBSHELL, so the `wait` after it waits for nothing (paid: 14z-128)
@@ -371,3 +371,5 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - `xdelta3 printhdr`'s "secondary compressor" line is the BINARY's default, not the file's (paid: 14z-148)
 - A CAPTURE THAT RECORDS ITS OWN EXIT STATUS UNDER `set -e` ENDS THE SCRIPT — the status and the message both die inside the variable (paid: 14z-152, 14z-153)
 - A FINDER `.DS_Store` IN `release/` TURNS `test_release_asset_shape` RED ON THIS MAC — the gate measured the host, not the artifact (paid: 14z-153)
+- A STRICT TIER'S WALL CLOCK MEASURES THE HOST, NOT THE TREE — another session's CPU burners turned a 20-minute run into 51 (paid: 14z-154)
+- A MUST-FIRE CONTROL THAT PLANTS ITS PERTURBATION AT END OF FILE DEPENDS ON WHICH SECTION IS LAST — the STATE.md clean-up killed `test_checkskills`' `state-anchor-outside` (paid: 14z-154)

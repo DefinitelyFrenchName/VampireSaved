@@ -4557,3 +4557,30 @@ zipped a `.DS_Store` INSIDE a platform directory into its asset), the shape gate
 `tests/test_release_os_metadata.sh` runs the real uploader over a release planted
 with them. None was ever committed: both repositories' `.gitignore` carry the rule.
 
+## A STRICT TIER'S WALL CLOCK MEASURES THE HOST, NOT THE TREE — another session's CPU burners turned a 20-minute run into 51 (paid: 14z-154)
+
+The same mid-session strict tier (`--exec-controls none`) took 20 min 39 s at 11:21 and
+51 min at 12:02 on an unchanged gate set; every heavy static gate ran ~2.5x slower
+(`test_m3a_reproducible` 215 -> 561 s). `ps` showed 24 `yes` processes at ~50% CPU
+each: a deliberate load test by ANOTHER Claude session, its parent shell's working
+directory `generalized-blackbox-harness/BBX`. Nothing in this tree had leaked them, and
+they were not ours to kill. **Before reading a slow tier as a regression, compare the
+per-gate times with the previous run's log and read `ps -Ao pid,ppid,lstart,pcpu,command`
+for load you did not start** — and park your own heavy work while a tier runs (a
+research agent grepping the 2.2 MB archive inflated another run the same morning).
+
+## A MUST-FIRE CONTROL THAT PLANTS ITS PERTURBATION AT END OF FILE DEPENDS ON WHICH SECTION IS LAST — the STATE.md clean-up killed `test_checkskills`' `state-anchor-outside` (paid: 14z-154)
+
+`checkskills.py` confines port-skill anchors in STATE.md to two sections, and a
+section's span runs from its heading to the next `## ` or to END OF FILE. The control
+APPENDED a planted port-skill anchor, rule number 999, to the end of a copy of STATE.md — outside the allowed spans
+only while the last section was a non-allowed one ("Integration notes"). The 14z-154
+clean-up made THE DEADNESS REGISTER the last section, the appended anchor fell inside
+it, and the perturbed copy PASSED: `CONTROL DEAD`, a strict tier NOT GREEN. The checker
+was right; the control's position had a layout dependency nobody had written down. It
+was caught by the gate's IN-GATE control run inside a mid-session tier (the executed
+`CONTROL=` modes were off by the 2026-09-14 ruling — the in-gate runs are not). **Plant a
+perturbation where the input is wrong BY CONSTRUCTION** — here, under the title line,
+in the session-group area that rolls — **never at a position whose meaning depends on
+the document's current order**, and after restructuring a document, run the gates whose
+controls perturb it.
