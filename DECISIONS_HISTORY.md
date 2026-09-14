@@ -27,6 +27,39 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-14 (14z-155) — entered at ruling time, under the amended lifecycle
+
+- **#136, TENANT MOVE PARITY AGAINST NATIVE VS2, IS FILED AND NOT STARTED (maintainer,
+  2026-09-14).** Told that the VS2 tenants' moves other than throws were never compared
+  with VS2 on the WIDE build, the maintainer: *"file it but don't start it"*. The ticket
+  is `parked` behind #135; the gap is a row of `docs/project/coverage_matrix.md`.
+- **THE #63 RESIDUAL IS DONE, AS #137 (maintainer, 2026-09-14).** *"we must check whether
+  this hardening has been done or not and if not whether we should do this hardening
+  because it is still applicable and desireable or not"*; given the analysis (not done,
+  applicable, worth doing): *"yes"*. The record is `tests/test_wide_profile.sh`'s header.
+- **KIND LABELS ON THE 74 AUDIT ISSUES (maintainer, 2026-09-14):** *"do it"* — each label
+  taken from the row's `kind` in `docs/project/tickets.tsv`.
+- **THE THREE AUDIT RESIDUALS (maintainer, 2026-09-14):** *"#1 : trap variant / #55 : open
+  the ticket / #50: add the line"* — #139 (the EXIT-trap variant, over staging the pack
+  through `rompath.tmp`; `tools/rompath_reject.sh`), #138 opened, and #50's generator
+  refactor policy under STATE.md "Standing rulings".
+- **THE HARNESS'S F9 WEAKNESS IS A TICKET, NOT A CHANGE (maintainer, 2026-09-14):** *"yes,
+  write that small ticket but don't do it"* — BBH-frame-based #1.
+- **THE ORANGE P2 SWORD IS THE MEDALLION FIX'S ACCEPTED TRADE (maintainer, 2026-09-14):**
+  *"This is the compromise we made when fixing Pyron's medaillon on the wheel. Something
+  had to give and it was less jarring to alter the sword color than the medaillon."* The
+  trade was already recorded in `docs/project/patch_index.md` ("Pyron medallion / P2
+  sword row collision (14z-116)"); it is not a ticket.
+- **THE README (maintainer, 2026-09-14):** *"I'm ok with the commit. Let's finish working
+  on the other details of the README in the next session"* — the added sections
+  committed at the 14z-155 close; the readability proposals carried in
+  `docs/NEXT_SESSION.md`.
+- **THE 14z-155 CLOSE IS COMMITTED, NOT PUSHED (maintainer, 2026-09-14).** The close tier's one red was a
+  timing flake in `test_bbh_fidelity` F1, and the gate passed re-run alone. Offered three closes — fix it
+  now and push on a green re-run, push under a recorded exception, or commit without pushing — the
+  maintainer chose *"Commit, don't push"*: the bbh fix, a green close tier and the push open the next
+  session.
+
 ## Ruled 2026-09-14 (14z-154) — entered at ruling time, under the amended lifecycle
 
 - **THE STATIC TIER'S MUST-FIRE CONTROLS RUN AT THE SESSION CLOSE, NOT AT EVERY

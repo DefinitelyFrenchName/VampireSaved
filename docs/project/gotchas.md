@@ -4597,3 +4597,28 @@ perturbation where the input is wrong BY CONSTRUCTION** — here, under the titl
 in the session-group area that rolls — **never at a position whose meaning depends on
 the document's current order**, and after restructuring a document, run the gates whose
 controls perturb it.
+
+## A TEXT LINT MATCHES ITS BANNED PATTERN INSIDE A PRINTED MESSAGE — a new gate's own `ok` line naming `${VAR:?}` turned two gates red (paid: 14z-155)
+
+`tests/test_demand_after_trap.sh` bars a `${VAR:?}` demand after a script's EXIT trap with
+a plain text scan: heredoc bodies and comment lines are exempt, quoted strings are not.
+`tests/test_rompath_reject.sh` exercises exactly that quirk inside a heredoc (exempt,
+correctly), then reported its own result in an `ok "… \${VAR:?} …"` line after its trap,
+and the scan read the message as a demand. `test_bbh_fidelity` F9 went red on the same
+line, because its demand-after-trap pair compares the lineage side's `>/dev/null; echo
+checked` with the harness's hit list (BBH-frame-based #1). One strict tier spent. **In any
+line a lint scans, describe a banned construct in words** ("an unset-variable demand");
+never loosen the lint for a message.
+
+## A STRICT TIER STARTED INSIDE A BACKGROUND TASK DIES WITH THE TASK — the harness's low-memory kill takes `nohup … &!` children too (paid: 14z-155)
+
+On this Mac the Claude Code harness kills a background task "because the system is
+running low on memory". A tier started with `nohup … &!` INSIDE such a task, together with
+its PID waiter, died with it: the runner's EXIT trap deleted its work directory, every
+later gate printed `FAIL 0s (exit 1)` beside `No such file or directory: …/tmp.XXXX/<gate>.out`,
+and the log ended in a `FileNotFoundError` with no `GREEN`/`NOT GREEN` line — a run worth
+nothing, not a red to chase. **Start the tier from a FOREGROUND call** (`nohup … < /dev/null
+&!`, which returns at once; `ps -o ppid` then reads 1) **and wait on its PID from a
+SEPARATE task**, whose death then costs nothing; take the verdict from the log's own line.
+A watcher that leaves its loop when the PID dies must still print what was logged after
+its last poll, or a red run's last FAIL goes unreported (one did).

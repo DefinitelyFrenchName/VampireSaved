@@ -1,69 +1,71 @@
-# NEXT SESSION — orientation (rewritten at the 14z-154 CLOSE, 2026-09-14)
+# NEXT SESSION — orientation (rewritten at the 14z-155 CLOSE, 2026-09-14)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## AN OPEN LIST NOW HOLDS ONLY WHAT IS OPEN: EVERY BUG, COSMETIC ITEM AND EVOLUTION IS A TICKET, STATE.md IS 55 KB, AND THE STATIC TIER'S CONTROLS RUN AT THE CLOSE. NO SHIPPED ROM BYTE MOVED.
+## THE 74 AUDIT ROWS ARE ANSWERED, TWO TEST-INTEGRITY HARDENINGS ARE IN, AND THE README HAS ITS PLAY, REPORT AND READ-MORE SECTIONS — BUT THE CLOSE TIER WENT RED ON A HARNESS FLAKE AND NOTHING OF 14z-155 IS PUSHED. NO SHIPPED ROM BYTE MOVED.
 
 M18 (`merged-m18`, `build/m3b_merged26`) is still the current freeze and
 release. `git status -sb` says the push state.
 
-**THE NEW SHAPE:**
-
-- **Tickets** (CLAUDE.md [VSP-182]). The LIST is `docs/project/tickets.tsv` (its
-  header is the spec; `docs/project/tickets.md` is the rendered page), the STORY is
-  the GitHub issue, the FACTS are the subject docs. Every ticket answers four
-  questions locally — repro, decided, learned, wrong — and learned/wrong link LIVE
-  docs only. A new ticket: the issue first, then `python3 tools/tickets.py refresh`,
-  then its row. Gate `tests/test_tickets.sh`.
-- **STATE.md** (CLAUDE.md [VSP-17]). The newest session groups plus four standing
-  sections: Standing rulings (one line each, the entry in DECISIONS_HISTORY),
-  STANDING PRINCIPLE, Decisions pending (undecided items only), THE DEADNESS
-  REGISTER. THE LEDGER is at the head of STATE_HISTORY.md. Gate
-  `tests/test_state_open_lists.sh`.
-- **Commits.** Mid-session: `tests/run_all_static.sh --strict --exec-controls none`
-  (~20 min on a quiet Mac) plus `CONTROL=<name>` for each gate the commit adds or
-  changes. The close runs every control (~37 min). The readout prints `time: gates
-  … controls … wall …` when controls run.
-
 ## START HERE — what is open
 
-- **FIRST: BACKFILL THE 114 PRE-EXISTING TICKET ROWS** (maintainer, 2026-09-14).
-  `tests/expected/tickets_debt.txt` lists them; each needs its kind, status and the
-  four answers as resolving links or `none`. The 74 audit rows (#1-#74) are mostly
-  mechanical from `docs/project/audit_2026-08-15_dispositions.md`, whose links their
-  `decided` column already carries. The 40 others (#75-#114) need each thread read
-  against the tree: a ruling or a learning left only on GitHub is copied into its
-  proper local home with its origin and date, and whichever side is behind is
-  reconciled. An issue leaves the debt file in the commit that answers its row's
-  last `?`.
-- **Then #135, the VS-vs-VS2 tick cadence**: the archaeology and the agreed plan are
-  in the issue body.
-- **Every other open ticket** is on `docs/project/tickets.md` ("Open and parked"):
-  #115 Zabel j.LK · #116 capture-matrix widening · #117/#118 community cross-check ·
-  #119/#120 living docs · #121/#122 the dedicated Linux server · #123-#128 cosmetic ·
-  #129 tenant CPU AI · #130 bundle_win_dlls · #131 audit_mask_window_ff42a2 · #132
-  merged-m15 never packaged · #133 pull-queue re-measure · #134 LP whiff at contact.
+- **FIRST: THE 14z-155 CLOSE WAS NOT GREEN, AND NOTHING OF IT IS PUSHED** (maintainer, 2026-09-14:
+  *"Commit, don't push"*). Local `main` carries the three 14z-155 commits, the two README merges,
+  the README commit and the close commit. The one red, `test_bbh_fidelity` F1: both runners
+  order the `(costliest controls: …)` list by whole seconds per gate, and F1's `norm()` masks the
+  figures (`Ns`) but not the order they produce, so the list reorders whenever a synthetic control
+  crosses a second boundary in one run only (the gate re-run alone passed). Fix it in bbh
+  (`selftest/test_fidelity_vampire.sh`: mask the costliest-controls list in F1's comparison, with a
+  dated line in its `docs/rebaselines.md`; bbh selftest and fidelity green; push bbh), then run
+  `tests/run_all_static.sh --strict` again with every control, and push `main` on green.
+- **THEN: THE README'S REMAINING DETAILS** (maintainer, 2026-09-14: *"Let's finish
+  working on the other details of the README in the next session"*). The readability
+  proposals given at the 14z-155 close, none applied, for the maintainer to take or
+  leave one by one:
+  1. the thank-you line is a `###` heading: a paragraph, or a "Thanks" section at the end;
+  2. a short title (`# Vampire Saved`) plus a one-line subtitle;
+  3. the order: summary, Get it and play it, Status, Report a problem, the "about this
+     project" disclaimer, the docs map, Licence;
+  4. "Implementation specifics" split into how the three were brought in, known
+     limitations, and extras;
+  5. "shell" defined once in plain words, and the "HOWEVER !" bullet broken into sentences;
+  6. internal jargon out ("maintainer-ruled 2026-08-22", "CLAUDE.md rule 7", "not a gate");
+  7. one spelling of CPS-2; VS and VS2 spelled out once; Huitzil/Phobos named once;
+  8. "byte-for-byte" becomes "identical, within a few small measured tolerances";
+  9. typos: "would have borderline impossible", "officila", "a competitive-ready",
+     "forward of back", "Japan - 970519", missing full stops.
+  **And capture the README's MAME recording command as an emulator-tier gate.** The 14z-155
+  smoke test (record and playback exit 0 on the release macOS `cps2` with the M18 build)
+  was run by hand, and [VSP-18] does not let a check stay manual.
+- **ASK THE MAINTAINER: file the static runner's controls-ledger defect?** Seen 14z-155,
+  not filed. `vs_classify` (`tests/lib/classify.sh`) reads a gate's controls only on PASS,
+  and `tests/run_all_static.sh` then re-adds the PREVIOUS gate's counts for a failing gate:
+  `fired 175 / declared 175` on a NOT GREEN run whose headers give 172. Verdicts and green
+  runs are unaffected; the harness's `lib/sh/classify.sh` and `bin/bbh-run-static` carry the
+  same lines.
+- **THE BACKFILL, SECOND HALF: #75-#114** (40 rows in `tests/expected/tickets_debt.txt`).
+  The method is in commit `fcf8ff1a`'s message: each thread read to its closing comment and
+  checked at HEAD, sessions from the commits a thread cites, `learned`/`wrong` to live
+  documents only, the TSV written by a script and checked on a copy first.
+- **#135**, the VS-vs-VS2 tick cadence; **#136** (tenant move parity) waits behind it.
+- Every other open ticket is on `docs/project/tickets.md` ("Open and parked"), #138 among
+  them; the harness has BBH-frame-based #1.
 
 ## TRAPS PAID THIS SITTING
 
-1. **A hand-edited TSV row can lose a tab silently** — write rows with a script that
-   asserts the column count; the pass-2 dry run caught #117's.
-2. **A tier's wall clock measures the host** — another Claude session's 24 CPU
-   burners made a 20-minute run take 51. Read `ps` (parent, working directory) before
-   calling a slowdown ours, and never kill what is not ours.
-3. **Editing an anchored paragraph stales a generated skill guide**, in bbh as in
-   this tree: run `skill-guide --check` after any doc edit.
-4. **A citation by rule ID can point at the wrong rule for months** — six carriers
-   cite `[VSE-83]`, the attract-demo rule, for the tick cadence; #135 fixes them with
-   the fact.
-5. **A control that plants its perturbation at END OF FILE depends on the file's
-   layout** — the clean-up made THE DEADNESS REGISTER STATE.md's last section, and
-   `test_checkskills`' `state-anchor-outside` (which appended its anchor) died: the
-   anchor now sat inside an allowed section. The gate's in-gate control run caught
-   it in a mid-session tier. Plant where the input is wrong BY CONSTRUCTION.
+1. **A strict tier started inside a background task dies with it** — start it from a
+   foreground call and wait from a separate task (now a project gotcha).
+2. **A watcher must print what was logged after its last poll** — a red run's second FAIL
+   went unreported.
+3. **A text lint matches its banned pattern inside a printed message** — describe the
+   construct in words (now a project gotcha).
+4. **A dispositions TABLE is a snapshot** — 41 "open" rows had all been closed on GitHub
+   since; read each issue's closing comment.
+5. **"Recorded nowhere" is a claim about a search's scope** — the orange P2 sword is the
+   medallion fix's accepted trade in `docs/project/patch_index.md`, a file the search skipped.
 
 **IF A DOC IS TOUCHED:** the eight `--check`s plus `tools/check_state_lists.py` and
 `tools/tickets.py check`, exit statuses captured directly, `${=cmd}` in zsh. **A
