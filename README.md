@@ -49,6 +49,63 @@ But let's talk practical details:
 - 1P mode is playable until the end as it doesn't crash but has seen no real care, on purpose: the stages will bear the names of the shell characters; fighting Pyron, Donovan or Phobos may cause the map to jump forward of back in stages before and/or after; their AI is noticeably worse than the other characters
 - For fun: Oboro Bishamon has been made selectable by holding start while selecting Bishamon but his intro is so long you will only get control long after round start
 
+## Get it and play it
+
+**Current release: `merged-m18`**; the character-select screen shows the mark **M18**.
+https://github.com/DefinitelyFrenchName/VampireSaved/releases/tag/freeze/merged-m18
+
+No ROM data is distributed. You rebuild the romset from your own dumps with a
+small applier, which checks every byte before writing anything.
+
+1. **Download exactly one package.** Each is complete on its own.
+
+   | package | for |
+   |---|---|
+   | `merged-m18-fbneo-macos-arm64.zip`, `merged-m18-fbneo-windows-x86_64.zip` | FBNeo, ready to play (the patched emulator is included) |
+   | `merged-m18-mame-macos-arm64.zip`, `merged-m18-mame-windows-x86_64.zip` | MAME, ready to play (the patched emulator is included) |
+   | `merged-m18-fbneo-recipe.zip`, `merged-m18-mame-recipe.zip` | any other OS: the emulator patch and its build steps, so you build the emulator once |
+   | `merged-m18-mister.zip` | MiSTer: the `jtcps2w` core and its `.mra` files |
+
+2. **What you need:** Python 3.8 or newer, and your own unmodified dumps in one
+   folder, named exactly `vsavj.zip` (Vampire Savior, Japan 970519), `vsav.zip`
+   (Europe 970519) and `vsav2.zip` (Vampire Savior 2, Japan 970913).
+3. **Build the romset:**
+   `python3 apply_release.py --romdir /path/to/your/dumps --out ./rompath`
+   writes `rompath/vsavjw.zip`. A wrong or modified dump is refused by name.
+4. **Play:** start the set `vsavjw` in the patched FBNeo or MAME, with
+   `vsavjw.zip` and your pristine `vsav.zip` in its rom folder. On MiSTer,
+   follow the package's steps: the card also needs `vsavj.zip` and `qsound.zip`.
+   The boot screen reads VAMPIRE SAVED.
+
+A stock FBNeo or MAME cannot run it, and renaming the set to `vsavj.zip` is
+never the fix (on MAME it sits on the legal screen forever). The `README.md`
+inside every package has the full steps and the troubleshooting.
+
+## Report a problem
+
+Open an issue at https://github.com/DefinitelyFrenchName/VampireSaved/issues,
+and say which package you used and which mark the select screen shows.
+
+If you can make it happen again, **record it on MAME**. A recording lets the
+project replay your exact session, frame for frame. Create two empty folders,
+`nvram_fresh` and `recordings`, so the replay starts from the same state you
+did, then run the MAME from your package (`cps2`, or `cps2.exe` on Windows):
+
+    cps2 vsavjw -rompath "./rompath;/path/to/your/dumps" -nvram_directory ./nvram_fresh -input_directory ./recordings -record my_session.inp
+
+Play until the problem happens, quit, and attach `recordings/my_session.inp`
+to the issue.
+
+## Find your way around the project
+
+- `docs/README.md`: the map of the documentation, split into what is known about
+  the game, the CPS-2 platform and its emulators, and this port.
+- `HANDOFF.md`: how to build everything from source, run the tests and play a
+  development build.
+- `CLAUDE.md`: the rules every change follows (vanilla behaviour stays identical,
+  no ROM content, no untested change).
+- `docs/project/tickets.md`: every known bug, cosmetic item and planned
+  evolution, each with its GitHub issue.
 
 ## Licence
 
