@@ -82,9 +82,12 @@ is. Each line points to where it is tracked or explained — follow the link for
 - **Which rules they follow:** Vampire Savior's. Internally each new character is loaded into the slot
   of an existing one — its *shell* — so everything that is not specific to the character runs on
   Vampire Savior's engine: Dark Force costs one bar and brings Vampire Savior's background change.
-- **Timing:** they tick on Vampire Savior's engine clock, not Vampire Savior 2's, so a move can span a
-  different number of video frames than in Vampire Savior 2 while its hits and damage match
-  ([#114](https://github.com/DefinitelyFrenchName/VampireSaved/issues/114); the two clocks are being measured in [#135](https://github.com/DefinitelyFrenchName/VampireSaved/issues/135)).
+- **Timing:** they run at Vampire Savior's game speeds. At factory settings NORMAL is the same speed as
+  in Vampire Savior 2 and TURBO is one step slower, and Vampire Savior 2 starts player 1's speed menu on
+  TURBO where Vampire Savior starts it on NORMAL. Compared at the same speed and with the same random
+  draws, Donovan's Lightning Sword matches Vampire Savior 2 hit for hit and frame for frame
+  ([#135](https://github.com/DefinitelyFrenchName/VampireSaved/issues/135)); the rest of their moves are
+  being compared in [#136](https://github.com/DefinitelyFrenchName/VampireSaved/issues/136).
 
 ### Features and original behaviour you might take for bugs
 

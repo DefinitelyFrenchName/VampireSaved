@@ -15,13 +15,9 @@ release. `git status -sb` says the push state.
 - **#136 (tenant move parity) is unblocked.** Compare every leg at a pinned speed level (`RAM:$FF8116`)
   and a pinned RNG (`RAM:$FF80D4-D5`), proven from each leg's dump —
   `tests/test_don_immortal_native.sh` is the worked form. It also holds #109's clone-beam contact leg.
-- **ASK THE MAINTAINER: ticket `tests/lua/walker_sp.lua`'s stack read?** It still reads `A7 or SP`, the
-  supervisor stack on this core, and `tests/audit_walker_ghost.sh` / `tests/audit_walker_repoint.sh`
-  consume its ranges. The first question is measurable: do the walker sites run in user mode, and so
-  what did those audits' ranges measure (docs/platform/gotchas.md, the M68000 entry).
-- **FOR THE MAINTAINER'S README**: line 85 still says the tenants "tick on Vampire Savior's engine
-  clock, not Vampire Savior 2's" (the retracted claim; #135), and the at-a-glance table now reads
-  "Phobos (Huitzil outside Japan)" — Huitzil is the Japanese name.
+- **#143 — `tests/lua/walker_sp.lua` reads the supervisor stack**, and two walker audits consume its
+  ranges. Ruled 2026-09-16: solve it CAUTIOUSLY — measure which stack is live at the walker sites
+  before changing the instrument (the issue carries the order).
 - Every other open ticket is on `docs/project/tickets.md` ("Open and parked"), #138, #140 and #141
   among them; the harness has BBH-frame-based #1.
 
@@ -36,6 +32,9 @@ release. `git status -sb` says the push state.
    this game's user-mode code walks the idle stack, and inside a write tap a nil state dies silently.
 4. **Load the project's skills before rewriting a gate** — they carried three rule lines restating the
    claim being retracted.
+5. **A fact held from outside the tree is unmeasured, however sure it feels** — I told the maintainer
+   "Huitzil is the Japanese name" from memory; vsav2 (Japan) shows **Phobos** on its select screen and
+   HUD (captured 2026-09-16). The maintainer uses the Japanese names.
 
 **IF A DOC IS TOUCHED:** the eight `--check`s plus `tools/check_state_lists.py` and
 `tools/tickets.py check`, exit statuses captured directly, `${=cmd}` in zsh. **A

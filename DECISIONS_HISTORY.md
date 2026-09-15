@@ -27,6 +27,22 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-16 (14z-158b) — entered at ruling time, under the amended lifecycle
+
+- **#143 FILED, TO BE SOLVED CAUTIOUSLY (maintainer, 2026-09-16).** Asked whether
+  `tests/lua/walker_sp.lua`'s supervisor-stack read should become a ticket, the maintainer: *"yes
+  but we probably want to be cautious when solving it"*. Filed as #143, measure-first: which stack
+  is live at the walker sites, before any change to an instrument two audits consume.
+- **README.md's engine-clock line (maintainer, 2026-09-16):** *"I shall commit and let you retract
+  or correct the part on 'tick on Vampire Savior's engine clock'"* — the README stays the
+  maintainer's file; that one retracted claim (#135) is corrected after their commit.
+- **THE MEASUREMENT RULE, RE-WORDED (maintainer, 2026-09-16), amending 2026-09-15's "a measurable
+  question is measured":** *"'Measure don't ask' is strange wording because asking is not bad per
+  se. Assuming is wrong. Don't assume, measure first, ask if necessary. And yes, this applies first
+  and foremost to code measurements but if you can hallucinate the region of a name..."* Said after
+  the 14z-158 close report asserted, unmeasured, that "Huitzil is the Japanese name" (vsav2 shows
+  Phobos). The failure is ASSUMING; asking stays right when a measurement cannot settle the question.
+
 ## Ruled 2026-09-15 (14z-158) — entered at ruling time, under the amended lifecycle
 
 - **THE IMMORTAL GATE AT MATCHED PLAY MODES; #114's "LP ONE HIT SHORT" RETRACTED AS A MODE
