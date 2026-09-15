@@ -11,12 +11,15 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**143 tickets** — status: open 9 · parked 16 · done 108 · declined 3 · not-ours 2 · invalid 4 · duplicate 1 · kind: bug 112 · cosmetic 10 · evolution 21 · **backfill debt: 0 rows**.
+**146 tickets** — status: open 12 · parked 16 · done 108 · declined 3 · not-ours 2 · invalid 4 · duplicate 1 · kind: bug 115 · cosmetic 10 · evolution 21 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#146](https://github.com/DefinitelyFrenchName/VampireSaved/issues/146) | bug | open | The release packages' player READMEs are not complete or detailed enough (reported) | none | none | none | none | 14z-158 |
+| [#145](https://github.com/DefinitelyFrenchName/VampireSaved/issues/145) | bug | open | Windows: the release packages' prebuilt emulator binaries fail to load the game (reported, not yet reproduced) | none | none | none | none | 14z-158 |
+| [#144](https://github.com/DefinitelyFrenchName/VampireSaved/issues/144) | bug | open | macOS: the release packages' prebuilt emulator binaries cannot be executed — macOS blocks them (reported, not yet reproduced) | none | none | none | none | 14z-158 |
 | [#143](https://github.com/DefinitelyFrenchName/VampireSaved/issues/143) | bug | open | tests/lua/walker_sp.lua reads the supervisor stack on MAME 0.288 (no A7 state); two walker audits consume its ranges | `docs/platform/gotchas.md § MAME 0.288'S 68000 CORE HAS NO `A7` STATE` | `DECISIONS_HISTORY.md § #143 FILED, TO BE SOLVED CAUTIOUSLY` | `docs/platform/gotchas.md § tests/lua/walker_sp.lua` still reads` | none | 14z-158 |
 | [#141](https://github.com/DefinitelyFrenchName/VampireSaved/issues/141) | evolution | parked | The full FBNeo hacked-vs-vanilla legacy track — CLAUDE.md [VSP-24]'s deferral (the #78 residual) | `tests/test_fbneo_legacy_oracle.sh` | `DECISIONS_HISTORY.md § #78: the full FBNeo legacy track becomes its own ticket, #141` · `CLAUDE.md § parked as #141, to be reopened on a measured FBNeo-vs-MAME disagreement on` | `tests/test_fbneo_legacy_oracle.sh § SCOPE, STATED PLAINLY (maintainer-agreed 14z-92)` | none | 14z-157 |
 | [#140](https://github.com/DefinitelyFrenchName/VampireSaved/issues/140) | bug | open | The static runners' controls readout re-adds the previous gate's must-fire counts for every gate that does not PASS — fired/declared overstated on a red run | `docs/project/gotchas.md § THE STATIC TIER'S MUST-FIRE READOUT OVERSTATES` | none | `docs/project/gotchas.md § THE STATIC TIER'S MUST-FIRE READOUT OVERSTATES` | none | 14z-155,14z-156 |
