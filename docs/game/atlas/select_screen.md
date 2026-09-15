@@ -232,8 +232,12 @@ cells are LIVE, and the WIDE wheel authors live rows at `0x10`, `0x11` and
 `0x13` — so on a WIDE build `$45` can hold a tenant id and this override
 *can* commit one. The claim was never re-qualified when the wheel grew.
 Consequence, and it is a feature rather than a defect: **the hidden-pick
-path below reaches the tenants, while the random CYCLE cannot** (next
-section). Neither is gated or exercised by any replay. It remains true that
+path below reaches the tenants**~~, while the random CYCLE cannot~~ (next
+section). ~~Neither is gated or exercised by any replay.~~ **CORRECTED
+14z-156 — this sentence had kept the 14z-116 state: since 14z-117 the random
+draw lists the tenants too ("THE RANDOM CELL `0x0B`" below, gate
+`tests/test_random_select_tenants.sh`), and the copy path is exercised by
+replay `113_shadow_vs_tenant` under `tests/test_shadow_tenant.sh`.** It remains true that
 this is *not* the route by which vanilla reaches `0x18` (Oboro Bishamon),
 and that entry path remains unlocated. **(14z-105: vanilla's route stays
 unlocated; the PORT now reaches `0x18` through its own hook — see "The
