@@ -1,11 +1,11 @@
-# NEXT SESSION — orientation (rewritten at the 14z-156 CLOSE, 2026-09-15)
+# NEXT SESSION — orientation (rewritten at the 14z-157 CLOSE, 2026-09-15)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## THE BACKFILL IS COMPLETE (DEBT 0), THE F1 FLAKE IS FIXED, #140 IS FILED, AND #135 HAS ITS FIRST MEASUREMENT: VSAV2 DOUBLES ITS LOGIC PASS EVERY THIRD FRAME, VSAVJ EVERY FOURTH OR FIFTH. NO SHIPPED ROM BYTE MOVED.
+## EVERY ITEM THE #75-#114 THREADS LEFT IS RULED AND CARRIED (#141 FILED), THE STALE LIVE CLAIMS ARE CORRECTED, AND RAM:$FF8130's WRITERS ARE MEASURED. NO SHIPPED ROM BYTE MOVED.
 
 M18 (`merged-m18`, `build/m3b_merged26`) is still the current freeze and
 release. `git status -sb` says the push state.
@@ -25,24 +25,27 @@ release. `git status -sb` says the push state.
   4. then the one section with its rule anchor, every carrier corrected in the same commit
      ([VSE-84] and its skill line, the six `[VSE-83]` citations, "four characters",
      `test_don_immortal_native.sh`'s header).
-  **#136** (tenant move parity) waits behind it.
+  **#136** (tenant move parity) waits behind it; it now also holds #109's clone-beam contact leg (14z-157).
 - **THE README'S REMAINING DETAILS** — the maintainer takes them (*"I'll do item 2 later"*):
   the nine readability proposals of 14z-155, and capturing the README's MAME recording
   command as an emulator-tier gate ([VSP-18]).
 - Every other open ticket is on `docs/project/tickets.md` ("Open and parked"), #138 and #140
-  among them; the harness has BBH-frame-based #1.
+  among them, and #141 (the full FBNeo legacy track, parked since 14z-157); the harness has
+  BBH-frame-based #1.
 
 ## TRAPS PAID THIS SITTING
 
-1. **A selection made by wall-clock durations is not verdict text either** — masking the
-   figures left the picks and their order compared (bbh F1, fixed).
-2. **A search that finds nothing is not a result until a planted case has been found by it**
-   — the accumulator search's control never ran (no numpy here), and two sibling searches
-   were quoted with no plant at all; caught at the close check and re-run in plain python
-   with plants, all three still find nothing. And **MAME's "Average speed … (48 seconds)" is
-   EMULATED time** — a runtime read from it was ~10× too long.
-3. **An accumulator can pause** — a constant-step-on-every-frame test rejects one that stops
-   on zero-tick frames.
+1. **A retraction grep that matches a claim's WORDING misses its paraphrases** — `id_space.md`'s
+   "written ONLY here" and `ram.md`'s `$FF8114` "voice-class borrow pool" survived the first pass.
+   Grep the FACT's other names (the address, the old label) as well as the sentence.
+2. **A question a measurement can settle is measured, never asked** (maintainer, 2026-09-15; a
+   "Standing rulings" line). The `$FF8130` writer count took one decode and three taps.
+3. **Neither record of a field's writers was right**: a scan anchored on the displacement word
+   misses a write that carries an immediate word first, and a word tap read without its mask
+   reports the neighbour byte's writes.
+4. **Changing text on one side of a copy moves the other side's gate** — bbh F9 compares the
+   gate-index page prose — and **new atlas addresses move checkdocs_rom's denominator**; the
+   first strict tier went 152 / 0 / 2 on both.
 
 **IF A DOC IS TOUCHED:** the eight `--check`s plus `tools/check_state_lists.py` and
 `tools/tickets.py check`, exit statuses captured directly, `${=cmd}` in zsh. **A
