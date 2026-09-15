@@ -16,13 +16,13 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**332 scripts** — 79 ci_portable, 75 ci_static, 178 emulator-tier (run by name).
+**333 scripts** — 79 ci_portable, 75 ci_static, 179 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 14 | the suite runners and their own ground truth |
 | [docs](#docs) | 17 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 33 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 34 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 56 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
@@ -107,6 +107,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_null_build.sh` | test | ci_static | ROMDIR | M0 acceptance: the null-patch build reproduces vanilla vsavj bit-identically from reference inputs, deterministically. | M0 |
 | `tests/test_phasec_image.sh` | test | emulator | MAME | Phase C step 2: the program image grows, and the extension is genuinely READ. | 14z-59g |
 | `tests/test_phasec_spaces.sh` | test | ci_static | ROMDIR | the address-space refactor must not move a byte. | 14z-123 |
+| `tests/test_readme_recording.sh` | test | emulator | MAME, a build dir, ~50 s | the README's "record it on MAME" command, run as written on this host's release MAME against the current merged romset, records a session the project replays frame for frame: | 14z-158 |
 | `tests/test_release_asset_shape.sh` | test | ci_portable | — | EVERY PUBLISHED ASSET IS SELF-SUFFICIENT, and the two emulator routes never travel together. ROM-free, no emulator, ~10 s. | 14z-149 |
 | `tests/test_release_binaries.sh` | test | emulator | MAME, FBNeo, a build dir, ~2 min | the PREBUILT emulator binaries for THIS host under release/emulators/{fbneo,mame}/<os-arch>/ (the build resource every release's emulator/bin/<os-arch>/ is hash-verified from; maintainer-ruled 2026-09-11: | 2026-09-11 |
 | `tests/test_release_os_metadata.sh` | test | ci_portable | — | a file manager's folder metadata (`.DS_Store`) in a release tree is never shipped and never counted: the real uploader cuts no asset carrying one, and every release listing that can see a dotfile drops it through the one definition, tests/l… | 2026-09-14 |

@@ -74,6 +74,7 @@ declares	test_pcrel_escapes
 declares	test_pod_black_foot_palette
 declares	test_pyron_medallion_2p
 declares	test_random_select_tenants
+declares	test_readme_recording
 declares	test_reconcile_matcher
 declares	test_ref_rot_image_pick
 declares	test_rehit_ring

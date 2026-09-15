@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-348 entries (41 game / 103 platform / 204 project), counted from the buckets at generation.
+349 entries (41 game / 104 platform / 204 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 41 entries
 
@@ -66,7 +66,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - THE BOOT NAME SCREEN'S DISPLAY SCRIPT TAKES AN EVEN COLUMN — an odd one is a 68k ADDRESS ERROR that soft-boots the machine (paid: 14z-127)
 - THE ENGINE CLAMPS THE FIGHTERS TO 336 px APART — a wider position poke is pulled back the same frame, and a "whiff" leg for a travelling move does not exist (paid: 14z-146)
 
-## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 103 entries
+## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 104 entries
 
 - A MAME BREAKPOINT CONDITION THAT DOES NOT PARSE SETS NO BREAKPOINT — `l@` is not a size, and the probe reports a clean zero (paid: 14z-93, #92)
 - A 1-BYTE MEMORY TAP MISSES WORD ACCESSES ON THIS 16-BIT BUS — and reads as a clean, meaningless zero (paid: 14z-126b)
@@ -171,6 +171,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A MISSING `qmake6` SILENTLY DROPS `-std=c++20` FROM MAME'S LINUX OSD — a bare `-I` swallows the next word (paid: 2026-09-13, the first WSL2 MAME release build, dead minutes in on `char8_t`)
 - ON A LINUX BUILD HOST EVERY BUNDLED LIBRARY ALSO RESOLVES SYSTEM-WIDE — a "resolved under /usr/lib" self-containment check is blind there (paid: 2026-09-13, the release gate's absolute-reference control DEAD on its first Linux run)
 - A NATIVE WINDOWS PYTHON WRITES `\r\n` FOR EVERY `\n` IT PRINTS — reconfiguring one Python block of a gate leaves the others emitting CRLF (paid: 2026-09-13, one CR byte left in the Windows release gate's output after the first fix)
+- MAME READS THE USER'S OWN `mame.ini` EVEN UNDER `-homepath` — every harness leg inherits what that file sets (found 2026-09-15, 14z-158, gating the README's recording command; nothing paid)
 
 ## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 204 entries
 

@@ -26,9 +26,6 @@ release. `git status -sb` says the push state.
      ([VSE-84] and its skill line, the six `[VSE-83]` citations, "four characters",
      `test_don_immortal_native.sh`'s header).
   **#136** (tenant move parity) waits behind it; it now also holds #109's clone-beam contact leg (14z-157).
-- **THE README'S REMAINING DETAILS** — the maintainer takes them (*"I'll do item 2 later"*):
-  the nine readability proposals of 14z-155, and capturing the README's MAME recording
-  command as an emulator-tier gate ([VSP-18]).
 - Every other open ticket is on `docs/project/tickets.md` ("Open and parked"), #138 and #140
   among them, and #141 (the full FBNeo legacy track, parked since 14z-157); the harness has
   BBH-frame-based #1.

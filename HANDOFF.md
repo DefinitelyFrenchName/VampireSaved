@@ -25,7 +25,7 @@ a heading):
 | freeze a build | "Build registry" — the tag, the row, the re-point sweep; the skill `vampire-saved-port` D.4 is the ritual |
 | package a release | `tools/package_release_platforms.py` — "RELEASE PACKAGING"; the format is `docs/project/release_format.md` |
 | know where a release emulator build is KNOWN to work (exact OS, shell, toolchain, package versions) | `docs/project/build_environments.md` — every host where the build and its gate passed, and the conditions known to break a build |
-| report a crash, or reproduce one | RECORD IT FIRST: `WIDE_RECORD=<name> tools/run_wide.sh <build> mame` — "Running a CPS-2 WIDE build (playtest)" ([VSP-119], [VSP-20]) |
+| report a crash, or reproduce one | RECORD IT FIRST: `WIDE_RECORD=<name> tools/run_wide.sh <build> mame` — "Running a CPS-2 WIDE build (playtest)" ([VSP-119], [VSP-20]); a PLAYER records with the command in README.md "Report a problem", which `tests/test_readme_recording.sh` runs as written and plays back frame for frame |
 | rebuild the reference emulators | `tools/setup_fbneo.sh` / `tools/setup_mame.sh` — "CPS-2 WIDE" and "MAME from source"; `WIDE=0` builds the reference binary, and the order is not optional ([CPE-24]) |
 | run the MiSTer simulation lane | `tools/run_sim_jtcps2.sh` — "MiSTer — the jtcps2w core"; read `docs/project/mister_core.md` first |
 | regenerate a GENERATED index | `tools/gen_annotations.py` / `gen_gate_index.py` / `gen_gotchas_index.py` / `gen_skill_guide.py`, in the commit that changes what they index |

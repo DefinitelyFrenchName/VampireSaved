@@ -2560,3 +2560,21 @@ starts that prints verdict text needs the line (or its output through
 `tr -d '\r'`). `PYTHONIOENCODING` fixes the encoding and never the newline.
 macOS and Linux are unaffected, and the line is inert there (the macOS gate
 re-run identical, 0 CR).
+
+## MAME READS THE USER'S OWN `mame.ini` EVEN UNDER `-homepath` — every harness leg inherits what that file sets (found 2026-09-15, 14z-158, gating the README's recording command; nothing paid)
+
+Every MAME run's log opens with `Parsing …/Library/Application Support/mame/mame.ini`
+on this Mac, and a sandboxed `-homepath` does not stop it. Measured on both the
+release `cps2` and the source-built one, `cps2 -showconfig` against
+`cps2 -noreadconfig -showconfig`: the file sets `verbose 1` and a `rompath`
+naming the pre-rename `…/Vampire Saved/VampireSaved/build/donovan6/rompath`
+(the third differing line, `readconfig`, is the flag itself). Nothing measured
+depends on it today: every harness leg passes `-rompath`, which the command line
+wins (the 14z-158 scratch legs read the file and still loaded the set from the
+`-rompath` they passed), and `verbose` changes only the log. But whatever the
+file gains later — a `cheat`, a `bios`, a sound or video option that changes
+emulation — reaches every leg silently, and another host holds a different file.
+`-noreadconfig` removes it. `tests/test_readme_recording.sh` passes it; the
+harness wrappers (`tools/run_mame.sh`, `tools/run_inp_guarded.sh`) do not, and
+adding it there changes the INSTRUMENT, so it goes through
+`tests/test_mame_parity.sh` first ([MFI-24]).
