@@ -1,7 +1,9 @@
 #!/bin/sh
-# audit_tick_cadence.sh — on VANILLA content the two engines double their logic pass at different cadences: vsav2 every third frame, vsavj every fourth or fifth, both fighters on the same frames, both passes inside ONE activation of the game task; vsav2's tick site is vsavj's minus 0xDAC and is the live writer (GitHub #135, measured 14z-156).
+# audit_tick_cadence.sh — THE EXTRA LOGIC PASS IS DECIDED BY THE SPEED LEVEL, and on vanilla content each game's DEFAULT play mode sets a different one: vsav2 (TURBO, level 8) doubles its pass every third frame, vsavj (NORMAL, level 6) every fourth or fifth, both fighters on the same frames, both passes inside ONE activation of the game task; section C: the decider, the play mode, the stack chain through the game-task loop, and causal controls at matched levels (GitHub #135, measured 14z-156 and 14z-158).
 #
 # MUST-FIRE: perturbed-copy: twin-pc — vsav2's taps read with vsavj's tick and node-entry PCs must fail the live-twin assertion (no writes land there), so every count below is proven to rest on the PC map
+# MUST-FIRE: perturbed-copy: frame-counter-decider — section C's pass prediction computed from the FRAME counter $FF8080 instead of the PASS counter $FF8081 must fail the every-frame match, so the prediction is proven to rest on the counter the decider reads
+# MUST-FIRE: shadow-tool: supervisor-stack — section C's return-address chain read from the supervisor stack (the "SP" state, what tap_writes.lua's STACKLOG read before 14z-158) must fail to find the game-task loop, so the chain is proven to rest on the live user stack
 #
 # WHAT IT MEASURES (#135 steps 1-2 of the maintainer-agreed plan, 2026-09-14). The
 # vanilla Victor mirror of tests/test_don_immortal_native.sh section 4 (forced id
@@ -54,10 +56,33 @@
 #     — and whose carry frames match the double set with F1 >= 0.8 at d = -2..2): none;
 #     planted: a byte stepping +0x3B with a pause every 17th frame, and a word stepping
 #     +0x3B11, each found against its own carry set.
-# WHAT DECIDES THE SECOND PASS IS STILL NOT LOCATED (#135 stays open).
+# ~~WHAT DECIDES THE SECOND PASS IS STILL NOT LOCATED~~ — LOCATED 14z-158, section C.
+#
+# SECTION C — WHAT DECIDES IT, MEASURED 14z-158: THE SPEED LEVEL. The game task's loop
+# (vsavj PRG:0x008E0C, vs2 0x0075DA, the same code) counts passes in $FF8081 and, before
+# each pass, the decider (vsavj 0x008E32, vs2 0x007600) requests an extra pass in the same
+# activation when the turbo-pass flag $FF812D is set and bit (($FF8081 + 1) & 31) of the
+# level's 32-bit pattern (vsavj 0x008E6C, vs2 0x00763A) is 1. The level $FF8116 is written
+# at the play-mode menu after character select from a per-game table read through the data
+# view, and vsav2 sets P1's cursor to TURBO at character confirm where vsavj sets NORMAL.
+# Frozen:
+#   C1 static: the decider byte-identical in both games; the 16 patterns identical, bits set
+#      per level 0 1 2 3 4 6 6 7 8 9 10 11 12 13 16 16; the level table giving levels 0/6/7/8
+#      (vsavj) and 0/4/6/8 (vs2) for index 0..3; the cursor-default instructions
+#      (clr.b $7(a6) on vsavj, move.b #$1,$7(a6) on vs2).
+#   C2 on section B's dumps: $FF812D = 1 and $FF8116 = 8 (vs2) / 6 (vsavj) on all 201 frames;
+#      the decider predicts the pass-counter step on all 200 frames; every P2 double-tick frame
+#      (tap frame f is dump frame f+1) is a two-pass frame.
+#   C3 a STACKLOG tap on P2's node timer: every tick write returns through the game-task loop
+#      (vsavj 0x00941E and 0x008E26, vs2 0x007C1E and 0x0075F4) on the live USER stack.
+#   C4 the play-mode confirm: vs2 cursor 1, index 3, level 8; vsavj cursor 0, index 1, level 6.
+#   C5 causal, the RNG pinned on both games from frame 2400: level 8 on both (vsavj forced) and
+#      level 6 on both (vs2's cursor forced to NORMAL, the game writing 6 itself) tick on the
+#      same frames over 2560..2899; vsavj with $FF812D forced 0 has no double-tick frame.
+# THE CROSS-GAME DIFFERENCE SECTION A FREEZES IS THE PLAY MODE, NOT THE ENGINE ([VSE-84]).
 #
 # Usage: ROMDIR=... [MAME_BIN=<reference binary, default ~/.cache/vampire-saved/mame-ref/cps2>] tests/audit_tick_cadence.sh
-# Runtime: ~50 s (49 s measured solo at the 14z-156 close check: ten MAME legs at ~25x speed plus
+# Runtime: ~1.5 min (90 s measured 14z-158 with section C's 16 legs; 49 s before them, measured solo at the 14z-156 close check: ten MAME legs at ~25x speed plus
 # the section B searches; MAME's "Average speed ... (48 seconds)" is EMULATED time, and a
 # runtime once read from it came out ~10x too long), emulator tier.
 set -eu
@@ -97,6 +122,41 @@ for g in vsav2 vsavj; do
     nd="$(ls "$W/dump_$g"/dump_*_ff0000.bin 2>/dev/null | wc -l | tr -d ' ')"
     [ "$nd" = 201 ] || { echo "FAIL: leg $g/dumps wrote $nd of 201 work-RAM dumps (see its MAME output)"; tail -3 "$W/dump_$g/mame.out"; exit 1; }
 done
+
+# ---- SECTION C's legs (14z-158): the decider's static facts need both decrypted
+# views; the stack chain, the play-mode writes and the causal pairs are taps on the
+# same Victor mirror. The causal pairs pin the RNG ($FF80D4-D5) on both games, which
+# otherwise pick the fighters' update order differently ([VSE-84]).
+. "$REPO/tests/lib/decrypt_cache.sh"
+decrypt_view vsavj "$W/vsavj_op.bin" "$W/vsavj_dat.bin" || { echo "FAIL: vsavj decrypt view"; exit 1; }
+decrypt_view vsav2 "$W/vsav2_op.bin" "$W/vsav2_dat.bin" || { echo "FAIL: vsav2 decrypt view"; exit 1; }
+seq_pokes() { python3 -c "import sys; a, b, s = sys.argv[1:4]; print(';'.join(f'{f}:{s}' for f in range(int(a), int(b))))" "$1" "$2" "$3"; }
+cleg() {  # cleg <name> <set> <tap> <frames> <window> <pokes> [VAR=value ...]
+    _n="$1"; _g="$2"; _t="$3"; _fr="$4"; _wi="$5"; _pk="$6"; shift 6
+    env "$@" MAME_BIN="$BIN" MAME_SANDBOX="$W/sbc_$_n" MAME_ROMPATH="$ROMDIR" \
+        REPLAY="$W/van.rpl" POKES="$_pk" TAP="$_t" WINDOW="$_wi" FRAMES="$_fr" TRACE_OUT="$W/$_n.tap" \
+        tools/run_mame.sh "$_g" -autoboot_script "$REPO/tests/lua/tap_writes.lua" > "$W/$_n.out" 2>&1 || true
+    rm -rf "$W/sbc_$_n"
+    grep -q "^END $_fr " "$W/$_n.tap" 2>/dev/null \
+        || { echo "FAIL: section C leg $_n did not reach frame $_fr (see its MAME output)"; tail -3 "$W/$_n.out"; exit 1; }
+}
+RNG="$(seq_pokes 2400 2901 ff80d4:0000)"
+L8="$(seq_pokes 2000 2901 ff8116:08)"
+CUR0="$(seq_pokes 1900 1960 ff8407:00)"
+OFF="$(seq_pokes 2400 2901 ff812d:00)"
+for g in vsav2 vsavj; do
+    cleg "${g}_stk"   "$g" ff8820,4 2760 2560,2760 "$VPOKE" STACKLOG=1 STACKLOG_DEPTH=8
+    cleg "${g}_lvl"   "$g" ff8116,2 2000 800,2000  "$VPOKE" REGLOG=1
+    cleg "${g}_cur"   "$g" ff8406,2 1965 1200,1965 "$VPOKE"
+    cleg "c8_${g}_p1" "$g" ff841c,8 2900 2300,2900 "$VPOKE;$L8;$RNG"
+    cleg "c8_${g}_p2" "$g" ff881c,8 2900 2300,2900 "$VPOKE;$L8;$RNG"
+done
+cleg c6_vsav2_p1  vsav2 ff841c,8 2900 2300,2900 "$VPOKE;$CUR0;$RNG"
+cleg c6_vsav2_p2  vsav2 ff881c,8 2900 2300,2900 "$VPOKE;$CUR0;$RNG"
+cleg c6_vsav2_lvl vsav2 ff8116,2 2000 800,2000  "$VPOKE;$CUR0" REGLOG=1
+cleg c6_vsavj_p1  vsavj ff841c,8 2900 2300,2900 "$VPOKE;$RNG"
+cleg c6_vsavj_p2  vsavj ff881c,8 2900 2300,2900 "$VPOKE;$RNG"
+cleg off_vsavj_p2 vsavj ff881c,8 2900 2300,2900 "$VPOKE;$OFF"
 
 python3 - "$W" "$MODE" <<'PY'
 import os, sys
@@ -176,7 +236,7 @@ def analyse(pcmap, quiet=False):
              f"{g}: on all {len(d2)} double-tick frames each game-task slot ran at most once — both passes in one activation")
         if not quiet:
             print(f"       {g}: passes per frame over 2300..2900 = {tot2 / len(W):.3f} (P2), {len(d2)} doubles")
-    need(FROZEN["vsav2"]["d2"] > FROZEN["vsavj"]["d2"], "vsav2 doubles more often than vsavj (the cross-game difference itself)")
+    need(FROZEN["vsav2"]["d2"] > FROZEN["vsavj"]["d2"], "vsav2 doubles more often than vsavj (each game's DEFAULT play mode: vs2 TURBO level 8, vsavj NORMAL level 6 — section C)")
     return fails
 
 # ---------------------------------------------------------------- section B
@@ -295,10 +355,135 @@ if MODE == "":
     else:
         print("CONTROL DEAD: twin-pc — vsav2's taps read with vsavj's PCs did not fail the live-twin assertion")
         sys.exit(1)
+# ---------------------------------------------------------------- section C (14z-158)
+C_GAME = {
+    "vsavj": dict(decider=0x008E32, table=0x008E6C, tbl=0x00A7F0, cursor_pc=0x020D38, cursor_words="422e0007",
+                  level_pc="020df2", cursor_writer="020d38", loop=(0x00941E, 0x008E26),
+                  level=6, cursor=0, index=1, levels=[0, 6, 7, 8]),
+    "vsav2": dict(decider=0x007600, table=0x00763A, tbl=0x009030, cursor_pc=0x01F98C, cursor_words="1d7c00010007",
+                  level_pc="01fa48", cursor_writer="01f98c", loop=(0x007C1E, 0x0075F4),
+                  level=8, cursor=1, index=3, levels=[0, 4, 6, 8]),
+}
+BITS = [0, 1, 2, 3, 4, 6, 6, 7, 8, 9, 10, 11, 12, 13, 16, 16]
+
+def section_c(mode):
+    fails = []
+    def need(cond, msg):
+        print(("  ok   " if cond else "  FAIL ") + msg)
+        if not cond: fails.append(msg)
+    V = {g: {k: open(f"{work}/{g}_{k}.bin", "rb").read() for k in ("op", "dat")} for g in C_GAME}
+    # C1 — static, the decrypted views
+    j, v = C_GAME["vsavj"], C_GAME["vsav2"]
+    need(V["vsavj"]["op"][j["decider"]:j["table"]] == V["vsav2"]["op"][v["decider"]:v["table"]],
+         f"the pass decider is byte-identical in both games (opcode view, {j['table'] - j['decider']} bytes)")
+    pats = {g: [int.from_bytes(V[g]["op"][C_GAME[g]["table"] + 4 * k:C_GAME[g]["table"] + 4 * k + 4], "big")
+                for k in range(16)] for g in C_GAME}
+    need(pats["vsavj"] == pats["vsav2"] and [bin(x).count("1") for x in pats["vsavj"]] == BITS,
+         f"the 16 speed-level patterns are identical in both games, bits set per level {BITS}")
+    for g, c in C_GAME.items():
+        lv = list(V[g]["dat"][c["tbl"]:c["tbl"] + 4])
+        need(lv == c["levels"], f"{g}: the play-mode level table (data view) gives levels {lv} for index 0..3 (frozen {c['levels']})")
+        w = V[g]["op"][c["cursor_pc"]:c["cursor_pc"] + len(c["cursor_words"]) // 2].hex()
+        need(w == c["cursor_words"], f"{g}: the cursor default at character confirm is {w} (frozen {c['cursor_words']}, cursor {c['cursor']})")
+    # C2 — section B's dumps: the decider predicts every frame
+    for g, c in C_GAME.items():
+        fs = list(range(2560, 2761))
+        D = {f: open(f"{work}/dump_{g}/dump_{f}_ff0000.bin", "rb").read() for f in fs}
+        need(all(D[f][0x812D] == 1 and D[f][0x8116] == c["level"] for f in fs),
+             f"{g}: turbo-pass flag $FF812D = 1 and speed level $FF8116 = {c['level']} on all 201 dumped frames")
+        def mism(counter_off):
+            out = []
+            for f in fs[1:]:
+                step = (D[f][0x8081] - D[f - 1][0x8081]) & 0xFF
+                lvl = D[f - 1][0x8116] & 0xF
+                pred = 2 if D[f - 1][0x812D] and (pats[g][lvl] >> ((D[f - 1][counter_off] + 1) & 31)) & 1 else 1
+                if pred != step: out.append(f)
+            return out
+        off = 0x8080 if mode == "frame-counter-decider" else 0x8081
+        bad = mism(off)
+        need(bad == [], f"{g}: the decider (bit (($FF{off:04X} + 1) & 31) of the level's pattern) predicts the pass count of all 200 frames 2561..2760 (mismatches {bad[:6]})")
+        if mode == "":
+            ctl = mism(0x8080)
+            if ctl:
+                print(f"CONTROL FIRED: frame-counter-decider — {g}: predicted from the frame counter $FF8080, {len(ctl)} of 200 frames mismatch")
+            else:
+                print(f"CONTROL DEAD: frame-counter-decider — {g}: the frame counter predicts as well as the pass counter"); fails.append("frame-counter-decider dead")
+        t = ticks(g, LIVE[g])["p2"]
+        dt = {f + 1 for f in range(2560, 2760) if t[f] >= 2}
+        tp = {f for f in fs[1:] if (D[f][0x8081] - D[f - 1][0x8081]) & 0xFF == 2}
+        need(len(dt) > 0 and dt <= tp,
+             f"{g}: every one of P2's {len(dt)} double-tick frames (tap frame f = dump frame f+1) is a two-pass frame ({len(tp)} two-pass frames)")
+    # C3 — the stack chain through the game-task loop
+    for g, c in C_GAME.items():
+        def chain(which):
+            n = bad = 0
+            for l in open(f"{work}/{g}_stk.tap"):
+                if not l.startswith("frame"): continue
+                t = l.split()
+                if t[3] != LIVE[g]["tick"] or int(t[5], 16) != 0xFF8820 or "sstack" not in t: continue
+                i, k = t.index("stack"), t.index("sstack")
+                vals = [int(x, 16) & 0xFFFFFF for x in (t[i + 1:k] if which == "stack" else t[k + 1:])]
+                n += 1
+                if not all(r in vals for r in c["loop"]): bad += 1
+            return n, bad
+        which = "sstack" if mode == "supervisor-stack" else "stack"
+        n, bad = chain(which)
+        need(n > 0 and bad == 0,
+             f"{g}: all {n} P2 tick writes return through the game-task loop ({', '.join('%06X' % r for r in c['loop'])}) on the {'supervisor' if which == 'sstack' else 'live user'} stack ({bad} do not)")
+        if mode == "":
+            cn, cb = chain("sstack")
+            if cn > 0 and cb == cn:
+                print(f"CONTROL FIRED: supervisor-stack — {g}: read from the supervisor stack, none of the {cn} tick writes shows the loop")
+            else:
+                print(f"CONTROL DEAD: supervisor-stack — {g}: the supervisor stack shows the loop on {cn - cb} of {cn}"); fails.append("supervisor-stack dead")
+    # C4 — the play mode
+    def reg_line(path, pc):
+        for l in open(path):
+            if l.startswith("frame"):
+                t = l.split()
+                if t[3] == pc:
+                    return t, dict(x.split("=") for x in t if "=" in x)
+        return None, None
+    for g, c in C_GAME.items():
+        t, r = reg_line(f"{work}/{g}_lvl.tap", c["level_pc"])
+        got = (int(t[7], 16) >> 8) & 0xFF if t else None
+        need(t is not None and got == c["level"] and int(r["D0"], 16) == 2 * c["cursor"] and int(r["D1"], 16) == c["index"],
+             f"{g}: at the play-mode confirm ({c['level_pc']}) the level written is {got}, cursor {int(r['D0'], 16) // 2 if r else None}, index {int(r['D1'], 16) if r else None} (frozen level {c['level']}, cursor {c['cursor']}, index {c['index']})")
+        cur = [l.split() for l in open(f"{work}/{g}_cur.tap") if l.startswith("frame")]
+        cw = [int(x[7], 16) & 0xFF for x in cur if x[3] == c["cursor_writer"] and int(x[9], 16) == 0xFF]
+        need(cw == [c["cursor"]], f"{g}: P1's play-mode cursor is set to {cw} at character confirm by {c['cursor_writer']} (frozen [{c['cursor']}])")
+    # C5 — causal, the RNG pinned on both games
+    def dist(name, g, base):
+        cnt = Counter()
+        for l in open(f"{work}/{name}.tap"):
+            if l.startswith("frame"):
+                t = l.split()
+                if t[3] == LIVE[g]["tick"] and int(t[5], 16) == base: cnt[int(t[1])] += 1
+        W = range(2560, 2900)
+        return sum(cnt[f] for f in W), frozenset(f for f in W if cnt[f] >= 2)
+    doubles = {}
+    for L in (8, 6):
+        for who, base in (("p1", 0xFF8420), ("p2", 0xFF8820)):
+            a, b = dist(f"c{L}_vsavj_{who}", "vsavj", base), dist(f"c{L}_vsav2_{who}", "vsav2", base)
+            doubles[(L, who)] = len(a[1])
+            need(a[0] > 0 and a == b,
+                 f"level {L}, RNG pinned: {who} ticks {a[0]} times with {len(a[1])} double-tick frames on vsavj, {b[0]} with {len(b[1])} on vsav2 — the same frames")
+    t, r = reg_line(f"{work}/c6_vsav2_lvl.tap", C_GAME["vsav2"]["level_pc"])
+    got = (int(t[7], 16) >> 8) & 0xFF if t else None
+    need(got == 6 and r is not None and int(r["D0"], 16) == 0,
+         f"vsav2 with P1's cursor forced to NORMAL writes level {got} itself at the confirm")
+    need(doubles[(8, "p2")] > doubles[(6, "p2")],
+         f"the level is live: P2 has {doubles[(8, 'p2')]} double-tick frames at level 8 and {doubles[(6, 'p2')]} at level 6")
+    o = dist("off_vsavj_p2", "vsavj", 0xFF8820)
+    need(o[0] > 0 and len(o[1]) == 0, f"vsavj with the turbo-pass flag forced 0: P2 ticks {o[0]} times with {len(o[1])} double-tick frames")
+    return fails
+
 if not fails:
     fails += section_b()
+if not fails:
+    fails += section_c(MODE)
 if fails:
     print(f"FAIL: audit_tick_cadence — {len(fails)} assertion(s) failed")
     sys.exit(1)
-print("PASS: audit_tick_cadence — vsav2 doubles every third frame, vsavj every fourth or fifth, globally and inside one activation; the tick twin is live; neither the frame counter, a single $FF8000-$FF83FF bit or value, nor a work-RAM accumulator decides it (each search found its plant)")
+print("PASS: audit_tick_cadence — at each game's default play mode vsav2 (TURBO, level 8) doubles every third frame and vsavj (NORMAL, level 6) every fourth or fifth, globally and inside one activation; the tick twin is live; the three searches find no simpler decider; the speed-level decider predicts every frame, the play mode and the stack chain are as frozen, and at matched levels with the RNG pinned the two games tick on the same frames")
 PY

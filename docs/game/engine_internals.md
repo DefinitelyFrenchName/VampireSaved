@@ -566,8 +566,58 @@ Mashing extends the loop, and the extension is MULTI-LEVEL by mash rate — not
 measured cleanly (see the gate's header). [M:
 `tests/test_don_immortal_native.sh` §1, native measured in-run; 14z-127]
 
-**THE TWO ENGINES DO NOT TICK AT THE SAME VIDEO-FRAME RATE, and it is not a
-per-character fact.** vsavj runs fewer engine double-ticks per video frame
+**THE PLAY MODE DECIDES THE EXTRA LOGIC PASSES — at the same speed level the two games tick
+alike; they differ in their DEFAULT play mode (measured 14z-158, #135).** The game task (vsavj
+`PRG:0x008E0C..0x008E30`, vs2 `0x0075DA..0x0075FE`, the same code) loops forever: `addq.b
+#1,$81(a5)` (the PASS counter `RAM:$FF8081`), the pass decider (`$8E32`), one logic pass
+(`$8F3C`), then `$8EB2`, which sleeps one frame (`jmp $1416`, trap #3) unless `RAM:$FF8118` is
+set — then the next pass runs in the same activation, marked `RAM:$FF8134` = `$FF`. The decider
+sets `$FF8118` when the turbo-pass flag `RAM:$FF812D` is set (from the round's start) and bit
+(`$FF8081` & 31) of the 32-bit pattern `PAT[$FF8116 & 15]` is 1. The table is the same in both
+games (vsavj `PRG:0x008E6C`, vs2 `0x00763A`, read PC-relative, so the opcode view; levels 0..15
+set 0, 1, 2, 3, 4, 6, 6, 7, 8, 9, 10, 11, 12, 13, 16, 16 bits of 32). The speed level
+`RAM:$FF8116` is written at the play-mode menu that follows character select (P1: NORMAL /
+TURBO / AUTO / AUTO&TURBO; the cursor is the player block's `+0x07`, a (turbo, auto) bit pair):
+`TBL[turbo + adjustment]`, the adjustment +0 / +1 / +2 for the speed setting `RAM:$FF80A3` = 4 /
+5 / anything else (config entry `$13`, copied at boot by `PRG:0x001A92`), `TBL` a byte table read
+through `(a0,d1.w)`, so the DATA view (vsavj `PRG:0x00A7F0`, vs2 `0x009030`): index 0..3 give
+levels 0, 6, 7, 8 on vsavj and 0, 4, 6, 8 on vs2. Factory settings: vsavj `$FF80A3` = 5, vs2 6. So **NORMAL is level 6 on both
+games; TURBO is level 7 on vsavj and 8 on vs2.** And **the DEFAULT differs**: at character
+confirm vsavj sets P1's cursor to NORMAL (`PRG:0x020D38`, `clr.b $7(a6)`), vsav2 to TURBO
+(`PRG:0x01F98C`, `move.b #$1,$7(a6)`) — a replay that never touches the menu plays vsavj at level
+6 and vsav2 at level 8. MEASURED on the vanilla Victor mirror, reference MAME: the decider
+predicts the pass count of all 220 frames 2541..2760 on both games; vsavj with the level forced
+to 8 ticks exactly as vs2 (P1 130/63, P2 134/65 single/double-tick frames), vs2 with P1's cursor
+forced to NORMAL writes level 6 itself and ticks exactly as vsavj (149/43, 153/45); turbo forced
+off leaves no double tick; and at matched levels the hit-freeze `+0x5C` = 11 drains in the same
+number of frames on both games (10 at level 6, 9 at level 8). **Consequence for cross-game work:
+compare at a MATCHED speed level AND a PINNED RNG** (the next paragraph; both ruled 2026-09-15 for
+the #114 gate) — a duration in video frames is then comparable between the siblings; at each
+game's default it is not. [M: `tests/audit_tick_cadence.sh` section C;
+`tests/test_don_immortal_native.sh` §0 and §4; 14z-158]
+
+**THE RNG PICKS WHICH FIGHTER UPDATES FIRST ON EVERY PASS — and the two games' RNG states differ,
+so a cross-game comparison must pin it (measured 14z-158, #142).** The object loop (vsavj
+`PRG:0x02207E`, vs2 `0x020A2E`, the same code) calls the engine RNG (vsavj `PRG:0x014E8A`, vs2
+`0x01357E`, the same routine over `RAM:$FF80D4-D5`) and updates P1 then P2 when its bit 0 is
+clear, P2 then P1 when it is set — each call the whole player update, its timer reducer included.
+On every frame 2540..2700 of the three measured pairings (MP no-mash native against ours at
+levels 6 and 8, and the vanilla Victor mirror on vsav2 against vsavj) the RNG state differs
+between the games; vsavj's first MB holds 225 `jsr` long calls to the routine, vs2's 258. The
+order decides whether a freeze set in one fighter's update is decremented in the other's within
+the same pass: on Donovan's 421+MP with no mash at level 6, the pass after the fourth hit ran in
+opposite orders on the two legs (native set the attacker's `+0x5C` = 4 before its reducer ran,
+ours after), ours' attacker stayed frozen one pass longer, and a fifth hit landed that native's
+did not. With `$FF80D4-D5` poked to `0000` on every frame of both legs, all 16 legs of that move
+(four strengths, no mash and at the ceiling, levels 6 and 8) are identical in hit count, damage
+and every hit frame. **The counts themselves follow the RNG path** (HP with no mash: 6 hits on
+each game's own draws, 7 pinned), so a frozen count holds only under the pin it was measured
+with. [M: `tests/test_don_immortal_native.sh` §0-§5 and its `unpinned-rng` control; 14z-158]
+
+~~**THE TWO ENGINES DO NOT TICK AT THE SAME VIDEO-FRAME RATE, and it is not a
+per-character fact.**~~ **RETRACTED 14z-158 (#135) — it measured the PLAY MODE (vs2's default
+TURBO against vsavj's NORMAL), not the engine; the paragraph above replaces it. Kept verbatim:**
+vsavj runs fewer engine double-ticks per video frame
 than vsav2 does, so the same countdown drains in more frames on vsavj:
 measured on **vanilla Victor, Demitri, Morrigan and Bishamon** mirrors (forced
 picks, identical inputs, the same scenario on both games), the hit-freeze
@@ -578,8 +628,10 @@ TICKS are. Same family as "THE ENGINE RUNS TWO TICKS IN ONE VIDEO FRAME"
 (`gotchas.md`) and the reason `tools/tick_durations.py` exists. [M:
 `tests/test_don_immortal_native.sh` §4, frozen at +1 frame; 14z-127]
 
-**MEASURED ON THE TICK INSTRUMENT, 14z-156 — #135 IN PROGRESS; the paragraph above is under
-re-examination there (its "four characters" is one Victor mirror in the gate it cites).**
+**MEASURED ON THE TICK INSTRUMENT, 14z-156 — and what it measured was vs2 at its DEFAULT play mode
+(TURBO, speed level 8) against vsavj at NORMAL (level 6): the cadences below are the two LEVELS'
+patterns, not two engines' (14z-158, the play-mode paragraph at the head of this section). Its
+"four characters" was one Victor mirror in the gate it cites.**
 Write taps on both fighters' `+0x1C..+0x23`, P2's `+0x5C` and the task table over the vanilla
 Victor mirror of that gate's §4, frames 2300-2900, reference MAME, both games:
 - **vs2's tick site is vsavj's minus `0xDAC`.** vsavj ticks at `PRG:0x027F70` (`532E 0020`,
@@ -601,8 +653,11 @@ Victor mirror of that gate's §4, frames 2300-2900, reference MAME, both games:
   `PRG:0x0231D0` over 2629-2637, vsavj `PRG:0x0245AE` over 2630-2638); the "9 vs 10" above counts
   frames with `+0x5C > 0` in per-frame dumps from the hit — a different measure, whose extra
   frame is where the first drain lands after the hit.
-- **What decides the second pass is NOT located — but three candidates are RULED OUT, each
-  search having first found a case planted in the same dumps** (per-frame dumps of all work RAM,
+- ~~**What decides the second pass is NOT located**~~ **LOCATED 14z-158: the speed level, the
+  play-mode paragraph at the head of this section.** The three searches below ran first and their
+  negatives stand — and they could not have found it: the decider combines a table, the level
+  byte and the PASS counter `RAM:$FF8081`, not the frame counter, one bit, or an accumulator.
+  **Three candidates RULED OUT, each search having first found a case planted in the same dumps** (per-frame dumps of all work RAM,
   frames 2560-2760, aligned by `RAM:$FF8080` stepping +1 between every pair): no modulus 2..64 of
   the frame counter `RAM:$FF8080` separates the double-tick frames from the single ones (a modulus
   near the 201-frame window is trivially pure and says nothing); no single bit or exact value of
@@ -621,8 +676,10 @@ correct in terms of ticks, although both VS and VS2 engine have slightly differe
 values for it so both may be marginally different in milliseconds."* So it was a PERCEPTION:
 the shell character's movement speed (before the alias-physics port, `patch_notes.md` 14z-66)
 and the broken GFX (STATE_HISTORY 14z-73) over a duration that is correct in ticks; the
-millisecond remainder is this paragraph's host-clock difference. A playtest verdict, not a
-measurement. [maintainer, 2026-09-14]
+millisecond remainder is this paragraph's host-clock difference *(CORRECTED 14z-158, #135: at a
+matched play mode there is no host-clock difference — any remainder between the two games is
+their default play modes or their RNG draws, [VSE-84]; the maintainer's verdict above is quoted
+as given)*. A playtest verdict, not a measurement. [maintainer, 2026-09-14]
 
 **THE MASH EXTENSION OF 421+P, AND WHAT GATES IT (measured 14z-127).** Mashing
 during the Lightning Sword extends its node loop. The mechanism, read off the

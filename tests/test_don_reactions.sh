@@ -27,7 +27,11 @@
 #     input ceiling MP/HP/ES equal native and LP is one hit short, ruled.
 #     (Until 14z-157 this line said neither gate covered mashing, because
 #     the rig's fixed absolute press frames land at different phases of the
-#     move on the two legs.)
+#     move on the two legs.) CORRECTED 14z-158 (#135, #142): those numbers
+#     compared native at vsav2's default TURBO play mode with ours at NORMAL,
+#     each on its own RNG draws, and "LP one hit short" was that mode. That
+#     gate now pins the speed level and the RNG on both legs, and every
+#     strength equals native, hit frames included (its header).
 #   * SO THE HARDCODED `native == 10` BELOW IS NOW MEASURED AND CORRECT. It
 #     did enter this file as testimony (STATE 14z-42c) and that criticism was
 #     fair; the number it asserted turned out to be right.
@@ -39,7 +43,11 @@
 #     421+HP. This gate was never affected -- it runs `vsavj` against a STOCK
 #     build (the battery passes its own outbase), which is the track replay 48
 #     is authored for. See `don/114_don_immortal_wide.rpl` for the WIDE twin.
-#   * THE FRAME-CADENCE DIFFERENCE IS THE HOST ENGINE'S, NOT THE PORT'S
+#   * RETRACTED 14z-158 (#135): the bullet below measured the PLAY MODE, not
+#     the engine — vsav2 defaults P1 to TURBO (speed level 8), vsavj to NORMAL
+#     (6), and at a matched level the vanilla freeze drains in the same frames
+#     on both games (docs/game/engine_internals.md). Kept verbatim:
+#   * ~~THE FRAME-CADENCE DIFFERENCE IS THE HOST ENGINE'S, NOT THE PORT'S~~
 #     (measured 14z-127). Our deity ticks run ~1 video frame slower per ~11
 #     engine ticks than native's. Controlled on VANILLA content -- Victor,
 #     Demitri, Morrigan and Bishamon mirrors, forced picks, identical inputs:

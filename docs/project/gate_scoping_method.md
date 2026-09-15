@@ -70,9 +70,12 @@ sampled frame, which is what actually says "the same thing happened".
 Split the assertion from the observation along the axis the project has
 already ruled on: STRUCTURE is asserted (which states, in which order; damage
 amount and the state it lands in), TIMING is reported (dwell, frame numbers,
-the ours/native ratio). On this engine the host runs ~9% slower than VS2 per
-[VSE-83]/#114, so any frame-indexed assertion is a trap and any frame-indexed
-*measurement* is a free confirmation of that rate.
+the ours/native ratio). ~~On this engine the host runs ~9% slower than VS2 per
+[VSE-83]/#114~~ CORRECTED 14z-158 (#135, #142): the two legs run different default
+play modes (native vsav2 TURBO, ours NORMAL) and different RNG draws, so unless both
+the speed level and the RNG are pinned ([VSE-84]) any frame-indexed assertion is a
+trap and any frame-indexed *measurement* reports the two modes' rates, not the
+engines'.
 
 ## 4. Prove the rig produced the event — every leg, every run
 

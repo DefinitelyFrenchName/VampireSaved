@@ -27,6 +27,45 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-15 (14z-158) — entered at ruling time, under the amended lifecycle
+
+- **THE IMMORTAL GATE AT MATCHED PLAY MODES; #114's "LP ONE HIT SHORT" RETRACTED AS A MODE
+  ARTIFACT (maintainer, 2026-09-15).** #135 measured that vsav2 hard-codes P1's play-mode
+  default to TURBO at character confirm (`PRG:0x01F98C`, `move.b #$1,$7(a6)`) where vsavj
+  defaults to NORMAL (`PRG:0x020D38`, `clr.b $7(a6)`), and that the play mode sets the speed
+  level `RAM:$FF8116`, which alone decides the extra logic passes. So every native-vs2 leg that
+  never touched the menu ran TURBO (level 8) against vsavj's or our build's NORMAL (level 6).
+  At matched levels LP at the mash ceiling is EQUAL (4h/8d at level 6, 5h/9d at level 8), the
+  vanilla Victor freeze drains in the same number of frames on both games (§4's "+1" is gone),
+  and MP with no mash at level 6 is 5 hits on ours against 4 on native. Asked "How should
+  test_don_immortal_native assert from now on?", the maintainer chose *"Matched modes, both
+  (Recommended)"*, whose text was: *"Force the same speed level on both legs and assert ours ==
+  native at NORMAL (level 6) and TURBO (level 8). Retract LP's 'one hit short' and §4's '+1
+  frame' as mode artifacts. The MP-at-NORMAL extra hit is then the one open difference, and the
+  gate stays red on it until it's resolved."* The 2026-09-02 ruling that the vanilla vsav engine
+  takes precedence is not re-opened; its LP example is what the measurement retracts.
+- **THE MP EXTRA HIT IS A TICKET, TO BE ROOT-CAUSED (maintainer, 2026-09-15).** Asked what should
+  happen to it, the maintainer chose *"Ticket + root-cause (Recommended)"*: *"File it as a bug and
+  find why our build runs one more loop iteration without mashing at level 6."* Filed as #142.
+- **THE IMMORTAL GATE ALSO PINS THE RNG AND ASSERTS HIT FRAMES (maintainer, 2026-09-15).** The
+  #142 root cause, measured the same sitting: the object loop (vsavj `PRG:0x02207E`, vs2
+  `0x020A2E`, the same code) picks P1-first or P2-first on every pass from bit 0 of the engine RNG
+  (`RAM:$FF80D4-D5`, vsavj `PRG:0x014E8A`, vs2 `0x01357E`, the same routine), and the two games'
+  RNG states differ throughout a match even on vanilla content — so on the pass after MP's fourth
+  hit the two legs updated the fighters in opposite orders, ours' attacker stayed frozen one pass
+  longer, and a fifth hit landed. With the level AND the RNG pinned on both legs, all 16 legs
+  (four strengths, no mash and at the ceiling, levels 6 and 8) are identical in hit count, damage
+  and every hit frame. Asked "How should test_don_immortal_native handle the RNG?", the maintainer
+  chose *"Pin both, assert frames (Recommended)"*, whose text was: *"Poke the level and
+  $FF80D4-D5 = 0000 every frame 2400-2800 on both legs; assert hit count, damage AND hit frames
+  equal (measured identical 16/16). Keep a must-fire control that leaves the RNG unpinned and must
+  diverge (MP at level 6), so the gate proves it sees the RNG. The gate goes green."* This
+  supersedes the previous entry's "the gate stays red on it until it's resolved".
+- **#142 CLOSED AS INVALID (maintainer, 2026-09-15).** Asked what becomes of #142, the maintainer
+  chose *"Close as invalid (Recommended)"*: *"The premise (a port difference) is refuted by
+  measurement. Close it with a comment naming the cause (RNG-picked player order), and point its
+  local answers at the rewritten gate and the engine doc."*
+
 ## Ruled 2026-09-15 (14z-157) — entered at ruling time, under the amended lifecycle
 
 - **A QUESTION A MEASUREMENT CAN SETTLE IS MEASURED (maintainer, 2026-09-15).** Told that

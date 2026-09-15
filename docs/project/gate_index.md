@@ -299,7 +299,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 | `tests/test_don_accent.sh` | test | emulator | emulator | weapon-accent steadiness + Victor-accent legacy guard (session 14z-19, rounds 34-35). | session 14z |
 | `tests/test_don_colors.sh` | test | emulator | emulator | Donovan color-set gate (session 14z-21). | session 14z |
 | `tests/test_don_column.sh` | test | emulator | emulator | swordless-421P column KO crash gate (14z-33). | 14z-33 |
-| `tests/test_don_immortal_native.sh` | test | emulator | MAME, ~15 min | 421+P (Lightning Sword) AGAINST NATIVE vsav2, in the units the comparison is allowed to use (14z-127, GitHub #114). | 14z-127 |
+| `tests/test_don_immortal_native.sh` | test | emulator | MAME, ~4 min | 421+P (Lightning Sword) AGAINST NATIVE vsav2 AT A MATCHED SPEED LEVEL AND A PINNED RNG, in hit count, damage and hit frames (14z-127, GitHub #114; matched 14z-158, #135, #142). | 14z-127 |
 | `tests/test_don_reactions.sh` | test | emulator | emulator | Change Immortal behavior gate (14z-26..28). | 14z-26 |
 | `tests/test_don_sound.sh` | test | emulator | emulator | Donovan sound gate (session 14z-52). | session 14z |
 | `tests/test_don_sword.sh` | test | emulator | emulator | Donovan sword-swing behavior gate (session 14z-5). | session 14z |
@@ -352,7 +352,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_guard_mask_reads.sh` | audit | emulator | MAME, a build dir, ~4 min | WHICH LONGWORDS OF THE GUARD-MASH MASK TABLE `PRG:0x028D50` THE ENGINE READS, ours vs vanilla — and that the port's bytes in its FIRST longword sit behind an index the check never produces. (14z-145.) | 14z-145 |
 | `tests/audit_pyron_capture_block.sh` | audit | emulator | MAME, a build dir, ~4 min | PYRON THROWS WITH DEMITRI'S CAPTURE GEOMETRY (measured 14z-131, maintainer-ruled "measure against native vs2 first"). | 14z-131 |
 | `tests/audit_tenant_throw_geometry.sh` | audit | emulator | MAME, a build dir, ~12 min | PHOBOS'S THREE THROWS, OURS vs NATIVE VS2 (14z-131, maintainer-directed 2026-09-04). | 14z-131 |
-| `tests/audit_tick_cadence.sh` | audit | emulator | MAME, ~50 s | on VANILLA content the two engines double their logic pass at different cadences: vsav2 every third frame, vsavj every fourth or fifth, both fighters on the same frames, both passes inside ONE activation of the game task; | 14z-156 |
+| `tests/audit_tick_cadence.sh` | audit | emulator | MAME, ~1.5 min | THE EXTRA LOGIC PASS IS DECIDED BY THE SPEED LEVEL, and on vanilla content each game's DEFAULT play mode sets a different one: | 14z-156 |
 | `tests/test_advancing_guard.sh` | test | emulator | MAME, ~2.5 min | THE ADVANCING GUARD (guard push), MEASURED on native vs2 and on vsavj, and frozen (14z-123, the documentation pass's G2). | 14z-123 |
 | `tests/test_anim_node_walk.sh` | test | emulator | MAME, a build dir, ~2 min | THE ANIMATION-NODE DECODER IS AN INSTRUMENT (character-data map, phase 1; 14z-118). tools/anim_nodes.py reads the per-character anim index tables and walks the 0x18-byte node chains by the rules read off vs2's walker (PRG:0x02713C / 0x0271C… | 14z-118 |
 | `tests/test_community_crosscheck.sh` | test | ci_static | ROMDIR | OUR DERIVED VANILLA FRAME DATA STILL SAYS WHAT THE COMMUNITY WORKBOOK SAYS (14z-125, the community cross-check). | 14z-125 |

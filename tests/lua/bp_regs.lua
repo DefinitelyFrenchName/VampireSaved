@@ -163,11 +163,12 @@ emu.register_periodic(function()
         for _, n in ipairs({"D0","D1","D2","D3","A0","A1","A2","A3","A4","A6"}) do
             r[#r + 1] = n .. "=" .. string.format("%08x", st[n].value)
         end
-        -- A7 first: MAME's m68k "SP" state can resolve to the inactive
-        -- stack pointer (measured 14z-85g: constant garbage ret on every
-        -- hit); A7 is the active one.
-        local spr = st["A7"] or st["SP"]
-        local sp = spr.value
+        -- THE LIVE STACK (14z-158, docs/platform/gotchas.md): MAME 0.288's
+        -- M68000 core has no "A7" state and its "SP" is the SUPERVISOR stack,
+        -- so the old `A7 or SP` read the idle stack in this game's user-mode
+        -- code (the 14z-85g "constant garbage ret on every hit"). Pick the
+        -- live pointer from SR's S bit.
+        local sp = ((st["SR"].value & 0x2000) ~= 0) and st["SP"].value or st["USP"].value
         local ok, ret = pcall(function()
             return string.format("ret=%08x,%08x", space:read_u32(sp), space:read_u32(sp + 4))
         end)

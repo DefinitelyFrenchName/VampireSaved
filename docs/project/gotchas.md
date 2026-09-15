@@ -620,7 +620,9 @@ visual fix, A/B the fix-on/fix-off builds on the reproducing replay —
 
 ## **[VSP-136]** Cross-game A/B pixel comparison: align by DISPLAYED RECORD, not frame
 Two false "garble" verdicts in one session (14z-9): the engines skew
-1-2 frames, so same-frame snapshots can compare DIFFERENT anim records
+1-2 frames *(CORRECTED 14z-158, #135: the LEGS skew — each game's default play mode,
+vsav2 TURBO against vsavj NORMAL, and their RNG draws; pinned, they do not, [VSE-84])*,
+so same-frame snapshots can compare DIFFERENT anim records
 — a mid-flail pose against a settle pose reads as scattered garbage.
 Align by the victim's cursor value (dump +0x1C, snapshot the frames
 where both games display the SAME mapped node). Also: the sibling
@@ -3583,7 +3585,8 @@ or its last byte plus the terminator — inside one video frame. A
 frame-indexed comparison of x deltas against the list bytes fails on
 those frames; comparing the delta against the bytes consumed between two
 samples of the step counter (`+0x1B0`) matches 9/9. The same fact is why
-`+0x15E` reads 0x1FF the frame after it is armed 0x200.
+`+0x15E` reads 0x1FF the frame after it is armed 0x200. HOW OFTEN is the speed level's
+pattern (`RAM:$FF8116`, set by the play mode; `docs/game/engine_internals.md`, #135).
 
 
 ## A CORNERED BLOCKER TRANSFERS THE BLOCK PUSHBACK ONTO THE ATTACKER — stage push measurements mid-screen (paid: 14z-123)

@@ -141,20 +141,30 @@ local function install_tap()
                     extra = ok and res or (" regerr")
                 end
                 if os.getenv("STACKLOG") then
-                    -- candidate return addresses from the top of the stack:
-                    -- caller attribution for engine-internal writer PCs
-                    -- (m68k register name differs by MAME version: SP or A7;
-                    -- memory reads inside a tap are pcall-guarded)
+                    -- candidate return addresses from the top of the LIVE
+                    -- stack: caller attribution for engine-internal writer PCs.
+                    -- MAME 0.288's M68000 core exposes A0-A6 only, "USP" (the
+                    -- user stack) and "SP" (the SUPERVISOR stack) — there is no
+                    -- "A7" state, and this game's logic runs in USER mode, so
+                    -- the old `SP or A7` read the idle supervisor stack (14z-158;
+                    -- docs/platform/gotchas.md). The live pointer is chosen by
+                    -- SR's S bit; the supervisor stack is logged beside it as
+                    -- `sstack` so the difference stays visible.
+                    -- env STACKLOG_DEPTH = longs per stack (default 5)
                     local ok, res = pcall(function()
                         local st = cpu.state
-                        local spr = st["SP"] or st["A7"]
-                        local sp = spr.value
-                        local r = {}
-                        for k = 0, 4 do
-                            r[#r + 1] = string.format("%08x",
-                                                      space:read_u32(sp + k * 4))
+                        local depth = tonumber(os.getenv("STACKLOG_DEPTH") or "") or 5
+                        local usp, ssp = st["USP"].value, st["SP"].value
+                        local live = ((st["SR"].value & 0x2000) ~= 0) and ssp or usp
+                        local function walk(p)
+                            local r = {}
+                            for k = 0, depth - 1 do
+                                r[#r + 1] = string.format("%08x", space:read_u32(p + k * 4))
+                            end
+                            return table.concat(r, " ")
                         end
-                        return " stack " .. table.concat(r, " ")
+                        return string.format(" sr %04x stack %s sstack %s",
+                                             st["SR"].value, walk(live), walk(ssp))
                     end)
                     extra = ok and res or (" stackerr " .. tostring(res))
                 end

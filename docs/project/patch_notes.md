@@ -161,7 +161,8 @@ identical; ours dwells one video frame longer at most keyframes (30 held
 frames against native's 28). That is the ruled host-clock cadence — vsavj runs
 fewer engine double-ticks per video frame than vsav2 ([VSE-83]; maintainer,
 2026-09-02: *"the engine, being vanilla vsav, takes precedence"*) — and
-[VSP-169] says assert structure, report timing. The gate compares offset SETS.
+[VSP-169] says assert structure, report timing. *(Corrected 14z-158, #135: that was the PLAY
+MODE — native vsav2 at its default TURBO, ours at NORMAL — not the engine; [VSE-84].)* The gate compares offset SETS.
 
 ## 14z-132 — THE M16 MARK FREEZE (donovan-m20 / huitzil-m27 / pyron-m21 / merged-m16, mark M16): the in-game mark becomes the merged build number
 

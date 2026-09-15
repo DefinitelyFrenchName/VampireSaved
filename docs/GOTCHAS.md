@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-349 entries (41 game / 104 platform / 204 project), counted from the buckets at generation.
+350 entries (41 game / 105 platform / 204 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 41 entries
 
@@ -60,13 +60,13 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - The ladder pick faults on an ODD venue byte — steer `$FF8121` with EVEN values only (14z-110)
 - THE "?" WALKER WRITES THE DRAWN ID EVERY FRAME, FROM TWO PATHS (paid: 14z-117, one crashing probe)
 - THE ENGINE DOES NOT RUN ONE TICK PER VIDEO FRAME — a `frame_done` trace CANNOT count animation frames (paid: 14z-125b, measured)
-- A DURATION IN VIDEO FRAMES IS NOT COMPARABLE BETWEEN THE SIBLING GAMES — vsavj and vsav2 do not run the same number of ENGINE TICKS per frame (paid: 14z-127, GitHub #114)
+- A CROSS-GAME COMPARISON NEEDS A MATCHED PLAY MODE AND A PINNED RNG — vsav2 defaults P1 to TURBO where vsavj defaults to NORMAL, and the two games' RNG states differ (paid: 14z-127 as "the engines tick at different rates"; corrected 14z-158, GitHub #135, #142)
 - A REPLAY DOES NOT TRANSFER BETWEEN REGIONAL SETS EITHER — `vsav`'s match starts ~200+ frames after `vsavj`'s (paid: 14z-127)
 - A "MASH" THAT PRESSES ONE FRAME AND RELEASES ONE FRAME IS HALF THE CEILING — and a saturation claim measured below the ceiling manufactures a difference (paid: 14z-127)
 - THE BOOT NAME SCREEN'S DISPLAY SCRIPT TAKES AN EVEN COLUMN — an odd one is a 68k ADDRESS ERROR that soft-boots the machine (paid: 14z-127)
 - THE ENGINE CLAMPS THE FIGHTERS TO 336 px APART — a wider position poke is pulled back the same frame, and a "whiff" leg for a travelling move does not exist (paid: 14z-146)
 
-## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 104 entries
+## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 105 entries
 
 - A MAME BREAKPOINT CONDITION THAT DOES NOT PARSE SETS NO BREAKPOINT — `l@` is not a size, and the probe reports a clean zero (paid: 14z-93, #92)
 - A 1-BYTE MEMORY TAP MISSES WORD ACCESSES ON THIS 16-BIT BUS — and reads as a clean, meaningless zero (paid: 14z-126b)
@@ -172,6 +172,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - ON A LINUX BUILD HOST EVERY BUNDLED LIBRARY ALSO RESOLVES SYSTEM-WIDE — a "resolved under /usr/lib" self-containment check is blind there (paid: 2026-09-13, the release gate's absolute-reference control DEAD on its first Linux run)
 - A NATIVE WINDOWS PYTHON WRITES `\r\n` FOR EVERY `\n` IT PRINTS — reconfiguring one Python block of a gate leaves the others emitting CRLF (paid: 2026-09-13, one CR byte left in the Windows release gate's output after the first fix)
 - MAME READS THE USER'S OWN `mame.ini` EVEN UNDER `-homepath` — every harness leg inherits what that file sets (found 2026-09-15, 14z-158, gating the README's recording command; nothing paid)
+- MAME 0.288'S 68000 CORE HAS NO `A7` STATE, AND ITS `SP` IS THE SUPERVISOR STACK — a Lua stack read in user-mode code walks the idle stack (paid: 14z-85g as "constant garbage ret on every hit", named 14z-158)
 
 ## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 204 entries
 

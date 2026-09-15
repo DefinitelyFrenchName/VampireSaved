@@ -686,7 +686,24 @@ invisible in the log — it looks like clean data with occasional skipped
 countdown values.
 
 
-## **[VSE-84]** A DURATION IN VIDEO FRAMES IS NOT COMPARABLE BETWEEN THE SIBLING GAMES — vsavj and vsav2 do not run the same number of ENGINE TICKS per frame (paid: 14z-127, GitHub #114)
+## **[VSE-84]** A CROSS-GAME COMPARISON NEEDS A MATCHED PLAY MODE AND A PINNED RNG — vsav2 defaults P1 to TURBO where vsavj defaults to NORMAL, and the two games' RNG states differ (paid: 14z-127 as "the engines tick at different rates"; corrected 14z-158, GitHub #135, #142)
+
+**The rule.** vsav2 and vsavj run the same pass decider and the same speed-level pattern table,
+but at character confirm vsav2 sets P1's play mode to TURBO (speed level `RAM:$FF8116` = 8) and
+vsavj to NORMAL (level 6), and on every measured frame their RNG states (`RAM:$FF80D4-D5`) differ
+— while the RNG picks which fighter updates first on every pass. So a replay that never touches
+the play-mode menu compares TURBO with NORMAL, on different draws. **Pin both, on both legs**:
+poke `$FF8116` and `$FF80D4-D5` every frame and prove from each leg's own dump that the pokes
+held. Pinned, Donovan's 421+P matches native in hit count, damage and every hit frame at all four
+strengths, no mash and at the ceiling, at levels 6 and 8, and the vanilla Victor freeze drains in
+the same number of frames on both games. Unpinned, hit counts follow each game's own draws (MP
+with no mash at level 6: 4 hits native, 5 ours — #142, closed invalid) and video-frame durations
+follow the two modes' rates. Mechanism: `engine_internals.md`, the play-mode and RNG paragraphs;
+gate: `tests/test_don_immortal_native.sh` (ruled 2026-09-15).
+
+~~A DURATION IN VIDEO FRAMES IS NOT COMPARABLE BETWEEN THE SIBLING GAMES — vsavj and vsav2 do not
+run the same number of ENGINE TICKS per frame~~ **RETRACTED 14z-158: what follows measured the
+play mode and the RNG, not two engines. Kept verbatim; the regional rule at its end stands.**
 
 The engine periodically runs two ticks in one video frame, and **the two games
 do it at different rates**. Measured on vanilla content, so no port is
@@ -772,8 +789,11 @@ ceiling the same builds read LP 4 / MP 8 / HP 10 / ES 15 against native's
 short.** Nothing changed but the input.
 
 **Why it went wrong, and it generalises to any real-time-input mechanic
-compared across the sibling games:** the two engines run different numbers of
-engine ticks per video frame, so at a sub-maximal rate the two legs sit at
+compared across the sibling games:** ~~the two engines run different numbers of
+engine ticks per video frame~~ *(CORRECTED 14z-158, #135, #142: the two LEGS did —
+native vsav2 at its default TURBO play mode against ours at NORMAL, on different RNG
+draws; [VSE-84]. With both pinned, all four strengths are equal at the ceiling,
+LP included)*, so at a sub-maximal rate the two legs sit at
 different points of the SAME response curve. The ceiling is where the curve is
 flat on both, which is the only place the comparison is honest.
 

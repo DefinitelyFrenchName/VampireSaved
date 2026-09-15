@@ -2578,3 +2578,25 @@ emulation — reaches every leg silently, and another host holds a different fil
 harness wrappers (`tools/run_mame.sh`, `tools/run_inp_guarded.sh`) do not, and
 adding it there changes the INSTRUMENT, so it goes through
 `tests/test_mame_parity.sh` first ([MFI-24]).
+
+## MAME 0.288'S 68000 CORE HAS NO `A7` STATE, AND ITS `SP` IS THE SUPERVISOR STACK — a Lua stack read in user-mode code walks the idle stack (paid: 14z-85g as "constant garbage ret on every hit", named 14z-158)
+
+`src/devices/cpu/m68000/m68000.cpp` registers `D0`-`D7`, `A0`-`A6`, `USP` (`m_da[15]`) and
+`SP` (`m_da[16]`); the live A7 is `m_da[m_sp]`, with `m_sp` = 16 in supervisor mode and 15
+in user mode. So `cpu.state["A7"]` is nil — a Lua callback that dereferences it dies, and
+inside a write tap it dies SILENTLY after any statement before it (a probe counted 710 hits
+and logged none) — and `st["A7"] or st["SP"]` falls through to the SUPERVISOR stack. Vampire
+Savior's game logic runs in USER mode (the S bit clear on every tick write of both games,
+measured 14z-158; the supervisor stack sits constant at `$FF7FF6`), so that read walks a
+stack nothing is using: `tests/lua/bp_regs.lua`'s `ret=` fields (the 14z-85g "garbage ret")
+and `tap_writes.lua`'s `STACKLOG` before 14z-158. Exception handlers run in supervisor mode,
+which is why `inp_guard.lua`'s fault-frame reads through `SP` were right. **Pick the live
+pointer from SR's S bit** (`(SR & 0x2000) ~= 0 and SP or USP`) and PROVE the choice on the
+data: a genuine return address is preceded by a `jsr`/`bsr` whose length ends exactly on it
+(2,611 such on the user stack over 520 vs2 tick writes, 0 on the supervisor stack).
+`tap_writes.lua`'s `STACKLOG` and `bp_regs.lua` read the live pointer since 14z-158.
+**`tests/lua/walker_sp.lua` still reads `A7 or SP`** (so, on this core, the supervisor
+stack) and was NOT changed: `tests/audit_walker_ghost.sh` and `tests/audit_walker_repoint.sh`
+consume its stack ranges, and moving an instrument under frozen measurements is a question
+to answer first — whether the walker sites run in user mode, and what those audits' ranges
+therefore measured.

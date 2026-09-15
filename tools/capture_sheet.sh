@@ -15,10 +15,14 @@
 # something to eyeball.
 #
 # *** THE ALIGNMENT RULE, and it is the whole point ([VSP-136]). *** The two
-# games do not run the same number of video frames per engine tick — ours dwells
-# about one frame longer per keyframe, the ruled host-clock difference ([VSE-83];
-# maintainer 2026-09-02, "the engine, being vanilla vsav, takes precedence"). So
-# same-frame snapshots compare DIFFERENT keyframes and invent a difference that
+# legs do not run the same number of video frames per engine tick — ours dwells
+# about one frame longer per keyframe. ~~the ruled host-clock difference ([VSE-83];
+# maintainer 2026-09-02, "the engine, being vanilla vsav, takes precedence")~~
+# CORRECTED 14z-158 (#135): that is the PLAY MODE — native vsav2 runs its
+# default TURBO (speed level RAM:$FF8116 = 8), ours vsavj's default NORMAL (6);
+# at a matched level the engines tick alike ([VSE-84],
+# docs/game/engine_internals.md). This tool leaves both legs at their defaults,
+# so same-frame snapshots compare DIFFERENT keyframes and invent a difference that
 # is not there. This tool reads each leg's per-frame victim offset, walks the
 # ORDERED sequence of distinct offsets, and photographs the frame on which each
 # leg is showing the SAME keyframe.
@@ -184,7 +188,7 @@ if [ -n "$FONT" ]; then
         -bordercolor '#101010' -border 10 "$W/h1.png"
     magick -background '#101010' -fill '#c8c8c8' -font "$FONT" -pointsize 14 \
         label:"Rows are matched by KEYFRAME, not by frame number: ours dwells ~1 video frame longer per keyframe
-(the ruled host-clock difference, [VSE-83]) so same-frame snapshots would compare different keyframes.
+(native runs the vsav2 default TURBO play mode, ours NORMAL: [VSE-84]) so same-frame snapshots would compare different keyframes.
 NOT comparable across the columns: HUD styling, and the victim's own sprite - each game ships its own.
 Compare WHERE and HOW the victim is held. Numbers: tools/capture_sheet.sh's stdout; verdicts: the gates." \
         -bordercolor '#101010' -border 10 "$W/h2.png"
