@@ -17,16 +17,16 @@ A forever true statement. But the FGC loves what ifs and this project attempts t
 
 |                                         |                                                              |
 | --------------------------------------- | ------------------------------------------------------------ |
-| **Base game**                           | Vampire Savior, Japan, 1997-05-19 — the version competitive play uses |
-| **Roster**                              | The original Vampire Savior cast, plus Donovan, Phobos (Huitzil in Japan) and Pyron from Vampire Savior 2. All characters run the Vampire Savior engine. |
+| **Base game**                           | Vampire Savior, Japan, 1997-05-19                            |
+| **Roster**                              | The original Vampire Savior cast, plus Donovan, Phobos (Huitzil outside Japan) and Pyron from Vampire Savior 2. All characters run the Vampire Savior engine. |
 | **Original characters and game engine** | Both unchanged. In 2-player versus their game state is checked frame by frame against the unmodified game, and matches it within a few small, measured tolerances. |
 | **Plays on**                            | a patched FBNeo or MAME (ready-made for Windows 10+ and Apple-silicon Macs on macOS 26+, or build it yourself on anything else), and MiSTer |
 | **Current release**                     | `merged-m18` — the character-select screen shows **M18** in its bottom-right corner |
 | **Made for**                            | 2-player versus. Arcade mode can be played to the end but    |
-| **Tournaments**                         | not a tournament build. Tournaments run original releases; this is for casuals, labs and locals |
+| **Tournaments**                         | **not** a tournament build. Tournaments run original releases; this is for casuals, labs and locals |
 
 **Why the emulator has to be patched:** the 18 characters do not fit in a stock CPS-2. The project
-defines a slightly larger CPS-2 — more room for program, graphics and sound — and adds it to FBNeo,
+defines a larger CPS-2 (more room for program, graphics and sound) and adds it to FBNeo,
 MAME and a MiSTer core. Stock emulators cannot run the game.
 
 ## Play it
@@ -34,17 +34,16 @@ MAME and a MiSTer core. Stock emulators cannot run the game.
 No ROM data is distributed. You rebuild the game from your own dumps with a small script that checks
 every byte before it writes anything.
 
-1. **Download ONE package** from the
-   [release page](https://github.com/DefinitelyFrenchName/VampireSaved/releases/tag/freeze/merged-m18).
+1. **Download ONE package** from the [release page](https://github.com/DefinitelyFrenchName/VampireSaved/releases/tag/freeze/merged-m18). 
    Each one is complete.
-
+   
    | package                                                      | pick it if you play on                                       |
    | ------------------------------------------------------------ | ------------------------------------------------------------ |
    | `merged-m18-fbneo-windows-x86_64.zip` or `merged-m18-fbneo-macos-arm64.zip` | FBNeo — the patched emulator is inside, ready to run         |
    | `merged-m18-mame-windows-x86_64.zip` or `merged-m18-mame-macos-arm64.zip` | MAME — the patched emulator is inside, ready to run          |
    | `merged-m18-fbneo-recipe.zip` or `merged-m18-mame-recipe.zip` | any other system — the emulator patch and the steps to build it once |
    | `merged-m18-mister.zip`                                      | MiSTer — the core and its menu entries                       |
-
+   
 2. **Gather your dumps** in one folder, unmodified, with these exact names: `vsavj.zip` (Vampire
    Savior, Japan 970519), `vsav.zip` (Europe 970519) and `vsav2.zip` (Vampire Savior 2, Japan 970913).
    You also need Python 3.8 or newer — nothing else.
@@ -68,8 +67,7 @@ every byte before it writes anything.
 
 **If it does not start:** "unknown system" means the emulator is not the patched one. A game frozen on
 the QSound/CAPCOM screen means the set was renamed to force it into a stock emulator — renaming is
-never the fix. For netplay, every player needs the same emulator build and the same romset. Each
-package's own `README.md` has the full steps.
+never the fix. Netplay has never been tested but in theory is possible however every player would need the same emulator build and the same romset.
 
 ## What to expect
 
@@ -104,7 +102,7 @@ is. Each line points to where it is tracked or explained — follow the link for
 
 In versus:
 
-- Donovan's **Press of Death** sometimes shows the wrong colours ([#112](https://github.com/DefinitelyFrenchName/VampireSaved/issues/112); a cleaner fix is tracked
+- Donovan's **Press of Death** sometimes shows the wrong colours ([#112](https://github.com/DefinitelyFrenchName/VampireSaved/issues/112); a potential cleaner fix is tracked
   as [#127](https://github.com/DefinitelyFrenchName/VampireSaved/issues/127)).
 - On the select screen, **player 2's Donovan has an orange sword** — an accepted trade-off
   ([port registry](docs/project/patch_index.md)).
@@ -145,8 +143,8 @@ Play until it happens, quit, and attach `recordings/my_session.inp` to the issue
 
 ## How it was made
 
-Vampire Saved is also an experiment. It started as a work-adjacent project about **black-box agentic
-engineering**: can AI agents, run the way you would run maintenance on a large system nobody can read
+Vampire Saved is actually an experiment. It started as a work-adjacent project about **black-box agentic
+engineering**: can AI agents, run the way you would run evolutive maintenance on a large system nobody can read
 in full, deliver a result that is *demonstrably* correct?
 
 **Who did what.** All of the code was written by AI — Anthropic's Claude, through Claude Code.
@@ -181,7 +179,7 @@ anyone could play. And a few original sequences are allowed small, measured and 
 because code added to reach the new characters costs the processor time. A move-by-move comparison of the three
 new characters with Vampire Savior 2 is tracked separately ([#136](https://github.com/DefinitelyFrenchName/VampireSaved/issues/136)).
 
-**Lineage.** The working discipline began in a Super Nintendo project,
+**Lineage.** The working discipline began in a Super Nintendo romhack project,
 [Sailor Moon S — FrenchName edition](https://github.com/DefinitelyFrenchName/SMS-FrenchName-edition),
 and was scaled up here. The test harness was then extracted into its own project,
 [BBH](https://github.com/DefinitelyFrenchName/BBH-frame-based), for anything that can be driven frame by frame, and generalised again as [BBX](https://github.com/DefinitelyFrenchName/BBX), for any work whose
