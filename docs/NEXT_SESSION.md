@@ -29,7 +29,7 @@ release. `git status -sb` says the push state.
   against #100), `tests/test_pod_black_foot_palette.sh` (~line 26, "still unknown"),
   `tools/audit_effect_rects.py` "WHY THIS EXISTS" (the retracted shelf-pack mechanism),
   `tests/test_don_reactions.sh` (~lines 25-28, "MASHING is NOT covered … Open on #114"),
-  `tests/test_voice_row_range.sh` (named and headed "voice-class rows"); #77's `contested`
+  `tests/test_voice_row_range.sh` (named and headed "voice-class rows"), `HANDOFF.md` ~line 363 ("no `.rbf` has been loaded onto a DE10-Nano" — `docs/project/mister_core.md` records hardware since 14z-109; found 14z-156 while drafting a README); #77's `contested`
   label on GitHub.
 - **#135 CONTINUES.** Steps 1-2 landed at 14z-156 (`tests/audit_tick_cadence.sh`, the 14z-156 addendum in
   `docs/game/engine_internals.md`, the issue comment). Next, cheapest first:
@@ -38,10 +38,10 @@ release. `git status -sb` says the push state.
      throwaway run (the debugger desyncs replays; the chain, not the timing, is wanted);
   2. the play-mode byte (NORMAL / TURBO / AUTO) read back on both legs, with TURBO as the
      positive control, and each game's EEPROM defaults;
-  3. the all-RAM accumulator search re-run WITH its planted control — numpy is absent on this
-     Mac, so write it in plain python;
-  4. constancy across content, Demitri / Morrigan / Bishamon, FBNeo;
-  5. then the one section with its rule anchor, every carrier corrected in the same commit
+  3. constancy across content, Demitri / Morrigan / Bishamon, FBNeo — the frame counter, a
+     single `$FF8000-$FF83FF` bit or value and a work-RAM accumulator are already ruled out
+     (section B of the audit, each search finding its plant);
+  4. then the one section with its rule anchor, every carrier corrected in the same commit
      ([VSE-84] and its skill line, the six `[VSE-83]` citations, "four characters",
      `test_don_immortal_native.sh`'s header).
   **#136** (tenant move parity) waits behind it.
@@ -56,7 +56,10 @@ release. `git status -sb` says the push state.
 1. **A selection made by wall-clock durations is not verdict text either** — masking the
    figures left the picks and their order compared (bbh F1, fixed).
 2. **A search that finds nothing is not a result until a planted case has been found by it**
-   — the all-RAM accumulator search's control never ran (no numpy here).
+   — the accumulator search's control never ran (no numpy here), and two sibling searches
+   were quoted with no plant at all; caught at the close check and re-run in plain python
+   with plants, all three still find nothing. And **MAME's "Average speed … (48 seconds)" is
+   EMULATED time** — a runtime read from it was ~10× too long.
 3. **An accumulator can pause** — a constant-step-on-every-frame test rejects one that stops
    on zero-tick frames.
 

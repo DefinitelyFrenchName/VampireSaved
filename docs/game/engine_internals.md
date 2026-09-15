@@ -591,11 +591,16 @@ Victor mirror of that gate's §4, frames 2300-2900, reference MAME, both games:
   `PRG:0x0231D0` over 2629-2637, vsavj `PRG:0x0245AE` over 2630-2638); the "9 vs 10" above counts
   frames with `+0x5C > 0` in per-frame dumps from the hit — a different measure, whose extra
   frame is where the first drain lands after the hit.
-- **What decides the second pass is NOT located.** It is not keyed on the frame counter
-  `RAM:$FF8080` (no modulus predicts it), and no single bit or exact value of `$FF8000-$FF83FF`
-  predicts it; a constant-step accumulator search over all work RAM found nothing but was never
-  shown to find a planted one, so that is not a result.
-[M: `tests/audit_tick_cadence.sh`; 14z-156]
+- **What decides the second pass is NOT located — but three candidates are RULED OUT, each
+  search having first found a case planted in the same dumps** (per-frame dumps of all work RAM,
+  frames 2560-2760, aligned by `RAM:$FF8080` stepping +1 between every pair): no modulus 2..64 of
+  the frame counter `RAM:$FF8080` separates the double-tick frames from the single ones (a modulus
+  near the 201-frame window is trivially pure and says nothing); no single bit or exact value of
+  `$FF8000-$FF83FF` equals the double-tick set at an offset of -2..+2 frames; and no pausable
+  constant-step accumulator anywhere in the 64 KB of work RAM carries on it (F1 >= 0.8). *Corrected
+  at the 14z-156 close check: this bullet first quoted all three before any of the searches had
+  found a planted case, and read "no modulus" without its bound.*
+[M: `tests/audit_tick_cadence.sh` sections A and B; 14z-156]
 
 **AN INSTANCE, RULED BY THE MAINTAINER (2026-09-14): Final Guardian Beta's pacing.**
 Phobos's EX Final Guardian Beta (pool object `0x46`) long read as lasting too long on our

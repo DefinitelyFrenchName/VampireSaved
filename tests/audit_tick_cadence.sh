@@ -13,9 +13,11 @@
 # compare the order of writes inside a frame across runs):
 #   P1 +0x1C..+0x23 and P2 +0x1C..+0x23 — the anim pointer, the node timer, its tick;
 #   P2 +0x5C..+0x5D — the hit-freeze counter and its drain;
-#   the task table $FF025C..$FF045B — 16 slots x 0x20, the scheduler's state writes.
+#   the task table $FF025C..$FF045B — 16 slots x 0x20, the scheduler's state writes;
+# plus one tests/lua/replay.lua run per game dumping ALL work RAM ($FF0000-$FFFFFF)
+# every frame 2560..2760, for section B.
 #
-# WHAT IT FROZE, measured 14z-156 on the reference MAME binary, frames 2300..2900:
+# SECTION A — WHAT IT FROZE, measured 14z-156 on the reference MAME binary, 2300..2900:
 #   * THE TICK SITE'S TWIN: vsav2 writes +0x20 at PRG:0x0271C4 (subq.b #1,$20(a6)) and
 #     enters nodes at 0x02713C/0x027140 — vsavj's 0x027F70/0x027EE8/0x027EEC minus
 #     0xDAC, found statically (docs/game/engine_internals.md, the 14z-156 addendum)
@@ -33,12 +35,31 @@
 #     write at PRG:0x001204/0x001218) at most ONCE per frame on both games, frame
 #     distribution slot 3 {0: 20, 1: 580}, slot 4 {0: 22, 1: 578}, double-tick frames
 #     included — so both passes of a double-tick frame run inside one activation.
-# WHAT DECIDES THE SECOND PASS IS NOT LOCATED (#135 stays open): no constant-step
-# accumulator was found in work RAM, but that search was never shown to find a
-# planted one, so it is not a result and nothing here asserts it.
+#
+# SECTION B — WHAT DOES NOT DECIDE THE SECOND PASS (added at the 14z-156 close check:
+# these three searches ran as scratch probes first and their negatives were quoted
+# before any of them had found a planted case). Over P2's double-tick frames inside
+# the dump window, each search must FIRST find a case planted in the real dumps —
+# a search that cannot see its own plant is a dead instrument and FAILS the gate:
+#   * the frame counter RAM:$FF8080 (the frame interrupt's addq.b #1, checked to step
+#     +1 between consecutive dumps — the dumps' alignment control): no modulus 2..64
+#     leaves every residue all-double or all-single (a modulus near the window's 201
+#     frames is trivially pure and says nothing, so none is tested); planted: a target
+#     set defined as counter % 3 == 0 must be found at modulus 3;
+#   * any single bit or exact byte value of $FF8000-$FF83FF at frame f-2..f+2 equal to
+#     the double-tick set: none; planted: bit 3 of a constant byte set on the double
+#     frames must be found at d = 0;
+#   * a constant-step accumulator ANYWHERE in the 64 KB (a byte or a big-endian word
+#     whose non-zero per-frame step is one constant on >= 60% of frames — it may pause
+#     — and whose carry frames match the double set with F1 >= 0.8 at d = -2..2): none;
+#     planted: a byte stepping +0x3B with a pause every 17th frame, and a word stepping
+#     +0x3B11, each found against its own carry set.
+# WHAT DECIDES THE SECOND PASS IS STILL NOT LOCATED (#135 stays open).
 #
 # Usage: ROMDIR=... [MAME_BIN=<reference binary, default ~/.cache/vampire-saved/mame-ref/cps2>] tests/audit_tick_cadence.sh
-# Runtime: ~7 min (eight MAME legs of 2,900 frames), emulator tier.
+# Runtime: ~50 s (49 s measured solo at the 14z-156 close check: ten MAME legs at ~25x speed plus
+# the section B searches; MAME's "Average speed ... (48 seconds)" is EMULATED time, and a
+# runtime once read from it came out ~10x too long), emulator tier.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
@@ -67,10 +88,18 @@ for g in vsav2 vsavj; do
         grep -q '^END 2900 ' "$W/${g}_$n.tap" 2>/dev/null \
             || { echo "FAIL: leg $g/$n did not reach frame 2900 (see its MAME output)"; tail -3 "$W/${g}_$n.out"; exit 1; }
     done
+    # section B's dumps: all work RAM every frame 2560..2760 (they land beside CHECKSUM_OUT)
+    DSPEC="$(python3 -c "print(';'.join(f'{f}:ff0000-ffffff' for f in range(2560, 2761)))")"
+    mkdir -p "$W/dump_$g"
+    MAME_BIN="$BIN" MAME_SANDBOX="$W/sbd_$g" MAME_ROMPATH="$ROMDIR" DUMPS="$DSPEC" \
+        REPLAY="$W/van.rpl" POKES="$VPOKE" CHECKSUM_OUT="$W/dump_$g/c.log" \
+        tools/run_mame.sh "$g" -autoboot_script "$REPO/tests/lua/replay.lua" > "$W/dump_$g/mame.out" 2>&1 || true
+    nd="$(ls "$W/dump_$g"/dump_*_ff0000.bin 2>/dev/null | wc -l | tr -d ' ')"
+    [ "$nd" = 201 ] || { echo "FAIL: leg $g/dumps wrote $nd of 201 work-RAM dumps (see its MAME output)"; tail -3 "$W/dump_$g/mame.out"; exit 1; }
 done
 
 python3 - "$W" "$MODE" <<'PY'
-import sys
+import os, sys
 from collections import Counter
 work, MODE = sys.argv[1], sys.argv[2]
 LIVE = {"vsav2": {"tick": "0271c4", "ptr": "02713c", "dur": "027140"},
@@ -100,6 +129,10 @@ def perturb(pcmap):
     m["vsav2"] = dict(pcmap["vsavj"])
     return m
 
+def ticks(g, pc):
+    return {who: Counter(fr for fr, p, off, m in TAPS[g][who] if p == pc["tick"] and off == base)
+            for who, base in (("p1", 0xFF8420), ("p2", 0xFF8820))}
+
 def analyse(pcmap, quiet=False):
     fails = []
     def need(cond, msg):
@@ -118,8 +151,7 @@ def analyse(pcmap, quiet=False):
             need(dom == pc["tick"], f"{g} {who}: the dominant byte writer of +0x20 is {pc['tick']} (measured {dom})")
             need(any(p == pc["ptr"] for fr, p, off, m in ev) and any(p == pc["dur"] for fr, p, off, m in ev),
                  f"{g} {who}: node entry writes land at {pc['ptr']}/{pc['dur']}")
-        t = {who: Counter(fr for fr, p, off, m in TAPS[g][who] if p == pc["tick"] and off == base)
-             for who, base in (("p1", 0xFF8420), ("p2", 0xFF8820))}
+        t = ticks(g, pc)
         W = range(2300, 2901)
         tot1, tot2 = sum(t["p1"][x] for x in W), sum(t["p2"][x] for x in W)
         d1 = {x for x in W if t["p1"][x] >= 2}; d2 = {x for x in W if t["p2"][x] >= 2}
@@ -147,6 +179,113 @@ def analyse(pcmap, quiet=False):
     need(FROZEN["vsav2"]["d2"] > FROZEN["vsavj"]["d2"], "vsav2 doubles more often than vsavj (the cross-game difference itself)")
     return fails
 
+# ---------------------------------------------------------------- section B
+def modulus_pure(col, fs, target, moduli):
+    """moduli M whose every residue of col is all-target or all-other, with both kinds present"""
+    out = []
+    for M in moduli:
+        kinds = {}
+        for f in fs:
+            kinds.setdefault(col[f] % M, set()).add(f in target)
+        if all(len(k) == 1 for k in kinds.values()) and any(k == {True} for k in kinds.values()):
+            out.append(M)
+    return out
+
+def predictors(byte_at, fs, target, offs):
+    """(kind, d, off, x): a bit (either polarity) or an exact value whose frames equal the target set at f+d"""
+    hits = []
+    for d in (-2, -1, 0, 1, 2):
+        fr = [f for f in fs if (f + d) in fs]
+        want = [f in target for f in fr]
+        if not any(want):
+            continue
+        for off in offs:
+            col = [byte_at(off, f + d) for f in fr]
+            for b in range(8):
+                v = [(x >> b) & 1 == 1 for x in col]
+                if v == want or [not y for y in v] == want:
+                    hits.append(("bit", d, off, b))
+            vals = set(col)
+            if 1 < len(vals) <= 64:
+                for x in vals:
+                    if [c == x for c in col] == want:
+                        hits.append(("eq", d, off, x))
+    return hits
+
+def accumulators(value_at, fs, target, offs, width):
+    """(off, width, k, d, tp, fp, fn): a pausable constant-step accumulator whose carries match the target"""
+    mod = 1 << (8 * width); out = []
+    pairs = [f for f in fs if f + 1 in fs]
+    for off in offs:
+        vals = {f: value_at(off, f, width) for f in fs}
+        steps = Counter((vals[f + 1] - vals[f]) % mod for f in pairs)
+        nz = [k for k in steps if k != 0]
+        if len(nz) != 1 or steps[nz[0]] < 0.6 * len(pairs):
+            continue
+        k = nz[0]
+        ev = {f for f in pairs if (vals[f + 1] - vals[f]) % mod == k and vals[f] + k >= mod}
+        if not ev:
+            continue
+        for d in (-2, -1, 0, 1, 2):
+            evd = {f + d for f in ev}
+            tp = len(evd & target); fp = len(evd - target); fn = len(target - evd)
+            if tp and 2 * tp / (2 * tp + fp + fn) >= 0.8:
+                out.append((off, width, k, d, tp, fp, fn))
+    return out
+
+def section_b(quiet=False):
+    fails = []
+    def need(cond, msg):
+        if not quiet: print(("  ok   " if cond else "  FAIL ") + msg)
+        if not cond: fails.append(msg)
+    for g in LIVE:
+        fs = list(range(2560, 2761))
+        D = {f: open(f"{work}/dump_{g}/dump_{f}_ff0000.bin", "rb").read() for f in fs}
+        need(all(len(D[f]) == 0x10000 for f in fs), f"{g}: 201 work-RAM dumps of 64 KB")
+        steps80 = {(D[f + 1][0x8080] - D[f][0x8080]) & 0xFF for f in fs[:-1]}
+        need(steps80 == {1}, f"{g}: RAM:$FF8080 steps +1 between every pair of dumps — the dumps are one frame apart (measured {sorted(steps80)})")
+        t = ticks(g, LIVE[g])["p2"]
+        target = {f for f in fs if t[f] >= 2}
+        need(len(target) > 0, f"{g}: {len(target)} P2 double-tick frames inside the dump window")
+        counter = {f: D[f][0x8080] for f in fs}
+        # the frame-counter modulus, and its plant
+        planted = {f for f in fs if counter[f] % 3 == 0}
+        need(3 in modulus_pure(counter, fs, planted, range(2, 65)), f"{g}: planted — a target defined as $FF8080 % 3 == 0 is found at modulus 3")
+        real = modulus_pure(counter, fs, target, range(2, 65))
+        need(real == [], f"{g}: no modulus 2..64 of $FF8080 separates double-tick frames from single ones (measured {real})")
+        # the bit / exact-value predictor over $FF8000-$FF83FF, and its plant
+        const = [o for o in range(0x8000, 0x8400) if len({D[f][o] for f in fs}) == 1]
+        need(len(const) > 0, f"{g}: a constant byte exists in $FF8000-$FF83FF to plant into")
+        po = const[0]
+        plant = {f: (0x08 if f in target else 0x00) for f in fs}
+        byte_planted = lambda off, f: plant[f] if off == po else D[f][off]
+        got = predictors(byte_planted, fs, target, [po])
+        need(("bit", 0, po, 3) in got, f"{g}: planted — bit 3 of RAM:${0xFF0000 + po:06X} set on the double frames is found at d = 0")
+        real = predictors(lambda off, f: D[f][off], fs, target, range(0x8000, 0x8400))
+        need(real == [], f"{g}: no bit or exact value of $FF8000-$FF83FF equals the double-tick set at d = -2..+2 (measured {len(real)} hit(s))")
+        # the accumulator over all work RAM, and its two plants (their own carry sets)
+        const_all = [o for o in range(0, 0x10000 - 1) if len({D[f][o] for f in fs}) == 1 and len({D[f][o + 1] for f in fs}) == 1]
+        need(len(const_all) > 0, f"{g}: a constant word exists in work RAM to plant into")
+        ao = const_all[0]
+        for width, k, v0 in ((1, 0x3B, 0x10), (2, 0x3B11, 0x1000)):
+            mod = 1 << (8 * width); v = v0; col = {}
+            for i, f in enumerate(fs):
+                col[f] = v
+                v = (v + (0 if i % 17 == 16 else k)) % mod
+            carries = {f for f in fs[:-1] if col[f + 1] != col[f] and col[f] + k >= mod}
+            def value_planted(off, f, w, col=col, width=width):
+                if off == ao and w == width:
+                    return col[f]
+                return int.from_bytes(D[f][off:off + w], "big")
+            got = accumulators(value_planted, fs, carries, [ao], width)
+            need(any(o == ao and dd == 0 and fp == 0 and fn == 0 for o, w, kk, dd, tp, fp, fn in got),
+                 f"{g}: planted — a width-{width} accumulator stepping +{k:#x} with pauses is found against its {len(carries)} carries")
+        real = []
+        for width in (1, 2):
+            real += accumulators(lambda off, f, w: int.from_bytes(D[f][off:off + w], "big"), fs, target, range(0, 0x10000 - width + 1), width)
+        need(real == [], f"{g}: no pausable constant-step accumulator anywhere in work RAM carries on the double-tick frames (F1 >= 0.8; measured {len(real)})")
+    return fails
+
 pcmap = perturb(LIVE) if MODE == "twin-pc" else LIVE
 fails = analyse(pcmap)
 if MODE == "":
@@ -156,8 +295,10 @@ if MODE == "":
     else:
         print("CONTROL DEAD: twin-pc — vsav2's taps read with vsavj's PCs did not fail the live-twin assertion")
         sys.exit(1)
+if not fails:
+    fails += section_b()
 if fails:
     print(f"FAIL: audit_tick_cadence — {len(fails)} assertion(s) failed")
     sys.exit(1)
-print("PASS: audit_tick_cadence — vsav2 doubles every third frame, vsavj every fourth or fifth, globally and inside one activation; the tick twin is live")
+print("PASS: audit_tick_cadence — vsav2 doubles every third frame, vsavj every fourth or fifth, globally and inside one activation; the tick twin is live; neither the frame counter, a single $FF8000-$FF83FF bit or value, nor a work-RAM accumulator decides it (each search found its plant)")
 PY
