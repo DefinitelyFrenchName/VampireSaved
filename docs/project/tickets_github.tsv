@@ -4,14 +4,14 @@
 # repo: DefinitelyFrenchName/VampireSaved
 # issues: 142
 number	state	reason	closed	labels	title
-142	OPEN	-	-	bug	Donovan's 421+MP with no mash lands 5 hits on our build and 4 on native vsav2 at NORMAL speed (equal at TURBO)
+142	CLOSED	NOT_PLANNED	2026-09-15	bug	Donovan's 421+MP with no mash lands 5 hits on our build and 4 on native vsav2 at NORMAL speed (equal at TURBO)
 141	OPEN	-	-	evolution	The full FBNeo hacked-vs-vanilla legacy track — CLAUDE.md [VSP-24]'s deferral, now its own ticket (the #78 residual)
 140	OPEN	-	-	bug	The static runners' controls readout re-adds the previous gate's must-fire counts for every gate that does not PASS — fired/declared overstated on a red run
 139	CLOSED	COMPLETED	2026-09-14	bug	A rejected build keeps its packed rompath, indistinguishable on disk from a finished build (the #1 residual)
 138	OPEN	-	-	bug	A stock-track build directory without its vsavj.zip silently dispatches run_suite to the VANILLA expectations — the reference-row rule nothing enforces (the #55 residual)
 137	CLOSED	COMPLETED	2026-09-14	bug	test_wide_profile's reference guard trusts a profile check that nothing in the run proves can see the profile (the #63 residual)
 136	OPEN	-	-	evolution	Tenant move parity vs native VS2: compare Donovan, Phobos and Pyron's moves on the WIDE merged build against vsav2
-135	OPEN	-	-	evolution	The VS-vs-VS2 tick cadence: re-establish its measurement, mechanism and scope, and document it properly
+135	CLOSED	COMPLETED	2026-09-15	evolution	The VS-vs-VS2 tick cadence: re-establish its measurement, mechanism and scope, and document it properly
 134	OPEN	-	-	bug	The hit rigs' LP events whiff at contact range
 133	OPEN	-	-	evolution	Re-measure the emulator runner's pull-queue gain on a wider host
 132	OPEN	-	-	bug	release/merged-m15 was never packaged
@@ -31,7 +31,7 @@ number	state	reason	closed	labels	title
 118	OPEN	-	-	evolution	Community cross-check: the ~90 unadopted mizuumi player-struct candidates, each adopted only once measured
 117	OPEN	-	-	evolution	Community cross-check: naming rigs on vsavj for specials, supers, throws, the CL. rows and the 6-prefixed rows
 116	OPEN	-	-	evolution	Capture matrix: widen the in-emulator anchors from 3 cells to a sampled row per tenant
-115	OPEN	-	-	contested,evolution,severity: low	Zabel j.LK proximity guard: a surgical legacy patch for vanilla and WIDE, its own session, recording first
+115	OPEN	-	-	contested,evolution	Zabel j.LK proximity guard: a surgical legacy patch for vanilla and WIDE, its own session, recording first
 114	CLOSED	COMPLETED	2026-09-02	bug,correctness,severity: medium	421+P (Lighting Sword): ours lands 3 hits and knocks the victim away; native VS2 lands 6 and holds — measured, and the gate cannot see it
 113	CLOSED	COMPLETED	2026-09-01	cosmetic,severity: low	Whole-screen flash at the first down (photosensitivity) — seen for many builds
 112	CLOSED	COMPLETED	2026-09-04	cosmetic,severity: low	Press of Death (41236+K): blue/black palette about half the time on merged-m9

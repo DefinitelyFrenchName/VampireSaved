@@ -39,6 +39,9 @@
 # with no mash at level 6 was 5 hits on ours and 4 on native, the fifth at frame
 # 2678, because on the pass after the fourth hit the two legs updated the
 # fighters in opposite orders and ours' attacker stayed frozen one pass longer.
+# The unpinned-rng control's evidence re-measures that order every run: on the
+# frame after the fourth hit the attacker's freeze `+0x5C` is written 3, 4, 3
+# on native (set, then its reducer) and 3, 2, 4 on ours (its reducer, then set).
 # With the level AND the RNG pinned, every leg is identical to the frame.
 #
 # MAINTAINER'S RULINGS (2026-09-15; DECISIONS_HISTORY.md "Ruled 2026-09-15
@@ -89,7 +92,7 @@
 # Usage: ROMDIR=... tests/test_don_immortal_native.sh [rompath_dir]
 #   The rompath's pack picks the track: a `vsavjw.zip` runs the WIDE leg
 #   (replay don/114 + the WIDE MAME binary), anything else the stock leg.
-# Runtime: ~4 min (40 MAME legs), emulator tier.
+# Runtime: ~4 min (42 MAME legs), emulator tier.
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that
@@ -154,6 +157,17 @@ run() {   # run <name> <set> <rompath> <rpl file> <pokes> [mame_bin]
     [ "$(ls "$WORK/$1"/dump_*_ff8800.bin 2>/dev/null | wc -l)" -ge 150 ] \
         || { echo "FAIL: leg $1 produced no dumps (see $WORK/$1/mame.log)"; exit 1; }
 }
+tapleg() {   # tapleg <name> <set> <rompath> <rpl file> <pokes> [mame_bin] — the attacker's freeze writes, frames 2655..2668
+    mkdir -p "$WORK/$1"
+    [ -n "${6:-}" ] && { MAME_BIN="$6"; export MAME_BIN; }
+    POKES="$5" REPLAY="$4" TAP=ff845c,2 WINDOW=2655,2668 FRAMES=2668 TRACE_OUT="$WORK/$1/tap.log" \
+        MAME_SANDBOX="$WORK/$1/sb" MAME_ROMPATH="$3" tools/run_mame.sh "$2" \
+        -autoboot_script "$REPO/tests/lua/tap_writes.lua" > "$WORK/$1/mame.log" 2>&1
+    unset MAME_BIN
+    rm -rf "$WORK/$1/sb"
+    grep -q '^END 2668 ' "$WORK/$1/tap.log" 2>/dev/null \
+        || { echo "FAIL: tap leg $1 did not reach frame 2668 (see $WORK/$1/mame.log)"; exit 1; }
+}
 # THE TWO PINS — one function each, used by every leg. The unmatched-modes mode
 # withholds the level from the native legs (vsav2 stays at its default, 8); the
 # unpinned-rng mode withholds the RNG pin from every leg.
@@ -199,11 +213,14 @@ for lv in 06 08; do
 done
 run ctl vsavj "$ROMDIR" "$REPO/tests/replays/48_don_immortal_ko.rpl" ""
 # the in-gate controls' own legs: native LP at the ceiling at its DEFAULT level
-# (RNG pinned), and MP no-mash at level 6 on both sides with the RNG UNPINNED
+# (RNG pinned), and MP no-mash at level 6 on both sides with the RNG UNPINNED —
+# plus a write tap on each unpinned MP leg for the order that makes them part
 run nat_LP_ceil_default vsav2 "$ROMDIR" "$WORK/nat_LP_ceil.rpl" "$(rng_pokes)"
 L6="$(level_pokes 06)"
 run nat_MP_L06_unpinned vsav2       "$ROMDIR"        "$WORK/nat_MP.rpl" "$L6"
 run our_MP_L06_unpinned "$OURS_SET" "$RPDIR;$ROMDIR" "$WORK/our_MP.rpl" "$L6" "$OURS_BIN"
+tapleg tap_nat_MP_L06_unpinned vsav2       "$ROMDIR"        "$WORK/nat_MP.rpl" "$L6"
+tapleg tap_our_MP_L06_unpinned "$OURS_SET" "$RPDIR;$ROMDIR" "$WORK/our_MP.rpl" "$L6" "$OURS_BIN"
 
 python3 - "$WORK" "$BASES" "$MODE" <<'EOF2'
 import sys, os, struct
@@ -241,6 +258,15 @@ def pins(leg, frame):   # (level $FF8116, RNG $FF80D4-D5, turbo-pass flag $FF812
     return b[0x96], u16(b, 0x54), b[0xAD]
 
 def shape(m): return (m['n'], m['dmg'], m['frames'])
+
+def freeze_writes(leg, frame):   # the attacker's +0x5C byte writes on one tap frame, in order
+    out = []
+    for l in open(os.path.join(work, leg, 'tap.log')):
+        if l.startswith('frame'):
+            t = l.split()
+            if int(t[1]) == frame and int(t[5], 16) == 0xFF845C and int(t[9], 16) == 0xFF00:
+                out.append((int(t[7], 16) >> 8) & 0xFF)
+    return out
 
 # THE EXECUTABLE MODE: treat the Jedah control leg as ours and require it to be
 # Donovan, which it never is, so the gate FAILs (a clean exit, not a traceback).
@@ -356,6 +382,13 @@ if shape(un) != shape(uo) and (rn, ro) != (0, 0):
 else:
     print(f"CONTROL DEAD: unpinned-rng — unpinned native {shape(un)}, ours {shape(uo)}, RNG {rn:04x}/{ro:04x}: "
           f"the gate cannot be shown to see the RNG"); fails.append("unpinned-rng dead")
+# WHY they part (#142): on the frame after the fourth hit (tap frame 2667) the
+# RNG-picked update order sets the attacker's freeze before its reducer on
+# native and after it on ours
+fn, fo = freeze_writes('tap_nat_MP_L06_unpinned', 2667), freeze_writes('tap_our_MP_L06_unpinned', 2667)
+need((fn, fo) == ([3, 4, 3], [3, 2, 4]),
+     f"#142's mechanism, unpinned MP at level 6: the attacker's +0x5C writes on tap frame 2667 are native {fn} "
+     f"(set, then reducer) and ours {fo} (reducer, then set) — frozen [3, 4, 3] / [3, 2, 4]")
 
 if fails:
     print(f"FAIL: test_don_immortal_native — {len(fails)} assertion(s) failed")
