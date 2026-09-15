@@ -74,7 +74,7 @@ is the source of truth (the 14z-123 ruling: a gate's WHY lives in the gate);
 when this file is stale or a script has no family row.
 
 **How to run things** is HANDOFF.md "How to test": the portable tier is
-`tests/run_all_static.sh` (ROM-free, ~1 min), `ROMDIR=... tests/run_all_static.sh
+`tests/run_all_static.sh` (ROM-free), `ROMDIR=... tests/run_all_static.sh
 --strict` adds the static tier and makes SKIP fatal; emulator-tier gates and
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.

@@ -143,27 +143,72 @@ family in section 2 (Donovan's wrong COLOURS there), and its two
 unmasked 0x021C64/0x021C8E siblings. That work is separate and still
 open — see section 2's consequence paragraph.
 
-## §2 addendum: the fold path is DORMANT in every measured flow (measured 14z-64)
+## §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100)
+
+**CORRECTED 14z-157.** Until then this heading read "DORMANT in every
+measured flow" and the verdict below said no tenant-visible surface reads a
+folded block. The taps' finding that the fold never fires stands (re-measured
+below); their COVERAGE did not include the arcade
+NEXT-STAGE screen, and that screen shows the fold's signature: in a
+maintainer playtest (2026-08-18, `build/m3b_merged9`, #100) it names Donovan
+"Victor" with a blank portrait, and `0x13 & 0x0F == 0x03`. What #100 read
+STATICALLY (not measured in a run):
+
+- the routine around `PRG:0x00A43E` loads `$382` from a player struct, folds
+  it (`andi.w #$000F` at `PRG:0x00A442`) and stores it to `$130(a5)` at
+  `PRG:0x00A446`;
+- `$130(a5)` has 14 readers, and they split: **8 fold it AGAIN**
+  (`PRG:0x01BF94`, `PRG:0x01BFEE`, `PRG:0x01C076`, `PRG:0x01C0E4`,
+  `PRG:0x01C238`, `PRG:0x01C292`, `PRG:0x01C31A`, `PRG:0x01C388`), so widening
+  the store alone changes nothing for them, and **6 use it raw**
+  (`PRG:0x00CD9C`, `PRG:0x021AC8`, `PRG:0x021C12`, `PRG:0x021C64`,
+  `PRG:0x021C8E`, `PRG:0x06C494`) and would index with `0x13` into tables that
+  may hold 16 rows. #100 names the fix's shape from that split: widen the
+  store and the eight re-folds, then prove each raw consumer has a row at
+  `0x13`.
+
+**Still unmeasured:** which reader draws which element of that screen — no
+rig reaches it (`RAM:$FF8130` stayed `0x00` across the 40,620-frame arcade
+marathon with Donovan forced).
+
+**THE WRITERS, MEASURED 14z-157 — neither record had them**
+(`tests/audit_ff8130_writers.sh`). #100's scan, which reads the displacement
+word right after the opcode, found only `PRG:0x00A446`; decoding at every
+offset finds four more DIRECT writers that carry an immediate word first —
+`move.b #$E,$130(a5)` at `PRG:0x08E336` and `PRG:0x090BE4`, `move.b
+#$5,$130(a5)` at `PRG:0x08E342` and `PRG:0x090BD2`. The 14z-64 audit's two
+writers write the NEIGHBOUR byte: `PRG:0x02033E` is `move.b $ac(a5),$131(a5)`
+and `PRG:0x020AE8` is `bset.b d2,$131(a5)`, and a tap on the word, bucketed
+by write mask, puts both on the `$FF8131` lane only. What reaches `$FF8130`
+on vanilla vsavj in boot, attract, select, a match and a 1P arcade run is
+block writes — the boot RAM test and clear (`PRG:0x000D34`, `PRG:0x000D3A`,
+`PRG:0x000DD8`) and `PRG:0x016DFC`, which clears `$FF8100-$FF817F` — and none
+of the five direct writers fires there.
+
+The 14z-64 audit, as written:
 
 The concern above presupposed the `0x00A43E` fold executing on tenant
 surfaces. Audited (14z-64), it does not:
 
 - **Dynamic**: write-taps on `$FF8130` across seven flows — boot,
   attract, 1P select, 2P select, VS, match, KO, bonus tally, 2P victory
-  screen, arcade win-quote — the fold write NEVER fires. The field's
+  screen, arcade win-quote — the fold write NEVER fires. ~~The field's
   live writers are the screen init (0, PC 0x2033E) and the cursor
   commit (1, PC 0x20AE8): in these flows `$130(a5)` is a context flag,
-  not an id.
+  not an id.~~ Those two write `$131(a5)`, the neighbour byte (measured
+  14z-157, above).
 - **Static**: ZERO jsr/bsr/jmp/table references to `0x00A43E` in the
   whole first MB — it is fall-through-interior code of a routine whose
-  trigger lies outside every measured flow (plausibly ending/gallery
-  content).
+  trigger lies outside every measured flow (~~plausibly ending/gallery
+  content~~ — it sits in the arcade-ladder code, and the next-stage screen
+  shows its signature, #100 above).
 - Twelve maintainer playtest rounds surfaced no color fault on any
   tenant screen.
 
-**Verdict: no tenant-visible surface reads a folded block today; no
+~~**Verdict: no tenant-visible surface reads a folded block today; no
 widening or block placement is needed.** RESIDUAL: the deep-arcade
 ENDING flow (finishing the game with the tenant) is unmeasured — if it
 ever shows Victor-colored elements, re-run this audit's taps on that
 flow; the fix pattern (win_pal-style sparse block + TT thunks at the
-consumers) is established.
+consumers) is established.~~ **RETRACTED 14z-157** — see the correction at
+the head of this addendum.

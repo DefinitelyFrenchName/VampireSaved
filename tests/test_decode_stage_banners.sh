@@ -139,7 +139,7 @@ for base in (0x00B268, 0x00BB68):
             print(o["hex"])
 PY
   A=$(sed -n 1p "$T/row"); B=$(sed -n 2p "$T/row")
-  [ -n "$A" ] && [ -n "$B" ] || { fail "$d: no authored voice rows found"; continue; }
+  [ -n "$A" ] && [ -n "$B" ] || { fail "$d: no authored arcade-ladder rows found"; continue; }
   $DEC ladder-hex "$A" "$B" --stages "$VJ" 0x26771e 0x26775a > "$T/l.txt" 2>&1
   n=$(sed -n 's/^  \([0-9]*\) out-of-range entries$/\1/p' "$T/l.txt")
   odd=$(grep -c 'OUT OF RANGE' "$T/l.txt" || true)

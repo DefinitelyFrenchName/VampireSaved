@@ -24,13 +24,6 @@ release. `git status -sb` says the push state.
     #100, #101, #102, #112;
   - judgement calls to confirm: #78 evolution, #108 invalid, #112 declined; GitHub kind labels
     on #75-#114.
-- **THE STALE LIVE CLAIMS THE THREADS FOUND** — verify each at HEAD, then fix by [VSP-13]:
-  `docs/game/atlas/venue_assets.md` §2 addendum (the fold "dormant in every measured flow",
-  against #100), `tests/test_pod_black_foot_palette.sh` (~line 26, "still unknown"),
-  `tools/audit_effect_rects.py` "WHY THIS EXISTS" (the retracted shelf-pack mechanism),
-  `tests/test_don_reactions.sh` (~lines 25-28, "MASHING is NOT covered … Open on #114"),
-  `tests/test_voice_row_range.sh` (named and headed "voice-class rows"), `HANDOFF.md` ~line 363 ("no `.rbf` has been loaded onto a DE10-Nano" — `docs/project/mister_core.md` records hardware since 14z-109; found 14z-156 while drafting a README); #77's `contested`
-  label on GitHub.
 - **#135 CONTINUES.** Steps 1-2 landed at 14z-156 (`tests/audit_tick_cadence.sh`, the 14z-156 addendum in
   `docs/game/engine_internals.md`, the issue comment). Next, cheapest first:
   1. the DECIDER of the second pass — a debugger call chain from the tick site

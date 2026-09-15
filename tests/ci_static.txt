@@ -191,7 +191,7 @@ test_bbh_fidelity
 # from the decrypted images. Each check QUOTES its claim from the document and
 # DERIVES the fact from the view, so a check cannot outlive the sentence it was
 # written for; the coverage figure is a NOTE-class number against the ruled
-# 346-address denominator. Four must-fire controls (a reworded claim, a flipped
+# 364-address denominator (346 at the 2026-09-07 ruling). Four must-fire controls (a reworded claim, a flipped
 # ROM byte, a PARAPHRASE claim's literal fact, a vacuous validator).
 # ci_static and not ci_portable: it reads the three decrypted reference views
 # (ROMDIR on a cache miss). ~2 s warm, ~35 s cold.

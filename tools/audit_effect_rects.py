@@ -20,18 +20,29 @@ byte-identical to the reference (measured: `vm3j.08a` differs in 0 of 524288
 bytes).  The port never rewrites them; it places the tenant's art AT the tile
 codes those host records already reference.  A CPS-2 block of `w x h` tiles
 draws `code + r*0x10 + c`, so a multi-tile block is only correct if the
-donor's rectangle was laid into the destination rectangle TILE FOR TILE.  The
-#112 "Press of Death turns black mid-move" was exactly this: of the 14 blocks
-in one record, 11 were placed perfectly and 3 were not — the 2x8 block had
-1 of its 16 tiles right, and the other 15 held real but FOREIGN donor art, so
-the foot drew as recognisable shapes filled with the wrong pixels.
+donor's rectangle was laid into the destination rectangle TILE FOR TILE.
+
+RETRACTED — THE #112 ATTRIBUTION THIS WAS BUILT FOR (retracted 14z-112, the
+same session; this docstring kept it until 14z-157).  It was written because
+#112's "Press of Death turns black mid-move" was read as exactly this defect:
+of the 14 blocks in one record, 11 placed perfectly and 3 holding real but
+FOREIGN donor art.  Its own first run killed that reading: every tile in the
+merged build's window `0xa000-0xffff` is byte-identical to stock vsavj, the
+foot's tiles included, so the port placed no art there and the "mis-packed"
+blocks were vsavj and vsav2 laying shared art out differently.  #112 was a
+palette overwrite, not tiles — docs/game/engine_internals.md "EFFECT PALETTES
+ARE OWNED BY THE PLAYER, NOT THE EFFECT".
 
 WHAT IT CHECKS.  For each observed block `(code, w, h)`:
     donor_of(ours[code + r*0x10 + c]) == donor_of(ours[code]) + r*0x10 + c
 for every r,c — i.e. the destination rectangle is a translated copy of one
 donor rectangle.  Tiles are matched BY CONTENT (128-byte hash), never by
-arithmetic: the band-delta inversion was falsified and the effect shelf packs
-non-contiguously, so only content matching is admissible here.
+arithmetic: the band-delta inversion was falsified, and the offset between
+the games' tile codes is not constant (14z-112: `0x0e715` -> vs2 `0x301e6` is
++0x21AD1, `0x0e740` -> `0x3021f` is +0x21ADF — read at the time as the effect
+shelf packing non-contiguously, but both codes sit in that stock window, so it
+is the two games' layouts that differ), so only content matching is
+admissible here.
 
 INPUTS (all produced by tests/lua/inp_probe.lua, see test_effect_rects.sh):
   --ours    <file>   "<tile_hex> <hash>" per line, the build under test

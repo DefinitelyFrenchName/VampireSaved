@@ -22,10 +22,17 @@
 #
 # What this gate does NOT establish: WHY the entry holds f111 at that moment.
 # The effect loads fcff and a later write of the same palette-copy routine
-# (PRG:0x02AD64/0x02AD78) puts f111 back before the sprite draws. Which
-# palette-sequence request issues that later write is still unknown.
+# (PRG:0x02AD64/0x02AD78) puts f111 back before the sprite draws. That WHY is
+# measured elsewhere (2026-09-02, 14z-126b; until 14z-157 this header still
+# called it unknown): every index-14 write in the window carries P1's fighter
+# block (A6 = RAM:$FF8400), and the early revert happens because Donovan is
+# HIT while his effect is still drawing — being hit re-requests his default
+# body palette. Of the eleven effect-palette loads in the recording, the one
+# that survives 28 frames instead of 108-144 is the only one with damage
+# inside its window. docs/game/engine_internals.md "EFFECT PALETTES ARE OWNED
+# BY THE PLAYER, NOT THE EFFECT".
 #
-# Usage: ROMDIR=... tests/test_pod_black_foot_palette.sh   (~7 min, 2 MAME runs)
+# Usage: ROMDIR=... tests/test_pod_black_foot_palette.sh   (~2.5 min, 3 MAME runs — 145 s measured 2026-09-15; it said ~7 min, 2 runs until then)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

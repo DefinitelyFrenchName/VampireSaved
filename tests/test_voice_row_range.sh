@@ -1,18 +1,25 @@
 #!/bin/sh
-# test_voice_row_range.sh — the AUTHORED voice-class rows must stay inside
+# test_voice_row_range.sh — the AUTHORED arcade-ladder rows must stay inside
 # vanilla's value range (14z-93, GitHub #92). ~2s, no emulator.
 #
-# THE DEFECT THIS GATES. Each tenant build authors a 64-byte row in each of
-# the two voice-class tables at its own voice-class index:
+# THE FILENAME IS THE 14z-93 READING, CORRECTED 14z-94 (#92). The rows were
+# first read as VOICE-CLASS rows; they are the ARCADE LADDER's — table A holds
+# candidate CLASSES, table B the STAGE for each, and `$FF8100` is the stage
+# index (docs/game/engine_internals.md, tools/decode_stage_banners.py). This
+# header kept the voice reading until 14z-157.
 #
-#     table A (candidate ids)      PRG:0x00B268 + class*64
-#     table B (parallel values)    PRG:0x00BB68 + class*64
+# THE DEFECT THIS GATES. Each tenant build authors a 64-byte row in each of
+# the two arcade-ladder tables at its own class index:
+#
+#     table A (candidate classes)  PRG:0x00B268 + class*64
+#     table B (the stage for each) PRG:0x00BB68 + class*64
 #
 # `0x00af16` fills the live pool from `class*64 + $FF8121`, the selector loop
 # at `0x00aee2` picks an unused candidate index, and `0x00af10` reads
-# `tableB_pool[index]` into `$FF8100`. That value is then used by `0x05ffb6`
-# as `A0 = 0x26775A + 2*v - 4`, a ROW of the per-char long-pointer table
-# `0x26771E`, whose FOLLOWING row is dereferenced.
+# `tableB_pool[index]` into `$FF8100`. `0x05ffa6` then computes
+# `A0 = 0x26775A + 2*v - 4` (the 14z-93 write tap attributed its store to
+# `0x05ffb6`), a ROW of table `0x26771E` whose FOLLOWING row is dereferenced
+# — from row `0x0F` on, that table is the stage-name banner family.
 #
 # **The last row with a valid follower is 0x19**, so the largest safe value
 # is `2*(0x19-14) = 0x16`. Vanilla obeys that by construction: over all 1024
@@ -165,7 +172,7 @@ for spec in os.environ["BUILDS"].split():
                 print(f"  ok   {d} row {cls:#04x} ({name}): all {len(h)} bytes <= {BOUND:#04x}")
 
 if seen == 0:
-    print("  FAIL: no authored voice rows found in any build — nothing measured")
+    print("  FAIL: no authored arcade-ladder rows found in any build — nothing measured")
     rc = 1
 sys.exit(rc)
 PY
@@ -308,4 +315,4 @@ fi
 [ "${rc_a:-0}" -eq 0 ] && [ "${rc_b:-0}" -eq 0 ] || exit 1
 
 echo
-echo "PASS: every authored voice row stays inside vanilla's value range."
+echo "PASS: every authored arcade-ladder row stays inside vanilla's value range."

@@ -20,7 +20,7 @@ number	state	reason	closed	labels	title
 127	OPEN	-	-	cosmetic	#112 option (B): the Press of Death effect owns its palette row (scope first)
 126	OPEN	-	-	cosmetic	Select-wheel look-and-feel polish
 125	OPEN	-	-	cosmetic	Arcade-ladder map names and pictures (not investigated)
-124	OPEN	-	-	cosmetic	Arcade-ladder roulette tag shows the base character for a tenant opponent
+124	OPEN	-	-	cosmetic	Arcade-ladder roulette tag shows the base/shell character for a tenant opponent on the arcade ladder map screen
 123	OPEN	-	-	cosmetic	Win-quote text for the three tenants (forgone for now; only the clean way, vanilla untouched)
 122	OPEN	-	-	evolution	Run the --controls release tier on the dedicated Linux server and compare its speed with the Mac
 121	OPEN	-	-	evolution	Linux release binaries built on the dedicated server, plus the clean-machine check at release (option 3)
@@ -29,7 +29,7 @@ number	state	reason	closed	labels	title
 118	OPEN	-	-	evolution	Community cross-check: the ~90 unadopted mizuumi player-struct candidates, each adopted only once measured
 117	OPEN	-	-	evolution	Community cross-check: naming rigs on vsavj for specials, supers, throws, the CL. rows and the 6-prefixed rows
 116	OPEN	-	-	evolution	Capture matrix: widen the in-emulator anchors from 3 cells to a sampled row per tenant
-115	OPEN	-	-	evolution	Zabel j.LK proximity guard: a surgical legacy patch for vanilla and WIDE, its own session, recording first
+115	OPEN	-	-	contested,evolution,severity: low	Zabel j.LK proximity guard: a surgical legacy patch for vanilla and WIDE, its own session, recording first
 114	CLOSED	COMPLETED	2026-09-02	bug,correctness,severity: medium	421+P (Lighting Sword): ours lands 3 hits and knocks the victim away; native VS2 lands 6 and holds — measured, and the gate cannot see it
 113	CLOSED	COMPLETED	2026-09-01	bug,severity: low	Whole-screen flash at the first down (photosensitivity) — seen for many builds
 112	CLOSED	COMPLETED	2026-09-04	bug,severity: low	Press of Death (41236+K): blue/black palette about half the time on merged-m9
@@ -67,7 +67,7 @@ number	state	reason	closed	labels	title
 80	CLOSED	COMPLETED	2026-08-17	-	Guard setup_mame’s destructive mirror target
 79	CLOSED	COMPLETED	2026-08-17	-	Make graphics safety checks survive optimized Python
 78	CLOSED	COMPLETED	2026-08-16	-	Add the direct FBNeo hacked-build legacy oracle
-77	CLOSED	COMPLETED	2026-08-17	contested	Bound FBNeo replay frames and check allocation arithmetic
+77	CLOSED	COMPLETED	2026-08-17	-	Bound FBNeo replay frames and check allocation arithmetic
 76	CLOSED	COMPLETED	2026-08-17	-	Reject aliased input and output directories in build_wide_romset
 75	CLOSED	COMPLETED	2026-08-16	correctness,revealed-by-audit,severity: high	verify_gfx_build --tenant huitzil FAILS on the current merged build (m3b_merged7) — hidden since merged6 by the swallowed exit status of #14
 74	CLOSED	COMPLETED	2026-08-18	audit-2026-08-15,documentation,evolution	Adversarial code review 2026-08-15 — findings index (73 issues)

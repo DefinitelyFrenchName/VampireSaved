@@ -49,8 +49,10 @@ THE MEASUREMENTS THAT SHAPED IT (§11.3, all made before this file existed):
     two or more — so a vsavj-only checker would leave its largest table
     unchecked. `decrypt_view` takes the set as an argument and the opener's
     ROM audit covers all 76 members, so this costs nothing.
-  * COVERAGE IS REPORTED AGAINST 346 (maintainer-ruled 2026-09-07): the 473
-    atlas addresses minus the 127 carried only by `ram.md`. Those 127 are
+  * COVERAGE IS REPORTED AGAINST THE ROM-TIER CENSUS (the definition
+    maintainer-ruled 2026-09-07: the atlas addresses minus those carried only
+    by `ram.md` — 346 at the ruling, 473 minus 127; 364 since 14z-157). Those
+    ram.md-only addresses are
     program addresses, but their claims are dataflow ("this routine writes
     that field") and belong to the suite, not here (scope §6.5). Counting
     them would make the number permanently and misleadingly low.
@@ -82,7 +84,9 @@ ROM_TIER_DOCS = ("README.md", "character_tables.md", "id_space.md",
 
 # Ruled 2026-09-07: the coverage denominator. Asserted against the live
 # census by --uncovered, so it cannot drift from the tree unnoticed.
-DENOMINATOR = 346
+# 346 at the ruling; 364 since 14z-157, when the venue_assets.md and ram.md
+# corrections for #100 and RAM:$FF8130 added 18 ROM-tier addresses.
+DENOMINATOR = 364
 
 
 class Stale(Exception):
@@ -158,7 +162,7 @@ UNENCODABLE = {}      # address -> why no check can reach it
 # Decision 4's fourth bucket: the census regex cannot tell an address from a
 # hex literal that looks like one (the `gen_annotations` header says so of
 # itself). These are DECLARED rather than guessed, and they stay INSIDE the
-# ruled 346 denominator — excluding them would silently move a number the
+# ruled denominator — excluding them would silently move a number the
 # maintainer ruled. They are labelled in --uncovered so no later session
 # tries to write a check for a notation example.
 NOT_ADDRESSES = {

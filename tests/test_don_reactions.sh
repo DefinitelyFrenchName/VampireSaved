@@ -22,10 +22,12 @@
 #   * MEASURED by `tests/test_don_immortal_native.sh` (which exists because of
 #     #114), native in-run, all four strengths, no mash, on BOTH tracks:
 #     LP 3h/7d - MP 5h/9d - HP 6h/10d - ES 9h/13d, OURS EQUAL TO NATIVE in
-#     every cell, victim held throughout. MASHING is NOT covered by either
-#     gate: the extension is multi-level by mash rate and the rig's fixed
-#     absolute press frames land at different phases of the move on the two
-#     legs. Open on #114.
+#     every cell, victim held throughout. MASHING is covered by section 5 of
+#     that gate, added later the same session (14z-127 (5)): at the true
+#     input ceiling MP/HP/ES equal native and LP is one hit short, ruled.
+#     (Until 14z-157 this line said neither gate covered mashing, because
+#     the rig's fixed absolute press frames land at different phases of the
+#     move on the two legs.)
 #   * SO THE HARDCODED `native == 10` BELOW IS NOW MEASURED AND CORRECT. It
 #     did enter this file as testimony (STATE 14z-42c) and that criticism was
 #     fair; the number it asserted turned out to be right.

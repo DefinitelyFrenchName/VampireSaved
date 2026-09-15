@@ -26,6 +26,14 @@ address.
 USING** — the cheapest form is to widen the range and confirm the count rises,
 or to survey the enclosing structure once before trusting a zero.
 
+**PAID AGAIN, THE MIRROR CASE (found 14z-157): a WORD tap read WITHOUT its
+mask reports the NEIGHBOUR byte's writes.** The 14z-64 venue-asset audit named
+`PRG:0x02033E` and `PRG:0x020AE8` as writers of `RAM:$FF8130`; both write
+`$FF8131`, and a `TAP=ff8130,2` run shows each with mask `0x00FF` only. The rule
+has a second half: once the tap covers the word, bucket every hit by its MASK
+(`0xFF00` the even byte, `0x00FF` the odd byte, `0xFFFF` both) before naming a
+writer of a BYTE. `tests/audit_ff8130_writers.sh` holds it.
+
 
 ## CPS-2 ROM file byte order is NOT 68k logical order (paid: 2026-07-25, ~1h)
 

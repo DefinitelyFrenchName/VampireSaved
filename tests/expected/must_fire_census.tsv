@@ -9,6 +9,7 @@ declares	audit_defense_row_residue
 declares	audit_df_accumulator
 declares	audit_df_dead_family
 declares	audit_df_startup_invuln
+declares	audit_ff8130_writers
 declares	audit_guard_corpus
 declares	audit_guard_mask_reads
 declares	audit_hui_grunt

@@ -11,12 +11,12 @@ is the source of truth (the 14z-123 ruling: a gate's WHY lives in the gate);
 when this file is stale or a script has no family row.
 
 **How to run things** is HANDOFF.md "How to test": the portable tier is
-`tests/run_all_static.sh` (ROM-free, ~1 min), `ROMDIR=... tests/run_all_static.sh
+`tests/run_all_static.sh` (ROM-free), `ROMDIR=... tests/run_all_static.sh
 --strict` adds the static tier and makes SKIP fatal; emulator-tier gates and
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**331 scripts** — 79 ci_portable, 75 ci_static, 177 emulator-tier (run by name).
+**332 scripts** — 79 ci_portable, 75 ci_static, 178 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -27,7 +27,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 82 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 24 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 25 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -176,7 +176,7 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 | `tests/test_thunk_addr_literal.sh` | test | ci_static | ROMDIR | ground truth for the STALE PLACED-ADDRESS guard in tools/gen_donovan_patch.py (14z-78). | 14z-78 |
 | `tests/test_type_stamp_census.sh` | test | ci_static | ROMDIR | the static type-stamp census reproduces the FROZEN inventory (build/manifest/type_stamps.toml), and its verdict logic is alive in both directions. | 14z-82 |
 | `tests/test_variant_dispatch.sh` | test | ci_static | ROMDIR | THE VARIANT-ROW DISPATCH AUDIT (14z-75). | 14z-75 |
-| `tests/test_voice_row_range.sh` | test | ci_static | ROMDIR | the AUTHORED voice-class rows must stay inside vanilla's value range (14z-93, GitHub #92). ~2s, no emulator. | 14z-93 |
+| `tests/test_voice_row_range.sh` | test | ci_static | ROMDIR | the AUTHORED arcade-ladder rows must stay inside vanilla's value range (14z-93, GitHub #92). ~2s, no emulator. | 14z-93 |
 | `tests/test_win_quote_decode.sh` | test | ci_static | ROMDIR | the win-quote text system's STRUCTURE, frozen (14z-116). ci_static: needs ROMDIR only, no emulator, no build dir. | 14z-116 |
 
 ## oracle
@@ -213,7 +213,7 @@ the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, du
 | `tests/test_m2a_stage4_oracle.sh` | test | emulator | a build dir | M2a stage-4 behavior gate: ported Donovan on vsavj vs NATIVE Donovan on vsav2 (CLAUDE.md §4 dual-oracle for new content, same-emulator two-game form). | M2a |
 | `tests/test_m2a_stage4_xemu.sh` | test | emulator | MAME, FBNeo | M2a stage-4 dual-emulator gate (CLAUDE.md §4): the PATCHED build runs 17_don_oracle_vsavj (both picks scripted, 16_xemu authoring rules) on MAME and on patched FBNeo; | M2a |
 | `tests/test_masked_compare.sh` | test | ci_portable | — | ground truth for tests/lib/masked_compare.sh, the ONE implementation of the CLAUDE.md §4 masked comparison vocabulary (14z-97, GitHub #96). | 14z-97 |
-| `tests/test_pod_black_foot_palette.sh` | test | emulator | MAME, ~7 min | GitHub #112's black foot, CAUSALLY located (14z-126b, 2026-09-01): the black pixels ARE palette row 0b index 14 (RAM:$90C17C) of the OBJ palette page, and nothing else. | 14z-126b |
+| `tests/test_pod_black_foot_palette.sh` | test | emulator | MAME, ~2.5 min | GitHub #112's black foot, CAUSALLY located (14z-126b, 2026-09-01): the black pixels ARE palette row 0b index 14 (RAM:$90C17C) of the OBJ palette page, and nothing else. | 14z-126b |
 
 ## gfx
 
@@ -346,6 +346,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_df_accumulator.sh` | audit | emulator | MAME, a build dir, ~3 min | THE +0x161 ACCUMULATOR IS SASQUATCH'S DARK FORCE ARMOR (measured 14z-123; inferred_claims row 1). | 14z-123 |
 | `tests/audit_df_dead_family.sh` | audit | emulator | ~3 min | THE VS-STYLE DARK FORCE FAMILY IS DEAD IN NATIVE vs2: its shared field-setter tail at vs2 PRG:0x02622A takes ZERO hits while the activation body takes exactly one (measured 14z-126). | 14z-126 |
 | `tests/audit_df_startup_invuln.sh` | audit | emulator | MAME, a build dir, ~3 min | THE DARK FORCE STARTUP INVINCIBILITY IS +0x147, ARMED PER CHARACTER BY THE seq-0x16 HANDLER, AND THE TENANTS ARM THEIR OWN (measured 14z-126; STATE "Decisions pending" DF-startup item). | 14z-126 |
+| `tests/audit_ff8130_writers.sh` | audit | emulator | MAME, ~1 min | who writes RAM:$FF8130 on vanilla vsavj, every write form and both byte lanes: five DIRECT writers (the id fold's store at PRG:0x00A446 and four constant writes), block writes that cover the word, and two writers of the NEIGHBOUR byte $FF81… | 14z-157 |
 | `tests/audit_front_comparator.sh` | audit | emulator | MAME, a build dir, ~3 min | what $FF8127 is, and what its input byte +0x10 is (14z-123, the documentation rationalization pass, inferred_claims row 4; closes the 14z-118 (16) leftover "Open: what object byte +0x10 is"). | 14z-123 |
 | `tests/audit_guard_mask_reads.sh` | audit | emulator | MAME, a build dir, ~4 min | WHICH LONGWORDS OF THE GUARD-MASH MASK TABLE `PRG:0x028D50` THE ENGINE READS, ours vs vanilla — and that the port's bytes in its FIRST longword sit behind an index the check never produces. (14z-145.) | 14z-145 |
 | `tests/audit_pyron_capture_block.sh` | audit | emulator | MAME, a build dir, ~4 min | PYRON THROWS WITH DEMITRI'S CAPTURE GEOMETRY (measured 14z-131, maintainer-ruled "measure against native vs2 first"). | 14z-131 |

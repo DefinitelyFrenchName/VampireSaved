@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3010 |
-| named by a document or manifest only | 2035 |
-| named by both a document/manifest and code | 638 |
-| named by CODE ONLY (the gap list below) | 337 |
-| carried by atlas | 481 |
+| distinct program-space addresses named | 3034 |
+| named by a document or manifest only | 2044 |
+| named by both a document/manifest and code | 647 |
+| named by CODE ONLY (the gap list below) | 343 |
+| carried by atlas | 499 |
 | carried by engine_internals | 551 |
-| carried by other docs | 961 |
+| carried by other docs | 963 |
 | carried by manifests | 1786 |
-| carried by code | 975 |
+| carried by code | 990 |
 
 ## Addresses
 
@@ -174,7 +174,9 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x009F38` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
 | `PRG:0x00A188` | docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; build/manifest/donovan.toml — obj_hook; build/manifest/huitzil.toml — obj_hook; build/manifest/pyron.toml — obj_hook |
 | `PRG:0x00A18A` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
-| `PRG:0x00A43E` | docs/game/atlas/id_space.md — 2. Code — how wide is the id where it is consumed?; docs/game/atlas/id_space.md — The seven vsavj folding sites; docs/game/atlas/id_space.md — What a per-tenant manifest must declare; docs/game/atlas/venue_assets.md — 2. Select / VS-screen palette blocks — FOLDED to 4 bits; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is DORMANT in every measured flow (measured 14z-64); docs/project/doc_audit_14z118.md — 1.1 'docs/game/' — the game itself (surveyed 14z-118); +6 more |
+| `PRG:0x00A43E` | docs/game/atlas/id_space.md — 2. Code — how wide is the id where it is consumed?; docs/game/atlas/id_space.md — The seven vsavj folding sites; docs/game/atlas/id_space.md — What a per-tenant manifest must declare; docs/game/atlas/venue_assets.md — 2. Select / VS-screen palette blocks — FOLDED to 4 bits; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); docs/project/doc_audit_14z118.md — 1.1 'docs/game/' — the game itself (surveyed 14z-118); +7 more |
+| `PRG:0x00A442` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); tests/audit_ff8130_writers.sh |
+| `PRG:0x00A446` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); tests/audit_ff8130_writers.sh |
 | `PRG:0x00A488` | docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question) |
 | `PRG:0x00A77C` | docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question) |
 | `PRG:0x00A804` | docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; build/manifest/donovan.toml — obj_hook; build/manifest/huitzil.toml — obj_hook; build/manifest/pyron.toml — obj_hook |
@@ -219,6 +221,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x00C87C` | docs/game/engine_internals.md — The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76); tools/decode_win_quotes.py |
 | `PRG:0x00C89C` | docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question) |
 | `PRG:0x00C8C8` | docs/game/engine_internals.md — The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76) |
+| `PRG:0x00CD9C` | docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100) |
 | `PRG:0x00D116` | docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question) |
 | `PRG:0x00D5EE` | build/manifest/reconciliation.toml — map |
 | `PRG:0x00D606` | build/manifest/reconciliation.toml — map |
@@ -337,6 +340,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x016D34` | docs/game/engine_internals.md — The SUB-STATE DISPATCHER FAMILY at 0x018460 (14z-79) [vs2]; docs/game/engine_internals.md — The object-script state dispatcher at 'PRG:0x018508' (14z-109) [vs2]; docs/project/patch_notes.md — donovan-m2 stage 5 — reaction_hook: ES-DP crash fix (2026-07-27, session 11, playtest-driven) [vs2]; build/manifest/donovan.toml — state_hook [vs2]; build/manifest/huitzil.toml — port_patch; build/manifest/pyron.toml — roster21 [vs2]; +2 more |
 | `PRG:0x016DDC` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2]; docs/project/patch_notes.md — A. '[reaction_hook]' d2 extension (donovan.toml; singleton, merged inherits); tests/test_reaction_hook_d2.sh; tools/audit_fsm_census.py |
 | `PRG:0x016DE4` | docs/game/engine_internals.md — The object-script state dispatcher at 'PRG:0x018508' (14z-109) [vs2]; docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2]; docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122) [vs2]; docs/project/patch_notes.md — A. '[reaction_hook]' d2 extension (donovan.toml; singleton, merged inherits); build/manifest/donovan.toml — reaction_hook; tests/test_reaction_hook_d2.sh; +1 more |
+| `PRG:0x016DFC` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); tests/audit_ff8130_writers.sh |
 | `PRG:0x016E04` | build/manifest/huitzil.toml — beam_effect_class31; tests/audit_effect_class_rows.sh |
 | `PRG:0x016E4C` | docs/game/atlas/id_space.md — Which ids vanilla ever assigns (measured over the corpus); tests/audit_id_writers.sh |
 | `PRG:0x016E4E` | docs/game/atlas/id_space.md — Which ids vanilla ever assigns (measured over the corpus); tests/audit_id_writers.sh |
@@ -542,9 +546,17 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01BF12` | build/manifest/donovan.toml — weapon_accent_rowd_slot |
 | `PRG:0x01BF56` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tools/gen_donovan_patch.py; tools/select_port.py |
 | `PRG:0x01BF5E` | docs/game/atlas/ram.md — System / match globals; docs/game/engine_internals.md — the #92 crash; decoded end to end and confirmed on screen); tools/decode_stage_banners.py |
+| `PRG:0x01BF94` | docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100) |
 | `PRG:0x01BF98` | docs/game/atlas/id_space.md — 2. Code — how wide is the id where it is consumed? |
+| `PRG:0x01BFEE` | docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100) |
+| `PRG:0x01C076` | docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100) |
+| `PRG:0x01C0E4` | docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100) |
 | `PRG:0x01C1B6` | build/manifest/donovan.toml — weapon_accent_rowd_slot |
 | `PRG:0x01C1FA` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tools/gen_donovan_patch.py; tools/select_port.py |
+| `PRG:0x01C238` | docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100) |
+| `PRG:0x01C292` | docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100) |
+| `PRG:0x01C31A` | docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100) |
+| `PRG:0x01C388` | docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100) |
 | `PRG:0x01C3A4` | docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116); docs/game/engine_internals.md — 2. PALETTE — pool + a per-char REMAP TABLE; docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven); docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven) [vs2]; docs/game/gotchas.md — THE "?" WALKER WRITES THE DRAWN ID EVERY FRAME, FROM TWO PATHS (paid: 14z-117, one crashing probe); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; +4 more |
 | `PRG:0x01C3AE` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
 | `PRG:0x01C3C2` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
@@ -599,7 +611,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x020312` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
 | `PRG:0x020316` | docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; build/manifest/donovan.toml — obj_hook; build/manifest/huitzil.toml — obj_hook; build/manifest/pyron.toml — obj_hook |
 | `PRG:0x020318` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
-| `PRG:0x02033E` | docs/game/atlas/venue_assets.md — §2 addendum: the fold path is DORMANT in every measured flow (measured 14z-64) |
+| `PRG:0x02033E` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); docs/platform/gotchas.md — A 1-BYTE MEMORY TAP MISSES WORD ACCESSES ON THIS 16-BIT BUS — and reads as a clean, meaningless zero (paid: 14z-126b); tests/audit_ff8130_writers.sh |
 | `PRG:0x0203D8` | build/manifest/donovan.toml — weapon_accent_rowd_slot |
 | `PRG:0x0206DA` | docs/game/engine_internals.md — THE VOICE-CLASS BORROW: '(0x382,A6)' is the fighter's voice-FLAVOR class (measured 14z-87) |
 | `PRG:0x020900` | docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116) |
@@ -622,7 +634,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x020AAE` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path |
 | `PRG:0x020AB4` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; tests/test_shadow_tenant.sh |
 | `PRG:0x020AC8` | docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question); docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path |
-| `PRG:0x020AE8` | docs/game/atlas/venue_assets.md — §2 addendum: the fold path is DORMANT in every measured flow (measured 14z-64) |
+| `PRG:0x020AE8` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); docs/platform/gotchas.md — A 1-BYTE MEMORY TAP MISSES WORD ACCESSES ON THIS 16-BIT BUS — and reads as a clean, meaningless zero (paid: 14z-126b); tests/audit_ff8130_writers.sh |
 | `PRG:0x020B9C` | docs/game/atlas/id_space.md — Which ids vanilla ever assigns (measured over the corpus); docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116); docs/game/atlas/select_screen.md — The Gallon variant path — vanilla's one immediate variant-half id; docs/game/atlas/select_screen.md — The Oboro select hook (14z-105, the port's own path to '0x18'); docs/game/engine_internals.md — The version string and the Oboro pick (atlas: select_screen.md); HANDOFF.md — Running a CPS-2 WIDE build (playtest); +15 more |
 | `PRG:0x020BA2` | docs/game/atlas/select_screen.md — The Oboro select hook (14z-105, the port's own path to '0x18'); docs/project/patch_notes.md — W1 — 'oboro_select_hook' ('[[site_thunk]]', every tenant manifest, deduped); build/manifest/donovan.toml — capture_kf_jedah; build/manifest/huitzil.toml — capture_kf_jedah; build/manifest/pyron.toml — pyron_capture_keyframes |
 | `PRG:0x020BB6` | docs/game/atlas/character_tables.md — Variant-slot semantics (structural finding); docs/game/atlas/id_space.md — RESERVED IDS — vanilla does use part of the variant half; docs/project/tenant_manifest.md — Rules the loader should enforce; tests/test_id_space.sh |
@@ -663,12 +675,13 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02163A` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
 | `PRG:0x0216A8` | docs/game/engine_internals.md — The child companion's shadow — a remapped tile never copied (fixed 14z-69o) |
 | `PRG:0x0219C4` | docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/reconciliation_donovan.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map [vs2]; build/manifest/reconciliation_pyron.toml — map [vs2] |
-| `PRG:0x021AC8` | docs/game/atlas/id_space.md — The seven vsavj folding sites |
+| `PRG:0x021AC8` | docs/game/atlas/id_space.md — The seven vsavj folding sites; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100) |
 | `PRG:0x021ADA` | docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; build/manifest/donovan.toml — obj_hook; build/manifest/huitzil.toml — obj_hook; build/manifest/pyron.toml — obj_hook |
 | `PRG:0x021ADC` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
 | `PRG:0x021BFC` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) |
-| `PRG:0x021C64` | docs/game/atlas/venue_assets.md — 2. Select / VS-screen palette blocks — FOLDED to 4 bits; docs/game/atlas/venue_assets.md — 3. HUD mugshot + name plate — NOT folded; 32-row aliased tables (14z-63); docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/reconciliation_donovan.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map [vs2]; build/manifest/reconciliation_pyron.toml — map [vs2] |
-| `PRG:0x021C8E` | docs/game/atlas/id_space.md — The seven vsavj folding sites; docs/game/atlas/venue_assets.md — 2. Select / VS-screen palette blocks — FOLDED to 4 bits; docs/game/atlas/venue_assets.md — 3. HUD mugshot + name plate — NOT folded; 32-row aliased tables (14z-63) |
+| `PRG:0x021C12` | docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100) |
+| `PRG:0x021C64` | docs/game/atlas/venue_assets.md — 2. Select / VS-screen palette blocks — FOLDED to 4 bits; docs/game/atlas/venue_assets.md — 3. HUD mugshot + name plate — NOT folded; 32-row aliased tables (14z-63); docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/reconciliation_donovan.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map [vs2]; +1 more |
+| `PRG:0x021C8E` | docs/game/atlas/id_space.md — The seven vsavj folding sites; docs/game/atlas/venue_assets.md — 2. Select / VS-screen palette blocks — FOLDED to 4 bits; docs/game/atlas/venue_assets.md — 3. HUD mugshot + name plate — NOT folded; 32-row aliased tables (14z-63); docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100) |
 | `PRG:0x021D66` | build/manifest/reconciliation.toml — map |
 | `PRG:0x021DEA` | docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; build/manifest/donovan.toml — obj_hook; build/manifest/huitzil.toml — obj_hook; build/manifest/pyron.toml — obj_hook |
 | `PRG:0x021DEC` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
@@ -1673,7 +1686,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x05FCD6` | build/manifest/donovan.toml — med_pal_row14_a |
 | `PRG:0x05FCE0` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — name_bank_variant_id; build/manifest/huitzil.toml — name_bank_variant_id; build/manifest/pyron.toml — name_bank_variant_id; build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; +1 more |
 | `PRG:0x05FD02` | docs/game/atlas/select_screen.md — The wheel DRAWER — object, bank word, and the bank-5 move (14z-63); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tests/test_tenant_select_records.sh; tools/gen_donovan_patch.py |
-| `PRG:0x05FFA6` | docs/game/atlas/ram.md — System / match globals; docs/game/engine_internals.md — the #92 crash; decoded end to end and confirmed on screen); tools/decode_stage_banners.py |
+| `PRG:0x05FFA6` | docs/game/atlas/ram.md — System / match globals; docs/game/engine_internals.md — the #92 crash; decoded end to end and confirmed on screen); tests/test_voice_row_range.sh; tools/decode_stage_banners.py |
 | `PRG:0x05FFB6` | docs/game/engine_internals.md — Select-screen (portrait/name) pipeline — mapped (session 14c); tests/test_voice_row_range.sh |
 | `PRG:0x05FFF6` | docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116); docs/game/gotchas.md — THE "?" WALKER WRITES THE DRAWN ID EVERY FRAME, FROM TWO PATHS (paid: 14z-117, one crashing probe) |
 | `PRG:0x060068` | docs/project/gotchas.md — PC-relative word tables are DATA — never let a pointer heuristic rewrite them (paid: 2026-07-25, ~1h); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
@@ -1772,6 +1785,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x06BC66` | docs/game/atlas/select_screen.md — The ring/highlight POSITION source — the 32-row base table (14z-63); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
 | `PRG:0x06BC78` | docs/game/atlas/select_screen.md — The ring/highlight POSITION source — the 32-row base table (14z-63); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
 | `PRG:0x06C0E0` | docs/game/atlas/select_screen.md — The RECORD-POINTER array — what the hovered cell displays (14z-61); docs/game/engine_internals.md — The select screen's laws (the atlas is canonical); docs/project/doc_audit_14z118.md — 2. Cross-document numbers to lock (candidates for the script); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — name_bank_variant_id; build/manifest/donovan.toml — splash_bank_variant_id; +6 more |
+| `PRG:0x06C494` | docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100) |
 | `PRG:0x06CA00` | build/manifest/huitzil.toml — throw_arc_tables [vs2] |
 | `PRG:0x06CAC0` | docs/game/engine_internals.md — The shared-type trap, and '[[obj_hook_extra]]' [vs2]; docs/project/gotchas.md — (14z-69; this is the real root of the parked effect family); docs/project/patch_notes.md — 14z-69 (session close) — byte detail; build/manifest/huitzil.toml — obj_hook; build/manifest/huitzil.toml — obj_hook [vs2]; tools/build_donovan.sh; +2 more |
 | `PRG:0x06CAFE` | build/manifest/type_stamps.toml — reader |
@@ -1905,6 +1919,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x08C09A` | build/manifest/pcrel_escapes.toml — pyron41 |
 | `PRG:0x08C0A2` | build/manifest/pcrel_escapes.toml — pyron41; tests/test_census_regions.sh |
 | `PRG:0x08C6E2` | docs/game/gotchas.md — "Slot-indexed cell" does not mean "slot-exclusive data" — three surgery traps; tools/select_port.py |
+| `PRG:0x08E336` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); tests/audit_ff8130_writers.sh |
+| `PRG:0x08E342` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); tests/audit_ff8130_writers.sh |
 | `PRG:0x08EDE2` | build/manifest/huitzil.toml — grab_hold_keyframes |
 | `PRG:0x08F1D6` | build/manifest/huitzil.toml — grab_hold_keyframes [vs2] |
 | `PRG:0x0907F6` | build/manifest/pcrel_escapes.toml — don_m22 |
@@ -1912,6 +1928,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x09098A` | build/manifest/pcrel_escapes.toml — don_m22 |
 | `PRG:0x090B08` | docs/project/patch_notes.md — (round-2 report; the capture-anim shadow over-index) [vs2] |
 | `PRG:0x090B0C` | docs/game/engine_internals.md — The child-companion shadow item (14z-68g/q — measured, still open) [vs2] |
+| `PRG:0x090BD2` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); tests/audit_ff8130_writers.sh |
+| `PRG:0x090BE4` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); tests/audit_ff8130_writers.sh |
 | `PRG:0x090FF4` | build/manifest/type_stamps.toml — stamp; tools/audit_type_stamps.py |
 | `PRG:0x0918F0` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tools/overlay_port.py |
 | `PRG:0x09190A` | build/manifest/reconciliation.toml — map |
@@ -2240,7 +2258,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0FD5A4` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
 | `PRG:0x0FDF52` | build/manifest/pyron.toml — palette_routine_row_11_c |
 | `PRG:0x0FFFFF` | docs/game/atlas/README.md — The three sets (measured M0; every figure still current); HANDOFF.md — CPS-2 WIDE — the extended hardware profile (2026-08-03, B0-B4 all green); docs/project/cps2_wide.md — B4 prg: PASSED, with the control that made it meaningful; docs/project/gotchas.md — Inside the crypt range the VIEW follows the ACCESS MODE, and the wrong one is plausible garbage (paid again: 14z-142); docs/project/mister_map.md — The minimal, profile-gated proposal — **IMPLEMENTED, slice D4**; tests/test_index_window_thunk.sh; +4 more |
-| `PRG:0x100000` | docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99); docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99) [vh2]; docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99) [vs2]; docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/platform/gotchas.md — 0x100000 (measured 14z-59k); docs/platform/gotchas.md — absolutizing a pc-relative table read on CPS-2 reads CIPHERTEXT; +32 more |
+| `PRG:0x100000` | docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99); docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99) [vh2]; docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99) [vs2]; docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/platform/gotchas.md — 0x100000 (measured 14z-59k); docs/platform/gotchas.md — absolutizing a pc-relative table read on CPS-2 reads CIPHERTEXT; +33 more |
 | `PRG:0x100001` | docs/platform/gotchas.md — The CPS-2 encrypted range is INCLUSIVE of its upper word — 0x100001, not; tests/test_crypt_boundary.sh |
 | `PRG:0x100002` | docs/platform/gotchas.md — 0x100000 (measured 14z-59k) |
 | `PRG:0x100E3C` | docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99); docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail; tools/build_donovan.sh |
@@ -2728,6 +2746,8 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x00C8E2` | tools/decode_win_quotes.py |
 | `PRG:0x00C912` | tools/decode_win_quotes.py |
 | `PRG:0x00E700` | tests/lua/inp_probe.lua |
+| `PRG:0x00E715` | tools/audit_effect_rects.py |
+| `PRG:0x00E740` | tools/audit_effect_rects.py |
 | `PRG:0x00E7FF` | tests/lua/inp_probe.lua |
 | `PRG:0x010005` | tests/test_gfx_collision_gate.sh |
 | `PRG:0x0112C0` | tests/test_win_quote_decode.sh |
@@ -2778,6 +2798,8 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x020A70` | tools/audit_id_space.py |
 | `PRG:0x020BA4` | tests/test_oboro_select.sh |
 | `PRG:0x020E24` | tests/test_advancing_guard.sh |
+| `PRG:0x021AD1` | tools/audit_effect_rects.py |
+| `PRG:0x021ADF` | tools/audit_effect_rects.py |
 | `PRG:0x022276` | tests/test_rehit_ring.sh |
 | `PRG:0x022496` | tests/test_advancing_guard.sh |
 | `PRG:0x02249C` | tests/test_advancing_guard.sh |
@@ -2827,6 +2849,8 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x02B674` | tests/test_variant_dispatch.sh |
 | `PRG:0x02EEBB` | tests/lua/scroll3_watch.lua; tests/test_m2b_scroll3.sh |
 | `PRG:0x030000` | tests/test_shared_writes.sh; tools/extract_char.py |
+| `PRG:0x0301E6` | tools/audit_effect_rects.py |
+| `PRG:0x03021F` | tools/audit_effect_rects.py |
 | `PRG:0x032000` | tests/test_hui_walk.sh |
 | `PRG:0x03975A` | tests/lua/index_watch.lua |
 | `PRG:0x03CB00` | tests/test_qs_songs.sh |
