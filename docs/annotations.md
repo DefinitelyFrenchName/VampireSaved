@@ -23,13 +23,13 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3034 |
-| named by a document or manifest only | 2044 |
+| distinct program-space addresses named | 3035 |
+| named by a document or manifest only | 2045 |
 | named by both a document/manifest and code | 647 |
 | named by CODE ONLY (the gap list below) | 343 |
 | carried by atlas | 499 |
 | carried by engine_internals | 551 |
-| carried by other docs | 963 |
+| carried by other docs | 964 |
 | carried by manifests | 1786 |
 | carried by code | 990 |
 
@@ -523,6 +523,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01AFAE` | docs/game/atlas/sprite_lists.md — 1. The drawer; build/manifest/huitzil.toml — beam_effect_class31; tests/test_beam_list_type6.sh; tools/checkdocs_rom.py |
 | `PRG:0x01AFB0` | build/manifest/huitzil.toml — beam_effect_class31 |
 | `PRG:0x01AFB2` | docs/project/patch_notes.md — donovan-m2 stage 5 — shared-table remap: mash/time crash fix (2026-07-27, session 11b) |
+| `PRG:0x01AFB4` | HANDOFF.md — Running a CPS-2 WIDE build (playtest) |
 | `PRG:0x01AFBA` | docs/game/atlas/sprite_lists.md — 1. The drawer; docs/game/engine_internals.md — OBJ (sprite) pipeline — the R2 answer (session 14, static decode); docs/game/engine_internals.md — The chain, end to end; build/manifest/huitzil.toml — beam_effect_class31; tests/audit_effect_class_rows.sh; tests/lua/obj_record_full_trace.lua; +2 more |
 | `PRG:0x01AFC6` | docs/game/atlas/sprite_lists.md — Handler targets; docs/project/gotchas.md — Per-record BANK attribution: the effect-tail triage has no bank column; tests/lua/obj_record_bank_trace.lua; tests/lua/obj_record_full_trace.lua; tools/obj_records.py |
 | `PRG:0x01B234` | docs/game/atlas/sprite_lists.md — Handler targets; docs/game/engine_internals.md — OBJ (sprite) pipeline — the R2 answer (session 14, static decode); docs/project/gotchas.md — Per-record BANK attribution: the effect-tail triage has no bank column; tests/lua/obj_record_bank_trace.lua; tests/lua/obj_record_full_trace.lua; tools/obj_records.py |

@@ -27,13 +27,18 @@
 # surprises.
 #
 # WHY AN OUT-OF-TREE MIRROR (docs/GOTCHAS.md):
-#   MAME's GENie build system does not support spaces anywhere in the source
-#   path — scripts/genie.lua:18 carries the escaping line COMMENTED OUT
-#   upstream, and SOURCES= builds shell out to makedep.py with MAME_DIR
-#   unquoted. This repository's path contains a space. Symlinking to a
-#   space-free path does NOT help: GENie resolves the physical path through
-#   getcwd(). So the pinned submodule stays the source of truth (never built
-#   in, stays clean) and the build runs from an rsync'd, space-free mirror.
+#   It was BUILT because MAME's GENie build system does not support spaces
+#   anywhere in the source path — scripts/genie.lua:18 carries the escaping
+#   line COMMENTED OUT upstream, and SOURCES= builds shell out to makedep.py
+#   with MAME_DIR unquoted — and this repository's path contained a space
+#   until the 2026-08-05 rename (symlinking to a space-free path does NOT
+#   help: GENie resolves the physical path through getcwd()). That reason is
+#   gone; the mirror stays for what it does now (dropping it was declined,
+#   maintainer 2026-09-15, GitHub #80): the pinned submodule stays the source
+#   of truth, never built in and clean, while the profile patch is applied in
+#   the mirror; the WIDE and reference builds get separate roots below, so
+#   both binaries exist at once; and tools/build_release_emulators.sh gives
+#   the release build its own, leaving the gates' instrument untouched.
 #
 # WHY A SOURCES-FILTERED BUILD:
 #   SUBTARGET=cps2 SOURCES=src/mame/capcom/cps2.cpp builds only the CPS-2

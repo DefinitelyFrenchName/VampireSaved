@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 140
+# issues: 141
 number	state	reason	closed	labels	title
+141	OPEN	-	-	evolution	The full FBNeo hacked-vs-vanilla legacy track — CLAUDE.md [VSP-24]'s deferral, now its own ticket (the #78 residual)
 140	OPEN	-	-	bug	The static runners' controls readout re-adds the previous gate's must-fire counts for every gate that does not PASS — fired/declared overstated on a red run
 139	CLOSED	COMPLETED	2026-09-14	bug	A rejected build keeps its packed rompath, indistinguishable on disk from a finished build (the #1 residual)
 138	OPEN	-	-	bug	A stock-track build directory without its vsavj.zip silently dispatches run_suite to the VANILLA expectations — the reference-row rule nothing enforces (the #55 residual)
@@ -31,45 +32,45 @@ number	state	reason	closed	labels	title
 116	OPEN	-	-	evolution	Capture matrix: widen the in-emulator anchors from 3 cells to a sampled row per tenant
 115	OPEN	-	-	contested,evolution,severity: low	Zabel j.LK proximity guard: a surgical legacy patch for vanilla and WIDE, its own session, recording first
 114	CLOSED	COMPLETED	2026-09-02	bug,correctness,severity: medium	421+P (Lighting Sword): ours lands 3 hits and knocks the victim away; native VS2 lands 6 and holds — measured, and the gate cannot see it
-113	CLOSED	COMPLETED	2026-09-01	bug,severity: low	Whole-screen flash at the first down (photosensitivity) — seen for many builds
-112	CLOSED	COMPLETED	2026-09-04	bug,severity: low	Press of Death (41236+K): blue/black palette about half the time on merged-m9
-111	CLOSED	COMPLETED	2026-08-26	-	Coverage rot: the Donovan crash soak picks Jedah, and the continue-switch rig no longer reaches its pairing
-110	CLOSED	COMPLETED	2026-08-22	-	audit_fg_damage + audit_pool_free_byte red since 14z-87 — rig constants describe the pre-beep-fix platform (bisected to merged6→merged7)
+113	CLOSED	COMPLETED	2026-09-01	cosmetic,severity: low	Whole-screen flash at the first down (photosensitivity) — seen for many builds
+112	CLOSED	COMPLETED	2026-09-04	cosmetic,severity: low	Press of Death (41236+K): blue/black palette about half the time on merged-m9
+111	CLOSED	COMPLETED	2026-08-26	bug	Coverage rot: the Donovan crash soak picks Jedah, and the continue-switch rig no longer reaches its pairing
+110	CLOSED	COMPLETED	2026-08-22	bug	audit_fg_damage + audit_pool_free_byte red since 14z-87 — rig constants describe the pre-beep-fix platform (bisected to merged6→merged7)
 109	CLOSED	COMPLETED	2026-08-21	bug,severity: medium	Phobos DF clone beams drawn 0xA00 LOW (the 14z-71 bias class through a path the ray fix never covered): per-clone pieces emit at 0x43xx/0x3Dxx where native uses 0x4Dxx — invisible on blank tiles; sound and mechanics fire
 108	CLOSED	COMPLETED	2026-08-20	bug,severity: medium	Pyron cosmo satellites carry collision word 0x1000 (native: 0x6000) and never enter the projectile sweep — spawn-inherited from the fighter's +0x18; writer unidentified (instrument paradox)
-107	CLOSED	COMPLETED	2026-08-21	severity: medium	Plausible reconciliation row 0x0448a6->0x02563e is the WRONG SIBLING (neighbor-anchored answer: 0x04367A); live in all three tenants' dispatch farms, cold on the corpus
-106	CLOSED	COMPLETED	2026-08-20	severity: medium	pcrel-escape verification does not cover the MERGED image (verify_pcrel_data needs extract/; merged builds have none)
-105	CLOSED	COMPLETED	2026-08-20	bug,severity: medium	AUTO mode: tenant win screens render as pure white shapes (correct shapes, no fill) — all three tenants
+107	CLOSED	COMPLETED	2026-08-21	bug,severity: medium	Plausible reconciliation row 0x0448a6->0x02563e is the WRONG SIBLING (neighbor-anchored answer: 0x04367A); live in all three tenants' dispatch farms, cold on the corpus
+106	CLOSED	COMPLETED	2026-08-20	bug,severity: medium	pcrel-escape verification does not cover the MERGED image (verify_pcrel_data needs extract/; merged builds have none)
+105	CLOSED	COMPLETED	2026-08-20	cosmetic,severity: medium	AUTO mode: tenant win screens render as pure white shapes (correct shapes, no fill) — all three tenants
 104	CLOSED	COMPLETED	2026-08-20	bug,severity: medium	Victor's headbutt grab (6+HP): tenant victim pose garbled (half squished/knocked-down sprites) — Donovan AND Phobos
-103	CLOSED	COMPLETED	2026-08-20	severity: high	Donovan KO'd by Lilith in arcade: the lose flow stalls ~8,000 frames (~2 min) before the game-over path fires
-102	CLOSED	NOT_PLANNED	2026-08-19	severity: low	Arcade ladder: later matches land on earlier venues and the chain can exceed the arcade norm, when switching to/from VS2 characters
-101	CLOSED	COMPLETED	2026-08-18	-	Phobos grunts when electrocuted (every other hit): vsavj's kernel per-class voice tables alias tenant rows to legacy rows
-100	CLOSED	COMPLETED	2026-08-18	wontfix	Next-stage screen shows Donovan as Victor with a blank portrait (0x13 & 0x0F == 0x03)
+103	CLOSED	COMPLETED	2026-08-20	bug,severity: high	Donovan KO'd by Lilith in arcade: the lose flow stalls ~8,000 frames (~2 min) before the game-over path fires
+102	CLOSED	NOT_PLANNED	2026-08-19	bug,severity: low	Arcade ladder: later matches land on earlier venues and the chain can exceed the arcade norm, when switching to/from VS2 characters
+101	CLOSED	COMPLETED	2026-08-18	cosmetic	Phobos grunts when electrocuted (every other hit): vsavj's kernel per-class voice tables alias tenant rows to legacy rows
+100	CLOSED	COMPLETED	2026-08-18	cosmetic,wontfix	Next-stage screen shows Donovan as Victor with a blank portrait (0x13 & 0x0F == 0x03)
 99	CLOSED	COMPLETED	2026-08-27	bug,deferred-with-reason,severity: high	CRASH-reset: Donovan vs Phobos at fight start, 5th arcade match after continue-with-character-switch (merged-m2 playtest)
-98	CLOSED	COMPLETED	2026-08-18	-	audit_pyron_ring's frozen ring inventory belongs to superseded builds and needs re-measuring
-97	CLOSED	COMPLETED	2026-08-18	-	Gates build into TRACKED build/ paths, so the pre-commit chain dirties the working tree
-96	CLOSED	COMPLETED	2026-08-19	-	test_m2a_stage4_code: 06_test_mode masked first-divergence is NONE, expected 700
-95	CLOSED	COMPLETED	2026-08-17	-	test_dualtrack compares two build dirs from different generations (732 unattributed bytes)
-94	CLOSED	COMPLETED	2026-08-17	-	audit_pyron_ring references build/pyron22, which lacks vsw.z01/z02 (4th reference-rot instance)
-93	CLOSED	COMPLETED	2026-08-19	severity: medium	audit_qs_voice_batch fails on the keyon multiset A/B (pre-existing, not #10)
-92	CLOSED	COMPLETED	2026-08-17	-	Second crash on the Huitzil arcade marathon: vec3 at the vanilla 5-entry dispatcher 0x1afb4 (unmasked by resolving #91's tripwire)
-91	CLOSED	COMPLETED	2026-08-17	-	A planted ILLEGAL tripwire is REACHABLE on the shipping merged build (unresolved vs2 0x494de, a divide helper vsavj already has)
-90	CLOSED	COMPLETED	2026-08-16	needs-maintainer-ruling	test_pyron_ladder's stage-4 boot probe asserts a clean forced-pick boot on a build with none of Pyron's port
-89	CLOSED	COMPLETED	2026-08-17	-	Bind QSound audits to the supplied build’s ledger
-88	CLOSED	COMPLETED	2026-08-17	-	Make run_suite freeze replace stale divergence expectations
-87	CLOSED	COMPLETED	2026-08-17	-	Consume or remove inert graphics-layout fields
-86	CLOSED	COMPLETED	2026-08-17	-	Publish masked bases transactionally
-85	CLOSED	COMPLETED	2026-08-17	-	Align QSound WAV windows with CPS frame timing
-84	CLOSED	COMPLETED	2026-08-16	-	Pass Pyron tenant selection into every ladder build
-83	CLOSED	COMPLETED	2026-08-17	-	Add both players’ meter state to the mapped emulator oracle
-82	CLOSED	COMPLETED	2026-08-17	-	Include the QSound terminal sample byte in batch audits
-81	CLOSED	COMPLETED	2026-08-17	-	Run generator mutation controls without editing tracked source
-80	CLOSED	COMPLETED	2026-08-17	-	Guard setup_mame’s destructive mirror target
-79	CLOSED	COMPLETED	2026-08-17	-	Make graphics safety checks survive optimized Python
-78	CLOSED	COMPLETED	2026-08-16	-	Add the direct FBNeo hacked-build legacy oracle
-77	CLOSED	COMPLETED	2026-08-17	-	Bound FBNeo replay frames and check allocation arithmetic
-76	CLOSED	COMPLETED	2026-08-17	-	Reject aliased input and output directories in build_wide_romset
-75	CLOSED	COMPLETED	2026-08-16	correctness,revealed-by-audit,severity: high	verify_gfx_build --tenant huitzil FAILS on the current merged build (m3b_merged7) — hidden since merged6 by the swallowed exit status of #14
+98	CLOSED	COMPLETED	2026-08-18	bug	audit_pyron_ring's frozen ring inventory belongs to superseded builds and needs re-measuring
+97	CLOSED	COMPLETED	2026-08-18	bug	Gates build into TRACKED build/ paths, so the pre-commit chain dirties the working tree
+96	CLOSED	COMPLETED	2026-08-19	bug	test_m2a_stage4_code: 06_test_mode masked first-divergence is NONE, expected 700
+95	CLOSED	COMPLETED	2026-08-17	bug	test_dualtrack compares two build dirs from different generations (732 unattributed bytes)
+94	CLOSED	COMPLETED	2026-08-17	bug	audit_pyron_ring references build/pyron22, which lacks vsw.z01/z02 (4th reference-rot instance)
+93	CLOSED	COMPLETED	2026-08-19	bug,severity: medium	audit_qs_voice_batch fails on the keyon multiset A/B (pre-existing, not #10)
+92	CLOSED	COMPLETED	2026-08-17	bug	Second crash on the Huitzil arcade marathon: vec3 at the vanilla 5-entry dispatcher 0x1afb4 (unmasked by resolving #91's tripwire)
+91	CLOSED	COMPLETED	2026-08-17	bug	A planted ILLEGAL tripwire is REACHABLE on the shipping merged build (unresolved vs2 0x494de, a divide helper vsavj already has)
+90	CLOSED	COMPLETED	2026-08-16	bug,needs-maintainer-ruling	test_pyron_ladder's stage-4 boot probe asserts a clean forced-pick boot on a build with none of Pyron's port
+89	CLOSED	COMPLETED	2026-08-17	bug	Bind QSound audits to the supplied build’s ledger
+88	CLOSED	COMPLETED	2026-08-17	bug	Make run_suite freeze replace stale divergence expectations
+87	CLOSED	COMPLETED	2026-08-17	bug	Consume or remove inert graphics-layout fields
+86	CLOSED	COMPLETED	2026-08-17	bug	Publish masked bases transactionally
+85	CLOSED	COMPLETED	2026-08-17	bug	Align QSound WAV windows with CPS frame timing
+84	CLOSED	COMPLETED	2026-08-16	bug	Pass Pyron tenant selection into every ladder build
+83	CLOSED	COMPLETED	2026-08-17	bug	Add both players’ meter state to the mapped emulator oracle
+82	CLOSED	COMPLETED	2026-08-17	bug	Include the QSound terminal sample byte in batch audits
+81	CLOSED	COMPLETED	2026-08-17	bug	Run generator mutation controls without editing tracked source
+80	CLOSED	COMPLETED	2026-08-17	bug	Guard setup_mame’s destructive mirror target
+79	CLOSED	COMPLETED	2026-08-17	bug	Make graphics safety checks survive optimized Python
+78	CLOSED	COMPLETED	2026-08-16	evolution	Add the direct FBNeo hacked-build legacy oracle
+77	CLOSED	COMPLETED	2026-08-17	bug	Bound FBNeo replay frames and check allocation arithmetic
+76	CLOSED	COMPLETED	2026-08-17	bug	Reject aliased input and output directories in build_wide_romset
+75	CLOSED	COMPLETED	2026-08-16	bug,correctness,revealed-by-audit,severity: high	verify_gfx_build --tenant huitzil FAILS on the current merged build (m3b_merged7) — hidden since merged6 by the swallowed exit status of #14
 74	CLOSED	COMPLETED	2026-08-18	audit-2026-08-15,documentation,evolution	Adversarial code review 2026-08-15 — findings index (73 issues)
 73	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,documentation,needs-maintainer-ruling,severity: low	Three tracked PNG goldens are full renders of Capcom title-screen artwork (maintainer decision)
 72	CLOSED	COMPLETED	2026-08-16	audit-2026-08-15,bug,duplication,severity: low	build/scratch/m68dis.py is a tracked stale twin of the promoted tools/m68dis.py and skips the mandatory SHA-1 print

@@ -27,6 +27,88 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-15 (14z-157) — entered at ruling time, under the amended lifecycle
+
+- **A QUESTION A MEASUREMENT CAN SETTLE IS MEASURED (maintainer, 2026-09-15).** Told that
+  RAM:$FF8130's writer count "can be settled by measurement rather than memory": *"then it
+  must! We measure, we don't believe or assume and we don't compromise on the discipline"*.
+  Measured the same session: `tests/audit_ff8130_writers.sh`.
+- **THE STALE-CLAIMS PASS, THREE RULINGS (maintainer, 2026-09-15):** `tests/test_voice_row_range.sh`
+  keeps its filename — *"keep it, we don't want to break things needlessly"*; #77's
+  `contested` label removed — *"I agree with removing it"*; #112's 14z-154 closing note
+  corrected on GitHub — *"Yes, correct please"*.
+- **THE #75-#114 RESIDUALS, THIN RECORDS, CALLS AND LABELS (maintainer, 2026-09-15):** *"I
+  agree with all recommendations"*, said of each group of the 14z-157 decision sheet:
+  - #78: the full FBNeo legacy track becomes its own ticket, #141 (evolution, parked);
+    CLAUDE.md [VSP-24]'s "revisit at MiSTer" awaits the maintainer's wording.
+  - #80: dropping the `tools/setup_mame.sh` mirror is DECLINED — the space that made it
+    necessary is gone, and the mirror now keeps the submodule pristine, separates the
+    reference and WIDE roots, and gives the release build its own.
+  - #93: option C (a tenant-only authored copy if the chirp tail is ever heard) and the
+    standing check on remapped records' played endpoint bytes are both DECLINED.
+  - #100: the "after MiSTer" residual is FOLDED INTO #125, cross-linked to #124.
+  - #103: naming the move that pinned `hp := 1` is DECLINED — the escape is fixed.
+  - #109: the clone-beam positive-contact damage leg is FOLDED INTO #136 (its rigs
+    `tests/replays/df/103_clone_beam_contact.rpl` and `df/104_clone_beam_contact_native.rpl`).
+  - #111: the merged expectations for replays 107-110 are DECLINED as superseded by the
+    14z-133b B2 design, which the maintainer confirms: the merged set carries no
+    tenant-content `.sha1` expectations (`tests/expected/merged-m18/README.md`).
+  - #96: the pipeline-image registry rows (`donovan-mN-stock` / `-stage4`), proposed at
+    14z-97 and registered at every freeze since, are RATIFIED (copied below).
+  - #90: no new ruling; its 2026-08-16 ruling is copied below.
+  - #78 stays `evolution`, #108 `invalid`, #112 `declined`; #101 and #105 become
+    `cosmetic`; the kind labels on #75-#114 applied from the index; the index header
+    gains definitions of the three kinds; GitHub's close reason stays unmapped, the
+    index being the source of truth for status.
+- **CLAUDE.md [VSP-24] RESTATED (maintainer, 2026-09-15):** the proposed wording — the full
+  FBNeo legacy track's revisit point, MiSTer, has passed, and the track is parked as #141,
+  to be reopened on a measured FBNeo-vs-MAME disagreement on legacy content — *"agreed"*.
+- **THE LESSONS WITH NO LIVE CARRIER (maintainer, 2026-09-15):** *"Issue 77, 92, 93, 95, 100,
+  101, 102, 112 I agree with the proposals"* — written as drafted in the 14z-157 decision
+  sheet: #77 and #95 a sentence in their gate's header; #92 a platform gotcha on a MAME
+  breakpoint condition that does not parse, plus links to [MFI-6] and the existing
+  breakpoint gotcha; #93 the checker's docstring (the channel field, the one-sided
+  compare); #100 links to the 14z-157 `ram.md` and `venue_assets.md` carriers; #101 a
+  project gotcha, two symptoms are one defect only if the mechanism predicts both; #102 a
+  paragraph in `engine_internals.md`, a continue clears the in-use mask; #112 links to the
+  bare-long-pointer gotcha and [VSP-46], with a PAID AGAIN paragraph there.
+- **THE 14z-85f FLAKY CRASH RESET, BY TESTIMONY (maintainer, 2026-09-15):** *"the Sasquatch
+  flaky reset was never reproduced since we fixed the crashed with the VS2 tenants. I'm
+  99.9% sure the problem was Donovan, not Sasquatch"*. No recording of it exists (it
+  predates CLAUDE.md [VSP-20]), so nothing can be measured; the archive's note that a link
+  from it to #92 is "open" is superseded by this testimony, and no ticket is opened.
+- **#91's LESSON CARRIER (maintainer, 2026-09-15):** of the three options offered (link CLAUDE.md
+  [VSP-20], a new project gotcha, or `none`), *"Link [VSP-20]"* — FIELD REPORTS ARE RECORDINGS
+  is the law for the class #91 was an early instance of: a rig crash taken for an
+  unreproduced field crash on a shared signature. With this, every item the #75-#114 threads
+  left for the maintainer is ruled.
+
+### Copied 2026-09-15 from GitHub #96 (comments 2026-08-19T06:03:07Z, 10:15:38Z and 10:16:03Z), verbatim excerpts
+
+> ## RULED (maintainer, 2026-08-19): option (a) — the battery targets the CURRENT frozen generation. Scheduled for next session.
+>
+> **The ruled policy:** the battery asserts "the pipeline, built fresh, reproduces the CURRENT freeze." Its specs re-point at each freeze (donovan-m8 is current). Under this policy a red battery means the pipeline cannot reproduce the current freeze — unambiguously rule-6 territory — which also resolves the standing "does a red dev-build gate trigger rule 6?" question: today's red was an artifact of the dated pin, not a build defect.
+
+> The two registry rows register **pipeline images**, not shipping artifacts — that is what the ruled policy needs to dispatch on, but registry rows are normally added at freeze time as a STATE decision, so I am proposing rather than ratifying. Everything is measured and reversible (two rows plus two directories). Say the word if you would rather they were named differently, scoped differently, or kept out of `registry.tsv` in favour of a battery-local table.
+
+> Closing on the ruling as executed (see the comment above). Reopen if the two registry rows for pipeline images should be named or scoped differently — that is the one thing in the change that is proposed rather than ratified.
+
+### Copied 2026-09-15 from GitHub #90 (the issue body and comment 2026-08-16T21:17:21Z), verbatim excerpts
+
+> ## Why this needs a ruling rather than a patch
+>
+> There are three defensible answers and they differ in what coverage is retained:
+>
+> - **(a) Move the probe to a stage-6 rung.** Probes what actually ships; loses the "does an intermediate rung boot" signal. Costs one more build per run.
+> - **(b) Keep it at stage 4 and assert the *documented* degraded shape** — the 14z-65 wedge ("poke holds, struct never forms, guard clean"). But Pyron does not wedge, he crashes, so this means freezing a CRASH as an expectation. That is a real cost: a genuine stage-4 regression would then be invisible.
+> - **(c) Drop the boot probe from the Pyron ladder**, relying on the frozen build's suite for boot coverage.
+>
+> **Recommendation: (a).** The probe's value is "a forced pick reaches a formed match", which is only meaningful where the port exists. (b) freezes a crash and (c) loses the check entirely. Note (a) makes the Pyron and Donovan ladders structurally identical in this respect, which is correct given both manifests are stage-6-heavy.
+
+> ## Fixed (maintainer ruling: option (a), move the probe to a stage-6 rung)
+>
+> `tests/test_pyron_ladder.sh` now builds `1 2 3 4 6` and runs the forced-pick boot probe on the **stage-6** rung — the one that carries Pyron's port and corresponds to what ships.
+
 ## Ruled 2026-09-14 (14z-155) — entered at ruling time, under the amended lifecycle
 
 - **#136, TENANT MOVE PARITY AGAINST NATIVE VS2, IS FILED AND NOT STARTED (maintainer,

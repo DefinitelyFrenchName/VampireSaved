@@ -5,12 +5,19 @@ voice batch (14z-86). usage:
         [--romdir DIR]
 
 Compares EVERYTHING each run keyed (window-free: per-id window
-attribution is venue-flaky for delayed keyons) as (voice, length,
-content) signatures. PASS iff: no native signature is missing from
+attribution is venue-flaky for delayed keyons) as (channel, length,
+content) signatures. The first field is the QSound HARDWARE CHANNEL
+(`reg >> 3`, 0-15), not a sound id: #93's first step read channel 13 as
+sound id 0x0D. PASS iff: no native signature is missing from
 ours, no ours signature is foreign to vs2's sample library (a
 signature ours-only but whose content exists in vs2's image is a
 priority-suppressed track echo — measured moving with injection
 timing), and no signature's count drifts by more than 2.
+
+The compare is ONE-SIDED (#93): an ours-only signature is forgiven when
+vs2's library holds its content; a native-only one never is, so a
+channel-allocation difference would read as a missing sound. Compare the
+content on the same channel and length before concluding one is missing.
 """
 import hashlib, os, re, sys, zipfile
 # NO HARDCODED ROMDIR (14z-94, GitHub #67). This was the maintainer's own

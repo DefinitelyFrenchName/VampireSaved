@@ -1,4 +1,6 @@
-# `donovan-m8-stage4` — the M2a stage-4 gate's target
+# `donovan-m19-stage4` — the M2a stage-4 gate's target
+
+*(Created 14z-97 as `donovan-m8-stage4` and carried forward with the freezes; this title kept that name until 14z-157.)*
 
 Created 14z-97 (GitHub #96, maintainer-ruled 2026-08-19). The sibling of
 `donovan-m8-stock`: same generation, same track, one stage earlier.

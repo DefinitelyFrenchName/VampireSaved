@@ -23,6 +23,12 @@
 # ~46 hours of emulated play. Nothing legitimate approaches it, and with both
 # addends bounded neither sum can wrap.
 #
+# CONTESTED AND WRONG (14z-92): the first assessment of #77 traced only the
+# first sum, called the outcome "a truncated run, not an out-of-bounds write"
+# and rated a correct finding down; the second sum is the out-of-bounds write,
+# found by the fix (11f2ced). Trace EVERY derived sum before narrowing an
+# overflow finding.
+#
 # HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
 #   (review-triage, #77) FBNeo replay frames are bounded before the

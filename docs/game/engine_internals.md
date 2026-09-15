@@ -275,6 +275,16 @@ That structure is why the two tables cannot be reasoned about separately, and
 why the in-use mask makes the pick a lottery — the same rig can take a
 different branch run to run, which is what made #92 present as a race.
 
+**A CONTINUE CLEARS THE IN-USE MASK, so the ladder restarts** (measured 14z-98,
+#102; `tests/audit_continue_ladder.sh`; the mask is in `atlas/ram.md`'s
+ARCADE-LADDER pick block row). Pristine vsavj, P1 Victor, no pokes: venues
+`06 -> 0E -> 12`, a loss at match 3, a CONTINUE (`$FF8004` = `000E`), `$FF8110`
+cleared `1 -> 0`, and the pool restarts `04 -> 0A -> 06` — earlier venues, a
+repeat, and more matches than the arcade norm. The merged build shows the same
+shape (`0x401 -> 0` after its loss at match 4), and it is not venue-monotonic
+even without a continue (`06 -> 0E -> 12 -> 02`). The venue VALUES are lottery
+draws that differ between builds; the reset is the finding.
+
 **`$FF8100` is the stage, and it is not just a caption.** Three readers,
 measured:
 

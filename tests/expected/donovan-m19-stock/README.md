@@ -1,4 +1,6 @@
-# `donovan-m8-stock` — the M2 battery's stage-6 target
+# `donovan-m19-stock` — the M2 battery's stage-6 target
+
+*(Created 14z-97 as `donovan-m8-stock` and carried forward with the freezes; this title kept that name until 14z-157.)*
 
 Created 14z-97 (GitHub #96, maintainer-ruled option (a) 2026-08-19: *"the
 battery asserts 'the pipeline, built fresh, reproduces the CURRENT freeze'.

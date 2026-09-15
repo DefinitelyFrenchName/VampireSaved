@@ -6,6 +6,24 @@ it is specific to this roster hack.
 
 Append the moment one is paid for. Read before touching the related area.
 
+## A MAME BREAKPOINT CONDITION THAT DOES NOT PARSE SETS NO BREAKPOINT — `l@` is not a size, and the probe reports a clean zero (paid: 14z-93, #92)
+
+MAME's debugger expressions read memory in four sizes — `b@`, `w@`, `d@`, `q@`
+(byte, word, 32-bit double, 64-bit quad; `emu/mame/src/emu/debug/express.cpp`).
+There is no `l@`. `bpset <addr>,<condition>` validates the condition first and,
+when it does not parse, prints "Error in expression" to the debugger console
+and RETURNS WITHOUT SETTING THE BREAKPOINT (`debugcon.cpp`
+`validate_expression_parameter`, `debugcmd.cpp` `execute_bpset`).
+`tests/lua/replay_guard.lua` issues its `GUARD_PROBE` through `debugger:command`
+and never reads that console afterwards, so a `GUARD_PROBE_COND` written with
+`l@(...)` arms nothing and the run reports zero hits. Paid in #92: a control
+conditioned `l@(a0+4) != 0`, true by construction, returned 0 hits, and the zero
+was nearly read as "the event does not happen".
+
+**RULE: spell a 32-bit read `d@`, and pair every conditional probe with an
+always-true twin on the same address that MUST hit** — a probe's zero means
+something only when its twin fired.
+
 ## A 1-BYTE MEMORY TAP MISSES WORD ACCESSES ON THIS 16-BIT BUS — and reads as a clean, meaningless zero (paid: 14z-126b)
 
 `space:install_write_tap(a, a, ...)` over a SINGLE BYTE returned ZERO hits on

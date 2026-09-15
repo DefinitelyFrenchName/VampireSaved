@@ -923,7 +923,7 @@ matches), `p1_ptr64`, `p1_word132`, `p1_x/y/flip/attack_id`, and even the
 **[MSV-24]** **THE ONE DISAGREEMENT, AND IT IS THE GAME'S OWN LOTTERY.** The CPU opponent
 differs: MAME drew the character whose record base is **$0AE9D4**, jtcps2 drew
 **$0A9518**. `05_timeout_idle` is a 1P arcade match and the ladder's in-use
-mask `RAM:$FF8110.l` is SOUND-STATE-FED (`docs/game/atlas/ram.md:99` — the
+mask `RAM:$FF8110.l` is SOUND-STATE-FED (`docs/game/atlas/ram.md`, the ARCADE-LADDER pick block row — the
 run-to-run draw that cost GitHub #110 two frozen audits in 14z-103), so the
 opponent is implementation-dependent by construction. Every field that is a
 function of WHICH character P2 is (`p2_hitbox_base`, `p2_ptr64`,

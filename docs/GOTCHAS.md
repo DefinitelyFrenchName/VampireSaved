@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-346 entries (41 game / 102 platform / 203 project), counted from the buckets at generation.
+348 entries (41 game / 103 platform / 204 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 41 entries
 
@@ -66,8 +66,9 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - THE BOOT NAME SCREEN'S DISPLAY SCRIPT TAKES AN EVEN COLUMN — an odd one is a 68k ADDRESS ERROR that soft-boots the machine (paid: 14z-127)
 - THE ENGINE CLAMPS THE FIGHTERS TO 336 px APART — a wider position poke is pulled back the same frame, and a "whiff" leg for a travelling move does not exist (paid: 14z-146)
 
-## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 102 entries
+## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 103 entries
 
+- A MAME BREAKPOINT CONDITION THAT DOES NOT PARSE SETS NO BREAKPOINT — `l@` is not a size, and the probe reports a clean zero (paid: 14z-93, #92)
 - A 1-BYTE MEMORY TAP MISSES WORD ACCESSES ON THIS 16-BIT BUS — and reads as a clean, meaningless zero (paid: 14z-126b)
 - CPS-2 ROM file byte order is NOT 68k logical order (paid: 2026-07-25, ~1h)
 - MAME `logerror` output needs `-log`, not `-verbose` (paid: 2026-07-25)
@@ -171,8 +172,9 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - ON A LINUX BUILD HOST EVERY BUNDLED LIBRARY ALSO RESOLVES SYSTEM-WIDE — a "resolved under /usr/lib" self-containment check is blind there (paid: 2026-09-13, the release gate's absolute-reference control DEAD on its first Linux run)
 - A NATIVE WINDOWS PYTHON WRITES `\r\n` FOR EVERY `\n` IT PRINTS — reconfiguring one Python block of a gate leaves the others emitting CRLF (paid: 2026-09-13, one CR byte left in the Windows release gate's output after the first fix)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 203 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 204 entries
 
+- TWO SYMPTOMS ARE ONE DEFECT ONLY IF THE MECHANISM PREDICTS BOTH (paid: 14z-95 to 14z-96, #93 and #101)
 - A gate that prints `SKIP:` AND exits NON-ZERO is a FAILURE, not a skip (paid: 14z-128)
 - `... | while read` puts the loop in a SUBSHELL, so the `wait` after it waits for nothing (paid: 14z-128)
 - A comparator's own ground-truth test can RATIFY a deviation from the governing spec (paid: 14z-95, GitHub #52)

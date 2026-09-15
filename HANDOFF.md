@@ -835,10 +835,16 @@ merged-m18 at 14z-157; this line said `merged-m14` until then). What
 was measured on merged-m1, and still describes the failure MODE: `tests/audit_tripwire_reach.sh` measures
 `CRASH 8887 vec4 PC 456930` — the tripwire for unresolved vs2 `0x494de` —
 on the 40,620-frame arcade marathon with Huitzil forced. Deterministic.
-**NOT Huitzil-only — retracted 14z-93:** the Pyron and Donovan legs' clean
+~~**NOT Huitzil-only — retracted 14z-93:** the Pyron and Donovan legs' clean
 `END 40620` is a TIMING accident, and under a sparse probe Pyron crashes
 identically (#92). It is a RACE, which is why three clean playtest matches
-prove nothing. The reconciliation row that resolves it is COMMITTED but this
+prove nothing.~~ **CORRECTED 14z-157 from #91's own thread: this crash IS
+Huitzil-only** — its six-leg matrix ran Pyron and Donovan `END 40620` clean on
+the solo and merged builds ("Two different bugs"); the Pyron crash under a
+sparse probe, and the race, are #92's (`vec3` at the ladder dispatcher
+`0x1afb4`). A short playtest still proves little, for #91's own reason: the rig
+fires at frame 8887, so depth is not the trigger — a specific action or spawn
+under the dense-chord mash is likelier. The reconciliation row that resolves it is COMMITTED but this
 fingerprint predated it; resolving it exposed a second crash (#92), which is
 why the re-freeze waited for #92 rather than shipping twice — both landed
 together at 14z-94. **THE DURABLE PART: `run_suite` does not see this class**
@@ -1109,10 +1115,15 @@ The project root is now `/Users/koneko/Developer/Vampire_Saved/VampireSaved`
   the directory it names).
 - A fresh worktree branches from `origin/main`, which trails local `main`
   badly here — `git reset --hard main` immediately after creating one.
-- **`tools/setup_mame.sh`'s rsync mirror exists ONLY because GENie could not
+- ~~**`tools/setup_mame.sh`'s rsync mirror exists ONLY because GENie could not
   handle the space.** That constraint is gone, so the mirror could be
   dropped — but it changes the INSTRUMENT, so `tests/test_mame_parity.sh`
-  must be green before and after. Not attempted yet.
+  must be green before and after. Not attempted yet.~~ **CORRECTED 14z-157:**
+  the space is why the mirror was BUILT, and it is gone, but the mirror now
+  does other work — the pinned submodule stays pristine while the profile
+  patch is applied in the mirror, the WIDE and reference builds get separate
+  roots, and the release build gets its own. **Dropping it was declined
+  (maintainer, 2026-09-15, #80).**
 
 ## Platform / migration notes (14z-59d)
 
@@ -1491,17 +1502,19 @@ NOTE: the tags mark the commit at which each build was frozen and was
 reproducible AT THAT TIME; no one has re-verified the older ones since.
 
 
-**TWO REGISTRY ROWS ARE NOT BUILDS** (14z-97, GitHub #96; carried at the
-14z-99 window freeze): `donovan-m9-stock` (`16da59b6`, the stock twin of
-the donovan-m9 freeze — it MOVED from `a054de5c` at 14z-99, deliberately,
-because #103's pcrel rows are not profile-gated) and `donovan-m9-stage4`
-(`35e948a1`) are the M2 battery's two legs. They are registered so the battery
-can dispatch on the fingerprint instead of a pinned set name — an unregistered
-image there means the pipeline no longer reproduces the current freeze, which
-is the rule-6 signal the maintainer's ruling asks for. Neither is playtested,
-neither is a shipping artifact, and both carry-rename with each freeze
-(m8 -> m9 executed 14z-99; the superseded m8 rows stay in the TSV as
-history, annotated).
+**TWO REGISTRY ROWS ARE NOT BUILDS** (14z-97, GitHub #96; RATIFIED by the
+maintainer 2026-09-15): the M2 battery's two legs, the stock twin
+(`donovan-mN-stock`) and the stage-4 image (`donovan-mN-stage4`) — today
+`donovan-m19-stock` (`e86e1d04`) and `donovan-m19-stage4` (`108f7523`), carried
+unchanged by rebuild through the 14z-132, 14z-143 and 14z-144 freezes. They are
+registered so the battery can dispatch on the fingerprint instead of a pinned
+set name — an unregistered image there means the pipeline no longer reproduces
+the current freeze, which is the rule-6 signal the maintainer's ruling asks
+for. Neither is playtested, neither is a shipping artifact, neither is tagged;
+each freeze rebuilds both and records whether they MOVED (superseded rows stay
+in the TSV as history, annotated). Until 14z-157 this paragraph named the m9
+rows as current and called the practice unratified in effect; the ruling is
+`DECISIONS_HISTORY.md` "Ruled 2026-09-15 (14z-157)".
 Their expectation sets are BATTERY-SCOPED and say so in their own READMEs.
 
 **The registry is a TABLE; each row's narrative (what the freeze changed,

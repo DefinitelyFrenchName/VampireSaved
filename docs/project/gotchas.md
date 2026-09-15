@@ -1,5 +1,21 @@
 # GOTCHAS (project) — traps in OUR pipeline and method
 
+## TWO SYMPTOMS ARE ONE DEFECT ONLY IF THE MECHANISM PREDICTS BOTH (paid: 14z-95 to 14z-96, #93 and #101)
+
+The 14z-95 close carried a keyon red on the trap-family sample (#93) and a
+maintainer report — Phobos grunts after being electrocuted, every other hit — as
+one investigation. They were two. The sample differs from vs2's at one INCLUSIVE
+endpoint byte (`0xFF` against `0x00`), and "a one-sample `0xFF`/`0x00`
+discontinuity predicts a click, not a ~300 ms voiced grunt, and a static byte
+cannot alternate every other hit" (#93). The grunt was #101: the kernel's
+per-class voice tables aliasing tenant rows to legacy rows.
+
+**RULE: before merging two symptoms into one ticket, write down what the
+candidate mechanism would PRODUCE — duration, character, cadence — and compare it
+with each symptom. If one does not follow, file the second as its own ticket at
+once (CLAUDE.md [VSP-182]); a finding kept inside another ticket's notes is paid
+for twice ([VSP-12]).** #102 was split out of #99 on the same grounds.
+
 ## A gate that prints `SKIP:` AND exits NON-ZERO is a FAILURE, not a skip (paid: 14z-128)
 
 `tests/test_wide_profile.sh` is scrupulous about the invariant it carries. With
@@ -320,6 +336,14 @@ Rules now enforced in `tools/extract_char.py` (source-only regions):
 - Identical-evidence dominance: a generic context anchor can match several
   sibling sites; one spurious shift-consistent hit must not outvote the
   true twin.
+
+**PAID AGAIN (14z-112, #112): by hand, not by the extractor.** Two byte-scan
+"findings" during #112 were instruction-boundary false positives — `0028394E`
+(a displacement word followed by the next opcode) read as a pointer to a vanilla
+animation sequence, and `e768 7105` matched inside base territory. Together they
+carried a "borrowed sequence" theory into the options offered for a ruling before
+it was retracted. The rules above are scoped to `tools/extract_char.py`; the
+lesson is not: DISASSEMBLE a candidate pointer in context before building on it.
 
 ## **[VSP-41]** Engine hooks on hot paths break whole-RAM legacy comparison — by construction (paid: 2026-07-25 session 7, ~2h)
 

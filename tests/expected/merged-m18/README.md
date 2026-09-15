@@ -1,3 +1,14 @@
+# merged-m18 — the SHIPPED merged build's expectation set (14z-144)
+
+CARRIED from `merged-m17` at the M18 freeze: the same 53 `.masked`, 19 `.skip`
+and the mask (counted 14z-157). Registry row keyed on the WHOLE-SET fingerprint
+only, as its row in `tests/expected/registry.tsv` says. Until 14z-157 this README
+began with merged-m17's own header, below.
+
+---
+
+The merged-m17 README:
+
 # merged-m17 — the SHIPPED merged build's expectation set (14z-143)
 
 CARRIED VERBATIM from `merged-m16` (53 `.masked`, 19 `.skip`, the mask): the M17
@@ -19,7 +30,7 @@ The merged-m16 README, kept for the class attributions and the B2 record:
 
 The 47 `.masked` specs and the mask are the merged build's own class table, `tests/expected/merged1/` (14z-91), COPIED here verbatim after being VERIFIED on `build/m3b_merged23` as a prebuilt image (`audit_merged_legacy` leg (a) 47/47, leg (b) PASS, 14z-133b). Registry row keyed on the WHOLE-SET fingerprint `2c926c5b…` only. The three legacy-oracle gates (`audit_legacy_pairings`, `audit_flicker_attribution`, `test_fbneo_legacy_oracle`) dispatch here for the merged build. `merged1/` stays the blanks-only instrument's table.
 
-**ADDED 14z-133b (B2), from `donovan-m20`:** the 20 `.skip` markers (replays that run on native `vsav2`, not on our build — build-independent exclusions) and SIX legacy `.masked` specs authored after 14z-91 (`94_tenant_vs_tenant` `96_don_victor_grab` `104_1p_auto_ko_win` `105_legacy_2pwin_auto` `105_projectile_clash_ctl` `106_pyron_cosmo_clash`) — copied as CANDIDATES measured on the solo track, then MEASURED on the merged build by `audit_legacy_pairings` (result in STATE 14z-133b). Six of the 47 original specs differ from the solo set's on purpose: they are the merged build's OWN classes (14z-91) and pass on `build/m3b_merged23`. Tenant-content `.sha1` self-frozen expectations are NOT carried: the merged build's tenant content is covered by `audit_merged_legacy` leg (b) and the tenant gates, and a merged freeze self-freezes them.
+**ADDED 14z-133b (B2), from `donovan-m20`:** the 20 `.skip` markers (replays that run on native `vsav2`, not on our build — build-independent exclusions) and SIX legacy `.masked` specs authored after 14z-91 (`94_tenant_vs_tenant` `96_don_victor_grab` `104_1p_auto_ko_win` `105_legacy_2pwin_auto` `105_projectile_clash_ctl` `106_pyron_cosmo_clash`) — copied as CANDIDATES measured on the solo track, then MEASURED on the merged build by `audit_legacy_pairings` (result in STATE 14z-133b). Six of the 47 original specs differ from the solo set's on purpose: they are the merged build's OWN classes (14z-91) and pass on `build/m3b_merged23`. Tenant-content `.sha1` self-frozen expectations are NOT carried: the merged build's tenant content is covered by `audit_merged_legacy` leg (b) and the tenant gates~~, and a merged freeze self-freezes them~~ — no merged freeze has: `merged-m16`, `merged-m17` and `merged-m18` hold no `.sha1` (counted 14z-157; the design confirmed by the maintainer 2026-09-15, #111).
 
 ---
 

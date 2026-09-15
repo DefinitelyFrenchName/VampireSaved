@@ -18,6 +18,11 @@
 # yet involved, and past that, differences that are DATA fed to the same
 # engine code rather than a different code path. Sections 1 and 4.
 #
+# A RED HERE IS NOT A STALE LEG until the fingerprints say so: #95 first blamed
+# two build directories from "different generations"; both matched their
+# frozen fingerprints (m5_wide 4b7d0dc7, m5_stock 6c93cfa8), and what had gone
+# stale was this gate's own claims.
+#
 # This gate establishes that directly, as a live A/B between the two builds
 # — no frozen expectations involved, so it is machine-independent and needs
 # no freeze decision:

@@ -12,18 +12,6 @@ release. `git status -sb` says the push state.
 
 ## START HERE — what is open
 
-- **ASK THE MAINTAINER: what the #75-#114 threads left behind** (the full list is in commit
-  `d8857bf5`'s message). Each is a ruling, never decided by a session:
-  - residuals — a new ticket, or declined? #78 (the full FBNeo legacy track, "revisit at
-    MiSTer"), #80 (drop the setup_mame mirror), #93 (option C; the endpoint-byte standing
-    check never built), #100 ("re-scoped to after MiSTer"), #103 (name the move that pins
-    `hp := 1`), #109 (the clone-beam damage leg), #111 (merged expectations for replays
-    107-110);
-  - thin local records: the #96 registry rows (ratified?), the #90 ruling (only in STATE_HISTORY);
-  - lessons with no live carrier (a gotcha, or `none` accepted): #77, #91, #92, #93, #95,
-    #100, #101, #102, #112;
-  - judgement calls to confirm: #78 evolution, #108 invalid, #112 declined; GitHub kind labels
-    on #75-#114.
 - **#135 CONTINUES.** Steps 1-2 landed at 14z-156 (`tests/audit_tick_cadence.sh`, the 14z-156 addendum in
   `docs/game/engine_internals.md`, the issue comment). Next, cheapest first:
   1. the DECIDER of the second pass — a debugger call chain from the tick site
