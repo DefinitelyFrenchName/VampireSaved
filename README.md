@@ -1,14 +1,12 @@
 # Vampire Saved
 
-*"Worst of all, though, is that Vampire Savior never did get an all-in-one perfect competitive version that has all the characters together" - GuileWinQuote*
+*"Worst of all, though, is that Vampire Savior never did get an all-in-one perfect competitive version that has all the characters together" -GuileWinQuote*
 
 A forever true statement. But the FGC loves what ifs and this project attempts to answer the question: "But if we had, how would it be then?"
 
-**Vampire Saved is Donovan, Phobos and Pyron, brought over from Vampire Savior 2 into the arcade Vampire Savior that competitive players use — with every original character left exactly as it was and everyone running the originla Vampire Savior engine.**
+### Vampire Saved is Donovan, Phobos and Pyron, brought over from Vampire Savior 2 into the arcade Vampire Savior that competitive players use — with every original character left exactly as it was and everyone running the originla Vampire Savior engine.
 
-This project stands on the shoulders of the Vampire Savior community and of the CPS-2 wizards who
-came before it. Support them, and support MAME, FBNeo and Jotego — without Jotego's CPS-2 core, the
-MiSTer version of the larger board this needs would have been close to impossible.
+### This project stands on the shoulders of the Vampire Savior community and of the CPS-2 wizards who came before it. Support them, and support MAME, FBNeo and Jotego — without Jotego's CPS-2 core, the MiSTer version of the larger board this needs would have been close to impossible.
 
 ***Disclaimer:** From its inception, this project has been an experiment in black-box agentic engineering. It just so happens that it's been applied to making a "Vampire Savior that could not be" instead of applying it to a more boring legacy program. As such the use of AI is intrinsically central and the main deliverable to its creator is not even the game but the work discipline and the test harness. But just because the ultimate goal wasn't the game doesn't change the value of the game itself.*
 
