@@ -186998,8 +186998,7 @@
     "handler_vs2": "0x6800c",
     "immediates": [],
     "moves": [
-     "Mighty Launcher",
-     "Circuit Scrapper"
+     "Mighty Launcher"
     ],
     "ours_source": "byte",
     "rows": [

@@ -372,6 +372,26 @@ Mechanism, fully measured in vsav2 (Japan 970913), Donovan
   move differ). Pre-battery state is identical except the latch; the
   pick identity is unchanged (hitbox base 0x0C8DF8 both runs).
 
+**PHOBOS'S SIDE OF THE LATCH, MEASURED 14z-160 (GitHub #151; the measurement
+#147 lacked).** On native vsav2 the CONFIRM writes the latch per character:
+`PRG:0x01F848` writes **00** for a real-cursor Phobos pick (frame 1299 of the
+naming rigs), where Donovan's default is 01 — so a rig that confirms Donovan's
+cell (the default R,R) and then pokes Phobos's id at 1400 carries **Donovan's
+01**, the VH2 flavor, for the whole match. The confirm also copies the id into
+`+0x3BD` (`PRG:0x01F6CE`) and `+0x3E0` (`PRG:0x01F6C8`), which the poke never
+reaches either; `tests/audit_forced_pick_fidelity.sh` freezes exactly those
+three offsets as the poked leg's whole-block difference from a real pick, and
+none for a same-id poke. Phobos's consumers of the latch in play (a PC-attributed
+tap over the first 3,400 frames, then the vs2 opcode view): `PRG:0x026318` —
+`cmpi.b #$10,$382(a6); tst.b $3c2(a6); beq` — which admits the **seq-4 sub-4
+startup state ONLY under flavor 1** (with flavor 0 the routine returns 0 and
+the state is never entered: 0 frames on a real pick against 40 on a poked one
+over the specials rig, which is what #149 had read as "native plays it");
+`PRG:0x02595A` (the float timer, 0x3C instead of 0x78 under flavor 1) and
+`PRG:0x02598A` (the hover fork). So VS2's own Phobos has flavor 0: no hover,
+no seq-4 startup state — and the ported default `flavor_default = 0x00` is
+the faithful one.
+
 **PORT CONSEQUENCE (measured on the stage-4 build):** both consumers live
 inside regions the port already relocates (Donovan code region and
 x065e5a), so the flavor fork ships with the port — but vsavj's engine

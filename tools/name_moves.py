@@ -54,18 +54,47 @@ PROLOGUE = """300-305 sys=C1
 1300-1302 p1=1
 1360-1362 p2=1
 """
+
+
+def prologue(tenant):
+    """The select prologue: replay 17's, with P1's cursor moves replaced by the
+    tenant's real path when it has one (14z-160). Moves start at 1100, 60 frames
+    apart, so a three-move path (1100/1160/1220) still confirms at 1300."""
+    path = TENANTS[tenant].get("path")
+    if not path:
+        return PROLOGUE.rstrip()
+    out = []
+    t = 1100
+    for line in PROLOGUE.rstrip().split("\n"):
+        if line.endswith("p1=R") and line.startswith(("1100-", "1160-")):
+            continue
+        if line.startswith("1104-"):
+            for m in path:
+                out.append(f"{t}-{t + 2} p1={m}")
+                t += 60
+        out.append(line)
+    return "\n".join(out)
 FIRST_EVENT = 2600
-# The native game is vsav2 for all three; Donovan is the default cursor's
-# R,R pick, the other two are FORCED by the early-window poke ([VSP-120]:
-# 1400-1500 only, the idiom of audit_clone_beam_lines.sh). The chains are
-# decoded from each tenant's vs2 extract (the solo build dir).
+# The native game is vsav2 for all three. Donovan is the default cursor's
+# R,R pick. SINCE 14z-160 (GitHub #151) Phobos and Pyron are REAL CURSOR PICKS
+# too — `path` is P1's cursor route from vsav2's default cell 0x01, decoded
+# from its TABLE B by tools/select_wheel.py (Phobos L,L,L; Pyron R,R,R) — and
+# the early-window poke ([VSP-120]: 1400-1500 only) is emitted ONLY for a
+# tenant with no path. The poke was the #147 rig artifact: the select CONFIRM
+# (frame ~1299) latches per-fighter state for the cell the cursor is on —
+# the flavor +0x3C2 and two id copies +0x3BD/+0x3E0 — BEFORE the poke swaps
+# the id, so a poked "native Phobos" carried Donovan's VH2 flavor
+# (tests/audit_forced_pick_fidelity.sh freezes exactly that inventory). The
+# victim rigs (P1 Victor, P2 the tenant, both poked) keep the poke for now:
+# eight gates freeze on them and their re-judging is #151's step 3.
+# The chains are decoded from each tenant's vs2 extract (the solo build dir).
 TENANTS = {"donovan": {"id": None, "build": "build/don_m22"},
            # PHASE 3 (reactions): the tenant on the VICTIM side (P2) — P1 is Victor (0x03), both by the early-window pokes
            "donovan_victim": {"id": "03", "id_p2": "13", "build": "build/don_m22"},
            "huitzil_victim": {"id": "03", "id_p2": "10", "build": "build/hui56"},
            "pyron_victim":   {"id": "03", "id_p2": "11", "build": "build/pyron41"},
-           "huitzil": {"id": "10", "build": "build/hui56"},
-           "pyron":   {"id": "11", "build": "build/pyron41"}}
+           "huitzil": {"id": "10", "path": ("L", "L", "L"), "build": "build/hui56"},
+           "pyron":   {"id": "11", "path": ("R", "R", "R"), "build": "build/pyron41"}}
 # P2 HP re-pin (both words, [VSP-125]) so a projectile-fed Victor never dies.
 HP_PIN_EVERY = 400
 
@@ -640,7 +669,7 @@ def gen(tenant, part, out_rpl, out_sched):
     lines = [f"# naming rig — {tenant} part {part} (tools/name_moves.py gen; DO NOT hand-edit,",
              "# regenerate). Native-game select prologue from replay 17; events from the",
              "# schedule in the tool. Analyse with: name_moves.py analyse <schedule.json>.",
-             PROLOGUE.rstrip()]
+             prologue(tenant)]
     sched = {"tenant": tenant, "part": part, "events": [], "pokes": []}
     t = FIRST_EVENT
     tid = TENANTS[tenant]["id"]
@@ -668,7 +697,7 @@ def gen(tenant, part, out_rpl, out_sched):
     lines.append(f"{end} wait")
     # pokes: P2 HP pin every HP_PIN_EVERY frames from the first event; stocks
     pokes = [] if (tenant, part) in NO_POKE_PARTS else [f"{f}:ff8850:01200120" for f in range(FIRST_EVENT - 50, end, HP_PIN_EVERY)]
-    if tid:
+    if tid and not TENANTS[tenant].get("path"):
         pokes = [f"{f}:ff8782:{tid}" for f in (1400, 1450, 1500)] + pokes
     if TENANTS[tenant].get("id_p2"):
         pokes = [f"{f}:ff8b82:{TENANTS[tenant]['id_p2']}" for f in (1400, 1450, 1500)] + pokes

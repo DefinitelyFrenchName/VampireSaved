@@ -27,28 +27,30 @@
 #     from the anchor each leg plays its own intro; measured, every one of those
 #     differences lies before the first event and the legs are bit-identical from
 #     it onwards.
-#   - The tenant is FORCED on our leg by the early-window poke ([VSP-123]); on
-#     native the rigs already force Phobos and Pyron and Donovan is the default
-#     cursor.
+#   - BOTH LEGS ARE REAL CURSOR PICKS (since 14z-160, GitHub #151). The rig's
+#     own prologue is the native path (vsav2's default cell 0x01: Donovan R,R,
+#     Phobos L,L,L, Pyron R,R,R — tools/name_moves.py `path`); our leg swaps
+#     it for the merged wheel's path (D,D,D from Demitri's cell reaches Phobos
+#     below Bishamon, one more D Pyron, DR from the random cell Donovan —
+#     atlas/select_screen.md "the three inbound edges"). No id poke on either
+#     leg: the select CONFIRM latches per-fighter state for the hovered cell
+#     BEFORE the early-window poke lands (+0x3C2 the flavor, +0x3BD/+0x3E0 two
+#     id copies — tests/audit_forced_pick_fidelity.sh), so a poked leg is not
+#     the tenant. Identity is ASSERTED from each leg's own trace, never assumed.
 #
 # WHAT IT DOES NOT COVER: per-hit damage, meter gain, hitboxes and projectile
 # parameters — separate instruments. P2 is Victor, a legacy character, so his
 # state is never compared ([VSP-168]).
 #
-# ** THE NATIVE LEG IS NOT VALIDATED FOR PHOBOS AND PYRON (14z-159, GitHub #151).**
-# Donovan's native leg is a REAL cursor pick; Phobos's and Pyron's are FORCED by
-# the early-window poke ([VSP-123]). Those are not equivalent: the select-confirm
-# path latches per-fighter state BEFORE the poke replaces the character id, so a
-# poked native leg carries another character's confirm wearing the tenant's id.
-# GitHub #147 is the worked case — five measurements of RAM:$FF87C2 on a poked
-# native leg all read the rig, a wrong fix shipped to a freeze on them, and the
-# maintainer's field report caught it. THIS GATE HAS NO CONTROL PROVING ITS
-# NATIVE LEG IS FAITHFUL; it proves only that it sees the speed level and the
-# placement translation. So the 17 Phobos and Pyron rows of
-# tests/expected/move_parity.tsv are UNVALIDATED — not known wrong, but not
-# entitled to be read as native comparisons either. #151 builds the missing
-# control (poked vs real-cursor, diffed over the whole fighter block) and
-# re-judges every verdict against what it finds.
+# THE FORCED-PICK HISTORY (14z-159 -> 14z-160, GitHub #147/#151). Until 14z-160
+# Phobos's and Pyron's native legs were FORCED by the early-window poke, and the
+# select confirm had already latched Donovan's per-fighter state — his VH2
+# flavor above all — before the poke swapped the id. GitHub #147 shipped a wrong
+# fix to a freeze on five readings of that rig, and the maintainer's field
+# report caught it. tests/audit_forced_pick_fidelity.sh now freezes what a poked
+# leg gets wrong (three bytes, none for a same-id poke), and this gate runs
+# real picks on both sides; the 27 verdicts were re-frozen on them at 14z-160
+# and the ten Phobos DIVERGES rows of 14z-159 were verdicts on the VH2 branch.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged26] [PARTS="donovan_1 pyron_2"] [ALL=1] [JOBS=6] tests/audit_move_parity.sh
 #   emulator tier, MAME. MEASURED 14z-159 on this MacBook, solo, at the default
@@ -94,7 +96,9 @@ else
   SET="donovan_1 pyron_2 huitzil_1"
 fi
 
-PICK_donovan=13; PICK_huitzil=10; PICK_pyron=11
+ID_donovan=13; ID_huitzil=10; ID_pyron=11
+# our leg's cursor path on the merged wheel, from Demitri's cell (the P1 default)
+OURS_PATH_donovan="D D DR DR"; OURS_PATH_huitzil="D D D"; OURS_PATH_pyron="D D D D"
 
 # ONE function builds a leg's pokes, so what the control perturbs is what the
 # gate asserts ([VSP-181]).
@@ -103,8 +107,6 @@ pokes_for() {  # pokes_for <tenant> <json> <leg> <frames>
     _base="$(python3 -c "import json;print(';'.join(json.load(open('$_j'))['pokes']))")"
     _lvl="$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$_fr)))")"
     _rng="$(python3 -c "print(';'.join(f'{f}:ff80d4:0000' for f in range(2363,$_fr)))")"
-    eval "_pid=\$PICK_$_t"
-    _pick="$(python3 -c "print(';'.join(f'{f}:ff8782:$_pid' for f in (1400,1450,1500)))")"
     if [ "$_leg" = native ]; then
         # the unpinned-level control withholds the level from the NATIVE leg only
         if [ "$CONTROL" = unpinned-level ] || [ "${CTL_ONE:-}" = unpinned-level ]; then
@@ -113,8 +115,22 @@ pokes_for() {  # pokes_for <tenant> <json> <leg> <frames>
             printf '%s;%s;%s' "$_base" "$_lvl" "$_rng"
         fi
     else
-        printf '%s;%s;%s;%s' "$_pick" "$_base" "$_lvl" "$_rng"
+        printf '%s;%s;%s' "$_base" "$_lvl" "$_rng"
     fi
+}
+
+# rpl_for <tenant> <rig.rpl> <leg> <out.rpl> — the rig as committed for native;
+# for ours, P1's prologue cursor moves replaced by the merged wheel's path
+# (1100, then every 60 frames; the confirm at 1300 is untouched).
+rpl_for() {
+    _t="$1"; _r="$2"; _leg="$3"; _o="$4"
+    if [ "$_leg" = native ]; then cp "$_r" "$_o"; return; fi
+    eval "_path=\$OURS_PATH_$_t"
+    awk -v path="$_path" '
+        /^1104-1106 p2=R$/ && !done { n = split(path, m, " "); t = 1100
+            for (i = 1; i <= n; i++) { printf "%d-%d p1=%s\n", t, t + 2, m[i]; t += 60 }; done = 1 }
+        /^(1100|1160|1220|1280)-[0-9]+ p1=/ { next }
+        { print }' "$_r" > "$_o"
 }
 
 FIELDS="ff841c:l:node,ff8420:b:cnt,ff8406:b:seq,ff8407:b:sub,ff8509:b:stock,ff8410:w:x,ff8414:w:y,ff8450:w:p1hp,ff8782:b:id,ff802e:b:df,ff840b:b:face,ff8116:b:lvl"
@@ -125,6 +141,7 @@ run_leg() {  # run_leg <tenant> <part> <leg>
     _r="$REPO/tests/replays/naming/${_t}_${_p}.rpl"
     _fr="$(python3 -c "import json;print(json.load(open('$_j'))['frames'])")"
     _pk="$(pokes_for "$_t" "$_j" "$_leg" "$_fr")"
+    rpl_for "$_t" "$_r" "$_leg" "$W/${_t}_${_p}_$_leg.rpl"; _r="$W/${_t}_${_p}_$_leg.rpl"
     if [ "$_leg" = native ]; then _set=vsav2; _rp="$ROMDIR"
     else _set=vsavjw; _rp="$BUILD/rompath;$ROMDIR"; fi
     mkdir -p "$W/${_t}_${_p}_$_leg"
@@ -169,6 +186,18 @@ for part in $SET; do
 done
 [ "$fail" = 0 ] || { echo "FAIL: a leg did not run"; exit 1; }
 ok "$n legs ran"
+# IDENTITY: the id field at the first sampled frame (2300, before the match, when
+# +0x382 is still the pick — in match the engine reassigns it, ram.md) must be
+# the tenant on BOTH legs: a real cursor pick that landed elsewhere is not a leg.
+for part in $SET; do
+    t="${part%_*}"; p="${part##*_}"; eval "_want=\$ID_$t"
+    for leg in native ours; do
+        got="$(awk '$1=="F" && $2==2300 {for(i=3;i<=NF;i++) if ($i ~ /^id=/) {sub("id=","",$i); printf "%02x", $i}}' "$W/tr_${t}_${p}_$leg.txt")"
+        [ "$got" = "$_want" ] || bad "$part: $leg leg picked id $got, not the tenant ($_want) — the cursor path did not land"
+    done
+done
+[ "$fail" = 0 ] || { echo "FAIL: a leg is not the tenant"; exit 1; }
+ok "every leg is the tenant by its own trace (id at 2300)"
 
 echo "== 2. every part's verdict equals the frozen expectation"
 : > "$W/got.tsv"

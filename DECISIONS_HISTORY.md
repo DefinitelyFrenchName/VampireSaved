@@ -39,6 +39,20 @@ retraction grep covers this file.
   is gone over again before any of it is built on, and the item leaves the open list only when
   that pass is done, never on the control alone.
 
+- **#149 AND #147 CLOSED AS INVALID (maintainer, 2026-09-16, 14z-160).** On the measurements
+  of 14z-160 (2)-(4) — the seq-4 startup state is flavor-1-only and a real-cursor native Phobos
+  plays it on 0 frames; a real Phobos confirm writes `+0x3C2 = 00` and ours ships 00, movement
+  and jump IDENTICAL to native — asked to close both as invalid: *"close #149 and #147 as
+  invalid => yes."* The 14z-159 "#149 waits for its measurements" line is retired with it.
+
+- **THE REMAINING PHOBOS DIVERGENCES, THE MAINTAINER'S TESTIMONY (2026-09-16, 14z-160):**
+  on the re-frozen #136 table (14 IDENTICAL / 13 DIVERGES): *"the divergences on Phobos are
+  aligned with moves that we had trouble with in the past and either had to be imported in
+  multiple passes or tweaked, so it's good news in the sense that if something diverges, I
+  would expect that to diverge."* Recorded as testimony, not a verdict: the rows stay
+  findings, each family (Plasma Trap; the Reflect Wall guard-cancels; Ray of Doom) its own
+  root-cause and ticket under the full re-examination of #136.
+
 ## Ruled 2026-09-16 (14z-159) — entered at ruling time, under the amended lifecycle
 
 - **THE M19 FREEZE IS WITHDRAWN IN FULL (maintainer, 2026-09-16).** After the

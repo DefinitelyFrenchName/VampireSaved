@@ -2015,6 +2015,13 @@ capture-keyframe pointer table `0x0BE27A`).
   only, min height 0x40, EXACTLY straight up, timer-limited; flavor 1
   (VH2): any-up pins the hover indefinitely. During the hover the
   mover is not called at all.
+- **The seq-4 startup state is flavor-gated too (measured 14z-160, #149/#151):**
+  vs2 `0x026318` reads `$382(a6)`, and for id 0x10 tests `$3c2(a6)` — flavor 0
+  returns 0 and the `seq 4 sub 4` starter at `0x026344` is never reached, flavor
+  1 plays it for 2 frames. A forced-pick native Phobos carries Donovan's
+  flavor 1 from the confirm, so "native plays the state and ours skips it" was
+  the rig; a real-cursor pick plays it on 0 frames of the specials rig, as ours
+  does (`atlas/character_tables.md` "PHOBOS'S SIDE OF THE LATCH").
 - **Jump physics:** per-char rows at the jump_params table (see the
   RAM atlas addendum) installed by the routine every seq-0600 starter
   calls. Air/ground dash physics are NOT table rows — they live in the

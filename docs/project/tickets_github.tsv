@@ -7,9 +7,9 @@ number	state	reason	closed	labels	title
 152	OPEN	-	-	evolution	An independent adversarial rule-checker at every decision point — redundancy for rule APPLICATION, not for measurement
 151	OPEN	-	-	evolution	Re-examine #136 end to end: the forced-pick native leg is unvalidated, so 17 of 27 parity verdicts rest on an unmeasured assumption
 150	OPEN	-	-	evolution	The freeze ritual's three silent-green failure modes need a mechanical guard (test_freeze_set_shape + a committed freeze driver)
-149	OPEN	-	-	bug	Phobos's specials skip a 2-frame seq-4 startup state native vsav2 plays (one cause behind ~11 of his moves)
+149	CLOSED	NOT_PLANNED	2026-09-16	bug	Phobos's specials skip a 2-frame seq-4 startup state native vsav2 plays (one cause behind ~11 of his moves)
 148	OPEN	-	-	evolution	Review the static tier's contents and when it is applied — a commit currently blocks the tree for ~25 min, a close for ~40
-147	OPEN	-	-	bug	Phobos's float runs the VH2 flavor: huitzil.toml flavor_default is 0x00 where native vsav2 seeds 0x01
+147	CLOSED	NOT_PLANNED	2026-09-16	bug	Phobos's float runs the VH2 flavor: huitzil.toml flavor_default is 0x00 where native vsav2 seeds 0x01
 146	OPEN	-	-	bug	The release packages' player READMEs are not complete or detailed enough (reported)
 145	OPEN	-	-	bug	Windows: the release packages' prebuilt emulator binaries fail to load the game (reported, not yet reproduced)
 144	OPEN	-	-	bug	macOS: the release packages' prebuilt emulator binaries cannot be executed — macOS blocks them (reported, not yet reproduced)

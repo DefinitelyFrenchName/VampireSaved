@@ -51,7 +51,8 @@ THE MEASUREMENTS THAT SHAPED IT (§11.3, all made before this file existed):
     ROM audit covers all 76 members, so this costs nothing.
   * COVERAGE IS REPORTED AGAINST THE ROM-TIER CENSUS (the definition
     maintainer-ruled 2026-09-07: the atlas addresses minus those carried only
-    by `ram.md` — 346 at the ruling, 473 minus 127; 364 since 14z-157). Those
+    by `ram.md` — 346 at the ruling, 473 minus 127; 364 since 14z-157; 370
+    since 14z-160). Those
     ram.md-only addresses are
     program addresses, but their claims are dataflow ("this routine writes
     that field") and belong to the suite, not here (scope §6.5). Counting
@@ -84,9 +85,11 @@ ROM_TIER_DOCS = ("README.md", "character_tables.md", "id_space.md",
 
 # Ruled 2026-09-07: the coverage denominator. Asserted against the live
 # census by --uncovered, so it cannot drift from the tree unnoticed.
+# 370 since 14z-160 (character_tables.md gained six vs2 PRG addresses: the
+# confirm's latch writers and Phobos's flavor readers, GitHub #151);
 # 346 at the ruling; 364 since 14z-157, when the venue_assets.md and ram.md
 # corrections for #100 and RAM:$FF8130 added 18 ROM-tier addresses.
-DENOMINATOR = 364
+DENOMINATOR = 370
 
 
 class Stale(Exception):

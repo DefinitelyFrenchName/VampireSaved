@@ -23,13 +23,13 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3062 |
-| named by a document or manifest only | 2055 |
+| distinct program-space addresses named | 3070 |
+| named by a document or manifest only | 2063 |
 | named by both a document/manifest and code | 659 |
 | named by CODE ONLY (the gap list below) | 348 |
-| carried by atlas | 512 |
-| carried by engine_internals | 565 |
-| carried by other docs | 965 |
+| carried by atlas | 518 |
+| carried by engine_internals | 567 |
+| carried by other docs | 969 |
 | carried by manifests | 1786 |
 | carried by code | 1007 |
 
@@ -605,8 +605,11 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01F5A8` | docs/game/atlas/id_space.md — RESERVED IDS — vanilla does use part of the variant half |
 | `PRG:0x01F5BC` | docs/game/atlas/id_space.md — RESERVED IDS — vanilla does use part of the variant half |
 | `PRG:0x01F5FC` | docs/game/atlas/select_screen.md — The routine [vs2] |
+| `PRG:0x01F6C8` | docs/game/atlas/character_tables.md — Start-hold flavor: RESOLVED (community-confirmed 2026-07-27, mechanism pinned); docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] [vs2]; docs/project/gotchas.md — A FORCED-PICK NATIVE LEG MEASURES THE RIG FOR ANYTHING THE SELECT CONFIRM LATCHES — and two poked legs agree with each other perfectly (paid: 14z-159, GitHub #147/#151) |
+| `PRG:0x01F6CE` | docs/game/atlas/character_tables.md — Start-hold flavor: RESOLVED (community-confirmed 2026-07-27, mechanism pinned); docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] [vs2]; docs/project/gotchas.md — A FORCED-PICK NATIVE LEG MEASURES THE RIG FOR ANYTHING THE SELECT CONFIRM LATCHES — and two poked legs agree with each other perfectly (paid: 14z-159, GitHub #147/#151) |
 | `PRG:0x01F800` | docs/game/atlas/select_screen.md — The appended cells' PLACEMENT and OUTLINES (14z-115, maintainer-directed); docs/project/mister_map.md — 1. THE CORRECTION THAT DECIDES THE DESIGN: 6.39 MB is not the footprint; docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-115 — THE SELECT-WHEEL SEPARATION (maintainer-directed "E2", approved 2026-08-28): byte detail; build/manifest/donovan.toml — roster21; build/manifest/huitzil.toml — roster21; +3 more |
 | `PRG:0x01F80B` | build/manifest/donovan.toml — roster21; build/manifest/huitzil.toml — roster21; build/manifest/pyron.toml — roster21 |
+| `PRG:0x01F848` | docs/game/atlas/character_tables.md — Start-hold flavor: RESOLVED (community-confirmed 2026-07-27, mechanism pinned); docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] [vs2]; docs/project/gotchas.md — A FORCED-PICK NATIVE LEG MEASURES THE RIG FOR ANYTHING THE SELECT CONFIRM LATCHES — and two poked legs agree with each other perfectly (paid: 14z-159, GitHub #147/#151) |
 | `PRG:0x01F856` | build/manifest/reconciliation.toml — map |
 | `PRG:0x01F864` | docs/game/atlas/id_space.md — RESERVED IDS — vanilla does use part of the variant half [vs2] |
 | `PRG:0x01F87E` | docs/project/gotchas.md — A FORCED-PICK NATIVE LEG MEASURES THE RIG FOR ANYTHING THE SELECT CONFIRM LATCHES — and two poked legs agree with each other perfectly (paid: 14z-159, GitHub #147/#151) |
@@ -827,6 +830,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x025402` | build/manifest/bank_map.toml — ai_script_3 [vs2] |
 | `PRG:0x02563E` | docs/project/hardening_register.md — 2. The 13 plausible reconciliation rows (triaged 14z-100, H3.2); docs/project/inferred_claims.md — Small fixes elsewhere; docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-102 — the #107 row flip — FROZEN in donovan-m10 + every tenant + stock (the shared map), #107 CLOSED; build/manifest/reconciliation.toml — map |
 | `PRG:0x02592A` | docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture) [vs2]; docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port) [vs2]; build/manifest/huitzil.toml — data_in_code; tools/build_donovan.sh |
+| `PRG:0x02595A` | docs/game/atlas/character_tables.md — Start-hold flavor: RESOLVED (community-confirmed 2026-07-27, mechanism pinned); docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] [vs2] |
+| `PRG:0x02598A` | docs/game/atlas/character_tables.md — Start-hold flavor: RESOLVED (community-confirmed 2026-07-27, mechanism pinned); docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] [vs2] |
 | `PRG:0x0259D4` | build/manifest/huitzil.toml — init_shim |
 | `PRG:0x0259DA` | build/manifest/type_stamps.toml — compare |
 | `PRG:0x025A96` | build/manifest/reconciliation_huitzil.toml — map |
@@ -854,6 +859,9 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0262C8` | build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x0262EE` | build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x0262FC` | build/manifest/reconciliation_huitzil.toml — map [vs2] |
+| `PRG:0x026318` | docs/game/atlas/character_tables.md — Start-hold flavor: RESOLVED (community-confirmed 2026-07-27, mechanism pinned) [vs2]; docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] [vs2]; docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port) [vs2] |
+| `PRG:0x026322` | docs/project/gotchas.md — A FORCED-PICK NATIVE LEG MEASURES THE RIG FOR ANYTHING THE SELECT CONFIRM LATCHES — and two poked legs agree with each other perfectly (paid: 14z-159, GitHub #147/#151) |
+| `PRG:0x026344` | docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port) |
 | `PRG:0x026484` | docs/project/patch_notes.md — rows 0x10 + the per-tenant VALUE_SKIP default; build/manifest/bank_map.toml — gap_be37a |
 | `PRG:0x0264BC` | build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x0264FE` | build/manifest/reconciliation_huitzil.toml — map [vs2] |

@@ -343,3 +343,4 @@ tests/test_controls_contract.sh	runner
 tests/audit_stock_emulator_stall.sh	pipeline
 tests/audit_ff8130_writers.sh	character-data
 tests/test_readme_recording.sh	platform
+tests/audit_forced_pick_fidelity.sh	character-data

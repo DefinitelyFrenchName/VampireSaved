@@ -1,4 +1,4 @@
-# naming rig — pyron part 6 (tools/name_moves.py gen; DO NOT hand-edit,
+# naming rig — huitzil_victim part 3 (tools/name_moves.py gen; DO NOT hand-edit,
 # regenerate). Native-game select prologue from replay 17; events from the
 # schedule in the tool. Analyse with: name_moves.py analyse <schedule.json>.
 300-305 sys=C1
@@ -7,21 +7,17 @@
 940-943 sys=S2
 1100-1102 p1=R
 1160-1162 p1=R
-1220-1222 p1=R
 1104-1106 p2=R
 1164-1166 p2=R
 1300-1302 p1=1
 1360-1362 p2=1
-2600-2602 p1=UR
-2614-2617 p1=1
-2750-2752 p1=UR
-2764-2767 p1=2
-2900-2902 p1=UR
-2914-2917 p1=3
-3050-3052 p1=UR
-3064-3067 p1=4
-3200-3202 p1=UR
-3214-3217 p1=5
-3350-3352 p1=UR
-3364-3367 p1=6
-3700 wait
+2600-2660 p1=R
+2680-2682 p2=U
+2692-2694 p1=3
+2940-2942 p2=U
+2946-2948 p1=R
+2950-2952 p1=D
+2954-2957 p1=DR1
+3240-3242 p2=U
+3270-3273 p1=D6
+3740 wait

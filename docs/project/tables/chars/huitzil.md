@@ -754,10 +754,10 @@ Every `$FF9400` type this character spawns (the census), its handler on vs2 and 
 
 | move (type) | handler vs2 | handler ours | shape | +0x9A | +0x26 | +0x50 | xv | xacc | yv | yacc | ours |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| Mighty Launcher / Circuit Scrapper (`0x44`) | `0x6800c` | `0xd2780` | B | 0 | 0 | 1 | 3.0 | 0.0 | 0.5 | -0.0625 | byte |
-| Mighty Launcher / Circuit Scrapper (`0x44`) | `0x6800c` | `0xd2780` | B | 2 | 0 | 1 | 4.0 | 0.0 | 0.5 | -0.0625 | byte |
-| Mighty Launcher / Circuit Scrapper (`0x44`) | `0x6800c` | `0xd2780` | B | 4 | 0 | 1 | 5.0 | 0.0 | 0.5 | -0.0625 | byte |
-| Mighty Launcher / Circuit Scrapper (`0x44`) | `0x6800c` | `0xd2780` | B | 6 | 0 | 3 | 6.0 | 0.0 | 0.5 | -0.0625 | byte |
+| Mighty Launcher (`0x44`) | `0x6800c` | `0xd2780` | B | 0 | 0 | 1 | 3.0 | 0.0 | 0.5 | -0.0625 | byte |
+| Mighty Launcher (`0x44`) | `0x6800c` | `0xd2780` | B | 2 | 0 | 1 | 4.0 | 0.0 | 0.5 | -0.0625 | byte |
+| Mighty Launcher (`0x44`) | `0x6800c` | `0xd2780` | B | 4 | 0 | 1 | 5.0 | 0.0 | 0.5 | -0.0625 | byte |
+| Mighty Launcher (`0x44`) | `0x6800c` | `0xd2780` | B | 6 | 0 | 3 | 6.0 | 0.0 | 0.5 | -0.0625 | byte |
 | Plasma Trap (`0x45`) | `0x68458` | `0xd2bd0` | B | 0 | 2144 | 1 | 1.0 | 0.0 | 5.0 | -0.3125 | byte |
 | Plasma Trap (`0x45`) | `0x68458` | `0xd2bd0` | B | 2 | 4192 | 1 | 2.0 | 0.0 | 5.0 | -0.3125 | byte |
 | Plasma Trap (`0x45`) | `0x68458` | `0xd2bd0` | B | 4 | 8288 | 1 | 3.0 | 0.0 | 5.0 | -0.3125 | byte |

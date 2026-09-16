@@ -8,7 +8,12 @@
 # Sol Smasher 0x40/0x41 (air), Cosmo 0x42; Huitzil Launcher 0x44, Plasma Trap
 # 0x45, Final Guardian 0x46, Erasing Sphere 0x47. Emulator tier (~2 min).
 #
-# Usage: ROMDIR=... [MAME_BIN=...] tests/test_projectile_census.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [FREEZE=1] tests/test_projectile_census.sh
+#   FREEZE=1 (since 14z-160) rewrites the census from the run; re-frozen 14z-160
+#   when the Phobos and Pyron rigs became REAL cursor picks on native vs2
+#   (GitHub #151): the poked leg's Donovan flavor had lengthened Phobos's
+#   Mighty Launcher windows by the 2-frame flavor-1 startup state and spawned a
+#   launcher from "Circuit Scrapper (ES)" that a real Phobos never spawns.
 #
 # HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -50,6 +55,7 @@ for t in donovan:2 donovan:4 pyron:2 pyron:4 huitzil:2 huitzil:4; do
     [ -s "$W/c_${n}_$p.txt" ] || bad "$n part $p: no samples"
     python3 tools/projectile_census.py "tests/replays/naming/${n}_$p.json" "$W/c_${n}_$p.txt" | sed "s/^/$n	/" >> "$W/got.txt"
 done
+if [ "${FREEZE:-0}" = 1 ]; then cp "$W/got.txt" tests/expected/projectile_census.txt; echo "  FROZE  tests/expected/projectile_census.txt from this run — VERIFY by re-running without FREEZE"; fi
 if diff -u tests/expected/projectile_census.txt "$W/got.txt" > "$W/diff.txt"; then ok "$(wc -l < "$W/got.txt" | tr -d ' ') census lines identical to tests/expected/projectile_census.txt"; else bad "census differs:"; head -20 "$W/diff.txt"; fi
 n="$(grep -c 0x "$W/got.txt" | tr -d ' ')"; [ "$n" -ge 20 ] && ok "$n spawning events" || bad "only $n spawning events"
 # control: every tenant must spawn at least one distinct type

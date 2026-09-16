@@ -10,6 +10,7 @@ declares	audit_df_accumulator
 declares	audit_df_dead_family
 declares	audit_df_startup_invuln
 declares	audit_ff8130_writers
+declares	audit_forced_pick_fidelity
 declares	audit_guard_corpus
 declares	audit_guard_mask_reads
 declares	audit_hui_grunt

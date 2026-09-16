@@ -4785,3 +4785,18 @@ applied to state written AT confirm rather than after it.
 **And: captures before conclusions.** No frame of the float, ours or native, was
 put in front of the maintainer before the rebuild. A behavioural claim about feel
 gets a capture first — the standing practice exists for exactly this.
+
+**THE INVENTORY, MEASURED 14z-160 (`tests/audit_forced_pick_fidelity.sh`, GitHub
+#151):** the whole P1 block diffed between the rig's poked leg and a real-cursor
+pick of the same tenant, at every pre-match sample from the last poke to the
+match anchor, holds exactly THREE latched bytes for Phobos and for Pyron alike —
+`+0x3BD` and `+0x3E0` (two confirm-time copies of the character id, vsav2
+`PRG:0x01F6CE` / `0x01F6C8`) and `+0x3C2` (the flavor latch, `PRG:0x01F848`) —
+and NONE for a same-id poke over Donovan's own confirm (the poke mechanism is
+inert; the confirm is the whole effect). Within a 3,400-frame cut of the part-1
+rig the id copies are never read; the flavor is read every match frame by vs2
+`0x026322`, and Phobos's specials rig diverges between the two legs from its
+first event, so every Phobos verdict measured on the poked leg was a verdict on
+the VH2 branch. The real cursor paths on vsav2 from the P1 default cell (0x01):
+Phobos L,L,L, Pyron R,R,R, Donovan R,R; from P2's (0x05): Victor R,R, Phobos
+L,L, Pyron L,L,UL, Donovan R,R,R (`tools/select_wheel.py` on the vs2 data view).
