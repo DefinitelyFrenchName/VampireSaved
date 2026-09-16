@@ -37,6 +37,13 @@ are on disk, UNREGISTERED — do not play them and do not point a gate at them.
   `verified` but structurally divergent at its 7th instruction) is separately NOT proven
   ([VSP-116]). Maintainer ruled: all the measurements first, no scoping — and the first
   measurement is #151's faithfulness control, not anything in #149.
+- **#152 — the independent adversarial RULE-CHECKER** (maintainer's proposal, 14z-159).
+  Redundancy for rule APPLICATION rather than for measurement, because 14z-159's rules were
+  all loaded and cited and still did not fire. Every condition in the ticket is load-bearing:
+  it reads ARTIFACTS not a summary, a 3-5 question checklist not the rulebook, structured
+  `VIOLATED/OK/N-A` + `file:line` output not prose, it must-fire like any other control, and
+  a VIOLATED verdict STOPS the action and is reported verbatim. Trigger: before a measurement
+  becomes a basis for action, never at session end.
 - **#150** (the freeze ritual's three silent-green failure modes) and **#148** (the static
   tier's cost) are filed and unstarted.
 - The MiSTer tail of any future freeze: the fork's `doc/mame.xml` CRC entry + pin bump, and

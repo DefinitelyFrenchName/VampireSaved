@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**151 tickets** — status: open 17 · parked 16 · done 108 · declined 3 · not-ours 2 · invalid 4 · duplicate 1 · kind: bug 117 · cosmetic 10 · evolution 24 · **backfill debt: 0 rows**.
+**152 tickets** — status: open 18 · parked 16 · done 108 · declined 3 · not-ours 2 · invalid 4 · duplicate 1 · kind: bug 117 · cosmetic 10 · evolution 25 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#152](https://github.com/DefinitelyFrenchName/VampireSaved/issues/152) | evolution | open | An independent adversarial rule-checker at every decision point — redundancy for rule APPLICATION, not for measurement | none | none | `docs/project/gotchas.md § A FORCED-PICK NATIVE LEG MEASURES THE RIG` | `docs/project/gotchas.md § A FORCED-PICK NATIVE LEG MEASURES THE RIG` | 14z-159 |
 | [#151](https://github.com/DefinitelyFrenchName/VampireSaved/issues/151) | evolution | open | Re-examine #136 end to end: the forced-pick native leg is unvalidated, so 17 of 27 parity verdicts rest on an unmeasured assumption | `tests/audit_move_parity.sh` | none | `docs/project/gotchas.md § A FORCED-PICK NATIVE LEG MEASURES THE RIG` | `docs/project/gotchas.md § A FORCED-PICK NATIVE LEG MEASURES THE RIG` | 14z-159 |
 | [#150](https://github.com/DefinitelyFrenchName/VampireSaved/issues/150) | evolution | open | The freeze ritual's three silent-green failure modes need a mechanical guard (test_freeze_set_shape + a committed freeze driver) | `docs/project/gotchas.md § A FREEZE DRIVER THAT DOES NOT PIN` | none | `docs/project/gotchas.md § THE MERGED EXPECTATION SET MUST HAVE ITS 16 SELF-FROZEN` | `docs/project/gotchas.md § A FREEZE DRIVER THAT DOES NOT PIN` | 14z-159 |
 | [#149](https://github.com/DefinitelyFrenchName/VampireSaved/issues/149) | bug | open | Phobos's specials skip a 2-frame seq-4 startup state native vsav2 plays (one cause behind ~11 of his moves) | `tests/audit_move_parity.sh` | none | `docs/game/engine_internals.md § The class-02 sequence system` | none | 14z-159 |
