@@ -9,6 +9,7 @@
 # is GENERATED from this + the ci registries + each script's own header).
 # oracle, gfx, tenant, character-data, review-triage, mister.
 # tests/gate_index.tsv — every script under tests/ and its FAMILY, the one
+tests/audit_move_parity.sh	character-data
 tests/audit_clone_beam_lines.sh	gfx
 tests/audit_continue_ladder.sh	tenant
 tests/audit_continue_switch.sh	tenant

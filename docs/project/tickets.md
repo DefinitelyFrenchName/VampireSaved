@@ -11,12 +11,14 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**146 tickets** — status: open 12 · parked 16 · done 108 · declined 3 · not-ours 2 · invalid 4 · duplicate 1 · kind: bug 115 · cosmetic 10 · evolution 21 · **backfill debt: 0 rows**.
+**148 tickets** — status: open 14 · parked 16 · done 108 · declined 3 · not-ours 2 · invalid 4 · duplicate 1 · kind: bug 116 · cosmetic 10 · evolution 22 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#148](https://github.com/DefinitelyFrenchName/VampireSaved/issues/148) | evolution | open | Review the static tier's contents and when it is applied — a commit currently blocks the tree for ~25 min, a close for ~40 | none | none | none | none | - |
+| [#147](https://github.com/DefinitelyFrenchName/VampireSaved/issues/147) | bug | open | Phobos's float runs the VH2 flavor: huitzil.toml flavor_default is 0x00 where native vsav2 seeds 0x01 | `tests/replays/naming/huitzil_1.rpl` | none | `docs/game/engine_internals.md § The float:` | `build/manifest/huitzil.toml § 14z-66 FLAVOR POLARITY` | - |
 | [#146](https://github.com/DefinitelyFrenchName/VampireSaved/issues/146) | bug | open | The release packages' player READMEs are not complete or detailed enough (reported) | none | none | none | none | 14z-158 |
 | [#145](https://github.com/DefinitelyFrenchName/VampireSaved/issues/145) | bug | open | Windows: the release packages' prebuilt emulator binaries fail to load the game (reported, not yet reproduced) | none | none | none | none | 14z-158 |
 | [#144](https://github.com/DefinitelyFrenchName/VampireSaved/issues/144) | bug | open | macOS: the release packages' prebuilt emulator binaries cannot be executed — macOS blocks them (reported, not yet reproduced) | none | none | none | none | 14z-158 |

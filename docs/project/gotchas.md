@@ -4666,3 +4666,50 @@ the same lines; `tests/run_all_emulator.sh` reads afresh for every row and is no
 affected. Verdicts and the PASS / SKIP / FAIL counts are untouched. **On a red run, trust
 the verdict rows, not `fired / declared` or `gates declaring none`** — the readout is
 exact only on a run in which every gate PASSED — until #140 is fixed.
+
+## PINNING THE ENGINE RNG THROUGH CHARACTER LOAD STOPS OUR BUILD LOADING THE MATCH AT ALL (paid: 14z-159, #136)
+
+The #136 cross-game rigs pin `RAM:$FF80D4-D5` so the two games take the same RNG path
+(the [VSE-84] ruling). Armed from frame 2000 — comfortably before the match anchor at
+2363 — our Donovan leg produced **377 live frames instead of 4568**: `id` fell back to 0,
+the fighter block was never populated and the match never started. Native `vsav2` was
+unaffected, and so were Phobos and Pyron, which is what made it look like a port defect
+in Donovan rather than a rig defect.
+
+Bisected: pin starts of 2000, 2200, 2300 and 2350 all break it; **2363, the match anchor,
+and later are fine.** Isolated further — the LEVEL pin (`$FF8116`) is innocent at any
+start, it is the RNG pin alone. Character init draws from the RNG (`engine_internals`
+records the intro variant at `+0x0A` as an RNG draw at char load), and pinning the word
+to a constant through that window is what breaks it.
+
+**So the two pins do not share a start frame:** the speed level is armed BEFORE the
+anchor, because the intro runs at the level too, and the RNG only FROM the anchor.
+
+## A CROSS-GAME COMPARISON MUST START AT THE FIRST SCRIPTED EVENT, NOT AT THE MATCH ANCHOR — the intro is an RNG draw (paid: 14z-159, #136)
+
+With the RNG pinned only from the match anchor (it cannot be pinned earlier, above), each
+leg draws its OWN intro variant at char load, so the two fighters play different intros
+and every frame of the intro compares unequal. Measured on `huitzil_1`: 237 differing
+frames, **every one of them between the anchor (2363) and the rig's first event (2600),
+and zero after it** — the legs are bit-identical from the first event onwards.
+
+Two ways this lies if the window is wrong. Starting at 2400 (where a pin happens to arm)
+makes native run frames 2363-2400 at its OWN default play mode, which desynchronises the
+intro and makes every subsequent part look broken — that is how ten of Phobos's parts
+first read as defects. Starting at the anchor keeps the honest intro difference in the
+comparison and reports it as a move divergence, which it is not.
+
+## A CONTROL FIXTURE BUILT BESIDE ITS CONTROL SECTION LEAVES THE CONTROL'S *MODE* COMPARING NOTHING — and an empty result reads as PASS (paid: 14z-159)
+
+`audit_move_parity`'s `no-translation` control writes a null placements file and
+re-compares one part with it. The file was created in the control section, at the END of
+the gate — but the `CONTROL=no-translation` MODE perturbs the comparison in section 2,
+which runs FIRST. The mode found no file, every `move_parity.py` call failed, `|| true`
+swallowed it, the verdict file came out EMPTY, the compare loop iterated zero times and
+the gate printed **PASS and exited 0** — the [VSP-181] "exit 0 is LIES" verdict, produced
+by the control's own fixture rather than by the thing under test.
+
+Two fixes, both needed: build a control's fixture where the gate STARTS, not beside the
+section that reads it, and make an empty verdict set an explicit FAIL
+(`[ -s "$W/got.tsv" ] || bad "an empty result is not a pass"`). The general form is the
+[VSP-176] family — a gate that never ran must never be able to read as PASS.

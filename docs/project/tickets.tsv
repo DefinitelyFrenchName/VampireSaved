@@ -71,6 +71,8 @@
 # WHAT THE GATE DOES NOT CLAIM: that an answer is ENOUGH. That is judged at the
 # close that closes the ticket.
 issue	kind	status	title	repro	decided	learned	wrong	sessions
+148	evolution	open	Review the static tier's contents and when it is applied — a commit currently blocks the tree for ~25 min, a close for ~40	none	none	none	none	-
+147	bug	open	Phobos's float runs the VH2 flavor: huitzil.toml flavor_default is 0x00 where native vsav2 seeds 0x01	tests/replays/naming/huitzil_1.rpl	none	docs/game/engine_internals.md § The float:	build/manifest/huitzil.toml § 14z-66 FLAVOR POLARITY	-
 146	bug	open	The release packages' player READMEs are not complete or detailed enough (reported)	none	none	none	none	14z-158
 145	bug	open	Windows: the release packages' prebuilt emulator binaries fail to load the game (reported, not yet reproduced)	none	none	none	none	14z-158
 144	bug	open	macOS: the release packages' prebuilt emulator binaries cannot be executed — macOS blocks them (reported, not yet reproduced)	none	none	none	none	14z-158

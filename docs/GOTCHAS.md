@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-350 entries (41 game / 105 platform / 204 project), counted from the buckets at generation.
+353 entries (41 game / 105 platform / 207 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 41 entries
 
@@ -174,7 +174,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - MAME READS THE USER'S OWN `mame.ini` EVEN UNDER `-homepath` — every harness leg inherits what that file sets (found 2026-09-15, 14z-158, gating the README's recording command; nothing paid)
 - MAME 0.288'S 68000 CORE HAS NO `A7` STATE, AND ITS `SP` IS THE SUPERVISOR STACK — a Lua stack read in user-mode code walks the idle stack (paid: 14z-85g as "constant garbage ret on every hit", named 14z-158)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 204 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 207 entries
 
 - TWO SYMPTOMS ARE ONE DEFECT ONLY IF THE MECHANISM PREDICTS BOTH (paid: 14z-95 to 14z-96, #93 and #101)
 - A gate that prints `SKIP:` AND exits NON-ZERO is a FAILURE, not a skip (paid: 14z-128)
@@ -380,3 +380,6 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A TEXT LINT MATCHES ITS BANNED PATTERN INSIDE A PRINTED MESSAGE — a new gate's own `ok` line naming `${VAR:?}` turned two gates red (paid: 14z-155)
 - A STRICT TIER STARTED INSIDE A BACKGROUND TASK DIES WITH THE TASK — the harness's low-memory kill takes `nohup … &!` children too (paid: 14z-155)
 - THE STATIC TIER'S MUST-FIRE READOUT OVERSTATES `fired / declared` ON A RED RUN — a gate that does not PASS re-adds the previous gate's counts (paid: 14z-155, #140)
+- PINNING THE ENGINE RNG THROUGH CHARACTER LOAD STOPS OUR BUILD LOADING THE MATCH AT ALL (paid: 14z-159, #136)
+- A CROSS-GAME COMPARISON MUST START AT THE FIRST SCRIPTED EVENT, NOT AT THE MATCH ANCHOR — the intro is an RNG draw (paid: 14z-159, #136)
+- A CONTROL FIXTURE BUILT BESIDE ITS CONTROL SECTION LEAVES THE CONTROL'S *MODE* COMPARING NOTHING — and an empty result reads as PASS (paid: 14z-159)

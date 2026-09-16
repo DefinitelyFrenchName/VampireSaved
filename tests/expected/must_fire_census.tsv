@@ -16,6 +16,7 @@ declares	audit_hui_grunt
 declares	audit_kill_poke_shape
 declares	audit_ladder_selector
 declares	audit_mister_map_fit
+declares	audit_move_parity
 declares	audit_pyron_ring
 declares	audit_qs_voice_wav
 declares	audit_stock_emulator_stall

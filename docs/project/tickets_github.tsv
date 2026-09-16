@@ -2,8 +2,10 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 146
+# issues: 148
 number	state	reason	closed	labels	title
+148	OPEN	-	-	evolution	Review the static tier's contents and when it is applied — a commit currently blocks the tree for ~25 min, a close for ~40
+147	OPEN	-	-	bug	Phobos's float runs the VH2 flavor: huitzil.toml flavor_default is 0x00 where native vsav2 seeds 0x01
 146	OPEN	-	-	bug	The release packages' player READMEs are not complete or detailed enough (reported)
 145	OPEN	-	-	bug	Windows: the release packages' prebuilt emulator binaries fail to load the game (reported, not yet reproduced)
 144	OPEN	-	-	bug	macOS: the release packages' prebuilt emulator binaries cannot be executed — macOS blocks them (reported, not yet reproduced)
@@ -22,7 +24,7 @@ number	state	reason	closed	labels	title
 131	OPEN	-	-	evolution	audit_mask_window_ff42a2: deprecate it, or keep it as a case-specific gate?
 130	OPEN	-	-	bug	bundle_win_dlls.py prints a broken character for its em dash on MSYS2 (build logs only)
 129	OPEN	-	-	bug	Tenant CPU AI looks lackluster (unproven; first question: are the ported script blocks complete?)
-128	OPEN	-	-	evolution	Marionette: parked until further notice
+128	OPEN	-	-	evolution,parked	Marionette: parked until further notice
 127	OPEN	-	-	cosmetic	#112 option (B): the Press of Death effect owns its palette row (scope first)
 126	OPEN	-	-	cosmetic	Select-wheel look-and-feel polish
 125	OPEN	-	-	cosmetic	Arcade-ladder map names and pictures (not investigated)
