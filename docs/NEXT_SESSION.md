@@ -22,7 +22,10 @@ are on disk, UNREGISTERED — do not play them and do not point a gate at them.
   gate header and in `tests/expected/move_parity.tsv`). Step 1 is the missing control:
   poked native vs REAL-cursor native, same character, diffed over the WHOLE fighter block
   — a field list is how this was missed. Then re-judge the verdicts, then sweep every
-  other gate with a forced-pick native leg.
+  other gate with a forced-pick native leg. **AND THE CONTROL IS NOT THE END OF IT
+  (maintainer, 14z-160 opener):** #136 is gone over again IN FULL — rigs, protocol, all
+  27 verdicts, Pyron and Phobos above all — and stays on this list until that pass is done
+  (`DECISIONS_HISTORY.md` "Ruled 2026-09-16 (14z-160)").
 - **#147 — OPEN, premise void.** All that survives is "Phobos's float differs from native
   in some way", and that is unmeasured until a faithful native leg exists. `flavor_default`
   is back at 0x00. Do not re-flip it on a poked measurement.

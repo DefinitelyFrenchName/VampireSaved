@@ -27,6 +27,18 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-16 (14z-160) — entered at ruling time, under the amended lifecycle
+
+- **#136 GOES OVER AGAIN IN FULL, AND STAYS ON THE LIST UNTIL IT HAS (maintainer, 2026-09-16).**
+  At the opener, on the proposed order #151 -> #147 -> #149 -> #152 -> #150/#148: *"I agree with
+  the order but I also must insist on going over #136 again in the todo list at some point because
+  too many things especially with Pyron and Phobos could be wrong in it."* So #151's faithfulness
+  control is the FIRST step of the re-examination, not the whole of it: every part of #136 — the
+  naming rigs, the pinning protocol, the 27 frozen verdicts of `tests/expected/move_parity.tsv`
+  with their twelve divergences and fifteen unknowns, and the Pyron and Phobos legs above all —
+  is gone over again before any of it is built on, and the item leaves the open list only when
+  that pass is done, never on the control alone.
+
 ## Ruled 2026-09-16 (14z-159) — entered at ruling time, under the amended lifecycle
 
 - **THE M19 FREEZE IS WITHDRAWN IN FULL (maintainer, 2026-09-16).** After the
