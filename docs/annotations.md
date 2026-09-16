@@ -23,13 +23,13 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3061 |
-| named by a document or manifest only | 2054 |
+| distinct program-space addresses named | 3062 |
+| named by a document or manifest only | 2055 |
 | named by both a document/manifest and code | 659 |
 | named by CODE ONLY (the gap list below) | 348 |
 | carried by atlas | 512 |
 | carried by engine_internals | 565 |
-| carried by other docs | 964 |
+| carried by other docs | 965 |
 | carried by manifests | 1786 |
 | carried by code | 1007 |
 
@@ -609,6 +609,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01F80B` | build/manifest/donovan.toml — roster21; build/manifest/huitzil.toml — roster21; build/manifest/pyron.toml — roster21 |
 | `PRG:0x01F856` | build/manifest/reconciliation.toml — map |
 | `PRG:0x01F864` | docs/game/atlas/id_space.md — RESERVED IDS — vanilla does use part of the variant half [vs2] |
+| `PRG:0x01F87E` | docs/project/gotchas.md — A FORCED-PICK NATIVE LEG MEASURES THE RIG FOR ANYTHING THE SELECT CONFIRM LATCHES — and two poked legs agree with each other perfectly (paid: 14z-159, GitHub #147/#151) |
 | `PRG:0x01F8A4` | docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116) [vh2] |
 | `PRG:0x01F8B4` | docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116) [vs2]; build/manifest/donovan.toml — oboro_select_hook [vs2]; build/manifest/huitzil.toml — oboro_select_hook [vs2]; build/manifest/pyron.toml — oboro_select_hook [vs2] |
 | `PRG:0x01F8CE` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path [vh2] |

@@ -35,6 +35,21 @@
 # parameters — separate instruments. P2 is Victor, a legacy character, so his
 # state is never compared ([VSP-168]).
 #
+# ** THE NATIVE LEG IS NOT VALIDATED FOR PHOBOS AND PYRON (14z-159, GitHub #151).**
+# Donovan's native leg is a REAL cursor pick; Phobos's and Pyron's are FORCED by
+# the early-window poke ([VSP-123]). Those are not equivalent: the select-confirm
+# path latches per-fighter state BEFORE the poke replaces the character id, so a
+# poked native leg carries another character's confirm wearing the tenant's id.
+# GitHub #147 is the worked case — five measurements of RAM:$FF87C2 on a poked
+# native leg all read the rig, a wrong fix shipped to a freeze on them, and the
+# maintainer's field report caught it. THIS GATE HAS NO CONTROL PROVING ITS
+# NATIVE LEG IS FAITHFUL; it proves only that it sees the speed level and the
+# placement translation. So the 17 Phobos and Pyron rows of
+# tests/expected/move_parity.tsv are UNVALIDATED — not known wrong, but not
+# entitled to be read as native comparisons either. #151 builds the missing
+# control (poked vs real-cursor, diffed over the whole fighter block) and
+# re-judges every verdict against what it finds.
+#
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged26] [PARTS="donovan_1 pyron_2"] [ALL=1] [JOBS=6] tests/audit_move_parity.sh
 #   emulator tier, MAME. MEASURED 14z-159 on this MacBook, solo, at the default
 #   JOBS=6: the default 3-part set 25 s; ALL=1 (27 parts, 54 legs) 130 s. Both

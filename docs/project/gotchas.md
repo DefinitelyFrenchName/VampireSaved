@@ -4713,3 +4713,75 @@ Two fixes, both needed: build a control's fixture where the gate STARTS, not bes
 section that reads it, and make an empty verdict set an explicit FAIL
 (`[ -s "$W/got.tsv" ] || bad "an empty result is not a pass"`). The general form is the
 [VSP-176] family — a gate that never ran must never be able to read as PASS.
+
+## A FREEZE DRIVER THAT DOES NOT PIN `MAME_BIN` BOOTS HOMEBREW'S MAME, WHICH DOES NOT KNOW `vsavjw` — and the freeze can still write expectations (paid: 14z-159)
+
+The M19 freeze's first pass ran `run_suite.sh --freeze` for all four sets without
+exporting `MAME_BIN`. `tools/run_mame.sh` falls back to Homebrew's `mame`, which has
+no WIDE driver, so every leg printed `Unknown system 'vsavjw'` and the suite went RED
+— [CPE-40], an EMULATOR problem wearing a ROM problem's clothes.
+
+**The tell is not the exit status, it is the `authored .masked expectation` count.**
+A healthy merged/solo freeze prints that line for ~52 of the 88 replays (HANDOFF
+"FREEZING AN EXPECTATION SET"). It printed it **zero** times. Had the run got
+slightly further it would have written `.sha1` files for a corpus that never booted,
+and a self-frozen expectation makes any behaviour correct by definition ([VSP-36]) —
+green forever after.
+
+**`tests/test_mame_bin_pinned.sh` does not protect this.** It scans scripts under
+`tests/` for a real `MAME_BIN` pin; a freeze is performed with an ad-hoc driver
+(here, one in `/tmp`), which is outside its reach. The guard covers gates, not the
+scripts a freeze is actually run with. Check the artifacts after any freeze pass that
+went red — `git status` the expectation dir — before re-running.
+
+## THE MERGED EXPECTATION SET MUST HAVE ITS 16 SELF-FROZEN `.sha1` DELETED AFTER EVERY FREEZE — and nothing enforces it (paid: 14z-159)
+
+`run_suite.sh --freeze` self-freezes any replay with no `.masked` in the target dir.
+On the merged set that is exactly the 16 TENANT-CONTENT replays (`36_pick_tenant_cell`,
+`61_tenant_2pwin`, `110_don_arcade_mash`, `113_shadow_vs_tenant`, …) — the class the
+#111 ruling (ratified 2026-09-15) says the merged set must NOT carry, because
+tenant-content expectations live in the solo sets. So **every** merged freeze
+regenerates them and every merged freeze must delete them again.
+
+`merged-m18`'s README documents the carry and says nothing about the deletion, so the
+step exists only in the ruling. What catches it is comparing the new set's `.sha1`
+count against its predecessor's (merged: 0; solo: 16/17/18, which are legitimate).
+
+**And once deleted, a plain `run_suite` on the merged build reads RED** — PASS 53 /
+SKIP 19 / 16 NO-EXPECTATION. That is the SHIPPED shape, not a defect: `merged-m18`
+measures identically on `build/m3b_merged26` (measured 14z-159 as the control). The
+merged build's legacy coverage is `audit_merged_legacy` leg (b) and the tenant gates,
+never a bare suite run. Do not "fix" that red by re-freezing the 16.
+
+## A FORCED-PICK NATIVE LEG MEASURES THE RIG FOR ANYTHING THE SELECT CONFIRM LATCHES — and two poked legs agree with each other perfectly (paid: 14z-159, GitHub #147/#151)
+
+The #136 rigs force the tenant with the early-window poke ([VSP-123],
+`ff8782:<id>` at frames 1400/1450/1500). The select CONFIRM runs at frame ~1299 —
+**before** those pokes. So every per-fighter field the confirm path writes is
+latched for **whatever character the cursor was on**, and the poke then swaps the
+id underneath it.
+
+Measured on `RAM:$FF87C2`, the VS2/VH2 flavor latch: a whole-boot write tap shows
+the last write before the match at frame **1299**, `PRG:0x01F87E` (the confirm),
+and the pick poke at **1400**. Five separate readings of that byte on the "native"
+leg — with and without the speed-level and RNG pins — all returned the rig's
+value, not the game's.
+
+**The failure mode is worse than a wrong number: it is SILENT AGREEMENT.** Both
+legs of the comparison used the same poke path, so ours-vs-native came out
+**6851/6851 frames identical** — a perfect result, anchored to nothing. On the
+strength of it a manifest value was flipped, five tracks rebuilt, four expectation
+sets re-frozen and the mark bumped; the maintainer's field report ("Phobos floats
+on a single jump press — that is the VH2 mechanic") is what caught it, and the
+whole freeze was withdrawn.
+
+**The control that was missing, and the rule:** a rig with a forced-pick native leg
+must prove that leg faithful — run the same rig with a REAL-cursor native pick and
+diff the WHOLE fighter block, not a field list (a field list is how this was
+missed). Anything that differs is a field that rig cannot measure. `[VSP-121]` and
+`[VSP-122]` already say the poke holds through SELECT only; this is the same rule
+applied to state written AT confirm rather than after it.
+
+**And: captures before conclusions.** No frame of the float, ours or native, was
+put in front of the maintainer before the rebuild. A behavioural claim about feel
+gets a capture first — the standing practice exists for exactly this.

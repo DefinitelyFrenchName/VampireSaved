@@ -2,8 +2,11 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 148
+# issues: 151
 number	state	reason	closed	labels	title
+151	OPEN	-	-	evolution	Re-examine #136 end to end: the forced-pick native leg is unvalidated, so 17 of 27 parity verdicts rest on an unmeasured assumption
+150	OPEN	-	-	evolution	The freeze ritual's three silent-green failure modes need a mechanical guard (test_freeze_set_shape + a committed freeze driver)
+149	OPEN	-	-	bug	Phobos's specials skip a 2-frame seq-4 startup state native vsav2 plays (one cause behind ~11 of his moves)
 148	OPEN	-	-	evolution	Review the static tier's contents and when it is applied — a commit currently blocks the tree for ~25 min, a close for ~40
 147	OPEN	-	-	bug	Phobos's float runs the VH2 flavor: huitzil.toml flavor_default is 0x00 where native vsav2 seeds 0x01
 146	OPEN	-	-	bug	The release packages' player READMEs are not complete or detailed enough (reported)
@@ -25,11 +28,11 @@ number	state	reason	closed	labels	title
 130	OPEN	-	-	bug	bundle_win_dlls.py prints a broken character for its em dash on MSYS2 (build logs only)
 129	OPEN	-	-	bug	Tenant CPU AI looks lackluster (unproven; first question: are the ported script blocks complete?)
 128	OPEN	-	-	evolution,parked	Marionette: parked until further notice
-127	OPEN	-	-	cosmetic	#112 option (B): the Press of Death effect owns its palette row (scope first)
+127	OPEN	-	-	cosmetic,parked	#112 option (B): the Press of Death effect owns its palette row (scope first)
 126	OPEN	-	-	cosmetic	Select-wheel look-and-feel polish
 125	OPEN	-	-	cosmetic	Arcade-ladder map names and pictures (not investigated)
 124	OPEN	-	-	cosmetic	Arcade-ladder roulette tag shows the base/shell character for a tenant opponent on the arcade ladder map screen
-123	OPEN	-	-	cosmetic	Win-quote text for the three tenants (forgone for now; only the clean way, vanilla untouched)
+123	OPEN	-	-	cosmetic,parked	Win-quote text for the three tenants (forgone for now; only the clean way, vanilla untouched)
 122	OPEN	-	-	evolution	Run the --controls release tier on the dedicated Linux server and compare its speed with the Mac
 121	OPEN	-	-	evolution	Linux release binaries built on the dedicated server, plus the clean-machine check at release (option 3)
 120	OPEN	-	-	evolution	The rebuild-from-docs option after MiSTer (a possibility to preserve, not a commitment)
@@ -37,7 +40,7 @@ number	state	reason	closed	labels	title
 118	OPEN	-	-	evolution	Community cross-check: the ~90 unadopted mizuumi player-struct candidates, each adopted only once measured
 117	OPEN	-	-	evolution	Community cross-check: naming rigs on vsavj for specials, supers, throws, the CL. rows and the 6-prefixed rows
 116	OPEN	-	-	evolution	Capture matrix: widen the in-emulator anchors from 3 cells to a sampled row per tenant
-115	OPEN	-	-	contested,evolution	Zabel j.LK proximity guard: a surgical legacy patch for vanilla and WIDE, its own session, recording first
+115	OPEN	-	-	contested,evolution,parked	Zabel j.LK proximity guard: a surgical legacy patch for vanilla and WIDE, its own session, recording first
 114	CLOSED	COMPLETED	2026-09-02	bug,correctness,severity: medium	421+P (Lighting Sword): ours lands 3 hits and knocks the victim away; native VS2 lands 6 and holds — measured, and the gate cannot see it
 113	CLOSED	COMPLETED	2026-09-01	cosmetic,severity: low	Whole-screen flash at the first down (photosensitivity) — seen for many builds
 112	CLOSED	COMPLETED	2026-09-04	cosmetic,severity: low	Press of Death (41236+K): blue/black palette about half the time on merged-m9

@@ -5,6 +5,11 @@
 # with FREEZE=1; re-freeze with the same invocation after a freeze that moves a
 # tenant's anim data. Columns: part, verdict, first divergent event (+offset).
 # A DIVERGES row names a KNOWN defect and its ticket, never a tolerance.
+# ** THE PHOBOS AND PYRON ROWS ARE UNVALIDATED (14z-159, GitHub #151).** Their
+# native legs are FORCED-PICK; Donovan's is a real cursor pick. The confirm path
+# latches per-fighter state before the poke lands, so a poked native leg is not
+# proven faithful (#147 is the worked case). These verdicts are not known wrong;
+# they are not entitled to be read as native comparisons until #151's control runs.
 #--
 donovan_1	IDENTICAL	-
 donovan_2	DIVERGES	Blizzard Sword [LP]+65f

@@ -27,6 +27,42 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-16 (14z-159) — entered at ruling time, under the amended lifecycle
+
+- **THE M19 FREEZE IS WITHDRAWN IN FULL (maintainer, 2026-09-16).** After the
+  freeze was assembled the maintainer played it and reported that Phobos floats on a
+  single jump press — the VH2 mechanic, not VS2's. GitHub #147's diagnosis was a rig
+  artifact (the flavor latch is written at select confirm, before the forced-pick poke
+  replaces the character id), so its fix was a regression. Ruled: *"withdraw the freeze
+  entirely, #147 needs reopening and honestly #136 needs to be looked at again,
+  thoroughly."* The tree is back at merged-m18: no M19, no registry rows, no expectation
+  sets, no re-point sweep, `flavor_default` restored to 0x00. #151 carries the
+  re-examination. THE NO-RELEASE RULING BELOW IS THEREFORE MOOT as written — it was
+  scoped to a freeze that no longer exists — but its REASON stands for the next freeze:
+  the release mechanism has open tickets (#144, #145, #146) and more fixes are expected.
+
+- **~~NO RELEASE AT THE M19 FREEZE (maintainer, 2026-09-16).~~ (moot — see above)** Asked whether the
+  Phobos-flavor freeze should also ship a release, the maintainer: *"I would argue
+  no release right now since we have potential issues with how we release anyway
+  and possibly more fixes to come soon."* So the 14z-159 freeze packages nothing:
+  `tools/package_release_platforms.py` was not run, there is no
+  `release/merged-m19/`, and no assets were uploaded.
+  **This is a recorded departure from [VSP-178]**, which says the freeze commit
+  carries the release directory and that a release run finding it untracked has
+  found an unfinished freeze. It is a decision, not an oversight; the next release
+  run must package merged-m19 (or its successor) rather than read the absence as a
+  defect. The open release tickets the ruling refers to are #144 (macOS blocks the
+  prebuilt binaries), #145 (Windows prebuilt binaries fail to load the game) and
+  #146 (the player READMEs are not detailed enough).
+
+- **#149 WAITS FOR ITS MEASUREMENTS (maintainer, 2026-09-16).** On whether to scope
+  a fix for Phobos's skipped seq-4 startup state: *"For #149 I think we need all the
+  measurements first."* So no thunk design and no scoping until the ticket's own open
+  measurement runs — route Phobos's flow at the `vs2 0x026252` / `vsavj 0x02706e`
+  call site to the ported copy and confirm the seq 4 sub 4 state appears and the
+  parity verdicts flip. Until then the twin-pair difference stays a CANDIDATE cause
+  ([VSP-116]), not the cause.
+
 ## Ruled 2026-09-16 (14z-158b) — entered at ruling time, under the amended lifecycle
 
 - **#143 FILED, TO BE SOLVED CAUTIOUSLY (maintainer, 2026-09-16).** Asked whether

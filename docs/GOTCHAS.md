@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-353 entries (41 game / 105 platform / 207 project), counted from the buckets at generation.
+356 entries (41 game / 105 platform / 210 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 41 entries
 
@@ -174,7 +174,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - MAME READS THE USER'S OWN `mame.ini` EVEN UNDER `-homepath` — every harness leg inherits what that file sets (found 2026-09-15, 14z-158, gating the README's recording command; nothing paid)
 - MAME 0.288'S 68000 CORE HAS NO `A7` STATE, AND ITS `SP` IS THE SUPERVISOR STACK — a Lua stack read in user-mode code walks the idle stack (paid: 14z-85g as "constant garbage ret on every hit", named 14z-158)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 207 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 210 entries
 
 - TWO SYMPTOMS ARE ONE DEFECT ONLY IF THE MECHANISM PREDICTS BOTH (paid: 14z-95 to 14z-96, #93 and #101)
 - A gate that prints `SKIP:` AND exits NON-ZERO is a FAILURE, not a skip (paid: 14z-128)
@@ -383,3 +383,6 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - PINNING THE ENGINE RNG THROUGH CHARACTER LOAD STOPS OUR BUILD LOADING THE MATCH AT ALL (paid: 14z-159, #136)
 - A CROSS-GAME COMPARISON MUST START AT THE FIRST SCRIPTED EVENT, NOT AT THE MATCH ANCHOR — the intro is an RNG draw (paid: 14z-159, #136)
 - A CONTROL FIXTURE BUILT BESIDE ITS CONTROL SECTION LEAVES THE CONTROL'S *MODE* COMPARING NOTHING — and an empty result reads as PASS (paid: 14z-159)
+- A FREEZE DRIVER THAT DOES NOT PIN `MAME_BIN` BOOTS HOMEBREW'S MAME, WHICH DOES NOT KNOW `vsavjw` — and the freeze can still write expectations (paid: 14z-159)
+- THE MERGED EXPECTATION SET MUST HAVE ITS 16 SELF-FROZEN `.sha1` DELETED AFTER EVERY FREEZE — and nothing enforces it (paid: 14z-159)
+- A FORCED-PICK NATIVE LEG MEASURES THE RIG FOR ANYTHING THE SELECT CONFIRM LATCHES — and two poked legs agree with each other perfectly (paid: 14z-159, GitHub #147/#151)
