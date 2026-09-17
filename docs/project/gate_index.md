@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**335 scripts** — 79 ci_portable, 75 ci_static, 181 emulator-tier (run by name).
+**338 scripts** — 79 ci_portable, 77 ci_static, 182 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -27,7 +27,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 82 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 27 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 30 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -351,6 +351,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_forced_pick_fidelity.sh` | audit | emulator | MAME | IS A FORCED-PICK NATIVE LEG FAITHFUL? The rig's poked pick vs a REAL cursor pick of the same tenant on native vsav2, diffed over the WHOLE fighter block (GitHub #151, 14z-160). | 14z-160 |
 | `tests/audit_front_comparator.sh` | audit | emulator | MAME, a build dir, ~3 min | what $FF8127 is, and what its input byte +0x10 is (14z-123, the documentation rationalization pass, inferred_claims row 4; closes the 14z-118 (16) leftover "Open: what object byte +0x10 is"). | 14z-123 |
 | `tests/audit_guard_mask_reads.sh` | audit | emulator | MAME, a build dir, ~4 min | WHICH LONGWORDS OF THE GUARD-MASH MASK TABLE `PRG:0x028D50` THE ENGINE READS, ours vs vanilla — and that the port's bytes in its FIRST longword sit behind an index the check never produces. (14z-145.) | 14z-145 |
+| `tests/audit_latch_reads.sh` | audit | emulator | MAME, a build dir, ~2 min | WHO READS THE SELECT-CONFIRM LATCH IN PLAY, per leg shape, with the VALUE each reader saw: the measured half of the #151 step-3 sweep, frozen (14z-161). | 14z-161 |
 | `tests/audit_move_parity.sh` | audit | emulator | MAME, a build dir | EVERY TENANT MOVE, OURS vs NATIVE vsav2, AT A MATCHED SPEED LEVEL AND A PINNED RNG (GitHub #136, 14z-159). | 14z-159 |
 | `tests/audit_pyron_capture_block.sh` | audit | emulator | MAME, a build dir, ~4 min | PYRON THROWS WITH DEMITRI'S CAPTURE GEOMETRY (measured 14z-131, maintainer-ruled "measure against native vs2 first"). | 14z-131 |
 | `tests/audit_tenant_throw_geometry.sh` | audit | emulator | MAME, a build dir, ~12 min | PHOBOS'S THREE THROWS, OURS vs NATIVE VS2 (14z-131, maintainer-directed 2026-09-04). | 14z-131 |
@@ -361,8 +362,10 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/test_df_startup_provenance.sh` | test | ci_static | ROMDIR | THE TENANTS' DARK FORCE STARTUP WINDOWS ARE CAPCOM'S OWN, CARRIED FROM vs2/vh2 — the three-way ROM agreement that backs the preservation claim, frozen (14z-126). | 14z-126 |
 | `tests/test_hitbox_encoding.sh` | test | emulator | MAME, a build dir, ~4 min | THE HITBOX ENCODING AND THE ATTACK RECORD ARE WHAT THE ENGINE USES (character-data map, PHASE 2; measured 14z-120 (5)). | 14z-120 (5) |
 | `tests/test_killshread_es.sh` | test | emulator | MAME, ~2 min | KILLSHREAD (ES): the maintainer's ruling (14z-121) that the ES stance change's effect plays out DURING THE SUMMON — the returning Killshread attacks going away AND coming back, where the plain summon attacks one way — MEASURED on native vs2… | 14z-121 |
+| `tests/test_latch_readers.sh` | test | ci_static | ROMDIR | WHO CAN READ THE SELECT-CONFIRM LATCH: the static census of every instruction naming a fighter block's +0x3BC/+0x3BD/+0x3C2/+0x3E0/+0x3E3 on vsav2, vsavj and the ported image, frozen (GitHub #151 step 3, 14z-161). | 14z-161 |
 | `tests/test_meter_gain.sh` | test | emulator | MAME, ~4 min | THE GAUGE COLUMN ARBITRATED: what a vanilla normal pays its attacker in METER, read off the engine on a CONNECT (14z-146). | 14z-146 |
 | `tests/test_move_naming.sh` | test | emulator | MAME, a build dir, ~1 min | THE MOVE LIST'S CHAIN IDS ARE WHAT NATIVE VS2 ENTERS (character-data map, phase 1 naming step; 14z-120). | 14z-120 |
+| `tests/test_poked_legs.sh` | test | ci_static | ROMDIR | THE CENSUS OF EVERY FORCED-PICK LEG in tests/ and tools/, classified by what the poke leaves latched, frozen shrink-only; a new CROSS-FLAVOR pairing fails until it is measured and accepted (GitHub #151 step 3, 14z-161). | 14z-161 |
 | `tests/test_projectile_census.sh` | test | emulator | MAME, ~2 min | WHICH PROJECTILE-POOL TYPES EACH TENANT'S MOVES SPAWN (character-data map phase 3, 14z-120 (11)). The naming rigs' specials and meter parts (donovan/pyron/huitzil parts 2 and 4) replayed on native vs2 with the 32 pool slots' type bytes samp… | 14z-120 (11) |
 | `tests/test_projectile_params.sh` | test | emulator | MAME, a build dir, ~3 min | THE PROJECTILE PARAMETERS (character-data map phase 3, 14z-121): every $FF9400-pool projectile type's inline parameter tables, decoded from the type HANDLER (tools/projectile_params.py) and MEASURED on the live spawn. | 14z-121 |
 | `tests/test_reactions.sh` | test | emulator | MAME, a build dir, ~1 min | WHICH CHAINS A TENANT RUNS AS THE VICTIM, PER REACTION CLASS, AND HOW LONG (character-data map, PHASE 3; measured 14z-120 (7)). | 14z-120 (7) |

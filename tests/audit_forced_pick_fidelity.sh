@@ -50,7 +50,7 @@
 # NOTHING — if it does, the poke mechanism itself perturbs state and every
 # LATCHED finding above is suspect.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [ROWS="huitzil pyron donovan-self"] [JOBS=6] [FREEZE=1] [MEASURE=1] tests/audit_forced_pick_fidelity.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [ROWS="huitzil pyron donovan-self"] [JOBS=6] [FREEZE=1] [MEASURE=1 [WHOLE=1]] tests/audit_forced_pick_fidelity.sh
 #   emulator tier, MAME, native vsav2 only (no build). MEASURE=1 prints every
 #   differing offset with its values and classification and freezes nothing.
 set -eu
@@ -87,6 +87,11 @@ bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 row_id()   { case "$1" in huitzil) echo 10;; pyron) echo 11;; donovan-self) echo 13;; esac; }
 row_rig()  { case "$1" in huitzil) echo huitzil_1;; pyron) echo pyron_1;; donovan-self) echo donovan_1;; esac; }
 row_path() { case "$1" in huitzil) echo "L L L";; pyron) echo "R R R";; donovan-self) echo "R R";; esac; }
+# A SECOND real route to the same cell (MEASURE only, 14z-161): REAL vs ALT is
+# the route-residue control — a byte that differs between two real picks of the
+# SAME cell is left by the cursor's route, not latched for the cell, and cannot
+# be charged to the poke. Routes enumerated by tools/select_paths.py.
+row_alt()  { case "$1" in huitzil) echo "L U L";; pyron) echo "R U R";; donovan-self) echo "D R";; esac; }
 
 END=3400          # the rig is cut here: the first events (walk, walk back, crouch, JUMP) are enough
 FIRST_EVENT=2600
@@ -94,6 +99,12 @@ FIRST_EVENT=2600
 DFRAMES="1290 1310 1399 1401 1451 1501 1600 1800 2000 2200 2362 2400 2500 2599"
 f=2600; while [ $f -le $END ]; do DFRAMES="$DFRAMES $f"; f=$((f + 20)); done
 DSPEC="$(for f in $DFRAMES; do printf '%s:ff8000-ff8c00;' "$f"; done)"
+# WHOLE=1 (MEASURE only, 14z-161): also dump the rest of work RAM at every
+# frame, so the latched inventory is asked over ALL 64 KB, not the P1 block —
+# a block copy (vs2 PRG:0x000D36) reads the latched bytes, so their values can
+# propagate outside the block. Diagnostics only; nothing frozen from it.
+[ "${WHOLE:-0}" = 1 ] && [ "${MEASURE:-0}" = 1 ] \
+    && DSPEC="$DSPEC$(for f in $DFRAMES; do printf '%s:ff0000-ff7fff;%s:ff8c00-ffffff;' "$f" "$f"; done)"
 
 # ONE function writes a leg's replay and pokes, so what the controls perturb
 # is what the gate asserts ([VSP-181]).
@@ -105,6 +116,7 @@ mkleg() {
     mkdir -p "$W/$_name"
     _path="R R"                                   # the rig's own prologue: Donovan's confirm
     [ "$_leg" = poked ] || _path="$(row_path "$_row")"
+    [ "$_leg" = alt ] && _path="$(row_alt "$_row")"
     if [ "$_short" = short ]; then _path="$(echo $_path | awk '{$NF=""; print}')"; fi
     {
         printf '300-305 sys=C1\n420-425 sys=C2\n800-803 sys=S1\n940-943 sys=S2\n'
@@ -122,7 +134,7 @@ import json; p=[x for x in json.load(open('$_j'))['pokes'] if ':ff8782:' not in 
     _rng="$(python3 -c "print(';'.join(f'{f}:ff80d4:0000' for f in range(2363,$END)))")"
     _pick="$(python3 -c "print(';'.join(f'{f}:ff8782:$_id' for f in (1400,1450,1500)))")"
     case "$_leg" in
-        real) printf '%s;%s;%s' "$_base" "$_lvl" "$_rng" ;;
+        real|alt) printf '%s;%s;%s' "$_base" "$_lvl" "$_rng" ;;
         *)    printf '%s;%s;%s;%s' "$_pick" "$_base" "$_lvl" "$_rng" ;;
     esac > "$W/$_name/pokes"
 }
@@ -197,6 +209,30 @@ if MEASURE:   # diagnostics go to stderr; stdout is the one TSV line the caller 
         fr = gl[off]; vals = " ".join(f"{f}:{da[f][off]:02x}/{db[f][off]:02x}" for f in fr[:4])
         print(f"    GL {0xFF8000 + off:06x} {len(fr):3d} frames  first {fr[0]}  {vals}", file=e)
     for off in sorted(p2): print(f"    P2 +{off - 0x800:03x} {len(p2[off]):3d} frames  first {p2[off][0]}", file=e)
+    # WHOLE=1: the rest of work RAM, same LATCHED/TRANSIENT/PLAY classes, with the
+    # frozen noise windows named rather than skipped (dead stack, QSound latch,
+    # the sound-driver work area — docs/project/oracle_classes.md)
+    NOISE = [(0xFF7F00, 0xFF8000, "dead-stack"), (0xFF043C, 0xFF043E, "qsound-latch"), (0xFF0500, 0xFF0600, "sound-work")]
+    def dumps_at(name, tag):
+        out = {}
+        for fn in os.listdir(f"{W}/{name}"):
+            if fn.startswith("dump_") and fn.endswith(f"_{tag}.bin"):
+                out[int(fn.split("_")[1])] = open(f"{W}/{name}/{fn}", "rb").read()
+        return out
+    for tag, base in (("ff0000", 0xFF0000), ("ff8c00", 0xFF8C00)):
+        wa, wb = dumps_at(A, tag), dumps_at(B, tag)
+        if not wa or not wb: continue
+        n = min(len(wa[f]) for f in wa) if wa else 0
+        for off in range(n):
+            fr = [f for f in frames if f in wa and f in wb and wa[f][off] != wb[f][off]]
+            if not fr: continue
+            prefr = [f for f in fr if f in pre]
+            cls = "LATCHED" if prefr and len(prefr) == len(pre) else "TRANSIENT" if prefr else "EARLY" if all(f < 1501 for f in fr) else "PLAY"
+            if cls == "PLAY": continue
+            addr = base + off
+            noise = next((nm for lo, hi, nm in NOISE if lo <= addr < hi), "")
+            vals = " ".join(f"{f}:{wa[f][off]:02x}/{wb[f][off]:02x}" for f in fr[:5])
+            print(f"    WR {addr:06x} {cls:9s} {len(fr):3d} frames  first {fr[0]}  {vals} {noise}", file=e)
 print("\t".join([fmt(latched), str(len(transient)), str(len(playonly)),
                  str(first_play) if first_play else "-", fmt(p2pre) if p2pre else "-", " ".join(idn)]))
 EOF
@@ -210,6 +246,9 @@ for row in $ROWS; do
         runleg "${row}_$leg"; n=$((n + 1)); [ $((n % JOBS)) -eq 0 ] && wait
     done
 done
+if [ "${MEASURE:-0}" = 1 ]; then
+    for row in $ROWS; do mkleg "$row" alt "${row}_alt"; runleg "${row}_alt"; n=$((n + 1)); done
+fi
 CTLROW="$(echo $ROWS | awk '{print $1}')"
 mkleg "$CTLROW" real "${CTLROW}_wrongcursor" short
 runleg "${CTLROW}_wrongcursor"; n=$((n + 1))
@@ -243,6 +282,11 @@ for row in $ROWS; do
                        || bad "$row: REAL vs SELF latches $selfl — the poke mechanism perturbs state"
     echo "  $row: POKED vs REAL latched [$latched] transient $tr_ play-only $po first-play-diff $fp (early-only differences are the cell and id the poke overwrites)"
     printf '%s\t%s\t%s\n' "$row" "$latched" "$fp" >> "$W/got.tsv"
+    if [ "${MEASURE:-0}" = 1 ]; then
+        echo "  -- $row: REAL vs ALT (route-residue control; two real routes to the same cell) --" >&2
+        altl="$(classify "${row}_real" "${row}_alt" "$id" "${row}_real")"
+        echo "  $row: REAL vs ALT latched [$(printf '%s' "$altl" | cut -f1)] $(printf '%s' "$altl" | cut -f6)"
+    fi
 done
 [ "${MEASURE:-0}" = 1 ] && { echo "MEASURE: nothing frozen, nothing compared"; exit 0; }
 if [ "${FREEZE:-0}" = 1 ]; then

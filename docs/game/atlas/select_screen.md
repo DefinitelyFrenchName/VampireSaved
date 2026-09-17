@@ -43,6 +43,7 @@ Related sites, both measured in the same tap run:
 | Address | What |
 |---|---|
 | `PRG:0x0209DA` | writes the DEFAULT cursor cell `0x01` (Demitri) at select entry |
+| (writer not located) | P2's DEFAULT cell is `0x05` (Morrigan): the one start from which the four P2 paths measured in 14z-160 (Victor R,R; Phobos L,L; Pyron L,L,UL; Donovan R,R,R on vsav2) all resolve through TABLE B with no mirroring, re-derived by `tools/select_paths.py --check` (14z-161). The same start holds on our wheel (P2 R,R is Victor there too) |
 | `PRG:0x020AA6` | `clr.b $3(a6)` on the confirm path |
 | `PRG:0x020A98` | `cmpi.b #$b,$3(a6)` — cell `0x0B` is special-cased at confirm (sets `$3C1(a6)`) |
 

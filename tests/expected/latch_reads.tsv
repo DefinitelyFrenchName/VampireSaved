@@ -1,0 +1,19 @@
+# tests/expected/latch_reads.tsv — the in-play readers of the select-confirm latch bytes per leg shape,
+# with the byte value each reader saw (tests/audit_latch_reads.sh; tools/tap_latch_reads.sh).
+# Evidence class: in-emulator (MAME, native vsav2 and the WIDE build; frames >= 2000).
+# Frozen 14z-161 with FREEZE=1. A new reader row is a finding (read tests/test_latch_readers.sh's census first);
+# a changed VALUE on phobos-over-donovan means the confirm's flavor table moved — re-derive it before re-freezing.
+# Columns: leg, side, offset, pc, values ('-' = no in-play read of any latched byte)
+#--
+phobos-real	P1	+0x3C2	02595a	00
+phobos-real	P1	+0x3C2	02598a	00
+phobos-real	P1	+0x3C2	026322	00
+phobos-over-donovan	P1	+0x3C2	02595a	01
+phobos-over-donovan	P1	+0x3C2	02598a	01
+phobos-over-donovan	P1	+0x3C2	026322	01
+phobos-over-demitri	P1	+0x3C2	026322	00
+donovan-over-demitri	-	-	-	-
+donovan-victim	-	-	-	-
+pyron-over-demitri	-	-	-	-
+ours-phobos	P1	+0x3C2	41d2c0	00
+ours-phobos	P1	+0x3C2	41d2f0	00

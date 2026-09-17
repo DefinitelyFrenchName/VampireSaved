@@ -28,13 +28,13 @@
 # the document and its checker moved in one commit.
 #
 # THE COVERAGE NUMBER IS NOTE-CLASS, NEVER FATAL (ruled 2026-09-07, the L2
-# convention): the tool prints `NOTE: checkdocs_rom.coverage <n>/370` at column
+# convention): the tool prints `NOTE: checkdocs_rom.coverage <n>/379` at column
 # 0, and because this gate CAPTURES the tool's output to a file it must RE-EMIT
 # that line itself, unindented — asserting the note inside a captured file
 # proves the tool works and says nothing about what the runner receives
-# (paid twice; docs/project/gotchas.md). 370 is the atlas tier (364 until 14z-160) minus the
+# (paid twice; docs/project/gotchas.md). 379 is the atlas tier (370 until 14z-161, 364 until 14z-160) minus the
 # addresses carried only by `ram.md` (346 at the 2026-09-07 ruling, 473 minus 127;
-# 370 since 14z-160; 364 since 14z-157), whose claims are dataflow and belong
+# 379 since 14z-161; 370 since 14z-160; 364 since 14z-157), whose claims are dataflow and belong
 # to the suite (scope §6.5). The COVERED set freezes at the atlas-tier close,
 # not here — this is the framework session.
 #
@@ -142,8 +142,8 @@ grep -q '^  ok: the covered set equals the frozen inventory' "$out" \
 note=$(grep '^NOTE: checkdocs_rom.coverage ' "$out")
 [ -n "$note" ] || bad "the coverage NOTE is absent from the tool's output"
 case "$note" in
-    "NOTE: checkdocs_rom.coverage "*"/370 atlas ROM-tier addresses")
-        ok "the coverage number reports against the ruled denominator, 370 since 14z-160" ;;
+    "NOTE: checkdocs_rom.coverage "*"/379 atlas ROM-tier addresses")
+        ok "the coverage number reports against the ruled denominator, 379 since 14z-161" ;;
     *)  bad "the coverage NOTE does not report against the ruled denominator: $note" ;;
 esac
 # RE-EMIT IT AT COLUMN 0. The tool's own output is captured to a file, so the

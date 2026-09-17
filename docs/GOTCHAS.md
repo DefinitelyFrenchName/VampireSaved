@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-356 entries (41 game / 105 platform / 210 project), counted from the buckets at generation.
+357 entries (41 game / 105 platform / 211 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 41 entries
 
@@ -174,7 +174,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - MAME READS THE USER'S OWN `mame.ini` EVEN UNDER `-homepath` — every harness leg inherits what that file sets (found 2026-09-15, 14z-158, gating the README's recording command; nothing paid)
 - MAME 0.288'S 68000 CORE HAS NO `A7` STATE, AND ITS `SP` IS THE SUPERVISOR STACK — a Lua stack read in user-mode code walks the idle stack (paid: 14z-85g as "constant garbage ret on every hit", named 14z-158)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 210 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 211 entries
 
 - TWO SYMPTOMS ARE ONE DEFECT ONLY IF THE MECHANISM PREDICTS BOTH (paid: 14z-95 to 14z-96, #93 and #101)
 - A gate that prints `SKIP:` AND exits NON-ZERO is a FAILURE, not a skip (paid: 14z-128)
@@ -386,3 +386,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A FREEZE DRIVER THAT DOES NOT PIN `MAME_BIN` BOOTS HOMEBREW'S MAME, WHICH DOES NOT KNOW `vsavjw` — and the freeze can still write expectations (paid: 14z-159)
 - THE MERGED EXPECTATION SET MUST HAVE ITS 16 SELF-FROZEN `.sha1` DELETED AFTER EVERY FREEZE — and nothing enforces it (paid: 14z-159)
 - A FORCED-PICK NATIVE LEG MEASURES THE RIG FOR ANYTHING THE SELECT CONFIRM LATCHES — and two poked legs agree with each other perfectly (paid: 14z-159, GitHub #147/#151)
+- WHAT A FORCED PICK GETS WRONG IS DECIDED BY THE CELL'S TABLE AND THE FIGHTER'S READERS, NOT BY THE POKE — measure both halves before converting a single gate (paid: 14z-161, GitHub #151 step 3)

@@ -1,0 +1,285 @@
+# tests/expected/poked_legs.tsv — every forced-pick leg in tests/ and tools/, as tools/audit_poked_legs.py
+# classifies it (test_poked_legs.sh). Evidence class: static (the scripts, the replays, the two decoded wheels).
+# Frozen 14z-161 with FREEZE=1; a new row is a new poked leg — classify it (and tap it if CROSS-FLAVOR) before re-freezing.
+#--
+script	leg	replay	side	route	cell	poke	class	note
+tests/audit_clone_beam_lines.sh	ours	replays/df/100_df_clone_beams.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/audit_clone_beam_lines.sh	ours	replays/df/100_df_clone_beams.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_continue_ladder.sh	ours	replays/26_don_arcade_mash.rpl	P1	U U R	0f Jedah	03	CROSS-INERT	
+tests/audit_continue_switch.sh	ours	replays/26_don_arcade_mash.rpl	P1	U U R	0f Jedah	10	CROSS-INERT	
+tests/audit_defense_row_residue.sh	native	replays/hui/80_hui_grab_2p.rpl	P1	-	01 Demitri	10 ($ATT)	CROSS-INERT	
+tests/audit_defense_row_residue.sh	native	replays/hui/80_hui_grab_2p.rpl	P2	R R	03 Victor	$vic	PARAM	CROSS-FLAVOR if id in 0x13
+tests/audit_defense_row_residue.sh	ours	replays/hui/80_hui_grab_2p.rpl	P1	-	01 Demitri	10 ($ATT)	CROSS-INERT	
+tests/audit_defense_row_residue.sh	ours	replays/hui/80_hui_grab_2p.rpl	P2	R R	03 Victor	$vic	PARAM	no id is CROSS-FLAVOR here
+tests/audit_df_accumulator.sh	native	replays/df/105_df_sas_armor.rpl	P1	-	01 Demitri	0a	CROSS-INERT	
+tests/audit_df_accumulator.sh	native	replays/df/105_df_sas_armor.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_df_accumulator.sh	ours	replays/df/105_df_sas_armor.rpl	P1	-	01 Demitri	0a	CROSS-INERT	
+tests/audit_df_accumulator.sh	ours	replays/df/105_df_sas_armor.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_df_dead_family.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	$id	PARAM	CROSS-FLAVOR if id in 0x13
+tests/audit_df_dead_family.sh	native	replays/df/97_df_mech.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_df_framework.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	$id	PARAM	no id is CROSS-FLAVOR here
+tests/audit_df_framework.sh	ours	replays/df/97_df_mech.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_df_gold.sh	ours	replays/hui/85_hui_df_vs2.rpl	P1	-	01 Demitri	$id	PARAM	no id is CROSS-FLAVOR here
+tests/audit_df_gold.sh	ours	replays/hui/85_hui_df_vs2.rpl	P2	R R	03 Victor	05	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	$1	PARAM	CROSS-FLAVOR if id in 0x13
+tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	01 ($id)	SAME	
+tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	02 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	03 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	04 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	05 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	06 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	07 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	08 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	09 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	0a ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	0c ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	0d ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	0e ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	10 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	11 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	13 ($id)	CROSS-FLAVOR	
+tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	R R	13 Donovan	$1	PARAM	CROSS-FLAVOR if id in 0x10
+tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	R R	13 Donovan	01 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	R R	13 Donovan	02 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	R R	13 Donovan	03 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	R R	13 Donovan	04 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	R R	13 Donovan	05 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	R R	13 Donovan	06 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	R R	13 Donovan	07 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	R R	13 Donovan	08 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	R R	13 Donovan	09 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	R R	13 Donovan	0a ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	R R	13 Donovan	0c ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	R R	13 Donovan	0d ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	R R	13 Donovan	0e ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	R R	13 Donovan	10 ($id)	CROSS-FLAVOR	
+tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	R R	13 Donovan	11 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	R R	13 Donovan	13 ($id)	SAME	
+tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	$1	PARAM	no id is CROSS-FLAVOR here
+tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	01 ($id)	SAME	
+tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	02 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	03 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	04 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	05 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	06 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	07 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	08 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	09 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	0a ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	0c ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	0d ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	0e ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	10 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	11 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	13 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	$1	PARAM	no id is CROSS-FLAVOR here
+tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	01 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	02 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	03 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	04 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	05 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	06 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	07 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	08 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	09 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	0a ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	0c ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	0d ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	0e ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	10 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	11 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	13 ($id)	CROSS-INERT	
+tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_don_ko_writer.sh	ours	replays/26_don_arcade_mash.rpl	P1	U U R	0f Jedah	$2	PARAM	no id is CROSS-FLAVOR here
+tests/audit_don_lilith_ko.sh	ours	replays/26_don_arcade_mash.rpl	P1	U U R	0f Jedah	$2	PARAM	no id is CROSS-FLAVOR here
+tests/audit_don_vs_cpu.sh	ours	replays/109_2p_don_vs_phobos.rpl	P1	L L D D	13 Donovan	13	SAME	
+tests/audit_don_vs_cpu.sh	ours	replays/110_don_arcade_mash.rpl	P1	L L D D	13 Donovan	13	SAME	
+tests/audit_down_attack.sh	ours	replays/judge/03_down_attack.rpl	P1	-	01 Demitri	$a	PARAM	no id is CROSS-FLAVOR here
+tests/audit_down_attack.sh	ours	replays/judge/03_down_attack.rpl	P2	R R	03 Victor	$b	PARAM	no id is CROSS-FLAVOR here
+tests/audit_edge_cases.sh	native	replays/judge/02_throw.rpl	P1	-	01 Demitri	$a	PARAM	CROSS-FLAVOR if id in 0x13
+tests/audit_edge_cases.sh	native	replays/judge/02_throw.rpl	P2	R R	03 Victor	$b	PARAM	CROSS-FLAVOR if id in 0x13
+tests/audit_edge_cases.sh	ours	replays/judge/02_throw.rpl	P1	-	01 Demitri	$a	PARAM	no id is CROSS-FLAVOR here
+tests/audit_edge_cases.sh	ours	replays/judge/02_throw.rpl	P2	R R	03 Victor	$b	PARAM	no id is CROSS-FLAVOR here
+tests/audit_empty_tiles.sh	ours	(replay not named in the script)	P1	-	-	10	?	
+tests/audit_fg_damage.sh	ours	(replay not named in the script)	P1	-	-	10	?	
+tests/audit_fg_damage.sh	ours	(replay not named in the script)	P2	-	-	03	?	
+tests/audit_fg_parity.sh	native	replays/hui/89_hui_ex_fg_vs2.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/audit_fg_parity.sh	native	replays/hui/89_hui_ex_fg_vs2.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_fg_parity.sh	ours	replays/hui/89_hui_ex_fg_vs2.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/audit_fg_parity.sh	ours	replays/hui/89_hui_ex_fg_vs2.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_grenade_ground_tiles.sh	native	replays/hui/83d_hui_grenade_ground.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/audit_grenade_ground_tiles.sh	native	replays/hui/83d_hui_grenade_ground.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_grenade_ground_tiles.sh	ours	replays/hui/83d_hui_grenade_ground.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/audit_grenade_ground_tiles.sh	ours	replays/hui/83d_hui_grenade_ground.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_hitclass_map_cost.sh	ours	replays/26_don_arcade_mash.rpl	P1	U U R	0f Jedah	10	CROSS-INERT	
+tests/audit_hitclass_map_cost.sh	ours	replays/26_don_arcade_mash.rpl	P1	U U R	0f Jedah	11	CROSS-INERT	
+tests/audit_hitclass_map_cost.sh	ours	replays/26_don_arcade_mash.rpl	P2	-	-	01	?	
+tests/audit_hitclass_map_cost.sh	ours	replays/26_don_arcade_mash.rpl	P2	-	-	03	?	
+tests/audit_hitclass_map_cost.sh	ours	replays/hui/88_hui_plasma_trap_contact.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/audit_hitclass_map_cost.sh	ours	replays/hui/88_hui_plasma_trap_contact.rpl	P1	-	01 Demitri	11	CROSS-INERT	
+tests/audit_hitclass_map_cost.sh	ours	replays/hui/88_hui_plasma_trap_contact.rpl	P2	R R	03 Victor	01	CROSS-INERT	
+tests/audit_hitclass_map_cost.sh	ours	replays/hui/88_hui_plasma_trap_contact.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_hitclass_map_cost.sh	ours	replays/hui/96_hui_grenade_clash.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/audit_hitclass_map_cost.sh	ours	replays/hui/96_hui_grenade_clash.rpl	P1	-	01 Demitri	11	CROSS-INERT	
+tests/audit_hitclass_map_cost.sh	ours	replays/hui/96_hui_grenade_clash.rpl	P2	R R	03 Victor	01	CROSS-INERT	
+tests/audit_hitclass_map_cost.sh	ours	replays/hui/96_hui_grenade_clash.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_hitclass_map_cost.sh	ours	replays/pyron/70_pyron_mash.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/audit_hitclass_map_cost.sh	ours	replays/pyron/70_pyron_mash.rpl	P1	-	01 Demitri	11	CROSS-INERT	
+tests/audit_hitclass_map_cost.sh	ours	replays/pyron/70_pyron_mash.rpl	P2	-	-	01	?	
+tests/audit_hitclass_map_cost.sh	ours	replays/pyron/70_pyron_mash.rpl	P2	-	-	03	?	
+tests/audit_hitclass_map_cost.sh	ours	replays/pyron/84_pyron_clash_type64.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/audit_hitclass_map_cost.sh	ours	replays/pyron/84_pyron_clash_type64.rpl	P1	-	01 Demitri	11	CROSS-INERT	
+tests/audit_hitclass_map_cost.sh	ours	replays/pyron/84_pyron_clash_type64.rpl	P2	R R	03 Victor	01	CROSS-INERT	
+tests/audit_hitclass_map_cost.sh	ours	replays/pyron/84_pyron_clash_type64.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_hui_grunt.sh	native	replays/hui/95_hui_electrocuted_x4.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/audit_hui_grunt.sh	native	replays/hui/95_hui_electrocuted_x4.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_hui_grunt.sh	ours	replays/hui/95_hui_electrocuted_x4.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/audit_hui_grunt.sh	ours	replays/hui/95_hui_electrocuted_x4.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_kill_poke_shape.sh	ours	replays/26_don_arcade_mash.rpl	P1	U U R	0f Jedah	03	CROSS-INERT	
+tests/audit_ladder_selector.sh	ours	replays/26_don_arcade_mash.rpl	P1	U U R	0f Jedah	13	CROSS-INERT	
+tests/audit_latch_reads.sh	ours	(replay not named in the script)	P1	-	-	$1	PARAM	no id is CROSS-FLAVOR here
+tests/audit_latch_reads.sh	ours	(replay not named in the script)	P2	-	-	$2	PARAM	no id is CROSS-FLAVOR here
+tests/audit_legacy_pairings.sh	ours	replays/16_xemu_2p.rpl	P1	-	01 Demitri	$id	PARAM	no id is CROSS-FLAVOR here
+tests/audit_merged_legacy.sh	ours	replays/03_two_player_vs.rpl	P1	-	01 Demitri	$1	PARAM	no id is CROSS-FLAVOR here
+tests/audit_merged_legacy.sh	ours	replays/03_two_player_vs.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/audit_merged_legacy.sh	ours	replays/03_two_player_vs.rpl	P1	-	01 Demitri	11	CROSS-INERT	
+tests/audit_merged_legacy.sh	ours	replays/03_two_player_vs.rpl	P2	R R	03 Victor	$1	PARAM	no id is CROSS-FLAVOR here
+tests/audit_merged_legacy.sh	ours	replays/03_two_player_vs.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_merged_vec3.sh	ours	replays/hui/70_hui_mash.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/audit_objhook_owner_census.sh	ours	(replay not named in the script)	P1	-	-	10	?	
+tests/audit_phase_mode_cost.sh	ours	replays/03_two_player_vs.rpl	P1	-	01 Demitri	13	CROSS-INERT	
+tests/audit_phase_mode_cost.sh	ours	replays/03_two_player_vs.rpl	P2	R R	03 Victor	13	CROSS-INERT	
+tests/audit_pool_free_byte.sh	ours	(replay not named in the script)	P1	-	-	10	?	
+tests/audit_pool_free_byte.sh	ours	(replay not named in the script)	P1	-	-	11	?	
+tests/audit_pool_free_byte.sh	ours	(replay not named in the script)	P2	-	-	01	?	
+tests/audit_projectile_clash.sh	native	replays/105_projectile_clash_ctl.rpl	P1	-	01 Demitri	01	SAME	
+tests/audit_projectile_clash.sh	native	replays/105_projectile_clash_ctl.rpl	P1	-	01 Demitri	11	CROSS-INERT	
+tests/audit_projectile_clash.sh	native	replays/105_projectile_clash_ctl.rpl	P2	R R	03 Victor	01	CROSS-INERT	
+tests/audit_projectile_clash.sh	native	replays/106_pyron_cosmo_clash.rpl	P1	-	01 Demitri	01	SAME	
+tests/audit_projectile_clash.sh	native	replays/106_pyron_cosmo_clash.rpl	P1	-	01 Demitri	11	CROSS-INERT	
+tests/audit_projectile_clash.sh	native	replays/106_pyron_cosmo_clash.rpl	P2	R R	03 Victor	01	CROSS-INERT	
+tests/audit_projectile_clash.sh	ours	replays/105_projectile_clash_ctl.rpl	P1	-	01 Demitri	01	SAME	
+tests/audit_projectile_clash.sh	ours	replays/105_projectile_clash_ctl.rpl	P1	-	01 Demitri	11	CROSS-INERT	
+tests/audit_projectile_clash.sh	ours	replays/105_projectile_clash_ctl.rpl	P2	R R	03 Victor	01	CROSS-INERT	
+tests/audit_projectile_clash.sh	ours	replays/106_pyron_cosmo_clash.rpl	P1	-	01 Demitri	01	SAME	
+tests/audit_projectile_clash.sh	ours	replays/106_pyron_cosmo_clash.rpl	P1	-	01 Demitri	11	CROSS-INERT	
+tests/audit_projectile_clash.sh	ours	replays/106_pyron_cosmo_clash.rpl	P2	R R	03 Victor	01	CROSS-INERT	
+tests/audit_pursuit_leap.sh	ours	replays/judge/03_down_attack.rpl	P1	-	01 Demitri	$a	PARAM	no id is CROSS-FLAVOR here
+tests/audit_pursuit_leap.sh	ours	replays/judge/03_down_attack.rpl	P2	R R	03 Victor	$b	PARAM	no id is CROSS-FLAVOR here
+tests/audit_pyron_capture_block.sh	native	replays/judge/02_throw.rpl	P1	-	01 Demitri	$a	PARAM	CROSS-FLAVOR if id in 0x13
+tests/audit_pyron_capture_block.sh	native	replays/judge/02_throw.rpl	P2	R R	03 Victor	$VICTIM	PARAM	CROSS-FLAVOR if id in 0x13
+tests/audit_pyron_capture_block.sh	ours	replays/judge/02_throw.rpl	P1	-	01 Demitri	$a	PARAM	no id is CROSS-FLAVOR here
+tests/audit_pyron_capture_block.sh	ours	replays/judge/02_throw.rpl	P2	R R	03 Victor	$VICTIM	PARAM	no id is CROSS-FLAVOR here
+tests/audit_pyron_ring.sh	ours	(replay not named in the script)	P1	-	-	11	?	
+tests/audit_region_movability.sh	ours	replays/12_donovan_vs_cpu.rpl	P1	U U R	0f Jedah	$tid	PARAM	no id is CROSS-FLAVOR here
+tests/audit_region_movability.sh	ours	replays/12_donovan_vs_cpu.rpl	P1	U U R	0f Jedah	13	CROSS-INERT	
+tests/audit_stage_sweep.sh	ours	replays/judge/02_throw.rpl	P1	-	01 Demitri	$id	PARAM	no id is CROSS-FLAVOR here
+tests/audit_stage_sweep.sh	ours	replays/judge/02_throw.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_tech_roll.sh	native	replays/judge/03_down_attack.rpl	P1	-	01 Demitri	$a	PARAM	CROSS-FLAVOR if id in 0x13
+tests/audit_tech_roll.sh	native	replays/judge/03_down_attack.rpl	P2	R R	03 Victor	$b	PARAM	CROSS-FLAVOR if id in 0x13
+tests/audit_tech_roll.sh	ours	replays/judge/03_down_attack.rpl	P1	-	01 Demitri	$a	PARAM	no id is CROSS-FLAVOR here
+tests/audit_tech_roll.sh	ours	replays/judge/03_down_attack.rpl	P2	R R	03 Victor	$b	PARAM	no id is CROSS-FLAVOR here
+tests/audit_tenant_downwin.sh	ours	replays/judge/01_timeout_lead.rpl	P1	-	01 Demitri	$a	PARAM	no id is CROSS-FLAVOR here
+tests/audit_tenant_downwin.sh	ours	replays/judge/01_timeout_lead.rpl	P2	R R	03 Victor	$b	PARAM	no id is CROSS-FLAVOR here
+tests/audit_tenant_throw_geometry.sh	native	(replay not named in the script)	P1	-	-	$ATT	PARAM	no id is CROSS-FLAVOR here
+tests/audit_tenant_throw_geometry.sh	native	(replay not named in the script)	P2	-	-	$vic	PARAM	no id is CROSS-FLAVOR here
+tests/audit_tenant_throw_geometry.sh	ours	(replay not named in the script)	P1	-	-	$ATT	PARAM	no id is CROSS-FLAVOR here
+tests/audit_tenant_throw_geometry.sh	ours	(replay not named in the script)	P2	-	-	$vic	PARAM	no id is CROSS-FLAVOR here
+tests/audit_tenant_throws.sh	ours	replays/judge/02_throw.rpl	P1	-	01 Demitri	$a	PARAM	no id is CROSS-FLAVOR here
+tests/audit_tenant_throws.sh	ours	replays/judge/02_throw.rpl	P2	R R	03 Victor	$b	PARAM	no id is CROSS-FLAVOR here
+tests/audit_tenant_timeout.sh	ours	replays/judge/01_timeout_lead.rpl	P1	-	01 Demitri	$id	PARAM	no id is CROSS-FLAVOR here
+tests/audit_tenant_timeout.sh	ours	replays/judge/01_timeout_lead.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_throw_tech.sh	native	replays/judge/02_throw.rpl	P1	-	01 Demitri	$a	PARAM	CROSS-FLAVOR if id in 0x13
+tests/audit_throw_tech.sh	native	replays/judge/02_throw.rpl	P2	R R	03 Victor	$b	PARAM	CROSS-FLAVOR if id in 0x13
+tests/audit_throw_tech.sh	ours	replays/judge/02_throw.rpl	P1	-	01 Demitri	$a	PARAM	no id is CROSS-FLAVOR here
+tests/audit_throw_tech.sh	ours	replays/judge/02_throw.rpl	P2	R R	03 Victor	$b	PARAM	no id is CROSS-FLAVOR here
+tests/audit_tick_cadence.sh	native	replays/48_don_immortal_ko.rpl	P1	U U R	11 Pyron	03	CROSS-INERT	
+tests/audit_tick_cadence.sh	native	replays/48_don_immortal_ko.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_trap_parity.sh	native	replays/hui/87_hui_plasma_trap.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/audit_trap_parity.sh	native	replays/hui/87_hui_plasma_trap.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_trap_parity.sh	ours	replays/hui/87_hui_plasma_trap.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/audit_trap_parity.sh	ours	replays/hui/87_hui_plasma_trap.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_trap_shock.sh	native	replays/hui/92_hui_trap_shock.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/audit_trap_shock.sh	native	replays/hui/92_hui_trap_shock.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_trap_shock.sh	ours	replays/hui/92_hui_trap_shock.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/audit_trap_shock.sh	ours	replays/hui/92_hui_trap_shock.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_trap_sound.sh	ours	replays/hui/87_hui_plasma_trap.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/audit_trap_sound.sh	ours	replays/hui/87_hui_plasma_trap.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_tripwire_reach.sh	ours	(replay not named in the script)	P1	-	-	$id	PARAM	no id is CROSS-FLAVOR here
+tests/audit_type_writes.sh	ours	(replay not named in the script)	P1	-	-	10	?	
+tests/audit_type_writes.sh	ours	(replay not named in the script)	P1	-	-	11	?	
+tests/audit_type_writes.sh	ours	(replay not named in the script)	P1	-	-	13	?	
+tests/audit_type_writes.sh	ours	(replay not named in the script)	P2	-	-	03	?	
+tests/audit_type_writes.sh	ours	(replay not named in the script)	P2	-	-	13	?	
+tests/audit_voice_borrow.sh	ours	replays/don/90_don_plant.rpl	P1	-	-	13	?	
+tests/audit_voice_borrow.sh	ours	replays/don/90_don_plant.rpl	P2	-	-	03	?	
+tests/audit_win_pal_auto.sh	ours	replays/103_tenant_2pwin_auto.rpl	P1	L L D D	13 Donovan	10	CROSS-INERT	
+tests/audit_win_pal_auto.sh	ours	replays/104_1p_auto_ko_win.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/audit_win_pal_auto.sh	ours	replays/105_legacy_2pwin_auto.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/audit_win_pal_auto.sh	ours	replays/61_tenant_2pwin.rpl	P1	L L D D	13 Donovan	10	CROSS-INERT	
+tests/test_beam_anim_walk.sh	native	replays/hui/83b_hui_ray_2p.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_beam_anim_walk.sh	ours	replays/hui/83b_hui_ray_2p.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_beam_variants.sh	native	replays/hui/86_hui_beam_variants.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_beam_variants.sh	native	replays/hui/86_hui_beam_variants.rpl	P2	R R	03 Victor	03	SAME	
+tests/test_beam_variants.sh	ours	replays/hui/86_hui_beam_variants.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_beam_variants.sh	ours	replays/hui/86_hui_beam_variants.rpl	P2	R R	03 Victor	03	SAME	
+tests/test_don_immortal_native.sh	native	replays/48_don_immortal_ko.rpl	P1	U U R	11 Pyron	03	CROSS-INERT	
+tests/test_don_immortal_native.sh	native	replays/48_don_immortal_ko.rpl	P2	R R	03 Victor	03	SAME	
+tests/test_don_immortal_native.sh	ours	replays/48_don_immortal_ko.rpl	P1	U U R	0f Jedah	03	CROSS-INERT	
+tests/test_don_immortal_native.sh	ours	replays/48_don_immortal_ko.rpl	P2	R R	03 Victor	03	SAME	
+tests/test_hui_air.sh	ours	replays/hui/75_hui_air.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_hui_air.sh	ours	replays/hui/79_hui_airdash.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_hui_df_style.sh	native	replays/hui/85_hui_df_vs2.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_hui_df_style.sh	native	replays/hui/85_hui_df_vs2.rpl	P2	R R	03 Victor	03	SAME	
+tests/test_hui_df_style.sh	ours	replays/hui/85_hui_df_vs2.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_hui_df_style.sh	ours	replays/hui/85_hui_df_vs2.rpl	P2	R R	03 Victor	03	SAME	
+tests/test_hui_electrocute.sh	native	replays/hui/93_hui_electrocuted.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_hui_electrocute.sh	native	replays/hui/93_hui_electrocuted.rpl	P2	R R	03 Victor	03	SAME	
+tests/test_hui_electrocute.sh	ours	replays/hui/93_hui_electrocuted.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_hui_electrocute.sh	ours	replays/hui/93_hui_electrocuted.rpl	P2	R R	03 Victor	03	SAME	
+tests/test_hui_ex.sh	ours	replays/hui/78_hui_fg_chaos.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_hui_fx_flow.sh	ours	replays/hui/83b_hui_ray_2p.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_hui_grab.sh	ours	replays/hui/80_hui_grab_2p.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_hui_grab_victim.sh	native	replays/hui/80_hui_grab_2p.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_hui_grab_victim.sh	native	replays/hui/80_hui_grab_2p.rpl	P2	R R	03 Victor	03	SAME	
+tests/test_hui_grab_victim.sh	ours	replays/hui/80_hui_grab_2p.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_hui_grab_victim.sh	ours	replays/hui/80_hui_grab_2p.rpl	P2	R R	03 Victor	03	SAME	
+tests/test_hui_oracle.sh	native	replays/18_veteran_ctl_vsav2.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_hui_oracle.sh	native	replays/18_veteran_ctl_vsavj.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_hui_oracle.sh	native	replays/hui/90_hui_oracle.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_hui_oracle.sh	ours	replays/18_veteran_ctl_vsav2.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_hui_oracle.sh	ours	replays/18_veteran_ctl_vsavj.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_hui_oracle.sh	ours	replays/hui/90_hui_oracle.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_hui_pairs.sh	ours	replays/hui/81_hui_rw_gc.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_hui_pairs.sh	ours	replays/hui/82_hui_df_2p.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_hui_soak.sh	ours	replays/hui/70_hui_mash.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_hui_walk.sh	ours	replays/hui/74_hui_walk.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_ladder_tenant_vs_palette.sh	ours	replays/109_2p_don_vs_phobos.rpl	P1	L L D D	13 Donovan	13	SAME	
+tests/test_ladder_tenant_vs_palette.sh	ours	replays/111_don_arcade_vs_screen.rpl	P1	L L D D	13 Donovan	13	SAME	
+tests/test_phasec_image.sh	ours	replays/12_donovan_vs_cpu.rpl	P1	U U R	0f Jedah	13	CROSS-INERT	
+tests/test_phasec_image.sh	ours	replays/12_donovan_vs_cpu.rpl	P2	-	-	03	?	
+tests/test_phasec_image.sh	ours	replays/judge/02_throw.rpl	P1	-	01 Demitri	13	CROSS-INERT	
+tests/test_phasec_image.sh	ours	replays/judge/02_throw.rpl	P2	R R	03 Victor	03	SAME	
+tests/test_pyron_blink.sh	native	replays/pyron/76_pyron_blink_vs2.rpl	P1	-	01 Demitri	11	CROSS-INERT	
+tests/test_pyron_blink.sh	native	replays/pyron/76_pyron_blink_vs2.rpl	P2	R R	03 Victor	03	SAME	
+tests/test_pyron_blink.sh	ours	replays/pyron/76_pyron_blink_vs2.rpl	P1	-	01 Demitri	11	CROSS-INERT	
+tests/test_pyron_blink.sh	ours	replays/pyron/76_pyron_blink_vs2.rpl	P2	R R	03 Victor	03	SAME	
+tests/test_pyron_cosmo.sh	ours	replays/pyron/72_pyron_cosmo_2p.rpl	P1	-	01 Demitri	11	CROSS-INERT	
+tests/test_pyron_cosmo.sh	ours	replays/pyron/72_pyron_cosmo_2p.rpl	P2	R R	03 Victor	03	SAME	
+tests/test_pyron_soak.sh	ours	replays/pyron/70_pyron_mash.rpl	P1	-	01 Demitri	11	CROSS-INERT	
+tests/test_shim_charid.sh	ours	(replay not named in the script)	P1	-	-	$TID	PARAM	no id is CROSS-FLAVOR here
+tests/test_shim_charid.sh	ours	(replay not named in the script)	P2	-	-	$TID	PARAM	no id is CROSS-FLAVOR here
+tools/capture_sheet.sh	native	replays/judge/02_throw.rpl	P1	-	01 Demitri	$ATT	PARAM	CROSS-FLAVOR if id in 0x13
+tools/capture_sheet.sh	native	replays/judge/02_throw.rpl	P2	R R	03 Victor	$VIC	PARAM	CROSS-FLAVOR if id in 0x13
+tools/capture_sheet.sh	ours	replays/judge/02_throw.rpl	P1	-	01 Demitri	$ATT	PARAM	no id is CROSS-FLAVOR here
+tools/capture_sheet.sh	ours	replays/judge/02_throw.rpl	P2	R R	03 Victor	$VIC	PARAM	no id is CROSS-FLAVOR here
+tools/force_pick_probe.sh	ours	(replay not named in the script)	P1	-	-	$ID	PARAM	no id is CROSS-FLAVOR here
+tools/name_moves.py	native	replays/naming/donovan_victim_*.rpl	P1	R R	13 Donovan	03	CROSS-INERT	the rig's prologue is replay 17's (P1 R,R on vsav2)
+tools/name_moves.py	native	replays/naming/donovan_victim_*.rpl	P2	R R	03 Victor	13	CROSS-FLAVOR	P2 R,R is Victor on vsav2
+tools/name_moves.py	native	replays/naming/huitzil_victim_*.rpl	P1	R R	13 Donovan	03	CROSS-INERT	the rig's prologue is replay 17's (P1 R,R on vsav2)
+tools/name_moves.py	native	replays/naming/huitzil_victim_*.rpl	P2	R R	03 Victor	10	CROSS-INERT	P2 R,R is Victor on vsav2
+tools/name_moves.py	native	replays/naming/pyron_victim_*.rpl	P1	R R	13 Donovan	03	CROSS-INERT	the rig's prologue is replay 17's (P1 R,R on vsav2)
+tools/name_moves.py	native	replays/naming/pyron_victim_*.rpl	P2	R R	03 Victor	11	CROSS-INERT	P2 R,R is Victor on vsav2

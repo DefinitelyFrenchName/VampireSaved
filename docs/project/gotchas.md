@@ -4800,3 +4800,44 @@ first event, so every Phobos verdict measured on the poked leg was a verdict on
 the VH2 branch. The real cursor paths on vsav2 from the P1 default cell (0x01):
 Phobos L,L,L, Pyron R,R,R, Donovan R,R; from P2's (0x05): Victor R,R, Phobos
 L,L, Pyron L,L,UL, Donovan R,R,R (`tools/select_wheel.py` on the vs2 data view).
+
+## WHAT A FORCED PICK GETS WRONG IS DECIDED BY THE CELL'S TABLE AND THE FIGHTER'S READERS, NOT BY THE POKE — measure both halves before converting a single gate (paid: 14z-161, GitHub #151 step 3)
+
+The step-3 sweep began as "37 gates still poke a native leg; switch each to a
+real path and re-freeze". Measuring first changed the job entirely:
+
+- **The whole-RAM fidelity measure** (`MEASURE=1 WHOLE=1
+  tests/audit_forced_pick_fidelity.sh`) found dozens of bytes outside the P1
+  block that differ between the poked and the real leg — and its REAL-vs-ALT
+  control (two real routes to the SAME cell) showed all but two of them are
+  ROUTE residue any two picks by different routes leave behind, and the two
+  (`$FF0EA4`/`$FF0EC4`) follow the route's side. A poked-vs-real diff is a
+  route diff plus a cell diff; without the second-route control it reads as
+  the poke's doing.
+- **The confirm's flavor write is a two-row table** (`vs2 PRG:0x01F832` /
+  `0x01F86A`): only Phobos's cell and Donovan's write `+0x3C2`. So the poke's
+  flavor defect has exactly two shapes, and the shape every `tests/hui/` gate
+  uses (Phobos over Demitri's cell) is FAITHFUL for the flavor by construction.
+  The 14z-160 finding was true of the naming rigs' R,R prologue and of nothing
+  else.
+- **"Never read in 3,400 frames" was one rig.** The static census by form
+  (`tools/audit_latch_readers.py`) found readers of the id copies the tap had
+  never seen — under the Shadow flag, in the ladder, in the HUD-name stager —
+  and Donovan's own flavor readers, which no tapped rig fires. Deadness is
+  measured by absence ([VSP-22]); the census is the population, the per-leg tap
+  is the sample, and a leg is called clean only with both in hand.
+- **A static census of shell scripts over-approximates.** `audit_poked_legs.py`
+  pairs every replay a script names with every poke it names; one of its three
+  CROSS-FLAVOR rows is a pairing the gate never runs. The accepted list says so
+  per row rather than pretending the census can follow the shell.
+
+The rule: before converting a rig on the strength of "the poke latches X", run
+the fidelity measure with its second-route control, read the writer's table,
+and tap the readers on THAT rig. Three legs were unfaithful in a way that
+mattered (the naming rigs, fixed 14z-160); the rest were not, and the gates
+that say so are `tests/test_poked_legs.sh`, `tests/test_latch_readers.sh` and
+`tests/audit_latch_reads.sh`.
+
+Two traps on the way: zsh's `set -- $var` does not word-split (`${=var}`), and a
+tool copied into a scratch dir resolves `REPO` from its own path — pin it in the
+copy, or the perturbed copy measures nothing and says so only by a missing file.

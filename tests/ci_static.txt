@@ -207,3 +207,5 @@ test_checkdocs_rom
 # ci_static and not ci_portable: it fingerprints the five current build dirs.
 # Scope discriminator and how to add a row are in its header.
 test_freeze_artifacts_current
+test_latch_readers
+test_poked_legs

@@ -16,6 +16,7 @@ declares	audit_guard_mask_reads
 declares	audit_hui_grunt
 declares	audit_kill_poke_shape
 declares	audit_ladder_selector
+declares	audit_latch_reads
 declares	audit_mister_map_fit
 declares	audit_move_parity
 declares	audit_pyron_ring
@@ -58,6 +59,7 @@ declares	test_header_defaults
 declares	test_host_libs
 declares	test_jtcores_twin
 declares	test_jtsim_scratch_heal
+declares	test_latch_readers
 declares	test_mame_bin_pinned
 declares	test_md_subset
 declares	test_meter_gain
@@ -74,6 +76,7 @@ declares	test_must_fire_census
 declares	test_obj_records
 declares	test_pcrel_escapes
 declares	test_pod_black_foot_palette
+declares	test_poked_legs
 declares	test_pyron_medallion_2p
 declares	test_random_select_tenants
 declares	test_readme_recording

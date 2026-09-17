@@ -5,7 +5,7 @@
 # issues: 152
 number	state	reason	closed	labels	title
 152	OPEN	-	-	evolution	An independent adversarial rule-checker at every decision point — redundancy for rule APPLICATION, not for measurement
-151	OPEN	-	-	evolution	Re-examine #136 end to end: the forced-pick native leg is unvalidated, so 17 of 27 parity verdicts rest on an unmeasured assumption
+151	OPEN	REOPENED	-	evolution	Re-examine #136 end to end: the forced-pick native leg is unvalidated, so 17 of 27 parity verdicts rest on an unmeasured assumption
 150	OPEN	-	-	evolution	The freeze ritual's three silent-green failure modes need a mechanical guard (test_freeze_set_shape + a committed freeze driver)
 149	CLOSED	NOT_PLANNED	2026-09-16	bug	Phobos's specials skip a 2-frame seq-4 startup state native vsav2 plays (one cause behind ~11 of his moves)
 148	OPEN	-	-	evolution	Review the static tier's contents and when it is applied — a commit currently blocks the tree for ~25 min, a close for ~40
@@ -20,7 +20,7 @@ number	state	reason	closed	labels	title
 139	CLOSED	COMPLETED	2026-09-14	bug	A rejected build keeps its packed rompath, indistinguishable on disk from a finished build (the #1 residual)
 138	OPEN	-	-	bug	A stock-track build directory without its vsavj.zip silently dispatches run_suite to the VANILLA expectations — the reference-row rule nothing enforces (the #55 residual)
 137	CLOSED	COMPLETED	2026-09-14	bug	test_wide_profile's reference guard trusts a profile check that nothing in the run proves can see the profile (the #63 residual)
-136	OPEN	-	-	evolution	Tenant move parity vs native VS2: compare Donovan, Phobos and Pyron's moves on the WIDE merged build against vsav2
+136	OPEN	REOPENED	-	evolution	Tenant move parity vs native VS2: compare Donovan, Phobos and Pyron's moves on the WIDE merged build against vsav2
 135	CLOSED	COMPLETED	2026-09-15	evolution	The VS-vs-VS2 tick cadence: re-establish its measurement, mechanism and scope, and document it properly
 134	OPEN	-	-	bug	The hit rigs' LP events whiff at contact range
 133	OPEN	-	-	evolution	Re-measure the emulator runner's pull-queue gain on a wider host

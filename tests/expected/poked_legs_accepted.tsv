@@ -1,0 +1,9 @@
+# tests/expected/poked_legs_accepted.tsv — the CROSS-FLAVOR pairings tools/audit_poked_legs.py reports that may STAY,
+# each with the measurement that lets it (test_poked_legs.sh; GitHub #151 step 3, 14z-161). A pairing is CROSS-FLAVOR
+# when the poked fighter (Phobos 0x10 or Donovan 0x13) would read a flavor +0x3C2 the confirm wrote for ANOTHER cell.
+# Evidence class: in-emulator (tests/audit_latch_reads.sh legs) or static (the script's own leg list).
+# Columns: script, leg, replay, side, poke, why-accepted
+#--
+tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	13	Donovan poked over Demitri's cell on the DF rig: latched flavor 00 where a real pick writes 01, and NO reader fires in 7,050 frames (audit_latch_reads leg donovan-over-demitri; Donovan's readers vs2 0x05A650/0x065FE2/0x066020 are action-specific)
+tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	10	a script-level pairing the gate never runs: its native leg is replay 97 with TRACE_NATIVE=13 only; replay 98 runs the contact section on vsavjw alone (a Phobos poked over Donovan's cell on native DOES read 01 — audit_latch_reads leg phobos-over-donovan — which is why this pairing must never become a real leg)
+tools/name_moves.py	native	replays/naming/donovan_victim_*.rpl	P2	13	P2 Donovan poked over Victor's cell: latched flavor 00, and no reader fires in any of the eight victim parts (14z-161 taps; audit_latch_reads leg donovan-victim keeps part 1 under watch)
