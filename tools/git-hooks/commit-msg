@@ -1,0 +1,6 @@
+#!/bin/sh
+# commit-msg — refuse a message GitHub would read as CLOSING an issue on push
+# (14z-162, GitHub #151). Installed by tools/install_hooks.sh; mirrored
+# non-optionally by tests/test_commit_subject.sh.
+REPO="$(git rev-parse --show-toplevel)"
+exec python3 "$REPO/tools/check_commit_subject.py" --file "$1"

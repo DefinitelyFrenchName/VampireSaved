@@ -242,4 +242,9 @@ test_state_open_lists
 # each answer link resolves (learned/wrong in live documents), the backfill debt is
 # shrink-only and the generated page is current. tools/tickets.py; six controls. ~1 s.
 test_tickets
+# 14z-162 (GitHub #151): no unpushed commit message carries a GitHub CLOSING
+# keyword before an issue reference — the shape that closed #151 twice and #136
+# once as a push side effect and was then misrecorded as a maintainer act.
+# tools/check_commit_subject.py; one control. ~1 s.
+test_commit_subject
 test_rompath_reject

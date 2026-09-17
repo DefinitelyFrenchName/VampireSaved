@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-357 entries (41 game / 105 platform / 211 project), counted from the buckets at generation.
+358 entries (41 game / 105 platform / 212 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 41 entries
 
@@ -174,8 +174,9 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - MAME READS THE USER'S OWN `mame.ini` EVEN UNDER `-homepath` — every harness leg inherits what that file sets (found 2026-09-15, 14z-158, gating the README's recording command; nothing paid)
 - MAME 0.288'S 68000 CORE HAS NO `A7` STATE, AND ITS `SP` IS THE SUPERVISOR STACK — a Lua stack read in user-mode code walks the idle stack (paid: 14z-85g as "constant garbage ret on every hit", named 14z-158)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 211 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 212 entries
 
+- A COMMIT SUBJECT THAT NAMES AN ISSUE AFTER A CLOSING KEYWORD CLOSES IT ON PUSH — and the close is attributed to the PUSHING account, not measured (paid: 14z-162, GitHub #151)
 - TWO SYMPTOMS ARE ONE DEFECT ONLY IF THE MECHANISM PREDICTS BOTH (paid: 14z-95 to 14z-96, #93 and #101)
 - A gate that prints `SKIP:` AND exits NON-ZERO is a FAILURE, not a skip (paid: 14z-128)
 - `... | while read` puts the loop in a SUBSHELL, so the `wait` after it waits for nothing (paid: 14z-128)

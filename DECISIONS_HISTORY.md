@@ -27,6 +27,29 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-17 (14z-162) — #151 (the forced-pick apparatus validation) may be closed, conditionally; #136 stays open and now documents the 13 divergences
+
+**Context.** On the 14z-162 measurement report of #151's steps 1-3 (the forced-pick
+native leg reproduces a real cursor pick except for the flavor latch `+0x3C2`,
+which no gate in the tree reads with a value a real pick would not write), the
+maintainer ruled #151 closable.
+
+**Ruling (verbatim):** *"Based on this information, I rule that #151 can be closed
+IF AND ONLY IF, the 13 diverges have been documentated or linked to at least in
+#136, AND that #136 is still open."*
+
+**Rationale (verbatim):** *"the rationale is thusly: per your own words 'The 13 are
+real defects, which are #136's work.' but if #136 is not aligned with #151 this is
+moot and if #136 is closed this is even worse as this means these defects will not
+be corrected but also likely assumed corrected."*
+
+**Both conditions met before #151 was closed:** #136 is OPEN, and the 13 DIVERGES
+are documented in it — the re-frozen per-part table (comment 2026-09-16) and a
+consolidated list with each move's first divergent event and its family (comment
+2026-09-17, from `tests/expected/move_parity.tsv`). Closing #151 validates the
+apparatus only; the 13 defects remain #136's open work and are NOT assumed fixed.
+
+
 
 ## Ruled 2026-09-17 (14z-161b) — the close-time safeguards stand until #148; the order of work is stable state, #148, #152, then everything else
 

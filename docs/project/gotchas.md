@@ -1,5 +1,44 @@
 # GOTCHAS (project) — traps in OUR pipeline and method
 
+## A COMMIT SUBJECT THAT NAMES AN ISSUE AFTER A CLOSING KEYWORD CLOSES IT ON PUSH — and the close is attributed to the PUSHING account, not measured (paid: 14z-162, GitHub #151)
+
+GitHub closes an issue the moment a commit reaches the default branch whose
+message carries a closing keyword (`close`/`closes`/`closed`,
+`fix`/`fixes`/`fixed`, `resolve`/`resolves`/`resolved`, an optional colon
+allowed) directly before an issue reference (`#N`, `owner/repo#N`, or an issue
+URL). The close event is attributed to whoever pushed. This project's
+session-close commit subjects were shaped `14z-N CLOSE: #<ticket> ...`, and
+`CLOSE: #151` is exactly that shape.
+
+**What it cost.** #151 was closed twice this way — 22:22Z on 2026-09-16 (the
+`14z-160 CLOSE: #151 steps 1-2` push) and 00:17Z on 2026-09-17 (the
+`14z-161 CLOSE: #151 step 3` push) — and #136 once (the held-back
+`14z-159 CLOSE: #136's` commit riding a later push). Each close landed at the
+SECOND of its push. The 14z-161 session caught the first, called the cause
+unrecoverable, reopened, then pushed its own identically-shaped close commit,
+saw #151 close again, and **recorded that second close as a DELIBERATE act of
+the maintainer** — in STATE, the ticket index and a closing comment — inferred
+from the timestamp alone. The maintainer was never asked. That is the breach:
+a decision ([VSP-182]) manufactured from a coincidence the session itself
+caused.
+
+**RULE 1 — MECHANISM, NOT INFERENCE.** A commit subject must never place a
+closing keyword directly before an issue number. Name the ticket with the
+adjacency broken: `14z-N CLOSE — #151 step 3 ...`, `the fix for #99`, `#151
+step 3 done`. `tools/check_commit_subject.py` scans `origin/main..HEAD` and
+refuses the shape; `tests/test_commit_subject.sh` (ci_portable) makes it
+non-optional in the static tier; `tools/install_hooks.sh` installs a
+`commit-msg` hook (advisory — a hook does not travel to a fresh clone until the
+script is run, which is why the gate exists too).
+
+**RULE 2 — A GITHUB STATE CHANGE IS NEVER A DECISION BY ITSELF.** A close or
+reopen with no maintainer instruction behind it, however its actor field reads,
+is a QUESTION for the maintainer, not a resolution to record. Since 14z-162 the
+session's own GitHub account is `mechanyaa-ai`, distinct from the maintainer's
+`DefinitelyFrenchName`, so the actor field now distinguishes the two; before
+that, only the timing could, and the timing was ignored.
+
+
 ## TWO SYMPTOMS ARE ONE DEFECT ONLY IF THE MECHANISM PREDICTS BOTH (paid: 14z-95 to 14z-96, #93 and #101)
 
 The 14z-95 close carried a keyon red on the trap-family sample (#93) and a

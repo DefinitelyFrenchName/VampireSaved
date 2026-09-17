@@ -5,7 +5,9 @@
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## THE CLOSE TIER RAN IN FULL AT 14z-161b (156 / 0 / 0, 176 controls executed and honoured) AFTER A CLOSE THAT HAD PUSHED ON THE MID-SESSION FORM — the safeguard stands until #148. #151 STEP 3 IS DONE BY MEASUREMENT: NO GATE IN THE TREE READS A LATCHED BYTE WITH A VALUE A REAL PICK WOULD NOT WRITE. The confirm's flavor table has two rows (Phobos's cell 00, Donovan's 01), only their code reads it, and the id copies are read in play by nothing. Three gates freeze that. NO SHIPPED ROM BYTE MOVED; THE TREE IS AT merged-m18.
+## 14z-162 CORRECTED A TRUST BREACH: #151 AND #136 WERE NOT CLOSED BY THE MAINTAINER — a commit subject `14z-N CLOSE: #<n>` is a GitHub closing keyword and closed them on push, and the 14z-161 session then recorded #151's close as the maintainer's deliberate act (it was never asked). #151 REOPENED then CLOSED PROPERLY by explicit maintainer ruling (both conditions met: #136 open and documenting the 13 divergences); the false claim retracted in STATE row (8), the ticket index, and on the issue. Guarded now by `tools/check_commit_subject.py` + `tests/test_commit_subject.sh` and a `commit-msg` hook (`tools/install_hooks.sh`). The session's GitHub account is now `mechanyaa-ai`, distinct from the maintainer's `DefinitelyFrenchName`, so an actor field distinguishes the two; git author identity is set per repo. Gotcha: `docs/project/gotchas.md` "A COMMIT SUBJECT THAT NAMES AN ISSUE AFTER A CLOSING KEYWORD".
+
+## THE CLOSE TIER RAN IN FULL AT 14z-161b (156 / 0 / 0, 176 controls executed and honoured) AFTER A CLOSE THAT HAD PUSHED ON THE MID-SESSION FORM — the safeguard stands until #148. #151 STEP 3 IS DONE BY MEASUREMENT: NO GATE IN THE TREE READS A LATCHED BYTE WITH A VALUE A REAL PICK WOULD NOT WRITE. The confirm's flavor table has two rows (Phobos's cell 00, Donovan's 01), only their code reads it, and the id copies are read in play by nothing. Three gates freeze that. **#151 CLOSED done (14z-162) by the maintainer's conditional ruling; #136 stays open with all 13 divergences documented and is the work.** NO SHIPPED ROM BYTE MOVED; THE TREE IS AT merged-m18.
 
 M18 (`merged-m18`, `build/m3b_merged26`) is still the current freeze and release.
 `git status -sb` says the push state. The withdrawn M19 build dirs (`don_m23`,
@@ -31,7 +33,7 @@ UNREGISTERED — do not play them and do not point a gate at them.
   of its own; captures before conclusions ([VSP-136]). The maintainer's testimony
   (2026-09-16): these are the moves imported in several passes or tweaked. Every #136
   verdict now rests on real picks both sides (14z-160) and on legs the sweep found
-  faithful (14z-161) — the apparatus is clean (#151 closed 2026-09-17); the families are the work.
+  faithful (14z-161) — the apparatus is clean (#151 closed done 14z-162 by maintainer ruling); the families are the work.
 - **#150** (the freeze ritual's silent-green modes) is filed and unstarted.
 - Every other open ticket is on `docs/project/tickets.md`; the harness has BBH-frame-based #1.
 
