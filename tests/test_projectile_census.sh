@@ -14,6 +14,9 @@
 #   (GitHub #151): the poked leg's Donovan flavor had lengthened Phobos's
 #   Mighty Launcher windows by the 2-frame flavor-1 startup state and spawned a
 #   launcher from "Circuit Scrapper (ES)" that a real Phobos never spawns.
+#   Re-frozen 14z-165 when the rigs' P2 became DEMITRI by his real route
+#   (maintainer-ruled 2026-09-17; Victor until then) — P2's id is asserted from
+#   each leg's trace (RAM:$FF8B82 at frame 2300).
 #
 # HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -39,7 +42,7 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
-F="$(python3 -c "print(','.join([f'ff{0x9400+0x100*n+2:04x}:b:t{n:02d}' for n in range(32)]+['ff841c:l:node','ff8782:b:id']))")"
+F="$(python3 -c "print(','.join([f'ff{0x9400+0x100*n+2:04x}:b:t{n:02d}' for n in range(32)]+['ff841c:l:node','ff8782:b:id','ff8b82:b:p2id']))")"
 for t in donovan:2 donovan:4 pyron:2 pyron:4 huitzil:2 huitzil:4; do
     n=${t%%:*}; p=${t#*:}
     POKES="$(python3 -c "import json;print(';'.join(json.load(open('tests/replays/naming/${n}_$p.json'))['pokes']))")"
@@ -53,6 +56,8 @@ wait
 for t in donovan:2 donovan:4 pyron:2 pyron:4 huitzil:2 huitzil:4; do
     n=${t%%:*}; p=${t#*:}
     [ -s "$W/c_${n}_$p.txt" ] || bad "$n part $p: no samples"
+    p2="$(awk '$1=="F" && $2==2300 {for(i=3;i<=NF;i++) if ($i ~ /^p2id=/) {sub("p2id=","",$i); printf "%02x", $i}}' "$W/c_${n}_$p.txt")"
+    [ "$p2" = "$(python3 -c "import sys; sys.path.insert(0,'tools'); import name_moves; print(name_moves.TENANTS['$n']['p2_id'])")" ] || bad "$n part $p: P2 is id $p2, not Demitri (01) — the P2 route did not land"
     python3 tools/projectile_census.py "tests/replays/naming/${n}_$p.json" "$W/c_${n}_$p.txt" | sed "s/^/$n	/" >> "$W/got.txt"
 done
 if [ "${FREEZE:-0}" = 1 ]; then cp "$W/got.txt" tests/expected/projectile_census.txt; echo "  FROZE  tests/expected/projectile_census.txt from this run — VERIFY by re-running without FREEZE"; fi

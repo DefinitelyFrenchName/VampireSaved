@@ -94,7 +94,7 @@
 #
 # gate	lane	scope	cadence	args	note
 
-audit_move_parity	mame	release	romset	-	release: every EVENT of the three tenants' move lists, ours vs native vsav2, at a matched speed level with the RNG pinned and the anim node translated out of its placement — the per-part verdict is frozen in tests/expected/move_parity.tsv and growth is a finding (#136, 14z-159). Two must-fire controls.
+audit_move_parity	mame	release	romset	-	release: every EVENT of the three tenants' move lists, ours vs native vsav2, at a matched speed level with the RNG pinned and the anim node translated out of its placement — one verdict per EVENT frozen in tests/expected/move_parity_events.tsv (14z-164); P2 is Demitri by his real route and asserted never to enter a chain whose data differs between the games (14z-165). Three must-fire controls.
 test_mame_parity	prereq	release	romset	-	THE instrument gate: the pinned MAME source build must reproduce every frozen oracle log before the profile patch goes near it ([CPE-24]). Run it FIRST.
 test_mame_determinism	prereq	release	romset	-	RUNS defaults high; MAME's own run-to-run determinism
 test_attract_determinism	prereq	release	romset	-	M0 acceptance, 3600 frames

@@ -27,7 +27,7 @@
 1	Hop Kick	a2:0x27 a2:0x63
 1	Killshread Surf [j.2LK]	a2:0x28
 1	Killshread Surf [j.2MK]	a2:0x29
-1	Killshread Dive [j.2HK]	a2:0x2a
+1	Killshread Dive [j.2HK]	a2:0x2a  FACING-LEFT
 2	Blizzard Sword [LP]	a2:0x4a a2:0x4b a2:0x31
 2	Blizzard Sword [MP]	a2:0x4a a2:0x4b a2:0x32
 2	Blizzard Sword [HP]	a2:0x4a a2:0x4b a2:0x33

@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-362 entries (42 game / 105 platform / 215 project), counted from the buckets at generation.
+364 entries (42 game / 105 platform / 217 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 42 entries
 
@@ -175,7 +175,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - MAME READS THE USER'S OWN `mame.ini` EVEN UNDER `-homepath` — every harness leg inherits what that file sets (found 2026-09-15, 14z-158, gating the README's recording command; nothing paid)
 - MAME 0.288'S 68000 CORE HAS NO `A7` STATE, AND ITS `SP` IS THE SUPERVISOR STACK — a Lua stack read in user-mode code walks the idle stack (paid: 14z-85g as "constant garbage ret on every hit", named 14z-158)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 215 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 217 entries
 
 - A NEW ANCHOR DOCUMENT FOR A SKILL IS A TWO-REPO EDIT — the harness's consumer config carries its own copy of the skills lock's document list (paid: 14z-163, GitHub #152)
 - A COMMIT SUBJECT THAT NAMES AN ISSUE AFTER A CLOSING KEYWORD CLOSES IT ON PUSH — and the close is attributed to the PUSHING account, not measured (paid: 14z-162, GitHub #151)
@@ -392,3 +392,5 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - WHAT A FORCED PICK GETS WRONG IS DECIDED BY THE CELL'S TABLE AND THE FIGHTER'S READERS, NOT BY THE POKE — measure both halves before converting a single gate (paid: 14z-161, GitHub #151 step 3)
 - A LEGACY P2 IS A CROSS-GENERATION CONFOUND IN EVERY OURS-VS-NATIVE RIG — after the first contact the comparison is partly a comparison of two Victors (paid: 14z-164, GitHub #136)
 - "IN DF" IN A RIG'S EVENT NAME IS A CLAIM — assert the mode on every event, per leg (paid: 14z-164, GitHub #136)
+- A MATCHED-DATA P2 TURNS A DATA-DEPENDENT MUST-FIRE CONTROL DEAD — perturb a copy of your own trace instead (paid: 14z-165, GitHub #136)
+- WHEN P2 CARRIES THE SAME DATA ON BOTH GAMES, IT STOPS BEING A CONFOUND BUT STARTS FEEDING P1's TIMING — a guard-cancel rig moves (paid: 14z-165, GitHub #136)

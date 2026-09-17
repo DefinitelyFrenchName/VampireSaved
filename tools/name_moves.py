@@ -19,8 +19,15 @@ new chain is reported UNFIRED, never guessed.
 
 THE SCHEDULE is data in this file (per tenant, per part): each event is
 (name, recipe) and the generator lays events out at fixed spacing on top
-of replay 17's select prologue (P1 = the tenant at the native game's
-default-cursor R,R, P2 Victor R,R, both human, P2 idle). Recipes are the
+of replay 17's select prologue (P1 = the tenant by its real cursor path from
+the native game's default cell, P2 = DEMITRI by his (`R` from P2's default
+cell 0x05, on both wheels), both human, P2 idle). P2 was Victor (R,R) until
+14z-165: the maintainer ruled Demitri on 2026-09-17 because P2 is a LEGACY
+character — VS's copy on our leg, VS2's on the native one — and Victor's
+hitstun head hurtbox is retuned on vs2 (tests/test_same_data_p2.sh), which is
+where five of GitHub #136's 13 divergences began; Demitri's data differs on
+three chains only (b:0x10, b:0x71, b:0x74) and the parity gate asserts he
+never enters the last two. Recipes are the
 input cadences of rigs that ALREADY fired the move natively (59 for
 41236, 60 for 63214, 19 for 623, 48/56 for 421, 50 for 214, 27 for the
 toward-throw). Parts keep each replay under a round's timer.
@@ -40,40 +47,28 @@ import sys
 from pathlib import Path
 
 # ---------------------------------------------------------------- prologue
-# replay 17's select prologue on vsav2 (P1 = default cursor R,R = the tenant
-# on its native game for Donovan; P2 Victor R,R). Match anchor 2363,
+# replay 17's select prologue on vsav2: the four system taps, P1's cursor
+# moves from 1100 every 60 frames (the default cell 0x01: R,R = Donovan on
+# vsav2), P2's from 1104 every 60 frames (the default cell 0x05: R,R = Victor,
+# R = Demitri), P1's confirm at 1300, P2's at 1360. Match anchor 2363,
 # actionable ~2463 on both games (test_m2a_stage4_oracle.sh).
-PROLOGUE = """300-305 sys=C1
-420-425 sys=C2
-800-803 sys=S1
-940-943 sys=S2
-1100-1102 p1=R
-1160-1162 p1=R
-1104-1106 p2=R
-1164-1166 p2=R
-1300-1302 p1=1
-1360-1362 p2=1
-"""
+REPLAY17_P1 = ("R", "R")   # replay 17's P1 route: Donovan's cell on vsav2
+REPLAY17_P2 = ("R", "R")   # replay 17's P2 route: Victor's cell on vsav2 (the victim rigs keep it)
 
 
 def prologue(tenant):
-    """The select prologue: replay 17's, with P1's cursor moves replaced by the
-    tenant's real path when it has one (14z-160). Moves start at 1100, 60 frames
-    apart, so a three-move path (1100/1160/1220) still confirms at 1300."""
-    path = TENANTS[tenant].get("path")
-    if not path:
-        return PROLOGUE.rstrip()
-    out = []
-    t = 1100
-    for line in PROLOGUE.rstrip().split("\n"):
-        if line.endswith("p1=R") and line.startswith(("1100-", "1160-")):
-            continue
-        if line.startswith("1104-"):
-            for m in path:
-                out.append(f"{t}-{t + 2} p1={m}")
-                t += 60
-        out.append(line)
-    return "\n".join(out)
+    """The select prologue: replay 17's shape, with each cursor's moves replaced
+    by the tenant's real path when it has one (P1 since 14z-160, P2 since
+    14z-165). Moves start at 1100 (P1) / 1104 (P2), 60 frames apart, so a
+    three-move path (1100/1160/1220) still confirms at 1300."""
+    t = TENANTS[tenant]
+    p1 = t.get("path") or REPLAY17_P1
+    p2 = t.get("p2_path") or REPLAY17_P2
+    lines = ["300-305 sys=C1", "420-425 sys=C2", "800-803 sys=S1", "940-943 sys=S2"]
+    lines += [f"{1100 + 60 * i}-{1102 + 60 * i} p1={m}" for i, m in enumerate(p1)]
+    lines += [f"{1104 + 60 * i}-{1106 + 60 * i} p2={m}" for i, m in enumerate(p2)]
+    lines += ["1300-1302 p1=1", "1360-1362 p2=1"]
+    return "\n".join(lines)
 FIRST_EVENT = 2600
 # The native game is vsav2 for all three. Donovan is the default cursor's
 # R,R pick. SINCE 14z-160 (GitHub #151) Phobos and Pyron are REAL CURSOR PICKS
@@ -87,21 +82,39 @@ FIRST_EVENT = 2600
 # (tests/audit_forced_pick_fidelity.sh freezes exactly that inventory). The
 # victim rigs (P1 Victor, P2 the tenant, both poked) keep the poke for now:
 # eight gates freeze on them and their re-judging is #151's step 3.
+# P2 OF THE NAMING (PARITY) RIGS IS DEMITRI SINCE 14z-165 (maintainer-ruled
+# 2026-09-17, DECISIONS_HISTORY.md "the parity rigs' P2 is DEMITRI, Bishamon
+# the fallback"): `p2_id` / `p2_path` — the real cursor route from P2's default
+# cell 0x05, `R` on the vsav2 wheel AND on the merged wheel (tools/select_paths.py,
+# measured 14z-165), so the parity gate's two legs share the P2 lines verbatim.
+# Demitri's data differs between vsavj and vs2 on three chains only (b:0x10 the
+# held-pose push box every legacy character carries, and b:0x71 / b:0x74, one
+# attack record each — tests/expected/same_data_p2.tsv); every rig that puts
+# him on P2 asserts he never enters the two ATTACK records b:0x71/b:0x74
+# (tools/move_parity.py p2check --never), and REPORTS his frame count in the pose
+# b:0x10 and asserts it equal on both legs (--report; 14z-165, rule-checker run
+# 2026-09-17-29 Q4: b:0x10 is a pushbox difference he enters identically on both
+# games, a bounded positional confound for the family pass).
+# The VICTIM rigs are NOT parity rigs: their P1 is Victor the ATTACKER (his
+# moves are the events) and their P2 is the tenant, so they keep replay 17's
+# routes and pokes unchanged.
 # The chains are decoded from each tenant's vs2 extract (the solo build dir).
-TENANTS = {"donovan": {"id": None, "build": "build/don_m22"},
+TENANTS = {"donovan": {"id": None, "p2_id": "01", "p2_path": ("R",), "build": "build/don_m22"},
            # PHASE 3 (reactions): the tenant on the VICTIM side (P2) — P1 is Victor (0x03), both by the early-window pokes
            "donovan_victim": {"id": "03", "id_p2": "13", "build": "build/don_m22"},
            "huitzil_victim": {"id": "03", "id_p2": "10", "build": "build/hui56"},
            "pyron_victim":   {"id": "03", "id_p2": "11", "build": "build/pyron41"},
-           "huitzil": {"id": "10", "path": ("L", "L", "L"), "build": "build/hui56"},
-           "pyron":   {"id": "11", "path": ("R", "R", "R"), "build": "build/pyron41"}}
-# P2 HP re-pin (both words, [VSP-125]) so a projectile-fed Victor never dies.
+           "huitzil": {"id": "10", "path": ("L", "L", "L"), "p2_id": "01", "p2_path": ("R",), "build": "build/hui56"},
+           "pyron":   {"id": "11", "path": ("R", "R", "R"), "p2_id": "01", "p2_path": ("R",), "build": "build/pyron41"}}
+P2_NEVER  = ("b:0x71", "b:0x74")   # Demitri's two ATTACK-record chains whose data differs between vsavj and vs2 (tests/expected/same_data_p2.tsv row 0x01): if P2 entered one his compared HP would differ by his own data, so the rigs assert he never does (measured: never entered)
+P2_REPORT = ("b:0x10",)            # his held-pose PUSH-BOX chain, the third differing one — every legacy character gained it on vs2. He DOES enter it (a pose, not an attack), so it is not a never; the gate reports his frame count and asserts it EQUAL on both legs, so the datum difference is a bounded positional confound (a candidate for the x-DIFF rows) rather than a divergence in what he does (rule-checker run 2026-09-17-29 Q4)
+# P2 HP re-pin (both words, [VSP-125]) so a projectile-fed P2 never dies.
 HP_PIN_EVERY = 400
 
 # ---------------------------------------------------------------- recipes
 # A recipe is a list of (start_offset, end_offset, tokens[, who]) relative to
 # the event frame; tokens in replay.lua grammar (U D L R 1-6), who = p1
-# (default) or p2 (the idle Victor, scripted only for an air throw's jump
+# (default) or p2 (the idle P2 — Demitri, scripted only for an air throw's jump
 # and the guard-cancel setup). P1 faces RIGHT.
 B = {"LP": "1", "MP": "2", "HP": "3", "LK": "4", "MK": "5", "HK": "6",
      "PP": "13", "KK": "46"}  # PP/KK = any two: LP+HP / LK+HK (ES resolver takes any pair)
@@ -153,7 +166,7 @@ def hold_pair(motion, pair, hold):  # an EX whose pair is HELD then released
 def rushing_punch():  # while dashing, 6+P
     return [(0, 1, "R"), (4, 5, "R"), (9, 12, "R1")]
 def guard_cancel(b, hit_at):
-    # P2 (Victor, at contact) presses HP; P1 blocks (holds back through the
+    # P2 (Demitri, at contact) presses HP; P1 blocks (holds back through the
     # hit) then inputs 623+b inside blockstun. hit_at = frames from P2's press
     # to the block, tried at several values by separate events.
     return [(0, 3, "3", "p2"), (-4, hit_at + 4, "L"), (hit_at + 5, hit_at + 7, "R"), (hit_at + 8, hit_at + 10, "D"), (hit_at + 11, hit_at + 14, "DR" + B[b])]
@@ -390,7 +403,7 @@ DONOVAN = {
         ("Blizzard Sword [LP] blocked", hcf("LP"), 300),
     ],
     "12": [  # KILLSHREAD (ES) — the maintainer's ruling 14z-121: the ES plant's effect plays DURING THE SUMMON (the sword
-             # attacks going away AND coming back; the plain summon one way). P2 (Victor, idle) pinned in the sword's path.
+             # attacks going away AND coming back; the plain summon one way). P2 (Demitri, idle) pinned in the sword's path.
         ("Killshread [214LK] plant", qcb("LK"), 260, "far"),
         ("Killshread Summon [214LK] after plain", qcb("LK"), 320, "far"),
         ("Killshread (ES) plant", qcb("KK"), 260, "far"),
@@ -519,7 +532,7 @@ HUITZIL = {
         ("Ray of Doom [LP+LK]", pair("14"), 200, "far"),
         ("5LP in DF", stand("LP"), 200, "far"), ("Plasma Beam [LP] in DF", qcf("LP"), 300, "far"),
     ],
-    "5": [  # Reflect Wall = the guard cancel: P2 Victor HP at contact, P1 blocks then 623+button inside blockstun
+    "5": [  # Reflect Wall = the guard cancel: P2 (Demitri) HP at contact, P1 blocks then 623+button inside blockstun
         ("Reflect Wall [gc LP at hit+2]", gc_fast("LP", 12), 220, "near"),
         ("Reflect Wall [gc LP at hit+6]", gc_fast("LP", 16), 220, "near"),
         ("Reflect Wall [gc LP at hit+10]", gc_fast("LP", 20), 220, "near"),
@@ -671,6 +684,8 @@ def gen(tenant, part, out_rpl, out_sched):
              "# schedule in the tool. Analyse with: name_moves.py analyse <schedule.json>.",
              prologue(tenant)]
     sched = {"tenant": tenant, "part": part, "events": [], "pokes": []}
+    if TENANTS[tenant].get("p2_path"):   # the naming rigs: P2 by his real route (the victim rigs' P2 is a poke, below)
+        sched["p2"] = {"id": TENANTS[tenant]["p2_id"], "path": list(TENANTS[tenant]["p2_path"]), "never": list(P2_NEVER), "report": list(P2_REPORT)}
     t = FIRST_EVENT
     tid = TENANTS[tenant]["id"]
     pin_pokes = []
@@ -818,8 +833,9 @@ def expect(sched_path, trace_path, chains_dir):
     order. This is what tests/test_move_naming.sh freezes."""
     sched = json.load(open(sched_path))
     node2chain, starts, edges = load_graph(chains_dir)
-    rows = []; facing = {}; ids = {}
+    rows = []; facing = {}; ids = {}; p2ids = {}
     want_id = int(TENANTS[sched["tenant"]]["id"] or "13", 16)   # Donovan = 0x13, the default cursor's pick
+    want_p2 = int(sched["p2"]["id"], 16) if sched.get("p2") else None   # the naming rigs' P2 (Demitri) — asserted when the trace carries p2id
     for line in open(trace_path):
         f = line.split()
         if len(f) < 3 or f[0] != "F":
@@ -828,6 +844,7 @@ def expect(sched_path, trace_path, chains_dir):
         rows.append((int(f[1]), int(d["node"])))
         if "face" in d: facing[int(f[1])] = int(d["face"])
         if "id" in d: ids[int(f[1])] = int(d["id"])
+        if "p2id" in d: p2ids[int(f[1])] = int(d["p2id"])
     ent = {}
     prev = None
     for fr, node in rows:
@@ -846,6 +863,8 @@ def expect(sched_path, trace_path, chains_dir):
         mark = "  FACING-LEFT" if (e["frame"] in facing and facing[e["frame"]] == 0) else ""
         if e["frame"] in ids and ids[e["frame"]] != want_id:
             mark += f"  WRONG-ID:{ids[e['frame']]:#x}"   # the wrong character is on P1 — the line can never match a sane freeze
+        if want_p2 is not None and e["frame"] in p2ids and p2ids[e["frame"]] != want_p2:
+            mark += f"  WRONG-P2:{p2ids[e['frame']]:#x}"   # the wrong character is on P2 (14z-165: Demitri by his real route)
         out.append(f"{sched['part']}\t{e['name']}\t" + " ".join(f"{t}:0x{q:02x}" if t != "OFF" else f"OFF:{q:#x}" for t, q in seen) + mark)
     return out
 

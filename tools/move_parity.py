@@ -18,9 +18,17 @@ node that falls in no placed region is reported, never silently compared
 ([VSP-166]: say what the expectation is anchored to).
 
 WHAT IS EXCLUDED, AND WHY.
-  - P2 is VICTOR, a LEGACY character — VS's Victor on our leg and VS2's on the
-    native one — so his node is never evidence about the port ([VSP-168]). His HP
-    is a number and is compared by the caller where it is meaningful.
+  - P2 is a LEGACY character — VS's copy on our leg and VS2's on the native
+    one — so his node is never evidence about the port ([VSP-168]). His HP is a
+    number and is compared by the caller where it is meaningful. P2 is DEMITRI
+    since 14z-165 (maintainer-ruled 2026-09-17; Victor until then): his data
+    differs between the games on three chains only (tests/expected/same_data_p2.tsv
+    — b:0x10, b:0x71, b:0x74); `p2check` (below) asserts from each leg's own trace
+    that he never enters the two ATTACK records (b:0x71/b:0x74, which would corrupt
+    his compared HP) and REPORTS his frame count in the pose b:0x10 (the held-pose
+    push box every legacy character gained on vs2), which the gate asserts equal on
+    both legs — he enters it identically, so its datum difference is a bounded,
+    named positional confound for the family pass, not a divergence in what he does.
   - The INTRO (match anchor .. the rig's first event) is excluded: the intro
     variant is an RNG draw at char load, so the two legs play different intros
     unless the RNG is pinned through the load — and pinning it there prevents the
@@ -37,7 +45,7 @@ each event is compared IN ITS OWN WINDOW [its frame, the next event's frame)
 and judged on its own: IDENT, DIFF (first differing frame and fields), VOID (no
 live frames). Two more fields join the tenant's: METER (`RAM:$FF850A`, the
 meter fraction — a stock crossing was the only way a meter difference showed
-before) and P2HP (`RAM:$FF8850`, Victor's HP — damage dealt); these two, the
+before) and P2HP (`RAM:$FF8850`, P2's HP — damage dealt); these two, the
 stock and the tenant's own HP are CUMULATIVE and are compared as their change
 from the previous sample; and EVERY compared field the rig itself writes (its
 per-event X pin, which lands 40 frames before the next event and so inside the
@@ -57,6 +65,16 @@ is NOT-IN-DF — 21 of the 24 "in DF" events of Donovan's part 6 ran with the
 flag 0 on both legs before this (DF lasts 360 frames; the battery spans 3,850).
 An event that ACTIVATES DF (its name carries a DF move: Slay Shred, Ray of
 Doom, Shining Gemini) must see the flag rise on both legs, or DF-NOT-ENTERED.
+
+P2CHECK (14z-165). `p2check <trace> <data image> --layout vsav2|vsavj --id 01
+--never b:0x71,b:0x74 --report b:0x10 [--from FRAME]` maps P2's sampled anim node pointer
+(`p2node`, RAM:$FF881C) onto P2's OWN chain graph as decoded from that leg's
+game image (the vs2 data view for the native leg, the build's data view for
+ours — tools/audit_same_data_p2.py's node index under the game's bank
+layout), asserts P2's id (`p2id`, RAM:$FF8B82) at the first sampled frame, and
+FAILS if any sampled frame lies in a chain named by --never. The chains
+entered and their frame counts are printed, so the assertion is a printed
+number, never an assumption.
 """
 import argparse
 import json
@@ -188,19 +206,99 @@ def compare_events(tenant, native, ours, placements, events, pokes, exclude_pins
     return out
 
 
+def p2_chain_index(image_path, layout, cid, bank_map=None):
+    """{node address: (table, seq)} for one legacy character under one game's
+    bank layout — tools/audit_same_data_p2.py's index, normalised to ints."""
+    import os
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import _minitoml
+    import audit_same_data_p2 as sd
+    bank_map = bank_map or os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "build", "manifest", "bank_map.toml")
+    bank = _minitoml.loads(open(bank_map).read())
+    orig = {"vsavj": int(bank["origins"]["vsavj"]), "vsav2": int(bank["origins"]["vsav2"])}
+    delta = orig[layout] - orig["vsavj"]
+    rows = {t["name"]: int(t["vsavj"]) for t in bank["table"]}
+    img = open(image_path, "rb").read()
+    out = {}
+    for addr, (table, seq, _k) in sd.node_index(img, rows, delta, cid).items():
+        a = int(addr, 16) if isinstance(addr, str) else int(addr)
+        q = int(seq, 0) if isinstance(seq, str) else int(seq)
+        out[a] = (table, q)
+    return out
+
+
+def p2check(trace, image, layout, cid, never, first, report=()):
+    """P2's identity and chain history from one leg's trace; returns (ok, lines).
+    `never` chains FAIL (attack records that would corrupt P2's compared HP);
+    `report` chains are counted and printed as `P2REPORT: <chain>=<n>` for the
+    caller to assert equal on both legs — a pose whose datum differs (b:0x10 the
+    held-pose push box) is entered legitimately, and equal counts prove the
+    difference is the datum, not a behavioural cascade (run 2026-09-17-29 Q4)."""
+    t = load_trace(trace)
+    frames = sorted(f for f in t if f >= first)
+    lines = []
+    if not frames:
+        return False, ["FAIL: no sampled frame at or after %d" % first]
+    f0 = frames[0]
+    if "p2id" not in t[f0] or "p2node" not in t[f0]:
+        return False, ["FAIL: the trace carries no p2id/p2node field (sample RAM:$FF8B82 and RAM:$FF881C)"]
+    got = t[f0]["p2id"]
+    lines.append("p2 id at f%d: %#04x (want %#04x)" % (f0, got, cid))
+    ok = got == cid
+    idx = p2_chain_index(image, layout, cid)
+    seen = {}
+    unmapped = 0
+    for f in frames:
+        n = t[f]["p2node"] & 0xFFFFFFFF
+        k = idx.get(n)
+        if k is None:
+            if n: unmapped += 1
+            continue
+        seen[k] = seen.get(k, 0) + 1
+    names = {"%s:0x%02x" % k: v for k, v in seen.items()}
+    lines.append("p2 chains entered over %d frames (%d unmapped non-zero nodes): %s" % (
+        len(frames), unmapped, " ".join("%s=%d" % kv for kv in sorted(names.items()))))
+    for nv in never:
+        if nv in names:
+            ok = False
+            lines.append("FAIL: P2 entered %s on %d frame(s) — a chain whose data differs between the games" % (nv, names[nv]))
+    rep = " ".join("%s=%d" % (r, names.get(r, 0)) for r in report)
+    if report:
+        lines.append("P2REPORT: " + rep)
+    if unmapped > 0.05 * len(frames):
+        ok = False
+        lines.append("FAIL: %d of %d frames hold a P2 node outside P2's decoded graph — the image or layout is not this leg's" % (unmapped, len(frames)))
+    return ok, lines
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("mode", choices=["compare", "events"])
-    ap.add_argument("tenant", choices=sorted(ANIM_KEY))
-    ap.add_argument("part")
-    ap.add_argument("native")
-    ap.add_argument("ours")
-    ap.add_argument("placements")
-    ap.add_argument("--first-event", type=int, required=True)
+    ap.add_argument("mode", choices=["compare", "events", "p2check"])
+    ap.add_argument("tenant", help="compare/events: the tenant; p2check: the TRACE file")
+    ap.add_argument("part", help="compare/events: the part; p2check: the game's DATA IMAGE for P2's leg")
+    ap.add_argument("native", nargs="?")
+    ap.add_argument("ours", nargs="?")
+    ap.add_argument("placements", nargs="?")
+    ap.add_argument("--first-event", type=int)
+    ap.add_argument("--layout", choices=("vsav2", "vsavj"), help="p2check: the bank layout the image is read with")
+    ap.add_argument("--id", help="p2check: P2's character id, hex (Demitri 01)")
+    ap.add_argument("--never", default="b:0x71,b:0x74", help="p2check: attack-record chains P2 must NEVER enter (they carry P2 damage, a compared field; comma-separated table:0xNN)")
+    ap.add_argument("--report", default="b:0x10", help="p2check: pose chains whose data differs but which P2 may enter — their frame count is PRINTED as P2REPORT for the caller to assert equal on both legs (comma-separated table:0xNN)")
+    ap.add_argument("--from", dest="from_frame", type=int, default=0, help="p2check: first frame to judge (default: every sampled frame)")
     ap.add_argument("--events", help="the rig's schedule json, to name the divergent event")
     ap.add_argument("--tsv", action="store_true")
     ap.add_argument("--no-pin-exclusion", action="store_true", help="events: compare on the rig's pin frames too (the gate's pins-ignored control)")
     a = ap.parse_args()
+    if a.mode == "p2check":
+        if not (a.layout and a.id):
+            print("p2check needs --layout and --id", file=sys.stderr); return 2
+        ok, lines = p2check(a.tenant, a.part, a.layout, int(a.id, 16), [x for x in a.never.split(",") if x], a.from_frame, [x for x in a.report.split(",") if x])
+        print("\n".join(lines))
+        return 0 if ok else 1
+    if a.tenant not in ANIM_KEY:
+        print("unknown tenant %s" % a.tenant, file=sys.stderr); return 2
+    if a.first_event is None or not (a.native and a.ours and a.placements):
+        print("%s needs <native> <ours> <placements> --first-event N" % a.mode, file=sys.stderr); return 2
     name = "%s_%s" % (a.tenant, a.part)
     if a.mode == "events":
         if not a.events:

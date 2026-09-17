@@ -4922,3 +4922,52 @@ for them are not in-DF measurements. `tools/move_parity.py events` now returns
 NOT-IN-DF for an "in DF" window whose flag is not up on 90% of its frames on
 both legs, and DF-NOT-ENTERED for an activation that did not raise it — a
 [VSE-76]-shaped rule at the granularity of the event, not the rig.
+
+## A MATCHED-DATA P2 TURNS A DATA-DEPENDENT MUST-FIRE CONTROL DEAD — perturb a copy of your own trace instead (paid: 14z-165, GitHub #136)
+
+The move-parity gate's `pins-ignored` control (14z-164) hunted for a real part
+whose verdict rows MOVED when the rig's own pin frames were compared instead of
+excluded — pyron_4's Cosmo Disruption held row, `+167` excluded and `+50` at
+the HP-pin frame, was that mover. It worked only because P2 was Victor and his
+data differs between the games, so the pinned HP frames genuinely disagreed.
+When 14z-165 switched P2 to Demitri (whose defense curve is the same on both
+games) BOTH legs agree on every pin frame, no real row moves with the exclusion
+off, and the control read DEAD — a control that depends on the data under test
+is a control that a clean result silently disarms. Rebuilt as a
+`perturbed-copy`: a copy of OUR trace with the compared x altered by +7 on
+exactly the rig's `RAM:$FF8410` pin frames, which must leave every verdict as
+frozen UNDER the exclusion and move at least one WITHOUT it. The perturbation is
+one function the control section and the `CONTROL=pins-ignored` mode both call
+([VSP-181]); the mode judges the verdict columns only, because the `excluded`
+count changes trivially with the exclusion off and would fire the control on its
+own bookkeeping. Rule: a must-fire control whose firing depends on the data
+being non-identical is not a control once the data matches — perturb a copy of
+the real input on exactly the frames the assertion protects.
+
+## WHEN P2 CARRIES THE SAME DATA ON BOTH GAMES, IT STOPS BEING A CONFOUND BUT STARTS FEEDING P1's TIMING — a guard-cancel rig moves (paid: 14z-165, GitHub #136)
+
+The 14z-164 gotcha above ("A LEGACY P2 IS A CROSS-GENERATION CONFOUND") said to
+pick a P2 whose data is the same on both games; the maintainer ruled Demitri
+(2026-09-17, DECISIONS_HISTORY.md 14z-164b). Switching Victor -> Demitri turned
+13 former Victor-first DIFF rows IDENT (the confound was real), but it also
+moved the huitzil_5/6 guard-cancel (Reflect Wall) events IDENT -> DIFF: those
+rigs time P1's block to P2's 5HP, and Demitri's 5HP differs from Victor's in
+startup and range, so P1's own x and node now diverge between ours and native.
+The lesson is not that Demitri is wrong — his DATA is identical on both legs, so
+a DIFF there is a real ours-vs-native difference in how OUR engine runs the
+guard cancel, not a two-Victors artifact. It is that a P2 change re-times every
+rig whose P1 input is cued off P2's attack, so a P2 switch re-freezes those
+parts by construction and the moved rows are for the family pass, not evidence
+the switch went wrong. Assert P2's identity AND that he carries matched data
+(tools/move_parity.py p2check: id 0x01, never the ATTACK records b:0x71/b:0x74),
+then read the moved rows as the rig's new baseline. AND WATCH THE THIRD DIFFERING
+CHAIN: same_data_p2.tsv lists THREE Demitri chains differing between the games,
+not two — b:0x10 the held-pose push box (every legacy character gained it on vs2)
+is the third, and a hard never on it is wrong because Demitri ENTERS the pose
+(donovan_3 22 f, donovan_12 43 f). It is instead REPORTED (p2check --report) and
+asserted EQUAL on both legs, so its pushbox datum difference is a bounded
+positional confound (a candidate for the x-DIFF rows), not a divergence in what
+P2 does. The rule-checker caught the missing b:0x10 (run 2026-09-17-29 Q4): when
+you narrow a differing-data set to a subset, name why each excluded member is
+harmless or the checker will — a pushbox difference reaches a COMPARED field (x)
+through contact even when the attack-record differences do not.

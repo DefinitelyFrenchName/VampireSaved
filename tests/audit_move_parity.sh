@@ -3,7 +3,7 @@
 #
 # MUST-FIRE: perturbed-copy: unpinned-level — the native leg left at vsav2's DEFAULT play mode (TURBO, level 8) against ours at NORMAL must fail every part, so each verdict is proven to rest on the level the gate pins (in-gate: one part is re-run with the native level pin withheld and must diverge; mode: every native leg runs unpinned and the comparisons FAIL)
 # MUST-FIRE: shadow-tool: no-translation — comparing our RAW anim node pointer against native's, without translating it out of its placement, must fail, so every IDENTICAL verdict is proven to rest on the translation (in-gate: one part is compared both ways; mode: every part is compared untranslated and FAILs)
-# MUST-FIRE: shadow-tool: pins-ignored — comparing with the rig's own pin frames NOT excluded must move at least one frozen row of a part whose schedule pins a compared field (pyron_4, in the default set since 14z-164: its Cosmo Disruption [KK held] row reads +167 excluded and +50, the HP-pin frame, not excluded), so the exclusion is proven live and load-bearing; a schedule without a `pokes` key is refused by the comparator (in-gate: pyron_4 compared both ways; mode: every part compared with the exclusion off and the table FAILs)
+# MUST-FIRE: perturbed-copy: pins-ignored — a copy of OUR trace with the compared X altered on exactly the rig's own X-pin frames (RAM:$FF8410, 40 f before each pinned event) must leave every verdict of the part as frozen under the pin exclusion and move at least one verdict with the exclusion off, so the exclusion is proven live in the comparator and load-bearing on the rig's own writes; a schedule without a `pokes` key is refused by the comparator (in-gate: the first part of the set whose schedule pins X — pyron_4 in the default set — compared both ways on its perturbed copy; mode: every part compared on its perturbed copy with the exclusion off, verdict columns only, and the table FAILs). Until 14z-165 this control hunted for a part whose REAL rows moved with the exclusion off; with Demitri on P2 no part of the 30 does (both legs agree on every pin frame), so a data-dependent control read DEAD
 #
 # WHAT IT MEASURES. tools/name_moves.py already performs every move of the
 # maintainer's move lists (build/manifest/moves_<tenant>.toml, 145 moves) on the
@@ -12,7 +12,7 @@
 # inputs, on native vsav2 and on the merged WIDE build, comparing the TENANT's
 # own state every frame — node (translated out of its placement), seq, sub-state,
 # node counter, x, y, stock, facing, Dark Force flag and HP — PLUS, since 14z-164,
-# the METER FRACTION (RAM:$FF850A) and VICTOR's HP (RAM:$FF8850, damage dealt).
+# the METER FRACTION (RAM:$FF850A) and P2's HP (RAM:$FF8850, damage dealt).
 # The comparator and what it excludes are tools/move_parity.py.
 #
 # THE VERDICT IS PER EVENT SINCE 14z-164 (GitHub #136, maintainer-agreed
@@ -53,12 +53,26 @@
 #     id copies — tests/audit_forced_pick_fidelity.sh), so a poked leg is not
 #     the tenant. Identity is ASSERTED from each leg's own trace, never assumed.
 #
+# P2 IS DEMITRI SINCE 14z-165 (maintainer-ruled 2026-09-17, DECISIONS_HISTORY.md
+# "the parity rigs' P2 is DEMITRI, Bishamon the fallback"; Victor until then).
+# P2 is a legacy character, VS's copy on our leg and VS2's on the native one, so
+# his node is never compared ([VSP-168]), only his HP — and Victor's basic hit
+# reactions carry a retuned head hurtbox on vs2 (tests/test_same_data_p2.sh),
+# which is where the 14z-164 census read five of the 13 part-level first
+# divergences beginning (GitHub #136). Demitri's data differs between the games
+# on three chains only — b:0x10 (the held-pose push box every legacy character
+# gained on vs2), b:0x71 and b:0x74 (one attack record each) — so each leg's
+# trace is checked with tools/move_parity.py p2check: P2's id is 0x01 at the
+# first sampled frame and P2's node NEVER lies in b:0x71 / b:0x74 over the
+# compared frames, on the native leg against the vs2 data view and on ours
+# against the build's own data view. His route is `R` from P2's default cell
+# 0x05 on BOTH wheels (tools/select_paths.py), so the two legs share the P2
+# prologue lines verbatim. The 506 events were re-frozen on him at 14z-165.
+#
 # WHAT IT DOES NOT COVER: hitboxes and projectile parameters — separate
-# instruments. P2 is Victor, a legacy character: his node is never compared
-# ([VSP-168]), only his HP; and his basic hit reactions carry a retuned head
-# hurtbox on vs2 (tests/test_same_data_p2.sh), so a DIFF that begins after
-# contact may be his, not the tenant's — the 14z-164 census read five of the 13
-# part-level first divergences as Victor-first (GitHub #136, the re-labelled table).
+# instruments; and a DIFF that begins after contact is still not attributed to
+# a side by this gate (P2's hurtboxes are the same data on both legs now, but
+# the engine that reads them is each game's own).
 #
 # THE FORCED-PICK HISTORY (14z-159 -> 14z-160, GitHub #147/#151). Until 14z-160
 # Phobos's and Pyron's native legs were FORCED by the early-window poke, and the
@@ -114,7 +128,7 @@ elif [ "${ALL:-0}" = 1 ]; then
   # which the per-part gate never ran
   SET="$(ls "$REPO"/tests/replays/naming/donovan_[0-9]*.json "$REPO"/tests/replays/naming/huitzil_[0-9]*.json "$REPO"/tests/replays/naming/pyron_[0-9]*.json | sed 's|.*/||; s|\.json$||' | sort -t_ -k1,1 -k2,2n | tr '\n' ' ')"
 else
-  SET="donovan_1 pyron_4 huitzil_1"   # pyron_4 since 14z-164: the part the pins-ignored control needs
+  SET="donovan_1 pyron_4 huitzil_1"   # pyron_4 since 14z-164: a part whose schedule pins X, which the pins-ignored control needs
 fi
 
 ID_donovan=13; ID_huitzil=10; ID_pyron=11
@@ -154,7 +168,7 @@ rpl_for() {
         { print }' "$_r" > "$_o"
 }
 
-FIELDS="ff841c:l:node,ff8420:b:cnt,ff8406:b:seq,ff8407:b:sub,ff8509:b:stock,ff8410:w:x,ff8414:w:y,ff8450:w:p1hp,ff8782:b:id,ff802e:b:df,ff840b:b:face,ff8116:b:lvl,ff850a:w:meter,ff8850:w:p2hp"
+FIELDS="ff841c:l:node,ff8420:b:cnt,ff8406:b:seq,ff8407:b:sub,ff8509:b:stock,ff8410:w:x,ff8414:w:y,ff8450:w:p1hp,ff8782:b:id,ff802e:b:df,ff840b:b:face,ff8116:b:lvl,ff850a:w:meter,ff8850:w:p2hp,ff881c:l:p2node,ff8b82:b:p2id"
 
 run_leg() {  # run_leg <tenant> <part> <leg>
     _t="$1"; _p="$2"; _leg="$3"
@@ -175,7 +189,27 @@ run_leg() {  # run_leg <tenant> <part> <leg>
       rm -rf "$W/${_t}_${_p}_$_leg/sb" ) </dev/null &
 }
 
-verdict_for() {  # verdict_for <tenant> <part> [--raw]
+# perturb_x_pins <schedule.json> <trace in> <trace out>: OUR trace with x altered
+# by +7 on exactly the frames the rig pins RAM:$FF8410 — the pins-ignored
+# control's perturbed copy ([VSP-181]: one function, the control and the mode).
+# Prints how many frames were altered (0 = the part pins no X; not a control part).
+perturb_x_pins() {
+    python3 - "$1" "$2" "$3" <<'PYX'
+import json, sys
+pins = {int(p.split(":")[0]) for p in json.load(open(sys.argv[1]))["pokes"] if p.split(":")[1].lower() == "ff8410"}
+n = 0
+with open(sys.argv[2]) as fi, open(sys.argv[3], "w") as fo:
+    for line in fi:
+        f = line.split()
+        if len(f) >= 3 and f[0] == "F" and int(f[1]) in pins:
+            f = [("x=%d" % (int(t[2:]) + 7)) if t.startswith("x=") else t for t in f]; n += 1
+            line = " ".join(f) + "\n"
+        fo.write(line)
+print(n)
+PYX
+}
+
+verdict_for() {  # verdict_for <tenant> <part> [--raw | --pert | --pert-no-pins]
     _t="$1"; _p="$2"; _raw="${3:-}"
     # the no-translation MODE applies the same perturbation to every part
     [ "$CONTROL" = no-translation ] && _raw=--raw
@@ -183,9 +217,16 @@ verdict_for() {  # verdict_for <tenant> <part> [--raw]
     _fe="$(python3 -c "import json;print(json.load(open('$_j'))['events'][0]['frame'])")"
     _pl="$BUILD/patch/placements.json"
     [ "$_raw" = --raw ] && _pl="$W/nullplacements.json"
-    _np=""; { [ "$_raw" = --no-pins ] || [ "$CONTROL" = pins-ignored ]; } && _np="--no-pin-exclusion"
+    _ours="$W/tr_${_t}_${_p}_ours.txt"
+    # the pins-ignored MODE compares every part on its perturbed copy with the exclusion off
+    [ "$CONTROL" = pins-ignored ] && _raw=--pert-no-pins
+    case "$_raw" in --pert|--pert-no-pins)
+        _ours="$W/tr_${_t}_${_p}_ours.pert.txt"
+        [ -f "$_ours" ] || perturb_x_pins "$_j" "$W/tr_${_t}_${_p}_ours.txt" "$_ours" > /dev/null ;;
+    esac
+    _np=""; [ "$_raw" = --pert-no-pins ] && _np="--no-pin-exclusion"
     python3 "$REPO/tools/move_parity.py" events "$_t" "$_p" \
-        "$W/tr_${_t}_${_p}_native.txt" "$W/tr_${_t}_${_p}_ours.txt" "$_pl" \
+        "$W/tr_${_t}_${_p}_native.txt" "$_ours" "$_pl" \
         --first-event "$_fe" --events "$_j" $_np 2>/dev/null || true
 }
 
@@ -220,6 +261,32 @@ for part in $SET; do
 done
 [ "$fail" = 0 ] || { echo "FAIL: a leg is not the tenant"; exit 1; }
 ok "every leg is the tenant by its own trace (id at 2300)"
+# P2 (14z-165): Demitri by his real route on both legs, and never in a chain whose
+# data differs between the games — from each leg's own trace against that leg's
+# game image (native: the vs2 data view; ours: the build's data view).
+. "$REPO/tests/lib/decrypt_cache.sh"
+decrypt_view vsav2 "$W/v2_op.bin" "$W/v2.bin" || { echo "FAIL: no vsav2 decrypt view for the P2 check"; exit 1; }
+[ -f "$BUILD/verify_data.bin" ] || { echo "FAIL: no $BUILD/verify_data.bin for the P2 check on our leg"; exit 1; }
+P2ID="$(python3 -c "import sys; sys.path.insert(0,'$REPO/tools'); import name_moves; print(name_moves.TENANTS['donovan']['p2_id'])")"
+P2NEVER="$(python3 -c "import sys; sys.path.insert(0,'$REPO/tools'); import name_moves; print(','.join(name_moves.P2_NEVER))")"
+P2REPORT="$(python3 -c "import sys; sys.path.insert(0,'$REPO/tools'); import name_moves; print(','.join(name_moves.P2_REPORT))")"
+for part in $SET; do
+    t="${part%_*}"; p="${part##*_}"
+    _fe="$(python3 -c "import json;print(json.load(open('$REPO/tests/replays/naming/${t}_${p}.json'))['events'][0]['frame'])")"
+    for leg in native ours; do
+        if [ "$leg" = native ]; then _img="$W/v2.bin"; _lay=vsav2; else _img="$BUILD/verify_data.bin"; _lay=vsavj; fi
+        if python3 "$REPO/tools/move_parity.py" p2check "$W/tr_${t}_${p}_$leg.txt" "$_img" --layout "$_lay" --id "$P2ID" --never "$P2NEVER" --report "$P2REPORT" --from "$_fe" > "$W/p2_${part}_$leg.txt" 2>&1; then :
+        else bad "$part: $leg leg P2 check — $(command grep -m1 FAIL "$W/p2_${part}_$leg.txt")"; fi
+    done
+    # the reported pose (b:0x10) is entered legitimately but its datum differs between
+    # the games; assert P2 enters it the SAME number of frames on both legs, so the
+    # difference is the datum, not a behavioural cascade (rule-checker run 2026-09-17-29 Q4)
+    rn="$(command grep -m1 'P2REPORT:' "$W/p2_${part}_native.txt" | sed 's/.*P2REPORT: //')"
+    ro="$(command grep -m1 'P2REPORT:' "$W/p2_${part}_ours.txt"   | sed 's/.*P2REPORT: //')"
+    [ "$rn" = "$ro" ] || bad "$part: P2's reported-pose frame counts differ between legs (native [$rn] ours [$ro]) — b:0x10 is a behavioural divergence here, not just a datum difference"
+done
+[ "$fail" = 0 ] || { echo "FAIL: P2 is not Demitri on the same data on every leg"; exit 1; }
+ok "P2 is Demitri (0x$P2ID) on every leg, never enters $P2NEVER, and holds the reported pose(s) the same on both legs (e.g. $(command grep -m1 'P2REPORT:' "$W/p2_$(echo $SET | awk '{print $1}')_native.txt"))"
 
 echo "== 2. every EVENT's verdict equals the frozen expectation"
 : > "$W/got.tsv"
@@ -235,9 +302,13 @@ if [ "${FREEZE:-0}" = 1 ]; then
     exit 0
 fi
 [ -s "$W/got.tsv" ] || bad "the comparator produced no verdict at all — an empty result is not a pass"
+# the pins-ignored MODE judges the VERDICT columns only (part, event, name, verdict,
+# first, fields): the `excluded` count changes trivially with the exclusion off and
+# would make the mode fire on its own bookkeeping (14z-164, 14z-165)
+CUT=cat; [ "$CONTROL" = pins-ignored ] && CUT="cut -f1-6"
 for part in $SET; do
-    awk -F'\t' -v n="$part" '!/^#/ && $1==n' "$EXPECT" > "$W/exp_$part.tsv"
-    awk -F'\t' -v n="$part" '$1==n' "$W/got.tsv" > "$W/got_$part.tsv"
+    awk -F'\t' -v n="$part" '!/^#/ && $1==n' "$EXPECT" | $CUT > "$W/exp_$part.tsv"
+    awk -F'\t' -v n="$part" '$1==n' "$W/got.tsv" | $CUT > "$W/got_$part.tsv"
     [ -s "$W/exp_$part.tsv" ] || { bad "$part: no rows in $(basename "$EXPECT")"; continue; }
     if command diff -u "$W/exp_$part.tsv" "$W/got_$part.tsv" > "$W/diff_$part.txt"; then
         ok "$part: $(command grep -c . "$W/got_$part.tsv") events as frozen ($(awk -F'\t' '$4=="IDENT"' "$W/got_$part.tsv" | command grep -c . || true) IDENT, $(awk -F'\t' '$4=="DIFF"' "$W/got_$part.tsv" | command grep -c . || true) DIFF, $(awk -F'\t' '$4!="IDENT" && $4!="DIFF"' "$W/got_$part.tsv" | command grep -c . || true) other)"
@@ -248,19 +319,25 @@ echo "== 3. must-fire controls"
 CTL="$(echo $SET | awk '{print $1}')"
 ct="${CTL%_*}"; cp="${CTL##*_}"
 
-# pins-ignored: the first part of the set whose VERDICT columns (part, event, name,
-# verdict, first, fields — never the `excluded` count, which changes trivially)
-# move when the rig's pin frames are compared too; pyron_4 in the default set.
-# The exclusion is load-bearing, not decoration, or this reads DEAD.
-PP=""
+# pins-ignored (perturbed-copy, 14z-165): the first part of the set whose schedule
+# pins X gets a copy of OUR trace with x altered on exactly those pin frames; its
+# VERDICT columns (part, event, name, verdict, first, fields — never the `excluded`
+# count) must equal the frozen rows under the exclusion AND differ with it off.
+PP=""; PN=0
 for part in $SET; do
     t="${part%_*}"; p="${part##*_}"
-    verdict_for "$t" "$p" --no-pins | cut -f1-6 > "$W/ctl_nopins_$part.tsv"
+    rm -f "$W/tr_${t}_${p}_ours.pert.txt"
+    PN="$(perturb_x_pins "$REPO/tests/replays/naming/${t}_${p}.json" "$W/tr_${t}_${p}_ours.txt" "$W/tr_${t}_${p}_ours.pert.txt")"
+    [ "$PN" -gt 0 ] || continue
+    verdict_for "$t" "$p" --pert | cut -f1-6 > "$W/ctl_pert_$part.tsv"
+    verdict_for "$t" "$p" --pert-no-pins | cut -f1-6 > "$W/ctl_pertnp_$part.tsv"
     awk -F'\t' -v n="$part" '!/^#/ && $1==n' "$EXPECT" | cut -f1-6 > "$W/exp_ctl_$part.tsv"
-    if ! command diff -q "$W/exp_ctl_$part.tsv" "$W/ctl_nopins_$part.tsv" > /dev/null; then PP="$part"; break; fi
+    if command diff -q "$W/exp_ctl_$part.tsv" "$W/ctl_pert_$part.tsv" > /dev/null \
+       && ! command diff -q "$W/exp_ctl_$part.tsv" "$W/ctl_pertnp_$part.tsv" > /dev/null; then PP="$part"; break; fi
+    echo "  note  $part: x altered on $PN pin frames — under the exclusion $(command diff "$W/exp_ctl_$part.tsv" "$W/ctl_pert_$part.tsv" | command grep -c '^>' || true) verdict row(s) moved (must be 0), without it $(command diff "$W/exp_ctl_$part.tsv" "$W/ctl_pertnp_$part.tsv" | command grep -c '^>' || true) (must be >0)"
 done
-if [ -z "$PP" ]; then echo "CONTROL DEAD: pins-ignored — no part in the set moves a verdict with the pin exclusion off"; fail=1
-else echo "CONTROL FIRED: pins-ignored — $PP moves $(command diff "$W/exp_ctl_$PP.tsv" "$W/ctl_nopins_$PP.tsv" | command grep -c '^>' || true) verdict row(s) with the pin exclusion off"; fi
+if [ -z "$PP" ]; then echo "CONTROL DEAD: pins-ignored — no part in the set both keeps its verdicts under the exclusion and moves one without it, on a copy perturbed on its X-pin frames"; fail=1
+else echo "CONTROL FIRED: pins-ignored — $PP: x altered on its $PN X-pin frames leaves every verdict as frozen under the exclusion and moves $(command diff "$W/exp_ctl_$PP.tsv" "$W/ctl_pertnp_$PP.tsv" | command grep -c '^>' || true) verdict row(s) with the exclusion off"; fi
 
 # no-translation: compare the raw pointer. The control part's IDENT events must
 # stop being identical without the placement translation.

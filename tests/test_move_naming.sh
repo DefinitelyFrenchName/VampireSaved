@@ -4,7 +4,7 @@
 #
 # WHAT IT HOLDS. build/manifest/moves_donovan.toml carries a (table, seq) per
 # move, measured by tools/name_moves.py: eight scripted rigs on NATIVE vs2
-# (P1 Donovan, P2 Victor idle) perform every move; P1's anim node pointer
+# (P1 Donovan, P2 DEMITRI idle — Victor until 14z-165) perform every move; P1's anim node pointer
 # obj+0x1C is sampled per frame (tests/lua/field_trace.lua) and mapped onto
 # the chain graph decoded by tools/anim_nodes.py (the instrument
 # test_anim_node_walk.sh verified). The chains ENTERED inside each event's
@@ -19,7 +19,16 @@
 #      Lightning Sword ES (a2:0x38 = vs2 0x284A64, replay 56's);
 #   3. every table:seq named in moves_donovan.toml was entered by some event;
 #   4. NEGATIVE CONTROL: the expectation lines are not vacuous — an event
-#      whose frozen chain is replaced by a neighbour's must FAIL the compare.
+#      whose frozen chain is replaced by a neighbour's must FAIL the compare;
+#   5. (14z-165) P2 IS DEMITRI BY HIS REAL ROUTE (`R` from P2's default cell),
+#      asserted from each leg's own trace (id 0x01 at every event, `WRONG-P2`
+#      otherwise), and he never enters b:0x71 / b:0x74 — the two chains whose
+#      data differs between vsavj and vs2 (tests/expected/same_data_p2.tsv), so
+#      the rigs' P2 carries the same data on the parity gate's two legs
+#      (tools/move_parity.py p2check on the vs2 data view). The maintainer ruled
+#      Demitri on 2026-09-17 (DECISIONS_HISTORY.md); the expectations were
+#      re-frozen on him at 14z-165 — every guard-cancel event (Reflect Wall) is
+#      timed to P2's 5HP, so those lines are the ones that could move.
 #
 # TRAPS THIS RIG PAID FOR (project/gotchas.md): $FF8109 is a BINARY timer —
 # a 0x99 poke ends the round; 63214 contains 214, so a grapple with the sword
@@ -72,6 +81,10 @@ fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 allfail=0
+# the vs2 DATA view: P2's (Demitri's) chain graph for the p2check (14z-165)
+. "$REPO/tests/lib/decrypt_cache.sh"
+decrypt_view vsav2 "$W/v2_op.bin" "$W/v2.bin" || { echo "SKIP: no vsav2 decrypt view"; exit 0; }
+VS2_DATA="$W/v2.bin"
 for TENANT in $TENANTS; do
 case $TENANT in donovan) EX="$DON/extract";; huitzil) EX="$HUI/extract";; pyron) EX="$PYR/extract";; esac
 [ -f "$EX/regions.json" ] || { echo "SKIP: no $EX/regions.json"; exit 0; }
@@ -106,7 +119,7 @@ for p in $PARTS; do
     POKES="$(python3 -c "import json;print(';'.join(json.load(open('$W/r_$p.json'))['pokes']))")"
     FR="$(python3 -c "import json;print(json.load(open('$W/r_$p.json'))['frames'])")"
     ( cd "$W" && MAME_SANDBOX="$W/sb$p" REPLAY="$W/r_$p.rpl" POKES="$POKES" \
-      FIELDS="ff841c:l:node,ff8420:b:cnt,ff8406:b:seq,ff8407:b:sub,ff8509:b:stock,ff8410:w:x,ff8414:w:y,ff8850:w:p2hp,ff8109:b:timer,ff8782:b:id,ff881c:l:p2node,ff802e:b:df,ff8810:w:p2x,ff840b:b:face" \
+      FIELDS="ff841c:l:node,ff8420:b:cnt,ff8406:b:seq,ff8407:b:sub,ff8509:b:stock,ff8410:w:x,ff8414:w:y,ff8850:w:p2hp,ff8109:b:timer,ff8782:b:id,ff881c:l:p2node,ff802e:b:df,ff8810:w:p2x,ff840b:b:face,ff8b82:b:p2id" \
       FIELD_OUT="$W/trace_$p.txt" FIELD_FROM=2300 FIELD_TO="$FR" FRAMES="$FR" \
       "$REPO/tools/run_mame.sh" vsav2 -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$W/out_$p.log" 2>&1 ) </dev/null &
 done
@@ -123,6 +136,16 @@ if diff -u "$EXP" "$W/got.txt" > "$W/diff.txt"; then
 else
     bad "measured chains differ from $EXP:"; head -40 "$W/diff.txt"
 fi
+
+echo "== 4b. P2 is Demitri by his real route and never enters b:0x71 / b:0x74 (14z-165)"
+P2ID="$(python3 -c "import sys; sys.path.insert(0,'tools'); import name_moves; print(name_moves.TENANTS['$TENANT']['p2_id'])")"
+P2NEVER="$(python3 -c "import sys; sys.path.insert(0,'tools'); import name_moves; print(','.join(name_moves.P2_NEVER))")"
+P2REPORT="$(python3 -c "import sys; sys.path.insert(0,'tools'); import name_moves; print(','.join(name_moves.P2_REPORT))")"
+for p in $PARTS; do
+    if python3 tools/move_parity.py p2check "$W/trace_$p.txt" "$VS2_DATA" --layout vsav2 --id "$P2ID" --never "$P2NEVER" --report "$P2REPORT" --from 2300 > "$W/p2_$p.txt" 2>&1; then :; else bad "part $p: P2 check — $(command grep -m1 FAIL "$W/p2_$p.txt")"; fi
+done
+[ $fail = 0 ] && ok "P2 = 0x$P2ID on every part, never in $P2NEVER, reported pose $P2REPORT counted per part ($(for p in $PARTS; do cat "$W/p2_$p.txt"; done | command grep -c 'p2 chains entered') traces read; e.g. $(sed -n 2p "$W/p2_$(echo $PARTS | awk '{print $1}').txt" | cut -c1-100) / $(command grep -m1 'P2REPORT:' "$W/p2_$(echo $PARTS | awk '{print $1}').txt"))"
+if command grep -q "WRONG-P2" "$W/got.txt"; then bad "a WRONG-P2 mark in the measured lines — the P2 route did not land on Demitri"; fi
 
 echo "== 5. every seq named in moves_$TENANT.toml was entered BY AN EVENT OF ITS OWN NAME (14z-120 (3): the cross-character check)"
 cat > "$W/ownname.py" <<'PY'
@@ -173,7 +196,7 @@ open(sys.argv[2], "w").write("\n".join(L))
 PY
 if diff -q "$W/ctl.txt" "$W/got.txt" >/dev/null; then bad "control: a swapped 5LP chain compared EQUAL — the compare is not comparing"; else ok "control: the swapped 5LP line fails the compare"; fi
 [ $fail = 0 ] && echo "$TENANT: PASS" || { echo "$TENANT: FAIL"; allfail=1; }
-rm -f "$W"/trace_*.txt "$W"/r_*.rpl "$W"/r_*.json "$W"/got.txt
+rm -f "$W"/trace_*.txt "$W"/r_*.rpl "$W"/r_*.json "$W"/got.txt "$W"/p2_*.txt
 done
 [ $allfail = 0 ] && echo PASS || echo FAIL
 exit $allfail

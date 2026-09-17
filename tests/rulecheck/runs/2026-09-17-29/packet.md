@@ -1,0 +1,26 @@
+THE PACKET
+
+Decision kind: expectation
+Subject: 14z-165: re-freeze the five naming/parity expectations on P2 = Demitri (the parity rigs' P2 switch, DECISIONS_HISTORY.md 14z-164b)
+Claim (the working agent's sentence): At 14z-165, under the maintainer's ruling of 2026-09-17 (DECISIONS_HISTORY.md "Ruled 2026-09-17 (14z-164b) - the parity rigs' P2 is DEMITRI, Bishamon the fallback"), the P2 character of the naming/parity rigs is changed from Victor (0x03) to Demitri (0x01) by his REAL cursor route, and five frozen expectations are re-frozen on him: tests/expected/move_naming_{donovan,huitzil,pyron}.txt, tests/expected/projectile_census.txt, tests/expected/killshread_es.txt and tests/expected/move_parity_events.tsv. THE RATIONALE FOR DEMITRI (not tested here, ruled by the maintainer): P2 is a legacy character, VS's copy on our leg and VS2's on the native leg, and Victor's basic hit reactions carry a retuned head hurtbox on vs2 (five of GitHub #136's 13 divergences began in his state); Demitri's per-character data differs between vsavj and vs2 on three anim chains only - b:0x10 (the held-pose push box every legacy character gained on vs2) and b:0x71 / b:0x74 (one attack record each), per tests/expected/same_data_p2.tsv - and his defense-curve row is the same on both games, so P2's HP damage is compared on matched data. THE MECHANISM OF THE SWITCH: tools/name_moves.py TENANTS now carry p2_id="01" and p2_path=("R",) for the three naming tenants (the victim rigs are unchanged - their P1 is Victor the attacker), the prologue() function emits P2's real route from P2's default cell 0x05, and select_paths measures that route as "R" on BOTH the vsav2 wheel and the merged wheel (so the parity gate's two legs share the P2 prologue lines verbatim); the rigs were regenerated and every gate's step 1 confirms the committed rigs equal a regeneration. THE NEW ASSERTION: tools/move_parity.py gained a p2check mode that maps P2's sampled node pointer (RAM:$FF881C) onto P2's own chain graph decoded from THAT LEG's game image (the vs2 data view for native, the build's verify_data.bin for ours - Demitri is legacy and unmodified, so his data on the build equals pristine vsavj) and FAILS if P2 enters b:0x71 or b:0x74 or if his id (RAM:$FF8B82) is not 0x01; every leg of every gate reads P2=0x01 and 0 frames in the never-set. WHAT THE RE-FREEZE MEASURED: move_parity_events.tsv moved from 377 IDENT / 103 DIFF (P2=Victor) to 372 IDENT / 108 DIFF (P2=Demitri) over the same 506 events - 13 former Victor-first DIFF rows became IDENT (e.g. pyron_4 Cosmo Disruption held, donovan_2 Blizzard Sword, huitzil_8 Reflect Wall) and 18 events became DIFF, of which the huitzil_5/6 guard-cancel (Reflect Wall) events dominate because those rigs time P1's block to P2's 5HP and Demitri's 5HP differs from Victor's in startup and range, so P1's own x and node diverge between ours and native; the three naming expectations moved only where P2's timing feeds P1 (huitzil parts 5/6/8, one Galactic Throw row on pyron), and the projectile census is byte-identical to the Victor freeze except its per-event spawn ordinal (0-indexed) which shifted with the pool occupancy. WHAT WAS NOT TESTED: each freeze was verified by a SECOND run of the same rig on the same host (run-to-run determinism of the MAME legs, not an independent measurement); the 108 DIFF rows are frozen AS MEASURED and no DIFF is attributed to a side or a mechanism (the #136 families are not root-caused this session, by the ruled order of work); the guard-cancel divergences are a real ours-vs-native difference now surfaced by Demitri's timing and are left frozen for the family pass; the p2check's "never enters b:0x71/b:0x74" rests on the frozen same_data_p2.tsv identifying exactly those two chains as differing by an attack record (its correctness is tested_by test_same_data_p2.sh, not re-derived here); the pins-ignored must-fire control was rebuilt as a PERTURBED COPY of our own trace (x altered on the rig's own X-pin frames) because with matched-data P2 no real verdict row moves with the exclusion off, so a data-dependent control read DEAD - the new control proves the comparator's pin exclusion is live on a synthetic perturbation, not on a real divergence; no shipped ROM byte moved (only rigs, expectations, tools and gate scripts changed - the tree stays at merged-m18). No behavioural conclusion about how any move plays is drawn by any freeze.
+Artifacts (read every one, in full):
+  - tools/name_moves.py
+  - tools/move_parity.py
+  - tests/audit_move_parity.sh
+  - tests/test_move_naming.sh
+  - tests/test_projectile_census.sh
+  - tests/test_killshread_es.sh
+  - tests/expected/move_parity_events.tsv
+  - tests/expected/move_naming_huitzil.txt
+  - tests/expected/move_naming_donovan.txt
+  - tests/expected/move_naming_pyron.txt
+  - tests/expected/projectile_census.txt
+  - tests/expected/killshread_es.txt
+  - tests/expected/same_data_p2.tsv
+  - build/move_parity_events_before_14z165.tsv
+  - build/gates_14z165/move_parity_freeze.log
+  - build/gates_14z165/move_parity_verify.log
+  - build/gates_14z165/move_naming_verify.log
+  - build/gates_14z165/move_parity_default.log
+  - DECISIONS_HISTORY.md.lines-30-52 (lines 30-52 of DECISIONS_HISTORY.md)
+  - tests/expected/PROVENANCE.md.lines-73-79 (lines 73-79 of tests/expected/PROVENANCE.md)

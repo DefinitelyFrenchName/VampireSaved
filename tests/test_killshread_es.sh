@@ -5,8 +5,10 @@
 # summon attacks one way — MEASURED on native vs2 and frozen.
 #
 # Rig: tools/name_moves.py donovan part 12 (tests/replays/naming/donovan_12.*):
-# Donovan (forced 0x13) on P1 pinned at x=552, Victor idle on P2 at x=728 (in
-# the sword's path); plain plant (214LK / 214HK) then a summon, then the ES
+# Donovan (forced 0x13) on P1 pinned at x=552, DEMITRI idle on P2 at x=728 (in
+# the sword's path; Victor until 14z-165 — the naming rigs' P2 is Demitri by
+# the maintainer's ruling of 2026-09-17, and the contact lines were re-frozen
+# on him: the same waves, Demitri's defense); plain plant (214LK / 214HK) then a summon, then the ES
 # plant (214KK, one stock) then a summon — twice each. field_trace.lua samples
 # P2's HP / white / class / freeze and the stock count.
 #
@@ -26,7 +28,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   (tier emulator (MAME, ~2 min)) KILLSHREAD (ES) (14z-121 (3)): the
 #   maintainer's ruling measured — Donovan part 12 (plain plant → summon, ES
-#   plant → summon, LK and HK; Victor idle in the sword's path): contact lines
+#   plant → summon, LK and HK; P2 idle in the sword's path): contact lines
 #   frozen in `tests/expected/killshread_es.txt` (`FREEZE=1`), plus the
 #   structural shape: a plain summon = ONE contact wave, an ES summon = TWO
 #   (going away and coming back), the plant never connects. Run after any
@@ -60,7 +62,7 @@ for l in open(sys.argv[1]):
     rows[int(f[1])] = {k: int(v) for k, v in (kv.split("=") for kv in f[2:])}
 ev = json.load(open(sys.argv[2]))["events"]
 ids = {(v["id"], v["p2id"]) for v in rows.values()}
-assert ids == {(0x13, 0x03)}, f"ids {ids}"   # Donovan vs Victor, both forced
+assert ids == {(0x13, 0x01)}, f"ids {ids}"   # Donovan (the default cursor's pick) vs Demitri (P2's real route, 14z-165)
 prev = None
 for fr in sorted(rows):
     v = rows[fr]

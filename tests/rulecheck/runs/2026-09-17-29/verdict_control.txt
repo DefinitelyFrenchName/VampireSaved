@@ -1,0 +1,6 @@
+Q1: VIOLATED — claim says "Not tested: nothing further" yet the gate is tenant-only: audit_move_parity.sh.txt:36 "P2 is Victor, a legacy character, so his state is never compared", so the legacy/superset invariant of a flavor_default change is an untested premise the claim omits.
+Q2: VIOLATED — the flavor latch selects the VS2/VH2 variant (a felt difference), yet the claim concludes flavor_default->0x01 and freezes M19 from "6851/6851 frames identical", a number, with no image or recording; "A number alone is not a capture."
+Q3: OK — the two legs run independent romsets (audit_move_parity.sh.txt:113-114, native=vsav2 vs ours=vsavjw) and the shared RNG/level pins are shown to discriminate rather than force agreement (move_parity.tsv:20 huitzil_1 DIVERGES under those same shared pins); no artifact shows a shared write selecting the flavor state on both legs.
+Q4: VIOLATED — the only controls are unpinned-level and no-translation (audit_move_parity.sh.txt:4-5); neither fires on a flavor_default change perturbing legacy/superset behaviour, which this tenant-only gate never checks (line 36), and the claim names no such gap.
+Q5: N-A — the packet attributes no decision, approval, ruling or closure to the maintainer or any person.
+VERDICT: VIOLATED
