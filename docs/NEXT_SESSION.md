@@ -17,21 +17,18 @@ UNREGISTERED — do not play them and do not point a gate at them.
 
 ## START HERE — what is open (THE ORDER IS RULED, 2026-09-17: stable state, then #148 (DONE), then #152 (BUILT, open until a real run under the bounded questions is accepted — runs 22-25 are real runs), then everything else)
 
-- **#136 — the P2 decision, then the families.** The maintainer agreed to a same-data P2;
-  none exists among the legacy characters (`tests/expected/same_data_p2.tsv`, differing
-  chains per table, shared seqs, invalid-on-one-side classed apart): for a P2 that stands
-  and gets hit what counts is table a (base states) and b (reactions), then c (thrown
-  poses) — Demitri a 0 / b 3 / c 0, Bishamon 2 / 2 / 0, Bulleta 3 / 1 / 0, Lei-Lei 4 / 1 / 0,
-  Victor 0 / 7 / 19 (his hitstun head hurtbox, the confound); every b list includes 0x10,
-  the engine-wide held-pose push box. So Demitri (P2 path `R` on both wheels; a rig must
-  assert he never enters `b:0x71/0x74`) or a second TENANT (same vs2 data on both legs by
-  construction, but its own port under test too). That is a decision for the maintainer
-  (asked 2026-09-17, rationale given at the 14z-164 close); switching P2 changes
-  every naming rig's prologue and re-freezes `test_move_naming`, `test_projectile_census`,
-  `audit_move_parity`. Only then root-cause the families, capture first ([VSP-136]):
-  the 103 DIFF rows are frozen as measured, 30 of them meter-first (Pyron's Planet
-  Burning +30 native / +20 ours per use is the largest), Cosmo Disruption held lands 4
-  hits on ours against 2 (`pyron_4`, +156), Press of Death's x, huitzil_5's gc window.
+- **#136 — SWITCH THE PARITY RIGS' P2 TO DEMITRI, then the families.** The P2 is
+  decided (Demitri; Bishamon if a case arises that Demitri cannot answer — the standing
+  line in STATE, the entry in `DECISIONS_HISTORY.md`, the rationale in
+  `tests/expected/same_data_p2.tsv`: Demitri table a 0 / b 3 / c 0 differing chains, his
+  P2 cursor path `R` on both wheels). The switch is a session of its own: every naming
+  rig's prologue changes (`tools/name_moves.py`, P2 path and pins), and `test_move_naming`,
+  `test_projectile_census` and `audit_move_parity` re-freeze — each freeze a rule-checker
+  `expectation` packet; a rig with Demitri on P2 asserts he never enters `b:0x71`/`b:0x74`.
+  Only then root-cause the families, capture first ([VSP-136]): the 103 DIFF rows are frozen
+  as measured, 30 of them meter-first (Pyron's Planet Burning +30 native / +20 ours per use
+  is the largest), Cosmo Disruption held lands 4 hits on ours against 2 (`pyron_4`, +156),
+  Press of Death's x, huitzil_5's gc window.
 - **In-DF coverage is 5LP/5MP (Donovan) and 5LP (Phobos, Pyron)**: the batteries outrun
   the 360-frame DF. A RIG change (re-activate DF per group of events, never a comparator
   tolerance) is needed before any in-DF move is measured — the maintainer agreed

@@ -164,6 +164,24 @@ questions still find is answered question by question through `resolve`.
 Every fixture was recalibrated on that wording; the ledger shows the
 before and after.
 
+**The first real runs under the bounded questions (14z-164, runs 22-28,
+seven in one sitting; GitHub #152 closed on them by ruling 2026-09-17).** Two
+recommendation packets and five expectation packets, every plant caught
+(7/7), every `VIOLATED` resolved by work: the checker found two instrument
+defects in the comparator the session itself had just written (a cumulative
+field compared from the window start turned the rig's periodic HP pin into a
+DIFF at the pin frame; the per-event X pin compared as an absolute inside the
+previous window), a silent fallback and a collapsed link comparison in a new
+static audit, a chain counted as a content difference when it was live on one
+game and invalid on the other, the working agent's own figures (a cross-part
+count written as one part's, one character's stock values copied from
+another's, "five" tables that were six, counts quoted from the previous
+freeze), and a defect in this tool's own staging (two line ranges of one file
+collapsed onto one copy, #156). The last three runs read Q2-Q5 `OK` and Q1 on
+claim accuracy alone. Cost: two fresh agents per run, 50k-260k tokens and
+30 s to 8 min each; the readers that read the most (the expectation packets,
+60+ artifacts) took 4-8 min.
+
 ## What it will not catch
 
 - **Operational slips.** A waiter wedged for hours is not a rule-application

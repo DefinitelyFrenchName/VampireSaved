@@ -27,6 +27,41 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-17 (14z-164b) — the parity rigs' P2 is DEMITRI, Bishamon the fallback
+
+- **P2 = DEMITRI, BISHAMON IF DEMITRI CANNOT ANSWER (maintainer, 2026-09-17, after the close):**
+  *"And I agree with Demitri for P2 with Bishamon as fallback if we end up in a case that Demitri
+  cannot answer"* — on the rationale given at the close from `tests/expected/same_data_p2.tsv`
+  (chains differing between vsavj and vs2, shared sequences, invalid-on-one-side classed apart):
+  Demitri table a 0 / b 3 / c 0, Bishamon 2 / 2 / 0, Bulleta 3 / 1 / 0, Lei-Lei 4 / 1 / 0, Victor
+  0 / 7 / 19 (his hitstun head hurtbox retuned on vs2 — the confound five of #136's 13
+  divergences begin in). Demitri's three reaction chains are `b:0x10` (the engine-wide held-pose
+  push box every legacy character carries) and `b:0x71`/`b:0x74` (one attack record each), so a
+  rig that puts him on P2 asserts he never enters 0x71/0x74; his P2 cursor path is `R` on both
+  wheels. A second tenant was the other option and is not taken: its data is vs2's on both legs
+  by construction, but its own port would be under test in the same rig. The switch is a session
+  of its own: every naming rig's prologue changes (`tools/name_moves.py`), and
+  `test_move_naming`, `test_projectile_census` and `audit_move_parity` re-freeze.
+
+---
+
+## Ruled 2026-09-17 (14z-164b) — #152 CLOSED: the rule-checker's real runs are accepted
+
+- **#152 CLOSES ON THE 14z-164 REAL RUNS (maintainer, 2026-09-17, after the close):** *"also I
+  believe we have real runs proving #152 is indeed now addressed. If you agree we can close the
+  ticket"* — agreed. The 14z-163 ruling held #152 open "until a real run under the bounded
+  questions is accepted"; runs `2026-09-17-22` to `-28` (two recommendation packets, five
+  expectation packets, all on the current checklist hash) are those runs: plants 7/7 caught,
+  every VIOLATED resolved question by question, and the findings were true each time — the
+  census's own comparator turning a rig pin into a DIFF (24) and comparing the X pin as an
+  absolute inside the previous window (25), a silent projectile fallback and collapsed links (26),
+  a chain counted as content when invalid on one side (27), the working agent's figures (28), and
+  a defect in the checker's own staging (#156). The checker stays on the default model and its
+  questions stay bounded (the 14z-163 rulings stand); what stops constraining work is only the
+  "closes after a first real run" clause, met.
+
+---
+
 ## Ruled 2026-09-17 (14z-164) — #136's scope census: per-event verdicts, a same-data P2, the 13 rows re-labelled
 
 - **THE THREE PROPOSITIONS OF THE 14z-164 SCOPE CENSUS ARE AGREED (maintainer, 2026-09-17):**

@@ -8,7 +8,7 @@ number	state	reason	closed	labels	title
 155	OPEN	-	-	bug	audit_forced_pick_fidelity: the poked leg is a hand-typed replica of the #136 rig's leg with no control against drift
 154	OPEN	-	-	bug	audit_forced_pick_fidelity: the FREEZE branch exits before the identity assertions and the controls, so a failed run can freeze
 153	OPEN	-	-	evolution	Run the test tiers on a scratch clone at a named commit (lever B of #148): integrity and traceability at freeze and release, as bbh/BBX do
-152	OPEN	-	-	evolution	An independent adversarial rule-checker at every decision point — redundancy for rule APPLICATION, not for measurement
+152	CLOSED	COMPLETED	2026-09-17	evolution	An independent adversarial rule-checker at every decision point — redundancy for rule APPLICATION, not for measurement
 151	CLOSED	COMPLETED	2026-09-17	evolution	Re-examine #136 end to end: the forced-pick native leg is unvalidated, so 17 of 27 parity verdicts rest on an unmeasured assumption
 150	OPEN	-	-	evolution	The freeze ritual's three silent-green failure modes need a mechanical guard (test_freeze_set_shape + a committed freeze driver)
 149	CLOSED	NOT_PLANNED	2026-09-16	bug	Phobos's specials skip a 2-frame seq-4 startup state native vsav2 plays (one cause behind ~11 of his moves)
