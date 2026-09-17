@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 155
+# issues: 156
 number	state	reason	closed	labels	title
+156	CLOSED	COMPLETED	2026-09-17	bug	rulecheck.py: two line ranges of one artifact collide in staging, the reader sees only the last
 155	OPEN	-	-	bug	audit_forced_pick_fidelity: the poked leg is a hand-typed replica of the #136 rig's leg with no control against drift
 154	OPEN	-	-	bug	audit_forced_pick_fidelity: the FREEZE branch exits before the identity assertions and the controls, so a failed run can freeze
 153	OPEN	-	-	evolution	Run the test tiers on a scratch clone at a named commit (lever B of #148): integrity and traceability at freeze and release, as bbh/BBX do

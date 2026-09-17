@@ -27,6 +27,35 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-17 (14z-164) — #136's scope census: per-event verdicts, a same-data P2, the 13 rows re-labelled
+
+- **THE THREE PROPOSITIONS OF THE 14z-164 SCOPE CENSUS ARE AGREED (maintainer, 2026-09-17):**
+  *"I agree with the 3 propositions"* — put to the maintainer after rule-checker runs
+  `2026-09-17-22` and `-23` (both VIOLATED, each answered by work; the verdicts verbatim in
+  `tests/rulecheck/runs/`), with the census under `build/move_parity_census_14z164/` and the
+  re-labelled table posted on GitHub #136 the same day:
+  1. **Per-event verdicts instead of per-part** in `tests/audit_move_parity.sh`, with the
+     stock, the meter fraction (`RAM:$FF850A`) and Victor's HP (`RAM:$FF8850`) as compared
+     fields, and each event labelled "in DF" asserted IN Dark Force on both legs (21 of the 24
+     "in DF" events of Donovan's part 6 ran with the flag 0 on both legs: DF lasts 360 frames,
+     the battery spans 3,850).
+  2. **A P2 whose data is the same on both games** — a second tenant, or a legacy character
+     whose per-character bank is byte-identical between vsavj and vs2, found statically by the
+     three-sibling diff. Reason: P2 is Victor, VS's on our leg and VS2's on the native one; five
+     of the 13 first divergences begin with Victor's own state, and 15 windows the tenant reads
+     identical in carry a differing Victor.
+  3. **The 13 rows are re-labelled by their fields before any family is root-caused** (the
+     table on #136, 2026-09-17): 5 Victor-first (donovan_3, donovan_4, huitzil_2, huitzil_9,
+     pyron_4), 3 DF activations (donovan_6, donovan_7, huitzil_4: the ruled cost plus the two DF
+     systems), 2 Phobos-HP-by-1 (huitzil_6, huitzil_8: the defense-curve cell victim 0x10 /
+     attacker 0x03 reads 0xFE on vsavj, 0x00 on vs2), donovan_2 (tenant first, at contact),
+     huitzil_5 (tenant first, Victor attacking), pyron_3 (a stock crossing). The two HP-by-1
+     rows and the three DF rows are not guard-cancel or move defects on the fields.
+  On a third checker run of the recommendation: *"fine by me if there's value in running it a
+  third time"* — not run; the per-event expectation freeze gets its own `expectation` run instead.
+
+---
+
 ## Ruled 2026-09-17 (14z-163) — the rule-checker's questions Q3 and Q4: bounded AND resolved in writing (option C)
 
 **The entry, moved verbatim from STATE "Decisions pending":**

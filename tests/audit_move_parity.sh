@@ -3,6 +3,7 @@
 #
 # MUST-FIRE: perturbed-copy: unpinned-level — the native leg left at vsav2's DEFAULT play mode (TURBO, level 8) against ours at NORMAL must fail every part, so each verdict is proven to rest on the level the gate pins (in-gate: one part is re-run with the native level pin withheld and must diverge; mode: every native leg runs unpinned and the comparisons FAIL)
 # MUST-FIRE: shadow-tool: no-translation — comparing our RAW anim node pointer against native's, without translating it out of its placement, must fail, so every IDENTICAL verdict is proven to rest on the translation (in-gate: one part is compared both ways; mode: every part is compared untranslated and FAILs)
+# MUST-FIRE: shadow-tool: pins-ignored — comparing with the rig's own pin frames NOT excluded must move at least one frozen row of a part whose schedule pins a compared field (pyron_4, in the default set since 14z-164: its Cosmo Disruption [KK held] row reads +167 excluded and +50, the HP-pin frame, not excluded), so the exclusion is proven live and load-bearing; a schedule without a `pokes` key is refused by the comparator (in-gate: pyron_4 compared both ways; mode: every part compared with the exclusion off and the table FAILs)
 #
 # WHAT IT MEASURES. tools/name_moves.py already performs every move of the
 # maintainer's move lists (build/manifest/moves_<tenant>.toml, 145 moves) on the
@@ -10,8 +11,22 @@
 # Nothing ran those rigs on a PORT build. This does: the same rig, the same
 # inputs, on native vsav2 and on the merged WIDE build, comparing the TENANT's
 # own state every frame — node (translated out of its placement), seq, sub-state,
-# node counter, x, y, stock, facing, Dark Force flag and HP. The comparator and
-# what it excludes are tools/move_parity.py.
+# node counter, x, y, stock, facing, Dark Force flag and HP — PLUS, since 14z-164,
+# the METER FRACTION (RAM:$FF850A) and VICTOR's HP (RAM:$FF8850, damage dealt).
+# The comparator and what it excludes are tools/move_parity.py.
+#
+# THE VERDICT IS PER EVENT SINCE 14z-164 (GitHub #136, maintainer-agreed
+# 2026-09-17): the rig re-pins both fighters' X before every event, so each of the
+# 506 events is judged IN ITS OWN WINDOW — IDENT / DIFF (+first frame, fields) /
+# VOID — and frozen as one row of tests/expected/move_parity_events.tsv; an
+# event labelled "in DF" must run with the DF flag up on both legs (NOT-IN-DF
+# otherwise) and a DF-activating event must see the flag rise (DF-NOT-ENTERED).
+# Until 14z-164 the gate froze one verdict per PART (the first divergent event;
+# 27 rows), which left 103 events UNKNOWN and 21 "in DF" events of Donovan's
+# part 6 unmeasured with the flag 0 on both legs (STATE 14z-164). A window IDENT
+# after an earlier DIFF in its part carries `coupled=after:<k>`: bit-identical is
+# evidence, a later DIFF may be downstream ([VSP-115]-shaped caveat, measured:
+# a one-frame idle-phase offset persisted through donovan_2).
 #
 # THE PROTOCOL, AND WHY EACH PIN SITS WHERE IT DOES (all three measured 14z-159):
 #   - SPEED LEVEL RAM:$FF8116 pinned to 6 on both legs from frame 2000. vsav2
@@ -38,9 +53,12 @@
 #     id copies — tests/audit_forced_pick_fidelity.sh), so a poked leg is not
 #     the tenant. Identity is ASSERTED from each leg's own trace, never assumed.
 #
-# WHAT IT DOES NOT COVER: per-hit damage, meter gain, hitboxes and projectile
-# parameters — separate instruments. P2 is Victor, a legacy character, so his
-# state is never compared ([VSP-168]).
+# WHAT IT DOES NOT COVER: hitboxes and projectile parameters — separate
+# instruments. P2 is Victor, a legacy character: his node is never compared
+# ([VSP-168]), only his HP; and his basic hit reactions carry a retuned head
+# hurtbox on vs2 (tests/test_same_data_p2.sh), so a DIFF that begins after
+# contact may be his, not the tenant's — the 14z-164 census read five of the 13
+# part-level first divergences as Victor-first (GitHub #136, the re-labelled table).
 #
 # THE FORCED-PICK HISTORY (14z-159 -> 14z-160, GitHub #147/#151). Until 14z-160
 # Phobos's and Pyron's native legs were FORCED by the early-window poke, and the
@@ -52,7 +70,7 @@
 # real picks on both sides; the 27 verdicts were re-frozen on them at 14z-160
 # and the ten Phobos DIVERGES rows of 14z-159 were verdicts on the VH2 branch.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged26] [PARTS="donovan_1 pyron_2"] [ALL=1] [JOBS=6] tests/audit_move_parity.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged26] [PARTS="donovan_1 pyron_2"] [ALL=1] [JOBS=6] [FREEZE=1] tests/audit_move_parity.sh
 #   emulator tier, MAME. MEASURED 14z-159 on this MacBook, solo, at the default
 #   JOBS=6: the default 3-part set 25 s; ALL=1 (27 parts, 54 legs) 130 s. Both
 #   figures are wall clock, not MAME's emulated-time line — that line reads ~10x
@@ -66,7 +84,7 @@ BUILD="${BUILD:-build/m3b_merged26}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
-EXPECT="$REPO/tests/expected/move_parity.tsv"
+EXPECT="$REPO/tests/expected/move_parity_events.tsv"
 JOBS="${JOBS:-6}"
 CONTROL="${CONTROL:-}"
 
@@ -75,7 +93,7 @@ CONTROL="${CONTROL:-}"
 [ -f "$BUILD/patch/placements.json" ] || { echo "SKIP: no placements.json at $BUILD"; exit 0; }
 [ -f "$EXPECT" ] || { echo "FAIL: no frozen expectation at $EXPECT"; exit 1; }
 case "$CONTROL" in
-    ""|unpinned-level|no-translation) ;;
+    ""|unpinned-level|no-translation|pins-ignored) ;;
     *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;;
 esac
 
@@ -91,9 +109,12 @@ bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 
 if [ -n "${PARTS:-}" ]; then SET="$PARTS"
 elif [ "${ALL:-0}" = 1 ]; then
-  SET="$(awk -F'\t' '!/^#/ && NF>1 {print $1}' "$EXPECT")"
+  # every committed naming part of the three tenants (never the victim rigs, whose
+  # subject is P2): since 14z-164 that includes Donovan's hit/block parts 9-11,
+  # which the per-part gate never ran
+  SET="$(ls "$REPO"/tests/replays/naming/donovan_[0-9]*.json "$REPO"/tests/replays/naming/huitzil_[0-9]*.json "$REPO"/tests/replays/naming/pyron_[0-9]*.json | sed 's|.*/||; s|\.json$||' | sort -t_ -k1,1 -k2,2n | tr '\n' ' ')"
 else
-  SET="donovan_1 pyron_2 huitzil_1"
+  SET="donovan_1 pyron_4 huitzil_1"   # pyron_4 since 14z-164: the part the pins-ignored control needs
 fi
 
 ID_donovan=13; ID_huitzil=10; ID_pyron=11
@@ -133,7 +154,7 @@ rpl_for() {
         { print }' "$_r" > "$_o"
 }
 
-FIELDS="ff841c:l:node,ff8420:b:cnt,ff8406:b:seq,ff8407:b:sub,ff8509:b:stock,ff8410:w:x,ff8414:w:y,ff8450:w:p1hp,ff8782:b:id,ff802e:b:df,ff840b:b:face,ff8116:b:lvl"
+FIELDS="ff841c:l:node,ff8420:b:cnt,ff8406:b:seq,ff8407:b:sub,ff8509:b:stock,ff8410:w:x,ff8414:w:y,ff8450:w:p1hp,ff8782:b:id,ff802e:b:df,ff840b:b:face,ff8116:b:lvl,ff850a:w:meter,ff8850:w:p2hp"
 
 run_leg() {  # run_leg <tenant> <part> <leg>
     _t="$1"; _p="$2"; _leg="$3"
@@ -162,9 +183,10 @@ verdict_for() {  # verdict_for <tenant> <part> [--raw]
     _fe="$(python3 -c "import json;print(json.load(open('$_j'))['events'][0]['frame'])")"
     _pl="$BUILD/patch/placements.json"
     [ "$_raw" = --raw ] && _pl="$W/nullplacements.json"
-    python3 "$REPO/tools/move_parity.py" compare "$_t" "$_p" \
+    _np=""; { [ "$_raw" = --no-pins ] || [ "$CONTROL" = pins-ignored ]; } && _np="--no-pin-exclusion"
+    python3 "$REPO/tools/move_parity.py" events "$_t" "$_p" \
         "$W/tr_${_t}_${_p}_native.txt" "$W/tr_${_t}_${_p}_ours.txt" "$_pl" \
-        --first-event "$_fe" --events "$_j" --tsv 2>/dev/null || true
+        --first-event "$_fe" --events "$_j" $_np 2>/dev/null || true
 }
 
 echo "== 1. the legs ($(echo $SET | wc -w | tr -d ' ') parts x 2, build $(basename "$BUILD"))"
@@ -199,56 +221,68 @@ done
 [ "$fail" = 0 ] || { echo "FAIL: a leg is not the tenant"; exit 1; }
 ok "every leg is the tenant by its own trace (id at 2300)"
 
-echo "== 2. every part's verdict equals the frozen expectation"
+echo "== 2. every EVENT's verdict equals the frozen expectation"
 : > "$W/got.tsv"
 for part in $SET; do
     t="${part%_*}"; p="${part##*_}"
     verdict_for "$t" "$p" >> "$W/got.tsv"
 done
 if [ "${FREEZE:-0}" = 1 ]; then
-    { sed -n '1,/^#--$/p' "$EXPECT" 2>/dev/null || true; cut -f1-3 "$W/got.tsv"; } > "$W/new.tsv"
+    { sed -n '1,/^#--$/p' "$EXPECT" 2>/dev/null || true; cat "$W/got.tsv"; } > "$W/new.tsv"
     cp "$W/new.tsv" "$EXPECT"
-    echo "  FROZE  $(basename "$EXPECT") from this run ($(cut -f1-3 "$W/got.tsv" | wc -l | tr -d ' ') parts)"
+    echo "  FROZE  $(basename "$EXPECT") from this run ($(command grep -c . "$W/got.tsv") events of $(echo $SET | wc -w | tr -d ' ') parts)"
     echo "  (freeze, then VERIFY: re-run without FREEZE — the second run is what makes it evidence)"
     exit 0
 fi
 [ -s "$W/got.tsv" ] || bad "the comparator produced no verdict at all — an empty result is not a pass"
-while IFS="$(printf '\t')" read -r name verdict ev rest; do
-    [ -n "$name" ] || continue
-    want="$(awk -F'\t' -v n="$name" '!/^#/ && $1==n {print $2"\t"$3}' "$EXPECT")"
-    got="$(printf '%s\t%s' "$verdict" "$ev")"
-    if [ -z "$want" ]; then bad "$name: no row in $(basename "$EXPECT")"
-    elif [ "$want" = "$got" ]; then ok "$name: $verdict${ev:+ ($ev)}"
-    else bad "$name: expected [$want] measured [$got]"; fi
-done < "$W/got.tsv"
+for part in $SET; do
+    awk -F'\t' -v n="$part" '!/^#/ && $1==n' "$EXPECT" > "$W/exp_$part.tsv"
+    awk -F'\t' -v n="$part" '$1==n' "$W/got.tsv" > "$W/got_$part.tsv"
+    [ -s "$W/exp_$part.tsv" ] || { bad "$part: no rows in $(basename "$EXPECT")"; continue; }
+    if command diff -u "$W/exp_$part.tsv" "$W/got_$part.tsv" > "$W/diff_$part.txt"; then
+        ok "$part: $(command grep -c . "$W/got_$part.tsv") events as frozen ($(awk -F'\t' '$4=="IDENT"' "$W/got_$part.tsv" | command grep -c . || true) IDENT, $(awk -F'\t' '$4=="DIFF"' "$W/got_$part.tsv" | command grep -c . || true) DIFF, $(awk -F'\t' '$4!="IDENT" && $4!="DIFF"' "$W/got_$part.tsv" | command grep -c . || true) other)"
+    else bad "$part: events moved:"; command grep '^[-+][^-+]' "$W/diff_$part.txt" | head -12; fi
+done
 
 echo "== 3. must-fire controls"
 CTL="$(echo $SET | awk '{print $1}')"
 ct="${CTL%_*}"; cp="${CTL##*_}"
 
-# no-translation: compare the raw pointer. A part whose frozen verdict is
-# IDENTICAL must stop being identical without the placement translation.
-raw="$(verdict_for "$ct" "$cp" --raw | cut -f2)"
-base="$(awk -F'\t' -v n="$CTL" '!/^#/ && $1==n {print $2}' "$EXPECT")"
-if [ "$base" = IDENTICAL ] && [ "$raw" = IDENTICAL ]; then
-    echo "CONTROL DEAD: no-translation — $CTL still reads IDENTICAL with the placement translation removed"
-    fail=1
-elif [ "$base" = IDENTICAL ]; then
-    echo "CONTROL FIRED: no-translation — $CTL is IDENTICAL translated and $raw untranslated"
+# pins-ignored: the first part of the set whose VERDICT columns (part, event, name,
+# verdict, first, fields — never the `excluded` count, which changes trivially)
+# move when the rig's pin frames are compared too; pyron_4 in the default set.
+# The exclusion is load-bearing, not decoration, or this reads DEAD.
+PP=""
+for part in $SET; do
+    t="${part%_*}"; p="${part##*_}"
+    verdict_for "$t" "$p" --no-pins | cut -f1-6 > "$W/ctl_nopins_$part.tsv"
+    awk -F'\t' -v n="$part" '!/^#/ && $1==n' "$EXPECT" | cut -f1-6 > "$W/exp_ctl_$part.tsv"
+    if ! command diff -q "$W/exp_ctl_$part.tsv" "$W/ctl_nopins_$part.tsv" > /dev/null; then PP="$part"; break; fi
+done
+if [ -z "$PP" ]; then echo "CONTROL DEAD: pins-ignored — no part in the set moves a verdict with the pin exclusion off"; fail=1
+else echo "CONTROL FIRED: pins-ignored — $PP moves $(command diff "$W/exp_ctl_$PP.tsv" "$W/ctl_nopins_$PP.tsv" | command grep -c '^>' || true) verdict row(s) with the pin exclusion off"; fi
+
+# no-translation: compare the raw pointer. The control part's IDENT events must
+# stop being identical without the placement translation.
+n_ident() { awk -F'\t' '$4=="IDENT"' "$1" | command grep -c . || true; }
+verdict_for "$ct" "$cp" > "$W/ctl_base.tsv"; base="$(n_ident "$W/ctl_base.tsv")"
+verdict_for "$ct" "$cp" --raw > "$W/ctl_raw.tsv"; raw="$(n_ident "$W/ctl_raw.tsv")"
+if [ "$base" -gt 0 ] && [ "$raw" -lt "$base" ]; then
+    echo "CONTROL FIRED: no-translation — $CTL reads $base IDENT events translated and $raw untranslated"
+elif [ "$base" -gt 0 ]; then
+    echo "CONTROL DEAD: no-translation — $CTL still reads $base IDENT events with the placement translation removed"; fail=1
 else
-    echo "CONTROL DEAD: no-translation — the control part $CTL is not frozen IDENTICAL, so the control cannot discriminate"
-    fail=1
+    echo "CONTROL DEAD: no-translation — the control part $CTL has no IDENT event, so the control cannot discriminate"; fail=1
 fi
 
 # unpinned-level: re-run the control part's NATIVE leg at vsav2's own default.
 CTL_ONE=unpinned-level run_leg "$ct" "$cp" native
 wait
-up="$(verdict_for "$ct" "$cp" | cut -f2)"
-if [ "$base" = IDENTICAL ] && [ "$up" = IDENTICAL ]; then
-    echo "CONTROL DEAD: unpinned-level — $CTL still reads IDENTICAL with the native leg at its default play mode"
-    fail=1
+verdict_for "$ct" "$cp" > "$W/ctl_up.tsv"; up="$(n_ident "$W/ctl_up.tsv")"
+if [ "$base" -gt 0 ] && [ "$up" -lt "$base" ]; then
+    echo "CONTROL FIRED: unpinned-level — $CTL reads $up IDENT events with the native level pin withheld ($base pinned)"
 else
-    echo "CONTROL FIRED: unpinned-level — $CTL reads $up with the native level pin withheld (frozen: $base)"
+    echo "CONTROL DEAD: unpinned-level — $CTL still reads $up IDENT events with the native leg at its default play mode ($base pinned)"; fail=1
 fi
 
 if [ "$fail" = 0 ]; then echo "PASS: audit_move_parity"; else echo "FAIL: audit_move_parity"; exit 1; fi

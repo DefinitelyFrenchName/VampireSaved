@@ -1,0 +1,70 @@
+THE PACKET
+
+Decision kind: expectation
+Subject: freeze tests/expected/move_parity_events.tsv (per-event verdicts, 506 events) and tests/expected/same_data_p2.tsv (0 of 12; one-side-invalid chains classed apart) — corrected after runs 24-27
+Claim (the working agent's sentence): Two expectations are frozen at 14z-164 under the maintainer's ruling of 2026-09-17 (DECISIONS_HISTORY.md "Ruled 2026-09-17 (14z-164)", propositions 1 and 2): (A) tests/expected/move_parity_events.tsv — tests/audit_move_parity.sh now judges every EVENT of the 30 naming-rig parts of the three tenants (27 parts the per-part gate ran plus Donovan's hit/block parts 9-11) in its own window, ours (build/m3b_merged26) vs native vsav2, both legs real cursor picks, speed level 6 and the RNG pinned as before, over the tenant's ten fields plus the meter fraction RAM:$FF850A and Victor's HP RAM:$FF8850, with the four cumulative fields (meter, both HPs, stock) compared as their change from the previous sample, and EVERY compared field the rig itself writes — its per-event X pin at RAM:$FF8410 (which lands 40 frames before the next event, or 230 frames before a 'near' event with its walk-in, inside the previous window), its P2 HP pin, its stock poke — excluded on the pin frames, the count of excluded samples frozen as a column of every row, and every "in DF" event asserted in Dark Force on both legs — the freeze reads 506 events: 377 IDENT, 103 DIFF, 25 NOT-IN-DF, 1 VOID (the zero-length "P2 blocks" setup event of donovan_11), and it REPLACES the per-part move_parity.tsv (27 rows, deleted) whose rule left 103 events unjudged; (B) tests/expected/same_data_p2.tsv — tests/test_same_data_p2.sh freezes, for the 12 legacy ids both games carry, tools/audit_same_data_p2.py's verdict that 0 of 12 carry the same character data on vsavj and vsav2 (bank value rows, every anim node's resolved boxes and attack record over tables a/a2/b/c/proj, the defense-curve row) and which chains differ per table, with Demitri (table a same; b:0x10/0x71/0x74 differ; c:0x2e/0x2f are live chains on vsavj and out-of-region entries on vs2, listed as invalid-on-one-side, not content) and Bishamon (a:0x1d/0x3e, b:0x10/0x74) the nearest for a victim role and Victor's b:0x00-0x05 hitstun head hurtbox retuned on vs2. NOT TESTED: (A) runs 2026-09-17-24 and -25 of this packet found the cumulative comparison turning the rig's HP pin into a DIFF at the pin frame, the X pin compared as an absolute inside the previous window, and the pin exclusion uncontrolled; all three are fixed and the gate carries a third must-fire control, pins-ignored, which compares pyron_4 (now in the default set) with the exclusion off and must move at least one frozen row (its Cosmo Disruption [KK held] row reads +167 excluded and +50, the pin frame, not; executable as a mode over every part), and the comparator refuses a schedule without a pokes key; the pyron_4 Cosmo Disruption rows read +156 and +167 on p2hp, which is a reading of Victor's HP changes and nothing more; (A) was frozen from one run and its verify run is the second run of the same rig on the same host (run-to-run determinism of the legs, not an independent measurement); a DIFF row's ATTRIBUTION (which side, which mechanism) is not part of the freeze — a DIFF is frozen as measured and the re-labelled table on GitHub #136 is the only attribution, itself unverified by capture; 30 of the 103 DIFF rows differ first on the meter within the window and the meter's mechanism is not root-caused; a window IDENT after an earlier DIFF is bit-identical in that window but its coupling to the earlier DIFF is unmeasured (coupled column); the NOT-IN-DF threshold (90% of the window's frames with the flag up) is a chosen number; the two controls (no-translation, unpinned-level) prove the comparator sees the placement translation and the level pin, not that any DIFF is the tenant's rather than Victor's; P2 is still Victor; the rig's X pins, P2 HP pin and stock poke reach compared fields on both legs by the gate's design and are excluded on exactly their pin frames, nothing more — a pin resets an absolute field on both legs, so an offset in x is not carried across a pin by design and the frames after a pin start from an equal x; (B) compares data only — not compared, stated per row in the frozen table: the 21 code_ptr rows (the character's own routines), the 19 auto rows of the bank map (kind unknown; a differing auto row is counted in its own column, 10 of 12 characters have at least one, and it is never classed as data or pointer), and five data_ptr rows the tool does not decode (capture_kf_ptr, tail_data_ptr, ai_script_0-3); 'which chains differ' and the Demitri/Bishamon 'nearest' reading are over the SHARED sequences of a table, and the sequences present in one game only are frozen as separate counts per table (Bishamon: b 2 differ + 70 vs2-only, c 0 differ + 122 vs2-only; Zabel b 59 + 107) and are not part of 'nearest'; the projectile chains are resolved through the projectile hitbox tables and a side whose tables cannot be read leaves the proj class UNRESOLVED and says so in the row (measured: readable on both sides for all 12, so Jedah's proj 0 is genuine); the first re-freeze after the link change read every looping chain as differing because the loop target was looked up as an integer against the walker's hex-string keys, caught by the table (table a differing on 0x00-0x05 for all 12), fixed and re-frozen; a "same-data" verdict would cover a standing, hit P2 and never the character as an attacker, the chain walker's and hitbox reader's decodings are trusted as instruments (their own gates: test_anim_node_walk, test_hitbox_encoding) and the same-data verdict for a chain rests on the fields those decoders expose (duration, flags, shadow, script-op bytes, sfx, resolved boxes and record content, and the link or loop target compared by where it lands in the character's own graph as (table, seq, node) — run 26 found it collapsed to one token) with the hit id and sprite pointer excluded; a seq whose walk the walker itself reports out_of_region or runaway (an entry past the table's live chains, walked as garbage that differs by game by construction) is NOT compared node by node but counted per row as an invalid chain (Zabel 53 vsavj / 116 vs2, Jedah 77/101, Demitri 1/3, Bishamon 2/9); a seq that is a live chain on one game and invalid on the other is listed per row as invalid_one_side and is neither a content difference nor part of 'nearest' (run 27 found it counted in differ: Demitri's c:0x2e); the node-level detail artifact (same_data_detail.txt) crashed on such an entry in run 27's packet and stopped before Victor's section, and is regenerated whole; which lowered Zabel's b-table count from 59 to 21 and Jedah's a-table from 152 to 121 while leaving Demitri's and Bishamon's rows unchanged; a link target outside the image is an unknown link and a node whose boxes cannot be resolved is unresolved, both counted per row and both 0/0 for all 12 in this freeze — the resolution recorded for run 2026-09-17-26 says '0 and 0 for all 12' and was FALSE when written: before the invalid-chain exclusion the unknown-link counts read up to 53/116 (Zabel) and 77/101 (Jedah), and the tool refuses to amend a resolution, so this packet carries the correction; its self-compare control proves the audit reads SAME-DATA when handed one image twice, not that a real cross-game difference of a kind the decoders do not expose would be seen. No behavioural conclusion about how any move plays is drawn by either freeze.
+Artifacts (read every one, in full):
+  - tests/audit_move_parity.sh
+  - tools/move_parity.py
+  - tests/expected/move_parity_events.tsv
+  - tests/test_same_data_p2.sh
+  - tools/audit_same_data_p2.py
+  - tests/expected/same_data_p2.tsv
+  - build/gates_14z164/move_parity_freeze4.log
+  - build/gates_14z164/move_parity_verify5.log
+  - build/gates_14z164/move_parity_ctl5_pins-ignored.log
+  - build/gates_14z164/move_parity_ctl4_no-translation.log
+  - build/gates_14z164/move_parity_ctl4_unpinned-level.log
+  - build/gates_14z164/same_data_verify.log
+  - build/gates_14z164/same_data_ctl_self.log
+  - build/gates_14z164/same_data_ctl_dropped.log
+  - build/move_parity_census_14z164/same_data_p2.txt
+  - build/move_parity_census_14z164/same_data_detail.py
+  - build/move_parity_census_14z164/same_data_detail.txt
+  - build/move_parity_census_14z164/p2_state_classify.py
+  - build/move_parity_census_14z164/p2_state_classify.txt
+  - build/move_parity_census_14z164/contact_classify.py
+  - build/move_parity_census_14z164/contact_classify.txt
+  - tests/expected/PROVENANCE.md.lines-77-77 (lines 77-77 of tests/expected/PROVENANCE.md)
+  - DECISIONS_HISTORY.md.lines-30-52 (lines 30-52 of DECISIONS_HISTORY.md)
+  - docs/project/tables/defense_rows.md.lines-1-12 (lines 1-12 of docs/project/tables/defense_rows.md)
+  - tools/name_moves.py.lines-1-140 (lines 1-140 of tools/name_moves.py)
+  - tools/name_moves.py.lines-640-720 (lines 640-720 of tools/name_moves.py)
+  - build/manifest/bank_map.toml.lines-1-80 (lines 1-80 of build/manifest/bank_map.toml)
+  - tools/anim_nodes.py.lines-1-60 (lines 1-60 of tools/anim_nodes.py)
+  - tests/replays/naming/donovan_1.json
+  - tests/replays/naming/donovan_10.json
+  - tests/replays/naming/donovan_11.json
+  - tests/replays/naming/donovan_12.json
+  - tests/replays/naming/donovan_13.json
+  - tests/replays/naming/donovan_14.json
+  - tests/replays/naming/donovan_2.json
+  - tests/replays/naming/donovan_3.json
+  - tests/replays/naming/donovan_4.json
+  - tests/replays/naming/donovan_5.json
+  - tests/replays/naming/donovan_6.json
+  - tests/replays/naming/donovan_7.json
+  - tests/replays/naming/donovan_8.json
+  - tests/replays/naming/donovan_9.json
+  - tests/replays/naming/huitzil_1.json
+  - tests/replays/naming/huitzil_10.json
+  - tests/replays/naming/huitzil_2.json
+  - tests/replays/naming/huitzil_3.json
+  - tests/replays/naming/huitzil_4.json
+  - tests/replays/naming/huitzil_5.json
+  - tests/replays/naming/huitzil_6.json
+  - tests/replays/naming/huitzil_7.json
+  - tests/replays/naming/huitzil_8.json
+  - tests/replays/naming/huitzil_9.json
+  - tests/replays/naming/pyron_1.json
+  - tests/replays/naming/pyron_2.json
+  - tests/replays/naming/pyron_3.json
+  - tests/replays/naming/pyron_4.json
+  - tests/replays/naming/pyron_5.json
+  - tests/replays/naming/pyron_6.json
+  - tests/lib/decrypt_cache.sh.lines-1-40 (lines 1-40 of tests/lib/decrypt_cache.sh)
+  - tests/rulecheck/runs/2026-09-17-24/verdict_real.txt
+  - tests/rulecheck/runs/2026-09-17-25/verdict_real.txt
+  - tests/rulecheck/runs/2026-09-17-26/verdict_real.txt
+  - tests/rulecheck/runs/2026-09-17-27/verdict_real.txt
+  - tests/rulecheck/ledger.tsv

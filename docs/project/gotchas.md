@@ -4898,3 +4898,27 @@ that say so are `tests/test_poked_legs.sh`, `tests/test_latch_readers.sh` and
 Two traps on the way: zsh's `set -- $var` does not word-split (`${=var}`), and a
 tool copied into a scratch dir resolves `REPO` from its own path — pin it in the
 copy, or the perturbed copy measures nothing and says so only by a missing file.
+
+## A LEGACY P2 IS A CROSS-GENERATION CONFOUND IN EVERY OURS-VS-NATIVE RIG — after the first contact the comparison is partly a comparison of two Victors (paid: 14z-164, GitHub #136)
+
+The tenant-move parity rigs put Victor on P2 and compared only the tenant's
+fields. The 14z-164 census re-read the 13 frozen divergences with Victor's x,
+HP and reaction class beside the tenant's (`build/move_parity_census_14z164/`)
+and five of them BEGIN in Victor's state; 15 windows the tenant read identical
+in carried a differing Victor. The mechanism is static
+(`tests/test_same_data_p2.sh`): VS's Victor and VS2's differ on his basic hit
+reactions `b:0x00-0x05` (a retuned head hurtbox), so a multi-hit move lands
+differently on him by game. Excluding P2's FIELDS from a comparison does not
+exclude his INFLUENCE. Rules: compare P2's HP and position too and read who
+diverged first; name the P2 as a shared premise; and pick a P2 whose data is
+the same on both games (no legacy character is — the nearest are Demitri, one
+cursor move for P2 on both wheels, and Bishamon) or a second tenant.
+
+## "IN DF" IN A RIG'S EVENT NAME IS A CLAIM — assert the mode on every event, per leg (paid: 14z-164, GitHub #136)
+
+Dark Force lasts 360 frames; Donovan's part 6 scheduled 24 "in DF" events over
+3,850 frames, so 21 ran with the flag 0 on both legs and the frozen naming lines
+for them are not in-DF measurements. `tools/move_parity.py events` now returns
+NOT-IN-DF for an "in DF" window whose flag is not up on 90% of its frames on
+both legs, and DF-NOT-ENTERED for an activation that did not raise it — a
+[VSE-76]-shaped rule at the granularity of the event, not the rig.

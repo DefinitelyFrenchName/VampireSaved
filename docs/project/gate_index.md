@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**340 scripts** — 81 ci_portable, 77 ci_static, 182 emulator-tier (run by name).
+**341 scripts** — 81 ci_portable, 78 ci_static, 182 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -27,7 +27,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 82 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 30 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 31 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -372,6 +372,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/test_projectile_params.sh` | test | emulator | MAME, a build dir, ~3 min | THE PROJECTILE PARAMETERS (character-data map phase 3, 14z-121): every $FF9400-pool projectile type's inline parameter tables, decoded from the type HANDLER (tools/projectile_params.py) and MEASURED on the live spawn. | 14z-121 |
 | `tests/test_reactions.sh` | test | emulator | MAME, a build dir, ~1 min | WHICH CHAINS A TENANT RUNS AS THE VICTIM, PER REACTION CLASS, AND HOW LONG (character-data map, PHASE 3; measured 14z-120 (7)). | 14z-120 (7) |
 | `tests/test_rehit_ring.sh` | test | emulator | MAME, ~4 min | THE MULTI-HIT RE-HIT RULE IS THE RECENT-HIT SLOT, CLEARED ON EVERY GAP NODE (14z-146, measured on stock vsavj). The knowledge item the 14z-145 close left open: | 14z-146 |
+| `tests/test_same_data_p2.sh` | test | ci_static | ROMDIR | NO LEGACY CHARACTER CARRIES THE SAME CHARACTER DATA ON vsavj AND vsav2, AND WHICH CHAINS DIFFER FOR EACH IS FROZEN (14z-164, GitHub #136 proposition 2, maintainer-agreed 2026-09-17). | 14z-164 |
 | `tests/test_tick_durations.sh` | test | emulator | MAME, ~22 min | OUR DERIVED FRAME DATA IS THE ENGINE'S, measured in ENGINE TICKS (14z-126b). This is what closed the last open residue of the community cross-check: Jedah's crouching recovery. | 14z-126b |
 | `tests/test_vanilla_aerial_join.sh` | test | emulator | MAME, ~10 min | WHICH ANIM CHAIN EACH VANILLA CHARACTER'S JUMPING NORMALS ENTER FROM A NEUTRAL JUMP AND FROM A FORWARD JUMP, MEASURED ON vsavj (14z-145, the community cross-check's aerial join). | 14z-145 |
 | `tests/test_vanilla_frame_join.sh` | test | emulator | MAME, ~4 min | WHICH ANIM CHAIN EACH VANILLA CHARACTER'S STANDING NORMALS ENTER, MEASURED ON vsavj (14z-125, the community cross-check's join). | 14z-125 |

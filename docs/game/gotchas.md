@@ -853,3 +853,18 @@ gain on the HP-drop frame (`tests/test_meter_gain.sh`). Rule: before
 building a whiff twin, ask whether the quantity's steps are already
 separable in the connect leg; and a whiff leg is VOID, never a baseline, the
 moment its victim's HP moved ([VSP-170]).
+
+## VS2 RETUNED VICTOR'S HITSTUN HEAD HURTBOX, AND GAVE NEARLY EVERY CHARACTER'S BOXLESS HELD POSE A PUSH BOX — no legacy character carries the same data in both games (measured: 14z-164)
+
+`tools/audit_same_data_p2.py` compared, for the 12 legacy ids both games carry,
+the bank's value rows, every anim node's RESOLVED boxes and attack record
+(tables a/a2/b/c/proj) and the defense-curve row: 0 of 12 are the same. Two
+drifts are systematic. Victor's basic hit reactions `b:0x00-0x05` carry a head
+hurtbox of (0,77,17,11) on vsavj and (21,88,27,16) on vs2 on every node — which
+is why he takes multi-hit moves differently on the two games. And chain
+`b:0x10`, a two-node held pose with no boxes on vsavj, carries a push box on
+vs2 for Bulleta, Demitri, Victor, Morrigan, Anakaris, Bishamon, Q-Bee, Lei-Lei,
+Lilith and Jedah alike — an engine-generation change, not tuning. Indices are
+not content: vs2 renumbered the family and record tables when it grew them
+(Bulleta 80 -> 85 families), so a comparison by `hb8`/`hbA` reads half of every
+character's chains as differing; resolve the boxes first ([VSP-53]).

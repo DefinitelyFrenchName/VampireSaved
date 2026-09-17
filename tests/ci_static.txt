@@ -209,3 +209,4 @@ test_checkdocs_rom
 test_freeze_artifacts_current
 test_latch_readers
 test_poked_legs
+test_same_data_p2

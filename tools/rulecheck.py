@@ -191,22 +191,33 @@ def stage_artifacts(root: Path, src_specs, dst: Path):
     """Copy each artifact (or a line range of it) under dst, keeping its path.
     Returns [(display path, sha1 of the staged copy)]."""
     out = []
+    seen = []
     for spec in src_specs:
         path, _, rng = spec.partition(":")
         src = root / path
         if not src.is_file():
             die(f"artifact not found: {path}")
         rel = Path(path)
-        target = dst / rel
-        target.parent.mkdir(parents=True, exist_ok=True)
         if rng:
+            # each RANGE stages under its own name: two ranges of one file used to
+            # collide on `dst / rel`, the second overwriting the first while the
+            # manifest listed both (GitHub #156, 14z-164) — the reader opens the
+            # staged name the packet gives it
             a, b = rng.split("-")
+            staged = rel.parent / f"{rel.name}.lines-{a}-{b}"
+            target = dst / staged
+            target.parent.mkdir(parents=True, exist_ok=True)
             lines = src.read_text(errors="replace").splitlines(keepends=True)
             target.write_text("".join(lines[int(a) - 1:int(b)]))
-            disp = f"{rel} (lines {a}-{b})"
+            disp = f"{staged} (lines {a}-{b} of {rel})"
         else:
+            target = dst / rel
+            target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(src, target)
             disp = str(rel)
+        if target.exists() and any(t == target for t in seen):
+            die(f"artifact staged twice: {disp}")
+        seen.append(target)
         out.append((disp, sha1(target), str(rel)))
     return out
 

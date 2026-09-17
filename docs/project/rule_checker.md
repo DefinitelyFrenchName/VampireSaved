@@ -58,7 +58,11 @@ narrative: handed a summary the checker inherits its framing, and two
 methods with one premise are one method ([VSP-148]). The claim sentence is
 the one narrative element, and it is required because the checker can only
 test whether a premise is STATED. The tool stages the artifacts under
-`build/rulecheck/<id>/` and records each one's SHA-1 in the run dir. **A
+`build/rulecheck/<id>/` and records each one's SHA-1 in the run dir; a line
+range `path:a-b` stages under its own name (`path.lines-a-b`), because two
+ranges of one file used to collapse onto one staged copy while the manifest
+listed both (GitHub #156, 14z-164: a reader answered Q5 from the range that
+had overwritten the ruling it was asked to find). **A
 packet is complete when the artifacts can settle every premise the claim
 names**: the first calibration of the negative fixture handed the checker a
 claim about shared pokes without the file that lists them, and the checker

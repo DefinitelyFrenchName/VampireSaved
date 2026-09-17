@@ -1,0 +1,95 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: #136 scope census, corrected: re-label the 13 divergences by their fields and move the gate to per-event verdicts
+Claim (the working agent's sentence): CORRECTED PACKET (run 2026-09-17-22 of this census returned VIOLATED on all five questions; every finding was answered by work, resolution recorded; its Q5 finding was partly a staging defect, GitHub #156, fixed in tools/rulecheck.py before this run). A read-only census of GitHub #136 move-parity coverage on merged-m18 (build/m3b_merged26), recommending that the 13 DIVERGES rows be RE-LABELLED on the field readings below (re-labelled, not closed) and that the gate be extended to per-event verdicts with the stock, the meter fraction and Victor HP as compared fields before any family is root-caused, finds: (1) tests/expected/move_parity.tsv judges PARTS, not moves: by tools/move_parity.py own rule 103 of the 461 events of the 27 in-gate parts are UNKNOWN and 174 events of the 42 naming rigs are outside the gate (Donovan parts 9-11 and the twelve victim parts), so the 14z-159 figure "117 of 145 moves measured" counts a move as covered when ANY event entering one of its chains lies in a frozen-IDENTICAL stretch (event_status_census.txt); (2) re-running the 13 DIVERGES parts on a scratch copy of tests/audit_move_parity.sh that keeps the traces reproduces every frozen first-divergent event (gate_run_13_parts.log, gate_run_donovan2_repinned.log, gate_run_p2fields.log), and comparing each EVENT in its own window (event_resync.txt, contact_classify.txt) reads the 13 first-divergent events as: donovan_6, donovan_7, huitzil_4 — node, seq and stock differ from the DF activation frame, stock native 9 to 7 and ours 9 to 8 (the DF stock cost ruled 2026-08-30, DECISIONS_HISTORY.md lines 3424-3432), and in huitzil_4 ours reads y 108-124 in seq 24 while native reads y 40 in seq 0 over frames 6060-6390 (traces p2_tr_huitzil_4_native/ours); huitzil_6, huitzil_8 — the ONLY differing field is Phobos own HP by 1 (native 275, ours 274; traces p2_tr_huitzil_6_*) after Victor HK, and the static defense-curve cell for victim 0x10 column 0x03 reads 0xFE on vsavj against 0x00 on vs2 (defense_cell_check.txt; the two games rows are content-swapped and ours keeps vanilla rows by the maintainer ruling of 2026-08-14, docs/project/tables/defense_rows.md lines 1-12), a difference in the direction of the observed extra damage; pyron_3 — stock native 0 to 1 at +30, ours 440 frames later (a stock crossing; the meter fraction is not a compared field); donovan_4, huitzil_2, huitzil_9, huitzil_5 — the first differing frame comes after Victor HP dropped, or for huitzil_5 after Victor HK was blocked (contact_classify.txt); donovan_2 — node counter from +65, then cnt and node differing on most frames of every later event of the part; donovan_3 — x only, native 499 to 439 over Press of Death LK and ours 499 throughout LK, MK, HK and Change Immortal (p2_tr_donovan_3_*); pyron_4 — x by 1 px from +143 of Piled Hell; (3) of the 24 events labelled "in DF" in donovan_6, 21 ran with the DF flag 0 on both legs (DF on 2928-3288 native, 2928-3289 ours; p2_tr_donovan_6_*), as did donovan_4 "5LP in DF" and pyron_4 "Sol Smasher [LP] in DF"; huitzil_4 "Plasma Beam [LP] in DF" ran with the flag 0 natively and 1 for its first 5 frames on ours; (4) the meter fraction RAM:$FF850A is not a compared field and its per-event end values differ: Donovan Sharirum Luna and Sword Grapple by 1 per throw, Pyron Corona Whip by 2 (ours higher), Pyron Planet Burning by 10 per use (native +30, ours +20), and during Donovan DF native 0 while ours gains (contact_classify.txt "meter n/o"); Victor HP drops and their count are equal on 86 contact events and differ on 10: five inside a window where both legs are in DF, one where ours is in DF for 5 frames, two immediately after a DF exit with the legs already on different nodes at the window start (donovan_4 5LP in DF, pyron_4 Sol Smasher in DF), and two with both legs synchronised at the window start and the flag 0 on both — donovan_6 "Hop Kick in DF" (native 1 hit for 11, ours 0) and pyron_4 Cosmo Disruption [PP held] (native 2 hits for 16, ours 4 hits for 29, Pyron own fields identical); (5) chain_census.txt: a2 chains entered by no naming rig, by distinct chain start — Donovan 15 (1 with attack records), Phobos 11 (4), Pyron 9 (2), read from the generated <tenant>_anim.md pages; (6) no live ours-vs-native gate compares a tenant as the VICTIM of a hit, Donovan or Pyron guard cancel, or meter gain, and the 14z-159 sentence "damage and meter EXACT on Donovan hit rigs, hitboxes EXACT over 3,021 frames" (STATE_HISTORY.md line 243) has no gate, log or file behind it in the tree. NOT TESTED, and no conclusion is drawn on any of it: whether the four contact-coupled divergences and the two synchronised damage differences are artefacts of Victor being VS Victor on our leg and VS2 Victor on the native one (no rig with a same-data P2 was run); the mechanism of any meter difference; whether an event window that reads identical AFTER an earlier divergence in its part is phase-coupled to it (identical-after-divergence is reported only where the window is bit-identical, and donovan_2 shows a persisting offset); the DF flag value 3 that flickers on both legs; the identities of the never-entered chains (attack-record presence read from the pages, not play); the victim parts and Donovan parts 9-11 were not run on ours; NO CAPTURE was produced and nothing above is a statement about how any move plays or feels — every item is a field reading to be captured before it is concluded; both legs share the rig schedule, its per-event X pins at $FF8410/$FF8810, its P2 HP pin at $FF8850, ITS STOCK POKE $FF8509 := 9 at the first event minus 60 and at mid-part on the meter parts (tools/name_moves.py line 710) which writes the compared stock field on both legs so a stock divergence before the mid-part reset agrees by construction after it, the level and RNG pins, tests/lua/field_trace.lua and MAME, so agreement on a pinned frame is by construction; the census scripts only control is that their first differing event equals the gate frozen one on all 13 parts, the contact, damage and chain classifications ran without a control, and defense_cell_check.py carries one same-cell control (row 0x03 column 0x10 equal on both games); the scratch copy unpinned-level control overwrites the FIRST part native trace, so donovan_2 was re-run behind an IDENTICAL part and huitzil_1 P2-field rows are excluded from every figure.
+Artifacts (read every one, in full):
+  - tests/audit_move_parity.sh
+  - tools/move_parity.py
+  - tests/expected/move_parity.tsv
+  - tests/expected/move_naming_donovan.txt
+  - tests/expected/move_naming_huitzil.txt
+  - tests/expected/move_naming_pyron.txt
+  - build/manifest/moves_donovan.toml
+  - build/manifest/moves_huitzil.toml
+  - build/manifest/moves_pyron.toml
+  - tools/name_moves.py.lines-1-140 (lines 1-140 of tools/name_moves.py)
+  - tools/name_moves.py.lines-640-720 (lines 640-720 of tools/name_moves.py)
+  - tests/replays/naming/donovan_1.json
+  - tests/replays/naming/donovan_10.json
+  - tests/replays/naming/donovan_11.json
+  - tests/replays/naming/donovan_12.json
+  - tests/replays/naming/donovan_13.json
+  - tests/replays/naming/donovan_14.json
+  - tests/replays/naming/donovan_2.json
+  - tests/replays/naming/donovan_3.json
+  - tests/replays/naming/donovan_4.json
+  - tests/replays/naming/donovan_5.json
+  - tests/replays/naming/donovan_6.json
+  - tests/replays/naming/donovan_7.json
+  - tests/replays/naming/donovan_8.json
+  - tests/replays/naming/donovan_9.json
+  - tests/replays/naming/donovan_victim_1.json
+  - tests/replays/naming/donovan_victim_2.json
+  - tests/replays/naming/donovan_victim_3.json
+  - tests/replays/naming/donovan_victim_4.json
+  - tests/replays/naming/huitzil_1.json
+  - tests/replays/naming/huitzil_10.json
+  - tests/replays/naming/huitzil_2.json
+  - tests/replays/naming/huitzil_3.json
+  - tests/replays/naming/huitzil_4.json
+  - tests/replays/naming/huitzil_5.json
+  - tests/replays/naming/huitzil_6.json
+  - tests/replays/naming/huitzil_7.json
+  - tests/replays/naming/huitzil_8.json
+  - tests/replays/naming/huitzil_9.json
+  - tests/replays/naming/huitzil_victim_1.json
+  - tests/replays/naming/huitzil_victim_2.json
+  - tests/replays/naming/huitzil_victim_3.json
+  - tests/replays/naming/huitzil_victim_4.json
+  - tests/replays/naming/pyron_1.json
+  - tests/replays/naming/pyron_2.json
+  - tests/replays/naming/pyron_3.json
+  - tests/replays/naming/pyron_4.json
+  - tests/replays/naming/pyron_5.json
+  - tests/replays/naming/pyron_6.json
+  - tests/replays/naming/pyron_victim_1.json
+  - tests/replays/naming/pyron_victim_2.json
+  - tests/replays/naming/pyron_victim_3.json
+  - tests/replays/naming/pyron_victim_4.json
+  - build/move_parity_census_14z164/event_status_census.py
+  - build/move_parity_census_14z164/event_status_census.txt
+  - build/move_parity_census_14z164/event_resync.py
+  - build/move_parity_census_14z164/event_resync.txt
+  - build/move_parity_census_14z164/contact_classify.py
+  - build/move_parity_census_14z164/contact_classify.txt
+  - build/move_parity_census_14z164/chain_census.py
+  - build/move_parity_census_14z164/chain_census.txt
+  - build/move_parity_census_14z164/defense_cell_check.py
+  - build/move_parity_census_14z164/defense_cell_check.txt
+  - build/move_parity_census_14z164/gate_run_13_parts.log
+  - build/move_parity_census_14z164/gate_run_donovan2_repinned.log
+  - build/move_parity_census_14z164/gate_run_p2fields.log
+  - build/move_parity_census_14z164/audit_move_parity_scratch_copy.sh.txt
+  - build/move_parity_census_14z164/audit_move_parity_scratch_copy_p2fields.sh.txt
+  - build/move_parity_census_14z164/traces/p2_tr_donovan_3_native.txt
+  - build/move_parity_census_14z164/traces/p2_tr_donovan_3_ours.txt
+  - build/move_parity_census_14z164/traces/p2_tr_huitzil_6_native.txt
+  - build/move_parity_census_14z164/traces/p2_tr_huitzil_6_ours.txt
+  - build/move_parity_census_14z164/traces/p2_tr_pyron_3_native.txt
+  - build/move_parity_census_14z164/traces/p2_tr_pyron_3_ours.txt
+  - build/move_parity_census_14z164/traces/p2_tr_donovan_6_native.txt
+  - build/move_parity_census_14z164/traces/p2_tr_donovan_6_ours.txt
+  - build/move_parity_census_14z164/traces/p2_tr_huitzil_4_native.txt
+  - build/move_parity_census_14z164/traces/p2_tr_huitzil_4_ours.txt
+  - build/move_parity_census_14z164/donovan_anim.md
+  - build/move_parity_census_14z164/huitzil_anim.md
+  - build/move_parity_census_14z164/pyron_anim.md
+  - build/move_parity_census_14z164/github_136_comments.md
+  - DECISIONS_HISTORY.md.lines-3424-3432 (lines 3424-3432 of DECISIONS_HISTORY.md)
+  - docs/project/tables/defense_rows.md.lines-1-12 (lines 1-12 of docs/project/tables/defense_rows.md)
+  - docs/project/tables/defense_rows.md.lines-108-125 (lines 108-125 of docs/project/tables/defense_rows.md)
+  - docs/game/atlas/ram.md.lines-185-187 (lines 185-187 of docs/game/atlas/ram.md)
+  - docs/game/engine_internals.md.lines-3587-3600 (lines 3587-3600 of docs/game/engine_internals.md)
+  - tests/audit_df_framework.sh.lines-1-40 (lines 1-40 of tests/audit_df_framework.sh)
+  - STATE_HISTORY.md.lines-243-243 (lines 243-243 of STATE_HISTORY.md)

@@ -92,6 +92,7 @@ declares	test_rompath_reject
 declares	test_rpl2siminputs
 declares	test_rule5_census
 declares	test_rule_checker
+declares	test_same_data_p2
 declares	test_shadow_tenant
 declares	test_shell_portability
 declares	test_sim_wram_contract
