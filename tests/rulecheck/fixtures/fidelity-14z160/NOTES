@@ -33,3 +33,12 @@ Calibration history (the ledger is the record; this file says why a fixture chan
   07); the third did not. The reader-to-reader spread on Q1 is a measured
   property of the checker, reported to the maintainer, not tuned.
 - v4: both statements corrected to what the gate shows.
+- BOUNDED QUESTIONS (maintainer-ruled option C; runs 18, 19, each beside a
+  caught plant): v4 read OK once and VIOLATED once — the VIOLATED reader found
+  a true premise the claim had not named: the POKED leg is the gate's own
+  hand-typed replica of the #136 rig's leg, and nothing asserts the replica
+  equals the rig (a gate gap, ticketed). v5 names it.
+- v5 under the bounded questions (runs 20, 21, each beside a caught plant): OK
+  and OK. CALIBRATED under checklist 62514a98c3e7. Every premise a reader ever
+  found true is now named in the claim; what remains is the maintainer's
+  written-resolution half of the ruling.

@@ -89,9 +89,9 @@ Q1 STATED BASIS — Does the claim state what it rests on that was NOT tested, a
 
 Q2 CAPTURE — If the claim draws a conclusion about behaviour a player could feel (how a move plays, its timing, a float, a hold, a hit), was a capture — an image or a recording — produced and put before the maintainer BEFORE the conclusion was drawn? A number alone is not a capture. N-A when no such conclusion is drawn.
 
-Q3 SHARED PREMISE — If two legs are compared (ours against native, before against after, A against B), do they share a rig, a tool, an input path, a poke, or a premise such that a defect in it would make them AGREE? Two agreeing methods sharing a premise are one method. N-A when there is no comparison.
+Q3 SHARED PREMISE — If two legs are compared (ours against native, before against after, A against B), do they share a rig, a tool, an input path, a poke, or a premise that the artifacts SHOW can write or select the compared state, such that a defect in it would make them AGREE? Two agreeing methods sharing a premise are one method. A mechanism no artifact shows is not a finding: name the line that shows the shared thing reaching the compared state, or answer OK. N-A when there is no comparison.
 
-Q4 CONTROL FOR THIS FAILURE — Does the instrument carry a control that would fire on the specific way THIS claim could be wrong — not merely some control? Name the control and the failure mode it covers, or name the failure mode nothing covers. A control that proves the instrument sees a different thing than the claim rests on does not count.
+Q4 CONTROL FOR THIS FAILURE — Does the instrument carry a control that would fire on the specific way THIS claim could be wrong — not merely some control? Name the control and the failure mode it covers. A failure mode that the CLAIM ITSELF names as untested or uncovered is OK here: a named gap is the working agent's to accept in writing, not the checker's to find. VIOLATED only for a failure mode that is neither controlled nor named by the claim; name it. A control that proves the instrument sees a different thing than the claim rests on does not count as covering it.
 
 Q5 DECISION SOURCE — If the packet attributes a decision, an approval, a ruling or a closure to the maintainer or to any person, is that person's OWN STATEMENT quoted in the artifacts? An inference from a timestamp, an event log, an actor field, a coincidence or a silence is VIOLATED. N-A when no decision is attributed to anyone.
 
@@ -109,7 +109,11 @@ VERDICT: <VIOLATED if any question is VIOLATED, otherwise OK>
 **The binding half is on the working agent.** A `VIOLATED` verdict STOPS
 the action until the violation is resolved and the resolution recorded
 (`tools/rulecheck.py resolve <id> --how "..."`; the gate fails on a
-`VIOLATED` row with no resolution). The checker's output is reported to the
+`VIOLATED` row with no resolution). The resolution answers EACH violated
+question by its label (`Q1: … Q4: …`) — what changed, or why the finding is
+accepted — and the tool refuses one that does not (maintainer-ruled, option
+C: the questions are bounded AND what they still find is answered in
+writing). The checker's output is reported to the
 maintainer VERBATIM, never summarised — paraphrase is where softening
 happens — and the run dir keeps it verbatim.
 
@@ -149,11 +153,12 @@ caught and cited to the artifact line that contradicts it. The negative
 fixture, an honest packet about a real gate, did NOT read OK by every reader:
 Q3 and Q4 as worded admit mechanisms no artifact shows and failure modes no
 real gate covers, so a reader can always find one more, and the readers' spread
-on the same packet is a property of the instrument. Whether the questions are
-bounded, or a `VIOLATED` on such grounds is answered in writing through
-`resolve`, is the maintainer's decision; until it is ruled, a `VIOLATED` on a
-real run stops the action as written, and the resolution names the finding it
-answers.
+on the same packet is a property of the instrument. The maintainer ruled BOTH:
+Q3 counts only a shared thing the artifacts show reaching the compared state,
+Q4 reads OK for a failure mode the claim itself names, and what the bounded
+questions still find is answered question by question through `resolve`.
+Every fixture was recalibrated on that wording; the ledger shows the
+before and after.
 
 ## What it will not catch
 

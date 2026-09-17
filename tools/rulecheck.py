@@ -119,6 +119,10 @@ def violated_list(answers):
 
 
 # ---------------------------------------------------------------- the packet
+def checklist_sha1(root: Path) -> str:
+    return hashlib.sha1(read_checklist(root).encode()).hexdigest()[:12]
+
+
 def read_checklist(root: Path) -> str:
     doc = (root / DOC).read_text()
     if CHECKLIST_BEGIN not in doc or CHECKLIST_END not in doc:
@@ -235,9 +239,9 @@ def cmd_prepare(a):
         if expect_kind == "OK":
             # a NEGATIVE fixture is calibrated beside a PLANT (a calibrated positive), blind,
             # so a reader quiet because it is dead cannot read as a clean packet (run 08, Q4)
-            eligible = [n for n, ex in fixtures if ex[0] == "VIOLATED" and calibrated(ledger_rows, n)]
+            eligible = [n for n, ex in fixtures if ex[0] == "VIOLATED" and calibrated(ledger_rows, n, root)]
             if not eligible:
-                die("a negative fixture is calibrated beside a plant — calibrate a positive fixture first")
+                die("a negative fixture is calibrated beside a plant — calibrate a positive fixture first (under the CURRENT checklist)")
             control_name = eligible[len(ledger_rows) % len(eligible)]
         else:
             control_name = a.calibrate
@@ -249,9 +253,9 @@ def cmd_prepare(a):
         decision, subject, claim = a.decision, a.subject, a.claim
         real_packet = None
         # the plant, by rotation over the calibrated fixtures, positive ones only
-        eligible = [n for n, ex in fixtures if ex[0] == "VIOLATED" and calibrated(ledger_rows, n)]
+        eligible = [n for n, ex in fixtures if ex[0] == "VIOLATED" and calibrated(ledger_rows, n, root)]
         if not eligible:
-            die("no CALIBRATED positive fixture to plant — run `prepare --calibrate <fixture>` first")
+            die("no positive fixture CALIBRATED under the current checklist to plant — run `prepare --calibrate <fixture>` first")
         control_name = eligible[len(ledger_rows) % len(eligible)]
 
     # slots: which of a/b carries the plant is drawn at random and recorded
@@ -292,7 +296,8 @@ def cmd_prepare(a):
     for slot, text in ((real_slot, real_text), (control_slot, control_text)):
         (stage / f"prompt_{slot}.md").write_text(prompt_text(root, text, str(stage / slot)))
     (rdir / "meta.tsv").write_text(
-        f"decision\t{decision}\nsubject\t{subject}\nsession\t{session}\nmodel\t{model}\nclaim\t{claim}\n")
+        f"decision\t{decision}\nsubject\t{subject}\nsession\t{session}\nmodel\t{model}\nclaim\t{claim}\n"
+        f"checklist\t{checklist_sha1(root)}\n")
     print(f"prepared run {rid}")
     print(f"  prompts: {stage}/prompt_a.md and {stage}/prompt_b.md")
     print("  spawn TWO FRESH agents (never a fork) in one message, one per prompt, each prompt verbatim")
@@ -304,14 +309,20 @@ def cmd_prepare(a):
         print(f"  (calibration of the negative {a.calibrate} beside the plant {control_name}: two agents, blind)")
 
 
-def calibrated(ledger_rows, name):
+def calibrated(ledger_rows, name, root: Path = None):
     """A positive fixture: a calibration row where it was itself caught. A negative
-    fixture: a calibration row where it read OK beside a CAUGHT plant (or, before
-    plants were paired, alone)."""
+    fixture: a calibration row where it read OK beside a CAUGHT plant. Only a row
+    read against the CURRENT checklist counts — a changed checklist moves the
+    instrument, and a run whose meta carries no checklist hash predates the rule."""
+    root = root or REPO
+    want = checklist_sha1(root)
     for r in ledger_rows:
         if r["decision"] != "calibration" or r["subject"] != name or r["control_verdict"] != "CAUGHT":
             continue
-        if r["control"] == name or r["verdict"] == "OK":
+        if not (r["control"] == name or r["verdict"] == "OK"):
+            continue
+        meta = root / RUNS / r["id"] / "meta.tsv"
+        if meta.is_file() and read_kv(meta).get("checklist") == want:
             return True
     return False
 
@@ -445,6 +456,9 @@ def cmd_resolve(a):
         die(f"run {a.id} is already resolved")
     if "\t" in a.how or "\n" in a.how or not a.how.strip():
         die("--how must be one non-empty line")
+    missing = [q for q in r["violated"].split() if f"{q}:" not in a.how]
+    if missing:
+        die(f"the resolution must answer each violated question by its label ({', '.join(q + ':' for q in missing)} missing) — what changed, or why the finding is accepted")
     p = root / LEDGER
     lines = p.read_text().splitlines(keepends=True)
     out = []
@@ -531,16 +545,20 @@ def cmd_check(root: Path) -> int:
             fail(f"{r['id']}: a DEAD plant must VOID the verdict (reads {r['verdict']})")
         if r["verdict"] == "VIOLATED" and r["resolution"] == "-" and r["decision"] != "calibration":
             fail(f"{r['id']}: VIOLATED with no resolution — the action it stopped is still stopped")
+        if r["verdict"] == "VIOLATED" and r["resolution"] != "-" and r["decision"] != "calibration":
+            miss = [q for q in r["violated"].split() if f"{q}:" not in r["resolution"]]
+            if miss and r["id"] > "2026-09-17-14":  # rows resolved before the ruling keep their form
+                fail(f"{r['id']}: the resolution does not answer {', '.join(miss)} by label")
     print(f"  {len(rows)} rows")
 
-    print("== 3. every fixture is CALIBRATED — proven catchable (or, negative, proven quiet) ==")
+    print(f"== 3. every fixture is CALIBRATED under the CURRENT checklist ({checklist_sha1(root)}) ==")
     for n, ex in fixtures:
         cal = [r for r in rows if r["decision"] == "calibration" and r["subject"] == n]
-        ok = [r for r in cal if r["control_verdict"] == "CAUGHT"]
-        if not ok:
-            fail(f"fixture {n}: no CAUGHT calibration row — an uncalibrated plant proves nothing")
+        ok = [r for r in cal if r["control_verdict"] == "CAUGHT" and (r["control"] == n or r["verdict"] == "OK")]
+        if not calibrated(rows, n, root):
+            fail(f"fixture {n}: no calibration row under the current checklist — a changed checklist moves the instrument; recalibrate")
         else:
-            print(f"  {n}: {len(ok)}/{len(cal)} calibrations caught")
+            print(f"  {n}: {len(ok)}/{len(cal)} calibrations caught (all checklists); calibrated under the current one")
 
     print("== 4. no real run rests on a DEAD plant, and the plant rotates ==")
     real = [r for r in rows if r["decision"] != "calibration"]

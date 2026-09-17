@@ -27,6 +27,21 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-17 (14z-163) — the rule-checker's questions Q3 and Q4: bounded AND resolved in writing (option C)
+
+**The entry, moved verbatim from STATE "Decisions pending":**
+
+- **14z-163 — THE RULE-CHECKER'S QUESTIONS Q3 AND Q4: BOUNDED, OR KEPT AS WRITTEN WITH A WRITTEN RESOLUTION STEP? (GitHub #152; the design is the maintainer's).** Measured: plants caught 8/8 (every positive fixture, every reader, the false-statement plant 3/3); the honest negative packet OK in 2 of 5 readings, and every VIOLATED reading true of the artifacts — two of them real defects (the `$FF8410` pin the claim denied; #154), the rest uncovered failure modes the claim itself names (Q4) or shared mechanisms no artifact shows (Q3). As worded, Q3 ("a premise such that a defect in it would make them AGREE") and Q4 ("a control that would fire on the specific way THIS claim could be wrong") have no bound a real gate can meet, so under [VSP-184] nearly every honest real run ends VIOLATED and stops. Options: **(A)** keep the five questions as written; a VIOLATED is resolved only by answering each finding in writing through `rulecheck resolve` — the checker never says OK on a real gate and becomes a forcing function for explicit written acceptance of every uncovered mode before the action. **(B)** bound them: Q3 counts only a shared thing the artifacts SHOW can write the compared state; Q4 reads OK when the claim itself names the uncovered mode as untested; every fixture recalibrated. **(C)** both — B's wording and A's written resolution for what remains. Recommendation: **C**: the value the checker proved today is catching false statements and unnamed premises (every one verified), which B keeps, while A keeps the stop honest for what a bounded question still finds. Not the session's call: the questions are the maintainer's proposal and a change moves the instrument.
+
+**Ruling (verbatim):** *"my decision is 'both'"* — option C: Q3 counts only a
+shared thing the artifacts SHOW can write or select the compared state; Q4
+reads OK when the claim itself names the uncovered failure mode as untested;
+and what a bounded question still finds stops the action until
+`tools/rulecheck.py resolve` answers EACH violated question in writing (the
+tool refuses a resolution that does not). Every fixture is recalibrated on the
+new wording, because a changed checklist moves the instrument
+(`docs/project/rule_checker.md`).
+
 ## Ruled 2026-09-17 (14z-163) — #152 closes after a first REAL run of the rule-checker; the checker stays on the default model
 
 **Context.** The rule-checker was built and calibrated in 14z-163 (seven
