@@ -1,5 +1,23 @@
 # GOTCHAS (project) — traps in OUR pipeline and method
 
+## A NEW ANCHOR DOCUMENT FOR A SKILL IS A TWO-REPO EDIT — the harness's consumer config carries its own copy of the skills lock's document list (paid: 14z-163, GitHub #152)
+
+`tools/checkskills.py` names the documents a skill's anchors may live in
+(`_PORT_DOCS` and the rest), and the generic harness's `check-skills` is the
+same tool config-driven: the list lives AGAIN in
+`~/Developer/blackbox-harness/example/consumers/bbh.vampire.toml` under
+`[skill_VSP] docs`. `tests/test_bbh_fidelity.sh` F11 runs both over this tree
+and demands identical output, so adding a document here alone makes the
+harness report every rule anchored in it as ANCHORED NOWHERE — one red gate,
+127 s, on the first strict tier after the edit (the row working as intended,
+as its own re-baseline page says of F9).
+
+**RULE: when a document joins a skill's anchor list in `checkskills.py`, the
+same path joins the consumer config in the harness, in a harness commit that
+names the lineage session; then re-run `test_bbh_fidelity` before the tier.**
+The fidelity gate is the guard; nothing in this tree can see the harness's
+list.
+
 ## A COMMIT SUBJECT THAT NAMES AN ISSUE AFTER A CLOSING KEYWORD CLOSES IT ON PUSH — and the close is attributed to the PUSHING account, not measured (paid: 14z-162, GitHub #151)
 
 GitHub closes an issue the moment a commit reaches the default branch whose

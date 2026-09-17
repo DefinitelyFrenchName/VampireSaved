@@ -247,4 +247,8 @@ test_tickets
 # once as a push side effect and was then misrecorded as a maintainer act.
 # tools/check_commit_subject.py; one control. ~1 s.
 test_commit_subject
+# test_rule_checker — the adversarial rule-checker's record (14z-163, GitHub #152):
+# every run's plant caught, every fixture calibrated, every VIOLATED resolved, every
+# freeze since the birth checked. tools/rulecheck.py; three controls. ~2 s.
+test_rule_checker
 test_rompath_reject

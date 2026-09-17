@@ -1,0 +1,24 @@
+# tests/rulecheck/ledger.tsv — THE RULE-CHECKER'S LEDGER: one row per run, append-only
+# (GitHub #152; spec docs/project/rule_checker.md; tool tools/rulecheck.py; gate
+# tests/test_rule_checker.sh). Written by `rulecheck record` and `rulecheck resolve`
+# only. Columns:
+#   id              <date>-<nn>, the run dir under tests/rulecheck/runs/
+#   date            the day the verdict was recorded
+#   session         the 14z-N key of the sitting
+#   decision        build | freeze | expectation | recommendation | calibration
+#   subject         what the action is about (freeze: the expectation sets, space-separated;
+#                   calibration: the fixture name)
+#   control         the fixture PLANTED beside the real packet (calibration: the fixture itself)
+#   control_verdict CAUGHT | DEAD — whether the plant's expected violation was returned
+#   verdict         OK | VIOLATED | VOID (VOID when the plant was DEAD: the run licenses nothing)
+#   violated        the questions VIOLATED on the real packet, or -
+#   resolution      - until a VIOLATED run's stop is resolved; then one line saying what changed
+#   model           the model the checker agents ran on, as given to `prepare --model`
+id	date	session	decision	subject	control	control_verdict	verdict	violated	resolution	model
+2026-09-17-01	2026-09-17	14z-163	calibration	forced-pick-14z159	forced-pick-14z159	CAUGHT	VIOLATED	Q1 Q2 Q3 Q4	-	default
+2026-09-17-02	2026-09-17	14z-163	calibration	inferred-decision-14z162	inferred-decision-14z162	CAUGHT	VIOLATED	Q1 Q3 Q4 Q5	-	default
+2026-09-17-03	2026-09-17	14z-163	calibration	fidelity-14z160	fidelity-14z160	DEAD	VOID	Q1 Q3 Q4	-	default
+2026-09-17-05	2026-09-17	14z-163	calibration	fidelity-14z160	fidelity-14z160	DEAD	VOID	Q1 Q3	-	default
+2026-09-17-04	2026-09-17	14z-163	calibration	fidelity-14z160	fidelity-14z160	DEAD	VOID	Q1	-	default
+2026-09-17-06	2026-09-17	14z-163	calibration	fidelity-14z160	fidelity-14z160	CAUGHT	OK	-	-	default
+2026-09-17-07	2026-09-17	14z-163	calibration	fidelity-14z160	fidelity-14z160	CAUGHT	OK	-	-	default

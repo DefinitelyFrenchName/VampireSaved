@@ -1,0 +1,17 @@
+# tests/expected/forced_pick_fidelity.tsv — what a FORCED-PICK native leg gets wrong,
+# measured by tests/audit_forced_pick_fidelity.sh on native vsav2 (GitHub #151,
+# 14z-160): per row, the P1 fighter-block offsets that differ at EVERY pre-match
+# sample between the #136 rig's poked leg (Donovan's confirm + the id poke) and a
+# REAL cursor pick of the same tenant (the LATCHED set), and the first frame at
+# which any OTHER byte of the block differs in play (the latch's behavioural
+# consequence within the cut rig; `-` = none within it).
+# Evidence class: in-emulator (native vsav2, both legs). Frozen 14z-160 with
+# FREEZE=1; re-freeze with the same invocation only after a change to the naming
+# rigs' prologue or to the poke protocol. The set can only SHRINK by a change to
+# the rigs; a new offset is a finding. donovan-self is the negative control (R,R
+# IS Donovan, so the same-id poke must latch nothing).
+# Columns: row, latched offsets (P1 block, +hex), first in-play difference frame.
+#--
+huitzil	+3bd,+3c2,+3e0	2980
+pyron	+3bd,+3c2,+3e0	-
+donovan-self	-	-

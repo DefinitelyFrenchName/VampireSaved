@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**339 scripts** — 80 ci_portable, 77 ci_static, 182 emulator-tier (run by name).
+**340 scripts** — 81 ci_portable, 77 ci_static, 182 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 14 | the suite runners and their own ground truth |
+| [runner](#runner) | 15 | the suite runners and their own ground truth |
 | [docs](#docs) | 18 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 34 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 56 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -48,6 +48,7 @@ the suite runners and their own ground truth.
 | `tests/test_header_defaults.sh` | test | ci_portable | — | a gate's HEADER must state the default its CODE actually uses (14z-128). ROM-free, ~2 s. | 14z-128 |
 | `tests/test_mame_bin_pinned.sh` | test | ci_portable | — | a gate that boots `vsavjw` through a MAME wrapper must PIN the MAME binary (14z-133). ROM-free, ~1 s. | 14z-133 |
 | `tests/test_must_fire_census.sh` | test | ci_portable | — | THE MUST-FIRE DOCTRINE, MACHINE-READ under the R10 grammar: which gates DECLARE a must-fire control (`# MUST-FIRE: <shape>: | 14z-145 |
+| `tests/test_rule_checker.sh` | test | ci_portable | — | the adversarial RULE-CHECKER's record is sound: every run in tests/rulecheck/ledger.tsv is complete and structured, every planted violation was caught, every fixture is calibrated, every VIOLATED resolved, and every freeze since the checker… | 14z-163 |
 | `tests/test_shell_portability.sh` | test | ci_portable | — | a `#!/bin/sh` script must actually be POSIX sh (14z-90, GitHub issue #15). | 14z-90 |
 | `tests/test_suite_dispatch.sh` | test | emulator | emulator | ground truth for the auto-detecting runner's dispatch pieces (no emulator needed; the emulator-side behaviors they gate are proven by test_m2_repoint.sh and the suite itself): 1. build_fingerprint: vanilla rompath -> 'vsavj'; | 14z-132 |
 | `tests/test_suite_dispatch_selftest.sh` | test | ci_static | ROMDIR | ground truth for the kind->owner table in tests/test_suite_dispatch.sh (14z-90, GitHub issue #7). | 14z-90 |

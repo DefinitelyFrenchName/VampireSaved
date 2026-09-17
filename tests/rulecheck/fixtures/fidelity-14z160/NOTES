@@ -1,0 +1,25 @@
+The NEGATIVE fixture: a packet the checker must leave OK. Not handed to the checker.
+Calibration history (the ledger is the record; this file says why a fixture changed):
+- v1 (run 2026-09-17-01..03 series, run 03): two artifacts, and a claim naming only
+  two untested items. The checker returned VIOLATED on Q1/Q3/Q4 with SPECIFIC
+  findings: the globals and route residue are MEASURE-only, SELF is a same-value
+  write, and the shared `_base` pokes were not in the packet so it could not tell
+  whether one lands in the P1 block. Read as a gap in the PACKET, not checker
+  noise: every finding was true of the artifacts as handed over.
+- v2: name_moves.py added (the schedule shows the shared pokes address P2's block
+  or the globals, from frame 2000 at the earliest), and the claim states each of
+  those limits. A negative fixture is what a COMPLIANT packet looks like; it is not
+  tuned until the checker agrees — if v2 is flagged with a finding that is true of
+  the artifacts, the finding is a gap in the gate and goes to its ticket.
+- v2 result (runs 04 and 05, two fresh agents): VIOLATED on Q1 (both) and Q3 (one).
+  Both found the SAME two false statements in the claim, verified in the file:
+  the rig pins P1's X at $FF8410 (P1 block +0x10) before every "far" event
+  (name_moves.py line 687), and part 1 has no stock pokes (METER_PARTS excludes
+  it); also the level/RNG pins are the gate's own, P2-empty is asserted on the
+  POKED-vs-REAL comparison only, LATCHED is over six samples, TRANSIENT is not
+  frozen. The checker caught the working agent's own claim. Not noise.
+- v3: the claim corrected to what the artifacts show (every item above stated).
+- v3 result (runs 06 and 07, two fresh agents): OK and OK, every named premise
+  confirmed at its line; each noted one imprecision it judged not load-bearing
+  (Victor on P2 is never asserted; donovan_1 rows carry no position pin).
+  CALIBRATED on v3. The record of v1/v2 stays in the ledger as VOID rows.

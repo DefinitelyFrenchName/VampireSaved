@@ -1,0 +1,2 @@
+fixture	fidelity-14z160
+slot	a
