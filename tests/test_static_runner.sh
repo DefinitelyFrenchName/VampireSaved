@@ -3,6 +3,7 @@
 # (14z-94, GitHub #30). ROM-free, ~3 s.
 #
 # MUST-FIRE: shadow-tool: reader-unplugged — a copy of run_all_static.sh that hands the classifier no gate script must let a stub with a declared-but-unfired control read PASS (mode: that copy is the runner every section drives, and section 11 must fail)
+# MUST-FIRE: shadow-tool: trigger-blind — a copy of run_all_static.sh with its cadence TRIGGER match disabled must leave a freeze-cadence gate deferred although a path it depends on changed; section 14's triggered case must FAIL under it
 #
 # WHY A GATE FOR THE RUNNER. CLAUDE.md §4: "Verdict logic is itself tested. A
 # test's classification code must be validated against known ground-truth
@@ -45,7 +46,15 @@ SHADOW="$T/run_all_static_unplugged.sh"
 sed 's|vs_classify "$_st" "$WORK/$g.out" 58 "tests/$g.sh"|vs_classify "$_st" "$WORK/$g.out" 58|' "$RUNNER" > "$SHADOW"
 cmp -s "$RUNNER" "$SHADOW" && fail "could not unplug the reader — the vs_classify call moved"
 chmod +x "$SHADOW"
-if vs_ctl_is reader-unplugged; then ln -s "$SHADOW" "$FR/tests/run_all_static.sh"; else ln -s "$RUNNER" "$FR/tests/run_all_static.sh"; fi
+# THE SECOND SHADOW (14z-162, #148): the runner with its cadence trigger match
+# disabled — a changed path no longer pulls a deferred gate back in.
+SHADOW_T="$T/run_all_static_triggerblind.sh"
+sed 's|case "$_pth" in "$_t"\*) _hit="$_pth"; break 2 ;; esac   # TRIGGER-MATCH|: # TRIGGER-MATCH disabled|' "$RUNNER" > "$SHADOW_T"
+cmp -s "$RUNNER" "$SHADOW_T" && fail "could not blind the trigger — the TRIGGER-MATCH line moved"
+chmod +x "$SHADOW_T"
+if vs_ctl_is reader-unplugged; then ln -s "$SHADOW" "$FR/tests/run_all_static.sh"
+elif vs_ctl_is trigger-blind; then ln -s "$SHADOW_T" "$FR/tests/run_all_static.sh"
+else ln -s "$RUNNER" "$FR/tests/run_all_static.sh"; fi
 # the runner sources THE ONE classifier relative to its repo (14z-139), so
 # the synthetic repo carries it too — the shipped lib, never a copy
 mkdir -p "$FR/tests/lib"; ln -s "$REPO/tests/lib/classify.sh" "$FR/tests/lib/classify.sh"
@@ -414,6 +423,61 @@ else
     vs_ctl_dead reader-unplugged "the unplugged runner still failed g_cmissing: $(printf '%s' "$o13" | grep -E '^  g_cmissing')"; rc=1
 fi
 rm -f "$FR/tests/run_all_static_unplugged.sh"
+
+echo "== 14. THE CADENCE (14z-162, #148): a listed gate is deferred AND NAMED, runs at its cadence, and is pulled back by a changed trigger path =="
+mk g_pass 0 "PASS: fine"; mk g_fail 1 "FAIL: broken"
+printf 'g_pass\ng_fail\n' > "$FR/tests/ci_portable.txt"; : > "$FR/tests/ci_static.txt"
+# (a) no cadence file: the pre-#148 behaviour, byte-for-byte — g_fail runs, no cadence text
+rm -f "$FR/tests/ci_cadence.tsv"
+o14a="$(cd "$FR" && STATIC_CHANGED_PATHS= sh tests/run_all_static.sh --tier portable --exec-controls none 2>&1)" && s14a=0 || s14a=$?
+[ "$s14a" = 1 ] && ! printf '%s' "$o14a" | grep -qi 'cadence' \
+    && echo "  ok: without tests/ci_cadence.tsv every gate runs and nothing mentions a cadence" \
+    || fail "14a: without a cadence file: exit $s14a, cadence text: $(printf '%s' "$o14a" | grep -ci cadence)"
+# (b) g_fail listed freeze: a default (session) run defers it, NAMES it, and is GREEN
+printf 'g_fail\tfreeze\tsrc/\n' > "$FR/tests/ci_cadence.tsv"
+o14b="$(cd "$FR" && STATIC_CHANGED_PATHS= sh tests/run_all_static.sh --tier portable --exec-controls none 2>&1)" && s14b=0 || s14b=$?
+if [ "$s14b" = 0 ] && printf '%s' "$o14b" | grep -q 'deferred (freeze cadence): g_fail' \
+   && printf '%s' "$o14b" | grep -q '^deferred: 1 '; then echo "  ok: session run defers g_fail, names it, exits 0"
+else fail "14b: session run: exit $s14b; $(printf '%s' "$o14b" | grep -E 'deferred|g_fail' | head -3)"; fi
+printf '%s' "$o14b" | grep -qE '^  g_fail ' && fail "14b: the deferred gate still RAN"
+# (c) --cadence freeze runs it -> RED
+o14c="$(cd "$FR" && STATIC_CHANGED_PATHS= sh tests/run_all_static.sh --tier portable --exec-controls none --cadence freeze 2>&1)" && s14c=0 || s14c=$?
+[ "$s14c" = 1 ] && printf '%s' "$o14c" | grep -qE '^  g_fail +FAIL' && echo "  ok: --cadence freeze runs g_fail and goes red" \
+    || fail "14c: --cadence freeze: exit $s14c"
+# (d) a changed trigger path pulls it back into a session run -> RED, and says why
+o14d="$(cd "$FR" && STATIC_CHANGED_PATHS='src/gen.py' sh tests/run_all_static.sh --tier portable --exec-controls none 2>&1)" && s14d=0 || s14d=$?
+if [ "$s14d" = 1 ] && printf '%s' "$o14d" | grep -q 'g_fail <- src/gen.py'; then echo "  ok: a changed src/ path triggers g_fail in a session run, and the readout names the path"
+else fail "14d: triggered run: exit $s14d; $(printf '%s' "$o14d" | grep -E 'triggered|g_fail' | head -3)"; fi
+# (e) an unrelated changed path does not
+o14e="$(cd "$FR" && STATIC_CHANGED_PATHS='docs/x.md' sh tests/run_all_static.sh --tier portable --exec-controls none 2>&1)" && s14e=0 || s14e=$?
+[ "$s14e" = 0 ] && echo "  ok: an unrelated changed path leaves g_fail deferred" || fail "14e: unrelated path triggered g_fail (exit $s14e)"
+# (f) the gate's own script is always a trigger
+o14f="$(cd "$FR" && STATIC_CHANGED_PATHS='tests/g_fail.sh' sh tests/run_all_static.sh --tier portable --exec-controls none 2>&1)" && s14f=0 || s14f=$?
+[ "$s14f" = 1 ] && echo "  ok: editing the gate's own script triggers it" || fail "14f: own-script change did not trigger (exit $s14f)"
+# (g) --list tags the listed gate
+o14g="$(cd "$FR" && sh tests/run_all_static.sh --list 2>&1)"
+printf '%s' "$o14g" | grep -q 'g_fail  \[freeze\]' && echo "  ok: --list tags g_fail [freeze]" || fail "14g: --list lacks the tag"
+# (h) the real cadence file: every listed gate is registered, cadence is freeze|release, triggers non-empty
+o14h="$(awk -F'\t' '!/^#/ && NF {print $1, $2, ($3 == "" ? "EMPTY" : "ok")}' "$REPO/tests/ci_cadence.tsv")"
+while read -r g c t; do
+    [ -n "$g" ] || continue
+    grep -qx "$g" "$REPO/tests/ci_portable.txt" "$REPO/tests/ci_static.txt" || fail "14h: $g is in ci_cadence.tsv but in no registry"
+    case "$c" in freeze|release) ;; *) fail "14h: $g has cadence '$c'" ;; esac
+    [ "$t" = ok ] || fail "14h: $g has no triggers"
+done <<EOF14
+$o14h
+EOF14
+echo "  ok: the real tests/ci_cadence.tsv lists $(printf '%s\n' "$o14h" | awk 'NF' | wc -l | tr -d ' ') registered gates, each freeze|release with triggers"
+
+echo "== 15. MUST-FIRE: with the trigger match blinded, section 14(d)'s changed path leaves g_fail deferred =="
+ln -s "$SHADOW_T" "$FR/tests/run_all_static_triggerblind.sh"
+o15="$(cd "$FR" && STATIC_CHANGED_PATHS='src/gen.py' sh tests/run_all_static_triggerblind.sh --tier portable --exec-controls none 2>&1)" && s15=0 || s15=$?
+if [ "$s15" = 0 ] && ! printf '%s' "$o15" | grep -q 'g_fail <- '; then
+    vs_ctl_fired trigger-blind "with the trigger match disabled, a changed src/ path no longer pulls the freeze-cadence g_fail into a session run (exit 0, nothing triggered)"
+else
+    vs_ctl_dead trigger-blind "the blinded runner still triggered g_fail (exit $s15)"; rc=1
+fi
+rm -f "$FR/tests/run_all_static_triggerblind.sh" "$FR/tests/ci_cadence.tsv"
 
 echo
 [ "$rc" = 0 ] && echo "PASS: the runner's verdicts mean what they say." \

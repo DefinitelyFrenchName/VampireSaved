@@ -27,6 +27,39 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-17 (14z-162) — #148 lever A: the static tier is cadence-tiered (session / freeze / release), the first-cut classification adopted
+
+**Context.** The 14z-162 measurement of the session tier (`run_all_static.sh --strict
+--exec-controls none`): 20.4 min of gate time over 156 gates, 121 of them ≤2 s; the
+top seven (`test_m3a_reproducible` 215 s, `test_bbh_fidelity` 125 s,
+`test_merged_inputs` 78 s, `test_phasec_spaces` 68 s, `test_census_regions` 64 s,
+`test_pcrel_escapes` 55 s, `test_hui_winscreen` 50 s) ~11 min, every one re-proving
+a build/content invariant that only moves at a freeze. The maintainer's framing
+(verbatim, the same day): *"whatever happens when we release we test absolutely
+everything, no matter how long it takes. When we freeze by default we test heavily
+but we don't go over all the tests including the longest MiSTer tests […] When it
+comes to the tests we do in our average session, it's a bit different: some of them
+are absolutely mandatory to guarantee quality, some might be just out of scope. So
+we need to check."* Two levers proposed on #148: (A) a cadence per static gate,
+mirroring the emulator tier's `scope`/`cadence`; (B) running the tier on a scratch
+clone as bbh/BBX do.
+
+**Ruling (verbatim).** On the classification — *"the seven expensive gates to freeze
+cadence with path triggers, the release and MiSTer gates to release, the fast gates
+stay session"* — **"agreed"**. On which lever first — **"lever A"**.
+
+**What it means.** `tests/ci_cadence.tsv` is the registry (unlisted = session);
+`run_all_static.sh --cadence session|freeze|release` (default session) defers a
+listed gate above the requested cadence BY NAME — never a SKIP, never silent — unless
+one of its trigger paths or its own script changed since origin/main or in the
+working tree; a freeze runs `--cadence freeze` and a release `--cadence release`,
+each on the commit it builds from, which is the safety net. Ground truth:
+`tests/test_static_runner.sh` §14-15 (control `trigger-blind`). Lever B is not
+built. The three ≤2 s gates among the release set (`test_release_asset_shape`,
+`test_release_os_metadata`, `test_mister_page` — the last a docs-consistency
+check) are listed as ruled; deferring them saves nothing, and pulling any back to
+session is the maintainer's call, raised on #148.
+
 ## Ruled 2026-09-17 (14z-162) — #151 (the forced-pick apparatus validation) may be closed, conditionally; #136 stays open and now documents the 13 divergences
 
 **Context.** On the 14z-162 measurement report of #151's steps 1-3 (the forced-pick

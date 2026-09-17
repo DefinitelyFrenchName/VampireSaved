@@ -37,6 +37,14 @@
 #   ... --tier portable|static              one tier only
 #   ... --exec-controls all|portable|none  which tier's declared must-fire
 #                                          controls are EXECUTED (default all)
+#   ... --cadence session|freeze|release   which CADENCE runs (default session):
+#                                          a gate listed in tests/ci_cadence.tsv
+#                                          above the requested cadence is
+#                                          DEFERRED and NAMED, unless a path it
+#                                          depends on changed (14z-162, #148).
+#                                          A freeze runs --cadence freeze, a
+#                                          release --cadence release: the full
+#                                          tier on the commit they build from.
 #
 # THE MUST-FIRE CONTROLS ARE READ AND EXECUTED (14z-147, step two of the
 # maintainer's ruling, STATE 14z-145). Two things, both through
@@ -83,13 +91,14 @@ cd "$REPO"
 # read it as FAIL. Sourced, not copied, so the two cannot drift again.
 . "$REPO/tests/lib/classify.sh"
 
-STRICT=0; TIER=all; LIST=0; EXEC_CTL=all
+STRICT=0; TIER=all; LIST=0; EXEC_CTL=all; CADENCE=session
 while [ $# -gt 0 ]; do
     case "$1" in
     --strict) STRICT=1 ;;
     --list)   LIST=1 ;;
     --tier)   shift; TIER="${1:?--tier needs portable|static|all}" ;;
     --exec-controls) shift; EXEC_CTL="${1:?--exec-controls needs all|portable|none}" ;;
+    --cadence) shift; CADENCE="${1:?--cadence needs session|freeze|release}" ;;
     -h|--help) sed -n '2,40p' "$0"; exit 0 ;;
     *) echo "unknown argument '$1' (try --help)" >&2; exit 2 ;;
     esac
@@ -104,11 +113,60 @@ read_reg() {  # read_reg <file> — non-comment, non-blank lines
 PORTABLE="$(read_reg tests/ci_portable.txt)"
 STATIC="$(read_reg tests/ci_static.txt)"
 
+# THE CADENCE (14z-162, GitHub #148, maintainer-ruled 2026-09-17). tests/ci_cadence.tsv
+# lists the gates that are NOT session cadence, each with the path prefixes it
+# depends on. Absent file = every gate is session = the pre-#148 behaviour,
+# byte-for-byte (bbh's fidelity test drives this runner in a root without it).
+CAD_FILE=tests/ci_cadence.tsv
+cad_rank() { case "$1" in session) echo 0 ;; freeze) echo 1 ;; release) echo 2 ;; *) echo 9 ;; esac; }
+[ "$(cad_rank "$CADENCE")" != 9 ] || { echo "bad --cadence '$CADENCE'" >&2; exit 2; }
+cad_of() {  # cad_of <gate> -> cadence name (session when unlisted)
+    [ -f "$CAD_FILE" ] || { echo session; return; }
+    awk -F'\t' -v g="$1" '!/^#/ && $1 == g {print $2; f = 1} END {if (!f) print "session"}' "$CAD_FILE"
+}
+cad_triggers() {  # cad_triggers <gate> -> its path prefixes, plus its own script
+    echo "tests/$1.sh"
+    [ -f "$CAD_FILE" ] || return 0
+    awk -F'\t' -v g="$1" '!/^#/ && $1 == g && $3 != "-" {print $3}' "$CAD_FILE" | tr ' ' '\n' | awk 'NF'
+}
+# The paths that changed: committed-but-unpushed plus the working tree (untracked
+# included). STATIC_CHANGED_PATHS overrides (newline-separated) for a scratch-clone
+# run or a test. With no origin/main to diff against, EVERY trigger fires — the
+# safe side is running the gate.
+CAD_CHANGED=""; CAD_NO_BASE=0
+cad_changed() {
+    [ -n "${STATIC_CHANGED_PATHS+x}" ] && { printf '%s\n' "$STATIC_CHANGED_PATHS"; return; }
+    if git rev-parse -q --verify origin/main >/dev/null 2>&1; then
+        git diff --name-only origin/main 2>/dev/null
+        git status --porcelain 2>/dev/null | awk '{print $NF}'
+    else
+        CAD_NO_BASE=1
+    fi
+}
+cad_select() {  # cad_select <names> -> the names to run; deferred/triggered recorded in $WORK
+    _want="$(cad_rank "$CADENCE")"
+    for _g in $1; do
+        _c="$(cad_of "$_g")"
+        if [ "$(cad_rank "$_c")" -le "$_want" ]; then echo "$_g"; continue; fi
+        [ -n "$CAD_CHANGED" ] || CAD_CHANGED="$(cad_changed)"
+        _hit=""
+        if [ "$CAD_NO_BASE" = 1 ]; then _hit="(no origin/main to diff against)"; else
+            for _t in $(cad_triggers "$_g"); do
+                for _pth in $CAD_CHANGED; do
+                    case "$_pth" in "$_t"*) _hit="$_pth"; break 2 ;; esac   # TRIGGER-MATCH
+                done
+            done
+        fi
+        if [ -n "$_hit" ]; then echo "$_g"; echo "$_g <- $_hit" >> "$WORK/triggered.txt"
+        else echo "$_c $_g" >> "$WORK/deferred.txt"; fi
+    done
+}
+
 if [ "$LIST" = 1 ]; then
     echo "portable ($(printf '%s\n' "$PORTABLE" | awk 'NF' | wc -l | tr -d ' ')):"
-    printf '%s\n' "$PORTABLE" | awk 'NF{print "  " $0}'
+    for _g in $PORTABLE; do _c="$(cad_of "$_g")"; [ "$_c" = session ] && echo "  $_g" || echo "  $_g  [$_c]"; done
     echo "static ($(printf '%s\n' "$STATIC" | awk 'NF' | wc -l | tr -d ' ')):"
-    printf '%s\n' "$STATIC" | awk 'NF{print "  " $0}'
+    for _g in $STATIC; do _c="$(cad_of "$_g")"; [ "$_c" = session ] && echo "  $_g" || echo "  $_g  [$_c]"; done
     exit 0
 fi
 
@@ -250,18 +308,20 @@ exec_controls() {  # exec_controls <gate> <tier-label>
     done
 }
 
+PORTABLE_RUN="$(cad_select "$PORTABLE")"
+STATIC_RUN="$(cad_select "$STATIC")"
 case "$TIER" in
-portable) run_tier portable "$PORTABLE" ;;
-static)   run_tier static   "$STATIC" ;;
+portable) run_tier portable "$PORTABLE_RUN" ;;
+static)   run_tier static   "$STATIC_RUN" ;;
 all)
-    run_tier portable "$PORTABLE"
+    run_tier portable "$PORTABLE_RUN"
     if [ -n "${ROMDIR:-}" ]; then
-        run_tier static "$STATIC"
+        run_tier static "$STATIC_RUN"
     else
         echo "== static tier =="
         echo "  NOT RUN: ROMDIR is unset. These gates read the reference set or"
         echo "           a build dir. Set ROMDIR to include them."
-        n_skip=$((n_skip + $(printf '%s\n' "$STATIC" | awk 'NF' | wc -l | tr -d ' ')))
+        n_skip=$((n_skip + $(printf '%s\n' "$STATIC_RUN" | awk 'NF' | wc -l | tr -d ' ')))
         skipped="$skipped <static-tier:ROMDIR-unset>"
     fi ;;
 *) echo "bad --tier '$TIER'" >&2; exit 2 ;;
@@ -462,10 +522,33 @@ else
 fi
 fi
 
+# THE CADENCE READOUT (14z-162, #148): printed only when something was deferred
+# or triggered, so a tree without tests/ci_cadence.tsv reads exactly as before.
+# A deferral is NAMED here and counted below; it is never a SKIP (a SKIP asserts
+# nothing by accident, a deferral by ruling) and never silent.
+n_defer=0
+if [ -s "$WORK/deferred.txt" ] || [ -s "$WORK/triggered.txt" ]; then
+    echo
+    echo "== cadence: $CADENCE =="
+    if [ -s "$WORK/deferred.txt" ]; then
+        n_defer=$(wc -l < "$WORK/deferred.txt" | tr -d ' ')
+        for _c in freeze release; do
+            _l="$(awk -v c="$_c" '$1 == c {printf "%s%s", (n++ ? " " : ""), $2}' "$WORK/deferred.txt")"
+            [ -n "$_l" ] && echo "  deferred ($_c cadence): $_l"
+        done
+        echo "  run --cadence freeze|release to include them; a freeze and a release ALWAYS run the full tier on the commit they build from"
+    fi
+    if [ -s "$WORK/triggered.txt" ]; then
+        echo "  triggered ($(wc -l < "$WORK/triggered.txt" | tr -d ' ') above-cadence gates ran because a path they depend on changed):"
+        sed 's/^/    /' "$WORK/triggered.txt"
+    fi
+fi
+
 echo
 echo "======================================================================"
 printf 'PASS %-4s  SKIP %-4s  FAIL %-4s  MISSING %s\n' \
     "$n_pass" "$n_skip" "$n_fail" "$n_miss"
+[ "$n_defer" != 0 ] && echo "deferred: $n_defer (cadence $CADENCE — named above, not run)"
 [ -n "$skipped" ] && echo "skipped:$skipped"
 [ -n "$failed" ]  && echo "failed: $failed"
 # THE CAVEAT BELONGS IN THE SUMMARY, not only in a section above it (14z-144).

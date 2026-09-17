@@ -1,0 +1,34 @@
+# tests/ci_cadence.tsv — THE CADENCE of each static-tier gate (14z-162, GitHub #148,
+# maintainer-ruled 2026-09-17). Read by tests/run_all_static.sh.
+#
+# A gate NOT listed here is `session` cadence: it runs on every invocation. A
+# listed gate runs only when the invocation's cadence is at least its own
+# (`--cadence session|freeze|release`, default session), OR when a path it
+# depends on has changed (its TRIGGERS, below, plus its own tests/<gate>.sh —
+# always) since origin/main or in the working tree. Deferred gates are NAMED in
+# the readout, never silently dropped, and a freeze or a release ALWAYS runs the
+# full tier on the commit it builds from (`--cadence freeze` / `--cadence
+# release`), which is the safety net that makes session-cadence deferral safe.
+#
+# The ruling (2026-09-17, on the 14z-162 measurement — the top seven gates were
+# ~11 of the tier's 20 minutes, every one re-proving a build/content invariant
+# that only moves at a freeze): those seven -> freeze with path triggers; the
+# release and MiSTer gates -> release; everything else stays session.
+#
+# Columns: gate<TAB>cadence<TAB>triggers (space-separated PATH PREFIXES, repo-relative)
+# A new listing is a reviewed event: it moves a gate OUT of every session run.
+test_m3a_reproducible	freeze	build/manifest/ tools/build_ tools/gen_ tools/pack_ tools/extract_ tools/reconcile tools/cps2_ tools/patch_prg tools/ensure_merged tools/build_fingerprint tests/expected/registry.tsv tests/lib/
+test_bbh_fidelity	freeze	tests/lib/ tests/run_ tests/ci_ tools/gen_gate_index tools/checkskills tools/gen_skill_guide tools/audit_header_defaults tools/audit_build_ref_rot tools/compare_fields tools/check_wram_dumps tests/expected/ tests/lua/ .claude/skills/ tools/run_replay tools/run_inp tools/run_mame
+test_merged_inputs	freeze	build/manifest/ tools/build_ tools/gen_ tools/ensure_merged tools/extract_ tools/build_wide_romset
+test_phasec_spaces	freeze	build/manifest/ tools/gen_ tools/build_ tools/patch_prg
+test_census_regions	freeze	build/manifest/ tools/census_regions tools/gen_
+test_pcrel_escapes	freeze	build/manifest/ tools/gen_ tools/triage_pcrel tools/audit_pointer_flow tests/expected/pcrel
+test_hui_winscreen	freeze	build/manifest/ tools/gen_ tools/build_ tests/hui/ tests/expected/hui
+test_release_roundtrip	release	tools/package_release tools/upload_release tools/build_release release/ docs/project/release_format.md tests/lib/os_metadata tools/apply_release
+test_release_asset_shape	release	tools/package_release tools/upload_release release/ docs/project/release_format.md
+test_release_os_metadata	release	tools/package_release release/ tests/lib/os_metadata
+test_mister_wide_gate	release	emu/jtcores emu/jtcores-patches/ tests/rtl/ tests/expect/ tools/setup_jtcores docs/project/cps2_wide.md
+test_mister_prg_probe	release	emu/jtcores emu/jtcores-patches/ tools/run_sim_jtcps2
+audit_mister_map_fit	release	emu/jtcores emu/jtcores-patches/ docs/project/mister_fit.md docs/project/mister_map.md tools/mister_
+test_mister_mra_map	release	emu/jtcores emu/jtcores-patches/ tools/mister_mra tools/gen_vsavjw_xml
+test_mister_page	release	tools/mk_mister_page tools/_pagestyle docs/project/mister_core.md
