@@ -1,0 +1,5 @@
+decision	recommendation
+subject	#152 calibration report to the maintainer: the checker is fit for real runs
+session	14z-163
+model	default
+claim	Seven calibration runs on fresh general-purpose agents on the default model show the two positive fixtures caught on their expected questions (forced-pick-14z159 on Q1-Q4, inferred-decision-14z162 on Q1/Q3/Q4/Q5) and the negative fixture fidelity-14z160 returned OK by two independent readers on its third version, so the checker is fit for real runs and #152 can close after a first real run. Not tested: any model but the default; a real packet rather than a fixture (this run is the first); the negative fixture's claim was revised twice on the checker's own findings, so its OK is of the corrected claim, and whether the checker would leave a DIFFERENT clean claim OK is unmeasured; the two readers disagreed on Q3 for the negative's second version (one VIOLATED, one OK) and that spread is not characterised; every fixture and every claim sentence was written by the same working agent that judged the results.

@@ -231,7 +231,16 @@ def cmd_prepare(a):
         real_packet = (fx / "packet.md").read_text()
         real_src = fx / "files"
         decision, subject, claim = "calibration", a.calibrate, "(the fixture's packet)"
-        control_name = a.calibrate
+        expect_kind = dict(fixtures)[a.calibrate][0]
+        if expect_kind == "OK":
+            # a NEGATIVE fixture is calibrated beside a PLANT (a calibrated positive), blind,
+            # so a reader quiet because it is dead cannot read as a clean packet (run 08, Q4)
+            eligible = [n for n, ex in fixtures if ex[0] == "VIOLATED" and calibrated(ledger_rows, n)]
+            if not eligible:
+                die("a negative fixture is calibrated beside a plant — calibrate a positive fixture first")
+            control_name = eligible[len(ledger_rows) % len(eligible)]
+        else:
+            control_name = a.calibrate
     else:
         if not (a.decision and a.subject and a.claim and a.artifact):
             die("prepare needs --decision --subject --claim and at least one --artifact")
@@ -269,10 +278,9 @@ def cmd_prepare(a):
             f.write(f"{disp}\t{h}\n")
 
     # the CONTROL packet: the plant's files copied under the other slot
-    if a.calibrate:
-        # calibration runs the fixture alone: the control slot is the same fixture,
-        # so the recorder's expectation is checked on the real slot and the
-        # control slot mirrors it (one agent is enough, but two prompts exist)
+    if a.calibrate and control_name == a.calibrate:
+        # a POSITIVE fixture is calibrated alone: the control slot mirrors the real
+        # slot (one agent is enough; pass its output as both --a and --b)
         shutil.copytree(real_src, stage / control_slot, dirs_exist_ok=True)
         control_text = real_text
     else:
@@ -290,13 +298,22 @@ def cmd_prepare(a):
     print("  spawn TWO FRESH agents (never a fork) in one message, one per prompt, each prompt verbatim")
     print(f"  and nothing else; save each agent's final message verbatim, then:")
     print(f"  python3 tools/rulecheck.py record {rid} --a <file> --b <file>")
-    if a.calibrate:
+    if a.calibrate and control_name == a.calibrate:
         print(f"  (calibration of {control_name}: one agent on prompt_{real_slot}.md is enough; pass the same file as --a and --b)")
+    elif a.calibrate:
+        print(f"  (calibration of the negative {a.calibrate} beside the plant {control_name}: two agents, blind)")
 
 
 def calibrated(ledger_rows, name):
-    return any(r["decision"] == "calibration" and r["subject"] == name and r["control_verdict"] == "CAUGHT"
-               for r in ledger_rows)
+    """A positive fixture: a calibration row where it was itself caught. A negative
+    fixture: a calibration row where it read OK beside a CAUGHT plant (or, before
+    plants were paired, alone)."""
+    for r in ledger_rows:
+        if r["decision"] != "calibration" or r["subject"] != name or r["control_verdict"] != "CAUGHT":
+            continue
+        if r["control"] == name or r["verdict"] == "OK":
+            return True
+    return False
 
 
 # ---------------------------------------------------------------- the ledger
@@ -352,13 +369,18 @@ def cmd_record(a):
     real_slot = "b" if control_slot == "a" else "a"
     expect = read_expect(root / FIXTURES / ctl["fixture"])
     calibration = meta["decision"] == "calibration"
-    if calibration:
+    self_cal = calibration and ctl["fixture"] == meta["subject"]
+    if self_cal:
         # the fixture is in BOTH slots; the verdict under test is the real slot's
         c_ans, c_ver = parsed[real_slot]
     else:
         c_ans, c_ver = parsed[control_slot]
     r_ans, r_ver = parsed[real_slot]
     plant_caught = caught(expect, c_ans, c_ver)
+    if calibration and not self_cal:
+        # a negative fixture beside a plant: the plant must be caught AND the subject must read as expected
+        subj_expect = read_expect(root / FIXTURES / meta["subject"])
+        subject_ok = caught(subj_expect, r_ans, r_ver)
     (rdir / "verdict_real.txt").write_text(texts[real_slot])
     (rdir / "verdict_control.txt").write_text(texts[control_slot])
     row = dict(id=a.id, date=_dt.date.today().isoformat(), session=meta["session"],
@@ -374,6 +396,18 @@ def cmd_record(a):
     print(f"== rulecheck {a.id} ({meta['decision']}: {meta['subject']}) ==")
     print(f"plant: {ctl['fixture']} in slot {control_slot} — {'CAUGHT' if plant_caught else 'DEAD'}"
           f" (expected {expect[0]} {' '.join(expect[1])})")
+    if calibration and not self_cal:
+        print("--- the negative's verdict (verbatim) ---")
+        print(texts[real_slot].rstrip())
+        if not plant_caught:
+            print(f"CONTROL DEAD: the plant {ctl['fixture']} was not caught — this calibration is VOID.")
+            print("--- plant output (verbatim) ---"); print(texts[control_slot].rstrip())
+            sys.exit(2)
+        if subject_ok:
+            print(f"CALIBRATED: the negative {meta['subject']} read OK beside a caught plant.")
+            return
+        print(f"CALIBRATION FAILED: the negative {meta['subject']} read {r_ver} on {' '.join(violated_list(r_ans)) or '-'} — read the evidence: a real gap in the packet, or checker noise.")
+        sys.exit(2)
     if calibration:
         # a calibration proves the FIXTURE: the expected verdict came back, or it did not
         print("--- verdict (verbatim) ---")
@@ -487,8 +521,8 @@ def cmd_check(root: Path) -> int:
                 if not fxd.is_dir():
                     fail(f"{r['id']}: control fixture {ctl.get('fixture')!r} does not exist")
                     continue
-                if r["decision"] == "calibration":
-                    continue  # the fixture is in both slots; the real slot carries the verdict
+                if r["decision"] == "calibration" and ctl.get("fixture") == r["subject"]:
+                    continue  # a self-calibration: the fixture is in both slots; the real slot carries the verdict
                 exp = read_expect(fxd)
                 c = caught(exp, ans, ver)
                 if c != (r["control_verdict"] == "CAUGHT"):

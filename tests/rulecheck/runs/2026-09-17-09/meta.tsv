@@ -1,0 +1,5 @@
+decision	calibration
+subject	forced-pick-14z159
+session	14z-163
+model	default (fresh general-purpose agent, spawned with the prompt file verbatim and nothing else)
+claim	(the fixture's packet)

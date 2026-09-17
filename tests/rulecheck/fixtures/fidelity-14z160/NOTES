@@ -23,3 +23,13 @@ Calibration history (the ledger is the record; this file says why a fixture chan
   confirmed at its line; each noted one imprecision it judged not load-bearing
   (Victor on P2 is never asserted; donovan_1 rows carry no position pin).
   CALIBRATED on v3. The record of v1/v2 stays in the ledger as VOID rows.
+- v3 beside a PLANT (run 12, after the first real run's Q4 finding): the plant
+  (forced-pick) CAUGHT; the negative VIOLATED on Q1 by a third reader with two
+  further points, both true of the artifacts: (a) "a first difference outside
+  the pinned field" — the first-play search excludes only latched offsets, so
+  the claim asserted what the gate does not show; (b) "every one of the six
+  samples" — the gate asserts >=30 dumps per leg and samples what both legs
+  share, so six is design, not assertion. Two readers had passed v3 (runs 06,
+  07); the third did not. The reader-to-reader spread on Q1 is a measured
+  property of the checker, reported to the maintainer, not tuned.
+- v4: both statements corrected to what the gate shows.

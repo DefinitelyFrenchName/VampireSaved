@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**153 tickets** — status: open 16 · parked 15 · done 110 · declined 3 · not-ours 2 · invalid 6 · duplicate 1 · kind: bug 117 · cosmetic 10 · evolution 26 · **backfill debt: 0 rows**.
+**154 tickets** — status: open 17 · parked 15 · done 110 · declined 3 · not-ours 2 · invalid 6 · duplicate 1 · kind: bug 118 · cosmetic 10 · evolution 26 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#154](https://github.com/DefinitelyFrenchName/VampireSaved/issues/154) | bug | open | audit_forced_pick_fidelity: the FREEZE branch exits before the identity assertions and the controls, so a failed run can freeze | `tests/audit_forced_pick_fidelity.sh` | none | none | none | 14z-163 |
 | [#153](https://github.com/DefinitelyFrenchName/VampireSaved/issues/153) | evolution | open | Run the test tiers on a scratch clone at a named commit (lever B of #148): integrity and traceability at freeze/release as bbh/BBX do | none | `DECISIONS_HISTORY.md § #148 second cut, #148 closed, lever B its own ticket` | none | none | 14z-162 |
 | [#152](https://github.com/DefinitelyFrenchName/VampireSaved/issues/152) | evolution | open | An independent adversarial rule-checker at every decision point — redundancy for rule APPLICATION, not for measurement | none | none | `docs/project/rule_checker.md § The failure it exists to catch` · `docs/project/rule_checker.md § What it will not catch` | `docs/project/gotchas.md § A FORCED-PICK NATIVE LEG MEASURES THE RIG` | 14z-159,14z-163 |
 | [#150](https://github.com/DefinitelyFrenchName/VampireSaved/issues/150) | evolution | open | The freeze ritual's three silent-green failure modes need a mechanical guard (test_freeze_set_shape + a committed freeze driver) | `docs/project/gotchas.md § A FREEZE DRIVER THAT DOES NOT PIN` | none | `docs/project/gotchas.md § THE MERGED EXPECTATION SET MUST HAVE ITS 16 SELF-FROZEN` | `docs/project/gotchas.md § A FREEZE DRIVER THAT DOES NOT PIN` | 14z-159 |

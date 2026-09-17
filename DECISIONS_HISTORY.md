@@ -27,6 +27,26 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-17 (14z-163) — #152 closes after a first REAL run of the rule-checker; the checker stays on the default model
+
+**Context.** The rule-checker was built and calibrated in 14z-163 (seven
+calibration runs: both positive fixtures caught, the negative fixture OK twice
+on its corrected third version), and the report to the maintainer asked
+whether #152 closes on the calibration and which model the checker should run
+on.
+
+**Ruling (verbatim):** *"We close after we measure so we need a first real
+run. I am fine with default model. We can always recalibrate later if we need,
+right?"* — the answer is yes: `tools/rulecheck.py prepare --calibrate` re-runs
+any fixture at any time, the ledger keeps every result, and the spec
+(`docs/project/rule_checker.md`) repeats calibration whenever the checklist
+or the model changes.
+
+**What it means.** #152 stays open until a real run (a `build`, `freeze`,
+`expectation` or `recommendation` packet, with its blind plant) is recorded
+in `tests/rulecheck/ledger.tsv`; the checker's model is the default until a
+later ruling, and a change of model is a recalibration.
+
 ## Ruled 2026-09-17 (14z-162) — #148 second cut, #148 closed, lever B its own ticket
 
 **Rulings (verbatim), on the two questions the lever-A measurement left open.** The

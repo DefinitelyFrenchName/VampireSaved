@@ -121,8 +121,11 @@ agent spawns two fresh agents in one message, neither told which packet is
 the plant. A plant that is not caught VOIDS the real verdict — it licenses
 nothing, and the run is repeated with fresh agents; a plant that is never
 caught means the checker is dead, not the plant. A fixture may serve as a
-plant only once it is CALIBRATED — run alone (`prepare --calibrate`) and
-caught — and at least one NEGATIVE fixture (expected `OK`) proves the
+plant only once it is CALIBRATED — a positive one run alone (`prepare
+--calibrate`) and caught; a NEGATIVE one (expected `OK`) run BESIDE a
+calibrated plant, blind, so that a reader quiet because it is dead cannot
+read as a clean packet (the first real run found the negative calibrations
+had carried no plant) — and at least one negative fixture proves the
 checker stays quiet on a clean packet: an instrument is proven to fire on a
 known positive and stay quiet on a known negative before its first real use
 ([VSP-19]). Calibration is repeated when the checklist changes or the model
@@ -134,6 +137,23 @@ row) must be named by an `OK` `freeze` run in the ledger, or
 `tests/test_rule_checker.sh` fails. The other three decision kinds cannot be
 bound by a file the tree can see; they are bound by the rule above, and the
 ledger is what the maintainer audits.
+
+## What the first runs measured
+
+The record is the ledger; this is what it showed at birth (the STATE record
+of the session that built the checker has the figures). Every plant put to a
+reader was caught, and every false statement put to a reader — the
+false-statement fixture, and the working agent's own claim sentences on the
+negative fixture, which were corrected three times on readers' findings — was
+caught and cited to the artifact line that contradicts it. The negative
+fixture, an honest packet about a real gate, did NOT read OK by every reader:
+Q3 and Q4 as worded admit mechanisms no artifact shows and failure modes no
+real gate covers, so a reader can always find one more, and the readers' spread
+on the same packet is a property of the instrument. Whether the questions are
+bounded, or a `VIOLATED` on such grounds is answered in writing through
+`resolve`, is the maintainer's decision; until it is ruled, a `VIOLATED` on a
+real run stops the action as written, and the resolution names the finding it
+answers.
 
 ## What it will not catch
 
@@ -153,12 +173,15 @@ ledger is what the maintainer audits.
 |---|---|---|
 | `forced-pick-14z159` | `VIOLATED` on Q3 or Q4 | the #136 rig at the commit before the M19 freeze: both legs of ours-vs-native force the tenant by the same poke after the confirm; no control proves the native leg faithful |
 | `inferred-decision-14z162` | `VIOLATED` on Q5 | the issue timeline, the two close commits and the STATE row that recorded a maintainer decision from the close event's timing |
-| `fidelity-14z160` | `OK` | the gate that measured what a forced pick gets wrong: the untested premise stated, the negative control named, no behavioural conclusion drawn |
+| `fidelity-14z160` | `OK` | the gate that measured what a forced pick gets wrong: every untested premise stated, the negative control named, no behavioural conclusion drawn |
+| `fidelity-14z160-false-statement` | `VIOLATED` on Q1 | the same packet with ONE false statement in a clean-shaped claim (the SELF leg called a changed-value write, which the gate's own header contradicts) — the failure mode the first real run named as covered by nothing |
 
 A fixture's `files/` are snapshots, never live paths, so the plant does not
 move when the tree does; gate scripts are stored with a `.txt` suffix so no
 registry or census counts them as gates. A new fixture is a paid case: it
-names its incident, its ticket and the question it exercises.
+names its incident, its ticket and the question it exercises, and its `NOTES`
+(never handed to the checker) records its calibration history and says of
+every firing beyond `EXPECT` whether it was true of the packet or noise.
 
 ## The ledger
 

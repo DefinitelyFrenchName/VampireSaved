@@ -1,0 +1,10 @@
+POSITIVE fixture: the issue timeline, the two close commits and the STATE row as
+14z-161 first wrote it (gotchas.md "A COMMIT SUBJECT THAT NAMES AN ISSUE AFTER A
+CLOSING KEYWORD"). Not handed to the checker.
+EXPECT names Q5 (a decision attributed with no statement quoted). Calibration
+run 02 also fired Q1, Q3 and Q4; all three are TRUE of the packet: the shared
+account is an untested premise the claim calls "nothing further" (Q1), the
+"deliberate this time" contrast rests on the same evidence as the accidental
+close (Q3), and the timeline's own commit column is the discriminator that fired
+and was ignored (Q4). EXPECT stays at Q5, the question the incident was written
+from.

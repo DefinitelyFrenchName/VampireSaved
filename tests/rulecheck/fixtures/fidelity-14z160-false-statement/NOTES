@@ -1,0 +1,8 @@
+POSITIVE fixture, built from the negative (run 08, Q4: "a checker that stays OK
+on a clean-shaped claim carrying a false statement it has not already corrected"
+was the failure mode nothing covered). The v3 claim of fidelity-14z160, every
+true caveat kept, with ONE false statement: that the SELF leg is a changed-value
+write. The gate's own header (lines 26-28) says SELF is the REAL path plus the
+SAME-id poke, and the claim's "tested directly" rests on that. A checker that
+reads the artifacts must return VIOLATED on Q1; a checker that reads the claim's
+shape returns OK. Not handed to the checker.

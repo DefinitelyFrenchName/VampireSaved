@@ -1,0 +1,17 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/rulecheck/ledger.tsv	464ae46484d3cba9e8ad422bd096fa78980fd477
+docs/project/rule_checker.md	0aef8953958fd7726161f9ecaab5aa6564c84aff
+tests/rulecheck/fixtures/forced-pick-14z159/packet.md	909e7e6938e4155c291e6153d2b1567600544da4
+tests/rulecheck/fixtures/forced-pick-14z159/EXPECT	513c03e452e75c43088eb70ebb1bb717a9941d12
+tests/rulecheck/fixtures/inferred-decision-14z162/packet.md	d836cfe9179a7de8f1cbe16a13be04d0e7b18326
+tests/rulecheck/fixtures/inferred-decision-14z162/EXPECT	e9b5b76efb0d9e09660746683c6f3db58a420e26
+tests/rulecheck/fixtures/fidelity-14z160/packet.md	e2a6aa64fc5ab2e35ec41f4769f28b6743796c99
+tests/rulecheck/fixtures/fidelity-14z160/EXPECT	09fb654c17cc05b11ef53bd35aa701f6d550e8e1
+tests/rulecheck/fixtures/fidelity-14z160/NOTES	b5a103d6d9ebf504e87ecba174fa1ac28d2ed392
+tests/rulecheck/runs/2026-09-17-01/verdict_real.txt	4efba7f5d0c92bc3f6c80433e2b4c38420c6de3d
+tests/rulecheck/runs/2026-09-17-02/verdict_real.txt	b732cf344c6cd97cca344c349581b08335c3e470
+tests/rulecheck/runs/2026-09-17-03/verdict_real.txt	3298146e950a0b9c4ff6ba9f96ecce69de62fad5
+tests/rulecheck/runs/2026-09-17-04/verdict_real.txt	e46dfd3d03e4e46f69f2f41d2cdd00240282f19e
+tests/rulecheck/runs/2026-09-17-05/verdict_real.txt	4908f7d9bb2ab2e3db484a8ffaba7691648c0e7c
+tests/rulecheck/runs/2026-09-17-06/verdict_real.txt	beb80981adeac420a3feb15163c80a94bd84be8d
+tests/rulecheck/runs/2026-09-17-07/verdict_real.txt	005e0b9a6b32374835bfd03a6bcf7fc3cf4695b5

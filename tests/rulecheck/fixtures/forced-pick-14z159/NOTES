@@ -1,0 +1,11 @@
+POSITIVE fixture: the #136 rig and its claim as the 14z-159 session believed them
+(commit fd3f164b; the freeze built on it was withdrawn — gotchas.md "A FORCED-PICK
+NATIVE LEG MEASURES THE RIG"). Not handed to the checker.
+EXPECT names Q3/Q4 (the shared poke path; no control for the native leg's
+faithfulness). Calibration run 01 also fired Q1 and Q2; both are TRUE of the
+packet: the claim names no untested premise while the gate's own header lists
+what it does not cover and the compared fields omit the byte being changed (Q1),
+and the conclusion is about how Phobos's jumps and floats play, drawn with no
+capture before the rebuild — the gotcha's second rule (Q2). Extra firings that
+are true findings are the checker working, not noise; EXPECT stays at the two
+questions the incident was written from.

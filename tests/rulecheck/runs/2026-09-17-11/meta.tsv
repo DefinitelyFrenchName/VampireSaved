@@ -1,0 +1,5 @@
+decision	calibration
+subject	fidelity-14z160-false-statement
+session	14z-163
+model	default (fresh general-purpose agent, spawned with the prompt file verbatim and nothing else)
+claim	(the fixture's packet)
