@@ -1,50 +1,49 @@
-# NEXT SESSION — orientation (rewritten at the 14z-162 CLOSE, 2026-09-17)
+# NEXT SESSION — orientation (rewritten at the 14z-163 CLOSE, 2026-09-17)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## THE SESSIONS ACT ON GITHUB AS `mechanyaa-ai` SINCE 14z-162 — an event, comment, commit or push by `DefinitelyFrenchName` IS the maintainer's, one by `mechanyaa-ai` is a session's; never attribute a GitHub state change to the maintainer without their words. If `gh auth status` shows any other account, stop and say so. A commit message must never put close/fix/resolve directly before `#N` (the hook and `test_commit_subject` refuse it; the shape closed #151 twice and was then recorded as the maintainer's act — the 14z-162 breach, STATE 14z-162 (1)).
+## THE RULE-CHECKER EXISTS SINCE 14z-163 (#152) AND RUNS BEFORE AN ACTION, NOT AFTER: a `build` on a measurement, a `freeze`, an `expectation` freeze or a `recommendation` to the maintainer goes through `tools/rulecheck.py prepare` (the decision kind, ONE claim sentence saying what is claimed and what was NOT tested, the artifacts by path), two FRESH general-purpose agents on the two prompt files verbatim (one carries a blind plant), `record` with both outputs. A `VIOLATED` stops the action until `resolve` answers each violated question by label; the verdict is reported to the maintainer VERBATIM. A freeze is refused mechanically without an OK `freeze` run. Spec `docs/project/rule_checker.md` ([VSP-183], [VSP-184]); the ledger `tests/rulecheck/ledger.tsv`. The first real run was on the session's own report and it FAILED on three true findings — expect it to catch your sentences, and write the claim with every untested premise named and every file that settles a premise included.
 
-## THE STATIC TIER RUNS BY CADENCE SINCE 14z-162 (#148 closed): `tests/run_all_static.sh` is the SESSION run (17 gates deferred BY NAME unless a path they depend on changed; ~5-8 min); a freeze runs `--cadence freeze`, a release `--cadence release`, on the commit they build from. The close is the session cadence with every control executed, then the push. `tests/ci_cadence.tsv` is the registry; a new listing is a reviewed event.
+## THE SESSIONS ACT ON GITHUB AS `mechanyaa-ai` — an event by `DefinitelyFrenchName` is the maintainer's; never attribute a GitHub state change to the maintainer without their words. A commit message must never put close/fix/resolve directly before `#N`.
+
+## THE STATIC TIER RUNS BY CADENCE (#148): `tests/run_all_static.sh` is the SESSION run (measured this sitting on a clean tree, nothing triggered: 335 s wall, 140 gates); the close is the session cadence with every control executed, then the push.
 
 M18 (`merged-m18`, `build/m3b_merged26`) is still the current freeze and release.
-`git status -sb` says the push state. The withdrawn M19 build dirs (`don_m23`,
-`hui58`, `pyron42`, `m3b_merged28`, `m5_stock18`, `don_stage4_m19`) are on disk,
+`git status -sb` says the push state. The withdrawn M19 build dirs are on disk,
 UNREGISTERED — do not play them and do not point a gate at them.
 
-## START HERE — what is open (THE ORDER IS RULED, 2026-09-17: stable state, then #148, then #152, then everything else — #148 is DONE)
+## START HERE — what is open (THE ORDER IS RULED, 2026-09-17: stable state, then #148 (DONE), then #152 (BUILT, open until a real run under the bounded questions is accepted), then everything else)
 
-- **#152 FIRST — the adversarial rule-checker at every decision point.** The 14z-162
-  breach is its case study: a session inferred a maintainer decision from a timestamp
-  and published it; #152 is redundancy on rule APPLICATION. Read `DECISIONS_HISTORY.md`
-  "Ruled 2026-09-17 (14z-162)" entries and the project gotcha "A COMMIT SUBJECT THAT
-  NAMES AN ISSUE AFTER A CLOSING KEYWORD" before designing it.
-- **Measure the second cut** at this session's first tier run: a session run with
-  nothing triggered was expected ~320 s (630 s measured before the second cut, 1,224 s
-  before cadence); record the figure on the lever-B ticket / HANDOFF.
-- **Lever B — scratch-clone tier runs** — is its own ticket (filed 14z-162; the number
-  is in `docs/project/tickets.md`): integrity and traceability at freeze/release, as
-  bbh/BBX do; session cadence stays on the working tree.
 - **#136 — THE FULL RE-EXAMINATION CONTINUES.** The 13 DIVERGES rows are consolidated
-  on #136 (comment 2026-09-17) with each move's first divergent event and family:
-  Phobos — Plasma Trap (2, 9), Reflect Wall guard-cancels (5, 6, 8), Ray of Doom (4);
-  Pyron 3, 4; Donovan 2, 3, 4, 6, 7 (3 and 4 fall on the maintainer's own rulings).
-  Each family a root-cause with a capture first ([VSP-136]) and its own ticket. The
-  apparatus is validated (#151 closed by ruling 2026-09-17).
-- **#150** (the freeze ritual's silent-green modes) is filed and unstarted.
+  on #136 with each move's first divergent event and family: Phobos — Plasma Trap
+  (2, 9), Reflect Wall guard-cancels (5, 6, 8), Ray of Doom (4); Pyron 3, 4; Donovan
+  2, 3, 4, 6, 7 (3 and 4 fall on the maintainer's own rulings). Each family a
+  root-cause with a capture first ([VSP-136]) and its own ticket. Any
+  recommendation that comes out of it is a rule-check packet.
+- **#154 and #155 — two real defects in `tests/audit_forced_pick_fidelity.sh`, found
+  by rule-checker readers who had never seen it:** the FREEZE branch exits before the
+  identity assertions and the controls (19 gates carry a `FREEZE=1` branch to sweep,
+  with #150), and the poked leg is a hand-typed replica of the rig's leg with no
+  control against drift. Small fixes; each needs the emulator gate re-run and its modes.
+- **#153** (lever B, scratch-clone tier runs) and **#150** (the freeze ritual's
+  silent-green modes) are filed and unstarted.
 - Every other open ticket is on `docs/project/tickets.md`; the harness has BBH-frame-based #1.
 
 ## TRAPS PAID THIS SITTING
 
-1. **A keyword count over a tier log is not a verdict**: `grep -c 'FAIL|SKIP'` counts the
-   summary line `PASS 157 SKIP 0 FAIL 0`; read the tally.
-2. **The closing-keyword lint trips on prose that DESCRIBES the mechanism** ("closed #151"
-   in a commit body) — break the adjacency, or the guard refuses your own fix.
-3. **A ticket's `sessions` column needs a STATE record for the key**: a mid-session
-   correction cannot claim its own `14z-N` until the group exists at the close.
-4. **A hook is advisory** (`--no-verify`, a fresh clone): the gate is the rule.
+1. **A claim sentence is where the checker catches you**: three false statements of
+   mine in one sitting, each cited to the line that contradicted it. Read the artifact
+   before writing the sentence about it.
+2. **An incomplete packet reads VIOLATED, correctly**: include every file that settles
+   a premise the claim names.
+3. **A doc that joins `checkskills.py`'s anchor list joins the harness's consumer config
+   too** (`bbh.vampire.toml`), or `test_bbh_fidelity` F11 goes red (gotcha).
+4. **A rollover script asserts on the HEADING line and writes both files or neither.**
+5. **The tally comes from the ledger, not from memory**: a plant count written from
+   recollection was wrong and corrected from `ledger.tsv`.
 
 **IF A DOC IS TOUCHED:** the doc gates (`test_checkdocs`, `test_docshape`,
 `test_doc_anchor_census`, `test_checkskills`, `test_gotchas_index_current`,
