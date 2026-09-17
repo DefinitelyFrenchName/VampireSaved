@@ -27,6 +27,16 @@ retraction grep covers this file.
 
 ---
 
+
+## Ruled 2026-09-17 (14z-161b) — the close-time safeguards stand until #148; the order of work is stable state, #148, #152, then everything else
+
+**Context.** The 14z-161 close pushed `main` on the mid-session static-tier form (`--strict --exec-controls none`, ~20 min) instead of the close form with every control executed (~40 min). The maintainer asked "closing ritual done?"; it was not. The close tier was then run in full and came out green (PASS 156 / SKIP 0 / FAIL 0, executed 176 honoured 176, wall 2,489 s).
+
+**Ruling 1 (verbatim):** *"To be clear, this is very time consuming and why #148 exists but until we tackle #148 we should not compromise on what we decided in terms of safeguards."* — the 2026-09-14 ruling (14z-154) stands exactly as written: the close runs every control and only then pushes; the cost is #148's business, not a reason to shorten the close.
+
+**Ruling 2 (verbatim):** *"as soon as we are in a state we know to be stable and reliable we should tackle #148, there is much time to gain there"*, refined the same hour to *"the ideal order should be stable state then #148 then #152 then everything else."* — NEXT_SESSION's START HERE carries that order; the #136 divergence families follow #152.
+
+**Recorded on #148** as a comment the same day; the standing lines are in STATE "Standing rulings".
 ## Ruled 2026-09-16 (14z-160) — entered at ruling time, under the amended lifecycle
 
 - **#136 GOES OVER AGAIN IN FULL, AND STAYS ON THE LIST UNTIL IT HAS (maintainer, 2026-09-16).**

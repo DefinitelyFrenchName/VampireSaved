@@ -5,20 +5,24 @@
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## #151 STEP 3 IS DONE BY MEASUREMENT: NO GATE IN THE TREE READS A LATCHED BYTE WITH A VALUE A REAL PICK WOULD NOT WRITE. The confirm's flavor table has two rows (Phobos's cell 00, Donovan's 01), only their code reads it, and the id copies are read in play by nothing. Three gates freeze that. NO SHIPPED ROM BYTE MOVED; THE TREE IS AT merged-m18.
+## THE CLOSE TIER RAN IN FULL AT 14z-161b (156 / 0 / 0, 176 controls executed and honoured) AFTER A CLOSE THAT HAD PUSHED ON THE MID-SESSION FORM — the safeguard stands until #148. #151 STEP 3 IS DONE BY MEASUREMENT: NO GATE IN THE TREE READS A LATCHED BYTE WITH A VALUE A REAL PICK WOULD NOT WRITE. The confirm's flavor table has two rows (Phobos's cell 00, Donovan's 01), only their code reads it, and the id copies are read in play by nothing. Three gates freeze that. NO SHIPPED ROM BYTE MOVED; THE TREE IS AT merged-m18.
 
 M18 (`merged-m18`, `build/m3b_merged26`) is still the current freeze and release.
 `git status -sb` says the push state. The withdrawn M19 build dirs (`don_m23`,
 `hui58`, `pyron42`, `m3b_merged28`, `m5_stock18`, `don_stage4_m19`) are on disk,
 UNREGISTERED — do not play them and do not point a gate at them.
 
-## START HERE — what is open
+## START HERE — what is open (THE ORDER IS RULED, 2026-09-17: stable state, then #148, then #152, then everything else)
 
-- **#151 — steps 1-3 are done; closing it is the maintainer's call.** Step 3's
-  answer is in STATE 14z-161 and on the issue: the census (`tests/test_poked_legs.sh`),
-  the reader population (`tests/test_latch_readers.sh`) and the per-leg taps
-  (`tests/audit_latch_reads.sh`). If a rig ever needs a real path,
-  `tools/select_paths.py --rpl-prologue <p1 cell> <p2 cell>` emits it for either wheel.
+- **#148 FIRST — the static tier's cost.** The maintainer, at the 14z-161 close: *"as soon as
+  we are in a state we know to be stable and reliable we should tackle #148, there is much
+  time to gain there"* — and the safeguards are NOT to be compromised until it is worked
+  (`DECISIONS_HISTORY.md` "Ruled 2026-09-17 (14z-161b)"). The measured shape of the cost:
+  the close tier is 2,489 s wall — gates 1,278 s, controls 1,203 s, the costliest controls
+  `test_mister_wide_gate` (236 s over 7), `test_docshape` (141 s over 15),
+  `test_release_roundtrip` (114 s over 8) (`build/gates_14z161/static_close.log`).
+- **#152 SECOND — the adversarial rule-checker at every decision point.**
+- Then everything else, in this order:
 - **#136 — THE FULL RE-EXAMINATION CONTINUES (maintainer's insistence, 14z-160).** The
   13 DIVERGES rows: on Phobos two families — **Plasma Trap** (parts 2, 9) and the
   **Reflect Wall guard-cancels** (5, 6, 8) — plus Ray of Doom at +0f; Pyron 3 (Sitting
@@ -27,9 +31,8 @@ UNREGISTERED — do not play them and do not point a gate at them.
   of its own; captures before conclusions ([VSP-136]). The maintainer's testimony
   (2026-09-16): these are the moves imported in several passes or tweaked. Every #136
   verdict now rests on real picks both sides (14z-160) and on legs the sweep found
-  faithful (14z-161) — the apparatus is clean; the families are the work.
-- **#152** (the adversarial rule-checker), **#150** (the freeze ritual's silent-green
-  modes) and **#148** (the static tier's cost) are filed and unstarted.
+  faithful (14z-161) — the apparatus is clean (#151 closed 2026-09-17); the families are the work.
+- **#150** (the freeze ritual's silent-green modes) is filed and unstarted.
 - Every other open ticket is on `docs/project/tickets.md`; the harness has BBH-frame-based #1.
 
 ## TRAPS PAID THIS SITTING
