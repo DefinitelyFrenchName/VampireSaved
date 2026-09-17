@@ -18,18 +18,25 @@ UNREGISTERED — do not play them and do not point a gate at them.
 ## START HERE — what is open (THE ORDER IS RULED, 2026-09-17: stable state, then #148 (DONE), then #152 (BUILT, open until a real run under the bounded questions is accepted — runs 22-25 are real runs), then everything else)
 
 - **#136 — the P2 decision, then the families.** The maintainer agreed to a same-data P2;
-  none exists among the legacy characters, so the choice is Demitri (table a identical,
-  reactions `b:0x10/0x71/0x74` and `c:0x2e/0x2f` differ — a rig must assert he never
-  enters them) or a second TENANT (same vs2 data on both legs by construction, but its
-  own port under test too). That is a decision for the maintainer; switching P2 changes
+  none exists among the legacy characters (`tests/expected/same_data_p2.tsv`, differing
+  chains per table, shared seqs, invalid-on-one-side classed apart): for a P2 that stands
+  and gets hit what counts is table a (base states) and b (reactions), then c (thrown
+  poses) — Demitri a 0 / b 3 / c 0, Bishamon 2 / 2 / 0, Bulleta 3 / 1 / 0, Lei-Lei 4 / 1 / 0,
+  Victor 0 / 7 / 19 (his hitstun head hurtbox, the confound); every b list includes 0x10,
+  the engine-wide held-pose push box. So Demitri (P2 path `R` on both wheels; a rig must
+  assert he never enters `b:0x71/0x74`) or a second TENANT (same vs2 data on both legs by
+  construction, but its own port under test too). That is a decision for the maintainer
+  (asked 2026-09-17, rationale given at the 14z-164 close); switching P2 changes
   every naming rig's prologue and re-freezes `test_move_naming`, `test_projectile_census`,
   `audit_move_parity`. Only then root-cause the families, capture first ([VSP-136]):
   the 103 DIFF rows are frozen as measured, 30 of them meter-first (Pyron's Planet
   Burning +30 native / +20 ours per use is the largest), Cosmo Disruption held lands 4
   hits on ours against 2 (`pyron_4`, +156), Press of Death's x, huitzil_5's gc window.
 - **In-DF coverage is 5LP/5MP (Donovan) and 5LP (Phobos, Pyron)**: the batteries outrun
-  the 360-frame DF. A rig change (re-activate DF per group of events) is needed before
-  any in-DF move is measured; the 25 NOT-IN-DF rows say exactly which.
+  the 360-frame DF. A RIG change (re-activate DF per group of events, never a comparator
+  tolerance) is needed before any in-DF move is measured — the maintainer agreed
+  2026-09-17 ("agreed and this should be in next_session.md"); the 25 NOT-IN-DF rows of
+  `tests/expected/move_parity_events.tsv` say exactly which events.
 - **#154 and #155** (the fidelity gate's FREEZE branch; its hand-typed replica leg), **#153**
   (lever B), **#150** (the freeze ritual's silent-green modes): filed and unstarted.
 - Every other open ticket is on `docs/project/tickets.md`; the harness has BBH-frame-based #1.
