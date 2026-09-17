@@ -27,6 +27,27 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-17 (14z-162) — #148 second cut, #148 closed, lever B its own ticket
+
+**Rulings (verbatim), on the two questions the lever-A measurement left open.** The
+three ≤2 s release-set gates (`test_release_asset_shape`, `test_release_os_metadata`,
+`test_mister_page`) back to session — *"yes, especially strong value for the
+docs-consistency, which besides the speed has likely always value."* The five 35-39 s
+gates (`test_suite_dispatch_selftest`, `test_reconcile_matcher`,
+`test_frozen_rompath_guard`, `test_accent_census`, `test_emulator_runner`), after the
+impact analysis (each locks a property of a small, nameable file set; none a doc or a
+rule application; a freeze re-runs all of them on the build commit) — *"second cut to
+freeze with those triggers."* On lever B — *"Lever B its own ticket, my gut feeling is
+that the gain for session is marginal but the gain for freeze or release is massive
+not so much for speed but for integrity and traceability, as demonstrated in bbh and
+BBX."* And, on my recommendation to close the session before working #148: *"we abide
+by the discipline and we adjust while abiding with the discipline: which is exactly
+what #148 is about"* — recorded as the rule it is.
+
+**Result.** `tests/ci_cadence.tsv` lists 12 freeze and 5 release gates; #148 closed
+done with lever B filed as its own ticket; the session close runs the session cadence
+with every control executed.
+
 ## Ruled 2026-09-17 (14z-162) — #148 lever A: the static tier is cadence-tiered (session / freeze / release), the first-cut classification adopted
 
 **Context.** The 14z-162 measurement of the session tier (`run_all_static.sh --strict

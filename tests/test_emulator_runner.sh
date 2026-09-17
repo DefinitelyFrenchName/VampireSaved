@@ -1,6 +1,6 @@
 #!/bin/sh
 # test_emulator_runner.sh — ground truth for tests/run_all_emulator.sh
-# (14z-128). ROM-free, ~5 s.
+# (14z-128). ROM-free, ~26 s (measured 14z-162; the header said ~5 s).
 #
 # MUST-FIRE: shadow-tool: export-removed — a copy of the runner without `export MAME_BIN` must leave the gate's MAME_BIN UNSET (mode: that copy is the runner every section drives; section 11 must fail)
 # MUST-FIRE: shadow-tool: reader-unplugged — a copy that hands the classifier no gate script must let a declared-but-unfired control read PASS (mode: section 14 must fail)
