@@ -28,15 +28,16 @@ SIGNATURES (each a measured property of the root's own window, never its name al
                  (DECISIONS_HISTORY.md "DARK FORCE STOCK COST FOR THE TENANTS")
   TRAP-REMAP     P2's reaction class 0x52 natively, 0x06 on ours, on a Phobos part — the 14z-85g(2)
                  remap, recorded "DECIDED (maintainer, 2026-08-14): OPTION (a)" (STATE_HISTORY.md
-                 "Decisions — 14z-85g(2)"; the maintainer's own words were not kept) (tests/audit_trap_shock.sh)
+                 "Decisions — 14z-85g(2)"; the maintainer's own words were not kept); its attacker-freeze
+                 deviation WITHDRAWN 2026-09-18 — the class takes vs2's 0x52 rule (tests/audit_trap_shock.sh)
   COLUMN-SHOCK   the same class pair on a Donovan part — the column's 14z-33 remap meeting the
                  14z-42 Lightning Sword thunks (tests/audit_column_shock.sh)
   GUARD-REENTRY  the first DIFF is P1's node on, or one frame after, the frame both legs leave the
                  block freeze (seq 0 -> 2) — vsavj re-enters the block animation (tests/audit_guard_reentry.sh)
   DEFENSE-ROW    the first DIFF is P1's HP alone, Phobos the victim, ours taking MORE (measured 11/13 on
                  Demitri's 5HP, 1 more on Victor's at 14z-164) — the vsavj defender rows, recorded
-                 "DECIDED (maintainer, 2026-08-14): OPTION (b)" (docs/project/tables/defense_rows.md;
-                 the maintainer's own words were not kept)
+                 "DECIDED (maintainer, 2026-08-14): OPTION (b)" (the maintainer's own words were not kept),
+                 SUPERSEDED 2026-09-18: "take the vs2 rows" (docs/project/tables/defense_rows.md)
   P2-DISPLACEMENT a seeded root whose own fields are IDENT while P2's x differs in its window — #159
   OTHER          none of the above: an UNATTRIBUTED root (the gate fails on it)
 

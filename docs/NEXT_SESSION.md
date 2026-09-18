@@ -1,62 +1,72 @@
-# NEXT SESSION — orientation (rewritten at the 14z-167 CLOSE, updated at the 14z-167b close, 2026-09-18)
+# NEXT SESSION — orientation (rewritten at the 14z-168 CLOSE, 2026-09-18)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## THE RULE-CHECKER RUNS ON OPUS 5 NOW (14z-167): Fable 5.1 was unreachable on the account's spend limit, so every fixture was recalibrated BY HAND under `--model claude-opus-5` (runs `2026-09-18-37`..`-40`, every plant caught, the negative OK). `tools/rulecheck.py` does NOT enforce a model change (**#158**): pass `--model <the resolved model id>` on every `prepare`, and before a real run check that the ledger holds calibration rows under that same model. A change of model, either way, is a recalibration (ruling 2026-09-17, 14z-163).
+## #136 IS ANALYSED (14z-168): all 108 frozen DIFF rows attributed by ablation and a measured signature (`tests/audit_move_parity_attribution.sh`, OTHER fails). Dark Force corrected at its root: vs2's P+K is Dark Force POWER; the tenants' reference is their vs2 EX move. The maintainer ruled on every capture put to them: the block re-entry, Pyron's form and Donovan's sword are IDENTICAL; the column shock is a defect.
 
-## 14z-166's re-freeze of `tests/expected/throw_registration.tsv` IS CHECKED (run `-41`, VIOLATED Q1 Q2 Q4, every finding true, resolved: the ids filter widened, a third control `double-write`, the tenant rows shown unchanged; the file did not move).
+## THE MAINTAINER'S ORDER (ruled 2026-09-17/18): all the analysis first, then the fixes, then relentless regression testing — every rig a gate. The fixes are RULED (standing lines in STATE; verbatim in `DECISIONS_HISTORY.md`), under one condition: *"the total overhead cost of our combined changes is less than 1/60s at all times"* — no new zero-pass frame (`$FF8081`, `tests/audit_pass_overrun.sh`) over the corpus against the build before them.
 
-## #136's x FAMILY IS ATTRIBUTED, CAPTURE FIRST (14z-167): the three Phobos first-event rows are the round-start ENTRANCE (the rig's first X pin lands before the round starts; the maintainer identified the entrances on the capture); donovan_3's row is downstream of Killshread Summon (ES) pushing Demitri the wrong way — **#159**, the facing rule 5 vsavj's hit code lacks, gate `tests/audit_facing_rule.sh`. Both are on #136.
+## START HERE — the analysis the fixes still need (measure, then design)
 
-M18 (`merged-m18`, `build/m3b_merged26`) is still the current freeze and release.
-`git status -sb` says the push state. The withdrawn M19 build dirs are on disk,
-UNREGISTERED — do not play them and do not point a gate at them.
+1. **Defense rows (ruled: take vs2's rows).** Both damage reads index by the victim's
+   `+0x382` (`docs/game/engine_internals.md`, the defense port note), so a data-only
+   edit of rows and thresholds 0x10/0x13 is possible. Measure first that EVERY hit on
+   a tenant victim, over the corpus, reads the tenant's own row and byte (a read watch
+   on both tables; `+0x382` is the voice-flavor class in a match).
+2. **The class-0x52 rule (ruled: the column shock and the Plasma Trap).** vsavj routes
+   class 0x38 to the same shock handler as 0x06, with the same property byte (the
+   column paragraph). Before it can be the discriminator: a census of class 0x38 in
+   EVERY legacy attack and projectile record (make it a gate; it also carries the
+   reaction-table facts, today a static read only), then the thunks' cost.
+3. **The other placed reads of vs2's Power flag `+0x1C3`:** 23 besides the three meter
+   adders, 4 executed by the corpus (`tests/audit_df_field_readers_live.sh`) — each to be
+   measured before #157's Dark Force tail is fixed.
+4. **The EX route (ruled: disable it)** and **no gauge in Dark Force** (#157's tail).
+   The vs2 EX inputs in use (421+KK, 263+PP, 2623+PP) are my measured candidates; the
+   maintainer offered to confirm them.
 
-## FIRST: THE CLOSE CHECKLIST IS RULED (2026-09-18, 14z-167b) — apply all six at this session's close: the findings table; `tools/close_findings.py <session>` (every GAP homed, every REVIEW answered, never cited as completeness); pointers on resolved earlier rows; the promise grep; cited scratch scripts promoted (on trial: record how many had figures quoted and how many were promoted); the documentation packet through the rule-checker. It lives in STATE.md's header ("THE CLOSE CHECKLIST", ruled 2026-09-18). Standing line in STATE; full entry `DECISIONS_HISTORY.md`.
+## THEN FILE THE TICKETS (drafts in `build/p136_14z168/gh/`, written before the 2026-09-18 rulings — update them): the column shock + Plasma Trap (the 0x52 rule), the EX route, the defense rows; comments on #136 and #157. As `mechanyaa-ai`, rule-checker (`recommendation`) first, `tools/tickets.py refresh`.
 
-## START HERE — what is open (THE ORDER IS RULED, 2026-09-17: stable state, then #148 (DONE), then #152 (DONE), then everything else — the #136 families included)
+## ALSO OPEN FROM 14z-168
 
-- **#136 — the Phobos guard-cancel rig.** huitzil_5/6/7 pin X at 2370, before the
-  round starts at 2544 (`$FF812D`), so the entrance decides where the first event
-  starts. The fix is a RIG change (the first pin after the round starts), then a
-  re-freeze of the affected rows through the rule-checker; never a comparator
-  tolerance. The later events of those parts first differ at +16/+17 on node/cnt,
-  unattributed.
-- **#136 — the cnt family.** On donovan_2 ev2 and donovan_10 ev1 BOTH fighters'
-  node counters fall one tick behind on ours at the same frame, every other field
-  equal: an engine tick lost on ours. Measure the pass counter `$FF8081` on both
-  legs to separate a slowdown frame (our extra code) from the speed pattern's
-  phase. Then donovan_11, huitzil_2/9, and huitzil_3's first event.
-- **#157 and #159: the fixes are the maintainer's to schedule** (both
-  needs-maintainer-ruling). #159's other rule-5 records (Donovan's `0xCA1CA`/
-  `0xCA1EA`, `0xD17C2`/`0xD1822`) are unmeasured.
-- **#158** (the checker's model binding), the in-DF rig change (agreed 2026-09-17),
-  #157's two unmeasured tails, **#154/#155**, **#153**, **#150**: filed and unstarted.
-- Every other open ticket is on `docs/project/tickets.md`; the harness has BBH-frame-based #1.
+- The static tier never checks that a `tests/ci_emulator.tsv` gate is EXECUTABLE:
+  `tests/audit_df_field_readers_live.sh` was committed without `+x` (7603c86a) and only the
+  emulator runner would have said so, at release (MISSING). Found at the 14z-168 close,
+  when its static twin `test_defense_rows_census` read MISSING; both fixed. Add the check
+  to a static gate.
+- A static gate for the unsafe MAME-leg shape (a backgrounded leg writing its status
+  under `set -e`; nine gates fixed by hand, `docs/project/gotchas.md`).
+- bbh `selftest/test_fidelity_vampire.sh:356`: the F9 provenance pair pipes this tree's
+  gate through `sed`, so our exit status reads 0 — a false difference on a red tree.
+  Fix it in bbh (writable, pushes at a green close) or file it there.
+- `build/manifest/huitzil.toml`'s "DEVIATION (maintainer-accepted …)" comment: update
+  it in the 0x52 fix's commit (a manifest edit moves build fingerprints).
+- #136's Phobos guard-cancel rig: the first X pin lands before the round starts — a
+  RIG fix (the first pin after `$FF812D`), then a re-freeze through the rule-checker.
+- #157, #159: the maintainer's to schedule; #158, #154/#155, #153, #150 filed and
+  unstarted; every other open ticket is on `docs/project/tickets.md`.
 
 ## TRAPS PAID THIS SITTING
 
-1. **A rig pin written before the round starts is overwritten by the entrance**, and
-   the entrance is drawn per leg — a first-event DIFF at +0 is a question about the
-   rig's opening before it is one about the move (`docs/project/gotchas.md`).
-2. **A word counter sampled as a byte reads its high byte**, and a flat field then
-   "excludes" the mechanism it belongs to — the checker caught it (run `-42` Q3).
-   Match a field's width to the instruction that reads it before excluding anything.
-3. **A write tap on a field written many times a frame crashed MAME** while the tap
-   log still had its END line — tap rare fields, sample hot ones with
-   `field_trace.lua`, and check the emulator's exit status (`docs/platform/gotchas.md`).
-4. **The parity gate's in-gate controls overwrite the FIRST part's saved inputs**
-   (the 14z-164 trap, paid again on the rpl/pokes files): put a sacrificial part
-   first in a scratch run (`build/x_family_14z167/audit_move_parity_keep.sh`).
-5. **`rulecheck prepare`'s counter re-uses an id whose run dir has no ledger row**
-   (run 36's NOT-RUN dir) — pass `--id`.
-6. **Ask about frames where the legs have visibly separated, against the
-   BACKGROUND** — the maintainer read the frames first asked about as identical;
-   the difference showed later, and a companion who moves on her own (Anita) is no
-   reference.
+1. **vs2's P+K is not the tenants' Dark Force** — it is Dark Force POWER; compare their
+   vs2 EX move (the maintainer caught it on the capture).
+2. **A light mash inside the block window measures the ADVANCING GUARD** (vsavj fires
+   on light presses, vs2 does not) — press after the window to ask "when can I act".
+3. **A backgrounded MAME leg under `set -e` loses its status on a teardown segfault**
+   (`exited none` on a complete log), and my first scripted fix put `set +e` on the
+   wrong subshell in three gates — green runs cannot show a robustness fix; inspect
+   every patched site.
+4. **A "different palette" by eye was the HUD and the background** — read palette RAM,
+   and give every comparison a known difference to see (the HUD rows) or it is blind.
+5. **A census built from a grep of MENTIONS is not a census of users** — grep for the
+   invocation (the read_tap "ten users" were eight, one missed).
+6. **A ruling is cited with the maintainer's words or not at all** — the words of the
+   2026-09-17 agreement were recovered from that sitting's transcript.
+7. **A heredoc terminator inside the text of another heredoc ends the outer one** —
+   patch gate bodies from a file, never an inline `<<'PY'` inside `<<'PY'`.
 
 **IF A DOC IS TOUCHED:** the doc gates (`test_checkdocs`, `test_docshape`,
 `test_doc_anchor_census`, `test_checkskills`, `test_gotchas_index_current`,

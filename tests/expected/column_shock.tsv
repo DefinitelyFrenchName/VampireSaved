@@ -3,7 +3,7 @@
 # tests/lua/read_tap.lua, non-debug). Evidence class: in-emulator. Frozen 14z-168 with FREEZE=1. THE DEFECT IS FROZEN AS
 # MEASURED: native's 0x52 handler writes the victim 0x18 and exempts Donovan; ours' 14z-42 thunks write the victim 0x0C and
 # Donovan 4. A fix re-freezes this file DELIBERATELY, with its rule-checker run named in the commit.
-# Columns: w <leg> <who> <frame> <writer PC> <value>
+# Columns: w <leg> <who> <frame> <writer PC> <value> | timeline <leg> hits= special= p1_neutral= p2_neutral= gap=
 #--
 w	native	p2	2837	017242	11
 w	native	p2	2838	022666	24
@@ -55,3 +55,5 @@ w	ours	p2	2849	02447c	11
 w	ours	p2	2850	02447c	10
 w	ours	p2	2851	02447c	9
 w	ours	p2	2852	02447c	8
+timeline	native	hits=2838,2845	special=2814	p1_neutral=2859	p2_neutral=2885	gap=26
+timeline	ours	hits=2838,2849	special=2814	p1_neutral=2865	p2_neutral=2879	gap=14

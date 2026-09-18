@@ -5124,3 +5124,42 @@ move list for Vampire Saved is linked to how we implemented it ... In VS2, you
 want to look for the name of the character's Dark Force in Vampire Saved."*
 Rule: a native reference leg for a move is found by the move's NAME in the
 native game, never by our list's input.
+
+## A PALETTE "DIFFERENCE" SEEN ON A CAPTURE WAS THE HUD AND THE BACKGROUND — read palette RAM, and give the comparison a known difference to see (paid: 14z-168)
+
+On the in-Dark-Force capture I reported Pyron's form "in a different palette" at f2700 without
+measuring it; the maintainer asked whether the background was confusing me. Measured with
+`tests/lua/sprite_capture.lua` (the OBJ list plus the palette page at `$90C000`): every
+palette drawing in Pyron's area has the same 16 colours on both legs. What differed was the
+form's idle-loop phase (other pieces at other heights) and the two games' HUD colours
+(palette 0x00 is the life bars). A difference judged by eye across two games is a hypothesis,
+never a finding. And a palette comparison that reports "no difference" is blind until it shows a
+difference it must see: the gate lists the palettes seen differing, and requires one in the HUD
+rows, with a `palette-blind` control (`tests/audit_df_moves.sh`, rule-checker run
+2026-09-18-49 Q4).
+
+## A CENSUS BUILT FROM A GREP OF MENTIONS IS NOT A CENSUS OF USERS (paid: 14z-168)
+
+I listed "the ten gates that use `read_tap.lua`" from a grep for the file name. Three of them
+only mentioned it, one ran `field_trace.lua` instead, and one real user was missed:
+`tests/audit_latch_reads.sh` runs it through `tools/tap_latch_reads.sh` (rule-checker run
+2026-09-18-47 Q1). Rule: grep for the INVOCATION (`autoboot_script "…read_tap.lua"`), follow each
+runner TOOL to its callers, include untracked files (`git grep --untracked`), and classify every
+mention (`build/p136_14z168/regress/read_tap_users.txt` is the worked example).
+
+## A HEREDOC TERMINATOR INSIDE ANOTHER HEREDOC'S TEXT ENDS THE OUTER ONE (paid: 14z-168)
+
+Patching a gate with `python3 - <<'PY'`, where the gate's own text contained a `<<'PY'` … `PY`
+block, ended the outer heredoc at the inner `PY`. The truncated Python never ran, so the file was
+untouched, and the shell then parsed the rest as commands (a zsh parse error). Rule: write the
+block to be inserted into a file first, and give the outer heredoc a distinct delimiter
+(`<<'EOF_PATCH'`).
+
+## A SCRIPT CREATED WITH THE FILE TOOL IS NOT EXECUTABLE, AND ONLY THE RUNNER THAT RUNS IT NOTICES (paid: 14z-168)
+
+`tests/test_defense_rows_census.sh` and `tests/audit_df_field_readers_live.sh` were written with the
+Write tool, which creates `-rw-r--r--` files. I ran both as `sh <gate>`, so every verify and control
+run passed. The static tier then read the census gate as MISSING ("registered but not executable").
+The live gate, an EMULATOR gate, had already been committed that way; the static tier never checks
+`tests/ci_emulator.tsv` gates for the bit, so it would have surfaced only at release. Rule: `chmod +x`
+every new gate in the same step that registers it, and check with `ls -l` before the tier.

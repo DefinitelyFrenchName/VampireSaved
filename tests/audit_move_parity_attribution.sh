@@ -15,7 +15,7 @@
 # CPU overruns (SLOWDOWN), the ruled Dark Force cost (DF-STOCK), the rig's opening
 # (ENTRANCE), vsavj's block re-entry (GUARD-REENTRY, tests/audit_guard_reentry.sh), #159
 # (P2-DISPLACEMENT), the ruled trap remap (TRAP-REMAP), the column shock (COLUMN-SHOCK,
-# tests/audit_column_shock.sh), the ruled defense row (DEFENSE-ROW).
+# tests/audit_column_shock.sh), the defense row (DEFENSE-ROW; the vs2 rows ruled 2026-09-18, not yet built).
 #
 # WHAT IT FREEZES (tests/expected/move_parity_attribution.tsv), the tool's rows:
 #   root <part:event | opening> <event name> <class> step=<n> <the signature's evidence>

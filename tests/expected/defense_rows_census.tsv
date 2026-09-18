@@ -1,0 +1,39 @@
+# tests/expected/defense_rows_census.tsv — the defense curve (vsavj 0x0B8940 / vs2 0x0D2ABE) and rally threshold (0x0BCC80 / 0x0D6E1E)
+# of every character id, vsavj vs vs2, and the tenants' rows on m3b_merged26 (tests/test_defense_rows_census.sh). Evidence
+# class: static. Frozen 14z-168 with FREEZE=1. The ruled fix (2026-09-18, take the vs2 rows) moves the tenant rows: re-freeze then.
+#--
+base	0x00	Bulleta	row=SAME	thr=0x38/0x38
+base	0x01	Demitri	row=SAME	thr=0x30/0x30
+base	0x02	Gallon	row=SAME	thr=0x30/0x30
+base	0x03	Victor	row=SAME	thr=0x28/0x28
+base	0x04	Zabel	row=SAME	thr=0x38/0x38
+base	0x05	Morrigan	row=SAME	thr=0x30/0x30
+base	0x06	Anakaris	row=SAME	thr=0x30/0x30
+base	0x07	Felicia	row=SAME	thr=0x30/0x30
+base	0x08	Bishamon	row=SAME	thr=0x30/0x30
+base	0x09	Aulbath	row=SAME	thr=0x20/0x20
+base	0x0a	Sasquatch	row=DIFFERS	thr=0x30/0x30
+base	0x0b	random	row=SAME	thr=0x30/0x30
+base	0x0c	Q-Bee	row=SAME	thr=0x40/0x40
+base	0x0d	Lei-Lei	row=SAME	thr=0x30/0x30
+base	0x0e	Lilith	row=SAME	thr=0x30/0x30
+base	0x0f	Jedah	row=SAME	thr=0x30/0x30
+variant	0x10	copy of Bulleta
+variant	0x11	copy of Demitri
+variant	0x12	copy of Gallon
+variant	0x13	copy of Victor
+variant	0x14	copy of Zabel
+variant	0x15	copy of Morrigan
+variant	0x16	copy of Anakaris
+variant	0x17	copy of Felicia
+variant	0x18	own
+variant	0x19	copy of Aulbath
+variant	0x1a	copy of Sasquatch
+variant	0x1b	copy of random
+variant	0x1c	copy of Q-Bee
+variant	0x1d	copy of Lei-Lei
+variant	0x1e	copy of Lilith
+variant	0x1f	copy of Jedah
+tenant	0x10	Phobos	ours=Bulleta+Demitri+Anakaris+Felicia+Aulbath+Jedah	thr=0x38	native=Victor+random	thr=0x28
+tenant	0x11	Pyron	ours=Bulleta+Demitri+Anakaris+Felicia+Aulbath+Jedah	thr=0x30	native=Bulleta+Demitri+Anakaris+Felicia+Aulbath+Sasquatch+Jedah	thr=0x30
+tenant	0x13	Donovan	ours=Victor+random	thr=0x28	native=Bulleta+Demitri+Anakaris+Felicia+Aulbath+Sasquatch+Jedah	thr=0x30

@@ -901,3 +901,14 @@ testing DF in our build versus the global/common Dark Force Power in VS2"*.
 Rule: before comparing a mode across the siblings, check that the input selects
 the SAME mode on both; for a newcomer's Dark Force the native reference is its
 vs2 EX move (`tests/audit_df_modes.sh` measures both routes).
+
+## "WHEN CAN THE BLOCKER ACT" IS NOT ASKED BY MASHING INSIDE THE BLOCK WINDOW — that measures the ADVANCING GUARD (paid: 14z-168)
+
+To test the maintainer's question on the block re-entry (does it delay when the victim can act?),
+I first mashed LP from inside the block freeze. On vsavj and ours the blocker left blockstun 13
+frames EARLY, and vs2 did not. That was the ADVANCING GUARD, not the re-entry: vsavj counts every
+light press toward it (with an RNG roll), while vs2 weights presses and needs a total of 10
+(`docs/game/engine_internals.md`, the ADVANCING GUARD paragraph). With the presses after the
+14-tick window, the first possible attack is hit+35 on all three games (`tests/audit_guard_reentry.sh`,
+the act rows). Rule: a "first possible frame" rig presses only after every window that counts
+presses has closed.

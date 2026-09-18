@@ -51,6 +51,7 @@ declares	test_checkskills
 declares	test_commit_subject
 declares	test_community_crosscheck
 declares	test_controls_contract
+declares	test_defense_rows_census
 declares	test_demand_after_trap
 declares	test_df_field_readers
 declares	test_df_startup_provenance

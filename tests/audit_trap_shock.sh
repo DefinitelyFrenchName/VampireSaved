@@ -9,7 +9,8 @@
 # 0x52 -> 0x06 (vs2's OWN table aliases 0x52 == 0x06 -> the shock
 # handler; vsavj entry[0x06] = its native electric-shake 0x23AC8, a
 # structural twin of vs2's 0x52 handler minus the attacker-freeze
-# exemption). KNOWN, MAINTAINER-ACCEPTED DEVIATION: Phobos receives
+# exemption). KNOWN DEVIATION, accepted 2026-08-14 and WITHDRAWN 2026-09-18 (the class takes vs2's 0x52 rule,
+# DECISIONS_HISTORY.md; the fix re-freezes this gate): Phobos receives
 # the normal 11f attacker hit-freeze on trap connect (vs2 exempts him)
 # — asserted PRESENT here, so a silent drift in either direction is
 # loud.

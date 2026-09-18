@@ -1,9 +1,27 @@
-# Tenant DEFENSE-side rows — DECIDED: keep the vanilla vsavj approximation
+# Tenant DEFENSE-side rows — vs2's rows are RULED; the build still carries the vsavj approximation until the fix lands
 
-**Maintainer ruling (2026-08-14, 14z-85f): option (b) — the tenants
-keep vanilla vsavj's defender-side rows.** This file records the
-choice, the exact values on both sides, and the recipe for changing it
-to native vs2 values if the ruling is ever revisited.
+**RULED 2026-09-18 (14z-168): Phobos and Donovan take their vs2 rows** —
+the maintainer: *"given the measurements we should take the vs2 rows. I hope
+we can do it in a way that doesn't cost frames and that doesn't create
+side-effects/regression elsewhere (e.g. it would be wrong to make changes that
+correct the 3 tenants but break vanilla characters)"* (`DECISIONS_HISTORY.md`
+"Ruled 2026-09-18 (14z-168) — the tenants' DEFENSE rows become vs2's"). The
+build still carries the approximation below until that fix lands.
+~~Maintainer ruling (2026-08-14, 14z-85f): option (b) — the tenants keep
+vanilla vsavj's defender-side rows.~~ SUPERSEDED by the ruling above. This
+file records the exact values on both sides and the recipe for the change.
+
+**The measurements the 2026-09-18 ruling rests on** (both data views, vsavj
+`d82320a0…` / vs2 `ac31740c…`, 14z-168): the 15 legacy characters' rows and
+thresholds are byte-identical between the games except Sasquatch's row; vsavj
+fills every variant-id row with a COPY of its base character's row (Oboro 0x18
+alone has its own), so the tenants' current rows are their SHELLS' — Phobos
+rides Bulleta's, Pyron Demitri's, Donovan Victor's; the two curves differ by
+exactly 2 rows at every attacker column (±1 on throws, +2 on Demitri's 5HP
+against Phobos, +1 on Victor's 5HP). The damage code reads the victim's own
+row (full id), so rows 0x10/0x13 are the tenants' own storage and no legacy
+character reads them — the possible data-only route (the 14z-118 port_param32
+pattern); the threshold read's index is NOT yet measured.
 
 ## What this covers
 
@@ -59,8 +77,9 @@ damage map — the `fe/ff/00…` curve indexes lower rows than the
 rows, Huitzil rides the lower-indexing curve and the earlier rally
 threshold, Donovan the higher-indexing curve and the later threshold —
 i.e., their defender-side identities are effectively exchanged
-relative to native. The maintainer accepts this as the deliberate
-vsavj-native approximation.
+relative to native. (Recorded on 2026-08-14 as "DECIDED (maintainer)": keep
+the approximation — the maintainer's own words were not kept; superseded by the
+2026-09-18 ruling quoted at the top of this file.)
 
 Re-derive the delta at any time:
 
@@ -74,11 +93,14 @@ for i in (0x10, 0x11, 0x13):
 EOF
 ```
 
-## What changing to native vs2 values would entail
+## What changing to native vs2 values entails — RULED, not yet built
 
-The rejected option (a), kept here as the recipe should the ruling be
-revisited (a player-feel report on tenant durability would be the
-trigger):
+Option (a) of 2026-08-14, now the ruled change. The recipe below was written in 2026-08 and
+proposes reader-site thunks. Since 14z-168 a DATA-ONLY route is the candidate: both reads index by
+the victim's id byte (`docs/game/engine_internals.md`, the defense port note), so rows and
+threshold bytes 0x10/0x13 are the tenants' own storage. It must first be measured that every
+hit on a tenant victim reads them. The maintainer's condition: no new frame of lag from the
+combined fixes, and no change to any legacy character. The 2026-08 recipe, kept as written:
 
 1. **Shape:** a variant-gated table extension on the
    `hitclass_map_extend` precedent — a generated thunk at each of the
@@ -110,8 +132,12 @@ trigger):
 `tests/audit_tenant_throw_geometry.sh` froze 5 of 54 (victim, throw) cells of
 Phobos's three throws differing from native by EXACTLY ±1 total damage — victim
 0x10 ours +1 on all three, 0x13 ours −1 on all three, 0x0A ours −1 on Circuit
-Scrapper only; ruled within tolerance (maintainer, 2026-09-04) and kept as a
-knowledge item. `tests/audit_defense_row_residue.sh` (a `-debug` read watch on
+Scrapper only; ruled within tolerance — the maintainer, 2026-09-04: *"+/- 1
+damage is within tolerances... interesting to root-cause it to deepen our
+understanding of the engines though so let's keep that open for a future
+session"* (quoted in `tests/audit_tenant_throw_geometry.sh`) — and kept as a
+knowledge item — the tenant cells of that residue are what the 2026-09-18 ruling
+removes. `tests/audit_defense_row_residue.sh` (a `-debug` read watch on
 the defense table, ours vs native, four victims) names the mechanism: each leg
 reads `row[victim id][attacker id]` of this table — the same index on both
 legs — and the byte answered differs on exactly the rows this page lists as

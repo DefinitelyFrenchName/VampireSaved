@@ -211,3 +211,4 @@ test_latch_readers
 test_poked_legs
 test_same_data_p2
 test_df_field_readers
+test_defense_rows_census

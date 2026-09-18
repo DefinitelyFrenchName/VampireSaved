@@ -90,9 +90,9 @@ frame data; its player-struct table vs `atlas/ram.md` is a queued item).
 
 - `reconciliation.md` — per-instance record of every VS2-vs-vanilla-vsav
   engine-rule reconciliation (SPEC §3.2): which rule won, what value, why.
-- `defense_rows.md` — the tenants' DEFENSE-side rows: maintainer-ruled
-  14z-85f to keep the vanilla vsavj approximation (the ruling and its
-  measurement).
+- `defense_rows.md` — the tenants' DEFENSE-side rows: ruled 2026-09-18
+  (14z-168) to take vs2's rows, superseding the 14z-85f approximation (the
+  rulings, the measurements and the change recipe).
 - `qs_voice_map.md` — the M5 voice-block id map (14z-86): every restored
   voice id, its block and its source.
 - `sfx_records.md` — the per-tenant sfx record tables (the `[[sound_table]]`

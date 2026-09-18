@@ -975,7 +975,13 @@ the victim".
   difference, and our build equals pristine vsavj on every sampled frame). On
   Phobos, whose block animation is a multi-node loop, the re-entry restarts the
   chain, which is #136's seven Reflect Wall guard-cancel DIFF rows (node at
-  +16/+17). The host engine's behaviour governs.
+  +16/+17). The host engine's behaviour governs. **It does not move when the
+  victim can act** (the maintainer's test, 14z-168): LP pressed every other frame
+  after the advancing-guard window gives the first attack state at hit+35 on
+  vsav2, vsavj and ours alike, with back held to +21 or to +50 — ruled *"it's
+  identical"* (DECISIONS_HISTORY.md, 2026-09-18). A light mash INSIDE the
+  window measures the advancing guard instead (below), which vsavj fires on
+  light presses and vs2 does not.
 - **How the stun runs (frame by frame, Donovan taking Victor's 5LP / 5MP,
   14z-120 (8)):** the contact frame installs the class and the freeze
   `+0x5C` = 11 and puts the node pointer on `c:0x08` node 0 with the node
@@ -3173,8 +3179,29 @@ ANY Donovan attacker to vs2's Lightning Sword tuning (victim 0x0C and `+0x147` =
 and the two writes at `PRG:0x3FFBC4`/`0x3FFBF4` — placed addresses, moving with a
 freeze). So on our build the column shocks for 12 frames where native
 shocks for 24, and Donovan freezes 4 frames per hit; damage and hit count are
-equal. Nothing rules on it (the trap dome's attacker freeze is the ruled
-precedent of the class; its victim freeze is untouched).
+equal. **The whole move, input to recovery (measured 14z-168, the timeline rows of
+the gate):** first hit at the same frame; ours' second hit 4 frames later; Donovan
+back to neutral 6 frames later (2865 vs 2859) and Demitri 6 frames earlier (2879 vs
+2885), so the gap between the two recoveries is 14 frames on ours against 26
+natively — the maintainer, on the every-frame capture: *"the move doesn't play out
+exactly the same since the timing of freeze, shock, recovery,etc. are slightly
+different"*. **RULED 2026-09-18: the class takes vs2's 0x52 rule** (victim 0x18,
+attacker exempt) for the tenants' 0x52-origin hits, which also removes the Plasma
+Trap's attacker freeze (DECISIONS_HISTORY.md); not yet built. (Superseded: "Nothing
+rules on it" — the text of this paragraph until 2026-09-18.) **For the fix's design
+(read 14z-168, static):** the 14z-42 thunks are two `jsr`s from vsavj's `0x06` handler
+`0x23AC8` itself (merged-m18: `0x023AD8`/`0x023ADE` → `0x3FFBB0`/`0x3FFBE0`); each
+tests only "is the attacker a fighter block whose `+0x382` is 0x13" and otherwise writes
+vsavj's own values (victim 0x18, attacker 0x0B). They run on EVERY hit that reaches
+`0x23AC8`, legacy electric hits included. vsavj's reaction table holds 80 classes
+(0x00-0x4F) and routes TWO of them to `0x23AC8`, **0x06 and 0x38**; their property
+bytes (the data view at `0x28D00`, read through a pc-relative `lea`) are both 0x0F.
+So a record remapped to 0x38 instead of 0x06 would reach the same handler and the same
+install, with the victim's `+0x54` naming it apart from Lightning Sword's 0x06 — a
+candidate discriminator for vs2's 0x52 rule, NOT yet safe: whether any legacy record
+carries class 0x38 is unmeasured (a census over every character's attack and
+projectile records), and the cost against the maintainer's combined budget (no new
+frame of lag at any time) is unmeasured.
 
 **Multi-hit accounting — THE RE-HIT RULE, MEASURED (14z-146,
 `tests/test_rehit_ring.sh`; atlas rows `+0x6C`, `+0x70`, `+0x08`):** the hit
@@ -3204,12 +3231,23 @@ chain can say. The attacker's `+0x08` non-zero bypasses the slot entirely
 rigs. The combo counter (`+0x144`, victim) is incremented by the REACTION
 handlers (vs2 beam reaction `0x56002`: +3/tick), not by the appliers.
 
-**Port note (defense side, DECIDED 2026-08-14):** tenant ids sit on
-vanilla vsavj defense-table rows — row 0x10's curve and low-HP
-threshold (vsavj 0x38 vs vs2 0x28 for Huitzil) are vanilla values,
-NOT the characters' native vs2 tuning. Maintainer-ruled KEPT as the
-deliberate vsavj approximation; the values and the would-be change
-recipe live in docs/project/tables/defense_rows.md. (Pyron's rows are
+**Port note (defense side; recorded 2026-08-14 as "DECIDED (maintainer)" to keep — the words
+not kept — and RULED 2026-09-18 to take vs2's rows, the words in DECISIONS_HISTORY.md; not yet built):** tenant ids sit on vanilla vsavj defense-table rows —
+row 0x10's curve and low-HP threshold (vsavj 0x38 vs vs2 0x28 for Huitzil) are
+vanilla values, NOT the characters' native vs2 tuning. **They are the SHELLS' rows**
+(measured 14z-168, `tests/test_defense_rows_census.sh`): vsavj fills every variant id
+with a copy of its base character's row, so Phobos takes Bulleta's, Donovan Victor's;
+the 15 legacy characters' rows are identical between the games but Sasquatch's.
+The values and the change recipe live in docs/project/tables/defense_rows.md.
+**Both reads index by the victim's id byte (read 14z-168):** the defense read
+`0x18C10`-`0x18C26` takes `$382(a1)` masked `#$1f`, shifted 5, plus `$3B3(a1)`; the
+rally-threshold read `0x18C78`-`0x18C82` takes `$382(a1)` unmasked. So rows 0x10/0x13
+and threshold bytes 0x10/0x13 are the tenants' own storage — a data-only change is
+possible (the 14z-118 port_param32 pattern). The caution: in a match `+0x382` is the
+voice-flavor class, which the engine can reassign (14z-87); the tenants' class byte
+holds their own id since the 14z-87 fix (`tests/audit_voice_borrow.sh`, own-class), and
+the 14z-145 read watch saw the tenant rows indexed — but that EVERY hit on a tenant
+victim reads the tenant's rows is unmeasured over the corpus. (Pyron's rows are
 identical between the games — unaffected either way.) **Its observable,
 measured 14z-145:** the ±1 damage residue of `audit_tenant_throw_geometry`
 (victims 0x10 +1, 0x13 −1, 0x0A −1) is this row — `d3 =
@@ -3981,6 +4019,13 @@ both legs at the event and at each hit) and to make P1 act on both legs (its seq
 pre-event state); the gate prints P1's state path for each event with no hit. On that print, inside
 the mode the two **Killshread [LK] inputs come out as a kick** (seq `0x0A`, after the crouch) on
 BOTH legs, not the special — Donovan's vs2 EX install and our Change agree on it.
+**The two visible differences, measured (14z-168, the gate's form rows) and ruled identical by the
+maintainer:** no piece in Pyron's area is drawn with a palette that differs (OBJ palettes 0x0a/0x0b,
+identical colours; his form's idle loop is at another phase at 2690-2710 and realigns inside the move;
+the palettes that do differ are the two games' HUD colours); Donovan's sword (P1's projectile slot 0,
+type 0x3d) is not RNG-driven, its idle loop starts 10 frames later natively, its 5HP flight path is
+identical to f3348 (1 px behind from 3349), and its spin angle follows the idle phase — the pose seen on
+the capture.
 
 **The gauge rule** [M: `tests/audit_df_meter.sh`]: the meter adder is
 byte-identical in the two games but for its mode test — vsavj `tst.b $111(a6)`,

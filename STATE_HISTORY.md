@@ -16049,6 +16049,8 @@ sound. NEXT SESSION: the M5 arc (ejection 0x739 = smallest target;
 voice blocks after the 0x02E5 decode, 14z-85d); the flaky
 Sasquatch-intro crash rig if it resurfaces.)
 
+**SUPERSEDED IN PART 2026-09-18 (14z-168) — marker added above this archived entry, the entry itself unchanged: the accepted attacker-freeze deviation is no longer accepted; the class takes vs2's 0x52 rule; see `DECISIONS_HISTORY.md` "Ruled 2026-09-18 (14z-168) — the column shock and the Plasma Trap take vs2's class-0x52 rule".**
+
 ### Decisions — 14z-85g(2): the trap SHOCK restoration shape.
 ### **DECIDED (maintainer, 2026-08-14): OPTION (a) — the vs2-licensed
 ### one-byte class remaps. EXECUTED TO FULL GREEN the same session:**
@@ -16218,6 +16220,8 @@ order of prior:
 Cheap first check before any of that: does the 61_tenant_2pwin replay
 family already cover a 2P tenant win → COM transition? If yes, diff
 what the perfect path adds.
+
+**SUPERSEDED 2026-09-18 (14z-168) — marker added above this archived entry, the entry itself unchanged: the maintainer ruled the vs2 rows; see `DECISIONS_HISTORY.md` "Ruled 2026-09-18 (14z-168) — the tenants' DEFENSE rows become vs2's".**
 
 ### Decisions — 14z-85f: tenant DEFENSE-side table rows (defender
 ### curves + low-HP rally thresholds). **DECIDED (maintainer,

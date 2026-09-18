@@ -27,6 +27,44 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-18 (14z-168) — the tenants' DEFENSE rows become vs2's (supersedes the 2026-08-14 option (b), 14z-85f)
+
+**The maintainer's first reading (verbatim):** *"My undesrtanding is that Pyron is virtually the same in both options and that Donovan and Phobos see a +/- 1dmg overall through our approximation, whereas using their VS2 values would be a substantial change. If so I say we keep the approximation and create a ticket for a possible evolution. However, I want you to first compare the defense-side rows between characters present in both vsavj and VS2 and whether the approximated rows we are currently using are not, in fact, inherited from the shell characters. With  these additionnal information, I can rule definitively."*
+
+**What was put, measured on both data views (vsavj `d82320a0…`, vs2 `ac31740c…`):**
+- The 15 legacy characters' defense rows and rally thresholds are byte-identical between the games, except Sasquatch's row (a vs2 retune). vs2 changed no one else's defense.
+- vsavj fills every variant-id row with a copy of its base character's row (Oboro 0x18 alone has its own). So the tenants' current rows are INHERITED FROM THE SHELLS: Phobos rides Bulleta's curve with a 56 HP rally threshold (native: Victor's curve, 40 HP). Donovan rides Victor's curve at 40 HP (native: the curve most of the cast shares, 48 HP). Pyron is identical either way.
+- The two curves differ by exactly 2 rows at every attacker column. Measured effects: ±1 on throws, +2 on Demitri's 5HP against Phobos (13 vs 11), +1 on Victor's 5HP — "±1–2 per hit, not ±1 overall".
+- The damage code reads the victim's own row (full id, `tests/audit_defense_row_residue.sh`), so rows 0x10/0x13 are the tenants' own storage, which no legacy character reads. That allows a possible data-only edit (the 14z-118 port_param32 pattern), not yet measured for the threshold read.
+
+**Ruling (verbatim):** *"Defense rows: given the measurements we should take the vs2 rows. I hope we can do it in a way that doesn't cost frames and that doesn't create side-effects/regression elsewhere (e.g. it would be wrong to make changes that correct the 3 tenants but break vanilla characters)"*
+
+**What it means.** Phobos and Donovan take vs2's defense rows and thresholds; Pyron needs nothing. The conditions are part of the ruling: no frame cost, and no change to any legacy character's behaviour (the superset invariant). The fix is sequenced by the 14z-168 order (analysis first). `docs/project/tables/defense_rows.md` carries the values and the recipe.
+
+**The meaning of the conditions, clarified by the maintainer the same day (verbatim, of both 2026-09-18 fix rulings):** *"FYI : when I say no frame cost I don't mean " no cost at all", I mean "a total cost that doesn't end up introducing a new frame of lag (i.e. the total overhead cost of our combined changes is less than 1/60s at all times)"* — measurable as NO new zero-pass frame (the pass counter `$FF8081`, `tests/audit_pass_overrun.sh`) anywhere in the corpus with the fixes combined, against the build before them.
+
+## Ruled 2026-09-18 (14z-168) — the column shock and the Plasma Trap take vs2's class-0x52 rule (supersedes the accepted deviation of 14z-85g(2) option (a))
+
+**The question (verbatim):** *"I guess my question is: if we remap the shock as we expect it for Donovan, does that make Plasma trap closer or farther from VS2 behavior?"*
+
+**The answer as put:** both moves carry vs2's class 0x52, whose rule is a 24-frame shock on the victim with the attacker exempt from hit-freeze.
+- Plasma Trap today (remapped to vsavj's 0x06): the victim side is already right; the one deviation is Phobos's 11-frame attacker freeze.
+- Donovan's column today: victim 12 frames (the 14z-42 Lightning Sword thunks) and a 4-frame freeze on Donovan per hit. Measured: native's recovery gap is 26 frames, ours 14.
+- The vs2 rule applied to the class fixes the column AND removes the trap's last deviation. A Donovan-only fix would leave the trap as is, and would give Donovan vsavj's 11-frame attacker freeze.
+
+**Ruling (verbatim):** *"then I'm all for fixing. Once again, as long as we don't introduce noticeable lag and we don't break more things, it's a pure win/win"*
+
+**What it means.** The fix implements vs2's class-0x52 rule (victim shock 0x18, attacker exempt) for the tenants' 0x52-origin hits: Donovan's Killshread Lightning column and Phobos's Plasma Trap. Lightning Sword (class 0x4E natively) keeps its own tuning. The 14z-85g(2) "accepted deviation" (Phobos's attacker freeze on trap connect) is no longer accepted. The conditions: no noticeable lag (the performance rule) and no new breakage. The cost of routes on the existing 0x06-handler thunks is to be measured before a design is picked. The fix is sequenced by the 14z-168 order.
+
+**The meaning of the conditions, clarified by the maintainer the same day (verbatim, of both 2026-09-18 fix rulings):** *"FYI : when I say no frame cost I don't mean " no cost at all", I mean "a total cost that doesn't end up introducing a new frame of lag (i.e. the total overhead cost of our combined changes is less than 1/60s at all times)"* — measurable as NO new zero-pass frame (the pass counter `$FF8081`, `tests/audit_pass_overrun.sh`) anywhere in the corpus with the fixes combined, against the build before them.
+
+## Ruled 2026-09-18 (14z-168) — the maintainer's conclusions on the 14z-168 captures
+
+- **The column shock (the every-frame capture and the RAM timeline):** *"yes but as you noticed it's not that simple because the move doesn't play out exactly the same since the timing of freeze, shock, recovery,etc. are slightly different. And I agree with your analysis."* The fix is in the entry above.
+- **The block re-entry (vsavj re-enters the block animation, vs2 does not; ours = vsavj):** put to the maintainer, who proposed the test (*"To be sure we have two avenues: read the values in RAM or have the victim try to act on the first possible frame post blockstun. if the frames align then it's truly identical mechanically imho"*). Measured: first possible attack at hit+35 on all three games, with back held to +21 or to +50. Ruling: *"agreed, all the tests converge : it's identical"*.
+- **Pyron's Dark Force form:** the palette was measured identical, and the pose phase realigns inside the move. Ruling: *"so that too is confirmed identical"*.
+- **Donovan's Dark Force sword:** not RNG. Its idle loop starts 10 frames later natively; the flight path and hits are identical; the spin angle follows the idle phase. Ruling: *"My conclusion then is that it is identical, just looking slightly different because of the 10 frames of delay, but that is not a bug, just a consequence of the delay and my understanding is that the delay or lack thereof is linked to how the move starts in DF or EX variants, so unless you disagree, to me it's identical."* Not disputed: the delay is measured at the activation; which handler causes it is not traced.
+
 ## Ruled 2026-09-18 (14z-168) — no gauge is built during Dark Force: the tenants' `+0x1C3` readers are a defect
 
 **Ruling (verbatim):** to the measurement that the shells gain nothing from a whiffed attack inside Dark Force Change while the tenants gain +6 (their placed copy of vs2's meter adder tests vs2's Power field `+0x1C3`), and to the question *"What is the swing-meter you are referring to?"* answered as the start-up gauge of an attack, the maintainer: *"I see, it makes sense that you can't build meter during DF"*.

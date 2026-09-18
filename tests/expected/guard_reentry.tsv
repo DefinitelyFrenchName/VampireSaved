@@ -116,3 +116,9 @@ win	vsavj	3640	+25	seq=2	cnt=255	frz=0
 superset	vsavj-vs-ours	frames-differing=0
 pixels	vsavj-vs-ours	frames=13	differing=0
 pixels	vsav2-vs-vsavj	frames=13	differing=13
+act	vsav2	hold=+21	first_attack=+35
+act	vsavj	hold=+21	first_attack=+35
+act	ours	hold=+21	first_attack=+35
+act	vsav2	hold=+50	first_attack=+35
+act	vsavj	hold=+50	first_attack=+35
+act	ours	hold=+50	first_attack=+35

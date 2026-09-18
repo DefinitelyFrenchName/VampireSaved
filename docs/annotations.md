@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3139 |
+| distinct program-space addresses named | 3141 |
 | named by a document or manifest only | 2083 |
-| named by both a document/manifest and code | 705 |
+| named by both a document/manifest and code | 707 |
 | named by CODE ONLY (the gap list below) | 351 |
 | carried by atlas | 563 |
-| carried by engine_internals | 612 |
+| carried by engine_internals | 616 |
 | carried by other docs | 981 |
 | carried by manifests | 1786 |
-| carried by code | 1056 |
+| carried by code | 1058 |
 
 ## Addresses
 
@@ -508,12 +508,14 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x018B8C` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/patch_notes.md — (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix); docs/project/patch_notes.md — donovan-m2 stage 4 — damage-pipeline R1 rows; BOTH GATES GREEN (2026-07-27, session 10); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/huitzil.toml — port_patch; build/manifest/reconciliation.toml — map |
 | `PRG:0x018B9C` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) |
 | `PRG:0x018C08` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f) |
+| `PRG:0x018C10` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) |
 | `PRG:0x018C1A` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
-| `PRG:0x018C1C` | docs/project/tables/defense_rows.md — What changing to native vs2 values would entail |
-| `PRG:0x018C26` | docs/project/tables/defense_rows.md — What changing to native vs2 values would entail; tests/audit_defense_row_residue.sh |
+| `PRG:0x018C1C` | docs/project/tables/defense_rows.md — What changing to native vs2 values entails — RULED, not yet built |
+| `PRG:0x018C26` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/tables/defense_rows.md — What changing to native vs2 values entails — RULED, not yet built; tests/audit_defense_row_residue.sh |
 | `PRG:0x018C3C` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) |
-| `PRG:0x018C7C` | docs/project/tables/defense_rows.md — What changing to native vs2 values would entail |
-| `PRG:0x018C82` | docs/project/tables/defense_rows.md — What changing to native vs2 values would entail |
+| `PRG:0x018C78` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) |
+| `PRG:0x018C7C` | docs/project/tables/defense_rows.md — What changing to native vs2 values entails — RULED, not yet built |
+| `PRG:0x018C82` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/tables/defense_rows.md — What changing to native vs2 values entails — RULED, not yet built |
 | `PRG:0x018CA6` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) |
 | `PRG:0x018D22` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2] |
 | `PRG:0x018D28` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) |
@@ -869,8 +871,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0239E8` | build/manifest/donovan.toml — ls_freeze_vs2_attacker [vs2] |
 | `PRG:0x023AC8` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/patch_notes.md — vs2-licensed class remaps; maintainer-ruled option (a)); build/manifest/donovan.toml — accent_color_aware_3; build/manifest/donovan.toml — hit_class_props_ext_hi; +4 more |
 | `PRG:0x023AD4` | build/manifest/donovan.toml — accent_color_aware_3 |
-| `PRG:0x023AD8` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured); build/manifest/donovan.toml — ls_freeze_vs2_victim; build/manifest/shared_writes.toml — donovan |
-| `PRG:0x023ADE` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured); build/manifest/donovan.toml — ls_freeze_vs2_attacker; build/manifest/shared_writes.toml — donovan |
+| `PRG:0x023AD8` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); build/manifest/donovan.toml — ls_freeze_vs2_victim; build/manifest/shared_writes.toml — donovan |
+| `PRG:0x023ADE` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); build/manifest/donovan.toml — ls_freeze_vs2_attacker; build/manifest/shared_writes.toml — donovan |
 | `PRG:0x023AFE` | docs/project/gotchas.md — space — and a window constant is a census, not a fact (14z-65); docs/project/patch_notes.md — 14z-65 (6) — the specials hunt: window widened, alias rule, farm verified (2026-08-07); build/manifest/reconciliation.toml — map [vs2]; tools/gen_donovan_patch.py |
 | `PRG:0x0245AE` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_tick_cadence.sh |
 | `PRG:0x024CBA` | docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/reconciliation.toml — map [vs2]; build/manifest/reconciliation_donovan.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map; build/manifest/reconciliation_huitzil.toml — map [vs2]; build/manifest/reconciliation_pyron.toml — map [vs2] |
@@ -2094,7 +2096,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0B7FB6` | build/manifest/donovan.toml — capture_kf_aulbath; build/manifest/huitzil.toml — capture_kf_aulbath; build/manifest/pyron.toml — capture_kf_aulbath |
 | `PRG:0x0B8140` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/patch_notes.md — (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map |
 | `PRG:0x0B8724` | build/manifest/donovan.toml — capture_kf_aulbath; build/manifest/huitzil.toml — capture_kf_aulbath; build/manifest/pyron.toml — capture_kf_aulbath |
-| `PRG:0x0B8940` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/tables/defense_rows.md — Cross-references; docs/project/tables/defense_rows.md — What this covers; docs/project/tables/defense_rows.md — vsavj d82320a0… / vs2 ac31740c…; re-derive with the snippet below); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map; +3 more |
+| `PRG:0x0B8940` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/tables/defense_rows.md — Cross-references; docs/project/tables/defense_rows.md — What this covers; docs/project/tables/defense_rows.md — vsavj d82320a0… / vs2 ac31740c…; re-derive with the snippet below); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map; +4 more |
 | `PRG:0x0B8D40` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/tables/defense_rows.md — vsavj d82320a0… / vs2 ac31740c…; re-derive with the snippet below) |
 | `PRG:0x0B9140` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/patch_notes.md — (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map |
 | `PRG:0x0B91C0` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) |
@@ -2106,7 +2108,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0BC448` | build/manifest/donovan.toml — capture_kf_qbee; build/manifest/huitzil.toml — capture_kf_qbee; build/manifest/pyron.toml — capture_kf_qbee |
 | `PRG:0x0BC680` | docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail; build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x0BCBB6` | build/manifest/donovan.toml — capture_kf_qbee; build/manifest/huitzil.toml — capture_kf_qbee; build/manifest/pyron.toml — capture_kf_qbee |
-| `PRG:0x0BCC80` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/tables/defense_rows.md — Cross-references; docs/project/tables/defense_rows.md — What this covers; docs/project/tables/defense_rows.md — vsavj d82320a0… / vs2 ac31740c…; re-derive with the snippet below); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map |
+| `PRG:0x0BCC80` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/tables/defense_rows.md — Cross-references; docs/project/tables/defense_rows.md — What this covers; docs/project/tables/defense_rows.md — vsavj d82320a0… / vs2 ac31740c…; re-derive with the snippet below); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map; +1 more |
 | `PRG:0x0BCD20` | docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail; build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x0BCE7A` | docs/game/atlas/character_tables.md — Animation index tables (bank extends below bank[0]); docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/project/patch_notes.md — crypt-placed code (data_in_code mechanism + census); build/manifest/bank_map.toml — anim_index_a; +2 more |
 | `PRG:0x0BCEFA` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated); docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); build/manifest/bank_map.toml — anim_index_a2 |
@@ -2277,7 +2279,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0D143E` | docs/project/patch_notes.md — 14z-65 (4) — Huitzil stage 4 BUILDS; the R1 frontier enumerated (2026-08-07); tools/build_donovan.sh |
 | `PRG:0x0D153E` | docs/game/engine_internals.md — Select-screen (portrait/name) pipeline — mapped (session 14c); docs/game/engine_internals.md — Select-screen (portrait/name) pipeline — mapped (session 14c) [vs2]; docs/project/doc_audit_14z118.md — 4. Log of the pass (one line per commit); docs/project/inferred_claims.md — What is NOT known — labelled unknowns that stay labelled (no measurement this pass) |
 | `PRG:0x0D22BE` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/project/patch_notes.md — (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map [vs2] |
-| `PRG:0x0D2ABE` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/project/tables/defense_rows.md — Cross-references; docs/project/tables/defense_rows.md — What this covers; docs/project/tables/defense_rows.md — vsavj d82320a0… / vs2 ac31740c…; re-derive with the snippet below); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); +4 more |
+| `PRG:0x0D2ABE` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/project/tables/defense_rows.md — Cross-references; docs/project/tables/defense_rows.md — What this covers; docs/project/tables/defense_rows.md — vsavj d82320a0… / vs2 ac31740c…; re-derive with the snippet below); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); +5 more |
 | `PRG:0x0D2EBE` | docs/project/tables/defense_rows.md — vsavj d82320a0… / vs2 ac31740c…; re-derive with the snippet below) |
 | `PRG:0x0D3070` | docs/project/patch_notes.md — The two rows; build/manifest/donovan.toml — obj_bank_word_slot; tests/test_don_sword.sh; tests/test_tenant_anim_relocation.sh |
 | `PRG:0x0D32BE` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
@@ -2293,7 +2295,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0D609E` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated); build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x0D681E` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x0D6B2A` | docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets [vh2]; build/manifest/bank_map.toml — origins [vh2]; tests/test_capture_pose_sources.sh; tests/test_df_startup_provenance.sh |
-| `PRG:0x0D6E1E` | docs/project/tables/defense_rows.md — Cross-references; docs/project/tables/defense_rows.md — What this covers; docs/project/tables/defense_rows.md — vsavj d82320a0… / vs2 ac31740c…; re-derive with the snippet below); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map [vs2] |
+| `PRG:0x0D6E1E` | docs/project/tables/defense_rows.md — Cross-references; docs/project/tables/defense_rows.md — What this covers; docs/project/tables/defense_rows.md — vsavj d82320a0… / vs2 ac31740c…; re-derive with the snippet below); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map [vs2]; tests/test_defense_rows_census.sh |
 | `PRG:0x0D6EBE` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x0D7018` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2]; docs/game/engine_internals.md — The chain decoder's table bound, and the "unindexed" lying/wake nodes (14z-121) |
 | `PRG:0x0D7098` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2] |

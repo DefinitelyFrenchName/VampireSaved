@@ -7,7 +7,9 @@
 # WHY. tests/audit_tenant_throw_geometry.sh froze 5 of 54 (victim, throw) cells
 # differing by EXACTLY ±1 total damage, sign per VICTIM: 0x10 (Phobos) ours +1
 # on all three throws, 0x13 (Donovan) ours -1 on all three, 0x0A (Sasquatch)
-# ours -1 on Circuit Scrapper only. Ruled WITHIN TOLERANCE (maintainer,
+# ours -1 on Circuit Scrapper only. (The tenant cells: the 2026-09-18 ruling takes vs2's rows —
+# DECISIONS_HISTORY.md "the tenants' DEFENSE rows become vs2's"; this gate re-freezes when that lands.)
+# Ruled WITHIN TOLERANCE (maintainer,
 # 2026-09-04), kept open as a KNOWLEDGE item. STATIC (14z-145): the
 # defender-side DEFENSE CURVE table (vsavj PRG:0x0B8940 / vs2 PRG:0x0D2ABE,
 # 32 B per victim id) differs between the games on EXACTLY ids 0x0A, 0x10,

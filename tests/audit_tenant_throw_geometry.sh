@@ -72,7 +72,8 @@
 # defender-side DEFENSE CURVE row the victim's id selects (vsavj 0x0B8940 /
 # vs2 0x0D2ABE, column = the attacker's id) differs between the games on EXACTLY
 # these three roster ids and no other — rows 0x10/0x13 are content-SWAPPED (the
-# port keeps vanilla's rows by ruling, defense_rows.md: Phobos rides Bulleta's
+# port kept vanilla's rows by the 2026-08-14 ruling, SUPERSEDED 2026-09-18 by "take the vs2 rows" —
+# the fix re-freezes this gate's tenant cells; defense_rows.md: Phobos rides Bulleta's
 # curve, Donovan Victor's, hence the opposite signs) and row 0x0A is a
 # CROSS-GENERATION retune of Sasquatch. Ours answers d3 = 0/2/1 where native
 # answers 2/0/0; the control victim answers 2/2. Not a defect; the residue

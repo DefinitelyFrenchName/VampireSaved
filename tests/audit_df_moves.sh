@@ -3,6 +3,9 @@
 #
 # MUST-FIRE: perturbed-copy: mode-lost — our Change field +0x111 zeroed at the first compared event's frame (what a rig that outran the mode would read) must be refused by the in-mode check, so every compared event is MEASURED inside the mode on both legs, not assumed from the rig's spacing (in-gate: the zeroed copy must fail the check; mode: our field is zeroed before the check and the gate FAILs)
 # MUST-FIRE: perturbed-copy: idle-leg — our P1 state held still over the first compared event's window (what an input that produced nothing would read) must be refused by the acted check, so no SAME row can be two legs agreeing on nothing (in-gate: the held copy must fail the check; mode: our state is held before the check and the gate FAILs)
+# MUST-FIRE: perturbed-copy: palette-blind — the form reducer run with our palette page replaced by native's own (what a read that never reached our palette RAM would compare) must be refused, because no HUD palette is then seen differing, so the palette comparison is proven to see a real difference (in-gate: the blind rows must fail the checks; mode: the blind rows replace the real ones and the gate FAILs)
+# MUST-FIRE: perturbed-copy: rng-dead — the form rows with our leg's RNG reads set to 0 (a pin that never reached the RNG) must be refused, so the sword's seed test is proven non-vacuous (in-gate: the rewritten rows must fail the checks; mode: the rows are rewritten and the gate FAILs)
+# MUST-FIRE: perturbed-copy: form-moved — a copy of the form rows with Pyron's colours reported different at f2730 (what a palette the port got wrong would read) must be refused by the colour check, so "identical" is measured on the palette RAM, not the eye (in-gate: the rewritten copy must fail the check; mode: the rows are rewritten before the check and the gate FAILs)
 # MUST-FIRE: perturbed-copy: hit-dropped — a copy of our rows with the first event's first hit removed (what a mode that lost an altered attack would read) must FAIL the frozen compare, so the frozen rows are what the altered attacks did (in-gate: the perturbed copy must differ from the frozen rows; mode: our rows are rewritten before the compare and the table FAILs)
 #
 # WHY. The #136 parity rigs outran the 360-frame Dark Force (25 NOT-IN-DF rows). Put to the
@@ -62,7 +65,7 @@ CONTROL="${CONTROL:-}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
-case "$CONTROL" in ""|hit-dropped|mode-lost|idle-leg) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+case "$CONTROL" in ""|hit-dropped|mode-lost|idle-leg|form-moved|rng-dead|palette-blind) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
@@ -267,6 +270,150 @@ if [ "$CONTROL" = idle-leg ]; then
 fi
 if acted "$W" "$PARTS" idle > /dev/null 2>&1; then echo "CONTROL DEAD: idle-leg — holding our P1 still at the first event was not seen"; fail=1
 else echo "CONTROL FIRED: idle-leg — holding our P1 still at the first event is refused"; fi
+
+echo "== 3b. how the forms LOOK: Pyron's palette, Donovan's sword (14z-168, the maintainer's questions on the captures)"
+# The captures (build/p136_14z168/cap_dfx_*) showed Pyron's form in what looked like another palette
+# at f2700, and Donovan's sword in another pose. Measured, and ruled identical by the maintainer
+# (2026-09-18, DECISIONS_HISTORY.md, the 14z-168 captures entry): the pieces in Pyron's area use OBJ
+# palettes 0x0a/0x0b, whose 16 colours are identical on both legs (the idle loop is at another phase
+# at 2690-2710; the pieces realign inside the 5LP by 2730); Donovan's sword (P1's projectile slot 0,
+# type 0x3d) is NOT RNG-driven (a second RNG seed leaves each leg's node sequence unchanged), its
+# idle loop starts 10 frames later natively (3215 vs 3205), its 5HP flight path is identical and its
+# spin angle follows the idle phase. OBJ dumps: tests/lua/sprite_capture.lua (read-only).
+spr() {  # spr <name> <set> <rompath> <rpl> <pokes> <frames list> <max frame>   (background)
+    mkdir -p "$W/$1"
+    ( set +e; cd "$W/$1" && MAME_SANDBOX="$W/$1/sb" MAME_ROMPATH="$3" REPLAY="$4" POKES="$5" DUMP_FRAMES="$6" FRAMES="$7" \
+        TRACE_OUT="$W/$1.spr" "$REPO/tools/run_mame.sh" "$2" -autoboot_script "$REPO/tests/lua/sprite_capture.lua" > "$W/$1/mame.log" 2>&1
+      _st=$?; grep -q '^OBJDUMPSUMMARY' "$W/$1.spr" 2>/dev/null && _st=0; echo $_st > "$W/$1/rc"; rm -rf "$W/$1/sb" ) </dev/null &
+}
+for part in pyron_dfx1 donovan_dfx1; do
+    fr="$(python3 -c "import json;print(json.load(open('$W/$part.json'))['frames'])")"
+    base="$(python3 -c "import json;print(';'.join(json.load(open('$W/$part.json'))['pokes']))");$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$fr)))")"
+    if [ $part = pyron_dfx1 ]; then FL="2690,2700,2710,2730"; MX=2735; SEEDS="0000"; else FL="$(python3 -c "print(','.join(str(f) for f in range(3200,3361)))")"; MX=3361; SEEDS="0000 1234"; fi
+    for seed in $SEEDS; do
+        pks="$base;$(python3 -c "print(';'.join(f'{f}:ff80d4:$seed' for f in range(2363,$MX)))")"
+        spr "$part.native.$seed" vsav2  "$ROMDIR" "$W/$part.native.rpl" "$pks" "$FL" "$MX"
+        spr "$part.ours.$seed"   vsavjw "$BUILD/rompath;$ROMDIR" "$W/$part.ours.cur.rpl" "$pks" "$FL" "$MX"
+    done
+done
+wait
+for r in pyron_dfx1.native.0000 pyron_dfx1.ours.0000 donovan_dfx1.native.0000 donovan_dfx1.ours.0000 donovan_dfx1.native.1234 donovan_dfx1.ours.1234; do
+    _rc="$(cat "$W/$r/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || bad "$r exited $_rc and wrote no OBJDUMPSUMMARY"
+done
+[ "$fail" = 0 ] || { echo "FAIL: audit_df_moves (a sprite dump was VOID)"; exit 1; }
+# THE RNG IS READ in the sword's window (rule-checker run 2026-09-18-49 Q4: a pin that never reaches
+# the RNG would make "seed-independent" vacuous): a read tap on the RNG word $FF80D4 over 3200..3360 on
+# both legs (seed 0000) counts the reads; each leg must read it. tests/audit_entrance_draw.sh shows the
+# same pin SELECTING a draw on vsav2 and on ours.
+for leg in native ours; do
+    if [ $leg = native ]; then set_=vsav2; rp="$ROMDIR"; r="$W/donovan_dfx1.native.rpl"; else set_=vsavjw; rp="$BUILD/rompath;$ROMDIR"; r="$W/donovan_dfx1.ours.cur.rpl"; fi
+    fr="$(python3 -c "import json;print(json.load(open('$W/donovan_dfx1.json'))['frames'])")"
+    pks="$(python3 -c "import json;print(';'.join(json.load(open('$W/donovan_dfx1.json'))['pokes']))");$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$fr)))");$(python3 -c "print(';'.join(f'{f}:ff80d4:0000' for f in range(2363,3361)))")"
+    mkdir -p "$W/rng.$leg"
+    ( set +e; cd "$W/rng.$leg" && MAME_SANDBOX="$W/rng.$leg/sb" MAME_ROMPATH="$rp" REPLAY="$r" POKES="$pks" RTAP=ff80d4,2 \
+        WINDOW=3200,3360 FRAMES=3361 TRACE_OUT="$W/rng.$leg.tap" \
+        "$REPO/tools/run_mame.sh" "$set_" -autoboot_script "$REPO/tests/lua/read_tap.lua" > "$W/rng.$leg/mame.log" 2>&1
+      _st=$?; grep -q -E '^(FIELDSUMMARY|END )' "$W/rng.$leg.tap" 2>/dev/null && _st=0; echo $_st > "$W/rng.$leg/rc"; rm -rf "$W/rng.$leg/sb" ) </dev/null &
+done
+wait
+for leg in native ours; do _rc="$(cat "$W/rng.$leg/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || bad "rng tap $leg exited $_rc and wrote no END"; done
+[ "$fail" = 0 ] || { echo "FAIL: audit_df_moves (an RNG tap was VOID)"; exit 1; }
+# ONE reducer: the form rows. `blind` compares our palette page with NATIVE's own (what a read that
+# did not reach our palette RAM would compare) — the palette-blind control's perturbation.
+form_reduce() {  # form_reduce <W> [blind]
+    python3 - "$1" "${2:-}" <<'PY'
+import sys, re, collections
+W, blind = sys.argv[1], sys.argv[2] == "blind"
+def load(name):
+    ent, pal, obj = collections.defaultdict(list), {}, collections.defaultdict(dict)
+    for l in open(f"{W}/{name}.spr"):
+        if l.startswith("F"):
+            m = re.match(r"F(\d+) B0 E\d+ x=(\w+) y=(\w+) code=\w+ attr=\w+ pal=(\w+)", l)
+            if m: ent[int(m.group(1))].append((int(m.group(2), 16) & 0x3ff, int(m.group(3), 16) & 0x3ff, int(m.group(4), 16)))
+        elif l.startswith("P"):
+            fr, hx = l.split(); pal[int(fr[1:])] = bytes.fromhex(hx)
+        elif l.startswith("O"):
+            m = re.match(r"O(\d+) pool=p slot=0 type=3d x=(\d+) y=(\d+) node=(\w+)", l)
+            if m: obj[int(m.group(1))] = (int(m.group(4), 16), int(m.group(2)), int(m.group(3)))
+    return ent, pal, obj
+pn, po = load("pyron_dfx1.native.0000"), load("pyron_dfx1.ours.0000")
+if blind: po = (po[0], pn[1], po[2])
+# THE PALETTE PAGE: tests/lua/sprite_capture.lua dumps 4 KB at $90C000 (atlas ram.md), read here as 32-byte
+# palettes indexed by an OBJ entry's attr palette number (the layout tools/sprite_render.py draws with).
+# Pyron's AREA: OBJ x 90..260, y 64..223 — below the HUD rows (the life bars, palette 0x00, reach y 56)
+# and before f2742, where the "FIRST ATTACK" banner (HUD text, palette 0x02, y 88) is drawn over him.
+box = lambda x, y: 90 <= x <= 260 and 64 <= y <= 223
+hudrow = lambda y: y < 64 or y >= 224
+for fr in (2690, 2700, 2710, 2730):
+    diff = {p for p in range(32) if pn[1][fr][p * 32: p * 32 + 32] != po[1][fr][p * 32: p * 32 + 32]}
+    inb = [(x, y, p) for e in (pn[0][fr], po[0][fr]) for x, y, p in e if box(x, y)]
+    if not inb: sys.exit(f"VOID: no OBJ pieces in Pyron's area at f{fr}")
+    used = sorted({p for _, _, p in inb})
+    ndiff = sum(1 for _, _, p in inb if p in diff)
+    same_pos = sorted(t for t in pn[0][fr] if box(t[0], t[1])) == sorted(t for t in po[0][fr] if box(t[0], t[1]))
+    print(f"form\tpyron\tf{fr}\tpalettes={','.join(f'{p:02x}' for p in used)}\tdiffering_pieces={ndiff}\tpieces={'same' if same_pos else 'moved'}")
+    # THE COMPARISON'S LIVENESS: every palette whose colours differ, and those among them with pieces in the HUD
+    # ROWS (y < 64 or >= 224): the life bars (0x00) and the HUD text are there, and so is one native stage object
+    hud = sorted({p for e in (pn[0][fr], po[0][fr]) for x, y, p in e if hudrow(y)} & diff)
+    print(f"form\tpalettes_differing\tf{fr}\tall={','.join(f'{p:02x}' for p in sorted(diff)) or 'none'}\tin_hud_rows={','.join(f'{p:02x}' for p in hud) or 'none'}")
+S = {k: load(f"donovan_dfx1.{k}")[2] for k in ("native.0000", "ours.0000", "native.1234", "ours.1234")}
+for leg in ("native", "ours"):
+    a, b = S[f"{leg}.0000"], S[f"{leg}.1234"]
+    if not a: sys.exit(f"VOID: no sword object on {leg}")
+    print(f"sword\tdonovan\t{leg}\tseed_independent={'yes' if a == b else 'NO'}")
+nat, our = S["native.0000"], S["ours.0000"]
+def loop_start(s):   # the start of the idle loop's 21-frame hold of one node
+    run = 0
+    for f in range(3201, 3300):
+        run = run + 1 if s[f][0] == s[f - 1][0] else 0
+        if run == 20: return f - 20
+    return None
+hn, ho = loop_start(nat), loop_start(our)
+if hn is None or ho is None: sys.exit("VOID: the sword's 21-frame idle hold was not found on a leg")
+print(f"sword\tdonovan\tidle_hold_starts\tnative={hn}\tours={ho}\toffset={hn - ho}")
+first_x = next((f for f in range(3315, 3361) if nat[f][1] != our[f][1]), None)
+first_y = next((f for f in range(3315, 3361) if nat[f][2] != our[f][2]), None)
+ys = sorted({nat[f][2] for f in range(3315, 3361)} | {our[f][2] for f in range(3315, 3361)})
+print(f"sword\tdonovan\tflight_x\tsame_from_3315_to={(first_x - 1) if first_x else 3360}\tfirst_px_diff={first_x}")
+print(f"sword\tdonovan\tflight_y\tfirst_diff={first_y}\tvalues={','.join(map(str, ys))}")
+for leg in ("native", "ours"):
+    n = sum(1 for l in open(f"{W}/rng.{leg}.tap") if l.startswith("R "))
+    print(f"sword\tdonovan\trng_reads_3200_3360\t{leg}={n}")
+PY
+}
+form_reduce "$W" > "$W/form.tsv" 2> "$W/form.err" || bad "form: $(cat "$W/form.err")"
+[ "$fail" = 0 ] || { echo "FAIL: audit_df_moves (the form rows were VOID)"; exit 1; }
+# ONE set of checks, run on the real rows, on each control's perturbed rows, and in each control's mode
+form_checks() {  # form_checks <rows>: exits 1 naming the first failed check
+    awk -F'\t' '$1=="form" && $2=="pyron" && $5!="differing_pieces=0" {exit 1}' "$1" || { echo "a piece in Pyron's area is drawn with a palette that differs between the legs"; return 1; }
+    awk -F'\t' '$1=="form" && $2=="palettes_differing" && $5=="in_hud_rows=none" {exit 1}' "$1" || { echo "no palette drawing in the HUD rows is seen differing — the palette comparison is blind"; return 1; }
+    awk -F'\t' '$1=="sword" && $4 ~ /^seed_independent/ && $4!="seed_independent=yes" {exit 1}' "$1" || { echo "the sword's animation depends on the RNG seed"; return 1; }
+    awk -F'\t' '$1=="sword" && $3=="rng_reads_3200_3360" {split($4, a, "="); if (a[2] + 0 == 0) exit 1}' "$1" || { echo "a leg never reads the RNG in the sword's window — the seed test is vacuous"; return 1; }
+}
+form_moved() {  # Pyron's colours reported different at f2730
+    awk -F'\t' 'BEGIN{OFS="\t"} $1=="form" && $2=="pyron" && $3=="f2730" {$5="differing_pieces=17"} {print}' "$1" > "$2"
+}
+rng_dead() {  # the RNG never read on our leg
+    awk -F'\t' 'BEGIN{OFS="\t"} $1=="sword" && $3=="rng_reads_3200_3360" && $4 ~ /^ours=/ {$4="ours=0"} {print}' "$1" > "$2"
+}
+case "$CONTROL" in
+    form-moved)    form_moved "$W/form.tsv" "$W/form.p" && mv "$W/form.p" "$W/form.tsv" ;;
+    rng-dead)      rng_dead "$W/form.tsv" "$W/form.p" && mv "$W/form.p" "$W/form.tsv" ;;
+    palette-blind) form_reduce "$W" blind > "$W/form.p" 2>/dev/null && mv "$W/form.p" "$W/form.tsv" ;;
+esac
+sed 's/^/  /' "$W/form.tsv"
+if _why="$(form_checks "$W/form.tsv")"; then ok "the form rows: no differing palette in Pyron's area, the HUD-row palettes seen differing, the sword seed-independent with the RNG read on both legs"
+else bad "$_why"; fi
+cat "$W/form.tsv" >> "$W/got.tsv"
+case "$CONTROL" in form-moved|rng-dead|palette-blind)
+    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: $CONTROL — the form checks refuse the perturbed rows"; echo "FAIL: audit_df_moves (control mode)"; exit 1
+    else echo "CONTROL DEAD: $CONTROL"; echo "FAIL: audit_df_moves"; exit 1; fi ;;
+esac
+form_moved "$W/form.tsv" "$W/ctl_f1.tsv"; rng_dead "$W/form.tsv" "$W/ctl_f2.tsv"; form_reduce "$W" blind > "$W/ctl_f3.tsv" 2>/dev/null
+for c in form-moved:ctl_f1 rng-dead:ctl_f2 palette-blind:ctl_f3; do
+    if _w="$(form_checks "$W/${c#*:}.tsv")"; then echo "CONTROL DEAD: ${c%%:*} — the perturbed rows passed"; fail=1
+    else echo "CONTROL FIRED: ${c%%:*} — $_w"; fi
+done
 drop_hit() { python3 - "$1" "$2" <<'PY'
 import sys
 rows = [l.rstrip("\n").split("\t") for l in open(sys.argv[1])]
@@ -286,7 +433,8 @@ if [ "${FREEZE:-0}" = 1 ]; then
     { echo "# tests/expected/df_moves.tsv — the tenants' in-DF moves, ours (Dark Force Change, P+K; merged-m18) vs native vsav2 (the tenant's"
       echo "# vs2 EX install), ordered hits (damage, P2 class) and gauge steps per event (tests/audit_df_moves.sh; field_trace)."
       echo "# Evidence class: in-emulator. Frozen 14z-168 with FREEZE=1 (GitHub #136). The gauge rows are frozen AS MEASURED (#157's"
-      echo "# Dark Force tail: our tenants' start-up gauge in the mode); a fix re-freezes this file DELIBERATELY."
+      echo "# Dark Force tail: our tenants' start-up gauge in the mode); a fix re-freezes this file DELIBERATELY. Since 14z-168 also the"
+      echo "# form rows (section 3b): Pyron's palettes in his area, Donovan's sword (RNG independence, idle phase, flight x)."
       echo "#--"; cat "$W/got.tsv"; } > "$EXPECT"
     echo "  FROZE  $(basename "$EXPECT") — VERIFY by re-running without FREEZE"; exit 0
 fi

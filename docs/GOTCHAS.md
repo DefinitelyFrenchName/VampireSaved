@@ -20,9 +20,9 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-377 entries (44 game / 108 platform / 225 project), counted from the buckets at generation.
+382 entries (45 game / 108 platform / 229 project), counted from the buckets at generation.
 
-## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 44 entries
+## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 45 entries
 
 - (the 14z-90 onset-frame entry that opened this file was RE-FILED to `docs/project/gotchas.md` at 14z-118 — it is a VERIFICATION-CLASS fact, not a game fact; S-C12 flagged it)
 - OBJ record formats differ in ENTRY STRIDE, not just header meaning
@@ -68,6 +68,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - VS2 RETUNED VICTOR'S HITSTUN HEAD HURTBOX, AND GAVE NEARLY EVERY CHARACTER'S BOXLESS HELD POSE A PUSH BOX — no legacy character carries the same data in both games (measured: 14z-164)
 - THE HIT STAGER PAYS METER TO WHOEVER IS REGISTERED, AND ONLY A HIT THAT REGISTERS ITSELF GETS IT RIGHT — the collision walk leaves the pair as (P2, P1) (measured: 14z-166)
 - P+K IS A DIFFERENT MODE ON vs2 AND vsav — a newcomer's Dark Force is compared against its vs2 EX move, never against vs2's P+K (paid: 14z-168)
+- "WHEN CAN THE BLOCKER ACT" IS NOT ASKED BY MASHING INSIDE THE BLOCK WINDOW — that measures the ADVANCING GUARD (paid: 14z-168)
 
 ## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 108 entries
 
@@ -180,7 +181,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - MAME 0.288'S LUA HAS NO SCREEN `vpos`/`hpos`, AND A SCRIPT THAT ERRORS BEFORE REGISTERING ITS FRAME CALLBACK RUNS MAME FOREVER (paid: 14z-168)
 - A `-debug` LOGGING BREAKPOINT DRIFTED THE INPUT PLAYBACK AND HID THE DIVERGENCE IT WAS PLACED TO EXPLAIN (paid: 14z-168)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 225 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 229 entries
 
 - A NEW ANCHOR DOCUMENT FOR A SKILL IS A TWO-REPO EDIT — the harness's consumer config carries its own copy of the skills lock's document list (paid: 14z-163, GitHub #152)
 - A COMMIT SUBJECT THAT NAMES AN ISSUE AFTER A CLOSING KEYWORD CLOSES IT ON PUSH — and the close is attributed to the PUSHING account, not measured (paid: 14z-162, GitHub #151)
@@ -407,3 +408,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A DIFF AFTER A DIFF IN ITS PART IS NOT A FINDING OF ITS OWN — attribute coupled rows by ABLATION (paid: 14z-168, #136)
 - A MOVE THE RIG NEVER LANDS READS IDENT ON BOTH LEGS — the parity table cannot see what the rig does not do (paid: 14z-168, #136)
 - THE MAINTAINER'S MOVE LISTS NAME THE VAMPIRE SAVED MOVE — in vs2 the same name may be a different input (paid: 14z-168)
+- A PALETTE "DIFFERENCE" SEEN ON A CAPTURE WAS THE HUD AND THE BACKGROUND — read palette RAM, and give the comparison a known difference to see (paid: 14z-168)
+- A CENSUS BUILT FROM A GREP OF MENTIONS IS NOT A CENSUS OF USERS (paid: 14z-168)
+- A HEREDOC TERMINATOR INSIDE ANOTHER HEREDOC'S TEXT ENDS THE OUTER ONE (paid: 14z-168)
+- A SCRIPT CREATED WITH THE FILE TOOL IS NOT EXECUTABLE, AND ONLY THE RUNNER THAT RUNS IT NOTICES (paid: 14z-168)
