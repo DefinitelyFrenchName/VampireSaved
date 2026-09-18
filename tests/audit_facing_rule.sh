@@ -11,14 +11,18 @@
 # so a 5 falls through to `eor.b d0,$5d(a1)` (0x1886C) and 1 XOR 5 = 4 lands in
 # the byte. The pushback step routine (vs2 0x27038) signs every step by +0x5D
 # (0 -> negated, nonzero -> added), so Killshread Summon (ES)'s returning wave
-# drags Demitri 80 px TOWARD Donovan on native and steps him the other way on
-# ours. Measured 14z-167 (build/x_family_14z167/; rule-checker run 2026-09-18-42,
+# drags Demitri 80 px TOWARD Donovan on native, while on ours the same steps are
+# ADDED, away from Donovan, and his x holds at 835 (what holds it there is not
+# measured; the frozen x rows are the measurement, 835/835 against 835/755). Measured 14z-167 (build/x_family_14z167/; rule-checker run 2026-09-18-42,
 # its Q3 resolved by work); the maintainer compared the captures first:
 # "But looking at the background it does seems that VS2 has demitri going
 # forward while our Demitri stays in place."
 #
 # WHAT IT FREEZES (tests/expected/facing_rule.tsv):
 #   static  <game> <resolver addr> rules=<the cmpi.b #N values of the compare chain>
+#   legacy  <game> records=<reachable legacy attack records> rule5=<how many carry rule 5>
+#           rules=<the full +0xE histogram>  — tools/audit_facing_rules.py, the legacy control
+#           (added 14z-167b: vsavj 0 of 1,085, vsav2 1 of 1,143)
 #   facing  <leg> <frame> <writer PC> <+0x5D after the write>  — every write to
 #           Demitri's +0x5D from 3850 to 3960 on the #136 rig donovan_3 (event 5,
 #           Killshread Summon (ES) at 3840), both legs REAL cursor picks
@@ -35,7 +39,8 @@
 # one-leg taps are non-debug (tests/lua/read_tap.lua), frames >= 3850 only.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged26] [FREEZE=1] tests/audit_facing_rule.sh
-#   emulator tier, MAME; four tap runs in parallel plus the two opcode views from the build/out decrypt cache
+#   emulator tier, MAME; four runs in parallel plus the two views from the build/out decrypt cache —
+#   measured 14z-167b on this MacBook, solo: ~5 s wall (verify), each control mode the same
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
@@ -158,11 +163,12 @@ echo "== 1. the static resolvers, both games"
 # through the build/out cache helper, never a direct decrypt (tests/test_decrypt_cache.sh §5, GitHub #69: a
 # short image is refused loudly instead of being read as garbage)
 . "$REPO/tests/lib/decrypt_cache.sh"
-decrypt_view vsavj "$W/vsavj_op.bin" || bad "vsavj opcode view not delivered"
-decrypt_view vsav2 "$W/vsav2_op.bin" || bad "vsav2 opcode view not delivered"
+decrypt_view vsavj "$W/vsavj_op.bin" "$W/vsavj_da.bin" || bad "vsavj views not delivered"
+decrypt_view vsav2 "$W/vsav2_op.bin" "$W/vsav2_da.bin" || bad "vsav2 views not delivered"
 [ "$fail" = 0 ] || { echo "FAIL: audit_facing_rule"; exit 1; }
 if [ "$CONTROL" = branch-planted ]; then plant_branch "$W/vsavj_op.bin" "$W/vsavj_op.pl" && mv "$W/vsavj_op.pl" "$W/vsavj_op.bin"; fi
-{ static_row vsavj "$W/vsavj_op.bin" && static_row vsav2 "$W/vsav2_op.bin"; } > "$W/static.rows" 2> "$W/static.err" || { bad "static read: $(cat "$W/static.err")"; }
+{ static_row vsavj "$W/vsavj_op.bin" && static_row vsav2 "$W/vsav2_op.bin" \
+  && python3 "$REPO/tools/audit_facing_rules.py" "$W/vsavj_da.bin" "$W/vsav2_da.bin" --tsv; } > "$W/static.rows" 2> "$W/static.err" || { bad "static read: $(cat "$W/static.err")"; }
 sed 's/^/  /' "$W/static.rows"
 
 echo "== 2. the taps, both legs ($PART, frames $FROM-$FR)"

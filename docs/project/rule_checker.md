@@ -182,6 +182,17 @@ claim accuracy alone. Cost: two fresh agents per run, 50k-260k tokens and
 30 s to 8 min each; the readers that read the most (the expectation packets,
 60+ artifacts) took 4-8 min.
 
+**The model (14z-167).** The session model moved to Opus 5 and Fable 5.1 was
+unreachable on the account's spend limit, so every fixture was recalibrated
+under `--model claude-opus-5` (runs 2026-09-18-37 to -40: each positive caught,
+the negative OK beside a caught plant). The tool records `--model` as given and
+does not bind a calibration to it (#158), and every row before those runs reads
+`default`. So the working agent passes the resolved model id on every `prepare`,
+spawns the readers on that model, and checks the ledger's calibration rows
+under it before a real run. And a prepared run that was never recorded (run
+2026-09-18-36, a `NOT-RUN.txt` only) makes `prepare`'s automatic id collide with
+it, so every later `prepare` takes `--id` (#160).
+
 ## What it will not catch
 
 - **Operational slips.** A waiter wedged for hours is not a rule-application

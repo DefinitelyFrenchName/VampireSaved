@@ -1,0 +1,26 @@
+THE PACKET
+
+Decision kind: expectation
+Subject: 14z-167b: freeze tests/expected/facing_rule.tsv (with the legacy control's rows) and tests/expected/rig_opening.tsv, both the defect or artifact frozen as measured
+Claim (the working agent's sentence): At 14z-167b two expectations are frozen AS MEASURED and each VERIFIED by a second run: tests/expected/facing_rule.tsv (32 rows) by tests/audit_facing_rule.sh - the two games' facing-rule resolvers read from the decrypted opcode images (vsavj 0x018854 rules=2,3,4; vsav2 0x01717e rules=2,3,4,5), the legacy control's facing-rule histogram per game from tools/audit_facing_rules.py (vsavj 1085 reachable records, rule5=0; vsav2 1143, rule5=1), every write to Demitri's +0x5D from 3850 to 3960 on the #136 rig donovan_3 with its writer PC (ours 4 at 0x01886c, native 1 then 0 at 0x0171e0), and Demitri's x at 3924 and 3946 (ours 835/835, native 835/755); and tests/expected/rig_opening.tsv (16 rows) by tests/audit_rig_opening.sh - the first frame RAM:$FF812D reads 1 (2545 on both legs) and P1's x and seq at 2363, 2370, 2395, 2481, 2544, 2560 and 2600 on huitzil_5. Both gates build their legs with the parity gate's pokes_for/rpl_for, copied (real cursor picks, the level and RNG pins, the rig's own pokes), assert every emulator run's exit status, and refuse a reduction with no END line or a missing sample as VOID; the opening gate also asserts P1 is Phobos (id 16). Controls: facing - rule5-resolved and branch-planted, both fired in-gate (facing_verify3.log) and both modes exit 1 (facing_ctl3_*.log); opening - entrance-swapped, fired in-gate (opening_verify.log), mode exit 1 (opening_ctl.log). NOT tested: the facing gate covers one rig and one move's six contacts; the static rows read the resolver's compare chain, not its branch bodies; the legacy histogram counts records reachable from walked chains, which include some that are not real records (odd values on both sides), so it is not a census of true records; the opening gate freezes huitzil_5 only (huitzil_6/7 were measured identical in scratch traces, not by a gate); x at 2370 is the rig's own X pin on both legs, a shared write to a compared field by construction; the 2544/2545 round-start frame differs between the atlas row (written at 2544) and the sample (first read at 2545) and is not reconciled beyond naming both; the verify runs are run-to-run determinism on one host; no shipped ROM byte moved.
+Artifacts (read every one, in full):
+  - tests/audit_facing_rule.sh
+  - tests/expected/facing_rule.tsv
+  - tests/audit_rig_opening.sh
+  - tests/expected/rig_opening.tsv
+  - tools/audit_facing_rules.py
+  - build/gates_14z167/facing_freeze4.log
+  - build/gates_14z167/facing_verify3.log
+  - build/gates_14z167/facing_ctl3_rule5-resolved.log
+  - build/gates_14z167/facing_ctl3_branch-planted.log
+  - build/gates_14z167/opening_freeze.log
+  - build/gates_14z167/opening_verify.log
+  - build/gates_14z167/opening_ctl.log
+  - tests/replays/naming/huitzil_5.json
+  - tests/replays/naming/donovan_3.json
+  - tests/audit_move_parity.sh.lines-130-172 (lines 130-172 of tests/audit_move_parity.sh)
+  - docs/game/atlas/ram.md.lines-97-97 (lines 97-97 of docs/game/atlas/ram.md)
+  - docs/game/atlas/ram.md.lines-163-163 (lines 163-163 of docs/game/atlas/ram.md)
+  - docs/game/engine_internals.md.lines-4264-4281 (lines 4264-4281 of docs/game/engine_internals.md)
+  - build/x_family_14z167/cap/DELIVERED.txt
+  - build/x_family_14z167/cap_d3/DELIVERED.txt

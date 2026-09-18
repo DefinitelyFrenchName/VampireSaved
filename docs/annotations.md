@@ -25,10 +25,10 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 |---|---|
 | distinct program-space addresses named | 3121 |
 | named by a document or manifest only | 2072 |
-| named by both a document/manifest and code | 696 |
-| named by CODE ONLY (the gap list below) | 353 |
-| carried by atlas | 546 |
-| carried by engine_internals | 597 |
+| named by both a document/manifest and code | 697 |
+| named by CODE ONLY (the gap list below) | 352 |
+| carried by atlas | 551 |
+| carried by engine_internals | 598 |
 | carried by other docs | 978 |
 | carried by manifests | 1786 |
 | carried by code | 1049 |
@@ -396,8 +396,9 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0170D2` | docs/project/patch_notes.md — donovan-m2 stage 4 — damage-pipeline R1 rows; BOTH GATES GREEN (2026-07-27, session 10); build/manifest/reconciliation.toml — map |
 | `PRG:0x0170DE` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2] |
 | `PRG:0x01714A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED) |
-| `PRG:0x017178` | build/manifest/reconciliation.toml — map [vs2] |
+| `PRG:0x017178` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x01717E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); tests/audit_facing_rule.sh |
+| `PRG:0x0171E0` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; tests/audit_facing_rule.sh |
 | `PRG:0x0171FA` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x0171FC` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x0172B0` | build/manifest/reconciliation.toml — map [vs2] |
@@ -482,9 +483,9 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0187BA` | docs/game/engine_internals.md — The SUB-STATE DISPATCHER FAMILY at 0x018460 (14z-79) |
 | `PRG:0x0187BC` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2]; tests/test_index_window_thunk.sh |
 | `PRG:0x01881A` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
-| `PRG:0x01884E` | build/manifest/reconciliation.toml — map |
-| `PRG:0x018854` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); tests/audit_facing_rule.sh |
-| `PRG:0x01886C` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); tests/audit_facing_rule.sh |
+| `PRG:0x01884E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; build/manifest/reconciliation.toml — map |
+| `PRG:0x018854` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); tests/audit_facing_rule.sh |
+| `PRG:0x01886C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); tests/audit_facing_rule.sh; tools/close_findings.py |
 | `PRG:0x0188BA` | build/manifest/reconciliation.toml — map |
 | `PRG:0x018952` | build/manifest/reconciliation.toml — map |
 | `PRG:0x018980` | docs/game/gotchas.md — THE HIT STAGER PAYS METER TO WHOEVER IS REGISTERED, AND ONLY A HIT THAT REGISTERS ITSELF GETS IT RIGHT — the collision walk leaves the pair as (P2, P1) (measured: 14z-166); build/manifest/reconciliation.toml — map; tests/audit_throw_registration.sh |
@@ -949,7 +950,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x027000` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126); docs/game/engine_internals.md — The two engines run DIFFERENT Dark Force systems (traced 14z-69c); build/manifest/huitzil.toml — pcrel_escape_fix; tests/audit_df_startup_invuln.sh |
 | `PRG:0x027008` | docs/game/engine_internals.md — What Dark Force is on each engine (measured 14z-69, both games) [vs2]; build/manifest/reconciliation.toml — map |
 | `PRG:0x027024` | docs/game/engine_internals.md — What Dark Force is on each engine (measured 14z-69, both games) [vs2] |
-| `PRG:0x027038` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); docs/project/gotchas.md — "THE ONLY WRITER" IS A CLAIM ABOUT THE TAP'S WINDOW — a light hit's overlap frames named the wrong mechanism for the pushback (14z-120 (12), corrected 14z-121 (3)); tests/audit_facing_rule.sh; tools/hitbox_records.py |
+| `PRG:0x027038` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); docs/project/gotchas.md — "THE ONLY WRITER" IS A CLAIM ABOUT THE TAP'S WINDOW — a light hit's overlap frames named the wrong mechanism for the pushback (14z-120 (12), corrected 14z-121 (3)); tests/audit_facing_rule.sh; +1 more |
 | `PRG:0x027044` | build/manifest/pcrel_escapes.toml — don_m22; build/manifest/pcrel_escapes.toml — hui56; build/manifest/pcrel_escapes.toml — pyron41 |
 | `PRG:0x02704E` | docs/game/engine_internals.md — The two engines run DIFFERENT Dark Force systems (traced 14z-69c) |
 | `PRG:0x027050` | docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/project/gotchas.md — A WORD COUNTER SAMPLED AS A BYTE READS ITS HIGH BYTE — and a flat trace field then "excludes" the very mechanism it belongs to (paid: 14z-167, GitHub #159, rule-checker run 2026-09-18-42 Q3) [vs2] |
@@ -1171,7 +1172,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x029950` | build/manifest/reconciliation.toml — map [vs2]; tools/build_donovan.sh |
 | `PRG:0x029974` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) [vs2] |
 | `PRG:0x029A02` | build/manifest/reconciliation.toml — map |
-| `PRG:0x029A16` | build/manifest/reconciliation.toml — map |
+| `PRG:0x029A16` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); build/manifest/reconciliation.toml — map |
 | `PRG:0x029A80` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) [vs2] |
 | `PRG:0x029B50` | build/manifest/donovan.toml — port_patch [vs2] |
 | `PRG:0x029B6C` | build/manifest/donovan.toml — port_patch [vs2]; build/manifest/donovan.toml — state_hook |
@@ -2839,7 +2840,6 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x0153D0` | tools/select_port.py |
 | `PRG:0x016EAE` | tools/audit_fsm_census.py |
 | `PRG:0x0170D6` | tests/test_mister_gfxc_fetch.sh |
-| `PRG:0x0171E0` | tests/audit_facing_rule.sh |
 | `PRG:0x017452` | tests/test_hitbox_encoding.sh |
 | `PRG:0x017456` | tests/test_hitbox_encoding.sh |
 | `PRG:0x0175C6` | tests/audit_defense_row_residue.sh |

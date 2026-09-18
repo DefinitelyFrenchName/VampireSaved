@@ -351,4 +351,5 @@ tests/test_poked_legs.sh	character-data
 tests/audit_latch_reads.sh	character-data
 tests/audit_throw_registration.sh	character-data
 tests/audit_facing_rule.sh	character-data
+tests/audit_rig_opening.sh	character-data
 tests/test_same_data_p2.sh	character-data

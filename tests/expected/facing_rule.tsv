@@ -7,6 +7,8 @@
 #--
 static	vsavj	0x018854	rules=2,3,4
 static	vsav2	0x01717e	rules=2,3,4,5
+legacy	vsavj	records=1085	rule5=0	rules=-117:1,-8:1,-7:1,-6:1,-1:26,0:1017,1:23,2:1,3:5,4:5,29:1,30:1,31:1,36:1
+legacy	vsav2	records=1143	rule5=1	rules=-1:25,0:1074,1:29,2:1,3:5,4:5,5:1,10:1,11:1,19:1
 facing	native	3882	017178	01
 facing	native	3882	0171e0	01
 facing	native	3885	017178	01

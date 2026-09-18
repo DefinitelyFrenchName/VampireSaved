@@ -1,0 +1,17 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+STATE.md.lines-44-57 (lines 44-57 of STATE.md)	f86d04b6baad25d8b7fe3a4e60941d45997da94f
+docs/project/rule_checker.md.lines-185-194 (lines 185-194 of docs/project/rule_checker.md)	eb9b7a5cab7fb2102faa852f2c97337a351eb17a
+docs/game/engine_internals.md.lines-984-992 (lines 984-992 of docs/game/engine_internals.md)	76d56f3f78d98887a4422c436a3922cbdc0e9d32
+docs/game/engine_internals.md.lines-1039-1043 (lines 1039-1043 of docs/game/engine_internals.md)	ba2c4e76a646676f21677d6e4c5a8d2ad13f857b
+docs/game/engine_internals.md.lines-3105-3116 (lines 3105-3116 of docs/game/engine_internals.md)	a0031cb6d18cfcd2de85b9007ad6473c5d231d5f
+docs/game/engine_internals.md.lines-4264-4281 (lines 4264-4281 of docs/game/engine_internals.md)	7a0ee5027756f80208fc37c983170356ac5fb32b
+docs/game/atlas/ram.md.lines-163-163 (lines 163-163 of docs/game/atlas/ram.md)	5009c4fb6bc3f6b9fa2b6c265533a3444bf2c712
+docs/project/gotchas.md.lines-4949-4960 (lines 4949-4960 of docs/project/gotchas.md)	8d7c4f717a5dbb329bd77f75a6b04b53041ae746
+docs/project/gotchas.md.lines-5008-5064 (lines 5008-5064 of docs/project/gotchas.md)	3bad3ca5851f6b0d399c09f5bd2b82ab027e9286
+docs/platform/gotchas.md.lines-2602-2616 (lines 2602-2616 of docs/platform/gotchas.md)	2c22e285bc29f789468bbee22c313aa6c7f07181
+tests/audit_throw_registration.sh.lines-1-8 (lines 1-8 of tests/audit_throw_registration.sh)	a1397b6f3f58d6d840f41659a57bfd633b6d6313
+tests/audit_move_parity.sh.lines-38-52 (lines 38-52 of tests/audit_move_parity.sh)	c70a67769a77cf9cfc7d0ce366613c08e355b7e7
+tests/audit_rig_opening.sh.lines-1-23 (lines 1-23 of tests/audit_rig_opening.sh)	6f5a66ff99d3bc44e749a6a429f87cae5185847d
+tests/audit_facing_rule.sh.lines-1-40 (lines 1-40 of tests/audit_facing_rule.sh)	3b9e8eef40942cbc053f324e8a4b85d8a9e29c57
+tools/close_findings.py	65e2153c7d86ffc634dcf4e061b8b1d0f7d75787
+build/gates_14z167/close_findings_14z167.txt	d0e23c115fb109df5687e3a3228460522627510f

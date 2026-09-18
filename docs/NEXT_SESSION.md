@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-167 CLOSE, 2026-09-18)
+# NEXT SESSION — orientation (rewritten at the 14z-167 CLOSE, updated at the 14z-167b close, 2026-09-18)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
@@ -14,6 +14,8 @@
 M18 (`merged-m18`, `build/m3b_merged26`) is still the current freeze and release.
 `git status -sb` says the push state. The withdrawn M19 build dirs are on disk,
 UNREGISTERED — do not play them and do not point a gate at them.
+
+## FIRST: THE ADAPTED CLOSE CHECKLIST AWAITS A RULING (STATE "Decisions pending", 14z-167b). Items 1, 3 and 4 are AGREED for this session's close whatever the ruling: a findings table (every finding of the group, its live home and its test), a pointer on every earlier row the sitting resolves, and a grep for promises. Items 2, 5 and 6 were trialled 14z-167b: `tools/close_findings.py <session>` (cheap; necessary, not sufficient — it sees addresses, not findings), cited scripts promoted into the tree, and a documentation packet through the rule-checker (run `-44` found what the tool could not).
 
 ## START HERE — what is open (THE ORDER IS RULED, 2026-09-17: stable state, then #148 (DONE), then #152 (DONE), then everything else — the #136 families included)
 

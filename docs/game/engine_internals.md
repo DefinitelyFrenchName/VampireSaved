@@ -1036,11 +1036,11 @@ disassembly, `tools/m68dis.py`); a field with no reader there is marked so.
 |---|---|---|
 | `+0x8` / `+0x9` | `0x1735C` / `0x17390` (+ `0x1745E/0x17480`) | real / white power (the damage subtract) |
 | `+0xC` (hit) / `+0xD` (block) | `0x16B4A` / `0x16CCE` → `0x172DA` | **THE PUSHBACK STEP-TABLE INDEX** → victim `+0x59` (forced 1 when the attacker's `+0x8`/`+0x11A` say so), consumed per frame by `0x27038` (see "Reactions as the victim", 14z-121 (3)) |
-| `+0xE` | `0x1717E` | the victim's FACING rule → `+0x5D`: 0/1 eor'd in, 2 = opposite of its own, 3 = the attacker's `+0xA`, 4 = by x against the other fighter, 5 = by the attacker's velocity sign, negative = by the attacker's x. **vsavj's resolver (`0x18854`) has NO rule 5** — it tests 2, 3 and 4, so a 5 falls through to `eor.b d0,$5d(a1)` (`0x1886C`) and is XORed in raw (1 XOR 5 = 4); values above 5 are XORed raw by BOTH resolvers. vsavj's legacy data never uses rule 5 (0 of 1,085 reachable records), vs2's once (a Lilith projectile record). Measured 14z-167 on Killshread Summon (ES), GitHub #159, `tests/audit_facing_rule.sh` |
+| `+0xE` | `0x1717E` | the victim's FACING rule → `+0x5D`: 0/1 eor'd in, 2 = opposite of its own, 3 = the attacker's `+0xA`, 4 = by x against the other fighter, 5 = by the attacker's velocity sign, negative = by the attacker's x. **vsavj's resolver (`0x18854`) has NO rule 5** — it tests 2, 3 and 4, so a 5 falls through to `eor.b d0,$5d(a1)` (`0x1886C`) and is XORed in raw (1 XOR 5 = 4); values above 5 are XORed raw by BOTH resolvers. vsavj's legacy data never uses rule 5 (0 of 1,085 reachable records), vs2's once (a Lilith projectile record) — `tools/audit_facing_rules.py`, frozen by the same gate. Measured 14z-167 on Killshread Summon (ES), GitHub #159, `tests/audit_facing_rule.sh` |
 | `+0xF` | `0x16B44` | → victim `+0x5A` |
 | `+0x10` | `0x16930`, `0x16B38` | the hit id, stored in the victim's ring at `+0x6C` (the multi-hit dedup) |
 | `+0x13` | `0x171FC` | **the HIT-FREEZE class**: → victim `+0x141`, and `+0x13*4` indexes the pairs table `0x17FA4` (hit) / `0x17FA6` (block, class byte negative) — `(a0)+` → the attacker's `+0x5C`, `(a0)` → the victim's; index 0x60 forced when the attacker's `+0x8` is clear and `+0x11A` set. The 11 measured on every normal is this table's entry |
-| `+0x14` | `0x172F6` | the attacker's METER (halved on block, `jsr 0x28D48`); the victim gets 8 while its combo count `+0x144` < 12. **MEASURED 14z-146 (`tests/test_meter_gain.sh`, 48 connecting events on five characters): the attacker's bar (`+0x10A`) steps by this byte ONCE PER LANDED HIT on the HP-drop frame, after a separate SWING COST of 0/3/6 by strength on the press frame that a whiff pays too — the workbook's `gauge whiff`; its `guage hit` is swing + `+0x14` x the hits its author saw land** |
+| `+0x14` | `0x172F6` | the attacker's METER (halved on block, `jsr 0x28D48` — vsavj's adder is `0x29A16`); the victim gets 8 while its combo count `+0x144` < 12. **MEASURED 14z-146 (`tests/test_meter_gain.sh`, 48 connecting events on five characters): the attacker's bar (`+0x10A`) steps by this byte ONCE PER LANDED HIT on the HP-drop frame, after a separate SWING COST of 0/3/6 by strength on the press frame that a whiff pays too — the workbook's `gauge whiff`; its `guage hit` is swing + `+0x14` x the hits its author saw land** |
 | `+0x16` | `0x16FA0` | the special flag: class 4 becomes 5 (+ `+0x117`) |
 | `+0x17` | `0x16F70` and the compares | the REACTION CLASS |
 | `+0x19` | `0x16B3E` | → victim `+0x56` |
@@ -3110,7 +3110,7 @@ own throw site (vsavj `0x029694/98`, vs2 `0x0289C6/CA`) and pays Demitri +9 and
 Victor +8 on BOTH pristine vsavj and vsav2 — the host engine's rule is vs2's and
 the legacy record carries the same value in both games, so the tenant rows are a
 port defect and not an engine-generation difference (`legacy_demitri` in
-`tests/audit_throw_registration.sh`). The fix candidate — reconciling ONLY the three pair-store
+`tests/audit_throw_registration.sh`). **The legacy rule rests on the TAPS alone:** its capture shows the same throw, pose and frame on both games and cannot show 9 against 8 on a meter gauge drawn in 16-unit bands (rule-checker run 2026-09-18-41 Q2, 14z-167). The fix candidate — reconciling ONLY the three pair-store
 pairs, leaving the `-0x4B3D` state-byte clears at vs2 offsets — is the
 maintainer's to schedule; whether 14x's breakage came from the stores or the
 clears was never separated. The per-character `moveq #N; jsr adder` sites are
@@ -4260,3 +4260,22 @@ OBJECT and A3 = a node that can live in the OPPONENT'S data block
 (measured: P2-Phobos's object walking a node inside Donovan's block — the
 same cross-fighter shape as the 14z-73 grab-victim keyframes). So a bad
 node in character X's data is triggered by X's OPPONENT, whoever that is.
+
+## The round-start ENTRANCE and the round start (measured 14z-167)
+
+Depends on atlas rows: `ram.md` `RAM:$FF812D` (the round start), fighter
+`+0x10` (x) and `+0x06` (seq). Gates: `tests/audit_rig_opening.sh` (the opening
+frozen on both legs), `tests/audit_move_parity.sh` (the rows it explains).
+
+A round opens with each fighter's ENTRANCE, and inputs act only from the round
+start (`$FF812D` 0 -> 1: written at 2544 per the atlas row, first sampled as 1 at 2545 by `field_trace.lua` on both legs, `tests/expected/rig_opening.tsv`). The entrance is chosen
+per fighter at character load (the parity gate's header, 14z-159), so two legs
+of one rig can draw different ones. The maintainer lists three for Phobos: the
+car arrival (Cecil driving, Phobos transforming back), picking Cecil up and
+setting him behind, and arriving with Cecil in hand. They move him differently.
+On the huitzil_5 rig the car arrival (native vsav2) carries Phobos from x=360 at
+the match anchor (2363) in seq 2 through the rig's X pin at 2370 to x=702 by
+2395; the Cecil-in-hand arrival (our build) holds him at the pinned 552 in seq 4
+until 2481. A position written before the round start is therefore overwritten
+or carried by the entrance. Which draw picks the entrance, and whether our build
+can draw the car arrival, are unmeasured.

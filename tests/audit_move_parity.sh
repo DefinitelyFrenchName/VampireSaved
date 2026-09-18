@@ -76,7 +76,10 @@
 # prologue lines verbatim. The 506 events were re-frozen on him at 14z-165.
 #
 # WHAT IT DOES NOT COVER: hitboxes and projectile parameters — separate
-# instruments; and a DIFF that begins after contact is still not attributed to
+# instruments; P2's POSITION — P2's x is not a compared field, so a move that
+# displaces P2 differently reads IDENT until P1's own fields feel it downstream
+# (14z-167: Killshread Summon (ES) moved Demitri on native only, event 5 read IDENT
+# and Press of Death read DIFF — GitHub #159); and a DIFF that begins after contact is still not attributed to
 # a side by this gate (P2's hurtboxes are the same data on both legs now, but
 # the engine that reads them is each game's own).
 #

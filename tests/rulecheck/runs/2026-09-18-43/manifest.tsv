@@ -1,0 +1,21 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_facing_rule.sh	dd4964ce42f981757b605008c90d0e1a7745df78
+tests/expected/facing_rule.tsv	f4589b286fdc6150de2a585f7bc88993c536b6c1
+tests/audit_rig_opening.sh	8fd2168274a94c72803ff4422acd14d62f1e0f7a
+tests/expected/rig_opening.tsv	12ec812673ba8fe4e98b4283a0a69422a6a21b01
+tools/audit_facing_rules.py	8843ce11e16da77ad69f174193351e358c38ae13
+build/gates_14z167/facing_freeze4.log	a3fb97e7ebaa52f706b79f1ede9baf98e4866a49
+build/gates_14z167/facing_verify3.log	a64e07869a4a5649c44e86f8db3a97cbfc08384a
+build/gates_14z167/facing_ctl3_rule5-resolved.log	6c31d680f76e689be7bc61574b5b23ab0c4e4387
+build/gates_14z167/facing_ctl3_branch-planted.log	164878bbcc1c940a07c60226b8a56d746ead0e5c
+build/gates_14z167/opening_freeze.log	637abe80e9f566f42d06e7a1a50d7ca9b3bbd747
+build/gates_14z167/opening_verify.log	a562cb727071aa6a31b0d1c4f053e21678214793
+build/gates_14z167/opening_ctl.log	b2418df692d4efe2f288c9b173fa283074795e33
+tests/replays/naming/huitzil_5.json	d4fd5a97b8bc35dccd393a93a560d10a92bca25e
+tests/replays/naming/donovan_3.json	22d74d2687879d0b5afa4ec75d5db9f96906cea6
+tests/audit_move_parity.sh.lines-130-172 (lines 130-172 of tests/audit_move_parity.sh)	a8bf70d6f7ccef5f1d503e3c434c78d2a30e2688
+docs/game/atlas/ram.md.lines-97-97 (lines 97-97 of docs/game/atlas/ram.md)	c2922d22d29fba3f6a786627ef6982ac81f112fd
+docs/game/atlas/ram.md.lines-163-163 (lines 163-163 of docs/game/atlas/ram.md)	5009c4fb6bc3f6b9fa2b6c265533a3444bf2c712
+docs/game/engine_internals.md.lines-4264-4281 (lines 4264-4281 of docs/game/engine_internals.md)	7a0ee5027756f80208fc37c983170356ac5fb32b
+build/x_family_14z167/cap/DELIVERED.txt	426f791fec26d677a91a62ef4d335856affc4471
+build/x_family_14z167/cap_d3/DELIVERED.txt	2cdee3937dc869ac71dc5baa185a57ac67437871

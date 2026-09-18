@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 159
+# issues: 160
 number	state	reason	closed	labels	title
+160	OPEN	-	-	bug,severity: low	rulecheck.py: prepare's auto id collides with a run directory that has no ledger row
 159	OPEN	-	-	bug,needs-maintainer-ruling,severity: medium	Tenant attack records with facing rule 5 are XORed into the victim's facing by vsavj's hit code (Killshread Summon (ES) pushes Demitri away where native drags him in)
 158	OPEN	-	-	bug	rulecheck.py: a model change never invalidates a calibration (the checklist hash is checked, the model is not, and the ledger records 'default')
 157	OPEN	-	-	bug,needs-maintainer-ruling,severity: high	Tenant throws pay meter to the wrong fighters — the ported throw code never registers the hit pair on vsavj (the 14x rollback's price; #136's meter family)

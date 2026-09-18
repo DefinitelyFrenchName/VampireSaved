@@ -5044,5 +5044,29 @@ reading `+0x5D` every frame of the slide. Re-sampled as `ff8964:w` the counter
 runs 0 -> 20 on both legs, and the step table is the mover. Rule: before a
 field that never moves is used to EXCLUDE a mechanism, read the instruction
 that accesses it and match the field's WIDTH; a constant sampled field is a
-question about the instrument before it is an answer about the game.
+question about the instrument before it is an answer about the game. AND THE ATLAS
+ALREADY SAID IT: `atlas/ram.md` lists the field as `+0x164.w`; reading the row
+before choosing the sample width would have avoided the trap.
+
+## A BYTE-ONLY MASK FILTER ON A TAP DROPS WORD STORES TO THE SAME BYTE (paid: 14z-167, rule-checker run 2026-09-18-41 Q1)
+
+`tests/audit_throw_registration.sh` froze each fighter's id as "the last
+pre-2300 write to the id byte", reading a two-byte tap of `$FF8782` and keeping
+only writes whose mask was exactly `ff00`. A WORD (or long) store that covers
+the id byte reports mask `ffff`, so it was dropped, and the frozen "last writer"
+was only the last BYTE writer. The checker found it from the reducer's source.
+The filter now keeps every write that touches the byte (`mask & ff00`); the
+verify run reproduced every frozen row, so no word store had in fact landed.
+Rule: a tap filter selects the BYTES of interest (`mask & <byte>`), never one
+exact mask value; an exact mask silently selects one store WIDTH.
+
+## A NEW GATE THAT READS A DECRYPTED VIEW TAKES IT FROM THE CACHE HELPER — `test_decrypt_cache` fails a direct decrypt (paid: 14z-167)
+
+`tests/audit_facing_rule.sh` first called `tools/cps2_decrypt.py` itself; the
+close tier went red on `tests/test_decrypt_cache.sh` §5 ("still decrypting
+directly"). The rule is #69's: `tests/lib/decrypt_cache.sh`'s `decrypt_view`
+delivers the build/out cache atomically and size-checked, so a truncated image
+fails loudly instead of being read as garbage. Rule: source the helper in any
+new gate that needs a decrypted image, and add a gate to §5's direct-decrypt
+exemptions only when decrypting IS its subject.
 
