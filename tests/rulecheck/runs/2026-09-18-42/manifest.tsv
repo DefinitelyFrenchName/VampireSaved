@@ -1,0 +1,17 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/x_family_14z167/facetap/native/tap.txt	2e194972c51e8f2d6026dfc344483d641d06d347
+build/x_family_14z167/facetap/ours/tap.txt	dc41cbb430bf93cc9f3be944e63ed4258d23683d
+build/x_family_14z167/facing_resolvers_disasm.txt	d091f16f7f3c17d4500d79dbf738f7e5da9293b9
+build/x_family_14z167/keep/tr_donovan_3_native.txt.lines-1571-1661 (lines 1571-1661 of build/x_family_14z167/keep/tr_donovan_3_native.txt)	8b2da7b430068071131c0a83e748347c8dfc2480
+build/x_family_14z167/keep/tr_donovan_3_ours.txt.lines-1571-1661 (lines 1571-1661 of build/x_family_14z167/keep/tr_donovan_3_ours.txt)	87ada976737a2a6463bebc4a41459ced11b6f0d8
+build/x_family_14z167/donovan_rule5_records.tsv	36ec00b87f30d32deedb51ca98ede67f5be29398
+build/x_family_14z167/cap_d3/DELIVERED.txt	2cdee3937dc869ac71dc5baa185a57ac67437871
+build/x_family_14z167/cap_d3/killshread_demitri_position_crop.png	e7e2247470053a76d4868944e19f9dd1212ff078
+build/x_family_14z167/cap_d3/donovan_3_killshread_summon_sheet.png	a04101fd1b8dc59d7536204f916e8c434f419890
+tests/expected/killshread_es.txt	752021b7e37424c31dcca6eaf3372a447c8ec954
+tests/replays/naming/donovan_3.json	22d74d2687879d0b5afa4ec75d5db9f96906cea6
+tests/replays/naming/donovan_3.rpl	7296358b8442dc98734d1993511a3ae4a5eb24af
+tests/audit_move_parity.sh.lines-130-200 (lines 130-200 of tests/audit_move_parity.sh)	d03b4c440f3def5d4752b94799cddcac92280e02
+build/x_family_14z167/audit_move_parity_keep.sh.lines-171-172 (lines 171-172 of build/x_family_14z167/audit_move_parity_keep.sh)	e63b1a6d434f83da7c490e39c95553f602aeee10
+docs/game/engine_internals.md.lines-1036-1040 (lines 1036-1040 of docs/game/engine_internals.md)	517cd356c784b31733ee9174fbfc141b80ed0f0c
+docs/game/engine_internals.md.lines-975-990 (lines 975-990 of docs/game/engine_internals.md)	bffdded1e3a66208da2aedb64ec14395f913e738

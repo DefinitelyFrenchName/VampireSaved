@@ -71,6 +71,7 @@
 # WHAT THE GATE DOES NOT CLAIM: that an answer is ENOUGH. That is judged at the
 # close that closes the ticket.
 issue	kind	status	title	repro	decided	learned	wrong	sessions
+159	bug	open	Tenant attack records with facing rule 5 are XORed into the victim's facing by vsavj's hit code — Killshread Summon (ES) pushes Demitri away where native drags him in	tests/audit_facing_rule.sh	none	docs/game/engine_internals.md § **vsavj's resolver (`0x18854`) has NO rule 5**	docs/project/gotchas.md § A WORD COUNTER SAMPLED AS A BYTE READS ITS HIGH BYTE	14z-167
 158	bug	open	rulecheck.py: a model change never invalidates a calibration — the checklist hash is checked, the model is not, and the ledger records 'default'	tools/rulecheck.py § def calibrated(ledger_rows, name	none	none	none	14z-167
 157	bug	open	Tenant throws pay meter to the wrong fighters — the ported throw code never registers the hit pair on vsavj (the 14x rollback's price; #136's meter family)	tests/audit_throw_registration.sh	none	docs/game/engine_internals.md § THE HIT-REGISTRATION PAIR, MEASURED (14z-166	docs/project/gotchas.md § A ROLLED-BACK RECONCILIATION IS A LIVE DEFECT WITH A NAMED PRICE	14z-166
 156	bug	done	rulecheck.py: two line ranges of one artifact collide in staging, the reader sees only the last	tools/rulecheck.py § a line range	docs/project/rule_checker.md § stages under its own name	docs/project/rule_checker.md § stages under its own name	tests/rulecheck/runs/2026-09-17-22/verdict_real.txt § Q5	14z-164

@@ -983,7 +983,7 @@ the victim".
   on a hit, `+0xD` on a block, copied at contact by `0x172DA`) → the word
   list at vs2 `0x2783C` (read through the DATA view) → a byte list of
   per-frame x steps indexed by the counter `+0x164` (cleared at the contact,
-  `0x1714A`); each frame `x += step` (negated by the victim's facing `+0x5D`,
+  `0x1714A`; a WORD — `move.w $164(a6)` at `0x27050`, 14z-167); each frame `x += step` (negated when the victim's facing `+0x5D` is 0, added when it is any nonzero value — `tst.b $5d(a6); bne` at `0x2706E`, which is how a rule-5 facing XORed to 4 on our engine reverses Killshread Summon (ES)'s drag, #159;
   suppressed while the other fighter's `+0x198` is set); a NEGATIVE byte
   ends the list and the routine returns 1 — **which is what releases the
   HOLD reaction** (the "slide stops = hold exits" of (9)). The lists:
@@ -1036,7 +1036,7 @@ disassembly, `tools/m68dis.py`); a field with no reader there is marked so.
 |---|---|---|
 | `+0x8` / `+0x9` | `0x1735C` / `0x17390` (+ `0x1745E/0x17480`) | real / white power (the damage subtract) |
 | `+0xC` (hit) / `+0xD` (block) | `0x16B4A` / `0x16CCE` → `0x172DA` | **THE PUSHBACK STEP-TABLE INDEX** → victim `+0x59` (forced 1 when the attacker's `+0x8`/`+0x11A` say so), consumed per frame by `0x27038` (see "Reactions as the victim", 14z-121 (3)) |
-| `+0xE` | `0x1717E` | the victim's FACING rule → `+0x5D`: 0/1 eor'd in, 2 = opposite of its own, 3 = the attacker's `+0xA`, 4 = by x against the other fighter, 5 = by the attacker's velocity sign, negative = by the attacker's x |
+| `+0xE` | `0x1717E` | the victim's FACING rule → `+0x5D`: 0/1 eor'd in, 2 = opposite of its own, 3 = the attacker's `+0xA`, 4 = by x against the other fighter, 5 = by the attacker's velocity sign, negative = by the attacker's x. **vsavj's resolver (`0x18854`) has NO rule 5** — it tests 2, 3 and 4, so a 5 falls through to `eor.b d0,$5d(a1)` (`0x1886C`) and is XORed in raw (1 XOR 5 = 4); values above 5 are XORed raw by BOTH resolvers. vsavj's legacy data never uses rule 5 (0 of 1,085 reachable records), vs2's once (a Lilith projectile record). Measured 14z-167 on Killshread Summon (ES), GitHub #159, `tests/audit_facing_rule.sh` |
 | `+0xF` | `0x16B44` | → victim `+0x5A` |
 | `+0x10` | `0x16930`, `0x16B38` | the hit id, stored in the victim's ring at `+0x6C` (the multi-hit dedup) |
 | `+0x13` | `0x171FC` | **the HIT-FREEZE class**: → victim `+0x141`, and `+0x13*4` indexes the pairs table `0x17FA4` (hit) / `0x17FA6` (block, class byte negative) — `(a0)+` → the attacker's `+0x5C`, `(a0)` → the victim's; index 0x60 forced when the attacker's `+0x8` is clear and `+0x11A` set. The 11 measured on every normal is this table's entry |

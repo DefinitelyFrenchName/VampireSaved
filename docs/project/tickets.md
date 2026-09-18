@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**158 tickets** — status: open 19 · parked 15 · done 112 · declined 3 · not-ours 2 · invalid 6 · duplicate 1 · kind: bug 122 · cosmetic 10 · evolution 26 · **backfill debt: 0 rows**.
+**159 tickets** — status: open 20 · parked 15 · done 112 · declined 3 · not-ours 2 · invalid 6 · duplicate 1 · kind: bug 123 · cosmetic 10 · evolution 26 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#159](https://github.com/DefinitelyFrenchName/VampireSaved/issues/159) | bug | open | Tenant attack records with facing rule 5 are XORed into the victim's facing by vsavj's hit code — Killshread Summon (ES) pushes Demitri away where native drags him in | `tests/audit_facing_rule.sh` | none | `docs/game/engine_internals.md § **vsavj's resolver (`0x18854`) has NO rule 5**` | `docs/project/gotchas.md § A WORD COUNTER SAMPLED AS A BYTE READS ITS HIGH BYTE` | 14z-167 |
 | [#158](https://github.com/DefinitelyFrenchName/VampireSaved/issues/158) | bug | open | rulecheck.py: a model change never invalidates a calibration — the checklist hash is checked, the model is not, and the ledger records 'default' | `tools/rulecheck.py § def calibrated(ledger_rows, name` | none | none | none | 14z-167 |
 | [#157](https://github.com/DefinitelyFrenchName/VampireSaved/issues/157) | bug | open | Tenant throws pay meter to the wrong fighters — the ported throw code never registers the hit pair on vsavj (the 14x rollback's price; #136's meter family) | `tests/audit_throw_registration.sh` | none | `docs/game/engine_internals.md § THE HIT-REGISTRATION PAIR, MEASURED (14z-166` | `docs/project/gotchas.md § A ROLLED-BACK RECONCILIATION IS A LIVE DEFECT WITH A NAMED PRICE` | 14z-166 |
 | [#155](https://github.com/DefinitelyFrenchName/VampireSaved/issues/155) | bug | open | audit_forced_pick_fidelity: the poked leg is a hand-typed replica of the #136 rig's leg with no control against drift | `tests/audit_forced_pick_fidelity.sh` | none | none | none | 14z-163 |

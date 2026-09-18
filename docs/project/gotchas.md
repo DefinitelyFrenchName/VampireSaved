@@ -5032,3 +5032,17 @@ IDENT; which entrance each leg drew then was not recorded. Rule: a rig pin or an
 input schedule that must hold at an event is written AFTER the round starts,
 never at a fixed offset from the match anchor; and a first-event DIFF at +0 is a
 question about the rig's opening before it is a question about the move.
+
+## A WORD COUNTER SAMPLED AS A BYTE READS ITS HIGH BYTE — and a flat trace field then "excludes" the very mechanism it belongs to (paid: 14z-167, GitHub #159, rule-checker run 2026-09-18-42 Q3)
+
+The victim's pushback step counter `+0x164` is a WORD (`move.w $164(a6)`,
+vs2 `0x27050`). Sampled as `ff8964:b` it read the high byte, 0 on every frame,
+while the slide it counts ran 20 steps; the claim then excluded the step table
+as the mover "because its counter is 0 and equal on both legs". The
+rule-checker caught it from the tap in the same packet: the step routine was
+reading `+0x5D` every frame of the slide. Re-sampled as `ff8964:w` the counter
+runs 0 -> 20 on both legs, and the step table is the mover. Rule: before a
+field that never moves is used to EXCLUDE a mechanism, read the instruction
+that accesses it and match the field's WIDTH; a constant sampled field is a
+question about the instrument before it is an answer about the game.
+

@@ -2600,3 +2600,15 @@ stack) and was NOT changed: `tests/audit_walker_ghost.sh` and `tests/audit_walke
 consume its stack ranges, and moving an instrument under frozen measurements is a question
 to answer first — whether the walker sites run in user mode, and what those audits' ranges
 therefore measured.
+
+## A NON-DEBUG WRITE TAP ON A FIELD WRITTEN MANY TIMES A FRAME CRASHED MAME — sample such a field instead (paid: 14z-167)
+
+`tests/lua/read_tap.lua` on `RAM:$FF8810,2` (P2's x, written by several
+routines every frame) segfaulted MAME on both legs, twice, while the same
+runs' taps on a rarely written byte (`$FF885C,2`) exited 0. The tap log still
+carried its END line, so a gate that checks only END would have taken a
+crashed run as evidence; `tests/audit_facing_rule.sh` records each run's exit
+status and fails on a non-zero one. Rule: tap only fields written rarely;
+sample a hot field once per frame with `tests/lua/field_trace.lua`; and check
+the emulator's exit status as well as the END line.
+
