@@ -1,42 +1,44 @@
-# NEXT SESSION — orientation (rewritten at the 14z-168 CLOSE, 2026-09-18)
+# NEXT SESSION — orientation (rewritten at the 14z-169 CLOSE, 2026-09-18)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## #136 IS ANALYSED (14z-168): all 108 frozen DIFF rows attributed by ablation and a measured signature (`tests/audit_move_parity_attribution.sh`, OTHER fails). Dark Force corrected at its root: vs2's P+K is Dark Force POWER; the tenants' reference is their vs2 EX move. The maintainer ruled on every capture put to them: the block re-entry, Pyron's form and Donovan's sword are IDENTICAL; the column shock is a defect.
+## #136's FIXES ARE ANALYSED, DESIGNED AND RULED GO (14z-169). The analysis in the maintainer's order found: the 0x52 rule works through a `+0x54` = 0x38 MARKER (nothing in vanilla produces it; every consumer reads it as 6) — not a remapped record; every defense read indexes the victim's own id (the defense-row fix is data only); only the three meter adders of the 26 `+0x1C3` readers play differently. The maintainer's condition on all four: *"the total overhead cost of our combined changes is less than 1/60s at all times"* — no new zero-pass frame (`$FF8081`, `tests/audit_pass_overrun.sh`) over the corpus against merged-m18.
 
-## THE MAINTAINER'S ORDER (ruled 2026-09-17/18): all the analysis first, then the fixes, then relentless regression testing — every rig a gate. The fixes are RULED (standing lines in STATE; verbatim in `DECISIONS_HISTORY.md`), under one condition: *"the total overhead cost of our combined changes is less than 1/60s at all times"* — no new zero-pass frame (`$FF8081`, `tests/audit_pass_overrun.sh`) over the corpus against the build before them.
+## START HERE — the four #136 fixes are RULED GO (14z-169); they land TOGETHER WITH THE M19 FREEZE
 
-## START HERE — the analysis is done (14z-169); the fixes' DESIGNS go to the maintainer before any byte moves
+Rulings (`DECISIONS_HISTORY.md` "Ruled 2026-09-18 (14z-169)"): all four fixes GO; the disabled EX
+route does the no-stock (sub-pattern) move at every stock level; the 0x52 fix scoped S1.
+**Why one freeze, not four green commits (found 14z-169):** a manifest change triggers
+`test_m3a_reproducible` (the four tracks against the registered fingerprints) and every gate
+targets the frozen merged-m18 — so the fixes, the registry rows, the tags, the re-point sweep, the
+re-frozen expectations (each through the rule-checker) and the freeze battery (~5 h) are one piece
+of work. Plan it as its own sitting(s): `vampire-saved-port` D.4 is the ritual.
 
-Measured this sitting (STATE 14z-169): (2) a record remapped to 0x38 cannot be the 0x52
-discriminator — the stager rewrites it to 6, Victor carries 0x38, the guard lists it — but
-`+0x54` = 0x38 is produced by nothing in vanilla and read by every consumer as 6 (vs2's 0x52
-role); (1) every defense read indexes the victim's own id, so the defense-row fix is data-only;
-(3) of the 26 `+0x1C3` readers only the three meter adders play differently.
-
-1. **The designs, for the maintainer's go-ahead (drafted 14z-169; ticket drafts in `build/rc169/gh/`):**
-   - **Gauge (#157's tail):** one `[[region_fix]]` per tenant manifest, region `x028122` offset
-     `0xC4A` (vs2 `0x28D6C`), `4a2e01c3` -> `4a2e0111` (`tst.b $1c3` -> `tst.b $111`); same size
-     and cycles, tenant code only; re-freezes `audit_df_meter`, `df_field_readers`.
-   - **Defense rows:** vs2's rows 0x10/0x13 (32 B each) and thresholds (0x10: 0x38->0x28, 0x13:
-     0x28->0x30) into vsavj's tables `0x0B8940`/`0x0BCC80`, the 14z-118 `port_param32` pattern; data
-     only; re-freezes `test_defense_rows_census`.
-   - **The 0x52 rule (column + trap):** drop the four 0x52->0x06 remap rows (donovan.toml
-     `hitbox_proj` +0x291/+0x2B1/+0x2D1, huitzil.toml's two trap rows); `[reaction_hook] case_a4`
-     writes 0x38 (`137c003800544e75`); the `es_type51_dispatch` thunk routes 0x52 to vsavj's
-     class-8 KO handler `0x0186E0` (else the 14z-33 KO crash); the 14z-42 thunks test 0x38 (victim
-     0x18 in the Donovan branch, the attacker write skipped in the default branch). Legacy cost:
-     one compare on electric ground hits and one on KO-path hits — measure with
-     `tests/audit_pass_overrun.sh`. **OPEN SCOPE QUESTION:** the reaction_hook, es_type51 and the
-     14z-42 thunks are donovan.toml's; on the SOLO Phobos track a native-0x52 trap record would hit
-     `index_window_018468`'s vs2-generated 0x52 case and the out-of-range reaction class — the trap
-     rows must stay remapped there (track-scoped) or the machinery move to a shared home.
-   - **EX route:** measured (`tests/audit_ex_refused.sh`, captures `build/rc169/cap_ex/` delivered): with no stock the input never enters and takes the SAME path on vs2 and ours for all three tenants — the native model of "disabled". Design: force the placed Change entry's refusal (vs2 `0x2617A`), verify the stock-3 EX on ours then takes the no-stock path; awaiting the maintainer's read of the captures.
-2. **Then file** the tickets and comments from `build/rc169/gh/` (rule-checker `recommendation`
-   first, as `mechanyaa-ai`, `tools/tickets.py refresh`).
+1. **Gauge (#157's tail) — IMPLEMENTED AND VERIFIED, NOT COMMITTED:** `git apply
+   build/rc169/fix1_gauge.patch` (one `[[port_patch]]` per tenant manifest, region `x028122`,
+   `src_addr 0x028D6C`, `4a2e01c3` -> `4a2e0111`). Built 14z-169 into `build/m3b_merged27`
+   (program key `04db6a44`, unregistered): the program image differs from merged-m18 in exactly
+   3 bytes, the three adder tests. Moves: `audit_df_meter`, `test_df_field_readers`,
+   `audit_df_field_readers_live`, `audit_df_moves` (gauge steps in the mode).
+2. **Defense rows:** four `[[data_port]]` rows (Phobos and Donovan: the curve row from vs2
+   `0x0D2ABE+id*32` to vsavj `0x0B8940+id*32`, 32 B; the threshold byte `0x0D6E1E+id` ->
+   `0x0BCC80+id`), `only_variant_slot`, `dst_old_head`/`dst_end` guards. Moves
+   `test_defense_rows_census`, `audit_defense_row_residue`, the move-parity DEFENSE-ROW rows.
+3. **0x52 rule (S1):** drop donovan.toml's three `hitbox_proj` remaps (+0x291/+0x2B1/+0x2D1) and
+   huitzil.toml's two trap remaps FOR THE MERGED COMPOSITION ONLY (a new generator row key, e.g.
+   `unless_port = "donovan"`, with its unit test); `[reaction_hook] case_a4 = "137c003800544e75"`;
+   `es_type51_dispatch` thunk: `cmpi.b #$52,d0` -> `addq.l #4,sp; jmp 0x0186E0`; the 14z-42 thunks:
+   0x38 -> victim 0x18 (Donovan branch), attacker write skipped (default branch). Verify with
+   `audit_column_shock`, `audit_trap_shock` (both re-freeze), the KO path (a column KO), and
+   `test_reaction_classes` (the ours routes move).
+4. **EX route:** force the placed Change entry's refusal (vs2 `0x2617A` in each `x026142` copy);
+   `audit_ex_refused`'s ours stock-3 rows must then read the no-stock path.
+5. **Then** the combined lag check (`audit_pass_overrun` over the corpus against merged-m18: no new
+   zero-pass frame) and the freeze. File the tickets from `build/rc169/gh/` (rule-checker
+   `recommendation` first, as `mechanyaa-ai`) — before or with the freeze.
 
 ## ALSO OPEN FROM 14z-168
 
@@ -57,24 +59,19 @@ role); (1) every defense read indexes the victim's own id, so the defense-row fi
 - #157, #159: the maintainer's to schedule; #158, #154/#155, #153, #150 filed and
   unstarted; every other open ticket is on `docs/project/tickets.md`.
 
-## TRAPS PAID THIS SITTING
+## TRAPS PAID THIS SITTING (14z-169)
 
-1. **vs2's P+K is not the tenants' Dark Force** — it is Dark Force POWER; compare their
-   vs2 EX move (the maintainer caught it on the capture).
-2. **A light mash inside the block window measures the ADVANCING GUARD** (vsavj fires
-   on light presses, vs2 does not) — press after the window to ask "when can I act".
-3. **A backgrounded MAME leg under `set -e` loses its status on a teardown segfault**
-   (`exited none` on a complete log), and my first scripted fix put `set +e` on the
-   wrong subshell in three gates — green runs cannot show a robustness fix; inspect
-   every patched site.
-4. **A "different palette" by eye was the HUD and the background** — read palette RAM,
-   and give every comparison a known difference to see (the HUD rows) or it is blind.
-5. **A census built from a grep of MENTIONS is not a census of users** — grep for the
-   invocation (the read_tap "ten users" were eight, one missed).
-6. **A ruling is cited with the maintainer's words or not at all** — the words of the
-   2026-09-17 agreement were recovered from that sitting's transcript.
-7. **A heredoc terminator inside the text of another heredoc ends the outer one** —
-   patch gate bodies from a file, never an inline `<<'PY'` inside `<<'PY'`.
+1. **A record's class byte is not the victim's reaction class** — the guard reads it, then a
+   STAGER rewrites it before `+0x54`; read the whole chain before designing on a table entry.
+2. **A manifest fix is not committable green between freezes** — `test_m3a_reproducible` is
+   triggered by `build/manifest/`; fixes land WITH the freeze (`docs/project/gotchas.md`).
+3. **The stager and reaction tables are 16-bit pc-relative** — a repointed entry cannot reach
+   placed code; design through the port's own long-table thunks (`reaction_hook`).
+4. **Look at a build directory before building into it** — `build/m3b_merged27` pre-existed.
+5. **A fingerprint row must be the WHOLE-SET key** (`--set-key`); the program key is shared
+   with `build/merged1` (rule-checker run 52).
+6. **Name the play reading of a code fact as unmeasured** — "must be blocked low" was a
+   conclusion without a hit or a capture (run 51 Q2).
 
 **IF A DOC IS TOUCHED:** the doc gates (`test_checkdocs`, `test_docshape`,
 `test_doc_anchor_census`, `test_checkskills`, `test_gotchas_index_current`,

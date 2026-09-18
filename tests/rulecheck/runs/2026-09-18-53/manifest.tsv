@@ -1,0 +1,12 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/rc169/findings_table_14z169.tsv	bdaf4587fbffe1764135fcb8dcecdb131388095e
+docs/game/engine_internals.md.lines-3152-3267 (lines 3152-3267 of docs/game/engine_internals.md)	ba26fb7e5e495362ba9a06e340564bacbca53cb2
+docs/game/engine_internals.md.lines-3295-3325 (lines 3295-3325 of docs/game/engine_internals.md)	091a7ef3fa060cfcd72285afa8137f25366a61c9
+docs/game/engine_internals.md.lines-4098-4128 (lines 4098-4128 of docs/game/engine_internals.md)	a45d1742db6e4807228701e287020743c5526e2c
+docs/game/atlas/ram.md.lines-163-165 (lines 163-165 of docs/game/atlas/ram.md)	0ecad302bc70e73dec7c4e2509013370610de695
+docs/game/gotchas.md.lines-916-932 (lines 916-932 of docs/game/gotchas.md)	3a4e2450a3c6e316b2676a8b2d4a8a105f51136e
+docs/project/gotchas.md.lines-5167-5177 (lines 5167-5177 of docs/project/gotchas.md)	695b9b91db0660a29a3fb99ef9db76615e84fd83
+docs/project/tables/defense_rows.md	99e19397d1cbb0270b56448c64eee37e0e71252c
+STATE.md.lines-53-69 (lines 53-69 of STATE.md)	2ab5916689b8bc0bc5c718f1a38af8bc8595992a
+DECISIONS_HISTORY.md.lines-30-50 (lines 30-50 of DECISIONS_HISTORY.md)	9c6cb4a502411feba87686b53096852c5c7c2332
+docs/NEXT_SESSION.md	a4f03a01833bf178f410e4e0a22e03620085967d

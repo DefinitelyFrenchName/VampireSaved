@@ -3218,7 +3218,9 @@ constant. vsavj's ground stager writes **6 for both 0x06 and 0x38** (one handler
 0x06/0x07/0x38/0x39/0x48. No stager handler in either game writes 0x38, no
 `move.b #imm,$54(An)` in either game's code does, and none of the 149 tapped runs did.
 So on vsavj **nothing produces `+0x54` = 0x38** — Victor's one 0x38 record (both games)
-reacts as 0x06. vs2 differs from vsavj in exactly two places for its column: its GROUND
+reacts as 0x06. vs2's own legacy data carries class 0x52 once — one Bishamon fighter
+record (reachable-record census, `tests/test_reaction_classes.sh`) — where vsavj's carries none, so
+on vs2 the 0x52 rule also reaches a legacy character. vs2 differs from vsavj in exactly two places for its column: its GROUND
 stager writes 0x52 for 0x52 (`0x016FEC`; the air and KO stagers fold 0x52 into 7 and 8
 like everything else), and its shock handler `0x22656` is vsavj's `0x23AC8` plus ONE
 test, `cmpi.b #$52,$54(a6); beq`, around the attacker's freeze write — so natively the
@@ -3246,11 +3248,21 @@ included, inside Huitzil's placed copy of vs2's reaction region (`x022400@huitzi
 corpus executes it. And two placed STAGER windows already write 0x52 into `+0x54` for a
 record of class 0x52 on a grounded victim — the `reaction_hook` (`donovan.toml`, sessions
 11/14w-c/14z-110: vs2's cases 0xA0-0xA6 for dispatchers 1 and 2, `case_a4` =
-`move.b #$52,$54(a1)`) and `index_window_018468` — while vsavj's REACTION table has no entry
-0x52: so a class-0x52 record would reach the reaction dispatch with an out-of-range class. That
+`move.b #$52,$54(a1)`; merged-m18 `PRG:0x0FFF50`) and `index_window_018468` (its 0xA4 case,
+merged-m18 `PRG:0x4716DC` — both placed addresses, moving with a freeze) — while vsavj's
+REACTION table has no entry 0x52: so a class-0x52 record would reach the reaction dispatch with an out-of-range class. That
 is why the column's and the trap's records carry 0x06 (14z-33, 14z-85g(2)); no record on
 merged-m18 carries 0x50-0x53 (`tools/audit_fsm_census.py`: 0, signature-bounded) and no
-corpus run executes either writer (`tests/audit_reaction_class_live.sh`). What these facts leave for the fix's design, and the cost against
+corpus run executes either writer (`tests/audit_reaction_class_live.sh`). **Which tracks carry
+that machinery (read 14z-169 on the four images):** the `reaction_hook` jump at `0x018458`, the
+`es_type51_dispatch` call at `0x0185CA` and the 14z-42 shock thunks at `0x023AD8`/`0x023ADE` are
+all `donovan.toml`'s, so they exist on Donovan's solo build and the merged build only; the solo
+Phobos build hooks only `0x018460` (`index_window_018468`, huitzil.toml) and the solo Pyron build
+none of the four sites. A class-0x52 record is therefore safe only where all of them are — the
+reason the ruled fix is scoped (DECISIONS_HISTORY.md, 14z-169, S1). And every entry of the three
+stager tables and of the reaction table is a 16-bit pc-relative word: a repointed entry must land
+within 32 KB of its table, inside the encrypted base program, so a new handler cannot be reached
+from placed code by a table edit alone. What these facts leave for the fix's design, and the cost against
 the maintainer's combined budget (no new frame of lag at any time), is not measured
 here.
 
@@ -4089,7 +4101,7 @@ the capture.
 byte-identical in the two games but for its mode test — vsavj `tst.b $111(a6)`,
 vs2 `tst.b $1c3(a6)`. Inside Change the shells gain NOTHING from a whiffed
 attack; the tenants gain +6, because each tenant's `x028122` copy carries vs2's
-adder and `+0x1C3` is never set by Change (measured: 1 throughout vs2's Power, 0
+adder (the test at vs2 `0x28D6C`, offset `0xC4A` of each tenant's `x028122` copy) and `+0x1C3` is never set by Change (measured: 1 throughout vs2's Power, 0
 throughout ours' Change; frozen since 14z-169 as the `pow` column of
 `tests/audit_df_modes.sh` — 388 frames on every vs2 P+K leg, 297 for Morrigan and
 Lilith, none on every Change leg of either game and on the tenants' vs2 EX). The maintainer: *"it makes sense that you can't build

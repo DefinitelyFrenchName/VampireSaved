@@ -5163,3 +5163,15 @@ run passed. The static tier then read the census gate as MISSING ("registered bu
 The live gate, an EMULATOR gate, had already been committed that way; the static tier never checks
 `tests/ci_emulator.tsv` gates for the bit, so it would have surfaced only at release. Rule: `chmod +x`
 every new gate in the same step that registers it, and check with `ls -l` before the tier.
+
+## A MANIFEST FIX CANNOT BE COMMITTED GREEN BETWEEN FREEZES — it lands with the freeze (paid: 14z-169)
+
+Asked to build four ruled fixes, I proposed "each its own commit, the gates re-frozen". It does
+not hold: any `build/manifest/*.toml` change TRIGGERS `tests/test_m3a_reproducible.sh` in the
+session-cadence static tier (`build/manifest/` is among its triggers in `tests/ci_cadence.tsv`),
+and that gate requires "EVERY frozen reference must rebuild BIT-EXACT from the current tree" — while
+every gate's default build is the current freeze. So a fix breaks the frozen references' rebuild,
+and the tier goes red until a freeze moves them. Rule: plan fixes as a batch that lands WITH the freeze (the
+registry rows, the tags, the re-point sweep, the re-frozen expectations, the battery —
+`vampire-saved-port` D.4); verify each fix on its own build before (a program-image diff against
+the freeze is cheap: 14z-169's gauge fix was exactly 3 bytes) and keep it as a patch until then.

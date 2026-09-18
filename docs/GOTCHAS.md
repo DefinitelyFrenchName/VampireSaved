@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-383 entries (46 game / 108 platform / 229 project), counted from the buckets at generation.
+384 entries (46 game / 108 platform / 230 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 46 entries
 
@@ -182,7 +182,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - MAME 0.288'S LUA HAS NO SCREEN `vpos`/`hpos`, AND A SCRIPT THAT ERRORS BEFORE REGISTERING ITS FRAME CALLBACK RUNS MAME FOREVER (paid: 14z-168)
 - A `-debug` LOGGING BREAKPOINT DRIFTED THE INPUT PLAYBACK AND HID THE DIVERGENCE IT WAS PLACED TO EXPLAIN (paid: 14z-168)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 229 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 230 entries
 
 - A NEW ANCHOR DOCUMENT FOR A SKILL IS A TWO-REPO EDIT — the harness's consumer config carries its own copy of the skills lock's document list (paid: 14z-163, GitHub #152)
 - A COMMIT SUBJECT THAT NAMES AN ISSUE AFTER A CLOSING KEYWORD CLOSES IT ON PUSH — and the close is attributed to the PUSHING account, not measured (paid: 14z-162, GitHub #151)
@@ -413,3 +413,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A CENSUS BUILT FROM A GREP OF MENTIONS IS NOT A CENSUS OF USERS (paid: 14z-168)
 - A HEREDOC TERMINATOR INSIDE ANOTHER HEREDOC'S TEXT ENDS THE OUTER ONE (paid: 14z-168)
 - A SCRIPT CREATED WITH THE FILE TOOL IS NOT EXECUTABLE, AND ONLY THE RUNNER THAT RUNS IT NOTICES (paid: 14z-168)
+- A MANIFEST FIX CANNOT BE COMMITTED GREEN BETWEEN FREEZES — it lands with the freeze (paid: 14z-169)
