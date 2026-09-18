@@ -27,6 +27,26 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-18 (14z-169) — the disabled EX route does the NO-STOCK move, at every stock level
+
+**The question (as put, with three capture sheets of the tenants' vs2 EX inputs with no stock, native vsav2 beside ours, `build/rc169/cap_ex/`):** *"The sheets show what each tenant's vs2 EX input does with NO stock (it can't enter Dark Force): the same move on vs2 and on ours for all three. Should the disabled EX route on our build do exactly that, for every stock level?"*
+
+**Ruling (verbatim):** *"Yes, the no-stock move (I command you for the test you did and I appreciate the test because it shows the same moves are getting out in both cases, which is what we want (and none of these moves are the EX input btw, Pyron is 623+P, Donovan is 1+K, and Phobos I'm unsure but my point is: because there is no stock the pattern being interpreted is a sub-pattern of the VS2 EX input.)"*
+
+**What it means.** With the EX route disabled, each tenant's vs2 EX input produces what vs2 produces when the EX cannot be paid for — the move read from a SUB-PATTERN of the EX input (the maintainer: Pyron's 623+P, Donovan's 1+K; Phobos's unnamed) — whatever the stock. Measured: that move takes the same state path on vs2 and ours (`tests/audit_ex_refused.sh`). Refines the 2026-09-18 (14z-168) EX-route ruling below.
+
+## Ruled 2026-09-18 (14z-169) — the class-0x52 fix is scoped to the tracks that carry its machinery (S1)
+
+**The question (as put):** *"The 0x52 fix for the column and the trap needs machinery that only exists on Donovan's tracks. On the solo Phobos track (not shipped, but it must not crash), how should the trap be handled?"* — S1: *"Keep Phobos's two trap remaps on the solo Phobos build only, via one new generator row key ('apply unless Donovan's manifest is in the composition'). The merged build gets the full fix; the solo Phobos build keeps today's trap behaviour."*; S2: the machinery moved to a shared manifest.
+
+**Ruling:** the maintainer chose *"S1: scoped row (Recommended)"*.
+
+## Ruled 2026-09-18 (14z-169) — the four #136 fixes are GO
+
+**The question (as put):** *"Go-ahead to build the designs? Each gets its own commit, the gates re-frozen through the rule-checker, and the pass-counter lag check over the corpus on the combined build."* — Gauge (#157 tail), Defense rows, 0x52 rule, EX route.
+
+**Ruling:** the maintainer selected all four: *"Gauge (#157 tail),Defense rows,0x52 rule,EX route"*. The designs: STATE 14z-169 rows (8)-(9), `docs/NEXT_SESSION.md`, the ticket drafts `build/rc169/gh/`.
+
 ## Ruled 2026-09-18 (14z-168) — the tenants' DEFENSE rows become vs2's (supersedes the 2026-08-14 option (b), 14z-85f)
 
 **The maintainer's first reading (verbatim):** *"My undesrtanding is that Pyron is virtually the same in both options and that Donovan and Phobos see a +/- 1dmg overall through our approximation, whereas using their VS2 values would be a substantial change. If so I say we keep the approximation and create a ticket for a possible evolution. However, I want you to first compare the defense-side rows between characters present in both vsavj and VS2 and whether the approximated rows we are currently using are not, in fact, inherited from the shell characters. With  these additionnal information, I can rule definitively."*

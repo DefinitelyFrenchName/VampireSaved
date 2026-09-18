@@ -368,3 +368,4 @@ tests/test_reaction_classes.sh	character-data
 tests/audit_reaction_class_live.sh	character-data
 tests/audit_defense_row_reads.sh	character-data
 tests/audit_crouch_flag.sh	character-data
+tests/audit_ex_refused.sh	character-data

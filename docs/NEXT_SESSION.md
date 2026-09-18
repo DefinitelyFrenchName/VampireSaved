@@ -17,19 +17,26 @@ discriminator — the stager rewrites it to 6, Victor carries 0x38, the guard li
 role); (1) every defense read indexes the victim's own id, so the defense-row fix is data-only;
 (3) of the 26 `+0x1C3` readers only the three meter adders play differently.
 
-1. **Put the four fix designs to the maintainer** (plan before building): the 0x52 rule through
-   a class dead in legacy whose three stager rows point at a stub writing 0x38 and vsavj's 7/8
-   handlers, with `reaction[0x38]` (reached by nothing in vanilla) repointed at a copy of vs2's
-   shock handler without the attacker write — zero legacy cycles; the alternative is native 0x52
-   records through the existing `reaction_hook` plus a reaction-dispatch hook (cycles on every
-   hit). Defense rows: vs2's rows into rows/thresholds 0x10/0x13, data only. The gauge: the
-   three adder copies' `tst.b $1c3` -> `tst.b $111`. The EX route: still to design — measure
-   what the vs2 EX input does on our build when the route is refused.
-2. **Before the 0x52 design is built:** choose the class by census (no legacy record, no guard
-   list, no tenant record, its stager rows dead in the corpus) and add it to
-   `tests/test_reaction_classes.sh`.
-
-## THEN FILE THE TICKETS (drafts in `build/p136_14z168/gh/`, written before the 2026-09-18 rulings — update them): the column shock + Plasma Trap (the 0x52 rule), the EX route, the defense rows; comments on #136 and #157. As `mechanyaa-ai`, rule-checker (`recommendation`) first, `tools/tickets.py refresh`.
+1. **The designs, for the maintainer's go-ahead (drafted 14z-169; ticket drafts in `build/rc169/gh/`):**
+   - **Gauge (#157's tail):** one `[[region_fix]]` per tenant manifest, region `x028122` offset
+     `0xC4A` (vs2 `0x28D6C`), `4a2e01c3` -> `4a2e0111` (`tst.b $1c3` -> `tst.b $111`); same size
+     and cycles, tenant code only; re-freezes `audit_df_meter`, `df_field_readers`.
+   - **Defense rows:** vs2's rows 0x10/0x13 (32 B each) and thresholds (0x10: 0x38->0x28, 0x13:
+     0x28->0x30) into vsavj's tables `0x0B8940`/`0x0BCC80`, the 14z-118 `port_param32` pattern; data
+     only; re-freezes `test_defense_rows_census`.
+   - **The 0x52 rule (column + trap):** drop the four 0x52->0x06 remap rows (donovan.toml
+     `hitbox_proj` +0x291/+0x2B1/+0x2D1, huitzil.toml's two trap rows); `[reaction_hook] case_a4`
+     writes 0x38 (`137c003800544e75`); the `es_type51_dispatch` thunk routes 0x52 to vsavj's
+     class-8 KO handler `0x0186E0` (else the 14z-33 KO crash); the 14z-42 thunks test 0x38 (victim
+     0x18 in the Donovan branch, the attacker write skipped in the default branch). Legacy cost:
+     one compare on electric ground hits and one on KO-path hits — measure with
+     `tests/audit_pass_overrun.sh`. **OPEN SCOPE QUESTION:** the reaction_hook, es_type51 and the
+     14z-42 thunks are donovan.toml's; on the SOLO Phobos track a native-0x52 trap record would hit
+     `index_window_018468`'s vs2-generated 0x52 case and the out-of-range reaction class — the trap
+     rows must stay remapped there (track-scoped) or the machinery move to a shared home.
+   - **EX route:** measured (`tests/audit_ex_refused.sh`, captures `build/rc169/cap_ex/` delivered): with no stock the input never enters and takes the SAME path on vs2 and ours for all three tenants — the native model of "disabled". Design: force the placed Change entry's refusal (vs2 `0x2617A`), verify the stock-3 EX on ours then takes the no-stock path; awaiting the maintainer's read of the captures.
+2. **Then file** the tickets and comments from `build/rc169/gh/` (rule-checker `recommendation`
+   first, as `mechanyaa-ai`, `tools/tickets.py refresh`).
 
 ## ALSO OPEN FROM 14z-168
 
