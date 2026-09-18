@@ -15,7 +15,7 @@ M18 (`merged-m18`, `build/m3b_merged26`) is still the current freeze and release
 `git status -sb` says the push state. The withdrawn M19 build dirs are on disk,
 UNREGISTERED — do not play them and do not point a gate at them.
 
-## FIRST: THE ADAPTED CLOSE CHECKLIST AWAITS A RULING (STATE "Decisions pending", 14z-167b). Items 1, 3 and 4 are AGREED for this session's close whatever the ruling: a findings table (every finding of the group, its live home and its test), a pointer on every earlier row the sitting resolves, and a grep for promises. Items 2, 5 and 6 were trialled 14z-167b: `tools/close_findings.py <session>` (cheap; necessary, not sufficient — it sees addresses, not findings), cited scripts promoted into the tree, and a documentation packet through the rule-checker (run `-44` found what the tool could not).
+## FIRST: THE CLOSE CHECKLIST IS RULED (2026-09-18, 14z-167b) — apply all six at this session's close: the findings table; `tools/close_findings.py <session>` (every GAP homed, every REVIEW answered, never cited as completeness); pointers on resolved earlier rows; the promise grep; cited scratch scripts promoted (on trial: record how many had figures quoted and how many were promoted); the documentation packet through the rule-checker. It lives in STATE.md's header ("THE CLOSE CHECKLIST", ruled 2026-09-18). Standing line in STATE; full entry `DECISIONS_HISTORY.md`.
 
 ## START HERE — what is open (THE ORDER IS RULED, 2026-09-17: stable state, then #148 (DONE), then #152 (DONE), then everything else — the #136 families included)
 

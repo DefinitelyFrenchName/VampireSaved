@@ -19,6 +19,10 @@
 #   start  <leg> <first frame $FF812D reads 1>
 #   at     <leg> <frame> x=<P1 x> seq=<P1 seq>  at 2363 2370 2395 2481 2544 2560 2600
 #
+# A field_trace.lua trace carries NO END line (unlike read_tap.lua's logs), so this
+# gate's reduction refuses a missing sample frame and asserts the emulator's exit
+# status instead of an END check (rule-checker run 2026-09-18-43 Q1).
+#
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged26] [FREEZE=1] tests/audit_rig_opening.sh
 #   emulator tier, MAME; two field_trace runs in parallel — measured 14z-167b on this MacBook, solo: ~3 s wall
 set -eu

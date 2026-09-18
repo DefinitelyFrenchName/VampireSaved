@@ -27,6 +27,40 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-18 (14z-167b) — the close checklist lives in STATE.md's header
+
+**Ruling (verbatim):** to the recommendation "It needs a ruling on where the checklist lives. I recommend STATE's header, beside the existing close rules", the maintainer: *"I agree"*.
+
+**What it means.** The six steps sit in STATE.md's header as the bullet "THE CLOSE CHECKLIST", beside the rollover rule and the push rule; the standing line points to it. The checklist is ruled in `DECISIONS_HISTORY.md` "Ruled 2026-09-18 (14z-167b) — the adapted close checklist".
+
+**The entry as drafted (moved verbatim from STATE.md "Decisions pending"):**
+
+### 14z-167b — WHERE THE CLOSE CHECKLIST LIVES (the checklist itself is ruled: DECISIONS_HISTORY.md "Ruled 2026-09-18 (14z-167b)")
+
+The six steps are ruled and applied from the next close. Open: which document carries them. (a) STATE.md's header, beside the rollover and push rules that already carry the close ritual; (b) the `vampire-saved-port` skill's close section; (c) CLAUDE.md [VSP-17], if it should be law. **Recommendation: (a)** — the close ritual already lives there, every session reads it first, and it is not law, so it can still be adjusted as items 2 and 5 are measured.
+
+## Ruled 2026-09-18 (14z-167b) — the adapted close checklist: items 1, 3, 4 and 6 adopted, item 2 kept with two changes, item 5 on trial and measured
+
+**Rulings (verbatim), in order:** *"I agree with 1,3,4 for next session. I really like 2, 5 and 6 as well and though they might be costly, I think it's worth trying it out."* — on the trial: *"Item 6 is good, I really like it, let's keep it. Item 5 I  think has potential, we should measure in the coming sessions how much it brings in value or not"* — and on item 2, after the assessment that it is a net positive only beside items 1 and 6 and a liability when its clean result is read as completeness: *"then let's implement them and keep item 2"*.
+
+**What it means.** At every close: (1) the findings table; (2) `tools/close_findings.py <session>` with the two changes IMPLEMENTED 14z-167b — it prints the GAPS only (never a count of homed addresses) and a REVIEW list of the session's addresses homed only by text older than the session, each answered, and its clean result is never cited as evidence of completeness; (3) pointers on every earlier row the sitting resolves; (4) the promise grep; (5) cited scripts promoted, ON TRIAL — each close records how many scratch scripts had figures quoted by a document or STATE row, and how many were promoted (14z-167 baseline: 3, 2 promoted — the legacy census, the entrance measurement; the cnt-family trace copy not yet), and whether a promoted one later caught something; (6) the documentation packet through the rule-checker. Where the checklist lives is NOT yet ruled; it stays under "Decisions pending".
+
+**The entry as drafted (moved verbatim from STATE.md "Decisions pending"):**
+
+### 14z-167b — THE ADAPTED CLOSE CHECKLIST (drafted at the maintainer's request, trialled on 14z-167's own record)
+
+**Context.** After the 14z-167 close the maintainer asked: *"has all the ritual been done? asking as 1) we might need to adapt it a bit 2) we have a tendency for staleness in documents and/or not documenting all finding"*. The audit found stale rows, a promise not kept, findings with no home and cited scripts outside the tree (STATE 14z-167b (1)), and proposed six additions. The maintainer: *"I agree with 1,3,4 for next session. I really like 2, 5 and 6 as well and though they might be costly, I think it's worth trying it out."* — and *"do it"* to fixing the gaps and drafting this.
+
+**The draft — six steps added to the close, after the STATE close entry and before the tier:**
+1. **FINDINGS TABLE.** Every finding of the sitting's STATE group, one line each: its live home (document and heading) and the test that reproduces it. An empty cell is a gap to fill or a stated exception. *(agreed for next session)*
+2. **MISSING-HOME CHECK.** `python3 tools/close_findings.py <session>`: every address the group names must appear in a live document (a fighter-block address counts when its `+0xNN` offset is in the atlas). TRIAL 14z-167b: under a second; found 3 unhomed addresses in 14z-167 (the facing seed and the rule-5 write), 1 in 14z-166 (vsavj's meter adder) and 1 false positive in 14z-165 (P2's node pointer, fixed by the offset rule); all homed.
+3. **CLOSE THE LOOP.** Every earlier row the sitting resolved (unchecked, not concluded, open) gets a pointer in place, in the same commit. *(agreed)*
+4. **PROMISE GREP.** The sitting's STATE rows and ledger resolutions searched for commitments ("from here on", "will", "is stated so", "next session"); each is fulfilled or becomes an open item. *(agreed)*
+5. **CITED SCRIPTS PROMOTED.** A script a live document cites for a figure moves into `tools/` or `tests/`, or the citation says it is scratch. TRIAL: the legacy census became `tools/audit_facing_rules.py`, frozen by `tests/audit_facing_rule.sh`; the entrance measurement became `tests/audit_rig_opening.sh`. Captures and traces stay as `build/` evidence, cited as such.
+6. **DOCUMENTATION PACKET.** The rule-checker reads the sitting's STATE group and the documents it names, against the claim that every finding has a home (each listed), before the close commit. TRIAL: run `2026-09-18-44` — plant caught; **VIOLATED Q1 Q4, every finding true**: two findings of 14z-167 still had no home (P2's x not being a compared field; the run-id collision), a home was mis-cited, gate headers had to count as live documents, and item 2's prototype proves an ADDRESS present but not the FINDING (an address older text already names homes any new finding about it, `$FF8081`) and had no control. Resolved by work: both homed, a gotcha added, the prototype now reads gate headers and carries `--selftest`. Cost: two fresh agents, the real reader 2 min 43 s. **What the trial shows: 6 finds what 2 cannot, so 2 is necessary, not sufficient, and 1 (the table) stays the sufficient check.**
+
+**Ruling needed: where the checklist lives.** (a) STATE.md's header, beside the rollover and push rules that already carry the close ritual; (b) the `vampire-saved-port` skill's close section; (c) CLAUDE.md [VSP-17], if it should be law. **Recommendation:** adopt 1, 3 and 4 now; adopt 2 as a close step (cheap, necessary, not sufficient — its blind spot is stated in the tool), and make it a `ci_static` gate on the newest group once three closes show no false positive; adopt 5 as a rule; adopt 6 at every close with its verdict resolved like any run. Home: (a).
+
 ## Ruled 2026-09-17 (14z-164b) — the parity rigs' P2 is DEMITRI, Bishamon the fallback
 
 - **P2 = DEMITRI, BISHAMON IF DEMITRI CANNOT ANSWER (maintainer, 2026-09-17, after the close):**
