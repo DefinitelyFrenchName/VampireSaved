@@ -41,7 +41,13 @@
 #     The intro variant is an RNG draw at char load, so with the RNG pinned only
 #     from the anchor each leg plays its own intro; measured, every one of those
 #     differences lies before the first event and the legs are bit-identical from
-#     it onwards.
+#     it onwards. CORRECTED 14z-167 (measured, build/x_family_14z167/): NOT on the
+#     guard-cancel parts huitzil_5/6/7, whose first X pin lands at 2370, inside
+#     Phobos's round-start ENTRANCE (the round starts at 2544, atlas $FF812D): the
+#     legs drew different entrances (native the car arrival, carried through the
+#     pin to x=702; ours with Cecil in hand, left at the pinned 552) and reach the
+#     first event apart, so those three first-event DIFF rows are the entrance,
+#     not the move (docs/project/gotchas.md, the 14z-167 entrance entry).
 #   - BOTH LEGS ARE REAL CURSOR PICKS (since 14z-160, GitHub #151). The rig's
 #     own prologue is the native path (vsav2's default cell 0x01: Donovan R,R,
 #     Phobos L,L,L, Pyron R,R,R — tools/name_moves.py `path`); our leg swaps

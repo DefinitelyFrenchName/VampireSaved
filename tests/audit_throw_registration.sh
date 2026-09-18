@@ -3,6 +3,7 @@
 #
 # MUST-FIRE: perturbed-copy: legs-swapped — a copy of our reduced rows with the P1 and P2 meter steps swapped (the fixed shape) must FAIL the frozen compare (in-gate: the perturbed copy is diffed against the frozen rows and must differ; mode: the real rows are swapped and the gate FAILs)
 # MUST-FIRE: perturbed-copy: dead-reader-planted — a copy of our dead-pair tap with ONE in-play read planted at a game PC must add a reader row and FAIL the frozen compare (in-gate: the planted copy is reduced and must differ; mode: the real tap is planted and the gate FAILs)
+# MUST-FIRE: perturbed-copy: double-write — a copy of our first part's P1 meter tap with a SECOND write planted on its first contact frame (the same value, a game PC) must print the `/2w` marker and FAIL the frozen compare, so the frozen rows' one-write reading is something the reducer can refuse and not merely a marker that never printed (in-gate: the planted copy is reduced and must differ from the frozen rows and carry /2w; mode: the P1 meter tap of every ours leg is planted and the table FAILs) — added 14z-167 on rule-checker run 2026-09-18-41 Q4
 #
 # WHY. tests/expected/move_parity_events.tsv froze 28 DIFF rows whose first differing
 # field is `meter`, every one at a tenant THROW contact or downstream of one. The
@@ -62,7 +63,7 @@ FLOOR=2300
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
-case "$CONTROL" in ""|legs-swapped|dead-reader-planted) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+case "$CONTROL" in ""|legs-swapped|dead-reader-planted|double-write) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
@@ -130,12 +131,14 @@ if part.startswith("legacy_"):
     import os
     base = os.path.dirname(mp1); pre = os.path.basename(mp1).replace(".m1.txt", "")
     def last_id(p):
-        # the id is a BYTE at an even address: the tap reports the 16-bit word with mask ff00 (the high byte);
-        # any other mask is a write to the NEIGHBOUR (+0x383), skipped; the writer PC is kept with the value
+        # the id is a BYTE at an even address: the tap reports the 16-bit word, mask ff00 for a byte store to it and
+        # ffff for a word (or long) store covering it — both count (14z-167, rule-checker run 2026-09-18-41 Q1: the
+        # filter was ==ff00 and dropped word stores); mask 00ff is a store to the NEIGHBOUR (+0x383) alone, skipped;
+        # the writer PC is kept with the value
         ws = []
         for l in open(p):
             t = l.split()
-            if t and t[0] == "W" and int(t[1]) < floor and int(t[9], 16) == 0xff00:
+            if t and t[0] == "W" and int(t[1]) < floor and int(t[9], 16) & 0xff00:
                 ws.append(f"{(int(t[7], 16) >> 8) & 0xff:02x}@{t[3]}")
         if not any(l.startswith("END") for l in open(p)): sys.exit(f"VOID: {p} has no END line")
         return ws[-1] if ws else "none"
@@ -149,6 +152,7 @@ PY
 }
 # the two perturbations, ONE function each (the control section and the mode both call them)
 swap_legs()   { awk -F'\t' 'BEGIN{OFS="\t"} $3=="contact" {t=$5; $5=$6; $6=t; sub(/^p2=/,"p1=",$5); sub(/^p1=/,"p2=",$6)} {print}' "$1"; }
+plant_double(){ awk -v f="$(awk -F'\t' '$3=="contact"{print $4; exit}' "$1")" '{print} $1=="W" && $2==f && !d {d=1; $4="0189a0"; print}' "$2"; }   # plant_double <rows> <meter tap> -> the tap with its contact-frame write doubled
 plant_reader(){ awk -v f="$FLOOR" '{print} /^END/ && !d {d=1} 1==0' "$1"; printf 'R %d PC 0189a0 off ff348c data 00008400 mask 0000ffff\n' "$((FLOOR + 800))" >> "$2"; }
 
 echo "== 1. the taps, both legs, per part"
@@ -199,6 +203,10 @@ for p in $PARTS; do
             bad "$p $leg: $(cat "$W/$p.$leg.err")"; continue
         fi
         if [ "$CONTROL" = legs-swapped ] && [ "$leg" = ours ]; then swap_legs "$W/$p.$leg.rows" > "$W/$p.$leg.sw" && mv "$W/$p.$leg.sw" "$W/$p.$leg.rows"; fi
+        if [ "$CONTROL" = double-write ] && [ "$leg" = ours ]; then
+            plant_double "$W/$p.$leg.rows" "$W/$p.$leg.m1.txt" > "$W/$p.$leg.m1.dbl"
+            reduce "$p" "$leg" "$W/$p.$leg.m1.dbl" "$W/$p.$leg.m2.txt" "$W/$p.$leg.pair.txt" "$dead" > "$W/$p.$leg.rows" 2>> "$W/$p.$leg.err" || bad "$p $leg: the double-write reduction failed"
+        fi
         cat "$W/$p.$leg.rows" >> "$W/got.tsv"
         ok "$p $leg: $(grep -c 'contact' "$W/$p.$leg.rows" | tr -d ' ') throw contacts — $(awk -F'\t' '$3=="contact"{printf "%s:%s/%s ", $4, $5, $6}' "$W/$p.$leg.rows")"
     done
@@ -237,6 +245,10 @@ if [ "$CONTROL" = dead-reader-planted ]; then
     if [ "$fail" = 1 ]; then echo "CONTROL FIRED: dead-reader-planted — the planted in-play reader is a new row"; echo "FAIL: audit_throw_registration (control mode)"; exit 1
     else echo "CONTROL DEAD: dead-reader-planted — the planted reader was not seen"; echo "FAIL: audit_throw_registration"; exit 1; fi
 fi
+if [ "$CONTROL" = double-write ]; then
+    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: double-write — a second write on a contact frame prints /2w and loses the frozen rows"; echo "FAIL: audit_throw_registration (control mode)"; exit 1
+    else echo "CONTROL DEAD: double-write — the doubled write still matched"; echo "FAIL: audit_throw_registration"; exit 1; fi
+fi
 first="$(echo $PARTS | awk '{print $1}')"
 swap_legs "$W/$first.ours.rows" > "$W/ctl.sw"
 if diff -q "$W/$first.ours.want" "$W/ctl.sw" > /dev/null; then echo "CONTROL DEAD: legs-swapped — swapping P1/P2 steps on $first ours still matches the frozen rows"; fail=1
@@ -245,5 +257,10 @@ cp "$W/$first.ours.dead.txt" "$W/ctl.dead"; plant_reader "$W/ctl.dead" "$W/ctl.d
 if reduce "$first" ours "$W/$first.ours.m1.txt" "$W/$first.ours.m2.txt" "$W/$first.ours.pair.txt" "$W/ctl.dead" > "$W/ctl.rows" 2>/dev/null && ! diff -q "$W/$first.ours.want" "$W/ctl.rows" > /dev/null; then
     echo "CONTROL FIRED: dead-reader-planted — one planted in-play read of the dead pair adds a reader row on $first ours"
 else echo "CONTROL DEAD: dead-reader-planted — the planted read changed nothing"; fail=1; fi
+plant_double "$W/$first.ours.rows" "$W/$first.ours.m1.txt" > "$W/ctl.m1"
+if reduce "$first" ours "$W/ctl.m1" "$W/$first.ours.m2.txt" "$W/$first.ours.pair.txt" "$W/$first.ours.dead.txt" > "$W/ctl.dbl" 2>/dev/null \
+   && grep -q '/2w' "$W/ctl.dbl" && ! diff -q "$W/$first.ours.want" "$W/ctl.dbl" > /dev/null; then
+    echo "CONTROL FIRED: double-write — a second write planted on $first ours' first contact frame prints $(grep -o '[+-][0-9]*/2w' "$W/ctl.dbl" | head -1) and differs from the frozen rows"
+else echo "CONTROL DEAD: double-write — the planted second write was not seen"; fail=1; fi
 
 if [ "$fail" = 0 ]; then echo "PASS: audit_throw_registration"; else echo "FAIL: audit_throw_registration"; exit 1; fi

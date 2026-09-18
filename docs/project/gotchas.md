@@ -4948,6 +4948,13 @@ the real input on exactly the frames the assertion protects.
 
 ## WHEN P2 CARRIES THE SAME DATA ON BOTH GAMES, IT STOPS BEING A CONFOUND BUT STARTS FEEDING P1's TIMING — a guard-cancel rig moves (paid: 14z-165, GitHub #136)
 
+**CORRECTED 14z-167 (measured, and the maintainer identified the entrances on the capture):** the FIRST
+event of huitzil_5/6/7 is not Demitri's timing. Its x differs from +0 because the rig's
+first X pin (frame 2370) lands inside Phobos's round-start ENTRANCE and the two legs drew
+different entrances — see the 14z-167 entry "A RIG PIN WRITTEN BEFORE THE ROUND STARTS"
+below. What follows still describes the LATER events of those parts (each re-pinned
+in-round, first differing at +16/+17 on node and cnt), which stay unattributed.
+
 The 14z-164 gotcha above ("A LEGACY P2 IS A CROSS-GENERATION CONFOUND") said to
 pick a P2 whose data is the same on both games; the maintainer ruled Demitri
 (2026-09-17, DECISIONS_HISTORY.md 14z-164b). Switching Victor -> Demitri turned
@@ -4999,3 +5006,29 @@ is the deliberate act that records the fix. And note the second thing the
 x028122 copy carries: a verbatim copy of vs2's METER ADDER, whose Dark-Force
 gate tests fighter `+0x1C3` (vs2's DF field) where vsavj's adder tests `+0x111`
 — unmeasured, and the first place to look when the in-DF rows are measured.
+
+## A RIG PIN WRITTEN BEFORE THE ROUND STARTS IS OVERWRITTEN BY THE ENTRANCE — and the entrance is drawn per leg, so the legs start the first event apart (paid: 14z-167, GitHub #136)
+
+The naming rigs pin both fighters' X before every event; the guard-cancel parts
+huitzil_5/6/7 pin 230 frames early, to leave room for P1's approach walk, so their
+FIRST pin lands at frame 2370 for the event at 2600. The round does not start
+until 2544 (`RAM:$FF812D`, atlas `ram.md`): at 2370 the round-start ENTRANCE is
+still playing, and neither leg acts on the walk input before 2544. The entrance
+is chosen per leg at character load (the parity gate's header: the RNG is pinned
+only from the match anchor, because pinning it through the load stops our build
+loading the match). Measured on merged-m18 against native vsav2, all three parts
+(`build/x_family_14z167/`, traces with both fighters' fields): native played the
+car arrival, which carried Phobos from x=360 through the pin to x=702, beside
+Demitri; ours played the arrival with Cecil in hand and left him at the pinned
+552. The walk then moved him for 15 frames only, so the legs met the first
+event 117 px apart and all three first events read DIFF at +0 on x. The
+maintainer identified the two entrances on the capture
+(`build/x_family_14z167/cap/huitzil_5_opening_sheet.png`, delivered before any
+conclusion): "one where he arrives as a car with Cecil (his kid sidekick) as the
+driver and transforms back into his humanoid shape(the one on native in the
+screen captures) … and one where he arrives with Cecil in his hand (the one on
+ours in the screen captures)". With Victor on P2 (14z-164) the same rows read
+IDENT; which entrance each leg drew then was not recorded. Rule: a rig pin or an
+input schedule that must hold at an event is written AFTER the round starts,
+never at a fixed offset from the match anchor; and a first-event DIFF at +0 is a
+question about the rig's opening before it is a question about the move.
