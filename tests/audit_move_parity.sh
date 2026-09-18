@@ -79,12 +79,12 @@
 # instruments; P2's POSITION — P2's x is not a compared field, so a move that
 # displaces P2 differently reads IDENT until P1's own fields feel it downstream
 # (14z-167: Killshread Summon (ES) moved Demitri on native only, event 5 read IDENT
-# and Press of Death read DIFF — GitHub #159); and the cnt DIFF rows are NOT yet
-# attributed — a first look (14z-167, GitHub #136): on donovan_2 event 2 (frame 3098)
-# and donovan_10 event 1 (2977) BOTH fighters' node counters fall one tick behind on
-# ours at the same frame with every other field equal, an engine tick lost on ours
-# rather than the move; the pass counter RAM:$FF8081 on both legs separates a
-# slowdown frame from the speed pattern's phase (unmeasured); and a DIFF that begins after contact is still not attributed to
+# and Press of Death read DIFF — GitHub #159); and WHICH ROOT a DIFF row belongs to —
+# ATTRIBUTED since 14z-168 by tests/audit_move_parity_attribution.sh (ablation + a
+# measured signature per root; every one of the 108 rows has a cause). The cnt rows
+# the 14z-167 first look called "an engine tick lost on ours" are CPU OVERRUNS on
+# Blizzard Sword frames — two of the three on NATIVE (tests/audit_pass_overrun.sh);
+# and a DIFF that begins after contact is still not attributed to
 # a side by this gate (P2's hurtboxes are the same data on both legs now, but
 # the engine that reads them is each game's own).
 #

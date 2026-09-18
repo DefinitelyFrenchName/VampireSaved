@@ -17,7 +17,9 @@
 -- docs/platform/gotchas.md); do not point this at ROM and read the
 -- silence as deadness.
 --
---   env RTAP     "hexaddr,declen"  (word-aligned start, decimal length)
+--   env RTAP     "hexaddr,declen"  (word-aligned start, decimal length); since
+--                14z-168 several ranges may be given, separated by ";" (both
+--                fighter blocks' field in one run — audit_df_field_readers_live.sh)
 --   env WINDOW   "lo,hi" frame gate for READ logging (writes always log
 --                — the boot POST writes are the liveness control)
 --   env REPLAY / POKES / FRAMES / TRACE_OUT as tap_writes.lua
@@ -31,8 +33,12 @@ local max_frames = tonumber(os.getenv("FRAMES") or "") or 5450
 local wa, wb = (os.getenv("WINDOW") or "0,99999999"):match("^(%d+),(%d+)$")
 wa, wb = tonumber(wa), tonumber(wb)
 local spec = assert(os.getenv("RTAP"), "set RTAP=hexaddr,declen")
-local a_s, l_s = spec:match("^(%x+),(%d+)$")
-local base, len = tonumber(a_s, 16), tonumber(l_s)
+local ranges = {}
+for one in spec:gmatch("[^;]+") do
+    local a_s, l_s = one:match("^(%x+),(%d+)$")
+    assert(a_s, "RTAP range not hexaddr,declen: " .. one)
+    ranges[#ranges + 1] = { tonumber(a_s, 16), tonumber(l_s) }
+end
 
 local machine = manager.machine
 local cpu     = machine.devices[":maincpu"]
@@ -41,12 +47,14 @@ local f = assert(io.open(out_path, "wb"))
 
 local frame = 0
 local hits, pchist = 0, {}
-local tap, wtap
+local taps = {}
 local installing = false
 local function install()
     if installing then return end
     installing = true
-    tap = space:install_read_tap(base, base + len - 1, "rt", function(offset, data, mask)
+    for i, r in ipairs(ranges) do
+    local base, len = r[1], r[2]
+    taps[#taps + 1] = space:install_read_tap(base, base + len - 1, "rt" .. i, function(offset, data, mask)
         if frame >= wa and frame <= wb then
             hits = hits + 1
             local pc = cpu.state["CURPC"].value & 0xFFFFFF
@@ -56,18 +64,20 @@ local function install()
         end
     end)
     -- write tap over the same range, always-on (liveness: boot POST must hit)
-    wtap = space:install_write_tap(base, base + len - 1, "wt", function(offset, data, mask)
+    taps[#taps + 1] = space:install_write_tap(base, base + len - 1, "wt" .. i, function(offset, data, mask)
         hits = hits + 1
         local pc = cpu.state["CURPC"].value & 0xFFFFFF
         f:write(string.format("W %d PC %06x off %06x data %08x mask %08x\n",
                 frame, pc, offset, data, mask))
     end)
+    end
     installing = false
 end
 install()
 space:add_change_notifier(function()
-    if tap then tap:remove() end
-    if wtap then wtap:remove() end
+    if installing then return end   -- a tap installed by this pass must not remove its siblings (14z-168: several ranges)
+    for _, t in ipairs(taps) do t:remove() end
+    taps = {}
     install()
 end)
 

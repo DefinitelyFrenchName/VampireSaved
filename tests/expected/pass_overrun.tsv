@@ -1,0 +1,45 @@
+# tests/expected/pass_overrun.tsv — the Blizzard Sword CPU overruns (zero-pass frames, RAM:$FF8081) and the scheduler's idle
+# spin dispatches per event window, ours (merged-m18) vs native vsav2 (tests/audit_pass_overrun.sh; field_trace + read_tap on
+# the task table). Evidence class: in-emulator. Frozen 14z-168 with FREEZE=1 (GitHub #136, class SLOWDOWN).
+# Columns: overrun <part> <leg> <frames|none> | idle <part> <event> <leg> mean= zero=
+#--
+overrun	donovan_2	native	3098
+overrun	donovan_2	ours	none
+overrun	donovan_10	native	none
+overrun	donovan_10	ours	2977
+overrun	donovan_11	native	4580
+overrun	donovan_11	ours	none
+idle	donovan_2	0	native	mean=40.2	zero=2
+idle	donovan_2	0	ours	mean=40.3	zero=3
+idle	donovan_2	1	native	mean=40.1	zero=4
+idle	donovan_2	1	ours	mean=40.2	zero=5
+idle	donovan_2	2	native	mean=37.4	zero=3
+idle	donovan_2	2	ours	mean=36.3	zero=3
+idle	donovan_10	0	native	mean=41.0	zero=2
+idle	donovan_10	0	ours	mean=41.2	zero=3
+idle	donovan_10	1	native	mean=36.7	zero=4
+idle	donovan_10	1	ours	mean=36.8	zero=4
+idle	donovan_11	1	native	mean=41.8	zero=0
+idle	donovan_11	1	ours	mean=42.2	zero=0
+idle	donovan_11	2	native	mean=41.6	zero=0
+idle	donovan_11	2	ours	mean=42.2	zero=0
+idle	donovan_11	3	native	mean=41.6	zero=0
+idle	donovan_11	3	ours	mean=42.1	zero=0
+idle	donovan_11	4	native	mean=41.7	zero=0
+idle	donovan_11	4	ours	mean=42.2	zero=0
+idle	donovan_11	5	native	mean=42.0	zero=0
+idle	donovan_11	5	ours	mean=42.5	zero=0
+idle	donovan_11	6	native	mean=41.8	zero=0
+idle	donovan_11	6	ours	mean=42.4	zero=0
+idle	donovan_11	7	native	mean=41.7	zero=0
+idle	donovan_11	7	ours	mean=42.3	zero=0
+idle	donovan_11	8	native	mean=41.7	zero=0
+idle	donovan_11	8	ours	mean=42.3	zero=0
+idle	donovan_11	9	native	mean=41.8	zero=0
+idle	donovan_11	9	ours	mean=42.2	zero=0
+idle	donovan_11	10	native	mean=41.9	zero=0
+idle	donovan_11	10	ours	mean=42.4	zero=0
+idle	donovan_11	11	native	mean=40.8	zero=0
+idle	donovan_11	11	ours	mean=41.4	zero=0
+idle	donovan_11	12	native	mean=36.5	zero=2
+idle	donovan_11	12	ours	mean=35.7	zero=5

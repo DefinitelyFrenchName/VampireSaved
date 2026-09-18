@@ -1,0 +1,15 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_df_field_readers_live.sh	0b95db5555069058f57b56a2166f157132daac4a
+tests/expected/df_field_readers_live.tsv	f1fe89fec176dcd55caf29b11676f958b1d3180e
+build/p136_14z168/regress/live_verify.log	c64e26312f1e296e3a22607f024b57688a085a43
+build/p136_14z168/regress/live_ctl_missed.log	aafcbdf90d58ac4823b1dfbdf42ec1865c16f6b2
+build/p136_14z168/regress/live_ctl_range.log	c20b2b7aef741700b3e1da79c1fbba16ee8e54dd
+build/p136_14z168/regress/read_tap_users.txt	e91193f5a5a16d44de3265e830ade51814f05346
+tests/lua/read_tap.lua	f2ff5081e1968b2c57677bc2df96b6b3a6292b6e
+tests/audit_df_moves.sh	150dc123a32ef21a6090677660b5df8d410fcee4
+tests/expected/df_moves.tsv	416cc10d83c3328e2ad58c66cd497a86be66ad24
+build/p136_14z168/regress/dfmoves_verify.log	0c68ba277c47c1520c7d4f9be0a9cc84a82ba6ef
+build/p136_14z168/regress/dfmoves_ctl_hit.log	8e624ee844c60921ad70120e67630c7183e13265
+build/p136_14z168/regress/dfmoves_ctl_mode.log	7e82668361c7371dccf671816edac95666b920d0
+build/p136_14z168/cap_dfx_donovan/DELIVERED.txt	7966f2d475c5a5eb5b1517d0304cac92405cd08f
+DECISIONS_HISTORY.md.lines-92-104 (lines 92-104 of DECISIONS_HISTORY.md)	7268ec078163950fba497bd620a6b2614530a53f

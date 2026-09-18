@@ -1,0 +1,57 @@
+# tests/expected/column_shock.tsv — every write to both fighters' hit-freeze byte +0x5C around Killshread Lightning [MP]'s
+# first column hit (#136 rig donovan_4, event 1 at 2800), ours (merged-m18) vs native vsav2 (tests/audit_column_shock.sh;
+# tests/lua/read_tap.lua, non-debug). Evidence class: in-emulator. Frozen 14z-168 with FREEZE=1. THE DEFECT IS FROZEN AS
+# MEASURED: native's 0x52 handler writes the victim 0x18 and exempts Donovan; ours' 14z-42 thunks write the victim 0x0C and
+# Donovan 4. A fix re-freezes this file DELIBERATELY, with its rule-checker run named in the commit.
+# Columns: w <leg> <who> <frame> <writer PC> <value>
+#--
+w	native	p2	2837	017242	11
+w	native	p2	2838	022666	24
+w	native	p2	2839	02309e	23
+w	native	p2	2840	02309e	22
+w	native	p2	2841	02309e	21
+w	native	p2	2841	02309e	20
+w	native	p2	2842	02309e	19
+w	native	p2	2843	02309e	18
+w	native	p2	2844	02309e	17
+w	native	p2	2844	017242	11
+w	native	p2	2845	022666	24
+w	native	p2	2845	02309e	23
+w	native	p2	2846	02309e	22
+w	native	p2	2847	02309e	21
+w	native	p2	2848	02309e	20
+w	native	p2	2849	02309e	19
+w	native	p2	2849	02309e	18
+w	native	p2	2850	02309e	17
+w	native	p2	2851	02309e	16
+w	native	p2	2852	02309e	15
+w	ours	p1	2838	3ffbf4	4
+w	ours	p1	2839	022558	3
+w	ours	p1	2840	022558	2
+w	ours	p1	2841	022558	1
+w	ours	p1	2841	022558	0
+w	ours	p1	2849	3ffbf4	4
+w	ours	p1	2849	022558	3
+w	ours	p1	2850	022558	2
+w	ours	p1	2851	022558	1
+w	ours	p1	2852	022558	0
+w	ours	p2	2837	018902	11
+w	ours	p2	2838	3ffbc4	12
+w	ours	p2	2839	02447c	11
+w	ours	p2	2840	02447c	10
+w	ours	p2	2841	02447c	9
+w	ours	p2	2841	02447c	8
+w	ours	p2	2842	02447c	7
+w	ours	p2	2843	02447c	6
+w	ours	p2	2844	02447c	5
+w	ours	p2	2845	02447c	4
+w	ours	p2	2845	02447c	3
+w	ours	p2	2846	02447c	2
+w	ours	p2	2847	02447c	1
+w	ours	p2	2848	02447c	0
+w	ours	p2	2848	018902	11
+w	ours	p2	2849	3ffbc4	12
+w	ours	p2	2849	02447c	11
+w	ours	p2	2850	02447c	10
+w	ours	p2	2851	02447c	9
+w	ours	p2	2852	02447c	8

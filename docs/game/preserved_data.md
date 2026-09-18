@@ -19,6 +19,20 @@ content (a handler that runs, a dataset that loads), not filler.
 
 ## 1. The VS-style Dark Force handler family in vs2 and vh2 — for all 18 characters (measured 14z-69c, 14z-126)
 
+> **CORRECTED 14z-168 — THE THREE NEWCOMERS' MEMBERS DO NOT QUALIFY.** vs2 reaches
+> them: each newcomer's vs2 EX move — the "personal" Dark Force vs2 moved out of
+> P+K (Mizuumi, via the maintainer: Slay Shred, Ray of Doom, Shining Gemini;
+> 421+KK / 263+PP / 2623+PP measured) — enters the Change machinery through vs2's
+> own entry `0x02622A` (the "shared TAIL" below, NOT dead) and arms `+0x147` from
+> the newcomer's own handler with the same values (Donovan 64 at `0x05A7DA`,
+> Phobos 79 at `0x056CA0`, Pyron 41 at `0x058D6A`), period 5, 478/509/478 frames
+> (`tests/audit_df_modes.sh`; `engine_internals.md` "Dark Force POWER, Dark Force
+> CHANGE"). The entry stands for the 15 VANILLA members as far as P+K goes (all
+> 15 vsav2 reaches, measured 14z-168: two stocks, no `+0x147` write, no seq-0x16
+> hold); whether another input reaches them is not measured. The `0x025F2A`
+> sentence below is RETRACTED (that write does not run on the activation). The
+> text below is kept as written at 14z-126.
+
 **What.** Vampire Savior's Dark Force is per-character: the activation body
 sets seq `0x16` and the per-character handler selected by `dispatch_16`
 (the 32-row code-pointer table, vsavj `PRG:0x0BF31A`) runs the character's
@@ -67,7 +81,8 @@ these; it restored them.
 existed, and the port restored the values Capcom set for these characters
 on this mechanism rather than inheriting the shells' — "incredibly lucky",
 and evidence the port is likely as close as Capcom intended, balance
-untested.
+untested. **[CORRECTED 14z-168: for the newcomers the values WERE played in a
+shipped game — vs2 runs them through the EX moves.]**
 
 **Not known.** WHEN the handlers were written — before VS shipped (an
 internal build with the three characters, cut with their data: the shipped

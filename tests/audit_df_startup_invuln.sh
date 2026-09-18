@@ -25,11 +25,15 @@
 #     their own placed vs2 handlers, byte-identical to vs2's rows: Huitzil
 #     0x4F (79 f; his shell Bulleta arms 0x29), Pyron 0x29 (41 f; Demitri
 #     0x29 — coincident by value, distinct by code path), Donovan 0x40 (64 f;
-#     Victor 0x3B). Natively on vs2 the seq-0x16 handler never runs and the
-#     DF path writes +0x147 = 1 at 0x25F2A, which the reducer clears before
-#     frame_done — NO observable window (measured: never armed on the native
-#     leg). vs2's different DF system ([VSE-69]); vsavj semantics govern here
-#     (the ruled framework).
+#     Victor 0x3B). Natively on vs2 a P+K activation (Dark Force POWER) never
+#     runs the seq-0x16 handler — NO observable window (measured: never armed
+#     on the native leg; all 15 vsav2 characters since 14z-168,
+#     tests/audit_df_modes.sh). CORRECTED 14z-168: the "vs2 DF path writes
+#     +0x147 = 1 at 0x25F2A" sentence that stood here is retracted (a non-debug
+#     tap sees no write to +0x147 on the activation), and the tenants' vs2 EX
+#     moves DO arm these same windows natively (their personal Dark Force,
+#     entered through vs2's 0x02622A). vsavj semantics govern here (the ruled
+#     framework).
 # So the answer is NEITHER global NOR inherited: each tenant carries its own
 # vs2 window, as every vanilla character carries its own. This audit is the
 # in-emulator half ([VSP-3], [VSP-18]).

@@ -2612,3 +2612,26 @@ status and fails on a non-zero one. Rule: tap only fields written rarely;
 sample a hot field once per frame with `tests/lua/field_trace.lua`; and check
 the emulator's exit status as well as the END line.
 
+
+## MAME 0.288'S LUA HAS NO SCREEN `vpos`/`hpos`, AND A SCRIPT THAT ERRORS BEFORE REGISTERING ITS FRAME CALLBACK RUNS MAME FOREVER (paid: 14z-168)
+
+Timing each logic pass inside its frame needed the raster position at a write:
+`screen_device` exposes `frame_number`, `frame_period`, `scan_period` and the
+visible area to Lua, but no `vpos`/`hpos` (`emu/mame/src/frontend/mame/luaengine.cpp`).
+A tap callback that calls one raises inside the tap and is swallowed — the log
+counted 5,172 hits and wrote none. A probe script that iterated
+`manager.machine.screens` with `pairs()` errored before `register_frame_done`
+ran, so nothing ever called `machine:exit()` and MAME ran until killed. Rule:
+test a new Lua binding in a script that registers its exit FIRST, bound every
+probe run by FRAMES or a timeout, and measure pass timing instead through the
+scheduler's dispatch writes (`tests/audit_pass_overrun.sh`).
+
+## A `-debug` LOGGING BREAKPOINT DRIFTED THE INPUT PLAYBACK AND HID THE DIVERGENCE IT WAS PLACED TO EXPLAIN (paid: 14z-168)
+
+Two `GUARD_PROBE` runs on the #136 guard-cancel rig logged INPUT-VIOLATION from
+frame 2800, and under `-debug` our leg no longer re-entered the block animation
+at all: the probe changed the replay it was probing. The non-debug write tap
+(`tests/lua/read_tap.lua`) and a legacy control on three legs answered the
+question instead. Rule ([VSP-130]'s instance): a `-debug` run is evidence only
+if its guard log carries no INPUT-VIOLATION; otherwise it describes a
+different match.

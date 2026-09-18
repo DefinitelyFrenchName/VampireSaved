@@ -78,17 +78,20 @@ rpl_for() {  # rpl_for <tenant> <rig.rpl> <leg> <out.rpl>
 }
 tap() {  # tap <name> <set> <rompath> <rpl> <pokes> <rtap> <out.txt>   (background)
     mkdir -p "$W/$1"
-    ( cd "$W/$1" && MAME_SANDBOX="$W/$1/sb" MAME_ROMPATH="$3" REPLAY="$4" POKES="$5" FRAMES="$FR" \
+    # (14z-168) MAME can segfault at TEARDOWN after the instrument has closed its log (docs/platform/gotchas.md):
+    # `set +e` keeps the status write alive, and a run whose instrument wrote its summary line counts as
+    # completed (docs/project/gotchas.md, the set -e capture entry)
+    ( set +e; cd "$W/$1" && MAME_SANDBOX="$W/$1/sb" MAME_ROMPATH="$3" REPLAY="$4" POKES="$5" FRAMES="$FR" \
         RTAP="$6" WINDOW="$FROM,$FR" TRACE_OUT="$7" \
         "$REPO/tools/run_mame.sh" "$2" -autoboot_script "$REPO/tests/lua/read_tap.lua" > "$W/$1/mame.log" 2>&1
-      echo $? > "$W/$1/rc"; rm -rf "$W/$1/sb" ) </dev/null &
+      _st=$?; grep -q -E '^(FIELDSUMMARY|END )' "$7" 2>/dev/null && _st=0; echo $_st > "$W/$1/rc"; rm -rf "$W/$1/sb" ) </dev/null &
 }
 sample() {  # sample <name> <set> <rompath> <rpl> <pokes> <out.txt>: Demitri's x per frame (tests/lua/field_trace.lua, as the parity gate samples)   (background)
     mkdir -p "$W/$1"
-    ( cd "$W/$1" && MAME_SANDBOX="$W/$1/sb" MAME_ROMPATH="$3" REPLAY="$4" POKES="$5" FRAMES="$FR" \
+    ( set +e; cd "$W/$1" && MAME_SANDBOX="$W/$1/sb" MAME_ROMPATH="$3" REPLAY="$4" POKES="$5" FRAMES="$FR" \
         FIELDS="ff8810:w:p2x" FIELD_OUT="$6" FIELD_FROM="$FROM" FIELD_TO="$FR" \
         "$REPO/tools/run_mame.sh" "$2" -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$W/$1/mame.log" 2>&1
-      echo $? > "$W/$1/rc"; rm -rf "$W/$1/sb" ) </dev/null &
+      _st=$?; grep -q -E '^(FIELDSUMMARY|END )' "$6" 2>/dev/null && _st=0; echo $_st > "$W/$1/rc"; rm -rf "$W/$1/sb" ) </dev/null &
 }
 # ONE static reader, shared by the gate and the branch-planted control: image -> row
 static_row() {  # static_row <game> <opcode image>

@@ -886,3 +886,18 @@ this one mechanism on every tenant throw (`tests/audit_throw_registration.sh`).
 Read the ORDER of the adder's two calls with the fighter block each lands on
 (a logging breakpoint at the adder entry, D0 and A6), never the attacker's
 meter trace alone — the trace shows an 8 that looks like a per-move value.
+
+## P+K IS A DIFFERENT MODE ON vs2 AND vsav — a newcomer's Dark Force is compared against its vs2 EX move, never against vs2's P+K (paid: 14z-168)
+
+The #136 in-DF comparison first set our Dark Force (P+K) against native vs2's
+P+K and read a dozen "defects" — extra hits, missing damage, meter — off two
+different modes. vs2's P+K is Dark Force POWER (two stocks, no startup
+invincibility, a global buff, no specific moves); vsav's is Dark Force CHANGE
+(one stock, the character-altering form with its startup window). vs2 kept the
+newcomers' Change behaviour as EX moves — their "personal" Dark Force, a timed
+install through vs2's own Change entry (`engine_internals.md` "Dark Force
+POWER, Dark Force CHANGE"). The maintainer caught it on the capture: *"you are
+testing DF in our build versus the global/common Dark Force Power in VS2"*.
+Rule: before comparing a mode across the siblings, check that the input selects
+the SAME mode on both; for a newcomer's Dark Force the native reference is its
+vs2 EX move (`tests/audit_df_modes.sh` measures both routes).

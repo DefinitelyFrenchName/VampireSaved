@@ -1,0 +1,58 @@
+# tests/expected/df_meter.tsv — the gauge in and out of Dark Force Change: the shells on vsavj, the tenants on ours (P+K) and
+# under their vs2 EX install on vsav2 (tests/audit_df_meter.sh; tests/lua/field_trace.lua). Evidence class: in-emulator.
+# Frozen 14z-168 with FREEZE=1 (GitHub #157's Dark Force tail). THE DEFECT IS FROZEN AS MEASURED: the shells gain nothing
+# from a whiffed attack inside +0x111; our tenants gain +6 (their placed adder tests vs2's +0x1C3). A fix re-freezes this
+# file DELIBERATELY, with its rule-checker run named in the commit.
+# Columns: mode <leg> <id> <+0x111 span> | step <leg> <id> <frame> <P1 gauge delta> <in|out>
+#--
+mode	vsavj	00	3000..3387
+step	vsavj	00	2614	6	out
+step	vsavj	00	2800	6	out
+step	vsavj	00	3388	6	out
+mode	vsavj	01	3000..3387
+step	vsavj	01	2614	6	out
+step	vsavj	01	2800	6	out
+mode	vsavj	03	3000..3387
+step	vsavj	03	2614	6	out
+step	vsavj	03	2800	6	out
+mode	ours	01	3000..3387
+step	ours	01	2614	6	out
+step	ours	01	2800	6	out
+mode	ours	10	3000..3405
+step	ours	10	2614	6	out
+step	ours	10	2800	6	out
+step	ours	10	3164	6	in
+step	ours	10	3350	6	in
+mode	ours	11	3000..3387
+step	ours	11	2614	6	out
+step	ours	11	2800	6	out
+step	ours	11	3164	6	in
+step	ours	11	3350	6	in
+mode	ours	13	3000..3387
+step	ours	13	2614	6	out
+step	ours	13	2800	6	out
+step	ours	13	3164	6	in
+step	ours	13	3350	6	in
+mode	vsav2	10	3010..3519
+step	vsav2	10	2614	6	out
+step	vsav2	10	2800	6	out
+step	vsav2	10	3164	6	in
+step	vsav2	10	3350	6	in
+mode	vsav2	11	3014..3491
+step	vsav2	11	2614	6	out
+step	vsav2	11	2800	6	out
+step	vsav2	11	3164	6	in
+step	vsav2	11	3197	18	in
+step	vsav2	11	3350	6	in
+mode	vsav2	13	3010..3487
+step	vsav2	13	2614	6	out
+step	vsav2	13	2800	6	out
+step	vsav2	13	3164	6	in
+step	vsav2	13	3253	2	in
+step	vsav2	13	3256	2	in
+step	vsav2	13	3258	2	in
+step	vsav2	13	3350	6	in
+step	vsav2	13	3355	2	in
+step	vsav2	13	3356	18	in
+step	vsav2	13	3357	2	in
+step	vsav2	13	3360	2	in

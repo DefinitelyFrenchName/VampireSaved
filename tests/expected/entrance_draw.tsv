@@ -1,0 +1,18 @@
+# tests/expected/entrance_draw.tsv — Phobos's round-start entrance variant (fighter +0x0A) over six RNG seeds, ours (merged-m18)
+# vs native vsav2 (tests/audit_entrance_draw.sh; tests/lua/field_trace.lua). Evidence class: in-emulator. Frozen 14z-168 with
+# FREEZE=1 (GitHub #136). Columns: draw <leg> <seed> <variant> drive=<yes|no> x2363=<P1 x> | set <leg> <union>
+#--
+draw	native	0000	0	drive=yes	x2363=360
+draw	native	1234	6	drive=no	x2363=552
+draw	native	5a5a	2	drive=no	x2363=552
+draw	native	9e37	6	drive=no	x2363=552
+draw	native	c3d2	6	drive=no	x2363=552
+draw	native	ffff	6	drive=no	x2363=552
+draw	ours	0000	0	drive=yes	x2363=360
+draw	ours	1234	2	drive=no	x2363=552
+draw	ours	5a5a	0	drive=yes	x2363=360
+draw	ours	9e37	6	drive=no	x2363=552
+draw	ours	c3d2	0	drive=yes	x2363=360
+draw	ours	ffff	6	drive=no	x2363=552
+set	native	0,2,6
+set	ours	0,2,6

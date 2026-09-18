@@ -4638,6 +4638,25 @@ had lost them (reproduced in a clean worktree, 33 lines against 38). **Rule:**
 run the command inside `( set +e; … )` — `x="$( (set +e; cmd 2>&1; echo "exit=$?") )"`.
 The harness bars the shape in its own scripts (`selftest/test_capture_status.sh`);
 this tree's gates carried no instance at the 14z-153 census.
+**A second shape, paid 14z-168:** the backgrounded MAME leg — `( cd "$d" && … run_mame.sh … > log
+2>&1`, then `echo $? > "$d/rc"` on the next line, `) &`. The leg's subshell inherits `-e`, so a MAME that segfaults at
+TEARDOWN (after its instrument closed a complete log — `docs/platform/gotchas.md`, the tap-installer
+entry) ends the subshell before the status write, and the gate reports the run as `exited none`: a
+red on a good run. Measured on 2 of 30 `read_tap.lua` runs of `tests/audit_df_field_readers_live.sh`,
+and with the unmodified single-range `read_tap.lua` too. Nine gates of 14z-167/168 carried the shape
+(`audit_entrance_draw`, `audit_guard_reentry`, `audit_df_modes`, `audit_df_meter`,
+`audit_column_shock`, `audit_pass_overrun`, `audit_df_moves`, `audit_facing_rule`,
+`audit_rig_opening`), and `tools/move_parity_attribution.py` the same class in Python (a nonzero
+return code VOIDed the step). **Fixed 14z-168:** `( set +e; cd … )`, and a run whose instrument
+wrote its summary line (`FIELDSUMMARY`, read_tap's `END`) counts as completed whatever the exit
+status. Measured with `exit 139` standing in for MAME under `set -eu`: the old shape leaves no status
+file (`none`), the new one writes 0 with a summary line present and 139 without. **And the fix
+itself went wrong once, invisibly:** the scripted patch took each block from the first `( cd` to the
+next status write, so in three gates (`audit_entrance_draw`, `audit_guard_reentry`, `audit_df_moves`)
+it put `set +e` on the rig-generator subshell above the MAME leg and left the leg unguarded. All ten
+re-runs were green, because no teardown segfault happened in them. A robustness fix is invisible to a
+green run: inspect every patched site (here, `awk` over every `( cd` opener beside the status writes),
+never the verdict alone.
 
 ## A FINDER `.DS_Store` IN `release/` TURNS `test_release_asset_shape` RED ON THIS MAC — the gate measured the host, not the artifact (paid: 14z-153)
 
@@ -5070,3 +5089,38 @@ fails loudly instead of being read as garbage. Rule: source the helper in any
 new gate that needs a decrypted image, and add a gate to §5's direct-decrypt
 exemptions only when decrypting IS its subject.
 
+
+## A DIFF AFTER A DIFF IN ITS PART IS NOT A FINDING OF ITS OWN — attribute coupled rows by ABLATION (paid: 14z-168, #136)
+
+`tests/expected/move_parity_events.tsv` held 108 DIFF rows; 89 came after an
+earlier DIFF in the same part (`coupled=after`). Read one by one they looked
+like 89 defects: 20 of donovan_2's alone were one CPU overrun on native at
+Blizzard Sword, which left the rest of the part one engine pass out of step
+with its inputs. Neither frame nor pass alignment can resync that. What
+separates the causes is removing a root event's INPUTS (the rig regenerated
+with that recipe emptied, every other frame and pin unchanged), re-running both
+legs, and seeing which rows vanish: 65 roots for 110 rows, every one then named
+by a measured signature (`tools/move_parity_attribution.py`,
+`tests/audit_move_parity_attribution.sh`). Rule: a coupled row is evidence only
+once an ablation shows it survives its predecessors; attribute before counting.
+
+## A MOVE THE RIG NEVER LANDS READS IDENT ON BOTH LEGS — the parity table cannot see what the rig does not do (paid: 14z-168, #136)
+
+Two throws the committed rigs never connect surfaced only under ablation:
+donovan_8 event 3 (the earlier throw leaves Demitri out of range; the part has
+no X pins) and pyron_3 event 0 (the pre-round X pin keeps Corona Whip from
+connecting). Both read IDENT in the frozen table — a whiff that both legs agree
+on — and both are #157 throws once they land. Rule: an IDENT row says the legs
+agree, not that the move happened; a parity rig needs a proof that its event
+occurred (the contact, the stock, the state) before its IDENT is coverage.
+
+## THE MAINTAINER'S MOVE LISTS NAME THE VAMPIRE SAVED MOVE — in vs2 the same name may be a different input (paid: 14z-168)
+
+`build/manifest/moves_<tenant>.toml` lists Slay Shred, Ray of Doom and Shining
+Gemini as P+K Dark Force because that is how Vampire Saved plays them. In vs2
+they are EX moves with their own inputs (421+KK, 263+PP, 2623+PP measured; the
+maintainer to confirm), and vs2's P+K is a different mode. The maintainer: *"the
+move list for Vampire Saved is linked to how we implemented it ... In VS2, you
+want to look for the name of the character's Dark Force in Vampire Saved."*
+Rule: a native reference leg for a move is found by the move's NAME in the
+native game, never by our list's input.

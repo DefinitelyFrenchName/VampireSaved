@@ -1,0 +1,20 @@
+THE PACKET
+
+Decision kind: expectation
+Subject: 14z-168: after run 2026-09-18-47 - df_field_readers_live re-frozen with a blocks column and per-range liveness; df_moves verified with a measured in-mode check
+Claim (the working agent's sentence): tests/expected/df_field_readers_live.tsv was re-frozen with FREEZE=1 and reproduced exactly by a run without FREEZE, and tests/expected/df_moves.tsv reproduced exactly with its new in-mode check green, each gate's must-fire controls fired in-gate and every CONTROL mode exited 1 (the logs named: missed-planted and range-silent for the live gate; hit-dropped and mode-lost for df_moves); the live gate taps both fighter blocks' +0x1C2..+0x1C9 through tests/lua/read_tap.lua over the 30 tenant naming parts with tests/audit_move_parity.sh's inputs and pokes for our leg (level pinned from 2000, RNG from 2363), requires a write in BOTH ranges in every run, and records which block each access touched; the eight gates that run read_tap.lua passed after its multi-range change (read_tap_users.txt); df_moves now reads the Change field +0x111 on both legs and requires it non-zero at every compared event and hit frame (29 of 29); the maintainer's agreement to a rig change is quoted in the gate and DECISIONS_HISTORY, and the per-group form is stated as not ruled; NOT tested or not established: the census cannot see indexed, absolute or indirect accesses or vsavj's own code, 37 of its 44 rows are not executed by the corpus, the three a4 movep rows are not shown to address a fighter block, the tenant as P2 is not sampled, the live gate uses the census tool's own span list to decide what is placed code and does not re-assert P1's id (the parity gate does on the same inputs); in df_moves the vs2 EX inputs (421+KK, 263+PP, 2623+PP) are my measured candidates, not confirmed canonical, +0x111 is the P1 block's field only (the native leg's EX install and our P+K both set it, measured in tests/audit_df_modes.sh, not re-shown here), X is pinned to the same far positions on both legs, which removes spacing differences by design, and the comparison is hits, damage, reaction class and gauge only — how the moves look is on the captures sent at 13:17Z, which the maintainer has not judged; FBNeo was not run
+Artifacts (read every one, in full):
+  - tests/audit_df_field_readers_live.sh
+  - tests/expected/df_field_readers_live.tsv
+  - build/p136_14z168/regress/live_verify.log
+  - build/p136_14z168/regress/live_ctl_missed.log
+  - build/p136_14z168/regress/live_ctl_range.log
+  - build/p136_14z168/regress/read_tap_users.txt
+  - tests/lua/read_tap.lua
+  - tests/audit_df_moves.sh
+  - tests/expected/df_moves.tsv
+  - build/p136_14z168/regress/dfmoves_verify.log
+  - build/p136_14z168/regress/dfmoves_ctl_hit.log
+  - build/p136_14z168/regress/dfmoves_ctl_mode.log
+  - build/p136_14z168/cap_dfx_donovan/DELIVERED.txt
+  - DECISIONS_HISTORY.md.lines-92-104 (lines 92-104 of DECISIONS_HISTORY.md)

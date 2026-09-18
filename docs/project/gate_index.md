@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**344 scripts** — 81 ci_portable, 78 ci_static, 185 emulator-tier (run by name).
+**354 scripts** — 81 ci_portable, 79 ci_static, 194 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -27,7 +27,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 82 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 34 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 44 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -345,17 +345,26 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 | gate | kind | tier | needs | locks (the script's own header) | since |
 |---|---|---|---|---|---|
+| `tests/audit_column_shock.sh` | audit | emulator | MAME, a build dir, ~6 s | DONOVAN'S KILLSHREAD LIGHTNING COLUMN SHOCKS ITS VICTIM FOR 12 FRAMES ON OUR BUILD, 24 NATIVELY, and freezes Donovan 4 frames per hit where vs2 exempts him, frozen AS MEASURED (14z-168, GitHub #136): | 14z-168 |
 | `tests/audit_defense_row_residue.sh` | audit | emulator | MAME, a build dir, ~5 min | THE PHOBOS-THROW ±1 DAMAGE RESIDUE IS THE DEFENSE-TABLE ROW THE VICTIM'S ID SELECTS, read watch on both legs (14z-145). | 14z-145 |
 | `tests/audit_df_accumulator.sh` | audit | emulator | MAME, a build dir, ~3 min | THE +0x161 ACCUMULATOR IS SASQUATCH'S DARK FORCE ARMOR (measured 14z-123; inferred_claims row 1). | 14z-123 |
-| `tests/audit_df_dead_family.sh` | audit | emulator | ~3 min | THE VS-STYLE DARK FORCE FAMILY IS DEAD IN NATIVE vs2: its shared field-setter tail at vs2 PRG:0x02622A takes ZERO hits while the activation body takes exactly one (measured 14z-126). | 14z-126 |
+| `tests/audit_df_dead_family.sh` | audit | emulator | ~3 min | vs2's P+K (DARK FORCE POWER) NEVER REACHES THE VS-STYLE DARK FORCE FAMILY: its shared field-setter tail at vs2 PRG:0x02622A takes ZERO hits on a P+K activation while the activation body takes exactly one (measured 14z-126). SCOPED 14z-168: | 14z-126 |
+| `tests/audit_df_field_readers_live.sh` | audit | emulator | MAME, a build dir, ~50 s | WHAT THE #136 CORPUS EXECUTES AGAINST vs2's DARK FORCE POWER FIELDS, cross-checked against the static census (14z-168, GitHub #136 / #157's Dark Force tail): | 14z-168 |
+| `tests/audit_df_meter.sh` | audit | emulator | MAME, a build dir, ~25 s | NO GAUGE IS BUILT IN DARK FORCE CHANGE, and the tenants build it anyway, frozen AS MEASURED (14z-168, GitHub #157's Dark Force tail): | 14z-168 |
+| `tests/audit_df_modes.sh` | audit | emulator | MAME, a build dir, ~95 s | DARK FORCE POWER vs DARK FORCE CHANGE, every selectable character, frozen AS MEASURED (14z-168, GitHub #136): on vsav2 P+K is the global DARK FORCE POWER (two stocks, no startup invincibility, the seq-0x16 handler never reached); | 14z-168 |
+| `tests/audit_df_moves.sh` | audit | emulator | MAME, a build dir, ~40 s | THE TENANTS' MOVES INSIDE THEIR DARK FORCE, ours (Dark Force Change, P+K) vs native (the vs2 personal-Dark-Force EX install), frozen AS MEASURED (14z-168, GitHub #136): | 14z-168 |
 | `tests/audit_df_startup_invuln.sh` | audit | emulator | MAME, a build dir, ~3 min | THE DARK FORCE STARTUP INVINCIBILITY IS +0x147, ARMED PER CHARACTER BY THE seq-0x16 HANDLER, AND THE TENANTS ARM THEIR OWN (measured 14z-126; STATE "Decisions pending" DF-startup item). | 14z-126 |
+| `tests/audit_entrance_draw.sh` | audit | emulator | MAME, a build dir, ~15 s | PHOBOS'S ROUND-START ENTRANCE IS DRAWN FROM THE SAME THREE VARIANTS ON OUR BUILD AS ON vsav2 (14z-168, GitHub #136): the legs of #136's guard-cancel rigs drew different entrances because the draw follows each game's RNG state at character l… | 14z-168 |
 | `tests/audit_facing_rule.sh` | audit | emulator | MAME, a build dir, ~5 s | THE VICTIM FACING RULE 5 ON OUR ENGINE, ours vs native, frozen AS MEASURED (GitHub #159, 14z-167): vs2's facing-rule resolver knows rule 5 and vsavj's does not, so a tenant attack record carrying it is XORed into the victim's facing on our… | 14z-167 |
 | `tests/audit_ff8130_writers.sh` | audit | emulator | MAME, ~1 min | who writes RAM:$FF8130 on vanilla vsavj, every write form and both byte lanes: five DIRECT writers (the id fold's store at PRG:0x00A446 and four constant writes), block writes that cover the word, and two writers of the NEIGHBOUR byte $FF81… | 14z-157 |
 | `tests/audit_forced_pick_fidelity.sh` | audit | emulator | MAME | IS A FORCED-PICK NATIVE LEG FAITHFUL? The rig's poked pick vs a REAL cursor pick of the same tenant on native vsav2, diffed over the WHOLE fighter block (GitHub #151, 14z-160). | 14z-160 |
 | `tests/audit_front_comparator.sh` | audit | emulator | MAME, a build dir, ~3 min | what $FF8127 is, and what its input byte +0x10 is (14z-123, the documentation rationalization pass, inferred_claims row 4; closes the 14z-118 (16) leftover "Open: what object byte +0x10 is"). | 14z-123 |
 | `tests/audit_guard_mask_reads.sh` | audit | emulator | MAME, a build dir, ~4 min | WHICH LONGWORDS OF THE GUARD-MASH MASK TABLE `PRG:0x028D50` THE ENGINE READS, ours vs vanilla — and that the port's bytes in its FIRST longword sit behind an index the check never produces. (14z-145.) | 14z-145 |
+| `tests/audit_guard_reentry.sh` | audit | emulator | MAME, a build dir, ~10 s | THE BLOCK ANIMATION RE-ENTERS ON vsavj, NOT ON vs2, on legacy content (14z-168, GitHub #136): when a block's hit-freeze ends into the blockstun slide (seq 0 -> 2) with BACK still held, vsavj re-enters the block animation (the node counter r… | 14z-168 |
 | `tests/audit_latch_reads.sh` | audit | emulator | MAME, a build dir, ~2 min | WHO READS THE SELECT-CONFIRM LATCH IN PLAY, per leg shape, with the VALUE each reader saw: the measured half of the #151 step-3 sweep, frozen (14z-161). | 14z-161 |
 | `tests/audit_move_parity.sh` | audit | emulator | MAME, a build dir | EVERY TENANT MOVE, OURS vs NATIVE vsav2, AT A MATCHED SPEED LEVEL AND A PINNED RNG (GitHub #136, 14z-159). | 14z-159 |
+| `tests/audit_move_parity_attribution.sh` | audit | emulator | MAME, a build dir, ~5 min | EVERY DIFF ROW OF THE #136 MOVE-PARITY TABLE HAS A MEASURED CAUSE, frozen (14z-168, GitHub #136): each root found by ablation (its event's inputs removed, both legs re-run, the rows that vanish are its) and named by a measured signature; | 14z-168 |
+| `tests/audit_pass_overrun.sh` | audit | emulator | MAME, a build dir, ~60 s | THE BLIZZARD SWORD CPU OVERRUNS, ours vs native, frozen AS MEASURED (14z-168, GitHub #136): on three Blizzard Sword frames of the whole #136 corpus a double-pass activation runs past the frame, so one frame completes NO logic pass — twice o… | 14z-168 |
 | `tests/audit_pyron_capture_block.sh` | audit | emulator | MAME, a build dir, ~4 min | PYRON THROWS WITH DEMITRI'S CAPTURE GEOMETRY (measured 14z-131, maintainer-ruled "measure against native vs2 first"). | 14z-131 |
 | `tests/audit_rig_opening.sh` | audit | emulator | MAME, a build dir, ~3 s | THE #136 GUARD-CANCEL RIG'S OPENING, ours vs native, frozen AS MEASURED (14z-167): the rig's first X pin lands before the round starts, inside the round-start entrance, and the two legs draw different entrances. | 14z-167 |
 | `tests/audit_tenant_throw_geometry.sh` | audit | emulator | MAME, a build dir, ~12 min | PHOBOS'S THREE THROWS, OURS vs NATIVE VS2 (14z-131, maintainer-directed 2026-09-04). | 14z-131 |
@@ -364,6 +373,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/test_advancing_guard.sh` | test | emulator | MAME, ~2.5 min | THE ADVANCING GUARD (guard push), MEASURED on native vs2 and on vsavj, and frozen (14z-123, the documentation pass's G2). | 14z-123 |
 | `tests/test_anim_node_walk.sh` | test | emulator | MAME, a build dir, ~2 min | THE ANIMATION-NODE DECODER IS AN INSTRUMENT (character-data map, phase 1; 14z-118). tools/anim_nodes.py reads the per-character anim index tables and walks the 0x18-byte node chains by the rules read off vs2's walker (PRG:0x02713C / 0x0271C… | 14z-118 |
 | `tests/test_community_crosscheck.sh` | test | ci_static | ROMDIR | OUR DERIVED VANILLA FRAME DATA STILL SAYS WHAT THE COMMUNITY WORKBOOK SAYS (14z-125, the community cross-check). | 14z-125 |
+| `tests/test_df_field_readers.sh` | test | ci_static | ROMDIR | EVERY PLACED INSTRUCTION THAT NAMES ONE OF vs2's DARK FORCE POWER FIELDS BY DISPLACEMENT, with the access it makes, frozen (14z-168, GitHub #136 / #157's Dark Force tail): | 14z-168 |
 | `tests/test_df_startup_provenance.sh` | test | ci_static | ROMDIR | THE TENANTS' DARK FORCE STARTUP WINDOWS ARE CAPCOM'S OWN, CARRIED FROM vs2/vh2 — the three-way ROM agreement that backs the preservation claim, frozen (14z-126). | 14z-126 |
 | `tests/test_hitbox_encoding.sh` | test | emulator | MAME, a build dir, ~4 min | THE HITBOX ENCODING AND THE ATTACK RECORD ARE WHAT THE ENGINE USES (character-data map, PHASE 2; measured 14z-120 (5)). | 14z-120 (5) |
 | `tests/test_killshread_es.sh` | test | emulator | MAME, ~2 min | KILLSHREAD (ES): the maintainer's ruling (14z-121) that the ES stance change's effect plays out DURING THE SUMMON — the returning Killshread attacks going away AND coming back, where the plain summon attacks one way — MEASURED on native vs2… | 14z-121 |

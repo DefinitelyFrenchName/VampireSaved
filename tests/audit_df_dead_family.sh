@@ -1,12 +1,16 @@
 #!/bin/sh
-# audit_df_dead_family.sh — THE VS-STYLE DARK FORCE FAMILY IS DEAD IN NATIVE
-# vs2: its shared field-setter tail at vs2 PRG:0x02622A takes ZERO hits while
-# the activation body takes exactly one (measured 14z-126).
+# audit_df_dead_family.sh — vs2's P+K (DARK FORCE POWER) NEVER REACHES THE
+# VS-STYLE DARK FORCE FAMILY: its shared field-setter tail at vs2 PRG:0x02622A
+# takes ZERO hits on a P+K activation while the activation body takes exactly one
+# (measured 14z-126). SCOPED 14z-168: the family is NOT dead in vs2 — the three
+# newcomers' vs2 EX moves (their personal Dark Force) run through 0x02622A and
+# arm +0x147 from their own handlers (tests/audit_df_modes.sh).
 #
 # MUST-FIRE: known-bad: candidate-reached — the dead field-setter 0x02622A is never reached, so demanding it WAS reached must fail (mode: the candidate is asserted to have fired, which the real trace never shows, so the gate FAILs)
 #
 # WHY. docs/game/preserved_data.md entry 1: vs2/vh2 carry the VS-style
-# seq-0x16 Dark Force handlers for all 18 characters and never reach them. The
+# seq-0x16 Dark Force handlers for all 18 characters and P+K never reaches them
+# (corrected 14z-168: the newcomers' EX moves do; this gate's legs are P+K). The
 # listing showed one more member — a vsav-style field setter at vs2 0x02622A
 # (`+0x111/+0x110/+0x143/+0x176`, fixed `+0x189` = 5 / `+0x188` = 0x23),
 # reached only by `jmp $2622a.l` from ten per-character sites inside the

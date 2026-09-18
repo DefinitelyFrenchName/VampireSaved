@@ -596,6 +596,18 @@ the #114 gate) — a duration in video frames is then comparable between the sib
 game's default it is not. [M: `tests/audit_tick_cadence.sh` section C;
 `tests/test_don_immortal_native.sh` §0 and §4; 14z-158]
 
+**A DOUBLE PASS CAN OVERRUN ITS FRAME — one frame then completes NO logic pass (measured 14z-168,
+#136).** Both passes of a double-pass frame run inside one activation of the game task (above); when
+their work does not fit, the activation runs into the next frame, the task is not dispatched there
+(the scheduler's state-8 write at `PRG:0x001204/0x001218` skips its slot), and `RAM:$FF8081` does not
+step: a ZERO-PASS frame. In the #136 corpus (30 parts, both games, level 6) it happens on three
+Blizzard Sword frames only — twice on native vsav2 (donovan_2 at 3098, donovan_11 at 4580), once on
+ours (donovan_10 at 2977) — and after it the rest of the part stays one engine pass out of step with
+its (per-frame) inputs. It is not a port cost: the scheduler's idle spin (slot 15, dispatched between
+passes until the frame flag) averages the same per event window on both builds (ratio 1.00-1.01);
+WHICH frame overruns is decided by where the work falls inside a frame. [M:
+`tests/audit_pass_overrun.sh`; attribution `tests/audit_move_parity_attribution.sh`, class SLOWDOWN]
+
 **THE RNG PICKS WHICH FIGHTER UPDATES FIRST ON EVERY PASS — and the two games' RNG states differ,
 so a cross-game comparison must pin it (measured 14z-158, #142).** The object loop (vsavj
 `PRG:0x02207E`, vs2 `0x020A2E`, the same code) calls the engine RNG (vsavj `PRG:0x014E8A`, vs2
@@ -954,6 +966,16 @@ the victim".
 - **A block is class `0xFF`** on every tenant: the block stance (Donovan
   `a:0x14`, Huitzil `a:0x15`, Pyron an unindexed node) then the SHARED
   blockstun chain **`b:0x0c`** (one node, 3 data frames, held).
+- **vsavj RE-ENTERS the block animation where vs2 does not (measured 14z-168,
+  #136; `tests/audit_guard_reentry.sh`).** When a block's freeze ends into the
+  blockstun slide (seq 0 -> 2) with BACK still held, vsavj reloads the block
+  animation's node counter on every frame back is held — 2 frames at a
+  guard cancel pressed at hit+6, 6 at hit+10 — where vs2 keeps ticking.
+  Measured on a Demitri mirror on both games (a legacy character: an ENGINE
+  difference, and our build equals pristine vsavj on every sampled frame). On
+  Phobos, whose block animation is a multi-node loop, the re-entry restarts the
+  chain, which is #136's seven Reflect Wall guard-cancel DIFF rows (node at
+  +16/+17). The host engine's behaviour governs.
 - **How the stun runs (frame by frame, Donovan taking Victor's 5LP / 5MP,
   14z-120 (8)):** the contact frame installs the class and the freeze
   `+0x5C` = 11 and puts the node pointer on `c:0x08` node 0 with the node
@@ -3141,6 +3163,19 @@ install (vsavj 0x27EC0 ↔ vs2 0x27114). Atlas rows: victim `+0x54`
 class, `+0x5C` freeze, `+0x07` seq sub-state (4 = shock), attacker
 link `+0x32`.
 
+**The licence covers the class, not every hook on the target handler (measured
+14z-168, #136; `tests/audit_column_shock.sh`).** Donovan's Killshread Lightning
+column carries class 0x52 natively (vs2's `0x22656`: the victim's `+0x5C` = 0x18,
+the attacker exempt) and, remapped to 0x06 (14z-33), reaches vsavj's
+`0x23AC8` — where the 14z-42 Lightning Sword thunks rewrite the two freezes for
+ANY Donovan attacker to vs2's Lightning Sword tuning (victim 0x0C and `+0x147` =
+0x0C, Donovan 4; on merged-m18 the placed thunks sit at `PRG:0x3FFBB0`/`0x3FFBE0`
+and the two writes at `PRG:0x3FFBC4`/`0x3FFBF4` — placed addresses, moving with a
+freeze). So on our build the column shocks for 12 frames where native
+shocks for 24, and Donovan freezes 4 frames per hit; damage and hit count are
+equal. Nothing rules on it (the trap dome's attacker freeze is the ruled
+precedent of the class; its victim freeze is untouched).
+
 **Multi-hit accounting — THE RE-HIT RULE, MEASURED (14z-146,
 `tests/test_rehit_ring.sh`; atlas rows `+0x6C`, `+0x70`, `+0x08`):** the hit
 test `PRG:0x018064` refuses a record whose hit id (byte `+0x10`) equals the
@@ -3550,7 +3585,8 @@ repointed through).
 **Gates:** `tests/audit_df_framework.sh`, `tests/test_hui_df_style.sh`,
 `tests/audit_df_gold.sh`, `tests/audit_df_accumulator.sh`,
 `tests/audit_df_startup_invuln.sh`, `tests/audit_palette_seq_ids.sh`,
-`tests/audit_clone_beam_lines.sh`.
+`tests/audit_clone_beam_lines.sh`, `tests/audit_df_modes.sh`,
+`tests/audit_df_meter.sh`, `tests/test_df_field_readers.sh` (14z-168).
 
 **The ruled framework** [M: `tests/audit_df_framework.sh`, measured 14z-101,
 frozen 14z-104; maintainer-ruled 2026-08-21 and reaffirmed 2026-08-30 for
@@ -3636,7 +3672,10 @@ The selection between those sites is traced next.
 ### The two engines run DIFFERENT Dark Force systems (traced 14z-69c)
 
 **[VSE-69]** The two engines run DIFFERENT Dark Force systems, and the tenant is
-caught between them.
+caught between them. P+K selects vs2's Dark Force POWER and vsav's Dark Force CHANGE; the
+newcomers' Change handlers stay reachable in vs2 through their EX moves (measured
+14z-168 — "Dark Force POWER, Dark Force CHANGE, and the newcomers' personal Dark
+Force" below), so a newcomer's Dark Force is compared against its vs2 EX move.
 
 | | vsavj (host engine) | vsav2 (native) |
 |---|---|---|
@@ -3674,7 +3713,11 @@ DF. Probe-measured with positive controls: native 0 hits at `0x56D70`,
 ours 1 hit at its placed twin `0x0C1780` — and that one hit is at frame
 3667, DF EXPIRY, where vs2's handler does exactly what it says
 (`moveq #0,d0; move.b d0,$17b/$111/$110/$1b5; rts` — a CANCEL body: vs2
-wrote it to switch the vsav-style DF off).
+wrote it to switch the vsav-style DF off). **[CORRECTED 14z-168: "never executes"
+holds for vs2's P+K Dark Force POWER only. Phobos's vs2 EX move (Ray of Doom,
+263+PP measured) enters the Change machinery through vs2's own entry `0x02622A`
+and arms `+0x147` from this handler family (`0x056CA0`) — "Dark Force POWER, Dark
+Force CHANGE, and the newcomers' personal Dark Force" below, `tests/audit_df_modes.sh`.]**
 
 **Legacy is unaffected and this is not "the host's style":** on vanilla
 vsavj a legacy character (Victor) in DF shows no recolour and no extra
@@ -3702,6 +3745,10 @@ That is a coherent, correctly-terminating mode, and it is almost
 certainly Huitzil's ORIGINAL Vampire-Savior Dark Force: vs2 still
 carries the per-char code in its tables but replaced the DF system, so
 the handler is vestigial THERE and live HERE. Our engine is vsav.
+**[CORRECTED 14z-168: not vestigial in vs2 — its P+K (Dark Force Power) never
+reaches the mode, but Phobos's vs2 EX move reaches it; the maintainer: his hover in
+DF on our build IS Ray of Doom, *"the move exists in VS2 but as an EX move, not as
+DF"*. The subsection "Dark Force POWER, Dark Force CHANGE" below.]**
 
 **The recolour was a palette-SEQUENCE animation through the global table**
 [M: 14z-69e]: one writer, engine `0x02AD68` (the `0x2AD64`-family uploader),
@@ -3782,7 +3829,11 @@ handler, and the tenants' handlers are their own** [M:
   activation this engine runs, dead in the shipped sequels, live here; the
   same provenance as Huitzil's flight form below. Caveat stated once: dead
   code may carry untuned values — Capcom's, but never player-tested in a
-  shipped game.
+  shipped game. **[CORRECTED 14z-168: for the three newcomers these handlers
+  are NOT dead in vs2 — each tenant's vs2 EX move (its personal Dark Force)
+  reaches them and arms the SAME values natively (Donovan 64 at `0x05A7DA`,
+  Phobos 79 at `0x056CA0`, Pyron 41 at `0x058D6A`), so the windows were played
+  in a shipped game. "Never reached" holds for P+K. `tests/audit_df_modes.sh`.]**
 - **THE DEAD FAMILY, MEASURED ACROSS ALL THREE ROMS** [M:
   `tests/test_df_startup_provenance.sh`, 14z-126]: vs2 and vh2 do not carry
   VS-style DF handlers for the three newcomers only — they carry them for
@@ -3794,7 +3845,10 @@ handler, and the tenants' handlers are their own** [M:
   handlers differ only by pointer-shifted operands, 4-7 bytes of 0x80),
   which is not the value of the vsavj row they alias. So the family was
   carried into the sequels whole and switched off for everyone by the new
-  activation body; the tenants' handlers are its three extra members. The
+  activation body; the tenants' handlers are its three extra members.
+  **[CORRECTED 14z-168: switched off for P+K; the three newcomers' members stay
+  reachable in vs2 through their EX moves. Whether any input reaches the other
+  15 is not measured.]** The
   class this belongs to — what a shipped ROM carries but never reaches — is
   catalogued in `docs/game/preserved_data.md`.
   **What the ROMs cannot say is WHEN they were written** — before VS shipped
@@ -3815,7 +3869,11 @@ handler, and the tenants' handlers are their own** [M:
   and balance.
 - **natively on vs2 there is no window at all**: the seq-0x16 handler never
   runs ([VSE-69]) and the vs2 DF path writes `+0x147` = 1 (`0x025F2A`),
-  cleared before frame_done — measured "never armed" on the native leg. The
+  cleared before frame_done — measured "never armed" on the native leg.
+  **[CORRECTED 14z-168: no window from P+K, now measured on all 15 characters
+  vsav2's wheel reaches — but the `0x025F2A` write does NOT run on the activation
+  (a non-debug write tap sees no write to `+0x147` at all; the instruction exists,
+  its reach is unmeasured), and the tenants' EX moves DO arm the window natively.]** The
   window the tenants have HERE is their Vampire-Savior-era handler's, live
   on this engine as their flight/form code is; vsavj semantics govern (the
   ruled framework).
@@ -3835,6 +3893,123 @@ reducer tick AFTER the body's write, so `+0x143`'s 0x14 is always SAMPLED as
 **Gameplay note ([VSP-10]):** nothing here is a change — the tenants ship
 with their own vs2 windows today. Retuning one is a single data byte in the
 ported handler, if the maintainer ever wants it.
+
+### Dark Force POWER, Dark Force CHANGE, and the newcomers' personal Dark Force (measured 14z-168)
+
+**Atlas rows:** `ram.md` fighter `+0x111`/`+0x110` (the Change mode), `+0x176`
+(its 112-unit timer), `+0x188`/`+0x189` (the tick countdown and its period),
+`+0x1C3` (vs2's Power field), `+0x147`, `+0x109`, `$FF802E`. **Gates:**
+`tests/audit_df_modes.sh` (every leg below, frozen), `tests/audit_df_meter.sh`
+(the gauge rule), `tests/test_df_field_readers.sh` (the placed instructions
+naming a Power field, by access) and `tests/audit_df_field_readers_live.sh`
+(what the #136 corpus executes against them), `tests/audit_df_moves.sh` (the
+moves inside the mode).
+
+**The two modes, in the maintainer's words (2026-09-18, 14z-168):** *"VS2's
+dark force power costs 2 meters instead of 1, has no invincibility at startup,
+is a global buff, has no specific moves while VS dark force (sometimes called
+dark force change) is a character altering ability with startup invincibility.
+The only common trait in Dark Force Power and Dark Force Change is the
+background change and timer."* P+K selects **Power** on vsav2 and **Change** on
+vsavj. vs2 did not delete the characters' Change-mode moves: per Mizuumi (the
+maintainer, same day), vs2 turned each "personal" Dark Force into a timed EX
+move. **Vampire Saved gives the newcomers vsav's Change** — the shells' common
+rules, their OWN vs2 startup windows, and their personal Dark Force (Slay Shred,
+Ray of Doom, Shining Gemini) active for the whole mode.
+
+**Measured on every character vsav2's wheel reaches** (real cursor picks, level
+6, `audit_df_modes.sh`):
+- **vsav2, P+K = Power, all 15:** two stocks; seq 0x16 never held; `+0x147`
+  never written (so the 14z-126 note that vs2's DF path writes 1 at `0x025F2A`
+  is RETRACTED — the instruction exists, it does not run on the activation);
+  `+0x176` never written; `$FF802E` held 360 frames (269 for Morrigan and
+  Lilith).
+- **vsavj, P+K = Change, all 15:** one stock; each character's own handler
+  arms `+0x147` (the frozen `df_startup_invuln.tsv` values); the body
+  `PRG:0x027000` sets `+0x176` = 0x70 (112) at `0x02701A` and
+  `+0x189` = the per-character byte table at `0x02704E` (3 for Gallon, Morrigan
+  and Lilith, 4 for everyone else and for rows 0x10-0x13), `+0x188` = that + 0x1E.
+  The reducer (`0x022514..0x022530`) counts `+0x188` down every engine tick and,
+  at zero, decrements `+0x176` and reloads `+0x188` from `+0x189` — so **the
+  duration is 112 x the period**, per character: `+0x111` is held 297 frames at
+  period 3 and 388 at period 4, and a character's own form stretches it
+  (Anakaris 411, Aulbath 426, Lei-Lei 439, Sasquatch 568, Q-Bee and Jedah 405 —
+  the seq-0x18 group Phobos joins). `$FF802E` rises 28 frames after the press:
+  269 / 360 / 383 / 398 / 411 / 540 / 377 frames. **Not a global setting**,
+  which is why the 2026-08-21 ruling ("keep vsavj DF durations") is per
+  character; reaffirmed 2026-09-18 for the tenants' 360/377/360.
+- **ours, P+K:** Demitri identical to vsavj; the tenants arm their own vs2
+  windows (64 / 79 / 41) and run period 4 (their table rows): 388 / 405 / 388
+  frames of `+0x111`.
+- **vsav2, the tenants' EX input** (Donovan 421+KK, Phobos 263+PP, Pyron
+  2623+PP — measured; the maintainer to confirm the canonical inputs): one
+  stock; vs2's own **Change entry `0x02622A`** sets `+0x111`/`+0x110`,
+  `+0x143` = 0x14, `+0x176` = 0x70 (at `0x02623C`) and a **CONSTANT** period
+  `+0x189` = 5 (`+0x188` = 0x23); each tenant's own vs2 handler arms `+0x147`
+  with the SAME values as on our build (Donovan 64 at `0x05A7DA`, Phobos 79 at
+  `0x056CA0`, Pyron 41 at `0x058D6A`); `+0x111` held 478 / 509 / 478 frames;
+  `$FF802E` stays 0 (Phobos's toggles 3/0 for 19 frames) and the stage keeps
+  its background. **So the newcomers' Change handlers and startup windows are
+  LIVE in vs2**, played through their EX moves — the 14z-126 "shipped but never
+  reached" reading holds for P+K only (corrected in place above and in
+  `preserved_data.md`). Whether any input reaches the OTHER characters'
+  VS-style handlers in vs2 is not measured.
+- **ours, the same EX input:** still honoured — the placed copy of `0x02622A`
+  (in each tenant's `x026142` region) runs, period 5, 478 / 496 / 478 frames of
+  `+0x111`, the same `+0x147` arms as P+K, and it raises `$FF802E` and the Dark
+  Force background (451 / 469 / 451 frames). A second, longer route into the
+  mode for the same one stock — **ruled 2026-09-18: disable it** (a fix ticket).
+
+**The altered attacks match native IN HITS, DAMAGE AND HIT FRAMES, on the right baseline** [M: `tests/audit_df_moves.sh`,
+14z-168; how they LOOK is not established]: every in-DF event of the #136 schedules (29), re-run inside a mode entered on both legs
+(ours by P+K, native by the tenant's vs2 EX input), positions pinned, the moves 110 frames after
+the activation (Phobos's vs2 EX takes his form ~75 frames in, so at 70 his first move was lost on
+the native leg). Compared by the ORDERED hits (damage, P2 reaction class) and gauge steps: the
+flying sword and Anita (Donovan), the clone beams (Phobos) and the flame burst (Pyron) land the
+same hits for the same damage on the same frames (Phobos's clone hits one frame later on ours);
+the one hit difference is Lightning Sword's class byte (0x4E natively, 0x06 on ours — the 14z-35
+remap under the 14z-42 thunks; equal damage and frame). Every other difference is gauge: vs2's EX
+install pays start-up AND hit gauge, ours pays no hit gauge in the mode (vsav's rule, ruled correct)
+but still the tenants' start-up gauge (the defect below). So the first in-DF comparison's "extra
+hits" and "missing damage" (our P+K against vs2's P+K) were the two different modes, not the port.
+The RAM rows do not compare appearance. Captures on this baseline (Donovan 5HP, Phobos 5LP, Pyron
+5LP; `build/p136_14z168/cap_dfx_*`, put before the maintainer 2026-09-18 13:17Z) show the hits on
+the same frames, and two visible differences — Donovan's sword in a different pose on the frames
+before its hits, Pyron's form in a different palette on the activation side — which are the
+maintainer's to judge (#136). Every compared event is MEASURED to run inside the mode (`+0x111` on
+both legs at the event and at each hit) and to make P1 act on both legs (its seq/sub leaves the
+pre-event state); the gate prints P1's state path for each event with no hit. On that print, inside
+the mode the two **Killshread [LK] inputs come out as a kick** (seq `0x0A`, after the crouch) on
+BOTH legs, not the special — Donovan's vs2 EX install and our Change agree on it.
+
+**The gauge rule** [M: `tests/audit_df_meter.sh`]: the meter adder is
+byte-identical in the two games but for its mode test — vsavj `tst.b $111(a6)`,
+vs2 `tst.b $1c3(a6)`. Inside Change the shells gain NOTHING from a whiffed
+attack; the tenants gain +6, because each tenant's `x028122` copy carries vs2's
+adder and `+0x1C3` is never set by Change (measured: 1 throughout vs2's Power, 0
+throughout ours' Change). The maintainer: *"it makes sense that you can't build
+meter during DF"* — a defect, GitHub #157's Dark Force tail. The same class
+covers every placed READ of a vs2 Power field. The census
+(`tests/test_df_field_readers.sh`) lists 44 placed instructions naming one on
+merged-m18: 26 reads, all of `+0x1C3` (the three `x028122` adder copies among
+them), and 18 writes — the placed copies of vs2's Power activation body
+(`x026142`) and three a4-based `movep` rows (`x05c800`) that nothing shows to
+address a fighter block. The #136 corpus executes 7 of the reads and every
+access it makes from placed code is a census row
+(`tests/audit_df_field_readers_live.sh`); one read is measured to change play.
+
+**The community cross-check** (Mizuumi's Dark Force table, `../community/`,
+the maintainer's pointer): its Invulnerability column equals our `+0x147` arm
+for 11 of 15 characters; Sasquatch, Q-Bee, Lei-Lei and Jedah arm `+0x147` late
+or re-arm it (above) and their listed window comes from elsewhere. Its Duration
+column follows no constant ratio to our spans (0.76 to 1.13): the column's
+start, end and game speed are not stated. By the community-data rule an
+inconsistent pattern means re-measure ours first — done: two instruments agree
+(`$FF802E` and `+0x111`) and the timer's arithmetic (112 x the period) predicts
+both, so our measurement stands and the column's definition is the open
+question. (The page is saved beside the tree as HTML and PDF, `../community/`;
+the generated `docs/project/tables/community_crosscheck.md` covers the frame-data
+workbook only.)
 
 ## The child companion's shadow — a remapped tile never copied (fixed 14z-69o)
 
@@ -4264,8 +4439,9 @@ node in character X's data is triggered by X's OPPONENT, whoever that is.
 ## The round-start ENTRANCE and the round start (measured 14z-167)
 
 Depends on atlas rows: `ram.md` `RAM:$FF812D` (the round start), fighter
-`+0x10` (x) and `+0x06` (seq). Gates: `tests/audit_rig_opening.sh` (the opening
-frozen on both legs), `tests/audit_move_parity.sh` (the rows it explains).
+`+0x10` (x), `+0x06` (seq) and `+0x0A` (the variant). Gates: `tests/audit_rig_opening.sh` (the opening
+frozen on both legs), `tests/audit_move_parity.sh` (the rows it explains), `tests/audit_entrance_draw.sh`
+(the variant set, 14z-168).
 
 A round opens with each fighter's ENTRANCE, and inputs act only from the round
 start (`$FF812D` 0 -> 1: written at 2544 per the atlas row, first sampled as 1 at 2545 by `field_trace.lua` on both legs, `tests/expected/rig_opening.tsv`). The entrance is chosen
@@ -4277,5 +4453,15 @@ On the huitzil_5 rig the car arrival (native vsav2) carries Phobos from x=360 at
 the match anchor (2363) in seq 2 through the rig's X pin at 2370 to x=702 by
 2395; the Cecil-in-hand arrival (our build) holds him at the pinned 552 in seq 4
 until 2481. A position written before the round start is therefore overwritten
-or carried by the entrance. Which draw picks the entrance, and whether our build
-can draw the car arrival, are unmeasured.
+or carried by the entrance. ~~Which draw picks the entrance, and whether our build
+can draw the car arrival, are unmeasured.~~ **MEASURED 14z-168
+(`tests/audit_entrance_draw.sh`):** the variant is written to fighter `+0x0A`
+during the intro: it goes 255 → 0 when the intro initialises, then stays 0 for
+the drive-in (x from 360) or takes 2 or 6 (Phobos held at the pinned 552) and
+returns to 0 when that pose ends — so a 0 in the trace is not by itself a draw;
+the gate reads the first value other than 0/255, checked against x moving. One
+RNG value poked at 2250 selects it; the two games draw DIFFERENT variants for
+the same value (their RNG consumption differs) but the SAME SET {0, 2, 6} over
+six seeds — our build lost none (the drive-in: seed 0000 on native; 0000, 5a5a,
+c3d2 on ours). The rig fix is still to pin
+after the round start (#136).

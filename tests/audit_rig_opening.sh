@@ -62,10 +62,13 @@ rpl_for() {  # rpl_for <tenant> <rig.rpl> <leg> <out.rpl>
 }
 sample() {  # sample <leg> <set> <rompath> <rpl> <pokes>   (background)
     mkdir -p "$W/$1"
-    ( cd "$W/$1" && MAME_SANDBOX="$W/$1/sb" MAME_ROMPATH="$3" REPLAY="$4" POKES="$5" FRAMES="$FR" \
+    # (14z-168) MAME can segfault at TEARDOWN after the instrument has closed its log (docs/platform/gotchas.md):
+    # `set +e` keeps the status write alive, and a run whose instrument wrote its summary line counts as
+    # completed (docs/project/gotchas.md, the set -e capture entry)
+    ( set +e; cd "$W/$1" && MAME_SANDBOX="$W/$1/sb" MAME_ROMPATH="$3" REPLAY="$4" POKES="$5" FRAMES="$FR" \
         FIELDS="ff8410:w:x,ff8406:b:seq,ff812d:b:rnd,ff8782:b:id" FIELD_OUT="$W/$1.tr" FIELD_FROM=2300 FIELD_TO="$FR" \
         "$REPO/tools/run_mame.sh" "$2" -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$W/$1/mame.log" 2>&1
-      echo $? > "$W/$1/rc"; rm -rf "$W/$1/sb" ) </dev/null &
+      _st=$?; grep -q -E '^(FIELDSUMMARY|END )' "$W/$1.tr" 2>/dev/null && _st=0; echo $_st > "$W/$1/rc"; rm -rf "$W/$1/sb" ) </dev/null &
 }
 reduce() {  # reduce <leg> <trace> -> rows
     python3 - "$1" "$2" <<'PY'

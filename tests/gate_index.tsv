@@ -353,3 +353,13 @@ tests/audit_throw_registration.sh	character-data
 tests/audit_facing_rule.sh	character-data
 tests/audit_rig_opening.sh	character-data
 tests/test_same_data_p2.sh	character-data
+tests/audit_df_modes.sh	character-data
+tests/audit_df_meter.sh	character-data
+tests/audit_guard_reentry.sh	character-data
+tests/audit_column_shock.sh	character-data
+tests/audit_move_parity_attribution.sh	character-data
+tests/audit_entrance_draw.sh	character-data
+tests/audit_pass_overrun.sh	character-data
+tests/test_df_field_readers.sh	character-data
+tests/audit_df_moves.sh	character-data
+tests/audit_df_field_readers_live.sh	character-data

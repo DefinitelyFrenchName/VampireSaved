@@ -1,0 +1,53 @@
+# tests/expected/df_field_readers.tsv — placed instructions of the merged build that name one of vs2's Dark Force POWER
+# fields (+0x1C3 +0x1C4 +0x1C6 +0x1C7 +0x1C8) by displacement, never set by our host engine's Dark Force Change, with the
+# access each makes and its base register (tests/test_df_field_readers.sh; tools/audit_df_field_readers.py). Evidence class:
+# static. Frozen 14z-168 with FREEZE=1 on m3b_merged26. ONE reader is measured to change play (the x028122 meter adder
+# copy, tests/audit_df_meter.sh); the rest are unmeasured. Columns: <access> <field> <addr> <region> <base> <insn>.
+# Re-freeze at every freeze (placed addresses move), reviewing the diff.
+#--
+read	+0x1c3	0x0bfb9a	code	a6	move.b $1c3(a6), $19c(a6)
+read	+0x1c3	0x0bfd90	code	a6	move.b $1c3(a6), $19c(a6)
+read	+0x1c3	0x0c150e	code	a6	move.b $1c3(a6), $19c(a6)
+read	+0x1c3	0x0c17a4	code	a6	move.b $1c3(a6), $19c(a6)
+read	+0x1c3	0x0cd3c8	x026142	a6	tst.b $1c3(a6)
+write	+0x1c3	0x0cd3f4	x026142	a6	move.b #$1, $1c3(a6)
+read	+0x1c3	0x0cffba	x028122	a6	tst.b $1c3(a6)
+read	+0x1c3	0x414680	code@huitzil	a6	tst.b $1c3(a6)
+read	+0x1c3	0x4148bc	code@huitzil	a6	tst.b $1c3(a6)
+read	+0x1c3	0x416e4a	x057456@huitzil	a6	move.b $1c3(a6), $19c(a6)
+read	+0x1c3	0x4170a4	x057456@huitzil	a6	move.b $1c3(a6), $19c(a6)
+read	+0x1c3	0x4170ce	x057456@huitzil	a6	move.b $1c3(a6), $19c(a6)
+read	+0x1c3	0x418e3a	x057456@huitzil	a6	move.b $1c3(a6), $19c(a6)
+read	+0x1c3	0x419030	x057456@huitzil	a6	move.b $1c3(a6), $19c(a6)
+read	+0x1c3	0x41a7ae	x057456@huitzil	a6	move.b $1c3(a6), $19c(a6)
+read	+0x1c3	0x41aa44	x057456@huitzil	a6	move.b $1c3(a6), $19c(a6)
+read	+0x1c3	0x41d848	x026142@huitzil	a6	tst.b $1c3(a6)
+write	+0x1c3	0x41d874	x026142@huitzil	a6	move.b #$1, $1c3(a6)
+read	+0x1c3	0x41f8fa	x028122@huitzil	a6	tst.b $1c3(a6)
+read	+0x1c3	0x471d5a	code@pyron	a6	move.b $1c3(a6), $19c(a6)
+read	+0x1c3	0x471fb4	code@pyron	a6	move.b $1c3(a6), $19c(a6)
+read	+0x1c3	0x471fde	code@pyron	a6	move.b $1c3(a6), $19c(a6)
+read	+0x1c3	0x473d4a	code@pyron	a6	move.b $1c3(a6), $19c(a6)
+read	+0x1c3	0x473f40	code@pyron	a6	move.b $1c3(a6), $19c(a6)
+read	+0x1c3	0x4756be	code@pyron	a6	move.b $1c3(a6), $19c(a6)
+read	+0x1c3	0x475954	code@pyron	a6	move.b $1c3(a6), $19c(a6)
+read	+0x1c3	0x476ab8	x026142@pyron	a6	tst.b $1c3(a6)
+write	+0x1c3	0x476ae4	x026142@pyron	a6	move.b #$1, $1c3(a6)
+read	+0x1c3	0x478b6a	x028122@pyron	a6	tst.b $1c3(a6)
+write	+0x1c4	0x0cd406	x026142	a6	move.w #$70, $1c4(a6)
+write	+0x1c4	0x41d886	x026142@huitzil	a6	move.w #$70, $1c4(a6)
+write	+0x1c4	0x476af6	x026142@pyron	a6	move.w #$70, $1c4(a6)
+write	+0x1c6	0x0cd42e	x026142	a6	move.b d1, $1c6(a6)
+write	+0x1c6	0x41d8ae	x026142@huitzil	a6	move.b d1, $1c6(a6)
+write	+0x1c6	0x476b1e	x026142@pyron	a6	move.b d1, $1c6(a6)
+write	+0x1c7	0x0cd426	x026142	a6	move.b d1, $1c7(a6)
+write	+0x1c7	0x41d8a6	x026142@huitzil	a6	move.b d1, $1c7(a6)
+write	+0x1c7	0x476b16	x026142@pyron	a6	move.b d1, $1c7(a6)
+write	+0x1c8	0x0c318c	x05c800	a4	movep.w d0, $1c8(a4)
+write	+0x1c8	0x0cd3fa	x026142	a6	move.b #$1, $1c8(a6)
+write	+0x1c8	0x41d87a	x026142@huitzil	a6	move.b #$1, $1c8(a6)
+write	+0x1c8	0x42022c	x05c800@huitzil	a4	movep.w d0, $1c8(a4)
+write	+0x1c8	0x476aea	x026142@pyron	a6	move.b #$1, $1c8(a6)
+write	+0x1c8	0x47949c	x05c800@pyron	a4	movep.w d0, $1c8(a4)
+count	+0x1c3=29	+0x1c4=3	+0x1c6=3	+0x1c7=3	+0x1c8=6
+access	read=26	write=18	rmw=0	addr=0

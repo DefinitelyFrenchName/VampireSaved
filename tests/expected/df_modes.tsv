@@ -1,0 +1,48 @@
+# tests/expected/df_modes.tsv — Dark Force Power vs Dark Force Change, every selectable character (tests/audit_df_modes.sh;
+# tests/lua/field_trace.lua + tests/lua/read_tap.lua over +0x146..+0x177, non-debug). Evidence class: in-emulator.
+# Frozen 14z-168 with FREEZE=1 (GitHub #136). vsav2's P+K is DARK FORCE POWER (two stocks, seq 0x16 never held, +0x147
+# never armed); vsavj's and ours' is each character's DARK FORCE CHANGE; the tenants' vs2 EX input reaches their Change
+# handler on BOTH games (period 5, 479/509 frames of +0x111). THE EX ROUTE ON OUR BUILD IS FROZEN AS MEASURED — the
+# maintainer ruled it disabled (2026-09-18); that fix re-freezes the ex/ours rows DELIBERATELY.
+# Columns: mode, leg, id, stock, seq16, arm, timer, dec, span111, flag (frames at speed level 6)
+#--
+power	vsav2	00	stock=3->1	seq16=0	arm=none	timer=none	dec=none	span111=none	flag=360
+power	vsav2	01	stock=3->1	seq16=0	arm=none	timer=none	dec=none	span111=none	flag=360
+power	vsav2	03	stock=3->1	seq16=0	arm=none	timer=none	dec=none	span111=none	flag=360
+power	vsav2	04	stock=3->1	seq16=0	arm=none	timer=none	dec=none	span111=none	flag=360
+power	vsav2	05	stock=3->1	seq16=0	arm=none	timer=none	dec=none	span111=none	flag=269
+power	vsav2	06	stock=3->1	seq16=0	arm=none	timer=none	dec=none	span111=none	flag=360
+power	vsav2	07	stock=3->1	seq16=0	arm=none	timer=none	dec=none	span111=none	flag=360
+power	vsav2	08	stock=3->1	seq16=0	arm=none	timer=none	dec=none	span111=none	flag=360
+power	vsav2	0c	stock=3->1	seq16=0	arm=none	timer=none	dec=none	span111=none	flag=360
+power	vsav2	0d	stock=3->1	seq16=0	arm=none	timer=none	dec=none	span111=none	flag=360
+power	vsav2	0e	stock=3->1	seq16=0	arm=none	timer=none	dec=none	span111=none	flag=269
+power	vsav2	0f	stock=3->1	seq16=0	arm=none	timer=none	dec=none	span111=none	flag=360
+power	vsav2	10	stock=3->1	seq16=0	arm=none	timer=none	dec=none	span111=none	flag=360
+power	vsav2	11	stock=3->1	seq16=0	arm=none	timer=none	dec=none	span111=none	flag=360
+power	vsav2	13	stock=3->1	seq16=0	arm=none	timer=none	dec=none	span111=none	flag=360
+change	vsavj	00	stock=3->2	seq16=31	arm=41@02f99c	timer=112@02701a	dec=022520x112	span111=388	flag=360
+change	vsavj	01	stock=3->2	seq16=31	arm=41@031386	timer=112@02701a	dec=022520x112	span111=388	flag=360
+change	vsavj	02	stock=3->2	seq16=24	arm=34@0316d0	timer=112@02701a	dec=022520x112	span111=297	flag=269
+change	vsavj	03	stock=3->2	seq16=46	arm=59@035fd2	timer=112@02701a	dec=022520x112	span111=388	flag=360
+change	vsavj	04	stock=3->2	seq16=50	arm=70@03855e	timer=112@02701a	dec=022520x112	span111=388	flag=360
+change	vsavj	05	stock=3->2	seq16=46	arm=60@039aa0	timer=112@02701a	dec=022520x112	span111=297	flag=269
+change	vsavj	06	stock=3->2	seq16=411	arm=60@03da44	timer=112@02701a	dec=022520x112	span111=411	flag=383
+change	vsavj	07	stock=3->2	seq16=35	arm=46@040f66	timer=112@02701a	dec=022520x112	span111=388	flag=360
+change	vsavj	08	stock=3->2	seq16=32	arm=43@043648	timer=112@02701a	dec=022520x112	span111=388	flag=360
+change	vsavj	09	stock=3->2	seq16=25	arm=34@045da6	timer=112@02701a	dec=022520x112	span111=426	flag=398
+change	vsavj	0a	stock=3->2	seq16=26	arm=5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02,5@047f02	timer=112@02701a	dec=022520x112	span111=568	flag=540
+change	vsavj	0c	stock=3->2	seq16=41	arm=4@049418	timer=112@02701a	dec=022520x112	span111=405	flag=377
+change	vsavj	0d	stock=3->2	seq16=388	arm=4@04c788	timer=112@02701a	dec=022520x112	span111=439	flag=411
+change	vsavj	0e	stock=3->2	seq16=46	arm=60@04dfb0	timer=112@02701a	dec=022520x112	span111=297	flag=269
+change	vsavj	0f	stock=3->2	seq16=19	arm=127@052f5c,4@052faa	timer=112@02701a	dec=022520x112	span111=405	flag=377
+change	ours	01	stock=3->2	seq16=31	arm=41@031386	timer=112@02701a	dec=022520x112	span111=388	flag=360
+change	ours	10	stock=3->2	seq16=63	arm=79@416150,4@41620c	timer=112@02701a	dec=022520x112	span111=405	flag=377
+change	ours	11	stock=3->2	seq16=34	arm=41@47312a	timer=112@02701a	dec=022520x112	span111=388	flag=360
+change	ours	13	stock=3->2	seq16=51	arm=64@0c10b0	timer=112@02701a	dec=022520x112	span111=388	flag=360
+ex	vsav2	10	stock=3->2	seq16=0	arm=79@056ca0,4@056d5c	timer=112@02623c	dec=020ed6x112	span111=509	flag=19
+ex	ours	10	stock=3->2	seq16=0	arm=79@416150,4@41620c	timer=112@41d90a	dec=022520x112	span111=496	flag=469
+ex	vsav2	11	stock=3->2	seq16=0	arm=41@058d6a	timer=112@02623c	dec=020ed6x112	span111=478	flag=none
+ex	ours	11	stock=3->2	seq16=0	arm=41@47312a	timer=112@476b7a	dec=022520x112	span111=478	flag=451
+ex	vsav2	13	stock=3->2	seq16=0	arm=64@05a7da	timer=112@02623c	dec=020ed6x112	span111=478	flag=none
+ex	ours	13	stock=3->2	seq16=0	arm=64@0c09ea	timer=112@0cd48a	dec=022520x112	span111=478	flag=451

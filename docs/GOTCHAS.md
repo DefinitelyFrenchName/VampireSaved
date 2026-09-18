@@ -20,9 +20,9 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-371 entries (43 game / 106 platform / 222 project), counted from the buckets at generation.
+377 entries (44 game / 108 platform / 225 project), counted from the buckets at generation.
 
-## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 43 entries
+## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 44 entries
 
 - (the 14z-90 onset-frame entry that opened this file was RE-FILED to `docs/project/gotchas.md` at 14z-118 — it is a VERIFICATION-CLASS fact, not a game fact; S-C12 flagged it)
 - OBJ record formats differ in ENTRY STRIDE, not just header meaning
@@ -67,8 +67,9 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - THE ENGINE CLAMPS THE FIGHTERS TO 336 px APART — a wider position poke is pulled back the same frame, and a "whiff" leg for a travelling move does not exist (paid: 14z-146)
 - VS2 RETUNED VICTOR'S HITSTUN HEAD HURTBOX, AND GAVE NEARLY EVERY CHARACTER'S BOXLESS HELD POSE A PUSH BOX — no legacy character carries the same data in both games (measured: 14z-164)
 - THE HIT STAGER PAYS METER TO WHOEVER IS REGISTERED, AND ONLY A HIT THAT REGISTERS ITSELF GETS IT RIGHT — the collision walk leaves the pair as (P2, P1) (measured: 14z-166)
+- P+K IS A DIFFERENT MODE ON vs2 AND vsav — a newcomer's Dark Force is compared against its vs2 EX move, never against vs2's P+K (paid: 14z-168)
 
-## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 106 entries
+## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 108 entries
 
 - A MAME BREAKPOINT CONDITION THAT DOES NOT PARSE SETS NO BREAKPOINT — `l@` is not a size, and the probe reports a clean zero (paid: 14z-93, #92)
 - A 1-BYTE MEMORY TAP MISSES WORD ACCESSES ON THIS 16-BIT BUS — and reads as a clean, meaningless zero (paid: 14z-126b)
@@ -176,8 +177,10 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - MAME READS THE USER'S OWN `mame.ini` EVEN UNDER `-homepath` — every harness leg inherits what that file sets (found 2026-09-15, 14z-158, gating the README's recording command; nothing paid)
 - MAME 0.288'S 68000 CORE HAS NO `A7` STATE, AND ITS `SP` IS THE SUPERVISOR STACK — a Lua stack read in user-mode code walks the idle stack (paid: 14z-85g as "constant garbage ret on every hit", named 14z-158)
 - A NON-DEBUG WRITE TAP ON A FIELD WRITTEN MANY TIMES A FRAME CRASHED MAME — sample such a field instead (paid: 14z-167)
+- MAME 0.288'S LUA HAS NO SCREEN `vpos`/`hpos`, AND A SCRIPT THAT ERRORS BEFORE REGISTERING ITS FRAME CALLBACK RUNS MAME FOREVER (paid: 14z-168)
+- A `-debug` LOGGING BREAKPOINT DRIFTED THE INPUT PLAYBACK AND HID THE DIVERGENCE IT WAS PLACED TO EXPLAIN (paid: 14z-168)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 222 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 225 entries
 
 - A NEW ANCHOR DOCUMENT FOR A SKILL IS A TWO-REPO EDIT — the harness's consumer config carries its own copy of the skills lock's document list (paid: 14z-163, GitHub #152)
 - A COMMIT SUBJECT THAT NAMES AN ISSUE AFTER A CLOSING KEYWORD CLOSES IT ON PUSH — and the close is attributed to the PUSHING account, not measured (paid: 14z-162, GitHub #151)
@@ -401,3 +404,6 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A WORD COUNTER SAMPLED AS A BYTE READS ITS HIGH BYTE — and a flat trace field then "excludes" the very mechanism it belongs to (paid: 14z-167, GitHub #159, rule-checker run 2026-09-18-42 Q3)
 - A BYTE-ONLY MASK FILTER ON A TAP DROPS WORD STORES TO THE SAME BYTE (paid: 14z-167, rule-checker run 2026-09-18-41 Q1)
 - A NEW GATE THAT READS A DECRYPTED VIEW TAKES IT FROM THE CACHE HELPER — `test_decrypt_cache` fails a direct decrypt (paid: 14z-167)
+- A DIFF AFTER A DIFF IN ITS PART IS NOT A FINDING OF ITS OWN — attribute coupled rows by ABLATION (paid: 14z-168, #136)
+- A MOVE THE RIG NEVER LANDS READS IDENT ON BOTH LEGS — the parity table cannot see what the rig does not do (paid: 14z-168, #136)
+- THE MAINTAINER'S MOVE LISTS NAME THE VAMPIRE SAVED MOVE — in vs2 the same name may be a different input (paid: 14z-168)

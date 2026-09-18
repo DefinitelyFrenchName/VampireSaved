@@ -27,6 +27,34 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-18 (14z-168) — no gauge is built during Dark Force: the tenants' `+0x1C3` readers are a defect
+
+**Ruling (verbatim):** to the measurement that the shells gain nothing from a whiffed attack inside Dark Force Change while the tenants gain +6 (their placed copy of vs2's meter adder tests vs2's Power field `+0x1C3`), and to the question *"What is the swing-meter you are referring to?"* answered as the start-up gauge of an attack, the maintainer: *"I see, it makes sense that you can't build meter during DF"*.
+
+**What it means.** The shells' behaviour is the rule; the tenants' swing gauge in the mode is a defect, filed on GitHub #157 (its Dark Force tail, the same placed `x028122` copy). The other placed readers of vs2's Power fields (44 on merged-m18, `tests/test_df_field_readers.sh` — *corrected 14z-168 before this entry was committed: 44 placed instructions, of which 26 are reads, all of `+0x1C3`, and 18 writes*) are candidates of the same class, each to be measured before any is changed. Frozen AS MEASURED: `tests/audit_df_meter.sh`.
+
+## Ruled 2026-09-18 (14z-168) — the tenants' vs2 EX route into Dark Force is DISABLED on our build
+
+**The question as put:** *"The EX route on our build. Keep it, or disable the EX input so P+K is the only way in? My recommendation is to disable it. As it stands it's a second, longer Dark Force for the same one stock, and you described the move as mapped onto DF 'and not being a separate EX move'. Disabling it is a gameplay change, so it's yours to decide."* **Ruling (verbatim):** *"agreed"* (with the next sentence: *"you can also find the community vanilla dark force values in the community docs"*).
+
+**What it means.** On merged-m18 the tenants' vs2 EX inputs (Donovan 421+KK, Phobos 263+PP, Pyron 2623+PP, measured) still run the placed copy of vs2's Change entry `0x02622A`: one stock, period 5, 478/496/478 frames of `+0x111`, the Dark Force flag and background (`tests/audit_df_modes.sh`, frozen AS MEASURED). The fix is scheduled by #136's ruled order (analysis first) and tracked as its own ticket; it re-freezes the `ex ours` rows deliberately.
+
+## Ruled 2026-09-18 (14z-168) — the tenants' Dark Force: vsav's Change with their own vs2 values and personal move; the DURATION stays vsavj's
+
+**The design, in the maintainer's words (verbatim):** *"VS2's dark force power costs 2 meters instead of 1, has no invincibility at startup, is a global buff, has no specific moves while VS dark force (sometimes called dark force change) is a character altering ability with startup invincibility. The only common trait in Dark Force Power and Dark Force Change is the background change and timer but we don't really care about them because in Vampire Saved we leverage the VS dark force change as-is. This leads to the two things we care about : 1) the startup invicibility, which you found in VS2 for the 3 tenants, although it is unreacheable in VS2 since Dark Force Power overrules it for every character (but please double check this!) and 2) the "character-altering" move during dark force change, and they do exist in VS2 but as EX moves. [...] What we did in Vampire Saved is threefold: have the new tenants use the VS Dark Force Change like their shell would (same common DF rules) but use the invincibility values recovered from VS2 instead of using the shell characters value AND have their character altering move activated at the start of DF for the duration of DF, like all the other vanilla characters... except that you had to map the move from VS2 to being activated during DF and not being a separate EX move."* — and: *"at least in principle you implemented it right as Dark Force works as intended for all 3 tenants. That doesn't mean the details and specific values might not be incorrect. But the mechanism is working as expected."* — and: *"we need to check if DF in Vampire Savior has the same timer duration for all characters. If so it's a global setting and it takes precedence as vanilla VS trumps VS2."* — and, on Phobos's hover in DF: *"YES! (and again, the move exists in VS2 but as an EX move, not as DF)"*.
+
+**The double checks, measured (`tests/audit_df_modes.sh`):** vs2's P+K never arms `+0x147` on any of the 15 characters its wheel reaches — but the tenants' vs2 EX moves DO arm it, with the same values (the "unreachable" reading holds for P+K only; `engine_internals.md` corrected in place). vsav's Dark Force duration is NOT global: 112 timer units x a per-character period (3 or 4 ticks, from a 32-row table; 4 for the tenants' rows) plus each character's own form — 269 to 540 frames of `$FF802E` at level 6.
+
+**The question as put:** *"Mode duration. Keep the ruled vsavj period 4 (360 frames), or take vs2's period 5 for the tenants (about 450)? My recommendation is to keep the ruling: it's Vampire Savior's per-character rule, and 'vanilla wins ties'."* **Ruling (verbatim):** *"agreed"*.
+
+**What it means.** The 2026-08-21 ruling ("keep vsavj DF durations") stands, reaffirmed with the measurement: the tenants keep 360/377/360 (`tests/audit_df_framework.sh`). A newcomer's Dark Force is compared against its vs2 EX move, never against vs2's P+K (`docs/game/gotchas.md`, the 14z-168 entry).
+
+## Ruled 2026-09-18 (14z-168) — #136: ALL the analysis first, then the fixes, then relentless regression testing
+
+**Ruling (verbatim), at the opener:** *"let's start with #136. While I usually prefer to fix first, here we have many divergences which may or may not share sources so let's finish all the analysis first. Then we'll fix and then relentlessly test for regressions, so all the rigs we create to test the build against vsavj or VS2 will be valuable at least at freeze/release time."*
+
+**What it means.** No #136 fix lands before every family is attributed; every instrument built for the analysis becomes a gate that runs at freeze and release (the eight 14z-168 gates, registered in `tests/ci_emulator.tsv` / `tests/ci_static.txt`). The fixes #157, #159 and the new tickets wait for the analysis to be complete.
+
 ## Ruled 2026-09-18 (14z-167b) — the close checklist lives in STATE.md's header
 
 **Ruling (verbatim):** to the recommendation "It needs a ruling on where the checklist lives. I recommend STATE's header, beside the existing close rules", the maintainer: *"I agree"*.
@@ -60,6 +88,20 @@ The six steps are ruled and applied from the next close. Open: which document ca
 6. **DOCUMENTATION PACKET.** The rule-checker reads the sitting's STATE group and the documents it names, against the claim that every finding has a home (each listed), before the close commit. TRIAL: run `2026-09-18-44` — plant caught; **VIOLATED Q1 Q4, every finding true**: two findings of 14z-167 still had no home (P2's x not being a compared field; the run-id collision), a home was mis-cited, gate headers had to count as live documents, and item 2's prototype proves an ADDRESS present but not the FINDING (an address older text already names homes any new finding about it, `$FF8081`) and had no control. Resolved by work: both homed, a gotcha added, the prototype now reads gate headers and carries `--selftest`. Cost: two fresh agents, the real reader 2 min 43 s. **What the trial shows: 6 finds what 2 cannot, so 2 is necessary, not sufficient, and 1 (the table) stays the sufficient check.**
 
 **Ruling needed: where the checklist lives.** (a) STATE.md's header, beside the rollover and push rules that already carry the close ritual; (b) the `vampire-saved-port` skill's close section; (c) CLAUDE.md [VSP-17], if it should be law. **Recommendation:** adopt 1, 3 and 4 now; adopt 2 as a close step (cheap, necessary, not sufficient — its blind spot is stated in the tool), and make it a `ci_static` gate on the newest group once three closes show no false positive; adopt 5 as a rule; adopt 6 at every close with its verdict resolved like any run. Home: (a).
+
+## Ruled 2026-09-17 (14z-164b) — the in-DF batteries need a RIG change (the words recovered 14z-168)
+
+- **Put to the maintainer at the 14z-164 close (2026-09-17T18:22Z):** *"Also open from today: the
+  in-DF batteries outrun the 360-frame Dark Force, so in-DF coverage is 5LP and 5MP only; that needs
+  a rig change, not a comparator change."* **The maintainer:** *"agreed and this should be in
+  next_session.md"*.
+- **Recorded late.** The 14z-164 close recorded only that the item went into NEXT_SESSION "with the
+  maintainer's agreement", without the words. Rule-checker run `2026-09-18-47` (Q5) found a gate
+  citing the agreement with no quote. The words above are recovered verbatim from that sitting's
+  session transcript, 14z-168.
+- **What it covers:** that the in-DF coverage is fixed in the RIG. It does not cover the rig's
+  form. The per-group re-activation that `tests/audit_df_moves.sh` uses was designed 14z-168 and is
+  not ruled.
 
 ## Ruled 2026-09-17 (14z-164b) — the parity rigs' P2 is DEMITRI, Bishamon the fallback
 
@@ -2534,7 +2576,7 @@ needed) and the CLAUDE.md condensing pass (pass 2 done 14z-124).
   vanilla values measured and frozen too (`tests/expected/df_startup_invuln.tsv`,
   gate `tests/audit_df_startup_invuln.sh`; engine_internals "Dark Force" ->
   "The STARTUP INVINCIBILITY window"). Natively on vs2: no window at all
-  ([VSE-69]). Retuning a tenant is one data byte in its ported handler, if
+  ([VSE-69]). *[CORRECTED 14z-168: no window from vs2's P+K (Dark Force Power, all 15 characters); the tenants' vs2 EX moves DO arm these windows natively — `tests/audit_df_modes.sh`, "Ruled 2026-09-18 (14z-168) — the tenants' Dark Force" above.]* Retuning a tenant is one data byte in its ported handler, if
   ever wanted. The original entry follows. **RECORDED, not started — and it is THE NEXT ARC
   (maintainer, 2026-08-31: the DF question first, then the Zabel j.LK patch,
   then Jedah's crouching recovery).** THE MAINTAINER SHARPENED IT (2026-08-31):
