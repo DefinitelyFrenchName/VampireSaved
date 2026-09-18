@@ -364,3 +364,7 @@ tests/test_df_field_readers.sh	character-data
 tests/test_defense_rows_census.sh	character-data
 tests/audit_df_moves.sh	character-data
 tests/audit_df_field_readers_live.sh	character-data
+tests/test_reaction_classes.sh	character-data
+tests/audit_reaction_class_live.sh	character-data
+tests/audit_defense_row_reads.sh	character-data
+tests/audit_crouch_flag.sh	character-data

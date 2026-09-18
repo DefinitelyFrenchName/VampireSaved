@@ -17,16 +17,21 @@
 # +0x189 = 5) and arm each tenant's own +0x147 from its own vs2 handler — so the
 # "shipped but never reached" reading of 14z-126 is wrong for the three tenants
 # (docs/game/engine_internals.md, Dark Force). Our build still honours those EX
-# inputs as well as P+K (maintainer-ruled 2026-09-18: disable the EX route).
+# inputs as well as P+K. The maintainer, asked (2026-09-18) "Keep it, or disable the EX
+# input so P+K is the only way in? My recommendation is to disable it.", answered "agreed"
+# (DECISIONS_HISTORY.md "Ruled 2026-09-18 (14z-168) — the tenants' vs2 EX route into Dark
+# Force is DISABLED on our build").
 #
 # WHAT IT FREEZES (tests/expected/df_modes.tsv), one row per leg:
 #   <mode> <leg> <id> stock=<before>-><after> seq16=<frames in seq 0x16>
 #       arm=<+0x147 arming value@writer PC | none> timer=<+0x176 init@writer PC | none>
 #       dec=<+0x176 decrement writer PC | none> span111=<frames +0x111 held | none>
-#       flag=<frames $FF802E held | none>
+#       flag=<frames $FF802E held | none> pow=<frames vs2's Power flag +0x1C3 held | none>
 #   mode: power (vsav2, P+K), change (vsavj and ours, P+K), ex (vsav2 and ours, the
 #   tenant's vs2 EX input: Donovan 421+KK, Phobos 263+PP, Pyron 2623+PP — measured
-#   14z-168, the maintainer to confirm the exact inputs)
+#   14z-168; the maintainer, 2026-09-18 (14z-169): "as far as I know these are the
+#   correct inputs in VS2, and given you were able to trigger the moves for the comparison
+#   we made last session I assume they are indeed correct")
 # Legs: vsav2 ids 00 01 03 04 05 06 07 08 0c 0d 0e 0f 10 11 13 (P+K); vsavj ids
 # 00-0a 0c-0f (P+K); ours 01 10 11 13 (P+K); vsav2 and ours 10 11 13 (EX). Every
 # pick is the REAL cursor path (tools/select_paths.py on each game's decoded wheel),
@@ -34,7 +39,14 @@
 # activation frame (3260), idle after, 3 stocks poked at 3100/3120, the speed level
 # pinned to 6 from 2000 and the RNG from 2363 (the parity gate's pins).
 #
-# WHAT IT DOES NOT COVER: which inputs are the vs2 EX moves' canonical ones; what
+# THE POWER FLAG (+0x1C3, added 14z-169, item 3 of the #136 fixes' analysis): vs2's Power
+# sets it and the tenants' ported code reads it at 26 placed sites (tests/test_df_field_readers.sh)
+# — the meter adders, the Change entry's "not during Power" test, Phobos's powered specials
+# (+0x106 = 0x1A) and a per-move latch (+0x19C) the tenants' own code tests later. Our build never
+# sets it, so every one of them reads 0; the `pow` column says what the REFERENCE reads while the
+# tenant is in its vs2 EX mode. POSITIVE CONTROL: every power row must hold it (a trace of an
+# address that is not +0x1C3 would read 0 everywhere and pass the rest).
+# WHAT IT DOES NOT COVER: whether other inputs also reach the vs2 EX moves; what
 # the modes DO beyond their fields (the altered attacks — the next #136 rig);
 # Sasquatch's alternate DFs; P2-side activations.
 #
@@ -61,7 +73,7 @@ ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 FR=3900
 PK="3100:ff8509:03;3120:ff8509:03;$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$FR)))");$(python3 -c "print(';'.join(f'{f}:ff80d4:0000' for f in range(2363,$FR)))")"
-FIELDS="ff802e:b:df,ff8509:b:stock,ff8406:b:seq,ff8511:b:f111,ff8782:b:id"
+FIELDS="ff802e:b:df,ff8509:b:stock,ff8406:b:seq,ff8511:b:f111,ff8782:b:id,ff85c3:b:pow"
 # the tenants' vs2 EX inputs, as replay lines relative to the activation frame (measured 14z-168)
 ex_lines() {  # ex_lines <id> <t>
     case $1 in
@@ -131,7 +143,7 @@ def span(k):
     return str(on[-1] - on[0] + 1) if on else "none"
 print(f"{m}\t{g}\t{want}\tstock={d[3250]['stock']}->{d[3400]['stock']}\tseq16={seq16}\tarm={','.join(arm) or 'none'}"
       f"\ttimer={','.join(tinit) or 'none'}\tdec={','.join(f'{p}x{n}' for p, n in sorted(dec.items())) or 'none'}"
-      f"\tspan111={span('f111')}\tflag={span('df')}")
+      f"\tspan111={span('f111')}\tflag={span('df')}\tpow={span('pow')}")
 PY
 }
 
@@ -173,18 +185,24 @@ EOF2
 done
 [ "$fail" = 0 ] || { echo "FAIL: audit_df_modes (a leg did not run or was VOID)"; exit 1; }
 ok "$(wc -l < "$W/got.tsv" | tr -d ' ') legs reduced"
+# POSITIVE CONTROL on the +0x1C3 read (14z-169): vs2's P+K is Dark Force Power, which sets it
+_np="$(awk -F'\t' '$1=="power" && $NF=="pow=none"' "$W/got.tsv" | wc -l | tr -d ' ')"
+[ "$_np" = 0 ] && ok "positive control: +0x1C3 is held on every vsav2 P+K (Power) leg" || bad "$_np vsav2 P+K leg(s) never hold +0x1C3 — the Power flag is not being read"
 sed 's/^/  /' "$W/got.tsv"
 
 echo "== 3. the frozen rows"
 if [ "${FREEZE:-0}" = 1 ]; then
+    [ "$fail" = 0 ] && [ -z "$CONTROL" ] || { echo "FAIL: audit_df_modes (not frozen: fix the red first, no control)"; exit 1; }
     {
         echo "# tests/expected/df_modes.tsv — Dark Force Power vs Dark Force Change, every selectable character (tests/audit_df_modes.sh;"
         echo "# tests/lua/field_trace.lua + tests/lua/read_tap.lua over +0x146..+0x177, non-debug). Evidence class: in-emulator."
-        echo "# Frozen 14z-168 with FREEZE=1 (GitHub #136). vsav2's P+K is DARK FORCE POWER (two stocks, seq 0x16 never held, +0x147"
+        echo "# Frozen 14z-168 with FREEZE=1 (GitHub #136); re-frozen 14z-169 with the pow column. vsav2's P+K is DARK FORCE POWER (two stocks, seq 0x16 never held, +0x147"
         echo "# never armed); vsavj's and ours' is each character's DARK FORCE CHANGE; the tenants' vs2 EX input reaches their Change"
         echo "# handler on BOTH games (period 5, 479/509 frames of +0x111). THE EX ROUTE ON OUR BUILD IS FROZEN AS MEASURED — the"
-        echo "# maintainer ruled it disabled (2026-09-18); that fix re-freezes the ex/ours rows DELIBERATELY."
-        echo "# Columns: mode, leg, id, stock, seq16, arm, timer, dec, span111, flag (frames at speed level 6)"
+        echo "# maintainer, asked \"Keep it, or disable the EX input so P+K is the only way in?\", answered \"agreed\" (2026-09-18,"
+        echo "# DECISIONS_HISTORY.md); that fix re-freezes the ex/ours rows DELIBERATELY."
+        echo "# Columns: mode, leg, id, stock, seq16, arm, timer, dec, span111, flag, pow (frames at speed level 6; pow = vs2's Power"
+        echo "# flag +0x1C3, the column added 14z-169)"
         echo "#--"
         cat "$W/got.tsv"
     } > "$EXPECT"

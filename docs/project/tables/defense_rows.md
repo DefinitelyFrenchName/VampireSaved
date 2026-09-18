@@ -21,7 +21,11 @@ exactly 2 rows at every attacker column (±1 on throws, +2 on Demitri's 5HP
 against Phobos, +1 on Victor's 5HP). The damage code reads the victim's own
 row (full id), so rows 0x10/0x13 are the tenants' own storage and no legacy
 character reads them — the possible data-only route (the 14z-118 port_param32
-pattern); the threshold read's index is NOT yet measured.
+pattern); ~~the threshold read's index is NOT yet measured~~ **both reads' indexes MEASURED
+14z-169 (`tests/audit_defense_row_reads.sh`): over the whole corpus — the naming victim and
+attacker parts and every suite replay on our build, every suite replay on pristine vsavj — each
+defense and threshold read took the VICTIM'S OWN id, tenants included (Donovan 394 hits, Phobos
+38, Pyron 28), identified by the hitbox base `+0x60`, never by `+0x382`.**
 
 ## What this covers
 
@@ -98,8 +102,8 @@ EOF
 Option (a) of 2026-08-14, now the ruled change. The recipe below was written in 2026-08 and
 proposes reader-site thunks. Since 14z-168 a DATA-ONLY route is the candidate: both reads index by
 the victim's id byte (`docs/game/engine_internals.md`, the defense port note), so rows and
-threshold bytes 0x10/0x13 are the tenants' own storage. It must first be measured that every
-hit on a tenant victim reads them. The maintainer's condition: no new frame of lag from the
+threshold bytes 0x10/0x13 are the tenants' own storage. ~~It must first be measured that every
+hit on a tenant victim reads them.~~ Measured 14z-169 (above): every hit in the corpus does. The maintainer's condition: no new frame of lag from the
 combined fixes, and no change to any legacy character. The 2026-08 recipe, kept as written:
 
 1. **Shape:** a variant-gated table extension on the

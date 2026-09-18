@@ -6,6 +6,8 @@
 declares	audit_capture_matrix
 declares	audit_clone_beam_lines
 declares	audit_column_shock
+declares	audit_crouch_flag
+declares	audit_defense_row_reads
 declares	audit_defense_row_residue
 declares	audit_df_accumulator
 declares	audit_df_dead_family
@@ -31,6 +33,7 @@ declares	audit_move_parity_attribution
 declares	audit_pass_overrun
 declares	audit_pyron_ring
 declares	audit_qs_voice_wav
+declares	audit_reaction_class_live
 declares	audit_rig_opening
 declares	audit_stock_emulator_stall
 declares	audit_tech_roll
@@ -94,6 +97,7 @@ declares	test_pod_black_foot_palette
 declares	test_poked_legs
 declares	test_pyron_medallion_2p
 declares	test_random_select_tenants
+declares	test_reaction_classes
 declares	test_readme_recording
 declares	test_reconcile_matcher
 declares	test_ref_rot_image_pick

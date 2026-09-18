@@ -9,24 +9,25 @@
 
 ## THE MAINTAINER'S ORDER (ruled 2026-09-17/18): all the analysis first, then the fixes, then relentless regression testing — every rig a gate. The fixes are RULED (standing lines in STATE; verbatim in `DECISIONS_HISTORY.md`), under one condition: *"the total overhead cost of our combined changes is less than 1/60s at all times"* — no new zero-pass frame (`$FF8081`, `tests/audit_pass_overrun.sh`) over the corpus against the build before them.
 
-## START HERE — the analysis the fixes still need (measure, then design)
+## START HERE — the analysis is done (14z-169); the fixes' DESIGNS go to the maintainer before any byte moves
 
-1. **Defense rows (ruled: take vs2's rows).** Both damage reads index by the victim's
-   `+0x382` (`docs/game/engine_internals.md`, the defense port note), so a data-only
-   edit of rows and thresholds 0x10/0x13 is possible. Measure first that EVERY hit on
-   a tenant victim, over the corpus, reads the tenant's own row and byte (a read watch
-   on both tables; `+0x382` is the voice-flavor class in a match).
-2. **The class-0x52 rule (ruled: the column shock and the Plasma Trap).** vsavj routes
-   class 0x38 to the same shock handler as 0x06, with the same property byte (the
-   column paragraph). Before it can be the discriminator: a census of class 0x38 in
-   EVERY legacy attack and projectile record (make it a gate; it also carries the
-   reaction-table facts, today a static read only), then the thunks' cost.
-3. **The other placed reads of vs2's Power flag `+0x1C3`:** 23 besides the three meter
-   adders, 4 executed by the corpus (`tests/audit_df_field_readers_live.sh`) — each to be
-   measured before #157's Dark Force tail is fixed.
-4. **The EX route (ruled: disable it)** and **no gauge in Dark Force** (#157's tail).
-   The vs2 EX inputs in use (421+KK, 263+PP, 2623+PP) are my measured candidates; the
-   maintainer offered to confirm them.
+Measured this sitting (STATE 14z-169): (2) a record remapped to 0x38 cannot be the 0x52
+discriminator — the stager rewrites it to 6, Victor carries 0x38, the guard lists it — but
+`+0x54` = 0x38 is produced by nothing in vanilla and read by every consumer as 6 (vs2's 0x52
+role); (1) every defense read indexes the victim's own id, so the defense-row fix is data-only;
+(3) of the 26 `+0x1C3` readers only the three meter adders play differently.
+
+1. **Put the four fix designs to the maintainer** (plan before building): the 0x52 rule through
+   a class dead in legacy whose three stager rows point at a stub writing 0x38 and vsavj's 7/8
+   handlers, with `reaction[0x38]` (reached by nothing in vanilla) repointed at a copy of vs2's
+   shock handler without the attacker write — zero legacy cycles; the alternative is native 0x52
+   records through the existing `reaction_hook` plus a reaction-dispatch hook (cycles on every
+   hit). Defense rows: vs2's rows into rows/thresholds 0x10/0x13, data only. The gauge: the
+   three adder copies' `tst.b $1c3` -> `tst.b $111`. The EX route: still to design — measure
+   what the vs2 EX input does on our build when the route is refused.
+2. **Before the 0x52 design is built:** choose the class by census (no legacy record, no guard
+   list, no tenant record, its stager rows dead in the corpus) and add it to
+   `tests/test_reaction_classes.sh`.
 
 ## THEN FILE THE TICKETS (drafts in `build/p136_14z168/gh/`, written before the 2026-09-18 rulings — update them): the column shock + Plasma Trap (the 0x52 rule), the EX route, the defense rows; comments on #136 and #157. As `mechanyaa-ai`, rule-checker (`recommendation`) first, `tools/tickets.py refresh`.
 

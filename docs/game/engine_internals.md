@@ -527,7 +527,9 @@ PC 0xCE38A = vs2 0x2713C + port offset):
 ### The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix)
 
 The victim's reaction class `+0x54` (record `+0x17`, "Hitboxes and attack
-records") reaches a FAMILY of sub-state dispatchers ("The SUB-STATE
+records"; precisely: the RECORD's class is what these dispatchers index, and their
+handlers are what WRITE `+0x54` — as the class itself or a constant, measured 14z-169,
+"The licence covers the class" below) reaches a FAMILY of sub-state dispatchers ("The SUB-STATE
 DISPATCHER FAMILY at 0x018460"): dispatcher 1 `PRG:0x018460` (80-entry word
 table `0x018468`), dispatcher 2 `PRG:0x018508` (80 entries) and a third at
 `0x0185DA`. vs2's twins (dispatcher 2 = `0x016DDC`, table `0x016DE4`) carry
@@ -3196,12 +3198,61 @@ vsavj's own values (victim 0x18, attacker 0x0B). They run on EVERY hit that reac
 `0x23AC8`, legacy electric hits included. vsavj's reaction table holds 80 classes
 (0x00-0x4F) and routes TWO of them to `0x23AC8`, **0x06 and 0x38**; their property
 bytes (the data view at `0x28D00`, read through a pc-relative `lea`) are both 0x0F.
-So a record remapped to 0x38 instead of 0x06 would reach the same handler and the same
+~~So a record remapped to 0x38 instead of 0x06 would reach the same handler and the same
 install, with the victim's `+0x54` naming it apart from Lightning Sword's 0x06 — a
 candidate discriminator for vs2's 0x52 rule, NOT yet safe: whether any legacy record
 carries class 0x38 is unmeasured (a census over every character's attack and
 projectile records), and the cost against the maintainer's combined budget (no new
-frame of lag at any time) is unmeasured.
+frame of lag at any time) is unmeasured.~~ **RETRACTED 14z-169 — a record remapped to
+0x38 would NOT be told apart, and the guard decision would treat it differently (below).**
+
+**The class reaches the reaction table only through a STAGER, and the stager rewrites
+it (measured 14z-169; `tests/test_reaction_classes.sh`, static, both games and our
+build; `tests/audit_reaction_class_live.sh`, every write and read of `+0x54` over the
+legacy suite on pristine vsavj and the #136 parts on ours and native).** Before the
+reaction, the record's class byte is dispatched by one of three stager tables — the
+sub-state dispatchers above (ground `0x018468`, air `0x018510`, KO `0x0185DA`) — and the
+handler writes the victim's `+0x54`: the class itself (the copy handler `0x01868C`) or a
+constant. vsavj's ground stager writes **6 for both 0x06 and 0x38** (one handler,
+`0x0186D0`), its air stager 7 for 0x06/0x07/0x38, its KO stager 8 for
+0x06/0x07/0x38/0x39/0x48. No stager handler in either game writes 0x38, no
+`move.b #imm,$54(An)` in either game's code does, and none of the 149 tapped runs did.
+So on vsavj **nothing produces `+0x54` = 0x38** — Victor's one 0x38 record (both games)
+reacts as 0x06. vs2 differs from vsavj in exactly two places for its column: its GROUND
+stager writes 0x52 for 0x52 (`0x016FEC`; the air and KO stagers fold 0x52 into 7 and 8
+like everything else), and its shock handler `0x22656` is vsavj's `0x23AC8` plus ONE
+test, `cmpi.b #$52,$54(a6); beq`, around the attacker's freeze write — so natively the
+exemption applies to a GROUNDED victim only. Measured on the parts: native writes 0x52
+at `0x016FEC` on four parts (the column and the trap) and 0x4E at `0x016FE4` on one
+(Lightning Sword); ours writes 6 at `0x0186D0` on the same four.
+**Who consumes `+0x54`, and why 0x38 there is neutral:** it is compared against
+constants at 80+ sites in each game and never against 0x06, 0x07, 0x08, 0x38 or 0x4E
+(vs2: 0x52 once, the test above); the three per-class tables it indexes into `+0x26`
+(vsavj `0x028BE0/0x028C40/0x028CA0`, by `+0x0A`/`+0x1A8`, read at `0x027D46`) hold the
+same byte for 0x06 and 0x38 (and vs2's for 0x52); the property map holds 0x0F for all;
+the two character-code compares of the attacker link's `+0x54` against `+0x375`
+(`0x03D12C`, `0x03D1EC`) can match neither, `+0x375` being written only with 0x1B,
+0x20-0x23, 0x34, 0x35, 0x3E, 0x3F. So **`+0x54` = 0x38 on vsavj reacts exactly as 0x06
+— the role 0x52 plays on vs2** — while nothing in vanilla produces it.
+**0x38 IN THE RECORD is not neutral:** the guard decision (`0x0182E8`-`0x0183E4`,
+before the stager) sends record classes 0x02, 0x03, 0x38 and 0x39 to the HIT path
+when the victim's crouch flag is 0, where 0x06 and vs2's 0x52 are in neither of its lists
+(the branch is the victim's `+0x121`, the crouch flag: 1 exactly while Down is held,
+measured on both games, `tests/audit_crouch_flag.sh`; with it set, 0x2C 0x37 0x42 0x48
+0x4A 0x4D take the hit path). That these are the lows and the overheads is a reading of
+the code: neither a hit of such a record against a guard nor a capture was run (rule-checker run 2026-09-18-51 Q2). And our build already carries vs2's shock handler, 0x52 test
+included, inside Huitzil's placed copy of vs2's reaction region (`x022400@huitzil`,
+`PRG:0x41BD66` on merged-m18 — a placed address, moving with a freeze); no run of the
+corpus executes it. And two placed STAGER windows already write 0x52 into `+0x54` for a
+record of class 0x52 on a grounded victim — the `reaction_hook` (`donovan.toml`, sessions
+11/14w-c/14z-110: vs2's cases 0xA0-0xA6 for dispatchers 1 and 2, `case_a4` =
+`move.b #$52,$54(a1)`) and `index_window_018468` — while vsavj's REACTION table has no entry
+0x52: so a class-0x52 record would reach the reaction dispatch with an out-of-range class. That
+is why the column's and the trap's records carry 0x06 (14z-33, 14z-85g(2)); no record on
+merged-m18 carries 0x50-0x53 (`tools/audit_fsm_census.py`: 0, signature-bounded) and no
+corpus run executes either writer (`tests/audit_reaction_class_live.sh`). What these facts leave for the fix's design, and the cost against
+the maintainer's combined budget (no new frame of lag at any time), is not measured
+here.
 
 **Multi-hit accounting — THE RE-HIT RULE, MEASURED (14z-146,
 `tests/test_rehit_ring.sh`; atlas rows `+0x6C`, `+0x70`, `+0x08`):** the hit
@@ -3246,8 +3297,15 @@ and threshold bytes 0x10/0x13 are the tenants' own storage — a data-only chang
 possible (the 14z-118 port_param32 pattern). The caution: in a match `+0x382` is the
 voice-flavor class, which the engine can reassign (14z-87); the tenants' class byte
 holds their own id since the 14z-87 fix (`tests/audit_voice_borrow.sh`, own-class), and
-the 14z-145 read watch saw the tenant rows indexed — but that EVERY hit on a tenant
-victim reads the tenant's rows is unmeasured over the corpus. (Pyron's rows are
+the 14z-145 read watch saw the tenant rows indexed — ~~but that EVERY hit on a tenant
+victim reads the tenant's rows is unmeasured over the corpus~~ **MEASURED 14z-169
+(`tests/audit_defense_row_reads.sh`): every read of both tables over the corpus indexed the
+VICTIM'S OWN id** — the victim identified by its hitbox base `+0x60`, never by `+0x382` —
+on our build (the 12 naming victim parts, the 30 attacker parts, every suite replay
+including the 1P CPU matches where the voice-class borrow runs: Donovan 394 hits,
+Phobos 38, Pyron 28) and on pristine vsavj (15 legacy characters, every suite replay).
+No legacy victim read another id's row. What it does not show: paths the corpus does not
+run. (Pyron's rows are
 identical between the games — unaffected either way.) **Its observable,
 measured 14z-145:** the ±1 damage residue of `audit_tenant_throw_geometry`
 (victims 0x10 +1, 0x13 −1, 0x0A −1) is this row — `d3 =
@@ -3980,7 +4038,7 @@ Ray of Doom, Shining Gemini) active for the whole mode.
   windows (64 / 79 / 41) and run period 4 (their table rows): 388 / 405 / 388
   frames of `+0x111`.
 - **vsav2, the tenants' EX input** (Donovan 421+KK, Phobos 263+PP, Pyron
-  2623+PP — measured; the maintainer to confirm the canonical inputs): one
+  2623+PP — measured; the maintainer, 2026-09-18 (14z-169): *"as far as I know these are the correct inputs in VS2, and given you were able to trigger the moves for the comparison we made last session I assume they are indeed correct"*): one
   stock; vs2's own **Change entry `0x02622A`** sets `+0x111`/`+0x110`,
   `+0x143` = 0x14, `+0x176` = 0x70 (at `0x02623C`) and a **CONSTANT** period
   `+0x189` = 5 (`+0x188` = 0x23); each tenant's own vs2 handler arms `+0x147`
@@ -4032,7 +4090,9 @@ byte-identical in the two games but for its mode test — vsavj `tst.b $111(a6)`
 vs2 `tst.b $1c3(a6)`. Inside Change the shells gain NOTHING from a whiffed
 attack; the tenants gain +6, because each tenant's `x028122` copy carries vs2's
 adder and `+0x1C3` is never set by Change (measured: 1 throughout vs2's Power, 0
-throughout ours' Change). The maintainer: *"it makes sense that you can't build
+throughout ours' Change; frozen since 14z-169 as the `pow` column of
+`tests/audit_df_modes.sh` — 388 frames on every vs2 P+K leg, 297 for Morrigan and
+Lilith, none on every Change leg of either game and on the tenants' vs2 EX). The maintainer: *"it makes sense that you can't build
 meter during DF"* — a defect, GitHub #157's Dark Force tail. The same class
 covers every placed READ of a vs2 Power field. The census
 (`tests/test_df_field_readers.sh`) lists 44 placed instructions naming one on
@@ -4042,6 +4102,18 @@ them), and 18 writes — the placed copies of vs2's Power activation body
 address a fighter block. The #136 corpus executes 7 of the reads and every
 access it makes from placed code is a census row
 (`tests/audit_df_field_readers_live.sh`); one read is measured to change play.
+**What the other 23 reads gate, and why only the gauge plays differently (14z-169):**
+3 are the Change entry's own "not during Power" test (vs2 `0x2617A`, in each tenant's
+`x026142` copy — the route the maintainer ruled disabled); 2 are Phobos's powered
+specials (vs2 `0x551D0`/`0x5540C`: `+0x106` = 0x1A instead of 0x0A under Power); 18 are a
+per-move Power LATCH, `move.b $1c3(a6),$19c(a6)` at a special's start in vs2's shared
+special-move routines (vs2 `0x5799A`...`0x5B594`, placed once per tenant), tested later by
+`tst.b $19c` at vs2 `0x5888C`, `0x588C8`, `0x59F74`, `0x6180A`, `0x62DF4` (also placed per
+tenant) — vsavj has no such latch: no instruction of its image loads or tests `+0x19C` (the census finds three `bchg`/`movep` encodings, twins of three in vs2's image, whose nature is not established). vs2's EX, the
+tenants' Dark Force reference, never sets `+0x1C3` (the `pow` column above), so natively in
+the mode all 23 read 0 exactly as on ours: the powered versions fire in neither. The meter
+adders are the one read whose rule the design changes — natively the EX pays gauge
+because the adder tests Power, and the ruled rule is the shells' (`+0x111`).
 
 **The community cross-check** (Mizuumi's Dark Force table, `../community/`,
 the maintainer's pointer): its Invulnerability column equals our `+0x147` arm

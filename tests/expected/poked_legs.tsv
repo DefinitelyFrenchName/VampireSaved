@@ -7,6 +7,7 @@ tests/audit_clone_beam_lines.sh	ours	replays/df/100_df_clone_beams.rpl	P1	-	01 D
 tests/audit_clone_beam_lines.sh	ours	replays/df/100_df_clone_beams.rpl	P2	R R	03 Victor	03	SAME	
 tests/audit_continue_ladder.sh	ours	replays/26_don_arcade_mash.rpl	P1	U U R	0f Jedah	03	CROSS-INERT	
 tests/audit_continue_switch.sh	ours	replays/26_don_arcade_mash.rpl	P1	U U R	0f Jedah	10	CROSS-INERT	
+tests/audit_defense_row_reads.sh	ours	(replay not named in the script)	P2	-	-	01	?	
 tests/audit_defense_row_residue.sh	native	replays/hui/80_hui_grab_2p.rpl	P1	-	01 Demitri	10 ($ATT)	CROSS-INERT	
 tests/audit_defense_row_residue.sh	native	replays/hui/80_hui_grab_2p.rpl	P2	R R	03 Victor	$vic	PARAM	CROSS-FLAVOR if id in 0x13
 tests/audit_defense_row_residue.sh	ours	replays/hui/80_hui_grab_2p.rpl	P1	-	01 Demitri	10 ($ATT)	CROSS-INERT	

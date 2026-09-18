@@ -1,0 +1,211 @@
+# tests/expected/reaction_classes.tsv — the route of a hit's class from the attack record (+0x17) through the three stager
+# tables (ground / air / KO: what each writes into the victim's +0x54) to the reaction table, for pristine vsavj, vs2 and
+# our merged build (m3b_merged26); the property bytes; the shock handler's shape on each; the legacy record census by
+# class; every constant write to +0x54 (tests/test_reaction_classes.sh; tools/audit_reaction_classes.py). Evidence class:
+# static. Frozen 14z-169 with FREEZE=1. Columns: <game> <kind> <where> <class> <value>.
+# The ours rows follow the build: re-freeze at every freeze, reviewing the diff.
+#--
+vsavj	route	stager_ground	06	#06
+vsavj	route	stager_ground	07	#07
+vsavj	route	stager_ground	08	#08
+vsavj	route	stager_ground	38	#06
+vsavj	route	stager_ground	39	#08
+vsavj	route	stager_ground	48	#08
+vsavj	route	stager_ground	4e	copy
+vsavj	writes38	stager_ground	-	none
+vsavj	copy-count	stager_ground	-	57
+vsavj	route	stager_air	06	#07
+vsavj	route	stager_air	07	#07
+vsavj	route	stager_air	08	copy
+vsavj	route	stager_air	38	#07
+vsavj	route	stager_air	39	#08
+vsavj	route	stager_air	48	#08
+vsavj	route	stager_air	4e	copy
+vsavj	writes38	stager_air	-	none
+vsavj	copy-count	stager_air	-	43
+vsavj	route	stager_ko	06	#08
+vsavj	route	stager_ko	07	#08
+vsavj	route	stager_ko	08	copy
+vsavj	route	stager_ko	38	#08
+vsavj	route	stager_ko	39	#08
+vsavj	route	stager_ko	48	#08
+vsavj	route	stager_ko	4e	copy
+vsavj	writes38	stager_ko	-	none
+vsavj	copy-count	stager_ko	-	34
+vsavj	reaction-to-shock	023ac8	-	06,38
+vsav2	route	stager_ground	06	#06
+vsav2	route	stager_ground	07	#07
+vsav2	route	stager_ground	08	#08
+vsav2	route	stager_ground	38	#06
+vsav2	route	stager_ground	39	#08
+vsav2	route	stager_ground	48	#08
+vsav2	route	stager_ground	4e	#4e
+vsav2	route	stager_ground	52	#52
+vsav2	writes38	stager_ground	-	none
+vsav2	copy-count	stager_ground	-	56
+vsav2	route	stager_air	06	#07
+vsav2	route	stager_air	07	#07
+vsav2	route	stager_air	08	copy
+vsav2	route	stager_air	38	#07
+vsav2	route	stager_air	39	#08
+vsav2	route	stager_air	48	#08
+vsav2	route	stager_air	4e	#07
+vsav2	route	stager_air	52	#07
+vsav2	writes38	stager_air	-	none
+vsav2	copy-count	stager_air	-	41
+vsav2	route	stager_ko	06	#08
+vsav2	route	stager_ko	07	#08
+vsav2	route	stager_ko	08	copy
+vsav2	route	stager_ko	38	#08
+vsav2	route	stager_ko	39	#08
+vsav2	route	stager_ko	48	#08
+vsav2	route	stager_ko	4e	#08
+vsav2	route	stager_ko	52	#08
+vsav2	writes38	stager_ko	-	none
+vsav2	copy-count	stager_ko	-	33
+vsav2	reaction-to-shock	022656	-	06,38,52
+ours	route	stager_ground	06	#06
+ours	route	stager_ground	07	#07
+ours	route	stager_ground	08	#08
+ours	route	stager_ground	38	#06
+ours	route	stager_ground	39	#08
+ours	route	stager_ground	48	#08
+ours	route	stager_ground	4e	copy
+ours	writes38	stager_ground	-	none
+ours	copy-count	stager_ground	-	57
+ours	route	stager_air	06	#07
+ours	route	stager_air	07	#07
+ours	route	stager_air	08	copy
+ours	route	stager_air	38	#07
+ours	route	stager_air	39	#08
+ours	route	stager_air	48	#08
+ours	route	stager_air	4e	copy
+ours	writes38	stager_air	-	none
+ours	copy-count	stager_air	-	43
+ours	route	stager_ko	06	#08
+ours	route	stager_ko	07	#08
+ours	route	stager_ko	08	copy
+ours	route	stager_ko	38	#08
+ours	route	stager_ko	39	#08
+ours	route	stager_ko	48	#08
+ours	route	stager_ko	4e	copy
+ours	writes38	stager_ko	-	none
+ours	copy-count	stager_ko	-	34
+ours	reaction-to-shock	023ac8	-	06,38
+vsavj	property	028d00	-	06:0f,07:0f,08:0f,38:0f,39:0f,48:0f,4e:00
+vsav2	property	027fd8	-	06:0f,07:0f,08:0f,38:0f,39:0f,48:0f,4e:0f,52:0f
+both	shock-handler	023ac8|022656	-	13|15 instructions; vs2-only: cmpi.b #$52, $54(a6) ; vs2-only: beq.b T
+ours	shock-handler	023ac8	-	13|13 instructions vs pristine; vsavj-only: move.b #$18, $5c(a6) ; vsavj-only: move.b #$b, $5c(a4) ; ours-only: jsr T ; ours-only: jsr T
+vsavj	records	reachable	-	1085
+vsavj	records	class>=50	-	9
+vsavj	records	class	06	9 Jedah/fighter:3,Lilith/fighter:1,Victor/fighter:5
+vsavj	records	class	07	8 Felicia/proj:1,Jedah/fighter:1,Victor/fighter:6
+vsavj	records	class	08	12 Jedah/fighter:2,Lilith/fighter:1,Victor/fighter:5,Victor/proj:1,Zabel/fighter:3
+vsavj	records	class	38	1 Victor/fighter:1
+vsavj	records	class	39	1 Victor/fighter:1
+vsavj	records	class	48	4 Victor/fighter:4
+vsavj	records	class	4e	0 -
+vsavj	records	class	52	0 -
+vsavj	records	unused<50	-	0c,0d,12,14,15,1e,25,2a,2b,2d,2e,30,3a,45,46,4b,4e,4f
+vsav2	records	reachable	-	1143
+vsav2	records	class>=50	-	2
+vsav2	records	class	06	9 Bishamon/fighter:1,Jedah/fighter:1,Lilith/fighter:1,Victor/fighter:5,Zabel/fighter:1
+vsav2	records	class	07	10 Jedah/fighter:2,Lilith/fighter:1,Victor/fighter:6,Zabel/fighter:1
+vsav2	records	class	08	12 Jedah/fighter:2,Victor/fighter:5,Victor/proj:1,Zabel/fighter:3,Zabel/proj:1
+vsav2	records	class	38	1 Victor/fighter:1
+vsav2	records	class	39	2 Bulleta/fighter:1,Victor/fighter:1
+vsav2	records	class	48	4 Victor/fighter:4
+vsav2	records	class	4e	0 -
+vsav2	records	class	52	1 Bishamon/fighter:1
+vsav2	records	unused<50	-	0d,0e,12,13,14,1f,25,30,32,3a,45,4b,4e,4f
+vsavj	imm54	sites	-	43
+vsavj	imm54	values	-	00:4,01:1,03:5,04:2,05:10,06:1,07:1,08:1,0a:1,0c:1,0e:1,0f:2,11:1,15:1,17:2,18:1,1f:1,24:1,25:2,2b:1,45:1,ff:2
+vsavj	imm54	value	06	0186d0/a1
+vsavj	imm54	value	07	0186d8/a1
+vsavj	imm54	value	08	0186e6/a1
+vsavj	imm54	value	38	none
+vsavj	imm54	value	39	none
+vsavj	imm54	value	48	none
+vsavj	imm54	value	4e	none
+vsavj	imm54	value	52	none
+vsav2	imm54	sites	-	48
+vsav2	imm54	values	-	00:4,01:2,03:5,04:2,05:11,06:1,07:1,08:1,0a:1,0c:1,0e:1,0f:3,11:1,15:1,17:2,18:1,1f:1,24:1,25:2,2b:1,45:1,4e:1,52:1,ff:2
+vsav2	imm54	value	06	016fc0/a1
+vsav2	imm54	value	07	016fc8/a1
+vsav2	imm54	value	08	016fd6/a1
+vsav2	imm54	value	38	none
+vsav2	imm54	value	39	none
+vsav2	imm54	value	48	none
+vsav2	imm54	value	4e	016fe4/a1
+vsav2	imm54	value	52	016fec/a1
+vsavj	rec17-cmp	all	-	00,01,02,03,0b,0c,0d,0e,0f,2c,2d,37,38,39,42,48,4a,4d
+vsavj	rec17-cmp	class	06	none
+vsavj	rec17-cmp	class	07	none
+vsavj	rec17-cmp	class	08	none
+vsavj	rec17-cmp	class	38	01836c(guard)
+vsavj	rec17-cmp	class	39	018376(guard)
+vsavj	rec17-cmp	class	48	0183b6(guard)
+vsavj	rec17-cmp	class	4e	none
+vsavj	rec17-cmp	class	52	none
+vsavj	cmp54	all	-	03,04,0b,0c,0f,13,14,15,17,18,19,1a,1b,1c,1d,1e,20,21,22,23,24,25,2b,2d,35,36,3a,3b,3c,40,41,44,47,49,4c,ff
+vsavj	cmp54	class	06	none
+vsavj	cmp54	class	07	none
+vsavj	cmp54	class	08	none
+vsavj	cmp54	class	38	none
+vsavj	cmp54	class	39	none
+vsavj	cmp54	class	48	none
+vsavj	cmp54	class	4e	none
+vsavj	cmp54	class	52	none
+vsavj	class-table	028be0	default	06:0a,07:0a,08:0a,38:0a,39:0a,48:0a,4e:0a
+vsavj	class-table	028c40	+0xA	06:09,07:09,08:09,38:09,39:09,48:09,4e:09
+vsavj	class-table	028ca0	+0x1A8	06:09,07:09,08:09,38:09,39:09,48:09,4e:09
+vsav2	rec17-cmp	all	-	00,01,02,03,0b,0c,0d,0e,0f,2c,2d,37,38,39,42,48,4a,4d,50
+vsav2	rec17-cmp	class	06	none
+vsav2	rec17-cmp	class	07	none
+vsav2	rec17-cmp	class	08	none
+vsav2	rec17-cmp	class	38	016c2e(guard)
+vsav2	rec17-cmp	class	39	016c38(guard)
+vsav2	rec17-cmp	class	48	016c78(guard)
+vsav2	rec17-cmp	class	4e	none
+vsav2	rec17-cmp	class	52	none
+vsav2	cmp54	all	-	03,04,0b,0c,0f,13,14,15,17,18,19,1a,1b,1c,1d,1e,20,21,22,23,24,25,2b,2d,35,36,3a,3b,3c,40,41,44,47,49,4c,4f,51,52,ff
+vsav2	cmp54	class	06	none
+vsav2	cmp54	class	07	none
+vsav2	cmp54	class	08	none
+vsav2	cmp54	class	38	none
+vsav2	cmp54	class	39	none
+vsav2	cmp54	class	48	none
+vsav2	cmp54	class	4e	none
+vsav2	cmp54	class	52	02266c
+vsav2	class-table	027eb8	default	06:0a,07:0a,08:0a,38:0a,39:0a,48:0a,4e:0a,52:0a
+vsav2	class-table	027f18	+0xA	06:09,07:09,08:09,38:09,39:09,48:09,4e:09,52:09
+vsav2	class-table	027f78	+0x1A8	06:09,07:09,08:09,38:09,39:09,48:09,4e:09,52:09
+ours	imm54	sites	-	71
+ours	imm54	values	-	00:9,01:3,03:10,04:2,05:17,06:1,07:2,08:1,0a:1,0c:1,0e:1,0f:6,11:1,15:1,17:3,18:1,1f:1,24:1,25:3,2b:1,45:1,52:2,ff:2
+ours	imm54	value	06	0186d0/a1
+ours	imm54	value	07	0186d8/a1,0fff80/a1
+ours	imm54	value	08	0186e6/a1
+ours	imm54	value	38	none
+ours	imm54	value	39	none
+ours	imm54	value	48	none
+ours	imm54	value	4e	none
+ours	imm54	value	52	0fff50/a1,4716dc/a1
+ours	rec17-cmp	all	-	00,01,02,03,0b,0c,0d,0e,0f,2c,2d,37,38,39,42,48,4a,4d
+ours	rec17-cmp	class	06	none
+ours	rec17-cmp	class	07	none
+ours	rec17-cmp	class	08	none
+ours	rec17-cmp	class	38	01836c(guard)
+ours	rec17-cmp	class	39	018376(guard)
+ours	rec17-cmp	class	48	0183b6(guard)
+ours	rec17-cmp	class	4e	none
+ours	rec17-cmp	class	52	none
+ours	cmp54	all	-	03,04,0b,0c,0f,13,14,15,17,18,19,1a,1b,1c,1d,1e,20,21,22,23,24,25,2b,2d,35,36,3a,3b,3c,40,41,44,47,49,4c,4f,51,52,ff
+ours	cmp54	class	06	none
+ours	cmp54	class	07	none
+ours	cmp54	class	08	none
+ours	cmp54	class	38	none
+ours	cmp54	class	39	none
+ours	cmp54	class	48	none
+ours	cmp54	class	4e	none
+ours	cmp54	class	52	41bd7c
+ours	build	merged-m18	-	00f9cf13

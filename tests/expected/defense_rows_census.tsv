@@ -1,6 +1,7 @@
 # tests/expected/defense_rows_census.tsv — the defense curve (vsavj 0x0B8940 / vs2 0x0D2ABE) and rally threshold (0x0BCC80 / 0x0D6E1E)
 # of every character id, vsavj vs vs2, and the tenants' rows on m3b_merged26 (tests/test_defense_rows_census.sh). Evidence
 # class: static. Frozen 14z-168 with FREEZE=1. The ruled fix (2026-09-18, take the vs2 rows) moves the tenant rows: re-freeze then.
+# The reader rows (every instruction naming either table by an absolute long or a pc-relative lea/pea) added and re-frozen 14z-169.
 #--
 base	0x00	Bulleta	row=SAME	thr=0x38/0x38
 base	0x01	Demitri	row=SAME	thr=0x30/0x30
@@ -37,3 +38,9 @@ variant	0x1f	copy of Jedah
 tenant	0x10	Phobos	ours=Bulleta+Demitri+Anakaris+Felicia+Aulbath+Jedah	thr=0x38	native=Victor+random	thr=0x28
 tenant	0x11	Pyron	ours=Bulleta+Demitri+Anakaris+Felicia+Aulbath+Jedah	thr=0x30	native=Bulleta+Demitri+Anakaris+Felicia+Aulbath+Sasquatch+Jedah	thr=0x30
 tenant	0x13	Donovan	ours=Victor+random	thr=0x28	native=Bulleta+Demitri+Anakaris+Felicia+Aulbath+Sasquatch+Jedah	thr=0x30
+reader	vsavj	curve	018c20	abs-long@018c22
+reader	vsavj	threshold	018c7c	abs-long@018c7e
+reader	vs2	curve	0175c6	abs-long@0175c8
+reader	vs2	threshold	01763c	abs-long@01763e
+reader	ours	curve	018c20	abs-long@018c22
+reader	ours	threshold	018c7c	abs-long@018c7e

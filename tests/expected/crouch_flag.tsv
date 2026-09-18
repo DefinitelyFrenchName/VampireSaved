@@ -1,0 +1,20 @@
+# tests/expected/crouch_flag.tsv — P1's +0x121 against the scripted Down of tests/replays/naming/donovan_1 (2840-2870), native vsav2
+# and m3b_merged26 (tests/audit_crouch_flag.sh; field_trace). Evidence class: in-emulator. Frozen 14z-169 with FREEZE=1.
+#--
+native	p1	2830	f121=0	seq=00	sub=02
+native	p1	2840	f121=1	seq=02	sub=02
+native	p1	2847	f121=1	seq=00	sub=04
+native	p1	2871	f121=0	seq=02	sub=04
+native	p1	2872	f121=0	seq=02	sub=06
+native	p1	2878	f121=0	seq=00	sub=00
+native	p1	2879	f121=0	seq=00	sub=02
+native	p2	f121-max=0
+ours	p1	2830	f121=0	seq=00	sub=02
+ours	p1	2840	f121=1	seq=02	sub=00
+ours	p1	2841	f121=1	seq=02	sub=02
+ours	p1	2848	f121=1	seq=00	sub=04
+ours	p1	2871	f121=0	seq=02	sub=04
+ours	p1	2872	f121=0	seq=02	sub=06
+ours	p1	2878	f121=0	seq=00	sub=00
+ours	p1	2879	f121=0	seq=00	sub=02
+ours	p2	f121-max=0

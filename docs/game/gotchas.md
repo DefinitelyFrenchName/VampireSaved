@@ -912,3 +912,18 @@ light press toward it (with an RNG roll), while vs2 weights presses and needs a 
 14-tick window, the first possible attack is hit+35 on all three games (`tests/audit_guard_reentry.sh`,
 the act rows). Rule: a "first possible frame" rig presses only after every window that counts
 presses has closed.
+
+## A RECORD'S CLASS BYTE IS NOT THE VICTIM'S REACTION CLASS — the guard reads it first and the stager rewrites it (paid: 14z-169)
+
+14z-168 read vsavj's reaction table, saw classes 0x06 AND 0x38 both sent to the shock handler
+`0x23AC8` with the same property byte, and wrote down "a record remapped to 0x38 would reach
+the same handler with `+0x54` naming it apart from 0x06" as the candidate design of a ruled
+fix. The record's `+0x17` does not reach the reaction table: it is dispatched first by one of
+three STAGER tables (ground / air / KO), whose handler writes `+0x54` — and vsavj's writes 6
+for both 0x06 and 0x38 on the ground. Before that, the GUARD decision compares the record's
+class against constant lists: with the victim's crouch flag `+0x121` at 0, record classes 0x02,
+0x03, 0x38 and 0x39 go to the hit path, and 0x06 is in neither list. So the remap would have
+changed what the guard decision does with the record (neither a hit of such a record against a guard nor a capture was run — how it plays is a reading of the code) and still reacted as 6. Rule: a class byte's meaning is
+every table and compare it passes through, in order — read the chain record → guard →
+stager → `+0x54` → reaction (`tests/test_reaction_classes.sh` prints it for any class;
+`docs/game/engine_internals.md`, "The licence covers the class").

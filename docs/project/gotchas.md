@@ -5119,7 +5119,7 @@ occurred (the contact, the stock, the state) before its IDENT is coverage.
 `build/manifest/moves_<tenant>.toml` lists Slay Shred, Ray of Doom and Shining
 Gemini as P+K Dark Force because that is how Vampire Saved plays them. In vs2
 they are EX moves with their own inputs (421+KK, 263+PP, 2623+PP measured; the
-maintainer to confirm), and vs2's P+K is a different mode. The maintainer: *"the
+maintainer, 14z-169: *"as far as I know these are the correct inputs in VS2, and given you were able to trigger the moves for the comparison we made last session I assume they are indeed correct"*), and vs2's P+K is a different mode. The maintainer: *"the
 move list for Vampire Saved is linked to how we implemented it ... In VS2, you
 want to look for the name of the character's Dark Force in Vampire Saved."*
 Rule: a native reference leg for a move is found by the move's NAME in the

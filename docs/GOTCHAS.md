@@ -20,9 +20,9 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-382 entries (45 game / 108 platform / 229 project), counted from the buckets at generation.
+383 entries (46 game / 108 platform / 229 project), counted from the buckets at generation.
 
-## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 45 entries
+## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 46 entries
 
 - (the 14z-90 onset-frame entry that opened this file was RE-FILED to `docs/project/gotchas.md` at 14z-118 — it is a VERIFICATION-CLASS fact, not a game fact; S-C12 flagged it)
 - OBJ record formats differ in ENTRY STRIDE, not just header meaning
@@ -69,6 +69,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - THE HIT STAGER PAYS METER TO WHOEVER IS REGISTERED, AND ONLY A HIT THAT REGISTERS ITSELF GETS IT RIGHT — the collision walk leaves the pair as (P2, P1) (measured: 14z-166)
 - P+K IS A DIFFERENT MODE ON vs2 AND vsav — a newcomer's Dark Force is compared against its vs2 EX move, never against vs2's P+K (paid: 14z-168)
 - "WHEN CAN THE BLOCKER ACT" IS NOT ASKED BY MASHING INSIDE THE BLOCK WINDOW — that measures the ADVANCING GUARD (paid: 14z-168)
+- A RECORD'S CLASS BYTE IS NOT THE VICTIM'S REACTION CLASS — the guard reads it first and the stager rewrites it (paid: 14z-169)
 
 ## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 108 entries
 

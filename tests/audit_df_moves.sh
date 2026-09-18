@@ -21,7 +21,8 @@
 # Dark Force, a timed EX move (DECISIONS_HISTORY.md "Ruled 2026-09-18 (14z-168) — the
 # tenants' Dark Force"; docs/game/engine_internals.md, "Dark Force POWER, Dark Force CHANGE"). This gate is the rig on that baseline: our leg presses
 # P+K, the native leg the tenant's vs2 EX input (Donovan 421+KK, Phobos 263+PP, Pyron
-# 2623+PP — measured; the canonical inputs are the maintainer's to confirm), the moves
+# 2623+PP — measured; the maintainer, 14z-169: "as far as I know these are the correct
+# inputs in VS2 ... I assume they are indeed correct"), the moves
 # start 110 frames after the activation (Phobos's vs2 EX takes his form ~75 frames in;
 # at 70 his first move was lost on the native leg — measured), every event pinned far
 # (552/728), the stock re-poked to 9 before each activation, the groups spaced past the

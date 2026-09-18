@@ -22,6 +22,10 @@
 --                fighter blocks' field in one run — audit_df_field_readers_live.sh)
 --   env WINDOW   "lo,hi" frame gate for READ logging (writes always log
 --                — the boot POST writes are the liveness control)
+--   env RPCS     optional "hexpc,hexpc,..." (14z-169): log a READ only when its CURPC
+--                is listed — for a field the engine reads everywhere (+0x382) when one
+--                reader is the question (tests/audit_defense_row_reads.sh). Writes and
+--                the PCHIST are unaffected; unset, the output is exactly as before.
 --   env REPLAY / POKES / FRAMES / TRACE_OUT as tap_writes.lua
 -- Logs: R <frame> PC <pc> off <addr> data <val> mask <m>
 --       W <frame> PC <pc> off <addr> data <val> mask <m>
@@ -33,6 +37,11 @@ local max_frames = tonumber(os.getenv("FRAMES") or "") or 5450
 local wa, wb = (os.getenv("WINDOW") or "0,99999999"):match("^(%d+),(%d+)$")
 wa, wb = tonumber(wa), tonumber(wb)
 local spec = assert(os.getenv("RTAP"), "set RTAP=hexaddr,declen")
+local rpcs = nil
+if os.getenv("RPCS") and os.getenv("RPCS") ~= "" then
+    rpcs = {}
+    for one in os.getenv("RPCS"):gmatch("[^,]+") do rpcs[tonumber(one, 16)] = true end
+end
 local ranges = {}
 for one in spec:gmatch("[^;]+") do
     local a_s, l_s = one:match("^(%x+),(%d+)$")
@@ -56,11 +65,13 @@ local function install()
     local base, len = r[1], r[2]
     taps[#taps + 1] = space:install_read_tap(base, base + len - 1, "rt" .. i, function(offset, data, mask)
         if frame >= wa and frame <= wb then
-            hits = hits + 1
             local pc = cpu.state["CURPC"].value & 0xFFFFFF
+            if rpcs == nil or rpcs[pc] then
+            hits = hits + 1
             pchist[pc] = (pchist[pc] or 0) + 1
             f:write(string.format("R %d PC %06x off %06x data %08x mask %08x\n",
                     frame, pc, offset, data, mask))
+            end
         end
     end)
     -- write tap over the same range, always-on (liveness: boot POST must hit)

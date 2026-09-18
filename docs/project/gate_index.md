@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**355 scripts** — 81 ci_portable, 80 ci_static, 194 emulator-tier (run by name).
+**359 scripts** — 81 ci_portable, 81 ci_static, 197 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -27,7 +27,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 82 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 45 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 49 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -346,6 +346,8 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | gate | kind | tier | needs | locks (the script's own header) | since |
 |---|---|---|---|---|---|
 | `tests/audit_column_shock.sh` | audit | emulator | MAME, a build dir, ~12 s | DONOVAN'S KILLSHREAD LIGHTNING COLUMN SHOCKS ITS VICTIM FOR 12 FRAMES ON OUR BUILD, 24 NATIVELY, and freezes Donovan 4 frames per hit where vs2 exempts him, frozen AS MEASURED (14z-168, GitHub #136): | 14z-168 |
+| `tests/audit_crouch_flag.sh` | audit | emulator | MAME, a build dir, ~15 s | THE FIGHTER'S +0x121 IS THE CROUCH FLAG, measured against a scripted Down on native vsav2 and on our merged build (14z-169): | 14z-169 |
+| `tests/audit_defense_row_reads.sh` | audit | emulator | MAME, a build dir | WHICH ROW EVERY HIT'S DEFENSE READS INDEX, by the victim's identity, over the corpus on our merged build and on pristine vsavj, frozen (14z-169, the analysis before the ruled fix "the tenants' defense rows become vs2's", #136). | 14z-169 |
 | `tests/audit_defense_row_residue.sh` | audit | emulator | MAME, a build dir, ~5 min | THE PHOBOS-THROW ±1 DAMAGE RESIDUE IS THE DEFENSE-TABLE ROW THE VICTIM'S ID SELECTS, read watch on both legs (14z-145). | 14z-145 |
 | `tests/audit_df_accumulator.sh` | audit | emulator | MAME, a build dir, ~3 min | THE +0x161 ACCUMULATOR IS SASQUATCH'S DARK FORCE ARMOR (measured 14z-123; inferred_claims row 1). | 14z-123 |
 | `tests/audit_df_dead_family.sh` | audit | emulator | ~3 min | vs2's P+K (DARK FORCE POWER) NEVER REACHES THE VS-STYLE DARK FORCE FAMILY: its shared field-setter tail at vs2 PRG:0x02622A takes ZERO hits on a P+K activation while the activation body takes exactly one (measured 14z-126). SCOPED 14z-168: | 14z-126 |
@@ -366,6 +368,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_move_parity_attribution.sh` | audit | emulator | MAME, a build dir, ~5 min | EVERY DIFF ROW OF THE #136 MOVE-PARITY TABLE HAS A MEASURED CAUSE, frozen (14z-168, GitHub #136): each root found by ablation (its event's inputs removed, both legs re-run, the rows that vanish are its) and named by a measured signature; | 14z-168 |
 | `tests/audit_pass_overrun.sh` | audit | emulator | MAME, a build dir, ~60 s | THE BLIZZARD SWORD CPU OVERRUNS, ours vs native, frozen AS MEASURED (14z-168, GitHub #136): on three Blizzard Sword frames of the whole #136 corpus a double-pass activation runs past the frame, so one frame completes NO logic pass — twice o… | 14z-168 |
 | `tests/audit_pyron_capture_block.sh` | audit | emulator | MAME, a build dir, ~4 min | PYRON THROWS WITH DEMITRI'S CAPTURE GEOMETRY (measured 14z-131, maintainer-ruled "measure against native vs2 first"). | 14z-131 |
+| `tests/audit_reaction_class_live.sh` | audit | emulator | MAME, a build dir | EVERY WRITE AND READ OF THE VICTIM'S REACTION CLASS (+0x54) OVER THE CORPUS, on pristine vsavj (the whole legacy suite), on our merged build and on native vs2 (the #136 naming parts), frozen (14z-169, the analysis before the class-0x52 fix… | 14z-169 |
 | `tests/audit_rig_opening.sh` | audit | emulator | MAME, a build dir, ~3 s | THE #136 GUARD-CANCEL RIG'S OPENING, ours vs native, frozen AS MEASURED (14z-167): the rig's first X pin lands before the round starts, inside the round-start entrance, and the two legs draw different entrances. | 14z-167 |
 | `tests/audit_tenant_throw_geometry.sh` | audit | emulator | MAME, a build dir, ~12 min | PHOBOS'S THREE THROWS, OURS vs NATIVE VS2 (14z-131, maintainer-directed 2026-09-04). | 14z-131 |
 | `tests/audit_throw_registration.sh` | audit | emulator | MAME, a build dir, ~3 min | THE HIT-REGISTRATION PAIR AT A TENANT THROW, ours vs native, frozen: on every tenant throw contact native's throw code writes the engine's (attacker, victim) registration pair right before the generic hit stager awards meter, while our plac… | 14z-166 |
@@ -384,6 +387,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/test_poked_legs.sh` | test | ci_static | ROMDIR | THE CENSUS OF EVERY FORCED-PICK LEG in tests/ and tools/, classified by what the poke leaves latched, frozen shrink-only; a new CROSS-FLAVOR pairing fails until it is measured and accepted (GitHub #151 step 3, 14z-161). | 14z-161 |
 | `tests/test_projectile_census.sh` | test | emulator | MAME, ~2 min | WHICH PROJECTILE-POOL TYPES EACH TENANT'S MOVES SPAWN (character-data map phase 3, 14z-120 (11)). The naming rigs' specials and meter parts (donovan/pyron/huitzil parts 2 and 4) replayed on native vs2 with the 32 pool slots' type bytes samp… | 14z-120 (11) |
 | `tests/test_projectile_params.sh` | test | emulator | MAME, a build dir, ~3 min | THE PROJECTILE PARAMETERS (character-data map phase 3, 14z-121): every $FF9400-pool projectile type's inline parameter tables, decoded from the type HANDLER (tools/projectile_params.py) and MEASURED on the live spawn. | 14z-121 |
+| `tests/test_reaction_classes.sh` | test | ci_static | ROMDIR | THE ROUTE OF A HIT'S CLASS FROM THE RECORD TO THE REACTION, re-derived from the decrypted images for pristine vsavj, vs2 and our merged build, with the legacy record census by class and every constant writer of the victim's +0x54, frozen (1… | 14z-169 |
 | `tests/test_reactions.sh` | test | emulator | MAME, a build dir, ~1 min | WHICH CHAINS A TENANT RUNS AS THE VICTIM, PER REACTION CLASS, AND HOW LONG (character-data map, PHASE 3; measured 14z-120 (7)). | 14z-120 (7) |
 | `tests/test_rehit_ring.sh` | test | emulator | MAME, ~4 min | THE MULTI-HIT RE-HIT RULE IS THE RECENT-HIT SLOT, CLEARED ON EVERY GAP NODE (14z-146, measured on stock vsavj). The knowledge item the 14z-145 close left open: | 14z-146 |
 | `tests/test_same_data_p2.sh` | test | ci_static | ROMDIR | NO LEGACY CHARACTER CARRIES THE SAME CHARACTER DATA ON vsavj AND vsav2, AND WHICH CHAINS DIFFER FOR EACH IS FROZEN (14z-164, GitHub #136 proposition 2, maintainer-agreed 2026-09-17). | 14z-164 |

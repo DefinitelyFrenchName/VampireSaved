@@ -3,6 +3,8 @@
 #
 # MUST-FIRE: perturbed-copy: tenant-row-moved — a copy of our build's data view with Phobos's row 0x10 overwritten by his vs2 row (what the ruled fix will do) must FAIL the frozen compare, so the frozen rows are read from the build under test and the fix re-freezes this file deliberately (in-gate: the perturbed view must census differently; mode: the gate censuses the perturbed view and FAILs)
 #
+# MUST-FIRE: perturbed-copy: reader-planted — a copy of our build's opcode image with an absolute load of an address INSIDE the curve (`movea.l #$000B8980,a1`, 0x100 bytes before the image's end) and a `lea d16(pc),a0` landing on the threshold table must add one reader row per arm and FAIL the frozen compare, so both arms of the reader census read the image they are given (in-gate: the planted copy must add exactly those two rows; mode: the gate censuses the planted copy and FAILs)
+#
 # WHY. The maintainer asked, before ruling on the tenants' defense rows (2026-09-18,
 # 14z-168): "compare the defense-side rows between characters present in both vsavj
 # and VS2 and whether the approximated rows we are currently using are not, in fact,
@@ -14,10 +16,23 @@
 # The shells (docs/game/engine_internals.md): Phobos 0x10 -> Bulleta 0x00, Pyron
 # 0x11 -> Demitri 0x01, Donovan 0x13 -> Victor 0x03.
 #
+# WHO READS THE TWO TABLES (added 14z-169, rule-checker run 2026-09-18-51 Q4: the live
+# gate tests/audit_defense_row_reads.sh taps only the two known reads, so a reader at
+# another pc would be invisible to it): every even offset of vsavj's and vs2's opcode views
+# and of our build's whole opcode image holding an address INSIDE a table as an absolute long
+# (the `movea.l #imm` / absolute-operand forms; the base alone until run 2026-09-18-52 Q1), and every
+# `lea d16(pc),An` / `pea d16(pc)` whose target lands inside a table. Measured: exactly the two host reads on vsavj and ours
+# (PRG:0x018C20 the curve, 0x018C7C the threshold), their twins on vs2. NOT COVERED: a base
+# computed at run time, `(d8,pc,Xn)` forms, a `(d16,pc)` operand of any instruction other than
+# lea/pea (it reaches only 32 KB either side, i.e. code inside the tables' own region), and a
+# table reached through a pointer in data. The scan is a raw match at every even offset, code and
+# data alike: a row can be data that happens to equal a table address, never a missed long.
+#
 # FROZEN: tests/expected/defense_rows_census.tsv —
 #   base <id> <name> row=<SAME|DIFFERS> thr=<vsavj>/<vs2>   (ids 0x00-0x0F, vsavj vs vs2)
 #   variant <id> <copy of base|own>                         (vsavj's ids 0x10-0x1F)
 #   tenant <id> <name> ours=<curve class> thr=<x> native=<curve class> thr=<x>
+#   reader <game> <table> <instruction pc> <form>          (since 14z-169)
 # where a curve class names the base characters whose vsavj row it equals.
 #
 # Usage: ROMDIR=... [BUILD=build/m3b_merged26] [FREEZE=1] tests/test_defense_rows_census.sh
@@ -31,7 +46,7 @@ case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/defense_rows_census.tsv"
 CONTROL="${CONTROL:-}"
 [ -f "$BUILD/verify_data.bin" ] || { echo "SKIP: no verify_data.bin in $BUILD"; exit 0; }
-case "$CONTROL" in ""|tenant-row-moved) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+case "$CONTROL" in ""|tenant-row-moved|reader-planted) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
@@ -43,6 +58,44 @@ decrypt_view vsav2 "$W/v2_op.bin" "$W/v2_da.bin" || bad "vsav2 views not deliver
 decrypt_view vsavj "$W/vj_op.bin" "$W/vj_da.bin" || bad "vsavj views not delivered"
 [ "$fail" = 0 ] || { echo "FAIL: test_defense_rows_census"; exit 1; }
 cp "$BUILD/verify_data.bin" "$W/ours_da.bin"
+[ -f "$BUILD/verify_op.bin" ] || { echo "SKIP: no verify_op.bin in $BUILD"; exit 0; }
+cp "$BUILD/verify_op.bin" "$W/ours_op.bin"
+# ONE planting function for the reader census ([VSP-181]): an extra absolute load of the curve's base
+plant_reader() {  # plant_reader <ours op in> <out>: BOTH arms, in a copy — movea.l #$000B8980,a1 (an address INSIDE the
+    # curve) 0x100 bytes before the image's end, and lea d16(pc),a0 landing on the threshold table 0x100 bytes below it
+    python3 - "$1" "$2" <<'PY'
+import sys, struct
+o = bytearray(open(sys.argv[1], "rb").read())
+a = len(o) - 0x100
+o[a:a + 6] = bytes.fromhex("227c000b8980")
+b = 0x0BCC80 - 0x100
+o[b:b + 4] = bytes.fromhex("41fa") + struct.pack(">h", 0x0BCC80 - (b + 2))
+open(sys.argv[2], "wb").write(o)
+PY
+}
+if [ "$CONTROL" = reader-planted ]; then plant_reader "$W/ours_op.bin" "$W/ours_opp.bin" && mv "$W/ours_opp.bin" "$W/ours_op.bin"; fi
+# ONE reader census, shared by the gate and the in-gate control
+readers() {  # readers <vsavj op> <vs2 op> <ours op>
+    python3 - "$@" <<'PY'
+import sys, struct
+imgs = [("vsavj", open(sys.argv[1], "rb").read(), 0x100000), ("vs2", open(sys.argv[2], "rb").read(), 0x100000), ("ours", open(sys.argv[3], "rb").read(), None)]
+TAB = {"vsavj": {"curve": (0xB8940, 0x400), "threshold": (0xBCC80, 0x20)}, "vs2": {"curve": (0xD2ABE, 0x400), "threshold": (0xD6E1E, 0x20)}}
+TAB["ours"] = TAB["vsavj"]
+for g, img, end in imgs:
+    end = end or len(img)
+    for name, (base, size) in TAB[g].items():
+        for a in range(2, end - 4, 2):
+            v = struct.unpack(">I", img[a:a + 4])[0]
+            if base <= v < base + size:
+                print(f"reader\t{g}\t{name}\t{a - 2:06x}\tabs-long@{a:06x}" + ("" if v == base else f"+{v - base:#x}"))
+        for a in range(0, end - 4, 2):
+            w = struct.unpack(">H", img[a:a + 2])[0]
+            if (w & 0xF1FF) == 0x41FA or w == 0x487A:
+                t = a + 2 + struct.unpack(">h", img[a + 2:a + 4])[0]
+                if base <= t < base + size:
+                    print(f"reader\t{g}\t{name}\t{a:06x}\t{'lea' if w != 0x487A else 'pea'}-pc@{t:06x}")
+PY
+}
 # ONE perturbation, shared by the in-gate control and the mode ([VSP-181])
 move_row() {  # move_row <ours view in> <out>: Phobos's row 0x10 given his vs2 row
     python3 - "$1" "$W/v2_da.bin" "$2" <<'PY'
@@ -76,17 +129,24 @@ for t, n in ((0x10, "Phobos"), (0x11, "Pyron"), (0x13, "Donovan")):
 PY
 }
 census "$W/vj_da.bin" "$W/v2_da.bin" "$W/ours_da.bin" > "$W/got.tsv" 2> "$W/sha.txt" || { bad "census: $(tail -1 "$W/sha.txt")"; }
+readers "$W/vj_op.bin" "$W/v2_op.bin" "$W/ours_op.bin" >> "$W/got.tsv" 2>> "$W/sha.txt" || { bad "reader census: $(tail -1 "$W/sha.txt")"; }
 [ "$fail" = 0 ] || { echo "FAIL: test_defense_rows_census"; exit 1; }
 sed 's/^/  /' "$W/sha.txt"
 echo "== 2. the census"
 sed 's/^/  /' "$W/got.tsv" | grep -v -E '^  (variant|base)' || true
+for g in vsavj ours; do
+    _r="$(awk -F'\t' -v g="$g" '$1=="reader" && $2==g {printf "%s:%s ", $3, $4}' "$W/got.tsv")"
+    [ "$_r" = "curve:018c20 threshold:018c7c " ] && ok "$g: the two tables are named only by the two host reads" || bad "$g: the tables are named by [$_r], not only by the two host reads"
+done
 ok "$(grep -c '^base' "$W/got.tsv" | tr -d ' ') base ids ($(awk -F'\t' '$1=="base" && $4=="row=DIFFERS" {printf "%s ", $3}' "$W/got.tsv")differ); $(awk -F'\t' '$1=="variant" && $3 ~ /^copy/' "$W/got.tsv" | grep -c . | tr -d ' ') of 16 variant rows are copies"
 
 echo "== 3. the frozen rows"
 if [ "${FREEZE:-0}" = 1 ]; then
+    [ "$fail" = 0 ] && [ -z "$CONTROL" ] || { echo "FAIL: test_defense_rows_census (not frozen: fix the red first, no control)"; exit 1; }
     { echo "# tests/expected/defense_rows_census.tsv — the defense curve (vsavj 0x0B8940 / vs2 0x0D2ABE) and rally threshold (0x0BCC80 / 0x0D6E1E)"
       echo "# of every character id, vsavj vs vs2, and the tenants' rows on $(basename "$BUILD") (tests/test_defense_rows_census.sh). Evidence"
       echo "# class: static. Frozen 14z-168 with FREEZE=1. The ruled fix (2026-09-18, take the vs2 rows) moves the tenant rows: re-freeze then."
+      echo "# The reader rows (every instruction naming either table by an absolute long or a pc-relative lea/pea) added and re-frozen 14z-169."
       echo "#--"; cat "$W/got.tsv"; } > "$EXPECT"
     echo "  FROZE  $(basename "$EXPECT") ($(wc -l < "$W/got.tsv" | tr -d ' ') rows) — VERIFY by re-running without FREEZE"; exit 0
 fi
@@ -95,7 +155,17 @@ grep -v '^#' "$EXPECT" > "$W/want.tsv"
 if diff "$W/want.tsv" "$W/got.tsv" > "$W/diff.txt"; then ok "every row as frozen"
 else bad "differs from the frozen rows"; sed 's/^/        /' "$W/diff.txt"; fi
 
-echo "== 4. must-fire control"
+echo "== 4. must-fire controls"
+if [ "$CONTROL" = reader-planted ]; then
+    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: reader-planted — the planted absolute load and pc-relative lea add reader rows"; echo "FAIL: test_defense_rows_census (control mode)"; exit 1
+    else echo "CONTROL DEAD: reader-planted — the planted load changed nothing"; echo "FAIL: test_defense_rows_census"; exit 1; fi
+fi
+plant_reader "$W/ours_op.bin" "$W/ctl_op.bin"
+readers "$W/vj_op.bin" "$W/v2_op.bin" "$W/ctl_op.bin" > "$W/ctl_r.tsv" 2>/dev/null || true
+_add="$(grep '^reader' "$W/got.tsv" | diff - "$W/ctl_r.tsv" | grep -c '^>' | tr -d ' ')" || true
+_arms="$(grep '^reader' "$W/got.tsv" | diff - "$W/ctl_r.tsv" | sed -n 's/^> //p' | awk -F'\t' '{split($5, f, "@"); print f[1]}' | sort | tr '\n' ' ')"
+if [ "$_add" = 2 ] && [ "$_arms" = "abs-long lea-pc " ]; then echo "CONTROL FIRED: reader-planted — both planted arms read as rows: $(grep '^reader' "$W/got.tsv" | diff - "$W/ctl_r.tsv" | sed -n 's/^> //p' | tr '\t' ' ' | tr '\n' ';')"
+else echo "CONTROL DEAD: reader-planted — the planted copy added $_add reader rows ($_arms), not one per arm"; fail=1; fi
 if [ "$CONTROL" = tenant-row-moved ]; then
     if [ "$fail" = 1 ]; then echo "CONTROL FIRED: tenant-row-moved — Phobos given his vs2 row loses the frozen rows"; echo "FAIL: test_defense_rows_census (control mode)"; exit 1
     else echo "CONTROL DEAD: tenant-row-moved — the moved row changed nothing"; echo "FAIL: test_defense_rows_census"; exit 1; fi
