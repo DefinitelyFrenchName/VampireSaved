@@ -1,0 +1,23 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_throw_registration.sh	4ffab7ce2fafe6887190448fd1902c7c492f7935
+tests/expected/throw_registration.tsv	1f0434037e120ce4b11fff7bb2ebcf56484d7c7c
+build/gates_14z166/throw_reg_freeze.log	fb986947849a9ce497a692916344548af6872026
+build/gates_14z166/throw_reg_verify.log	18bd3680411690887f1bbd706003196f98143e79
+build/gates_14z166/throw_reg_ctl_swapped.log	7ed3ab18a1f9f51e849c03189fe4f21faeac8607
+build/gates_14z166/throw_reg_ctl_planted.log	a85f779b67da5d6198526bcf65ffafe75ad9ce9d
+tests/lua/read_tap.lua	ae90f3a61428f39ef9684310088431667e78b3f9
+tests/audit_move_parity.sh.lines-130-200 (lines 130-200 of tests/audit_move_parity.sh)	08783cae143311d760088eb0ca384b433f0bfde1
+tests/replays/naming/pyron_3.json	95a208163207feccf445a2ad80ffb6c3a8407ec8
+tests/replays/naming/huitzil_3.json	fcc78d97c2360b7bdb01767580fdad35622cf234
+tests/replays/naming/donovan_5.json	bdcab149eb4940e4e7f0ffed167b3105e8b58a5f
+tests/expected/move_parity_events.tsv	1329a5529b992046f0d099261c5c881e39b31f78
+tests/expected/PROVENANCE.md.lines-110-116 (lines 110-116 of tests/expected/PROVENANCE.md)	6d829a93bbbf4e032b7959afa594cd0e77e62b34
+tests/ci_emulator.tsv.lines-270-276 (lines 270-276 of tests/ci_emulator.tsv)	7e4b3773f26f30366860632102264b3f267fad9d
+tests/expected/must_fire_census.tsv	cc4e9233f3455ec2acfd2e98aa526253edca7929
+build/meter_probe_14z166/huitzil_3/readout.txt	a229e90d40c0366693901631a26654eb481787d4
+build/meter_probe_14z166/pyron_3/readout.txt	8cc713ee9f0061714bd0d8ff72fcfef7cec78a84
+build/meter_probe_14z166/donovan_5/readout.txt	7c33800cc88af1ab6e6ae2f0644ced6b066b1352
+build/meter_probe_14z166/disasm.txt	af13049869930dbc996eb2f9d7c94591952aa120
+build/meter_probe_14z166/census.txt	6ced1f2e8047a6a126d92744a1c9d0a99db135fa
+docs/game/engine_internals.md.lines-3040-3110 (lines 3040-3110 of docs/game/engine_internals.md)	4806f8b3162be51cac40a7547b2ce3553f3ee6de
+docs/project/must_fire_contract.md	a912b5e1d488aeeeeb865afb52b7be371929d0c5

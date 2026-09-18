@@ -1,0 +1,28 @@
+THE PACKET
+
+Decision kind: expectation
+Subject: 14z-166 (run 3): re-freeze tests/expected/throw_registration.tsv with the legacy control part legacy_demitri - Demitri's throw on pristine vsavj and on vsav2 pays +9 / +8 on both
+Claim (the working agent's sentence): At 14z-166 tests/expected/throw_registration.tsv is RE-FROZEN (74 rows: the 70 tenant rows of the first freeze unchanged plus 4 rows of a new part) by tests/audit_throw_registration.sh with FREEZE=1 and VERIFIED by a second run without FREEZE (build/gates_14z166/throw_reg_freeze2.log, throw_reg_verify2.log; the first freeze's rows and their checker runs 2026-09-18-32/-33 are unchanged and not re-argued here): the new part is the LEGACY CONTROL the maintainer asked for - `legacy_demitri`, Demitri (0x01) throwing Victor (0x03) by tests/replays/judge/02_throw.rpl (the all-legacy leg of tests/audit_tenant_throws.sh, the ids by the same 1400-1500 pokes it uses, speed level 6 and the RNG pinned as the tenant parts are) on PRISTINE vsavj (leg `vsavj`, MAME_ROMPATH=$ROMDIR only, no build) and on vsav2 (leg `native`), under three non-debug taps per leg (P1 meter $FF850A, P2 meter $FF890A, the engine's own pair: $FF343A-D on vsavj, $FF348C-F on vsav2), the contacts of a non-ours leg being the non-collision writers of its own pair: vsavj registers the pair at its own throw site 0x029694/0x029698 at frame 3062 and pays P1 +9 and P2 +8; vsav2 registers at 0x0289C6/0x0289CA at frame 3061 and pays P1 +9 and P2 +8 - the same rule, the same record value, one frame apart. WHAT THIS SETTLES: the host engine pays a legacy throw as vs2 does, so the tenant rows (ours attacker +8 / victim the record) are a PORT DEFECT of the placed throw code's registration and not an engine-generation difference; the alternative reading (vsavj itself paying the attacker 8) is excluded by measurement. The reducer's one change: a leg that is not `ours` takes its contacts from its own pair's throw-site writers (the native leg did already; the vsavj leg now does the same); the two must-fire controls are unchanged, fired in-gate (throw_reg_verify2.log) and both modes exit 1 (throw_reg_ctl_swapped2.log, throw_reg_ctl_planted2.log) with the legacy rows reading `as frozen` under both perturbations (they perturb ours' rows and ours' dead-pair tap, which the legacy part has neither of). The first exploratory run of the same measurement, build/meter_probe_14z166/legacy_throw.sh with its outputs under legacy_throw/, read the same figures. The registry rows (tests/expected/PROVENANCE.md, tests/ci_emulator.tsv) name the control. NOT tested: one legacy throw of one character on one rig - other legacy characters' throw records may carry different +0x14 values in the two games (the 14z-164 same-data audit lists per character which attack records differ; Demitri's differing chains are b:0x10/0x71/0x74 and his throw is not one of them by this measurement); the pokes force the ids at 1400-1500 on both games (the confirm-latch defect of a forced pick is measured to matter only for Phobos's and Donovan's cells, tests/audit_forced_pick_fidelity.sh, not for Demitri); the vsavj leg's collision registration PCs are the ones the reducer already excludes for ours (0x017FF8/0x018000); the verify run is run-to-run determinism on one host; no shipped ROM byte moved.
+Artifacts (read every one, in full):
+  - tests/audit_throw_registration.sh
+  - tests/expected/throw_registration.tsv
+  - build/gates_14z166/throw_reg_freeze2.log
+  - build/gates_14z166/throw_reg_verify2.log
+  - build/gates_14z166/throw_reg_ctl_swapped2.log
+  - build/gates_14z166/throw_reg_ctl_planted2.log
+  - build/meter_probe_14z166/legacy_throw.sh
+  - build/meter_probe_14z166/legacy_throw/vsavj_m1.txt
+  - build/meter_probe_14z166/legacy_throw/vsavj_m2.txt
+  - build/meter_probe_14z166/legacy_throw/vsavj_pair.txt
+  - build/meter_probe_14z166/legacy_throw/vsav2_m1.txt
+  - build/meter_probe_14z166/legacy_throw/vsav2_m2.txt
+  - build/meter_probe_14z166/legacy_throw/vsav2_pair.txt
+  - tests/replays/judge/02_throw.rpl
+  - tests/audit_tenant_throws.sh.lines-1-70 (lines 1-70 of tests/audit_tenant_throws.sh)
+  - tests/lua/read_tap.lua
+  - tests/expected/PROVENANCE.md.lines-110-116 (lines 110-116 of tests/expected/PROVENANCE.md)
+  - tests/ci_emulator.tsv.lines-270-276 (lines 270-276 of tests/ci_emulator.tsv)
+  - tests/expected/same_data_p2.tsv
+  - tests/audit_forced_pick_fidelity.sh.lines-1-60 (lines 1-60 of tests/audit_forced_pick_fidelity.sh)
+  - build/meter_probe_14z166/disasm.txt
+  - docs/game/engine_internals.md.lines-3040-3130 (lines 3040-3130 of docs/game/engine_internals.md)

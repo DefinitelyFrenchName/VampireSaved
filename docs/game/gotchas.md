@@ -868,3 +868,21 @@ Lilith and Jedah alike — an engine-generation change, not tuning. Indices are
 not content: vs2 renumbered the family and record tables when it grew them
 (Bulleta 80 -> 85 families), so a comparison by `hb8`/`hbA` reads half of every
 character's chains as differing; resolve the boxes first ([VSP-53]).
+
+## THE HIT STAGER PAYS METER TO WHOEVER IS REGISTERED, AND ONLY A HIT THAT REGISTERS ITSELF GETS IT RIGHT — the collision walk leaves the pair as (P2, P1) (measured: 14z-166)
+
+The generic hit stager (vsavj `PRG:0x018980`, vs2 `0x172F2`) does not know who
+attacked: it pays the record's `+0x14` to the fighter registered at
+`-0x4BC6(a5)` and a flat 8 to the one at `-0x4BC4(a5)` (`atlas/ram.md`
+`$FF343A`). The per-frame collision registration writes that pair once per
+fighter, (P1, P2) then (P2, P1), so between walks it reads REVERSED, and any
+damage applied outside the walk — a throw's, applied from the thrower's script —
+is paid to the wrong fighters unless the throw code registers the pair itself
+first, which every native throw does on its contact frame (vsavj
+`0x029694/98`, vs2 `0x0289C6/CA`). The tell of a missing registration is exact
+and cheap to read: the attacker's step is the victim's constant 8 and the
+victim's step is the record's value. Paid: GitHub #136's 28 meter DIFF rows were
+this one mechanism on every tenant throw (`tests/audit_throw_registration.sh`).
+Read the ORDER of the adder's two calls with the fighter block each lands on
+(a logging breakpoint at the adder entry, D0 and A6), never the attacker's
+meter trace alone — the trace shows an 8 that looks like a per-move value.

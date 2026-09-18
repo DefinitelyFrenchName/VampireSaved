@@ -1,0 +1,85 @@
+# tests/expected/throw_registration.tsv — the hit-registration pair at every tenant throw contact, ours vs native
+# (tests/audit_throw_registration.sh; tests/lua/read_tap.lua, non-debug). Evidence class: in-emulator (MAME,
+# native vsav2 and the WIDE build merged-m18; frames >= 2300). Frozen 14z-166 with FREEZE=1.
+# THE DEFECT IS FROZEN AS MEASURED: ours p1=+8 p2=<record> on every contact where native reads p1=<record> p2=+8
+# — GitHub #136's meter family. A fix that reconciles the placed pair stores re-freezes this file DELIBERATELY,
+# with its rule-checker run named in the commit. A new dead-pair READER on ours is a finding (the vs2 displacements
+# stopped being dead on vsavj); a contact frame that moves means the rig moved — re-derive before re-freezing.
+# Columns: part, leg, kind (contact | live-pair-writers | dead-pair-writers | dead-pair-readers), frame, a, b
+#--
+pyron_3	native	contact	3049	p1=+6	p2=+8
+pyron_3	native	contact	3469	p1=+6	p2=+8
+pyron_3	native	contact	3942	p1=+18	p2=+8
+pyron_3	native	contact	4362	p1=+18	p2=+8
+pyron_3	native	contact	4782	p1=+18	p2=+8
+pyron_3	native	contact	5829	p1=+6	p2=+8
+pyron_3	native	contact	6249	p1=+6	p2=+8
+pyron_3	native	live-pair-writers	-	0289c6,0289ca,028a94,028a98	-
+pyron_3	ours	contact	3049	p1=+8	p2=+6
+pyron_3	ours	contact	3469	p1=+8	p2=+6
+pyron_3	ours	contact	3942	p1=+8	p2=+18
+pyron_3	ours	contact	4362	p1=+8	p2=+18
+pyron_3	ours	contact	4782	p1=+8	p2=+18
+pyron_3	ours	contact	5829	p1=+8	p2=+6
+pyron_3	ours	contact	6249	p1=+8	p2=+6
+pyron_3	ours	live-pair-writers	-	-	-
+pyron_3	ours	dead-pair-writers	-	4787c4,4787c8,478892,478896	-
+pyron_3	ours	dead-pair-readers	-	000d32,000d36	-
+huitzil_3	native	contact	2682	p1=none	p2=none
+huitzil_3	native	contact	2689	p1=+9	p2=+8
+huitzil_3	native	contact	3102	p1=none	p2=none
+huitzil_3	native	contact	3109	p1=+9	p2=+8
+huitzil_3	native	contact	3502	p1=none	p2=none
+huitzil_3	native	contact	3512	p1=+9	p2=+8
+huitzil_3	native	contact	3939	p1=+9	p2=+8
+huitzil_3	native	contact	4358	p1=+9	p2=+8
+huitzil_3	native	contact	4778	p1=+9	p2=+8
+huitzil_3	native	contact	4999	p1=+9	p2=+8
+huitzil_3	native	contact	5419	p1=+9	p2=+8
+huitzil_3	native	contact	5882	p1=none	p2=none
+huitzil_3	native	contact	5888	p1=+9	p2=+8
+huitzil_3	native	contact	6302	p1=none	p2=none
+huitzil_3	native	contact	6308	p1=+9	p2=+8
+huitzil_3	native	live-pair-writers	-	0289c6,0289ca,028a94,028a98	-
+huitzil_3	ours	contact	3102	p1=none	p2=none
+huitzil_3	ours	contact	3109	p1=+8	p2=+9
+huitzil_3	ours	contact	3502	p1=none	p2=none
+huitzil_3	ours	contact	3512	p1=+8	p2=+9
+huitzil_3	ours	contact	3939	p1=+8	p2=+9
+huitzil_3	ours	contact	4358	p1=+8	p2=+9
+huitzil_3	ours	contact	4778	p1=+8	p2=+9
+huitzil_3	ours	contact	4999	p1=+8	p2=+9
+huitzil_3	ours	contact	5419	p1=+8	p2=+9
+huitzil_3	ours	contact	5882	p1=none	p2=none
+huitzil_3	ours	contact	5888	p1=+8	p2=+9
+huitzil_3	ours	contact	6302	p1=none	p2=none
+huitzil_3	ours	contact	6308	p1=+8	p2=+9
+huitzil_3	ours	live-pair-writers	-	-	-
+huitzil_3	ours	dead-pair-writers	-	41f554,41f558,41f622,41f626	-
+huitzil_3	ours	dead-pair-readers	-	000d32,000d36	-
+donovan_5	native	contact	2873	p1=none	p2=none
+donovan_5	native	contact	2887	p1=none	p2=none
+donovan_5	native	contact	2905	p1=none	p2=none
+donovan_5	native	contact	2917	p1=+9	p2=+8
+donovan_5	native	contact	3273	p1=none	p2=none
+donovan_5	native	contact	3287	p1=none	p2=none
+donovan_5	native	contact	3304	p1=none	p2=none
+donovan_5	native	contact	3317	p1=+9	p2=+8
+donovan_5	native	live-pair-writers	-	0289c6,0289ca,028a94,028a98	-
+donovan_5	ours	contact	2873	p1=none	p2=none
+donovan_5	ours	contact	2887	p1=none	p2=none
+donovan_5	ours	contact	2905	p1=none	p2=none
+donovan_5	ours	contact	2917	p1=+8	p2=+9
+donovan_5	ours	contact	3273	p1=none	p2=none
+donovan_5	ours	contact	3287	p1=none	p2=none
+donovan_5	ours	contact	3304	p1=none	p2=none
+donovan_5	ours	contact	3317	p1=+8	p2=+9
+donovan_5	ours	live-pair-writers	-	-	-
+donovan_5	ours	dead-pair-writers	-	0cfc14,0cfc18,0cfce2,0cfce6	-
+donovan_5	ours	dead-pair-readers	-	000d32,000d36	-
+legacy_demitri	vsavj	contact	3062	p1=+9	p2=+8
+legacy_demitri	vsavj	live-pair-writers	-	029694,029698	-
+legacy_demitri	vsavj	ids	-	p1=01@009008	p2=03@020a80
+legacy_demitri	native	contact	3061	p1=+9	p2=+8
+legacy_demitri	native	live-pair-writers	-	0289c6,0289ca	-
+legacy_demitri	native	ids	-	p1=01@0077d6	p2=03@01f64a

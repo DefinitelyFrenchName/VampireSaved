@@ -349,4 +349,5 @@ tests/audit_forced_pick_fidelity.sh	character-data
 tests/test_latch_readers.sh	character-data
 tests/test_poked_legs.sh	character-data
 tests/audit_latch_reads.sh	character-data
+tests/audit_throw_registration.sh	character-data
 tests/test_same_data_p2.sh	character-data

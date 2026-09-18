@@ -1,0 +1,23 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_throw_registration.sh	9495928e8bd10c55c6773df53224c005dcb8213a
+tests/expected/throw_registration.tsv	cfaa6b85c639a4670dd944d51832f1f1400f6679
+build/gates_14z166/throw_reg_freeze2.log	3267042ae887b37515d8a548be3e3388956eea63
+build/gates_14z166/throw_reg_verify2.log	a717ce5ccbba94a44af166412d96ea4bc43ba248
+build/gates_14z166/throw_reg_ctl_swapped2.log	a2d82b933cc550253ee9c10c0f5aa6cc4501d632
+build/gates_14z166/throw_reg_ctl_planted2.log	4fab131b1b7f2a0bb6f2e68b7847a52ac62dcecb
+build/meter_probe_14z166/legacy_throw.sh	84c3aca3b52d33fac61f453b93c925c4ff0518c6
+build/meter_probe_14z166/legacy_throw/vsavj_m1.txt	5e8156cd0b0d792968635bb3d4196404b986720a
+build/meter_probe_14z166/legacy_throw/vsavj_m2.txt	911141554ded036b728612edea8afad798454af3
+build/meter_probe_14z166/legacy_throw/vsavj_pair.txt	274baca533b168615ced667598406bd380915f41
+build/meter_probe_14z166/legacy_throw/vsav2_m1.txt	4a7ffcc793694930554bae7259e325b106a97ec4
+build/meter_probe_14z166/legacy_throw/vsav2_m2.txt	1f276fa160ba4cde2768bceff562f772db3ddb92
+build/meter_probe_14z166/legacy_throw/vsav2_pair.txt	f85601479e7016bbb0b0a5cd308e7faeeaaf6a33
+tests/replays/judge/02_throw.rpl	7b44c0f73ea9aab8685c9ed0aa09de9e6e5dba0c
+tests/audit_tenant_throws.sh.lines-1-70 (lines 1-70 of tests/audit_tenant_throws.sh)	5ca79814d118249e8c5904f7ff3aff864b225329
+tests/lua/read_tap.lua	ae90f3a61428f39ef9684310088431667e78b3f9
+tests/expected/PROVENANCE.md.lines-110-116 (lines 110-116 of tests/expected/PROVENANCE.md)	39e68fe103fb9e5a8bc520b731502289d4f9a91c
+tests/ci_emulator.tsv.lines-270-276 (lines 270-276 of tests/ci_emulator.tsv)	249e53417f7c2a01b5e0af9a15ee0278053a4aa9
+tests/expected/same_data_p2.tsv	2e87d2229fe26239bda7b2caa050eb6929978f41
+tests/audit_forced_pick_fidelity.sh.lines-1-60 (lines 1-60 of tests/audit_forced_pick_fidelity.sh)	830b1e38ae983671df9a4c04f2b5144af676c39d
+build/meter_probe_14z166/disasm.txt	60c3b0f2d7e786d8b905a2872a6a9116cbb242aa
+docs/game/engine_internals.md.lines-3040-3130 (lines 3040-3130 of docs/game/engine_internals.md)	d9f0054400ff1a140bec9dfcde8a3d5cc60b5635

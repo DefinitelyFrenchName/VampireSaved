@@ -1,0 +1,20 @@
+PREPARED BUT NEVER READ — 14z-166, 2026-09-18.
+
+This packet (the final re-freeze of tests/expected/throw_registration.tsv: the
+reducer's frame-net contact steps, the ids rows with their writer PCs, and the
+legacy control captured) was prepared and both reader agents were spawned. Both
+terminated before reading anything, on the account's monthly spend limit:
+
+  "Agent terminated early due to an API error: You've hit your monthly spend
+   limit." (rate_limit, HTTP 429, requests req_011Cf9soGHWfQ2BfsRhaMnW3 and
+   req_011Cf9sogYHBQzFedgYLgor6, model claude-fable-5-1)
+
+So there is NO verdict, no plant result and no ledger row: the run does not
+exist as evidence and must not be counted as one. The freeze it was to check
+(freeze4/verify4) is therefore UNCHECKED under [VSP-183], and that is recorded
+in STATE 14z-166 and in NEXT_SESSION's START HERE as open work: re-prepare and
+read this packet before the expectation is built on.
+
+The preceding runs of the same family DID complete and are in the ledger:
+2026-09-18-32 and -33 (the first freeze), -34 and -35 (the legacy control);
+every one caught its plant and every VIOLATED was resolved by work.

@@ -467,8 +467,11 @@ note = "OBJ bank setter (H farm zone): vs2 bank 3 -> WIDE bank 4"
 # are Donovan's session-14n throw-damage fix VERBATIM (same region,
 # same instructions — his copy is patched and play-proven; the fix
 # never propagated when H/P were ported). The 14x grab-pointer rollback
-# family (-$4B74/-$4B72/-$4B3D) is deliberately NOT touched: ported
-# readers consume those vars (donovan.toml stage-99 record).
+# family (-$4B74/-$4B72/-$4B3D) is deliberately NOT touched (donovan.toml
+# stage-99 record). 14z-166 RETRACTED the reason given here until then
+# ("ported readers consume those vars"): no ported instruction reads them,
+# and leaving the stores at vs2 offsets pays every tenant throw's meter to
+# the wrong fighters (GitHub #157). Untouched pending the maintainer's ruling.
 [[port_patch]]
 stage = 6
 region = "x028122"

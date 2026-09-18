@@ -1588,7 +1588,7 @@ displacement change (b498→b446, b494→b442 ×2, b496→b444 ×2, plus the
 flag-word immediates' rows) = 12 bytes per tenant copy. Donovan's rows
 verbatim. The 14x rollback family (-0x4B74/-0x4B72/-0x4B3D — attacker/
 victim registration + state byte) left at vs2 offsets on purpose:
-ported readers consume them (donovan.toml stage-99 parked rows).
+ported readers consume them (donovan.toml stage-99 parked rows). [CORRECTED 14z-166: no ported instruction reads them — every placed site is a write — and the price of leaving them is GitHub #157, the tenant throws' meter paid to the wrong fighters.]
 Static census after: ZERO vs2 damage-band A5 writes remain in ported
 space on either build (the remaining b48c/b48e/b4c3 hits are the
 rollback family, by design).

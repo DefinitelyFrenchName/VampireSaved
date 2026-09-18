@@ -1,0 +1,20 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_throw_registration.sh	3b6b692b4e4eb27fc64b827f1bbb8e4b1cad7342
+tests/expected/throw_registration.tsv	096b1ac0030c40d63ee600ebae59852525b6cff5
+build/gates_14z166/throw_reg_freeze3.log	40a1d7f828e3a582449ffa23f7904229caa0c980
+build/gates_14z166/throw_reg_verify3.log	a717ce5ccbba94a44af166412d96ea4bc43ba248
+build/gates_14z166/throw_reg_ctl_swapped3.log	a2d82b933cc550253ee9c10c0f5aa6cc4501d632
+build/gates_14z166/throw_reg_ctl_planted3.log	4fab131b1b7f2a0bb6f2e68b7847a52ac62dcecb
+build/meter_probe_14z166/wheel_resolve.txt	ba1b5be3f05f2c3ed5ad347995551bfcaa21226d
+build/meter_probe_14z166/wheels/vsavj.json	6556460f1492aa2a0e963993dda7b1a1cbbeea8f
+build/meter_probe_14z166/wheels/vsav2.json	adc15fbc4c96d6b14a96f8183d529cd8d0dbcb13
+tools/select_paths.py	054ea33649d0f50be6c47bb7e667424272fd3164
+tests/replays/judge/02_throw.rpl	7b44c0f73ea9aab8685c9ed0aa09de9e6e5dba0c
+tests/lua/read_tap.lua	ae90f3a61428f39ef9684310088431667e78b3f9
+tests/expected/PROVENANCE.md.lines-110-116 (lines 110-116 of tests/expected/PROVENANCE.md)	39e68fe103fb9e5a8bc520b731502289d4f9a91c
+tests/ci_emulator.tsv.lines-270-276 (lines 270-276 of tests/ci_emulator.tsv)	249e53417f7c2a01b5e0af9a15ee0278053a4aa9
+tests/expected/same_data_p2.tsv	2e87d2229fe26239bda7b2caa050eb6929978f41
+build/meter_probe_14z166/disasm.txt	60c3b0f2d7e786d8b905a2872a6a9116cbb242aa
+docs/game/engine_internals.md.lines-3040-3130 (lines 3040-3130 of docs/game/engine_internals.md)	cbfd2b075a02009289325be59252f6c4b05e1681
+STATE.md.lines-44-60 (lines 44-60 of STATE.md)	48b59ecaf4067a2e876a9747132d22eb1e6dee3f
+build/meter_probe_14z166/legacy_throw.sh	987b01dd6d4bdcc369f6123b9b3ed15ef56dc02e

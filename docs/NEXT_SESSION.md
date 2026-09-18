@@ -1,13 +1,13 @@
-# NEXT SESSION — orientation (rewritten at the 14z-165 CLOSE, 2026-09-17)
+# NEXT SESSION — orientation (rewritten at the 14z-166 CLOSE, 2026-09-18)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## THE PARITY RIGS' P2 IS DEMITRI NOW (14z-165), the ruled 14z-164b P2. `tools/name_moves.py` carries `p2_id`/`p2_path` for the three naming tenants, `tools/move_parity.py p2check` asserts P2 = 0x01, never in his two differing ATTACK records `b:0x71`/`b:0x74`, and holds his third differing chain `b:0x10` (the pose push box) EQUALLY on both legs — its pushbox datum a bounded positional confound named for the family pass (the rule-checker caught the missing `b:0x10`, run 2026-09-17-29 Q4) — from each leg's own game image, and five expectations are re-frozen on him: `move_naming_{donovan,huitzil,pyron}.txt`, `projectile_census.txt`, `killshread_es.txt`, `move_parity_events.tsv` (506 events: **372 IDENT / 108 DIFF / 25 NOT-IN-DF / 1 VOID**). The victim rigs are unchanged (their P1 is Victor the attacker). The switch turned 13 former Victor-first DIFF rows IDENT and turned the huitzil_5/6 guard-cancel events DIFF (Demitri's 5HP re-times P1's block) — all frozen AS MEASURED, no family root-caused.
+## #136's METER FAMILY IS ROOT-CAUSED AND IS #157 (14z-166): every tenant throw pays the attacker the victim's flat 8 and the victim the throw record's meter, because the ported throw code's hit-registration stores still write vs2's displacements (the 14x rollback) and the vsavj hit stager reads the collision walk's leftover (P2, P1). Frozen AS MEASURED by `tests/audit_throw_registration.sh` (`tests/expected/throw_registration.tsv`, three tenants, Phobos's air throw included); the facts are `engine_internals.md` "THE HIT-REGISTRATION PAIR, MEASURED" and `atlas/ram.md` `$FF343A`. The 14x reason ("ported readers consume those vars") is RETRACTED: no ported instruction reads them; the one vsavj reader is the hit-value ring shift `PRG:0x0194AE`, trigger unmeasured. THE MAINTAINER'S CONTROL settles the reading: Demitri's throw on pristine vsavj and on vsav2 registers the pair at each engine's own throw site and pays +9 / +8 on both — the host rule is vs2's, the tenant rows are a PORT DEFECT (gate part `legacy_demitri`). Rule-checker runs 30-34 (`tests/rulecheck/ledger.tsv`), every plant caught, every VIOLATED resolved — run 33's Q2 stands on the record: the capture (`build/meter_probe_14z166/captures/meter_sheet_pyron3.png`) came AFTER the conclusion. **CAPTURE FIRST on the next family** ([VSP-173]).
 
-## THE #136 FAMILIES ARE STILL OPEN and are the next work (the ruled order: stable state, #148 DONE, #152 DONE, then everything else — the #136 families included). The 108 DIFF rows of `tests/expected/move_parity_events.tsv` are frozen as measured; NONE is attributed to a side or a mechanism yet. Root-cause them capture-first ([VSP-136], [VSP-20]): the guard-cancel family (huitzil_5/6 Reflect Wall, now DIFF on P1's x/node because gc timing is cued off P2's 5HP — and P2's b:0x10 pushbox is the named candidate for the x rows), the meter-first rows (~30, Pyron's Planet Burning +30 native / +20 ours per use the largest), Cosmo Disruption held (pyron_4, 4 hits ours vs 2), Press of Death's x, pyron_3's stock crossing.
+## THE FIX IS THE MAINTAINER'S TO SCHEDULE (#157, needs-maintainer-ruling): reconcile ONLY the three pair-store pairs in each tenant's x028122 copy (donovan.toml's stage-99 rows, `0x0289C6/CA` and siblings), leave the throw-state-byte clears (`-0x4B3D`) at vs2 offsets; measure under `audit_throw_registration` (then re-freeze it DELIBERATELY, checker run named in the commit), `audit_tenant_throws`, the capture gates and a hand-played recording — 14x saw its breakage in play. Not a session's to decide ([VSP-10]).
 
 ## THE SESSIONS ACT ON GITHUB AS `mechanyaa-ai`; a commit subject never puts close/fix/resolve directly before `#N`. The static tier runs by CADENCE; the close is the session cadence with every control executed, then the push.
 
@@ -15,17 +15,25 @@ M18 (`merged-m18`, `build/m3b_merged26`) is still the current freeze and release
 `git status -sb` says the push state. The withdrawn M19 build dirs are on disk,
 UNREGISTERED — do not play them and do not point a gate at them.
 
+## FIRST, BEFORE ANYTHING IS BUILT ON IT: the current freeze of `tests/expected/throw_registration.tsv` is UNCHECKED. Its packet is prepared as rulecheck run `2026-09-18-36`; both readers died on the account's monthly spend limit, so there is no verdict and no ledger row (`tests/rulecheck/runs/2026-09-18-36/NOT-RUN.txt`). Re-prepare it (the claim is in that run's `meta.tsv`) and read it with two fresh agents. The four earlier runs of the same family (32-35) are complete and in the ledger. AND CHECK THE READER MODEL: this session ran as Fable 5.1 and then as Opus 5; a change of the checker's model is a recalibration (ruling 2026-09-17, 14z-163).
+
 ## START HERE — what is open (THE ORDER IS RULED, 2026-09-17: stable state, then #148 (DONE), then #152 (DONE), then everything else — the #136 families included)
 
-- **#136 — ROOT-CAUSE THE FAMILIES, capture first.** The parity rigs' P2 is now
-  Demitri and the 506 events are frozen on him; the families to convict are the
-  guard cancel (huitzil_5/6, DIFF on P1's x/node), the meter fraction (~30 rows,
-  Planet Burning the largest), Cosmo Disruption held (pyron_4, 2-vs-4 hits), and
-  the residual per-move x/cnt rows. Each is a maintainer-facing finding: measure,
-  capture ours-vs-native, run it through `tools/rulecheck.py` before proposing a
-  fix, and remember a DIFF may be OUR engine running the move differently, not a
-  data-port bug. Bishamon is the P2 FALLBACK if a case arises Demitri cannot
-  answer (DECISIONS_HISTORY.md 14z-164b).
+- **#136 — the REMAINING families, capture first.** After the meter family (#157):
+  the x-at-window-start rows (huitzil_5/6/7 Reflect Wall and Circuit Scrapper,
+  donovan_3 Press of Death — P2's `b:0x10` pushbox is the named candidate), the cnt
+  rows (donovan_2/10/11 Blizzard Sword, huitzil_2/9 Plasma Trap), and huitzil_3's
+  first event (ours lands a 6MP normal where native throws at 2689). The method
+  that worked: census the DIFF rows by first field, read the existing traces for
+  the signature, static census of the code, non-debug taps for the mechanism,
+  a -debug probe only for register ORDER at contacts the taps also show
+  ([VSP-130] bit once), the checker before the write-up.
+- **Two unmeasured tails of #157, for whoever measures it:** the ring shift
+  `PRG:0x0194AE` (what it does with the pointer words the placed stores spray into
+  its ring, and what triggers it), and the four damage-scaler reads of the stale
+  live pair (tenant throw DAMAGE was equal on every measured throw). And the placed
+  copy of vs2's meter adder tests `+0x1C3` (vs2's DF field) where vsavj's tests
+  `+0x111` — the first thing to look at when the in-DF rows are measured.
 - **In-DF coverage is 5LP/5MP (Donovan) and 5LP (Phobos, Pyron)**: the batteries
   outrun the 360-frame DF. A RIG change (re-activate DF per group of events, never
   a comparator tolerance) is needed before any in-DF move is measured — the
@@ -37,22 +45,32 @@ UNREGISTERED — do not play them and do not point a gate at them.
 
 ## TRAPS PAID THIS SITTING
 
-1. **A matched-data P2 turns a data-dependent must-fire control DEAD.** The
-   `pins-ignored` control (14z-164) fired only because Victor's data differed
-   between the games; Demitri's defense is the same on both, so no real row moved
-   and the control read DEAD. Rebuilt as a perturbed-copy of our own trace (x
-   altered on the rig's `$FF8410` pin frames). A control whose firing depends on
-   the data under test is disarmed by a clean result.
-2. **A matched-data P2 stops being a confound but starts feeding P1's timing.**
-   The guard-cancel rigs cue P1's block off P2's 5HP; Demitri's 5HP differs from
-   Victor's, so those parts re-froze DIFF by construction. A P2 switch re-freezes
-   every rig whose P1 input is timed to P2's attack.
-3. **`p2check` reads OURS against the build's own `verify_data.bin`**, because
-   Demitri is a legacy-unmodified character there, so his graph on the merged
-   build equals pristine vsavj's — the native leg uses the vs2 data view.
-4. **A skip-then-continue loop over a single-line ruling deletes the NEXT line too**
-   (a standing ruling was dropped and restored; assert the file after a
-   programmatic STATE edit).
+1. **A rollback note that names a mechanism is a claim** — "ported readers consume
+   those vars" stood in three manifests for 100+ sessions; one read tap and one
+   static sweep refuted it. Measure the readers before repeating a note.
+2. **A -debug probe timeline can play a DIFFERENT match at a collision-sensitive
+   event** ([VSP-130], paid again): huitzil_3's first Magnet Slam threw on the
+   -debug ours leg and landed a normal on the canonical one. Cite -debug probes
+   only for register ORDER at contacts the non-debug taps also show; freeze
+   non-debug only; the -debug INPUT-VIOLATION lines were the debugger's alone
+   (six non-debug guard runs read 0).
+3. **"Nothing reads it" from three rigs is not "dead"**: the static sweep found
+   the vsavj ring shift the rigs never triggered. A dynamic null needs a static
+   census of every access FORM, and the form no sweep sees (a pointer derived
+   elsewhere) named.
+4. **A snapshot run's PNGs live in the MAME sandbox** — `rm -rf sb` deleted the
+   first captures; keep the sandbox (or copy `sb/snap/<set>/*.png` out) before
+   cleaning.
+5. **`MAME_BIN` must be pinned in every ad-hoc runner too**, not only in gates:
+   five probe legs booted Homebrew's mame (which does not know `vsavjw`) and exited
+   0 with a game list in the log.
+6. **A capture at frames chosen from the RAM numbers can show NOTHING** — the first
+   meter sheet was pixel-identical, as the maintainer measured, because every pair of
+   values fell in the same band of the gauge; the frames that separate the legs were
+   the ones straddling a band and the stock crossing. Know what the screen can
+   resolve before choosing the frame, or the capture is a picture of nothing.
+7. **Capture BEFORE the conclusion** — the checker read the order off the claim's
+   own words; a capture that follows is a record of the miss, not a cure.
 
 **IF A DOC IS TOUCHED:** the doc gates (`test_checkdocs`, `test_docshape`,
 `test_doc_anchor_census`, `test_checkskills`, `test_gotchas_index_current`,

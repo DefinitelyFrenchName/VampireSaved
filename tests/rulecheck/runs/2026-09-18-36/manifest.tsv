@@ -1,0 +1,24 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_throw_registration.sh	f8879638ce1d285cf7bb60c134468da6ec0c3075
+tests/expected/throw_registration.tsv	b6d163a5c0a70f5c8f0aa7696f56ed16f7919361
+build/gates_14z166/throw_reg_freeze4.log	40a1d7f828e3a582449ffa23f7904229caa0c980
+build/gates_14z166/throw_reg_verify4.log	a717ce5ccbba94a44af166412d96ea4bc43ba248
+build/gates_14z166/throw_reg_ctl_swapped4.log	a2d82b933cc550253ee9c10c0f5aa6cc4501d632
+build/gates_14z166/throw_reg_ctl_planted4.log	4fab131b1b7f2a0bb6f2e68b7847a52ac62dcecb
+build/meter_probe_14z166/wheel_resolve.txt	ba1b5be3f05f2c3ed5ad347995551bfcaa21226d
+build/meter_probe_14z166/wheels/vsavj.json	6556460f1492aa2a0e963993dda7b1a1cbbeea8f
+build/meter_probe_14z166/wheels/vsav2.json	adc15fbc4c96d6b14a96f8183d529cd8d0dbcb13
+tools/select_paths.py	054ea33649d0f50be6c47bb7e667424272fd3164
+tests/replays/judge/02_throw.rpl	7b44c0f73ea9aab8685c9ed0aa09de9e6e5dba0c
+tests/lua/read_tap.lua	ae90f3a61428f39ef9684310088431667e78b3f9
+tests/lua/snapshot_frames.lua	f78f7e34866129349b9b38ba6ee33cf81daf6991
+build/meter_probe_14z166/captures_legacy/legacy_throw_sheet.png	c3514329cb7d04aeee44b45a786023cab4e2b651
+build/meter_probe_14z166/captures_legacy/vsavj/index.txt	a764417e241f5fb55ea655ce828a3ba5b793e923
+build/meter_probe_14z166/captures_legacy/vsav2/index.txt	a764417e241f5fb55ea655ce828a3ba5b793e923
+build/meter_probe_14z166/captures/DELIVERED.txt	1fbbfd03d64a1de3098d90ad954125f7f257db7e
+tests/expected/PROVENANCE.md.lines-110-116 (lines 110-116 of tests/expected/PROVENANCE.md)	39e68fe103fb9e5a8bc520b731502289d4f9a91c
+tests/ci_emulator.tsv.lines-270-276 (lines 270-276 of tests/ci_emulator.tsv)	249e53417f7c2a01b5e0af9a15ee0278053a4aa9
+tests/expected/same_data_p2.tsv	2e87d2229fe26239bda7b2caa050eb6929978f41
+build/meter_probe_14z166/disasm.txt	60c3b0f2d7e786d8b905a2872a6a9116cbb242aa
+docs/game/engine_internals.md.lines-3040-3130 (lines 3040-3130 of docs/game/engine_internals.md)	cbfd2b075a02009289325be59252f6c4b05e1681
+STATE.md.lines-44-62 (lines 44-62 of STATE.md)	b3c14cd8d7448b41fb0cdc0e5dda8d5543a40ed0

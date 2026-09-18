@@ -3063,10 +3063,61 @@ port_patched to the vsavj layout** — the reconciler rewrites absolute
 addresses, not d16 displacements. Donovan's six session-14n rows are
 the template; propagated to H/P 14z-85f after Phobos' FG beam ticks
 measured 12 combo-counted hits with ZERO HP (damage staged into the
-vs2 vars nobody reads). The 14x rollback rule still holds: the
+vs2 vars nobody reads). ~~The 14x rollback rule still holds: the
 attacker/victim-registration and state-byte family
 (`-0x4B74/-0x4B72/-0x4B3D`) is consumed by PORTED readers and must
-stay at vs2 offsets. Gate: `tests/audit_fg_parity.sh`.
+stay at vs2 offsets.~~ **RETRACTED 14z-166 (measured, next paragraph): NO ported
+instruction reads that family — all 24 placed sites naming vs2's displacements
+are WRITES, and the only other instructions naming them are 4 in vsavj's own
+engine, the ring shift (`build/meter_probe_14z166/census.txt` part 4) — and leaving the
+stores at vs2 offsets is what pays every tenant throw's meter to the wrong
+fighters (GitHub #157). The rows stay at stage 99 until the maintainer
+schedules the re-attempt.** Gate: `tests/audit_fg_parity.sh`.
+
+**THE HIT-REGISTRATION PAIR, MEASURED (14z-166, `tests/audit_throw_registration.sh`,
+`build/meter_probe_14z166/`):** the pair vsavj `-0x4BC6/-0x4BC4(a5)` =
+`RAM:$FF343A/$FF343C` (vs2 `-0x4B74/-0x4B72` = `$FF348C/$FF348E`) holds the
+(attacker, victim) fighter-block words of the CURRENT hit. Its WRITERS: the
+per-frame collision registration `PRG:0x017FF8/0x018000` (vs2 `0x016870/0x016878`),
+run once per fighter every frame — so it writes (P1, P2) then (P2, P1) and the
+pair is left as (P2, P1) after the walk; the projectile-hit registration
+`0x0193F6/0x0193FE` and `0x01944A/0x019452`; and the THROW sites `0x029694/98`,
+`0x029762/66`, `0x029828/2C` (vs2 `0x0289C6/CA`, `0x028A94/98`), which register
+the thrower and the held victim on the contact frame right before the damage
+call. Its ENGINE CONSUMERS: 34 sites in vsavj's engine range (the census is
+`build/meter_probe_14z166/census.txt` part 3), among them the generic hit
+stager's meter section `0x018990/0x0189A0` (the record's `+0x14` to the fighter at
+`-0x4BC6`, a flat 8 to the one at `-0x4BC4` — the vs2 twin `0x17302/0x17312`) and
+the damage scaler's attacker-pointer reads `0x018B9C/0x018C3C/0x018CA6/0x018D28`
+(vs2 `0x17532/0x175FC/0x17666/0x176E8`). **THE COST OF THE 14x ROLLBACK, measured
+on every tenant throw of three naming-rig parts (one per tenant, Phobos's air
+throw included):** the placed x028122 copies of the throw sites write vs2's
+displacements, `$FF348C-F`, which on vsavj are two words of a FOUR-WORD RING
+`-0x4B76..-0x4B70(a5)` shifted by `PRG:0x0194AE` (`move.w -$4b72,-$4b70; -$4b74,-$4b72;
+-$4b76,-$4b74; d2,-$4b76` when fighter `+0x70` and the staging flag `-0x4BBA`
+are clear — its entry is a dispatch-table target, not a branch, and its
+trigger is unmeasured): no ported instruction reads them (all 24 placed sites
+are writes, `census.txt` part 4; no absolute-address or lea form exists either, part 6 — a
+read through a pointer derived elsewhere is outside any static sweep), and in the three rigs the only reader that
+fired was the boot RAM test `0x000D32/0x000D36`; so at a tenant throw's damage
+the vsavj stager reads the collision walk's leftover (P2, P1) and pays the
+VICTIM the throw record's `+0x14` and the ATTACKER the flat 8 — native pays the
+reverse. That is GitHub #136's meter family (28 DIFF rows) in full; whether the
+four scaler reads change tenant throw DAMAGE is unmeasured (equal HP drops on
+every measured throw). **THE LEGACY CONTROL (the maintainer, 2026-09-18: "the values are quite widly different, we really need that control you're doing with a legacy character"):**
+Demitri throwing Victor under the same taps registers the pair at each engine's
+own throw site (vsavj `0x029694/98`, vs2 `0x0289C6/CA`) and pays Demitri +9 and
+Victor +8 on BOTH pristine vsavj and vsav2 — the host engine's rule is vs2's and
+the legacy record carries the same value in both games, so the tenant rows are a
+port defect and not an engine-generation difference (`legacy_demitri` in
+`tests/audit_throw_registration.sh`). The fix candidate — reconciling ONLY the three pair-store
+pairs, leaving the `-0x4B3D` state-byte clears at vs2 offsets — is the
+maintainer's to schedule; whether 14x's breakage came from the stores or the
+clears was never separated. The per-character `moveq #N; jsr adder` sites are
+the SWING costs and fire identically on both games; each tenant calls a placed
+COPY of vs2's adder (in its x028122 copy) that is vs2's routine verbatim but for
+its reconciled tail call, and so tests fighter `+0x1C3` — vs2's DF flag — where
+vsavj's own adder tests `+0x111`: a Dark-Force-only difference, unmeasured.
 
 **[VSE-42]** **The victim-side REACTION CLASS dispatch (14z-85g(2), measured):**
 after the appliers, the victim's reaction is chosen at `PRG:0x2384E`:

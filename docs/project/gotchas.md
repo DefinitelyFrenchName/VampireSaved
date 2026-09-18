@@ -2240,8 +2240,10 @@ in ANY existing manifest, the rows come with it — grep
 `region = "<name>"` across build/manifest/*.toml is the two-second
 check. And its converse from 14x still binds: do NOT blanket-copy the
 rolled-back families (the grab-pointer/state rows are stage-99 parked
-in donovan.toml because ported READERS consume those vars at vs2
-offsets).
+in donovan.toml ~~because ported READERS consume those vars at vs2
+offsets~~ — **that reason was RETRACTED 14z-166: no ported instruction reads
+them, and the rows' price is GitHub #157**; they stay parked until the
+maintainer schedules the re-attempt).
 
 ## **[VSP-91]** A 0x7xx sfx id's faithfulness is a property of its CONTENT, not its number (14z-85g)
 
@@ -4971,3 +4973,29 @@ P2 does. The rule-checker caught the missing b:0x10 (run 2026-09-17-29 Q4): when
 you narrow a differing-data set to a subset, name why each excluded member is
 harmless or the checker will — a pushbox difference reaches a COMPARED field (x)
 through contact even when the attack-record differences do not.
+
+## A ROLLED-BACK RECONCILIATION IS A LIVE DEFECT WITH A NAMED PRICE, NOT A SETTLED STATE — the 14x grab-pointer rollback pays every tenant throw's meter to the wrong fighter (paid: 14z-166, GitHub #136)
+
+Session 14v reconciled eight A5 work-var stores in the ported throw code to
+vsavj's layout; 14x rolled all eight back because Donovan's throw broke in play,
+and every later tenant manifest copied the rule "the grab-pointer family stays
+at vs2 offsets — ported readers consume it". Measured 14z-166: the family has NO
+ported reader (statically: all 24 placed sites naming vs2's displacements are
+writes, and the 4 vsavj-engine instructions naming them are the ring shift) — the placed stores write `RAM:$FF348C-F`, on vsavj two words of a
+hit-value ring that `PRG:0x0194AE` shifts, a reader that fired in none of the
+three rigs — and the ENGINE's readers of vsavj's own pair (34 sites,
+`build/meter_probe_14z166/census.txt`) see the collision walk's stale (P2, P1)
+at every tenant throw, which is exactly #136's meter family. Two lessons. (1) A
+rollback note that names a mechanism ("ported readers consume those vars") is a
+claim like any other: when the next symptom lands near it, MEASURE the readers
+(a read tap on the address answers it in one run) before repeating the note into
+a third manifest. (2) The eight rows were rolled back as ONE family, so "the fix
+broke the throw" never said WHICH rows broke it — the three pair-store pairs or
+the two state-byte clears (`-0x4B3D` → `-0x4B8F`, the engine's throw-state byte
+that `0x018A9E`/`0x019138` test). A re-attempt separates them, one at a time,
+under `tests/audit_tenant_throws.sh`, the capture gates and a hand-played
+recording ([VSP-20]); the re-freeze of `tests/expected/throw_registration.tsv`
+is the deliberate act that records the fix. And note the second thing the
+x028122 copy carries: a verbatim copy of vs2's METER ADDER, whose Dark-Force
+gate tests fighter `+0x1C3` (vs2's DF field) where vsavj's adder tests `+0x111`
+— unmeasured, and the first place to look when the in-DF rows are measured.
