@@ -5340,3 +5340,19 @@ build's fingerprint on the sheet or beside it. When the claim rests on a differe
 re-shoot and compare before the conclusion transfers. And cite a history entry by its heading, not
 by a line number. The packet's `DECISIONS_HISTORY.md:a-b` citations went stale as entries were
 added at the head (run -75's note). They were re-derived by looking each quoted line up verbatim.
+
+## THE RE-POINT SWEEP SEES BUILD NAMES IN THIS TREE — A PINNED FINGERPRINT AND THE HARNESS'S DEFAULTS ARE OUTSIDE IT (paid: 14z-170)
+
+The M19 freeze re-pointed 304 live build references in 153 files and re-froze every static gate it
+ran, and still two gates held M18 at the close. `test_phasec_spaces` pins the stock twin's
+FINGERPRINT (`e86e1d04`, donovan-m19-stock), not a build name, so the sweep had nothing to rename.
+The freeze moved the twin by design (`c54f1fb8`, donovan-m23-stock). The harness's lineage
+defaults (`lib/py/bbh/config.py` and three sibling files in `~/Developer/blackbox-harness`) named
+`m3b_merged26`, and `test_bbh_fidelity`'s F4 read the two runners' dry-runs DIFFERENT. That is the
+second freeze in a row: the M18 re-point sat uncommitted there for a day (harness `10a82d2`). Both
+are FREEZE-cadence gates, and neither ran in the freeze's own static pass. The first close tier then
+ran without `ROMDIR`, and 81 gates SKIPPED, these two among them. `--strict` read that as red, which
+is what it is for. Rule: at a freeze, run `tests/run_all_static.sh --strict --cadence freeze` with
+`ROMDIR` set BEFORE the tags ([VSP-101], [VSP-103]). Grep for the OLD FINGERPRINTS as well as the
+old build names, and re-point the harness's defaults in the same sitting. The phasec re-freeze is
+attributed by the freeze's own op-by-op delta of the stock twin (`attr2_m5_stock18.txt`).

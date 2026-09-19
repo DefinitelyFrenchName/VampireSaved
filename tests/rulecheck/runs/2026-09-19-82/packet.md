@@ -1,0 +1,30 @@
+THE PACKET
+
+Decision kind: expectation
+Subject: 14z-170 close tier: test_phasec_spaces's stock fingerprint re-frozen e86e1d04 -> c54f1fb8 (donovan-m23-stock), and the harness's lineage defaults re-pointed to M19 (after the resolution of 2026-09-19-81)
+Claim (the working agent's sentence): test_phasec_spaces's stock-twin fingerprint is re-frozen e86e1d04 -> c54f1fb8, and the close tier's two reds are closed with live homes. The gate builds the stage-6 stock track from the tree and pinned e86e1d04, donovan-m19-stock (registry line 152); the tree now builds c54f1fb8, the stock twin the M19 freeze registered as donovan-m23-stock (registry line 170) — the close tier read the mismatch red (phasec_fail_tier.log, static_close2.log). The move is the freeze's own: attr2_m5_stock18.txt attributes the stock twin's delta against build/m5_stock17 (whose program is e86e1d04: baselines.txt) op by op, and edits_check_m5_stock18.txt recognises every EDIT and INSERTED op as a designed edit kind, 0 unexplained; from the other side, which the tool's listing cannot absorb, the stock image holds every op of its patch (image_vs_patch.txt) and each of its 321/322 changed bytes lies inside an M19 op or is back to the base, 0 neither (image_delta_classes.txt), and the tool's SAME on this track is verified pair by pair, 241 listed and each identical (same_class_check.txt), its classes planted (tool_plants.txt). After the re-freeze the gate reads PASS on c54f1fb8 (phasec_after_refreeze.log) and FAIL when handed the old value (phasec_old_expect.log; both logs carry their invocation and EXIT status). Every other M18 fingerprint in tests/*.sh, tests/lib, tests/lua and tools is a comment, an already re-frozen 'was' note, or tools/rulecheck.py's BIRTH_REGISTRY_KEY — merged-m18's whole-set key held on purpose as the rule-checker's permanent birth anchor (tools/rulecheck.py:64-68, its guard at 585-592) — each of the 16 hits classified by reading its line (m18_fp_grep.txt, m18_fp_classified.txt). The second red, test_bbh_fidelity F4, was the harness's lineage defaults still naming the M18 builds (bbh_fail_tier.log): re-pointed to M19 in the same four files the M18 re-point moved (bbh_repoint.diff), after which the gate reads PASS, F4 identical (bbh_fidelity_after_repoint.log), and the harness's selftest GREEN (bbh_selftest.log). Both are homed in docs/project/gotchas.md 'THE RE-POINT SWEEP SEES BUILD NAMES IN THIS TREE — A PINNED FINGERPRINT AND THE HARNESS'S DEFAULTS ARE OUTSIDE IT' and the findings table's last two rows. NOT tested: the full static tier on the tree as it now stands runs after this check (its third run); the grep covers the M18 fingerprints' 8-character forms in the gate and tool trees, not every other freeze's pins; the harness commit is not pushed yet.
+Artifacts (read every one, in full):
+  - tests/test_phasec_spaces.sh.lines-50-68 (lines 50-68 of tests/test_phasec_spaces.sh)
+  - build/rc170/phasec_fail_tier.log
+  - build/rc170/phasec_after_refreeze.log
+  - build/rc170/phasec_old_expect.log
+  - build/rc170/static_close2.log
+  - build/rc170/freeze/rc_final/attr2_m5_stock18.txt
+  - build/rc170/freeze/rc_final/edits_check_m5_stock18.txt
+  - build/rc170/freeze/rc_final/image_vs_patch.txt
+  - build/rc170/freeze/rc_final/image_delta_classes.txt
+  - build/rc170/freeze/rc_final/same_class_check.txt
+  - build/rc170/freeze/rc_final/tool_plants.txt
+  - build/rc170/freeze/rc_final/baselines.txt
+  - tests/expected/registry.tsv.lines-152-152 (lines 152-152 of tests/expected/registry.tsv)
+  - tests/expected/registry.tsv.lines-170-170 (lines 170-170 of tests/expected/registry.tsv)
+  - build/rc170/m18_fp_grep.txt
+  - build/rc170/m18_fp_classified.txt
+  - tools/rulecheck.py.lines-60-70 (lines 60-70 of tools/rulecheck.py)
+  - tools/rulecheck.py.lines-580-595 (lines 580-595 of tools/rulecheck.py)
+  - build/rc170/bbh_fail_tier.log
+  - build/rc170/bbh_repoint.diff
+  - build/rc170/bbh_fidelity_after_repoint.log
+  - build/rc170/bbh_selftest.log
+  - docs/project/gotchas.md.lines-5344-5358 (lines 5344-5358 of docs/project/gotchas.md)
+  - build/rc170/findings_table_14z170.tsv

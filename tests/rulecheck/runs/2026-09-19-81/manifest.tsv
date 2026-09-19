@@ -1,0 +1,18 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/test_phasec_spaces.sh.lines-50-68 (lines 50-68 of tests/test_phasec_spaces.sh)	5f1f5bff6a5c058841f065d990724716865ad030
+build/rc170/phasec_fail_tier.log	2b1253447848dad895ed63b4a12fb66acaaf0f27
+build/rc170/phasec_after_refreeze.log	87a45bc4b83712b21e6ee6ea62dab50748561283
+build/rc170/phasec_old_expect.log	2b1253447848dad895ed63b4a12fb66acaaf0f27
+build/rc170/static_close2.log	ea386c770176109f429af924c97f7f02bdf784e3
+build/rc170/freeze/rc_final/attr2_m5_stock18.txt	c2169823ca829e82529fcf6c430529fb4ba43c22
+build/rc170/freeze/rc_final/edits_check_m5_stock18.txt	85f6db3a37a1276ac95df70e90c8c33d13922f61
+build/rc170/freeze/rc_final/baselines.txt	343a78da327895e8dd101fd00527a4ab342a3871
+tests/expected/registry.tsv.lines-152-152 (lines 152-152 of tests/expected/registry.tsv)	307f2ed81b9fe9398c72fb6811848460f255a2bd
+tests/expected/registry.tsv.lines-170-170 (lines 170-170 of tests/expected/registry.tsv)	f0a1e328d9b4658096618ac10db1a6cddc6cfe25
+build/rc170/m18_fp_grep.txt	35f06e5cf033a066582e32604f95bda84e8df09a
+build/rc170/bbh_fail_tier.log	406c683c41fd4f023241d2eb31371101556bf14c
+build/rc170/bbh_repoint.diff	8c99015c1cd3a2445c62b3b92948637f46d9f8ac
+build/rc170/bbh_fidelity_after_repoint.log	4ce88d4856ded86f27e5270724cc2f2e620c787c
+build/rc170/bbh_selftest.log	cd0d7247086d907dd7472e79a51218bc4d01cea5
+docs/project/gotchas.md.lines-5344-5358 (lines 5344-5358 of docs/project/gotchas.md)	54493709a800de1f8d3b517f0f07149c3997ef7b
+build/rc170/findings_table_14z170.tsv	f66114ad6b70a82526507bf1492d0d0cdf2b0ecd
