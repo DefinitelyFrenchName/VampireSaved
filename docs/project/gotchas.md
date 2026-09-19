@@ -5175,3 +5175,168 @@ and the tier goes red until a freeze moves them. Rule: plan fixes as a batch tha
 registry rows, the tags, the re-point sweep, the re-frozen expectations, the battery —
 `vampire-saved-port` D.4); verify each fix on its own build before (a program-image diff against
 the freeze is cheap: 14z-169's gauge fix was exactly 3 bytes) and keep it as a patch until then.
+
+## A RESOLVER THAT SCANS IN PLACE READS ITS OWN OUTPUT — resolve tagged placeholders at the offsets you wrote them (paid: 14z-170)
+
+The generator's `x2b7ef4` companion-effect pass tags each ported coordinate-list pointer as
+`0xEE000000 + off`, allocates the lists, then resolved the tags by scanning every even offset of
+the blob for a long whose top byte is `0xEE` — in place. After it resolved a pointer to `0x..EExx`,
+the window two bytes on began with that pointer's LOW WORD (`EE xx ..`) and was "resolved" again:
+the pointer became an ODD address and the record's next word was overwritten. Whether a build is hit
+is placement-dependent, so it passed every gate for many freezes: merged-m16, -m17 and -m18 (and
+`don_m22`, the stock twin) ship 22 such sites in Donovan's copy, and merged-m18 52 in all. It
+surfaced only when the four #136 fixes grew three thunks, shifted 27 regions by +0x30, and an
+op-by-op attribution of the delta (`tools/attribute_patch_delta.py`, promoted from the scratch
+`build/rc170/delta_ops.py`) found three records that were
+neither designed edits nor relocations. Rule: a tag written for later resolution is resolved at
+the recorded offsets (`resolve_tagged_placeholders()`, ground truth
+`tests/test_effect_placeholders.sh`), never found by a pattern scan over bytes the pass has
+already rewritten — and a program delta is ATTRIBUTED, byte class by byte class, before a freeze:
+"the fix moved N bytes" hides a corruption inside the relocation noise. The generated
+`docs/project/tables/chars/donovan.md` had been reporting "relocated ok 2032 / bad 33" for this
+region: a generated page's "bad" count is a finding with no owner until someone reads it.
+
+## A GATE THAT LOOKS UP "OURS" IN A PRISTINE IMAGE CANNOT SEE THE BUILD CHANGE (paid: 14z-170)
+
+`tests/audit_defense_row_residue.sh` logs, under a `-debug` read watch, the INDEX each leg's
+defense read uses, then takes the byte answered from a data view — and for our leg it took it
+from pristine vsavj's (`build/out/vsavj_data.bin`). While the tenants' rows were vsavj's copies
+that was the same number; once the ruled fix gave them vs2's rows, the gate kept reporting the
+old bytes, an alarming "the fix did nothing". A MAME watchpoint logs registers, not memory, so
+the "value read" is always a lookup in an image the gate chose ([VSP-147]). Rule: a gate that
+reads the build under test's bytes reads them from THAT build's own view (`$BUILD/verify_data.bin`),
+and a classification ("residue" / "control") is defined against the build, not against the two
+reference games.
+
+## A LABEL IN A CENSUS ROW IS NOT A DESIGN — disassemble around the address before planning on it (paid: 14z-170)
+
+14z-169's census called three placed reads of `+0x1C3` (vs2 `0x2617A`) "the Change entry's 'not
+during Power' test (the EX route)", and the EX-route fix was planned as "force that refusal". Read
+in context, `0x2617A` sits in vs2's POWER activation (`0x026166`: sets `+0x1C3`, two stocks), a
+routine the tenants' EX route never passes; the EX site's gate is `0x028534` (the stock tested
+before the input). Rule: before designing on an address a census named, disassemble the routine
+around it and its callers (both absolute and pc-relative forms); a row's label is a reading, not
+a measurement.
+
+## TODAY'S TOOL OVER YESTERDAY'S INPUTS MEASURES THE TOOL CHANGE AS DATA (paid: 14z-170)
+
+To attribute the rule-5 census's `fact` growth at the M19 freeze, the working tree's
+`tools/audit_rule5.py` was run over HEAD's manifests (`--root` on a `git archive` copy) and diffed
+against today's tree. The diff showed nine new pcrel-section keys with no matching removals: the
+freeze's re-point sweep had renamed the sections AND taught the tool the new names, so today's
+tool could not see HEAD's sections at all. Only running HEAD's OWN tool over HEAD's inputs
+(`cd <archive> && python3 tools/audit_rule5.py --root <archive>`) gave the true before: the
+re-key nets to zero and the growth is exactly the new rows' keys (rule-checker run 2026-09-19-55
+Q1). Rule: a BEFORE measurement runs the before-tree's own tool; a tool edited in the same change
+is part of what moved.
+
+## A SCRATCH COPY OF A GATE THAT DOES NOT PARSE EXITS 0 — check a ground truth RAN before reading its verdict (paid: 14z-170)
+
+To run a new check in the failing direction, a gate was copied with one line substituted. The
+substitution left an unbalanced `{` — `sh` printed "syntax error: unexpected end of file" and the
+run's exit status was 0, so "the check did not fire" was nearly recorded as a finding about the
+check. Rule: a perturbed copy is `sh -n`-checked before it runs, and its log is read for the
+lines the check prints, never inferred from the exit status alone (the same class as
+"Pipe a build tool through tail" — an exit status is only as good as what produced it).
+
+## THE MiSTer ROMSET LANE CANNOT RUN BEFORE THE FORK'S CATALOGUE NAMES THE NEW BUILD (paid: 14z-170)
+
+jtframe's `.rom` builder finds every zip member by CRC32 alone, so the `vsavjw` entry in the
+jtcores fork's `doc/mame.xml` must name the new build's CRCs (`tools/gen_vsavjw_xml.py`). At the
+M19 freeze the MiSTer romset lane (`test_mister_prg_window`, `_gfxc_fetch`, `_sdram_census`) was
+started before that step: `mra_header.py` refused ("8 of 31 CRC parts do not resolve") and every
+gate failed "the positive leg did not complete" within seconds — or, for the census, after 16
+minutes of stock legs, with its control reported DEAD. Rule: the MiSTer tail (catalogue, fork
+commit, pin bump, series) comes BEFORE the MiSTer lane in the freeze; a local fork commit is
+enough (the scratch clones fetch the local submodule first), the fork PUSH precedes the pin's push.
+
+## A FROZEN EXPECTATION OF RAM THAT HOLDS ROM-DERIVED DATA FREEZES HASHES, NEVER THE BYTES (paid: 14z-170)
+
+`tests/audit_column_flash.sh` first froze palette row 11 as 32 bytes of hex per leg and frame.
+Palette RAM at that moment is a copy of ROM palette data, so the expectation would have put
+ROM-derived bytes in the tree ([VSP-8]; the frame-data rule keeps the tree to readers, verdicts
+and hashes). Caught before commit, while reading the new tool output for another reason. Rule: a
+gate whose compared state is ROM-derived content (palettes, tiles, record bytes) freezes a hash
+of it, and the prose describing it names what it is ("a fire ramp"), not its values.
+
+## A FIX THAT MOVES A FROZEN VALUE HAS TO LAND ON NATIVE, NOT JUST MOVE AWAY FROM THE DEFECT (paid: 14z-170)
+
+At the M19 freeze the attribution table was re-derived and two Phobos rows kept their class
+DEFENSE-ROW: Demitri's 5HP on Phobos had moved from 13 to 12 when the ruled defense-row fix gave
+him vs2's rows. Native is 11. The re-freeze read "the fixed row moved, as designed". But the row
+was already byte-identical to vs2's, so the class no longer explained the number. The attribution
+gate's only control proved every DIFF row carries a class. It never proved that a class still
+explains its row after the fix. The rule-checker caught it (run 2026-09-19-60 Q1/Q4). Measured
+across three RNG pins, the extra point was deterministic. It went to the maintainer and was ruled
+"Freeze, ticket it". It is now the open class `PHOBOS-DMG-OPEN`, and
+`tests/audit_phobos_dmg_residual.sh` is its reproducer. Rule: after a ruled fix, compare every
+row it moved against NATIVE, not against the old defect. A value that is neither is a finding, and
+it goes to the maintainer before anything is re-frozen. An attribution class that names a root
+has to re-check that root on the build (here, the row read against vs2's).
+
+## A DAMAGE FIX RE-TIMES EVERY RIG THAT WAITS FOR A KO (paid: 14z-170)
+
+At the M19 freeze the defense-row fix changed how much Phobos and Donovan take from each hit.
+Two gates went red, and neither had found a defect. Both rigs were timed by a KO their inputs
+never cause. In `test_tenant_winpal`, replay 62's Donovan died about 160 frames earlier (11 a hit,
+not 10), so P2's scripted mash, which ran to f5035, landed on Victor's win-quote screen and
+skipped it. The palette check at the FIXED frame 5300 then read the next VS screen. In
+`audit_continue_switch`, Phobos no longer lost the marathon's first match by KO (it went to a
+timeout), and the scripted continue depended on that loss. Rule: a rig that reaches a screen
+through a KO it does not cause is re-timed by any damage change. Find the event per build
+instead of pinning its frame: trace the KO, drop the trailing inputs, and search the window
+(the win-pal lose leg since 14z-170). When a rig's premise moves, re-author the rig as the
+maintainer rules (the continue-switch re-authoring). Before calling a moved landing a defect,
+measure what vanilla does from the same state (pristine vsavj's Victor lands on Jedah too).
+
+## A CLASS THAT ABSORBS ANOTHER CLASS HIDES IT FROM EVERY LISTING (paid: 14z-170)
+
+`tools/attribute_patch_delta.py`, written this sitting to attribute the M19 program delta op by
+op, defined SAME as "same address, same bytes". But its relocation pass fell through to
+`same += 1` for an op at an unchanged address whose bytes differed only by relocated longs. So
+114 in-place relocations on merged-m19 were counted as SAME, and they were never listed: `--moved`
+listed only ops whose address moved. The rule-checker (run 2026-09-19-63 Q4) noticed that
+merged-m19's `vm3j.07b` had moved while no listed op fell in that member. The member held 14
+`poke32` pointers into Pyron's regions, each shifted +0x30. Nothing was wrong in the build, but
+the attribution could not show that. Fixed: RELOCATED (in place) is its own class, counted and
+listed. The tool's split is now planted (a byte in a SAME, an in-place RELOCATED and a MOVED op
+each become an EDIT). SAME itself is listable (`--same`): every listed pair was checked
+identical in kind, address and bytes on all six M19 tracks, and a relocated long planted into a
+SAME op leaves SAME for RELOCATED (in place), counted and listed (run 2026-09-19-79). Rule: every class a tool counts must be one its docstring defines, and one
+its listing can show. A reconciliation from the other side catches the rest: every changed byte
+of the image lies inside some op (the freeze's `image_outside_ops` check).
+
+## A DIRECTORY'S MODIFICATION TIME HIDES A REMOVAL BEHIND ANY LATER ADDITION (paid: 14z-170)
+
+At the M19 freeze the question "was a file some gate read removed while the gates ran?" was
+answered from directory modification times. A directory's mtime moves when an entry is added or
+removed, and every changed directory was explained by an entry created at that second. The
+rule-checker (run 2026-09-19-74 Q1/Q4) pointed out that an mtime records only the LAST change: a
+file removed at 10:00 from a directory that gains a file at 13:00 reads as "an addition". Worse,
+the inventory that paired changed files with the gates naming them skipped a gate-named file that
+no longer existed without a word (`if os.path.exists(inc)`). Checked from the removal side
+instead. Tracked removals come from git: none since HEAD, which predated the window. Every full
+repo path named in a gate's code, or in a file the gate names directly, was checked to exist now: 48 missing, 32 in comments and 16 in code,
+each decided, none a file a gate read. 341 more were cut short by a shell variable or a glob and
+could be checked only by their directory. A plant (a missing tool named in a closure line) must be
+reported. Rule: an existence check that skips a missing input is a removal detector switched off.
+Report the missing file, never skip it. An mtime is evidence of the last change, never of the only
+one. What stays invisible is named, not claimed: an untracked file removed that no gate names in
+full, whether it is read through a variable-built path, a glob, or no name at all, or named only
+in a file the gate reaches through a variable, an import or a second-level file (the scan opens
+one level).
+
+## A CAPTURE IS EVIDENCE FOR THE BUILD IT WAS SHOT ON (paid: 14z-170)
+
+The maintainer read the M19 fixes' capture sheets before the freeze. Most were shot on scratch
+builds: `build/fix170_b`, and for Pyron's EX `build/fix170_all`, deleted since. The freeze claim
+rested them on the frozen `build/m3b_merged27`. The rule-checker (run 2026-09-19-72 Q1; -73 for
+the column-KO sheet, whose build no artifact showed) found no artifact joining the two. They were
+joined by re-shooting every "ours" leg on the frozen build with the same replay, pokes and frames.
+78 of 78 snapshots matched. For the KO sheet, 8 of 8 snapshots and every frame's whole-RAM
+checksum matched, and the leg's own MAME log names the archive it opened. The same comparison saw
+a planted pixel and the M18-vs-fix difference. Rule: a capture shown to the maintainer names its
+build's fingerprint on the sheet or beside it. When the claim rests on a different build,
+re-shoot and compare before the conclusion transfers. And cite a history entry by its heading, not
+by a line number. The packet's `DECISIONS_HISTORY.md:a-b` citations went stale as entries were
+added at the head (run -75's note). They were re-derived by looking each quoted line up verbatim.

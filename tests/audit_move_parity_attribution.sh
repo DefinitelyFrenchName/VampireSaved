@@ -15,7 +15,9 @@
 # CPU overruns (SLOWDOWN), the ruled Dark Force cost (DF-STOCK), the rig's opening
 # (ENTRANCE), vsavj's block re-entry (GUARD-REENTRY, tests/audit_guard_reentry.sh), #159
 # (P2-DISPLACEMENT), the ruled trap remap (TRAP-REMAP), the column shock (COLUMN-SHOCK,
-# tests/audit_column_shock.sh), the defense row (DEFENSE-ROW; the vs2 rows ruled 2026-09-18, not yet built).
+# tests/audit_column_shock.sh), the defense row (DEFENSE-ROW; the vs2 rows ruled 2026-09-18, BUILT at the M19 freeze — on a build whose row
+# 0x10 is already vs2's the same signature is PHOBOS-DMG-OPEN: Demitri's 5HP 11 native / 12 ours, cause unmeasured, an
+# open ticket, ruled 2026-09-19 "Freeze, ticket it (Recommended)").
 #
 # WHAT IT FREEZES (tests/expected/move_parity_attribution.tsv), the tool's rows:
 #   root <part:event | opening> <event name> <class> step=<n> <the signature's evidence>
@@ -24,14 +26,14 @@
 # rig never lands). A FIX CHANGES THIS FILE BY DESIGN: re-freeze it with the move-parity
 # table, and read the diff as the fix's effect (rows gone, roots gone), never as noise.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged26] [JOBS=6] [FREEZE=1] tests/audit_move_parity_attribution.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [JOBS=6] [FREEZE=1] tests/audit_move_parity_attribution.sh
 #   emulator tier, MAME; ~12 ablation steps over the 19 parts carrying a DIFF — measured 14z-168 on this MacBook, solo: ~5 min wall
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged26}"
+BUILD="${BUILD:-build/m3b_merged27}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/move_parity_attribution.tsv"
 EVENTS="$REPO/tests/expected/move_parity_events.tsv"

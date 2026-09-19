@@ -1,0 +1,24 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/rc170/fix_manifest.diff	832d2aaf51995814d5cd67ef54b8c80df7aab063
+build/rc170/delta_ops_step1.txt	643c58ec433b0fb10eec5a08a00fbc7a58f84b70
+build/rc170/delta_ops_step2.txt	232dc6849406e420df1fc35991c53d130b344bce
+build/rc170/delta_ops.py	ad04b363ca313f6617d8c0350ad4dd95160bdf38
+build/rc170/disasm_evidence.txt	32c306ddf5d47f4cf0c4c7b075f3bb6342d87edf
+build/rc170/vb/audit_ex_refused.log	667b07de0eb3ccc0fad86eeeddf3be80c25106eb
+build/rc170/vb/audit_column_shock.log	fa7e1734fcc025666f0f8279902acbb4bb241339
+build/rc170/vb/audit_df_meter.log	2e428d54b61ed329d16a274c0f6f9654508edbc5
+build/rc170/vb/audit_pass_overrun.log	a53e5aa7a918765e3d7276ca69379963db5ed879
+build/rc170/vb/defres.log	948de5b07909597571f39d279357a19dad03acc8
+build/rc170/vb/trap_check.log	836d06dbd0e52960d57f0e257c2d2ad7cab3aceb
+build/rc170/trap_check_m18.log	d2a32163d30428ff5fcd7b0d98fd96bef49e7de4
+build/rc170/ko_b.sh	80c079221a9a7bbd68c843f6ddc80ceff29de04c
+build/rc170/ko_b/native/f.txt	3a34e41fc1dff61febcdbe36b53170af027fefab
+build/rc170/ko_b/fix/f.txt	3a34e41fc1dff61febcdbe36b53170af027fefab
+build/rc170/ko_b/m18/f.txt	3a34e41fc1dff61febcdbe36b53170af027fefab
+tests/test_unless_composed.sh	85b5143c19dd8d3f4889d8117e701df22805dd3c
+tests/test_effect_placeholders.sh	75712ae9ee13f820d27aa2be42d406e4a7883a40
+build/rc170/effph.log	1e33ca76739da7aa595e4f5db45003f98b60375b
+build/rc170/tenant_loop_2.log	ce862607cf1de64246ee69d57cf384afe96213d4
+tests/audit_defense_row_residue.sh	1e2e54acea953b18ecc509cfe0f65da24b9487ff
+build/rc170/cap_pyr/Pyron_2623PP_after_fix_sheet.png	cc679852a57d93af247b3bdf7a6418ed4755ab88
+DECISIONS_HISTORY.md.lines-30-135 (lines 30-135 of DECISIONS_HISTORY.md)	a79829abebb891e454a86629d66d1eee08369fbe

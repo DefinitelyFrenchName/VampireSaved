@@ -1,5 +1,124 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-170 — THE M19 FREEZE (donovan-m23 / huitzil-m30 / pyron-m24 / merged-m19, mark M19): the four ruled #136 fixes, and a placeholder corruption that had shipped since merged-m16
+
+**WHAT THE FREEZE CARRIES.** The four fixes the maintainer ruled on 2026-09-18
+(`DECISIONS_HISTORY.md`), designed in 14z-169, built and verified in 14z-170;
+and the repair of a generator defect the fixes' own delta attribution exposed.
+The mark `M18` -> `M19`.
+
+**1. THE GAUGE (the meter adder).** Each tenant's placed copy of vs2's meter
+adder tested `+0x1C3`, vs2's Dark Force POWER flag, where vsavj's adder tests
+`+0x111`, the CHANGE flag; the two routines are otherwise byte-identical. One
+`[[port_patch]]` per tenant (region `x028122`, vs2 `0x028D6C`) rewrites the
+operand: `4a2e01c3` -> `4a2e0111` — three adder tests on the merged image,
+one of them in the crypt range (a 2-byte stored change). The tenants now gain no gauge
+inside their Dark Force, as the shells do not (`tests/audit_df_meter.sh`).
+
+**2. THE DEFENSE ROWS.** Phobos (0x10) and Donovan (0x13) took damage through
+vsavj's rows for those ids, which are copies of their SHELLS' rows (Bulleta's,
+Victor's), and rallied at the shells' thresholds. Four `[[data_port]]` rows
+place vs2's own: the curve row (vsavj `PRG:0x0B8940` table; Phobos's row at
+`0x0B8B40`, Donovan's at `0x0B8BA0`) and the rally threshold as a WORD
+(`patch_prg` writes words), each with the neighbour byte asserted unchanged by
+a same-value `fixes` entry — Pyron's 0x11 and 0x12, the legacy-reachable Dark
+Gallon id, both 0x30 in vsavj, vs2 and vh2. `orc` against vh2's copies.
+`only_variant_slot`: the stock twin keeps its substituted slot's row. 66 bytes
+change on the merged image. The build answers vs2's bytes live: Phobos 40 HP and
+Donovan 48 HP thresholds, as native (`tests/audit_defense_row_residue.sh`'s
+threshold legs). **One residual is open:** Demitri's 5HP takes 12 HP from Phobos
+where native takes 11 (13 before the fix), with both of his rows already vs2's,
+deterministic across RNG pins, so the extra point enters later in the damage chain.
+Ruled *"Freeze, ticket it (Recommended)"*: M19 ships as built, and the residual is
+#161 (`tests/audit_phobos_dmg_residual.sh`).
+
+**3. THE EX ROUTE, DISABLED.** The tenants' vs2 EX inputs (Donovan 421+KK,
+Phobos 263+PP, Pyron 2623+PP) entered Dark Force through the placed copy of
+vs2's Change entry for a stock — a second, longer route into the mode. One
+`[[port_patch]]` per tenant turns the `bne.w` after `tst.b $111` at the EX
+site into `bra.w` (Phobos vs2 `0x05553C`, Pyron `0x057CCC`, Donovan
+`0x059D28`), so the input takes vs2's own stock-0 path. Phobos and Donovan
+then do exactly what vs2 does at stock 0; Pyron falls through to 623+PP, his
+ES move, for one stock — ruled 2026-09-19 *"Natural reading"*
+(`tests/audit_ex_refused.sh`).
+
+**4. THE CLASS-0x52 RULE (scoped S1).** vs2's hit class 0x52 shocks a
+grounded victim 24 frames and exempts the attacker from the hit-freeze; vsavj
+has no 0x52 slot, so the column's three records and the trap's two had been
+remapped to 0x06, losing the exemption (and, for Donovan, meeting the 14z-42
+Lightning Sword thunks: victim 12, Donovan 4). The fix: `reaction_hook`
+`case_a4` writes the 0x38 marker into `+0x54` (a value vanilla never
+produces, read by every consumer exactly as 6); the two 14z-42 thunks test it
+— the victim thunk inside the Donovan branch only (zero legacy cost), the
+attacker thunk on both branches (~24 cycles on a grounded electric hit);
+`es_type51_dispatch` routes 0x52 to vsavj's KO handler `0x0186E0` (vs2's
+KO[0x52] = KO[0x06]). The column's three remaps are retired (the records keep
+native 0x52). Phobos's two trap remaps gained the row key
+`unless_composed = "donovan"`: where Donovan's machinery is composed (the
+merged build) the trap keeps native 0x52; on Phobos's solo track it keeps the
+14z-85g(2) remap and its attacker freeze (`tests/test_unless_composed.sh`,
+`tests/audit_trap_shock.sh`'s three legs). Column: victim freeze 24 at both
+hits, no attacker write, the whole timeline equal to native
+(`tests/audit_column_shock.sh`, the KO in its section 1b). Trap on merged:
+class 0x38, attacker exempt, frame-for-frame native (speed and RNG pinned).
+
+**5. THE x2b7ef4 PLACEHOLDER RESOLVER.** The generator's companion-effect
+pass tagged each ported coordinate-list pointer `0xEE000000 + off` and then
+resolved the tags by scanning the blob IN PLACE; a resolved pointer whose low
+word began `0xEE` was re-read as a tag, turning the pointer odd and clobbering
+the next word. merged-m18 shipped 52 such sites (Donovan's copy at
+`PRG:0x0F3F70`: 22 intra-region pointers and 18 coordinate-list pointers;
+Pyron's merged copy: 12). The 22-site class is identical in merged-m16, -m17,
+-m18, `don_m22` and the stock twin. Now resolved at the RECORDED offsets
+(`resolve_tagged_placeholders()`, `tests/test_effect_placeholders.sh`). No
+naming part reads a corrupted span in a match (measured on merged-m18 by
+`tests/audit_x2b7ef4_reach_m18.sh`: a read watch on the corrupted bytes only, armed after
+boot, each run's node trajectory checked against a non-debug run — the first, whole-copy
+watch desynced Donovan's replays with its own stops and was VOID); which
+effect draws the records is not established. Donovan's character map moves
+with it: `x2b7ef4` relocated bad 33 -> 11 (the 11 are tripwire stubs,
+`0x4AFC` at `PRG:0x0CBAE0`-`0x0CBF50`, for vs2 targets past the region's end
+— unchanged), unattributed 692 -> 558.
+Checked independently of the generator, against vs2's own source bytes (rule-checker run
+2026-09-19-57; the scratch `build/rc170/freeze/rc_freeze/x2b7ef4_sites_check.py`): of the 160 bytes
+that changed in Donovan's merged copy, 44 are intra-region pointers now equal to vs2's pointer
+relocated to the copy (the first site: vs2 `0x2C2D8C` -> `0x0FEE08`, where merged-m18 held the odd
+`0x0F0047`), 36 are coordinate-list pointers whose target list equals vs2's by content, and 80 are
+vs2's own bytes restored; Pyron's and Phobos's merged copies change only by the +0x30 cascade and
+the repair — 0 bytes unexplained; a planted byte at a repaired site is flagged.
+
+**THE DELTA, attributed.** Merged: ops 831 -> 835 (the four `data_port`
+rows); every other difference is a designed edit or allocator relocation —
+the three grown thunks shift 27 placed regions by +0x30, and allocations at
+hole boundaries reshuffle between holes with content identical (the slot-clearing
+alloc wrapper `PRG:0x3FFFC0` -> `PRG:0x46A630`, rule-checker run 2026-09-19-54 Q1)
+(`tools/attribute_patch_delta.py`, promoted from the scratch `build/rc170/delta_ops.py`: 15 EDIT, every
+one a designed edit by the scratch `build/rc170/delta_edits_check.py`). Per track (ops): donovan
+342 -> 344, huitzil 373 -> 375, pyron 312, stock twin moved (`e86e1d04` ->
+`c54f1fb8`; the defense rows are `only_variant_slot`), stage-4 image moved by
+ONE byte (`108f7523` -> `2fa7c2f1`, case_a4).
+
+**FINGERPRINTS.** program / whole-set: donovan `48423867` / `22c9c9d8`;
+huitzil `7e2531b3` / `af0bb263`; pyron `ef4bbb25` / `bc95f77a`; merged
+`681ac3ad` / `61e9815a`; stock twin `c54f1fb8`; stage 4 `2fa7c2f1`.
+
+**COST.** No new zero-pass frame over the 42 naming parts
+(`tests/audit_lag_budget.sh`, M19 against M18) — the maintainer's condition
+that the combined fixes add no frame of lag.
+
+**THE FREEZE.** Registry rows (whole-set keyed): donovan-m23, huitzil-m30,
+pyron-m24, merged-m19, and the battery's donovan-m23-stock / donovan-m23-stage4.
+The four WIDE expectation sets CARRY their predecessors' authored `.masked`,
+`.skip` and mask byte-identical, were frozen and then verified SUITE GREEN on
+their builds (the authored count equal to the predecessor's each time);
+merged-m19's 16 self-frozen tenant `.sha1` were deleted per #111. The stock and
+stage-4 sets carry verbatim and pass 14/14 through the battery's masked leg.
+Member delta by CRC: merged 8, donovan 5, huitzil 3, pyron 3, stock 3, stage-4
+1. The MiSTer tail: the fork's `vsavjw` catalogue regenerated (the eight merged
+members), pin bumped, series `0035`; `release/merged-m19/` packaged (the WIDE
+MRA's BUILD block and eight CRCs; the stock control MRA unchanged). Rule-checker
+runs 2026-09-19-55 (the static re-freezes), -56 and -57 (the freeze).
+
 ## 14z-144 — DONOVAN THROWING JEDAH KEEPS JEDAH'S GEOMETRY: the mirror-victim fix gated to the base-slot track
 
 **THE DEFECT, and it had been shipping since 14z-64.** `donovan.toml`'s

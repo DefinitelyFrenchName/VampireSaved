@@ -114,7 +114,7 @@ if [ -f "$M/rompath/vsavjw.zip" ]; then
     printf '  %s/rompath/vsavjw.zip present (%s bytes)\n' "$M" "$(wc -c < "$M/rompath/vsavjw.zip" | tr -d ' ')"
     if command -v python3 >/dev/null 2>&1 && [ -f tools/build_fingerprint.py ]; then
         printf '  program fingerprint: %s\n' "$(python3 tools/build_fingerprint.py "$M/rompath" --set vsavjw --sha-only 2>&1 | head -1)"
-        printf '  (merged-m18 is 1d8bedc5a6aa784967595b95c092fcb5f1c68f26)\n'
+        printf '  (merged-m19 is 681ac3adbb927c4936b896af4205e38d9155401e)\n'
     fi
 else
     printf '  %s/rompath/vsavjw.zip ABSENT — see WINDOWS_BUILD.md section 3\n' "$M"

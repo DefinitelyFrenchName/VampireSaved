@@ -27,9 +27,12 @@
 -- HEARTBEAT lines fire once a second regardless of hits, so "armed but
 -- idle" and "never armed" cannot look alike (the index_watch lesson).
 --
--- The debugger pauses emulated time during a stop, so frame-counted input
--- playback stays aligned; verify the run's liveness from the log's own
--- event lines, never from a clean exit alone.
+-- ~~The debugger pauses emulated time during a stop, so frame-counted input
+-- playback stays aligned~~ — CONTRADICTED (measured 14z-170, [CPE-5]): the frame_done
+-- counter this script keys input playback on ADVANCES on every debugger stop, so a
+-- breakpoint that fires often desyncs the replay (docs/platform/gotchas.md "Debugger
+-- stops DESYNC replay frame counting"). Verify the run's liveness from the log's own
+-- event lines, never from a clean exit alone — and for WHEN, trust a non-debug tap.
 
 local out_path   = os.getenv("TRACE_OUT") or "bp_regs.txt"
 local max_frames = tonumber(os.getenv("FRAMES") or "") or 3600

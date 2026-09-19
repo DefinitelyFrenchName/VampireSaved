@@ -1,0 +1,26 @@
+# tests/expected/x2b7ef4_reach_m18.tsv — per Donovan/Pyron naming part on merged-m18: reads of the corrupted x2b7ef4
+# records (a -debug read watch on the corrupted bytes only, armed at frame 2000), the first read's frame, and how many of
+# the part's three alignment dumps before it equal a non-debug run's (tests/audit_x2b7ef4_reach_m18.sh). Evidence class:
+# in-emulator, MAME. Frozen AS MEASURED with FREEZE=1. Columns: <part> hits <n> first <frame|-> aligned <k>/<k>; one build row.
+#--
+donovan_1	hits	0	first	-	aligned	1588/1588	skew	-
+donovan_2	hits	0	first	-	aligned	2270/2270	skew	-
+donovan_3	hits	0	first	-	aligned	1507/1507	skew	-
+donovan_4	hits	0	first	-	aligned	2133/2133	skew	-
+donovan_5	hits	0	first	-	aligned	1298/1298	skew	-
+donovan_6	hits	0	first	-	aligned	1793/1793	skew	-
+donovan_7	hits	0	first	-	aligned	2113/2113	skew	-
+donovan_8	hits	0	first	-	aligned	834/834	skew	-
+donovan_9	hits	0	first	-	aligned	1168/1168	skew	-
+donovan_10	hits	0	first	-	aligned	196/1013	skew	2980
+donovan_11	hits	0	first	-	aligned	982/982	skew	-
+donovan_12	hits	0	first	-	aligned	376/982	skew	3537
+donovan_13	hits	0	first	-	aligned	1909/1909	skew	-
+donovan_14	hits	0	first	-	aligned	515/515	skew	-
+pyron_1	hits	0	first	-	aligned	1999/1999	skew	-
+pyron_2	hits	0	first	-	aligned	2508/2508	skew	-
+pyron_3	hits	0	first	-	aligned	1887/1887	skew	-
+pyron_4	hits	0	first	-	aligned	2104/2104	skew	-
+pyron_5	hits	0	first	-	aligned	1933/1933	skew	-
+pyron_6	hits	0	first	-	aligned	663/663	skew	-
+build	merged-m18

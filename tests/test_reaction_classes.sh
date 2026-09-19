@@ -28,11 +28,11 @@
 # The `ours` rows follow the merged build: re-freeze at every freeze (FREEZE=1), reviewing
 # the diff; the vsavj and vsav2 rows move only if the reference images or the tool do.
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged26] [FREEZE=1] tests/test_reaction_classes.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged27] [FREEZE=1] tests/test_reaction_classes.sh
 #   static tier (a build dir + the decrypted reference views, no emulator); measured 14z-169 on this MacBook: ~3 s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-BUILD="${BUILD:-build/m3b_merged26}"
+BUILD="${BUILD:-build/m3b_merged27}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/reaction_classes.tsv"
 CONTROL="${CONTROL:-}"
@@ -68,7 +68,18 @@ grep -q '^vsavj	reaction-to-shock	023ac8	-	06' "$W/got.tsv" || bad "vsavj's reac
 grep -q '^ours	reaction-to-shock	023ac8	-	06' "$W/got.tsv" || bad "our build's reaction table does not send 0x06 to 0x23AC8"
 grep -q '^both	shock-handler	.*vs2-only: cmpi.b #\$52, \$54(a6)' "$W/got.tsv" || bad "the vs2 shock handler's 0x52 test is not seen"
 awk -F'\t' '$2=="writes38" && $5!="none"' "$W/got.tsv" | grep -q . && bad "a stager handler writes 0x38 into +0x54: $(awk -F'\t' '$2=="writes38" && $5!="none"' "$W/got.tsv" | head -1)"
-awk -F'\t' '$2=="imm54" && $3=="value" && $4=="38" && $5!="none"' "$W/got.tsv" | grep -q . && bad "a constant write puts 0x38 into +0x54"
+# the REFERENCE rows must EXIST before their "none" can mean anything (rule-checker run
+# 2026-09-19-55 Q4: a check over rows the tool stopped emitting would pass vacuously)
+for _g in vsavj vsav2; do
+    awk -F'\t' -v g="$_g" '$1==g && $2=="imm54" && $3=="value" && $4=="38"' "$W/got.tsv" | grep -q . \
+        || bad "no '$_g imm54 value 38' row — the reference 0x38 check below would read nothing"
+done
+awk -F'\t' '$1!="ours" && $2=="imm54" && $3=="value" && $4=="38" && $5!="none"' "$W/got.tsv" | grep -q . && bad "a constant write puts 0x38 into +0x54 on a REFERENCE image — the S1 marker's premise (vanilla never produces 0x38) is gone"
+# OURS carries exactly ONE constant 0x38 writer since the M19 freeze (14z-170): the class-0x52
+# fix's marker, reaction_hook case_a4 (`move.b #$38,$54(a1)`, donovan.toml), which the two
+# 14z-42 thunks test; the frozen table pins where it is placed
+_n38="$(awk -F'\t' '$1=="ours" && $2=="imm54" && $3=="value" && $4=="38" && $5!="none" {print $5}' "$W/got.tsv" | tr ',' '\n' | grep -c . || true)"
+[ "$_n38" = 1 ] || bad "our build has $_n38 constant 0x38 writers into +0x54 — the S1 design has exactly one (reaction_hook case_a4)"
 
 echo "== 2. the must-fire controls (in-gate)"
 for c in stager-38-copy record-06-to-38; do

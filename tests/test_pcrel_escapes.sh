@@ -45,7 +45,7 @@ PCREL_MODE=0; vs_ctl_is wrong-placement-suffix && PCREL_MODE=1; export PCREL_MOD
 python3 - <<'PY' || rc=1
 import os, re, subprocess, sys
 
-BUILDS = ["hui56", "pyron41", "don_m22"]  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b  # re-pointed 14z-144 (M18 donovan/jedah freeze) <- 14z-143
+BUILDS = ["hui57", "pyron42", "don_m23"]  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b  # re-pointed 14z-144 (M18 donovan/jedah freeze) <- 14z-143
 present = [b for b in BUILDS if os.path.isdir(f"build/{b}/rompath")]
 if not present:
     print("SKIP: none of the three tenant builds are on disk")

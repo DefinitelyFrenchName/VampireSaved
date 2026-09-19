@@ -1,0 +1,9 @@
+# pointer-flow baseline for donovan-m23 (build/don_m23), frozen 14z-170 — the M19 freeze.
+# vs the 14z-130 baseline (donovan-m19, which every Donovan build to donovan-m22 satisfied unchanged):
+# `data:long` 1263 -> 1260 (-3), ATTRIBUTED (build/rc170/freeze/pflow/): the three vanished lines are
+# 0xf5efe, 0xf7f56 and 0xfe16a, offsets 0x1F8E, 0x3FE6 and 0xA1FA of his x2b7ef4 copy (placed at
+# PRG:0x0F3F70) — pointer-shaped longs that the in-place placeholder scan had written into corrupted
+# records (docs/project/gotchas.md "A RESOLVER THAT SCANS IN PLACE READS ITS OWN OUTPUT"); the
+# recorded-offset resolver leaves vs2's bytes there. Nothing added.
+WEAK-COUNT	code:move_imm	1
+WEAK-COUNT	data:long	1260

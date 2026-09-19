@@ -1,0 +1,15 @@
+THE PACKET
+
+Decision kind: expectation
+Subject: 14z-170 M19 freeze: the emulator-tier battery's 15 reds re-frozen or reworked on build/m3b_merged27 (the #136 gates, bases.tsv, the prg_window pair, the win-pal and continue-switch rigs)
+Claim (the working agent's sentence): The freeze battery's first pass on the M19 builds (144 PASS, 15 FAIL, pass1_reds.log) found no legacy regression: every red is one of (a) a table the ruled fixes move by design, re-frozen and then verified by a second run (verify.log) — the column, the gauge, the EX route, the class-0x52 marker, the move-parity events (only DIFF->IDENT or field-narrowing transitions, none IDENT->DIFF), (b) a placed address moved +0x30 by the allocator cascade (bases.tsv's Pyron row re-derived from the image's own table; the dead-pair writers; the prg_window pair's first_addr/max), or (c) a rig whose premise a ruled fix changed, reworked and ground-truthed both ways (groundtruth.txt): the win-pal lose leg now FINDS Victor's quote screen per build (KO traced, P2's trailing mash dropped) and passes on M18 and M19 and fails on a wrong-pool plant; the continue-switch marathon now idles P1 to a natural KO, as the maintainer ruled (ruling_contsw.txt), and all five assertions hold; two live gates whose anchor the gauge fix and the S1 marker removed are re-anchored and fail on merged-m18. Each moved line's cause is in attribution_emu.txt. NOT tested: the defense_row_reads suite counts are attributed by argument (the legacy replays are RAM-identical to vanilla on this build), not replay by replay; the prg_window pair's blocks and cycle/read counters are recorded as measured, not explained; the re-frozen tables are frozen and verified on build/m3b_merged27 only; the win-pal lose leg no longer exercises the quote screen being skipped by a trailing input; and the reworked continue-switch rig no longer exercises the mash-to-KO path the frozen one did.
+Artifacts (read every one, in full):
+  - build/rc170/freeze/rc_emu/pass1_reds.log
+  - build/rc170/freeze/rc_emu/expected.diff
+  - build/rc170/freeze/rc_emu/gates.diff
+  - build/rc170/freeze/rc_emu/verify.log
+  - build/rc170/freeze/rc_emu/groundtruth.txt
+  - build/rc170/freeze/rc_emu/attribution_emu.txt
+  - build/rc170/freeze/rc_emu/ruling_contsw.txt
+  - build/rc170/freeze/rc_emu/replay62_post_ko.png
+  - build/rc170/freeze/rc_emu/phase1b_post_ko.png

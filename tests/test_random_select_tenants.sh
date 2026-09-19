@@ -62,7 +62,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD="${BUILD:-build/m3b_merged26}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged27}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 # PREV_BUILD (was CONTROL until 14z-147c): the last merged WITHOUT the thunk, an
 # OPTIONAL extra leg in section 3 (SKIPped when pruned). Renamed off CONTROL
 # because that env name is now the must-fire mode selector.

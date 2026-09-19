@@ -1,63 +1,56 @@
 # tests/expected/move_parity_attribution.tsv — the cause of every DIFF row of tests/expected/move_parity_events.tsv, by ablation
 # and a measured signature (tests/audit_move_parity_attribution.sh; tools/move_parity_attribution.py). Evidence class:
-# in-emulator. Frozen 14z-168 with FREEZE=1 on m3b_merged26 (GitHub #136). A FIX CHANGES THIS FILE BY DESIGN — re-freeze it
+# in-emulator. Frozen 14z-168 with FREEZE=1 on m3b_merged27 (GitHub #136). A FIX CHANGES THIS FILE BY DESIGN — re-freeze it
 # with the move-parity table and read the diff as the fix's effect.
 # Columns: root <part:event|opening> <name> <class> step=<n> <evidence> | row <part> <event> <base|surfaced> <root> <class>
 #--
 root	opening	shifted huitzil_3 huitzil_5 huitzil_6 huitzil_7 pyron_3	ENTRANCE	step=E	
 root	donovan_2:2	Blizzard Sword [HP]	SLOWDOWN	step=1	zero-pass frame native [3098] ours []
 root	donovan_3:5	Killshread Summon (ES)	P2-DISPLACEMENT	step=1	P2's x differs in the window while the tenant's fields are IDENT
-root	donovan_4:1	Killshread Lightning [MP]	COLUMN-SHOCK	step=1	P2 class 0x52 native / 0x06 ours at 2838
+root	donovan_4:14	Foot Stab [8P] off throw	METER-SWAP	step=1	at 5647 native (P1,P2) (9, 8) ours (8, 9)
 root	donovan_5:1	Sword Grapple [MP]	METER-SWAP	step=1	at 2918 native (P1,P2) (9, 8) ours (8, 9)
 root	donovan_6:2	Slay Shred [LP+LK]	DF-STOCK	step=1	stock 7 native vs 8 ours at the activation
 root	donovan_7:29	Sharirum Luna [6MP] swordless	METER-SWAP	step=1	at 7367 native (P1,P2) (9, 8) ours (8, 9)
 root	donovan_8:1	Sharirum Luna [4MP]	METER-SWAP	step=1	at 2887 native (P1,P2) (9, 8) ours (8, 9)
 root	donovan_10:1	Blizzard Sword [MP] at range	SLOWDOWN	step=1	zero-pass frame native [] ours [2977]
 root	donovan_11:12	Blizzard Sword [LP] blocked	SLOWDOWN	step=1	zero-pass frame native [4580] ours []
-root	huitzil_2:17	Plasma Trap [j.214LK]	TRAP-REMAP	step=1	P2 class 0x52 native / 0x06 ours at 6632
 root	huitzil_3:0	Magnet Slam [6MP]	METER-SWAP	step=1	at 2889 native (P1,P2) (9, 8) ours (8, 9)
 root	huitzil_4:10	Sitting Attack (ES) [8PP] off throw	METER-SWAP	step=1	at 5669 native (P1,P2) (9, 8) ours (8, 9)
 root	huitzil_5:1	Reflect Wall [gc LP at hit+6]	GUARD-REENTRY	step=1	node differs at 3236, both legs leaving the block freeze at 3236 (seq 0 -> 2)
 root	huitzil_6:0	Circuit Scrapper [MP] cont	METER-SWAP	step=1	at 2872 native (P1,P2) (9, 8) ours (8, 9)
 root	huitzil_7:10	Circuit Scrapper [MP] motion then button	METER-SWAP	step=1	at 6875 native (P1,P2) (9, 8) ours (8, 9)
 root	huitzil_8:5	Circuit Scrapper [63214MP] step back	METER-SWAP	step=1	at 4482 native (P1,P2) (9, 8) ours (8, 9)
-root	huitzil_9:1	Plasma Trap [j.214LK] late	TRAP-REMAP	step=1	P2 class 0x52 native / 0x06 ours at 2964
 root	pyron_3:0	Corona Whip [6MP]	METER-SWAP	step=1	at 2830 native (P1,P2) (6, 8) ours (8, 6)
 root	pyron_4:11	Sitting Attack (ES) [8PP] off throw	METER-SWAP	step=1	at 5950 native (P1,P2) (6, 8) ours (8, 6)
 root	donovan_2:15	Sharirum Luna [6MP]	METER-SWAP	step=2	at 6007 native (P1,P2) (9, 8) ours (8, 9)
 root	donovan_3:14	Slay Shred [MP+MK]	DF-STOCK	step=2	stock 6 native vs 7 ours at the activation
-root	donovan_4:14	Foot Stab [8P] off throw	METER-SWAP	step=2	at 5647 native (P1,P2) (9, 8) ours (8, 9)
+root	donovan_4:16	Foot Stab [8K] off throw	METER-SWAP	step=2	at 6147 native (P1,P2) (9, 8) ours (8, 9)
 root	donovan_5:3	Sword Grapple [HP]	METER-SWAP	step=2	at 3318 native (P1,P2) (9, 8) ours (8, 9)
 root	donovan_7:31	Foot Stab [8P] swordless off throw	METER-SWAP	step=2	at 7767 native (P1,P2) (9, 8) ours (8, 9)
 root	donovan_8:3	Sharirum Luna [4HP]	METER-SWAP	step=2	at 3287 native (P1,P2) (9, 8) ours (8, 9)
-root	donovan_10:9	Killshread Lightning [LP] column	COLUMN-SHOCK	step=2	P2 class 0x52 native / 0x06 ours at 4644
-root	huitzil_2:18	Plasma Trap [j.214MK]	TRAP-REMAP	step=2	P2 class 0x52 native / 0x06 ours at 6859
 root	huitzil_3:1	Magnet Slam [6HP]	METER-SWAP	step=2	at 3310 native (P1,P2) (9, 8) ours (8, 9)
 root	huitzil_4:11	Ray of Doom [LP+LK]	DF-STOCK	step=2	stock 5 native vs 6 ours at the activation
 root	huitzil_5:2	Reflect Wall [gc LP at hit+10]	GUARD-REENTRY	step=2	node differs at 3656, both legs leaving the block freeze at 3656 (seq 0 -> 2)
 root	huitzil_6:1	Circuit Scrapper [HP] cont	METER-SWAP	step=2	at 3292 native (P1,P2) (9, 8) ours (8, 9)
-root	huitzil_9:2	Plasma Trap [j.214MK] early	TRAP-REMAP	step=2	P2 class 0x52 native / 0x06 ours at 3231
 root	pyron_3:1	Corona Whip [6HP]	METER-SWAP	step=2	at 3250 native (P1,P2) (6, 8) ours (8, 6)
 root	pyron_4:12	Shining Gemini [LP+LK]	DF-STOCK	step=2	stock 5 native vs 6 ours at the activation
 root	donovan_2:17	Sharirum Luna [6HP]	METER-SWAP	step=3	at 6407 native (P1,P2) (9, 8) ours (8, 9)
-root	donovan_4:16	Foot Stab [8K] off throw	METER-SWAP	step=3	at 6147 native (P1,P2) (9, 8) ours (8, 9)
+root	donovan_4:18	Foot Stab (ES) [8PP] off throw	METER-SWAP	step=3	at 6647 native (P1,P2) (9, 8) ours (8, 9)
 root	donovan_7:32	Slay Shred [LP+LK] swordless	DF-STOCK	step=3	stock 6 native vs 7 ours at the activation
 root	huitzil_3:2	Magnet Slam [4MP]	METER-SWAP	step=3	at 3713 native (P1,P2) (9, 8) ours (8, 9)
 root	huitzil_5:3	Reflect Wall [gc LP at hit+14]	GUARD-REENTRY	step=3	node differs at 4077, both legs leaving the block freeze at 4076 (seq 0 -> 2)
-root	huitzil_6:16	Reflect Wall [gc v: 623 buffered pre-hit, LP at hit+2]	DEFENSE-ROW	step=3	Phobos takes 11 native / 13 ours
-root	huitzil_9:3	Plasma Trap [j.214MK] late	TRAP-REMAP	step=3	P2 class 0x52 native / 0x06 ours at 3491
+root	huitzil_6:16	Reflect Wall [gc v: 623 buffered pre-hit, LP at hit+2]	PHOBOS-DMG-OPEN	step=3	Phobos takes 11 native / 12 ours; his defense row is already vs2's
 root	pyron_3:2	Corona Whip [4MP]	METER-SWAP	step=3	at 3670 native (P1,P2) (6, 8) ours (8, 6)
 root	donovan_2:19	Sword Grapple [MP]	METER-SWAP	step=4	at 6838 native (P1,P2) (9, 8) ours (8, 9)
-root	donovan_4:18	Foot Stab (ES) [8PP] off throw	METER-SWAP	step=4	at 6647 native (P1,P2) (9, 8) ours (8, 9)
+root	donovan_4:20	Foot Stab (ES) [8KK] off throw	METER-SWAP	step=4	at 7147 native (P1,P2) (9, 8) ours (8, 9)
 root	huitzil_3:3	Circuit Scrapper [MP]	METER-SWAP	step=4	at 4140 native (P1,P2) (9, 8) ours (8, 9)
 root	huitzil_5:4	Reflect Wall [gc HP at hit+6]	GUARD-REENTRY	step=4	node differs at 4496, both legs leaving the block freeze at 4495 (seq 0 -> 2)
 root	pyron_3:3	Planet Burning [MP]	METER-SWAP	step=4	at 4143 native (P1,P2) (18, 8) ours (8, 18)
 root	donovan_2:21	Sword Grapple [HP]	METER-SWAP	step=5	at 7238 native (P1,P2) (9, 8) ours (8, 9)
-root	donovan_4:20	Foot Stab (ES) [8KK] off throw	METER-SWAP	step=5	at 7147 native (P1,P2) (9, 8) ours (8, 9)
+root	donovan_4:21	Slay Shred [LP+LK]	DF-STOCK	step=5	stock 7 native vs 8 ours at the activation
 root	huitzil_3:4	Circuit Scrapper [HP]	METER-SWAP	step=5	at 4560 native (P1,P2) (9, 8) ours (8, 9)
 root	huitzil_5:5	Reflect Wall [gc LK at hit+6]	GUARD-REENTRY	step=5	node differs at 4916, both legs leaving the block freeze at 4915 (seq 0 -> 2)
 root	pyron_3:4	Planet Burning [HP]	METER-SWAP	step=5	at 4563 native (P1,P2) (18, 8) ours (8, 18)
-root	donovan_4:21	Slay Shred [LP+LK]	DF-STOCK	step=6	stock 7 native vs 8 ours at the activation
 root	huitzil_3:5	Circuit Scrapper [MP] far (whiff)	METER-SWAP	step=6	at 4980 native (P1,P2) (9, 8) ours (8, 9)
 root	huitzil_5:6	Reflect Wall [gc HK at hit+6]	GUARD-REENTRY	step=6	node differs at 5336, both legs leaving the block freeze at 5335 (seq 0 -> 2)
 root	pyron_3:5	Planet Burning [MP] far (whiff)	METER-SWAP	step=6	at 4983 native (P1,P2) (18, 8) ours (8, 18)
@@ -65,7 +58,7 @@ root	huitzil_3:6	Sky Capture [j.6MP]	METER-SWAP	step=7	at 5200 native (P1,P2) (9
 root	huitzil_5:7	Reflect Wall [gc PP at hit+6]	GUARD-REENTRY	step=7	node differs at 5756, both legs leaving the block freeze at 5755 (seq 0 -> 2)
 root	pyron_3:8	Sitting Attack [8P] off throw	METER-SWAP	step=7	at 6030 native (P1,P2) (6, 8) ours (8, 6)
 root	huitzil_3:7	Sky Capture [j.6HP]	METER-SWAP	step=8	at 5620 native (P1,P2) (9, 8) ours (8, 9)
-root	huitzil_5:8	Reflect Wall [gc LP at hit+6] (control: no block)	DEFENSE-ROW	step=8	Phobos takes 11 native / 13 ours
+root	huitzil_5:8	Reflect Wall [gc LP at hit+6] (control: no block)	PHOBOS-DMG-OPEN	step=8	Phobos takes 11 native / 12 ours; his defense row is already vs2's
 root	pyron_3:9	Sitting Attack [8K] off throw	METER-SWAP	step=8	at 6450 native (P1,P2) (6, 8) ours (8, 6)
 root	huitzil_3:8	Sitting Attack [8P] off throw	METER-SWAP	step=9	at 6089 native (P1,P2) (9, 8) ours (8, 9)
 root	huitzil_3:9	Sitting Attack [8K] off throw	METER-SWAP	step=10	at 6509 native (P1,P2) (9, 8) ours (8, 9)
@@ -99,7 +92,6 @@ row	donovan_3	8	base	donovan_3:5	P2-DISPLACEMENT
 row	donovan_3	9	base	donovan_3:5	P2-DISPLACEMENT
 row	donovan_3	10	base	donovan_3:5	P2-DISPLACEMENT
 row	donovan_3	14	base	donovan_3:14	DF-STOCK
-row	donovan_4	1	base	donovan_4:1	COLUMN-SHOCK
 row	donovan_4	14	base	donovan_4:14	METER-SWAP
 row	donovan_4	16	base	donovan_4:16	METER-SWAP
 row	donovan_4	18	base	donovan_4:18	METER-SWAP
@@ -124,10 +116,8 @@ row	donovan_10	5	base	donovan_10:1	SLOWDOWN
 row	donovan_10	6	base	donovan_10:1	SLOWDOWN
 row	donovan_10	7	base	donovan_10:1	SLOWDOWN
 row	donovan_10	8	base	donovan_10:1	SLOWDOWN
-row	donovan_10	9	base	donovan_10:9	COLUMN-SHOCK
+row	donovan_10	9	base	donovan_10:1	SLOWDOWN
 row	donovan_11	12	base	donovan_11:12	SLOWDOWN
-row	huitzil_2	17	base	huitzil_2:17	TRAP-REMAP
-row	huitzil_2	18	base	huitzil_2:18	TRAP-REMAP
 row	huitzil_3	0	base	huitzil_3:0	METER-SWAP
 row	huitzil_3	1	base	huitzil_3:1	METER-SWAP
 row	huitzil_3	2	base	huitzil_3:2	METER-SWAP
@@ -149,7 +139,7 @@ row	huitzil_5	4	base	huitzil_5:4	GUARD-REENTRY
 row	huitzil_5	5	base	huitzil_5:5	GUARD-REENTRY
 row	huitzil_5	6	base	huitzil_5:6	GUARD-REENTRY
 row	huitzil_5	7	base	huitzil_5:7	GUARD-REENTRY
-row	huitzil_5	8	base	huitzil_5:8	DEFENSE-ROW
+row	huitzil_5	8	base	huitzil_5:8	PHOBOS-DMG-OPEN
 row	huitzil_6	0	base	huitzil_6:0	METER-SWAP
 row	huitzil_6	1	base	huitzil_6:1	METER-SWAP
 row	huitzil_6	9	base	huitzil_6:opening	ENTRANCE
@@ -158,15 +148,12 @@ row	huitzil_6	12	base	huitzil_6:opening	ENTRANCE
 row	huitzil_6	13	base	huitzil_6:opening	ENTRANCE
 row	huitzil_6	14	base	huitzil_6:opening	ENTRANCE
 row	huitzil_6	15	base	huitzil_6:opening	ENTRANCE
-row	huitzil_6	16	base	huitzil_6:16	DEFENSE-ROW
+row	huitzil_6	16	base	huitzil_6:16	PHOBOS-DMG-OPEN
 row	huitzil_6	17	base	huitzil_6:opening	ENTRANCE
 row	huitzil_7	0	base	huitzil_7:opening	ENTRANCE
 row	huitzil_7	1	base	huitzil_7:opening	ENTRANCE
 row	huitzil_7	10	base	huitzil_7:10	METER-SWAP
 row	huitzil_8	5	base	huitzil_8:5	METER-SWAP
-row	huitzil_9	1	base	huitzil_9:1	TRAP-REMAP
-row	huitzil_9	2	base	huitzil_9:2	TRAP-REMAP
-row	huitzil_9	3	base	huitzil_9:3	TRAP-REMAP
 row	pyron_3	0	surfaced	pyron_3:0	METER-SWAP
 row	pyron_3	1	base	pyron_3:1	METER-SWAP
 row	pyron_3	2	base	pyron_3:2	METER-SWAP

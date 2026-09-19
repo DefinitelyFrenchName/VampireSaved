@@ -52,14 +52,14 @@
 # (docs/game/atlas/ram.md +0x10A), so the no-hit L rows have no gauge step whether or not the
 # attack came out.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged26] [FREEZE=1] tests/audit_df_moves.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [FREEZE=1] tests/audit_df_moves.sh
 #   emulator tier, MAME; 10 legs in parallel — measured 14z-168 on this MacBook, solo: ~40 s wall
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged26}"
+BUILD="${BUILD:-build/m3b_merged27}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/df_moves.tsv"
 CONTROL="${CONTROL:-}"
@@ -431,7 +431,7 @@ ok "$(grep -c '^ev' "$W/got.tsv" | tr -d ' ') in-DF events; $(awk -F'\t' '$5=="S
 awk -F'\t' '$1=="ev" && $5!="SAME" && $5!="DIFFER(p1meter)" {print "        " $2 " ev" $3 " " $4 ": " $5}' "$W/got.tsv"
 
 if [ "${FREEZE:-0}" = 1 ]; then
-    { echo "# tests/expected/df_moves.tsv — the tenants' in-DF moves, ours (Dark Force Change, P+K; merged-m18) vs native vsav2 (the tenant's"
+    { echo "# tests/expected/df_moves.tsv — the tenants' in-DF moves, ours (Dark Force Change, P+K; $(basename "$BUILD")) vs native vsav2 (the tenant's"
       echo "# vs2 EX install), ordered hits (damage, P2 class) and gauge steps per event (tests/audit_df_moves.sh; field_trace)."
       echo "# Evidence class: in-emulator. Frozen 14z-168 with FREEZE=1 (GitHub #136). The gauge rows are frozen AS MEASURED (#157's"
       echo "# Dark Force tail: our tenants' start-up gauge in the mode); a fix re-freezes this file DELIBERATELY. Since 14z-168 also the"

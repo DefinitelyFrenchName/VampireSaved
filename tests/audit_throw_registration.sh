@@ -47,14 +47,14 @@
 # tests/audit_move_parity.sh's, copied here; every tap is tests/lua/read_tap.lua,
 # non-debug, so frames are replay-exact; a tap log without END is VOID, never read.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged26] [PARTS="pyron_3 huitzil_3 donovan_5 legacy_demitri"] [FREEZE=1] tests/audit_throw_registration.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [PARTS="pyron_3 huitzil_3 donovan_5 legacy_demitri"] [FREEZE=1] tests/audit_throw_registration.sh
 #   emulator tier, MAME; ~3 min (7 tap runs per part, in parallel)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged26}"
+BUILD="${BUILD:-build/m3b_merged27}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/throw_registration.tsv"
 CONTROL="${CONTROL:-}"
@@ -218,7 +218,7 @@ if [ "${FREEZE:-0}" = 1 ]; then
     {
         echo "# tests/expected/throw_registration.tsv — the hit-registration pair at every tenant throw contact, ours vs native"
         echo "# (tests/audit_throw_registration.sh; tests/lua/read_tap.lua, non-debug). Evidence class: in-emulator (MAME,"
-        echo "# native vsav2 and the WIDE build merged-m18; frames >= $FLOOR). Frozen 14z-166 with FREEZE=1."
+        echo "# native vsav2 and the WIDE build $(basename "$BUILD"); frames >= $FLOOR). Frozen 14z-166 with FREEZE=1."
         echo "# THE DEFECT IS FROZEN AS MEASURED: ours p1=+8 p2=<record> on every contact where native reads p1=<record> p2=+8"
         echo "# — GitHub #136's meter family. A fix that reconciles the placed pair stores re-freezes this file DELIBERATELY,"
         echo "# with its rule-checker run named in the commit. A new dead-pair READER on ours is a finding (the vs2 displacements"

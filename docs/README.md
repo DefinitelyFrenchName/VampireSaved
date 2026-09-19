@@ -163,7 +163,7 @@ history twins and are listed last. Level-0 files are the entry points above.
 - [`community_crosscheck.md`](project/tables/community_crosscheck.md) — **GENERATED** · our frame data vs the best community reverse engineering, classified EXACT / CONSTANT OFFSET / CONSTANT RATIO / INCONSISTENT / UNCOMPARABLE · generated (do not edit)
 - [`select_wheel.md`](project/tables/select_wheel.md) — **REFERENCE** · the select wheel's five INBOUND edges into the tenant row — the only wheel bytes written over legacy content, with the ruling behind each
 - [`rule5_ledger.md`](project/tables/rule5_ledger.md) — **LOG** · the rule-5 migration ledger: what moved out of a manifest into a documented table, session by session, with the census numbers it moved
-- [`defense_rows.md`](project/tables/defense_rows.md) — **REFERENCE** · Tenant DEFENSE-side rows — vs2's rows are RULED; the build still carries the vsavj approximation until the fix lands
+- [`defense_rows.md`](project/tables/defense_rows.md) — **REFERENCE** · Tenant DEFENSE-side rows — vs2's rows, as ruled, SHIPPED IN M19 (merged-m19)
 - [`donovan.md`](project/tables/donovan.md) — **GENERATED** · Donovan (char id 0x13) — extraction manifest & behavioral values · generated (do not edit)
 - [`huitzil.md`](project/tables/huitzil.md) — **GENERATED** · Huitzil (Phobos) (char id 0x10) — extraction manifest & behavioral values · generated (do not edit)
 - [`pyron.md`](project/tables/pyron.md) — **GENERATED** · Pyron (char id 0x11) — extraction manifest & behavioral values · generated (do not edit)

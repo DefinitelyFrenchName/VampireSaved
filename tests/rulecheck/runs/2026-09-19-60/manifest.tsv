@@ -1,0 +1,10 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/rc170/freeze/rc_emu/pass1_reds.log	94afc41618c36d7260d669394b1ac45a1cece0da
+build/rc170/freeze/rc_emu/expected.diff	153bf0f28aa90925110b753ee9383b93f94acbe2
+build/rc170/freeze/rc_emu/gates.diff	766c89eacc8644c7c4a5ce07262b0f9257da073d
+build/rc170/freeze/rc_emu/verify.log	80734e780450361b133878ea1dfda6c3aec1c060
+build/rc170/freeze/rc_emu/groundtruth.txt	b3fa818c4b45168dd8a3d462325c032e96c8f693
+build/rc170/freeze/rc_emu/attribution_emu.txt	91429c0496a4a3f886848a78d99566d60ab905e1
+build/rc170/freeze/rc_emu/ruling_contsw.txt	e9e8dcf477bb0cac5a76510a841043c99de2e7a6
+build/rc170/freeze/rc_emu/replay62_post_ko.png	2bb757dd8f72a6486c5e24b758ad6ee34259638d
+build/rc170/freeze/rc_emu/phase1b_post_ko.png	0e39cd7139498bc0d159d373450abab5ddc859f6

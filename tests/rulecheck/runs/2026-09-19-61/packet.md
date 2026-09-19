@@ -1,0 +1,66 @@
+THE PACKET
+
+Decision kind: freeze
+Subject: 14z-170 M19 freeze registry rows donovan-m23 huitzil-m30 pyron-m24 merged-m19 donovan-m23-stock donovan-m23-stage4 and their expectation sets (final: after battery pass 2 and the resolutions of 2026-09-19-59 and -60)
+Claim (the working agent's sentence): The six registry rows (registry.diff) name the fingerprints the M19 builds measure now (sets_and_fingerprints.txt); every comparison's M18 baseline is the registered predecessor image (baselines.txt); the tree rebuilds the four WIDE builds and the stock twin bit-exact (test_m3a_reproducible.log). Each row's member list equals the members whose content moved: every rompath file and every member of every zip is compared M18 -> M19 by CRC and by SHA-1 on all six pairs, both inventories printed (members_all.txt), and the moved gfx members are shown by content to be the one re-authored version glyph, a plant outside it flagged (gfx_mark_check*.txt). Each row's delta note matches its build's op-by-op attribution against its M18 build (attr_*.txt), whose RELOCATED class is content-checked. On every track every EDIT and INSERTED op is recognised by content as one of the design's edit kinds, 0 unexplained, by a checker that fails on a planted byte in an EDIT op (two plants) and in each of three INSERTED ops (edits_check_*.txt, edits_check_plant*.txt); every x2b7ef4 repair is checked byte for byte against vs2's own bytes, 0 unexplained, a plant flagged (x2b7ef4_sites_check*.txt). The four WIDE expectation sets carry their predecessors' authored .masked, .skip and mask byte-identical and verify SUITE GREEN with equal authored-.masked counts (freeze/verify logs); merged-m19's 16 self-frozen tenant .sha1 were deleted under the #111 ruling (rulings.txt), and the committed set reads PASS 53, SKIP 19, NO-EXPECTATION 16, FAIL 0, for which the runner prints SUITE RED because it counts NO-EXPECTATION as red (run_suite_no_expectation.txt) — the shipped shape; the stock and stage-4 battery sets verify 14/14 each (stock.log, stage4.log). The emulator-tier battery ran on these builds after the re-freezes: PASS 159, SKIP 0, FAIL 0 (battery_p2_*), and the MiSTer prg_window pair PASS (mister_p2_*); the two files the battery flagged as changed during its run are the working agent's own concurrent edits, attributed (tree_dirtied_attribution.txt). Three gates added or changed after that battery began were each run on their own, both directions: the Phobos residual (phobos_residual_*), the x2b7ef4 reachability (reach_*), the orange flash's writer leg (flash_*); and the open attribution class (attribution_open_class.verify.log). The rulings the rows' behaviour rests on are quoted in the maintainer's words (rulings.txt, rulings_emu.txt), including the ruling that freezes Phobos's remaining +1 damage as an open ticket. NOT tested: the stage-4 image is a scratch build that test_m3a_reproducible does not rebuild; that a moved self-frozen tenant .sha1 moved for the fixes and nothing else (sha1_moves.txt gives only the first differing frame); the MiSTer bitstream-cadence gates, which a freeze does not run by ruling; the Phobos residual's cause (ruled, ticketed); and the new gates' verdicts under the full battery runner (run standalone only).
+Artifacts (read every one, in full):
+  - build/rc170/freeze/rc_final/attr_don_m23.txt
+  - build/rc170/freeze/rc_final/attr_hui57.txt
+  - build/rc170/freeze/rc_final/attr_m3b_merged27.txt
+  - build/rc170/freeze/rc_final/attr_m5_stock18.txt
+  - build/rc170/freeze/rc_final/attr_pyron42.txt
+  - build/rc170/freeze/rc_final/attr_stage4.txt
+  - build/rc170/freeze/rc_final/attribution_open_class.verify.log
+  - build/rc170/freeze/rc_final/baselines.txt
+  - build/rc170/freeze/rc_final/battery_p2_head.txt
+  - build/rc170/freeze/rc_final/battery_p2_results.tsv
+  - build/rc170/freeze/rc_final/battery_p2_summary.txt
+  - build/rc170/freeze/rc_final/donovan-m23.freeze.log
+  - build/rc170/freeze/rc_final/donovan-m23.verify.log
+  - build/rc170/freeze/rc_final/edits_check_don_m23.txt
+  - build/rc170/freeze/rc_final/edits_check_hui57.txt
+  - build/rc170/freeze/rc_final/edits_check_m3b_merged27.txt
+  - build/rc170/freeze/rc_final/edits_check_m5_stock18.txt
+  - build/rc170/freeze/rc_final/edits_check_plant_0x0bf6a0.txt
+  - build/rc170/freeze/rc_final/edits_check_plant_0x0fff53.txt
+  - build/rc170/freeze/rc_final/edits_check_plant_ins_0x0b8ba5.txt
+  - build/rc170/freeze/rc_final/edits_check_plant_ins_0x0bcc93.txt
+  - build/rc170/freeze/rc_final/edits_check_plant_ins_0x41a085.txt
+  - build/rc170/freeze/rc_final/edits_check_pyron42.txt
+  - build/rc170/freeze/rc_final/edits_check_rerun_don.txt
+  - build/rc170/freeze/rc_final/edits_check_stage4.txt
+  - build/rc170/freeze/rc_final/flash_gate.ctl.log
+  - build/rc170/freeze/rc_final/flash_gate.m18.log
+  - build/rc170/freeze/rc_final/flash_gate.verify.log
+  - build/rc170/freeze/rc_final/gfx_mark_check.txt
+  - build/rc170/freeze/rc_final/gfx_mark_check_plant.txt
+  - build/rc170/freeze/rc_final/huitzil-m30.freeze.log
+  - build/rc170/freeze/rc_final/huitzil-m30.verify.log
+  - build/rc170/freeze/rc_final/members.txt
+  - build/rc170/freeze/rc_final/members_all.txt
+  - build/rc170/freeze/rc_final/merged-m19.committed.verify.log
+  - build/rc170/freeze/rc_final/merged-m19.freeze.log
+  - build/rc170/freeze/rc_final/merged-m19.verify.log
+  - build/rc170/freeze/rc_final/mister_p2_results.tsv
+  - build/rc170/freeze/rc_final/mister_p2_summary.txt
+  - build/rc170/freeze/rc_final/phobos_residual_gate.ctl.log
+  - build/rc170/freeze/rc_final/phobos_residual_gate.m18.log
+  - build/rc170/freeze/rc_final/phobos_residual_gate.verify.log
+  - build/rc170/freeze/rc_final/pyron-m24.freeze.log
+  - build/rc170/freeze/rc_final/pyron-m24.verify.log
+  - build/rc170/freeze/rc_final/reach_gate.ctl.log
+  - build/rc170/freeze/rc_final/reach_gate.verify.log
+  - build/rc170/freeze/rc_final/registry.diff
+  - build/rc170/freeze/rc_final/rulings.txt
+  - build/rc170/freeze/rc_final/rulings_emu.txt
+  - build/rc170/freeze/rc_final/run_suite_no_expectation.txt
+  - build/rc170/freeze/rc_final/sets_and_fingerprints.txt
+  - build/rc170/freeze/rc_final/sha1_moves.txt
+  - build/rc170/freeze/rc_final/stage4.log
+  - build/rc170/freeze/rc_final/stock.log
+  - build/rc170/freeze/rc_final/test_m3a_reproducible.log
+  - build/rc170/freeze/rc_final/tree_dirtied_attribution.txt
+  - build/rc170/freeze/rc_final/x2b7ef4_sites_check.txt
+  - build/rc170/freeze/rc_final/x2b7ef4_sites_check_plant.txt
+  - build/rc170/freeze/rc_final/x2b7ef4_sites_check_solo.txt
+  - build/rc170/freeze/rc_final/x2b7ef4_sites_check_stock.txt

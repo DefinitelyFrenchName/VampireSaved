@@ -38,7 +38,7 @@
 # 0xD17C2/0xD1822 — GitHub #159); what holds ours at 835; P2-side tenants; the
 # one-leg taps are non-debug (tests/lua/read_tap.lua), frames >= 3850 only.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged26] [FREEZE=1] tests/audit_facing_rule.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [FREEZE=1] tests/audit_facing_rule.sh
 #   emulator tier, MAME; four runs in parallel plus the two views from the build/out decrypt cache —
 #   measured 14z-167b on this MacBook, solo: ~5 s wall (verify), each control mode the same
 set -eu
@@ -46,7 +46,7 @@ set -eu
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged26}"
+BUILD="${BUILD:-build/m3b_merged27}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/facing_rule.tsv"
 CONTROL="${CONTROL:-}"

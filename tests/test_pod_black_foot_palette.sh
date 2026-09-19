@@ -39,7 +39,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 case "$ROMDIR" in /*) ;; *) ROMDIR="$(cd "$ROMDIR" && pwd)" ;; esac
 export ROMDIR
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
-BUILD="${BUILD:-build/m3b_merged26}"
+BUILD="${BUILD:-build/m3b_merged27}"
 [ -f "$REPO/$BUILD/rompath/vsavjw.zip" ] || { if [ -n "$MODE" ]; then echo "REFUSED: CONTROL=$MODE needs a WIDE build at $BUILD (absent)"; exit 3; fi; echo "SKIP: no WIDE build at $BUILD"; exit 0; }
 [ -f "$REPO/tests/inp/pod-black-m14-01/pod-black-m14-01.inp" ] || { if [ -n "$MODE" ]; then echo "REFUSED: CONTROL=$MODE needs the pod-black-m14-01 recording (absent)"; exit 3; fi; echo "SKIP: recording absent"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT

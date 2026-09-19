@@ -36,14 +36,14 @@
 # and `<leg> runs <n>`. The ours rows follow the build (placed pcs move): re-freeze at every
 # freeze (FREEZE=1), reviewing the diff.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged26] [JOBS=6] [LEGS="vsavj ours native"] [FREEZE=1] tests/audit_reaction_class_live.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [JOBS=6] [LEGS="vsavj ours native"] [FREEZE=1] tests/audit_reaction_class_live.sh
 #   emulator tier, MAME; 148 tap runs — measured 14z-169 on this MacBook, solo, JOBS=6: see the header of the first frozen run (PROVENANCE)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged26}"
+BUILD="${BUILD:-build/m3b_merged27}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/reaction_class_live.tsv"
 JOBS="${JOBS:-6}"
@@ -190,9 +190,22 @@ PY
 }
 reduce "$W/got.tsv" $LEGS
 awk -F'\t' '{ n[$1 " " $2]++ } END { for (k in n) printf "  %s rows: %d\n", k, n[k] }' "$W/got.tsv" | sort
-awk -F'\t' '$2=="W" && $4=="38" && ($1=="vsavj" || $1=="ours")' "$W/got.tsv" > "$W/w38.tsv"
-if [ -s "$W/w38.tsv" ]; then bad "0x38 is written into a victim's +0x54:"; sed 's/^/        /' "$W/w38.tsv"
-else ok "no write puts 0x38 into +0x54 on vsavj (the legacy corpus) or on ours (the naming parts)"; fi
+# 0x38 in +0x54 (reworked 14z-170): vanilla must never produce it — the premise the class-0x52 fix's MARKER
+# rests on; since the M19 freeze OUR build produces it from exactly one place, reaction_hook case_a4
+# (`move.b #$38,$54(a1)`, donovan.toml, S1), located here in the build's OWN patch by its instruction bytes.
+_a4="$(python3 - "$BUILD/patch/patch.json" <<'PY'
+import json, sys
+for o in json.load(open(sys.argv[1]))["ops"]:
+    h = o.get("hex", "")
+    i = h.find("137c00380054")
+    if i >= 0 and i % 2 == 0: print("%06x" % (int(o["addr"], 16) + i // 2)); break
+PY
+)"
+awk -F'\t' '$2=="W" && $4=="38" && $1=="vsavj"' "$W/got.tsv" > "$W/w38.tsv"
+awk -F'\t' -v a4="$_a4" '$2=="W" && $4=="38" && $1=="ours" && $3!=a4' "$W/got.tsv" >> "$W/w38.tsv"
+if [ -s "$W/w38.tsv" ]; then bad "0x38 is written into a victim's +0x54 by something other than the S1 marker:"; sed 's/^/        /' "$W/w38.tsv"
+elif [ -z "$_a4" ]; then bad "the build carries no reaction_hook case_a4 store (move.b #\$38,\$54(a1)) — not an M19 build"
+else ok "no write puts 0x38 into +0x54 on vsavj (the legacy corpus); on ours only the S1 marker at $_a4 does"; fi
 case " $LEGS " in *" ours "*)
     awk -F'\t' '$1=="ours" && $2=="W" && $4=="06" && $3>="0186d0" && $3<="0186d5"' "$W/got.tsv" | grep -q . \
         && ok "positive control: ours shows vsavj's ground stager writing 6 (the tenants' remapped electric hits)" \

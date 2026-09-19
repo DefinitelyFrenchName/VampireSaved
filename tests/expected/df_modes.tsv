@@ -40,11 +40,11 @@ change	vsavj	0e	stock=3->2	seq16=46	arm=60@04dfb0	timer=112@02701a	dec=022520x11
 change	vsavj	0f	stock=3->2	seq16=19	arm=127@052f5c,4@052faa	timer=112@02701a	dec=022520x112	span111=405	flag=377	pow=none
 change	ours	01	stock=3->2	seq16=31	arm=41@031386	timer=112@02701a	dec=022520x112	span111=388	flag=360	pow=none
 change	ours	10	stock=3->2	seq16=63	arm=79@416150,4@41620c	timer=112@02701a	dec=022520x112	span111=405	flag=377	pow=none
-change	ours	11	stock=3->2	seq16=34	arm=41@47312a	timer=112@02701a	dec=022520x112	span111=388	flag=360	pow=none
+change	ours	11	stock=3->2	seq16=34	arm=41@47315a	timer=112@02701a	dec=022520x112	span111=388	flag=360	pow=none
 change	ours	13	stock=3->2	seq16=51	arm=64@0c10b0	timer=112@02701a	dec=022520x112	span111=388	flag=360	pow=none
 ex	vsav2	10	stock=3->2	seq16=0	arm=79@056ca0,4@056d5c	timer=112@02623c	dec=020ed6x112	span111=509	flag=19	pow=none
-ex	ours	10	stock=3->2	seq16=0	arm=79@416150,4@41620c	timer=112@41d90a	dec=022520x112	span111=496	flag=469	pow=none
+ex	ours	10	stock=3->3	seq16=0	arm=none	timer=none	dec=none	span111=none	flag=none	pow=none
 ex	vsav2	11	stock=3->2	seq16=0	arm=41@058d6a	timer=112@02623c	dec=020ed6x112	span111=478	flag=none	pow=none
-ex	ours	11	stock=3->2	seq16=0	arm=41@47312a	timer=112@476b7a	dec=022520x112	span111=478	flag=451	pow=none
+ex	ours	11	stock=3->2	seq16=0	arm=none	timer=none	dec=none	span111=none	flag=none	pow=none
 ex	vsav2	13	stock=3->2	seq16=0	arm=64@05a7da	timer=112@02623c	dec=020ed6x112	span111=478	flag=none	pow=none
-ex	ours	13	stock=3->2	seq16=0	arm=64@0c09ea	timer=112@0cd48a	dec=022520x112	span111=478	flag=451	pow=none
+ex	ours	13	stock=3->3	seq16=0	arm=none	timer=none	dec=none	span111=none	flag=none	pow=none

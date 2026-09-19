@@ -1,0 +1,18 @@
+# tests/expected/phobos_dmg_residual.tsv — every P1 (Phobos) HP step on the #136 naming parts huitzil_5/huitzil_6 (Demitri's
+# 5HP), native vsav2 against our merged build, at RNG pins 0000/1234/5a5a (tests/audit_phobos_dmg_residual.sh). Evidence
+# class: in-emulator, MAME. Frozen AS MEASURED with FREEZE=1 on m3b_merged27 — the open bug ticket: native 11,
+# ours one more with the defense row already vs2's. Columns: <part> <pin> <leg> <frame> <hp before> <hp after>; one build row.
+#--
+huitzil_5	0000	native	5966	288	277
+huitzil_5	0000	ours	5966	288	276
+huitzil_5	1234	native	5966	288	277
+huitzil_5	1234	ours	5966	288	276
+huitzil_5	5a5a	native	5966	288	277
+huitzil_5	5a5a	ours	5966	288	276
+huitzil_6	0000	native	7725	288	277
+huitzil_6	0000	ours	7725	288	276
+huitzil_6	1234	native	7725	288	277
+huitzil_6	1234	ours	7725	288	276
+huitzil_6	5a5a	native	7725	288	277
+huitzil_6	5a5a	ours	7725	288	276
+ours	build	merged-m19	61e9815a

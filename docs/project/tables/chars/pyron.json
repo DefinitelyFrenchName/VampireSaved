@@ -12,20 +12,20 @@
  },
  "inputs": {
   "bank_map.toml": "ece2b13bfbddaf6fea14e56baf65502945ba52dd",
-  "manifest": "fb5c37c77781c9acea07d63b854e72378f1a86ff",
+  "manifest": "bd4e02222cba03dda688716da8df47db41c02dda",
   "overrides": "c9fd380922c8aa18a77ee701da7589f037c25a42",
   "placements.json": "a15a693a9b57f85b73c16b22c2cf027567c1b6c0",
-  "reconciliation.toml": "40528aeb863028d885f868f34368443c460b5ca2",
+  "reconciliation.toml": "477efcb72d82fcbafe1e4a4f59252385bcb75bac",
   "reconciliation_pyron.toml": "366cbf0325dd3e633588b1062747755edc719b2c",
   "regions.json": "fbc97da4285b700b92f7122cb517117dd79dc147",
-  "verify_data.bin": "cc66aefe3066acf84ace5e246fc2a4479ba3cdc8"
+  "verify_data.bin": "0b5cd48119f3295b4f5ee7c011bc49fe336868dd"
  },
  "overrides": [],
  "schema": 1,
  "sources": {
   "ours": {
    "kind": "built",
-   "set": "build/pyron41"
+   "set": "build/pyron42"
   },
   "vh": null,
   "vs2": {
@@ -150329,7 +150329,7 @@
     "orc": "0x0574f0",
     "placed": "0x0bf6a0",
     "refs": 776,
-    "sha1_ours": "5497587d6047803392bbdbca471b5cb73a82f325",
+    "sha1_ours": "362da5dcfd61926d39ebbc7a578e92484c31e521",
     "sha1_vs2": "7613fc93be3a278902ea7a12b01a7dd8a0b7d684",
     "src": "0x0574c0",
     "variant_sites": 4
@@ -150409,7 +150409,7 @@
     "orc": "0x028150",
     "placed": "0x0c5d40",
     "refs": 46,
-    "sha1_ours": "95e3e8d155a5a9122e52ddd6bed6fb21bf6a50f4",
+    "sha1_ours": "ff6c05575b8672b9feab5088e8a2ecdc72976f0b",
     "sha1_vs2": "25f8809c49687e0e954078fb6e4f6841591cc5fb",
     "src": "0x028122",
     "variant_sites": 0

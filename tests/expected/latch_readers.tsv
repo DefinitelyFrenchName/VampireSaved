@@ -1,6 +1,6 @@
 # tests/expected/latch_readers.tsv — every instruction operand naming a fighter block's confirm-latch offset,
 # on the two reference opcode views and the ported image (tools/audit_latch_readers.py; test_latch_readers.sh).
-# Evidence class: static (the decrypted opcode views; the ported image is build/m3b_merged26/verify_op.bin).
+# Evidence class: static (the decrypted opcode views; the ported image is build/m3b_merged27/verify_op.bin).
 # Frozen 14z-161 with FREEZE=1; re-freeze after a port stage that relocates a reader, never to absorb a new one unread.
 # Columns: image, addr, offset, what, class, width, mnemonic, operands
 #--
@@ -172,6 +172,6 @@ merged	0x41D2F0	0x3C2	flavor	read	b	tst.b	$3c2(a6)
 merged	0x41D4CC	0x3C2	flavor	read	b	tst.b	$3c2(a6)
 merged	0x41D9F0	0x3C2	flavor	read	b	tst.b	$3c2(a6)
 merged	0x42B8AE	0x3BC	flag	read	b	move.b	$3bc(a4), d1
-merged	0x474A10	0x3C2	flavor	read	b	tst.b	$3c2(a6)
-merged	0x476C60	0x3C2	flavor	read	b	tst.b	$3c2(a6)
-merged	0x483DBE	0x3BC	flag	read	b	move.b	$3bc(a4), d1
+merged	0x474A40	0x3C2	flavor	read	b	tst.b	$3c2(a6)
+merged	0x476C90	0x3C2	flavor	read	b	tst.b	$3c2(a6)
+merged	0x483DEE	0x3BC	flag	read	b	move.b	$3bc(a4), d1

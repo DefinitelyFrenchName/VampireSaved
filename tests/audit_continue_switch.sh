@@ -20,8 +20,10 @@
 #      CRASH/PCWEEDS/SOFTRESET/END-CRASH lines, across two continues and
 #      two character switches.
 #   2. #103 lock on this path: the tenant's natural loss JUDGES — KO
-#      (p1 hp < 0) resolves through mode 8 to a NEW match within 1600
-#      frames. (This exact rig froze 9,500+ frames at that KO before the
+#      (p1 hp < 0) resolves to a NEW match within 1600 frames (RE-RULED
+#      2026-09-19, 14z-170: the mode path is printed, not required — see
+#      the 14z-170 note below). (This exact rig froze 9,500+ frames at
+#      that KO before the
 #      14z-99 fix — 14z-97 (7).)
 #   3. The switch lands: the post-continue match plays P1 = DONOVAN.
 #   4. A tenant-vs-tenant CPU pairing occurs after a continue (both
@@ -39,6 +41,17 @@
 # stale bases.tsv rows were the #94 reference-rot class, fixed same
 # commit). Tenant space test: base >= 0x300000 (wide_ext-relocated blocks;
 # every legacy base is < 0x100000).
+#
+# THE 14z-170 RE-AUTHOR (maintainer-ruled 2026-09-19, DECISIONS_HISTORY.md): on merged-m19 Phobos
+# takes damage through vs2's defense row and SURVIVES the scripted mash to a timeout — no natural KO
+# loss at all (phase-1 mapping, build/rc170/freeze/contsw/). P1 now stands IDLE through match 1
+# (IDLE_FROM/IDLE_TO below; sys= lines kept), CPU Bulleta KOs him at f8080 with no pokes, and the
+# judge runs mode 6 -> the same-character continue prompt -> select (captures
+# build/rc170/freeze/contsw/phase1b_post_ko.png). The continue landing on Jedah without the switch
+# pokes is the RIG, measured: pristine vsavj's Victor on the same rig lands on Jedah too.
+# MEASURED WITH THE POKES (14z-170, merged-m19 = build/m3b_merged27 / 681ac3ad): KO f8100, judged into
+# a new match at f9220 that is P1=DONOVAN vs CPU-PHOBOS — the switch, the tenant-vs-tenant pairing
+# and the LITERAL #99 pairing in one, the FIRST post-continue match; END 40620 with zero guard trips.
 #
 # THE SWITCH-POKE WINDOW IS FROZEN TO THIS BUILD'S MEASURED TRAJECTORY, and
 # it moves at every freeze that touches timing. Its history, which is the
@@ -69,7 +82,7 @@
 # Kill pokes: NONE (audit_kill_poke_shape: a 2-byte HP poke manufactures
 # the #103 stall shape by instrument; losses here are the mash's own).
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged26] tests/audit_continue_switch.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged27] tests/audit_continue_switch.sh
 # ~18 min (one guarded 40,620-frame MAME marathon). On-demand.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -82,7 +95,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # VARIABLE (forks set their own); only made absolute, and only if it exists,
 # so a gate that means to SKIP on a missing ROMDIR still does.
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
-BUILD="${BUILD:-build/m3b_merged26}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged27}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no build at $BUILD"; exit 0; }
 [ -f "$BUILD/prg/vm3j.04d" ] || { echo "SKIP: no prg/vm3j.04d in $BUILD (need the decoded member for the base table)"; exit 0; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
@@ -97,7 +110,10 @@ python3 - "$RPL" <<'PY'
 import sys
 lines = open("tests/replays/26_don_arcade_mash.rpl").read().splitlines(keepends=True)
 out, done = [], False
-for ln in lines:
+IDLE_FROM, IDLE_TO = 2600, 12300   # 14z-170 (ruled): P1 stands IDLE through match 1 so CPU Bulleta KOs Phobos
+for ln in lines:                     # naturally (no HP pokes); every sys= line (the coins, the START presses) is kept
+    if ln[:1].isdigit() and " p1=" in ln and IDLE_FROM <= int(ln.split("-")[0]) <= IDLE_TO:
+        continue
     if not done and ln[:1].isdigit():
         out.append("100-105 sys=C1\n140-145 sys=C1\n180-185 sys=C1\n220-225 sys=C1\n")
         done = True
@@ -124,8 +140,8 @@ PK="1704:ff8782:10;1760:ff8782:10;1900:ff8782:10;2100:ff8782:10;2400:ff8782:10"
 # why the frozen f31960-32540 window fired long after the select it was meant
 # to catch and P1 came out legacy. [VSP-132]: a 1P-arcade rig is pinned to the
 # ARCADE DRAW, so any timing change re-rolls the trajectory.
-RESELECT_OPEN=24420
-NEXT_MATCH=24980
+RESELECT_OPEN=8460   # 14z-170 (merged-m19, P1 idle): KO f8080, the judge's mode 6 f8460, the continue prompt f8600-8800
+NEXT_MATCH=9180      # 14z-170: the post-continue match starts here (phase-1b mapping, build/rc170/freeze/contsw/)
 export RESELECT_OPEN NEXT_MATCH
 # Blanket the WHOLE re-select window (14z-110): the re-select's class read
 # sits elsewhere in it than the initial select's, so a narrow poke set does
@@ -203,10 +219,15 @@ loss = next((f for f, m, p1, p2, hp in rows if hp < 0 and p1 >= TEN), None)
 if loss is None:
     print("FAIL: no tenant KO loss observed (rig dead?)"); fail = 1
 else:
-    j = [f for f, m, p1, p2, hp in rows if f > loss and m == 8]
+    # 14z-170 (ruled 2026-09-19): the KO must be JUDGED into a new match within 1600 frames; the mode path
+    # is RECORDED, not required — on the P1-idle trajectory the judge goes mode 6 -> the continue prompt ->
+    # select (no mode 8, which only the countdown path shows)
     nxt = [f for f, p1, p2 in matches if f > loss]
-    if j and nxt and j[0] - loss <= 1600 and nxt[0] - loss <= 1600:
-        print(f"   ok: tenant loss f{loss} JUDGED (mode 8 f{j[0]}, next match f{nxt[0]}) (assertion 2)")
+    path = []
+    for f, m, p1, p2, hp in rows:
+        if loss < f <= (nxt[0] if nxt else loss + 1600) and (not path or path[-1] != m): path.append(m)
+    if nxt and nxt[0] - loss <= 1600:
+        print(f"   ok: tenant loss f{loss} JUDGED into a new match at f{nxt[0]} (modes {'->'.join(f'{m:x}' for m in path)}) (assertion 2)")
     else:
         print(f"FAIL: loss f{loss} did not judge into a new match within 1600f (#103 shape)"); fail = 1
 # 3: the forced switch landed — some match after the loss plays P1=Donovan

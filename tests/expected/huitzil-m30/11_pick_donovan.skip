@@ -1,0 +1,5 @@
+picks the DONOVAN cell (id 0x13), which huitzil-m1 does not back (this build
+backs only Huitzil at 0x10). The pick therefore lands on an unbacked cell and
+the select divergence is not a clean vanilla-legacy window (measured: 2 runs,
+window ends 2836, vs donovan-m3a's single window to 2415 where 0x13 IS backed).
+The tenant pick is covered by 37_pick_huitzil_cell. Re-authored 14z-73.

@@ -883,6 +883,86 @@ def normalise_tenants(port, profile=None, override=None):
     return port
 
 
+def resolve_tagged_placeholders(blob, offsets, la):
+    """Resolve the `0xEE`-tagged coordinate-list placeholders of the x2b7ef4 pass AT THE
+    OFFSETS THEY WERE WRITTEN (14z-170). `blob` is the region's bytearray, `offsets` the
+    record `cptr` offsets the pass wrote `0xEE000000 + off` into, `la` the placed address of the
+    ported coordinate-list fragment. Returns the list of offsets that no longer held a
+    placeholder when resolved (the caller fails the build on any).
+
+    WHY NOT A SCAN (the code until 14z-170): resolving by scanning every even offset for a long
+    whose top byte is 0xEE runs IN PLACE, so once a pointer is resolved, the window two bytes on
+    starts with that pointer's LOW WORD — and when its high byte is 0xEE (placement-dependent: la
+    + off in 0x..EExx) the window is taken for a placeholder and rewritten, clobbering the pointer
+    and the record's first tile word. The four #136 fixes' +0x30 allocator shift moved three of
+    Pyron's resolved pointers from 0x4BEDxx to 0x4BEExx and the scan corrupted all three (the
+    [VSP-68] class: placement-dependent heuristics re-roll with every allocator change). Ground
+    truth: tests/test_effect_placeholders.sh."""
+    stale = []
+    for i in offsets:
+        vv = int.from_bytes(blob[i:i + 4], "big")
+        if (vv >> 24) != 0xEE:
+            stale.append(i)
+            continue
+        blob[i:i + 4] = (la + (vv & 0xFFFFFF)).to_bytes(4, "big")
+    return stale
+
+
+def port_tenant_names(manifest_dir):
+    """The tenant names the manifests declare — the vocabulary of the
+    `unless_composed` row key (14z-170), DERIVED so that no second copy of the
+    roster lives in code: the `name` of every `[[tenant]]` block of every
+    `build/manifest/*.toml` (the untracked `probe_*.toml` copies skipped, as
+    tools/audit_rule5.py skips them). A LINE scan, not a parse: two of those
+    files (gfx_layout3.toml, shared_writes.toml) carry `[[tenant]]` tables in
+    their own schemas with arrays the subset parser refuses — every one names
+    the same three tenants (measured 14z-170)."""
+    names = set()
+    for p in sorted(Path(manifest_dir).glob("*.toml")):
+        if p.name.startswith("probe_"):
+            continue
+        in_tenant = False
+        for line in p.read_text().splitlines():
+            t = line.strip()
+            if t.startswith("["):
+                in_tenant = (t == "[[tenant]]")
+                continue
+            if in_tenant and t.startswith("name") and "=" in t:
+                key, val = t.split("=", 1)
+                if key.strip() == "name":
+                    val = val.split("#", 1)[0].strip()
+                    if len(val) >= 2 and val[0] == val[-1] == '"':
+                        names.add(val[1:-1])
+    return frozenset(names)
+
+
+def composition_allows(row, composed, known):
+    """`unless_composed = "<tenant>[,<tenant>...]"` (14z-170): does a row apply to a
+    build whose composition is the tenant names in `composed`?
+
+    The row applies only when NONE of the named tenants is in the composition.
+    Written for the class-0x52 fix's scope (S1, maintainer-ruled 2026-09-18 —
+    DECISIONS_HISTORY.md "Ruled 2026-09-18 (14z-169) — the class-0x52 fix is
+    scoped to the tracks that carry its machinery"): Phobos's two Plasma Trap
+    class remaps (0x52 -> 0x06) stay only where the machinery that handles a
+    NATIVE class-0x52 record — donovan.toml's `reaction_hook`,
+    `es_type51_dispatch` and 14z-42 shock thunks — is absent, i.e. on a build
+    composed WITHOUT Donovan. `known` is port_tenant_names(); a name outside it
+    raises: a typo would otherwise match no composition and leave the row
+    applying everywhere, silently. Ground truth: tests/test_unless_composed.sh.
+    """
+    spec = str(row.get("unless_composed", "")).strip()
+    if not spec:
+        return True
+    names = {n.strip() for n in spec.split(",") if n.strip()}
+    unknown = names - set(known)
+    if unknown or not names:
+        raise SystemExit(
+            f"unless_composed = {spec!r} names no tenant of this port "
+            f"(unknown: {sorted(unknown)}; known: {sorted(known)})")
+    return not (names & set(composed))
+
+
 def row_owner(row, tenants, default=None):
     """The tenant context that owns a row (M3b slice C).
 
@@ -952,6 +1032,8 @@ def main():
     ap.add_argument("--vsavj", type=Path, required=True)
     ap.add_argument("--stage", type=int, required=True, choices=range(1, 7))
     root = Path(__file__).resolve().parent.parent
+    # the `unless_composed` vocabulary (14z-170), derived from the manifests
+    _known_tenants = port_tenant_names(root / "build/manifest")
     # REPEATABLE (M3b slice F): one manifest FILE per tenant. Ownership comes
     # from the file (slice C), so the merged build is `--port a --port b ...`
     # and no manifest row changes. Default preserved exactly.
@@ -1266,8 +1348,15 @@ def main():
         MISSED site is findable by grepping `port.get("` below the loop
         header rather than by reasoning about it — which is what
         tests/test_tenant_loop.sh does.
+
+        `unless_composed` (14z-170) is honoured here, the one funnel every
+        list-row read passes through: a row naming a tenant that IS in this
+        build's composition is dropped (composition_allows()).
         """
-        return [r for r in port.get(section, []) if row_here(r)]
+        _composed = [t.get("name") for t in (port.get("_tenants") or [])]
+        return [r for r in port.get(section, [])
+                if row_here(r)
+                and composition_allows(r, _composed, _known_tenants)]
 
     # ── THE ENGINE-LEVEL UNION (14z-80f) ────────────────────────────────────
     # An ENGINE table — `obj_hook`'s extended secondary-object dispatch — is
@@ -3236,6 +3325,7 @@ def main():
                     b2_pairs = []
                     extra_lists = bytearray()
                     extra_map = {}
+                    placeholder_at = []   # the cptr offsets given a 0xEE placeholder (14z-170)
                     n_et = n_b2 = n_cfix = n_cport = 0
                     seen2 = set()
                     for i in range(0, r["len"] - 4, 2):
@@ -3281,6 +3371,7 @@ def main():
                             blob[o + 6:o + 10] = (0xEE000000
                                                   + extra_map[key2]).to_bytes(
                                                       4, "big")
+                            placeholder_at.append(o + 6)
                             n_cport += 1
                         for toff, hdr_at in offs:
                             t = int.from_bytes(blob[toff:toff + 2], "big")
@@ -3321,12 +3412,15 @@ def main():
                                     "path": _efl})
                         fragments.append((la, len(extra_lists), "VS2",
                                           "companion-effect coord lists"))
-                        # resolve the 0xEE-tagged placeholders
-                        for i in range(0, r["len"] - 4, 2):
-                            vv = int.from_bytes(blob[i:i + 4], "big")
-                            if (vv >> 24) == 0xEE:
-                                blob[i:i + 4] = (la + (vv & 0xFFFFFF)).to_bytes(
-                                    4, "big")
+                        # resolve the 0xEE-tagged placeholders AT THE OFFSETS
+                        # WRITTEN — never by an in-place scan (14z-170: the scan
+                        # re-read resolved pointers' low words as placeholders;
+                        # resolve_tagged_placeholders() has the account)
+                        _stale = resolve_tagged_placeholders(blob, placeholder_at, la)
+                        if _stale:
+                            fail.append(f"{name}: {len(_stale)} coordinate-list "
+                                        f"placeholders overwritten before resolution "
+                                        f"(first at +{_stale[0]:#x})")
                     if b2_pairs:
                         # only reachable with [gfx_remap] present (b2_recs
                         # gating above), whose pass wrote effect_map.json

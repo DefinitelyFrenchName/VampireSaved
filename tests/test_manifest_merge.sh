@@ -106,7 +106,11 @@ FROZEN = [
     # damage fix propagated Donovan's six x028122 work-var port_patch rows
     # to huitzil+pyron verbatim (+6 each, +6 shared) and this gate was not
     # re-run at that close; caught here alongside the aux_poke staleness)
-    ("port_patch",       (21, 61, 20), 93, 9),
+    # RE-FROZEN 14z-170 (was (21,61,20),93,9): the M19 fixes add TWO port_patch
+    # rows per manifest — the meter-adder test (region x028122, vs2 0x028D6C,
+    # IDENTICAL in all three, so it dedupes: shared +1) and the EX-site branch
+    # (each tenant's own vs2 address, so it concatenates: +3) — merged +4
+    ("port_patch",       (23, 63, 22), 97, 10),
     ("tenant",           (1, 1, 1),  3,  0),   # never shared, by definition
     ("select_records",   (6, 6, 6),  18, 0),   # six pieces PER TENANT
     ("win_pal_variant",  (1, 1, 1),  3,  0),

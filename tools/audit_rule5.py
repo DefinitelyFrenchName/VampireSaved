@@ -84,6 +84,7 @@ GENERATORS = ["gen_donovan_patch.py", "select_port.py", "build_gfx_donovan.py",
 GAMEPLAY_KEYS = {
     "only_variant_slot",  # the superset invariant per row: tenant slot only
     "only_base_slot",     # its twin
+    "unless_composed",    # 14z-170: which COMPOSITION a row applies to (the class-0x52 fix's S1 scope)
     "id_by_profile",      # which id the tenant takes, per profile
     "dst_slot",           # the destination roster slot
     "mirror_variant",     # the mirror-match variant
@@ -150,7 +151,7 @@ KNOWN_PAIRS = {
         "note", "only_base_slot", "only_variant_slot", "orc",
         "slot_ptr_table", "slot_rows", "src", "stage"
     },
-    "don_m22": {
+    "don_m23": {
         "escapes", "resolved", "unresolved"
     },
     "file": {
@@ -168,7 +169,7 @@ KNOWN_PAIRS = {
     "hole_b": {
         "end", "start"
     },
-    "hui56": {
+    "hui57": {
         "escapes", "resolved", "unresolved"
     },
     "init_shim": {
@@ -222,7 +223,7 @@ KNOWN_PAIRS = {
     "profile": {
         "bank4_word", "bank5_word", "collision_rule", "group", "name"
     },
-    "pyron41": {
+    "pyron42": {
         "escapes", "resolved", "unresolved"
     },
     "reaction_hook": {
@@ -235,7 +236,8 @@ KNOWN_PAIRS = {
         "d16", "form", "next_words", "src_addr", "tenants"
     },
     "region_fix": {
-        "new_hex", "note", "off", "old_hex", "region", "stage"
+        "new_hex", "note", "off", "old_hex", "region", "stage",
+        "unless_composed"
     },
     "select_records": {
         "allow_placeholder_tiles", "art", "expect_vj_alias_p1",

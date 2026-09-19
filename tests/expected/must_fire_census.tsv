@@ -5,6 +5,7 @@
 # class<TAB>gate
 declares	audit_capture_matrix
 declares	audit_clone_beam_lines
+declares	audit_column_flash
 declares	audit_column_shock
 declares	audit_crouch_flag
 declares	audit_defense_row_reads
@@ -27,11 +28,13 @@ declares	audit_guard_reentry
 declares	audit_hui_grunt
 declares	audit_kill_poke_shape
 declares	audit_ladder_selector
+declares	audit_lag_budget
 declares	audit_latch_reads
 declares	audit_mister_map_fit
 declares	audit_move_parity
 declares	audit_move_parity_attribution
 declares	audit_pass_overrun
+declares	audit_phobos_dmg_residual
 declares	audit_pyron_ring
 declares	audit_qs_voice_wav
 declares	audit_reaction_class_live
@@ -40,8 +43,10 @@ declares	audit_stock_emulator_stall
 declares	audit_tech_roll
 declares	audit_throw_registration
 declares	audit_tick_cadence
+declares	audit_trap_shock
 declares	audit_voice_borrow
 declares	audit_walker_repoint
+declares	audit_x2b7ef4_reach_m18
 declares	test_annotations_current
 declares	test_battery_accounting
 declares	test_build_environment_entry
@@ -66,6 +71,7 @@ declares	test_don_immortal_native
 declares	test_don_reactions
 declares	test_down_flash_mechanism
 declares	test_dualtrack
+declares	test_effect_placeholders
 declares	test_emulator_runner
 declares	test_escape_triage
 declares	test_expectation_provenance
@@ -124,6 +130,7 @@ declares	test_tenant_anim_relocation
 declares	test_tenant_id
 declares	test_tick_durations
 declares	test_tickets
+declares	test_unless_composed
 declares	test_vanilla_aerial_join
 declares	test_vanilla_frame_join
 declares	test_wide_profile

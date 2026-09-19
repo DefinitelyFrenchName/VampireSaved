@@ -252,3 +252,9 @@ test_commit_subject
 # freeze since the birth checked. tools/rulecheck.py; three controls. ~2 s.
 test_rule_checker
 test_rompath_reject
+# 14z-170: the `unless_composed` manifest row key (the S1 scope of the class-0x52 fix) —
+# its semantics, its refusal of an unknown tenant, the two rows that carry it. ~1 s.
+test_unless_composed
+# 14z-170: the x2b7ef4 coordinate-list placeholders resolve at their recorded offsets, never by an
+# in-place scan (the latent corruption merged-m16..m18 shipped). ~1 s.
+test_effect_placeholders

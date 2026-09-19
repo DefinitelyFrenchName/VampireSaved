@@ -22,7 +22,7 @@
 #   for donovan_2 (events 0-2), donovan_10 (0-1) and donovan_11 (the P2 block event and
 #   Blizzard Sword [LP] blocked), the committed rigs with the parity gate's pins.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged26] [FREEZE=1] tests/audit_pass_overrun.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [FREEZE=1] tests/audit_pass_overrun.sh
 #   emulator tier, MAME; 12 runs (the task taps write ~100 MB each, deleted with the work dir) —
 #   measured 14z-168 on this MacBook, solo: ~60 s wall
 set -eu
@@ -30,7 +30,7 @@ set -eu
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged26}"
+BUILD="${BUILD:-build/m3b_merged27}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/pass_overrun.tsv"
 CONTROL="${CONTROL:-}"
@@ -43,6 +43,8 @@ fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 PARTS="donovan_2:3110 donovan_10:3000 donovan_11:4590"   # part:last frame (past each overrun)
+# the build under test, named in the log by its fingerprint (14z-170, rule-checker run 2026-09-19-54 Q4)
+echo "== build under test: $BUILD  $(python3 "$REPO/tools/build_fingerprint.py" "$BUILD/rompath" --set vsavjw --sha-only | cut -c1-8)"
 OURS_PATH_donovan="D D DR DR"
 pokes_for() {  # pokes_for <json> <frames> (the parity gate's, copied)
     _b="$(python3 -c "import json;print(';'.join(json.load(open('$1'))['pokes']))")"
@@ -83,7 +85,9 @@ done
 # evidence only if it carries its END line; the field traces must exit 0
 for pf in $PARTS; do part="${pf%:*}"; for leg in native ours; do
     _rc="$(cat "$W/$part.$leg.f/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || bad "$part $leg trace exited $_rc"
-    tail -1 "$W/$part.$leg.tap" 2>/dev/null | grep -q '^END ' || bad "$part $leg task tap has no END line (exit $(cat "$W/$part.$leg.t/rc" 2>/dev/null))"
+    if tail -1 "$W/$part.$leg.tap" 2>/dev/null | grep -q '^END '; then
+        ok "$part $leg: the pass trace completed and the task tap reached $(tail -1 "$W/$part.$leg.tap" | cut -c1-24) (a teardown segfault after END is MAME's, docs/platform/gotchas.md)"
+    else bad "$part $leg task tap has no END line (exit $(cat "$W/$part.$leg.t/rc" 2>/dev/null))"; fi
 done; done
 [ "$fail" = 0 ] || { echo "FAIL: audit_pass_overrun"; exit 1; }
 plant() {  # plant <trace in> <trace out>: one pass-counter step removed at 4000 (a planted zero-pass frame)

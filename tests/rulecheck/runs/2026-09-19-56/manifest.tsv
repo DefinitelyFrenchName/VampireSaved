@@ -1,0 +1,20 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/rc170/freeze/rc_freeze/registry.diff	223541126a96c74fe11b2f1221459c1b454396ea
+build/rc170/freeze/rc_freeze/sets_and_fingerprints.txt	70825473add6edeba3fecef53264aeb72140dda3
+build/rc170/freeze/rc_freeze/test_m3a_reproducible.log	79c03914a832e4a56121f46de0a711892ed88e3e
+build/rc170/freeze/rc_freeze/delta_don_m23.txt	f02323da0c65e0b111109b52390b646ef6acd46a
+build/rc170/freeze/rc_freeze/delta_hui57.txt	0cf6dbc82096a1a048d382e3d21073149ceff6c0
+build/rc170/freeze/rc_freeze/delta_pyron42.txt	3da31dcd3e04fe2eba6cc21420d1fe34999498b7
+build/rc170/freeze/rc_freeze/delta_m5_stock18.txt	7fbe2b63a97f722d76cf9c6cb21fa2d64fdfa3dd
+build/rc170/freeze/rc_freeze/stage4_delta.txt	0bc62afd369d15a0f8844061a2f7d6256079566e
+build/rc170/freeze/rc_freeze/donovan-m23.freeze.log	08bdfc1fadb39a94f5e153cb09bec41c4301f603
+build/rc170/freeze/rc_freeze/donovan-m23.verify.log	35fe3afb44e2e3387f7377c879a676a3f1ce39dd
+build/rc170/freeze/rc_freeze/huitzil-m30.freeze.log	816328f525d69d3af552750ba1e1603eebaeff1c
+build/rc170/freeze/rc_freeze/huitzil-m30.verify.log	f10ea21fcbba6a08137f639cbacb5d578628930e
+build/rc170/freeze/rc_freeze/pyron-m24.freeze.log	6a742d31cd4ebf362d6f8f4e72f6f1fda9944061
+build/rc170/freeze/rc_freeze/pyron-m24.verify.log	e37ecf39351fcbeb990c8272d7e7bed4d27ab421
+build/rc170/freeze/rc_freeze/merged-m19.freeze.log	bf353c69a5129831553646eb7847ec3e4092bd8d
+build/rc170/freeze/rc_freeze/merged-m19.verify.log	d72d1dbae37b9caafffe29065840eaa821822350
+build/rc170/freeze/rc_freeze/stock.log	79c5b9635cac3aba96f1acbe2b2bf335afd30827
+build/rc170/freeze/rc_freeze/stage4.log	b90e1d4ba770f15b4504a13b2e959e64b1e9f625
+build/rc170/freeze/rc_freeze/sha1_moves.txt	ef8ae845755ab0e4526266271a2af271cb7dbf8d

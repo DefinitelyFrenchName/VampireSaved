@@ -1,0 +1,19 @@
+cps2 — MAME 0.288, CPS-2 subtarget, carrying the CPS-2 WIDE v1 driver patch, prebuilt for macos-arm64
+=====================================================================================================
+
+# Every file in this directory, and its sha256 — verify before running:
+#   awk '/^sha256 /{print $2"  "$3}' BINARY.txt | shasum -a 256 -c      (macOS/Linux)
+sha256 198b2d8c19c035cdb5f8a232a700eecb7ad65eb323da682872c42c7760bfdefe cps2
+sha256 b15a4124b6e0abd76f3ff2888d65f91a4265af310ca0f6574e4bfe1b02009dc5 libSDL3.0.dylib
+
+upstream   https://github.com/mamedev/mame
+pin        27a8d9e85b58058965907d1d8a7a92f8ed039348
+patch      0002-cps2-wide-v1.patch  sha1 1d13c9d80dc61cf39ddba16aaa30d8db0acb1131  (the ONLY patch applied; the project's replay-harness patch is a test instrument and is not in this binary)
+recipe     git clone https://github.com/mamedev/mame mame && cd mame && git checkout 27a8d9e85b58058965907d1d8a7a92f8ed039348 && git apply 0002-cps2-wide-v1.patch && make SUBTARGET=cps2 SOURCES=src/mame/capcom/cps2.cpp NOWERROR=1 REGENIE=1 -j12
+built      2026-09-11 on macOS 26.6.2 (arm64), Apple clang version 21.0.0 (clang-2100.3.34.2), by tools/build_release_emulators.sh mame
+requires   macOS 26.0 or later, arm64. Nothing to install: the libraries the recipe links from Homebrew (SDL3) are bundled here with @loader_path install names, all ad-hoc signed.
+run        `./cps2 vsavjw -rompath "/path/to/your/built/set;/path/to/your/dumps"` (the built vsavjw.zip and the pristine vsav.zip must both be on the rompath). `./cps2 -verifyroms vsavjw -rompath ...` says `is bad` BY DESIGN and must list exactly the members inside vsavjw.zip as INCORRECT CHECKSUM (stock CRCs for the members the port rewrites, sentinel CRCs for the new ones) — a NOT FOUND line is the real problem. MAME's own UI (Tab) maps controls.
+gatekeeper the binary is ad-hoc signed, NOT notarized: macOS quarantines a downloaded copy and refuses it on first launch. Either right-click > Open once on the executable, or run `xattr -dr com.apple.quarantine .` inside this directory.
+not works  "Unknown system: vsavjw" means the binary is not this one (no driver patch). A stock emulator fed the set renamed to vsavj.zip STALLS on the legal screen forever (measured 2026-09-11) — renaming is never the fix.
+asset      merged-m18-mame-macos-arm64.zip attached to the GitHub release on tag freeze/merged-m18 — https://github.com/DefinitelyFrenchName/VampireSaved/releases/tag/freeze/merged-m18 (verify the rows above after unzipping; the previous freeze's assets are deleted at each release)
+provenance a prebuilt is the recipe above run on one host and nothing else; the reviewable trust surface stays the patch (its sha1 above). Rebuild from the recipe to check: the binary is rebuildable, not byte-reproducible (link order, timestamps).

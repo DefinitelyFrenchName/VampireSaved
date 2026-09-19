@@ -1,0 +1,7 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/rc170/freeze/rc_static/expected.diff	22d1b3511583106b3dcd1b6415193624ded800a1
+build/rc170/freeze/rc_static/pointer_flow_new_baselines.txt	06ada979f81289c5b405b0890f8a51a0dbbfdba6
+build/rc170/freeze/rc_static/gates.diff	24105d6934dee4a29656e95a317b2afe80a286fc
+build/rc170/freeze/rc_static/charmaps.diff	eed8c5795eb1d92fd81c8822dcc8e687bbdeb2f9
+build/rc170/freeze/rc_static/verify.log	bc6d854a2693284d3c61b02525e1846b73d85538
+build/rc170/freeze/rc_static/attribution.txt	6ffd781125127609f38b39f3a2c84951aaf23b00

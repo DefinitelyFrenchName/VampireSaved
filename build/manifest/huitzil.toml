@@ -520,6 +520,43 @@ old_hex = "3b42b496"
 new_hex = "3b42b444"
 note = "obj-hit dmg: white damage -> vsavj layout (-0x4BBC)"
 
+# 14z-169, LANDED 14z-170 (#157's Dark Force tail, ruled 2026-09-18 — the maintainer: "it makes sense that you
+# can't build meter during DF"): the placed copy of vs2's meter adder tests vs2's Dark Force POWER
+# flag +0x1C3, which our host's Dark Force Change never sets, so the tenants built gauge inside
+# the mode (tests/audit_df_meter.sh). vsavj's own adder (0x29A16) is byte-identical but for this
+# test, which reads the Change field +0x111 — the shells' rule. Same size and cycles; tenant code
+# only. The other 23 placed +0x1C3 reads are left: vs2's EX never sets the flag either, so they
+# read 0 on both engines (tests/audit_df_modes.sh, the pow column).
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028D6C
+old_hex = "4a2e01c3"
+new_hex = "4a2e0111"
+note = "meter adder: Dark Force test +0x1C3 (vs2 Power) -> +0x111 (vsavj Change), #157 DF tail"
+
+# THE EX ROUTE INTO DARK FORCE, DISABLED (14z-170; RULED 2026-09-18, 14z-168: the
+# tenants' vs2 EX input into the mode on our build is to be DISABLED, "agreed"; and
+# 14z-169: it does "the no-stock move" at every stock level — DECISIONS_HISTORY.md).
+# vs2's EX site (vs2 0x055538, the 263+PP input): `tst.b $111(a6); bne.w <fall>`, then
+# `moveq #0,d1; jsr <0x028534>; beq.w <fall>`, then the mode via the Change entry 0x02622A.
+# 0x028534 refuses with no stock BEFORE it reads the input (`tst.b $109(a6); beq` ->
+# `moveq #0,d0; rts`), so vs2's no-stock case is "fall through to <fall>" (0x05524A),
+# the sub-pattern motion checks. bne.w -> bra.w takes that path at EVERY stock level
+# without calling 0x028534 at all (no stock spent, no input consumed); what the skip
+# leaves different is dead there — d0/d1 and the flags are rewritten by the first
+# motion tracker <fall> calls (vs2 0x0292A4: `moveq #0,d0`, then d1 from its table)
+# before any read. One opcode byte, the displacement kept; fewer cycles than vs2's
+# refusal. Gate: tests/audit_ex_refused.sh (ours at stock 3 must take the path vs2
+# takes at stock 0). his `code` region (placed PRG:0x4149EC on merged-m18).
+[[port_patch]]
+stage = 6
+region = "code"
+src_addr = 0x05553C
+old_hex = "6600fd0c"
+new_hex = "6000fd0c"
+note = "EX route disabled: bne.w -> bra.w past the EX check (vs2's no-stock path at every stock level), ruled 2026-09-18"
+
 # ── The ported per-char OBJ bank table copy (x026142 tail; the same
 # truncation + vs2-values defects Donovan's table_fix repairs). Rows =
 # VANILLA vsavj 0x282D4 values EXCEPT row 0x10 = 0x1000: H's sprites
@@ -855,7 +892,7 @@ march_retarget_mid = true
 # same-source-or-fail names any future collision). Screen position =
 # the empty bottom-right corner (measured on merged-m5 snapshots, 14z-105).
 # THE TEXT NAMES THE FREEZE GENERATION — change it at every freeze.
-version_text = "M18"
+version_text = "M19"
 version_font = "build/manifest/version_font.json"
 version_x = 324
 version_y = 202
@@ -2163,18 +2200,28 @@ note = "14z-82c: extend the projectile hit-class byte map to vs2's 80 entries; >
 # shock install), and vsavj entry[0x06] = its native electric-shake
 # 0x23AC8 — a STRUCTURAL TWIN of vs2's handler minus one guard (vs2's
 # 0x52 path skips the ATTACKER's 0x0B hit-freeze; the attacker is a
-# mine). property[0x06] == property[0x52] == 0x0F both games. KNOWN
-# DEVIATION (maintainer-accepted with the ruling): Phobos receives the
-# normal 11-frame attacker hit-freeze when the trap connects — vs2
-# exempts him. Option (b) (faithful dispatch thunk, exemption
-# included) is on record in STATE 14z-85g(2) if the freeze bothers
-# play. Gate: tests/audit_trap_shock.sh (the deep-overlap rig).
+# mine). property[0x06] == property[0x52] == 0x0F both games.
+# ~~KNOWN DEVIATION (maintainer-accepted with the ruling): Phobos receives
+# the normal 11-frame attacker hit-freeze when the trap connects — vs2
+# exempts him.~~ WITHDRAWN 2026-09-18 (14z-168): the maintainer ruled the
+# trap takes vs2's class-0x52 rule (DECISIONS_HISTORY.md "Ruled 2026-09-18
+# (14z-168) — the column shock and the Plasma Trap"), SCOPED S1 (14z-169):
+# `unless_composed = "donovan"` (14z-170) — the remaps below apply only on a
+# build WITHOUT donovan.toml. Where Donovan's manifest is composed (the
+# merged build) the records keep native 0x52 and donovan.toml's machinery
+# plays vs2's rule: reaction_hook case_a4 writes the 0x38 marker, the
+# ls_freeze thunks exempt the attacker and give the victim 0x18, and the air
+# and KO stagers fold 0x52 as vs2's do. The solo Phobos build has none of
+# that machinery (its index_window_018468 case 0xA4 writes 0x52, which
+# vsavj's reaction table cannot dispatch), so it keeps today's remap and the
+# deviation. Gate: tests/audit_trap_shock.sh (the deep-overlap rig).
 [[region_fix]]
 stage = 6
 region = "hitbox_proj"
 off = 0x17D
 old_hex = "52"
 new_hex = "06"
+unless_composed = "donovan"   # S1 (14z-169): only where Donovan's 0x52 machinery is absent
 note = "trap dome hit record 1: class 0x52 -> 0x06 (vs2-alias-proven; routes vsavj electric-shake 0x23AC8)"
 
 [[region_fix]]
@@ -2183,6 +2230,7 @@ region = "hitbox_proj"
 off = 0x19D
 old_hex = "52"
 new_hex = "06"
+unless_composed = "donovan"   # S1 (14z-169): only where Donovan's 0x52 machinery is absent
 note = "trap dome hit record 2: class 0x52 -> 0x06 (vs2-alias-proven)"
 
 # 14z-85g REMAP: record node 11 (id 0x73A) remapped to vsavj 0x199
@@ -2352,6 +2400,51 @@ only_variant_slot = true
 # tests/test_voice_row_range.sh (section A) and test_decode_stage_banners.sh.
 fixes = "0x01:18:0a,0x1a:18:0a,0x29:18:0a,0x31:18:0a"
 note = "14z-87 option (c): vs2's Huitzil row of the paired arcade-ladder stage table (feeds $FF8100 via the borrow); 14z-94 retargets the four class-0x13 entries off vs2-only stage 0x18 (#92)"
+
+# THE DEFENSE ROWS (14z-170; RULED 2026-09-18, 14z-168: "given the
+# measurements we should take the vs2 rows" — DECISIONS_HISTORY.md "Ruled
+# 2026-09-18 (14z-168) — the tenants' DEFENSE rows become vs2's", superseding
+# the 2026-08-14 option (b)). The damage chain's two victim-indexed tables
+# (docs/project/tables/defense_rows.md): the defense curve, 32 B per victim id
+# (vsavj PRG:0x0B8940, vs2 PRG:0x0D2ABE, vh2 oracle 0x0D2350), and the low-HP
+# rally threshold, 1 B per id (vsavj PRG:0x0BCC80, vs2 PRG:0x0D6E1E, vh2
+# 0x0D66B0). vsavj fills variant row 0x10 with a COPY of Bulleta's row 0x00, so
+# Phobos took his shell's curve and 56 HP threshold; native he rides Victor's
+# curve and 40 HP. DATA-ONLY because both host reads (PRG:0x018C20 the curve,
+# 0x018C7C the threshold — the ONLY readers of either table, static census
+# tests/test_defense_rows_census.sh) index row = the VICTIM'S OWN id, tenants
+# included, over the whole corpus (tests/audit_defense_row_reads.sh, 14z-169);
+# no legacy character carries id 0x10, so no legacy read reaches the row.
+# only_variant_slot: on the base-slot track row 0x10 stays vanilla's copy.
+[[data_port]]
+stage = 6
+name = "defense_curve_row"
+src = 0xD2CBE         # vs2 0xD2ABE + 0x10*0x20
+len = 0x20
+orc = 0xD2550         # vh2 0xD2350 + 0x10*0x20 (the sibling oracle holds the same row)
+dst = 0xB8B40         # vsavj 0xB8940 + 0x10*0x20 (variant row, copy of Bulleta's 0x00)
+dst_end = 0xB8B60
+dst_old_head = "fefefefeffffffffffff00000000000000000001010102020203030304040405"
+only_variant_slot = true
+note = "14z-170 (ruled 14z-168): vs2's Phobos defense-curve row over vsavj's variant row 0x10 (Bulleta's copy)"
+
+# The threshold is ONE byte, but patch_prg writes whole words, so the row is the
+# WORD 0x10-0x11: byte 1 is Pyron's threshold, 0x30 on vsavj, vs2 and vh2 alike.
+# The `fixes` entry 0x01:30:30 is an ASSERTION, not an edit: the build fails if
+# the source's byte 1 is not vsavj's 0x30 (and dst_old_head holds vsavj's side),
+# so Pyron's byte is rewritten with the value it already has.
+[[data_port]]
+stage = 6
+name = "defense_rally_threshold"
+src = 0xD6E2E         # vs2 0xD6E1E + 0x10: 0x28 (40 HP), then Pyron's 0x30
+len = 2
+orc = 0xD66C0         # vh2 0xD66B0 + 0x10
+dst = 0xBCC90         # vsavj 0xBCC80 + 0x10: 0x38 (56 HP, Bulleta's copy), then Pyron's 0x30
+dst_end = 0xBCC92
+dst_old_head = "3830"
+fixes = "0x01:30:30"
+only_variant_slot = true
+note = "14z-170 (ruled 14z-168): vs2's Phobos low-HP rally threshold (40 HP) over vsavj's variant byte 0x10 (56 HP, Bulleta's copy); Pyron's byte 0x11 kept at 0x30"
 
 # THE VOICE ALIAS THUNK (14z-86, shared by all tenants — identical
 # rows dedupe on merge). A range-gated clone of the per-node sfx

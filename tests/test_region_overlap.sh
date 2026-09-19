@@ -49,7 +49,7 @@ cd "$REPO"
 # it reported PASS about three builds nobody ships. Section 5 adds the CURRENT
 # trio. Both are true at once; neither replaces the other.
 HIST_BUILDS="build/m5_wide build/hui30 build/pyron21"
-CUR_BUILDS="build/don_m22 build/hui56 build/pyron41"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+CUR_BUILDS="build/don_m23 build/hui57 build/pyron42"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 BUILDS="${*:-$HIST_BUILDS}"
 
 # Presence is two-tier. An UNBUILT tree (no build dir has placements.json at
@@ -183,7 +183,7 @@ if [ $# -eq 0 ]; then
 # — the shared regions' tenant copies differ in placement-dependent bytes,
 # so the 1-differs counts and the totals move (2089 / 7604). The control's
 # superseded trio still measures 2000 and is still rejected.
-echo "== 5: the CURRENT trio — don_m22 / hui56 / pyron41 (label re-pointed 14z-117) =="  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+echo "== 5: the CURRENT trio — don_m23 / hui57 / pyron42 (label re-pointed 14z-117) =="  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
     for b in $CUR_BUILDS; do
         [ -f "$b/patch/placements.json" ] || {
             echo "FAIL: current build $b has no patch/placements.json"; exit 1; }
@@ -209,8 +209,12 @@ eq("unique to one tenant", len(d["unique"]), 17)
 # The span figures MOVED from the 14z-77 trio, and that movement is the point:
 # 2000 -> 2033 at 14z-103 (2012 at 14z-90), spans shifting. A gate frozen only
 # on the old trio could not see this.
+# RE-FROZEN 14z-170 (the M19 freeze): x2b7ef4 1-differs 1042 -> 878. Only Donovan's copy
+# changed (160 bytes: the x2b7ef4 placeholder repair, patch_notes 14z-170; Phobos's and
+# Pyron's copies byte-identical to M18), so fewer bytes are his alone; conflict 1582 and
+# the 2089 total unchanged.
 FROZEN_CUR = {"x026142": (38, 69), "x028122": (36, 53),
-              "x05c800": (444, 385), "x2b7ef4": (1042, 1582)}
+              "x05c800": (444, 385), "x2b7ef4": (878, 1582)}
 for n, (solo, conf) in FROZEN_CUR.items():
     v = d["blobs"].get(n, {})
     eq("%s (1-differs, conflict)" % n, (v.get("solo"), v.get("conflict")),

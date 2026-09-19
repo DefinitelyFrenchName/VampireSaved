@@ -27,6 +27,76 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-19 (14z-170) — the column KO under the class-0x52 rule reads clean on the capture (#163)
+
+**What was put:** rule-checker run 2026-09-19-62 (Q2) found the column-KO finding drawn from RAM traces alone (the reaction class reads 8 on native, M19 and M18, traces matching). A capture was made (`build/rc170/ko_cap/column_ko_sheet.png`: donovan_4 with Demitri's HP poked to 1 so the column's first hit at f2838 KOs; native vs2, M19 and M18 at eight frames) and sent with: *"Column KO (Demitri's HP poked to 1, so the column's first hit at f2838 KOs), shown at the same frames. Rows: native vs2, M19, M18. The column/trap ticket stays open until you've read this one."* A second image, the win-pal lose leg's matched window, was sent for reference only.
+
+**Ruling (verbatim):** *"looks clean to me"*.
+
+**What it means.** The column KO under the M19 rule plays as native. #163 keeps one open item: a column hit on an airborne victim (the air stager's case), not measured.
+
+## Ruled 2026-09-19 (14z-170) — the maintainer's reads of the fixed build's captures: the column, and Phobos's and Donovan's EX inputs
+
+**The question (as put, with four capture sheets sent first — the column, the Plasma Trap, Phobos's and Donovan's EX inputs, `build/rc170/cap_fix/`):** *"From the four sheets I just sent: does the fixed build play the column, the Plasma Trap and Phobos's and Donovan's EX inputs as you expect from vs2? (The rule-checker requires your read of captures before I call the fixes verified.)"*
+
+**The reads (verbatim):** *"Let me proceed one by one, starting with Column_KillshreadLightning_after_fix: - The fix is mechanically perfect - The orange flash at 2860 is cosmetic but strange as it's the sprite of the stand-like entity above Donovan that turns orange instead of staying blue: looks like a wrong palette since the rest is clean, just the colors swapped. Only cosmetic however why it happens would answer whether it's a minor side effect or something that could have impacts elsewhere. Plasma trap : I can't rule for now because the move does not just seem to end at a different frame, it seems it starts at a different frame so I would need more frames from the beginning of the move until the activation of the trap and frames until the end of recovery, on all builds. Phobos_263PP_after_fix -> clean Donovan_421KK_after_fix -> clean"*
+
+**What it means.** The column and both EX inputs read as native on the captures. The trap was re-shot with the speed level and RNG pinned and read *"Yes, as expected"* (the entry below); the flash became #162; the column KO was read on its own capture (the entry above).
+
+## Ruled 2026-09-19 (14z-170) — the orange flash on the column's deity is a cosmetic ticket (#162); the pinned Plasma Trap plays as expected
+
+**The questions (as put, with the captures before the maintainer):** *"The orange flash turns out to be an older cosmetic defect (merged-m18 has it). Our build loads a fire palette into row 11 as the move ends, while native keeps it blue, so the deity's last frame shows orange. How should I treat it?"* — "Ticket it, go on (Recommended)": *"File a cosmetic ticket with the captures and the measurements so far. Root-cause it later, then the freeze proceeds."*; "Root-cause it now". And: *"Pinned, the Plasma Trap plays identically on native and the fixed build, and the fix removes only Phobos's own hit-stop. Does it play as you expect now?"*
+
+**Rulings:** the maintainer selected *"Ticket it, go on (Recommended)"* and *"Yes, as expected"*.
+
+**What it means.** The flash is #162, frozen AS MEASURED by `tests/audit_column_flash.sh`; its writer, first misread from a `-debug` watch, is the palette-SEQUENCE uploader (STATE 14z-170 row (12)). The trap's fix stands as built.
+
+## Ruled 2026-09-19 (14z-170) — Phobos's remaining +1 damage from Demitri's 5HP after the defense-row fix: freeze M19, ticket it
+
+**What was measured first (STATE 14z-170; rule-checker run 2026-09-19-60 found it in the re-frozen attribution table):** after the ruled defense-row fix Phobos takes 12 where native vsav2 takes 11 from Demitri's 5HP (merged-m18: 13), on both parity rigs that land the hit (huitzil_5 f5966, huitzil_6 f7725), deterministic across three RNG pin values (0000, 1234, 5a5a — `build/rc170/freeze/dmg/`), while his curve row and rally threshold answer vs2's bytes live (`tests/audit_defense_row_residue.sh`). A second per-victim factor in the damage chain remains, unidentified.
+
+**The question (as put):** *"How should M19 handle it?"* — "Freeze, ticket it (Recommended)": *"Freeze M19 as built (the ruled fix is in and moves 13->12); the two attribution rows get an honest open class — 'Phobos takes more with the defense rows already native: cause unmeasured', frozen AS MEASURED — and a new bug ticket carries the damage-chain trace for a later session."*
+
+**Ruling:** the maintainer selected *"Freeze, ticket it (Recommended)"*.
+
+## Ruled 2026-09-19 (14z-170) — audit_continue_switch is re-authored: P1 idle to a natural KO, and assertion 2 checks the KO is judged into a new match
+
+**What was measured first (STATE 14z-170):** at the M19 freeze the #99/#103 continue-with-switch marathon went red — Phobos's vs2 defense row lets him survive the scripted mash to a TIMEOUT, so no natural KO loss occurs (phase-1 mapping, `build/rc170/freeze/contsw/`). With P1 idle through the first match, CPU Bulleta KOs him naturally (f8080, no pokes) and the loss is judged: YOU LOSE, the quote, the same-character continue prompt, a new match (captures `build/rc170/freeze/contsw/phase1b_post_ko.png`) — but through `$FF8004` mode 6 -> 2, not the mode 8 the old trajectory showed. The continue landing on Jedah was measured NOT to be a defect: pristine vsavj's Victor on the same rig lands on Jedah too.
+
+**The question (as put):** *"How should I proceed?"* — "Re-author as described (Recommended)": *"Idle P1 until the natural KO, assertion 2 checks the KO is judged into a new match within 1600 frames (mode path recorded, not required), then re-measure the switch window and venue steer until assertions 3-5 hold again; every change written into the gate's header with the measurements."*
+
+**Ruling:** the maintainer selected *"Re-author as described (Recommended)"*.
+
+## Ruled 2026-09-19 (14z-170) — freeze M19 this sitting
+
+**The question (as put, 08:05Z, the four #136 fixes and the x2b7ef4 resolver fix built and verified on a scratch build, uncommitted):** *"The four #136 fixes plus the placeholder-corruption fix are built, verified against native and your captures, and through the rule-checker, all uncommitted, as they must be until a freeze. Freezing M19 means: moving aside the withdrawn M19's leftover build dirs, building the five tracks, re-freezing every expectation the fixes move (each through the rule-checker), registry rows, tags, the re-point sweep, filing the tickets, and the ~5 h emulator battery. That's several hours. How do you want to proceed?"* — "Freeze M19 now (Recommended)": *"Start the freeze ritual this sitting. The battery runs detached, and I report as it goes. The fixes can only be committed green with the freeze."*; "Stop here, freeze next": *"Save the fixes as a patch (the 14z-169 way), commit only what's green against merged-m18, and close. The next sitting starts with the freeze."*
+
+**Ruling (08:10Z):** the maintainer selected *"Freeze M19 now (Recommended)"*.
+
+**What it means.** The M19 freeze ran this sitting (STATE 14z-170 row (8)): five builds, the expectation sets re-frozen, the emulator battery, and the rule-checker's freeze runs 2026-09-19-56..76 — the last reading OK. Recorded here at the close (rule-checker run 2026-09-19-76, its Q5 note): STATE row (8) had kept only the answer; the question, both options and the two times are quoted from the session's own records of the question and the answer.
+
+## Ruled 2026-09-19 (14z-170) — the x2b7ef4 placeholder corruption in the shipped builds: M19 supersedes M18, and its reachability measured first
+
+**What was put (STATE 14z-170 row (5)):** attributing the four #136 fixes' program delta found a latent generator bug — the x2b7ef4 companion-effect pass resolved its `0xEE` coordinate-list placeholders by an in-place scan, which re-read a resolved pointer's `0xEE..` low word as a placeholder — so merged-m18 ships 52 corrupted sites (Donovan's copy 40, Pyron's 12; the 22-site class also in merged-m16 and -m17), each a pointer turned odd; the corrected resolver is required for M19 regardless, since the fixes' +0x30 shift re-rolls three more.
+
+**The questions (as put):** *"What about the published M18?"* — "M19 supersedes it (Recommended)": *"Land the generator fix with the M19 freeze, file a ticket now, and leave merged-m18 as published. It gets replaced when M19 is released."*; "Hotfix M18 first": *"Cut an M18.1 release with only the generator fix …"*. And *"Should I find out which Donovan effect draws the corrupted records before the freeze? That's a read watch over the corrupted addresses across his naming parts, about 15-20 min. It would tell you how exposed M18 players are."* — "Measure it now (Recommended)" / "Skip it".
+
+**Ruling:** the maintainer selected *"M19 supersedes it (Recommended)"* and *"Measure it now (Recommended)"*.
+
+**Measured the same sitting (`build/rc170/reach/`):** a `-debug` read watch on merged-m18 over Donovan's copy (all 14 Donovan naming parts, his movelist) and over Pyron's corrupted span (his 6 parts): the corrupted spans are never read in a match (Donovan: all 53,924 in-match reads fall in one other 1 KB block, each attributed by an address register inside the window — the heuristic's positive control; Pyron: the boot sweep only). Which effect draws the corrupted records is not established.
+
+**CORRECTED later the same sitting (14z-170), marked in place:** the Donovan runs above were VOID. Every debugger stop advances the watch script's frame counter ([CPE-5]), and his watch covered a block read thousands of times per match, so those replays desynced by up to ~5,700 frames and never played the moves. (Pyron's six runs took only the boot stop and were sound.) Re-measured soundly by `tests/audit_x2b7ef4_reach_m18.sh`: the watch covers the corrupted bytes only and is armed at frame 2000, and each debug run's P1 anim-node trajectory is checked against a non-debug run. **The conclusion stands:** no Donovan part (14) and no Pyron part (6) reads a corrupted record on merged-m18. 18 of the 20 runs are frame-exact with the reference to the end; donovan_10 and donovan_12 skew by one frame at f2980 and f3537 with no stop, deterministically, and read none in the runs they played. The hot-block control (the widened watch) hits 5,572 times from f2363 and then desyncs.
+
+## Ruled 2026-09-19 (14z-170) — Pyron's 2623+PP with stock reads NATURALLY (its 623+PP ES move), refining the no-stock ruling below
+
+**What was measured first (14z-170, the EX-route fix built into `build/fix170_all`, `tests/audit_ex_refused.sh`):** the fix (each tenant's EX site takes vs2's no-stock branch at every stock level, one opcode byte) gives Phobos and Donovan vs2's no-stock path at stock 3 exactly — no mode, no stock spent. Pyron's does not: at stock 3 his vs2 EX input falls through to the sub-pattern 623+PP, which the host reads as the ES version when a stock is available — seq 0x10, five hits, the stock 3 -> 2 — where vs2 with no stock does the normal 623+P (seq 0x0E), as ours does with no stock. Capture put before the maintainer first (`build/rc170/cap_pyr/Pyron_2623PP_after_fix_sheet.png`: native vs2 no stock | ours fixed stock 3 | ours fixed no stock).
+
+**The question (as put):** *"With the EX route disabled, Phobos and Donovan now do vs2's no-stock move at every stock level. Pyron doesn't: his 2623+PP falls through to 623+PP, which the game reads as the ES version when a stock is available (middle column: blue ES move, 5 hits, costs 1 stock). With no stock it's the normal 623+P, identical to native. Which should Pyron's 2623+PP do when he has stock?"* — "Natural reading (Recommended)": *"Keep it as built: the input reads as its 623+PP sub-pattern, i.e. the ES move when a stock is available and the normal move without one, the same as any input ending in 623+PP. No extra code."*; "Force the no-stock move": a new check recognising the full 2623+PP pattern to suppress the ES.
+
+**Ruling:** the maintainer selected *"Natural reading (Recommended)"*.
+
+**What it means.** The disabled EX route leaves each tenant's vs2 EX input to be read as whatever its sub-pattern is on our build: for Phobos and Donovan that is the no-stock move at every stock level (their sub-patterns have no ES version); for Pyron it is 623+PP — the ES move when a stock is available, the normal 623+P without one. The 2026-09-18 (14z-169) ruling below stands for Phobos and Donovan and is refined by this one for Pyron.
+
 ## Ruled 2026-09-18 (14z-169) — the disabled EX route does the NO-STOCK move, at every stock level
 
 **The question (as put, with three capture sheets of the tenants' vs2 EX inputs with no stock, native vsav2 beside ours, `build/rc169/cap_ex/`):** *"The sheets show what each tenant's vs2 EX input does with NO stock (it can't enter Dark Force): the same move on vs2 and on ours for all three. Should the disabled EX route on our build do exactly that, for every stock level?"*

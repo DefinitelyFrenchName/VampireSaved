@@ -245,6 +245,27 @@ events; for anything frame-accurate or complete, use replay.lua DUMPS
 (exact, no debugger) and read state from RAM — companion-slot cursor
 fields survive at frame-done even when the live flag is clear.
 
+PAID AGAIN 14z-170, with a WATCHPOINT (`tests/lua/trace_writes.lua`) this time. A write
+watch on palette row 11 logged 240 staging-copy writes, one "frame" each, from 2585 on.
+Read as replay frames, they put the copy inside Donovan's column move, and a mechanism
+was written into a gate header, an issue draft and STATE. A non-debug write tap
+(`tests/lua/read_tap.lua`, the same row) shows the same 240 writes as 16 words on each of
+15 frames at 2313-2355, the round-start fade. The counter had advanced once per stop.
+Inside the move, the row's only writer is the palette-sequence uploader. When the
+question is WHEN a write happens, use the non-debug tap. A `-debug` log gives the WHO,
+and its frame column is not a time. (`tests/lua/bp_regs.lua`'s header says the opposite
+— "the debugger pauses emulated time during a stop, so frame-counted input playback
+stays aligned" — and this measurement contradicts it.)
+The same sitting paid it a second time, worse. A reachability read watch over Donovan's whole
+x2b7ef4 copy stopped on a block the match reads thousands of times, so its replays desynced by
+up to ~5,700 frames and a "never read" was reported from runs that never played the moves.
+The sound form is `tests/audit_x2b7ef4_reach_m18.sh`. It watches only the bytes in question,
+arms after boot (`WATCH_FROM`, several ranges in one `WATCH`, both added to
+`trace_writes.lua` 14z-170), and compares each run's P1 anim-node trajectory (`SAMPLE`) with a
+non-debug run's. That comparison is the check a zero-hit debug run needs: with no stop, 18 of
+20 runs were frame-exact; two skewed by one frame mid-move with no stop at all, so a debug run
+remains its own timeline even when silent.
+
 ## CPS-2 program zips store CODE encrypted — static byte reads of code are noise
 **[CPH-2]** Paid for in session 14z-2 (an hour of "why does the ported region disassemble
 to garbage"). The romset zips (+ .key) hold ENCRYPTED opcodes; only DATA

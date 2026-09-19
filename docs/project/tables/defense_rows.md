@@ -1,12 +1,19 @@
-# Tenant DEFENSE-side rows — vs2's rows are RULED; the build still carries the vsavj approximation until the fix lands
+# Tenant DEFENSE-side rows — vs2's rows, as ruled, SHIPPED IN M19 (merged-m19)
 
 **RULED 2026-09-18 (14z-168): Phobos and Donovan take their vs2 rows** —
 the maintainer: *"given the measurements we should take the vs2 rows. I hope
 we can do it in a way that doesn't cost frames and that doesn't create
 side-effects/regression elsewhere (e.g. it would be wrong to make changes that
 correct the 3 tenants but break vanilla characters)"* (`DECISIONS_HISTORY.md`
-"Ruled 2026-09-18 (14z-168) — the tenants' DEFENSE rows become vs2's"). The
-build still carries the approximation below until that fix lands.
+"Ruled 2026-09-18 (14z-168) — the tenants' DEFENSE rows become vs2's"). **BUILT
+14z-170** as four `[[data_port]]` rows (Phobos's in `huitzil.toml`, Donovan's in
+`donovan.toml`): each tenant's 32-byte curve row from vs2, and its threshold as a WORD —
+`patch_prg` writes words — with the neighbour byte asserted unchanged (a same-value `fixes`
+entry: Pyron's 0x11 and id 0x12, the legacy-reachable Dark Gallon, are 0x30 in vsavj, vs2
+and vh2); `only_variant_slot`, so the stock twin's rows stay vanilla; `orc` against vh2's
+copies (vh2's curve table `PRG:0x0D2350`, its threshold table `PRG:0x0D66B0`). The program delta is exactly 66 bytes; the fixed build answers vs2's bytes at every
+read (`tests/audit_defense_row_residue.sh`, which reads ours from the build since 14z-170).
+The rows below are the values before the fix, kept as the record.
 ~~Maintainer ruling (2026-08-14, 14z-85f): option (b) — the tenants keep
 vanilla vsavj's defender-side rows.~~ SUPERSEDED by the ruling above. This
 file records the exact values on both sides and the recipe for the change.
@@ -97,7 +104,10 @@ for i in (0x10, 0x11, 0x13):
 EOF
 ```
 
-## What changing to native vs2 values entails — RULED, not yet built
+## What changing to native vs2 values entails, and how it was built
+
+**BUILT 14z-170** by the data-only route (four `[[data_port]]` rows, the head of this file), not by the reader-site thunks the
+2026-08 recipe below proposes; the recipe is kept as written, for the record.
 
 Option (a) of 2026-08-14, now the ruled change. The recipe below was written in 2026-08 and
 proposes reader-site thunks. Since 14z-168 a DATA-ONLY route is the candidate: both reads index by
@@ -151,6 +161,12 @@ that is nothing of the port's; the control victim 0x03 answers 2 / 2. The
 defense byte seeds `d3`, the row of the final 2D damage map, so a one-row
 shift is a ±1 on a throw's damage. Re-ruling option (a) would move the two
 tenant cells and leave Sasquatch's, which is vanilla vsavj's own data.
+
+**After the fix (14z-170, M19):** the two tenant cells are gone — `audit_tenant_throw_geometry`'s residue is
+Sasquatch's 0x0A alone, re-frozen. **ONE RESIDUAL IS OPEN:** Demitri's 5HP takes 12 HP from Phobos where native vs2
+takes 11 (merged-m18 13), deterministic across RNG pins, with Phobos's curve row AND threshold word already vs2's —
+so the extra point enters elsewhere in the chain; cause unmeasured (GitHub #161). Reproducer:
+`tests/audit_phobos_dmg_residual.sh`; the attribution class `PHOBOS-DMG-OPEN` (`tools/move_parity_attribution.py`).
 
 ## Cross-references
 

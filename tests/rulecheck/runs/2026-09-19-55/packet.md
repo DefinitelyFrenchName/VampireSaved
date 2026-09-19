@@ -1,0 +1,12 @@
+THE PACKET
+
+Decision kind: expectation
+Subject: 14z-170 M19 freeze: twelve static-tier gates' frozen expectations re-frozen on the M19 builds, two gates reworked
+Claim (the working agent's sentence): Twelve static gates are green on the M19 builds (build/m3b_merged27, don_m23, hui57, pyron42) after their expectations were re-frozen (verify.log, a second run after each freeze), and every line that moved has one of three causes shown in attribution.txt or the diffs: the fixes' own bytes (defense_rows_census: Phobos's and Donovan's rows now vs2's; df_field_readers: the three x028122 adder reads of +0x1C3 gone; reaction_classes: reaction_hook case_a4 now the one constant 0x38 writer and the two thunks' three 0x38 compares; manifest_merge: +2 port_patch rows per manifest; rule5_baked: +6 build-gate flags, declared in its growth line), the +0x30 allocator relocation (latch_readers, escape_triage, the two STRONG pointer-flow findings and the moved addresses in df_field_readers and reaction_classes), or the x2b7ef4 placeholder repair (Donovan's pointer-flow data:long -3, the region-overlap x2b7ef4 1-differs 1042 -> 878, the charmap's relocated_bad 33 -> 11). Two gates were reworked because a fix removed what they anchored on: df_field_readers's known reader is now vs2's own 0x2617A tst.b $1c3(a6) read from vs2's pristine opcode view, and reaction_classes's no-0x38-writer assertion is scoped to the reference images with exactly one writer required on ours; each new check was run in the failing direction (attribution.txt sections 4-5). NOT tested: that a moved line's cause is its ONLY cause (the pointer-flow diff matches identity or +0x30 and nothing else); the out-of-tree charmap HTML pages, re-hashed as derived from the in-tree JSON reviewed in charmaps.diff; the reachability of the 11 relocated_bad rows left in Donovan's x2b7ef4 (tripwire stubs, unchanged from M18).
+Artifacts (read every one, in full):
+  - build/rc170/freeze/rc_static/expected.diff
+  - build/rc170/freeze/rc_static/pointer_flow_new_baselines.txt
+  - build/rc170/freeze/rc_static/gates.diff
+  - build/rc170/freeze/rc_static/charmaps.diff
+  - build/rc170/freeze/rc_static/verify.log
+  - build/rc170/freeze/rc_static/attribution.txt

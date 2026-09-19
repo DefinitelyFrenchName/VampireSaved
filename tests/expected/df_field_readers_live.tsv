@@ -1,14 +1,11 @@
 # tests/expected/df_field_readers_live.tsv — the census rows of tools/audit_df_field_readers.py that the #136 corpus executes on
-# our build (merged-m18), with vsavj's own accesses to the same bytes (tests/audit_df_field_readers_live.sh; tests/lua/read_tap.lua).
-# Evidence class: in-emulator. Frozen 14z-168 with FREEZE=1 on m3b_merged26. Re-freeze at every freeze, reviewing the diff.
+# our build (m3b_merged27), with vsavj's own accesses to the same bytes (tests/audit_df_field_readers_live.sh; tests/lua/read_tap.lua).
+# Evidence class: in-emulator. First frozen 14z-168; this freeze with FREEZE=1 on m3b_merged27. Re-freeze at every freeze, reviewing the diff.
 #--
 sampled	read	+0x1c3	0x0bfd90	code	a6	P1	donovan_3,donovan_7
-sampled	read	+0x1c3	0x0cffba	x028122	a6	P1	donovan_1,donovan_10,donovan_11,donovan_12,donovan_13,donovan_14,donovan_2,donovan_3,donovan_4,donovan_5,donovan_6,donovan_7,donovan_8,donovan_9
 sampled	read	+0x1c3	0x4148bc	code@huitzil	a6	P1	huitzil_4
-sampled	read	+0x1c3	0x41f8fa	x028122@huitzil	a6	P1	huitzil_1,huitzil_10,huitzil_2,huitzil_3,huitzil_4,huitzil_6,huitzil_7,huitzil_8,huitzil_9
-sampled	read	+0x1c3	0x471fb4	code@pyron	a6	P1	pyron_4,pyron_5
-sampled	read	+0x1c3	0x471fde	code@pyron	a6	P1	pyron_4
-sampled	read	+0x1c3	0x478b6a	x028122@pyron	a6	P1	pyron_1,pyron_2,pyron_3,pyron_4,pyron_5,pyron_6
+sampled	read	+0x1c3	0x471fe4	code@pyron	a6	P1	pyron_4,pyron_5
+sampled	read	+0x1c3	0x47200e	code@pyron	a6	P1	pyron_4
 host	W	0x000d34	P1,P2	30 runs
 host	W	0x000d3a	P1,P2	30 runs
 host	W	0x000dd8	P1,P2	30 runs

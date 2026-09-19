@@ -403,6 +403,46 @@ old_hex = "3b42b496"
 new_hex = "3b42b444"
 note = "obj-hit dmg: white damage -> vsavj layout (-0x4BBC)"
 
+# 14z-169, LANDED 14z-170 (#157's Dark Force tail, ruled 2026-09-18 — the maintainer: "it makes sense that you
+# can't build meter during DF"): the placed copy of vs2's meter adder tests vs2's Dark Force POWER
+# flag +0x1C3, which our host's Dark Force Change never sets, so the tenants built gauge inside
+# the mode (tests/audit_df_meter.sh). vsavj's own adder (0x29A16) is byte-identical but for this
+# test, which reads the Change field +0x111 — the shells' rule. Same size and cycles; tenant code
+# only. The other 23 placed +0x1C3 reads are left: vs2's EX never sets the flag either, so they
+# read 0 on both engines (tests/audit_df_modes.sh, the pow column).
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028D6C
+old_hex = "4a2e01c3"
+new_hex = "4a2e0111"
+note = "meter adder: Dark Force test +0x1C3 (vs2 Power) -> +0x111 (vsavj Change), #157 DF tail"
+
+# THE EX ROUTE INTO DARK FORCE, DISABLED (14z-170; RULED 2026-09-18, 14z-168: the
+# tenants' vs2 EX input into the mode on our build is to be DISABLED, "agreed"; and
+# 14z-169: it does "the no-stock move" at every stock level — DECISIONS_HISTORY.md).
+# vs2's EX site (vs2 0x057CC8, the 2623+PP input): `tst.b $111(a6); bne.w <fall>`, then
+# `moveq #0,d1; jsr <0x028534>; beq.w <fall>`, then the mode via the Change entry 0x02622A.
+# 0x028534 refuses with no stock BEFORE it reads the input (`tst.b $109(a6); beq` ->
+# `moveq #0,d0; rts`), so vs2's no-stock case is "fall through to <fall>" (0x0579FA),
+# the sub-pattern motion checks. bne.w -> bra.w takes that path at EVERY stock level
+# without calling 0x028534 at all (no stock spent, no input consumed); what the skip
+# leaves different is dead there — d0/d1 and the flags are rewritten by the first
+# motion tracker <fall> calls (vs2 0x0292A4: `moveq #0,d0`, then d1 from its table)
+# before any read. One opcode byte, the displacement kept; fewer cycles than vs2's
+# refusal. Gate: tests/audit_ex_refused.sh. his `code` region (placed PRG:0x47208C on
+# merged-m18). MEASURED 14z-170: for Pyron the fall-through reads the sub-pattern
+# 623+PP, which at stock >= 1 is his ES move (seq 0x10, one stock) and at stock 0 the
+# normal 623+P vs2 plays — RULED 2026-09-19, "Natural reading (Recommended)"
+# (DECISIONS_HISTORY.md): no input-specific code, the input reads as 623+PP does.
+[[port_patch]]
+stage = 6
+region = "code"
+src_addr = 0x057CCC
+old_hex = "6600fd2c"
+new_hex = "6000fd2c"
+note = "EX route disabled: bne.w -> bra.w past the EX check (the input reads as its 623+PP sub-pattern: ES with a stock, normal without), ruled 2026-09-18 / 2026-09-19"
+
 # ── The ported per-char OBJ bank table copy (x026142 tail).
 # Rows = the VANILLA vsavj 0x282D4 values, with Pyron's own row 0x11 =
 # 0x1000 (his sprites fetch from WIDE bank 4 on any read path that
@@ -819,7 +859,7 @@ march_retarget_mid = true
 # same-source-or-fail names any future collision). Screen position =
 # the empty bottom-right corner (measured on merged-m5 snapshots, 14z-105).
 # THE TEXT NAMES THE FREEZE GENERATION — change it at every freeze.
-version_text = "M18"
+version_text = "M19"
 version_font = "build/manifest/version_font.json"
 version_x = 324
 version_y = 202

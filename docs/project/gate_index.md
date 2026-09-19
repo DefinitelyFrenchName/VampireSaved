@@ -16,18 +16,18 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**360 scripts** — 81 ci_portable, 81 ci_static, 198 emulator-tier (run by name).
+**366 scripts** — 83 ci_portable, 81 ci_static, 202 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 15 | the suite runners and their own ground truth |
 | [docs](#docs) | 18 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 34 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
-| [pipeline](#pipeline) | 56 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
+| [pipeline](#pipeline) | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 82 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 50 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 54 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -138,6 +138,7 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 | `tests/test_capture_kf_ownership.sh` | test | ci_static | ROMDIR | THE CAPTURE-KEYFRAME POINTER TABLE IS HAND-OWNED, AND NO GENERIC bank_map REPOINT MAY WRITE IT (14z-130). | 14z-130 |
 | `tests/test_capture_pose_sources.sh` | test | ci_static | ROMDIR | THE #104 FIX PREMISES (14z-99). The maintainer ruled the fix scope: option (a), full, "measure first: if option (a) is not feasible, then we reassess". | 14z-99 |
 | `tests/test_census_regions.sh` | test | ci_static | ROMDIR | ground truth for tools/census_regions.py (the 14z-66 data_in_code + pcrel-escape censuses, promoted to a tool for the D4 step-2 Pyron early warning, 14z-67). | 14z-66 |
+| `tests/test_effect_placeholders.sh` | test | ci_portable | — | THE x2b7ef4 COORDINATE-LIST PLACEHOLDERS ARE RESOLVED AT THE OFFSETS THEY WERE WRITTEN, never by an in-place scan (14z-170): | 14z-170 |
 | `tests/test_escape_triage.sh` | test | ci_static | ROMDIR | H3.1's verdicts, frozen (14z-100 hardening). | 14z-100 |
 | `tests/test_extract_hp.sh` | test | ci_static | ROMDIR | the Huitzil/Pyron extraction gate (14z-65, M3b Phase 1). | 14z-65 |
 | `tests/test_freeze_artifacts_current.sh` | test | ci_static | ROMDIR | TRACKED ARTIFACTS THAT FOLLOW THE ROMSET MUST HAVE BEEN REFRESHED AT THE CURRENT FREEZE. (14z-144.) | 14z-144 |
@@ -178,6 +179,7 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 | `tests/test_tenant_select_records.sh` | test | emulator | MAME | the M3a select-records half: at a variant-half tenant id the build must carry the tenant's OWN select records and the host's records must return to VANILLA bytes. | M3a |
 | `tests/test_thunk_addr_literal.sh` | test | ci_static | ROMDIR | ground truth for the STALE PLACED-ADDRESS guard in tools/gen_donovan_patch.py (14z-78). | 14z-78 |
 | `tests/test_type_stamp_census.sh` | test | ci_static | ROMDIR | the static type-stamp census reproduces the FROZEN inventory (build/manifest/type_stamps.toml), and its verdict logic is alive in both directions. | 14z-82 |
+| `tests/test_unless_composed.sh` | test | ci_portable | — | THE `unless_composed` ROW KEY (14z-170): a manifest row naming a tenant applies only to a build whose composition does NOT include that tenant; a name outside the port's roster fails the build; | 14z-170 |
 | `tests/test_variant_dispatch.sh` | test | ci_static | ROMDIR | THE VARIANT-ROW DISPATCH AUDIT (14z-75). | 14z-75 |
 | `tests/test_voice_row_range.sh` | test | ci_static | ROMDIR | the AUTHORED arcade-ladder rows must stay inside vanilla's value range (14z-93, GitHub #92). ~2s, no emulator. | 14z-93 |
 | `tests/test_win_quote_decode.sh` | test | ci_static | ROMDIR | the win-quote text system's STRUCTURE, frozen (14z-116). ci_static: needs ROMDIR only, no emulator, no build dir. | 14z-116 |
@@ -290,7 +292,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 | `tests/audit_tenant_timeout.sh` | audit | emulator | MAME, a build dir, ~2 min | THE TIMEOUT JUDGE, per tenant (14z-104). | 14z-104 |
 | `tests/audit_throw_tech.sh` | audit | emulator | MAME, a build dir, ~1 min | THE THROW TECH-HIT (escape), both directions per tenant (14z-104 (3); coverage matrix gap 1's second half). | 14z-104 (3) |
 | `tests/audit_trap_parity.sh` | audit | emulator | MAME, a build dir, ~5 min | the Plasma Trap SOUND parity A/B (14z-85g): the same far/timer replay on native vsav2 and on the build, trap-event ring-id inventories compared against the frozen measurement. On-demand, ~5 min (2 MAME runs, parallel). | 14z-85g |
-| `tests/audit_trap_shock.sh` | audit | emulator | a build dir, ~4 min | the Plasma Trap dome inflicts SHOCK (14z-85g(2), maintainer-ruled option (a) 2026-08-14). On-demand, ~4 min (2 runs). | 14z-85g(2) |
+| `tests/audit_trap_shock.sh` | audit | emulator | a build dir, ~4 min | the Plasma Trap dome inflicts SHOCK on BOTH of Phobos's tracks, and since the 14z-170 class-0x52 fix (ruled 2026-09-18, scoped S1) the two differ by design: | 14z-170 |
 | `tests/audit_trap_sound.sh` | audit | emulator | a build dir, ~10 min | the MK Plasma Trap fires, ring live (14z-82d lock, RE-SCOPED 14z-85g). | 14z-82d |
 | `tests/audit_tripwire_reach.sh` | audit | emulator | MAME, ~15 min | DO ANY PLANTED TRIPWIRES FIRE IN EXTENDED PLAY? (14z-93, on-demand, ~15 min at JOBS=3.) | 14z-93 |
 | `tests/audit_voice_borrow.sh` | audit | emulator | MAME, a build dir, ~6 min | THE VOICE-CLASS BORROW mechanism gate (14z-87). | 14z-87 |
@@ -345,35 +347,39 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 | gate | kind | tier | needs | locks (the script's own header) | since |
 |---|---|---|---|---|---|
-| `tests/audit_column_shock.sh` | audit | emulator | MAME, a build dir, ~12 s | DONOVAN'S KILLSHREAD LIGHTNING COLUMN SHOCKS ITS VICTIM FOR 12 FRAMES ON OUR BUILD, 24 NATIVELY, and freezes Donovan 4 frames per hit where vs2 exempts him, frozen AS MEASURED (14z-168, GitHub #136): | 14z-168 |
+| `tests/audit_column_flash.sh` | audit | emulator | MAME, FBNeo, a build dir | THE ORANGE FLASH ON THE DEITY AS DONOVAN'S KILLSHREAD LIGHTNING COLUMN ENDS, frozen AS MEASURED (14z-170, the maintainer's capture read): | 14z-170 |
+| `tests/audit_column_shock.sh` | audit | emulator | MAME, a build dir, ~12 s | DONOVAN'S KILLSHREAD LIGHTNING COLUMN PLAYS vs2's CLASS-0x52 RULE ON OUR BUILD (since the 14z-170 fix, ruled 2026-09-18): the victim shocked 24 frames and Donovan exempt, every +0x5C write of both fighters equal to native's in frame and val… | 14z-170 |
 | `tests/audit_crouch_flag.sh` | audit | emulator | MAME, a build dir, ~15 s | THE FIGHTER'S +0x121 IS THE CROUCH FLAG, measured against a scripted Down on native vsav2 and on our merged build (14z-169): | 14z-169 |
 | `tests/audit_defense_row_reads.sh` | audit | emulator | MAME, a build dir | WHICH ROW EVERY HIT'S DEFENSE READS INDEX, by the victim's identity, over the corpus on our merged build and on pristine vsavj, frozen (14z-169, the analysis before the ruled fix "the tenants' defense rows become vs2's", #136). | 14z-169 |
-| `tests/audit_defense_row_residue.sh` | audit | emulator | MAME, a build dir, ~5 min | THE PHOBOS-THROW ±1 DAMAGE RESIDUE IS THE DEFENSE-TABLE ROW THE VICTIM'S ID SELECTS, read watch on both legs (14z-145). | 14z-145 |
+| `tests/audit_defense_row_residue.sh` | audit | emulator | MAME, a build dir, ~6 min | THE PHOBOS-THROW ±1 DAMAGE RESIDUE IS THE DEFENSE-TABLE ROW THE VICTIM'S ID SELECTS, read watch on both legs (14z-145). | 14z-145 |
 | `tests/audit_df_accumulator.sh` | audit | emulator | MAME, a build dir, ~3 min | THE +0x161 ACCUMULATOR IS SASQUATCH'S DARK FORCE ARMOR (measured 14z-123; inferred_claims row 1). | 14z-123 |
 | `tests/audit_df_dead_family.sh` | audit | emulator | ~3 min | vs2's P+K (DARK FORCE POWER) NEVER REACHES THE VS-STYLE DARK FORCE FAMILY: its shared field-setter tail at vs2 PRG:0x02622A takes ZERO hits on a P+K activation while the activation body takes exactly one (measured 14z-126). SCOPED 14z-168: | 14z-126 |
 | `tests/audit_df_field_readers_live.sh` | audit | emulator | MAME, a build dir, ~50 s | WHAT THE #136 CORPUS EXECUTES AGAINST vs2's DARK FORCE POWER FIELDS, cross-checked against the static census (14z-168, GitHub #136 / #157's Dark Force tail): | 14z-168 |
-| `tests/audit_df_meter.sh` | audit | emulator | MAME, a build dir, ~25 s | NO GAUGE IS BUILT IN DARK FORCE CHANGE, and the tenants build it anyway, frozen AS MEASURED (14z-168, GitHub #157's Dark Force tail): | 14z-168 |
+| `tests/audit_df_meter.sh` | audit | emulator | MAME, a build dir, ~25 s | NO GAUGE IS BUILT IN DARK FORCE CHANGE, and since the 14z-170 fix (GitHub #157's Dark Force tail, ruled 2026-09-18) the tenants build none either: | 14z-170 |
 | `tests/audit_df_modes.sh` | audit | emulator | MAME, a build dir, ~95 s | DARK FORCE POWER vs DARK FORCE CHANGE, every selectable character, frozen AS MEASURED (14z-168, GitHub #136): on vsav2 P+K is the global DARK FORCE POWER (two stocks, no startup invincibility, the seq-0x16 handler never reached); | 14z-168 |
 | `tests/audit_df_moves.sh` | audit | emulator | MAME, a build dir, ~40 s | THE TENANTS' MOVES INSIDE THEIR DARK FORCE, ours (Dark Force Change, P+K) vs native (the vs2 personal-Dark-Force EX install), frozen AS MEASURED (14z-168, GitHub #136): | 14z-168 |
 | `tests/audit_df_startup_invuln.sh` | audit | emulator | MAME, a build dir, ~3 min | THE DARK FORCE STARTUP INVINCIBILITY IS +0x147, ARMED PER CHARACTER BY THE seq-0x16 HANDLER, AND THE TENANTS ARM THEIR OWN (measured 14z-126; STATE "Decisions pending" DF-startup item). | 14z-126 |
 | `tests/audit_entrance_draw.sh` | audit | emulator | MAME, a build dir, ~15 s | PHOBOS'S ROUND-START ENTRANCE IS DRAWN FROM THE SAME THREE VARIANTS ON OUR BUILD AS ON vsav2 (14z-168, GitHub #136): the legs of #136's guard-cancel rigs drew different entrances because the draw follows each game's RNG state at character l… | 14z-168 |
-| `tests/audit_ex_refused.sh` | audit | emulator | MAME, a build dir | WHAT THE TENANTS' vs2 EX INPUT DOES WHEN THE MODE IS REFUSED, on native vsav2 and on our merged build, frozen AS MEASURED (14z-169, the analysis before the ruled EX-route fix, #136): | 14z-169 |
+| `tests/audit_ex_refused.sh` | audit | emulator | MAME, a build dir | WHAT THE TENANTS' vs2 EX INPUT DOES WHEN THE MODE IS REFUSED, on native vsav2 and on our merged build, frozen AS MEASURED (14z-169; since 14z-170 the ruled EX-route fix's gate): | 14z-169 |
 | `tests/audit_facing_rule.sh` | audit | emulator | MAME, a build dir, ~5 s | THE VICTIM FACING RULE 5 ON OUR ENGINE, ours vs native, frozen AS MEASURED (GitHub #159, 14z-167): vs2's facing-rule resolver knows rule 5 and vsavj's does not, so a tenant attack record carrying it is XORed into the victim's facing on our… | 14z-167 |
 | `tests/audit_ff8130_writers.sh` | audit | emulator | MAME, ~1 min | who writes RAM:$FF8130 on vanilla vsavj, every write form and both byte lanes: five DIRECT writers (the id fold's store at PRG:0x00A446 and four constant writes), block writes that cover the word, and two writers of the NEIGHBOUR byte $FF81… | 14z-157 |
 | `tests/audit_forced_pick_fidelity.sh` | audit | emulator | MAME | IS A FORCED-PICK NATIVE LEG FAITHFUL? The rig's poked pick vs a REAL cursor pick of the same tenant on native vsav2, diffed over the WHOLE fighter block (GitHub #151, 14z-160). | 14z-160 |
 | `tests/audit_front_comparator.sh` | audit | emulator | MAME, a build dir, ~3 min | what $FF8127 is, and what its input byte +0x10 is (14z-123, the documentation rationalization pass, inferred_claims row 4; closes the 14z-118 (16) leftover "Open: what object byte +0x10 is"). | 14z-123 |
 | `tests/audit_guard_mask_reads.sh` | audit | emulator | MAME, a build dir, ~4 min | WHICH LONGWORDS OF THE GUARD-MASH MASK TABLE `PRG:0x028D50` THE ENGINE READS, ours vs vanilla — and that the port's bytes in its FIRST longword sit behind an index the check never produces. (14z-145.) | 14z-145 |
 | `tests/audit_guard_reentry.sh` | audit | emulator | MAME, a build dir, ~20 s | THE BLOCK ANIMATION RE-ENTERS ON vsavj, NOT ON vs2, on legacy content (14z-168, GitHub #136): when a block's hit-freeze ends into the blockstun slide (seq 0 -> 2) with BACK still held, vsavj re-enters the block animation (the node counter r… | 14z-168 |
+| `tests/audit_lag_budget.sh` | audit | emulator | MAME, FBNeo, a build dir | A FIX SET ADDS NO FRAME OF LAG: over every #136 naming part (the three tenants' moves, and legacy attackers against each tenant), the build under test has no zero-pass frame that the reference build — the one before the fixes — does not hav… | 14z-170 |
 | `tests/audit_latch_reads.sh` | audit | emulator | MAME, a build dir, ~2 min | WHO READS THE SELECT-CONFIRM LATCH IN PLAY, per leg shape, with the VALUE each reader saw: the measured half of the #151 step-3 sweep, frozen (14z-161). | 14z-161 |
 | `tests/audit_move_parity.sh` | audit | emulator | MAME, a build dir | EVERY TENANT MOVE, OURS vs NATIVE vsav2, AT A MATCHED SPEED LEVEL AND A PINNED RNG (GitHub #136, 14z-159). | 14z-159 |
 | `tests/audit_move_parity_attribution.sh` | audit | emulator | MAME, a build dir, ~5 min | EVERY DIFF ROW OF THE #136 MOVE-PARITY TABLE HAS A MEASURED CAUSE, frozen (14z-168, GitHub #136): each root found by ablation (its event's inputs removed, both legs re-run, the rows that vanish are its) and named by a measured signature; | 14z-168 |
 | `tests/audit_pass_overrun.sh` | audit | emulator | MAME, a build dir, ~60 s | THE BLIZZARD SWORD CPU OVERRUNS, ours vs native, frozen AS MEASURED (14z-168, GitHub #136): on three Blizzard Sword frames of the whole #136 corpus a double-pass activation runs past the frame, so one frame completes NO logic pass — twice o… | 14z-168 |
+| `tests/audit_phobos_dmg_residual.sh` | audit | emulator | MAME, FBNeo, a build dir, ~4 min | PHOBOS TAKES ONE MORE HP THAN NATIVE FROM DEMITRI'S 5HP, WITH HIS DEFENSE ROW ALREADY VS2'S, frozen AS MEASURED (14z-170, the open bug ticket): | 14z-170 |
 | `tests/audit_pyron_capture_block.sh` | audit | emulator | MAME, a build dir, ~4 min | PYRON THROWS WITH DEMITRI'S CAPTURE GEOMETRY (measured 14z-131, maintainer-ruled "measure against native vs2 first"). | 14z-131 |
 | `tests/audit_reaction_class_live.sh` | audit | emulator | MAME, a build dir | EVERY WRITE AND READ OF THE VICTIM'S REACTION CLASS (+0x54) OVER THE CORPUS, on pristine vsavj (the whole legacy suite), on our merged build and on native vs2 (the #136 naming parts), frozen (14z-169, the analysis before the class-0x52 fix… | 14z-169 |
 | `tests/audit_rig_opening.sh` | audit | emulator | MAME, a build dir, ~3 s | THE #136 GUARD-CANCEL RIG'S OPENING, ours vs native, frozen AS MEASURED (14z-167): the rig's first X pin lands before the round starts, inside the round-start entrance, and the two legs draw different entrances. | 14z-167 |
 | `tests/audit_tenant_throw_geometry.sh` | audit | emulator | MAME, a build dir, ~12 min | PHOBOS'S THREE THROWS, OURS vs NATIVE VS2 (14z-131, maintainer-directed 2026-09-04). | 14z-131 |
 | `tests/audit_throw_registration.sh` | audit | emulator | MAME, a build dir, ~3 min | THE HIT-REGISTRATION PAIR AT A TENANT THROW, ours vs native, frozen: on every tenant throw contact native's throw code writes the engine's (attacker, victim) registration pair right before the generic hit stager awards meter, while our plac… | 14z-166 |
 | `tests/audit_tick_cadence.sh` | audit | emulator | MAME, ~1.5 min | THE EXTRA LOGIC PASS IS DECIDED BY THE SPEED LEVEL, and on vanilla content each game's DEFAULT play mode sets a different one: | 14z-156 |
+| `tests/audit_x2b7ef4_reach_m18.sh` | audit | emulator | MAME, FBNeo, a build dir | DOES ANY NAMING PART READ A CORRUPTED x2b7ef4 RECORD ON merged-m18? The reachability the maintainer asked for (2026-09-19, "Measure it now (Recommended)"), re-measured SOUNDLY (14z-170): | 2026-09-19 |
 | `tests/test_advancing_guard.sh` | test | emulator | MAME, ~2.5 min | THE ADVANCING GUARD (guard push), MEASURED on native vs2 and on vsavj, and frozen (14z-123, the documentation pass's G2). | 14z-123 |
 | `tests/test_anim_node_walk.sh` | test | emulator | MAME, a build dir, ~2 min | THE ANIMATION-NODE DECODER IS AN INSTRUMENT (character-data map, phase 1; 14z-118). tools/anim_nodes.py reads the per-character anim index tables and walks the 0x18-byte node chains by the rules read off vs2's walker (PRG:0x02713C / 0x0271C… | 14z-118 |
 | `tests/test_community_crosscheck.sh` | test | ci_static | ROMDIR | OUR DERIVED VANILLA FRAME DATA STILL SAYS WHAT THE COMMUNITY WORKBOOK SAYS (14z-125, the community cross-check). | 14z-125 |

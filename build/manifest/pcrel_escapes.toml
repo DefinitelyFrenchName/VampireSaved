@@ -49,7 +49,10 @@
 # RE-POINTED 14z-119 (the physics-port freeze): hui51/pyron35/don_m17 ->
 # hui53/pyron37/don_m19, merged m3b_merged20 -> m3b_merged22. Donovan's three
 # physics value ops moved NO address; inventories identical (test_pcrel_escapes PASS).
-[hui56]
+# RE-POINTED 14z-170 (the M19 freeze): hui56/pyron41/don_m22 -> hui57/pyron42/don_m23,
+# merged m3b_merged26 -> m3b_merged27 (no RE-POINTED line was added here between 14z-119
+# and this one; the sections read hui56/pyron41/don_m22 at HEAD). The gate measures.
+[hui57]
 unresolved = 69
 resolved = 0
 escapes = [
@@ -125,7 +128,7 @@ escapes = [
 ]
 
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-[pyron41]
+[pyron42]
 unresolved = 10
 resolved = 0
 escapes = [
@@ -145,7 +148,7 @@ escapes = [
 # same lea->table pairs — the d2 window + the remap touch neither region). The section is keyed by
 # build dir, so a re-point with no re-key reads as "10 NEW" (paid for 14z-111).
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-[don_m22]
+[don_m23]
 unresolved = 10
 resolved = 0
 escapes = [
@@ -176,27 +179,27 @@ escapes = [
 
 [merged_don]
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-build = "m3b_merged26"
+build = "m3b_merged27"
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-extract = "build/don_m22/extract"
+extract = "build/don_m23/extract"
 placement_suffix = ""
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-same_as = "don_m22"
+same_as = "don_m23"
 
 [merged_hui]
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-build = "m3b_merged26"
+build = "m3b_merged27"
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-extract = "build/hui56/extract"
+extract = "build/hui57/extract"
 placement_suffix = "@huitzil"
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-same_as = "hui56"
+same_as = "hui57"
 
 [merged_pyr]
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-build = "m3b_merged26"
+build = "m3b_merged27"
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-extract = "build/pyron41/extract"
+extract = "build/pyron42/extract"
 placement_suffix = "@pyron"
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-same_as = "pyron41"
+same_as = "pyron42"

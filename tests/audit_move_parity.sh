@@ -98,7 +98,7 @@
 # real picks on both sides; the 27 verdicts were re-frozen on them at 14z-160
 # and the ten Phobos DIVERGES rows of 14z-159 were verdicts on the VH2 branch.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged26] [PARTS="donovan_1 pyron_2"] [ALL=1] [JOBS=6] [FREEZE=1] tests/audit_move_parity.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [PARTS="donovan_1 pyron_2"] [ALL=1] [JOBS=6] [FREEZE=1] tests/audit_move_parity.sh
 #   emulator tier, MAME. MEASURED 14z-159 on this MacBook, solo, at the default
 #   JOBS=6: the default 3-part set 25 s; ALL=1 (27 parts, 54 legs) 130 s. Both
 #   figures are wall clock, not MAME's emulated-time line — that line reads ~10x
@@ -108,7 +108,7 @@ set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-BUILD="${BUILD:-build/m3b_merged26}"
+BUILD="${BUILD:-build/m3b_merged27}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN

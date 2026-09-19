@@ -226,6 +226,8 @@ tests/test_mame_mirror_guard.sh	review-triage
 tests/test_mame_parity.sh	platform
 tests/test_mame_wide.sh	platform
 tests/test_manifest_merge.sh	pipeline
+tests/test_unless_composed.sh	pipeline
+tests/test_effect_placeholders.sh	pipeline
 tests/test_mask_ranges_reader.sh	review-triage
 tests/test_masked_compare.sh	oracle
 tests/test_md_subset.sh	docs
@@ -360,6 +362,10 @@ tests/audit_column_shock.sh	character-data
 tests/audit_move_parity_attribution.sh	character-data
 tests/audit_entrance_draw.sh	character-data
 tests/audit_pass_overrun.sh	character-data
+tests/audit_lag_budget.sh	character-data
+tests/audit_column_flash.sh	character-data
+tests/audit_phobos_dmg_residual.sh	character-data
+tests/audit_x2b7ef4_reach_m18.sh	character-data
 tests/test_df_field_readers.sh	character-data
 tests/test_defense_rows_census.sh	character-data
 tests/audit_df_moves.sh	character-data

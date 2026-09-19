@@ -1,0 +1,72 @@
+# tests/expected/column_flash.tsv — palette row 11 (RAM:$90C160, 32 bytes, HASHED) at the end of Donovan's Killshread Lightning
+# column (naming part donovan_4), native vsav2 against our merged build (tests/audit_column_flash.sh). Evidence class:
+# in-emulator, MAME. Frozen AS MEASURED with FREEZE=1 on m3b_merged27: native keeps its blue ramp, ours turns to a
+# fire ramp — the open cosmetic ticket. Columns: <leg> <frame> <row 11 SHA-1, 12 hex — never the bytes>; then
+# <leg> writer <pc> <frames>: every writer of row 11 from 2780 (a non-debug write tap); <leg> run <pc> <count>: every
+# writer over the whole run; one ours build row.
+#--
+native	2858	8250af4dffdb
+native	2860	8250af4dffdb
+native	2866	8250af4dffdb
+ours	2858	8250af4dffdb
+ours	2860	4c7396d85cee
+ours	2866	4c7396d85cee
+native	writer	02a0ba	2813
+native	writer	02a0ce	2813
+native	run	000d34	32
+native	run	000d3a	32
+native	run	01ab72	16
+native	run	01ae26	16
+native	run	01ae3a	16
+native	run	012702	15
+native	run	012704	15
+native	run	012706	15
+native	run	012708	15
+native	run	01270a	15
+native	run	01270c	15
+native	run	01270e	15
+native	run	012710	15
+native	run	012712	15
+native	run	012714	15
+native	run	012716	15
+native	run	012718	15
+native	run	01271a	15
+native	run	01271c	15
+native	run	01271e	15
+native	run	012720	15
+native	run	012850	144
+native	run	01b16a	8
+native	run	01b16e	8
+native	run	0129b4	240
+native	run	02a0ba	16
+native	run	02a0ce	16
+ours	writer	02ad64	2807,2813,2858
+ours	writer	02ad78	2807,2813,2858
+ours	run	000d34	32
+ours	run	000d3a	32
+ours	run	01c104	16
+ours	run	01c3b6	16
+ours	run	01c3ca	16
+ours	run	014040	15
+ours	run	014042	15
+ours	run	014044	15
+ours	run	014046	15
+ours	run	014048	15
+ours	run	01404a	15
+ours	run	01404c	15
+ours	run	01404e	15
+ours	run	014050	15
+ours	run	014052	15
+ours	run	014054	15
+ours	run	014056	15
+ours	run	014058	15
+ours	run	01405a	15
+ours	run	01405c	15
+ours	run	01405e	15
+ours	run	01418e	144
+ours	run	01c6e4	8
+ours	run	01c6e8	8
+ours	run	01433c	240
+ours	run	02ad64	56
+ours	run	02ad78	56
+ours	build	merged-m19	61e9815a

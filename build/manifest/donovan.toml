@@ -240,7 +240,19 @@ first_ext = 0xA0
 n_ext = 4
 case_a0 = "137c000f00544e75"
 case_a2 = "136b001700544e75"
-case_a4 = "137c005200544e75"
+# 14z-170 (THE CLASS-0x52 RULE, ruled 2026-09-18 — DECISIONS_HISTORY.md "Ruled
+# 2026-09-18 (14z-168) — the column shock and the Plasma Trap", scoped S1 14z-169):
+# case 0xA4 (record class 0x52 on a GROUNDED victim) writes the MARKER 0x38 into
+# +0x54 where vs2's case writes 0x52 — vsavj's reaction table has no entry 0x52
+# (80 classes) and routes 0x38, like 0x06, to its shock handler 0x23AC8, with the
+# same property byte (0x0F) and the same per-class table bytes; no vsavj code
+# produces +0x54 = 0x38 and no consumer compares +0x54 against it
+# (tests/test_reaction_classes.sh), so 0x38 there plays exactly as 0x06 except
+# where the ls_freeze thunks below test it: the role 0x52 plays on vs2, whose
+# shock handler 0x22656 is vsavj's 0x23AC8 plus ONE test around the attacker's
+# freeze. The air (d2_case_a4 = 7) and KO (es_type51_dispatch -> 0x0186E0 = 8)
+# stagers fold 0x52 exactly as vs2's do.
+case_a4 = "137c003800544e75"
 case_a6 = "42290121137c000100544e75"
 # 14z-110 (#99, maintainer-ruled 2026-08-26): THE D2 WINDOW — the same
 # 0x50-0x53 extension for DISPATCHER 2 (0x018508), whose only entry is the
@@ -792,6 +804,43 @@ src_addr = 0x028B5E
 old_hex = "3b49b48e"
 new_hex = "3b49b43c"
 note = "grab ptr store a1 (site 3)"
+
+# 14z-169, LANDED 14z-170 (#157's Dark Force tail, ruled 2026-09-18 — the maintainer: "it makes sense that you
+# can't build meter during DF"): the placed copy of vs2's meter adder tests vs2's Dark Force POWER
+# flag +0x1C3, which our host's Dark Force Change never sets, so the tenants built gauge inside
+# the mode (tests/audit_df_meter.sh). vsavj's own adder (0x29A16) is byte-identical but for this
+# test, which reads the Change field +0x111 — the shells' rule. Same size and cycles; tenant code
+# only. The other 23 placed +0x1C3 reads are left: vs2's EX never sets the flag either, so they
+# read 0 on both engines (tests/audit_df_modes.sh, the pow column).
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028D6C
+old_hex = "4a2e01c3"
+new_hex = "4a2e0111"
+note = "meter adder: Dark Force test +0x1C3 (vs2 Power) -> +0x111 (vsavj Change), #157 DF tail"
+
+# THE EX ROUTE INTO DARK FORCE, DISABLED (14z-170; RULED 2026-09-18, 14z-168: the
+# tenants' vs2 EX input into the mode on our build is to be DISABLED, "agreed"; and
+# 14z-169: it does "the no-stock move" at every stock level — DECISIONS_HISTORY.md).
+# vs2's EX site (vs2 0x059D24, the 421+KK input): `tst.b $111(a6); bne.w <fall>`, then
+# `moveq #1,d1; jsr <0x028534>; beq.w <fall>`, then the mode via the Change entry 0x02622A.
+# 0x028534 refuses with no stock BEFORE it reads the input (`tst.b $109(a6); beq` ->
+# `moveq #0,d0; rts`), so vs2's no-stock case is "fall through to <fall>" (0x059A76),
+# the sub-pattern motion checks. bne.w -> bra.w takes that path at EVERY stock level
+# without calling 0x028534 at all (no stock spent, no input consumed); what the skip
+# leaves different is dead there — d0/d1 and the flags are rewritten by the first
+# motion tracker <fall> calls (vs2 0x0292A4: `moveq #0,d0`, then d1 from its table)
+# before any read. One opcode byte, the displacement kept; fewer cycles than vs2's
+# refusal. Gate: tests/audit_ex_refused.sh (ours at stock 3 must take the path vs2
+# takes at stock 0). his `code` region (placed PRG:0x0BFF38 on merged-m18).
+[[port_patch]]
+stage = 6
+region = "code"
+src_addr = 0x059D28
+old_hex = "6600fd4c"
+new_hex = "6000fd4c"
+note = "EX route disabled: bne.w -> bra.w past the EX check (vs2's no-stock path at every stock level), ruled 2026-09-18"
 
 # Throw victim-keyframe table (session 14z-2 — the ACTUAL throw-teleport
 # root cause). The victim positioner (vanilla trio 0x2804C/0x280C4/0x2813E
@@ -1369,19 +1418,34 @@ thunk_hex = "0c2e00TT0382660c202e03a46726204070024e75306e00300c2800TT03826614700
 # freeze was doubling as vsavj's only re-hit gate. vs2's $147=0xC
 # IS the re-hit gate (period ~10f) — ported into the Donovan branch
 # (flag-identical: 0x0C and 0x18 set the same CCR bits).
+# 14z-170 (the class-0x52 rule, ruled 2026-09-18): both thunks test
+# `cmpi.b #$38,$54(a6)` — the victim's reaction class, 0x38 only for a record of
+# native class 0x52 on a grounded victim (reaction_hook case_a4 above) — and play
+# vs2's 0x52 handler 0x22656, which is vsavj's 0x23AC8 plus ONE test,
+# `cmpi.b #$52,$54(a6); beq` around the attacker's `move.b #$0B,$5C(a4)`:
+#   VICTIM: the test sits INSIDE the Donovan branch only — 0x38 there falls to
+#     the default 0x18 (vs2's value; no $147). Any other attacker already takes
+#     the default, so the legacy path is byte-for-byte the old one: no added cost.
+#   ATTACKER: 0x38 SKIPS the write, on the Donovan branch AND the default one
+#     (the trap's attacker is not Donovan), with vs2's flags on the skip (Z from
+#     the compare; nothing after it reads them). The default path pays one cmpi
+#     and one untaken beq (~24 cycles) on every grounded electric hit that reaches
+#     0x23AC8 — the legacy suite lands none (tests/audit_reaction_class_live.sh).
+# Lightning Sword's 0x06 keeps the 14z-42 values. Gates: tests/audit_column_shock.sh,
+# tests/audit_trap_shock.sh.
 [[site_thunk]]
 stage = 6
 name = "ls_freeze_vs2_victim"
 site = 0x023AD8
 old_hex = "1d7c0018005c"
-thunk_hex = "b8fc84006706b8fc880066160c2c00TT0382660e1d7c000c005c1d7c000c01474e751d7c0018005c4e75"
+thunk_hex = "b8fc84006706b8fc8800661e0c2c00TT038266160c2e00380054670e1d7c000c005c1d7c000c01474e751d7c0018005c4e75"
 
 [[site_thunk]]
 stage = 6
 name = "ls_freeze_vs2_attacker"
 site = 0x023ADE
 old_hex = "197c000b005c"
-thunk_hex = "b8fc84006706b8fc880066100c2c00TT03826608197c0004005c4e75197c000b005c4e75"
+thunk_hex = "b8fc84006706b8fc880066180c2c00TT038266100c2e003800546716197c0004005c4e750c2e003800546706197c000b005c4e75"
 
 # 14z-43: ES CHANGE IMMORTAL class-0x51 port (round-51 upgrade: ES
 # base 8 vs native 9 + no mash extension = the 14z-35 interim's
@@ -1487,14 +1551,27 @@ old_hex = "51"
 new_hex = "44"
 note = "deity node next-state vs2 0x51 -> 0x44 (the 14z-110b five-consumer equivalence; 14z-35 tried 0x4E and 14z-43 retired it — 0x44 preserves property 0x19 AND the 0x2384E handler family)"
 
+# 14z-170 (the class-0x52 rule): the thunk also routes record class 0x52 on the
+# KO branch — vsavj's KO table 0x0185DA ends at 0x4F and reads [0x52] as the
+# odd displacement 0xB26D (the 14z-33 vec3) — to 0x0186E0 (`move.b #1,$117(a1);
+# move.b #8,$54(a1); rts`), vsavj's own KO handler for 0x06/0x07/0x38/0x39/0x48,
+# the twin of vs2's KO[0x52] = KO[0x06] = 0x016FD0. Any other class still rts's
+# into the untouched vanilla read at 0x0185D0.
 [[site_thunk]]
 stage = 6
 name = "es_type51_dispatch"
 site = 0x0185CA
 old_hex = "7000102b0017"
-thunk_hex = "7000102b00170c00005167024e75588f4ef90001868c"
+thunk_hex = "7000102b00170c00005167080c000052670a4e75588f4ef90001868c588f4ef9000186e0"
 
 
+# RETIRED 14z-170 (the class-0x52 rule, ruled 2026-09-18; staged 99, never
+# applied): the column's three records carry native class 0x52 again, handled by
+# reaction_hook case_a4 (ground -> the 0x38 marker), d2_case_a4 (air -> 7) and
+# es_type51_dispatch (KO -> 0x0186E0 = 8), so the 14z-33 wild jump cannot recur;
+# the remap it made sent the column through the ls_freeze thunks as Lightning
+# Sword (victim 12 frames where vs2 shocks 24 — tests/audit_column_shock.sh).
+# The type-0x50 rows below are NOT retired. The 14z-33 text, kept:
 # 14z-33: COLUMN-CRASH FIX (round-45 go-ahead; full decode in STATE
 # 14z-31/32). The swordless-421P column's KO record (hitbox_proj
 # +0x27A) carries vs2's EXTENDED record type 0x52; vsavj's record-type
@@ -1506,32 +1583,32 @@ thunk_hex = "7000102b00170c00005167024e75588f4ef90001868c"
 # lesson of the 14z-27 class-remap failure applied: only remap when
 # the source engine itself proves equivalence).
 [[region_fix]]
-stage = 6
+stage = 99
 region = "hitbox_proj"
 off = 0x291
 old_hex = "52"
 new_hex = "06"
-note = "column KO record type 0x52 -> 0x06 (vs2 dispatch alias; vsavj table ends at 0x4F -> wild jump)"
+note = "RETIRED 14z-170 (native 0x52, the class-0x52 rule) — was: column KO record type 0x52 -> 0x06 (vs2 dispatch alias; vsavj table ends at 0x4F -> wild jump)"
 
 # 14z-33 sweep: the column's sibling records + the type-0x50 set
 # (all alias-proven by vs2's own dispatch table; the type-0x51
 # cluster in region hitbox is NOT alias-provable yet — logged in
 # STATE, untouched).
 [[region_fix]]
-stage = 6
+stage = 99
 region = "hitbox_proj"
 off = 0x2b1
 old_hex = "52"
 new_hex = "06"
-note = "column sibling hit record, same type-0x52 alias remap (would crash on its own kill timing)"
+note = "RETIRED 14z-170 (native 0x52, the class-0x52 rule) — was: column sibling hit record, same type-0x52 alias remap (would crash on its own kill timing)"
 
 [[region_fix]]
-stage = 6
+stage = 99
 region = "hitbox_proj"
 off = 0x2d1
 old_hex = "52"
 new_hex = "06"
-note = "column sibling hit record, same type-0x52 alias remap (would crash on its own kill timing)"
+note = "RETIRED 14z-170 (native 0x52, the class-0x52 rule) — was: column sibling hit record, same type-0x52 alias remap (would crash on its own kill timing)"
 
 [[region_fix]]
 stage = 6
@@ -2246,6 +2323,47 @@ dst_old_head = "0612100a0214160a0408120c0214160a100e08060214160a0612000a0414160a
 only_variant_slot = true
 note = "14z-87 option (c): vs2's Donovan row of the paired voice-number table (feeds $FF8100 via the borrow)"
 
+# THE DEFENSE ROWS (14z-170; RULED 2026-09-18, 14z-168: "given the
+# measurements we should take the vs2 rows" — DECISIONS_HISTORY.md "Ruled
+# 2026-09-18 (14z-168) — the tenants' DEFENSE rows become vs2's", superseding
+# the 2026-08-14 option (b)). The mechanism and the evidence are the twin
+# block in huitzil.toml (the two victim-indexed tables, both read by the
+# victim's OWN id — tests/audit_defense_row_reads.sh — and read nowhere else —
+# tests/test_defense_rows_census.sh). vsavj fills variant row 0x13 with a COPY
+# of Victor's row 0x03, so Donovan took his shell's curve and 40 HP threshold;
+# native he rides the curve most of the cast shares and 48 HP. only_variant_slot:
+# on the stock track Donovan sits at 0x0F and row 0x13 stays vanilla's copy.
+[[data_port]]
+stage = 6
+name = "defense_curve_row"
+src = 0xD2D1E         # vs2 0xD2ABE + 0x13*0x20
+len = 0x20
+orc = 0xD25B0         # vh2 0xD2350 + 0x13*0x20 (the sibling oracle holds the same row)
+dst = 0xB8BA0         # vsavj 0xB8940 + 0x13*0x20 (variant row, copy of Victor's 0x03)
+dst_end = 0xB8BC0
+dst_old_head = "0000000001010101010102020202020202020203030304040405050506060607"
+only_variant_slot = true
+note = "14z-170 (ruled 14z-168): vs2's Donovan defense-curve row over vsavj's variant row 0x13 (Victor's copy)"
+
+# The threshold is ONE byte, but patch_prg writes whole words, so the row is the
+# WORD 0x12-0x13: byte 0 is id 0x12's threshold — the Dark Gallon variant, which
+# vanilla's select screen writes, so LEGACY-REACHABLE — 0x30 on vsavj, vs2 and
+# vh2 alike. The `fixes` entry 0x00:30:30 is an ASSERTION, not an edit: the build
+# fails if the source's byte 0 is not vsavj's 0x30 (and dst_old_head holds
+# vsavj's side), so the legacy byte is rewritten with the value it already has.
+[[data_port]]
+stage = 6
+name = "defense_rally_threshold"
+src = 0xD6E30         # vs2 0xD6E1E + 0x12: id 0x12's 0x30, then Donovan's 0x30 (48 HP)
+len = 2
+orc = 0xD66C2         # vh2 0xD66B0 + 0x12
+dst = 0xBCC92         # vsavj 0xBCC80 + 0x12: id 0x12's 0x30, then 0x28 (40 HP, Victor's copy)
+dst_end = 0xBCC94
+dst_old_head = "3028"
+fixes = "0x00:30:30"
+only_variant_slot = true
+note = "14z-170 (ruled 14z-168): vs2's Donovan low-HP rally threshold (48 HP) over vsavj's variant byte 0x13 (40 HP, Victor's copy); id 0x12's legacy byte kept at 0x30"
+
 # ── SELECT WHEEL: three appended cells (14z-60s) ────────────────────────────
 # Adds Huitzil/Phobos (0x10), Pyron (0x11) and Donovan (0x13) to the
 # character-select wheel. Profile-gated CONTENT: a stock build skips this
@@ -2326,7 +2444,7 @@ march_retarget_mid = true
 # same-source-or-fail names any future collision). Screen position =
 # the empty bottom-right corner (measured on merged-m5 snapshots, 14z-105).
 # THE TEXT NAMES THE FREEZE GENERATION — change it at every freeze.
-version_text = "M18"
+version_text = "M19"
 version_font = "build/manifest/version_font.json"
 version_x = 324
 version_y = 202

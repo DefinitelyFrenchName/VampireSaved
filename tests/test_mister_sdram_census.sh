@@ -82,7 +82,7 @@ fail=0; ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 # Under a mode a SKIP would read as LIES, so REFUSE when a prerequisite is absent.
 if [ -n "$MODE" ]; then
-    _b="${CENSUS_BUILD:-build/m3b_merged26}"
+    _b="${CENSUS_BUILD:-build/m3b_merged27}"
     if [ -z "${ROMDIR:-}" ] || ! command -v verilator >/dev/null 2>&1 || [ ! -f "$REPO/emu/jtcores/.gitmodules" ] || [ ! -f "$REPO/$_b/rompath/vsavjw.zip" ]; then
         echo "REFUSED: CONTROL=$MODE needs ROMDIR, verilator, jtcores and the WIDE romset at $_b"; exit 3
     fi
@@ -91,7 +91,7 @@ fi
 [ -n "${ROMDIR:-}" ] || { echo "SKIP: ROMDIR unset (this gate runs the real romset)"; exit 77; }
 command -v verilator >/dev/null 2>&1 || { echo "SKIP: verilator not installed (docs/platform/mister.md Recipe)"; exit 77; }
 [ -f "$REPO/emu/jtcores/.gitmodules" ] || { echo "SKIP: emu/jtcores not initialised (tools/setup_jtcores.sh)"; exit 77; }
-BUILD="${CENSUS_BUILD:-build/m3b_merged26}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${CENSUS_BUILD:-build/m3b_merged27}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -f "$REPO/$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE romset at $BUILD/rompath/vsavjw.zip"; exit 77; }
 
 RPL="$REPO/tests/replays/05_timeout_idle.rpl"

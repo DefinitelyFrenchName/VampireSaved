@@ -39,6 +39,11 @@ SIGNATURES (each a measured property of the root's own window, never its name al
                  "DECIDED (maintainer, 2026-08-14): OPTION (b)" (the maintainer's own words were not kept),
                  SUPERSEDED 2026-09-18: "take the vs2 rows" (docs/project/tables/defense_rows.md)
   P2-DISPLACEMENT a seeded root whose own fields are IDENT while P2's x differs in its window — #159
+  PHOBOS-DMG-OPEN the DEFENSE-ROW signature (P1's HP alone, Phobos the victim, ours taking MORE) on a build
+                 whose defense-curve row 0x10 ALREADY equals vs2's (read from the build's own data image and
+                 vs2's): the ruled fix is in and the excess remains — Demitri's 5HP 11 native / 12 ours at M19
+                 (M18: 13), deterministic across RNG pins; cause UNMEASURED, an open ticket (ruled 2026-09-19:
+                 "Freeze, ticket it (Recommended)", DECISIONS_HISTORY.md)
   OTHER          none of the above: an UNATTRIBUTED root (the gate fails on it)
 
 Usage: move_parity_attribution.py run --build DIR --romdir DIR --work DIR [--jobs 6] [--no-ablate]
@@ -50,6 +55,7 @@ import argparse, json, os, subprocess, sys
 from concurrent.futures import ThreadPoolExecutor
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROW10_NATIVE = False   # set in main() from the build under test
 sys.path.insert(0, os.path.join(REPO, "tools"))
 import move_parity as mp  # noqa: E402
 import name_moves as nm   # noqa: E402
@@ -172,6 +178,8 @@ def classify(part, k, trdir, rigdir, row):
     if fields == ["p1hp"] and tenant == "huitzil":   # Phobos the VICTIM, ours taking more: vsavj's row 0x10 indexes lower
         dn = n[f0 - 1]["p1hp"] - n[f0]["p1hp"]; do = o[f0 - 1]["p1hp"] - o[f0]["p1hp"]
         if 0 < dn < do:
+            if ROW10_NATIVE:
+                return "PHOBOS-DMG-OPEN", f"Phobos takes {dn} native / {do} ours; his defense row is already vs2's"
             return "DEFENSE-ROW", f"Phobos takes {dn} native / {do} ours"
     return "OTHER", f"first DIFF {row[4]} on {row[5]}"
 
@@ -185,6 +193,14 @@ def main():
     ap.add_argument("--mame-bin", default=os.path.expanduser("~/.cache/vampire-saved/mame/cps2"))
     a = ap.parse_args()
     a.build = os.path.abspath(a.build); a.romdir = os.path.abspath(a.romdir); a.work = os.path.abspath(a.work)
+    # is Phobos's defense-curve row (vsavj 0x0B8940 + 0x10*32) in THIS build vs2's own (vs2 0x0D2ABE + 0x10*32)?
+    global ROW10_NATIVE
+    try:
+        _b = open(f"{a.build}/verify_data.bin", "rb").read()[0x0B8940 + 0x200:0x0B8940 + 0x220]
+        _v = open(os.path.join(REPO, "build/out/vsav2_data.bin"), "rb").read()[0x0D2ABE + 0x200:0x0D2ABE + 0x220]
+        ROW10_NATIVE = len(_b) == 0x20 and _b == _v
+    except OSError:
+        ROW10_NATIVE = False
     frozen = rows_of(f"{REPO}/tests/expected/move_parity_events.tsv")
     parts = a.parts.split() if a.parts else sorted({k[0] for k, r in frozen.items() if r[3] == "DIFF"},
                                                    key=lambda s: (s.split("_")[0], int(s.split("_")[1])))

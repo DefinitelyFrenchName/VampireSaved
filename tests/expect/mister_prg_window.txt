@@ -1,6 +1,15 @@
 # tests/test_mister_prg_window.sh — the frozen pair. One line per leg,
 # the probe's own last per-frame report. Regenerate DELIBERATELY (--freeze):
 # a moved count on a deterministic simulation is a finding.
+# RE-FROZEN 14z-170 on merged-m19 (build/m3b_merged27) from the M19 freeze's own MiSTer romset lane
+# (build/emu_freeze_m19_mister/test_mister_prg_window.log — every structural assertion PASSED there; only the
+# pair moved, the control leg's line UNCHANGED). WHAT MOVED M18 -> M19: `first_addr` 4c13d0 -> 4c1400 and `max`
+# 4d479e -> 4d47ce, both +0x30 — the relocated OBJ walker and the read ceiling carried by the allocator cascade of
+# the three regrown thunks (27 placed regions +0x30, patch_notes 14z-170); `blocks` 8 -> 7 and `cyc` / `rd_lo`
+# -1214 / -1078. RECORDED AS MEASURED, NOT EXPLAINED ([VSP-116]): the block count and the two counters are
+# not attributed here — the candidate, untested, is the +0x30 shift moving a placed span across a block
+# boundary and the fixes changing what the 68k executes in the match frames this replay reaches.
+#
 # Re-frozen 14z-134 on merged-m16 (build/m3b_merged23) from the M16 release run's own
 # measurement: the first extension address the 68k executes is the relocated OBJ
 # walker's PLACEMENT (4be7c0 on merged-m10 -> 4c13d0 there), which moves with the
@@ -26,5 +35,5 @@
 # 6 -> 7 -> 8; a sparse 7 differing from a dense 6 and 8 would produce this.
 # first_addr 4c13d0, first_frame 1119, min 413c70, blocks 8, cyc_hi_rd/wr and
 # rd_hi are all UNCHANGED, and every structural assertion PASSED in that run.
-pos frame 2900 wide 1 cyc 97642730 cyc_hi_rd 1211302 cyc_hi_wr 10816 rd_hi 1211302 rd_lo 75764374 blocks 8 first_frame 1119 first_addr 4c13d0 min 413c70 max 4d479e
+pos frame 2900 wide 1 cyc 97641516 cyc_hi_rd 1211302 cyc_hi_wr 10816 rd_hi 1211302 rd_lo 75763296 blocks 7 first_frame 1119 first_addr 4c1400 min 413c70 max 4d47ce
 neg frame 2900 wide 0 cyc 97337938 cyc_hi_rd 4 cyc_hi_wr 10113 rd_hi 0 rd_lo 75503450 blocks 0 first_frame -1 first_addr 000000 min 7ffffe max 000000

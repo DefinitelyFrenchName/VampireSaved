@@ -12,20 +12,20 @@
  },
  "inputs": {
   "bank_map.toml": "ece2b13bfbddaf6fea14e56baf65502945ba52dd",
-  "manifest": "b4d692697817502efe37b0b8e211c92479f00901",
+  "manifest": "2bac0cd483f607c25ded0d430a38ae791a84e33b",
   "overrides": "be0e9b96c8414532cc7a1d60f7a4a235a7d6362d",
   "placements.json": "913270ce40f1e46e11e9b6daa7ff4346771009c3",
-  "reconciliation.toml": "40528aeb863028d885f868f34368443c460b5ca2",
+  "reconciliation.toml": "477efcb72d82fcbafe1e4a4f59252385bcb75bac",
   "reconciliation_huitzil.toml": "23a15e51725a81723de8019f1e61bca7b8c62f22",
   "regions.json": "97f76c952701ef0e82b257ef5fe848a86304481f",
-  "verify_data.bin": "5afec64d3952d86d2243c89f2042117c2642c2c3"
+  "verify_data.bin": "4bfd52d6987b1603a3fdb1ecbd4e182783060967"
  },
  "overrides": [],
  "schema": 1,
  "sources": {
   "ours": {
    "kind": "built",
-   "set": "build/hui56"
+   "set": "build/hui57"
   },
   "vh": null,
   "vs2": {
@@ -187440,7 +187440,7 @@
     "orc": "0x054cc6",
     "placed": "0x0bf6a0",
     "refs": 418,
-    "sha1_ours": "a960c4395e1ef69cb04d73fd2fdb4f0d7603fcf5",
+    "sha1_ours": "8aefe1782f434588048f75c3c700f1066d2243e5",
     "sha1_vs2": "47f8f31195f0d25714452ed857a0068581047ed3",
     "src": "0x054c90",
     "variant_sites": 0
@@ -187551,7 +187551,7 @@
     "orc": "0x028150",
     "placed": "0x0ca210",
     "refs": 46,
-    "sha1_ours": "87e01047f4c464d80fbd60469c56001d18428fa4",
+    "sha1_ours": "73f91fb1dbc917469d6a5baf606b029f6481e0b6",
     "sha1_vs2": "25f8809c49687e0e954078fb6e4f6841591cc5fb",
     "src": "0x028122",
     "variant_sites": 0

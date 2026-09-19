@@ -2,8 +2,14 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 160
+# issues: 166
 number	state	reason	closed	labels	title
+166	CLOSED	COMPLETED	2026-09-19	bug	The generator's in-place placeholder scan corrupted 52 x2b7ef4 companion-effect records, shipped since merged-m16
+165	CLOSED	COMPLETED	2026-09-19	bug	The tenants' vs2 EX inputs entered Dark Force through a placed copy of vs2's Change entry — a second, longer route into the mode
+164	CLOSED	COMPLETED	2026-09-19	bug	Phobos and Donovan took damage and rallied through their shells' defense rows (vsavj's copies for ids 0x10/0x13), not vs2's own
+163	OPEN	-	-	bug	The Killshread Lightning column and the Plasma Trap ran vsavj's shock remap instead of vs2's class-0x52 rule — the victim's freeze and the attacker's hit-freeze differed from native
+162	OPEN	-	-	cosmetic	The deity above Donovan flashes orange as the Killshread Lightning column ends — an extra palette-sequence upload of row 11 native does not make
+161	OPEN	-	-	bug	Phobos takes one more HP than native from Demitri's 5HP with his defense rows already vs2's (12 against 11)
 160	OPEN	-	-	bug,severity: low	rulecheck.py: prepare's auto id collides with a run directory that has no ledger row
 159	OPEN	-	-	bug,needs-maintainer-ruling,severity: medium	Tenant attack records with facing rule 5 are XORed into the victim's facing by vsavj's hit code (Killshread Summon (ES) pushes Demitri away where native drags him in)
 158	OPEN	-	-	bug	rulecheck.py: a model change never invalidates a calibration (the checklist hash is checked, the model is not, and the ledger records 'default')
@@ -35,7 +41,7 @@ number	state	reason	closed	labels	title
 132	OPEN	-	-	bug	release/merged-m15 was never packaged
 131	OPEN	-	-	evolution	audit_mask_window_ff42a2: deprecate it, or keep it as a case-specific gate?
 130	OPEN	-	-	bug	bundle_win_dlls.py prints a broken character for its em dash on MSYS2 (build logs only)
-129	OPEN	-	-	bug	Tenant CPU AI looks lackluster (unproven; first question: are the ported script blocks complete?)
+129	OPEN	-	-	bug,evolution,severity: low	Tenant CPU AI looks lackluster (unproven; first question: are the ported script blocks complete?)
 128	OPEN	-	-	evolution,parked	Marionette: parked until further notice
 127	OPEN	-	-	cosmetic,parked	#112 option (B): the Press of Death effect owns its palette row (scope first)
 126	OPEN	-	-	cosmetic	Select-wheel look-and-feel polish

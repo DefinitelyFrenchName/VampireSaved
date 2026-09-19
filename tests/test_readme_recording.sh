@@ -55,7 +55,7 @@
 # 16_xemu_2p, whose inputs stop at frame 1362, half the stream reproduced
 # every checksum, and only MAME's frame count saw the cut.
 #
-# Usage: ROMDIR=... [MERGED=build/m3b_merged26] [RELEASE_EMULATORS=release/emulators]
+# Usage: ROMDIR=... [MERGED=build/m3b_merged27] [RELEASE_EMULATORS=release/emulators]
 #        [MAME_BIN=~/.cache/vampire-saved/mame/cps2] [RPL=tests/replays/03_two_player_vs.rpl]
 #        tests/test_readme_recording.sh
 #   SKIPs when this host has no release MAME, no source-built MAME or no romset.
@@ -81,7 +81,7 @@ esac
 case "$(uname -m)" in arm64|aarch64) ARCH=arm64 ;; x86_64|amd64) ARCH=x86_64 ;; *) ARCH="$(uname -m)" ;; esac
 EXESUF=""; [ "$HOSTOS" = windows ] && EXESUF=".exe"
 OSARCH="$HOSTOS-$ARCH"
-MERGED="${MERGED:-build/m3b_merged26}"
+MERGED="${MERGED:-build/m3b_merged27}"
 ROOT="${RELEASE_EMULATORS:-release/emulators}"
 SRC="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 RPL="${RPL:-tests/replays/03_two_player_vs.rpl}"

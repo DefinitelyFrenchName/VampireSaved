@@ -36,7 +36,7 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 # THE KNOWN-BAD OVERRIDE FILES, built up front from the real donovan extract;
 # under CONTROL=<name> the named one replaces donovan's override file in the
 # main check below, which must then FAIL.
-m_don="docs/project/tables/chars/donovan.json"; ex_don="build/don_m22/extract"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+m_don="docs/project/tables/chars/donovan.json"; ex_don="build/don_m23/extract"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 OV_DON="build/manifest/charmap_donovan.toml"
 if [ -f "$m_don" ] && [ -d "$ex_don" ]; then
     real="$(python3 -c "b=open('$ex_don/region_hitbox.bin','rb').read(); print(b[0x100:0x101].hex())")"
@@ -67,7 +67,7 @@ for n in donovan huitzil pyron; do
     fi
 done
 
-m="docs/project/tables/chars/donovan.json"; ex="build/don_m22/extract"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+m="docs/project/tables/chars/donovan.json"; ex="build/don_m23/extract"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 if [ -f "$m" ] && [ -d "$ex" ]; then
     cp build/manifest/donovan.toml "$W/don.toml"
     # (a) wrong expect

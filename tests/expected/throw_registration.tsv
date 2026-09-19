@@ -1,6 +1,6 @@
 # tests/expected/throw_registration.tsv — the hit-registration pair at every tenant throw contact, ours vs native
 # (tests/audit_throw_registration.sh; tests/lua/read_tap.lua, non-debug). Evidence class: in-emulator (MAME,
-# native vsav2 and the WIDE build merged-m18; frames >= 2300). Frozen 14z-166 with FREEZE=1.
+# native vsav2 and the WIDE build m3b_merged27; frames >= 2300). Frozen 14z-166 with FREEZE=1.
 # THE DEFECT IS FROZEN AS MEASURED: ours p1=+8 p2=<record> on every contact where native reads p1=<record> p2=+8
 # — GitHub #136's meter family. A fix that reconciles the placed pair stores re-freezes this file DELIBERATELY,
 # with its rule-checker run named in the commit. A new dead-pair READER on ours is a finding (the vs2 displacements
@@ -23,7 +23,7 @@ pyron_3	ours	contact	4782	p1=+8	p2=+18
 pyron_3	ours	contact	5829	p1=+8	p2=+6
 pyron_3	ours	contact	6249	p1=+8	p2=+6
 pyron_3	ours	live-pair-writers	-	-	-
-pyron_3	ours	dead-pair-writers	-	4787c4,4787c8,478892,478896	-
+pyron_3	ours	dead-pair-writers	-	4787f4,4787f8,4788c2,4788c6	-
 pyron_3	ours	dead-pair-readers	-	000d32,000d36	-
 huitzil_3	native	contact	2682	p1=none	p2=none
 huitzil_3	native	contact	2689	p1=+9	p2=+8

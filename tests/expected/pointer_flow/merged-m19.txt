@@ -1,0 +1,14 @@
+# pointer-flow baseline for merged-m19 (build/m3b_merged27), frozen 14z-170 — the M19 freeze (the four
+# ruled #136 fixes and the x2b7ef4 placeholder resolver).
+# vs the 14z-143 baseline (merged-m17, which merged-m18 satisfied unchanged): the two STRONG
+# `code:movea_imm` findings are the SAME two, RELOCATED BY EXACTLY 0x30 — site 0x4d4520 -> 0x4d4550 and
+# targets 0x4c7aa0 -> 0x4c7ad0 and 0x4cda40 -> 0x4cda70 — the allocator cascade of the three grown thunks
+# (27 placed regions +0x30, STATE 14z-170 row (1)). Same class (WIDE-HOLE), same count.
+# `data:long` 1188 -> 1189 (+1), ATTRIBUTED by a shift-aware diff (build/rc170/freeze/pflow/): every
+# merged-m18 finding reappears at its own address or +0x30; the ONE new line is 0x487764 -> 0x5a0000,
+# a 2-aligned pointer 0x004A002A in merged-m18 relocated +0x30 to 0x004A005A, whose 4-aligned window
+# now reads 0x005A0000, a WIDE-HOLE-shaped long — the WEAK class's documented noise. No STRONG
+# finding appears or disappears.
+STRONG	code:movea_imm	0x4d4550+0x16	0x4c7ad0	WIDE-HOLE
+STRONG	code:movea_imm	0x4d4550+0x24	0x4cda70	WIDE-HOLE
+WEAK-COUNT	data:long	1189

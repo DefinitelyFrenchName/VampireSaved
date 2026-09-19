@@ -27,11 +27,11 @@
 # moves a placed region moves these addresses: re-freeze at every freeze (FREEZE=1),
 # reviewing the diff.
 #
-# Usage: [BUILD=build/m3b_merged26] [FREEZE=1] tests/test_df_field_readers.sh
+# Usage: [BUILD=build/m3b_merged27] [FREEZE=1] tests/test_df_field_readers.sh
 #   static tier (a build dir, no emulator); measured 14z-168 on this MacBook: ~6 s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-BUILD="${BUILD:-build/m3b_merged26}"
+BUILD="${BUILD:-build/m3b_merged27}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/df_field_readers.tsv"
 CONTROL="${CONTROL:-}"
@@ -56,7 +56,34 @@ echo "== 1. the classifier's ground truth, then the census"
 python3 "$TOOL" --selftest > "$W/selftest.log" 2>&1 && ok "$(tail -1 "$W/selftest.log")" || { bad "the classifier fails its fixtures:"; sed 's/^/        /' "$W/selftest.log"; }
 python3 "$TOOL" "$IMG" "$BUILD/patch/placements.json" "$BUILD/patch/patch.json" --tsv > "$W/got.tsv" 2> "$W/err" || { bad "tool: $(tail -1 "$W/err")"; }
 [ "$fail" = 0 ] || { echo "FAIL: test_df_field_readers"; exit 1; }
-awk -F'\t' '$1=="read" && $4=="x028122"' "$W/got.tsv" | grep -q . || bad "the measured reader (the x028122 meter adder copy) is missing or not a read — the census is blind"
+# THE KNOWN READER, anchored OUTSIDE our build (reworked 14z-170): until the M19 freeze this
+# line required the x028122 meter-adder copy, the reader tests/audit_df_meter.sh measured —
+# and the ruled gauge fix moved exactly that operand to +0x111, vsavj's own adder's field. The
+# anchor is now vs2's OWN code: its POWER activation's "already in Power" test at vs2
+# 0x02617A (`tst.b $1c3(a6)`, read here in vs2's pristine opcode view), which every tenant's
+# placed x026142 copy carries at placement + (0x2617A - src). Each must be a census row.
+. "$REPO/tests/lib/decrypt_cache.sh"
+decrypt_view vsav2 "$W/vsav2.op" || { bad "decrypt_view vsav2 unavailable"; echo "FAIL: test_df_field_readers"; exit 1; }
+_anchor="$(python3 -c "import sys; print(open(sys.argv[1],'rb').read()[0x2617A:0x2617E].hex())" "$W/vsav2.op")"
+[ "$_anchor" = 4a2e01c3 ] || bad "vs2's 0x02617A is not tst.b \$1c3(a6) (read $_anchor) — the anchor moved, the reading is wrong"
+_want="$(python3 - "$BUILD/patch/placements.json" <<'PY'
+import json, sys
+R = json.load(open(sys.argv[1]))["regions"]
+for k, v in sorted(R.items()):
+    if k.split("@")[0] == "x026142" and v["src"] <= 0x2617A < v["src"] + v["len"]:
+        print("%#08x\t%s" % (v["dst"] + 0x2617A - v["src"], k))
+PY
+)"
+[ "$(printf '%s\n' "$_want" | grep -c .)" = 3 ] || bad "expected three placed x026142 copies (one per tenant), found: $(printf '%s' "$_want" | tr '\n' ' ')"
+printf '%s\n' "$_want" | while IFS="$(printf '\t')" read -r _a _r; do
+    [ -n "$_a" ] || continue
+    awk -F'\t' -v a="$_a" -v r="$_r" '$1=="read" && $2=="+0x1c3" && $3==a && $4==r' "$W/got.tsv" | grep -q . \
+        || { echo "  FAIL  the known reader (vs2 0x02617A's copy in $_r at $_a) is not a census row — the census is blind"; echo x >> "$W/anchor.bad"; }
+done
+[ -f "$W/anchor.bad" ] && fail=1
+[ -f "$W/anchor.bad" ] || ok "the known reader, vs2 0x02617A's tst.b \$1c3(a6), is a row in every placed x026142 copy ($(printf '%s\n' "$_want" | grep -c .))"
+# THE RULED GAUGE FIX, asserted: no +0x1C3 read in any x028122 copy (the adder tests +0x111)
+awk -F'\t' '$2=="+0x1c3" && $4 ~ /^x028122/' "$W/got.tsv" | grep -q . && bad "an x028122 copy reads +0x1C3 again — the M19 gauge fix (the adder tests +0x111, as vsavj's) regressed"
 ok "$(grep -c -v -E '^(count|access)' "$W/got.tsv" | tr -d ' ') rows; $(grep '^access' "$W/got.tsv" | cut -f2- | tr '\t' ' '); $(grep '^count' "$W/got.tsv" | cut -f2- | tr '\t' ' ')"
 
 echo "== 2. the frozen rows"
@@ -65,8 +92,9 @@ if [ "${FREEZE:-0}" = 1 ]; then
         echo "# tests/expected/df_field_readers.tsv — placed instructions of the merged build that name one of vs2's Dark Force POWER"
         echo "# fields (+0x1C3 +0x1C4 +0x1C6 +0x1C7 +0x1C8) by displacement, never set by our host engine's Dark Force Change, with the"
         echo "# access each makes and its base register (tests/test_df_field_readers.sh; tools/audit_df_field_readers.py). Evidence class:"
-        echo "# static. Frozen 14z-168 with FREEZE=1 on $(basename "$BUILD"). ONE reader is measured to change play (the x028122 meter adder"
-        echo "# copy, tests/audit_df_meter.sh); the rest are unmeasured. Columns: <access> <field> <addr> <region> <base> <insn>."
+        echo "# static. First frozen 14z-168; this freeze with FREEZE=1 on $(basename "$BUILD"). The x028122 meter adder copies, the one reader"
+        echo "# measured to change play, test +0x111 since the M19 gauge fix (tests/audit_df_meter.sh) and are no rows; the rest are"
+        echo "# unmeasured. Columns: <access> <field> <addr> <region> <base> <insn>."
         echo "# Re-freeze at every freeze (placed addresses move), reviewing the diff."
         echo "#--"
         cat "$W/got.tsv"

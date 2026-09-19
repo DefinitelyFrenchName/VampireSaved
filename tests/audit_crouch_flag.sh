@@ -17,14 +17,14 @@
 # FROZEN: tests/expected/crouch_flag.tsv — per leg, P1's (+0x121, seq, sub) at every frame it
 # changes over 2830-2880, plus P2's +0x121 held 0.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged26] [FREEZE=1] tests/audit_crouch_flag.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [FREEZE=1] tests/audit_crouch_flag.sh
 #   emulator tier, MAME; 4 field-trace runs — measured 14z-169 on this MacBook: ~15 s wall
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged26}"
+BUILD="${BUILD:-build/m3b_merged27}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/crouch_flag.tsv"
 CONTROL="${CONTROL:-}"

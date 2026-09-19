@@ -1,0 +1,20 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/rc170/findings_table_14z170.tsv	325f50b8d0c8e2d9256d1c41dd7e16e1de44dc6a
+build/rc170/close_findings_2.txt	5c5cf8538eb541a5e85cd6633d69c268a374c140
+STATE.md.lines-53-71 (lines 53-71 of STATE.md)	3c45992f2a796afbbcad855a7fd8037ca5969c69
+DECISIONS_HISTORY.md.lines-30-57 (lines 30-57 of DECISIONS_HISTORY.md)	4f2cb315ad6f66858727e465f51decc5b5fa8ee2
+docs/game/engine_internals.md.lines-1290-1365 (lines 1290-1365 of docs/game/engine_internals.md)	b3372cd7bc88b4a446ccb10d3056f4e96594e832
+docs/game/engine_internals.md.lines-3205-3300 (lines 3205-3300 of docs/game/engine_internals.md)	c23bee96d2b8e96209711656029705cb39822604
+docs/game/engine_internals.md.lines-4150-4180 (lines 4150-4180 of docs/game/engine_internals.md)	d398242d668d73040ad87991b0d49ae185b92902
+docs/project/gotchas.md.lines-5179-5290 (lines 5179-5290 of docs/project/gotchas.md)	8bdae726cf79061c6b279a9c613b63fc1f9159db
+docs/platform/gotchas.md.lines-232-270 (lines 232-270 of docs/platform/gotchas.md)	5ca7bccb2290ee3c5b286444b5af868eb9a56012
+docs/project/tables/defense_rows.md	494c527adfe4a25ac41bf43194748ea36e2e68a0
+docs/NEXT_SESSION.md	7c7d1625340d69884f662aa431667434f856a20b
+build/rc170/gh/issue_column_trap.md	b7b1c4255d34ff50dd3546c1be1b14a1043df8dc
+build/rc170/gh/issue_defense_rows.md	429ff72873135fd2db04b787558a98bf19c6265c
+build/rc170/gh/issue_exroute.md	be840bf1cfbea23ff05d89e9d51065431c5429c0
+build/rc170/gh/issue_x2b7ef4.md	7b9761de20c3049b354027efedb76106bc72ede5
+build/rc170/gh/issue_orange_flash.md	65577d3ce5552d942bab642146b68cf76a0d75c5
+build/rc170/gh/issue_phobos_dmg.md	698c42bcabecf6c226f253dc8b520ee390621172
+build/rc170/gh/comment_136.md	34d63e3dc17662d06a4b92478005d7e66efa05e8
+build/rc170/gh/comment_157.md	bb1ed972df3924c7f3804df63e7bd7954f3cc5ef

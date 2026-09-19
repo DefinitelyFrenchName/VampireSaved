@@ -22,8 +22,10 @@
 #   3. RUNTIME — replay 61 (tenant beats Victor): victory rows
 #      0x15-0x19 == vs2 Donovan color-0 set (F000-alpha), frames
 #      5500 AND 5700. Replay 62 (Victor beats the tenant): rows ==
-#      the VANILLA pool slice (color 0, id 3) at frame 5300 — the
-#      else path serves untouched vanilla bytes.
+#      the VANILLA pool slice (color 0, id 3) on the quote screen — FOUND
+#      per build since 14z-170 (the KO frame traced, P2's trailing mash
+#      dropped, three consecutive samples) — the else path serves untouched
+#      vanilla bytes.
 #
 # Usage: ROMDIR=... tests/test_tenant_winpal.sh [outbase]
 # Env: MAME_WIDE_BIN (default ~/.cache/vampire-saved/mame/cps2);
@@ -142,10 +144,32 @@ else
     }
     run win 61_tenant_2pwin.rpl \
         "5500:90c2a0-90c33f;5700:90c2a0-90c33f" 5750
-    run lose 62_tenant_2plose.rpl "5300:90c2a0-90c33f" 5350
-    python3 - "$WORK" "$WORK/vs2_data.bin" <<'PY' || fail=1
-import sys
-work, vs2p = sys.argv[1], sys.argv[2]
+    # THE LOSE LEG IS FOUND, NOT FRAME-PINNED (reworked 14z-170): at the M19 freeze the tenants' vs2
+    # defense rows made Donovan die ~160 frames earlier in replay 62, so P2's scripted mash (to f5035)
+    # landed on the win-quote screen and SKIPPED it — the fixed f5300 then read the next VS screen
+    # (snapshots in STATE 14z-170). Pass 1 traces P1's HP to find the KO frame K on THIS build; pass 2
+    # replays with P2's inputs dropped after K+10 (the quote screen is not skipped) and samples rows
+    # 0x15-0x19 every 25 frames over K+300..K+1100: at least three CONSECUTIVE samples must hold the
+    # vanilla pool slice. Measured: merged-m18's don_m22 K=4698, M19's don_m23 K=4538 (pool 5113-5463).
+    mkdir -p "$WORK/ko"
+    FIELDS="ff8450:w:p1hp" FIELD_OUT="$WORK/ko/f.ft" FIELD_FROM=2400 FIELD_TO=6000 FRAMES=6000 \
+    REPLAY="$REPO/tests/replays/62_tenant_2plose.rpl" MAME_SANDBOX="$WORK/sbx_ko" MAME_BIN="$WIDE_BIN" \
+    MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
+        tools/run_mame.sh vsavjw -autoboot_script tests/lua/field_trace.lua > /dev/null 2>&1 || true
+    KO="$(awk '$1=="F" { for (i = 3; i <= NF; i++) if ($i ~ /^p1hp=/) { v = substr($i, 6) + 0; if (v < 0 || v > 32767) { print $2; exit } } }' "$WORK/ko/f.ft")"
+    [ -n "$KO" ] || { echo "  FAIL: replay 62: P1 is never KO'd before f6000 — the lose leg's rig is dead"; fail=1; KO=4600; }
+    echo "  lose leg: P1 KO at f$KO (pass 1); P2's inputs dropped after f$((KO + 10))"
+    awk -v k=$((KO + 10)) '/^[0-9]/ { split($1, r, "-"); if (r[1] > k && $0 ~ /p2=/) next } { print }' \
+        "$REPO/tests/replays/62_tenant_2plose.rpl" > "$WORK/lose_cut.rpl"
+    LOSE_DUMPS="$(python3 -c "print(';'.join(f'{f}:90c2a0-90c33f' for f in range($KO + 300, $KO + 1101, 25)))")"
+    mkdir -p "$WORK/lose"
+    DUMPS="$LOSE_DUMPS" CHECKSUM_OUT="$WORK/lose/cks.log" FRAMES=$((KO + 1150)) \
+    REPLAY="$WORK/lose_cut.rpl" MAME_SANDBOX="$WORK/sbx_lose" MAME_BIN="$WIDE_BIN" \
+    MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
+        tools/run_mame.sh vsavjw -autoboot_script tests/lua/replay.lua > /dev/null 2>&1 || true
+    python3 - "$WORK" "$WORK/vs2_data.bin" "$KO" <<'PY' || fail=1
+import sys, os
+work, vs2p, ko = sys.argv[1], sys.argv[2], int(sys.argv[3])
 vs2 = open(vs2p, "rb").read()
 vj = open("build/out/vsavj_data.bin", "rb").read()
 def alpha(b):
@@ -158,12 +182,18 @@ for fr in (5500, 5700):
         f"tenant win f{fr}: rows != vs2 Donovan c0 set (head "
         f"{got[:8].hex()})")
 want_lose = alpha(vj[0x3AD700 + 3 * 0xA0:0x3AD700 + 3 * 0xA0 + 0xA0])
-got = open(f"{work}/lose/dump_5300_90c2a0.bin", "rb").read()[:0xA0]
-assert got == want_lose, (
-    f"vanilla win f5300: rows != vanilla pool (c0,id3) (head "
-    f"{got[:8].hex()})")
-print("  ok: tenant win = vs2 set (f5500+f5700); vanilla win = "
-      "untouched pool (f5300)")
+frames = list(range(ko + 300, ko + 1101, 25))
+hit = [os.path.exists(f"{work}/lose/dump_{f}_90c2a0.bin")
+       and open(f"{work}/lose/dump_{f}_90c2a0.bin", "rb").read()[:0xA0] == want_lose for f in frames]
+run = best = 0
+for h in hit:
+    run = run + 1 if h else 0; best = max(best, run)
+assert best >= 3, (
+    f"vanilla win (KO f{ko}): rows 0x15-0x19 never hold the vanilla pool (c0,id3) "
+    f"for 3 consecutive samples over f{frames[0]}..f{frames[-1]} (best run {best})")
+first = frames[hit.index(True)]
+print(f"  ok: tenant win = vs2 set (f5500+f5700); vanilla win = untouched pool "
+      f"(KO f{ko}, pool from f{first}, {sum(hit)} of {len(frames)} samples, best run {best})")
 PY
 fi
 

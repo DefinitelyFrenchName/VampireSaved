@@ -1,0 +1,14 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/rc170/findings_table_14z170.tsv	e656ab994db34c9feee03d12a4f2d72694ba644f
+build/rc170/close_findings_4.txt	942d2868d5855b1eaea50147d820a5068c1701d8
+STATE.md.lines-53-73 (lines 53-73 of STATE.md)	f8fee8bbf68ff5e0a824c0c6a43bfce6680fcef8
+DECISIONS_HISTORY.md.lines-70-77 (lines 70-77 of DECISIONS_HISTORY.md)	33d95d2d8f96f663f264643ff0434aaa5f5a45fd
+docs/project/gotchas.md.lines-5292-5336 (lines 5292-5336 of docs/project/gotchas.md)	727164ee8b2b453b8b010ab7a4b6fcd0108afca1
+tests/expected/registry.tsv.lines-169-169 (lines 169-169 of tests/expected/registry.tsv)	2818c4365935c0c960e9182764d39c146d260dde
+build/rc170/freeze/rc_final/removals_check.txt	a49b0adc0cf774877e9ba108042929112d0f346d
+build/rc170/freeze/rc_final/removals_classified.txt	78e853f5191e386e9a0125e888df7ac1f2c035c4
+build/rc170/freeze/rc_final/recap/recap.log	8076ba7318cbde5d737927f68131be9b8c73bf6c
+build/rc170/freeze/rc_final/recap/recap_ko.log	59a9500840fc023c9c72d05d7973117dfd3063d5
+build/rc170/freeze/rc_final/fix170_b_vs_m19.txt	6138c15976306f3c75b765a0c07e13bb5c68fdb2
+build/rc170/freeze/rc_final/tool_plants.txt	02c787521d1729a78149027c3f76cf58215e1103
+build/rc170/gh/issue_column_trap.md	fc963e7188b5e188974a7aae1b7990a15dd1e3ef

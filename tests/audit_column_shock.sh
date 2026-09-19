@@ -1,7 +1,7 @@
 #!/bin/sh
-# audit_column_shock.sh — DONOVAN'S KILLSHREAD LIGHTNING COLUMN SHOCKS ITS VICTIM FOR 12 FRAMES ON OUR BUILD, 24 NATIVELY, and freezes Donovan 4 frames per hit where vs2 exempts him, frozen AS MEASURED (14z-168, GitHub #136): two earlier fixes compose — 14z-33 remapped the column's hit records from vs2's extended class 0x52 to 0x06, and 14z-42's Lightning Sword thunks give every Donovan hit that reaches vsavj's class-0x06 shock handler vs2's Lightning Sword tuning.
+# audit_column_shock.sh — DONOVAN'S KILLSHREAD LIGHTNING COLUMN PLAYS vs2's CLASS-0x52 RULE ON OUR BUILD (since the 14z-170 fix, ruled 2026-09-18): the victim shocked 24 frames and Donovan exempt, every +0x5C write of both fighters equal to native's in frame and value, the move's timeline equal, and a column KO taking the same path (class 8, no exception). Until 14z-170 it froze the DEFECT as measured (14z-168, GitHub #136): 12 frames and Donovan frozen 4, from 14z-33's 0x52 -> 0x06 remap reaching 14z-42's Lightning Sword thunks.
 #
-# MUST-FIRE: perturbed-copy: native-shock — a copy of our rows with the two thunk writes replaced by what vs2's 0x52 handler writes (the victim 0x18, no attacker write), and our timeline row replaced by native's, must FAIL the frozen compare, so the frozen rows are the defect and a fix is a deliberate re-freeze (in-gate: the perturbed copy must differ from the frozen rows; mode: our rows are rewritten before the compare and the table FAILs)
+# MUST-FIRE: perturbed-copy: old-shock — a copy of our rows with the pre-fix mechanism planted (the victim's hit writes 24 -> 12, a 4 written to Donovan's +0x5C at each hit — the 14z-42 Lightning Sword values the column took until 14z-170) must FAIL the native-equality check, so "equal to native" is a comparison of the two legs' writes (in-gate: the planted copy must be caught; mode: our rows are planted before the checks and the gate FAILs)
 #
 # WHY. #136's donovan_4 event 1 (Killshread Lightning [MP]) and donovan_10 event 9
 # (the [LP] column) read DIFF at +40 / +35 on the counter: natively the column's hits
@@ -18,6 +18,13 @@
 # Plasma Trap's attacker freeze is the ruled precedent of the same remap class
 # (14z-85g(2), tests/audit_trap_shock.sh), the victim's halved shock is not.
 #
+# THE FIX (14z-170, DECISIONS_HISTORY.md "the column shock and the Plasma Trap take vs2's class-0x52 rule"):
+# the column's records keep native 0x52; reaction_hook case 0xA4 writes the marker 0x38 into +0x54;
+# the ls_freeze thunks give 0x38 vsav's default victim freeze 0x18 and skip the attacker's
+# (docs/game/engine_internals.md, "The fix as built"). The KO branch: es_type51_dispatch routes 0x52 to
+# vsavj's KO handler 0x0186E0 (class 8) — section 1b, a column KO (P2's HP poked to 1 on both words
+# at 2826 and 2830), traced on both legs: the same frames, fields and class, and no exception on ours.
+#
 # WHAT IT FREEZES (tests/expected/column_shock.tsv): every write to P1's and P2's
 # +0x5C (RAM:$FF845C / $FF885C) from 2836 to 2852 on the committed #136 rig donovan_4
 # (event 1 at 2800), both legs REAL cursor picks with the parity gate's pins:
@@ -29,21 +36,21 @@
 # The fix is RULED (2026-09-18, DECISIONS_HISTORY.md "the column shock and the Plasma Trap take vs2's
 # class-0x52 rule"); it re-freezes this file.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged26] [FREEZE=1] tests/audit_column_shock.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [FREEZE=1] tests/audit_column_shock.sh
 #   emulator tier, MAME; four tap runs, then two field traces — measured 14z-168 on this MacBook, solo: ~12 s wall
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged26}"
+BUILD="${BUILD:-build/m3b_merged27}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/column_shock.tsv"
 CONTROL="${CONTROL:-}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
-case "$CONTROL" in ""|native-shock) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+case "$CONTROL" in ""|old-shock) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
@@ -90,12 +97,26 @@ for l in open(p):
 if not ended: sys.exit(f"VOID: {p} has no END line (a dead tap is not evidence)")
 PY
 }
-native_shock() {  # native_shock <rows in> <rows out>: our thunk writes replaced by vs2's 0x52 handler's, and our
-    # timeline replaced by native's (what the ruled fix should read) — so the control covers both row kinds
-    awk -F'\t' 'BEGIN{OFS="\t"} $1=="timeline" && $2=="native" {nt = $0}
-        $2=="ours" && $5=="3ffbc4" {$5="022666"; $6=24} $2=="ours" && $5=="3ffbf4" {next}
-        $1=="timeline" && $2=="ours" {held = 1; next} {print}
-        END {if (held && nt != "") {sub(/^timeline\tnative/, "timeline\tours", nt); print nt}}' "$1" > "$2"
+old_shock() {  # old_shock <rows in> <rows out>: THE PERTURBATION — the pre-fix mechanism planted in our rows:
+    # our victim's 24 at each native hit frame becomes 12, and a 4 is written to Donovan's +0x5C at each
+    # (the 14z-42 Lightning Sword values the column took until 14z-170)
+    awk -F'\t' 'BEGIN{OFS="\t"} NR==FNR {if ($2=="native" && $3=="p2" && $6==24) hit[$4]=1; next}
+        $1=="w" && $2=="ours" && $3=="p2" && ($4 in hit) && $6==24 {$6=12; print; print "w", "ours", "p1", $4, "planted", 4; next}
+        {print}' "$1" "$1" > "$2"
+}
+same_writes() {  # same_writes <rows>: exit 0 when ours' +0x5C writes equal native's in (fighter, frame, value)
+    python3 - "$1" <<'PY'
+import sys, collections
+legs = collections.defaultdict(list)
+for l in open(sys.argv[1]):
+    t = l.rstrip("\n").split("\t")
+    if t[0] == "w": legs[t[1]].append((t[2], int(t[3]), int(t[5])))
+a, b = sorted(legs["native"]), sorted(legs["ours"])
+if a == b and a: sys.exit(0)
+na, nb = collections.Counter(a), collections.Counter(b)
+print("native only:", sorted((na - nb).elements())[:6], " ours only:", sorted((nb - na).elements())[:6])
+sys.exit(1)
+PY
 }
 
 echo "== 1. the taps ($PART, +0x5C of both fighters, frames $LO-$HI)"
@@ -152,20 +173,68 @@ for leg in ("native", "ours"):
 PY
 [ "$fail" = 0 ] || { echo "FAIL: audit_column_shock (the timeline was VOID)"; exit 1; }
 grep '^timeline' "$W/got.tsv" | sed 's/^/  /'
-if [ "$CONTROL" = native-shock ]; then native_shock "$W/got.tsv" "$W/got.ns" && mv "$W/got.ns" "$W/got.tsv"; fi
-awk -F'\t' '$2=="ours" && $3=="p2" && $5=="3ffbc4" && $6==12' "$W/got.tsv" | grep -q . || bad "ours: no 0x0C victim write by the placed thunk at 0x3FFBC4 — the frozen mechanism is absent"
+if [ "$CONTROL" = old-shock ]; then old_shock "$W/got.tsv" "$W/got.os" && mv "$W/got.os" "$W/got.tsv"; fi
 awk -F'\t' '$2=="native" && $5=="022666" && $6==24' "$W/got.tsv" | grep -q . || bad "native: no 0x18 victim write by vs2's shock handler 0x22666 — the rig did not land the column"
 awk -F'\t' '$5!="022474" && $5!="02309e" && $5!="02447c" && $5!="022558" && $5!="0231d0" && $5!="0245ae" {print "  " $0}' "$W/got.tsv" | head -12
+# THE FIX'S CLAIM (14z-170): both fighters' +0x5C writes equal native's in frame and value, and the timeline
+if same_writes "$W/got.tsv" > "$W/sw.txt"; then ok "ours' +0x5C writes equal native's in fighter, frame and value (vs2's 0x52 rule: the victim 24, Donovan exempt)"
+else bad "ours' +0x5C writes differ from native's: $(cat "$W/sw.txt")"; fi
+_tn="$(awk -F'\t' '$1=="timeline" && $2=="native" {sub(/^timeline\tnative\t/, ""); print}' "$W/got.tsv")"
+_to="$(awk -F'\t' '$1=="timeline" && $2=="ours" {sub(/^timeline\tours\t/, ""); print}' "$W/got.tsv")"
+[ -n "$_tn" ] && [ "$_tn" = "$_to" ] && ok "the move's timeline equals native's ($_to)" || bad "timeline: ours '$_to' vs native '$_tn'"
+old_shock "$W/got.tsv" "$W/ctl.tsv"
+if [ "$CONTROL" != old-shock ]; then
+    if same_writes "$W/ctl.tsv" > /dev/null; then echo "CONTROL DEAD: old-shock — the planted pre-fix mechanism still reads equal to native"; fail=1
+    else echo "CONTROL FIRED: old-shock — the planted pre-fix mechanism (victim 12, Donovan 4) fails the native-equality check"; fi
+fi
+
+echo "== 1b. the KO branch: a column KO on both legs (P2's HP poked to 1 on both words)"
+ko_trace() {  # ko_trace <name> <set> <rompath> <rpl> <out.ft>   (background)
+    mkdir -p "$W/$1"
+    ( set +e; cd "$W/$1" && MAME_SANDBOX="$W/$1/sb" MAME_ROMPATH="$3" REPLAY="$4" \
+        POKES="$(pokes_for "$j" 3100);2826:ff8850:0001;2826:ff8852:0001;2830:ff8850:0001;2830:ff8852:0001" \
+        FIELDS="ff8854:b:cls,ff8850:w:hp,ff8852:w:white,ff8807:b:sub,ff891f:b:dead,ff0000:w:exc,ff8406:b:p1seq" \
+        FIELD_OUT="$5" FIELD_FROM=2830 FIELD_TO=3100 FRAMES=3100 \
+        "$REPO/tools/run_mame.sh" "$2" -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$W/$1/mame.log" 2>&1
+      _st=$?; grep -q -E '^(FIELDSUMMARY|END )' "$5" 2>/dev/null && _st=0; echo $_st > "$W/$1/rc"; rm -rf "$W/$1/sb" ) </dev/null &
+}
+ko_trace kn vsav2  "$ROMDIR" "$W/native.rpl" "$W/ko_native.ft"
+ko_trace ko vsavjw "$ORP"    "$W/ours.rpl"   "$W/ko_ours.ft"
+wait
+for t in kn ko; do _rc="$(cat "$W/$t/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || bad "KO trace $t exited $_rc"; done
+python3 - "$W" >> "$W/got.tsv" 2> "$W/err" <<'PY' || bad "KO: $(cat "$W/err")"
+import sys
+W = sys.argv[1]
+rows = {}
+for leg in ("native", "ours"):
+    d = {}
+    for l in open(f"{W}/ko_{leg}.ft"):
+        t = l.split()
+        if t and t[0] == "F": d[int(t[1])] = tuple(sorted(t[2:]))
+    if 2830 not in d or max(d) < 3099: sys.exit(f"VOID: {leg} KO trace incomplete")
+    rows[leg] = d
+    kv = {f: dict(x.split("=", 1) for x in v) for f, v in d.items()}
+    ko = next((f for f in sorted(kv) if kv[f]["dead"] != "0"), None)
+    if ko is None: sys.exit(f"VOID: {leg} the column did not KO (P2's death flag never set)")
+    exc = max(int(kv[f]["exc"]) for f in kv)
+    print(f"ko\t{leg}\tko_frame={ko}\tcls={kv[ko]['cls']}\texc_max={exc}")
+if rows["native"] != rows["ours"]:
+    diff = [f for f in sorted(rows["native"]) if rows["native"][f] != rows["ours"].get(f)]
+    sys.exit(f"the KO traces differ from frame {diff[0]}: native {rows['native'][diff[0]]} ours {rows['ours'].get(diff[0])}")
+PY
+grep '^ko' "$W/got.tsv" | sed 's/^/  /'
+awk -F'\t' '$1=="ko" && $2=="ours" && $5!="exc_max=0"' "$W/got.tsv" | grep -q . && bad "ours: an exception was raised on the KO path"
+awk -F'\t' '$1=="ko"' "$W/got.tsv" | grep -q . && [ "$fail" = 0 ] && ok "the column KO takes the same path on both legs (every traced field, every frame), no exception"
 
 echo "== 2. the frozen rows"
 if [ "${FREEZE:-0}" = 1 ]; then
     {
         echo "# tests/expected/column_shock.tsv — every write to both fighters' hit-freeze byte +0x5C around Killshread Lightning [MP]'s"
-        echo "# first column hit (#136 rig donovan_4, event 1 at 2800), ours (merged-m18) vs native vsav2 (tests/audit_column_shock.sh;"
-        echo "# tests/lua/read_tap.lua, non-debug). Evidence class: in-emulator. Frozen 14z-168 with FREEZE=1. THE DEFECT IS FROZEN AS"
-        echo "# MEASURED: native's 0x52 handler writes the victim 0x18 and exempts Donovan; ours' 14z-42 thunks write the victim 0x0C and"
-        echo "# Donovan 4. A fix re-freezes this file DELIBERATELY, with its rule-checker run named in the commit."
-        echo "# Columns: w <leg> <who> <frame> <writer PC> <value> | timeline <leg> hits= special= p1_neutral= p2_neutral= gap="
+        echo "# first column hit (#136 rig donovan_4, event 1 at 2800), ours ($(basename "$BUILD")) vs native vsav2 (tests/audit_column_shock.sh;"
+        echo "# tests/lua/read_tap.lua, non-debug), the move's timeline, and a column KO. Evidence class: in-emulator. Frozen with FREEZE=1:"
+        echo "# first 14z-168 (the defect as measured), re-frozen 14z-170 on the class-0x52 fix (ours' writes equal native's in"
+        echo "# frame and value; the placed thunk PCs move with a freeze)."
+        echo "# Columns: w <leg> <who> <frame> <writer PC> <value> | timeline <leg> hits= special= p1_neutral= p2_neutral= gap= | ko <leg> ko_frame= cls= exc_max="
         echo "#--"
         cat "$W/got.tsv"
     } > "$EXPECT"
@@ -177,12 +246,9 @@ if diff "$W/want.tsv" "$W/got.tsv" > "$W/diff.txt"; then ok "every row as frozen
 else bad "differs from the frozen rows"; sed 's/^/        /' "$W/diff.txt" | head -20; fi
 
 echo "== 3. must-fire control"
-if [ "$CONTROL" = native-shock ]; then
-    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: native-shock — vs2's shock applied on ours loses the frozen rows"; echo "FAIL: audit_column_shock (control mode)"; exit 1
-    else echo "CONTROL DEAD: native-shock — the rewrite changed nothing"; echo "FAIL: audit_column_shock"; exit 1; fi
+if [ "$CONTROL" = old-shock ]; then
+    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: old-shock — the planted pre-fix mechanism fails the gate"; echo "FAIL: audit_column_shock (control mode)"; exit 1
+    else echo "CONTROL DEAD: old-shock — the planted rows passed"; echo "FAIL: audit_column_shock"; exit 1; fi
 fi
-native_shock "$W/got.tsv" "$W/ctl.tsv"
-if diff -q "$W/got.tsv" "$W/ctl.tsv" > /dev/null; then echo "CONTROL DEAD: native-shock — ours carries no thunk write to rewrite"; fail=1
-else echo "CONTROL FIRED: native-shock — vs2's shock changes $(diff "$W/got.tsv" "$W/ctl.tsv" | grep -c '^<' | tr -d ' ') of our rows"; fi
 
 if [ "$fail" = 0 ]; then echo "PASS: audit_column_shock"; else echo "FAIL: audit_column_shock"; exit 1; fi

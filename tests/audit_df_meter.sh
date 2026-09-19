@@ -1,7 +1,7 @@
 #!/bin/sh
-# audit_df_meter.sh — NO GAUGE IS BUILT IN DARK FORCE CHANGE, and the tenants build it anyway, frozen AS MEASURED (14z-168, GitHub #157's Dark Force tail): a whiffed attack's start-up gauge (the "swing" call of the meter adder) is suppressed while +0x111 is held on vsavj, but the tenants' swings go through their placed copy of vs2's adder, which tests vs2's Dark Force Power field +0x1C3 — never set by vsav's Dark Force Change — so they gain +6 per whiffed attack in the mode.
+# audit_df_meter.sh — NO GAUGE IS BUILT IN DARK FORCE CHANGE, and since the 14z-170 fix (GitHub #157's Dark Force tail, ruled 2026-09-18) the tenants build none either: a whiffed attack's start-up gauge is suppressed inside +0x111 on every leg of ours, as vsavj's shells — frozen as measured, with vs2's EX install (which pays it) beside for reference. Until 14z-170 it froze the DEFECT: our tenants gained +6 per swing in the mode.
 #
-# MUST-FIRE: perturbed-copy: suppressed — a copy of our tenant rows with every in-mode gauge step removed (what a fixed build gives, the shells' behaviour) must FAIL the frozen compare, so the frozen rows are the defect and a fix is a deliberate re-freeze (in-gate: the perturbed copy must differ from the frozen rows; mode: our tenant rows are rewritten before the compare and the table FAILs)
+# MUST-FIRE: perturbed-copy: swing-planted — a copy of our rows with one in-mode gauge step planted per tenant (+6 at the in-mode swing frames, the pre-fix defect) must FAIL the no-in-mode-gauge check, so "no gauge in the mode" is read from our legs' steps (in-gate: the planted copy must be caught; mode: our rows are planted before the checks and the gate FAILs)
 #
 # WHY. The meter adder (vsavj PRG:0x29A16, vs2 0x28D48) is byte-identical in the two
 # games but for the Dark Force test: vsavj `tst.b $111(a6)`, vs2 `tst.b $1c3(a6)` —
@@ -23,23 +23,23 @@
 # WHAT IT FREEZES (tests/expected/df_meter.tsv), per leg:
 #   mode  <leg> <id> <+0x111 first>..<last>
 #   step  <leg> <id> <frame> <P1 gauge delta> <in|out>   — every change of RAM:$FF850A
-#   (in = inside the +0x111 span). The shells' in-mode swings are ABSENT; the tenants'
-#   read +6 at 3164 and 3350 on ours (the defect) and on vsav2 (vs2's own EX install,
-#   which does not suppress them either — vs2's adder tests +0x1C3). Gauge paid by the
+#   (in = inside the +0x111 span). The shells' in-mode swings are ABSENT, and since the
+#   14z-170 fix the tenants' on ours too (until then +6 at 3164 and 3350 — the defect); on
+#   vsav2 they read +6 (vs2's own EX install does not suppress them — its adder tests +0x1C3). Gauge paid by the
 #   altered attacks' HITS appears as further in-mode steps on the vsav2 legs; on ours a
 #   hit pays through vsavj's own adder and is suppressed like any legacy hit.
 #
 # WHAT IT DOES NOT COVER: the other 26 +0x1C3 readers' consequences (the static census
 # names them); P2's gauge; the gauge a HIT pays in the mode beyond these rows.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged26] [FREEZE=1] tests/audit_df_meter.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [FREEZE=1] tests/audit_df_meter.sh
 #   emulator tier, MAME; 10 field_trace legs in parallel — measured 14z-168 on this MacBook, solo: ~25 s wall
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged26}"
+BUILD="${BUILD:-build/m3b_merged27}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/df_meter.tsv"
 CONTROL="${CONTROL:-}"
@@ -47,7 +47,7 @@ CONTROL="${CONTROL:-}"
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
 [ -f "$BUILD/verify_data.bin" ] || { echo "SKIP: no verify_data.bin at $BUILD"; exit 0; }
-case "$CONTROL" in ""|suppressed) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+case "$CONTROL" in ""|swing-planted) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
@@ -104,8 +104,13 @@ for f in sorted(d):
         print(f"step\t{g}\t{want}\t{f}\t{d[f]['meter'] - d[f - 1]['meter']}\t{'in' if on[0] <= f <= on[-1] else 'out'}")
 PY
 }
-suppress() {  # suppress <rows in> <rows out>: our TENANT rows without any in-mode step (the shells' rule)
-    awk -F'\t' '!($1 == "step" && $2 == "ours" && $3 != "01" && $6 == "in")' "$1" > "$2"
+plant_swing() {  # plant_swing <rows in> <rows out>: THE PERTURBATION — one in-mode +6 per tenant leg of ours at the
+    # first in-mode swing frame vs2's legs show (the pre-fix defect's shape)
+    awk -F'\t' 'BEGIN{OFS="\t"} {print} $1=="step" && $2=="vsav2" && $6=="in" && !($3 in seen) {seen[$3]=1; print "step", "ours", $3, $4, 6, "in"}' "$1" > "$2"
+}
+no_mode_gauge() {  # no_mode_gauge <rows>: exit 0 when no leg of ours has an in-mode step and every leg of ours has an out-of-mode one
+    awk -F'\t' '$1=="step" && $2=="ours" && $6=="in" {bad=1} $1=="step" && $2=="ours" && $6=="out" {live[$3]=1}
+        END {n=0; for (k in live) n++; exit (bad || n < 4) ? 1 : 0}' "$1"
 }
 
 echo "== 1. the decoded wheels"
@@ -129,22 +134,33 @@ for s in $LEGS; do
     reduce "$g" "$id" "$W/$g.$id.ft" >> "$W/got.tsv" 2> "$W/$g.$id.err" || bad "$g $id: $(cat "$W/$g.$id.err")"
 done
 [ "$fail" = 0 ] || { echo "FAIL: audit_df_meter (a leg did not run or was VOID)"; exit 1; }
-if [ "$CONTROL" = suppressed ]; then suppress "$W/got.tsv" "$W/got.sp" && mv "$W/got.sp" "$W/got.tsv"; fi
+if [ "$CONTROL" = swing-planted ]; then plant_swing "$W/got.tsv" "$W/got.sp" && mv "$W/got.sp" "$W/got.tsv"; fi
 ok "$(grep -c '^mode' "$W/got.tsv" | tr -d ' ') legs, $(grep -c '^step' "$W/got.tsv" | tr -d ' ') gauge steps"
+# every leg's Dark Force span (+0x111), so the log shows each leg IN the mode — ours' by P+K (14z-170, run 54 Q4)
+awk -F'\t' '$1=="mode" {printf "  mode   %-6s %s: +0x111 %s\n", $2, $3, $4}' "$W/got.tsv"
 for s in $LEGS; do g="${s%:*}"; id="${s#*:}"
     printf '  %-6s %s: in-mode steps %s | out %s\n' "$g" "$id" \
         "$(awk -F'\t' -v g="$g" -v i="$id" '$1=="step" && $2==g && $3==i && $6=="in" {printf "%s@%s ", $5, $4}' "$W/got.tsv")" \
         "$(awk -F'\t' -v g="$g" -v i="$id" '$1=="step" && $2==g && $3==i && $6=="out" {printf "%s@%s ", $5, $4}' "$W/got.tsv")"
 done
 
+# THE FIX'S CLAIM (14z-170): no leg of ours gains gauge inside the mode — the shells' rule — and every leg of
+# ours still shows its out-of-mode swings (the liveness: a dead meter trace would read "no in-mode step" too)
+if no_mode_gauge "$W/got.tsv"; then ok "no leg of ours gains gauge in the mode, and all four gain it outside (the shells' rule, #157's DF tail fixed)"
+else bad "a leg of ours gains gauge in the mode, or a leg of ours shows no out-of-mode swing (dead trace)"; fi
+plant_swing "$W/got.tsv" "$W/ctl.tsv"
+if [ "$CONTROL" != swing-planted ]; then
+    if no_mode_gauge "$W/ctl.tsv"; then echo "CONTROL DEAD: swing-planted — a planted in-mode step passed the check"; fail=1
+    else echo "CONTROL FIRED: swing-planted — one planted in-mode step per tenant fails the no-in-mode-gauge check"; fi
+fi
+
 echo "== 3. the frozen rows"
 if [ "${FREEZE:-0}" = 1 ]; then
     {
         echo "# tests/expected/df_meter.tsv — the gauge in and out of Dark Force Change: the shells on vsavj, the tenants on ours (P+K) and"
         echo "# under their vs2 EX install on vsav2 (tests/audit_df_meter.sh; tests/lua/field_trace.lua). Evidence class: in-emulator."
-        echo "# Frozen 14z-168 with FREEZE=1 (GitHub #157's Dark Force tail). THE DEFECT IS FROZEN AS MEASURED: the shells gain nothing"
-        echo "# from a whiffed attack inside +0x111; our tenants gain +6 (their placed adder tests vs2's +0x1C3). A fix re-freezes this"
-        echo "# file DELIBERATELY, with its rule-checker run named in the commit."
+        echo "# Frozen with FREEZE=1: first 14z-168 (the defect as measured: our tenants gained +6 in the mode), re-frozen 14z-170 on"
+        echo "# the fix (GitHub #157's Dark Force tail): no leg of ours gains gauge inside +0x111; vs2's EX install still pays it."
         echo "# Columns: mode <leg> <id> <+0x111 span> | step <leg> <id> <frame> <P1 gauge delta> <in|out>"
         echo "#--"
         cat "$W/got.tsv"
@@ -156,13 +172,10 @@ grep -v '^#' "$EXPECT" > "$W/want.tsv"
 if diff "$W/want.tsv" "$W/got.tsv" > "$W/diff.txt"; then ok "every row as frozen"
 else bad "differs from the frozen rows"; sed 's/^/        /' "$W/diff.txt"; fi
 
-echo "== 4. must-fire control"
-if [ "$CONTROL" = suppressed ]; then
-    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: suppressed — the shells' rule applied to our tenants loses the frozen rows"; echo "FAIL: audit_df_meter (control mode)"; exit 1
-    else echo "CONTROL DEAD: suppressed — removing the tenants' in-mode steps changed nothing"; echo "FAIL: audit_df_meter"; exit 1; fi
+echo "== 4. must-fire control (the mode)"
+if [ "$CONTROL" = swing-planted ]; then
+    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: swing-planted — the planted in-mode steps fail the gate"; echo "FAIL: audit_df_meter (control mode)"; exit 1
+    else echo "CONTROL DEAD: swing-planted — the planted rows passed"; echo "FAIL: audit_df_meter"; exit 1; fi
 fi
-suppress "$W/got.tsv" "$W/ctl.tsv"
-if diff -q "$W/got.tsv" "$W/ctl.tsv" > /dev/null; then echo "CONTROL DEAD: suppressed — our tenants carry no in-mode step to remove"; fail=1
-else echo "CONTROL FIRED: suppressed — the shells' rule removes $(diff "$W/got.tsv" "$W/ctl.tsv" | grep -c '^<' | tr -d ' ') in-mode steps from our tenants"; fi
 
 if [ "$fail" = 0 ]; then echo "PASS: audit_df_meter"; else echo "FAIL: audit_df_meter"; exit 1; fi

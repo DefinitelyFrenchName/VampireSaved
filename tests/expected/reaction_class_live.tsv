@@ -1,5 +1,5 @@
 # tests/expected/reaction_class_live.tsv — every write and read of the victim's reaction class (+0x54, both fighter blocks)
-# over the corpus: vsavj = pristine vsavj, every tests/replays/*.rpl; ours = m3b_merged26, the 30 #136 naming parts; native = vsav2,
+# over the corpus: vsavj = pristine vsavj, every tests/replays/*.rpl; ours = m3b_merged27, the 30 #136 naming parts; native = vsav2,
 # the same parts (tests/audit_reaction_class_live.sh; tests/lua/read_tap.lua). Evidence class: in-emulator. Frozen 14z-169
 # with FREEZE=1. Columns: <leg> W <pc> <+0x54 value> <blocks> <runs> | <leg> R <pc> <blocks> <runs> <values seen>.
 # The ours rows follow the build: re-freeze at every freeze, reviewing the diff.
@@ -151,7 +151,7 @@ ours	W	01869a	03	P2	3
 ours	W	01869a	05	P2	3
 ours	W	01869a	4c	P2	1
 ours	W	0186b6	04	P2	1
-ours	W	0186d0	06	P2	4
+ours	W	0186d0	06	P2	1
 ours	W	0186e6	08	P2	2
 ours	W	0186f4	0a	P2	7
 ours	W	018718	0f	P2	3
@@ -163,33 +163,34 @@ ours	W	02609a	00	P1,P2	30
 ours	W	02732c	00	P1,P2	21
 ours	W	0cfc48	05	P2	2
 ours	W	0cfc48	11	P2	4
+ours	W	0fff50	38	P2	4
 ours	W	0fff5c	01	P2	3
 ours	W	41dbe4	00	P1	1
 ours	W	41f588	05	P2	2
 ours	W	41f588	11	P2	2
 ours	W	41f588	12	P2	5
-ours	W	4787f8	10	P2	2
-ours	W	4787f8	11	P2	3
+ours	W	478828	10	P2	2
+ours	W	478828	11	P2	3
 ours	R	000d32	P1,P2	30	00
 ours	R	000d36	P1,P2	30	00,ff
-ours	R	0188ce	P1,P2	30	00,01,02,03,04,05,06,0a,0f,10,11,12,14,16,25,44,4c,4f,ff
-ours	R	018988	P1,P2	30	00,01,02,03,04,05,06,08,0a,0f,10,11,12,14,16,25,44,4c,4f,ff
-ours	R	01899a	P1,P2	30	00,01,02,03,04,05,06,08,0a,0f,10,11,12,14,16,25,44,4c,4f,ff
-ours	R	0189f8	P1,P2	30	00,01,02,03,04,05,06,08,0a,0f,10,11,12,14,16,25,44,4c,4f,ff
-ours	R	018a2c	P1,P2	30	00,01,02,03,04,05,06,08,0a,0f,10,11,12,14,16,44,4c,4f,ff
-ours	R	018f04	P1,P2	30	00,01,02,03,04,05,06,08,0a,0f,14,16,25,44,4c,4f,ff
-ours	R	018f88	P1,P2	30	00,01,02,03,04,05,06,08,0a,0f,14,16,25,44,4c,4f,ff
-ours	R	019030	P1,P2	30	00,01,02,03,04,05,06,08,0a,0f,14,16,25,44,4c,4f,ff
-ours	R	02381e	P1,P2	26	00,01,03,05,06,0a,14,44,4f,ff
-ours	R	02383c	P1,P2	29	00,01,02,03,04,05,06,08,0a,0f,10,11,12,14,16,25,44,4c,4f,ff
-ours	R	02384e	P1,P2	29	00,01,02,03,04,05,06,08,0a,0f,10,11,12,14,16,25,44,4c,4f
+ours	R	0188ce	P1,P2	30	00,01,02,03,04,05,06,0a,0f,10,11,12,14,16,25,38,44,4c,4f,ff
+ours	R	018988	P1,P2	30	00,01,02,03,04,05,06,08,0a,0f,10,11,12,14,16,25,38,44,4c,4f,ff
+ours	R	01899a	P1,P2	30	00,01,02,03,04,05,06,08,0a,0f,10,11,12,14,16,25,38,44,4c,4f,ff
+ours	R	0189f8	P1,P2	30	00,01,02,03,04,05,06,08,0a,0f,10,11,12,14,16,25,38,44,4c,4f,ff
+ours	R	018a2c	P1,P2	30	00,01,02,03,04,05,06,08,0a,0f,10,11,12,14,16,38,44,4c,4f,ff
+ours	R	018f04	P1,P2	30	00,01,02,03,04,05,06,08,0a,0f,14,16,25,38,44,4c,4f,ff
+ours	R	018f88	P1,P2	30	00,01,02,03,04,05,06,08,0a,0f,14,16,25,38,44,4c,4f,ff
+ours	R	019030	P1,P2	30	00,01,02,03,04,05,06,08,0a,0f,14,16,25,38,44,4c,4f,ff
+ours	R	02381e	P1,P2	26	00,01,03,05,0a,14,38,44,4f,ff
+ours	R	02383c	P1,P2	29	00,01,02,03,04,05,06,08,0a,0f,10,11,12,14,16,25,38,44,4c,4f,ff
+ours	R	02384e	P1,P2	29	00,01,02,03,04,05,06,08,0a,0f,10,11,12,14,16,25,38,44,4c,4f
 ours	R	023926	P1,P2	26	00,01,02,4f
 ours	R	0239d4	P2	3	03
 ours	R	0239f0	P2	3	03
 ours	R	023a36	P2	8	04,05
 ours	R	023a4c	P2	8	04,05
 ours	R	023a66	P2	8	04,05
-ours	R	023afa	P2	4	06
+ours	R	023afa	P2	4	06,38
 ours	R	023b3a	P2	2	08
 ours	R	023b9a	P2	8	0a,44,4c
 ours	R	023ba2	P2	8	0a,44
@@ -210,7 +211,7 @@ ours	R	024440	P1,P2	29	00,01,02,03,0a,0f,10,11,16,44,4c,4f,ff
 ours	R	024448	P1,P2	29	00,01,02,03,0a,0f,10,11,16,44,4c,4f,ff
 ours	R	024450	P1,P2	29	00,01,02,03,0a,0f,10,11,16,44,4c,4f,ff
 ours	R	024458	P1,P2	29	00,01,02,03,0a,0f,10,11,16,44,4c,4f,ff
-ours	R	02449e	P2	4	06
+ours	R	02449e	P2	4	06,38
 ours	R	0245be	P2	8	04,05
 ours	R	0245c6	P2	8	04,05
 ours	R	0245ce	P2	8	04,05
@@ -230,13 +231,16 @@ ours	R	02732c	P1,P2	21	00
 ours	R	027d46	P2	19	03,05,0a,0f,10,11,44
 ours	R	0bf942	P2	1	00,01
 ours	R	0cfcea	P2	5	00
+ours	R	3ffbc4	P2	2	06,38
+ours	R	3ffc04	P2	2	06,38
+ours	R	3ffc14	P2	2	38
 ours	R	414c66	P2	1	4c
 ours	R	414df0	P2	1	0a,4c
 ours	R	4151f6	P2	1	01
 ours	R	41dbe4	P1	1	00
 ours	R	41f53e	P2	1	01
 ours	R	41f62a	P2	4	00,01
-ours	R	47889a	P2	3	00
+ours	R	4788ca	P2	3	00
 native	runs	30
 native	W	000d34	00	P1,P2	30
 native	W	000d34	ff	P1,P2	30

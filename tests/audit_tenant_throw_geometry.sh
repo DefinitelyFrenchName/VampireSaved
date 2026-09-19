@@ -102,7 +102,7 @@
 # would quadruple a ~12 min run to re-measure an axis already gated.
 #
 # 6 MAME runs, 2 at a time, ~12 min.
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged26] [VICTIM=03]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [VICTIM=03]
 #        tests/audit_tenant_throw_geometry.sh
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -122,7 +122,7 @@ if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 # DUMPS and the liveness check reported "held frames ours=0". First seen on
 # the M16 freeze sweep, the gate's first run under the runner.
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged26}"
+BUILD="${BUILD:-build/m3b_merged27}"
 VICTIM="${VICTIM:-03}"
 ATT="${ATT:-10}"            # Phobos/Huitzil as the thrower
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
@@ -220,10 +220,13 @@ def states(s):
 # extra_native) and is UNIFORM across every victim, so it is one shape per
 # throw. `dmg` names the only victims whose TOTAL damage differs, with the
 # exact (ours, native) pair — an OPEN finding, frozen so it cannot drift.
+# RE-FROZEN 14z-170 (the M19 freeze): the ±1 total-damage residue of victims 0x10 and 0x13 is GONE — it was
+# the defense-curve row the victim's id selects (root-caused 14z-145), and the ruled fix gave Phobos and
+# Donovan vs2's own rows. 0x0a (Sasquatch) stays: vanilla vsavj's own row differs from vs2's.
 FROZEN = {
- 'std': dict(tail=(1, 0), arc={64}, es=False, dmg={'10': (15, 14), '13': (14, 15)}),
- 'cs':  dict(tail=(0, 0), arc={278,284,287,288,290,291,295,296,298,306,311}, es=False, dmg={'0a': (19, 20), '10': (20, 19), '13': (19, 20)}),
- 'es':  dict(tail=(0, 1), arc={380,386,389,390,392,393,397,398,400,408,413}, es=True,  dmg={'10': (20, 19), '13': (19, 20)}),
+ 'std': dict(tail=(1, 0), arc={64}, es=False, dmg={}),
+ 'cs':  dict(tail=(0, 0), arc={278,284,287,288,290,291,295,296,298,306,311}, es=False, dmg={'0a': (19, 20)}),
+ 'es':  dict(tail=(0, 1), arc={380,386,389,390,392,393,397,398,400,408,413}, es=True,  dmg={}),
 }
 NAMES = {'std': 'standard throw 6+HP', 'cs': 'circuit scrapper 63214+MP',
          'es': 'ES circuit scrapper 63214+2P'}
@@ -273,7 +276,7 @@ for nm in ('std', 'cs', 'es'):
     if dmg_got != {k: tuple(v) for k, v in f['dmg'].items()}:
         print(f"  FAIL: total-damage residue moved: {dmg_got}, frozen {f['dmg']}"); bad += 1
     else:
-        print(f"  ok: total damage identical except the frozen residue {f['dmg']} (OPEN, see STATE)")
+        print(f"  ok: total damage identical except the frozen residue {f['dmg']} (Sasquatch's vanilla row; the tenants' residue fixed at M19)")
     # THE ARC — the check that refuted replay 80's "only the throw-arc HEIGHT
     # differs" claim. Kept when the gate widened; losing it would have quietly
     # dropped the one assertion that retired a nine-session-old suspicion.

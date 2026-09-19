@@ -1311,6 +1311,16 @@ move with it (docs/game/atlas/ram.md "Masked windows"). Atlas rows this
 section depends on: ram.md `$FF4182-$FF41A1`, `$FF41C2/$FF4222/$FF42A2`
 family row, and "The palette staging area".
 
+**The fade STEPPER's write (measured 14z-170, a non-debug write tap on palette row 11):** the
+routine that walks palette RAM toward a target one component step at a time writes with
+`move.w d2,(a1)+` at vsavj `PRG:0x01433C` (vs2 `PRG:0x0129B4`, the same code; a `-debug` watch
+reports the post-instruction `0x01433E` / `0x0129B6`). At the round start it rewrites row 11
+sixteen words a frame on every third frame from 2313 to 2355 (240 writes, both games), and not
+again up to frame 2870 on that rig (naming part donovan_4; `tests/audit_column_flash.sh` freezes
+every writer of the row over the run with its count — its `run` rows). Inside a move, a palette row is written by the SEQUENCE uploader below, which is
+where the 14z-170 misreading of the orange flash went wrong (`docs/platform/gotchas.md` [CPE-5],
+PAID AGAIN).
+
 ### The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink)
 
 A second, separate path writes `90C000` — not the fade buffer above, and
@@ -1326,7 +1336,11 @@ not the match-start palette load. **Read this before attributing any
   uniform +8 shift from row 0x1E up, so a ported script's seq ids must be
   remapped +8. The port already does this correctly (measured: ours asks
   0x26/0x39/0x3A where native asks 0x1E/0x31/0x32).
-- **Uploader** `PRG:0x02AD68` (row start) and `0x02AD7C` (row+0x10) copy
+- **Uploader**: the two `movem.l d0-d3,(a1)` at `PRG:0x02AD64` (row start) and
+  `0x02AD78` (row+0x10); vs2's twins are `0x02A0BA`/`0x02A0CE` (disassembly and a
+  non-debug write tap, 14z-170). A `-debug` watch reports the NEXT instructions,
+  `0x02AD68`/`0x02AD7C`, which is how this line first read (the post-instruction PC,
+  `docs/platform/gotchas.md`). They copy
   the resolved row into palette RAM, applying `0xF000` — a stored
   `0x0RGB` becomes a palette-RAM `0xFRGB`. Do not expect to find a
   palette-RAM value verbatim in the ROM; search for it with the top
@@ -1339,6 +1353,12 @@ not the match-start palette load. **Read this before attributing any
   `tests/audit_palette_seq_ids.sh`, and that audit is the ONLY guard on
   this path, because it never transits work RAM and so is invisible to
   every RAM gate.
+- **Port note — Donovan's Killshread Lightning column (14z-170, the orange flash,
+  GitHub #162):** inside the move's window, palette row 11 (`RAM:$90C160`) is written
+  ONLY by this uploader on both games: ours uploads it at frames 2807, 2813 and 2858,
+  native at 2813 only, and the 2858 upload is the fire ramp the maintainer saw. The
+  engine's fade staging copy also writes row 11, but only at the round-start fade
+  (non-debug write tap; `tests/audit_column_flash.sh`).
 
 **The Pyron instance (14z-75, FIXED) — a DEAD ROW.** His palette row 10
 alternated every frame between his own palette and seq row `0x26`; native
@@ -3189,7 +3209,8 @@ natively — the maintainer, on the every-frame capture: *"the move doesn't play
 exactly the same since the timing of freeze, shock, recovery,etc. are slightly
 different"*. **RULED 2026-09-18: the class takes vs2's 0x52 rule** (victim 0x18,
 attacker exempt) for the tenants' 0x52-origin hits, which also removes the Plasma
-Trap's attacker freeze (DECISIONS_HISTORY.md); not yet built. (Superseded: "Nothing
+Trap's attacker freeze (DECISIONS_HISTORY.md); **BUILT 14z-170, SHIPPED IN THE M19 FREEZE (merged-m19)** (the
+design as built is at the end of the stager paragraph below). (Superseded: "Nothing
 rules on it" — the text of this paragraph until 2026-09-18.) **For the fix's design
 (read 14z-168, static):** the 14z-42 thunks are two `jsr`s from vsavj's `0x06` handler
 `0x23AC8` itself (merged-m18: `0x023AD8`/`0x023ADE` → `0x3FFBB0`/`0x3FFBE0`); each
@@ -3251,8 +3272,9 @@ record of class 0x52 on a grounded victim — the `reaction_hook` (`donovan.toml
 `move.b #$52,$54(a1)`; merged-m18 `PRG:0x0FFF50`) and `index_window_018468` (its 0xA4 case,
 merged-m18 `PRG:0x4716DC` — both placed addresses, moving with a freeze) — while vsavj's
 REACTION table has no entry 0x52: so a class-0x52 record would reach the reaction dispatch with an out-of-range class. That
-is why the column's and the trap's records carry 0x06 (14z-33, 14z-85g(2)); no record on
-merged-m18 carries 0x50-0x53 (`tools/audit_fsm_census.py`: 0, signature-bounded) and no
+is why the column's and the trap's records carried 0x06 (14z-33, 14z-85g(2)); no record on
+merged-m18 carries 0x50-0x53 (`tools/audit_fsm_census.py`: 0, signature-bounded; on merged-m19
+the column's three and the trap's two carry native 0x52 again — the fix as built, below) and no
 corpus run executes either writer (`tests/audit_reaction_class_live.sh`). **Which tracks carry
 that machinery (read 14z-169 on the four images):** the `reaction_hook` jump at `0x018458`, the
 `es_type51_dispatch` call at `0x0185CA` and the 14z-42 shock thunks at `0x023AD8`/`0x023ADE` are
@@ -3265,6 +3287,21 @@ within 32 KB of its table, inside the encrypted base program, so a new handler c
 from placed code by a table edit alone. What these facts leave for the fix's design, and the cost against
 the maintainer's combined budget (no new frame of lag at any time), is not measured
 here.
+**The fix as built (14z-170, the M19 freeze; scope S1, DECISIONS_HISTORY.md):** the column's three
+and — on the merged build only, by the `unless_composed` row key — the trap's two records keep
+NATIVE class 0x52; `donovan.toml`'s `reaction_hook` case 0xA4 (a grounded victim) writes the
+MARKER 0x38 into `+0x54` instead of 0x52, so the reaction dispatch sends it to `0x23AC8` exactly as
+0x06; the 14z-42 thunks test it — the victim's inside the Donovan branch (0x38 falls to the default
+0x18, vs2's value), the attacker's on both branches (0x38 skips the write: vs2's `cmpi.b
+#$52,$54(a6); beq`, with the same flags); the air stager's 0xA4 case already writes 7 and
+`es_type51_dispatch` now routes 0x52 on the KO branch to `0x0186E0` (8), as vs2's KO[0x52] =
+KO[0x06]. Measured on the merged build (STATE 14z-170): the column's whole timeline equals native
+(victim 24, no attacker freeze, recovery gap 26), a column KO takes class 8 identically on native,
+the fix and merged-m18, the trap's attacker freeze is gone; the legacy path pays nothing on the
+victim thunk and one `cmpi`+untaken `beq` (~24 cycles) on the attacker thunk per grounded
+electric hit (the legacy suite lands none, `tests/audit_reaction_class_live.sh`); no new zero-pass
+frame over the #136 corpus (`tests/audit_pass_overrun.sh`). Not measured: a column hit on an
+airborne victim (the air stager's case).
 
 **Multi-hit accounting — THE RE-HIT RULE, MEASURED (14z-146,
 `tests/test_rehit_ring.sh`; atlas rows `+0x6C`, `+0x70`, `+0x08`):** the hit
@@ -3295,7 +3332,10 @@ rigs. The combo counter (`+0x144`, victim) is incremented by the REACTION
 handlers (vs2 beam reaction `0x56002`: +3/tick), not by the appliers.
 
 **Port note (defense side; recorded 2026-08-14 as "DECIDED (maintainer)" to keep — the words
-not kept — and RULED 2026-09-18 to take vs2's rows, the words in DECISIONS_HISTORY.md; not yet built):** tenant ids sit on vanilla vsavj defense-table rows —
+not kept — and RULED 2026-09-18 to take vs2's rows, the words in DECISIONS_HISTORY.md; **BUILT 14z-170, SHIPPED
+IN THE M19 FREEZE (merged-m19)**: four `[[data_port]]` rows, the curve row and the threshold word per tenant,
+data only — the reads below index the victim's own id — and the fixed build answers vs2's bytes,
+`tests/audit_defense_row_residue.sh`):** tenant ids sit on vanilla vsavj defense-table rows —
 row 0x10's curve and low-HP threshold (vsavj 0x38 vs vs2 0x28 for Huitzil) are
 vanilla values, NOT the characters' native vs2 tuning. **They are the SHELLS' rows**
 (measured 14z-168, `tests/test_defense_rows_census.sh`): vsavj fills every variant id
@@ -4066,7 +4106,15 @@ Ray of Doom, Shining Gemini) active for the whole mode.
   (in each tenant's `x026142` region) runs, period 5, 478 / 496 / 478 frames of
   `+0x111`, the same `+0x147` arms as P+K, and it raises `$FF802E` and the Dark
   Force background (451 / 469 / 451 frames). A second, longer route into the
-  mode for the same one stock — **ruled 2026-09-18: disable it** (a fix ticket).
+  mode for the same one stock — **ruled 2026-09-18: disable it**; **DISABLED 14z-170 (the M19
+  freeze):** at each tenant's EX site (vs2 Donovan `0x059D24`, Phobos `0x055538`, Pyron `0x057CC8`:
+  `tst.b $111; bne.w <fall>; moveq #N,d1; jsr 0x028534; beq.w <fall>; …; jmp 0x02622A`) the `bne.w`
+  becomes `bra.w`, so the EX check `0x028534` — which refuses with no stock BEFORE it reads the
+  input — is never called and the input falls through to the sub-pattern checks at every stock
+  level; `d0`/`d1` and the flags it leaves different are rewritten by the first motion tracker
+  (`0x0292A4`) before any read. Measured (`tests/audit_ex_refused.sh`): Phobos and Donovan at stock 3
+  take vs2's stock-0 path exactly; Pyron's input reads 623+PP, his ES move when a stock is
+  available (ruled 2026-09-19, "Natural reading").
 
 **The altered attacks match native IN HITS, DAMAGE AND HIT FRAMES, on the right baseline** [M: `tests/audit_df_moves.sh`,
 14z-168; how they LOOK is not established]: every in-DF event of the #136 schedules (29), re-run inside a mode entered on both legs
@@ -4105,18 +4153,25 @@ adder (the test at vs2 `0x28D6C`, offset `0xC4A` of each tenant's `x028122` copy
 throughout ours' Change; frozen since 14z-169 as the `pow` column of
 `tests/audit_df_modes.sh` — 388 frames on every vs2 P+K leg, 297 for Morrigan and
 Lilith, none on every Change leg of either game and on the tenants' vs2 EX). The maintainer: *"it makes sense that you can't build
-meter during DF"* — a defect, GitHub #157's Dark Force tail. The same class
+meter during DF"* — a defect, GitHub #157's Dark Force tail; **FIXED 14z-170 (the M19 freeze):**
+the three `x028122` copies' test reads `+0x111` (vsavj's), and in the mode the tenants gain nothing,
+as the shells (`tests/audit_df_meter.sh`). The same class
 covers every placed READ of a vs2 Power field. The census
 (`tests/test_df_field_readers.sh`) lists 44 placed instructions naming one on
 merged-m18: 26 reads, all of `+0x1C3` (the three `x028122` adder copies among
-them), and 18 writes — the placed copies of vs2's Power activation body
+them), and 18 writes — 41 on merged-m19, the three adder reads gone with the gauge fix — — the placed copies of vs2's Power activation body
 (`x026142`) and three a4-based `movep` rows (`x05c800`) that nothing shows to
 address a fighter block. The #136 corpus executes 7 of the reads and every
 access it makes from placed code is a census row
 (`tests/audit_df_field_readers_live.sh`); one read is measured to change play.
 **What the other 23 reads gate, and why only the gauge plays differently (14z-169):**
-3 are the Change entry's own "not during Power" test (vs2 `0x2617A`, in each tenant's
-`x026142` copy — the route the maintainer ruled disabled); 2 are Phobos's powered
+3 are the POWER activation's own "already in Power" test (vs2 `0x2617A`, in each tenant's
+`x026142` copy: vs2's `0x026166` sets `+0x1C3` and costs two stocks; vs2 reaches it only by the
+two `bsr.w` at `0x020D8E`/`0x020DD2` (caller scan, absolute and pc-relative); on merged-m18 no absolute long and no pc-relative branch in the
+whole image targets any of the three placed copies — read 14z-170, a computed jump not covered;
+~~"the Change entry's own 'not during Power' test … the route the maintainer ruled disabled"~~
+MISLABELLED 14z-169, corrected 14z-170: the tenants' EX route jumps to the Change entry
+`0x02622A` from each tenant's EX site, gated by `0x028534`, and never passes `0x2617A`); 2 are Phobos's powered
 specials (vs2 `0x551D0`/`0x5540C`: `+0x106` = 0x1A instead of 0x0A under Power); 18 are a
 per-move Power LATCH, `move.b $1c3(a6),$19c(a6)` at a special's start in vs2's shared
 special-move routines (vs2 `0x5799A`...`0x5B594`, placed once per tenant), tested later by

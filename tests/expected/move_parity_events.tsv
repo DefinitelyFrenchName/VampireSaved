@@ -97,28 +97,28 @@ donovan_3	12	walk-in	IDENT	-	-	120	after:6	1
 donovan_3	13	Foot Stab (ES) [8KK]	IDENT	-	-	260	after:6	0
 donovan_3	14	Slay Shred [MP+MK]	DIFF	+0	cnt,node,seq,stock,sub	751	after:6	2
 donovan_4	0	Killshread [MK]	IDENT	-	-	200	-	0
-donovan_4	1	Killshread Lightning [MP]	DIFF	+40	cnt,node	240	-	1
-donovan_4	2	Killshread Summon [LK] (2)	IDENT	-	-	220	after:1	0
-donovan_4	3	Killshread [LK] (2)	IDENT	-	-	200	after:1	1
-donovan_4	4	Killshread Lightning [HP]	IDENT	-	-	240	after:1	0
-donovan_4	5	Killshread Summon [HK]	IDENT	-	-	220	after:1	1
-donovan_4	6	Killshread [HK] (2)	IDENT	-	-	200	after:1	0
-donovan_4	7	Killshread Summon [j.214LK]	IDENT	-	-	220	after:1	1
-donovan_4	8	Killshread Summon [MK]	IDENT	-	-	220	after:1	1
-donovan_4	9	walk-in	IDENT	-	-	240	after:1	0
-donovan_4	10	Sword Grapple [MP] (sword in hand)	IDENT	-	-	260	after:1	1
-donovan_4	11	walk-in	IDENT	-	-	140	after:1	0
-donovan_4	12	Sword Grapple [HP] (sword in hand)	IDENT	-	-	260	after:1	2
-donovan_4	13	walk-in	IDENT	-	-	140	after:1	0
-donovan_4	14	Foot Stab [8P] off throw	DIFF	+47	meter	320	after:1	1
-donovan_4	15	walk-in	IDENT	-	-	180	after:1	0
-donovan_4	16	Foot Stab [8K] off throw	DIFF	+47	meter	320	after:1	1
-donovan_4	17	walk-in	IDENT	-	-	180	after:1	1
-donovan_4	18	Foot Stab (ES) [8PP] off throw	DIFF	+47	meter	320	after:1	0
-donovan_4	19	walk-in	IDENT	-	-	180	after:1	1
-donovan_4	20	Foot Stab (ES) [8KK] off throw	DIFF	+47	meter	320	after:1	1
-donovan_4	21	Slay Shred [LP+LK]	DIFF	+0	cnt,node,seq,stock,sub	400	after:1	1
-donovan_4	22	5LP in DF	NOT-IN-DF	-	df native 0/451 ours 0/451	451	after:1	0
+donovan_4	1	Killshread Lightning [MP]	IDENT	-	-	240	-	1
+donovan_4	2	Killshread Summon [LK] (2)	IDENT	-	-	220	-	0
+donovan_4	3	Killshread [LK] (2)	IDENT	-	-	200	-	1
+donovan_4	4	Killshread Lightning [HP]	IDENT	-	-	240	-	0
+donovan_4	5	Killshread Summon [HK]	IDENT	-	-	220	-	1
+donovan_4	6	Killshread [HK] (2)	IDENT	-	-	200	-	0
+donovan_4	7	Killshread Summon [j.214LK]	IDENT	-	-	220	-	1
+donovan_4	8	Killshread Summon [MK]	IDENT	-	-	220	-	1
+donovan_4	9	walk-in	IDENT	-	-	240	-	0
+donovan_4	10	Sword Grapple [MP] (sword in hand)	IDENT	-	-	260	-	1
+donovan_4	11	walk-in	IDENT	-	-	140	-	0
+donovan_4	12	Sword Grapple [HP] (sword in hand)	IDENT	-	-	260	-	2
+donovan_4	13	walk-in	IDENT	-	-	140	-	0
+donovan_4	14	Foot Stab [8P] off throw	DIFF	+47	meter	320	-	1
+donovan_4	15	walk-in	IDENT	-	-	180	after:14	0
+donovan_4	16	Foot Stab [8K] off throw	DIFF	+47	meter	320	after:14	1
+donovan_4	17	walk-in	IDENT	-	-	180	after:14	1
+donovan_4	18	Foot Stab (ES) [8PP] off throw	DIFF	+47	meter	320	after:14	0
+donovan_4	19	walk-in	IDENT	-	-	180	after:14	1
+donovan_4	20	Foot Stab (ES) [8KK] off throw	DIFF	+47	meter	320	after:14	1
+donovan_4	21	Slay Shred [LP+LK]	DIFF	+0	cnt,node,seq,stock,sub	400	after:14	1
+donovan_4	22	5LP in DF	NOT-IN-DF	-	df native 0/451 ours 0/451	451	after:14	0
 donovan_5	0	walk-in	IDENT	-	-	240	-	0
 donovan_5	1	Sword Grapple [MP]	DIFF	+78	meter	260	-	1
 donovan_5	2	walk-in	IDENT	-	-	140	after:1	0
@@ -141,7 +141,7 @@ donovan_6	0	U+LP neutral	IDENT	-	-	150	-	0
 donovan_6	1	U+LK neutral	IDENT	-	-	150	-	0
 donovan_6	2	Slay Shred [LP+LK]	DIFF	+0	cnt,node,seq,stock,sub	120	-	1
 donovan_6	3	5LP in DF	DIFF	+0	cnt,node	120	after:2	0
-donovan_6	4	5MP in DF	DIFF	+0	cnt,meter,node	120	after:2	0
+donovan_6	4	5MP in DF	DIFF	+0	cnt,node	120	after:2	0
 donovan_6	5	5HP in DF	NOT-IN-DF	-	df native 28/150 ours 29/150	150	after:2	0
 donovan_6	6	5LK in DF	NOT-IN-DF	-	df native 0/120 ours 0/120	120	after:2	0
 donovan_6	7	5MK in DF	NOT-IN-DF	-	df native 0/120 ours 0/120	120	after:2	0
@@ -338,10 +338,10 @@ huitzil_2	13	Genocide Vulcan [HK]	IDENT	-	-	220	-	1
 huitzil_2	14	Genocide Vulcan [LK] slow	IDENT	-	-	220	-	3
 huitzil_2	15	Genocide Vulcan [LK] end-D	IDENT	-	-	220	-	0
 huitzil_2	16	Genocide Vulcan [LK] near	IDENT	-	-	420	-	2
-huitzil_2	17	Plasma Trap [j.214LK]	DIFF	+93	cnt	220	-	2
-huitzil_2	18	Plasma Trap [j.214MK]	DIFF	+100	cnt	220	after:17	2
-huitzil_2	19	Plasma Trap [j.214HK]	IDENT	-	-	220	after:17	1
-huitzil_2	20	Plasma Trap [j.214HK] late	IDENT	-	-	471	after:17	1
+huitzil_2	17	Plasma Trap [j.214LK]	IDENT	-	-	220	-	2
+huitzil_2	18	Plasma Trap [j.214MK]	IDENT	-	-	220	-	2
+huitzil_2	19	Plasma Trap [j.214HK]	IDENT	-	-	220	-	1
+huitzil_2	20	Plasma Trap [j.214HK] late	IDENT	-	-	471	-	1
 huitzil_3	0	Magnet Slam [6MP]	DIFF	+0	cnt,meter,node,seq,sub,x	420	-	2
 huitzil_3	1	Magnet Slam [6HP]	DIFF	+90	meter	420	after:0	2
 huitzil_3	2	Magnet Slam [4MP]	DIFF	+73	meter	420	after:0	2
@@ -422,11 +422,11 @@ huitzil_8	6	Circuit Scrapper [63214MP] no-pin walk	IDENT	-	-	300	after:5	2
 huitzil_8	7	Reflect Wall [gc MP] (meter)	IDENT	-	-	420	after:5	2
 huitzil_8	8	Reflect Wall [gc HP] (meter)	IDENT	-	-	671	after:5	1
 huitzil_9	0	Plasma Trap [j.214LK] early	IDENT	-	-	260	-	1
-huitzil_9	1	Plasma Trap [j.214LK] late	DIFF	+106	cnt	260	-	2
-huitzil_9	2	Plasma Trap [j.214MK] early	DIFF	+112	cnt,node	260	after:1	2
-huitzil_9	3	Plasma Trap [j.214MK] late	DIFF	+112	cnt,node	260	after:1	1
-huitzil_9	4	Plasma Trap [j.214HK] early	IDENT	-	-	260	after:1	2
-huitzil_9	5	Plasma Trap [j.214HK] late	IDENT	-	-	511	after:1	1
+huitzil_9	1	Plasma Trap [j.214LK] late	IDENT	-	-	260	-	2
+huitzil_9	2	Plasma Trap [j.214MK] early	IDENT	-	-	260	-	2
+huitzil_9	3	Plasma Trap [j.214MK] late	IDENT	-	-	260	-	1
+huitzil_9	4	Plasma Trap [j.214HK] early	IDENT	-	-	260	-	2
+huitzil_9	5	Plasma Trap [j.214HK] late	IDENT	-	-	511	-	1
 huitzil_10	0	j.LP [9]	IDENT	-	-	150	-	1
 huitzil_10	1	j.MP [9]	IDENT	-	-	150	-	1
 huitzil_10	2	j.HP [9]	IDENT	-	-	150	-	2

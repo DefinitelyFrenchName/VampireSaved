@@ -44,14 +44,14 @@
 # P1/P2, the executed accesses touched), `host <R|W> <pc> <blocks> <n runs>`, and
 # `unsampled <n>`. Re-freeze at every freeze (placed addresses move), reviewing the diff.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged26] [JOBS=6] [FREEZE=1] tests/audit_df_field_readers_live.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [JOBS=6] [FREEZE=1] tests/audit_df_field_readers_live.sh
 #   emulator tier, MAME; 30 tap runs — measured 14z-168 on this MacBook, solo, JOBS=6: ~50 s wall
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged26}"
+BUILD="${BUILD:-build/m3b_merged27}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/df_field_readers_live.tsv"
 JOBS="${JOBS:-6}"
@@ -199,14 +199,20 @@ if [ "$CONTROL" = missed-planted ]; then
     if [ -s "$W/xcheck.err" ]; then bad "(control) the planted census:"; sed 's/^/        /' "$W/xcheck.err"; fi
 fi
 sed 's/^/  /' "$W/got.tsv"
-awk -F'\t' '$1=="sampled" && $5 ~ /^x028122/' "$W/got.tsv" | grep -q . || bad "the measured reader (the x028122 meter adder copy) was never sampled — the corpus or the tap is blind"
+# THE TAP IS NOT BLIND (reworked 14z-170): until the M19 freeze this required the x028122 meter-adder copy
+# sampled reading +0x1C3 — and the ruled gauge fix moved exactly that operand to +0x111 (vsavj's adder's
+# field). Liveness is now: the corpus samples +0x1C3 reads from placed code at all (the per-move Power latch,
+# vs2's `move.b $1c3(a6),$19c(a6)`, and Phobos's powered specials remain); and the FIX is asserted — no
+# x028122 copy is sampled reading +0x1C3 (on merged-m18 all three were: the failing direction).
+awk -F'\t' '$1=="sampled" && $2=="read" && $3=="+0x1c3"' "$W/got.tsv" | grep -q . || bad "no +0x1C3 read from placed code was sampled — the corpus or the tap is blind"
+awk -F'\t' '$1=="sampled" && $3=="+0x1c3" && $5 ~ /^x028122/' "$W/got.tsv" | grep -q . && bad "an x028122 meter-adder copy is sampled reading +0x1C3 — the M19 gauge fix (the adder tests +0x111, as vsavj's) is not in this build"
 
 echo "== 4. the frozen rows"
 if [ "${FREEZE:-0}" = 1 ]; then
     [ "$fail" = 0 ] || { echo "FAIL: audit_df_field_readers_live (not frozen: fix the red first)"; exit 1; }
     { echo "# tests/expected/df_field_readers_live.tsv — the census rows of tools/audit_df_field_readers.py that the #136 corpus executes on"
-      echo "# our build (merged-m18), with vsavj's own accesses to the same bytes (tests/audit_df_field_readers_live.sh; tests/lua/read_tap.lua)."
-      echo "# Evidence class: in-emulator. Frozen 14z-168 with FREEZE=1 on $(basename "$BUILD"). Re-freeze at every freeze, reviewing the diff."
+      echo "# our build ($(basename "$BUILD")), with vsavj's own accesses to the same bytes (tests/audit_df_field_readers_live.sh; tests/lua/read_tap.lua)."
+      echo "# Evidence class: in-emulator. First frozen 14z-168; this freeze with FREEZE=1 on $(basename "$BUILD"). Re-freeze at every freeze, reviewing the diff."
       echo "#--"; cat "$W/got.tsv"; } > "$EXPECT"
     echo "  FROZE  $(basename "$EXPECT") ($(wc -l < "$W/got.tsv" | tr -d ' ') rows) — VERIFY by re-running without FREEZE"; exit 0
 fi

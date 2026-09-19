@@ -99,13 +99,13 @@ FIRST_EVENT = 2600
 # moves are the events) and their P2 is the tenant, so they keep replay 17's
 # routes and pokes unchanged.
 # The chains are decoded from each tenant's vs2 extract (the solo build dir).
-TENANTS = {"donovan": {"id": None, "p2_id": "01", "p2_path": ("R",), "build": "build/don_m22"},
+TENANTS = {"donovan": {"id": None, "p2_id": "01", "p2_path": ("R",), "build": "build/don_m23"},
            # PHASE 3 (reactions): the tenant on the VICTIM side (P2) — P1 is Victor (0x03), both by the early-window pokes
-           "donovan_victim": {"id": "03", "id_p2": "13", "build": "build/don_m22"},
-           "huitzil_victim": {"id": "03", "id_p2": "10", "build": "build/hui56"},
-           "pyron_victim":   {"id": "03", "id_p2": "11", "build": "build/pyron41"},
-           "huitzil": {"id": "10", "path": ("L", "L", "L"), "p2_id": "01", "p2_path": ("R",), "build": "build/hui56"},
-           "pyron":   {"id": "11", "path": ("R", "R", "R"), "p2_id": "01", "p2_path": ("R",), "build": "build/pyron41"}}
+           "donovan_victim": {"id": "03", "id_p2": "13", "build": "build/don_m23"},
+           "huitzil_victim": {"id": "03", "id_p2": "10", "build": "build/hui57"},
+           "pyron_victim":   {"id": "03", "id_p2": "11", "build": "build/pyron42"},
+           "huitzil": {"id": "10", "path": ("L", "L", "L"), "p2_id": "01", "p2_path": ("R",), "build": "build/hui57"},
+           "pyron":   {"id": "11", "path": ("R", "R", "R"), "p2_id": "01", "p2_path": ("R",), "build": "build/pyron42"}}
 P2_NEVER  = ("b:0x71", "b:0x74")   # Demitri's two ATTACK-record chains whose data differs between vsavj and vs2 (tests/expected/same_data_p2.tsv row 0x01): if P2 entered one his compared HP would differ by his own data, so the rigs assert he never does (measured: never entered)
 P2_REPORT = ("b:0x10",)            # his held-pose PUSH-BOX chain, the third differing one — every legacy character gained it on vs2. He DOES enter it (a pose, not an attack), so it is not a never; the gate reports his frame count and asserts it EQUAL on both legs, so the datum difference is a bounded positional confound (a candidate for the x-DIFF rows) rather than a divergence in what he does (rule-checker run 2026-09-17-29 Q4)
 # P2 HP re-pin (both words, [VSP-125]) so a projectile-fed P2 never dies.

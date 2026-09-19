@@ -17,6 +17,17 @@
 --                    m_readimm16 = AS_OPCODES. A plain wpset on such a
 --                    table is SILENTLY BLIND and reports zero hits, which
 --                    reads as "this table is never used" (14z-71).
+--   env REGS_EXTRA   opt-in "D5,..." — extra registers appended to each hit line (14z-170;
+--                    unset = the line format every existing caller parses, unchanged)
+--   env WATCH (several) opt-in since 14z-170: specs separated by ";" — one watchpoint each
+--   env WATCH_FROM   opt-in "<frame>" (14z-170): arm the watchpoints at that frame, not at load
+--                    (an `ARMED <frame>` line marks it) — past the boot sweep
+--   env SAMPLE       opt-in "hexaddr,declen" (14z-170): log `S <frame> <hex>` whenever those bytes
+--                    change — a run's OWN liveness trace. EVERY DEBUGGER STOP ADVANCES THE FRAME
+--                    COUNTER ([CPE-5]): a "never read" is sound only from a run with no stop before
+--                    its question, checked by its SAMPLE trajectory against a non-debug run's
+--                    (tests/audit_x2b7ef4_reach_m18.sh). Frame 1 always logs the debugger's own
+--                    initial break.
 --   env TRACE_OUT    log path (default trace_writes.txt)
 --   env FRAMES       stop after this many frames (default 3600)
 --   env DUMPS        "frame:lo-hi;..." (replay.lua grammar) — RAM dumps
@@ -33,6 +44,14 @@
 -- instruction trace.
 
 local watch = assert(os.getenv("WATCH"), "set WATCH=start,len")
+-- REGS_EXTRA (14z-170, opt-in): "D5,D2" appends those registers to every hit line, AFTER the
+-- fixed fields, so an unset REGS_EXTRA writes exactly the old line (every existing user unaffected).
+-- Added for the rally-threshold read, which indexes with D5 (audit_defense_row_residue.sh).
+local regs_extra = {}
+for r in (os.getenv("REGS_EXTRA") or ""):gmatch("[^,]+") do
+    assert(r:match("^[DA][0-7]$"), "REGS_EXTRA entries are D0-D7 / A0-A7, got " .. r)
+    regs_extra[#regs_extra + 1] = r
+end
 local out_path = os.getenv("TRACE_OUT") or "trace_writes.txt"
 local max_frames = tonumber(os.getenv("FRAMES") or "") or 3600
 
@@ -103,20 +122,39 @@ end
 -- never touched". That is a false negative that looks exactly like a
 -- finding; it nearly shipped one. Callers that passed decimal lengths are
 -- unaffected: MAME was already reading them as hex.
-local start_addr, len, mode, space = watch:match("^(%x+),(%x+),?(%a*),?(%a*)$")
-assert(start_addr, "WATCH format: hexaddr,hexlen[,r|w|rw][,p|d|o]")
-if mode == "" then mode = "w" end
-if space == "" then space = "p" end
+-- SEVERAL RANGES, AND A LATE ARMING FRAME (14z-170, both opt-in; unset = exactly as before).
+-- WATCH may hold several specs separated by ";" — one watchpoint each — so a watch can cover
+-- scattered sites WITHOUT the hot records between them. WATCH_FROM=<frame> arms them at that
+-- frame instead of at load. Both exist because every debugger STOP advances this script's
+-- frame counter ([CPE-5], docs/platform/gotchas.md "Debugger stops DESYNC replay frame
+-- counting"): a watch that stops on the boot sweep or on hot records shifts every later input,
+-- so a "never read" answer is sound only from a run with NO stops before its question — the
+-- 14z-170 reachability re-measurement (tests/audit_x2b7ef4_reach_m18.sh).
 local WPCMD = { p = "wpset", d = "wpdset", o = "wposet" }
-assert(WPCMD[space], "WATCH space must be p (program), d (data) or o (opcodes)")
-
--- register the watchpoint (or breakpoint, mode "b") on the maincpu
-debugger:command(string.format("focus 0"))
-if mode == "b" then
-    debugger:command(string.format("bpset %s", start_addr))
-else
-    debugger:command(string.format("%s %s,%s,%s", WPCMD[space], start_addr, len, mode))
+local cmds = {}
+for one in watch:gmatch("[^;]+") do
+    local start_addr, len, mode, space = one:match("^(%x+),(%x+),?(%a*),?(%a*)$")
+    assert(start_addr, "WATCH format: hexaddr,hexlen[,r|w|rw][,p|d|o] (several separated by ;)")
+    if mode == "" then mode = "w" end
+    if space == "" then space = "p" end
+    assert(WPCMD[space], "WATCH space must be p (program), d (data) or o (opcodes)")
+    if mode == "b" then cmds[#cmds + 1] = string.format("bpset %s", start_addr)
+    else cmds[#cmds + 1] = string.format("%s %s,%s,%s", WPCMD[space], start_addr, len, mode) end
 end
+local watch_from = tonumber(os.getenv("WATCH_FROM") or "")
+-- SAMPLE (14z-170, opt-in): "hexaddr,declen" — log `S <frame> <hex>` whenever those bytes change
+-- (read at frame_done). A -debug run is its OWN timeline (the 14z-98 note above), so a run's
+-- liveness is judged from its own samples — e.g. P1's anim-node pointer, compared as a SET with
+-- a non-debug run's — never by frame-aligning it to another run.
+local sample_a, sample_n = (os.getenv("SAMPLE") or ""):match("^(%x+),(%d+)$")
+sample_a, sample_n = tonumber(sample_a or "", 16), tonumber(sample_n or "")
+local sample_prev = nil
+local function arm()
+    -- register the watchpoints (or breakpoints, mode "b") on the maincpu
+    debugger:command(string.format("focus 0"))
+    for _, c in ipairs(cmds) do debugger:command(c) end
+end
+if not watch_from then arm() end
 
 -- POKES (14z-68): same grammar/application point as replay.lua, so the
 -- forced-pick rigs can be traced.
@@ -139,6 +177,13 @@ end
 local pressed = {}
 emu.register_frame_done(function()
     frame = frame + 1
+    if watch_from and frame == watch_from then arm(); f:write(string.format("ARMED %d\n", frame)) end
+    if sample_a then
+        local hx = {}
+        for a = sample_a, sample_a + sample_n - 1 do hx[#hx + 1] = string.format("%02x", poke_space:read_u8(a)) end
+        local v = table.concat(hx)
+        if v ~= sample_prev then f:write(string.format("S %d %s\n", frame, v)); sample_prev = v end
+    end
     for _, pk in ipairs(pokes) do
         if pk[1] == frame then
             local a = pk[2]
@@ -179,11 +224,13 @@ end)
 emu.register_periodic(function()
     if debugger.execution_state == "stop" then
         local st = cpu.state
+        local extra = ""
+        for _, r in ipairs(regs_extra) do extra = extra .. string.format(" %s %08x", r, st[r].value) end
         f:write(string.format(
-            "frame %d PC %06x D0 %08x D1 %08x A0 %08x A1 %08x A2 %08x A3 %08x A4 %08x A6 %08x\n",
+            "frame %d PC %06x D0 %08x D1 %08x A0 %08x A1 %08x A2 %08x A3 %08x A4 %08x A6 %08x%s\n",
             frame, st["CURPC"].value, st["D0"].value, st["D1"].value,
             st["A0"].value, st["A1"].value, st["A2"].value, st["A3"].value,
-            st["A4"].value, st["A6"].value))
+            st["A4"].value, st["A6"].value, extra))
         hits = hits + 1
         debugger.execution_state = "run"
     end

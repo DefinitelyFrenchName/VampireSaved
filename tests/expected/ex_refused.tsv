@@ -1,16 +1,16 @@
-# tests/expected/ex_refused.tsv — the tenants' vs2 EX input with the stock at 0 (refused) and 3 (entered), native vsav2 and
-# m3b_merged26 (tests/audit_ex_refused.sh; field_trace). Evidence class: in-emulator. Frozen 14z-169 with FREEZE=1.
+# tests/expected/ex_refused.tsv — the tenants' vs2 EX input with the stock at 0 (refused) and 3 (stocked), native vsav2 and
+# m3b_merged27 (tests/audit_ex_refused.sh; field_trace). Evidence class: in-emulator. Frozen with FREEZE=1 (first 14z-169; the EX-route fix 14z-170).
 # path = P1's (seq/sub) at each change over 3255-3400, as frame offsets from the input at 3260.
 #--
-ours	10	entered	stock=3	entered=yes	stock_after=2	path=-5:00/02 0:02/00 1:02/02 3:02/04 4:04/02 7:00/02 8:14/02 10:12/02 56:12/04 73:18/00 74:18/02
 ours	10	refused	stock=0	entered=no	stock_after=0	path=-5:00/02 0:02/00 1:02/02 3:02/04 4:04/02 7:00/02 8:14/02 11:14/04 37:00/00 38:00/02
-ours	11	entered	stock=3	entered=yes	stock_after=2	path=-5:00/02 0:02/00 1:02/02 3:02/04 4:04/02 7:00/02 8:02/00 9:02/02 11:02/06 12:02/00 13:02/02 14:12/02 48:00/00 49:00/02
+ours	10	stocked	stock=3	entered=no	stock_after=3	path=-5:00/02 0:02/00 1:02/02 3:02/04 4:04/02 7:00/02 8:14/02 11:14/04 37:00/00 38:00/02
 ours	11	refused	stock=0	entered=no	stock_after=0	path=-5:00/02 0:02/00 1:02/02 3:02/04 4:04/02 7:00/02 8:02/00 9:02/02 11:02/06 12:02/00 13:02/02 14:0e/02 17:0e/04 22:0e/06 34:00/00 35:00/02
-ours	13	entered	stock=3	entered=yes	stock_after=2	path=-5:00/02 0:04/02 3:00/02 4:02/00 5:02/02 7:02/04 8:02/00 9:02/02 10:12/02 61:00/00 62:00/02
+ours	11	stocked	stock=3	entered=no	stock_after=2	path=-5:00/02 0:02/00 1:02/02 3:02/04 4:04/02 7:00/02 8:02/00 9:02/02 11:02/06 12:02/00 13:02/02 14:10/02 19:10/04 86:10/06 98:00/00 99:08/00 110:00/02
 ours	13	refused	stock=0	entered=no	stock_after=0	path=-5:00/02 0:04/02 3:00/02 4:02/00 5:02/02 7:02/04 8:02/00 9:02/02 10:0a/04 23:00/04 24:02/06 31:00/00 32:00/02
-vsav2	10	entered	stock=3	entered=yes	stock_after=2	path=-5:00/02 0:02/00 1:02/02 3:02/04 4:04/02 7:00/02 8:14/02 10:12/02 56:12/04 73:18/00 74:18/02
+ours	13	stocked	stock=3	entered=no	stock_after=3	path=-5:00/02 0:04/02 3:00/02 4:02/00 5:02/02 7:02/04 8:02/00 9:02/02 10:0a/04 23:00/04 24:02/06 31:00/00 32:00/02
 vsav2	10	refused	stock=0	entered=no	stock_after=0	path=-5:00/02 0:02/00 1:02/02 3:02/04 4:04/02 7:00/02 8:14/02 11:14/04 37:00/00 38:00/02
-vsav2	11	entered	stock=3	entered=yes	stock_after=2	path=-5:00/02 0:02/00 1:02/02 3:02/04 4:04/02 7:00/02 8:02/00 9:02/02 11:02/06 12:02/00 13:02/02 14:12/02 48:00/00 49:00/02
+vsav2	10	stocked	stock=3	entered=yes	stock_after=2	path=-5:00/02 0:02/00 1:02/02 3:02/04 4:04/02 7:00/02 8:14/02 10:12/02 56:12/04 73:18/00 74:18/02
 vsav2	11	refused	stock=0	entered=no	stock_after=0	path=-5:00/02 0:02/00 1:02/02 3:02/04 4:04/02 7:00/02 8:02/00 9:02/02 11:02/06 12:02/00 13:02/02 14:0e/02 17:0e/04 22:0e/06 34:00/00 35:00/02
-vsav2	13	entered	stock=3	entered=yes	stock_after=2	path=-5:00/02 0:04/02 3:00/02 4:02/00 5:02/02 7:02/04 8:02/00 9:02/02 10:12/02 61:00/00 62:00/02
+vsav2	11	stocked	stock=3	entered=yes	stock_after=2	path=-5:00/02 0:02/00 1:02/02 3:02/04 4:04/02 7:00/02 8:02/00 9:02/02 11:02/06 12:02/00 13:02/02 14:12/02 48:00/00 49:00/02
 vsav2	13	refused	stock=0	entered=no	stock_after=0	path=-5:00/02 0:04/02 3:00/02 4:02/00 5:02/02 7:02/04 8:02/00 9:02/02 10:0a/04 23:00/04 24:02/06 31:00/00 32:00/02
+vsav2	13	stocked	stock=3	entered=yes	stock_after=2	path=-5:00/02 0:04/02 3:00/02 4:02/00 5:02/02 7:02/04 8:02/00 9:02/02 10:12/02 61:00/00 62:00/02

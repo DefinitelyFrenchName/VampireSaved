@@ -1,7 +1,7 @@
 #!/bin/sh
-# audit_ex_refused.sh — WHAT THE TENANTS' vs2 EX INPUT DOES WHEN THE MODE IS REFUSED, on native vsav2 and on our merged build, frozen AS MEASURED (14z-169, the analysis before the ruled EX-route fix, #136): with an empty stock the input cannot enter the mode, and what comes out instead is the natural model of the ruled "disabled" route.
+# audit_ex_refused.sh — WHAT THE TENANTS' vs2 EX INPUT DOES WHEN THE MODE IS REFUSED, on native vsav2 and on our merged build, frozen AS MEASURED (14z-169; since 14z-170 the ruled EX-route fix's gate): with an empty stock the input cannot enter the mode on either game, and on our build it enters at NO stock level — Phobos and Donovan take vs2's stock-0 path at stock 3, Pyron reads 623+PP (his ES move with a stock), as ruled.
 #
-# MUST-FIRE: perturbed-copy: stock-kept — the refused legs run with their stock left at 3 (the refusal removed) must be reported as ENTERING the mode and FAIL, so "never enters" is read from the mode field, not assumed from the poke (in-gate: the stock-3 legs, already run, must read entered on the same check; mode: every refused leg runs with stock 3 and the gate FAILs)
+# MUST-FIRE: perturbed-copy: stock-kept — the refused legs run with their stock left at 3 (the refusal removed) must be reported as ENTERING the mode and FAIL, so "never enters" is read from the mode field, not assumed from the poke (in-gate: vs2's three stock-3 legs, already run, must read entered on the same check — ours' no longer enter, which is the fix; mode: every refused leg runs with stock 3, vs2's enter, and the gate FAILs)
 #
 # WHY. The maintainer ruled the tenants' vs2 EX route into Dark Force DISABLED on our build
 # (2026-09-18; asked "Keep it, or disable the EX input so P+K is the only way in? My
@@ -17,17 +17,23 @@
 # NOT COVERED: which move the path IS (the captures are for the maintainer, not frozen here);
 # P2-side inputs; inputs other than these three.
 #
-# FROZEN: tests/expected/ex_refused.tsv — `<game> <id> <refused|entered> stock=<n> entered=<yes|no>
-# stock_after=<n> path=<P1 (seq/sub) changes over 3255-3400, frame offsets from 3260>`.
+# THE FIX (14z-170, ruled 2026-09-18 "disable it" and 2026-09-19 "Natural reading" — DECISIONS_HISTORY.md):
+# each tenant's EX site skips vs2's EX check (`0x028534`), so on ours NO stocked leg enters the mode,
+# and Phobos's and Donovan's stocked paths equal vs2's REFUSED (stock-0) paths; Pyron's stocked leg
+# reads 623+PP, his ES move (one stock), frozen as measured.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged26] [FREEZE=1] tests/audit_ex_refused.sh
+# FROZEN: tests/expected/ex_refused.tsv — `<game> <id> <refused|stocked> stock=<n> entered=<yes|no>
+# stock_after=<n> path=<P1 (seq/sub) changes over 3255-3400, frame offsets from 3260>` (the stock-3
+# role was named `entered` until 14z-170).
+#
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [FREEZE=1] tests/audit_ex_refused.sh
 #   emulator tier, MAME; 12 field-trace runs — measured 14z-169 on this MacBook: see PROVENANCE
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged26}"
+BUILD="${BUILD:-build/m3b_merged27}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/ex_refused.tsv"
 CONTROL="${CONTROL:-}"
@@ -69,7 +75,7 @@ leg() {  # leg <game> <id> <stock> <role>
 }
 echo "== 1. the legs"
 REFUSED_STOCK=0; [ "$CONTROL" = stock-kept ] && REFUSED_STOCK=3
-for g in vsav2 ours; do for id in 13 10 11; do leg "$g" "$id" "$REFUSED_STOCK" refused; [ -n "$CONTROL" ] || leg "$g" "$id" 3 entered; done; wait; done
+for g in vsav2 ours; do for id in 13 10 11; do leg "$g" "$id" "$REFUSED_STOCK" refused; [ -n "$CONTROL" ] || leg "$g" "$id" 3 stocked; done; wait; done
 # ONE reducer
 reduce() {  # reduce <game> <id> <stock> <role> <trace> -> one row; exits 1 on a VOID leg
     python3 - "$@" <<'PY'
@@ -92,9 +98,9 @@ print(f"{g}\t{i}\t{role}\tstock={st}\tentered={'yes' if entered else 'no'}\tstoc
 PY
 }
 : > "$W/got.tsv"
-for g in vsav2 ours; do for id in 13 10 11; do for role in refused entered; do
-    [ "$role" = entered ] && [ -n "$CONTROL" ] && continue
-    st="$REFUSED_STOCK"; [ "$role" = entered ] && st=3
+for g in vsav2 ours; do for id in 13 10 11; do for role in refused stocked; do
+    [ "$role" = stocked ] && [ -n "$CONTROL" ] && continue
+    st="$REFUSED_STOCK"; [ "$role" = stocked ] && st=3
     [ -f "$W/${g}_${id}_$role.ft" ] || { bad "${g}_${id}_$role: no trace (exit $(cat "$W/${g}_${id}_$role/rc" 2>/dev/null || echo none))"; continue; }
     reduce "$g" "$id" "$st" "$role" "$W/${g}_${id}_$role.ft" >> "$W/got.tsv" 2> "$W/err" || bad "$(cat "$W/err")"
 done; done; done
@@ -105,16 +111,24 @@ sed 's/^/  /' "$W/got.tsv"
 _in="$(awk -F'\t' '$3=="refused" && $5=="entered=yes"' "$W/got.tsv")"
 [ -z "$_in" ] && ok "no refused leg enters the mode" || { bad "a refused leg entered the mode:"; echo "$_in" | sed 's/^/        /'; }
 if [ -z "$CONTROL" ]; then
-    _c="$(awk -F'\t' '$3=="entered" && $5=="entered=yes"' "$W/got.tsv" | wc -l | tr -d ' ')"
-    if [ "$_c" = 6 ]; then echo "CONTROL FIRED: stock-kept — with stock 3 all six legs read entered on the same check"
-    else echo "CONTROL DEAD: stock-kept — only $_c of 6 stock-3 legs read entered"; fail=1; fi
+    _c="$(awk -F'\t' '$1=="vsav2" && $3=="stocked" && $5=="entered=yes"' "$W/got.tsv" | wc -l | tr -d ' ')"
+    if [ "$_c" = 3 ]; then echo "CONTROL FIRED: stock-kept — with stock 3 vs2's three legs read entered on the same check"
+    else echo "CONTROL DEAD: stock-kept — only $_c of vs2's 3 stock-3 legs read entered"; fail=1; fi
+    # THE FIX (14z-170): no stocked leg on ours enters; Phobos's and Donovan's stocked paths are vs2's refused paths
+    _o="$(awk -F'\t' '$1=="ours" && $3=="stocked" && $5=="entered=yes"' "$W/got.tsv")"
+    [ -z "$_o" ] && ok "no stocked leg on ours enters the mode (the disabled EX route)" || { bad "a stocked leg on ours entered the mode:"; echo "$_o" | sed 's/^/        /'; }
+    for _id in 10 13; do
+        _v="$(awk -F'\t' -v i="$_id" '$1=="vsav2" && $2==i && $3=="refused" {print $7}' "$W/got.tsv")"
+        _s="$(awk -F'\t' -v i="$_id" '$1=="ours" && $2==i && $3=="stocked" {print $7}' "$W/got.tsv")"
+        [ -n "$_v" ] && [ "$_v" = "$_s" ] && ok "0x$_id at stock 3 on ours takes vs2's stock-0 path" || bad "0x$_id at stock 3 on ours: '$_s' where vs2 at stock 0 takes '$_v'"
+    done
 fi
 
 echo "== 2. the frozen rows"
 if [ "${FREEZE:-0}" = 1 ]; then
     [ "$fail" = 0 ] && [ -z "$CONTROL" ] || { echo "FAIL: audit_ex_refused (not frozen: fix the red first, no control)"; exit 1; }
-    { echo "# tests/expected/ex_refused.tsv — the tenants' vs2 EX input with the stock at 0 (refused) and 3 (entered), native vsav2 and"
-      echo "# $(basename "$BUILD") (tests/audit_ex_refused.sh; field_trace). Evidence class: in-emulator. Frozen 14z-169 with FREEZE=1."
+    { echo "# tests/expected/ex_refused.tsv — the tenants' vs2 EX input with the stock at 0 (refused) and 3 (stocked), native vsav2 and"
+      echo "# $(basename "$BUILD") (tests/audit_ex_refused.sh; field_trace). Evidence class: in-emulator. Frozen with FREEZE=1 (first 14z-169; the EX-route fix 14z-170)."
       echo "# path = P1's (seq/sub) at each change over 3255-3400, as frame offsets from the input at 3260."
       echo "#--"; cat "$W/got.tsv"; } > "$EXPECT"
     echo "  FROZE  $(basename "$EXPECT") ($(wc -l < "$W/got.tsv" | tr -d ' ') rows) — VERIFY by re-running without FREEZE"; exit 0
