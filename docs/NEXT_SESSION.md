@@ -15,10 +15,13 @@ and patch_notes 14z-170 have the detail; STATE 14z-170 the record.
 
 ## START HERE
 
-1. **M19 IS FROZEN, NOT RELEASED.** The release run is `--scope all --lane all --strict --controls`
-   (~5.5 h, HANDOFF "WHAT THE RELEASE RUN COSTS"), then `tools/upload_release_assets.sh` on
-   `freeze/merged-m19`. `release/merged-m19/` is packaged and gated in-tree. The maintainer's call
-   when to release.
+1. **M19 IS FROZEN, NOT RELEASED — and the release WAITS, by ruling (2026-09-20):** *"let's not
+   release now, especially since we have tickets relative to the deliverables on various OS"*. The
+   blockers are **#144** (macOS blocks the prebuilt binaries), **#145** (Windows: they fail to load)
+   and **#146** (the player READMEs), each reported and none yet reproduced. When they are done, the
+   release run is `--scope all --lane all --strict --controls` (~5.5 h, HANDOFF "WHAT THE RELEASE RUN
+   COSTS"), then `tools/upload_release_assets.sh` on `freeze/merged-m19`. `release/merged-m19/` is
+   packaged and gated in-tree; the freeze tags and registry rows stand.
 2. **The orange flash** (the cosmetic ticket #162; `tests/audit_column_flash.sh` freezes it): our build
    uploads palette row 11 through the palette-SEQUENCE uploader at 2858, where native does not upload.
    The open question is which sequence id it asks for, and why (the +8 row remap between the games,

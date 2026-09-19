@@ -27,6 +27,14 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-20 (14z-170 close) — M19 is FROZEN, NOT RELEASED: the release waits on the per-OS deliverable tickets
+
+**What was put (the close report, after the freeze, the green close tier and the pushes):** *"Still open: #161 (Phobos's remaining +1), #162 (the orange flash), #163 (the column and the trap on an airborne victim — I extended its open item to the trap, since both were measured only on a grounded victim). M19 is frozen, not released; the release run is yours to call."*
+
+**Ruling (verbatim):** *"let's not release now, especially since we have tickets relative to the deliverables on various OS."*
+
+**What it means.** The M19 release run (`--scope all --lane all --strict --controls`, then the asset upload on `freeze/merged-m19`) does NOT follow this freeze. It waits on the open deliverable tickets: **#144** (macOS blocks the release packages' prebuilt binaries), **#145** (Windows: the prebuilt binaries fail to load the game), **#146** (the player READMEs are not complete enough) — each reported and none yet reproduced or fixed. `release/merged-m19/` stays packaged and gated in-tree; the freeze tags and the registry rows stand. The same sitting's other word, *"I say we close and pick up further work in a fresh session"*, closed 14z-170.
+
 ## Ruled 2026-09-19 (14z-170) — the column KO under the class-0x52 rule reads clean on the capture (#163)
 
 **What was put:** rule-checker run 2026-09-19-62 (Q2) found the column-KO finding drawn from RAM traces alone (the reaction class reads 8 on native, M19 and M18, traces matching). A capture was made (`build/rc170/ko_cap/column_ko_sheet.png`: donovan_4 with Demitri's HP poked to 1 so the column's first hit at f2838 KOs; native vs2, M19 and M18 at eight frames) and sent with: *"Column KO (Demitri's HP poked to 1, so the column's first hit at f2838 KOs), shown at the same frames. Rows: native vs2, M19, M18. The column/trap ticket stays open until you've read this one."* A second image, the win-pal lose leg's matched window, was sent for reference only.
