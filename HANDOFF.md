@@ -1552,6 +1552,28 @@ NOTE: the tags mark the commit at which each build was frozen and was
 reproducible AT THAT TIME; no one has re-verified the older ones since.
 
 
+**BEFORE THE TAGS: THE FREEZE-CADENCE STATIC TIER, WITH `ROMDIR` (14z-170).**
+
+```sh
+ROMDIR=... tests/run_all_static.sh --strict --cadence freeze --exec-controls all
+```
+
+It is the only run that exercises the FREEZE-cadence gates, and two of them
+held M18 through the whole M19 freeze because nothing ran them earlier:
+`test_phasec_spaces` (it pins the stock twin's FINGERPRINT, so the re-point
+sweep, which renames `build/<name>`, had nothing to rename) and
+`test_bbh_fidelity` (the harness's lineage defaults live OUTSIDE this tree —
+the second freeze in a row to leave them stale). Without `ROMDIR` the run
+SKIPS 81 gates, which `--strict` reads as red, correctly. So, in order: the
+rows, the sets, this tier green, THEN the tags. Grep the OLD FINGERPRINTS as
+well as the old build names, and re-point the harness
+(`~/Developer/blackbox-harness`, four files: its `bbh/config.py`
+placeholders and inp build, its config page's default row, the consumer toml,
+the fidelity selftest) in the same sitting — its own selftest
+and this tree's `test_bbh_fidelity` are the acceptance. The gotcha is
+`docs/project/gotchas.md` [VSP-185]; the gate that would catch the fingerprint
+half by machine is #167.
+
 **TWO REGISTRY ROWS ARE NOT BUILDS** (14z-97, GitHub #96; RATIFIED by the
 maintainer 2026-09-15): the M2 battery's two legs, the stock twin
 (`donovan-mN-stock`) and the stage-4 image (`donovan-mN-stage4`) — today

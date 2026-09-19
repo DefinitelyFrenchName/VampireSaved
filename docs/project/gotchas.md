@@ -5341,7 +5341,7 @@ re-shoot and compare before the conclusion transfers. And cite a history entry b
 by a line number. The packet's `DECISIONS_HISTORY.md:a-b` citations went stale as entries were
 added at the head (run -75's note). They were re-derived by looking each quoted line up verbatim.
 
-## THE RE-POINT SWEEP SEES BUILD NAMES IN THIS TREE — A PINNED FINGERPRINT AND THE HARNESS'S DEFAULTS ARE OUTSIDE IT (paid: 14z-170)
+## **[VSP-185]** THE RE-POINT SWEEP SEES BUILD NAMES IN THIS TREE — A PINNED FINGERPRINT AND THE HARNESS'S DEFAULTS ARE OUTSIDE IT (paid: 14z-170)
 
 The M19 freeze re-pointed 304 live build references in 153 files and re-froze every static gate it
 ran, and still two gates held M18 at the close. `test_phasec_spaces` pins the stock twin's
@@ -5355,4 +5355,6 @@ ran without `ROMDIR`, and 81 gates SKIPPED, these two among them. `--strict` rea
 is what it is for. Rule: at a freeze, run `tests/run_all_static.sh --strict --cadence freeze` with
 `ROMDIR` set BEFORE the tags ([VSP-101], [VSP-103]). Grep for the OLD FINGERPRINTS as well as the
 old build names, and re-point the harness's defaults in the same sitting. The phasec re-freeze is
-attributed by the freeze's own op-by-op delta of the stock twin (`attr2_m5_stock18.txt`).
+attributed by the freeze's own op-by-op delta of the stock twin (`attr2_m5_stock18.txt`). A gate for the
+fingerprint half — a live pin on a SUPERSEDED registry row's key, with the rule-checker's birth anchor
+exempt and a planted pin as its control — is open as #167; until it lands, the grep is the only guard.

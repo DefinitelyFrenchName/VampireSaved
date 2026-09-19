@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 166
+# issues: 167
 number	state	reason	closed	labels	title
+167	OPEN	-	-	evolution	A freeze leaves stale PINS the re-point sweep cannot see: a gate for superseded-fingerprint references
 166	CLOSED	COMPLETED	2026-09-19	bug	The generator's in-place placeholder scan corrupted 52 x2b7ef4 companion-effect records, shipped since merged-m16
 165	CLOSED	COMPLETED	2026-09-19	bug	The tenants' vs2 EX inputs entered Dark Force through a placed copy of vs2's Change entry — a second, longer route into the mode
 164	CLOSED	COMPLETED	2026-09-19	bug	Phobos and Donovan took damage and rallied through their shells' defense rows (vsavj's copies for ids 0x10/0x13), not vs2's own

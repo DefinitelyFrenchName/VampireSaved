@@ -563,3 +563,4 @@ VSP-181	HANDOFF.md	THE PRE-COMMIT COMMAND — run this, not a filename (since 14
 VSP-182	CLAUDE.md	5. Working style	IN-LIST
 VSP-183	docs/project/rule_checker.md	THE PROTOCOL — artifacts in, a structured verdict out, before the action	IN-LIST
 VSP-184	docs/project/rule_checker.md	THE BINDING AND THE MUST-FIRE — a verdict that stops the action, a plant that proves the checker ali	IN-LIST
+VSP-185	docs/project/gotchas.md	THE RE-POINT SWEEP SEES BUILD NAMES IN THIS TREE — A PINNED FINGERPRINT AND THE HARNESS'S DEFAULTS A	IN-LIST
