@@ -18,23 +18,18 @@ What the freeze carries is in HANDOFF "Current WIDE builds" and patch_notes 14z-
    each reported and none yet reproduced. When they are done the release run is
    `--scope all --lane all --strict --controls` (~5.5 h, HANDOFF "WHAT THE RELEASE RUN COSTS"), then
    `tools/upload_release_assets.sh` on `freeze/merged-m19`.
-2. **#168 IS DONE (14z-172)** — the naming rigs' first pin now lands at 2565, after the 2545 round
-   start, by a shift of 195 derived from the engine's double-pass cadence rather than tuned. **The
-   mechanism is the new thing and it is general: the second logic pass falls on a periodic set of
-   FRAMES — one residue class mod 3 at speed level 8, three mod 13 at level 6** (`audit_tick_phase`,
-   `engine_internals.md` "THE CADENCE IS STRICTLY PERIODIC IN THE FRAME INDEX"). **Any rig that moves
-   a schedule moves its events' phase**; quantise the shift or expect input-window-edge recipes to
-   fire a different move. `move_parity` DIFF **102 -> 94** and the ENTRANCE root is gone.
-3. **#169 (new, from #168's sweep): `pyron_3`'s Galactic Throw connects on only ONE strength**, and
-   which one depends on the schedule — at HEAD `[j.6HP]` is frozen as `a2:0x14`, a plain j.HP, so
-   the rig has recorded a whiff under the move's name since 14z-120. It is the one event family in
-   the corpus whose outcome does NOT follow the double-pass phase, so the second factor behind it is
-   unidentified and is the interesting part. Everything measured is on the issue.
-4. **#161 — Phobos's remaining +1** (`tests/audit_phobos_dmg_residual.sh` reproduces it): Demitri's
+2. **#169: `pyron_3`'s Galactic Throw connects on only ONE strength**, and which one depends on the
+   schedule — at HEAD `[j.6HP]` is frozen as `a2:0x14`, a plain j.HP, so the rig has recorded a whiff
+   under the move's name since 14z-120. It is the one event family in the corpus whose outcome does
+   NOT follow the engine's double-pass phase — the rule that now governs every rig schedule change
+   (`engine_internals.md` "THE CADENCE IS STRICTLY PERIODIC IN THE FRAME INDEX", gate
+   `audit_tick_phase`) — so the second factor behind it is unidentified and is the interesting part.
+   Everything measured is on the issue.
+3. **#161 — Phobos's remaining +1** (`tests/audit_phobos_dmg_residual.sh` reproduces it): Demitri's
    5HP takes 12 on ours, 11 native, with Phobos's defense rows already vs2's — trace the damage
    staging vars stage by stage on both legs for that one hit (`engine_internals.md` "The DAMAGE
    pipeline"). Its expectation re-froze at 14z-172 as a pure +195 shift; the residual is untouched.
-5. **The #136 tickets still open**: **#157** (the throw hit-registration pair — the meter family),
+4. **The #136 tickets still open**: **#157** (the throw hit-registration pair — the meter family),
    **#159** (facing rule 5), **#163** (the column/trap rule: its airborne case); the maintainer's to
    schedule. #136's own DIFF table is now 94 rows.
 

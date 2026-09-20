@@ -5,6 +5,7 @@
 # [VSP-17]). ci_portable: no ROM, no build dir, no emulator, ~1 s.
 #
 # MUST-FIRE: perturbed-copy: closed-pending-entry — a struck-through DECIDED entry added to "Decisions pending" must fail as a pending violation
+# MUST-FIRE: perturbed-copy: closed-start-here — a DONE entry added to docs/NEXT_SESSION.md "START HERE" must fail as a start-here violation; this branch parsed ZERO entries from 2026-09-18 (when the section became a NUMBERED list and the parser knew only bullets) until 14z-172, and no control exercised it
 # MUST-FIRE: perturbed-copy: ticket-section — an "Open bugs" section added under the standing sections must fail (tickets are never listed in STATE)
 # MUST-FIRE: perturbed-copy: fourth-group — session group headings added above the standing sections must fail the group count
 # MUST-FIRE: perturbed-copy: over-budget — STATE.md padded past 150 KiB must fail the size budget
@@ -58,6 +59,12 @@ if name == "closed-pending-entry":
     i = s.index("\n## Decisions pending")
     j = s.index("\n", i + 1) + 1
     s = s[:j] + "\n- ~~**A SYNTHETIC ITEM ADDED BY THE CONTROL**~~ **DECIDED** in place.\n" + s[j:]
+elif name == "closed-start-here":
+    nxt = root / "docs" / "NEXT_SESSION.md"
+    x = nxt.read_text()
+    i = x.index("\n## START HERE")
+    j = x.index("\n", i + 1) + 1
+    nxt.write_text(x[:j] + "\n9. **A SYNTHETIC START-HERE ITEM ADDED BY THE CONTROL IS DONE** — it must fail.\n" + x[j:])
 elif name == "ticket-section":
     s += "\n## Open bugs (synthetic, added by the control)\n\n- a bug listed in STATE\n"
 elif name == "fourth-group":
@@ -78,6 +85,7 @@ state.write_text(s)
 PY
     case "$1" in
     closed-pending-entry)  EXPECT="A SYNTHETIC ITEM ADDED BY THE CONTROL" ;;
+    closed-start-here)     EXPECT="start-here" ;;
     ticket-section)        EXPECT="Open bugs (synthetic" ;;
     fourth-group)          EXPECT="session groups above" ;;
     over-budget)           EXPECT="KiB budget" ;;

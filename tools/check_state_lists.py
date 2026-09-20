@@ -106,11 +106,22 @@ def body(lines, hdrs, idx):
     return lines[first:end]
 
 
+ENTRY_RE = re.compile(r"^(?:- |\d+\. )")
+
+
 def entries(block):
-    """Top-level `- ` entries of a section body, each as its list of lines."""
+    """Top-level entries of a section body, each as its list of lines.
+
+    A `- ` BULLET or a `1. ` NUMBERED item both start one. The numbered shape was
+    added 14z-172: NEXT_SESSION's "START HERE" became a numbered list on
+    2026-09-18 and this function only knew bullets, so the start-here check
+    parsed ZERO entries and asserted nothing for ten revisions of that file —
+    a dead branch nothing noticed because no must-fire control exercised it
+    ([VSP-181], and `closed-start-here` is now that control).
+    """
     out, cur = [], None
     for line in block:
-        if line.startswith("- "):
+        if ENTRY_RE.match(line):
             cur = [line]
             out.append(cur)
         elif HDR_RE.match(line):
