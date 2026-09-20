@@ -264,6 +264,8 @@ def emulator_side(platform, dest, name):
 2. Put `vsavjw.zip` (from the applier) in the emulator's rom directory. That
    is the ONLY file — the set is standalone, so no `vsav.zip`, no `vsavj.zip`
    and no QSound BIOS zip go beside it{' (FBNeo has no rom-path option: it reads `roms/` next to the binary, or the dirs set in its config)' if platform == 'fbneo' else ' — or pass `-rompath "/your/rompath"`'}.
+   Use the applier's DEFAULT here, not `--no-qsound-bios`: that option is for
+   MiSTer{', and MAME refuses a set built with it' if platform == 'mame' else ''}.
 3. Start the set `vsavjw`. The boot name screen reads VAMPIRE SAVED and the
    select screen shows the mark {name.split('-')[-1].upper() if '-' in name else ''}.
 """
@@ -387,18 +389,28 @@ sha256 — verified against the file when this directory was packaged).
 ## On the SD card
     _Arcade/<the .mra files here>
     _Arcade/cores/jtcps2w.rbf        <- in this directory (verify the sha256 in BITSTREAM.txt after copying)
-    games/mame/vsavjw.zip            <- from apply_release.py; for the WIDE MRA this is the ONLY file needed
+    games/mame/vsavjw.zip            <- from apply_release.py --no-qsound-bios (see below)
 
-The WIDE MRA runs the full roster on `jtcps2w.rbf`, and since the 2026-09-20
-standalone completion it resolves **every one of its 31 CRC-matched parts out of
-`vsavjw.zip` alone** — the applier copies the parent's members and the QSound
-BIOS member in from your own dumps, so no `vsav.zip` or `qsound.zip` is needed
-beside it. The other two zips are only for the OTHER things on the card:
+**On MiSTer, build the set with `--no-qsound-bios`.** Your card already carries
+`games/mame/qsound.zip` the moment you play any CPS-2 game, and the WIDE MRA's
+part chain is `vsavjw.zip|vsav.zip|qsound.zip`, so it picks the BIOS member up
+from there: measured 2026-09-20, **all 31 CRC-matched parts resolve — 30 out of
+`vsavjw.zip` and `dl-1425.bin` out of `qsound.zip`** — and you do not need
+`qsound_hle.zip` among your dumps at all. Keeping the member (the applier's
+default) also works and costs nothing but the 24 KB; it is what emulator players
+want, because MAME refuses a set without it.
+
+The WIDE MRA runs the full roster on `jtcps2w.rbf`. Apart from the BIOS member it
+needs nothing beside `vsavjw.zip`: the applier copies the parent's members in from
+your own dumps. The other zips are only for the OTHER things on the card:
 
     games/mame/vsavj.zip             <- your PRISTINE dump: the STOCK CONTROL MRA only
     games/mame/vsav.zip              <- your PRISTINE dump: the STOCK CONTROL MRA, and
                                         stock Vampire Savior on Jotego's own jtcps2.rbf
-    games/mame/qsound.zip            <- dl-1425.bin: the STOCK CONTROL MRA only The `[STOCK CONTROL]`
+    games/mame/qsound.zip            <- dl-1425.bin: the WIDE MRA (with --no-qsound-bios)
+                                        and the STOCK CONTROL MRA
+
+The `[STOCK CONTROL]`
 MRA runs stock `vsavj` on the SAME bitstream with the profile bit at its
 `0xFF` fill: it is the superset invariant on silicon and only needs running
 when the BITSTREAM changes (new seed, slice or pin), not per release. Stock

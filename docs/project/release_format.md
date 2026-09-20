@@ -63,8 +63,27 @@ player's OWN dumps and SHA-1 verified like any other pristine copy, so nothing
 new is distributed and rule 7 is untouched. `qsound_hle.zip` is a PRISTINE
 SOURCE ONLY, deliberately not in the source blob: the blob is what every
 xdelta is encoded against, so adding a zip to it would rewrite every patch
-file for the sake of one 24 KB member. The player needs a fourth DUMP and
-places one ZIP.
+file for the sake of one 24 KB member.
+
+**`dl-1425.bin` IS OPTIONAL (ruled 2026-09-20).** `apply_release.py` includes it
+by default — a set that is self-sufficient on MAME too — and `--no-qsound-bios`
+leaves it out, which also stops the applier requiring `qsound_hle.zip` among the
+dumps. Who needs it, measured: **MAME does** and refuses the set without it
+(`dl-1425.bin - NOT FOUND`); **FBNeo does not** (its descriptor omits the member,
+its QSound is HLE) and runs the smaller set identically — zero `(not found)`,
+same RAM and framebuffer over 12,120 frames; **MiSTer does not** need it inside
+the zip, because the WIDE MRA's part chain is `vsavjw.zip|vsav.zip|qsound.zip`
+and all 31 CRC-matched parts resolve with 30 out of `vsavjw.zip` and the BIOS out
+of the card's own `qsound.zip`. The manifest marks the entry `optional` and
+carries a second key, `applied_set_key_no_qsound_bios`; the applier verifies
+whichever variant it wrote against that declaration and prints it. The MiSTer
+page tells players to use the flag, the emulator pages the default.
+
+**The applied zip is DEFLATED** (ruled 2026-09-20), which is 28.0 MB against
+73.7 MB stored for byte-for-byte identical members. Every check here compares
+members, not archive bytes, so compression is outside the comparison. Cost
+measured once at load, not per frame: MAME boot + 1 s, stored 1.67/1.69 s
+against deflate 1.90/1.98 s. The MiSTer side is unmeasured — no hardware here.
 
 **The build is not touched.** No fingerprint, expectation set, registry row or
 MiSTer CRC moves; the shipped zip is a declared SUPERSET of the gated one, and
@@ -74,6 +93,13 @@ the difference is held by machine rather than argued:
   byte-identical to the build's, every ADDED member byte-identical to the
   reference member `standalone_completion` names, an UNDECLARED addition a
   FAIL, and the whole applied set hashing to `applied_set_key`.
+- `tests/test_release_binaries.sh` §3d — the `--no-qsound-bios` variant's three
+  documented properties, asserted rather than stated: MAME refuses it, FBNeo runs
+  it identically to the full set, and the WIDE MRA resolves every part with the
+  BIOS one coming from `qsound.zip`.
+- `tests/test_release_roundtrip.sh` §1 also holds the second variant: it must drop
+  exactly the members the manifest marks optional, keep every other member
+  byte-identical, and hash to its own declared key.
 - `tests/test_release_binaries.sh` §3 — the shipped release directory applied to
   the pristine dumps, that set ALONE in the rom path, on THREE instruments:
   **§3a** completeness from the emulator's own descriptor (`-verifyroms` against

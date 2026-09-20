@@ -181,6 +181,14 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--manifest", default=os.path.join(os.path.dirname(
         os.path.abspath(__file__)), "manifest.json"))
+    # THE ONE OPTIONAL MEMBER (2026-09-20): the QSound BIOS, dl-1425.bin. Leave it IN
+    # (the default) and the romset is self-sufficient on MAME as well as FBNeo. Leave it
+    # OUT and you do not even need qsound_hle.zip among your dumps — right for MiSTer,
+    # whose WIDE MRA resolves it from the card's own qsound.zip, and for FBNeo, whose
+    # descriptor does not list it. MAME needs it and will refuse a set without it.
+    ap.add_argument("--no-qsound-bios", action="store_true",
+                    help="omit the optional QSound BIOS member (dl-1425.bin); "
+                         "for MiSTer, or any setup that already provides it")
     a = ap.parse_args()
     here = os.path.dirname(os.path.abspath(a.manifest))
     m = json.load(open(a.manifest))
@@ -204,8 +212,19 @@ def main():
     # member MAME wants and which no xdelta is encoded against). Verified to the
     # same standard as the blob's recipe — a wrong or modified dump is named and
     # nothing is written. Absent in releases packaged before 2026-09-20.
+    # Which entries are being skipped, so a pristine source that only feeds skipped
+    # entries is not demanded of the user at all.
+    def skipped(e):
+        return a.no_qsound_bios and e.get("optional") == "qsound-bios"
+    needed_srcs = set()
+    for entries in m["zips"].values():
+        for e in entries:
+            if "pristine_from" in e and not skipped(e):
+                needed_srcs.add(e["pristine_from"]["zip"])
     nextra = 0
     for src in m.get("pristine_sources", []):
+        if src["zip"] not in needed_srcs:
+            continue
         zp = os.path.join(a.romdir, src["zip"])
         if not os.path.exists(zp):
             sys.exit(f"missing reference dump: {zp}")
@@ -234,9 +253,13 @@ def main():
 
     # 3. every target member, verified before anything is written
     built = {}
+    nskip = 0
     for zname, entries in m["zips"].items():
         built[zname] = []
         for e in entries:
+            if skipped(e):
+                nskip += 1
+                continue
             if "pristine_from" in e:
                 d = refs[e["pristine_from"]["zip"]].read(e["pristine_from"]["member"])
             else:
@@ -253,17 +276,52 @@ def main():
             if len(d) != e["size"] or sha1(d) != e["sha1"]:
                 sys.exit(f"{zname}/{e['member']}: rebuilt member does not match the manifest — NOT writing")
             built[zname].append((e["member"], d))
-        print(f"  {zname}: {len(entries)} members verified")
+        print(f"  {zname}: {len(built[zname])} members verified"
+              + (f" ({nskip} optional member(s) omitted)" if nskip else ""))
 
     # 4. write
+    # DEFLATED since 2026-09-20 (maintainer: "If it is identical content, I see no reason
+    # not to go for the smaller size"). The standalone completion added 24 MB of pristine
+    # members, and STORED made the set 73.7 MB where deflate gives 28.0 MB for byte-for-byte
+    # identical MEMBERS — which is what every check here compares (per-member SHA-1), so
+    # compression is outside the comparison and cannot make a set pass that would not.
+    # It also matches the build's own zips, which have always been deflated.
     os.makedirs(a.out, exist_ok=True)
     for zname, ms in built.items():
-        with zipfile.ZipFile(os.path.join(a.out, zname), "w", zipfile.ZIP_STORED) as zf:
+        with zipfile.ZipFile(os.path.join(a.out, zname), "w", zipfile.ZIP_DEFLATED) as zf:
             for n, d in ms:
                 zi = zipfile.ZipInfo(n, date_time=(1997, 5, 19, 0, 0, 0))
+                # THE COMPRESS TYPE LIVES ON THE ZipInfo, NOT ON THE ARCHIVE: writestr with
+                # an explicit ZipInfo uses ITS compress_type, which defaults to STORED, so
+                # the ZipFile(..., ZIP_DEFLATED) argument above is silently ignored here.
+                # Measured 2026-09-20: setting only the archive argument left the set at
+                # 71 MB, exactly its stored size, with no error and no warning.
+                zi.compress_type = zipfile.ZIP_DEFLATED
                 zf.writestr(zi, d)
+    # THE SET KEY, CHECKED AGAINST THE MANIFEST'S OWN DECLARATION for the variant just
+    # written — computed exactly as tools/build_fingerprint.py wholeset_key() does. It is
+    # the player's one-line confirmation that they hold the same romset everyone else does
+    # (netplay needs it identical), and it fails loudly rather than reporting a set that
+    # is subtly not what the release promised.
+    key_field = "applied_set_key_no_qsound_bios" if a.no_qsound_bios else "applied_set_key"
+    want = m.get(key_field)
+    h = hashlib.sha1()
+    for zname in sorted(built):
+        h.update(zname.encode())
+        for member, data in sorted(built[zname], key=lambda kv: kv[0]):
+            h.update(member.encode()); h.update(data)
+    got = h.hexdigest()
+    if want and got != want:
+        sys.exit(f"the written set's key {got[:8]} does not match the manifest's "
+                 f"{key_field} {want[:8]} — the output is NOT what this release declares")
+    variant = "without the optional QSound BIOS member" if a.no_qsound_bios else "standalone (every member the emulator asks for)"
     print(f"OK: wrote {', '.join(sorted(built))} to {a.out} — every member verified "
           f"(build {m.get('build_fingerprint') or '?'}, mark {m.get('version_string')!r})")
+    print(f"    {variant}; set key {got[:8]}"
+          + ("" if want else " (this release declares no key for that variant)"))
+    if a.no_qsound_bios:
+        print("    NOTE: MAME needs dl-1425.bin and will refuse this set; it is right for "
+              "MiSTer (the MRA resolves it from qsound.zip) and for FBNeo.")
 
 
 if __name__ == "__main__":

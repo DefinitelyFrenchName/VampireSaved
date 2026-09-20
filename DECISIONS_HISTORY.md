@@ -27,6 +27,48 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-20 (14z-173) — the applied set is DEFLATED, and the QSound BIOS member is OPTIONAL
+
+Three questions were put to the maintainer after the standalone set landed. Their answers,
+verbatim:
+
+**Compression** — *"If it is identical content, I see no reason not to go for the smaller
+size (I assume it's loaded decompressed in ram by the emulator/mister anyway so there's no
+decompression overhead, right?)"* The applier now writes `ZIP_DEFLATED`: **73.7 MB -> 28.0
+MB** for byte-for-byte identical members, which is all any check here compares (per-member
+SHA-1), so compression sits outside the comparison. THE ASSUMPTION WAS MEASURED RATHER THAN
+AGREED WITH, and it is right about the part that matters and not quite right as stated: the
+ROM does end up inflated in RAM, so there is no per-frame cost, but there IS a one-off
+inflate at load — MAME boot + 1 s of emulation, two runs each: **stored 1.67 / 1.69 s,
+deflate 1.90 / 1.98 s, so about +0.26 s once**, to save 45.7 MB. The MiSTer side is
+UNMEASURED (no hardware here): the ARM inflates while streaming to SDRAM, trading that
+against 46 MB less SD-card I/O. A first attempt at this changed only the `ZipFile(...)`
+argument and left the set at 71 MB, because `writestr` with an explicit `ZipInfo` uses
+THAT object's `compress_type`, which defaults to STORED — caught by measuring the output
+instead of trusting the flag.
+
+**The QSound BIOS member** — *"Ideally I'd love the option to choose to add it or not. The
+main reason is that most people playing on emulator would likely want a fully
+self-supporting rom since they already have to use a custom version of the emulator however
+MiSTer players will have their own qsound file present on their MiSTer as soon as they play
+any CPS-2 game and our wide core should leverage that by default"*. So `dl-1425.bin` is the
+one OPTIONAL completion member: `apply_release.py` includes it by default and
+`--no-qsound-bios` leaves it out, which also stops the applier demanding `qsound_hle.zip`
+among the dumps at all. The manifest marks the entry `optional` and carries a second key,
+`applied_set_key_no_qsound_bios`, and the applier checks whichever variant it wrote against
+the declaration. The three properties the per-platform READMEs now rely on are ASSERTED, not
+stated (`test_release_binaries.sh` 3d): **MAME refuses** the smaller set (`dl-1425.bin - NOT
+FOUND`), **FBNeo runs it identically** to the full one (its descriptor omits the member;
+zero `(not found)`, same RAM and same framebuffer over 12,120 frames), and the **WIDE MRA
+resolves all 31 of its parts — 30 from `vsavjw.zip` and the BIOS from the card's
+`qsound.zip`**. The MiSTer page therefore tells players to use `--no-qsound-bios`; the
+emulator pages tell them to use the default.
+
+**The four stale `BINARY.txt` run lines** — *"correct move."* The generator is fixed and the
+shipped records, which are written at emulator-build time and hash-linked to the binaries,
+are left to correct themselves at the next macOS emulator build rather than by a hand edit
+of a generated record.
+
 ## Ruled 2026-09-20 (14z-173) — THE DELIVERABLES: the order of work, and macOS FIRST
 
 Asked for my view on the state of the deliverables, the maintainer set out theirs and

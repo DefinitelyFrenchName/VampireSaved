@@ -18,7 +18,10 @@
 #      ADDS to stand alone (2026-09-20) byte-identical to the reference member
 #      the manifest declares it was copied from, with an undeclared addition a
 #      FAIL; the applied set to hash to the manifest's `applied_set_key`; the
-#      program fingerprint to agree; and the applier to be DETERMINISTIC.
+#      program fingerprint to agree; the applier to be DETERMINISTIC; and the
+#      SECOND, `--no-qsound-bios` variant to drop exactly the members the manifest
+#      marks optional, keep every other byte-identical, and hash to its own
+#      declared key.
 #   2  THE APPLIER REFUSES — a corrupted patch file, a wrong reference
 #      member (one byte flipped in a copy of vsavj.zip), and a manifest
 #      with a wrong target sha1 must each make apply_release.py exit
@@ -196,6 +199,47 @@ fp() { python3 tools/build_fingerprint.py "$1" --set vsavjw --sha-only; }
 fa="$(fp "$RP")"; fb="$(fp "$W/applied")"
 [ -n "$fa" ] && [ "$fa" = "$fb" ] && echo "  ok: program fingerprint $fb reproduced" \
     || { echo "FAIL: fingerprint $fa vs $fb"; fail=1; }
+# THE SECOND VARIANT (2026-09-20): the QSound BIOS member is OPTIONAL, so the release
+# declares TWO outputs and both must be verifiable. The smaller one must differ from the
+# default by EXACTLY the members the manifest marks optional — no more, no fewer — every
+# member it does keep must be byte-identical to the default's, and it must hash to
+# `applied_set_key_no_qsound_bios`. Without this the flag could quietly drop anything.
+python3 "$APPLY_DIR/apply_release.py" --romdir "$APPLY_ROMDIR" --out "$W/applied_min" --no-qsound-bios \
+    > "$W/apply_min.log" 2>&1 || { echo "FAIL: applier --no-qsound-bios"; tail -5 "$W/apply_min.log"; exit 1; }
+python3 - "$W/applied" "$W/applied_min" "$APPLY_DIR/manifest.json" <<'PY' || fail=1
+import sys, os, json, zipfile, hashlib
+full, mini, mf = sys.argv[1:4]
+m = json.load(open(mf))
+optional = {e["member"] for z in m["zips"].values() for e in z if e.get("optional")}
+if not optional:
+    print("  note: this release declares no optional member — the second variant is the same set")
+n = 0
+for z in sorted(q for q in os.listdir(full) if q.endswith(".zip")):
+    za, zb = zipfile.ZipFile(os.path.join(full, z)), zipfile.ZipFile(os.path.join(mini, z))
+    dropped = set(za.namelist()) - set(zb.namelist())
+    added = set(zb.namelist()) - set(za.namelist())
+    if added:
+        print(f"FAIL: --no-qsound-bios ADDED members to {z}: {sorted(added)}"); sys.exit(1)
+    if dropped != (optional & set(za.namelist())):
+        print(f"FAIL: --no-qsound-bios dropped {sorted(dropped)} from {z}, "
+              f"the manifest marks optional {sorted(optional)}"); sys.exit(1)
+    for mm in zb.namelist():
+        if za.read(mm) != zb.read(mm):
+            print(f"FAIL: {z}/{mm} differs between the two variants"); sys.exit(1)
+        n += 1
+h = hashlib.sha1()
+for z in sorted(q for q in os.listdir(mini) if q.endswith(".zip")):
+    h.update(z.encode())
+    with zipfile.ZipFile(os.path.join(mini, z)) as zf:
+        for nm in sorted(zf.namelist()):
+            h.update(nm.encode()); h.update(zf.read(nm))
+want = m.get("applied_set_key_no_qsound_bios")
+if want and h.hexdigest() != want:
+    print(f"FAIL: --no-qsound-bios set key {h.hexdigest()[:8]} != manifest {want[:8]}"); sys.exit(1)
+print(f"  ok: --no-qsound-bios drops exactly {sorted(optional)}, keeps {n} members byte-identical, key {h.hexdigest()[:8]}")
+PY
+rm -rf "$W/applied_min"
+
 # THE WHOLE-ARTIFACT MANIFEST: build-vs-applied equality STOPPED BEING THE RIGHT
 # CLAIM at the 2026-09-20 standalone completion — the applied set is a declared
 # superset, so the digests differ by construction. What replaced it is not weaker:

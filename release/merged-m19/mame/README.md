@@ -51,9 +51,9 @@ get the emulator or core ("Play on MAME" at the end), play.
   patches itself.
 - **The reference dumps, unmodified, with these exact names** in one
   directory: `vsavj.zip` (Vampire Savior, Japan 970519), `vsav.zip` (Europe
-  970519), `vsav2.zip` (Vampire Savior 2, Japan 970913) and `qsound_hle.zip`
-  (the QSound BIOS set — MAME wants `dl-1425.bin` and it is copied in for you,
-  so you never place it yourself). Vampire Hunter 2 is
+  970519), `vsav2.zip` (Vampire Savior 2, Japan 970913) — and `qsound_hle.zip`
+  (the QSound BIOS set) UNLESS you pass `--no-qsound-bios`, for which see
+  "One optional member" below. Vampire Hunter 2 is
   NOT needed (it is the project's verification oracle, not a source of
   anything in the set). The applier checks every member's SHA-1
   against the manifest before doing anything, so a wrong, renamed or
@@ -68,13 +68,33 @@ including the ones normally resolved from the parent `vsav.zip` and MAME's
 QSound BIOS, each copied pristine from your own dumps and SHA-1 verified. You
 do not put `vsav.zip`, `vsavj.zip` or `qsound_hle.zip` in the emulator's rom
 directory. The applier refuses to write if any member's SHA-1 does not match
-the manifest.
+the manifest. One member is optional — see below if you are on MiSTer.
+
+## One optional member — the QSound BIOS
+
+`dl-1425.bin` is the only part of the set you get a choice about.
+
+- **Keep it (the default).** The romset is then self-sufficient on every
+  emulator, MAME included. You need `qsound_hle.zip` among your dumps.
+- **Leave it out:** `python3 apply_release.py --romdir … --out … --no-qsound-bios`.
+  You then do not need `qsound_hle.zip` at all. Measured 2026-09-20:
+  **FBNeo** runs the smaller set identically (its descriptor does not list the
+  member; zero `(not found)`, same RAM and same framebuffer over 12,120 frames),
+  and on **MiSTer** the WIDE MRA still resolves all 31 of its parts — 30 out of
+  `vsavjw.zip` and the BIOS out of the `qsound.zip` your card already has from any
+  CPS-2 game. **MAME refuses the smaller set** (`dl-1425.bin - NOT FOUND`), so
+  keep the member if MAME is your emulator.
+
+Either way the applier prints the set key it wrote and checks it against this
+release's own declaration, so you can tell at a glance which variant you hold —
+and netplay peers must hold the same one.
 
 ## Identify the build
 - In game: the mark `M19` at the bottom-right of the
   character-select screen, and the boot name screen reads VAMPIRE SAVED.
-- On disk: whole-set key `923c1e7a` — the set the applier writes, which
-  `manifest.json` carries as `applied_set_key` with every member's SHA-1.
+- On disk: whole-set key `923c1e7a` — the set the applier writes by default
+  (`19ca6f3f` with `--no-qsound-bios`), which `manifest.json` carries as
+  `applied_set_key` / `applied_set_key_no_qsound_bios` with every member's SHA-1.
   (The build this was packaged from is `61e9815a`; they differ by the standalone
   completion above, which is pristine content from your dumps.)
 
@@ -94,7 +114,7 @@ the manifest.
 
 ## What is patched
 20 members are rebuilt, 12 are copied pristine from your dumps
-(of those, 7 complete the set so it stands alone: dl-1425.bin <- qsound_hle.zip, vm3.11m <- vsav.zip, vm3.12m <- vsav.zip, vm3.14m <- vsav.zip, vm3.16m <- vsav.zip, vm3.18m <- vsav.zip, vm3.20m <- vsav.zip).
+(of those, 7 complete the set so it stands alone: dl-1425.bin <- qsound_hle.zip (optional), vm3.11m <- vsav.zip, vm3.12m <- vsav.zip, vm3.14m <- vsav.zip, vm3.16m <- vsav.zip, vm3.18m <- vsav.zip, vm3.20m <- vsav.zip).
 The patches hold only bytes the port generates or authors (relocated code,
 tables, the version glyphs); everything that comes from the original games
 is expressed as a reference into YOUR dumps, which is what keeps this package
@@ -114,5 +134,7 @@ reference-ROM bytes before a release is cut.
 2. Put `vsavjw.zip` (from the applier) in the emulator's rom directory. That
    is the ONLY file — the set is standalone, so no `vsav.zip`, no `vsavj.zip`
    and no QSound BIOS zip go beside it — or pass `-rompath "/your/rompath"`.
+   Use the applier's DEFAULT here, not `--no-qsound-bios`: that option is for
+   MiSTer, and MAME refuses a set built with it.
 3. Start the set `vsavjw`. The boot name screen reads VAMPIRE SAVED and the
    select screen shows the mark M19.

@@ -24,7 +24,10 @@
 # packager's `standalone_completion` declaration, so it is what can catch an omitted or
 # wrong completion member — the three QSound members included, which neither stream sees.
 # 3c uses the HARNESS FBNeo build, not the release binary, which carries no harness by
-# design. ~8 min with section 3.
+# design. 3d then holds the SECOND, `--no-qsound-bios` variant to the three properties the
+# MiSTer README tells players to rely on: MAME refuses it, FBNeo runs it identically, and
+# the WIDE MRA resolves every part with the BIOS one coming from the card's qsound.zip.
+# ~11 min with section 3.
 #
 # MUST-FIRE: perturbed-copy: flipped-library-byte — a copy of the fbneo resource dir with one byte of a bundled library flipped must fail the record check (mode: the gate checks that copy in place of the resource)
 # MUST-FIRE: perturbed-copy: standalone-audio-member-content — the applied STANDALONE set with a QSound completion member (vm3.11m) carrying another sample member's bytes must be caught by section 3a's `-verifyroms` completeness check; NEITHER compared stream can see an audio member (3 of the 7 completion members are QSound), so without 3a this failure mode is uncovered — which is also why 3a's expectation comes from the emulator's descriptor and not from the packager's own `standalone_completion` declaration (fires in-gate after 3a-3c pass)
@@ -562,8 +565,8 @@ if [ "$f2" = 0 ]; then
     fi
 fi
 # 3c FBNeo, on the HARNESS build (the release binary has none, by design)
+FBH="${FBNEO_HARNESS_BIN:-$REPO/emu/fbneo/fbneo}"
 if [ "$f2" = 0 ]; then
-    FBH="${FBNEO_HARNESS_BIN:-$REPO/emu/fbneo/fbneo}"
     if [ ! -x "$FBH" ]; then
         echo "FAIL: no harness FBNeo at $FBH — section 3c cannot run (tools/setup_fbneo.sh; the RELEASE binary carries no harness by design, so it cannot drive a replay)"
         f2=1
@@ -582,6 +585,64 @@ if [ "$f2" = 0 ]; then
             echo "  ok: fbneo — the standalone set alone loads every member ((not found) x0) and reproduces the build arrangement's RAM log AND framebuffer stream"
         fi
     fi
+fi
+
+# ---- 3d: THE SECOND, --no-qsound-bios VARIANT, whose three documented properties are
+# what the MiSTer README now tells players to rely on, so they are asserted rather than
+# stated: MAME REFUSES it (dl-1425.bin NOT FOUND — keep the member if MAME is your
+# emulator); FBNeo runs it IDENTICALLY to the full variant (its descriptor does not list
+# the member); and the WIDE MRA still resolves all of its CRC-matched parts, the BIOS one
+# coming from the card's own qsound.zip.
+if [ "$f2" = 0 ]; then
+    rm -rf "$W/standalone_min"
+    if ! python3 "$reldir/apply_release.py" --romdir "$ROMDIR" --out "$W/standalone_min" --no-qsound-bios > "$W/sa_min_apply.log" 2>&1; then
+        echo "FAIL: the shipped applier did not produce a --no-qsound-bios set:"; tail -5 "$W/sa_min_apply.log"; f2=1
+    else
+        # (i) MAME must REFUSE it, and for the stated reason
+        "$MM/cps2$EXESUF" -verifyroms vsavjw -rompath "$(native_pathlist "$W/standalone_min")" > "$W/sa_min_verify.log" 2>&1 || true
+        if ! command grep -q 'dl-1425.bin .* - NOT FOUND' "$W/sa_min_verify.log"; then
+            echo "FAIL: MAME did not report dl-1425.bin NOT FOUND on the --no-qsound-bios set — the README's warning is wrong"
+            f2=1
+        fi
+        # (ii) FBNeo must run it identically to the full variant (reuse 3c's full-variant logs)
+        if [ "$f2" = 0 ]; then
+            if ! FBNEO_BIN="$FBH" sa_fbneo "$W/fb_min.log" "$W/fb_min.vid" "$W/standalone_min" "" min; then
+                echo "FAIL: FBNeo did not complete a replay on the --no-qsound-bios set:"; tail -5 "$W/sa_frun_min.log"; f2=1
+            elif ! cmp -s "$W/fb_min.log" "$W/fb_alone.log" || ! cmp -s "$W/fb_min.vid" "$W/fb_alone.vid"; then
+                echo "FAIL: on FBNeo the --no-qsound-bios set differs from the full one:"
+                cmp -s "$W/fb_min.log" "$W/fb_alone.log" || echo "  work RAM differs"
+                cmp -s "$W/fb_min.vid" "$W/fb_alone.vid" || echo "  framebuffer differs"
+                f2=1
+            fi
+        fi
+        # (iii) the WIDE MRA's parts must still all resolve, the BIOS one from qsound.zip
+        if [ "$f2" = 0 ]; then
+            python3 - "$W/standalone_min/vsavjw.zip" "$ROMDIR/qsound_hle.zip" "$reldir/../mister" <<'PY4' || f2=1
+import zipfile, re, sys, os, glob
+zp, qp, misdir = sys.argv[1:4]
+mras = [f for f in glob.glob(os.path.join(misdir, "*.mra")) if "STOCK" not in open(f).read()[:400].upper()]
+wide = [f for f in mras if "WIDE" in os.path.basename(f).upper()]
+if not wide:
+    print("FAIL: no WIDE .mra beside the release to check"); sys.exit(1)
+have = {i.CRC: "vsavjw.zip" for i in zipfile.ZipFile(zp).infolist()}
+for i in zipfile.ZipFile(qp).infolist():
+    have.setdefault(i.CRC, "qsound.zip")
+parts = re.findall(r'<part name="([^"]+)" crc="([0-9a-fA-F]+)"', open(wide[0]).read())
+miss = [(n, c) for n, c in parts if int(c, 16) not in have]
+if miss:
+    print(f"FAIL: the WIDE MRA cannot resolve {miss} from the --no-qsound-bios set plus qsound.zip")
+    sys.exit(1)
+from collections import Counter
+src = Counter(have[int(c, 16)] for n, c in parts)
+if src.get("qsound.zip", 0) != 1:
+    print(f"FAIL: expected exactly ONE part from qsound.zip, got {dict(src)}"); sys.exit(1)
+print(f"  ok: mister — the WIDE MRA resolves all {len(parts)} parts from the --no-qsound-bios set "
+      f"plus the card's qsound.zip ({dict(src)})")
+PY4
+        fi
+        [ "$f2" = 0 ] && echo "  ok: --no-qsound-bios — MAME refuses it (dl-1425.bin NOT FOUND, as the README says), FBNeo runs it identically to the full set"
+    fi
+    rm -rf "$W/standalone_min"
 fi
 
 # ---- section 3's must-fire controls: TWO perturbations, a gfx member and an AUDIO member.

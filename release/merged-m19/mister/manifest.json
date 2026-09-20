@@ -3,6 +3,7 @@
  "version_string": "M19",
  "build_fingerprint": "61e9815a3956b7c6e5c7c513043694edb78c8ece",
  "applied_set_key": "923c1e7a9f8025d6ce1202003e948150a26742b0",
+ "applied_set_key_no_qsound_bios": "19ca6f3fc3ec99964906637a0eccd823895d1891",
  "standalone_completion": [
   "dl-1425.bin <- qsound_hle.zip",
   "vm3.11m <- vsav.zip",
@@ -619,7 +620,9 @@
     "pristine_from": {
      "zip": "qsound_hle.zip",
      "member": "dl-1425.bin"
-    }
+    },
+    "optional": "qsound-bios",
+    "optional_why": "MAME needs it; FBNeo's descriptor omits it; MiSTer resolves it from the card's qsound.zip"
    }
   ]
  }

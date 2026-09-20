@@ -73,6 +73,17 @@ PRISTINE_ONLY_SOURCES = ["qsound_hle.zip"]
 # which is why no in-tree load map declares it.  FBNeo's descriptor omits it
 # entirely (its QSound is HLE), so it is inert there — an unlisted zip member.
 QSOUND_BIOS = ("qsound_hle.zip", "dl-1425.bin")
+# ...and it is the one OPTIONAL completion member (maintainer-ruled 2026-09-20): "most
+# people playing on emulator would likely want a fully self-supporting rom ... however
+# MiSTer players will have their own qsound file present on their MiSTer as soon as they
+# play any CPS-2 game and our wide core should leverage that by default". Who needs it:
+# MAME does (its descriptor lists dl-1425.bin as a BIOS-set member and refuses the set
+# without it); FBNeo does NOT (its descriptor omits it, its QSound is HLE); MiSTer does
+# not need it INSIDE the zip, because the WIDE MRA's part chain is
+# `vsavjw.zip|vsav.zip|qsound.zip` and resolves it from the card's own qsound.zip. So the
+# applier includes it by DEFAULT and `--no-qsound-bios` leaves it out, which also drops
+# qsound_hle.zip from the dumps the applier requires at all.
+OPTIONAL_TAG = "qsound-bios"
 
 
 def sha1(b):
@@ -212,10 +223,21 @@ def main():
                 h = sha1(d)
                 if ref.get(h) is None:
                     sys.exit(f"{zsrc}/{msrc}: not in the reference inventory")
-                members[zname].append({"member": msrc, "size": len(d), "sha1": h,
-                                       "pristine_from": {"zip": zsrc, "member": msrc}})
+                entry = {"member": msrc, "size": len(d), "sha1": h,
+                          "pristine_from": {"zip": zsrc, "member": msrc}}
+                if (zsrc, msrc) == QSOUND_BIOS:
+                    entry["optional"] = OPTIONAL_TAG
+                    entry["optional_why"] = ("MAME needs it; FBNeo's descriptor omits it; "
+                                             "MiSTer resolves it from the card's qsound.zip")
+                members[zname].append(entry)
                 contents[zname].append((msrc, d))
                 ncopy += 1
+                # MACHINE-READ FIELD: exactly "<member> <- <zip>", nothing else.
+                # test_release_roundtrip.sh section 1 splits on " <- " and OPENS the right
+                # half as a path; a "(optional)" marker appended here made it try to open
+                # "qsound_hle.zip (optional)" (caught by that gate, 2026-09-20). Whether a
+                # member is optional is the entry's own `optional` field, and the README
+                # derives its wording from that.
                 nfill.append(f"{msrc} <- {zsrc}")
 
     # THE BUILD IDENTITY IS THE WHOLE-SET KEY (14z-148): since the 14z-132
@@ -254,8 +276,15 @@ def main():
         "name": a.name, "version_string": a.version,
         "build_fingerprint": fp,
         # What the APPLIER writes. It differs from build_fingerprint by the
-        # standalone completion above and is the key a player can check.
+        # standalone completion above and is the key a player can check. TWO keys since
+        # 2026-09-20, because the QSound BIOS member is optional: the default variant and
+        # the `--no-qsound-bios` one, so either output can be checked against the manifest.
         "applied_set_key": applied_set_key(contents),
+        "applied_set_key_no_qsound_bios": applied_set_key(
+            {z: [(n, d) for (n, d) in ms
+                 if not any(e["member"] == n and e.get("optional") == OPTIONAL_TAG
+                            for e in members[z])]
+             for z, ms in contents.items()}),
         "standalone_completion": sorted(nfill),
         "source": {"order": SOURCE_ORDER, "sha1": src_sha,
                    "size": os.path.getsize(src_path), "recipe": recipe},
@@ -283,9 +312,12 @@ def readme(a, m, npatch, ncopy):
     zips = ", ".join(sorted(m["zips"]))
     key = (m["build_fingerprint"] or "?")[:8]
     akey = (m.get("applied_set_key") or "?")[:8]
+    akeymin = (m.get("applied_set_key_no_qsound_bios") or "?")[:8]
     fillrows = m.get("standalone_completion") or []
     nfill = len(fillrows)
-    fill = ", ".join(fillrows) if fillrows else "none"
+    opt = {e["member"] for z in m.get("zips", {}).values() for e in z if e.get("optional")}
+    fill = ", ".join(r + (" (optional)" if r.split(" <- ")[0] in opt else "")
+                     for r in fillrows) if fillrows else "none"
     return f"""# VAMPIRE SAVED — {m['name']} (in-game mark "{m['version_string']}")
 
 Full-roster Vampire Savior on the real CPS-2 engine: the 15+1 of vsavj plus
@@ -311,9 +343,9 @@ without your own dumps.
   patches itself.
 - **The reference dumps, unmodified, with these exact names** in one
   directory: `vsavj.zip` (Vampire Savior, Japan 970519), `vsav.zip` (Europe
-  970519), `vsav2.zip` (Vampire Savior 2, Japan 970913) and `qsound_hle.zip`
-  (the QSound BIOS set — MAME wants `dl-1425.bin` and it is copied in for you,
-  so you never place it yourself). Vampire Hunter 2 is
+  970519), `vsav2.zip` (Vampire Savior 2, Japan 970913) — and `qsound_hle.zip`
+  (the QSound BIOS set) UNLESS you pass `--no-qsound-bios`, for which see
+  "One optional member" below. Vampire Hunter 2 is
   NOT needed (it is the project's verification oracle, not a source of
   anything in the set). The applier checks every member's SHA-1
   against the manifest before doing anything, so a wrong, renamed or
@@ -328,13 +360,33 @@ including the ones normally resolved from the parent `vsav.zip` and MAME's
 QSound BIOS, each copied pristine from your own dumps and SHA-1 verified. You
 do not put `vsav.zip`, `vsavj.zip` or `qsound_hle.zip` in the emulator's rom
 directory. The applier refuses to write if any member's SHA-1 does not match
-the manifest.
+the manifest. One member is optional — see below if you are on MiSTer.
+
+## One optional member — the QSound BIOS
+
+`dl-1425.bin` is the only part of the set you get a choice about.
+
+- **Keep it (the default).** The romset is then self-sufficient on every
+  emulator, MAME included. You need `qsound_hle.zip` among your dumps.
+- **Leave it out:** `python3 apply_release.py --romdir … --out … --no-qsound-bios`.
+  You then do not need `qsound_hle.zip` at all. Measured 2026-09-20:
+  **FBNeo** runs the smaller set identically (its descriptor does not list the
+  member; zero `(not found)`, same RAM and same framebuffer over 12,120 frames),
+  and on **MiSTer** the WIDE MRA still resolves all 31 of its parts — 30 out of
+  `vsavjw.zip` and the BIOS out of the `qsound.zip` your card already has from any
+  CPS-2 game. **MAME refuses the smaller set** (`dl-1425.bin - NOT FOUND`), so
+  keep the member if MAME is your emulator.
+
+Either way the applier prints the set key it wrote and checks it against this
+release's own declaration, so you can tell at a glance which variant you hold —
+and netplay peers must hold the same one.
 
 ## Identify the build
 - In game: the mark `{m['version_string']}` at the bottom-right of the
   character-select screen, and the boot name screen reads VAMPIRE SAVED.
-- On disk: whole-set key `{akey}` — the set the applier writes, which
-  `manifest.json` carries as `applied_set_key` with every member's SHA-1.
+- On disk: whole-set key `{akey}` — the set the applier writes by default
+  (`{akeymin}` with `--no-qsound-bios`), which `manifest.json` carries as
+  `applied_set_key` / `applied_set_key_no_qsound_bios` with every member's SHA-1.
   (The build this was packaged from is `{key}`; they differ by the standalone
   completion above, which is pristine content from your dumps.)
 
