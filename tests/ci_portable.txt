@@ -231,6 +231,7 @@ test_release_asset_shape
 # a file manager's folder metadata (`.DS_Store`) in a release tree is never shipped and
 # never counted (maintainer-ruled 2026-09-14) — the real uploader over a synthetic release
 # planted with them, and the three release listings through tests/lib/os_metadata.sh. ~3 s.
+test_release_launcher
 test_release_os_metadata
 # 14z-154 (maintainer-ruled 2026-09-14, CLAUDE.md [VSP-17]): AN OPEN LIST HOLDS ONLY
 # WHAT IS OPEN — STATE.md's "Decisions pending" and NEXT_SESSION's START HERE carry no

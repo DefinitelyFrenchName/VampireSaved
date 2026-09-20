@@ -384,7 +384,8 @@ else
     # (linux-x86_64, windows-x86_64); a [a-z0-9-]+ segment silently rejected
     # both as "outside the ruled inventory" — found 14z-150 before the first
     # Linux build rather than during it
-    EMU_INV='^(manifest\.json|apply_release\.py|README\.md|EMULATOR\.md|patches/vsavjw/d_[a-z0-9_]+\.xdelta|emulator/0002-cps2-wide-v1\.patch|emulator/bin/[a-z0-9_-]+/[^/]+)$'
+    # PLAY.command joined the inventory 2026-09-20 (the launcher; docs/project/release_format.md)
+    EMU_INV='^(manifest\.json|apply_release\.py|README\.md|EMULATOR\.md|PLAY\.command|patches/vsavjw/d_[a-z0-9_]+\.xdelta|emulator/0002-cps2-wide-v1\.patch|emulator/bin/[a-z0-9_-]+/[^/]+)$'
     inv_check fbneo "$EMU_INV"; inv_check mame "$EMU_INV"
     inv_check mister '^(manifest\.json|apply_release\.py|README\.md|MISTER\.md|BITSTREAM\.txt|jtcps2w\.rbf|[^/]+\.mra|patches/vsavjw/d_[a-z0-9_]+\.xdelta)$'
     # every prebuilt-binary dir: BINARY.txt names each file with a matching sha256

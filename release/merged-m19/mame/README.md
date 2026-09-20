@@ -131,10 +131,15 @@ reference-ROM bytes before a release is cut.
    - `merged-m19-mame-recipe.zip`: build it once from the pinned upstream with
      `emulator/0002-cps2-wide-v1.patch`; `EMULATOR.md` has the exact commands.
    Both are the same code; the patch is 0002-cps2-wide-v1.
-2. Put `vsavjw.zip` (from the applier) in the emulator's rom directory. That
+2. **The easy way: double-click `PLAY.command`** (or `sh PLAY.command` in a
+   terminal). It finds this package's binary for your machine, checks it really
+   carries the WIDE profile, deals with macOS's quarantine flag, puts the romset
+   where the emulator will actually look, and starts the game. If anything is
+   missing it says which thing and what to do. The manual route is below.
+3. Manually: put `vsavjw.zip` (from the applier) in the emulator's rom directory. That
    is the ONLY file — the set is standalone, so no `vsav.zip`, no `vsavj.zip`
    and no QSound BIOS zip go beside it — or pass `-rompath "/your/rompath"`.
    Use the applier's DEFAULT here, not `--no-qsound-bios`: that option is for
    MiSTer, and MAME refuses a set built with it.
-3. Start the set `vsavjw`. The boot name screen reads VAMPIRE SAVED and the
+4. Start the set `vsavjw`. The boot name screen reads VAMPIRE SAVED and the
    select screen shows the mark M19.

@@ -16,13 +16,13 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**368 scripts** — 84 ci_portable, 81 ci_static, 203 emulator-tier (run by name).
+**369 scripts** — 85 ci_portable, 81 ci_static, 203 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 16 | the suite runners and their own ground truth |
 | [docs](#docs) | 18 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 34 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 35 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
@@ -113,6 +113,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_readme_recording.sh` | test | emulator | MAME, a build dir, ~50 s | the README's "record it on MAME" command, run as written on this host's release MAME against the current merged romset, records a session the project replays frame for frame: | 14z-158 |
 | `tests/test_release_asset_shape.sh` | test | ci_portable | — | EVERY PUBLISHED ASSET IS SELF-SUFFICIENT, and the two emulator routes never travel together. ROM-free, no emulator, ~10 s. | 14z-149 |
 | `tests/test_release_binaries.sh` | test | emulator | MAME, FBNeo, a build dir, ~2 min | the PREBUILT emulator binaries for THIS host under release/emulators/{fbneo,mame}/<os-arch>/ (the build resource every release's emulator/bin/<os-arch>/ is hash-verified from; maintainer-ruled 2026-09-11: | 2026-09-11 |
+| `tests/test_release_launcher.sh` | test | ci_portable | — | THE PLAYER'S LAUNCHER, DRIVEN (2026-09-20). | 2026-09-20 |
 | `tests/test_release_os_metadata.sh` | test | ci_portable | — | a file manager's folder metadata (`.DS_Store`) in a release tree is never shipped and never counted: the real uploader cuts no asset carrying one, and every release listing that can see a dotfile drops it through the one definition, tests/l… | 2026-09-14 |
 | `tests/test_release_roundtrip.sh` | test | ci_static | ROMDIR | THE RELEASE PACKAGE GATE (14z-105). | 14z-105 |
 | `tests/test_replay_stage_census.sh` | test | ci_portable | — | FREEZE the input-staging convention of every replay-driving Lua instrument (14z-93, GitHub issue #10). No ROMs, no emulator, ~1s. | 14z-93 |

@@ -113,6 +113,7 @@ declares	test_ref_rot_image_pick
 declares	test_rehit_ring
 declares	test_release_asset_shape
 declares	test_release_binaries
+declares	test_release_launcher
 declares	test_release_os_metadata
 declares	test_release_roundtrip
 declares	test_rompath_reject
