@@ -28,7 +28,9 @@ NAME the loader asks for (libavif.16.dylib), with the CONTENT of the real file
 install_name_tool invalidates the code signature, and on Apple Silicon an
 unsigned binary does not run at all, so every file is re-signed ad-hoc
 (`codesign -s -`). Ad-hoc is not notarization: a downloaded copy is quarantined
-and the user opens it once via right-click > Open (BINARY.txt says so).
+and the user clears the quarantine flag once (BINARY.txt says so). NOTE 2026-09-20:
+# right-click > Open, which this line used to name, does NOT get past the block on
+# current macOS — measured on the maintainer's Mac, GitHub #144.
 
 Prints the inventory (name, size) and exits non-zero on any leftover absolute
 reference — the assertion is on the ARTIFACT, not on the tool's intent.

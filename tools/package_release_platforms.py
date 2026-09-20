@@ -180,9 +180,12 @@ if [ "$OS" = macos ] && command -v xattr >/dev/null 2>&1; then
             say "Cleared."
             ;;
         *)
-            die "not cleared, so the emulator would be blocked." \
-                "Either run:  xattr -dr com.apple.quarantine '$HERE'" \
-                "or right-click the binary once and choose Open:" "  $BIN"
+            die "not cleared, so macOS will block the emulator." \
+                "macOS shows: \"fbneo\" Not Opened — Apple could not verify ..." \
+                "with only Done and Move to Bin. RIGHT-CLICK > OPEN DOES NOT GET PAST IT" \
+                "on current macOS. What works is clearing the flag:" \
+                "  xattr -dr com.apple.quarantine '$HERE'" \
+                "then start this launcher again."
             ;;
         esac
         say ""
@@ -409,8 +412,18 @@ get the emulator or core ("Play on {up}" at the end), play.
 
 
 def append_play(dest, text):
-    with open(os.path.join(dest, "README.md"), "a") as f:
-        f.write(text)
+    """Put the platform's "Play on …" section where a PLAYER needs it — directly after
+    the build step — rather than at the end of the file, which is where a plain append
+    left it. #146, 2026-09-20: the reader is not a developer and has never seen this
+    project, so the document has to run in the order they will act in."""
+    path = os.path.join(dest, "README.md")
+    body = open(path).read()
+    if "<!--PLAY-->" in body:
+        body = body.replace("<!--PLAY-->", text.strip("\n"), 1)
+        open(path, "w").write(body)
+    else:                       # no marker (an older common README): keep the old behaviour
+        with open(path, "a") as f:
+            f.write(text)
 
 
 def emulator_side(platform, dest, name):
@@ -428,27 +441,33 @@ def emulator_side(platform, dest, name):
     up = platform.upper()
     play = f"""
 ## Play on {up}
-1. The patched emulator. **You already have it, or you build it once — whichever
-   package you took:**
+You need the prepared emulator, and then the game file next to it.
+
+1. **The emulator.** You already have it, or you build it once — whichever package
+   you downloaded:
    - `{name}-{platform}-<os-arch>.zip` ({avail}): the emulator is in this package
-     under `emulator/bin/<os-arch>/`. Verify every file's sha256 against
-     `BINARY.txt` beside it, then run it. Nothing to build, nothing to patch —
-     this package carries no emulator patch on purpose.
-   - `{name}-{platform}-recipe.zip`: build it once from the pinned upstream with
-     `emulator/0002-cps2-wide-v1.patch`; `EMULATOR.md` has the exact commands.
-   Both are the same code; the patch is 0002-cps2-wide-v1.
-2. **The easy way: double-click `PLAY.command`** (or `sh PLAY.command` in a
-   terminal). It finds this package's binary for your machine, checks it really
-   carries the WIDE profile, deals with macOS's quarantine flag, puts the romset
-   where the emulator will actually look, and starts the game. If anything is
-   missing it says which thing and what to do. The manual route is below.
-3. Manually: put `vsavjw.zip` (from the applier) in the emulator's rom directory. That
-   is the ONLY file — the set is standalone, so no `vsav.zip`, no `vsavj.zip`
-   and no QSound BIOS zip go beside it{' (FBNeo has no rom-path option: it reads `roms/` next to the binary, or the dirs set in its config)' if platform == 'fbneo' else ' — or pass `-rompath "/your/rompath"`'}.
-   Use the applier's DEFAULT here, not `--no-qsound-bios`: that option is for
-   MiSTer{', and MAME refuses a set built with it' if platform == 'mame' else ''}.
-4. Start the set `vsavjw`. The boot name screen reads VAMPIRE SAVED and the
-   select screen shows the mark {name.split('-')[-1].upper() if '-' in name else ''}.
+     under `emulator/bin/<os-arch>/`, where `<os-arch>` names your system —
+     `macos-arm64` is an Apple-Silicon Mac, `windows-x86_64` an ordinary 64-bit
+     Windows PC. `BINARY.txt` beside it lists a fingerprint for every file so you
+     can confirm nothing was altered in transit. Nothing to build or patch.
+   - `{name}-{platform}-recipe.zip`: no ready-made program, but the one small
+     change (`emulator/0002-cps2-wide-v1.patch`) and step-by-step build commands
+     in `EMULATOR.md`. Use this if your system is not listed above, or if you
+     would rather build it yourself than trust a binary.
+   Both routes give the same program.
+2. **The easy way — macOS: double-click `PLAY.command`** (Linux:
+   `sh PLAY.command`; not yet available on Windows). It picks the right program
+   for your machine, checks it is the prepared one and not an ordinary copy,
+   handles macOS's "downloaded from the internet" block, puts your `vsavjw.zip`
+   where this emulator actually looks for it, and starts the game. If anything is
+   missing it names it. Skip to step 4.
+3. **By hand.** Put the `vsavjw.zip` you built in step 1 {'in a folder called `roms/` next to the emulator program, and start the emulator FROM that folder. This sounds fussy and is: this version of FBNeo has no setting for where games live — it only ever looks in `roms/` beside wherever you started it, so pointing at the file from its menu will not work' if platform == 'fbneo' else 'anywhere you like, and tell the emulator where by starting it with `-rompath "/that/folder"`'}.
+   It is the **only** file you put there — not `vsav.zip`, not `vsavj.zip`, not
+   the sound file. Everything the emulator needs is already inside it{', as long as you built it the normal way (without `--no-qsound-bios`, which is for MiSTer and which MAME will refuse)' if platform == 'mame' else ''}.
+4. Start it. The emulator calls this game `vsavjw`. When it works, the first
+   screen reads **VAMPIRE SAVED** and the character-select screen shows
+   **{name.split('-')[-1].upper() if '-' in name else ''}** in the bottom-right
+   corner. Donovan, Phobos and Pyron are on the select screen with everyone else.
 """
     append_play(dest, play)
     # the launcher, executable, beside the README it points at

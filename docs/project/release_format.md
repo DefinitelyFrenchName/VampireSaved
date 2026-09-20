@@ -222,7 +222,12 @@ release/emulators/<platform>/<os-arch>/                         <- THE BINARY BU
   sha1, and the statement that it is the ONLY patch — the harness patch never
   ships), `recipe`, `built` (date, host OS, compiler), `requires` (the minimum
   OS the artifact carries and the arch), `run`, `gatekeeper` (ad-hoc signed,
-  not notarized: right-click > Open once, or clear the quarantine attribute),
+  not notarized, so macOS BLOCKS the binary on first launch with "Not Opened — Apple
+  could not verify …" and only Done / Move to Bin. **Right-click > Open does NOT get
+  past it** on current macOS — confirmed on the maintainer's Mac 2026-09-20 for both
+  binaries, and the earlier advice to do that is WITHDRAWN. What is measured to work is
+  clearing the quarantine flag, `xattr -dr com.apple.quarantine .`, which `PLAY.command`
+  offers to do; notarization is the real fix and is #144),
   `not works`, `provenance` (rebuildable, not byte-reproducible).
   **SELF-CONTAINED by construction:** the recipe links Homebrew's SDL by
   absolute path, so the build tool bundles every non-system library flat

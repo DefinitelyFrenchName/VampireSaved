@@ -7,9 +7,9 @@
 > and the README pass #146 come first. **One slice is nonetheless already proven**:
 > A1's VCDIFF port decodes all 20 shipped patches to the manifest's exact SHA-1, and
 > every other capability the page needs was measured native rather than assumed (§3).
-> **Three things are OPEN for the maintainer** and none of them is mine to settle: where
-> the page lives, whether it ships per release or once, and whether a browser page is
-> acceptable at all for players handing over ROM files (§6).
+> **The three open questions were RULED on 2026-09-20** (§6): a local file in the
+> asset, one page per release shipping beside that release's own files, and a browser
+> page is acceptable. What remains open belongs to slice A2.
 
 **Why this document exists:** the same reason `harness_scope.md` and
 `living_docs_scope.md` do. This is a backlog direction the maintainer ordered, it is
@@ -111,19 +111,31 @@ Naive peak memory is ~171 MB, which a browser tab holds, but see the slices.
 - Anything that makes the page a prerequisite: a release must remain usable with
   Python alone.
 
-## 6. OPEN — FOR THE MAINTAINER
+## 6. RULED — and the one question that was mine to answer
 
-1. **Where does it live?** A release asset is a zip the player must unzip and open
-   locally (works, no hosting, but `file://` has quirks); GitHub Pages on this repo is
-   one URL that always matches the latest release (but is a hosted surface we then
-   maintain, and must be shown to be doing no upload). A local file is the more
-   conservative default and my recommendation unless you want the URL.
-2. **Does it ship per release, or once?** Pinned to a release's manifest is simpler to
-   verify; a generic page that reads any release's `manifest.json` is one artifact
-   forever but must then tolerate manifests it has not seen.
-3. **Is a browser page acceptable at all** for players who will be asked to hand a
-   local page their ROM files? The trust story is better than an unsigned binary's,
-   but it is still a thing to say out loud in the README.
+All three were put to the maintainer on 2026-09-20 and answered the same day.
+
+1. **Where does it live? — RULED: a local file in the asset.** *"preferably a local
+   file in the asset"*. So the page ships inside each release package beside
+   `apply_release.py`, is opened from disk, and there is no hosted surface to
+   maintain or to prove is not uploading anything.
+2. **Per release, or one generic page? — I asked this badly and the maintainer said
+   so** (*"not sure what you mean"*). Restated: the page could either carry this
+   release's difference files inside it, so it only ever builds this version; or be a
+   general reader that you point at any release's `manifest.json`, so one copy of the
+   page works for every future version. **It follows from (1) and does not need
+   asking again:** shipping inside the asset means the page sits next to that
+   release's own `patches/` and `manifest.json`, so it reads the files beside it and
+   is automatically correct for the release it shipped with. One page per release, no
+   version-matching for the player to get wrong.
+3. **Is a browser page acceptable for players handing it ROM files? — RULED: yes**,
+   *"in any case that's not a blocker as of now so we can assume yes"*. The
+   client-side constraint in §2 stands regardless, and the README will say plainly
+   that nothing leaves the machine.
+
+**Still open, and it belongs to A2:** confirming `deflate-raw` and
+`crypto.subtle` behave in real browsers as they did under node (§3), and which
+browsers are in scope.
 
 ## 7. Provenance
 

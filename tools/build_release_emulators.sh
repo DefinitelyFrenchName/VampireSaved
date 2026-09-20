@@ -77,7 +77,7 @@ Darwin)
     HOST="macOS $(sw_vers -productVersion) ($(uname -m)), $(clang --version | head -1)"
     SDL3LIB=libSDL3.dylib
     SIGNED=" all ad-hoc signed"
-    FIRSTRUN="gatekeeper the binary is ad-hoc signed, NOT notarized: macOS quarantines a downloaded copy and refuses it on first launch. Either right-click > Open once on the executable, or run \`xattr -dr com.apple.quarantine .\` inside this directory."
+    FIRSTRUN="gatekeeper the binary is ad-hoc signed, NOT notarized, so macOS BLOCKS IT ON FIRST LAUNCH: \"\\"<name>\\" Not Opened — Apple could not verify ... is free of malware\", offering only Done and Move to Bin. **RIGHT-CLICK > OPEN DOES NOT GET PAST THIS** on current macOS (confirmed on the maintainer's Mac, 2026-09-20, for both binaries — the old advice to do that was wrong and is withdrawn). WHAT WORKS, measured: clear the quarantine flag, then launch — `xattr -dr com.apple.quarantine .` inside this directory. The release also ships PLAY.command, which does that for you after asking. System Settings > Privacy & Security may additionally offer \"Open Anyway\" after a blocked attempt; that route is NOT verified here. The real fix is notarization, which needs a paid Apple Developer account — see GitHub #144."
     ;;
 Linux)
     HOSTOS=linux

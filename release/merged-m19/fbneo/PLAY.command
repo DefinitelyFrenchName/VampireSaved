@@ -62,9 +62,12 @@ if [ "$OS" = macos ] && command -v xattr >/dev/null 2>&1; then
             say "Cleared."
             ;;
         *)
-            die "not cleared, so the emulator would be blocked." \
-                "Either run:  xattr -dr com.apple.quarantine '$HERE'" \
-                "or right-click the binary once and choose Open:" "  $BIN"
+            die "not cleared, so macOS will block the emulator." \
+                "macOS shows: \"fbneo\" Not Opened — Apple could not verify ..." \
+                "with only Done and Move to Bin. RIGHT-CLICK > OPEN DOES NOT GET PAST IT" \
+                "on current macOS. What works is clearing the flag:" \
+                "  xattr -dr com.apple.quarantine '$HERE'" \
+                "then start this launcher again."
             ;;
         esac
         say ""

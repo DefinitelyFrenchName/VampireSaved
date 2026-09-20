@@ -1,15 +1,56 @@
-# VAMPIRE SAVED — merged-m19 (in-game mark "M19")
+# VAMPIRE SAVED — merged-m19
 
-Full-roster Vampire Savior on the real CPS-2 engine: the 15+1 of vsavj plus
-Donovan, Huitzil/Phobos and Pyron, and a hand-pickable Oboro Bishamon. Runs
-on the CPS-2 WIDE profile — an extended CPS-2 board that a patched FBNeo, a
-patched MAME (driver `vsavjw`) or the `jtcps2w` MiSTer core implements.
+**What this is.** Vampire Savior (the arcade fighting game, 1997) with three
+characters added who were never in it: **Donovan**, **Phobos** (called Huitzil in
+the Western release) and **Pyron**. They come from two sister games Capcom built
+on the same hardware. Nothing else is changed — every original character plays
+exactly as before. Once it is running, the character-select screen shows the mark
+`M19` in the bottom-right corner, which is how you can tell you
+are playing this and not the original.
 
-**THIS PACKAGE CONTAINS NO ROM DATA AND NO COPYRIGHTED ASSET, EVER.** It is a
-set of patches computed against the three reference dumps you must already
-own, a manifest, and an applier that rebuilds the romset from YOUR dumps and
-verifies every byte before writing anything. Nothing in it can be played
-without your own dumps.
+**What you need before you start.** Three things, and the first one is the one we
+cannot help with:
+
+1. **Your own copies of the original arcade game files.** These are the contents
+   of an arcade machine's chips, usually called *ROM sets* or *dumps*; they are
+   ordinary `.zip` files. **We cannot give them to you** — they are Capcom's
+   property, and this package deliberately contains none of them. You need
+   `vsavj.zip`, `vsav.zip` and `vsav2.zip`, unmodified, with exactly those names,
+   together in one folder. (A fourth, `qsound_hle.zip`, only for MAME — see
+   "One optional member" below.)
+2. **Python 3** — a free programming language macOS and Linux already include and
+   Windows offers in its store. You will not write any; one command uses it. To
+   check, open a terminal and type `python3 --version`.
+3. **Room and time**: about 60 MB of free disk space for the package and the
+   file you build, and ten minutes. The build briefly uses around 150 MB of
+   memory, which any machine made this century has.
+
+**What you are going to do — three steps, in this order:**
+
+> **1. Build the game file.** One command turns *your* files into a new file,
+> `vsavjw.zip`. That file is the modified game.
+> **2. Get the emulator** — the program that pretends to be the arcade machine.
+> This package already contains one, prepared for this game. **An ordinary
+> emulator you may already own will not work**; the reason is below.
+> **3. Put them together and play.** On **macOS**, double-click
+> **`PLAY.command`** and it does steps 2 and 3 for you. On Linux, run
+> `sh PLAY.command`. On **Windows there is no launcher yet** — follow "Play on…"
+> below by hand; it is four short steps.
+
+**THIS PACKAGE CONTAINS NO ROM DATA AND NO COPYRIGHTED ASSET, EVER.** What it
+carries instead is a list of *differences* — "take these bytes from the file you
+already own, change these ones". Applied to your files they produce the modified
+game; by themselves they are not playable and contain nothing of Capcom's. Every
+byte produced is checked against an expected fingerprint before anything is
+written, so a wrong, renamed or damaged file is reported by name instead of being
+silently used.
+
+**Why an ordinary emulator will not work.** The three added characters need more
+storage than a real CPS-2 arcade board had, so this version runs on a slightly
+extended board. A normal emulator knows only the original board: it will refuse
+the file, or sit on the startup screen forever. The emulator here is an ordinary
+FBNeo or MAME with one small published change that teaches it the larger board —
+that is the only difference, and you can read the change if you want to.
 
 ## The deliverables — what to download, and what each is for
 Everything ships as ASSETS of the GitHub release on tag `freeze/merged-m19`:
@@ -40,11 +81,18 @@ copies of the patch set are byte-identical, and a gate asserts it).
 get the emulator or core ("Play on FBNeo" at the end), play.
 
 ## What is in this package
-- `patches/` — 20 VCDIFF patch files (xdelta3 format), one per rebuilt member
-- `manifest.json` — every target member's SHA-1 and size, which members are
-  copied pristine from which dump, the exact source recipe
-- `apply_release.py` — the applier (Python 3, nothing else needed)
-- this README, plus the platform notes beside it
+- `PLAY.command` — **on macOS, double-click this to play** once you have done
+  step 1 (on Linux, `sh PLAY.command`; **not yet available for Windows**). It
+  finds the right emulator for your machine, checks it really is the prepared
+  one, puts the game file where the emulator will look, and starts it. If
+  anything is missing it tells you which thing and what to do about it.
+- `apply_release.py` — the program that does step 1. Needs Python 3 and nothing
+  else.
+- `patches/` — 20 files of differences, one for each part of the game that
+  changed. Not readable, not playable, and no use without your own game files.
+- `manifest.json` — the list of expected fingerprints the applier checks
+  everything against. You never edit this.
+- this README, plus notes for your platform beside it
 
 ## What you need
 - **Python 3** (3.8 or newer). No other tool: the applier decodes the
@@ -60,7 +108,18 @@ get the emulator or core ("Play on FBNeo" at the end), play.
   modified dump is reported by name, never silently patched over.
 
 ## Build the romset (one command)
+
+"Romset" is just the name for the game file the emulator loads. To make yours,
+open a terminal, go to this folder, and run the line below — replacing
+`/path/to/your/dumps` with the folder that holds your `vsavj.zip`, `vsav.zip`
+and `vsav2.zip`:
+
     python3 apply_release.py --romdir /path/to/your/dumps --out ./rompath
+
+If you have never used a terminal: on macOS open **Terminal** from
+Applications > Utilities, type `cd ` (with the space), drag this folder onto the
+window, and press Return — you are now "in" this folder. On Windows use
+**PowerShell** the same way. It prints a line per step and finishes with `OK:`.
 
 `./rompath/` then holds `vsavjw.zip`, and that is **the only file you place** —
 it is a STANDALONE set: every member the emulator asks for is inside it,
@@ -70,9 +129,40 @@ do not put `vsav.zip`, `vsavj.zip` or `qsound_hle.zip` in the emulator's rom
 directory. The applier refuses to write if any member's SHA-1 does not match
 the manifest. One member is optional — see below if you are on MiSTer.
 
-## One optional member — the QSound BIOS
+## Play on FBNEO
+You need the prepared emulator, and then the game file next to it.
 
-`dl-1425.bin` is the only part of the set you get a choice about.
+1. **The emulator.** You already have it, or you build it once — whichever package
+   you downloaded:
+   - `merged-m19-fbneo-<os-arch>.zip` (built for: macos-arm64, windows-x86_64): the emulator is in this package
+     under `emulator/bin/<os-arch>/`, where `<os-arch>` names your system —
+     `macos-arm64` is an Apple-Silicon Mac, `windows-x86_64` an ordinary 64-bit
+     Windows PC. `BINARY.txt` beside it lists a fingerprint for every file so you
+     can confirm nothing was altered in transit. Nothing to build or patch.
+   - `merged-m19-fbneo-recipe.zip`: no ready-made program, but the one small
+     change (`emulator/0002-cps2-wide-v1.patch`) and step-by-step build commands
+     in `EMULATOR.md`. Use this if your system is not listed above, or if you
+     would rather build it yourself than trust a binary.
+   Both routes give the same program.
+2. **The easy way — macOS: double-click `PLAY.command`** (Linux:
+   `sh PLAY.command`; not yet available on Windows). It picks the right program
+   for your machine, checks it is the prepared one and not an ordinary copy,
+   handles macOS's "downloaded from the internet" block, puts your `vsavjw.zip`
+   where this emulator actually looks for it, and starts the game. If anything is
+   missing it names it. Skip to step 4.
+3. **By hand.** Put the `vsavjw.zip` you built in step 1 in a folder called `roms/` next to the emulator program, and start the emulator FROM that folder. This sounds fussy and is: this version of FBNeo has no setting for where games live — it only ever looks in `roms/` beside wherever you started it, so pointing at the file from its menu will not work.
+   It is the **only** file you put there — not `vsav.zip`, not `vsavj.zip`, not
+   the sound file. Everything the emulator needs is already inside it.
+4. Start it. The emulator calls this game `vsavjw`. When it works, the first
+   screen reads **VAMPIRE SAVED** and the character-select screen shows
+   **M19** in the bottom-right
+   corner. Donovan, Phobos and Pyron are on the select screen with everyone else.
+
+## One optional member — the sound chip's own program
+
+The arcade board's sound hardware had a small program of its own, in a file
+called `dl-1425.bin`. It is the only part of the set you get a choice about,
+because different emulators want it in different places.
 
 - **Keep it (the default).** The romset is then self-sufficient on every
   emulator, MAME included. You need `qsound_hle.zip` among your dumps.
@@ -99,47 +189,45 @@ and netplay peers must hold the same one.
   completion above, which is pristine content from your dumps.)
 
 ## If it does not work
+Almost every first-time problem is one of these five.
+
+- **macOS says the emulator "Not Opened — Apple could not verify…"** and offers
+  only *Done* and *Move to Bin*. This is macOS refusing to run a program that was
+  not submitted to Apple for approval; it is not a sign that anything is wrong
+  with the file. **Right-clicking and choosing Open does NOT get past it** on
+  current macOS. What works: open a terminal in this folder and run
+  `xattr -dr com.apple.quarantine .` — that clears the "downloaded from the
+  internet" mark — then start it again. `PLAY.command` offers to do this for you.
 - **"Unknown system: vsavjw" / "no such driver"** — the emulator is not the
-  patched one. Use the prebuilt binary or the recipe in `EMULATOR.md`.
+  prepared one, so it does not know this game. Use the emulator in this package,
+  or build one with the recipe in `EMULATOR.md`. Your normal emulator cannot be
+  made to work by renaming anything.
 - **The game sits on the QSound / CAPCOM legal screen and never reaches the
   title** — you renamed the set to force it into an unpatched emulator. The
   stock 4 MB driver never loads the program extension, the sound driver or
   the QSound extension, so the boot handshake never completes (measured
   2026-09-11: no crash, no gameplay, the legal screen forever). It needs the
   patched emulator; renaming is never the fix.
-- **"reference dumps do not match the manifest"** — a dump is wrong,
-  modified or from another region; the message names the member.
-- **Netplay** — every peer needs the same emulator build AND the same romset
-  (compare the whole-set key above).
+- **"reference dumps do not match the manifest"** — one of your original game
+  files is not the exact version expected: a different region, a different
+  revision, or altered at some point. The message names the file and the part of
+  it that differs. Nothing is written when this happens.
+- **The game runs but a character looks wrong, or the sound is missing** — almost
+  always a game file that is the right size but the wrong contents. Re-run the
+  build command; it checks every part and will say which one.
+- **Playing online against someone** — both of you need the same emulator AND the
+  same game file. Compare the key printed under "Identify the build": if they do
+  not match, you are not running the same thing.
 
-## What is patched
-20 members are rebuilt, 12 are copied pristine from your dumps
-(of those, 7 complete the set so it stands alone: dl-1425.bin <- qsound_hle.zip (optional), vm3.11m <- vsav.zip, vm3.12m <- vsav.zip, vm3.14m <- vsav.zip, vm3.16m <- vsav.zip, vm3.18m <- vsav.zip, vm3.20m <- vsav.zip).
-The patches hold only bytes the port generates or authors (relocated code,
-tables, the version glyphs); everything that comes from the original games
-is expressed as a reference into YOUR dumps, which is what keeps this package
-free of copyrighted content — and a gate scans every patch for verbatim
-reference-ROM bytes before a release is cut.
+## What is patched — for the curious, not needed to play
+The finished `vsavjw.zip` has 20 parts rebuilt from the differences in
+`patches/` and 12 copied across from your own files untouched. Of those
+copies, 7 are there so the result needs no other file beside it:
+dl-1425.bin <- qsound_hle.zip (optional), vm3.11m <- vsav.zip, vm3.12m <- vsav.zip, vm3.14m <- vsav.zip, vm3.16m <- vsav.zip, vm3.18m <- vsav.zip, vm3.20m <- vsav.zip.
 
-## Play on FBNEO
-1. The patched emulator. **You already have it, or you build it once — whichever
-   package you took:**
-   - `merged-m19-fbneo-<os-arch>.zip` (built for: macos-arm64, windows-x86_64): the emulator is in this package
-     under `emulator/bin/<os-arch>/`. Verify every file's sha256 against
-     `BINARY.txt` beside it, then run it. Nothing to build, nothing to patch —
-     this package carries no emulator patch on purpose.
-   - `merged-m19-fbneo-recipe.zip`: build it once from the pinned upstream with
-     `emulator/0002-cps2-wide-v1.patch`; `EMULATOR.md` has the exact commands.
-   Both are the same code; the patch is 0002-cps2-wide-v1.
-2. **The easy way: double-click `PLAY.command`** (or `sh PLAY.command` in a
-   terminal). It finds this package's binary for your machine, checks it really
-   carries the WIDE profile, deals with macOS's quarantine flag, puts the romset
-   where the emulator will actually look, and starts the game. If anything is
-   missing it says which thing and what to do. The manual route is below.
-3. Manually: put `vsavjw.zip` (from the applier) in the emulator's rom directory. That
-   is the ONLY file — the set is standalone, so no `vsav.zip`, no `vsavj.zip`
-   and no QSound BIOS zip go beside it (FBNeo has no rom-path option: it reads `roms/` next to the binary, or the dirs set in its config).
-   Use the applier's DEFAULT here, not `--no-qsound-bios`: that option is for
-   MiSTer.
-4. Start the set `vsavjw`. The boot name screen reads VAMPIRE SAVED and the
-   select screen shows the mark M19.
+The difference files describe only what this project itself wrote — relocated
+program code, data tables, the version lettering. Anything that came from the
+original games is expressed as "copy it from the player's own file" rather than
+included, which is what keeps this package free of Capcom's content. Before any
+release is published, an automated check scans every difference file for runs of
+original game data and refuses to ship if it finds any.

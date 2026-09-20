@@ -27,6 +27,47 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-20 (14z-173) — #144 is macOS BLOCKING the binaries, the old workaround is withdrawn; the applier page ships local, per release
+
+**#144, settled by capture.** The maintainer double-clicked both prebuilt binaries and
+sent the dialogs: *"fbneo" Not Opened — Apple could not verify "fbneo" is free of malware
+that may harm your Mac or compromise your privacy*, with only **Done** and **Move to
+Bin**, and the same for `cps2`. Asked directly whether right-click > Open gets past it:
+*"Does not open"*. So the advice this project shipped — right-click > Open once — is
+**FALSE on current macOS and is WITHDRAWN** from every live carrier
+(`build_release_emulators.sh`'s record text, the launcher's refusal in
+`package_release_platforms.py`, `release_format.md`, a comment in `bundle_dylibs.py`);
+re-grepped, nothing live still recommends it. What is measured to work is clearing the
+quarantine flag, which `PLAY.command` offers to do. The four shipped `BINARY.txt` records
+still carry the old sentence and correct themselves at the next macOS emulator build,
+which the maintainer had already ruled the right move (*"correct move."*). The ticket now
+turns on a spend: notarization needs a paid Apple Developer account, and the two
+observations that would settle the alternatives (System Settings > "Open Anyway", and
+whether `PLAY.command` is itself blocked) are asked on the issue.
+
+**#146, the brief for the READMEs**, in the maintainer's own words:
+
+> *"the simplest way for me to describe them is : 'it must have felt clear to the expert
+> who wrote them'. Same issue as I encountered often in my work: things arbitrarily
+> considered obvious not explained or quoted, step by step than nonetheless assume the
+> reader has some understanding of the development of that project, nevermind that the
+> user is usually not a developer, and basically never on the project."*
+
+Acted on the same sitting: the player READMEs are rewritten for someone who is not a
+developer and has never seen this project — every term glossed on first use (`dump`,
+`romset`, `driver`, the fingerprints), the three steps stated before any detail, the
+"Play on…" section MOVED to directly after the build step rather than the end of the
+file, and the troubleshooting list led by the macOS block because that is the first
+thing a Mac player hits.
+
+**The applier page (§6 of `applier_app_scope.md`).** Where it lives: *"preferably a local
+file in the asset"*. Whether a browser page is acceptable for players handing over ROM
+files: *"I would suppose so, in any case that's not a blocker as of now so we can assume
+yes"*. The third question was asked badly — *"not sure what you mean"* — and is answered
+in the document rather than re-asked: shipping inside the asset means one page per
+release, sitting beside that release's own files, with no version-matching for the player
+to get wrong.
+
 ## Ruled 2026-09-20 (14z-173) — the applied set is DEFLATED, and the QSound BIOS member is OPTIONAL
 
 Three questions were put to the maintainer after the standalone set landed. Their answers,
