@@ -27,6 +27,57 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-20 (14z-171) — the naming rigs' stock poke: land it ONLY as a DEMONSTRATED prophylactic
+
+The sitting proposed changing the rigs' stock pokes from two per part to one per event,
+first as a repair for ES events firing on an empty meter. Put to the maintainer with the
+measured cost (176 stock samples excluded from the parity comparison) once the repair
+story had been falsified — no part was ever measured to run dry — the ruling was a
+CONDITION, in their own words:
+
+> *"I lean landing, if and only if it's a demonstrated prophylactic that will catch
+> regression there should they pop up. As usual, it's a matter of : is it measured or is
+> it wishful thinking. If it's measured, then it's coverage that might never be useful but
+> that is at least relevant, which is a tradeoff I'm ready to accept. But it has to be
+> demonstrably the case not just a neat idea"*
+
+The poke ALONE did not meet it: prevention is not detection, and every gate would have
+stayed green had it silently stopped landing (the rule-checker's Q4, run `2026-09-20-84`).
+So the condition was met by BUILDING the detection half — `audit_move_parity` section 2b,
+the stock each leg had at every event of every meter part, demonstrated both ways over the
+full corpus. Landed on that basis.
+
+## Ruled 2026-09-20 (14z-171) — land the stock fix, ticket the pin fix as #168, keep it on the next priorities
+
+With the pin fix measured, working and destabilising three input-window-edge events, the
+choice put to the maintainer was (1) land the stock fix alone and ticket the pin fix, (2)
+land both and re-tune the three recipes, or (3) land both and freeze the regressions
+(advised against). Their words:
+
+> *"Do 1 but the complement ticket to reach "2" should be on the list of next priorities,"*
+
+So the pin fix is GitHub **#168**, filed with everything measured and its generator patch
+attached, and it sits at START HERE item 4. Earlier in the same sitting, on the narrower
+question of whether to fix the stock pokes at all:
+
+> *"let's do A, I think it's safer and the cost we'd have to pay eventually anyway"*
+
+and on where to pick #168 up:
+
+> *"I'd rather pick up #168 first"* — taken with the close finished first, so the next
+> session opens on a green pushed tree.
+
+## Ruled 2026-09-20 (14z-171) — #162 is parked, not closed
+
+On the orange flash, once the sitting had answered its open question (it is not a
+sequence-id defect; ours' row 11 baseline is Donovan's sprite-palette block):
+
+> *"We can put #162 on ice while we do the rework"*
+
+Parked, not closed: the ticket stays OPEN with one measurement outstanding — which path
+sets `a0` to the sprite block — and its facts were homed in
+`docs/game/engine_internals.md` [VSP-186] before it was parked, so parking loses nothing.
+
 ## Ruled 2026-09-20 (14z-170 close) — M19 is FROZEN, NOT RELEASED: the release waits on the per-OS deliverable tickets
 
 **What was put (the close report, after the freeze, the green close tier and the pushes):** *"Still open: #161 (Phobos's remaining +1), #162 (the orange flash), #163 (the column and the trap on an airborne victim — I extended its open item to the trap, since both were measured only on a grounded victim). M19 is frozen, not released; the release run is yours to call."*

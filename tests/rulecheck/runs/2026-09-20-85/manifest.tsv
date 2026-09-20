@@ -1,0 +1,8 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+STATE.md	c2d3f1c67bdb4971f843f97907ec65e074d9bdc0
+docs/NEXT_SESSION.md	e7d775b82787f0e3027cbe8a86952a77b146a507
+docs/game/engine_internals.md	ea9cd86db7df40d56b0799ea5a2e1256fc5254cd
+tools/name_moves.py	fdf34698620fdf7534ea7b8af67e32b733314c78
+tests/audit_move_parity.sh	e4517cf116a92357666f6266c0d080072797245d
+build/rig171/close_tier2.log	9f0dbf281173a0e2eabea31176ca0a254680453f
+build/rig171/stock_delivery.log	d4269f6d8eef464346ded783ff8c774f6a73a9e6

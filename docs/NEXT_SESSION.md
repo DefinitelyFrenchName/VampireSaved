@@ -22,13 +22,13 @@ and patch_notes 14z-170 have the detail; STATE 14z-170 the record.
    release run is `--scope all --lane all --strict --controls` (~5.5 h, HANDOFF "WHAT THE RELEASE RUN
    COSTS"), then `tools/upload_release_assets.sh` on `freeze/merged-m19`. `release/merged-m19/` is
    packaged and gated in-tree; the freeze tags and registry rows stand.
-2. **The orange flash** (#162, cosmetic) is ANSWERED and PARKED by agreement — see ALSO OPEN. It is
+2. **The orange flash** (#162, cosmetic) is ANSWERED and PARKED by ruling (*"We can put #162 on ice while we do the rework"*, `DECISIONS_HISTORY.md` "Ruled 2026-09-20 (14z-171) — #162 is parked, not closed") — see ALSO OPEN. It is
    NOT a sequence-id defect: ours' row 11 baseline is Donovan's sprite-palette block, native's is
    vs2 seq row 0x2CF, and both games upload seq 0x2D4 identically during the move.
 3. **Phobos's remaining +1** (the bug ticket, #161; `tests/audit_phobos_dmg_residual.sh` reproduces it): Demitri's 5HP
    takes 12 on ours, 11 native, with Phobos's defense rows already vs2's — trace the damage staging vars stage by stage on
    both legs for that one hit (`docs/game/engine_internals.md` "The DAMAGE pipeline").
-4. **#168 — THE RIG FIX THE MAINTAINER PUT ON THE NEXT PRIORITIES (2026-09-20).** The naming rigs'
+4. **#168 — THE RIG FIX THE MAINTAINER PUT ON THE NEXT PRIORITIES** (*"the complement ticket to reach "2" should be on the list of next priorities"*, 2026-09-20; `DECISIONS_HISTORY.md`). The naming rigs'
    first X pin lands at 2370, inside the round-start entrance, on SEVEN parts (`donovan_13`,
    `huitzil_3/5/6/7`, `pyron_3/5`) — the #136 ENTRANCE class. The fix is WRITTEN AND MEASURED
    (`PIN_FLOOR = 2560`: `move_parity` DIFF 102 -> 95, the ENTRANCE root gone, two events shown never
