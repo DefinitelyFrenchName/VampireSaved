@@ -1,5 +1,87 @@
 # GOTCHAS (project) — traps in OUR pipeline and method
 
+## A CHAIN ID IN A NAMING EXPECTATION IS IDENTIFIED FROM THE SLOT TABLE, NEVER DESCRIBED IN PROSE (paid: 14z-171, caught 14z-172, GitHub #168)
+
+14z-171 reported that two `pyron_3` / `pyron_5` events "had never fired their
+named move at all", quoting `a2:0x03` and `a2:0x02` and glossing both as
+**"a walk"**. The gloss went into the issue body, and 14z-172 repeated it into a
+rule-checker packet and a report before a capture was made.
+
+**Both are wrong, and the tree already held the answer.**
+`tests/expected/vanilla_normal_slots.tsv` (measured on vsavj at 14z-125, every
+vanilla character) freezes `<char> far MP a2:0x03` and `<char> near MP a2:0x02`:
+**`a2:0x03` is the FAR standing MP slot and `a2:0x02` the NEAR one.** The walk
+chains are in table **`a`** (`a:0x02` forward, `a:0x04` back — `move_naming_*`
+part 1), never `a2`. Both events were recording **the character's medium
+punch** — the normal a command throw leaves behind when it does not connect.
+
+**The gloss cost more than accuracy: it hid a piece of evidence.** `a2:0x03`
+being the FAR slot says the two fighters met the event AT RANGE, which is
+independent confirmation of the very entrance defect the ticket was about
+(the legs stood 117 px apart). "A walk" says nothing and points nowhere.
+
+**RULE: before writing what a measured chain id IS, look it up —
+`tests/expected/vanilla_normal_slots.tsv` for the standing normals,
+`move_naming_<tenant>.txt` part 1 for that character's own movement and normals,
+`build/manifest/moves_<tenant>.toml` for the specials.** An id you cannot find
+in one of those is an id you may not name in prose. And when the claim is about
+what a move DOES, produce the capture before the sentence ([VSP-173]) — here the
+picture and the slot table agreed and both contradicted the prose.
+
+## MOVING A RIG'S SCHEDULE MOVES EVERY EVENT'S DOUBLE-PASS PHASE — a shift is a MEASURED QUANTITY, not a spacing choice (paid: 14z-171 to 14z-172, GitHub #168)
+
+The naming rigs' first position pin had to move 175 frames later to clear the
+round-start entrance. 14z-171 moved it 190 and three input-window-edge events
+fired a different move (a walk recorded as an ES move's chain); 200 was worse,
+22 chain lines. The reflex — search the shift for one that looks clean — is the
+trap, and `docs/NEXT_SESSION_HISTORY.md` 14z-171 records it as "the corpus is
+frame-fragile, not a number to search".
+
+**MECHANISM (14z-172): the engine's second logic pass falls on a periodic set of
+FRAMES, and the period is the speed level's** —
+`docs/game/engine_internals.md`, the cadence bullet: one residue class mod **3**
+at level 8 (what `test_move_naming` runs, vsav2's default TURBO) and three
+classes mod **13** at level 6 (what `audit_move_parity` pins). So an input
+scheduled DF frames later meets a different pass phase unless `DF % period == 0`,
+and a recipe that sits at an input-window edge by design then resolves the other
+way. Measured over the corpus: the `huitzil_7` Circuit Scrapper family moved at
+every shift with `DF % 3 != 0` (190, 194, 208) and at none with `DF % 3 == 0`
+(192, 195, 234, 273).
+
+**RULE: quantise the shift to the cadence period — `lcm(3, 13) = 39` for a rig
+both gates run — and keep the constant next to the measurement that produced it
+(`tools/name_moves.py` `TICK_QUANTUM`, asserted by
+`tests/audit_tick_phase.sh`).** And state the residual: divisibility is NOT
+sufficient, because `pyron_3`'s marginal air throw moves at 273 = 7x39 as well
+(its own ticket, #169). A quantised shift is a measured-clean shift, not a
+proven-safe one, and the sweep that says so belongs in the packet.
+
+## A POSITIVE CONTROL DEFINED IN THE INSTRUMENT'S OWN COORDINATES CANNOT SHOW THAT THOSE COORDINATES ARE WRONG (paid: 14z-156, found 14z-172, GitHub #168)
+
+`tests/audit_tick_cadence.sh` section B searched every modulus 2..64 of the
+frame counter `RAM:$FF8080` for one that separates the double-pass frames from
+the single ones, found none, and the finding propagated into
+`engine_internals.md` as "not the frame counter". The search carried a proper
+plant and the plant fired.
+
+**It was still blind, and the plant is why.** `$FF8080` is a BYTE: it wraps at
+256, and `256 % 3 == 1`, so each wrap ROTATES every residue. That window has a
+wrap, at frame 2652 — enough to smear the double set across two residues. The
+same set indexed by the FRAME INDEX is one clean residue class mod 3 in the very
+same window. The plant was *"a target set defined as counter % 3 == 0 must be
+found at modulus 3"* — defined in the counter's own terms, so it wraps WITH the
+counter and is found either way. A control built from the instrument's
+coordinates validates the search, never the coordinates.
+
+**RULE: when a search over a quantity comes back empty, ask what the quantity
+cannot express before recording the negative — and build at least one plant in
+the coordinates of the thing being looked FOR, not of the instrument doing the
+looking** ([VSP-166]; the same shape as "where the classifier LOOKS is validated
+too, and never from our own generator"). A wrapping counter, a masked field and
+a clamped index are the three that have bitten here. The negative itself was
+sound and stays; what needed correcting was the sentence drawn from it
+([VSP-13]).
+
 ## A NEW ANCHOR DOCUMENT FOR A SKILL IS A TWO-REPO EDIT — the harness's consumer config carries its own copy of the skills lock's document list (paid: 14z-163, GitHub #152)
 
 `tools/checkskills.py` names the documents a skill's anchors may live in

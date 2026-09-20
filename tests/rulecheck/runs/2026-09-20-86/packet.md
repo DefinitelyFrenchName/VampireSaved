@@ -1,0 +1,25 @@
+THE PACKET
+
+Decision kind: expectation
+Subject: GitHub #168: the naming rigs' first position pin moved after the round start by a schedule shift quantised to the engine's double-pass cadence, and the six expectation sets that re-freezes
+Claim (the working agent's sentence): The seven naming parts whose first event carries a 'near' pin (donovan_13, huitzil_3/5/6/7, pyron_3/5) have their schedules shifted by 195 frames so the first position pin moves from 2370 to 2565, after the measured round start of 2545, and 195 is chosen as a multiple of 39 = lcm(3, 13), the two double-pass periods read per-frame from the pass counter RAM:$FF8081 on this rig's own legs (3 frames at speed level 8, which tests/test_move_naming.sh runs unpinned, and 13 at level 6, which tests/audit_move_parity.sh pins on both legs), so that every event keeps its double-pass phase and no event is sampled inside the round-start entrance the two games draw differently; on that shift tests/test_move_naming.sh over the whole corpus moves exactly two lines, both corrections of events that had been recording a WALK as their named move, and tests/audit_move_parity.sh goes from 102 to 94 DIFF rows with the entrance class's 15 x-only rows gone. NOT TESTED: why a shift must be divisible by 39 rather than by 3 alone — 192 and 273 are both multiples of 3 and each moved pyron_3's Galactic Throw rows while 195 and 234 did not, so 195 is measured-clean over this corpus and not proven-safe, and the second periodicity behind those rows is unidentified; no speed level other than 6 and 8 is measured, and the cadence is measured on one part (huitzil_7) only; the two corrections are supported by their agreement with sibling rows in the same expectation file and by the stock discriminator, not by a capture.
+Artifacts (read every one, in full):
+  - build/rig172/name_moves.diff
+  - tools/name_moves.py
+  - tests/audit_tick_phase.sh
+  - build/rig172/tick_phase.log
+  - build/rig172/shift_sweep.txt
+  - build/rig172/move_naming_fix195.log
+  - build/rig172/naming_ctl194.log
+  - build/rig172/naming_ctl192.log
+  - build/rig172/naming_ctl234.log
+  - build/rig172/naming_ctl273.log
+  - build/rig172/stock_pyron5.log
+  - tests/audit_rig_opening.sh
+  - tests/expected/rig_opening.tsv
+  - build/rig172/rig_opening.head.tsv
+  - build/rig172/move_parity_events.head.tsv
+  - build/rig172/move_parity_events.fix195.tsv
+  - build/rig172/ro_audit_throw_registration.log
+  - build/rig172/ro_audit_phobos_dmg_residual.log
+  - build/rig172/ro_audit_x2b7ef4_reach_m18.log

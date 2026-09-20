@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**367 scripts** — 84 ci_portable, 81 ci_static, 202 emulator-tier (run by name).
+**368 scripts** — 84 ci_portable, 81 ci_static, 203 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -27,7 +27,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 82 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 54 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 55 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -376,10 +376,11 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_phobos_dmg_residual.sh` | audit | emulator | MAME, FBNeo, a build dir, ~4 min | PHOBOS TAKES ONE MORE HP THAN NATIVE FROM DEMITRI'S 5HP, WITH HIS DEFENSE ROW ALREADY VS2'S, frozen AS MEASURED (14z-170, the open bug ticket): | 14z-170 |
 | `tests/audit_pyron_capture_block.sh` | audit | emulator | MAME, a build dir, ~4 min | PYRON THROWS WITH DEMITRI'S CAPTURE GEOMETRY (measured 14z-131, maintainer-ruled "measure against native vs2 first"). | 14z-131 |
 | `tests/audit_reaction_class_live.sh` | audit | emulator | MAME, a build dir | EVERY WRITE AND READ OF THE VICTIM'S REACTION CLASS (+0x54) OVER THE CORPUS, on pristine vsavj (the whole legacy suite), on our merged build and on native vs2 (the #136 naming parts), frozen (14z-169, the analysis before the class-0x52 fix… | 14z-169 |
-| `tests/audit_rig_opening.sh` | audit | emulator | MAME, a build dir, ~3 s | THE #136 GUARD-CANCEL RIG'S OPENING, ours vs native, frozen AS MEASURED (14z-167): the rig's first X pin lands before the round starts, inside the round-start entrance, and the two legs draw different entrances. | 14z-167 |
+| `tests/audit_rig_opening.sh` | audit | emulator | MAME, a build dir, ~5 s | THE NAMING RIGS' OPENING: the two legs draw DIFFERENT round-start entrances, and the rig no longer samples across the difference (14z-167, rewritten 14z-172 for GitHub #168). | 14z-167 |
 | `tests/audit_tenant_throw_geometry.sh` | audit | emulator | MAME, a build dir, ~12 min | PHOBOS'S THREE THROWS, OURS vs NATIVE VS2 (14z-131, maintainer-directed 2026-09-04). | 14z-131 |
 | `tests/audit_throw_registration.sh` | audit | emulator | MAME, a build dir, ~3 min | THE HIT-REGISTRATION PAIR AT A TENANT THROW, ours vs native, frozen: on every tenant throw contact native's throw code writes the engine's (attacker, victim) registration pair right before the generic hit stager awards meter, while our plac… | 14z-166 |
 | `tests/audit_tick_cadence.sh` | audit | emulator | MAME, ~1.5 min | THE EXTRA LOGIC PASS IS DECIDED BY THE SPEED LEVEL, and on vanilla content each game's DEFAULT play mode sets a different one: | 14z-156 |
+| `tests/audit_tick_phase.sh` | audit | emulator | MAME, a build dir, ~60 s | THE ENGINE'S DOUBLE-PASS CADENCE IS PERIODIC IN FRAMES, AND ITS PERIOD IS WHAT tools/name_moves.py QUANTISES ITS SCHEDULE SHIFT TO (14z-172, GitHub #168). | 14z-172 |
 | `tests/audit_x2b7ef4_reach_m18.sh` | audit | emulator | MAME, FBNeo, a build dir | DOES ANY NAMING PART READ A CORRUPTED x2b7ef4 RECORD ON merged-m18? The reachability the maintainer asked for (2026-09-19, "Measure it now (Recommended)"), re-measured SOUNDLY (14z-170): | 2026-09-19 |
 | `tests/test_advancing_guard.sh` | test | emulator | MAME, ~2.5 min | THE ADVANCING GUARD (guard push), MEASURED on native vs2 and on vsavj, and frozen (14z-123, the documentation pass's G2). | 14z-123 |
 | `tests/test_anim_node_walk.sh` | test | emulator | MAME, a build dir, ~2 min | THE ANIMATION-NODE DECODER IS AN INSTRUMENT (character-data map, phase 1; 14z-118). tools/anim_nodes.py reads the per-character anim index tables and walks the 0x18-byte node chains by the rules read off vs2's walker (PRG:0x02713C / 0x0271C… | 14z-118 |

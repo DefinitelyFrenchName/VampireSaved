@@ -3,16 +3,16 @@
 # class: in-emulator, MAME. Frozen AS MEASURED with FREEZE=1 on m3b_merged27 — the open bug ticket: native 11,
 # ours one more with the defense row already vs2's. Columns: <part> <pin> <leg> <frame> <hp before> <hp after>; one build row.
 #--
-huitzil_5	0000	native	5966	288	277
-huitzil_5	0000	ours	5966	288	276
-huitzil_5	1234	native	5966	288	277
-huitzil_5	1234	ours	5966	288	276
-huitzil_5	5a5a	native	5966	288	277
-huitzil_5	5a5a	ours	5966	288	276
-huitzil_6	0000	native	7725	288	277
-huitzil_6	0000	ours	7725	288	276
-huitzil_6	1234	native	7725	288	277
-huitzil_6	1234	ours	7725	288	276
-huitzil_6	5a5a	native	7725	288	277
-huitzil_6	5a5a	ours	7725	288	276
+huitzil_5	0000	native	6161	288	277
+huitzil_5	0000	ours	6161	288	276
+huitzil_5	1234	native	6161	288	277
+huitzil_5	1234	ours	6161	288	276
+huitzil_5	5a5a	native	6161	288	277
+huitzil_5	5a5a	ours	6161	288	276
+huitzil_6	0000	native	7920	288	277
+huitzil_6	0000	ours	7920	288	276
+huitzil_6	1234	native	7920	288	277
+huitzil_6	1234	ours	7920	288	276
+huitzil_6	5a5a	native	7920	288	277
+huitzil_6	5a5a	ours	7920	288	276
 ours	build	merged-m19	61e9815a

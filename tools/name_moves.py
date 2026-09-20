@@ -667,6 +667,37 @@ METER_PARTS = {"donovan": {"3", "4", "5", "6", "7", "8", "12"}, "pyron": {"4", "
 # round-start spacing, near = pushbox contact — so P1 always faces RIGHT
 # and no walk-in (whose trailing R + the motion's R made a DASH) is needed.
 PIN = {"far": (552, 728)}
+# THE FIRST EVENT'S PIN MUST LAND AFTER THE ROUND STARTS, AND THE SHIFT THAT
+# MAKES IT IS QUANTISED TO THE ENGINE'S DOUBLE-PASS CADENCE (GitHub #168).
+#
+# THE DEFECT. A "near" first event pinned at FIRST_EVENT-230 = 2370 wrote both
+# fighters' X INSIDE the round-start entrance, which the two games DRAW
+# DIFFERENTLY (native the car arrival, ours Cecil-in-hand), so the legs met the
+# first event 117 px apart and the row read DIFF at +0 on x with no move
+# involved — the ENTRANCE class of the #136 attribution, on seven parts
+# (donovan_13, huitzil_3/5/6/7, pyron_3/5). The round starts at frame 2545:
+# MEASURED on both legs of every near-pinned part, all three tenants ($FF812D
+# first reads 1 at 2545 on all ten legs), so it is the round INTRO's property,
+# not the character's entrance; SEPARATING CONTROL, still 2545 on both games
+# with the rigs' speed-level pin withheld. A "far" first event pins at
+# FIRST_EVENT-40 = 2560, already past it, so those 35 parts do not move.
+#
+# WHY THE SHIFT IS QUANTISED. The engine runs a SECOND logic pass on a
+# strictly periodic set of frames, and the period is the SPEED LEVEL's
+# (engine_internals.md "the extra logic pass is decided by the speed level"):
+# MEASURED per-frame on this rig's own leg from the PASS counter $FF8081 over
+# frames 2560-6000 — at level 8, vsav2's default TURBO and what the NAMING gate
+# runs, the double-pass frames are exactly those == 2 (mod 3), 1146 gaps all of
+# 3; at level 6, the pin the PARITY gate puts on both legs, they are == 3, 8, 12
+# (mod 13), gaps 4x528 / 5x264. So an input scheduled ΔF frames later meets a
+# DIFFERENT pass phase unless ΔF is a multiple of the period, and the events
+# that sit at an input-window edge by design ("late button", "after the
+# motion") change which move they fire. Measured, both ways: ΔF = 190 (190 mod
+# 3 = 1, mod 13 = 8) moved three of them and ΔF = 200 (mod 3 = 2) moved more.
+# The quantum is lcm(3, 13) = 39, which holds the phase on BOTH gates.
+ROUND_START = 2545    # frame; measured, both legs, all three tenants (#168)
+TICK_QUANTUM = 39     # lcm(3, 13): the double-pass periods at levels 8 and 6
+PIN_LEAD = {"near": 230, "far": 40}   # how far ahead of its event each pin lands
 # "near" is NOT a poked pair: 880/925 and then 861/925 both OVERLAPPED the
 # pushboxes (Pyron's is wide) and the engine resolved the overlap by
 # CROSSING the fighters five frames later — P1 faced LEFT for whole parts
@@ -686,7 +717,14 @@ def gen(tenant, part, out_rpl, out_sched):
     sched = {"tenant": tenant, "part": part, "events": [], "pokes": []}
     if TENANTS[tenant].get("p2_path"):   # the naming rigs: P2 by his real route (the victim rigs' P2 is a poke, below)
         sched["p2"] = {"id": TENANTS[tenant]["p2_id"], "path": list(TENANTS[tenant]["p2_path"]), "never": list(P2_NEVER), "report": list(P2_REPORT)}
-    t = FIRST_EVENT
+    # A part whose FIRST event carries a pin starts late enough for that pin to
+    # land after the round start, shifted by whole TICK_QUANTUMs so every event
+    # keeps its double-pass phase; every other part is untouched (#168).
+    _e0 = ev[0]
+    _lead = PIN_LEAD.get(_e0[3], 0) if len(_e0) > 3 else 0
+    _short = (ROUND_START - (FIRST_EVENT - _lead)) if _lead else 0
+    first = FIRST_EVENT + (0 if _short <= 0 else -(-_short // TICK_QUANTUM) * TICK_QUANTUM)
+    t = first
     tid = TENANTS[tenant]["id"]
     pin_pokes = []
     for e in ev:
@@ -711,7 +749,7 @@ def gen(tenant, part, out_rpl, out_sched):
     end = t + 200
     lines.append(f"{end} wait")
     # pokes: P2 HP pin every HP_PIN_EVERY frames from the first event; stocks
-    pokes = [] if (tenant, part) in NO_POKE_PARTS else [f"{f}:ff8850:01200120" for f in range(FIRST_EVENT - 50, end, HP_PIN_EVERY)]
+    pokes = [] if (tenant, part) in NO_POKE_PARTS else [f"{f}:ff8850:01200120" for f in range(first - 50, end, HP_PIN_EVERY)]
     if tid and not TENANTS[tenant].get("path"):
         pokes = [f"{f}:ff8782:{tid}" for f in (1400, 1450, 1500)] + pokes
     if TENANTS[tenant].get("id_p2"):
@@ -720,7 +758,7 @@ def gen(tenant, part, out_rpl, out_sched):
     # NO timer poke: $FF8109 is BINARY (99, one tick per ~82 frames = ~8,100
     # frames per round); a 0x99 poke read as 153 ENDED the round (measured
     # 14z-120). Parts are kept under a round instead.
-    assert end - FIRST_EVENT < 7500, f"part {part} exceeds a round ({end - FIRST_EVENT} frames)"
+    assert end - ROUND_START < 7500, f"part {part} exceeds a round ({end - ROUND_START} frames from the round start)"
     if part in METER_PARTS[tenant]:
         # A STOCK POKE PER EVENT, 60 frames ahead of its input (14z-171). It was
         # TWO pokes — `first - 60` and the part's MIDPOINT — and a midpoint does
@@ -748,6 +786,14 @@ def gen(tenant, part, out_rpl, out_sched):
         # `tests/test_move_naming.sh` reports ZERO chain differences and
         # `audit_move_parity`'s verdicts are unchanged (only `excluded` moves).
         pokes += [f"{e['frame'] - 60}:ff8509:09" for e in sched["events"]]
+    # THE GUARD: no position pin may land before the round starts (#168). Only
+    # the first event's can, and only if the quantised shift above was skipped.
+    for _p in pin_pokes:
+        _f = int(_p.split(":")[0])
+        assert _f >= ROUND_START, (
+            f"{tenant} part {part}: position pin at frame {_f} lands before the "
+            f"round starts ({ROUND_START}) — it would write X inside the entrance, "
+            f"which each game draws differently")
     sched["pokes"] = pokes
     sched["frames"] = end + 50
     Path(out_rpl).write_text("\n".join(lines) + "\n")

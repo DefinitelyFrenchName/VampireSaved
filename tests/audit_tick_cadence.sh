@@ -47,7 +47,16 @@
 #     +1 between consecutive dumps — the dumps' alignment control): no modulus 2..64
 #     leaves every residue all-double or all-single (a modulus near the window's 201
 #     frames is trivially pure and says nothing, so none is tested); planted: a target
-#     set defined as counter % 3 == 0 must be found at modulus 3;
+#     set defined as counter % 3 == 0 must be found at modulus 3.
+#     THIS NEGATIVE IS TRUE OF THE BYTE AND ONLY OF THE BYTE (14z-172, #168): $FF8080
+#     wraps at 256 and 256 % 3 == 1, % 13 == 9, so every wrap ROTATES the residue — this
+#     window has one, at frame 2652 (255 -> 0). Indexed by the FRAME INDEX instead, the
+#     double-pass frames ARE one residue class mod 3 at level 8 and three mod 13 at
+#     level 6, disjoint from the single ones, in this very window; the cadence is
+#     strictly periodic and tests/audit_tick_phase.sh is where that is asserted.
+#     The plant above could not have caught the difference: it defines its target set in
+#     the INSTRUMENT'S OWN COORDINATES (counter % 3), so it rides through the wrap with
+#     the instrument ([VSP-166]; docs/game/engine_internals.md, the cadence bullet);
 #   * any single bit or exact byte value of $FF8000-$FF83FF at frame f-2..f+2 equal to
 #     the double-tick set: none; planted: bit 3 of a constant byte set on the double
 #     frames must be found at d = 0;

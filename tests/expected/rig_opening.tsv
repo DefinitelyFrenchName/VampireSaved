@@ -1,22 +1,27 @@
-# tests/expected/rig_opening.tsv — the #136 guard-cancel rig's opening (huitzil_5), ours (merged-m18) vs native vsav2
-# (tests/audit_rig_opening.sh; tests/lua/field_trace.lua). Evidence class: in-emulator. Frozen 14z-167 with FREEZE=1.
-# THE RIG ARTIFACT IS FROZEN AS MEASURED: the round starts after the rig's first X pin (2370), the legs draw different
-# entrances and stand apart at the first event. The rig change that pins after the round start re-freezes this file.
+# tests/expected/rig_opening.tsv — the naming rigs' opening (huitzil_5), ours (merged-m19) vs native vsav2
+# (tests/audit_rig_opening.sh; tests/lua/field_trace.lua). Evidence class: in-emulator. Re-frozen 14z-172 with FREEZE=1.
+# WHAT THESE ROWS RECORD: the two games draw DIFFERENT round-start entrances (native the car arrival, ours the arrival
+# with Cecil in hand) and CONVERGE once the rig's first position pin lands, which is after the round start (#168).
+# The pre-pin rows are the entrance DIFFERENCE, frozen as measured; the rows from the pin on are the convergence.
 # Columns: start <leg> <first frame $FF812D = 1> | at <leg> <frame> x= seq=
 #--
 start	native	2545
 at	native	2363	x=360	seq=2
-at	native	2370	x=552	seq=2
-at	native	2395	x=702	seq=4
-at	native	2481	x=702	seq=4
-at	native	2544	x=698	seq=0
-at	native	2560	x=728	seq=4
-at	native	2600	x=714	seq=4
+at	native	2370	x=402	seq=2
+at	native	2395	x=552	seq=4
+at	native	2481	x=552	seq=4
+at	native	2544	x=552	seq=0
+at	native	2560	x=552	seq=0
+at	native	2565	x=552	seq=0
+at	native	2600	x=552	seq=0
+at	native	2795	x=899	seq=4
 start	ours	2545
 at	ours	2363	x=552	seq=4
 at	ours	2370	x=552	seq=4
 at	ours	2395	x=552	seq=4
 at	ours	2481	x=552	seq=0
 at	ours	2544	x=552	seq=0
-at	ours	2560	x=611	seq=4
-at	ours	2600	x=597	seq=4
+at	ours	2560	x=552	seq=0
+at	ours	2565	x=552	seq=0
+at	ours	2600	x=552	seq=0
+at	ours	2795	x=899	seq=4

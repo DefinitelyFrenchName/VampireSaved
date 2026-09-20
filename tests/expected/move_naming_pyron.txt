@@ -55,7 +55,7 @@
 2	Galaxy Trip [j.421LK]	a2:0x3a a2:0x3b
 2	Galaxy Trip [j.421MK]	a2:0x3a a2:0x3b
 2	Galaxy Trip [j.421HK]	a2:0x3a a2:0x3b
-3	Corona Whip [6MP]	a2:0x03
+3	Corona Whip [6MP]	a2:0x1e a2:0x20
 3	Corona Whip [6HP]	a2:0x1e a2:0x20
 3	Corona Whip [4MP]	a2:0x1e a2:0x20  FACING-LEFT
 3	Planet Burning [MP]	a2:0x24 a2:0x1e a2:0x21 a2:0x22
@@ -80,7 +80,7 @@
 4	Shining Gemini [LP+LK]	
 4	5LP in DF	a2:0x00
 4	Sol Smasher [LP] in DF	a2:0x26
-5	Planet Burning [MP] step back (control)	a2:0x02
+5	Planet Burning [MP] step back (control)	a2:0x1e a2:0x21 a2:0x22
 5	Planet Burning (ES) [63214 MP+HP] step back	a2:0x1e a2:0x21 a2:0x22
 5	Planet Burning (ES) [63214 LP+HP] step back	a2:0x1e a2:0x21 a2:0x22
 5	Planet Burning (ES) [63214 LP+MP] step back	a2:0x1e a2:0x21 a2:0x22

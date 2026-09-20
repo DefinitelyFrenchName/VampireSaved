@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 168
+# issues: 169
 number	state	reason	closed	labels	title
+169	OPEN	-	-	bug	pyron_3 Galactic Throw: the air throw connects on only one strength, and [j.6HP]'s frozen chain is a plain j.HP
 168	OPEN	-	-	bug	The naming rigs' first X pin lands before the round starts on seven parts — the #136 ENTRANCE class
 167	OPEN	-	-	evolution	A freeze leaves stale PINS the re-point sweep cannot see: a gate for superseded-fingerprint references
 166	CLOSED	COMPLETED	2026-09-19	bug	The generator's in-place placeholder scan corrupted 52 x2b7ef4 companion-effect records, shipped since merged-m16

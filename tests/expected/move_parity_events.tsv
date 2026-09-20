@@ -342,12 +342,12 @@ huitzil_2	17	Plasma Trap [j.214LK]	IDENT	-	-	220	-	2
 huitzil_2	18	Plasma Trap [j.214MK]	IDENT	-	-	220	-	2
 huitzil_2	19	Plasma Trap [j.214HK]	IDENT	-	-	220	-	1
 huitzil_2	20	Plasma Trap [j.214HK] late	IDENT	-	-	471	-	1
-huitzil_3	0	Magnet Slam [6MP]	DIFF	+0	cnt,meter,node,seq,sub,x	420	-	2
+huitzil_3	0	Magnet Slam [6MP]	DIFF	+90	meter	420	-	2
 huitzil_3	1	Magnet Slam [6HP]	DIFF	+90	meter	420	after:0	2
 huitzil_3	2	Magnet Slam [4MP]	DIFF	+73	meter	420	after:0	2
-huitzil_3	3	Circuit Scrapper [MP]	DIFF	+0	x	420	after:0	2
+huitzil_3	3	Circuit Scrapper [MP]	DIFF	+80	meter	420	after:0	2
 huitzil_3	4	Circuit Scrapper [HP]	DIFF	+79	meter	420	after:0	2
-huitzil_3	5	Circuit Scrapper [MP] far (whiff)	DIFF	+10	x	260	after:0	2
+huitzil_3	5	Circuit Scrapper [MP] far (whiff)	DIFF	+79	meter	260	after:0	2
 huitzil_3	6	Sky Capture [j.6MP]	DIFF	+40	meter	420	after:0	2
 huitzil_3	7	Sky Capture [j.6HP]	DIFF	+40	meter	420	after:0	2
 huitzil_3	8	Sitting Attack [8P] off throw	DIFF	+89	meter	420	after:0	2
@@ -366,17 +366,17 @@ huitzil_4	10	Sitting Attack (ES) [8PP] off throw	DIFF	+89	meter	420	-	3
 huitzil_4	11	Ray of Doom [LP+LK]	DIFF	+0	cnt,node,seq,stock,sub	200	after:10	3
 huitzil_4	12	5LP in DF	DIFF	+0	cnt,node,seq,sub,y	200	after:10	2
 huitzil_4	13	Plasma Beam [LP] in DF	NOT-IN-DF	-	df native 0/551 ours 5/551	551	after:10	0
-huitzil_5	0	Reflect Wall [gc LP at hit+2]	DIFF	+0	x	420	-	3
-huitzil_5	1	Reflect Wall [gc LP at hit+6]	DIFF	+17	cnt,node	420	after:0	3
-huitzil_5	2	Reflect Wall [gc LP at hit+10]	DIFF	+16	node	420	after:0	3
-huitzil_5	3	Reflect Wall [gc LP at hit+14]	DIFF	+16	node	420	after:0	3
-huitzil_5	4	Reflect Wall [gc HP at hit+6]	DIFF	+16	node	420	after:0	3
-huitzil_5	5	Reflect Wall [gc LK at hit+6]	DIFF	+16	node	420	after:0	3
-huitzil_5	6	Reflect Wall [gc HK at hit+6]	DIFF	+16	node	420	after:0	3
-huitzil_5	7	Reflect Wall [gc PP at hit+6]	DIFF	+16	node	420	after:0	3
-huitzil_5	8	Reflect Wall [gc LP at hit+6] (control: no block)	DIFF	+6	p1hp	671	after:0	2
-huitzil_6	0	Circuit Scrapper [MP] cont	DIFF	+0	x	420	-	3
-huitzil_6	1	Circuit Scrapper [HP] cont	DIFF	+0	x	420	after:0	3
+huitzil_5	0	Reflect Wall [gc LP at hit+2]	IDENT	-	-	420	-	3
+huitzil_5	1	Reflect Wall [gc LP at hit+6]	DIFF	+17	cnt,node	420	-	3
+huitzil_5	2	Reflect Wall [gc LP at hit+10]	DIFF	+16	node	420	after:1	3
+huitzil_5	3	Reflect Wall [gc LP at hit+14]	DIFF	+16	node	420	after:1	3
+huitzil_5	4	Reflect Wall [gc HP at hit+6]	DIFF	+16	node	420	after:1	3
+huitzil_5	5	Reflect Wall [gc LK at hit+6]	DIFF	+16	node	420	after:1	3
+huitzil_5	6	Reflect Wall [gc HK at hit+6]	DIFF	+16	node	420	after:1	3
+huitzil_5	7	Reflect Wall [gc PP at hit+6]	DIFF	+16	node	420	after:1	3
+huitzil_5	8	Reflect Wall [gc LP at hit+6] (control: no block)	DIFF	+6	p1hp	671	after:1	2
+huitzil_6	0	Circuit Scrapper [MP] cont	DIFF	+72	meter	420	-	3
+huitzil_6	1	Circuit Scrapper [HP] cont	DIFF	+72	meter	420	after:0	3
 huitzil_6	2	Circuit Scrapper (ES) cont	IDENT	-	-	420	after:0	3
 huitzil_6	3	Genocide Vulcan [214LK ground]	IDENT	-	-	220	after:0	2
 huitzil_6	4	Genocide Vulcan [623LK]	IDENT	-	-	220	after:0	3
@@ -384,34 +384,34 @@ huitzil_6	5	Genocide Vulcan [41236LK]	IDENT	-	-	220	after:0	2
 huitzil_6	6	Genocide Vulcan [63214LK]	IDENT	-	-	220	after:0	3
 huitzil_6	7	Genocide Vulcan [charge 2-8 LK]	IDENT	-	-	220	after:0	3
 huitzil_6	8	Genocide Vulcan [charge 4-6 LK]	IDENT	-	-	220	after:0	3
-huitzil_6	9	Genocide Vulcan [22LK]	DIFF	+72	x	220	after:0	2
+huitzil_6	9	Genocide Vulcan [22LK]	IDENT	-	-	220	after:0	2
 huitzil_6	10	Genocide Vulcan [421LK near, slow]	IDENT	-	-	420	after:0	4
-huitzil_6	11	Genocide Vulcan [421LK air]	DIFF	+78	x	220	after:0	1
-huitzil_6	12	Reflect Wall [gc v: L to hit+1, 623LP at hit+2]	DIFF	+232	x	420	after:0	3
-huitzil_6	13	Reflect Wall [gc v: L to hit+1, 623LP at hit+6]	DIFF	+0	x	420	after:0	3
-huitzil_6	14	Reflect Wall [gc v: L to hit+1, 623HP at hit+2]	DIFF	+241	x	420	after:0	3
-huitzil_6	15	Reflect Wall [gc v: L to hit+1, 623LK at hit+2]	DIFF	+240	x	420	after:0	3
-huitzil_6	16	Reflect Wall [gc v: 623 buffered pre-hit, LP at hit+2]	DIFF	+0	x	420	after:0	3
-huitzil_6	17	Reflect Wall [gc v: P2 HK, L to hit+1, 623LP at hit+4]	DIFF	+0	x	420	after:0	4
+huitzil_6	11	Genocide Vulcan [421LK air]	IDENT	-	-	220	after:0	1
+huitzil_6	12	Reflect Wall [gc v: L to hit+1, 623LP at hit+2]	IDENT	-	-	420	after:0	3
+huitzil_6	13	Reflect Wall [gc v: L to hit+1, 623LP at hit+6]	IDENT	-	-	420	after:0	3
+huitzil_6	14	Reflect Wall [gc v: L to hit+1, 623HP at hit+2]	IDENT	-	-	420	after:0	3
+huitzil_6	15	Reflect Wall [gc v: L to hit+1, 623LK at hit+2]	IDENT	-	-	420	after:0	3
+huitzil_6	16	Reflect Wall [gc v: 623 buffered pre-hit, LP at hit+2]	DIFF	+5	p1hp	420	after:0	3
+huitzil_6	17	Reflect Wall [gc v: P2 HK, L to hit+1, 623LP at hit+4]	IDENT	-	-	420	after:0	4
 huitzil_6	18	Reflect Wall [gc v: P2 HK, 623LP at hit+10]	IDENT	-	-	671	after:0	1
-huitzil_7	0	Reflect Wall [gc LP]	DIFF	+0	x	420	-	3
-huitzil_7	1	Reflect Wall [gc MP]	DIFF	+0	x	420	after:0	3
-huitzil_7	2	Reflect Wall [gc HP]	IDENT	-	-	420	after:0	3
-huitzil_7	3	Reflect Wall [gc LK]	IDENT	-	-	420	after:0	3
-huitzil_7	4	Reflect Wall [gc MK]	IDENT	-	-	420	after:0	3
-huitzil_7	5	Reflect Wall [gc HK]	IDENT	-	-	420	after:0	3
-huitzil_7	6	Reflect Wall [gc PP]	IDENT	-	-	420	after:0	4
-huitzil_7	7	Reflect Wall [623LP neutral]	IDENT	-	-	220	after:0	2
-huitzil_7	8	Circuit Scrapper [MP] late button	IDENT	-	-	420	after:0	3
-huitzil_7	9	Circuit Scrapper [HP] late button	IDENT	-	-	420	after:0	3
-huitzil_7	10	Circuit Scrapper [MP] motion then button	DIFF	+75	meter	420	after:0	3
-huitzil_7	11	Genocide Vulcan [421LP]	IDENT	-	-	220	after:0	2
-huitzil_7	12	Genocide Vulcan [421MP]	IDENT	-	-	220	after:0	3
-huitzil_7	13	Genocide Vulcan [421HP]	IDENT	-	-	220	after:0	2
-huitzil_7	14	Genocide Vulcan [421LK vs airborne P2]	IDENT	-	-	220	after:0	3
-huitzil_7	15	Genocide Vulcan [421HK vs airborne P2]	IDENT	-	-	220	after:0	3
-huitzil_7	16	Genocide Vulcan [421KK vs airborne P2]	IDENT	-	-	220	after:0	2
-huitzil_7	17	Genocide Vulcan [421LK near vs airborne P2]	IDENT	-	-	671	after:0	2
+huitzil_7	0	Reflect Wall [gc LP]	IDENT	-	-	420	-	3
+huitzil_7	1	Reflect Wall [gc MP]	IDENT	-	-	420	-	3
+huitzil_7	2	Reflect Wall [gc HP]	IDENT	-	-	420	-	3
+huitzil_7	3	Reflect Wall [gc LK]	IDENT	-	-	420	-	3
+huitzil_7	4	Reflect Wall [gc MK]	IDENT	-	-	420	-	3
+huitzil_7	5	Reflect Wall [gc HK]	IDENT	-	-	420	-	3
+huitzil_7	6	Reflect Wall [gc PP]	IDENT	-	-	420	-	4
+huitzil_7	7	Reflect Wall [623LP neutral]	IDENT	-	-	220	-	2
+huitzil_7	8	Circuit Scrapper [MP] late button	IDENT	-	-	420	-	3
+huitzil_7	9	Circuit Scrapper [HP] late button	IDENT	-	-	420	-	3
+huitzil_7	10	Circuit Scrapper [MP] motion then button	DIFF	+75	meter	420	-	3
+huitzil_7	11	Genocide Vulcan [421LP]	IDENT	-	-	220	after:10	2
+huitzil_7	12	Genocide Vulcan [421MP]	IDENT	-	-	220	after:10	3
+huitzil_7	13	Genocide Vulcan [421HP]	IDENT	-	-	220	after:10	2
+huitzil_7	14	Genocide Vulcan [421LK vs airborne P2]	IDENT	-	-	220	after:10	3
+huitzil_7	15	Genocide Vulcan [421HK vs airborne P2]	IDENT	-	-	220	after:10	3
+huitzil_7	16	Genocide Vulcan [421KK vs airborne P2]	IDENT	-	-	220	after:10	2
+huitzil_7	17	Genocide Vulcan [421LK near vs airborne P2]	IDENT	-	-	671	after:10	2
 huitzil_8	0	Genocide Vulcan (ES) [421PP]	IDENT	-	-	260	-	2
 huitzil_8	1	Genocide Vulcan [421LP] (2)	IDENT	-	-	260	-	3
 huitzil_8	2	Circuit Scrapper [63214 MP+HP]	IDENT	-	-	420	-	3
@@ -490,16 +490,16 @@ pyron_2	23	Galaxy Trip [j.421HP]	IDENT	-	-	200	-	2
 pyron_2	24	Galaxy Trip [j.421LK]	IDENT	-	-	200	-	1
 pyron_2	25	Galaxy Trip [j.421MK]	IDENT	-	-	200	-	2
 pyron_2	26	Galaxy Trip [j.421HK]	IDENT	-	-	451	-	1
-pyron_3	0	Corona Whip [6MP]	IDENT	-	-	420	-	2
-pyron_3	1	Corona Whip [6HP]	DIFF	+30	meter	420	-	2
-pyron_3	2	Corona Whip [4MP]	DIFF	+30	meter	420	after:1	2
-pyron_3	3	Planet Burning [MP]	DIFF	+83	meter	420	after:1	2
-pyron_3	4	Planet Burning [HP]	DIFF	+83	meter	420	after:1	2
-pyron_3	5	Planet Burning [MP] far (whiff)	DIFF	+83	meter	260	after:1	2
-pyron_3	6	Galactic Throw [j.6MP]	IDENT	-	-	420	after:1	2
-pyron_3	7	Galactic Throw [j.6HP]	DIFF	+20	meter,stock	420	after:1	2
-pyron_3	8	Sitting Attack [8P] off throw	DIFF	+30	meter	420	after:1	2
-pyron_3	9	Sitting Attack [8K] off throw	DIFF	+30	meter	671	after:1	1
+pyron_3	0	Corona Whip [6MP]	DIFF	+30	meter	420	-	2
+pyron_3	1	Corona Whip [6HP]	DIFF	+30	meter	420	after:0	2
+pyron_3	2	Corona Whip [4MP]	DIFF	+30	meter	420	after:0	2
+pyron_3	3	Planet Burning [MP]	DIFF	+83	meter	420	after:0	2
+pyron_3	4	Planet Burning [HP]	DIFF	+83	meter	420	after:0	2
+pyron_3	5	Planet Burning [MP] far (whiff)	DIFF	+83	meter	260	after:0	2
+pyron_3	6	Galactic Throw [j.6MP]	IDENT	-	-	420	after:0	2
+pyron_3	7	Galactic Throw [j.6HP]	DIFF	+20	meter,stock	420	after:0	2
+pyron_3	8	Sitting Attack [8P] off throw	DIFF	+30	meter	420	after:0	2
+pyron_3	9	Sitting Attack [8K] off throw	DIFF	+30	meter	671	after:0	1
 pyron_4	0	Sol Smasher (ES)	IDENT	-	-	220	-	2
 pyron_4	1	Sol Smasher (ES) [air]	IDENT	-	-	220	-	3
 pyron_4	2	Zodiac Fire (ES)	IDENT	-	-	220	-	2
@@ -515,16 +515,16 @@ pyron_4	11	Sitting Attack (ES) [8PP] off throw	DIFF	+30	meter	420	-	3
 pyron_4	12	Shining Gemini [LP+LK]	DIFF	+0	node,seq,stock,sub	200	after:11	2
 pyron_4	13	5LP in DF	DIFF	+24	p2hp	200	after:11	3
 pyron_4	14	Sol Smasher [LP] in DF	NOT-IN-DF	-	df native 0/551 ours 0/551	551	after:11	0
-pyron_5	0	Planet Burning [MP] step back (control)	IDENT	-	-	420	-	3
-pyron_5	1	Planet Burning (ES) [63214 MP+HP] step back	IDENT	-	-	420	-	3
-pyron_5	2	Planet Burning (ES) [63214 LP+HP] step back	IDENT	-	-	420	-	3
-pyron_5	3	Planet Burning (ES) [63214 LP+MP] step back	IDENT	-	-	420	-	3
-pyron_5	4	Planet Burning (ES) [63214 MP+HP] slow, step back	IDENT	-	-	420	-	3
-pyron_5	5	Planet Burning (ES) [63214 MP+HP] pair AFTER the motion	IDENT	-	-	420	-	3
-pyron_5	6	Cosmo Disruption [41236 PP] far	IDENT	-	-	400	-	3
-pyron_5	7	Cosmo Disruption [63214 PP] far, no dash	IDENT	-	-	400	-	3
-pyron_5	8	Cosmo Disruption [63214 MP+HP] far, no dash	IDENT	-	-	400	-	3
-pyron_5	9	Cosmo Disruption [41236 MP+HP] far	IDENT	-	-	651	-	1
+pyron_5	0	Planet Burning [MP] step back (control)	DIFF	+105	meter	420	-	3
+pyron_5	1	Planet Burning (ES) [63214 MP+HP] step back	IDENT	-	-	420	after:0	3
+pyron_5	2	Planet Burning (ES) [63214 LP+HP] step back	IDENT	-	-	420	after:0	3
+pyron_5	3	Planet Burning (ES) [63214 LP+MP] step back	IDENT	-	-	420	after:0	3
+pyron_5	4	Planet Burning (ES) [63214 MP+HP] slow, step back	IDENT	-	-	420	after:0	3
+pyron_5	5	Planet Burning (ES) [63214 MP+HP] pair AFTER the motion	IDENT	-	-	420	after:0	3
+pyron_5	6	Cosmo Disruption [41236 PP] far	IDENT	-	-	400	after:0	3
+pyron_5	7	Cosmo Disruption [63214 PP] far, no dash	IDENT	-	-	400	after:0	3
+pyron_5	8	Cosmo Disruption [63214 MP+HP] far, no dash	IDENT	-	-	400	after:0	3
+pyron_5	9	Cosmo Disruption [41236 MP+HP] far	IDENT	-	-	651	after:0	1
 pyron_6	0	j.LP [9]	IDENT	-	-	150	-	1
 pyron_6	1	j.MP [9]	IDENT	-	-	150	-	1
 pyron_6	2	j.HP [9]	IDENT	-	-	150	-	2

@@ -670,7 +670,9 @@ Victor mirror of that gate's §4, frames 2300-2900, reference MAME, both games:
 - ~~**What decides the second pass is NOT located**~~ **LOCATED 14z-158: the speed level, the
   play-mode paragraph at the head of this section.** The three searches below ran first and their
   negatives stand — and they could not have found it: the decider combines a table, the level
-  byte and the PASS counter `RAM:$FF8081`, not the frame counter, one bit, or an accumulator.
+  byte and the PASS counter `RAM:$FF8081`, not the frame-counter BYTE, one bit, or an accumulator.
+  *(Read "not the frame counter" narrowly — the cadence IS strictly periodic in the frame INDEX;
+  the bullet below this one is the correction, 14z-172.)*
   **Three candidates RULED OUT, each search having first found a case planted in the same dumps** (per-frame dumps of all work RAM,
   frames 2560-2760, aligned by `RAM:$FF8080` stepping +1 between every pair): no modulus 2..64 of
   the frame counter `RAM:$FF8080` separates the double-tick frames from the single ones (a modulus
@@ -679,7 +681,34 @@ Victor mirror of that gate's §4, frames 2300-2900, reference MAME, both games:
   constant-step accumulator anywhere in the 64 KB of work RAM carries on it (F1 >= 0.8). *Corrected
   at the 14z-156 close check: this bullet first quoted all three before any of the searches had
   found a planted case, and read "no modulus" without its bound.*
-[M: `tests/audit_tick_cadence.sh` sections A and B; 14z-156]
+- **THE CADENCE IS STRICTLY PERIODIC IN THE FRAME INDEX, AND THE PERIOD IS THE SPEED LEVEL'S
+  (measured 14z-172, #168) — the bullet above is SOUND ABOUT THE BYTE and its inference was too
+  wide.** Over frames 2560-6000 of a naming-rig leg (`tests/replays/naming/huitzil_7`, native
+  vsav2, no zero-pass frame in the window), the double-pass frames — `RAM:$FF8081` stepping by 2,
+  `atlas/ram.md` — are **exactly one residue class mod 3 at speed level 8** (1147 of 3440 frames,
+  every gap 3) and **exactly three classes mod 13 at level 6** (793 of 3440, gaps 4 x528 / 5 x264,
+  the 2:1 that makes the period 4+4+5), each disjoint from the single-pass frames. Those are the
+  same two cadences the bullets above measured as "every third frame" and "every fourth or fifth";
+  what is new is that they are PHASES OF THE FRAME INDEX, so the pass count at any frame is
+  predictable and a schedule shift has a phase.
+  **WHY THE 14z-156 SEARCH COULD NOT SEE IT, mechanically:** it indexed by `RAM:$FF8080`, which is
+  a BYTE and wraps at 256, and **256 mod 3 = 1, 256 mod 13 = 9** — so every wrap ROTATES the
+  residue. Its window (2560-2760) contains a wrap, at frame 2652 (`$FF8080` 255 -> 0), which alone
+  splits the level-8 double set across residues {1, 2} and overlaps the single-pass ones. The same
+  set indexed by the host frame index is disjoint in that very window (67 doubles, residue {2}).
+  The negative was therefore TRUE of the byte and says nothing about the frame index.
+  **AND ITS POSITIVE CONTROL COULD NOT HAVE CAUGHT THAT**, which is the transferable part: the
+  plant was "a target set defined as counter % 3 == 0 must be found at modulus 3" — defined in the
+  INSTRUMENT'S OWN COORDINATES, so it rides through the wrap with the instrument and is found
+  whether or not those coordinates can express the real pattern ([VSP-166], `docs/project/gotchas.md`).
+  **CONSEQUENCE, and it is why this was measured:** an input scheduled DF frames later meets a
+  different pass phase unless DF is a multiple of the period, so any rig that moves a schedule
+  moves its events' phase — `tools/name_moves.py` quantises its round-start shift to
+  lcm(3, 13) = 39 for exactly this reason (#168).
+  *The periodicity is PIECEWISE: a zero-pass overrun frame re-phases it (the bullet above,
+  three frames in the whole #136 corpus), so a window containing one shows two phases.*
+[M: `tests/audit_tick_cadence.sh` sections A and B, 14z-156; `tests/audit_tick_phase.sh`
+section 1 and its `flat-pass` control, 14z-172]
 
 **AN INSTANCE, RULED BY THE MAINTAINER (2026-09-14): Final Guardian Beta's pacing.**
 Phobos's EX Final Guardian Beta (pool object `0x46`) long read as lasting too long on our
