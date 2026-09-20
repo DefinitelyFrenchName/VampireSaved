@@ -227,7 +227,11 @@ release/emulators/<platform>/<os-arch>/                         <- THE BINARY BU
   past it** on current macOS — confirmed on the maintainer's Mac 2026-09-20 for both
   binaries, and the earlier advice to do that is WITHDRAWN. What is measured to work is
   clearing the quarantine flag, `xattr -dr com.apple.quarantine .`, which `PLAY.command`
-  offers to do; notarization is the real fix and is #144),
+  offers to do for the whole folder at once. **System Settings > Privacy & Security >
+  "Open Anyway" also works** (maintainer, 2026-09-20) but is **PER BLOCKED FILE**, and a
+  bundle is not one file: MAME needs **2** approvals, **FBNeo 24** (its executable plus
+  23 bundled libraries), which is why the one-step route is what the READMEs lead with.
+  Notarization is the real fix and is #144),
   `not works`, `provenance` (rebuildable, not byte-reproducible).
   **SELF-CONTAINED by construction:** the recipe links Homebrew's SDL by
   absolute path, so the build tool bundles every non-system library flat

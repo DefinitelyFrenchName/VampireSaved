@@ -40,10 +40,23 @@ Bin**, and the same for `cps2`. Asked directly whether right-click > Open gets p
 re-grepped, nothing live still recommends it. What is measured to work is clearing the
 quarantine flag, which `PLAY.command` offers to do. The four shipped `BINARY.txt` records
 still carry the old sentence and correct themselves at the next macOS emulator build,
-which the maintainer had already ruled the right move (*"correct move."*). The ticket now
-turns on a spend: notarization needs a paid Apple Developer account, and the two
-observations that would settle the alternatives (System Settings > "Open Anyway", and
-whether `PLAY.command` is itself blocked) are asked on the issue.
+which the maintainer had already ruled the right move (*"correct move."*). **THE FIRST OF THOSE CAME BACK THE SAME DAY AND IS DECISIVE:** System Settings >
+Privacy & Security > "Open Anyway" DOES work — *"yes BUT needs the open anyway for the
+executable AND for libSDL3.0.dylib. After that it launches"* — but it is **per blocked
+file**, and a bundle is not one file. Counted in the M19 packages: **MAME needs 2**
+approvals (executable + `libSDL3.0.dylib`, exactly what the maintainer hit) and **FBNeo
+needs 24** (executable + 23 bundled libraries). Twenty-four trips through System Settings
+is not a recommended path, so the READMEs give both routes, lead with the one-step
+quarantine clear (`PLAY.command`, or one `xattr -dr` line) and state the 2-vs-24 cost so
+the player chooses knowingly. The maintainer's reading of the MAME case is also right and
+is why the launcher exists: MAME's front-end lists only what is on its configured rom
+path, so double-clicking it gives a GUI with no game, and *"the rest is likely 'just'
+scripting to launch the emulator directly with the rom as target"* — which is what
+`PLAY.command` does. STILL UNMEASURED: whether `PLAY.command` is itself blocked on a
+double-click; the maintainer could not find one because the launcher exists only in the
+unpushed M19 tree and the published assets are M18, so the file was sent to them
+directly. Notarization remains the only fix that removes the question, and it is a paid
+Apple Developer account — the maintainer's call.
 
 **#146, the brief for the READMEs**, in the maintainer's own words:
 

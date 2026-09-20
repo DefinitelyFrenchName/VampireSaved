@@ -192,12 +192,19 @@ and netplay peers must hold the same one.
 Almost every first-time problem is one of these five.
 
 - **macOS says the emulator "Not Opened — Apple could not verify…"** and offers
-  only *Done* and *Move to Bin*. This is macOS refusing to run a program that was
-  not submitted to Apple for approval; it is not a sign that anything is wrong
-  with the file. **Right-clicking and choosing Open does NOT get past it** on
-  current macOS. What works: open a terminal in this folder and run
-  `xattr -dr com.apple.quarantine .` — that clears the "downloaded from the
-  internet" mark — then start it again. `PLAY.command` offers to do this for you.
+  only *Done* and *Move to Bin*. macOS is refusing to run a program that was not
+  submitted to Apple for approval; nothing is wrong with the file. **Right-clicking
+  and choosing Open does NOT get past it** on current macOS. Two things do:
+  - **The one-step way (recommended).** On macOS, double-click `PLAY.command`; it
+    offers to clear the "downloaded from the internet" mark for the whole folder at
+    once and then starts the game. By hand, the same thing is one line in a terminal
+    opened in this folder: `xattr -dr com.apple.quarantine .`
+  - **Without a terminal at all.** After a blocked attempt, open **System Settings >
+    Privacy & Security**, scroll to the message about the blocked program, and click
+    **Open Anyway**. This works (confirmed 2026-09-20) but you must do it **for each
+    blocked file separately** — and there are more than one, because the program
+    carries its own copies of the libraries it needs. For MAME that is **2** files;
+    **for FBNeo it is 24**, so on FBNeo prefer the one-step way above.
 - **"Unknown system: vsavjw" / "no such driver"** — the emulator is not the
   prepared one, so it does not know this game. Use the emulator in this package,
   or build one with the recipe in `EMULATOR.md`. Your normal emulator cannot be
