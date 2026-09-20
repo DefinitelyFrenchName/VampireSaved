@@ -4934,6 +4934,12 @@ exclude his INFLUENCE. Rules: compare P2's HP and position too and read who
 diverged first; name the P2 as a shared premise; and pick a P2 whose data is
 the same on both games (no legacy character is — the nearest are Demitri, one
 cursor move for P2 on both wheels, and Bishamon) or a second tenant.
+**OUTCOME: the maintainer ruled DEMITRI on 2026-09-17 and the naming rigs
+switched at 14z-165** (`DECISIONS_HISTORY.md` "Ruled 2026-09-17 (14z-164b) —
+the parity rigs' P2 is DEMITRI, Bishamon the fallback"), so the Victor confound
+above is RETIRED for the move-parity rigs; his `b:0x10` held pose is the one
+residual and the gate asserts it equal on both legs. Every OTHER ours-vs-native
+rig still puts Victor on P2 and the trap still applies to them.
 
 ## "IN DF" IN A RIG'S EVENT NAME IS A CLAIM — assert the mode on every event, per leg (paid: 14z-164, GitHub #136)
 

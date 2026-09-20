@@ -81,67 +81,67 @@ donovan_2	22	walk-in	DIFF	+2	cnt,x	120	after:2	0
 donovan_2	23	Foot Stab [8P]	DIFF	+0	cnt	260	after:2	1
 donovan_2	24	walk-in	DIFF	+0	cnt	120	after:2	0
 donovan_2	25	Foot Stab [8K]	DIFF	+0	cnt	511	after:2	1
-donovan_3	0	Blizzard Sword (ES)	IDENT	-	-	240	-	0
-donovan_3	1	Ifrit Sword (ES)	IDENT	-	-	220	-	1
-donovan_3	2	Lightning Sword (ES)	IDENT	-	-	300	-	1
-donovan_3	3	Killshread (ES)	IDENT	-	-	220	-	0
-donovan_3	4	Killshread Lightning (ES)	IDENT	-	-	260	-	1
-donovan_3	5	Killshread Summon (ES)	IDENT	-	-	240	-	0
-donovan_3	6	Press of Death [LK]	DIFF	+1	x	260	-	1
-donovan_3	7	Press of Death [MK]	DIFF	+0	x	260	after:6	1
+donovan_3	0	Blizzard Sword (ES)	IDENT	-	-	240	-	1
+donovan_3	1	Ifrit Sword (ES)	IDENT	-	-	220	-	2
+donovan_3	2	Lightning Sword (ES)	IDENT	-	-	300	-	2
+donovan_3	3	Killshread (ES)	IDENT	-	-	220	-	1
+donovan_3	4	Killshread Lightning (ES)	IDENT	-	-	260	-	2
+donovan_3	5	Killshread Summon (ES)	IDENT	-	-	240	-	1
+donovan_3	6	Press of Death [LK]	DIFF	+1	x	260	-	2
+donovan_3	7	Press of Death [MK]	DIFF	+0	x	260	after:6	2
 donovan_3	8	Press of Death [HK]	DIFF	+0	x	260	after:6	1
-donovan_3	9	Change Immortal	DIFF	+0	x	400	after:6	1
-donovan_3	10	walk-in	DIFF	+0	x	120	after:6	1
-donovan_3	11	Foot Stab (ES) [8PP]	IDENT	-	-	260	after:6	0
-donovan_3	12	walk-in	IDENT	-	-	120	after:6	1
-donovan_3	13	Foot Stab (ES) [8KK]	IDENT	-	-	260	after:6	0
+donovan_3	9	Change Immortal	DIFF	+0	x	400	after:6	2
+donovan_3	10	walk-in	DIFF	+0	x	120	after:6	2
+donovan_3	11	Foot Stab (ES) [8PP]	IDENT	-	-	260	after:6	1
+donovan_3	12	walk-in	IDENT	-	-	120	after:6	2
+donovan_3	13	Foot Stab (ES) [8KK]	IDENT	-	-	260	after:6	1
 donovan_3	14	Slay Shred [MP+MK]	DIFF	+0	cnt,node,seq,stock,sub	751	after:6	2
-donovan_4	0	Killshread [MK]	IDENT	-	-	200	-	0
-donovan_4	1	Killshread Lightning [MP]	IDENT	-	-	240	-	1
-donovan_4	2	Killshread Summon [LK] (2)	IDENT	-	-	220	-	0
-donovan_4	3	Killshread [LK] (2)	IDENT	-	-	200	-	1
-donovan_4	4	Killshread Lightning [HP]	IDENT	-	-	240	-	0
-donovan_4	5	Killshread Summon [HK]	IDENT	-	-	220	-	1
-donovan_4	6	Killshread [HK] (2)	IDENT	-	-	200	-	0
-donovan_4	7	Killshread Summon [j.214LK]	IDENT	-	-	220	-	1
-donovan_4	8	Killshread Summon [MK]	IDENT	-	-	220	-	1
-donovan_4	9	walk-in	IDENT	-	-	240	-	0
-donovan_4	10	Sword Grapple [MP] (sword in hand)	IDENT	-	-	260	-	1
-donovan_4	11	walk-in	IDENT	-	-	140	-	0
+donovan_4	0	Killshread [MK]	IDENT	-	-	200	-	1
+donovan_4	1	Killshread Lightning [MP]	IDENT	-	-	240	-	2
+donovan_4	2	Killshread Summon [LK] (2)	IDENT	-	-	220	-	1
+donovan_4	3	Killshread [LK] (2)	IDENT	-	-	200	-	2
+donovan_4	4	Killshread Lightning [HP]	IDENT	-	-	240	-	1
+donovan_4	5	Killshread Summon [HK]	IDENT	-	-	220	-	2
+donovan_4	6	Killshread [HK] (2)	IDENT	-	-	200	-	1
+donovan_4	7	Killshread Summon [j.214LK]	IDENT	-	-	220	-	2
+donovan_4	8	Killshread Summon [MK]	IDENT	-	-	220	-	2
+donovan_4	9	walk-in	IDENT	-	-	240	-	1
+donovan_4	10	Sword Grapple [MP] (sword in hand)	IDENT	-	-	260	-	2
+donovan_4	11	walk-in	IDENT	-	-	140	-	1
 donovan_4	12	Sword Grapple [HP] (sword in hand)	IDENT	-	-	260	-	2
-donovan_4	13	walk-in	IDENT	-	-	140	-	0
-donovan_4	14	Foot Stab [8P] off throw	DIFF	+47	meter	320	-	1
-donovan_4	15	walk-in	IDENT	-	-	180	after:14	0
-donovan_4	16	Foot Stab [8K] off throw	DIFF	+47	meter	320	after:14	1
-donovan_4	17	walk-in	IDENT	-	-	180	after:14	1
-donovan_4	18	Foot Stab (ES) [8PP] off throw	DIFF	+47	meter	320	after:14	0
-donovan_4	19	walk-in	IDENT	-	-	180	after:14	1
-donovan_4	20	Foot Stab (ES) [8KK] off throw	DIFF	+47	meter	320	after:14	1
-donovan_4	21	Slay Shred [LP+LK]	DIFF	+0	cnt,node,seq,stock,sub	400	after:14	1
+donovan_4	13	walk-in	IDENT	-	-	140	-	1
+donovan_4	14	Foot Stab [8P] off throw	DIFF	+47	meter	320	-	2
+donovan_4	15	walk-in	IDENT	-	-	180	after:14	1
+donovan_4	16	Foot Stab [8K] off throw	DIFF	+47	meter	320	after:14	2
+donovan_4	17	walk-in	IDENT	-	-	180	after:14	2
+donovan_4	18	Foot Stab (ES) [8PP] off throw	DIFF	+47	meter	320	after:14	1
+donovan_4	19	walk-in	IDENT	-	-	180	after:14	2
+donovan_4	20	Foot Stab (ES) [8KK] off throw	DIFF	+47	meter	320	after:14	2
+donovan_4	21	Slay Shred [LP+LK]	DIFF	+0	cnt,node,seq,stock,sub	400	after:14	2
 donovan_4	22	5LP in DF	NOT-IN-DF	-	df native 0/451 ours 0/451	451	after:14	0
-donovan_5	0	walk-in	IDENT	-	-	240	-	0
-donovan_5	1	Sword Grapple [MP]	DIFF	+78	meter	260	-	1
-donovan_5	2	walk-in	IDENT	-	-	140	after:1	0
-donovan_5	3	Sword Grapple [HP]	DIFF	+78	meter	260	after:1	1
-donovan_5	4	walk-in	IDENT	-	-	140	after:1	0
-donovan_5	5	5LP close	IDENT	-	-	120	after:1	1
-donovan_5	6	5MP close	IDENT	-	-	120	after:1	0
-donovan_5	7	5HP close	IDENT	-	-	150	after:1	0
-donovan_5	8	5LK close	IDENT	-	-	120	after:1	0
+donovan_5	0	walk-in	IDENT	-	-	240	-	1
+donovan_5	1	Sword Grapple [MP]	DIFF	+78	meter	260	-	2
+donovan_5	2	walk-in	IDENT	-	-	140	after:1	1
+donovan_5	3	Sword Grapple [HP]	DIFF	+78	meter	260	after:1	2
+donovan_5	4	walk-in	IDENT	-	-	140	after:1	1
+donovan_5	5	5LP close	IDENT	-	-	120	after:1	2
+donovan_5	6	5MP close	IDENT	-	-	120	after:1	1
+donovan_5	7	5HP close	IDENT	-	-	150	after:1	1
+donovan_5	8	5LK close	IDENT	-	-	120	after:1	1
 donovan_5	9	5MK close	IDENT	-	-	120	after:1	2
-donovan_5	10	5HK close	IDENT	-	-	150	after:1	0
-donovan_5	11	2LP close	IDENT	-	-	120	after:1	0
-donovan_5	12	2MP close	IDENT	-	-	120	after:1	1
-donovan_5	13	2HP close	IDENT	-	-	150	after:1	0
-donovan_5	14	2LK close	IDENT	-	-	120	after:1	0
-donovan_5	15	2MK close	IDENT	-	-	120	after:1	1
-donovan_5	16	2HK close	IDENT	-	-	150	after:1	0
+donovan_5	10	5HK close	IDENT	-	-	150	after:1	1
+donovan_5	11	2LP close	IDENT	-	-	120	after:1	1
+donovan_5	12	2MP close	IDENT	-	-	120	after:1	2
+donovan_5	13	2HP close	IDENT	-	-	150	after:1	1
+donovan_5	14	2LK close	IDENT	-	-	120	after:1	1
+donovan_5	15	2MK close	IDENT	-	-	120	after:1	2
+donovan_5	16	2HK close	IDENT	-	-	150	after:1	1
 donovan_5	17	Change Immortal + 2/8	IDENT	-	-	651	after:1	2
-donovan_6	0	U+LP neutral	IDENT	-	-	150	-	0
-donovan_6	1	U+LK neutral	IDENT	-	-	150	-	0
-donovan_6	2	Slay Shred [LP+LK]	DIFF	+0	cnt,node,seq,stock,sub	120	-	1
-donovan_6	3	5LP in DF	DIFF	+0	cnt,node	120	after:2	0
-donovan_6	4	5MP in DF	DIFF	+0	cnt,node	120	after:2	0
+donovan_6	0	U+LP neutral	IDENT	-	-	150	-	1
+donovan_6	1	U+LK neutral	IDENT	-	-	150	-	1
+donovan_6	2	Slay Shred [LP+LK]	DIFF	+0	cnt,node,seq,stock,sub	120	-	2
+donovan_6	3	5LP in DF	DIFF	+0	cnt,node	120	after:2	1
+donovan_6	4	5MP in DF	DIFF	+0	cnt,node	120	after:2	1
 donovan_6	5	5HP in DF	NOT-IN-DF	-	df native 28/150 ours 29/150	150	after:2	0
 donovan_6	6	5LK in DF	NOT-IN-DF	-	df native 0/120 ours 0/120	120	after:2	0
 donovan_6	7	5MK in DF	NOT-IN-DF	-	df native 0/120 ours 0/120	120	after:2	0
@@ -165,43 +165,43 @@ donovan_6	24	Lightning Sword [LP] in DF	NOT-IN-DF	-	df native 0/260 ours 0/260	2
 donovan_6	25	Killshread [LK] in DF	NOT-IN-DF	-	df native 0/220 ours 0/220	220	after:2	0
 donovan_6	26	Killshread Summon [LK] in DF	NOT-IN-DF	-	df native 0/220 ours 0/220	220	after:2	0
 donovan_6	27	idle to DF expiry	DIFF	+0	x	851	after:2	2
-donovan_7	0	Killshread [LK] (plant)	IDENT	-	-	200	-	0
-donovan_7	1	5LP (swordless)	IDENT	-	-	120	-	0
-donovan_7	2	5MP (swordless)	IDENT	-	-	120	-	1
-donovan_7	3	5HP (swordless)	IDENT	-	-	150	-	0
-donovan_7	4	5LK (swordless)	IDENT	-	-	120	-	0
-donovan_7	5	5MK (swordless)	IDENT	-	-	120	-	1
-donovan_7	6	5HK (swordless)	IDENT	-	-	150	-	0
-donovan_7	7	2LP swordless	IDENT	-	-	120	-	0
-donovan_7	8	2MP (swordless)	IDENT	-	-	120	-	1
-donovan_7	9	2HP (swordless)	IDENT	-	-	150	-	0
-donovan_7	10	2LK swordless	IDENT	-	-	120	-	0
-donovan_7	11	2MK swordless	IDENT	-	-	120	-	1
-donovan_7	12	2HK swordless	IDENT	-	-	150	-	0
-donovan_7	13	j.LP swordless	IDENT	-	-	150	-	0
-donovan_7	14	j.MP swordless	IDENT	-	-	150	-	1
-donovan_7	15	j.HP swordless	IDENT	-	-	150	-	0
-donovan_7	16	j.LK swordless	IDENT	-	-	150	-	1
-donovan_7	17	j.MK swordless	IDENT	-	-	150	-	0
-donovan_7	18	j.HK swordless	IDENT	-	-	150	-	0
-donovan_7	19	Hop Kick swordless	IDENT	-	-	150	-	1
+donovan_7	0	Killshread [LK] (plant)	IDENT	-	-	200	-	1
+donovan_7	1	5LP (swordless)	IDENT	-	-	120	-	1
+donovan_7	2	5MP (swordless)	IDENT	-	-	120	-	2
+donovan_7	3	5HP (swordless)	IDENT	-	-	150	-	1
+donovan_7	4	5LK (swordless)	IDENT	-	-	120	-	1
+donovan_7	5	5MK (swordless)	IDENT	-	-	120	-	2
+donovan_7	6	5HK (swordless)	IDENT	-	-	150	-	1
+donovan_7	7	2LP swordless	IDENT	-	-	120	-	1
+donovan_7	8	2MP (swordless)	IDENT	-	-	120	-	2
+donovan_7	9	2HP (swordless)	IDENT	-	-	150	-	1
+donovan_7	10	2LK swordless	IDENT	-	-	120	-	1
+donovan_7	11	2MK swordless	IDENT	-	-	120	-	2
+donovan_7	12	2HK swordless	IDENT	-	-	150	-	1
+donovan_7	13	j.LP swordless	IDENT	-	-	150	-	1
+donovan_7	14	j.MP swordless	IDENT	-	-	150	-	2
+donovan_7	15	j.HP swordless	IDENT	-	-	150	-	1
+donovan_7	16	j.LK swordless	IDENT	-	-	150	-	2
+donovan_7	17	j.MK swordless	IDENT	-	-	150	-	1
+donovan_7	18	j.HK swordless	IDENT	-	-	150	-	1
+donovan_7	19	Hop Kick swordless	IDENT	-	-	150	-	2
 donovan_7	20	Killshread Surf [j.2LK] swordless	IDENT	-	-	150	-	1
-donovan_7	21	Killshread Dive [j.2HK] swordless	IDENT	-	-	150	-	0
-donovan_7	22	Blizzard Sword [LP] swordless	IDENT	-	-	220	-	1
-donovan_7	23	Ifrit Sword [LP] swordless	IDENT	-	-	220	-	0
-donovan_7	24	Lightning Sword [LP] swordless	IDENT	-	-	260	-	1
-donovan_7	25	Lightning Sword [HP] swordless	IDENT	-	-	260	-	1
-donovan_7	26	Press of Death [LK] swordless	IDENT	-	-	260	-	0
-donovan_7	27	Forward dash swordless	IDENT	-	-	150	-	1
-donovan_7	28	walk-in	IDENT	-	-	240	-	0
-donovan_7	29	Sharirum Luna [6MP] swordless	DIFF	+47	meter	260	-	1
-donovan_7	30	walk-in	IDENT	-	-	140	after:29	0
-donovan_7	31	Foot Stab [8P] swordless off throw	DIFF	+47	meter	320	after:29	1
+donovan_7	21	Killshread Dive [j.2HK] swordless	IDENT	-	-	150	-	1
+donovan_7	22	Blizzard Sword [LP] swordless	IDENT	-	-	220	-	2
+donovan_7	23	Ifrit Sword [LP] swordless	IDENT	-	-	220	-	1
+donovan_7	24	Lightning Sword [LP] swordless	IDENT	-	-	260	-	2
+donovan_7	25	Lightning Sword [HP] swordless	IDENT	-	-	260	-	2
+donovan_7	26	Press of Death [LK] swordless	IDENT	-	-	260	-	1
+donovan_7	27	Forward dash swordless	IDENT	-	-	150	-	2
+donovan_7	28	walk-in	IDENT	-	-	240	-	1
+donovan_7	29	Sharirum Luna [6MP] swordless	DIFF	+47	meter	260	-	2
+donovan_7	30	walk-in	IDENT	-	-	140	after:29	1
+donovan_7	31	Foot Stab [8P] swordless off throw	DIFF	+47	meter	320	after:29	2
 donovan_7	32	Slay Shred [LP+LK] swordless	DIFF	+0	cnt,node,seq,stock,sub	451	after:29	1
-donovan_8	0	walk-in	IDENT	-	-	240	-	0
-donovan_8	1	Sharirum Luna [4MP]	DIFF	+47	meter	260	-	1
-donovan_8	2	walk-in	IDENT	-	-	140	after:1	0
-donovan_8	3	Sharirum Luna [4HP]	IDENT	-	-	260	after:1	1
+donovan_8	0	walk-in	IDENT	-	-	240	-	1
+donovan_8	1	Sharirum Luna [4MP]	DIFF	+47	meter	260	-	2
+donovan_8	2	walk-in	IDENT	-	-	140	after:1	1
+donovan_8	3	Sharirum Luna [4HP]	IDENT	-	-	260	after:1	2
 donovan_8	4	Change Immortal + 8 held	IDENT	-	-	400	after:1	2
 donovan_8	5	Change Immortal + 2 held	IDENT	-	-	651	after:1	1
 donovan_9	0	walk-in	IDENT	-	-	90	-	0
@@ -249,13 +249,13 @@ donovan_11	9	walk-in	IDENT	-	-	60	-	0
 donovan_11	10	Ifrit Sword [LP] blocked	IDENT	-	-	300	-	0
 donovan_11	11	Walk back	IDENT	-	-	120	-	0
 donovan_11	12	Blizzard Sword [LP] blocked	DIFF	+70	cnt	551	-	0
-donovan_12	0	Killshread [214LK] plant	IDENT	-	-	260	-	1
-donovan_12	1	Killshread Summon [214LK] after plain	IDENT	-	-	320	-	2
-donovan_12	2	Killshread (ES) plant	IDENT	-	-	260	-	2
-donovan_12	3	Killshread Summon [214LK] after ES	IDENT	-	-	320	-	2
+donovan_12	0	Killshread [214LK] plant	IDENT	-	-	260	-	2
+donovan_12	1	Killshread Summon [214LK] after plain	IDENT	-	-	320	-	3
+donovan_12	2	Killshread (ES) plant	IDENT	-	-	260	-	3
+donovan_12	3	Killshread Summon [214LK] after ES	IDENT	-	-	320	-	3
 donovan_12	4	Killshread [214HK] plant	IDENT	-	-	260	-	2
-donovan_12	5	Killshread Summon [214HK] after plain	IDENT	-	-	320	-	2
-donovan_12	6	Killshread (ES) plant (2)	IDENT	-	-	260	-	2
+donovan_12	5	Killshread Summon [214HK] after plain	IDENT	-	-	320	-	3
+donovan_12	6	Killshread (ES) plant (2)	IDENT	-	-	260	-	3
 donovan_12	7	Killshread Summon [214HK] after ES	IDENT	-	-	571	-	1
 donovan_13	0	5LP point-blank	IDENT	-	-	420	-	2
 donovan_13	1	5MP point-blank	IDENT	-	-	420	-	2
@@ -352,74 +352,74 @@ huitzil_3	6	Sky Capture [j.6MP]	DIFF	+40	meter	420	after:0	2
 huitzil_3	7	Sky Capture [j.6HP]	DIFF	+40	meter	420	after:0	2
 huitzil_3	8	Sitting Attack [8P] off throw	DIFF	+89	meter	420	after:0	2
 huitzil_3	9	Sitting Attack [8K] off throw	DIFF	+89	meter	671	after:0	1
-huitzil_4	0	Plasma Beam (ES) [PP]	IDENT	-	-	240	-	1
-huitzil_4	1	Plasma Beam (ES) [KK]	IDENT	-	-	240	-	2
-huitzil_4	2	Mighty Launcher (ES)	IDENT	-	-	240	-	1
-huitzil_4	3	Mighty Launcher (ES) [air]	IDENT	-	-	240	-	2
-huitzil_4	4	Genocide Vulcan (ES)	IDENT	-	-	240	-	2
-huitzil_4	5	Plasma Trap (ES)	IDENT	-	-	240	-	1
-huitzil_4	6	Final Guardian Beta	IDENT	-	-	320	-	2
+huitzil_4	0	Plasma Beam (ES) [PP]	IDENT	-	-	240	-	2
+huitzil_4	1	Plasma Beam (ES) [KK]	IDENT	-	-	240	-	3
+huitzil_4	2	Mighty Launcher (ES)	IDENT	-	-	240	-	2
+huitzil_4	3	Mighty Launcher (ES) [air]	IDENT	-	-	240	-	3
+huitzil_4	4	Genocide Vulcan (ES)	IDENT	-	-	240	-	3
+huitzil_4	5	Plasma Trap (ES)	IDENT	-	-	240	-	2
+huitzil_4	6	Final Guardian Beta	IDENT	-	-	320	-	3
 huitzil_4	7	Erasing Sphere [KK held]	IDENT	-	-	400	-	3
-huitzil_4	8	Erasing Sphere [KK tap]	IDENT	-	-	400	-	2
-huitzil_4	9	Circuit Scrapper (ES)	IDENT	-	-	420	-	2
-huitzil_4	10	Sitting Attack (ES) [8PP] off throw	DIFF	+89	meter	420	-	2
-huitzil_4	11	Ray of Doom [LP+LK]	DIFF	+0	cnt,node,seq,stock,sub	200	after:10	2
-huitzil_4	12	5LP in DF	DIFF	+0	cnt,node,seq,sub,y	200	after:10	1
+huitzil_4	8	Erasing Sphere [KK tap]	IDENT	-	-	400	-	3
+huitzil_4	9	Circuit Scrapper (ES)	IDENT	-	-	420	-	3
+huitzil_4	10	Sitting Attack (ES) [8PP] off throw	DIFF	+89	meter	420	-	3
+huitzil_4	11	Ray of Doom [LP+LK]	DIFF	+0	cnt,node,seq,stock,sub	200	after:10	3
+huitzil_4	12	5LP in DF	DIFF	+0	cnt,node,seq,sub,y	200	after:10	2
 huitzil_4	13	Plasma Beam [LP] in DF	NOT-IN-DF	-	df native 0/551 ours 5/551	551	after:10	0
-huitzil_5	0	Reflect Wall [gc LP at hit+2]	DIFF	+0	x	420	-	2
-huitzil_5	1	Reflect Wall [gc LP at hit+6]	DIFF	+17	cnt,node	420	after:0	2
-huitzil_5	2	Reflect Wall [gc LP at hit+10]	DIFF	+16	node	420	after:0	2
-huitzil_5	3	Reflect Wall [gc LP at hit+14]	DIFF	+16	node	420	after:0	2
+huitzil_5	0	Reflect Wall [gc LP at hit+2]	DIFF	+0	x	420	-	3
+huitzil_5	1	Reflect Wall [gc LP at hit+6]	DIFF	+17	cnt,node	420	after:0	3
+huitzil_5	2	Reflect Wall [gc LP at hit+10]	DIFF	+16	node	420	after:0	3
+huitzil_5	3	Reflect Wall [gc LP at hit+14]	DIFF	+16	node	420	after:0	3
 huitzil_5	4	Reflect Wall [gc HP at hit+6]	DIFF	+16	node	420	after:0	3
-huitzil_5	5	Reflect Wall [gc LK at hit+6]	DIFF	+16	node	420	after:0	2
-huitzil_5	6	Reflect Wall [gc HK at hit+6]	DIFF	+16	node	420	after:0	2
-huitzil_5	7	Reflect Wall [gc PP at hit+6]	DIFF	+16	node	420	after:0	2
+huitzil_5	5	Reflect Wall [gc LK at hit+6]	DIFF	+16	node	420	after:0	3
+huitzil_5	6	Reflect Wall [gc HK at hit+6]	DIFF	+16	node	420	after:0	3
+huitzil_5	7	Reflect Wall [gc PP at hit+6]	DIFF	+16	node	420	after:0	3
 huitzil_5	8	Reflect Wall [gc LP at hit+6] (control: no block)	DIFF	+6	p1hp	671	after:0	2
-huitzil_6	0	Circuit Scrapper [MP] cont	DIFF	+0	x	420	-	2
-huitzil_6	1	Circuit Scrapper [HP] cont	DIFF	+0	x	420	after:0	2
-huitzil_6	2	Circuit Scrapper (ES) cont	IDENT	-	-	420	after:0	2
-huitzil_6	3	Genocide Vulcan [214LK ground]	IDENT	-	-	220	after:0	1
-huitzil_6	4	Genocide Vulcan [623LK]	IDENT	-	-	220	after:0	2
-huitzil_6	5	Genocide Vulcan [41236LK]	IDENT	-	-	220	after:0	1
-huitzil_6	6	Genocide Vulcan [63214LK]	IDENT	-	-	220	after:0	2
-huitzil_6	7	Genocide Vulcan [charge 2-8 LK]	IDENT	-	-	220	after:0	2
-huitzil_6	8	Genocide Vulcan [charge 4-6 LK]	IDENT	-	-	220	after:0	2
-huitzil_6	9	Genocide Vulcan [22LK]	DIFF	+72	x	220	after:0	1
-huitzil_6	10	Genocide Vulcan [421LK near, slow]	IDENT	-	-	420	after:0	3
+huitzil_6	0	Circuit Scrapper [MP] cont	DIFF	+0	x	420	-	3
+huitzil_6	1	Circuit Scrapper [HP] cont	DIFF	+0	x	420	after:0	3
+huitzil_6	2	Circuit Scrapper (ES) cont	IDENT	-	-	420	after:0	3
+huitzil_6	3	Genocide Vulcan [214LK ground]	IDENT	-	-	220	after:0	2
+huitzil_6	4	Genocide Vulcan [623LK]	IDENT	-	-	220	after:0	3
+huitzil_6	5	Genocide Vulcan [41236LK]	IDENT	-	-	220	after:0	2
+huitzil_6	6	Genocide Vulcan [63214LK]	IDENT	-	-	220	after:0	3
+huitzil_6	7	Genocide Vulcan [charge 2-8 LK]	IDENT	-	-	220	after:0	3
+huitzil_6	8	Genocide Vulcan [charge 4-6 LK]	IDENT	-	-	220	after:0	3
+huitzil_6	9	Genocide Vulcan [22LK]	DIFF	+72	x	220	after:0	2
+huitzil_6	10	Genocide Vulcan [421LK near, slow]	IDENT	-	-	420	after:0	4
 huitzil_6	11	Genocide Vulcan [421LK air]	DIFF	+78	x	220	after:0	1
-huitzil_6	12	Reflect Wall [gc v: L to hit+1, 623LP at hit+2]	DIFF	+232	x	420	after:0	2
-huitzil_6	13	Reflect Wall [gc v: L to hit+1, 623LP at hit+6]	DIFF	+0	x	420	after:0	2
-huitzil_6	14	Reflect Wall [gc v: L to hit+1, 623HP at hit+2]	DIFF	+241	x	420	after:0	2
-huitzil_6	15	Reflect Wall [gc v: L to hit+1, 623LK at hit+2]	DIFF	+240	x	420	after:0	2
-huitzil_6	16	Reflect Wall [gc v: 623 buffered pre-hit, LP at hit+2]	DIFF	+0	x	420	after:0	2
-huitzil_6	17	Reflect Wall [gc v: P2 HK, L to hit+1, 623LP at hit+4]	DIFF	+0	x	420	after:0	3
+huitzil_6	12	Reflect Wall [gc v: L to hit+1, 623LP at hit+2]	DIFF	+232	x	420	after:0	3
+huitzil_6	13	Reflect Wall [gc v: L to hit+1, 623LP at hit+6]	DIFF	+0	x	420	after:0	3
+huitzil_6	14	Reflect Wall [gc v: L to hit+1, 623HP at hit+2]	DIFF	+241	x	420	after:0	3
+huitzil_6	15	Reflect Wall [gc v: L to hit+1, 623LK at hit+2]	DIFF	+240	x	420	after:0	3
+huitzil_6	16	Reflect Wall [gc v: 623 buffered pre-hit, LP at hit+2]	DIFF	+0	x	420	after:0	3
+huitzil_6	17	Reflect Wall [gc v: P2 HK, L to hit+1, 623LP at hit+4]	DIFF	+0	x	420	after:0	4
 huitzil_6	18	Reflect Wall [gc v: P2 HK, 623LP at hit+10]	IDENT	-	-	671	after:0	1
-huitzil_7	0	Reflect Wall [gc LP]	DIFF	+0	x	420	-	2
-huitzil_7	1	Reflect Wall [gc MP]	DIFF	+0	x	420	after:0	2
-huitzil_7	2	Reflect Wall [gc HP]	IDENT	-	-	420	after:0	2
-huitzil_7	3	Reflect Wall [gc LK]	IDENT	-	-	420	after:0	2
-huitzil_7	4	Reflect Wall [gc MK]	IDENT	-	-	420	after:0	2
-huitzil_7	5	Reflect Wall [gc HK]	IDENT	-	-	420	after:0	2
-huitzil_7	6	Reflect Wall [gc PP]	IDENT	-	-	420	after:0	3
-huitzil_7	7	Reflect Wall [623LP neutral]	IDENT	-	-	220	after:0	1
+huitzil_7	0	Reflect Wall [gc LP]	DIFF	+0	x	420	-	3
+huitzil_7	1	Reflect Wall [gc MP]	DIFF	+0	x	420	after:0	3
+huitzil_7	2	Reflect Wall [gc HP]	IDENT	-	-	420	after:0	3
+huitzil_7	3	Reflect Wall [gc LK]	IDENT	-	-	420	after:0	3
+huitzil_7	4	Reflect Wall [gc MK]	IDENT	-	-	420	after:0	3
+huitzil_7	5	Reflect Wall [gc HK]	IDENT	-	-	420	after:0	3
+huitzil_7	6	Reflect Wall [gc PP]	IDENT	-	-	420	after:0	4
+huitzil_7	7	Reflect Wall [623LP neutral]	IDENT	-	-	220	after:0	2
 huitzil_7	8	Circuit Scrapper [MP] late button	IDENT	-	-	420	after:0	3
-huitzil_7	9	Circuit Scrapper [HP] late button	IDENT	-	-	420	after:0	2
-huitzil_7	10	Circuit Scrapper [MP] motion then button	DIFF	+75	meter	420	after:0	2
-huitzil_7	11	Genocide Vulcan [421LP]	IDENT	-	-	220	after:0	1
-huitzil_7	12	Genocide Vulcan [421MP]	IDENT	-	-	220	after:0	2
-huitzil_7	13	Genocide Vulcan [421HP]	IDENT	-	-	220	after:0	1
-huitzil_7	14	Genocide Vulcan [421LK vs airborne P2]	IDENT	-	-	220	after:0	2
-huitzil_7	15	Genocide Vulcan [421HK vs airborne P2]	IDENT	-	-	220	after:0	2
-huitzil_7	16	Genocide Vulcan [421KK vs airborne P2]	IDENT	-	-	220	after:0	1
+huitzil_7	9	Circuit Scrapper [HP] late button	IDENT	-	-	420	after:0	3
+huitzil_7	10	Circuit Scrapper [MP] motion then button	DIFF	+75	meter	420	after:0	3
+huitzil_7	11	Genocide Vulcan [421LP]	IDENT	-	-	220	after:0	2
+huitzil_7	12	Genocide Vulcan [421MP]	IDENT	-	-	220	after:0	3
+huitzil_7	13	Genocide Vulcan [421HP]	IDENT	-	-	220	after:0	2
+huitzil_7	14	Genocide Vulcan [421LK vs airborne P2]	IDENT	-	-	220	after:0	3
+huitzil_7	15	Genocide Vulcan [421HK vs airborne P2]	IDENT	-	-	220	after:0	3
+huitzil_7	16	Genocide Vulcan [421KK vs airborne P2]	IDENT	-	-	220	after:0	2
 huitzil_7	17	Genocide Vulcan [421LK near vs airborne P2]	IDENT	-	-	671	after:0	2
-huitzil_8	0	Genocide Vulcan (ES) [421PP]	IDENT	-	-	260	-	1
-huitzil_8	1	Genocide Vulcan [421LP] (2)	IDENT	-	-	260	-	2
-huitzil_8	2	Circuit Scrapper [63214 MP+HP]	IDENT	-	-	420	-	2
-huitzil_8	3	Circuit Scrapper [63214 LP+MP]	IDENT	-	-	420	-	2
+huitzil_8	0	Genocide Vulcan (ES) [421PP]	IDENT	-	-	260	-	2
+huitzil_8	1	Genocide Vulcan [421LP] (2)	IDENT	-	-	260	-	3
+huitzil_8	2	Circuit Scrapper [63214 MP+HP]	IDENT	-	-	420	-	3
+huitzil_8	3	Circuit Scrapper [63214 LP+MP]	IDENT	-	-	420	-	3
 huitzil_8	4	Circuit Scrapper [63214 LP+HP] (ES, meter)	IDENT	-	-	420	-	3
-huitzil_8	5	Circuit Scrapper [63214MP] step back	DIFF	+102	meter	420	-	2
-huitzil_8	6	Circuit Scrapper [63214MP] no-pin walk	IDENT	-	-	300	after:5	2
-huitzil_8	7	Reflect Wall [gc MP] (meter)	IDENT	-	-	420	after:5	2
+huitzil_8	5	Circuit Scrapper [63214MP] step back	DIFF	+102	meter	420	-	3
+huitzil_8	6	Circuit Scrapper [63214MP] no-pin walk	IDENT	-	-	300	after:5	3
+huitzil_8	7	Reflect Wall [gc MP] (meter)	IDENT	-	-	420	after:5	3
 huitzil_8	8	Reflect Wall [gc HP] (meter)	IDENT	-	-	671	after:5	1
 huitzil_9	0	Plasma Trap [j.214LK] early	IDENT	-	-	260	-	1
 huitzil_9	1	Plasma Trap [j.214LK] late	IDENT	-	-	260	-	2
@@ -500,30 +500,30 @@ pyron_3	6	Galactic Throw [j.6MP]	IDENT	-	-	420	after:1	2
 pyron_3	7	Galactic Throw [j.6HP]	DIFF	+20	meter,stock	420	after:1	2
 pyron_3	8	Sitting Attack [8P] off throw	DIFF	+30	meter	420	after:1	2
 pyron_3	9	Sitting Attack [8K] off throw	DIFF	+30	meter	671	after:1	1
-pyron_4	0	Sol Smasher (ES)	IDENT	-	-	220	-	1
-pyron_4	1	Sol Smasher (ES) [air]	IDENT	-	-	220	-	2
-pyron_4	2	Zodiac Fire (ES)	IDENT	-	-	220	-	1
-pyron_4	3	Orbital Blaze (ES)	IDENT	-	-	220	-	2
-pyron_4	4	Orbital Blaze (ES) late	IDENT	-	-	220	-	1
-pyron_4	5	Cosmo Disruption [PP held]	IDENT	-	-	400	-	2
-pyron_4	6	Cosmo Disruption [KK held]	IDENT	-	-	400	-	2
-pyron_4	7	Cosmo Disruption [PP tap]	IDENT	-	-	400	-	2
+pyron_4	0	Sol Smasher (ES)	IDENT	-	-	220	-	2
+pyron_4	1	Sol Smasher (ES) [air]	IDENT	-	-	220	-	3
+pyron_4	2	Zodiac Fire (ES)	IDENT	-	-	220	-	2
+pyron_4	3	Orbital Blaze (ES)	IDENT	-	-	220	-	3
+pyron_4	4	Orbital Blaze (ES) late	IDENT	-	-	220	-	2
+pyron_4	5	Cosmo Disruption [PP held]	IDENT	-	-	400	-	3
+pyron_4	6	Cosmo Disruption [KK held]	IDENT	-	-	400	-	3
+pyron_4	7	Cosmo Disruption [PP tap]	IDENT	-	-	400	-	3
 pyron_4	8	Piled Hell [623KK]	IDENT	-	-	300	-	3
-pyron_4	9	Piled Hell [j.623KK]	IDENT	-	-	300	-	2
-pyron_4	10	Planet Burning (ES)	IDENT	-	-	420	-	2
-pyron_4	11	Sitting Attack (ES) [8PP] off throw	DIFF	+30	meter	420	-	2
-pyron_4	12	Shining Gemini [LP+LK]	DIFF	+0	node,seq,stock,sub	200	after:11	1
-pyron_4	13	5LP in DF	DIFF	+24	p2hp	200	after:11	2
+pyron_4	9	Piled Hell [j.623KK]	IDENT	-	-	300	-	3
+pyron_4	10	Planet Burning (ES)	IDENT	-	-	420	-	3
+pyron_4	11	Sitting Attack (ES) [8PP] off throw	DIFF	+30	meter	420	-	3
+pyron_4	12	Shining Gemini [LP+LK]	DIFF	+0	node,seq,stock,sub	200	after:11	2
+pyron_4	13	5LP in DF	DIFF	+24	p2hp	200	after:11	3
 pyron_4	14	Sol Smasher [LP] in DF	NOT-IN-DF	-	df native 0/551 ours 0/551	551	after:11	0
-pyron_5	0	Planet Burning [MP] step back (control)	IDENT	-	-	420	-	2
-pyron_5	1	Planet Burning (ES) [63214 MP+HP] step back	IDENT	-	-	420	-	2
-pyron_5	2	Planet Burning (ES) [63214 LP+HP] step back	IDENT	-	-	420	-	2
-pyron_5	3	Planet Burning (ES) [63214 LP+MP] step back	IDENT	-	-	420	-	2
-pyron_5	4	Planet Burning (ES) [63214 MP+HP] slow, step back	IDENT	-	-	420	-	2
+pyron_5	0	Planet Burning [MP] step back (control)	IDENT	-	-	420	-	3
+pyron_5	1	Planet Burning (ES) [63214 MP+HP] step back	IDENT	-	-	420	-	3
+pyron_5	2	Planet Burning (ES) [63214 LP+HP] step back	IDENT	-	-	420	-	3
+pyron_5	3	Planet Burning (ES) [63214 LP+MP] step back	IDENT	-	-	420	-	3
+pyron_5	4	Planet Burning (ES) [63214 MP+HP] slow, step back	IDENT	-	-	420	-	3
 pyron_5	5	Planet Burning (ES) [63214 MP+HP] pair AFTER the motion	IDENT	-	-	420	-	3
-pyron_5	6	Cosmo Disruption [41236 PP] far	IDENT	-	-	400	-	2
-pyron_5	7	Cosmo Disruption [63214 PP] far, no dash	IDENT	-	-	400	-	2
-pyron_5	8	Cosmo Disruption [63214 MP+HP] far, no dash	IDENT	-	-	400	-	2
+pyron_5	6	Cosmo Disruption [41236 PP] far	IDENT	-	-	400	-	3
+pyron_5	7	Cosmo Disruption [63214 PP] far, no dash	IDENT	-	-	400	-	3
+pyron_5	8	Cosmo Disruption [63214 MP+HP] far, no dash	IDENT	-	-	400	-	3
 pyron_5	9	Cosmo Disruption [41236 MP+HP] far	IDENT	-	-	651	-	1
 pyron_6	0	j.LP [9]	IDENT	-	-	150	-	1
 pyron_6	1	j.MP [9]	IDENT	-	-	150	-	1

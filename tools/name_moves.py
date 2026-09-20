@@ -722,7 +722,32 @@ def gen(tenant, part, out_rpl, out_sched):
     # 14z-120). Parts are kept under a round instead.
     assert end - FIRST_EVENT < 7500, f"part {part} exceeds a round ({end - FIRST_EVENT} frames)"
     if part in METER_PARTS[tenant]:
-        pokes += [f"{FIRST_EVENT - 60}:ff8509:09", f"{FIRST_EVENT + (end - FIRST_EVENT) // 2}:ff8509:09"]
+        # A STOCK POKE PER EVENT, 60 frames ahead of its input (14z-171). It was
+        # TWO pokes — `first - 60` and the part's MIDPOINT — and a midpoint does
+        # not track the events: donovan_7 runs 21 events between them, donovan_6
+        # 19, donovan_4 13. An ES move with an empty meter degrades SILENTLY to
+        # its normal version ([VSP-170]) and the naming table would record that
+        # as the ES move's own chain.
+        #
+        # THIS IS PROPHYLACTIC, NOT A REPAIR — measured, and the measurement is
+        # the point: `$FF8509` read AT EVERY EVENT FRAME on both legs of
+        # donovan_7 (the worst ratio), donovan_12 and pyron_5, under the OLD
+        # scheme and this one, NEVER reached 0. The old scheme let the stock
+        # DECLINE (pyron_5 9,9,8,7,6,5,...; donovan_7's tail to 6; donovan_12 to
+        # 8); this one holds the stock UP — 9 at most events and a measured
+        # CORPUS MINIMUM OF 7, because the poke lands 60 frames out and a close
+        # pair of events can still spend before the next (donovan_7's tail reads
+        # 8). So it removes the
+        # headroom problem before a schedule change can turn it into a defect —
+        # which is exactly what GitHub #168 does — rather than fixing an observed
+        # one. It also PROVES the poke lands: 9 where the old scheme read 5.
+        # COST: the poke frame's stock sample is excluded from the parity
+        # comparison (`excluded` +176 rows), because the rig writes that field
+        # on that frame.
+        # MEASURED INERT: the poke lists of 14 meter parts move,
+        # `tests/test_move_naming.sh` reports ZERO chain differences and
+        # `audit_move_parity`'s verdicts are unchanged (only `excluded` moves).
+        pokes += [f"{e['frame'] - 60}:ff8509:09" for e in sched["events"]]
     sched["pokes"] = pokes
     sched["frames"] = end + 50
     Path(out_rpl).write_text("\n".join(lines) + "\n")

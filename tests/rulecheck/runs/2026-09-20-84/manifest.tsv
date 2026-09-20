@@ -1,0 +1,8 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tools/name_moves.py	db18753dd1bd62c7a09c8d701a111c644cc57e4f
+tests/expected/move_parity_events.tsv	763f4a200a83a8797c98a53d20c20559936ba314
+tests/expected/move_parity_attribution.tsv	412fff51c9e1851671879c5d2fa8838da5e3f603
+build/rig171/naming_stockonly.log	c423d10a52479ebf421f7378ab92a2765fd23e7e
+build/rig171/v2/summary.txt	19c8f3d4f2461ba24c9710e3d209bf20d89f8d0d
+build/rig171/mp_verify_stock.log	ddffd4aeac0e8e4d8841ea4bfb6a7501630bb8bf
+build/rig171/attr_stock.log	7d4e4efdf9d86617f4eaabb04ceabe32c9ad5a23

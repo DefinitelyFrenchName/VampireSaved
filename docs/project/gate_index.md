@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**366 scripts** — 83 ci_portable, 81 ci_static, 202 emulator-tier (run by name).
+**367 scripts** — 84 ci_portable, 81 ci_static, 202 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 15 | the suite runners and their own ground truth |
+| [runner](#runner) | 16 | the suite runners and their own ground truth |
 | [docs](#docs) | 18 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 34 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -42,6 +42,7 @@ the suite runners and their own ground truth.
 | `tests/run_battery_m2.sh` | run | emulator | MAME, FBNeo, a build dir, ~15 min | the M2 deliverable battery: the EXACT gate chain a stage-6 dev build must pass before any commit that touches the build (CLAUDE.md rule 2 / persistent-suite doctrine). One command, no chat-memory chain. Sections: 0. | M2 |
 | `tests/run_suite.sh` | run | emulator | MAME | the oracle replay suite (MAME side), auto-detecting runner. | 14z-94 |
 | `tests/test_bbh_fidelity.sh` | test | ci_static | ROMDIR | the generic black-box harness (`bbh`, the SEPARATE repository extracted from this tree, docs/project/harness_scope.md) reproduces THIS tree's verdicts: its fidelity gate is run against this tree and must be green. | 2026-09-06 |
+| `tests/test_bg_leg_shape.sh` | test | ci_portable | — | NO GATE MAY BACKGROUND AN EMULATOR LEG THAT WRITES ITS EXIT STATUS UNDER `set -e` WITHOUT `set +e` INSIDE THE GROUP (14z-171). ROM-free, ~2 s. Tool: tools/audit_bg_leg_shape.py (its docstring is the WHY). | 14z-171 |
 | `tests/test_controls_contract.sh` | test | ci_portable | — | ground truth for THE MUST-FIRE CONTRACT'S READER, tests/lib/controls.sh: the four regexes of the R10 grammar, the leading comment block as the header (a bare `#` continues it, a non-comment line ends it), the declared-vs-fired readback the… | 14z-147 |
 | `tests/test_demand_after_trap.sh` | test | ci_portable | — | no gate carries a `${VAR:?msg}` DEMAND after its EXIT trap (14z-134). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-134 |
 | `tests/test_emulator_runner.sh` | test | ci_portable | — | ground truth for tests/run_all_emulator.sh (14z-128). ROM-free, ~26 s (measured 14z-162; the header said ~5 s). | 14z-128 |

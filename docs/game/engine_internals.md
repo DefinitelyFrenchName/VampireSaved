@@ -4648,4 +4648,12 @@ RNG value poked at 2250 selects it; the two games draw DIFFERENT variants for
 the same value (their RNG consumption differs) but the SAME SET {0, 2, 6} over
 six seeds — our build lost none (the drive-in: seed 0000 on native; 0000, 5a5a,
 c3d2 on ours). The rig fix is still to pin
-after the round start (#136).
+after the round start (#136; the rig work is GitHub #168).
+**THE ROUND START IS 2545, AND IT IS THE ROUND INTRO'S, NOT THE CHARACTER'S
+(measured 14z-171).** `$FF812D` first reads 1 at 2545 on BOTH legs of every part
+whose first event carries a "near" pin — `donovan_13`, `huitzil_3`, `huitzil_5`,
+`pyron_3`, `pyron_5`, ten legs, all three tenants — so it does not follow the
+entrance, which each leg draws differently. SEPARATING CONTROL: it still reads
+2545 on both games with the rigs' speed-level pin withheld, so it is not a
+property of the rig's own pokes either. That is what would license ONE floor
+constant for every part; the seven parts that pin at 2370 are listed on #168.

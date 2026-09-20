@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-170 CLOSE, 2026-09-19)
+# NEXT SESSION — orientation (rewritten at the 14z-171 CLOSE, 2026-09-20)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
@@ -22,46 +22,53 @@ and patch_notes 14z-170 have the detail; STATE 14z-170 the record.
    release run is `--scope all --lane all --strict --controls` (~5.5 h, HANDOFF "WHAT THE RELEASE RUN
    COSTS"), then `tools/upload_release_assets.sh` on `freeze/merged-m19`. `release/merged-m19/` is
    packaged and gated in-tree; the freeze tags and registry rows stand.
-2. **The orange flash** (the cosmetic ticket #162; `tests/audit_column_flash.sh` freezes it): our build
-   uploads palette row 11 through the palette-SEQUENCE uploader at 2858, where native does not upload.
-   The open question is which sequence id it asks for, and why (the +8 row remap between the games,
-   `engine_internals.md` "The palette-SEQUENCE uploader"). The answer decides whether it is local or wider.
+2. **The orange flash** (#162, cosmetic) is ANSWERED and PARKED by agreement — see ALSO OPEN. It is
+   NOT a sequence-id defect: ours' row 11 baseline is Donovan's sprite-palette block, native's is
+   vs2 seq row 0x2CF, and both games upload seq 0x2D4 identically during the move.
 3. **Phobos's remaining +1** (the bug ticket, #161; `tests/audit_phobos_dmg_residual.sh` reproduces it): Demitri's 5HP
    takes 12 on ours, 11 native, with Phobos's defense rows already vs2's — trace the damage staging vars stage by stage on
    both legs for that one hit (`docs/game/engine_internals.md` "The DAMAGE pipeline").
-4. **The #136 tickets still open**: #157 (the throw hit-registration pair — the meter family), #159
-   (facing rule 5), #163 (the column/trap rule: its airborne case), and the rig items below; the maintainer's to schedule.
+4. **#168 — THE RIG FIX THE MAINTAINER PUT ON THE NEXT PRIORITIES (2026-09-20).** The naming rigs'
+   first X pin lands at 2370, inside the round-start entrance, on SEVEN parts (`donovan_13`,
+   `huitzil_3/5/6/7`, `pyron_3/5`) — the #136 ENTRANCE class. The fix is WRITTEN AND MEASURED
+   (`PIN_FLOOR = 2560`: `move_parity` DIFF 102 -> 95, the ENTRANCE root gone, two events shown never
+   to have fired their named move) and BACKED OUT, because moving the first event re-rolls the
+   corpus's input-window-edge probes and three regress. What it needs: re-tune `pyron_5` ev5 and
+   `huitzil_7` ev8/ev9 until each enters its own `moves_*.toml` chain, then the re-freeze and a
+   rule-checker run. The reworked `audit_rig_opening` (green, ground-truthed both ways) comes back
+   with it. Everything measured is on the issue.
+5. **The #136 tickets still open**: #157 (the throw hit-registration pair — the meter family), #159
+   (facing rule 5), #163 (the column/trap rule: its airborne case); the maintainer's to schedule.
 
 ## ALSO OPEN (carried from 14z-168/169)
 
-- The static tier never checks that a `tests/ci_emulator.tsv` gate is EXECUTABLE (a gate committed
-  without `+x` reads MISSING only at release). Add the check to a static gate.
-- A static gate for the unsafe MAME-leg shape (a backgrounded leg writing its status under
-  `set -e`).
-- bbh `selftest/test_fidelity_vampire.sh:356`: the F9 provenance pair pipes this tree's gate
-  through `sed`, so our exit status reads 0 — a false difference on a red tree.
-- #136's Phobos guard-cancel rig: the first X pin lands before the round starts — a RIG fix, then
-  a re-freeze through the rule-checker.
 - A column hit on an AIRBORNE victim (the air stager's case) is not measured — #163's one open item (the column KO read clean on the capture, 2026-09-19).
+- #162 is ANSWERED and PARKED by agreement: the orange flash is not a sequence-id defect but
+  Donovan's sprite-palette block showing through, and his palette-routine row `0x13` is the no-op
+  default in all three dispatcher tables where vs2 runs a real routine. The one open measurement is
+  which path sets `a0` to the sprite block (a breakpoint at the uploader; registers are trustworthy
+  under `-debug`, frame numbers are not). Everything measured is on the issue.
 
-## TRAPS PAID THIS SITTING (14z-170)
+## TRAPS PAID THIS SITTING (14z-171)
 
-1. **Attribute a freeze's program delta op by op** (`tools/attribute_patch_delta.py`) — "the fix
-   moved N bytes" hid 52 corrupted records inside the relocation noise.
-2. **The MiSTer tail comes BEFORE the MiSTer lane** — a stale fork catalogue fails every romset
-   MiSTer gate in seconds.
-3. **A BEFORE measurement runs the before-tree's own tool.**
-4. **`sh -n` a perturbed gate copy before reading its verdict** — a syntax error exits 0.
-5. **Freeze hashes, never ROM-derived bytes** (palette, tile, record content).
-6. **An unpinned rig is not "the move starts later"** — pin the speed level and the RNG on every
-   ours-vs-native timeline (vs2 runs TURBO by default).
-7. **A fix that moves a frozen value has to land on NATIVE, not just move away from the defect**: compare every
-   moved row with native before re-freezing.
-8. **A damage fix re-times every rig that waits for a KO** (win-pal, continue-switch): find the event per build.
-9. **A `-debug` watch's frame column counts debugger STOPS, not frames ([CPE-5], paid TWICE this
-   sitting):** the orange flash's writer and the x2b7ef4 reachability were both misread from it. For WHEN,
-   use the non-debug tap (`read_tap.lua`); for a "never read", watch only the bytes in question, arm
-   late, and check the run's node trajectory against a non-debug run (`tests/audit_x2b7ef4_reach_m18.sh`).
+1. **A rig change is not "a shift" until every moved row is attributed field by field.** The
+   throw table moved by a clean +190 with byte-identical values on one part and GAINED a real
+   contact on another; only the column-level diff separated the two.
+2. **Separate two changes before believing either.** The pin fix and the stock fix landed
+   together and the naming diff looked like one defect; run alone, the stock fix is provably
+   INERT (zero chain differences) and every moved chain belongs to the pin fix.
+3. **A field named `seq` is not the field the naming walker uses.** An A/B on `$FF8406` read
+   "identical engine behaviour" for an event whose reported chain had changed — the wrong
+   instrument for the question, and it produced a confident wrong conclusion ([VSP-148]).
+4. **Take a baseline at HEAD before concluding a frozen line is stale.** A worktree at HEAD
+   showed `test_move_naming` green, which is what proved the moved chains were mine.
+5. **A constant validated under the rig's own pokes needs the poke withheld.** The round start
+   reads 2545 with AND without the speed-level pin, which is what makes it the intro's property
+   rather than the rig's.
+6. **Tune nothing to make a symptom go away.** `PIN_FLOOR` 2560 broke three events and 2570
+   broke more — a signal that the corpus is frame-fragile, not a number to search.
+7. **`git checkout HEAD -- <file>` reverts every edit in that file**, including an unrelated one
+   made earlier in the sitting (the P2 retraction had to be re-applied).
 
 **IF A DOC IS TOUCHED:** the doc gates (`test_checkdocs`, `test_docshape`,
 `test_doc_anchor_census`, `test_checkskills`, `test_gotchas_index_current`,

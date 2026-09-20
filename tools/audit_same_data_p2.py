@@ -5,10 +5,13 @@ maintainer-agreed 2026-09-17).
 
   python3 tools/audit_same_data_p2.py <vsavj_data.bin> <vsav2_data.bin> [--ids 03,05] [--json out]
 
-WHY. The tenant-move rigs put VICTOR on P2; on our leg he is Vampire Savior's
-Victor and on the native leg Vampire Savior 2's, and the 14z-164 census found
-five of the 13 first divergences begin in HIS state. A P2 whose data is the
-same on both games removes that confound. The three-sibling law ([VSE-1]: the
+WHY. The tenant-move rigs PUT VICTOR ON P2 UNTIL 14z-165; on our leg he is
+Vampire Savior's Victor and on the native leg Vampire Savior 2's, and the
+14z-164 census found five of the 13 first divergences begin in HIS state. A P2
+whose data is the same on both games removes that confound. THIS TOOL'S ANSWER
+WAS ACTED ON: the maintainer ruled Demitri (Bishamon the fallback) on
+2026-09-17 and the naming rigs switched at 14z-165, so the rigs no longer put
+Victor on P2 — the tool now guards that choice rather than motivating it. The three-sibling law ([VSE-1]: the
 per-character bank is index-aligned across the sets) makes the question STATIC:
 for every legacy id both games carry, compare what the bank row reaches.
 

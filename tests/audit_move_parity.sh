@@ -3,6 +3,7 @@
 #
 # MUST-FIRE: perturbed-copy: unpinned-level — the native leg left at vsav2's DEFAULT play mode (TURBO, level 8) against ours at NORMAL must fail every part, so each verdict is proven to rest on the level the gate pins (in-gate: one part is re-run with the native level pin withheld and must diverge; mode: every native leg runs unpinned and the comparisons FAIL)
 # MUST-FIRE: shadow-tool: no-translation — comparing our RAW anim node pointer against native's, without translating it out of its placement, must fail, so every IDENTICAL verdict is proven to rest on the translation (in-gate: one part is compared both ways; mode: every part is compared untranslated and FAILs)
+# MUST-FIRE: perturbed-copy: stock-starved — a copy of a meter part's OWN trace with the stock zeroed at one event frame must make section 2b report that event as starved, so the headroom check is live on the real traces (in-gate: the first meter part's ours leg, perturbed; mode: every meter part's ours leg is perturbed before 2b and the section FAILs)
 # MUST-FIRE: perturbed-copy: pins-ignored — a copy of OUR trace with the compared X altered on exactly the rig's own X-pin frames (RAM:$FF8410, 40 f before each pinned event) must leave every verdict of the part as frozen under the pin exclusion and move at least one verdict with the exclusion off, so the exclusion is proven live in the comparator and load-bearing on the rig's own writes; a schedule without a `pokes` key is refused by the comparator (in-gate: the first part of the set whose schedule pins X — pyron_4 in the default set — compared both ways on its perturbed copy; mode: every part compared on its perturbed copy with the exclusion off, verdict columns only, and the table FAILs). Until 14z-165 this control hunted for a part whose REAL rows moved with the exclusion off; with Demitri on P2 no part of the 30 does (both legs agree on every pin frame), so a data-dependent control read DEAD
 #
 # WHAT IT MEASURES. tools/name_moves.py already performs every move of the
@@ -121,7 +122,7 @@ CONTROL="${CONTROL:-}"
 [ -f "$BUILD/patch/placements.json" ] || { echo "SKIP: no placements.json at $BUILD"; exit 0; }
 [ -f "$EXPECT" ] || { echo "FAIL: no frozen expectation at $EXPECT"; exit 1; }
 case "$CONTROL" in
-    ""|unpinned-level|no-translation|pins-ignored) ;;
+    ""|unpinned-level|no-translation|pins-ignored|stock-starved) ;;
     *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;;
 esac
 
@@ -244,6 +245,29 @@ verdict_for() {  # verdict_for <tenant> <part> [--raw | --pert | --pert-no-pins]
         --first-event "$_fe" --events "$_j" $_np 2>/dev/null || true
 }
 
+# THE PERTURBATION for stock-starved, one function the control and the mode both
+# call ([VSP-181]): a copy of a REAL trace with stock=0 written at a real EVENT
+# frame — the frame the check reads, or the control proves nothing.
+starve_trace() {  # starve_trace <src trace> <dst> <schedule json>
+    python3 - "$1" "$2" "$3" <<'PY'
+import json, re, sys
+src, dst, js = sys.argv[1], sys.argv[2], sys.argv[3]
+have = {int(l.split()[1]) for l in open(src) if l.startswith("F ")}
+ev = [e["frame"] for e in json.load(open(js))["events"] if e["frame"] in have]
+if not ev:
+    sys.exit("REFUSED: no event frame of %s appears in %s" % (js, src))
+target = ev[len(ev) // 2]
+out = []
+for l in open(src):
+    f = l.split()
+    if f and f[0] == "F" and int(f[1]) == target:
+        l = re.sub(r"stock=\d+", "stock=0", l)
+    out.append(l)
+if not any("stock=0" in l for l in out):
+    sys.exit("REFUSED: no stock= field at event frame %d to zero" % target)
+open(dst, "w").writelines(out)
+PY
+}
 echo "== 1. the legs ($(echo $SET | wc -w | tr -d ' ') parts x 2, build $(basename "$BUILD"))"
 n=0
 for part in $SET; do
@@ -328,6 +352,84 @@ for part in $SET; do
         ok "$part: $(command grep -c . "$W/got_$part.tsv") events as frozen ($(awk -F'\t' '$4=="IDENT"' "$W/got_$part.tsv" | command grep -c . || true) IDENT, $(awk -F'\t' '$4=="DIFF"' "$W/got_$part.tsv" | command grep -c . || true) DIFF, $(awk -F'\t' '$4!="IDENT" && $4!="DIFF"' "$W/got_$part.tsv" | command grep -c . || true) other)"
     else bad "$part: events moved:"; command grep '^[-+][^-+]' "$W/diff_$part.txt" | head -12; fi
 done
+
+echo "== 2b. STOCK HEADROOM at every event of a meter part, both legs"
+# WHY THIS EXISTS (14z-171, rule-checker 2026-09-20-84 Q4). The rigs poke the
+# stock to 9 sixty frames before every event of a meter part, so an ES move can
+# never fire on an empty meter and degrade SILENTLY to its normal version
+# ([VSP-170]) — which the naming table would then record as the ES move's own
+# chain. That poke is PREVENTION; on its own nothing would notice if it stopped
+# working, because the naming table freezes chain ids and this gate EXCLUDES the
+# poke's own frames from the comparison. This section is the DETECTION half: it
+# reads the stock the legs actually had AT each event and fails if any reached
+# zero, and it prints the MINIMUM so a decline is visible long before it is a
+# defect. MEASURED AT BIRTH, full corpus: 28 meter-part legs, no event on an
+# empty meter, LOWEST STOCK AT ANY EVENT = 7 — not 9. The poke restores 9 sixty
+# frames before an event, and where events sit close one can still spend before
+# the next poke (donovan_7's tail reads 8). That is the honest figure and this
+# section is what tracks it: a fall toward 0 is the signal, 0 is the failure.
+# Under the two-poke scheme it replaces the same parts declined further
+# (pyron_5 to 5, donovan_7's tail to 6, donovan_12 to 8) without reaching 0.
+_sb_min=99; _sb_n=0; _sb_bad=0
+for part in $SET; do
+    t="${part%_*}"; p="${part##*_}"
+    python3 -c "
+import sys; sys.path.insert(0,'tools'); import name_moves
+print('yes' if '$p' in name_moves.METER_PARTS.get('$t',[]) else 'no')" 2>/dev/null | grep -q yes || continue
+    for leg in native ours; do
+        _tr="$W/tr_${t}_${p}_$leg.txt"
+        [ "$CONTROL" = stock-starved ] && [ "$leg" = ours ] && { starve_trace "$_tr" "$W/sb_$part.$leg" "$REPO/tests/replays/naming/${t}_${p}.json"; _tr="$W/sb_$part.$leg"; }
+        _r="$(python3 - "$_tr" "$REPO/tests/replays/naming/${t}_${p}.json" <<'PY'
+import json, sys
+tr, js = sys.argv[1], sys.argv[2]
+d = {}
+for l in open(tr):
+    f = l.split()
+    if f and f[0] == "F": d[int(f[1])] = dict(kv.split("=", 1) for kv in f[2:])
+lo, starved = 99, []
+for e in json.load(open(js))["events"]:
+    v = d.get(e["frame"], {}).get("stock")
+    if v is None: continue
+    v = int(v); lo = min(lo, v)
+    if v == 0: starved.append(e["name"][:34])
+print("%d\t%d\t%s" % (lo, len(starved), ";".join(starved[:3])))
+PY
+)"
+        _lo="$(printf '%s' "$_r" | cut -f1)"; _ns="$(printf '%s' "$_r" | cut -f2)"; _nm="$(printf '%s' "$_r" | cut -f3)"
+        _sb_n=$((_sb_n + 1))
+        [ "$_lo" -lt "$_sb_min" ] 2>/dev/null && _sb_min="$_lo"
+        if [ "${_ns:-0}" != 0 ]; then bad "2b: $part $leg — $_ns event(s) fired on an EMPTY meter ($_nm)"; _sb_bad=$((_sb_bad + 1)); fi
+    done
+done
+[ "$_sb_bad" = 0 ] && ok "2b: $_sb_n meter-part legs, no event on an empty meter; lowest stock at any event = $_sb_min"
+# MUST-FIRE: the same perturbation on a real trace must be SEEN by the same reader.
+_sb_p=""; for part in $SET; do
+    t="${part%_*}"; p="${part##*_}"
+    python3 -c "
+import sys; sys.path.insert(0,'tools'); import name_moves
+print('yes' if '$p' in name_moves.METER_PARTS.get('$t',[]) else 'no')" 2>/dev/null | grep -q yes || continue
+    [ -s "$W/tr_${t}_${p}_ours.txt" ] && { _sb_p="$part"; _sb_t="$t"; _sb_pp="$p"; break; }
+done
+if [ -n "$_sb_p" ] && starve_trace "$W/tr_${_sb_t}_${_sb_pp}_ours.txt" "$W/sb_ctl.txt" "$REPO/tests/replays/naming/${_sb_t}_${_sb_pp}.json" 2>/dev/null; then
+    _c="$(python3 - "$W/sb_ctl.txt" "$REPO/tests/replays/naming/${_sb_t}_${_sb_pp}.json" <<'PY'
+import json, sys
+d = {}
+for l in open(sys.argv[1]):
+    f = l.split()
+    if f and f[0] == "F": d[int(f[1])] = dict(kv.split("=", 1) for kv in f[2:])
+print(sum(1 for e in json.load(open(sys.argv[2]))["events"]
+          if d.get(e["frame"], {}).get("stock") == "0"))
+PY
+)"
+    if [ "${_c:-0}" -ge 1 ]; then
+        echo "CONTROL FIRED: stock-starved — $_sb_p's own ours trace with the stock zeroed at one event frame reads $_c starved event(s), where the real trace reads 0"
+    else
+        echo "CONTROL DEAD: stock-starved — the perturbed trace still read no starved event"; fail=1
+    fi
+else
+    echo "CONTROL DEAD: stock-starved — no meter-part trace could be perturbed"; fail=1
+fi
+
 
 echo "== 3. must-fire controls"
 CTL="$(echo $SET | awk '{print $1}')"

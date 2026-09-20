@@ -4,6 +4,7 @@
 #
 # MUST-FIRE: shadow-tool: export-removed — a copy of the runner without `export MAME_BIN` must leave the gate's MAME_BIN UNSET (mode: that copy is the runner every section drives; section 11 must fail)
 # MUST-FIRE: shadow-tool: reader-unplugged — a copy that hands the classifier no gate script must let a declared-but-unfired control read PASS (mode: section 14 must fail)
+# MUST-FIRE: perturbed-copy: row-not-executable — a farm of symlinks to the REAL scripts named by the REAL tests/ci_emulator.tsv, with ONE replaced by a non-executable copy, must make section 10b report it unrunnable (mode: that farm is what 10b checks; section 10b must fail)
 #
 # WHY A GATE FOR THE RUNNER, again. CLAUDE.md §4: "Verdict logic is itself
 # tested." tests/test_static_runner.sh states the reason for its twin and it
@@ -25,6 +26,9 @@
 #                                must read PASS, or every gate that documents
 #                                the convention is miscounted
 #   MISSING                      a registry row whose script is not executable
+#   REGISTRY EXECUTABILITY       10b: the same defect caught STATICALLY, over
+#                                the SHIPPED registry — the runner only reports
+#                                it once the release sweep reaches that row
 #   TIMEOUT                      a gate that overruns --timeout is neither a
 #                                PASS nor an ordinary FAIL: it asserted nothing
 #   UNREGISTERED / DEAD ROW      the anti-orphan check, both directions
@@ -332,6 +336,66 @@ if missing:
     sys.exit(1)
 print(f"  ok: {len(rows)} registry rows, all well-formed, no duplicates")
 PY
+
+echo "10b. every registry row's script is EXECUTABLE (a gate without +x reads MISSING only at release)"
+# WHY, and why HERE. run_all_emulator.sh classifies a non-executable row
+# MISSING (case 9 above is that ground truth), but nothing in the STATIC tier
+# ever looked: a gate committed without its +x bit stayed green through every
+# pre-commit run and surfaced hours into a release sweep, as a MISSING row
+# nobody could distinguish from a deleted script. This section already owns the
+# SHIPPED registry, so the cheap static check belongs to it.
+#
+# THE PERTURBATION IS ONE FUNCTION the control section and the mode both call
+# ([VSP-181]): a farm of SYMLINKS to the real scripts named by the real
+# registry (so the check reads the shipped bits, not a rewrite of them), with
+# exactly one replaced by a non-executable COPY.
+regfarm() {   # regfarm <dest> <gate to break, "" for none>
+    rm -rf "$1"; mkdir -p "$1/tests"
+    cp "$REPO/tests/ci_emulator.tsv" "$1/tests/ci_emulator.tsv"
+    awk -F'\t' '!/^#/ && NF {print $1}' "$REPO/tests/ci_emulator.tsv" | while read -r _g; do
+        [ -e "$REPO/tests/$_g.sh" ] || continue
+        if [ "$_g" = "$2" ]; then
+            cp "$REPO/tests/$_g.sh" "$1/tests/$_g.sh"; chmod -x "$1/tests/$_g.sh"
+        else
+            ln -s "$REPO/tests/$_g.sh" "$1/tests/$_g.sh"
+        fi
+    done
+}
+regx() {      # regx <root>; prints the tally, exits 1 naming the unrunnable rows
+    python3 - "$1" <<'PY10B'
+import os, sys
+root = sys.argv[1]
+bad, seen = [], 0
+for line in open(os.path.join(root, "tests", "ci_emulator.tsv")):
+    if line.startswith("#") or not line.strip():
+        continue
+    g = line.split("\t")[0].strip()
+    seen += 1
+    p = os.path.join(root, "tests", g + ".sh")
+    if not os.path.exists(p):
+        bad.append((g, "absent"))
+    elif not os.access(p, os.X_OK):
+        bad.append((g, "not executable"))
+print("%d rows, %d unrunnable" % (seen, len(bad)))
+for g, why in bad[:10]:
+    print("    %s.sh %s" % (g, why))
+sys.exit(1 if bad else 0)
+PY10B
+}
+# The gate the perturbation breaks: the registry's FIRST row, so the choice
+# follows the shipped file rather than a name frozen here ([VSP-95]).
+CTLG="$(awk -F'\t' '!/^#/ && NF {print $1; exit}' "$REPO/tests/ci_emulator.tsv")"
+BREAK10=""
+[ "$VS_CTL" = row-not-executable ] && BREAK10="$CTLG"
+regfarm "$T/regfarm" "$BREAK10"
+out10b="$(regx "$T/regfarm" 2>&1)" && ok "10b: $(printf '%s' "$out10b" | head -1)" \
+    || fail "10b: a registry row names a script that cannot be run —
+$out10b"
+# MUST-FIRE CONTROL: the same farm with one REAL script's +x bit cleared.
+regfarm "$T/regfarm_bad" "$CTLG"
+regx "$T/regfarm_bad" >"$T/regx_bad.log" 2>&1 \
+    && { vs_ctl_dead row-not-executable "the check passed with $CTLG.sh non-executable"; fail "row-not-executable"; } \
+    || vs_ctl_fired row-not-executable "$CTLG.sh with its +x cleared -> $(sed -n '1p' "$T/regx_bad.log")"
 
 echo "11. the runner EXPORTS the WIDE MAME default, and a caller's MAME_BIN wins (14z-133b)"
 # Until 14z-133 the runner exported nothing: an unpinned gate ran `mame` on
