@@ -65,6 +65,15 @@ Every capability the page needs exists natively, so the dependency count is **ze
 **The port is the only real work, and it is done and proven** (the measurement above,
 against the shipped `release/merged-m19` patches). Everything else is wiring.
 
+**WHICH OF THOSE ROWS IS GATED, and which is not.** Only the decoder is:
+`tests/test_applier_vcdiff.sh` re-runs it against every shipped patch on every static
+tier. The `deflate-raw` round trip and the `crypto.subtle` SHA-1 agreement were measured
+**under node's implementation of those same web standards, not in a browser**, and they
+are NOT gated — a gate there would be testing node, not the thing the page runs on. Treat
+them as what they are: strong evidence that the APIs do what the plan needs, to be
+confirmed in a real browser when slice A2 is written. That confirmation is part of A2, not
+something this document has already banked.
+
 The shape of the job, from the M19 manifest: a **97.0 MB** source blob rebuilt from 51
 members of 3 zips; **20** patches totalling 2.62 MB of VCDIFF; 12 pristine copies; **32**
 output members, 73.7 MB uncompressed; **83** SHA-1 verifications; largest member 4.2 MB.
