@@ -1,0 +1,14 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/rig172/state_14z172.md	1823da8e6f7d583011b58e16063da210bbb79e87
+docs/NEXT_SESSION.md	0f2896a3ea188b7f98b72b759f67a027cf33ee42
+docs/project/tickets.tsv	c22abc8519fc299997ad7d5b6304c2326aa86f1e
+build/rig172/issue168_close.md	4a0ad6a49db821bc35e4a06b2dbafcf52d9bc5d6
+build/rig172/issue168_correction.md	89e183a3fc1937cbbcdd4642f44ee183affc3f93
+build/rig172/issue_galactic.md	60fb67547e6a0fc9c258b7a69a790a5458d55a7e
+build/rig172/shift_sweep.txt	6550b6fddfb4f59aec5c9831e93223059024b273
+build/rig172/refreeze.out	1f00ccefbb18ea267fa5ac2c3d228a422d3a1e84
+tests/audit_tick_phase.sh	8893a40d7cc7d089c55d85edef3b366f523b4ee3
+tests/audit_rig_opening.sh	c63c0856d268fbf5ed875f6195a31c239c5d9fb9
+tests/expected/vanilla_normal_slots.tsv	54a8d9d7808bada9edd3caa922b8e7c8b021fcc8
+tests/rulecheck/runs/2026-09-20-86/verdict_real.txt	131312a6bfd0f27a17dbe54e3a2cc894c94c3133
+tests/rulecheck/ledger.tsv	a5c6411e0c5265919e6cd82c87ccae759dbd976c

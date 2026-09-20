@@ -28,11 +28,17 @@
 #      unpinned — and exactly three residue classes mod 13 at level 6, the pin
 #      tests/audit_move_parity.sh puts on both its legs;
 #   2. tools/name_moves.py's TICK_QUANTUM equals the lcm of those two periods;
-#   3. the round start is the SAME frame on both legs AND with the rig's own
-#      speed-level pin WITHHELD — the separating control that makes 2545 the
-#      round intro's property rather than the rig's (14z-171, promoted here
-#      14z-172 from build/rig171/roundstart.sh and rs_unpinned.sh), and it
-#      equals the generator's ROUND_START.
+#   3. the round start is the SAME frame with the rig's own speed-level pin and
+#      WITHOUT it, and equals the generator's ROUND_START. WHAT THAT SEPARATES,
+#      EXACTLY: the round start does not move with the SPEED-LEVEL PIN, so 2545
+#      is not that pin's number (14z-171, promoted here 14z-172 from
+#      build/rig171/roundstart.sh and rs_unpinned.sh). WHAT IT DOES NOT
+#      SEPARATE: both legs run the SAME replay and the SAME base poke list, so a
+#      defect in the rig's input path would move the round start on both and this
+#      section would not see it (rule-checker run 2026-09-20-87 Q3). The claim
+#      that 2545 belongs to the round INTRO rather than to the rig rests on the
+#      other measurement 14z-171 made — the same 2545 on both legs of five
+#      differently-scheduled parts across all three tenants — not on this gate.
 #
 # WHAT IT DOES NOT CLAIM. Only levels 6 and 8 are measured, on one part; the
 # cadence at any other level is not asserted, and neither is WHY a shift
@@ -180,8 +186,8 @@ RS_GEN="$(python3 -c "
 import re, sys
 print(re.search(r'^ROUND_START = (\d+)', open(sys.argv[1]).read(), re.M).group(1))" "$REPO/tools/name_moves.py")"
 if [ -n "$RS8" ] && [ "$RS8" = "$RS6" ]; then
-    ok "3.1 the round start is frame $RS8 WITH the rig's speed-level pin (level 6) and WITHOUT it (level 8) — the round intro's property, not the pin's"
-else bad "3.1 the round start moves with the speed-level pin (pinned $RS6, unpinned $RS8) — 2545 would then be the rig's number, not the intro's"; fi
+    ok "3.1 the round start is frame $RS8 WITH the rig's speed-level pin (level 6) and WITHOUT it (level 8) — so 2545 is not the speed pin's number; both legs share the replay and base pokes, so this does not separate the rig itself (header, Q3)"
+else bad "3.1 the round start moves with the speed-level pin (pinned $RS6, unpinned $RS8) — 2545 would then be the speed pin's number, and the generator's ROUND_START would be a rig artifact"; fi
 if [ "$RS8" = "$RS_GEN" ]; then ok "3.2 tools/name_moves.py's ROUND_START = $RS_GEN, the measured frame"
 else bad "3.2 tools/name_moves.py's ROUND_START = $RS_GEN but the measured round start is $RS8 — the pin floor no longer follows the game"; fi
 

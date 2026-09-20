@@ -1,0 +1,6 @@
+decision	recommendation
+subject	the 14z-172 close packet: the session record, the homed findings, the #168 closure and the #169 handoff
+session	14z-172
+model	claude-opus-5
+claim	This close records that GitHub #168 is fixed and closed and that #169 is opened in its place, on the strength of: a cadence measured per-frame from RAM:$FF8081 on the rig's own legs and now asserted by tests/audit_tick_phase.sh; a whole-corpus naming run at the landed shift that moves exactly two lines, both corrections; six expectation sets re-frozen and each verified by a second FREEZE-less run; and a shift sweep over seven candidate values. NOT TESTED, and named here rather than found: why a shift must be divisible by 39 rather than by 3 alone (192 and 273 are multiples of 3 and each moved pyron_3's Galactic Throw rows, so the landed 195 is measured-clean over this corpus and NOT proven-safe, and the second periodicity is unidentified — that is what #169 carries); no speed level other than 6 and 8 is measured and the cadence is measured on one part; the two corrections rest on a capture, the near/far MP slot table and the stock discriminator, and on no third instrument; the shift sweep's 190 and 200 rows are quoted from the 14z-171 record and were not re-measured this sitting; and the close's own tier had not yet been run when this row was written.
+checklist	62514a98c3e7

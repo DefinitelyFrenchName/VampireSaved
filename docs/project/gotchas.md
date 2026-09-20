@@ -7,26 +7,37 @@ named move at all", quoting `a2:0x03` and `a2:0x02` and glossing both as
 **"a walk"**. The gloss went into the issue body, and 14z-172 repeated it into a
 rule-checker packet and a report before a capture was made.
 
-**Both are wrong, and the tree already held the answer.**
-`tests/expected/vanilla_normal_slots.tsv` (measured on vsavj at 14z-125, every
-vanilla character) freezes `<char> far MP a2:0x03` and `<char> near MP a2:0x02`:
-**`a2:0x03` is the FAR standing MP slot and `a2:0x02` the NEAR one.** The walk
-chains are in table **`a`** (`a:0x02` forward, `a:0x04` back — `move_naming_*`
-part 1), never `a2`. Both events were recording **the character's medium
-punch** — the normal a command throw leaves behind when it does not connect.
+**Both are wrong, and the tree already held the answer.** Walk chains are in
+table **`a`** (`a:0x02` forward, `a:0x04` back — `move_naming_*` part 1); `a2`
+is the ATTACK table. `move_naming_pyron.txt` part 1 names **`a2:0x02` as Pyron's
+own `5MP`**. So both events were recording **the character's medium punch** —
+the normal a command throw leaves behind when it does not connect — and neither
+was a walk.
 
-**The gloss cost more than accuracy: it hid a piece of evidence.** `a2:0x03`
-being the FAR slot says the two fighters met the event AT RANGE, which is
-independent confirmation of the very entrance defect the ticket was about
-(the legs stood 117 px apart). "A walk" says nothing and points nowhere.
+**BUT MIND HOW FAR THE SLOT TABLE REACHES, which is the second half of this
+entry and was itself paid for** (the rule-checker's Q1, run `2026-09-20-87`,
+which caught the first version of this paragraph over-reaching).
+`tests/expected/vanilla_normal_slots.tsv` (measured on vsavj at 14z-125) covers
+the **15 VANILLA characters only — no tenant row** — and its mapping is
+**character-dependent**: `near MP` is `a2:0x02` for all 15, but `far MP` is
+`a2:0x03` for only **10** of them and `a2:0x02` for the other five (AN, BI, JE,
+QB, ZA), who take the same id at both distances. **Pyron is not in the table**,
+so "`a2:0x03` is the far slot" is not a fact about him, and the tempting
+inference — that the id alone proves the two fighters met the event AT RANGE —
+does NOT follow. What proves the range is the CAPTURE
+(`tools/naming_shift_sheet.sh`), which shows them apart.
 
-**RULE: before writing what a measured chain id IS, look it up —
-`tests/expected/vanilla_normal_slots.tsv` for the standing normals,
-`move_naming_<tenant>.txt` part 1 for that character's own movement and normals,
-`build/manifest/moves_<tenant>.toml` for the specials.** An id you cannot find
-in one of those is an id you may not name in prose. And when the claim is about
-what a move DOES, produce the capture before the sentence ([VSP-173]) — here the
-picture and the slot table agreed and both contradicted the prose.
+**RULE: a chain id is looked up in a table that covers THE CHARACTER, and a
+per-character table is not a per-id fact.** ([VSP-146]: to test "is X
+per-char?", vary the CHARACTER.) For a tenant the covering sources are that
+tenant's own `move_naming_<tenant>.txt` part 1 and
+`build/manifest/moves_<tenant>.toml`; `vanilla_normal_slots.tsv` is evidence
+about the 15 it measured and a hypothesis about anyone else.
+
+An id you cannot find in a source that covers the character is an id you may not
+name in prose. And when the claim is about what a move DOES, produce the capture
+before the sentence ([VSP-173]) — here the picture is what settled it, and the
+slot table is what over-reached when it was used as a shortcut.
 
 ## MOVING A RIG'S SCHEDULE MOVES EVERY EVENT'S DOUBLE-PASS PHASE — a shift is a MEASURED QUANTITY, not a spacing choice (paid: 14z-171 to 14z-172, GitHub #168)
 

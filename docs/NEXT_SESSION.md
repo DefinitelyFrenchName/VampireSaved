@@ -55,9 +55,12 @@ What the freeze carries is in HANDOFF "Current WIDE builds" and patch_notes 14z-
 2. **Two clean data points are not a law.** "The period is exactly 39" followed rigorously from four
    measurements and was falsified by the fifth (273 = 7x39 is not clean). Run the one that would
    break it, especially when the evidence looks settled.
-3. **A chain id is looked up, never described.** `a2:0x03` and `a2:0x02` are the FAR and NEAR
-   standing MP slots (`tests/expected/vanilla_normal_slots.tsv`, 14z-125) — 14z-171 glossed both as
-   "a walk", which hid that the FAR slot was itself evidence of the entrance gap.
+3. **A chain id is looked up in a table that covers THE CHARACTER.** 14z-171 glossed `a2:0x03`
+   and `a2:0x02` as "a walk"; they are `a2` NORMALS (walks are table `a`), and `a2:0x02` is Pyron's
+   own `5MP` by his part-1 row. The correction then over-reached in turn, reading them as the FAR
+   and NEAR MP slots from `vanilla_normal_slots.tsv` — which covers the 15 VANILLA characters only
+   and maps `far MP` to `a2:0x03` for just 10 of them. Pyron is not in it. The rule-checker caught
+   that (run `2026-09-20-87` Q1); the capture is what settles the range.
 4. **A control defined in the instrument's own coordinates validates the search, not the
    coordinates.** 14z-156's modulus search over `$FF8080` carried a plant and fired it, and was still
    blind, because the byte wraps at 256 and the plant was defined in the byte's own terms.
