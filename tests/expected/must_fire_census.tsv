@@ -49,6 +49,7 @@ declares	audit_voice_borrow
 declares	audit_walker_repoint
 declares	audit_x2b7ef4_reach_m18
 declares	test_annotations_current
+declares	test_applier_vcdiff
 declares	test_battery_accounting
 declares	test_bg_leg_shape
 declares	test_build_environment_entry
