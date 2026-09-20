@@ -1,0 +1,7 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/standalone_14z173.diff	bbc57f42277fb42241c0d62b08ca5b3fcd3f7395
+tools/package_release.py	e451695497513d05d7ffa9bf499ef997f053173c
+tests/test_release_roundtrip.sh	44db35cf85c623c8e3c3ac8a95dcb657e8cc29af
+tests/test_release_binaries.sh	05c0e103e3939eb375aecb30154a9a12ffbdd45e
+build/release_binaries_14z173.log	42ce060014f4cb71b481a8c75b3b943e0e945a61
+docs/project/release_format.md	c27dfe8a917cb737eb7963c6938898e4633d018f

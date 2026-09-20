@@ -261,8 +261,9 @@ def emulator_side(platform, dest, name):
    - `{name}-{platform}-recipe.zip`: build it once from the pinned upstream with
      `emulator/0002-cps2-wide-v1.patch`; `EMULATOR.md` has the exact commands.
    Both are the same code; the patch is 0002-cps2-wide-v1.
-2. Put `vsavjw.zip` (from the applier) AND your pristine `vsav.zip` in the
-   emulator's rom directory{' (FBNeo has no rom-path option: it reads `roms/` next to the binary, or the dirs set in its config)' if platform == 'fbneo' else ' — or pass `-rompath "/your/rompath;/your/dumps"`'}.
+2. Put `vsavjw.zip` (from the applier) in the emulator's rom directory. That
+   is the ONLY file — the set is standalone, so no `vsav.zip`, no `vsavj.zip`
+   and no QSound BIOS zip go beside it{' (FBNeo has no rom-path option: it reads `roms/` next to the binary, or the dirs set in its config)' if platform == 'fbneo' else ' — or pass `-rompath "/your/rompath"`'}.
 3. Start the set `vsavjw`. The boot name screen reads VAMPIRE SAVED and the
    select screen shows the mark {name.split('-')[-1].upper() if '-' in name else ''}.
 """
@@ -282,9 +283,10 @@ the project's gates were run against).
 {e['note']}
 ## The romset
 Apply `apply_release.py` per `README.md`, then point the patched emulator's
-rom path at the output directory. The set is `vsavjw` (a clone of `vsav`);
-keep your pristine `vsav.zip` in the rom path too — the loader resolves the
-unmodified members from it.
+rom path at the output directory. The set is `vsavjw` and it is STANDALONE:
+the applier copies in every member the loader asks for, the parent's and
+MAME's QSound BIOS member included, so the output directory needs nothing
+beside it.
 """
     # THIS FILE SHIPS IN THE `-recipe` ASSET ONLY (ruled 2026-09-12), so it
     # addresses a reader who is building, and points at the other route rather
@@ -385,12 +387,18 @@ sha256 — verified against the file when this directory was packaged).
 ## On the SD card
     _Arcade/<the .mra files here>
     _Arcade/cores/jtcps2w.rbf        <- in this directory (verify the sha256 in BITSTREAM.txt after copying)
-    games/mame/vsavjw.zip            <- from apply_release.py
-    games/mame/vsav.zip              <- your PRISTINE dump (the WIDE set is a clone of it)
-    games/mame/vsavj.zip             <- your PRISTINE dump (the STOCK CONTROL MRA)
-    games/mame/qsound.zip            <- dl-1425.bin
+    games/mame/vsavjw.zip            <- from apply_release.py; for the WIDE MRA this is the ONLY file needed
 
-The WIDE MRA runs the full roster on `jtcps2w.rbf`. The `[STOCK CONTROL]`
+The WIDE MRA runs the full roster on `jtcps2w.rbf`, and since the 2026-09-20
+standalone completion it resolves **every one of its 31 CRC-matched parts out of
+`vsavjw.zip` alone** — the applier copies the parent's members and the QSound
+BIOS member in from your own dumps, so no `vsav.zip` or `qsound.zip` is needed
+beside it. The other two zips are only for the OTHER things on the card:
+
+    games/mame/vsavj.zip             <- your PRISTINE dump: the STOCK CONTROL MRA only
+    games/mame/vsav.zip              <- your PRISTINE dump: the STOCK CONTROL MRA, and
+                                        stock Vampire Savior on Jotego's own jtcps2.rbf
+    games/mame/qsound.zip            <- dl-1425.bin: the STOCK CONTROL MRA only The `[STOCK CONTROL]`
 MRA runs stock `vsavj` on the SAME bitstream with the profile bit at its
 `0xFF` fill: it is the superset invariant on silicon and only needs running
 when the BITSTREAM changes (new seed, slice or pin), not per release. Stock

@@ -2,6 +2,16 @@
  "name": "merged-m19",
  "version_string": "M19",
  "build_fingerprint": "61e9815a3956b7c6e5c7c513043694edb78c8ece",
+ "applied_set_key": "923c1e7a9f8025d6ce1202003e948150a26742b0",
+ "standalone_completion": [
+  "dl-1425.bin <- qsound_hle.zip",
+  "vm3.11m <- vsav.zip",
+  "vm3.12m <- vsav.zip",
+  "vm3.14m <- vsav.zip",
+  "vm3.16m <- vsav.zip",
+  "vm3.18m <- vsav.zip",
+  "vm3.20m <- vsav.zip"
+ ],
  "source": {
   "order": [
    "vsavj.zip",
@@ -319,6 +329,18 @@
    }
   ]
  },
+ "pristine_sources": [
+  {
+   "zip": "qsound_hle.zip",
+   "members": [
+    {
+     "member": "dl-1425.bin",
+     "size": 24576,
+     "sha1": "555f50fe5cdf127619da7d854c03f4a244a0c501"
+    }
+   ]
+  }
+ ],
  "xdelta3_flags": [
   "-e",
   "-S",
@@ -535,6 +557,69 @@
     "patch": "patches/vsavjw/d_vsw_z02.xdelta",
     "patch_size": 430,
     "patch_sha1": "36c85539d0be679bd6038dc925653144e0e79d57"
+   },
+   {
+    "member": "vm3.11m",
+    "size": 4194304,
+    "sha1": "74181fca4b764fb3c56ceef2cb4c6fd6c18ec4b6",
+    "pristine_from": {
+     "zip": "vsav.zip",
+     "member": "vm3.11m"
+    }
+   },
+   {
+    "member": "vm3.12m",
+    "size": 4194304,
+    "sha1": "7059db25698a0b286314c5961c618f6d2e6f24a1",
+    "pristine_from": {
+     "zip": "vsav.zip",
+     "member": "vm3.12m"
+    }
+   },
+   {
+    "member": "vm3.14m",
+    "size": 4194304,
+    "sha1": "012803af33174c0602649d2a2d84f6ee79f54ad2",
+    "pristine_from": {
+     "zip": "vsav.zip",
+     "member": "vm3.14m"
+    }
+   },
+   {
+    "member": "vm3.16m",
+    "size": 4194304,
+    "sha1": "a19a9a6fb829953b054dc5c3b0dc017f60d37928",
+    "pristine_from": {
+     "zip": "vsav.zip",
+     "member": "vm3.16m"
+    }
+   },
+   {
+    "member": "vm3.18m",
+    "size": 4194304,
+    "sha1": "ce29ff00cf4b6fdd9b3b1ed87823534f1d364eab",
+    "pristine_from": {
+     "zip": "vsav.zip",
+     "member": "vm3.18m"
+    }
+   },
+   {
+    "member": "vm3.20m",
+    "size": 4194304,
+    "sha1": "df7538c05b03a4ad94d369f8083799979e6fac42",
+    "pristine_from": {
+     "zip": "vsav.zip",
+     "member": "vm3.20m"
+    }
+   },
+   {
+    "member": "dl-1425.bin",
+    "size": 24576,
+    "sha1": "555f50fe5cdf127619da7d854c03f4a244a0c501",
+    "pristine_from": {
+     "zip": "qsound_hle.zip",
+     "member": "dl-1425.bin"
+    }
    }
   ]
  }

@@ -199,9 +199,28 @@ def main():
             bad.append(f"{r['zip']}/{r['member']}: member missing"); continue
         if len(d) != r["size"] or sha1(d) != r["sha1"]:
             bad.append(f"{r['zip']}/{r['member']}: sha1/size mismatch (wrong or modified dump)")
+    # PRISTINE-ONLY SOURCES: reference zips the release copies members OUT of
+    # without them being part of the source blob (the QSound BIOS set, whose one
+    # member MAME wants and which no xdelta is encoded against). Verified to the
+    # same standard as the blob's recipe — a wrong or modified dump is named and
+    # nothing is written. Absent in releases packaged before 2026-09-20.
+    nextra = 0
+    for src in m.get("pristine_sources", []):
+        zp = os.path.join(a.romdir, src["zip"])
+        if not os.path.exists(zp):
+            sys.exit(f"missing reference dump: {zp}")
+        zf = refs.setdefault(src["zip"], zipfile.ZipFile(zp))
+        for r in src["members"]:
+            try:
+                d = zf.read(r["member"])
+            except KeyError:
+                bad.append(f"{src['zip']}/{r['member']}: member missing"); continue
+            if len(d) != r["size"] or sha1(d) != r["sha1"]:
+                bad.append(f"{src['zip']}/{r['member']}: sha1/size mismatch (wrong or modified dump)")
+            nextra += 1
     if bad:
         sys.exit("reference dumps do not match the manifest:\n  " + "\n  ".join(bad))
-    print(f"reference dumps verified: {len(m['source']['recipe'])} members")
+    print(f"reference dumps verified: {len(m['source']['recipe']) + nextra} members")
 
     # 2. the source blob (in memory: ~140 MB)
     parts = []; h = hashlib.sha1()

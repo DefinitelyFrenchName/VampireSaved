@@ -27,6 +27,78 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-20 (14z-173) — THE DELIVERABLES: the order of work, and macOS FIRST
+
+Asked for my view on the state of the deliverables, the maintainer set out theirs and
+then ruled the order. Their assessment, verbatim:
+
+> *"There is hardly any pressure on the timing"* — *"MiSTer is basically good"* —
+> *"Linux & windows require dedicated environments. which is doable but parallel to
+> MacOS"* — *"The most important is the prebuilt libraries, not the full DIY process.
+> It implies two things: 1) making sure the OS accepts to run the binary 2) make it
+> stupid easy to run, because as things stand users will try by default to run FBNeo
+> or Mame and fail because even with the WIDE drivers, using it through the default
+> GUI does not work. So either provide an alternate shell script that runs the
+> emulator the way we want or at least make it super obvious what to do, and that
+> also includes where to put all the ROMS. And speaking of which there is an
+> argumetn to make vsavjw standalone because at the moment ir not only requires
+> qsound but also vsav and vsavj, or so the patched emulators say"* — and on the
+> applier: *"Can't we package a nice tiny app (Web, OS-agnostic or one per OS, I
+> don't really care) that is self-supporting executable-wise and just asks the roms
+> and provides vsavjw.zip from it? Because the developers won't care but the immense
+> majority of the users will."*
+
+THE ORDER, put to them and agreed: **standalone set → launcher per platform →
+reproduce #144/#145 on clean hosts → README pass written against the new, smaller
+shape → the applier app.** The standalone set is first because it shrinks the
+instruction surface everything else has to describe, and because it changes the
+layout, so it wants to land BEFORE the READMEs are rewritten.
+
+THE CAVEAT, which is itself the ruling on release scope, verbatim:
+
+> *"Agreed with one caveat: let's focus on MacOS first, even if we were to release
+> M19 only for MiSTer and MacOS, the proof of concept would be fully validated and
+> we could go forward knowing the windows and linux can run parallel while we go
+> forward with other tasks"*
+
+So: **macOS and MiSTer are the proof-of-concept release; Windows and Linux proceed in
+parallel and do not block it.** #145 (Windows) leaves the near-term path; #144 (macOS
+binaries) and #146 (the READMEs) stay on it. One correction recorded with the ruling:
+the emulators want `vsav.zip` + `qsound_hle.zip` at runtime, NOT `vsavj.zip` — that
+one is a build-time source only, and the impression came from `tools/run_wide.sh`
+symlinking all six reference zips into its play overlay.
+
+## Ruled 2026-09-20 (14z-173) — the standalone set lands in the RELEASE, not the build (route (c))
+
+Two routes were measured and put to the maintainer:
+
+- **(a) build-side** — the build packs the 7 completing members. One artifact: what the
+  gates measure is exactly what the user runs. But `wholeset_key()` hashes every member
+  of every zip in the rompath, so all four tracks' keys move: new registry rows, carried
+  and re-frozen expectation sets, the re-point sweep, a MiSTer catalogue regen plus a
+  fork commit (the `mame.xml` entry is CRC-pinned and enumerates members), and the ~5 h
+  freeze battery. An **M20 freeze**, with M19 superseded before it ever shipped.
+- **(c) release-side** — the applier completes the set. M19 ships as frozen; no
+  fingerprint, expectation set, registry row or MiSTer CRC moves. The cost is that the
+  shipped zip is a declared SUPERSET of the gated one.
+
+Recommended (c), on the grounds that it ships M19 now — which is what the proof of
+concept needs — and that the one honest objection to it, gated artifact ≠ shipped
+artifact, is closeable by machine rather than by argument. The maintainer ruled:
+
+> *"C"*
+
+The objection is discharged by `test_release_roundtrip.sh` §1 (every authored member
+byte-identical to the build's, every ADDED member byte-identical to the reference member
+the manifest declares, an undeclared addition a FAIL, the whole set hashing to
+`applied_set_key`) and by the new `test_release_binaries.sh` §2b (the shipped release dir
+applied, that set ALONE in the rom path, producing a whole-RAM log bit-identical to the
+build arrangement's on the same binary — a live A/B, no frozen expectation, no registry
+row for a key that moves every freeze). The spec is `docs/project/release_format.md`
+"THE STANDALONE SET". Deferred and NOT bundled: the applier writes `ZIP_STORED`, so the
+standalone set is 73.7 MB where deflate gives 28.0 MB — a shipped-shape change outside
+what was approved, raised separately.
+
 ## Ruled 2026-09-20 (14z-171) — the naming rigs' stock poke: land it ONLY as a DEMONSTRATED prophylactic
 
 The sitting proposed changing the rigs' stock pokes from two per part to one per event,

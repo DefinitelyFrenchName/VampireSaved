@@ -49,9 +49,11 @@ get the emulator or core ("Play on MAME" at the end), play.
 ## What you need
 - **Python 3** (3.8 or newer). No other tool: the applier decodes the
   patches itself.
-- **The three reference dumps, unmodified, with these exact names** in one
+- **The reference dumps, unmodified, with these exact names** in one
   directory: `vsavj.zip` (Vampire Savior, Japan 970519), `vsav.zip` (Europe
-  970519), `vsav2.zip` (Vampire Savior 2, Japan 970913). Vampire Hunter 2 is
+  970519), `vsav2.zip` (Vampire Savior 2, Japan 970913) and `qsound_hle.zip`
+  (the QSound BIOS set — MAME wants `dl-1425.bin` and it is copied in for you,
+  so you never place it yourself). Vampire Hunter 2 is
   NOT needed (it is the project's verification oracle, not a source of
   anything in the set). The applier checks every member's SHA-1
   against the manifest before doing anything, so a wrong, renamed or
@@ -60,15 +62,21 @@ get the emulator or core ("Play on MAME" at the end), play.
 ## Build the romset (one command)
     python3 apply_release.py --romdir /path/to/your/dumps --out ./rompath
 
-`./rompath/` then holds `vsavjw.zip`. The applier refuses to write if any rebuilt
-member's SHA-1 does not match the manifest. Keep your pristine `vsav.zip`
-next to it when you play: the WIDE set is a clone of `vsav` and the emulator
-resolves the unmodified members from the parent.
+`./rompath/` then holds `vsavjw.zip`, and that is **the only file you place** —
+it is a STANDALONE set: every member the emulator asks for is inside it,
+including the ones normally resolved from the parent `vsav.zip` and MAME's
+QSound BIOS, each copied pristine from your own dumps and SHA-1 verified. You
+do not put `vsav.zip`, `vsavj.zip` or `qsound_hle.zip` in the emulator's rom
+directory. The applier refuses to write if any member's SHA-1 does not match
+the manifest.
 
 ## Identify the build
 - In game: the mark `M19` at the bottom-right of the
   character-select screen, and the boot name screen reads VAMPIRE SAVED.
-- On disk: whole-set key `61e9815a` (`manifest.json` has every member's SHA-1).
+- On disk: whole-set key `923c1e7a` — the set the applier writes, which
+  `manifest.json` carries as `applied_set_key` with every member's SHA-1.
+  (The build this was packaged from is `61e9815a`; they differ by the standalone
+  completion above, which is pristine content from your dumps.)
 
 ## If it does not work
 - **"Unknown system: vsavjw" / "no such driver"** — the emulator is not the
@@ -85,7 +93,8 @@ resolves the unmodified members from the parent.
   (compare the whole-set key above).
 
 ## What is patched
-20 members are rebuilt, 5 are copied pristine from your dumps.
+20 members are rebuilt, 12 are copied pristine from your dumps
+(of those, 7 complete the set so it stands alone: dl-1425.bin <- qsound_hle.zip, vm3.11m <- vsav.zip, vm3.12m <- vsav.zip, vm3.14m <- vsav.zip, vm3.16m <- vsav.zip, vm3.18m <- vsav.zip, vm3.20m <- vsav.zip).
 The patches hold only bytes the port generates or authors (relocated code,
 tables, the version glyphs); everything that comes from the original games
 is expressed as a reference into YOUR dumps, which is what keeps this package
@@ -102,7 +111,8 @@ reference-ROM bytes before a release is cut.
    - `merged-m19-mame-recipe.zip`: build it once from the pinned upstream with
      `emulator/0002-cps2-wide-v1.patch`; `EMULATOR.md` has the exact commands.
    Both are the same code; the patch is 0002-cps2-wide-v1.
-2. Put `vsavjw.zip` (from the applier) AND your pristine `vsav.zip` in the
-   emulator's rom directory — or pass `-rompath "/your/rompath;/your/dumps"`.
+2. Put `vsavjw.zip` (from the applier) in the emulator's rom directory. That
+   is the ONLY file — the set is standalone, so no `vsav.zip`, no `vsavj.zip`
+   and no QSound BIOS zip go beside it — or pass `-rompath "/your/rompath"`.
 3. Start the set `vsavjw`. The boot name screen reads VAMPIRE SAVED and the
    select screen shows the mark M19.

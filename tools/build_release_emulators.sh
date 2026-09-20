@@ -224,7 +224,7 @@ fbneo)
     RECIPE="git clone $UPSTREAM fbneo && cd fbneo && git checkout $PIN && git apply 0002-cps2-wide-v1.patch && make sdl2 SKIPDEPEND=1 -j$JOBS -k; make sdl2 SKIPDEPEND=1 -j$JOBS   (twice on a fresh clone: the first parallel pass dies on burn.o until the driver list is generated)"
     EXE="$EXENAME"
     TITLE="fbneo — FBNeo (SDL2 frontend) carrying the CPS-2 WIDE v1 driver patch, prebuilt for $OSARCH"
-    RUN='run it from a directory that has a `roms/` subdirectory holding your built vsavjw.zip AND your pristine vsav.zip (FBNeo has no rom-path option: it reads `roms/` relative to the current directory, or the paths set in its config): `./'"fbneo$EXESUF"' vsavjw`. Controls: FBNeo'"'"'s own menu (Tab).'
+    RUN='run it from a directory that has a `roms/` subdirectory holding your built vsavjw.zip — that ONE file, since the release set is standalone (FBNeo has no rom-path option: it reads `roms/` relative to the current directory, or the paths set in its config): `./'"fbneo$EXESUF"' vsavjw`. Controls: FBNeo'"'"'s own menu (Tab).'
     LIBS="SDL2 (sdl2-compat over SDL3 where the host uses it), SDL2_image and their image codecs"
     ;;
 mame)
@@ -253,7 +253,7 @@ mame)
     RECIPE="git clone $UPSTREAM mame && cd mame && git checkout $PIN && git apply 0002-cps2-wide-v1.patch && make SUBTARGET=cps2 SOURCES=src/mame/capcom/cps2.cpp NOWERROR=1 REGENIE=1$QTNOTE -j$JOBS"
     EXE="$EXENAME"
     TITLE="cps2 — MAME 0.288, CPS-2 subtarget, carrying the CPS-2 WIDE v1 driver patch, prebuilt for $OSARCH"
-    RUN='`./'"cps2$EXESUF"' vsavjw -rompath "/path/to/your/built/set;/path/to/your/dumps"` (the built vsavjw.zip and the pristine vsav.zip must both be on the rompath). `./'"cps2$EXESUF"' -verifyroms vsavjw -rompath ...` says `is bad` BY DESIGN and must list exactly the members inside vsavjw.zip as INCORRECT CHECKSUM (stock CRCs for the members the port rewrites, sentinel CRCs for the new ones) — a NOT FOUND line is the real problem. MAME'"'"'s own UI (Tab) maps controls.'
+    RUN='`./'"cps2$EXESUF"' vsavjw -rompath "/path/to/your/built/set"` (the built vsavjw.zip is the only file needed: the release set is standalone). `./'"cps2$EXESUF"' -verifyroms vsavjw -rompath ...` says `is bad` BY DESIGN and must list exactly the members inside vsavjw.zip as INCORRECT CHECKSUM (stock CRCs for the members the port rewrites, sentinel CRCs for the new ones) — a NOT FOUND line is the real problem. MAME'"'"'s own UI (Tab) maps controls.'
     # WHAT THE RECORD SAYS IT CARRIES IS PER PLATFORM, like the OSD itself:
     # macOS links SDL3, Linux the sdl OSD's SDL2 + SDL2_ttf + fontconfig, and
     # Windows links `-static` (MAME's scripts/genie.lua, configuration mingw*)

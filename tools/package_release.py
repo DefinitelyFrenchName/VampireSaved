@@ -48,6 +48,32 @@ import argparse, hashlib, json, os, shutil, subprocess, sys, zipfile
 SOURCE_ORDER = ["vsavj.zip", "vsav.zip", "vsav2.zip"]   # three since 14z-149; vhunt2 is the oracle, not a source
 XDELTA_FLAGS = ["-e", "-S", "none", "-B", str(1 << 28), "-W", str(1 << 23), "-f"]
 
+# ── THE STANDALONE SET (ruled 2026-09-20, route (c)) ────────────────────────
+# A build packs only the members it AUTHORS, and the emulators resolve the rest
+# from the parent `vsav.zip` plus, on MAME, the QSound BIOS set — so a player
+# had to place three archives and the READMEs named two of them (the MAME
+# README never mentioned the BIOS at all, measured 2026-09-20: MAME reports
+# `dl-1425.bin - NOT FOUND (qsound_hle)` and refuses the set).  The RELEASED
+# zip is therefore COMPLETED here: every member the emulators want is copied in
+# PRISTINE from the player's own dumps, so one file in `roms/` is the whole
+# instruction.  The build is untouched — no fingerprint, expectation set,
+# registry row or MiSTer CRC moves — and what the release adds is byte-identical
+# to the dumps it came from, which the applier verifies by SHA-1 like any other
+# pristine copy.  Measured equivalent to the three-archive arrangement over
+# 12,120 frames of `05_timeout_idle` on BOTH emulators, work RAM and framebuffer
+# alike, with the de-substitution invariant intact; the gates that hold it are
+# `test_release_roundtrip.sh` section 1 and `test_release_binaries.sh`.
+#
+# `qsound_hle.zip` is a PRISTINE SOURCE ONLY — deliberately NOT in SOURCE_ORDER.
+# The source blob is what every xdelta is encoded against, so adding a zip to it
+# rewrites every patch file and puts a fourth dump in the blob recipe for the
+# sake of one 24 KB member.  A pristine copy needs no blob entry.
+PRISTINE_ONLY_SOURCES = ["qsound_hle.zip"]
+# MAME's QSound DSP program is a BIOS-SET member, not part of ROM_START(vsavjw),
+# which is why no in-tree load map declares it.  FBNeo's descriptor omits it
+# entirely (its QSound is HLE), so it is inert there — an unlisted zip member.
+QSOUND_BIOS = ("qsound_hle.zip", "dl-1425.bin")
+
 
 def sha1(b):
     return hashlib.sha1(b).hexdigest()
@@ -66,6 +92,43 @@ def build_source(romdir, out_path):
                 f.write(d); h.update(d)
                 recipe.append({"zip": z, "member": n, "size": len(d), "sha1": sha1(d)})
     return h.hexdigest(), recipe
+
+
+def standalone_completion(present):
+    """The members a RELEASED `vsavjw.zip` must gain to stand alone, given the
+    members the build's own zip already carries.
+
+    DERIVED, never listed twice: `gen_vsavjw_xml.PARENT_MEMBERS` is the tree's
+    declaration of which members live in the parent zip (it exists for the
+    MiSTer catalogue, which must mark them `merge=`), so the completion is
+    exactly those the build does not author itself, plus the QSound BIOS member.
+    If the profile ever grows a parent-resident member and that set is not
+    updated, `test_release_binaries.sh` fails on the emulator's own
+    `-verifyroms`, which is a behavioural check with no list to rot.
+    """
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import gen_vsavjw_xml
+    want = [("vsav.zip", m) for m in sorted(gen_vsavjw_xml.PARENT_MEMBERS)
+            if m not in present]
+    if QSOUND_BIOS[1] not in present:
+        want.append(QSOUND_BIOS)
+    return want
+
+
+def applied_set_key(zips):
+    """The whole-set key of what the APPLIER writes — computed exactly as
+    tools/build_fingerprint.py wholeset_key() does (zip name, then each member
+    name and its bytes, both sorted), so the README can name the identity the
+    player actually gets rather than the build's, which the standalone
+    completion moves away from.
+    """
+    h = hashlib.sha1()
+    for zname in sorted(zips):
+        h.update(zname.encode())
+        for member, data in sorted(zips[zname], key=lambda kv: kv[0]):
+            h.update(member.encode())
+            h.update(data)
+    return h.hexdigest()
 
 
 def main():
@@ -88,8 +151,11 @@ def main():
 
     # reference inventory (sha1 -> (zip, member)) and the source blob
     ref = {}
-    for z in SOURCE_ORDER:
-        zf = zipfile.ZipFile(os.path.join(a.romdir, z))
+    for z in SOURCE_ORDER + PRISTINE_ONLY_SOURCES:
+        zp = os.path.join(a.romdir, z)
+        if not os.path.exists(zp):
+            sys.exit(f"missing reference dump: {zp}")
+        zf = zipfile.ZipFile(zp)
         for n in zf.namelist():
             ref[sha1(zf.read(n))] = (z, n)
     src_path = os.path.join(work, "source.bin")
@@ -97,12 +163,15 @@ def main():
     print(f"source blob: {os.path.getsize(src_path)} bytes, sha1 {src_sha}")
 
     members = {}
+    contents = {}          # zname -> [(member, bytes)], for the applied-set key
+    nfill = []             # the standalone completion, for the log and the README
     npatch = ncopy = 0
     for zname in sorted(os.listdir(a.rompath)):
         if not zname.endswith(".zip"):
             continue
         zf = zipfile.ZipFile(os.path.join(a.rompath, zname))
         members[zname] = []
+        contents[zname] = []
         for n in sorted(zf.namelist()):
             d = zf.read(n); h = sha1(d)
             entry = {"member": n, "size": len(d), "sha1": h}
@@ -130,6 +199,24 @@ def main():
                 npatch += 1
                 print(f"  {zname}/{n}: delta {entry['patch_size']} bytes")
             members[zname].append(entry)
+            contents[zname].append((n, d))
+
+        # THE STANDALONE COMPLETION (see the header note).  Only the WIDE set is
+        # completed: it is the one a player launches.  Every added member is a
+        # PRISTINE COPY out of the player's own dumps, so nothing new is
+        # distributed and the applier verifies each by SHA-1 before writing.
+        if zname == "vsavjw.zip":
+            present = {m for m, _ in contents[zname]}
+            for zsrc, msrc in standalone_completion(present):
+                d = zipfile.ZipFile(os.path.join(a.romdir, zsrc)).read(msrc)
+                h = sha1(d)
+                if ref.get(h) is None:
+                    sys.exit(f"{zsrc}/{msrc}: not in the reference inventory")
+                members[zname].append({"member": msrc, "size": len(d), "sha1": h,
+                                       "pristine_from": {"zip": zsrc, "member": msrc}})
+                contents[zname].append((msrc, d))
+                ncopy += 1
+                nfill.append(f"{msrc} <- {zsrc}")
 
     # THE BUILD IDENTITY IS THE WHOLE-SET KEY (14z-148): since the 14z-132
     # whole-set keying a merged build's PROGRAM key is shared with the
@@ -147,11 +234,32 @@ def main():
     except Exception:
         pass
 
+    # The pristine-only reference zips the completion actually drew from, with
+    # each member's size and sha1 so the applier verifies them exactly as it
+    # verifies the blob's recipe. Absent when nothing was drawn from them, so an
+    # older-shaped release stays valid.
+    pristine_sources = []
+    for z in PRISTINE_ONLY_SOURCES:
+        used = sorted({e["pristine_from"]["member"]
+                       for mz in members.values() for e in mz
+                       if e.get("pristine_from", {}).get("zip") == z})
+        if not used:
+            continue
+        zf = zipfile.ZipFile(os.path.join(a.romdir, z))
+        pristine_sources.append({"zip": z, "members": [
+            {"member": n, "size": len(zf.read(n)), "sha1": sha1(zf.read(n))}
+            for n in used]})
+
     manifest = {
         "name": a.name, "version_string": a.version,
         "build_fingerprint": fp,
+        # What the APPLIER writes. It differs from build_fingerprint by the
+        # standalone completion above and is the key a player can check.
+        "applied_set_key": applied_set_key(contents),
+        "standalone_completion": sorted(nfill),
         "source": {"order": SOURCE_ORDER, "sha1": src_sha,
                    "size": os.path.getsize(src_path), "recipe": recipe},
+        "pristine_sources": pristine_sources,
         "xdelta3_flags": XDELTA_FLAGS,
         "zips": members,
     }
@@ -161,6 +269,9 @@ def main():
     open(os.path.join(rel, "README.md"), "w").write(readme(a, manifest, npatch, ncopy))
     shutil.rmtree(work)
     print(f"packaged {a.name}: {npatch} patched members, {ncopy} pristine copies -> {rel}")
+    if nfill:
+        print(f"  standalone completion ({len(nfill)}): " + ", ".join(sorted(nfill)))
+        print(f"  applied set key: {manifest['applied_set_key'][:8]}")
 
 
 def readme(a, m, npatch, ncopy):
@@ -171,6 +282,10 @@ def readme(a, m, npatch, ncopy):
     The diagnostics in "If it does not work" are MEASURED (STATE 14z-148)."""
     zips = ", ".join(sorted(m["zips"]))
     key = (m["build_fingerprint"] or "?")[:8]
+    akey = (m.get("applied_set_key") or "?")[:8]
+    fillrows = m.get("standalone_completion") or []
+    nfill = len(fillrows)
+    fill = ", ".join(fillrows) if fillrows else "none"
     return f"""# VAMPIRE SAVED — {m['name']} (in-game mark "{m['version_string']}")
 
 Full-roster Vampire Savior on the real CPS-2 engine: the 15+1 of vsavj plus
@@ -194,9 +309,11 @@ without your own dumps.
 ## What you need
 - **Python 3** (3.8 or newer). No other tool: the applier decodes the
   patches itself.
-- **The three reference dumps, unmodified, with these exact names** in one
+- **The reference dumps, unmodified, with these exact names** in one
   directory: `vsavj.zip` (Vampire Savior, Japan 970519), `vsav.zip` (Europe
-  970519), `vsav2.zip` (Vampire Savior 2, Japan 970913). Vampire Hunter 2 is
+  970519), `vsav2.zip` (Vampire Savior 2, Japan 970913) and `qsound_hle.zip`
+  (the QSound BIOS set — MAME wants `dl-1425.bin` and it is copied in for you,
+  so you never place it yourself). Vampire Hunter 2 is
   NOT needed (it is the project's verification oracle, not a source of
   anything in the set). The applier checks every member's SHA-1
   against the manifest before doing anything, so a wrong, renamed or
@@ -205,15 +322,21 @@ without your own dumps.
 ## Build the romset (one command)
     python3 apply_release.py --romdir /path/to/your/dumps --out ./rompath
 
-`./rompath/` then holds `{zips}`. The applier refuses to write if any rebuilt
-member's SHA-1 does not match the manifest. Keep your pristine `vsav.zip`
-next to it when you play: the WIDE set is a clone of `vsav` and the emulator
-resolves the unmodified members from the parent.
+`./rompath/` then holds `{zips}`, and that is **the only file you place** —
+it is a STANDALONE set: every member the emulator asks for is inside it,
+including the ones normally resolved from the parent `vsav.zip` and MAME's
+QSound BIOS, each copied pristine from your own dumps and SHA-1 verified. You
+do not put `vsav.zip`, `vsavj.zip` or `qsound_hle.zip` in the emulator's rom
+directory. The applier refuses to write if any member's SHA-1 does not match
+the manifest.
 
 ## Identify the build
 - In game: the mark `{m['version_string']}` at the bottom-right of the
   character-select screen, and the boot name screen reads VAMPIRE SAVED.
-- On disk: whole-set key `{key}` (`manifest.json` has every member's SHA-1).
+- On disk: whole-set key `{akey}` — the set the applier writes, which
+  `manifest.json` carries as `applied_set_key` with every member's SHA-1.
+  (The build this was packaged from is `{key}`; they differ by the standalone
+  completion above, which is pristine content from your dumps.)
 
 ## If it does not work
 - **"Unknown system: vsavjw" / "no such driver"** — the emulator is not the
@@ -230,7 +353,8 @@ resolves the unmodified members from the parent.
   (compare the whole-set key above).
 
 ## What is patched
-{npatch} members are rebuilt, {ncopy} are copied pristine from your dumps.
+{npatch} members are rebuilt, {ncopy} are copied pristine from your dumps
+(of those, {nfill} complete the set so it stands alone: {fill}).
 The patches hold only bytes the port generates or authors (relocated code,
 tables, the version glyphs); everything that comes from the original games
 is expressed as a reference into YOUR dumps, which is what keeps this package

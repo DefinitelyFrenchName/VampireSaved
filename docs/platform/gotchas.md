@@ -6,6 +6,34 @@ it is specific to this roster hack.
 
 Append the moment one is paid for. Read before touching the related area.
 
+## A ROMSET WITH MEMBERS MISSING RUNS FOR THOUSANDS OF FRAMES WITH WORK RAM BIT-IDENTICAL — only the framebuffer shows it (paid: 2026-09-20)
+
+A `vsavjw` run whose SIX parent-resolved members were absent — `vm3.14m/16m/18m/20m`
+(group-B gfx) and `vm3.11m/12m` (QSound samples) — completed all **12,120 frames** of
+`05_timeout_idle` on FBNeo, produced a **bit-identical whole-RAM checksum log** to a
+complete run, and differed ONLY in the per-frame framebuffer checksums. FBNeo logs
+`Loading graphics (vm3.14m)... (not found)` and carries on; its CRC-then-`0xFF`-fill
+loader means a *wrong* member behaves the same way. This is the **14z-60z class** —
+"Donovan and Anita rendered as garbage while every automated gate stayed green" —
+restated for whole members rather than wrong banks, and the reason
+`tests/test_wide_render_content.sh` exists at all.
+
+**How it was paid:** a reference leg was invoked with a RELATIVE `ROMDIR` (`../ROMS`),
+which resolves against the run's sandbox and finds nothing — the trap
+`tools/run_replay_fbneo.sh`'s own header and the 14z-132 absolutisation already
+name. The resulting framebuffer divergence was briefly read as CRC hash-shadowing of
+the port's group-A members by the parent zip. It was not: a separating control that
+dropped exactly those four members from a full `ROMDIR` clone changed **nothing**, and
+two repeats of the suspect leg with an ABSOLUTE `ROMDIR` matched the complete run
+exactly. The romset arrangement was innocent; the instrument was misconfigured.
+
+**RULES.** (1) A romset-arrangement claim is NOT established by work RAM — assert
+`FBNEO_HVIDEO` / `VIDEO_OUT` as well, or the comparison is blind to every gfx and PCM
+member. (2) Absolutise `ROMDIR` in any leg that changes directory, and when a leg
+disagrees with its reference, **repeat it with the suspected confounder removed before
+theorising about the subject.** (3) `(OK)` in an FBNeo load log is not proof a member
+was served: check for `(not found)` lines and count them.
+
 ## A MAME BREAKPOINT CONDITION THAT DOES NOT PARSE SETS NO BREAKPOINT — `l@` is not a size, and the probe reports a clean zero (paid: 14z-93, #92)
 
 MAME's debugger expressions read memory in four sizes — `b@`, `w@`, `d@`, `q@`

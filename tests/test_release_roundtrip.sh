@@ -13,9 +13,12 @@
 # A release is a set of xdelta3 patches + a manifest + an applier
 # (tools/package_release.py). This gate is what makes it shippable:
 #   1  ROUND TRIP — package the build, apply the package to the PRISTINE
-#      reference dumps in a scratch dir, and require every member of every
-#      output zip byte-identical to the build's rompath (and the program
-#      fingerprint + whole-artifact manifest to agree).
+#      reference dumps in a scratch dir, and require every member the build
+#      authors byte-identical to the build's rompath; every member the release
+#      ADDS to stand alone (2026-09-20) byte-identical to the reference member
+#      the manifest declares it was copied from, with an undeclared addition a
+#      FAIL; the applied set to hash to the manifest's `applied_set_key`; the
+#      program fingerprint to agree; and the applier to be DETERMINISTIC.
 #   2  THE APPLIER REFUSES — a corrupted patch file, a wrong reference
 #      member (one byte flipped in a copy of vsavj.zip), and a manifest
 #      with a wrong target sha1 must each make apply_release.py exit
@@ -113,7 +116,11 @@ e["patch_size"] = os.path.getsize(pf); e["patch_sha1"] = hashlib.sha1(open(pf, "
 json.dump(m, open(mf, "w"))
 PY
 mkdir -p "$W/bad_roms"
-for z in vsavj vsav vsav2; do ln -s "$ROMDIR/$z.zip" "$W/bad_roms/$z.zip"; done   # three dumps since 14z-149
+# EVERY zip the applier opens, or the control fires for the wrong reason: since
+# the 2026-09-20 standalone completion the applier also reads qsound_hle.zip as a
+# PRISTINE SOURCE, and a farm without it makes the applier exit on "missing
+# reference dump" instead of the sha1 mismatch this control is testing.
+for z in vsavj vsav vsav2 qsound_hle; do ln -s "$ROMDIR/$z.zip" "$W/bad_roms/$z.zip"; done   # three dumps since 14z-149, + the BIOS source since 2026-09-20
 rm "$W/bad_roms/vsavj.zip"
 python3 - "$ROMDIR/vsavj.zip" "$W/bad_roms/vsavj.zip" <<'PY'
 import zipfile, sys
@@ -132,20 +139,53 @@ secondary-compressed-patch) APPLY_DIR="$W/bad_lzma" ;;
 esac
 python3 "$APPLY_DIR/apply_release.py" --romdir "$APPLY_ROMDIR" --out "$W/applied" \
     > "$W/apply.log" 2>&1 || { echo "FAIL: applier"; tail -5 "$W/apply.log"; exit 1; }
-python3 - "$RP" "$W/applied" <<'PY' || fail=1
-import sys, zipfile, hashlib, os
-a, b = sys.argv[1:3]
-n = 0
+# THE APPLIED SET IS THE BUILD PLUS THE STANDALONE COMPLETION (2026-09-20).
+# The release completes `vsavjw.zip` so a player places ONE file, so the applied
+# inventory is deliberately a SUPERSET of the build's. Nothing goes unverified:
+# every member the build authors must be byte-identical to the build's, every
+# ADDED member must be byte-identical to the reference member the manifest names
+# it was copied from, and the set as a whole must hash to the manifest's declared
+# `applied_set_key`. An added member the manifest does not declare is a FAIL, so
+# the superset cannot quietly grow.
+python3 - "$RP" "$W/applied" "$APPLY_DIR/manifest.json" "$APPLY_ROMDIR" <<'PY' || fail=1
+import sys, zipfile, hashlib, os, json
+a, b, mf, romdir = sys.argv[1:5]
+m = json.load(open(mf))
+declared = {}
+for r in m.get("standalone_completion", []):
+    member, src = r.split(" <- ")
+    declared[member] = src
+n = nx = 0
 for z in sorted(os.listdir(a)):
     if not z.endswith(".zip"): continue
     za, zb = zipfile.ZipFile(os.path.join(a, z)), zipfile.ZipFile(os.path.join(b, z))
-    if sorted(za.namelist()) != sorted(zb.namelist()):
-        print(f"FAIL: {z} member inventory differs"); sys.exit(1)
-    for m in za.namelist():
-        if za.read(m) != zb.read(m):
-            print(f"FAIL: {z}/{m} differs after the round trip"); sys.exit(1)
+    extra = sorted(set(zb.namelist()) - set(za.namelist()))
+    missing = sorted(set(za.namelist()) - set(zb.namelist()))
+    if missing:
+        print(f"FAIL: {z} lost members in the round trip: {missing}"); sys.exit(1)
+    for e in extra:
+        if z != "vsavjw.zip" or e not in declared:
+            print(f"FAIL: {z}/{e} added but not declared in standalone_completion"); sys.exit(1)
+        ref = zipfile.ZipFile(os.path.join(romdir, declared[e]))
+        if zb.read(e) != ref.read(e):
+            print(f"FAIL: {z}/{e} is not byte-identical to {declared[e]}/{e}"); sys.exit(1)
+        nx += 1
+    if z == "vsavjw.zip" and sorted(extra) != sorted(declared):
+        print(f"FAIL: completion mismatch — added {sorted(extra)}, declared {sorted(declared)}"); sys.exit(1)
+    for mm in za.namelist():
+        if za.read(mm) != zb.read(mm):
+            print(f"FAIL: {z}/{mm} differs after the round trip"); sys.exit(1)
         n += 1
-print(f"  ok: {n} members byte-identical after the round trip")
+# the whole applied set must hash to what the manifest promises the player
+h = hashlib.sha1()
+for z in sorted(q for q in os.listdir(b) if q.endswith(".zip")):
+    h.update(z.encode())
+    with zipfile.ZipFile(os.path.join(b, z)) as zf:
+        for nm in sorted(zf.namelist()):
+            h.update(nm.encode()); h.update(zf.read(nm))
+if m.get("applied_set_key") and h.hexdigest() != m["applied_set_key"]:
+    print(f"FAIL: applied set key {h.hexdigest()[:8]} != manifest {m['applied_set_key'][:8]}"); sys.exit(1)
+print(f"  ok: {n} build members byte-identical, {nx} completion members equal to their dumps, applied key {h.hexdigest()[:8]}")
 PY
 # --sha-only, not a stderr scrape: this assertion is about the PROGRAM
 # fingerprint, and --sha-only prints exactly that and nothing else. The old
@@ -156,9 +196,20 @@ fp() { python3 tools/build_fingerprint.py "$1" --set vsavjw --sha-only; }
 fa="$(fp "$RP")"; fb="$(fp "$W/applied")"
 [ -n "$fa" ] && [ "$fa" = "$fb" ] && echo "  ok: program fingerprint $fb reproduced" \
     || { echo "FAIL: fingerprint $fa vs $fb"; fail=1; }
-ma="$(python3 tools/artifact_manifest.py "$RP")"; mb="$(python3 tools/artifact_manifest.py "$W/applied")"
-[ "$ma" = "$mb" ] && echo "  ok: whole-artifact manifest reproduced ($mb)" \
-    || { echo "FAIL: whole-artifact manifest $ma vs $mb"; fail=1; }
+# THE WHOLE-ARTIFACT MANIFEST: build-vs-applied equality STOPPED BEING THE RIGHT
+# CLAIM at the 2026-09-20 standalone completion — the applied set is a declared
+# superset, so the digests differ by construction. What replaced it is not weaker:
+# the comparison above checks every byte of every member on BOTH sides (100% of
+# the shipped bytes, where this digest also covered 100% but as one hash), and the
+# assertion here is now the applier's DETERMINISM, which nothing else held —
+# applying the same package twice must produce a byte-identical artifact.
+python3 "$APPLY_DIR/apply_release.py" --romdir "$APPLY_ROMDIR" --out "$W/applied2" \
+    > "$W/apply2.log" 2>&1 || { echo "FAIL: applier (second run)"; tail -5 "$W/apply2.log"; exit 1; }
+mb="$(python3 tools/artifact_manifest.py "$W/applied")"
+mc="$(python3 tools/artifact_manifest.py "$W/applied2")"
+[ -n "$mb" ] && [ "$mb" = "$mc" ] && echo "  ok: the applier is deterministic — artifact manifest $mb twice" \
+    || { echo "FAIL: applier not deterministic: $mb vs $mc"; fail=1; }
+rm -rf "$W/applied2"
 
 echo "== 2. the applier refuses bad inputs and writes nothing =="
 refuse() { # refuse <name> <reldir> <romdir>

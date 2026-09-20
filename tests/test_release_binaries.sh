@@ -15,7 +15,20 @@
 # shipped binary is proven to be the same instrument the gates ran, not a
 # recipe believed equivalent. mame + fbneo, ~2 min.
 #
+# AND SINCE 2026-09-20, SECTION 3: the SHIPPED release directory applied to the pristine
+# dumps must yield a STANDALONE romset — one zip, no parent, no QSound BIOS zip — that is
+# (3a) COMPLETE by the emulator's own descriptor, `-verifyroms` against that set alone
+# reporting no NOT FOUND and the same flagged set as the build arrangement; and
+# behaviourally identical to the gated build on (3b) MAME and (3c) FBNeo, in whole-RAM
+# checksums AND per-frame framebuffer checksums. 3a is the leg that does not read the
+# packager's `standalone_completion` declaration, so it is what can catch an omitted or
+# wrong completion member — the three QSound members included, which neither stream sees.
+# 3c uses the HARNESS FBNeo build, not the release binary, which carries no harness by
+# design. ~8 min with section 3.
+#
 # MUST-FIRE: perturbed-copy: flipped-library-byte — a copy of the fbneo resource dir with one byte of a bundled library flipped must fail the record check (mode: the gate checks that copy in place of the resource)
+# MUST-FIRE: perturbed-copy: standalone-audio-member-content — the applied STANDALONE set with a QSound completion member (vm3.11m) carrying another sample member's bytes must be caught by section 3a's `-verifyroms` completeness check; NEITHER compared stream can see an audio member (3 of the 7 completion members are QSound), so without 3a this failure mode is uncovered — which is also why 3a's expectation comes from the emulator's descriptor and not from the packager's own `standalone_completion` declaration (fires in-gate after 3a-3c pass)
+# MUST-FIRE: perturbed-copy: standalone-member-content — the applied STANDALONE set with one completion member (vm3.14m) carrying another gfx member's bytes — same name, same size, so it still loads — must diverge from the build arrangement; measured 2026-09-20, work RAM is UNMOVED by that and only the framebuffer shows it (the 14z-60z class), so this is what makes section 3's VIDEO_OUT half load-bearing rather than decorative (fires in-gate after 3a-3c pass)
 # MUST-FIRE: perturbed-copy: absolute-reference — a copy of the mame resource dir carrying a reference that does NOT resolve inside the directory, with the record made consistent so the record check PASSES, must fail the self-containment check (macOS: one install name rewritten back to an absolute Homebrew path, re-signed and re-hashed; Linux/Windows: one bundled library removed together with its sha256 row, so the folder now needs it from outside — Linux: tools/check_host_libs.py fails it as on no host-provided list; Windows: ldd resolves it outside the folder) (mode: the gate checks that copy)
 #
 # WHY. A prebuilt built by the EMULATOR.md recipe links Homebrew's SDL by
@@ -364,14 +377,28 @@ check_dir "$MM" "cps2$EXESUF" || f2=1
 # byte-identical to a pristine twin are flagged INCORRECT CHECKSUM, and nothing is NOT
 # FOUND (measured 14z-149; the shipped
 # recipe's "must say good" line was false since the first content build).
-"$MM/cps2$EXESUF" -verifyroms vsavjw -rompath "$(native_pathlist "$REPO/$MERGED/rompath;$ROMDIR")" > "$W/verify.log" 2>&1 || true
-python3 - "$W/verify.log" "$MERGED/rompath/vsavjw.zip" "$ROMDIR/vsavj.zip" "$ROMDIR/vsav.zip" <<'PY' || f2=1
+# ONE function, two callers (this leg and section 3's standalone leg), so the standalone
+# set is held to exactly the check the build arrangement is held to. The expectation is
+# computed from the EMULATOR'S OWN descriptor plus the pristine dumps and NEVER from the
+# packager's `standalone_completion` declaration: that independence is the whole point,
+# because it is what catches a completion member that is MISSING (a NOT FOUND line) or
+# that carries WRONG CONTENT (an extra INCORRECT CHECKSUM), for a QSound member as
+# readily as for a gfx one, without inheriting the derivation under test.
+verify_check() {   # verify_check <verifyroms log> <the vsavjw.zip it ran against> <label>
+    # EVERY reference zip the set can draw a pristine member from must be in the twin
+    # list, or a correct member with no twin is counted as "expected flagged" and the
+    # check fails on its own arithmetic. qsound_hle.zip joined it on 2026-09-20 with the
+    # standalone completion, whose dl-1425.bin comes from there — caught by this gate on
+    # its first run ("missed ['dl-1425.bin']"). Adding the twin STRENGTHENS the check: the
+    # member is now expected UNFLAGGED, so wrong content in it fails here.
+    python3 - "$1" "$2" "$ROMDIR/vsavj.zip" "$ROMDIR/vsav.zip" "$ROMDIR/qsound_hle.zip" "$3" <<'PYV'
 import sys, re, zipfile
 # THE LAST CR OF THE WINDOWS OUTPUT (14z-153): this block prints the gate's one PASS
 # line from Python, and a NATIVE Windows python writes "\r\n" for "\n" — the one CR
 # byte left in the MSYS2 output after 14z-152 reconfigured the other block (above).
 sys.stdout.reconfigure(encoding="utf-8", newline="\n")
-log, z, *pristine = sys.argv[1:]
+log, z, p1, p2, p3, label = sys.argv[1:7]
+pristine = [p1, p2, p3]
 text = open(log, errors="replace").read()
 flagged = set(re.findall(r"^vsavjw\s*:\s*(\S+) .* - INCORRECT CHECKSUM", text, re.M))
 other = [l for l in text.splitlines() if l.startswith("vsavjw") and "INCORRECT CHECKSUM" not in l]
@@ -385,9 +412,13 @@ if other: print("FAIL: -verifyroms reports something other than a checksum misma
 if flagged != expect:
     print(f"FAIL: -verifyroms flagged {sorted(flagged - expect)} unexpectedly / missed {sorted(expect - flagged)}"); ok = False
 if not re.search(r"^romset vsavjw \[vsav\] is bad", text, re.M): print("FAIL: no 'romset vsavjw [vsav] is bad' summary line"); ok = False
-print(f"  -verifyroms: {len(flagged)} members flagged = exactly the WIDE zip's {len(expect)} rewritten/new members, none NOT FOUND")
+print(f"  -verifyroms{label}: {len(flagged)} members flagged = exactly the WIDE zip's {len(expect)} rewritten/new members, none NOT FOUND")
 sys.exit(0 if ok else 1)
-PY
+PYV
+}
+
+"$MM/cps2$EXESUF" -verifyroms vsavjw -rompath "$(native_pathlist "$REPO/$MERGED/rompath;$ROMDIR")" > "$W/verify.log" 2>&1 || true
+verify_check "$W/verify.log" "$MERGED/rompath/vsavjw.zip" "" || f2=1
 if [ "$f2" = 0 ]; then
     MAME_BIN="$MM/cps2$EXESUF" MAME_ROMPATH="$(native_pathlist "$REPO/$MERGED/rompath;$ROMDIR")" SUITE_ONLY=05_timeout_idle \
         tests/run_suite.sh vsavjw > "$W/suite.log" 2>&1 || true
@@ -395,6 +426,195 @@ if [ "$f2" = 0 ]; then
     if ! grep -q "SUITE GREEN" "$W/suite.log" || [ "$n" != 1 ]; then
         echo "FAIL: the release MAME did not reproduce 05_timeout_idle's frozen expectation:"; tail -6 "$W/suite.log"; f2=1
     fi
+fi
+# ONE perturbation function for section 3, called by the control section AND by the
+# CONTROL= mode, so what a mode proves is exactly what the control claims ([VSP-181]).
+# The swap preserves the member's name and size, so the set still LOADS: that is the
+# point, a member that fails to load is caught trivially and proves nothing about the
+# comparison. <victim> takes <donor>'s bytes; both must be completion members.
+sa_perturb() {  # sa_perturb <victim member> <donor member> <src dir> <out dir>
+    rm -rf "$4"; cp -R "$3" "$4"
+    python3 - "$4/vsavjw.zip" "$1" "$2" <<'PY3'
+import zipfile, sys, shutil
+p, victim, donor = sys.argv[1:4]
+shutil.copyfile(p, p + ".orig")
+src = zipfile.ZipFile(p + ".orig")
+d = src.read(donor)
+assert len(d) == len(src.read(victim)), "the swap must preserve the member size"
+with zipfile.ZipFile(p, "w", zipfile.ZIP_STORED) as out:
+    for n in src.namelist():
+        out.writestr(n, d if n == victim else src.read(n))
+PY3
+    rm -f "$4/vsavjw.zip.orig"
+}
+
+# ---- section 3: THE SHIPPED RELEASE DIRECTORY PRODUCES A SET THAT STANDS ALONE AND
+# BEHAVES LIKE THE GATED BUILD (2026-09-20, the standalone completion).
+# The release completes `vsavjw.zip` so a player places ONE file, which makes the zip a
+# player runs a declared SUPERSET of the zip every other gate measures. That difference is
+# checked here, by machine, on BOTH emulators and on THREE independent instruments:
+#
+#   3a  COMPLETENESS, from the emulator's own descriptor — `-verifyroms` against the
+#       applied set ALONE: no NOT FOUND, and exactly the same flagged set as the build
+#       arrangement. This is the check that does not read the packager's
+#       `standalone_completion` declaration, so it is what catches a completion member
+#       that is missing or wrong — INCLUDING the three QSound members, which neither
+#       stream below can see (measured 2026-09-20: `vm3.11m` given `vm3.12m`'s bytes adds
+#       exactly one INCORRECT CHECKSUM line and is invisible to RAM and video alike).
+#   3b  MAME behaviour — the applied set alone vs the build arrangement, whole-RAM
+#       checksums AND `VIDEO_OUT` framebuffer checksums, on the RELEASE binary.
+#   3c  FBNeo behaviour — the same A/B on the HARNESS build, because the release FBNeo
+#       binary deliberately carries no harness (section 1 asserts that), and FBNeo is the
+#       loader that matters most here: its CRC-then-`0xFF`-fill path runs thousands of
+#       frames with work RAM BIT-IDENTICAL on missing members, so its own load log is
+#       checked for `(not found)` as well (docs/platform/gotchas.md, 2026-09-20).
+if [ "$f2" = 0 ]; then
+    reldir="$(python3 - "$REPO" "$REPO/$MERGED/rompath" <<'PY2'
+import glob, json, os, re, sys, subprocess
+repo, rp = sys.argv[1:3]
+out = subprocess.run([sys.executable, os.path.join(repo, "tools", "build_fingerprint.py"),
+                      rp, "--set", "vsavjw", "--set-key"], capture_output=True, text=True).stdout
+keys = re.findall(r"\b[0-9a-f]{40}\b", out)
+key = keys[-1] if keys else None
+for m in sorted(glob.glob(os.path.join(repo, "release", "*", "mame", "manifest.json"))):
+    try:
+        j = json.load(open(m))
+    except Exception:
+        continue
+    if key and j.get("build_fingerprint") == key and j.get("standalone_completion"):
+        print(os.path.dirname(m)); break
+PY2
+)"
+    if [ -z "$reldir" ]; then
+        echo "FAIL: no shipped release dir carries a standalone completion for this build — section 3 cannot run"
+        f2=1
+    else
+        rm -rf "$W/standalone"
+        if ! python3 "$reldir/apply_release.py" --romdir "$ROMDIR" --out "$W/standalone" > "$W/sa_apply.log" 2>&1; then
+            echo "FAIL: the shipped applier did not produce a set:"; tail -5 "$W/sa_apply.log"; f2=1
+        fi
+        # THE MODES: the perturbed set becomes the INPUT the whole of section 3 runs on,
+        # so the gate reaches its OWN FAIL rather than a bespoke assertion. The in-gate
+        # control block below is then skipped by its `f2 = 0` guard, which is correct —
+        # under a mode the main path IS the control.
+        if [ "$f2" = 0 ] && vs_ctl_is standalone-member-content; then
+            sa_perturb vm3.14m vm3.16m "$W/standalone" "$W/sa_mode"
+            rm -rf "$W/standalone"; mv "$W/sa_mode" "$W/standalone"
+        fi
+        if [ "$f2" = 0 ] && vs_ctl_is standalone-audio-member-content; then
+            sa_perturb vm3.11m vm3.12m "$W/standalone" "$W/sa_mode"
+            rm -rf "$W/standalone"; mv "$W/sa_mode" "$W/standalone"
+        fi
+    fi
+fi
+
+# ---- 3a: completeness from the emulator's descriptor, the applied set ALONE.
+# THE EXPECTATION IS COMPUTED FROM THE **BUILD'S** ZIP, NEVER FROM THE SET UNDER TEST.
+# Paid for immediately: the first version passed the applied zip as the expectation
+# source, so under `CONTROL=` the perturbation moved BOTH sides — the swapped member is
+# not byte-identical to a pristine twin, so it became "expected flagged", was flagged,
+# and 3a agreed with itself. That is the very defect (one derivation writing both sides)
+# this leg exists to prevent, reintroduced inside the fix for it. The build's zip is the
+# gated artifact and is untouched by any perturbation of the applied set, and the 7
+# completion members are pristine copies that the descriptor does NOT flag, so the honest
+# expectation is: the applied set flags EXACTLY the members the build authors, and nothing
+# else. A completion member that is missing shows up as NOT FOUND; one carrying wrong
+# content shows up as a flagged member the build does not author. Both then FAIL here.
+if [ "$f2" = 0 ]; then
+    "$MM/cps2$EXESUF" -verifyroms vsavjw -rompath "$(native_pathlist "$W/standalone")" > "$W/sa_verify.log" 2>&1 || true
+    verify_check "$W/sa_verify.log" "$REPO/$MERGED/rompath/vsavjw.zip" " (standalone set alone, expectation from the build)" || f2=1
+fi
+
+# ---- 3b / 3c: the behavioural A/B on both emulators
+if [ "$f2" = 0 ]; then
+    sa_mame() {  # sa_mame <ramlog> <videolog> <rompath> <tag>
+        MAME_BIN="$MM/cps2$EXESUF" MAME_ROMPATH="$(native_pathlist "$3")" VIDEO_OUT="$2" \
+        tools/run_replay_mame.sh vsavjw tests/replays/05_timeout_idle.rpl "$1" "$W/sa_sb_$4" \
+        > "$W/sa_run_$4.log" 2>&1
+    }
+    sa_fbneo() {  # sa_fbneo <ramlog> <videolog> <romdir> <fbneo_overlay_or_empty> <tag>
+        ROMDIR="$3" FBNEO_ROMPATH="$4" FBNEO_HVIDEO="$2" \
+        tools/run_replay_fbneo.sh vsavjw tests/replays/05_timeout_idle.rpl "$1" "$W/sa_fsb_$5" \
+        > "$W/sa_frun_$5.log" 2>&1
+    }
+    cmp_legs() {  # cmp_legs <label> <ram_a> <ram_b> <vid_a> <vid_b>
+        if ! cmp -s "$2" "$3"; then
+            echo "FAIL: $1 — the standalone set diverges from the build arrangement in work RAM:"
+            diff "$2" "$3" | head -4; return 1
+        fi
+        if ! cmp -s "$4" "$5"; then
+            echo "FAIL: $1 — the standalone set diverges from the build arrangement in the FRAMEBUFFER:"
+            diff "$4" "$5" | head -4; return 1
+        fi
+        d="$(sort -u "$4" | wc -l | tr -d ' ')"
+        [ "$d" -ge 100 ] || { echo "FAIL: $1 — the framebuffer stream is near-constant ($d distinct); the video comparison would be vacuous"; return 1; }
+        return 0
+    }
+    # 3b MAME, on the release binary
+    if ! sa_mame "$W/sa_alone.log" "$W/sa_alone.vid" "$W/standalone" alone; then
+        echo "FAIL: the applied standalone set did not complete a MAME replay:"; tail -5 "$W/sa_run_alone.log"; f2=1
+    elif ! sa_mame "$W/sa_build.log" "$W/sa_build.vid" "$REPO/$MERGED/rompath;$ROMDIR" build; then
+        echo "FAIL: the build arrangement did not complete a MAME replay:"; tail -5 "$W/sa_run_build.log"; f2=1
+    elif ! cmp_legs "mame" "$W/sa_alone.log" "$W/sa_build.log" "$W/sa_alone.vid" "$W/sa_build.vid"; then
+        f2=1
+    else
+        echo "  ok: mame — the standalone set alone reproduces the build arrangement's $(wc -l < "$W/sa_alone.log" | tr -d ' ')-frame RAM log AND framebuffer stream"
+    fi
+fi
+# 3c FBNeo, on the HARNESS build (the release binary has none, by design)
+if [ "$f2" = 0 ]; then
+    FBH="${FBNEO_HARNESS_BIN:-$REPO/emu/fbneo/fbneo}"
+    if [ ! -x "$FBH" ]; then
+        echo "FAIL: no harness FBNeo at $FBH — section 3c cannot run (tools/setup_fbneo.sh; the RELEASE binary carries no harness by design, so it cannot drive a replay)"
+        f2=1
+    elif ! FBNEO_BIN="$FBH" sa_fbneo "$W/fb_alone.log" "$W/fb_alone.vid" "$W/standalone" "" alone; then
+        echo "FAIL: the applied standalone set did not complete an FBNeo replay:"; tail -5 "$W/sa_frun_alone.log"; f2=1
+    elif ! FBNEO_BIN="$FBH" sa_fbneo "$W/fb_build.log" "$W/fb_build.vid" "$ROMDIR" "$REPO/$MERGED/rompath" build; then
+        echo "FAIL: the build arrangement did not complete an FBNeo replay:"; tail -5 "$W/sa_frun_build.log"; f2=1
+    elif ! cmp_legs "fbneo" "$W/fb_alone.log" "$W/fb_build.log" "$W/fb_alone.vid" "$W/fb_build.vid"; then
+        f2=1
+    else
+        nnf="$(command grep -c '(not found)' "$W/sa_frun_alone.log" 2>/dev/null || true)"
+        if [ "${nnf:-0}" != 0 ]; then
+            echo "FAIL: FBNeo reported $nnf '(not found)' member(s) on the standalone set — it is not complete for FBNeo:"
+            command grep '(not found)' "$W/sa_frun_alone.log" | head -4; f2=1
+        else
+            echo "  ok: fbneo — the standalone set alone loads every member ((not found) x0) and reproduces the build arrangement's RAM log AND framebuffer stream"
+        fi
+    fi
+fi
+
+# ---- section 3's must-fire controls: TWO perturbations, a gfx member and an AUDIO member.
+# The audio one exists because 3 of the 7 completion members are QSound (vm3.11m/12m and
+# dl-1425.bin) and NEITHER compared stream can see them — only 3a can, which is exactly
+# why 3a does not read the packager's declaration.
+if [ "$f2" = 0 ]; then
+    # (i) a GFX completion member with another gfx member's bytes: same name, same size,
+    # so it loads; work RAM is unmoved and the FRAMEBUFFER is what shows it.
+    sa_perturb vm3.14m vm3.16m "$W/standalone" "$W/sa_gfx"
+    grc=0
+    sa_mame "$W/sa_g.log" "$W/sa_g.vid" "$W/sa_gfx" gfx || grc=$?
+    gram=same; gvid=same
+    cmp -s "$W/sa_g.log" "$W/sa_build.log" || gram=differs
+    cmp -s "$W/sa_g.vid" "$W/sa_build.vid" || gvid=differs
+    if [ "$grc" != 0 ]; then
+        vs_ctl_fired standalone-member-content "vm3.14m := vm3.16m's bytes: the leg did not complete (rc=$grc) — caught, but not via the video comparison"
+    elif [ "$gvid" = differs ]; then
+        vs_ctl_fired standalone-member-content "vm3.14m := vm3.16m's bytes: framebuffer differs (work RAM $gram — which is why the video half is asserted)"
+    elif [ "$gram" = differs ]; then
+        vs_ctl_fired standalone-member-content "vm3.14m := vm3.16m's bytes: work RAM differs"
+    else
+        vs_ctl_dead standalone-member-content "a set whose vm3.14m carries vm3.16m's bytes compared EQUAL on both streams" || true; f2=1
+    fi
+    # (ii) an AUDIO completion member: invisible to RAM and video, so 3a must catch it.
+    sa_perturb vm3.11m vm3.12m "$W/standalone" "$W/sa_aud"
+    "$MM/cps2$EXESUF" -verifyroms vsavjw -rompath "$(native_pathlist "$W/sa_aud")" > "$W/sa_aud_verify.log" 2>&1 || true
+    if verify_check "$W/sa_aud_verify.log" "$REPO/$MERGED/rompath/vsavjw.zip" " (audio control)" > "$W/sa_aud_check.log" 2>&1; then
+        vs_ctl_dead standalone-audio-member-content "a set whose vm3.11m carries vm3.12m's bytes passed the completeness check" || true; f2=1
+    else
+        vs_ctl_fired standalone-audio-member-content "vm3.11m := vm3.12m's bytes: $(command grep -m1 '^FAIL' "$W/sa_aud_check.log" | cut -c1-96)"
+    fi
+    rm -rf "$W/sa_gfx" "$W/sa_aud"
 fi
 [ "$f2" = 0 ] && echo "  ok: record, self-contained, $SIGNED, knows vsavjw, -verifyroms flags exactly the WIDE members, reproduced 05_timeout_idle's frozen masked expectation"
 [ "$f2" = 0 ] || fail=1

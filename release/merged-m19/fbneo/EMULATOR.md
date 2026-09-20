@@ -27,9 +27,10 @@ same romset (the patched build's fingerprint is in ../manifest.json).
 
 ## The romset
 Apply `apply_release.py` per `README.md`, then point the patched emulator's
-rom path at the output directory. The set is `vsavjw` (a clone of `vsav`);
-keep your pristine `vsav.zip` in the rom path too — the loader resolves the
-unmodified members from it.
+rom path at the output directory. The set is `vsavjw` and it is STANDALONE:
+the applier copies in every member the loader asks for, the parent's and
+MAME's QSound BIOS member included, so the output directory needs nothing
+beside it.
 
 ## Prebuilt binaries — the other route
 
