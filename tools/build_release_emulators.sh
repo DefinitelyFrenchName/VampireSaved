@@ -77,7 +77,7 @@ Darwin)
     HOST="macOS $(sw_vers -productVersion) ($(uname -m)), $(clang --version | head -1)"
     SDL3LIB=libSDL3.dylib
     SIGNED=" all ad-hoc signed"
-    FIRSTRUN="gatekeeper the binary is ad-hoc signed, NOT notarized, so macOS BLOCKS IT ON FIRST LAUNCH: \"\\"<name>\\" Not Opened — Apple could not verify ... is free of malware\", offering only Done and Move to Bin. **RIGHT-CLICK > OPEN DOES NOT GET PAST THIS** on current macOS (confirmed on the maintainer's Mac, 2026-09-20, for both binaries — the old advice to do that was wrong and is withdrawn). WHAT WORKS, measured: clear the quarantine flag, then launch — `xattr -dr com.apple.quarantine .` inside this directory. The release also ships PLAY.command, which does that for you after asking. System Settings > Privacy & Security may additionally offer \"Open Anyway\" after a blocked attempt; that route is NOT verified here. The real fix is notarization, which needs a paid Apple Developer account — see GitHub #144."
+    FIRSTRUN="gatekeeper the binary is ad-hoc signed, NOT notarized, so macOS BLOCKS IT ON FIRST LAUNCH: a dialog saying the program Not Opened, Apple could not verify it is free of malware, offering only Done and Move to Bin. RIGHT-CLICK > OPEN DOES NOT GET PAST THIS on current macOS (confirmed 2026-09-20 on both binaries; the older advice to do that was wrong and is withdrawn). WHAT WORKS, measured: clear the quarantine flag and launch again, via the shipped PLAY.command or by running: xattr -dr com.apple.quarantine . inside this directory. System Settings > Privacy and Security > Open Anyway also works but is PER BLOCKED FILE, so it costs one approval per file in this directory. Notarization would remove the question entirely and needs a paid Apple Developer account - see GitHub #144."
     ;;
 Linux)
     HOSTOS=linux
@@ -179,6 +179,7 @@ extra_sdl3_args() {  # extra_sdl3_args <path to the linked libSDL2> -> prints --
 case "$KIND" in
 fbneo)
     PATCH="$REPO/emu/fbneo-patches/0002-cps2-wide-v1.patch"
+    PATCH3="$REPO/emu/fbneo-patches/0003-drop-sdl2-image.patch"
     PIN="$(git -C "$REPO" rev-parse HEAD:emu/fbneo)"
     CHECKED="$(git -C "$REPO/emu/fbneo" rev-parse HEAD)"
     [ "$PIN" = "$CHECKED" ] || {
@@ -192,10 +193,15 @@ fbneo)
     git -C "$REPO/emu/fbneo" worktree add --detach "$WT" "$PIN" >/dev/null
     echo "fbneo: clean worktree of $PIN at $WT"
     git -C "$WT" apply "$PATCH"
-    # Assert the STATE of the tree, not the exit code: the profile present, the harness ABSENT.
+    git -C "$WT" apply "$PATCH3"
+    # Assert the STATE of the tree, not the exit code: the profile present, the harness
+    # ABSENT, and SDL2_image gone (0003) — the last one is what keeps the macOS bundle at
+    # 4 files instead of 24, which is 4 Gatekeeper approvals instead of 24 (#144).
     grep -q Cps2Wide "$WT/src/burn/drv/capcom/cps.h" || { echo "0002 did not land" >&2; exit 1; }
     [ ! -f "$WT/src/burner/sdl/harness.cpp" ] || { echo "harness present in a release tree" >&2; exit 1; }
-    echo "fbneo: patch 0002 applied, harness absent (verified)"
+    ! grep -q 'SDL2_image' "$WT/makefile.sdl2" || { echo "0003 did not land (SDL2_image still linked)" >&2; exit 1; }
+    ! grep -rq 'SDL_image\.h' "$WT/src/burner/sdl" "$WT/src/intf/video/sdl" || { echo "0003 did not land (SDL_image.h still included)" >&2; exit 1; }
+    echo "fbneo: patches 0002 + 0003 applied, harness absent (verified)"
     # TWO PASSES on a fresh tree (measured 14z-149, docs/platform/gotchas.md
     # [CPE-26]): burn.o's prerequisite is the GENERATED driverlist.h, whose rule
     # runs only after every driver object exists, so a parallel first pass
@@ -221,7 +227,7 @@ fbneo)
     # shellcheck disable=SC2046  # the helper prints zero or two arguments by design
     python3 "$REPO/tools/$BUNDLER" "$OUT" "$OUT/$EXENAME" $(extra_sdl3_args "$SDL2LIB")
     UPSTREAM="https://github.com/finalburnneo/FBNeo"
-    RECIPE="git clone $UPSTREAM fbneo && cd fbneo && git checkout $PIN && git apply 0002-cps2-wide-v1.patch && make sdl2 SKIPDEPEND=1 -j$JOBS -k; make sdl2 SKIPDEPEND=1 -j$JOBS   (twice on a fresh clone: the first parallel pass dies on burn.o until the driver list is generated)"
+    RECIPE="git clone $UPSTREAM fbneo && cd fbneo && git checkout $PIN && git apply 0002-cps2-wide-v1.patch && git apply 0003-drop-sdl2-image.patch && make sdl2 SKIPDEPEND=1 -j$JOBS -k; make sdl2 SKIPDEPEND=1 -j$JOBS   (twice on a fresh clone: the first parallel pass dies on burn.o until the driver list is generated)"
     EXE="$EXENAME"
     TITLE="fbneo — FBNeo (SDL2 frontend) carrying the CPS-2 WIDE v1 driver patch, prebuilt for $OSARCH"
     RUN='run it from a directory that has a `roms/` subdirectory holding your built vsavjw.zip — that ONE file, since the release set is standalone (FBNeo has no rom-path option: it reads `roms/` relative to the current directory, or the paths set in its config): `./'"fbneo$EXESUF"' vsavjw`. Controls: FBNeo'"'"'s own menu (Tab).'
@@ -285,7 +291,11 @@ PATCH_SHA1="$(sha1_of "$PATCH")"
     echo
     echo "upstream   $UPSTREAM"
     echo "pin        $PIN"
-    echo "patch      0002-cps2-wide-v1.patch  sha1 $PATCH_SHA1  (the ONLY patch applied; the project's replay-harness patch is a test instrument and is not in this binary)"
+    if [ "$KIND" = fbneo ]; then
+        echo "patch      0002-cps2-wide-v1.patch  sha1 $PATCH_SHA1  and 0003-drop-sdl2-image.patch  sha1 $(sha1_of "$PATCH3")  (the ONLY patches applied; the project's replay-harness patch is a test instrument and is not in this binary. 0003 drops the SDL2_image link, which removes 21 transitive image codecs from this directory — 24 files to 4 — and with them 20 of the macOS Gatekeeper approvals a downloaded copy needs)"
+    else
+        echo "patch      0002-cps2-wide-v1.patch  sha1 $PATCH_SHA1  (the ONLY patch applied; the project's replay-harness patch is a test instrument and is not in this binary)"
+    fi
     echo "recipe     $RECIPE"
     echo "built      $DATE on $HOST, by tools/build_release_emulators.sh $KIND"
     # THE ENVIRONMENT, 2026-09-13: what docs/project/build_environments.md is composed from —

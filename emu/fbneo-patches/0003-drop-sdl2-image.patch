@@ -1,0 +1,83 @@
+CPS-2 WIDE release build: do not link SDL2_image
+
+WHY. FBNeo's SDL2 build links SDL2_image for ONE call — an optional per-game
+preview PNG in its own game-browser GUI (`LoadTitleImage`, support/titles/<name>.png).
+That single call drags in the whole Homebrew image-codec chain: measured on
+macos-arm64, the release bundle is 24 files, of which 21 are transitive codecs
+(AVIF, JPEG-XL, TIFF, WebP, brotli, dav1d, lcms2, zstd...). Nothing in this project
+uses any of them: the launcher starts the emulator directly with the set, and no
+title set is shipped, so the NULL path this patch makes unconditional is the path
+that already ran.
+
+WHAT IT BUYS (GitHub #144). macOS refuses to run an ad-hoc-signed download and the
+no-terminal remedy — System Settings > Privacy & Security > "Open Anyway" — must be
+done PER BLOCKED FILE. Measured: 24 approvals for FBNeo against 2 for MAME. With this
+patch the FBNeo bundle is 4 files, so the same route costs 4. Notarization would remove
+the question entirely and is not being bought.
+
+SCOPE. Frontend only, like the harness patch 0001, and NOT emulation: the makefile's
+link flag, one call site in `src/burner/sdl/sdl2_gui.cpp`, and an unused include in
+`src/intf/video/sdl/vid_sdl2.cpp` (unused, but it makes the sdl2_image HEADERS a build
+prerequisite, so it goes too). No CPU, sprite, timing or QSound code is touched.
+
+COST. FBNeo's own game-browser GUI no longer shows per-game preview images. It only
+ever showed them for someone who had installed a support/titles/ image set, which no
+release here ships.
+
+---
+diff --git a/makefile.sdl2 b/makefile.sdl2
+index 3bf65bd..ad4437a 100644
+--- a/makefile.sdl2
++++ b/makefile.sdl2
+@@ -96,11 +96,11 @@ incdir	= $(foreach dir,$(alldir),-I$(srcdir)$(dir)) -I$(objdir)dep/generated \
+ 		  -I$(srcdir)intf/input/sdl `sdl2-config --cflags`
+ 
+ ifdef WINDOWS
+-lib	= -lstdc++ `sdl2-config --libs` -lopengl32 -lSDL2_image -lm
++lib	= -lstdc++ `sdl2-config --libs` -lopengl32 -lm
+ else ifdef DARWIN
+-lib	= -lstdc++ `sdl2-config --libs` -lSDL2_image -lm -lpthread
++lib	= -lstdc++ `sdl2-config --libs` -lm -lpthread
+ else
+-lib	= -lstdc++ `sdl2-config --libs` -lGL -lSDL2_image -lm -lpthread
++lib	= -lstdc++ `sdl2-config --libs` -lGL -lm -lpthread
+ endif
+ 
+ ifdef FORCE_PULSE_AUDIO
+diff --git a/src/burner/sdl/sdl2_gui.cpp b/src/burner/sdl/sdl2_gui.cpp
+index 1ec99d7..371219b 100644
+--- a/src/burner/sdl/sdl2_gui.cpp
++++ b/src/burner/sdl/sdl2_gui.cpp
+@@ -1,4 +1,3 @@
+-#include <SDL_image.h>
+ #include "burner.h"
+ #include "sdl2_gui_common.h"
+ #include "misc_image.h"
+@@ -60,7 +59,14 @@ SDL_Texture* LoadTitleImage(SDL_Renderer* renderer, SDL_Texture* loadedTexture)
+ #else
+ 	snprintf(titlePath, MAX_PATH, "support\\titles\\%s.png", BurnDrvGetTextA(0));
+ #endif
+-	loadedTexture = IMG_LoadTexture(renderer, titlePath);
++	// CPS-2 WIDE release build: SDL2_image is not linked, so the optional per-game
++	// preview PNG is not loaded. This is the path that already ran whenever
++	// support/titles/<game>.png was absent, which is the normal case for a release
++	// that ships no title set. Dropping the library removes 21 transitive image
++	// codecs from the bundle (24 files -> 4), which on macOS is 24 Gatekeeper
++	// approvals -> 4 for a player who uses the System Settings route (GitHub #144).
++	(void)titlePath;
++	loadedTexture = NULL;
+ 	SDL_QueryTexture(loadedTexture, NULL, NULL, &w, &h);
+ 
+ 	title_texture_rect.x = 0; //the x coordinate
+diff --git a/src/intf/video/sdl/vid_sdl2.cpp b/src/intf/video/sdl/vid_sdl2.cpp
+index 80cab01..0eaa0e0 100644
+--- a/src/intf/video/sdl/vid_sdl2.cpp
++++ b/src/intf/video/sdl/vid_sdl2.cpp
+@@ -8,7 +8,6 @@
+ #endif
+ 
+ #include <SDL.h>
+-#include <SDL_image.h>
+ 
+ extern int vsync;
+ extern char videofiltering[3];
