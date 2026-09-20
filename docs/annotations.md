@@ -23,12 +23,12 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3223 |
-| named by a document or manifest only | 2124 |
+| distinct program-space addresses named | 3225 |
+| named by a document or manifest only | 2126 |
 | named by both a document/manifest and code | 732 |
 | named by CODE ONLY (the gap list below) | 367 |
 | carried by atlas | 571 |
-| carried by engine_internals | 654 |
+| carried by engine_internals | 657 |
 | carried by other docs | 1000 |
 | carried by manifests | 1818 |
 | carried by code | 1099 |
@@ -584,7 +584,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01AC40` | docs/game/atlas/ram.md — Masked windows for hooked-build legacy comparison (CLAUDE.md §4 amendment, 2026-07-25); tests/audit_mask_window_ff42a2.sh |
 | `PRG:0x01AC68` | docs/game/atlas/ram.md — Masked windows for hooked-build legacy comparison (CLAUDE.md §4 amendment, 2026-07-25); docs/game/engine_internals.md — OBJ (sprite) pipeline — the R2 answer (session 14, static decode); tools/obj_records.py |
 | `PRG:0x01AE14` | build/manifest/reconciliation.toml — map [vs2] |
-| `PRG:0x01AE6E` | docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven) [vs2]; tools/gen_donovan_patch.py |
+| `PRG:0x01AE6E` | docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven) [vs2]; docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2]; tools/gen_donovan_patch.py |
 | `PRG:0x01AF9E` | docs/game/engine_internals.md — OBJ (sprite) pipeline — the R2 answer (session 14, static decode); tools/obj_records.py |
 | `PRG:0x01AFA6` | docs/game/atlas/select_screen.md — The RECORD-POINTER array — what the hovered cell displays (14z-61); docs/game/atlas/sprite_lists.md — 1. The drawer; docs/game/engine_internals.md — The chain, end to end; tests/test_select_arrays.sh; tools/checkdocs_rom.py; tools/select_arrays.py |
 | `PRG:0x01AFAA` | build/manifest/huitzil.toml — beam_effect_class31 |
@@ -629,7 +629,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01C3A4` | docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116); docs/game/engine_internals.md — 2. PALETTE — pool + a per-char REMAP TABLE; docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven); docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven) [vs2]; docs/game/gotchas.md — THE "?" WALKER WRITES THE DRAWN ID EVERY FRAME, FROM TWO PATHS (paid: 14z-117, one crashing probe); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; +4 more |
 | `PRG:0x01C3AE` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
 | `PRG:0x01C3C2` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
-| `PRG:0x01C3FE` | docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven); build/manifest/donovan.toml — gfx_remap; tools/audit_palette_ptr_rows.py; tools/gen_donovan_patch.py |
+| `PRG:0x01C3FE` | docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven); docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); build/manifest/donovan.toml — gfx_remap; tools/audit_palette_ptr_rows.py; tools/gen_donovan_patch.py |
 | `PRG:0x01C426` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tools/gen_donovan_patch.py |
 | `PRG:0x01C42E` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
 | `PRG:0x01C586` | docs/project/patch_notes.md — A. 'fixture_row0f_override_bank0/1' DELETED (donovan only); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — weapon_accent_rowd_slot; build/manifest/shared_writes.toml — donovan; tools/probe_hook_removal.sh |
@@ -1239,6 +1239,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02A0C8` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) |
 | `PRG:0x02A0CE` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2]; tests/audit_column_flash.sh |
 | `PRG:0x02A128` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) |
+| `PRG:0x02A142` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2] |
 | `PRG:0x02A1B4` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) |
 | `PRG:0x02A2EA` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) |
 | `PRG:0x02A42E` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) |
@@ -2318,7 +2319,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0CE412` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2] |
 | `PRG:0x0CE51C` | docs/project/gotchas.md — Disabling a heuristic CLASS wholesale can revert load-bearing writes |
 | `PRG:0x0CEAF0` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tests/test_dualtrack.sh |
-| `PRG:0x0CEB50` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] |
+| `PRG:0x0CEB50` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) |
 | `PRG:0x0CF360` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
 | `PRG:0x0CF598` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x0D0C7E` | build/manifest/pyron.toml — port_patch; tools/audit_index_users.py |
@@ -2784,6 +2785,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x39BC9C` | docs/project/patch_notes.md — where the detail lives [vs2]; build/manifest/huitzil.toml — sprite; build/manifest/pyron.toml — obj_bank_word_slot |
 | `PRG:0x39C19C` | build/manifest/pyron.toml — obj_bank_word_slot [vs2]; build/manifest/pyron.toml — sprite |
 | `PRG:0x39CB9C` | docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven) [vs2]; build/manifest/donovan.toml — sprite |
+| `PRG:0x39CBBC` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2] |
 | `PRG:0x39CBDC` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 [vs2]; build/manifest/donovan.toml — spark_bank_swap; build/manifest/donovan.toml — weapon_accent_t0; build/manifest/donovan.toml — weapon_accent_t1; tests/test_don_accent.sh |
 | `PRG:0x39CBFC` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 [vs2]; build/manifest/donovan.toml — weapon_accent_rowd_slot; tests/test_don_accent.sh |
 | `PRG:0x39FBE0` | docs/project/gotchas.md — A0-at-write is post-increment — SECOND payment (14z-18 tail row); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 [vs2]; build/manifest/donovan.toml — spark_bank_swap; build/manifest/donovan.toml — weapon_accent_t0; tests/test_accent_census.sh; +1 more |
