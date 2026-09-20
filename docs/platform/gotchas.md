@@ -6,6 +6,28 @@ it is specific to this roster hack.
 
 Append the moment one is paid for. Read before touching the related area.
 
+## `spctl -a` REPORTS THE SIGNING-POLICY VERDICT, NOT WHETHER A LAUNCH IS BLOCKED — and `unzip` DOES propagate com.apple.quarantine (measured: 2026-09-20, macOS 26.0 arm64, #144)
+
+Rehearsing a player's route on the published `merged-m18-fbneo-macos-arm64.zip`:
+
+- **`unzip` propagated the quarantine flag** from the zip to all 84 extracted files.
+  The common belief that only Archive Utility does this is wrong here, so a test that
+  unzips from the shell reproduces the player's quarantine state rather than dodging it.
+- **`spctl -a -t execute` printed `rejected` WITH the quarantine flag and, after
+  `xattr -dr com.apple.quarantine`, printed `rejected` AGAIN.** The binary is ad-hoc
+  signed, not Developer ID, and that is what `spctl` is answering about. So a `rejected`
+  from `spctl` does NOT establish that a launch is blocked, and its disappearance would
+  not establish the reverse.
+- **The quarantined binary EXECUTED fine from a terminal** — `rc=124`, i.e. still running
+  when the timeout killed it, both before and after clearing the flag.
+
+**RULE: do not conclude "macOS will block this" from `spctl`, and do not conclude
+"the workaround does nothing" from `spctl` being unchanged by it.** Gatekeeper's
+*blocking* is keyed on the quarantine flag; `spctl` reports the policy assessment. The
+two questions have different instruments, and the GUI double-click — the path a player
+actually takes and the one the report was about — is measurable only by a human at a Mac,
+which is why #144 stays open on that point with everything else recorded.
+
 ## A ROMSET WITH MEMBERS MISSING RUNS FOR THOUSANDS OF FRAMES WITH WORK RAM BIT-IDENTICAL — only the framebuffer shows it (paid: 2026-09-20)
 
 A `vsavjw` run whose SIX parent-resolved members were absent — `vm3.14m/16m/18m/20m`

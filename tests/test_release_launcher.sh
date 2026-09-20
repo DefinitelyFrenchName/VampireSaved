@@ -126,6 +126,41 @@ for plat in fbneo mame; do
     refuse unpatched-emulator 'does not'
 done
 
+# ---- the QUARANTINE branch (2026-09-20, #144). A macOS download is quarantined and
+# `unzip` PROPAGATES the flag to every extracted file (measured, not assumed). Without
+# consent the launcher must REFUSE and hand over the exact command; with
+# PLAY_CLEAR_QUARANTINE=1 it must clear the flag and carry on. This is the only branch
+# that touches the player's security state, so it is the one that must not act silently.
+if [ "$(uname -s)" = Darwin ] && command -v xattr >/dev/null 2>&1; then
+    QD="$W/quar"; stage fbneo "$QD"
+    QV="0081;$(printf '%x' "$(date +%s)");Safari;$( (uuidgen 2>/dev/null) || echo 0-0-0-0-0)"
+    find "$QD" -type f -exec xattr -w com.apple.quarantine "$QV" {} \; 2>/dev/null || true
+    # (a) no consent given -> refuse, naming the command
+    OUT="$W/out.txt"; RC=0
+    ( cd "$QD" && PLAY_DRY_RUN=1 sh ./PLAY.command </dev/null ) > "$OUT" 2>&1 || RC=$?
+    if [ "$RC" = 0 ]; then
+        bad "quarantine: the launcher proceeded without consent"
+    elif grep -q 'com.apple.quarantine' "$OUT"; then
+        ok "quarantine: refused without consent and named the xattr command (rc=$RC)"
+    else
+        bad "quarantine: exited $RC but never named the fix: $(grep -m1 '^!!' "$OUT" || echo 'no !! line')"
+    fi
+    # (b) consent given -> clears the flag and reaches the emulator
+    OUT="$W/out2.txt"; RC=0
+    ( cd "$QD" && PLAY_DRY_RUN=1 PLAY_CLEAR_QUARANTINE=1 sh ./PLAY.command </dev/null ) > "$OUT" 2>&1 || RC=$?
+    if [ "$RC" = 0 ] && grep -q '^WOULD RUN: ' "$OUT"; then
+        if xattr -p com.apple.quarantine "$QD/emulator/bin/$OSARCH/fbneo" >/dev/null 2>&1; then
+            bad "quarantine: the launcher said it cleared the flag but it is still set"
+        else
+            ok "quarantine: with consent, cleared the flag and reached the emulator"
+        fi
+    else
+        bad "quarantine: with consent it did not reach the emulator (rc=$RC): $(grep -m1 '^!!' "$OUT" || head -2 "$OUT" | tr '\n' ' ')"
+    fi
+else
+    echo "  note: not macOS (or no xattr) — the quarantine branch is not exercised here"
+fi
+
 # ---- the must-fire control, in-gate: an unpatched binary on the success path
 CD="$W/ctl"; stage fbneo "$CD"
 printf '#!/bin/sh\necho stock\n' > "$CD/emulator/bin/$OSARCH/fbneo"; chmod +x "$CD/emulator/bin/$OSARCH/fbneo"
