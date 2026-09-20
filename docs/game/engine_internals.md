@@ -1353,8 +1353,33 @@ not the match-start palette load. **Read this before attributing any
   `tests/audit_palette_seq_ids.sh`, and that audit is the ONLY guard on
   this path, because it never transits work RAM and so is invisible to
   every RAM gate.
-- **Port note — Donovan's Killshread Lightning column (14z-170, the orange flash,
-  GitHub #162):** inside the move's window, palette row 11 (`RAM:$90C160`) is written
+- **[VSP-186] Port note — Donovan's Killshread Lightning column and the orange
+  flash (GitHub #162; measured 14z-170, RE-AIMED 14z-171).** Inside the move's
+  window, palette row 11 (`RAM:$90C160`) is written ONLY by this uploader on
+  both games. **The flash is NOT a wrong sequence id.** Both games upload the
+  SAME row during the move — vs2 seq `0x2D4`, byte-identical on the two legs at
+  f2813. What differs is the BASELINE the row returns to:
+  - **native** holds vs2 seq row **`0x2CF`** (blue);
+  - **ours** holds Donovan's SPRITE-palette block row 1 (an orange ramp),
+    placed by the `[[palette]]` mechanism as a `data_file` at
+    `PRG:0x0CEB50` from vs2 `PRG:0x39CBBC`, whose uploader (vsavj
+    `PRG:0x01C3FE`, vs2 twin `0x01AE6E`) writes 12 rows to `RAM:$90C140` —
+    so row 11 is its SECOND row.
+  The orange ramp appears exactly once in our image and is in NO
+  palette-sequence table (ours', vsavj's or vs2's), so the resolver
+  `a0 = 0x39A900 + (d0 & 0xFFF) * 0x20` cannot have produced it.
+  **The class is the Pyron blink's, in its SAFE direction:** Donovan's
+  per-character palette-routine row **`0x13` is `0x0040`, the no-op default, in
+  all three dispatcher tables — `PRG:0x02A8A4` (in-match), `PRG:0x02B650`
+  (select) and `PRG:0x073790` (route map) — on our build AND on pristine
+  vsavj** —
+  while vs2's in-match twin table **`PRG:0x02A142`** (located by the
+  dispatcher's own byte sequence, the twin of vsavj's `0x02A8A4`) gives id
+  `0x13` a real routine, displacement **`0x01D4`**. `build/manifest/pyron.toml`
+  recorded this at 14z-75 as "a missing feature, not a spurious one".
+  NOT ESTABLISHED: which path sets `a0` to the sprite block at f2807/f2859.
+  Gate: `tests/audit_column_flash.sh`.
+- **Superseded note (14z-170), kept for the frames it measured:** inside the move's window, palette row 11 (`RAM:$90C160`) is written
   ONLY by this uploader on both games: ours uploads it at frames 2807, 2813 and 2858,
   native at 2813 only, and the 2858 upload is the fire ramp the maintainer saw. The
   engine's fade staging copy also writes row 11, but only at the round-start fade

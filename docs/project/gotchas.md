@@ -4920,6 +4920,26 @@ Two traps on the way: zsh's `set -- $var` does not word-split (`${=var}`), and a
 tool copied into a scratch dir resolves `REPO` from its own path — pin it in the
 copy, or the perturbed copy measures nothing and says so only by a missing file.
 
+## THE FIELD THAT LOOKS LIKE THE ANSWER IS NOT THE ONE THE INSTRUMENT READS — an A/B on `RAM:$FF8406` "proved" two legs identical whose reported chains differed (paid: 14z-171, GitHub #168)
+
+Two runs of one naming event, at the frames before and after a schedule shift,
+were traced on `RAM:$FF8406` (the fighter's seq) plus node, x and `RAM:$FF8509`.
+Every sampled value matched, one pixel apart, and the reading written down was
+"identical engine behaviour" — while `tests/test_move_naming.sh` reported the
+event entering a DIFFERENT chain at those very frames. Both cannot be true, and
+the trace was what was wrong: the naming tool does not read `$FF8406`. It walks
+the anim tables `a / a2 / b / c / proj` through `tools/anim_nodes.py` and
+reports the CHAIN, which a seq byte does not determine. The A/B measured a real
+field that had nothing to say about the question, and it was used to argue a
+gate was wrong.
+
+Rule: before running an A/B to confirm or refute what another instrument
+reported, name the field THAT instrument reads and trace THAT. A matching trace
+on a neighbouring field is not corroboration, it is a second question answered.
+When a measurement contradicts a gate, the instrument is the first suspect
+([VSP-148]). The same sitting's other correction has the same shape from the
+other side — a `-debug` watch's frame column, [CPE-5] — so this is a family.
+
 ## A LEGACY P2 IS A CROSS-GENERATION CONFOUND IN EVERY OURS-VS-NATIVE RIG — after the first contact the comparison is partly a comparison of two Victors (paid: 14z-164, GitHub #136)
 
 The tenant-move parity rigs put Victor on P2 and compared only the tenant's
