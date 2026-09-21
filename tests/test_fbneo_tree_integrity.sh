@@ -23,8 +23,11 @@
 # land within ~3 lines of an existing hunk. A check that fails open on the
 # scenario it was written for is worse than none.
 #
-# So this RECONSTRUCTS the expected tree (pinned commit + both patches into a
-# scratch dir) and compares WHOLE FILES with cmp, plus an inventory check so
+# So this RECONSTRUCTS the expected tree (pinned commit + the two DEVELOPMENT patches,
+# 0001 and 0002, into a scratch dir — NOT 0003-drop-sdl2-image, which is RELEASE-ONLY
+# (ratified 2026-09-21) and is applied by tools/build_release_emulators.sh into its own
+# worktree, never to this submodule) and compares WHOLE FILES with cmp, plus an
+# inventory check so
 # drift in a file no patch touches cannot hide either.
 #
 # Usage: tests/test_fbneo_tree_integrity.sh   (no ROMs, no emulator, ~5s)
@@ -70,7 +73,7 @@ if [ "$got" = "$PINNED" ]; then
     echo "  ok: $PINNED"
 else
     echo "FAIL: submodule at $got, expected $PINNED"
-    echo "      an upstream bump invalidates both patches' line numbers"
+    echo "      an upstream bump invalidates every patch's line numbers"
     fail=1
 fi
 

@@ -27,6 +27,53 @@ retraction grep covers this file.
 
 ---
 
+## Ratified 2026-09-21 (14z-173) — FBNeo patch 0003, drop SDL2_image from RELEASE builds
+
+**Rule 1 asks for a ratification per emulator change, and this is it.** Put to the
+maintainer with the measurement in hand; approved in their words: *"in that case then
+yes, i approve of patch 0003"*.
+
+**WHAT IT CHANGES.** FBNeo's SDL2 build links SDL2_image for exactly one call — the
+optional per-game preview PNG in FBNeo's OWN game-browser menu (`LoadTitleImage`,
+`support/titles/<name>.png`). No release here ships a title set, so that call has always
+taken its NULL path; the patch makes that unconditional and removes the link. 14 lines
+across the makefile, `src/burner/sdl/sdl2_gui.cpp` and an unused include in
+`src/intf/video/sdl/vid_sdl2.cpp`.
+
+**WHY.** That one call dragged in 21 transitive image codecs (AVIF, JPEG-XL, TIFF, WebP,
+brotli, dav1d, lcms2, zstd…). macOS blocks an ad-hoc-signed download, and the
+no-terminal remedy — System Settings > Privacy & Security > "Open Anyway" — is **per
+blocked file**: 24 approvals for FBNeo against 2 for MAME. The bundle is now **4 files**,
+so that route costs 4. Notarization was ruled OUT the same day (*"I wouldn't mind
+spending the money if the community supported, which is not (yet) the case … I'd rather
+just provide the sources and the MiSTer version or at least not provide the binary for
+Mac OS if it came to this"*), which is what made this worth measuring.
+
+**WHY IT SATISFIES RULE 1.** Frontend only — no CPU, sprite, timing or QSound code is
+touched, the same class as the harness patch 0001. The superset evidence is MEASURED, not
+argued: a harness build carrying 0001+0002+0003 against the current 0001+0002 binary, over
+12,120 frames of `05_timeout_idle`, is **BIT-IDENTICAL in work RAM AND in the framebuffer**
+(7,891 distinct rendered frames, so the comparison is not vacuous). `test_release_binaries`
+passes on the rebuilt binary — record, self-containment, signature, profile, no harness,
+and a headless boot with every descriptor member `(OK)`.
+
+**SCOPE — RELEASE BUILDS ONLY.** `tools/build_release_emulators.sh` applies it;
+`tools/setup_fbneo.sh` does not, so the development binary every gate measures with is
+unchanged and `test_fbneo_tree_integrity` still reconstructs the submodule from the two
+development patches alone.
+
+**THE COST, stated at ratification:** FBNeo's own game-browser menu no longer shows
+per-game preview images — which it only ever did for someone who had installed a
+`support/titles/` set that no release here ships.
+
+**A NOTE ON HOW THIS WAS ASKED.** The first time it was put to the maintainer it was
+called "patch 0003" with no explanation, and they said so: *"You do realise that mentions
+like 0003 are internal numbering and I have no idea what they represent"*. It is the same
+failure #146 is about — internal shorthand mistaken for shared language — committed in
+conversation one message after claiming to have fixed it in the READMEs. Restated in plain
+terms (what each of the three FBNeo patches is, what ships, what is lost), the decision
+took one line.
+
 ## Ruled 2026-09-20 (14z-173) — #144 is macOS BLOCKING the binaries, the old workaround is withdrawn; the applier page ships local, per release
 
 **#144, settled by capture.** The maintainer double-clicked both prebuilt binaries and
