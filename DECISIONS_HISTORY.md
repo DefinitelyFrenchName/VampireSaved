@@ -43,8 +43,9 @@ across the makefile, `src/burner/sdl/sdl2_gui.cpp` and an unused include in
 **WHY.** That one call dragged in 21 transitive image codecs (AVIF, JPEG-XL, TIFF, WebP,
 brotli, dav1d, lcms2, zstd…). macOS blocks an ad-hoc-signed download, and the
 no-terminal remedy — System Settings > Privacy & Security > "Open Anyway" — is **per
-blocked file**: 24 approvals for FBNeo against 2 for MAME. The bundle is now **4 files**,
-so that route costs 4. Notarization was ruled OUT the same day (*"I wouldn't mind
+blocked file**: 24 approvals for FBNeo against 2 for MAME. The bundle is now **4 files**, so that route
+SHOULD cost 4 — inferred from MAME's measured 2-file/2-approval case, and exercised at
+neither 24 nor 4. The file count is what is measured and what the gate can assert. Notarization was ruled OUT the same day (*"I wouldn't mind
 spending the money if the community supported, which is not (yet) the case … I'd rather
 just provide the sources and the MiSTer version or at least not provide the binary for
 Mac OS if it came to this"*), which is what made this worth measuring.

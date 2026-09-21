@@ -1,67 +1,77 @@
-# NEXT SESSION — orientation (rewritten at the 14z-172 CLOSE, 2026-09-20)
+# NEXT SESSION — orientation (rewritten at the 14z-173 CLOSE, 2026-09-21)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## M19 IS FROZEN (14z-170) AND STILL NOT RELEASED — donovan-m23 / huitzil-m30 / pyron-m24 / merged-m19, `build/m3b_merged27`
+## M19 IS STILL FROZEN AND STILL NOT RELEASED — the tree is at `build/m3b_merged27`
 
-No shipped ROM byte moved at 14z-171 or 14z-172; the tree is still at merged-m19.
-What the freeze carries is in HANDOFF "Current WIDE builds" and patch_notes 14z-170.
+No shipped ROM byte moved at 14z-173. What DID move is everything around the romset:
+the release package, the launcher, the emulator binary and the player documentation.
+The romset itself is untouched, so every fingerprint, expectation set and registry row
+stands.
 
 ## START HERE
 
-1. **THE RELEASE STILL WAITS, by ruling (2026-09-20):** *"let's not release now, especially since we
-   have tickets relative to the deliverables on various OS"*. The blockers are **#144** (macOS blocks
-   the prebuilt binaries), **#145** (Windows: they fail to load) and **#146** (the player READMEs),
-   each reported and none yet reproduced. When they are done the release run is
-   `--scope all --lane all --strict --controls` (~5.5 h, HANDOFF "WHAT THE RELEASE RUN COSTS"), then
-   `tools/upload_release_assets.sh` on `freeze/merged-m19`.
-2. **#169: `pyron_3`'s Galactic Throw connects on only ONE strength**, and which one depends on the
-   schedule — at HEAD `[j.6HP]` is frozen as `a2:0x14`, a plain j.HP, so the rig has recorded a whiff
-   under the move's name since 14z-120. It is the one event family in the corpus whose outcome does
-   NOT follow the engine's double-pass phase — the rule that now governs every rig schedule change
-   (`engine_internals.md` "THE CADENCE IS STRICTLY PERIODIC IN THE FRAME INDEX", gate
-   `audit_tick_phase`) — so the second factor behind it is unidentified and is the interesting part.
-   Everything measured is on the issue.
-3. **#161 — Phobos's remaining +1** (`tests/audit_phobos_dmg_residual.sh` reproduces it): Demitri's
-   5HP takes 12 on ours, 11 native, with Phobos's defense rows already vs2's — trace the damage
-   staging vars stage by stage on both legs for that one hit (`engine_internals.md` "The DAMAGE
-   pipeline"). Its expectation re-froze at 14z-172 as a pure +195 shift; the residual is untouched.
-4. **The #136 tickets still open**: **#157** (the throw hit-registration pair — the meter family),
-   **#159** (facing rule 5), **#163** (the column/trap rule: its airborne case); the maintainer's to
-   schedule. #136's own DIFF table is now 94 rows.
+1. **THE APPLIER PAGE — slices A2-A6, and nothing blocks it.** The plan is
+   `docs/project/applier_app_scope.md`; all three of its open questions were ruled at
+   14z-173 (a local file in the asset, one page per release, a browser page is
+   acceptable). Slice **A1 is already landed and gated** — `tools/applier/vcdiff.mjs`
+   decodes all 20 shipped patches to the manifest's exact sha1, locked by
+   `tests/test_applier_vcdiff.sh`. What remains is the page itself, its refusals (which
+   are the deliverable — see #146's lesson), the optional-BIOS choice, and the
+   byte-identity contract against `apply_release.py`. §3 of the scope names which of its
+   feasibility figures are GATED and which were measured under node and still need a
+   real browser.
+2. **#146 — the READMEs are rewritten but the maintainer has not read them.** They are
+   generated, so read `release/merged-m19/fbneo/README.md`. The brief was theirs: *"it
+   must have felt clear to the expert who wrote them … the user is usually not a
+   developer, and basically never on the project."* Do not close it on our own say-so.
+3. **#144 — no longer a mystery, and the decision is a spend.** macOS blocks the
+   binaries by design; right-click > Open does NOT get past it (withdrawn everywhere);
+   "Open Anyway" works but is PER FILE (MAME: 2 files, 2 approvals, measured), and patch
+   0003 took the FBNeo bundle from 24 files to 4 — the matching approval counts are
+   inferred from that one data point, not exercised. Notarization is ruled OUT until the community justifies it. The ticket is
+   arguably closeable as *mitigated, not eliminated* — the maintainer's call, because
+   it means accepting four System Settings clicks.
+4. **A LIVE PROBLEM THE CLOSE SURFACED:** `merged-m18` is the CURRENTLY PUBLISHED
+   release and its README and `BINARY.txt` still tell macOS players to right-click >
+   Open, which is measured false. Anyone downloading today is misinformed. Not rewritten
+   (a published release is history, and its GitHub assets would still differ) — so it is
+   either a note on the release page or a reason to bring the M19 release forward.
 
 ## ALSO OPEN (carried)
 
-- **#162 is ANSWERED and PARKED by agreement** — the orange flash is not a sequence-id defect but
-  Donovan's sprite-palette block showing through, and his palette-routine row `0x13` is the no-op
-  default in all three dispatcher tables where vs2 runs a real routine. The one open measurement is
-  which path sets `a0` to the sprite block.
-- A column hit on an AIRBORNE victim (the air stager's case) is not measured — #163's one open item.
+- **#145 Windows binaries** — untouched by ruling (macOS first). Note that patch 0003
+  drops the SDL2_image link on ALL platforms, so the next Windows build shrinks that
+  bundle from **31 files** for free. That does not fix "fails to load", which is still
+  unreproduced.
+- **No Windows launcher.** `PLAY.command` is macOS/Linux; Windows needs its own.
+- **#161** (Phobos's +1 damage), **#169** (`pyron_3`'s Galactic Throw), and the #136
+  tickets **#157 / #159 / #163** — all untouched this sitting, all still the
+  maintainer's to schedule.
 
-## TRAPS PAID THIS SITTING (14z-172)
+## TRAPS PAID THIS SITTING (14z-173)
 
-1. **A script that mutates a tool must restore it, or every later measurement is of the control.**
-   Four control runs left `tools/name_moves.py` at a different quantum and the parity gate was then
-   run against it; the tables turned out byte-identical, but the figures had not been measured on the
-   schedule that lands. `build/rig172/shift_control.sh` now restores on EXIT.
-2. **Two clean data points are not a law.** "The period is exactly 39" followed rigorously from four
-   measurements and was falsified by the fifth (273 = 7x39 is not clean). Run the one that would
-   break it, especially when the evidence looks settled.
-3. **A chain id is looked up in a table that covers THE CHARACTER.** 14z-171 glossed `a2:0x03`
-   and `a2:0x02` as "a walk"; they are `a2` NORMALS (walks are table `a`), and `a2:0x02` is Pyron's
-   own `5MP` by his part-1 row. The correction then over-reached in turn, reading them as the FAR
-   and NEAR MP slots from `vanilla_normal_slots.tsv` — which covers the 15 VANILLA characters only
-   and maps `far MP` to `a2:0x03` for just 10 of them. Pyron is not in it. The rule-checker caught
-   that (run `2026-09-20-87` Q1); the capture is what settles the range.
-4. **A control defined in the instrument's own coordinates validates the search, not the
-   coordinates.** 14z-156's modulus search over `$FF8080` carried a plant and fired it, and was still
-   blind, because the byte wraps at 256 and the plant was defined in the byte's own terms.
-5. **The field a rig POKES cannot be evidence that two legs converged.** The first version of the
-   rewritten `audit_rig_opening` sampled the pin frame itself inside its convergence assertion — the
-   rule-checker's Q3 found it.
+1. **An ad-hoc rig's defect is not the subject's defect — this cost four measurements.**
+   A relative `ROMDIR` that loaded six members short looked like CRC hash-shadowing; a
+   hand-rolled `bundle_dylibs.py` call missing `--extra` looked like our bundler
+   under-collecting (it does not — `extra_sdl3_args` already handles it); comparing two
+   logs while one was still being written looked like a patch changing behaviour. Build
+   the rig the way the project builds it, or attribute the result to the rig first.
+2. **`sh -n` validates syntax, not intent.** A rewritten string produced `\"\\"`, which
+   closes the shell string and leaves `<name>` as an input redirection. It parsed
+   cleanly and broke the build. Run the thing, or at least `CHECK=1` it.
+3. **A count is a better check than a script's progress output.** A gate edit silently
+   never applied because its script aborted on an earlier assertion; the tell was six
+   files staged against five reported changed.
+4. **Grepping for a phrase cannot tell advice from its withdrawal.** Checking which
+   records still recommended right-click > Open matched the corrected text too, because
+   the correction names the thing it withdraws. Grep for the recommendation's wording.
+5. **Internal numbering is not shared language.** "Patch 0003" meant nothing to the
+   maintainer and stalled a decision until it was restated as what it does. The same
+   failure #146 is about.
 
 **IF A DOC IS TOUCHED:** the doc gates (`test_checkdocs`, `test_docshape`,
 `test_doc_anchor_census`, `test_checkskills`, `test_gotchas_index_current`,

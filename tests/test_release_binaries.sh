@@ -367,6 +367,25 @@ cp "$W/fb_boot.log" "$REPO/build/fbneo_boot_$HOSTOS.log" 2>/dev/null || true
 # (FBNeo's SDL frontend connects the core's message function only off
 # SDL_WINDOWS), so a check keyed on that one line went red there on a correct boot.
 vs_fbneo_boot_log "$W/fb_boot.log" "$HOSTOS" "$REPO/emu/fbneo-patches/0002-cps2-wide-v1.patch" || fail=1
+# THE RATIFIED 0003 DECISION, LOCKED (2026-09-21). Patch 0003 drops the SDL2_image link
+# so a macOS FBNeo bundle is 4 files instead of 24. What that costs a player using the
+# System Settings route follows only if macOS asks once per blocked file — inferred from
+# MAME's measured 2-file/2-approval case, never exercised at 24 or 4 (#144). This gate
+# asserts the FILE COUNT, which is what it can see. Nothing else would
+# notice it silently coming back: the record check only asserts that the files PRESENT
+# match their hashes, so a bundle that regrew to 24 would still pass. This asserts the
+# decision itself — no image codec may reappear beside the FBNeo binary.
+if [ -n "${FB:-}" ] && [ -d "$FB" ]; then
+    codecs="$(ls "$FB" 2>/dev/null | grep -icE 'SDL2_image|libaom|libavif|libbrotli|libdav1d|libhwy|libjpeg|libjxl|liblcms|liblzma|libpng|libsharpyuv|libtiff|libvmaf|libwebp|libzstd' || true)"
+    if [ "${codecs:-0}" != 0 ]; then
+        echo "FAIL: $codecs image-codec librar(ies) are back in the fbneo bundle — patch 0003 is not being applied"
+        ls "$FB" | grep -iE 'SDL2_image|libaom|libavif|libbrotli|libdav1d|libhwy|libjpeg|libjxl|liblcms|liblzma|libpng|libsharpyuv|libtiff|libvmaf|libwebp|libzstd' | sed 's/^/        /'
+        fail=1
+    else
+        echo "  ok: no image codec beside the fbneo binary — the ratified 0003 decision holds ($(ls "$FB" | grep -vc '^BINARY.txt$') files)"
+    fi
+fi
+
 [ "$fail" = 0 ] && echo "  ok: record, self-contained, $SIGNED, profile, no harness; booted vsavjw headless (every descriptor member (OK), running at 20 s)"
 
 # ---- section 2: MAME

@@ -11,8 +11,11 @@ that already ran.
 
 WHAT IT BUYS (GitHub #144). macOS refuses to run an ad-hoc-signed download and the
 no-terminal remedy — System Settings > Privacy & Security > "Open Anyway" — must be
-done PER BLOCKED FILE. Measured: 24 approvals for FBNeo against 2 for MAME. With this
-patch the FBNeo bundle is 4 files, so the same route costs 4. Notarization would remove
+done PER BLOCKED FILE. MEASURED: the maintainer's MAME bundle is 2 files and cost 2
+approvals. COUNTED, not exercised: the FBNeo bundle was 24 files and is 4 with this
+patch. The step from files to approvals assumes ONE approval per blocked file — it fits
+the single MAME data point and nobody has yet approved a 24- or 4-file bundle, so treat
+4 as the expected cost, not a measured one. Notarization would remove
 the question entirely and is not being bought.
 
 SCOPE. Frontend only, like the harness patch 0001, and NOT emulation: the makefile's

@@ -11,10 +11,10 @@ sha256 843cd71ee24c30ed25559b6eb6a80fa4fa224468beb32b77b6ab2b2a343fc1a5 libSDL3.
 
 upstream   https://github.com/finalburnneo/FBNeo
 pin        79188379cc8442c54712acbe3b7e73dce157985f
-patch      0002-cps2-wide-v1.patch  sha1 17cd7516a25e6198376bc69b88b3392d85122d0e  and 0003-drop-sdl2-image.patch  sha1 a18ea29e0f31fa0b837abdf912c3f8b92489f127  (the ONLY patches applied; the project's replay-harness patch is a test instrument and is not in this binary. 0003 drops the SDL2_image link, which removes 21 transitive image codecs from this directory — 24 files to 4 — and with them 20 of the macOS Gatekeeper approvals a downloaded copy needs)
+patch      0002-cps2-wide-v1.patch  sha1 17cd7516a25e6198376bc69b88b3392d85122d0e  and 0003-drop-sdl2-image.patch  sha1 abb4bd0ca9f10e03e5649d1eab35c481071f7ed5  (the ONLY patches applied; the project's replay-harness patch is a test instrument and is not in this binary. 0003 drops the SDL2_image link, which removes 21 transitive image codecs from this directory — 24 files to 4 — and with them 20 of the macOS Gatekeeper approvals a downloaded copy needs)
 recipe     git clone https://github.com/finalburnneo/FBNeo fbneo && cd fbneo && git checkout 79188379cc8442c54712acbe3b7e73dce157985f && git apply 0002-cps2-wide-v1.patch && git apply 0003-drop-sdl2-image.patch && make sdl2 SKIPDEPEND=1 -j12 -k; make sdl2 SKIPDEPEND=1 -j12   (twice on a fresh clone: the first parallel pass dies on burn.o until the driver list is generated)
-built      2026-09-20 on macOS 26.6.2 (arm64), Apple clang version 21.0.0 (clang-2100.3.34.2), by tools/build_release_emulators.sh fbneo
-tree       4ccf4d32fbf6 (with uncommitted changes to the build scripts or patches)
+built      2026-09-21 on macOS 26.6.2 (arm64), Apple clang version 21.0.0 (clang-2100.3.34.2), by tools/build_release_emulators.sh fbneo
+tree       651017908496 (with uncommitted changes to the build scripts or patches)
 jobs       12
 env        macOS 26.6.2 arm64; Command Line Tools 27.0.0.0.1788430756
 env        brew sdl2-compat 2.32.70

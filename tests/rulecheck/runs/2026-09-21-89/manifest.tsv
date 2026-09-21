@@ -1,0 +1,7 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+STATE.md	6311af7452f822ca7aaf2124b785fa71d8b56cb4
+DECISIONS_HISTORY.md	a7dd29c980442a94cfd39a59d0473c82fd7fdced
+docs/project/release_format.md	7440021b817cc7926fc3addd00e47a86a65e2bb6
+docs/project/applier_app_scope.md	20ebfef877c68247a7a755006563758bfa61c836
+emu/fbneo-patches/0003-drop-sdl2-image.patch	a18ea29e0f31fa0b837abdf912c3f8b92489f127
+build/session_14z173.diffstat	cca30206bd579a49934db4eb0efdd885db5cda36

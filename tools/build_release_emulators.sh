@@ -196,7 +196,9 @@ fbneo)
     git -C "$WT" apply "$PATCH3"
     # Assert the STATE of the tree, not the exit code: the profile present, the harness
     # ABSENT, and SDL2_image gone (0003) — the last one is what keeps the macOS bundle at
-    # 4 files instead of 24, which is 4 Gatekeeper approvals instead of 24 (#144).
+    # 4 files instead of 24. The approval cost follows only if macOS asks once per
+    # blocked file, which is inferred from MAME's 2-file/2-approval case and not
+    # exercised at 24 or 4 (#144).
     grep -q Cps2Wide "$WT/src/burn/drv/capcom/cps.h" || { echo "0002 did not land" >&2; exit 1; }
     [ ! -f "$WT/src/burner/sdl/harness.cpp" ] || { echo "harness present in a release tree" >&2; exit 1; }
     ! grep -q 'SDL2_image' "$WT/makefile.sdl2" || { echo "0003 did not land (SDL2_image still linked)" >&2; exit 1; }
