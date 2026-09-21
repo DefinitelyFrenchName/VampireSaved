@@ -1,0 +1,127 @@
+<!doctype html>
+<!--
+  applier_driver.html — the harness page for tests/test_applier_page_browser.sh.
+
+  IT DOES NOT TOUCH THE PAGE UNDER TEST. The shipped `apply_release.html` is
+  loaded, byte for byte, as its own document inside an iframe; this page fetches
+  the reference dumps into ITS OWN document and drives the applier through the
+  iframe's DOM, exactly as a player drives it — read the list of files the page
+  asks for, drop them on the drop zone, tick the radio, click Build, read the
+  panel. Nothing is appended to the shipped file and no private binding of the
+  page is used: it exposes no test hook, on purpose.
+
+  WHY AN IFRAME AND NOT A CONCATENATION (changed 2026-09-21): the shipped page
+  carries a Content-Security-Policy of `default-src 'none'; connect-src 'none'`,
+  so a driver living INSIDE that document cannot fetch anything — the first
+  attempt failed with "Failed to fetch", which is the CSP doing its job. Driving
+  from outside keeps the page's real policy intact during the test instead of
+  testing a page whose promise has been diluted to make it testable. Same-origin
+  access to the iframe is what `--allow-file-access-from-files` buys the gate;
+  the page itself never needs it.
+
+  Two mechanics that are not optional:
+  * WAITS ARE MutationObservers, NEVER setTimeout. Under --virtual-time-budget a
+    timer advances virtual time instantly, so a polling loop exhausts the budget
+    and Chrome dumps the DOM mid-run. Observing costs no virtual time.
+  * THE DOWNLOAD IS NOT FETCHED BACK. Reading the blob: URL leaves a fetch
+    pending, which ends the dump early (measured 2026-09-21). The download's
+    CONTENT is covered by the set key the page prints — a SHA-1 over every member
+    name and every member byte — and by tests/test_applier_page.sh comparing the
+    same modules with apply_release.py byte for byte.
+-->
+<html><head><meta charset="utf-8"><title>applier driver</title></head>
+<body>
+<pre id="verdict">driver did not run</pre>
+<iframe id="frame" src="./apply_release.html" style="width:900px;height:600px;border:1px solid #888"></iframe>
+<script type="module">
+const v = [];
+const out = document.getElementById("verdict");
+const say = (k, s) => { v.push(k + "=" + s); out.textContent = v.join("\n"); };
+const frame = document.getElementById("frame");
+
+const wait = (pred, root) => new Promise((res) => {
+  if (pred()) return res();
+  const ob = new MutationObserver(() => { if (pred()) { ob.disconnect(); res(); } });
+  ob.observe(root, { subtree: true, childList: true, characterData: true, attributes: true });
+});
+
+try {
+  // AN IFRAME'S contentDocument IS about:blank UNTIL THE REAL NAVIGATION LANDS, and
+  // that placeholder already reports readyState "complete" — resolving on it observes
+  // a document the browser is about to throw away, and every wait below then hangs
+  // (measured 2026-09-21; it cost this driver its first run). Wait for the LOAD event
+  // unless the frame's own URL already says the page is there.
+  const loaded = () => {
+    try { return /apply_release\.html$/.test(frame.contentWindow.location.pathname); }
+    catch (e) { return false; }
+  };
+  if (!loaded()) await new Promise((r) => frame.addEventListener("load", r, { once: true }));
+  const doc = frame.contentDocument;
+  if (!doc) throw new Error("the driver cannot reach the page's document (same-origin file access?)");
+  const win = frame.contentWindow;
+  const $ = (id) => doc.getElementById(id);
+  const resultText = () => $("result").textContent.replace(/\s+/g, " ").trim();
+  // what the page ITSELF says it needs — the driver never knows more than a player
+  const asksFor = () => [...$("wanted").querySelectorAll("li")]
+    .filter((li) => !/not needed/.test(li.textContent))
+    .map((li) => li.querySelector(".mono").textContent.trim());
+
+  // the page's own module has to have run before #wanted exists
+  await wait(() => $("wanted") && $("wanted").children.length > 0, doc);
+  say("csp", doc.querySelector('meta[http-equiv="Content-Security-Policy"]') ? "present" : "ABSENT");
+  say("caps", $("caps").textContent.replace(/\s+/g, " ").trim().slice(0, 70));
+
+  async function drop(dir, names) {
+    // the Files are built in THIS document and handed to the page's drop zone, which
+    // is what a real drag-and-drop does; the page's own CSP never sees a fetch
+    const dt = new win.DataTransfer();
+    for (const n of names) {
+      const r = await fetch(dir + n);
+      if (!r.ok) throw new Error("the driver cannot read " + dir + n);
+      dt.items.add(new win.File([await r.arrayBuffer()], n, { type: "application/zip" }));
+    }
+    $("drop").dispatchEvent(new win.DragEvent("drop", { dataTransfer: dt, bubbles: true, cancelable: true }));
+  }
+
+  async function build(tag) {
+    $("result").innerHTML = "";
+    await wait(() => !$("go").disabled, doc);
+    $("go").click();
+    await wait(() => resultText().length > 0, doc);
+    const res = $("result");
+    say(tag + "_panel", res.querySelector(".panel.ok") ? "ok"
+      : res.querySelector(".panel.bad") ? "bad" : "none");
+    const key = /set key ([0-9a-f]{8})/.exec(resultText());
+    say(tag + "_setkey", key ? key[1] : "NONE");
+    const a = res.querySelector("a[download]");
+    say(tag + "_download", a ? a.getAttribute("download") : "NONE");
+    say(tag + "_label", a ? a.textContent.trim() : "NONE");
+    say(tag + "_text", resultText().slice(0, 260));
+  }
+
+  const all = asksFor();
+  say("asks_for", all.join(","));
+
+  // (a) the standalone variant, every dump the page asked for
+  await drop("./roms/", all);
+  await wait(() => !$("go").disabled, doc);
+  say("ready", $("ready").textContent.trim());
+  await build("standalone");
+
+  // (b) the optional member left out — the page must stop ASKING for the BIOS set,
+  //     not merely drop it from the output (A4)
+  doc.querySelector('input[name="bios"][value="drop"]').click();
+  await wait(() => asksFor().length < all.length, doc);
+  say("nobios_asks_for", asksFor().join(","));
+  await build("nobios");
+
+  // (c) a refusal, end to end in the real browser: one dump replaced by a damaged copy
+  doc.querySelector('input[name="bios"][value="keep"]').click();
+  await drop("./broken/", [all[0]]);
+  await build("refusal");
+  say("refusal_named_it", new RegExp(all[0].replace(".", "\\.")).test(resultText()) ? "yes" : "no");
+
+  say("DONE", 1);
+} catch (e) { say("DRIVER_ERROR", e.message); say("DONE", 0); }
+</script>
+</body></html>

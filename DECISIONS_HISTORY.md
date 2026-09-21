@@ -27,6 +27,53 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-21 (14z-174) — #146 CLOSED, and the READMEs change on USER FEEDBACK from here
+
+**The question put:** the player READMEs were rewritten at 14z-173 against the
+maintainer's own brief, but the maintainer had not read them. #146 could not be
+closed on our say-so, so it was put to them at the 14z-174 opener with the
+generated file named (`release/merged-m19/fbneo/README.md`).
+
+**THE RULING, verbatim:** *"README is good enough for now. It may be improved,
+but it will be on the basis of more user feedback"*.
+
+**What it settles.** #146 is CLOSED as done. The READMEs are not rewritten again
+speculatively: the next revision waits for a real reader's difficulty, which is
+the only evidence that distinguishes a genuine gap from an expert's taste. The
+standing obligation that remains is the ordinary one — a change to what a player
+DOES (this sitting added the browser applier) updates the README in the same
+commit, which is what happened here.
+
+**What is NOT claimed:** that the READMEs are now good for a non-developer. That
+is a judgement only readers can make, and the closing comment says so. The
+transferable part of how they were wrong — first use against first need, and the
+fix re-introducing the bug — is a gotcha in `docs/project/gotchas.md`, not an
+archive entry, so it survives this file.
+
+## Ruled 2026-09-21 (14z-174) — #144 CLOSED as MITIGATED, NOT ELIMINATED
+
+**The question put:** after 14z-173 reproduced #144 from the maintainer's own
+captures, withdrew the false "right-click > Open" advice everywhere, measured the
+"Open Anyway" route as PER FILE and shipped FBNeo patch 0003 to take that bundle
+from 24 files to 4, the ticket was arguably closeable as mitigated rather than
+solved — the maintainer's call, because closing it means accepting that a macOS
+player clicks through System Settings.
+
+**THE RULING, verbatim:** *"Indeed, closeable with an explicit comment as
+mitigated not solved."*
+
+**What it settles.** #144 is CLOSED, with a closing comment that states plainly
+what remains true: macOS blocks unsigned binaries by design, this project does not
+sign them, and a player either lets `PLAY.command` clear the quarantine flag (one
+prompt, the route the READMEs lead with) or approves each blocked file in System
+Settings. The root cause is Apple's policy and is not ours to fix.
+
+**The option that stays open becomes its own ticket** (CLAUDE.md [VSP-182]:
+closed means nothing is left to do): notarization, ruled out at 14z-173 —
+*"I wouldn't mind spending the money if the community supported, which is not
+(yet) the case"* — is tracked separately and PARKED on that condition, so closing
+#144 does not bury it.
+
 ## Ratified 2026-09-21 (14z-173) — FBNeo patch 0003, drop SDL2_image from RELEASE builds
 
 **Rule 1 asks for a ratification per emulator change, and this is it.** Put to the

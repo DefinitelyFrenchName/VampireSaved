@@ -18,17 +18,23 @@ cannot help with:
    `vsavj.zip`, `vsav.zip` and `vsav2.zip`, unmodified, with exactly those names,
    together in one folder. (A fourth, `qsound_hle.zip`, only for MAME — see
    "One optional member" below.)
-2. **Python 3** — a free programming language macOS and Linux already include and
-   Windows offers in its store. You will not write any; one command uses it. To
-   check, open a terminal and type `python3 --version`.
+2. **A way to run step 1 — and you almost certainly already have one.** Either
+   **a web browser** (double-click `apply_release.html`, in this folder: no
+   install, no terminal, and it works with the internet disconnected), or
+   **Python 3**, a free programming language macOS and Linux already include and
+   Windows offers in its store. Both produce exactly the same file. If you are
+   not sure which you want, use the browser.
 3. **Room and time**: about 60 MB of free disk space for the package and the
    file you build, and ten minutes. The build briefly uses around 150 MB of
-   memory, which any machine made this century has.
+   memory in Python, or around 300 MB in a browser tab — either way, less than
+   any machine made this century has.
 
 **What you are going to do — three steps, in this order:**
 
 > **1. Build the game file.** One command turns *your* files into a new file,
 > `vsavjw.zip`. That file is the modified game.
+> **Double-click `apply_release.html`** and your browser does it, or run one
+> command with Python — whichever you prefer.
 > **2. Get the emulator** — the program that pretends to be the arcade machine.
 > This package already contains one, prepared for this game. **An ordinary
 > emulator you may already own will not work**; the reason is below.
@@ -86,8 +92,14 @@ get the emulator or core ("Play on MAME" at the end), play.
   finds the right emulator for your machine, checks it really is the prepared
   one, puts the game file where the emulator will look, and starts it. If
   anything is missing it tells you which thing and what to do about it.
-- `apply_release.py` — the program that does step 1. Needs Python 3 and nothing
-  else.
+- `apply_release.html` — **step 1 in your browser.** Double-click it, choose your
+  `.zip` dumps, press the button, save the file it gives you. Nothing is
+  installed and nothing is uploaded: the page has no network code in it at all,
+  and it works with the internet switched off. Open it and read it if you like —
+  it is one plain file.
+- `apply_release.py` — step 1 on the command line instead. Needs Python 3 and
+  nothing else. It and the page produce the same romset, member for member, and
+  a test asserts that on every build.
 - `patches/` — 20 files of differences, one for each part of the game that
   changed. Not readable, not playable, and no use without your own game files.
 - `manifest.json` — the list of expected fingerprints the applier checks
@@ -107,9 +119,29 @@ get the emulator or core ("Play on MAME" at the end), play.
   against the manifest before doing anything, so a wrong, renamed or
   modified dump is reported by name, never silently patched over.
 
-## Build the romset (one command)
+## Build the romset
 
-"Romset" is just the name for the game file the emulator loads. To make yours,
+"Romset" is just the name for the game file the emulator loads. There are two
+ways to make yours and they produce the same file; take whichever suits you.
+
+### The easy way: your browser
+
+**Double-click `apply_release.html`.** It opens as an ordinary web page. It lists
+the dump files it needs, you choose them (or drag them onto it), you press
+**Build**, and it hands you `vsavjw.zip` to save. It checks every byte against the
+same fingerprints the command below does, and refuses to give you anything at all
+if something does not match.
+
+It runs entirely inside your browser, on your machine. Your dumps are not
+uploaded — there is no code in that page capable of sending them anywhere, which
+you can check for yourself, and it works with the internet disconnected.
+
+*If your browser is too old it will say so plainly, in which case use the command
+line below.*
+
+### The other way: one command
+
+To do the same thing with Python,
 open a terminal, go to this folder, and run the line below — replacing
 `/path/to/your/dumps` with the folder that holds your `vsavj.zip`, `vsav.zip`
 and `vsav2.zip`:
@@ -166,14 +198,18 @@ because different emulators want it in different places.
 
 - **Keep it (the default).** The romset is then self-sufficient on every
   emulator, MAME included. You need `qsound_hle.zip` among your dumps.
-- **Leave it out:** `python3 apply_release.py --romdir … --out … --no-qsound-bios`.
-  You then do not need `qsound_hle.zip` at all. Measured 2026-09-20:
-  **FBNeo** runs the smaller set identically (its descriptor does not list the
-  member; zero `(not found)`, same RAM and same framebuffer over 12,120 frames),
-  and on **MiSTer** the WIDE MRA still resolves all 31 of its parts — 30 out of
-  `vsavjw.zip` and the BIOS out of the `qsound.zip` your card already has from any
-  CPS-2 game. **MAME refuses the smaller set** (`dl-1425.bin - NOT FOUND`), so
-  keep the member if MAME is your emulator.
+- **Leave it out:** in the browser page, pick "Leave it out" in step 3; on the
+  command line, `python3 apply_release.py --romdir … --out … --no-qsound-bios`.
+  You then do not need `qsound_hle.zip` at all.
+  - **On MiSTer this is the one to pick.** Any CPS emulation on MiSTer already
+    requires your own `qsound.zip` in the `games/mame` folder, so there is no
+    reason to put a second copy inside the Vampire Saved romset. (Measured
+    2026-09-20: all 31 parts still resolve — 30 from `vsavjw.zip` and the sound
+    program from that `qsound.zip`.)
+  - **FBNeo** runs the smaller set identically: its descriptor does not list the
+    member; zero `(not found)`, same RAM and same framebuffer over 12,120 frames.
+  - **MAME refuses the smaller set** (`dl-1425.bin - NOT FOUND`), so keep the
+    member if MAME is your emulator.
 
 Either way the applier prints the set key it wrote and checks it against this
 release's own declaration, so you can tell at a glance which variant you hold —

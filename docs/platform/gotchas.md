@@ -2706,3 +2706,49 @@ at all: the probe changed the replay it was probing. The non-debug write tap
 question instead. Rule ([VSP-130]'s instance): a `-debug` run is evidence only
 if its guard log carries no INPUT-VIOLATION; otherwise it describes a
 different match.
+
+## A PAGE OPENED FROM `file://` CANNOT READ ANY FILE BESIDE IT — not by fetch, not by XHR, not by `import` (measured 2026-09-21, 14z-174, before the applier page was designed)
+
+The applier page ships "as a local file in the asset" (maintainer-ruled
+2026-09-20) and the obvious shape — a small `.html` beside `manifest.json` and
+`patches/`, reading them — **does not work in any current browser.** A `file://`
+page has an opaque origin, so every route to a sibling file is refused:
+
+| from a `file://` page | Chrome 141 | Firefox 156 |
+|---|---|---|
+| `import("./mod.mjs")` | blocked, `TypeError` | blocked, `TypeError` |
+| `fetch("./x.json")` | blocked, `TypeError` | blocked, `NetworkError` |
+| `XMLHttpRequest` on `./x.json` | blocked | blocked |
+| inline `<script type="module">` | works | works |
+| `window.isSecureContext` | **true** | **true** |
+| `crypto.subtle.digest("SHA-1")` | correct | correct |
+| `DecompressionStream("deflate-raw")` | exact round trip | exact round trip |
+
+So the page must be ONE self-contained file with its manifest, its patches and
+its modules inlined — which `tools/gen_applier_page.py` does, and which
+`tests/test_applier_page.sh` §1 holds (no `fetch`, no XHR, no dynamic `import`,
+no `src=`/`href=` to anything but a `#fragment`). The two rows that are NOT
+blocked are what make the page possible at all: `file://` counts as a secure
+context, so WebCrypto is available, and the compression streams are there.
+
+A test harness may pass Chrome `--allow-file-access-from-files` to hand the page
+its input (`tests/test_applier_page_browser.sh` does); the SHIPPED page never
+relies on it, which is the point of the section that forbids the primitives.
+
+## `CompressionStream("deflate-raw")` IS NOT BYTE-COMPARABLE TO `zlib.compressobj`, EVEN AT THE SAME LEVEL — and the two browser engines differ from each other (measured 2026-09-21, 14z-174)
+
+Python's `zipfile` deflates with `zlib.compressobj(Z_DEFAULT_COMPRESSION,
+DEFLATED, -15)` in one shot. `CompressionStream` deflates a *stream*, and flushes
+on chunk boundaries, so the bit stream differs even where the library and level
+are identical. Measured on the real release members: node and Python agree on a
+single 200 KB buffer (1424 bytes, same sha1) and **disagree on all 32 shipped
+members** (e.g. `vm3j.03d`: python 484140, node 485178), one larger and one
+smaller depending on the input. Firefox differs again on the same 200 KB
+fixture — 2042 bytes against zlib's 1424.
+
+**Consequence for any "our output equals the tool of record" claim about a zip:**
+compare the MEMBERS, never the container. `tests/test_applier_page.sh` §3
+compares member bytes, member order and every zip HEADER field (all identical),
+and says in its own header that the container bytes are deliberately out of
+scope. Nothing downstream reads the container: emulators, `build_fingerprint.py`
+and the applied-set key all read members.

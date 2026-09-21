@@ -4,6 +4,7 @@
 #
 # MUST-FIRE: perturbed-copy: route-mixed — a prebuilt asset that also carries EMULATOR.md and the driver patch must FAIL: that is the 14z-149 shape the maintainer ruled out, a player handed a patch their binary already contains
 # MUST-FIRE: perturbed-copy: applier-missing — an asset with no apply_release.py must FAIL: without the applier a download cannot build the romset, which is exactly what "self-sufficient" denies
+# MUST-FIRE: perturbed-copy: page-missing — an asset with no apply_release.html must FAIL: the browser applier is the route for a player who has no terminal, and an asset that drops it sends that player back to the command line the page exists to replace
 #
 # WHY THIS GATE EXISTS. The maintainer, 2026-09-12, reading the M18 release
 # page: the prebuilt packages "dont include the parts and doc to patch the
@@ -85,6 +86,7 @@ perturb_list() {  # perturb_list <kind> <list-file>
                         echo "$p/emulator/bin/macos-arm64/BINARY.txt"; } >> "$2"
                       sort -u -o "$2" "$2" ;;
     applier-missing)  grep -v '/apply_release\.py$' "$2" > "$2.tmp" && mv "$2.tmp" "$2" ;;
+    page-missing)     grep -v '/apply_release\.html$' "$2" > "$2.tmp" && mv "$2.tmp" "$2" ;;
     esac
 }
 prebuilt_list() {  # the first list that holds a binary, if any
@@ -96,6 +98,8 @@ route-mixed)     t="$(prebuilt_list || true)"
                  echo "  mode: $(basename "$t") carrying BOTH routes"; perturb_list route-mixed "$t" ;;
 applier-missing) t="$(ls "$W"/lists/*.list | head -1)"
                  echo "  mode: $(basename "$t") without its applier"; perturb_list applier-missing "$t" ;;
+page-missing)    t="$(ls "$W"/lists/*.list | head -1)"
+                 echo "  mode: $(basename "$t") without its browser applier"; perturb_list page-missing "$t" ;;
 esac
 
 # ---- 1. self-sufficiency --------------------------------------------------
@@ -103,7 +107,7 @@ echo "== 1. every asset carries the whole romset route"
 for L in "$W"/lists/*.list; do
     a="$(basename "$L" .list)"; p="$(head -1 "$L" | cut -d/ -f1)"
     miss=""
-    for f in README.md apply_release.py manifest.json; do
+    for f in README.md apply_release.py apply_release.html manifest.json; do
         grep -q "^$p/$f$" "$L" || miss="$miss $f"
     done
     grep -q "^$p/patches/" "$L" || miss="$miss patches/"
@@ -193,10 +197,14 @@ ctl_check() {  # ctl_check <name> <list> — the perturbed copy must be REJECTED
     applier-missing) if grep -q "^$p/apply_release.py$" "$c"
                      then vs_ctl_dead applier-missing "the applier survived its own removal" || true; fail=1
                      else vs_ctl_fired applier-missing "a list without apply_release.py is seen as not self-sufficient"; fi ;;
+    page-missing)    if grep -q "^$p/apply_release.html$" "$c"
+                     then vs_ctl_dead page-missing "the browser applier survived its own removal" || true; fail=1
+                     else vs_ctl_fired page-missing "a list without apply_release.html is seen as not self-sufficient"; fi ;;
     esac
 }
 ctl_check route-mixed "$(ls "$W"/lists/*.list | head -1)"
 ctl_check applier-missing "$(ls "$W"/lists/*.list | head -1)"
+ctl_check page-missing "$(ls "$W"/lists/*.list | head -1)"
 
 if [ "$fail" = 0 ]; then echo "PASS test_release_asset_shape"; exit 0; fi
 echo "FAIL test_release_asset_shape"; exit 1

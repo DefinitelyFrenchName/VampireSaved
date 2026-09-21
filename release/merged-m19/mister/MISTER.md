@@ -1,14 +1,15 @@
 # merged-m19 — MiSTer side
 
 This directory is self-sufficient for MiSTer: the romset patch set
-(`patches/`, `manifest.json`, `apply_release.py`, `README.md`), the `.mra`
+(`patches/`, `manifest.json`, `apply_release.py`, `apply_release.html`,
+`README.md`), the `.mra`
 files, the bitstream `jtcps2w.rbf` and its record `BITSTREAM.txt` (seed, slack,
 sha256 — verified against the file when this directory was packaged).
 
 ## On the SD card
     _Arcade/<the .mra files here>
     _Arcade/cores/jtcps2w.rbf        <- in this directory (verify the sha256 in BITSTREAM.txt after copying)
-    games/mame/vsavjw.zip            <- from apply_release.py --no-qsound-bios (see below)
+    games/mame/vsavjw.zip            <- built WITHOUT the QSound BIOS member (see below)
 
 **On MiSTer, build the set with `--no-qsound-bios`.** Your card already carries
 `games/mame/qsound.zip` the moment you play any CPS-2 game, and the WIDE MRA's

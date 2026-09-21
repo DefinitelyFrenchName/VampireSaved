@@ -1,7 +1,8 @@
 # merged-m19 — MAME side
 
 This directory is self-sufficient for MAME: the romset patch
-set (`patches/`, `manifest.json`, `apply_release.py`, `README.md`) and the
+set (`patches/`, `manifest.json`, `apply_release.py`, `apply_release.html`,
+`README.md`) and the
 emulator driver patch in `emulator/`. Nothing for any other platform is here.
 
 ## The emulator
@@ -27,7 +28,8 @@ required. MAME's own `-verifyroms vsavjw` is the independent check that the
 romset the applier produced is the one the driver expects.
 
 ## The romset
-Apply `apply_release.py` per `README.md`, then point the patched emulator's
+Apply the patch set per `README.md` — double-click `apply_release.html`, or run
+`apply_release.py` — then point the patched emulator's
 rom path at the output directory. The set is `vsavjw` and it is STANDALONE:
 the applier copies in every member the loader asks for, the parent's and
 MAME's QSound BIOS member included, so the output directory needs nothing

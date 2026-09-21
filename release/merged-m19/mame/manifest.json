@@ -622,7 +622,7 @@
      "member": "dl-1425.bin"
     },
     "optional": "qsound-bios",
-    "optional_why": "MAME needs it; FBNeo's descriptor omits it; MiSTer resolves it from the card's qsound.zip"
+    "optional_why": "MAME needs it; FBNeo's descriptor omits it; on MiSTer the owner's own qsound.zip in games/mame already provides it for every CPS core"
    }
   ]
  }

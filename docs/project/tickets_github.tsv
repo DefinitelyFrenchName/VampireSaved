@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 169
+# issues: 170
 number	state	reason	closed	labels	title
+170	OPEN	-	-	enhancement	Notarize the macOS release binaries (PARKED on community demand)
 169	OPEN	-	-	bug	pyron_3 Galactic Throw: the air throw connects on only one strength, and [j.6HP]'s frozen chain is a plain j.HP
 168	CLOSED	COMPLETED	2026-09-20	bug	The naming rigs' first X pin lands before the round starts on seven parts — the #136 ENTRANCE class
 167	OPEN	-	-	evolution	A freeze leaves stale PINS the re-point sweep cannot see: a gate for superseded-fingerprint references
@@ -27,9 +28,9 @@ number	state	reason	closed	labels	title
 149	CLOSED	NOT_PLANNED	2026-09-16	bug	Phobos's specials skip a 2-frame seq-4 startup state native vsav2 plays (one cause behind ~11 of his moves)
 148	CLOSED	COMPLETED	2026-09-17	evolution	Review the static tier's contents and when it is applied — a commit currently blocks the tree for ~25 min, a close for ~40
 147	CLOSED	NOT_PLANNED	2026-09-16	bug	Phobos's float runs the VH2 flavor: huitzil.toml flavor_default is 0x00 where native vsav2 seeds 0x01
-146	OPEN	-	-	bug	The release packages' player READMEs are not complete or detailed enough (reported)
+146	CLOSED	COMPLETED	2026-09-21	bug	The release packages' player READMEs are not complete or detailed enough (reported)
 145	OPEN	-	-	bug	Windows: the release packages' prebuilt emulator binaries fail to load the game (reported, not yet reproduced)
-144	OPEN	-	-	bug	macOS: the release packages' prebuilt emulator binaries cannot be executed — macOS blocks them (reported, not yet reproduced)
+144	CLOSED	COMPLETED	2026-09-21	bug	macOS: the release packages' prebuilt emulator binaries cannot be executed — macOS blocks them (reported, not yet reproduced)
 143	OPEN	-	-	bug	tests/lua/walker_sp.lua reads the supervisor stack on MAME 0.288 (no A7 state); two walker audits consume its ranges
 142	CLOSED	NOT_PLANNED	2026-09-15	bug	Donovan's 421+MP with no mash lands 5 hits on our build and 4 on native vsav2 at NORMAL speed (equal at TURBO)
 141	OPEN	-	-	evolution	The full FBNeo hacked-vs-vanilla legacy track — CLAUDE.md [VSP-24]'s deferral, now its own ticket (the #78 residual)

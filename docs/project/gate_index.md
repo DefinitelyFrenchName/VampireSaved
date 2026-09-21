@@ -16,13 +16,13 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**370 scripts** — 85 ci_portable, 82 ci_static, 203 emulator-tier (run by name).
+**372 scripts** — 85 ci_portable, 84 ci_static, 203 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 16 | the suite runners and their own ground truth |
 | [docs](#docs) | 18 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 36 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
@@ -86,6 +86,8 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | gate | kind | tier | needs | locks (the script's own header) | since |
 |---|---|---|---|---|---|
 | `tests/audit_wide_phase_a.sh` | audit | emulator | emulator | CPS-2 WIDE Phase A measurements (no ROM growth, no emulator changes). Each section answers ONE architecture question and prints a decision line. Run on VANILLA vsavj: | 14z-123 |
+| `tests/test_applier_page.sh` | test | ci_static | ROMDIR | SLICES A2-A6 OF THE APPLIER APP: the page must EQUAL the tool of record, refuse everything it refuses, and carry no way to phone home (2026-09-21). | 2026-09-21 |
+| `tests/test_applier_page_browser.sh` | test | ci_static | ROMDIR | THE APPLIER PAGE IN A REAL BROWSER ENGINE (2026-09-21). | 2026-09-21 |
 | `tests/test_applier_vcdiff.sh` | test | ci_static | ROMDIR | SLICE A1 OF THE APPLIER APP: the JS VCDIFF decoder must equal the tool of record on the bytes we actually ship (2026-09-20). | 2026-09-20 |
 | `tests/test_attract_determinism.sh` | test | emulator | emulator | M0 acceptance: a 60-second scripted attract-mode run checksums work RAM identically across two fresh runs. | M0 |
 | `tests/test_build_environment_entry.sh` | test | ci_portable | — | tools/record_build_environment.py, which composes an entry of docs/project/build_environments.md from a host's BINARY.txt records and the log of a PASSING tests/test_release_binaries.sh, against SYNTHETIC records and logs: | 2026-09-13 |

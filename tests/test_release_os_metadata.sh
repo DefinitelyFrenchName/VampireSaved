@@ -59,7 +59,7 @@ mkroot() {  # mkroot <root> <helper> — a throwaway repo: the real uploader, th
     rel="$r/release/merged-m99"
     for p in fbneo mister; do
         mkdir -p "$rel/$p/patches/vsavjw"
-        for f in README.md manifest.json apply_release.py; do echo "$p $f" > "$rel/$p/$f"; done
+        for f in README.md manifest.json apply_release.py apply_release.html; do echo "$p $f" > "$rel/$p/$f"; done
         echo delta > "$rel/$p/patches/vsavjw/d_x.xdelta"
     done
     mkdir -p "$rel/fbneo/emulator/bin/macos-arm64"

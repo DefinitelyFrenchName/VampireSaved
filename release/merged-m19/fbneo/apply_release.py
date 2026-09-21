@@ -175,6 +175,22 @@ def sha1(b):
     return hashlib.sha1(b).hexdigest()
 
 
+def open_dump(romdir, zname, refs):
+    """Open a reference dump, or STOP naming it. A truncated or half-copied download is
+    an ordinary thing to have, and a BadZipFile traceback tells the player nothing about
+    which of their files is wrong (2026-09-21)."""
+    if zname in refs:
+        return refs[zname]
+    zp = os.path.join(romdir, zname)
+    if not os.path.exists(zp):
+        sys.exit(f"missing reference dump: {zp}")
+    try:
+        refs[zname] = zipfile.ZipFile(zp)
+    except zipfile.BadZipFile:
+        sys.exit(f"{zname}: not a readable zip file (damaged, incomplete, or not a zip) — {zp}")
+    return refs[zname]
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--romdir", required=True)
@@ -184,8 +200,9 @@ def main():
     # THE ONE OPTIONAL MEMBER (2026-09-20): the QSound BIOS, dl-1425.bin. Leave it IN
     # (the default) and the romset is self-sufficient on MAME as well as FBNeo. Leave it
     # OUT and you do not even need qsound_hle.zip among your dumps — right for MiSTer,
-    # whose WIDE MRA resolves it from the card's own qsound.zip, and for FBNeo, whose
-    # descriptor does not list it. MAME needs it and will refuse a set without it.
+    # where every CPS core already needs the owner's own qsound.zip in games/mame (our WIDE
+    # MRA resolves the member from it), and for FBNeo, whose descriptor does not list it.
+    # MAME needs it and will refuse a set without it.
     ap.add_argument("--no-qsound-bios", action="store_true",
                     help="omit the optional QSound BIOS member (dl-1425.bin); "
                          "for MiSTer, or any setup that already provides it")
@@ -197,14 +214,13 @@ def main():
     refs = {}
     bad = []
     for r in m["source"]["recipe"]:
-        zp = os.path.join(a.romdir, r["zip"])
-        if not os.path.exists(zp):
-            sys.exit(f"missing reference dump: {zp}")
-        zf = refs.setdefault(r["zip"], zipfile.ZipFile(zp))
+        zf = open_dump(a.romdir, r["zip"], refs)
         try:
             d = zf.read(r["member"])
         except KeyError:
             bad.append(f"{r['zip']}/{r['member']}: member missing"); continue
+        except (zipfile.BadZipFile, EOFError, OSError) as ex:
+            sys.exit(f"{r['zip']}/{r['member']}: cannot read this member (damaged dump) — {ex}")
         if len(d) != r["size"] or sha1(d) != r["sha1"]:
             bad.append(f"{r['zip']}/{r['member']}: sha1/size mismatch (wrong or modified dump)")
     # PRISTINE-ONLY SOURCES: reference zips the release copies members OUT of
@@ -225,15 +241,14 @@ def main():
     for src in m.get("pristine_sources", []):
         if src["zip"] not in needed_srcs:
             continue
-        zp = os.path.join(a.romdir, src["zip"])
-        if not os.path.exists(zp):
-            sys.exit(f"missing reference dump: {zp}")
-        zf = refs.setdefault(src["zip"], zipfile.ZipFile(zp))
+        zf = open_dump(a.romdir, src["zip"], refs)
         for r in src["members"]:
             try:
                 d = zf.read(r["member"])
             except KeyError:
                 bad.append(f"{src['zip']}/{r['member']}: member missing"); continue
+            except (zipfile.BadZipFile, EOFError, OSError) as ex:
+                sys.exit(f"{src['zip']}/{r['member']}: cannot read this member (damaged dump) — {ex}")
             if len(d) != r["size"] or sha1(d) != r["sha1"]:
                 bad.append(f"{src['zip']}/{r['member']}: sha1/size mismatch (wrong or modified dump)")
             nextra += 1
@@ -320,8 +335,9 @@ def main():
     print(f"    {variant}; set key {got[:8]}"
           + ("" if want else " (this release declares no key for that variant)"))
     if a.no_qsound_bios:
-        print("    NOTE: MAME needs dl-1425.bin and will refuse this set; it is right for "
-              "MiSTer (the MRA resolves it from qsound.zip) and for FBNeo.")
+        print("    NOTE: MAME needs dl-1425.bin and will refuse this set. On MiSTer this is the "
+              "right choice — any CPS core there already needs your own qsound.zip in games/mame, "
+              "which provides it. FBNeo runs either.")
 
 
 if __name__ == "__main__":

@@ -478,7 +478,8 @@ You need the prepared emulator, and then the game file next to it.
     text = f"""# {name} — {platform.upper()} side
 
 This directory is self-sufficient for {platform.upper()}: the romset patch
-set (`patches/`, `manifest.json`, `apply_release.py`, `README.md`) and the
+set (`patches/`, `manifest.json`, `apply_release.py`, `apply_release.html`,
+`README.md`) and the
 emulator driver patch in `emulator/`. Nothing for any other platform is here.
 
 ## The emulator
@@ -489,7 +490,8 @@ the project's gates were run against).
 {e['recipe'].format(upstream=e['upstream'], pin=pin)}
 {e['note']}
 ## The romset
-Apply `apply_release.py` per `README.md`, then point the patched emulator's
+Apply the patch set per `README.md` — double-click `apply_release.html`, or run
+`apply_release.py` — then point the patched emulator's
 rom path at the output directory. The set is `vsavjw` and it is STANDALONE:
 the applier copies in every member the loader asks for, the parent's and
 MAME's QSound BIOS member included, so the output directory needs nothing
@@ -587,14 +589,15 @@ def mister_side(dest, src, name, bdir):
     text = f"""# {name} — MiSTer side
 
 This directory is self-sufficient for MiSTer: the romset patch set
-(`patches/`, `manifest.json`, `apply_release.py`, `README.md`), the `.mra`
+(`patches/`, `manifest.json`, `apply_release.py`, `apply_release.html`,
+`README.md`), the `.mra`
 files, the bitstream `jtcps2w.rbf` and its record `BITSTREAM.txt` (seed, slack,
 sha256 — verified against the file when this directory was packaged).
 
 ## On the SD card
     _Arcade/<the .mra files here>
     _Arcade/cores/jtcps2w.rbf        <- in this directory (verify the sha256 in BITSTREAM.txt after copying)
-    games/mame/vsavjw.zip            <- from apply_release.py --no-qsound-bios (see below)
+    games/mame/vsavjw.zip            <- built WITHOUT the QSound BIOS member (see below)
 
 **On MiSTer, build the set with `--no-qsound-bios`.** Your card already carries
 `games/mame/qsound.zip` the moment you play any CPS-2 game, and the WIDE MRA's
@@ -661,6 +664,12 @@ def main():
             emulator_side(p, dest, a.name)
         else:
             mister_side(dest, a.mister_src, a.name, resolve_bitstream(a.bitstream))
+        # the applier page again, now that the platform is known: its "when you have
+        # the file" line is the only part that differs per platform, and a MiSTer
+        # player is told to choose the smaller set (docs/project/applier_app_scope.md)
+        subprocess.run([sys.executable, os.path.join(HERE, "gen_applier_page.py"),
+                        dest, "--platform", p, "-o", os.path.join(dest, "apply_release.html")],
+                       check=True, stdout=subprocess.DEVNULL)
         insert_deliverables(dest, a.name, p)
         n = sum(len(f) for _, _, f in os.walk(dest))
         print(f"  {p}: {n} files -> {dest}")

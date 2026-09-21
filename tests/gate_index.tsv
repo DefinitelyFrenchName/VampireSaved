@@ -294,6 +294,8 @@ tests/test_release_roundtrip.sh	platform
 tests/test_release_binaries.sh	platform
 tests/test_release_launcher.sh	platform
 tests/test_applier_vcdiff.sh	platform
+tests/test_applier_page.sh	platform
+tests/test_applier_page_browser.sh	platform
 tests/test_release_asset_shape.sh	platform
 tests/test_release_os_metadata.sh	platform
 tests/test_bundle_parsers.sh	platform

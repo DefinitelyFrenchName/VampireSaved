@@ -334,7 +334,7 @@ else
     sed -i '' '/^## If it does not work/d' "$W/layout_readme/fbneo/README.md"
     vs_ctl_is readme-missing-section && REL="$W/layout_readme"
     for p in fbneo mame mister; do
-        for f in manifest.json apply_release.py README.md patches; do
+        for f in manifest.json apply_release.py apply_release.html README.md patches; do
             [ -e "$REL/$p/$f" ] || { echo "FAIL: $REL/$p/$f missing"; fail=1; }
         done
     done
@@ -385,9 +385,13 @@ else
     # both as "outside the ruled inventory" — found 14z-150 before the first
     # Linux build rather than during it
     # PLAY.command joined the inventory 2026-09-20 (the launcher; docs/project/release_format.md)
-    EMU_INV='^(manifest\.json|apply_release\.py|README\.md|EMULATOR\.md|PLAY\.command|patches/vsavjw/d_[a-z0-9_]+\.xdelta|emulator/0002-cps2-wide-v1\.patch|emulator/bin/[a-z0-9_-]+/[^/]+)$'
+    # apply_release.html joined it 2026-09-21 — the browser applier, which the maintainer
+    # asked for as "a local file in the asset" (DECISIONS_HISTORY.md, ruled 2026-09-20);
+    # it is GENERATED per platform by tools/gen_applier_page.py and held by
+    # tests/test_applier_page.sh and tests/test_applier_page_browser.sh
+    EMU_INV='^(manifest\.json|apply_release\.py|apply_release\.html|README\.md|EMULATOR\.md|PLAY\.command|patches/vsavjw/d_[a-z0-9_]+\.xdelta|emulator/0002-cps2-wide-v1\.patch|emulator/bin/[a-z0-9_-]+/[^/]+)$'
     inv_check fbneo "$EMU_INV"; inv_check mame "$EMU_INV"
-    inv_check mister '^(manifest\.json|apply_release\.py|README\.md|MISTER\.md|BITSTREAM\.txt|jtcps2w\.rbf|[^/]+\.mra|patches/vsavjw/d_[a-z0-9_]+\.xdelta)$'
+    inv_check mister '^(manifest\.json|apply_release\.py|apply_release\.html|README\.md|MISTER\.md|BITSTREAM\.txt|jtcps2w\.rbf|[^/]+\.mra|patches/vsavjw/d_[a-z0-9_]+\.xdelta)$'
     # every prebuilt-binary dir: BINARY.txt names each file with a matching sha256
     for rec in "$REL"/fbneo/emulator/bin/*/BINARY.txt "$REL"/mame/emulator/bin/*/BINARY.txt; do
         [ -f "$rec" ] || continue

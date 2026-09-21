@@ -171,8 +171,10 @@ while read -r asset platform kind; do
             ! grep -qE '/EMULATOR\.md$|/emulator/.*\.patch$' "$W/$asset.list" \
                 || { echo "REFUSING: $asset carries the build recipe a prebuilt user must not apply" >&2; exit 1; } ;;
     esac
-    if ! grep -q "^$platform/README.md$" "$W/$asset.list" || ! grep -q "^$platform/apply_release.py$" "$W/$asset.list"; then
-        echo "REFUSING: $asset is not self-sufficient (no README or no applier)" >&2; exit 1
+    if ! grep -q "^$platform/README.md$" "$W/$asset.list" \
+       || ! grep -q "^$platform/apply_release.py$" "$W/$asset.list" \
+       || ! grep -q "^$platform/apply_release.html$" "$W/$asset.list"; then
+        echo "REFUSING: $asset is not self-sufficient (no README, no applier, or no browser applier)" >&2; exit 1
     fi
     rm -f "$W/$asset"
     ( cd "release/$NAME" && zip -q -X "$W/$asset" -@ ) < "$W/$asset.list"

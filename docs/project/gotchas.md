@@ -5477,3 +5477,62 @@ old build names, and re-point the harness's defaults in the same sitting. The ph
 attributed by the freeze's own op-by-op delta of the stock twin (`attr2_m5_stock18.txt`). A gate for the
 fingerprint half — a live pin on a SUPERSEDED registry row's key, with the rule-checker's birth anchor
 exempt and a planted pin as its control — is open as #167; until it lands, the grep is the only guard.
+
+## A DOCUMENT WRITTEN BY THE EXPERT READS AS COMPLETE TO THE EXPERT — the tell is FIRST USE against FIRST NEED, and you will write a fresh instance of the bug while fixing it (paid: 14z-173/14z-174, GitHub #146)
+
+The maintainer on the shipped player READMEs: *"it must have felt clear to the
+expert who wrote them … things arbitrarily considered obvious not explained or
+quoted … the user is usually not a developer, and basically never on the
+project."* Read cold, the first page used `vsavj`, "15+1", "CPS-2 WIDE profile",
+"driver", "dumps", "manifest", "applier", "VCDIFF", "members" and *"a gate
+asserts it"* before saying what the reader would actually do.
+
+**The mechanical tell, which does not need a fresh reader:** for each term and
+each instruction, compare the line where it FIRST APPEARS with the line where the
+reader FIRST NEEDS it. A term used before it is glossed, and a step placed after
+the step that depends on it, are both defects you can find by reading your own
+document backwards. At 14z-173 that moved the whole "Play on …" section from the
+end of the file to directly after the build step, because that is the order the
+reader acts in — a change of ORDER, not of content, and the biggest single
+improvement in the pass.
+
+**AND THE PART THAT GENERALISES FURTHEST: the fix introduces the bug again.**
+14z-173's rewrite added a line telling Windows users to double-click a launcher
+that does not exist on Windows; 14z-174's README pass had to be re-read for the
+same class after adding the browser applier (*does the reader know what a "dump"
+is at the point they are told to choose one?*). Treat a documentation fix like a
+code fix: re-read the WHOLE section afterwards, not the diff. A diff shows what
+changed, and this defect is about what is around it.
+
+**What is machine-checkable, and what is not.** The gate
+(`tests/test_release_roundtrip.sh` §4) asserts the six END-USER sections exist —
+that is structure, and structure is all a gate can see here. Whether a sentence
+is comprehensible to someone who has never seen the project is a maintainer
+judgement, which is why #146 was closed on the maintainer's word and not on ours.
+
+## WHEN A RULE-CHECKER PACKET ATTRIBUTES A DECISION, THE DECISION RECORD IS AN ARTIFACT — otherwise Q5 is VIOLATED and it is right to be (paid: 14z-174, run 2026-09-21-90)
+
+The 14z-174 close packet said two tickets were "closed on the maintainer's rulings"
+and listed eight artifacts, all of them code and one scope document. None of them
+carried the maintainer's words. Q5 came back VIOLATED, correctly: from what the
+checker was given, the attribution rested on nothing.
+
+**It was not a false claim** — the rulings are real, quoted verbatim and dated in
+`DECISIONS_HISTORY.md` and in each issue's closing comment. It was a packet built
+out of the things the WORK touched rather than the things the CLAIM rests on, and
+those are different sets. [VSP-183] already says the packet carries "the ARTIFACTS
+by path"; the rule this adds is which ones:
+
+**Include, as artifacts, the record of every decision the claim attributes to
+anyone** — the `DECISIONS_HISTORY.md` entry, the STATE "Standing rulings" line, or
+the issue comment. A checker that cannot see the words must treat the attribution
+as unsupported, and a checker that waves it through on your say-so is not a
+checker.
+
+**And keep a fidelity claim and a recommendation apart.** The same packet's second
+limb — "the remaining release blocker list is now empty but for #145" — is not a
+fact about the code the artifacts contain; it follows from two closures and a
+sentence of the maintainer's. It was withdrawn from the packet and belongs in the
+close's recommendation, with the words quoted there. A packet that mixes "these
+files do what I say" with "therefore we should ship" gets the second one judged by
+the evidence assembled for the first.

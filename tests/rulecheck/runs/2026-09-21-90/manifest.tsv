@@ -1,0 +1,9 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tools/gen_applier_page.py	18160e689936943250a2bddc3341ecb87d4d502b
+tools/applier/applier.mjs	d290ac9f7565ceaca70263909e1cd11af58743da
+tools/applier/zip.mjs	cacf2b7a599ab3df1650911702e7dfd1b446a487
+tools/applier/page_shell.html	e5a09300684e536f60aac5364be3f03213d01e6b
+tools/apply_release.py	0cfc832fe64e01844e475652227d33cabbc09c41
+tests/test_applier_page.sh	25620e85751a7d6c1d76a236ce8ac425e4d1abc7
+tests/test_applier_page_browser.sh	0090390f0023fa69cf454cc758d4a5e46c408ab2
+docs/project/applier_app_scope.md	50c76f4d5e75039a6989bf07a43bbcba4ea65687
