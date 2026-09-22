@@ -27,6 +27,29 @@ retraction grep covers this file.
 
 ---
 
+## Approved 2026-09-22 (14z-174) — the M19 release carries the `audit_mask_window_ff42a2` SKIP
+
+**The rule.** At a release, *anything red or skipped is a hard fail unless approved
+at release time* (`DECISIONS_HISTORY.md`, release scope, 2026-09-02). A skipped gate
+asserts nothing, which is why `--strict` counts it as a failure.
+
+**The item.** The M19 release emulator tier finished **PASS 281, FAIL 0, TIMEOUT 0,
+SKIP 1**, the one skip being `audit_mask_window_ff42a2`: *"no operands — this is the
+pre/post attribution INSTRUMENT"*. It is not a broken gate but an instrument that
+needs a before/after build pair handed to it, and this release has no such
+attribution to make, so it skips by construction. HANDOFF records the same gate in
+the same state as *"the approved `audit_mask_window_ff42a2`"* at the 14z-153 release.
+
+**Asked rather than assumed**, because a previous approval is not a standing one:
+*"may I carry that approval to this release?"*
+
+**THE APPROVAL, verbatim:** *"yes"*.
+
+**So the M19 release runs with one approved SKIP and nothing else outstanding.** The
+better answer — give the instrument operands so it measures something, or make it
+declare itself not-applicable rather than skipping — belongs to GitHub #171, which
+is about exactly this class: a gate that asserts nothing while looking like a pass.
+
 ## Ruled 2026-09-22 (14z-174) — the three stale expectations are RE-FROZEN AS-IS, and every gate gets qualified
 
 **The question put.** The M19 release tier came back NOT GREEN: `PASS 275, SKIP 1,
