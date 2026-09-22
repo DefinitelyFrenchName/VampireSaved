@@ -27,6 +27,49 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-22 (14z-174) — the three stale expectations are RE-FROZEN AS-IS, and every gate gets qualified
+
+**The question put.** The M19 release tier came back NOT GREEN: `PASS 275, SKIP 1,
+FAIL 8, TIMEOUT 1`, 6 h 24 min. None of the eight was a defect in the romset. Five
+were one dead call (`name_moves.PROLOGUE`, deleted 14z-165, caller never updated);
+three were expectations left behind by rigs that moved at 14z-171 and 14z-172. The
+attribution for those three was one variable and conclusive — restore the rigs to
+the M19 freeze and all three pass — and the shipped build is byte-unmoved since
+that freeze (0 manifest paths, 0 generator paths, fingerprint `681ac3ad`).
+
+**But the rule-checker (run `2026-09-22-91`) found a fourth thing**, verified in the
+code: `tools/name_moves.py:802` pokes `ff8509 := 09` before every event and
+`tests/test_killshread_es.sh:50` samples `ff8509` as the `stock` column, so **that
+column reads the rig's own poke back**, and [VSP-170]'s ES-versus-normal stock-drop
+discriminator is neutralised in that rig. Three options were put to the maintainer:
+(1) re-freeze as-is and record what the column now is; (2) stop sampling stock where
+the rig pins it, or exempt part 12 from the per-event top-up, so the discriminator
+survives; (3) ticket it and re-freeze meanwhile.
+
+**THE RULING, verbatim:** *"Option 1 and ticket to qualify all gates in the future
+because either the gates are moving silently or they never were validated and in
+both cases that's a lot of both uncertainty and wasted time"*.
+
+**What it settles.** The three expectations are re-frozen as they stand. The
+`stock` column's nature is recorded in the gate's own header and in
+`tests/expected/PROVENANCE.md`, so no future reader takes it for a measurement of
+the engine's meter. The diffs were reviewed paired row by row before freezing, and
+in all three tables **every identity column is unchanged** — leg, direction, pc,
+value, kind, victim identity — with only counts moving: killshread six rows where
+only `stock` 8 -> 9 differs, reaction_class_live 13 rows of count drift,
+defense_row_reads 5.
+
+**And the wider instruction is #171**: qualify every gate — prove it measures what
+it claims and that it notices when its inputs move. The sitting found four distinct
+shapes of this (a dead call, stale expectations, a control killed by its own
+timeout, a column reading back a poke), all invisible to every green session close,
+because the emulator tier only runs at a freeze or a release.
+
+**What is NOT claimed:** that each re-frozen value is the one the engine should
+produce. The attribution establishes what CAUSED the rows to move, not that each new
+number is correct; the gates' own substantive assertions are what check correctness,
+and they passed in both states.
+
 ## Ruled 2026-09-21 (14z-174) — #146 CLOSED, and the READMEs change on USER FEEDBACK from here
 
 **The question put:** the player READMEs were rewritten at 14z-173 against the

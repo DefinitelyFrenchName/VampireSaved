@@ -107,7 +107,7 @@ def gen(cid, dist, out_rpl, out_sched, pins=None):
              "# (tools/vanilla_join_rig.py gen; DO NOT hand-edit, regenerate).",
              "# Select prologue from replay 17 (the character is FORCED by the",
              "# early-window poke, so the cursor path does not matter).",
-             name_moves.PROLOGUE.rstrip()]
+             name_moves.REPLAY17_PROLOGUE.rstrip()]
     kind, gap, walkin = SETS[dist]
     x1, x2 = pins or name_moves.PIN["far"]     # pins: a wider pair for a WHIFF leg of a long-reach move (14z-146)
     t = name_moves.FIRST_EVENT

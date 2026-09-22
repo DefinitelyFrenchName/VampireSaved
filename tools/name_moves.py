@@ -56,19 +56,33 @@ REPLAY17_P1 = ("R", "R")   # replay 17's P1 route: Donovan's cell on vsav2
 REPLAY17_P2 = ("R", "R")   # replay 17's P2 route: Victor's cell on vsav2 (the victim rigs keep it)
 
 
+def prologue_for(p1, p2):
+    """The select prologue's SHAPE for any pair of cursor paths: replay 17's four
+    system taps, each cursor's moves from 1100 (P1) / 1104 (P2) 60 frames apart, and
+    the two confirms. Split out of prologue() at 14z-174 so the FORCED-pick rigs can
+    reach replay 17's own prologue without inventing a second copy of these lines."""
+    lines = ["300-305 sys=C1", "420-425 sys=C2", "800-803 sys=S1", "940-943 sys=S2"]
+    lines += [f"{1100 + 60 * i}-{1102 + 60 * i} p1={m}" for i, m in enumerate(p1)]
+    lines += [f"{1104 + 60 * i}-{1106 + 60 * i} p2={m}" for i, m in enumerate(p2)]
+    lines += ["1300-1302 p1=1", "1360-1362 p2=1"]
+    return "\n".join(lines)
+
+
 def prologue(tenant):
     """The select prologue: replay 17's shape, with each cursor's moves replaced
     by the tenant's real path when it has one (P1 since 14z-160, P2 since
     14z-165). Moves start at 1100 (P1) / 1104 (P2), 60 frames apart, so a
     three-move path (1100/1160/1220) still confirms at 1300."""
     t = TENANTS[tenant]
-    p1 = t.get("path") or REPLAY17_P1
-    p2 = t.get("p2_path") or REPLAY17_P2
-    lines = ["300-305 sys=C1", "420-425 sys=C2", "800-803 sys=S1", "940-943 sys=S2"]
-    lines += [f"{1100 + 60 * i}-{1102 + 60 * i} p1={m}" for i, m in enumerate(p1)]
-    lines += [f"{1104 + 60 * i}-{1106 + 60 * i} p2={m}" for i, m in enumerate(p2)]
-    lines += ["1300-1302 p1=1", "1360-1362 p2=1"]
-    return "\n".join(lines)
+    return prologue_for(t.get("path") or REPLAY17_P1, t.get("p2_path") or REPLAY17_P2)
+
+
+# REPLAY 17'S OWN PROLOGUE, for rigs whose character is FORCED by an early-window poke
+# so the cursor path does not matter (tools/vanilla_join_rig.py). It replaces the flat
+# PROLOGUE constant removed at 14z-165 when P2 became per-tenant, and is BYTE-IDENTICAL
+# to it — verified against e01ae8de^ before this was written, because five gates'
+# frozen expectations were measured on those exact lines.
+REPLAY17_PROLOGUE = prologue_for(REPLAY17_P1, REPLAY17_P2)
 FIRST_EVENT = 2600
 # The native game is vsav2 for all three. Donovan is the default cursor's
 # R,R pick. SINCE 14z-160 (GitHub #151) Phobos and Pyron are REAL CURSOR PICKS

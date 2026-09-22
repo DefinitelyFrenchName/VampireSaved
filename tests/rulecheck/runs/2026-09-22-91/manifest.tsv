@@ -1,0 +1,8 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_reaction_class_live.sh	ab7a3d0e05d39a253171b15de17f49ffba971470
+tests/audit_defense_row_reads.sh	2d165cdaa8ac162d79ed2dbedd01d5ef0a00e094
+tests/test_killshread_es.sh	76e53cb5b726f35546291c1b9e6666ae14b12d2c
+tools/name_moves.py	c9cfa55c4b16f6f9836e2d1d87926f5c424225bd
+tools/audit_lane_carry.py	7576400a2d7bb60b7d492cbc40b09c78c09075f4
+tests/ci_emulator.tsv	adb34601b74b8102fd5f51e49ee92547e6144f2c
+DECISIONS_HISTORY.md	8cb7017eed7d664f125189363e33aecd8fd19ce1

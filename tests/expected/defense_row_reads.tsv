@@ -5,13 +5,13 @@
 # Frozen 14z-169 with FREEZE=1. Columns: <leg> <pc> <read> <identity> <value read> <reads> <runs>.
 # The ours rows follow the build: re-freeze at every freeze, reviewing the diff.
 #--
-attacker	018c10	defense	demitri:01	01	450	29
+attacker	018c10	defense	demitri:01	01	452	29
 attacker	018c10	defense	phobos:10	10	4	2
-attacker	018c40	attacker-combo	demitri:01	01	68	9
+attacker	018c40	attacker-combo	demitri:01	01	76	9
 attacker	018c40	attacker-combo	donovan:13	13	68	10
-attacker	018c40	attacker-combo	phobos:10	10	48	8
-attacker	018c40	attacker-combo	pyron:11	11	84	6
-attacker	018c78	threshold	demitri:01	01	450	29
+attacker	018c40	attacker-combo	phobos:10	10	44	7
+attacker	018c40	attacker-combo	pyron:11	11	82	6
+attacker	018c78	threshold	demitri:01	01	452	29
 attacker	018c78	threshold	phobos:10	10	4	2
 suite	018c10	defense	anakaris:06	06	225	4
 suite	018c10	defense	aulbath:09	09	82	1

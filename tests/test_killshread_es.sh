@@ -22,6 +22,23 @@
 # one stock. The gate also asserts those shapes structurally (a plain summon
 # has one contact group, an ES summon two), so the frozen numbers are not
 # the only check.
+# THE `stock` COLUMN RECORDS THE RIG, NOT THE ENGINE'S METER (found by the
+# rule-checker 2026-09-22, run 2026-09-22-91 Q3; maintainer-ruled the same day to
+# re-freeze as-is and record it). tools/name_moves.py:802 pokes `ff8509 := 09`
+# sixty frames before EVERY event of a meter part, and FIELDS below samples
+# `ff8509` as `stock` — so that column reads our own poke back. Two consequences,
+# neither of them hidden:
+#   * a `stock` value here is evidence the poke landed, NOT evidence about what the
+#     engine's meter did, and it must never be read as the latter;
+#   * [VSP-170]'s ES-versus-normal discriminator IS the stock drop, and the
+#     per-event top-up neutralises it IN THIS RIG. The ES/normal distinction here
+#     rests on the contact-wave counts (1 for a plain summon, 2 for an ES one),
+#     which this gate does assert, and not on the meter.
+# The column moved 8 -> 9 at the 14z-174 re-freeze for exactly that reason: the
+# 14z-171 top-up, and nothing else. Every other field of all six rows — move,
+# frame, class, hp, white — is byte-identical across that re-freeze.
+# Qualifying this properly is GitHub #171.
+#
 # Emulator tier (MAME, ~2 min). Usage: ROMDIR=... [MAME_BIN=...] [FREEZE=1] tests/test_killshread_es.sh
 #
 # HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
