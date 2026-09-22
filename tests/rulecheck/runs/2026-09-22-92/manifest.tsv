@@ -1,0 +1,8 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+STATE.md	d0dc057013077544e51da64af40cd0fe96a5cfd1
+docs/NEXT_SESSION.md	f3792dc6529d50cb4db72ed141f8fbd1331b2159
+DECISIONS_HISTORY.md	cc38dea2d0aa30325d8a20e96c22ddc44406feb1
+tools/audit_lane_carry.py	7576400a2d7bb60b7d492cbc40b09c78c09075f4
+tools/attribute_expectation.sh	5c26e17a2b0ea139bc797d2f3a84cc1aa3553b14
+tests/ci_emulator.tsv	adb34601b74b8102fd5f51e49ee92547e6144f2c
+tests/test_killshread_es.sh	d1eaea657dd5d878318f97408a63fffef083716d

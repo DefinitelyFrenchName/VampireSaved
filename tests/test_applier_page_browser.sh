@@ -127,9 +127,16 @@ note "driving the page from file:// with $(basename "$CHROME")"
 
 # --virtual-time-budget is what makes --dump-dom wait for the page's async work; the
 # driver's waits are MutationObservers precisely so they do not spend that budget.
-"$CHROME" --headless --disable-gpu --no-sandbox --allow-file-access-from-files \
-    --virtual-time-budget=1800000 --dump-dom "file://$W/run/driver.html" \
-    > "$W/dom.html" 2>"$W/chrome.err" || true
+# WARM THE READS FIRST: the driver fetches ~48 MB over file://, and virtual time
+# advances while the renderer waits on a cold cache. This does not make the race
+# impossible, which is why the retry below exists — it makes it rare.
+for _z in "$W/run/roms"/*.zip "$W/run/broken"/*.zip; do [ -f "$_z" ] && cat "$_z" > /dev/null 2>&1 || true; done
+drive() {   # drive <dom-output> — one browser run
+    "$CHROME" --headless --disable-gpu --no-sandbox --allow-file-access-from-files \
+        --virtual-time-budget=1800000 --dump-dom "file://$W/run/driver.html" \
+        > "$1" 2>"$W/chrome.err" || true
+}
+drive "$W/dom.html"
 verdict_of() {   # pull the driver's <pre id="verdict"> block out of a dumped DOM
     python3 - "$1" <<'PY'
 import html, re, sys
@@ -141,6 +148,18 @@ print(html.unescape(m.group(1)).strip())
 PY
 }
 verdict_of "$W/dom.html" > "$W/verdict.txt" || true
+# ONE retry, and only for an INCOMPLETE run — never for a content failure, which is a
+# real verdict and must not be re-rolled until it passes.
+if ! grep -q '^DONE=1$' "$W/verdict.txt" 2>/dev/null; then
+    note "incomplete browser run (no DONE=1) — retrying once with the reads warm"
+    drive "$W/dom2.html"
+    verdict_of "$W/dom2.html" > "$W/verdict2.txt" || true
+    if grep -q '^DONE=1$' "$W/verdict2.txt" 2>/dev/null; then
+        mv "$W/verdict2.txt" "$W/verdict.txt"; note "  the retry completed"
+    else
+        note "  the retry did not complete either"
+    fi
+fi
 if [ ! -s "$W/verdict.txt" ]; then
     note "the browser produced no verdict at all"
     tail -5 "$W/chrome.err" | sed 's/^/    /'
@@ -154,7 +173,22 @@ WANT_KEY_NB="$(python3 -c "import json; print((json.load(open('$REL/manifest.jso
 check() {   # label, got, want
     if [ "$2" = "$3" ]; then note "ok: $1 = $2"; else note "$1: got '$2', expected '$3'"; fails=$((fails + 1)); fi
 }
-[ "$(get DONE)" = "1" ] || { note "the driver did not finish: $(get DRIVER_ERROR)"; fails=$((fails + 1)); }
+# AN INCOMPLETE BROWSER RUN IS NOT A PAGE DEFECT, and must not be reported as one.
+# Before this (measured 14z-174, one flake in a close tier), a driver that stalled
+# during its 48 MB of file:// reads printed EIGHT content-shaped failures — "standalone
+# panel: got '', expected 'ok'" and so on — for a run that had measured no content at
+# all. That is a gate lying about what it saw, which is #171's own subject.
+# MECHANISM: --virtual-time-budget ADVANCES while the renderer sits idle waiting on
+# I/O, so a cold page cache lets the budget expire mid-load and Chrome dumps the DOM
+# early. The reads are warmed below and the run is retried once; twice incomplete is a
+# real failure, and it is reported as an INCOMPLETE RUN with no content verdict claimed.
+if [ "$(get DONE)" != "1" ]; then
+    note "THE BROWSER RUN DID NOT COMPLETE — the driver stopped after: $(tail -1 "$W/verdict.txt" | cut -c1-60)"
+    _de="$(get DRIVER_ERROR)"; note "  driver error: ${_de:-(none — it stalled silently)}"
+    note "  NO CONTENT VERDICT IS CLAIMED from this run: the checks below are not evaluated."
+    echo "FAIL: test_applier_page_browser (the browser run did not complete; page NOT judged)"
+    exit 1
+fi
 check "(a) standalone panel" "$(get standalone_panel)" "ok"
 check "(a) standalone set key" "$(get standalone_setkey)" "$WANT_KEY"
 check "(a) download offered" "$(get standalone_download)" "vsavjw.zip"

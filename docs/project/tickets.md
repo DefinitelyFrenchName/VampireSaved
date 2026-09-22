@@ -11,12 +11,14 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**170 tickets** — status: open 24 · parked 16 · done 118 · declined 3 · not-ours 2 · invalid 6 · duplicate 1 · kind: bug 131 · cosmetic 11 · evolution 28 · **backfill debt: 0 rows**.
+**172 tickets** — status: open 26 · parked 16 · done 118 · declined 3 · not-ours 2 · invalid 6 · duplicate 1 · kind: bug 131 · cosmetic 11 · evolution 30 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#172](https://github.com/DefinitelyFrenchName/VampireSaved/issues/172) | evolution | open | Enforce the discipline at the AGENT level: orchestrator / checker / workers | `docs/project/gotchas.md § A DOCUMENT WRITTEN BY THE EXPERT` | `DECISIONS_HISTORY.md § Ruled 2026-09-22 (14z-174)` | `docs/platform/gotchas.md § A PAGE OPENED FROM `file://`` | none | 14z-174 |
+| [#171](https://github.com/DefinitelyFrenchName/VampireSaved/issues/171) | evolution | open | Qualify every gate: prove it measures what it claims, and that it notices when its inputs move | `docs/project/gotchas.md § A DOCUMENT WRITTEN BY THE EXPERT` | `DECISIONS_HISTORY.md § Ruled 2026-09-22 (14z-174)` | `docs/platform/gotchas.md § A PAGE OPENED FROM `file://`` | none | 14z-174 |
 | [#170](https://github.com/DefinitelyFrenchName/VampireSaved/issues/170) | evolution | parked | Notarize the macOS release binaries so Gatekeeper stops blocking them (parked on community demand) | `docs/platform/gotchas.md § REPORTS THE SIGNING-POLICY VERDICT` | `DECISIONS_HISTORY.md § #144 CLOSED as MITIGATED` | `docs/project/release_format.md § Gatekeeper` | none | 14z-174 |
 | [#169](https://github.com/DefinitelyFrenchName/VampireSaved/issues/169) | bug | open | pyron_3 Galactic Throw: the air throw connects on only one strength, and [j.6HP]'s frozen chain is a plain j.HP | `tests/test_move_naming.sh` · `tests/expected/move_naming_pyron.txt` | none | `docs/project/gotchas.md § MOVING A RIG'S SCHEDULE MOVES EVERY EVENT'S DOUBLE-PASS PHASE` | none | 14z-172 |
 | [#167](https://github.com/DefinitelyFrenchName/VampireSaved/issues/167) | evolution | open | A freeze leaves stale PINS the re-point sweep cannot see: a gate for superseded-fingerprint references | `tests/test_phasec_spaces.sh` · `tests/test_bbh_fidelity.sh` | `STATE_HISTORY.md § THE CLOSE TIER` | `docs/project/gotchas.md § THE RE-POINT SWEEP SEES BUILD NAMES IN THIS TREE` · `HANDOFF.md § BEFORE THE TAGS: THE FREEZE-CADENCE STATIC TIER` | `docs/project/gotchas.md § THE RE-POINT SWEEP SEES BUILD NAMES IN THIS TREE` | 14z-170 |

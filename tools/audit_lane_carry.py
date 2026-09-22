@@ -10,12 +10,30 @@ them and re-running the whole tier would have cost another 6 h 24 min — and
 **the MiSTer lane alone is 13.8 h of the 19.8 h serial, 70% of the work** —
 to re-measure inputs that had not moved by a single byte.
 
-THE RULE IT ENFORCES is the one already written in `tests/ci_emulator.tsv`: a row's
+THE RULE IT LEANS ON is the one written in `tests/ci_emulator.tsv`: a row's
 `cadence` names WHAT MOVING THING THE GATE FOLLOWS. `bitstream` rows' subject is
 the CORE; `romset` rows' subject is where THIS ROMSET lands. So a lane's green
-describes the tree it ran on for exactly as long as those subjects are unchanged,
-and this tool proves that or refuses it. It is NOT a licence to skip a gate: a gate
-that never ran is not carried, and any moved subject fails the check.
+describes the tree it ran on for exactly as long as those subjects are unchanged.
+It is NOT a licence to skip a gate: a gate that never ran is not carried, and any
+moved subject fails the check.
+
+**WHAT THIS TOOL ACTUALLY DOES, said plainly because the first version of its own
+STATE entry overstated it and a rule-checker caught that (run 2026-09-22-92, Q1 and
+Q4): THE SUBJECT LISTS BELOW ARE HARDCODED.** It reads `ci_emulator.tsv` only to
+collect the lane's gate NAMES; it does NOT parse the `cadence` column, and it
+cannot discover a subject nobody wrote down here. Two known omissions, left as
+GitHub #171 rather than patched blind at a session close:
+
+  * `tests/replays` — `ci_emulator.tsv` makes a replay a load-bearing operand of a
+    mister gate ("THE ARGS ARE LOAD-BEARING"), so a moved replay is a moved subject
+    and this tool would not see it;
+  * `tests/ci_emulator.tsv` itself, which carries every row's args and timeouts.
+
+**So a MAY CARRY from this tool is necessary, not sufficient.** Until #171 widens
+the lists and adds the control that reconciles them against the registry, check the
+omitted paths by hand before relying on it — which is what was done for the M19
+release (`tests/replays` 0 changed; the one `ci_emulator.tsv` row that moved was a
+MAME-lane row), and the conclusion held.
 
 Releases are where this matters, because a release runs everything by ruling
 (`docs/project/release_format.md`), and a red found late otherwise forces a full
@@ -55,6 +73,16 @@ LANE_SUBJECTS = {
         "the romset": ["build/manifest"],
         "the replays and rigs": ["tests/replays", "tools/name_moves.py"],
     },
+}
+
+
+# What each lane's list is KNOWN to omit. Printed with every MAY CARRY so the verdict
+# cannot be read as stronger than it is; emptied as #171 folds each one into the lists.
+KNOWN_OMISSIONS = {
+    "mister": ["tests/replays (ci_emulator.tsv makes a replay a load-bearing operand of a mister gate)",
+               "tests/ci_emulator.tsv itself (it carries every row's args and timeouts)"],
+    "fbneo":  ["tests/replays", "tests/ci_emulator.tsv itself"],
+    "mame":   ["tests/ci_emulator.tsv itself"],
 }
 
 
@@ -110,9 +138,17 @@ def main():
     if moved:
         print(f"MUST RE-RUN: {len(moved)} subject path(s) of the {a.lane} lane moved since {a.since}.")
         return 1
-    print(f"MAY CARRY: every subject of the {a.lane} lane is byte-unchanged since {a.since},")
+    print(f"MAY CARRY: every LISTED subject of the {a.lane} lane is byte-unchanged since {a.since},")
     print(f"           so its green describes this tree. Re-running would re-measure the same inputs.")
     print(f"           This is not a skip: the lane RAN, at release scope, on this content.")
+    # NECESSARY, NOT SUFFICIENT — and the verdict says so out loud, because a reader of
+    # stdout does not read the docstring. The lists are hardcoded and known incomplete
+    # (GitHub #171); a MAY CARRY that hid that would be the very thing #171 is about.
+    print()
+    print(f"           CAVEAT: the subject lists are HARDCODED and known INCOMPLETE (#171).")
+    for omission in KNOWN_OMISSIONS.get(a.lane, []):
+        print(f"             not checked: {omission}")
+    print(f"           Check those by hand before relying on this verdict.")
     return 0
 
 

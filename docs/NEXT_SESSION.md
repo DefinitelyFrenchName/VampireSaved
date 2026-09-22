@@ -1,95 +1,86 @@
-# NEXT SESSION — orientation (rewritten at the 14z-174 CLOSE, 2026-09-21)
+# NEXT SESSION — orientation (rewritten at the 14z-174 CLOSE, 2026-09-22)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## M19 IS STILL FROZEN AND STILL NOT RELEASED — the tree is at `build/m3b_merged27`
+## M19 IS RELEASED. The tree is at `build/m3b_merged27`; no shipped ROM byte moved
 
-No shipped ROM byte moved at 14z-174 either. The release was RE-PACKAGED (no manifest
-and no patch moved — only the READMEs, `apply_release.py` and the new browser applier),
-so every fingerprint, expectation set and registry row still stands.
+Seven assets published on `freeze/merged-m19`, each downloaded back from GitHub and
+compared file-by-file against the tree; **merged-m18's seven are pruned**, so the README
+that told macOS players to right-click > Open is no longer downloadable. Every package
+carries `apply_release.html`, the browser applier — no Python, no terminal.
 
-**What changed is that the release's own blocker list is now empty but for #145**, and
-the maintainer has ruled that #145 does not have to block it: *"it's acceptable not to
-have all the environments available as long as we have sources, MiSTer core, and an
-easy way to produce the wide patched rom."* All three of those exist.
+**Confirmed by the maintainer, 2026-09-22, which is the part no gate could give:**
+*"I tested on MiSTer, M19 is clean and the rom made with the local webapp is good"*.
+
+The gates behind it: emulator tier at release scope **PASS 281, FAIL 0, TIMEOUT 0**, one
+approved SKIP, controls `fired 92 / declared 92`, with the MiSTer lane carried on
+`tools/audit_lane_carry.py`'s recorded evidence; static tier at release cadence **PASS
+169, SKIP 0, FAIL 0**, controls `201 / 201`.
 
 ## START HERE
 
-1. **RELEASE M19. This is the decision the maintainer has already leaned on** — *"we
-   absolutely should aim to bring M19 forward, not try to patch M18's release docs"* —
-   and it is now the largest open item. It has not been started because publishing is
-   outward-facing and wanted their go-ahead. What it costs, from the ritual
-   (`vampire-saved-port` D.4, `docs/project/release_format.md`):
-   - the **freeze-cadence static tier** with `ROMDIR` (`--cadence freeze`), then the
-     **release-cadence** one — the only runs that exercise those gates;
-   - the **emulator tier at release scope**: `--scope all --lane all --strict
-     --controls`, **measured 5 h 37 min** at `--jobs 4` on this MacBook (14z-153). Run
-     it DETACHED and poll the PID; never beside other heavy work;
-   - then `tools/upload_release_assets.sh freeze/merged-m19 --prune`, which publishes
-     the assets and deletes M18's.
-   **The live problem this fixes:** `merged-m18` is what the public can download today,
-   and its README and `BINARY.txt` still give the right-click > Open advice that 14z-173
-   measured false. Every day M19 is unreleased, that is what a new player reads.
-2. **#145 — Windows binaries "fail to load", still unreproduced, and no longer a
-   blocker.** Worth an hour before or after the release: patch 0003 drops the SDL2_image
-   link on Windows too, taking that bundle from **31 files** to a handful at the next
-   build, which may or may not be the same problem.
-3. **No Windows launcher.** `PLAY.command` is macOS/Linux; Windows players follow the
-   README by hand. The browser applier now covers step 1 on every OS, so what is left
-   for Windows is only steps 2 and 3.
-4. **#170 (new) — notarize the macOS binaries.** PARKED on community demand by the
-   maintainer's own condition; split out of #144 so closing that one did not bury it.
-5. **#161** (Phobos's +1 damage), **#169** (`pyron_3`'s Galactic Throw), and the #136
-   tickets **#157 / #159 / #163** — all untouched again, all still the maintainer's to
-   schedule.
-
-## THE ONE THING A HUMAN SHOULD DO BEFORE THE RELEASE
-
-**Open `release/merged-m19/fbneo/apply_release.html` by double-clicking it, and build a
-romset with it.** Two reasons, both named in `applier_app_scope.md` §3 rather than
-glossed: **no human has ever used the page** (only a script has driven it), and
-**WebKit/Safari is UNMEASURED** — which is the engine a double-clicked `.html` opens on
-macOS by default. Chromium is gated, Gecko was measured by hand on a capability probe.
-The page names any capability it cannot find rather than failing obscurely, but that is
-a mitigation, not a measurement.
+1. **#171 — QUALIFY EVERY GATE. This is the largest open item and the maintainer opened
+   it from evidence, not suspicion.** The M19 release tier came back with **eight reds,
+   none of them a defect in the romset**, in four distinct shapes: five gates that had
+   asserted nothing for four days (a deleted constant, caller never updated); three
+   expectations stale behind rigs that legitimately moved; a control killed by its own
+   timeout on every run; and a column that read the rig's own poke back. The maintainer:
+   *"either the gates are moving silently or they never were validated and in both cases
+   that's a lot of both uncertainty and wasted time"*. The common factor is that **the
+   emulator tier only runs at a freeze or a release**, so breakage accumulates and
+   surfaces at the worst moment. Two tools exist to build on: `tools/audit_lane_carry.py`
+   and `tools/attribute_expectation.sh`.
+2. **#172 — the agent-level architecture**, raised from this sitting's own worst failure:
+   polling was chosen as the right strategy, stated, and then not done, leaving three
+   finished jobs idle for 2.5 h, 1.5 h and 1.5 h. The maintainer's shape — a Fable
+   orchestrator that cannot override Opus/Sonnet checkers which hold the rules and no
+   project context, with narrowly-specified workers — is quoted verbatim on the issue,
+   along with what `tools/rulecheck.py` already proves about that pattern and the gap it
+   does NOT cover: nothing currently asks whether the ORCHESTRATOR followed its own
+   procedure.
+3. **#145 Windows binaries** — "fails to load", still unreproduced, no longer a blocker.
+   Patch 0003 drops SDL2_image there too, so the next Windows build shrinks that bundle
+   from 31 files for free; whether that is the same problem is unknown.
+4. **No Windows launcher.** `PLAY.command` is macOS/Linux. The browser applier now covers
+   step 1 on every OS, so what is left for Windows is steps 2 and 3 only.
+5. **#170** (notarize macOS, PARKED on community demand), **#161**, **#169**, and the #136
+   tickets **#157 / #159 / #163** — all untouched, all the maintainer's to schedule.
 
 ## TRAPS PAID THIS SITTING (14z-174)
 
-1. **Measure the platform BEFORE designing for it.** The scope document's central
-   assumption — that the page could read the `manifest.json` and `patches/` beside it —
-   is false in every browser: `fetch`, XHR and cross-file `import` are all refused from
-   `file://`. A 20-minute probe before any code was written is why that cost nothing.
-2. **One buffer is not a corpus.** `CompressionStream` and Python's zlib produced a
-   byte-identical deflate stream on one 200 KB fixture, which would have supported a
-   whole-zip byte-identity claim. On the **32 real members they disagree on all 32**.
-   The fixture agreed by being one chunk; streaming flush boundaries are the mechanism.
-3. **A control that does not fire is a bug report about the control.** `no-member-check`
-   was DEAD on its first run: removing the rebuilt-member check does not let a corrupted
-   patch through, because VCDIFF's own adler32 catches it first. Re-aim the control at
-   the perturbation only that check can see (here, a tampered manifest) — do not widen
-   the gate until the control passes.
-4. **A strict checker with no exemptions is worth adapting the code for.** The
-   generator's self-containment scan refused two of my own pages — a comment using the
-   literal token, and a `href="${url}"` in a template literal. Both were fixed rather
-   than exempted: an exemption is exactly where a real network call would hide.
-5. **A guarantee the browser enforces beats a list you maintain — and it will break
-   your harness, which is the point.** "No network primitive" was a denylist of seven
-   names with one control, and the page itself carried a URL assignment the scan could
-   not see. The fix was a Content-Security-Policy, not a longer list. It immediately
-   killed the browser gate's driver (which lived inside the document and could no longer
-   fetch), and the right response was to move the driver OUT into a page that iframes the
-   shipped file — never to weaken the policy so the test could pass.
-6. **Headless Chrome's `--virtual-time-budget` is spent by `setTimeout`.** A polling
-   loop exhausts the budget and the DOM dumps mid-run; use `MutationObserver`. And do
-   not `fetch` a `blob:` URL in a driver — the pending fetch truncates the dump.
-
-7. **An iframe's `contentDocument` is `about:blank` until the real navigation lands —
-   and that placeholder already reports `readyState === "complete"`.** Resolving on it
-   observes a document the browser is about to discard, and every later wait hangs
-   forever. Wait for the `load` event, or check the frame's own URL.
+1. **A STRATEGY YOU STATE AND DO NOT EXECUTE IS WORSE THAN NONE**, because it reads as
+   handled. Polling long background jobs is the right approach here and is written down
+   (`poll-long-jobs-directly`); it was chosen out loud and then not done, three times,
+   for ~5.5 h of wall clock during a release. The maintainer's diagnosis is the one to
+   keep: *"Polling is likely the good option. The problem is actually doing it."* #172.
+2. **Measure the platform BEFORE designing for it.** The applier plan's central
+   assumption — the page could read the manifest and patches beside it — is false in
+   every browser. A 20-minute probe before any code cost nothing; discovering it later
+   would have cost the design.
+3. **One buffer is not a corpus.** `CompressionStream` matched Python's zlib byte for
+   byte on one 200 KB fixture and disagreed on all 32 real members. The fixture agreed
+   by being a single chunk.
+4. **A control that does not fire is a bug report about the control, not the code.**
+   `no-member-check` was dead on its first run: VCDIFF's own adler32 catches a corrupted
+   patch first. Re-aim the control at the perturbation only that check can see.
+5. **PAIR THE ROWS BEFORE READING A DIFF.** A unified diff invites comparing a removed
+   line against the wrong added line: that is how "damage moved" was reported to the
+   maintainer when only a meter count had. Pair them and name which FIELDS moved.
+6. **An estimate borrowed from a different workload is a guess wearing a number.** "~2 h"
+   for the non-MiSTer tier came from dividing its serial time by the speedup the FULL run
+   achieved — but that speedup came from four long MiSTer jobs running side by side. It
+   took 6 h. Say "I don't know how well this parallelises".
+7. **`sh -n` before running a new `#!/bin/sh` script**, and no process substitution in
+   one — `<(...)` is a syntax error there, and a script that does not parse never runs
+   at all, which looks exactly like a script that ran and did nothing.
+8. **An iframe's `contentDocument` is `about:blank` until the real navigation lands**,
+   and that placeholder already reports `readyState === "complete"`.
+9. **`git checkout <commit> -- path` STAGES the old version**, and `git checkout HEAD --`
+   destroys uncommitted work in that path. Both bit this sitting; `tools/attribute_expectation.sh`
+   exists partly to make the safe form the easy one.
 
 **IF A DOC IS TOUCHED:** the doc gates (`test_checkdocs`, `test_docshape`,
 `test_doc_anchor_census`, `test_checkskills`, `test_gotchas_index_current`,
