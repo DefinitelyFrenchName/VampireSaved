@@ -1,93 +1,67 @@
-# NEXT SESSION — orientation (rewritten at the 14z-174 CLOSE, 2026-09-22)
+# NEXT SESSION — orientation (rewritten at the 14z-175 CLOSE, 2026-09-23)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## M19 IS RELEASED. The tree is at `build/m3b_merged27`; no shipped ROM byte moved
+## THIS SESSION RUNS UNDER A HOOK. A Bash call that detaches a job is REFUSED
 
-Seven assets published on `freeze/merged-m19`, each downloaded back from GitHub and
-compared file-by-file against the tree; **merged-m18's seven are pruned**, so the README
-that told macOS players to right-click > Open is no longer downloadable. Every package
-carries `apply_release.html`, the browser applier — no Python, no terminal.
+`.claude/settings.json` (tracked) runs `tools/agent/hooks/pre_bash.py` before every Bash
+call. `nohup`, `setsid`, `disown`, a backgrounding `&` with no later `wait`, or a loop on
+`pgrep` is **denied with a reason** — relaunch the job with the Bash tool's
+`run_in_background: true` in the FOREGROUND form (no nohup, no trailing `&`); the harness
+tracks it and its completion wakes you. That is the point: 14z-174 lost hours to twelve
+`nohup` launches no notification could ever report (`docs/project/agent_architecture_scope.md`).
+**The settings, `tools/agent/hooks/**` and `tools/agent/agentlib.py` are edit-locked**
+(`permissions.deny`): only the maintainer changes the enforcement. A write through Bash
+is not blocked by the lock — do not use that gap; propose the change as a file under
+`build/` with its proof, and ask (14z-175 did exactly that for the classifier fix).
 
-**Confirmed by the maintainer, 2026-09-22, which is the part no gate could give:**
-*"I tested on MiSTer, M19 is clean and the rom made with the local webapp is good"*.
-
-The gates behind it: emulator tier at release scope **PASS 281, FAIL 0, TIMEOUT 0**, one
-approved SKIP, controls `fired 92 / declared 92`, with the MiSTer lane carried on
-`tools/audit_lane_carry.py`'s recorded evidence; static tier at release cadence **PASS
-169, SKIP 0, FAIL 0**, controls `201 / 201`.
+The tree is still at `build/m3b_merged27` (merged-m19, released); no ROM byte moved.
 
 ## START HERE
 
-1. **#171 — QUALIFY EVERY GATE. This is the largest open item and the maintainer opened
-   it from evidence, not suspicion.** The M19 release tier came back with **eight reds,
-   none of them a defect in the romset**, in four distinct shapes: five gates that had
-   asserted nothing for four days (a deleted constant, caller never updated); three
-   expectations stale behind rigs that legitimately moved; a control killed by its own
-   timeout on every run; and a column that read the rig's own poke back. The maintainer:
-   *"either the gates are moving silently or they never were validated and in both cases
-   that's a lot of both uncertainty and wasted time"*. The common factor is that **the
-   emulator tier only runs at a freeze or a release**, so breakage accumulates and
-   surfaces at the worst moment. Two tools exist to build on —
-   `tools/audit_lane_carry.py` and `tools/attribute_expectation.sh` — and **the first is
-   itself a case this ticket must fix: its subject lists are HARDCODED and known
-   INCOMPLETE** (it omits `tests/replays`, a load-bearing operand of a mister gate, and
-   `ci_emulator.tsv` itself; nothing reconciles the lists against the registry).
-   Widening the lists and building the control that reconciles them against the
-   registry is part of #171. **Until then a `MAY CARRY` from it is NECESSARY, NOT
-   SUFFICIENT** — check the omitted paths by hand, as the M19 release did. It prints its
-   own unchecked paths with every verdict.
-2. **#172 — the agent-level architecture**, raised from this sitting's own worst failure:
-   polling was chosen as the right strategy, stated, and then not done, leaving three
-   finished jobs idle for 2.5 h, 1.5 h and 1.5 h. The maintainer's shape — a Fable
-   orchestrator that cannot override Opus/Sonnet checkers which hold the rules and no
-   project context, with narrowly-specified workers — is quoted verbatim on the issue,
-   along with what `tools/rulecheck.py` already proves about that pattern and the gap it
-   does NOT cover: nothing currently asks whether the ORCHESTRATOR followed its own
-   procedure.
-3. **#145 Windows binaries** — "fails to load", still unreproduced, no longer a blocker.
-   Patch 0003 drops SDL2_image there too, so the next Windows build shrinks that bundle
-   from 31 files for free; whether that is the same problem is unknown.
-4. **No Windows launcher.** `PLAY.command` is macOS/Linux. The browser applier now covers
-   step 1 on every OS, so what is left for Windows is steps 2 and 3 only.
-5. **#170** (notarize macOS, PARKED on community demand), **#161**, **#169**, and the #136
-   tickets **#157 / #159 / #163** — all untouched, all the maintainer's to schedule.
+1. **#172 — FINISH IT (the maintainer: *"best finish #172 first"*).** Ruled: *"S1 alone
+   first"* — this sitting is the FIRST that runs under S1 from its first command, so
+   measure it as you go: `python3 tools/agent/transcript_gaps.py --refusals <session>`
+   lists every C0.1 refusal (a false positive is a finding: add it to
+   `tests/agent/c01_commands.jsonl` as must-allow, fix through the maintainer),
+   `--tasks <session>` every tracked job. Then, in the scope doc's order (§5):
+   **S2** the close-time process sweep (C0.3 — the 35-hour Chrome and the 17-day
+   `tail -F` are its ground truth), **S3** the procedural model checker C1 (its
+   checklist now carries C0.2's two questions — said-vs-done and every job accounted
+   for; fixtures from the 14z-174 transcript; calibrated like `rulecheck`; bound to
+   `git push` by a hook — ruled *"Every push + every close"*), **S4** worker
+   definitions, **S5** the orchestrator (Fable 5.1 at `high` per the ticket — reachable,
+   `probe_hooks.sh` P5). **Every change to a locked file is the maintainer's to apply.**
+   Rulings: `DECISIONS_HISTORY.md` "Ruled 2026-09-23 (14z-175)" (two entries).
+2. **#171 — qualify every gate.** Unchanged from 14z-174: `tools/audit_lane_carry.py`'s
+   subject lists are hardcoded and known incomplete, so a `MAY CARRY` from it is
+   NECESSARY, NOT SUFFICIENT; widening them and the control that reconciles them
+   against the registry is part of the ticket.
+3. **#145 Windows binaries**, **no Windows launcher**, **#170**, **#161**, **#169**,
+   **#157 / #159 / #163** — unchanged, the maintainer's to schedule.
 
-## TRAPS PAID THIS SITTING (14z-174)
+## TRAPS PAID THIS SITTING (14z-175)
 
-1. **A STRATEGY YOU STATE AND DO NOT EXECUTE IS WORSE THAN NONE**, because it reads as
-   handled. Polling long background jobs is the right approach here and is written down
-   (`poll-long-jobs-directly`); it was chosen out loud and then not done, three times,
-   for ~5.5 h of wall clock during a release. The maintainer's diagnosis is the one to
-   keep: *"Polling is likely the good option. The problem is actually doing it."* #172.
-2. **Measure the platform BEFORE designing for it.** The applier plan's central
-   assumption — the page could read the manifest and patches beside it — is false in
-   every browser. A 20-minute probe before any code cost nothing; discovering it later
-   would have cost the design.
-3. **One buffer is not a corpus.** `CompressionStream` matched Python's zlib byte for
-   byte on one 200 KB fixture and disagreed on all 32 real members. The fixture agreed
-   by being a single chunk.
-4. **A control that does not fire is a bug report about the control, not the code.**
-   `no-member-check` was dead on its first run: VCDIFF's own adler32 catches a corrupted
-   patch first. Re-aim the control at the perturbation only that check can see.
-5. **PAIR THE ROWS BEFORE READING A DIFF.** A unified diff invites comparing a removed
-   line against the wrong added line: that is how "damage moved" was reported to the
-   maintainer when only a meter count had. Pair them and name which FIELDS moved.
-6. **An estimate borrowed from a different workload is a guess wearing a number.** "~2 h"
-   for the non-MiSTer tier came from dividing its serial time by the speedup the FULL run
-   achieved — but that speedup came from four long MiSTer jobs running side by side. It
-   took 6 h. Say "I don't know how well this parallelises".
-7. **`sh -n` before running a new `#!/bin/sh` script**, and no process substitution in
-   one — `<(...)` is a syntax error there, and a script that does not parse never runs
-   at all, which looks exactly like a script that ran and did nothing.
-8. **An iframe's `contentDocument` is `about:blank` until the real navigation lands**,
-   and that placeholder already reports `readyState === "complete"`.
-9. **`git checkout <commit> -- path` STAGES the old version**, and `git checkout HEAD --`
-   destroys uncommitted work in that path. Both bit this sitting; `tools/attribute_expectation.sh`
-   exists partly to make the safe form the easy one.
+1. **A pattern classifier over shell text needs a must-stay-quiet corpus cut from REAL
+   commands.** Three census cuts in one sitting, each wrong in a way its output hid
+   (`&&`, heredoc bodies, multi-line quotes, `& … wait`); the real-data diff over 4,624
+   commands found what thinking did not (`docs/project/gotchas.md`).
+2. **A stripper that fails by removing too much hides exactly what the classifier looks
+   for.** The heredoc stripper swallowed every line after an unterminated `<<` — a
+   `nohup` below `<<<word` passed, and a quoted program lost its closing quote so a
+   quoted `&` was refused. Fail toward keeping text.
+3. **Never grep a transcript** — it embeds the system prompt, which names the markers.
+   Parse records by type; a completion notification has TWO forms (a user message when
+   idle, a `queued_command` attachment mid-turn).
+4. **The rule-checker was right four runs out of four about my own figures** (97-100):
+   counters, an unmeasured "short", a probe that proved the report and not the effect,
+   and a live defect. Promoting inline counts into tools found a fifth (a wrong split in
+   my own commit message, corrected in STATE 14z-175 row (8)).
+5. **A recipe's boundary marker goes stale; the assertion does not.** STATE has no `---`
+   above `# STANDING SECTIONS` any more — the rollover slice ends at that heading.
 
 **IF A DOC IS TOUCHED:** the doc gates (`test_checkdocs`, `test_docshape`,
 `test_doc_anchor_census`, `test_checkskills`, `test_gotchas_index_current`,

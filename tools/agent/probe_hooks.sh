@@ -8,6 +8,8 @@
 #       P1c, its must-fire leg: the same prompt with the deny switched off DOES create it
 #   P2  a Stop hook BLOCKS the end of a turn once, and `stop_hook_active` releases it
 #   P4  the must-stay-quiet control: the P1/P2 counts read zero on the P3 run
+#   P6  the embedding itself: a bare grep finds the notification tag in a transcript
+#       that received no notification (the system-prompt snapshot)
 #   P3  a run_in_background launch is recorded in the transcript with its task id
 #       and output path — and a HEADLESS run ends with the task still running
 #
@@ -125,6 +127,14 @@ for m in ${PROBE_MODELS:-}; do
     *) echo "FAIL P5: $m -> ${got:-no answer} $(head -c 160 "model_$m.err")"; fail=1;;
   esac
 done
+
+# P6: the EMBEDDING itself — a bare grep for the notification tag MATCHES the P3
+# transcript, which received no notification (P3b): the system-prompt snapshot names it.
+# This is the trap P4's record counters exist to avoid; P6 shows the trap is real.
+g=$(grep -c 'task-notification' "$T" 2>/dev/null || true)
+if [ "${g:-0}" -ge 1 ] && [ "$(count_rec "$T" user-str '<task-notification>')" = 0 ]
+then echo "PASS P6: a bare grep finds 'task-notification' on $g transcript line(s) of a run that received none (the embedded prompt)"
+else echo "FAIL P6: bare-grep lines $g — the transcript no longer embeds the prompt's mention, so P4's reason to exist has changed"; fail=1; fi
 
 echo "scratch: $S"
 exit $fail

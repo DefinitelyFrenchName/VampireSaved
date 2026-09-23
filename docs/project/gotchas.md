@@ -5536,3 +5536,56 @@ sentence of the maintainer's. It was withdrawn from the packet and belongs in th
 close's recommendation, with the words quoted there. A packet that mixes "these
 files do what I say" with "therefore we should ship" gets the second one judged by
 the evidence assembled for the first.
+
+## A SESSION TRANSCRIPT EMBEDS THE SYSTEM PROMPT, AND A TASK'S COMPLETION IS RECORDED IN TWO FORMS — parse records by type, never grep (paid: 14z-175, GitHub #172)
+
+Two traps in the same instrument, both paid for while measuring the #172 agent hooks
+(`tools/agent/agentlib.py`, `docs/project/agent_architecture_scope.md` §2).
+
+**A grep over a transcript matches the system prompt.** Each `.jsonl` carries a
+prompt snapshot, and the prompt names the markers you are looking for. A probe that
+asserted "no `task-notification` in the transcript" FAILED on a run that had received
+none; it had matched the prompt. Every assertion in `tools/agent/probe_hooks.sh` now
+counts `user` / `tool_result` RECORDS by type, and its P4 control requires those counts
+to read zero on a run with no event, so a counter that matched anything would fail.
+
+**A completion notification has two shapes.** When the agent is idle it arrives as a
+`user` message whose content starts `<task-notification>`; when it arrives mid-turn it
+is a `queued_command` ATTACHMENT (with `queue-operation` records). Reading only the
+first form reported three of 14z-174's five tracked tasks as never notified; all five
+were (rule-checker run `2026-09-23-98`). `agentlib.notifications()` reads both, and
+`transcript_gaps.py --selftest` has a case for each.
+
+## A `&` IN A COMMAND IS NOT A DETACH UNTIL YOU HAVE RULED OUT FIVE LOOK-ALIKES (paid: 14z-175, GitHub #172)
+
+A census of "detached launches" went through three classifiers in one sitting, and
+each earlier one was wrong in a way a quick read of its output would not show:
+`&\s*$|&\s*echo` counted the second `&` of `cmd && echo …` (85 of 14z-174's 97
+"detached" were `&&` chains — caught by rule-checker run `2026-09-23-97`, Q4); the
+next still counted a `&` inside a heredoc BODY (a script being written, not run),
+inside a multi-line quoted string (`node -e "… & 0xff …"`, bitwise), and before a later
+`wait` (a foreground parallel run). And the fix for heredocs first broke itself:
+blanking quoted strings BEFORE finding the heredoc tag erased a quoted tag (`<<'EOF'`),
+so no body was skipped at all. The one classifier is now `agentlib.detach_reason`, and
+it was validated on real data before any hook used it —
+`transcript_gaps.py --classifier-audit` runs it over every Bash command of the archived
+sessions and exits non-zero on any command only it flags or any clearance it cannot
+explain.
+
+**Transferable:** a pattern classifier over shell text needs a must-stay-quiet corpus
+cut from REAL commands, not a list of the cases you thought of. Four of the five
+look-alikes above were found by the real-data diff, not by thinking.
+
+**And the stripper itself over-matched, found by the close's rule-checker (run
+`2026-09-23-100`, Q3/Q4) and then MEASURED LIVE the same hour.** The heredoc pattern
+also read `<<<word` (a here-string) and `1<<3` (a shift) as operators, and an operator
+with no terminator line swallowed every line after it. Both directions of harm were
+real: a `nohup` below a here-string passed the hook (false negative, fixture rows), and a
+`<<'EOF'` inside a quoted `python3 -c` program swallowed the line closing the quote, so
+the quote came un-closed and a quoted `&` was REFUSED (false positive — it refused one of
+this sitting's own commands; `transcript_gaps.py --refusals`). The fix strips only a
+TERMINATED heredoc whose tag starts with a letter and touches no third `<`, and changes no
+verdict on the 4,624 archived commands. **Transferable: a stripper that fails by
+removing too much hides exactly what the classifier exists to find — make it fail toward
+keeping text.** The `greedy-heredoc` control in `tests/test_agent_hooks.sh` restores the
+over-strip on a copy and must turn the gate red.

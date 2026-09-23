@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-407 entries (46 game / 112 platform / 249 project), counted from the buckets at generation.
+409 entries (46 game / 112 platform / 251 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 46 entries
 
@@ -186,7 +186,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A PAGE OPENED FROM `file://` CANNOT READ ANY FILE BESIDE IT — not by fetch, not by XHR, not by `import` (measured 2026-09-21, 14z-174, before the applier page was designed)
 - `CompressionStream("deflate-raw")` IS NOT BYTE-COMPARABLE TO `zlib.compressobj`, EVEN AT THE SAME LEVEL — and the two browser engines differ from each other (measured 2026-09-21, 14z-174)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 249 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 251 entries
 
 - A CHAIN ID IN A NAMING EXPECTATION IS IDENTIFIED FROM THE SLOT TABLE, NEVER DESCRIBED IN PROSE (paid: 14z-171, caught 14z-172, GitHub #168)
 - MOVING A RIG'S SCHEDULE MOVES EVERY EVENT'S DOUBLE-PASS PHASE — a shift is a MEASURED QUANTITY, not a spacing choice (paid: 14z-171 to 14z-172, GitHub #168)
@@ -437,3 +437,5 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - THE RE-POINT SWEEP SEES BUILD NAMES IN THIS TREE — A PINNED FINGERPRINT AND THE HARNESS'S DEFAULTS ARE OUTSIDE IT (paid: 14z-170)
 - A DOCUMENT WRITTEN BY THE EXPERT READS AS COMPLETE TO THE EXPERT — the tell is FIRST USE against FIRST NEED, and you will write a fresh instance of the bug while fixing it (paid: 14z-173/14z-174, GitHub #146)
 - WHEN A RULE-CHECKER PACKET ATTRIBUTES A DECISION, THE DECISION RECORD IS AN ARTIFACT — otherwise Q5 is VIOLATED and it is right to be (paid: 14z-174, run 2026-09-21-90)
+- A SESSION TRANSCRIPT EMBEDS THE SYSTEM PROMPT, AND A TASK'S COMPLETION IS RECORDED IN TWO FORMS — parse records by type, never grep (paid: 14z-175, GitHub #172)
+- A `&` IN A COMMAND IS NOT A DETACH UNTIL YOU HAVE RULED OUT FIVE LOOK-ALIKES (paid: 14z-175, GitHub #172)

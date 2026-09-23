@@ -1,0 +1,18 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+STATE.md.lines-63-78 (lines 63-78 of STATE.md)	8f25260750717250afc1828c5d2c1eca24aed690
+DECISIONS_HISTORY.md.lines-30-87 (lines 30-87 of DECISIONS_HISTORY.md)	bea0ea833efbf8c0d99ada7544c2dfa74498c6cd
+docs/project/agent_architecture_scope.md	9b85885f2ad5d5810238c486da4117016c6ce4e0
+docs/project/gotchas.md.lines-5540-5577 (lines 5540-5577 of docs/project/gotchas.md)	49f03b7992c4a5f0a9fd71ec6e86b4cb36791ea4
+tools/agent/transcript_gaps.py	ffc5f81b57e23f3311b2b083364a664bf60cd34b
+tools/agent/probe_hooks.sh	44e3fd23a18cd8ebb4379bd43aefc13ffa7b58b0
+tools/agent/agentlib.py	0966949efbef68758a21b872a11f05cebcab7dcd
+tools/agent/hooks/pre_bash.py	95e421bba566cf8d3d724f917f6b0542ebf3ce5a
+tests/test_agent_hooks.sh	6d7be7a1ce51bccd0e9580a1abeee815dda5f85e
+.claude/settings.json	00db7a9a35892c8172151030086e77a51cc3d23c
+build/agent172/close_census.txt	7caa5c070810a40ffb32a42284792ee050b92f50
+build/agent172/close_classifier_audit.txt	0722ca8afc2e46b3ee67a9f263b3aee826e2a57b
+build/agent172/close_c02.txt	1360a4fb290bc9535cec90a19cb81e72ce1964b3
+build/agent172/tracked_14z174.txt	aca79478131b081750a4c071500b62b114f0f89c
+build/agent172/detached_14z174.txt	79fcdb52b7cf218a71d405e95576e46ee149cd89
+build/agent172/close_probe_run.txt	1398f0f436cb0d232709351f3b83836840a77944
+build/agent172/close_test_agent_hooks.log	28bc5b8ec2bd3d9ea4300f157612490e8c6dc332

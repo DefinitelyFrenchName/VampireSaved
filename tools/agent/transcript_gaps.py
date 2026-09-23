@@ -30,6 +30,17 @@ Usage:
                  background to its completion notification, in EITHER form: a user message
                  (the agent idle) or a `queued_command` attachment (it arrived mid-turn) —
                  parsing only the first form reports finished tasks as never notified
+  --detached P   every DETACHED launch of that session (record index, description, the
+                 matching span) — the itemised list the scope doc's §1 reads one by one
+  --refusals P   every refusal of that session: a C0.1 hook denial (with the command it
+                 refused) and a permission-rule denial of an edit (the C0.4 lock)
+  --classifier-audit  every non-background Bash command of the selected sessions through
+                 the shared classifier AND the census's previous pattern; prints the four agreement
+                 counts and, for every command the classifier clears that the first cut
+                 flagged, the reason it clears (the S1 validation, scope doc §4)
+  --c02          the two deterministic C0.2 candidates over the selected sessions: tracked
+                 tasks finished and never read after, and turn ends that promise a wait
+                 while no tracked task runs (why C0.2 moved to C1, scope doc §4)
   --selftest     classify a synthetic transcript with known answers and exit
 
 Reads only; writes nothing. Stdlib only (no numpy on this Mac).
@@ -126,6 +137,85 @@ def tasks(path):
             for t in agentlib.tasks(path)]
 
 
+# the census's PREVIOUS pattern (written after rule-checker run 2026-09-23-97, replaced
+# by agentlib when S1 began), kept only so --classifier-audit reproduces the comparison
+# the scope doc quotes (never used to count anything)
+FIRST_CUT = re.compile(r"\bnohup\b|\bsetsid\b|\bdisown\b"
+                       r"|(?<![&>|])&(?![&>\d])\s*($|\n|;|\)|echo|wait|sleep|pid=|PID=|P\d?=|\w+=\$!)", re.M)
+PROMISE = re.compile(r"\b(I'?ll|I will|will)\s+(poll|check back|report (back|when|once)|come back|"
+                     r"keep (an eye|polling|watching)|let you know|update you|wait for|be notified|"
+                     r"get a notification|notify)|\b(when|once) it (lands|finishes|completes|is done)|"
+                     r"\bstill running\b|\bin the background\b", re.I)
+
+
+def classifier_audit(files):
+    import collections
+    tot, why = collections.Counter(), collections.Counter()
+    for f in files:
+        for _, r in agentlib.records(f):
+            c = agentlib._content(r)
+            if not isinstance(c, list):
+                continue
+            for b in c:
+                if b.get("type") != "tool_use" or b.get("name") != "Bash":
+                    continue
+                inp = b.get("input") or {}
+                if inp.get("run_in_background"):
+                    continue
+                cmd = str(inp.get("command", ""))
+                old, new = bool(FIRST_CUT.search(cmd)), bool(agentlib.detach_reason(cmd))
+                tot[("first" if old else "-") + "/" + ("shared" if new else "-")] += 1
+                if old and not new:
+                    body = agentlib._QUOTED.sub("''", agentlib.strip_heredocs(cmd))
+                    if not FIRST_CUT.search(agentlib.strip_heredocs(cmd)):
+                        why["inside a heredoc body"] += 1
+                    elif not FIRST_CUT.search(body):
+                        why["inside a quoted string"] += 1
+                    elif agentlib._WAIT.search(body):
+                        why["& ... wait (foreground parallel)"] += 1
+                    elif "&&" in cmd:
+                        why["&& chain"] += 1
+                    else:
+                        why["UNEXPLAINED"] += 1
+    print(f"commands {sum(tot.values())}: both flag {tot['first/shared']}, neither {tot['-/-']}, "
+          f"shared-only {tot['-/shared']}, previous-only {tot['first/-']}")
+    for k, v in why.most_common():
+        print(f"  previous-only, cleared because {k}: {v}")
+    return 1 if tot["-/shared"] or why["UNEXPLAINED"] else 0
+
+
+def c02(files):
+    for f in files:
+        recs = list(agentlib.records(f))
+        ts = agentlib.tasks(f)
+        unread = [t for t in ts if t["end_n"] is not None and not t["read_after"]]
+        ends = []
+        for i, (n, r) in enumerate(recs):
+            c = agentlib._content(r)
+            if r.get("type") != "assistant" or not isinstance(c, list):
+                continue
+            if any(b.get("type") == "tool_use" for b in c) or not any(b.get("type") == "text" for b in c):
+                continue
+            nxt = next((q for _, q in recs[i + 1:] if q.get("type") in ("user", "assistant")), None)
+            if nxt and nxt.get("type") == "user":
+                ends.append((n, " ".join(b["text"] for b in c if b.get("type") == "text")))
+        prom = [(n, t) for n, t in ends if PROMISE.search(t)]
+        bare = [n for n, _ in prom
+                if not [t for t in ts if t["start_n"] < n and (t["end_n"] is None or t["end_n"] > n)]]
+        longest = max(((agentlib_minutes(t)), t["id"]) for t in ts) if ts else (0, "-")
+        print(f"{os.path.basename(f)[:8]}  tracked {len(ts):3}  finished-unread {len(unread):3}  "
+              f"promise-ends {len(prom):3}  promise-with-nothing-tracked {len(bare):3}  "
+              f"longest task {longest[0]:.0f} min ({longest[1]})")
+    return 0
+
+
+def agentlib_minutes(t):
+    if not t["ended"]:
+        return 0.0
+    iso = lambda x: datetime.datetime.fromisoformat(x.replace("Z", "+00:00"))
+    return (iso(t["ended"]) - iso(t["started"])).total_seconds() / 60
+
+
 def selftest():
     t0 = datetime.datetime(2026, 9, 21, 8, 0, tzinfo=datetime.timezone.utc)
 
@@ -173,10 +263,21 @@ def selftest():
     tk = {t: form for t, _, _, form, _ in tasks(f.name + ".t")}
     os.unlink(f.name + ".t")
     tasks_ok = tk == {"b1": "idle", "b2": "NONE", "b3": "mid-turn"}
+    # the audit's must-fire plant: `a & b` is a detach the PREVIOUS pattern cannot see,
+    # so an audit over it must exit non-zero; a clean `&&` alone must exit zero
+    import contextlib, io
+    audit_ok = True
+    for cmd, want in (("a & b", 1), ("a && b", 0)):
+        with open(f.name + ".a", "w") as g:
+            g.write(json.dumps(rec(0, "assistant", [{"type": "tool_use", "name": "Bash", "input": {"command": cmd}}])) + "\n")
+        with contextlib.redirect_stdout(io.StringIO()):
+            rc = classifier_audit([f.name + ".a"])
+        os.unlink(f.name + ".a")
+        audit_ok = audit_ok and rc == want
     got = [(round(g), c) for g, c, _, _ in gaps(recs, 20)]
     want = [(60, "status"), (30, "notif"), (30, "other"), (30, "other")]
-    ok = got == want and (det, trk) == (2, 2) and tasks_ok
-    print(f"selftest: gaps {got} detached {det} tracked {trk} tasks {tk} -> {'PASS' if ok else 'FAIL'}")
+    ok = got == want and (det, trk) == (2, 2) and tasks_ok and audit_ok
+    print(f"selftest: gaps {got} detached {det} tracked {trk} tasks {tk} audit-plant {'fires' if audit_ok else 'DEAD'} -> {'PASS' if ok else 'FAIL'}")
     return 0 if ok else 1
 
 
@@ -188,6 +289,10 @@ def main():
     ap.add_argument("--gap", type=float, default=20)
     ap.add_argument("--detail", default=None)
     ap.add_argument("--tasks", default=None)
+    ap.add_argument("--classifier-audit", action="store_true")
+    ap.add_argument("--c02", action="store_true")
+    ap.add_argument("--detached", default=None)
+    ap.add_argument("--refusals", default=None)
     ap.add_argument("--selftest", action="store_true")
     a = ap.parse_args()
     if a.selftest:
@@ -197,6 +302,47 @@ def main():
     if not files:
         print(f"no transcripts under {d}", file=sys.stderr)
         return 2
+    if a.refusals:
+        hit = [f for f in files if os.path.basename(f).startswith(a.refusals)]
+        if len(hit) != 1:
+            print(f"--refusals {a.refusals}: {len(hit)} matches", file=sys.stderr)
+            return 2
+        calls = {}
+        for n, r in agentlib.records(hit[0]):
+            c = agentlib._content(r)
+            if not isinstance(c, list):
+                continue
+            for b in c:
+                if b.get("type") == "tool_use":
+                    calls[b.get("id")] = (b.get("name"), b.get("input") or {})
+                elif b.get("type") == "tool_result":
+                    body = json.dumps(b.get("content"))
+                    name, inp = calls.get(b.get("tool_use_id"), ("?", {}))
+                    what = " ".join(str(inp.get("command") or inp.get("file_path") or "").split())[:110]
+                    if "hook error: C0.1" in body:
+                        print(f"{str(r.get('timestamp'))[:16]}Z  #{n}  C0.1 DENIED {name}: {what}")
+                    elif "denied by your permission settings" in body:
+                        print(f"{str(r.get('timestamp'))[:16]}Z  #{n}  EDIT-LOCK REFUSED {name}: {what}")
+        return 0
+    if a.detached:
+        hit = [f for f in files if os.path.basename(f).startswith(a.detached)]
+        if len(hit) != 1:
+            print(f"--detached {a.detached}: {len(hit)} matches", file=sys.stderr)
+            return 2
+        for n, r in agentlib.records(hit[0]):
+            c = agentlib._content(r)
+            if not isinstance(c, list):
+                continue
+            for b in c:
+                if b.get("type") == "tool_use" and b.get("name") == "Bash":
+                    inp = b.get("input") or {}
+                    cmd = str(inp.get("command", ""))
+                    if not inp.get("run_in_background") and agentlib.detach_reason(cmd):
+                        m = (re.search(r"\b(nohup|setsid|disown)\b.{0,70}", cmd, re.S)
+                             or re.search(r".{0,50}&", cmd, re.S))
+                        span = " ".join((m.group(0) if m else cmd[:70]).split())
+                        print(f"{str(r.get('timestamp'))[:16]}Z  #{n}  {inp.get('description', '')[:55]:55} | {span}")
+        return 0
     if a.tasks:
         hit = [f for f in files if os.path.basename(f).startswith(a.tasks)]
         if len(hit) != 1:
@@ -218,6 +364,10 @@ def main():
         return 0
     sel = files[:len(files) - a.skip_newest] if a.skip_newest else files
     sel = sel[-a.last:]
+    if a.classifier_audit:
+        return classifier_audit(sel)
+    if a.c02:
+        return c02(sel)
     print(f"transcripts: {d}  (gap >= {a.gap:g} min; newest {a.skip_newest} skipped)")
     print(f"{'session':10} {'start (UTC)':16} {'gaps':>5} {'status':>6} {'notif':>5} {'other':>5} "
           f"{'status-min':>10} {'detached':>8} {'tracked':>7}")

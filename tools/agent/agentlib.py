@@ -3,10 +3,11 @@
 
 Everything here reads either a Bash command string or a Claude Code session transcript
 (`~/.claude/projects/<project>/<session>.jsonl`). Stdlib only. Used by
-`tools/agent/hooks/pre_bash.py` (C0.1), `tools/agent/hooks/stop_check.py` (C0.2) and
-`tools/agent/transcript_gaps.py` (the census), so the hooks and the measurement that
-justified them can never disagree about what a detached launch or a finished task is
-(`docs/project/agent_architecture_scope.md`).
+`tools/agent/hooks/pre_bash.py` (C0.1) and `tools/agent/transcript_gaps.py` (the census),
+so the hook and the measurement that justified it can never disagree about what a
+detached launch or a finished task is (`docs/project/agent_architecture_scope.md`).
+C0.2 was measured and moved to the procedural checker (ruled 2026-09-23); no Stop hook
+uses this module.
 
 THE TWO TRAPS PAID FOR WHILE MEASURING (both from rule-checker runs 2026-09-23-97/98):
 - a single `&` is not a detach when it is half of `&&`, a `>&`/`&>` redirect, inside a
@@ -22,7 +23,10 @@ import re
 
 # ---------------------------------------------------------------- commands (C0.1)
 
-_HEREDOC = re.compile(r"<<-?\s*(['\"]?)(\w+)\1")
+# a heredoc operator: `<<TAG`, `<<-TAG`, `<<'TAG'`, `<<"TAG"` — NOT a here-string
+# (`<<<word`) and NOT a shift (`1<<3`): the tag starts with a letter or `_`, and the
+# operator touches no third `<` (rule-checker run 2026-09-23-100, Q3/Q4)
+_HEREDOC = re.compile(r"(?<!<)<<(?!<)-?\s*(['\"]?)([A-Za-z_]\w*)\1")
 # quoted strings may span lines (a `node -e "..."` program is data, and its `&` is bitwise)
 _QUOTED = re.compile(r"'[^']*'|\"(?:\\.|[^\"\\])*\"")
 _DETACH_WORD = re.compile(r"\b(nohup|setsid|disown)\b")
@@ -43,9 +47,13 @@ def strip_heredocs(cmd):
         i += 1
         if m:
             tag = m.group(2)
-            while i < len(lines) and lines[i].strip() != tag:
-                i += 1
-            i += 1  # the terminator line itself
+            # strip ONLY a body whose terminator line exists: an operator with no
+            # terminator (a `<<` inside a quoted program, an arithmetic shift) used to
+            # swallow every later line — hiding a real `nohup`, and un-closing a quoted
+            # string so a quoted `&` was flagged (both measured, 14z-175)
+            end = next((k for k in range(i, len(lines)) if lines[k].strip() == tag), None)
+            if end is not None:
+                i = end + 1
     return "\n".join(out)
 
 

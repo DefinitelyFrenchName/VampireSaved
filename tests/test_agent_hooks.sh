@@ -17,6 +17,7 @@
 # justified the hook (`tools/agent/transcript_gaps.py --selftest`) shares its classifier.
 #
 # MUST-FIRE: perturbed-copy: blind-classifier — a copy of the hooks whose `detach_reason` always answers "no detach" must let the 14z-174 launches through, and the gate must FAIL on them (mode: the gate runs against that copy)
+# MUST-FIRE: perturbed-copy: greedy-heredoc — a copy whose `strip_heredocs` swallows every line after an UNTERMINATED `<<` operator (the defect rule-checker run 2026-09-23-100 found) must hide the `nohup` in the arithmetic-shift rows, and the gate must FAIL on the must-deny side (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: no-heredoc-strip — a copy whose `strip_heredocs` returns the command unchanged must deny commands that only WRITE a script containing `&`, and the gate must FAIL on the must-allow side (mode: the gate runs against that copy)
 #
 # Usage: tests/test_agent_hooks.sh      # ci_portable, ~2 s
@@ -37,6 +38,15 @@ import sys; p = sys.argv[1]; s = open(p).read()
 a = 'def detach_reason(cmd):\n'
 assert s.count(a) == 1
 s = s.replace(a, a + '    return None  # CONTROL blind-classifier\n', 1)
+open(p, 'w').write(s)
+PY
+            ;;
+        greedy-heredoc)
+            python3 - "$W/$1/agent/agentlib.py" <<'PY'
+import sys; p = sys.argv[1]; s = open(p).read()
+a = '            if end is not None:\n                i = end + 1\n'
+assert s.count(a) == 1
+s = s.replace(a, '            i = end + 1 if end is not None else len(lines)  # CONTROL greedy-heredoc\n', 1)
 open(p, 'w').write(s)
 PY
             ;;
@@ -83,7 +93,7 @@ echo "  fixture: $n_deny must-deny ($n_174 of them the 14z-174 launches), $n_all
 [ "$n_174" -eq 12 ] || { echo "FAIL: the fixture must carry the twelve 14z-174 launches (has $n_174)"; fail=1; }
 
 AG=tools/agent
-if vs_ctl_is blind-classifier || vs_ctl_is no-heredoc-strip; then AG="$(make_copy "$VS_CTL")"; fi
+if vs_ctl_is blind-classifier || vs_ctl_is greedy-heredoc || vs_ctl_is no-heredoc-strip; then AG="$(make_copy "$VS_CTL")"; fi
 replay "$AG" "$W/replay.txt"
 sed -n '/^MISMATCH/p' "$W/replay.txt" | head -12 | sed 's/^/  /'
 tail -1 "$W/replay.txt" | sed 's/^/  /'
@@ -98,15 +108,41 @@ else
     echo "FAIL: the fail-open path (rc=$rc, out='$out', log $( [ -f "$E/build/agent_hooks/errors.log" ] && echo present || echo absent))"; fail=1
 fi
 
+# the INSTALLATION (ruled 2026-09-23, "Install + protect"): the tracked project settings
+# must still wire this hook on Bash and keep the three edit-lock rules — a settings edit
+# that drops either would otherwise switch the enforcement off with every gate green
+python3 - .claude/settings.json > "$W/wiring.txt" <<'PY' || fail=1
+import json, sys
+try:
+    s = json.load(open(sys.argv[1]))
+except Exception as e:
+    print(f"FAIL: .claude/settings.json unreadable ({e})"); sys.exit(1)
+cmds = [h.get("command", "") for m in s.get("hooks", {}).get("PreToolUse", []) if m.get("matcher") == "Bash"
+        for h in m.get("hooks", []) if h.get("type") == "command"]
+deny = set(s.get("permissions", {}).get("deny", []))
+need = {"Edit(.claude/settings.json)", "Edit(tools/agent/hooks/**)", "Edit(tools/agent/agentlib.py)"}
+bad = []
+if not any("tools/agent/hooks/pre_bash.py" in c for c in cmds):
+    bad.append("no PreToolUse Bash hook runs tools/agent/hooks/pre_bash.py")
+if need - deny:
+    bad.append(f"edit-lock rules missing: {sorted(need - deny)}")
+for b in bad:
+    print(f"FAIL: installation — {b}")
+if not bad:
+    print("  installation: .claude/settings.json wires pre_bash.py on Bash and keeps the three edit-lock rules")
+sys.exit(1 if bad else 0)
+PY
+cat "$W/wiring.txt"
+
 # the census shares the classifier and its own selftest must hold
 python3 tools/agent/transcript_gaps.py --selftest | sed 's/^/  /'
 python3 tools/agent/transcript_gaps.py --selftest | grep -q 'PASS$' || { echo "FAIL: transcript_gaps selftest"; fail=1; }
 
 # the controls, in-gate: each perturbed copy must produce mismatches on ITS side
 if [ -z "${VS_CTL:-}" ]; then
-    for c in blind-classifier no-heredoc-strip; do
+    for c in blind-classifier greedy-heredoc no-heredoc-strip; do
         replay "$(make_copy "$c")" "$W/ctl_$c.txt"
-        case "$c" in blind-classifier) side=deny;; no-heredoc-strip) side=allow;; esac
+        case "$c" in blind-classifier|greedy-heredoc) side=deny;; no-heredoc-strip) side=allow;; esac
         k=$(grep -c "^MISMATCH expect=$side " "$W/ctl_$c.txt" || true)
         if [ "${k:-0}" -gt 0 ]; then vs_ctl_fired "$c" "$k must-$side rows mismatched on the perturbed copy"
         else vs_ctl_dead "$c" "the perturbed copy matched every must-$side row — the replay cannot see this failure" || fail=1; fi

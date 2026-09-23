@@ -77,19 +77,26 @@ for each defect. **Re-measured again when S1 began** — the census now counts t
 the SAME classifier the hooks use (`tools/agent/agentlib.py`), which also clears a
 backgrounding `&` inside a heredoc body or a quoted string and one followed by `wait`
 (a foreground parallel run). Over the 4,624 Bash commands of the eleven sessions it
-flags nothing the first classifier did not, and every one of the 59 it clears was
-classified by reason (heredoc body 30, `& … wait` 25, `&&` 3, quoted 1); 14z-174's
-row does not move, the other sessions' detached counts fall.
+flags nothing the census's PREVIOUS pattern (the one written after run `2026-09-23-97`)
+did not, and every one of the 59 it clears has a reason — heredoc body 30, `& … wait`
+28, quoted 1 (`transcript_gaps.py --classifier-audit`, which exits non-zero on any
+command only the new classifier flags or any clearance it cannot explain). A first,
+inline count of the same comparison reported the split as 30 / 25 / `&&` 3 / 1 and
+called the baseline "the first classifier"; both were corrected when the count was
+promoted into the tool (the three were `& … wait` runs that also contained `&&`).
+14z-174's row does not move; the other sessions' detached counts fall.
 
 **The mechanism the table points at.** A job launched with `nohup … &` inside an
 ordinary Bash call is invisible to the harness: it cannot produce a completion
 notification, so once the agent ends its turn, the only things that can end the
 wait are the agent's own poll, which it cannot make while idle, and the
 maintainer. **In 14z-174 all twelve detached launches were `nohup` launches of the
-LONG jobs** — the static tier twice, the release emulator tier twice, the close tier
+jobs the sitting's own record describes as long** — the static tier twice, the release emulator tier twice, the close tier
 three times, a control measurement, the rig attribution, the re-freeze diff capture,
 the re-freeze and the release upload (2 + 2 + 3 + 5 = 12), read one by one from the
-transcript. Its five TRACKED tasks, each timed from its move to the background to its
+transcript (`transcript_gaps.py --detached d5b070d5`). Their DURATIONS are not measured
+here — a detached job leaves no end record in the transcript; the 14z-174 record gives the
+release emulator tier's as 6 h 24 min (STATE_HISTORY/STATE 14z-174, row (11)). Its five TRACKED tasks, each timed from its move to the background to its
 completion notification (`transcript_gaps.py --tasks d5b070d5`, which reads both
 notification forms — §2): two ended within a minute; two ran 45 and
 39 minutes and were WAITER LOOPS (`for i …; do ps -p <pid> … sleep 55; done`, the
@@ -112,7 +119,8 @@ the agent checked the OUTPUT it wanted and never the PROCESS it had started.
 The design rests on these rows. "Measured" means a probe in a scratch project
 (`claude -p`, Claude Code 2.1.280, 2026-09-23), not the documentation;
 `tools/agent/probe_hooks.sh` re-measures every MEASURED row in about a minute (P1-P3
-the mechanisms, P5 the models when `PROBE_MODELS` names them), with two controls — P1c,
+the mechanisms, P5 the models when `PROBE_MODELS` names them, P6 the prompt embedding
+itself), with two controls — P1c,
 the deny switched off, must create the marker P1 requires absent, and P4, the P1/P2
 record counts must read zero on a run with no denial and no block — and exits non-zero
 if any has changed.
@@ -123,7 +131,7 @@ if any has changed.
 | **Stop hook blocks the end of a turn** | **MEASURED** | `{"decision":"block","reason":…}` → the transcript records `Stop hook feedback: <reason>` and the agent continues; the next Stop arrives with `stop_hook_active: true` (the loop guard) |
 | **the transcript records every background task** | **MEASURED** | a tracked launch's result reads `Command running in background with ID: <id>. Output is being written to: <path>`; a 120 s timeout reads `moved to the background (ID: <id>)`; completion is a `<task-notification>` with `<status>` — **in TWO forms**: a user message when it arrives while the agent is idle, and a `queued_command` ATTACHMENT (with `queue-operation` records) when it arrives mid-turn. A first reading that parsed only the first form reported three of 14z-174's five tracked tasks as never notified; all five were (rule-checker run `2026-09-23-98`). C0.2 parses both |
 | **a headless run exits with a tracked task still running** | **MEASURED** (P3b) | the probe agent said *"I'll wait for the completion notification"* and the session ended about 6 s in (5,939 ms on the recorded run) with its 20 s task still running and no notification received. Interactively the notification wakes the agent; headless, nothing does |
-| **a transcript embeds the system prompt** | **MEASURED** | a `grep` for `task-notification` over a transcript MATCHES in a run that received none — the prompt snapshot the transcript records mentions the tag. The probe script's first version failed on exactly this. **Every C0 check parses records by type; none greps a transcript** |
+| **a transcript embeds the system prompt** | **MEASURED** | a `grep` for `task-notification` over a transcript MATCHES in a run that received none — the prompt snapshot the transcript records mentions the tag. The probe script's first version failed on exactly this, and P6 now shows it directly (a bare grep matches a run with no notification). **Every C0 check parses records by type; none greps a transcript** |
 | `--agent <name>` runs the MAIN session as a defined agent | CLI help (`claude --help`, 2.1.280) | the orchestrator can be a definition carrying its own model, effort and prompt. (The documentation summary this session obtained said no such flag exists; the binary says otherwise, which is why the row is sourced from the binary.) |
 | subagent definitions `.claude/agents/<name>.md` with `model`, `effort`, `tools`, `disallowedTools`, `hooks` | documented | workers and checkers as named, capped definitions; a hook scoped to one agent |
 | `type: "prompt"` / `type: "agent"` hooks (a model judges the event) | documented; agent hooks EXPERIMENTAL, default model Haiku, 30/60 s default timeouts | a model checker at Stop without the orchestrator's cooperation — see §4, C1 |
@@ -160,7 +168,8 @@ will of checker agents"*. A model checker is kept for what needs judgement.
   harness tracks is a job whose end wakes the agent.
 - **C0.2 — MEASURED BEFORE BUILDING, AND NEITHER DETERMINISTIC FORM SURVIVED (14z-175,
   slice S1).** Both were run over the eleven archived transcripts with the S1 parser
-  (`agentlib.tasks`, both notification forms) before any hook was written.
+  (`agentlib.tasks`, both notification forms) before any hook was written; the
+  figures below re-derive with `transcript_gaps.py --c02`.
   *"A finished task whose result no later tool call looked at"* flagged 26 tasks in one
   session, and every case read by hand was a result the agent HAD used — acted on from
   the notification, polled from its log before the notification, or read through a
@@ -231,7 +240,7 @@ RETURN, not by a second orchestrator.
 
 | slice | what | the gate that proves it |
 |---|---|---|
-| **S1** | C0.1 (+ C0.2, moved to C1 on measurement — §4) as scripts under `tools/agent/` + the project `.claude/settings.json` wiring + C0.4. **C0.1 LANDED 14z-175:** `tools/agent/agentlib.py` (the one classifier, also behind the census), `tools/agent/hooks/pre_bash.py`, gate `tests/test_agent_hooks.sh`; wiring verified in a scratch project, then INSTALLED here (ruled "Install + protect"): a live `nohup` launch denied, its marker never created, an Edit of the settings refused | a ROM-free gate that REPLAYS recorded transcripts through the hook scripts: on the 14z-174 transcript C0.2 must fire at the finished-and-unread tasks and C0.1 on its detached launches; on a clean synthetic transcript both stay quiet (must-fire and must-stay-quiet, [VSP-19]) |
+| **S1** | C0.1 (+ C0.2, moved to C1 on measurement — §4) as scripts under `tools/agent/` + the project `.claude/settings.json` wiring + C0.4. **C0.1 LANDED 14z-175:** `tools/agent/agentlib.py` (the one classifier, also behind the census), `tools/agent/hooks/pre_bash.py`, gate `tests/test_agent_hooks.sh`; wiring verified in a scratch project, then INSTALLED here (ruled "Install + protect"): a live `nohup` launch denied, its marker never created, an Edit of the settings refused | `tests/test_agent_hooks.sh` (ci_portable): the hook over `tests/agent/c01_commands.jsonl` — 44 rows cut from real transcripts and synthetic edge cases: 14z-174's twelve launches and the over-strip cases must be DENIED, the real look-alikes and this sitting's live false positive ALLOWED — plus the fail-open path, the installed wiring, and three controls (`blind-classifier`, `greedy-heredoc`, `no-heredoc-strip`). (The plan said this gate would replay C0.2 too; C0.2 moved to C1, so it replays C0.1 only.) **The close's rule-checker run `2026-09-23-100` found the stripper over-matched** — `<<<word` and `1<<3` read as heredoc operators, and an unterminated one swallowed every later line, hiding a real `nohup` below it and, live in this sitting, un-closing a quoted program so its `&` was refused. The fix (terminated heredocs only, a tag that starts with a letter, no third `<`) changes no verdict on the 4,624 archived commands and is applied by the maintainer, the file being edit-locked |
 | **S2** | C0.3 — the close sweep, and its step in STATE.md's close checklist | the gate plants a live child process and requires the sweep to name it |
 | **S3** | C1 — `tools/proccheck.py` (or a `rulecheck` decision kind), the transcript extractor, the checklist, fixtures from 14z-174, calibration, the push binding | fixtures calibrated like `rulecheck`'s: each positive caught, a negative quiet beside a caught plant |
 | **S4** | W — worker definitions and the spec template | a worker run on a known task returns figures each traceable to a command |
