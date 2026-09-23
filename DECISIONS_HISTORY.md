@@ -27,6 +27,30 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-23 (14z-177) — #172 slice S4 step 4: the pinned readers are SUBAGENTS; the sitting closes
+
+**The questions put.** (1) How the pinned `rule-checker` readers are spawned. Measured first
+(`tools/agent/probe_agents.sh` A3, A12): a SUBAGENT's definition applies its effort; a
+definition run headless as the main session (`claude -p --agent`) takes its model and tools but
+NOT its effort (an explicit `--effort` pins it); and a session sees only definitions that existed
+when it started. The maintainer asked *"what are the pros and cons"*; they were given (headless:
+works in any session, verdicts written verbatim by the tool, all parameters on one command line
+— but a new launch mechanism, readers outside the session's extract, and, UNMEASURED, a headless
+session inside the repo very likely loads CLAUDE.md, against the maintainer's #172 ask that the
+checker have *"no project-specific context to have no bias there"* and the 14z-175 ruling (2),
+*"Checklist + transcript extract (Recommended)"*, put as "never CLAUDE.md or the project's
+history"; subagents: the smallest change, the definition's effort applies, visible in C1's extract
+— but they wait a session, verdicts are still copied by hand, and whether a subagent sees
+CLAUDE.md is equally unmeasured), with the recommendation moved to subagents once the close was
+chosen. (2) Continue step 4 in this sitting, or close.
+
+**THE RULINGS, verbatim:** (1) *"Subagents (Recommended)"* — the option chosen, whose text put
+to the maintainer read *"Spawn `rule-checker` subagents as today; the definition's effort applies
+(A3). Step 4 first measures whether a reader sees CLAUDE.md."*; (2) *"Close now (Recommended)"*,
+whose text read *"Step 4 becomes START HERE item 1, with its route decided."*
+
+---
+
 ## Ruled 2026-09-23 (14z-177) — #172 slice S4: the CALL GATE installed
 
 **The question put.** Whether to install `tools/agent/hooks/pre_agent.py`, a PreToolUse hook on

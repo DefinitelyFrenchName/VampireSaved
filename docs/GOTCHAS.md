@@ -188,7 +188,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - macOS HIDES THE ENVIRONMENT OF ITS OWN BINARIES AND OF HARDENED APPS — an inherited variable cannot find `tail`, `sleep`, `zsh` or Chrome (measured 2026-09-23, 14z-176)
 - `$!` AFTER `cd DIR && CMD &` IS THE SUBSHELL, NOT `CMD` — killing it leaves `CMD` orphaned (paid: 14z-176)
 - HEADLESS CHROME'S `--virtual-time-budget` RUNS OUT WHILE THE PAGE WAITS ON I/O — an incomplete run looks like a content verdict in EVERY leg that reads it (paid: 14z-174, and again 14z-176)
-- A SUBAGENT WITH NO `effort` LINE RUNS AT ITS CALLER'S EFFORT, AND THE CALLER'S `model` BEATS THE DEFINITION'S — a cap written in `.claude/agents/<name>.md` alone does not hold (measured 2026-09-23, 14z-177, Claude Code 2.1.280)
+- A SUBAGENT WITH NO `effort` LINE RUNS AT ITS CALLER'S EFFORT, AND THE CALLER'S `model` BEATS THE DEFINITION'S — a cap written in `.claude/agents/<name>.md` alone does not hold (measured 2026-09-23, 14z-177, Claude Code 2.1.280, and all twelve legs re-run on 2.1.281 after it updated mid-session)
 
 ## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 251 entries
 

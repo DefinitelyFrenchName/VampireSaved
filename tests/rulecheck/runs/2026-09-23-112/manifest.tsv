@@ -1,0 +1,15 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+STATE.md.lines-71-84 (lines 71-84 of STATE.md)	f54ef306f08ca92a151b71ef02038bb1e4a2fd12
+DECISIONS_HISTORY.md.lines-30-102 (lines 30-102 of DECISIONS_HISTORY.md)	eb59e9563f3ba5a0bb6946b1b20e227c2c8538af
+docs/project/agent_architecture_scope.md.lines-24-44 (lines 24-44 of docs/project/agent_architecture_scope.md)	55b8e5f03829e79bfacd3a6b63459df803ec0293
+docs/project/agent_architecture_scope.md.lines-126-172 (lines 126-172 of docs/project/agent_architecture_scope.md)	ef6d129e9906e6155123c25cd9c85d238f53d71a
+docs/project/agent_architecture_scope.md.lines-279-320 (lines 279-320 of docs/project/agent_architecture_scope.md)	e6e871770ff0d34292ae3ae5a3471d59bfdd61fc
+docs/platform/gotchas.md.lines-2804-2851 (lines 2804-2851 of docs/platform/gotchas.md)	87d7b442d607e82d74be757ceac65d419b199efd
+docs/project/rule_checker.md.lines-237-262 (lines 237-262 of docs/project/rule_checker.md)	58f05a48e7034212d477590cfce8a24c7ddad65d
+docs/project/worker_spec.md	f747953257eac25c418c003fcebb3dba6d0e0c29
+docs/NEXT_SESSION.md	7d2255fc2e4a0b61557b3bf1944f17f7841c3159
+tools/agent/probe_agents.sh	998c773c768628217ee6373d2c5ea3b9b29a0b68
+build/agent172/probe_agents_14z177.txt	dc5c11bd655c14beee9ad805aa3cdb8d40931667
+build/agent172/subagents_readers_14z177.txt	0e2348b3d53a6063d56a9bbecfdebdc89aaf7f22
+tests/test_agent_defs.sh	dc8cc9171fa4fceaf1bec5b1e4bdd6d7fcdaa94e
+tests/test_agent_worker.sh	60afd05f7e874ab1c95300e4bae0fa6fd9273020

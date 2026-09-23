@@ -2801,7 +2801,7 @@ says the control's run did not complete and claims nothing). Both legs now go th
 one `run_leg`. **When a gate drives a browser more than once, every leg needs the
 completion marker** — a fix applied to "the run" is applied to one call site.
 
-## A SUBAGENT WITH NO `effort` LINE RUNS AT ITS CALLER'S EFFORT, AND THE CALLER'S `model` BEATS THE DEFINITION'S — a cap written in `.claude/agents/<name>.md` alone does not hold (measured 2026-09-23, 14z-177, Claude Code 2.1.280)
+## A SUBAGENT WITH NO `effort` LINE RUNS AT ITS CALLER'S EFFORT, AND THE CALLER'S `model` BEATS THE DEFINITION'S — a cap written in `.claude/agents/<name>.md` alone does not hold (measured 2026-09-23, 14z-177, Claude Code 2.1.280, and all twelve legs re-run on 2.1.281 after it updated mid-session)
 
 Measured in a scratch project with headless `claude -p` runs (`tools/agent/probe_agents.sh`,
 legs A1-A12, every "cannot" leg beside its "can" leg). A worker's transcript
@@ -2843,9 +2843,9 @@ SESSION's effort: `high` for every Opus 5.5 calibration and real run (14z-175, 1
 `xhigh` for 14z-174's on Opus 5. Nothing records it (`docs/project/rule_checker.md`, "The
 effort"; the model half of the same gap is #158).
 
-And where a worker's words land: a background worker's final report reaches the
-orchestrator's transcript as an `<agent-message from="<id>">[Subagent hand-back]` record
-(its `SubagentHandback` call, in the worker's own transcript), the completion
-`<task-notification>` explicitly NOT repeating it; a foreground worker's report is the
-Agent call's tool result. The worker's own commands exist only in its transcript, linked
+And where a worker's words land: a FOREGROUND worker's report is the Agent call's tool result
+(A10, controlled, with a wrong-id control); a BACKGROUND worker's final report was seen, in ONE
+transcript read (14z-176's), to reach the orchestrator as an `<agent-message from="<id>">
+[Subagent hand-back]` record (its `SubagentHandback` call), the completion `<task-notification>`
+saying it is not repeated there — not measured by any leg. The worker's own commands exist only in its transcript, linked
 to the spawning call by `meta.json`'s `toolUseId`.
