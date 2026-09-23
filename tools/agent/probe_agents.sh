@@ -30,7 +30,12 @@
 #       transcript is linked to that call by `meta.json`'s `toolUseId`, its COMMANDS are in
 #       that transcript and not the orchestrator's, and its REPORT reaches the orchestrator's
 #       transcript (as the call's tool result, or a `[Subagent hand-back]` record)
-#   (A9 and A10 added after rule-checker run 2026-09-23-109 found both premises unmeasured)
+#   (A9 and A10 added after rule-checker run 2026-09-23-109 found both premises unmeasured;
+#   run 2026-09-23-110 then found A10's delivery check VACUOUS — it matched the spec's own
+#   token — A9's general-purpose half under one parent only, and A8 not asserting the prompt
+#   a template check reads: A10 now uses an output token the spec cannot supply, matched only
+#   against THIS call's result or hand-back, with a wrong-id control; A9 runs general-purpose
+#   under both parents; A8 asserts the hook's input carries the call's prompt)
 #
 # Usage: tools/agent/probe_agents.sh [SCRATCH_DIR]   (~4 min: thirteen short Haiku/Sonnet runs)
 # Prints one PASS/FAIL line per leg and exits non-zero on any FAIL.
@@ -118,7 +123,7 @@ PY
 has() { workers "$1" | grep -qx "$2"; }
 
 # A1 + A3: two effort-capped Sonnet workers under a Haiku parent (which records no effort)
-run a haiku "" 0 'Call the Agent tool twice, one after the other: first with subagent_type "w-low" and the prompt "Run the Bash command: echo A-low", then with subagent_type "w-xhigh" and the prompt "Run the Bash command: echo A-xhigh". Reply with both outputs.'
+run a haiku "" 0 'Call the Agent tool twice, one after the other: first with subagent_type "w-low" and the prompt "Run the Bash command: echo LOW-$((6*7))", then with subagent_type "w-xhigh" and the prompt "Run the Bash command: echo A-xhigh". Reply with both outputs.'
 if has a "w-low claude-sonnet-5 low" && has a "w-xhigh claude-sonnet-5 xhigh"
 then echo "PASS A1+A3: each definition's model (sonnet) and effort (low, xhigh) is what its worker ran at"
 else echo "FAIL A1+A3: workers seen: $(workers a | tr '\n' ';')"; fail=1; fi
@@ -168,8 +173,12 @@ esac
 run h haiku "" 1 'Call the Agent tool with subagent_type "w-ro", the model parameter set to "sonnet", and the prompt "What is 2+2?". If the call is refused, reply with the refusal text verbatim and do not retry.'
 run i haiku "" 1 'Call the Agent tool with subagent_type "w-ro" and no model parameter, with the prompt "What is 2+2? Reply with the number only." Reply with its answer.'
 den=$(python3 -c "import json;print(len(json.load(open('out_h.json')).get('permission_denials') or []))" 2>/dev/null)
-if [ "${den:-0}" -ge 1 ] && [ -z "$(workers h)" ] && workers i | grep -q '^w-ro claude-haiku'
-then echo "PASS A8: the Agent gate refused the model override ($den denial, no worker ran); A8c: the call without one ran on the definition's haiku"
+a8p=$(python3 -c "
+import json,sys
+rows=[json.loads(l) for l in open(sys.argv[1]) if json.loads(l)['tool'] in ('Agent','Task')]
+print(sum(1 for r in rows if '2+2' in str(r['input'].get('prompt','')) and r['input'].get('subagent_type')=='w-ro'))" "$S/log_i.jsonl" 2>/dev/null)
+if [ "${den:-0}" -ge 1 ] && [ -z "$(workers h)" ] && workers i | grep -q '^w-ro claude-haiku' && [ "${a8p:-0}" -ge 1 ]
+then echo "PASS A8: the Agent gate refused the model override ($den denial, no worker ran); A8c: the call without one ran on the definition's haiku; and the hook's input carried the call's prompt and subagent_type ($a8p row) — what a template check would read"
 else echo "FAIL A8: denials ${den:-?}, workers with override: $(workers h | tr '\n' ';') without: $(workers i | tr '\n' ';')"; fail=1; fi
 
 # A6c: the A6 hook command, wired as a PROJECT hook, fires and denies the same worker call
@@ -181,51 +190,75 @@ else echo "FAIL A6c: scoped hook log $( [ -e scoped_hook.log ] && echo present |
 
 # A9: no model line, and a general-purpose call with no model, follow the caller's model
 run j haiku "" 0 'Call the Agent tool twice, one after the other, with no model parameter either time: first with subagent_type "w-nomodel" and the prompt "Run the Bash command: echo J1", then with subagent_type "general-purpose" and the prompt "Reply with exactly: J2". Reply with both outputs.'
-run k sonnet "" 0 'Call the Agent tool with subagent_type "w-nomodel", no model parameter, and the prompt "Run the Bash command: echo K". Reply with its output.'
-if workers j | grep -q '^w-nomodel claude-haiku' && workers j | grep -q '^general-purpose claude-haiku' && workers k | grep -q '^w-nomodel claude-sonnet'
-then echo "PASS A9: a definition with no model ran on the caller's (haiku under haiku, sonnet under sonnet), and so did a general-purpose call with no model"
+run k sonnet "" 0 'Call the Agent tool twice, one after the other, with no model parameter either time: first with subagent_type "w-nomodel" and the prompt "Run the Bash command: echo K1", then with subagent_type "general-purpose" and the prompt "Reply with exactly: K2". Reply with both outputs.'
+if workers j | grep -q '^w-nomodel claude-haiku' && workers j | grep -q '^general-purpose claude-haiku' && workers k | grep -q '^w-nomodel claude-sonnet' && workers k | grep -q '^general-purpose claude-sonnet'
+then echo "PASS A9: with no model, a definition AND a general-purpose call each ran on the caller's model under BOTH parents (haiku under haiku, sonnet under sonnet)"
 else echo "FAIL A9: under haiku: $(workers j | tr '\n' ';') under sonnet: $(workers k | tr '\n' ';')"; fail=1; fi
 
 # A10: spec, link, commands and report, read from run a's transcripts (w-low ran `echo A-low`)
 a10=$(python3 - "$S/log_a.jsonl" <<'PY'
-import glob, json, sys
+# The worker ran `echo LOW-$((6*7))`: its output token LOW-42 is NOT in its spec nor in the
+# orchestrator's prompt (asserted), so finding it in the orchestrator's transcript means the
+# REPORT arrived. Delivery is matched only in a tool_result FOR THIS CALL's id or an
+# <agent-message from="THIS AGENT"> record, never anywhere in the transcript (the first
+# version matched the spec's own token and passed vacuously — rule-checker run 2026-09-23-110).
+import glob, json, os, sys
+TOKEN = "LOW-42"
 t = next(json.loads(l)["transcript"] for l in open(sys.argv[1]))
-calls, main_text, main_bash = {}, [], []
-for line in open(t):
-    r = json.loads(line)
+recs = [json.loads(l) for l in open(t)]
+calls, main_bash, prompt_has = {}, [], False
+for r in recs:
     c = (r.get("message") or {}).get("content")
-    blobs = [r.get("attachment") or {}] + (c if isinstance(c, list) else [c])
-    for b in blobs:
-        if isinstance(b, dict) and b.get("type") == "tool_use" and b.get("name") in ("Agent", "Task"):
+    if r.get("type") == "user" and isinstance(c, str) and TOKEN in c:
+        prompt_has = True
+    for b in c if isinstance(c, list) else []:
+        if b.get("type") == "tool_use" and b.get("name") in ("Agent", "Task"):
             calls[b["id"]] = (b.get("input") or {}).get("prompt", "")
-        if isinstance(b, dict) and b.get("type") == "tool_use" and b.get("name") == "Bash":
+        if b.get("type") == "tool_use" and b.get("name") == "Bash":
             main_bash.append(json.dumps(b.get("input")))
-        if r.get("type") in ("user", "attachment"):
-            main_text.append(json.dumps(b))
-ok = []
+def delivered(call_id, agent_id):
+    for r in recs:
+        c = (r.get("message") or {}).get("content")
+        for b in c if isinstance(c, list) else []:
+            if b.get("type") == "tool_result" and b.get("tool_use_id") == call_id and TOKEN in json.dumps(b.get("content")):
+                return "tool-result"
+        texts = [c] if isinstance(c, str) else []
+        texts += [json.dumps(r.get("attachment") or {}), str(r.get("content") or "")]
+        for x in texts:
+            if f'agent-message from=\\"{agent_id}\\"' in x or f'agent-message from="{agent_id}"' in x:
+                if TOKEN in x:
+                    return "hand-back"
+    return ""
+out = []
 for meta in glob.glob(t[:-len(".jsonl")] + "/subagents/*.meta.json"):
     m = json.load(open(meta))
     if m.get("agentType") != "w-low":
         continue
+    aid = os.path.basename(meta)[len("agent-"):-len(".meta.json")]
     spec = calls.get(m.get("toolUseId"), "")
-    wbash, report = [], ""
+    wbash = []
     for line in open(meta[:-len(".meta.json")] + ".jsonl"):
         r = json.loads(line)
         c = (r.get("message") or {}).get("content")
         for b in c if isinstance(c, list) else []:
             if b.get("type") == "tool_use" and b.get("name") == "Bash":
                 wbash.append(json.dumps(b.get("input")))
-            if r.get("type") == "assistant" and b.get("type") == "text":
-                report = b.get("text", "")
-    ok.append(("echo A-low" in spec, any("A-low" in x for x in wbash),
-               not any("A-low" in x for x in main_bash),
-               bool(report.strip()) and any(report.strip()[:40] in x or "A-low" in x for x in main_text)))
-print(" ".join("1" if all(o) else "0" for o in ok) or "none")
+    form = delivered(m.get("toolUseId"), aid)
+    wrong = delivered("toolu_not_this_call", "not-this-agent")   # the matcher's own control
+    checks = ["LOW-" in spec and TOKEN not in spec and not prompt_has,  # the token is not supplied by the spec
+              any("LOW-" in x for x in wbash),                          # the command ran in the worker
+              not any("LOW-" in x for x in main_bash),                  # ... and not in the orchestrator
+              bool(form), not wrong]                                    # delivered to THIS call; a wrong id finds nothing
+    out.append(("1" if all(checks) else "0") + ":" + "".join("1" if c else "0" for c in checks) + ":" + (form or "none"))
+print(" ".join(out) or "none")
 PY
 )
-if [ "$a10" = 1 ]
-then echo "PASS A10: w-low's spec is the Agent call's prompt, its transcript links to that call by toolUseId, its Bash call is in its own transcript and not the orchestrator's, and its report reached the orchestrator's transcript"
-else echo "FAIL A10: linkage checks ${a10:-none} (spec/link, worker command, not in main, report delivered)"; fail=1; fi
+case "$a10" in
+  1:*) a10ok=1;; *) a10ok=0;;
+esac
+if [ "$a10ok" = 1 ] && [ "$(echo "$a10" | wc -w | tr -d ' ')" = 1 ]
+then echo "PASS A10: w-low's spec is the Agent call's prompt (linked by toolUseId) and does not contain its output token, its Bash call is in its own transcript and not the orchestrator's, and its REPORT (the token) reached the orchestrator's transcript for THIS call as ${a10##*:}; the matcher finds nothing for a wrong call id ($a10)"
+else echo "FAIL A10: checks ${a10:-none} (token-not-in-spec, worker command, not in main, delivered to this call, wrong-id quiet : form)"; fail=1; fi
 
 echo "scratch: $S"
 exit $fail

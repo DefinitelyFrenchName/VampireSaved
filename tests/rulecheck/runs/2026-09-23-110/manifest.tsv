@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent172/s4_proposal.md	762932f8f20fceaddc3ef61b868842587318b8f9
+docs/project/agent_architecture_scope.md.lines-24-44 (lines 24-44 of docs/project/agent_architecture_scope.md)	55b8e5f03829e79bfacd3a6b63459df803ec0293
+docs/project/agent_architecture_scope.md.lines-126-165 (lines 126-165 of docs/project/agent_architecture_scope.md)	c6181e336dc88be14621f47f20259a659d87cdba
+docs/project/agent_architecture_scope.md.lines-277-342 (lines 277-342 of docs/project/agent_architecture_scope.md)	916ed0c7a1c15f0bd75318227074f2fe35ef8c43
+docs/platform/gotchas.md.lines-2804-2843 (lines 2804-2843 of docs/platform/gotchas.md)	a78cfce31e050e1949aae19d1966613fb0d4a508
+tools/agent/probe_agents.sh	ec07996796f30e9161b8847d964d2fe59a8dd6ae
+build/agent172/probe_agents_14z177.txt	b7de3022d9617d63a9ddba5df8e0caa399791337
+build/agent172/subagents_readers_14z177.txt	0e2348b3d53a6063d56a9bbecfdebdc89aaf7f22
+docs/project/rule_checker.md.lines-237-260 (lines 237-260 of docs/project/rule_checker.md)	563c1d216d4db5426adf0ceeb9383fe27aaac116
+DECISIONS_HISTORY.md.lines-30-130 (lines 30-130 of DECISIONS_HISTORY.md)	33690734d9c1eadf536e6c04cf72bbaa3f40c4c7

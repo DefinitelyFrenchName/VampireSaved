@@ -1,0 +1,7 @@
+decision	recommendation
+subject	the #172 slice S4 design (worker definitions, caps, spec template, C1 spec-vs-return, its gate) and the four questions put to the maintainer — corrected after run 2026-09-23-109
+session	14z-177
+model	claude-opus-5-5
+claim	The S4 proposal's design rests on platform facts measured this sitting by tools/agent/probe_agents.sh (legs A1-A10, each 'cannot' leg beside a 'can' leg, run log attached), on the maintainer's own words in #172's ask for the caps and the specs, and on the scope document's UNRULED template-plus-C1 recommendation, which it puts to the maintainer together with four questions (forks allowed as the orchestrator, a pinned rule-checker definition with recalibration, a new QP5, the order); NOT tested: no definition, gate, hook or extract change has been built or run; the frontmatter-hook negative (A6) was tested in one YAML form only; a fork's model and effort were not measured (the proposal cites the Agent tool's description); 'an omitted tools list grants every tool' is documented, not measured; A10 does not assert which delivery form a foreground report takes; and the rule-checker readers' effort figures are read from their own transcripts, not from a controlled run.
+checklist	62514a98c3e7
+family	evidence
