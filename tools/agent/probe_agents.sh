@@ -39,6 +39,12 @@
 #       and the cap is the only property the gate needs. `claude-code-guide` is not available to
 #       a headless run ("this agent type doesn't exist"), so it cannot be probed and is NOT
 #       allowlisted — a call to it passes a model
+#   A12 a definition run as the MAIN session (`claude -p --agent <name>`, the route a pinned
+#       rule-checker reader could take — S4 step 4): its `model` and `tools` apply (the definition
+#       without Write answers NO-TOOL; A12c, a copy WITH Write, creates its marker), but its
+#       `effort` does NOT — the session runs at the settings' default (the definition says low,
+#       the run is not low) — while an explicit `--effort low` pins it (added 14z-177; the
+#       subagent route applies a definition's effort, A3)
 #   (A9 and A10 added after rule-checker run 2026-09-23-109 found both premises unmeasured;
 #   run 2026-09-23-110 then found A10's delivery check VACUOUS — it matched the spec's own
 #   token — A9's general-purpose half under one parent only, and A8 not asserting the prompt
@@ -46,7 +52,7 @@
 #   against THIS call's result or hand-back, with a wrong-id control; A9 runs general-purpose
 #   under both parents; A8 asserts the hook's input carries the call's prompt)
 #
-# Usage: tools/agent/probe_agents.sh [SCRATCH_DIR]   (~5 min: fourteen short runs, one on Fable 5.1)
+# Usage: tools/agent/probe_agents.sh [SCRATCH_DIR]   (~6 min: seventeen short runs, one on Fable 5.1)
 # Prints one PASS/FAIL line per leg and exits non-zero on any FAIL.
 # Needs: the `claude` CLI and python3. Writes only under SCRATCH_DIR (default: a mktemp dir).
 set -u
@@ -284,6 +290,46 @@ print(('1 ' if ok else '0 ') + f'Explore={ex or \"none\"};general-purpose={gp or
 case "$a11" in
   1*) echo "PASS A11: under a Fable parent with no model, Explore stayed at most Opus-class while general-purpose ran on Fable (${a11#1 }) — the call gate's SELF_CAPPED list holds, and the leg sees the breach";;
   *)  echo "FAIL A11: ${a11:-no workers} — Explore ran above Opus-class under a Fable caller (the call gate's SELF_CAPPED list is stale), or general-purpose did not inherit Fable (the leg cannot see a breach)"; fail=1;;
+esac
+
+# A12: --agent runs a definition as the main session — model and tools apply, effort does not
+defn m-rc sonnet low "Read, Glob, Grep"
+defn m-rcw sonnet low "Read, Write"
+echo hello > f12.txt
+rm -f W12_MARKER W12C_MARKER
+main() { # tag agent extra-args prompt   -> out_<tag>.json
+  tag=$1 ag=$2 extra=$3; shift 3
+  PROBE_LOG="$S/log_$tag.jsonl" PROBE_AGENT_GATE=0 PROBE_SCOPED=0 claude -p "$1" --agent "$ag" $extra \
+    --allowedTools "Write Read" --output-format json </dev/null >"out_$tag.json" 2>"err_$tag.txt"
+}
+main n1 m-rc "" 'Create a file named W12_MARKER containing x with the Write tool; if you cannot, reply NO-TOOL. Then read f12.txt and reply with its contents.'
+main n2 m-rcw "" 'Create a file named W12C_MARKER containing x with the Write tool; if you cannot, reply NO-TOOL.'
+main n3 m-rc "--effort low" 'Reply with exactly: E12'
+a12=$(python3 - "$S" <<'PY'
+import glob, json, os, sys
+S = sys.argv[1]
+def run(tag):
+    sid = json.load(open(f"{S}/out_{tag}.json")).get("session_id", "")
+    hits = glob.glob(os.path.expanduser(f"~/.claude/projects/*/{sid}.jsonl")) if sid else []
+    e, m = set(), set()
+    for line in open(hits[0]) if hits else []:
+        r = json.loads(line)
+        if r.get("type") == "assistant":
+            e.add(str(r.get("effort"))); m.add(str((r.get("message") or {}).get("model")))
+    return e, m
+e1, m1 = run("n1"); e3, m3 = run("n3")
+checks = [bool(m1) and all(x.startswith("claude-sonnet") for x in m1),   # the definition's model
+          not os.path.exists(f"{S}/W12_MARKER"),                         # its tools bind
+          os.path.exists(f"{S}/W12C_MARKER"),                            # A12c: the Write copy can
+          bool(e1) and "low" not in e1,                                  # its effort does NOT apply
+          e3 == {"low"}]                                                 # --effort pins it
+print(("1 " if all(checks) else "0 ") + "".join("1" if c else "0" for c in checks)
+      + f" model={','.join(sorted(m1))} effort-without-flag={','.join(sorted(e1))} with-flag={','.join(sorted(e3))}")
+PY
+)
+case "$a12" in
+  1*) echo "PASS A12: --agent applied the definition's model and tools (no Write -> no marker; A12c: the Write copy created one) but NOT its effort, which an explicit --effort pinned (${a12#1 })";;
+  *)  echo "FAIL A12: ${a12:-no result} (model, tools bind, can-write copy, effort not applied, --effort pins) — the --agent behaviour changed"; fail=1;;
 esac
 
 echo "scratch: $S"

@@ -2804,7 +2804,7 @@ completion marker** — a fix applied to "the run" is applied to one call site.
 ## A SUBAGENT WITH NO `effort` LINE RUNS AT ITS CALLER'S EFFORT, AND THE CALLER'S `model` BEATS THE DEFINITION'S — a cap written in `.claude/agents/<name>.md` alone does not hold (measured 2026-09-23, 14z-177, Claude Code 2.1.280)
 
 Measured in a scratch project with headless `claude -p` runs (`tools/agent/probe_agents.sh`,
-legs A1-A10, every "cannot" leg beside its "can" leg). A worker's transcript
+legs A1-A12, every "cannot" leg beside its "can" leg). A worker's transcript
 (`<session>/subagents/agent-<id>.jsonl`) records `effort` and `message.model` on every
 assistant record, which is what makes these checkable:
 
@@ -2827,6 +2827,11 @@ assistant record, which is what makes these checkable:
   ran, and the command it should have refused created its marker) — it reads as
   enforcement and is not, at least in the one form the probe writes; the SAME command wired
   as a project hook fired and denied (A6c), so it is the frontmatter that is silent;
+- a definition run as the MAIN session (`claude -p --agent <name>`) takes its `model` and
+  `tools` but NOT its `effort`: the settings' default applied where the definition said `low`,
+  and only an explicit `--effort` pinned it (A12) — the opposite of the subagent route (A3);
+  and a session loads its agent list at START, so a definition written mid-session cannot be
+  spawned until the next session;
 - a PROJECT `PreToolUse` hook DOES fire for a worker's own tool calls, and its input names
   the worker (`agent_type`, `agent_id`); the orchestrator's own calls carry neither. So a
   rule scoped to one worker is a project hook that reads `agent_type`, and every project
