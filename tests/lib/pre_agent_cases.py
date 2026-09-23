@@ -43,6 +43,10 @@ CASES = [  # (label, tool_input, expected 'deny'|'allow')
     ("(d) a worker prompt missing ONE heading (STOP:)", {"subagent_type": "measurer", "prompt": SPEC.replace("STOP:", "HALT:")}, "deny"),
     ("(d) a heading not at a line start does not count", {"subagent_type": "reader", "prompt": SPEC.replace("TASK: q", "  TASK: q")}, "deny"),
     ("(d) allow: the reader with a full spec", {"subagent_type": "reader", "prompt": SPEC}, "allow"),
+    # the pinned rule-checker (14z-178): a defined worker, so a model is refused (b); its prompt is
+    # a rulecheck.py packet, not a worker spec, so the template rule (d) must NOT apply to it
+    ("(b) a model on the pinned rule-checker", {"subagent_type": "rule-checker", "model": "opus", "prompt": "You are an independent rule-checker"}, "deny"),
+    ("(d) allow: the rule-checker with no model and a packet prompt (not a template worker)", {"subagent_type": "rule-checker", "prompt": "You are an independent rule-checker"}, "allow"),
     ("fork allowed (ruled)", {"subagent_type": "fork", "prompt": "x"}, "allow"),
     ("fork allowed even with no model", {"subagent_type": "fork"}, "allow"),
     ("a path-traversal type is no definition (and no model): denied by (c)", {"subagent_type": "../../etc/passwd", "prompt": "x"}, "deny"),

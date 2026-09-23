@@ -2847,5 +2847,39 @@ And where a worker's words land: a FOREGROUND worker's report is the Agent call'
 (A10, controlled, with a wrong-id control); a BACKGROUND worker's final report was seen, in ONE
 transcript read (14z-176's), to reach the orchestrator as an `<agent-message from="<id>">
 [Subagent hand-back]` record (its `SubagentHandback` call), the completion `<task-notification>`
-saying it is not repeated there — not measured by any leg. The worker's own commands exist only in its transcript, linked
+saying it is not repeated there — not measured by any leg *(— 14z-178: a background leg now exists, and it found a THIRD form; the entry below)*. The worker's own commands exist only in its transcript, linked
 to the spawning call by `meta.json`'s `toolUseId`.
+
+## A SUBAGENT IS HANDED THE PROJECT'S CLAUDE.md — AND, INTERACTIVELY, THE AUTO-MEMORY INDEX, WHICH THE DOCS SAY IT IS NOT; `omitClaudeMd: true` REMOVES CLAUDE.md (measured 2026-09-24, 14z-178, Claude Code 2.1.281)
+
+A context-free worker is not context-free by default. Measured with a RANDOM codeword in a
+scratch project's CLAUDE.md, asked for with no tool (`tools/agent/probe_agents.sh` A13): the
+main session, a definition shaped as the rule-checker (Read/Grep/Glob) and a `general-purpose`
+call each NAMED it, and each worker's transcript carried an `instructions` ATTACHMENT listing
+`CLAUDE.md` — the answer agreeing with the record; the SAME definition with **`omitClaudeMd:
+true`** (a documented frontmatter key, v2.1.271+) named nothing and carried no attachment, and
+`Explore` likewise (the docs: Explore and Plan skip CLAUDE.md).
+
+**Auto memory, where the docs are wrong for this host:** the documentation says *"the main
+conversation's auto memory isn't loaded"* in a non-fork subagent. In an INTERACTIVE session a
+`general-purpose` worker with no tool call quoted the first three entries of this project's
+`MEMORY.md` exactly, and its attachment listed `AutoMem:MEMORY.md` (14z-178, this session's
+transcript — an observation, not a leg: a HEADLESS `claude -p` session loaded no auto-memory at
+all, so A13's memory half reads VOID there and cannot be scripted). The archive agrees:
+`transcript_gaps.py --subagents all` shows the attachment on every `general-purpose` worker
+since 2.1.270 (217 of them) and the one `measurer`; the 16 on 2.1.240 carry no such record,
+and whether that version sent none or recorded none is not known. **Read the attachment's
+`files` list; a text match over the record's JSON missed every one** (the rendered
+`Contents of … (project instructions` string lives elsewhere in the line).
+
+Whether `omitClaudeMd: true` also removes the MEMORY index is NOT measured — only an interactive
+session STARTED after such a definition exists can spawn it.
+
+**And the report's THIRD form:** on 2.1.281 a headless run launches every Agent call in the
+BACKGROUND (`meta.json` `requestShape: background`; the call returns "Async agent launched"),
+and the worker's report arrives as the `<result>` element of its completion
+`<task-notification>` — neither the call's tool result nor a `[Subagent hand-back]`, the two
+forms a matcher knew (A10 FAILED on it until it learned the third; `extract.py` skipped every
+notification record and so never sourced such a report). An interactive session in the same
+hour delivered its workers' reports as hand-backs, the notification saying *"it is not repeated
+here"* — so a reader of reports must accept all three.

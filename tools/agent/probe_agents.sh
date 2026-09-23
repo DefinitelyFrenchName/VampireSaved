@@ -29,7 +29,11 @@
 #   A10 where a worker's words land: its SPEC is the Agent call's `prompt`, its worker
 #       transcript is linked to that call by `meta.json`'s `toolUseId`, its COMMANDS are in
 #       that transcript and not the orchestrator's, and its REPORT reaches the orchestrator's
-#       transcript (as the call's tool result, or a `[Subagent hand-back]` record)
+#       transcript (as the call's tool result, a `[Subagent hand-back]` record, or — since
+#       2.1.281, where a headless run launches every worker in the BACKGROUND — the `<result>`
+#       of the completion notification carrying THIS call's tool-use id; A10 FAILED on that
+#       third form 14z-178 until the matcher learned it, and its "the spec did not supply the
+#       token" check no longer counts a notification as the prompt)
 #   A11 the SELF-CAPPED built-in the S4 call gate lets through with no model (`Explore`) stays at
 #       most Opus-class under a caller ABOVE Opus-class (a Fable 5.1 parent), while
 #       `general-purpose` under the same parent runs on Fable — the breach the gate refuses, and
@@ -45,6 +49,11 @@
 #       `effort` does NOT — the session runs at the settings' default (the definition says low,
 #       the run is not low) — while an explicit `--effort low` pins it (added 14z-177; the
 #       subagent route applies a definition's effort, A3)
+#   A13 what project context a SUBAGENT sees (14z-178, S4 step 4's first act): a random codeword
+#       in CLAUDE.md and one in the project's auto-memory index; the main session (the can-leg),
+#       a rule-checker-shaped definition, the same with `omitClaudeMd: true`, general-purpose and
+#       Explore (the cannot-leg), each read by its no-tool ANSWER against its instructions
+#       ATTACHMENT — details at the leg
 #   (A9 and A10 added after rule-checker run 2026-09-23-109 found both premises unmeasured;
 #   run 2026-09-23-110 then found A10's delivery check VACUOUS — it matched the spec's own
 #   token — A9's general-purpose half under one parent only, and A8 not asserting the prompt
@@ -52,9 +61,11 @@
 #   against THIS call's result or hand-back, with a wrong-id control; A9 runs general-purpose
 #   under both parents; A8 asserts the hook's input carries the call's prompt)
 #
-# Usage: tools/agent/probe_agents.sh [SCRATCH_DIR]   (~6 min: seventeen short runs, one on Fable 5.1)
+# Usage: tools/agent/probe_agents.sh [SCRATCH_DIR]   (~7 min: nineteen short runs, one on Fable 5.1)
 # Prints one PASS/FAIL line per leg and exits non-zero on any FAIL.
-# Needs: the `claude` CLI and python3. Writes only under SCRATCH_DIR (default: a mktemp dir).
+# Needs: the `claude` CLI and python3. Writes only under SCRATCH_DIR (default: a mktemp dir), except
+# A13's memory index, created under ~/.claude/projects/<the scratch project>/memory/ only if absent and
+# deleted after the leg.
 set -u
 S=${1:-$(mktemp -d "${TMPDIR:-/tmp}/agentprobe.XXXXXX")}
 rm -rf "$S"; mkdir -p "$S/.claude/agents" "$S/hooks" || exit 2
@@ -217,14 +228,16 @@ a10=$(python3 - "$S/log_a.jsonl" <<'PY'
 # REPORT arrived. Delivery is matched only in a tool_result FOR THIS CALL's id or an
 # <agent-message from="THIS AGENT"> record, never anywhere in the transcript (the first
 # version matched the spec's own token and passed vacuously — rule-checker run 2026-09-23-110).
-import glob, json, os, sys
+import glob, json, os, re, sys
 TOKEN = "LOW-42"
 t = next(json.loads(l)["transcript"] for l in open(sys.argv[1]))
 recs = [json.loads(l) for l in open(t)]
 calls, main_bash, prompt_has = {}, [], False
 for r in recs:
     c = (r.get("message") or {}).get("content")
-    if r.get("type") == "user" and isinstance(c, str) and TOKEN in c:
+    # the orchestrator's PROMPT only — a <task-notification> is also a user string, and since
+    # 2.1.281 one can carry the report itself (14z-178), which is delivery, not supply
+    if r.get("type") == "user" and isinstance(c, str) and TOKEN in c and not c.lstrip().startswith("<task-notification>"):
         prompt_has = True
     for b in c if isinstance(c, list) else []:
         if b.get("type") == "tool_use" and b.get("name") in ("Agent", "Task"):
@@ -238,11 +251,16 @@ def delivered(call_id, agent_id):
             if b.get("type") == "tool_result" and b.get("tool_use_id") == call_id and TOKEN in json.dumps(b.get("content")):
                 return "tool-result"
         texts = [c] if isinstance(c, str) else []
-        texts += [json.dumps(r.get("attachment") or {}), str(r.get("content") or "")]
+        texts += [str((r.get("attachment") or {}).get("prompt") or ""), str(r.get("content") or "")]
         for x in texts:
-            if f'agent-message from=\\"{agent_id}\\"' in x or f'agent-message from="{agent_id}"' in x:
-                if TOKEN in x:
-                    return "hand-back"
+            if f'agent-message from="{agent_id}"' in x and TOKEN in x:
+                return "hand-back"
+            # the THIRD form (2.1.281, a background worker in a headless run, 14z-178): the report
+            # is the <result> of the completion notification whose <tool-use-id> is THIS call's
+            m = re.search(r"<tool-use-id>([^<]+)</tool-use-id>", x)
+            res = re.search(r"<result>(.*?)</result>", x, re.S)
+            if x.lstrip().startswith("<task-notification>") and m and m.group(1) == call_id and res and TOKEN in res.group(1):
+                return "notification-result"
     return ""
 out = []
 for meta in glob.glob(t[:-len(".jsonl")] + "/subagents/*.meta.json"):
@@ -330,6 +348,83 @@ PY
 case "$a12" in
   1*) echo "PASS A12: --agent applied the definition's model and tools (no Write -> no marker; A12c: the Write copy created one) but NOT its effort, which an explicit --effort pinned (${a12#1 })";;
   *)  echo "FAIL A12: ${a12:-no result} (model, tools bind, can-write copy, effort not applied, --effort pins) — the --agent behaviour changed"; fail=1;;
+esac
+
+# A13: what project context does a SUBAGENT see — the project's CLAUDE.md, and the project's
+# AUTO-MEMORY index? (S4 step 4's first act, ruled "Subagents", 14z-177; measured 14z-178.)
+# Two RANDOM codewords no prompt contains — one in the scratch CLAUDE.md, one in the scratch
+# project's own auto-memory index (`<its transcript dir>/memory/MEMORY.md`, located from an
+# earlier leg's transcript path, never computed; created only if absent and DELETED after the
+# leg — the one write this probe makes outside SCRATCH_DIR). A worker can name a codeword only
+# if that file is in its context. Each is asked, WITHOUT a tool, for every CANARY- word it has.
+# Two readings per worker: its ANSWER (its assistant records only — never the attachment record
+# that carries the file) and the INSTRUCTIONS attachment in its transcript (which files it lists).
+#   A13m  the main session — the can-leg: both files load at all, and both codewords are
+#         answerable (if memory does not load here, the memory half is VOID, not "blind")
+#   A13d  `w-rc`, shaped as the pinned rule-checker (Read, Grep, Glob; its own model)
+#   A13o  `w-rco`, the same with `omitClaudeMd: true` (documented, v2.1.271+: "launch this
+#         subagent without the user, project, and local CLAUDE.md files")
+#   A13g  general-purpose with a model — the form every rule-checker reader has taken
+#   A13e  Explore — the archive's cannot-leg (no instructions attachment on any archived run)
+# A spec carrying a codeword (the orchestrator sees both files and could pass one on) or a
+# worker that ran Read/Grep/Glob VOIDS the leg. The docs say "the main conversation's auto memory
+# isn't loaded" in a non-fork subagent; the archive's 217 general-purpose attachments list
+# MEMORY.md — this leg measures which is true, and asserts what it measured.
+cmd="CANARY-C$(python3 -c 'import secrets; print(secrets.token_hex(5))')"
+mem="CANARY-M$(python3 -c 'import secrets; print(secrets.token_hex(5))')"
+printf 'Probe project notes.\nThe project codeword is %s.\n' "$cmd" > CLAUDE.md
+memdir="$(dirname "$(python3 -c "import json,sys;print(json.loads(open(sys.argv[1]).readline())['transcript'])" "$S/log_a.jsonl")")/memory"
+memmine=0
+if [ ! -e "$memdir" ]; then
+  mkdir -p "$memdir" && printf -- '- [Probe note](probe.md) — the memory codeword is %s\n' "$mem" > "$memdir/MEMORY.md" && memmine=1
+fi
+defn w-rc haiku high "Read, Glob, Grep"
+defn w-rco haiku high "Read, Glob, Grep" "omitClaudeMd: true"
+ASK='Without using ANY tool, answer from your context alone: list every word in your context (system prompt, instructions, attachments, memory) that begins with CANARY- . Reply with those words exactly, separated by spaces, and nothing else; if there are none, reply NONE.'
+run pm haiku "" 0 "$ASK"
+run pw haiku "" 0 "Call the Agent tool four times, one after the other, each time passing the prompt below VERBATIM and adding nothing to it: first with subagent_type \"w-rc\" and no model parameter, then with subagent_type \"w-rco\" and no model parameter, then with subagent_type \"general-purpose\" and the model parameter \"haiku\", then with subagent_type \"Explore\" and no model parameter. Reply with the four answers, one per line. The prompt: $ASK"
+[ "$memmine" = 1 ] && rm -rf "$memdir"
+a13=$(python3 - "$S" "$cmd" "$mem" "$memmine" <<'PY'
+import glob, json, os, sys
+S, cmd, mem, memmine = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4] == "1"
+def said(recs):
+    out = ""
+    for r in recs:
+        if r.get("type") != "assistant":
+            continue
+        c = (r.get("message") or {}).get("content")
+        for b in c if isinstance(c, list) else [{"text": c}]:
+            out += json.dumps(b.get("input")) if b.get("type") == "tool_use" else str(b.get("text") or "")
+    return out
+def reading(text):
+    return ("C" if cmd in text else "-") + ("M" if mem in text else "-")
+main = json.load(open(f"{S}/out_pm.json")).get("result", "")
+t = next(json.loads(l)["transcript"] for l in open(f"{S}/log_pw.jsonl"))
+specs = [json.dumps(json.loads(l)["input"]) for l in open(f"{S}/log_pw.jsonl") if json.loads(l)["tool"] in ("Agent", "Task")]
+res = {"main": (reading(main), "-")}
+for meta in glob.glob(t[:-len(".jsonl")] + "/subagents/*.meta.json"):
+    at = json.load(open(meta)).get("agentType")
+    recs = [json.loads(l) for l in open(meta[:-len(".meta.json")] + ".jsonl")]
+    tools = [b.get("name") for r in recs if r.get("type") == "assistant"
+             for b in ((r.get("message") or {}).get("content") or []) if isinstance(b, dict) and b.get("type") == "tool_use"]
+    files = [os.path.basename(str(f.get("path"))) for r in recs if r.get("type") == "attachment"
+             and (r.get("attachment") or {}).get("type") == "instructions" for f in (r["attachment"].get("files") or [])]
+    att = ("C" if "CLAUDE.md" in files else "-") + ("M" if "MEMORY.md" in files else "-")
+    res[at] = ("VOID" if any(n in ("Read", "Grep", "Glob") for n in tools) else reading(said(recs)), att)
+leak = any(cmd in s or mem in s for s in specs)
+# the can-leg must see CLAUDE.md; the memory half is judged only where the main session saw memory
+mem_live = memmine and res["main"][0][1] == "M"
+ok = not leak and res["main"][0][0] == "C" and res.get("Explore") == ("--", "--")
+for k in ("w-rc", "w-rco", "general-purpose"):
+    ans, att = res.get(k, ("", ""))
+    ok = ok and ans not in ("", "VOID") and ans[0] == att[0] and (not mem_live or ans[1] == att[1])
+print(("1 " if ok else "0 ") + ("SPEC-LEAK " if leak else "") + ("memory-live " if mem_live else "MEMORY-VOID ")
+      + " ".join(f"{k}=answer:{v[0]}/attached:{v[1]}" for k, v in sorted(res.items())))
+PY
+)
+case "$a13" in
+  1*) echo "PASS A13: ${a13#1 } (C = the CLAUDE.md codeword, M = the memory codeword; answer = what the worker named with no tool, attached = what its instructions attachment listed) — the main session names CLAUDE.md's (the can-leg), Explore names nothing and carries nothing (the cannot-leg), and for w-rc, w-rco and general-purpose the answer agrees with the attachment";;
+  *)  echo "FAIL A13: ${a13:-no result} (main must name C, Explore must be --/--, no spec may carry a codeword, no worker may read a file, and each worker's answer must agree with its attachment)"; fail=1;;
 esac
 
 echo "scratch: $S"

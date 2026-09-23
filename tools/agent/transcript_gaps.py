@@ -47,7 +47,11 @@ Usage:
                  its own transcript records on its assistant records — a subagent with no
                  `effort` in its definition runs at its caller's (14z-177), so this is how the
                  rule-checker's readers were shown to have run at the session's effort;
-                 `--match RE` keeps only descriptions matching RE
+                 and (14z-178) the CONTEXT an `instructions` attachment handed it
+                 (`Project:CLAUDE.md`, `AutoMem:MEMORY.md`) with its Claude Code version, then
+                 one `context-census:` line per (type, context, version) — how every
+                 rule-checker reader was shown to have been handed CLAUDE.md and the memory
+                 index; `--match RE` keeps only descriptions matching RE
   --selftest     classify a synthetic transcript with known answers and exit
 
 Reads only; writes nothing. Stdlib only (no numpy on this Mac).
@@ -256,30 +260,44 @@ def refusals(path):
 
 
 def subagents(transcript):
-    """-> [(agent_type, description, {models}, {efforts}, n_assistant)] for every subagent of
-    one session transcript, read from `<session>/subagents/*.meta.json` and the worker's own
-    transcript beside it. Model and effort are FIELDS of assistant records (`message.model`,
-    `effort`), never text: a record that mentions "effort" in its content counts for nothing."""
+    """-> [(agent_type, description, {models}, {efforts}, n_assistant, {context}, {versions})]
+    for every subagent of one session transcript, read from `<session>/subagents/*.meta.json`
+    and the worker's own transcript beside it. Model and effort are FIELDS of assistant records
+    (`message.model`, `effort`), never text: a record that mentions "effort" in its content
+    counts for nothing. CONTEXT is what an `instructions` ATTACHMENT record handed the worker —
+    `<type>:<file name>` per entry of its `files` list (`Project:CLAUDE.md`,
+    `AutoMem:MEMORY.md`, 14z-178) — read from the structure, never by matching text: a first
+    text match over the attachment's JSON missed every one of them, and a tool result that
+    QUOTES CLAUDE.md must not count. VERSIONS are the Claude Code versions its records carry
+    (2.1.240's workers carry no such record at all — whether it sent none or recorded none is
+    not known)."""
     out = []
     for meta in sorted(glob.glob(transcript[:-len(".jsonl")] + "/subagents/*.meta.json")):
         try:
             m = json.load(open(meta))
         except (OSError, ValueError):
             continue
-        models, efforts, n = set(), set(), 0
+        models, efforts, n, context, versions = set(), set(), 0, set(), set()
         try:
             for line in open(meta[:-len(".meta.json")] + ".jsonl"):
                 try:
                     r = json.loads(line)
                 except ValueError:
                     continue
+                if r.get("version"):
+                    versions.add(str(r["version"]))
                 if r.get("type") == "assistant":
                     n += 1
                     models.add(str((r.get("message") or {}).get("model")))
                     efforts.add(str(r.get("effort")))
+                att = r.get("attachment") if r.get("type") == "attachment" else None
+                if isinstance(att, dict) and att.get("type") == "instructions":
+                    for f in att.get("files") or []:
+                        if isinstance(f, dict) and f.get("path"):
+                            context.add(f"{f.get('type')}:{os.path.basename(f['path'])}")
         except OSError:
             pass
-        out.append((m.get("agentType"), m.get("description", ""), models, efforts, n))
+        out.append((m.get("agentType"), m.get("description", ""), models, efforts, n, context, versions))
     return out
 
 
@@ -367,11 +385,27 @@ def selftest():
     with open(os.path.join(sd, "sess", "subagents", "agent-x.meta.json"), "w") as g:
         json.dump({"agentType": "general-purpose", "description": "reader run 1"}, g)
     with open(os.path.join(sd, "sess", "subagents", "agent-x.jsonl"), "w") as g:
-        for r in ({"type": "user", "message": {"content": "set effort: xhigh please"}},
+        for r in ({"type": "user", "version": "9.9.1", "message": {"content": "set effort: xhigh please"}},
+                  {"type": "attachment", "attachment": {"type": "instructions", "files": [
+                      {"path": "/r/CLAUDE.md", "type": "Project", "content": "x"},
+                      {"path": "/m/memory/MEMORY.md", "type": "AutoMem", "content": "y"}]}},
                   {"type": "assistant", "effort": "high", "message": {"model": "m1", "content": "the effort was low"}},
                   {"type": "assistant", "effort": "high", "message": {"model": "m1"}}):
             g.write(json.dumps(r) + "\n")
-    sub_ok = subagents(top) == [("general-purpose", "reader run 1", {"m1"}, {"high"}, 2)]
+    # a second worker: CLAUDE.md QUOTED in a tool result and named in text, never attached,
+    # and an attachment of another type — its context must read EMPTY
+    with open(os.path.join(sd, "sess", "subagents", "agent-y.meta.json"), "w") as g:
+        json.dump({"agentType": "Explore", "description": "no context"}, g)
+    with open(os.path.join(sd, "sess", "subagents", "agent-y.jsonl"), "w") as g:
+        for r in ({"type": "user", "message": {"content": [{"type": "tool_result", "tool_use_id": "u",
+                   "content": "Contents of /r/CLAUDE.md (project instructions, checked into the codebase)"}]}},
+                  {"type": "attachment", "attachment": {"type": "deferred_tools_delta", "files": [
+                      {"path": "/r/CLAUDE.md", "type": "Project"}]}},
+                  {"type": "assistant", "effort": "high", "message": {"model": "m2"}}):
+            g.write(json.dumps(r) + "\n")
+    sub_ok = subagents(top) == [
+        ("general-purpose", "reader run 1", {"m1"}, {"high"}, 2, {"Project:CLAUDE.md", "AutoMem:MEMORY.md"}, {"9.9.1"}),
+        ("Explore", "no context", {"m2"}, {"high"}, 1, set(), set())]
     import shutil
     shutil.rmtree(sd)
     got = [(round(g), c) for g, c, _, _ in gaps(recs, 20)]
@@ -411,13 +445,22 @@ def main():
             print(f"--subagents {a.subagents}: no transcript matches", file=sys.stderr)
             return 2
         n = 0
+        census = {}
         for f in hit:
-            for at, desc, models, efforts, k in subagents(f):
+            for at, desc, models, efforts, k, context, versions in subagents(f):
                 if a.match and not re.search(a.match, desc):
                     continue
                 n += 1
+                ctx = ",".join(sorted(context)) or "-"
                 print(f"{os.path.basename(f)[:8]}  {str(at):18} {desc[:48]:48} model {','.join(sorted(models)) or '-'}"
-                      f"  effort {','.join(sorted(efforts)) or '-'}  ({k} records)")
+                      f"  effort {','.join(sorted(efforts)) or '-'}  context {ctx}"
+                      f"  v{','.join(sorted(versions)) or '-'}  ({k} records)")
+                key = (str(at), ctx, ",".join(sorted(versions)) or "-")
+                census[key] = census.get(key, 0) + 1
+        # the CONTEXT census (14z-178): which worker types were handed CLAUDE.md / the memory
+        # index by an instructions attachment, per Claude Code version
+        for (at, ctx, ver), c in sorted(census.items()):
+            print(f"context-census: {c:4d}  {at:18} context {ctx:34} v{ver}")
         # always a count line: an empty listing and a blind reader must not look alike
         print(f"subagents: {n}")
         return 0

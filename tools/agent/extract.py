@@ -21,8 +21,10 @@ One line per event, in transcript order, each prefixed `[<record index> <HH:MM>]
   R   the call's result: `ok` or `ERROR`, and its first 160 characters
   N   a task event: a tracked launch (its id) or its completion notification (id,
       status, and whether it arrived with the agent idle or mid-turn)
-  H   a background worker's report arriving as a `[Subagent hand-back]` (its text joins the
-      sources an A# line is checked against, so quoting a worker is not "unsourced")
+  H   a background worker's report arriving as a `[Subagent hand-back]`, or (since 2.1.281,
+      measured 14z-178 by `probe_agents.sh` A10) as the `<result>` of its completion
+      notification (its text joins the sources an A# line is checked against, so quoting a
+      worker is not "unsourced")
 
 and, under every Agent call, the WORKER it started (slice S4, 14z-177 — read from the worker's
 own transcript, `<session>/subagents/agent-<id>.jsonl`, matched by `meta.json`'s `toolUseId`;
@@ -180,6 +182,16 @@ def extract(path, first=0, last=None):
             if inside:
                 who = re.search(r'from="([^"]+)"', hb)
                 out.append(f"[{n} {ts}] H  report of worker {who.group(1) if who else '?'} arrived (hand-back)")
+        # the THIRD report form (2.1.281, measured 14z-178 by probe_agents.sh A10): a background
+        # worker's report as the <result> of its completion notification — a user string or a
+        # queued_command attachment. Its text sources an A# line like a hand-back's.
+        for note in ([c] if r.get("type") == "user" and isinstance(c, str) else []) + [hb]:
+            res = re.search(r"<result>(.*?)</result>", note, re.S) if note.lstrip().startswith("<task-notification>") else None
+            if res and res.group(1).strip():
+                corpus.append(res.group(1))
+                if inside:
+                    tid = re.search(r"<task-id>([^<]+)</task-id>", note)
+                    out.append(f"[{n} {ts}] H  report of task {tid.group(1) if tid else '?'} arrived (in its completion notification)")
         for tid, st, form in agentlib.notifications(r):
             if tid in tracked:
                 tracked[tid]["ended"] = True
@@ -288,6 +300,14 @@ def selftest():
         {"type": "attachment", "timestamp": "2026-09-23T10:05:00Z",
          "attachment": {"type": "queued_command", "prompt": '<agent-message from="w9">[Subagent hand-back] FIG n = 8642 <- C1'}},
         rec("assistant", [{"type": "text", "text": "the worker says 8642"}]),
+        # the third form (14z-178): the report as the <result> of the completion notification;
+        # a notification with no <result>, and a maintainer message QUOTING one, carry no report
+        rec("user", "<task-notification>\n<task-id>tq7</task-id>\n<status>completed</status>\n"
+                    "<result>FIG q = 7531 <- C1</result>\n</task-notification>"),
+        rec("assistant", [{"type": "text", "text": "the second worker says 7531"}]),
+        rec("user", "<task-notification>\n<task-id>tq8</task-id>\n<status>completed</status>\n</task-notification>"),
+        rec("user", "why did it print <task-notification><result>4455</result> earlier?"),
+        rec("assistant", [{"type": "text", "text": "and 3344 is mine"}]),
     ]
     with open(main, "w") as g:
         for r in wrows:
@@ -314,7 +334,13 @@ def selftest():
         "worker figure in no result flagged": "9876" in wline,
         "worker figure found only in the SPEC flagged": "555" in wline,
         "a call without a worker transcript is loud": "NO WORKER TRANSCRIPT" in wg,
-        "a hand-back is shown and sources the orchestrator": "H  report of worker w9 arrived" in wg and "A# " not in wg,
+        "a hand-back is shown and sources the orchestrator": "H  report of worker w9 arrived" in wg
+            and not any("A# " in ln and "8642" in ln for ln in wg.split("\n")),
+        "a notification's <result> is shown and sources the orchestrator": "H  report of task tq7 arrived (in its completion notification)" in wg
+            and not any("A# " in ln and "7531" in ln for ln in wg.split("\n")),
+        "a notification with no <result> carries no report": "task tq8 arrived" not in wg,
+        "a message QUOTING a notification is not a report": "4455" not in "".join(ln for ln in wg.split("\n") if " H  " in ln),
+        "an unsourced figure after them is still flagged": any("A# " in ln and "3344" in ln for ln in wg.split("\n")),
     })
     bad = [k for k, v in checks.items() if not v]
     for k in bad:

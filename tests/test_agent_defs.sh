@@ -18,6 +18,10 @@
 # MUST-FIRE: perturbed-copy: max-effort — measurer.md's effort set to max must be refused, and the gate must FAIL (mode: the gate checks that copy)
 # MUST-FIRE: perturbed-copy: frontmatter-hooks — a hooks: block added to reader.md must be refused, and the gate must FAIL (mode: the gate checks that copy)
 # MUST-FIRE: perturbed-copy: write-tool — Write added to reader.md's tools must be refused, and the gate must FAIL (mode: the gate checks that copy)
+# MUST-FIRE: perturbed-copy: context-leak — rule-checker.md's omitClaudeMd line removed must be refused (it would receive CLAUDE.md, probe_agents A13), and the gate must FAIL (mode: the gate checks that copy)
+#
+# Since 14z-178 the pinned rule-checker (step 4) is required too, and must carry
+# `omitClaudeMd: true` (measured by probe_agents.sh A13 to keep CLAUDE.md out of its context).
 #
 # Usage: tests/test_agent_defs.sh      # ci_portable, ~1 s
 set -eu
@@ -46,6 +50,7 @@ open(p, "w").write(s)
 PY
             echo "key 'hooks' not allowed";;
         write-tool)     sed -i.bak 's/^tools: .*/&, Write/' "$2/reader.md"; echo "tool 'Write'";;
+        context-leak)   sed -i.bak '/^omitClaudeMd:/d' "$2/rule-checker.md"; echo "omitClaudeMd: true missing";;
     esac
     rm -f "$2"/*.bak
 }
@@ -61,13 +66,13 @@ echo "== the definitions under $target"
 out="$($CHECK "$target" 2>&1)" && rc=0 || rc=$?
 echo "$out" | sed 's/^/  /'
 if [ "$rc" -ne 0 ]; then echo "FAIL: a definition breaks the caps"; fail=1; fi
-for n in measurer reader; do
+for n in measurer reader rule-checker; do
     echo "$out" | grep -q "^OK  $n.md$" || { echo "FAIL: $n.md is not an OK definition"; fail=1; }
 done
 
 if [ -z "$VS_CTL" ]; then
     echo "== controls: one planted defect per copy, each must be refused with its reason"
-    for c in fable-model missing-effort max-effort frontmatter-hooks write-tool; do
+    for c in fable-model missing-effort max-effort frontmatter-hooks write-tool context-leak; do
         want="$(perturb "$c" "$W/$c")"
         got="$($CHECK "$W/$c" 2>&1)" && crc=0 || crc=$?
         if [ "$crc" -ne 0 ] && echo "$got" | grep '^BAD ' | grep -qF "$want"; then
@@ -78,6 +83,6 @@ if [ -z "$VS_CTL" ]; then
     done
 fi
 
-if [ "$fail" -eq 0 ]; then echo "PASS: every worker definition states its caps (model at most Opus-class, effort at most xhigh, an allowed tool list) and carries no unapproved key"
+if [ "$fail" -eq 0 ]; then echo "PASS: every worker definition states its caps (model at most Opus-class, effort at most xhigh, an allowed tool list) and carries no unapproved key; the rule-checker launches without CLAUDE.md"
 else echo "FAIL: test_agent_defs"; fi
 exit "$fail"

@@ -258,6 +258,19 @@ era's readers ran at one effort (Fable 5.1 `high`, Opus 5 `xhigh`, Opus 5.5 `hig
 calibrations hold for Opus 5.5 at `high`, and a session at another effort would spawn an
 uncalibrated instrument without a word — the class #158 names for the model.
 
+**The context (14z-178) — the readers were never context-free.** The design gives the
+checker *"no project-specific context"* (the #172 ask) and *"a generic checklist plus a transcript
+extract, never CLAUDE.md"* (the 14z-175 ruling). Measured: a `general-purpose` subagent is handed
+this project's CLAUDE.md and, in an interactive session, its auto-memory index, as an
+`instructions` attachment (`tools/agent/probe_agents.sh` A13 with a random codeword; the archive
+read by `transcript_gaps.py --subagents all`: every `general-purpose` worker since 2.1.270). **So
+every reader of every run in the ledger, calibrations included, read its packet with CLAUDE.md
+and the memory index in context.** The plants were still caught on every valid run; what the runs
+did not have is the independence the design names, since both carry the working agent's own
+rules and memories. The pinned definition `.claude/agents/rule-checker.md` carries `omitClaudeMd:
+true`, measured to remove CLAUDE.md (A13); whether it removes the memory index too is measured
+at its first spawn, which only a session started after the definition existed can make.
+
 ## What it will not catch
 
 - **Operational slips.** A waiter wedged for hours is not a rule-application

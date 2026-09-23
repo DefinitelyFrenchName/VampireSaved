@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-413 entries (46 game / 116 platform / 251 project), counted from the buckets at generation.
+414 entries (46 game / 117 platform / 251 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 46 entries
 
@@ -71,7 +71,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - "WHEN CAN THE BLOCKER ACT" IS NOT ASKED BY MASHING INSIDE THE BLOCK WINDOW — that measures the ADVANCING GUARD (paid: 14z-168)
 - A RECORD'S CLASS BYTE IS NOT THE VICTIM'S REACTION CLASS — the guard reads it first and the stager rewrites it (paid: 14z-169)
 
-## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 116 entries
+## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 117 entries
 
 - `spctl -a` REPORTS THE SIGNING-POLICY VERDICT, NOT WHETHER A LAUNCH IS BLOCKED — and `unzip` DOES propagate com.apple.quarantine (measured: 2026-09-20, macOS 26.0 arm64, #144)
 - A ROMSET WITH MEMBERS MISSING RUNS FOR THOUSANDS OF FRAMES WITH WORK RAM BIT-IDENTICAL — only the framebuffer shows it (paid: 2026-09-20)
@@ -189,6 +189,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - `$!` AFTER `cd DIR && CMD &` IS THE SUBSHELL, NOT `CMD` — killing it leaves `CMD` orphaned (paid: 14z-176)
 - HEADLESS CHROME'S `--virtual-time-budget` RUNS OUT WHILE THE PAGE WAITS ON I/O — an incomplete run looks like a content verdict in EVERY leg that reads it (paid: 14z-174, and again 14z-176)
 - A SUBAGENT WITH NO `effort` LINE RUNS AT ITS CALLER'S EFFORT, AND THE CALLER'S `model` BEATS THE DEFINITION'S — a cap written in `.claude/agents/<name>.md` alone does not hold (measured 2026-09-23, 14z-177, Claude Code 2.1.280, and all twelve legs re-run on 2.1.281 after it updated mid-session)
+- A SUBAGENT IS HANDED THE PROJECT'S CLAUDE.md — AND, INTERACTIVELY, THE AUTO-MEMORY INDEX, WHICH THE DOCS SAY IT IS NOT; `omitClaudeMd: true` REMOVES CLAUDE.md (measured 2026-09-24, 14z-178, Claude Code 2.1.281)
 
 ## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 251 entries
 

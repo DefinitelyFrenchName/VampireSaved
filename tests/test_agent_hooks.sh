@@ -35,7 +35,7 @@
 # refuses an Agent call with a model above Opus-class, a model on a defined worker, no model
 # on a type that would inherit the orchestrator's (Explore excepted, measured capped), or a
 # template-driven worker's spec missing a heading; forks pass (ruled). `tests/lib/pre_agent_cases.py`
-# drives it through 25 cases, every rule both ways and fail-open, against the installed hook.
+# drives it through 27 cases (25 until 14z-178 added the pinned rule-checker's two), every rule both ways and fail-open, against the installed hook.
 #
 # Usage: tests/test_agent_hooks.sh      # ci_portable, ~4 s
 set -eu
@@ -270,5 +270,5 @@ PY
     done
 fi
 
-if [ "$fail" = 0 ]; then echo "PASS: C0.1 denies the 14z-174 launches and every must-deny case, allows every must-allow case, and fails open on a malformed event; C1's push hook decides all 18 of its cases; S4's call gate decides all 25 of its cases"
+if [ "$fail" = 0 ]; then echo "PASS: C0.1 denies the 14z-174 launches and every must-deny case, allows every must-allow case, and fails open on a malformed event; C1's push hook decides all 18 of its cases; S4's call gate decides all 27 of its cases"
 else echo "FAIL: test_agent_hooks"; exit 1; fi

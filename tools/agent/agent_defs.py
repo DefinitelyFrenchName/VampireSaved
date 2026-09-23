@@ -17,9 +17,16 @@ Each `<dir>/*.md` must have a frontmatter block (`---` ... `---`) with EXACTLY t
   effort       low | medium | high | xhigh   (never omitted, never `max`)
   tools        a comma-separated list, every entry in ALLOWED_TOOLS (never omitted: an omitted
                list grants every tool — documented, not measured)
+and ONE optional key:
+  omitClaudeMd exactly `true` (14z-178: MEASURED by probe_agents.sh A13 to launch the worker with
+               no CLAUDE.md in its context — no instructions attachment, and the CLAUDE.md
+               codeword unnamed — where every definition without it, and every general-purpose
+               call, receives CLAUDE.md; any other value reads as a setting and is refused)
 Any other key (`hooks`, `permissionMode`, `disallowedTools`, `mcpServers`, ...) is refused: a
 new key is a reviewed widening of this list, never a silent one. And every name in REQUIRED
-must be present. The body (the worker's prompt) must be non-empty.
+must be present; a name in CONTEXT_FREE must carry `omitClaudeMd: true` — the rule-checker is
+context-free by ruling (2026-09-23, 14z-175: "a generic checklist plus a transcript extract,
+never CLAUDE.md"). The body (the worker's prompt) must be non-empty.
 
 Usage:
   python3 tools/agent/agent_defs.py [DIR]      # default .claude/agents; exit 0 all OK, 1 any BAD
@@ -30,13 +37,16 @@ import re
 import sys
 
 KEYS = ("name", "description", "model", "effort", "tools")
+OPTIONAL = ("omitClaudeMd",)
 MODELS = re.compile(r"^(opus|sonnet|haiku|claude-(opus|sonnet|haiku)-[0-9][0-9a-z.-]*)$")
 EFFORTS = ("low", "medium", "high", "xhigh")
 # the tools a worker may hold. No Write/Edit/NotebookEdit (a worker returns figures, it does not
 # change the tree), no Agent/Task (a worker does not spawn workers — the call gate binds calls).
 ALLOWED_TOOLS = ("Bash", "Read", "Grep", "Glob")
-# the definitions the ruled order puts in step 1 (the pinned rule-checker joins at step 4)
-REQUIRED = ("measurer", "reader")
+# the definitions the ruled order puts in step 1, and the pinned rule-checker of step 4 (14z-178)
+REQUIRED = ("measurer", "reader", "rule-checker")
+# the definitions that must launch with no CLAUDE.md in context (see OPTIONAL above)
+CONTEXT_FREE = ("rule-checker",)
 
 
 def parse(path):
@@ -71,7 +81,7 @@ def check(path):
         return bad
     stem = os.path.splitext(os.path.basename(path))[0]
     for k in keys:
-        if k not in KEYS:
+        if k not in KEYS + OPTIONAL:
             bad.append(f"key {k!r} not allowed" + (" (a frontmatter hooks: block did not fire, probe_agents A6)" if k == "hooks" else ""))
     for k in KEYS:
         if k not in keys or not keys[k]:
@@ -89,6 +99,10 @@ def check(path):
         for t in tools:
             if t not in ALLOWED_TOOLS:
                 bad.append(f"tool {t!r} not in {'/'.join(ALLOWED_TOOLS)}")
+    if "omitClaudeMd" in keys and keys["omitClaudeMd"] != "true":
+        bad.append(f"omitClaudeMd {keys['omitClaudeMd']!r} is not exactly true")
+    if stem in CONTEXT_FREE and keys.get("omitClaudeMd") != "true":
+        bad.append("omitClaudeMd: true missing (a context-free checker; without it the worker receives CLAUDE.md, probe_agents A13)")
     if not body:
         bad.append("empty body (no prompt)")
     return bad
