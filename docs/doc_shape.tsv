@@ -66,6 +66,7 @@ docs/project/M3b_plan.md	HIST	-	-
 docs/project/WINDOWS_BUILD.md	REFERENCE	-	-
 docs/project/WSL2_SETUP.md	REFERENCE	-	-
 docs/project/audit_2026-08-15_dispositions.md	HIST	-	-
+docs/project/agent_architecture_scope.md	REFERENCE	-	banner
 docs/project/applier_app_scope.md	REFERENCE	-	banner
 docs/project/beam_port_scope.md	HIST	-	-
 docs/project/build_dir_triage.md	REFERENCE	docs/project/build_dir_triage_history.md	banner

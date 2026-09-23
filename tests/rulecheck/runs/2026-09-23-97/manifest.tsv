@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+docs/project/agent_architecture_scope.md	2a9042a498938d2aef59da5b5574651d5ef708a8
+tools/agent/transcript_gaps.py	1bb993944dcd885db43488fbdacbfccc14c879a7
+tools/agent/probe_hooks.sh	6839ef8c13deaa6854e3b96c825d279c37ae5617
+build/agent172/census.txt	272a4c31391aeae98c93080a6f856208c158decb
+build/agent172/census_14z174_detail.txt	f84f0d4c3f509ce7d835f78674810638be790548
+build/agent172/census_selftest.txt	9b560f7180930dfdfe0b43e12b171f067e9d85b8
+build/agent172/probe_run.txt	c272e08ef11122a474404681d4fcecc980f66090
+build/agent172/cli_agent_flag.txt	b67927e578fbc0d016b4c3dba4cea2e412579e1f
+build/agent172/issue_172.txt	784a285c66652e529c4dcbd871d7cc663a74692e
+docs/project/rule_checker.md	5a29ec8e29c18f2409863d220f796062ce8f60f2

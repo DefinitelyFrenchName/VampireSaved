@@ -1,0 +1,264 @@
+# THE AGENT ARCHITECTURE — scope, before the work (GitHub #172)
+
+> **STATUS (14z-175, 2026-09-23): RULED, NOT YET BUILT.** The maintainer ruled all
+> four questions of §6 the same day (`DECISIONS_HISTORY.md` "Ruled 2026-09-23
+> (14z-175) — #172"), adding one constraint that binds every slice: **a block stops
+> the task at fault, never the session.** Slice S1 is next. The hooks named here do
+> NOT exist in `.claude/` yet.
+
+**Why this document exists:** the same reason `harness_scope.md` and
+`applier_app_scope.md` do — a direction the maintainer ordered, big enough that
+starting it blind would waste a sitting, with open design questions that are the
+maintainer's to rule. The ticket is the story (#172, [VSP-182]); this is the plan.
+
+**The ask (maintainer, 2026-09-22), verbatim from #172:**
+
+> *"the worrying part is not that you have not polled you own background work, it's
+> that you explicitly chose earlier to poll to avoid waiting forever for tasks you
+> would never see finish either because they finished too fast or because of how they
+> reported. Polling is likely the good option. The problem is actually doing it."*
+
+> * **orchestrator: fable 5.1 agent**, free to choose how best to work **BUT cannot
+>   go against the will of checker agents**
+> * **checker: one or more opus agents** (could be lowered to sonnet if no adverse
+>   effects), **only knows the rules and ways of working, no project-specific context
+>   to have no bias there**: only purpose is to check if the discipline is applied
+>   (e.g. are the values measured, not inferred by the workers? is the orchestrator
+>   applying the procedures it should?)
+> * **workers: specialized, driven by very precise specifications and directives
+>   given by the orchestrator.** There should be as few or many as deemed adequate by
+>   the orchestrator at any given moment. By default they should be limited to a
+>   small context (and they should be at most opus-class or maybe even sonnet if
+>   context is small and specs clear and precise)
+> * **max acceptable effort for fable is high, for Opus and Sonnet is xHigh**
+
+## 1. THE FAILURE, MEASURED FROM THE TRANSCRIPTS
+
+Every session's transcript is on disk (`~/.claude/projects/<project>/<session>.jsonl`).
+`tools/agent/transcript_gaps.py` (re-derives this table; `--selftest`; `--detail <id>`
+lists one session's gaps) reads the last eleven sessions before this one, counting
+every gap of 20 minutes or more that began after the agent's own turn, and
+classifying what ended it. A "status" ender is a message of at most 80 characters
+matching a status keyword: a first cut without the length bound counted three long
+messages as status questions — one of them #172's own origin message — and every
+message the bound reclassified was read and confirmed not a status question.
+
+| session | start (UTC) | gaps ≥ 20 min | ended by "what's the status" | ended by a notification | other | detached launches | harness-tracked tasks |
+|---|---|---|---|---|---|---|---|
+| 4404c66f | 09-17 15:31 | 0 | 0 | 0 | 0 | 16 | 0 |
+| b402dba6 | 09-17 19:10 | 1 | 0 | 0 | 1 | 0 | 2 |
+| 35f352b6 | 09-17 20:55 | 3 | 0 | 1 | 2 | 12 | 12 |
+| 21b7a712 | 09-18 06:29 | 2 | 0 | 2 | 0 | 1 | 6 |
+| 82693a92 | 09-18 10:21 | 4 | 0 | 1 | 3 | 28 | 8 |
+| 92e58f46 | 09-18 17:37 | 2 | 0 | 0 | 2 | 10 | 0 |
+| b0c1cbc9 | 09-18 22:34 | 6 | 0 | 3 | 3 | 51 | 10 |
+| 4724b8d7 | 09-19 22:51 | 5 | 2 | 0 | 3 | 19 | 11 |
+| 5b2495dc | 09-20 12:30 | 2 | 0 | 0 | 2 | 7 | 6 |
+| 5d6dd31f | 09-20 16:28 | 4 | 0 | 2 | 2 | 0 | 36 |
+| **d5b070d5 (14z-174)** | 09-21 08:37 | **17** | **11** | **1** | 5 | **12** | **5** |
+
+"Detached" is a Bash call (not `run_in_background`) whose command carries `nohup`,
+`setsid`, `disown` or a single command-ending `&` — not half of `&&`, not a `>&`
+redirect. "Tracked" is a task the harness reports running in the background: a
+`run_in_background` launch, or a call it moved there at the 120 s timeout. **The
+14z-174 gaps that the maintainer's status question ended total 1,623 minutes.
+That is an UPPER BOUND on waste, not the waste:** part of each gap was a job
+genuinely still running. The maintainer's own figure for the finished-and-idle
+part is 2.5 h, 1.5 h and 1.5 h (#172).
+
+**CORRECTED BEFORE THE MAINTAINER SAW IT (rule-checker run `2026-09-23-97`, Q1 and
+Q4, both true).** The first cut of this table read 14z-174 as **97 detached, 0
+tracked**. Both figures were wrong: the detach pattern also matched `cmd && echo …`
+(85 of the 97), and the tracked count read only `run_in_background`, missing the five
+calls the harness moved to the background at the 120 s timeout. The table above is
+the re-measure; `transcript_gaps.py --selftest` now carries a must-stay-quiet case
+for each defect.
+
+**The mechanism the table points at.** A job launched with `nohup … &` inside an
+ordinary Bash call is invisible to the harness: it cannot produce a completion
+notification, so once the agent ends its turn, the only things that can end the
+wait are the agent's own poll, which it cannot make while idle, and the
+maintainer. **In 14z-174 all twelve detached launches were `nohup` launches of the
+LONG jobs** — the static tier twice, the release emulator tier twice, the close tier
+three times, a control measurement, the rig attribution, the re-freeze diff capture,
+the re-freeze and the release upload (2 + 2 + 3 + 5 = 12), read one by one from the
+transcript. Its five TRACKED tasks, each timed from its move to the background to its
+completion notification (`transcript_gaps.py --tasks d5b070d5`, which reads both
+notification forms — §2): two ended within a minute; two ran 45 and
+39 minutes and were WAITER LOOPS (`for i …; do ps -p <pid> … sleep 55; done`, the
+commands `--tasks` prints) around a detached job — and the one 14z-174 gap
+a notification ended is the first of them, so where a long detached job WAS wrapped in
+a tracked waiter, the agent was woken; the fifth was the netlog Chrome of #172's
+comment, whose task ended 2,113 minutes (35 h) after it was moved. Across the eleven
+sessions the correlation is weaker than that one session: several sessions detached
+many launches and were rarely chased for status. So what is measured is that **every
+long job the costliest session launched for its result was detached, and the harness
+saw one only where the agent wrapped a tracked waiter around it**; that the invisibility
+CAUSED the gaps is not tested, and §5's slice S1 replay is where it is.
+
+**The second shape (#172's comment):** two processes survived their sessions — a
+headless Chrome for 1 d 11 h and a `tail -F` orphaned for 17 days. In both cases
+the agent checked the OUTPUT it wanted and never the PROCESS it had started.
+
+## 2. WHAT THE PLATFORM OFFERS — MEASURED WHERE IT MATTERS
+
+The design rests on these rows. "Measured" means a probe in a scratch project
+(`claude -p`, Claude Code 2.1.280, 2026-09-23), not the documentation;
+`tools/agent/probe_hooks.sh` re-measures every MEASURED row in about a minute (P1-P3
+the mechanisms, P5 the models when `PROBE_MODELS` names them), with two controls — P1c,
+the deny switched off, must create the marker P1 requires absent, and P4, the P1/P2
+record counts must read zero on a run with no denial and no block — and exits non-zero
+if any has changed.
+
+| mechanism | status | what it gives |
+|---|---|---|
+| **PreToolUse hook denies a Bash call with a reason** | **MEASURED** (P1, P1c) | the agent received `PreToolUse:Bash hook error: <reason>` as the tool result, and the denied command NEVER RAN: the marker file it would have created is absent, while the same prompt with the deny switched off creates it (P1c, the must-fire leg) |
+| **Stop hook blocks the end of a turn** | **MEASURED** | `{"decision":"block","reason":…}` → the transcript records `Stop hook feedback: <reason>` and the agent continues; the next Stop arrives with `stop_hook_active: true` (the loop guard) |
+| **the transcript records every background task** | **MEASURED** | a tracked launch's result reads `Command running in background with ID: <id>. Output is being written to: <path>`; a 120 s timeout reads `moved to the background (ID: <id>)`; completion is a `<task-notification>` with `<status>` — **in TWO forms**: a user message when it arrives while the agent is idle, and a `queued_command` ATTACHMENT (with `queue-operation` records) when it arrives mid-turn. A first reading that parsed only the first form reported three of 14z-174's five tracked tasks as never notified; all five were (rule-checker run `2026-09-23-98`). C0.2 parses both |
+| **a headless run exits with a tracked task still running** | **MEASURED** (P3b) | the probe agent said *"I'll wait for the completion notification"* and the session ended about 6 s in (5,939 ms on the recorded run) with its 20 s task still running and no notification received. Interactively the notification wakes the agent; headless, nothing does |
+| **a transcript embeds the system prompt** | **MEASURED** | a `grep` for `task-notification` over a transcript MATCHES in a run that received none — the prompt snapshot the transcript records mentions the tag. The probe script's first version failed on exactly this. **Every C0 check parses records by type; none greps a transcript** |
+| `--agent <name>` runs the MAIN session as a defined agent | CLI help (`claude --help`, 2.1.280) | the orchestrator can be a definition carrying its own model, effort and prompt. (The documentation summary this session obtained said no such flag exists; the binary says otherwise, which is why the row is sourced from the binary.) |
+| subagent definitions `.claude/agents/<name>.md` with `model`, `effort`, `tools`, `disallowedTools`, `hooks` | documented | workers and checkers as named, capped definitions; a hook scoped to one agent |
+| `type: "prompt"` / `type: "agent"` hooks (a model judges the event) | documented; agent hooks EXPERIMENTAL, default model Haiku, 30/60 s default timeouts | a model checker at Stop without the orchestrator's cooperation — see §4, C1 |
+| permissions `deny` on `Edit`/`Write` of `.claude/settings.json` | documented | the enforcement cannot be edited away by the agent it binds |
+| an event when a background Bash task finishes | **documented as ABSENT** — NOT exercised | so the Stop hook must reconstruct task state from the transcript. C0.2 rests on this row; if an event exists after all, C0.2 gets simpler, not wrong |
+| Fable 5.1, Opus 5.5, Sonnet 5 reachable on this account | **MEASURED** 2026-09-23 (P5) | each answered a one-line probe as itself (`modelUsage` names the model); the 2026-09-18 spend-limit failure on Fable 5.1 is not current |
+
+## 3. WHAT EXISTS AND WHAT IT DOES NOT COVER
+
+`tools/rulecheck.py` ([VSP-183], [VSP-184]) is already the CHECKER tier for
+EVIDENCE: fresh agents, artifacts only, five fixed questions, a planted known
+violation every run, a VIOLATED verdict that stops the action until each question is
+answered in writing. Recalibrated on Opus 5.5 this sitting (ledger runs
+`2026-09-23-93..96`). Its own spec names the gap: *"Operational slips. A waiter
+wedged for hours is not a rule-application failure; it was not looking. The checker
+does not fix that."* Nothing checks PROCEDURE — whether the agent did what it said
+it would, and what the rules require of the working method itself.
+
+## 4. THE RECOMMENDATION — BIND WHAT CAN BE BOUND MECHANICALLY, JUDGE THE REST
+
+**The principle: a check that needs no judgement should not be given to a model.**
+The costliest failures in §1 are mechanically detectable from the transcript and
+the process table; a hook that detects them cannot be argued with, forgotten, or
+talked round, which is the strongest available reading of *"cannot go against the
+will of checker agents"*. A model checker is kept for what needs judgement.
+
+### C0 — the deterministic checker (hooks; no model)
+
+- **C0.1 no invisible jobs (PreToolUse, Bash).** Deny a command that detaches
+  (`nohup`, `setsid`, `disown`, a trailing `&`) or waits on a process-table query
+  (`until … pgrep`, `while pgrep` — the self-matching waiter,
+  `never-wait-on-pgrep`), with the reason naming the tracked alternative:
+  `run_in_background: true`, which notifies, or `Monitor` for a condition. A job the
+  harness tracks is a job whose end wakes the agent.
+- **C0.2 no finished job left unread (Stop).** At every Stop, reconstruct the
+  session's tasks from the transcript. A task whose completion notification arrived
+  and whose output has not been read since → BLOCK, naming the task and its output
+  file. A task still running → allowed, because a tracked task will notify (C0.1 is
+  what makes that true).
+- **C0.3 no process outlives its purpose (the close).** A sweep tool lists every
+  process the session started that is still alive (tracked task ids from the
+  transcript, plus a process-table scan for the project's own tools), and the close
+  checklist requires the list to be empty or each survivor declared in writing. The
+  Chrome case of #172 is the ground truth.
+- **C0.4 the enforcement protects itself.** `permissions.deny` on editing
+  `.claude/settings.json` and the hook scripts; only the maintainer changes them.
+
+### C1 — the procedural checker (a model, context-free, alongside `rulecheck`)
+
+`rulecheck` asks whether a CLAIM is supported. C1 asks whether the PROCEDURE was
+followed. It reads the rules and the session's own record, never the project's
+history:
+
+- **Input:** a generic ways-of-working checklist (distilled from the project-agnostic
+  `bbx` skill and this document — not CLAUDE.md, which is project-specific) plus an
+  EXTRACT of the session transcript produced by a tool: the agent's statements of
+  intent, the tool calls, the task events, the reports made to the maintainer.
+- **Questions (draft; each written from a paid failure):** QP1 SAID-VS-DONE — every
+  intent the agent stated ("I'll poll", "I'll report when", "I'll carry forward") has
+  a later action that discharges it (14z-174: polling chosen and not done; "I'd
+  carry it forward" not written down, `b5b1f1c9`). QP2 CLAIMED-VS-RUN — every ritual
+  step the agent reports done has a tool call that did it (14z-174: `6e01c5f4`, *"the
+  ritual check found TWO steps I had claimed and not done"*). QP3 PRODUCED-NOT-INFERRED
+  — every number reported to the maintainer appears in a tool output in the extract.
+  QP4 ACCOUNTED — every background job has a disposition.
+- **Binding:** the same as `rulecheck` — fixed six-line answers, a planted known
+  violation each run (fixtures cut from the 14z-174 transcript, which holds real
+  instances of all four), VIOLATED stops the action until resolved in writing. The
+  mechanical binding is a PreToolUse hook on `git push`: the push is denied unless the
+  ledger holds an OK procedural run for the commits being pushed — the way
+  `test_rule_checker.sh` binds a freeze.
+
+### O — the orchestrator
+
+The main session as `--agent orchestrator` (or the `agent` setting): the model the
+maintainer names (Fable 5.1 per #172) at effort `high`, carrying the C0 hooks.
+Changing the orchestrator's model does not touch the checker's calibration — that is
+bound to the CHECKER's model, per the standing ruling "a change of model is a
+recalibration".
+
+### W — the workers
+
+Named definitions under `.claude/agents/` with model and effort capped as ruled
+(at most Opus-class, effort at most `xhigh`), each with a narrow toolset and, where
+it fits, a scoped hook (a measuring worker may not edit tracked files). A spec
+TEMPLATE the orchestrator fills: inputs, the exact commands, the return format
+(raw figures WITH the command that produced each), and what the worker must NOT
+infer. The blind-spot question in #172 — what stops the orchestrator's framing
+propagating into every worker — is answered by C1 reading the SPEC against the
+RETURN, not by a second orchestrator.
+
+## 5. THE SLICES — each landed only with its gate
+
+| slice | what | the gate that proves it |
+|---|---|---|
+| **S1** | C0.1 + C0.2 as scripts under `tools/agent/` + the project `.claude/settings.json` wiring + C0.4 | a ROM-free gate that REPLAYS recorded transcripts through the hook scripts: on the 14z-174 transcript C0.2 must fire at the finished-and-unread tasks and C0.1 on its detached launches; on a clean synthetic transcript both stay quiet (must-fire and must-stay-quiet, [VSP-19]) |
+| **S2** | C0.3 — the close sweep, and its step in STATE.md's close checklist | the gate plants a live child process and requires the sweep to name it |
+| **S3** | C1 — `tools/proccheck.py` (or a `rulecheck` decision kind), the transcript extractor, the checklist, fixtures from 14z-174, calibration, the push binding | fixtures calibrated like `rulecheck`'s: each positive caught, a negative quiet beside a caught plant |
+| **S4** | W — worker definitions and the spec template | a worker run on a known task returns figures each traceable to a command |
+| **S5** | O — the orchestrator definition and model switch | one real sitting under it, the C0/C1 record read at its close |
+
+S1 alone addresses the measured failure. It is small, it needs no model, and it can
+be replayed against history — which is why it goes first.
+
+## 6. THE RULINGS (the ticket's open questions — RULED 2026-09-23)
+
+**All four recommendations below were taken** (items 1-3 and 5; item 4 rides on
+item 3's checkpoints). The maintainer's words on item 1 add the constraint every
+slice must meet: *"Hard block + written resolve is fine but that doesn't mean that
+the session should grind to a halt: it means the task at fault should be redone or
+corrected, and when it is, it is checked and again and if green things are
+unblocked … the point of this agent architecture is to minimize the risk while
+keeping the system going forward autonomously (until user input is required of
+course)"*. So: a denied tool call is redone in the allowed form; a blocked Stop is
+answered by doing the outstanding thing; a denied push waits while the rest of the
+work continues. No check is built whose only exit is the maintainer, except where
+user input is genuinely required. The verbatim rulings are in `DECISIONS_HISTORY.md`.
+The questions as put:
+
+1. **"Cannot go against the will of checker agents", mechanically.** Recommended: a
+   HARD BLOCK for the deterministic checks (C0 — the harness refuses; only the
+   maintainer can change the hook), and BLOCK-UNTIL-RESOLVED-IN-WRITING for the model
+   checker (C1 — like `rulecheck`, because a model checker has false positives and an
+   unresolvable block would deadlock; the resolution is recorded for the maintainer to
+   audit).
+2. **The context split.** Recommended: the checker gets a generic procedure checklist
+   plus the session's transcript extract, never CLAUDE.md or the project's history.
+3. **What triggers a check.** Recommended: C0 on every tool call and every Stop
+   (cheap, deterministic); C1 at declared checkpoints — every `git push` (bound
+   mechanically) and every close — not on a timer, which the platform does not offer
+   outside `/loop`.
+4. **Worker specs.** Recommended: the orchestrator writes them from a template; C1
+   checks the spec against the return at the next checkpoint.
+5. **The order.** Recommended: S1 first and alone, measured for a sitting, before
+   the model tiers.
+
+## 7. WHAT IT WILL NOT CATCH
+
+- **A job the agent never launches through a tool** — the hooks see only tool calls.
+- **An intent the agent never states** — QP1 can only hold the agent to what it said.
+- **The maintainer's time outside the session** — a notification wakes the agent;
+  nothing here wakes the maintainer, except the push notifications already enabled.
+- **A C0 pattern it does not list** — C0.1 is a denylist of launch forms, so a new
+  detaching form passes until it is added; the S1 replay over every archived
+  transcript is how new forms are found.

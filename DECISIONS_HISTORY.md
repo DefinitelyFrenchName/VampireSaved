@@ -27,6 +27,39 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-23 (14z-175) — #172: the agent architecture's four design questions
+
+**The question put.** `docs/project/agent_architecture_scope.md` §6, after three
+rule-checker runs on it (`2026-09-23-97`, `-98`, `-99`: every plant caught, every
+real verdict VIOLATED, every finding true and resolved by work). Four questions, each
+with a recommendation: (1) what "cannot go against the will of checker agents" means
+mechanically — hard block for the deterministic hook checks, block-until-resolved-in-
+writing for the model checker; (2) what the procedural checker reads — a generic
+checklist plus a tool-made transcript extract, never CLAUDE.md or project history;
+(3) when the model checker runs — every `git push` (bound by a hook) and every close;
+(4) the order — slice S1, the deterministic hooks, alone first and measured for a
+sitting.
+
+**THE RULINGS, verbatim:**
+- (1) *"Hard block + written resolve is fine but that doesn't mean that the session
+  should grind to a halt: it means the task at fault should be redone or corrected,
+  and when it is, it is checked and again and if green things are unblocked. Stating
+  this because the point of this agent architecture is to minimize the risk while
+  keeping the system going forward autonomously (until user input is required of
+  course)"*
+- (2) *"Checklist + transcript extract (Recommended)"*
+- (3) *"Every push + every close (Recommended)"*
+- (4) *"S1 alone first (Recommended)"*
+
+**What (1) adds, and it is a design constraint, not a nuance:** a block binds the
+TASK AT FAULT, never the session. A refused tool call is redone in the allowed form;
+a refused end-of-turn is answered by doing the outstanding thing; a refused push
+waits while every other piece of work continues, and the push goes through when the
+re-check is green. No check may be built whose only exit is the maintainer, except
+where user input is genuinely required.
+
+---
+
 ## Approved 2026-09-22 (14z-174) — the M19 release carries the `audit_mask_window_ff42a2` SKIP
 
 **The rule.** At a release, *anything red or skipped is a hard fail unless approved

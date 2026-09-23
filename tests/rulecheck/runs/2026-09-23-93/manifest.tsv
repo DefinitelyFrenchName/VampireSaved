@@ -1,0 +1,4 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+audit_move_parity.sh.txt	7cb146252c9fd49104a92c2cddb9739425f4c63b
+move_parity.tsv	560341358a82b312beb12f9607e9b8305f6256b0
+name_moves.py.txt	d1d39588e6c59ac9a4ae1e79f968c27edb80aa74
