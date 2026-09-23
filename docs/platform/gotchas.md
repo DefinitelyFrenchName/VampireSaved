@@ -2800,3 +2800,42 @@ starving only that leg's budget: the old gate prints that line verbatim; the fix
 says the control's run did not complete and claims nothing). Both legs now go through
 one `run_leg`. **When a gate drives a browser more than once, every leg needs the
 completion marker** — a fix applied to "the run" is applied to one call site.
+
+## A SUBAGENT WITH NO `effort` LINE RUNS AT ITS CALLER'S EFFORT, AND THE CALLER'S `model` BEATS THE DEFINITION'S — a cap written in `.claude/agents/<name>.md` alone does not hold (measured 2026-09-23, 14z-177, Claude Code 2.1.280)
+
+Measured in a scratch project with headless `claude -p` runs (`tools/agent/probe_agents.sh`,
+legs A1-A8, every "cannot" leg beside its "can" leg). A worker's transcript
+(`<session>/subagents/agent-<id>.jsonl`) records `effort` and `message.model` on every
+assistant record, which is what makes these checkable:
+
+- a definition's `model` and `effort` ARE applied (`sonnet` + `low` ran at low, `+ xhigh`
+  at xhigh) — **but a definition with NO `effort` line runs at the CALLER's effort**
+  (`low` under a `--effort low` parent, `xhigh` under `xhigh`), so an effort cap holds only
+  if every definition states one;
+- **the Agent call's `model` parameter BEATS the definition's `model`** (a `haiku`
+  definition ran on Sonnet when the call said `sonnet`), so a model cap in a definition
+  holds only if the call cannot override it — a project `PreToolUse` hook on `Agent` CAN
+  deny such a call (its input carries `subagent_type`, `model` and `prompt`), and the
+  same hook lets the plain call through;
+- a definition's `tools` list binds (a Read/Glob/Grep worker had no way to create a file;
+  the same ask to a worker given Write did);
+- **a `hooks:` block in the definition's own frontmatter did NOT fire** (its deny never
+  ran, and the command it should have refused created its marker) — it reads as
+  enforcement and is not, at least in the form the probe writes;
+- a PROJECT `PreToolUse` hook DOES fire for a worker's own tool calls, and its input names
+  the worker (`agent_type`, `agent_id`); the orchestrator's own calls carry neither. So a
+  rule scoped to one worker is a project hook that reads `agent_type`, and every project
+  hook — C0.1 included — already binds workers.
+
+**Paid at once, on this project's own instrument:** the rule-checker's readers are spawned
+as `general-purpose` with `model: "opus"` and no effort, so they ran at the WORKING
+SESSION's effort: `high` for every Opus 5.5 calibration and real run (14z-175, 14z-176),
+`xhigh` for 14z-174's on Opus 5. Nothing records it (`docs/project/rule_checker.md`, "The
+effort"; the model half of the same gap is #158).
+
+And where a worker's words land: a background worker's final report reaches the
+orchestrator's transcript as an `<agent-message from="<id>">[Subagent hand-back]` record
+(its `SubagentHandback` call, in the worker's own transcript), the completion
+`<task-notification>` explicitly NOT repeating it; a foreground worker's report is the
+Agent call's tool result. The worker's own commands exist only in its transcript, linked
+to the spawning call by `meta.json`'s `toolUseId`.

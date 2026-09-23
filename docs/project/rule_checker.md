@@ -245,6 +245,19 @@ under it before a real run. And a prepared run that was never recorded (run
 2026-09-18-36, a `NOT-RUN.txt` only) makes `prepare`'s automatic id collide with
 it, so every later `prepare` takes `--id` (#160).
 
+**The effort (14z-177) — a second unbound parameter of the instrument.** The readers are
+spawned as `general-purpose` with `model: "opus"` and no effort, and a subagent with no
+effort runs at its CALLER's (`docs/platform/gotchas.md`, measured by
+`tools/agent/probe_agents.sh` A4). Read back from the readers' own transcripts, which
+record it on every assistant record: **every Opus 5.5 calibration and real run (ledger
+`2026-09-23-93` to `-108`) ran at `high`**, because their sessions did, and 14z-174's six
+readers ran at `xhigh` on Opus 5. Neither the ledger nor the tool records it. **No run has yet
+used an effort other than its own calibration's** — over every archived transcript each model
+era's readers ran at one effort (Fable 5.1 `high`, Opus 5 `xhigh`, Opus 5.5 `high`;
+`transcript_gaps.py --subagents all`) — so the gap is that nothing BINDS it: today's
+calibrations hold for Opus 5.5 at `high`, and a session at another effort would spawn an
+uncalibrated instrument without a word — the class #158 names for the model.
+
 ## What it will not catch
 
 - **Operational slips.** A waiter wedged for hours is not a rule-application

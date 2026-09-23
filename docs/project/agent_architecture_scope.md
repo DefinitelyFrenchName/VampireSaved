@@ -132,7 +132,8 @@ the mechanisms, P5 the models when `PROBE_MODELS` names them, P6 the prompt embe
 itself), with two controls — P1c,
 the deny switched off, must create the marker P1 requires absent, and P4, the P1/P2
 record counts must read zero on a run with no denial and no block — and exits non-zero
-if any has changed.
+if any has changed. The worker rows (14z-177) are re-measured the same way by
+`tools/agent/probe_agents.sh` (A1-A8, ~3 min, every "cannot" leg beside its "can" leg).
 
 | mechanism | status | what it gives |
 |---|---|---|
@@ -151,6 +152,14 @@ if any has changed.
 | **an orphan keeps its working directory, not its lineage** | **MEASURED** (14z-176) | a job whose tool shell exits is reparented to launchd (`ppid 1`); its session id is the DEAD tool shell's pid, so neither parent nor session ties it back to Claude. Its cwd and streams do (`lsof -d cwd,0,1,2`) |
 | **the environment (`CLAUDE_CODE_SESSION_ID`) is readable only for some binaries** | **MEASURED** (14z-176) | inherited by every tool-call process, and readable (`ps -E`) for a CLT Python and Homebrew's `ugrep` — but NOT for Apple platform binaries (`tail`, `sleep`, `zsh`: `KERN_PROCARGS2` returns 38 bytes of arguments) nor for Google Chrome (hardened). Both ground-truth leftovers are those shapes, so C0.3 cannot rest on it (`docs/platform/gotchas.md`) |
 | Fable 5.1, Opus 5.5, Sonnet 5 reachable on this account | **MEASURED** 2026-09-23 (P5) | each answered a one-line probe as itself (`modelUsage` names the model); the 2026-09-18 spend-limit failure on Fable 5.1 is not current |
+| **a worker definition's `model` and `effort` are applied, and recorded** | **MEASURED** 2026-09-23 (14z-177, `tools/agent/probe_agents.sh` A1, A3) | `sonnet` + `low` ran at low, `+ xhigh` at xhigh; the worker's own transcript (`<session>/subagents/agent-<id>.jsonl`) carries `message.model` and `effort` on every assistant record, and `meta.json` its type, description and spawning `toolUseId` — so a cap is CHECKABLE after the fact (`transcript_gaps.py --subagents`) |
+| **a definition with NO `effort` line runs at the CALLER's effort** | **MEASURED** (A4, both directions) | `low` under a `--effort low` parent, `xhigh` under `xhigh`: an effort cap holds only where the definition states one. **Paid at once:** the rule-checker's readers (`general-purpose`, `model: "opus"`, no effort) ran at the SESSION's effort — all 26 readers of runs `2026-09-23-93..108` at `high`, 14z-174's at `xhigh` — and nothing records it (`rule_checker.md` "The effort") |
+| **the Agent call's `model` parameter BEATS the definition's** | **MEASURED** (A2) | a `haiku` definition ran on Sonnet when the call said `sonnet`: a model cap in a definition holds only if the call cannot override it |
+| **a project PreToolUse hook on `Agent` sees the spec and can DENY the call** | **MEASURED** (A8, A8c) | its input carries `subagent_type`, `model`, `prompt`, `description`; a deny on a `model` override was refused with its reason and no worker ran, and the same gate let the plain call run |
+| **a definition's `tools` list binds** | **MEASURED** (A5, A5c) | a Read/Glob/Grep worker could not create a file; the same ask to a worker given Write did. Bash stays a write path for any worker that has it |
+| **a `hooks:` block in the definition's frontmatter did NOT fire** | **MEASURED** (A6, a NEGATIVE kept as a leg) | its deny never ran and the command it should have refused created its marker — it reads as enforcement and is not, in the form the probe writes |
+| **a project hook sees a worker's OWN tool calls, and names the worker** | **MEASURED** (A7) | a worker's calls carry `agent_type` and `agent_id`, the orchestrator's neither: a rule scoped to one worker is a project hook reading `agent_type`, and C0.1 already binds every worker |
+| **where a worker's words land** | **MEASURED** (14z-176's transcript, read 14z-177) | the SPEC is the Agent call's `prompt`; a background worker's REPORT reaches the orchestrator as an `<agent-message from="<id>">[Subagent hand-back]` record (the completion `<task-notification>` explicitly does NOT repeat it), a foreground worker's as the call's tool result; the worker's COMMANDS exist only in its own transcript. `extract.py` carries 300 characters of the spec and neither the report nor the commands |
 
 ## 3. WHAT EXISTS AND WHAT IT DOES NOT COVER
 
@@ -274,6 +283,16 @@ TEMPLATE the orchestrator fills: inputs, the exact commands, the return format
 infer. The blind-spot question in #172 — what stops the orchestrator's framing
 propagating into every worker — is answered by C1 reading the SPEC against the
 RETURN, not by a second orchestrator.
+
+**MEASURED BEFORE DESIGNING (14z-177), and it moves three things in the paragraph above**
+(§2's rows from "a worker definition's `model`" down): (1) a cap in a definition is not a
+cap — the call's `model` beats it and a missing `effort` inherits the orchestrator's, so the
+caps need a STATIC check on every definition (model named and at most Opus-class, effort
+named and at most `xhigh`) AND a check on the CALL (a PreToolUse hook on `Agent`, measured
+able to deny); (2) "a scoped hook" cannot live in the definition — its `hooks:` block did not
+fire — but a PROJECT hook sees the worker's calls with `agent_type`, which is where a
+per-worker rule goes; (3) C1 cannot read spec against return today: the extract has neither
+the report nor the worker's commands, which live in the worker's own transcript.
 
 ## 5. THE SLICES — each landed only with its gate
 

@@ -42,6 +42,12 @@ Usage:
   --c02          the two deterministic C0.2 candidates over the selected sessions: tracked
                  tasks finished and never read after, and turn ends that promise a wait
                  while no tracked task runs (why C0.2 moved to C1, scope doc §4)
+  --subagents P  every SUBAGENT of the session(s) whose id starts with P (`all` for every
+                 session of the directory): its type, description, and the MODEL and EFFORT
+                 its own transcript records on its assistant records — a subagent with no
+                 `effort` in its definition runs at its caller's (14z-177), so this is how the
+                 rule-checker's readers were shown to have run at the session's effort;
+                 `--match RE` keeps only descriptions matching RE
   --selftest     classify a synthetic transcript with known answers and exit
 
 Reads only; writes nothing. Stdlib only (no numpy on this Mac).
@@ -249,6 +255,34 @@ def refusals(path):
     return out
 
 
+def subagents(transcript):
+    """-> [(agent_type, description, {models}, {efforts}, n_assistant)] for every subagent of
+    one session transcript, read from `<session>/subagents/*.meta.json` and the worker's own
+    transcript beside it. Model and effort are FIELDS of assistant records (`message.model`,
+    `effort`), never text: a record that mentions "effort" in its content counts for nothing."""
+    out = []
+    for meta in sorted(glob.glob(transcript[:-len(".jsonl")] + "/subagents/*.meta.json")):
+        try:
+            m = json.load(open(meta))
+        except (OSError, ValueError):
+            continue
+        models, efforts, n = set(), set(), 0
+        try:
+            for line in open(meta[:-len(".meta.json")] + ".jsonl"):
+                try:
+                    r = json.loads(line)
+                except ValueError:
+                    continue
+                if r.get("type") == "assistant":
+                    n += 1
+                    models.add(str((r.get("message") or {}).get("model")))
+                    efforts.add(str(r.get("effort")))
+        except OSError:
+            pass
+        out.append((m.get("agentType"), m.get("description", ""), models, efforts, n))
+    return out
+
+
 def selftest():
     t0 = datetime.datetime(2026, 9, 21, 8, 0, tzinfo=datetime.timezone.utc)
 
@@ -325,10 +359,26 @@ def selftest():
             g.write(json.dumps(r) + "\n")
     ref_ok = [k for _, _, k, _, _ in refusals(f.name + ".r")] == ["C0.1", "harness", "permission"]
     os.unlink(f.name + ".r")
+    # subagents: effort and model read as FIELDS; a text mention of effort must stay quiet
+    sd = tempfile.mkdtemp()
+    top = os.path.join(sd, "sess.jsonl")
+    open(top, "w").close()
+    os.makedirs(os.path.join(sd, "sess", "subagents"))
+    with open(os.path.join(sd, "sess", "subagents", "agent-x.meta.json"), "w") as g:
+        json.dump({"agentType": "general-purpose", "description": "reader run 1"}, g)
+    with open(os.path.join(sd, "sess", "subagents", "agent-x.jsonl"), "w") as g:
+        for r in ({"type": "user", "message": {"content": "set effort: xhigh please"}},
+                  {"type": "assistant", "effort": "high", "message": {"model": "m1", "content": "the effort was low"}},
+                  {"type": "assistant", "effort": "high", "message": {"model": "m1"}}):
+            g.write(json.dumps(r) + "\n")
+    sub_ok = subagents(top) == [("general-purpose", "reader run 1", {"m1"}, {"high"}, 2)]
+    import shutil
+    shutil.rmtree(sd)
     got = [(round(g), c) for g, c, _, _ in gaps(recs, 20)]
     want = [(60, "status"), (30, "notif"), (30, "other"), (30, "other")]
-    ok = got == want and (det, trk) == (2, 2) and tasks_ok and audit_ok and ref_ok
-    print(f"selftest: gaps {got} detached {det} tracked {trk} tasks {tk} audit-plant {'fires' if audit_ok else 'DEAD'} -> {'PASS' if ok else 'FAIL'}")
+    ok = got == want and (det, trk) == (2, 2) and tasks_ok and audit_ok and ref_ok and sub_ok
+    print(f"selftest: gaps {got} detached {det} tracked {trk} tasks {tk} audit-plant {'fires' if audit_ok else 'DEAD'} "
+          f"subagents {'ok' if sub_ok else 'WRONG'} -> {'PASS' if ok else 'FAIL'}")
     return 0 if ok else 1
 
 
@@ -344,6 +394,8 @@ def main():
     ap.add_argument("--c02", action="store_true")
     ap.add_argument("--detached", default=None)
     ap.add_argument("--refusals", default=None)
+    ap.add_argument("--subagents", default=None)
+    ap.add_argument("--match", default=None)
     ap.add_argument("--selftest", action="store_true")
     a = ap.parse_args()
     if a.selftest:
@@ -353,6 +405,22 @@ def main():
     if not files:
         print(f"no transcripts under {d}", file=sys.stderr)
         return 2
+    if a.subagents:
+        hit = files if a.subagents == "all" else [f for f in files if os.path.basename(f).startswith(a.subagents)]
+        if not hit:
+            print(f"--subagents {a.subagents}: no transcript matches", file=sys.stderr)
+            return 2
+        n = 0
+        for f in hit:
+            for at, desc, models, efforts, k in subagents(f):
+                if a.match and not re.search(a.match, desc):
+                    continue
+                n += 1
+                print(f"{os.path.basename(f)[:8]}  {str(at):18} {desc[:48]:48} model {','.join(sorted(models)) or '-'}"
+                      f"  effort {','.join(sorted(efforts)) or '-'}  ({k} records)")
+        # always a count line: an empty listing and a blind reader must not look alike
+        print(f"subagents: {n}")
+        return 0
     if a.refusals:
         hit = [f for f in files if os.path.basename(f).startswith(a.refusals)]
         if len(hit) != 1:
