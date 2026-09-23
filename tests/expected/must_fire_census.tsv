@@ -52,6 +52,7 @@ declares	test_agent_defs
 declares	test_agent_extract
 declares	test_agent_hooks
 declares	test_agent_sweep
+declares	test_agent_worker
 declares	test_annotations_current
 declares	test_applier_page
 declares	test_applier_page_browser

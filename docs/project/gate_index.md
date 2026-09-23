@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**376 scripts** — 89 ci_portable, 84 ci_static, 203 emulator-tier (run by name).
+**377 scripts** — 90 ci_portable, 84 ci_static, 203 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 20 | the suite runners and their own ground truth |
+| [runner](#runner) | 21 | the suite runners and their own ground truth |
 | [docs](#docs) | 18 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -45,6 +45,7 @@ the suite runners and their own ground truth.
 | `tests/test_agent_extract.sh` | test | ci_portable | — | SLICE S3 OF GitHub #172: the transcript EXTRACT the procedural checker (C1) reads says what the transcript says (`tools/agent/extract.py`, 2026-09-23). | 2026-09-23 |
 | `tests/test_agent_hooks.sh` | test | ci_portable | — | SLICE S1 OF GitHub #172: the agent-discipline hooks decide what the evidence says they should (docs/project/agent_architecture_scope.md, 2026-09-23). | 2026-09-23 |
 | `tests/test_agent_sweep.sh` | test | ci_portable | — | SLICE S2 OF GitHub #172: C0.3, the close-time process sweep (`tools/agent/sweep.py`), names every survivor it must and nothing it must not (docs/project/agent_architecture_scope.md §4 C0.3, 2026-09-23). | 2026-09-23 |
+| `tests/test_agent_worker.sh` | test | ci_portable | — | SLICE S4 OF GitHub #172, step 2: "a worker run on a known task returns figures each traceable to a command" (docs/project/agent_architecture_scope.md §5), over a FROZEN real run — ruled 2026-09-23 (14z-177, DECISIONS_HISTORY.md "Ruled 2026-… | 2026-09-23 |
 | `tests/test_bbh_fidelity.sh` | test | ci_static | ROMDIR | the generic black-box harness (`bbh`, the SEPARATE repository extracted from this tree, docs/project/harness_scope.md) reproduces THIS tree's verdicts: its fidelity gate is run against this tree and must be green. | 2026-09-06 |
 | `tests/test_bg_leg_shape.sh` | test | ci_portable | — | NO GATE MAY BACKGROUND AN EMULATOR LEG THAT WRITES ITS EXIT STATUS UNDER `set -e` WITHOUT `set +e` INSIDE THE GROUP (14z-171). ROM-free, ~2 s. Tool: tools/audit_bg_leg_shape.py (its docstring is the WHY). | 14z-171 |
 | `tests/test_controls_contract.sh` | test | ci_portable | — | ground truth for THE MUST-FIRE CONTRACT'S READER, tests/lib/controls.sh: the four regexes of the R10 grammar, the leading comment block as the header (a bare `#` continues it, a non-comment line ends it), the declared-vs-fired readback the… | 14z-147 |

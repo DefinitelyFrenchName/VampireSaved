@@ -21,6 +21,24 @@ One line per event, in transcript order, each prefixed `[<record index> <HH:MM>]
   R   the call's result: `ok` or `ERROR`, and its first 160 characters
   N   a task event: a tracked launch (its id) or its completion notification (id,
       status, and whether it arrived with the agent idle or mid-turn)
+  H   a background worker's report arriving as a `[Subagent hand-back]` (its text joins the
+      sources an A# line is checked against, so quoting a worker is not "unsourced")
+
+and, under every Agent call, the WORKER it started (slice S4, 14z-177 — read from the worker's
+own transcript, `<session>/subagents/agent-<id>.jsonl`, matched by `meta.json`'s `toolUseId`;
+the orchestrator's transcript holds neither its commands nor, for a background worker, its
+report — measured, `tools/agent/probe_agents.sh` A10):
+
+  W   the call: the worker's type, any `model` override, and its description
+  WS  the SPEC, verbatim, line by line (bounded) — what C1 reads the return against
+  WM  the model and effort the worker actually RAN at (fields of its assistant records)
+  WT  each of the worker's own tool calls (tool, head of its command or path)
+  WR  each result the worker got: `ok` or `ERROR`, and its first 160 characters
+  WX  the worker's REPORT, verbatim, line by line (bounded)
+  W#  every figure of the report that no result the WORKER itself got contains (QP3 widened
+      to workers, ruled 2026-09-23) — a hint, as A# is; the spec is NOT a source, because a
+      figure found only in the spec was handed to the worker, not measured by it
+  W   `NO WORKER TRANSCRIPT` when a call has none, so a missing worker cannot read as a quiet one
 
 and a closing TASKS block: every tracked task with no notification in the span, and
 every detached launch — the jobs QP4 asks the agent to have accounted for.
@@ -80,8 +98,74 @@ def _text(content):
     return " ".join(x.get("text", "") for x in content or [] if isinstance(x, dict))
 
 
+SPEC_LINES, REPORT_LINES = 80, 60
+
+
+def workers_of(path):
+    """-> {toolUseId: (agent_id, meta, records)} for every worker of this session transcript."""
+    found = {}
+    for meta in sorted(glob.glob(path[:-len(".jsonl")] + "/subagents/*.meta.json")):
+        try:
+            m = json.load(open(meta))
+            recs = [json.loads(line) for line in open(meta[:-len(".meta.json")] + ".jsonl")]
+        except (OSError, ValueError):
+            continue
+        found[m.get("toolUseId")] = (os.path.basename(meta)[len("agent-"):-len(".meta.json")], m, recs)
+    return found
+
+
+def worker_lines(tag, block, inp, workers):
+    """The W block for one Agent call (see the module docstring)."""
+    out = []
+    over = f" (model override: {inp['model']})" if inp.get("model") else ""
+    out.append(f"{tag} W  worker {inp.get('subagent_type') or 'general-purpose'}{over} — {inp.get('description', '')}")
+    spec = str(inp.get("prompt", "")).split("\n")
+    for ln in spec[:SPEC_LINES]:
+        out.append(f"{tag} WS | {ln}")
+    if len(spec) > SPEC_LINES:
+        out.append(f"{tag} WS | … {len(spec) - SPEC_LINES} more spec lines not shown")
+    w = workers.get(block.get("id"))
+    if not w:
+        out.append(f"{tag} W  NO WORKER TRANSCRIPT for this call — its commands and report cannot be read")
+        return out
+    _, _, recs = w
+    models, efforts, results, report = set(), set(), [], ""
+    for r in recs:
+        c = (r.get("message") or {}).get("content")
+        if r.get("type") == "assistant":
+            models.add(str((r.get("message") or {}).get("model")))
+            efforts.add(str(r.get("effort")))
+        for b in c if isinstance(c, list) else []:
+            t = b.get("type")
+            if t == "tool_use" and b.get("name") == "SubagentHandback":
+                report = str((b.get("input") or {}).get("message", "")) or report
+            elif t == "tool_use":
+                i = b.get("input") or {}
+                what = i.get("command") or i.get("file_path") or i.get("pattern") or i.get("prompt") or ""
+                out.append(f"{tag} WT {b.get('name')}: {' '.join(str(what).split())[:300]}")
+            elif t == "tool_result":
+                text = _text(b.get("content"))
+                if text.startswith('{"success":true,"message":"Report delivered'):
+                    continue
+                results.append(text)
+                out.append(f"{tag} WR {'ERROR' if b.get('is_error') else 'ok'}: {' '.join(text.split())[:160]}")
+            elif t == "text" and r.get("type") == "assistant" and b.get("text", "").strip():
+                report = b["text"].strip()
+    out.insert(1 + min(len(spec), SPEC_LINES + 1), f"{tag} WM ran on {','.join(sorted(models))} at effort {','.join(sorted(efforts))}")
+    rep = report.split("\n") if report else ["(no report)"]
+    for ln in rep[:REPORT_LINES]:
+        out.append(f"{tag} WX | {ln}")
+    if len(rep) > REPORT_LINES:
+        out.append(f"{tag} WX | … {len(rep) - REPORT_LINES} more report lines not shown")
+    miss = [f for f in figures(report) if not sourced(f, results)]
+    if miss:
+        out.append(f"{tag} W# figures in the report that no result the worker got contains: {', '.join(miss[:40])}")
+    return out
+
+
 def extract(path, first=0, last=None):
     out, corpus = [], []
+    workers = workers_of(path)
     tracked, detached = {}, []
     for n, r in agentlib.records(path):
         if last is not None and n > last:
@@ -89,6 +173,13 @@ def extract(path, first=0, last=None):
         c = agentlib._content(r)
         ts = str(r.get("timestamp"))[11:16]
         inside = n >= first
+        a = r.get("attachment") or {}
+        hb = str(a.get("prompt", "")) if r.get("type") == "attachment" else ""
+        if hb.startswith("<agent-message"):
+            corpus.append(hb)
+            if inside:
+                who = re.search(r'from="([^"]+)"', hb)
+                out.append(f"[{n} {ts}] H  report of worker {who.group(1) if who else '?'} arrived (hand-back)")
         for tid, st, form in agentlib.notifications(r):
             if tid in tracked:
                 tracked[tid]["ended"] = True
@@ -121,6 +212,8 @@ def extract(path, first=0, last=None):
                 bg = " [run_in_background]" if inp.get("run_in_background") else ""
                 if inside:
                     out.append(f"[{n} {ts}] T  {b.get('name')}{bg}: {inp.get('description', '')} :: {what}")
+                    if b.get("name") in ("Agent", "Task"):
+                        out.extend(worker_lines(f"[{n} {ts}]", b, inp, workers))
                 if b.get("name") == "Bash" and not inp.get("run_in_background"):
                     why = agentlib.detach_reason(str(inp.get("command", "")))
                     if why:
@@ -181,6 +274,48 @@ def selftest():
         "tracked open task listed": "no completion notification by its end: bx1" in got,
         "a QUOTED launch marker is not a launch": "bq9" not in got.split("TASKS")[1] and "task bq9 launched" not in got,
     }
+    # the worker block: a session with two Agent calls, one with a worker transcript (a sourced
+    # figure, an unsourced one, and one found ONLY in its spec) and one without; plus a hand-back
+    import shutil
+    d = tempfile.mkdtemp()
+    main = os.path.join(d, "s.jsonl")
+    wrows = [
+        rec("user", "go"),
+        rec("assistant", [{"type": "tool_use", "id": "a1", "name": "Agent",
+                           "input": {"subagent_type": "measurer", "description": "m", "prompt": "TASK: x\nC1: wc -l f\nthe answer is 555"}}]),
+        rec("user", [{"type": "tool_result", "tool_use_id": "a1", "content": "ok"}]),
+        rec("assistant", [{"type": "tool_use", "id": "a2", "name": "Agent", "input": {"subagent_type": "reader", "prompt": "TASK: y"}}]),
+        {"type": "attachment", "timestamp": "2026-09-23T10:05:00Z",
+         "attachment": {"type": "queued_command", "prompt": '<agent-message from="w9">[Subagent hand-back] FIG n = 8642 <- C1'}},
+        rec("assistant", [{"type": "text", "text": "the worker says 8642"}]),
+    ]
+    with open(main, "w") as g:
+        for r in wrows:
+            g.write(json.dumps(r) + "\n")
+    os.makedirs(os.path.join(d, "s", "subagents"))
+    with open(os.path.join(d, "s", "subagents", "agent-w1.meta.json"), "w") as g:
+        json.dump({"agentType": "measurer", "toolUseId": "a1"}, g)
+    with open(os.path.join(d, "s", "subagents", "agent-w1.jsonl"), "w") as g:
+        for r in ({"type": "assistant", "effort": "high", "message": {"model": "mS", "content": [
+                      {"type": "tool_use", "id": "b1", "name": "Bash", "input": {"command": "wc -l f"}}]}},
+                  {"type": "user", "message": {"content": [{"type": "tool_result", "tool_use_id": "b1", "content": "  1234 f"}]}},
+                  {"type": "assistant", "effort": "high", "message": {"model": "mS", "content": [
+                      {"type": "text", "text": "FIG lines = 1234 <- C1\nFIG other = 9876 <- C1\nFIG answer = 555 <- C1"}]}}):
+            g.write(json.dumps(r) + "\n")
+    wg = extract(main)
+    shutil.rmtree(d)
+    wline = next((ln for ln in wg.split("\n") if " W# " in ln), "")
+    checks.update({
+        "worker spec shown": "WS | TASK: x" in wg,
+        "worker caps shown": "WM ran on mS at effort high" in wg,
+        "worker call and result shown": "WT Bash: wc -l f" in wg and "WR ok: 1234 f" in wg,
+        "worker report shown": "WX | FIG lines = 1234 <- C1" in wg,
+        "worker figure sourced in its own result not flagged": "1234" not in wline,
+        "worker figure in no result flagged": "9876" in wline,
+        "worker figure found only in the SPEC flagged": "555" in wline,
+        "a call without a worker transcript is loud": "NO WORKER TRANSCRIPT" in wg,
+        "a hand-back is shown and sources the orchestrator": "H  report of worker w9 arrived" in wg and "A# " not in wg,
+    })
     bad = [k for k, v in checks.items() if not v]
     for k in bad:
         print(f"  selftest WRONG: {k}")

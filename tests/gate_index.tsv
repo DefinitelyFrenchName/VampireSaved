@@ -385,3 +385,4 @@ tests/test_agent_hooks.sh	runner
 tests/test_agent_extract.sh	runner
 tests/test_agent_sweep.sh	runner
 tests/test_agent_defs.sh	runner
+tests/test_agent_worker.sh	runner

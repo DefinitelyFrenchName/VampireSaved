@@ -274,3 +274,6 @@ test_agent_extract
 # #172 slice S4 step 1 (14z-177): every worker definition under .claude/agents/ states its caps —
 # model at most Opus-class, effort at most xhigh, an allowed tool list, no unapproved key; five controls. ~1 s.
 test_agent_defs
+# #172 slice S4 step 2 (14z-177): a frozen real measurer run (tests/agent/worker_fixture/, CUT — no e-mail)
+# returns figures each traceable to a spec command it ran, re-derived here; conformance; three controls. ~1 s.
+test_agent_worker
