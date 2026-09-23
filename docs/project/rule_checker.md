@@ -194,8 +194,9 @@ maintainer 2026-09-23, 14z-176b): `tools/agent/hooks/pre_push.py`, a PreToolUse 
 `git push` OF THIS REPOSITORY, allows the push only when a passed or resolved
 `procedure` run checked a commit inside the pushed range (`meta.tsv` records that commit
 as `head`); a push of another repository (the bbh harness, the jtcores fork) is not its
-business. Gate: `tests/test_agent_hooks.sh` (`tests/lib/pre_push_cases.py`, 18 cases;
-control `open-push-hook`).
+business. Gate: `tests/test_agent_hooks.sh` (`tests/lib/pre_push_cases.py`, 18 cases, plus the
+hook's reader run on the REAL ledger against `rulecheck.py`'s own; controls
+`open-push-hook`, `misread-ledger`, `no-target-check`).
 
 ## What the first runs measured
 

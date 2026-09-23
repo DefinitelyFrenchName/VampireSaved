@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+STATE.md.lines-85-89 (lines 85-89 of STATE.md)	d99f52ffa981de80c608bbc253e6fb2e0289c691
+DECISIONS_HISTORY.md.lines-30-48 (lines 30-48 of DECISIONS_HISTORY.md)	45c584864ab061b9e19bf52138638036ff1919e9
+tools/agent/hooks/pre_push.py	d72220fbb3cb7552de5113849bc25105952562ef
+tests/lib/pre_push_cases.py	763cd484efa87ce1bcc0777d3ea1e75108028a0f
+tests/test_agent_hooks.sh	d8089fef3164c4077bded9ace2dccc86d1a9913b
+.claude/settings.json	9524912515d37edeefe53147965407a71fe8316b
+tools/agent/agentlib.py	fcc0f3ae341a716d738a2e13d70765370e49e883
+tools/agent/extract.py	455eda6ca4e6c44e5436beab84d44036b7473773
+build/agent172/apply_launchfix.py	5cb98da1c4b45a6a8c4db013821073343405415e
+docs/project/rule_checker.md.lines-186-200 (lines 186-200 of docs/project/rule_checker.md)	951b75084c1d98d8d85654ebaa0d40ab31cde8a2

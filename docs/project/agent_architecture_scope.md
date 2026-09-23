@@ -14,7 +14,7 @@
 > fixtures calibrated on Opus 5.5 (runs `2026-09-23-101..104`); its push binding **`tools/agent/hooks/pre_push.py` is INSTALLED
 > (14z-176b, the maintainer: *"since we both think the push hook is a good idea, I'll install
 > it"*)** — refusing live a push of an unchecked commit, and letting another repository's push
-> through; gated by `tests/test_agent_hooks.sh` (18 cases, control `open-push-hook`). Next: S4 (worker definitions).
+> through; gated by `tests/test_agent_hooks.sh` (18 cases and the real ledger; controls `open-push-hook`, `misread-ledger`, `no-target-check`). Next: S4 (worker definitions).
 
 **Why this document exists:** the same reason `harness_scope.md` and
 `applier_app_scope.md` do — a direction the maintainer ordered, big enough that

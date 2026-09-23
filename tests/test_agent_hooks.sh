@@ -19,6 +19,8 @@
 # MUST-FIRE: perturbed-copy: blind-classifier — a copy of the hooks whose `detach_reason` always answers "no detach" must let the 14z-174 launches through, and the gate must FAIL on them (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: greedy-heredoc — a copy whose `strip_heredocs` swallows every line after an UNTERMINATED `<<` operator (the defect rule-checker run 2026-09-23-100 found) must hide the `nohup` in the arithmetic-shift rows, and the gate must FAIL on the must-deny side (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: no-heredoc-strip — a copy whose `strip_heredocs` returns the command unchanged must deny commands that only WRITE a script containing `&`, and the gate must FAIL on the must-allow side (mode: the gate runs against that copy)
+# MUST-FIRE: perturbed-copy: misread-ledger — a copy of the push hook whose ledger column tuple has `control_verdict` and `verdict` swapped must read the REAL ledger differently from the rule-checker's own reader, and the gate must FAIL (rule-checker run 2026-09-23-107: the 18 cases write their own ledger in the hook's assumed layout, so they cannot see a misread of the real one) (mode: the gate drives that copy)
+# MUST-FIRE: perturbed-copy: no-target-check — a copy of the push hook without the this-repository guard must refuse pushes of ANOTHER repository (the defect the proof found before installation, 14z-176b), and the gate must FAIL on those cases (mode: the gate drives that copy)
 # MUST-FIRE: perturbed-copy: open-push-hook — a copy of the C1 push hook (`pre_push.py`, slice S3) whose `decide` allows every call must let an unchecked push through, and the gate must FAIL on the must-deny push cases (mode: the gate drives that copy)
 #
 # SLICE S3's BINDING (installed by the maintainer 2026-09-23, 14z-176b): `pre_push.py`
@@ -76,6 +78,24 @@ s = s.replace(a, a + '    return None, None  # CONTROL open-push-hook\n', 1)
 open(p, 'w').write(s)
 PY
             ;;
+        misread-ledger)
+            python3 - "$W/$1/agent/hooks/pre_push.py" <<'PY'
+import sys; p = sys.argv[1]; s = open(p).read()
+a = '"control_verdict", "verdict", "violated"'
+assert s.count(a) == 1
+s = s.replace(a, '"verdict", "control_verdict", "violated"', 1)  # CONTROL misread-ledger
+open(p, 'w').write(s)
+PY
+            ;;
+        no-target-check)
+            python3 - "$W/$1/agent/hooks/pre_push.py" <<'PY'
+import sys; p = sys.argv[1]; s = open(p).read()
+a = '    if not same_repo(target, root):\n        return None, None\n'
+assert s.count(a) == 1
+s = s.replace(a, '    pass  # CONTROL no-target-check\n', 1)
+open(p, 'w').write(s)
+PY
+            ;;
     esac
     echo "$W/$1/agent"
 }
@@ -110,7 +130,8 @@ echo "  fixture: $n_deny must-deny ($n_174 of them the 14z-174 launches), $n_all
 [ "$n_174" -eq 12 ] || { echo "FAIL: the fixture must carry the twelve 14z-174 launches (has $n_174)"; fail=1; }
 
 AG=tools/agent
-if vs_ctl_is blind-classifier || vs_ctl_is greedy-heredoc || vs_ctl_is no-heredoc-strip || vs_ctl_is open-push-hook; then AG="$(make_copy "$VS_CTL")"; fi
+if vs_ctl_is blind-classifier || vs_ctl_is greedy-heredoc || vs_ctl_is no-heredoc-strip || vs_ctl_is open-push-hook \
+   || vs_ctl_is misread-ledger || vs_ctl_is no-target-check; then AG="$(make_copy "$VS_CTL")"; fi
 replay "$AG" "$W/replay.txt"
 sed -n '/^MISMATCH/p' "$W/replay.txt" | head -12 | sed 's/^/  /'
 tail -1 "$W/replay.txt" | sed 's/^/  /'
@@ -159,12 +180,53 @@ sed -n '/^  BAD /p' "$W/push.txt" | head -8
 tail -1 "$W/push.txt" | sed 's/^/  push hook: /'
 grep -q -- '-> PASS$' "$W/push.txt" || { echo "FAIL: the push hook's decisions disagree with its cases"; fail=1; }
 
+# THE REAL LEDGER (rule-checker run 2026-09-23-107, Q1/Q3/Q4): the 18 cases write their
+# own ledger in the hook's assumed layout, so they cannot see the hook MISREAD the real one.
+# Here the hook's own reader runs on the tree's tests/rulecheck/ledger.tsv and run dirs and
+# must equal a reading built INDEPENDENTLY with tools/rulecheck.py's reader (the tool of
+# record, its own column names) — and must be non-empty, with run 2026-09-23-106's resolved
+# head among it, so an empty agreement cannot pass
+python3 - "$AG/hooks/pre_push.py" "$REPO" > "$W/ledger.txt" 2>&1 <<'PY' || true
+import importlib.util, sys
+from pathlib import Path
+hook_path, repo = sys.argv[1:3]
+spec = importlib.util.spec_from_file_location("hook", hook_path); hook = importlib.util.module_from_spec(spec); spec.loader.exec_module(hook)
+sys.path.insert(0, f"{repo}/tools"); import rulecheck
+got = hook.passing_heads(repo)
+want = set()
+for r in rulecheck.read_ledger(Path(repo)):
+    if r["decision"] != "procedure" or r["control_verdict"] != "CAUGHT":
+        continue
+    if not (r["verdict"] == "OK" or (r["verdict"] == "VIOLATED" and r["resolution"] != "-")):
+        continue
+    meta = rulecheck.read_kv(Path(repo) / "tests" / "rulecheck" / "runs" / r["id"] / "meta.tsv")
+    if meta.get("head"):
+        want.add(meta["head"])
+known = "2652a538aa294c4635a2ceb4255d9b832c1f0654"  # run 2026-09-23-106, resolved
+ok = got == want and known in want
+print(f"hook reads {len(got)} passing head(s), the rule-checker's reader {len(want)}; run 106's head {'present' if known in got else 'ABSENT'} -> {'AGREE' if ok else 'DISAGREE'}")
+PY
+sed 's/^/  real ledger: /' "$W/ledger.txt"
+grep -q -- '-> AGREE$' "$W/ledger.txt" || { echo "FAIL: the push hook reads the real ledger differently from the rule-checker"; fail=1; }
+
 # the census shares the classifier and its own selftest must hold
 python3 tools/agent/transcript_gaps.py --selftest | sed 's/^/  /'
 python3 tools/agent/transcript_gaps.py --selftest | grep -q 'PASS$' || { echo "FAIL: transcript_gaps selftest"; fail=1; }
 
 # the controls, in-gate: each perturbed copy must produce mismatches on ITS side
 if [ -z "${VS_CTL:-}" ]; then
+    python3 - "$(make_copy misread-ledger)/hooks/pre_push.py" "$REPO" > "$W/ctl_ledger.txt" 2>&1 <<'PY' || true
+import importlib.util, sys
+hook_path, repo = sys.argv[1:3]
+spec = importlib.util.spec_from_file_location("hook", hook_path); hook = importlib.util.module_from_spec(spec); spec.loader.exec_module(hook)
+print("heads", len(hook.passing_heads(repo)), "present" if "2652a538aa294c4635a2ceb4255d9b832c1f0654" in hook.passing_heads(repo) else "ABSENT")
+PY
+    if grep -q 'ABSENT' "$W/ctl_ledger.txt"; then vs_ctl_fired misread-ledger "a hook with two ledger columns swapped loses run 106's head ($(cat "$W/ctl_ledger.txt"))"
+    else vs_ctl_dead misread-ledger "a hook with swapped ledger columns still read run 106's head — the real-ledger check cannot see a misread" || fail=1; fi
+    python3 tests/lib/pre_push_cases.py "$(make_copy no-target-check)/hooks/pre_push.py" > "$W/ctl_target.txt" 2>&1 || true
+    k=$(grep -c '^  BAD .*other repo.*expect allow' "$W/ctl_target.txt" || true)
+    if [ "${k:-0}" -gt 0 ]; then vs_ctl_fired no-target-check "$k other-repository pushes refused by a hook without the this-repository guard"
+    else vs_ctl_dead no-target-check "a hook without the guard still let other repositories through — the cases cannot see the defect" || fail=1; fi
     python3 tests/lib/pre_push_cases.py "$(make_copy open-push-hook)/hooks/pre_push.py" > "$W/ctl_push.txt" 2>&1 || true
     k=$(grep -c '^  BAD .*expect deny' "$W/ctl_push.txt" || true)
     if [ "${k:-0}" -gt 0 ]; then vs_ctl_fired open-push-hook "$k must-deny push cases let through by the perturbed copy"
