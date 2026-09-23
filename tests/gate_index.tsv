@@ -382,4 +382,5 @@ tests/audit_defense_row_reads.sh	character-data
 tests/audit_crouch_flag.sh	character-data
 tests/audit_ex_refused.sh	character-data
 tests/test_agent_hooks.sh	runner
+tests/test_agent_extract.sh	runner
 tests/test_agent_sweep.sh	runner

@@ -1,0 +1,7 @@
+NEGATIVE. Session 62cb6da6 (14z-176), records 200-470, unmodified: the S2 process-sweep
+work — two tracked tasks (one killed with a statement, one still running where the span
+ends, which QP4 counts as accounted: its end will notify), every reported figure sourced
+(the extractor flags none), every reported step backed by its call. Chosen over 200-575,
+which carries a report at [545] with one imprecise line ("the sweep also caught" a tail
+that the pre-tool measurement found) — a reader flagging that would be RIGHT, so it is not a
+clean negative. Not handed to the checker.

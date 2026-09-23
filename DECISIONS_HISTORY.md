@@ -27,6 +27,29 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-23 (14z-176) — #172 slice S3: the procedural checker's four questions and fixtures, and the agentlib launch fix
+
+**The questions put.** (1) `tools/agent/agentlib.py` (edit-locked) counts a tool OUTPUT
+that merely quotes "Command running in background with ID: …" as a tracked task: across
+every archived transcript, 7 of 798 marker-carrying results were quotes (4 in 14z-175's
+transcript, 3 in 14z-176's) — measured afterwards, in memory, to yield 3 phantom task
+ids, the question having said "each producing a phantom task"; no published figure
+moves. A roughly 15-line fix (`tracked_launch`, accepting only a result that STARTS
+with the launch text); staging it as a copy of the locked file under `build/` was
+refused. (2) S3's procedural checker as four questions to a fresh, context-free reader
+over a transcript extract — QP1 SAID-VS-DONE, QP2 CLAIMED-VS-RUN, QP3
+MEASURED-NOT-INFERRED, QP4 ACCOUNTED — on the rule-checker's machinery, with fixtures
+QP1+QP4 from a real 14z-174 span, QP2 and QP3 PLANTED into a real clean span of
+14z-176, and that span unmodified as the negative.
+
+**THE RULINGS, verbatim:** (1) *"Happy to apply it but it'll be in a while. I have no
+access to the machine right now"* — the fix waits for the maintainer, as
+`build/agent172/apply_launchfix.py` (`--prove` in memory: tracked tasks 794 -> 791,
+removals only, the 44 C0.1 fixture verdicts unchanged; `--apply` is the maintainer's);
+(2) *"Build it as described (Recommended)"*.
+
+---
+
 ## Ruled 2026-09-23 (14z-175) — #172 slice S1: C0.1 INSTALLED with its edit lock, and C0.2 moved to the procedural checker
 
 **The questions put.** (1) C0.1 — deny detached launches and `pgrep` waiters — passed its

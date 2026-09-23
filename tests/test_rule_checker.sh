@@ -4,6 +4,7 @@
 # MUST-FIRE: perturbed-copy: quiet-control — a copy of the record in which one run's plant reads DEAD while its verdict still reads OK must fail: a dead plant VOIDS the verdict, and a checker that stopped catching its plants is a dead control
 # MUST-FIRE: perturbed-copy: unchecked-freeze — a copy of the registry with one more row after the birth row, named by no `freeze` run, must fail: a freeze is bound to the checker mechanically
 # MUST-FIRE: perturbed-copy: prose-verdict — a copy of the record in which one run's real verdict is prose instead of the six structured lines must fail: a prose verdict is unfalsifiable and the recorder refuses it
+# MUST-FIRE: perturbed-copy: cross-family-plant — a copy of the record in which a PROCEDURE calibration names an EVIDENCE fixture as its plant must fail: a plant answers its own family's questions, so one from the other checklist proves nothing about the reader (#172 S3, 14z-176)
 #
 # WHY. The rule-checker (docs/project/rule_checker.md, [VSP-183]/[VSP-184]) is a
 # fresh agent that answers five fixed questions from the artifacts behind a
@@ -16,7 +17,7 @@
 #
 # Section 1 is the tool's parser selftest (the recorder's refusal of prose is
 # what "structured output, never prose" rests on). Section 2 is the check on
-# the real tree. Section 3 fires the three controls on a copy.
+# the real tree. Section 3 fires the four controls on a copy (the fourth, cross-family-plant, since 14z-176).
 #
 # Usage: tests/test_rule_checker.sh
 set -eu
@@ -59,6 +60,12 @@ PY
         [ -n "$_run" ] || { echo "no run dir to perturb"; return 1; }
         printf 'Overall this looks fine to me; the legs agree and the control exists.\n' > "$_run/verdict_real.txt"
         ;;
+    cross-family-plant)
+        # the first procedure-family run (a meta.tsv reading `family procedure`) names an evidence plant
+        _run="$(grep -l '^family	procedure$' "$2"/tests/rulecheck/runs/*/meta.tsv | head -1 | xargs dirname)"
+        [ -n "$_run" ] || { echo "no procedure run to perturb"; return 1; }
+        printf 'fixture\tforced-pick-14z159\nslot\tb\n' > "$_run/control.txt"
+        ;;
     *) echo "unknown perturbation $1"; return 1 ;;
     esac
 }
@@ -70,6 +77,7 @@ expect_msg() {  # expect_msg <name>
     quiet-control)    echo "a DEAD plant must VOID the verdict" ;;
     unchecked-freeze) echo "was frozen with no OK \`freeze\` rulecheck row" ;;
     prose-verdict)    echo "not a structured verdict" ;;
+    cross-family-plant) echo "is from the evidence family, but the run was read under the procedure checklist" ;;
     esac
 }
 
@@ -94,7 +102,7 @@ echo "== 2. the record on the real tree =="
 python3 tools/rulecheck.py check || fail=1
 
 echo "== 3. MUST-FIRE CONTROLS on a copy =="
-for c in quiet-control unchecked-freeze prose-verdict; do
+for c in quiet-control unchecked-freeze prose-verdict cross-family-plant; do
     rm -rf "$W/c"; mkcopy "$W/c"; perturb "$c" "$W/c"
     if python3 tools/rulecheck.py check --root "$W/c" > "$W/c.log" 2>&1; then
         vs_ctl_dead "$c" "the perturbed copy passed the check"; fail=1
@@ -106,7 +114,7 @@ for c in quiet-control unchecked-freeze prose-verdict; do
 done
 
 if [ "$fail" -eq 0 ]; then
-    echo "PASS: the rule-checker's record is sound and its three controls fire"
+    echo "PASS: the rule-checker's record is sound and its four controls fire"
 else
     echo "FAIL: rule-checker record"
     exit 1

@@ -8,7 +8,12 @@
 > measurement (§4, and the ruling "— #172 slice S1"). **S2 LANDED 14z-176:** C0.3 is
 > `tools/agent/sweep.py`, gated by `tests/test_agent_sweep.sh`, and it is a step of the
 > close (STATE.md's header); on its first live run it found an 18-day orphan of the
-> 14z-133 session that the by-hand check for #172 had missed (§4). Next: S3 (C1).
+> 14z-133 session that the by-hand check for #172 had missed (§4). **S3 LANDED 14z-176
+> (ruled *"Build it as described"*):** C1 is the rule-checker's `procedure` family —
+> `tools/agent/extract.py`, the QP1-QP4 checklist in `docs/project/rule_checker.md`, four
+> fixtures calibrated on Opus 5.5 (runs `2026-09-23-101..104`); its push binding is a PROVEN
+> PROPOSAL awaiting the maintainer (`build/agent172/proposal_pre_push/`), so until then the close
+> carries the step. Next: S4 (worker definitions).
 
 **Why this document exists:** the same reason `harness_scope.md` and
 `applier_app_scope.md` do — a direction the maintainer ordered, big enough that
@@ -275,7 +280,7 @@ RETURN, not by a second orchestrator.
 |---|---|---|
 | **S1** | C0.1 (+ C0.2, moved to C1 on measurement — §4) as scripts under `tools/agent/` + the project `.claude/settings.json` wiring + C0.4. **C0.1 LANDED 14z-175:** `tools/agent/agentlib.py` (the one classifier, also behind the census), `tools/agent/hooks/pre_bash.py`, gate `tests/test_agent_hooks.sh`; wiring verified in a scratch project, then INSTALLED here (ruled "Install + protect"): a live `nohup` launch denied, its marker never created, an Edit of the settings refused | `tests/test_agent_hooks.sh` (ci_portable): the hook over `tests/agent/c01_commands.jsonl` — 44 rows cut from real transcripts and synthetic edge cases: 14z-174's twelve launches and the over-strip cases must be DENIED, the real look-alikes and this sitting's live false positive ALLOWED — plus the fail-open path, the installed wiring, and three controls (`blind-classifier`, `greedy-heredoc`, `no-heredoc-strip`). (The plan said this gate would replay C0.2 too; C0.2 moved to C1, so it replays C0.1 only.) **The close's rule-checker run `2026-09-23-100` found the stripper over-matched** — `<<<word` and `1<<3` read as heredoc operators, and an unterminated one swallowed every later line, hiding a real `nohup` below it and, live in this sitting, un-closing a quoted program so its `&` was refused. The fix (terminated heredocs only, a tag that starts with a letter, no third `<`) changes no verdict on the 4,624 archived commands and is applied by the maintainer, the file being edit-locked |
 | **S2** | C0.3 — the close sweep, and its step in STATE.md's close checklist. **LANDED 14z-176:** `tools/agent/sweep.py`, the close step before the push (STATE.md's header) | `tests/test_agent_sweep.sh` (ci_portable, ~12 s): a planted world — a fake Claude with a tool shell that must be named ATTACHED with its child and a non-leader helper that must stay quiet; six orphans, one per signal (cwd twice, once as a `sh`+`tail` pair, argv, stream, env, Claude tool shell) that must each be named WITH that signal; a quiet orphan; the sweep's own shell. Then every survivor declared -> CLEAN, then every plant killed -> CLEAN with no survivor. Three controls (`blind-orphans`, `blind-cwd`, `blind-leaders`), each reaching FAIL as a mode |
-| **S3** | C1 — `tools/proccheck.py` (or a `rulecheck` decision kind), the transcript extractor, the checklist, fixtures from 14z-174, calibration, the push binding | fixtures calibrated like `rulecheck`'s: each positive caught, a negative quiet beside a caught plant |
+| **S3** | C1 — `tools/proccheck.py` (or a `rulecheck` decision kind), the transcript extractor, the checklist, fixtures from 14z-174, calibration, the push binding. **LANDED 14z-176 as a `rulecheck` FAMILY** (`procedure`): `tools/agent/extract.py`, the checklist, fixtures `proc-promise-14z174` (REAL), `proc-planted-claim-14z176` and `proc-planted-figure-14z176` (PLANTED into a real clean span — the real 14z-174 QP2 case needs ritual knowledge a context-free reader is ruled not to have, and no real QP3 case survived a check of 14z-174), `proc-clean-14z176` (negative). The push binding is proven (14 cases) and awaits the maintainer | runs `2026-09-23-101..104`: each positive caught — the real one on BOTH QP1 and QP4, with a second instance the fixture's notes had not named — and the negative OK beside a caught plant; `tests/test_rule_checker.sh` (+ `cross-family-plant`) and `tests/test_agent_extract.sh` (two controls) |
 | **S4** | W — worker definitions and the spec template | a worker run on a known task returns figures each traceable to a command |
 | **S5** | O — the orchestrator definition and model switch | one real sitting under it, the C0/C1 record read at its close |
 
@@ -318,6 +323,9 @@ The questions as put:
 
 - **A job the agent never launches through a tool** — the hooks see only tool calls.
 - **An intent the agent never states** — QP1 can only hold the agent to what it said.
+- **A statement the transcript never recorded** — measured 14z-176: every report that ENDS a
+  turn is kept, but mid-turn narration just before a tool call is sometimes absent (at least
+  12 statements in one span of that sitting). C1 can only miss on it, never flag falsely.
 - **The maintainer's time outside the session** — a notification wakes the agent;
   nothing here wakes the maintainer, except the push notifications already enabled.
 - **An orphan that points nowhere into the project** — C0.3 finds orphans by where they

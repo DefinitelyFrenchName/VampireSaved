@@ -1,0 +1,94 @@
+[200 12:30] T  Bash: Show the tree under Claude with session leaders marked :: python3 - "$CLAUDE_PID" <<'EOF' import os, subprocess, sys c = int(sys.argv[1]) rows = [l.split(None, 3) for l in subprocess.run(["ps", "-Ao", "pid=,ppid=,comm=,command="], capture_output=True, text=True).stdout.splitlines()] kids = {} for pid, ppid, comm, *cmd in rows: kids.setdefault(int(ppid), []
+[201 12:30] N  task bmy9jiy8t launched (tracked; its end will notify)
+[201 12:30] R  ok: Command running in background with ID: bmy9jiy8t. Output is being written to: /private/tmp/claude-501/-Users-koneko-Developer-Vampire-Saved-VampireSaved/62cb6da
+[202 12:30] R  ok: 62313 sid=62313 LEADER /bin/zsh :: /bin/zsh -c source /Users/koneko/.claude/shell-snapshots/snapshot-zsh-1790161863445-frju8a 62315 sid=62313 /Library/Develop :
+[213 12:30] T  Bash: Check whether a tracked task's shell names its task id :: ps -ww -o command= -p 62313 | sed -E 's/eval .*/eval …/' | head -c 900; echo; echo ---; ps -ww -o command= -p 62313 | grep -oE 'tasks/[a-z0-9]+\.output|bmy9jiy8t' | sort -u; lsof -a -p 62315 -d 1 -Fn 2>/dev/null | tail -1
+[214 12:31] R  ok: /bin/zsh -c source /Users/koneko/.claude/shell-snapshots/snapshot-zsh-1790161863445-frju8a.sh 2>/dev/null || true && setopt NO_EXTENDED_GLOB NO_BARE_GLOB_QUAL 2
+[218 12:31] T  Bash: Check headless Chrome processes inherit the session env :: UD=/private/tmp/claude-501/sweep_probe_ud; rm -rf $UD "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --user-data-dir=$UD --no-first-run about:blank >/dev/null 2>&1 & C=$! python3 -c 'import time; time.sleep(4)' python3 - "$C" "$CLAUDE_CODE_SESSION_ID" <<'EOF' import su
+[219 12:31] R  ok: 62366 NO-VAR Google Chrome
+[222 12:31] A  Headless Chrome did not show the session variable. Checking whether its environment is hidden entirely or only lacks that variable.
+[223 12:31] T  Bash: Inspect headless Chrome env visibility and children :: UD=/private/tmp/claude-501/sweep_probe_ud; rm -rf $UD "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --user-data-dir=$UD --no-first-run --remote-debugging-port=0 about:blank >/dev/null 2>&1 & C=$! python3 -c 'import time; time.sleep(4)' echo "alive: $(ps -o pid= -p $C)
+[230 12:31] R  ok: alive: 62387 3 62394 62387 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.54/Helpers/Google Chrome He
+[236 12:32] T  Bash: Read the S1 gate and census tool headers :: cat tests/test_agent_hooks.sh && sed -n 1,60p tools/agent/transcript_gaps.py
+[237 12:32] R  ok: #!/bin/sh # test_agent_hooks.sh — SLICE S1 OF GitHub #172: the agent-discipline hooks decide what # the evidence says they should (docs/project/agent_architectu
+[238 12:32] N  task bmy9jiy8t finished: completed (mid-turn)
+[247 12:32] A  The probe task `bmy9jiy8t` finished as planned (it was only there to be inspected). Before writing the tool, I'm running the orphan rule against the real process table as a must-stay-quiet check.
+[248 12:32] T  Bash: Measure false positives of the orphan rule on the live table :: time (lsof -a -u "$USER" -d cwd -Fpn 2>/dev/null > /private/tmp/claude-501/cwds.txt); python3 - <<'EOF' import os, subprocess cwd = {}; pid = None for l in open("/private/tmp/claude-501/cwds.txt"): if l[0] == "p": pid = int(l[1:]) elif l[0] == "n" and pid: cwd[pid] = l[1:].rstrip("\n") rows = [l.spl
+[249 12:32] R  ok: ( lsof -a -u "$USER" -d cwd -Fpn 2> /dev/null > ; ) 0.02s user 0.13s system 54% cpu 0.290 total user processes with ppid 1: 283 | cwd known for 283 their cwds: 
+[253 12:32] T  Bash: Inspect the three orphans the rule found :: for p in 62230 86029 86032; do echo "== $p"; ps -ww -o pid=,ppid=,lstart=,etime=,command= -p $p; lsof -a -p $p -d 0,1,2 -Fn 2>/dev/null | grep '^n' | tr '\n' ' '; echo; done; ps -Ao pid=,ppid=,comm= | awk '$2==86029 || $2==86032'
+[254 12:32] R  ok: == 62230 62230 1 Wed Sep 23 14:29:35 2026 03:20 tail -F /dev/null n/dev/null n/dev/null n/dev/null == 86029 86029 1 Fri Sep 4 23:01:22 2026 18-15:31:33 tail -n 
+[258 12:33] T  Bash: Kill own leaked tail; read #172 on the orphans :: kill 62230 && echo "killed my own leaked tail 62230"; gh issue view 172 --comments --json comments,body -q '.body, (.comments[] | "---- " + .author.login + " " + .createdAt + "\n" + .body)' | grep -n -iE -B2 -A4 'tail|chrome|orphan|17 day|ground truth' | head -60
+[265 12:33] R  ok: killed my own leaked tail 62230 41-| pid | what | running for | cpu | 42-|---|---|---|---| 43:| 8759 | a headless Chrome started for a `--log-net-log` probe | *
+[269 12:33] T  Bash: Check the ticket's two processes are gone :: ps -o pid=,etime=,command= -p 2985,8759 | cut -c1-120 || echo "neither 2985 nor 8759 is alive"
+[270 12:33] R  ok: (Bash completed with no output)
+[274 12:34] T  Bash: Find where the S1 gate is registered :: grep -rn 'test_agent_hooks' tests/*.txt tests/*.tsv tests/expected/*.tsv docs/project/gate_index.md 2>/dev/null | cut -c1-220; sed -n 1,40p tests/lib/controls.sh | grep -nE '^(vs_ctl|# )' | head -20
+[275 12:34] R  ok: tests/ci_portable.txt:266:test_agent_hooks tests/gate_index.tsv:384:tests/test_agent_hooks.sh runner tests/expected/must_fire_census.tsv:51:declares test_agent_
+[285 12:35] T  Write:  :: /Users/koneko/Developer/Vampire_Saved/VampireSaved/tools/agent/sweep.py
+[286 12:35] R  ok: File created successfully at: /Users/koneko/Developer/Vampire_Saved/VampireSaved/tools/agent/sweep.py (file state is current in your context — no need to Read i
+[297 12:35] T  Bash: Refactor the env read and run the sweep live :: python3 - <<'EOF' p = "tools/agent/sweep.py"; s = open(p).read() old_env = s[s.index("def environ_session(pid):"):s.index("def getsid(pid):")] new_env = '''def environ_sessions(pids): """-> {pid: the CLAUDE_CODE_SESSION_ID in its environment} for the pids whose environment is readable and carries on
+[298 12:35] R  ok: == C0.3 process sweep (#172 S2) — session 62cb6da6, claude pid 60552 roots: /Users/koneko/Developer/Vampire_Saved/VampireSaved, /private/tmp/claude-501/-Users-k
+[309 12:35] T  Bash: Record the first live sweep, kill the orphan, re-sweep :: mkdir -p build/agent172 && python3 tools/agent/sweep.py > build/agent172/sweep_first_live_14z176.txt; echo "first live run exit $?"; kill 86029 86032; python3 -c 'import time; time.sleep(0.5)'; python3 tools/agent/sweep.py; echo "exit $?"
+[310 12:35] R  ok: first live run exit 1 == C0.3 process sweep (#172 S2) — session 62cb6da6, claude pid 60552 roots: /Users/koneko/Developer/Vampire_Saved/VampireSaved, /private/t
+[313 12:35] A  The machine is clean. Now the attached half, live: a tracked background task that is still running must show up as ATTACHED with its task ID, and on an OPEN TASK line from the transcript.
+[314 12:35] T  Bash [run_in_background]: Plant a tracked task for the live attached check :: python3 -c 'import time; time.sleep(120)' # sweep-live-attached-plant
+[315 12:35] T  Bash: Sweep with a live tracked task running :: python3 tools/agent/sweep.py; echo "exit $?"; ls ~/.claude/projects/-Users-koneko-Developer-Vampire-Saved-VampireSaved/$CLAUDE_CODE_SESSION_ID.jsonl
+[316 12:35] N  task bi3rc93y5 launched (tracked; its end will notify)
+[316 12:35] R  ok: Command running in background with ID: bi3rc93y5. Output is being written to: /private/tmp/claude-501/-Users-koneko-Developer-Vampire-Saved-VampireSaved/62cb6da
+[317 12:35] R  ok: == C0.3 process sweep (#172 S2) — session 62cb6da6, claude pid 60552 roots: /Users/koneko/Developer/Vampire_Saved/VampireSaved, /private/tmp/claude-501/-Users-k
+[321 12:36] T  Bash: Fix kill hint, then exercise --declare live :: python3 - <<'EOF' p = "tools/agent/sweep.py"; s = open(p).read() old = ''' pids = " ".join(str(r) for k, r, _ in survivors if not declared.get((r, procs[r]["lstart"]))) print(f"SURVIVORS {n} ({undeclared} undeclared) — kill each (`kill {pids}`, then re-run) "''' new = ''' # every pid of every undecl
+[328 12:36] R  ok: attached root: 62647 DECLARED 62647 (started Wed Sep 23 14:35:53 2026): live check of --declare (14z-176), killed right after DECLARED 62647 started Wed Sep 23 
+[331 12:36] A  `--declare` works, and it refuses an unknown PID or an empty reason. Now I'm removing the declared plant leaves-first, as the new hint does, and confirming nothing is left behind.
+[332 12:36] T  Bash: Kill the plant leaves-first and re-sweep :: kill 62649 62647; python3 -c 'import time; time.sleep(0.5)'; python3 tools/agent/sweep.py | grep -vE '^ roots'; echo "exit ${pipestatus[1]}"
+[335 12:36] R  ok: == C0.3 process sweep (#172 S2) — session 62cb6da6, claude pid 60552 OPEN TASK bi3rc93y5 (no completion notification; no process holds its output) :: Plant a tr
+[336 12:36] N  task bi3rc93y5 finished: failed (mid-turn)
+[341 12:37] T  Write:  :: /Users/koneko/Developer/Vampire_Saved/VampireSaved/tests/test_agent_sweep.sh
+[342 12:37] R  ok: File created successfully at: /Users/koneko/Developer/Vampire_Saved/VampireSaved/tests/test_agent_sweep.sh (file state is current in your context — no need to R
+[352 12:37] T  Bash: Fix the plant cleanup and run the new gate :: python3 - <<'EOF' p = "tests/test_agent_sweep.sh"; s = open(p).read() a = s.index("kill = tool_child + [tool.pid]"); b = s.index('time.sleep(0.4)\nres["r3"] = run()') new = '''# kill every plant LEAVES FIRST, by its exact subtree: killing only a parent would orphan # its child (o2's tail, o6's pytho
+[353 12:38] R  ok: == test_agent_sweep: #172 slice S2 — C0.3 against a planted process world == SUMMARY named 7 (want 7) mismatches 0 CONTROL FIRED: blind-orphans — 7 mismatches o
+[364 12:38] T  Bash: Check for leftovers and run each control as a mode :: echo "leftovers: $(ps -Ao pid=,command= | grep -E 'sweep-plant|tail -f /dev/null|snapshot-gate' | grep -v grep | wc -l)"; for c in blind-orphans blind-cwd blind-leaders; do CONTROL=$c tests/test_agent_sweep.sh > /private/tmp/claude-501/ctl_$c.txt 2>&1; echo "CONTROL=$c exit $? :: $(tail -1 /private/
+[365 12:38] R  ok: leftovers: 0 CONTROL=blind-orphans exit 1 :: FAIL: test_agent_sweep CONTROL=blind-cwd exit 1 :: FAIL: test_agent_sweep CONTROL=blind-leaders exit 1 :: FAIL: tes
+[369 12:38] T  Bash: Replace fixed waits with polls; soak the gate 5 times :: python3 - <<'EOF' p = "tests/test_agent_sweep.sh"; s = open(p).read() old = '''time.sleep(0.6) tool_child = [int(l.split()[0]) for l in subprocess.run(["ps", "-Ao", "pid=,ppid="], capture_output=True, text=True).stdout.splitlines() if int(l.split()[1]) == tool.pid] ''' new = '''# poll (bounded) unti
+[370 12:39] R  ok: run 1 exit 0 :: SUMMARY named 7 (want 7) mismatches 0 fired=3 run 2 exit 0 :: SUMMARY named 7 (want 7) mismatches 0 fired=3 run 3 exit 0 :: SUMMARY named 7 (wan
+[374 12:39] T  Bash: Inspect registration files and gotcha format :: grep -n 'agent_hooks' tests/gate_index.tsv tests/ci_portable.txt tests/expected/must_fire_census.tsv; sed -n 1,12p tests/expected/must_fire_census.tsv; grep -n '^## \|^### ' docs/platform/gotchas.md | tail -5; grep -n 'file://' docs/platform/gotchas.md | head -3
+[375 12:39] R  ok: tests/ci_portable.txt:266:test_agent_hooks tests/expected/must_fire_census.tsv:51:declares test_agent_hooks tests/gate_index.tsv:384:tests/test_agent_hooks.sh r
+[385 12:39] A  Registering the gate and writing the two gotchas. Checking the entry format of the platform gotchas file first.
+[386 12:39] T  Bash: Read the last platform gotcha for format :: sed -n '2738,2800p' docs/platform/gotchas.md; wc -l docs/platform/gotchas.md; head -30 tools/gen_gotchas_index.py | grep -iE 'bucket|##|paid|format'
+[387 12:39] R  ok: ## `CompressionStream("deflate-raw")` IS NOT BYTE-COMPARABLE TO `zlib.compressobj`, EVEN AT THE SAME LEVEL — and the two browser engines differ from each other 
+[390 12:39] T  Bash: Append two gotchas and register the gate :: cat >> docs/platform/gotchas.md <<'EOF' ## macOS HIDES THE ENVIRONMENT OF ITS OWN BINARIES AND OF HARDENED APPS — an inherited variable cannot find `tail`, `sleep`, `zsh` or Chrome (measured 2026-09-23, 14z-176) Every process a Claude Code tool call starts inherits `CLAUDE_CODE_SESSION_ID`, so the o
+[391 12:39] R  ok: tests/ci_portable.txt | 1 + tests/expected/must_fire_census.tsv | 1 + tests/gate_index.tsv | 1 + 3 files changed, 3 insertions(+) diff --git a/tests/expected/mu
+[394 12:40] A  `ci_portable.txt` gives each entry a comment line, so the new one needs one too.
+[395 12:40] T  Bash: Annotate the portable entry and regenerate indexes :: python3 - <<'EOF' p = "tests/ci_portable.txt"; s = open(p).read() assert s.endswith("test_agent_hooks\ntest_agent_sweep\n") s = s[:-len("test_agent_sweep\n")] + ("# #172 slice S2 (14z-176): C0.3, the close-time process sweep, against a planted process world —\n" "# a fake Claude's tool shell ATTACHE
+[402 12:40] R  ok: # over a fixture cut from real transcripts — 14z-174's twelve nohup launches must be denied, # real false-positive shapes allowed; fail-open recorded. tools/age
+[405 12:40] A  Indexes regenerated. Now the scope document: status banner, the measured rows in §2, C0.3 as built in §4, the S2 row in §5, and what it won't catch in §7.
+[406 12:40] T  Bash: Update the scope document with S2 as built :: python3 - <<'EOF' p = "docs/project/agent_architecture_scope.md"; s = open(p).read() def rep(a, b): global s assert s.count(a) == 1, a[:60] s = s.replace(a, b) rep("""> measurement (§4, and the ruling "— #172 slice S1"). Next: S2 (the close sweep, C0.3).""", """> measurement (§4, and the ruling "— #
+[407 12:40] R  ok: ok
+[410 12:40] A  One claim in that paragraph needs correcting. The measurement I cited matched three processes, not two: the pipeline plus my own leaked `tail`. Fixing the wording to say exactly that.
+[411 12:40] T  Bash: Correct the claim to the three measured matches :: python3 - <<'EOF' p = "docs/project/agent_architecture_scope.md"; s = open(p).read() a = """kept (`build/agent172/sweep_first_live_14z176.txt`). Over the same live table the rule named nothing else among the user's 283 launchd children, 198 of them at cwd `/`.""" b = """kept (`build/agent172/sweep_f
+[412 12:40] R  ok: 58:- **THE LAST STEP OF THE CLOSE IS THE PUSH (maintainer-ruled 2026-09-10):** 59- static tier strict green WITH every control executed (the default `all`), the
+[422 12:40] A  Adding the sweep to the close, between the tier and the push. It has to run after the tier because the tier spawns processes of its own.
+[423 12:40] T  Edit:  :: /Users/koneko/Developer/Vampire_Saved/VampireSaved/STATE.md
+[424 12:40] T  Bash: Locate the HANDOFF agent-hooks rows :: grep -n 'THE AGENT HOOKS' HANDOFF.md | head
+[425 12:40] R  ok: The file /Users/koneko/Developer/Vampire_Saved/VampireSaved/STATE.md has been updated successfully. (file state is current in your context — no need to Read it 
+[426 12:40] R  ok: 42:| know why a Bash command was REFUSED with "C0.1 (#172, no invisible jobs)", or measure how sessions lose time | the agent-discipline hooks — "THE AGENT HOOK
+[430 12:40] T  Bash: Verify S1 gate row and control counts :: wc -l < tests/agent/c01_commands.jsonl; grep -c '^# MUST-FIRE' tests/test_agent_hooks.sh; grep -rn '40 rows\|two controls' HANDOFF.md docs/project/agent_architecture_scope.md docs/project/gate_index.md tests/ci_portable.txt | cut -c1-160
+[431 12:40] R  ok: 44 3 HANDOFF.md:69:| **THE SAME-DATA P2 AUDIT (14z-164, GitHub #136 proposition 2)** | `tools/audit_same_data_p2.py <vsavj_data.bin> <vsav2_data.bin>` — for eve
+[433 12:41] T  Bash: Update HANDOFF rows and fix the stale S1 counts :: python3 - <<'EOF' p = "HANDOFF.md"; s = open(p).read() a = """Gate `tests/test_agent_hooks.sh` (ci_portable, two controls): the hook over `tests/agent/c01_commands.jsonl`, 40 rows cut from real transcripts — 14z-174's twelve `nohup` launches must be denied. C0.2 was measured and moved to the procedu
+[434 12:41] R  ok: ok
+[443 12:41] T  Bash: Run the doc gates and the census gates :: sed -i '' 's/; three controls (two until 14z-176.s recount)\. ~2 s\./; three controls. ~2 s./' tests/ci_portable.txt && grep -n 'tools/agent/; three' tests/ci_portable.txt for g in test_checkdocs test_docshape test_doc_anchor_census test_checkskills test_gotchas_index_current test_gate_index_current
+[444 12:42] R  ok: 265:# real false-positive shapes allowed; fail-open recorded. tools/agent/; three controls. ~2 s. test_checkdocs exit 0 :: PASS test_docshape exit 0 :: PASS tes
+[448 12:42] T  Bash: Read the ROMDIR location memory :: cat /Users/koneko/.claude/projects/-Users-koneko-Developer-Vampire-Saved-VampireSaved/memory/romdir-location.md | tail -5
+[449 12:42] R  ok: papercut rather than a breach — but do not repeat the claim as fact.) CAUTION (2026-07-31): the dir is NOT reliably pristine — it grew cfg/nvram dirs and lost q
+[451 12:42] T  Bash: Find ROMDIR and audit the reference sets :: grep -m3 -n 'ROMS\|ROMDIR=' /Users/koneko/.claude/projects/-Users-koneko-Developer-Vampire-Saved-VampireSaved/memory/romdir-location.md; cd /Users/koneko/Developer/Vampire_Saved/VampireSaved && python3 tools/audit_roms.py ../ROMS 2>&1 | tail -2
+[452 12:42] R  ok: 8:`ROMDIR=/Users/koneko/Developer/Vampire_Saved/ROMS` — the reference-set 12:Path CORRECTED 2026-08-08: it was `Vampire Saved/ROMS` (with a space) until read 76
+[455 12:42] T  Bash: Audit the reference ROM sets :: python3 tools/audit_roms.py /Users/koneko/Developer/Vampire_Saved/ROMS > /private/tmp/claude-501/audit_roms.txt 2>&1; echo "exit $?"; grep -ciE 'mismatch|missing|fail' /private/tmp/claude-501/audit_roms.txt; tail -3 /private/tmp/claude-501/audit_roms.txt
+[456 12:43] R  ok: exit 0 0 verified 76 members against checksums.txt: all match read 76 members from /Users/koneko/Developer/Vampire_Saved/ROMS
+[458 12:43] A  The reference sets are clean (76 of 76 members match, in 41.7 s). Launching the mid-session static tier as a tracked job.
+[458 12:43] A# figures no earlier tool output, tool input or maintainer message contains: 41.7
+[459 12:43] T  Bash [run_in_background]: Run the mid-session static tier, strict, no controls :: ROMDIR=/Users/koneko/Developer/Vampire_Saved/ROMS tests/run_all_static.sh --strict --exec-controls none > build/agent172/static_mid_14z176.log 2>&1; echo "tier exit $?"
+[460 12:43] N  task bfcuxdh43 launched (tracked; its end will notify)
+[460 12:43] R  ok: Command running in background with ID: bfcuxdh43. Output is being written to: /private/tmp/claude-501/-Users-koneko-Developer-Vampire-Saved-VampireSaved/62cb6da
+[470 12:43] T  Bash: Measure this sitting's refusals and tracked tasks :: python3 tools/agent/transcript_gaps.py --refusals 62cb6da6 2>&1 | tail -15; echo ---; python3 tools/agent/transcript_gaps.py --tasks 62cb6da6 2>&1 | tail -12
+
+TASKS (the jobs QP4 asks about)
+  tracked tasks launched in the span with no completion notification by its end: bfcuxdh43
+  detached launches in the span (no notification can ever report them): 0

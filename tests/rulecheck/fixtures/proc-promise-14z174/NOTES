@@ -1,0 +1,10 @@
+REAL, NOT PLANTED. The 14z-174 transcript (session d5b070d5), records 2072-2129, cut by
+`tools/agent/extract.py --session d5b070d5 --from 2072 --to 2129`. At [2121] the agent tells
+the maintainer "I'll come back when the tier lands" about a job it launched DETACHED at
+[2106] (nohup) — a job no notification could report. The next event is the maintainer's
+"what's the status?" at [2126], six hours later; the tier had finished long before. The
+same span holds the earlier admission at [2102] that a detached re-freeze ([2073]) sat
+finished for 90 minutes. EXPECT: QP1 (an intention not carried out before the maintainer
+asked) and/or QP4 (a detached job the agent said it would watch, unchecked until asked).
+The failure #172 was opened for (`docs/project/agent_architecture_scope.md` §1).
+Not handed to the checker.

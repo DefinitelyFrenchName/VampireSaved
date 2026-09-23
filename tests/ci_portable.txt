@@ -251,7 +251,8 @@ test_tickets
 test_commit_subject
 # test_rule_checker — the adversarial rule-checker's record (14z-163, GitHub #152):
 # every run's plant caught, every fixture calibrated, every VIOLATED resolved, every
-# freeze since the birth checked. tools/rulecheck.py; three controls. ~2 s.
+# freeze since the birth checked, every plant from its own family (evidence | procedure).
+# tools/rulecheck.py; four controls. ~2 s.
 test_rule_checker
 test_rompath_reject
 # 14z-170: the `unless_composed` manifest row key (the S1 scope of the class-0x52 fix) —
@@ -267,3 +268,6 @@ test_agent_hooks
 # #172 slice S2 (14z-176): C0.3, the close-time process sweep, against a planted process world —
 # a fake Claude's tool shell ATTACHED, six orphan shapes by signal, three must-stay-quiet cases; three controls. ~12 s.
 test_agent_sweep
+# #172 slice S3 (14z-176): the transcript extract the procedural checker (C1) reads — figures sourced
+# and flagged, reasoning excluded, detached/open/real launches; two controls. ~1 s.
+test_agent_extract
