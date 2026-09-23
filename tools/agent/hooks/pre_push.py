@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """pre_push.py — C1's BINDING (GitHub #172 slice S3): no push without a procedure check.
-A Claude Code PreToolUse hook on Bash (to be wired in `.claude/settings.json` beside
+A Claude Code PreToolUse hook on Bash (wired in `.claude/settings.json` beside
 `pre_bash.py`; spec `docs/project/rule_checker.md` "THE PROCEDURE FAMILY").
 
 It DENIES a Bash call that runs `git push` unless `tests/rulecheck/ledger.tsv` holds a
