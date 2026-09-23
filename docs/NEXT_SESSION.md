@@ -28,15 +28,14 @@ The tree is still at `build/m3b_merged27` (merged-m19, released); no ROM byte mo
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`, NOT A `ps` GREP** — twenty openers in a row
    reported "nothing running" beside an 18-day orphan, because a grep for `tail -F` cannot match
    `tail -n +1 -F`; this sitting's own procedure check caught the twentieth.
-1. **WAITING ON THE MAINTAINER — two proven proposals under `build/agent172/`.** The first
-   was put to them (*"it'll be in a while"*); the second was first put to them at the 14z-176
-   close, with no answer recorded yet. (a) `apply_launchfix.py` — the `agentlib.tasks` phantom-task fix
-   (`--prove`: 794 -> 791 tasks, removals only, 44 C0.1 verdicts unchanged; `--apply`). After
-   it lands, make `tools/agent/extract.py` call `agentlib.tracked_launch` instead of its own
-   copy, and re-run `tests/test_agent_extract.sh` and `tests/test_agent_hooks.sh`. (b)
-   `proposal_pre_push/` — C1's push hook (`prove.py`, 14/14; `INSTALL.md`). After it lands,
-   move `prove.py`'s cases into `tests/test_agent_hooks.sh` and add `pre_push.py` to its
-   installed-wiring check; the close's procedure step then becomes a hook, not a promise.
+1. **WAITING ON THE MAINTAINER — C1's push hook, `build/agent172/proposal_pre_push/`**
+   (`prove.py`, 18/18; `INSTALL.md`). Put to them at the 14z-176 close; at 14z-176b they asked
+   whether it was a good bar and were given a recommendation — no install word recorded yet.
+   **Fixed before installation (14z-176b):** the first version would have refused a push of
+   the bbh harness or the jtcores fork whenever this repo held an unchecked commit; it now
+   binds only a push of THIS repository. After it lands, move `prove.py`'s cases into
+   `tests/test_agent_hooks.sh` and add `pre_push.py` to its installed-wiring check. (The
+   `agentlib` phantom-task fix was APPLIED by the maintainer at 14z-176b and verified.)
 2. **#172 — S4, the worker definitions** (scope doc §4 W, §5): named `.claude/agents/`
    definitions with model and effort capped as ruled (at most Opus-class, effort at most
    `xhigh`), a spec TEMPLATE, and C1 reading the SPEC against the RETURN; its gate is a worker

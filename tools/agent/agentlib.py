@@ -85,6 +85,19 @@ _OUT_PATH = re.compile(r"Output is being written to: (\S+?\.output)")
 _NOTE_ID = re.compile(r"<task-id>(\w+)</task-id>")
 _NOTE_STATUS = re.compile(r"<status>(\w+)</status>")
 _PATHISH = re.compile(r"[\w./~$-]*[/.][\w./-]*\.(?:log|txt|tsv|out|output|json)\b")
+# a tracked launch's result STARTS with one of these; a result that merely QUOTES the
+# marker (a `sed` of this file, a selftest printed) is not a launch — 7 of 798 marker-
+# carrying results in the archive were quotes (14z-176): 3 phantom tasks
+_LAUNCH_HEADS = ("Command running in background with ID:", "Command did not complete within")
+
+
+def tracked_launch(text):
+    """-> the task id if this tool-result text IS a tracked launch, else None."""
+    s = text.lstrip()
+    if not s.startswith(_LAUNCH_HEADS):
+        return None
+    m = _TASK_ID.search(s)
+    return (m.group(1) or m.group(2)) if m else None
 
 
 def records(path):
@@ -141,11 +154,10 @@ def tasks(path):
                     later_inputs.append((n, json.dumps(inp)))
                 elif b.get("type") == "tool_result":
                     body = json.dumps(b.get("content"))
-                    if any(k in body for k in TRACKED_RESULT):
-                        m = _TASK_ID.search(body)
-                        if not m:
-                            continue
-                        tid = m.group(1) or m.group(2)
+                    cont = b.get("content")
+                    tid = tracked_launch(cont if isinstance(cont, str) else " ".join(
+                        x.get("text", "") for x in cont or [] if isinstance(x, dict)))
+                    if tid:
                         op = _OUT_PATH.search(body)
                         inp = calls.get(b.get("tool_use_id"), {})
                         cmd = str(inp.get("command", ""))

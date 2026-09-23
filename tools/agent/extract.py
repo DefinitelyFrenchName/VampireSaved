@@ -74,23 +74,6 @@ def sourced(fig, corpus):
     return any(pat.search(s) or (alt and alt.search(s)) for s in corpus)
 
 
-# A tracked launch's result STARTS with one of these; a result that merely QUOTES the
-# marker (a `sed` of a file that names it, a selftest printed) is not a launch — 7 of
-# 798 marker-carrying results in the archive were quotes (14z-176), yielding 3 phantom
-# tasks (2 in 14z-175's transcript, 1 in 14z-176's — some ids were quoted twice).
-# `agentlib.tasks` still uses the looser test; the same fix there is the maintainer's to
-# apply (the file is edit-locked), after which this should call it instead.
-_LAUNCH_HEADS = ("Command running in background with ID:", "Command did not complete within")
-
-
-def tracked_launch(text):
-    s = text.lstrip()
-    if not s.startswith(_LAUNCH_HEADS):
-        return None
-    m = agentlib._TASK_ID.search(s)
-    return (m.group(1) or m.group(2)) if m else None
-
-
 def _text(content):
     if isinstance(content, str):
         return content
@@ -147,7 +130,9 @@ def extract(path, first=0, last=None):
             elif t == "tool_result":
                 text = _text(b.get("content"))
                 corpus.append(text)
-                tid = tracked_launch(text)
+                # agentlib's test: a result that merely QUOTES the launch marker is not a
+                # launch (7 of 798 in the archive were quotes, 3 phantom tasks; 14z-176)
+                tid = agentlib.tracked_launch(text)
                 if tid:
                     tracked.setdefault(tid, {"n": n, "ended": False})
                     if inside:

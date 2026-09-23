@@ -14,7 +14,7 @@
 # marker is NOT a launch (the phantom-task defect of 14z-176: 7 of 798 marker-carrying
 # results in the archive were quotes).
 #
-# MUST-FIRE: perturbed-copy: loose-launch — a copy whose launch test accepts the marker ANYWHERE in a result (the pre-14z-176 test) must invent the quoted task, and the selftest must FAIL (mode: the gate runs against that copy)
+# MUST-FIRE: perturbed-copy: loose-launch — a copy whose launch test (agentlib.tracked_launch) accepts the marker ANYWHERE in a result (the pre-14z-176 test) must invent the quoted task, and the selftest must FAIL (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: blind-figures — a copy whose figure finder returns nothing must stop flagging the invented figure, and the selftest must FAIL (mode: the gate runs against that copy)
 #
 # Usage: tests/test_agent_extract.sh      # ci_portable, ~1 s
@@ -24,14 +24,17 @@ cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 
-# make_copy <name> — a copy of tools/agent with ONE perturbation in extract.py
+# make_copy <name> — a copy of tools/agent with ONE perturbation (in agentlib.py or extract.py)
 make_copy() {
     mkdir -p "$W/$1"; cp -R tools/agent "$W/$1/agent"
-    python3 - "$W/$1/agent/extract.py" "$1" <<'PY'
-import sys; p, name = sys.argv[1:3]; s = open(p).read()
+    python3 - "$W/$1/agent" "$1" <<'PY'
+import os, sys; d, name = sys.argv[1:3]
+# loose-launch perturbs agentlib (the ONE launch test, since the maintainer applied it
+# 14z-176); blind-figures perturbs the extractor itself
+p = os.path.join(d, "agentlib.py" if name == "loose-launch" else "extract.py"); s = open(p).read()
 edits = {
     "loose-launch": ("    if not s.startswith(_LAUNCH_HEADS):\n        return None\n",
-                     "    if not any(k in s for k in agentlib.TRACKED_RESULT):  # CONTROL loose-launch\n        return None\n"),
+                     "    if not any(k in s for k in TRACKED_RESULT):  # CONTROL loose-launch\n        return None\n"),
     "blind-figures": ('    """-> the figures a statement reports, normalised (thousands separators dropped)."""\n',
                       '    """-> the figures a statement reports, normalised (thousands separators dropped)."""\n    return []  # CONTROL blind-figures\n'),
 }
