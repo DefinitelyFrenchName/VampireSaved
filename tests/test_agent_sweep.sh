@@ -232,6 +232,36 @@ sed -n '/^MISMATCH/p' "$W/main.txt" | head -12 | sed 's/^/  /'
 tail -1 "$W/main.txt" | sed 's/^/  /'
 grep -q ' mismatches 0$' "$W/main.txt" || { echo "FAIL: the sweep's report disagrees with the planted world"; sed 's/^/    | /' "$W/main/r1.txt" 2>/dev/null | head -30; fail=1; }
 
+# THE PLATFORM FACT THE DESIGN RESTS ON (macOS only; rule-checker run 2026-09-23-105, Q1):
+# an inherited variable is READABLE (`ps -E`) for a CLT Python and HIDDEN for Apple's own
+# `tail` — so the sweep cannot rely on the environment and finds orphans by where they
+# point. The Python leg is the POSITIVE CONTROL on the same instrument: without it, a
+# `ps -E` that reads nothing would pass as "hidden". Chrome (hardened) is NOT measured here.
+if [ "$(uname -s)" = Darwin ]; then
+    _envfact="$(SWEEP_ENV_PROBE=14z176 python3 - <<'PY'
+import os, subprocess, sys, time
+env = dict(os.environ, SWEEP_ENV_PROBE="14z176")
+t = subprocess.Popen(["tail", "-f", "/dev/null"], env=env)
+p = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"], env=env)
+time.sleep(0.4)
+def seen(pid):
+    out = subprocess.run(["ps", "-E", "-ww", "-o", "command=", "-p", str(pid)], capture_output=True, text=True).stdout
+    return "SWEEP_ENV_PROBE=14z176" in out
+print(f"python={'readable' if seen(p.pid) else 'hidden'} tail={'readable' if seen(t.pid) else 'hidden'}")
+for x in (t, p):
+    x.kill(); x.wait()
+PY
+)"
+    echo "  platform fact (macOS): the inherited variable is $_envfact"
+    case "$_envfact" in
+        "python=readable tail=hidden") ;;
+        python=hidden*) echo "FAIL: ps -E read NO environment, not even Python's — the instrument is blind, the fact is unmeasured"; fail=1 ;;
+        *) echo "FAIL: macOS now shows tail's environment — docs/platform/gotchas.md (the environment entry) is stale; re-measure the design's premise"; fail=1 ;;
+    esac
+else
+    echo "  platform fact: not macOS — the environment-hiding measurement is macOS-only and was not taken"
+fi
+
 # the controls, in-gate: each perturbed copy must produce mismatches
 if [ -z "${VS_CTL:-}" ]; then
     for c in blind-orphans blind-cwd blind-leaders; do

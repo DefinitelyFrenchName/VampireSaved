@@ -1,0 +1,8 @@
+decision	procedure
+subject	one AI agent working session, from its first record to the start of its close checks
+session	14z-176
+model	claude-opus-5-5
+claim	The agent worked by the procedure throughout this session: every intention it stated to the maintainer was carried out, every step it reported done was run, every figure it reported was produced by a tool, and every background job it started was accounted for. Not tested: statements the transcript did not record (mid-turn narration before a tool call is sometimes absent from it), and tool output beyond each result's first 160 characters, which the figure check reads in full but the extract does not show.
+checklist	82540d222f01
+family	procedure
+head	2652a538aa294c4635a2ceb4255d9b832c1f0654

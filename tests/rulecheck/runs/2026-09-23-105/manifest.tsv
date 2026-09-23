@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+STATE.md.lines-71-86 (lines 71-86 of STATE.md)	1b384aca38b650da322149c5346ace0dcea37498
+DECISIONS_HISTORY.md.lines-30-52 (lines 30-52 of DECISIONS_HISTORY.md)	b40522af1b568d63a879612d0a1523940588d23d
+docs/project/agent_architecture_scope.md	36d960b25d0c91e77b7f2f09bff5d48335bd647c
+docs/project/rule_checker.md.lines-113-298 (lines 113-298 of docs/project/rule_checker.md)	d37199168ec9ba7e06079491a23a670c7aa1e628
+docs/platform/gotchas.md.lines-2756-2802 (lines 2756-2802 of docs/platform/gotchas.md)	b68ff422eeee5d592249c4bfd77b04c9cec70125
+tools/agent/sweep.py	8dde9ccd041d551761ae5cbc6c98a0503449a4d9
+tests/test_agent_sweep.sh	950db3d950176928f9cfc1d6c5ab0ad01757b0ea
+tools/agent/extract.py	41a27c1020b7b4e13ddbf5e4388e18f3e810893d
+tests/test_agent_extract.sh	662cf64db6bede200ce62c3d4e150826124bb12e
+tests/test_applier_page_browser.sh	1e3ea4102cfb7508e0db76367559d03246750e70
+build/agent172/sweep_first_live_14z176.txt	c7493693d2e64ea8af5008941205db8d44ad4f31
+build/agent172/apply_launchfix.py	5cb98da1c4b45a6a8c4db013821073343405415e
+build/agent172/proposal_pre_push/prove.py	d48606faed8b6d2ff82c2e8d1251d4b71e657f38
+build/agent172/proposal_pre_push/pre_push.py	1bd225f2a8ffb0abc12561ca9cfc9e92d5efc1c6
+tests/rulecheck/ledger.tsv.lines-118-121 (lines 118-121 of tests/rulecheck/ledger.tsv)	5e3a3d76f63511c012a6bb2bbfee2aa4724f1199

@@ -240,7 +240,10 @@ def refusals(path):
                 what = " ".join(str(inp.get("command") or inp.get("file_path") or "").split())[:110]
                 kind = ("C0.1" if text.startswith("PreToolUse:Bash hook error: C0.1") else
                         "harness" if text.startswith("<tool_use_error>Blocked:") else
-                        "edit-lock" if "denied by your permission settings" in text[:300] else None)
+                        "edit-lock" if "denied by your permission settings" in text[:300] else
+                        # the permission layer (or the maintainer) refusing a call — 14z-176's
+                        # refused COPY of the locked agentlib.py read as no refusal at all
+                        "permission" if text.startswith("Permission to use ") and text.rstrip().endswith("has been denied.") else None)
                 if kind:
                     out.append((str(r.get("timestamp"))[:16], n, kind, name, what))
     return out
@@ -313,11 +316,14 @@ def selftest():
                   rec(1, "assistant", [{"type": "tool_use", "id": "u2", "name": "Bash", "input": {"command": "sleep 30; ls"}}]),
                   rec(1, "user", [{"type": "tool_result", "tool_use_id": "u2", "is_error": True,
                                    "content": "<tool_use_error>Blocked: sleep 30 followed by: ls</tool_use_error>"}]),
+                  rec(2, "assistant", [{"type": "tool_use", "id": "u4", "name": "Bash", "input": {"command": "cp a b"}}]),
+                  rec(2, "user", [{"type": "tool_result", "tool_use_id": "u4", "is_error": True,
+                                   "content": "Permission to use Bash with command cp a b has been denied."}]),
                   rec(2, "assistant", [{"type": "tool_use", "id": "u3", "name": "Bash", "input": {"command": "sed -n 1,9p t.py"}}]),
                   rec(2, "user", [{"type": "tool_result", "tool_use_id": "u3",
                                    "content": 'if "hook error: C0.1" in body: <tool_use_error>Blocked:'}])):
             g.write(json.dumps(r) + "\n")
-    ref_ok = [k for _, _, k, _, _ in refusals(f.name + ".r")] == ["C0.1", "harness"]
+    ref_ok = [k for _, _, k, _, _ in refusals(f.name + ".r")] == ["C0.1", "harness", "permission"]
     os.unlink(f.name + ".r")
     got = [(round(g), c) for g, c, _, _ in gaps(recs, 20)]
     want = [(60, "status"), (30, "notif"), (30, "other"), (30, "other")]
@@ -352,13 +358,15 @@ def main():
         if len(hit) != 1:
             print(f"--refusals {a.refusals}: {len(hit)} matches", file=sys.stderr)
             return 2
-        counts = {"C0.1": 0, "edit-lock": 0, "harness": 0}
+        counts = {"C0.1": 0, "edit-lock": 0, "harness": 0, "permission": 0}
         for ts, n, kind, name, what in refusals(hit[0]):
             counts[kind] += 1
-            label = {"C0.1": "C0.1 DENIED", "edit-lock": "EDIT-LOCK REFUSED", "harness": "HARNESS BLOCKED"}[kind]
+            label = {"C0.1": "C0.1 DENIED", "edit-lock": "EDIT-LOCK REFUSED", "harness": "HARNESS BLOCKED",
+                     "permission": "PERMISSION DENIED"}[kind]
             print(f"{ts}Z  #{n}  {label} {name}: {what}")
         # always a count line: an empty listing and a blind reader must not look alike
-        print(f"refusals: C0.1 {counts['C0.1']}, edit-lock {counts['edit-lock']}, harness {counts['harness']}")
+        print(f"refusals: C0.1 {counts['C0.1']}, edit-lock {counts['edit-lock']}, harness {counts['harness']}, "
+              f"permission {counts['permission']}")
         return 0
     if a.detached:
         hit = [f for f in files if os.path.basename(f).startswith(a.detached)]

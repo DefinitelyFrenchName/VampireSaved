@@ -26,6 +26,7 @@
 # BROWSER so the driver can hand the page its input; the page itself never reads a file
 # from disk, which is section 1 of the sibling gate.
 #
+# MUST-FIRE: perturbed-copy: starved-control-leg — the control leg run with a 1 ms virtual-time budget cannot complete, and the gate must report the control as NOT JUDGED (FAIL) — never as a page verdict, which is what it printed under 14z-176's loaded tier (mode: the gate starves its control leg)
 # MUST-FIRE: perturbed-copy: broken-page — a copy of the page with one byte of its inlined manifest's declared set key changed must make the browser run FAIL, because the page would then build a set it cannot vouch for; if the run still passed, the gate would not be reading the page's verdict at all (mode: the gate drives that copy)
 #
 # Usage: ROMDIR=... tests/test_applier_page_browser.sh [release/merged-m19/fbneo]   # ci_static
@@ -133,7 +134,7 @@ note "driving the page from file:// with $(basename "$CHROME")"
 for _z in "$W/run/roms"/*.zip "$W/run/broken"/*.zip; do [ -f "$_z" ] && cat "$_z" > /dev/null 2>&1 || true; done
 drive() {   # drive <dom-output> — one browser run
     "$CHROME" --headless --disable-gpu --no-sandbox --allow-file-access-from-files \
-        --virtual-time-budget=1800000 --dump-dom "file://$W/run/driver.html" \
+        --virtual-time-budget="${BUDGET:-1800000}" --dump-dom "file://$W/run/driver.html" \
         > "$1" 2>"$W/chrome.err" || true
 }
 verdict_of() {   # pull the driver's <pre id="verdict"> block out of a dumped DOM
@@ -221,20 +222,49 @@ fi
 
 [ "$fails" = 0 ] || { echo "FAIL: test_applier_page_browser ($fails check(s))"; exit 1; }
 
-# the control, in-gate — through the same run_leg, so an INCOMPLETE control run is
-# reported as one and never as a verdict about the page
+# judge_ctl <verdict file> — the ONE reading of a control leg, used by the real control
+# and by starved-control-leg: prints `fired`, `incomplete` or `dead` and a detail. An
+# INCOMPLETE run is never read as a page verdict (14z-176: the old reading printed "still
+# reached an ok panel" for a run that had measured no panel at all)
+judge_ctl() {
+    if ! grep -q '^DONE=1$' "$1"; then
+        echo "incomplete the driver stopped after: $(tail -1 "$1" | cut -c1-60)"
+    elif [ "$(grep -m1 '^standalone_panel=' "$1" | cut -d= -f2-)" = "bad" ]; then
+        echo "fired $(grep -m1 '^standalone_text=' "$1" | cut -c17-92)"
+    else
+        echo "dead standalone_panel='$(grep -m1 '^standalone_panel=' "$1" | cut -d= -f2-)', not bad"
+    fi
+}
+
+# the control, in-gate — through the same run_leg and judge_ctl, so an INCOMPLETE control
+# run is reported as one and never as a verdict about the page
 break_page "$W/apply_release.html" "$W/run/apply_release.html"
+if vs_ctl_is starved-control-leg; then BUDGET=1; fi
 run_leg ctl
-_cp="$(grep -m1 '^standalone_panel=' "$W/ctl.txt" | cut -d= -f2-)"
-if ! grep -q '^DONE=1$' "$W/ctl.txt"; then
-    note "THE CONTROL'S BROWSER RUN DID NOT COMPLETE (twice) — the driver stopped after: $(tail -1 "$W/ctl.txt" | cut -c1-60)"
-    note "  NO VERDICT ABOUT THE BROKEN PAGE IS CLAIMED; the control did not fire, which the contract reads as FAIL"
-    echo "FAIL: test_applier_page_browser (the control's browser run did not complete; control NOT judged)"; exit 1
-elif [ "$_cp" = "bad" ]; then
-    vs_ctl_fired broken-page "a page declaring the wrong set key refuses instead of handing over a file: $(grep -m1 '^standalone_text=' "$W/ctl.txt" | cut -c17-92)"
-else
-    vs_ctl_dead broken-page "the page with a changed declared set key completed its run with standalone_panel='$_cp', not bad" || true
-    echo "FAIL: test_applier_page_browser"; exit 1
-fi
+BUDGET=
+_j="$(judge_ctl "$W/ctl.txt")"
+case "$_j" in
+    incomplete*)
+        note "THE CONTROL'S BROWSER RUN DID NOT COMPLETE (twice) — ${_j#incomplete }"
+        note "  NO VERDICT ABOUT THE BROKEN PAGE IS CLAIMED; the control did not fire, which the contract reads as FAIL"
+        echo "FAIL: test_applier_page_browser (the control's browser run did not complete; control NOT judged)"; exit 1 ;;
+    fired*)
+        vs_ctl_fired broken-page "a page declaring the wrong set key refuses instead of handing over a file: ${_j#fired }" ;;
+    *)
+        vs_ctl_dead broken-page "the page with a changed declared set key completed its run with ${_j#dead }" || true
+        echo "FAIL: test_applier_page_browser"; exit 1 ;;
+esac
+
+# starved-control-leg, in-gate: the same broken page with the control leg STARVED (a 1 ms
+# virtual-time budget cannot finish), read by the same judge_ctl — it must say INCOMPLETE.
+# Reading it as `dead` or `fired` is the lie this gate told under 14z-176's loaded tier
+# (docs/platform/gotchas.md); the fix is only real if this path is exercised
+BUDGET=1 run_leg starved
+_s="$(judge_ctl "$W/starved.txt")"
+case "$_s" in
+    incomplete*) vs_ctl_fired starved-control-leg "a starved control run is read as INCOMPLETE, not as a page verdict (${_s#incomplete })" ;;
+    *) vs_ctl_dead starved-control-leg "a starved control run was read as '${_s%% *}' — a page verdict from a run that measured nothing" || true
+       echo "FAIL: test_applier_page_browser"; exit 1 ;;
+esac
 
 echo "PASS: test_applier_page_browser — the shipped page runs from file:// in a real engine, builds both variants to the declared set keys, and refuses a damaged dump by name"

@@ -226,7 +226,7 @@ will of checker agents"*. A model checker is kept for what needs judgement.
   tool was written — the cwd rule alone over the user's 283 launchd children, 198 of them
   at cwd `/` — matched exactly three: this pipeline's two processes and a `tail` this
   sitting's own probe had leaked a minute earlier (`docs/platform/gotchas.md`, the `$!`
-  entry), killed before the tool's first run. No false positive among the other 280.
+  entry), killed before the tool's first run. No false positive among the other 280. **AND IT CORRECTS THE RECORD:** every session opener from 14z-156 to 14z-176 — twenty of them — recorded "nothing running" (or "no project job running") while that pipeline was alive; each checked with a `ps` grep, and a grep for `tail -F` does not match `tail -n +1 -F`. The 14z-176 opener's own claim was caught by that sitting's procedure check (run `2026-09-23-106`, QP3) — which is the case for running the SWEEP at the opener too, not a grep.
 - **C0.4 the enforcement protects itself.** `permissions.deny` on editing
   `.claude/settings.json` and the hook scripts; only the maintainer changes them.
 

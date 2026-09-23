@@ -1,0 +1,7 @@
+decision	recommendation
+subject	the 14z-176 close: the session group, its findings table, and the records of #172 slices S2 and S3
+session	14z-176
+model	claude-opus-5-5
+claim	The 14z-176 group and close row in STATE.md are accurate: the process sweep names attached and orphaned processes as its gate plants them and found, on its first live run, an 18-day orphan pipeline (evidence file); macOS hides the environment of its own binaries and of Chrome, so the sweep finds orphans by where they point; the browser gate's control leg could report a panel it never measured and now cannot; --refusals and the extract no longer read a quoted marker as an event; the procedure family is calibrated on Opus 5.5 with every plant caught and the negative OK beside a caught plant; the agentlib phantom-task fix and the push hook are proven but NOT installed, both awaiting the maintainer, whose words are quoted. NOT tested: that the tier-time browser-gate red was the incomplete-run mechanism (shown sufficient for its message, not proven for that instance); the orphan census (283/198/3), the 798/7 marker count and the transcript-drop count (12) come from inline probes not promoted; the push hook has never run on a real push; each positive fixture was calibrated by one reader; the sweep's task-id label is shown live only and no gate asserts it.
+checklist	62514a98c3e7
+family	evidence
