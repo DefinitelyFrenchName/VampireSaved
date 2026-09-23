@@ -2752,3 +2752,51 @@ compares member bytes, member order and every zip HEADER field (all identical),
 and says in its own header that the container bytes are deliberately out of
 scope. Nothing downstream reads the container: emulators, `build_fingerprint.py`
 and the applied-set key all read members.
+
+## macOS HIDES THE ENVIRONMENT OF ITS OWN BINARIES AND OF HARDENED APPS — an inherited variable cannot find `tail`, `sleep`, `zsh` or Chrome (measured 2026-09-23, 14z-176)
+
+Every process a Claude Code tool call starts inherits `CLAUDE_CODE_SESSION_ID`, so
+the obvious way to find a session's leftovers is to read each process's environment
+(`ps -E`, which reads `KERN_PROCARGS2`). **On macOS that works only for some
+binaries.** Measured on processes this user owns: a Python from the Command Line
+Tools and Homebrew's `ugrep` show their whole environment; `/usr/bin/tail`,
+`/bin/sleep` and `/bin/zsh` (Apple platform binaries) and Google Chrome (a hardened
+app) return their ARGUMENTS ONLY — `sysctl(KERN_PROCARGS2)` succeeds with 38 bytes
+for `tail`, and `ps -E` prints no variable at all. That is exactly the shape of both
+#172 ground-truth leftovers, a headless Chrome and an orphaned `tail -F`.
+
+**What IS readable for all of them: the working directory and the standard streams**
+(`lsof -a -p PID -d cwd,0,1,2`). So `tools/agent/sweep.py` (C0.3) finds an orphan by
+where it points — cwd, a stream, its command line — and uses the environment only as
+a bonus signal. On its first live run the cwd rule found a `tail -F | ugrep` pipeline
+of the 14z-133 session, alive 18 days, whose `tail` half no environment read could
+have attributed (the `ugrep` half named its session, `b4735532`).
+
+## `$!` AFTER `cd DIR && CMD &` IS THE SUBSHELL, NOT `CMD` — killing it leaves `CMD` orphaned (paid: 14z-176)
+
+A backgrounded LIST (`a && b &`) runs in a forked subshell, and `$!` is that
+subshell's pid. `kill $!` ends the subshell and **reparents `b` to launchd**, alive,
+with nothing tracking it. Measured this sitting: a probe ran `sh -c 'cd build && tail
+-F /dev/null &'`, killed the recorded pid, and the `tail` survived until the new
+process sweep's must-stay-quiet pass over the live table named it. The same holds for
+any tool shell: killing a parent kills the parent only. **Kill a process tree leaves
+first** — `sweep.py` prints its kill hint in that order for exactly this reason — or
+start the job with `exec` so the recorded pid IS the job.
+
+## HEADLESS CHROME'S `--virtual-time-budget` RUNS OUT WHILE THE PAGE WAITS ON I/O — an incomplete run looks like a content verdict in EVERY leg that reads it (paid: 14z-174, and again 14z-176)
+
+`--virtual-time-budget` is what makes `--dump-dom` wait for a page's async work, but
+virtual time ADVANCES while the renderer sits idle on I/O, so a cold cache or a loaded
+machine lets the budget expire mid-load and Chrome dumps the DOM early. The dump is a
+well-formed page with the driver's verdict block cut short. **Any check that reads a
+field's ABSENCE as a finding then lies**: 14z-174's close tier printed eight
+content-shaped failures for a run that measured no content, and the fix (an explicit
+`DONE=1` marker, one retry for incompleteness only, and "no content verdict claimed"
+when twice incomplete) went into the MAIN leg of `tests/test_applier_page_browser.sh`.
+**The in-gate control leg drove Chrome separately and was not touched**, so under
+14z-176's mid-session tier it printed `CONTROL DEAD … still reached an ok panel` — the
+old code's message for ANY outcome but `bad`, incomplete included (reproduced by
+starving only that leg's budget: the old gate prints that line verbatim; the fixed one
+says the control's run did not complete and claims nothing). Both legs now go through
+one `run_leg`. **When a gate drives a browser more than once, every leg needs the
+completion marker** — a fix applied to "the run" is applied to one call site.

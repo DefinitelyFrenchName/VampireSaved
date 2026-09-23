@@ -33,7 +33,8 @@ Usage:
   --detached P   every DETACHED launch of that session (record index, description, the
                  matching span) — the itemised list the scope doc's §1 reads one by one
   --refusals P   every refusal of that session: a C0.1 hook denial (with the command it
-                 refused) and a permission-rule denial of an edit (the C0.4 lock)
+                 refused) and a permission-rule denial of an edit (the C0.4 lock), plus Claude
+                 Code's own tool guard (`Blocked:`), then a count line of all three
   --classifier-audit  every non-background Bash command of the selected sessions through
                  the shared classifier AND the census's previous pattern; prints the four agreement
                  counts and, for every command the classifier clears that the first cut
@@ -216,6 +217,35 @@ def agentlib_minutes(t):
     return (iso(t["ended"]) - iso(t["started"])).total_seconds() / 60
 
 
+def refusals(path):
+    """-> [(ts, record index, kind, tool name, what)] for every REFUSED tool call: a C0.1
+    hook denial, a permission-rule denial (the C0.4 edit lock), or Claude Code's own tool
+    guard (`Blocked:`, e.g. chained sleeps — not ours, listed so no refusal is invisible).
+    A refusal is an ERROR result that STARTS with its marker: a result that merely QUOTES
+    the marker (a `sed` of this very file, 14z-176) is not one — the transcript-grep trap
+    one level down."""
+    calls, out = {}, []
+    for n, r in agentlib.records(path):
+        c = agentlib._content(r)
+        if not isinstance(c, list):
+            continue
+        for b in c:
+            if b.get("type") == "tool_use":
+                calls[b.get("id")] = (b.get("name"), b.get("input") or {})
+            elif b.get("type") == "tool_result" and b.get("is_error"):
+                body = b.get("content")
+                text = (body if isinstance(body, str) else
+                        " ".join(x.get("text", "") for x in body or [] if isinstance(x, dict))).lstrip()
+                name, inp = calls.get(b.get("tool_use_id"), ("?", {}))
+                what = " ".join(str(inp.get("command") or inp.get("file_path") or "").split())[:110]
+                kind = ("C0.1" if text.startswith("PreToolUse:Bash hook error: C0.1") else
+                        "harness" if text.startswith("<tool_use_error>Blocked:") else
+                        "edit-lock" if "denied by your permission settings" in text[:300] else None)
+                if kind:
+                    out.append((str(r.get("timestamp"))[:16], n, kind, name, what))
+    return out
+
+
 def selftest():
     t0 = datetime.datetime(2026, 9, 21, 8, 0, tzinfo=datetime.timezone.utc)
 
@@ -274,9 +304,24 @@ def selftest():
             rc = classifier_audit([f.name + ".a"])
         os.unlink(f.name + ".a")
         audit_ok = audit_ok and rc == want
+    # refusals: a real denial, a harness block, and a non-error result that only QUOTES the
+    # marker (must stay quiet — the 14z-176 false positive)
+    with open(f.name + ".r", "w") as g:
+        for r in (rec(0, "assistant", [{"type": "tool_use", "id": "u1", "name": "Bash", "input": {"command": "nohup x &"}}]),
+                  rec(0, "user", [{"type": "tool_result", "tool_use_id": "u1", "is_error": True,
+                                   "content": "PreToolUse:Bash hook error: C0.1 (#172, no invisible jobs): x"}]),
+                  rec(1, "assistant", [{"type": "tool_use", "id": "u2", "name": "Bash", "input": {"command": "sleep 30; ls"}}]),
+                  rec(1, "user", [{"type": "tool_result", "tool_use_id": "u2", "is_error": True,
+                                   "content": "<tool_use_error>Blocked: sleep 30 followed by: ls</tool_use_error>"}]),
+                  rec(2, "assistant", [{"type": "tool_use", "id": "u3", "name": "Bash", "input": {"command": "sed -n 1,9p t.py"}}]),
+                  rec(2, "user", [{"type": "tool_result", "tool_use_id": "u3",
+                                   "content": 'if "hook error: C0.1" in body: <tool_use_error>Blocked:'}])):
+            g.write(json.dumps(r) + "\n")
+    ref_ok = [k for _, _, k, _, _ in refusals(f.name + ".r")] == ["C0.1", "harness"]
+    os.unlink(f.name + ".r")
     got = [(round(g), c) for g, c, _, _ in gaps(recs, 20)]
     want = [(60, "status"), (30, "notif"), (30, "other"), (30, "other")]
-    ok = got == want and (det, trk) == (2, 2) and tasks_ok and audit_ok
+    ok = got == want and (det, trk) == (2, 2) and tasks_ok and audit_ok and ref_ok
     print(f"selftest: gaps {got} detached {det} tracked {trk} tasks {tk} audit-plant {'fires' if audit_ok else 'DEAD'} -> {'PASS' if ok else 'FAIL'}")
     return 0 if ok else 1
 
@@ -307,22 +352,13 @@ def main():
         if len(hit) != 1:
             print(f"--refusals {a.refusals}: {len(hit)} matches", file=sys.stderr)
             return 2
-        calls = {}
-        for n, r in agentlib.records(hit[0]):
-            c = agentlib._content(r)
-            if not isinstance(c, list):
-                continue
-            for b in c:
-                if b.get("type") == "tool_use":
-                    calls[b.get("id")] = (b.get("name"), b.get("input") or {})
-                elif b.get("type") == "tool_result":
-                    body = json.dumps(b.get("content"))
-                    name, inp = calls.get(b.get("tool_use_id"), ("?", {}))
-                    what = " ".join(str(inp.get("command") or inp.get("file_path") or "").split())[:110]
-                    if "hook error: C0.1" in body:
-                        print(f"{str(r.get('timestamp'))[:16]}Z  #{n}  C0.1 DENIED {name}: {what}")
-                    elif "denied by your permission settings" in body:
-                        print(f"{str(r.get('timestamp'))[:16]}Z  #{n}  EDIT-LOCK REFUSED {name}: {what}")
+        counts = {"C0.1": 0, "edit-lock": 0, "harness": 0}
+        for ts, n, kind, name, what in refusals(hit[0]):
+            counts[kind] += 1
+            label = {"C0.1": "C0.1 DENIED", "edit-lock": "EDIT-LOCK REFUSED", "harness": "HARNESS BLOCKED"}[kind]
+            print(f"{ts}Z  #{n}  {label} {name}: {what}")
+        # always a count line: an empty listing and a blind reader must not look alike
+        print(f"refusals: C0.1 {counts['C0.1']}, edit-lock {counts['edit-lock']}, harness {counts['harness']}")
         return 0
     if a.detached:
         hit = [f for f in files if os.path.basename(f).startswith(a.detached)]

@@ -136,7 +136,6 @@ drive() {   # drive <dom-output> — one browser run
         --virtual-time-budget=1800000 --dump-dom "file://$W/run/driver.html" \
         > "$1" 2>"$W/chrome.err" || true
 }
-drive "$W/dom.html"
 verdict_of() {   # pull the driver's <pre id="verdict"> block out of a dumped DOM
     python3 - "$1" <<'PY'
 import html, re, sys
@@ -147,19 +146,27 @@ if not m:
 print(html.unescape(m.group(1)).strip())
 PY
 }
-verdict_of "$W/dom.html" > "$W/verdict.txt" || true
-# ONE retry, and only for an INCOMPLETE run — never for a content failure, which is a
-# real verdict and must not be re-rolled until it passes.
-if ! grep -q '^DONE=1$' "$W/verdict.txt" 2>/dev/null; then
-    note "incomplete browser run (no DONE=1) — retrying once with the reads warm"
-    drive "$W/dom2.html"
-    verdict_of "$W/dom2.html" > "$W/verdict2.txt" || true
-    if grep -q '^DONE=1$' "$W/verdict2.txt" 2>/dev/null; then
-        mv "$W/verdict2.txt" "$W/verdict.txt"; note "  the retry completed"
-    else
-        note "  the retry did not complete either"
+# run_leg <name> — one browser run into $W/<name>.txt, with ONE retry, and only for an
+# INCOMPLETE run — never for a content failure, which is a real verdict and must not be
+# re-rolled until it passes. BOTH legs use it: until 14z-176 the in-gate control drove
+# Chrome once with no such handling, so an incomplete control run under a loaded tier
+# printed "CONTROL DEAD … still reached an ok panel" for a run that had measured no
+# panel at all — the 14z-174 lie, surviving in the leg the 14z-174 fix did not touch.
+run_leg() {
+    drive "$W/$1_dom.html"
+    verdict_of "$W/$1_dom.html" > "$W/$1.txt" || true
+    if ! grep -q '^DONE=1$' "$W/$1.txt" 2>/dev/null; then
+        note "incomplete browser run ($1, no DONE=1) — retrying once with the reads warm"
+        drive "$W/$1_dom2.html"
+        verdict_of "$W/$1_dom2.html" > "$W/$1_2.txt" || true
+        if grep -q '^DONE=1$' "$W/$1_2.txt" 2>/dev/null; then
+            mv "$W/$1_2.txt" "$W/$1.txt"; note "  the retry completed"
+        else
+            note "  the retry did not complete either"
+        fi
     fi
-fi
+}
+run_leg verdict
 if [ ! -s "$W/verdict.txt" ]; then
     note "the browser produced no verdict at all"
     tail -5 "$W/chrome.err" | sed 's/^/    /'
@@ -214,16 +221,19 @@ fi
 
 [ "$fails" = 0 ] || { echo "FAIL: test_applier_page_browser ($fails check(s))"; exit 1; }
 
-# the control, in-gate
+# the control, in-gate — through the same run_leg, so an INCOMPLETE control run is
+# reported as one and never as a verdict about the page
 break_page "$W/apply_release.html" "$W/run/apply_release.html"
-"$CHROME" --headless --disable-gpu --no-sandbox --allow-file-access-from-files \
-    --virtual-time-budget=1800000 --dump-dom "file://$W/run/driver.html" \
-    > "$W/ctl_dom.html" 2>/dev/null || true
-verdict_of "$W/ctl_dom.html" > "$W/ctl.txt" || true
-if grep -q '^standalone_panel=bad' "$W/ctl.txt"; then
+run_leg ctl
+_cp="$(grep -m1 '^standalone_panel=' "$W/ctl.txt" | cut -d= -f2-)"
+if ! grep -q '^DONE=1$' "$W/ctl.txt"; then
+    note "THE CONTROL'S BROWSER RUN DID NOT COMPLETE (twice) — the driver stopped after: $(tail -1 "$W/ctl.txt" | cut -c1-60)"
+    note "  NO VERDICT ABOUT THE BROKEN PAGE IS CLAIMED; the control did not fire, which the contract reads as FAIL"
+    echo "FAIL: test_applier_page_browser (the control's browser run did not complete; control NOT judged)"; exit 1
+elif [ "$_cp" = "bad" ]; then
     vs_ctl_fired broken-page "a page declaring the wrong set key refuses instead of handing over a file: $(grep -m1 '^standalone_text=' "$W/ctl.txt" | cut -c17-92)"
 else
-    vs_ctl_dead broken-page "the page with a changed declared set key still reached an ok panel" || true
+    vs_ctl_dead broken-page "the page with a changed declared set key completed its run with standalone_panel='$_cp', not bad" || true
     echo "FAIL: test_applier_page_browser"; exit 1
 fi
 

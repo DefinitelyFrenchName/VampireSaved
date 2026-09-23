@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-409 entries (46 game / 112 platform / 251 project), counted from the buckets at generation.
+412 entries (46 game / 115 platform / 251 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 46 entries
 
@@ -71,7 +71,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - "WHEN CAN THE BLOCKER ACT" IS NOT ASKED BY MASHING INSIDE THE BLOCK WINDOW — that measures the ADVANCING GUARD (paid: 14z-168)
 - A RECORD'S CLASS BYTE IS NOT THE VICTIM'S REACTION CLASS — the guard reads it first and the stager rewrites it (paid: 14z-169)
 
-## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 112 entries
+## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 115 entries
 
 - `spctl -a` REPORTS THE SIGNING-POLICY VERDICT, NOT WHETHER A LAUNCH IS BLOCKED — and `unzip` DOES propagate com.apple.quarantine (measured: 2026-09-20, macOS 26.0 arm64, #144)
 - A ROMSET WITH MEMBERS MISSING RUNS FOR THOUSANDS OF FRAMES WITH WORK RAM BIT-IDENTICAL — only the framebuffer shows it (paid: 2026-09-20)
@@ -185,6 +185,9 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A `-debug` LOGGING BREAKPOINT DRIFTED THE INPUT PLAYBACK AND HID THE DIVERGENCE IT WAS PLACED TO EXPLAIN (paid: 14z-168)
 - A PAGE OPENED FROM `file://` CANNOT READ ANY FILE BESIDE IT — not by fetch, not by XHR, not by `import` (measured 2026-09-21, 14z-174, before the applier page was designed)
 - `CompressionStream("deflate-raw")` IS NOT BYTE-COMPARABLE TO `zlib.compressobj`, EVEN AT THE SAME LEVEL — and the two browser engines differ from each other (measured 2026-09-21, 14z-174)
+- macOS HIDES THE ENVIRONMENT OF ITS OWN BINARIES AND OF HARDENED APPS — an inherited variable cannot find `tail`, `sleep`, `zsh` or Chrome (measured 2026-09-23, 14z-176)
+- `$!` AFTER `cd DIR && CMD &` IS THE SUBSHELL, NOT `CMD` — killing it leaves `CMD` orphaned (paid: 14z-176)
+- HEADLESS CHROME'S `--virtual-time-budget` RUNS OUT WHILE THE PAGE WAITS ON I/O — an incomplete run looks like a content verdict in EVERY leg that reads it (paid: 14z-174, and again 14z-176)
 
 ## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 251 entries
 

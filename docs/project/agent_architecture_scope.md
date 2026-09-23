@@ -5,7 +5,10 @@
 > (14z-175) — #172"), adding one constraint that binds every slice: **a block stops
 > the task at fault, never the session.** S1 is live as **C0.1** in the tracked
 > `.claude/settings.json`, with **C0.4**'s edit lock on it; **C0.2 moved to C1** on
-> measurement (§4, and the ruling "— #172 slice S1"). Next: S2 (the close sweep, C0.3).
+> measurement (§4, and the ruling "— #172 slice S1"). **S2 LANDED 14z-176:** C0.3 is
+> `tools/agent/sweep.py`, gated by `tests/test_agent_sweep.sh`, and it is a step of the
+> close (STATE.md's header); on its first live run it found an 18-day orphan of the
+> 14z-133 session that the by-hand check for #172 had missed (§4). Next: S3 (C1).
 
 **Why this document exists:** the same reason `harness_scope.md` and
 `applier_app_scope.md` do — a direction the maintainer ordered, big enough that
@@ -137,6 +140,10 @@ if any has changed.
 | `type: "prompt"` / `type: "agent"` hooks (a model judges the event) | documented; agent hooks EXPERIMENTAL, default model Haiku, 30/60 s default timeouts | a model checker at Stop without the orchestrator's cooperation — see §4, C1 |
 | permissions `deny` on `Edit`/`Write` of `.claude/settings.json` | documented | the enforcement cannot be edited away by the agent it binds |
 | an event when a background Bash task finishes | **documented as ABSENT** — NOT exercised | so the Stop hook must reconstruct task state from the transcript. C0.2 rests on this row; if an event exists after all, C0.2 gets simpler, not wrong |
+| **a tool call's shell is a SESSION LEADER and a direct child of the Claude process** | **MEASURED** 2026-09-23 (14z-176) | every Bash call, foreground or tracked, runs in `/bin/zsh -c source ~/.claude/shell-snapshots/…` with `sid == pid` and `ppid == $CLAUDE_PID`; Claude Code's own `caffeinate` is a child but NOT a leader. So "under a leader child of Claude" is what a tool call started, and C0.3's ATTACHED half needs no transcript to find it |
+| **a tracked task's output file names its session and task** | **MEASURED** (14z-176) | the task shell's stdout is `<scratch>/<session-uuid>/tasks/<id>.output` (`lsof -d 1`), so a live process is labelled with its task id — and an orphan still writing there with its session |
+| **an orphan keeps its working directory, not its lineage** | **MEASURED** (14z-176) | a job whose tool shell exits is reparented to launchd (`ppid 1`); its session id is the DEAD tool shell's pid, so neither parent nor session ties it back to Claude. Its cwd and streams do (`lsof -d cwd,0,1,2`) |
+| **the environment (`CLAUDE_CODE_SESSION_ID`) is readable only for some binaries** | **MEASURED** (14z-176) | inherited by every tool-call process, and readable (`ps -E`) for a CLT Python and Homebrew's `ugrep` — but NOT for Apple platform binaries (`tail`, `sleep`, `zsh`: `KERN_PROCARGS2` returns 38 bytes of arguments) nor for Google Chrome (hardened). Both ground-truth leftovers are those shapes, so C0.3 cannot rest on it (`docs/platform/gotchas.md`) |
 | Fable 5.1, Opus 5.5, Sonnet 5 reachable on this account | **MEASURED** 2026-09-23 (P5) | each answered a one-line probe as itself (`modelUsage` names the model); the 2026-09-18 spend-limit failure on Fable 5.1 is not current |
 
 ## 3. WHAT EXISTS AND WHAT IT DOES NOT COVER
@@ -189,6 +196,32 @@ will of checker agents"*. A model checker is kept for what needs judgement.
   transcript, plus a process-table scan for the project's own tools), and the close
   checklist requires the list to be empty or each survivor declared in writing. The
   Chrome case of #172 is the ground truth.
+  **AS BUILT (14z-176, slice S2): `tools/agent/sweep.py`**, in two halves because §2's
+  measurements say one cannot see both. **ATTACHED** — every subtree under a
+  session-leader child of `$CLAUDE_PID` except the sweep's own tool shell, labelled with
+  its task id from the output file. **ORPHAN** — every process of this user reparented to
+  launchd/init that points into the project: its cwd, a standard stream or its command
+  line names a project root (the repo, the session scratchpad, `~/.cache/vampire-saved`,
+  `/tmp/vampire-saved-*`), or it is an orphaned Claude tool shell (`.claude/shell-snapshots/`
+  on its command line), or its readable environment carries the swept session id.
+  Orphans are listed WHATEVER session left them: nothing tracks an orphan, so the close
+  that sees it owns it. The transcript supplies OPEN TASK lines (a tracked task with no
+  completion notification yet) as a cross-check, never the verdict. The instrument must
+  see ITSELF (its own pid and cwd) before it may print CLEAN, and a declaration
+  (`--declare PID "REASON"`, `build/agent_hooks/declared.tsv`) is keyed on pid AND start
+  time, so a reused pid inherits nothing. The kill hint lists each subtree LEAVES FIRST,
+  because killing a parent reparents its child — paid for this sitting (§7).
+  **FIRST LIVE RUN (2026-09-23): TWO SURVIVORS, both real** — `tail -n +1 -F
+  build/emu_sweep_14z133/results.tsv | ugrep …`, started 2026-09-04 23:01, alive
+  **18 days 15 h**, left by session `b4735532` (14z-133) — a SECOND pipeline beside the
+  `emu_sweep_14z133b` one #172's comment reported. The by-hand check that produced that
+  comment missed it; the cwd rule found the `tail` half (whose environment is hidden)
+  and the environment named the `ugrep` half's session. Killed after the evidence was
+  kept (`build/agent172/sweep_first_live_14z176.txt`). The measurement taken BEFORE the
+  tool was written — the cwd rule alone over the user's 283 launchd children, 198 of them
+  at cwd `/` — matched exactly three: this pipeline's two processes and a `tail` this
+  sitting's own probe had leaked a minute earlier (`docs/platform/gotchas.md`, the `$!`
+  entry), killed before the tool's first run. No false positive among the other 280.
 - **C0.4 the enforcement protects itself.** `permissions.deny` on editing
   `.claude/settings.json` and the hook scripts; only the maintainer changes them.
 
@@ -241,7 +274,7 @@ RETURN, not by a second orchestrator.
 | slice | what | the gate that proves it |
 |---|---|---|
 | **S1** | C0.1 (+ C0.2, moved to C1 on measurement — §4) as scripts under `tools/agent/` + the project `.claude/settings.json` wiring + C0.4. **C0.1 LANDED 14z-175:** `tools/agent/agentlib.py` (the one classifier, also behind the census), `tools/agent/hooks/pre_bash.py`, gate `tests/test_agent_hooks.sh`; wiring verified in a scratch project, then INSTALLED here (ruled "Install + protect"): a live `nohup` launch denied, its marker never created, an Edit of the settings refused | `tests/test_agent_hooks.sh` (ci_portable): the hook over `tests/agent/c01_commands.jsonl` — 44 rows cut from real transcripts and synthetic edge cases: 14z-174's twelve launches and the over-strip cases must be DENIED, the real look-alikes and this sitting's live false positive ALLOWED — plus the fail-open path, the installed wiring, and three controls (`blind-classifier`, `greedy-heredoc`, `no-heredoc-strip`). (The plan said this gate would replay C0.2 too; C0.2 moved to C1, so it replays C0.1 only.) **The close's rule-checker run `2026-09-23-100` found the stripper over-matched** — `<<<word` and `1<<3` read as heredoc operators, and an unterminated one swallowed every later line, hiding a real `nohup` below it and, live in this sitting, un-closing a quoted program so its `&` was refused. The fix (terminated heredocs only, a tag that starts with a letter, no third `<`) changes no verdict on the 4,624 archived commands and is applied by the maintainer, the file being edit-locked |
-| **S2** | C0.3 — the close sweep, and its step in STATE.md's close checklist | the gate plants a live child process and requires the sweep to name it |
+| **S2** | C0.3 — the close sweep, and its step in STATE.md's close checklist. **LANDED 14z-176:** `tools/agent/sweep.py`, the close step before the push (STATE.md's header) | `tests/test_agent_sweep.sh` (ci_portable, ~12 s): a planted world — a fake Claude with a tool shell that must be named ATTACHED with its child and a non-leader helper that must stay quiet; six orphans, one per signal (cwd twice, once as a `sh`+`tail` pair, argv, stream, env, Claude tool shell) that must each be named WITH that signal; a quiet orphan; the sweep's own shell. Then every survivor declared -> CLEAN, then every plant killed -> CLEAN with no survivor. Three controls (`blind-orphans`, `blind-cwd`, `blind-leaders`), each reaching FAIL as a mode |
 | **S3** | C1 — `tools/proccheck.py` (or a `rulecheck` decision kind), the transcript extractor, the checklist, fixtures from 14z-174, calibration, the push binding | fixtures calibrated like `rulecheck`'s: each positive caught, a negative quiet beside a caught plant |
 | **S4** | W — worker definitions and the spec template | a worker run on a known task returns figures each traceable to a command |
 | **S5** | O — the orchestrator definition and model switch | one real sitting under it, the C0/C1 record read at its close |
@@ -287,6 +320,12 @@ The questions as put:
 - **An intent the agent never states** — QP1 can only hold the agent to what it said.
 - **The maintainer's time outside the session** — a notification wakes the agent;
   nothing here wakes the maintainer, except the push notifications already enabled.
+- **An orphan that points nowhere into the project** — C0.3 finds orphans by where they
+  point; a job started from `/` with no project path in its arguments or streams, as an
+  Apple binary whose environment is hidden, is invisible to it (the gate's quiet orphan
+  is that shape, on purpose). A job re-parented under anything but launchd/init (a
+  subreaper, a surviving parent) is not an orphan to it either, and is listed only while
+  it sits under this session's tool shells.
 - **A C0 pattern it does not list** — C0.1 is a denylist of launch forms, so a new
   detaching form passes until it is added; the S1 replay over every archived
   transcript is how new forms are found.

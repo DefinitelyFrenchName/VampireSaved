@@ -56,7 +56,11 @@ How to work with it:
   were promoted; (6) the DOCUMENTATION PACKET through the rule-checker (`recommendation`, the table as
   the claim), its verdict resolved like any run.
 - **THE LAST STEP OF THE CLOSE IS THE PUSH (maintainer-ruled 2026-09-10):**
-  static tier strict green WITH every control executed (the default `all`), the doc checks green, nothing pending -> `git push
+  static tier strict green WITH every control executed (the default `all`), the doc checks green, **the process
+  sweep CLEAN** (C0.3, #172 slice S2, since 2026-09-23: `python3 tools/agent/sweep.py`
+  run AFTER the tier, which spawns processes of its own, exits 0 — every survivor
+  killed leaves first, as its hint lists them, or declared in writing with
+  `--declare PID "REASON"` and named in the close entry), nothing pending -> `git push
   origin main`; anything red or skipped leaves the commits local and the
   close entry says so.
 
