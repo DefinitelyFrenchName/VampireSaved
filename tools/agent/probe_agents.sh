@@ -30,6 +30,15 @@
 #       transcript is linked to that call by `meta.json`'s `toolUseId`, its COMMANDS are in
 #       that transcript and not the orchestrator's, and its REPORT reaches the orchestrator's
 #       transcript (as the call's tool result, or a `[Subagent hand-back]` record)
+#   A11 the SELF-CAPPED built-in the S4 call gate lets through with no model (`Explore`) stays at
+#       most Opus-class under a caller ABOVE Opus-class (a Fable 5.1 parent), while
+#       `general-purpose` under the same parent runs on Fable — the breach the gate refuses, and
+#       the leg's proof that it can see one. Written 14z-177 after a first A11 (a Sonnet parent)
+#       FAILED: `Explore` ran on the CALLER's Sonnet, so "it carries its own model" was wrong;
+#       the archive fits "the caller's model, capped at Opus-class" (Opus 5 under Fable parents),
+#       and the cap is the only property the gate needs. `claude-code-guide` is not available to
+#       a headless run ("this agent type doesn't exist"), so it cannot be probed and is NOT
+#       allowlisted — a call to it passes a model
 #   (A9 and A10 added after rule-checker run 2026-09-23-109 found both premises unmeasured;
 #   run 2026-09-23-110 then found A10's delivery check VACUOUS — it matched the spec's own
 #   token — A9's general-purpose half under one parent only, and A8 not asserting the prompt
@@ -37,7 +46,7 @@
 #   against THIS call's result or hand-back, with a wrong-id control; A9 runs general-purpose
 #   under both parents; A8 asserts the hook's input carries the call's prompt)
 #
-# Usage: tools/agent/probe_agents.sh [SCRATCH_DIR]   (~4 min: thirteen short Haiku/Sonnet runs)
+# Usage: tools/agent/probe_agents.sh [SCRATCH_DIR]   (~5 min: fourteen short runs, one on Fable 5.1)
 # Prints one PASS/FAIL line per leg and exits non-zero on any FAIL.
 # Needs: the `claude` CLI and python3. Writes only under SCRATCH_DIR (default: a mktemp dir).
 set -u
@@ -259,6 +268,23 @@ esac
 if [ "$a10ok" = 1 ] && [ "$(echo "$a10" | wc -w | tr -d ' ')" = 1 ]
 then echo "PASS A10: w-low's spec is the Agent call's prompt (linked by toolUseId) and does not contain its output token, its Bash call is in its own transcript and not the orchestrator's, and its REPORT (the token) reached the orchestrator's transcript for THIS call as ${a10##*:}; the matcher finds nothing for a wrong call id ($a10)"
 else echo "FAIL A10: checks ${a10:-none} (token-not-in-spec, worker command, not in main, delivered to this call, wrong-id quiet : form)"; fail=1; fi
+
+# A11: under a Fable parent, Explore (no model) stays at most Opus-class; general-purpose does not
+run m claude-fable-5-1 "" 0 'Call the Agent tool twice, one after the other, with no model parameter either time: first with subagent_type "Explore" and the prompt "Reply with exactly: E11 (do not search anything)", then with subagent_type "general-purpose" and the prompt "Reply with exactly: G11". Reply with both answers.'
+a11=$(workers m | python3 -c "
+import re, sys
+got = {}
+for l in sys.stdin:
+    r = l.split()
+    if len(r) >= 2: got[r[0]] = r[1]
+cap = re.compile(r'^claude-(opus|sonnet|haiku)-')
+ex = got.get('Explore', ''); gp = got.get('general-purpose', '')
+ok = bool(ex) and all(cap.match(m) for m in ex.split(',')) and 'fable' in gp
+print(('1 ' if ok else '0 ') + f'Explore={ex or \"none\"};general-purpose={gp or \"none\"}')")
+case "$a11" in
+  1*) echo "PASS A11: under a Fable parent with no model, Explore stayed at most Opus-class while general-purpose ran on Fable (${a11#1 }) — the call gate's SELF_CAPPED list holds, and the leg sees the breach";;
+  *)  echo "FAIL A11: ${a11:-no workers} — Explore ran above Opus-class under a Fable caller (the call gate's SELF_CAPPED list is stale), or general-purpose did not inherit Fable (the leg cannot see a breach)"; fail=1;;
+esac
 
 echo "scratch: $S"
 exit $fail

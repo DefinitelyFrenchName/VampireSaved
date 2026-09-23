@@ -2812,7 +2812,10 @@ assistant record, which is what makes these checkable:
   at xhigh) — **but a definition with NO `effort` line runs at the CALLER's effort**
   (`low` under a `--effort low` parent, `xhigh` under `xhigh`), so an effort cap holds only
   if every definition states one; likewise a definition with no `model`, and a
-  `general-purpose` call with none, run on the CALLER's model (A9);
+  `general-purpose` call with none, run on the CALLER's model (A9) — Fable 5.1 under a Fable
+  parent (A11) — while the built-in `Explore` follows the caller below Opus-class and is
+  capped there above it (Opus 5.5 under a Fable parent; it does NOT carry a model of its own:
+  under Sonnet it ran on Sonnet), and `claude-code-guide` is absent from a headless run;
 - **the Agent call's `model` parameter BEATS the definition's `model`** (a `haiku`
   definition ran on Sonnet when the call said `sonnet`), so a model cap in a definition
   holds only if the call cannot override it — a project `PreToolUse` hook on `Agent` CAN

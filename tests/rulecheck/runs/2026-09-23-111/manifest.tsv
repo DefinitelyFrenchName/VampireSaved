@@ -1,0 +1,10 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent172/proposal_pre_agent/pre_agent.py	d76a9a6a83255535c35fe40248684c465302a1d9
+build/agent172/proposal_pre_agent/prove.py	62cf457e7d47fd2df665a0f83dd15aabc77b96ca
+build/agent172/proposal_pre_agent/prove_14z177.txt	ee45b442ec26e34e5e89d02e2a5fc5700baba7fe
+build/agent172/proposal_pre_agent/INSTALL.md	2f4b34e3b119cd046c0bc2c77ebfd7d6998f92d0
+build/agent172/proposal_pre_agent/settings_snippet.json	821a9fec310b7e632ff5ee8ece50d8ca4062238c
+tools/agent/probe_agents.sh	2ba7fb708dd73a219d76e354e692bd33aa3b3a58
+build/agent172/probe_agents_14z177.txt	22c2d6ef7affdb593b5060c3306f868bf7be2bd5
+docs/project/agent_architecture_scope.md.lines-153-168 (lines 153-168 of docs/project/agent_architecture_scope.md)	dbd0f8409d2ca3673960e3d5cd0ef8f15fba42a7
+DECISIONS_HISTORY.md.lines-30-62 (lines 30-62 of DECISIONS_HISTORY.md)	6e1cf9d7e777e1113af11c518ac8beda2dda0965
