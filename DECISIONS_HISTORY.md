@@ -27,6 +27,39 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-23 (14z-177) — #172 slice S4: forks, the pinned checker, QP3 wider + QP5, and the order
+
+**The questions put.** `build/agent172/s4_proposal.md` (untracked; its measured basis is
+`agent_architecture_scope.md` §2's worker rows and `tools/agent/probe_agents.sh` A1-A10), after
+rule-checker runs `2026-09-23-109` and `-110` (both plants caught, both real verdicts VIOLATED,
+every finding true and resolved by work). Measured first: a worker definition's cap does not
+hold by itself — the Agent call's `model` beats the definition's, and an omitted model or
+effort follows the caller — so the caps are enforced on the CALL by a hook, with a static gate
+on every definition. (1) Should FORKS pass that hook? (2) The rule-checker's readers always ran
+at the working session's effort, unrecorded: pin them as a named definition now? (3) How C1
+judges a worker's spec against its return — asked first as "a new QP5 or a wider QP3"; the
+maintainer asked *"How is "each figure traces to a command" different from "every figure
+measures, not inferred"?"*, the answer was that on figures they are the SAME test (QP3 applied
+to the worker's own tool results) and the new content is conformance, and the question was put
+again without the overlap. (4) The order — which also approves the template-plus-C1 shape, never
+separately ruled (scope §6 item 4 "rides on item 3's checkpoints").
+
+**THE RULINGS, verbatim (option labels chosen):**
+- (1) *"Allow forks (Recommended)"* — a fork is the orchestrator continuing, not a spec'd
+  worker; C1 reads its return like the orchestrator's own statements; the caps bind workers.
+- (2) *"Pin it now (Recommended)"* — a `rule-checker` definition: `opus`, effort `high` (the
+  calibrated value), read-only tools; all eight fixtures recalibrated before it serves a real run.
+- (3) *"QP3 wider + QP5 (Recommended)"* — QP3 also covers a worker's figures against the
+  worker's own tool results; a new QP5 SPEC-CONFORMANCE: the return answers what the spec asked,
+  the worker ran the commands the spec named, and did nothing the spec forbade; one
+  recalibration of the procedure family plus a planted QP5 fixture.
+- (4) *"As proposed (Recommended)"* — 1) the static cap gate, the two worker definitions
+  (`measurer`, `reader`) and the spec template; 2) the extract carries spec, commands and report,
+  and the S4 gate runs on a frozen real worker run; 3) the call-gate hook as a proposal for the
+  maintainer to install; 4) the checker recalibration. S5 only after.
+
+---
+
 ## Ruled 2026-09-23 (14z-176b) — #172 slice S3: C1's push hook INSTALLED
 
 **The question put.** Whether to install `tools/agent/hooks/pre_push.py` — refusing a

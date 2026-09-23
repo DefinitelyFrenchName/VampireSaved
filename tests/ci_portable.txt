@@ -271,3 +271,6 @@ test_agent_sweep
 # #172 slice S3 (14z-176): the transcript extract the procedural checker (C1) reads — figures sourced
 # and flagged, reasoning excluded, detached/open/real launches; two controls. ~1 s.
 test_agent_extract
+# #172 slice S4 step 1 (14z-177): every worker definition under .claude/agents/ states its caps —
+# model at most Opus-class, effort at most xhigh, an allowed tool list, no unapproved key; five controls. ~1 s.
+test_agent_defs
