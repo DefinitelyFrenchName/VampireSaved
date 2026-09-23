@@ -27,6 +27,26 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-23 (14z-177) — #172 slice S4: the CALL GATE installed
+
+**The question put.** Whether to install `tools/agent/hooks/pre_agent.py`, a PreToolUse hook on
+`Agent|Task` refusing a model above Opus-class, a model on a defined worker, no model on a type
+that would inherit the orchestrator's (Explore excepted — probe A11 measured it capped at
+Opus-class under a Fable caller), and a template-driven worker's spec missing a heading; forks
+pass. Proven 26/0 in the proposal (settings-snippet check with a refused control); rule-checker
+run `2026-09-23-111` (plant caught) VIOLATED Q1/Q4/Q5, all true, resolved by work. Stated cost:
+on the archive it refuses 147 of 280 past calls — 61 of them ran on Fable, 84 within the cap
+(the hook cannot see the orchestrator's model; the redo is one `model` parameter).
+
+**THE RULING, verbatim:** *"I'll install it (Recommended)"*, then *"done"*. Verified: both files
+byte-identical to the proposal; LIVE in the installing session, a `general-purpose` call with
+`model: fable` and one with no model were REFUSED with their reasons, and a `general-purpose` call
+with `model: haiku` ran. Gated in `tests/test_agent_hooks.sh` (25 cases, control `open-agent-gate`).
+Also committed on the maintainer's *"Commit it (Recommended)"*: their one-line correction of
+`pre_push.py`'s stale docstring (`57637828`).
+
+---
+
 ## Ruled 2026-09-23 (14z-177) — #172 slice S4: forks, the pinned checker, QP3 wider + QP5, and the order
 
 **The questions put.** `build/agent172/s4_proposal.md` (untracked; its measured basis is

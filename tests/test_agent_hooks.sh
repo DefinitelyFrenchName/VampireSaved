@@ -21,6 +21,7 @@
 # MUST-FIRE: perturbed-copy: no-heredoc-strip — a copy whose `strip_heredocs` returns the command unchanged must deny commands that only WRITE a script containing `&`, and the gate must FAIL on the must-allow side (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: misread-ledger — a copy of the push hook whose ledger column tuple has `control_verdict` and `verdict` swapped must read the REAL ledger differently from the rule-checker's own reader, and the gate must FAIL (rule-checker run 2026-09-23-107: the 18 cases write their own ledger in the hook's assumed layout, so they cannot see a misread of the real one) (mode: the gate drives that copy)
 # MUST-FIRE: perturbed-copy: no-target-check — a copy of the push hook without the this-repository guard must refuse pushes of ANOTHER repository (the defect the proof found before installation, 14z-176b), and the gate must FAIL on those cases (mode: the gate drives that copy)
+# MUST-FIRE: perturbed-copy: open-agent-gate — a copy of the S4 call gate (`pre_agent.py`) whose `decide` allows every call must let an over-cap Agent call through, and the gate must FAIL on the must-deny call cases (mode: the gate drives that copy)
 # MUST-FIRE: perturbed-copy: open-push-hook — a copy of the C1 push hook (`pre_push.py`, slice S3) whose `decide` allows every call must let an unchecked push through, and the gate must FAIL on the must-deny push cases (mode: the gate drives that copy)
 #
 # SLICE S3's BINDING (installed by the maintainer 2026-09-23, 14z-176b): `pre_push.py`
@@ -29,6 +30,12 @@
 # drives it through 18 cases against a scratch repo — including pushes of ANOTHER
 # repository from the same shell, which the proposal wrongly refused until those cases
 # were added (14z-176b).
+#
+# SLICE S4's CALL GATE (installed by the maintainer 2026-09-23, 14z-177): `pre_agent.py`
+# refuses an Agent call with a model above Opus-class, a model on a defined worker, no model
+# on a type that would inherit the orchestrator's (Explore excepted, measured capped), or a
+# template-driven worker's spec missing a heading; forks pass (ruled). `tests/lib/pre_agent_cases.py`
+# drives it through 25 cases, every rule both ways and fail-open, against the installed hook.
 #
 # Usage: tests/test_agent_hooks.sh      # ci_portable, ~4 s
 set -eu
@@ -66,6 +73,15 @@ import sys; p = sys.argv[1]; s = open(p).read()
 a = 'def strip_heredocs(cmd):\n'
 assert s.count(a) == 1
 s = s.replace(a, a + '    return cmd  # CONTROL no-heredoc-strip\n', 1)
+open(p, 'w').write(s)
+PY
+            ;;
+        open-agent-gate)
+            python3 - "$W/$1/agent/hooks/pre_agent.py" <<'PY'
+import sys; p = sys.argv[1]; s = open(p).read()
+a = '    """-> (decision, reason); decision is 'deny' or None."""\n'
+assert s.count(a) == 1
+s = s.replace(a, a + '    return None, None  # CONTROL open-agent-gate\n', 1)
 open(p, 'w').write(s)
 PY
             ;;
@@ -130,7 +146,7 @@ echo "  fixture: $n_deny must-deny ($n_174 of them the 14z-174 launches), $n_all
 [ "$n_174" -eq 12 ] || { echo "FAIL: the fixture must carry the twelve 14z-174 launches (has $n_174)"; fail=1; }
 
 AG=tools/agent
-if vs_ctl_is blind-classifier || vs_ctl_is greedy-heredoc || vs_ctl_is no-heredoc-strip || vs_ctl_is open-push-hook \
+if vs_ctl_is blind-classifier || vs_ctl_is greedy-heredoc || vs_ctl_is no-heredoc-strip || vs_ctl_is open-push-hook || vs_ctl_is open-agent-gate \
    || vs_ctl_is misread-ledger || vs_ctl_is no-target-check; then AG="$(make_copy "$VS_CTL")"; fi
 replay "$AG" "$W/replay.txt"
 sed -n '/^MISMATCH/p' "$W/replay.txt" | head -12 | sed 's/^/  /'
@@ -164,15 +180,25 @@ if not any("tools/agent/hooks/pre_bash.py" in c for c in cmds):
     bad.append("no PreToolUse Bash hook runs tools/agent/hooks/pre_bash.py")
 if not any("tools/agent/hooks/pre_push.py" in c for c in cmds):
     bad.append("no PreToolUse Bash hook runs tools/agent/hooks/pre_push.py (C1's push binding)")
+agent = [h.get("command", "") for m in s.get("hooks", {}).get("PreToolUse", []) if m.get("matcher") == "Agent|Task"
+         for h in m.get("hooks", []) if h.get("type") == "command"]
+if not any("tools/agent/hooks/pre_agent.py" in c for c in agent):
+    bad.append("no PreToolUse Agent|Task hook runs tools/agent/hooks/pre_agent.py (S4's call gate)")
 if need - deny:
     bad.append(f"edit-lock rules missing: {sorted(need - deny)}")
 for b in bad:
     print(f"FAIL: installation — {b}")
 if not bad:
-    print("  installation: .claude/settings.json wires pre_bash.py and pre_push.py on Bash and keeps the three edit-lock rules")
+    print("  installation: .claude/settings.json wires pre_bash.py and pre_push.py on Bash, pre_agent.py on Agent|Task, and keeps the three edit-lock rules")
 sys.exit(1 if bad else 0)
 PY
 cat "$W/wiring.txt"
+
+# S4's call gate over its cases (the installed hook, or the control's perturbed copy)
+python3 tests/lib/pre_agent_cases.py "$AG/hooks/pre_agent.py" > "$W/agentgate.txt" 2>&1 || true
+sed -n '/^  BAD /p' "$W/agentgate.txt" | head -8
+tail -1 "$W/agentgate.txt" | sed 's/^/  call gate: /'
+grep -q ' wrong 0$' "$W/agentgate.txt" || { echo "FAIL: the call gate's decisions disagree with its cases"; fail=1; }
 
 # C1's push hook over its 18 cases (the installed hook, or the control's perturbed copy)
 python3 tests/lib/pre_push_cases.py "$AG/hooks/pre_push.py" > "$W/push.txt" 2>&1 || true
@@ -227,6 +253,10 @@ PY
     k=$(grep -c '^  BAD .*other repo.*expect allow' "$W/ctl_target.txt" || true)
     if [ "${k:-0}" -gt 0 ]; then vs_ctl_fired no-target-check "$k other-repository pushes refused by a hook without the this-repository guard"
     else vs_ctl_dead no-target-check "a hook without the guard still let other repositories through — the cases cannot see the defect" || fail=1; fi
+    python3 tests/lib/pre_agent_cases.py "$(make_copy open-agent-gate)/hooks/pre_agent.py" > "$W/ctl_agent.txt" 2>&1 || true
+    k=$(grep -c '^  BAD .*expect deny' "$W/ctl_agent.txt" || true)
+    if [ "${k:-0}" -gt 0 ]; then vs_ctl_fired open-agent-gate "$k must-deny call cases let through by the perturbed copy"
+    else vs_ctl_dead open-agent-gate "the always-allow copy matched every call case — the cases cannot see an open gate" || fail=1; fi
     python3 tests/lib/pre_push_cases.py "$(make_copy open-push-hook)/hooks/pre_push.py" > "$W/ctl_push.txt" 2>&1 || true
     k=$(grep -c '^  BAD .*expect deny' "$W/ctl_push.txt" || true)
     if [ "${k:-0}" -gt 0 ]; then vs_ctl_fired open-push-hook "$k must-deny push cases let through by the perturbed copy"
@@ -240,5 +270,5 @@ PY
     done
 fi
 
-if [ "$fail" = 0 ]; then echo "PASS: C0.1 denies the 14z-174 launches and every must-deny case, allows every must-allow case, and fails open on a malformed event; C1's push hook decides all 18 of its cases"
+if [ "$fail" = 0 ]; then echo "PASS: C0.1 denies the 14z-174 launches and every must-deny case, allows every must-allow case, and fails open on a malformed event; C1's push hook decides all 18 of its cases; S4's call gate decides all 25 of its cases"
 else echo "FAIL: test_agent_hooks"; exit 1; fi

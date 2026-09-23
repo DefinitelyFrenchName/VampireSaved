@@ -263,7 +263,7 @@ test_unless_composed
 test_effect_placeholders
 # 14z-175, GitHub #172 slice S1: the C0.1 hook (no detached jobs, no pgrep waiters) replayed
 # over a fixture cut from real transcripts — 14z-174's twelve nohup launches must be denied,
-# real false-positive shapes allowed; fail-open recorded; C1's push hook over 18 cases and the real ledger. tools/agent/; six controls. ~5 s.
+# real false-positive shapes allowed; fail-open recorded; C1's push hook over 18 cases and the real ledger; S4's call gate over 25 cases (14z-177). tools/agent/; seven controls. ~5 s.
 test_agent_hooks
 # #172 slice S2 (14z-176): C0.3, the close-time process sweep, against a planted process world —
 # a fake Claude's tool shell ATTACHED, six orphan shapes by signal, three must-stay-quiet cases; three controls. ~12 s.
