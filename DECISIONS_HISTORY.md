@@ -27,6 +27,32 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-23 (14z-175) — #172 slice S1: C0.1 INSTALLED with its edit lock, and C0.2 moved to the procedural checker
+
+**The questions put.** (1) C0.1 — deny detached launches and `pgrep` waiters — passed its
+gate (`tests/test_agent_hooks.sh`, 40 fixture rows cut from real transcripts, two
+controls) and was verified end to end in a scratch project; installing it means creating
+a TRACKED `.claude/settings.json`, so every later session here runs it. (2) C0.2 was
+measured over eleven archived transcripts before any hook was written, and both
+deterministic forms failed: "a finished task never read" flagged 26 tasks in one session,
+each case read by hand being a result the agent had used; "a promise to wait with no
+tracked task running" was masked for a whole session by a 35-hour orphaned task.
+
+**THE RULINGS, verbatim:** (1) *"Install + protect (Recommended)"* — the hook plus
+`permissions.deny` on editing `.claude/settings.json`, `tools/agent/hooks/**` and
+`tools/agent/agentlib.py`, so only the maintainer changes the enforcement; (2) *"Move it
+to C1 (Recommended)"* — the procedural model checker judges it (QP1 said-vs-done, QP4
+every job accounted for) at every push and close; S1 ships as C0.1 + C0.4, and C0.3's
+close sweep becomes S2.
+
+**What was verified on installation, in this session:** the hook denied a live
+`nohup touch <marker> &` with its reason, the marker was never created, and an Edit of
+`.claude/settings.json` was refused by the deny rule. **What the lock does NOT cover:**
+`Edit(...)` deny rules bind the file-editing tools; a write through Bash (`sed -i`, a
+heredoc) is not refused by them.
+
+---
+
 ## Ruled 2026-09-23 (14z-175) — #172: the agent architecture's four design questions
 
 **The question put.** `docs/project/agent_architecture_scope.md` §6, after three

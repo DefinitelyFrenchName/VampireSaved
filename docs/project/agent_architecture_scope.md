@@ -1,10 +1,11 @@
 # THE AGENT ARCHITECTURE — scope, before the work (GitHub #172)
 
-> **STATUS (14z-175, 2026-09-23): RULED, NOT YET BUILT.** The maintainer ruled all
-> four questions of §6 the same day (`DECISIONS_HISTORY.md` "Ruled 2026-09-23
+> **STATUS (14z-175, 2026-09-23): RULED; SLICE S1 INSTALLED.** The maintainer ruled
+> all four questions of §6 the same day (`DECISIONS_HISTORY.md` "Ruled 2026-09-23
 > (14z-175) — #172"), adding one constraint that binds every slice: **a block stops
-> the task at fault, never the session.** Slice S1 is next. The hooks named here do
-> NOT exist in `.claude/` yet.
+> the task at fault, never the session.** S1 is live as **C0.1** in the tracked
+> `.claude/settings.json`, with **C0.4**'s edit lock on it; **C0.2 moved to C1** on
+> measurement (§4, and the ruling "— #172 slice S1"). Next: S2 (the close sweep, C0.3).
 
 **Why this document exists:** the same reason `harness_scope.md` and
 `applier_app_scope.md` do — a direction the maintainer ordered, big enough that
@@ -47,13 +48,13 @@ message the bound reclassified was read and confirmed not a status question.
 |---|---|---|---|---|---|---|---|
 | 4404c66f | 09-17 15:31 | 0 | 0 | 0 | 0 | 16 | 0 |
 | b402dba6 | 09-17 19:10 | 1 | 0 | 0 | 1 | 0 | 2 |
-| 35f352b6 | 09-17 20:55 | 3 | 0 | 1 | 2 | 12 | 12 |
-| 21b7a712 | 09-18 06:29 | 2 | 0 | 2 | 0 | 1 | 6 |
-| 82693a92 | 09-18 10:21 | 4 | 0 | 1 | 3 | 28 | 8 |
-| 92e58f46 | 09-18 17:37 | 2 | 0 | 0 | 2 | 10 | 0 |
-| b0c1cbc9 | 09-18 22:34 | 6 | 0 | 3 | 3 | 51 | 10 |
-| 4724b8d7 | 09-19 22:51 | 5 | 2 | 0 | 3 | 19 | 11 |
-| 5b2495dc | 09-20 12:30 | 2 | 0 | 0 | 2 | 7 | 6 |
+| 35f352b6 | 09-17 20:55 | 3 | 0 | 1 | 2 | 9 | 12 |
+| 21b7a712 | 09-18 06:29 | 2 | 0 | 2 | 0 | 0 | 6 |
+| 82693a92 | 09-18 10:21 | 4 | 0 | 1 | 3 | 10 | 8 |
+| 92e58f46 | 09-18 17:37 | 2 | 0 | 0 | 2 | 9 | 0 |
+| b0c1cbc9 | 09-18 22:34 | 6 | 0 | 3 | 3 | 23 | 10 |
+| 4724b8d7 | 09-19 22:51 | 5 | 2 | 0 | 3 | 13 | 11 |
+| 5b2495dc | 09-20 12:30 | 2 | 0 | 0 | 2 | 5 | 6 |
 | 5d6dd31f | 09-20 16:28 | 4 | 0 | 2 | 2 | 0 | 36 |
 | **d5b070d5 (14z-174)** | 09-21 08:37 | **17** | **11** | **1** | 5 | **12** | **5** |
 
@@ -72,7 +73,13 @@ tracked**. Both figures were wrong: the detach pattern also matched `cmd && echo
 (85 of the 97), and the tracked count read only `run_in_background`, missing the five
 calls the harness moved to the background at the 120 s timeout. The table above is
 the re-measure; `transcript_gaps.py --selftest` now carries a must-stay-quiet case
-for each defect.
+for each defect. **Re-measured again when S1 began** — the census now counts through
+the SAME classifier the hooks use (`tools/agent/agentlib.py`), which also clears a
+backgrounding `&` inside a heredoc body or a quoted string and one followed by `wait`
+(a foreground parallel run). Over the 4,624 Bash commands of the eleven sessions it
+flags nothing the first classifier did not, and every one of the 59 it clears was
+classified by reason (heredoc body 30, `& … wait` 25, `&&` 3, quoted 1); 14z-174's
+row does not move, the other sessions' detached counts fall.
 
 **The mechanism the table points at.** A job launched with `nohup … &` inside an
 ordinary Bash call is invisible to the harness: it cannot produce a completion
@@ -151,7 +158,19 @@ will of checker agents"*. A model checker is kept for what needs judgement.
   `never-wait-on-pgrep`), with the reason naming the tracked alternative:
   `run_in_background: true`, which notifies, or `Monitor` for a condition. A job the
   harness tracks is a job whose end wakes the agent.
-- **C0.2 no finished job left unread (Stop).** At every Stop, reconstruct the
+- **C0.2 — MEASURED BEFORE BUILDING, AND NEITHER DETERMINISTIC FORM SURVIVED (14z-175,
+  slice S1).** Both were run over the eleven archived transcripts with the S1 parser
+  (`agentlib.tasks`, both notification forms) before any hook was written.
+  *"A finished task whose result no later tool call looked at"* flagged 26 tasks in one
+  session, and every case read by hand was a result the agent HAD used — acted on from
+  the notification, polled from its log before the notification, or read through a
+  `$VAR` path no matcher resolves. *"A promise to wait or report with no tracked task
+  running"* failed the other way: in 14z-174 the netlog Chrome's task stayed "running"
+  for 35 hours and masked nearly every promise the session made while its detached jobs
+  ran. Whether a running thing is RELEVANT to a promise is judgement, so under this
+  document's own principle C0.2 is carried by the procedural checker (C1, QP1 and QP4),
+  pending the maintainer's word. The original design, kept for the record:
+  **C0.2 no finished job left unread (Stop).** At every Stop, reconstruct the
   session's tasks from the transcript. A task whose completion notification arrived
   and whose output has not been read since → BLOCK, naming the task and its output
   file. A task still running → allowed, because a tracked task will notify (C0.1 is
@@ -212,7 +231,7 @@ RETURN, not by a second orchestrator.
 
 | slice | what | the gate that proves it |
 |---|---|---|
-| **S1** | C0.1 + C0.2 as scripts under `tools/agent/` + the project `.claude/settings.json` wiring + C0.4 | a ROM-free gate that REPLAYS recorded transcripts through the hook scripts: on the 14z-174 transcript C0.2 must fire at the finished-and-unread tasks and C0.1 on its detached launches; on a clean synthetic transcript both stay quiet (must-fire and must-stay-quiet, [VSP-19]) |
+| **S1** | C0.1 (+ C0.2, moved to C1 on measurement — §4) as scripts under `tools/agent/` + the project `.claude/settings.json` wiring + C0.4. **C0.1 LANDED 14z-175:** `tools/agent/agentlib.py` (the one classifier, also behind the census), `tools/agent/hooks/pre_bash.py`, gate `tests/test_agent_hooks.sh`; wiring verified in a scratch project, then INSTALLED here (ruled "Install + protect"): a live `nohup` launch denied, its marker never created, an Edit of the settings refused | a ROM-free gate that REPLAYS recorded transcripts through the hook scripts: on the 14z-174 transcript C0.2 must fire at the finished-and-unread tasks and C0.1 on its detached launches; on a clean synthetic transcript both stay quiet (must-fire and must-stay-quiet, [VSP-19]) |
 | **S2** | C0.3 — the close sweep, and its step in STATE.md's close checklist | the gate plants a live child process and requires the sweep to name it |
 | **S3** | C1 — `tools/proccheck.py` (or a `rulecheck` decision kind), the transcript extractor, the checklist, fixtures from 14z-174, calibration, the push binding | fixtures calibrated like `rulecheck`'s: each positive caught, a negative quiet beside a caught plant |
 | **S4** | W — worker definitions and the spec template | a worker run on a known task returns figures each traceable to a command |

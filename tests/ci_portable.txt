@@ -260,3 +260,7 @@ test_unless_composed
 # 14z-170: the x2b7ef4 coordinate-list placeholders resolve at their recorded offsets, never by an
 # in-place scan (the latent corruption merged-m16..m18 shipped). ~1 s.
 test_effect_placeholders
+# 14z-175, GitHub #172 slice S1: the C0.1 hook (no detached jobs, no pgrep waiters) replayed
+# over a fixture cut from real transcripts — 14z-174's twelve nohup launches must be denied,
+# real false-positive shapes allowed; fail-open recorded. tools/agent/; two controls. ~2 s.
+test_agent_hooks

@@ -43,15 +43,14 @@ import re
 import sys
 import tempfile
 
-# A DETACHING & is a single & that ends a command: not half of `&&`, not a `>&`/`&>`
-# redirect. The first cut (`&\s*$|&\s*echo`) also matched `cmd && echo ...` and counted
-# 85 of 14z-174's 97 "detached" calls wrongly (rule-checker run 2026-09-23-97, Q4).
-DETACHED = re.compile(r"\bnohup\b|\bsetsid\b|\bdisown\b"
-                      r"|(?<![&>|])&(?![&>\d])\s*($|\n|;|\)|echo|wait|sleep|pid=|PID=|P\d?=|\w+=\$!)", re.M)
-# TRACKED is read from the tool RESULT, not the call: the harness also tracks a call it
-# moved to the background at the 120 s timeout, which `run_in_background` never shows
-# (14z-174 had five; the same run's Q1).
-TRACKED_RESULT = ("Command running in background with ID:", "moved to the background (ID:")
+# DETACHED and TRACKED come from the ONE classifier the hooks use (agentlib), so the
+# census and the hooks cannot disagree. History: a first cut here (`&\s*$|&\s*echo`)
+# counted `cmd && echo ...` as detached — 85 of 14z-174's 97 (rule-checker run
+# 2026-09-23-97, Q4); a second counted `a & b & wait` (a foreground parallel run).
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import agentlib  # noqa: E402
+
+TRACKED_RESULT = agentlib.TRACKED_RESULT
 STATUS = re.compile(r"status|finished|landed|done yet|still running|progress", re.I)
 # a status QUESTION is short: 14z-174's one long message quoting the agent's own
 # sentence back ("... not polling my own background work") matched the keywords and
@@ -80,7 +79,7 @@ def parse(path):
             for b in c:
                 if b.get("type") == "tool_use" and b.get("name") == "Bash":
                     inp = b.get("input") or {}
-                    if not inp.get("run_in_background") and DETACHED.search(inp.get("command", "")):
+                    if not inp.get("run_in_background") and agentlib.detach_reason(str(inp.get("command", ""))):
                         det += 1
                 elif b.get("type") == "tool_result":
                     body = json.dumps(b.get("content"))
@@ -120,43 +119,11 @@ def gaps(recs, gap_min):
 
 
 def tasks(path):
-    """-> [(task_id, started, ended_or_None, form, description)] for every tracked task."""
-    start, end, desc, calls = {}, {}, {}, {}
-    idre = re.compile(r"\(ID: (\w+)\)|with ID: (\w+)")
-    for line in open(path, encoding="utf-8", errors="replace"):
-        try:
-            r = json.loads(line)
-        except ValueError:
-            continue
-        if r.get("isSidechain"):
-            continue
-        ts = r.get("timestamp")
-        m = r.get("message")
-        c = m.get("content") if isinstance(m, dict) else None
-        if isinstance(c, list):
-            for b in c:
-                if b.get("type") == "tool_use":
-                    inp = b.get("input") or {}
-                    cmd = " ".join(str(inp.get("command", "")).split())
-                    calls[b.get("id")] = f'{inp.get("description", "")} :: {cmd[:140]}'
-                elif b.get("type") == "tool_result":
-                    body = json.dumps(b.get("content"))
-                    hit = idre.search(body)
-                    if hit and any(k in body for k in TRACKED_RESULT):
-                        t = hit.group(1) or hit.group(2)
-                        start[t] = ts
-                        desc[t] = calls.get(b.get("tool_use_id"), "?")
-        notes = []
-        if isinstance(c, str) and c.lstrip().startswith("<task-notification>"):
-            notes.append((c, "idle"))
-        att = r.get("attachment") or {}
-        if att.get("type") == "queued_command" and "<task-notification>" in str(att.get("prompt")):
-            notes.append((str(att["prompt"]), "mid-turn"))
-        for text, form in notes:
-            k = re.search(r"<task-id>(\w+)</task-id>", text)
-            if k and k.group(1) not in end:
-                end[k.group(1)] = (ts, form)
-    return [(t, start[t], end.get(t, (None, None))[0], end.get(t, (None, "NONE"))[1], desc[t]) for t in start]
+    """-> [(task_id, started, ended_or_None, form, description)] — agentlib.tasks, the
+    ONE parser the C0.2 hook uses (both notification forms)."""
+    return [(t["id"], t["started"], t["ended"], t["form"] or "NONE",
+             f'{t["description"]} :: {" ".join(t["command"].split())[:140]}')
+            for t in agentlib.tasks(path)]
 
 
 def selftest():
@@ -173,6 +140,8 @@ def selftest():
         rec(1, "assistant", [{"type": "tool_use", "name": "Bash", "input": {"command": "a && echo ok || echo no"}}]),
         rec(1, "assistant", [{"type": "tool_use", "name": "Bash", "input": {"command": "b > l 2>&1; c &> m"}}]),
         rec(1, "assistant", [{"type": "tool_use", "name": "Bash", "input": {"command": "d &&\n e"}}]),
+        rec(1, "assistant", [{"type": "tool_use", "name": "Bash", "input": {"command": "f a & f b & wait; echo done"}}]),
+        rec(1, "assistant", [{"type": "tool_use", "name": "Bash", "input": {"command": "cat > s.sh <<'EOF'\nx & y\nEOF\nsh s.sh"}}]),
         rec(2, "assistant", [{"type": "tool_use", "name": "Bash", "input": {"command": "y.sh", "run_in_background": True}}]),
         rec(2, "user", [{"type": "tool_result", "content": "Command running in background with ID: b1. Output is being written to: /t/b1.output"}]),
         rec(2, "user", [{"type": "tool_result", "content": "Command did not complete within its 120s timeout and was moved to the background (ID: b2)."}]),
