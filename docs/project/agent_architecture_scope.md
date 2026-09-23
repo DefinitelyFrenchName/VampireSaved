@@ -133,7 +133,7 @@ itself), with two controls — P1c,
 the deny switched off, must create the marker P1 requires absent, and P4, the P1/P2
 record counts must read zero on a run with no denial and no block — and exits non-zero
 if any has changed. The worker rows (14z-177) are re-measured the same way by
-`tools/agent/probe_agents.sh` (A1-A8, ~3 min, every "cannot" leg beside its "can" leg).
+`tools/agent/probe_agents.sh` (A1-A10, ~4 min, every "cannot" leg beside its "can" leg).
 
 | mechanism | status | what it gives |
 |---|---|---|
@@ -157,9 +157,10 @@ if any has changed. The worker rows (14z-177) are re-measured the same way by
 | **the Agent call's `model` parameter BEATS the definition's** | **MEASURED** (A2) | a `haiku` definition ran on Sonnet when the call said `sonnet`: a model cap in a definition holds only if the call cannot override it |
 | **a project PreToolUse hook on `Agent` sees the spec and can DENY the call** | **MEASURED** (A8, A8c) | its input carries `subagent_type`, `model`, `prompt`, `description`; a deny on a `model` override was refused with its reason and no worker ran, and the same gate let the plain call run |
 | **a definition's `tools` list binds** | **MEASURED** (A5, A5c) | a Read/Glob/Grep worker could not create a file; the same ask to a worker given Write did. Bash stays a write path for any worker that has it |
-| **a `hooks:` block in the definition's frontmatter did NOT fire** | **MEASURED** (A6, a NEGATIVE kept as a leg) | its deny never ran and the command it should have refused created its marker — it reads as enforcement and is not, in the form the probe writes |
+| **a `hooks:` block in the definition's frontmatter did NOT fire** | **MEASURED** (A6, a NEGATIVE kept as a leg; A6c its must-fire leg) | its deny never ran and the command it should have refused created its marker — it reads as enforcement and is not, in the ONE YAML form the probe writes. The SAME command wired as a project hook fired and its deny held (A6c), so the silence is the frontmatter's, not a broken command |
+| **a definition with no `model`, and a `general-purpose` call with none, run on the CALLER's model** | **MEASURED** (A9, both parents) | haiku under a haiku parent, sonnet under sonnet: an omitted model is the orchestrator's, which S5 makes Fable |
 | **a project hook sees a worker's OWN tool calls, and names the worker** | **MEASURED** (A7) | a worker's calls carry `agent_type` and `agent_id`, the orchestrator's neither: a rule scoped to one worker is a project hook reading `agent_type`, and C0.1 already binds every worker |
-| **where a worker's words land** | **MEASURED** (14z-176's transcript, read 14z-177) | the SPEC is the Agent call's `prompt`; a background worker's REPORT reaches the orchestrator as an `<agent-message from="<id>">[Subagent hand-back]` record (the completion `<task-notification>` explicitly does NOT repeat it), a foreground worker's as the call's tool result; the worker's COMMANDS exist only in its own transcript. `extract.py` carries 300 characters of the spec and neither the report nor the commands |
+| **where a worker's words land** | **MEASURED** (14z-176's transcript, read 14z-177; then A10, controlled) | the SPEC is the Agent call's `prompt`; a background worker's REPORT reaches the orchestrator as an `<agent-message from="<id>">[Subagent hand-back]` record (the completion `<task-notification>` explicitly does NOT repeat it), a foreground worker's as the call's tool result; the worker's COMMANDS exist only in its own transcript. `extract.py` carries 300 characters of the spec and neither the report nor the commands. A10 checks the link, the command's place (in the worker's transcript, NOT the orchestrator's) and the report's arrival; it accepts either delivery form and does not assert which a foreground call takes |
 
 ## 3. WHAT EXISTS AND WHAT IT DOES NOT COVER
 
@@ -286,7 +287,7 @@ RETURN, not by a second orchestrator.
 
 **MEASURED BEFORE DESIGNING (14z-177), and it moves three things in the paragraph above**
 (§2's rows from "a worker definition's `model`" down): (1) a cap in a definition is not a
-cap — the call's `model` beats it and a missing `effort` inherits the orchestrator's, so the
+cap — the call's `model` beats it, and a missing `model` or `effort` is the orchestrator's, so the
 caps need a STATIC check on every definition (model named and at most Opus-class, effort
 named and at most `xhigh`) AND a check on the CALL (a PreToolUse hook on `Agent`, measured
 able to deny); (2) "a scoped hook" cannot live in the definition — its `hooks:` block did not

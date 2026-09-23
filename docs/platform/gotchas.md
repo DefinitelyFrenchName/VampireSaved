@@ -2804,14 +2804,15 @@ completion marker** — a fix applied to "the run" is applied to one call site.
 ## A SUBAGENT WITH NO `effort` LINE RUNS AT ITS CALLER'S EFFORT, AND THE CALLER'S `model` BEATS THE DEFINITION'S — a cap written in `.claude/agents/<name>.md` alone does not hold (measured 2026-09-23, 14z-177, Claude Code 2.1.280)
 
 Measured in a scratch project with headless `claude -p` runs (`tools/agent/probe_agents.sh`,
-legs A1-A8, every "cannot" leg beside its "can" leg). A worker's transcript
+legs A1-A10, every "cannot" leg beside its "can" leg). A worker's transcript
 (`<session>/subagents/agent-<id>.jsonl`) records `effort` and `message.model` on every
 assistant record, which is what makes these checkable:
 
 - a definition's `model` and `effort` ARE applied (`sonnet` + `low` ran at low, `+ xhigh`
   at xhigh) — **but a definition with NO `effort` line runs at the CALLER's effort**
   (`low` under a `--effort low` parent, `xhigh` under `xhigh`), so an effort cap holds only
-  if every definition states one;
+  if every definition states one; likewise a definition with no `model`, and a
+  `general-purpose` call with none, run on the CALLER's model (A9);
 - **the Agent call's `model` parameter BEATS the definition's `model`** (a `haiku`
   definition ran on Sonnet when the call said `sonnet`), so a model cap in a definition
   holds only if the call cannot override it — a project `PreToolUse` hook on `Agent` CAN
@@ -2821,7 +2822,8 @@ assistant record, which is what makes these checkable:
   the same ask to a worker given Write did);
 - **a `hooks:` block in the definition's own frontmatter did NOT fire** (its deny never
   ran, and the command it should have refused created its marker) — it reads as
-  enforcement and is not, at least in the form the probe writes;
+  enforcement and is not, at least in the one form the probe writes; the SAME command wired
+  as a project hook fired and denied (A6c), so it is the frontmatter that is silent;
 - a PROJECT `PreToolUse` hook DOES fire for a worker's own tool calls, and its input names
   the worker (`agent_type`, `agent_id`); the orchestrator's own calls carry neither. So a
   rule scoped to one worker is a project hook that reads `agent_type`, and every project
