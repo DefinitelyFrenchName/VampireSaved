@@ -11,9 +11,9 @@ is allowed. Ruled 2026-09-23 (14z-175): *"Every push + every close"*, and a bloc
 the task at fault, never the session — the reason names what to run, the rest of the work
 goes on, and the push waits until the check is green or resolved.
 
-A PROPOSAL, NOT INSTALLED: `tools/agent/hooks/**` and the settings are edit-locked, so the
-maintainer installs it (copy this file to `tools/agent/hooks/pre_push.py`, add the entry in
-`settings_snippet.json`). `prove.py` beside it drives every case against a scratch repo.
+INSTALLED 2026-09-23 (14z-176b) by the maintainer; tools/agent/hooks/** and the settings are
+edit-locked. Its cases are tests/lib/pre_push_cases.py, run by tests/test_agent_hooks.sh
+(18 cases, control open-push-hook).
 
 FAIL-OPEN BY DESIGN, like pre_bash.py: an internal error allows the call and is logged to
 `build/agent_hooks/errors.log`.

@@ -30,9 +30,7 @@ The tree is still at `build/m3b_merged27` (merged-m19, released); no ROM byte mo
    `tail -n +1 -F`; this sitting's own procedure check caught the twentieth.
 1. **A PUSH NOW NEEDS A PROCEDURE CHECK — the hook refuses it otherwise** (installed 14z-176b).
    Run it before the close's push: extract, `prepare --decision procedure`, two fresh readers,
-   `record`, `resolve`; the refusal names the commands. **One stale line in a locked file:**
-   `tools/agent/hooks/pre_push.py`'s docstring still says "A PROPOSAL, NOT INSTALLED" — the
-   maintainer's to correct (raised 14z-176b).
+   `record`, `resolve`; the refusal names the commands.
 2. **#172 — S4, the worker definitions** (scope doc §4 W, §5): named `.claude/agents/`
    definitions with model and effort capped as ruled (at most Opus-class, effort at most
    `xhigh`), a spec TEMPLATE, and C1 reading the SPEC against the RETURN; its gate is a worker
