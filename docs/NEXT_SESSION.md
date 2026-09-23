@@ -31,14 +31,15 @@ approved SKIP, controls `fired 92 / declared 92`, with the MiSTer lane carried o
    *"either the gates are moving silently or they never were validated and in both cases
    that's a lot of both uncertainty and wasted time"*. The common factor is that **the
    emulator tier only runs at a freeze or a release**, so breakage accumulates and
-   surfaces at the worst moment.    reconciles it against the registry. Two tools exist to build on —
+   surfaces at the worst moment. Two tools exist to build on —
    `tools/audit_lane_carry.py` and `tools/attribute_expectation.sh` — and **the first is
    itself a case this ticket must fix: its subject lists are HARDCODED and known
    INCOMPLETE** (it omits `tests/replays`, a load-bearing operand of a mister gate, and
-   `ci_emulator.tsv` itself; nothing reconciles the lists against the registry). **A
-   `MAY CARRY` from it is NECESSARY, NOT SUFFICIENT** — check the omitted paths by hand,
-   as the M19 release did. It prints its own unchecked paths with every verdict.
-   and `tools/attribute_expectation.sh`.
+   `ci_emulator.tsv` itself; nothing reconciles the lists against the registry).
+   Widening the lists and building the control that reconciles them against the
+   registry is part of #171. **Until then a `MAY CARRY` from it is NECESSARY, NOT
+   SUFFICIENT** — check the omitted paths by hand, as the M19 release did. It prints its
+   own unchecked paths with every verdict.
 2. **#172 — the agent-level architecture**, raised from this sitting's own worst failure:
    polling was chosen as the right strategy, stated, and then not done, leaving three
    finished jobs idle for 2.5 h, 1.5 h and 1.5 h. The maintainer's shape — a Fable
