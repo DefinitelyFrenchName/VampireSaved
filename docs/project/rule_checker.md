@@ -189,11 +189,13 @@ changes, because either moves the instrument.
 row) must be named by an `OK` `freeze` run in the ledger, or
 `tests/test_rule_checker.sh` fails. The evidence family's other three decision kinds
 cannot be bound by a file the tree can see; they are bound by the rule above, and the
-ledger is what the maintainer audits. **The `procedure` kind is bindable, and its binding
-is a proposal awaiting the maintainer** (the hooks are edit-locked): a PreToolUse hook
-on `git push` that allows the push only when a passed or resolved `procedure` run
-checked a commit inside the pushed range (`meta.tsv` records that commit as `head`).
-Until it is installed, the close checklist carries the step.
+ledger is what the maintainer audits. **The `procedure` kind is BOUND MECHANICALLY** (installed by the
+maintainer 2026-09-23, 14z-176b): `tools/agent/hooks/pre_push.py`, a PreToolUse hook on
+`git push` OF THIS REPOSITORY, allows the push only when a passed or resolved
+`procedure` run checked a commit inside the pushed range (`meta.tsv` records that commit
+as `head`); a push of another repository (the bbh harness, the jtcores fork) is not its
+business. Gate: `tests/test_agent_hooks.sh` (`tests/lib/pre_push_cases.py`, 18 cases;
+control `open-push-hook`).
 
 ## What the first runs measured
 

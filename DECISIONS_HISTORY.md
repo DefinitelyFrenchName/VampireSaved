@@ -27,6 +27,25 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-23 (14z-176b) — #172 slice S3: C1's push hook INSTALLED
+
+**The question put.** Whether to install `tools/agent/hooks/pre_push.py` — refusing a
+`git push` of this repository until a passed or resolved `procedure` run of the
+rule-checker covers a commit in the pushed range. The maintainer asked *"sounds like good
+safety/quality bar, no?"*; the working agent recommended it after first extending the
+proof with pushes of ANOTHER repository from the same shell, which the proposal failed 3
+of 3 (it would have refused bbh and jtcores-fork pushes whenever this repo held an
+unchecked commit) and which were fixed before installation (18/18). Stated limits: it
+binds only the agent's Bash-tool pushes; a check of ANY commit in the range suffices; a
+resolved VIOLATED counts, its resolution audited in the ledger.
+
+**THE RULING, verbatim:** *"well, since we both think the push hook is a good idea, I'll
+install it"*, then *"it should be done"*. Verified: both installed files byte-identical to
+the proposal; a live dry-run push of the unchecked `f1d579f6` REFUSED with its reason; a
+push aimed outside this repository passed the hook.
+
+---
+
 ## Ruled 2026-09-23 (14z-176) — #172 slice S3: the procedural checker's four questions and fixtures, and the agentlib launch fix
 
 **The questions put.** (1) `tools/agent/agentlib.py` (edit-locked) counts a tool OUTPUT

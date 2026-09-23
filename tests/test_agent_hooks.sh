@@ -19,8 +19,16 @@
 # MUST-FIRE: perturbed-copy: blind-classifier — a copy of the hooks whose `detach_reason` always answers "no detach" must let the 14z-174 launches through, and the gate must FAIL on them (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: greedy-heredoc — a copy whose `strip_heredocs` swallows every line after an UNTERMINATED `<<` operator (the defect rule-checker run 2026-09-23-100 found) must hide the `nohup` in the arithmetic-shift rows, and the gate must FAIL on the must-deny side (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: no-heredoc-strip — a copy whose `strip_heredocs` returns the command unchanged must deny commands that only WRITE a script containing `&`, and the gate must FAIL on the must-allow side (mode: the gate runs against that copy)
+# MUST-FIRE: perturbed-copy: open-push-hook — a copy of the C1 push hook (`pre_push.py`, slice S3) whose `decide` allows every call must let an unchecked push through, and the gate must FAIL on the must-deny push cases (mode: the gate drives that copy)
 #
-# Usage: tests/test_agent_hooks.sh      # ci_portable, ~2 s
+# SLICE S3's BINDING (installed by the maintainer 2026-09-23, 14z-176b): `pre_push.py`
+# refuses a `git push` of THIS repository unless a passed or resolved `procedure` run of
+# the rule-checker checked a commit in the pushed range. `tests/lib/pre_push_cases.py`
+# drives it through 18 cases against a scratch repo — including pushes of ANOTHER
+# repository from the same shell, which the proposal wrongly refused until those cases
+# were added (14z-176b).
+#
+# Usage: tests/test_agent_hooks.sh      # ci_portable, ~4 s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
@@ -59,6 +67,15 @@ s = s.replace(a, a + '    return cmd  # CONTROL no-heredoc-strip\n', 1)
 open(p, 'w').write(s)
 PY
             ;;
+        open-push-hook)
+            python3 - "$W/$1/agent/hooks/pre_push.py" <<'PY'
+import sys; p = sys.argv[1]; s = open(p).read()
+a = 'def decide(event, root):\n'
+assert s.count(a) == 1
+s = s.replace(a, a + '    return None, None  # CONTROL open-push-hook\n', 1)
+open(p, 'w').write(s)
+PY
+            ;;
     esac
     echo "$W/$1/agent"
 }
@@ -93,7 +110,7 @@ echo "  fixture: $n_deny must-deny ($n_174 of them the 14z-174 launches), $n_all
 [ "$n_174" -eq 12 ] || { echo "FAIL: the fixture must carry the twelve 14z-174 launches (has $n_174)"; fail=1; }
 
 AG=tools/agent
-if vs_ctl_is blind-classifier || vs_ctl_is greedy-heredoc || vs_ctl_is no-heredoc-strip; then AG="$(make_copy "$VS_CTL")"; fi
+if vs_ctl_is blind-classifier || vs_ctl_is greedy-heredoc || vs_ctl_is no-heredoc-strip || vs_ctl_is open-push-hook; then AG="$(make_copy "$VS_CTL")"; fi
 replay "$AG" "$W/replay.txt"
 sed -n '/^MISMATCH/p' "$W/replay.txt" | head -12 | sed 's/^/  /'
 tail -1 "$W/replay.txt" | sed 's/^/  /'
@@ -124,15 +141,23 @@ need = {"Edit(.claude/settings.json)", "Edit(tools/agent/hooks/**)", "Edit(tools
 bad = []
 if not any("tools/agent/hooks/pre_bash.py" in c for c in cmds):
     bad.append("no PreToolUse Bash hook runs tools/agent/hooks/pre_bash.py")
+if not any("tools/agent/hooks/pre_push.py" in c for c in cmds):
+    bad.append("no PreToolUse Bash hook runs tools/agent/hooks/pre_push.py (C1's push binding)")
 if need - deny:
     bad.append(f"edit-lock rules missing: {sorted(need - deny)}")
 for b in bad:
     print(f"FAIL: installation — {b}")
 if not bad:
-    print("  installation: .claude/settings.json wires pre_bash.py on Bash and keeps the three edit-lock rules")
+    print("  installation: .claude/settings.json wires pre_bash.py and pre_push.py on Bash and keeps the three edit-lock rules")
 sys.exit(1 if bad else 0)
 PY
 cat "$W/wiring.txt"
+
+# C1's push hook over its 18 cases (the installed hook, or the control's perturbed copy)
+python3 tests/lib/pre_push_cases.py "$AG/hooks/pre_push.py" > "$W/push.txt" 2>&1 || true
+sed -n '/^  BAD /p' "$W/push.txt" | head -8
+tail -1 "$W/push.txt" | sed 's/^/  push hook: /'
+grep -q -- '-> PASS$' "$W/push.txt" || { echo "FAIL: the push hook's decisions disagree with its cases"; fail=1; }
 
 # the census shares the classifier and its own selftest must hold
 python3 tools/agent/transcript_gaps.py --selftest | sed 's/^/  /'
@@ -140,6 +165,10 @@ python3 tools/agent/transcript_gaps.py --selftest | grep -q 'PASS$' || { echo "F
 
 # the controls, in-gate: each perturbed copy must produce mismatches on ITS side
 if [ -z "${VS_CTL:-}" ]; then
+    python3 tests/lib/pre_push_cases.py "$(make_copy open-push-hook)/hooks/pre_push.py" > "$W/ctl_push.txt" 2>&1 || true
+    k=$(grep -c '^  BAD .*expect deny' "$W/ctl_push.txt" || true)
+    if [ "${k:-0}" -gt 0 ]; then vs_ctl_fired open-push-hook "$k must-deny push cases let through by the perturbed copy"
+    else vs_ctl_dead open-push-hook "the always-allow copy matched every push case — the cases cannot see an open hook" || fail=1; fi
     for c in blind-classifier greedy-heredoc no-heredoc-strip; do
         replay "$(make_copy "$c")" "$W/ctl_$c.txt"
         case "$c" in blind-classifier|greedy-heredoc) side=deny;; no-heredoc-strip) side=allow;; esac
@@ -149,5 +178,5 @@ if [ -z "${VS_CTL:-}" ]; then
     done
 fi
 
-if [ "$fail" = 0 ]; then echo "PASS: C0.1 denies the 14z-174 launches and every must-deny case, allows every must-allow case, and fails open on a malformed event"
+if [ "$fail" = 0 ]; then echo "PASS: C0.1 denies the 14z-174 launches and every must-deny case, allows every must-allow case, and fails open on a malformed event; C1's push hook decides all 18 of its cases"
 else echo "FAIL: test_agent_hooks"; exit 1; fi

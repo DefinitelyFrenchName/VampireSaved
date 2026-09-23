@@ -5,7 +5,7 @@
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## THE CLOSE HAS TWO NEW STEPS, AND A BASH CALL THAT DETACHES A JOB IS STILL REFUSED
+## THE CLOSE HAS TWO NEW STEPS, A PUSH IS REFUSED WITHOUT A PROCEDURE CHECK, AND A DETACHING BASH CALL IS STILL REFUSED
 
 `.claude/settings.json` (tracked) runs `tools/agent/hooks/pre_bash.py` before every Bash
 call: `nohup`, `setsid`, `disown`, a backgrounding `&` with no later `wait`, or a loop on
@@ -28,14 +28,11 @@ The tree is still at `build/m3b_merged27` (merged-m19, released); no ROM byte mo
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`, NOT A `ps` GREP** — twenty openers in a row
    reported "nothing running" beside an 18-day orphan, because a grep for `tail -F` cannot match
    `tail -n +1 -F`; this sitting's own procedure check caught the twentieth.
-1. **WAITING ON THE MAINTAINER — C1's push hook, `build/agent172/proposal_pre_push/`**
-   (`prove.py`, 18/18; `INSTALL.md`). Put to them at the 14z-176 close; at 14z-176b they asked
-   whether it was a good bar and were given a recommendation — no install word recorded yet.
-   **Fixed before installation (14z-176b):** the first version would have refused a push of
-   the bbh harness or the jtcores fork whenever this repo held an unchecked commit; it now
-   binds only a push of THIS repository. After it lands, move `prove.py`'s cases into
-   `tests/test_agent_hooks.sh` and add `pre_push.py` to its installed-wiring check. (The
-   `agentlib` phantom-task fix was APPLIED by the maintainer at 14z-176b and verified.)
+1. **A PUSH NOW NEEDS A PROCEDURE CHECK — the hook refuses it otherwise** (installed 14z-176b).
+   Run it before the close's push: extract, `prepare --decision procedure`, two fresh readers,
+   `record`, `resolve`; the refusal names the commands. **One stale line in a locked file:**
+   `tools/agent/hooks/pre_push.py`'s docstring still says "A PROPOSAL, NOT INSTALLED" — the
+   maintainer's to correct (raised 14z-176b).
 2. **#172 — S4, the worker definitions** (scope doc §4 W, §5): named `.claude/agents/`
    definitions with model and effort capped as ruled (at most Opus-class, effort at most
    `xhigh`), a spec TEMPLATE, and C1 reading the SPEC against the RETURN; its gate is a worker
