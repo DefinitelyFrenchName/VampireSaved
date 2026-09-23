@@ -27,7 +27,7 @@ CASES = [  # (label, tool_input, expected 'deny'|'allow')
     ("(a) a fable model on general-purpose", {"subagent_type": "general-purpose", "model": "fable", "prompt": "x"}, "deny"),
     ("(a) a claude-fable id", {"subagent_type": "general-purpose", "model": "claude-fable-5-1", "prompt": "x"}, "deny"),
     ("(a) an unknown model name", {"subagent_type": "general-purpose", "model": "gpt", "prompt": "x"}, "deny"),
-    ("(a) allow: opus on general-purpose (the rule-checker readers' form)", {"subagent_type": "general-purpose", "model": "opus", "prompt": "x"}, "allow"),
+    ("(a) allow: opus on general-purpose (the rule-checker readers' form until 14z-178 pinned them)", {"subagent_type": "general-purpose", "model": "opus", "prompt": "x"}, "allow"),
     ("(a) allow: a claude-sonnet id", {"subagent_type": "general-purpose", "model": "claude-sonnet-5", "prompt": "x"}, "allow"),
     ("(b) a model on a defined worker", {"subagent_type": "measurer", "model": "sonnet", "prompt": SPEC}, "deny"),
     ("(b) allow: the defined worker with no model", {"subagent_type": "measurer", "prompt": SPEC}, "allow"),

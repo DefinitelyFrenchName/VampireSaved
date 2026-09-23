@@ -42,3 +42,4 @@ Calibration history (the ledger is the record; this file says why a fixture chan
   and OK. CALIBRATED under checklist 62514a98c3e7. Every premise a reader ever
   found true is now named in the claim; what remains is the maintainer's
   written-resolution half of the ruling.
+- 14z-178 (the PINNED READER, #172 S4 step 4): recalibrated as run 2026-09-24-121 on `.claude/agents/rule-checker.md` (rule-checker@efa6cdd64dd0: Opus 5.5, effort high, omitClaudeMd — no CLAUDE.md or memory in context, unlike every earlier run), plant CAUGHT, verdict OK -. Both readers of run 121 noted that donovan_1's rig carries no position pin — TRUE of the packet (known since v2, above), outside the LATCHED premise; the negative's reader kept Q1 OK.

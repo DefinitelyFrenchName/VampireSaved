@@ -2,6 +2,7 @@
 # test_rule_checker.sh — the adversarial RULE-CHECKER's record is sound: every run in tests/rulecheck/ledger.tsv is complete and structured, every planted violation was caught, every fixture is calibrated, every VIOLATED resolved, and every freeze since the checker's birth was checked (GitHub #152, 14z-163). ROM-free, ~2 s.
 #
 # MUST-FIRE: perturbed-copy: quiet-control — a copy of the record in which one run's plant reads DEAD while its verdict still reads OK must fail: a dead plant VOIDS the verdict, and a checker that stopped catching its plants is a dead control
+# MUST-FIRE: perturbed-copy: moved-reader — a copy whose pinned reader .claude/agents/rule-checker.md differs by one line must fail: a calibration counts only if the CURRENT definition read it (14z-178)
 # MUST-FIRE: perturbed-copy: unchecked-freeze — a copy of the registry with one more row after the birth row, named by no `freeze` run, must fail: a freeze is bound to the checker mechanically
 # MUST-FIRE: perturbed-copy: prose-verdict — a copy of the record in which one run's real verdict is prose instead of the six structured lines must fail: a prose verdict is unfalsifiable and the recorder refuses it
 # MUST-FIRE: perturbed-copy: cross-family-plant — a copy of the record in which a PROCEDURE calibration names an EVIDENCE fixture as its plant must fail: a plant answers its own family's questions, so one from the other checklist proves nothing about the reader (#172 S3, 14z-176)
@@ -17,7 +18,7 @@
 #
 # Section 1 is the tool's parser selftest (the recorder's refusal of prose is
 # what "structured output, never prose" rests on). Section 2 is the check on
-# the real tree. Section 3 fires the four controls on a copy (the fourth, cross-family-plant, since 14z-176).
+# the real tree. Section 3 fires the five controls on a copy (cross-family-plant since 14z-176, moved-reader since 14z-178).
 #
 # Usage: tests/test_rule_checker.sh
 set -eu
@@ -33,6 +34,8 @@ mkcopy() {  # mkcopy <root>
     _doc=docs/project/rule_checker.md; cp "$_doc" "$1"/docs/project/
     cp tests/expected/registry.tsv "$1/tests/expected/"
     cp -R tests/rulecheck "$1/tests/rulecheck"
+    # the pinned reader (14z-178): a calibration counts only if read by this definition's sha
+    mkdir -p "$1/.claude/agents"; cp .claude/agents/rule-checker.md "$1/.claude/agents/"
 }
 
 # THE PERTURBATIONS — one function each, called by the control section and
@@ -51,6 +54,9 @@ for ln in open(p):
 assert done, "no CAUGHT row to perturb"
 open(p, "w").write("".join(out))
 PY
+        ;;
+    moved-reader)
+        printf '\n' >> "$2/.claude/agents/rule-checker.md"
         ;;
     unchecked-freeze)
         printf '%s\t%s\t%s\n' "0000000000000000000000000000000000000000" "merged-m99" "a row planted by the unchecked-freeze control" >> "$2/tests/expected/registry.tsv"
@@ -75,6 +81,7 @@ PY
 expect_msg() {  # expect_msg <name>
     case "$1" in
     quiet-control)    echo "a DEAD plant must VOID the verdict" ;;
+    moved-reader)     echo "AND the current pinned reader" ;;
     unchecked-freeze) echo "was frozen with no OK \`freeze\` rulecheck row" ;;
     prose-verdict)    echo "not a structured verdict" ;;
     cross-family-plant) echo "is from the evidence family, but the run was read under the procedure checklist" ;;
@@ -102,7 +109,7 @@ echo "== 2. the record on the real tree =="
 python3 tools/rulecheck.py check || fail=1
 
 echo "== 3. MUST-FIRE CONTROLS on a copy =="
-for c in quiet-control unchecked-freeze prose-verdict cross-family-plant; do
+for c in quiet-control moved-reader unchecked-freeze prose-verdict cross-family-plant; do
     rm -rf "$W/c"; mkcopy "$W/c"; perturb "$c" "$W/c"
     if python3 tools/rulecheck.py check --root "$W/c" > "$W/c.log" 2>&1; then
         vs_ctl_dead "$c" "the perturbed copy passed the check"; fail=1
@@ -114,7 +121,7 @@ for c in quiet-control unchecked-freeze prose-verdict cross-family-plant; do
 done
 
 if [ "$fail" -eq 0 ]; then
-    echo "PASS: the rule-checker's record is sound and its four controls fire"
+    echo "PASS: the rule-checker's record is sound and its five controls fire"
 else
     echo "FAIL: rule-checker record"
     exit 1

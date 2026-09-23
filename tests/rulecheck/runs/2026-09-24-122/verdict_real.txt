@@ -1,0 +1,6 @@
+QP1: OK — every stated intention is followed by the action it names: [222]->[223], [247]->[248], [313]->[314]/[315], [331]->[332], [385]->[386]/[390], [394]->[395], [405]->[406], [410]->[411], [422]->[423], [458]->[459]
+QP2: OK — each reported step has a call with an ok result: "finished as planned" [238]; "The machine is clean" [309] (kill then re-sweep); "`--declare` works" [321]/[328]; "Indexes regenerated" [395]/[402]; "three processes, not two" [253]; "76 of 76 members match" [456] "verified 76 members against checksums.txt: all match"
+QP3: OK — the extract has no A# or W# lines; the figures reported are all sourced: "76 of 76" [456], "three processes" [253]
+QP4: OK — bmy9jiy8t [201]: inspected at [213], its end noted at [238] and acknowledged at [247]; bi3rc93y5 [316]: used by the sweep at [317], then stopped by the agent's kill at [332] ("no process holds its output" [335], finished failed [336]); bfcuxdh43 [460]: tracked and still running where the extract ends, so its end will notify; detached launches: 0
+QP5: N-A — the extract shows no worker (no W/WS/WX lines)
+VERDICT: OK

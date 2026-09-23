@@ -251,8 +251,8 @@ test_tickets
 test_commit_subject
 # test_rule_checker — the adversarial rule-checker's record (14z-163, GitHub #152):
 # every run's plant caught, every fixture calibrated, every VIOLATED resolved, every
-# freeze since the birth checked, every plant from its own family (evidence | procedure).
-# tools/rulecheck.py; four controls. ~2 s.
+# freeze since the birth checked, every plant from its own family (evidence | procedure), every
+# calibration read by the current pinned reader (14z-178). tools/rulecheck.py; five controls. ~2 s.
 test_rule_checker
 test_rompath_reject
 # 14z-170: the `unless_composed` manifest row key (the S1 scope of the class-0x52 fix) —
@@ -272,7 +272,8 @@ test_agent_sweep
 # and flagged, reasoning excluded, detached/open/real launches; two controls. ~1 s.
 test_agent_extract
 # #172 slice S4 step 1 (14z-177): every worker definition under .claude/agents/ states its caps —
-# model at most Opus-class, effort at most xhigh, an allowed tool list, no unapproved key; five controls. ~1 s.
+# model at most Opus-class, effort at most xhigh, an allowed tool list, no unapproved key; the rule-checker
+# carries omitClaudeMd: true (14z-178); six controls. ~1 s.
 test_agent_defs
 # #172 slice S4 step 2 (14z-177): a frozen real measurer run (tests/agent/worker_fixture/, CUT — no e-mail)
 # returns figures each traceable to a spec command it ran, re-derived here; conformance; three controls. ~1 s.

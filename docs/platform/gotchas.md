@@ -2831,7 +2831,11 @@ assistant record, which is what makes these checkable:
   `tools` but NOT its `effort`: the settings' default applied where the definition said `low`,
   and only an explicit `--effort` pinned it (A12) — the opposite of the subagent route (A3);
   and a session loads its agent list at START, so a definition written mid-session cannot be
-  spawned until the next session;
+  spawned until the next session *(— CORRECTED 14z-178: on 2.1.281 a definition written
+  mid-session WAS announced by the harness ("New agent types are now available") at a later turn
+  and then spawned at its caps; the 14z-177 observation, `Agent type 'measurer' not found`, was
+  real for that moment — when the list reloads is not measured, so check for the announcement
+  or spawn it, never assume either way)*;
 - a PROJECT `PreToolUse` hook DOES fire for a worker's own tool calls, and its input names
   the worker (`agent_type`, `agent_id`); the orchestrator's own calls carry neither. So a
   rule scoped to one worker is a project hook that reads `agent_type`, and every project
@@ -2850,7 +2854,7 @@ transcript read (14z-176's), to reach the orchestrator as an `<agent-message fro
 saying it is not repeated there — not measured by any leg *(— 14z-178: a background leg now exists, and it found a THIRD form; the entry below)*. The worker's own commands exist only in its transcript, linked
 to the spawning call by `meta.json`'s `toolUseId`.
 
-## A SUBAGENT IS HANDED THE PROJECT'S CLAUDE.md — AND, INTERACTIVELY, THE AUTO-MEMORY INDEX, WHICH THE DOCS SAY IT IS NOT; `omitClaudeMd: true` REMOVES CLAUDE.md (measured 2026-09-24, 14z-178, Claude Code 2.1.281)
+## A SUBAGENT IS HANDED THE PROJECT'S CLAUDE.md — AND, INTERACTIVELY, THE AUTO-MEMORY INDEX, WHICH THE DOCS SAY IT IS NOT; `omitClaudeMd: true` REMOVES BOTH (measured 2026-09-24, 14z-178, Claude Code 2.1.281)
 
 A context-free worker is not context-free by default. Measured with a RANDOM codeword in a
 scratch project's CLAUDE.md, asked for with no tool (`tools/agent/probe_agents.sh` A13): the
@@ -2872,8 +2876,12 @@ and whether that version sent none or recorded none is not known. **Read the att
 `files` list; a text match over the record's JSON missed every one** (the rendered
 `Contents of … (project instructions` string lives elsewhere in the line).
 
-Whether `omitClaudeMd: true` also removes the MEMORY index is NOT measured — only an interactive
-session STARTED after such a definition exists can spawn it.
+**`omitClaudeMd: true` removes the MEMORY index too** (14z-178, interactive, this project): the
+pinned `rule-checker` definition, spawned in the same session in which a `general-purpose`
+worker had quoted `MEMORY.md`, ran with NO `instructions` attachment at all and answered NONE to
+both questions (is there a memory index; is there a CLAUDE.md) with no tool call — on
+`claude-opus-5-5` at effort `high`, its definition's caps (`transcript_gaps.py --subagents`). It
+was spawnable in the session that wrote it: the harness announced it mid-session.
 
 **And the report's THIRD form:** on 2.1.281 a headless run launches every Agent call in the
 BACKGROUND (`meta.json` `requestShape: background`; the call returns "Async agent launched"),

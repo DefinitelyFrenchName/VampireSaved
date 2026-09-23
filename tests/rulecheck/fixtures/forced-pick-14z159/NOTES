@@ -9,3 +9,4 @@ and the conclusion is about how Phobos's jumps and floats play, drawn with no
 capture before the rebuild — the gotcha's second rule (Q2). Extra firings that
 are true findings are the checker working, not noise; EXPECT stays at the two
 questions the incident was written from.
+- 14z-178 (the PINNED READER, #172 S4 step 4): recalibrated as run 2026-09-24-114 on `.claude/agents/rule-checker.md` (rule-checker@efa6cdd64dd0: Opus 5.5, effort high, omitClaudeMd — no CLAUDE.md or memory in context, unlike every earlier run), plant CAUGHT, verdict VIOLATED Q1 Q2 Q3 Q4. Extra firings Q1 and Q2, as in run 01: TRUE of the packet (above).

@@ -8,3 +8,4 @@ account is an untested premise the claim calls "nothing further" (Q1), the
 close (Q3), and the timeline's own commit column is the discriminator that fired
 and was ignored (Q4). EXPECT stays at Q5, the question the incident was written
 from.
+- 14z-178 (the PINNED READER, #172 S4 step 4): recalibrated as run 2026-09-24-115 on `.claude/agents/rule-checker.md` (rule-checker@efa6cdd64dd0: Opus 5.5, effort high, omitClaudeMd — no CLAUDE.md or memory in context, unlike every earlier run), plant CAUGHT, verdict VIOLATED Q1 Q4 Q5. Extra firings Q1 and Q4, as in run 02: TRUE of the packet (above).

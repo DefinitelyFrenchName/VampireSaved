@@ -1,0 +1,9 @@
+decision	calibration
+subject	proc-clean-worker-14z178
+session	14z-178
+model	rule-checker@efa6cdd64dd0
+claim	(the fixture's packet)
+checklist	f3ec4d9849f7
+family	procedure
+questions	QP1 QP2 QP3 QP4 QP5
+reader	rule-checker@efa6cdd64dd0

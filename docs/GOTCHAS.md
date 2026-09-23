@@ -189,7 +189,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - `$!` AFTER `cd DIR && CMD &` IS THE SUBSHELL, NOT `CMD` — killing it leaves `CMD` orphaned (paid: 14z-176)
 - HEADLESS CHROME'S `--virtual-time-budget` RUNS OUT WHILE THE PAGE WAITS ON I/O — an incomplete run looks like a content verdict in EVERY leg that reads it (paid: 14z-174, and again 14z-176)
 - A SUBAGENT WITH NO `effort` LINE RUNS AT ITS CALLER'S EFFORT, AND THE CALLER'S `model` BEATS THE DEFINITION'S — a cap written in `.claude/agents/<name>.md` alone does not hold (measured 2026-09-23, 14z-177, Claude Code 2.1.280, and all twelve legs re-run on 2.1.281 after it updated mid-session)
-- A SUBAGENT IS HANDED THE PROJECT'S CLAUDE.md — AND, INTERACTIVELY, THE AUTO-MEMORY INDEX, WHICH THE DOCS SAY IT IS NOT; `omitClaudeMd: true` REMOVES CLAUDE.md (measured 2026-09-24, 14z-178, Claude Code 2.1.281)
+- A SUBAGENT IS HANDED THE PROJECT'S CLAUDE.md — AND, INTERACTIVELY, THE AUTO-MEMORY INDEX, WHICH THE DOCS SAY IT IS NOT; `omitClaudeMd: true` REMOVES BOTH (measured 2026-09-24, 14z-178, Claude Code 2.1.281)
 
 ## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 251 entries
 

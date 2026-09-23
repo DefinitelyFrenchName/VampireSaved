@@ -1,0 +1,9 @@
+decision	calibration
+subject	forced-pick-14z159
+session	14z-178
+model	rule-checker@efa6cdd64dd0
+claim	(the fixture's packet)
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@efa6cdd64dd0
