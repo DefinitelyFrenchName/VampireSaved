@@ -14,6 +14,11 @@
 # EXPECTS: every mapped field agreeing at the anchor and offsets with the frozen skew of
 #   463; SIM_CORE=cps2 re-runs the reference leg. The second re-freeze moved nothing after
 #   the four-buttons-held fidelity defect was fixed, which was itself the result.
+# FOLLOWS: docs/platform/mister.md emu/jtcores-patches/ emu/jtcores/ emu/mame-patches/
+#   tests/fields_m2a.tsv tests/lua/replay.lua tests/replays/05_timeout_idle.rpl tests/rtl/
+#   tools/check_wram_dumps.py tools/compare_fields.py tools/mister_mra.sh
+#   tools/rpl2siminputs.py tools/run_mame.sh tools/run_replay_mame.sh
+#   tools/run_sim_jtcps2.sh tools/setup_jtcores.sh tools/setup_mame.sh
 #
 # SINCE SLICE D1 THE CORE UNDER TEST IS `cps2w`, NOT `cps2`, AND THAT IS THE
 # POINT (14z-107 (6)). cores/cps2w now carries RTL, and the profile it adds is

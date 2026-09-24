@@ -10,6 +10,8 @@
 #   each).
 # EXPECTS: no exception on any recording without a DEFECT file, the declared crash exact on
 #   any with one, OPEN ones listed loudly.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/inp/ tests/lua/inp_guard.lua
+#   tools/run_inp_guarded.sh tools/setup_mame.sh
 #
 # WHY THIS EXISTS (the learning, paid for in 14z-109..111). WIDE_RECORD
 # (tools/run_wide.sh) had existed since 14z-9x and HANDOFF called a recorded

@@ -66,6 +66,9 @@ test_demand_after_trap
 test_must_fire_census
 test_module_refs
 test_gate_descriptions
+test_gate_follows
+test_lane_carry
+test_emulator_staleness
 test_gate_coverage_current
 test_hex_lengths
 test_masked_compare

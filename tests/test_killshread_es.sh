@@ -16,6 +16,8 @@
 #   `stock` COLUMN READS THE RIG'S OWN POKE BACK (the generator tops the stock up before
 #   every event), never the engine's meter — recorded in the header and PROVENANCE; the
 #   ES/normal distinction here rests on the wave counts (#171 shape 4).
+# FOLLOWS: emu/mame-patches/ tests/expected/killshread_es.txt tests/lua/field_trace.lua
+#   tests/replays/ tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
 #
 # Rig: tools/name_moves.py donovan part 12 (tests/replays/naming/donovan_12.*):
 # Donovan (forced 0x13) on P1 pinned at x=552, DEMITRI idle on P2 at x=728 (in

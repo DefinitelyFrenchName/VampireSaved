@@ -12,6 +12,10 @@
 #   walker entry, A0 read at the satellite's first tick.
 # EXPECTS: A0 the healthy value on the merged build; a FAIL is a regression of the
 #   renumbering (pair any change with donovan/12_vs_cpu staying guard-clean).
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/audit_merged_legacy.sh
+#   tests/lua/replay_guard.lua tests/replays/hui/70_hui_mash.rpl
+#   tests/test_type_stamp_census.sh tools/run_mame.sh tools/run_replay_guarded.sh
+#   tools/setup_mame.sh
 #
 # THE MEASURED DEFECT (14z-81, deterministic, 3/3 MAME runs): on a 3-tenant
 # merged build, Huitzil's satellite (object $FFB800 at char-init, MAME frame

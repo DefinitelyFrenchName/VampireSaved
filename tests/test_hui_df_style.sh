@@ -14,6 +14,9 @@
 # EXPECTS: with DF_STYLE_EXPECT=differs (the default since the palette fix was withdrawn)
 #   ours differs from native as recorded; the three controls fail. Do not re-fix by
 #   restoring the withdrawn palette-seq row — it was Bulleta's block.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/obj_records_dump.lua
+#   tests/lua/replay.lua tests/replays/hui/85_hui_df_vs2.rpl tools/check_df_style.py
+#   tools/run_mame.sh tools/run_replay_mame.sh tools/setup_mame.sh
 #
 # WHY IT EXISTS. The playtest item is "in Dark Force H gets afterimages
 # and a purple recolour; native applies neither". Two sessions chased it

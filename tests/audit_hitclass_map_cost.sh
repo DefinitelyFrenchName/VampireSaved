@@ -12,6 +12,11 @@
 # EXPECTS: the fix leg ends clean and the twin crashes; every legacy replay identical
 #   between the builds; the fire censuses give the denominators. A twin that does not crash
 #   means the rig stopped reaching the map, and the gate refuses a verdict.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lua/replay.lua
+#   tests/lua/replay_guard.lua tests/lua/type_write_census.lua tests/replays/
+#   tools/analyze_divergence.py tools/build_donovan.sh tools/classify_hitclass_probe.py
+#   tools/classify_pool_spawns.py tools/run_mame.sh tools/run_replay_guarded.sh
+#   tools/run_replay_mame.sh tools/setup_mame.sh
 #
 # THE CONSEQUENCE IS PER-INDEX, and this decides what can be a control
 # (measured 14z-129, vsavj OPCODE view at PRG:0x1A88E — the map lives in the

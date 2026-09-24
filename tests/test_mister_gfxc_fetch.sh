@@ -18,6 +18,10 @@
 #   on the measured-green replay operands (the default replay cannot reach a match).
 # EXPECTS: p0/p1 non-zero and in-extent on the positive leg, zero on the control, p2/p3 busy
 #   on both; the control is the profile bit, not another build.
+# FOLLOWS: build/manifest/ docs/platform/mister.md emu/jtcores-patches/ emu/jtcores/
+#   tests/replays/11_pick_donovan.rpl tests/replays/36_pick_tenant_cell.rpl tests/rtl/
+#   tools/check_wram_dumps.py tools/mister_mra.sh tools/rpl2siminputs.py
+#   tools/run_sim_jtcps2.sh tools/setup_jtcores.sh
 #
 # WHAT IT PROVES, AND WHY IT IS NOT A PICTURE. Slices D0-D2 built the MRA, the
 # runtime profile gate and the SDRAM placement, and every one of them was

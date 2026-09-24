@@ -12,6 +12,8 @@
 # EXPECTS: leg 1 (Phobos) has at least one row byte-equal to a gold-block row; leg 2
 #   (Bulleta) has zero. A red on leg 1 is a dead upload, on leg 2 a leak into a vanilla
 #   character's DF.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua
+#   tests/replays/hui/85_hui_df_vs2.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # The palette path is RAM-gate-blind (the standing 14z-79 lesson), so
 # this guard reads the LIVE CPS palette RAM during a controlled DF

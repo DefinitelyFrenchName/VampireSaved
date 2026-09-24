@@ -13,6 +13,9 @@
 # EXPECTS: no 0x38 write anywhere, the positive controls present, the frozen W/R rows equal
 #   per leg; the planted 0x38 is reported and the silent window reads DEAD. Not sampled:
 #   every path the corpus does not run.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/reaction_class_live.tsv
+#   tests/lua/read_tap.lua tests/replays/ tools/name_moves.py tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: planted-38 — a run of 02_demitri_vs_cpu on pristine vsavj with a Lua poke of 0x38 into P1's +0x54 at frame 3000 must be reported as a 0x38 write and FAIL the no-0x38 check, so the check reads what the tap logged (in-gate: that one run must report the value; mode: every vsavj run carries the poke and the gate FAILs)
 # MUST-FIRE: perturbed-copy: range-silent — a copy of a tap log with every access to P2's +0x54 window deleted must be reported as a DEAD range, so each run's two windows are each proven live to the end before their silence is trusted (in-gate: the first run's copy must read P2 dead; mode: every run's log is perturbed before the liveness check and the gate FAILs)

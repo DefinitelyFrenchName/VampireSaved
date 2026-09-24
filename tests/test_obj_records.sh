@@ -10,6 +10,10 @@
 #   dump and give an impossible page offset.
 # EXPECTS: 1153/1153 lines identical; the flipped bit makes the walkers disagree, the
 #   impossible page is REFUSED. If they ever diverge the Lua is the authority.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh
+#   tests/lua/obj_records_dump.lua tests/lua/replay.lua
+#   tests/replays/36_pick_tenant_cell.rpl tools/oram_obj_records.py tools/run_mame.sh
+#   tools/run_replay_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: flipped-tile-code — a one-bit change in a tile code must change the records, so the python walker on a flipped dump must disagree with the lua walker (mode: a byte of the REAL dump is flipped before the section-1 walk and the walkers disagree, so the gate FAILs)
 # MUST-FIRE: known-bad: wrong-page-geometry — an impossible page offset must be REFUSED, not silently walked (mode: the section-1 walk is given an out-of-range --first-page so it produces no records and section 1 disagrees, so the gate FAILs)

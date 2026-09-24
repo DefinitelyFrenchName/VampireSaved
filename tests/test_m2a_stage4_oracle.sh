@@ -12,6 +12,9 @@
 #   window.
 # EXPECTS: the four locks; frame-exact combat comparison across the two engines is
 #   impossible by construction, so the bound and the HP sequence are what is asserted.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/fields_m2a.tsv tests/lua/replay.lua
+#   tests/replays/ tools/build_donovan.sh tools/compare_fields.py tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # Replay pair tests/replays/17_don_oracle_{vsav2,vsavj}.rpl: both games
 # run IDENTICAL inputs (sibling engines traverse identical menu timelines

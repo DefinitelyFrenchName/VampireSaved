@@ -11,6 +11,9 @@
 #   tables' slot-0x0F entries pointed at a planted ILLEGAL and at an odd address.
 # EXPECTS: CLEAN on the negatives, CRASH vec4 and vec3 on the positives; a guard that misses
 #   either plant is not trusted.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/vsavj/02_demitri_vs_cpu.sha1
+#   tests/lua/replay_guard.lua tests/replays/02_demitri_vs_cpu.rpl tools/pack_build.sh
+#   tools/patch_prg.py tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
 #   1a. Negative control, cheap mode (no -debug): clean AND checksum log
 #       matches the frozen vanilla expectation (guard instrumentation itself

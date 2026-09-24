@@ -12,6 +12,9 @@
 #   lines present.
 # EXPECTS: the lines present and the burst present; the forced-defect mode fails.
 #   EXPECT_LINES=0 freezes the pre-fix signature (zero 16x1 entries) on an old build.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh
+#   tests/lua/obj_records_dump.lua tests/replays/df/100_df_clone_beams.rpl tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: expect-lines-flip — with the beam lines actually present, asserting the DEFECT signature (EXPECT_LINES=0) must fail (mode: EXPECT_LINES is forced to 0 so "line entries present but EXPECT_LINES=0" fires and the gate FAILs)
 #

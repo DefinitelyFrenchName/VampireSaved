@@ -10,6 +10,8 @@
 #   replay on the previous merged build with no thunk and must see no tenant.
 # EXPECTS: the set of ids seen equals exactly the 15 vanilla ids plus the build's tenants
 #   and the cursor reaches every index; the no-thunk control draws no tenant.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/replay.lua
+#   tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: no-tenant-drawn — the previous merged build (no thunk) draws NO tenant, so running the tenant-inclusion assertion against it must fail (mode: the build under test is set to the no-thunk control build; REFUSES with exit 3 if that build is absent)
 #

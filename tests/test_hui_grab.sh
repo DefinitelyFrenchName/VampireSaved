@@ -10,6 +10,9 @@
 #   native A/B of record.
 # EXPECTS: the thunk present and the grab connecting with the native damage; a red is the
 #   move-start dying on the pcrel escapes or the arc tables gone.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua
+#   tests/replays/hui/80_hui_grab_2p.rpl tools/build_donovan.sh tools/run_mame.sh
+#   tools/run_replay_guarded.sh tools/setup_mame.sh
 #
 # Root (measured): recognition was ALWAYS live (probe-proven); the
 # move-start died on x026142's oracle-invisible pcrel escapes — fixed

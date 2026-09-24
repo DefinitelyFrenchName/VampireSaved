@@ -12,6 +12,8 @@
 # EXPECTS: morph to 0x13 with record 0x003FA9D0 in section 1; nothing armed or morphed in
 #   section 2. Only the first morph is deterministic — the arcade draw is a lottery past
 #   ~8500.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/replay.lua
+#   tests/replays/113_shadow_vs_tenant.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: four-presses-morph — FOUR START presses must NOT arm the copy, so demanding that the four-press leg morphed must fail (mode: the four-press control leg is asserted to have morphed to the tenant, which it never does, so the gate FAILs)
 #

@@ -11,6 +11,10 @@
 # EXPECTS: stock unchanged, the shape right, END clean, the zeroed run diverging (at frame
 #   3121 on the first measurement); a relocation that passes without its control proves
 #   nothing.
+# FOLLOWS: build/manifest/ emu/fbneo-patches/ emu/fbneo/ emu/mame-patches/
+#   tests/expected/registry.tsv tests/lua/replay.lua tests/replays/12_donovan_vs_cpu.rpl
+#   tests/replays/judge/02_throw.rpl tools/build_donovan.sh tools/build_wide_romset.py
+#   tools/run_mame.sh tools/run_replay_fbneo.sh tools/setup_fbneo.sh tools/setup_mame.sh
 #
 # The dual-track decision (14z-59g) says WIDE is the roster build while the
 # stock build stays byte-identical. This gate holds both halves at once:

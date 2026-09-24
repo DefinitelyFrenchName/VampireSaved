@@ -14,6 +14,9 @@
 #   new match within 1600 frames, the post-continue match P1 = Donovan vs CPU Phobos. A red
 #   names which lock (crash, judge, switch, pairing) failed; the poke window moves at
 #   freezes that touch timing and is re-measured then.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua
+#   tests/replays/26_don_arcade_mash.rpl tools/run_mame.sh tools/run_replay_guarded.sh
+#   tools/setup_mame.sh
 #
 # THE SCENARIO (#99, maintainer field report on merged-m2): a crash-reset at
 # fight start of the 5th arcade match, Donovan vs CPU-Phobos, reached by

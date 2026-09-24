@@ -9,6 +9,8 @@
 #   instruction 0x0011E6) and every written value inside $FF0200-$FF04FF. A second writer or
 #   an out-of-range value means the atlas row and the flicker ratification must be
 #   re-derived.
+# FOLLOWS: emu/fbneo-patches/ emu/fbneo/ tests/replays/04_select_fuzz.rpl
+#   tools/run_replay_fbneo.sh tools/setup_fbneo.sh
 #
 # ON-DEMAND (1 FBNeo run, ~1 min). The measurement behind the 14z-82 atlas
 # row: $FF0460 is the SOUND DRIVER's current-record pointer spill, written

@@ -11,6 +11,8 @@
 #   forces a vanilla hit count non-zero.
 # EXPECTS: vanilla entries silent and relocated entries firing on the build; vanilla entries
 #   firing on the reference build. Zero everywhere is a dead breakpoint, not a pass.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/walker_sp.lua
+#   tests/replays/ tools/audit_walker_callers.py tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: vanilla-walker-reached — after the relocation no caller reaches a vanilla walker, so a nonzero hit on one must fail section 1 (mode: a vanilla-walker hit count is forced nonzero so the "still reached" FAIL fires and the gate FAILs)
 #

@@ -13,6 +13,10 @@
 # EXPECTS: decode as documented in select_screen.md, every pair measured as predicted, the
 #   controls failing, 16 cell positions measured. WHEEL_STATIC_ONLY=1 skips the emulator
 #   sections.
+# FOLLOWS: docs/checksums.txt emu/mame-patches/ tests/lib/decrypt_cache.sh
+#   tests/lua/replay.lua tests/lua/tap_writes.lua tools/audit_roms.py
+#   tools/check_wheel_walk.py tools/run_mame.sh tools/select_wheel.py tools/setup_mame.sh
+#   tools/wheel_layout.py tools/wheel_positions.py
 #
 # WHY THIS EXISTS. The roster plan (option 1: append three cells) rests
 # entirely on how the select cursor moves and what it commits. That

@@ -15,6 +15,8 @@
 #   block empty pre-match; the self-diff control comes out empty against a non-empty
 #   expectation and fails, the short cursor path confirms another character and fails
 #   identity.
+# FOLLOWS: emu/mame-patches/ tests/expected/forced_pick_fidelity.tsv tests/lua/replay.lua
+#   tests/replays/ tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: same-leg — the poked leg diffed against ITSELF yields no latched offset, and that empty set must fail the frozen non-empty expectation (in-gate: the first row's poked leg is diffed against itself and must come out empty where the frozen set is not; mode: every row is diffed leg-against-itself and the comparison FAILs)
 # MUST-FIRE: known-bad: wrong-cursor — a real-cursor leg whose path is one move short confirms ANOTHER character, and the gate's identity assertion on the real leg must FAIL (in-gate: one extra leg with the last cursor move dropped; mode: every real leg runs one move short and the identity assertions FAIL)

@@ -133,6 +133,9 @@ STATIC="$(read_reg tests/ci_static.txt)"
 CAD_FILE=tests/ci_cadence.tsv
 cad_rank() { case "$1" in session) echo 0 ;; freeze) echo 1 ;; release) echo 2 ;; *) echo 9 ;; esac; }
 [ "$(cad_rank "$CADENCE")" != 9 ] || { echo "bad --cadence '$CADENCE'" >&2; exit 2; }
+# The gates that judge BY cadence read it from here (tests/test_emulator_staleness.sh:
+# a stale emulator gate is a NOTE at session, a FAIL at freeze/release — ruled 2026-09-24).
+VS_CADENCE="$CADENCE"; export VS_CADENCE
 cad_of() {  # cad_of <gate> -> cadence name (session when unlisted)
     [ -f "$CAD_FILE" ] || { echo session; return; }
     awk -F'\t' -v g="$1" '!/^#/ && $1 == g {print $2; f = 1} END {if (!f) print "session"}' "$CAD_FILE"

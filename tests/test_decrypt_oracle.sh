@@ -8,6 +8,7 @@
 #   byte for byte.
 # EXPECTS: byte-identical; a difference is a defect in one implementation's reading of the
 #   CPS-2 encryption.
+# FOLLOWS: tests/lua/dump_opcodes.lua tools/cps2_decrypt.py
 #
 # Usage: ROMDIR=/path/to/roms tests/test_decrypt_oracle.sh [set]   (default vsavj)
 # PASS = our decrypted image is byte-identical to MAME's opcode space.

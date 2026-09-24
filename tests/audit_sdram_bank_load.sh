@@ -12,6 +12,10 @@
 # EXPECTS: a measurement with a peak table, not a frozen verdict — read the peak table, not
 #   only the phase averages; the stock leg bounds the repack's headroom and does not prove
 #   the design.
+# FOLLOWS: build/manifest/ docs/platform/gotchas.md docs/platform/mister.md
+#   emu/jtcores-patches/ emu/jtcores/ tests/replays/05_timeout_idle.rpl tests/rtl/
+#   tools/check_wram_dumps.py tools/mister_mra.sh tools/rpl2siminputs.py
+#   tools/run_sim_jtcps2.sh tools/setup_jtcores.sh
 #
 # WHY IT EXISTS. The MiSTer memory-map ruling (maintainer, 2026-08-23) is the
 # BANK REPACK at our v1.7.3 pin: vanilla's 32 MB of GFX stays in SDRAM banks

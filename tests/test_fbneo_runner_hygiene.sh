@@ -9,6 +9,8 @@
 #   checks they are gone (~5 s, no ROMs used).
 # EXPECTS: no surviving stale artifact; the exit code is not the discriminator here, the
 #   artifact is.
+# FOLLOWS: emu/fbneo-patches/ emu/fbneo/ tests/replays/01_attract_long.rpl
+#   tools/run_replay_fbneo.sh tools/setup_fbneo.sh
 #
 # WHY. tools/run_replay_fbneo.sh decides success by an ARTIFACT check —
 # `grep -q "^END " "$OUT"` — and did not clear $OUT first. Paired with the C++

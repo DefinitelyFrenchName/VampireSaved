@@ -83,6 +83,7 @@ declares	test_down_flash_mechanism
 declares	test_dualtrack
 declares	test_effect_placeholders
 declares	test_emulator_runner
+declares	test_emulator_staleness
 declares	test_escape_triage
 declares	test_expectation_provenance
 declares	test_fbneo_boot_log
@@ -90,12 +91,14 @@ declares	test_freeze_artifacts_current
 declares	test_freeze_tag_coverage
 declares	test_gate_coverage_current
 declares	test_gate_descriptions
+declares	test_gate_follows
 declares	test_gate_index_current
 declares	test_gotchas_index_current
 declares	test_header_defaults
 declares	test_host_libs
 declares	test_jtcores_twin
 declares	test_jtsim_scratch_heal
+declares	test_lane_carry
 declares	test_latch_readers
 declares	test_mame_bin_pinned
 declares	test_md_subset

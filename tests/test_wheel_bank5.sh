@@ -11,6 +11,10 @@
 #   and both source zips against the built image; negative controls corrupt a tile byte and
 #   strip the code op; runtime on WIDE MAME with replay 36.
 # EXPECTS: static equal, both controls failing, the engine's bank-5 walk observed.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/decrypt_cache.sh
+#   tests/lib/tenant_build.sh tests/lua/obj_record_bank_trace.lua tests/lua/replay.lua
+#   tests/replays/ tools/build_donovan.sh tools/check_wheel_bank5.py tools/gfx_tiles.py
+#   tools/run_mame.sh tools/setup_mame.sh
 #
 # MECHANISM (measured 14z-63; docs/game/atlas/select_screen.md). The wheel is
 # ONE record drawn by ONE object ($FFB800) whose select-screen anim chain

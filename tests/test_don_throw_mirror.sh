@@ -11,6 +11,9 @@
 #   old one (206/0 on the candidate, 0/206 pre-fix).
 # EXPECTS: the word present and the walker reading only the fixed block. SKIPs on variant-id
 #   builds, where the mirror is tenant-vs-tenant at 0x13 and correct by construction.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/trace_writes.lua
+#   tests/replays/65_don_mirror_throw.rpl tools/build_donovan.sh tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # MECHANISM. The throw victim-keyframe blob (data_port
 # throw_victim_keyframes, dst 0x0B19F8) carries a victim-id offset table;

@@ -14,6 +14,8 @@
 # EXPECTS: with EXPECT_WHITE=0 (since the fix) every leg reads COLOURED; C must always be
 #   coloured or the reading is wrong. A DEAD leg (neither white nor coloured) is refused;
 #   leg E carries its own liveness (Demitri's base, P2 KO'd).
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/replays/
+#   tools/run_mame.sh tools/setup_mame.sh
 #
 # THE SURFACE (named from the maintainer's captures, reproduced
 # deterministically): the victory screen — winner portrait + win quote —

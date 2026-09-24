@@ -9,6 +9,9 @@
 # EXPECTS: a mine spawned and ring activity continuing to the end; a crashing trap dies
 #   before any further ring activity. Sound parity is audit_trap_parity's question, not this
 #   gate's.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/ring_tap.lua
+#   tests/lua/type_write_census.lua tests/replays/hui/87_hui_plasma_trap.rpl
+#   tools/run_mame.sh tools/setup_mame.sh
 #
 # WHY. Air 214+MK's detonation crashed the machine on every Phobos build
 # before the 14z-79 (b') fix. This audit locks that fix: the 87 timer

@@ -13,6 +13,8 @@
 #   inventories per leg.
 # EXPECTS: ours equals its frozen inventory, native its own, 0x739/0x73A absent on ours,
 #   0x49A present on both. The 0x10A/0x10B pair is a recorded cosmetic delta, not gated.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/ring_tap.lua
+#   tests/replays/hui/87_hui_plasma_trap.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # THE MEASURED MECHANISM THIS FREEZES (14z-85g, both halves):
 # native vs2 fires per trap attempt: id 0x0739 at the mine SPAWN

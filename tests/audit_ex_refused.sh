@@ -12,6 +12,9 @@
 # EXPECTS: no leg of ours enters the mode, vs2's stock-3 legs enter, our stocked paths equal
 #   vs2's refused paths (Pyron's the ES move); the stock-kept control fails. Which move a
 #   path IS is for the captures, not frozen here.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ex_refused.tsv
+#   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tests/replays/df/97_df_mech.rpl
+#   tools/run_mame.sh tools/select_paths.py tools/select_wheel.py tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: stock-kept — the refused legs run with their stock left at 3 (the refusal removed) must be reported as ENTERING the mode and FAIL, so "never enters" is read from the mode field, not assumed from the poke (in-gate: vs2's three stock-3 legs, already run, must read entered on the same check — ours' no longer enter, which is the fix; mode: every refused leg runs with stock 3, vs2's enter, and the gate FAILs)
 #

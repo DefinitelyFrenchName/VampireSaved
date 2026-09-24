@@ -10,6 +10,13 @@
 #   legacy suite, the attract and pick divergence frames, the crash guard.
 # EXPECTS: every gate as listed; any failure is allocator/copy/repoint/encrypt tooling,
 #   nothing else.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/fields_m2a.tsv
+#   tests/lib/m2a_common.sh tests/lib/masked_compare.sh tests/lua/replay.lua
+#   tests/lua/replay_guard.lua tests/replays/ tools/build_donovan.sh
+#   tools/build_fingerprint.py tools/check_diverge.py tools/compare_composite.py
+#   tools/compare_fields.py tools/compare_flicker.py tools/compare_window.py
+#   tools/freeze_masked_basis.sh tools/propose_masked_specs.sh tools/run_mame.sh
+#   tools/run_replay_guarded.sh tools/run_replay_mame.sh tools/setup_mame.sh
 #
 # Stage 1 copies Jedah's OWN player-path hitbox block into free hole A
 # (data raw inside the encrypted zone) and repoints the +0x60/+0x64 pair

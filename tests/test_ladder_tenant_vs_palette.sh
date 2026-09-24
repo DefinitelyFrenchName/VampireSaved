@@ -14,6 +14,10 @@
 # EXPECTS: one probe hit per 1P leg with the right addresses, zero on the 2P leg, the row
 #   equal to pool | 0xF000, only the tag box changing under the red poke, 0 px differing on
 #   the VS screen. The cosmetic roulette tag (base name and colours) is recorded, not fixed.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ladder_tenant_vs_palette.txt
+#   tests/lua/replay_guard.lua tests/replays/109_2p_don_vs_phobos.rpl
+#   tests/replays/111_don_arcade_vs_screen.rpl tools/run_mame.sh tools/run_replay_guarded.sh
+#   tools/setup_mame.sh
 #
 # WHY. Since M2b engine_internals carried "0x90C140 writers (vsavj 0xB0AC
 # attract path, table 0x3A3CA0 keyed by $114(a5)) not yet repointed — if the

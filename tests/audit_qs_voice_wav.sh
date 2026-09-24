@@ -10,6 +10,9 @@
 #   ours capture.
 # EXPECTS: no window flagged suspect; the truncated copy is flagged. Keep beside
 #   audit_qs_voice_batch: equal data can still play differently.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/qs_sweep.lua
+#   tests/replays/06_test_mode.rpl tools/build_qs_songs.py tools/check_qs_voice_wav.py
+#   tools/qs_ledger.py tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: truncated-window — a truncated sounding window in the OURS capture must be flagged by the spectral A/B (mode: the real ours capture is truncated and the A/B against native must fail)
 #

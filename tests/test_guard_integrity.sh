@@ -10,6 +10,9 @@
 #   passing MASK_RANGES (~2 min).
 # EXPECTS: the violation caught at its frame, the unsupported variable refused, the clean
 #   run clean. Not portable.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua
+#   tests/replays/11_pick_donovan.rpl tools/run_mame.sh tools/run_replay_guarded.sh
+#   tools/setup_mame.sh
 #
 # WHY. replay_guard.lua's header advertised "same env contract ... can
 # substitute for replay.lua in any gate". Two things made that false:

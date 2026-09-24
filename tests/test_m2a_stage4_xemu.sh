@@ -11,6 +11,11 @@
 #   tools/compare_fields.py over the compared offsets.
 # EXPECTS: agreement at the anchor and follow offsets; the FBNeo run completing is the
 #   cross-emulator crash-freedom.
+# FOLLOWS: build/manifest/ emu/fbneo-patches/ emu/fbneo/ emu/mame-patches/
+#   tests/fields_m2a.tsv tests/lua/replay.lua tests/replays/17_don_oracle_vsavj.rpl
+#   tools/build_donovan.sh tools/compare_fields.py tools/run_mame.sh
+#   tools/run_replay_fbneo.sh tools/run_replay_mame.sh tools/setup_fbneo.sh
+#   tools/setup_mame.sh
 #
 # Follow offsets stay BEFORE the in-match battery (absolute frame 2600,
 # anchor ~2363): the two emulators reach the anchor a few frames apart, so

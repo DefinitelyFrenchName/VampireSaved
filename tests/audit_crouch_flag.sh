@@ -10,6 +10,9 @@
 #   deletes the Down from the replay and the flag must then never rise.
 # EXPECTS: the frozen transitions on both legs, P2's flag held 0, the stripped run flat. NOT
 #   covered: +0x121 in the air, while blocking, or on P2.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/crouch_flag.tsv
+#   tests/lua/field_trace.lua tests/replays/ tools/name_moves.py tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: down-removed — the same rig with P1's Down (2840-2870) deleted from the replay must never raise +0x121, so the transition rows are proven to follow the input and not a timer (in-gate: the stripped run's +0x121 must stay 0 over the window; mode: every leg runs stripped and the frozen compare FAILs)
 #

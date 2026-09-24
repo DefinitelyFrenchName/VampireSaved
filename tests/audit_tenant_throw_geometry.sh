@@ -13,6 +13,8 @@
 # EXPECTS: 18/18 identical ordered states per throw, the frozen tail shape, the ±1 damage
 #   residue cells as frozen (the defense-row class, audit_defense_row_residue); a red is a
 #   state missing, reordered, or a damage cell moved.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/replays/
+#   tools/run_mame.sh tools/setup_mame.sh
 #
 # THE ASK, verbatim in substance: *"there are throws that have been
 # historically problematic with the VS2 tenants as THROWERS, not victims,

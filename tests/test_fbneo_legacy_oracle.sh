@@ -12,6 +12,8 @@
 #   offset inventory is the expectation, FBNEO_ORACLE_EXPECT=exact demands bit-identity.
 # EXPECTS: equal outside the frozen offsets; a byte inside a window but outside the
 #   inventory FAILS as GROWTH — stop and root-cause, never widen ([VSP-26]).
+# FOLLOWS: build/manifest/ emu/fbneo-patches/ emu/fbneo/ tests/expected/ tests/replays/
+#   tools/build_fingerprint.py tools/run_replay_fbneo.sh tools/setup_fbneo.sh
 #
 # THE HOLE THIS CLOSES. CLAUDE.md §4 defines the oracle as vanilla on
 # vanilla FBNeo versus the hacked set on patched FBNeo, per-frame work RAM.

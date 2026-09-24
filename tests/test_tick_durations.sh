@@ -14,6 +14,9 @@
 # EXPECTS: 18/18 totals equal with no tolerance; the perturbed total fails. The header
 #   records two paid traps: the tap range must be even and word-aligned, and counting over a
 #   rig window measures the crouch idle.
+# FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lua/tap_writes.lua
+#   tools/cps2_decrypt.py tools/run_mame.sh tools/setup_mame.sh tools/tick_durations.py
+#   tools/vanilla_frames.py tools/vanilla_join_rig.py
 #
 # MUST-FIRE: perturbed-copy: perturbed-total — a crouching move's derived total moved by one in the measured tick table must fail the derived-vs-measured compare (mode: JE's first crouch total is bumped and section 1 must fail)
 #

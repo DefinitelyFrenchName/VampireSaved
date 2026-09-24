@@ -14,6 +14,9 @@
 #   sets).
 # EXPECTS: band equivalence, pristine bank 2, distinctness, the poison control, liveness.
 #   H's and P's FIRST render gate.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/gfx_region_dump.lua
+#   tests/lua/replay.lua tests/replays/ tools/audit_romset_identity.py tools/build_merged.sh
+#   tools/run_mame.sh tools/setup_mame.sh
 #
 # The RAM gates are structurally blind to the video path (14z-55/60z), and
 # until this gate NOTHING looked at Huitzil's or Pyron's art in any

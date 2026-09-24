@@ -12,6 +12,9 @@
 #   control plants the pre-fix values (12 and 4) into our rows.
 # EXPECTS: our writes equal native's frame for frame, the timelines equal, the KO path equal
 #   and exception-free; the planted pre-fix shape fails. A red is the remap class back.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/column_shock.tsv
+#   tests/lua/field_trace.lua tests/lua/read_tap.lua tests/replays/ tools/name_moves.py
+#   tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: old-shock — a copy of our rows with the pre-fix mechanism planted (the victim's hit writes 24 -> 12, a 4 written to Donovan's +0x5C at each hit — the 14z-42 Lightning Sword values the column took until 14z-170) must FAIL the native-equality check, so "equal to native" is a comparison of the two legs' writes (in-gate: the planted copy must be caught; mode: our rows are planted before the checks and the gate FAILs)
 #

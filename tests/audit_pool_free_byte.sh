@@ -14,6 +14,8 @@
 #   tagged family slots and only thunk PCs writing; $FFB800's hole_b word writes stay
 #   non-zero as the liveness control. Taps are bucketed by BYTE LANE — the word-offset
 #   accounting that once hid a write is the header's gotcha.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/lua/tap_writes.lua
+#   tests/replays/ tools/run_mame.sh tools/setup_mame.sh
 #
 # POOL ATTRIBUTION (corrected 14z-85 — the 14z-84 version of this audit
 # measured only $FFB800 and attributed the result to the 59-75 family,

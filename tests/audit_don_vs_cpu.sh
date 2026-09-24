@@ -15,6 +15,9 @@
 # EXPECTS: each leg's opponent is the one selected (a wrong opponent is a DEAD leg, never a
 #   pass) and the run ends clean. A clean pass is COVERAGE of the pairing, not proof the #99
 #   crash is absent — the header records that it does not reproduce here.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua
+#   tests/replays/110_don_arcade_mash.rpl tools/run_mame.sh tools/run_replay_guarded.sh
+#   tools/setup_mame.sh
 #
 # HOW IT IS DETERMINISTIC. The arcade ladder's opponent draw is a
 # sound-state-fed LOTTERY (atlas/ram.md, $FF8110) UNLESS the venue byte

@@ -10,6 +10,9 @@
 #   other, and against donovan6's known medallion difference at frames 650 / 950 / 1250.
 # EXPECTS: all four checks; an instrument that always differs is as useless as one that
 #   never does.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/vsavj/02_demitri_vs_cpu.sha1
+#   tests/lua/replay.lua tests/replays/02_demitri_vs_cpu.rpl tools/build_donovan.sh
+#   tools/run_mame.sh tools/run_replay_mame.sh tools/setup_mame.sh
 #
 # WHY: session 14z-55 discovered that the FBNeo harness had never rendered a
 # pixel — every gate the project owned on that side was structurally blind to

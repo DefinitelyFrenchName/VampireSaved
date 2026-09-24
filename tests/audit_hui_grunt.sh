@@ -13,6 +13,8 @@
 # EXPECTS: the measured ring equals the frozen inventory for the build (an unregistered
 #   build REFUSES until measured); attempt 2 on the fixed builds reads 0x2a2. A red is the
 #   alias back or the alternation phase moving.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/ring_tap.lua
+#   tests/replays/hui/95_hui_electrocuted_x4.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: perturbed-inventory — a WRONG expected attempt-2 kernel voice id must fail the per-attempt comparison (mode: GRUNT_OURS_A2 is set to a wrong id so the measured ring != expected and the gate must FAIL)
 #

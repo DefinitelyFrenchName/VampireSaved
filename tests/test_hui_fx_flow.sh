@@ -11,6 +11,9 @@
 # EXPECTS: the fighter-side writes present, the refuted entry absent, the piece-side machine
 #   and bank word matching the build's port state. Ground-truthed on hui9 and a bad-thunk
 #   negative control.
+# FOLLOWS: build/manifest/ emu/fbneo-patches/ emu/fbneo/
+#   tests/replays/hui/83b_hui_ray_2p.rpl tools/build_donovan.sh tools/run_replay_fbneo.sh
+#   tools/setup_fbneo.sh
 #
 # Captures the tap probe that refuted the 14z-67 seq-D entry theory
 # and named the true root (STATE 14z-68). Two legs on replay 83b

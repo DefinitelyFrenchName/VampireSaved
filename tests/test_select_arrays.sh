@@ -11,6 +11,9 @@
 #   cells.
 # EXPECTS: the model holds, the corruption fails, the engine fetches the predicted rows. A
 #   tenant at 0x13 costs six longs.
+# FOLLOWS: emu/mame-patches/ tests/lib/decrypt_cache.sh tests/lua/trace_writes.lua
+#   tests/replays/11_pick_donovan.rpl tools/run_mame.sh tools/select_arrays.py
+#   tools/setup_mame.sh
 #
 # WHY (14z-61). The port displays the tenant's select portrait today by
 # IN-PLACE record surgery on Jedah's records (tools/select_port.py), which

@@ -10,6 +10,12 @@
 #   guard, the cheap-guard round, the legacy suite.
 # EXPECTS: as listed; a crash here is a waived-mixture artifact only with crash-stack
 #   evidence AND a passing stage 4.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lib/m2a_common.sh
+#   tests/lib/masked_compare.sh tests/lua/replay.lua tests/lua/replay_guard.lua
+#   tests/replays/ tools/build_donovan.sh tools/build_fingerprint.py tools/check_diverge.py
+#   tools/compare_composite.py tools/compare_flicker.py tools/compare_window.py
+#   tools/freeze_masked_basis.sh tools/propose_masked_specs.sh tools/run_mame.sh
+#   tools/run_replay_guarded.sh tools/run_replay_mame.sh tools/setup_mame.sh
 #
 # This is the ladder's weakest mixture: Jedah's state handlers index
 # Donovan's anim space. The gate is deliberately narrow — idle only:

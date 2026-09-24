@@ -8,6 +8,8 @@
 #   never-started runner, an empty log, and a live positive leg.
 # EXPECTS: the two dead rigs fail as `dead`, the live one scores `runs`; the positive leg is
 #   not optional.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/audit_region_movability.sh
+#   tools/setup_mame.sh
 #
 # WHY. The audit's verdict used to derive from the ABSENCE of a crash string:
 #

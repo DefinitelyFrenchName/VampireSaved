@@ -13,6 +13,9 @@
 #   byte-identically; the control swaps one character's neutral and forward rows.
 # EXPECTS: every event fires (never UNFIRED but Anakaris's declared six), the 360 rows equal
 #   to the frozen map, the structural rule per direction; the swapped rows fail.
+# FOLLOWS: emu/mame-patches/ tests/expected/vanilla_aerial_slots.tsv tests/lib/controls.sh
+#   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tools/run_mame.sh
+#   tools/setup_mame.sh tools/vanilla_join_rig.py
 #
 # MUST-FIRE: perturbed-copy: swapped-directions — swapping one character's neutral/forward rows in a copy of the frozen aerial map must fail the section-3 compare against the measured map (mode: section 3 compares the measured map against that swapped copy and must fail)
 #

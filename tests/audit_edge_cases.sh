@@ -13,6 +13,8 @@
 #   throw cannot finish an opponent and restores HP to half — measured identical on native
 #   vsav2 and frozen so); the trade reads the draw code; frame-1 EX fires where the
 #   character has one (stock decrements) and produces a stockless action where not.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/field_trace.lua
+#   tests/replays/judge/02_throw.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # Three families, all on the judge/pokes scaffolding, all guarded by
 # field-liveness (a crash kills a leg's samples and fails it):

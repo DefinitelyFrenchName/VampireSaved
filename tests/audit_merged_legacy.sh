@@ -13,6 +13,14 @@
 # EXPECTS: every legacy replay on its ratified class; a deviation is mechanism-attributed
 #   and maintainer-signed or it stays red. It proves NOTHING about tenant correctness (gfx
 #   pristine by design).
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/audit_merged_vec3.sh tests/expected/
+#   tests/lib/enumerate_expectations.sh tests/lua/replay.lua tests/lua/replay_guard.lua
+#   tests/replays/ tests/test_tenant_loop.sh tools/analyze_divergence.py
+#   tools/audit_romset_identity.py tools/build_fingerprint.py tools/check_diverge.py
+#   tools/compare_composite.py tools/compare_flicker.py tools/compare_window.py
+#   tools/describe_masked_shape.py tools/ensure_merged_inputs.sh tools/gen_donovan_patch.py
+#   tools/pack_build.sh tools/patch_prg.py tools/run_mame.sh tools/run_replay_guarded.sh
+#   tools/run_replay_mame.sh tools/setup_mame.sh
 #
 # WHY (14z-80 close, maintainer-ordered FIRST priority; counts re-frozen
 # since — see the op-count gate below). The 3-tenant merged patch APPLIES but

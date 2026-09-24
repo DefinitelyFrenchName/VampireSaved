@@ -15,6 +15,9 @@
 #   captures, every observed byte in the frozen vocabulary. A violation means the input is
 #   not node+0x10 — re-measure, never widen; vocabulary growth is a new pose class to extend
 #   deliberately.
+# FOLLOWS: emu/mame-patches/ tests/expected/front_comparator.txt tests/lib/decrypt_cache.sh
+#   tests/lua/field_trace.lua tests/replays/37_victor_ko_vsavj.rpl tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # WHY. ram.md recorded $FF8127 as a per-frame COMPARATOR written by
 # PRG:0x02228E — `d1 = (P1)+0x10; cmp.b (P2)+0x10,d1; beq/bcc -> 0, else 1`

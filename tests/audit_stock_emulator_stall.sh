@@ -13,6 +13,9 @@
 #   control runs the 'stock' leg on the WIDE binary, where the divergence must be absent.
 # EXPECTS: the frozen divergence frame and no crash; the control fails. A build that
 #   crashed, garbled or played on a stock emulator would falsify the README and fail here.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh
+#   tests/lua/replay_guard.lua tests/replays/16_xemu_2p.rpl tools/run_mame.sh
+#   tools/run_replay_guarded.sh tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: wide-binary-no-stall — the same replay on the PATCHED binary with the real set must NOT diverge from itself at the frozen frame: under the mode the "stock" leg is the WIDE binary on the real set, so the divergence is absent and this gate must FAIL
 #

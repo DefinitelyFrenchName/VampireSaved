@@ -10,6 +10,8 @@
 #   the dummy's) must be judged the other way.
 # EXPECTS: per leg the timer reaches 0, winner 0xFF, round 0 -> 1, HP refilled to 0x120, END
 #   clean; `inv` reads 0x01. A red on `ctl` means the instrument moved.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/field_trace.lua
+#   tests/replays/judge/01_timeout_lead.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # §4 mandates timeout coverage per ported character; until this audit the
 # tenants' timeout wins were FIELD-CONFIRMED only (maintainer, 14z-101)

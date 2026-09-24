@@ -14,6 +14,10 @@
 # EXPECTS: every Power row arm=none with pow held, every Change row armed from its handler,
 #   the EX rows entering the Change machinery on both games; the planted Power log changes
 #   its row and fails.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/df_modes.tsv
+#   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tests/lua/read_tap.lua
+#   tests/replays/df/97_df_mech.rpl tools/run_mame.sh tools/select_paths.py
+#   tools/select_wheel.py tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: power-armed — a copy of a vsav2 P+K leg's tap log with ONE planted +0x147 arming write (what a reachable Change handler would leave) must change that leg's row and FAIL the frozen compare, so a Power row's `arm=none` is a reading of the log, not a default (in-gate: the planted copy must reduce differently; mode: every vsav2 P+K log is planted before the reduction and the table FAILs)
 #

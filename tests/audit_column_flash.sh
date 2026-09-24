@@ -13,6 +13,10 @@
 #   equal to native at 2858 (so a leg that missed the move cannot pass), every writer the
 #   uploader's `movem.l` in its own opcode image. A red is the flash gone or moved; which
 #   sequence id we upload, and why, is NOT covered.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/column_flash.tsv
+#   tests/expected/registry.tsv tests/lib/controls.sh tests/lua/read_tap.lua
+#   tests/lua/replay.lua tests/replays/ tools/build_fingerprint.py tools/name_moves.py
+#   tools/run_mame.sh tools/run_replay_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: flash-gone — a copy of our leg's palette dumps with row 11 replaced by native's (what a fix of the flash looks like) must FAIL the frozen compare, so the gate reads the row it claims to read (in-gate: the planted copy must differ from the frozen rows; mode: the planted copy IS our leg and the gate FAILs)
 #

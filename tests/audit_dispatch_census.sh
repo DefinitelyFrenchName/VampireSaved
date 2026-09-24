@@ -10,6 +10,8 @@
 # EXPECTS: the inventory reproduced exactly; growth fails. Coverage stated: site 0x054470
 #   fires in only 5 of 50 replays and the curve has not converged, so 'never observed' is a
 #   bound, not a proof, and no repoint ships on the complement.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/vsavj/masked-v2/logs/
+#   tests/lua/dispatch_census.lua tests/replays/ tools/run_mame.sh tools/setup_mame.sh
 #
 # WHY (14z-89). The legacy-cycle regression's fix is option (b) (maintainer,
 # 2026-08-15): move the tenant's work OFF the legacy path. For obj_hook that

@@ -17,6 +17,10 @@
 # EXPECTS: high-window reads on the positive leg landing in ledgered samples, zero on the
 #   control with the low window busy; every address with pcm_addr[22:20] == 0, which is what
 #   makes the SLOT5_AW=20 mask lossless.
+# FOLLOWS: build/manifest/ docs/platform/mister.md emu/jtcores-patches/ emu/jtcores/
+#   tests/replays/108_tenant_voice.rpl tests/rtl/ tools/check_wram_dumps.py
+#   tools/mister_mra.sh tools/rpl2siminputs.py tools/run_sim_jtcps2.sh
+#   tools/setup_jtcores.sh
 #
 # This gate counts the SDRAM reads the core issues into that window while a
 # tenant is fighting, and requires the same image with the profile bit CLEAR

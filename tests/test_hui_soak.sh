@@ -9,6 +9,9 @@
 #   pristine ROM: false green).
 # EXPECTS: guard clean end to end and both satellite pointers non-zero at f6000; a red is a
 #   crash or a pod lost across the round.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua
+#   tests/replays/hui/70_hui_mash.rpl tools/build_donovan.sh tools/run_mame.sh
+#   tools/run_replay_guarded.sh tools/setup_mame.sh
 #
 # The full behavioral chain, guarded, on the REAL packed set: builds stage
 # 4, forces id 0x10 through the vanilla select flow, then runs the chaos

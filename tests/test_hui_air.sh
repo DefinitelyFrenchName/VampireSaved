@@ -11,6 +11,9 @@
 # EXPECTS: Y pinned >= 100px over f3350-f3370; seq 0x14 with X advancing >= 30px at
 #   near-constant height over f3185-f3200. A red is the float or dash dead again, or a
 #   rise-speed change moving the sample window.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua
+#   tests/replays/hui/75_hui_air.rpl tests/replays/hui/79_hui_airdash.rpl
+#   tools/build_donovan.sh tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
 # Mechanism (measured; STATE 14z-66): vs2 routes the class-02 jump seq
 # BY CHAR ID at the engine head — id 0x10 gets his OWN per-char jump

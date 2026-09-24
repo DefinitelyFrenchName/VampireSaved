@@ -545,6 +545,32 @@ v14c="$(awk -F'\t' '$1=="g_cmissing"{print $4}' "$T/l14c/results.tsv" 2>/dev/nul
 rm -f "$FR/tests/run_all_emulator_unplugged.sh"
 rm -f "$FR/tests/g_cfired.sh" "$FR/tests/g_cmissing.sh" "$FR/tests/g_clies.sh" "$FR/tests/g_cref.sh"
 
+echo "15. the commit of record and --stale (14z-180, GitHub #171 slice Q4)"
+# commit.txt: HEAD on its first line when the tree is a git checkout, `no-git` otherwise;
+# --stale: the selection is exactly the names tools/audit_emulator_staleness.py prints.
+reg "$(row g_pass mame release - '')" "$(row g_out mame release - '')"
+run --lane mame --log "$T/l15a" >/dev/null 2>&1 || true
+c15a="$(head -1 "$T/l15a/commit.txt" 2>/dev/null)"
+[ "$c15a" = "no-git" ] && ok "outside a git checkout commit.txt says no-git" || fail "commit.txt outside git: '$c15a'"
+( cd "$FR" && git init -q && git -c user.name=t -c user.email=t@t add -A . >/dev/null 2>&1 \
+    && git -c user.name=t -c user.email=t@t commit -q -m base ) || fail "could not init the fakerepo as git"
+head15="$(cd "$FR" && git rev-parse HEAD 2>/dev/null)"
+run --lane mame --log "$T/l15b" >/dev/null 2>&1 || true
+c15b="$(head -1 "$T/l15b/commit.txt" 2>/dev/null)"
+[ -n "$head15" ] && [ "$c15b" = "$head15" ] && ok "commit.txt's first line is the HEAD the run measured" \
+                                             || fail "commit.txt in git: '$c15b', HEAD '$head15'"
+# a stub staleness audit naming one gate: --stale runs it and nothing else
+printf '#!/usr/bin/env python3\nimport sys\nif "--names" in sys.argv: print("g_out")\n' > "$FR/tools/audit_emulator_staleness.py"
+run --lane mame --stale --log "$T/l15c" >/dev/null 2>&1 || true
+n15="$(awk -F'\t' 'NR>1{print $1}' "$T/l15c/results.tsv" 2>/dev/null | tr '\n' ' ')"
+[ "$n15" = "g_out " ] && ok "--stale ran exactly the named gate (g_out), not g_pass" || fail "--stale selection: '$n15'"
+printf '#!/usr/bin/env python3\n' > "$FR/tools/audit_emulator_staleness.py"
+out15="$(run --lane mame --stale --log "$T/l15d" 2>&1 || true)"
+printf '%s' "$out15" | grep -q 'no emulator gate is stale' && [ ! -d "$T/l15d" ] \
+    && ok "--stale with nothing named exits before writing a run directory and says so" \
+    || fail "--stale with an empty list: $(printf '%s' "$out15" | head -1)"
+rm -rf "$FR/.git" "$FR/tools/audit_emulator_staleness.py"
+
 echo
 [ "$rc" = 0 ] && echo "PASS: run_all_emulator.sh classifies every ground-truth case correctly" \
               || echo "FAIL: see above"

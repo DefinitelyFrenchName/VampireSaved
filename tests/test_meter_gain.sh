@@ -17,6 +17,9 @@
 # EXPECTS: law A on every event, the swing costs, the six frozen cells, no VOID on a frozen
 #   cell, the out-of-tree hash equal; the perturbed net fails law A. SKIPs without the
 #   community workbook.
+# FOLLOWS: emu/mame-patches/ tests/expected/vanilla_meter_gain.sha256 tests/lib/controls.sh
+#   tests/lua/field_trace.lua tools/cps2_decrypt.py tools/meter_gain.py tools/run_mame.sh
+#   tools/setup_mame.sh tools/vanilla_frames.py tools/vanilla_join_rig.py
 #
 # MUST-FIRE: perturbed-copy: perturbed-net — SA 5MP's net meter gain moved by one in a copy of the measured table must fail law A (mode: section A-D runs the real verdict on that perturbed table and must fail)
 #

@@ -13,6 +13,9 @@
 # EXPECTS: the .inp valid and complete, both playbacks covering every frame with
 #   byte-identical checksum logs, the idle leg departing at frame 300; the used nvram and
 #   the truncated recording fail.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lib/native_path.sh
+#   tests/lua/ tests/replays/03_two_player_vs.rpl tools/build_release_emulators.sh
+#   tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: used-nvram — a playback started from the nvram directory the recording run left behind (what a player's `nvram_fresh` holds once their session is over) must diverge from the recording and fail, so the comparison is proven able to fail and the README's EMPTY folder proven load-bearing
 # MUST-FIRE: perturbed-copy: truncated-inp — the recording cut to half its input stream must fail the frame-count check, so a playback that stops early can never pass as the whole session

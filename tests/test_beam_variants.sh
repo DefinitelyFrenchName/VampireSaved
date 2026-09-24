@@ -10,6 +10,9 @@
 # EXPECTS: one art path, the ES richer with a stock spent, 0 tiles missing from group C. An
 #   empty meter degrades the ES silently — the stock check is what makes the ES leg
 #   evidence.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/obj_records_dump.lua
+#   tests/replays/hui/86_hui_beam_variants.rpl tools/gfx_tiles.py tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # WHY IT EXISTS. Two facts the beam port rests on, both measured this
 # session and both easy to get wrong later:

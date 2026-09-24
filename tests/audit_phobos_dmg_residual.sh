@@ -13,6 +13,10 @@
 # EXPECTS: one P1 HP step per part on the same frame on both legs, not moving with the pin,
 #   the rows equal to vs2's, the frozen 11/12; the planted native step fails. WHY the extra
 #   point is the ticket's question, not covered.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/phobos_dmg_residual.tsv
+#   tests/expected/registry.tsv tests/lib/controls.sh tests/lua/field_trace.lua
+#   tests/replays/ tools/build_fingerprint.py tools/name_moves.py tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: residual-gone — a copy of our leg's HP trace with native's step in place of ours (what a fix of the residual looks like) must FAIL the frozen compare, so the gate reads the step it claims to read (in-gate: the planted copy must differ from the frozen rows; mode: the planted copy IS our leg and the gate FAILs)
 #

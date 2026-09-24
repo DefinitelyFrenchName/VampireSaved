@@ -12,6 +12,8 @@
 #   controls.
 # EXPECTS: per leg the KO happens, $FF810E goes 0 -> 1 with winner 0xFF, round 2 spawns with
 #   both HP at 0x120, END clean; the nopoke leg shows no transition.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/field_trace.lua
+#   tests/replays/judge/01_timeout_lead.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # §4 mandates life-marker-transition coverage per ported character; the
 # corpus had it for Donovan only (20_don_round2 / 23_don_matchwin). This

@@ -9,6 +9,13 @@
 #   MAME against their frozen expectations.
 # EXPECTS: every stage's invariant holds, the probe loads his id, legacy identical on both
 #   bases; a red names the stage and op or replay.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/donovan-m5/mask
+#   tests/expected/vsavj/02_demitri_vs_cpu.sha1
+#   tests/expected/vsavj/masked-v2/logs/02_demitri_vs_cpu.log tests/lua/replay.lua
+#   tests/lua/replay_guard.lua tests/replays/02_demitri_vs_cpu.rpl
+#   tests/test_shared_writes.sh tools/build_donovan.sh tools/compare_flicker.py
+#   tools/force_pick_probe.sh tools/run_mame.sh tools/run_replay_guarded.sh
+#   tools/run_replay_mame.sh tools/setup_mame.sh
 #
 # Pyron is a VARIANT-ID tenant (0x11): no vanilla path can reach his rows,
 # so the stage 1-3 ladder invariant is total (the H-ladder shape).

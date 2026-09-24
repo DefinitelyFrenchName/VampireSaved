@@ -10,6 +10,10 @@
 #   tests/fields_m2a.tsv.
 # EXPECTS: agreement on the positive control, exit 3 on the negative; the §4 protocol's
 #   first real exercise, kept as its ground truth.
+# FOLLOWS: emu/fbneo-patches/ emu/fbneo/ emu/mame-patches/ tests/fields_m2a.tsv
+#   tests/lua/replay.lua tests/replays/02_demitri_vs_cpu.rpl tests/replays/16_xemu_2p.rpl
+#   tools/compare_fields.py tools/run_mame.sh tools/run_replay_fbneo.sh
+#   tools/run_replay_mame.sh tools/setup_fbneo.sh tools/setup_mame.sh
 #
 #   1. Positive control (first real exercise of the amended CLAUDE.md §4
 #      protocol on known-good content): 16_xemu_2p on MAME vs patched FBNeo

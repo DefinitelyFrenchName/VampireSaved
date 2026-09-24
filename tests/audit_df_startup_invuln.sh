@@ -14,6 +14,10 @@
 #   perturbs a frozen arm value.
 # EXPECTS: every frozen arm as ruled, the shells' merged traces byte-identical to pristine,
 #   the inside contact refused and the outside one landing; the perturbed value fails.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/df_startup_invuln.tsv
+#   tests/lib/controls.sh tests/lib/decrypt_cache.sh tests/lua/field_trace.lua
+#   tests/replays/df/97_df_mech.rpl tests/replays/df/98_df_startup_contact.rpl
+#   tools/run_mame.sh tools/setup_mame.sh tools/vanilla_join_rig.py
 #
 # MUST-FIRE: perturbed-copy: perturbed-frozen-arm — a perturbed frozen arm value must be caught by the trace compare (mode: the frozen baseline is perturbed and the measured trace no longer matches it, so the gate FAILs)
 #

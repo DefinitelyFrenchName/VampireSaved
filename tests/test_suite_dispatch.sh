@@ -25,6 +25,11 @@
 # EXPECTS: every dispatch case gives the designed answer; a red names the piece. The
 #   emulator-side behaviours these pieces gate are proven by test_m2_repoint.sh and the
 #   suite itself.
+# FOLLOWS: build/manifest/ tests/audit_legacy_pairings.sh tests/expected/
+#   tests/lib/controls.sh tests/lib/masked_compare.sh tests/replays/ tests/run_battery_m2.sh
+#   tests/run_suite.sh tools/build_fingerprint.py tools/check_diverge.py
+#   tools/compare_composite.py tools/compare_flicker.py tools/compare_window.py
+#   tools/freeze_masked_basis.sh tools/pack_build.sh tools/patch_prg.py
 #
 # MUST-FIRE: known-bad: program-fallback-reaches-wholeset — a whole-set-only registry row must be UNREACHABLE by the program-key fallback (the merged1-vs-shipped hazard); the mode demands the forbidden resolution (rc 0) where the design refuses it (rc 2), so the run must FAIL
 #

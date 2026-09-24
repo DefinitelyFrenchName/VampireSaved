@@ -12,6 +12,8 @@
 #   appear (rig liveness); the 59-75 range is reported per writer class, not gated.
 # EXPECTS: every observed writer in the inventory (else extend the inventory FIRST); the
 #   liveness stamp seen. Measured 14z-82: 118/120 not observed.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/type_write_census.lua tests/replays/
+#   tools/audit_roms.py tools/run_mame.sh tools/setup_mame.sh
 #
 # ON-DEMAND (6 MAME runs, ~8 min). Run BEFORE trusting any change to the
 # type-renumbering emit path, and after any change that could add a family

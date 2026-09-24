@@ -14,6 +14,9 @@
 # EXPECTS: the read fires on every leg from the one reader, the indices equal, the bytes
 #   differ on residue victims only; the equal-bytes control fails section 3, the empty trace
 #   fails liveness.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh
+#   tests/lua/trace_writes.lua tests/replays/hui/80_hui_grab_2p.rpl
+#   tools/build_fingerprint.py tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: residue-answers-equal — a residue victim answering the SAME defense byte on both legs must fail section 3 (mode: the real native leg's bytes of the first residue victim — the first whose row differs between the BUILD and vs2 — are forced equal to ours and the section-3 verdict must fail)
 #

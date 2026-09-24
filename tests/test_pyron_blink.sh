@@ -12,6 +12,9 @@
 #   bit-for-bit; =blinks reproduces the pre-fix two-value alternation on build/pyron15. This
 #   gate sees the IN-MATCH instance only; the select and route-map tables are
 #   test_variant_dispatch's.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/decrypt_cache.sh tests/lua/replay.lua
+#   tests/replays/pyron/76_pyron_blink_vs2.rpl tools/check_pyron_blink.py tools/run_mame.sh
+#   tools/run_replay_mame.sh tools/setup_mame.sh
 #
 # Palette RAM row 10 (0x90C140) carries Pyron's SPRITE and his in-match
 # HUD MUGSHOT — which is why both blinked. Before the fix it alternated

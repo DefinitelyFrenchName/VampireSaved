@@ -8,6 +8,8 @@
 #   logs compared.
 # EXPECTS: the two logs identical; a difference is a determinism failure of the instrument,
 #   not of the game.
+# FOLLOWS: emu/mame-patches/ tests/lua/attract_checksum.lua tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # Usage: ROMDIR=/path/to/roms tests/test_attract_determinism.sh [set] [frames]
 # Defaults: vsavj, 3600 frames. PASS = per-frame checksum logs identical.

@@ -19,6 +19,9 @@
 #   70_pyron_mash guarded on MAME on the packed set.
 # EXPECTS: guard clean end to end and the satellite pointer 0xD4xx at f6000; a red is a
 #   crash or the satellite lost.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua
+#   tests/replays/pyron/70_pyron_mash.rpl tools/build_donovan.sh tools/run_mame.sh
+#   tools/run_replay_guarded.sh tools/setup_mame.sh
 #
 # WHY STAGE 6, MEASURED 14z-129 (it was RED in the 14z-128 sweep at stage 4,
 # CRASH 3020 vec4 PC 000000, and the crash was the GATE's premise, not the

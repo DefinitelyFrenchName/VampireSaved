@@ -14,6 +14,9 @@
 # EXPECTS: reads present on both legs (liveness), every in-play hit the mash check with A0 =
 #   the table, no D0 of 0, the per-offset inventories identical; the injected offset-0 read
 #   fails section 3.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh
+#   tests/lua/trace_writes.lua tests/replays/ tools/build_fingerprint.py tools/name_moves.py
+#   tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: offset-0-read — a read at table offset 0 (mask[0], where the port's bytes sit) must be caught by section 3 (mode: an offset-0 read is injected into the REAL ours leg and the section-3 verdict must fail)
 #

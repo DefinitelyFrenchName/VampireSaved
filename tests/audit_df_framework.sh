@@ -10,6 +10,8 @@
 # EXPECTS: every leg activates, spends one stock and holds its frozen duration exactly; the
 #   Demitri control must read 360/1 or no tenant figure of the run is trusted. A red is a
 #   porting change that moved a tenant's DF cost, duration or class.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/field_trace.lua
+#   tests/replays/df/97_df_mech.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # 14z-101 measured, and the maintainer then RULED (2026-08-21, DECIDED:
 # "we absolutely, categorically, keep vsavj DF durations"), the tenants'

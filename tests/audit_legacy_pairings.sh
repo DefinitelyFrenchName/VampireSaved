@@ -13,6 +13,9 @@
 #   overridden only by a printed `.legacy-exempt` reason.
 # EXPECTS: no legacy pairing on a bare .sha1, every override printed, NO-MATCH replays
 #   reported for hand judgement.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lua/field_trace.lua
+#   tests/replays/ tools/build_fingerprint.py tools/check_legacy_pairings.py
+#   tools/freeze_masked_basis.sh tools/run_mame.sh tools/setup_mame.sh
 #
 # WHY THIS EXISTS (14z-89, closing the gap 14z-88 exposed the hard way).
 # The 14z-87b medallion row move cost `38_victor_p1_vsavj` — P1 Victor vs

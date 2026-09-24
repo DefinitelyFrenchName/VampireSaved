@@ -13,6 +13,9 @@
 # EXPECTS: the multisets match within the frozen tolerance, with the one ruled exception
 #   (the bank-108 inclusive-endpoint byte, #93, verified per run); the corrupted copy reads
 #   as a foreign signature.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/qs_sweep.lua
+#   tests/replays/06_test_mode.rpl tools/build_qs_songs.py tools/check_qs_voice_batch.py
+#   tools/qs_ledger.py tools/run_mame.sh tools/setup_mame.sh
 #
 # Builds the qs_songs voice batch onto a scratch copy of the canonical
 # WIDE overlay (or verifies a given BUILD's romset directly), then sweeps

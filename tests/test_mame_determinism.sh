@@ -8,6 +8,9 @@
 #   pairwise, a divergent pair analysed by tools/analyze_divergence.py.
 # EXPECTS: every run identical. Coverage limit stated in the header: the 520-frame probe
 #   bounds the boot window only, not a full replay (PROBE= a replay measures that).
+# FOLLOWS: emu/mame-patches/ tests/lua/replay.lua tests/probes/boot_probe.rpl
+#   tools/analyze_divergence.py tools/run_mame.sh tools/run_replay_mame.sh
+#   tools/setup_mame.sh
 #
 # The whole oracle rests on an assumption nobody had ever measured at
 # volume: that the same binary, the same set and the same inputs produce

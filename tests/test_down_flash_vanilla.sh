@@ -13,6 +13,8 @@
 #   control.
 # EXPECTS: the inventory as measured (1909/1911, 2148, 6646 on vanilla 104); an unattributed
 #   white frame is a new flash, ours or the emulator's.
+# FOLLOWS: emu/mame-patches/ tests/lua/inp_probe.lua tests/replays/104_1p_auto_ko_win.rpl
+#   tools/run_mame.sh tools/setup_mame.sh
 #
 # Runs tests/lua/inp_probe.lua (per-frame framebuffer fnv1a64 + fighter death
 # flags) on STOCK vsavj with 104_1p_auto_ko_win.rpl (a real KO at ~f6550, no

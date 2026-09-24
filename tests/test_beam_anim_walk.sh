@@ -11,6 +11,8 @@
 #   window, comparing leg-independent quantities only (read or not, how often — never a PC).
 # EXPECTS: ported nodes, native walked, ours walked; =absent reproduces the pre-fix state on
 #   an older build.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/trace_writes.lua
+#   tests/replays/hui/83b_hui_ray_2p.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # WHY IT EXISTS. The effect family (beam / grab lightning / ES big beam /
 # 214 explosion) has been chased for several sessions from the emitter

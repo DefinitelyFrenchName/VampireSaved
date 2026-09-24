@@ -11,6 +11,8 @@
 #   moves x through three values), else VOID; the control rewrites our draws to variant 6.
 # EXPECTS: the per-seed rows frozen and the two legs' variant SETS equal; the rewritten
 #   copy's set differs and fails.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/entrance_draw.tsv
+#   tests/lua/field_trace.lua tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: variant-lost — a copy of our rows with every drive-in draw rewritten to the held variant 6 (what a build that lost the car arrival would read) must FAIL the set compare against native, so the compared sets are what the draws produced (in-gate: the perturbed copy's set must differ from native's; mode: our rows are rewritten before the compare and the table FAILs)
 #

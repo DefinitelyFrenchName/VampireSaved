@@ -9,6 +9,12 @@
 #   suite through the registry.
 # EXPECTS: veto, bring-up and superset all green; an unregistered fingerprint stops the gate
 #   as a rule-6 signal.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lib/m2a_common.sh
+#   tests/lib/masked_compare.sh tests/lua/replay.lua tests/lua/replay_guard.lua
+#   tests/replays/ tools/build_donovan.sh tools/build_fingerprint.py tools/check_diverge.py
+#   tools/compare_composite.py tools/compare_flicker.py tools/compare_window.py
+#   tools/freeze_masked_basis.sh tools/propose_masked_specs.sh tools/run_mame.sh
+#   tools/run_replay_guarded.sh tools/run_replay_mame.sh tools/setup_mame.sh
 #
 # Locks (all measured 2026-07-25, session 7):
 #   1. Extraction correctness: the bare-long sibling veto holds — the seven

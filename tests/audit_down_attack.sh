@@ -12,6 +12,8 @@
 # EXPECTS: per leg the sweep connected and knocked down (else the leg is REFUSED, not
 #   judged), the down attack dealt damage in the window, and the run ended clean; the early
 #   control deals none. A red names the tenant and the direction.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/field_trace.lua
+#   tests/replays/judge/03_down_attack.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # The corpus had ZERO coverage of the down-state contact surface (no
 # rig, no gate, no doc mention). The surface is real ported data both

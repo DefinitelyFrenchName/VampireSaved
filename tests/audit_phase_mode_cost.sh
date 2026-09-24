@@ -11,6 +11,9 @@
 #   the shim runs, for 24-135 frames in 13-16 runs, then re-converge for thousands of
 #   frames. An IDENTICAL result on his own content FAILS — the rig stopped forming the
 #   match.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/lua/replay_guard.lua
+#   tests/replays/ tools/build_donovan.sh tools/build_wide_romset.py tools/run_mame.sh
+#   tools/run_replay_guarded.sh tools/run_replay_mame.sh tools/setup_mame.sh
 #
 # WHY (M3b, 14z-77, the maintainer's ratified condition). A merged build has
 # ONE init shim and therefore ONE seeder. Phobos NEEDS `latch_mode = "phase"`

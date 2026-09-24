@@ -10,6 +10,8 @@
 # EXPECTS: zero blank tiles drawn; a hit names the code to add to
 #   build/manifest/extra_tiles/<char>.json. Ground-truthed: passes on hui14, fails on hui12
 #   naming both shadow tiles.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/obj_records_dump.lua tests/replays/
+#   tools/gfx_tiles.py tools/run_mame.sh tools/setup_mame.sh
 #
 # WHY. A tenant's gfx remap rewrites tile codes in a band from the source
 # bank to group C. If a tile inside that band was never COPIED — because

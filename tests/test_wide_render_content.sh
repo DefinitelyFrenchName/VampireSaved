@@ -13,6 +13,10 @@
 # EXPECTS: the three band equalities as designed, the poison rejected and visible, liveness.
 #   Donovan rendered as garbage for two sessions with every RAM gate green — this is the
 #   missing gate.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/gfx_region_dump.lua
+#   tests/lua/replay.lua tests/replays/36_pick_tenant_cell.rpl
+#   tools/audit_romset_identity.py tools/build_donovan.sh tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # WHY THIS EXISTS (14z-60z). Donovan and Anita rendered as garbage on the
 # WIDE track for two sessions while EVERY automated gate stayed green: the

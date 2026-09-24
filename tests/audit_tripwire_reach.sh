@@ -11,6 +11,8 @@
 # EXPECTS: END clean on every build. A PASS means no tripwire fired on THIS rig, never that
 #   none is reachable; the 14z-93 fires (the 0x494de divide helper) are what this gate
 #   exists to catch again.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua tests/replays/
+#   tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
 # WHAT A TRIPWIRE IS. Every shipped build is generated with
 # `--tripwire-open`, whose own help text is the point:

@@ -7,6 +7,7 @@
 #   two fresh-sandbox runs (the EEPROM sandboxing fix's guard).
 # HOW: two fresh-sandbox FBNeo runs of one replay, the checksum logs compared.
 # EXPECTS: identical logs; a difference is nondeterminism in the harness or the sandbox.
+# FOLLOWS: emu/fbneo-patches/ emu/fbneo/ tools/run_replay_fbneo.sh tools/setup_fbneo.sh
 #
 # Usage: ROMDIR=... tests/test_fbneo_replay_determinism.sh [set] [replay]
 set -eu

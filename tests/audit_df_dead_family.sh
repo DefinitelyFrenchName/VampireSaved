@@ -16,6 +16,9 @@
 #   does.
 # EXPECTS: 0 probe lines on the candidate and exactly 1 on the control at frame 3260 on both
 #   legs.
+# FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lua/replay_guard.lua
+#   tests/replays/df/97_df_mech.rpl tools/run_mame.sh tools/run_replay_guarded.sh
+#   tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: candidate-reached — the dead field-setter 0x02622A is never reached, so demanding it WAS reached must fail (mode: the candidate is asserted to have fired, which the real trace never shows, so the gate FAILs)
 #

@@ -14,6 +14,9 @@
 # EXPECTS: pointers as decoded, A3 the node's record on every write, 8/8 hits on the first
 #   overlap frame with no whiff overlap, +0x54 = record +0x17 (or the forced generic 1); the
 #   un-mirrored convention fails most hits.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/field_trace.lua
+#   tests/lua/trace_writes.lua tools/anim_nodes.py tools/name_moves.py tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # WHAT IT HOLDS. tools/hitbox_records.py's reading of a tenant's hitbox data
 # (the five tables behind +0x80..+0x90, 8-byte (x,y,hw,hh) boxes authored

@@ -12,6 +12,9 @@
 # EXPECTS: static bytes right, 0 out-of-range reads against a live control, no reset and the
 #   EX firing. The withdrawn 14z-74 engine-word fix is recorded in the header: right effect,
 #   wrong byte.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/decrypt_cache.sh tests/lua/replay.lua
+#   tests/replays/pyron/72_pyron_cosmo_2p.rpl tools/run_mame.sh tools/run_replay_mame.sh
+#   tools/setup_mame.sh
 #
 # THE CRASH. Pyron's EX drives the shared engine to sub-state 81 and the
 # engine dispatches it through a pc-relative table:

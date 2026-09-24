@@ -14,6 +14,9 @@
 #   and host rows frozen with the unsampled count; the deleted-row copy reports a missed PC,
 #   the silent range reads DEAD. Unsampled: the tenant as P2, the vs2 EX route, every path
 #   the corpus never runs.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/df_field_readers_live.tsv
+#   tests/lua/read_tap.lua tests/replays/ tools/audit_df_field_readers.py
+#   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: shadow-tool: missed-planted — a copy of the census with the FIRST row the corpus reaches deleted must make the cross-check report that access as MISSED and FAIL, so a reader the census cannot see is caught wherever the corpus runs it (in-gate: the planted copy must report exactly one missed pc; mode: the gate cross-checks against the planted copy and FAILs)
 # MUST-FIRE: perturbed-copy: range-silent — a copy of a tap log with every access to P2's block range deleted must be reported as a DEAD range, so each run's two tap ranges are each proven live before the cross-check trusts their silence (in-gate: the perturbed copy of the first run must be reported silent in P2; mode: every run's log is perturbed before the liveness check and the gate FAILs)

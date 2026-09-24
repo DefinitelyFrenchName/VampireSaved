@@ -12,6 +12,8 @@
 # EXPECTS: the 2-byte leg STALLS unresolved and the 4-byte leg FLOWS in about 600 frames —
 #   both frozen as engine facts. A NO-KO on either leg is a dead rig. If the 2-byte leg ever
 #   flows, the judge stopped reading white's sign: a full stop.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/replay.lua
+#   tests/replays/26_don_arcade_mash.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: two-byte-flowed — the 2-byte kill poke must STALL (the judge reads white's sign), so a FLOWED classification of it must fail (mode: the 2-byte leg is classified FLOWED, which the real judge never allows, so the gate FAILs)
 #

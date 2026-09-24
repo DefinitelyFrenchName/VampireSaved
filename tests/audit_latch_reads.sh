@@ -13,6 +13,9 @@
 # EXPECTS: the frozen per-leg inventories (Phobos real 00, over Donovan 01, no reader for
 #   Donovan or Pyron in these rigs, ours only the float fork seeing the shim's 00); the
 #   real-path swap reads 00 where the row says 01 and fails, the moved windows read VOID.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/latch_reads.tsv
+#   tests/lua/read_tap.lua tests/replays/ tests/test_latch_readers.sh tools/run_mame.sh
+#   tools/setup_mame.sh tools/tap_latch_reads.sh
 #
 # MUST-FIRE: perturbed-copy: real-instead-of-poked — the phobos-over-donovan leg run with Phobos's REAL cursor path instead of the poke reads flavor 00 where the frozen row says 01, and the comparison must FAIL (in-gate: that leg's values are asserted to differ from the phobos-real leg's; mode: the poked leg is replaced by the real path and the gate FAILs)
 # MUST-FIRE: perturbed-copy: tap-window-moved — the tap windows shifted past the latch bytes capture nothing, and a frozen non-empty leg must FAIL (in-gate: the reducer is fed an empty tap and must report VOID rather than an empty inventory; mode: every leg's window is moved and the gate FAILs)

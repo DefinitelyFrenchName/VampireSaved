@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**380 scripts** — 93 ci_portable, 84 ci_static, 203 emulator-tier (run by name).
+**383 scripts** — 96 ci_portable, 84 ci_static, 203 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 22 | the suite runners and their own ground truth |
+| [runner](#runner) | 25 | the suite runners and their own ground truth |
 | [docs](#docs) | 20 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -51,13 +51,16 @@ the suite runners and their own ground truth.
 | `tests/test_controls_contract.sh` | test | ci_portable | — | ground truth for THE MUST-FIRE CONTRACT'S READER, tests/lib/controls.sh: the four regexes of the R10 grammar, the leading comment block as the header (a bare `#` continues it, a non-comment line ends it), the declared-vs-fired readback the… | 14z-147 |
 | `tests/test_demand_after_trap.sh` | test | ci_portable | — | no gate carries a `${VAR:?msg}` DEMAND after its EXIT trap (14z-134). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-134 |
 | `tests/test_emulator_runner.sh` | test | ci_portable | — | ground truth for tests/run_all_emulator.sh (14z-128). ROM-free, ~26 s (measured 14z-162; the header said ~5 s). | 14z-128 |
+| `tests/test_emulator_staleness.sh` | test | ci_portable | — | WHICH EMULATOR GATES' GREEN IS STALE, and is any row eating its cap (GitHub #171 slices Q4 and Q5, ruled 2026-09-24: "NOTE at session, FAIL at freeze/release"; | 2026-09-24 |
+| `tests/test_gate_follows.sh` | test | ci_portable | — | EVERY EMULATOR-TIER GATE DECLARES WHAT IT FOLLOWS, and no declaration is narrower than what the gate's own text reads (GitHub #171 slice Q3, ruled 2026-09-24 "Header line" — DECISIONS_HISTORY.md "Ruled 2026-09-24 (14z-180) — #171 gate quali… | 2026-09-24 |
 | `tests/test_header_defaults.sh` | test | ci_portable | — | a gate's HEADER must state the default its CODE actually uses (14z-128). ROM-free, ~2 s. | 14z-128 |
+| `tests/test_lane_carry.sh` | test | ci_portable | — | ground truth for tools/audit_lane_carry.py: a lane's carry verdict is derived from its gates' `# FOLLOWS:` declarations and fails when one moved or one is missing (GitHub #171 slice Q3; the tool itself 14z-174). ci_portable: | 14z-174 |
 | `tests/test_mame_bin_pinned.sh` | test | ci_portable | — | a gate that boots `vsavjw` through a MAME wrapper must PIN the MAME binary (14z-133). ROM-free, ~1 s. | 14z-133 |
 | `tests/test_module_refs.sh` | test | ci_portable | — | EVERY CROSS-MODULE PYTHON NAME THE TOOLS AND GATES REFERENCE STILL EXISTS (GitHub #171 slice Q1, ruled 2026-09-24 — DECISIONS_HISTORY.md "Ruled 2026-09-24 (14z-180) — #171 gate qualification", "Land it now"). ci_portable: | 2026-09-24 |
 | `tests/test_must_fire_census.sh` | test | ci_portable | — | THE MUST-FIRE DOCTRINE, MACHINE-READ under the R10 grammar: which gates DECLARE a must-fire control (`# MUST-FIRE: <shape>: | 14z-145 |
 | `tests/test_rule_checker.sh` | test | ci_portable | — | the adversarial RULE-CHECKER's record is sound: every run in tests/rulecheck/ledger.tsv is complete and structured, every planted violation was caught, every fixture is calibrated, every VIOLATED resolved, and every freeze since the checker… | 14z-163 |
 | `tests/test_shell_portability.sh` | test | ci_portable | — | a `#!/bin/sh` script must actually be POSIX sh (14z-90, GitHub issue #15). | 14z-90 |
-| `tests/test_suite_dispatch.sh` | test | emulator | emulator | ground truth for the auto-detecting runner's dispatch pieces (no emulator needed; the emulator-side behaviors they gate are proven by test_m2_repoint.sh and the suite itself): 1. build_fingerprint: vanilla rompath -> 'vsavj'; | 14z-132 |
+| `tests/test_suite_dispatch.sh` | test | emulator | a build dir | ground truth for the auto-detecting runner's dispatch pieces (no emulator needed; the emulator-side behaviors they gate are proven by test_m2_repoint.sh and the suite itself): 1. build_fingerprint: vanilla rompath -> 'vsavj'; | 14z-132 |
 | `tests/test_suite_dispatch_selftest.sh` | test | ci_static | ROMDIR | ground truth for the kind->owner table in tests/test_suite_dispatch.sh (14z-90, GitHub issue #7). | 14z-90 |
 
 ## docs
@@ -100,7 +103,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_attract_determinism.sh` | test | emulator | MAME | M0 acceptance: a 60-second scripted attract-mode run checksums work RAM identically across two fresh runs. | M0 |
 | `tests/test_build_environment_entry.sh` | test | ci_portable | — | tools/record_build_environment.py, which composes an entry of docs/project/build_environments.md from a host's BINARY.txt records and the log of a PASSING tests/test_release_binaries.sh, against SYNTHETIC records and logs: | 2026-09-13 |
 | `tests/test_bundle_parsers.sh` | test | ci_portable | — | the LINUX and WINDOWS library bundlers (tools/bundle_elf_libs.py, tools/bundle_win_dlls.py) read real `ldd`, `readelf -d` and `objdump -p` output, walk a closure, and tell a closure the tools said NOTHING about (refused) from one they descr… | 14z-149 |
-| `tests/test_crash_guard.sh` | test | emulator | MAME | ground truth for the crash guard (verdict-logic doctrine, CLAUDE.md §4: a detector is trusted only after it classifies known-good and known-bad scenarios correctly). | — |
+| `tests/test_crash_guard.sh` | test | emulator | MAME, a build dir | ground truth for the crash guard (verdict-logic doctrine, CLAUDE.md §4: a detector is trusted only after it classifies known-good and known-bad scenarios correctly). | — |
 | `tests/test_crypt_boundary.sh` | test | ci_static | ROMDIR | code in the WIDE extension must be stored RAW. | 14z-123 |
 | `tests/test_decrypt_oracle.sh` | test | emulator | MAME | verify tools/cps2_decrypt.py against MAME's own cps2crypt implementation (dual-implementation agreement). | — |
 | `tests/test_fbneo_boot_log.sh` | test | ci_portable | — | the verdict logic of tests/lib/fbneo_boot_log.sh (what a healthy FBNeo WIDE boot log must show) against RECORDED boot logs from two real hosts: | 2026-09-13 |
@@ -117,9 +120,9 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_input_integrity.sh` | test | emulator | MAME | ground truth for the input-integrity check. | session 14z |
 | `tests/test_mame_determinism.sh` | test | emulator | MAME | is MAME actually deterministic, run to run? | session 14z |
 | `tests/test_mame_parity.sh` | test | emulator | MAME, FBNeo | B5 PREREQUISITE: the pinned MAME source build must be indistinguishable from the binary that froze the oracle, BEFORE any profile patch is applied to it. | session 1 |
-| `tests/test_mame_wide.sh` | test | emulator | MAME, FBNeo | CPS-2 WIDE profile gate, MAME side (B5). | session 14z |
+| `tests/test_mame_wide.sh` | test | emulator | MAME, FBNeo, a build dir | CPS-2 WIDE profile gate, MAME side (B5). | session 14z |
 | `tests/test_null_build.sh` | test | ci_static | ROMDIR | M0 acceptance: the null-patch build reproduces vanilla vsavj bit-identically from reference inputs, deterministically. | M0 |
-| `tests/test_phasec_image.sh` | test | emulator | MAME | Phase C step 2: the program image grows, and the extension is genuinely READ. | 14z-59g |
+| `tests/test_phasec_image.sh` | test | emulator | MAME, FBNeo, a build dir | Phase C step 2: the program image grows, and the extension is genuinely READ. | 14z-59g |
 | `tests/test_phasec_spaces.sh` | test | ci_static | ROMDIR | the address-space refactor must not move a byte. | 14z-123 |
 | `tests/test_readme_recording.sh` | test | emulator | MAME, a build dir, ~50 s | the README's "record it on MAME" command, run as written on this host's release MAME against the current merged romset, records a session the project replays frame for frame: | 14z-158 |
 | `tests/test_release_asset_shape.sh` | test | ci_portable | — | EVERY PUBLISHED ASSET IS SELF-SUFFICIENT, and the two emulator routes never travel together. ROM-free, no emulator, ~10 s. | 14z-149 |
@@ -128,9 +131,9 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_release_os_metadata.sh` | test | ci_portable | — | a file manager's folder metadata (`.DS_Store`) in a release tree is never shipped and never counted: the real uploader cuts no asset carrying one, and every release listing that can see a dotfile drops it through the one definition, tests/l… | 2026-09-14 |
 | `tests/test_release_roundtrip.sh` | test | ci_static | ROMDIR | THE RELEASE PACKAGE GATE (14z-105). | 14z-105 |
 | `tests/test_replay_stage_census.sh` | test | ci_portable | — | FREEZE the input-staging convention of every replay-driving Lua instrument (14z-93, GitHub issue #10). No ROMs, no emulator, ~1s. | 14z-93 |
-| `tests/test_replay_video_selfcheck.sh` | test | emulator | MAME, FBNeo | ground truth for replay.lua's VIDEO_OUT, the MAME per-frame framebuffer checksum. | session 14z |
+| `tests/test_replay_video_selfcheck.sh` | test | emulator | MAME, FBNeo, a build dir | ground truth for replay.lua's VIDEO_OUT, the MAME per-frame framebuffer checksum. | session 14z |
 | `tests/test_romset_identity.sh` | test | ci_static | ROMDIR | ground truth for tools/audit_romset_identity.py. | 14z-60z |
-| `tests/test_wide_profile.sh` | test | emulator | FBNeo | CPS-2 WIDE profile gate (Phase B). | 14z-123 |
+| `tests/test_wide_profile.sh` | test | emulator | FBNeo, a build dir | CPS-2 WIDE profile gate (Phase B). | 14z-123 |
 
 ## pipeline
 
@@ -141,7 +144,7 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 | `tests/audit_capture_matrix.sh` | audit | ci_static | ROMDIR | THE WHOLE CAPTURE-GEOMETRY MATRIX, ours vs native vsav2, every reachable (ATTACKER, VICTIM) cell (14z-143, maintainer-directed). | 14z-143 |
 | `tests/audit_dispatch_census.sh` | audit | emulator | MAME, a build dir, ~2 min | WHICH type indices does LEGACY ever dispatch at the two obj_hook sites, and is the frozen observation still complete? | 14z-89 |
 | `tests/audit_objhook_owner_census.sh` | audit | emulator | MAME, a build dir, ~6 min | which OWNER does each extended obj_hook type carry at DISPATCH TIME? (14z-81b; the vec3-fix design measurement.) | 14z-81b |
-| `tests/audit_region_movability.sh` | audit | emulator | MAME, ~10 min | which regions can actually live in wide_ext? | M3b |
+| `tests/audit_region_movability.sh` | audit | emulator | MAME, a build dir, ~10 min | which regions can actually live in wide_ext? | M3b |
 | `tests/audit_stock_emulator_stall.sh` | audit | emulator | MAME, a build dir, ~1 min | the WIDE romset FORCED into an UNPATCHED MAME (renamed to vsavj.zip) boots, prints WRONG CHECKSUMS, and STALLS on the QSound legal screen without a crash: | 2026-09-11 |
 | `tests/audit_type_writes.sh` | audit | emulator | MAME, a build dir, ~8 min | the DYNAMIC half of the 14z-82 type-stamp census: which PCs actually write extended-family type bytes on the ground-truth single-tenant builds, and do they all map to the FROZEN static inventory? | 14z-82 |
 | `tests/test_accent_census.sh` | test | ci_static | ROMDIR | the accent/march census (14z-63, phase 3 item 6, the 62k-class audit): every path that can resolve a weapon-accent from the march family must be thunked on a variant-id build. | 14z-63 |
@@ -162,17 +165,17 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 | `tests/test_index_space.sh` | test | ci_static | ROMDIR | THE OUT-OF-RANGE INDEX SWEEP (14z-76). Static, seconds. | 14z-76 |
 | `tests/test_index_window_thunk.sh` | test | ci_static | ROMDIR | the (b') index-window thunk gate (14z-79). | 14z-79 |
 | `tests/test_kernel_voice_tables.sh` | test | ci_static | ROMDIR | the KERNEL per-class voice tables (14z-96, GitHub #101). | 14z-96 |
-| `tests/test_m2_repoint.sh` | test | emulator | MAME | proves the M2 slot-replacement mechanism on trusted vanilla tooling: repointing a bank-table slot entry takes effect in a live game, AND the superset invariant holds (only content involving the modified slot changes). | M2 |
-| `tests/test_m2a_stage1_nullreloc.sh` | test | emulator | MAME | M2a stage-1 gate: the null relocation. | M2a |
-| `tests/test_m2a_stage2_data.sh` | test | emulator | MAME | M2a stage-2 gate: Donovan passive data. | M2a |
-| `tests/test_m2a_stage3_anim.sh` | test | emulator | MAME | M2a stage-3 gate: Donovan anim + sprite sub-table clusters, still under Jedah's dispatch code. | M2a |
+| `tests/test_m2_repoint.sh` | test | emulator | MAME, a build dir | proves the M2 slot-replacement mechanism on trusted vanilla tooling: repointing a bank-table slot entry takes effect in a live game, AND the superset invariant holds (only content involving the modified slot changes). | M2 |
+| `tests/test_m2a_stage1_nullreloc.sh` | test | emulator | MAME, a build dir | M2a stage-1 gate: the null relocation. | M2a |
+| `tests/test_m2a_stage2_data.sh` | test | emulator | MAME, a build dir | M2a stage-2 gate: Donovan passive data. | M2a |
+| `tests/test_m2a_stage3_anim.sh` | test | emulator | MAME, a build dir | M2a stage-3 gate: Donovan anim + sprite sub-table clusters, still under Jedah's dispatch code. | M2a |
 | `tests/test_m2a_target_policy.sh` | test | ci_portable | — | the M2 battery's target is RESOLVED, never pinned, and the mask literal has exactly one home. ROM-free, ~1 s. | M2 |
 | `tests/test_m2a_target_resolution.sh` | test | ci_static | ROMDIR | the M2 battery resolves its legacy target from the BUILD, and an unregistered image stops it. Needs ROMDIR, no emulator, ~10 s. | M2 |
 | `tests/test_m3a_reproducible.sh` | test | ci_static | ROMDIR | the M3b Phase 0 reproducibility gate (14z-65). | M3b |
 | `tests/test_manifest_merge.sh` | test | ci_portable | — | what the three tenant manifests do when merged. | M3b |
-| `tests/test_movability_liveness.sh` | test | emulator | ~18 min | ground truth that tests/audit_region_movability.sh cannot score a DEAD emulator as a successful run (14z-90, GitHub issue #5). | 14z-90 |
+| `tests/test_movability_liveness.sh` | test | emulator | MAME, a build dir, ~18 min | ground truth that tests/audit_region_movability.sh cannot score a DEAD emulator as a successful run (14z-90, GitHub issue #5). | 14z-90 |
 | `tests/test_patch_overlap.sh` | test | ci_static | ROMDIR | ground truth for the patch_prg op-overlap assertion (14z-65, M3b Phase 0). Two ops writing one word must be a BUILD ERROR that names both ops; disjoint and word-adjacent ops must stay clean. No emulator. | 14z-65 |
-| `tests/test_patch_prg.sh` | test | emulator | MAME | the program-patch tooling round-trips through MAME. | M2 |
+| `tests/test_patch_prg.sh` | test | emulator | MAME, a build dir | the program-patch tooling round-trips through MAME. | M2 |
 | `tests/test_pointer_flow.sh` | test | ci_static | ROMDIR | the composed-output pointer/flow comb as a gate (14z-100, the hardening program's H1; maintainer-directed 2026-08-20). | 14z-100 |
 | `tests/test_qs_id_table.sh` | test | ci_static | ROMDIR | the QSound Z80 driver id-table census gate (14z-86). | 14z-86 |
 | `tests/test_qs_songs.sh` | test | ci_static | ROMDIR | the authored-Z80-song machinery gate (14z-86, M5). | 14z-86 |
@@ -189,7 +192,7 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 | `tests/test_shim_charid.sh` | test | emulator | MAME, a build dir, ~44 s | the init shim can identify WHICH tenant it is running for, because (0x382,A6) already holds the character id when it runs. | M3b |
 | `tests/test_tenant_anim_relocation.sh` | test | ci_static | ROMDIR | EVERY SPRITE-RECORD POINTER IN A TENANT'S PLACED ANIM CHAINS IS RELOCATED (14z-126b). ci_static: needs the tenant build dirs, no ROMDIR, no emulator, ~5 s. | 14z-126b |
 | `tests/test_tenant_row_owner.sh` | test | ci_static | ROMDIR | the row-OWNER threading is LIVE, not decoration. | M3b |
-| `tests/test_tenant_select_records.sh` | test | emulator | MAME | the M3a select-records half: at a variant-half tenant id the build must carry the tenant's OWN select records and the host's records must return to VANILLA bytes. | M3a |
+| `tests/test_tenant_select_records.sh` | test | emulator | MAME, a build dir | the M3a select-records half: at a variant-half tenant id the build must carry the tenant's OWN select records and the host's records must return to VANILLA bytes. | M3a |
 | `tests/test_thunk_addr_literal.sh` | test | ci_static | ROMDIR | ground truth for the STALE PLACED-ADDRESS guard in tools/gen_donovan_patch.py (14z-78). | 14z-78 |
 | `tests/test_type_stamp_census.sh` | test | ci_static | ROMDIR | the static type-stamp census reproduces the FROZEN inventory (build/manifest/type_stamps.toml), and its verdict logic is alive in both directions. | 14z-82 |
 | `tests/test_unless_composed.sh` | test | ci_portable | — | THE `unless_composed` ROW KEY (14z-170): a manifest row naming a tenant applies only to a build whose composition does NOT include that tenant; a name outside the port's roster fails the build; | 14z-170 |
@@ -206,7 +209,7 @@ the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, du
 | `tests/audit_flicker_attribution.sh` | audit | emulator | MAME, a build dir, ~3 min | WHY is each of these flicker frames in a frozen expectation? Re-derives the attribution instead of trusting the commit message that first made it. | 14z-91 |
 | `tests/audit_guard_corpus.sh` | audit | emulator | MAME, a build dir | THE AUTHORITATIVE-GUARD CORPUS SOAK (14z-101, hardening register §5's queued item). Every replay in tests/replays/*.rpl runs under the crash guard on the build under test, in FOUR legs: | 14z-101 |
 | `tests/audit_legacy_pairings.sh` | audit | emulator | MAME, a build dir, ~30 min | WHICH REPLAYS ARE LEGACY CONTENT, and is every one of them compared against VANILLA rather than against itself? | 14z-88 |
-| `tests/audit_mask_window_ff4182.sh` | audit | emulator | MAME | on-demand audit of the third masked window (14z-49, maintainer-ratified round 64). | 14z-49 |
+| `tests/audit_mask_window_ff4182.sh` | audit | emulator | MAME, a build dir | on-demand audit of the third masked window (14z-49, maintainer-ratified round 64). | 14z-49 |
 | `tests/audit_mask_window_ff42a2.sh` | audit | emulator | MAME | the row-0x1D palette-staging window ($FF42A2-$FF42C1, mask entry `42a2-42c2`, V3 basis; maintainer-ratified 2026-08-15, applied 14z-88 — then WITHDRAWN the same day with the medallion REVERT this audit motivated) attributed on the TENANT-CO… | 2026-08-15 |
 | `tests/audit_merged_legacy.sh` | audit | emulator | MAME, a build dir, ~2 h | does a 3-TENANT MERGED program image perturb LEGACY? | 14z-91 |
 | `tests/audit_merged_vec3.sh` | audit | emulator | MAME, a build dir, ~4 min | the merged-build Huitzil satellite anim-base probe (14z-81). Rerunnable capture of the diagnosis rig that localized the merged-legacy audit's Huitzil crash; becomes the REGRESSION GATE for the eventual fix. | 14z-81 |
@@ -222,16 +225,16 @@ the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, du
 | `tests/test_down_flash_mechanism.sh` | test | emulator | MAME | THE MECHANISM behind GitHub #113's one-frame white-out, measured 2026-09-01 (14z-126b) and locked here. | 2026-09-01 |
 | `tests/test_down_flash_vanilla.sh` | test | emulator | MAME | GitHub #113 ground truth (14z-112; #113 CLOSED 2026-09-01 as vanilla, board-confirmed — this gate is what keeps that verdict honest, so it stays): the one-frame WHOLE-SCREEN WHITE at a down is VANILLA Vampire Savior behaviour, not ours. | 14z-112 |
 | `tests/test_dualtrack.sh` | test | emulator | FBNeo, a build dir | the two tracks must differ ONLY where they are meant to. | 14z-59g |
-| `tests/test_fbneo_legacy_oracle.sh` | test | emulator | MAME, FBNeo, ~5 min | the HACKED build's legacy content, compared against VANILLA, on FBNeo (14z-92, GitHub #78 partial). | 14z-92 |
+| `tests/test_fbneo_legacy_oracle.sh` | test | emulator | MAME, FBNeo, a build dir, ~5 min | the HACKED build's legacy content, compared against VANILLA, on FBNeo (14z-92, GitHub #78 partial). | 14z-92 |
 | `tests/test_freeze_basis_sandbox.sh` | test | ci_portable | — | GROUND TRUTH: tools/freeze_masked_basis.sh must never hand one run's MAME sandbox to the next run. | 14z-91 |
 | `tests/test_inp_corpus.sh` | test | emulator | MAME, a build dir, ~1 min | EVERY tracked hand-played recording plays through with NO CPU exception on the current merged build. 14z-111, maintainer-ruled. | 14z-111 |
 | `tests/test_inp_crash_merged_m8_01.sh` | test | emulator | MAME, a build dir, ~1 min | THE #99 NATURAL-PATH CAPTURE, as a gate (14z-111). tests/inp/crash-merged-m8-01 is the maintainer's own MAME session (WIDE_RECORD): | 14z-111 |
 | `tests/test_m2a_flicker_gate.sh` | test | ci_portable | — | ground truth for the M2 battery's masked legacy gate (`m2a_legacy_gate_masked`). ROM-free: the emulator is stubbed and the logs are crafted from the real frozen basis. | M2 |
-| `tests/test_m2a_stage4_code.sh` | test | emulator | MAME | M2a stage-4 gate: ported code + engine hooks. | M2a |
+| `tests/test_m2a_stage4_code.sh` | test | emulator | MAME, a build dir | M2a stage-4 gate: ported code + engine hooks. | M2a |
 | `tests/test_m2a_stage4_oracle.sh` | test | emulator | MAME, a build dir | M2a stage-4 behavior gate: ported Donovan on vsavj vs NATIVE Donovan on vsav2 (CLAUDE.md §4 dual-oracle for new content, same-emulator two-game form). | M2a |
-| `tests/test_m2a_stage4_xemu.sh` | test | emulator | MAME, FBNeo | M2a stage-4 dual-emulator gate (CLAUDE.md §4): the PATCHED build runs 17_don_oracle_vsavj (both picks scripted, 16_xemu authoring rules) on MAME and on patched FBNeo; | M2a |
+| `tests/test_m2a_stage4_xemu.sh` | test | emulator | MAME, FBNeo, a build dir | M2a stage-4 dual-emulator gate (CLAUDE.md §4): the PATCHED build runs 17_don_oracle_vsavj (both picks scripted, 16_xemu authoring rules) on MAME and on patched FBNeo; | M2a |
 | `tests/test_masked_compare.sh` | test | ci_portable | — | ground truth for tests/lib/masked_compare.sh, the ONE implementation of the CLAUDE.md §4 masked comparison vocabulary (14z-97, GitHub #96). | 14z-97 |
-| `tests/test_pod_black_foot_palette.sh` | test | emulator | MAME, ~2.5 min | GitHub #112's black foot, CAUSALLY located (14z-126b, 2026-09-01): the black pixels ARE palette row 0b index 14 (RAM:$90C17C) of the OBJ palette page, and nothing else. | 14z-126b |
+| `tests/test_pod_black_foot_palette.sh` | test | emulator | MAME, a build dir, ~2.5 min | GitHub #112's black foot, CAUSALLY located (14z-126b, 2026-09-01): the black pixels ARE palette row 0b index 14 (RAM:$90C17C) of the OBJ palette page, and nothing else. | 14z-126b |
 
 ## gfx
 
@@ -240,7 +243,7 @@ tiles, OBJ records, sprite lists, render-layer verdicts.
 | gate | kind | tier | needs | locks (the script's own header) | since |
 |---|---|---|---|---|---|
 | `tests/audit_clone_beam_lines.sh` | audit | emulator | MAME, a build dir | the GitHub #109 lock: Phobos' DF clone-mode attack must draw the BEAM-LINE sprites (effect-class row 31). | 14z-102 |
-| `tests/audit_effect_class_rows.sh` | audit | emulator | MAME | the THREE deadness measurements the beam port rests on (14z-71). All are ROM-read audits, and the first two are the ONLY guards their claims have. | 14z-71 |
+| `tests/audit_effect_class_rows.sh` | audit | emulator | MAME, a build dir | the THREE deadness measurements the beam port rests on (14z-71). All are ROM-read audits, and the first two are the ONLY guards their claims have. | 14z-71 |
 | `tests/audit_empty_tiles.sh` | audit | emulator | MAME, a build dir | does this build DRAW any sprite whose tile is blank? (14z-69o, the child-shadow method, promoted to a test.) | 14z-69o |
 | `tests/audit_gfx_merged_census.sh` | audit | ci_static | ROMDIR | the 3-tenant merged group-C write-set census (M3b Phase 3 S0, 14z-83; expectation flipped to ZERO-REAL by the S3 strip relocation, maintainer-approved same day). Static: reference zips + frozen manifests/build side files; | M3b |
 | `tests/audit_grenade_ground_tiles.sh` | audit | emulator | MAME, a build dir, ~4 min | Huitzil's 214+LP GROUND explosion draws native vs2's own art (14z-123, the documentation rationalization pass, inferred_claims row 9; closes the GUESS "the fuchsia class was most likely fixed at 14z-67"). | 14z-123 |
@@ -252,18 +255,18 @@ tiles, OBJ records, sprite lists, render-layer verdicts.
 | `tests/test_gfx_chain.sh` | test | ci_static | ROMDIR | the group-C gfx CHAIN mode (14z-83 S2; expectation flipped by the S3 strip relocation: the full D->H->P chain now SUCCEEDS, and the must-fail control runs on an old-shift fixture). ~9 min. | 14z-83 |
 | `tests/test_gfx_collision_gate.sh` | test | ci_portable | — | ground truth for build_gfx_donovan.place() (14z-83 S1): the same-source-or-fail rule every gfx pass now routes through. Pure functions on synthetic simms — no ROMs, no emulator, ~1s. | 14z-83 |
 | `tests/test_gfx_layout3.sh` | test | ci_static | ROMDIR | fact-locks for the 3-tenant group-C tile layout (D4 opener step 1, session 14z-67). Static: reads the reference zips only, no MAME, no build output. ~90s (one vs2 decrypt). | session 14z |
-| `tests/test_gfx_menus.sh` | test | emulator | MAME | pixel-level menu/UI regression gate (session 14s). | session 14s |
+| `tests/test_gfx_menus.sh` | test | emulator | MAME, a build dir | pixel-level menu/UI regression gate (session 14s). | session 14s |
 | `tests/test_gfx_menus_guard.sh` | test | ci_static | ROMDIR | ground truth for the pixel gate's rompath guard (14z-90, GitHub issue #6). | 14z-90 |
 | `tests/test_gfx_tile_codec.sh` | test | ci_portable | — | ground truth for tools/gfx_tiles.py decode/encode (14z-105, born with the select-screen version string's AUTHORED tiles — the first tiles this project ever SYNTHESIZED rather than copied). | 14z-105 |
 | `tests/test_gfx_tiles.sh` | test | ci_static | ROMDIR | fact-locks for the CPS-2 gfx tile layout understanding (M2b groundwork, session 14). Static only: reads reference zips, no MAME. | M2b |
 | `tests/test_list_type_census.sh` | test | ci_static | ROMDIR | the ONE-SOURCE-BANK re-check, per tenant (14z-74). | 14z-74 |
-| `tests/test_merged_render_content.sh` | test | emulator | MAME, ~25 min | the MERGED build must serve all THREE tenants' tiles (and only where designed), measured in the emulator's own decoded gfx memory (M3b Phase 3 S5, 14z-83). | M3b |
+| `tests/test_merged_render_content.sh` | test | emulator | MAME, a build dir, ~25 min | the MERGED build must serve all THREE tenants' tiles (and only where designed), measured in the emulator's own decoded gfx memory (M3b Phase 3 S5, 14z-83). | M3b |
 | `tests/test_obj_record_walk.sh` | test | ci_portable | — | ground truth for the RELOCATION-AWARENESS of obj_records.walk()'s two heuristic passes (14z-92, GitHub #75). Pure functions on a synthetic region — no ROMs, no build dirs, no emulator, ~1s. Portable by construction (tests/ci_portable.txt). | 14z-92 |
-| `tests/test_obj_records.sh` | test | emulator | Verilator, MAME, ~2 min | ground truth for tools/oram_obj_records.py. | 14z-108 |
+| `tests/test_obj_records.sh` | test | emulator | Verilator, MAME, a build dir, ~2 min | ground truth for tools/oram_obj_records.py. | 14z-108 |
 | `tests/test_obj_walker_relocation.sh` | test | ci_static | ROMDIR | the obj_walker relocation is STRUCTURALLY what it claims: a verbatim walker copy, its own table behind it, the vanilla dispatch sites untouched, and every caller repointed by OPERAND. | 14z-91 |
 | `tests/test_version_string.sh` | test | emulator | MAME, a build dir, ~2 min | THE IN-GAME VERSION STRING (W2, 14z-105; CLAUDE.md §5 "shipped builds carry a visible in-game version string as the naked-eye A/B tell", open since 14z-92, maintainer-approved 14z-104). | 14z-105 |
-| `tests/test_wheel_bank5.sh` | test | emulator | MAME | the select-wheel bank-5 move (14z-63, phase 3): real medallion art for the appended cells, vanilla cells byte-copied. | 14z-63 |
-| `tests/test_wide_render_content.sh` | test | emulator | MAME | the WIDE track must SERVE the ported content's tiles (and only where designed), measured in the emulator's own decoded gfx memory. | 14z-60z |
+| `tests/test_wheel_bank5.sh` | test | emulator | MAME, a build dir | the select-wheel bank-5 move (14z-63, phase 3): real medallion art for the appended cells, vanilla cells byte-copied. | 14z-63 |
+| `tests/test_wide_render_content.sh` | test | emulator | MAME, a build dir | the WIDE track must SERVE the ported content's tiles (and only where designed), measured in the emulator's own decoded gfx memory. | 14z-60z |
 
 ## tenant
 
@@ -274,7 +277,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 | `tests/audit_continue_ladder.sh` | audit | emulator | MAME, a build dir, ~20 min | THE #102 DISCRIMINATOR (14z-98): does a loss+continue reset the arcade ladder's in-use mask ON VANILLA, with a pure-legacy character? On-demand, ~20 min (2 full-marathon MAME runs, parallel: pristine vsavj + the merged build). | 14z-98 |
 | `tests/audit_continue_switch.sh` | audit | emulator | MAME, a build dir, ~18 min | THE #99 CONTINUE-WITH-SWITCH RIG, committed (the 14z-97 (7) doctrine debt, payable once #103 was fixed — paid at the 14z-99 post-freeze close, 2026-08-20). | 14z-97 (7) |
 | `tests/audit_df_framework.sh` | audit | emulator | MAME, a build dir, ~2 min | THE DF FRAMEWORK TABLE, FROZEN (14z-104). | 14z-104 |
-| `tests/audit_df_gold.sh` | audit | emulator | a build dir, ~10 min | Phobos' Dark Force uploads HIS gold block; Bulleta's DF does not leak it (14z-84, the huitzil-m6 feature's guard). ~10 min, 2 controlled DF legs on the build under test. | 14z-84 |
+| `tests/audit_df_gold.sh` | audit | emulator | MAME, a build dir, ~10 min | Phobos' Dark Force uploads HIS gold block; Bulleta's DF does not leak it (14z-84, the huitzil-m6 feature's guard). ~10 min, 2 controlled DF legs on the build under test. | 14z-84 |
 | `tests/audit_don_grab_pose.sh` | audit | emulator | MAME, a build dir, ~12 min | THE #104 LOCK: a legacy grab holds a TENANT victim on the wrong capture record. On-demand, ~12 min (8 MAME runs, 2 at a time: the build + native vsav2, for one legacy control victim and three tenants). | 2026-08-19 |
 | `tests/audit_don_ko_writer.sh` | audit | emulator | MAME, a build dir, ~8 min | THE #103 ROOT-CAUSE LOCK (14z-98): WHO WRITES DONOVAN'S HP AT HIS ARCADE DEATH, PC-attributed, non-debug (canonical timeline). On-demand, ~8 min (2 MAME read_tap runs, parallel). | 14z-98 |
 | `tests/audit_don_lilith_ko.sh` | audit | emulator | MAME, FBNeo, a build dir, ~5 min | A DONOVAN P1 DEATH IN ARCADE STALLS THE LOSE FLOW ~8,000 FRAMES (14z-97, GitHub #103). On-demand, ~5 min (2 MAME runs, parallel). | 14z-97 |
@@ -288,11 +291,11 @@ tenant content — per-character gates and on-demand audits on the ported charac
 | `tests/audit_hui_grunt.sh` | audit | emulator | MAME, a build dir, ~3 min | the electrocute-grunt A/B over FIVE electrocutions (14z-96, on-demand, ~3 min, 2 MAME runs parallel). The dynamic ground truth under tests/test_kernel_voice_tables.sh (the static half) and the instrument the maintainer's 2026-08-18 grunt re… | 14z-96 |
 | `tests/audit_id_writers.sh` | audit | emulator | MAME, ~10 min | which character ids does VANILLA ever assign? | 14z-60 |
 | `tests/audit_kill_poke_shape.sh` | audit | emulator | MAME, a build dir, ~7 min | A 2-BYTE HP KILL POKE MANUFACTURES #103's UNJUDGEABLE STATE ON ANY CHARACTER (14z-98). On-demand, ~7 min (2 MAME runs, parallel). GROUND TRUTH FOR RIG AUTHORS, frozen both ways. | 14z-98 |
-| `tests/audit_ladder_selector.sh` | audit | emulator | MAME, ~12 min | THE ARCADE-LADDER SELECTOR, made rerunnable (14z-95, GitHub #99). On-demand, ~12 min (2 marathon runs, parallel). | 14z-95 |
-| `tests/audit_palette_seq_ids.sh` | audit | emulator | MAME | which palette-seq ids does LEGACY ever request? | 14z-79 |
-| `tests/audit_phase_mode_cost.sh` | audit | emulator | MAME, ~15 min | what does Phobos' phase-gated latch cost Donovan? | M3b |
+| `tests/audit_ladder_selector.sh` | audit | emulator | MAME, a build dir, ~12 min | THE ARCADE-LADDER SELECTOR, made rerunnable (14z-95, GitHub #99). On-demand, ~12 min (2 marathon runs, parallel). | 14z-95 |
+| `tests/audit_palette_seq_ids.sh` | audit | emulator | MAME, a build dir | which palette-seq ids does LEGACY ever request? | 14z-79 |
+| `tests/audit_phase_mode_cost.sh` | audit | emulator | MAME, a build dir, ~15 min | what does Phobos' phase-gated latch cost Donovan? | M3b |
 | `tests/audit_pool_free_byte.sh` | audit | emulator | MAME, a build dir, ~20 min | the owner-tag byte (+0x7F of an object-pool slot) audit, BOTH pools. On-demand, ~20 min (3 legs x census + tap on the merged build). | 14z-85 |
-| `tests/audit_projectile_clash.sh` | audit | emulator | MAME, FBNeo, ~5 min | the pool-vs-pool projectile-contact surface (14z-100 hardening H4; the census gap the hitclass KEEP ruling named). RE-FRAMED 14z-101: | 14z-100 |
+| `tests/audit_projectile_clash.sh` | audit | emulator | MAME, FBNeo, a build dir, ~5 min | the pool-vs-pool projectile-contact surface (14z-100 hardening H4; the census gap the hitclass KEEP ruling named). RE-FRAMED 14z-101: | 14z-100 |
 | `tests/audit_pursuit_leap.sh` | audit | emulator | MAME, a build dir, ~1 min | THE LEAPING PURSUIT ATTACK, both directions per tenant (14z-104; the §4 "pursuit attacks" cell's SECOND instrument, beside audit_down_attack's grounded OTG surface). | 14z-104 |
 | `tests/audit_pyron_ring.sh` | audit | emulator | MAME, a build dir, ~10 min | Pyron's merged-vs-solo sound-ring inventory, frozen (14z-85). On-demand, ~10 min (2 replays x merged+solo = 4 runs). | 14z-85 |
 | `tests/audit_qs_voice_batch.sh` | audit | emulator | MAME, a build dir, ~8 min | THE VOICE-BATCH KEYON A/B (14z-86, on-demand, ~8 min, 2 parallel MAME runs). | 14z-86 |
@@ -307,52 +310,52 @@ tenant content — per-character gates and on-demand audits on the ported charac
 | `tests/audit_trap_parity.sh` | audit | emulator | MAME, a build dir, ~5 min | the Plasma Trap SOUND parity A/B (14z-85g): the same far/timer replay on native vsav2 and on the build, trap-event ring-id inventories compared against the frozen measurement. On-demand, ~5 min (2 MAME runs, parallel). | 14z-85g |
 | `tests/audit_trap_shock.sh` | audit | emulator | MAME, a build dir, ~4 min | the Plasma Trap dome inflicts SHOCK on BOTH of Phobos's tracks, and since the 14z-170 class-0x52 fix (ruled 2026-09-18, scoped S1) the two differ by design: | 14z-170 |
 | `tests/audit_trap_sound.sh` | audit | emulator | MAME, a build dir, ~10 min | the MK Plasma Trap fires, ring live (14z-82d lock, RE-SCOPED 14z-85g). | 14z-82d |
-| `tests/audit_tripwire_reach.sh` | audit | emulator | MAME, ~15 min | DO ANY PLANTED TRIPWIRES FIRE IN EXTENDED PLAY? (14z-93, on-demand, ~15 min at JOBS=3.) | 14z-93 |
+| `tests/audit_tripwire_reach.sh` | audit | emulator | MAME, a build dir, ~15 min | DO ANY PLANTED TRIPWIRES FIRE IN EXTENDED PLAY? (14z-93, on-demand, ~15 min at JOBS=3.) | 14z-93 |
 | `tests/audit_voice_borrow.sh` | audit | emulator | MAME, a build dir, ~6 min | THE VOICE-CLASS BORROW mechanism gate (14z-87). | 14z-87 |
 | `tests/audit_walker_ghost.sh` | audit | emulator | MAME, a build dir, ~5 min | WHERE ON THE STACK does each object-pool walker's `jsr (A0)` push its return address, and is that longword inside the masked dead-stack window? | 14z-91 |
 | `tests/audit_walker_repoint.sh` | audit | emulator | MAME, a build dir, ~5 min | after the relocation, does ANYTHING still reach the vanilla object-pool walkers? | 14z-91 |
 | `tests/audit_win_pal_auto.sh` | audit | emulator | MAME, a build dir, ~8 min | THE #105 LOCK (14z-99): with AUTO selected by the WINNER, the 2P victory portrait screen draws a TENANT winner's portrait WHITE (correct shapes, white fill — the maintainer's captured surface). On-demand, ~8 min (3 MAME runs, 2 at a time). | 14z-99 |
 | `tests/test_attract_roster.sh` | test | ci_static | ROMDIR | THE ATTRACT-DEMO ROSTER, decoded from the ROM and frozen (14z-118, the ram.md audit). ci_static: needs ROMDIR (the decrypt cache), no build dir, no emulator, ~2 s. | 14z-118 |
-| `tests/test_don_accent.sh` | test | emulator | MAME | weapon-accent steadiness + Victor-accent legacy guard (session 14z-19, rounds 34-35). | session 14z |
-| `tests/test_don_colors.sh` | test | emulator | MAME | Donovan color-set gate (session 14z-21). | session 14z |
-| `tests/test_don_column.sh` | test | emulator | MAME | swordless-421P column KO crash gate (14z-33). | 14z-33 |
-| `tests/test_don_immortal_native.sh` | test | emulator | MAME, ~4 min | 421+P (Lightning Sword) AGAINST NATIVE vsav2 AT A MATCHED SPEED LEVEL AND A PINNED RNG, in hit count, damage and hit frames (14z-127, GitHub #114; matched 14z-158, #135, #142). | 14z-127 |
-| `tests/test_don_reactions.sh` | test | emulator | MAME | Change Immortal behavior gate (14z-26..28). | 14z-26 |
-| `tests/test_don_sound.sh` | test | emulator | MAME | Donovan sound gate (session 14z-52). | session 14z |
-| `tests/test_don_sword.sh` | test | emulator | MAME | Donovan sword-swing behavior gate (session 14z-5). | session 14z |
-| `tests/test_don_throw_mirror.sh` | test | emulator | MAME | the 14z-2 mirror-victim fix (applied 14z-64 in the M3a re-freeze bundle): in a BASE-SLOT mirror match (both players on slot 0x0F = Donovan there), the thrown victim must use the DONOVAN-victim keyframe block, not Jedah's. | 14z-2 |
+| `tests/test_don_accent.sh` | test | emulator | MAME, a build dir | weapon-accent steadiness + Victor-accent legacy guard (session 14z-19, rounds 34-35). | session 14z |
+| `tests/test_don_colors.sh` | test | emulator | MAME, a build dir | Donovan color-set gate (session 14z-21). | session 14z |
+| `tests/test_don_column.sh` | test | emulator | MAME, a build dir | swordless-421P column KO crash gate (14z-33). | 14z-33 |
+| `tests/test_don_immortal_native.sh` | test | emulator | MAME, a build dir, ~4 min | 421+P (Lightning Sword) AGAINST NATIVE vsav2 AT A MATCHED SPEED LEVEL AND A PINNED RNG, in hit count, damage and hit frames (14z-127, GitHub #114; matched 14z-158, #135, #142). | 14z-127 |
+| `tests/test_don_reactions.sh` | test | emulator | MAME, a build dir | Change Immortal behavior gate (14z-26..28). | 14z-26 |
+| `tests/test_don_sound.sh` | test | emulator | MAME, a build dir | Donovan sound gate (session 14z-52). | session 14z |
+| `tests/test_don_sword.sh` | test | emulator | MAME, a build dir | Donovan sword-swing behavior gate (session 14z-5). | session 14z |
+| `tests/test_don_throw_mirror.sh` | test | emulator | MAME, a build dir | the 14z-2 mirror-victim fix (applied 14z-64 in the M3a re-freeze bundle): in a BASE-SLOT mirror match (both players on slot 0x0F = Donovan there), the thrown victim must use the DONOVAN-victim keyframe block, not Jedah's. | 14z-2 |
 | `tests/test_hui_air.sh` | test | emulator | MAME, a build dir | Huitzil air-movement gate (14z-66, playtest round-1 item 3: float + air dash were DEAD). | 14z-66 |
-| `tests/test_hui_boot.sh` | test | emulator | MAME | the Huitzil stage-4 BOOT gate (14z-65). | 14z-65 |
+| `tests/test_hui_boot.sh` | test | emulator | MAME, a build dir | the Huitzil stage-4 BOOT gate (14z-65). | 14z-65 |
 | `tests/test_hui_df_style.sh` | test | emulator | MAME, a build dir | the DARK FORCE STYLE gate (14z-69): a direct ours-vs-NATIVE A/B of Huitzil in Dark Force, at the phase the symptom was reported at. | 14z-69 |
 | `tests/test_hui_electrocute.sh` | test | emulator | MAME, a build dir, ~2 min | PHOBOS AS THE ELECTROCUTE VICTIM, ours vs native vsav2 (14z-95). The consumer for tests/replays/hui/93_hui_electrocuted.rpl. | 14z-95 |
 | `tests/test_hui_ex.sh` | test | emulator | MAME, a build dir | Huitzil EX-move gate (14z-66, playtest round-1 item 1). | 14z-66 |
 | `tests/test_hui_fx_flow.sh` | test | emulator | FBNeo, a build dir | the effect-flow attribution gate (14z-68). | 14z-68 |
 | `tests/test_hui_grab.sh` | test | emulator | MAME, FBNeo, a build dir | Circuit Scrapper gate (14z-66, playtest round-1 item 4: the 63214 command grab "did not come out"). | 14z-66 |
 | `tests/test_hui_grab_victim.sh` | test | emulator | MAME, a build dir | the GRAB-VICTIM placement A/B gate (14z-73). | 14z-73 |
-| `tests/test_hui_ladder.sh` | test | emulator | MAME | the Huitzil stage 1-3 ladder gate (14z-65, M3b). | 14z-65 |
+| `tests/test_hui_ladder.sh` | test | emulator | MAME, a build dir | the Huitzil stage 1-3 ladder gate (14z-65, M3b). | 14z-65 |
 | `tests/test_hui_oracle.sh` | test | emulator | MAME, a build dir, ~10 min | Huitzil vsav2-as-oracle behavior gate (14z-66, the 17/18-style battery; CLAUDE.md §4 dual-oracle for new content, same-emulator two-game form — the test_m2a_stage4_oracle.sh pattern adapted for a poke-picked tenant). | 14z-66 |
 | `tests/test_hui_pairs.sh` | test | emulator | MAME, a build dir | Reflect Wall guard-cancel + pair-press gate (14z-66, playtest round-1 items 6/7 — the coverage half of item 5). Both sections assert the NATIVE-MATCHED signatures measured on the A/B of record (replay headers), not just no-crash. Usage: | 14z-66 |
-| `tests/test_hui_soak.sh` | test | emulator | MAME | the Huitzil stage-4 SOAK gate (14z-65). | 14z-65 |
+| `tests/test_hui_soak.sh` | test | emulator | MAME, a build dir | the Huitzil stage-4 SOAK gate (14z-65). | 14z-65 |
 | `tests/test_hui_walk.sh` | test | emulator | MAME, a build dir | Huitzil velocity-port gate (14z-66, playtest round-1 item 2 "feels a bit slower"). | 14z-66 |
 | `tests/test_hui_winscreen.sh` | test | ci_static | ROMDIR | the Huitzil WIN-SCREEN gate (14z-68m). | 14z-68m |
 | `tests/test_ladder_tenant_vs_palette.sh` | test | emulator | MAME, a build dir, ~5 min | THE ARCADE-LADDER "VS PALETTE POOL" (PRG:0x3A3CA0 + id*32) MEASURED ON SCREEN for a TENANT opponent (14z-123, the documentation rationalization pass, inferred_claims.md row 7). | 14z-123 |
-| `tests/test_m2a_flavor_selector.sh` | test | emulator | MAME | the Start-hold flavor selector (stage 5). | — |
-| `tests/test_m2b_scroll3.sh` | test | emulator | MAME | scroll3-vs-OBJ-band exclusivity check (M2b). The Donovan tile placement overwrites vsav bank-2 OBJ positions 0x2AD8F-0x2EEBB (Jedah's band). scroll1/2 cannot address bank 2 (measured: CPS2 draw path, no mapper, offsets pin them to bank 1); | M2b |
+| `tests/test_m2a_flavor_selector.sh` | test | emulator | MAME, a build dir | the Start-hold flavor selector (stage 5). | — |
+| `tests/test_m2b_scroll3.sh` | test | emulator | MAME, a build dir | scroll3-vs-OBJ-band exclusivity check (M2b). The Donovan tile placement overwrites vsav bank-2 OBJ positions 0x2AD8F-0x2EEBB (Jedah's band). scroll1/2 cannot address bank 2 (measured: CPS2 draw path, no mapper, offsets pin them to bank 1); | M2b |
 | `tests/test_m2b_stage6.sh` | test | emulator | MAME, a build dir | the M2b (graphics) build gate: 1. Build stage 6 (includes tools/verify_gfx_build.py: record/entry parity, tile-code containment, placed bank table — the static output checks that caught the fmt-0 count corruption). 2. | M2b |
 | `tests/test_oboro_select.sh` | test | emulator | MAME, FBNeo, a build dir, ~4 min | THE OBORO SELECT HOOK (W1, 14z-105; maintainer-ruled 2026-08-22: vanilla vsavj Oboro, selected by hand). | 14z-105 |
 | `tests/test_pyron_blink.sh` | test | emulator | MAME, a build dir | the Pyron sprite/HUD BLINK gate (14z-75). | 14z-75 |
 | `tests/test_pyron_cosmo.sh` | test | emulator | MAME, a build dir | the Cosmo Disruption crash gate (rewritten 14z-75). | 14z-75 |
 | `tests/test_pyron_ladder.sh` | test | emulator | MAME, a build dir | test_pyr_ladder.sh — the Pyron stage 1-3 ladder gate (14z-67, M3b Phase 5). | 14z-67 |
 | `tests/test_pyron_medallion_2p.sh` | test | emulator | MAME, a build dir, ~5 min | the P2-HOVER half of medallion palette stability (14z-116). EMULATOR gate, ~5 min, two MAME runs. NOT in ci_static; indexed in HANDOFF. | 14z-116 |
-| `tests/test_pyron_soak.sh` | test | emulator | MAME | the Pyron STAGE-6 chaos soak (14z-67 as stage 4; MOVED TO STAGE 6 at 14z-129, maintainer-approved). The full behavioral chain, guarded, on the real packed set: | 14z-67 |
+| `tests/test_pyron_soak.sh` | test | emulator | MAME, a build dir | the Pyron STAGE-6 chaos soak (14z-67 as stage 4; MOVED TO STAGE 6 at 14z-129, maintainer-approved). The full behavioral chain, guarded, on the real packed set: | 14z-67 |
 | `tests/test_random_select_tenants.sh` | test | emulator | MAME, a build dir, ~12 min | RANDOM SELECT INCLUDES THE TENANTS (14z-117, the maintainer's own list item, added 2026-08-28). | 14z-117 |
 | `tests/test_select_wheel.sh` | test | emulator | MAME | the character-select cursor mechanism: decoded from the ROM, and MEASURED in the emulator. | 14z-123 |
 | `tests/test_shadow_tenant.sh` | test | emulator | MAME, a build dir, ~6 min | SHADOW morphing into a TENANT (14z-116). EMULATOR gate, ~6 min, two MAME runs. NOT in ci_static (see the registry check in run_all_static.sh); indexed in HANDOFF. | 14z-116 |
-| `tests/test_tenant_hud.sh` | test | emulator | MAME | the variant-id HUD fix (14z-63, phase 3 item 4): a tenant at 0x13 must show its OWN in-match mugshot and name plate, and the host's own HUD cells must stay pristine. | 14z-63 |
+| `tests/test_tenant_hud.sh` | test | emulator | MAME, a build dir | the variant-id HUD fix (14z-63, phase 3 item 4): a tenant at 0x13 must show its OWN in-match mugshot and name plate, and the host's own HUD cells must stay pristine. | 14z-63 |
 | `tests/test_tenant_id.sh` | test | ci_portable | — | the tenant's character id is a BUILD INPUT, and the frozen reference must stay reproducible while a move is in progress. | M3a |
 | `tests/test_tenant_loop.sh` | test | ci_static | ROMDIR | the N-tenant loop ITERATES, and it is inert at N=1. | M3b |
 | `tests/test_tenant_pairings.sh` | test | emulator | MAME, a build dir, ~3 min | TWO PORTED CHARACTERS IN ONE MATCH, every ordering (14z-95). The coverage CLAUDE.md §4 mandates and the suite did not have. | 14z-95 |
-| `tests/test_tenant_winpal.sh` | test | emulator | MAME | the variant-id WIN-SCREEN palette (14z-63, phase 3 item 5): a tenant winning a 2P match must get its OWN vs2 win palette, and a vanilla winner must get the untouched vanilla pool. | 14z-63 |
+| `tests/test_tenant_winpal.sh` | test | emulator | MAME, a build dir | the variant-id WIN-SCREEN palette (14z-63, phase 3 item 5): a tenant winning a 2P match must get its OWN vs2 win palette, and a vanilla winner must get the untouched vanilla pool. | 14z-63 |
 
 ## character-data
 
@@ -366,7 +369,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_defense_row_reads.sh` | audit | emulator | MAME, a build dir | WHICH ROW EVERY HIT'S DEFENSE READS INDEX, by the victim's identity, over the corpus on our merged build and on pristine vsavj, frozen (14z-169, the analysis before the ruled fix "the tenants' defense rows become vs2's", #136). | 14z-169 |
 | `tests/audit_defense_row_residue.sh` | audit | emulator | MAME, a build dir, ~6 min | THE PHOBOS-THROW ±1 DAMAGE RESIDUE IS THE DEFENSE-TABLE ROW THE VICTIM'S ID SELECTS, read watch on both legs (14z-145). | 14z-145 |
 | `tests/audit_df_accumulator.sh` | audit | emulator | MAME, a build dir, ~3 min | THE +0x161 ACCUMULATOR IS SASQUATCH'S DARK FORCE ARMOR (measured 14z-123; inferred_claims row 1). | 14z-123 |
-| `tests/audit_df_dead_family.sh` | audit | emulator | ~3 min | vs2's P+K (DARK FORCE POWER) NEVER REACHES THE VS-STYLE DARK FORCE FAMILY: its shared field-setter tail at vs2 PRG:0x02622A takes ZERO hits on a P+K activation while the activation body takes exactly one (measured 14z-126). SCOPED 14z-168: | 14z-126 |
+| `tests/audit_df_dead_family.sh` | audit | emulator | MAME, ~3 min | vs2's P+K (DARK FORCE POWER) NEVER REACHES THE VS-STYLE DARK FORCE FAMILY: its shared field-setter tail at vs2 PRG:0x02622A takes ZERO hits on a P+K activation while the activation body takes exactly one (measured 14z-126). SCOPED 14z-168: | 14z-126 |
 | `tests/audit_df_field_readers_live.sh` | audit | emulator | MAME, a build dir, ~50 s | WHAT THE #136 CORPUS EXECUTES AGAINST vs2's DARK FORCE POWER FIELDS, cross-checked against the static census (14z-168, GitHub #136 / #157's Dark Force tail): | 14z-168 |
 | `tests/audit_df_meter.sh` | audit | emulator | MAME, a build dir, ~25 s | NO GAUGE IS BUILT IN DARK FORCE CHANGE, and since the 14z-170 fix (GitHub #157's Dark Force tail, ruled 2026-09-18) the tenants build none either: | 14z-170 |
 | `tests/audit_df_modes.sh` | audit | emulator | MAME, a build dir, ~95 s | DARK FORCE POWER vs DARK FORCE CHANGE, every selectable character, frozen AS MEASURED (14z-168, GitHub #136): on vsav2 P+K is the global DARK FORCE POWER (two stocks, no startup invincibility, the seq-0x16 handler never reached); | 14z-168 |
@@ -431,11 +434,11 @@ the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guar
 | `tests/test_decrypt_cache.sh` | test | ci_static | ROMDIR | ground truth for tests/lib/decrypt_cache.sh (14z-94, GitHub #69). ~1 s warm; no ROMDIR needed when the cache is present. | 14z-94 |
 | `tests/test_freeze_retires_diverge.sh` | test | ci_portable | — | freezing a replay must actually govern it (14z-94, GitHub #88). ROM-free, no MAME, ~2 s. | 14z-94 |
 | `tests/test_gfx_layout_fields_live.sh` | test | ci_portable | — | gfx_layout3.toml's profile and scatter fields must MEAN something (14z-94, GitHub #87). ROM-free, ~2 s. | 14z-94 |
-| `tests/test_guard_integrity.sh` | test | emulator | MAME, ~2 min | the crash guard must carry the input-integrity assertion, and must refuse env vars it does not implement (14z-94, GitHub #31). Needs ROMDIR + a WIDE build; ~2 min. | 14z-94 |
+| `tests/test_guard_integrity.sh` | test | emulator | MAME, a build dir, ~2 min | the crash guard must carry the input-integrity assertion, and must refuse env vars it does not implement (14z-94, GitHub #31). Needs ROMDIR + a WIDE build; ~2 min. | 14z-94 |
 | `tests/test_harness_frame_bound.sh` | test | ci_static | ROMDIR | the FBNeo harness must bound replay frame numbers (14z-94, GitHub #77). ROM-free structurally; the functional half runs only if a built binary and ROMDIR are present. ~5 s. | 14z-94 |
 | `tests/test_hex_lengths.sh` | test | ci_portable | — | ground truth for tools/audit_hex_lengths.py, the balanced-byte-edit check (14z-94, GitHub #20). ROM-free, ~1 s. | 14z-94 |
 | `tests/test_mame_mirror_guard.sh` | test | ci_portable | — | setup_mame.sh must never run `rsync --delete` into a directory it does not own (14z-94, GitHub #80). ROM-free, ~3 s. | 14z-94 |
-| `tests/test_mask_ranges_reader.sh` | test | emulator | MAME, ~1 min | the MASK_RANGES reader must mask exactly what the spec says (14z-94, GitHub #61). ~1 min, needs ROMDIR + a WIDE build. | 14z-94 |
+| `tests/test_mask_ranges_reader.sh` | test | emulator | MAME, a build dir, ~1 min | the MASK_RANGES reader must mask exactly what the spec says (14z-94, GitHub #61). ~1 min, needs ROMDIR + a WIDE build. | 14z-94 |
 | `tests/test_member_classify.sh` | test | ci_static | ROMDIR | PROGRAM and GFX members must never be confused, and the three classifiers must agree (14z-94, GitHub #19). ~2 s. | 14z-94 |
 | `tests/test_merged_inputs.sh` | test | ci_static | ROMDIR | ground truth for tools/ensure_merged_inputs.sh, the helper that makes rule 3 ONE COMMAND for the merged build (14z-95, GitHub #27, maintainer-ruled 2026-08-18: "it should be one command; | 14z-95 |
 | `tests/test_meter_in_field_map.sh` | test | ci_portable | — | the dual-emulator oracle must actually compare meter (14z-94, GitHub #83). ROM-free, no emulator, ~2 s. | 14z-94 |
@@ -466,14 +469,14 @@ the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generatio
 | `tests/test_jtsim_scratch_heal.sh` | test | ci_portable | — | a jtsim scratch clone hollowed by the macOS tmp reaper is HEALED, not trusted (14z-133b). ROM-free, ~5 s (three local clones of emu/jtcores, hardlinked). | 14z-133b |
 | `tests/test_mister_gfxc_fetch.sh` | test | emulator | Verilator, a build dir, ~93 min | THE PAYOFF GATE: it goes green the day the core FETCHES a tenant tile. IT HAS BEEN GREEN — with the right replay (see STATUS). Its DEFAULT replay cannot reach a match, so a bare run is red by construction; pass the measured-green operands. | 14z-107 (10) |
 | `tests/test_mister_mra_map.sh` | test | ci_static | ROMDIR | the MiSTer download image is EXACTLY the placement map, the trim that makes it downloadable is real, and the stock reference leg did not move. (14z-107 (5), MiSTer slice D0; docs/project/mister_map.md §3 is the design this gate defends.) | 14z-107 (5) |
-| `tests/test_mister_obj_oracle.sh` | test | emulator | Verilator, MAME, ~65 min | the FIRST cross-implementation agreement this project has on a VIDEO-DETERMINING surface, and it is on the content the port exists to add. | 14z-108 |
+| `tests/test_mister_obj_oracle.sh` | test | emulator | Verilator, MAME, a build dir, ~65 min | the FIRST cross-implementation agreement this project has on a VIDEO-DETERMINING surface, and it is on the content the port exists to add. | 14z-108 |
 | `tests/test_mister_page.sh` | test | ci_static | ROMDIR | the MiSTer synthesis page still draws the map that is actually there. (14z-107 (10); docs/project/mister_core.md + tools/mk_mister_page.py.) | 14z-107 (10) |
 | `tests/test_mister_prg_probe.sh` | test | ci_portable | — | the ROM-free half of the slice D4 discriminator (14z-107 (11)). It locks the CONTRACT of the 68k program-ROM read probe and of the tool that reads it, without a ROM, an emulator or 40 minutes of Verilator. | 14z-107 (11) |
 | `tests/test_mister_prg_window.sh` | test | emulator | Verilator, a build dir, ~55 min | SLICE D4's OWN EVIDENCE: what the 68k does with CPU:$400000-$5FFFFF on the core. 14z-107 (11). Emulator tier: ROMDIR + Verilator; MEASURED 14z-134: | 14z-107 (11) |
-| `tests/test_mister_qsound_ext.sh` | test | emulator | Verilator, ~94 min | THE QSOUND EXTENSION IS FETCHED ON THE CORE (14z-108). The roster's own voices live in DSP sample banks 0x80-0x8E, which stock CPS-2 cannot address at all: | 14z-108 |
-| `tests/test_mister_sdram_census.sh` | test | emulator | Verilator, ~8 min | SLICE D2'S CORE EVIDENCE: the CPS-2 WIDE romset lands in SDRAM exactly where docs/project/mister_map.md section 5 places it. (14z-107 (9).) | 14z-107 (9) |
+| `tests/test_mister_qsound_ext.sh` | test | emulator | Verilator, a build dir, ~94 min | THE QSOUND EXTENSION IS FETCHED ON THE CORE (14z-108). The roster's own voices live in DSP sample banks 0x80-0x8E, which stock CPS-2 cannot address at all: | 14z-108 |
+| `tests/test_mister_sdram_census.sh` | test | emulator | Verilator, a build dir, ~8 min | SLICE D2'S CORE EVIDENCE: the CPS-2 WIDE romset lands in SDRAM exactly where docs/project/mister_map.md section 5 places it. (14z-107 (9).) | 14z-107 (9) |
 | `tests/test_mister_sim_anchor.sh` | test | emulator | Verilator, MAME, ~1.0 s | THE MiSTer LEG OF THE §4 DUAL-EMULATOR ORACLE (14z-107). A jtcps2 core under Verilator and MAME run the same legacy replay on the same stock vsavj romset; | 14z-107 |
-| `tests/test_mister_tenant_oracle.sh` | test | emulator | Verilator, MAME, FBNeo, ~1 s | THE §4 DUAL-EMULATOR ORACLE ON TENANT CONTENT (14z-108). MAME and jtcps2w run the same TENANT-PICKING replay on the same WIDE romset, and the mapped gameplay fields must agree at the round-1 match-start anchor. | 14z-108 |
+| `tests/test_mister_tenant_oracle.sh` | test | emulator | Verilator, MAME, FBNeo, a build dir, ~1 s | THE §4 DUAL-EMULATOR ORACLE ON TENANT CONTENT (14z-108). MAME and jtcps2w run the same TENANT-PICKING replay on the same WIDE romset, and the mapped gameplay fields must agree at the round-1 match-start anchor. | 14z-108 |
 | `tests/test_mister_wide_gate.sh` | test | ci_portable | — | THE CPS-2 WIDE RUNTIME PROFILE GATE, on MiSTer. 14z-107 (6), slice D1; EXTENDED 14z-107 (9) for slice D2. ROM-free; seconds without Verilator, ~30 s with it. | 14z-107 (6) |
 | `tests/test_mister_wide_inert.sh` | test | emulator | Verilator, MAME, ~11 min | THE FPGA SUPERSET INVARIANT, MEASURED DIRECTLY. 14z-107 (6), slice D1. | 14z-107 (6) |
 | `tests/test_mra_build_line.sh` | test | ci_static | ROMDIR | the WIDE MRA names the FREEZE it was generated for, and can never name the wrong one (14z-133b). Static tier: ROMDIR + the merged build + emu/jtcores; ~1 min (three ROM-free MRA generations). | 14z-133b |

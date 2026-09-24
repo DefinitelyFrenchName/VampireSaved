@@ -12,6 +12,10 @@
 #   native's and plant a `cmpi.b #5` into vsavj's image.
 # EXPECTS: the frozen defect rows (ours writes 4 at 0x1886C, native 1 and 0; x 835 vs 755)
 #   and static rows exact; both controls fail. A fix re-freezes this file deliberately.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/facing_rule.tsv
+#   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tests/lua/read_tap.lua
+#   tests/replays/ tools/audit_facing_rules.py tools/name_moves.py tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: rule5-resolved — a copy of our facing rows with the resolver's value replaced by native's at the same frame (what a fixed build would write) must FAIL the frozen compare, so the frozen rows are the defect and a fix is a deliberate re-freeze (in-gate: the perturbed copy must differ from the frozen rows; mode: our reduced rows are replaced before the compare and the table FAILs)
 # MUST-FIRE: perturbed-copy: branch-planted — a copy of vsavj's decrypted opcode image with the resolver's rule-4 compare rewritten to `cmpi.b #5` must change vsavj's static row and FAIL, so the static read sees the compare chain it claims to list (in-gate: the planted copy must read differently; mode: the real image is planted before the static read and the table FAILs)

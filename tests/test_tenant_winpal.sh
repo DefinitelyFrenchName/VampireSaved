@@ -12,6 +12,9 @@
 #   victory rows read at the KO-traced frames.
 # EXPECTS: rows 0x15-0x19 equal to vs2's Donovan colour-0 set on replay 61 and to the
 #   vanilla pool slice on replay 62; the stripped patch fails.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/decrypt_cache.sh
+#   tests/lib/tenant_build.sh tests/lua/field_trace.lua tests/lua/replay.lua tests/replays/
+#   tools/build_donovan.sh tools/run_mame.sh tools/setup_mame.sh
 #
 # MECHANISM (measured; STATE 14z-63 / patch_notes addendum 3). The 2P
 # victory screen's palette load at PRG:0x5F1B6 computes

@@ -12,6 +12,9 @@
 # EXPECTS: native class 0x52 / merged 0x38 / solo 0x06, all with seq7 == 4 and the freeze
 #   from 0x18; no attacker freeze on native and merged, present on solo; native and merged
 #   frame-for-frame identical over the dome window. Pre-fix builds fail by design.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/replay.lua
+#   tests/replays/hui/92_hui_trap_shock.rpl tools/run_mame.sh tools/run_replay_mame.sh
+#   tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: attacker-frozen — a copy of the merged leg's dumps with Phobos's +0x5C set to 0x0B at the dome's first hit frame (the pre-fix attacker freeze) must FAIL the merged verdict, so "the attacker is exempt" is read from the merged leg's own RAM (in-gate: the planted rows must be caught; mode: the merged leg's rows are planted before the verdict and the gate FAILs)
 #

@@ -13,6 +13,8 @@
 # EXPECTS: ours matches native through the hold with the control identical; a red is the
 #   alias back. The gate locks the observed difference; the one-mechanism reading (position
 #   and pose from one keyframe stream) is in the header.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua
+#   tests/replays/judge/02_throw.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # THE MECHANISM, read off vsavj's own positioner at PRG:0x02802E (vanilla
 # engine code, byte-identical in both games):

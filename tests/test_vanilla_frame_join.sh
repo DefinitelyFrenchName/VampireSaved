@@ -12,6 +12,10 @@
 #   and near rows.
 # EXPECTS: every event fires, the 180 rows equal to the frozen slot map, the out-of-tree
 #   hash equal; the swapped rows fail.
+# FOLLOWS: emu/mame-patches/ tests/expected/vanilla_hit_damage.sha256
+#   tests/expected/vanilla_normal_slots.tsv tests/lib/controls.sh tests/lib/decrypt_cache.sh
+#   tests/lua/field_trace.lua tools/run_mame.sh tools/setup_mame.sh
+#   tools/vanilla_join_rig.py
 #
 # MUST-FIRE: perturbed-copy: swapped-rows — swapping one character's far/near rows in a copy of the frozen slot map must fail the section-3 compare against the measured map (mode: section 3 compares the measured map against that swapped copy and must fail)
 #

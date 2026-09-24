@@ -10,6 +10,9 @@
 #   tools/reaction_map.py; both fighters' ids asserted from the trace.
 # EXPECTS: the per-tenant files equal (re-frozen only after a change is attributed); a red
 #   is a changed reaction set, extract, decoder or rig.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lua/field_trace.lua
+#   tests/replays/ tools/anim_nodes.py tools/name_moves.py tools/reaction_map.py
+#   tools/run_mame.sh tools/setup_mame.sh
 #
 # WHAT IT HOLDS. tools/name_moves.py's `<tenant>_victim` schedules put the
 # tenant on P2 (the P2 early-window poke) against Victor on P1 (forced 0x03)

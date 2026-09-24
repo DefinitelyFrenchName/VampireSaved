@@ -12,6 +12,9 @@
 #   which must leave rows unattributed.
 # EXPECTS: the frozen root and row tables equal (a fix changes them by design and is read as
 #   the fix's effect), no OTHER, no UNATTRIBUTED; the no-ablation run fails.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/move_parity_attribution.tsv
+#   tests/expected/move_parity_events.tsv tools/move_parity_attribution.py
+#   tools/setup_mame.sh
 #
 # MUST-FIRE: shadow-tool: no-ablation — the tool with ablation disabled (roots classified, never removed) must leave rows UNATTRIBUTED and FAIL, so every attribution rests on a row actually vanishing when its root's inputs are removed (in-gate: donovan_11 alone with ablation disabled must leave its row unattributed; mode: the whole table with ablation disabled FAILs)
 #

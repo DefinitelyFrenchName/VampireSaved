@@ -13,6 +13,10 @@
 #   gives the noise bound.
 # EXPECTS: the four locks hold; a red names the anchor, field or HP step that differs beyond
 #   the control's bound.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/fields_m2a.tsv tests/lua/replay.lua
+#   tests/replays/18_veteran_ctl_vsav2.rpl tests/replays/18_veteran_ctl_vsavj.rpl
+#   tests/replays/hui/90_hui_oracle.rpl tools/build_donovan.sh tools/compare_fields.py
+#   tools/run_mame.sh tools/setup_mame.sh
 #
 # ONE replay (tests/replays/hui/90_hui_oracle.rpl) runs on native vsav2
 # (reference binary) and on the ported vsavjw build (WIDE binary) with

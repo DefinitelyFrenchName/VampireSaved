@@ -10,6 +10,8 @@
 #   (p2y rising >= 20px) read from dumps; a `whiff` control throws at spawn range.
 # EXPECTS: every leg shows the signature (a leg with NO damage is REFUSED as rig geometry,
 #   never read as a tech); the whiff deals nothing.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/field_trace.lua
+#   tests/replays/judge/02_throw.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # §4 mandates throw/tech coverage per ported character. The corpus had
 # command grabs (H: 80/Circuit Scrapper, D: 65/96) but NO normal-throw

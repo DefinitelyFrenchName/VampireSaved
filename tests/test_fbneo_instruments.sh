@@ -9,6 +9,9 @@
 #   region dump compared with MAME's at a frame stable across the known frame skew.
 # EXPECTS: identical checksums, writes captured, the poke visible, the dumps byte-equal; an
 #   instrument that reports nothing is a red, not a null.
+# FOLLOWS: emu/fbneo-patches/ emu/fbneo/ emu/mame-patches/ tests/lua/replay.lua
+#   tests/replays/02_demitri_vs_cpu.rpl tools/run_mame.sh tools/run_replay_fbneo.sh
+#   tools/run_replay_mame.sh tools/setup_fbneo.sh tools/setup_mame.sh
 #
 # WHY: FBNeo is the PRIMARY target (the GGPO rollback-netplay reference), yet
 # until B5b the oracle had far better debugging instruments than the platform

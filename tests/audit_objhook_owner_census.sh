@@ -11,6 +11,8 @@
 # EXPECTS: a per-type owner report, 114/116/118/120 stated as not observed. STALE since
 #   14z-91 (the header says so): the probe points at a thunk that no longer exists and must
 #   be re-pointed at the relocated walker before it is trusted.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua tests/replays/
+#   tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
 # WHY. The merged obj_hook union gives a MULTI-OWNER type (114-120, the
 # x088512 pool family — all three tenants port it) ONE extended-table entry,

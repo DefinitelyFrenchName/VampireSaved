@@ -12,6 +12,9 @@
 # EXPECTS: the shake installed by the held HP on both legs, not by the quick press, and the
 #   window inventory frozen. The two extra pre-match Phobos voices are a measurement with an
 #   open confound, deliberately not asserted.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/lua/ring_tap.lua
+#   tests/replays/hui/93_hui_electrocuted.rpl tools/run_mame.sh tools/run_replay_mame.sh
+#   tools/setup_mame.sh
 #
 # WHY IT EXISTS. STATE recorded TWICE (14z-74, 14z-76) that "no existing
 # replay produces an electrocute", so the effect-palette block's visibility

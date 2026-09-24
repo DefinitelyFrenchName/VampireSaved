@@ -12,6 +12,9 @@
 #   run time (no frame constant to rot), the files compared and sized.
 # EXPECTS: extent, determinism, liveness and both controls; nothing may be read off a
 #   recording until this passes.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/record_window.lua
+#   tests/lua/replay.lua tests/replays/26_don_arcade_mash.rpl tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # WHY THIS GATE EXISTS. A recorder that drops, duplicates or blanks frames
 # still produces a file that plays, and a human watching it cannot tell. Its

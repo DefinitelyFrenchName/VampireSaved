@@ -11,6 +11,8 @@
 # EXPECTS: (1) vanilla row 14 in vanilla's slot, (2) the ported row in the build's, (3)
 #   identical outside the window. A (3) failure is stop-and-root-cause, never a mask
 #   widening.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua
+#   tests/replays/05_timeout_idle.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # THE WINDOW: RAM:$FF4182-$FF41A1, the palette-fade staging buffer's
 # slot for select palette-block-A row 14 (docs/game/atlas/ram.md). It is

@@ -10,6 +10,8 @@
 # EXPECTS: zero music-range ids and every inventory exact. The `SET=vsavjw` mode is VOID
 #   (the replays select Jedah on a WIDE wheel) — the header says so; WIDE coverage needs
 #   re-authored twins.
+# FOLLOWS: build/manifest/ docs/project/gotchas.md emu/mame-patches/ tests/lua/ring_tap.lua
+#   tests/replays/ tools/run_mame.sh tools/setup_mame.sh
 #
 # THE TRIPWIRE THAT MATTERS: vsavj's sound-id range 0x700-0x7FF holds
 # MUSIC TRACKS, while vs2 uses that same range for Donovan's voice bank

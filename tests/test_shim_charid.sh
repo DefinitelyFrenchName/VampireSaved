@@ -11,6 +11,8 @@
 #   NOT hold the id.
 # EXPECTS: 0x13 read at +0x382 on both structs, the control offset not; a quiet leg without
 #   section 0 is a dead rig.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua tests/replays/
+#   tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
 # WHY (M3b slice G, 14z-77). A merged build has ONE init shim serving N
 # tenants, and each needs a different VS2/VH2 flavor byte. `flavor_tail()`

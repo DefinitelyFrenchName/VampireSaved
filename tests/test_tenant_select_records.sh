@@ -14,6 +14,11 @@
 #   with replay 36 reads the record walker.
 # EXPECTS: static equal, the three controls failing, the engine's rows as predicted;
 #   SKIP_RUNTIME=1 skips section 3.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/donovan-m5/mask
+#   tests/expected/vsavj/masked-v2/logs/11_pick_donovan.log tests/lib/decrypt_cache.sh
+#   tests/lib/tenant_build.sh tests/lua/replay.lua tests/lua/trace_writes.lua tests/replays/
+#   tools/build_donovan.sh tools/check_tenant_select.py tools/compare_window.py
+#   tools/run_mame.sh tools/run_replay_mame.sh tools/setup_mame.sh
 #
 # WHY (14z-62/62e). The slot-0x0F port displays the tenant's select UI by
 # in-place surgery on Jedah's records (tools/select_port.py). De-substituting

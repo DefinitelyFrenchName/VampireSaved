@@ -12,6 +12,9 @@
 #   stream read for the staged codes.
 # EXPECTS: static checks green, the stripped patch failing, mugshot 0xBE90 (2x2) and name
 #   0xBE8C (3x1) staged in match with the opponent's mugshot still from the vanilla page.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/decrypt_cache.sh
+#   tests/lib/tenant_build.sh tests/lua/obj_records_dump.lua tests/replays/
+#   tools/build_donovan.sh tools/check_tenant_hud.py tools/run_mame.sh tools/setup_mame.sh
 #
 # MECHANISM (measured; docs/game/atlas/venue_assets.md addendum). Both HUD
 # consumers are UNMASKED (mugshot stager 0x8937C by $782/$b82(a5); name

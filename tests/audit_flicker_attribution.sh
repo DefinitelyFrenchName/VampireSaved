@@ -12,6 +12,9 @@
 #   classified by tools/attribute_ramdiff.py against the named windows.
 # EXPECTS: every byte inside its window; a byte outside means the specs describe something
 #   else and must be re-opened, never widened.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lua/replay.lua
+#   tests/replays/ tools/attribute_ramdiff.py tools/build_fingerprint.py tools/run_mame.sh
+#   tools/run_replay_mame.sh tools/setup_mame.sh
 #
 # WHY (14z-91). The legacy-regression fix re-measured 139 specs, and two of
 # them GAINED a flicker frame:

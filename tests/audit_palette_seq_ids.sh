@@ -11,6 +11,9 @@
 # EXPECTS: the measured inventory equals the frozen census; a DF-on character with 0 calls
 #   is reported as having no palette-seq path. Growth is the signal: re-derive before
 #   trusting that any row is free.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/palette_seq_ids_corpus.txt
+#   tests/lua/replay_guard.lua tests/replays/ tools/run_mame.sh tools/run_replay_guarded.sh
+#   tools/setup_mame.sh
 #
 # *** THIS AUDIT RETURNED A FALSE PASS FOR TEN SESSIONS (retracted 14z-79). ***
 # It guarded the 14z-69p DF-palette rewrite of rows 0x1E-0x21, and reported

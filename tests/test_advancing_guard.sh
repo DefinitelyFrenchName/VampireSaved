@@ -15,6 +15,9 @@
 # EXPECTS: the frozen per-event lines and the structural rules (weights and threshold 10 on
 #   vs2, count and the RNG on vsavj, steps equal to the list, the attacker pushed AWAY,
 #   Anakaris inert); a red is the mechanic or threshold moving.
+# FOLLOWS: emu/mame-patches/ tests/expected/advancing_guard.txt tests/lib/decrypt_cache.sh
+#   tests/lua/field_trace.lua tests/replays/ tools/advancing_guard.py tools/name_moves.py
+#   tools/run_mame.sh tools/setup_mame.sh
 #
 # WHY. 14z-121 (4) read vs2 `0x27082` (the second per-frame step routine,
 # three byte lists at `0x2797A`: 91 / 115 / 157 px) plus its arming site

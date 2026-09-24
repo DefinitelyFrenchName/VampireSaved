@@ -13,6 +13,8 @@
 # EXPECTS: BOTH legs equal the frozen staircase with 12 ticks and 5 stock decrements; native
 #   drifting is as loud as ours. Pre-fix builds read 1/1/1/1/1 on ours — the gate was
 #   ground-truthed failing there.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua
+#   tests/replays/hui/89_hui_ex_fg_vs2.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # THE ITEM THIS LOCKS (14z-85f, closing the 14z-85e parity item): the
 # beam ticks of FG are processed by the PORTED vs2 object-hit damage

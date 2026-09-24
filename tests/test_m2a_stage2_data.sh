@@ -10,6 +10,12 @@
 #   -debug guard over the pick window, the legacy suite.
 # EXPECTS: coherence and provenance hold; behaviour correctness is deliberately not gated at
 #   this mixture.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lib/m2a_common.sh
+#   tests/lib/masked_compare.sh tests/lua/replay.lua tests/lua/replay_guard.lua
+#   tests/replays/ tools/build_donovan.sh tools/build_fingerprint.py tools/check_diverge.py
+#   tools/compare_composite.py tools/compare_flicker.py tools/compare_window.py
+#   tools/freeze_masked_basis.sh tools/propose_masked_specs.sh tools/run_mame.sh
+#   tools/run_replay_guarded.sh tools/run_replay_mame.sh tools/setup_mame.sh
 #
 # Stage 2 injects Donovan's hitbox + projectile-hitbox blobs and all his
 # per-character value rows; Jedah's code and anim stay (dispatch 00/01 still

@@ -13,6 +13,8 @@
 # EXPECTS: one source colour, one destination colour, the frozen count; the neighbour
 #   control fails. WHY the entry holds f111 at that moment is measured elsewhere (a hit
 #   re-requests the body palette).
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/inp/ tests/lib/controls.sh
+#   tests/lua/inp_probe.lua tools/run_inp_probe.sh tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: neighbour-poke-disjoint — the neighbour palette entry 0x90C17A moves a DISJOINT non-black pixel set, so treating it as the black-foot set must fail (mode: the neighbour-poke set is substituted for the fix set and the black-pixel assertions fail; REFUSES with exit 3 if the recording is absent)
 #

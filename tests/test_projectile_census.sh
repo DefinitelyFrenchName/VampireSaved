@@ -16,6 +16,9 @@
 #   types that first appear after its input; P2's id asserted from the trace.
 # EXPECTS: the census equal to tests/expected/projectile_census.txt (re-frozen when the rigs
 #   became real picks and when P2 became Demitri); a red is a spawn missing, extra or moved.
+# FOLLOWS: emu/mame-patches/ tests/expected/projectile_census.txt tests/lua/field_trace.lua
+#   tests/replays/ tools/name_moves.py tools/projectile_census.py tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [FREEZE=1] tests/test_projectile_census.sh
 #   FREEZE=1 (since 14z-160) rewrites the census from the run; re-frozen 14z-160

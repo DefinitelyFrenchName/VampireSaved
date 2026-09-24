@@ -10,6 +10,8 @@
 #   mash onset later so a real onset reads as moved earlier.
 # EXPECTS: the merged-vs-solo id-set diff equals the frozen inventory (empty); any new id or
 #   a solo id missing on merged fails.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/ring_tap.lua
+#   tests/replays/ tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: onset-earlier — the mash divergence onset moving EARLIER than the frozen one must FAIL (mode: PYRON_RING_ONSET is set LATER than the real onset so the real onset reads as moved earlier and the gate must FAIL)
 #

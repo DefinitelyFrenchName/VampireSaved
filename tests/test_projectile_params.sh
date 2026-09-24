@@ -16,6 +16,9 @@
 # EXPECTS: frozen rows equal, ours == vs2 on three builds, 27 tabled spawns matching (Cosmo
 #   Disruption exempt and reported); the perturbed row fails the live compare. NOLIVE=1 runs
 #   the ROM-free half alone.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/projectile_params.txt
+#   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tests/replays/ tools/name_moves.py
+#   tools/projectile_params.py tools/run_mame.sh tools/setup_mame.sh
 #
 # WHAT IT HOLDS.
 #   1. the decoder's rows for the eight handlers on NATIVE vs2 (walker-2 table

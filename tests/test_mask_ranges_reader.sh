@@ -9,6 +9,9 @@
 #   (~1 min).
 # EXPECTS: exact masking on nested, overlapping and normal masks, nonsense refused. Not
 #   portable.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lua/replay.lua
+#   tests/replays/11_pick_donovan.rpl tools/run_mame.sh tools/run_replay_mame.sh
+#   tools/setup_mame.sh
 #
 # WHY IT MATTERS. The mask string IS the definition of the ratified comparison
 # basis (CLAUDE.md §4, docs/game/atlas/ram.md). Every `.masked` expectation

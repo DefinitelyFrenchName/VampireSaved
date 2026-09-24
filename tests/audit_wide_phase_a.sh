@@ -13,6 +13,8 @@
 # EXPECTS: a decision line per section consistent with the approved WIDE plan
 #   (docs/project/cps2_wide.md); a section whose instrument cannot see its own positive
 #   control is not a null.
+# FOLLOWS: emu/mame-patches/ tests/lua/ tests/replays/ tools/audit_z80_space.py
+#   tools/run_mame.sh tools/setup_mame.sh
 #
 #   A1  unmapped 68k address space   -> is PRG linear growth to 6MB inert?
 #   A2  OBJ y-word bit 12            -> is the 19th tile-address bit free?

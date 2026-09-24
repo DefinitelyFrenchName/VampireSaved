@@ -9,6 +9,8 @@
 # EXPECTS: every written value is a base id 0x00-0x0F from the known writer sites (attract,
 #   init, CPU opponent, challenger, select). Known gap stated in the header: Oboro's 0x18 IS
 #   a vanilla variant id no replay here reaches, so the proof is about THIS corpus.
+# FOLLOWS: docs/game/atlas/id_space.md emu/mame-patches/ tests/lua/tap_writes.lua
+#   tests/replays/ tools/audit_roms.py tools/run_mame.sh tools/setup_mame.sh
 #
 # ON-DEMAND (22 MAME runs, ~10 min). Not in the battery; run it when the
 # claim below is load-bearing for a decision, and after any change that

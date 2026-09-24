@@ -13,6 +13,8 @@
 #   writes and the kill commit at death; leg B always shows the commit. A quiet leg A with a
 #   quiet leg B is a dead tap, not a pass; EXPECT_DEFECT=1 re-measures the pre-fix shape on
 #   an old build.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/read_tap.lua
+#   tests/replays/26_don_arcade_mash.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # THE MECHANISM THIS LOCKS (full chain on GitHub #103, 14z-98 comment):
 # the round judge kills on THE SIGN OF WHITE HP (+0x52; in-match machine

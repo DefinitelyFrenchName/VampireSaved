@@ -12,6 +12,9 @@
 #   neighbour's.
 # EXPECTS: every event's entered-chain list equal to the frozen line, every TOML seq
 #   entered, P2 = 0x01 at every event and never in b:0x71/b:0x74; the neighbour swap fails.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lib/decrypt_cache.sh
+#   tests/lua/field_trace.lua tests/replays/ tools/anim_nodes.py tools/move_parity.py
+#   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
 #
 # WHAT IT HOLDS. build/manifest/moves_donovan.toml carries a (table, seq) per
 # move, measured by tools/name_moves.py: eight scripted rigs on NATIVE vs2

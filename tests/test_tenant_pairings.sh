@@ -12,6 +12,9 @@
 #   derived from the merged image's own table; an unpoked run must be REFUSED.
 # EXPECTS: six END-clean runs with both bases as frozen; the unpoked run refused. Adding a
 #   pairing is a row in the bases file, not a new replay.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/roster_pairings/bases.tsv
+#   tests/lib/pairing.sh tests/lua/replay_guard.lua tests/replays/94_tenant_vs_tenant.rpl
+#   tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
 # WHY IT EXISTS. §4 requires "vs each of the 18 (both sides)" for a ported
 # character. Until 14z-95 `tests/replays/` contained no pairing of two ported

@@ -11,6 +11,10 @@
 #   non-constant.
 # EXPECTS: byte-identical across the window, the shifted control failing, the window live.
 #   Completeness of the dump sets is asserted by the producer (check_wram_dumps.py).
+# FOLLOWS: docs/platform/mister.md emu/jtcores-patches/ emu/jtcores/
+#   tests/replays/05_timeout_idle.rpl tests/rtl/ tools/check_wram_dumps.py
+#   tools/mister_mra.sh tools/rpl2siminputs.py tools/run_sim_jtcps2.sh
+#   tools/setup_jtcores.sh
 #
 # WHAT IT ASSERTS. The reference core `cps2` and the CPS-2 WIDE core `cps2w`,
 # running the SAME stock `vsavj` download under Verilator, must produce

@@ -8,6 +8,11 @@
 #   crash guard on MAME, and a legacy replay against the frozen vanilla expectation.
 # EXPECTS: his base loaded, guard clean (a watchdog reboot would read as zeros, which the
 #   base check subsumes), legacy bit-identical.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/donovan-m5/mask
+#   tests/expected/vsavj/masked-v2/logs/02_demitri_vs_cpu.log tests/lua/replay.lua
+#   tests/lua/replay_guard.lua tests/replays/02_demitri_vs_cpu.rpl tools/build_donovan.sh
+#   tools/compare_flicker.py tools/force_pick_probe.sh tools/run_mame.sh
+#   tools/run_replay_guarded.sh tools/run_replay_mame.sh tools/setup_mame.sh
 #
 # The first rung with his CODE live: builds stage 4 from the huitzil
 # manifest and proves a forced-id match FORMS and SURVIVES —

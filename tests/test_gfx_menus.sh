@@ -9,6 +9,9 @@
 # EXPECTS: zero pixels differing outside the mask; the RAM oracles are blind to this class
 #   (the session-14r overlay corrupted three menus while every RAM gate stayed green).
 #   --freeze regenerates the goldens from vanilla.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/vsavj/menus/
+#   tests/lua/replay.lua tests/replays/02_demitri_vs_cpu.rpl tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # WHY THIS EXISTS: every RAM-basis gate is blind to graphics. The
 # session-14r overlay tile placements corrupted the title screen,

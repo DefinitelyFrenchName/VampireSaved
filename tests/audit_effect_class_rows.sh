@@ -13,6 +13,8 @@
 #   instrument and leg.
 # EXPECTS: 0 / used / used as measured, the fallback inventory exact; a blind instrument
 #   cannot pass as a clean result.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/trace_writes.lua tests/replays/
+#   tools/run_mame.sh tools/setup_mame.sh
 #
 # WHY THIS EXISTS. Two of the beam port's rows are justified by "legacy
 # never reaches this", which is a measurement, not an argument:

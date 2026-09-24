@@ -13,6 +13,8 @@
 # EXPECTS: every tenant's installed index equals native's and the control agrees on both
 #   legs. A red on a tenant is the alias class back (Donovan served Victor's 6, Phobos
 #   Bulleta's 12); a red on the control voids every tenant verdict.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua
+#   tests/replays/96_don_victor_grab.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # THE REPORT (maintainer, MAME field test 2026-08-19): a tenant victim of
 # Victor's headbutting grab (6+HP) shows a half-right / half-squished

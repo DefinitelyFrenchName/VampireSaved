@@ -13,6 +13,8 @@
 # EXPECTS: roller legs fire a roll state and move >= 60px; attacker legs let Victor roll
 #   except off Phobos (frozen native-anchored); the pursuit at a rolling victim fires, deals
 #   no damage and the victim ends displaced >= 60px; the tap does not roll.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/field_trace.lua
+#   tests/replays/judge/03_down_attack.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: tap-must-not-roll — a 4-frame tap must NOT register a roll, so demanding the FORBIDDEN roll from the tap leg must fail (mode: the tap leg is asserted to roll >=60px, which the real tap never does, so the gate FAILs)
 #

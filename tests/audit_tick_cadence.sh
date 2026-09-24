@@ -15,6 +15,9 @@
 # EXPECTS: the frozen tick, double-tick and freeze counts per game, one activation per
 #   frame, the pass prediction matching every frame from $FF8081 and the level; each control
 #   fails its section. Levels other than 6 and 8 are not asserted.
+# FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lib/decrypt_cache.sh
+#   tests/lua/replay.lua tests/lua/tap_writes.lua tests/replays/48_don_immortal_ko.rpl
+#   tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: twin-pc — vsav2's taps read with vsavj's tick and node-entry PCs must fail the live-twin assertion (no writes land there), so every count below is proven to rest on the PC map
 # MUST-FIRE: perturbed-copy: frame-counter-decider — section C's pass prediction computed from the FRAME counter $FF8080 instead of the PASS counter $FF8081 must fail the every-frame match, so the prediction is proven to rest on the counter the decider reads

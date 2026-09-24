@@ -1,4 +1,4 @@
 # tests/expected/module_refs_floor.txt — the fewest cross-module references
 # tests/test_module_refs.sh accepts (rises only; FREEZE=1 after review). Provenance:
 # tests/expected/PROVENANCE.md.
-270
+285

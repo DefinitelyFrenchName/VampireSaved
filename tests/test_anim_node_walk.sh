@@ -31,6 +31,9 @@
 # EXPECTS: 3638/3638 on-graph, every change an edge or a jump, countdowns exact or dur-1;
 #   the wrong-stride decode fails. Run after any change to the decoder or the node-format
 #   claims.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/field_trace.lua
+#   tests/replays/17_don_oracle_vsav2.rpl tools/anim_nodes.py tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/don_m23] tests/test_anim_node_walk.sh  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 #

@@ -10,6 +10,9 @@
 #   the first draft).
 # EXPECTS: silent on clean, the violation at the injected frame; a check that has only ever
 #   been silent proves nothing.
+# FOLLOWS: emu/mame-patches/ tests/expected/vsavj/02_demitri_vs_cpu.sha1
+#   tests/lua/replay.lua tests/replays/02_demitri_vs_cpu.rpl tools/run_mame.sh
+#   tools/run_replay_mame.sh tools/setup_mame.sh
 #
 # WHY IT EXISTS (session 14z-59c). Two MAME replay divergences went
 # unexplained through ~2,400 runs of statistics. The maintainer then

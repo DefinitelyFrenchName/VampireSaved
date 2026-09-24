@@ -13,6 +13,9 @@
 # EXPECTS: SAME on every event but the frozen DIFFER rows, every activation entered on both
 #   legs (else VOID), the six controls failing. Not shown: that the named move came out AS
 #   that move — the printed state paths say what it did.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/df_moves.tsv
+#   tests/lua/field_trace.lua tests/lua/read_tap.lua tests/lua/sprite_capture.lua
+#   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: mode-lost — our Change field +0x111 zeroed at the first compared event's frame (what a rig that outran the mode would read) must be refused by the in-mode check, so every compared event is MEASURED inside the mode on both legs, not assumed from the rig's spacing (in-gate: the zeroed copy must fail the check; mode: our field is zeroed before the check and the gate FAILs)
 # MUST-FIRE: perturbed-copy: idle-leg — our P1 state held still over the first compared event's window (what an input that produced nothing would read) must be refused by the acted check, so no SAME row can be two legs agreeing on nothing (in-gate: the held copy must fail the check; mode: our state is held before the check and the gate FAILs)

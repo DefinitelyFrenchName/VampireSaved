@@ -7,6 +7,7 @@
 # HOW: one headless FBNeo run of the reference set for the soak period, the log read for
 #   member load lines and liveness.
 # EXPECTS: all members (OK), emulation running for the whole soak.
+# FOLLOWS: emu/fbneo-patches/ emu/fbneo/ tools/run_fbneo.sh tools/setup_fbneo.sh
 #
 # Usage: ROMDIR=/path/to/roms tests/test_fbneo_smoke.sh [set] [seconds]
 # PASS = all ROM members load OK, emulation starts, and the process is still

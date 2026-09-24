@@ -10,6 +10,9 @@
 #   controls.
 # EXPECTS: with GRAB_VICTIM_EXPECT=matches (the default) ours tracks native through the hold
 #   (peak delta 0); a leg without seq 0x0E and 0x13 damage is refused; the controls fail.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/field_trace.lua
+#   tests/replays/hui/80_hui_grab_2p.rpl tools/check_grab_victim.py tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # THE DEFECT — FIXED 14z-73 (grab_hold_keyframes: H's own vs2 keyframe
 # block 0x0C56AA ported, row 0xBE2BA repointed; patch_index documents this

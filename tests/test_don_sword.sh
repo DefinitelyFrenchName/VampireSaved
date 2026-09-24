@@ -8,6 +8,8 @@
 #   for the swing node and its index write within a frame of it.
 # EXPECTS: the swing node resolved and idx +9 written; a red is the missing-swing bug back.
 #   The node address depends on the anim region's placement and is re-derived when it moves.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua
+#   tests/replays/31_don_6hp_vsavj.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # Verifies the round-26 sword-swing fix: on 6HP the sword object
 # ($FF9500 on the ported build) must be COMMANDED into the swing anim

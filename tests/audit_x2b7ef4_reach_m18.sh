@@ -13,6 +13,10 @@
 # EXPECTS: no read of a corrupted record on any part, every run tracking its reference (a
 #   run that never tracks is VOID), the frozen skews; the hot-block control hits and skews
 #   and fails. The gate refuses any build but merged-m18 by fingerprint.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/registry.tsv
+#   tests/expected/x2b7ef4_reach_m18.tsv tests/lib/controls.sh tests/lua/field_trace.lua
+#   tests/lua/trace_writes.lua tests/replays/ tools/build_fingerprint.py tools/name_moves.py
+#   tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: hot-block — the same rig with the watch widened over the block Donovan's copy reads in every match (CPU:$0FCC00, 1 KB) must HIT in the match AND its node trajectory must then leave the reference's, so the watch can fire and the trajectory check sees the desync a stop causes (in-gate: one run of donovan_4; mode: the widened watch replaces donovan_4's and the gate FAILs)
 #

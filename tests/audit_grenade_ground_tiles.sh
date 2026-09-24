@@ -13,6 +13,9 @@
 #   canonical content (phase-free: the legs run ~5-6 frames apart).
 # EXPECTS: ours-only 0, native-only 0, no blank explosion tile; a non-empty ours-only tile
 #   is a real divergence.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/obj_records_dump.lua
+#   tests/replays/hui/83d_hui_grenade_ground.rpl tools/gfx_tiles.py tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # WHY. engine_internals' grenade section (14z-70e/f) concluded the ground
 # mushroom "LOOKS right" from snapshots and that the original fuchsia report

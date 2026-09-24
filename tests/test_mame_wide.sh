@@ -12,6 +12,9 @@
 # EXPECTS: all three invariants hold on both checksums; the superset leg skips LOUDLY
 #   without the reference binary. The framebuffer half is what sees a video-path change RAM
 #   cannot.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/replays/
+#   tools/build_fingerprint.py tools/build_wide_romset.py tools/run_mame.sh
+#   tools/run_replay_mame.sh tools/setup_mame.sh
 #
 # The MAME twin of tests/test_wide_profile.sh. Same two invariants, same
 # two bases, so that "the profile is safe" is a claim two unrelated

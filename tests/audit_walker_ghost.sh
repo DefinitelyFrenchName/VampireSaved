@@ -12,6 +12,8 @@
 # EXPECTS: min(A7)-4 >= 0xFF7F00 and max(A7) <= 0xFF8000 at both sites (measured A7 =
 #   0xff7ff6 constant over 279,577 dispatches); the dispatch counts reproduce the dispatch
 #   census. A red is an escalation, not a mask change.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/vsavj/masked-v2/logs/
+#   tests/lua/walker_sp.lua tests/replays/ tools/run_mame.sh tools/setup_mame.sh
 #
 # WHY (14z-91). The obj_hook legacy-cycle regression's fix relocates each
 # walker (0x54458 / 0x5E52A, 0x2C bytes) into free space, appends the

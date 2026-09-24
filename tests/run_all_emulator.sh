@@ -9,7 +9,8 @@
 #   then the mame/fbneo/mister lanes, each gate under its own timeout, classifying every
 #   exit through tests/lib/classify.sh and, under --controls, executing every declared
 #   must-fire control as a CONTROL=<name> mode; writes one results.tsv row per gate and per
-#   control.
+#   control, and the run's commit of record (commit.txt: HEAD, then the dirty tracked
+#   paths); --stale selects exactly the gates tools/audit_emulator_staleness.py names.
 # EXPECTS: a readout PASS / SKIP / FAIL / TIMEOUT / MISSING with SKIP counted apart from
 #   PASS; at release scope (--scope all --lane all --strict --controls) anything but PASS is
 #   a hard fail. It asserts nothing about the romset itself — its verdict logic is what
@@ -72,6 +73,8 @@
 #   ... --resume                                         skip gates already in the log's results.tsv
 #   ... --strict                                         SKIP and UNREGISTERED are failures too
 #   ... --keep-going                                     do not stop when the prereq lane fails
+#   ... --stale                                          run exactly the gates tests/test_emulator_staleness.sh
+#                                                        names (a passed gate whose # FOLLOWS: path moved)
 #   ... --dry-run                                        print the resolved command per gate
 #   ... --controls                                       EXECUTE every declared must-fire control
 #                                                        (`CONTROL=<name> tests/<g>.sh` after a PASS;
@@ -125,7 +128,7 @@ cd "$REPO"
 
 REG=tests/ci_emulator.tsv
 SCOPE=release; CADENCE=all; LANES="prereq fbneo mame"; LANES_SET=""; ONLY=""; JOBS=1; TMO=5400
-LOGDIR=""; RESUME=0; STRICT=0; KEEPGOING=0; DRY=0; LIST=0; CONTROLS=0
+LOGDIR=""; RESUME=0; STRICT=0; KEEPGOING=0; DRY=0; LIST=0; CONTROLS=0; STALE=0
 while [ $# -gt 0 ]; do
     case "$1" in
     --scope)   shift; SCOPE="${1:?--scope needs release|all}" ;;
@@ -151,8 +154,9 @@ while [ $# -gt 0 ]; do
     --keep-going) KEEPGOING=1 ;;
     --dry-run) DRY=1 ;;
     --controls) CONTROLS=1 ;;
+    --stale)   STALE=1 ;;
     --list)    LIST=1 ;;
-    -h|--help) sed -n '2,72p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,82p' "$0"; exit 0 ;;
     *) echo "unknown argument '$1' (try --help)" >&2; exit 2 ;;
     esac
     shift
@@ -185,7 +189,21 @@ expand() {  # expand <string> — the %PLACEHOLDER% vocabulary
 # ── THE REGISTRY ────────────────────────────────────────────────────────────
 rows() { sed 's/\r$//' "$REG" | awk -F'\t' 'NF>=3 && $0 !~ /^#/ && $1 != ""'; }
 
-selected() {  # rows matching --lane / --scope / --cadence / --only, in lane order
+# --stale (14z-180, GitHub #171 slice Q4): run EXACTLY the gates the staleness audit
+# names — those that PASSED in the newest recorded run and have since had a declared
+# `# FOLLOWS:` path move. The names come from the one reader; an empty list is a
+# clean tree, not an error, and says so.
+STALE_NAMES=""
+if [ "$STALE" = 1 ]; then
+    STALE_NAMES="$(python3 tools/audit_emulator_staleness.py --names 2>/dev/null || true)"
+    if [ -z "$STALE_NAMES" ]; then
+        echo "--stale: no emulator gate is stale (nothing a passed gate follows moved since the"
+        echo "         newest recorded run, or no run under build/ carries commit.txt yet)."
+        exit 0
+    fi
+fi
+
+selected() {  # rows matching --lane / --scope / --cadence / --only / --stale, in lane order
     for _l in $LANES; do
         rows | awk -F'\t' -v lane="$_l" -v scope="$SCOPE" -v cad="$CADENCE" '
             $2 == lane && (scope == "all" || $3 == "release") \
@@ -195,6 +213,9 @@ selected() {  # rows matching --lane / --scope / --cadence / --only, in lane ord
         if [ -n "$ONLY" ]; then
             # shellcheck disable=SC2254
             case "$_g" in $ONLY) ;; *) continue ;; esac
+        fi
+        if [ "$STALE" = 1 ]; then
+            printf '%s\n' "$STALE_NAMES" | grep -qx -- "$_g" || continue
         fi
         printf '%s\n' "$line"
     done
@@ -220,6 +241,17 @@ STAMP="$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$LOGDIR"
 RESULTS="$LOGDIR/results.tsv"
 [ -f "$RESULTS" ] || printf 'gate\tlane\tscope\tverdict\tseconds\tdetail\n' > "$RESULTS"
+# THE COMMIT OF RECORD (14z-180, GitHub #171 slice Q4): the HEAD this run measures,
+# first line, then every dirty tracked path — so tests/test_emulator_staleness.sh can
+# say which passed gates have had a declared input move since. Written once per run
+# directory (a --resume continues the run it records).
+if [ ! -f "$LOGDIR/commit.txt" ]; then
+    if git rev-parse --git-dir >/dev/null 2>&1; then
+        { git rev-parse HEAD; git status --porcelain -- . 2>/dev/null | grep -v '^??' | awk '{print $2}'; } > "$LOGDIR/commit.txt"
+    else
+        echo "no-git" > "$LOGDIR/commit.txt"
+    fi
+fi
 
 echo "== the emulator-tier sweep =="
 echo "  registry   $REG"

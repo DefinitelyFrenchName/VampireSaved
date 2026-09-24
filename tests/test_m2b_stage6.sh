@@ -28,6 +28,13 @@
 # EXPECTS: gfx checks green, every soak END clean, the legacy leg EXACT against the frozen
 #   generation; a red on the last means the pipeline built fresh no longer reproduces the
 #   freeze.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lib/m2a_common.sh
+#   tests/lib/masked_compare.sh tests/lua/replay.lua tests/lua/replay_guard.lua
+#   tests/replays/ tests/test_gfx_menus.sh tools/build_donovan.sh tools/build_fingerprint.py
+#   tools/check_diverge.py tools/compare_composite.py tools/compare_flicker.py
+#   tools/compare_window.py tools/freeze_masked_basis.sh tools/propose_masked_specs.sh
+#   tools/run_mame.sh tools/run_replay_guarded.sh tools/run_replay_mame.sh
+#   tools/setup_mame.sh
 #
 # Usage: ROMDIR=... tests/test_m2b_stage6.sh [outbase]
 set -eu

@@ -15,6 +15,12 @@
 # EXPECTS: agreement on every compared field with P1's base 0x003FA9D0 and id 0x13 on both;
 #   the perturbed field fails; REFUSES without the sim prerequisites. The first evidence the
 #   tenant FIGHTS correctly on the core, not only that its art is fetched.
+# FOLLOWS: build/manifest/ docs/platform/mister.md emu/jtcores-patches/ emu/jtcores/
+#   emu/mame-patches/ tests/fields_m2a.tsv tests/lib/controls.sh tests/lua/replay.lua
+#   tests/replays/36_pick_tenant_cell.rpl tests/rtl/ tools/check_wram_dumps.py
+#   tools/compare_fields.py tools/mister_mra.sh tools/rpl2siminputs.py tools/run_mame.sh
+#   tools/run_replay_mame.sh tools/run_sim_jtcps2.sh tools/setup_jtcores.sh
+#   tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: perturbed-field — a perturbed COMPARED field must be caught by the field comparison (mode: the timer byte is perturbed in the REAL sim dump and the anchor comparison must fail; REFUSES with exit 3 if the sim prerequisites are absent)
 #

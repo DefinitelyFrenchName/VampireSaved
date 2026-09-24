@@ -11,6 +11,10 @@
 #   control removes one pass-counter step from our trace.
 # EXPECTS: the overrun rows (native donovan_2 and donovan_11, ours donovan_10) and idle rows
 #   equal; the planted zero-pass frame changes a row and fails.
+# FOLLOWS: build/manifest/ docs/platform/gotchas.md emu/mame-patches/
+#   tests/expected/pass_overrun.tsv tests/lua/field_trace.lua tests/lua/read_tap.lua
+#   tests/replays/ tools/build_fingerprint.py tools/name_moves.py tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: overrun-planted — a copy of our donovan_11 trace with one pass-counter step removed (a zero-pass frame planted where ours has none) must change our overrun row and FAIL the frozen compare, so an `overrun ... none` row is a reading of the trace (in-gate: the planted copy must reduce differently; mode: every part's trace is planted before the reduction and the table FAILs)
 #

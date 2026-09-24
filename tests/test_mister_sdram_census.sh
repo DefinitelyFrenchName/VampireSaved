@@ -15,6 +15,10 @@
 # EXPECTS: leg A exact against the WIDE map, B failing it with banks 2+3 differing from A, C
 #   and D identical on banks 1-3 and differing on bank 0; the controls fail; REFUSES without
 #   the sim prerequisites.
+# FOLLOWS: build/manifest/ docs/platform/mister.md emu/jtcores-patches/ emu/jtcores/
+#   tests/lib/controls.sh tests/replays/05_timeout_idle.rpl tests/rtl/
+#   tools/check_wram_dumps.py tools/mister_mra.sh tools/mister_sdram_census.py
+#   tools/rpl2siminputs.py tools/run_sim_jtcps2.sh tools/setup_jtcores.sh
 #
 # MUST-FIRE: known-bad: perturbed-map — the WIDE image must NOT match the STOCK map, so comparing leg A against the wrong map must fail (mode: leg A is censused against the STOCK map and the census fails, so the gate FAILs; REFUSES with exit 3 if the sim prerequisites are absent)
 #

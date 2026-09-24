@@ -14,6 +14,11 @@
 #   dumps; the control flips one bit of a promoted entry in the real core dump.
 # EXPECTS: promoted identical and in the 19-bit address range on both; the flipped entry
 #   fails PROMOTED_IDENTICAL; REFUSES with exit 3 without the sim prerequisites.
+# FOLLOWS: build/manifest/ docs/platform/mister.md emu/jtcores-patches/ emu/jtcores/
+#   emu/mame-patches/ tests/lib/controls.sh tests/lua/obj_records_dump.lua
+#   tests/replays/36_pick_tenant_cell.rpl tests/rtl/ tools/check_wram_dumps.py
+#   tools/mister_mra.sh tools/obj_select_compare.py tools/rpl2siminputs.py tools/run_mame.sh
+#   tools/run_sim_jtcps2.sh tools/setup_jtcores.sh tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: perturbed-promoted-entry — a one-bit change in a promoted (group-C) tile code must be caught, so a perturbed promoted entry must break section 1's promoted-identical check (mode: one promoted entry is flipped in the REAL core dump and PROMOTED_IDENTICAL goes NO, so the gate FAILs; REFUSES with exit 3 if the sim prerequisites are absent)
 #

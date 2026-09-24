@@ -5589,3 +5589,28 @@ verdict on the 4,624 archived commands. **Transferable: a stripper that fails by
 removing too much hides exactly what the classifier exists to find — make it fail toward
 keeping text.** The `greedy-heredoc` control in `tests/test_agent_hooks.sh` restores the
 over-strip on a copy and must turn the gate red.
+
+## A PATH EXTRACTOR OVER SHELL TEXT MISSES THE PATHS THAT ARE NOT SPELLED AS PATHS — read its proposals against what each gate SAYS it uses before trusting a census (paid: 14z-180, GitHub #171)
+
+`tools/gate_follows.py` extracts the repo paths an emulator gate references so its
+`# FOLLOWS:` declaration can be reconciled against them. The first extractor, a regex
+for `tests/… tools/… …` tokens with a "not preceded by a path character" guard, gave a
+clean census and NO references at all for 33 of 199 gates — every one spelled its paths
+`"$REPO/tools/x.py"` or `"$PWD/tests/replays/x.rpl"`, and the guard rejected the `/`
+before them. The second miss was smaller and hid in plain sight: `${RPL:-tests/replays/
+11_pick_donovan.rpl}` — the default IS the reference, and the `-` before it failed the
+guard, so three gates' replays were invisible while their declarations reconciled
+clean. The third: a token cut at a variable kept a trailing `.` or `}`
+(`tests/replays/naming/donovan_12.` from `donovan_12.${x}`).
+
+None of the three was found by the reconciliation — a reconciliation can only say a
+declaration covers what the extractor SAW. They were found by putting each gate's
+proposed declaration beside its own `# HOW:` field and asking whether the rig the
+sentence names appears in the list ("the timer trap rig on MAME" with no replay in the
+proposal; "huitzil_5 naming part" with no rig generator).
+
+**Transferable:** a text extractor's blind spots are the spellings it never met, and
+its own census cannot show them; the control is an independent statement of what
+should be there — here the human-readable description the same header carries (slice
+Q0 made Q3 checkable). A count that looks complete ("199 declares, 0 uncovered") says
+nothing about reach.

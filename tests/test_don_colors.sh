@@ -9,6 +9,8 @@
 #   measured on vsav2 (replay 43).
 # EXPECTS: both replays' rows equal the frozen native rows; a red is a palette or table
 #   change regressing either path.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/replays/
+#   tools/run_mame.sh tools/setup_mame.sh
 #
 # Locks the round-36-queue "alt-color Donovan" item, resolved NO-BUG:
 # the kick-color set is a fixed +0x180 offset INSIDE the char sprite

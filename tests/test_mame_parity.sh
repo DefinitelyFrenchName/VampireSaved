@@ -12,6 +12,8 @@
 #   directly (skipped LOUDLY without the reference binary).
 # EXPECTS: every frozen log reproduced, every A/B identical; a red means the instrument
 #   moved and every MAME finding since is in question.
+# FOLLOWS: emu/mame-patches/ tests/expected/vsavj/ tests/lua/replay.lua tests/replays/
+#   tools/run_mame.sh tools/run_replay_mame.sh tools/setup_mame.sh
 #
 # Why this gate exists, and why it comes first:
 #

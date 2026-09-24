@@ -15,6 +15,11 @@
 #   frozen pair.
 # EXPECTS: the measured pair equal to the frozen one on both legs, the below-window control
 #   loud and verified; a moved count is a finding — the simulation is deterministic.
+# FOLLOWS: build/manifest/ docs/platform/mister.md emu/jtcores-patches/ emu/jtcores/
+#   tests/expect/mister_prg_window.txt tests/lib/controls.sh
+#   tests/replays/11_pick_donovan.rpl tests/rtl/ tools/check_wram_dumps.py
+#   tools/mister_mra.sh tools/prgprobe_verdict.py tools/rpl2siminputs.py
+#   tools/run_sim_jtcps2.sh tools/setup_jtcores.sh
 #
 # MUST-FIRE: perturbed-copy: frozen-pair-moved — a perturbed copy of the frozen prg-window pair must fail the compare against the measured pair (mode: the measured pair is compared against that perturbed copy; REFUSES with exit 3 if the sim prerequisites or the frozen file are absent)
 #

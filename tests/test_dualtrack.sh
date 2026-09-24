@@ -10,6 +10,8 @@
 #   six offsets so a legacy replay's onset moves EARLIER and the gate must FAIL.
 # EXPECTS: every onset equal to its frozen value, no growth outside the offsets; an onset
 #   moving earlier is the failure (CLAUDE.md [VSP-25]).
+# FOLLOWS: build/manifest/ docs/game/atlas/ram.md emu/fbneo-patches/ emu/fbneo/
+#   tests/lib/controls.sh tests/replays/ tools/run_replay_fbneo.sh tools/setup_fbneo.sh
 #
 # MUST-FIRE: known-bad: stray-byte-growth — a byte differing before a replay's frozen onset OUTSIDE the six frozen execution-position offsets is GROWTH, not a flicker, and must move the STATE onset earlier (mode: such a byte is flipped in a REAL pre-onset WIDE dump so a legacy replay's onset moves earlier and the gate FAILs)
 #

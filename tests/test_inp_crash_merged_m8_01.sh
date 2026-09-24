@@ -12,6 +12,8 @@
 # HOW: tests/inp/crash-merged-m8-01 under tests/lua/inp_guard.lua on MAME (~1 min).
 # EXPECTS: clean through 6000 (the default since 14z-111); the defect mode reproduces the
 #   captured crash on a pre-fix build.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/inp/crash-merged-m8-01/
+#   tests/lua/inp_guard.lua tools/run_inp_guarded.sh tools/setup_mame.sh
 #
 #   MODE=defect (the default until the fix shipped in merged-m9): asserts the crash fires EXACTLY
 #         as captured — vec11 (line-F) at PRG:0x422BAC, frame 4806 (+-2) —

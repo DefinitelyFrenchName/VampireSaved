@@ -12,6 +12,9 @@
 #   compared with the frozen vanilla logs.
 # EXPECTS: the new base loaded, legacy identical, the attract divergence exactly at 4278 —
 #   the superset invariant specified, not weakened.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/vsavj/ tests/lua/replay.lua
+#   tests/replays/ tools/pack_build.sh tools/patch_prg.py tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # Experiment: repoint vsavj Jedah's (slot 0x0F) hitbox-base entry in table
 # PRG:0x0BD97A to Demitri's (slot 0x01, 0x093B6A). Then:

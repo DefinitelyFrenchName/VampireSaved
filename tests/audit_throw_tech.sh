@@ -12,6 +12,8 @@
 # EXPECTS: each leg's teched damage equals its frozen value; notech deals 13. A red is a
 #   ported reaction row that stopped honouring the escape, or a tech landing where native
 #   has none.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/field_trace.lua
+#   tests/replays/judge/02_throw.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # MEASURED (legacy control, 14z-104 (3)): the tech registers as the
 # victim's own throw input (forward + HP) held from ~2 frames AFTER the

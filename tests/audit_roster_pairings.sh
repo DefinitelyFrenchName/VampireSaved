@@ -11,6 +11,9 @@
 #   unpoked run must be refused).
 # EXPECTS: every pairing END-clean with both bases as derived; a crash is rule 6 — capture
 #   it, do not keep batching for a completeness number.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/roster_pairings/bases.tsv
+#   tests/lib/pairing.sh tests/lua/replay_guard.lua tests/replays/94_tenant_vs_tenant.rpl
+#   tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
 # WHY IT EXISTS. CLAUDE.md §4 mandates, for a ported character, "vs each of
 # the 18 (both sides)". The suite has never had it. 14z-95's

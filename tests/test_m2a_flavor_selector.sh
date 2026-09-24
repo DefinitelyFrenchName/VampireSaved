@@ -8,6 +8,9 @@
 #   latches read from dumps after char-init.
 # EXPECTS: 01 / 00 / 01 for P1 and 00 for P2 in every run; a red is the init shim reading
 #   the wrong Start bit or seeding the wrong struct.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua
+#   tests/replays/17_don_oracle_vsavj.rpl tools/build_donovan.sh tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # Community-confirmed protocol (docs/game/atlas/character_tables.md): holding
 # YOUR Start through select confirm and match load selects the other

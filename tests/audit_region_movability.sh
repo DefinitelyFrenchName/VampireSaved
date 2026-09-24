@@ -10,6 +10,9 @@
 #   tests/test_movability_liveness.sh's.
 # EXPECTS: every measured region runs. Scope stated: one tenant's regions; Huitzil's and
 #   Pyron's anim are unmeasured here.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua
+#   tests/replays/12_donovan_vs_cpu.rpl tests/test_thunk_addr_literal.sh
+#   tools/build_donovan.sh tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
 # WHY (M3b, 14z-77). The merge's binding constraint is the CRYPT WINDOW, not
 # total size: one tenant already saturates hole_a, and three tenants keeping

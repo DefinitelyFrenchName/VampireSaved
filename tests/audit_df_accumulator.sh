@@ -13,6 +13,9 @@
 # EXPECTS: the armor leg's frozen shape (adds 20/30/40, break past 60, decay 240), hphk and
 #   nodf flat, merged byte-identical to pristine; the perturbed table fails. vsav2 has no
 #   Sasquatch — stated, not measured there.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/df_accumulator.txt
+#   tests/lib/controls.sh tests/lua/field_trace.lua tests/replays/df/105_df_sas_armor.rpl
+#   tools/df_accumulator_check.py tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: perturbed-frozen-arm — a perturbed copy of the frozen per-contact table must fail the diff against the measured output (mode: the measured got.txt is compared against that perturbed copy and the gate must FAIL)
 #

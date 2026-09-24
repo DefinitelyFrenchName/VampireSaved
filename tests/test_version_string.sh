@@ -13,6 +13,8 @@
 #   position by 1 px and corrupt a glyph tile.
 # EXPECTS: static and runtime exact, both controls failing; the snapshot check is what
 #   caught the tile codec's half-mirror.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/obj_records_dump.lua
+#   tests/lua/snapshot_frames.lua tools/run_mame.sh tools/setup_mame.sh
 #
 # Where and how: the SELECT SCREEN, the one roster-owned always-visited
 # surface (attract/title would violate the superset invariant; select

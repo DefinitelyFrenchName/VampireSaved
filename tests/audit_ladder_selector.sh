@@ -13,6 +13,9 @@
 #   re-freeze, fewer a regression), the clamp at idx 6 / stage 0x0016, and a stage set that
 #   changes under the poke. The dead hypothesis (overrun to 0x18, #99's shape) stays locked
 #   dead.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh
+#   tests/lua/replay_guard.lua tests/replays/26_don_arcade_mash.rpl tools/run_mame.sh
+#   tools/run_replay_guarded.sh tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: mask-not-load-bearing — the in-use mask drives the stage, so a run where saturating it changes no stage must fail section 3 (mode: the saturated stage set is forced equal to the control so section 3 reads the mask as inert and the gate FAILs)
 #

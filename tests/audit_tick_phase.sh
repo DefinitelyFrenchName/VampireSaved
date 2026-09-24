@@ -14,6 +14,8 @@
 # EXPECTS: the residue classes exact, the constants equal to the measured periods and round
 #   start; the flat trace and the wrong quantum fail. WHY a shift must be a multiple of 39
 #   rather than 3 is recorded as its own ticket, not explained here.
+# FOLLOWS: emu/mame-patches/ tests/lua/field_trace.lua tools/name_moves.py tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: flat-pass — a copy of the level-8 trace with the pass counter made to step by exactly 1 every frame (no second pass anywhere) must FAIL the period assertion, so a dead tap or a frozen counter cannot read as a clean cadence (in-gate: the flattened copy must lose its double-pass frames; mode: the flattened trace replaces the real one and section 1 FAILs)
 # MUST-FIRE: perturbed-copy: quantum-off — a copy of tools/name_moves.py whose TICK_QUANTUM is not the lcm of the two measured periods must FAIL section 2, so the constant cannot drift from what this gate measures (in-gate: the perturbed value must be rejected; mode: the gate reads the perturbed copy and section 2 FAILs)

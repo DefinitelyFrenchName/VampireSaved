@@ -6,6 +6,9 @@
 #   alias remaps proven by vs2's own dispatch.
 # HOW: the exact crash replay run GUARDED on MAME.
 # EXPECTS: END clean; a vec3 reset or exception is the crash back.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/lua/replay_guard.lua
+#   tests/replays/50_don_column_ko.rpl tools/run_mame.sh tools/run_replay_guarded.sh
+#   tools/setup_mame.sh
 #
 # The column's KO records carried vs2's EXTENDED record types
 # 0x50/0x52; vsavj's record-type dispatch table ends at entry 0x4F, so

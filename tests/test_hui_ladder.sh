@@ -9,6 +9,9 @@
 #   sets, and runs a legacy replay on MAME against the frozen whole-RAM expectation.
 # EXPECTS: every op in free space or a variant row and the legacy replay bit-identical; a
 #   red names the op that touched a reachable byte.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/vsavj/02_demitri_vs_cpu.sha1
+#   tests/lua/replay.lua tests/replays/02_demitri_vs_cpu.rpl tools/build_donovan.sh
+#   tools/run_mame.sh tools/run_replay_mame.sh tools/setup_mame.sh
 #
 # Huitzil is a VARIANT-ID tenant (0x10): no vanilla path can reach his rows,
 # so unlike Donovan's M2a ladder (divergence frames pinned per stage) the

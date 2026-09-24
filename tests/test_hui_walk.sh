@@ -10,6 +10,9 @@
 #   values.
 # EXPECTS: rows correct and the deltas exactly 0x1C2000 / 0x384000; the alias build's
 #   0x1B0000 / 0x360000 is the natural negative control the gate fails back to.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua
+#   tests/replays/hui/74_hui_walk.rpl tools/build_donovan.sh tools/cps2_decrypt.py
+#   tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
 # Mechanism (measured): both vsavj param32 tables are 32-row with rows
 # 0x10-0x1F byte-aliasing 0x00-0x0F, and all three consumers index the

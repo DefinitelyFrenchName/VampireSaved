@@ -12,6 +12,9 @@
 #   bytes read from dumps at the measured frames.
 # EXPECTS: both signatures present; a red is either mechanism dead or changed, not merely a
 #   crash.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua
+#   tests/replays/hui/81_hui_rw_gc.rpl tests/replays/hui/82_hui_df_2p.rpl
+#   tools/build_donovan.sh tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):

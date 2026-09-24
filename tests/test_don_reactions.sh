@@ -9,6 +9,8 @@
 # EXPECTS: multi-hit, no knockdown, the death chain complete, damage within bound; the
 #   knockdown control fails. The two-sided native comparison is test_don_immortal_native's;
 #   this gate keeps the one-sided locks honest.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/replay.lua
+#   tests/replays/ tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: knockdown-forbidden — 421P must not knock down a standing opponent, so a knockdown-family node reading must fail section 1 (mode: the victim node is forced into the knockdown family so the no-knockdown assertion fails and the gate FAILs)
 #

@@ -11,6 +11,9 @@
 #   frames), which must fail.
 # EXPECTS: 4/4 swaps each followed by white, the region all ffff, the control failing. WHY
 #   Capcom flashes is not established — mechanism only.
+# FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lua/inp_probe.lua
+#   tests/lua/tap_writes.lua tests/replays/104_1p_auto_ko_win.rpl tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: normal-base-satisfies — the normal palette base 0x90c0 must NOT satisfy the 4-write flash shape, so demanding that it does must fail (mode: 0x90c0 is asserted to satisfy the shape, which it never does, so the gate FAILs)
 #

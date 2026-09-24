@@ -15,6 +15,9 @@
 # EXPECTS: the frozen defect rows (ours p1=+8 p2=record; native the reverse), no in-play
 #   reader of the dead pair, the legacy legs paying the attacker the record on both engines;
 #   all three controls fail. A fix re-freezes this file deliberately.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/throw_registration.tsv
+#   tests/lua/read_tap.lua tests/replays/ tools/name_moves.py tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: legs-swapped — a copy of our reduced rows with the P1 and P2 meter steps swapped (the fixed shape) must FAIL the frozen compare (in-gate: the perturbed copy is diffed against the frozen rows and must differ; mode: the real rows are swapped and the gate FAILs)
 # MUST-FIRE: perturbed-copy: dead-reader-planted — a copy of our dead-pair tap with ONE in-play read planted at a game PC must add a reader row and FAIL the frozen compare (in-gate: the planted copy is reduced and must differ; mode: the real tap is planted and the gate FAILs)

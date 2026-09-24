@@ -13,11 +13,11 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**380 of 380 gates described.**
+**383 of 383 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 22 | 22 | the suite runners and their own ground truth |
+| [runner](#runner) | 25 | 25 | the suite runners and their own ground truth |
 | [docs](#docs) | 20 | 20 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 38 | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -30,13 +30,13 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 22 of 22 described.
+the suite runners and their own ground truth. 25 of 25 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
 **WHAT:** every gate that needs MAME, FBNeo or the Verilator simulator runs from ONE registry (tests/ci_emulator.tsv) with its declared lane, scope, cadence, args and timeout, so a release can say "all tests ran" over an enumerated set.
 
-**HOW:** reads the registry, runs the prereq lane first (a red instrument gate stops the run), then the mame/fbneo/mister lanes, each gate under its own timeout, classifying every exit through tests/lib/classify.sh and, under --controls, executing every declared must-fire control as a `CONTROL=<name>` mode; writes one results.tsv row per gate and per control.
+**HOW:** reads the registry, runs the prereq lane first (a red instrument gate stops the run), then the mame/fbneo/mister lanes, each gate under its own timeout, classifying every exit through tests/lib/classify.sh and, under --controls, executing every declared must-fire control as a `CONTROL=<name>` mode; writes one results.tsv row per gate and per control, and the run's commit of record (commit.txt: HEAD, then the dirty tracked paths); --stale selects exactly the gates tools/audit_emulator_staleness.py names.
 
 **EXPECTS:** a readout PASS / SKIP / FAIL / TIMEOUT / MISSING with SKIP counted apart from PASS; at release scope (--scope all --lane all --strict --controls) anything but PASS is a hard fail. It asserts nothing about the romset itself — its verdict logic is what tests/test_emulator_runner.sh tests.
 
@@ -144,6 +144,22 @@ the suite runners and their own ground truth. 22 of 22 described.
 
 **EXPECTS:** every case reads the verdict it was built to produce and each control's section fails on its copy; a red names the case — a wrong reading here would turn the release policy into a rubber stamp.
 
+### `test_emulator_staleness.sh` — test, ci_portable
+
+**WHAT:** over the newest emulator-tier run that recorded its commit `(build/emu_*/commit.txt,` written by tests/run_all_emulator.sh since 14z-180): every gate that PASSED there and has since had a path its `# FOLLOWS:` header declares move — committed, in the working tree or untracked — is STALE; and no results row's seconds reach HALF its cap (the registry's 7th column, else 5,400 s; a control row shares its gate's cap).
+
+**HOW:** tools/audit_emulator_staleness.py (importing the one FOLLOWS reader) diffs the recorded commit against the tree and matches the moved paths to each passed gate's declaration; the cadence comes from VS_CADENCE (exported by tests/run_all_static.sh, default session). Section 2 proves the instrument on a scratch git repository: a planted run whose declared replay moved must name its gate, an unmoved one must not, an undeclared gate must be named as unjudgeable, and a planted row at 0.5 of its cap must fail; the controls run the tool at freeze cadence over the moved plant and over the headroom plant.
+
+**EXPECTS:** at session cadence a PASS whatever is stale (the stale list is a NOTE and the command to retire it: tests/run_all_emulator.sh --stale); at freeze or release cadence a stale or undeclared passed gate is a FAIL; a row at or above half its cap is a FAIL at every cadence; no run of record is a NOTE at session and a FAIL at freeze/release.
+
+### `test_gate_follows.sh` — test, ci_portable
+
+**WHAT:** two properties of the `# FOLLOWS:` header field over every gate registered in tests/ci_emulator.tsv: (1) the census — which gates DECLARE (grows only) and which are UNDECLARED (shrinks only) — equals the frozen tests/expected/gate_follows.tsv; (2) the RECONCILIATION, three classes — TEXT: every repo path a declaring gate's text references (its script, the shared libraries it sources, the replay runners it calls, its registry row's args) is covered by a declared prefix; RULE: every prefix the widening rules require (the emulator's patches and setup script for the emulator the gate reaches, the manifest for a gate that takes or builds a romset, the core sources for the MiSTer lane, the rig generators) is declared; PROSE: every replay the gate's own # WHAT: / # HOW: description names resolves to a covered file.
+
+**HOW:** tools/gate_follows.py (the ONE reader — the lane-carry tool and the staleness gate import it) parses each leading comment block, extracts each script's references and the rule-required prefixes, and reads the replay names out of the description prose (an INDEPENDENT extractor: the prose was written by reading the gate, so a path the text regex cannot see still has to be covered when the description names it); this gate compares the census classes with the frozen file and runs --reconcile over the tree; four controls run the checks on a copy of the tree with one gate perturbed.
+
+**EXPECTS:** PASS when the census equals the frozen file and --reconcile names no gate. A red names the gate, the class and the item (lost its declaration / new declaration not yet frozen / text:, rule: or prose: outside its declaration — widen the declaration, never delete the reference).
+
 ### `test_header_defaults.sh` — test, ci_portable
 
 **WHAT:** a gate's header states the default its CODE actually uses: every `build/<dir>` a header presents as an invocation or a default is one the code sets, so the generated gate index never tells a reader to pass a pruned build directory.
@@ -151,6 +167,14 @@ the suite runners and their own ground truth. 22 of 22 described.
 **HOW:** tools/audit_header_defaults.py compares each header's invocation-shaped build paths with the defaults its code assigns, exempting backticked tokens and blocks introduced as verbatim archives; the control adds a stub with a stale Usage directory to a copy of every real header.
 
 **EXPECTS:** PASS when every header default is a code default; a red names the gate and the stale path.
+
+### `test_lane_carry.sh` — test, ci_portable
+
+**WHAT:** tools/audit_lane_carry.py answers MAY CARRY only when every path a lane's gates declare, the gate scripts and the registry are byte-unchanged since the commit, says MUST RE-RUN naming the moved path when one moved, and refuses to carry a lane whose gate declares nothing.
+
+**HOW:** a scratch git repository with two stub emulator gates (one declaring `tests/replays/x.rpl tools/t.py`, one undeclared in a second lane) and a registry, one commit; the REAL tool runs against it (--repo) in three states: unchanged, a declared replay edited in the working tree, and the undeclared lane; two shadow-tool controls run copies of the tool with the derivation blinded and the undeclared refusal removed.
+
+**EXPECTS:** MAY CARRY (exit 0) on the unchanged repo; MUST RE-RUN (exit 1) naming tests/replays/x.rpl after the edit; MUST RE-RUN (exit 1) naming the undeclared gate; each control's copy reads the opposite on its section.
 
 ### `test_mame_bin_pinned.sh` — test, ci_portable
 

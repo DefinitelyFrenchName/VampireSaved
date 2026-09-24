@@ -11,6 +11,9 @@
 #   frozen with its in/out label; the control plants +6 in-mode steps into our rows.
 # EXPECTS: no in-mode gauge step on any ours or vsavj leg, the vsav2 legs' +6 steps present,
 #   the frozen table equal; the planted swings fail.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/df_meter.tsv
+#   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tools/run_mame.sh
+#   tools/select_paths.py tools/select_wheel.py tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: swing-planted — a copy of our rows with one in-mode gauge step planted per tenant (+6 at the in-mode swing frames, the pre-fix defect) must FAIL the no-in-mode-gauge check, so "no gauge in the mode" is read from our legs' steps (in-gate: the planted copy must be caught; mode: our rows are planted before the checks and the gate FAILs)
 #

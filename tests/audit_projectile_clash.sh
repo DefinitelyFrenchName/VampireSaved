@@ -14,6 +14,10 @@
 #   word 0x1000, satellite +0x94 == 0 and zero probe fires, the native leg +0x94 == 0 and
 #   bank word 0x6000. A hit-active native satellite reopens #108; EXPECT_SAT_SWEEP=1 is
 #   refused.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/lua/replay_guard.lua
+#   tests/replays/105_projectile_clash_ctl.rpl tests/replays/106_pyron_cosmo_clash.rpl
+#   tools/run_mame.sh tools/run_replay_guarded.sh tools/run_replay_mame.sh
+#   tools/setup_mame.sh
 #
 # What 14z-101's writer hunt established (FBNEO_HTAP, both legs, whole-run):
 #   - fighter/satellite +0x18 is the per-char OBJ BANK WORD (table

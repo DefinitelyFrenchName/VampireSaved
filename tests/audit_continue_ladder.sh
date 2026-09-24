@@ -14,6 +14,8 @@
 # EXPECTS: on each leg at least 3 matches and at least one loss+continue where the mask goes
 #   non-zero then clears to 0 while matches follow. Leg A (vanilla) red means vanilla
 #   stopped resetting and #102 reopens as ours.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua
+#   tests/replays/26_don_arcade_mash.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # #102 IS CLOSED — maintainer-ruled 2026-08-19, NOT OURS (the answer this
 # gate produced). It is now a REGRESSION LOCK, not an open investigation:

@@ -179,6 +179,7 @@ declares	test_dualtrack
 declares	test_effect_palette_table
 declares	test_effect_placeholders
 declares	test_emulator_runner
+declares	test_emulator_staleness
 declares	test_escape_triage
 declares	test_expectation_provenance
 declares	test_extract_hp
@@ -200,6 +201,7 @@ declares	test_frozen_rompath_guard
 declares	test_fsm_census
 declares	test_gate_coverage_current
 declares	test_gate_descriptions
+declares	test_gate_follows
 declares	test_gate_index_current
 declares	test_gfx_chain
 declares	test_gfx_collision_gate
@@ -242,6 +244,7 @@ declares	test_jtsim_scratch_heal
 declares	test_kernel_voice_tables
 declares	test_killshread_es
 declares	test_ladder_tenant_vs_palette
+declares	test_lane_carry
 declares	test_latch_readers
 declares	test_list_type_census
 declares	test_m2_repoint

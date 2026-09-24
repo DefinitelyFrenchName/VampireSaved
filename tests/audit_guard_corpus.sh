@@ -13,6 +13,9 @@
 #   must FAIL.
 # EXPECTS: every leg END-clean; the known crash reproduced by the control. A PASS is
 #   rig-bounded: no vector fired on THESE rigs — widen the corpus, never the tolerance.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh
+#   tests/lua/replay_guard.lua tests/replays/ tools/run_mame.sh tools/run_replay_guarded.sh
+#   tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: known-crash — the 14z-93 vec4 tripwire on build/hui41 + 26_don_arcade_mash must reproduce a crash (mode: the gate runs that rig with the late pick frames and must FAIL; REFUSES with exit 3 if build/hui41 or the replay is absent)
 #

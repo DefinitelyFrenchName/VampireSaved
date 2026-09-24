@@ -12,6 +12,9 @@
 # EXPECTS: ours == native in every cell, both pins proven held by each leg's own dumps; the
 #   three controls fail as they must. Testimony has no place here: every constant is
 #   measured in the run.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/roster_pairings/bases.tsv
+#   tests/lib/controls.sh tests/lua/replay.lua tests/lua/tap_writes.lua tests/replays/
+#   tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: jedah-artefact — the #114 artefact (pristine vsavj + replay 48 selects JEDAH, not Donovan) must not be accepted as ours, so treating the Jedah control leg as ours must fail (mode: the control leg is measured and required to match Donovan, which it never does, so the gate FAILs)
 # MUST-FIRE: perturbed-copy: unmatched-modes — the native legs left at vsav2's DEFAULT play mode (TURBO, speed level 8) against ours at level 6 must fail, so the gate is proven to see the level it pins (in-gate: native LP at the ceiling at the default level lands its hits on different frames from ours at level 6; mode: every native leg runs at its default level and the level-6 comparisons FAIL)

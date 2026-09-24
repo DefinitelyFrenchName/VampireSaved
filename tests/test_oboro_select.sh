@@ -11,6 +11,9 @@
 # EXPECTS: 0x18 / base 0x0B3450 where the hook applies, 0x08 / 0x0A6418 without the hold and
 #   on the stock twin, 0x01 on Demitri's cell, P2 independent, FBNeo agreeing. A leg proving
 #   a byte without the base is not a pass.
+# FOLLOWS: build/manifest/ emu/fbneo-patches/ emu/fbneo/ emu/mame-patches/
+#   tests/lua/replay.lua tools/run_mame.sh tools/run_replay_fbneo.sh tools/setup_fbneo.sh
+#   tools/setup_mame.sh
 #
 # vsavj ships Oboro Bishamon complete at variant id 0x18 (hitbox base
 # 0x0B3450, docs/game/atlas/character_tables.md) and the select commit path

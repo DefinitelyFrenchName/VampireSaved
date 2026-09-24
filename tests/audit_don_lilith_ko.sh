@@ -15,6 +15,9 @@
 # EXPECTS: KO to the stage word moving in the healthy band; a red is the stall back (the
 #   judge starved by a ported row that pins white HP). The gate measures the STALL, never a
 #   permanent freeze — that first wording is retracted in the header.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua
+#   tests/replays/26_don_arcade_mash.rpl tools/run_mame.sh tools/run_replay_guarded.sh
+#   tools/setup_mame.sh
 #
 # THE DEFECT, measured on merged-m3 AND merged-m2 (so it predates the #101
 # batch): P1 Donovan loses a round to CPU Lilith in arcade -> his HP

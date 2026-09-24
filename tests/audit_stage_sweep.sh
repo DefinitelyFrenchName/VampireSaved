@@ -11,6 +11,8 @@
 # EXPECTS: 37 legs: the stage word reads the poked value, P2 at 0x120 then damaged, run
 #   complete; the sweep produces at least 8 distinct stage-palette blocks. A red names the
 #   tenant and stage.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua
+#   tests/replays/judge/02_throw.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # Stage selection is the $FF8100 word (the ladder/venue index,
 # engine_internals "the stage-name banner" section: 12 stages, values

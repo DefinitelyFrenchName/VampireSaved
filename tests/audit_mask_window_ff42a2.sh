@@ -18,6 +18,8 @@
 #   isolated-and-attributed under the mask; anything else is a mechanism outside the family
 #   — stop and root-cause (its first run caught the 38 regression this way). Its future is
 #   ticket #131.
+# FOLLOWS: emu/mame-patches/ tests/lua/replay.lua tests/replays/ tools/compare_flicker.py
+#   tools/run_mame.sh tools/run_replay_mame.sh tools/setup_mame.sh
 #
 # THE QUESTION: when the 14z-87b medallion move (Pyron's wheel pal_row
 # 0x1A -> 0x1D, one layout field) moved a set's self-frozen `.sha1`

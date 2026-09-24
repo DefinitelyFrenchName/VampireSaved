@@ -14,6 +14,8 @@
 #   victim legs fire at the downed tenant; the control does not fire 0x0E. The CONNECT
 #   (pursuit damage) is deliberately not asserted — a rig knife-edge on both games, recorded
 #   in the header.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/field_trace.lua
+#   tests/replays/judge/03_down_attack.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # The maintainer confirmed (2026-08-22) vsav retains the Night Warriors
 # leaping pursuit: universal U + any P/K over a knocked-down opponent,

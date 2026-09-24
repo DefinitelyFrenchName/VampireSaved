@@ -7,7 +7,8 @@
 > (§4, §5) were ruled *"As proposed WITH THIS ADDITION"* — a human-readable description in
 > every gate (§4 Q0, the maintainer's words in §6) — and the six questions of §6 were each
 > answered (`DECISIONS_HISTORY.md` "Ruled 2026-09-24 (14z-180) — #171 gate qualification").
-> Order: **Q0, Q1, Q3+Q4 (Q5 inside), Q2, Q6.** Q1's gate is `tests/test_module_refs.sh`.
+> Order: **Q0, Q1, Q3+Q4 (Q5 inside), Q2, Q6.** Q1's gate is `tests/test_module_refs.sh`;
+> Q0, Q1, Q3, Q4 and Q5 are LANDED (each section says when); Q2 and Q6 remain.
 
 **Why this document exists:** the same reason `harness_scope.md`,
 `applier_app_scope.md` and `agent_architecture_scope.md` do — a direction the
@@ -107,8 +108,10 @@ be a read-back, the other three are UNMEASURED.
   on`, `re-freeze` command. It is the consumer map for the 63 files it covers; the
   per-build expectation SETS are covered by `registry.tsv` and the freeze tags instead.
 - **`tools/audit_lane_carry.py`** (14z-174): may a lane's green be carried forward?
-  Hardcoded subject lists, two known omissions, its `MAY CARRY` printing the caveat —
-  NECESSARY, NOT SUFFICIENT (the ticket's first comment).
+  AS SCOPED: hardcoded subject lists, two known omissions, its `MAY CARRY` printing the
+  caveat — NECESSARY, NOT SUFFICIENT (the ticket's first comment). **SUPERSEDED the same
+  day by slice Q3:** the subjects are now DERIVED from the gates' `# FOLLOWS:` declarations
+  (below) and the lists are gone.
 - **`tools/attribute_expectation.sh`** (14z-174): a red expectation attributed to the
   rig or the subject by restoring named paths and re-running — the triage tool once a
   staleness is found, not the detector.
@@ -186,9 +189,15 @@ they have one — no grammar, no reader, but nothing stops the 8th gate omitting
 
 ### Q3 — every emulator gate declares what it FOLLOWS (shape 2, and the carry)
 
+**LANDED 2026-09-24 (14z-180)** — the grammar and the reader are `gate_header_contract.md`'s
+FOLLOWS section; the 199 declarations were written from each script's text and harness
+(`tools/gate_follows.py --refs`), widened by reading (the emulator's patches, the manifest,
+the core sources, the rig generators), and the reconciliation control holds them.
+
 A header line `# FOLLOWS: <repo path prefixes>` on every emulator-tier gate (its own
 script is implied, as `ci_cadence.tsv` implies it), read by one reader
-(`tests/lib/follows.sh`). Two static gates: a CENSUS (`declares` grows only,
+(`tools/gate_follows.py` — Python rather than the `tests/lib/follows.sh` first proposed,
+so the carry tool and the staleness audit import it instead of re-parsing). Two static gates: a CENSUS (`declares` grows only,
 `undeclared` shrinks only — the must-fire census's three-class pattern) and a
 RECONCILIATION control: the paths a gate's script TEXT references (`tests/replays/…`,
 `tests/expected/…`, `tools/<x>.py`, `build/manifest`, plus its `ci_emulator.tsv`
@@ -203,6 +212,10 @@ WHY lives in the gate (the 14z-123 ruling), and the registry row is already six
 columns wide.
 
 ### Q4 — the runner records its commit; a session gate names STALE emulator gates (shape 2)
+
+**LANDED 2026-09-24 (14z-180)** — `tests/run_all_emulator.sh` writes `commit.txt` and takes
+`--stale`; `tools/audit_emulator_staleness.py` + `tests/test_emulator_staleness.sh` (session
+cadence; the cadence reaches it as `VS_CADENCE`, exported by `tests/run_all_static.sh`).
 
 `run_all_emulator.sh` writes `HEAD` (and the dirty-tree state it already snapshots)
 into the run directory as `commit.txt`, and every `results.tsv` row gains nothing —
@@ -220,6 +233,8 @@ instead of carrying it to the release. Shape 2 at 14z-174 would have read: "3 ga
 stale since 14z-171" at the 14z-171 close.
 
 ### Q5 — headroom is checked, not assumed (shape 3)
+
+**LANDED 2026-09-24 (14z-180)**, inside Q4's tool and gate as scoped.
 
 The same staleness gate reads the newest run's `seconds` against each row's cap (the
 7th column or 5,400) for gates AND controls (a control shares its gate's cap), and
@@ -251,9 +266,9 @@ gate claims.
 | **Q0** | `# WHAT:` / `# HOW:` / `# EXPECTS:` in every gate's header; the reader; the coverage page rendering them per family; batches by family for the maintainer's review | `tests/test_gate_descriptions.sh`: the census (declares grows only, undeclared shrinks only), a control dropping one field from a copy must FAIL, a control with the fields outside the block must FAIL; `tests/test_gate_coverage_current.sh` holds the page to the headers | several sittings — 377 scripts read one by one, the reading being the point |
 | **Q1** | `tools/audit_module_refs.py` (built) + `tests/test_module_refs.sh` | the gate itself, controls `planted-prologue` (the `--plant` mode) and `empty-census` (`--plant-empty`), the floor frozen | one sitting's hour |
 | **Q2** | the MEASURES/MEASURED grammar, its reader, the runners reading it, the 7 gates declaring | `tests/test_controls_contract.sh`'s twin for the new reader; a control where a declared measurement is missing and one where it is below floor; the 7 gates' own controls unchanged | a sitting |
-| **Q3** | `# FOLLOWS:` on 199 gates, `tests/lib/follows.sh`, the census gate, the reconciliation control; `audit_lane_carry.py` rewritten on it | the census (three classes frozen), the reconciliation control (a declaration narrower than the script's references must fail), the carry tool's control (an uncovered gate must fail the carry) | two sittings — the 199 declarations are read from each script, not guessed, and the reconciliation control is what proves them |
-| **Q4** | `commit.txt` per run; `tests/test_emulator_staleness.sh`; `run_all_emulator.sh --stale` | the staleness gate over a planted run dir (a moved input must name its gate; an unmoved one must not); `test_emulator_runner.sh` gains the `--stale` selection and the commit record | a sitting |
-| **Q5** | the headroom check inside Q4's gate | a planted `seconds` at 0.5 of cap must fail; the real run must not | inside Q4 |
+| **Q3** (LANDED) | `# FOLLOWS:` on 199 gates, `tools/gate_follows.py`, the census gate `tests/test_gate_follows.sh`, the reconciliation control; `audit_lane_carry.py` rewritten on it, `tests/test_lane_carry.sh` its ground truth | the census (three classes frozen), the reconciliation control (a declaration narrower than the script's references must fail), the carry tool's control (an uncovered gate must fail the carry) | two sittings — the 199 declarations are read from each script, not guessed, and the reconciliation control is what proves them |
+| **Q4** (LANDED) | `commit.txt` per run; `tools/audit_emulator_staleness.py` + `tests/test_emulator_staleness.sh`; `run_all_emulator.sh --stale` | the staleness gate over a planted run dir (a moved input must name its gate; an unmoved one must not); `test_emulator_runner.sh` gains the `--stale` selection and the commit record | a sitting |
+| **Q5** (LANDED) | the headroom check inside Q4's gate | a planted `seconds` at 0.5 of cap must fail; the real run must not | inside Q4 |
 | **Q6** | `tools/audit_poke_readback.py`, the frozen classification table, the per-finding rulings | the census gate re-deriving every intersection; the killshread `stock` column must appear as READS-BACK (the known case is the positive control) | a sitting for the census; the rulings as they come |
 
 **Order RULED (2026-09-24):** Q0 first (the maintainer's addition — the foundation of the

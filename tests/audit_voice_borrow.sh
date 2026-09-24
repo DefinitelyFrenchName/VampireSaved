@@ -12,6 +12,9 @@
 # EXPECTS: static facts hold, exactly the expected writer (none mid-match for own-class),
 #   the window's ids all in the authored voice range, and the foreign-id control fails. The
 #   fired id itself is never frozen — it is a lottery on the QSound-latch phase.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/read_tap.lua
+#   tests/lua/ring_tap.lua tests/replays/don/90_don_plant.rpl tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: foreign-ring-id — a foreign id in the plant-end ring window must be caught by the membership check (mode: a foreign id is injected into the REAL ring and section 2 must fail)
 #
