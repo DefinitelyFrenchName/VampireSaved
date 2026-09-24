@@ -1,6 +1,16 @@
 #!/bin/sh
 # test_list_type_census.sh — the ONE-SOURCE-BANK re-check, per tenant (14z-74).
 #
+# WHAT: the ONE-SOURCE-BANK re-check per tenant: a list type 4 composes its own bank word
+#   and breaks a delta-0 group-C placement (Huitzil's beam), so the type-4 population of
+#   each tenant's fighter anim span is frozen — Huitzil 26 (the POSITIVE CONTROL: the first
+#   version was blind and read 0 for him), Donovan 1, Pyron 0 (what licenses his delta-0
+#   rung).
+# HOW: tools/enum lists over the vs2 data view's anim spans, Huitzil's known population
+#   asserted first on the same instrument.
+# EXPECTS: 26 / 1 / 0 exact. Pyron's effect data rides the shared region and must be
+#   re-checked when its rung lands.
+#
 # WHY IT EXISTS. `build/manifest/gfx_layout3.toml` asserts that a tenant's art
 # is ONE contiguous band in ONE source bank, so a delta-0 placement into WIDE
 # group C is complete. Huitzil's beam broke that: a **list type 4** composes its

@@ -3,6 +3,16 @@
 # the classifier that turns a measured masked divergence into a PROPOSED
 # expectation line in the ratified §4 vocabulary.
 #
+# WHAT: tools/describe_masked_shape.py, which turns a measured masked divergence into a
+#   PROPOSED expectation line, picks the right class (exact / flicker / window / composite /
+#   two-window), refuses the never-re-converges shape as not expressible, and sits exactly
+#   on the two thresholds (flicker <= 2 frames, re-convergence > 60) shared with the
+#   comparators.
+# HOW: 11 synthetic divergence shapes through the tool (static, ~1 s), one per branch plus
+#   both threshold boundaries and the length-mismatch report.
+# EXPECTS: every proposed line as designed; a wrong window bound here would be copied into
+#   an expectation file by hand.
+#
 # WHY IT NEEDS ITS OWN TEST (14z-89). This code used to live as a heredoc
 # inside tests/audit_merged_legacy.sh, where nothing exercised it except the
 # failure path of a ~45-minute audit — i.e. it was only ever run when

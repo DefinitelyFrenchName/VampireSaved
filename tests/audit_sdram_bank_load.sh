@@ -2,6 +2,17 @@
 # audit_sdram_bank_load.sh — MEASURE the per-bank SDRAM load of stock vsavj on
 # the stock jtcps2 core, phase by phase (14z-107 (3)).
 #
+# WHAT: the per-bank SDRAM load of stock vsavj on the stock jtcps2 core, phase by phase
+#   (attract / select / in-match): accesses, ACTIVE commands (the row-miss count on banks
+#   1-3), bus occupancy, the same-row re-open statistic and the harness's clash warnings —
+#   the traffic the bank repack (tenant art beside the QSound PCM in bank 1) would perturb;
+#   `--core cps2w --wide` is the leg that measures the repacked design itself.
+# HOW: a Verilator run of the core over the replay with the SDRAM reporter (~50 min), the
+#   phase table and the PEAK table derived from the reporter's own intervals.
+# EXPECTS: a measurement with a peak table, not a frozen verdict — read the peak table, not
+#   only the phase averages; the stock leg bounds the repack's headroom and does not prove
+#   the design.
+#
 # WHY IT EXISTS. The MiSTer memory-map ruling (maintainer, 2026-08-23) is the
 # BANK REPACK at our v1.7.3 pin: vanilla's 32 MB of GFX stays in SDRAM banks
 # 2+3, and the ~6.4 MB of tenant art goes into bank 1 ALONGSIDE the QSound

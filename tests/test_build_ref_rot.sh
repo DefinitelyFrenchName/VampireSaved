@@ -2,6 +2,15 @@
 # test_build_ref_rot.sh — a hardcoded build/<name> default must not have
 # rotted (14z-94, GitHub #94). ROM-free, ~2 s.
 #
+# WHAT: no hardcoded build/<name> default in a script that READS a rompath has rotted: a
+#   present reference is a WIDE v1.1 set (21 members, vsw.z01/z02), absent is reported never
+#   failed, and — since 14z-97 — both the positional and the named-env default idioms are
+#   seen and a loaded reference is also checked for CURRENCY against the registry.
+# HOW: tools/audit_build_ref_rot.py over every tests/ and tools/ script, judging each
+#   rompath by its preferred image (test_ref_rot_image_pick's rule).
+# EXPECTS: every present reference current-shaped and registered; a red names the script and
+#   default. A default read only for its extract/ is not judged.
+#
 # THE CLASS. Build dirs are UNTRACKED by design (rule 7 keeps romset-derived
 # artifacts out of the tree), so every `${1:-build/pyron22}` default is a
 # pointer with a shelf life. Four instances surfaced in a single session —

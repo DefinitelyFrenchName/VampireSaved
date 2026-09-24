@@ -2,6 +2,14 @@
 # test_mame_mirror_guard.sh — setup_mame.sh must never run `rsync --delete`
 # into a directory it does not own (14z-94, GitHub #80). ROM-free, ~3 s.
 #
+# WHAT: tools/setup_mame.sh never runs `rsync --delete` into a directory it does not own:
+#   root, $HOME, ancestors, the repo and source trees are rejected by canonical path, and a
+#   pre-existing non-empty target without the ownership sentinel is refused with the opt-in
+#   spelled out; a new empty target self-claims.
+# HOW: the guard block EXTRACTED from the shipped script between its markers (never copied)
+#   and run in a harness; section 0 fails if the extraction is empty (~3 s, ROM-free).
+# EXPECTS: every dangerous target refused, the legitimate initialisation still one command.
+#
 # THE DEFECT. setup_mame.sh did:
 #
 #     MIRROR="$MAME_BUILD_ROOT"          # only validation: contains no space

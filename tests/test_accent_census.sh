@@ -3,6 +3,15 @@
 # 6, the 62k-class audit): every path that can resolve a weapon-accent
 # from the march family must be thunked on a variant-id build.
 #
+# WHAT: every path that can resolve a weapon accent from the palette-march family is thunked
+#   on a variant-id build: the vanilla image has exactly four family-base operand sites and
+#   no direct T0/T1 slot references, and a variant build's patch routes all four.
+# HOW: static census of the vanilla opcode image for the family base and the slot addresses;
+#   the variant build's patch checked for the four jsr routes; the negative control strips
+#   one route.
+# EXPECTS: exactly four sites, zero direct slot references, all four routed; the stripped
+#   patch fails. A fifth site is a new consumer to audit.
+#
 # MECHANISM. The accent march reads the 0x39A900 family; the static
 # slots T0/T1 (0x39FBE0/0x39FC00) hold the HOST's punch-color rows and
 # are vanilla on variant builds — any un-thunked family consumer that

@@ -2,6 +2,13 @@
 # test_hex_lengths.sh — ground truth for tools/audit_hex_lengths.py, the
 # balanced-byte-edit check (14z-94, GitHub #20). ROM-free, ~1 s.
 #
+# WHAT: tools/audit_hex_lengths.py, the balanced-byte-edit check over the manifests' `fixes`
+#   keys, catches a length mismatch (an unverified write plus a wrong provenance span — the
+#   issue's 'resize' mechanism was wrong and section 3 pins the real shape).
+# HOW: the checker over the real manifests and over synthetic mismatches (ROM-free, ~1 s).
+# EXPECTS: the tree clean, the mismatch caught; a checker that passes everything is
+#   indistinguishable from a clean tree.
+#
 # WHY IT MATTERS HERE AND NOT ONLY IN THE ABSTRACT: the `fixes` key is what
 # the #92 arcade-ladder fix rides (four `18:0a` entries per tenant). It was an
 # unguarded mechanism at the moment it was used to change shipped bytes. The

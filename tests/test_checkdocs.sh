@@ -3,6 +3,15 @@
 # across documents (14z-118, the documentation audit). ci_portable: no ROM,
 # no build dir, no emulator, ~0.2 s.
 #
+# WHAT: the load-bearing numbers the docs share are LOCKED across documents: for every row
+#   of docs/doc_locks.tsv every listed document quotes the canonical value verbatim
+#   (PRESENCE) and no rival value of the same shape sits beside the fact's key (NO RIVAL),
+#   the atlas row canonical and the syntheses following it.
+# HOW: tools/checkdocs.py over the real tree with twelve extractor self-tests (~0.2 s); four
+#   controls on a perturbed copy (a dropped number, a rival number, a lock naming a missing
+#   file, a reworded key that disarms a lock).
+# EXPECTS: every lock present with no rival; each control fails for its stated reason.
+#
 # MUST-FIRE: perturbed-copy: dropped-number — engine_internals no longer quotes the OBJ bank table address; PRESENCE must fail, or a doc can stop quoting a locked number unnoticed
 # MUST-FIRE: perturbed-copy: rival-number — a different address beside the same label; NO RIVAL must fail, or two docs can disagree while both pass
 # MUST-FIRE: perturbed-copy: missing-lock-file — a lock row naming a file that is not there must fail, or a row can lock nothing

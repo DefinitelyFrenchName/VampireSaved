@@ -4,6 +4,17 @@
 # translation of a real replay, and the refusals must FIRE (P2, button 4,
 # service). ROM-free, seconds, ci_portable.
 #
+# WHAT: the .rpl -> jtframe sim_inputs.hex translator: the direction bit map is the measured
+#   one (file bit4 = RIGHT, bit5 = LEFT, bit6 = DOWN, bit7 = UP — the reverse of the macro
+#   name, measured on the game's own input mirror on both implementations), a real replay's
+#   translation is frozen, and the refusals fire (P2, button 4, service).
+# HOW: the translator over fixtures and 05_timeout_idle (ROM-free, seconds); controls run a
+#   copy with the pre-14z-108 reversed map, append direction lines to the anchor
+#   translation, and append a P2 line to the no-P2 translation.
+# EXPECTS: the bit-map vector, the frozen sha1 (which carries no direction token and so did
+#   not move at the fix), the refusals; each control fails its check. 14z-107 (12) inferred
+#   a two-bit swap from half the data and was wrong — the full measurement is the header.
+#
 # MUST-FIRE: shadow-tool: reversed-map — a copy of the translator with the pre-14z-108 REVERSED direction map must be rejected by check 5 (mode: every check runs that copy)
 # MUST-FIRE: known-bad: direction-counter — check 6's counter must COUNT a direction bit (mode: direction lines appended to the anchor translation, check 6 must fail)
 # MUST-FIRE: known-bad: p2-counter — check 7c's counter must count a P2 bit (mode: a P2 line appended to the no-p2 translation, 7c must fail)

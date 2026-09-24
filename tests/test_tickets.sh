@@ -4,6 +4,19 @@
 # questions with links that resolve (14z-154; maintainer-ruled 2026-09-14,
 # CLAUDE.md [VSP-182]). ci_portable: no ROM, no network, no emulator, ~1 s.
 #
+# WHAT: the ticket index: every saved GitHub issue has exactly one row in
+#   docs/project/tickets.tsv and no row lacks an issue, each status agrees with GitHub's
+#   saved open/closed state, every one of the four answers is a resolving link or an
+#   explicit none, no `learned`/`wrong` answer points at STATE or an archive, every session
+#   key resolves, `?` appears only in the shrink-only backfill debt, and the generated
+#   tickets.md is current.
+# HOW: tools/tickets.py check and page --check over the TSV, the saved GitHub list and the
+#   debt file (~1 s, offline); six controls (a missing row, a disagreeing state, an
+#   unresolved link, a learned answer in an archive, debt growth, a stale page).
+# EXPECTS: every property holds and every control fails. It does not judge whether an answer
+#   is ENOUGH (the close does), nor that the saved GitHub list is fresh (refreshed at every
+#   close).
+#
 # MUST-FIRE: perturbed-copy: row-missing — a ticket row deleted from a copy of the index must fail (a saved issue with no row)
 # MUST-FIRE: perturbed-copy: state-disagrees — a row whose status says the opposite of the saved GitHub state must fail
 # MUST-FIRE: perturbed-copy: link-unresolved — an answer linking text no line of its file contains must fail

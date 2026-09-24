@@ -3,6 +3,16 @@
 # judges a rompath by: the named preference (vsavjw, then vsavj, then name
 # order), never directory order (14z-139). ROM-free, ~2 s.
 #
+# WHAT: test_build_ref_rot.sh judges a rompath by the NAMED image preference (vsavjw, then
+#   vsavj, then first by name), never by directory listing order — a verdict that depends on
+#   which file the filesystem lists first is a verdict about the filesystem.
+# HOW: the REAL gate symlinked into a synthetic repo with two rompaths each carrying an
+#   adversary zip shaped like the rot signature; the control edits a copy's preference to
+#   the adversary, which must judge both ROTTED; the fallback with no preferred name
+#   present.
+# EXPECTS: the right image judged in both rompaths, the adversary copy reports ROTTED, the
+#   fallback first-by-name.
+#
 # MUST-FIRE: shadow-tool: adversary-preference — a copy of test_build_ref_rot.sh whose IMAGE_PREFER names the adversary must judge both rompaths ROTTED (mode: section 1 runs that copy instead of the real gate)
 #
 # WHY. Until 14z-139 that gate took the `vsavjw` zip, else whatever

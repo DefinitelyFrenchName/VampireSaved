@@ -2,6 +2,15 @@
 # test_fbneo_overlay_hygiene.sh — a non-overlay FBNeo run must not inherit a
 # previous run's overlay (14z-94, GitHub #38). ~2 s, no emulator, no ROMs.
 #
+# WHAT: a non-overlay FBNeo run never inherits a previous run's overlay: the runner's roms/
+#   wiring replaces a stale overlay directory instead of nesting a symlink inside it, and
+#   the rm beside the $ROMDIR symlink never empties the reference sets.
+# HOW: drives tools/run_replay_fbneo.sh with a stub emulator and a populated fake ROMDIR (no
+#   ROMs, no FBNeo): overlay then non-overlay in one sandbox, twice; RUNNER= points it at
+#   another copy of the script for the control gate.
+# EXPECTS: the non-overlay run serves the fake ROMDIR, the reference contents survive;
+#   test_fbneo_overlay_hygiene_control.sh proves the gate fails against the pre-fix runner.
+#
 # THE DEFECT. run_replay_fbneo.sh builds "$WORK/roms" two ways: with
 # FBNEO_ROMPATH it makes a real DIRECTORY of symlinks (reference zips first,
 # overlay zips winning); without it, it symlinks $ROMDIR directly. The second

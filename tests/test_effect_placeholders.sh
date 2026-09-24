@@ -1,6 +1,16 @@
 #!/bin/sh
 # test_effect_placeholders.sh — THE x2b7ef4 COORDINATE-LIST PLACEHOLDERS ARE RESOLVED AT THE OFFSETS THEY WERE WRITTEN, never by an in-place scan (14z-170): a resolved pointer whose low word begins 0xEE is left alone, source data beginning 0xEE is left alone, and a placeholder overwritten before resolution is reported.
 #
+# WHAT: the x2b7ef4 coordinate-list placeholders are resolved at the offsets they were
+#   WRITTEN, never by an in-place scan: a resolved pointer whose low word begins 0xEE is
+#   left alone, source data beginning 0xEE is left alone, and a placeholder overwritten
+#   before resolution is reported.
+# HOW: the generator's module-level resolver on synthetic blobs (the straddle case, source
+#   data with a 0xEE top byte, a lost placeholder); the control runs the pre-14z-170
+#   in-place scan on the straddle fixture, which must corrupt it.
+# EXPECTS: exact resolution and no collateral write; the shadow scan corrupts the fixture
+#   and fails. The pass's record DISCOVERY is not covered here.
+#
 # MUST-FIRE: shadow-tool: in-place-scan — the resolver the generator carried until 14z-170 (an in-place scan for any even-aligned long whose top byte is 0xEE), run on the same straddle fixture, must CORRUPT it — the resolved pointer's low word and the record's first tile — so the fixture exercises the defect the fix removes (in-gate: the shadow scan's output must differ from the expected bytes; mode: the gate resolves with the shadow scan and FAILs)
 #
 # WHY. tools/gen_donovan_patch.py's x2b7ef4 companion-effect pass writes a `0xEE000000 + off`

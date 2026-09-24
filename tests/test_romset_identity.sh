@@ -1,6 +1,14 @@
 #!/bin/sh
 # test_romset_identity.sh — ground truth for tools/audit_romset_identity.py.
 #
+# WHAT: tools/audit_romset_identity.py catches the 14z-60z shape — a member carrying the
+#   PRISTINE bytes of a member the build patched shadows it at load time (both emulators
+#   resolve by hash before name) — and raises no false positive on placeholder members or an
+#   unpatched set.
+# HOW: four synthetic sets built from $ROMDIR: patched / patched plus a pristine copy under
+#   another name / patched plus byte-identical placeholders / unpatched.
+# EXPECTS: PASS, FAIL naming the member, PASS, PASS.
+#
 # The audit encodes the 14z-60z failure: both emulators resolve a ROM entry
 # by HASH before falling back to its NAME, so any member carrying the
 # PRISTINE bytes of a member the build patched can shadow it — the patch

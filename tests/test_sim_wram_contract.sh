@@ -5,6 +5,19 @@
 # an hour of simulation (the live end-to-end run is
 # tests/test_mister_sim_anchor.sh, emulator tier).
 #
+# WHAT: the ROM-free contract between the fork's Verilator work-RAM hook and
+#   tools/compare_fields.py: the dump naming, the big-endian byte order (a byte-swapped side
+#   must FAIL), anchor mode absorbing cross-implementation frame skew, a perturbed
+#   non-predicate field REPORTED, the runner refusing to write dumps or simulate inside the
+#   repo (rule 7), the harness patch inert under its #ifdef, the CPS-2 constants agreeing
+#   with the pinned RTL, a lost or short dump LOUD (check_wram_dumps.py, itself controlled),
+#   frame output off by default, and the fork-flush mechanism ground-truthed.
+# HOW: synthetic dump sets, the patch text, the runner's source and the RTL constants (no
+#   ROM, no emulator); controls: a byte-swapped side, a perturbed field, a line hoisted
+#   above the #ifdef.
+# EXPECTS: all ten locks; each control fails. The live end-to-end run is
+#   test_mister_sim_anchor.
+#
 # MUST-FIRE: known-bad: byte-swapped-side — a dump set written in the wrong byte order must be rejected by the anchor predicate (mode: check 3 compares against it and must fail)
 # MUST-FIRE: known-bad: perturbed-field — one non-predicate field wrong at the anchor must be REPORTED as a mismatch (mode: check 3 compares against it and must fail)
 # MUST-FIRE: known-bad: unguarded-line — the harness patch with one added code line hoisted above the #ifdef must fail the guard checker (mode: check 6 reads that patch)

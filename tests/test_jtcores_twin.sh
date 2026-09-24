@@ -2,6 +2,18 @@
 # test_jtcores_twin.sh — the MiSTer core scaffold is a TWIN of the reference
 # core, and the three copies of its delta agree (14z-106).
 #
+# WHAT: the MiSTer core scaffold cores/cps2w is a TWIN of the reference core modulo EXACTLY
+#   its declared delta (the macros, the mame2mra rows, the frozen RTL override set in
+#   tests/expect/cps2w_game_yaml_delta.txt), nothing undeclared landed anywhere in the fork,
+#   the reference cores are byte-untouched against upstream v1.7.3, emu/jtcores sits at its
+#   pin, and emu/jtcores-patches reproduces the fork's commits as a patch series byte for
+#   byte.
+# HOW: git diffs of the fork against upstream and of cps2w against cps2, the patch series
+#   regenerated with format-patch and compared (ROM-free, seconds); controls add an
+#   undeclared hdl file and an undeclared game.yaml pull.
+# EXPECTS: every check exact; an undeclared file, pull or fork commit fails. The strongest
+#   text form of 'profile-gated by construction': the originals cannot have moved.
+#
 # MUST-FIRE: perturbed-copy: undeclared-hdl-file — an extra file in the cores/cps2w/hdl listing must fail check 2a (the override set is enumerated)
 # MUST-FIRE: perturbed-copy: undeclared-yaml-pull — a game.yaml copy pulling one undeclared module must fail check 2a2 (the frozen delta)
 #

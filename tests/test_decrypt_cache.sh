@@ -2,6 +2,13 @@
 # test_decrypt_cache.sh — ground truth for tests/lib/decrypt_cache.sh
 # (14z-94, GitHub #69). ~1 s warm; no ROMDIR needed when the cache is present.
 #
+# WHAT: tests/lib/decrypt_cache.sh delivers full, correct decrypted images to the 22 gates
+#   that read through it, and a TRUNCATED cache is refused, not silently served (the pattern
+#   it replaced fell back on `[ -f ]`, which a half-written file satisfies).
+# HOW: the helper against a warm cache, a missing cache and a truncated one (~1 s warm).
+# EXPECTS: correct bytes and length, the truncated image refused; a wrong image here would
+#   make eighteen gates assert against garbage and pass.
+#
 # WHY A GATE. The helper replaced 22 direct decrypts with a cache read, so
 # every converted gate now reads bytes this file handed it. If it delivers the
 # WRONG bytes — or a short image — eighteen gates assert against garbage and

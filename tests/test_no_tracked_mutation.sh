@@ -2,6 +2,14 @@
 # test_no_tracked_mutation.sh — test instrumentation must not write tracked
 # source (14z-94, GitHub #81). ROM-free, ~2 s.
 #
+# WHAT: no test writes into tools/: verdict controls that perturb the generator do so on a
+#   shadow copy in a throwaway repo root (tests/lib/shadow_tools.sh), never the tracked file
+#   with an exit-trap restore.
+# HOW: the shadow-copy helper exercised, and a scan of every test for writes into tools/
+#   (ROM-free, ~2 s).
+# EXPECTS: the helper works and no test writes tracked source; section 3 fails any NEW test
+#   that does.
+#
 # THE DEFECT. Several verdict controls prove a substitution site is live by
 # PERTURBING tools/gen_donovan_patch.py and re-running it. They edited the
 # tracked file in place and restored from a snapshot on an exit trap.

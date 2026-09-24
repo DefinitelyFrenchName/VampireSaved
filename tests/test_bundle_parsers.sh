@@ -5,6 +5,16 @@
 # tools said NOTHING about (refused) from one they described as all-system (a
 # static build, accepted and said). ROM-free, no emulator, ~2 s.
 #
+# WHAT: the Linux and Windows library bundlers read real ldd / readelf / objdump output,
+#   walk a closure, and REFUSE an empty closure (the tools said nothing) rather than report
+#   a self-contained binary — the OS-independent half, provable on this Mac.
+# HOW: recorded tool output and stub tools on PATH drive both bundlers; three shadow-tool
+#   controls (the refusal removed, the MSYS path translation disabled, the artifact check
+#   neutered) must each fail their section.
+# EXPECTS: parsers, closure walk, refusal and artifact check as specified; the controls
+#   fail. It does NOT claim the binaries work on a real host — that is test_release_binaries
+#   there.
+#
 # MUST-FIRE: shadow-tool: empty-closure — a stub toolchain that reports NO libraries must make each bundler REFUSE, never report a self-contained binary (mode: a COPY of both bundlers with the refusal removed must make section 2 fail)
 # MUST-FIRE: shadow-tool: msys-path-untranslated — a COPY of the Windows bundler with the MSYS-path translation disabled must FAIL section 4: `ldd` answers in MSYS's namespace (`/mingw64/bin/x.dll`) and the native Windows python cannot open that, so every resolved DLL would read as missing
 # MUST-FIRE: shadow-tool: unbundled-leftover — a stub readelf reporting a NEEDED library that is neither bundled nor a host library must make the Linux bundler's ARTIFACT check fail (mode: a COPY with the artifact check neutered must make the control section fail)

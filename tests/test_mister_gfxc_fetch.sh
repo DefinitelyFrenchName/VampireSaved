@@ -8,6 +8,17 @@
 # on two scratch clones by default (MISTER_LEGS=serial for one), ~1.6 h.
 # NOT ci_portable, NOT ci_static.
 #
+# WHAT: the core FETCHES a tenant tile: with the profile bit ON, SDRAM reads land in the
+#   group-C obj bank 4 and bank 5 windows and the tile codes they name fall inside the
+#   roster's frozen live extents; with the SAME .rom and only header byte 41 flipped to 0xFF
+#   (profile OFF) those two windows read EXACTLY ZERO while the vanilla banks stay busy in
+#   both legs.
+# HOW: two Verilator legs (~93 min each, in parallel on two scratch clones) with the
+#   harness's SDRAM read probe armed on four windows (p2/p3 the vanilla banks as liveness),
+#   on the measured-green replay operands (the default replay cannot reach a match).
+# EXPECTS: p0/p1 non-zero and in-extent on the positive leg, zero on the control, p2/p3 busy
+#   on both; the control is the profile bit, not another build.
+#
 # WHAT IT PROVES, AND WHY IT IS NOT A PICTURE. Slices D0-D2 built the MRA, the
 # runtime profile gate and the SDRAM placement, and every one of them was
 # proven with a STATIC artefact: the .rom's bytes, an exhaustive bench, an

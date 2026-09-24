@@ -2,6 +2,14 @@
 # test_commit_subject.sh — no unpushed commit message may carry a GitHub CLOSING
 # keyword before an issue reference (14z-162, GitHub #151). ROM-free, ~1 s.
 #
+# WHAT: no unpushed commit message carries a GitHub CLOSING keyword directly before an issue
+#   reference — the shape that closed #151 twice and #136 once as a side effect of a push
+#   and was then recorded as the maintainer's act.
+# HOW: tools/check_commit_subject.py over every message in origin/main..HEAD (~1 s); the
+#   control feeds a message carrying the shape.
+# EXPECTS: no adjacency; the planted shape reported and non-zero. Closing a ticket is a
+#   decision, never a commit side effect.
+#
 # MUST-FIRE: perturbed-copy: closing-subject — a message file carrying the flagged
 # shape (a closing keyword directly before `#N`) must be REPORTED by the tool and
 # fail the gate; the mode feeds the tool such a file and section 1 must FAIL

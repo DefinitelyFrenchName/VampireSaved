@@ -4,6 +4,13 @@
 # windows). Written before ratification precisely so the class can be judged
 # on a checker whose verdicts are already evidenced.
 #
+# WHAT: tools/compare_composite.py, the §4 v4 composite class (a frozen flicker inventory
+#   plus frozen bounded windows), accepts exactly the frozen shape and rejects every laxer
+#   one: an extra or missing flicker frame, a late onset, a window that never re-converges,
+#   bit-identical logs (the class asserts existence), a second unfrozen window.
+# HOW: seven synthetic log pairs through the checker (no emulator, ~1 s).
+# EXPECTS: case 1 PASS, cases 2-7 FAIL.
+#
 # CLAUDE.md §4: "Verdict logic is itself tested." A checker that has only
 # ever been shown to PASS is not evidence. Seven synthetic cases, no
 # emulator, ~1s:

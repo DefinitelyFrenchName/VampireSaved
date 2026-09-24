@@ -3,6 +3,15 @@
 # flipped by the S3 strip relocation: the full D->H->P chain now SUCCEEDS,
 # and the must-fail control runs on an old-shift fixture). ~9 min.
 #
+# WHAT: the group-C gfx CHAIN mode: a chain-free Donovan run reproduces the frozen
+#   build/m5_wide gfx members byte for byte, re-chaining a link over its own output is a
+#   no-op, D->H carries a cumulative ledger with the relocated strip, H->P completes the
+#   full 3-tenant chain with zero real collisions, and an old-shift strip fixture makes the
+#   chain die loudly at the historical collision naming both sources.
+# HOW: build_gfx run per link with --chain over the frozen build dirs' side files (~9 min),
+#   members and ledgers compared.
+# EXPECTS: sections 1-4 green and section 5 (the must-fail control) failing as it must.
+#
 # The merge's gfx half runs build_gfx once per tenant, each link chaining
 # over the prior link's members + write ledger (--chain). Five sections,
 # using the FROZEN build dirs' side files as inputs (provenance:

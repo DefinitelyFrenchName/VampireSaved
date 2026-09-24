@@ -2,6 +2,15 @@
 # test_effect_palette_table.sh — the per-character palette POINTER tables are
 # 32-row and id-indexed (14z-76). Static, no emulator, seconds.
 #
+# WHAT: the per-character palette POINTER tables (0x38C198 sprite, 0x38C218 effect) are each
+#   ONE 32-row table indexed by the full character id, their second halves never used as a
+#   base, aliasing the base half except rows 0x12/0x18, the five readers taking the id
+#   unmasked — what licenses repointing a tenant's row (the 'only sixteen rows' reading had
+#   deferred Pyron's effect palette).
+# HOW: tools/audit_effect_palette_table.py over vanilla vsavj and the build under test
+#   (static, seconds); four negative controls, one per assertion.
+# EXPECTS: the model holds on both images and every control fails.
+#
 # WHAT THIS PROTECTS. Pyron's effect palette was deferred for two sessions on
 # the premise that PRG:0x38C218 "has only sixteen rows", so a tenant at a
 # variant id would index PAST it and clobber a row vanilla uses. It does not:

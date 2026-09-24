@@ -1,6 +1,16 @@
 #!/bin/sh
 # test_index_space.sh — THE OUT-OF-RANGE INDEX SWEEP (14z-76). Static, seconds.
 #
+# WHAT: the out-of-range index sweep: every `jmp (d8,PC,Dn.w)` dispatch table's entry count
+#   derived in BOTH ROMs from two structural bounds, reporting where vs2's table is longer
+#   than vsavj's (the class behind Pyron's Cosmo crash) — 110 tables, 81 twinned, 29 NOT
+#   JUDGED, 3 risky, frozen with the unjudged count part of the verdict.
+# HOW: tools/audit_index_space.py over the two opcode views; the positive control re-derives
+#   the Cosmo table at 80 entries against vs2's 84; negative controls on the length
+#   derivation.
+# EXPECTS: the frozen counts exact and the Cosmo table at 80/84; a quietly shrinking judged
+#   set reads as a red, not as 'no risk'.
+#
 # The class, named in 14z-75 after Pyron's Cosmo Disruption crash: vsavj's
 # dispatch tables are SHORTER than vs2's, so a ported character carrying vs2's
 # indices verbatim can dispatch past the end of vsavj's table. Pyron's

@@ -3,6 +3,14 @@
 # ONCE and every consumer resolves to that one declaration (14z-93,
 # GitHub #44). No ROMs, no emulator, ~1s.
 #
+# WHAT: the ratified CLAUDE.md §4 thresholds (FLICKER_MAX, RECONVERGE) are declared ONCE in
+#   tools/s4_thresholds.py and every comparator imports them, re-declaring no local literal
+#   and hardcoding no argparse default.
+# HOW: reads the four consumers' sources (~1 s); a verdict control both ways (a
+#   re-introduced literal caught, a comment not flagged).
+# EXPECTS: the values, the imports, no literals; a red is a comparator that could disagree
+#   with the classifier about what a flicker is.
+#
 # WHAT #44 REPORTED. FLICKER_MAX and RECONVERGE were declared FOUR times —
 # describe_masked_shape.py, compare_composite.py, compare_flicker.py,
 # compare_window.py — with a comment saying they "must stay in step" and

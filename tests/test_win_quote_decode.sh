@@ -2,6 +2,14 @@
 # test_win_quote_decode.sh — the win-quote text system's STRUCTURE, frozen
 # (14z-116). ci_static: needs ROMDIR only, no emulator, no build dir.
 #
+# WHAT: the win-quote text system's STRUCTURE: the root is a 4-entry region array with the
+#   measured bank sizes, the first-level offsets alias 0x10->0x00 (the defect pattern),
+#   every winner's every reachable line walks clean on all four banks within the renderer's
+#   66-word buffer, and vs2 carries the three tenant blocks unaliased at 0x10/0x11/0x13.
+# HOW: static over the decrypted data views (ROMDIR only); controls perturb a first-level
+#   offset far out of the bank and make one record's length absurd.
+# EXPECTS: the four sections as measured; both perturbations refused.
+#
 # MUST-FIRE: known-bad: perturbed-offset — a copy of the data view with one first-level offset pointing far out of the bank must make the walk malformed (mode: section 3 dumps from that image and must fail)
 # MUST-FIRE: known-bad: overlong-record — a copy with one record's length made absurd must be refused against the renderer's buffer (mode: section 3 dumps from that image and must fail)
 #

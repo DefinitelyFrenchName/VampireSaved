@@ -3,6 +3,15 @@
 # (14z-110, GitHub #99). Locks tools/audit_fsm_census.py against its frozen
 # inventory (build/manifest/fsm_census.toml) AND proves the checker can fail.
 #
+# WHAT: the static object-script node-state census: every ported node whose state byte
+#   (+0x17) is at or past vsavj's 80-entry FSM table is enumerated and classified against
+#   vs2, and the inventory equals the frozen build/manifest/fsm_census.toml (EMPTY since the
+#   14z-110b remap) — the build-time guard #99 asked for.
+# HOW: tools/audit_fsm_census.py --check over the build's verify_data.bin with vs2 as the
+#   classification oracle; controls perturb a node's +0x17 to a fresh out-of-range value
+#   (ADDED) and clear one to in-range (MISSING) in copies.
+# EXPECTS: the pristine build passes with the frozen inventory; both perturbations fail.
+#
 # WHAT IT LOCKS. Every ported node whose object-script state byte (+0x17) is
 # >= vsavj's 80-entry FSM table size is enumerated and its dispatcher-level vs2
 # equivalence classified. The frozen inventory is the point: a tenant edit that

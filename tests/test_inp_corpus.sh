@@ -2,6 +2,15 @@
 # test_inp_corpus.sh — EVERY tracked hand-played recording plays through with
 # NO CPU exception on the current merged build. 14z-111, maintainer-ruled.
 #
+# WHAT: every tracked hand-played recording under tests/inp/ plays through on the current
+#   merged build with NO CPU exception — a captured-but-unfixed defect is declared by a
+#   DEFECT file naming its expected vector and PC, and then that exact crash is asserted so
+#   the capture cannot rot.
+# HOW: every recording replayed headless under tests/lua/inp_guard.lua on MAME (~1 min
+#   each).
+# EXPECTS: no exception on any recording without a DEFECT file, the declared crash exact on
+#   any with one, OPEN ones listed loudly.
+#
 # WHY THIS EXISTS (the learning, paid for in 14z-109..111). WIDE_RECORD
 # (tools/run_wide.sh) had existed since 14z-9x and HANDOFF called a recorded
 # field report "a replay protocol" — but no gate consumed the recordings and

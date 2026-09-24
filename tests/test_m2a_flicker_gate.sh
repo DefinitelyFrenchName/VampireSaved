@@ -3,6 +3,16 @@
 # gate (`m2a_legacy_gate_masked`). ROM-free: the emulator is stubbed and the
 # logs are crafted from the real frozen basis.
 #
+# WHAT: the M2 battery's masked legacy gate (m2a_legacy_gate_masked) asserts the CURRENT
+#   frozen generation: a flicker inventory that grows OR shrinks fails, the frozen shape
+#   passes, a required replay with no spec fails (never a quiet skip), an unresolvable
+#   target fails naming rule 6.
+# HOW: the gate's logic with the emulator stubbed and logs crafted from the real frozen
+#   basis (no ROMs, ~3 s).
+# EXPECTS: the five cases as listed. The predicate was INVERTED at 14z-97 (#96): a shrink
+#   used to be advisory when the battery gated unfrozen dev builds; against a frozen target
+#   it is a build that is not the frozen one.
+#
 # REWRITTEN 14z-97 (GitHub #96) — AND THE PREDICATE IT USED TO LOCK IS NOW
 # THE OPPOSITE. Read this before "fixing" case 2 back.
 #

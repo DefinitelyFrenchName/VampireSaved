@@ -1,6 +1,15 @@
 #!/bin/sh
 # test_release_launcher.sh — THE PLAYER'S LAUNCHER, DRIVEN (2026-09-20).
 #
+# WHAT: the player's PLAY.command reaches the right emulator invocation (creating FBNeo's
+#   roms/ for it) and REFUSES every wrong situation with a message that names the cause — no
+#   romset, no binary for this machine, a symlinked roms/, an emulator without the profile.
+# HOW: both platforms' launchers driven in a staged copy of the release under PLAY_DRY_RUN=1
+#   (stops before the emulator); the control stages an emulator binary without the profile
+#   as the success path.
+# EXPECTS: the success path's invocation, every refusal non-zero and named; the
+#   unpatched-emulator control refused. The real launch is test_release_binaries' half.
+#
 # `PLAY.command` is the one shipped file whose whole job is to be run by somebody
 # who knows none of this project's facts, so it is the one file whose FAILURE
 # messages matter as much as its success path. This gate drives both platforms'

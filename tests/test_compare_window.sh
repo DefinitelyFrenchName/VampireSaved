@@ -2,6 +2,13 @@
 # test_compare_window.sh — ground truth for the "bounded re-convergent
 # window" comparison class (CLAUDE.md §4 v3).
 #
+# WHAT: the §4 v3 'bounded re-convergent window' checker accepts exactly the select-screen
+#   shape (one contiguous run, fixed onset, full re-convergence, match state untouched) and
+#   rejects scattered flicker, a drifting onset, a run that never re-converges, and a
+#   silently identical pair.
+# HOW: synthetic log pairs through tools/compare_window.py (no emulator, no ROMDIR).
+# EXPECTS: the accepted shape passes, every laxer shape fails.
+#
 # A comparison class is worth exactly as much as its checker, and this
 # project has shipped a wrong conclusion from a verdict bug before (the SMS
 # "blockable frame trap"). So the checker is exercised against synthetic

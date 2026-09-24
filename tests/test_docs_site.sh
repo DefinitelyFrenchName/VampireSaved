@@ -3,6 +3,17 @@
 # deterministic (14z-140, living-docs slice L4).
 # ci_portable: no ROM, no build dir, no emulator, ~25 s.
 #
+# WHAT: the documentation site renders, resolves and is deterministic: every declared
+#   document and the two skill GUIDEs parse inside the markdown subset, every in-tree href
+#   points at a file the render wrote, nothing loads from the network, the rendered tree
+#   holds exactly the page set, two renders are byte-identical, and every page closes what
+#   it opens.
+# HOW: tools/mk_docs_site.py --check and a second render into temp dirs, an href walk
+#   independent of the generator (scripts stripped first), a tag-balance reader per page
+#   (~25 s); five controls: an h4 heading, an unresolved README link, a dangling anchor, an
+#   unclosed code span swallowing a heading, an unclosed <header>.
+# EXPECTS: every assertion and every control; the site is a projection, never a source.
+#
 # MUST-FIRE: perturbed-copy: unsupported-construct — a REFERENCE doc gaining an h4 heading must fail --check (mode: on a copy of the real corpus)
 # MUST-FIRE: perturbed-copy: unresolved-link — a README link to a page that is not there must fail --check
 # MUST-FIRE: perturbed-copy: dangling-anchor — a link to a heading no page has must fail --check

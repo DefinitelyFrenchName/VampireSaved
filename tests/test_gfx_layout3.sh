@@ -3,6 +3,16 @@
 # (D4 opener step 1, session 14z-67). Static: reads the reference zips
 # only, no MAME, no build output. ~90s (one vs2 decrypt).
 #
+# WHAT: the 3-tenant group-C tile layout facts: all three tenants read vs2 BANK 3 (the
+#   one-source-bank premise), the frozen per-tenant tile inventories and bands (H 15,034 / P
+#   14,225 / D 15,612), H∪P's delta-0 placement disjoint from Donovan's frozen band by
+#   interval, the D4 flip condition (three tenants fit bank 4 with headroom), and
+#   gfx_layout3.toml agreeing with the measurement.
+# HOW: tools/obj_records.py over the ratified extraction anim spans of the reference zips
+#   (static, ~90 s, one vs2 decrypt).
+# EXPECTS: every number as frozen; drift means the walker, the extraction shapes or the
+#   understanding moved — stop and root-cause, do not re-freeze.
+#
 # Locks (measured 2026-08-07, instrument tools/obj_records.py over the
 # ratified extraction anim spans — spans verified verbatim slices of the
 # vs2 data image):

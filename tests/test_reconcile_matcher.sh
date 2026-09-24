@@ -2,6 +2,17 @@
 # test_reconcile_matcher.sh — ONE matcher, two callers, and the parameters
 # that separate them (14z-95, GitHub #43(a), maintainer-ruled 2026-08-18).
 #
+# WHAT: ONE matcher serves both find_equiv.py and reconcile_batch.py: the refactor that
+#   deleted the batch tool's drifted copy is inert against the pre-refactor copy
+#   reconstructed from git (1640/1640 probes at the historical parameters), and the
+#   parameters that separate the two callers are load-bearing (183/1640 change when freed).
+# HOW: two decrypts and 3280 masked searches with the pre-refactor matcher rebuilt from git
+#   history (~4 min); the control perturbs the comparison's binding, which must read a moved
+#   result as a failure.
+# EXPECTS: section 2 identical at the historical pin, section 3's delta the measured
+#   constant; a green re-emit of the manifest proves nothing (existing rows win), which is
+#   why the comparison is at the matcher. Not portable.
+#
 # MUST-FIRE: perturbed-copy: moved-result — the matcher comparison with its binding perturbed must detect a moved result (mode: section 2's comparison runs under that binding and reads the moved result as the failure it would be)
 #
 # tools/reconcile_batch.py carried a COPY of tools/find_equiv.py's core, and

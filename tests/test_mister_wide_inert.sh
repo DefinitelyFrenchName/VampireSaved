@@ -2,6 +2,16 @@
 # test_mister_wide_inert.sh — THE FPGA SUPERSET INVARIANT, MEASURED DIRECTLY.
 # 14z-107 (6), slice D1.
 #
+# WHAT: the FPGA superset invariant measured directly: the reference core cps2 and the WIDE
+#   core cps2w, running the SAME stock vsavj download under Verilator, produce BIT-IDENTICAL
+#   68k work RAM at every frame of a window (one differing byte is the whole report).
+# HOW: two Verilator runs with the work-RAM hook over the window (~11 min per core at the
+#   default early-boot window), every dump compared; the control re-compares the cps2 dumps
+#   against themselves shifted by one frame, which must FAIL, and the window must be
+#   non-constant.
+# EXPECTS: byte-identical across the window, the shifted control failing, the window live.
+#   Completeness of the dump sets is asserted by the producer (check_wram_dumps.py).
+#
 # WHAT IT ASSERTS. The reference core `cps2` and the CPS-2 WIDE core `cps2w`,
 # running the SAME stock `vsavj` download under Verilator, must produce
 # BIT-IDENTICAL 68k work RAM at every frame of a window. Not "agree on mapped

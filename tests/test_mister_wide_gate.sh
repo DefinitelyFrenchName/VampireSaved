@@ -3,6 +3,22 @@
 # 14z-107 (6), slice D1; EXTENDED 14z-107 (9) for slice D2. ROM-free; seconds
 # without Verilator, ~30 s with it.
 #
+# WHAT: the CPS-2 WIDE runtime profile on MiSTer is BOUNDED, DECLARATIVE, PROFILE-GATED and
+#   REACHABLE (Rule 1 v2 on FPGA): the diff of every overridden RTL file is frozen, the
+#   profile byte agrees in the fork's TOML, the RTL decoder and this gate (41 / 0xFE /
+#   active-low), the three gated modules are simulated exhaustively (the QSound bank latch
+#   over all 65,536 dsp_ab values, the profile decoder over a real header stream, the obj
+#   promote over all 65,536 y-words in both profile states — bank bit 2 stuck at zero with
+#   wide_en low, never setting the terminator bit 15), and jtframe resolves cps2w to our
+#   files.
+# HOW: frozen delta compares plus Verilator benches of the three modules (~30 s with
+#   Verilator, seconds without); seven controls perturb an override, bypass each gate, point
+#   the decoder at byte 40, flip the polarity, read bit 15, and ungate the decryption-range
+#   fix.
+# EXPECTS: every check and bench green, every control failing its bench or the frozen delta.
+#   The polarity control is the superset-invariant break: a 0xFF-filled stock header must
+#   never arm the profile.
+#
 # MUST-FIRE: perturbed-copy: override-perturbed — an override file changed by one width must break the frozen RTL delta (check 1)
 # MUST-FIRE: perturbed-copy: bank-gate-bypassed — the QSound bank latch with `wide_en ?` replaced by the wide arm must fail the wide_en-low leg of its bench (needs Verilator)
 # MUST-FIRE: perturbed-copy: profile-byte-40 — the profile decoder pointed at header byte 40 (jtframe's JOY_BYTE) must fail its bench (needs Verilator)

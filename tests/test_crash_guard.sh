@@ -3,6 +3,15 @@
 # doctrine, CLAUDE.md §4: a detector is trusted only after it classifies
 # known-good and known-bad scenarios correctly).
 #
+# WHAT: the crash guard classifies known-good and known-bad correctly: a clean vanilla run
+#   is CLEAN (and, in cheap mode, checksum-identical to the frozen expectation), a planted
+#   ILLEGAL opcode trips vec4, a planted odd jump address trips vec3.
+# HOW: four MAME runs: the negative control in cheap and -debug modes (the latter compared
+#   run-to-run, never to vanilla — -debug shifts the scheduler), then the 14 dispatch
+#   tables' slot-0x0F entries pointed at a planted ILLEGAL and at an odd address.
+# EXPECTS: CLEAN on the negatives, CRASH vec4 and vec3 on the positives; a guard that misses
+#   either plant is not trusted.
+#
 #   1a. Negative control, cheap mode (no -debug): clean AND checksum log
 #       matches the frozen vanilla expectation (guard instrumentation itself
 #       does not perturb emulation).

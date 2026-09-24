@@ -5,6 +5,17 @@
 # PARALLEL on two scratch clones by default (MISTER_LEGS=serial for one), ~1 h.
 # NOT ci_portable, NOT ci_static.
 #
+# WHAT: slice D4's own evidence: what the 68k does with CPU:$400000-$5FFFFF on the core —
+#   the program window is READ and the bytes latched are the .rom's (right bytes: D4 works),
+#   with the SAME .rom and only the profile bit clear as the control leg, and the reads
+#   below $400000 as the loud in-run control the verdict tool demands.
+# HOW: two Verilator legs (~55 min each, in parallel) with the sim-only JTCPS2W_PRGPROBE
+#   (address and data halves), tools/prgprobe_verdict.py over the probe's last per-frame
+#   report; the frozen pair in tests/expect/mister_prg_window.txt; the control perturbs the
+#   frozen pair.
+# EXPECTS: the measured pair equal to the frozen one on both legs, the below-window control
+#   loud and verified; a moved count is a finding — the simulation is deterministic.
+#
 # MUST-FIRE: perturbed-copy: frozen-pair-moved — a perturbed copy of the frozen prg-window pair must fail the compare against the measured pair (mode: the measured pair is compared against that perturbed copy; REFUSES with exit 3 if the sim prerequisites or the frozen file are absent)
 #
 # THE QUESTION, AND WHY IT IS THREE-WAY. D4 declares a 6 MB program window.

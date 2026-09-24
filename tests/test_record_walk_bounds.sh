@@ -2,6 +2,14 @@
 # test_record_walk_bounds.sh — the record walkers must examine the LAST long
 # that fits in their range (14z-94, GitHub #51). ROM-free, ~1 s.
 #
+# WHAT: both record walkers (obj_records and overlay_port) examine the LAST long that fits
+#   in their range, and the sweep pass the last 10-byte read — a record pointer in a
+#   region's final long is no longer omitted from the tile inventory (silently wrong art, no
+#   builder error).
+# HOW: the walkers over synthetic regions with a pointer at end-4 (ROM-free, ~1 s).
+# EXPECTS: the last pointer seen by both walkers and the sweep; measured inert on every
+#   shipping tenant when fixed, so the gate is what keeps it fixed.
+#
 # THE DEFECT. Both walkers scanned `range(start, end - 4, 2)`. A 4-byte long
 # stored at exactly `end-4` lies WHOLLY inside [start, end), but that range
 # stops at `end-6` and never examines it. A record pointer in the last long

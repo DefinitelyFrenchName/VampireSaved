@@ -4,6 +4,16 @@
 # #27, maintainer-ruled 2026-08-18: "it should be one command; the procedure
 # should be considered only if a single command cannot work").
 #
+# WHAT: tools/ensure_merged_inputs.sh makes rule 3 ONE COMMAND for the merged build: a
+#   missing ROM-derived input is regenerated and the regenerated set yields the
+#   byte-identical merged patch (the ARTIFACT is reproducible — the extract dirs themselves
+#   are not byte-equal, a cosmetic staleness), an existing input is never rewritten, and
+#   --check reports without creating.
+# HOW: three extractions and two generator runs against $ROMDIR and the pinned build dirs
+#   (~2 min), the emitted patch.json and blobs compared.
+# EXPECTS: identical merged patch from either input set, no rewrite of an existing input;
+#   verdict controls. Not portable.
+#
 # THE QUESTION THIS GATE ANSWERS, and the one it deliberately does NOT.
 # It does NOT assert that a regenerated extract dir is byte-equal to the
 # pinned one. That is the wrong property and it is FALSE today: measured

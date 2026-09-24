@@ -2,6 +2,17 @@
 # test_reaction_hook_d2.sh — the #99 fix gate: the reaction_hook D2 WINDOW
 # (14z-110, maintainer-ruled 2026-08-26).
 #
+# WHAT: the #99 fix: the 82-byte reaction_hook thunk's dispatcher-2 window (states
+#   0x50-0x53) dispatches through a second table whose four cases are byte-identical to
+#   vs2's dispatcher-2 handlers, re-derived from vsav2.zip; the site is a jmp to the thunk;
+#   vanilla dispatcher 2 is byte-identical to vsavj's own decrypted bytes; the node data
+#   matches the frozen census (empty since the 14z-110b remap).
+# HOW: reconstruction from the two decrypted images compared with the built Donovan-carrying
+#   image (static, seconds); three verdict controls perturb a built case byte, a table long
+#   and a window bound.
+# EXPECTS: every section equal and every control caught. The dynamic leg (forcing D0 at the
+#   site) is recorded in STATE, not here.
+#
 # WHAT IT LOCKS. The 82-byte reaction_hook thunk on a Donovan-carrying build:
 # its bne-arm (the ONLY entry into dispatcher 2 at 0x018508) must carry the
 # 0x50-0x53 window dispatching through a second ext table whose four cases are

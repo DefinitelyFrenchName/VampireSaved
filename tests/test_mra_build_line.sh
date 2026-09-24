@@ -3,6 +3,17 @@
 # and can never name the wrong one (14z-133b). Static tier: ROMDIR + the
 # merged build + emu/jtcores; ~1 min (three ROM-free MRA generations).
 #
+# WHAT: the WIDE MRA names the FREEZE it was generated for and can never name the wrong one:
+#   with --wide the header's BUILD block carries the registry row resolved from the build's
+#   rompath, the mark, the zip's sha1 and both keys — written only after every
+#   CRC-identified part resolves against that build's zips; without --wide it says 'not
+#   stated'; rewriting is idempotent.
+# HOW: three ROM-free MRA generations through tools/mister_mra.sh and tools/mra_header.py
+#   (~1 min); the control points --wide at a rompath whose vsavjw.zip differs by one member
+#   byte, so one part cannot resolve and the generator must REFUSE and write no block.
+# EXPECTS: the block exact for the current merged build, absent on the stock control MRA,
+#   honest without --wide, idempotent; the foreign rompath refused.
+#
 # MUST-FIRE: known-bad: foreign-rompath — a rompath whose vsavjw.zip differs by one member byte (so one CRC part cannot resolve) must make the generator REFUSE and write no block (mode: section 1 generates for that rompath and must fail)
 #
 # WHY. Maintainer, mid-field-test on M16, 2026-09-05: "it might be nicer to

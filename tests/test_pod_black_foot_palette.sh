@@ -3,6 +3,17 @@
 # (14z-126b, 2026-09-01): the black pixels ARE palette row 0b index 14
 # (RAM:$90C17C) of the OBJ palette page, and nothing else.
 #
+# WHAT: #112's black foot, CAUSALLY located: the black pixels ARE palette row 0b index 14
+#   (RAM:$90C17C) of the OBJ page — poking that entry across the black frame of the
+#   recording turns exactly the 7007 near-black pixels to the poked colour and nothing else,
+#   while poking the neighbouring entry moves a disjoint non-black set.
+# HOW: tests/inp/pod-black-m14-01 on MAME with the entry poked (3 runs, ~2.5 min), the
+#   framebuffer diffed pixel by pixel; the control substitutes the neighbour poke's pixel
+#   set.
+# EXPECTS: one source colour, one destination colour, the frozen count; the neighbour
+#   control fails. WHY the entry holds f111 at that moment is measured elsewhere (a hit
+#   re-requests the body palette).
+#
 # MUST-FIRE: known-bad: neighbour-poke-disjoint — the neighbour palette entry 0x90C17A moves a DISJOINT non-black pixel set, so treating it as the black-foot set must fail (mode: the neighbour-poke set is substituted for the fix set and the black-pixel assertions fail; REFUSES with exit 3 if the recording is absent)
 #
 # WHY A CAUSAL GATE. The mechanism was first argued from a COLOUR COINCIDENCE

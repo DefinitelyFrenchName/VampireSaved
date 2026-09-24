@@ -5,6 +5,15 @@
 # committed. ci_static: needs the three solo build dirs, no ROM read, no
 # emulator, ~1 s.
 #
+# WHAT: the community-facing behavioural tables
+#   docs/project/tables/{donovan,huitzil,pyron}.md (rule 5's tunables) are GENERATED from
+#   the current solo builds' extracts and bank maps and equal what is committed.
+# HOW: tools/tables_char_md.py from each build's extract/regions.json and bank_map.toml
+#   compared with the committed pages (~1 s; SKIPs without the builds); the control changes
+#   one value byte in a copy of donovan's extract.
+# EXPECTS: pages equal; the perturbed extract regenerates differently. A table that does not
+#   follow the build is a claim with nothing behind it.
+#
 # MUST-FIRE: perturbed-copy: perturbed-word132 — a copy of donovan's extract with one value byte changed must regenerate a page that differs from the committed one (mode: donovan's page is regenerated from that copy and must fail the cmp)
 #
 # WHY (14z-118, the documentation audit). donovan.md was hand-written on

@@ -3,6 +3,16 @@
 # indistinguishable from the binary that froze the oracle, BEFORE any profile
 # patch is applied to it.
 #
+# WHAT: the pinned MAME source build is indistinguishable from the binary that froze the
+#   oracle, BEFORE any profile patch — every frozen vsavj expectation reproduced bit-for-bit
+#   (twice, so nondeterminism fails too), and the unfrozen vsavj and vsav2 replays
+#   A/B-identical between the two binaries.
+# HOW: section 1 runs every replay with a frozen .sha1 twice on the source build; sections 2
+#   and 3 run the remaining vsavj and the vsav2 replays on both binaries and compare
+#   directly (skipped LOUDLY without the reference binary).
+# EXPECTS: every frozen log reproduced, every A/B identical; a red means the instrument
+#   moved and every MAME finding since is in question.
+#
 # Why this gate exists, and why it comes first:
 #
 #   Every MAME-side expectation this project owns was frozen against the

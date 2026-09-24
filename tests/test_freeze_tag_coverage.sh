@@ -2,6 +2,16 @@
 # test_freeze_tag_coverage.sh — EVERY FROZEN BUILD IS GIT-TAGGED (14z-126b).
 # ci_portable: no ROM, no build dir, no emulator, ~1 s. Needs git tags.
 #
+# WHAT: every frozen build in tests/expected/registry.tsv has an ANNOTATED git tag
+#   freeze/<set> whose message names the build's fingerprint — the only route back to a tree
+#   that reproduces a superseded build; the two M2 battery legs and the vsavj null baseline
+#   are excused by shape.
+# HOW: reads the registry and `git tag` (annotated, message content) for every build-shaped
+#   row; controls perturb a registry copy (an untagged row, a fingerprint the tag cannot
+#   name).
+# EXPECTS: every build row tagged, annotated and naming its fingerprint; both controls fail.
+#   No grandfathered exception remains.
+#
 # MUST-FIRE: perturbed-copy: untagged-row — a registry copy with a build row that has no freeze tag must fail section 1
 # MUST-FIRE: perturbed-copy: fingerprint-not-in-tag — a registry copy with one fingerprint perturbed must fail section 3 (the tag message cannot name it)
 #

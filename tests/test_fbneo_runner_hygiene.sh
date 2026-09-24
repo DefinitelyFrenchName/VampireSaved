@@ -2,6 +2,14 @@
 # test_fbneo_runner_hygiene.sh — a failed FBNeo run must not leave the PREVIOUS
 # run's artifacts behind (14z-90, GitHub issue #12, shell half).
 #
+# WHAT: a FAILED FBNeo run leaves none of the previous run's artifacts behind: the runner
+#   clears its output log, .tap and dumps before the run, so an artifact check (grep ^END)
+#   can never read yesterday's results as today's.
+# HOW: runs tools/run_replay_fbneo.sh to a failure with stale artifacts pre-planted and
+#   checks they are gone (~5 s, no ROMs used).
+# EXPECTS: no surviving stale artifact; the exit code is not the discriminator here, the
+#   artifact is.
+#
 # WHY. tools/run_replay_fbneo.sh decides success by an ARTIFACT check —
 # `grep -q "^END " "$OUT"` — and did not clear $OUT first. Paired with the C++
 # half (main.cpp calls HarnessRun() for side effects inside a void DoGame and

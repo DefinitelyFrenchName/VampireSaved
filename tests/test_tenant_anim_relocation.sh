@@ -3,6 +3,16 @@
 # PLACED ANIM CHAINS IS RELOCATED (14z-126b). ci_static: needs the tenant
 # build dirs, no ROMDIR, no emulator, ~5 s.
 #
+# WHAT: every sprite-record pointer in a tenant's PLACED anim chains is relocated: no node's
+#   +4 lands in the tenant's own vs2 SOURCE range (an unrelocated pointer draws vanilla art
+#   in a tenant's move and never faults), with the 24-bit address mask load-bearing.
+# HOW: walks every emitted node of each tenant build's verify_data.bin (garbage included)
+#   classifying the masked pointer; out-of-region pointers are REPORTED, not asserted (walk
+#   overrun, an instrument property); the control rewrites one node's +4 to a source-range
+#   address in a copy.
+# EXPECTS: zero source-range pointers per tenant (3722/3722 for Donovan); the planted
+#   pointer fails section 1.
+#
 # MUST-FIRE: perturbed-copy: planted-pointer — a copy of the first tenant's verify_data.bin with ONE node's +4 rewritten to a source-range address must fail section 1 (mode: the loop audits that copy in the tenant's place)
 #
 # THE DEFECT CLASS IT LOCKS. A tenant's animation is extracted from vs2 and

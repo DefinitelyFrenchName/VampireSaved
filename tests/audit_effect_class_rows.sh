@@ -3,6 +3,17 @@
 # port rests on (14z-71). All are ROM-read audits, and the first two are
 # the ONLY guards their claims have.
 #
+# WHAT: the three deadness measurements the beam port rests on: vanilla never dispatches
+#   effect-class row 16 (0 reads against a live control on row 37), the composite handler's
+#   A5 scratch $FF3578-$FF3581 IS used by vsavj (so vs2's displacements cannot be kept), and
+#   drawer list-type 10 is NOT a spare slot (thousands of legacy reads) — plus since 14z-91
+#   the type-6 fallback's EXECUTION against a frozen per-replay inventory.
+# HOW: MAME -debug watches on the OPCODES space (the tables are read pc-relatively; a plain
+#   watchpoint is silently blind), every section with a positive control on the same
+#   instrument and leg.
+# EXPECTS: 0 / used / used as measured, the fallback inventory exact; a blind instrument
+#   cannot pass as a clean result.
+#
 # WHY THIS EXISTS. Two of the beam port's rows are justified by "legacy
 # never reaches this", which is a measurement, not an argument:
 #

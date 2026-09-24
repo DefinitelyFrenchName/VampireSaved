@@ -3,6 +3,18 @@
 # project has on a VIDEO-DETERMINING surface, and it is on the content the
 # port exists to add.
 #
+# WHAT: the first cross-implementation agreement on a video-determining surface: the OBJ
+#   (sprite) list the 68k builds, dumped from MAME's ORAM and from the jtcps2w core's SDRAM
+#   and walked by the same byte-level walker, agrees EXACTLY on the PROMOTED subset (y bit
+#   12, the group-C sprites this port adds — lottery-free) at the frozen tenant anchor (31
+#   vs 31, ordered and field-for-field), the unpromoted vanilla remainder reported, never
+#   asserted (the CPU opponent is a lottery).
+# HOW: MAME and a Verilator run of the core on the WIDE set with replay 36 (~65 min;
+#   --sim-dir/--mame-log re-analyse finished runs), tools/oram_obj_records.py over both
+#   dumps; the control flips one bit of a promoted entry in the real core dump.
+# EXPECTS: promoted identical and in the 19-bit address range on both; the flipped entry
+#   fails PROMOTED_IDENTICAL; REFUSES with exit 3 without the sim prerequisites.
+#
 # MUST-FIRE: known-bad: perturbed-promoted-entry — a one-bit change in a promoted (group-C) tile code must be caught, so a perturbed promoted entry must break section 1's promoted-identical check (mode: one promoted entry is flipped in the REAL core dump and PROMOTED_IDENTICAL goes NO, so the gate FAILs; REFUSES with exit 3 if the sim prerequisites are absent)
 #
 # WHAT IT COMPARES. The OBJ (sprite) list the 68k builds in ORAM, dumped from

@@ -3,6 +3,13 @@
 # files (14z-122, the documentation rationalization pass). ci_portable: no
 # ROM, no build dir, no emulator, ~1 s.
 #
+# WHAT: docs/GOTCHAS.md, the GENERATED index of the three gotcha buckets (one line per `## `
+#   entry, wrapped headers joined, anchor tokens stripped), equals a fresh regeneration.
+# HOW: tools/gen_gotchas_index.py --check (~1 s); controls append an entry to a bucket and
+#   hand-add a bullet to the index.
+# EXPECTS: committed equals regenerated; a new entry fails and is NAMED in the diff, a hand
+#   edit fails the cmp.
+#
 # MUST-FIRE: perturbed-copy: new-bucket-entry — a `## ` entry appended to a bucket must fail --check and be NAMED in the diff, or a new gotcha can miss the index silently
 # MUST-FIRE: perturbed-copy: hand-edited-index — a bullet hand-added to the committed index must fail the cmp, or the index stops being generated
 #

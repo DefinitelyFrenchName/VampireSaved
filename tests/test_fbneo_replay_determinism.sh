@@ -3,6 +3,11 @@
 # with identical work-RAM checksums across two fresh-sandbox runs.
 # (Guards the EEPROM-sandboxing fix — see docs/GOTCHAS.md.)
 #
+# WHAT: the patched FBNeo runs a scripted replay with identical work-RAM checksums across
+#   two fresh-sandbox runs (the EEPROM sandboxing fix's guard).
+# HOW: two fresh-sandbox FBNeo runs of one replay, the checksum logs compared.
+# EXPECTS: identical logs; a difference is nondeterminism in the harness or the sandbox.
+#
 # Usage: ROMDIR=... tests/test_fbneo_replay_determinism.sh [set] [replay]
 set -eu
 

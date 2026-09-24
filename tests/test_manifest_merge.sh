@@ -1,6 +1,15 @@
 #!/bin/sh
 # test_manifest_merge.sh — what the three tenant manifests do when merged.
 #
+# WHAT: what the three tenant manifests do when MERGED: the shared-row dedup counts and the
+#   exact collision inventory are frozen (three real blockers, six that dissolve on the WIDE
+#   track), a span collision is its own check, and the merge REFUSES anything it cannot
+#   dedup identically.
+# HOW: merge_manifests() over the real manifests (no ROMs, no build, ~1 s) with four
+#   permissiveness controls.
+# EXPECTS: counts and collisions as frozen; a new collision or a lost dedup fails with the
+#   address named.
+#
 # WHY (M3b slice F, 14z-77). Until now the merge's hazards were a LIST IN A
 # DOCUMENT, re-derived by reading TOML by eye. `merge_manifests()` makes them
 # a measurement, and this gate FREEZES it: the shared-row dedup counts and the

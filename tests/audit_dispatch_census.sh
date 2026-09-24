@@ -2,6 +2,15 @@
 # audit_dispatch_census.sh — WHICH type indices does LEGACY ever dispatch at
 # the two obj_hook sites, and is the frozen observation still complete?
 #
+# WHAT: which object-type indices LEGACY ever dispatches at the two obj_hook sites over the
+#   corpus, against the frozen inventory build/manifest/dispatch_census.toml — a NEW type
+#   observed is a corpus that grew a spawn it never had.
+# HOW: breakpoints on both dispatch sites over every replay with a frozen vanilla
+#   masked-basis log on MAME (50 short debug runs), D0/4 = the dispatched index.
+# EXPECTS: the inventory reproduced exactly; growth fails. Coverage stated: site 0x054470
+#   fires in only 5 of 50 replays and the curve has not converged, so 'never observed' is a
+#   bound, not a proof, and no repoint ships on the complement.
+#
 # WHY (14z-89). The legacy-cycle regression's fix is option (b) (maintainer,
 # 2026-08-15): move the tenant's work OFF the legacy path. For obj_hook that
 # means putting the tenant's object types on table entries LEGACY NEVER

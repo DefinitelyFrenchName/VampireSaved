@@ -2,6 +2,14 @@
 # test_attribute_ramdiff.sh — ground truth for tools/attribute_ramdiff.py
 # (14z-90, GitHub issue #21).
 #
+# WHAT: tools/attribute_ramdiff.py REFUSES when both logs resolve to the SAME dump file
+#   (MAME dump names are directory-scoped, so two logs in one directory compared a file
+#   against itself and reported IDENTICAL), while a genuine zero-diff between DISTINCT dumps
+#   stays a note-and-pass.
+# HOW: synthetic log pairs in one directory and in two (no ROMs, ~1 s).
+# EXPECTS: same-file refused, distinct-identical noted; a PASS guaranteed by path resolution
+#   is not a gate.
+#
 # WHY. `find_dump()` tries two patterns, and the second is DIRECTORY scoped:
 #     <log>.dump_<frame>_*.bin        (FBNeo harness — log-scoped, safe)
 #     <dir>/dump_<frame>_*.bin        (MAME replay.lua — directory-scoped)

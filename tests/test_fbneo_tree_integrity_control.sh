@@ -2,6 +2,12 @@
 # test_fbneo_tree_integrity_control.sh — ground truth for the emu/fbneo tree
 # integrity gate (14z-90, GitHub issue #36).
 #
+# WHAT: the tree-integrity gate catches what `git apply -R --check` misses: a line appended
+#   at EOF of cps_obj.cpp, a line inserted far from any hunk, and the other planted shapes,
+#   each on a SCRATCH copy.
+# HOW: five planted edits on a scratch copy of the tree, the real gate run against each.
+# EXPECTS: the gate FAILS on every plant, case 1 (the issue's own scenario) above all.
+#
 # WHY A CONTROL AT ALL. The obvious implementation of that gate — and the one
 # the issue suggests — is `git apply -R --check` against the tracked patches.
 # It FAILS OPEN on the issue's own failure scenario. Measured on a scratch

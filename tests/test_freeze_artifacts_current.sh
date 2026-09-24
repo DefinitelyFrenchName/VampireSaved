@@ -2,6 +2,16 @@
 # test_freeze_artifacts_current.sh — TRACKED ARTIFACTS THAT FOLLOW THE ROMSET
 # MUST HAVE BEEN REFRESHED AT THE CURRENT FREEZE. (14z-144.)
 #
+# WHAT: the tracked artifacts that FOLLOW the romset but have no static gate of their own
+#   were refreshed at the current freeze: build/merged1's ops (by value, not count), the
+#   MiSTer prg_window expectation's header, and patch_index.md's registration cells naming
+#   the current build dirs and fingerprints.
+# HOW: compares each artifact with the current freeze's build set and registry; six controls
+#   (a one-value change at an equal op count, a non-current header, a stale dir, a stale
+#   fingerprint, an unregistered-but-registered row, a program-key alias).
+# EXPECTS: every artifact current; each control fails its section. Add a row when an
+#   artifact is tracked, build-derived and covered by no ci_static gate.
+#
 # MUST-FIRE: perturbed-copy: one-value-change — build/merged1's ops with ONE value changed at an unchanged op count must fail section 1 (instance 3's shape; mode: that copy is compared)
 # MUST-FIRE: known-bad: non-current-header — a prg_window header naming a non-current build dir must fail section 2 (mode: that header is what section 2 reads)
 # MUST-FIRE: known-bad: stale-dir — a bundles-table row naming a superseded build dir as current must fail section 4 (mode: the row joins the real table)

@@ -1,6 +1,15 @@
 #!/bin/sh
 # test_id_space.sh — freeze the shape of the character-id space.
 #
+# WHAT: the shape of the character-id space is frozen: zero out-of-range variant rows across
+#   the layout-verified tables, exactly seven sites folding the id to 4 bits (five by
+#   register, two directly in memory), the only variant rows with their own data 0x18 and
+#   Anakaris's word_pos_a, and the reserved id 0x12; vsav2's reference shape (distinct rows
+#   at 10/11/13/18/19, two fold sites).
+# HOW: tools/audit_id_space.py over the decrypted data views of vsavj and vsav2.
+# EXPECTS: every frozen count exact; growth of the fold set or the reserved set invalidates
+#   the roster plan's premise that 0x10/0x11/0x13 are free.
+#
 # WHY. The roster plan puts three newcomers on ids in the variant half
 # (0x10-0x1F), which is only sound if (a) the per-character tables really
 # have rows there and (b) the small set of code sites that narrow the id to

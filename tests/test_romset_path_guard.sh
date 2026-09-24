@@ -3,6 +3,14 @@
 # delete, the reference set (14z-94, GitHub #76). ROM-free, ~2 s: the fixture
 # builds its own fake romdir, so no real dump is ever at risk in this test.
 #
+# WHAT: build_wide_romset never writes into, or deletes, the reference set: identity, `..`
+#   spellings, symlink aliases and containment in either direction between outdir and romdir
+#   are refused BEFORE any mutation, the source zips byte-identical afterwards — the one
+#   failure in that file with no undo — and a legitimate separate directory still builds.
+# HOW: a fake romdir fixture (no real dump at risk) through the tool's guard with each alias
+#   shape, then a real separate-directory build (~2 s).
+# EXPECTS: every alias refused with the sources untouched, the legitimate build working.
+#
 # THE DEFECT. The tool's docstring promises "the reference set in ROMDIR is
 # never modified". Nothing enforced it. With outdir == romdir the overlay
 # loop does, in order:

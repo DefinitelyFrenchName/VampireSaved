@@ -4,6 +4,19 @@
 # leg did not move. (14z-107 (5), MiSTer slice D0;
 # docs/project/mister_map.md §3 is the design this gate defends.)
 #
+# WHAT: the MiSTer download image is EXACTLY the placement map: cps2w's stock vsavj MRA is
+#   byte-identical to cps2's but for the rbf and cps2 emits NO WIDE MRA (the profile gated
+#   by sourcefile), the WIDE MRA's region table and four header words are the map's with
+#   every region 1 KiB-aligned, the produced .rom is 66,265,152 B with the trimmed QSound
+#   region a pure truncation, the catalogue names the current build's CRCs, the stock .rom
+#   is bit-identical to the 14z-106 measurement, and header byte 41 is 0xFE in the WIDE MRA
+#   and 0xFF in every stock one.
+# HOW: the REAL generator over the REAL romset (ROM-free MRA generations plus the .rom build
+#   when the romset is present); controls generate the untrimmed mapping (which must exceed
+#   the 26-bit ceiling) and move the trim by 1 KiB.
+# EXPECTS: every lock as listed; both controls fail. The map and the arithmetic were derived
+#   independently, so a disagreement is the finding.
+#
 # MUST-FIRE: known-bad: untrimmed-mapping — the UNTRIMMED mapping (the QSound extension whole, as MAME declares it) must produce an image past the 26-bit ioctl_addr ceiling needing a firmware start word that does not fit 16 bits (mode: that MRA is what section 2 checks against the frozen table, and must fail)
 # MUST-FIRE: perturbed-copy: trim-perturbed — the trim length moved by 1 KiB must break the frozen region table (mode: that MRA is what section 2 checks)
 #

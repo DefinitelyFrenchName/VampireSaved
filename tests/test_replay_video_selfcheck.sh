@@ -2,6 +2,15 @@
 # test_replay_video_selfcheck.sh — ground truth for replay.lua's VIDEO_OUT,
 # the MAME per-frame framebuffer checksum.
 #
+# WHAT: replay.lua's VIDEO_OUT (the MAME per-frame framebuffer checksum) is a trustworthy
+#   instrument: live (thousands of distinct checksums in a match), non-perturbing (the RAM
+#   log still equals the frozen expectation), deterministic, and correct both ways against a
+#   build with a KNOWN pixel difference (identical frames match, differing frames differ).
+# HOW: MAME runs with VIDEO_OUT on, compared with the frozen RAM expectation, with each
+#   other, and against donovan6's known medallion difference at frames 650 / 950 / 1250.
+# EXPECTS: all four checks; an instrument that always differs is as useless as one that
+#   never does.
+#
 # WHY: session 14z-55 discovered that the FBNeo harness had never rendered a
 # pixel — every gate the project owned on that side was structurally blind to
 # the video path, and would have reported the CPS-2 WIDE 19-bit tile address

@@ -1,6 +1,16 @@
 #!/bin/sh
 # test_escape_triage.sh — H3.1's verdicts, frozen (14z-100 hardening).
 #
+# WHAT: the classification of every UNCOVERED word-form pc-relative branch escape on the
+#   merged placements is frozen verbatim: 25 sites, zero LIVE-RISK — 22 ADJACENT-OK and 3
+#   reviewed census false positives — and any drift fails both ways.
+# HOW: tools/triage_pcrel_escapes.py over the three solo extracts and the merged placements,
+#   its verdict set compared with the frozen one; the control includes COVERED regions,
+#   whose raw escapes must classify non-OK by the hundreds.
+# EXPECTS: the verdict set exact; a new line is an unreviewed escape, a missing one a build
+#   that is not the frozen generation; the control's zero would mean the classifier stopped
+#   discriminating.
+#
 # MUST-FIRE: known-bad: covered-regions-raw — the classifier over COVERED regions (--all-regions) must yield raw LIVE-RISK verdicts by the hundreds, so a zero means it stopped discriminating (mode: that verdict set is compared against the frozen one and must fail)
 #
 # tools/triage_pcrel_escapes.py classifies every UNCOVERED word-form pc-rel

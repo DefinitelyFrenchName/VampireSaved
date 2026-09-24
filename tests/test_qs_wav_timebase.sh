@@ -2,6 +2,14 @@
 # test_qs_wav_timebase.sh — the WAV audit's frame->time conversion must use
 # CPS timing, not 60 Hz (14z-94, GitHub #85). ROM-free, no MAME, ~2 s.
 #
+# WHAT: the WAV audit converts emulated frames to sample offsets at the CPS-2 rate
+#   (59.637405 Hz, derived from MAME's own constants), not a literal 60 — the drift a 60 Hz
+#   reading introduces exceeds a window by the end of an 80-id sweep — and the audit's
+#   control shares the checker's window maths.
+# HOW: the rate re-derived and compared, the drift computed over the sweep, the control's
+#   window code checked for a shared source (ROM-free, ~2 s).
+# EXPECTS: rate exact, drift as stated, one copy of the maths.
+#
 # THE DEFECT. tests/lua/qs_sweep.lua schedules injections by emulated FRAME.
 # check_qs_voice_wav.py converted those frames to WAV sample offsets at a
 # literal 60. CPS-2 runs at 8 MHz / (512 * 262) = 59.637405 Hz, so the error

@@ -1,6 +1,14 @@
 #!/bin/sh
 # test_extract_hp.sh — the Huitzil/Pyron extraction gate (14z-65, M3b Phase 1).
 #
+# WHAT: the Huitzil and Pyron extraction shapes are as measured: Huitzil's code region with
+#   its +0x36 shift, the 6-byte sibling-insertion sliver and the x057456 group with one dead
+#   filler zone; Pyron's single code region with its shift and one filler zone; a character
+#   with no anchor row is refused and the charid scanner finds the tenant's own id.
+# HOW: runs the extractor on both tenants from the reference sets (~2 min) and compares the
+#   region shapes; the refusal and the scanner are the negative controls.
+# EXPECTS: shapes exact, the unanchored id refused, the scanner correct.
+#
 # Freezes the measured extraction shapes for the two next tenants:
 #   0x10 Huitzil: code [0x057020,+0x436) shift +0x36 with the 6-byte
 #     SIBLING-INSERTION sliver at +0x430 (vs2-only `jsr $8ACD8` at his

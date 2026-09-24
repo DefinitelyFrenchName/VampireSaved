@@ -2,6 +2,14 @@
 # test_classify_hitclass_probe.sh — ground truth for the hit-class probe
 # classifier (14z-93). No ROMs, no emulator, ~1s.
 #
+# WHAT: the hit-class probe classifier's verdict logic: a census zero is told apart as OK
+#   (the tenant stayed inside vanilla's 64 entries), DEAD, CRASH or CAPPED, D0 is read as
+#   the RAW index (index*4 at the obj_hook sites), the low word is the index with a stale
+#   high word masked and a large low word kept as a real trap.
+# HOW: 15 synthetic cases through tools/classify_hitclass_probe.py (no ROMs, ~1 s).
+# EXPECTS: every case its designed verdict; the fixture caught its own author once (a wrong
+#   width), which is why the cases exist.
+#
 # WHY THIS EXISTS. `tools/classify_hitclass_probe.py` is the verdict logic
 # behind the tenant fire census: it decides whether a run's zero means "the
 # tenant stayed inside vanilla's 64 entries", "no rig produced the event at

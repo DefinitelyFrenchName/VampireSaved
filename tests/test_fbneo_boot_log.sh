@@ -5,6 +5,16 @@
 # every emulator-core message missing) and this MacBook's release-binary boot
 # (14z-151). ROM-free, no emulator, ~1 s.
 #
+# WHAT: the verdict logic of tests/lib/fbneo_boot_log.sh — what a healthy FBNeo WIDE boot
+#   log must show, per OS — proven against RECORDED boot logs from the first Windows boot
+#   (no core messages by design) and this Mac's release-binary boot.
+# HOW: the reader applied to the recorded logs under each OS rule: the Windows log passes on
+#   windows and fails on macos, the macOS log passes on both (the profile line demanded
+#   where the core prints); controls drop the WIDE member line, drop the profile line, and
+#   remove the descriptor rows.
+# EXPECTS: the five sections as listed; each control fails or refuses. A Windows release
+#   verdict rests on this before it is trusted.
+#
 # MUST-FIRE: perturbed-copy: wide-member-dropped — the recorded Windows boot with its `vsw.41` load line removed must FAIL the member check (mode: section 1 checks that copy)
 # MUST-FIRE: perturbed-copy: profile-line-dropped — the recorded macOS boot with `CPS-2 WIDE v1 profile active` removed must FAIL: the core's messages reach that log, so the missing line means vsavjw booted without the WIDE init (mode: section 2 checks that copy)
 # MUST-FIRE: perturbed-copy: descriptor-unreadable — a copy of patch 0002 with the vsavjw descriptor's rows removed must make the check REFUSE, never pass an empty member list (mode: sections 1-3 read that copy)

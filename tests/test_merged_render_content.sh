@@ -3,6 +3,18 @@
 # tenants' tiles (and only where designed), measured in the emulator's own
 # decoded gfx memory (M3b Phase 3 S5, 14z-83).
 #
+# WHAT: the MERGED build serves all three tenants' tiles where designed, measured in the
+#   emulator's decoded gfx memory: Donovan's, Huitzil's and Pyron's bands and the relocated
+#   strip equal the frozen SOLO builds' at the composed addresses, merged bank 2 is PRISTINE
+#   (the de-substitution held), the four windows are pairwise distinct, a poisoned group C
+#   is rejected and changes every window, and the three pick replays complete with a live
+#   framebuffer.
+# HOW: a live A/B against the three frozen solo builds on WIDE MAME (no frozen hash files),
+#   windows chosen where only one tenant places (the merged bank is the union of the write
+#   sets).
+# EXPECTS: band equivalence, pristine bank 2, distinctness, the poison control, liveness.
+#   H's and P's FIRST render gate.
+#
 # The RAM gates are structurally blind to the video path (14z-55/60z), and
 # until this gate NOTHING looked at Huitzil's or Pyron's art in any
 # emulator — Donovan's band check (test_wide_render_content.sh §2) was the

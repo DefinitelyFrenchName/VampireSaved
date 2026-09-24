@@ -1,6 +1,16 @@
 #!/bin/sh
 # test_beam_list_type6.sh — the LIST-TYPE 6 TAKEOVER gate (14z-71).
 #
+# WHAT: the list-type 6 takeover: the thunk body is Capcom's composite handler (vs2
+#   0x01A1FC) with exactly the six scratch displacements, one call and one loop displacement
+#   changed, and the non-tenant FALLBACK reproduces vsav's own type-6 head instruction for
+#   instruction and rejoins at 0x01B6B2 — the whole safety argument, checked statically
+#   because legacy exercises it only by accident.
+# HOW: reconstruction from vs2's and vsavj's bytes compared with the build (no emulator,
+#   seconds).
+# EXPECTS: body and fallback as reconstructed; a hand edit that still assembles would fail
+#   here. The dynamic half is audit_effect_class_rows section 4.
+#
 # vsav's sprite-list drawer has six list types (0..10); vs2 has seven (0..12),
 # and the beam's list is the type-12 COMPOSITE. The table cannot grow (entry
 # 0's own offset IS its length) or move (the dispatch is (d8,PC,Xn)), so the

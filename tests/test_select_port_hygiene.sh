@@ -2,6 +2,14 @@
 # test_select_port_hygiene.sh — select_port.py must be chainable, idempotent
 # and free of unreachable statements (14z-94, GitHub #46). ROM-free-ish, ~2 s.
 #
+# WHAT: select_port.py (dormant today — every live tenant is variant-half — but imported for
+#   PLACEMENTS and revived by any base-half tenant) is chainable (src, out), idempotent, and
+#   free of unreachable statements, while KEEPING the round-22 analysis that convicted the
+#   block copies of the throw teleport.
+# HOW: runs the tool twice on a scratch copy (chain and idempotence), scans for the dead
+#   WINPAL block, and checks the analysis text survived (~2 s).
+# EXPECTS: chainable, idempotent, no unreachable code, the analysis present.
+#
 # WHY THIS GATE EXISTS FOR A DORMANT TOOL. build_donovan.sh:306 calls
 # select_port ONLY for a base-half tenant id (`TEN_ID < 16`), and all three
 # live tenants are variant-half — Donovan 0x13, Huitzil 0x10, Pyron 0x11 — so

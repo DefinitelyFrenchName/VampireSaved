@@ -2,6 +2,16 @@
 # test_fbneo_tree_integrity.sh — the emu/fbneo working tree must be EXACTLY
 # the pinned upstream commit plus the two tracked patches (14z-90, issue #36).
 #
+# WHAT: the emu/fbneo working tree is EXACTLY the pinned upstream commit plus the two
+#   tracked development patches (0001 harness, 0002 WIDE) — whole-file compare and a
+#   changed-file inventory, because `git apply -R --check` validates only hunk context and
+#   accepts an edit a few lines away.
+# HOW: reconstructs the expected tree from `git archive PIN` plus the two patches into a
+#   scratch dir and cmp's every file the patches touch, plus the inventory of changed files
+#   (0003 is release-only and never applied here).
+# EXPECTS: byte-identical files and the same inventory; a red is untracked drift in the
+#   emulator — the trust surface rule 1 rests on.
+#
 # WHY. CLAUDE.md rule 1 makes the patch files the trust surface: "the trust
 # surface of emulator changes must remain a small, human-reviewable set of
 # declarative mapping lines." That is only true if the BINARY WE BUILD comes

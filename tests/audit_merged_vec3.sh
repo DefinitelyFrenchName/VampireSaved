@@ -4,6 +4,15 @@
 # merged-legacy audit's Huitzil crash; becomes the REGRESSION GATE for the
 # eventual fix.
 #
+# WHAT: the merged-build Huitzil satellite anim-base probe: on the merged build the
+#   satellite enters the anim walker with base A0 = anim@huitzil + 0xB8AC (its own placed
+#   anim), not tenant 0's planted tripwire address — the regression gate for the per-tenant
+#   type-number renumbering that fixed the 14z-81 vec3.
+# HOW: two guarded MAME runs of hui/70_hui_mash on the merged build with GUARD_PROBE on the
+#   walker entry, A0 read at the satellite's first tick.
+# EXPECTS: A0 the healthy value on the merged build; a FAIL is a regression of the
+#   renumbering (pair any change with donovan/12_vs_cpu staying guard-clean).
+#
 # THE MEASURED DEFECT (14z-81, deterministic, 3/3 MAME runs): on a 3-tenant
 # merged build, Huitzil's satellite (object $FFB800 at char-init, MAME frame
 # 2886 on hui/70_hui_mash) enters the vanilla anim walker (entry PRG:0x15084;

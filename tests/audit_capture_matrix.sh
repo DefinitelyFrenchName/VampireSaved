@@ -2,6 +2,20 @@
 # audit_capture_matrix.sh — THE WHOLE CAPTURE-GEOMETRY MATRIX, ours vs native
 # vsav2, every reachable (ATTACKER, VICTIM) cell (14z-143, maintainer-directed).
 #
+# WHAT: the whole capture-geometry matrix, ours vs native vs2, every reachable (attacker,
+#   victim) cell: our served capture sub-block equals native's for every victim, vsavj's and
+#   vs2's BASE sub-blocks are byte-identical for all 16 legacy attackers (the #104
+#   legacy-safety premise), and the port adds the tenants' own sub-blocks where vsavj
+#   aliases them.
+# HOW: static over the decrypted images and the build's image (no emulator, the records ARE
+#   what the engine draws — licensed by the in-emulator anchors audit_don_grab_pose,
+#   test_hui_grab_victim, audit_pyron_capture_block): each cell compared over min(spacing)
+#   of the two blocks; controls flip one record byte in a copy of our image and run the
+#   naive fixed-count comparison, which must invent differences at the small-spacing
+#   attackers.
+# EXPECTS: every cell equal, the premise holding, the additions present; the flipped byte
+#   fails its cell and the fixed count fails at exactly attackers 0x06/0x08/0x09/0x0D.
+#
 # MUST-FIRE: perturbed-copy: perturbed-record-byte — one byte of one record flipped in a copy of our image must break that cell's comparison (mode: section 1 compares that copy and must fail)
 # MUST-FIRE: known-bad: fixed-count-comparison — a FIXED 20-record comparison must invent differences at exactly the small-spacing attackers (mode: section 1 uses the fixed count and must fail — the instrument's own negative control)
 #

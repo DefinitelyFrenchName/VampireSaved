@@ -3,6 +3,16 @@
 # (14z-123, the documentation rationalization pass, G6). ci_portable: no ROM,
 # no build dir, no emulator, ~1 s.
 #
+# WHAT: docs/project/gate_index.md, the GENERATED index of every gate (kind, tier from the
+#   ci registries, family from tests/gate_index.tsv, needs, the header's own first sentence,
+#   since), equals a fresh regeneration, every script has a family row and no row names a
+#   missing script.
+# HOW: tools/gen_gate_index.py --check over the tree (~1 s); controls on a copy: a script
+#   with no family row, a dead TSV row, a hand-edited index.
+# EXPECTS: current and complete; each control fails --check or the cmp. The index the
+#   generic harness renders byte-identically (bbh F9), which is why the descriptions live on
+#   their own page.
+#
 # MUST-FIRE: perturbed-copy: no-family-row — a script with no tests/gate_index.tsv row must fail --check, or a new gate goes unclassified
 # MUST-FIRE: perturbed-copy: dead-tsv-row — a TSV row whose script is gone must fail --check
 # MUST-FIRE: perturbed-copy: hand-edited-index — a row hand-added to the committed index must fail the cmp

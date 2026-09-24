@@ -3,6 +3,18 @@
 # content extents it depends on have not moved. (14z-107 (4);
 # docs/project/mister_map.md is the design this gate defends.)
 #
+# WHAT: the MiSTer SDRAM placement map FITS the 64 MB tier — decided by the DECLARED region
+#   sizes the MRA downloads (bank 1 exactly full, bank 0 with 131,072 B free), not by tile
+#   ceilings — and the four content extents that bound where content lives (obj bank 4 and 5
+#   top codes, the QSound extension's live extent, the 6 MB PRG region) have not moved; a
+#   tile code is its SDRAM address under the CPS-2 scramble.
+# HOW: the frozen placement() table's arithmetic over the declared regions and the extents
+#   read from the built artifacts (static); three controls: the untrimmed 16 MB QSound
+#   region must overflow both the ioctl_addr port and the header word, one extra megabyte of
+#   obj bank 5 must overflow bank 0, and the identity must fail without the scramble.
+# EXPECTS: the fit and the extents as frozen; each control overflows or fails as it must. A
+#   fit check with no control asserts nothing.
+#
 # MUST-FIRE: known-bad: untrimmed-qsound — the UNTRIMMED 16 MB QSound region must overflow both the 26-bit ioctl_addr port and the 16-bit header start word (mode: the fit is computed with it and must fail)
 # MUST-FIRE: known-bad: obj-bank5-plus-1mb — one extra megabyte of the obj-bank-5 REGION must overflow SDRAM bank 0 (mode: the placement is modelled with it and must fail)
 # MUST-FIRE: known-bad: no-scramble — the tile-code-is-its-address identity must FAIL without the CPS-2 scramble (mode: the identity is checked with the scramble removed and must fail)

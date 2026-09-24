@@ -3,6 +3,16 @@
 # vsavj vs NATIVE Donovan on vsav2 (CLAUDE.md §4 dual-oracle for new
 # content, same-emulator two-game form).
 #
+# WHAT: ported Donovan on vsavj against NATIVE Donovan on vsav2 with identical inputs:
+#   match-start anchors equal, the neutral window field-exact every frame, P2 HP-change
+#   value sequences equal, and the ported character's cross-game mismatch count no higher
+#   than the untouched veteran control's (Demitri on both games).
+# HOW: the replay pair 17_don_oracle_{vsav2,vsavj} plus the 18_veteran_ctl pair on MAME
+#   against the stock twin, tools/compare_fields.py at anchors and --exact over the neutral
+#   window.
+# EXPECTS: the four locks; frame-exact combat comparison across the two engines is
+#   impossible by construction, so the bound and the HP sequence are what is asserted.
+#
 # Replay pair tests/replays/17_don_oracle_{vsav2,vsavj}.rpl: both games
 # run IDENTICAL inputs (sibling engines traverse identical menu timelines
 # — measured: both anchor at frame 2363), P1 Donovan, P2 Victor, then a

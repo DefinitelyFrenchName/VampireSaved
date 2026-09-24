@@ -2,6 +2,16 @@
 # audit_objhook_owner_census.sh — which OWNER does each extended obj_hook
 # type carry at DISPATCH TIME? (14z-81b; the vec3-fix design measurement.)
 #
+# WHAT: which OWNER each extended obj_hook type (114-120, the multi-owner pool family)
+#   carries at DISPATCH TIME on a single-tenant build — the measurement behind the vec3-fix
+#   design (type 115 reads zero at dispatch while the same frame's dump shows the owner:
+#   time-varying within a frame).
+# HOW: two guarded MAME runs on a Huitzil build probing the dispatch's +0x30 word per type;
+#   REPORT-ONLY (exit 0 unless the rig is dead).
+# EXPECTS: a per-type owner report, 114/116/118/120 stated as not observed. STALE since
+#   14z-91 (the header says so): the probe points at a thunk that no longer exists and must
+#   be re-pointed at the relocated walker before it is trusted.
+#
 # WHY. The merged obj_hook union gives a MULTI-OWNER type (114-120, the
 # x088512 pool family — all three tenants port it) ONE extended-table entry,
 # and the fix needs a runtime owner read. This census measures, per dispatch,

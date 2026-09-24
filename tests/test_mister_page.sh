@@ -3,6 +3,19 @@
 # actually there. (14z-107 (10); docs/project/mister_core.md +
 # tools/mk_mister_page.py.)
 #
+# WHAT: the MiSTer synthesis page (docs/project/mister_core.md plus the drawn page
+#   tools/mk_mister_page.py renders) still draws the map that is actually there: every
+#   placement offset and length against the fit gate's frozen table, the bank tops and free
+#   bytes, the .rom size and header words against mister_map.md, every frozen content
+#   extent, and the ASCII figures embedded in the committed markdown.
+# HOW: the generator's own --check re-deriving each number (ROM-free; the group-C census and
+#   the palette re-read SKIP loudly when their inputs are absent), the rich page rendered to
+#   a temp path only; three shadow-tool controls move a placement constant, a frozen extent
+#   and one ASCII glyph.
+# EXPECTS: every re-derivation equal and the render structurally sound; each control
+#   rejected. A synthesis that draws last month's arithmetic is exactly the rot this
+#   catches.
+#
 # MUST-FIRE: shadow-tool: placement-constant — a copy of the generator with the QSound high window moved must fail --check against the map (mode: section 1 runs that copy)
 # MUST-FIRE: shadow-tool: frozen-extent — a copy with obj bank 4's top code moved must fail the extent check
 # MUST-FIRE: shadow-tool: ascii-figure — a copy with one ASCII glyph changed must fail the committed-markdown check

@@ -3,6 +3,16 @@
 # frozen expectation? Re-derives the attribution instead of trusting the
 # commit message that first made it.
 #
+# WHAT: why each flicker frame of the frozen composite expectations is there: every
+#   differing byte at the attributed frames (41_don_altcolor +2313, 37_victor_ko +7168,
+#   105_legacy_2pwin_auto +2713/+5868) falls inside a NAMED window — the palette-fade
+#   staging buffer rows or the OBJ-builder secondary stack — re-derived rather than trusted
+#   from the commit that first wrote it.
+# HOW: ours-vs-vanilla work-RAM dumps at the attributed frames on MAME, every differing byte
+#   classified by tools/attribute_ramdiff.py against the named windows.
+# EXPECTS: every byte inside its window; a byte outside means the specs describe something
+#   else and must be re-opened, never widened.
+#
 # WHY (14z-91). The legacy-regression fix re-measured 139 specs, and two of
 # them GAINED a flicker frame:
 #

@@ -1,6 +1,16 @@
 #!/bin/sh
 # test_unless_composed.sh — THE `unless_composed` ROW KEY (14z-170): a manifest row naming a tenant applies only to a build whose composition does NOT include that tenant; a name outside the port's roster fails the build; and the only rows carrying the key are Phobos's two Plasma Trap class remaps.
 #
+# WHAT: the `unless_composed` row key: a manifest row naming a tenant applies only to a
+#   build whose composition does NOT include that tenant, an unknown name fails the build,
+#   and the only rows carrying the key are Phobos's two Plasma Trap class remaps (naming
+#   donovan).
+# HOW: the generator's vocabulary (port_tenant_names), a truth table over
+#   composition_allows(), the refusals, and the real rows across build/manifest/*.toml (~1
+#   s, no ROM); the control perturbs the vocabulary to contain the misspelt name.
+# EXPECTS: vocabulary, semantics, refusals and the two real rows as specified; the perturbed
+#   vocabulary accepts the typo and fails.
+#
 # MUST-FIRE: perturbed-copy: typo-accepted — the refusal case run against a vocabulary that already contains the misspelt name must stop refusing, so the refusal is a reading of the vocabulary and not a constant (in-gate: the perturbed vocabulary must accept the typo; mode: the gate's vocabulary is perturbed and the refusal check FAILs)
 #
 # WHY. The class-0x52 fix is scoped S1 (maintainer-ruled 2026-09-18, DECISIONS_HISTORY.md

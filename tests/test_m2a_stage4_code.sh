@@ -1,6 +1,15 @@
 #!/bin/sh
 # test_m2a_stage4_code.sh — M2a stage-4 gate: ported code + engine hooks.
 #
+# WHAT: the M2a stage-4 build (ported code and engine hooks): the bare-long sibling veto
+#   holds in extraction (the seven operand-pair sites byte-identical to vs2, a non-zero veto
+#   count), the full moveset replay runs END-clean under the -debug guard, and the masked
+#   legacy gate passes against the target resolved from the build's fingerprint.
+# HOW: the stage-4 build on MAME: the extract log, replay 12 guarded, the masked legacy
+#   suite through the registry.
+# EXPECTS: veto, bring-up and superset all green; an unregistered fingerprint stops the gate
+#   as a rule-6 signal.
+#
 # Locks (all measured 2026-07-25, session 7):
 #   1. Extraction correctness: the bare-long sibling veto holds — the seven
 #      operand-pair sites that were being corrupted (docs/GOTCHAS.md) are

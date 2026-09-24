@@ -3,6 +3,14 @@
 # assertion, and must refuse env vars it does not implement (14z-94,
 # GitHub #31). Needs ROMDIR + a WIDE build; ~2 min.
 #
+# WHAT: the crash guard (replay_guard.lua) carries the input-integrity assertion — a stray
+#   host press is INPUT-VIOLATION, not a clean PASS — and REFUSES env vars it does not
+#   implement (MASK_RANGES) rather than silently producing an unmasked log.
+# HOW: a WIDE build on MAME: a clean guarded run, one with an injected press, and one
+#   passing MASK_RANGES (~2 min).
+# EXPECTS: the violation caught at its frame, the unsupported variable refused, the clean
+#   run clean. Not portable.
+#
 # WHY. replay_guard.lua's header advertised "same env contract ... can
 # substitute for replay.lua in any gate". Two things made that false:
 #

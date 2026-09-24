@@ -2,6 +2,13 @@
 # test_movability_liveness.sh — ground truth that tests/audit_region_movability.sh
 # cannot score a DEAD emulator as a successful run (14z-90, GitHub issue #5).
 #
+# WHAT: audit_region_movability.sh cannot score a DEAD emulator as `runs`: a never-started
+#   or empty-log rig must FAIL and be named `dead`, and a live rig must still score `runs`.
+# HOW: the audit's BUILDER_CMD and GUARDED_RUNNER seams take stubs (no builds, seconds): a
+#   never-started runner, an empty log, and a live positive leg.
+# EXPECTS: the two dead rigs fail as `dead`, the live one scores `runs`; the positive leg is
+#   not optional.
+#
 # WHY. The audit's verdict used to derive from the ABSENCE of a crash string:
 #
 #     tools/run_replay_guarded.sh ... || true

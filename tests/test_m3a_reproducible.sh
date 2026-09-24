@@ -1,6 +1,16 @@
 #!/bin/sh
 # test_m3a_reproducible.sh — the M3b Phase 0 reproducibility gate (14z-65).
 #
+# WHAT: every frozen reference rebuilds BIT-EXACT from the current tree: the three solo
+#   tenant builds, the stock twin and the merged image (the one that gets played), each
+#   against its frozen fingerprint — three independent tenant fingerprints are three oracles
+#   over any machinery refactor.
+# HOW: rebuilds each track into a scratch dir with tools/build_donovan.sh and compares
+#   fingerprints and artifact manifests (skipping the merged image, and saying so, when its
+#   untracked inputs are absent).
+# EXPECTS: every fingerprint equal; a moved fingerprint is a failed change whatever it was
+#   trying to do. ~4 min, ROMDIR only.
+#
 # EVERY frozen reference must rebuild BIT-EXACT from the current tree. The
 # CURRENT values live in the EXPECT_* lines below — READ THOSE, not this
 # header: the four names it used to list carried fingerprints superseded

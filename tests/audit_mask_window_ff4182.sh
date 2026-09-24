@@ -2,6 +2,16 @@
 # audit_mask_window_ff4182.sh — on-demand audit of the third masked
 # window (14z-49, maintainer-ratified round 64).
 #
+# WHAT: the third masked window ($FF4182-$FF41A1, the palette-fade staging slot for select
+#   block-A row 14) hides exactly the designed medallion-recolour diff and nothing else: at
+#   the historical first divergence the build's slot holds the ported row, vanilla's holds
+#   vanilla's, and every surrounding byte is identical.
+# HOW: a $FF4140-$FF41DF dump of vanilla and the build under test at 05_timeout_idle f9126
+#   on MAME, compared byte by byte.
+# EXPECTS: (1) vanilla row 14 in vanilla's slot, (2) the ported row in the build's, (3)
+#   identical outside the window. A (3) failure is stop-and-root-cause, never a mask
+#   widening.
+#
 # THE WINDOW: RAM:$FF4182-$FF41A1, the palette-fade staging buffer's
 # slot for select palette-block-A row 14 (docs/game/atlas/ram.md). It is
 # masked out of the legacy oracle because the 14z-49 medallion recolor

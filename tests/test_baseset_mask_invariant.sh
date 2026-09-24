@@ -2,6 +2,15 @@
 # test_baseset_mask_invariant.sh — a .masked spec's baseset must be frozen
 # under the same mask the set runs (14z-94, GitHub #62). ROM-free, ~1 s.
 #
+# WHAT: every `.masked` spec cites a basis frozen under the SAME mask the expectation set
+#   runs — statically, across the whole tree, including sets no current build dispatches to
+#   (masked bytes are skipped from the checksum, so a v2 log cannot be compared under a v3
+#   mask).
+# HOW: pairs each spec's baseset with the set's mask file and the basis's MASK record
+#   (ROM-free, ~1 s).
+# EXPECTS: every pairing consistent; a red is a one-token retarget or mask edit the suite
+#   itself could not detect.
+#
 # THE INVARIANT was stated in run_suite.sh's own header — "A .masked spec's
 # <baseset> MUST be the vanilla basis generated under the SAME mask (masked
 # bytes are skipped from the checksum, so v2 logs cannot be compared under a

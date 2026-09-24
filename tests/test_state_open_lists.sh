@@ -4,6 +4,18 @@
 # HERE, and THE LEDGER's keys (14z-154; maintainer-ruled 2026-09-14, CLAUDE.md
 # [VSP-17]). ci_portable: no ROM, no build dir, no emulator, ~1 s.
 #
+# WHAT: an open list holds only what is open: STATE.md's 'Decisions pending' and
+#   NEXT_SESSION's START HERE carry no closed marker, STATE stays within its size budget and
+#   session-group count with exactly the four standing sections and no ticket list, standing
+#   rulings are one line each with a home, and every ledger key in either line form resolves
+#   to an archived record — violations that predate the rule frozen shrink-only.
+# HOW: tools/check_state_lists.py over STATE.md, docs/NEXT_SESSION.md and STATE_HISTORY.md
+#   against tests/expected/state_open_lists_debt.txt (~1 s); seven controls on perturbed
+#   copies (a struck-through pending entry, a DONE start-here entry, a ticket section, a
+#   fourth group, an over-budget file, an unresolved ledger key in each line form).
+# EXPECTS: no new violation and no listed one that stopped occurring; each control fails. It
+#   does not claim an entry with no marker is open.
+#
 # MUST-FIRE: perturbed-copy: closed-pending-entry — a struck-through DECIDED entry added to "Decisions pending" must fail as a pending violation
 # MUST-FIRE: perturbed-copy: closed-start-here — a DONE entry added to docs/NEXT_SESSION.md "START HERE" must fail as a start-here violation; this branch parsed ZERO entries from 2026-09-18 (when the section became a NUMBERED list and the parser knew only bullets) until 14z-172, and no control exercised it
 # MUST-FIRE: perturbed-copy: ticket-section — an "Open bugs" section added under the standing sections must fail (tickets are never listed in STATE)

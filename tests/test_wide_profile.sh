@@ -1,6 +1,17 @@
 #!/bin/sh
 # test_wide_profile.sh — CPS-2 WIDE profile gate (Phase B).
 #
+# WHAT: the CPS-2 WIDE profile is safe on FBNeo: the patched binary runs stock vsavj
+#   bit-identically to a pre-patch reference binary (the emulator superset invariant, Rule 1
+#   v2), and the WIDE set behaves bit-identically to the stock set on the same binary
+#   (inertness) — both on per-frame work-RAM AND framebuffer checksums over the legacy
+#   corpus.
+# HOW: FBNeo runs of the corpus on the reference and patched binaries and on the stock and
+#   WIDE sets; the reference guard refuses a reference that carries the profile; controls
+#   point FBNEO_REF at the WIDE binary and stub `strings` to find nothing.
+# EXPECTS: both invariants hold on both checksums; the superset leg skips LOUDLY without
+#   FBNEO_REF; both controls fail at the guard.
+#
 # MUST-FIRE: known-bad: contaminated-ref — the reference guard must REFUSE the WIDE binary under test, a reference that carries the profile by construction; in-gate it classifies that binary before any negative on FBNEO_REF is trusted, and the mode points FBNEO_REF at it and must FAIL at the guard (#137)
 # MUST-FIRE: shadow-tool: blind-predicate — a `strings` that finds nothing must leave the guard UNPROVEN, so the gate FAILS without trusting any negative on FBNEO_REF; in-gate the stub makes the WIDE binary read as clean, and the mode puts it first on PATH for the run (#137)
 #

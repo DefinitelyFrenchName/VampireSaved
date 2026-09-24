@@ -4,6 +4,17 @@
 # slice L3). ci_static: needs ROMDIR (or a warm decrypt cache), no build dir,
 # no emulator, ~2 s on a warm cache and ~35 s cold (three sets to decrypt).
 #
+# WHAT: the atlas's ROM-shaped claims are re-derived from the decrypted images: every
+#   registered check quotes its claim from the document and derives the same fact from the
+#   view, every @table negative control fires, the coverage NOTE is re-emitted at column 0,
+#   and the covered set equals the frozen tests/expected/checkdocs_rom_covered.tsv as a
+#   multiset.
+# HOW: tools/checkdocs_rom.py over the three decrypted views (~2 s warm); five controls: a
+#   reworded claim (STALE), a flipped ROM byte (MISMATCH), a PARAPHRASE claim's literal
+#   perturbed (MISMATCH), a vacuous @table validator, a dropped covered row.
+# EXPECTS: every check derived equal, the note printed, the covered set exact; each control
+#   caught. Coverage is NOTE-class, never fatal (ruled).
+#
 # MUST-FIRE: perturbed-copy: reworded-claim — a quoted claim reworded in a copy of the atlas must be reported STALE (mode: section 2 runs over that copy)
 # MUST-FIRE: perturbed-copy: flipped-rom-byte — one byte flipped at a checked address, in a copy of the view, must be a MISMATCH
 # MUST-FIRE: perturbed-copy: paraphrase-literal — the PARAPHRASE claim's literal fact perturbed in a copy of the view must be a MISMATCH (the declared class cannot degrade into a silent skip)

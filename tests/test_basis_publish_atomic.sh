@@ -2,6 +2,14 @@
 # test_basis_publish_atomic.sh — freezing a masked basis is all-or-nothing
 # (14z-94, GitHub #86). ROM-free, no MAME, ~3 s.
 #
+# WHAT: freezing a masked basis is all-or-nothing: a failure on replay N of M leaves no
+#   mixed-generation basis (no new MASK beside old logs) in the live destination.
+# HOW: the REAL tools/freeze_masked_basis.sh symlinked into a fake repo with a stub MAME
+#   runner that fabricates logs and fails on a named replay, on the second run only, or
+#   nondeterministically; section 0 proves the harness drives the real file.
+# EXPECTS: no partial publish in any failure shape; a red is the oracle trust root becoming
+#   a mixed generation by a route the write-side guards cannot see.
+#
 # THE DEFECT. tools/freeze_masked_basis.sh wrote MASK and then each replay's
 # log/sha into the LIVE destination as that replay passed. A failure on
 # replay 5 of 8 therefore left four new logs, four old ones, and a new MASK

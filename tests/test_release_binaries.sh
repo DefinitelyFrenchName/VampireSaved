@@ -15,6 +15,21 @@
 # shipped binary is proven to be the same instrument the gates ran, not a
 # recipe believed equivalent. mame + fbneo, ~2 min.
 #
+# WHAT: the prebuilt emulator binaries for THIS host are what their record says (sha256 per
+#   file), self-contained (every reference resolves inside the folder), signed, carry the
+#   WIDE profile, and BOOT the merged romset — FBNeo headless 20 s, MAME -verifyroms
+#   flagging exactly the rewritten members and reproducing one frozen masked legacy
+#   expectation; and the shipped release applied to pristine dumps yields a STANDALONE set
+#   complete by the emulator's own descriptor and behaviourally identical to the gated build
+#   on both emulators, the --no-qsound-bios variant behaving as the MiSTer README promises.
+# HOW: the record, otool/ldd/codesign, strings and boot legs on the resource dirs; section 3
+#   applies the release and compares whole-RAM and framebuffer checksums on MAME and the
+#   harness FBNeo; four controls (a flipped library byte, an absolute reference, a QSound
+#   completion member with wrong bytes, a gfx completion member with wrong bytes).
+# EXPECTS: every leg green, the QSound-member control caught by 3a's -verifyroms alone and
+#   the gfx-member control by the framebuffer alone (work RAM is blind to both); a red names
+#   the file, reference or member. ~11 min with section 3.
+#
 # AND SINCE 2026-09-20, SECTION 3: the SHIPPED release directory applied to the pristine
 # dumps must yield a STANDALONE romset — one zip, no parent, no QSound BIOS zip — that is
 # (3a) COMPLETE by the emulator's own descriptor, `-verifyroms` against that set alone

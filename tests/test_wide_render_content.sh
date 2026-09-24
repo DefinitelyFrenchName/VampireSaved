@@ -3,6 +3,17 @@
 # content's tiles (and only where designed), measured in the emulator's
 # own decoded gfx memory.
 #
+# WHAT: the WIDE track SERVES the ported content's tiles where designed, in the emulator's
+#   decoded gfx memory: Donovan's band at WIDE bank 4 equals the stock track's at bank 2,
+#   WIDE bank 2 equals PRISTINE (Jedah restored — the de-substitution invariant), the stock
+#   band differs from pristine (the dump is not blind), a zero-poisoned group C is rejected
+#   and changes the dump, and the real cell-0x13 pick completes with a live framebuffer.
+# HOW: member identity statically, then decoded tile-memory dumps on WIDE MAME for both
+#   tracks and pristine, the poison control, replay 36.
+# EXPECTS: the three band equalities as designed, the poison rejected and visible, liveness.
+#   Donovan rendered as garbage for two sessions with every RAM gate green — this is the
+#   missing gate.
+#
 # WHY THIS EXISTS (14z-60z). Donovan and Anita rendered as garbage on the
 # WIDE track for two sessions while EVERY automated gate stayed green: the
 # RAM gates are structurally blind to the video path (14z-55) and nothing

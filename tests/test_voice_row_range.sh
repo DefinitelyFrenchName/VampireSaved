@@ -2,6 +2,15 @@
 # test_voice_row_range.sh — the AUTHORED arcade-ladder rows must stay inside
 # vanilla's value range (14z-93, GitHub #92). ~2s, no emulator.
 #
+# WHAT: the AUTHORED arcade-ladder rows (tables A and B at each tenant's class index) stay
+#   inside vanilla's value range — the largest safe stage value is 0x16, derived from the
+#   two tables — so the pointer-table lookup never reaches the terminator row (the vec3 that
+#   Huitzil's and Pyron's 0x18 entries caused).
+# HOW: reads each tenant build's authored rows from the DATA view and derives the bound from
+#   the stage-name pointer table (~2 s, no emulator).
+# EXPECTS: every authored value at or below the derived bound; the bound follows the table
+#   if it grows.
+#
 # THE FILENAME IS THE 14z-93 READING, CORRECTED 14z-94 (#92). The rows were
 # first read as VOICE-CLASS rows; they are the ARCADE LADDER's — table A holds
 # candidate CLASSES, table B the STAGE for each, and `$FF8100` is the stage

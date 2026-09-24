@@ -3,6 +3,16 @@
 # reaper is HEALED, not trusted (14z-133b). ROM-free, ~5 s (three local
 # clones of emu/jtcores, hardlinked).
 #
+# WHAT: a jtsim scratch clone hollowed by the macOS tmp reaper (tracked files gone, .git
+#   intact) is HEALED in place by `mister_mra.sh --ensure-scratch`, a clone whose object
+#   store is hollow too is re-cloned at the pin, and a fresh scratch is cloned at the pin
+#   with nothing missing.
+# HOW: three local hardlinked clones of emu/jtcores shaped as fresh, reaped, and
+#   store-hollowed (ROM-free, ~5 s); the control cuts the heal block from a copy of the
+#   tool, which must leave the reaped clone hollow.
+# EXPECTS: the three shapes handled as stated and the control failing; a red is the 0-second
+#   'Cannot open macros.def' red returning between two static runs.
+#
 # MUST-FIRE: shadow-tool: heal-removed — a copy of mister_mra.sh with the 1b HEAL block cut must leave a hollowed clone hollow (mode: section 2 runs that copy, and must fail)
 #
 # THE CLASS. tools/mister_mra.sh and tools/run_sim_jtcps2.sh keep a clone of

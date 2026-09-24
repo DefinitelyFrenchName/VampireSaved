@@ -3,6 +3,15 @@
 # numbers (14z-94, GitHub #77). ROM-free structurally; the functional half
 # runs only if a built binary and ROMDIR are present. ~5 s.
 #
+# WHAT: the FBNeo harness bounds replay frame numbers BEFORE its arithmetic (cap 10,000,000
+#   frames, re-derived from the longest replay in tests/replays, never trusted), so a
+#   mistyped frame can neither truncate a replay silently nor wrap the allocation into an
+#   out-of-bounds write.
+# HOW: structural check of the harness source (ROM-free); the functional half runs a built
+#   binary against an over-cap script when the binary and ROMDIR are present.
+# EXPECTS: the cap present and derived, the over-cap script refused. Trace every derived sum
+#   before narrowing an overflow finding (the header's own correction).
+#
 # THE DEFECT. parse_script() took frame numbers as unrestricted UINT32 and fed
 # them to unchecked arithmetic:
 #

@@ -2,6 +2,14 @@
 # test_qs_window_law.sh — ground truth for the QSound sample-window endpoint
 # law (14z-93, GitHub #82). No ROMs, no emulator, ~1s.
 #
+# WHAT: the QSound sample-window endpoint law — a record's end offset is played and looped
+#   INCLUSIVE — is declared once in tools/qs_window.py and every consumer (the song builder
+#   and both voice-batch audits) resolves to it, with bounds CHECKED not clamped.
+# HOW: 14 cases over the shared module and its consumers (no ROMs, ~1 s), including a
+#   terminal-byte corruption control and a control reproducing the old exclusive blindness.
+# EXPECTS: every case as specified; a red is the tree contradicting itself about the byte
+#   that caused the sword-plant beep.
+#
 # THE LAW: a record's `end` offset is played and looped INCLUSIVE (packing
 # law #3, 14z-87b). Proven twice — by field width (native windows end at
 # 0xFFFF, which an exclusive reading cannot express) and by the sword-plant

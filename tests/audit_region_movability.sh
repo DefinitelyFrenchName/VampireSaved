@@ -1,6 +1,16 @@
 #!/bin/sh
 # audit_region_movability.sh — which regions can actually live in wide_ext?
 #
+# WHAT: which of Donovan's regions can live in the WIDE extension (region_space): anim,
+#   aux0_4, the x06717c code region and hitbox(+proj) each build and RUN when moved there —
+#   the measurement that cleared the merge's crypt-window constraint after anim's crash was
+#   traced to a baked placed address.
+# HOW: builds a Donovan variant per case with the region moved, runs replay 12 guarded on
+#   MAME and scores runs / crash; the liveness of that scoring is
+#   tests/test_movability_liveness.sh's.
+# EXPECTS: every measured region runs. Scope stated: one tenant's regions; Huitzil's and
+#   Pyron's anim are unmeasured here.
+#
 # WHY (M3b, 14z-77). The merge's binding constraint is the CRYPT WINDOW, not
 # total size: one tenant already saturates hole_a, and three tenants keeping
 # their own region copies need 761,316 bytes of its 264,544

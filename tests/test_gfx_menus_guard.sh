@@ -2,6 +2,14 @@
 # test_gfx_menus_guard.sh — ground truth for the pixel gate's rompath guard
 # (14z-90, GitHub issue #6).
 #
+# WHAT: the pixel gate's rompath guard tests the SET ZIP, not the directory: an absent
+#   rompath and a vsavjw-only rompath both FAIL (MAME would otherwise resolve missing
+#   members by hash from $ROMDIR and compare vanilla to vanilla-frozen goldens forever), and
+#   a proper rompath still runs.
+# HOW: three cases without the emulator (the guard fires first) and a positive control that
+#   starts MAME (~40 s).
+# EXPECTS: two refusals and one run; a directory check alone passes the dangerous case.
+#
 # WHY. tests/test_gfx_menus.sh hardcoded build/donovan6/rompath while its
 # caller built into $OUTBASE, so on any non-default outbase the soaks and the
 # masked legacy gate measured one build and the pixel gate measured another.

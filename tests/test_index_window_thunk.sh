@@ -1,6 +1,18 @@
 #!/bin/sh
 # test_index_window_thunk.sh — the (b') index-window thunk gate (14z-79).
 #
+# WHAT: the index-window thunk at engine site 0x018460 (covering vsavj's 80-entry sub-state
+#   table's out-of-range window for the tenants) is byte-identical to what
+#   tools/gen_index_window_thunk.py derives from the two reference ROMs, the engine around
+#   it is vanilla (the table, the sibling dispatcher, the handler pool), and the table still
+#   has exactly 80 entries.
+# HOW: reconstruction from the decrypted views compared with the build's image (never a
+#   tolerance diff); three verdict controls perturb a trampoline address, a table word and a
+#   danger body.
+# EXPECTS: site, body and surroundings as reconstructed, the table at 80; each control
+#   caught. One wrong trampoline is a silent wrong-routine dispatch — the class the thunk
+#   removes.
+#
 # WHAT IT LOCKS. The thunk at engine site 0x018460 that covers the
 # OUT-OF-RANGE INDEX WINDOW of vsavj's sub-state table 0x018468 (80 entries;
 # vs2's twin has 84). It fixes two confirmed Phobos defects — Plasma Trap

@@ -3,6 +3,15 @@
 # (14z-83 S1): the same-source-or-fail rule every gfx pass now routes
 # through. Pure functions on synthetic simms — no ROMs, no emulator, ~1s.
 #
+# WHAT: build_gfx_donovan.place()'s same-source-or-fail rule on every pass: a clean write
+#   records provenance, a same-source duplicate skips benignly keeping the first provenance,
+#   DIFFERENT bytes raise naming both provenances, and no pass bypasses place() (the only
+#   direct write_tile on a destination is inside it).
+# HOW: pure functions on synthetic simms (no ROMs, ~1 s) plus a textual coverage check of
+#   the passes.
+# EXPECTS: the four cases as designed; the different-bytes case must actually raise or the
+#   gate fails.
+#
 # The verdict logic is itself under test (CLAUDE.md §4): a collision gate
 # that cannot fail is not a gate, so the different-bytes case must RAISE
 # and the test FAILS if it does not (RH-25).

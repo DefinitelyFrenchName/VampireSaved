@@ -1,6 +1,16 @@
 #!/bin/sh
 # test_m2a_stage2_data.sh — M2a stage-2 gate: Donovan passive data.
 #
+# WHAT: the M2a stage-2 build (Donovan's passive data under Jedah's code and anim): slot
+#   0x0F loads Donovan's relocated hitbox base and companion from the generator's
+#   placements, a full round completes coherently under the cheap guard with the pick window
+#   exception-free under -debug, and the superset invariant holds (legacy green, pick
+#   divergence at 2886).
+# HOW: the stage-2 build on MAME: the pick replay's RAM reads, a ~9300-frame round, the
+#   -debug guard over the pick window, the legacy suite.
+# EXPECTS: coherence and provenance hold; behaviour correctness is deliberately not gated at
+#   this mixture.
+#
 # Stage 2 injects Donovan's hitbox + projectile-hitbox blobs and all his
 # per-character value rows; Jedah's code and anim stay (dispatch 00/01 still
 # route through the stage-1 trampolines). The mixture is wrong-but-defined:

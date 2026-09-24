@@ -2,6 +2,14 @@
 # test_member_classify.sh — PROGRAM and GFX members must never be confused,
 # and the three classifiers must agree (14z-94, GitHub #19). ~2 s.
 #
+# WHAT: PROGRAM and GFX romset members are never confused (the PRG suffix class excludes
+#   `m`, so `vsw.41m`/`vsw.43m` at the documented --gfx 8 growth path stay GFX) and the
+#   three classifiers agree.
+# HOW: the classifiers over the current member names and over the names that do not exist
+#   yet (~2 s).
+# EXPECTS: every name classed as its kind on all three classifiers; a red is a gfx member
+#   loaded as program at the next member count.
+#
 # THE DEFECT. `_PRG_RE` matched `.41`-`.44` with an optional single-letter
 # suffix, so it also matched the GFX members `vsw.41m` and `vsw.43m`. The gfx
 # namer emits `vsw.{31+2i}m`; at the currently-used `--gfx 4` it stops at

@@ -2,6 +2,14 @@
 # test_meter_in_field_map.sh — the dual-emulator oracle must actually compare
 # meter (14z-94, GitHub #83). ROM-free, no emulator, ~2 s.
 #
+# WHAT: the dual-emulator oracle's field map (tests/fields_m2a.tsv) actually compares METER
+#   — both halves, both players — at the addresses the atlas documents, as CLAUDE.md §4
+#   names it.
+# HOW: the TSV checked for the four rows and their atlas addresses; section 3 plants a
+#   difference confined to a meter byte in synthetic dumps and compare_fields.py must catch
+#   it (ROM-free, ~2 s).
+# EXPECTS: rows present, bound to ram.md, the meter-only difference caught.
+#
 # THE DEFECT. CLAUDE.md §4 states the dual-emulator protocol compares "mapped
 # gameplay state at sync anchors ... character IDs, HP, positions, timer,
 # METER, and the other fields in docs/game/atlas/ram.md". tests/fields_m2a.tsv

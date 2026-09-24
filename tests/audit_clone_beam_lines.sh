@@ -2,6 +2,17 @@
 # audit_clone_beam_lines.sh — the GitHub #109 lock: Phobos' DF clone-mode
 # attack must draw the BEAM-LINE sprites (effect-class row 31).
 #
+# WHAT: the #109 lock: Phobos's Dark Force clone-mode attack draws the BEAM-LINE sprites
+#   (effect-class row 31, the emitter vs2 ships and vsavj stubbed) — with EXPECT_LINES=1, at
+#   least MIN_LINES 16x1 line entries inside the beam window at the native code family under
+#   our composition, pal 05.
+# HOW: the clone rig on MAME with the OBJ list dumped EVERY frame of the window (the lines
+#   strobe on alternating frames, so single-frame dumps miss them); the muzzle-burst set
+#   must appear in both modes as rig liveness; the control forces EXPECT_LINES=0 with the
+#   lines present.
+# EXPECTS: the lines present and the burst present; the forced-defect mode fails.
+#   EXPECT_LINES=0 freezes the pre-fix signature (zero 16x1 entries) on an old build.
+#
 # MUST-FIRE: known-bad: expect-lines-flip — with the beam lines actually present, asserting the DEFECT signature (EXPECT_LINES=0) must fail (mode: EXPECT_LINES is forced to 0 so "line entries present but EXPECT_LINES=0" fires and the gate FAILs)
 #
 # THE MECHANISM (measured 14z-102, the whole chain on the issue): the

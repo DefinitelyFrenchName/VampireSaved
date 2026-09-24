@@ -2,6 +2,17 @@
 # test_capture_kf_ownership.sh — THE CAPTURE-KEYFRAME POINTER TABLE IS
 # HAND-OWNED, AND NO GENERIC bank_map REPOINT MAY WRITE IT (14z-130).
 #
+# WHAT: the capture-keyframe pointer table PRG:0x0BE27A (32 longs by attacker id) is
+#   HAND-OWNED by data_port rows, and no generic bank_map repoint writes it — which would
+#   discard Donovan's mirror-victim fix and Pyron's ported row 0x11; the model (longs,
+#   variant rows aliasing base rows) is read from the reference ROM and the shipped image,
+#   never from the patch.
+# HOW: static over pristine vsavj's data view and each track's verify_data.bin: the model,
+#   the repoint inventory, the base-slot fix word on the stock track and its absence on the
+#   variant track; controls perturb an unclaimed row, plant the fix on the variant blob, and
+#   remove it from the stock track.
+# EXPECTS: model, inventory and fix words as frozen; all three controls fail.
+#
 # MUST-FIRE: perturbed-copy: perturbed-unclaimed-row — an unclaimed row perturbed in a copy of the first image must change the repoint inventory (mode: section 2 reads that copy and must fail)
 # MUST-FIRE: perturbed-copy: fix-on-variant-track — the base-slot fix word planted on donovan's VARIANT-track blob must be caught by section 3 (the 14z-143 defect; mode: section 3 reads that copy)
 # MUST-FIRE: perturbed-copy: fix-gone-on-stock — the 14z-64 fix removed from the base-slot track must be caught by section 3 (mode: section 3 reads that copy)

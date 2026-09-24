@@ -2,6 +2,15 @@
 # test_gfx_tiles.sh — fact-locks for the CPS-2 gfx tile layout understanding
 # (M2b groundwork, session 14). Static only: reads reference zips, no MAME.
 #
+# WHAT: the CPS-2 gfx tile layout facts the port's cross-sibling assumptions rest on: vsav2
+#   and vhunt2 share gfx layout (>= 200,000 tiles matching at the same index), vsav2 and
+#   vsav share art but REPACKED (>= 195,000 non-blank tiles found content-addressed, <
+#   10,000 at the same index), and naive contiguous 32-byte slicing does NOT reproduce that.
+# HOW: tile decoding in the Cps2LoadOne-derived canonical form over the reference zips
+#   (static, no MAME).
+# EXPECTS: the three locks as measured 2026-07-28; the slicing trap stays documented by
+#   failing.
+#
 # Locks (measured 2026-07-28, correct Cps2LoadOne-derived canonical form):
 #   1. vsav2 vs vhunt2 (siblings): >=200000 tiles match AT THE SAME INDEX
 #      -- the sibling pair shares gfx layout, the property every

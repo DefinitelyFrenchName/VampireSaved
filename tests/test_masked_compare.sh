@@ -3,6 +3,16 @@
 # ONE implementation of the CLAUDE.md §4 masked comparison vocabulary
 # (14z-97, GitHub #96).
 #
+# WHAT: tests/lib/masked_compare.sh, the ONE implementation of the §4 masked vocabulary
+#   (exact / flicker / diverge / window / composite plus the baseset-mask guard) shared by
+#   run_suite and the M2 battery, DISPATCHES each spec line to the right checker with the
+#   right arguments and turns its result into the right verdict — each class in both
+#   directions.
+# HOW: synthetic specs and logs through the library (no ROMs, ~2 s), including the diverge
+#   case that caught the lift's temp-file-stem bug.
+# EXPECTS: every class accepting its shape and rejecting a laxer one; a red means run_suite
+#   and the battery could read one spec two ways.
+#
 # WHY. The vocabulary used to live inline in run_suite.sh, where its only
 # proof was the corpus itself: if a class was subtly wrong, the way you found
 # out was a wrong verdict on a real build. Lifting it out for the M2 battery

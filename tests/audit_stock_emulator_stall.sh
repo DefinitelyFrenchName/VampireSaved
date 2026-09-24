@@ -5,6 +5,15 @@
 # vector, no gameplay. This is the README's "if it does not work" diagnostic, measured.
 # mame (the WIDE binary AND the stock reference binary), ~1 min (three MAME runs).
 #
+# WHAT: the WIDE romset forced into an UNPATCHED MAME (renamed vsavj.zip) boots, prints
+#   wrong checksums and STALLS on the QSound legal screen without a crash — the README's 'if
+#   it does not work' diagnostic, kept true across freezes.
+# HOW: three MAME runs: the real WIDE run, the stock reference binary on the renamed set,
+#   compared per frame (RAM identical through 468, divergent from 469, no crash vector); the
+#   control runs the 'stock' leg on the WIDE binary, where the divergence must be absent.
+# EXPECTS: the frozen divergence frame and no crash; the control fails. A build that
+#   crashed, garbled or played on a stock emulator would falsify the README and fail here.
+#
 # MUST-FIRE: known-bad: wide-binary-no-stall — the same replay on the PATCHED binary with the real set must NOT diverge from itself at the frozen frame: under the mode the "stock" leg is the WIDE binary on the real set, so the divergence is absent and this gate must FAIL
 #
 # WHY. A user who renames vsavjw.zip to force it into a stock emulator sees a legal screen

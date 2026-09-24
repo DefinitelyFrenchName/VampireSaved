@@ -8,6 +8,16 @@
 # clean checkout has no build dirs, so on the CI runner it could only SKIP (which
 # the portable tier rightly counts as failure).
 #
+# WHAT: the character-data OVERRIDE channel round-trips: the hand-written
+#   charmap_<tenant>.toml compiles into the `# BEGIN charmap … # END charmap` block of the
+#   tenant manifest, and the committed block equals a fresh compile; an override whose
+#   expect does not match the vs2 bytes, or whose expect and value differ in length, is
+#   REFUSED.
+# HOW: tools/charmap_compile.py over the override files and the manifests, reading the
+#   freeze dirs' extracts (~1 s; ci_static for that reason); three controls (wrong expect,
+#   length mismatch, a stale block).
+# EXPECTS: blocks equal, both bad overrides refused, the stale block failing --check.
+#
 # MUST-FIRE: known-bad: wrong-expect — an override whose `expect` does not match the vs2 bytes must be REFUSED by the compiler (mode: it replaces donovan's override file in the main check)
 # MUST-FIRE: known-bad: length-mismatch — an override whose expect and value differ in length must be REFUSED
 # MUST-FIRE: known-bad: stale-block — a valid override compiled against a manifest whose block does not carry it must fail --check

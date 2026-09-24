@@ -3,6 +3,19 @@
 # (14z-114; level 0 added 14z-134). ci_portable: no ROM, no build dir, no
 # emulator, ~1 s.
 #
+# WHAT: the eight skills are locked to the docs they distil: every `- [PFX-N]` rule is
+#   anchored exactly once as `**[PFX-N]**` in its docs and every anchor has a rule, the
+#   level-0 and level-1 skills name nothing board- or game-specific, every number a skill
+#   quotes appears in a LOG, every cross-reference names a defined rule, and every lifted
+#   rule keeps its old ID as a redirect.
+# HOW: tools/checkskills.py over .claude/skills/*/SKILL.md and the docs (~1 s) with
+#   extractor self-tests; eleven controls perturb copies (an unanchored rule, a stripped
+#   anchor, a game name in level 1, a number no log carries, a dangling cross-ref, a port
+#   token in the game skill, a VSP anchor outside STATE's standing sections, a board name in
+#   level 0, a deleted redirect stub).
+# EXPECTS: every rule anchored both ways and every control failing; a red is a skill quoting
+#   something no document holds.
+#
 # MUST-FIRE: perturbed-copy: unanchored-rule — a rule appended to a level-1 skill with no anchor in any doc must be reported ANCHORED NOWHERE
 # MUST-FIRE: perturbed-copy: stripped-anchor — the first MSV anchor stripped from mister_map.md must leave its rule ANCHORED NOWHERE
 # MUST-FIRE: perturbed-copy: game-name-in-level1 — a level-1 (board) skill naming a character must fail the liftability test

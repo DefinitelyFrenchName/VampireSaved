@@ -2,6 +2,17 @@
 # test_release_asset_shape.sh — EVERY PUBLISHED ASSET IS SELF-SUFFICIENT, and
 # the two emulator routes never travel together. ROM-free, no emulator, ~10 s.
 #
+# WHAT: every published release asset is SELF-SUFFICIENT (README, applier, page, manifest,
+#   patch set) and the two emulator routes never travel together: a prebuilt asset carries
+#   no driver patch or recipe, a recipe asset no binary, and every file of the platform
+#   directory reaches an asset.
+# HOW: the lists the real uploader produces under --dry-run (writes nothing into the tree)
+#   checked for the five properties; controls mix the routes, drop the applier, drop the
+#   page.
+# EXPECTS: every asset self-sufficient and unmixed, completeness both ways; the three
+#   controls fail. It does NOT claim the assets on GitHub are these — the uploader's
+#   download-back cmp does.
+#
 # MUST-FIRE: perturbed-copy: route-mixed — a prebuilt asset that also carries EMULATOR.md and the driver patch must FAIL: that is the 14z-149 shape the maintainer ruled out, a player handed a patch their binary already contains
 # MUST-FIRE: perturbed-copy: applier-missing — an asset with no apply_release.py must FAIL: without the applier a download cannot build the romset, which is exactly what "self-sufficient" denies
 # MUST-FIRE: perturbed-copy: page-missing — an asset with no apply_release.html must FAIL: the browser applier is the route for a player who has no terminal, and an asset that drops it sends that player back to the command line the page exists to replace

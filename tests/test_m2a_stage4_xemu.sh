@@ -4,6 +4,14 @@
 # authoring rules) on MAME and on patched FBNeo; mapped gameplay fields
 # must agree at the match-start anchor and pre-battery follow offsets.
 #
+# WHAT: the patched stock build runs replay 17 on MAME and on patched FBNeo and the mapped
+#   gameplay fields agree at the match-start anchor and the pre-battery follow offsets (the
+#   §4 dual-emulator protocol for new content).
+# HOW: MAME wide-window dumps and an FBNeo coarse-then-fine anchor scan,
+#   tools/compare_fields.py over the compared offsets.
+# EXPECTS: agreement at the anchor and follow offsets; the FBNeo run completing is the
+#   cross-emulator crash-freedom.
+#
 # Follow offsets stay BEFORE the in-match battery (absolute frame 2600,
 # anchor ~2363): the two emulators reach the anchor a few frames apart, so
 # anchor-relative frames after scripted inputs land on different content —

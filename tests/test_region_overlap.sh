@@ -1,6 +1,15 @@
 #!/bin/sh
 # test_region_overlap.sh — freeze what the three tenants' regions do together.
 #
+# WHAT: what the three tenants' regions do together: 17 shared spans, 8 name collisions, 13
+#   unique, and the bytes two or more tenants write DIFFERENTLY (2,000 on the original trio,
+#   2,033 on the shipped one) — which cannot be placed once by dedup; placement
+#   normalisation is proven load-bearing (7,591 raw against 2,000).
+# HOW: tools/audit_region_overlap.py over the three builds' blobs with placement
+#   normalisation (static, no ROMs); --no-normalise is the control only.
+# EXPECTS: the frozen counts exact on both trios; two-tenant spans report UNDECIDABLE, never
+#   a reassuring zero.
+#
 # WHY (M3b, 14z-77). M3b_plan Phase 2 item 2 assumes "a shared span is placed
 # ONCE and all tenants' relocations resolve through the shared placement".
 # This gate freezes the measurement that decides whether that is achievable,

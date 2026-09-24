@@ -5,6 +5,16 @@
 # and `ldd` on PATH — so the verdict logic is proven on any host, not only on the Linux
 # box that runs the release gate. ROM-free, no Linux toolchain needed, ~1 s.
 #
+# WHAT: tools/check_host_libs.py holds a Linux release folder to its rule — every file's
+#   direct NEEDED sonames are shipped and resolve in the folder, or are on the external
+#   host-provided list (manylinux_2_39 plus ruled exceptions); nothing 'not found' — proven
+#   on any host with stub readelf and ldd.
+# HOW: a fixture folder under stub tools: it passes and counts what it asks the host for; a
+#   soname on no list fails; a 'not found' fails; an empty list and a folder without ELF
+#   refuse; the real list file's shape is checked; controls remove the bundled libSDL2 and
+#   strip the RUNPATH.
+# EXPECTS: the five sections as listed, both controls failing rules R1 and R2.
+#
 # MUST-FIRE: perturbed-copy: bundled-lib-removed — the fixture folder with its bundled libSDL2 removed must FAIL rule R1 (the change the release gate's absolute-reference control makes on Linux) (mode: section 1 checks that copy)
 # MUST-FIRE: perturbed-copy: runpath-lost — the fixture with the executable's RUNPATH gone, so the stub loader resolves the SHIPPED libSDL2 from /usr/lib, must FAIL rule R2 (mode: section 1 checks that copy)
 #

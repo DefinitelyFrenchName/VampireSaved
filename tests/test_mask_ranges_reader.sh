@@ -2,6 +2,14 @@
 # test_mask_ranges_reader.sh — the MASK_RANGES reader must mask exactly what
 # the spec says (14z-94, GitHub #61). ~1 min, needs ROMDIR + a WIDE build.
 #
+# WHAT: the MASK_RANGES reader masks EXACTLY the spec — a nested or overlapping window no
+#   longer rewinds the position and re-includes excluded bytes — and refuses nonsense; inert
+#   on every frozen set (all live masks disjoint and ascending), proven directly.
+# HOW: a WIDE build on MAME with crafted mask strings compared with the expected exclusions
+#   (~1 min).
+# EXPECTS: exact masking on nested, overlapping and normal masks, nonsense refused. Not
+#   portable.
+#
 # WHY IT MATTERS. The mask string IS the definition of the ratified comparison
 # basis (CLAUDE.md §4, docs/game/atlas/ram.md). Every `.masked` expectation
 # cites one. freeze_masked_basis.sh grew three guards in 14z-89 because a

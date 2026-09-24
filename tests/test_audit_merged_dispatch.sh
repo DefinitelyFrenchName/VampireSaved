@@ -3,6 +3,14 @@
 # that tests/audit_merged_legacy.sh now runs before its leg-(a) glob
 # (14z-90, GitHub issue #17).
 #
+# WHAT: the expectation enumeration audit_merged_legacy.sh runs before its leg-(a) glob sees
+#   every kind — a `.pending` pairing (no ratified class in any set) is named NOT-EVALUATED,
+#   never dropped silently by a *.masked-only glob.
+# HOW: ROM-free and emulator-free: the enumeration over the expectation directories with
+#   synthetic and real cases (donovan-m5 must name exactly 2 NOT-EVALUATED).
+# EXPECTS: every kind enumerated and the live case's count exact; a red means the audit's
+#   blind spot is back over the one open superset regression.
+#
 # WHY. That audit evaluated `*.masked` only. `.pending` marks a legacy pairing
 # with no ratified class in ANY set — the exact state the audit exists to
 # detect — so the two dropped replays put its blind spot over the project's one

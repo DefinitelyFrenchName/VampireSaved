@@ -3,6 +3,19 @@
 # lands in SDRAM exactly where docs/project/mister_map.md section 5 places it.
 # (14z-107 (9).)
 #
+# WHAT: slice D2's core evidence: the CPS-2 WIDE romset lands in SDRAM exactly where
+#   mister_map.md places it — every one of the 67,108,864 bytes of the four dumped banks
+#   checked against the map — with the reference core placing the same image the reference
+#   way (group C aliasing onto banks 2+3), the re-pack confined to bank 0 on a stock image,
+#   and the census tool calibrated on a mapping nobody changed.
+# HOW: four Verilator download legs (cps2w+WIDE, cps2+WIDE, cps2w+stock, cps2+stock), all
+#   four banks dumped and compared by tools/mister_sdram_census.py (which replays the
+#   download mapping and the GFX scramble); cross-checks between legs independent of the
+#   tool; controls census leg A against the STOCK map and move a placement constant.
+# EXPECTS: leg A exact against the WIDE map, B failing it with banks 2+3 differing from A, C
+#   and D identical on banks 1-3 and differing on bank 0; the controls fail; REFUSES without
+#   the sim prerequisites.
+#
 # MUST-FIRE: known-bad: perturbed-map — the WIDE image must NOT match the STOCK map, so comparing leg A against the wrong map must fail (mode: leg A is censused against the STOCK map and the census fails, so the gate FAILs; REFUSES with exit 3 if the sim prerequisites are absent)
 #
 # WHY A CENSUS AND NOT A REPLAY. D2 PLACES the romset; the fetch that READS

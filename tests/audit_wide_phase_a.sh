@@ -4,6 +4,16 @@
 # prints a decision line. Run on VANILLA vsavj: these measure what the
 # ORIGINAL game does, which is what the profile must not disturb.
 #
+# WHAT: the CPS-2 WIDE Phase A architecture questions on VANILLA vsavj — is linear PRG
+#   growth to 6 MB inert (unmapped address space), is OBJ y-word bit 12 free as the 19th
+#   tile-address bit, is growing the gfx region inert for scroll3, and is there Z80 driver
+#   ROM room for new sample rows — each answered with a decision line.
+# HOW: measurement runs on pristine vsavj on MAME over the corpus, one section per question,
+#   each ground-truthing its own instrument before trusting a null.
+# EXPECTS: a decision line per section consistent with the approved WIDE plan
+#   (docs/project/cps2_wide.md); a section whose instrument cannot see its own positive
+#   control is not a null.
+#
 #   A1  unmapped 68k address space   -> is PRG linear growth to 6MB inert?
 #   A2  OBJ y-word bit 12            -> is the 19th tile-address bit free?
 #       (bit 15 is NOT available: it terminates the CPS-2 sprite list)

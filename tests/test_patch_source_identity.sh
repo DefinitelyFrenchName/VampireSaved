@@ -2,6 +2,14 @@
 # test_patch_source_identity.sh — a patch may only be applied to the source
 # set it was generated against (14z-94, GitHub #18). ~5 s, no emulator.
 #
+# WHAT: a patch applies only to the source set it was generated against: the generator
+#   records `src_program_identity` (a sha1 over the program members in load order) and
+#   patch_prg refuses a mismatch; an absent identity is a warning (inline synthetic patches
+#   are legitimate), pinned as deliberate.
+# HOW: patch_prg against a matching, a mismatching and an identity-less patch (~5 s, no
+#   emulator); both sides compute the identity from the same helper.
+# EXPECTS: mismatch fatal, absence warned, match applied. Not portable.
+#
 # THE GAP. A generated patch.json carries only {op, addr, val|hex|path}: no
 # expected-old bytes and no statement of what it was generated AGAINST. All
 # the old-byte verification in this project lives in gen_donovan_patch.py and

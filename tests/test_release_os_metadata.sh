@@ -1,6 +1,15 @@
 #!/bin/sh
 # test_release_os_metadata.sh — a file manager's folder metadata (`.DS_Store`) in a release tree is never shipped and never counted: the real uploader cuts no asset carrying one, and every release listing that can see a dotfile drops it through the one definition, tests/lib/os_metadata.sh. ROM-free, ~3 s.
 #
+# WHAT: a file manager's folder metadata (.DS_Store) in a release tree is never shipped and
+#   never counted: the uploader cuts no asset carrying one, and every release listing that
+#   can see a dotfile drops it through the one definition tests/lib/os_metadata.sh.
+# HOW: the filter over a path list (exact basename only); the REAL uploader under --dry-run
+#   in a throwaway repo with .DS_Store planted in four places; the three listings' wiring
+#   read from the scripts; the control disables the filter in a shadow copy of the lib.
+# EXPECTS: no list and no zip carrying a dotfile, the wiring present; the disabled filter
+#   lets the plant into an asset list and fails.
+#
 # MUST-FIRE: shadow-tool: filter-disabled — a shadow copy of tests/lib/os_metadata.sh whose filter passes every path must let a planted `.DS_Store` into the synthetic release's asset lists (mode: section 2 runs the uploader against that copy and must FAIL)
 #
 # WHY (maintainer-ruled 2026-09-14: "they must be ignored"). Finder writes a

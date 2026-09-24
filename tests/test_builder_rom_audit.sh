@@ -2,6 +2,13 @@
 # test_builder_rom_audit.sh — every builder that reads $ROMDIR must run the
 # mandatory checksum gate first (14z-94, GitHub #28). ~5 s, no emulator.
 #
+# WHAT: every builder that reads $ROMDIR runs the mandatory checksum audit FIRST and refuses
+#   an unauditable $ROMDIR with CLAUDE.md §3's message before writing any artifact — and a
+#   real $ROMDIR gets past it.
+# HOW: each builder invoked against a fake unauditable romdir and against the real one, the
+#   refusal timing checked against artifact writes (~5 s, no emulator).
+# EXPECTS: early refusal on the bad romdir, pass-through on the good one.
+#
 # CLAUDE.md §3: "Verify SHA-1 against docs/checksums.txt before any session
 # that reads them. If checksums mismatch, stop." build_donovan.sh did this;
 # build_merged.sh did not, while reading $ROMDIR at five points — so pointing

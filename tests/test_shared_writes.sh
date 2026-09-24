@@ -1,6 +1,17 @@
 #!/bin/sh
 # test_shared_writes.sh — the frozen shared-surface write inventory (14z-79).
 #
+# WHAT: every build op that lands outside declared free space and outside a known variant
+#   row is FROZEN per tenant in build/manifest/shared_writes.toml, and any addition, removal
+#   or change fails — the build-time event for the next Bulleta-class write (a tenant row
+#   landing on a vanilla character's data).
+# HOW: tools/audit_shared_writes.py over each tenant build against the frozen inventory
+#   (static, seconds; SKIPs absent builds); the positive control finds the withdrawn
+#   DF-palette write in the frozen huitzil-m2 build; two verdict controls add and remove a
+#   synthetic write.
+# EXPECTS: inventories unchanged, the real defect flagged on hui27, both controls caught.
+#   HONEST LIMIT: a pass means unchanged since reviewed, not safe.
+#
 # WHAT IT LOCKS. Every build op that lands outside declared free space and
 # outside a known variant row is enumerated per tenant in
 # build/manifest/shared_writes.toml. Any addition, removal or change fails.

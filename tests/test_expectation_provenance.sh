@@ -2,6 +2,14 @@
 # test_expectation_provenance.sh — every frozen expectation file says WHERE ITS
 # NUMBERS CAME FROM (14z-128). ROM-free, ~1 s.
 #
+# WHAT: every frozen expectation FILE directly under tests/expected/ (and tests/expect/) has
+#   a row in PROVENANCE.md saying where its numbers came from, and no row names a file that
+#   is gone — complete both ways.
+# HOW: the register read against the directory listing (~1 s); controls delete a row and add
+#   a row for a missing file.
+# EXPECTS: both directions complete; each control fails. A register that is confidently
+#   incomplete is read as exhaustive, which is worse than none.
+#
 # MUST-FIRE: perturbed-copy: deleted-row — the page with one row removed must report that file as unprovenanced (section 1 fails)
 # MUST-FIRE: perturbed-copy: dead-row — the page with a row naming a file that does not exist must be caught (section 1 fails)
 #

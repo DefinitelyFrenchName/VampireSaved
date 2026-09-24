@@ -2,6 +2,16 @@
 # test_pointer_flow.sh — the composed-output pointer/flow comb as a gate
 # (14z-100, the hardening program's H1; maintainer-directed 2026-08-20).
 #
+# WHAT: every address the patch introduces (op extents, poke32 repoint values, code abs.l
+#   operands, data bare longs) classifies against the op map and the SHIPPED image bytes as
+#   frozen per build: STRONG findings verbatim (each reviewed), WEAK volume by count —
+#   growth either way fails.
+# HOW: tools/audit_pointer_flow.py over each build dir's outputs against
+#   tests/expected/pointer_flow/<set>.txt (reads build outputs only; SKIPs per absent
+#   build).
+# EXPECTS: the frozen findings and counts exact; a new STRONG finding is an unreviewed
+#   pointer into fill space, a moved count a build that is not the frozen one.
+#
 # tools/audit_pointer_flow.py classifies EVERY address the patch introduces
 # (op extents, poke32 repoint values, code abs.l operands, data bare longs)
 # against the op map + the SHIPPED image bytes (the vsw.* members carry

@@ -3,6 +3,16 @@
 # (14z-122, the documentation rationalization pass). ci_portable: no ROM, no
 # build dir, no emulator, ~2 s.
 #
+# WHAT: every hand-written document's SHAPE is declared in docs/doc_shape.tsv and enforced:
+#   completeness, no session-shaped header or bold chronology paragraph in a
+#   REFERENCE/REGISTER doc, no anchors in HIST files, twins two-way, banners where required,
+#   no dangling doc link in README/HANDOFF/CLAUDE.md, every section citation in tools/ and
+#   tests/ real, and the README's Contents reaching every declared document with its shape
+#   tag.
+# HOW: tools/checkdocshape.py --no-pending over the tree (~2 s); fifteen controls, one per
+#   rule, on perturbed copies.
+# EXPECTS: the tree clean under the end-state mode and every control reported.
+#
 # MUST-FIRE: perturbed-copy: chronology-header — a session-shaped header appended to a REFERENCE doc must be reported
 # MUST-FIRE: perturbed-copy: anchor-in-hist — a rule anchor in a HIST-class doc must be reported
 # MUST-FIRE: perturbed-copy: undeclared-doc — a markdown file with no doc_shape row must be reported

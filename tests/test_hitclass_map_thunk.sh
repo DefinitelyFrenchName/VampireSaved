@@ -3,6 +3,16 @@
 # reconstructs from the two reference ROMs, and any committed row matches
 # the reconstruction byte-for-byte.
 #
+# WHAT: the hit-class map-extension thunk body (vanilla's 64 bytes verbatim, vs2's 16
+#   extension entries, a loud ILLEGAL at or past 80) reconstructs from the two reference
+#   ROMs with the generator's own safety asserts, and every committed manifest row matches
+#   the reconstruction byte for byte.
+# HOW: tools/gen_hitclass_map_thunk.py from the decrypted views, the output compared with
+#   the site_thunk rows of the real manifests; controls corrupt a committed hex and invoke
+#   the generator on a wrong image.
+# EXPECTS: reconstruction and rows equal; the corrupted hex fails the compare and the wrong
+#   image fails the generator.
+#
 # THE CLAIM. vsavj's projectile-pool hit sweep maps BOTH colliding
 # objects' type bytes through one 64-entry byte map (routine PRG:0x1A888,
 # seven callers); vs2's sibling map has 80 entries. A ported object of

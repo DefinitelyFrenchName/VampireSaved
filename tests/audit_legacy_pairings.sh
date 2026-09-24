@@ -2,6 +2,18 @@
 # audit_legacy_pairings.sh — WHICH REPLAYS ARE LEGACY CONTENT, and is every
 # one of them compared against VANILLA rather than against itself?
 #
+# WHAT: every replay that loads only vanilla characters on the build (a LEGACY pairing,
+#   judged by the fighters' hitbox bases, never by the filename) carries a `.masked` or
+#   `.pending` expectation compared against VANILLA — a self-frozen `.sha1` on legacy
+#   content is the 14z-88 hole where a superset regression sat green; a tenant-loading
+#   replay keeps its `.sha1`.
+# HOW: every non-skipped replay run bare on MAME as run_suite does (no pokes), the loaded
+#   characters read from +0x60 and classed LEGACY / TENANT / NO-MATCH by
+#   tools/check_legacy_pairings.py against the expectation kinds; a LEGACY verdict may be
+#   overridden only by a printed `.legacy-exempt` reason.
+# EXPECTS: no legacy pairing on a bare .sha1, every override printed, NO-MATCH replays
+#   reported for hand judgement.
+#
 # WHY THIS EXISTS (14z-89, closing the gap 14z-88 exposed the hard way).
 # The 14z-87b medallion row move cost `38_victor_p1_vsavj` — P1 Victor vs
 # P2 cell 0x0F — one main-loop iteration at the select->VS fade, and the

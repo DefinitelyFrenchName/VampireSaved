@@ -2,6 +2,16 @@
 # test_shim_charid.sh — the init shim can identify WHICH tenant it is running
 # for, because (0x382,A6) already holds the character id when it runs.
 #
+# WHAT: the init shim can identify WHICH tenant it runs for: at char-init (0x382,A6) already
+#   holds the character id, on BOTH player structs — the premise the merged shim's per-id
+#   flavour chain rests on.
+# HOW: GUARD_PROBE_MEM reads memory at the shim's hit on two 2P replays on MAME with the
+#   forced-pick pokes (without them the shim never runs and the gate measures nothing —
+#   section 0 proves the probe armed); the verdict control reads offset +0x000, which must
+#   NOT hold the id.
+# EXPECTS: 0x13 read at +0x382 on both structs, the control offset not; a quiet leg without
+#   section 0 is a dead rig.
+#
 # WHY (M3b slice G, 14z-77). A merged build has ONE init shim serving N
 # tenants, and each needs a different VS2/VH2 flavor byte. `flavor_tail()`
 # therefore emits `cmpi.b #id,(0x382,A6)` per tenant — which is only correct

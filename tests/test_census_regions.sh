@@ -3,6 +3,17 @@
 # 14z-66 data_in_code + pcrel-escape censuses, promoted to a tool for the
 # D4 step-2 Pyron early warning, 14z-67).
 #
+# WHAT: tools/census_regions.py (the data_in_code and pcrel-escape censuses) reproduces the
+#   FROZEN inventory on the Huitzil extraction (5 data_in_code rows, the x02592a 89->35 and
+#   x026142 9->6 escapes, the adjacency-safe code->x057456 cluster, two known operand false
+#   positives, the x05c800 pair covered) and Pyron's own code stays clean with the
+#   shared-zone findings mirrored.
+# HOW: the tool over a stage-4 Huitzil build (self-built unless given) and the Pyron
+#   extraction, the counts compared with the frozen ones, adjacency asserted from
+#   placements.json.
+# EXPECTS: every census number as frozen; growth in ANY number is stop and root-cause
+#   (latent escapes bite later).
+#
 # Section 1 — INSTRUMENT VALIDATION on the full Huitzil extraction (the
 # known inventory, frozen):
 #   data_in_code: EXACTLY the 5 shipped manifest rows (readers 0x056020/

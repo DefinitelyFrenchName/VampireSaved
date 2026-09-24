@@ -1,6 +1,18 @@
 #!/bin/sh
 # test_mame_wide.sh — CPS-2 WIDE profile gate, MAME side (B5).
 #
+# WHAT: the CPS-2 WIDE profile is safe on MAME as on FBNeo: the patched binary runs stock
+#   vsavj bit-identically to the reference binary (the emulator superset invariant), the
+#   WIDE set behaves bit-identically to the stock set on the same binary (inertness), and
+#   the B4 canary proves the 19th tile-address bit reaches the appended banks
+#   (pixel-identical with sprites relocated at draw time).
+# HOW: replays on MAME comparing per-frame work-RAM AND framebuffer checksums (replay.lua
+#   VIDEO_OUT) across the reference/patched binaries and the stock/WIDE sets, plus the
+#   CPS2_WIDE_CANARY=1 run.
+# EXPECTS: all three invariants hold on both checksums; the superset leg skips LOUDLY
+#   without the reference binary. The framebuffer half is what sees a video-path change RAM
+#   cannot.
+#
 # The MAME twin of tests/test_wide_profile.sh. Same two invariants, same
 # two bases, so that "the profile is safe" is a claim two unrelated
 # emulator codebases have each had to satisfy independently:

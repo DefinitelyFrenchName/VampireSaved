@@ -4,6 +4,16 @@
 # inferred_claims row 9; closes the GUESS "the fuchsia class was most likely
 # fixed at 14z-67").
 #
+# WHAT: Phobos's 214+LP GROUND explosion draws native vs2's own art tile for tile: the set
+#   of palette-06 explosion tile CONTENTS our build draws across the detonation equals
+#   native's (441 tiles, intersection 441, 0 ours-only, 0 native-only) and none is blank —
+#   closing the 'most likely fixed' guess.
+# HOW: replay 83d on the merged build and on native vs2 on the same WIDE MAME binary, the
+#   OBJ list dumped every frame across the detonation and each drawn tile decoded to its
+#   canonical content (phase-free: the legs run ~5-6 frames apart).
+# EXPECTS: ours-only 0, native-only 0, no blank explosion tile; a non-empty ours-only tile
+#   is a real divergence.
+#
 # WHY. engine_internals' grenade section (14z-70e/f) concluded the ground
 # mushroom "LOOKS right" from snapshots and that the original fuchsia report
 # "was most likely fixed" at the 14z-67 effect work — but the closing word

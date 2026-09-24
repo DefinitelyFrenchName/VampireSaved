@@ -6,6 +6,18 @@
 # sample-bank WIDTH fix AND slice D2's QSound SPLIT across two SDRAM banks
 # (`pcmh_sel = wide_en & pcm_addr[PCM_AW]`, a 1 MB window at PCMH_OFFSET).
 #
+# WHAT: the QSound extension is FETCHED on the core: while a tenant fights, the core issues
+#   SDRAM reads into the 1 MB high PCM window (DSP banks 0x80-0x8E, which stock CPS-2 cannot
+#   address) at image bytes overlapping the build's ledgered samples, and the same image
+#   with the profile bit clear issues NONE there while still issuing tens of millions of
+#   reads in QSound LOW (the liveness that makes the zero evidence about wide_en).
+# HOW: two Verilator legs (~94 min each, in parallel) of 108_tenant_voice with the SDRAM
+#   read probe on the high and low PCM windows; the ledger (tools/qs_ledger.py) says what is
+#   populated.
+# EXPECTS: high-window reads on the positive leg landing in ledgered samples, zero on the
+#   control with the low window busy; every address with pcm_addr[22:20] == 0, which is what
+#   makes the SLOT5_AW=20 mask lossless.
+#
 # This gate counts the SDRAM reads the core issues into that window while a
 # tenant is fighting, and requires the same image with the profile bit CLEAR
 # to issue NONE. It is the last major subsystem of the profile to get any

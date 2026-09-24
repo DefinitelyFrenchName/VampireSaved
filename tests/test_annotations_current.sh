@@ -3,6 +3,14 @@
 # (14z-123, the documentation rationalization pass). ci_portable: no ROM,
 # no build dir, no emulator, ~1 s.
 #
+# WHAT: docs/annotations.md, the GENERATED address -> label/comment stream, follows its
+#   carriers: a regeneration from every live carrier (the atlas, engine_internals, the
+#   reference docs, the manifests, tools/ and tests/) equals the committed file.
+# HOW: tools/gen_annotations.py --check over the tree (~1 s); controls add an address to a
+#   copy of the atlas and hand-add a row to the index.
+# EXPECTS: committed equals regenerated; a new carrier address fails until regenerated, a
+#   hand edit fails the cmp.
+#
 # MUST-FIRE: perturbed-copy: new-carrier-address — a carrier gaining a program address must fail --check until the index is regenerated (mode: a copy of the real carriers with one address added to the atlas)
 # MUST-FIRE: perturbed-copy: hand-edited-index — a row hand-added to annotations.md must fail the cmp, or the index stops being generated
 #

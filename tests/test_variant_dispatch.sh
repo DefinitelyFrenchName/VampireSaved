@@ -1,6 +1,16 @@
 #!/bin/sh
 # test_variant_dispatch.sh — THE VARIANT-ROW DISPATCH AUDIT (14z-75).
 #
+# WHAT: the variant-row dispatch sweep: for every 32-row per-character jump table whose
+#   variant half vsav aliases onto the base half, ours[tenant row] equals vs2's — rows where
+#   OURS runs a routine vs2 does not fail (Pyron's blink lived in three such tables), rows
+#   where vs2 runs one we do not are reported only.
+# HOW: tools/audit_variant_dispatch.py over the build's image against vs2's, every `jmp
+#   (d8,PC,Dn.w)` word table with a mostly-aliased variant half (5); controls reintroduce an
+#   aliased row into a copy and require no table left unjudgeable.
+# EXPECTS: clean for the tenant, the reintroduced row caught, every table judged (the twin
+#   finder matches by ordinal).
+#
 # The single most common defect shape in this port: a 32-row
 # per-character jump table where vsav ALIASES rows 0x10-0x1F onto
 # 0x00-0x0F, so a tenant at a variant id silently inherits a base-half

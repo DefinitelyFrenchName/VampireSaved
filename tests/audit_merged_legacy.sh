@@ -1,6 +1,19 @@
 #!/bin/sh
 # audit_merged_legacy.sh — does a 3-TENANT MERGED program image perturb LEGACY?
 #
+# WHAT: a 3-tenant MERGED program image does not perturb LEGACY: its legacy behaviour lands
+#   on the same ratified comparison classes as the frozen single-tenant builds (the merged
+#   build's own class table since 14z-91), with one ratified merged-specific exception on
+#   04_select_fuzz, and the merged init shim is planted on every declaring tenant's row
+#   (HENT == SHIM, PENT != SHIM).
+# HOW: the merged image packed against the zero-filled WIDE overlay (build/merged1, a
+#   legacy-only instrument with no registry row on purpose) run over the legacy corpus on
+#   MAME against vanilla, every class deviation printed with a proposed expectation line and
+#   FAILED, never absorbed; leg (b) covers the tenant content's crash-freedom.
+# EXPECTS: every legacy replay on its ratified class; a deviation is mechanism-attributed
+#   and maintainer-signed or it stays red. It proves NOTHING about tenant correctness (gfx
+#   pristine by design).
+#
 # WHY (14z-80 close, maintainer-ordered FIRST priority; counts re-frozen
 # since — see the op-count gate below). The 3-tenant merged patch APPLIES but
 # nothing merged had ever run in an emulator when this was written. This

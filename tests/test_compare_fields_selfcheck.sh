@@ -3,6 +3,14 @@
 # comparator (verdict-logic doctrine): its verdicts are trusted only after it
 # agrees on known-good content and disagrees on known-different content.
 #
+# WHAT: the dual-emulator field comparator agrees on known-good content (16_xemu_2p on MAME
+#   vs patched FBNeo at the match-start anchor and shortly after, all mapped fields) and
+#   FAILS on known-different content (16 on MAME vs 02_demitri_vs_cpu on MAME).
+# HOW: the two replays run on MAME and FBNeo, tools/compare_fields.py over the dumps with
+#   tests/fields_m2a.tsv.
+# EXPECTS: agreement on the positive control, exit 3 on the negative; the §4 protocol's
+#   first real exercise, kept as its ground truth.
+#
 #   1. Positive control (first real exercise of the amended CLAUDE.md §4
 #      protocol on known-good content): 16_xemu_2p on MAME vs patched FBNeo
 #      must agree on all mapped fields at the match-start anchor and shortly

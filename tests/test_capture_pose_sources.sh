@@ -5,6 +5,16 @@
 # measurement, made rerunnable — it locks every ROM fact the fix design
 # rests on, so drift in any of them is loud before the window opens.
 #
+# WHAT: the ROM facts the #104 fix design rests on: the positioner's id-unmasked read bytes,
+#   exactly five code sites carrying the table immediate, vsavj's 16 blocks aliasing or
+#   copying their variant half, vs2 and vh2 carrying twin blocks with distinct tenant rows
+#   and equal stride, every BASE sub-block byte-identical between vsavj and vs2, the
+#   signed-16-bit offset bound, and the 15-block port inventory.
+# HOW: static over the three decrypted images (~5 s warm), with two verdict controls
+#   perturbing a buffer each direction.
+# EXPECTS: every fact as measured 14z-99; a sixth consumer site, a drifted block or a broken
+#   premise fails.
+#
 # THE MECHANISM (engine_internals "THE CAPTURE-POSE INSTALLER"): the
 # capture positioner (PRG:0x02802E) resolves the ATTACKER's keyframe block
 # via 0xBE27A[attacker], then indexes the block's 32-word head by the

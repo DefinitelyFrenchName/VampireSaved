@@ -2,6 +2,16 @@
 # test_rompath_reject.sh — a REJECTED build does not keep its rompath: the
 # builders' EXIT trap (tools/rompath_reject.sh) moves it aside (14z-155, #139).
 #
+# WHAT: a REJECTED build does not keep its rompath: the builders' EXIT trap
+#   (tools/rompath_reject.sh) moves it aside on an explicit exit 1, a set -e failure, a
+#   `${VAR:?}` demand (exit 0 under a trap on bash 3.2, still failed), SIGTERM and a missing
+#   disarm, while a success keeps it and a failure before the pack has nothing to move; both
+#   real builders source it, arm it after the clear and disarm it after every verifier.
+# HOW: scripted builders sourcing the REAL helper under sh, bash and dash, plus the wiring
+#   read from both builders; controls disable the rename and move a disarm above the audit.
+# EXPECTS: every helper case and the wiring as specified; both controls fail. That a real
+#   build rejects end to end is not claimed (ROMs needed).
+#
 # MUST-FIRE: perturbed-copy: rename-disabled — a copy of tools/rompath_reject.sh whose rename never runs must fail the helper cases: a scripted builder exiting 1 after its pack then keeps its rompath
 # MUST-FIRE: perturbed-copy: disarm-early — a copy of tools/build_donovan.sh with its disarm moved above the member-identity audit must fail the wiring check: a build that audit rejects would keep its rompath
 #

@@ -1,6 +1,16 @@
 #!/bin/sh
 # test_input_integrity.sh — ground truth for the input-integrity check.
 #
+# WHAT: the input-integrity check works both ways: replay.lua's per-frame comparison of the
+#   live controller bits against what it staged is silent on a clean run and writes
+#   INPUT-VIOLATION at the right frame when a stray press lands (MAME's window can take host
+#   focus even under -video none).
+# HOW: a clean replay and a replay with an injected un-scripted press on MAME, comparing
+#   only the bits the harness can drive (the EEPROM data line on IN2 flagged every replay in
+#   the first draft).
+# EXPECTS: silent on clean, the violation at the injected frame; a check that has only ever
+#   been silent proves nothing.
+#
 # WHY IT EXISTS (session 14z-59c). Two MAME replay divergences went
 # unexplained through ~2,400 runs of statistics. The maintainer then
 # supplied the mechanism: the harness runs on their working laptop, and

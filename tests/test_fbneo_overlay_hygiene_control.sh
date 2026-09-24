@@ -3,6 +3,13 @@
 # Reconstructs the PRE-FIX runner (bare `ln -sfn`, no clear) and requires
 # tests/test_fbneo_overlay_hygiene.sh to FAIL against it. A hygiene gate that
 # has never seen the defect is indistinguishable from one that cannot see it.
+#
+# WHAT: the overlay-hygiene gate can SEE the defect it guards: reconstructed with the
+#   pre-fix runner (a bare ln -sfn, no clear), tests/test_fbneo_overlay_hygiene.sh must
+#   FAIL.
+# HOW: reconstructs the pre-fix runner into a scratch copy and runs the gate against it.
+# EXPECTS: the gate FAILS on the pre-fix runner; a gate that has never seen the defect is
+#   indistinguishable from one that cannot.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

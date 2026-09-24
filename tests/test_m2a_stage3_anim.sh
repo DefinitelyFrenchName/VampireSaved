@@ -2,6 +2,15 @@
 # test_m2a_stage3_anim.sh — M2a stage-3 gate: Donovan anim + sprite
 # sub-table clusters, still under Jedah's dispatch code.
 #
+# WHAT: the M2a stage-3 build (Donovan's anim and sprite clusters under Jedah's dispatch):
+#   after match start the anim cursor +0x1C lies inside the relocated region over an idle
+#   window, no crash across it, a full round completes, legacy green and the pick divergence
+#   at 2886.
+# HOW: the stage-3 build on MAME: the cursor sampled over ~600 idle frames, the -debug
+#   guard, the cheap-guard round, the legacy suite.
+# EXPECTS: as listed; a crash here is a waived-mixture artifact only with crash-stack
+#   evidence AND a passing stage 4.
+#
 # This is the ladder's weakest mixture: Jedah's state handlers index
 # Donovan's anim space. The gate is deliberately narrow — idle only:
 #   1. Anim system engages the relocated data: after match start, the anim

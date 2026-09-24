@@ -3,6 +3,16 @@
 # (14z-105, born with the select-screen version string's AUTHORED tiles —
 # the first tiles this project ever SYNTHESIZED rather than copied).
 #
+# WHAT: the CPS-2 OBJ tile bit law in tools/gfx_tiles.py: within each 8-pixel half of a tile
+#   row, plane bit i is pixel 7-i (pen 15 transparent); decode(encode(px)) and
+#   encode(decode(t)) round-trip; the pre-fix mirrored mapping reconstructed inline
+#   DISAGREES with encode on an asymmetric tile and a one-bit corruption does not
+#   round-trip.
+# HOW: synthetic tiles and random fields through the codec (ROM-free, ~1 s).
+# EXPECTS: the law, both round trips, both controls. Measured 14z-105: the mirrored encode
+#   drew every half mirrored on the real OBJ path, caught only because 'M6' is not
+#   symmetric.
+#
 # THE LAW IT LOCKS: within each 8-pixel half of a CPS-2 OBJ tile row,
 # plane bit i is pixel 7-i. MEASURED 14z-105: tiles encoded with bit i =
 # pixel i drew every half mirrored on the real OBJ path (MAME snapshot of

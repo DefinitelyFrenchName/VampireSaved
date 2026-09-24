@@ -1,6 +1,14 @@
 #!/bin/sh
 # test_mra_parts.sh — ground-truth for tools/check_mra_parts.py's VERDICT LOGIC.
 #
+# WHAT: tools/check_mra_parts.py's verdict logic — whether a bundle's MRA parts actually
+#   resolve against the zips by CRC32 (jtframe fills an unresolvable part with 0xFF rather
+#   than refusing) — on fixtures whose answer is known by construction.
+# HOW: ROM-free fixture zips written by the gate itself (ci_portable): a resolving MRA, one
+#   with a bogus CRC on its second part, one against a directory with no zip.
+# EXPECTS: the resolving fixture passes; the bogus CRC fails naming the one bad part; the
+#   missing zip fails with every part unresolved.
+#
 # MUST-FIRE: known-bad: bogus-crc — an MRA whose second part carries a CRC no zip member has must fail the resolver, naming the one bad part
 # MUST-FIRE: known-bad: missing-zip — an MRA resolved against a directory holding no zip at all must fail with every part unresolved
 #

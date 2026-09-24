@@ -2,6 +2,11 @@
 # test_compare_flicker.sh — ground truth for the flicker comparator's verdict
 # logic (CLAUDE.md §4: classification code is validated before its verdicts
 # are trusted). Synthetic logs, no emulator, fast.
+#
+# WHAT: the flicker comparator's verdict logic (the §4 v2 class): synthetic log pairs with
+#   known flicker inventories classify as PASS or FAIL as designed.
+# HOW: synthetic logs through tools/compare_flicker.py (no emulator, fast).
+# EXPECTS: every synthetic case as designed.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 W="$(mktemp -d)"

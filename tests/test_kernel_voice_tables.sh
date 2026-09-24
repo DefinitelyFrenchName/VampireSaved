@@ -1,6 +1,16 @@
 #!/bin/sh
 # test_kernel_voice_tables.sh — the KERNEL per-class voice tables (14z-96, GitHub #101).
 #
+# WHAT: the sound kernel's four per-class voice-id tables: vsavj's variant halves are
+#   byte-copies of the base halves (the grunt defect's alias shape), vs2's variant halves
+#   carry the newcomers' real rows (frozen verbatim), every entry of event .N ends in nibble
+#   N on both games, and 0x2a1/0x2a2 are FREE Z80 ids in both (the deliberate-silence
+#   premise).
+# HOW: static over the OPCODE views (the tables sit inside the crypt window) and both Z80 id
+#   tables; two verdict controls perturb a copy each direction.
+# EXPECTS: all four facts hold and both controls fail; a fix that ports the rows re-freezes
+#   section 1 deliberately.
+#
 # Freezes the ROM facts under the merged-m2 "grunt after the electrocution,
 # every other time" defect (engine_internals "The KERNEL per-class voice
 # tables"): the sound kernel carries FOUR per-class voice-id word tables

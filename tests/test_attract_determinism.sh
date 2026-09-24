@@ -2,6 +2,13 @@
 # test_attract_determinism.sh — M0 acceptance: a 60-second scripted
 # attract-mode run checksums work RAM identically across two fresh runs.
 #
+# WHAT: MAME is deterministic over a 60-second scripted attract-mode run: two fresh runs
+#   checksum work RAM identically every frame (the M0 acceptance).
+# HOW: two runs of the attract script on the reference set on MAME, the per-frame checksum
+#   logs compared.
+# EXPECTS: the two logs identical; a difference is a determinism failure of the instrument,
+#   not of the game.
+#
 # Usage: ROMDIR=/path/to/roms tests/test_attract_determinism.sh [set] [frames]
 # Defaults: vsavj, 3600 frames. PASS = per-frame checksum logs identical.
 set -eu

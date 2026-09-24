@@ -1,6 +1,15 @@
 #!/bin/sh
 # test_crypt_boundary.sh — code in the WIDE extension must be stored RAW.
 #
+# WHAT: code placed above vsavj's encryption window (PRG:0x100000) is stored RAW by the
+#   patcher: the cipher's crypt_words_at passes those words through unchanged in both
+#   directions, with the exact boundary word pinned — load-bearing for every ported routine
+#   in hole_b and the WIDE extension.
+# HOW: drives tools/cps2_decrypt.py's cipher over words straddling the boundary in both
+#   directions.
+# EXPECTS: words below the boundary transformed, words at and above it unchanged; a red
+#   means silently corrupted ported code.
+#
 # WHY THIS IS LOAD-BEARING. vsavj's CPS-2 encryption covers only
 # PRG:0x000000-0x100000 (HANDOFF "Key findings"); above that the CPU fetches
 # opcodes raw. The `code` ops the generator emits are re-encrypted by

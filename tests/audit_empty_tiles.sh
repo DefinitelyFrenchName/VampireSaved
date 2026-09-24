@@ -2,6 +2,15 @@
 # audit_empty_tiles.sh — does this build DRAW any sprite whose tile is
 # blank? (14z-69o, the child-shadow method, promoted to a test.)
 #
+# WHAT: the build DRAWS no sprite whose group-C tile is BLANK — a tile remapped into the
+#   band but never copied renders as a solid rectangle, invisible to every record, code and
+#   walk check (the child sidekick's shadow).
+# HOW: a replay on MAME with every drawn group-C sprite decoded from the emulator's tile
+#   memory and flagged if all-zero — complete over what the build renders, not a sample.
+# EXPECTS: zero blank tiles drawn; a hit names the code to add to
+#   build/manifest/extra_tiles/<char>.json. Ground-truthed: passes on hui14, fails on hui12
+#   naming both shadow tiles.
+#
 # WHY. A tenant's gfx remap rewrites tile codes in a band from the source
 # bank to group C. If a tile inside that band was never COPIED — because
 # the OBJ-record walk that builds the copy inventory follows pointers and

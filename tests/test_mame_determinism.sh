@@ -1,6 +1,14 @@
 #!/bin/sh
 # test_mame_determinism.sh — is MAME actually deterministic, run to run?
 #
+# WHAT: MAME's run-to-run determinism RATE on a short boot probe: N runs of the same binary,
+#   set and inputs must be identical; a divergence is preserved and classed PHASE SHIFT or
+#   TRANSIENT.
+# HOW: RUNS repetitions of the probe on MAME (JOBS parallel), the checksum logs compared
+#   pairwise, a divergent pair analysed by tools/analyze_divergence.py.
+# EXPECTS: every run identical. Coverage limit stated in the header: the 520-frame probe
+#   bounds the boot window only, not a full replay (PROBE= a replay measures that).
+#
 # The whole oracle rests on an assumption nobody had ever measured at
 # volume: that the same binary, the same set and the same inputs produce
 # the same work-RAM stream every time. B5 found two counterexamples in a

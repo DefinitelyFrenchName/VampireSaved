@@ -1,6 +1,16 @@
 #!/bin/sh
 # test_beam_variants.sh — the BEAM VARIANT + GFX-READINESS gate (14z-70h).
 #
+# WHAT: the beam port's premises: Phobos's three beam inputs (236+P, 236+K, 236+2P/2K) are
+#   ONE art path (pal 0x0C from his band, the ES simply richer), the ES really is the ES (a
+#   stock spent, more sprites than P/K), and every tile the variants draw is already in
+#   group C.
+# HOW: the native leg on MAME (~1 min) with the OBJ list dumped and multi-tile sprites
+#   expanded w*h (the dump reports the base code only); the stock byte asserted spent.
+# EXPECTS: one art path, the ES richer with a stock spent, 0 tiles missing from group C. An
+#   empty meter degrades the ES silently — the stock check is what makes the ES leg
+#   evidence.
+#
 # WHY IT EXISTS. Two facts the beam port rests on, both measured this
 # session and both easy to get wrong later:
 #

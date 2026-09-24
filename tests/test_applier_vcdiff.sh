@@ -2,6 +2,15 @@
 # test_applier_vcdiff.sh — SLICE A1 OF THE APPLIER APP: the JS VCDIFF decoder must
 # equal the tool of record on the bytes we actually ship (2026-09-20).
 #
+# WHAT: the JS VCDIFF decoder (tools/applier/vcdiff.mjs) equals the tool of record on the
+#   bytes we ship: every patch of the shipped release decodes to the manifest's exact size
+#   and SHA-1.
+# HOW: rebuilds the source blob from $ROMDIR as the applier does (asserting the blob's own
+#   sha1 first), decodes every patch under node and compares; the control flips one byte of
+#   a patch copy.
+# EXPECTS: every member's size and SHA-1 as the manifest declares; the flipped patch yields
+#   a mismatch or a refusal.
+#
 # docs/project/applier_app_scope.md recommends a static, client-side browser page as the
 # no-Python route to vsavjw.zip, and the ONE part of that which is not wiring is the
 # VCDIFF decoder — everything else the page needs is native (`deflate-raw`,

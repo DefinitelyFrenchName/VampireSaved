@@ -3,6 +3,17 @@
 # and every construct outside it FAILS (14z-140, living-docs slice L4).
 # ci_portable: no ROM, no build dir, no emulator, ~3 s.
 #
+# WHAT: tools/md_subset.py parses the markdown SUBSET the corpus writes strictly: its
+#   self-tests pass, every declared document and both skill GUIDEs parse inside the subset,
+#   each construct left OUT (h4, raw HTML, footnotes, images, autolinks, task lists,
+#   reference-link definitions, unclosed fences) raises, and the six corpus-forced rules
+#   (wrapped code spans, escaped pipes, optional leading pipe, pipes inside code spans,
+#   ragged rows normalised, the delimiter row) are accepted.
+# HOW: the parser over the corpus and over fixtures (~3 s); nine known-bad controls each
+#   appended to a copy of a corpus file.
+# EXPECTS: the corpus parses, every excluded construct raises, every accepted shape passes;
+#   a construct mis-read here renders wrong somewhere no reader would notice.
+#
 # MUST-FIRE: known-bad: h4-heading — an h4 heading must be rejected as outside the subset (mode: appended to a copy of one corpus file, which the corpus parse must then fail)
 # MUST-FIRE: known-bad: raw-html-div — raw HTML <div> must be rejected as outside the subset (mode: appended to a copy of one corpus file, which the corpus parse must then fail)
 # MUST-FIRE: known-bad: raw-html-b — raw HTML <b> must be rejected as outside the subset (mode: appended to a copy of one corpus file, which the corpus parse must then fail)

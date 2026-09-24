@@ -3,6 +3,14 @@
 # from the artifact it is auditing (14z-94, GitHub #89). ROM-free, no MAME,
 # ~2 s: the fixture fabricates romsets and ledgers.
 #
+# WHAT: a QSound audit's voice-id inventory comes from a ledger fingerprint-BOUND to the
+#   artifact it audits (over the members that determine voice playback), emitted at build
+#   time, and tools/qs_ledger.py refuses a mismatch or an absence before any emulator runs —
+#   never ids rebuilt from today's manifest against an older build.
+# HOW: fabricated romsets and ledgers through qs_ledger.py (ROM-free, ~2 s).
+# EXPECTS: match accepted, mismatch and absence refused; a red is an audit sweeping the
+#   wrong ids and calling the result a verdict on the artifact.
+#
 # THE DEFECT. The voice ids the QSound audits sweep come from the MANIFEST by
 # way of build_qs_songs.py's ledger — never from the romset. Handed a build
 # directory, both audits:

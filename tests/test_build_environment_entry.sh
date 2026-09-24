@@ -5,6 +5,16 @@
 # carries the captured environment, and every way an entry could rest on something other
 # than a capture REFUSES. ROM-free, no emulator, ~1 s.
 #
+# WHAT: tools/record_build_environment.py composes a build_environments.md entry only from a
+#   real capture: a host's BINARY.txt records plus the log of a PASSING release-binaries
+#   gate; every way an entry could rest on something else REFUSES.
+# HOW: synthetic records and logs: section 0 the capture (tests/lib/host_env.sh) against
+#   stub package managers, section 1 a passing pair composes the entry, section 2 a record
+#   for another os-arch refuses; controls turn the PASS line into FAIL and drop the env
+#   lines.
+# EXPECTS: the entry carries host, system, packages, pins, tree and the PASS line; every
+#   refusal refuses; both controls fail.
+#
 # MUST-FIRE: perturbed-copy: gate-not-passed — the synthetic gate log with its PASS line turned into a FAIL line must make the tool REFUSE, never print an entry (mode: section 1 reads that copy)
 # MUST-FIRE: perturbed-copy: env-lines-dropped — a synthetic record with its `env` lines removed must make the tool REFUSE (mode: section 1 reads that copy)
 #

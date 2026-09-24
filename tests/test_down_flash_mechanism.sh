@@ -2,6 +2,16 @@
 # test_down_flash_mechanism.sh — THE MECHANISM behind GitHub #113's one-frame
 # white-out, measured 2026-09-01 (14z-126b) and locked here.
 #
+# WHAT: the MECHANISM of #113's one-frame white-out: a deliberate palette-BASE swap — CPS-A
+#   register 0x80410a written from the normal 0x90c0 to 0x9240 for exactly one frame,
+#   0x924000 filled with ffff — exactly 4 times in the 6,700-frame run, each followed by an
+#   all-white frame and no white frame without one.
+# HOW: a register write tap on the live CPS-A block on MAME plus the framebuffer hashes; the
+#   control asserts the same 4-write shape against the normal base 0x90c0 (present on ~6,590
+#   frames), which must fail.
+# EXPECTS: 4/4 swaps each followed by white, the region all ffff, the control failing. WHY
+#   Capcom flashes is not established — mechanism only.
+#
 # MUST-FIRE: known-bad: normal-base-satisfies — the normal palette base 0x90c0 must NOT satisfy the 4-write flash shape, so demanding that it does must fail (mode: 0x90c0 is asserted to satisfy the shape, which it never does, so the gate FAILs)
 #
 # WHAT IT ASSERTS. The white frame is a DELIBERATE PALETTE-BASE SWAP, not a

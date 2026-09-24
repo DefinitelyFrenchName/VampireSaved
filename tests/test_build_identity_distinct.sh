@@ -2,6 +2,13 @@
 # test_build_identity_distinct.sh — a playtest build must be distinguishable
 # from its legacy-only instrument (14z-94). ROM-free, ~2 s.
 #
+# WHAT: the merged playtest build stays distinguishable from its legacy-only instrument
+#   (build/merged1), which SHARES its program fingerprint by design: the whole-artifact
+#   manifest discriminates them.
+# HOW: tools/artifact_manifest.py over both rompaths compared.
+# EXPECTS: the manifests differ; a red means a rebuild made the playable build and the
+#   blank-tenant rig indistinguishable by every measure.
+#
 # WHY THIS EXISTS. The maintainer asked which merged build to test, fearing
 # they had tested the wrong one. That fear was well founded and the obvious
 # check would NOT have settled it:

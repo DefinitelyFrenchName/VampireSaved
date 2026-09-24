@@ -3,6 +3,11 @@
 # (14z-65, M3b Phase 0). Two ops writing one word must be a BUILD ERROR that
 # names both ops; disjoint and word-adjacent ops must stay clean. No emulator.
 #
+# WHAT: patch_prg's op-overlap assertion: two ops writing one word is a BUILD ERROR naming
+#   both ops; disjoint and word-adjacent ops stay clean.
+# HOW: synthetic op sets through the real patcher (~2 s, no emulator).
+# EXPECTS: the overlap refused by name, the clean cases accepted.
+#
 # Usage: ROMDIR=... tests/test_patch_overlap.sh
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the

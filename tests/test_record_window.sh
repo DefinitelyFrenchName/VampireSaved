@@ -3,6 +3,16 @@
 # in-emulator windowed movie recorder (14z-94). ~40 s, needs ROMDIR + a WIDE
 # build; no frozen expectations.
 #
+# WHAT: tests/lua/record_window.lua, the in-emulator windowed movie recorder, records the
+#   frames it claims: the movie covers exactly the requested window, the same window
+#   recorded twice is byte-identical, a window the framebuffer checksum stream says CHANGES
+#   yields a materially bigger file than a still one, an inverted window aborts and an
+#   unclosed one reports FORCED.
+# HOW: MAME runs on a WIDE build with windows CHOSEN from the measured checksum stream at
+#   run time (no frame constant to rot), the files compared and sized.
+# EXPECTS: extent, determinism, liveness and both controls; nothing may be read off a
+#   recording until this passes.
+#
 # WHY THIS GATE EXISTS. A recorder that drops, duplicates or blanks frames
 # still produces a file that plays, and a human watching it cannot tell. Its
 # output is then used to date a visual event — which is exactly what the

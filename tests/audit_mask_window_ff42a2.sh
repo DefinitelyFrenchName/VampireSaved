@@ -6,6 +6,19 @@
 # replays. Kept as THE pre/post attribution instrument for any future
 # select-palette row move (it is what caught the 38 regression).
 #
+# WHAT: the pre/post attribution instrument for a select-palette row move: when a layout
+#   change moved a set's self-frozen tenant replays, did anything move OUTSIDE the ratified
+#   staging family — the pair must differ unmasked, and under the V3 mask be exact or differ
+#   only on isolated frames whose bytes all fall in the palette staging area, the
+#   OBJ-builder secondary stack, or the input-accept latch.
+# HOW: A/B of the PRE-move build against the POST-move build on each replay on MAME,
+#   unmasked and masked, with work RAM dumped at every isolated differing frame and every
+#   byte classified.
+# EXPECTS: (1) a differing unmasked pair (else the replay is not on the list), (2) exact or
+#   isolated-and-attributed under the mask; anything else is a mechanism outside the family
+#   — stop and root-cause (its first run caught the 38 regression this way). Its future is
+#   ticket #131.
+#
 # THE QUESTION: when the 14z-87b medallion move (Pyron's wheel pal_row
 # 0x1A -> 0x1D, one layout field) moved a set's self-frozen `.sha1`
 # replays, did anything move OUTSIDE the ratified staging family? Those

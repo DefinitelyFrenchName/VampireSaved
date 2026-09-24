@@ -1,6 +1,15 @@
 #!/bin/sh
 # test_gfx_menus.sh — pixel-level menu/UI regression gate (session 14s).
 #
+# WHAT: the title screen, the character-select screen and the speed menu on the build under
+#   test are PIXEL-identical to the frozen vanilla goldens (frames 650 / 950 / 1250), the
+#   medallion cell box masked on the two wheel frames because the wheel is ported by design.
+# HOW: MAME snapshots of the build compared with the committed goldens under tests/ (derived
+#   work, not ROM bytes — ruled), the cell box masked.
+# EXPECTS: zero pixels differing outside the mask; the RAM oracles are blind to this class
+#   (the session-14r overlay corrupted three menus while every RAM gate stayed green).
+#   --freeze regenerates the goldens from vanilla.
+#
 # WHY THIS EXISTS: every RAM-basis gate is blind to graphics. The
 # session-14r overlay tile placements corrupted the title screen,
 # select screen and speed menu (bank-1 "OBJ-dead" positions back

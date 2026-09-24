@@ -2,6 +2,13 @@
 # test_decrypt_oracle.sh — verify tools/cps2_decrypt.py against MAME's own
 # cps2crypt implementation (dual-implementation agreement).
 #
+# WHAT: tools/cps2_decrypt.py agrees with MAME's own cps2crypt: our decrypted image is
+#   byte-identical to MAME's opcode space (dual-implementation agreement).
+# HOW: decrypts the reference set with our tool and dumps MAME's opcode space, then compares
+#   byte for byte.
+# EXPECTS: byte-identical; a difference is a defect in one implementation's reading of the
+#   CPS-2 encryption.
+#
 # Usage: ROMDIR=/path/to/roms tests/test_decrypt_oracle.sh [set]   (default vsavj)
 # PASS = our decrypted image is byte-identical to MAME's opcode space.
 set -eu

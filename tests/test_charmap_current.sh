@@ -5,6 +5,16 @@
 # tools/charmap_gen.py -> tools/charmap_md.py and must equal a regeneration.
 # ci_static: needs the three solo build dirs; no ROM read, no emulator, ~20 s.
 #
+# WHAT: the character-data map (docs/project/tables/chars/<tenant>.{json,md}) follows the
+#   three current solo builds: every bank row, dispatch row, ported region's ATTRIBUTED byte
+#   diff, sfx record and FSM run regenerates identically, so an unattributed difference, a
+#   moved placement or a changed physics row changes the page and fails.
+# HOW: tools/charmap_gen.py -> charmap_md.py from each build's extract, image, placements
+#   and manifest, compared with the committed pages (~20 s; SKIPs without the builds);
+#   controls change one value byte inside donovan's placed hitbox region (unattributed +1)
+#   and apply an override row.
+# EXPECTS: pages equal; the changed byte and the override each regenerate a different map.
+#
 # MUST-FIRE: perturbed-copy: changed-built-byte — a copy of donovan's build with ONE value byte changed inside the placed hitbox region must regenerate a different map, its unattributed count up by one (mode: that copy is donovan's build in the main loop)
 # MUST-FIRE: perturbed-copy: added-override — an override row applied to donovan's generation must change the map (mode: the main loop generates donovan with that override file)
 #

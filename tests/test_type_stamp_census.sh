@@ -3,6 +3,15 @@
 # FROZEN inventory (build/manifest/type_stamps.toml), and its verdict logic
 # is alive in both directions.
 #
+# WHAT: the static type-stamp census (tools/audit_type_stamps.py) reproduces the FROZEN
+#   inventory build/manifest/type_stamps.toml — every family stamp, compare, reader and
+#   embedded-walker site, source-address-keyed — with its positive control (the six measured
+#   stamp sites seen) and negative control (the three unported stamps mapping to no tenant).
+# HOW: the scan over vsav2's opcode view and the three extract dirs against the frozen file
+#   (~5 s); controls demand a bogus extra site and tamper the frozen copy.
+# EXPECTS: no drift and both in-scan controls green; the bogus site fails the scan and the
+#   tampered copy fails verification.
+#
 # WHY (14z-82). The merged obj_hook fix renumbers TYPE NUMBERS inside
 # non-first tenants' region copies. That is only sound while every site
 # that WRITES or CONSULTS a family type is known; the frozen inventory is

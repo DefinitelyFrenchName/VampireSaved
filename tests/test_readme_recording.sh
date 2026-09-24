@@ -1,6 +1,19 @@
 #!/bin/sh
 # test_readme_recording.sh — the README's "record it on MAME" command, run as written on this host's release MAME against the current merged romset, records a session the project replays frame for frame: work RAM identical on every frame, on the release binary and on the tree's source-built MAME, from an empty nvram (14z-158).
 #
+# WHAT: the README's 'record it on MAME' command, run as written on this host's release MAME
+#   against the merged romset, records a session the project replays frame for frame — work
+#   RAM identical every frame on the release binary and on the source-built MAME, from an
+#   EMPTY nvram — and the README prose agrees with the command.
+# HOW: the indented command read out of README.md and run token for token from a player
+#   folder built as the README says (cps2 -> the release binary, the dumps path -> $ROMDIR;
+#   headless flags and -noreadconfig appended), the recording leg driven by replay 03, then
+#   playback on both binaries; a no-playback leg must differ; controls start playback from a
+#   used nvram and truncate the .inp.
+# EXPECTS: the .inp valid and complete, both playbacks covering every frame with
+#   byte-identical checksum logs, the idle leg departing at frame 300; the used nvram and
+#   the truncated recording fail.
+#
 # MUST-FIRE: perturbed-copy: used-nvram — a playback started from the nvram directory the recording run left behind (what a player's `nvram_fresh` holds once their session is over) must diverge from the recording and fail, so the comparison is proven able to fail and the README's EMPTY folder proven load-bearing
 # MUST-FIRE: perturbed-copy: truncated-inp — the recording cut to half its input stream must fail the frame-count check, so a playback that stops early can never pass as the whole session
 #

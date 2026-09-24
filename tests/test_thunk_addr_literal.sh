@@ -2,6 +2,15 @@
 # test_thunk_addr_literal.sh — ground truth for the STALE PLACED-ADDRESS guard
 # in tools/gen_donovan_patch.py (14z-78).
 #
+# WHAT: a placed address baked into a hand-authored site_thunk body is a BUILD error (the
+#   guard in gen_donovan_patch.py), opcode-anchored and word-aligned, with the
+#   addr_literal_ok escape hatch — and the three real manifests stay quiet under it.
+# HOW: the generator alone against an extract dir on COPIES of the manifests (~40 s, no
+#   emulator): the wrong spelling planted must be refused, the real manifests pass, two
+#   verdict controls; section 3c states the coverage boundary (a raw longword in embedded
+#   data is out of scope).
+# EXPECTS: the plant refused, the real manifests quiet, the controls caught.
+#
 # WHY THIS EXISTS. A `[[site_thunk]]` body is hand-authored machine code, and
 # anything the BUILD chooses that gets written into it as a literal is a trap:
 # the literal stops tracking the moment the build's choice changes, and nothing

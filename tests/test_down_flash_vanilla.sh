@@ -4,6 +4,16 @@
 # honest, so it stays): the one-frame
 # WHOLE-SCREEN WHITE at a down is VANILLA Vampire Savior behaviour, not ours.
 #
+# WHAT: #113's ground truth: the one-frame whole-screen WHITE at a down is VANILLA Vampire
+#   Savior behaviour — on stock vsavj the all-white framebuffer hash appears exactly at the
+#   attributable events (the match-intro pair, one at match start, one 50-120 frames after
+#   the first death flag) and NOWHERE ELSE.
+# HOW: tests/lua/inp_probe.lua (per-frame framebuffer fnv1a64 plus death flags) on stock
+#   vsavj with replay 104 on MAME; a white frame with no attributable event is the negative
+#   control.
+# EXPECTS: the inventory as measured (1909/1911, 2148, 6646 on vanilla 104); an unattributed
+#   white frame is a new flash, ours or the emulator's.
+#
 # Runs tests/lua/inp_probe.lua (per-frame framebuffer fnv1a64 + fighter death
 # flags) on STOCK vsavj with 104_1p_auto_ko_win.rpl (a real KO at ~f6550, no
 # pokes needed — measured this session) and asserts the WHITE-FRAME INVENTORY:

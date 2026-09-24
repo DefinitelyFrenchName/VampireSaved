@@ -4,6 +4,15 @@
 # game, AND the superset invariant holds (only content involving the modified
 # slot changes).
 #
+# WHAT: the M2 slot-replacement mechanism on trusted vanilla tooling: repointing Jedah's
+#   hitbox-base table entry to Demitri's takes effect in a live match (RAM:$FF8460 loads the
+#   new base), every legacy replay not involving Jedah is bit-identical to vanilla, and the
+#   attract replay diverges exactly where its demo shows Jedah (frame 4278).
+# HOW: a patched vsavj on MAME with the pick replay, the legacy suite and the attract replay
+#   compared with the frozen vanilla logs.
+# EXPECTS: the new base loaded, legacy identical, the attract divergence exactly at 4278 —
+#   the superset invariant specified, not weakened.
+#
 # Experiment: repoint vsavj Jedah's (slot 0x0F) hitbox-base entry in table
 # PRG:0x0BD97A to Demitri's (slot 0x01, 0x093B6A). Then:
 #   1. in a live match, picking Jedah loads 0x093B6A at RAM:$FF8460;

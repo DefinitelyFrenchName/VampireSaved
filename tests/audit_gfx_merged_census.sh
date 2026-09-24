@@ -5,6 +5,17 @@
 # manifests/build side files; no MAME, no build. ~4 min (one vs2 decrypt +
 # 4 census runs).
 #
+# WHAT: the complete 3-tenant merged group-C write-set census: ZERO real collisions
+#   (Huitzil's strip relocated to 0x86A0-0x87BF by S3), every shared destination
+#   same-source, intra-tenant collisions zero, the four free pools empty, and the union
+#   occupancy frozen.
+# HOW: tools/audit_gfx_merged.py over the reference zips and the frozen manifests and side
+#   files (static, ~4 min); three verdict controls (a shift-0 strip on Huitzil's own band,
+#   the old shift 0x1000 reproducing the historical 288-collision defect exactly, and a
+#   doctored vsav2.zip dropping it to 287 — per-tile identity).
+# EXPECTS: zero real collisions and the frozen occupancy; drift is re-review, never absorb;
+#   the three controls as stated.
+#
 # WHAT IT FREEZES: the complete merged bank-4/bank-5 destination model and
 # its collision classification (tools/audit_gfx_merged.py):
 #   - ZERO real collisions anywhere. The one that existed — Huitzil's 288

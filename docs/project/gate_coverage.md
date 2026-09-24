@@ -13,20 +13,20 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**161 of 380 gates described.**
+**380 of 380 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
 | [runner](#runner) | 22 | 22 | the suite runners and their own ground truth |
-| [docs](#docs) | 2 | 20 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 0 | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
-| [pipeline](#pipeline) | 0 | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
-| [oracle](#oracle) | 0 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
-| [gfx](#gfx) | 0 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
+| [docs](#docs) | 20 | 20 | the documentation locks — docs, skills, indexes, tables follow the tree |
+| [platform](#platform) | 38 | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [pipeline](#pipeline) | 58 | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
+| [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
+| [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 82 | 82 | tenant content — per-character gates and on-demand audits on the ported characters |
 | [character-data](#character-data) | 55 | 55 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
-| [review-triage](#review-triage) | 0 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
-| [mister](#mister) | 0 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
+| [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
+| [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
 ## runner
 
@@ -36,7 +36,7 @@ the suite runners and their own ground truth. 22 of 22 described.
 
 **WHAT:** every gate that needs MAME, FBNeo or the Verilator simulator runs from ONE registry (tests/ci_emulator.tsv) with its declared lane, scope, cadence, args and timeout, so a release can say "all tests ran" over an enumerated set.
 
-**HOW:** reads the registry, runs the prereq lane first (a red instrument gate stops the run), then the mame/fbneo/mister lanes, each gate under its own timeout, classifying every exit through tests/lib/classify.sh and, under --controls, executing every declared must-fire control as a CONTROL=<name> mode; writes one results.tsv row per gate and per control.
+**HOW:** reads the registry, runs the prereq lane first (a red instrument gate stops the run), then the mame/fbneo/mister lanes, each gate under its own timeout, classifying every exit through tests/lib/classify.sh and, under --controls, executing every declared must-fire control as a `CONTROL=<name>` mode; writes one results.tsv row per gate and per control.
 
 **EXPECTS:** a readout PASS / SKIP / FAIL / TIMEOUT / MISSING with SKIP counted apart from PASS; at release scope (--scope all --lane all --strict --controls) anything but PASS is a hard fail. It asserts nothing about the romset itself — its verdict logic is what tests/test_emulator_runner.sh tests.
 
@@ -60,7 +60,7 @@ the suite runners and their own ground truth. 22 of 22 described.
 
 **WHAT:** the legacy oracle: every `tests/replays/*.rpl` replayed on MAME against the build the rompath resolves, its per-frame work-RAM checksums compared with the expectation set that build's fingerprint selects (exact, masked, flicker, diverge, window, skip — the CLAUDE.md §4 classes).
 
-**HOW:** fingerprints the build (tests/expected/registry.tsv; an unregistered fingerprint fails loudly), runs each replay TWICE and fails on nondeterminism, then applies the replay's expectation kind from tests/expected/<set>/; --freeze writes new expectations only for replays with no authored class.
+**HOW:** fingerprints the build (tests/expected/registry.tsv; an unregistered fingerprint fails loudly), runs each replay TWICE and fails on nondeterminism, then applies the replay's expectation kind from `tests/expected/<set>/;` --freeze writes new expectations only for replays with no authored class.
 
 **EXPECTS:** every replay matches its frozen class; the first divergent frame and the RAM diff are the failure report. `authored .masked expectation — not self-frozen` must print for the authored replays under --freeze, or the legacy oracle has been replaced by a tautology.
 
@@ -122,7 +122,7 @@ the suite runners and their own ground truth. 22 of 22 described.
 
 ### `test_controls_contract.sh` — test, ci_portable
 
-**WHAT:** the must-fire contract's reader (tests/lib/controls.sh) reads what the grammar says: the four R10 regexes, the leading comment block as the header (a bare `#` continues it), the declared-vs-fired readback that turns a PASS with a missing or DEAD control into FAIL, the CONTROL=<name> mode and its REFUSED exit, and the `none` declaration.
+**WHAT:** the must-fire contract's reader (tests/lib/controls.sh) reads what the grammar says: the four R10 regexes, the leading comment block as the header (a bare `#` continues it), the declared-vs-fired readback that turns a PASS with a missing or DEAD control into FAIL, the `CONTROL=<name>` mode and its REFUSED exit, and the `none` declaration.
 
 **HOW:** synthetic gate scripts and logs of each shape are pushed through the SHIPPED classifier and reader; two controls (a declared control printing DEAD, an undeclared name printing FIRED) must classify FAIL.
 
@@ -210,7 +210,95 @@ the suite runners and their own ground truth. 22 of 22 described.
 
 ## docs
 
-the documentation locks — docs, skills, indexes, tables follow the tree. 2 of 20 described.
+the documentation locks — docs, skills, indexes, tables follow the tree. 20 of 20 described.
+
+### `test_annotations_current.sh` — test, ci_portable
+
+**WHAT:** docs/annotations.md, the GENERATED address -> label/comment stream, follows its carriers: a regeneration from every live carrier (the atlas, engine_internals, the reference docs, the manifests, tools/ and tests/) equals the committed file.
+
+**HOW:** tools/gen_annotations.py --check over the tree (~1 s); controls add an address to a copy of the atlas and hand-add a row to the index.
+
+**EXPECTS:** committed equals regenerated; a new carrier address fails until regenerated, a hand edit fails the cmp.
+
+### `test_charmap_current.sh` — test, ci_static
+
+**WHAT:** the character-data map `(docs/project/tables/chars/<tenant>.{json,md})` follows the three current solo builds: every bank row, dispatch row, ported region's ATTRIBUTED byte diff, sfx record and FSM run regenerates identically, so an unattributed difference, a moved placement or a changed physics row changes the page and fails.
+
+**HOW:** tools/charmap_gen.py -> charmap_md.py from each build's extract, image, placements and manifest, compared with the committed pages (~20 s; SKIPs without the builds); controls change one value byte inside donovan's placed hitbox region (unattributed +1) and apply an override row.
+
+**EXPECTS:** pages equal; the changed byte and the override each regenerate a different map.
+
+### `test_charmap_overrides.sh` — test, ci_static
+
+**WHAT:** the character-data OVERRIDE channel round-trips: the hand-written `charmap_<tenant>.toml` compiles into the `# BEGIN charmap … # END charmap` block of the tenant manifest, and the committed block equals a fresh compile; an override whose expect does not match the vs2 bytes, or whose expect and value differ in length, is REFUSED.
+
+**HOW:** tools/charmap_compile.py over the override files and the manifests, reading the freeze dirs' extracts (~1 s; ci_static for that reason); three controls (wrong expect, length mismatch, a stale block).
+
+**EXPECTS:** blocks equal, both bad overrides refused, the stale block failing --check.
+
+### `test_checkdocs.sh` — test, ci_portable
+
+**WHAT:** the load-bearing numbers the docs share are LOCKED across documents: for every row of docs/doc_locks.tsv every listed document quotes the canonical value verbatim (PRESENCE) and no rival value of the same shape sits beside the fact's key (NO RIVAL), the atlas row canonical and the syntheses following it.
+
+**HOW:** tools/checkdocs.py over the real tree with twelve extractor self-tests (~0.2 s); four controls on a perturbed copy (a dropped number, a rival number, a lock naming a missing file, a reworded key that disarms a lock).
+
+**EXPECTS:** every lock present with no rival; each control fails for its stated reason.
+
+### `test_checkdocs_rom.sh` — test, ci_static
+
+**WHAT:** the atlas's ROM-shaped claims are re-derived from the decrypted images: every registered check quotes its claim from the document and derives the same fact from the view, every @table negative control fires, the coverage NOTE is re-emitted at column 0, and the covered set equals the frozen tests/expected/checkdocs_rom_covered.tsv as a multiset.
+
+**HOW:** tools/checkdocs_rom.py over the three decrypted views (~2 s warm); five controls: a reworded claim (STALE), a flipped ROM byte (MISMATCH), a PARAPHRASE claim's literal perturbed (MISMATCH), a vacuous @table validator, a dropped covered row.
+
+**EXPECTS:** every check derived equal, the note printed, the covered set exact; each control caught. Coverage is NOTE-class, never fatal (ruled).
+
+### `test_checkskills.sh` — test, ci_portable
+
+**WHAT:** the eight skills are locked to the docs they distil: every `- [PFX-N]` rule is anchored exactly once as `**[PFX-N]**` in its docs and every anchor has a rule, the level-0 and level-1 skills name nothing board- or game-specific, every number a skill quotes appears in a LOG, every cross-reference names a defined rule, and every lifted rule keeps its old ID as a redirect.
+
+**HOW:** tools/checkskills.py over `.claude/skills/*/SKILL.md` and the docs (~1 s) with extractor self-tests; eleven controls perturb copies (an unanchored rule, a stripped anchor, a game name in level 1, a number no log carries, a dangling cross-ref, a port token in the game skill, a VSP anchor outside STATE's standing sections, a board name in level 0, a deleted redirect stub).
+
+**EXPECTS:** every rule anchored both ways and every control failing; a red is a skill quoting something no document holds.
+
+### `test_commit_subject.sh` — test, ci_portable
+
+**WHAT:** no unpushed commit message carries a GitHub CLOSING keyword directly before an issue reference — the shape that closed #151 twice and #136 once as a side effect of a push and was then recorded as the maintainer's act.
+
+**HOW:** tools/check_commit_subject.py over every message in origin/main..HEAD (~1 s); the control feeds a message carrying the shape.
+
+**EXPECTS:** no adjacency; the planted shape reported and non-zero. Closing a ticket is a decision, never a commit side effect.
+
+### `test_doc_anchor_census.sh` — test, ci_portable
+
+**WHAT:** every skill anchor's FILE and SECTION are frozen: one row per `**[PFX-N]**` anchor (id, file, nearest preceding header, list status) over every doc checkskills reads plus the archives it does not, equal to tests/expected/doc_anchor_census.tsv — a moved paragraph is a reviewed diff, a defined rule anchored in a history twin or on two rows is a hard fail.
+
+**HOW:** tools/doc_anchor_census.py --check (~1 s); four controls: an anchor moved between two files of one list (checkskills must still PASS it — the blind spot is real), a header inserted above an anchor, a rule anchored in a history twin, a stray bold token in an archive.
+
+**EXPECTS:** the census exact; each control fails as stated.
+
+### `test_docs_site.sh` — test, ci_portable
+
+**WHAT:** the documentation site renders, resolves and is deterministic: every declared document and the two skill GUIDEs parse inside the markdown subset, every in-tree href points at a file the render wrote, nothing loads from the network, the rendered tree holds exactly the page set, two renders are byte-identical, and every page closes what it opens.
+
+**HOW:** tools/mk_docs_site.py --check and a second render into temp dirs, an href walk independent of the generator (scripts stripped first), a tag-balance reader per page (~25 s); five controls: an h4 heading, an unresolved README link, a dangling anchor, an unclosed code span swallowing a heading, an unclosed `<header>.`
+
+**EXPECTS:** every assertion and every control; the site is a projection, never a source.
+
+### `test_docshape.sh` — test, ci_portable
+
+**WHAT:** every hand-written document's SHAPE is declared in docs/doc_shape.tsv and enforced: completeness, no session-shaped header or bold chronology paragraph in a REFERENCE/REGISTER doc, no anchors in HIST files, twins two-way, banners where required, no dangling doc link in README/HANDOFF/CLAUDE.md, every section citation in tools/ and tests/ real, and the README's Contents reaching every declared document with its shape tag.
+
+**HOW:** tools/checkdocshape.py --no-pending over the tree (~2 s); fifteen controls, one per rule, on perturbed copies.
+
+**EXPECTS:** the tree clean under the end-state mode and every control reported.
+
+### `test_expectation_provenance.sh` — test, ci_portable
+
+**WHAT:** every frozen expectation FILE directly under tests/expected/ (and tests/expect/) has a row in PROVENANCE.md saying where its numbers came from, and no row names a file that is gone — complete both ways.
+
+**HOW:** the register read against the directory listing (~1 s); controls delete a row and add a row for a missing file.
+
+**EXPECTS:** both directions complete; each control fails. A register that is confidently incomplete is read as exhaustive, which is worse than none.
 
 ### `test_gate_coverage_current.sh` — test, ci_portable
 
@@ -228,31 +316,1277 @@ the documentation locks — docs, skills, indexes, tables follow the tree. 2 of 
 
 **EXPECTS:** PASS when the census equals the frozen file exactly. A red names the gate and its direction (lost its description / new description not yet frozen).
 
-**Not yet described:** `test_annotations_current.sh`, `test_charmap_current.sh`, `test_charmap_overrides.sh`, `test_checkdocs.sh`, `test_checkdocs_rom.sh`, `test_checkskills.sh`, `test_commit_subject.sh`, `test_doc_anchor_census.sh`, `test_docs_site.sh`, `test_docshape.sh`, `test_expectation_provenance.sh`, `test_gate_index_current.sh`, `test_gotchas_index_current.sh`, `test_md_subset.sh`, `test_skill_guides.sh`, `test_state_open_lists.sh`, `test_tables_current.sh`, `test_tickets.sh`.
+### `test_gate_index_current.sh` — test, ci_portable
+
+**WHAT:** docs/project/gate_index.md, the GENERATED index of every gate (kind, tier from the ci registries, family from tests/gate_index.tsv, needs, the header's own first sentence, since), equals a fresh regeneration, every script has a family row and no row names a missing script.
+
+**HOW:** tools/gen_gate_index.py --check over the tree (~1 s); controls on a copy: a script with no family row, a dead TSV row, a hand-edited index.
+
+**EXPECTS:** current and complete; each control fails --check or the cmp. The index the generic harness renders byte-identically (bbh F9), which is why the descriptions live on their own page.
+
+### `test_gotchas_index_current.sh` — test, ci_portable
+
+**WHAT:** docs/GOTCHAS.md, the GENERATED index of the three gotcha buckets (one line per `## ` entry, wrapped headers joined, anchor tokens stripped), equals a fresh regeneration.
+
+**HOW:** tools/gen_gotchas_index.py --check (~1 s); controls append an entry to a bucket and hand-add a bullet to the index.
+
+**EXPECTS:** committed equals regenerated; a new entry fails and is NAMED in the diff, a hand edit fails the cmp.
+
+### `test_md_subset.sh` — test, ci_portable
+
+**WHAT:** tools/md_subset.py parses the markdown SUBSET the corpus writes strictly: its self-tests pass, every declared document and both skill GUIDEs parse inside the subset, each construct left OUT (h4, raw HTML, footnotes, images, autolinks, task lists, reference-link definitions, unclosed fences) raises, and the six corpus-forced rules (wrapped code spans, escaped pipes, optional leading pipe, pipes inside code spans, ragged rows normalised, the delimiter row) are accepted.
+
+**HOW:** the parser over the corpus and over fixtures (~3 s); nine known-bad controls each appended to a copy of a corpus file.
+
+**EXPECTS:** the corpus parses, every excluded construct raises, every accepted shape passes; a construct mis-read here renders wrong somewhere no reader would notice.
+
+### `test_skill_guides.sh` — test, ci_portable
+
+**WHAT:** the level-0 skills' GUIDE.md files are CURRENT against SKILL.md and the documentation paragraphs each rule is anchored to (the human rendition, each rule followed by its incident), generated by tools/gen_skill_guide.py.
+
+**HOW:** the generator's --check (~1 s); controls edit a rule's text in SKILL.md, edit an anchored incident paragraph, and hand-add a line to a guide.
+
+**EXPECTS:** guides current; each control leaves a guide STALE or fails the cmp.
+
+### `test_state_open_lists.sh` — test, ci_portable
+
+**WHAT:** an open list holds only what is open: STATE.md's 'Decisions pending' and NEXT_SESSION's START HERE carry no closed marker, STATE stays within its size budget and session-group count with exactly the four standing sections and no ticket list, standing rulings are one line each with a home, and every ledger key in either line form resolves to an archived record — violations that predate the rule frozen shrink-only.
+
+**HOW:** tools/check_state_lists.py over STATE.md, docs/NEXT_SESSION.md and STATE_HISTORY.md against tests/expected/state_open_lists_debt.txt (~1 s); seven controls on perturbed copies (a struck-through pending entry, a DONE start-here entry, a ticket section, a fourth group, an over-budget file, an unresolved ledger key in each line form).
+
+**EXPECTS:** no new violation and no listed one that stopped occurring; each control fails. It does not claim an entry with no marker is open.
+
+### `test_tables_current.sh` — test, ci_static
+
+**WHAT:** the community-facing behavioural tables docs/project/tables/{donovan,huitzil,pyron}.md (rule 5's tunables) are GENERATED from the current solo builds' extracts and bank maps and equal what is committed.
+
+**HOW:** tools/tables_char_md.py from each build's extract/regions.json and bank_map.toml compared with the committed pages (~1 s; SKIPs without the builds); the control changes one value byte in a copy of donovan's extract.
+
+**EXPECTS:** pages equal; the perturbed extract regenerates differently. A table that does not follow the build is a claim with nothing behind it.
+
+### `test_tickets.sh` — test, ci_portable
+
+**WHAT:** the ticket index: every saved GitHub issue has exactly one row in docs/project/tickets.tsv and no row lacks an issue, each status agrees with GitHub's saved open/closed state, every one of the four answers is a resolving link or an explicit none, no `learned`/`wrong` answer points at STATE or an archive, every session key resolves, `?` appears only in the shrink-only backfill debt, and the generated tickets.md is current.
+
+**HOW:** tools/tickets.py check and page --check over the TSV, the saved GitHub list and the debt file (~1 s, offline); six controls (a missing row, a disagreeing state, an unresolved link, a learned answer in an archive, debt growth, a stale page).
+
+**EXPECTS:** every property holds and every control fails. It does not judge whether an answer is ENOUGH (the close does), nor that the saved GitHub list is fresh (refreshed at every close).
 
 ## platform
 
-the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene. 0 of 38 described.
+the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene. 38 of 38 described.
 
-**Not yet described:** `audit_wide_phase_a.sh`, `test_applier_page.sh`, `test_applier_page_browser.sh`, `test_applier_vcdiff.sh`, `test_attract_determinism.sh`, `test_build_environment_entry.sh`, `test_bundle_parsers.sh`, `test_crash_guard.sh`, `test_crypt_boundary.sh`, `test_decrypt_oracle.sh`, `test_fbneo_boot_log.sh`, `test_fbneo_instruments.sh`, `test_fbneo_overlay_hygiene.sh`, `test_fbneo_overlay_hygiene_control.sh`, `test_fbneo_replay_determinism.sh`, `test_fbneo_runner_hygiene.sh`, `test_fbneo_smoke.sh`, `test_fbneo_tree_integrity.sh`, `test_fbneo_tree_integrity_control.sh`, `test_frozen_rompath_guard.sh`, `test_host_libs.sh`, `test_input_integrity.sh`, `test_mame_determinism.sh`, `test_mame_parity.sh`, `test_mame_wide.sh`, `test_null_build.sh`, `test_phasec_image.sh`, `test_phasec_spaces.sh`, `test_readme_recording.sh`, `test_release_asset_shape.sh`, `test_release_binaries.sh`, `test_release_launcher.sh`, `test_release_os_metadata.sh`, `test_release_roundtrip.sh`, `test_replay_stage_census.sh`, `test_replay_video_selfcheck.sh`, `test_romset_identity.sh`, `test_wide_profile.sh`.
+### `audit_wide_phase_a.sh` — audit, emulator
+
+**WHAT:** the CPS-2 WIDE Phase A architecture questions on VANILLA vsavj — is linear PRG growth to 6 MB inert (unmapped address space), is OBJ y-word bit 12 free as the 19th tile-address bit, is growing the gfx region inert for scroll3, and is there Z80 driver ROM room for new sample rows — each answered with a decision line.
+
+**HOW:** measurement runs on pristine vsavj on MAME over the corpus, one section per question, each ground-truthing its own instrument before trusting a null.
+
+**EXPECTS:** a decision line per section consistent with the approved WIDE plan (docs/project/cps2_wide.md); a section whose instrument cannot see its own positive control is not a null.
+
+### `test_applier_page.sh` — test, ci_static
+
+**WHAT:** the browser applier page EQUALS the tool of record (apply_release.py) member for member on both variants, refuses everything it refuses, is self-contained (a Content-Security-Policy the browser enforces plus a scan for named network primitives), carries its modules verbatim, and stops demanding qsound_hle.zip under --no-qsound-bios.
+
+**HOW:** the shipped apply_release.html of every platform dir compared with a fresh generation; the inlined modules compared with `tools/applier/*.mjs;` the modules run under node against apply_release.py on $ROMDIR for member order, bytes, zip header fields and the set key (container bytes deliberately not compared); six refusals exercised on both tools; four controls (a fetch() in the shell, the CSP removed, the member check removed, a flipped member).
+
+**EXPECTS:** every section green and every control failing; a red names the member, refusal or primitive. The page's own WIRING is test_applier_page_browser's half.
+
+### `test_applier_page_browser.sh` — test, ci_static
+
+**WHAT:** the shipped applier page RUNS where a player runs it — opened from file:// in a real browser engine and driven through its own drop zone, radio and button: a build prints the manifest's set key, 'leave it out' stops the qsound demand and builds to the other key, a damaged dump is refused by name.
+
+**HOW:** headless Chrome drives page_test.html (the shipped file as a byte-prefix plus tests/lib/applier_driver.html) with the maintainer's dumps; an incomplete run is its own verdict, never a content verdict; controls starve the control leg's virtual-time budget and flip a byte of the inlined set key.
+
+**EXPECTS:** the three player paths as described; the starved control reads NOT JUDGED, the broken page fails. A stalled driver retries once for incompleteness only, never for a content failure.
+
+### `test_applier_vcdiff.sh` — test, ci_static
+
+**WHAT:** the JS VCDIFF decoder (tools/applier/vcdiff.mjs) equals the tool of record on the bytes we ship: every patch of the shipped release decodes to the manifest's exact size and SHA-1.
+
+**HOW:** rebuilds the source blob from $ROMDIR as the applier does (asserting the blob's own sha1 first), decodes every patch under node and compares; the control flips one byte of a patch copy.
+
+**EXPECTS:** every member's size and SHA-1 as the manifest declares; the flipped patch yields a mismatch or a refusal.
+
+### `test_attract_determinism.sh` — test, emulator
+
+**WHAT:** MAME is deterministic over a 60-second scripted attract-mode run: two fresh runs checksum work RAM identically every frame (the M0 acceptance).
+
+**HOW:** two runs of the attract script on the reference set on MAME, the per-frame checksum logs compared.
+
+**EXPECTS:** the two logs identical; a difference is a determinism failure of the instrument, not of the game.
+
+### `test_build_environment_entry.sh` — test, ci_portable
+
+**WHAT:** tools/record_build_environment.py composes a build_environments.md entry only from a real capture: a host's BINARY.txt records plus the log of a PASSING release-binaries gate; every way an entry could rest on something else REFUSES.
+
+**HOW:** synthetic records and logs: section 0 the capture (tests/lib/host_env.sh) against stub package managers, section 1 a passing pair composes the entry, section 2 a record for another os-arch refuses; controls turn the PASS line into FAIL and drop the env lines.
+
+**EXPECTS:** the entry carries host, system, packages, pins, tree and the PASS line; every refusal refuses; both controls fail.
+
+### `test_bundle_parsers.sh` — test, ci_portable
+
+**WHAT:** the Linux and Windows library bundlers read real ldd / readelf / objdump output, walk a closure, and REFUSE an empty closure (the tools said nothing) rather than report a self-contained binary — the OS-independent half, provable on this Mac.
+
+**HOW:** recorded tool output and stub tools on PATH drive both bundlers; three shadow-tool controls (the refusal removed, the MSYS path translation disabled, the artifact check neutered) must each fail their section.
+
+**EXPECTS:** parsers, closure walk, refusal and artifact check as specified; the controls fail. It does NOT claim the binaries work on a real host — that is test_release_binaries there.
+
+### `test_crash_guard.sh` — test, emulator
+
+**WHAT:** the crash guard classifies known-good and known-bad correctly: a clean vanilla run is CLEAN (and, in cheap mode, checksum-identical to the frozen expectation), a planted ILLEGAL opcode trips vec4, a planted odd jump address trips vec3.
+
+**HOW:** four MAME runs: the negative control in cheap and -debug modes (the latter compared run-to-run, never to vanilla — -debug shifts the scheduler), then the 14 dispatch tables' slot-0x0F entries pointed at a planted ILLEGAL and at an odd address.
+
+**EXPECTS:** CLEAN on the negatives, CRASH vec4 and vec3 on the positives; a guard that misses either plant is not trusted.
+
+### `test_crypt_boundary.sh` — test, ci_static
+
+**WHAT:** code placed above vsavj's encryption window (PRG:0x100000) is stored RAW by the patcher: the cipher's crypt_words_at passes those words through unchanged in both directions, with the exact boundary word pinned — load-bearing for every ported routine in hole_b and the WIDE extension.
+
+**HOW:** drives tools/cps2_decrypt.py's cipher over words straddling the boundary in both directions.
+
+**EXPECTS:** words below the boundary transformed, words at and above it unchanged; a red means silently corrupted ported code.
+
+### `test_decrypt_oracle.sh` — test, emulator
+
+**WHAT:** tools/cps2_decrypt.py agrees with MAME's own cps2crypt: our decrypted image is byte-identical to MAME's opcode space (dual-implementation agreement).
+
+**HOW:** decrypts the reference set with our tool and dumps MAME's opcode space, then compares byte for byte.
+
+**EXPECTS:** byte-identical; a difference is a defect in one implementation's reading of the CPS-2 encryption.
+
+### `test_fbneo_boot_log.sh` — test, ci_portable
+
+**WHAT:** the verdict logic of tests/lib/fbneo_boot_log.sh — what a healthy FBNeo WIDE boot log must show, per OS — proven against RECORDED boot logs from the first Windows boot (no core messages by design) and this Mac's release-binary boot.
+
+**HOW:** the reader applied to the recorded logs under each OS rule: the Windows log passes on windows and fails on macos, the macOS log passes on both (the profile line demanded where the core prints); controls drop the WIDE member line, drop the profile line, and remove the descriptor rows.
+
+**EXPECTS:** the five sections as listed; each control fails or refuses. A Windows release verdict rests on this before it is trusted.
+
+### `test_fbneo_instruments.sh` — test, emulator
+
+**WHAT:** the B5b FBNeo instruments are trustworthy: the write tap does not perturb a run (checksum-identical to an untapped one) and captures writes, the frame-scheduled poke changes state, and the address-resolved dumps equal MAME's dump of the same region byte for byte.
+
+**HOW:** tapped and untapped FBNeo runs compared; a poke leg whose target must change; a region dump compared with MAME's at a frame stable across the known frame skew.
+
+**EXPECTS:** identical checksums, writes captured, the poke visible, the dumps byte-equal; an instrument that reports nothing is a red, not a null.
+
+### `test_fbneo_overlay_hygiene.sh` — test, ci_portable
+
+**WHAT:** a non-overlay FBNeo run never inherits a previous run's overlay: the runner's roms/ wiring replaces a stale overlay directory instead of nesting a symlink inside it, and the rm beside the $ROMDIR symlink never empties the reference sets.
+
+**HOW:** drives tools/run_replay_fbneo.sh with a stub emulator and a populated fake ROMDIR (no ROMs, no FBNeo): overlay then non-overlay in one sandbox, twice; RUNNER= points it at another copy of the script for the control gate.
+
+**EXPECTS:** the non-overlay run serves the fake ROMDIR, the reference contents survive; test_fbneo_overlay_hygiene_control.sh proves the gate fails against the pre-fix runner.
+
+### `test_fbneo_overlay_hygiene_control.sh` — test, ci_portable
+
+**WHAT:** the overlay-hygiene gate can SEE the defect it guards: reconstructed with the pre-fix runner (a bare ln -sfn, no clear), tests/test_fbneo_overlay_hygiene.sh must FAIL.
+
+**HOW:** reconstructs the pre-fix runner into a scratch copy and runs the gate against it.
+
+**EXPECTS:** the gate FAILS on the pre-fix runner; a gate that has never seen the defect is indistinguishable from one that cannot.
+
+### `test_fbneo_replay_determinism.sh` — test, emulator
+
+**WHAT:** the patched FBNeo runs a scripted replay with identical work-RAM checksums across two fresh-sandbox runs (the EEPROM sandboxing fix's guard).
+
+**HOW:** two fresh-sandbox FBNeo runs of one replay, the checksum logs compared.
+
+**EXPECTS:** identical logs; a difference is nondeterminism in the harness or the sandbox.
+
+### `test_fbneo_runner_hygiene.sh` — test, emulator
+
+**WHAT:** a FAILED FBNeo run leaves none of the previous run's artifacts behind: the runner clears its output log, .tap and dumps before the run, so an artifact check (grep ^END) can never read yesterday's results as today's.
+
+**HOW:** runs tools/run_replay_fbneo.sh to a failure with stale artifacts pre-planted and checks they are gone (~5 s, no ROMs used).
+
+**EXPECTS:** no surviving stale artifact; the exit code is not the discriminator here, the artifact is.
+
+### `test_fbneo_smoke.sh` — test, emulator
+
+**WHAT:** the FBNeo headless runner boots vsavj and survives a soak: every ROM member loads OK, emulation starts, and the process is still alive when killed (the M0 smoke).
+
+**HOW:** one headless FBNeo run of the reference set for the soak period, the log read for member load lines and liveness.
+
+**EXPECTS:** all members (OK), emulation running for the whole soak.
+
+### `test_fbneo_tree_integrity.sh` — test, ci_static
+
+**WHAT:** the emu/fbneo working tree is EXACTLY the pinned upstream commit plus the two tracked development patches (0001 harness, 0002 WIDE) — whole-file compare and a changed-file inventory, because `git apply -R --check` validates only hunk context and accepts an edit a few lines away.
+
+**HOW:** reconstructs the expected tree from `git archive PIN` plus the two patches into a scratch dir and cmp's every file the patches touch, plus the inventory of changed files (0003 is release-only and never applied here).
+
+**EXPECTS:** byte-identical files and the same inventory; a red is untracked drift in the emulator — the trust surface rule 1 rests on.
+
+### `test_fbneo_tree_integrity_control.sh` — test, ci_static
+
+**WHAT:** the tree-integrity gate catches what `git apply -R --check` misses: a line appended at EOF of cps_obj.cpp, a line inserted far from any hunk, and the other planted shapes, each on a SCRATCH copy.
+
+**HOW:** five planted edits on a scratch copy of the tree, the real gate run against each.
+
+**EXPECTS:** the gate FAILS on every plant, case 1 (the issue's own scenario) above all.
+
+### `test_frozen_rompath_guard.sh` — test, ci_static
+
+**WHAT:** tools/build_donovan.sh refuses to replace one track's packed set with the other's under a frozen reference's name (a stock rebuild over a registered WIDE rompath), while a same-track rebuild of a reference stays legal (HANDOFF's documented recipe).
+
+**HOW:** runs the real builder to the guard on a COPY of a frozen rompath, both the mismatch and the same-track cases (~4-8 min, no emulator).
+
+**EXPECTS:** the mismatch refused, the same-track rebuild allowed; a red in the first direction is the #26 loss (a frozen name measuring a different ROM).
+
+### `test_host_libs.sh` — test, ci_portable
+
+**WHAT:** tools/check_host_libs.py holds a Linux release folder to its rule — every file's direct NEEDED sonames are shipped and resolve in the folder, or are on the external host-provided list (manylinux_2_39 plus ruled exceptions); nothing 'not found' — proven on any host with stub readelf and ldd.
+
+**HOW:** a fixture folder under stub tools: it passes and counts what it asks the host for; a soname on no list fails; a 'not found' fails; an empty list and a folder without ELF refuse; the real list file's shape is checked; controls remove the bundled libSDL2 and strip the RUNPATH.
+
+**EXPECTS:** the five sections as listed, both controls failing rules R1 and R2.
+
+### `test_input_integrity.sh` — test, emulator
+
+**WHAT:** the input-integrity check works both ways: replay.lua's per-frame comparison of the live controller bits against what it staged is silent on a clean run and writes INPUT-VIOLATION at the right frame when a stray press lands (MAME's window can take host focus even under -video none).
+
+**HOW:** a clean replay and a replay with an injected un-scripted press on MAME, comparing only the bits the harness can drive (the EEPROM data line on IN2 flagged every replay in the first draft).
+
+**EXPECTS:** silent on clean, the violation at the injected frame; a check that has only ever been silent proves nothing.
+
+### `test_mame_determinism.sh` — test, emulator
+
+**WHAT:** MAME's run-to-run determinism RATE on a short boot probe: N runs of the same binary, set and inputs must be identical; a divergence is preserved and classed PHASE SHIFT or TRANSIENT.
+
+**HOW:** RUNS repetitions of the probe on MAME (JOBS parallel), the checksum logs compared pairwise, a divergent pair analysed by tools/analyze_divergence.py.
+
+**EXPECTS:** every run identical. Coverage limit stated in the header: the 520-frame probe bounds the boot window only, not a full replay (PROBE= a replay measures that).
+
+### `test_mame_parity.sh` — test, emulator
+
+**WHAT:** the pinned MAME source build is indistinguishable from the binary that froze the oracle, BEFORE any profile patch — every frozen vsavj expectation reproduced bit-for-bit (twice, so nondeterminism fails too), and the unfrozen vsavj and vsav2 replays A/B-identical between the two binaries.
+
+**HOW:** section 1 runs every replay with a frozen .sha1 twice on the source build; sections 2 and 3 run the remaining vsavj and the vsav2 replays on both binaries and compare directly (skipped LOUDLY without the reference binary).
+
+**EXPECTS:** every frozen log reproduced, every A/B identical; a red means the instrument moved and every MAME finding since is in question.
+
+### `test_mame_wide.sh` — test, emulator
+
+**WHAT:** the CPS-2 WIDE profile is safe on MAME as on FBNeo: the patched binary runs stock vsavj bit-identically to the reference binary (the emulator superset invariant), the WIDE set behaves bit-identically to the stock set on the same binary (inertness), and the B4 canary proves the 19th tile-address bit reaches the appended banks (pixel-identical with sprites relocated at draw time).
+
+**HOW:** replays on MAME comparing per-frame work-RAM AND framebuffer checksums (replay.lua VIDEO_OUT) across the reference/patched binaries and the stock/WIDE sets, plus the CPS2_WIDE_CANARY=1 run.
+
+**EXPECTS:** all three invariants hold on both checksums; the superset leg skips LOUDLY without the reference binary. The framebuffer half is what sees a video-path change RAM cannot.
+
+### `test_null_build.sh` — test, ci_static
+
+**WHAT:** the null-patch build reproduces vanilla vsavj bit-identically from the reference inputs, deterministically (the M0 acceptance).
+
+**HOW:** two builds compared as zips, and every member's SHA-1 compared with docs/checksums.txt.
+
+**EXPECTS:** byte-identical zips and every member equal to the frozen manifest.
+
+### `test_phasec_image.sh` — test, emulator
+
+**WHAT:** the program image grows to 6 MB and the WIDE extension is genuinely READ: the stock build is unchanged, the WIDE build has the profile's four appended members and runs a full replay clean on vsavjw, and zeroing the relocated sound table at CPU:$400010 CHANGES behaviour (the negative control that makes 'relocated' mean 'used').
+
+**HOW:** builds both tracks, checks the stock fingerprint and the WIDE set's shape, runs the replay on MAME, then the zeroed-table run compared with the clean one.
+
+**EXPECTS:** stock unchanged, the shape right, END clean, the zeroed run diverging (at frame 3121 on the first measurement); a relocation that passes without its control proves nothing.
+
+### `test_phasec_spaces.sh` — test, ci_static
+
+**WHAT:** the declarative address-space model is byte-for-byte inert on a STOCK build (the pre-refactor fingerprint) even with the WIDE extension and a profile-gated row declared, and a WIDE build makes the extension available with a precise diagnosis where the pipeline cannot yet grow the image.
+
+**HOW:** builds the stock track and compares its fingerprint with the frozen pre-refactor value; builds the WIDE track and reads its diagnosis.
+
+**EXPECTS:** stock fingerprint unmoved, the WIDE expectation as frozen; a re-freeze is a recorded decision, never a silent green.
+
+### `test_readme_recording.sh` — test, emulator
+
+**WHAT:** the README's 'record it on MAME' command, run as written on this host's release MAME against the merged romset, records a session the project replays frame for frame — work RAM identical every frame on the release binary and on the source-built MAME, from an EMPTY nvram — and the README prose agrees with the command.
+
+**HOW:** the indented command read out of README.md and run token for token from a player folder built as the README says (cps2 -> the release binary, the dumps path -> $ROMDIR; headless flags and -noreadconfig appended), the recording leg driven by replay 03, then playback on both binaries; a no-playback leg must differ; controls start playback from a used nvram and truncate the .inp.
+
+**EXPECTS:** the .inp valid and complete, both playbacks covering every frame with byte-identical checksum logs, the idle leg departing at frame 300; the used nvram and the truncated recording fail.
+
+### `test_release_asset_shape.sh` — test, ci_portable
+
+**WHAT:** every published release asset is SELF-SUFFICIENT (README, applier, page, manifest, patch set) and the two emulator routes never travel together: a prebuilt asset carries no driver patch or recipe, a recipe asset no binary, and every file of the platform directory reaches an asset.
+
+**HOW:** the lists the real uploader produces under --dry-run (writes nothing into the tree) checked for the five properties; controls mix the routes, drop the applier, drop the page.
+
+**EXPECTS:** every asset self-sufficient and unmixed, completeness both ways; the three controls fail. It does NOT claim the assets on GitHub are these — the uploader's download-back cmp does.
+
+### `test_release_binaries.sh` — test, emulator
+
+**WHAT:** the prebuilt emulator binaries for THIS host are what their record says (sha256 per file), self-contained (every reference resolves inside the folder), signed, carry the WIDE profile, and BOOT the merged romset — FBNeo headless 20 s, MAME -verifyroms flagging exactly the rewritten members and reproducing one frozen masked legacy expectation; and the shipped release applied to pristine dumps yields a STANDALONE set complete by the emulator's own descriptor and behaviourally identical to the gated build on both emulators, the --no-qsound-bios variant behaving as the MiSTer README promises.
+
+**HOW:** the record, otool/ldd/codesign, strings and boot legs on the resource dirs; section 3 applies the release and compares whole-RAM and framebuffer checksums on MAME and the harness FBNeo; four controls (a flipped library byte, an absolute reference, a QSound completion member with wrong bytes, a gfx completion member with wrong bytes).
+
+**EXPECTS:** every leg green, the QSound-member control caught by 3a's -verifyroms alone and the gfx-member control by the framebuffer alone (work RAM is blind to both); a red names the file, reference or member. ~11 min with section 3.
+
+### `test_release_launcher.sh` — test, ci_portable
+
+**WHAT:** the player's PLAY.command reaches the right emulator invocation (creating FBNeo's roms/ for it) and REFUSES every wrong situation with a message that names the cause — no romset, no binary for this machine, a symlinked roms/, an emulator without the profile.
+
+**HOW:** both platforms' launchers driven in a staged copy of the release under PLAY_DRY_RUN=1 (stops before the emulator); the control stages an emulator binary without the profile as the success path.
+
+**EXPECTS:** the success path's invocation, every refusal non-zero and named; the unpatched-emulator control refused. The real launch is test_release_binaries' half.
+
+### `test_release_os_metadata.sh` — test, ci_portable
+
+**WHAT:** a file manager's folder metadata (.DS_Store) in a release tree is never shipped and never counted: the uploader cuts no asset carrying one, and every release listing that can see a dotfile drops it through the one definition tests/lib/os_metadata.sh.
+
+**HOW:** the filter over a path list (exact basename only); the REAL uploader under --dry-run in a throwaway repo with .DS_Store planted in four places; the three listings' wiring read from the scripts; the control disables the filter in a shadow copy of the lib.
+
+**EXPECTS:** no list and no zip carrying a dotfile, the wiring present; the disabled filter lets the plant into an asset list and fails.
+
+### `test_release_roundtrip.sh` — test, ci_static
+
+**WHAT:** the release package is shippable: applied to the PRISTINE dumps it reproduces every authored member byte-identically and every added standalone member from its declared source, hashes to the manifest's keys (both variants), deterministically; the applier REFUSES a corrupted patch, a wrong dump and a wrong target sha1 without writing; no patch carries a verbatim run of reference-ROM bytes (rule 7); and every platform directory has exactly the ruled inventory with the end-user README sections.
+
+**HOW:** packages the build, applies it in a scratch dir, compares members and keys; section 2 exercises the refusals; section 3 indexes every 64-byte-aligned reference chunk and slides a window over every patch byte; section 4 checks the per-platform layout, BINARY.txt hashes and the README sections; eight known-bad controls.
+
+**EXPECTS:** every section green and every control caught (the planted reference chunk, the secondary-compressed patch, the stray file, the missing README section among them).
+
+### `test_replay_stage_census.sh` — test, ci_portable
+
+**WHAT:** the input-staging convention of every replay-driving Lua instrument is FROZEN: replay.lua's canonical (parse held[fr], stage held[frame+1]) against the ten instruments that net a +1 shift — so the split cannot grow and a new instrument cannot copy the wrong flavour unnoticed; a frame number from a drifted log is not a frame number from a checksum log.
+
+**HOW:** strips Lua comments (the drifted files quote the canonical idiom in their banners) and classes each instrument's parse/stage pair against the frozen list.
+
+**EXPECTS:** exactly the frozen deviants, each carrying its banner, replay.lua canonical. EXPECT_DEVIANT=0 flips it to asserting uniformity once the staging fix and the consuming gates' re-measurement land as ONE change.
+
+### `test_replay_video_selfcheck.sh` — test, emulator
+
+**WHAT:** replay.lua's VIDEO_OUT (the MAME per-frame framebuffer checksum) is a trustworthy instrument: live (thousands of distinct checksums in a match), non-perturbing (the RAM log still equals the frozen expectation), deterministic, and correct both ways against a build with a KNOWN pixel difference (identical frames match, differing frames differ).
+
+**HOW:** MAME runs with VIDEO_OUT on, compared with the frozen RAM expectation, with each other, and against donovan6's known medallion difference at frames 650 / 950 / 1250.
+
+**EXPECTS:** all four checks; an instrument that always differs is as useless as one that never does.
+
+### `test_romset_identity.sh` — test, ci_static
+
+**WHAT:** tools/audit_romset_identity.py catches the 14z-60z shape — a member carrying the PRISTINE bytes of a member the build patched shadows it at load time (both emulators resolve by hash before name) — and raises no false positive on placeholder members or an unpatched set.
+
+**HOW:** four synthetic sets built from $ROMDIR: patched / patched plus a pristine copy under another name / patched plus byte-identical placeholders / unpatched.
+
+**EXPECTS:** PASS, FAIL naming the member, PASS, PASS.
+
+### `test_wide_profile.sh` — test, emulator
+
+**WHAT:** the CPS-2 WIDE profile is safe on FBNeo: the patched binary runs stock vsavj bit-identically to a pre-patch reference binary (the emulator superset invariant, Rule 1 v2), and the WIDE set behaves bit-identically to the stock set on the same binary (inertness) — both on per-frame work-RAM AND framebuffer checksums over the legacy corpus.
+
+**HOW:** FBNeo runs of the corpus on the reference and patched binaries and on the stock and WIDE sets; the reference guard refuses a reference that carries the profile; controls point FBNEO_REF at the WIDE binary and stub `strings` to find nothing.
+
+**EXPECTS:** both invariants hold on both checksums; the superset leg skips LOUDLY without FBNEO_REF; both controls fail at the guard.
 
 ## pipeline
 
-the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses. 0 of 58 described.
+the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses. 58 of 58 described.
 
-**Not yet described:** `audit_capture_matrix.sh`, `audit_dispatch_census.sh`, `audit_objhook_owner_census.sh`, `audit_region_movability.sh`, `audit_stock_emulator_stall.sh`, `audit_type_writes.sh`, `test_accent_census.sh`, `test_audit_merged_dispatch.sh`, `test_build_gate_status.sh`, `test_build_identity_distinct.sh`, `test_capture_kf_ownership.sh`, `test_capture_pose_sources.sh`, `test_census_regions.sh`, `test_effect_placeholders.sh`, `test_escape_triage.sh`, `test_extract_hp.sh`, `test_freeze_artifacts_current.sh`, `test_freeze_tag_coverage.sh`, `test_fsm_census.sh`, `test_hitclass_map_thunk.sh`, `test_id_space.sh`, `test_index_space.sh`, `test_index_window_thunk.sh`, `test_kernel_voice_tables.sh`, `test_m2_repoint.sh`, `test_m2a_stage1_nullreloc.sh`, `test_m2a_stage2_data.sh`, `test_m2a_stage3_anim.sh`, `test_m2a_target_policy.sh`, `test_m2a_target_resolution.sh`, `test_m3a_reproducible.sh`, `test_manifest_merge.sh`, `test_movability_liveness.sh`, `test_patch_overlap.sh`, `test_patch_prg.sh`, `test_pointer_flow.sh`, `test_qs_id_table.sh`, `test_qs_songs.sh`, `test_qs_window_law.sh`, `test_reaction_hook_d2.sh`, `test_record_window.sh`, `test_region_overlap.sh`, `test_region_overlap_control.sh`, `test_rompath_reject.sh`, `test_rule5_census.sh`, `test_s4_thresholds.sh`, `test_select_arrays.sh`, `test_shared_writes.sh`, `test_shim_charid.sh`, `test_tenant_anim_relocation.sh`, `test_tenant_row_owner.sh`, `test_tenant_select_records.sh`, `test_thunk_addr_literal.sh`, `test_type_stamp_census.sh`, `test_unless_composed.sh`, `test_variant_dispatch.sh`, `test_voice_row_range.sh`, `test_win_quote_decode.sh`.
+### `audit_capture_matrix.sh` — audit, ci_static
+
+**WHAT:** the whole capture-geometry matrix, ours vs native vs2, every reachable (attacker, victim) cell: our served capture sub-block equals native's for every victim, vsavj's and vs2's BASE sub-blocks are byte-identical for all 16 legacy attackers (the #104 legacy-safety premise), and the port adds the tenants' own sub-blocks where vsavj aliases them.
+
+**HOW:** static over the decrypted images and the build's image (no emulator, the records ARE what the engine draws — licensed by the in-emulator anchors audit_don_grab_pose, test_hui_grab_victim, audit_pyron_capture_block): each cell compared over min(spacing) of the two blocks; controls flip one record byte in a copy of our image and run the naive fixed-count comparison, which must invent differences at the small-spacing attackers.
+
+**EXPECTS:** every cell equal, the premise holding, the additions present; the flipped byte fails its cell and the fixed count fails at exactly attackers 0x06/0x08/0x09/0x0D.
+
+### `audit_dispatch_census.sh` — audit, emulator
+
+**WHAT:** which object-type indices LEGACY ever dispatches at the two obj_hook sites over the corpus, against the frozen inventory build/manifest/dispatch_census.toml — a NEW type observed is a corpus that grew a spawn it never had.
+
+**HOW:** breakpoints on both dispatch sites over every replay with a frozen vanilla masked-basis log on MAME (50 short debug runs), D0/4 = the dispatched index.
+
+**EXPECTS:** the inventory reproduced exactly; growth fails. Coverage stated: site 0x054470 fires in only 5 of 50 replays and the curve has not converged, so 'never observed' is a bound, not a proof, and no repoint ships on the complement.
+
+### `audit_objhook_owner_census.sh` — audit, emulator
+
+**WHAT:** which OWNER each extended obj_hook type (114-120, the multi-owner pool family) carries at DISPATCH TIME on a single-tenant build — the measurement behind the vec3-fix design (type 115 reads zero at dispatch while the same frame's dump shows the owner: time-varying within a frame).
+
+**HOW:** two guarded MAME runs on a Huitzil build probing the dispatch's +0x30 word per type; REPORT-ONLY (exit 0 unless the rig is dead).
+
+**EXPECTS:** a per-type owner report, 114/116/118/120 stated as not observed. STALE since 14z-91 (the header says so): the probe points at a thunk that no longer exists and must be re-pointed at the relocated walker before it is trusted.
+
+### `audit_region_movability.sh` — audit, emulator
+
+**WHAT:** which of Donovan's regions can live in the WIDE extension (region_space): anim, aux0_4, the x06717c code region and hitbox(+proj) each build and RUN when moved there — the measurement that cleared the merge's crypt-window constraint after anim's crash was traced to a baked placed address.
+
+**HOW:** builds a Donovan variant per case with the region moved, runs replay 12 guarded on MAME and scores runs / crash; the liveness of that scoring is tests/test_movability_liveness.sh's.
+
+**EXPECTS:** every measured region runs. Scope stated: one tenant's regions; Huitzil's and Pyron's anim are unmeasured here.
+
+### `audit_stock_emulator_stall.sh` — audit, emulator
+
+**WHAT:** the WIDE romset forced into an UNPATCHED MAME (renamed vsavj.zip) boots, prints wrong checksums and STALLS on the QSound legal screen without a crash — the README's 'if it does not work' diagnostic, kept true across freezes.
+
+**HOW:** three MAME runs: the real WIDE run, the stock reference binary on the renamed set, compared per frame (RAM identical through 468, divergent from 469, no crash vector); the control runs the 'stock' leg on the WIDE binary, where the divergence must be absent.
+
+**EXPECTS:** the frozen divergence frame and no crash; the control fails. A build that crashed, garbled or played on a stock emulator would falsify the README and fail here.
+
+### `audit_type_writes.sh` — audit, emulator
+
+**WHAT:** every write of an extended-family type byte (114-120) on the ground-truth single-tenant builds comes from a PC in the FROZEN static stamp inventory — the dynamic half of the type-stamp census, which sees register-sourced and computed stamps the static scan cannot.
+
+**HOW:** six MAME tap runs on the single-tenant builds, every family-valued type-byte write attributed by PC and mapped to build/manifest/type_stamps.toml; the 117 stamp PC must appear (rig liveness); the 59-75 range is reported per writer class, not gated.
+
+**EXPECTS:** every observed writer in the inventory (else extend the inventory FIRST); the liveness stamp seen. Measured 14z-82: 118/120 not observed.
+
+### `test_accent_census.sh` — test, ci_static
+
+**WHAT:** every path that can resolve a weapon accent from the palette-march family is thunked on a variant-id build: the vanilla image has exactly four family-base operand sites and no direct T0/T1 slot references, and a variant build's patch routes all four.
+
+**HOW:** static census of the vanilla opcode image for the family base and the slot addresses; the variant build's patch checked for the four jsr routes; the negative control strips one route.
+
+**EXPECTS:** exactly four sites, zero direct slot references, all four routed; the stripped patch fails. A fifth site is a new consumer to audit.
+
+### `test_audit_merged_dispatch.sh` — test, ci_portable
+
+**WHAT:** the expectation enumeration audit_merged_legacy.sh runs before its leg-(a) glob sees every kind — a `.pending` pairing (no ratified class in any set) is named NOT-EVALUATED, never dropped silently by a `*.masked-only` glob.
+
+**HOW:** ROM-free and emulator-free: the enumeration over the expectation directories with synthetic and real cases (donovan-m5 must name exactly 2 NOT-EVALUATED).
+
+**EXPECTS:** every kind enumerated and the live case's count exact; a red means the audit's blind spot is back over the one open superset regression.
+
+### `test_build_gate_status.sh` — test, ci_portable
+
+**WHAT:** a REJECTED build aborts the gate instead of being soaked and stamped PASS: the stage-4/6 gates no longer pipe the builder through tail (whose status hid every rejection), and a stale or missing rompath cannot be measured as the build.
+
+**HOW:** the gates copied into a scratch repo whose build_donovan.sh is a stub with scripted failures: reject-after-pack, stale rompath, no rompath, plus a positive control; GATE_SRC= reruns it against the pre-fix gates.
+
+**EXPECTS:** the three failure modes abort and the positive control passes; against the pre-fix gates it must FAIL.
+
+### `test_build_identity_distinct.sh` — test, ci_static
+
+**WHAT:** the merged playtest build stays distinguishable from its legacy-only instrument (build/merged1), which SHARES its program fingerprint by design: the whole-artifact manifest discriminates them.
+
+**HOW:** tools/artifact_manifest.py over both rompaths compared.
+
+**EXPECTS:** the manifests differ; a red means a rebuild made the playable build and the blank-tenant rig indistinguishable by every measure.
+
+### `test_capture_kf_ownership.sh` — test, ci_static
+
+**WHAT:** the capture-keyframe pointer table PRG:0x0BE27A (32 longs by attacker id) is HAND-OWNED by data_port rows, and no generic bank_map repoint writes it — which would discard Donovan's mirror-victim fix and Pyron's ported row 0x11; the model (longs, variant rows aliasing base rows) is read from the reference ROM and the shipped image, never from the patch.
+
+**HOW:** static over pristine vsavj's data view and each track's verify_data.bin: the model, the repoint inventory, the base-slot fix word on the stock track and its absence on the variant track; controls perturb an unclaimed row, plant the fix on the variant blob, and remove it from the stock track.
+
+**EXPECTS:** model, inventory and fix words as frozen; all three controls fail.
+
+### `test_capture_pose_sources.sh` — test, ci_static
+
+**WHAT:** the ROM facts the #104 fix design rests on: the positioner's id-unmasked read bytes, exactly five code sites carrying the table immediate, vsavj's 16 blocks aliasing or copying their variant half, vs2 and vh2 carrying twin blocks with distinct tenant rows and equal stride, every BASE sub-block byte-identical between vsavj and vs2, the signed-16-bit offset bound, and the 15-block port inventory.
+
+**HOW:** static over the three decrypted images (~5 s warm), with two verdict controls perturbing a buffer each direction.
+
+**EXPECTS:** every fact as measured 14z-99; a sixth consumer site, a drifted block or a broken premise fails.
+
+### `test_census_regions.sh` — test, ci_static
+
+**WHAT:** tools/census_regions.py (the data_in_code and pcrel-escape censuses) reproduces the FROZEN inventory on the Huitzil extraction (5 data_in_code rows, the x02592a 89->35 and x026142 9->6 escapes, the adjacency-safe code->x057456 cluster, two known operand false positives, the x05c800 pair covered) and Pyron's own code stays clean with the shared-zone findings mirrored.
+
+**HOW:** the tool over a stage-4 Huitzil build (self-built unless given) and the Pyron extraction, the counts compared with the frozen ones, adjacency asserted from placements.json.
+
+**EXPECTS:** every census number as frozen; growth in ANY number is stop and root-cause (latent escapes bite later).
+
+### `test_effect_placeholders.sh` — test, ci_portable
+
+**WHAT:** the x2b7ef4 coordinate-list placeholders are resolved at the offsets they were WRITTEN, never by an in-place scan: a resolved pointer whose low word begins 0xEE is left alone, source data beginning 0xEE is left alone, and a placeholder overwritten before resolution is reported.
+
+**HOW:** the generator's module-level resolver on synthetic blobs (the straddle case, source data with a 0xEE top byte, a lost placeholder); the control runs the pre-14z-170 in-place scan on the straddle fixture, which must corrupt it.
+
+**EXPECTS:** exact resolution and no collateral write; the shadow scan corrupts the fixture and fails. The pass's record DISCOVERY is not covered here.
+
+### `test_escape_triage.sh` — test, ci_static
+
+**WHAT:** the classification of every UNCOVERED word-form pc-relative branch escape on the merged placements is frozen verbatim: 25 sites, zero LIVE-RISK — 22 ADJACENT-OK and 3 reviewed census false positives — and any drift fails both ways.
+
+**HOW:** tools/triage_pcrel_escapes.py over the three solo extracts and the merged placements, its verdict set compared with the frozen one; the control includes COVERED regions, whose raw escapes must classify non-OK by the hundreds.
+
+**EXPECTS:** the verdict set exact; a new line is an unreviewed escape, a missing one a build that is not the frozen generation; the control's zero would mean the classifier stopped discriminating.
+
+### `test_extract_hp.sh` — test, ci_static
+
+**WHAT:** the Huitzil and Pyron extraction shapes are as measured: Huitzil's code region with its +0x36 shift, the 6-byte sibling-insertion sliver and the x057456 group with one dead filler zone; Pyron's single code region with its shift and one filler zone; a character with no anchor row is refused and the charid scanner finds the tenant's own id.
+
+**HOW:** runs the extractor on both tenants from the reference sets (~2 min) and compares the region shapes; the refusal and the scanner are the negative controls.
+
+**EXPECTS:** shapes exact, the unanchored id refused, the scanner correct.
+
+### `test_freeze_artifacts_current.sh` — test, ci_static
+
+**WHAT:** the tracked artifacts that FOLLOW the romset but have no static gate of their own were refreshed at the current freeze: build/merged1's ops (by value, not count), the MiSTer prg_window expectation's header, and patch_index.md's registration cells naming the current build dirs and fingerprints.
+
+**HOW:** compares each artifact with the current freeze's build set and registry; six controls (a one-value change at an equal op count, a non-current header, a stale dir, a stale fingerprint, an unregistered-but-registered row, a program-key alias).
+
+**EXPECTS:** every artifact current; each control fails its section. Add a row when an artifact is tracked, build-derived and covered by no ci_static gate.
+
+### `test_freeze_tag_coverage.sh` — test, ci_portable
+
+**WHAT:** every frozen build in tests/expected/registry.tsv has an ANNOTATED git tag `freeze/<set>` whose message names the build's fingerprint — the only route back to a tree that reproduces a superseded build; the two M2 battery legs and the vsavj null baseline are excused by shape.
+
+**HOW:** reads the registry and `git tag` (annotated, message content) for every build-shaped row; controls perturb a registry copy (an untagged row, a fingerprint the tag cannot name).
+
+**EXPECTS:** every build row tagged, annotated and naming its fingerprint; both controls fail. No grandfathered exception remains.
+
+### `test_fsm_census.sh` — test, ci_static
+
+**WHAT:** the static object-script node-state census: every ported node whose state byte (+0x17) is at or past vsavj's 80-entry FSM table is enumerated and classified against vs2, and the inventory equals the frozen build/manifest/fsm_census.toml (EMPTY since the 14z-110b remap) — the build-time guard #99 asked for.
+
+**HOW:** tools/audit_fsm_census.py --check over the build's verify_data.bin with vs2 as the classification oracle; controls perturb a node's +0x17 to a fresh out-of-range value (ADDED) and clear one to in-range (MISSING) in copies.
+
+**EXPECTS:** the pristine build passes with the frozen inventory; both perturbations fail.
+
+### `test_hitclass_map_thunk.sh` — test, ci_static
+
+**WHAT:** the hit-class map-extension thunk body (vanilla's 64 bytes verbatim, vs2's 16 extension entries, a loud ILLEGAL at or past 80) reconstructs from the two reference ROMs with the generator's own safety asserts, and every committed manifest row matches the reconstruction byte for byte.
+
+**HOW:** tools/gen_hitclass_map_thunk.py from the decrypted views, the output compared with the site_thunk rows of the real manifests; controls corrupt a committed hex and invoke the generator on a wrong image.
+
+**EXPECTS:** reconstruction and rows equal; the corrupted hex fails the compare and the wrong image fails the generator.
+
+### `test_id_space.sh` — test, ci_static
+
+**WHAT:** the shape of the character-id space is frozen: zero out-of-range variant rows across the layout-verified tables, exactly seven sites folding the id to 4 bits (five by register, two directly in memory), the only variant rows with their own data 0x18 and Anakaris's word_pos_a, and the reserved id 0x12; vsav2's reference shape (distinct rows at 10/11/13/18/19, two fold sites).
+
+**HOW:** tools/audit_id_space.py over the decrypted data views of vsavj and vsav2.
+
+**EXPECTS:** every frozen count exact; growth of the fold set or the reserved set invalidates the roster plan's premise that 0x10/0x11/0x13 are free.
+
+### `test_index_space.sh` — test, ci_static
+
+**WHAT:** the out-of-range index sweep: every `jmp (d8,PC,Dn.w)` dispatch table's entry count derived in BOTH ROMs from two structural bounds, reporting where vs2's table is longer than vsavj's (the class behind Pyron's Cosmo crash) — 110 tables, 81 twinned, 29 NOT JUDGED, 3 risky, frozen with the unjudged count part of the verdict.
+
+**HOW:** tools/audit_index_space.py over the two opcode views; the positive control re-derives the Cosmo table at 80 entries against vs2's 84; negative controls on the length derivation.
+
+**EXPECTS:** the frozen counts exact and the Cosmo table at 80/84; a quietly shrinking judged set reads as a red, not as 'no risk'.
+
+### `test_index_window_thunk.sh` — test, ci_static
+
+**WHAT:** the index-window thunk at engine site 0x018460 (covering vsavj's 80-entry sub-state table's out-of-range window for the tenants) is byte-identical to what tools/gen_index_window_thunk.py derives from the two reference ROMs, the engine around it is vanilla (the table, the sibling dispatcher, the handler pool), and the table still has exactly 80 entries.
+
+**HOW:** reconstruction from the decrypted views compared with the build's image (never a tolerance diff); three verdict controls perturb a trampoline address, a table word and a danger body.
+
+**EXPECTS:** site, body and surroundings as reconstructed, the table at 80; each control caught. One wrong trampoline is a silent wrong-routine dispatch — the class the thunk removes.
+
+### `test_kernel_voice_tables.sh` — test, ci_static
+
+**WHAT:** the sound kernel's four per-class voice-id tables: vsavj's variant halves are byte-copies of the base halves (the grunt defect's alias shape), vs2's variant halves carry the newcomers' real rows (frozen verbatim), every entry of event .N ends in nibble N on both games, and 0x2a1/0x2a2 are FREE Z80 ids in both (the deliberate-silence premise).
+
+**HOW:** static over the OPCODE views (the tables sit inside the crypt window) and both Z80 id tables; two verdict controls perturb a copy each direction.
+
+**EXPECTS:** all four facts hold and both controls fail; a fix that ports the rows re-freezes section 1 deliberately.
+
+### `test_m2_repoint.sh` — test, emulator
+
+**WHAT:** the M2 slot-replacement mechanism on trusted vanilla tooling: repointing Jedah's hitbox-base table entry to Demitri's takes effect in a live match (RAM:$FF8460 loads the new base), every legacy replay not involving Jedah is bit-identical to vanilla, and the attract replay diverges exactly where its demo shows Jedah (frame 4278).
+
+**HOW:** a patched vsavj on MAME with the pick replay, the legacy suite and the attract replay compared with the frozen vanilla logs.
+
+**EXPECTS:** the new base loaded, legacy identical, the attract divergence exactly at 4278 — the superset invariant specified, not weakened.
+
+### `test_m2a_stage1_nullreloc.sh` — test, emulator
+
+**WHAT:** the M2a stage-1 null relocation: Jedah's own hitbox block copied into hole A and repointed, two dispatch entries routed through jmp-back trampolines, with zero Donovan bytes — picking slot 0x0F loads the relocated base, Jedah's match is field-identical to vanilla but for the two relocated pointers, legacy replays bit-identical, the pick replay diverging exactly at 2886, the -debug guard clean.
+
+**HOW:** the stage-1 build on MAME: the pick replay, compare_fields against vanilla, the legacy suite, the attract and pick divergence frames, the crash guard.
+
+**EXPECTS:** every gate as listed; any failure is allocator/copy/repoint/encrypt tooling, nothing else.
+
+### `test_m2a_stage2_data.sh` — test, emulator
+
+**WHAT:** the M2a stage-2 build (Donovan's passive data under Jedah's code and anim): slot 0x0F loads Donovan's relocated hitbox base and companion from the generator's placements, a full round completes coherently under the cheap guard with the pick window exception-free under -debug, and the superset invariant holds (legacy green, pick divergence at 2886).
+
+**HOW:** the stage-2 build on MAME: the pick replay's RAM reads, a ~9300-frame round, the -debug guard over the pick window, the legacy suite.
+
+**EXPECTS:** coherence and provenance hold; behaviour correctness is deliberately not gated at this mixture.
+
+### `test_m2a_stage3_anim.sh` — test, emulator
+
+**WHAT:** the M2a stage-3 build (Donovan's anim and sprite clusters under Jedah's dispatch): after match start the anim cursor +0x1C lies inside the relocated region over an idle window, no crash across it, a full round completes, legacy green and the pick divergence at 2886.
+
+**HOW:** the stage-3 build on MAME: the cursor sampled over ~600 idle frames, the -debug guard, the cheap-guard round, the legacy suite.
+
+**EXPECTS:** as listed; a crash here is a waived-mixture artifact only with crash-stack evidence AND a passing stage 4.
+
+### `test_m2a_target_policy.sh` — test, ci_portable
+
+**WHAT:** the M2 battery's legacy target is RESOLVED from the build's fingerprint through the registry, never pinned: neither tests/lib/m2a_common.sh nor run_suite.sh carries a hardcoded mask or set name any more (#96's ruling), and a re-introduced literal is caught.
+
+**HOW:** reads the two sources for the forbidden literals.
+
+**EXPECTS:** no pin and no duplicated mask; a red is the #96 defect returning.
+
+### `test_m2a_target_resolution.sh` — test, ci_static
+
+**WHAT:** the M2 battery RESOLVES its legacy target from the build under test and STOPS on an unregistered image with a loud message, instead of judging any build against a fixed expectation set.
+
+**HOW:** runs the resolver on a registered build and on a synthesised unregistered one (a one-instruction poke); structurally forbidden from booting an emulator (m2a_run_masked replaced by a loud failure).
+
+**EXPECTS:** the registered build resolves to its set, the unregistered one stops with the message; an emulator reached is an immediate fail.
+
+### `test_m3a_reproducible.sh` — test, ci_static
+
+**WHAT:** every frozen reference rebuilds BIT-EXACT from the current tree: the three solo tenant builds, the stock twin and the merged image (the one that gets played), each against its frozen fingerprint — three independent tenant fingerprints are three oracles over any machinery refactor.
+
+**HOW:** rebuilds each track into a scratch dir with tools/build_donovan.sh and compares fingerprints and artifact manifests (skipping the merged image, and saying so, when its untracked inputs are absent).
+
+**EXPECTS:** every fingerprint equal; a moved fingerprint is a failed change whatever it was trying to do. ~4 min, ROMDIR only.
+
+### `test_manifest_merge.sh` — test, ci_portable
+
+**WHAT:** what the three tenant manifests do when MERGED: the shared-row dedup counts and the exact collision inventory are frozen (three real blockers, six that dissolve on the WIDE track), a span collision is its own check, and the merge REFUSES anything it cannot dedup identically.
+
+**HOW:** merge_manifests() over the real manifests (no ROMs, no build, ~1 s) with four permissiveness controls.
+
+**EXPECTS:** counts and collisions as frozen; a new collision or a lost dedup fails with the address named.
+
+### `test_movability_liveness.sh` — test, emulator
+
+**WHAT:** audit_region_movability.sh cannot score a DEAD emulator as `runs`: a never-started or empty-log rig must FAIL and be named `dead`, and a live rig must still score `runs`.
+
+**HOW:** the audit's BUILDER_CMD and GUARDED_RUNNER seams take stubs (no builds, seconds): a never-started runner, an empty log, and a live positive leg.
+
+**EXPECTS:** the two dead rigs fail as `dead`, the live one scores `runs`; the positive leg is not optional.
+
+### `test_patch_overlap.sh` — test, ci_static
+
+**WHAT:** patch_prg's op-overlap assertion: two ops writing one word is a BUILD ERROR naming both ops; disjoint and word-adjacent ops stay clean.
+
+**HOW:** synthetic op sets through the real patcher (~2 s, no emulator).
+
+**EXPECTS:** the overlap refused by name, the clean cases accepted.
+
+### `test_patch_prg.sh` — test, emulator
+
+**WHAT:** the program-patch tooling round-trips through MAME: a null patch is bit-identical to reference vsavj, an injected code blob decrypts back to its plaintext in MAME's real opcode space, and an injected data blob reads raw.
+
+**HOW:** three patched images booted on MAME with the relevant spaces dumped and compared.
+
+**EXPECTS:** all three; the null case is what the superset invariant rests on.
+
+### `test_pointer_flow.sh` — test, ci_static
+
+**WHAT:** every address the patch introduces (op extents, poke32 repoint values, code abs.l operands, data bare longs) classifies against the op map and the SHIPPED image bytes as frozen per build: STRONG findings verbatim (each reviewed), WEAK volume by count — growth either way fails.
+
+**HOW:** tools/audit_pointer_flow.py over each build dir's outputs against `tests/expected/pointer_flow/<set>.txt` (reads build outputs only; SKIPs per absent build).
+
+**EXPECTS:** the frozen findings and counts exact; a new STRONG finding is an unreviewed pointer into fill space, a moved count a build that is not the frozen one.
+
+### `test_qs_id_table.sh` — test, ci_static
+
+**WHAT:** the QSound Z80 driver id-table census of both games as derived from the $3B00 anchor blocks (vsavj's modulus and live/free rows, the pilot rows, vs2's), the code-identity licence for verbatim stream copies (the two regions byte-identical below 0x34F1 but for two envelope-base immediates), and the ejection sample's content lock (vs2's window byte-identical in vsav's image).
+
+**HOW:** tools/audit_qs_id_table.py over the two Z80 members (static, ~5 s); controls corrupt an id-table row in a temp copy and guard the parser against reproducing the retracted region-mapping bytes for id 0x119.
+
+**EXPECTS:** every census fact frozen exact; the corrupted row fails; the file-mapping trap stays caught.
+
+### `test_qs_songs.sh` — test, ci_static
+
+**WHAT:** the authored-Z80-song machinery: every [[song]] row's placement equals its vs2 source bytes, its id row encodes exactly [addr24 BE][00], every byte outside the declared spans equals the stock driver members (legacy-invisible by construction), and the driver's reachability laws hold (entry b0 != 0, placement inside the banked image).
+
+**HOW:** tools/build_qs_songs.py on a scratch copy of the WIDE overlay, verified against the REFERENCES not the builder's output; controls corrupt a song byte, target a LIVE id, and place over non-zero bytes.
+
+**EXPECTS:** all properties hold; the corruption is caught and the two bad rows refused.
+
+### `test_qs_window_law.sh` — test, ci_portable
+
+**WHAT:** the QSound sample-window endpoint law — a record's end offset is played and looped INCLUSIVE — is declared once in tools/qs_window.py and every consumer (the song builder and both voice-batch audits) resolves to it, with bounds CHECKED not clamped.
+
+**HOW:** 14 cases over the shared module and its consumers (no ROMs, ~1 s), including a terminal-byte corruption control and a control reproducing the old exclusive blindness.
+
+**EXPECTS:** every case as specified; a red is the tree contradicting itself about the byte that caused the sword-plant beep.
+
+### `test_reaction_hook_d2.sh` — test, ci_static
+
+**WHAT:** the #99 fix: the 82-byte reaction_hook thunk's dispatcher-2 window (states 0x50-0x53) dispatches through a second table whose four cases are byte-identical to vs2's dispatcher-2 handlers, re-derived from vsav2.zip; the site is a jmp to the thunk; vanilla dispatcher 2 is byte-identical to vsavj's own decrypted bytes; the node data matches the frozen census (empty since the 14z-110b remap).
+
+**HOW:** reconstruction from the two decrypted images compared with the built Donovan-carrying image (static, seconds); three verdict controls perturb a built case byte, a table long and a window bound.
+
+**EXPECTS:** every section equal and every control caught. The dynamic leg (forcing D0 at the site) is recorded in STATE, not here.
+
+### `test_record_window.sh` — test, emulator
+
+**WHAT:** tests/lua/record_window.lua, the in-emulator windowed movie recorder, records the frames it claims: the movie covers exactly the requested window, the same window recorded twice is byte-identical, a window the framebuffer checksum stream says CHANGES yields a materially bigger file than a still one, an inverted window aborts and an unclosed one reports FORCED.
+
+**HOW:** MAME runs on a WIDE build with windows CHOSEN from the measured checksum stream at run time (no frame constant to rot), the files compared and sized.
+
+**EXPECTS:** extent, determinism, liveness and both controls; nothing may be read off a recording until this passes.
+
+### `test_region_overlap.sh` — test, ci_static
+
+**WHAT:** what the three tenants' regions do together: 17 shared spans, 8 name collisions, 13 unique, and the bytes two or more tenants write DIFFERENTLY (2,000 on the original trio, 2,033 on the shipped one) — which cannot be placed once by dedup; placement normalisation is proven load-bearing (7,591 raw against 2,000).
+
+**HOW:** tools/audit_region_overlap.py over the three builds' blobs with placement normalisation (static, no ROMs); --no-normalise is the control only.
+
+**EXPECTS:** the frozen counts exact on both trios; two-tenant spans report UNDECIDABLE, never a reassuring zero.
+
+### `test_region_overlap_control.sh` — test, ci_static
+
+**WHAT:** the region-overlap gate's CURRENT-trio constants can fail: pointed at the superseded trio it must reject (2000 vs 2012), an absent build must FAIL not SKIP, and the positive control still passes.
+
+**HOW:** runs the gate's section 5 with the trio redirected and with a missing build (~2 min, no ROMs).
+
+**EXPECTS:** reject, FAIL, pass — a constant nobody can make fail is not an assertion.
+
+### `test_rompath_reject.sh` — test, ci_portable
+
+**WHAT:** a REJECTED build does not keep its rompath: the builders' EXIT trap (tools/rompath_reject.sh) moves it aside on an explicit exit 1, a set -e failure, a `${VAR:?}` demand (exit 0 under a trap on bash 3.2, still failed), SIGTERM and a missing disarm, while a success keeps it and a failure before the pack has nothing to move; both real builders source it, arm it after the clear and disarm it after every verifier.
+
+**HOW:** scripted builders sourcing the REAL helper under sh, bash and dash, plus the wiring read from both builders; controls disable the rename and move a disarm above the audit.
+
+**EXPECTS:** every helper case and the wiring as specified; both controls fail. That a real build rejects end to end is not claimed (ROMs needed).
+
+### `test_rule5_census.sh` — test, ci_portable
+
+**WHAT:** the rule-5 census (behavioural values live in documented tables) runs clean with nothing UNCLASSIFIED, the frozen BAKED gameplay+code inventory has not grown, IN-TABLE is pointer-driven, and every tripwire of tools/audit_rule5.py still fires.
+
+**HOW:** the tool's --check over the canonical manifests and generators against tests/expected/rule5_baked.tsv (~6 s); four controls (a new kind/key, an aux_poke outside every band, a new baked gameplay value, an edited inventory).
+
+**EXPECTS:** clean census, inventory unchanged or smaller, every control failing; `fact` is a NOTE-class number, not frozen.
+
+### `test_s4_thresholds.sh` — test, ci_portable
+
+**WHAT:** the ratified CLAUDE.md §4 thresholds (FLICKER_MAX, RECONVERGE) are declared ONCE in tools/s4_thresholds.py and every comparator imports them, re-declaring no local literal and hardcoding no argparse default.
+
+**HOW:** reads the four consumers' sources (~1 s); a verdict control both ways (a re-introduced literal caught, a comment not flagged).
+
+**EXPECTS:** the values, the imports, no literals; a red is a comparator that could disagree with the classifier about what a flicker is.
+
+### `test_select_arrays.sh` — test, emulator
+
+**WHAT:** the select-screen record-pointer arrays (portrait, name, highlight; 32 rows per player, P2 at +0x80, indexed by cell/id with no 4-bit fold, rows 0x10-0x1F variant aliases) as modelled against the reference image, and the ENGINE's own row fetch agreeing: hovering four known cells fetches exactly the four frozen records.
+
+**HOW:** static model against the reference data view with a one-byte corruption control; runtime on MAME reading $1C(a6)+4 at the record walker while the cursor hovers the cells.
+
+**EXPECTS:** the model holds, the corruption fails, the engine fetches the predicted rows. A tenant at 0x13 costs six longs.
+
+### `test_shared_writes.sh` — test, ci_static
+
+**WHAT:** every build op that lands outside declared free space and outside a known variant row is FROZEN per tenant in build/manifest/shared_writes.toml, and any addition, removal or change fails — the build-time event for the next Bulleta-class write (a tenant row landing on a vanilla character's data).
+
+**HOW:** tools/audit_shared_writes.py over each tenant build against the frozen inventory (static, seconds; SKIPs absent builds); the positive control finds the withdrawn DF-palette write in the frozen huitzil-m2 build; two verdict controls add and remove a synthetic write.
+
+**EXPECTS:** inventories unchanged, the real defect flagged on hui27, both controls caught. HONEST LIMIT: a pass means unchanged since reviewed, not safe.
+
+### `test_shim_charid.sh` — test, emulator
+
+**WHAT:** the init shim can identify WHICH tenant it runs for: at char-init (0x382,A6) already holds the character id, on BOTH player structs — the premise the merged shim's per-id flavour chain rests on.
+
+**HOW:** GUARD_PROBE_MEM reads memory at the shim's hit on two 2P replays on MAME with the forced-pick pokes (without them the shim never runs and the gate measures nothing — section 0 proves the probe armed); the verdict control reads offset +0x000, which must NOT hold the id.
+
+**EXPECTS:** 0x13 read at +0x382 on both structs, the control offset not; a quiet leg without section 0 is a dead rig.
+
+### `test_tenant_anim_relocation.sh` — test, ci_static
+
+**WHAT:** every sprite-record pointer in a tenant's PLACED anim chains is relocated: no node's +4 lands in the tenant's own vs2 SOURCE range (an unrelocated pointer draws vanilla art in a tenant's move and never faults), with the 24-bit address mask load-bearing.
+
+**HOW:** walks every emitted node of each tenant build's verify_data.bin (garbage included) classifying the masked pointer; out-of-region pointers are REPORTED, not asserted (walk overrun, an instrument property); the control rewrites one node's +4 to a source-range address in a copy.
+
+**EXPECTS:** zero source-range pointers per tenant (3722/3722 for Donovan); the planted pointer fails section 1.
+
+### `test_tenant_row_owner.sh` — test, ci_static
+
+**WHAT:** the row-OWNER threading of the multi-tenant refactor is LIVE, not decoration: perturbing ONE owner-derived binding at a time changes the generator's whole output directory (blobs included), an intentionally unused binding reads DEAD, and two unperturbed runs agree byte for byte.
+
+**HOW:** the generator alone against an existing extract dir (seconds; SKIPs without one), one perturbation per owner-derived site, the output directories compared.
+
+**EXPECTS:** every live site changes the output, the dead one does not, determinism holds; a site whose perturbation changes nothing is dead code.
+
+### `test_tenant_select_records.sh` — test, emulator
+
+**WHAT:** at a variant-half tenant id the build carries the tenant's OWN select records (six array rows repointed, records composed from the vs2 image) and the host's select-record block, palette-grid column and shared coord list return to VANILLA bytes; the engine walking onto cell 0x13 fetches exactly the predicted row sequence for all three UI pieces.
+
+**HOW:** tools/check_tenant_select.py re-derives the composition from the vs2 image and select_port.PLACEMENTS and compares the built image; negative controls (a pristine image, a flipped composed byte, a flipped host byte) must fail; runtime on WIDE MAME with replay 36 reads the record walker.
+
+**EXPECTS:** static equal, the three controls failing, the engine's rows as predicted; SKIP_RUNTIME=1 skips section 3.
+
+### `test_thunk_addr_literal.sh` — test, ci_static
+
+**WHAT:** a placed address baked into a hand-authored site_thunk body is a BUILD error (the guard in gen_donovan_patch.py), opcode-anchored and word-aligned, with the addr_literal_ok escape hatch — and the three real manifests stay quiet under it.
+
+**HOW:** the generator alone against an extract dir on COPIES of the manifests (~40 s, no emulator): the wrong spelling planted must be refused, the real manifests pass, two verdict controls; section 3c states the coverage boundary (a raw longword in embedded data is out of scope).
+
+**EXPECTS:** the plant refused, the real manifests quiet, the controls caught.
+
+### `test_type_stamp_census.sh` — test, ci_static
+
+**WHAT:** the static type-stamp census (tools/audit_type_stamps.py) reproduces the FROZEN inventory build/manifest/type_stamps.toml — every family stamp, compare, reader and embedded-walker site, source-address-keyed — with its positive control (the six measured stamp sites seen) and negative control (the three unported stamps mapping to no tenant).
+
+**HOW:** the scan over vsav2's opcode view and the three extract dirs against the frozen file (~5 s); controls demand a bogus extra site and tamper the frozen copy.
+
+**EXPECTS:** no drift and both in-scan controls green; the bogus site fails the scan and the tampered copy fails verification.
+
+### `test_unless_composed.sh` — test, ci_portable
+
+**WHAT:** the `unless_composed` row key: a manifest row naming a tenant applies only to a build whose composition does NOT include that tenant, an unknown name fails the build, and the only rows carrying the key are Phobos's two Plasma Trap class remaps (naming donovan).
+
+**HOW:** the generator's vocabulary (port_tenant_names), a truth table over composition_allows(), the refusals, and the real rows across `build/manifest/*.toml` (~1 s, no ROM); the control perturbs the vocabulary to contain the misspelt name.
+
+**EXPECTS:** vocabulary, semantics, refusals and the two real rows as specified; the perturbed vocabulary accepts the typo and fails.
+
+### `test_variant_dispatch.sh` — test, ci_static
+
+**WHAT:** the variant-row dispatch sweep: for every 32-row per-character jump table whose variant half vsav aliases onto the base half, ours[tenant row] equals vs2's — rows where OURS runs a routine vs2 does not fail (Pyron's blink lived in three such tables), rows where vs2 runs one we do not are reported only.
+
+**HOW:** tools/audit_variant_dispatch.py over the build's image against vs2's, every `jmp (d8,PC,Dn.w)` word table with a mostly-aliased variant half (5); controls reintroduce an aliased row into a copy and require no table left unjudgeable.
+
+**EXPECTS:** clean for the tenant, the reintroduced row caught, every table judged (the twin finder matches by ordinal).
+
+### `test_voice_row_range.sh` — test, ci_static
+
+**WHAT:** the AUTHORED arcade-ladder rows (tables A and B at each tenant's class index) stay inside vanilla's value range — the largest safe stage value is 0x16, derived from the two tables — so the pointer-table lookup never reaches the terminator row (the vec3 that Huitzil's and Pyron's 0x18 entries caused).
+
+**HOW:** reads each tenant build's authored rows from the DATA view and derives the bound from the stage-name pointer table (~2 s, no emulator).
+
+**EXPECTS:** every authored value at or below the derived bound; the bound follows the table if it grows.
+
+### `test_win_quote_decode.sh` — test, ci_static
+
+**WHAT:** the win-quote text system's STRUCTURE: the root is a 4-entry region array with the measured bank sizes, the first-level offsets alias 0x10->0x00 (the defect pattern), every winner's every reachable line walks clean on all four banks within the renderer's 66-word buffer, and vs2 carries the three tenant blocks unaliased at 0x10/0x11/0x13.
+
+**HOW:** static over the decrypted data views (ROMDIR only); controls perturb a first-level offset far out of the bank and make one record's length absurd.
+
+**EXPECTS:** the four sections as measured; both perturbations refused.
 
 ## oracle
 
-the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus. 0 of 29 described.
+the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus. 29 of 29 described.
 
-**Not yet described:** `audit_flicker_attribution.sh`, `audit_guard_corpus.sh`, `audit_legacy_pairings.sh`, `audit_mask_window_ff4182.sh`, `audit_mask_window_ff42a2.sh`, `audit_merged_legacy.sh`, `audit_merged_vec3.sh`, `audit_roster_pairings.sh`, `test_attribute_ramdiff.sh`, `test_classify_hitclass_probe.sh`, `test_classify_pool_spawns.sh`, `test_compare_composite.sh`, `test_compare_fields_selfcheck.sh`, `test_compare_flicker.sh`, `test_compare_window.sh`, `test_describe_masked_shape.sh`, `test_down_flash_mechanism.sh`, `test_down_flash_vanilla.sh`, `test_dualtrack.sh`, `test_fbneo_legacy_oracle.sh`, `test_freeze_basis_sandbox.sh`, `test_inp_corpus.sh`, `test_inp_crash_merged_m8_01.sh`, `test_m2a_flicker_gate.sh`, `test_m2a_stage4_code.sh`, `test_m2a_stage4_oracle.sh`, `test_m2a_stage4_xemu.sh`, `test_masked_compare.sh`, `test_pod_black_foot_palette.sh`.
+### `audit_flicker_attribution.sh` — audit, emulator
+
+**WHAT:** why each flicker frame of the frozen composite expectations is there: every differing byte at the attributed frames (41_don_altcolor +2313, 37_victor_ko +7168, 105_legacy_2pwin_auto +2713/+5868) falls inside a NAMED window — the palette-fade staging buffer rows or the OBJ-builder secondary stack — re-derived rather than trusted from the commit that first wrote it.
+
+**HOW:** ours-vs-vanilla work-RAM dumps at the attributed frames on MAME, every differing byte classified by tools/attribute_ramdiff.py against the named windows.
+
+**EXPECTS:** every byte inside its window; a byte outside means the specs describe something else and must be re-opened, never widened.
+
+### `audit_guard_corpus.sh` — audit, emulator
+
+**WHAT:** every replay in tests/replays runs under the authoritative crash guard on the build under test in four legs — unpoked and with P1 forced to each tenant — with no 68k exception, PC excursion or soft reset anywhere (rule 6 on any finding).
+
+**HOW:** ~79 replays x 4 legs, guarded on MAME at JOBS=2 (~30-45 min), a DEAD leg (no verdict line) refused; the control replays the known 14z-93 vec4 tripwire on build/hui41 and must FAIL.
+
+**EXPECTS:** every leg END-clean; the known crash reproduced by the control. A PASS is rig-bounded: no vector fired on THESE rigs — widen the corpus, never the tolerance.
+
+### `audit_legacy_pairings.sh` — audit, emulator
+
+**WHAT:** every replay that loads only vanilla characters on the build (a LEGACY pairing, judged by the fighters' hitbox bases, never by the filename) carries a `.masked` or `.pending` expectation compared against VANILLA — a self-frozen `.sha1` on legacy content is the 14z-88 hole where a superset regression sat green; a tenant-loading replay keeps its `.sha1`.
+
+**HOW:** every non-skipped replay run bare on MAME as run_suite does (no pokes), the loaded characters read from +0x60 and classed LEGACY / TENANT / NO-MATCH by tools/check_legacy_pairings.py against the expectation kinds; a LEGACY verdict may be overridden only by a printed `.legacy-exempt` reason.
+
+**EXPECTS:** no legacy pairing on a bare .sha1, every override printed, NO-MATCH replays reported for hand judgement.
+
+### `audit_mask_window_ff4182.sh` — audit, emulator
+
+**WHAT:** the third masked window ($FF4182-$FF41A1, the palette-fade staging slot for select block-A row 14) hides exactly the designed medallion-recolour diff and nothing else: at the historical first divergence the build's slot holds the ported row, vanilla's holds vanilla's, and every surrounding byte is identical.
+
+**HOW:** a $FF4140-$FF41DF dump of vanilla and the build under test at 05_timeout_idle f9126 on MAME, compared byte by byte.
+
+**EXPECTS:** (1) vanilla row 14 in vanilla's slot, (2) the ported row in the build's, (3) identical outside the window. A (3) failure is stop-and-root-cause, never a mask widening.
+
+### `audit_mask_window_ff42a2.sh` — audit, emulator
+
+**WHAT:** the pre/post attribution instrument for a select-palette row move: when a layout change moved a set's self-frozen tenant replays, did anything move OUTSIDE the ratified staging family — the pair must differ unmasked, and under the V3 mask be exact or differ only on isolated frames whose bytes all fall in the palette staging area, the OBJ-builder secondary stack, or the input-accept latch.
+
+**HOW:** A/B of the PRE-move build against the POST-move build on each replay on MAME, unmasked and masked, with work RAM dumped at every isolated differing frame and every byte classified.
+
+**EXPECTS:** (1) a differing unmasked pair (else the replay is not on the list), (2) exact or isolated-and-attributed under the mask; anything else is a mechanism outside the family — stop and root-cause (its first run caught the 38 regression this way). Its future is ticket #131.
+
+### `audit_merged_legacy.sh` — audit, emulator
+
+**WHAT:** a 3-tenant MERGED program image does not perturb LEGACY: its legacy behaviour lands on the same ratified comparison classes as the frozen single-tenant builds (the merged build's own class table since 14z-91), with one ratified merged-specific exception on 04_select_fuzz, and the merged init shim is planted on every declaring tenant's row (HENT == SHIM, PENT != SHIM).
+
+**HOW:** the merged image packed against the zero-filled WIDE overlay (build/merged1, a legacy-only instrument with no registry row on purpose) run over the legacy corpus on MAME against vanilla, every class deviation printed with a proposed expectation line and FAILED, never absorbed; leg (b) covers the tenant content's crash-freedom.
+
+**EXPECTS:** every legacy replay on its ratified class; a deviation is mechanism-attributed and maintainer-signed or it stays red. It proves NOTHING about tenant correctness (gfx pristine by design).
+
+### `audit_merged_vec3.sh` — audit, emulator
+
+**WHAT:** the merged-build Huitzil satellite anim-base probe: on the merged build the satellite enters the anim walker with base A0 = anim@huitzil + 0xB8AC (its own placed anim), not tenant 0's planted tripwire address — the regression gate for the per-tenant type-number renumbering that fixed the 14z-81 vec3.
+
+**HOW:** two guarded MAME runs of hui/70_hui_mash on the merged build with GUARD_PROBE on the walker entry, A0 read at the satellite's first tick.
+
+**EXPECTS:** A0 the healthy value on the merged build; a FAIL is a regression of the renumbering (pair any change with donovan/12_vs_cpu staying guard-clean).
+
+### `audit_roster_pairings.sh` — audit, emulator
+
+**WHAT:** every tenant against every character, BOTH sides (the §4 'vs each of the 18' mandate): each of the 111 pairings runs guarded to END with no crash, and BOTH characters actually loaded on their hitbox bases — expectations DERIVED from the merged image's own table, never harvested from a run.
+
+**HOW:** 99+ guarded MAME runs on the merged build (measured ~5 min at JOBS=6), bases compared with tests/expected/roster_pairings/bases.tsv, plus a no-poke verdict control (an unpoked run must be refused).
+
+**EXPECTS:** every pairing END-clean with both bases as derived; a crash is rule 6 — capture it, do not keep batching for a completeness number.
+
+### `test_attribute_ramdiff.sh` — test, ci_portable
+
+**WHAT:** tools/attribute_ramdiff.py REFUSES when both logs resolve to the SAME dump file (MAME dump names are directory-scoped, so two logs in one directory compared a file against itself and reported IDENTICAL), while a genuine zero-diff between DISTINCT dumps stays a note-and-pass.
+
+**HOW:** synthetic log pairs in one directory and in two (no ROMs, ~1 s).
+
+**EXPECTS:** same-file refused, distinct-identical noted; a PASS guaranteed by path resolution is not a gate.
+
+### `test_classify_hitclass_probe.sh` — test, ci_portable
+
+**WHAT:** the hit-class probe classifier's verdict logic: a census zero is told apart as OK (the tenant stayed inside vanilla's 64 entries), DEAD, CRASH or CAPPED, D0 is read as the RAW index `(index*4` at the obj_hook sites), the low word is the index with a stale high word masked and a large low word kept as a real trap.
+
+**HOW:** 15 synthetic cases through tools/classify_hitclass_probe.py (no ROMs, ~1 s).
+
+**EXPECTS:** every case its designed verdict; the fixture caught its own author once (a wrong width), which is why the cases exist.
+
+### `test_classify_pool_spawns.sh` — test, ci_portable
+
+**WHAT:** the projectile-pool spawn classifier supplies the denominator that makes a hit-class census zero interpretable (how many type >= 64 objects entered the pool), reading the type byte from the HIGH lane of the logged word (+0x02, an even address) — the real captures carry equal lanes, so a low-lane reader is right by coincidence.
+
+**HOW:** 12 synthetic cases through tools/classify_pool_spawns.py, every lane case with UNEQUAL lanes (no ROMs, ~1 s).
+
+**EXPECTS:** every case as designed; the lane cases fail a low-lane reader. Protects the 2026-08-16 KEEP ruling on hitclass_map_extend.
+
+### `test_compare_composite.sh` — test, ci_portable
+
+**WHAT:** tools/compare_composite.py, the §4 v4 composite class (a frozen flicker inventory plus frozen bounded windows), accepts exactly the frozen shape and rejects every laxer one: an extra or missing flicker frame, a late onset, a window that never re-converges, bit-identical logs (the class asserts existence), a second unfrozen window.
+
+**HOW:** seven synthetic log pairs through the checker (no emulator, ~1 s).
+
+**EXPECTS:** case 1 PASS, cases 2-7 FAIL.
+
+### `test_compare_fields_selfcheck.sh` — test, emulator
+
+**WHAT:** the dual-emulator field comparator agrees on known-good content (16_xemu_2p on MAME vs patched FBNeo at the match-start anchor and shortly after, all mapped fields) and FAILS on known-different content (16 on MAME vs 02_demitri_vs_cpu on MAME).
+
+**HOW:** the two replays run on MAME and FBNeo, tools/compare_fields.py over the dumps with tests/fields_m2a.tsv.
+
+**EXPECTS:** agreement on the positive control, exit 3 on the negative; the §4 protocol's first real exercise, kept as its ground truth.
+
+### `test_compare_flicker.sh` — test, ci_portable
+
+**WHAT:** the flicker comparator's verdict logic (the §4 v2 class): synthetic log pairs with known flicker inventories classify as PASS or FAIL as designed.
+
+**HOW:** synthetic logs through tools/compare_flicker.py (no emulator, fast).
+
+**EXPECTS:** every synthetic case as designed.
+
+### `test_compare_window.sh` — test, ci_portable
+
+**WHAT:** the §4 v3 'bounded re-convergent window' checker accepts exactly the select-screen shape (one contiguous run, fixed onset, full re-convergence, match state untouched) and rejects scattered flicker, a drifting onset, a run that never re-converges, and a silently identical pair.
+
+**HOW:** synthetic log pairs through tools/compare_window.py (no emulator, no ROMDIR).
+
+**EXPECTS:** the accepted shape passes, every laxer shape fails.
+
+### `test_describe_masked_shape.sh` — test, ci_portable
+
+**WHAT:** tools/describe_masked_shape.py, which turns a measured masked divergence into a PROPOSED expectation line, picks the right class (exact / flicker / window / composite / two-window), refuses the never-re-converges shape as not expressible, and sits exactly on the two thresholds (flicker <= 2 frames, re-convergence > 60) shared with the comparators.
+
+**HOW:** 11 synthetic divergence shapes through the tool (static, ~1 s), one per branch plus both threshold boundaries and the length-mismatch report.
+
+**EXPECTS:** every proposed line as designed; a wrong window bound here would be copied into an expectation file by hand.
+
+### `test_down_flash_mechanism.sh` — test, emulator
+
+**WHAT:** the MECHANISM of #113's one-frame white-out: a deliberate palette-BASE swap — CPS-A register 0x80410a written from the normal 0x90c0 to 0x9240 for exactly one frame, 0x924000 filled with ffff — exactly 4 times in the 6,700-frame run, each followed by an all-white frame and no white frame without one.
+
+**HOW:** a register write tap on the live CPS-A block on MAME plus the framebuffer hashes; the control asserts the same 4-write shape against the normal base 0x90c0 (present on ~6,590 frames), which must fail.
+
+**EXPECTS:** 4/4 swaps each followed by white, the region all ffff, the control failing. WHY Capcom flashes is not established — mechanism only.
+
+### `test_down_flash_vanilla.sh` — test, emulator
+
+**WHAT:** #113's ground truth: the one-frame whole-screen WHITE at a down is VANILLA Vampire Savior behaviour — on stock vsavj the all-white framebuffer hash appears exactly at the attributable events (the match-intro pair, one at match start, one 50-120 frames after the first death flag) and NOWHERE ELSE.
+
+**HOW:** tests/lua/inp_probe.lua (per-frame framebuffer fnv1a64 plus death flags) on stock vsavj with replay 104 on MAME; a white frame with no attributable event is the negative control.
+
+**EXPECTS:** the inventory as measured (1909/1911, 2148, 6646 on vanilla 104); an unattributed white frame is a new flash, ours or the emulator's.
+
+### `test_dualtrack.sh` — test, emulator
+
+**WHAT:** the stock and WIDE tracks differ ONLY where they are meant to: legacy replays bit-identical UP TO SELECT ENTRY outside the six frozen execution-position offsets, each select-reaching replay's STATE onset equal to its frozen onset (the two rosters differ by construction), and past that only data fed to the same engine code.
+
+**HOW:** a live A/B of the two builds on FBNeo over the corpus (no frozen expectations, machine-independent); the control flips a byte in a real pre-onset WIDE dump outside the six offsets so a legacy replay's onset moves EARLIER and the gate must FAIL.
+
+**EXPECTS:** every onset equal to its frozen value, no growth outside the offsets; an onset moving earlier is the failure (CLAUDE.md [VSP-25]).
+
+### `test_fbneo_legacy_oracle.sh` — test, emulator
+
+**WHAT:** the hacked build's legacy content compared against VANILLA on FBNeo — our patch bytes under the FBNeo 68k core — on sampled frames chosen from each replay's frozen MAME spec and pushed clear of every ratified divergence, masked per §4 (the dead stack, the QSound latch) and expected to differ only at the frozen FBNeo-only phase offsets (#78's partial track).
+
+**HOW:** 4 replays x 5 frames on FBNeo: leg A vanilla vsavj (on FBNEO_REF, else on the patched binary with test_wide_profile completing the claim), leg B the hacked set; the frozen offset inventory is the expectation, FBNEO_ORACLE_EXPECT=exact demands bit-identity.
+
+**EXPECTS:** equal outside the frozen offsets; a byte inside a window but outside the inventory FAILS as GROWTH — stop and root-cause, never widen ([VSP-26]).
+
+### `test_freeze_basis_sandbox.sh` — test, ci_portable
+
+**WHAT:** tools/freeze_masked_basis.sh never hands one run's MAME sandbox to the next: naming the same replay twice in one invocation (the documented canary command) gives the second leg a FRESH sandbox, so it cannot inherit the first leg's EEPROM and overwrite a basis it just verified.
+
+**HOW:** a scratch repo with the real freeze script and a STUB run_replay_mame.sh whose output depends on whether it was handed a dirty sandbox (no emulator, no ROMs); section 3 re-runs against the reconstructed pre-fix tool, where section 1 must fail.
+
+**EXPECTS:** fresh sandboxes both legs, the pre-fix tool failing; a red is the baseline the superset invariant rests on being silently redefined.
+
+### `test_inp_corpus.sh` — test, emulator
+
+**WHAT:** every tracked hand-played recording under tests/inp/ plays through on the current merged build with NO CPU exception — a captured-but-unfixed defect is declared by a DEFECT file naming its expected vector and PC, and then that exact crash is asserted so the capture cannot rot.
+
+**HOW:** every recording replayed headless under tests/lua/inp_guard.lua on MAME (~1 min each).
+
+**EXPECTS:** no exception on any recording without a DEFECT file, the declared crash exact on any with one, OPEN ones listed loudly.
+
+### `test_inp_crash_merged_m8_01.sh` — test, emulator
+
+**WHAT:** the #99 natural-path capture (the maintainer's own MAME session: 1P Donovan, 6+HP through Bishamon, keep-away vs CPU Phobos) plays back with NO exception through frame 6000 on the current merged build — the fix's acceptance; MODE=defect asserts the captured crash exactly (vec11 at PRG:0x422BAC, frame 4806 ±2) so the capture cannot rot.
+
+**HOW:** tests/inp/crash-merged-m8-01 under tests/lua/inp_guard.lua on MAME (~1 min).
+
+**EXPECTS:** clean through 6000 (the default since 14z-111); the defect mode reproduces the captured crash on a pre-fix build.
+
+### `test_m2a_flicker_gate.sh` — test, ci_portable
+
+**WHAT:** the M2 battery's masked legacy gate (m2a_legacy_gate_masked) asserts the CURRENT frozen generation: a flicker inventory that grows OR shrinks fails, the frozen shape passes, a required replay with no spec fails (never a quiet skip), an unresolvable target fails naming rule 6.
+
+**HOW:** the gate's logic with the emulator stubbed and logs crafted from the real frozen basis (no ROMs, ~3 s).
+
+**EXPECTS:** the five cases as listed. The predicate was INVERTED at 14z-97 (#96): a shrink used to be advisory when the battery gated unfrozen dev builds; against a frozen target it is a build that is not the frozen one.
+
+### `test_m2a_stage4_code.sh` — test, emulator
+
+**WHAT:** the M2a stage-4 build (ported code and engine hooks): the bare-long sibling veto holds in extraction (the seven operand-pair sites byte-identical to vs2, a non-zero veto count), the full moveset replay runs END-clean under the -debug guard, and the masked legacy gate passes against the target resolved from the build's fingerprint.
+
+**HOW:** the stage-4 build on MAME: the extract log, replay 12 guarded, the masked legacy suite through the registry.
+
+**EXPECTS:** veto, bring-up and superset all green; an unregistered fingerprint stops the gate as a rule-6 signal.
+
+### `test_m2a_stage4_oracle.sh` — test, emulator
+
+**WHAT:** ported Donovan on vsavj against NATIVE Donovan on vsav2 with identical inputs: match-start anchors equal, the neutral window field-exact every frame, P2 HP-change value sequences equal, and the ported character's cross-game mismatch count no higher than the untouched veteran control's (Demitri on both games).
+
+**HOW:** the replay pair 17_don_oracle_{vsav2,vsavj} plus the 18_veteran_ctl pair on MAME against the stock twin, tools/compare_fields.py at anchors and --exact over the neutral window.
+
+**EXPECTS:** the four locks; frame-exact combat comparison across the two engines is impossible by construction, so the bound and the HP sequence are what is asserted.
+
+### `test_m2a_stage4_xemu.sh` — test, emulator
+
+**WHAT:** the patched stock build runs replay 17 on MAME and on patched FBNeo and the mapped gameplay fields agree at the match-start anchor and the pre-battery follow offsets (the §4 dual-emulator protocol for new content).
+
+**HOW:** MAME wide-window dumps and an FBNeo coarse-then-fine anchor scan, tools/compare_fields.py over the compared offsets.
+
+**EXPECTS:** agreement at the anchor and follow offsets; the FBNeo run completing is the cross-emulator crash-freedom.
+
+### `test_masked_compare.sh` — test, ci_portable
+
+**WHAT:** tests/lib/masked_compare.sh, the ONE implementation of the §4 masked vocabulary (exact / flicker / diverge / window / composite plus the baseset-mask guard) shared by run_suite and the M2 battery, DISPATCHES each spec line to the right checker with the right arguments and turns its result into the right verdict — each class in both directions.
+
+**HOW:** synthetic specs and logs through the library (no ROMs, ~2 s), including the diverge case that caught the lift's temp-file-stem bug.
+
+**EXPECTS:** every class accepting its shape and rejecting a laxer one; a red means run_suite and the battery could read one spec two ways.
+
+### `test_pod_black_foot_palette.sh` — test, emulator
+
+**WHAT:** #112's black foot, CAUSALLY located: the black pixels ARE palette row 0b index 14 (RAM:$90C17C) of the OBJ page — poking that entry across the black frame of the recording turns exactly the 7007 near-black pixels to the poked colour and nothing else, while poking the neighbouring entry moves a disjoint non-black set.
+
+**HOW:** tests/inp/pod-black-m14-01 on MAME with the entry poked (3 runs, ~2.5 min), the framebuffer diffed pixel by pixel; the control substitutes the neighbour poke's pixel set.
+
+**EXPECTS:** one source colour, one destination colour, the frozen count; the neighbour control fails. WHY the entry holds f111 at that moment is measured elsewhere (a hit re-requests the body palette).
 
 ## gfx
 
-tiles, OBJ records, sprite lists, render-layer verdicts. 0 of 25 described.
+tiles, OBJ records, sprite lists, render-layer verdicts. 25 of 25 described.
 
-**Not yet described:** `audit_clone_beam_lines.sh`, `audit_effect_class_rows.sh`, `audit_empty_tiles.sh`, `audit_gfx_merged_census.sh`, `audit_grenade_ground_tiles.sh`, `test_beam_anim_walk.sh`, `test_beam_list_type6.sh`, `test_beam_variants.sh`, `test_biased_list_inventory.sh`, `test_effect_palette_table.sh`, `test_gfx_chain.sh`, `test_gfx_collision_gate.sh`, `test_gfx_layout3.sh`, `test_gfx_menus.sh`, `test_gfx_menus_guard.sh`, `test_gfx_tile_codec.sh`, `test_gfx_tiles.sh`, `test_list_type_census.sh`, `test_merged_render_content.sh`, `test_obj_record_walk.sh`, `test_obj_records.sh`, `test_obj_walker_relocation.sh`, `test_version_string.sh`, `test_wheel_bank5.sh`, `test_wide_render_content.sh`.
+### `audit_clone_beam_lines.sh` — audit, emulator
+
+**WHAT:** the #109 lock: Phobos's Dark Force clone-mode attack draws the BEAM-LINE sprites (effect-class row 31, the emitter vs2 ships and vsavj stubbed) — with EXPECT_LINES=1, at least MIN_LINES 16x1 line entries inside the beam window at the native code family under our composition, pal 05.
+
+**HOW:** the clone rig on MAME with the OBJ list dumped EVERY frame of the window (the lines strobe on alternating frames, so single-frame dumps miss them); the muzzle-burst set must appear in both modes as rig liveness; the control forces EXPECT_LINES=0 with the lines present.
+
+**EXPECTS:** the lines present and the burst present; the forced-defect mode fails. EXPECT_LINES=0 freezes the pre-fix signature (zero 16x1 entries) on an old build.
+
+### `audit_effect_class_rows.sh` — audit, emulator
+
+**WHAT:** the three deadness measurements the beam port rests on: vanilla never dispatches effect-class row 16 (0 reads against a live control on row 37), the composite handler's A5 scratch $FF3578-$FF3581 IS used by vsavj (so vs2's displacements cannot be kept), and drawer list-type 10 is NOT a spare slot (thousands of legacy reads) — plus since 14z-91 the type-6 fallback's EXECUTION against a frozen per-replay inventory.
+
+**HOW:** MAME -debug watches on the OPCODES space (the tables are read pc-relatively; a plain watchpoint is silently blind), every section with a positive control on the same instrument and leg.
+
+**EXPECTS:** 0 / used / used as measured, the fallback inventory exact; a blind instrument cannot pass as a clean result.
+
+### `audit_empty_tiles.sh` — audit, emulator
+
+**WHAT:** the build DRAWS no sprite whose group-C tile is BLANK — a tile remapped into the band but never copied renders as a solid rectangle, invisible to every record, code and walk check (the child sidekick's shadow).
+
+**HOW:** a replay on MAME with every drawn group-C sprite decoded from the emulator's tile memory and flagged if all-zero — complete over what the build renders, not a sample.
+
+**EXPECTS:** zero blank tiles drawn; a hit names the code to add to `build/manifest/extra_tiles/<char>.json.` Ground-truthed: passes on hui14, fails on hui12 naming both shadow tiles.
+
+### `audit_gfx_merged_census.sh` — audit, ci_static
+
+**WHAT:** the complete 3-tenant merged group-C write-set census: ZERO real collisions (Huitzil's strip relocated to 0x86A0-0x87BF by S3), every shared destination same-source, intra-tenant collisions zero, the four free pools empty, and the union occupancy frozen.
+
+**HOW:** tools/audit_gfx_merged.py over the reference zips and the frozen manifests and side files (static, ~4 min); three verdict controls (a shift-0 strip on Huitzil's own band, the old shift 0x1000 reproducing the historical 288-collision defect exactly, and a doctored vsav2.zip dropping it to 287 — per-tile identity).
+
+**EXPECTS:** zero real collisions and the frozen occupancy; drift is re-review, never absorb; the three controls as stated.
+
+### `audit_grenade_ground_tiles.sh` — audit, emulator
+
+**WHAT:** Phobos's 214+LP GROUND explosion draws native vs2's own art tile for tile: the set of palette-06 explosion tile CONTENTS our build draws across the detonation equals native's (441 tiles, intersection 441, 0 ours-only, 0 native-only) and none is blank — closing the 'most likely fixed' guess.
+
+**HOW:** replay 83d on the merged build and on native vs2 on the same WIDE MAME binary, the OBJ list dumped every frame across the detonation and each drawn tile decoded to its canonical content (phase-free: the legs run ~5-6 frames apart).
+
+**EXPECTS:** ours-only 0, native-only 0, no blank explosion tile; a non-empty ours-only tile is a real divergence.
+
+### `test_beam_anim_walk.sh` — test, emulator
+
+**WHAT:** the build WALKS the anim nodes that carry Phobos's beam sprite lists: the placed twin is read inside the beam window (BEAM_WALK_EXPECT=walks since the row-16 fix), the nodes are correctly ported (every differing byte a relocated 3-byte pointer), native reads its node inside the window (rig liveness), and the watchpoint's arming line is excluded from every count.
+
+**HOW:** static node comparison, then MAME -debug read watches on both legs over the beam window, comparing leg-independent quantities only (read or not, how often — never a PC).
+
+**EXPECTS:** ported nodes, native walked, ours walked; =absent reproduces the pre-fix state on an older build.
+
+### `test_beam_list_type6.sh` — test, ci_static
+
+**WHAT:** the list-type 6 takeover: the thunk body is Capcom's composite handler (vs2 0x01A1FC) with exactly the six scratch displacements, one call and one loop displacement changed, and the non-tenant FALLBACK reproduces vsav's own type-6 head instruction for instruction and rejoins at 0x01B6B2 — the whole safety argument, checked statically because legacy exercises it only by accident.
+
+**HOW:** reconstruction from vs2's and vsavj's bytes compared with the build (no emulator, seconds).
+
+**EXPECTS:** body and fallback as reconstructed; a hand edit that still assembles would fail here. The dynamic half is audit_effect_class_rows section 4.
+
+### `test_beam_variants.sh` — test, emulator
+
+**WHAT:** the beam port's premises: Phobos's three beam inputs (236+P, 236+K, 236+2P/2K) are ONE art path (pal 0x0C from his band, the ES simply richer), the ES really is the ES (a stock spent, more sprites than P/K), and every tile the variants draw is already in group C.
+
+**HOW:** the native leg on MAME (~1 min) with the OBJ list dumped and multi-tile sprites expanded `w*h` (the dump reports the base code only); the stock byte asserted spent.
+
+**EXPECTS:** one art path, the ES richer with a stock spent, 0 tiles missing from group C. An empty meter degrades the ES silently — the stock check is what makes the ES leg evidence.
+
+### `test_biased_list_inventory.sh` — test, ci_static
+
+**WHAT:** the #109-B sweep inventory: every biased-type (4/6/8) sprite list and composite (12) across the tenants' placed regions, outside the tool's documented false-positive families, is frozen with its 14z-102 review verdict (FP node streams, the accepted-with-evidence x2b7ef4 strips, the AI-script block) — a new row or a changed status is a stop-and-review event.
+
+**HOW:** tools/enum_biased_lists.py over the three builds' placements and the vs2 data view, the filtered inventory compared with the frozen verdicts.
+
+**EXPECTS:** the inventory exact; new ported data carrying an unreviewed biased list, or moved retype coverage, fails.
+
+### `test_effect_palette_table.sh` — test, ci_static
+
+**WHAT:** the per-character palette POINTER tables (0x38C198 sprite, 0x38C218 effect) are each ONE 32-row table indexed by the full character id, their second halves never used as a base, aliasing the base half except rows 0x12/0x18, the five readers taking the id unmasked — what licenses repointing a tenant's row (the 'only sixteen rows' reading had deferred Pyron's effect palette).
+
+**HOW:** tools/audit_effect_palette_table.py over vanilla vsavj and the build under test (static, seconds); four negative controls, one per assertion.
+
+**EXPECTS:** the model holds on both images and every control fails.
+
+### `test_gfx_chain.sh` — test, ci_static
+
+**WHAT:** the group-C gfx CHAIN mode: a chain-free Donovan run reproduces the frozen build/m5_wide gfx members byte for byte, re-chaining a link over its own output is a no-op, D->H carries a cumulative ledger with the relocated strip, H->P completes the full 3-tenant chain with zero real collisions, and an old-shift strip fixture makes the chain die loudly at the historical collision naming both sources.
+
+**HOW:** build_gfx run per link with --chain over the frozen build dirs' side files (~9 min), members and ledgers compared.
+
+**EXPECTS:** sections 1-4 green and section 5 (the must-fail control) failing as it must.
+
+### `test_gfx_collision_gate.sh` — test, ci_portable
+
+**WHAT:** build_gfx_donovan.place()'s same-source-or-fail rule on every pass: a clean write records provenance, a same-source duplicate skips benignly keeping the first provenance, DIFFERENT bytes raise naming both provenances, and no pass bypasses place() (the only direct write_tile on a destination is inside it).
+
+**HOW:** pure functions on synthetic simms (no ROMs, ~1 s) plus a textual coverage check of the passes.
+
+**EXPECTS:** the four cases as designed; the different-bytes case must actually raise or the gate fails.
+
+### `test_gfx_layout3.sh` — test, ci_static
+
+**WHAT:** the 3-tenant group-C tile layout facts: all three tenants read vs2 BANK 3 (the one-source-bank premise), the frozen per-tenant tile inventories and bands (H 15,034 / P 14,225 / D 15,612), H∪P's delta-0 placement disjoint from Donovan's frozen band by interval, the D4 flip condition (three tenants fit bank 4 with headroom), and gfx_layout3.toml agreeing with the measurement.
+
+**HOW:** tools/obj_records.py over the ratified extraction anim spans of the reference zips (static, ~90 s, one vs2 decrypt).
+
+**EXPECTS:** every number as frozen; drift means the walker, the extraction shapes or the understanding moved — stop and root-cause, do not re-freeze.
+
+### `test_gfx_menus.sh` — test, emulator
+
+**WHAT:** the title screen, the character-select screen and the speed menu on the build under test are PIXEL-identical to the frozen vanilla goldens (frames 650 / 950 / 1250), the medallion cell box masked on the two wheel frames because the wheel is ported by design.
+
+**HOW:** MAME snapshots of the build compared with the committed goldens under tests/ (derived work, not ROM bytes — ruled), the cell box masked.
+
+**EXPECTS:** zero pixels differing outside the mask; the RAM oracles are blind to this class (the session-14r overlay corrupted three menus while every RAM gate stayed green). --freeze regenerates the goldens from vanilla.
+
+### `test_gfx_menus_guard.sh` — test, ci_static
+
+**WHAT:** the pixel gate's rompath guard tests the SET ZIP, not the directory: an absent rompath and a vsavjw-only rompath both FAIL (MAME would otherwise resolve missing members by hash from $ROMDIR and compare vanilla to vanilla-frozen goldens forever), and a proper rompath still runs.
+
+**HOW:** three cases without the emulator (the guard fires first) and a positive control that starts MAME (~40 s).
+
+**EXPECTS:** two refusals and one run; a directory check alone passes the dangerous case.
+
+### `test_gfx_tile_codec.sh` — test, ci_portable
+
+**WHAT:** the CPS-2 OBJ tile bit law in tools/gfx_tiles.py: within each 8-pixel half of a tile row, plane bit i is pixel 7-i (pen 15 transparent); decode(encode(px)) and encode(decode(t)) round-trip; the pre-fix mirrored mapping reconstructed inline DISAGREES with encode on an asymmetric tile and a one-bit corruption does not round-trip.
+
+**HOW:** synthetic tiles and random fields through the codec (ROM-free, ~1 s).
+
+**EXPECTS:** the law, both round trips, both controls. Measured 14z-105: the mirrored encode drew every half mirrored on the real OBJ path, caught only because 'M6' is not symmetric.
+
+### `test_gfx_tiles.sh` — test, ci_static
+
+**WHAT:** the CPS-2 gfx tile layout facts the port's cross-sibling assumptions rest on: vsav2 and vhunt2 share gfx layout (>= 200,000 tiles matching at the same index), vsav2 and vsav share art but REPACKED (>= 195,000 non-blank tiles found content-addressed, < 10,000 at the same index), and naive contiguous 32-byte slicing does NOT reproduce that.
+
+**HOW:** tile decoding in the Cps2LoadOne-derived canonical form over the reference zips (static, no MAME).
+
+**EXPECTS:** the three locks as measured 2026-07-28; the slicing trap stays documented by failing.
+
+### `test_list_type_census.sh` — test, ci_static
+
+**WHAT:** the ONE-SOURCE-BANK re-check per tenant: a list type 4 composes its own bank word and breaks a delta-0 group-C placement (Huitzil's beam), so the type-4 population of each tenant's fighter anim span is frozen — Huitzil 26 (the POSITIVE CONTROL: the first version was blind and read 0 for him), Donovan 1, Pyron 0 (what licenses his delta-0 rung).
+
+**HOW:** tools/enum lists over the vs2 data view's anim spans, Huitzil's known population asserted first on the same instrument.
+
+**EXPECTS:** 26 / 1 / 0 exact. Pyron's effect data rides the shared region and must be re-checked when its rung lands.
+
+### `test_merged_render_content.sh` — test, emulator
+
+**WHAT:** the MERGED build serves all three tenants' tiles where designed, measured in the emulator's decoded gfx memory: Donovan's, Huitzil's and Pyron's bands and the relocated strip equal the frozen SOLO builds' at the composed addresses, merged bank 2 is PRISTINE (the de-substitution held), the four windows are pairwise distinct, a poisoned group C is rejected and changes every window, and the three pick replays complete with a live framebuffer.
+
+**HOW:** a live A/B against the three frozen solo builds on WIDE MAME (no frozen hash files), windows chosen where only one tenant places (the merged bank is the union of the write sets).
+
+**EXPECTS:** band equivalence, pristine bank 2, distinctness, the poison control, liveness. H's and P's FIRST render gate.
+
+### `test_obj_record_walk.sh` — test, ci_portable
+
+**WHAT:** obj_records.walk()'s two heuristic passes are RELOCATION-AWARE: the sweep pass's aux-window test and the pointer pass's region-window test take the allow-maps that keep the same bytes from answering differently before and after placement, so no phantom record is invented in the built image alone (#75's +1 record that aborted every merged build).
+
+**HOW:** a synthetic region reproducing #75's straddle shape (no ROMs, ~1 s); four controls — the phantom with ptr_allow=None MUST appear and the allow-map MUST reject it, a clobbered count word loses its record, an un-relocated pointer loses its record, swapped pointers are caught though the counts match.
+
+**EXPECTS:** every control fires as stated; a parity check that cannot fail is not a check.
+
+### `test_obj_records.sh` — test, emulator
+
+**WHAT:** tools/oram_obj_records.py, the byte-level OBJ-list walker (the surface a cross-implementation video oracle stands on, since the core cannot run Lua), reproduces tests/lua/obj_records_dump.lua BYTE FOR BYTE on the same ORAM bytes at the frozen tenant anchor, reporting the terminator so the live and idle pages are told apart.
+
+**HOW:** the same ORAM walked by the live MAME Lua and by the python over a raw dump (~2 min, regenerated each run — ORAM is ROM-derived); controls flip a tile-code bit in the real dump and give an impossible page offset.
+
+**EXPECTS:** 1153/1153 lines identical; the flipped bit makes the walkers disagree, the impossible page is REFUSED. If they ever diverge the Lua is the authority.
+
+### `test_obj_walker_relocation.sh` — test, ci_static
+
+**WHAT:** the obj_walker relocation is STRUCTURALLY what it claims, from patch.json alone: the copy is vanilla's bytes verbatim, its table's vanilla rows are vanilla's, the copy's pc-relative dispatch resolves to its own table, the vanilla dispatch sites are touched by NO op (zero cost by construction), every caller is a 4-byte OPERAND write at caller+2 with the 4EB9 opcode untouched, and the table op is `code` (address-aware re-encryption) not `data`.
+
+**HOW:** reads the build's patch.json and the decrypted view (ROM-free beyond that, seconds); two verdict controls.
+
+**EXPECTS:** all six legs; a 'relocation' that edits the code or patches a site voids the timing claim.
+
+### `test_version_string.sh` — test, emulator
+
+**WHAT:** the in-game version string on the select screen (the naked-eye A/B tell): the built wheel record's last N entries are the glyph codes at the declared palette row and screen position with authored tiles byte-identical to the generator's, and on a select frame the LIVE OBJ list carries exactly those N sprites and a MAME snapshot pixel-matches the intended bitmap with ZERO mismatches.
+
+**HOW:** static over the built record, coord list and packed group C; runtime on MAME with obj_records_dump.lua and a snapshot (~2 min, 2 runs); controls shift the expected position by 1 px and corrupt a glyph tile.
+
+**EXPECTS:** static and runtime exact, both controls failing; the snapshot check is what caught the tile codec's half-mirror.
+
+### `test_wheel_bank5.sh` — test, emulator
+
+**WHAT:** the select-wheel bank-5 move: the drawer's bank-word immediate flipped to bank 5, every referenced wheel tile placed in group C at 0x10000+code (host entries byte-identical to vsav's group A, appended entries from vs2's), and the engine walking the wheel record from bank 5 with the fmt-2 handler seeing bank word 0x3000 and the relocated record.
+
+**HOW:** tools/check_wheel_bank5.py re-derives the whole move from the ROM record, the layout and both source zips against the built image; negative controls corrupt a tile byte and strip the code op; runtime on WIDE MAME with replay 36.
+
+**EXPECTS:** static equal, both controls failing, the engine's bank-5 walk observed.
+
+### `test_wide_render_content.sh` — test, emulator
+
+**WHAT:** the WIDE track SERVES the ported content's tiles where designed, in the emulator's decoded gfx memory: Donovan's band at WIDE bank 4 equals the stock track's at bank 2, WIDE bank 2 equals PRISTINE (Jedah restored — the de-substitution invariant), the stock band differs from pristine (the dump is not blind), a zero-poisoned group C is rejected and changes the dump, and the real cell-0x13 pick completes with a live framebuffer.
+
+**HOW:** member identity statically, then decoded tile-memory dumps on WIDE MAME for both tracks and pristine, the poison control, replay 36.
+
+**EXPECTS:** the three band equalities as designed, the poison rejected and visible, liveness. Donovan rendered as garbage for two sessions with every RAM gate green — this is the missing gate.
 
 ## tenant
 
@@ -1272,7 +2606,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ### `test_move_naming.sh` — test, emulator
 
-**WHAT:** the move lists' chain ids (build/manifest/moves_<tenant>.toml) are what NATIVE vs2 enters: every event of the naming rigs enters the frozen chains, every seq the TOML names is entered by some event, the rigs equal a regeneration, and P2 is Demitri by his real route, never entering the two chains whose data differs between the games.
+**WHAT:** the move lists' chain ids `(build/manifest/moves_<tenant>.toml)` are what NATIVE vs2 enters: every event of the naming rigs enters the frozen chains, every seq the TOML names is entered by some event, the rigs equal a regeneration, and P2 is Demitri by his real route, never entering the two chains whose data differs between the games.
 
 **HOW:** eight Donovan, four Pyron and eight Phobos parts on native vs2 on MAME (legs in parallel), P1's node pointer +0x1C sampled per frame and mapped onto tools/anim_nodes.py's graph; the negative control replaces an event's frozen chain by a neighbour's.
 
@@ -1314,7 +2648,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **WHAT:** which chains a tenant runs as the VICTIM, per reaction class, and for how long: for every contact class the naming rigs reach (hits, blocked, anti-air) the victim's class byte, freeze, chain path and frames back to a stand chain, frozen per tenant.
 
-**HOW:** the <tenant>_victim schedules on MAME (the tenant on P2 by the early-window poke, Victor forced on P1), P2's node pointer per frame turned into one line per contact by tools/reaction_map.py; both fighters' ids asserted from the trace.
+**HOW:** the `<tenant>_victim` schedules on MAME (the tenant on P2 by the early-window poke, Victor forced on P1), P2's node pointer per frame turned into one line per contact by tools/reaction_map.py; both fighters' ids asserted from the trace.
 
 **EXPECTS:** the per-tenant files equal (re-frozen only after a change is attributed); a red is a changed reaction set, extract, decoder or rig.
 
@@ -1360,12 +2694,416 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ## review-triage
 
-the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for. 0 of 31 described.
+the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for. 31 of 31 described.
 
-**Not yet described:** `test_baseset_mask_invariant.sh`, `test_basis_publish_atomic.sh`, `test_battery_accounting.sh`, `test_build_ref_rot.sh`, `test_builder_rom_audit.sh`, `test_decode_stage_banners.sh`, `test_decrypt_cache.sh`, `test_freeze_retires_diverge.sh`, `test_gfx_layout_fields_live.sh`, `test_guard_integrity.sh`, `test_harness_frame_bound.sh`, `test_hex_lengths.sh`, `test_mame_mirror_guard.sh`, `test_mask_ranges_reader.sh`, `test_member_classify.sh`, `test_merged_inputs.sh`, `test_meter_in_field_map.sh`, `test_minitoml_subset.sh`, `test_no_tracked_mutation.sh`, `test_optimize_guard.sh`, `test_patch_source_identity.sh`, `test_pcrel_escapes.sh`, `test_phasea_a3_liveness.sh`, `test_qs_ledger_binding.sh`, `test_qs_wav_timebase.sh`, `test_reconcile_matcher.sh`, `test_record_walk_bounds.sh`, `test_ref_rot_image_pick.sh`, `test_romset_path_guard.sh`, `test_select_port_hygiene.sh`, `test_static_runner.sh`.
+### `test_baseset_mask_invariant.sh` — test, ci_portable
+
+**WHAT:** every `.masked` spec cites a basis frozen under the SAME mask the expectation set runs — statically, across the whole tree, including sets no current build dispatches to (masked bytes are skipped from the checksum, so a v2 log cannot be compared under a v3 mask).
+
+**HOW:** pairs each spec's baseset with the set's mask file and the basis's MASK record (ROM-free, ~1 s).
+
+**EXPECTS:** every pairing consistent; a red is a one-token retarget or mask edit the suite itself could not detect.
+
+### `test_basis_publish_atomic.sh` — test, ci_portable
+
+**WHAT:** freezing a masked basis is all-or-nothing: a failure on replay N of M leaves no mixed-generation basis (no new MASK beside old logs) in the live destination.
+
+**HOW:** the REAL tools/freeze_masked_basis.sh symlinked into a fake repo with a stub MAME runner that fabricates logs and fails on a named replay, on the second run only, or nondeterministically; section 0 proves the harness drives the real file.
+
+**EXPECTS:** no partial publish in any failure shape; a red is the oracle trust root becoming a mixed generation by a route the write-side guards cannot see.
+
+### `test_battery_accounting.sh` — test, ci_portable
+
+**WHAT:** run_battery_m2.sh cannot print BATTERY GREEN while gates self-skipped: branch skips are counted by group size and a skipped gate is not a pass.
+
+**HOW:** the battery's accounting functions driven directly with scripted verdicts (no ROMs, ~1 s); the control unplugs the classifier's gate-script argument so a declared-but-unfired control would pass.
+
+**EXPECTS:** GREEN only when every gate ran and passed; the unplugged copy fails section 7.
+
+### `test_build_ref_rot.sh` — test, ci_portable
+
+**WHAT:** no hardcoded `build/<name>` default in a script that READS a rompath has rotted: a present reference is a WIDE v1.1 set (21 members, vsw.z01/z02), absent is reported never failed, and — since 14z-97 — both the positional and the named-env default idioms are seen and a loaded reference is also checked for CURRENCY against the registry.
+
+**HOW:** tools/audit_build_ref_rot.py over every tests/ and tools/ script, judging each rompath by its preferred image (test_ref_rot_image_pick's rule).
+
+**EXPECTS:** every present reference current-shaped and registered; a red names the script and default. A default read only for its extract/ is not judged.
+
+### `test_builder_rom_audit.sh` — test, ci_static
+
+**WHAT:** every builder that reads $ROMDIR runs the mandatory checksum audit FIRST and refuses an unauditable $ROMDIR with CLAUDE.md §3's message before writing any artifact — and a real $ROMDIR gets past it.
+
+**HOW:** each builder invoked against a fake unauditable romdir and against the real one, the refusal timing checked against artifact writes (~5 s, no emulator).
+
+**EXPECTS:** early refusal on the bad romdir, pass-through on the good one.
+
+### `test_decode_stage_banners.sh` — test, ci_static
+
+**WHAT:** tools/decode_stage_banners.py names the #92 value space correctly: both stage families enumerate to their measured sizes (vsavj 12, vs2 13), known records decode to known text, the 12 shared stages agree 1:1 in order (the port owes no renumber), and every out-of-range authored entry is #92's one shape.
+
+**HOW:** the decoder over the decrypted DATA views; three verdict controls, the load-bearing one decoding vs2 from its table BASE instead of the ANCHOR read from its code site, which manufactures a '+8 renumber' that does not exist and must be REJECTED loudly.
+
+**EXPECTS:** every section as measured, the base-as-anchor decode refused naming the anchor. Not portable (needs the data views).
+
+### `test_decrypt_cache.sh` — test, ci_static
+
+**WHAT:** tests/lib/decrypt_cache.sh delivers full, correct decrypted images to the 22 gates that read through it, and a TRUNCATED cache is refused, not silently served (the pattern it replaced fell back on `[ -f ]`, which a half-written file satisfies).
+
+**HOW:** the helper against a warm cache, a missing cache and a truncated one (~1 s warm).
+
+**EXPECTS:** correct bytes and length, the truncated image refused; a wrong image here would make eighteen gates assert against garbage and pass.
+
+### `test_freeze_retires_diverge.sh` — test, ci_portable
+
+**WHAT:** `run_suite.sh --freeze` on a replay still carrying a `.diverge` RETIRES that marker (loudly, keeping it as evidence) so the new `.sha1` governs, instead of writing an expectation the dispatch order can never reach.
+
+**HOW:** the REAL run_suite.sh symlinked into a fake repo with stubbed MAME runner, fingerprint and check_diverge (which prints a marker, so the dispatched branch is observable).
+
+**EXPECTS:** the marker retired and the sha1 dispatched afterwards; a red is a fixed divergence still being accepted.
+
+### `test_gfx_layout_fields_live.sh` — test, ci_portable
+
+**WHAT:** gfx_layout3.toml's profile and scatter fields MEAN something: bank4_word, bank5_word, collision_rule and the tenants' scatter bounds are CHECKED against what the builder computes and places (never obeyed, so they cannot move a frozen byte), and an edit to any of them fails loudly.
+
+**HOW:** the builder's checks run over the manifest and the placed inventories (ROM-free, ~2 s).
+
+**EXPECTS:** every field agrees with the artifact (Huitzil's out-of-band bound re-measured, not widened); a red is policy the artifact producer no longer enforces.
+
+### `test_guard_integrity.sh` — test, emulator
+
+**WHAT:** the crash guard (replay_guard.lua) carries the input-integrity assertion — a stray host press is INPUT-VIOLATION, not a clean PASS — and REFUSES env vars it does not implement (MASK_RANGES) rather than silently producing an unmasked log.
+
+**HOW:** a WIDE build on MAME: a clean guarded run, one with an injected press, and one passing MASK_RANGES (~2 min).
+
+**EXPECTS:** the violation caught at its frame, the unsupported variable refused, the clean run clean. Not portable.
+
+### `test_harness_frame_bound.sh` — test, ci_static
+
+**WHAT:** the FBNeo harness bounds replay frame numbers BEFORE its arithmetic (cap 10,000,000 frames, re-derived from the longest replay in tests/replays, never trusted), so a mistyped frame can neither truncate a replay silently nor wrap the allocation into an out-of-bounds write.
+
+**HOW:** structural check of the harness source (ROM-free); the functional half runs a built binary against an over-cap script when the binary and ROMDIR are present.
+
+**EXPECTS:** the cap present and derived, the over-cap script refused. Trace every derived sum before narrowing an overflow finding (the header's own correction).
+
+### `test_hex_lengths.sh` — test, ci_portable
+
+**WHAT:** tools/audit_hex_lengths.py, the balanced-byte-edit check over the manifests' `fixes` keys, catches a length mismatch (an unverified write plus a wrong provenance span — the issue's 'resize' mechanism was wrong and section 3 pins the real shape).
+
+**HOW:** the checker over the real manifests and over synthetic mismatches (ROM-free, ~1 s).
+
+**EXPECTS:** the tree clean, the mismatch caught; a checker that passes everything is indistinguishable from a clean tree.
+
+### `test_mame_mirror_guard.sh` — test, ci_portable
+
+**WHAT:** tools/setup_mame.sh never runs `rsync --delete` into a directory it does not own: root, $HOME, ancestors, the repo and source trees are rejected by canonical path, and a pre-existing non-empty target without the ownership sentinel is refused with the opt-in spelled out; a new empty target self-claims.
+
+**HOW:** the guard block EXTRACTED from the shipped script between its markers (never copied) and run in a harness; section 0 fails if the extraction is empty (~3 s, ROM-free).
+
+**EXPECTS:** every dangerous target refused, the legitimate initialisation still one command.
+
+### `test_mask_ranges_reader.sh` — test, emulator
+
+**WHAT:** the MASK_RANGES reader masks EXACTLY the spec — a nested or overlapping window no longer rewinds the position and re-includes excluded bytes — and refuses nonsense; inert on every frozen set (all live masks disjoint and ascending), proven directly.
+
+**HOW:** a WIDE build on MAME with crafted mask strings compared with the expected exclusions (~1 min).
+
+**EXPECTS:** exact masking on nested, overlapping and normal masks, nonsense refused. Not portable.
+
+### `test_member_classify.sh` — test, ci_static
+
+**WHAT:** PROGRAM and GFX romset members are never confused (the PRG suffix class excludes `m`, so `vsw.41m`/`vsw.43m` at the documented --gfx 8 growth path stay GFX) and the three classifiers agree.
+
+**HOW:** the classifiers over the current member names and over the names that do not exist yet (~2 s).
+
+**EXPECTS:** every name classed as its kind on all three classifiers; a red is a gfx member loaded as program at the next member count.
+
+### `test_merged_inputs.sh` — test, ci_static
+
+**WHAT:** tools/ensure_merged_inputs.sh makes rule 3 ONE COMMAND for the merged build: a missing ROM-derived input is regenerated and the regenerated set yields the byte-identical merged patch (the ARTIFACT is reproducible — the extract dirs themselves are not byte-equal, a cosmetic staleness), an existing input is never rewritten, and --check reports without creating.
+
+**HOW:** three extractions and two generator runs against $ROMDIR and the pinned build dirs (~2 min), the emitted patch.json and blobs compared.
+
+**EXPECTS:** identical merged patch from either input set, no rewrite of an existing input; verdict controls. Not portable.
+
+### `test_meter_in_field_map.sh` — test, ci_portable
+
+**WHAT:** the dual-emulator oracle's field map (tests/fields_m2a.tsv) actually compares METER — both halves, both players — at the addresses the atlas documents, as CLAUDE.md §4 names it.
+
+**HOW:** the TSV checked for the four rows and their atlas addresses; section 3 plants a difference confined to a meter byte in synthetic dumps and compare_fields.py must catch it (ROM-free, ~2 s).
+
+**EXPECTS:** rows present, bound to ram.md, the meter-only difference caught.
+
+### `test_minitoml_subset.sh` — test, ci_portable
+
+**WHAT:** the manifest parser means the SAME THING on every host: tools/_minitoml.py's subset parser REFUSES every construct it and tomllib would read differently (dotted headers and keys, duplicates, signed hex), so the build is not a function of the interpreter version.
+
+**HOW:** the subset parser over accepted and refused fixtures (ROM-free, ~1 s; needs no tomllib to check, which is why it never skips).
+
+**EXPECTS:** every divergent construct refused, every accepted one identical under tomllib by construction; a red once shipped different ROM bytes on two hosts from one manifest.
+
+### `test_no_tracked_mutation.sh` — test, ci_portable
+
+**WHAT:** no test writes into tools/: verdict controls that perturb the generator do so on a shadow copy in a throwaway repo root (tests/lib/shadow_tools.sh), never the tracked file with an exit-trap restore.
+
+**HOW:** the shadow-copy helper exercised, and a scan of every test for writes into tools/ (ROM-free, ~2 s).
+
+**EXPECTS:** the helper works and no test writes tracked source; section 3 fails any NEW test that does.
+
+### `test_optimize_guard.sh` — test, ci_portable
+
+**WHAT:** the tools whose safety checks are `assert` statements refuse `python -O` / PYTHONOPTIMIZE (which removes asserts entirely), and every assert-using tool a builder invokes carries the guard.
+
+**HOW:** each tool imported under the optimise mode must refuse; a scan of the builders' invoked tools for the guard (ROM-free, ~2 s).
+
+**EXPECTS:** six tools refuse, no unguarded assert-using tool in a builder's path; the systemic section found four of the six.
+
+### `test_patch_source_identity.sh` — test, ci_static
+
+**WHAT:** a patch applies only to the source set it was generated against: the generator records `src_program_identity` (a sha1 over the program members in load order) and patch_prg refuses a mismatch; an absent identity is a warning (inline synthetic patches are legitimate), pinned as deliberate.
+
+**HOW:** patch_prg against a matching, a mismatching and an identity-less patch (~5 s, no emulator); both sides compute the identity from the same helper.
+
+**EXPECTS:** mismatch fatal, absence warned, match applied. Not portable.
+
+### `test_pcrel_escapes.sh` — test, ci_static
+
+**WHAT:** the pc-relative DATA-escape inventory of the three tenant builds is UNCHANGED SINCE REVIEWED (build/manifest/pcrel_escapes.toml): any addition, removal or change fails, and region x06cac0 (broken on hui11, fixed 14z-69i) stays absent.
+
+**HOW:** tools/verify_pcrel_data.py over the three builds against vsav2's data view and the frozen inventory (~2 min); the control runs the merged leg with a wrong placement suffix, which must read zero escapes and fail.
+
+**EXPECTS:** the inventory exact and the positive control absent; a pass means unchanged since reviewed, NOT that the escapes are safe. Not portable.
+
+### `test_phasea_a3_liveness.sh` — test, ci_portable
+
+**WHAT:** audit_wide_phase_a's A3 (may gfx groups be appended?) cannot publish its permissive decision on a DEAD measurement: a corpus that measured nothing, or only its first replay, makes the audit REFUSE rather than decide.
+
+**HOW:** a scratch copy of the audit with its emulator invocation replaced by a dead-probe stub and by a partial-corpus stub (ROM-free, ~2 s); stubbing run_one alone was not enough, and section 3 caught that.
+
+**EXPECTS:** refusal on both stubs; a red is 'gfx growth is inert' published from a probe that saw no access.
+
+### `test_qs_ledger_binding.sh` — test, ci_portable
+
+**WHAT:** a QSound audit's voice-id inventory comes from a ledger fingerprint-BOUND to the artifact it audits (over the members that determine voice playback), emitted at build time, and tools/qs_ledger.py refuses a mismatch or an absence before any emulator runs — never ids rebuilt from today's manifest against an older build.
+
+**HOW:** fabricated romsets and ledgers through qs_ledger.py (ROM-free, ~2 s).
+
+**EXPECTS:** match accepted, mismatch and absence refused; a red is an audit sweeping the wrong ids and calling the result a verdict on the artifact.
+
+### `test_qs_wav_timebase.sh` — test, ci_portable
+
+**WHAT:** the WAV audit converts emulated frames to sample offsets at the CPS-2 rate (59.637405 Hz, derived from MAME's own constants), not a literal 60 — the drift a 60 Hz reading introduces exceeds a window by the end of an 80-id sweep — and the audit's control shares the checker's window maths.
+
+**HOW:** the rate re-derived and compared, the drift computed over the sweep, the control's window code checked for a shared source (ROM-free, ~2 s).
+
+**EXPECTS:** rate exact, drift as stated, one copy of the maths.
+
+### `test_reconcile_matcher.sh` — test, ci_static
+
+**WHAT:** ONE matcher serves both find_equiv.py and reconcile_batch.py: the refactor that deleted the batch tool's drifted copy is inert against the pre-refactor copy reconstructed from git (1640/1640 probes at the historical parameters), and the parameters that separate the two callers are load-bearing (183/1640 change when freed).
+
+**HOW:** two decrypts and 3280 masked searches with the pre-refactor matcher rebuilt from git history (~4 min); the control perturbs the comparison's binding, which must read a moved result as a failure.
+
+**EXPECTS:** section 2 identical at the historical pin, section 3's delta the measured constant; a green re-emit of the manifest proves nothing (existing rows win), which is why the comparison is at the matcher. Not portable.
+
+### `test_record_walk_bounds.sh` — test, ci_portable
+
+**WHAT:** both record walkers (obj_records and overlay_port) examine the LAST long that fits in their range, and the sweep pass the last 10-byte read — a record pointer in a region's final long is no longer omitted from the tile inventory (silently wrong art, no builder error).
+
+**HOW:** the walkers over synthetic regions with a pointer at end-4 (ROM-free, ~1 s).
+
+**EXPECTS:** the last pointer seen by both walkers and the sweep; measured inert on every shipping tenant when fixed, so the gate is what keeps it fixed.
+
+### `test_ref_rot_image_pick.sh` — test, ci_portable
+
+**WHAT:** test_build_ref_rot.sh judges a rompath by the NAMED image preference (vsavjw, then vsavj, then first by name), never by directory listing order — a verdict that depends on which file the filesystem lists first is a verdict about the filesystem.
+
+**HOW:** the REAL gate symlinked into a synthetic repo with two rompaths each carrying an adversary zip shaped like the rot signature; the control edits a copy's preference to the adversary, which must judge both ROTTED; the fallback with no preferred name present.
+
+**EXPECTS:** the right image judged in both rompaths, the adversary copy reports ROTTED, the fallback first-by-name.
+
+### `test_romset_path_guard.sh` — test, ci_portable
+
+**WHAT:** build_wide_romset never writes into, or deletes, the reference set: identity, `..` spellings, symlink aliases and containment in either direction between outdir and romdir are refused BEFORE any mutation, the source zips byte-identical afterwards — the one failure in that file with no undo — and a legitimate separate directory still builds.
+
+**HOW:** a fake romdir fixture (no real dump at risk) through the tool's guard with each alias shape, then a real separate-directory build (~2 s).
+
+**EXPECTS:** every alias refused with the sources untouched, the legitimate build working.
+
+### `test_select_port_hygiene.sh` — test, ci_portable
+
+**WHAT:** select_port.py (dormant today — every live tenant is variant-half — but imported for PLACEMENTS and revived by any base-half tenant) is chainable (src, out), idempotent, and free of unreachable statements, while KEEPING the round-22 analysis that convicted the block copies of the throw teleport.
+
+**HOW:** runs the tool twice on a scratch copy (chain and idempotence), scans for the dead WINPAL block, and checks the analysis text survived (~2 s).
+
+**EXPECTS:** chainable, idempotent, no unreachable code, the analysis present.
+
+### `test_static_runner.sh` — test, ci_portable
+
+**WHAT:** tests/run_all_static.sh's verdicts mean what they say: PASS / SKIP / FAIL counted apart with SKIP in PROSE still PASS, an exit-0 shell crash FAIL, the anti-orphan registry check both ways, --strict, the controls readout, and the cadence triggers (a freeze-cadence gate runs when a path it follows changed).
+
+**HOW:** a synthetic repo of stub gates with known verdicts run through the REAL runner via its registry files (never a copy of its logic); two shadow-tool controls unplug the controls reader and blind the cadence trigger match.
+
+**EXPECTS:** every case reads its designed verdict; the unplugged reader lets a dead control pass and fails section 11, the blind trigger leaves a triggered gate deferred and fails section 14.
 
 ## mister
 
-the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation. 0 of 20 described.
+the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation. 20 of 20 described.
 
-**Not yet described:** `audit_mister_map_fit.sh`, `audit_sdram_bank_load.sh`, `test_jtcores_twin.sh`, `test_jtsim_scratch_heal.sh`, `test_mister_gfxc_fetch.sh`, `test_mister_mra_map.sh`, `test_mister_obj_oracle.sh`, `test_mister_page.sh`, `test_mister_prg_probe.sh`, `test_mister_prg_window.sh`, `test_mister_qsound_ext.sh`, `test_mister_sdram_census.sh`, `test_mister_sim_anchor.sh`, `test_mister_tenant_oracle.sh`, `test_mister_wide_gate.sh`, `test_mister_wide_inert.sh`, `test_mra_build_line.sh`, `test_mra_parts.sh`, `test_rpl2siminputs.sh`, `test_sim_wram_contract.sh`.
+### `audit_mister_map_fit.sh` — audit, ci_static
+
+**WHAT:** the MiSTer SDRAM placement map FITS the 64 MB tier — decided by the DECLARED region sizes the MRA downloads (bank 1 exactly full, bank 0 with 131,072 B free), not by tile ceilings — and the four content extents that bound where content lives (obj bank 4 and 5 top codes, the QSound extension's live extent, the 6 MB PRG region) have not moved; a tile code is its SDRAM address under the CPS-2 scramble.
+
+**HOW:** the frozen placement() table's arithmetic over the declared regions and the extents read from the built artifacts (static); three controls: the untrimmed 16 MB QSound region must overflow both the ioctl_addr port and the header word, one extra megabyte of obj bank 5 must overflow bank 0, and the identity must fail without the scramble.
+
+**EXPECTS:** the fit and the extents as frozen; each control overflows or fails as it must. A fit check with no control asserts nothing.
+
+### `audit_sdram_bank_load.sh` — audit, emulator
+
+**WHAT:** the per-bank SDRAM load of stock vsavj on the stock jtcps2 core, phase by phase (attract / select / in-match): accesses, ACTIVE commands (the row-miss count on banks 1-3), bus occupancy, the same-row re-open statistic and the harness's clash warnings — the traffic the bank repack (tenant art beside the QSound PCM in bank 1) would perturb; `--core cps2w --wide` is the leg that measures the repacked design itself.
+
+**HOW:** a Verilator run of the core over the replay with the SDRAM reporter (~50 min), the phase table and the PEAK table derived from the reporter's own intervals.
+
+**EXPECTS:** a measurement with a peak table, not a frozen verdict — read the peak table, not only the phase averages; the stock leg bounds the repack's headroom and does not prove the design.
+
+### `test_jtcores_twin.sh` — test, ci_portable
+
+**WHAT:** the MiSTer core scaffold cores/cps2w is a TWIN of the reference core modulo EXACTLY its declared delta (the macros, the mame2mra rows, the frozen RTL override set in tests/expect/cps2w_game_yaml_delta.txt), nothing undeclared landed anywhere in the fork, the reference cores are byte-untouched against upstream v1.7.3, emu/jtcores sits at its pin, and emu/jtcores-patches reproduces the fork's commits as a patch series byte for byte.
+
+**HOW:** git diffs of the fork against upstream and of cps2w against cps2, the patch series regenerated with format-patch and compared (ROM-free, seconds); controls add an undeclared hdl file and an undeclared game.yaml pull.
+
+**EXPECTS:** every check exact; an undeclared file, pull or fork commit fails. The strongest text form of 'profile-gated by construction': the originals cannot have moved.
+
+### `test_jtsim_scratch_heal.sh` — test, ci_portable
+
+**WHAT:** a jtsim scratch clone hollowed by the macOS tmp reaper (tracked files gone, .git intact) is HEALED in place by `mister_mra.sh --ensure-scratch`, a clone whose object store is hollow too is re-cloned at the pin, and a fresh scratch is cloned at the pin with nothing missing.
+
+**HOW:** three local hardlinked clones of emu/jtcores shaped as fresh, reaped, and store-hollowed (ROM-free, ~5 s); the control cuts the heal block from a copy of the tool, which must leave the reaped clone hollow.
+
+**EXPECTS:** the three shapes handled as stated and the control failing; a red is the 0-second 'Cannot open macros.def' red returning between two static runs.
+
+### `test_mister_gfxc_fetch.sh` — test, emulator
+
+**WHAT:** the core FETCHES a tenant tile: with the profile bit ON, SDRAM reads land in the group-C obj bank 4 and bank 5 windows and the tile codes they name fall inside the roster's frozen live extents; with the SAME .rom and only header byte 41 flipped to 0xFF (profile OFF) those two windows read EXACTLY ZERO while the vanilla banks stay busy in both legs.
+
+**HOW:** two Verilator legs (~93 min each, in parallel on two scratch clones) with the harness's SDRAM read probe armed on four windows (p2/p3 the vanilla banks as liveness), on the measured-green replay operands (the default replay cannot reach a match).
+
+**EXPECTS:** p0/p1 non-zero and in-extent on the positive leg, zero on the control, p2/p3 busy on both; the control is the profile bit, not another build.
+
+### `test_mister_mra_map.sh` — test, ci_static
+
+**WHAT:** the MiSTer download image is EXACTLY the placement map: cps2w's stock vsavj MRA is byte-identical to cps2's but for the rbf and cps2 emits NO WIDE MRA (the profile gated by sourcefile), the WIDE MRA's region table and four header words are the map's with every region 1 KiB-aligned, the produced .rom is 66,265,152 B with the trimmed QSound region a pure truncation, the catalogue names the current build's CRCs, the stock .rom is bit-identical to the 14z-106 measurement, and header byte 41 is 0xFE in the WIDE MRA and 0xFF in every stock one.
+
+**HOW:** the REAL generator over the REAL romset (ROM-free MRA generations plus the .rom build when the romset is present); controls generate the untrimmed mapping (which must exceed the 26-bit ceiling) and move the trim by 1 KiB.
+
+**EXPECTS:** every lock as listed; both controls fail. The map and the arithmetic were derived independently, so a disagreement is the finding.
+
+### `test_mister_obj_oracle.sh` — test, emulator
+
+**WHAT:** the first cross-implementation agreement on a video-determining surface: the OBJ (sprite) list the 68k builds, dumped from MAME's ORAM and from the jtcps2w core's SDRAM and walked by the same byte-level walker, agrees EXACTLY on the PROMOTED subset (y bit 12, the group-C sprites this port adds — lottery-free) at the frozen tenant anchor (31 vs 31, ordered and field-for-field), the unpromoted vanilla remainder reported, never asserted (the CPU opponent is a lottery).
+
+**HOW:** MAME and a Verilator run of the core on the WIDE set with replay 36 (~65 min; --sim-dir/--mame-log re-analyse finished runs), tools/oram_obj_records.py over both dumps; the control flips one bit of a promoted entry in the real core dump.
+
+**EXPECTS:** promoted identical and in the 19-bit address range on both; the flipped entry fails PROMOTED_IDENTICAL; REFUSES with exit 3 without the sim prerequisites.
+
+### `test_mister_page.sh` — test, ci_static
+
+**WHAT:** the MiSTer synthesis page (docs/project/mister_core.md plus the drawn page tools/mk_mister_page.py renders) still draws the map that is actually there: every placement offset and length against the fit gate's frozen table, the bank tops and free bytes, the .rom size and header words against mister_map.md, every frozen content extent, and the ASCII figures embedded in the committed markdown.
+
+**HOW:** the generator's own --check re-deriving each number (ROM-free; the group-C census and the palette re-read SKIP loudly when their inputs are absent), the rich page rendered to a temp path only; three shadow-tool controls move a placement constant, a frozen extent and one ASCII glyph.
+
+**EXPECTS:** every re-derivation equal and the render structurally sound; each control rejected. A synthesis that draws last month's arithmetic is exactly the rot this catches.
+
+### `test_mister_prg_probe.sh` — test, ci_portable
+
+**WHAT:** the 68k program-ROM read probe's CONTRACT (the ROM-free half of slice D4): every line the probe patch adds to jtcps2_main.v sits inside its `ifdef guard (inert by construction), the probe's window is the decode's window (both re-read from the RTL), the address half counts bus cycles independently of any chip select, tools/prgprobe_verdict.py gives all three verdicts and BOTH refusals on synthetic logs, and the runner refuses --prgprobe on the reference core.
+
+**HOW:** the patch, the RTL and the verdict tool checked statically (~3 s); a copy of the patch with one line hoisted above the guard must be rejected.
+
+**EXPECTS:** every lock as listed; a tool that cannot say 'I refuse' is not an instrument.
+
+### `test_mister_prg_window.sh` — test, emulator
+
+**WHAT:** slice D4's own evidence: what the 68k does with CPU:$400000-$5FFFFF on the core — the program window is READ and the bytes latched are the .rom's (right bytes: D4 works), with the SAME .rom and only the profile bit clear as the control leg, and the reads below $400000 as the loud in-run control the verdict tool demands.
+
+**HOW:** two Verilator legs (~55 min each, in parallel) with the sim-only JTCPS2W_PRGPROBE (address and data halves), tools/prgprobe_verdict.py over the probe's last per-frame report; the frozen pair in tests/expect/mister_prg_window.txt; the control perturbs the frozen pair.
+
+**EXPECTS:** the measured pair equal to the frozen one on both legs, the below-window control loud and verified; a moved count is a finding — the simulation is deterministic.
+
+### `test_mister_qsound_ext.sh` — test, emulator
+
+**WHAT:** the QSound extension is FETCHED on the core: while a tenant fights, the core issues SDRAM reads into the 1 MB high PCM window (DSP banks 0x80-0x8E, which stock CPS-2 cannot address) at image bytes overlapping the build's ledgered samples, and the same image with the profile bit clear issues NONE there while still issuing tens of millions of reads in QSound LOW (the liveness that makes the zero evidence about wide_en).
+
+**HOW:** two Verilator legs (~94 min each, in parallel) of 108_tenant_voice with the SDRAM read probe on the high and low PCM windows; the ledger (tools/qs_ledger.py) says what is populated.
+
+**EXPECTS:** high-window reads on the positive leg landing in ledgered samples, zero on the control with the low window busy; every address with pcm_addr[22:20] == 0, which is what makes the SLOT5_AW=20 mask lossless.
+
+### `test_mister_sdram_census.sh` — test, emulator
+
+**WHAT:** slice D2's core evidence: the CPS-2 WIDE romset lands in SDRAM exactly where mister_map.md places it — every one of the 67,108,864 bytes of the four dumped banks checked against the map — with the reference core placing the same image the reference way (group C aliasing onto banks 2+3), the re-pack confined to bank 0 on a stock image, and the census tool calibrated on a mapping nobody changed.
+
+**HOW:** four Verilator download legs (cps2w+WIDE, cps2+WIDE, cps2w+stock, cps2+stock), all four banks dumped and compared by tools/mister_sdram_census.py (which replays the download mapping and the GFX scramble); cross-checks between legs independent of the tool; controls census leg A against the STOCK map and move a placement constant.
+
+**EXPECTS:** leg A exact against the WIDE map, B failing it with banks 2+3 differing from A, C and D identical on banks 1-3 and differing on bank 0; the controls fail; REFUSES without the sim prerequisites.
+
+### `test_mister_sim_anchor.sh` — test, emulator
+
+**WHAT:** the MiSTer leg of the §4 dual-emulator oracle on LEGACY content: jtcps2w under Verilator (the profile bit clear, so this is the FPGA edition of the emulator superset invariant) and MAME running the same legacy replay on stock vsavj agree on the mapped gameplay fields at the round-1 match-start anchor and the follow offsets — the frozen anchors MAME 2146 / sim 2609 (the reference core's numbers, not re-measured on cps2w).
+
+**HOW:** a ~45-minute Verilator run from frame 0 with the work-RAM hook, dumps compared by tools/compare_fields.py against MAME's at the anchor (frame output off).
+
+**EXPECTS:** every mapped field agreeing at the anchor and offsets with the frozen skew of 463; SIM_CORE=cps2 re-runs the reference leg. The second re-freeze moved nothing after the four-buttons-held fidelity defect was fixed, which was itself the result.
+
+### `test_mister_tenant_oracle.sh` — test, emulator
+
+**WHAT:** the §4 dual-emulator oracle on TENANT content: MAME and jtcps2w run the same tenant-picking replay on the WIDE romset and agree on the mapped gameplay fields at the round-1 anchor (frozen MAME 2886 / sim 3546 — the transfer plus one frame, as on legacy) with P1 the RELOCATED tenant record on both sides; the P2 fields are excluded BY NAME because the CPU opponent is a sound-state-fed lottery that genuinely differs.
+
+**HOW:** a Verilator run of the core on the WIDE set with 36_pick_tenant_cell beside MAME's, compared by tools/compare_fields.py; the control perturbs the timer byte in the real sim dump.
+
+**EXPECTS:** agreement on every compared field with P1's base 0x003FA9D0 and id 0x13 on both; the perturbed field fails; REFUSES without the sim prerequisites. The first evidence the tenant FIGHTS correctly on the core, not only that its art is fetched.
+
+### `test_mister_wide_gate.sh` — test, ci_portable
+
+**WHAT:** the CPS-2 WIDE runtime profile on MiSTer is BOUNDED, DECLARATIVE, PROFILE-GATED and REACHABLE (Rule 1 v2 on FPGA): the diff of every overridden RTL file is frozen, the profile byte agrees in the fork's TOML, the RTL decoder and this gate (41 / 0xFE / active-low), the three gated modules are simulated exhaustively (the QSound bank latch over all 65,536 dsp_ab values, the profile decoder over a real header stream, the obj promote over all 65,536 y-words in both profile states — bank bit 2 stuck at zero with wide_en low, never setting the terminator bit 15), and jtframe resolves cps2w to our files.
+
+**HOW:** frozen delta compares plus Verilator benches of the three modules (~30 s with Verilator, seconds without); seven controls perturb an override, bypass each gate, point the decoder at byte 40, flip the polarity, read bit 15, and ungate the decryption-range fix.
+
+**EXPECTS:** every check and bench green, every control failing its bench or the frozen delta. The polarity control is the superset-invariant break: a 0xFF-filled stock header must never arm the profile.
+
+### `test_mister_wide_inert.sh` — test, emulator
+
+**WHAT:** the FPGA superset invariant measured directly: the reference core cps2 and the WIDE core cps2w, running the SAME stock vsavj download under Verilator, produce BIT-IDENTICAL 68k work RAM at every frame of a window (one differing byte is the whole report).
+
+**HOW:** two Verilator runs with the work-RAM hook over the window (~11 min per core at the default early-boot window), every dump compared; the control re-compares the cps2 dumps against themselves shifted by one frame, which must FAIL, and the window must be non-constant.
+
+**EXPECTS:** byte-identical across the window, the shifted control failing, the window live. Completeness of the dump sets is asserted by the producer (check_wram_dumps.py).
+
+### `test_mra_build_line.sh` — test, ci_static
+
+**WHAT:** the WIDE MRA names the FREEZE it was generated for and can never name the wrong one: with --wide the header's BUILD block carries the registry row resolved from the build's rompath, the mark, the zip's sha1 and both keys — written only after every CRC-identified part resolves against that build's zips; without --wide it says 'not stated'; rewriting is idempotent.
+
+**HOW:** three ROM-free MRA generations through tools/mister_mra.sh and tools/mra_header.py (~1 min); the control points --wide at a rompath whose vsavjw.zip differs by one member byte, so one part cannot resolve and the generator must REFUSE and write no block.
+
+**EXPECTS:** the block exact for the current merged build, absent on the stock control MRA, honest without --wide, idempotent; the foreign rompath refused.
+
+### `test_mra_parts.sh` — test, ci_portable
+
+**WHAT:** tools/check_mra_parts.py's verdict logic — whether a bundle's MRA parts actually resolve against the zips by CRC32 (jtframe fills an unresolvable part with 0xFF rather than refusing) — on fixtures whose answer is known by construction.
+
+**HOW:** ROM-free fixture zips written by the gate itself (ci_portable): a resolving MRA, one with a bogus CRC on its second part, one against a directory with no zip.
+
+**EXPECTS:** the resolving fixture passes; the bogus CRC fails naming the one bad part; the missing zip fails with every part unresolved.
+
+### `test_rpl2siminputs.sh` — test, ci_portable
+
+**WHAT:** the .rpl -> jtframe sim_inputs.hex translator: the direction bit map is the measured one (file bit4 = RIGHT, bit5 = LEFT, bit6 = DOWN, bit7 = UP — the reverse of the macro name, measured on the game's own input mirror on both implementations), a real replay's translation is frozen, and the refusals fire (P2, button 4, service).
+
+**HOW:** the translator over fixtures and 05_timeout_idle (ROM-free, seconds); controls run a copy with the pre-14z-108 reversed map, append direction lines to the anchor translation, and append a P2 line to the no-P2 translation.
+
+**EXPECTS:** the bit-map vector, the frozen sha1 (which carries no direction token and so did not move at the fix), the refusals; each control fails its check. 14z-107 (12) inferred a two-bit swap from half the data and was wrong — the full measurement is the header.
+
+### `test_sim_wram_contract.sh` — test, ci_portable
+
+**WHAT:** the ROM-free contract between the fork's Verilator work-RAM hook and tools/compare_fields.py: the dump naming, the big-endian byte order (a byte-swapped side must FAIL), anchor mode absorbing cross-implementation frame skew, a perturbed non-predicate field REPORTED, the runner refusing to write dumps or simulate inside the repo (rule 7), the harness patch inert under its #ifdef, the CPS-2 constants agreeing with the pinned RTL, a lost or short dump LOUD (check_wram_dumps.py, itself controlled), frame output off by default, and the fork-flush mechanism ground-truthed.
+
+**HOW:** synthetic dump sets, the patch text, the runner's source and the RTL constants (no ROM, no emulator); controls: a byte-swapped side, a perturbed field, a line hoisted above the #ifdef.
+
+**EXPECTS:** all ten locks; each control fails. The live end-to-end run is test_mister_sim_anchor.

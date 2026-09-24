@@ -2,6 +2,16 @@
 # test_wheel_bank5.sh — the select-wheel bank-5 move (14z-63, phase 3):
 # real medallion art for the appended cells, vanilla cells byte-copied.
 #
+# WHAT: the select-wheel bank-5 move: the drawer's bank-word immediate flipped to bank 5,
+#   every referenced wheel tile placed in group C at 0x10000+code (host entries
+#   byte-identical to vsav's group A, appended entries from vs2's), and the engine walking
+#   the wheel record from bank 5 with the fmt-2 handler seeing bank word 0x3000 and the
+#   relocated record.
+# HOW: tools/check_wheel_bank5.py re-derives the whole move from the ROM record, the layout
+#   and both source zips against the built image; negative controls corrupt a tile byte and
+#   strip the code op; runtime on WIDE MAME with replay 36.
+# EXPECTS: static equal, both controls failing, the engine's bank-5 walk observed.
+#
 # MECHANISM (measured 14z-63; docs/game/atlas/select_screen.md). The wheel is
 # ONE record drawn by ONE object ($FFB800) whose select-screen anim chain
 # is a single stop-flagged entry (0x2689FA -> the record) — so per-entry

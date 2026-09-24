@@ -4,6 +4,18 @@
 # the same WIDE romset, and the mapped gameplay fields must agree at the
 # round-1 match-start anchor.
 #
+# WHAT: the §4 dual-emulator oracle on TENANT content: MAME and jtcps2w run the same
+#   tenant-picking replay on the WIDE romset and agree on the mapped gameplay fields at the
+#   round-1 anchor (frozen MAME 2886 / sim 3546 — the transfer plus one frame, as on legacy)
+#   with P1 the RELOCATED tenant record on both sides; the P2 fields are excluded BY NAME
+#   because the CPU opponent is a sound-state-fed lottery that genuinely differs.
+# HOW: a Verilator run of the core on the WIDE set with 36_pick_tenant_cell beside MAME's,
+#   compared by tools/compare_fields.py; the control perturbs the timer byte in the real sim
+#   dump.
+# EXPECTS: agreement on every compared field with P1's base 0x003FA9D0 and id 0x13 on both;
+#   the perturbed field fails; REFUSES without the sim prerequisites. The first evidence the
+#   tenant FIGHTS correctly on the core, not only that its art is fetched.
+#
 # MUST-FIRE: known-bad: perturbed-field — a perturbed COMPARED field must be caught by the field comparison (mode: the timer byte is perturbed in the REAL sim dump and the anchor comparison must fail; REFUSES with exit 3 if the sim prerequisites are absent)
 #
 # WHY IT EXISTS, and why it is not the same gate as test_mister_sim_anchor.

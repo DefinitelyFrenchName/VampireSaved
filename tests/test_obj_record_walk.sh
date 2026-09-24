@@ -4,6 +4,17 @@
 # Pure functions on a synthetic region — no ROMs, no build dirs, no
 # emulator, ~1s. Portable by construction (tests/ci_portable.txt).
 #
+# WHAT: obj_records.walk()'s two heuristic passes are RELOCATION-AWARE: the sweep pass's
+#   aux-window test and the pointer pass's region-window test take the allow-maps that keep
+#   the same bytes from answering differently before and after placement, so no phantom
+#   record is invented in the built image alone (#75's +1 record that aborted every merged
+#   build).
+# HOW: a synthetic region reproducing #75's straddle shape (no ROMs, ~1 s); four controls —
+#   the phantom with ptr_allow=None MUST appear and the allow-map MUST reject it, a
+#   clobbered count word loses its record, an un-relocated pointer loses its record, swapped
+#   pointers are caught though the counts match.
+# EXPECTS: every control fires as stated; a parity check that cannot fail is not a check.
+#
 # WHY THIS EXISTS. verify_gfx_build.py compares a walk of the SOURCE anim
 # region against a walk of the BUILT image. Both passes of the walker are
 # heuristics whose predicates are PLACEMENT-DEPENDENT:

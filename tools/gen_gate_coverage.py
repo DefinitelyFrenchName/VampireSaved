@@ -56,11 +56,14 @@ first sentence) is `gate_index.md`.
 def safe(text):
     """Description text as the site's markdown subset must see it: a token carrying a
     bare `*` outside a code span (`tests/*.sh`) is wrapped in backticks, or the subset's
-    italic rule pairs two of them into an <em> (test_docs_site went red on exactly that,
+    italic rule pairs two of them into an <em>; a token shaped like a tag (`<header>`) is
+    wrapped too, or the subset rejects it as raw HTML (test_docs_site went red on each,
     14z-180). Existing code spans are left alone."""
     parts = re.split(r"(`[^`]*`)", text)
     for i in range(0, len(parts), 2):
-        parts[i] = " ".join(f"`{t}`" if "*" in t else t for t in parts[i].split(" "))
+        parts[i] = " ".join(
+            f"`{t}`" if ("*" in t or re.search(r"</?[A-Za-z][A-Za-z0-9-]*>", t)) else t
+            for t in parts[i].split(" "))
     return "".join(parts)
 
 

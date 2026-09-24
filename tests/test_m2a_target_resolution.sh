@@ -3,6 +3,15 @@
 # from the BUILD, and an unregistered image stops it. Needs ROMDIR, no
 # emulator, ~10 s.
 #
+# WHAT: the M2 battery RESOLVES its legacy target from the build under test and STOPS on an
+#   unregistered image with a loud message, instead of judging any build against a fixed
+#   expectation set.
+# HOW: runs the resolver on a registered build and on a synthesised unregistered one (a
+#   one-instruction poke); structurally forbidden from booting an emulator (m2a_run_masked
+#   replaced by a loud failure).
+# EXPECTS: the registered build resolves to its set, the unregistered one stops with the
+#   message; an emulator reached is an immediate fail.
+#
 # The companion to tests/test_m2a_target_policy.sh, which reads the source.
 # This one runs the resolver: policy that is only asserted textually is
 # policy nobody has executed (GitHub #30's lesson, one level down).

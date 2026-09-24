@@ -4,6 +4,17 @@
 # on the same stock vsavj romset; the mapped gameplay fields must agree at the
 # round-1 match-start anchor and at the follow offsets.
 #
+# WHAT: the MiSTer leg of the §4 dual-emulator oracle on LEGACY content: jtcps2w under
+#   Verilator (the profile bit clear, so this is the FPGA edition of the emulator superset
+#   invariant) and MAME running the same legacy replay on stock vsavj agree on the mapped
+#   gameplay fields at the round-1 match-start anchor and the follow offsets — the frozen
+#   anchors MAME 2146 / sim 2609 (the reference core's numbers, not re-measured on cps2w).
+# HOW: a ~45-minute Verilator run from frame 0 with the work-RAM hook, dumps compared by
+#   tools/compare_fields.py against MAME's at the anchor (frame output off).
+# EXPECTS: every mapped field agreeing at the anchor and offsets with the frozen skew of
+#   463; SIM_CORE=cps2 re-runs the reference leg. The second re-freeze moved nothing after
+#   the four-buttons-held fidelity defect was fixed, which was itself the result.
+#
 # SINCE SLICE D1 THE CORE UNDER TEST IS `cps2w`, NOT `cps2`, AND THAT IS THE
 # POINT (14z-107 (6)). cores/cps2w now carries RTL, and the profile it adds is
 # selected at RUNTIME from a spare MRA header byte — so a STOCK vsavj MRA runs

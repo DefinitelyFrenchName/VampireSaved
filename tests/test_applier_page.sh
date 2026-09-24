@@ -2,6 +2,19 @@
 # test_applier_page.sh — SLICES A2-A6 OF THE APPLIER APP: the page must EQUAL the tool
 # of record, refuse everything it refuses, and carry no way to phone home (2026-09-21).
 #
+# WHAT: the browser applier page EQUALS the tool of record (apply_release.py) member for
+#   member on both variants, refuses everything it refuses, is self-contained (a
+#   Content-Security-Policy the browser enforces plus a scan for named network primitives),
+#   carries its modules verbatim, and stops demanding qsound_hle.zip under --no-qsound-bios.
+# HOW: the shipped apply_release.html of every platform dir compared with a fresh
+#   generation; the inlined modules compared with tools/applier/*.mjs; the modules run under
+#   node against apply_release.py on $ROMDIR for member order, bytes, zip header fields and
+#   the set key (container bytes deliberately not compared); six refusals exercised on both
+#   tools; four controls (a fetch() in the shell, the CSP removed, the member check removed,
+#   a flipped member).
+# EXPECTS: every section green and every control failing; a red names the member, refusal or
+#   primitive. The page's own WIRING is test_applier_page_browser's half.
+#
 # docs/project/applier_app_scope.md §4: the page is an alternative front end to
 # tools/apply_release.py, never a second definition of the romset. A5 is the acceptance —
 # "not 'it looks right', but 'it equals the tool of record'" — and this gate is that

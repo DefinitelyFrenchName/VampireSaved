@@ -1,6 +1,18 @@
 #!/bin/sh
 # test_applier_page_browser.sh — THE APPLIER PAGE IN A REAL BROWSER ENGINE (2026-09-21).
 #
+# WHAT: the shipped applier page RUNS where a player runs it — opened from file:// in a real
+#   browser engine and driven through its own drop zone, radio and button: a build prints
+#   the manifest's set key, 'leave it out' stops the qsound demand and builds to the other
+#   key, a damaged dump is refused by name.
+# HOW: headless Chrome drives page_test.html (the shipped file as a byte-prefix plus
+#   tests/lib/applier_driver.html) with the maintainer's dumps; an incomplete run is its own
+#   verdict, never a content verdict; controls starve the control leg's virtual-time budget
+#   and flip a byte of the inlined set key.
+# EXPECTS: the three player paths as described; the starved control reads NOT JUDGED, the
+#   broken page fails. A stalled driver retries once for incompleteness only, never for a
+#   content failure.
+#
 # tests/test_applier_page.sh proves the page's MODULES equal tools/apply_release.py under
 # node, and that the page carries those modules verbatim. This gate answers the other
 # half, which node cannot: does the shipped HTML actually RUN where a player runs it —

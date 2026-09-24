@@ -1,6 +1,16 @@
 #!/bin/sh
 # test_biased_list_inventory.sh — the #109-B sweep inventory, frozen (14z-102).
 #
+# WHAT: the #109-B sweep inventory: every biased-type (4/6/8) sprite list and composite (12)
+#   across the tenants' placed regions, outside the tool's documented false-positive
+#   families, is frozen with its 14z-102 review verdict (FP node streams, the
+#   accepted-with-evidence x2b7ef4 strips, the AI-script block) — a new row or a changed
+#   status is a stop-and-review event.
+# HOW: tools/enum_biased_lists.py over the three builds' placements and the vs2 data view,
+#   the filtered inventory compared with the frozen verdicts.
+# EXPECTS: the inventory exact; new ported data carrying an unreviewed biased list, or moved
+#   retype coverage, fails.
+#
 # WHAT IT LOCKS. tools/enum_biased_lists.py enumerates every biased-type
 # (4/6/8) sprite list and composite (12) across a tenant's placed regions and
 # classifies them against the retype machinery. The FILTERED inventory — the

@@ -2,6 +2,16 @@
 # test_freeze_basis_sandbox.sh — GROUND TRUTH: tools/freeze_masked_basis.sh
 # must never hand one run's MAME sandbox to the next run.
 #
+# WHAT: tools/freeze_masked_basis.sh never hands one run's MAME sandbox to the next: naming
+#   the same replay twice in one invocation (the documented canary command) gives the second
+#   leg a FRESH sandbox, so it cannot inherit the first leg's EEPROM and overwrite a basis
+#   it just verified.
+# HOW: a scratch repo with the real freeze script and a STUB run_replay_mame.sh whose output
+#   depends on whether it was handed a dirty sandbox (no emulator, no ROMs); section 3
+#   re-runs against the reconstructed pre-fix tool, where section 1 must fail.
+# EXPECTS: fresh sandboxes both legs, the pre-fix tool failing; a red is the baseline the
+#   superset invariant rests on being silently redefined.
+#
 # WHY (14z-91, measured). freeze_one() derives its sandbox paths from the
 # replay NAME alone (`$WORK/sb_${_n}_$_i`), and tools/run_mame.sh:6-10 treats
 # an explicit MAME_SANDBOX as DELIBERATE REUSE — it does not clear it. So
@@ -26,7 +36,7 @@
 # invariant rests on" is precisely the one that needs a gate, and the guards
 # it already carries cannot see this one.
 #
-# HOW: no emulator and no ROMs. A scratch repo gets the real
+# METHOD (14z-91): no emulator and no ROMs. A scratch repo gets the real
 # freeze_masked_basis.sh and a STUB run_replay_mame.sh whose output depends
 # on whether it was handed a dirty sandbox — the same signature as the real
 # defect, deterministic in a second. (The scratch-repo + stubbed-dependency

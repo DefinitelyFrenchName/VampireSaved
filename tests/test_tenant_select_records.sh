@@ -3,6 +3,18 @@
 # variant-half tenant id the build must carry the tenant's OWN select
 # records and the host's records must return to VANILLA bytes.
 #
+# WHAT: at a variant-half tenant id the build carries the tenant's OWN select records (six
+#   array rows repointed, records composed from the vs2 image) and the host's select-record
+#   block, palette-grid column and shared coord list return to VANILLA bytes; the engine
+#   walking onto cell 0x13 fetches exactly the predicted row sequence for all three UI
+#   pieces.
+# HOW: tools/check_tenant_select.py re-derives the composition from the vs2 image and
+#   select_port.PLACEMENTS and compares the built image; negative controls (a pristine
+#   image, a flipped composed byte, a flipped host byte) must fail; runtime on WIDE MAME
+#   with replay 36 reads the record walker.
+# EXPECTS: static equal, the three controls failing, the engine's rows as predicted;
+#   SKIP_RUNTIME=1 skips section 3.
+#
 # WHY (14z-62/62e). The slot-0x0F port displays the tenant's select UI by
 # in-place surgery on Jedah's records (tools/select_port.py). De-substituting
 # the tenant to id 0x13 replaces that mechanism with NINE repointed

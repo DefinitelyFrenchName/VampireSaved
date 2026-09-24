@@ -2,6 +2,15 @@
 # test_classify_pool_spawns.sh — ground truth for the projectile-pool spawn
 # classifier (14z-93). No ROMs, no emulator, ~1s.
 #
+# WHAT: the projectile-pool spawn classifier supplies the denominator that makes a hit-class
+#   census zero interpretable (how many type >= 64 objects entered the pool), reading the
+#   type byte from the HIGH lane of the logged word (+0x02, an even address) — the real
+#   captures carry equal lanes, so a low-lane reader is right by coincidence.
+# HOW: 12 synthetic cases through tools/classify_pool_spawns.py, every lane case with
+#   UNEQUAL lanes (no ROMs, ~1 s).
+# EXPECTS: every case as designed; the lane cases fail a low-lane reader. Protects the
+#   2026-08-16 KEEP ruling on hitclass_map_extend.
+#
 # WHY THIS EXISTS. `tools/classify_pool_spawns.py` supplies the denominator
 # that makes a zero from the hit-class map census interpretable: "the tenant
 # never stamps a dangerous type" and "it stamps them constantly and nothing

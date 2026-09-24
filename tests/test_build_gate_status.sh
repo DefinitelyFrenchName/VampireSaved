@@ -2,6 +2,15 @@
 # test_build_gate_status.sh — ground truth for "a rejected build must abort
 # the gate" (14z-90, GitHub issue #1).
 #
+# WHAT: a REJECTED build aborts the gate instead of being soaked and stamped PASS: the
+#   stage-4/6 gates no longer pipe the builder through tail (whose status hid every
+#   rejection), and a stale or missing rompath cannot be measured as the build.
+# HOW: the gates copied into a scratch repo whose build_donovan.sh is a stub with scripted
+#   failures: reject-after-pack, stale rompath, no rompath, plus a positive control;
+#   GATE_SRC= reruns it against the pre-fix gates.
+# EXPECTS: the three failure modes abort and the positive control passes; against the
+#   pre-fix gates it must FAIL.
+#
 # WHY. tests/test_m2b_stage6.sh and tests/test_m2a_stage4_code.sh piped
 # tools/build_donovan.sh through `tail`. Under #!/bin/sh with no pipefail a
 # pipeline's status is the LAST command's, so `tail` always returned 0 and

@@ -3,6 +3,15 @@
 # (14z-141, living-docs slice L2).
 # ci_portable: no ROM, no build dir, no emulator, ~6 s (measured).
 #
+# WHAT: the rule-5 census (behavioural values live in documented tables) runs clean with
+#   nothing UNCLASSIFIED, the frozen BAKED gameplay+code inventory has not grown, IN-TABLE
+#   is pointer-driven, and every tripwire of tools/audit_rule5.py still fires.
+# HOW: the tool's --check over the canonical manifests and generators against
+#   tests/expected/rule5_baked.tsv (~6 s); four controls (a new kind/key, an aux_poke
+#   outside every band, a new baked gameplay value, an edited inventory).
+# EXPECTS: clean census, inventory unchanged or smaller, every control failing; `fact` is a
+#   NOTE-class number, not frozen.
+#
 # MUST-FIRE: perturbed-copy: new-kind-key — a manifest copy with a (kind, key) pair the census has never classified must fail --check as UNCLASSIFIED
 # MUST-FIRE: perturbed-copy: aux-poke-no-band — an aux_poke outside every declared band must fail --check
 # MUST-FIRE: perturbed-copy: new-baked-value — a NEW baked gameplay value must fail --check (the inventory can only shrink)

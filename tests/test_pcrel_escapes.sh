@@ -3,6 +3,15 @@
 # SINCE REVIEWED (14z-94, GitHub #22). Needs ROMDIR + the three tenant builds
 # and build/out/vsav2_data.bin; ~2 min.
 #
+# WHAT: the pc-relative DATA-escape inventory of the three tenant builds is UNCHANGED SINCE
+#   REVIEWED (build/manifest/pcrel_escapes.toml): any addition, removal or change fails, and
+#   region x06cac0 (broken on hui11, fixed 14z-69i) stays absent.
+# HOW: tools/verify_pcrel_data.py over the three builds against vsav2's data view and the
+#   frozen inventory (~2 min); the control runs the merged leg with a wrong placement
+#   suffix, which must read zero escapes and fail.
+# EXPECTS: the inventory exact and the positive control absent; a pass means unchanged since
+#   reviewed, NOT that the escapes are safe. Not portable.
+#
 # MUST-FIRE: known-bad: wrong-placement-suffix — the merged leg with its placement suffix deliberately wrong must read ZERO escapes and therefore fail the reference comparison (mode: every merged leg runs with the wrong suffix, and this run must fail)
 #
 # THE FINDING BEHIND IT. tools/verify_pcrel_data.py is the instrument that

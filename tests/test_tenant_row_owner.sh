@@ -1,6 +1,15 @@
 #!/bin/sh
 # test_tenant_row_owner.sh — the row-OWNER threading is LIVE, not decoration.
 #
+# WHAT: the row-OWNER threading of the multi-tenant refactor is LIVE, not decoration:
+#   perturbing ONE owner-derived binding at a time changes the generator's whole output
+#   directory (blobs included), an intentionally unused binding reads DEAD, and two
+#   unperturbed runs agree byte for byte.
+# HOW: the generator alone against an existing extract dir (seconds; SKIPs without one), one
+#   perturbation per owner-derived site, the output directories compared.
+# EXPECTS: every live site changes the output, the dead one does not, determinism holds; a
+#   site whose perturbation changes nothing is dead code.
+#
 # WHY (M3b slices C, D and E, 14z-77). The multi-tenant refactor replaces "is
 # THE tenant a variant id?" (one global scalar) with "is THIS ROW's owning
 # tenant a variant id?" at every gate, and the same substitution at every

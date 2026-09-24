@@ -3,6 +3,15 @@
 # cannot publish its permissive decision on a DEAD measurement (14z-94,
 # GitHub #25). ROM-free, no emulator, ~2 s.
 #
+# WHAT: audit_wide_phase_a's A3 (may gfx groups be appended?) cannot publish its permissive
+#   decision on a DEAD measurement: a corpus that measured nothing, or only its first
+#   replay, makes the audit REFUSE rather than decide.
+# HOW: a scratch copy of the audit with its emulator invocation replaced by a dead-probe
+#   stub and by a partial-corpus stub (ROM-free, ~2 s); stubbing run_one alone was not
+#   enough, and section 3 caught that.
+# EXPECTS: refusal on both stubs; a red is 'gfx growth is inert' published from a probe that
+#   saw no access.
+#
 # WHY. A3 decides whether gfx groups may be appended at all. It used to print
 # a `note` and `continue` when a replay produced no summary, so a corpus that
 # measured NOTHING — a renamed Lua script, a MAME that aborts at boot, a wrong

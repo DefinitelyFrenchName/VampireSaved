@@ -2,6 +2,14 @@
 # test_frozen_rompath_guard.sh — tools/build_donovan.sh must refuse to rebuild
 # over a FROZEN REFERENCE rompath (14z-90, GitHub issue #26).
 #
+# WHAT: tools/build_donovan.sh refuses to replace one track's packed set with the other's
+#   under a frozen reference's name (a stock rebuild over a registered WIDE rompath), while
+#   a same-track rebuild of a reference stays legal (HANDOFF's documented recipe).
+# HOW: runs the real builder to the guard on a COPY of a frozen rompath, both the mismatch
+#   and the same-track cases (~4-8 min, no emulator).
+# EXPECTS: the mismatch refused, the same-track rebuild allowed; a red in the first
+#   direction is the #26 loss (a frozen name measuring a different ROM).
+#
 # WHY. build_donovan.sh does an unconditional `rm -rf "$OUTBASE/rompath"`, and
 # its callers take an arbitrary outbase. So `tests/run_battery_m2.sh
 # build/don_m5` deletes the registered donovan-m5 reference and repacks a

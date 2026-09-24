@@ -2,6 +2,16 @@
 # test_select_arrays.sh — freeze the select-screen record-pointer array, the
 # table M3a's tenant move depends on.
 #
+# WHAT: the select-screen record-pointer arrays (portrait, name, highlight; 32 rows per
+#   player, P2 at +0x80, indexed by cell/id with no 4-bit fold, rows 0x10-0x1F variant
+#   aliases) as modelled against the reference image, and the ENGINE's own row fetch
+#   agreeing: hovering four known cells fetches exactly the four frozen records.
+# HOW: static model against the reference data view with a one-byte corruption control;
+#   runtime on MAME reading $1C(a6)+4 at the record walker while the cursor hovers the
+#   cells.
+# EXPECTS: the model holds, the corruption fails, the engine fetches the predicted rows. A
+#   tenant at 0x13 costs six longs.
+#
 # WHY (14z-61). The port displays the tenant's select portrait today by
 # IN-PLACE record surgery on Jedah's records (tools/select_port.py), which
 # works only because the tenant occupies slot 0x0F. Moving it to id 0x13

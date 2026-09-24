@@ -1,6 +1,12 @@
 #!/bin/sh
 # test_patch_prg.sh — the program-patch tooling round-trips through MAME.
 #
+# WHAT: the program-patch tooling round-trips through MAME: a null patch is bit-identical to
+#   reference vsavj, an injected code blob decrypts back to its plaintext in MAME's real
+#   opcode space, and an injected data blob reads raw.
+# HOW: three patched images booted on MAME with the relevant spaces dumped and compared.
+# EXPECTS: all three; the null case is what the superset invariant rests on.
+#
 # Usage: ROMDIR=... tests/test_patch_prg.sh
 # Gates: (1) null patch is bit-identical to reference vsavj; (2) an injected
 # code blob decrypts back to its plaintext in MAME's real opcode space;

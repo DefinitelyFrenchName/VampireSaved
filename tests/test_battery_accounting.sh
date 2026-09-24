@@ -2,6 +2,13 @@
 # test_battery_accounting.sh — "BATTERY GREEN" must not be printable when
 # gates self-skipped (14z-94, GitHub #24). ROM-free, ~1 s.
 #
+# WHAT: run_battery_m2.sh cannot print BATTERY GREEN while gates self-skipped: branch skips
+#   are counted by group size and a skipped gate is not a pass.
+# HOW: the battery's accounting functions driven directly with scripted verdicts (no ROMs,
+#   ~1 s); the control unplugs the classifier's gate-script argument so a
+#   declared-but-unfired control would pass.
+# EXPECTS: GREEN only when every gate ran and passed; the unplugged copy fails section 7.
+#
 # MUST-FIRE: shadow-tool: reader-unplugged — the extracted accounting with the classifier's gate-script argument removed must let a declared-but-unfired control pass (mode: section 7 drives that copy, and must fail)
 #
 # WHY. run_battery_m2.sh is `set -eu` and invoked each gate as a bare command,

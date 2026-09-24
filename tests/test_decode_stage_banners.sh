@@ -2,6 +2,16 @@
 # test_decode_stage_banners.sh — ground truth for tools/decode_stage_banners.py,
 # the decoder that turns the #92 value space into NAMES (14z-94, GitHub #92).
 #
+# WHAT: tools/decode_stage_banners.py names the #92 value space correctly: both stage
+#   families enumerate to their measured sizes (vsavj 12, vs2 13), known records decode to
+#   known text, the 12 shared stages agree 1:1 in order (the port owes no renumber), and
+#   every out-of-range authored entry is #92's one shape.
+# HOW: the decoder over the decrypted DATA views; three verdict controls, the load-bearing
+#   one decoding vs2 from its table BASE instead of the ANCHOR read from its code site,
+#   which manufactures a '+8 renumber' that does not exist and must be REJECTED loudly.
+# EXPECTS: every section as measured, the base-as-anchor decode refused naming the anchor.
+#   Not portable (needs the data views).
+#
 # WHY THIS EXISTS. The #92 fix replaces four bytes per tenant with a legal
 # stage value, and that value is player-perceptible — so it is a maintainer
 # decision taken against a NAMED value space, not an arbitrary in-range pick.

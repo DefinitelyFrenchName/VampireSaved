@@ -1,6 +1,16 @@
 #!/bin/sh
 # test_obj_records.sh — ground truth for tools/oram_obj_records.py.
 #
+# WHAT: tools/oram_obj_records.py, the byte-level OBJ-list walker (the surface a
+#   cross-implementation video oracle stands on, since the core cannot run Lua), reproduces
+#   tests/lua/obj_records_dump.lua BYTE FOR BYTE on the same ORAM bytes at the frozen tenant
+#   anchor, reporting the terminator so the live and idle pages are told apart.
+# HOW: the same ORAM walked by the live MAME Lua and by the python over a raw dump (~2 min,
+#   regenerated each run — ORAM is ROM-derived); controls flip a tile-code bit in the real
+#   dump and give an impossible page offset.
+# EXPECTS: 1153/1153 lines identical; the flipped bit makes the walkers disagree, the
+#   impossible page is REFUSED. If they ever diverge the Lua is the authority.
+#
 # MUST-FIRE: known-bad: flipped-tile-code — a one-bit change in a tile code must change the records, so the python walker on a flipped dump must disagree with the lua walker (mode: a byte of the REAL dump is flipped before the section-1 walk and the walkers disagree, so the gate FAILs)
 # MUST-FIRE: known-bad: wrong-page-geometry — an impossible page offset must be REFUSED, not silently walked (mode: the section-1 walk is given an out-of-range --first-page so it produces no records and section 1 disagrees, so the gate FAILs)
 #

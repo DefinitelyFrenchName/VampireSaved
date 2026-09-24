@@ -2,6 +2,15 @@
 # test_freeze_retires_diverge.sh — freezing a replay must actually govern it
 # (14z-94, GitHub #88). ROM-free, no MAME, ~2 s.
 #
+# WHAT: `run_suite.sh --freeze` on a replay still carrying a `.diverge` RETIRES that marker
+#   (loudly, keeping it as evidence) so the new `.sha1` governs, instead of writing an
+#   expectation the dispatch order can never reach.
+# HOW: the REAL run_suite.sh symlinked into a fake repo with stubbed MAME runner,
+#   fingerprint and check_diverge (which prints a marker, so the dispatched branch is
+#   observable).
+# EXPECTS: the marker retired and the sha1 dispatched afterwards; a red is a fixed
+#   divergence still being accepted.
+#
 # THE DEFECT. run_suite.sh dispatches `.diverge` BEFORE `.sha1`:
 #
 #     elif [ -f "$EXPDIR/$name.diverge" ]; then  check_diverge ...

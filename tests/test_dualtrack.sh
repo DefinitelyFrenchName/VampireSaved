@@ -1,6 +1,16 @@
 #!/bin/sh
 # test_dualtrack.sh — the two tracks must differ ONLY where they are meant to.
 #
+# WHAT: the stock and WIDE tracks differ ONLY where they are meant to: legacy replays
+#   bit-identical UP TO SELECT ENTRY outside the six frozen execution-position offsets, each
+#   select-reaching replay's STATE onset equal to its frozen onset (the two rosters differ
+#   by construction), and past that only data fed to the same engine code.
+# HOW: a live A/B of the two builds on FBNeo over the corpus (no frozen expectations,
+#   machine-independent); the control flips a byte in a real pre-onset WIDE dump outside the
+#   six offsets so a legacy replay's onset moves EARLIER and the gate must FAIL.
+# EXPECTS: every onset equal to its frozen value, no growth outside the offsets; an onset
+#   moving earlier is the failure (CLAUDE.md [VSP-25]).
+#
 # MUST-FIRE: known-bad: stray-byte-growth — a byte differing before a replay's frozen onset OUTSIDE the six frozen execution-position offsets is GROWTH, not a flicker, and must move the STATE onset earlier (mode: such a byte is flipped in a REAL pre-onset WIDE dump so a legacy replay's onset moves earlier and the gate FAILs)
 #
 # The dual-track decision (14z-59g) keeps a stock-size build alongside the

@@ -3,6 +3,17 @@
 # (14z-122, the documentation rationalization pass). ci_portable: no ROM, no
 # build dir, no emulator, ~1 s.
 #
+# WHAT: every skill anchor's FILE and SECTION are frozen: one row per `**[PFX-N]**` anchor
+#   (id, file, nearest preceding header, list status) over every doc checkskills reads plus
+#   the archives it does not, equal to tests/expected/doc_anchor_census.tsv — a moved
+#   paragraph is a reviewed diff, a defined rule anchored in a history twin or on two rows
+#   is a hard fail.
+# HOW: tools/doc_anchor_census.py --check (~1 s); four controls: an anchor moved between two
+#   files of one list (checkskills must still PASS it — the blind spot is real), a header
+#   inserted above an anchor, a rule anchored in a history twin, a stray bold token in an
+#   archive.
+# EXPECTS: the census exact; each control fails as stated.
+#
 # MUST-FIRE: perturbed-copy: anchor-moved-between-files — an MSV anchor moved from mister_map.md to platform/mister.md (both in one checkskills list, so checkskills PASSES it) must fail the frozen census
 # MUST-FIRE: perturbed-copy: section-moved — a header inserted above the first anchored line of engine_internals must fail the census (the anchor's section changed)
 # MUST-FIRE: perturbed-copy: rule-in-history — a defined rule anchored in a history twin must be reported

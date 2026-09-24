@@ -1,6 +1,16 @@
 #!/bin/sh
 # test_m2a_stage1_nullreloc.sh — M2a stage-1 gate: the null relocation.
 #
+# WHAT: the M2a stage-1 null relocation: Jedah's own hitbox block copied into hole A and
+#   repointed, two dispatch entries routed through jmp-back trampolines, with zero Donovan
+#   bytes — picking slot 0x0F loads the relocated base, Jedah's match is field-identical to
+#   vanilla but for the two relocated pointers, legacy replays bit-identical, the pick
+#   replay diverging exactly at 2886, the -debug guard clean.
+# HOW: the stage-1 build on MAME: the pick replay, compare_fields against vanilla, the
+#   legacy suite, the attract and pick divergence frames, the crash guard.
+# EXPECTS: every gate as listed; any failure is allocator/copy/repoint/encrypt tooling,
+#   nothing else.
+#
 # Stage 1 copies Jedah's OWN player-path hitbox block into free hole A
 # (data raw inside the encrypted zone) and repoints the +0x60/+0x64 pair
 # (slots 0x0F+0x1F), plus routes two dispatch entries through jmp-back

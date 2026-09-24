@@ -2,6 +2,13 @@
 # test_region_overlap_control.sh — ground truth for tests/test_region_overlap.sh
 # (14z-90, GitHub issue #9).
 #
+# WHAT: the region-overlap gate's CURRENT-trio constants can fail: pointed at the superseded
+#   trio it must reject (2000 vs 2012), an absent build must FAIL not SKIP, and the positive
+#   control still passes.
+# HOW: runs the gate's section 5 with the trio redirected and with a missing build (~2 min,
+#   no ROMs).
+# EXPECTS: reject, FAIL, pass — a constant nobody can make fail is not an assertion.
+#
 # WHY. That gate froze 2000 conflicting bytes measured on build/m5_wide +
 # build/hui30 + build/pyron21 — a trio that has been superseded 2-9 freezes
 # over. It exited 0 while asserting facts about builds nobody ships, which is a

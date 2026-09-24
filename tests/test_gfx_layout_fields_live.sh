@@ -2,6 +2,15 @@
 # test_gfx_layout_fields_live.sh — gfx_layout3.toml's profile and scatter
 # fields must MEAN something (14z-94, GitHub #87). ROM-free, ~2 s.
 #
+# WHAT: gfx_layout3.toml's profile and scatter fields MEAN something: bank4_word,
+#   bank5_word, collision_rule and the tenants' scatter bounds are CHECKED against what the
+#   builder computes and places (never obeyed, so they cannot move a frozen byte), and an
+#   edit to any of them fails loudly.
+# HOW: the builder's checks run over the manifest and the placed inventories (ROM-free, ~2
+#   s).
+# EXPECTS: every field agrees with the artifact (Huitzil's out-of-band bound re-measured,
+#   not widened); a red is policy the artifact producer no longer enforces.
+#
 # THE DEFECT. bank4_word, bank5_word, collision_rule and the tenants'
 # scatter_lo/scatter_hi read as executable layout policy and were consumed by
 # nothing. The bank words are computed by gfx_tiles.bank_word(); the collision

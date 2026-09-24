@@ -2,6 +2,16 @@
 # test_phasec_image.sh — Phase C step 2: the program image grows, and the
 # extension is genuinely READ.
 #
+# WHAT: the program image grows to 6 MB and the WIDE extension is genuinely READ: the stock
+#   build is unchanged, the WIDE build has the profile's four appended members and runs a
+#   full replay clean on vsavjw, and zeroing the relocated sound table at CPU:$400010
+#   CHANGES behaviour (the negative control that makes 'relocated' mean 'used').
+# HOW: builds both tracks, checks the stock fingerprint and the WIDE set's shape, runs the
+#   replay on MAME, then the zeroed-table run compared with the clean one.
+# EXPECTS: stock unchanged, the shape right, END clean, the zeroed run diverging (at frame
+#   3121 on the first measurement); a relocation that passes without its control proves
+#   nothing.
+#
 # The dual-track decision (14z-59g) says WIDE is the roster build while the
 # stock build stays byte-identical. This gate holds both halves at once:
 #

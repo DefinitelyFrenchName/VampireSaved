@@ -2,6 +2,17 @@
 # test_fbneo_legacy_oracle.sh — the HACKED build's legacy content, compared
 # against VANILLA, on FBNeo (14z-92, GitHub #78 partial).
 #
+# WHAT: the hacked build's legacy content compared against VANILLA on FBNeo — our patch
+#   bytes under the FBNeo 68k core — on sampled frames chosen from each replay's frozen MAME
+#   spec and pushed clear of every ratified divergence, masked per §4 (the dead stack, the
+#   QSound latch) and expected to differ only at the frozen FBNeo-only phase offsets (#78's
+#   partial track).
+# HOW: 4 replays x 5 frames on FBNeo: leg A vanilla vsavj (on FBNEO_REF, else on the patched
+#   binary with test_wide_profile completing the claim), leg B the hacked set; the frozen
+#   offset inventory is the expectation, FBNEO_ORACLE_EXPECT=exact demands bit-identity.
+# EXPECTS: equal outside the frozen offsets; a byte inside a window but outside the
+#   inventory FAILS as GROWTH — stop and root-cause, never widen ([VSP-26]).
+#
 # THE HOLE THIS CLOSES. CLAUDE.md §4 defines the oracle as vanilla on
 # vanilla FBNeo versus the hacked set on patched FBNeo, per-frame work RAM.
 # What the suite actually had was two adjacent things:

@@ -5,6 +5,14 @@
 # field reported, reproduced BY HAND on merged15 after every scripted rig
 # ran clean. Played back headless under tests/lua/inp_guard.lua.
 #
+# WHAT: the #99 natural-path capture (the maintainer's own MAME session: 1P Donovan, 6+HP
+#   through Bishamon, keep-away vs CPU Phobos) plays back with NO exception through frame
+#   6000 on the current merged build — the fix's acceptance; MODE=defect asserts the
+#   captured crash exactly (vec11 at PRG:0x422BAC, frame 4806 ±2) so the capture cannot rot.
+# HOW: tests/inp/crash-merged-m8-01 under tests/lua/inp_guard.lua on MAME (~1 min).
+# EXPECTS: clean through 6000 (the default since 14z-111); the defect mode reproduces the
+#   captured crash on a pre-fix build.
+#
 #   MODE=defect (the default until the fix shipped in merged-m9): asserts the crash fires EXACTLY
 #         as captured — vec11 (line-F) at PRG:0x422BAC, frame 4806 (+-2) —
 #         so the capture itself cannot rot silently.

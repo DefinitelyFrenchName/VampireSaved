@@ -1,6 +1,15 @@
 #!/bin/sh
 # test_fbneo_instruments.sh — ground truth for the B5b FBNeo instruments.
 #
+# WHAT: the B5b FBNeo instruments are trustworthy: the write tap does not perturb a run
+#   (checksum-identical to an untapped one) and captures writes, the frame-scheduled poke
+#   changes state, and the address-resolved dumps equal MAME's dump of the same region byte
+#   for byte.
+# HOW: tapped and untapped FBNeo runs compared; a poke leg whose target must change; a
+#   region dump compared with MAME's at a frame stable across the known frame skew.
+# EXPECTS: identical checksums, writes captured, the poke visible, the dumps byte-equal; an
+#   instrument that reports nothing is a red, not a null.
+#
 # WHY: FBNeo is the PRIMARY target (the GGPO rollback-netplay reference), yet
 # until B5b the oracle had far better debugging instruments than the platform
 # players actually use. "Who wrote this address?" — the question that

@@ -2,6 +2,15 @@
 # test_minitoml_subset.sh — the manifest parser must mean the SAME THING on
 # every host (14z-94, GitHub #42). ROM-free, ~1 s.
 #
+# WHAT: the manifest parser means the SAME THING on every host: tools/_minitoml.py's subset
+#   parser REFUSES every construct it and tomllib would read differently (dotted headers and
+#   keys, duplicates, signed hex), so the build is not a function of the interpreter
+#   version.
+# HOW: the subset parser over accepted and refused fixtures (ROM-free, ~1 s; needs no
+#   tomllib to check, which is why it never skips).
+# EXPECTS: every divergent construct refused, every accepted one identical under tomllib by
+#   construction; a red once shipped different ROM bytes on two hosts from one manifest.
+#
 # THE DEFECT. tools/_minitoml.py delegates to tomllib on Python >= 3.11 and
 # falls back to its own subset parser below that. The two are not equivalent,
 # and where they disagree they disagree SILENTLY — so "the build" became a

@@ -2,6 +2,13 @@
 # test_m2a_target_policy.sh — the M2 battery's target is RESOLVED, never
 # pinned, and the mask literal has exactly one home. ROM-free, ~1 s.
 #
+# WHAT: the M2 battery's legacy target is RESOLVED from the build's fingerprint through the
+#   registry, never pinned: neither tests/lib/m2a_common.sh nor run_suite.sh carries a
+#   hardcoded mask or set name any more (#96's ruling), and a re-introduced literal is
+#   caught.
+# HOW: reads the two sources for the forbidden literals.
+# EXPECTS: no pin and no duplicated mask; a red is the #96 defect returning.
+#
 # WAS test_m2a_mask_pin.sh, and it asserted the OPPOSITE (14z-93 -> 14z-97).
 # That gate existed because tests/lib/m2a_common.sh hardcoded the V1 mask and
 # run_suite.sh carried the same string as its default: GitHub #70 called the

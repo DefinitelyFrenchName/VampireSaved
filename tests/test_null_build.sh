@@ -2,6 +2,12 @@
 # test_null_build.sh — M0 acceptance: the null-patch build reproduces vanilla
 # vsavj bit-identically from reference inputs, deterministically.
 #
+# WHAT: the null-patch build reproduces vanilla vsavj bit-identically from the reference
+#   inputs, deterministically (the M0 acceptance).
+# HOW: two builds compared as zips, and every member's SHA-1 compared with
+#   docs/checksums.txt.
+# EXPECTS: byte-identical zips and every member equal to the frozen manifest.
+#
 # Usage: ROMDIR=/path/to/roms tests/test_null_build.sh
 # PASS = (a) two builds are byte-identical zips, and (b) every member's SHA-1
 # equals the frozen reference manifest entry (docs/checksums.txt).

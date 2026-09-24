@@ -1,6 +1,15 @@
 #!/bin/sh
 # test_qs_songs.sh — the authored-Z80-song machinery gate (14z-86, M5).
 #
+# WHAT: the authored-Z80-song machinery: every [[song]] row's placement equals its vs2
+#   source bytes, its id row encodes exactly [addr24 BE][00], every byte outside the
+#   declared spans equals the stock driver members (legacy-invisible by construction), and
+#   the driver's reachability laws hold (entry b0 != 0, placement inside the banked image).
+# HOW: tools/build_qs_songs.py on a scratch copy of the WIDE overlay, verified against the
+#   REFERENCES not the builder's output; controls corrupt a song byte, target a LIVE id, and
+#   place over non-zero bytes.
+# EXPECTS: all properties hold; the corruption is caught and the two bad rows refused.
+#
 # Runs tools/build_qs_songs.py against a scratch copy of the canonical
 # WIDE overlay and verifies the result AGAINST THE REFERENCES, not the
 # builder's own output: every [[song]] row's placement must equal its vs2

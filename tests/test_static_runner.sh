@@ -2,6 +2,17 @@
 # test_static_runner.sh — ground truth for tests/run_all_static.sh
 # (14z-94, GitHub #30). ROM-free, ~3 s.
 #
+# WHAT: tests/run_all_static.sh's verdicts mean what they say: PASS / SKIP / FAIL counted
+#   apart with SKIP in PROSE still PASS, an exit-0 shell crash FAIL, the anti-orphan
+#   registry check both ways, --strict, the controls readout, and the cadence triggers (a
+#   freeze-cadence gate runs when a path it follows changed).
+# HOW: a synthetic repo of stub gates with known verdicts run through the REAL runner via
+#   its registry files (never a copy of its logic); two shadow-tool controls unplug the
+#   controls reader and blind the cadence trigger match.
+# EXPECTS: every case reads its designed verdict; the unplugged reader lets a dead control
+#   pass and fails section 11, the blind trigger leaves a triggered gate deferred and fails
+#   section 14.
+#
 # MUST-FIRE: shadow-tool: reader-unplugged — a copy of run_all_static.sh that hands the classifier no gate script must let a stub with a declared-but-unfired control read PASS (mode: that copy is the runner every section drives, and section 11 must fail)
 # MUST-FIRE: shadow-tool: trigger-blind — a copy of run_all_static.sh with its cadence TRIGGER match disabled must leave a freeze-cadence gate deferred although a path it depends on changed; section 14's triggered case must FAIL under it
 #

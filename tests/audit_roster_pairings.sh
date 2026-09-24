@@ -2,6 +2,16 @@
 # audit_roster_pairings.sh — EVERY TENANT AGAINST EVERY CHARACTER, BOTH SIDES.
 # On-demand, ~1 h (99 guarded MAME runs, batched). 14z-97.
 #
+# WHAT: every tenant against every character, BOTH sides (the §4 'vs each of the 18'
+#   mandate): each of the 111 pairings runs guarded to END with no crash, and BOTH
+#   characters actually loaded on their hitbox bases — expectations DERIVED from the merged
+#   image's own table, never harvested from a run.
+# HOW: 99+ guarded MAME runs on the merged build (measured ~5 min at JOBS=6), bases compared
+#   with tests/expected/roster_pairings/bases.tsv, plus a no-poke verdict control (an
+#   unpoked run must be refused).
+# EXPECTS: every pairing END-clean with both bases as derived; a crash is rule 6 — capture
+#   it, do not keep batching for a completeness number.
+#
 # WHY IT EXISTS. CLAUDE.md §4 mandates, for a ported character, "vs each of
 # the 18 (both sides)". The suite has never had it. 14z-95's
 # test_tenant_pairings closed the tenant-vs-tenant half — six orderings — and

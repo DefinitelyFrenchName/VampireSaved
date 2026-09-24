@@ -2,6 +2,16 @@
 # test_beam_anim_walk.sh — the BEAM ANIM-WALK gate (14z-70): does the
 # build ever WALK the anim nodes that carry the beam sprite lists?
 #
+# WHAT: the build WALKS the anim nodes that carry Phobos's beam sprite lists: the placed
+#   twin is read inside the beam window (BEAM_WALK_EXPECT=walks since the row-16 fix), the
+#   nodes are correctly ported (every differing byte a relocated 3-byte pointer), native
+#   reads its node inside the window (rig liveness), and the watchpoint's arming line is
+#   excluded from every count.
+# HOW: static node comparison, then MAME -debug read watches on both legs over the beam
+#   window, comparing leg-independent quantities only (read or not, how often — never a PC).
+# EXPECTS: ported nodes, native walked, ours walked; =absent reproduces the pre-fix state on
+#   an older build.
+#
 # WHY IT EXISTS. The effect family (beam / grab lightning / ES big beam /
 # 214 explosion) has been chased for several sessions from the emitter
 # side. By 14z-69 the beam object was native-equivalent on every axis

@@ -4,6 +4,16 @@
 # of the tool that reads it, without a ROM, an emulator or 40 minutes of
 # Verilator. The live end-to-end runs are the emulator tier.
 #
+# WHAT: the 68k program-ROM read probe's CONTRACT (the ROM-free half of slice D4): every
+#   line the probe patch adds to jtcps2_main.v sits inside its `ifdef guard (inert by
+#   construction), the probe's window is the decode's window (both re-read from the RTL),
+#   the address half counts bus cycles independently of any chip select,
+#   tools/prgprobe_verdict.py gives all three verdicts and BOTH refusals on synthetic logs,
+#   and the runner refuses --prgprobe on the reference core.
+# HOW: the patch, the RTL and the verdict tool checked statically (~3 s); a copy of the
+#   patch with one line hoisted above the guard must be rejected.
+# EXPECTS: every lock as listed; a tool that cannot say 'I refuse' is not an instrument.
+#
 # WHY THE PROBE EXISTS. D4 declares a 6 MB program window on cores/cps2w and
 # the only evidence for it was that its lines are in the RTL: the SDRAM census
 # proves the bytes are PLACED above CPU:$400000, nothing proved the 68k could

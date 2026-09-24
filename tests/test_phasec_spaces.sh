@@ -1,6 +1,15 @@
 #!/bin/sh
 # test_phasec_spaces.sh — the address-space refactor must not move a byte.
 #
+# WHAT: the declarative address-space model is byte-for-byte inert on a STOCK build (the
+#   pre-refactor fingerprint) even with the WIDE extension and a profile-gated row declared,
+#   and a WIDE build makes the extension available with a precise diagnosis where the
+#   pipeline cannot yet grow the image.
+# HOW: builds the stock track and compares its fingerprint with the frozen pre-refactor
+#   value; builds the WIDE track and reads its diagnosis.
+# EXPECTS: stock fingerprint unmoved, the WIDE expectation as frozen; a re-freeze is a
+#   recorded decision, never a silent green.
+#
 # Phase C replaces two hard-coded holes with a declarative, ordered space
 # list, and adds a profile-gated space for the CPS-2 WIDE program extension.
 # That is a refactor of the ALLOCATOR, which decides where every ported byte

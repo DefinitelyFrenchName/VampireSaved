@@ -3,6 +3,17 @@
 # what it claims: a verbatim walker copy, its own table behind it, the
 # vanilla dispatch sites untouched, and every caller repointed by OPERAND.
 #
+# WHAT: the obj_walker relocation is STRUCTURALLY what it claims, from patch.json alone: the
+#   copy is vanilla's bytes verbatim, its table's vanilla rows are vanilla's, the copy's
+#   pc-relative dispatch resolves to its own table, the vanilla dispatch sites are touched
+#   by NO op (zero cost by construction), every caller is a 4-byte OPERAND write at caller+2
+#   with the 4EB9 opcode untouched, and the table op is `code` (address-aware re-encryption)
+#   not `data`.
+# HOW: reads the build's patch.json and the decrypted view (ROM-free beyond that, seconds);
+#   two verdict controls.
+# EXPECTS: all six legs; a 'relocation' that edits the code or patches a site voids the
+#   timing claim.
+#
 # WHY (14z-91). The legacy-cycle regression's obj_hook half is fixed by
 # relocating each object-pool walker rather than hooking its dispatch site.
 # The correctness argument has four legs, and each is cheap to check from

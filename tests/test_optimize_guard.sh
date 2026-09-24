@@ -2,6 +2,14 @@
 # test_optimize_guard.sh — a safety check that an environment variable can
 # switch off is not a safety check (14z-94, GitHub #79). ROM-free, ~2 s.
 #
+# WHAT: the tools whose safety checks are `assert` statements refuse `python -O` /
+#   PYTHONOPTIMIZE (which removes asserts entirely), and every assert-using tool a builder
+#   invokes carries the guard.
+# HOW: each tool imported under the optimise mode must refuse; a scan of the builders'
+#   invoked tools for the guard (ROM-free, ~2 s).
+# EXPECTS: six tools refuse, no unguarded assert-using tool in a builder's path; the
+#   systemic section found four of the six.
+#
 # THE DEFECT. The graphics collision, band-bound and placement checks are
 # `assert` statements, and `python -O` / PYTHONOPTIMIZE=1 removes assert
 # statements ENTIRELY. Under that mode an invalid placement exits 0 — and the

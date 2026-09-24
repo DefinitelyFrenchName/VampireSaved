@@ -1,6 +1,17 @@
 #!/bin/sh
 # test_qs_id_table.sh — the QSound Z80 driver id-table census gate (14z-86).
 #
+# WHAT: the QSound Z80 driver id-table census of both games as derived from the $3B00 anchor
+#   blocks (vsavj's modulus and live/free rows, the pilot rows, vs2's), the code-identity
+#   licence for verbatim stream copies (the two regions byte-identical below 0x34F1 but for
+#   two envelope-base immediates), and the ejection sample's content lock (vs2's window
+#   byte-identical in vsav's image).
+# HOW: tools/audit_qs_id_table.py over the two Z80 members (static, ~5 s); controls corrupt
+#   an id-table row in a temp copy and guard the parser against reproducing the retracted
+#   region-mapping bytes for id 0x119.
+# EXPECTS: every census fact frozen exact; the corrupted row fails; the file-mapping trap
+#   stays caught.
+#
 # Freezes what tools/audit_qs_id_table.py derives from the two games'
 # Z80 members (every base from the $3B00 anchor block — nothing filed),
 # plus the cross-game facts the M5 ejection pilot rests on:

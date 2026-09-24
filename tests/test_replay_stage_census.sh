@@ -3,6 +3,17 @@
 # replay-driving Lua instrument (14z-93, GitHub issue #10). No ROMs, no
 # emulator, ~1s.
 #
+# WHAT: the input-staging convention of every replay-driving Lua instrument is FROZEN:
+#   replay.lua's canonical (parse held[fr], stage held[frame+1]) against the ten instruments
+#   that net a +1 shift — so the split cannot grow and a new instrument cannot copy the
+#   wrong flavour unnoticed; a frame number from a drifted log is not a frame number from a
+#   checksum log.
+# HOW: strips Lua comments (the drifted files quote the canonical idiom in their banners)
+#   and classes each instrument's parse/stage pair against the frozen list.
+# EXPECTS: exactly the frozen deviants, each carrying its banner, replay.lua canonical.
+#   EXPECT_DEVIANT=0 flips it to asserting uniformity once the staging fix and the consuming
+#   gates' re-measurement land as ONE change.
+#
 # THE DEFECT THIS GUARDS (not fixed — deliberately; see below). All replay
 # instruments increment `frame` at the top of the same
 # `emu.register_frame_done` callback. The CANONICAL convention is

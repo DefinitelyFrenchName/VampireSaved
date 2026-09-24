@@ -5,6 +5,15 @@
 # and with P1 forced to each tenant (0x10 / 0x11 / 0x13). Any 68k exception,
 # PC excursion or soft reset on any leg is a FINDING; rule 6 applies.
 #
+# WHAT: every replay in tests/replays runs under the authoritative crash guard on the build
+#   under test in four legs — unpoked and with P1 forced to each tenant — with no 68k
+#   exception, PC excursion or soft reset anywhere (rule 6 on any finding).
+# HOW: ~79 replays x 4 legs, guarded on MAME at JOBS=2 (~30-45 min), a DEAD leg (no verdict
+#   line) refused; the control replays the known 14z-93 vec4 tripwire on build/hui41 and
+#   must FAIL.
+# EXPECTS: every leg END-clean; the known crash reproduced by the control. A PASS is
+#   rig-bounded: no vector fired on THESE rigs — widen the corpus, never the tolerance.
+#
 # MUST-FIRE: known-bad: known-crash — the 14z-93 vec4 tripwire on build/hui41 + 26_don_arcade_mash must reproduce a crash (mode: the gate runs that rig with the late pick frames and must FAIL; REFUSES with exit 3 if build/hui41 or the replay is absent)
 #
 # WHY IT EXISTS. The suite's comparison gates see divergence, not vectors;

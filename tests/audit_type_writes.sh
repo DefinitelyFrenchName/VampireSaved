@@ -3,6 +3,16 @@
 # which PCs actually write extended-family type bytes on the ground-truth
 # single-tenant builds, and do they all map to the FROZEN static inventory?
 #
+# WHAT: every write of an extended-family type byte (114-120) on the ground-truth
+#   single-tenant builds comes from a PC in the FROZEN static stamp inventory — the dynamic
+#   half of the type-stamp census, which sees register-sourced and computed stamps the
+#   static scan cannot.
+# HOW: six MAME tap runs on the single-tenant builds, every family-valued type-byte write
+#   attributed by PC and mapped to build/manifest/type_stamps.toml; the 117 stamp PC must
+#   appear (rig liveness); the 59-75 range is reported per writer class, not gated.
+# EXPECTS: every observed writer in the inventory (else extend the inventory FIRST); the
+#   liveness stamp seen. Measured 14z-82: 118/120 not observed.
+#
 # ON-DEMAND (6 MAME runs, ~8 min). Run BEFORE trusting any change to the
 # type-renumbering emit path, and after any change that could add a family
 # stamp site.

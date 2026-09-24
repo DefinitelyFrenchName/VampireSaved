@@ -3,6 +3,17 @@
 # §5 "shipped builds carry a visible in-game version string as the naked-eye
 # A/B tell", open since 14z-92, maintainer-approved 14z-104).
 #
+# WHAT: the in-game version string on the select screen (the naked-eye A/B tell): the built
+#   wheel record's last N entries are the glyph codes at the declared palette row and screen
+#   position with authored tiles byte-identical to the generator's, and on a select frame
+#   the LIVE OBJ list carries exactly those N sprites and a MAME snapshot pixel-matches the
+#   intended bitmap with ZERO mismatches.
+# HOW: static over the built record, coord list and packed group C; runtime on MAME with
+#   obj_records_dump.lua and a snapshot (~2 min, 2 runs); controls shift the expected
+#   position by 1 px and corrupt a glyph tile.
+# EXPECTS: static and runtime exact, both controls failing; the snapshot check is what
+#   caught the tile codec's half-mirror.
+#
 # Where and how: the SELECT SCREEN, the one roster-owned always-visited
 # surface (attract/title would violate the superset invariant; select
 # already diverges under the ratified §4 v3 window). The [[select_wheel]]
