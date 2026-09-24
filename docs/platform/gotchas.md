@@ -2894,11 +2894,13 @@ here"* — so a reader of reports must accept all three.
 
 ## CLAUDE CODE DELETES SESSION TRANSCRIPTS AFTER 30 DAYS — THE ARCHIVE THE AGENT TOOLING READS SHRINKS UNDER IT (measured 2026-09-24, 14z-178)
 
-`transcript_gaps.py --subagents all` read **288** worker transcripts in the morning of 14z-178
-and **280** that afternoon, with 15 workers added by the sitting in between: the 23 workers of the
+`transcript_gaps.py --subagents all` read **288** worker transcripts at the start of 14z-178
+and **280** an hour later, with 15 workers added by the sitting in between (both reads are cut,
+with their transcript records, into `build/agent172/pkt178/census_reads_14z178.txt`; a read at the
+close gave 294, more readers having run since): the 23 workers of the
 2.1.240 sessions (22-24 August — 16 `general-purpose`, 6 `Explore`, 1 fork) had been DELETED, and
 the oldest session transcript left was 25 August, 30 days back — Claude Code's default
-retention (`cleanupPeriodDays`, a user setting; this host sets none). The deletion happened during
+retention (`cleanupPeriodDays`, a user setting; this host set none when it was read, 2026-09-24). The deletion happened during
 the sitting, most likely when the probe's headless `claude -p` runs started. **So every census over
 `~/.claude/projects/` is a census of the last 30 days**, and a figure quoted from it can stop being
 reproducible without anything in the tree changing: the "16 on 2.1.240 with no instructions
@@ -2925,4 +2927,20 @@ model as if the definition had named it (A14's first form failed exactly that wa
 back is an uncalibrated reader whatever its verdict says. `tools/rulecheck.py spawned` fails any
 reader whose own transcript shows a fallback, a model or effort other than the definition's, or an
 instructions attachment; `transcript_gaps.py --subagents` prints `FALLBACK <from>-><to>` per
-worker and counts them. The whole archive held none at 14z-178 (280 workers, the last 30 days).
+worker and counts them. The whole archive held none at 14z-178 (280 workers when it was read, the last 30 days).
+
+## A MAIN SESSION RUN AS A DEFINITION (`claude --agent <name>`) LOSES CLAUDE CODE'S WHOLE DEFAULT SYSTEM PROMPT — THE DEFINITION'S BODY REPLACES IT (measured 2026-09-24, 14z-178, Claude Code 2.1.281)
+
+`tools/agent/probe_agents.sh` A15/A16: a main session started with `--agent <definition>` keeps the
+project's CLAUDE.md (a CLAUDE.md codeword is named — even with `omitClaudeMd: true` in the
+definition, which the docs say is "ignored when the agent runs as the main session") and the
+environment block, but its SYSTEM PROMPT is the definition's body alone: asked with no tool for the
+first sentence of its system prompt beginning "IMPORTANT:", a plain session quotes the default
+prompt's *"Assist with authorized security testing, …"* and the `--agent` session quotes instead the
+*"These instructions OVERRIDE …"* preamble that heads CLAUDE.md; the transcripts' `prompt_snapshot`
+records agree (64 characters against about 28,200 — 28,207 to 28,209 over the runs that read it). So every instruction Claude Code gives its own model
+— tool use, git, safety, how to report — is GONE under `--agent` unless the definition re-supplies
+it. **`--append-system-prompt` is the route that adds without replacing** (A16c: the default line
+and an appended token are both named). Two discriminators FAILED before this one and must not be
+reused: "the first sentence of your system prompt" (both modes quote an SDK preamble that lives
+outside the snapshot) and "the primary working directory" (the environment block reaches both).

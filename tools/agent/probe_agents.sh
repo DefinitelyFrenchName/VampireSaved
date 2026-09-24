@@ -54,6 +54,11 @@
 #       a rule-checker-shaped definition, the same with `omitClaudeMd: true`, general-purpose and
 #       Explore (the cannot-leg), each read by its no-tool ANSWER against its instructions
 #       ATTACHMENT — details at the leg
+#   A17 a PLAIN session's effort is the user settings' per-model key where there is one (a model whose
+#       per-model effort differs from the top-level one discriminates; host-dependent — 14z-178)
+#   A15 a main session under --agent keeps CLAUDE.md (omitClaudeMd ignored there); A16 it LOSES Claude
+#       Code's default system prompt (the definition's body replaces it); A16c --append-system-prompt
+#       keeps the default (14z-178, S5's measurement — details at the legs)
 #   A14 a definition naming its model by VERSION id (claude-opus-5-5) runs on that model under a
 #       haiku parent (14z-178: the pinned rule-checker names its id, never the `opus` alias, #158)
 #   (A9 and A10 added after rule-checker run 2026-09-23-109 found both premises unmeasured;
@@ -63,7 +68,7 @@
 #   against THIS call's result or hand-back, with a wrong-id control; A9 runs general-purpose
 #   under both parents; A8 asserts the hook's input carries the call's prompt)
 #
-# Usage: tools/agent/probe_agents.sh [SCRATCH_DIR]   (~7 min: twenty short runs, one on Fable 5.1)
+# Usage: tools/agent/probe_agents.sh [SCRATCH_DIR]   (~9 min: twenty-five short runs, two on Fable 5.1)
 # Prints one PASS/FAIL line per leg and exits non-zero on any FAIL.
 # Needs: the `claude` CLI and python3. Writes only under SCRATCH_DIR (default: a mktemp dir), except
 # A13's memory index, created under ~/.claude/projects/<the scratch project>/memory/ only if absent and
@@ -467,6 +472,90 @@ case "$a14" in
   1*) echo "PASS A14: a definition naming claude-opus-5-5 requested that model at high under a haiku parent (${a14#1 }) — a version id in the model line is applied, not dropped to the caller's; a fallback, if any, is named";;
   *)  echo "FAIL A14: ${a14:-no result}"; fail=1;;
 esac
+
+# A15 + A16 (14z-178, S5's measurement): what a MAIN session run as a definition (`--agent`) keeps.
+# A15: CLAUDE.md still loads — even with `omitClaudeMd: true` in the definition (the docs: "Ignored
+#      when the agent runs as the main session agent via --agent") — the A13 codeword is named.
+# A16: Claude Code's DEFAULT system prompt is REPLACED by the definition's body. Asked with no tool
+#      for the first sentence of its system prompt beginning "IMPORTANT:", the PLAIN session quotes
+#      the default prompt's line ("Assist with authorized security testing ...") and the --agent
+#      session does NOT (it quotes the "These instructions OVERRIDE" preamble before CLAUDE.md, so it
+#      answers rather than refuses); the prompt_snapshot records agree (the body's size, not ~28 KB).
+#      Two discriminators failed first and are recorded so nobody reuses them: "the first sentence of
+#      your system prompt" (both quote an SDK preamble outside the snapshot) and "the primary working
+#      directory" (the environment block reaches both).
+# A16c: `--append-system-prompt` KEEPS the default and adds to it: the same question quotes the
+#      default line, and an appended random token is named — the route that adds an orchestrator's
+#      instructions without losing Claude Code's.
+printf -- '---\nname: w-main\ndescription: Probe main-session definition.\nmodel: haiku\neffort: low\nomitClaudeMd: true\ntools: Read\n---\nYou are a probe main session. Answer exactly what you are asked.\n' > .claude/agents/w-main.md
+app="CANARY-A$(python3 -c 'import secrets; print(secrets.token_hex(5))')"
+QI='Without using ANY tool, answer from your context alone, on two lines: (1) every word in your context beginning with CANARY- (exactly), or NONE; (2) verbatim, the first sentence of your system prompt that begins with the word IMPORTANT followed by a colon, or NONE.'
+mainq() { # tag extra-args...
+  tag=$1; shift
+  PROBE_LOG="$S/log_$tag.jsonl" PROBE_AGENT_GATE=0 PROBE_SCOPED=0 claude -p "$QI" "$@" --allowedTools "Read" --output-format json </dev/null >"out_$tag.json" 2>"err_$tag.txt"
+}
+mainq s5p --model haiku
+mainq s5a --agent w-main
+mainq s5x --model haiku --append-system-prompt "The appended orchestrator note is $app."
+a1516=$(python3 - "$S" "$cmd" "$app" <<'PY'
+import glob, json, os, sys
+S, cmd, app = sys.argv[1:4]
+def leg(tag):
+    o = json.load(open(f"{S}/out_{tag}.json"))
+    r = o.get("result", "")
+    t = glob.glob(os.path.expanduser(f"~/.claude/projects/*/{o.get('session_id')}.jsonl"))
+    snap = 0
+    for line in open(t[0]) if t else []:
+        a = json.loads(line).get("attachment") or {}
+        if a.get("type") == "prompt_snapshot":
+            sp = a.get("systemPrompt"); snap = len(" ".join(sp) if isinstance(sp, list) else str(sp)); break
+    return {"claude": cmd in r, "default": "authorized security testing" in r, "app": app in r, "snap": snap}
+p, a, x = leg("s5p"), leg("s5a"), leg("s5x")
+ok = p["claude"] and p["default"] and a["claude"] and not a["default"] and x["default"] and x["app"] and a["snap"] < 1000 < p["snap"]
+print(("1 " if ok else "0 ") + f"plain={p} agent={a} append={x}")
+PY
+)
+case "$a1516" in
+  1*) echo "PASS A15+A16: under --agent the main session keeps CLAUDE.md (omitClaudeMd ignored) but LOSES Claude Code's default system prompt, replaced by the definition's body; A16c: --append-system-prompt keeps the default and adds to it (${a1516#1 })";;
+  *)  echo "FAIL A15+A16: ${a1516:-no result}"; fail=1;;
+esac
+
+# A17 (14z-178, rule-checker run 2026-09-24-135 Q1/Q4): the EFFORT a PLAIN session runs at comes
+# from the user settings' per-model key (`modelSettings.<model>.effortLevel`) where there is one,
+# else the top-level `effortLevel` — so a plain Fable 5.1 orchestrator's effort is a settings fact.
+# DISCRIMINATING by construction: it needs a model whose per-model effort DIFFERS from the top-level
+# one (this host: claude-opus-5 xhigh against high) and reads it back from the session's own records.
+# HOST-DEPENDENT: it reads ~/.claude/settings.json, and says so (a NOTE, not a FAIL) when no model
+# there has a differing per-model effort.
+a17=$(python3 - <<'PY'
+import json, os
+try:
+    d = json.load(open(os.path.expanduser("~/.claude/settings.json")))
+except Exception:
+    d = {}
+top = d.get("effortLevel"); ms = d.get("modelSettings") or {}
+diff = [(m, v.get("effortLevel")) for m, v in ms.items() if isinstance(v, dict) and v.get("effortLevel") and v.get("effortLevel") != top]
+fable = (ms.get("claude-fable-5-1") or {}).get("effortLevel")
+print(f"{diff[0][0]} {diff[0][1]} {top} {fable or '-'}" if diff and top else "none")
+PY
+)
+if [ "$a17" = none ]; then
+  echo "NOTE A17: this host's user settings carry no per-model effort that differs from the top-level one — nothing to discriminate, leg not run"
+else
+  set -- $a17
+  eff() { # model -> the effort set its plain session recorded
+    PROBE_LOG="$S/log_e_$1.jsonl" PROBE_AGENT_GATE=0 PROBE_SCOPED=0 claude -p "Reply with exactly: E17" --model "$1" --allowedTools "Read" --output-format json </dev/null >"out_e_$1.json" 2>/dev/null
+    python3 -c "
+import glob, json, os, sys
+o = json.load(open(sys.argv[1])); t = glob.glob(os.path.expanduser('~/.claude/projects/*/' + o.get('session_id', '') + '.jsonl'))
+print(','.join(sorted({str(json.loads(l).get('effort')) for l in open(t[0]) if json.loads(l).get('type') == 'assistant'})) if t else '-')" "out_e_$1.json"
+  }
+  got=$(eff "$1"); fgot=-
+  [ "$4" != - ] && fgot=$(eff claude-fable-5-1)
+  if [ "$got" = "$2" ] && { [ "$4" = - ] || [ "$fgot" = "$4" ]; }
+  then echo "PASS A17: a plain session on $1 ran at $got, its per-model effort, not the top-level $3; claude-fable-5-1 at $fgot (its per-model key: $4)"
+  else echo "FAIL A17: $1 ran at $got (per-model $2, top-level $3); claude-fable-5-1 at $fgot (per-model $4)"; fail=1; fi
+fi
 
 echo "scratch: $S"
 exit $fail

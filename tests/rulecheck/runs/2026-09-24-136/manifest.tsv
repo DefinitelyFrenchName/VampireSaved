@@ -1,0 +1,14 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+STATE.md.lines-71-87 (lines 71-87 of STATE.md)	6b50cd5b10a51dd546696fd8b748c6e7d164c945
+DECISIONS_HISTORY.md.lines-30-72 (lines 30-72 of DECISIONS_HISTORY.md)	de8da1025ef5150b377d8ebb7ef61b3b68666af5
+docs/NEXT_SESSION.md	c02f03857819f198cca05c686134f17fb0bb85e9
+docs/platform/gotchas.md.lines-2857-2944 (lines 2857-2944 of docs/platform/gotchas.md)	9e0dd30f596db099ea76426544914d2f6bfa998d
+docs/project/rule_checker.md.lines-74-96 (lines 74-96 of docs/project/rule_checker.md)	4c97ed13f431a67de96bb64140b4a5357fe93c64
+docs/project/rule_checker.md.lines-282-311 (lines 282-311 of docs/project/rule_checker.md)	98036939b96c54c9a19f0bac6657fe1c85f931e1
+docs/project/agent_architecture_scope.md.lines-287-308 (lines 287-308 of docs/project/agent_architecture_scope.md)	c5722cef1fb58b8f21f79e4a566e5493ee4f8f4e
+build/agent172/probe_agents_14z178f.log	83150eb397fa45f11d9509206e9146f49fdf1811
+build/agent172/pkt178/readers_census.txt	06e6f9ea6ccf78a963a25bb80a4149ef50bae40f
+build/agent172/pkt178/spawned_114_134.txt	b52f9f67f6fc0fd5aec89ff7d297f5b3d8051c96
+build/agent172/pkt178/memory_probe_evidence.txt	cc7a4e124027ec2f5f81522aea84fdb58971f44e
+build/agent172/pkt178/context_census_14z178_afternoon.txt	35fe99bce787a57c6c4a9463eaf49be890bb567d
+tests/rulecheck/ledger.tsv.lines-131-152 (lines 131-152 of tests/rulecheck/ledger.tsv)	c1ac27070ce0a21c3eee99eaf2512caf9594178e

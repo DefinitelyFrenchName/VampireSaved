@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-416 entries (46 game / 119 platform / 251 project), counted from the buckets at generation.
+417 entries (46 game / 120 platform / 251 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 46 entries
 
@@ -71,7 +71,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - "WHEN CAN THE BLOCKER ACT" IS NOT ASKED BY MASHING INSIDE THE BLOCK WINDOW — that measures the ADVANCING GUARD (paid: 14z-168)
 - A RECORD'S CLASS BYTE IS NOT THE VICTIM'S REACTION CLASS — the guard reads it first and the stager rewrites it (paid: 14z-169)
 
-## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 119 entries
+## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 120 entries
 
 - `spctl -a` REPORTS THE SIGNING-POLICY VERDICT, NOT WHETHER A LAUNCH IS BLOCKED — and `unzip` DOES propagate com.apple.quarantine (measured: 2026-09-20, macOS 26.0 arm64, #144)
 - A ROMSET WITH MEMBERS MISSING RUNS FOR THOUSANDS OF FRAMES WITH WORK RAM BIT-IDENTICAL — only the framebuffer shows it (paid: 2026-09-20)
@@ -192,6 +192,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A SUBAGENT IS HANDED THE PROJECT'S CLAUDE.md — AND, INTERACTIVELY, THE AUTO-MEMORY INDEX, WHICH THE DOCS SAY IT IS NOT; `omitClaudeMd: true` REMOVES BOTH (measured 2026-09-24, 14z-178, Claude Code 2.1.281)
 - CLAUDE CODE DELETES SESSION TRANSCRIPTS AFTER 30 DAYS — THE ARCHIVE THE AGENT TOOLING READS SHRINKS UNDER IT (measured 2026-09-24, 14z-178)
 - A WORKER CAN FINISH ON ANOTHER MODEL THAN ITS DEFINITION NAMES — A SAFETY-CLASSIFIER STOP TRIGGERS A SILENT FALLBACK (measured 2026-09-24, 14z-178, Claude Code 2.1.281)
+- A MAIN SESSION RUN AS A DEFINITION (`claude --agent <name>`) LOSES CLAUDE CODE'S WHOLE DEFAULT SYSTEM PROMPT — THE DEFINITION'S BODY REPLACES IT (measured 2026-09-24, 14z-178, Claude Code 2.1.281)
 
 ## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 251 entries
 

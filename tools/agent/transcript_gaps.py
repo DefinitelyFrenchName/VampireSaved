@@ -51,7 +51,9 @@ Usage:
                  (`Project:CLAUDE.md`, `AutoMem:MEMORY.md`) with its Claude Code version, then
                  one `context-census:` line per (type, context, version) — how every
                  rule-checker reader was shown to have been handed CLAUDE.md and the memory
-                 index; `--match RE` keeps only descriptions matching RE
+                 index; `--match RE` keeps only descriptions matching RE; `--cap` (S5's close
+                 check, 14z-178) exits 1 on any worker above Opus-class, with no model, or that
+                 fell back
   --selftest     classify a synthetic transcript with known answers and exit
 
 Reads only; writes nothing. Stdlib only (no numpy on this Mac).
@@ -308,6 +310,23 @@ def subagents(transcript):
     return out
 
 
+CAPPED = re.compile(r"^claude-(opus|sonnet|haiku)-")
+
+
+def cap_breaches(rows):
+    """-> one line per worker that ran on a model above Opus-class (anything but a
+    claude-(opus|sonnet|haiku)-<version> id) or fell back — the #172 ask's cap on workers
+    ("at most opus-class"), read from each worker's OWN records (14z-178, the S5 close check).
+    A worker with no assistant record (no model) is a breach too: an unread cap is not a pass."""
+    out = []
+    for sess, at, desc, models, fallbacks in rows:
+        over = sorted(m for m in models if not CAPPED.match(m))
+        if over or fallbacks or not models:
+            out.append(f"{sess} {at} {desc[:40]!r} models {','.join(sorted(models)) or 'NONE'}"
+                       + (f" FALLBACK {';'.join(fallbacks)}" if fallbacks else ""))
+    return out
+
+
 def selftest():
     t0 = datetime.datetime(2026, 9, 21, 8, 0, tzinfo=datetime.timezone.utc)
 
@@ -411,7 +430,11 @@ def selftest():
                       {"path": "/r/CLAUDE.md", "type": "Project"}]}},
                   {"type": "assistant", "effort": "high", "message": {"model": "m2", "content": "a fallback from m0 was feared"}}):
             g.write(json.dumps(r) + "\n")
-    sub_ok = subagents(top) == [
+    cap_ok = (len(cap_breaches([("s", "w", "a", {"claude-opus-5-5"}, [])])) == 0
+              and len(cap_breaches([("s", "w", "b", {"claude-fable-5-1"}, [])])) == 1
+              and len(cap_breaches([("s", "w", "c", {"claude-opus-4-8"}, ["claude-opus-5-5->claude-opus-4-8"])])) == 1
+              and len(cap_breaches([("s", "w", "d", set(), [])])) == 1)
+    sub_ok = cap_ok and subagents(top) == [
         ("general-purpose", "reader run 1", {"m1"}, {"high"}, 2, {"Project:CLAUDE.md", "AutoMem:MEMORY.md"}, {"9.9.1"}, ["m0->m1"]),
         ("Explore", "no context", {"m2"}, {"high"}, 1, set(), set(), [])]
     import shutil
@@ -438,6 +461,7 @@ def main():
     ap.add_argument("--refusals", default=None)
     ap.add_argument("--subagents", default=None)
     ap.add_argument("--match", default=None)
+    ap.add_argument("--cap", action="store_true")
     ap.add_argument("--selftest", action="store_true")
     a = ap.parse_args()
     if a.selftest:
@@ -455,11 +479,13 @@ def main():
         n = 0
         nfall = 0
         census = {}
+        rows = []
         for f in hit:
             for at, desc, models, efforts, k, context, versions, fallbacks in subagents(f):
                 if a.match and not re.search(a.match, desc):
                     continue
                 n += 1
+                rows.append((os.path.basename(f)[:8], at, desc, models, fallbacks))
                 ctx = ",".join(sorted(context)) or "-"
                 print(f"{os.path.basename(f)[:8]}  {str(at):18} {desc[:48]:48} model {','.join(sorted(models)) or '-'}"
                       f"  effort {','.join(sorted(efforts)) or '-'}  context {ctx}"
@@ -474,6 +500,13 @@ def main():
             print(f"context-census: {c:4d}  {at:18} context {ctx:34} v{ver}")
         # always a count line: an empty listing and a blind reader must not look alike
         print(f"subagents: {n}  fallbacks: {nfall}")
+        if a.cap:
+            # S5's close check (ruled 2026-09-24, 14z-178): no worker above Opus-class, no fallback
+            bad = cap_breaches(rows)
+            for line in bad:
+                print(f"CAP BREACH: {line}")
+            print(f"cap: {len(bad)} breach(es) over {n} worker(s) — workers at most Opus-class, no fallback")
+            return 1 if bad else 0
         return 0
     if a.refusals:
         hit = [f for f in files if os.path.basename(f).startswith(a.refusals)]

@@ -1,0 +1,7 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent172/pkt178s5/issue_172_body.txt	bede98034482aef3a6e05b78e643a6eac90a0786
+build/agent172/pkt178s5/user_settings_model_keys.txt	6f845456e6bedafaa12399e61bb22ea558de7884
+build/agent172/probe_agents_14z178e.log	5d9b5e94b8a9444432bb4bfc1f6c750438dc9fc2
+tools/agent/probe_agents.sh.lines-474-521 (lines 474-521 of tools/agent/probe_agents.sh)	78bedf1239e9b9caa4c9b8e430f72f34db3f674f
+docs/project/agent_architecture_scope.md.lines-276-303 (lines 276-303 of docs/project/agent_architecture_scope.md)	030a703748be87c3f74e668928da7d75e5d4bd57
+docs/platform/gotchas.md.lines-2930-2944 (lines 2930-2944 of docs/platform/gotchas.md)	c0635d9337f74b1040af3cddfc0dc86f6a4f18f2

@@ -1,0 +1,9 @@
+decision	recommendation
+subject	the 14z-178 close: the session group, its findings table, the two rulings and the next-session orientation
+session	14z-178
+model	rule-checker@163e4ce9cf7b
+claim	The 14z-178 records — the STATE group with its close checklist, the two DECISIONS_HISTORY entries, the next-session orientation, the four new platform gotchas, and the rule_checker.md and scope-doc sections — state only what the sitting measured, built or was told, each figure traceable to an artifact in this packet, and each ruling quoted in the maintainer's chosen option label. NOT tested: that omitClaudeMd removes the memory index rests on one interactive spawn; six ledger runs link to no reader and why is not measured; the maintainer's cleanupPeriodDays is not yet set (START HERE item 1); the tier, the sweep and the procedure check of this close have not run yet (the row says PENDING); and the figures quoted from the transcript archive are dated, since Claude Code deletes transcripts after 30 days.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b

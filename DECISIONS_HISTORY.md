@@ -27,6 +27,28 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-24 (14z-178) — #172 slice S5: the orchestrator is a PLAIN session on Fable 5.1, and its gate
+
+**The questions put**, after rule-checker run `2026-09-24-135` (plant caught) returned VIOLATED on Q1,
+Q4 and Q5, all true and resolved by work (probe leg A17 measured a plain session's effort; the gate
+was named as proposed, never ruled). Measured first (`tools/agent/probe_agents.sh` A12, A15, A16,
+A16c, A17): a session run as a definition (`claude --agent`) keeps CLAUDE.md but its system prompt
+is the definition's body alone — Claude Code's default prompt is gone — and it does not take the
+definition's effort; a plain session keeps the default, takes its model from settings or
+`--model`, and its effort from the user settings' per-model key (Fable 5.1: `high`, the #172 ask's
+maximum for Fable). (1) How should S5 be built? (2) Its gate, proposed in the scope doc's slice
+table and never ruled: one real sitting under Fable with the C0/C1 record read at its close, plus a
+check at that close that no worker ran above Opus-class?
+
+**THE RULINGS, verbatim (option labels chosen):** (1) *"Plain session (Recommended)"*, whose text read
+*"No orchestrator definition. You start the sitting on Fable 5.1 (`claude --model claude-fable-5-1`,
+or the settings `model` key). Any orchestrator-only note is appended with --append-system-prompt."*;
+(2) *"That gate (Recommended)"*, whose text read *"One real Fable sitting you start. Its close reads
+the hook refusals, the sweep and the procedure check, and verifies every worker's model from its own
+transcript."* The worker check is `tools/agent/transcript_gaps.py --subagents <session> --cap`.
+
+---
+
 ## Ruled 2026-09-24 (14z-178) — #158 closed; the transcript retention raised by the maintainer
 
 **The questions put**, after rule-checker run `2026-09-24-134` (the pinned reader's first real run,
@@ -37,8 +59,9 @@ id (not the `opus` alias), and `record` refuses a run whose readers ran on anoth
 fell back, or carried context; the issue text repeats a misattributed rule, which the closing
 comment would correct. (2) Claude Code deleted this project's transcripts older than 30 days
 during the sitting — the evidence the #172 tools read; `cleanupPeriodDays` (default 30) is honored
-at any settings level: who sets what? (the maintainer set it themselves at user level; 604 MB for
-this project's last 30 days, so roughly 7 GB a year — an estimate).
+at any settings level: who sets what? (put as: the maintainer sets it at user level, or the session
+does, or the default stays; 604 MB for this project's last 30 days, so roughly 7 GB a year — an
+estimate).
 
 **THE RULINGS, verbatim (option labels chosen):** (1) *"Close it (Recommended)"*, whose text read
 *"Close #158 now in one commit: its row, the four answers, and a closing comment that states the

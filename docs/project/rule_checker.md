@@ -285,8 +285,10 @@ extract, never CLAUDE.md"* (the 14z-175 ruling). Measured: a `general-purpose` s
 this project's CLAUDE.md and, in an interactive session, its auto-memory index, as an
 `instructions` attachment (`tools/agent/probe_agents.sh` A13 with a random codeword; the archive
 read by `transcript_gaps.py --subagents all`: every `general-purpose` worker since 2.1.270). **So
-every reader of every run in the ledger, calibrations included, read its packet with CLAUDE.md
-and the memory index in context.** The plants were still caught on every valid run; what the runs
+every reader linked to a ledger run BEFORE `2026-09-24-114`, calibrations included, read its packet
+with CLAUDE.md and the memory index in context** — 192 readers over 107 of those 113 runs
+(`rulecheck.py readers`; six runs link to no reader, and why is not measured; the pinned readers
+from run 114 on carry none). The plants were still caught on every valid run; what the runs
 did not have is the independence the design names, since both carry the working agent's own
 rules and memories. The pinned definition `.claude/agents/rule-checker.md` carries `omitClaudeMd:
 true`, measured to remove CLAUDE.md (A13) AND the memory index: its first spawn (14z-178,

@@ -1,6 +1,6 @@
 # THE AGENT ARCHITECTURE — scope, before the work (GitHub #172)
 
-> **STATUS (14z-178, 2026-09-24): SLICES S1-S4 LANDED; NEXT S5, THE ORCHESTRATOR.** The maintainer ruled
+> **STATUS (14z-178, 2026-09-24): SLICES S1-S4 LANDED; S5 RULED (a plain session on Fable 5.1, no definition) — ITS GATE IS THE NEXT SITTING, WHICH THE MAINTAINER STARTS.** The maintainer ruled
 > all four questions of §6 the same day (`DECISIONS_HISTORY.md` "Ruled 2026-09-23
 > (14z-175) — #172"), adding one constraint that binds every slice: **a block stops
 > the task at fault, never the session.** S1 is live as **C0.1** in the tracked
@@ -18,7 +18,8 @@
 > `measurer` / `reader` workers and their spec template, the extract's worker lines, the CALL GATE
 > `pre_agent.py` (maintainer-installed), and the pinned `rule-checker` definition — after the
 > measurement that every subagent had been handed CLAUDE.md and, interactively, the memory index,
-> it carries `omitClaudeMd: true` — with QP5 and all ten fixtures recalibrated on it. Next: S5.
+> it carries `omitClaudeMd: true` — with QP5 and all ten fixtures recalibrated on it. S5 is RULED
+> (§4 O): no orchestrator definition, a plain session on Fable 5.1; its gate is a real sitting.
 
 **Why this document exists:** the same reason `harness_scope.md` and
 `applier_app_scope.md` do — a direction the maintainer ordered, big enough that
@@ -283,6 +284,28 @@ changes" (`rule_checker.md` [VSP-184], the spec — the 2026-09-17 ruling this l
 only *"We can always recalibrate later if we need, right?"*; corrected 14z-178, rule-checker run
 `2026-09-24-134` Q5), and since 14z-178 the checker's model is its pinned definition's.
 
+**MEASURED BEFORE PROPOSING S5 (14z-178), and it removes the definition from the design**
+(`tools/agent/probe_agents.sh` A12, A15, A16, A16c; `docs/platform/gotchas.md`): a main session run
+as a definition (`--agent`; the `agent` setting is documented to do the same and was NOT measured) takes the definition's model and tools but not
+its effort (A12), keeps CLAUDE.md (A15), and **loses Claude Code's whole default system prompt**,
+replaced by the definition's body (A16) — an orchestrator built that way would have to re-supply
+every harness instruction, and would drift from Claude Code's own as it updates. What the
+orchestrator needs is already reachable WITHOUT a definition: the session's model and effort come
+from settings (`model`, and `modelSettings` per model — the maintainer's user settings already set
+Fable 5.1 to effort `high`) or `claude --model`; the C0 hooks and the call gate bind any session
+in the tree; and any orchestrator-specific instruction can be APPENDED with
+`--append-system-prompt`, which keeps the default (A16c; the `-file` form not measured). **PROPOSED S5 (14z-178, for the
+maintainer's ruling):** no orchestrator definition; the orchestrator is a plain session switched
+to Fable 5.1 by the maintainer (a settings `model` or a `--model` launch), at the effort the user settings give it
+(the per-model `modelSettings` key is honoured, else the top-level `effortLevel` — probe A17,
+discriminated on this host by claude-opus-5 running at its per-model `xhigh` against a top-level
+`high`; Fable 5.1's key reads `high`, the #172 ask's maximum for Fable); its gate is the one §5's
+slice table PROPOSED (never separately ruled — rule-checker run `2026-09-24-135` Q5) — one real
+sitting under it, the C0/C1 record read at its close — plus a check at that close that no worker
+ran above Opus-class (`transcript_gaps.py --subagents <session>`: every worker's model, fallbacks
+included). **RULED 2026-09-24 (14z-178, `DECISIONS_HISTORY.md` "Ruled 2026-09-24 (14z-178) — #172 slice S5"):**
+*"Plain session"* and *"That gate"*; the worker check is `transcript_gaps.py --subagents <session> --cap`.
+
 ### W — the workers
 
 Named definitions under `.claude/agents/` with model and effort capped as ruled
@@ -319,7 +342,7 @@ the call-gate hook, then the recalibration.
 | **S2** | C0.3 — the close sweep, and its step in STATE.md's close checklist. **LANDED 14z-176:** `tools/agent/sweep.py`, the close step before the push (STATE.md's header) | `tests/test_agent_sweep.sh` (ci_portable, ~12 s): a planted world — a fake Claude with a tool shell that must be named ATTACHED with its child and a non-leader helper that must stay quiet; six orphans, one per signal (cwd twice, once as a `sh`+`tail` pair, argv, stream, env, Claude tool shell) that must each be named WITH that signal; a quiet orphan; the sweep's own shell. Then every survivor declared -> CLEAN, then every plant killed -> CLEAN with no survivor. Three controls (`blind-orphans`, `blind-cwd`, `blind-leaders`), each reaching FAIL as a mode |
 | **S3** | C1 — `tools/proccheck.py` (or a `rulecheck` decision kind), the transcript extractor, the checklist, fixtures from 14z-174, calibration, the push binding. **LANDED 14z-176 as a `rulecheck` FAMILY** (`procedure`): `tools/agent/extract.py`, the checklist, fixtures `proc-promise-14z174` (REAL), `proc-planted-claim-14z176` and `proc-planted-figure-14z176` (PLANTED into a real clean span — the real 14z-174 QP2 case needs ritual knowledge a context-free reader is ruled not to have, and no real QP3 case survived a check of 14z-174), `proc-clean-14z176` (negative). The push binding was INSTALLED 14z-176b, after its own proof (grown to 18 cases) found it would have refused pushes of OTHER repositories — fixed before installation | runs `2026-09-23-101..104`: each positive caught — the real one on BOTH QP1 and QP4, with a second instance the fixture's notes had not named — and the negative OK beside a caught plant; `tests/test_rule_checker.sh` (+ `cross-family-plant`) and `tests/test_agent_extract.sh` (two controls) |
 | **S4** | W — worker definitions and the spec template. **RULED 14z-177** (§4 W): four steps — the static cap gate + `measurer` / `reader` + `docs/project/worker_spec.md`; the extract's worker lines + the S4 gate; the call-gate hook (maintainer-installed); the pinned `rule-checker` definition and its recalibration. **Steps 1, 2 and 3 LANDED 14z-177** (step 3, the call gate `tools/agent/hooks/pre_agent.py`, INSTALLED by the maintainer — *"I'll install it"*, *"done"* — verified live both ways, gated in `tests/test_agent_hooks.sh`): `tests/test_agent_defs.sh` (five controls) and `tests/test_agent_worker.sh` (three controls) over a frozen real `measurer` run whose two figures each re-derive from the spec command that produced them. **Step 4 LANDED 14z-178:** measured first (A13) — every subagent was handed CLAUDE.md and, interactively, the memory index, so the pinned `.claude/agents/rule-checker.md` carries `omitClaudeMd: true` (measured to remove both); QP5 + QP3-for-workers in the procedure checklist with `proc-planted-spec-14z178` and `proc-clean-worker-14z178`; calibrations bound to the definition's sha; all ten fixtures recalibrated on it (runs `2026-09-24-114..123`) | a worker run on a known task returns figures each traceable to a command |
-| **S5** | O — the orchestrator definition and model switch | one real sitting under it, the C0/C1 record read at its close |
+| **S5** | O — the orchestrator. **RULED 14z-178: NO definition** (under `--agent` the default system prompt is replaced, probe A16) — a plain session the maintainer starts on Fable 5.1, its effort from the per-model settings (A17) | one real sitting under it, the C0/C1 record read at its close, and `transcript_gaps.py --subagents <session> --cap` (no worker above Opus-class, no fallback) — ruled *"That gate"* |
 
 S1 alone addresses the measured failure. It is small, it needs no model, and it can
 be replayed against history — which is why it goes first.

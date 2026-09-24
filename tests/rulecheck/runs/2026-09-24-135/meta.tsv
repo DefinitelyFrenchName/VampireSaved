@@ -1,0 +1,9 @@
+decision	recommendation
+subject	#172 S5: no orchestrator definition — a plain session switched to Fable 5.1
+session	14z-178
+model	rule-checker@163e4ce9cf7b
+claim	S5 should build NO orchestrator definition: a main session run as a definition with --agent keeps CLAUDE.md but loses Claude Code's whole default system prompt, replaced by the definition's body (probe A16, discriminated by the default prompt's IMPORTANT line and the prompt_snapshot sizes), and does not take the definition's effort (A12); so I propose the orchestrator be a plain session the maintainer switches to Fable 5.1 (a settings model key or claude --model), at the effort the maintainer's user settings already give Fable 5.1 (high, the #172 ask's maximum for Fable), with any orchestrator-specific instruction appended by --append-system-prompt, which keeps the default (A16c), and its gate the ruled one — one real sitting under it with the C0/C1 record read at its close — plus a check at that close that no worker ran above Opus-class. NOT tested: a real sitting under Fable (that is the gate itself); the agent settings key and the --append-system-prompt-file form (only the --agent and --append-system-prompt flags were measured); A15/A16 on a model other than haiku (the behaviour is the harness's, assumed model-independent); and whether the call gate and the hooks behave identically under a Fable main session beyond probe A11 (general-purpose inherits Fable, Explore stays capped).
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
