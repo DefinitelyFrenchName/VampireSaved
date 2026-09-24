@@ -27,6 +27,15 @@ it refuses a run whose readers fail. `--a/--b` files are for pre-pinning runs on
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`**, not a `ps` grep.
+0b. **CARRIED FROM 14z-178 TO THIS SITTING'S CLOSE** (the maintainer: *"Let's carry them."*):
+   (a) `main` is AHEAD of `origin/main` by 14z-178's post-close commits (`git log origin/main..HEAD`)
+   — they go out with this close's push; (b) 14z-178's procedure check (run `2026-09-24-137`)
+   stopped at the check itself, so the span after it — the `extract.py` fix, the re-run tier, two
+   STATE edits of mine that failed silently and were re-applied — was never read by C1: cut
+   `extract.py --session 55857809 --from 2704` and put it through this close's procedure check
+   too; (c) 14z-178's close row item (5) says 8 quoted scratch scripts / 5 promoted — it is 9 / 5
+   (the census-reads cutter behind `build/agent172/pkt178/census_reads_14z178.txt`, not promoted):
+   correct it, marked in place.
 1. **#172 S5's gate** — this sitting, if it runs on Fable 5.1: work as usual, and at the close add
    `transcript_gaps.py --subagents <session> --cap` to the checklist.
 2. **#171 — qualify every gate.** Unchanged: `tools/audit_lane_carry.py`'s subject lists are
