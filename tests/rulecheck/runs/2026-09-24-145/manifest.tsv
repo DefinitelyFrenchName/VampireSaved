@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+STATE.md	b61a20caba2849da2e484e44d966b2d44bd1c3be
+docs/NEXT_SESSION.md	561ab3f65ee314f316777039628169ed815fe37f
+docs/project/gate_header_contract.md	e94781c84a94c89af14f51450b51c9bc7bbbf5b0
+docs/project/gate_qualification_scope.md	6731a4e4d2a2dbc029b35690e292b8a1acb37152
+docs/project/gotchas.md	113ee3205ae5e6de5fc9a924fc260224059dbdd7
+tests/rulecheck/ledger.tsv	41e74314dd6beead81434553332aad13366470e6
+tests/rulecheck/runs/2026-09-24-142/verdict_real.txt	78486ae1c14eb7bf35458eaadde06445f02b66c3
+tests/rulecheck/runs/2026-09-24-143/verdict_real.txt	d31dbce300977e8ae7ebfc51a5be2928d89ffe0a
+tests/rulecheck/runs/2026-09-24-144/verdict_real.txt	e64d4cdb12a102db3da5d910c8f3152179581ea4
+build/gatequal180/q3q4_gate_outputs_14z180.txt	6a7a7ee2cd29d22ea931f3bf95181758859268d9
+build/gatequal180/q2_evidence_14z180.txt	88f776dcfeb3c417d4c4c2423744b9fdd92f9359
+build/gatequal180/q6_evidence_14z180.txt	c2724b01ffbb5d3ed771c897204ff851458628e0
+tests/test_gate_follows.sh	9175e61b012689a21dc6fea77e9740816e5804ba
+tests/test_measures_contract.sh	16a4a4554617a32c14ee97d488cea59d7fe2daca
+tests/test_poke_readback.sh	c6d17c773676919d16f8631bda7ef341830c6f0f

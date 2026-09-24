@@ -157,8 +157,9 @@ generator) — that rendered page is the functional-coverage view the maintainer
 family by family, as each batch lands. A census
 (`tests/test_gate_descriptions.sh`) freezes `declares` (grows only) against `undeclared`
 (shrinks only), the must-fire census's pattern, so a description cannot be dropped and
-the retrofit's progress is a number. 377 scripts at scoping, 380 with the three gates this slice and Q1 added.
-**Written 2026-09-24: all 380 described**, in the ruled order (runner, tenant, character-data first, then
+the retrofit's progress is a number. 377 scripts at scoping, 380 with the three gates Q0 and Q1 added,
+385 with the five the later slices added (the frozen census, not this sentence, is the count).
+**Written 2026-09-24: all described**, in the ruled order (runner, tenant, character-data first, then
 platform, pipeline, review-triage, oracle, gfx, mister, docs); the maintainer reviews the rendered page family
 by family and corrections are header edits. The maintainer's rationale, verbatim,
 is in §6 (1): supervision of whether a test is *"practically correct or relevant in a way

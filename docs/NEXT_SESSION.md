@@ -1,53 +1,99 @@
-# NEXT SESSION — orientation (rewritten at the 14z-179 CLOSE, 2026-09-24)
+# NEXT SESSION — orientation (rewritten at the 14z-180 CLOSE, 2026-09-24)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## #172 IS CLOSED — WHAT NOW BINDS EVERY SITTING
+## #171 IS THE WORK, ON THE #172 SETUP
 
-The agent architecture is complete. Its last gate, the 14z-179 close, read green on every item of the
-ruling's list — hook refusals 0, six workers all Opus-class with no fallback, the orchestrator on Fable 5.1 at
-`high` over its whole transcript, tier green, sweep clean, procedure check resolved — and #172 was closed on
-*"Close it on green"* (STATE 14z-179).
-What binds you, all of it standing: **three hooks** — `pre_bash.py` (no detached jobs), `pre_push.py`
-(a push needs a passed or resolved `procedure` run in the range), `pre_agent.py` (a `model` above
-Opus-class, a `model` on a DEFINED worker, or none on a type that would inherit yours is refused) —
-and **the close's steps in STATE.md's header**: the checklist, the tier with every control executed,
-the sweep, the procedure check (`extract.py`, then a `procedure` run), and — ruled 14z-179, *"Standing step"* —
-the worker cap read, `python3 tools/agent/transcript_gaps.py --subagents <session> --cap` (exit 0). **The rule-checker's
-readers are the pinned `rule-checker` definition** (claude-opus-5-5, `high`, Read/Grep/Glob,
-`omitClaudeMd: true`), spawned with NO model, then `python3 tools/rulecheck.py record <id> --session
-<prefix>`, which spawn-checks every reader from its own transcript and refuses a run whose readers fail.
+#172 is closed and this sitting ran on it: a plain Fable 5.1 session, every quoted
+figure from a `measurer` spec (`docs/project/worker_spec.md`, spawned with NO model),
+every recommendation through the pinned `rule-checker` and `rulecheck.py record --session`.
+The maintainer asked for confirmation that every further session uses it: say so at the
+opener, and route figures through workers from the first measurement, not after (14z-180
+ran its opener inline and had to say so).
+
+#171's shape is RULED (`DECISIONS_HISTORY.md` "Ruled 2026-09-24 (14z-180)",
+`docs/project/gate_qualification_scope.md` §4-§6): seven slices in the order
+**Q0, Q1 (landed), Q3+Q4 (Q5 inside), Q2, Q6.** Q0 is the maintainer's addition and the
+foundation of their supervision: every gate carries `# WHAT:` / `# HOW:` / `# EXPECTS:`
+(`docs/project/gate_header_contract.md`), rendered from the headers into the GENERATED
+`docs/project/gate_coverage.md` (the site page `docs/site/project/gate_coverage.html` after
+`python3 tools/mk_docs_site.py`), which the maintainer reviews family by family — a wrong
+description is corrected IN THE GATE.
 
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`**, not a `ps` grep.
-0b. **CARRIED FROM 14z-179:** its procedure check (run `2026-09-24-140`) stopped at the check itself, so the
-   span after it — the results written, the #172 close, the commit and the push — was never read by C1: cut
-   `extract.py --session 8037cb8c --from 721` and put it through this close's procedure check too.
-1. **#171 — qualify every gate.** Unchanged: `tools/audit_lane_carry.py`'s subject lists are
-   hardcoded and known incomplete, so its `MAY CARRY` is NECESSARY, NOT SUFFICIENT.
-2. **#145 Windows binaries**, **no Windows launcher**, **#170**, **#161**, **#169**,
+0b. **CARRIED FROM 14z-180:** its procedure check (run `2026-09-24-146`) stopped at the
+   check itself; cut `extract.py --session 63442647 --from 3458` and put the span after it
+   — the tier's result, the push — through this close's procedure run beside the session's own
+   extract, as 14z-180 did for 14z-179.
+1. **Q0 IS WRITTEN — 385 of 385 gates described, census frozen 385/0** (380 at `6e6be0c9`, plus
+   the five gates the sitting added; `tests/expected/gate_descriptions.tsv` is the count, this
+   line is narrative). The
+   maintainer reviews `docs/site/project/gate_coverage.html` (re-render `python3
+   tools/mk_docs_site.py`; source `docs/project/gate_coverage.md`) family by family, in
+   the ruled order; every correction is a header edit in the gate script, followed by
+   `python3 tools/gen_gate_coverage.py` and `tests/test_gate_descriptions.sh` (a reworded
+   field needs no re-freeze; only the declares/undeclared sets are frozen). The
+   maintainer's corrections come before any new slice.
+2. **#171: the seven slices are built (14z-180); what is open is the maintainer's.** Q0 the
+   descriptions (385/385, reviewed family by family on `docs/site/project/gate_coverage.html`),
+   Q1 the module references, Q2 the MEASURES contract (five gates, six floors, the freeze
+   guard), Q3 the FOLLOWS declarations (199, three reconciliation classes), Q4+Q5 the commit
+   of record, the staleness gate and `--stale`, Q6 the poke read-back CENSUS. Open, and the
+   maintainer's: the 73 UNCLASSIFIED rows of `tests/expected/poke_readback.tsv` (STATE
+   "Decisions pending" carries them as one item — rule each OBSERVES or READS-BACK; a
+   READS-BACK column is then dropped from its gate's compare or labelled a rig record in
+   the header), and any correction to a description or a declaration (a header edit).
+   The first emulator run after these commits is the first run of record for the
+   staleness gate; `test_release_binaries` has not yet printed its declared measurement in
+   a run. #171 closes when the rulings are given and recorded (the four local answers in
+   `tickets.tsv`).
+3. **#145 Windows binaries**, **no Windows launcher**, **#170**, **#161**, **#169**,
    **#157 / #159 / #163** — unchanged, the maintainer's to schedule.
 
-## TRAPS PAID THIS SITTING (14z-179)
+## TRAPS PAID THIS SITTING (14z-180)
 
-1. **A mid-sitting read is a SNAPSHOT, not "every record".** A claim about the whole session (its
-   model, its refusals) made from a read taken partway through is an inference; read again at the
-   close, over the whole transcript, and say when each read was taken.
-2. **The ledger has TWO line forms** (`- Session KEY — …` and `- **KEY** (date) — …`), and a
-   pattern copied from the gate matched only one: a "missing line" finding was a matcher artifact,
-   and the gate itself had never checked the four lines in the second form. Fixed with a control.
-3. **`tail -N` of a control mode's output shows whichever control printed LAST**, not the mode you
-   ran: a log labelled "the old mode" carried the new control's line. Keep a mode's full output;
-   its exit status is the verdict.
-4. **A rule you can state is not a rule anyone ruled.** "The gate's ruled rule is key resolution"
-   was how the check was written, not a ruling; the checker asked for the quote and there was none.
+1. **A worker figure can contradict its own list.** Worker C returned "13" where its C6 list
+   had 14 entries and the command prints 14. Re-derive any worker figure that disagrees with
+   another of its own before quoting it; keep the wrong one beside the correction.
+2. **A control that perturbs the wrong root perturbs nothing and passes.** The census gate's
+   `perturb` ran the tool with `--root tests` (the tool appends `/tests`), found no declaring
+   gate, printed REFUSED inside a `$(...)` and the modes exited 0. Run every mode and read
+   its exit before trusting a CONTROL FIRED line.
+3. **A pros-and-cons written ABOVE a question dialog is not seen.** The maintainer: *"I don't
+   see the pros and cons anywhere"*. Put the comparison inside the question text.
+4. **A stray `*` in generated prose pairs into an `<em>` on the site.** `tests/*.sh` twice in
+   a cell broke `test_docs_site`; the renderer now code-spans asterisk-bearing tokens.
+5. **Never edit during the tier.** The mid-session tier ran ~35 min; the next family's
+   descriptions were drafted under build/ and applied after it.
+6. **A reconciliation that checks an extractor against itself agrees by construction.** "0
+   uncovered" said nothing about reach until a SECOND witness read the same thing another way
+   (the description prose naming the replay). Rule-checker run 142, Q3 — look for the second
+   witness before quoting a census as coverage.
+7. **A floor taken from a file's line count includes its header lines.** 51 for a 49-row table;
+   the gate RUN on MAME printed 49. Take a floor from the gate's own MEASURED line in a real run,
+   and derive it once more from a different file.
+8. **A known-bad plant reads its poke back BY DESIGN.** A census that joins pokes to samples
+   without the leg they sit on lists a control's plant as the measuring leg's finding (run 144).
+   Attribute the leg, and say what the attribution rests on.
+9. **Run `test_bbh_fidelity` alone.** Beside a MAME gate it read FAIL; alone, PASS (the known
+   flake, memory `bbh-fidelity-flake`).
+10. **A completion notice is not a result.** "The tier is alive and passing" was said on a
+   liveness task's completion alone, its output unread (procedure run 146, QP2). Read the
+   output, then say what it showed.
+11. **Read a worker's tool calls against its COMMANDS, not only its figures.** Two measurers
+   ran `git rev-parse HEAD` outside their spec, one did not STOP on an error, both appended
+   a conclusion; the orchestrator's read caught the wrong figure and missed the rest (run
+   146, QP5). The extract's WT lines against WS is the read.
+12. **`rulecheck.py resolve --how "…"` eats backticks** like any double-quoted shell string:
+   run 146's resolution has two holes and cannot be re-resolved. Write the text to a file.
 
 **IF A DOC IS TOUCHED:** the doc gates (`test_checkdocs`, `test_docshape`,
 `test_doc_anchor_census`, `test_checkskills`, `test_gotchas_index_current`,
-`test_gate_index_current`, `test_state_open_lists`, `test_tickets`) plus
+`test_gate_index_current`, `test_state_open_lists`, `test_tickets`, `test_docs_site`) plus
 `tools/check_state_lists.py` and `tools/tickets.py check`, exit statuses captured
 directly, `${=cmd}` in zsh. **A running script is never edited** ([MSC-54]).

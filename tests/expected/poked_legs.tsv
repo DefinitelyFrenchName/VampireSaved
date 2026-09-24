@@ -141,6 +141,8 @@ tests/audit_hui_grunt.sh	ours	replays/hui/95_hui_electrocuted_x4.rpl	P1	-	01 Dem
 tests/audit_hui_grunt.sh	ours	replays/hui/95_hui_electrocuted_x4.rpl	P2	R R	03 Victor	03	SAME	
 tests/audit_kill_poke_shape.sh	ours	replays/26_don_arcade_mash.rpl	P1	U U R	0f Jedah	03	CROSS-INERT	
 tests/audit_ladder_selector.sh	ours	replays/26_don_arcade_mash.rpl	P1	U U R	0f Jedah	13	CROSS-INERT	
+tests/audit_latch_reads.sh	native	(replay not named in the script)	P1	-	-	$1	PARAM	no id is CROSS-FLAVOR here
+tests/audit_latch_reads.sh	native	(replay not named in the script)	P2	-	-	$2	PARAM	no id is CROSS-FLAVOR here
 tests/audit_latch_reads.sh	ours	(replay not named in the script)	P1	-	-	$1	PARAM	no id is CROSS-FLAVOR here
 tests/audit_latch_reads.sh	ours	(replay not named in the script)	P2	-	-	$2	PARAM	no id is CROSS-FLAVOR here
 tests/audit_legacy_pairings.sh	ours	replays/16_xemu_2p.rpl	P1	-	01 Demitri	$id	PARAM	no id is CROSS-FLAVOR here

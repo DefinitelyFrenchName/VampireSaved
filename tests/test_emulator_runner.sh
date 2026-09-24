@@ -80,6 +80,7 @@ esac
 # the synthetic repo carries it too — the shipped lib, never a copy
 mkdir -p "$FR/tests/lib"; ln -s "$REPO/tests/lib/classify.sh" "$FR/tests/lib/classify.sh"
 ln -s "$REPO/tests/lib/controls.sh" "$FR/tests/lib/controls.sh"   # the controls reader beside it (14z-147)
+ln -s "$REPO/tests/lib/measures.sh" "$FR/tests/lib/measures.sh"   # the measurement reader too (14z-180): the runner must survive a gate that declares nothing
 
 # Stub tools so the runner's preconditions execute for real.
 printf '#!/usr/bin/env python3\nimport sys\n' > "$FR/tools/audit_roms.py"

@@ -21,6 +21,7 @@
 #   stale row: mark it RETIRED with why; the known case lost: the census went blind).
 #
 # MUST-FIRE: perturbed-copy: known-case-blind — a copy of the tree where test_killshread_es no longer samples ff8509 as `stock` must lose the known READS-BACK finding and FAIL: the census's positive control (mode: the census runs on that copy)
+# MUST-FIRE: perturbed-copy: rig-poke-width — a copy with a synthetic gate that generates donovan part 12 (its HP pin a 4-byte poke at ff8850) and samples only the white-HP word at ff8852 must derive that finding, or a rig poke counted one byte wide misses what it covers — the 72-for-74 defect (mode: the census runs on that copy; the mode FAILS because the new finding has no row)
 # MUST-FIRE: perturbed-copy: control-leg-flagged — a copy with a synthetic gate whose poke is assigned as PLANT_POKE and sampled must derive that finding with leg=control, or a known-bad plant's read-back would be listed as the measuring leg's (mode: the census runs on that copy; the mode FAILS because the new finding has no row)
 # MUST-FIRE: perturbed-copy: unclassified-finding — a copy where one gate gains a FIELDS entry over an address its rig pokes must derive a finding with no row and FAIL (mode: the census runs on that copy)
 #
@@ -51,6 +52,14 @@ perturb() {  # perturb NAME ROOT — a copy of the tree with one gate perturbed;
         control-leg-flagged)
             g=test_plant_probe
             printf '#!/bin/sh\n: "${MAME_BIN:-}"\nPLANT_POKE="1400:ff8782:10"\nFIELDS="ff8782:b:id"\necho PASS\n' > "$2/tests/$g.sh"
+            chmod +x "$2/tests/$g.sh"; printf '%s\tmame\trelease\tromset\t-\tsynthetic\n' "$g" >> "$2/tests/ci_emulator.tsv"
+            echo "$g" ;;
+        rig-poke-width)
+            # a synthetic gate that GENERATES donovan part 12 (whose HP pin is the 4-byte
+            # 2550:ff8850:01200120) and samples only the white-HP word at ff8852: the finding
+            # exists only if the rig poke is given its real width (rule-checker run 2026-09-24-145)
+            g=test_rig_width_probe
+            printf '#!/bin/sh\n: "${MAME_BIN:-}"\npython3 tools/name_moves.py gen donovan 12 "$W/r.rpl" "$W/r.json"\nFIELDS="ff8852:w:p2white"\necho PASS\n' > "$2/tests/$g.sh"
             chmod +x "$2/tests/$g.sh"; printf '%s\tmame\trelease\tromset\t-\tsynthetic\n' "$g" >> "$2/tests/ci_emulator.tsv"
             echo "$g" ;;
         unclassified-finding)
@@ -112,6 +121,10 @@ if [ -z "$VS_CTL" ]; then
     g="$(perturb unclassified-finding "$W/c2" | tail -1)"
     if census "$W/c2" | grep -q "^$g	ff8782	FIELDS:id"; then vs_ctl_fired unclassified-finding "$g derives a finding (ff8782, FIELDS:id) with no row (section 1 would FAIL)"
     else vs_ctl_dead unclassified-finding "the planted poke-and-sample pair did not derive"; fail=1; fi
+    g="$(perturb rig-poke-width "$W/c4" | tail -1)"
+    if python3 tools/audit_poke_readback.py --root "$W/c4" 2>/dev/null | grep -q "^$g	ff8850	.*	FIELDS:p2white"; then
+        vs_ctl_fired rig-poke-width "the rig's 4-byte HP pin at ff8850 reaches the white-HP word sampled at ff8852 ($g)"
+    else vs_ctl_dead rig-poke-width "a rig poke counted one byte wide misses the word it covers"; fail=1; fi
     g="$(perturb control-leg-flagged "$W/c3" | tail -1)"
     leg="$(python3 tools/audit_poke_readback.py --root "$W/c3" 2>/dev/null | awk -F'\t' -v g="$g" '$1==g && $2=="ff8782" {print $5; exit}')"
     [ "$leg" = control ] && vs_ctl_fired control-leg-flagged "a poke assigned as PLANT_POKE derives with leg=control ($g)" \

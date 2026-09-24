@@ -71,6 +71,7 @@ else ln -s "$RUNNER" "$FR/tests/run_all_static.sh"; fi
 mkdir -p "$FR/tests/lib"; ln -s "$REPO/tests/lib/classify.sh" "$FR/tests/lib/classify.sh"
 # ...and the controls reader the classifier sources beside it (14z-147)
 ln -s "$REPO/tests/lib/controls.sh" "$FR/tests/lib/controls.sh"
+ln -s "$REPO/tests/lib/measures.sh" "$FR/tests/lib/measures.sh"   # the measurement reader beside it (14z-180): the first close tier died on its empty-list grep, which a fakerepo WITHOUT the library could not reach
 
 mk() {  # mk <name> <exit> <output...>
     n="$1"; st="$2"; shift 2

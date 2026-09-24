@@ -72,7 +72,9 @@ vs_meas_read() {  # vs_meas_read <script> <log>
     _got="$(grep -aE '^MEASURED: [a-z0-9-]+ = -?[0-9]+' "$_l" 2>/dev/null | sed -E 's/^MEASURED: ([a-z0-9-]+) = (-?[0-9]+).*/\1 \2/')"
     # one declaration per line, name<TAB>floor: read with cut, never with a parameter
     # expansion on a literal tab (an editor can silently turn it into spaces)
-    printf '%s\n' "$_decl" | grep -v '^$' > "${TMPDIR:-/tmp}/vs_meas_$$.txt"
+    # awk, not `grep -v`: an empty declaration list must not return 1 under a runner's set -e
+    # (the first close tier of 14z-180 died on its first gate exactly there)
+    printf '%s\n' "$_decl" | awk 'NF' > "${TMPDIR:-/tmp}/vs_meas_$$.txt"
     while IFS= read -r _row; do
         _n="$(printf '%s' "$_row" | cut -f1)"; _f="$(printf '%s' "$_row" | cut -f2)"
         VS_MEAS_DECLARED=$((VS_MEAS_DECLARED + 1))
