@@ -1,0 +1,10 @@
+decision	procedure
+subject	one AI agent working session (14z-179) from its first record to the start of its procedure check, plus the unchecked tail of the previous session (14z-178, records 2704 to its end) carried to this close
+session	14z-179
+model	rule-checker@163e4ce9cf7b
+claim	The agent worked by the procedure throughout both spans: every intention it stated to the maintainer was carried out, every step it reported done was run, every figure it reported was produced by a tool or derived from one by stated arithmetic, every background job it started was accounted for, and every worker it started did what its spec asked, running the commands the spec named and nothing the spec forbade. Not tested: statements the transcript did not record (mid-turn narration before a tool call is sometimes absent from it), tool output beyond each result's first 160 characters, and the span of this session after this check was prepared (the results written, the ticket closed, the commit and the push), which the next close carries as 14z-178's tail was carried here.
+checklist	f3ec4d9849f7
+family	procedure
+questions	QP1 QP2 QP3 QP4 QP5
+reader	rule-checker@163e4ce9cf7b
+head	576eeee583f311a4fa57630c29170a56437985f7

@@ -4,7 +4,7 @@
 # repo: DefinitelyFrenchName/VampireSaved
 # issues: 172
 number	state	reason	closed	labels	title
-172	OPEN	-	-	enhancement	Enforce the discipline at the AGENT level: orchestrator / checker / workers, with the checker unable to be overridden
+172	CLOSED	COMPLETED	2026-09-24	enhancement	Enforce the discipline at the AGENT level: orchestrator / checker / workers, with the checker unable to be overridden
 171	OPEN	-	-	enhancement	Qualify every gate: prove it measures what it claims, and that it notices when its inputs move
 170	OPEN	-	-	enhancement	Notarize the macOS release binaries (PARKED on community demand)
 169	OPEN	-	-	bug	pyron_3 Galactic Throw: the air throw connects on only one strength, and [j.6HP]'s frozen chain is a plain j.HP

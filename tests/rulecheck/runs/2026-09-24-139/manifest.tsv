@@ -1,0 +1,18 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+STATE.md.lines-72-83 (lines 72-83 of STATE.md)	84a845e3569c221d9273f96dfa6a9f94b55daebd
+STATE.md.lines-121-121 (lines 121-121 of STATE.md)	9f053b530655b3c694c7b1462a1d0d23c04192c7
+STATE.md.lines-38-76 (lines 38-76 of STATE.md)	3c5c957135b96f5b032c7efcc48b0feca7ed14ff
+DECISIONS_HISTORY.md.lines-30-53 (lines 30-53 of DECISIONS_HISTORY.md)	1a5bf572b8ea6f826bacf4bc0cfeaca92000a5c7
+docs/NEXT_SESSION.md	fdc7557f8a182e252817aa2e81c75f583713df80
+docs/project/agent_architecture_scope.md.lines-1-22 (lines 1-22 of docs/project/agent_architecture_scope.md)	7e81a7b8582727f1ddd88ddb0acaf74463017522
+docs/project/agent_architecture_scope.md.lines-337-349 (lines 337-349 of docs/project/agent_architecture_scope.md)	e5d47f371f32a8a1016b730e345319a5ecec1464
+HANDOFF.md.lines-76-76 (lines 76-76 of HANDOFF.md)	edb60f86989f759d37de06a50a6abacab06e85ab
+build/agent172/pkt179/s5_gate_opener_reads.txt	7b9fb83262cc57628ad0ba9c9c3dcdd323aee650
+build/agent172/pkt179/session_model_reads.txt	a5815ba20749fba9ace35f750742b49a73a99b14
+build/agent172/pkt179/ledger_coverage_14z179.txt	19dc4cca8b61a29a783fd775f2bcc0f85548a5e9
+build/agent172/pkt179/open_lists_gate_14z179.txt	efe85ebc1576c909378944c737bf1e46aee1c10c
+build/agent172/pkt179/ledger_fix.diff	4fe679bde6a7d08ebc4eaff6ca4d405db00984cc
+build/agent172/extract_55857809_tail.txt	d3c3f0232f360a8a75c874d5d42e496f126a9e33
+tests/rulecheck/ledger.tsv.lines-150-155 (lines 150-155 of tests/rulecheck/ledger.tsv)	5fd07e7f18f9c1604464bbdba462f8d1c5d593d2
+tests/rulecheck/runs/2026-09-24-138/verdict_real.txt	0a9fd6d4ebe4e0b4da80fe06a246384c7597b1e0
+tests/rulecheck/runs/2026-09-24-138/packet.md	b1495cabd3cd118902a20be1cc18f984102957fd

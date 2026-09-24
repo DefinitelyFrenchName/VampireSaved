@@ -1,0 +1,9 @@
+decision	recommendation
+subject	the 14z-179 close: the session group, its findings table, the ruling, the next-session orientation, the scope-doc and HANDOFF status lines
+session	14z-179
+model	rule-checker@163e4ce9cf7b
+claim	The 14z-179 records — the STATE group with its close checklist, the DECISIONS_HISTORY entry, the next-session orientation, the scope doc's STATUS banner and S5 row, HANDOFF's hooks row, and the standing-rulings line and close step naming the --cap read — state only what this sitting measured, built or was told, each figure traceable to an artifact in this packet, each ruling quoted in the maintainer's chosen option label, and each wrong finding of mine (the 'missing' ledger line; the two inferences) kept beside its correction. NOT tested: the tier, the sweep, the procedure check over both extracts and the three close-time re-reads (refusals, the session's model and effort over the whole transcript, --cap) have not run — every sentence stating their result is a PENDING-14z179 placeholder to be replaced before any commit; the 36 archived keys are counted, not read one by one; the ticket row and closing comment for #172 are not yet written (they follow a green gate).
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b

@@ -10,6 +10,7 @@
 # MUST-FIRE: perturbed-copy: fourth-group — session group headings added above the standing sections must fail the group count
 # MUST-FIRE: perturbed-copy: over-budget — STATE.md padded past 150 KiB must fail the size budget
 # MUST-FIRE: perturbed-copy: unresolved-ledger-key — a ledger line naming a session with no record in STATE_HISTORY.md must fail
+# MUST-FIRE: perturbed-copy: unresolved-ledger-key-bold — the same in the ledger's SECOND line form, `- **KEY** (date) — …`, which the checker did not match until 14z-179 (four real lines went unchecked)
 #
 # WHAT IT HOLDS. `tools/check_state_lists.py` reads STATE.md, docs/NEXT_SESSION.md
 # and STATE_HISTORY.md and names every violation by a stable key: the size
@@ -79,6 +80,11 @@ elif name == "unresolved-ledger-key":
     i = h.index("\n- Session ")
     h = h[:i] + "\n- Session 14z-999 — a synthetic ledger line added by the control" + h[i:]
     hist.write_text(h)
+elif name == "unresolved-ledger-key-bold":
+    h = hist.read_text()
+    i = h.index("\n- Session ")
+    h = h[:i] + "\n- **14z-998** (2026-01-01) — a synthetic ledger line in the second form, added by the control" + h[i:]
+    hist.write_text(h)
 else:
     sys.exit(1)
 state.write_text(s)
@@ -90,6 +96,7 @@ PY
     fourth-group)          EXPECT="session groups above" ;;
     over-budget)           EXPECT="KiB budget" ;;
     unresolved-ledger-key) EXPECT="ledger key 14z-999" ;;
+    unresolved-ledger-key-bold) EXPECT="ledger key 14z-998" ;;
     esac
 }
 

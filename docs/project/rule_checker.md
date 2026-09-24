@@ -313,6 +313,13 @@ model and effort, no model FALLBACK (a safety-classifier stop can move a worker 
 
 ## What it will not catch
 
+**A reader can echo the claim's figures as its own reading (measured 14z-179, run `2026-09-24-140`
+QP3).** The plant-side reader of run 139 reported "the pins land at 2550/2560 (name_moves.py.txt:687,
+699)" — two figures that occur nowhere in that file (the lines hold expressions), only in the claim it
+was handed. Nothing in the six-line verdict distinguishes a figure read from a figure repeated; the
+extract's `W#` line (QP3 over workers, S4 step 4) is what sees it, and the procedure check is where it
+is judged. A reader's evidence is therefore a pointer to check, never a measurement of its own.
+
 - **Operational slips.** A waiter wedged for hours is not a rule-application
   failure; it was not looking. The checker does not fix that.
 - **A premise nobody wrote down.** It can only ask whether the premise is

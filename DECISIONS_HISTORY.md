@@ -27,6 +27,37 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-24 (14z-179) — #172 closed on a green S5 gate; no ticket for the ledger's reverse check
+
+**The questions put**, after rule-checker run `2026-09-24-138` (plant caught) returned VIOLATED on Q1,
+Q4 and Q5, all true and resolved by work (the close's conditions widened to the ruling's own list plus
+the orchestrator's model re-read; two inferences rewritten as measured facts; the packet's gate log
+re-captured in full). Measured first: this sitting's transcript shows every assistant record on
+`claude-fable-5-1` at effort `high` (a mid-sitting read, to be repeated over the whole transcript at
+the close), 0 hook refusals of every kind at the opener, and the pinned readers of run 138 on
+`claude-opus-5-5` at `high` with no fallback. (1) If this close reads green on the ruling's list —
+hook refusals re-read at the close, the sweep, the procedure check over this session's extract AND
+14z-178's unchecked tail, `--cap` over every worker, plus the orchestrator's own model and effort
+re-read over the whole transcript — should #172 be closed at this close? (2) The open-lists gate
+matched only one of the ledger's two line forms (fixed, with a control); its check is key resolution
+only, and 36 older archived session keys (14z-147 and older) have no ledger line of their own: a
+ticket for the reverse check?
+
+**THE RULINGS, verbatim (option labels chosen):** (1) *"Close it on green (Recommended)"*, whose text
+read *"Every slice S1-S5 is landed and gated; the S5 gate is this sitting's close. If any check reads
+red, #172 stays open and the close says so."*; (2) *"No ticket (Recommended)"*, whose text read *"The
+rollover recipe writes a line per group; the 36 are pre-14z-150 groups. Recorded in STATE row (3) as
+measured, nothing more."*
+
+**A third question, put after rule-checker run `2026-09-24-139` (plant caught) returned VIOLATED on Q5:** the
+worker-cap read had been written into STATE's close steps as STANDING when ruling (1) of 14z-178 covered this
+sitting's close only; withdrawn, then asked: a standing step of every close, beside the procedure check?
+**THE RULING, verbatim:** *"Standing step (Recommended)"*, whose text read *"Every close runs --cap after the
+procedure check; exit 0 is the verdict. It costs seconds and is the only read that sees a silent model
+fallback, which the call gate cannot."*
+
+---
+
 ## Ruled 2026-09-24 (14z-178) — #172 slice S5: the orchestrator is a PLAIN session on Fable 5.1, and its gate
 
 **The questions put**, after rule-checker run `2026-09-24-135` (plant caught) returned VIOLATED on Q1,

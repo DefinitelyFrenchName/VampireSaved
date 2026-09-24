@@ -1,62 +1,50 @@
-# NEXT SESSION — orientation (rewritten at the 14z-178 CLOSE, 2026-09-24)
+# NEXT SESSION — orientation (rewritten at the 14z-179 CLOSE, 2026-09-24)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## #172 S4 IS DONE; S5 IS THIS KIND OF SITTING — A PLAIN SESSION ON FABLE 5.1
+## #172 IS CLOSED — WHAT NOW BINDS EVERY SITTING
 
-Ruled 14z-178 (*"Plain session"*, *"That gate"*): the orchestrator is NOT a definition — under
-`claude --agent` Claude Code's default system prompt is replaced by the definition's body (probe
-A16) — but a plain session the maintainer STARTS on Fable 5.1 (`claude --model claude-fable-5-1`,
-or the settings `model` key); its effort comes from the per-model settings (`high`, probe A17). Its
-gate is that sitting's close: the C0/C1 record, and **`python3 tools/agent/transcript_gaps.py
---subagents <session> --cap`** — every worker at most Opus-class, none fallen back. If this sitting
-is not on Fable, S5's gate is still open; say so at the opener.
-
-**Three hooks and the pinned reader bind you.** `pre_bash.py` (no detached jobs), `pre_push.py` (a push
-needs a passed or resolved `procedure` run in the range) and `pre_agent.py` (a `model` above
-Opus-class, a `model` on a DEFINED worker, or none on a type that would inherit yours is refused).
-**The rule-checker's readers are the pinned `rule-checker` definition** (claude-opus-5-5, `high`,
-Read/Grep/Glob, `omitClaudeMd: true`), spawned with NO model; then
-**`python3 tools/rulecheck.py record <id> --session <prefix>`** — it spawn-checks every reader from
-its own transcript (model, effort, fallback, context, prompt verbatim) and collects the verdicts;
-it refuses a run whose readers fail. `--a/--b` files are for pre-pinning runs only.
+The agent architecture is complete. Its last gate, the 14z-179 close, read green on every item of the
+ruling's list — hook refusals 0, six workers all Opus-class with no fallback, the orchestrator on Fable 5.1 at
+`high` over its whole transcript, tier green, sweep clean, procedure check resolved — and #172 was closed on
+*"Close it on green"* (STATE 14z-179).
+What binds you, all of it standing: **three hooks** — `pre_bash.py` (no detached jobs), `pre_push.py`
+(a push needs a passed or resolved `procedure` run in the range), `pre_agent.py` (a `model` above
+Opus-class, a `model` on a DEFINED worker, or none on a type that would inherit yours is refused) —
+and **the close's steps in STATE.md's header**: the checklist, the tier with every control executed,
+the sweep, the procedure check (`extract.py`, then a `procedure` run), and — ruled 14z-179, *"Standing step"* —
+the worker cap read, `python3 tools/agent/transcript_gaps.py --subagents <session> --cap` (exit 0). **The rule-checker's
+readers are the pinned `rule-checker` definition** (claude-opus-5-5, `high`, Read/Grep/Glob,
+`omitClaudeMd: true`), spawned with NO model, then `python3 tools/rulecheck.py record <id> --session
+<prefix>`, which spawn-checks every reader from its own transcript and refuses a run whose readers fail.
 
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`**, not a `ps` grep.
-0b. **CARRIED FROM 14z-178 TO THIS SITTING'S CLOSE** (the maintainer: *"Let's carry them."*):
-   (a) `main` is AHEAD of `origin/main` by 14z-178's post-close commits (`git log origin/main..HEAD`)
-   — they go out with this close's push; (b) 14z-178's procedure check (run `2026-09-24-137`)
-   stopped at the check itself, so the span after it — the `extract.py` fix, the re-run tier, two
-   STATE edits of mine that failed silently and were re-applied — was never read by C1: cut
-   `extract.py --session 55857809 --from 2704` and put it through this close's procedure check
-   too; (c) 14z-178's close row item (5) says 8 quoted scratch scripts / 5 promoted — it is 9 / 5
-   (the census-reads cutter behind `build/agent172/pkt178/census_reads_14z178.txt`, not promoted):
-   correct it, marked in place.
-1. **#172 S5's gate** — this sitting, if it runs on Fable 5.1: work as usual, and at the close add
-   `transcript_gaps.py --subagents <session> --cap` to the checklist.
-2. **#171 — qualify every gate.** Unchanged: `tools/audit_lane_carry.py`'s subject lists are
+0b. **CARRIED FROM 14z-179:** its procedure check (run `2026-09-24-140`) stopped at the check itself, so the
+   span after it — the results written, the #172 close, the commit and the push — was never read by C1: cut
+   `extract.py --session 8037cb8c --from 721` and put it through this close's procedure check too.
+1. **#171 — qualify every gate.** Unchanged: `tools/audit_lane_carry.py`'s subject lists are
    hardcoded and known incomplete, so its `MAY CARRY` is NECESSARY, NOT SUFFICIENT.
-3. **#145 Windows binaries**, **no Windows launcher**, **#170**, **#161**, **#169**,
+2. **#145 Windows binaries**, **no Windows launcher**, **#170**, **#161**, **#169**,
    **#157 / #159 / #163** — unchanged, the maintainer's to schedule.
 
-## TRAPS PAID THIS SITTING (14z-178)
+## TRAPS PAID THIS SITTING (14z-179)
 
-1. **A subagent is handed CLAUDE.md and (interactively) the memory index** — the docs deny the
-   second. `omitClaudeMd: true` removes both. Read the `instructions` attachment's `files`
-   list; a text match over the record missed every one.
-2. **A worker can finish on another model**: a safety-classifier stop triggers a silent
-   FALLBACK, recorded only as a `fallback` content block. Read the model REQUESTED.
-3. **Transcripts older than 30 days are deleted** (and a probe's `claude -p` runs can trigger it
-   mid-sitting): date every census figure; cut evidence into the tree before it ages out.
-4. **`claude --agent` replaces Claude Code's default system prompt**; `--append-system-prompt` adds.
-5. **A headless worker's report arrives as its notification's `<result>`** — the third form.
-6. **A discriminator must be something the model cannot get elsewhere**: "the first sentence of
-   your system prompt" and "the working directory" both failed before the IMPORTANT line worked.
-7. **A rule glossed in a ruling's "What it means" is not the maintainer's words** — quote theirs.
+1. **A mid-sitting read is a SNAPSHOT, not "every record".** A claim about the whole session (its
+   model, its refusals) made from a read taken partway through is an inference; read again at the
+   close, over the whole transcript, and say when each read was taken.
+2. **The ledger has TWO line forms** (`- Session KEY — …` and `- **KEY** (date) — …`), and a
+   pattern copied from the gate matched only one: a "missing line" finding was a matcher artifact,
+   and the gate itself had never checked the four lines in the second form. Fixed with a control.
+3. **`tail -N` of a control mode's output shows whichever control printed LAST**, not the mode you
+   ran: a log labelled "the old mode" carried the new control's line. Keep a mode's full output;
+   its exit status is the verdict.
+4. **A rule you can state is not a rule anyone ruled.** "The gate's ruled rule is key resolution"
+   was how the check was written, not a ruling; the checker asked for the quote and there was none.
 
 **IF A DOC IS TOUCHED:** the doc gates (`test_checkdocs`, `test_docshape`,
 `test_doc_anchor_census`, `test_checkskills`, `test_gotchas_index_current`,

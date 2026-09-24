@@ -1,0 +1,19 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+STATE.md.lines-71-80 (lines 71-80 of STATE.md)	39cbc1fc472abfa64df0eb77c5ff5fc29ef78243
+STATE.md.lines-118-118 (lines 118-118 of STATE.md)	ca4a263ddcc76ee960a75fae30e8905797a5b73a
+DECISIONS_HISTORY.md.lines-30-51 (lines 30-51 of DECISIONS_HISTORY.md)	f6beebae4acb8762e3ee236c9cfe5cd0e5f47c03
+docs/project/agent_architecture_scope.md.lines-1-22 (lines 1-22 of docs/project/agent_architecture_scope.md)	b175eb97913a69d8b7b95d5ff46f73c375875e73
+docs/project/agent_architecture_scope.md.lines-287-308 (lines 287-308 of docs/project/agent_architecture_scope.md)	c5722cef1fb58b8f21f79e4a566e5493ee4f8f4e
+docs/project/agent_architecture_scope.md.lines-337-349 (lines 337-349 of docs/project/agent_architecture_scope.md)	e6a0a4aeddb367c573c9d6546940f2f6a58bcb90
+docs/project/tickets.tsv.lines-1-74 (lines 1-74 of docs/project/tickets.tsv)	b8bdf9f53d5854566b04fb69e8ee4eef7c068793
+docs/NEXT_SESSION.md	53d5b9930453c9c774b4627acfed9efcab67ac2e
+HANDOFF.md.lines-76-76 (lines 76-76 of HANDOFF.md)	7891a15c0651ce81810d146040ff04cf11f808a6
+build/agent172/pkt179/issue_172.txt	b18810b0327de6b3b454116d59064d8951f0d7d3
+build/agent172/pkt179/s5_gate_opener_reads.txt	7b9fb83262cc57628ad0ba9c9c3dcdd323aee650
+build/agent172/pkt179/session_model_reads.txt	a5815ba20749fba9ace35f750742b49a73a99b14
+build/agent172/pkt179/ledger_coverage_14z179.txt	19dc4cca8b61a29a783fd775f2bcc0f85548a5e9
+build/agent172/pkt179/open_lists_gate_14z179.txt	141638376135f810e79ff0810dbe3b9b6ff71cb2
+build/agent172/pkt179/ledger_fix.diff	4fe679bde6a7d08ebc4eaff6ca4d405db00984cc
+tools/check_state_lists.py.lines-60-72 (lines 60-72 of tools/check_state_lists.py)	ceef5bae2156f3442abf5a2be88112c199edfbec
+tools/check_state_lists.py.lines-205-225 (lines 205-225 of tools/check_state_lists.py)	af93c5e2aa1fb7001dcc50863ac7bce6787dff6b
+build/agent172/extract_55857809_tail.txt	d3c3f0232f360a8a75c874d5d42e496f126a9e33

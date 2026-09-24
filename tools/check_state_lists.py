@@ -64,7 +64,10 @@ MARKERS = ["DECIDED", "DONE", "FIXED", "CLOSED", "RESOLVED", "SETTLED", "RULED",
 MARKER_RE = re.compile(r"~~|\b(" + "|".join(MARKERS) + r")\b")
 HOME_RE = re.compile(r"DECISIONS_HISTORY\.md|`[\w./-]+\.(?:md|sh|py|tsv|toml)`")
 HDR_RE = re.compile(r"^(#{1,3}) (.*)$")
-LEDGER_KEY_RE = re.compile(r"^- Sessions? ([0-9][0-9a-z-]*)")
+# A ledger line names its session in one of TWO forms — `- Session KEY — …` (the
+# rollover recipe's) and `- **KEY** (date) — …` (four lines since 14z-156). Until
+# 14z-179 only the first was matched, so the second form was never checked.
+LEDGER_KEY_RE = re.compile(r"^- (?:Sessions? |\*\*)([0-9][0-9a-z-]*)")
 
 
 def headings(lines):

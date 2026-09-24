@@ -1,0 +1,9 @@
+decision	recommendation
+subject	#172: this sitting is S5's gate; recommend closing the ticket at this close if its tier, sweep, procedure check and worker cap are green
+session	14z-179
+model	rule-checker@163e4ce9cf7b
+claim	#172 is complete once this sitting's close is green: slices S1-S4 are landed and gated (STATE 14z-175..178, the scope doc's slice table), S5 was ruled 2026-09-24 as a plain session on Fable 5.1 whose gate is one real sitting's close, and THIS sitting is that sitting — its transcript shows every assistant record on claude-fable-5-1 at effort high, its C0 record so far reads 0 refusals of every kind and 0 workers (the cap check will read this run's own two readers and every later worker at the close), 14z-178's three carried items are taken in order (item (5) corrected in place, the tail extract cut as the procedure run's second artifact, the push carried to this close), and on the way the open-lists gate was found to match only one of the ledger's two line forms, so four real lines had never been checked — fixed with a new control that fires. I recommend (1) closing #172 at this close IF the tier, the sweep, the procedure check over both extracts and transcript_gaps.py --cap are green, with the row, the four answers and a closing comment written then, and (2) no ticket for the 36 older archived session keys (14z-147 and older) that have no ledger line of their own, since the gate's ruled rule is key resolution, not record coverage. NOT tested: the tier, the sweep, the procedure check and the final cap have not run; whether a group headline's [+N more entries] covers any of the 36 keys was not checked; the standing-rulings line for #172 is proposed to stay while the hooks constrain work.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
