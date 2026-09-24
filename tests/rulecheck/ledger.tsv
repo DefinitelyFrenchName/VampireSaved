@@ -138,3 +138,13 @@ id	date	session	decision	subject	control	control_verdict	verdict	violated	resolu
 2026-09-24-123	2026-09-24	14z-178	calibration	proc-clean-worker-14z178	proc-planted-claim-14z176	CAUGHT	OK	-	-	rule-checker@efa6cdd64dd0
 2026-09-24-122	2026-09-24	14z-178	calibration	proc-clean-14z176	proc-planted-claim-14z176	CAUGHT	OK	-	-	rule-checker@efa6cdd64dd0
 2026-09-24-121	2026-09-24	14z-178	calibration	fidelity-14z160	fidelity-14z160-false-statement	CAUGHT	OK	-	-	rule-checker@efa6cdd64dd0
+2026-09-24-125	2026-09-24	14z-178	calibration	inferred-decision-14z162	inferred-decision-14z162	CAUGHT	VIOLATED	Q1 Q4 Q5	-	rule-checker@163e4ce9cf7b
+2026-09-24-128	2026-09-24	14z-178	calibration	proc-planted-claim-14z176	proc-planted-claim-14z176	CAUGHT	VIOLATED	QP2	-	rule-checker@163e4ce9cf7b
+2026-09-24-129	2026-09-24	14z-178	calibration	proc-planted-figure-14z176	proc-planted-figure-14z176	CAUGHT	VIOLATED	QP3	-	rule-checker@163e4ce9cf7b
+2026-09-24-130	2026-09-24	14z-178	calibration	proc-planted-spec-14z178	proc-planted-spec-14z178	CAUGHT	VIOLATED	QP5	-	rule-checker@163e4ce9cf7b
+2026-09-24-127	2026-09-24	14z-178	calibration	proc-promise-14z174	proc-promise-14z174	CAUGHT	VIOLATED	QP1 QP4	-	rule-checker@163e4ce9cf7b
+2026-09-24-124	2026-09-24	14z-178	calibration	forced-pick-14z159	forced-pick-14z159	CAUGHT	VIOLATED	Q1 Q2 Q3 Q4	-	rule-checker@163e4ce9cf7b
+2026-09-24-126	2026-09-24	14z-178	calibration	fidelity-14z160-false-statement	fidelity-14z160-false-statement	CAUGHT	VIOLATED	Q1 Q4	-	rule-checker@163e4ce9cf7b
+2026-09-24-133	2026-09-24	14z-178	calibration	proc-clean-worker-14z178	proc-planted-spec-14z178	CAUGHT	OK	-	-	rule-checker@163e4ce9cf7b
+2026-09-24-132	2026-09-24	14z-178	calibration	proc-clean-14z176	proc-planted-spec-14z178	CAUGHT	OK	-	-	rule-checker@163e4ce9cf7b
+2026-09-24-131	2026-09-24	14z-178	calibration	fidelity-14z160	forced-pick-14z159	CAUGHT	OK	-	-	rule-checker@163e4ce9cf7b

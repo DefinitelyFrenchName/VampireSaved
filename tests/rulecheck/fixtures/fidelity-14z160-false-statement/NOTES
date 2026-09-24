@@ -7,3 +7,4 @@ SAME-id poke, and the claim's "tested directly" rests on that. A checker that
 reads the artifacts must return VIOLATED on Q1; a checker that reads the claim's
 shape returns OK. Not handed to the checker.
 - 14z-178 (the PINNED READER, #172 S4 step 4): recalibrated as run 2026-09-24-116 on `.claude/agents/rule-checker.md` (rule-checker@efa6cdd64dd0: Opus 5.5, effort high, omitClaudeMd — no CLAUDE.md or memory in context, unlike every earlier run), plant CAUGHT, verdict VIOLATED Q1 Q4. Extra firing Q4 (no control writes a changed-value id): TRUE of the packet — it is the planted sentence's other face.
+- 14z-178, second round (the model pinned by VERSION id, claude-opus-5-5, never the alias — #158): run 2026-09-24-126 on rule-checker@163e4ce9cf7b, plant CAUGHT, verdict VIOLATED Q1 Q4; every reader verified from its own transcript (`rulecheck.py spawned`) and every verdict collected from it (`collect`). Extra firings as in the round above.

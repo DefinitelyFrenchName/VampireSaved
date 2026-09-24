@@ -42,7 +42,10 @@ Usage:
   python3 tools/rulecheck.py prepare --calibrate FIXTURE [--session 14z-N] [--model NAME]
   python3 tools/rulecheck.py record ID --a FILE --b FILE      # the two agents' final messages, verbatim
   python3 tools/rulecheck.py resolve ID --how "..."           # after a VIOLATED
-  python3 tools/rulecheck.py spawned ID --session PREFIX      # the readers were the pinned definition, no model, each prompt verbatim
+  python3 tools/rulecheck.py spawned ID --session PREFIX      # the readers were the pinned definition, no model, each prompt verbatim,
+                                                              # on the definition's model with no fallback (or --transcript PATH)
+  python3 tools/rulecheck.py collect ID --session PREFIX      # each reader's report, from its OWN transcript, into
+                                                              # build/rulecheck/ID/verdict_<slot>.txt — never retyped
   python3 tools/rulecheck.py check [--root DIR]               # the gate's logic
   python3 tools/rulecheck.py --selftest                       # the parser's fixtures
 """
@@ -549,24 +552,49 @@ def cmd_record(a):
     print("OK: no question violated; the action may proceed.")
 
 
-def cmd_spawned(a):
-    """THE SPAWN CHECK (14z-178): the Agent calls in a session transcript that carried this
-    run's prompts — each must be the pinned `rule-checker`, with NO model parameter, and its
-    prompt the prompt file's exact text (a final newline aside). The protocol says "each prompt
-    verbatim"; the working agent types it, so this is where a slip in the copy is caught."""
+def check_spawns(root: Path, rid: str, transcript: str):
+    """THE SPAWN CHECK (14z-178): the Agent calls in a session transcript that carried run `rid`'s
+    prompts — each must be the pinned `rule-checker`, with NO model parameter, its prompt the
+    prompt file's exact text (a final newline aside), and its OWN transcript must show it ran on
+    the definition's model and nothing else, with no model fallback (measured 14z-178, probe A14:
+    a safety-classifier stop moved a worker from claude-opus-5-5 to claude-opus-4-8 — a reader
+    that fell back is an uncalibrated instrument, whatever its verdict says). The protocol says
+    "each prompt verbatim"; the working agent types it, so this is where a slip in the copy is
+    caught. -> (report lines, n bad, [missing slots])"""
     import glob as _glob
     import json as _json
-    root = REPO
-    stage = root / STAGING / a.id
-    if not stage.is_dir():
-        die(f"no staged prompts for {a.id} under {STAGING}/")
-    base = os.path.expanduser("~/.claude/projects/" + re.sub(r"[^A-Za-z0-9]", "-", str(root)))
-    hits = sorted(_glob.glob(os.path.join(base, a.session + "*.jsonl")))
-    if len(hits) != 1:
-        die(f"--session {a.session!r} matches {len(hits)} transcripts under {base}")
+    stage = root / STAGING / rid
     want = {slot: (stage / f"prompt_{slot}.md").read_text() for slot in "ab" if (stage / f"prompt_{slot}.md").is_file()}
-    seen, bad = {}, 0
-    for line in open(hits[0], encoding="utf-8"):
+    dtext = (root / READER).read_text()
+    dm = re.search(r"(?m)^model:\s*(\S+)", dtext)
+    de = re.search(r"(?m)^effort:\s*(\S+)", dtext)
+    def_model, def_effort = (dm.group(1) if dm else ""), (de.group(1) if de else "")
+    workers = {}
+    for meta_p in _glob.glob(transcript[:-len(".jsonl")] + "/subagents/*.meta.json"):
+        try:
+            tu = _json.load(open(meta_p)).get("toolUseId")
+        except (OSError, ValueError):
+            continue
+        ran, fell, eff, ctx = set(), [], set(), []
+        for wl in open(meta_p[:-len(".meta.json")] + ".jsonl", encoding="utf-8"):
+            try:
+                wr = _json.loads(wl)
+            except ValueError:
+                continue
+            att = wr.get("attachment") if wr.get("type") == "attachment" else None
+            if isinstance(att, dict) and att.get("type") == "instructions":
+                ctx += [os.path.basename(str(f.get("path"))) for f in att.get("files") or [] if isinstance(f, dict)]
+            if wr.get("type") != "assistant":
+                continue
+            msg = wr.get("message") or {}
+            ran.add(str(msg.get("model")))
+            eff.add(str(wr.get("effort")))
+            for wb in msg.get("content") if isinstance(msg.get("content"), list) else []:
+                if isinstance(wb, dict) and wb.get("type") == "fallback":
+                    fell.append(f"{(wb.get('from') or {}).get('model')}->{(wb.get('to') or {}).get('model')}")
+        workers[tu] = (ran, fell, eff, ctx)
+    out, seen, bad = [], {}, 0
+    for line in open(transcript, encoding="utf-8"):
         try:
             r = _json.loads(line)
         except ValueError:
@@ -576,25 +604,118 @@ def cmd_spawned(a):
             if b.get("type") != "tool_use" or b.get("name") not in ("Agent", "Task"):
                 continue
             i = b.get("input") or {}
-            m = re.search(re.escape(f"{STAGING}/{a.id}/") + r"([ab])\b", str(i.get("prompt", "")))
+            m = re.search(re.escape(f"{STAGING}/{rid}/") + r"([ab])\b", str(i.get("prompt", "")))
             if not m:
                 continue
             slot = m.group(1)
             same = str(i.get("prompt", "")).strip() == want.get(slot, "").strip()
-            ok = same and i.get("subagent_type") == "rule-checker" and not i.get("model")
+            ran, fell, eff, ctx = workers.get(b.get("id"), (None, [], set(), []))
+            # the definition's model and effort, no fallback, and NO instructions attachment — the
+            # reader is context-free by ruling ("never CLAUDE.md"), measured to be so under
+            # omitClaudeMd (probe A13), and this is the per-run proof
+            ran_ok = ran is not None and ran == {def_model} and not fell and eff == {def_effort} and not ctx
+            ok = same and i.get("subagent_type") == "rule-checker" and not i.get("model") and ran_ok
             bad += not ok
             seen.setdefault(slot, []).append(ok)
-            print(f"  slot {slot}: type {i.get('subagent_type')!r} model {i.get('model') or '-'} prompt "
-                  f"{'IDENTICAL' if same else 'DIFFERS from ' + str(stage / f'prompt_{slot}.md')} -> {'ok' if ok else 'BAD'}")
-    missing = [s for s in want if s not in seen]
+            ranmsg = (("NO WORKER TRANSCRIPT" if ran is None else ",".join(sorted(ran)) or "-")
+                      + (f" at {','.join(sorted(eff))}" if ran is not None else "")
+                      + (f" FALLBACK {';'.join(fell)}" if fell else "") + (f" CONTEXT {','.join(ctx)}" if ctx else ""))
+            out.append(f"  slot {slot}: type {i.get('subagent_type')!r} model {i.get('model') or '-'} prompt "
+                       f"{'IDENTICAL' if same else 'DIFFERS from ' + str(stage / f'prompt_{slot}.md')} ran {ranmsg}"
+                       f" (definition {def_model} at {def_effort}) -> {'ok' if ok else 'BAD'}")
+    missing = [s_ for s_ in want if s_ not in seen]
     # a self-calibration puts one fixture in both slots: one spawn on the real slot is the protocol
-    ctl = read_kv(root / RUNS / a.id / "control.txt") if (root / RUNS / a.id / "control.txt").is_file() else {}
-    meta = read_kv(root / RUNS / a.id / "meta.tsv") if (root / RUNS / a.id / "meta.tsv").is_file() else {}
+    ctl = read_kv(root / RUNS / rid / "control.txt") if (root / RUNS / rid / "control.txt").is_file() else {}
+    meta = read_kv(root / RUNS / rid / "meta.tsv") if (root / RUNS / rid / "meta.tsv").is_file() else {}
     if meta.get("decision") == "calibration" and ctl.get("fixture") == meta.get("subject") and len(seen) == 1:
         missing = []
-    for s_ in missing:
-        print(f"  slot {s_}: NO spawn carried this prompt")
-    print(f"spawned {a.id}: {sum(len(v) for v in seen.values())} call(s), {bad} bad, {len(missing)} slot(s) missing")
+    out += [f"  slot {s_}: NO spawn carried this prompt" for s_ in missing]
+    return out, bad, missing
+
+
+def collect_reports(root: Path, rid: str, transcript: str):
+    """-> {slot: the report text} for run `rid`: each slot's reader found through the Agent call
+    that carried its prompt (the `toolUseId` link `check_spawns` uses), its report read from the
+    reader's OWN transcript — the `message` of its `SubagentHandback` call, else its last text —
+    so the verdict file is the reader's words byte for byte, never retyped (14z-178)."""
+    import glob as _glob
+    import json as _json
+    calls = {}
+    for line in open(transcript, encoding="utf-8"):
+        try:
+            r = _json.loads(line)
+        except ValueError:
+            continue
+        c = (r.get("message") or {}).get("content")
+        for b in c if isinstance(c, list) else []:
+            if b.get("type") == "tool_use" and b.get("name") in ("Agent", "Task"):
+                m = re.search(re.escape(f"{STAGING}/{rid}/") + r"([ab])\b", str((b.get("input") or {}).get("prompt", "")))
+                if m:
+                    calls[b.get("id")] = m.group(1)
+    out = {}
+    for meta_p in _glob.glob(transcript[:-len(".jsonl")] + "/subagents/*.meta.json"):
+        try:
+            slot = calls.get(_json.load(open(meta_p)).get("toolUseId"))
+        except (OSError, ValueError):
+            continue
+        if not slot:
+            continue
+        hand, last = None, None
+        for wl in open(meta_p[:-len(".meta.json")] + ".jsonl", encoding="utf-8"):
+            try:
+                wr = _json.loads(wl)
+            except ValueError:
+                continue
+            if wr.get("type") != "assistant":
+                continue
+            for wb in (wr.get("message") or {}).get("content") or []:
+                if not isinstance(wb, dict):
+                    continue
+                if wb.get("type") == "tool_use" and wb.get("name") == "SubagentHandback":
+                    hand = str((wb.get("input") or {}).get("message", ""))
+                elif wb.get("type") == "text" and wb.get("text", "").strip():
+                    last = wb["text"]
+        if slot in out:
+            die(f"slot {slot} of {rid} was read by more than one reader — pass the right one by hand")
+        out[slot] = hand if hand is not None else (last or "")
+    return out
+
+
+def cmd_collect(a):
+    import glob as _glob
+    root = REPO
+    stage = root / STAGING / a.id
+    if not stage.is_dir():
+        die(f"no staged prompts for {a.id} under {STAGING}/")
+    base = os.path.expanduser("~/.claude/projects/" + re.sub(r"[^A-Za-z0-9]", "-", str(root)))
+    hits = [a.transcript] if a.transcript else sorted(_glob.glob(os.path.join(base, a.session + "*.jsonl")))
+    if len(hits) != 1:
+        die(f"--session {a.session!r} matches {len(hits)} transcripts under {base}")
+    got = collect_reports(root, a.id, hits[0])
+    if not got:
+        die(f"no reader of {a.id} found in {hits[0]}")
+    for slot, text in sorted(got.items()):
+        (stage / f"verdict_{slot}.txt").write_text(text.rstrip("\n") + "\n")
+        print(f"  {stage}/verdict_{slot}.txt  ({len(text.splitlines())} lines)")
+    print(f"collected {a.id}: {', '.join(sorted(got))}")
+
+
+def cmd_spawned(a):
+    import glob as _glob
+    root = REPO
+    if not (root / STAGING / a.id).is_dir():
+        die(f"no staged prompts for {a.id} under {STAGING}/")
+    if a.transcript:
+        transcript = a.transcript
+    else:
+        base = os.path.expanduser("~/.claude/projects/" + re.sub(r"[^A-Za-z0-9]", "-", str(root)))
+        hits = sorted(_glob.glob(os.path.join(base, a.session + "*.jsonl")))
+        if len(hits) != 1:
+            die(f"--session {a.session!r} matches {len(hits)} transcripts under {base}")
+        transcript = hits[0]
+    out, bad, missing = check_spawns(root, a.id, transcript)
+    print("\n".join(out))
+    print(f"spawned {a.id}: {len(out) - len(missing)} call(s), {bad} bad, {len(missing)} slot(s) missing")
     if bad or missing:
         sys.exit(1)
 
@@ -808,8 +929,59 @@ def selftest() -> int:
             parse_verdict(text, qs); bad += 1; print(f"  selftest WRONG: {name} parsed")
         except ValueError:
             pass
+    bad += spawn_selftest()
     cases = cases + [("procedure", proc, True)]
     print(f"selftest: {len(cases)} fixtures, {bad} wrong")
+    return bad
+
+
+def spawn_selftest():
+    """check_spawns() against a synthetic root and transcript: the conforming spawn reads ok, and
+    each way a spawn can be wrong reads BAD — a model parameter, another type, a differing prompt,
+    another model, a fallback, no worker transcript (14z-178). -> the number of wrong cases."""
+    import json as _json
+    import tempfile
+    bad = 0
+    d = Path(tempfile.mkdtemp())
+    try:
+        (d / ".claude/agents").mkdir(parents=True)
+        (d / READER).write_text("---\nname: rule-checker\nmodel: m-good\neffort: high\n---\nbody\n")
+        rid = "2099-01-01-01"
+        st = d / STAGING / rid
+        st.mkdir(parents=True)
+        (st / "prompt_a.md").write_text(f"read {STAGING}/{rid}/a now\n")
+        cases = [("conforming", {}, "m-good", False, True), ("a model parameter", {"model": "opus"}, "m-good", False, False),
+                 ("another type", {"subagent_type": "general-purpose"}, "m-good", False, False),
+                 ("a differing prompt", {"prompt": f"read {STAGING}/{rid}/a later"}, "m-good", False, False),
+                 ("another model", {}, "m-other", False, False), ("a fallback", {}, "m-good", True, False),
+                 ("no worker transcript", {}, None, False, False),
+                 ("another effort", {}, "m-good", "effort", False), ("a CLAUDE.md attachment", {}, "m-good", "context", False)]
+        for n, (name, over, model, fell, ok) in enumerate(cases):
+            tr = d / f"t{n}.jsonl"
+            inp = {"subagent_type": "rule-checker", "prompt": f"read {STAGING}/{rid}/a now"}
+            inp.update(over)
+            tr.write_text(_json.dumps({"type": "assistant", "message": {"content": [
+                {"type": "tool_use", "id": f"call{n}", "name": "Agent", "input": inp}]}}) + "\n")
+            if model:
+                sd = d / f"t{n}" / "subagents"
+                sd.mkdir(parents=True)
+                (sd / "agent-x.meta.json").write_text(_json.dumps({"toolUseId": f"call{n}"}))
+                body = [{"type": "text", "text": "Q1: OK"}]
+                if fell is True:
+                    body = [{"type": "fallback", "from": {"model": "m-good"}, "to": {"model": "m-old"}}] + body
+                recs = [{"type": "assistant", "effort": "low" if fell == "effort" else "high",
+                         "message": {"model": model, "content": body}}]
+                if fell == "context":
+                    recs.insert(0, {"type": "attachment", "attachment": {"type": "instructions",
+                                    "files": [{"path": "/r/CLAUDE.md", "type": "Project"}]}})
+                (sd / "agent-x.jsonl").write_text("".join(_json.dumps(r) + "\n" for r in recs))
+            out, nbad, _ = check_spawns(d, rid, str(tr))
+            got = nbad == 0 and bool(out)
+            if got != ok:
+                bad += 1
+                print(f"  selftest WRONG: spawn check '{name}' read {'ok' if got else 'BAD'}: {out}")
+    finally:
+        shutil.rmtree(d)
     return bad
 
 
@@ -824,7 +996,10 @@ def main():
     p.add_argument("--calibrate"); p.add_argument("--session"); p.add_argument("--model"); p.add_argument("--id")
     r = sub.add_parser("record"); r.add_argument("id"); r.add_argument("--a", required=True); r.add_argument("--b", required=True)
     s = sub.add_parser("resolve"); s.add_argument("id"); s.add_argument("--how", required=True)
-    sp = sub.add_parser("spawned"); sp.add_argument("id"); sp.add_argument("--session", required=True)
+    sp = sub.add_parser("spawned"); sp.add_argument("id")
+    g = sp.add_mutually_exclusive_group(required=True); g.add_argument("--session"); g.add_argument("--transcript")
+    co = sub.add_parser("collect"); co.add_argument("id")
+    g2 = co.add_mutually_exclusive_group(required=True); g2.add_argument("--session"); g2.add_argument("--transcript")
     c = sub.add_parser("check"); c.add_argument("--root", default=str(REPO))
     a = ap.parse_args()
     if a.selftest:
@@ -841,6 +1016,8 @@ def main():
         cmd_resolve(a); return 0
     if a.cmd == "spawned":
         cmd_spawned(a); return 0
+    if a.cmd == "collect":
+        cmd_collect(a); return 0
     if a.cmd == "check":
         bad = cmd_check(Path(a.root).resolve())
         if bad:

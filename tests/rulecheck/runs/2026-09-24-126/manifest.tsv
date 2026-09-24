@@ -1,0 +1,4 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+audit_forced_pick_fidelity.sh.txt	c621b3d2f46f20bec7847c50a9ae8b31f087252d
+forced_pick_fidelity.tsv	51a1704ed5aafb63fe6f03bb57e155bd0798869f
+name_moves.py.txt	db64228de2403f25e1400a696ea20b5b3444878e

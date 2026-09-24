@@ -6,3 +6,4 @@ negative (proc-clean-14z176) shows no worker, so QP5 reads N-A there, and a read
 EVERY worker would calibrate clean: QP5 is proven quiet on a conforming worker here, and loud
 on the planted one ([VSP-19], both directions). Not handed to the checker.
 - 14z-178 (the PINNED READER, #172 S4 step 4): recalibrated as run 2026-09-24-123 on `.claude/agents/rule-checker.md` (rule-checker@efa6cdd64dd0: Opus 5.5, effort high, omitClaudeMd — no CLAUDE.md or memory in context, unlike every earlier run), plant CAUGHT, verdict OK -.
+- 14z-178, second round (the model pinned by VERSION id, claude-opus-5-5, never the alias — #158): run 2026-09-24-133 on rule-checker@163e4ce9cf7b, plant CAUGHT, verdict OK -; every reader verified from its own transcript (`rulecheck.py spawned`) and every verdict collected from it (`collect`). Extra firings as in the round above.

@@ -6,3 +6,4 @@ which carries a report at [545] with one imprecise line ("the sweep also caught"
 that the pre-tool measurement found) — a reader flagging that would be RIGHT, so it is not a
 clean negative. Not handed to the checker.
 - 14z-178 (the PINNED READER, #172 S4 step 4): recalibrated as run 2026-09-24-122 on `.claude/agents/rule-checker.md` (rule-checker@efa6cdd64dd0: Opus 5.5, effort high, omitClaudeMd — no CLAUDE.md or memory in context, unlike every earlier run), plant CAUGHT, verdict OK -.
+- 14z-178, second round (the model pinned by VERSION id, claude-opus-5-5, never the alias — #158): run 2026-09-24-132 on rule-checker@163e4ce9cf7b, plant CAUGHT, verdict OK -; every reader verified from its own transcript (`rulecheck.py spawned`) and every verdict collected from it (`collect`). Extra firings as in the round above.

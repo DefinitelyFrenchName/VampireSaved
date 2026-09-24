@@ -75,11 +75,15 @@ premise was unverifiable. An incomplete packet is a stop, not noise.
 agent's context and therefore its framing — given the prompt file verbatim
 and nothing else. It reads the files with its own tools. It runs nothing and
 modifies nothing. **Since 14z-178 that agent is the PINNED READER**: a subagent of type
-`rule-checker` (`.claude/agents/rule-checker.md` — `opus`, effort `high`, Read/Grep/Glob,
-`omitClaudeMd: true`), spawned with NO model parameter (the call gate refuses one); `prepare`
+`rule-checker` (`.claude/agents/rule-checker.md` — `claude-opus-5-5`, effort `high`, Read/Grep/Glob,
+`omitClaudeMd: true`; the model a VERSION id, since an alias could move with the sha unchanged), spawned with NO model parameter (the call gate refuses one); `prepare`
 records the definition's sha as the run's `reader`, a calibration counts only if the CURRENT
-definition read it, and `rulecheck.py spawned <id> --session <prefix>` checks from the session
-transcript that each prompt reached a `rule-checker` verbatim, with no model.
+definition read it, `rulecheck.py spawned <id> --session <prefix>` checks from the session
+transcript that each prompt reached a `rule-checker` verbatim, with no model, and that the
+reader's own transcript shows the definition's model and effort, no fallback and no instructions
+attachment; and `rulecheck.py collect <id> --session <prefix>` writes each reader's verdict file
+from its own transcript, so a verdict is never retyped. The run: `prepare` -> spawn -> `collect`
+-> `spawned` -> `record`.
 
 **What comes out.** Six lines and nothing else: the five questions, each
 `VIOLATED`, `OK` or `N-A` with evidence as a path and line or a verbatim
@@ -290,7 +294,15 @@ checklist with QP5 and the widened QP3 — and each came back as expected: the s
 caught on their EXPECT question (`proc-planted-spec-14z178` on QP5 alone), and the three negatives
 OK beside a caught plant (`proc-clean-worker-14z178` OK on QP5 for a conforming worker). The first
 runs of readers with no CLAUDE.md and no memory index in context read the same fixtures the same
-way the earlier readers had, extra firings included (each fixture's NOTES).
+way the earlier readers had, extra firings included (each fixture's NOTES). **Then again, on the VERSION id (runs `2026-09-24-124` to `-133`):**
+the definition first named the `opus` alias, which could move to a new model with the definition's
+sha unchanged — the silent model change #158 names — so it was pinned to `claude-opus-5-5`
+(`agent_defs.py` refuses an alias for it, control `alias-model`) and every fixture recalibrated
+once more on that sha. Every reader of both rounds was verified from its OWN transcript by
+`rulecheck.py spawned`: the pinned type, no model parameter, the prompt verbatim, the definition's
+model and effort, no model FALLBACK (a safety-classifier stop can move a worker to another model —
+`docs/platform/gotchas.md`), no instructions attachment; and each verdict file was written by
+`rulecheck.py collect` from the reader's own `SubagentHandback`, never retyped.
 
 ## What it will not catch
 

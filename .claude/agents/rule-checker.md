@@ -1,7 +1,7 @@
 ---
 name: rule-checker
 description: An independent, context-free checker for one prepared rule-checker packet. Spawn it only with a prompt file that tools/rulecheck.py prepared, passed verbatim, and never with a model parameter. It reads the files the prompt names and answers the prompt's fixed questions in the prompt's exact format.
-model: opus
+model: claude-opus-5-5
 effort: high
 omitClaudeMd: true
 tools: Read, Grep, Glob

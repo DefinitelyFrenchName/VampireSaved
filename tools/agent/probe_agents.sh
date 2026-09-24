@@ -54,6 +54,8 @@
 #       a rule-checker-shaped definition, the same with `omitClaudeMd: true`, general-purpose and
 #       Explore (the cannot-leg), each read by its no-tool ANSWER against its instructions
 #       ATTACHMENT — details at the leg
+#   A14 a definition naming its model by VERSION id (claude-opus-5-5) runs on that model under a
+#       haiku parent (14z-178: the pinned rule-checker names its id, never the `opus` alias, #158)
 #   (A9 and A10 added after rule-checker run 2026-09-23-109 found both premises unmeasured;
 #   run 2026-09-23-110 then found A10's delivery check VACUOUS — it matched the spec's own
 #   token — A9's general-purpose half under one parent only, and A8 not asserting the prompt
@@ -61,7 +63,7 @@
 #   against THIS call's result or hand-back, with a wrong-id control; A9 runs general-purpose
 #   under both parents; A8 asserts the hook's input carries the call's prompt)
 #
-# Usage: tools/agent/probe_agents.sh [SCRATCH_DIR]   (~7 min: nineteen short runs, one on Fable 5.1)
+# Usage: tools/agent/probe_agents.sh [SCRATCH_DIR]   (~7 min: twenty short runs, one on Fable 5.1)
 # Prints one PASS/FAIL line per leg and exits non-zero on any FAIL.
 # Needs: the `claude` CLI and python3. Writes only under SCRATCH_DIR (default: a mktemp dir), except
 # A13's memory index, created under ~/.claude/projects/<the scratch project>/memory/ only if absent and
@@ -425,6 +427,45 @@ PY
 case "$a13" in
   1*) echo "PASS A13: ${a13#1 } (C = the CLAUDE.md codeword, M = the memory codeword; answer = what the worker named with no tool, attached = what its instructions attachment listed) — the main session names CLAUDE.md's (the can-leg), Explore names nothing and carries nothing (the cannot-leg), and for w-rc, w-rco and general-purpose the answer agrees with the attachment";;
   *)  echo "FAIL A13: ${a13:-no result} (main must name C, Explore must be --/--, no spec may carry a codeword, no worker may read a file, and each worker's answer must agree with its attachment)"; fail=1;;
+esac
+
+# A14: a definition naming its model by VERSION id (`claude-opus-5-5`, as the pinned rule-checker
+# does since 14z-178, #158) runs on THAT model — under a HAIKU parent, so an id Claude Code ignored
+# (falling back to the caller's model, A9) would read as haiku, not pass unseen as it would under an
+# Opus caller
+defn w-id claude-opus-5-5 high "Read"
+run q haiku "" 0 'Call the Agent tool with subagent_type "w-id" and no model parameter, with the prompt "Reply with exactly: Q14". Reply with its answer.'
+# READ THE MODEL REQUESTED, NOT ONLY THE ONE THAT ANSWERED: the leg's first run (14z-178) read
+# claude-opus-4-8 — a safety-classifier stop on the first answer had made Claude Code FALL BACK,
+# recorded as a `fallback` content block {from: claude-opus-5-5, to: claude-opus-4-8}. So the model
+# requested is a fallback's `from` where there is one, and a fallback is reported, never hidden
+a14=$(python3 - "$S/log_q.jsonl" <<'PY'
+import glob, json, sys
+t = next(json.loads(l)["transcript"] for l in open(sys.argv[1]))
+out = []
+for meta in glob.glob(t[:-len(".jsonl")] + "/subagents/*.meta.json"):
+    if json.load(open(meta)).get("agentType") != "w-id":
+        continue
+    req, ran, fell, eff = set(), set(), [], set()
+    for line in open(meta[:-len(".meta.json")] + ".jsonl"):
+        r = json.loads(line)
+        if r.get("type") != "assistant":
+            continue
+        m = r.get("message") or {}
+        ran.add(str(m.get("model"))); eff.add(str(r.get("effort")))
+        blocks = [b for b in (m.get("content") or []) if isinstance(b, dict) and b.get("type") == "fallback"]
+        for b in blocks:
+            fell.append(f"{b['from']['model']}->{b['to']['model']}"); req.add(b["from"]["model"])
+        if not blocks and not fell:
+            req.add(str(m.get("model")))
+    out.append(f"{'1' if req == {'claude-opus-5-5'} and eff == {'high'} else '0'} requested={','.join(sorted(req))} ran={','.join(sorted(ran))}"
+               + (f" FALLBACK {';'.join(fell)}" if fell else ""))
+print(" ".join(out) or "0 none")
+PY
+)
+case "$a14" in
+  1*) echo "PASS A14: a definition naming claude-opus-5-5 requested that model at high under a haiku parent (${a14#1 }) — a version id in the model line is applied, not dropped to the caller's; a fallback, if any, is named";;
+  *)  echo "FAIL A14: ${a14:-no result}"; fail=1;;
 esac
 
 echo "scratch: $S"

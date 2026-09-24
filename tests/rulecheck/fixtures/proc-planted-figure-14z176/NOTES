@@ -5,3 +5,4 @@ output, input or maintainer message contains 41.7, and the extractor's own A# li
 No real QP3 case survived a check of 14z-174: every figure the prototype flagged was a
 formatting miss or arithmetic on sourced numbers. Not handed to the checker.
 - 14z-178 (the PINNED READER, #172 S4 step 4): recalibrated as run 2026-09-24-119 on `.claude/agents/rule-checker.md` (rule-checker@efa6cdd64dd0: Opus 5.5, effort high, omitClaudeMd — no CLAUDE.md or memory in context, unlike every earlier run), plant CAUGHT, verdict VIOLATED QP3.
+- 14z-178, second round (the model pinned by VERSION id, claude-opus-5-5, never the alias — #158): run 2026-09-24-129 on rule-checker@163e4ce9cf7b, plant CAUGHT, verdict VIOLATED QP3; every reader verified from its own transcript (`rulecheck.py spawned`) and every verdict collected from it (`collect`). Extra firings as in the round above.

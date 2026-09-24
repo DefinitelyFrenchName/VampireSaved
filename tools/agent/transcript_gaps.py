@@ -270,14 +270,17 @@ def subagents(transcript):
     text match over the attachment's JSON missed every one of them, and a tool result that
     QUOTES CLAUDE.md must not count. VERSIONS are the Claude Code versions its records carry
     (2.1.240's workers carry no such record at all — whether it sent none or recorded none is
-    not known)."""
+    not known). FALLBACKS are the `fallback` content blocks of its assistant records,
+    `<from>-><to>` (14z-178, probe A14: a safety-classifier stop moved a worker from
+    claude-opus-5-5 to claude-opus-4-8 — so the models a worker ran on are not always the one
+    it requested)."""
     out = []
     for meta in sorted(glob.glob(transcript[:-len(".jsonl")] + "/subagents/*.meta.json")):
         try:
             m = json.load(open(meta))
         except (OSError, ValueError):
             continue
-        models, efforts, n, context, versions = set(), set(), 0, set(), set()
+        models, efforts, n, context, versions, fallbacks = set(), set(), 0, set(), set(), []
         try:
             for line in open(meta[:-len(".meta.json")] + ".jsonl"):
                 try:
@@ -290,6 +293,10 @@ def subagents(transcript):
                     n += 1
                     models.add(str((r.get("message") or {}).get("model")))
                     efforts.add(str(r.get("effort")))
+                    body = (r.get("message") or {}).get("content")
+                    for b in body if isinstance(body, list) else []:
+                        if isinstance(b, dict) and b.get("type") == "fallback":
+                            fallbacks.append(f"{(b.get('from') or {}).get('model')}->{(b.get('to') or {}).get('model')}")
                 att = r.get("attachment") if r.get("type") == "attachment" else None
                 if isinstance(att, dict) and att.get("type") == "instructions":
                     for f in att.get("files") or []:
@@ -297,7 +304,7 @@ def subagents(transcript):
                             context.add(f"{f.get('type')}:{os.path.basename(f['path'])}")
         except OSError:
             pass
-        out.append((m.get("agentType"), m.get("description", ""), models, efforts, n, context, versions))
+        out.append((m.get("agentType"), m.get("description", ""), models, efforts, n, context, versions, fallbacks))
     return out
 
 
@@ -390,7 +397,8 @@ def selftest():
                       {"path": "/r/CLAUDE.md", "type": "Project", "content": "x"},
                       {"path": "/m/memory/MEMORY.md", "type": "AutoMem", "content": "y"}]}},
                   {"type": "assistant", "effort": "high", "message": {"model": "m1", "content": "the effort was low"}},
-                  {"type": "assistant", "effort": "high", "message": {"model": "m1"}}):
+                  {"type": "assistant", "effort": "high", "message": {"model": "m1", "content": [
+                      {"type": "fallback", "from": {"model": "m0"}, "to": {"model": "m1"}}]}}):
             g.write(json.dumps(r) + "\n")
     # a second worker: CLAUDE.md QUOTED in a tool result and named in text, never attached,
     # and an attachment of another type — its context must read EMPTY
@@ -401,11 +409,11 @@ def selftest():
                    "content": "Contents of /r/CLAUDE.md (project instructions, checked into the codebase)"}]}},
                   {"type": "attachment", "attachment": {"type": "deferred_tools_delta", "files": [
                       {"path": "/r/CLAUDE.md", "type": "Project"}]}},
-                  {"type": "assistant", "effort": "high", "message": {"model": "m2"}}):
+                  {"type": "assistant", "effort": "high", "message": {"model": "m2", "content": "a fallback from m0 was feared"}}):
             g.write(json.dumps(r) + "\n")
     sub_ok = subagents(top) == [
-        ("general-purpose", "reader run 1", {"m1"}, {"high"}, 2, {"Project:CLAUDE.md", "AutoMem:MEMORY.md"}, {"9.9.1"}),
-        ("Explore", "no context", {"m2"}, {"high"}, 1, set(), set())]
+        ("general-purpose", "reader run 1", {"m1"}, {"high"}, 2, {"Project:CLAUDE.md", "AutoMem:MEMORY.md"}, {"9.9.1"}, ["m0->m1"]),
+        ("Explore", "no context", {"m2"}, {"high"}, 1, set(), set(), [])]
     import shutil
     shutil.rmtree(sd)
     got = [(round(g), c) for g, c, _, _ in gaps(recs, 20)]
@@ -445,16 +453,19 @@ def main():
             print(f"--subagents {a.subagents}: no transcript matches", file=sys.stderr)
             return 2
         n = 0
+        nfall = 0
         census = {}
         for f in hit:
-            for at, desc, models, efforts, k, context, versions in subagents(f):
+            for at, desc, models, efforts, k, context, versions, fallbacks in subagents(f):
                 if a.match and not re.search(a.match, desc):
                     continue
                 n += 1
                 ctx = ",".join(sorted(context)) or "-"
                 print(f"{os.path.basename(f)[:8]}  {str(at):18} {desc[:48]:48} model {','.join(sorted(models)) or '-'}"
                       f"  effort {','.join(sorted(efforts)) or '-'}  context {ctx}"
-                      f"  v{','.join(sorted(versions)) or '-'}  ({k} records)")
+                      f"  v{','.join(sorted(versions)) or '-'}  ({k} records)"
+                      + (f"  FALLBACK {';'.join(fallbacks)}" if fallbacks else ""))
+                nfall += len(fallbacks)
                 key = (str(at), ctx, ",".join(sorted(versions)) or "-")
                 census[key] = census.get(key, 0) + 1
         # the CONTEXT census (14z-178): which worker types were handed CLAUDE.md / the memory
@@ -462,7 +473,7 @@ def main():
         for (at, ctx, ver), c in sorted(census.items()):
             print(f"context-census: {c:4d}  {at:18} context {ctx:34} v{ver}")
         # always a count line: an empty listing and a blind reader must not look alike
-        print(f"subagents: {n}")
+        print(f"subagents: {n}  fallbacks: {nfall}")
         return 0
     if a.refusals:
         hit = [f for f in files if os.path.basename(f).startswith(a.refusals)]

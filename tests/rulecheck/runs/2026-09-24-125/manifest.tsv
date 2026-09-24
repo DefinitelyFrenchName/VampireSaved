@@ -1,0 +1,4 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+git_log.txt	f4965549275a0a2f6e4714f77057ecf371099b21
+issue_151_timeline.txt	22ed99cc817ba508109064a58c841acaedcee738
+state_row_draft.txt	47dcea190599b326165b3de69789909e1c9c931f

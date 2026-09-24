@@ -2871,7 +2871,7 @@ conversation's auto memory isn't loaded"* in a non-fork subagent. In an INTERACT
 transcript — an observation, not a leg: a HEADLESS `claude -p` session loaded no auto-memory at
 all, so A13's memory half reads VOID there and cannot be scripted). The archive agrees:
 `transcript_gaps.py --subagents all` shows the attachment on every `general-purpose` worker
-since 2.1.270 (217 of them) and the one `measurer`; the 16 on 2.1.240 carry no such record,
+since 2.1.270 (217 of them) and the one `measurer`; the 16 on 2.1.240 carried no such record (read 2026-09-24 before those transcripts aged out — the entry below),
 and whether that version sent none or recorded none is not known. **Read the attachment's
 `files` list; a text match over the record's JSON missed every one** (the rendered
 `Contents of … (project instructions` string lives elsewhere in the line).
@@ -2891,3 +2891,38 @@ forms a matcher knew (A10 FAILED on it until it learned the third; `extract.py` 
 notification record and so never sourced such a report). An interactive session in the same
 hour delivered its workers' reports as hand-backs, the notification saying *"it is not repeated
 here"* — so a reader of reports must accept all three.
+
+## CLAUDE CODE DELETES SESSION TRANSCRIPTS AFTER 30 DAYS — THE ARCHIVE THE AGENT TOOLING READS SHRINKS UNDER IT (measured 2026-09-24, 14z-178)
+
+`transcript_gaps.py --subagents all` read **288** worker transcripts in the morning of 14z-178
+and **280** that afternoon, with 15 workers added by the sitting in between: the 23 workers of the
+2.1.240 sessions (22-24 August — 16 `general-purpose`, 6 `Explore`, 1 fork) had been DELETED, and
+the oldest session transcript left was 25 August, 30 days back — Claude Code's default
+retention (`cleanupPeriodDays`, a user setting; this host sets none). The deletion happened during
+the sitting, most likely when the probe's headless `claude -p` runs started. **So every census over
+`~/.claude/projects/` is a census of the last 30 days**, and a figure quoted from it can stop being
+reproducible without anything in the tree changing: the "16 on 2.1.240 with no instructions
+record" of this sitting's context census was measured before the deletion and cannot be re-derived
+now. What is safe is what was CUT into the tree (`tests/rulecheck/fixtures/*/files/extract.txt`,
+`tests/agent/worker_fixture/`); a finding that rests on a raw transcript must quote its figure with
+the date it was read, or be cut into a fixture before the transcript ages out (14z-174's, behind
+the real QP1/QP4 fixture, would go around 2026-10-21 — its span is already cut).
+
+## A WORKER CAN FINISH ON ANOTHER MODEL THAN ITS DEFINITION NAMES — A SAFETY-CLASSIFIER STOP TRIGGERS A SILENT FALLBACK (measured 2026-09-24, 14z-178, Claude Code 2.1.281)
+
+`tools/agent/probe_agents.sh` A14 spawns a definition naming `model: claude-opus-5-5` from a
+haiku parent and asks it to *"Reply with exactly: Q14"*. On both full probe runs the worker's
+first answer was **stopped by a safety classifier** (a user record: *"Your response above was
+stopped by a safety classifier — this is not a tool or API error"*), and Claude Code **fell back
+to `claude-opus-4-8`**, which answered — recorded ONLY as a `fallback` content block `{from:
+claude-opus-5-5, to: claude-opus-4-8}` on the worker's next assistant record, with every later
+record's `message.model` reading `claude-opus-4-8`. An ad-hoc run of the same definition from the
+same parent, with a one-line body, did not fall back. So the model a worker's records show is not
+always the one it requested, and a reader of `message.model` alone would report the fallback
+model as if the definition had named it (A14's first form failed exactly that way).
+
+**For a calibrated instrument this is #158 arriving mid-run:** a `rule-checker` reader that fell
+back is an uncalibrated reader whatever its verdict says. `tools/rulecheck.py spawned` fails any
+reader whose own transcript shows a fallback, a model or effort other than the definition's, or an
+instructions attachment; `transcript_gaps.py --subagents` prints `FALLBACK <from>-><to>` per
+worker and counts them. The whole archive held none at 14z-178 (280 workers, the last 30 days).

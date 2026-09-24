@@ -24,7 +24,8 @@ and ONE optional key:
                call, receives CLAUDE.md; any other value reads as a setting and is refused)
 Any other key (`hooks`, `permissionMode`, `disallowedTools`, `mcpServers`, ...) is refused: a
 new key is a reviewed widening of this list, never a silent one. And every name in REQUIRED
-must be present; a name in CONTEXT_FREE must carry `omitClaudeMd: true` — the rule-checker is
+must be present; a name in PINNED_MODEL must name a version id, never an alias (#158); a name in
+CONTEXT_FREE must carry `omitClaudeMd: true` — the rule-checker is
 context-free by ruling (2026-09-23, 14z-175: "a generic checklist plus a transcript extract,
 never CLAUDE.md"). The body (the worker's prompt) must be non-empty.
 
@@ -47,6 +48,11 @@ ALLOWED_TOOLS = ("Bash", "Read", "Grep", "Glob")
 REQUIRED = ("measurer", "reader", "rule-checker")
 # the definitions that must launch with no CLAUDE.md in context (see OPTIONAL above)
 CONTEXT_FREE = ("rule-checker",)
+# the definitions whose model must be a VERSION id, never an alias: the rule-checker's calibrations
+# bind to its definition's sha, and an alias (`opus`) can move to a new model with the sha unchanged
+# — the silent model change #158 names, against the 2026-09-17 ruling "a change of model is a
+# recalibration" (14z-178)
+PINNED_MODEL = ("rule-checker",)
 
 
 def parse(path):
@@ -101,6 +107,8 @@ def check(path):
                 bad.append(f"tool {t!r} not in {'/'.join(ALLOWED_TOOLS)}")
     if "omitClaudeMd" in keys and keys["omitClaudeMd"] != "true":
         bad.append(f"omitClaudeMd {keys['omitClaudeMd']!r} is not exactly true")
+    if stem in PINNED_MODEL and keys.get("model") and not re.match(r"^claude-(opus|sonnet|haiku)-[0-9]", keys["model"]):
+        bad.append(f"model {keys['model']!r} is an alias (a calibrated reader needs a version id, e.g. claude-opus-5-5, #158)")
     if stem in CONTEXT_FREE and keys.get("omitClaudeMd") != "true":
         bad.append("omitClaudeMd: true missing (a context-free checker; without it the worker receives CLAUDE.md, probe_agents A13)")
     if not body:
