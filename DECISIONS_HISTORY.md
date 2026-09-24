@@ -707,6 +707,8 @@ sets `a0` to the sprite block — and its facts were homed in
 
 ## Ruled 2026-09-20 (14z-170 close) — M19 is FROZEN, NOT RELEASED: the release waits on the per-OS deliverable tickets
 
+**SUPERSEDED 2026-09-22 (14z-174), marked in place 2026-09-25 (14z-181):** merged-m19 WAS released on 2026-09-22 — seven assets on `freeze/merged-m19`, M18's pruned (STATE_HISTORY.md 14z-174 row (14); the approval is "Approved 2026-09-22 (14z-174) — the M19 release carries the `audit_mask_window_ff42a2` SKIP" above). #144 and #146 closed at 14z-174; #145 stays open. The entry below is kept as ruled.
+
 **What was put (the close report, after the freeze, the green close tier and the pushes):** *"Still open: #161 (Phobos's remaining +1), #162 (the orange flash), #163 (the column and the trap on an airborne victim — I extended its open item to the trap, since both were measured only on a grounded victim). M19 is frozen, not released; the release run is yours to call."*
 
 **Ruling (verbatim):** *"let's not release now, especially since we have tickets relative to the deliverables on various OS."*
