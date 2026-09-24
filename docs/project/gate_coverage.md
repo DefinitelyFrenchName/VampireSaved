@@ -13,11 +13,11 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**384 of 384 gates described.**
+**385 of 385 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 26 | 26 | the suite runners and their own ground truth |
+| [runner](#runner) | 27 | 27 | the suite runners and their own ground truth |
 | [docs](#docs) | 20 | 20 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 38 | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -30,7 +30,7 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 26 of 26 described.
+the suite runners and their own ground truth. 27 of 27 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
@@ -207,6 +207,14 @@ the suite runners and their own ground truth. 26 of 26 described.
 **HOW:** tests/lib/controls.sh (the contract's one reader) classes every gate's leading comment block and body; the three classes are compared with the frozen file; two controls neuter one gate's declaration and another's FIRED lines in copies of tests/ and must move them between classes.
 
 **EXPECTS:** PASS when the census equals the frozen inventories in the allowed directions; a red names the gate that dropped a declaration, joined the header-only set, or appeared undeclared. It does not claim a printed verdict is honest — the runners' executed controls do.
+
+### `test_poke_readback.sh` — test, ci_portable
+
+**WHAT:** the census of tools/audit_poke_readback.py — for every tests/ci_emulator.tsv gate, each address the gate's rig POKES (literal `frame:addr:hex` tokens and the pokes of the name_moves / vanilla_join_rig schedules it generates) that a SAMPLE of the same gate reads (FIELDS, DUMPS, TAP/WATCH/RTAP, FBNEO_HTAP) — equals the live rows of the frozen tests/expected/poke_readback.tsv: every derived finding has a row with the census's LEG (main / control / mixed — a control leg's plant reads its poke back by design), every non-RETIRED row still derives, a READS-BACK row never silently disappears, and the known positive case (test_killshread_es's `stock` column over the rig's ff8509 poke) derives and is classed READS-BACK.
+
+**HOW:** the tool runs over the tree (and, for the controls, over a copy with one gate perturbed); the gate joins its output with the frozen table by (gate, address, sample); a finding without a row, a live row without a finding, or a mis-classed known case is a red.
+
+**EXPECTS:** PASS when the derived findings and the table agree. A red names the finding and the direction (new finding: classify it — FREEZE=1 adds it as UNCLASSIFIED for the maintainer; stale row: mark it RETIRED with why; the known case lost: the census went blind).
 
 ### `test_rule_checker.sh` — test, ci_portable
 

@@ -118,6 +118,7 @@ declares	test_must_fire_census
 declares	test_obj_records
 declares	test_pcrel_escapes
 declares	test_pod_black_foot_palette
+declares	test_poke_readback
 declares	test_poked_legs
 declares	test_pyron_medallion_2p
 declares	test_random_select_tenants

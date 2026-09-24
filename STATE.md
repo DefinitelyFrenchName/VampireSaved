@@ -194,7 +194,24 @@ them would reduce the legacy footprint from 5 bytes to 2.
 Only undecided items live here; a ruling moves its entry to `DECISIONS_HISTORY.md` in the
 commit that records it (CLAUDE.md [VSP-17]).
 
-*None open.*
+- **#171 slice Q6 — the 73 UNCLASSIFIED poke read-back findings (opened 14z-180, 2026-09-24).**
+  `tests/expected/poke_readback.tsv` lists every gate that SAMPLES an address its own rig
+  POKES (74 findings over 31 emulator gates, derived by `tools/audit_poke_readback.py`).
+  One is ruled: the killshread `stock` column, READS-BACK (2026-09-22). The other 73 need a
+  ruling each — **OBSERVES** (the poke sets the stage, the game changes it, the gate measures
+  the change: the row stays and grows the class) or **READS-BACK** (the column records the rig,
+  not the engine: it is dropped from the gate's compare or labelled a rig record in its
+  header, then the row shrinks the class). Recommendation: rule by family of poke — the
+  position pins (`ff8410`/`ff8810`, poked 40 frames before an event and sampled as `p1x`/`p2x`)
+  and the P2 HP pins (`ff8850`) are OBSERVES wherever the gate asserts a CHANGE after the pin,
+  READS-BACK wherever it asserts the pinned value itself; the id pokes (`ff8782`/`ff8b82`) sampled
+  as an identity guard are OBSERVES (the guard is what the poke is for); the stock top-ups
+  (`ff8509`) sampled as a meter reading are READS-BACK, the killshread shape. The table is the
+  list; this entry is the pointer. Nothing a player feels changes by the ruling — what changes
+  is what a gate CLAIMS. Two of the 73 sit on a CONTROL leg (`leg` column: a known-bad plant
+  that reads its poke back by design — `audit_defense_row_reads` ff8b82, `audit_reaction_class_live`
+  ff8454); the recommendation for those is a class of their own, CONTROL-PLANT, if the maintainer
+  wants them off the list rather than ruled one by one.
 
 ## THE DEADNESS REGISTER (opened 14z-71, maintainer's standing instruction)
 

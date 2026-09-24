@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tools/audit_poke_readback.py	dd6ed9b08e283852243b49f07e2b73fc31fb0be5
+tests/test_poke_readback.sh	e633e34999a8b5e0a254f65857ace84695e4160a
+tests/expected/poke_readback.tsv	52284e53a866b77287099afe425867cf491f9cce
+build/gatequal180/q6_evidence_14z180.txt	8935bf56a93a4163e7d70d4d753bb1a9dd5903c4
+build/gatequal180/ruling_killshread_2026-09-22.txt	29a4c70b1c9208f60976ea424eeb8742c0e35fb4
+tests/test_killshread_es.sh	bcec1d173fb59cf5e5a1d6bef845f52c12884835
+tools/name_moves.py	c9cfa55c4b16f6f9836e2d1d87926f5c424225bd
+tests/expected/PROVENANCE.md	1091dd1d86ec4281d8a96da4e8563c622ad43a64
+docs/project/gate_qualification_scope.md	3a98afc5f1ec75a6c53b9509ba68a9ad6d9cd34a
+STATE.md	5e6eba6882286f96b8de895ae30fb80b97739dce

@@ -1,0 +1,84 @@
+# tests/expected/poke_readback.tsv — THE POKE READ-BACK CLASSIFICATION (GitHub #171 slice Q6, shape 4).
+# One row per finding of tools/audit_poke_readback.py: a gate that SAMPLES an address its own rig
+# POKES. class: UNCLASSIFIED (the maintainer's to rule, one by one), OBSERVES (the poke sets the
+# stage, the game changes it, the gate measures the change — grows only), READS-BACK (the column
+# records the rig, not the engine — shrinks only: a READS-BACK column is dropped from the compare or
+# labelled in the gate's header as a rig record), RETIRED (the finding no longer derives; kept for the
+# record). Gate: tests/test_poke_readback.sh — every derived finding has a row, every live row derives.
+# leg: main (the measuring leg's poke), control (a poke on a line naming a plant, a control or a mode — a
+# known-bad plant that reads its poke back by design; rule-checker run 2026-09-24-144) or mixed.
+# gate<TAB>addr<TAB>sample<TAB>class<TAB>note<TAB>leg
+audit_column_shock	ff8850	FIELDS:hp	UNCLASSIFIED	derived 14z-180 (poke frames 2826-2830x2); awaiting the maintainer's ruling	main
+audit_column_shock	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2826-2830x2); awaiting the maintainer's ruling	main
+audit_column_shock	ff8852	FIELDS:white	UNCLASSIFIED	derived 14z-180 (poke frames 2826-2830x2); awaiting the maintainer's ruling	main
+audit_defense_row_reads	ff8b82	RTAP:ff8b82	UNCLASSIFIED	derived 14z-180 (poke frames 2680-2680x1); awaiting the maintainer's ruling	control
+audit_df_framework	ff8509	FIELDS:stocks	UNCLASSIFIED	derived 14z-180 (poke frames 3100-3120x2); awaiting the maintainer's ruling	main
+audit_df_modes	ff8509	FIELDS:stock	UNCLASSIFIED	derived 14z-180 (poke frames 3100-3120x2); awaiting the maintainer's ruling	main
+audit_df_moves	ff8509	FIELDS:stock	UNCLASSIFIED	derived 14z-180 (poke frames 2540-8695x167); awaiting the maintainer's ruling	main
+audit_df_moves	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2550-9145x34); awaiting the maintainer's ruling	main
+audit_df_startup_invuln	ff8410	FIELDS:p1x	UNCLASSIFIED	derived 14z-180 (poke frames 2370-4770x8); awaiting the maintainer's ruling	main
+audit_df_startup_invuln	ff8450	FIELDS:p1hp	UNCLASSIFIED	derived 14z-180 (poke frames 3240-4240x2); awaiting the maintainer's ruling	main
+audit_df_startup_invuln	ff8509	FIELDS:stocks	UNCLASSIFIED	derived 14z-180 (poke frames 3100-4120x4); awaiting the maintainer's ruling	main
+audit_df_startup_invuln	ff8810	FIELDS:p2x	UNCLASSIFIED	derived 14z-180 (poke frames 2370-4770x8); awaiting the maintainer's ruling	main
+audit_don_ko_writer	ff8450	RTAP:ff8450	UNCLASSIFIED	derived 14z-180 (poke frames 6200-6320x3); awaiting the maintainer's ruling	main
+audit_edge_cases	ff8450	FIELDS:p1hp	UNCLASSIFIED	derived 14z-180 (poke frames 3004-3004x1); awaiting the maintainer's ruling	main
+audit_edge_cases	ff8509	FIELDS:stk	UNCLASSIFIED	derived 14z-180 (poke frames 2860-2880x2); awaiting the maintainer's ruling	main
+audit_edge_cases	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 3006-3006x1); awaiting the maintainer's ruling	main
+audit_entrance_draw	ff8410	FIELDS:x	UNCLASSIFIED	derived 14z-180 (poke frames 2565-5925x9); awaiting the maintainer's ruling	main
+audit_guard_reentry	ff8410	FIELDS:x	UNCLASSIFIED	derived 14z-180 (poke frames 2565-5925x9); awaiting the maintainer's ruling	main
+audit_legacy_pairings	ff8782	FIELDS:p1id	UNCLASSIFIED	derived 14z-180 (poke frames 1400-1500x3); awaiting the maintainer's ruling	main
+audit_move_parity	ff8410	FIELDS:x	UNCLASSIFIED	derived 14z-180 (poke frames 2560-8690x166); awaiting the maintainer's ruling	main
+audit_move_parity	ff8509	FIELDS:stock	UNCLASSIFIED	derived 14z-180 (poke frames 2540-8695x167); awaiting the maintainer's ruling	main
+audit_move_parity	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2550-9145x34); awaiting the maintainer's ruling	main
+audit_reaction_class_live	ff8454	RTAP:ff8454	UNCLASSIFIED	derived 14z-180 (poke frames 3000-3000x1); awaiting the maintainer's ruling	control
+audit_rig_opening	ff8410	FIELDS:x	UNCLASSIFIED	derived 14z-180 (poke frames 2560-8690x121); awaiting the maintainer's ruling	main
+audit_stage_sweep	ff8100	DUMPS:f3000	UNCLASSIFIED	derived 14z-180 (poke frames 2150-2200x2); awaiting the maintainer's ruling	main
+audit_tenant_downwin	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 3006-3006x1); awaiting the maintainer's ruling	main
+audit_tenant_timeout	ff8109	FIELDS:timer	UNCLASSIFIED	derived 14z-180 (poke frames 3300-3300x1); awaiting the maintainer's ruling	main
+audit_tenant_timeout	ff8450	FIELDS:p1hp	UNCLASSIFIED	derived 14z-180 (poke frames 3200-3200x1); awaiting the maintainer's ruling	main
+audit_voice_borrow	ff8782	RTAP:ff8782	UNCLASSIFIED	derived 14z-180 (poke frames 1400-1500x3); awaiting the maintainer's ruling	main
+test_advancing_guard	ff8410	FIELDS:p1x	UNCLASSIFIED	derived 14z-180 (poke frames 2670-5890x8); awaiting the maintainer's ruling	main
+test_advancing_guard	ff8782	FIELDS:id	UNCLASSIFIED	derived 14z-180 (poke frames 1400-1500x3); awaiting the maintainer's ruling	main
+test_advancing_guard	ff8810	FIELDS:p2x	UNCLASSIFIED	derived 14z-180 (poke frames 2670-5890x8); awaiting the maintainer's ruling	main
+test_advancing_guard	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2550-6550x11); awaiting the maintainer's ruling	main
+test_advancing_guard	ff8b82	FIELDS:p2id	UNCLASSIFIED	derived 14z-180 (poke frames 1400-1500x3); awaiting the maintainer's ruling	main
+test_don_immortal_native	ff8509	DUMPS:f2600	UNCLASSIFIED	derived 14z-180 (poke frames 2550-2550x1); awaiting the maintainer's ruling	main
+test_hitbox_encoding	ff8410	FIELDS:x	UNCLASSIFIED	derived 14z-180 (poke frames 2560-7395x30); awaiting the maintainer's ruling	main
+test_hitbox_encoding	ff8810	FIELDS:p2x	UNCLASSIFIED	derived 14z-180 (poke frames 2560-7395x30); awaiting the maintainer's ruling	main
+test_hitbox_encoding	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2550-8150x28); awaiting the maintainer's ruling	main
+test_hitbox_encoding	ff8850	WATCH:ff8850	UNCLASSIFIED	derived 14z-180 (poke frames 2550-8150x28); awaiting the maintainer's ruling	main
+test_hui_ex	ff8509	DUMPS:f$lastdump	UNCLASSIFIED	derived 14z-180 (poke frames 3000-4000x2); awaiting the maintainer's ruling	main
+test_hui_ex	ff8509	DUMPS:f3200	UNCLASSIFIED	derived 14z-180 (poke frames 3000-4000x2); awaiting the maintainer's ruling	main
+test_hui_ex	ff8509	DUMPS:f3900	UNCLASSIFIED	derived 14z-180 (poke frames 3000-4000x2); awaiting the maintainer's ruling	main
+test_killshread_es	ff8410	FIELDS:p1x	UNCLASSIFIED	derived 14z-180 (poke frames 2560-4560x8); awaiting the maintainer's ruling	main
+test_killshread_es	ff8509	FIELDS:stock	READS-BACK	the known case: name_moves.py pokes ff8509 := 09 sixty frames before every event of a meter part and the `stock` column samples it (the gate's header, rule-checker run 2026-09-22-91 Q3, maintainer-ruled 2026-09-22 to re-freeze as-is and record it); poke frames 2540-4540x8	main
+test_killshread_es	ff8810	FIELDS:p2x	UNCLASSIFIED	derived 14z-180 (poke frames 2560-4560x8); awaiting the maintainer's ruling	main
+test_killshread_es	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2550-4950x7); awaiting the maintainer's ruling	main
+test_ladder_tenant_vs_palette	90c140	DUMPS:f$ROUL	UNCLASSIFIED	derived 14z-180 (poke frames 2450-2650x2); awaiting the maintainer's ruling	main
+test_ladder_tenant_vs_palette	90c140	DUMPS:f$VS1P	UNCLASSIFIED	derived 14z-180 (poke frames 2450-2650x2); awaiting the maintainer's ruling	main
+test_ladder_tenant_vs_palette	90c140	DUMPS:f$VS2P	UNCLASSIFIED	derived 14z-180 (poke frames 2450-2650x2); awaiting the maintainer's ruling	main
+test_meter_gain	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2580-4980x6); awaiting the maintainer's ruling	main
+test_move_naming	ff8410	FIELDS:x	UNCLASSIFIED	derived 14z-180 (poke frames 2560-8690x166); awaiting the maintainer's ruling	main
+test_move_naming	ff8509	FIELDS:stock	UNCLASSIFIED	derived 14z-180 (poke frames 2540-8695x167); awaiting the maintainer's ruling	main
+test_move_naming	ff8810	FIELDS:p2x	UNCLASSIFIED	derived 14z-180 (poke frames 2560-8690x166); awaiting the maintainer's ruling	main
+test_move_naming	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2550-9145x34); awaiting the maintainer's ruling	main
+test_pyron_cosmo	ff8509	DUMPS:f$f	UNCLASSIFIED	derived 14z-180 (poke frames 3300-4100x3); awaiting the maintainer's ruling	main
+test_pyron_cosmo	ff8509	DUMPS:f3290	UNCLASSIFIED	derived 14z-180 (poke frames 3300-4100x3); awaiting the maintainer's ruling	main
+test_pyron_cosmo	ff8509	DUMPS:f3450	UNCLASSIFIED	derived 14z-180 (poke frames 3300-4100x3); awaiting the maintainer's ruling	main
+test_pyron_cosmo	ff8782	DUMPS:f$f	UNCLASSIFIED	derived 14z-180 (poke frames 1400-1500x3); awaiting the maintainer's ruling	main
+test_reactions	ff8410	FIELDS:x	UNCLASSIFIED	derived 14z-180 (poke frames 2560-8690x166); awaiting the maintainer's ruling	main
+test_reactions	ff8810	FIELDS:p2x	UNCLASSIFIED	derived 14z-180 (poke frames 2560-8690x166); awaiting the maintainer's ruling	main
+test_reactions	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2550-9145x34); awaiting the maintainer's ruling	main
+test_rehit_ring	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2580-4980x6); awaiting the maintainer's ruling	main
+test_vanilla_aerial_join	ff8410	FIELDS:p1x	UNCLASSIFIED	derived 14z-180 (poke frames 2370-4770x12); awaiting the maintainer's ruling	main
+test_vanilla_aerial_join	ff8782	FIELDS:id	UNCLASSIFIED	derived 14z-180 (poke frames 1400-1500x3); awaiting the maintainer's ruling	main
+test_vanilla_aerial_join	ff8810	FIELDS:p2x	UNCLASSIFIED	derived 14z-180 (poke frames 2370-4770x12); awaiting the maintainer's ruling	main
+test_vanilla_aerial_join	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2550-5350x8); awaiting the maintainer's ruling	main
+test_vanilla_aerial_join	ff8b82	FIELDS:p2id	UNCLASSIFIED	derived 14z-180 (poke frames 1400-1500x3); awaiting the maintainer's ruling	main
+test_vanilla_frame_join	ff8410	FIELDS:p1x	UNCLASSIFIED	derived 14z-180 (poke frames 2370-4770x12); awaiting the maintainer's ruling	main
+test_vanilla_frame_join	ff8782	FIELDS:id	UNCLASSIFIED	derived 14z-180 (poke frames 1400-1500x3); awaiting the maintainer's ruling	main
+test_vanilla_frame_join	ff8810	FIELDS:p2x	UNCLASSIFIED	derived 14z-180 (poke frames 2370-4770x12); awaiting the maintainer's ruling	main
+test_vanilla_frame_join	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2550-5350x14); awaiting the maintainer's ruling	main
+test_vanilla_frame_join	ff8b82	FIELDS:p2id	UNCLASSIFIED	derived 14z-180 (poke frames 1400-1500x3); awaiting the maintainer's ruling	main
+test_killshread_es	ff8850	FIELDS:p2white	UNCLASSIFIED	derived 2026-09-24; awaiting the maintainer's ruling	main
+test_reactions	ff8850	FIELDS:p2white	UNCLASSIFIED	derived 2026-09-24; awaiting the maintainer's ruling	main

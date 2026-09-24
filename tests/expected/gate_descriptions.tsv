@@ -311,6 +311,7 @@ declares	test_phasec_image
 declares	test_phasec_spaces
 declares	test_pod_black_foot_palette
 declares	test_pointer_flow
+declares	test_poke_readback
 declares	test_poked_legs
 declares	test_projectile_census
 declares	test_projectile_params

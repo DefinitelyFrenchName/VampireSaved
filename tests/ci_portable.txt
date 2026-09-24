@@ -70,6 +70,7 @@ test_gate_follows
 test_lane_carry
 test_emulator_staleness
 test_measures_contract
+test_poke_readback
 test_gate_coverage_current
 test_hex_lengths
 test_masked_compare

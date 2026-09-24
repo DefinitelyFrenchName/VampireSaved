@@ -8,7 +8,8 @@
 > every gate (§4 Q0, the maintainer's words in §6) — and the six questions of §6 were each
 > answered (`DECISIONS_HISTORY.md` "Ruled 2026-09-24 (14z-180) — #171 gate qualification").
 > Order: **Q0, Q1, Q3+Q4 (Q5 inside), Q2, Q6.** Q1's gate is `tests/test_module_refs.sh`;
-> Q0, Q1, Q2, Q3, Q4 and Q5 are LANDED (each section says when); Q6 remains.
+> Q0-Q5 are LANDED and Q6's census is (each section says when); Q6's 73 rulings are the
+> maintainer's, one finding at a time, and are what remains of #171.
 
 **Why this document exists:** the same reason `harness_scope.md`,
 `applier_app_scope.md` and `agent_architecture_scope.md` do — a direction the
@@ -250,6 +251,21 @@ being a safe cap. The current run has none (max 0.38). A control mode plants a
 
 ### Q6 — the poke read-back census (shape 4)
 
+**THE CENSUS LANDED 2026-09-24 (14z-180); THE RULINGS ARE OPEN.** `tools/audit_poke_readback.py`
+derives 74 findings over 31 of the 199 emulator gates (literal `frame:addr:hex` pokes and the
+schedules of the rigs a gate generates, against its FIELDS / DUMPS / TAP / WATCH / RTAP /
+FBNEO_HTAP samples); `tests/expected/poke_readback.tsv` holds one row each — the killshread
+`stock` column READS-BACK by the maintainer's 2026-09-22 ruling, the other 73 UNCLASSIFIED until
+ruled; each row carries its LEG — `main`, or `control` for a poke on a line naming a plant, a
+control or a mode (a known-bad plant reads its poke back by design: 2 of the 74, found by
+rule-checker run `2026-09-24-144`) — so the maintainer rules a control-leg row for what it is;
+`tests/test_poke_readback.sh` keeps the table joined to the census (STATE "Decisions pending"
+carries the rulings as one item). The census compares ADDRESSES, not dataflow (§7): what it does
+NOT read is in the tool's header — what a reducer does with a column afterwards, addresses
+composed from variables with no literal, the -debug watchpoint scripts, and a plant assigned on
+a line that names none of the control words reads as `main`. The 74 is neither a floor nor a
+ceiling on the true count: the reach misses, and a control-leg row over-reports.
+
 `tools/audit_poke_readback.py`: for every gate, the ADDRESSES its rig pokes (resolved
 through `name_moves.py`'s schedule for the 27 naming-rig gates; the `POKES=`/`POKE=`/
 `FBNEO_HPOKE` tokens for the rest) intersected with the addresses it SAMPLES or asserts
@@ -274,7 +290,7 @@ gate claims.
 | **Q3** (LANDED) | `# FOLLOWS:` on 199 gates, `tools/gate_follows.py`, the census gate `tests/test_gate_follows.sh`, the reconciliation control; `audit_lane_carry.py` rewritten on it, `tests/test_lane_carry.sh` its ground truth | the census (three classes frozen), the reconciliation control (a declaration narrower than the script's references must fail), the carry tool's control (an uncovered gate must fail the carry) | two sittings — the 199 declarations are read from each script, not guessed, and the reconciliation control is what proves them |
 | **Q4** (LANDED) | `commit.txt` per run; `tools/audit_emulator_staleness.py` + `tests/test_emulator_staleness.sh`; `run_all_emulator.sh --stale` | the staleness gate over a planted run dir (a moved input must name its gate; an unmoved one must not); `test_emulator_runner.sh` gains the `--stale` selection and the commit record | a sitting |
 | **Q5** (LANDED) | the headroom check inside Q4's gate | a planted `seconds` at 0.5 of cap must fail; the real run must not | inside Q4 |
-| **Q6** | `tools/audit_poke_readback.py`, the frozen classification table, the per-finding rulings | the census gate re-deriving every intersection; the killshread `stock` column must appear as READS-BACK (the known case is the positive control) | a sitting for the census; the rulings as they come |
+| **Q6** (CENSUS LANDED, rulings open) | `tools/audit_poke_readback.py`, the frozen classification table `tests/expected/poke_readback.tsv` (74 rows: 1 READS-BACK, 73 UNCLASSIFIED), the per-finding rulings | the census gate re-deriving every intersection; the killshread `stock` column must appear as READS-BACK (the known case is the positive control) | a sitting for the census; the rulings as they come |
 
 **Order RULED (2026-09-24):** Q0 first (the maintainer's addition — the foundation of the
 supervision), then Q1 (landed this sitting, *"Land it now"*), Q3 and Q4 together (the
