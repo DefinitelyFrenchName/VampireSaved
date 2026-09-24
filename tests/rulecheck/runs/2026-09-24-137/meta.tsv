@@ -1,0 +1,10 @@
+decision	procedure
+subject	one AI agent working session, from its first record to the start of its procedure check
+session	14z-178
+model	rule-checker@163e4ce9cf7b
+claim	The agent worked by the procedure throughout this session: every intention it stated to the maintainer was carried out, every step it reported done was run, every figure it reported was produced by a tool, every background job it started was accounted for, and every worker it started did what its spec asked, running the commands the spec named and nothing the spec forbade. Not tested: statements the transcript did not record (mid-turn narration before a tool call is sometimes absent from it), and tool output beyond each result's first 160 characters, which the figure check reads in full but the extract does not show.
+checklist	f3ec4d9849f7
+family	procedure
+questions	QP1 QP2 QP3 QP4 QP5
+reader	rule-checker@163e4ce9cf7b
+head	63cb2d1d55e0b16033a854becd79ab0d11168b85

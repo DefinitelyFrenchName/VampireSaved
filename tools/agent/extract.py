@@ -131,7 +131,11 @@ def worker_lines(tag, block, inp, workers):
         out.append(f"{tag} W  NO WORKER TRANSCRIPT for this call — its commands and report cannot be read")
         return out
     _, _, recs = w
-    models, efforts, results, report = set(), set(), [], ""
+    # the REPORT is what the worker DELIVERED: its SubagentHandback message when it made one, else
+    # its last text. A text written AFTER the hand-back is never delivered and must not override it
+    # (14z-178, procedure run 2026-09-24-137 QP5: a worker's trailing prose, written after a
+    # conforming hand-back, was read as its report and judged against its spec)
+    models, efforts, results, report, handback = set(), set(), [], "", None
     for r in recs:
         c = (r.get("message") or {}).get("content")
         if r.get("type") == "assistant":
@@ -140,7 +144,7 @@ def worker_lines(tag, block, inp, workers):
         for b in c if isinstance(c, list) else []:
             t = b.get("type")
             if t == "tool_use" and b.get("name") == "SubagentHandback":
-                report = str((b.get("input") or {}).get("message", "")) or report
+                handback = str((b.get("input") or {}).get("message", ""))
             elif t == "tool_use":
                 i = b.get("input") or {}
                 what = i.get("command") or i.get("file_path") or i.get("pattern") or i.get("prompt") or ""
@@ -154,6 +158,8 @@ def worker_lines(tag, block, inp, workers):
             elif t == "text" and r.get("type") == "assistant" and b.get("text", "").strip():
                 report = b["text"].strip()
     out.insert(1 + min(len(spec), SPEC_LINES + 1), f"{tag} WM ran on {','.join(sorted(models))} at effort {','.join(sorted(efforts))}")
+    if handback is not None:
+        report = handback
     rep = report.split("\n") if report else ["(no report)"]
     for ln in rep[:REPORT_LINES]:
         out.append(f"{tag} WX | {ln}")
@@ -320,7 +326,12 @@ def selftest():
                       {"type": "tool_use", "id": "b1", "name": "Bash", "input": {"command": "wc -l f"}}]}},
                   {"type": "user", "message": {"content": [{"type": "tool_result", "tool_use_id": "b1", "content": "  1234 f"}]}},
                   {"type": "assistant", "effort": "high", "message": {"model": "mS", "content": [
-                      {"type": "text", "text": "FIG lines = 1234 <- C1\nFIG other = 9876 <- C1\nFIG answer = 555 <- C1"}]}}):
+                      {"type": "text", "text": "FIG lines = 1234 <- C1\nFIG other = 9876 <- C1\nFIG answer = 555 <- C1"}]}},
+                  {"type": "assistant", "effort": "high", "message": {"model": "mS", "content": [
+                      {"type": "tool_use", "id": "h1", "name": "SubagentHandback",
+                       "input": {"message": "FIG lines = 1234 <- C1\nFIG other = 9876 <- C1\nFIG answer = 555 <- C1"}}]}},
+                  {"type": "assistant", "effort": "high", "message": {"model": "mS", "content": [
+                      {"type": "text", "text": "Trailing prose written after the hand-back, never delivered."}]}}):
             g.write(json.dumps(r) + "\n")
     wg = extract(main)
     shutil.rmtree(d)
@@ -330,6 +341,7 @@ def selftest():
         "worker caps shown": "WM ran on mS at effort high" in wg,
         "worker call and result shown": "WT Bash: wc -l f" in wg and "WR ok: 1234 f" in wg,
         "worker report shown": "WX | FIG lines = 1234 <- C1" in wg,
+        "the DELIVERED hand-back is the report, not a text written after it": "Trailing prose" not in wg,
         "worker figure sourced in its own result not flagged": "1234" not in wline,
         "worker figure in no result flagged": "9876" in wline,
         "worker figure found only in the SPEC flagged": "555" in wline,
