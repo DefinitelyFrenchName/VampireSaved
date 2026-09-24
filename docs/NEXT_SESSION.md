@@ -27,14 +27,11 @@ it refuses a run whose readers fail. `--a/--b` files are for pre-pinning runs on
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`**, not a `ps` grep.
-1. **The maintainer's `cleanupPeriodDays`** (ruled *"You set it, user level"*): check
-   `~/.claude/settings.json` carries it; transcripts older than 30 days are deleted otherwise, and
-   the #172 tools read them (`docs/platform/gotchas.md`).
-2. **#172 S5's gate** — this sitting, if it runs on Fable 5.1: work as usual, and at the close add
+1. **#172 S5's gate** — this sitting, if it runs on Fable 5.1: work as usual, and at the close add
    `transcript_gaps.py --subagents <session> --cap` to the checklist.
-3. **#171 — qualify every gate.** Unchanged: `tools/audit_lane_carry.py`'s subject lists are
+2. **#171 — qualify every gate.** Unchanged: `tools/audit_lane_carry.py`'s subject lists are
    hardcoded and known incomplete, so its `MAY CARRY` is NECESSARY, NOT SUFFICIENT.
-4. **#145 Windows binaries**, **no Windows launcher**, **#170**, **#161**, **#169**,
+3. **#145 Windows binaries**, **no Windows launcher**, **#170**, **#161**, **#169**,
    **#157 / #159 / #163** — unchanged, the maintainer's to schedule.
 
 ## TRAPS PAID THIS SITTING (14z-178)
