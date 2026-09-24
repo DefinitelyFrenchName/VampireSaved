@@ -2,6 +2,15 @@
 # test_hui_walk.sh — Huitzil velocity-port gate (14z-66, playtest
 # round-1 item 2 "feels a bit slower").
 #
+# WHAT: Phobos moves at his own vs2 velocities (the param32 rows 0x10 carry his true pairs,
+#   the vanilla rows pristine) — not at Bulleta's aliased content, which made him feel
+#   slower.
+# HOW: static: the built zip's data view at rows 0x10 and 0x00-0x0F; dynamic: replay 74
+#   (steady forward walk) on MAME, the 15-frame 16.16 X deltas compared with the frozen
+#   values.
+# EXPECTS: rows correct and the deltas exactly 0x1C2000 / 0x384000; the alias build's
+#   0x1B0000 / 0x360000 is the natural negative control the gate fails back to.
+#
 # Mechanism (measured): both vsavj param32 tables are 32-row with rows
 # 0x10-0x1F byte-aliasing 0x00-0x0F, and all three consumers index the
 # RAW +0x382 id (no fold) — so tenant 0x10 moved at the ALIAS CONTENT

@@ -1,6 +1,15 @@
 #!/bin/sh
 # test_pyr_ladder.sh — the Pyron stage 1-3 ladder gate (14z-67, M3b Phase 5).
 #
+# WHAT: Pyron's stages 1-4 build from his manifest with the op invariant per stage (every op
+#   in free space or a variant row; stage 4's engine-hook sites exempted from the reviewed,
+#   frozen shared_writes.toml inventory), the forced-pick boot probe at stage 4, and the
+#   legacy legs bit-identical (stage 3 unmasked, stage 4 EXACT on the masked V2 basis).
+# HOW: builds each stage, checks every op, runs the boot probe and the legacy replays on
+#   MAME against their frozen expectations.
+# EXPECTS: every stage's invariant holds, the probe loads his id, legacy identical on both
+#   bases; a red names the stage and op or replay.
+#
 # Pyron is a VARIANT-ID tenant (0x11): no vanilla path can reach his rows,
 # so the stage 1-3 ladder invariant is total (the H-ladder shape).
 # STAGE 4: the generator emits engine-hook sites unconditionally, so its

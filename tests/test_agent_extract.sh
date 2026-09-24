@@ -2,6 +2,17 @@
 # test_agent_extract.sh — SLICE S3 OF GitHub #172: the transcript EXTRACT the procedural
 # checker (C1) reads says what the transcript says (`tools/agent/extract.py`, 2026-09-23).
 #
+# WHAT: the transcript EXTRACT the procedural checker reads (tools/agent/extract.py) says
+#   what the transcript says: statements without private reasoning, each tool call and its
+#   result head, tracked launches and completions, DETACHED launches, unsourced figures, and
+#   workers' specs, commands and reports.
+# HOW: drives the extractor's selftest over a synthetic transcript with known answers (a
+#   sourced figure, an invented one, non-figures, an open task, a marker merely quoted); two
+#   controls run copies with the launch test loosened and the figure finder blinded and must
+#   fail the selftest.
+# EXPECTS: the selftest's checks all pass and both controls fail on their copies; a red
+#   names the check, and an extract that lies is a procedure check that cannot see.
+#
 # C1 is context-free by ruling, so everything it can judge is in this extract: the
 # maintainer's messages, the agent's statements (never its private reasoning), each tool
 # call and the head of its result, every tracked launch and completion, every DETACHED

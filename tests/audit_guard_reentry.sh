@@ -1,6 +1,20 @@
 #!/bin/sh
 # audit_guard_reentry.sh — THE BLOCK ANIMATION RE-ENTERS ON vsavj, NOT ON vs2, on legacy content (14z-168, GitHub #136): when a block's hit-freeze ends into the blockstun slide (seq 0 -> 2) with BACK still held, vsavj re-enters the block animation (the node counter reloaded, every frame back is held) where vsav2 keeps ticking — an ENGINE-GENERATION difference, measured on Demitri on both games, and the source of #136's seven Reflect Wall guard-cancel DIFF rows (Phobos's block animation is a multi-node loop, so on him the re-entry restarts the chain).
 #
+# WHAT: the block animation RE-ENTERS on vsavj and not on vs2, on legacy content: when a
+#   block's hit-freeze ends into blockstun with BACK held, vsavj reloads the node counter
+#   every frame back is held where vsav2 keeps ticking — an engine-generation difference,
+#   and the source of #136's Reflect Wall guard-cancel DIFF rows; our build equals vsavj on
+#   every sampled field, and the first possible attack frame is identical.
+# HOW: the huitzil part 5 rig with Demitri on P1 (the default cell) on pristine vsavj, vsav2
+#   and our build on MAME: three field traces (seq, node counter, +0x5C at offsets +8..+25
+#   of three guard-cancel events), three snapshot legs for the pixel rows, and 12 act legs
+#   for the first-possible-attack test; controls move the act rows 3 frames later and plant
+#   vsav2's counter values into the vsavj rows.
+# EXPECTS: the frozen windows per game, the superset row 0 (vsavj vs ours), the act rows
+#   identical for vsavj and ours; both controls fail. Ruled identical by the maintainer on
+#   the captures and the first-frame test.
+#
 # MUST-FIRE: perturbed-copy: act-late — a copy of the act rows with ours' and vsavj's first possible attack moved 3 frames later (what a re-entry that delayed recovery would read) must FAIL both the same-frame check and the frozen compare, so "identical" is a measured frame, not an absence (in-gate: the moved copy must fail the check; mode: the rows are moved before the checks and the gate FAILs)
 # MUST-FIRE: perturbed-copy: vs2-pattern — a copy of the vsavj rows carrying vsav2's counter values (what vsavj would read if it did NOT re-enter) must FAIL the frozen compare, so the frozen vsavj rows are the re-entry (in-gate: the perturbed copy must differ from the frozen rows; mode: the vsavj rows are replaced before the compare and the table FAILs)
 #

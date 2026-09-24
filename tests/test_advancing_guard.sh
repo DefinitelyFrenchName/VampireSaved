@@ -2,6 +2,20 @@
 # test_advancing_guard.sh — THE ADVANCING GUARD (guard push), MEASURED on
 # native vs2 and on vsavj, and frozen (14z-123, the documentation pass's G2).
 #
+# WHAT: the advancing guard (guard push) on native vs2 and on vsavj: a blocker's new button
+#   presses inside the 14-frame blockstun window feed a counter, and when it crosses the
+#   threshold the attacker is pushed away by the strength class's list (91/115/157 px) — vs2
+#   by press weights reaching 10, vsavj by count with an RNG roll below 8; Anakaris never on
+#   either game.
+# HOW: the donovan_victim part 4 rig on MAME (Victor 5MP/5HP into a blocking, mashing P2
+#   pinned mid-screen) on vs2 with Donovan and Anakaris blocking and on vsavj with Demitri
+#   and Anakaris; per-event counter values, push frame, list index, facing and per-frame
+#   steps reduced by tools/advancing_guard.py against the list bytes read from each game's
+#   data view; control and late-mash legs must never push.
+# EXPECTS: the frozen per-event lines and the structural rules (weights and threshold 10 on
+#   vs2, count and the RNG on vsavj, steps equal to the list, the attacker pushed AWAY,
+#   Anakaris inert); a red is the mechanic or threshold moving.
+#
 # WHY. 14z-121 (4) read vs2 `0x27082` (the second per-frame step routine,
 # three byte lists at `0x2797A`: 91 / 115 / 157 px) plus its arming site
 # `0x2681E` and wrote them up as "the shape of a THROW MASH-ESCAPE pushing the

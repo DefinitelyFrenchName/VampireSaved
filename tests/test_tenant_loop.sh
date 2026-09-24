@@ -1,6 +1,16 @@
 #!/bin/sh
 # test_tenant_loop.sh — the N-tenant loop ITERATES, and it is inert at N=1.
 #
+# WHAT: the N-tenant generator loop is REAL and inert at N=1: per-tenant op counts frozen,
+#   each tenant's regions at distinct addresses, the shared region rows and the obj_hook
+#   union attributed per tenant, both N-way chains decoded, and a 3-tenant patch generating
+#   and APPLYING with zero op collisions.
+# HOW: the generator alone against the existing extract dirs (SKIPs without them), nine
+#   sections and five verdict controls; section 5 runs patch_prg over the merged patch.
+# EXPECTS: every section green. Honest limit in the header: this proves the PROGRAM half
+#   composes and applies, not that a merged ROM is correct — that is the merged build's own
+#   gates.
+#
 # WHY (M3b, 14z-80). main()'s body is now the body of a loop over the
 # tenants. For one tenant the loop runs once and every byte is unchanged —
 # which is the whole safety argument, and also the whole blind spot: a loop

@@ -3,6 +3,16 @@
 # EXIT STATUS UNDER `set -e` WITHOUT `set +e` INSIDE THE GROUP (14z-171).
 # ROM-free, ~2 s. Tool: tools/audit_bg_leg_shape.py (its docstring is the WHY).
 #
+# WHAT: no gate backgrounds an emulator leg that writes its exit status under `set -e`
+#   without `set +e` inside the group — the shape that made nine gates print `exited none`
+#   on a green run at 14z-168 and blame the emulator.
+# HOW: tools/audit_bg_leg_shape.py reads every tests/*.sh for a backgrounded group that
+#   captures `$?` under errexit and classes it SAFE or RISKY; the control deletes one real
+#   gate's `set +e` in a copy of the whole tests/ tree and audits that copy.
+# EXPECTS: PASS when no group is RISKY; a red names the gate and the group. It does not
+#   claim the status file is USED or that the right subshell carries the `set +e` — only
+#   that a captured status cannot be lost.
+#
 # MUST-FIRE: perturbed-copy: plus-e-removed — a copy of the WHOLE tests/ tree with one real gate's `set +e` deleted must be reported RISKY by the auditor (mode: that copy is what section 1 audits, so the run must fail)
 #
 # WHY A STATIC GATE. The defect is silent on a GREEN run: the leg's artifacts

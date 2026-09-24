@@ -2,6 +2,16 @@
 # audit_stage_sweep.sh — EVERY TENANT ON EVERY STAGE (14z-104, the §4
 # "each stage" cell — no stage sweep existed anywhere before this).
 #
+# WHAT: every tenant fights on every one of the 12 stages: the venue word sticks, the match
+#   is live, a throw connects on that venue, and the poke is load-bearing on the asset side.
+# HOW: the judge/02_throw rig on MAME per (tenant x stage) with $FF8100 poked at f2150/f2200
+#   (after the selector, before the venue assets load); readback at f3000, P2 HP and damage
+#   from dumps, the stage palette block compared for distinctness across stages; a no-poke
+#   control reads the default venue.
+# EXPECTS: 37 legs: the stage word reads the poked value, P2 at 0x120 then damaged, run
+#   complete; the sweep produces at least 8 distinct stage-palette blocks. A red names the
+#   tenant and stage.
+#
 # Stage selection is the $FF8100 word (the ladder/venue index,
 # engine_internals "the stage-name banner" section: 12 stages, values
 # 0x00..0x16 even; the twelve are identical at identical values across

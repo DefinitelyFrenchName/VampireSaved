@@ -2,6 +2,18 @@
 # test_emulator_runner.sh — ground truth for tests/run_all_emulator.sh
 # (14z-128). ROM-free, ~26 s (measured 14z-162; the header said ~5 s).
 #
+# WHAT: tests/run_all_emulator.sh's verdicts mean what they say: PASS / FAIL / SKIP counted
+#   apart, SKIP-in-prose read as PASS, a non-executable registry row MISSING, a timeout
+#   TIMEOUT, the anti-orphan check both ways, --strict, the prereq stop, --scope,
+#   placeholder expansion, the exported MAME_BIN and the controls reader.
+# HOW: a synthetic repository of stub gates with KNOWN verdicts is driven through the REAL
+#   runner by symlink (never a copy of its logic), with stub tools so the runner's own
+#   preconditions run; three controls run copies of the runner with a piece removed (the
+#   export, the reader, an executable row).
+# EXPECTS: every case reads the verdict it was built to produce and each control's section
+#   fails on its copy; a red names the case — a wrong reading here would turn the release
+#   policy into a rubber stamp.
+#
 # MUST-FIRE: shadow-tool: export-removed — a copy of the runner without `export MAME_BIN` must leave the gate's MAME_BIN UNSET (mode: that copy is the runner every section drives; section 11 must fail)
 # MUST-FIRE: shadow-tool: reader-unplugged — a copy that hands the classifier no gate script must let a declared-but-unfired control read PASS (mode: section 14 must fail)
 # MUST-FIRE: perturbed-copy: row-not-executable — a farm of symlinks to the REAL scripts named by the REAL tests/ci_emulator.tsv, with ONE replaced by a non-executable copy, must make section 10b report it unrunnable (mode: that farm is what 10b checks; section 10b must fail)

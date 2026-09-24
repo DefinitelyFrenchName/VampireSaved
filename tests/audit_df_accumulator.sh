@@ -2,6 +2,18 @@
 # audit_df_accumulator.sh — THE +0x161 ACCUMULATOR IS SASQUATCH'S DARK FORCE
 # ARMOR (measured 14z-123; inferred_claims row 1).
 #
+# WHAT: the fighter's +0x161 accumulator is SASQUATCH's Dark Force armor (dispatch_16 row
+#   0x0A), not Aulbath's: while armed each contact adds the record's +0x1C with no reaction
+#   until the sum passes 60, the HP+HK activation never arms it, no stocks means no mode,
+#   and the merged build's trace is byte-identical to pristine vsavj's.
+# HOW: four MAME legs in parallel on pristine vsavj (armor LP+LK, hphk, nodf) and the same
+#   armor leg on the merged build, field traces of $FF802E, +0x15E, +0x161, +0x162, +0x18F
+#   and +0x54 per contact, the per-contact shape frozen; the control perturbs the frozen
+#   per-contact table.
+# EXPECTS: the armor leg's frozen shape (adds 20/30/40, break past 60, decay 240), hphk and
+#   nodf flat, merged byte-identical to pristine; the perturbed table fails. vsav2 has no
+#   Sasquatch — stated, not measured there.
+#
 # MUST-FIRE: perturbed-copy: perturbed-frozen-arm — a perturbed copy of the frozen per-contact table must fail the diff against the measured output (mode: the measured got.txt is compared against that perturbed copy and the gate must FAIL)
 #
 # WHY. 14z-121 decoded the attack record's +0x1C from its one reader (vs2

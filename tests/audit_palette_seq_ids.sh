@@ -1,6 +1,17 @@
 #!/bin/sh
 # audit_palette_seq_ids.sh — which palette-seq ids does LEGACY ever request?
 #
+# WHAT: the inventory of palette-seq ids LEGACY requests, in ordinary play AND with Dark
+#   Force forced on across a character-varied set — the only guard on any claim that a
+#   palette-seq row is free for a tenant (this audit returned a false pass for ten sessions
+#   when its replays could not enter DF).
+# HOW: an uncapped logging breakpoint on the resolver PRG:0x02AD82 over vanilla replays on
+#   MAME, phase A ordinary play and phase B with DF on per character; the full-roster result
+#   is frozen in tests/expected/df_palette_seq_census.txt.
+# EXPECTS: the measured inventory equals the frozen census; a DF-on character with 0 calls
+#   is reported as having no palette-seq path. Growth is the signal: re-derive before
+#   trusting that any row is free.
+#
 # *** THIS AUDIT RETURNED A FALSE PASS FOR TEN SESSIONS (retracted 14z-79). ***
 # It guarded the 14z-69p DF-palette rewrite of rows 0x1E-0x21, and reported
 # "legacy never requests these ids". Legacy requests them constantly — they

@@ -1,6 +1,17 @@
 #!/bin/sh
 # audit_lag_budget.sh — A FIX SET ADDS NO FRAME OF LAG: over every #136 naming part (the three tenants' moves, and legacy attackers against each tenant), the build under test has no zero-pass frame that the reference build — the one before the fixes — does not have (14z-170; the maintainer's condition on the #136 fixes: "the total overhead cost of our combined changes is less than 1/60s at all times").
 #
+# WHAT: a fix set adds no frame of lag: over every #136 naming part, the build under test
+#   has no zero-pass frame (the pass counter $FF8081 not advancing after the round start)
+#   that the reference build before the fixes does not have — the maintainer's
+#   combined-overhead condition, under 1/60 s at all times.
+# HOW: 84 field-trace runs on MAME (42 parts on BOTH builds, the same replays and pokes, the
+#   tenant parts through the merged wheel's path, level and RNG pinned), the build's
+#   zero-pass frame set checked as a subset of the reference's; a leg that does not complete
+#   is VOID and fails; the control removes one frame's pass advance from a build trace.
+# EXPECTS: no new zero-pass frame on any part; the planted frame is caught. NOT covered:
+#   content outside the naming corpus and the idle-time margin short of a lost pass.
+#
 # MUST-FIRE: perturbed-copy: lag-planted — a copy of each part's trace on the build under test with the midpoint frame's whole pass-counter advance removed (a zero-pass frame planted where the reference has none) must FAIL the subset check, so "no new zero-pass frame" is read from the build's own pass counter (in-gate: the planted copy of the first part must be caught; mode: every part's build trace is planted before the check and the gate FAILs)
 #
 # WHY. The maintainer, of the 2026-09-18 fix rulings (DECISIONS_HISTORY.md, the defense-row entry):

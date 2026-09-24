@@ -2,6 +2,15 @@
 # audit_pyron_ring.sh — Pyron's merged-vs-solo sound-ring inventory,
 # frozen (14z-85). On-demand, ~10 min (2 replays x merged+solo = 4 runs).
 #
+# WHAT: Pyron's sound-ring id inventory on the MERGED build equals the SOLO build's per
+#   replay (the frozen diff is EMPTY), so no merged-only music-range id (the 0x729 retrigger
+#   class) and no missing solo id can appear.
+# HOW: two replays on merged and solo builds on MAME (four runs), the sound ring's ids
+#   collected whole-run and diffed; housekeeping ids excluded; the control moves the frozen
+#   mash onset later so a real onset reads as moved earlier.
+# EXPECTS: the merged-vs-solo id-set diff equals the frozen inventory (empty); any new id or
+#   a solo id missing on merged fails.
+#
 # MUST-FIRE: known-bad: onset-earlier — the mash divergence onset moving EARLIER than the frozen one must FAIL (mode: PYRON_RING_ONSET is set LATER than the real onset so the real onset reads as moved earlier and the gate must FAIL)
 #
 # WHAT 14z-85 MEASURED (the owner-tag fix's own before/after): the ring

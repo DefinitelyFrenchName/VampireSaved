@@ -5,6 +5,14 @@
 # A/B of record (replay headers), not just no-crash.
 # Usage: ROMDIR=... tests/test_hui_pairs.sh [existing-stage4-builddir]
 #
+# WHAT: Phobos's Reflect Wall guard-cancel and his pair-press Dark Force both come out with
+#   their native-matched signatures (GC seq 0x0E with blowback; DF seq 0x0A at both
+#   activations).
+# HOW: the two rigs on MAME against a stage-4 build (self-built unless given), the sequence
+#   bytes read from dumps at the measured frames.
+# EXPECTS: both signatures present; a red is either mechanism dead or changed, not merely a
+#   crash.
+#
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
 #   Reflect Wall GC + Dark Force gate (14z-66): both native-matched signatures

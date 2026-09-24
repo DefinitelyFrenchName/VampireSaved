@@ -1,6 +1,15 @@
 #!/bin/sh
 # test_hui_ladder.sh — the Huitzil stage 1-3 ladder gate (14z-65, M3b).
 #
+# WHAT: Phobos's stages 1-3 build from his manifest and every emitted op writes only into
+#   declared free space or a variant row (slot 0x10-0x1F) of a bank-map table — the superset
+#   invariant at the op level — while a legacy replay on the stage-3 build is bit-identical
+#   to vanilla, unmasked.
+# HOW: builds stages 1-3, checks each op against the allocator's free-space and variant-row
+#   sets, and runs a legacy replay on MAME against the frozen whole-RAM expectation.
+# EXPECTS: every op in free space or a variant row and the legacy replay bit-identical; a
+#   red names the op that touched a reachable byte.
+#
 # Huitzil is a VARIANT-ID tenant (0x10): no vanilla path can reach his rows,
 # so unlike Donovan's M2a ladder (divergence frames pinned per stage) the
 # ladder invariant here is total:

@@ -2,6 +2,16 @@
 # test_demand_after_trap.sh — no gate carries a `${VAR:?msg}` DEMAND after its
 # EXIT trap (14z-134). ci_portable: no ROM, no build dir, no emulator, ~1 s.
 #
+# WHAT: no gate under tests/ (or tests/lib/) carries a `${VAR:?msg}` demand AFTER its EXIT
+#   trap is armed, because on macOS bash 3.2 such an abort exits 0 and a runner reads the
+#   dead gate as PASS.
+# HOW: scans every script's non-heredoc text for a parameter-expansion demand positioned
+#   after a `trap … EXIT` line; the control adds a synthetic script with the defect to a
+#   copy of tests/ and must report it, and the same script with the demand before the trap
+#   must pass.
+# EXPECTS: PASS when no script has the shape; a red names the script and line, and the fix
+#   is an explicit `[ -n "${X:-}" ] || { echo FAIL; exit 1; }` test.
+#
 # MUST-FIRE: known-bad: demand-after-trap — a script with a `${VAR:?}` demand after its EXIT trap must be reported (mode: that script added to a copy of tests/)
 #
 # WHY. On macOS bash 3.2 — /bin/sh AND /bin/bash — a parameter-expansion

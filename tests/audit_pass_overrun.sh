@@ -1,6 +1,17 @@
 #!/bin/sh
 # audit_pass_overrun.sh — THE BLIZZARD SWORD CPU OVERRUNS, ours vs native, frozen AS MEASURED (14z-168, GitHub #136): on three Blizzard Sword frames of the whole #136 corpus a double-pass activation runs past the frame, so one frame completes NO logic pass — twice on native vsav2 (donovan_2, donovan_11), once on ours (donovan_10) — and the rest of each part stays one engine pass out of step with its inputs. Per event window the scheduler's idle time is equal on both builds within about 1%.
 #
+# WHAT: the Blizzard Sword CPU overruns, ours vs native, frozen as measured: on three frames
+#   of the #136 corpus a double-pass activation runs past the frame so one frame completes
+#   no logic pass — twice on native, once on ours — and the scheduler's idle time per event
+#   window is equal on both builds within about 1%; not a port cost, the host clock governs.
+# HOW: 12 MAME runs (task-table taps and pass-counter traces of donovan_2, donovan_10 and
+#   donovan_11 on both legs with the parity gate's pins); the zero-pass frames after the
+#   round start and the idle-spin dispatches per frame per event window are frozen; the
+#   control removes one pass-counter step from our trace.
+# EXPECTS: the overrun rows (native donovan_2 and donovan_11, ours donovan_10) and idle rows
+#   equal; the planted zero-pass frame changes a row and fails.
+#
 # MUST-FIRE: perturbed-copy: overrun-planted — a copy of our donovan_11 trace with one pass-counter step removed (a zero-pass frame planted where ours has none) must change our overrun row and FAIL the frozen compare, so an `overrun ... none` row is a reading of the trace (in-gate: the planted copy must reduce differently; mode: every part's trace is planted before the reduction and the table FAILs)
 #
 # WHY. 29 of #136's 108 DIFF rows (tests/audit_move_parity_attribution.sh, class

@@ -2,6 +2,15 @@
 # audit_qs_voice_wav.sh — THE EAR-LEVEL VOICE A/B (14z-86, on-demand,
 # ~12 min, 2 MAME runs with -wavwrite).
 #
+# WHAT: the voice sweep SOUNDS the same on ours and native vsav2: per-window RMS and
+#   high-band energy of the captured audio agree — the ear-level A/B that caught the
+#   half-bank truncation every register and content gate was blind to.
+# HOW: two MAME runs with -wavwrite (ours, native), windows compared by
+#   tools/check_qs_voice_wav.py; the control truncates a sounding window in a copy of the
+#   ours capture.
+# EXPECTS: no window flagged suspect; the truncated copy is flagged. Keep beside
+#   audit_qs_voice_batch: equal data can still play differently.
+#
 # MUST-FIRE: perturbed-copy: truncated-window — a truncated sounding window in the OURS capture must be flagged by the spectral A/B (mode: the real ours capture is truncated and the A/B against native must fail)
 #
 # Captures the full voice-id sweep as AUDIO on ours and native vsav2 and

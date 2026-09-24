@@ -2,6 +2,17 @@
 # test_hui_electrocute.sh — PHOBOS AS THE ELECTROCUTE VICTIM, ours vs native
 # vsav2 (14z-95). The consumer for tests/replays/hui/93_hui_electrocuted.rpl.
 #
+# WHAT: Phobos as the ELECTROCUTE victim, ours vs native vsav2: Victor's HELD HP (class
+#   0x07) installs the electric shake on both legs, a quick press does not, and the
+#   sound-ring inventory across the electrocute window matches native up to the recorded
+#   cosmetic 0x10A/0x10B pair.
+# HOW: replay 93 on both games on MAME (four runs), the victim's class, freeze and shake
+#   rows read from dumps; the quick-press leg is a standing negative control; section 3
+#   freezes the ring over the electrocute window only.
+# EXPECTS: the shake installed by the held HP on both legs, not by the quick press, and the
+#   window inventory frozen. The two extra pre-match Phobos voices are a measurement with an
+#   open confound, deliberately not asserted.
+#
 # WHY IT EXISTS. STATE recorded TWICE (14z-74, 14z-76) that "no existing
 # replay produces an electrocute", so the effect-palette block's visibility
 # had to be settled by playtest and the maintainer's 2026-08-18 sfx report had

@@ -4,6 +4,18 @@
 # 14z-145 close left open: same-id attack windows land ONCE on SA CL.5HK
 # (`2(2)3`), THREE times on JE 5HP (`2(5)2(5)2`), FOUR on MO CL.5HK.
 #
+# WHAT: the multi-hit re-hit rule is the RECENT-HIT SLOT, cleared on every gap node: the hit
+#   test refuses a record whose hit id equals the victim's slot for that attacker, the
+#   contact installs the id, and the clearer runs every engine tick the attacker's node has
+#   no attack record — so same-id windows land once on SA CL.5HK (the juggle gate, not the
+#   dedup), three times on JE 5HP, four on MO CL.5HK, as tools/frame_data.py derives.
+# HOW: three vanilla hit rigs on MAME (6 runs in parallel) under a PC-attributed write tap
+#   on P2's ring, the clear/skip structure checked per node sample, contacts and the
+#   derivation compared; controls insert a clear on an attack-node frame of JE's tap and
+#   remove a contact from MO's.
+# EXPECTS: only the two writers, the structure rule holding, JE 3 / MO 4 / SA 1 contacts
+#   with the juggle refusal, the derivation agreeing; both perturbed taps fail.
+#
 # MUST-FIRE: perturbed-copy: clear-on-attack-node — a clear inserted on a non-last attack-node frame of JE's real tap must fail the structure check (mode: JE is reduced from that perturbed tap and section 1-4 must fail)
 # MUST-FIRE: perturbed-copy: missing-contact — a contact removed from MO's real tap must fail the contact/derivation check (mode: MO is reduced from that perturbed tap and section 1-4 must fail)
 #

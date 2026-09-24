@@ -3,6 +3,16 @@
 # `jsr (A0)` push its return address, and is that longword inside the masked
 # dead-stack window?
 #
+# WHAT: where each relocated object-pool walker's `jsr (A0)` pushes its return address: the
+#   one longword of state the walker relocation changes must land inside the ratified
+#   dead-stack mask window $FF7F00-$FF7FFF, or the design stops (never widen the mask).
+# HOW: corpus-wide MAME -debug runs recording A7 at both walker sites over every dispatch,
+#   with a per-page stack histogram; the frozen figure lives in
+#   build/manifest/walker_ghost.toml.
+# EXPECTS: min(A7)-4 >= 0xFF7F00 and max(A7) <= 0xFF8000 at both sites (measured A7 =
+#   0xff7ff6 constant over 279,577 dispatches); the dispatch counts reproduce the dispatch
+#   census. A red is an escalation, not a mask change.
+#
 # WHY (14z-91). The obj_hook legacy-cycle regression's fix relocates each
 # walker (0x54458 / 0x5E52A, 0x2C bytes) into free space, appends the
 # extended type table at copy+0x2C — the site's own `movea.l (0x12,PC,D0.w)`

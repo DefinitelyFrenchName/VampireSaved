@@ -12,6 +12,14 @@
 #      H links two pods);
 #   3. run on the set the build actually packed.
 #
+# WHAT: Pyron survives the 11,000-frame input-chaos soak across round transitions on the
+#   REAL packed stage-6 set, with his satellite alive in round 2.
+# HOW: builds stage 6 (stage 5 is the select plumbing that makes id 0x11 loadable — at stage
+#   4 the forced pick crashes by the gate's own premise), forces id 0x11 and runs
+#   70_pyron_mash guarded on MAME on the packed set.
+# EXPECTS: guard clean end to end and the satellite pointer 0xD4xx at f6000; a red is a
+#   crash or the satellite lost.
+#
 # WHY STAGE 6, MEASURED 14z-129 (it was RED in the 14z-128 sweep at stage 4,
 # CRASH 3020 vec4 PC 000000, and the crash was the GATE's premise, not the
 # port). STAGE 5 IS THE SELECT PLUMBING — the `aux_poke` rows that make a

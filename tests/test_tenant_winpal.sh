@@ -3,6 +3,16 @@
 # phase 3 item 5): a tenant winning a 2P match must get its OWN vs2
 # win palette, and a vanilla winner must get the untouched vanilla pool.
 #
+# WHAT: a tenant winning a 2P match gets its OWN vs2 win-screen palette through the sparse
+#   block and the TT thunk at the base load, and a vanilla winner still gets the untouched
+#   vanilla pool slice through the thunk's else path.
+# HOW: static: the site jsr, the thunk with its rebase re-derived, and the 8 sparse data ops
+#   equal to vs2's sets; a patch stripped of the site op is the negative control; runtime:
+#   replay 61 (tenant beats Victor) and replay 62 (Victor beats the tenant) on MAME with the
+#   victory rows read at the KO-traced frames.
+# EXPECTS: rows 0x15-0x19 equal to vs2's Donovan colour-0 set on replay 61 and to the
+#   vanilla pool slice on replay 62; the stripped patch fails.
+#
 # MECHANISM (measured; STATE 14z-63 / patch_notes addendum 3). The 2P
 # victory screen's palette load at PRG:0x5F1B6 computes
 # pool + (color*17 + winner_id)*0xA0 with the winner id UNMASKED in d6

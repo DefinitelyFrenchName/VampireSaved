@@ -1,6 +1,19 @@
 #!/bin/sh
 # test_rule_checker.sh — the adversarial RULE-CHECKER's record is sound: every run in tests/rulecheck/ledger.tsv is complete and structured, every planted violation was caught, every fixture is calibrated, every VIOLATED resolved, and every freeze since the checker's birth was checked (GitHub #152, 14z-163). ROM-free, ~2 s.
 #
+# WHAT: the adversarial rule-checker's record (tests/rulecheck/ledger.tsv and the run
+#   directories) is sound: every run complete and structured, every planted violation
+#   caught, every fixture calibrated by the CURRENT pinned reader, every VIOLATED resolved
+#   in writing, every freeze since the checker's birth named by an OK freeze run, and
+#   `record` bound to the readers' spawn check.
+# HOW: section 1 runs tools/rulecheck.py's parser selftest; section 2 runs `rulecheck.py
+#   check` on the real ledger, fixtures, run dirs and registry; section 3 fires six controls
+#   on perturbed copies (a quiet plant, a moved reader, an unchecked freeze, a prose
+#   verdict, an unbound recorder, a cross-family plant); the RECORD BINDING section proves a
+#   pinned-reader run cannot be recorded without its transcript.
+# EXPECTS: PASS with every control fired; a red names the run or fixture and the shape in
+#   which the checker could look alive while asserting nothing.
+#
 # MUST-FIRE: perturbed-copy: quiet-control — a copy of the record in which one run's plant reads DEAD while its verdict still reads OK must fail: a dead plant VOIDS the verdict, and a checker that stopped catching its plants is a dead control
 # MUST-FIRE: perturbed-copy: moved-reader — a copy whose pinned reader .claude/agents/rule-checker.md differs by one line must fail: a calibration counts only if the CURRENT definition read it (14z-178)
 # MUST-FIRE: perturbed-copy: unchecked-freeze — a copy of the registry with one more row after the birth row, named by no `freeze` run, must fail: a freeze is bound to the checker mechanically

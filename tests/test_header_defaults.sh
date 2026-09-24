@@ -2,6 +2,16 @@
 # test_header_defaults.sh — a gate's HEADER must state the default its CODE
 # actually uses (14z-128). ROM-free, ~2 s.
 #
+# WHAT: a gate's header states the default its CODE actually uses: every `build/<dir>` a
+#   header presents as an invocation or a default is one the code sets, so the generated
+#   gate index never tells a reader to pass a pruned build directory.
+# HOW: tools/audit_header_defaults.py compares each header's invocation-shaped build paths
+#   with the defaults its code assigns, exempting backticked tokens and blocks introduced as
+#   verbatim archives; the control adds a stub with a stale Usage directory to a copy of
+#   every real header.
+# EXPECTS: PASS when every header default is a code default; a red names the gate and the
+#   stale path.
+#
 # MUST-FIRE: known-bad: stale-usage-dir — a Usage line naming a build dir the code does not default to must be caught (mode: that stub added to a copy of every real header)
 #
 # THE CLASS, and it is the twin of test_build_ref_rot.sh's. That gate closed

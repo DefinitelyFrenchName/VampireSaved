@@ -2,6 +2,17 @@
 # audit_throw_tech.sh — THE THROW TECH-HIT (escape), both directions per
 # tenant (14z-104 (3); coverage matrix gap 1's second half).
 #
+# WHAT: the throw tech (escape) both ways per tenant: a tenant escaping Demitri's throw
+#   halves the damage to the frozen 7, Victor escaping each tenant's throw reads the
+#   per-throw frozen value, and Donovan's throw is identical with and without the tech — as
+#   on native vsav2.
+# HOW: the judge/02_throw rig on MAME plus the victim's own throw input held from about 2
+#   frames after the grab connects; damage read from dumps; a `notech` control (no victim
+#   input) must deal the full 13.
+# EXPECTS: each leg's teched damage equals its frozen value; notech deals 13. A red is a
+#   ported reaction row that stopped honouring the escape, or a tech landing where native
+#   has none.
+#
 # MEASURED (legacy control, 14z-104 (3)): the tech registers as the
 # victim's own throw input (forward + HP) held from ~2 frames AFTER the
 # grab connects; it HALVES the throw damage (control: 13 -> 7) while

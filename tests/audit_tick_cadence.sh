@@ -1,6 +1,21 @@
 #!/bin/sh
 # audit_tick_cadence.sh — THE EXTRA LOGIC PASS IS DECIDED BY THE SPEED LEVEL, and on vanilla content each game's DEFAULT play mode sets a different one: vsav2 (TURBO, level 8) doubles its pass every third frame, vsavj (NORMAL, level 6) every fourth or fifth, both fighters on the same frames, both passes inside ONE activation of the game task; section C: the decider, the play mode, the stack chain through the game-task loop, and causal controls at matched levels (GitHub #135, measured 14z-156 and 14z-158).
 #
+# WHAT: the engine's extra logic pass is decided by the SPEED LEVEL, and each game's default
+#   play mode sets a different one on vanilla content — vsav2 (TURBO, level 8) doubles its
+#   pass every third frame, vsavj (NORMAL, level 6) every fourth or fifth — both fighters on
+#   the same frames, both passes inside one activation of the game task; the decider, the
+#   play mode and the stack chain measured (#135).
+# HOW: the vanilla Victor mirror on vsav2 and vsavj on MAME under tests/lua/tap_writes.lua
+#   (no debugger): taps on both fighters' node pointer/timer/tick, P2's hit-freeze, and the
+#   task table, plus a whole-work-RAM dump every frame over 2560-2760; section B's negative
+#   searches must first find a planted case; controls read vs2's taps with vsavj's PCs,
+#   predict from the frame counter instead of the pass counter, and read the chain from the
+#   supervisor stack.
+# EXPECTS: the frozen tick, double-tick and freeze counts per game, one activation per
+#   frame, the pass prediction matching every frame from $FF8081 and the level; each control
+#   fails its section. Levels other than 6 and 8 are not asserted.
+#
 # MUST-FIRE: perturbed-copy: twin-pc — vsav2's taps read with vsavj's tick and node-entry PCs must fail the live-twin assertion (no writes land there), so every count below is proven to rest on the PC map
 # MUST-FIRE: perturbed-copy: frame-counter-decider — section C's pass prediction computed from the FRAME counter $FF8080 instead of the PASS counter $FF8081 must fail the every-frame match, so the prediction is proven to rest on the counter the decider reads
 # MUST-FIRE: shadow-tool: supervisor-stack — section C's return-address chain read from the supervisor stack (the "SP" state, what tap_writes.lua's STACKLOG read before 14z-158) must fail to find the game-task loop, so the chain is proven to rest on the live user stack

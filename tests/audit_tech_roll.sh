@@ -3,6 +3,17 @@
 # per tenant, plus the pursuit-vs-roll counter (14z-104 (3); coverage
 # matrix gap 1, maintainer-described mechanic 2026-08-22).
 #
+# WHAT: the tech roll (moving recovery) works both ways per tenant — a rolling tenant runs
+#   his ported recovery states and translates, a legacy victim rolls out of a tenant's
+#   knockdown (except Phobos's untechable crouch-HK, identical on native) — and the
+#   pursuit-vs-roll counter whiffs as designed.
+# HOW: the judge/03_down_attack rig on MAME with the victim's held direction+button through
+#   the landing; roll state and translation read from dumps; a `tap` control (4-frame tap)
+#   must not roll; an all-legacy `ctl` leg checks the instrument.
+# EXPECTS: roller legs fire a roll state and move >= 60px; attacker legs let Victor roll
+#   except off Phobos (frozen native-anchored); the pursuit at a rolling victim fires, deals
+#   no damage and the victim ends displaced >= 60px; the tap does not roll.
+#
 # MUST-FIRE: known-bad: tap-must-not-roll — a 4-frame tap must NOT register a roll, so demanding the FORBIDDEN roll from the tap leg must fail (mode: the tap leg is asserted to roll >=60px, which the real tap never does, so the gate FAILs)
 #
 # MEASURED (legacy control, 14z-104 (3)): the roll registers as a HELD

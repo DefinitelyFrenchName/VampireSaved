@@ -8,6 +8,15 @@
 # Sol Smasher 0x40/0x41 (air), Cosmo 0x42; Huitzil Launcher 0x44, Plasma Trap
 # 0x45, Final Guardian 0x46, Erasing Sphere 0x47. Emulator tier (~2 min).
 #
+# WHAT: which projectile-pool types each tenant's moves SPAWN on native vs2 (Donovan's
+#   Blizzard 0x3E; Pyron's Sol Smasher 0x40/0x41 and Cosmo 0x42; Phobos's Launcher 0x44,
+#   Trap 0x45, Final Guardian 0x46, Erasing Sphere 0x47), frozen per event.
+# HOW: the naming rigs' specials and meter parts on native vs2 on MAME with the 32 pool
+#   slots' type bytes sampled per frame; tools/projectile_census.py lists per event the
+#   types that first appear after its input; P2's id asserted from the trace.
+# EXPECTS: the census equal to tests/expected/projectile_census.txt (re-frozen when the rigs
+#   became real picks and when P2 became Demitri); a red is a spawn missing, extra or moved.
+#
 # Usage: ROMDIR=... [MAME_BIN=...] [FREEZE=1] tests/test_projectile_census.sh
 #   FREEZE=1 (since 14z-160) rewrites the census from the run; re-frozen 14z-160
 #   when the Phobos and Pyron rigs became REAL cursor picks on native vs2

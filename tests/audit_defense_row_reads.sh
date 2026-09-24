@@ -1,6 +1,19 @@
 #!/bin/sh
 # audit_defense_row_reads.sh — WHICH ROW EVERY HIT'S DEFENSE READS INDEX, by the victim's identity, over the corpus on our merged build and on pristine vsavj, frozen (14z-169, the analysis before the ruled fix "the tenants' defense rows become vs2's", #136).
 #
+# WHAT: which row every hit's two defense-table reads (the curve at PRG:0x018C20 and the
+#   rally threshold at 0x018C7C) actually INDEX, by the victim's identity, over the corpus
+#   on our merged build and on pristine vsavj — the live half of the ruled defense-row fix's
+#   premise that a tenant victim's hit reads the tenant's own row.
+# HOW: 218 non-debug read-tap runs on MAME (the 12 victim parts, the 30 naming parts, every
+#   suite replay on ours, and every suite replay on pristine vsavj as the legacy control),
+#   each read attributed by PC with the +0x382 value it took, identity from each block's
+#   tapped hitbox base (never +0x382 itself, the thing in question); liveness per window by
+#   the END probe; controls plant a foreign flavour poke and delete a tap window.
+# EXPECTS: every tenant hit reads the tenant's own row, the legacy control reads vanilla's
+#   rows, the frozen table equal; a dead window or a foreign row fails. NOT covered: a table
+#   base computed at run time or reached through a data pointer.
+#
 # MUST-FIRE: perturbed-copy: planted-flavor — donovan_victim_1 on our build with a Lua poke of 0x01 into P2's +0x382 at frame 2680 (inside the match, before the first hit) must be reported as a tenant hit reading a row that is NOT its own and FAIL the own-row check, so the check reads the index the engine read (in-gate: that one run must report a mismatch; mode: every victim part carries the poke and the gate FAILs)
 # MUST-FIRE: perturbed-copy: range-silent — a copy of a tap log with every access to P2's +0x382 window deleted must be reported as a DEAD window, so each run's windows are each proven live to the end (in-gate: the first run's copy must read P2 dead; mode: every run's log is perturbed before the liveness check and the gate FAILs)
 #

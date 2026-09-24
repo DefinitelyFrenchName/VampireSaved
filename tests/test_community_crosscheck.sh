@@ -2,6 +2,18 @@
 # test_community_crosscheck.sh — OUR DERIVED VANILLA FRAME DATA STILL SAYS WHAT
 # THE COMMUNITY WORKBOOK SAYS (14z-125, the community cross-check).
 #
+# WHAT: our derived vanilla frame data still says what the community workbook says: every
+#   (character, column) classified EXACT / CONSTANT OFFSET / CONSTANT RATIO / INCONSISTENT /
+#   UNCOMPARABLE as frozen, and the committed page carries verdicts only — no per-move
+#   number of ours or the workbook's.
+# HOW: tools/xlsx_read.py reads the third-party workbook outside the tree (checked cell for
+#   cell against openpyxl when present), tools/vanilla_frames.py derives all 15 characters
+#   off the frozen vsavj image, tools/crosscheck_framedata.py classifies against
+#   tests/expected/community_crosscheck.txt, and the GENERATED page is compared with a
+#   regeneration; the control moves one derived startup by three frames.
+# EXPECTS: the classification and the page equal; the perturbed startup flips a column out
+#   of CONSTANT OFFSET; without the workbook the gate SKIPs, never passes.
+#
 # MUST-FIRE: perturbed-copy: perturbed-startup — one derived startup moved by three frames must flip that character's column out of CONSTANT OFFSET (mode: the perturbed derivation is what sections 3-4 classify, and this run must fail)
 #
 # WHAT IT HOLDS. tools/vanilla_frames.py derives startup / active / recovery /

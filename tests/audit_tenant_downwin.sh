@@ -2,6 +2,17 @@
 # audit_tenant_downwin.sh — THE LIFE-MARKER TRANSITION (KO-path judge),
 # both directions per tenant (14z-104).
 #
+# WHAT: the life-marker transition on the KO path, both ways per tenant: a tenant KOs a
+#   legacy dummy and a legacy attacker KOs the tenant, and in both the round judge awards
+#   the down and spawns round 2 — the direct lock on the #103 class (a ported row starving
+#   the judge).
+# HOW: the judge/01_timeout_lead rig on MAME with the target's real and white HP poked to 1
+#   so the jab kills; $FF810E, $FF8120 and both HP words read from dumps; all-legacy
+#   `ctl`/`vctl` legs and a `nopoke` leg (the jab must not advance the round) are the
+#   controls.
+# EXPECTS: per leg the KO happens, $FF810E goes 0 -> 1 with winner 0xFF, round 2 spawns with
+#   both HP at 0x120, END clean; the nopoke leg shows no transition.
+#
 # §4 mandates life-marker-transition coverage per ported character; the
 # corpus had it for Donovan only (20_don_round2 / 23_don_matchwin). This
 # is also the DIRECT #103-class lock: the round judge kills on WHITE

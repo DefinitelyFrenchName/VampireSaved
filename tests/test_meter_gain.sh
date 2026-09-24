@@ -4,6 +4,20 @@
 # community cross-check's `gauge_hit` column carried six cells no instrument
 # could adjudicate (SA 5HK/2HP, BI 2HK, FE 5MP, ZA J.2HK, LE J.HP).
 #
+# WHAT: what a vanilla normal pays its attacker in METER on a CONNECT, read off the engine:
+#   the net on-hit gain equals the record's +0x14 times the hits that landed (law A), the
+#   swing cost is 0/3/6 by strength and equals the workbook's whiff cell, and the six cells
+#   the cross-check could not adjudicate are frozen as (hits landed, net) — the residue is
+#   how many windows LAND, never the per-hit meter.
+# HOW: the connecting legs of tools/vanilla_join_rig.py on MAME (8 runs in parallel, P2
+#   Victor idle, HP re-pinned) traced for P1's meter and stocks and P2's HP, reduced by
+#   tools/meter_gain.py; the full table is hash-locked out of tree
+#   (../charpages/framedata/); the control perturbs SA 5MP's net gain in a copy of the
+#   table.
+# EXPECTS: law A on every event, the swing costs, the six frozen cells, no VOID on a frozen
+#   cell, the out-of-tree hash equal; the perturbed net fails law A. SKIPs without the
+#   community workbook.
+#
 # MUST-FIRE: perturbed-copy: perturbed-net — SA 5MP's net meter gain moved by one in a copy of the measured table must fail law A (mode: section A-D runs the real verdict on that perturbed table and must fail)
 #
 # THE INSTRUMENT: tools/vanilla_join_rig.py CONNECTING legs (`hit`, `hit_crouch`,

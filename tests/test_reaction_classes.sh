@@ -1,6 +1,18 @@
 #!/bin/sh
 # test_reaction_classes.sh — THE ROUTE OF A HIT'S CLASS FROM THE RECORD TO THE REACTION, re-derived from the decrypted images for pristine vsavj, vs2 and our merged build, with the legacy record census by class and every constant writer of the victim's +0x54, frozen (14z-169, the analysis before the class-0x52 fix of the column shock and the Plasma Trap, #136, which the maintainer ruled on 2026-09-18: "then I'm all for fixing. Once again, as long as we don't introduce noticeable lag and we don't break more things, it's a pure win/win" — DECISIONS_HISTORY.md).
 #
+# WHAT: the route of a hit's class from the attack record through the three stagers to the
+#   reaction table, re-derived from the decrypted images for vsavj, vs2 and our merged
+#   build: no stager or constant write puts 0x38 into +0x54 in vanilla (the ground stager
+#   writes 6 for 0x06 and 0x38 alike), vs2 tells its 0x52 apart only on a grounded victim,
+#   with the legacy record census by class and every constant writer of +0x54 frozen.
+# HOW: tools/audit_reaction_classes.py static over the three images (~3 s); controls
+#   re-point vsavj's ground stager entry 0x38 at the copy handler and re-class a reachable
+#   legacy record from 0x06 to 0x38 in copies of the images.
+# EXPECTS: the frozen route, census and writer rows equal (the ours rows following the
+#   build); each plant moves exactly its two rows and fails. Not covered: +0x54 written from
+#   a register — audit_reaction_class_live's half.
+#
 # MUST-FIRE: perturbed-copy: stager-38-copy — a copy of vsavj's opcode image with the ground stager's entry 0x38 re-pointed at the copy handler must move the 0x38 route and the copy count and FAIL the frozen compare, so the route rows are read from the image (in-gate: the planted run must differ on exactly those two rows; mode: the gate runs on the planted copy and FAILs)
 # MUST-FIRE: perturbed-copy: record-06-to-38 — a copy of vsavj's data image with the first reachable class-0x06 legacy record re-classed 0x38 must move the 0x06 and 0x38 census rows and FAIL the frozen compare, so the census reads each record's class byte (in-gate: the planted run must differ on exactly those two rows; mode: the gate runs on the planted copy and FAILs)
 #

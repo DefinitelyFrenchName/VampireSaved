@@ -4,6 +4,17 @@
 # WHITE (correct shapes, white fill — the maintainer's captured surface).
 # On-demand, ~8 min (3 MAME runs, 2 at a time).
 #
+# WHAT: the #105 lock: with AUTO chosen by the winner, the 2P and 1P victory screens draw a
+#   TENANT winner's portrait in colour (the win palette uploaded in time), as vanilla draws
+#   its own AUTO winner.
+# HOW: five MAME runs: merged + AUTO (leg A), merged without AUTO (B), pristine vsavj + AUTO
+#   (C, the not-ours control), the 1P vs COM flavour (D) and a legacy winner with inputs
+#   ended at the KO (E); palette RAM at 0x90C2A0 is scanned over the whole window for a
+#   white run or a real ramp.
+# EXPECTS: with EXPECT_WHITE=0 (since the fix) every leg reads COLOURED; C must always be
+#   coloured or the reading is wrong. A DEAD leg (neither white nor coloured) is refused;
+#   leg E carries its own liveness (Demitri's base, P2 KO'd).
+#
 # THE SURFACE (named from the maintainer's captures, reproduced
 # deterministically): the victory screen — winner portrait + win quote —
 # shown after match wins in BOTH 1P-vs-COM (PRESS START corner; leg D,

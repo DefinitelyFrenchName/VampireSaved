@@ -3,6 +3,19 @@
 # is (14z-123, the documentation rationalization pass, inferred_claims row 4;
 # closes the 14z-118 (16) leftover "Open: what object byte +0x10 is").
 #
+# WHAT: what RAM:$FF8127 is — the FRONT/BACK draw-order selector: its writer compares byte
+#   +0x10 of each fighter's current ANIM NODE (a per-pose depth key with a small frozen
+#   vocabulary), and the identity front = (P1 node[+0x10] < P2 node[+0x10]) holds every
+#   frame outside a capture window.
+# HOW: one MAME run of replay 37 (2P Jedah vs Victor to a KO) on pristine vsavj, the two
+#   node pointers and $FF8127 traced per frame, the node bytes read from the ROM, the
+#   identity checked on every non-capture frame (the capture flag widened by ±8 frames), the
+#   vocabulary compared with tests/expected/front_comparator.txt.
+# EXPECTS: the tap live (front toggles thousands of times), zero violations outside
+#   captures, every observed byte in the frozen vocabulary. A violation means the input is
+#   not node+0x10 — re-measure, never widen; vocabulary growth is a new pose class to extend
+#   deliberately.
+#
 # WHY. ram.md recorded $FF8127 as a per-frame COMPARATOR written by
 # PRG:0x02228E — `d1 = (P1)+0x10; cmp.b (P2)+0x10,d1; beq/bcc -> 0, else 1`
 # — but left OPEN what the byte +0x10 it reads actually IS ("an 8-bit

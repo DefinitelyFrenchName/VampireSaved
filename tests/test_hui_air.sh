@@ -2,6 +2,16 @@
 # test_hui_air.sh — Huitzil air-movement gate (14z-66, playtest round-1
 # item 3: float + air dash were DEAD).
 #
+# WHAT: Phobos's air movement is alive with its measured mode signatures: hold-8 rises then
+#   HOVERS at a pinned height, and 66 during the float engages the air dash (seq 0x14) with
+#   a flat advance — not merely no crash.
+# HOW: replay 75 (float) and replay 79 (air dash) on MAME against a stage-4 build
+#   (self-built unless given), Y and X and the seq byte read from dumps at the frames after
+#   the rise completes.
+# EXPECTS: Y pinned >= 100px over f3350-f3370; seq 0x14 with X advancing >= 30px at
+#   near-constant height over f3185-f3200. A red is the float or dash dead again, or a
+#   rise-speed change moving the sample window.
+#
 # Mechanism (measured; STATE 14z-66): vs2 routes the class-02 jump seq
 # BY CHAR ID at the engine head — id 0x10 gets his OWN per-char jump
 # handler (float/air-action/restart bodies). The port clones that

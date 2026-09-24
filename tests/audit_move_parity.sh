@@ -1,6 +1,20 @@
 #!/bin/sh
 # audit_move_parity.sh — EVERY TENANT MOVE, OURS vs NATIVE vsav2, AT A MATCHED SPEED LEVEL AND A PINNED RNG (GitHub #136, 14z-159).
 #
+# WHAT: every tenant move, ours vs native vsav2, at a matched speed level and a pinned RNG
+#   (#136): the same naming rigs on both games, the tenant's own state compared every frame
+#   (node translated out of its placement, seq, sub-state, counter, x, y, stock, facing, DF
+#   flag, HP, meter fraction, P2's HP), one verdict per EVENT — IDENT / DIFF / VOID — frozen
+#   for all 506 events.
+# HOW: the 30 naming parts on MAME on both legs as REAL cursor picks (the merged wheel's
+#   path on ours), the level pinned to 6 from 2000 and the RNG from the match anchor, the
+#   comparison window starting at each rig's first event and each event judged in its own
+#   X-pinned window (tools/move_parity.py); four controls (the native level unpinned, the
+#   node untranslated, a stock starved, the X pins ignored).
+# EXPECTS: the 506 rows equal to tests/expected/move_parity_events.tsv, every in-DF event
+#   with the flag up on both legs, every DF activation seen; each control turns verdicts. A
+#   DIFF's cause is audit_move_parity_attribution's question.
+#
 # MUST-FIRE: perturbed-copy: unpinned-level — the native leg left at vsav2's DEFAULT play mode (TURBO, level 8) against ours at NORMAL must fail every part, so each verdict is proven to rest on the level the gate pins (in-gate: one part is re-run with the native level pin withheld and must diverge; mode: every native leg runs unpinned and the comparisons FAIL)
 # MUST-FIRE: shadow-tool: no-translation — comparing our RAW anim node pointer against native's, without translating it out of its placement, must fail, so every IDENTICAL verdict is proven to rest on the translation (in-gate: one part is compared both ways; mode: every part is compared untranslated and FAILs)
 # MUST-FIRE: perturbed-copy: stock-starved — a copy of a meter part's OWN trace with the stock zeroed at one event frame must make section 2b report that event as starved, so the headroom check is live on the real traces (in-gate: the first meter part's ours leg, perturbed; mode: every meter part's ours leg is perturbed before 2b and the section FAILs)

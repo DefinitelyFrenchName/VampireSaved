@@ -4,6 +4,17 @@
 # RE-FRAMED 14z-101: the "defect signature" this audit froze at authoring
 # is MEASURED NATIVE PARITY, not a defect — see GitHub #108's resolution.
 #
+# WHAT: the pool-vs-pool projectile-contact surface for Pyron's Cosmo satellites: they are
+#   projectile-sweep-inert on our build exactly as on native vsav2 (+0x94 hit-row index 0 on
+#   both), with each game's own OBJ bank word — measured native parity, not a defect (#108).
+# HOW: three parallel MAME legs probing the hit-class thunk body: a Demitri-vs-Demitri flare
+#   control that must show the sweep path ALIVE, the tenant rig on the build, and the same
+#   rig on pristine vsav2 as the parity anchor.
+# EXPECTS: the control fires (a quiet control voids everything), the tenant leg shows bank
+#   word 0x1000, satellite +0x94 == 0 and zero probe fires, the native leg +0x94 == 0 and
+#   bank word 0x6000. A hit-active native satellite reopens #108; EXPECT_SAT_SWEEP=1 is
+#   refused.
+#
 # What 14z-101's writer hunt established (FBNEO_HTAP, both legs, whole-run):
 #   - fighter/satellite +0x18 is the per-char OBJ BANK WORD (table
 #     PRG:0x282D4, writer PRG:0x282C0). Ours reads 0x1000 because our own

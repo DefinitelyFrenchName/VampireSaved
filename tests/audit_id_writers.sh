@@ -1,6 +1,15 @@
 #!/bin/sh
 # audit_id_writers.sh — which character ids does VANILLA ever assign?
 #
+# WHAT: no legacy gameplay path in the replay corpus ever writes a character id in the
+#   variant half 0x10-0x1F into either player struct — the invariant that makes a tenant on
+#   a variant id superset-safe by construction.
+# HOW: write taps on both id fields ($FF8782 P1, $FF8B82 P2) over 11 legacy replays on MAME
+#   (22 runs), collecting every (writer PC, value) pair; boot RAM-clear PCs excluded.
+# EXPECTS: every written value is a base id 0x00-0x0F from the known writer sites (attract,
+#   init, CPU opponent, challenger, select). Known gap stated in the header: Oboro's 0x18 IS
+#   a vanilla variant id no replay here reaches, so the proof is about THIS corpus.
+#
 # ON-DEMAND (22 MAME runs, ~10 min). Not in the battery; run it when the
 # claim below is load-bearing for a decision, and after any change that
 # could add a writer of the character-id field.

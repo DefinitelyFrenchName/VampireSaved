@@ -2,6 +2,17 @@
 # test_don_immortal_native.sh — 421+P (Lightning Sword) AGAINST NATIVE vsav2 AT A MATCHED SPEED LEVEL AND A PINNED RNG,
 # in hit count, damage and hit frames (14z-127, GitHub #114; matched 14z-158, #135, #142).
 #
+# WHAT: Donovan's 421+P (Lightning Sword) equals NATIVE vsav2 in hit count, damage and hit
+#   frames at every strength, no-mash and at the mash ceiling, at a matched speed level and
+#   a pinned RNG — the vanilla vsav engine taking precedence.
+# HOW: the same replays on native vsav2 and on the build on MAME with the speed level
+#   $FF8116 (6 and 8) and the RNG $FF80D4-D5 poked on both legs, hits read from the victim's
+#   HP; section 2 asserts WHO was selected (the #114 Jedah artefact is the must-fire
+#   control); two further controls leave the level and the RNG unpinned and must diverge.
+# EXPECTS: ours == native in every cell, both pins proven held by each leg's own dumps; the
+#   three controls fail as they must. Testimony has no place here: every constant is
+#   measured in the run.
+#
 # MUST-FIRE: known-bad: jedah-artefact — the #114 artefact (pristine vsavj + replay 48 selects JEDAH, not Donovan) must not be accepted as ours, so treating the Jedah control leg as ours must fail (mode: the control leg is measured and required to match Donovan, which it never does, so the gate FAILs)
 # MUST-FIRE: perturbed-copy: unmatched-modes — the native legs left at vsav2's DEFAULT play mode (TURBO, speed level 8) against ours at level 6 must fail, so the gate is proven to see the level it pins (in-gate: native LP at the ceiling at the default level lands its hits on different frames from ours at level 6; mode: every native leg runs at its default level and the level-6 comparisons FAIL)
 # MUST-FIRE: perturbed-copy: unpinned-rng — the MP no-mash legs at level 6 with the RNG left unpinned must diverge (native 4 hits, ours 5, measured 14z-158: #142), so the gate is proven to see the RNG state it pins (in-gate: two unpinned legs; mode: every leg runs unpinned and the comparisons FAIL)

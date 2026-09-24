@@ -2,6 +2,16 @@
 # test_don_accent.sh — weapon-accent steadiness + Victor-accent legacy
 # guard (session 14z-19, rounds 34-35).
 #
+# WHAT: Donovan's weapon-accent palette stays steady through the engine's accent march (both
+#   accent slots hold row-C content for slot 0x0F), Victor's accent data at 0x39B040 stays
+#   byte-identical to vanilla and his row-0x10 glow still cycles in a match — palette ROM to
+#   palette RAM never transits work RAM, so this is the only guard.
+# HOW: static reads of the built image's accent slots and Victor's block against vanilla,
+#   plus replays on MAME dumping palette RAM rows during a match for the cycle and the
+#   fixture-override and shock-window rows.
+# EXPECTS: identical accent uploads every phase, Victor's bytes untouched and cycling, the
+#   shock-window rows vanilla; a red is a palette regression no RAM oracle would see.
+#
 # Mechanism under test (docs/project/patch_notes.md 14z-19): the engine MARCHES
 # palette row 0x0C (P1 weapon row) through accent slots T0 (0x39FBE0)
 # and T1 (0x39FC00) plus the sprite block; for slot 0x0F both slots

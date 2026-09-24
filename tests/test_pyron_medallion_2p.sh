@@ -3,6 +3,16 @@
 # stability (14z-116). EMULATOR gate, ~5 min, two MAME runs. NOT in
 # ci_static; indexed in HANDOFF.
 #
+# WHAT: the P2-hover half of medallion palette stability: when P2 hovers Donovan, palette
+#   row 0x1A (Pyron's medallion row AND the P2 figure's sword-accent slot) keeps Pyron's vs2
+#   palette, and when P1 hovers Donovan row 0x17 still RECEIVES the accent — so the fix
+#   cannot be 'passed' by disabling the whole thunk.
+# HOW: two MAME runs on the merged build reading the two rows over the whole select screen;
+#   the control demands the pre-thunk grey ramp on row 0x17, which a good build never has.
+# EXPECTS: row 0x1A Pyron's palette throughout leg 1, row 0x17 receiving the accent in leg
+#   2, the control failing. The trade (the P2 sword drawn in medallion colours) is the
+#   board-confirmed, recorded cost.
+#
 # MUST-FIRE: known-bad: accent-lost — P1's accent must LAND on row 0x17 (not the pre-thunk grey ramp), so demanding the grey ramp must fail (mode: leg 2 is asserted to find the grey ramp on row 0x17, which a good build never has, so the gate FAILs)
 #
 # WHY THIS EXISTS — it closes a COVERAGE GAP, not just a bug.

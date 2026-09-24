@@ -1,6 +1,19 @@
 #!/bin/sh
 # audit_phobos_dmg_residual.sh — PHOBOS TAKES ONE MORE HP THAN NATIVE FROM DEMITRI'S 5HP, WITH HIS DEFENSE ROW ALREADY VS2'S, frozen AS MEASURED (14z-170, the open bug ticket): native vs2 11, our merged build 12, the same at three RNG pins — the residual the M19 defense-row fix left (merged-m18 read 13), cause unmeasured.
 #
+# WHAT: Phobos takes one more HP than native from Demitri's 5HP with his defense row already
+#   vs2's — native 11, ours 12, at three RNG pins — frozen as measured as the open bug's
+#   reproducer (#161); the premise 'his rows are already native' is checked from the build's
+#   own image.
+# HOW: twelve MAME runs, two at a time: the #136 parts huitzil_5 and huitzil_6 on native and
+#   ours (the merged wheel's Phobos path, the part's pokes, the level pin) at RNG pins
+#   0000/1234/5a5a, P1's HP traced every frame from 2300 and every loss frozen; the build's
+#   curve row 0x10 and threshold words compared with vs2's; the control replaces our step by
+#   native's.
+# EXPECTS: one P1 HP step per part on the same frame on both legs, not moving with the pin,
+#   the rows equal to vs2's, the frozen 11/12; the planted native step fails. WHY the extra
+#   point is the ticket's question, not covered.
+#
 # MUST-FIRE: perturbed-copy: residual-gone — a copy of our leg's HP trace with native's step in place of ours (what a fix of the residual looks like) must FAIL the frozen compare, so the gate reads the step it claims to read (in-gate: the planted copy must differ from the frozen rows; mode: the planted copy IS our leg and the gate FAILs)
 #
 # WHY. The maintainer ruled the #136 defense-row fix (vs2's defense curve and threshold rows for

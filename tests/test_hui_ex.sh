@@ -1,6 +1,15 @@
 #!/bin/sh
 # test_hui_ex.sh — Huitzil EX-move gate (14z-66, playtest round-1 item 1).
 #
+# WHAT: Phobos's two EX moves (Final Guardian 623+2K, Erasing Sphere 421+2K) run to
+#   completion without the watchdog reset the open sound-farm tripwire caused, and each
+#   actually FIRES.
+# HOW: both scripted EX repros guarded on MAME against a stage-4 build (self-built unless
+#   given); the stock byte $FF8509 must decrement from the poked 9 in each section.
+# EXPECTS: guard clean end to end and a stock consumed per section. Without the decrement a
+#   timing drift that stopped the move would leave the gate green — the silent coverage-loss
+#   mechanism.
+#
 # The maintainer's round-1 report: both EX moves (Final Guardian 623+2K,
 # Erasing Sphere 421+2K) ran most of their animation then crash-reset
 # (watchdog signature). Root cause (measured, replay 72): the ES flow's

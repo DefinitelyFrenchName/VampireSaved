@@ -2,6 +2,18 @@
 # audit_pyron_capture_block.sh — PYRON THROWS WITH DEMITRI'S CAPTURE GEOMETRY
 # (measured 14z-131, maintainer-ruled "measure against native vs2 first").
 #
+# WHAT: Pyron's throws place the victim with HIS OWN vs2 capture-keyframe block (ported at
+#   14z-143), not Demitri's, which vsavj's row 0x11 aliased: the held victim's position and
+#   pose sequence on our build equal native vs2's, while the Demitri control is identical on
+#   both legs.
+# HOW: static: Pyron's block against Demitri's in vsav2 (1 of 8 keyframes agree, the
+#   all-zero one); in-emulator: P1 Pyron vs P2 Victor on judge/02_throw on ours and native
+#   vs2 on MAME, the victim's per-frame offset and pose record over the hold compared by
+#   keyframe; EXPECT_MATCH=1 since the port.
+# EXPECTS: ours matches native through the hold with the control identical; a red is the
+#   alias back. The gate locks the observed difference; the one-mechanism reading (position
+#   and pose from one keyframe stream) is in the header.
+#
 # THE MECHANISM, read off vsavj's own positioner at PRG:0x02802E (vanilla
 # engine code, byte-identical in both games):
 #

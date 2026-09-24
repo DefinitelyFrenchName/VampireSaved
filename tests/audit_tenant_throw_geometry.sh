@@ -2,6 +2,18 @@
 # audit_tenant_throw_geometry.sh — PHOBOS'S THREE THROWS, OURS vs NATIVE VS2
 # (14z-131, maintainer-directed 2026-09-04).
 #
+# WHAT: Phobos's three throws (6+HP, Circuit Scrapper, ES Circuit Scrapper), ours vs native
+#   vs2, for all 18 roster victims: the held victim traverses the SAME ordered (pose, dx,
+#   dy) states in the same order on both legs, the end-of-hold tail is one uniform shape per
+#   throw, and damage is compared as (amount, pose) pairs — dwell reported, never asserted.
+# HOW: the same replay per throw and victim on both legs on MAME (six-way parallel, 54
+#   cells), every frame of the hold collapsed into the ordered state sequence with dwell
+#   counts; pose indexes resolved through each game's own anim_index_c (pixels deliberately
+#   not compared: two generations of the victim's art).
+# EXPECTS: 18/18 identical ordered states per throw, the frozen tail shape, the ±1 damage
+#   residue cells as frozen (the defense-row class, audit_defense_row_residue); a red is a
+#   state missing, reordered, or a damage cell moved.
+#
 # THE ASK, verbatim in substance: *"there are throws that have been
 # historically problematic with the VS2 tenants as THROWERS, not victims,
 # namely Phobos' throws: 4/6 + MP/HP at contact (standard throw); 63214 +

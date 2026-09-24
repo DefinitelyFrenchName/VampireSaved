@@ -1,6 +1,16 @@
 #!/bin/sh
 # test_hui_grab_victim.sh — the GRAB-VICTIM placement A/B gate (14z-73).
 #
+# WHAT: during Phobos's grab the VICTIM is placed as native vsav2 places him through the
+#   hold — the victim's offset relative to the attacker tracks native (the 14z-73 fix;
+#   before it the victim teleported ~109px mid-animation).
+# HOW: replay 80 on native vsav2 and on the build on MAME through field_trace.lua, comparing
+#   dx = p2x - p1x (which cancels the ~21px camera offset between the games) via
+#   tools/check_grab_victim.py; the checker refuses a leg that never grabbed; two verdict
+#   controls.
+# EXPECTS: with GRAB_VICTIM_EXPECT=matches (the default) ours tracks native through the hold
+#   (peak delta 0); a leg without seq 0x0E and 0x13 damage is refused; the controls fail.
+#
 # THE DEFECT — FIXED 14z-73 (grab_hold_keyframes: H's own vs2 keyframe
 # block 0x0C56AA ported, row 0xBE2BA repointed; patch_index documents this
 # gate guarding it at `matches`, peak Δ=0). Historical shape: during

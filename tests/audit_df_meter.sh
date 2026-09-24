@@ -1,6 +1,17 @@
 #!/bin/sh
 # audit_df_meter.sh — NO GAUGE IS BUILT IN DARK FORCE CHANGE, and since the 14z-170 fix (GitHub #157's Dark Force tail, ruled 2026-09-18) the tenants build none either: a whiffed attack's start-up gauge is suppressed inside +0x111 on every leg of ours, as vsavj's shells — frozen as measured, with vs2's EX install (which pays it) beside for reference. Until 14z-170 it froze the DEFECT: our tenants gained +6 per swing in the mode.
 #
+# WHAT: no gauge is built inside Dark Force Change on our build — for the shells as vsavj
+#   does it and, since the 14z-170 fix, for the tenants too (their ported meter adder used
+#   to pay start-up gauge inside the mode) — with vs2's EX install, which does pay it,
+#   frozen beside for reference.
+# HOW: 10 field-trace legs in parallel on MAME (real cursor picks, P2 kept out of reach so
+#   every attack whiffs): j.HP and 5HP out of the mode and in it, the mode at 3000 (P+K on
+#   vsavj and ours, the tenant's vs2 EX input on vsav2); every change of the gauge $FF850A
+#   frozen with its in/out label; the control plants +6 in-mode steps into our rows.
+# EXPECTS: no in-mode gauge step on any ours or vsavj leg, the vsav2 legs' +6 steps present,
+#   the frozen table equal; the planted swings fail.
+#
 # MUST-FIRE: perturbed-copy: swing-planted — a copy of our rows with one in-mode gauge step planted per tenant (+6 at the in-mode swing frames, the pre-fix defect) must FAIL the no-in-mode-gauge check, so "no gauge in the mode" is read from our legs' steps (in-gate: the planted copy must be caught; mode: our rows are planted before the checks and the gate FAILs)
 #
 # WHY. The meter adder (vsavj PRG:0x29A16, vs2 0x28D48) is byte-identical in the two

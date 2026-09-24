@@ -3,6 +3,18 @@
 # (PRG:0x3A3CA0 + id*32) MEASURED ON SCREEN for a TENANT opponent (14z-123,
 # the documentation rationalization pass, inferred_claims.md row 7).
 #
+# WHAT: the arcade ladder's VS-palette pool row for a TENANT opponent: the roulette screen
+#   copies pool row id*32 into palette row 0x0A (the tag's mini-art beside the opponent's
+#   name) and the VS screen itself is pixel-identical between 1P against CPU Phobos and 2P
+#   with P2 Phobos — the placeholder-ramp sentence about the VS screen was wrong.
+# HOW: four parallel MAME -debug legs on the merged build: the copy helper probed at 0xB0B4
+#   with A0/A1 read, screen identity from the state words, palette RAM at the VS frame,
+#   opponent liveness from the base table, a red-poke A/B on row 0x0A and a 1P-vs-2P pixel
+#   diff of the portrait regions; frozen in tests/expected/ladder_tenant_vs_palette.txt.
+# EXPECTS: one probe hit per 1P leg with the right addresses, zero on the 2P leg, the row
+#   equal to pool | 0xF000, only the tag box changing under the red poke, 0 px differing on
+#   the VS screen. The cosmetic roulette tag (base name and colours) is recorded, not fixed.
+#
 # WHY. Since M2b engine_internals carried "0x90C140 writers (vsavj 0xB0AC
 # attract path, table 0x3A3CA0 keyed by $114(a5)) not yet repointed — if the
 # attract demo shows wrong Donovan colors, that is the mechanism", later

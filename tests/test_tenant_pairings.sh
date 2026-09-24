@@ -3,6 +3,16 @@
 # ordering (14z-95). The coverage CLAUDE.md §4 mandates and the suite did not
 # have.
 #
+# WHAT: two ported characters in ONE match, all six orderings, run without a crash and with
+#   BOTH characters actually loaded — the 'vs each of the 18, both sides' coverage the
+#   corpus lacked when #99 slipped through.
+# HOW: replay 94 (character-agnostic) six times on the MERGED build, guarded on MAME in
+#   parallel; identity is checked on the per-character hitbox base +0x60.l (never +0x382,
+#   the voice-flavour class in match) against tests/expected/roster_pairings/bases.tsv,
+#   derived from the merged image's own table; an unpoked run must be REFUSED.
+# EXPECTS: six END-clean runs with both bases as frozen; the unpoked run refused. Adding a
+#   pairing is a row in the bases file, not a new replay.
+#
 # WHY IT EXISTS. §4 requires "vs each of the 18 (both sides)" for a ported
 # character. Until 14z-95 `tests/replays/` contained no pairing of two ported
 # characters AT ALL — which is the gap GitHub #99 walked through, and the

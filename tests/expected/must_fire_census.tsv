@@ -88,6 +88,8 @@ declares	test_expectation_provenance
 declares	test_fbneo_boot_log
 declares	test_freeze_artifacts_current
 declares	test_freeze_tag_coverage
+declares	test_gate_coverage_current
+declares	test_gate_descriptions
 declares	test_gate_index_current
 declares	test_gotchas_index_current
 declares	test_header_defaults
@@ -105,6 +107,7 @@ declares	test_mister_prg_window
 declares	test_mister_sdram_census
 declares	test_mister_tenant_oracle
 declares	test_mister_wide_gate
+declares	test_module_refs
 declares	test_mra_build_line
 declares	test_mra_parts
 declares	test_must_fire_census

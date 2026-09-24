@@ -1,6 +1,18 @@
 #!/bin/sh
 # audit_trap_shock.sh — the Plasma Trap dome inflicts SHOCK on BOTH of Phobos's tracks, and since the 14z-170 class-0x52 fix (ruled 2026-09-18, scoped S1) the two differ by design: the MERGED build plays vs2's rule (the victim shocked, Phobos exempt — the marker class 0x38), the SOLO Phobos build keeps the 14z-85g(2) remap and its attacker freeze (it lacks Donovan's machinery). On-demand, ~4 min (3 runs).
 #
+# WHAT: the Plasma Trap dome inflicts SHOCK on the victim on both of Phobos's tracks, and
+#   since the class-0x52 fix the two tracks differ by design: the merged build plays vs2's
+#   rule (victim shocked, Phobos exempt from the attacker freeze) and the solo Phobos build
+#   keeps the remap with its attacker freeze; native vsav2 is the anchor.
+# HOW: three MAME runs of the deep-overlap trap rig (native, merged, solo) with the speed
+#   level and RNG pinned on every leg; the victim's class, shock sub-state and freeze, and
+#   Phobos's own freeze, read per frame from dumps; the control plants the attacker freeze
+#   into the merged leg's rows.
+# EXPECTS: native class 0x52 / merged 0x38 / solo 0x06, all with seq7 == 4 and the freeze
+#   from 0x18; no attacker freeze on native and merged, present on solo; native and merged
+#   frame-for-frame identical over the dome window. Pre-fix builds fail by design.
+#
 # MUST-FIRE: perturbed-copy: attacker-frozen — a copy of the merged leg's dumps with Phobos's +0x5C set to 0x0B at the dome's first hit frame (the pre-fix attacker freeze) must FAIL the merged verdict, so "the attacker is exempt" is read from the merged leg's own RAM (in-gate: the planted rows must be caught; mode: the merged leg's rows are planted before the verdict and the gate FAILs)
 #
 # THE MECHANISM THIS LOCKS: the dome's hit records carry vs2's EXTENDED

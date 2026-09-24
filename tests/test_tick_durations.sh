@@ -3,6 +3,18 @@
 # ENGINE TICKS (14z-126b). This is what closed the last open residue of the
 # community cross-check: Jedah's crouching recovery.
 #
+# WHAT: our derived frame data is the engine's, in ENGINE TICKS: for three vanilla
+#   characters every crouching normal's derived total (startup+active+recovery) equals the
+#   ticks the chain consumes on stock vsavj, 18 of 18 exactly — which arbitrated Jedah's
+#   crouching recovery against the workbook.
+# HOW: 6 MAME runs with a write tap on the tick site PRG:0x027F70 (one write is one tick;
+#   frames cannot adjudicate a one-frame convention), segmented by the anim pointer leaving
+#   the chain's range, compared with tools/vanilla_frames.py; the control bumps one derived
+#   total.
+# EXPECTS: 18/18 totals equal with no tolerance; the perturbed total fails. The header
+#   records two paid traps: the tap range must be even and word-aligned, and counting over a
+#   rig window measures the crouch idle.
+#
 # MUST-FIRE: perturbed-copy: perturbed-total — a crouching move's derived total moved by one in the measured tick table must fail the derived-vs-measured compare (mode: JE's first crouch total is bumped and section 1 must fail)
 #
 # WHAT IT ASSERTS. For three vanilla characters (JE, LI, DE) every crouching

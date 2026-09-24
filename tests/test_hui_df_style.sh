@@ -3,6 +3,18 @@
 # ours-vs-NATIVE A/B of Huitzil in Dark Force, at the phase the symptom
 # was reported at.
 #
+# WHAT: Phobos in Dark Force compared directly with native vsav2 at the reported phase:
+#   whether his afterimages and recolour differ from native — with DF proven ACTIVE on both
+#   legs before any judgement (the first version compared two matches in which DF never
+#   activated).
+# HOW: replay 85 on native vsav2 and on the build on MAME with stocks poked;
+#   tools/check_df_style.py refuses to judge unless both legs show $FF802E set and a stock
+#   spent, then compares palette and afterimage evidence; three synthetic corruptions are
+#   the verdict controls.
+# EXPECTS: with DF_STYLE_EXPECT=differs (the default since the palette fix was withdrawn)
+#   ours differs from native as recorded; the three controls fail. Do not re-fix by
+#   restoring the withdrawn palette-seq row — it was Bulleta's block.
+#
 # WHY IT EXISTS. The playtest item is "in Dark Force H gets afterimages
 # and a purple recolour; native applies neither". Two sessions chased it
 # from our side alone (effect channels, the seq-0x0A handler, shadow

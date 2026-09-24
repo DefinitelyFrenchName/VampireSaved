@@ -1,6 +1,16 @@
 #!/bin/sh
 # audit_crouch_flag.sh — THE FIGHTER'S +0x121 IS THE CROUCH FLAG, measured against a scripted Down on native vsav2 and on our merged build (14z-169): the guard decision (vsavj PRG:0x0182E8-0x0183E4, vs2 0x016BA4-) branches on the VICTIM's +0x121 before comparing the record's class, so this names which of its two class lists applies to a standing victim (0x02 0x03 0x38 0x39) and which to a crouching one (0x2C 0x37 0x42 0x48 0x4A 0x4D) — read as lows and overheads, no hit against a guard run.
 #
+# WHAT: the fighter's +0x121 is the CROUCH flag: it rises with a scripted Down and falls
+#   with its release, identically on native vs2 and on our merged build — the fact that
+#   names which of the guard decision's two class lists applies to a standing and to a
+#   crouching victim.
+# HOW: the naming part donovan_1 (Down held 2840-2870) on both games on MAME, P1's (+0x121,
+#   seq, sub) at every change over 2830-2880 and P2's flag frozen per leg; the control
+#   deletes the Down from the replay and the flag must then never rise.
+# EXPECTS: the frozen transitions on both legs, P2's flag held 0, the stripped run flat. NOT
+#   covered: +0x121 in the air, while blocking, or on P2.
+#
 # MUST-FIRE: perturbed-copy: down-removed — the same rig with P1's Down (2840-2870) deleted from the replay must never raise +0x121, so the transition rows are proven to follow the input and not a timer (in-gate: the stripped run's +0x121 must stay 0 over the window; mode: every leg runs stripped and the frozen compare FAILs)
 #
 # WHY. docs/game/engine_internals.md ("The licence covers the class") states that a record

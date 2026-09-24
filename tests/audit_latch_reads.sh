@@ -1,6 +1,19 @@
 #!/bin/sh
 # audit_latch_reads.sh — WHO READS THE SELECT-CONFIRM LATCH IN PLAY, per leg shape, with the VALUE each reader saw: the measured half of the #151 step-3 sweep, frozen (14z-161).
 #
+# WHAT: who reads the select-confirm latch (+0x3BD/+0x3E0 id copies, +0x3C2 flavour) IN
+#   PLAY, per forced-pick leg shape, with the value each reader saw — the dynamic half of
+#   the #151 sweep that makes the static reader census's classes evidence (Phobos's flavour
+#   readers see 01, Donovan's VH2 flavour, on the #147 shape).
+# HOW: seven leg shapes on MAME (Phobos real, Phobos over Donovan, Phobos over Demitri,
+#   Donovan over Demitri, the Donovan victim rig, Pyron over Demitri, our WIDE build's
+#   Phobos) each under the non-debug PC-attributed read tap over both blocks' latch windows,
+#   the in-play readers frozen per leg with the byte seen; controls swap the poked leg for
+#   the real path and move the tap windows off the bytes.
+# EXPECTS: the frozen per-leg inventories (Phobos real 00, over Donovan 01, no reader for
+#   Donovan or Pyron in these rigs, ours only the float fork seeing the shim's 00); the
+#   real-path swap reads 00 where the row says 01 and fails, the moved windows read VOID.
+#
 # MUST-FIRE: perturbed-copy: real-instead-of-poked — the phobos-over-donovan leg run with Phobos's REAL cursor path instead of the poke reads flavor 00 where the frozen row says 01, and the comparison must FAIL (in-gate: that leg's values are asserted to differ from the phobos-real leg's; mode: the poked leg is replaced by the real path and the gate FAILs)
 # MUST-FIRE: perturbed-copy: tap-window-moved — the tap windows shifted past the latch bytes capture nothing, and a frozen non-empty leg must FAIL (in-gate: the reducer is fed an empty tap and must report VOID rather than an empty inventory; mode: every leg's window is moved and the gate FAILs)
 #

@@ -1,6 +1,20 @@
 #!/bin/sh
 # audit_df_field_readers_live.sh — WHAT THE #136 CORPUS EXECUTES AGAINST vs2's DARK FORCE POWER FIELDS, cross-checked against the static census (14z-168, GitHub #136 / #157's Dark Force tail): every placed instruction the corpus runs that reads or writes +0x1C3..+0x1C8 of either fighter block is a census row with the right access, and the rows it reaches are frozen.
 #
+# WHAT: what the #136 corpus actually EXECUTES against vs2's Dark Force POWER fields
+#   (+0x1C3..+0x1C8) on our build, cross-checked against the static census: every placed
+#   instruction that runs and touches a field is a census row with the right access class,
+#   nothing hides in a skipped region, and the host's own accesses are frozen.
+# HOW: 30 non-debug read-tap runs on MAME (every naming part of the three tenants with the
+#   parity gate's inputs and pins), both fighter blocks' +0x1C2..+0x1C9 tapped, every access
+#   attributed by PC and matched to tests/expected/df_field_readers.tsv; liveness per range
+#   needs a game write and the END probe; controls delete the first reached census row and
+#   delete a range's accesses.
+# EXPECTS: no MISSED or MISLABELLED access, no access inside a skipped region, the sampled
+#   and host rows frozen with the unsampled count; the deleted-row copy reports a missed PC,
+#   the silent range reads DEAD. Unsampled: the tenant as P2, the vs2 EX route, every path
+#   the corpus never runs.
+#
 # MUST-FIRE: shadow-tool: missed-planted — a copy of the census with the FIRST row the corpus reaches deleted must make the cross-check report that access as MISSED and FAIL, so a reader the census cannot see is caught wherever the corpus runs it (in-gate: the planted copy must report exactly one missed pc; mode: the gate cross-checks against the planted copy and FAILs)
 # MUST-FIRE: perturbed-copy: range-silent — a copy of a tap log with every access to P2's block range deleted must be reported as a DEAD range, so each run's two tap ranges are each proven live before the cross-check trusts their silence (in-gate: the perturbed copy of the first run must be reported silent in P2; mode: every run's log is perturbed before the liveness check and the gate FAILs)
 #

@@ -3,6 +3,16 @@
 # DF does not leak it (14z-84, the huitzil-m6 feature's guard). ~10 min,
 # 2 controlled DF legs on the build under test.
 #
+# WHAT: Phobos's Dark Force uploads HIS gold palette block into live palette RAM, and
+#   Bulleta's Dark Force does not leak it (the palette path never transits work RAM, so no
+#   RAM oracle can see this).
+# HOW: two controlled DF legs on the build under test (stocks poked, $FF802E asserted):
+#   palette RAM 0x90C000-0x90C400 is dumped and its rows compared on the 0x0FFF colour bits
+#   against the gold block read from the build's own patch.json.
+# EXPECTS: leg 1 (Phobos) has at least one row byte-equal to a gold-block row; leg 2
+#   (Bulleta) has zero. A red on leg 1 is a dead upload, on leg 2 a leak into a vanilla
+#   character's DF.
+#
 # The palette path is RAM-gate-blind (the standing 14z-79 lesson), so
 # this guard reads the LIVE CPS palette RAM during a controlled DF
 # ($FF8509 stock bank + $FF802E asserted — the ratified rig) and

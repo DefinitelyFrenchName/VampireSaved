@@ -4,6 +4,16 @@
 # and tick counts compared against the frozen native staircase.
 # On-demand, ~4 min (2 MAME runs, parallel).
 #
+# WHAT: Phobos's EX Final Guardian deals the same damage on our build as on native vsav2:
+#   the frozen native staircase 23/23/23/23/52 HP over five attempts, 12 HP-decrement ticks
+#   each — the lock on the x028122 object-hit damage applier's work-var reconciliation.
+# HOW: the same replay (89_hui_ex_fg_vs2) on native vsav2 and on the build in parallel on
+#   MAME; per-attempt damage and tick counts read from HP dumps; each attempt's stock
+#   decrement is the EX-fired tell; two verdict controls (a tick removed, no stocks).
+# EXPECTS: BOTH legs equal the frozen staircase with 12 ticks and 5 stock decrements; native
+#   drifting is as loud as ours. Pre-fix builds read 1/1/1/1/1 on ours — the gate was
+#   ground-truthed failing there.
+#
 # THE ITEM THIS LOCKS (14z-85f, closing the 14z-85e parity item): the
 # beam ticks of FG are processed by the PORTED vs2 object-hit damage
 # applier (vs2 0x28A6A, region x028122). Before the fix its A5-relative

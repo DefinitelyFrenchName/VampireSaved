@@ -1,6 +1,15 @@
 #!/bin/sh
 # audit_ff0460_writer.sh — who writes RAM:$FF0460, and with what values?
 #
+# WHAT: who writes RAM:$FF0460 and with what values — the sound driver's current-record
+#   pointer spill, which explains the merged build's one-frame flicker at that address as
+#   pointer phase, not gameplay state.
+# HOW: one FBNeo run with a PC-attributed write tap on $FF0460, boot-clear PCs excluded.
+# EXPECTS: exactly one gameplay writer PC (the dispatch prologue, tapped at the following
+#   instruction 0x0011E6) and every written value inside $FF0200-$FF04FF. A second writer or
+#   an out-of-range value means the atlas row and the flicker ratification must be
+#   re-derived.
+#
 # ON-DEMAND (1 FBNeo run, ~1 min). The measurement behind the 14z-82 atlas
 # row: $FF0460 is the SOUND DRIVER's current-record pointer spill, written
 # by the dispatch prologue at PRG:0x0011DE/0x0011E2 (`move.l sp,(-$7BA4,A5);

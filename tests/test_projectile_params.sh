@@ -4,6 +4,19 @@
 # tables, decoded from the type HANDLER (tools/projectile_params.py) and
 # MEASURED on the live spawn.
 #
+# WHAT: the projectile parameters: every $FF9400-pool type's inline init (velocities,
+#   accelerations, +0x26 and +0x50 selected by the slot's +0x9A variant) decoded from the
+#   type HANDLER equals the frozen rows on native vs2, the same decoder on each build's
+#   placed handler yields the same rows (ours == vs2), and every live spawn on the census
+#   rigs matches its decoded row within one tick.
+# HOW: tools/projectile_params.py over vs2's opcode view and each build's verify_op.bin at
+#   the placed addresses; five native legs in parallel on MAME reading each spawn's slot
+#   fields at its first sampled frame; the control perturbs one velocity word of a decoded
+#   row.
+# EXPECTS: frozen rows equal, ours == vs2 on three builds, 27 tabled spawns matching (Cosmo
+#   Disruption exempt and reported); the perturbed row fails the live compare. NOLIVE=1 runs
+#   the ROM-free half alone.
+#
 # WHAT IT HOLDS.
 #   1. the decoder's rows for the eight handlers on NATIVE vs2 (walker-2 table
 #      0x5C620[type]: 0x3E Blizzard Sword; 0x40/0x41/0x42 Sol Smasher ground/

@@ -1,6 +1,19 @@
 #!/bin/sh
 # audit_df_moves.sh — THE TENANTS' MOVES INSIDE THEIR DARK FORCE, ours (Dark Force Change, P+K) vs native (the vs2 personal-Dark-Force EX install), frozen AS MEASURED (14z-168, GitHub #136): every in-DF event of the #136 naming schedules re-run inside a mode that is ENTERED on both legs, compared by its ORDERED hits (damage, P2 reaction class) and gauge steps — all 29 events match in hits and damage but for the known remaps; the gauge differs by the two ruled rules.
 #
+# WHAT: the tenants' moves INSIDE their Dark Force, ours (Change, P+K) against native (the
+#   vs2 personal-Dark-Force EX install), frozen as measured: all 29 in-DF events match in
+#   ordered hits and damage but for the known remaps, and the gauge differs by the two ruled
+#   rules — with the mode proven ENTERED on both legs at every activation.
+# HOW: 10 legs in parallel on MAME, the #136 in-DF events re-run in groups of at most two
+#   per activation (110 frames after it, stocks re-poked, groups spaced past the longer
+#   mode), both legs' ordered hits (damage, class), gauge steps, palette page and RNG reads
+#   compared; six controls (the mode lost, an idle leg, a blind palette, a dead RNG pin, a
+#   moved form, a dropped hit) each must be refused.
+# EXPECTS: SAME on every event but the frozen DIFFER rows, every activation entered on both
+#   legs (else VOID), the six controls failing. Not shown: that the named move came out AS
+#   that move — the printed state paths say what it did.
+#
 # MUST-FIRE: perturbed-copy: mode-lost — our Change field +0x111 zeroed at the first compared event's frame (what a rig that outran the mode would read) must be refused by the in-mode check, so every compared event is MEASURED inside the mode on both legs, not assumed from the rig's spacing (in-gate: the zeroed copy must fail the check; mode: our field is zeroed before the check and the gate FAILs)
 # MUST-FIRE: perturbed-copy: idle-leg — our P1 state held still over the first compared event's window (what an input that produced nothing would read) must be refused by the acted check, so no SAME row can be two legs agreeing on nothing (in-gate: the held copy must fail the check; mode: our state is held before the check and the gate FAILs)
 # MUST-FIRE: perturbed-copy: palette-blind — the form reducer run with our palette page replaced by native's own (what a read that never reached our palette RAM would compare) must be refused, because no HUD palette is then seen differing, so the palette comparison is proven to see a real difference (in-gate: the blind rows must fail the checks; mode: the blind rows replace the real ones and the gate FAILs)

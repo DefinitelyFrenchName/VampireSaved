@@ -2,6 +2,15 @@
 # test_random_select_tenants.sh — RANDOM SELECT INCLUDES THE TENANTS (14z-117,
 # the maintainer's own list item, added 2026-08-28).
 #
+# WHAT: the random-select '?' cell draws the tenants too: the walker's bound and its draw
+#   table are displaced into bodies carrying 15 + tenant-count and the 18-entry table (the
+#   15 vanilla ids plus this build's tenants), and a confirm on a tenant loads that tenant.
+# HOW: static: both site thunks and the table in the built patch; runtime: P1 parks on '?'
+#   on MAME and $382 is sampled every frame over a full cycle; the control runs the same
+#   replay on the previous merged build with no thunk and must see no tenant.
+# EXPECTS: the set of ids seen equals exactly the 15 vanilla ids plus the build's tenants
+#   and the cursor reaches every index; the no-thunk control draws no tenant.
+#
 # MUST-FIRE: known-bad: no-tenant-drawn — the previous merged build (no thunk) draws NO tenant, so running the tenant-inclusion assertion against it must fail (mode: the build under test is set to the no-thunk control build; REFUSES with exit 3 if that build is absent)
 #
 # THE MECHANISM (docs/game/atlas/select_screen.md "THE RANDOM CELL"): while

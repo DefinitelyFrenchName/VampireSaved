@@ -1,6 +1,12 @@
 #!/bin/sh
 # test_don_column.sh — swordless-421P column KO crash gate (14z-33).
 #
+# WHAT: the swordless 421+P column's KO no longer crashes the machine: its KO records
+#   carried vs2's extended record types 0x50/0x52 past vsavj's dispatch table, fixed by
+#   alias remaps proven by vs2's own dispatch.
+# HOW: the exact crash replay run GUARDED on MAME.
+# EXPECTS: END clean; a vec3 reset or exception is the crash back.
+#
 # The column's KO records carried vs2's EXTENDED record types
 # 0x50/0x52; vsavj's record-type dispatch table ends at entry 0x4F, so
 # those types fetched CODE BYTES as jump displacements -> vec3 reset

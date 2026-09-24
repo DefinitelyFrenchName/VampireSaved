@@ -3,6 +3,18 @@
 # (the 14z-97 (7) doctrine debt, payable once #103 was fixed — paid at the
 # 14z-99 post-freeze close, 2026-08-20).
 #
+# WHAT: the #99 continue-with-switch path on the shipping merged build: lose as Phobos,
+#   continue, switch to Donovan at the re-select, and the ladder plays on through a
+#   Donovan-vs-CPU-Phobos match with no crash, the loss judged and the switch landed.
+# HOW: one guarded 40,620-frame marathon on MAME with the switch pokes frozen to the build's
+#   measured trajectory (P1 idle through match 1, CPU Bulleta KOs him, the judge runs to the
+#   continue prompt); fighter identity is checked through each block's +0x60 against the
+#   build's own hitbox-base table, so relocated tenant blocks are read at run time.
+# EXPECTS: END at 40620 with zero CRASH / PCWEEDS / SOFTRESET lines, the KO judged into a
+#   new match within 1600 frames, the post-continue match P1 = Donovan vs CPU Phobos. A red
+#   names which lock (crash, judge, switch, pairing) failed; the poke window moves at
+#   freezes that touch timing and is re-measured then.
+#
 # THE SCENARIO (#99, maintainer field report on merged-m2): a crash-reset at
 # fight start of the 5th arcade match, Donovan vs CPU-Phobos, reached by
 # continuing WITH A CHARACTER SWITCH after losing as Phobos. This rig

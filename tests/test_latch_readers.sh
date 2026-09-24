@@ -1,6 +1,19 @@
 #!/bin/sh
 # test_latch_readers.sh — WHO CAN READ THE SELECT-CONFIRM LATCH: the static census of every instruction naming a fighter block's +0x3BC/+0x3BD/+0x3C2/+0x3E0/+0x3E3 on vsav2, vsavj and the ported image, frozen (GitHub #151 step 3, 14z-161).
 #
+# WHAT: who CAN read the select-confirm latch: the static census of every instruction naming
+#   a fighter block's +0x3BC/+0x3BD/+0x3C2/+0x3E0/+0x3E3 on vsav2, vsavj and the ported
+#   image, by addressing form, frozen — the whole population the per-leg tap
+#   (audit_latch_reads) can ever attribute a read to, with the census's data-region `movep`
+#   noise frozen and named.
+# HOW: tools/audit_latch_readers.py over the decrypted opcode views and
+#   build/m3b_merged27/verify_op.bin, anchored on the extension word so a data table is not
+#   an instruction, its --selftest on both reference views first; controls: a shadow copy of
+#   the tool blind to the (d16,An) form, and the frozen inventory minus one vs2 reader row.
+# EXPECTS: the frozen inventory equal (vs2's confirm writers and clears, the tenants'
+#   in-play flavour readers and their relocated copies, the Shadow-flag readers); the blind
+#   tool fails its selftest, the dropped row fails the compare.
+#
 # MUST-FIRE: shadow-tool: blind-census — a copy of tools/audit_latch_readers.py whose disassembler never decodes the (d16,An) form must FAIL its own positive controls (in-gate: the tool's --selftest runs on both reference views and must PASS; mode: the shadow copy runs the same selftest and the gate's FAIL is its FAIL)
 # MUST-FIRE: perturbed-copy: dropped-reader — the frozen inventory with one vsav2 reader row removed must FAIL the comparison (in-gate: the frozen file is compared against itself minus its first vs2 read row and must differ; mode: the gate compares the measured census against that perturbed expectation and FAILs)
 #

@@ -3,6 +3,18 @@
 # (`tools/agent/sweep.py`), names every survivor it must and nothing it must not
 # (docs/project/agent_architecture_scope.md §4 C0.3, 2026-09-23).
 #
+# WHAT: the close-time process sweep (tools/agent/sweep.py) names every process a session
+#   left alive that it must — an ATTACHED tool shell under Claude with its child, six ORPHAN
+#   shapes pointing into the project — and nothing it must not (a non-leader helper, a quiet
+#   orphan, its own shell).
+# HOW: plants a live synthetic process world (a fake Claude, the six orphans, the quiet one)
+#   with the CLAUDE_* environment scrubbed, runs the sweep, then declares every survivor and
+#   expects CLEAN, then kills every plant and expects CLEAN with no survivor; three controls
+#   blind one signal each in a copy of the sweep.
+# EXPECTS: each plant named with its signal, the quiet processes unnamed, CLEAN after
+#   declaration and after the kill; a red names the plant missed or the process wrongly
+#   named.
+#
 # A synthetic process world, planted live, because the sweep reads the real process
 # table and nothing else would test it:
 #   - a FAKE CLAUDE process with (a) a tool shell — a session-leader child running a

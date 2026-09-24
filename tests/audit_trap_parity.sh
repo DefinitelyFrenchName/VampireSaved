@@ -4,6 +4,16 @@
 # ring-id inventories compared against the frozen measurement.
 # On-demand, ~5 min (2 MAME runs, parallel).
 #
+# WHAT: the Plasma Trap's SOUNDS on our build match the frozen per-attempt inventory: the
+#   restored ejection (an authored Z80 song at 0xD8) and the restored detonation chirp
+#   (0x199), never vsavj's music ids 0x739/0x73A, with the ambient 0x49A present as ring
+#   liveness; native vsav2's own inventory is re-measured beside it.
+# HOW: the far/timer trap replay on native vsav2 and on the build in parallel on MAME; the
+#   sound ring's ids around each trap event are collected and compared with the frozen
+#   inventories per leg.
+# EXPECTS: ours equals its frozen inventory, native its own, 0x739/0x73A absent on ours,
+#   0x49A present on both. The 0x10A/0x10B pair is a recorded cosmetic delta, not gated.
+#
 # THE MEASURED MECHANISM THIS FREEZES (14z-85g, both halves):
 # native vs2 fires per trap attempt: id 0x0739 at the mine SPAWN
 # (throw+15f, per-node record node 10), 0x010B, then 0x073A at the

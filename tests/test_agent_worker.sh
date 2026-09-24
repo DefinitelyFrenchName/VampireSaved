@@ -3,6 +3,18 @@
 # figures each traceable to a command" (docs/project/agent_architecture_scope.md §5), over a
 # FROZEN real run — ruled 2026-09-23 (14z-177, DECISIONS_HISTORY.md "Ruled 2026-09-23 (14z-177)").
 #
+# WHAT: a worker run on a known task returns figures each traceable to a spec command: over
+#   a FROZEN real `measurer` run, the worker ran at its definition's caps, every report
+#   figure appears in a result the worker itself got, every FIG names a spec command the
+#   worker ran and re-running that command reproduces the figure, and nothing off-spec ran.
+# HOW: tools/agent/extract.py reads the cut fixture tests/agent/worker_fixture/ (the raw
+#   transcript carried the maintainer's e-mail; the cut keeps only what the extract reads);
+#   only pinned `git show <sha>:<path> | wc -l | shasum` shapes are re-executed; three
+#   controls perturb a copy (a changed figure, a missing worker transcript, an off-spec
+#   command).
+# EXPECTS: every figure re-derives and conformance holds; each control fails on its copy; a
+#   red names the figure or the command.
+#
 # The fixture, tests/agent/worker_fixture/: a headless `claude -p` in this repository
 # (2026-09-23, Claude Code 2.1.280, session f155b260) that handed `.claude/agents/measurer.md` a
 # spec written from docs/project/worker_spec.md — two commands reading only content pinned at

@@ -19,6 +19,16 @@
 #   tests/test_m2a_stage4_xemu.sh   build/donovan6/rompath
 #   tests/test_m2a_flavor_selector.sh build/donovan6/rompath
 #
+# WHAT: the graphics build gate: stage 6 builds with its static gfx verification, survives
+#   the guarded soaks (moveset, DP spam, round 2, input chaos, the 40K marathon), and the
+#   fresh pipeline reproduces the CURRENT frozen generation on the masked legacy gate.
+# HOW: builds stage 6 (tools/verify_gfx_build.py inside), runs the guarded soaks on MAME,
+#   then the masked legacy suite with the target resolved from the build's fingerprint (the
+#   stock twin of the current freeze).
+# EXPECTS: gfx checks green, every soak END clean, the legacy leg EXACT against the frozen
+#   generation; a red on the last means the pipeline built fresh no longer reproduces the
+#   freeze.
+#
 # Usage: ROMDIR=... tests/test_m2b_stage6.sh [outbase]
 set -eu
 

@@ -2,6 +2,17 @@
 # test_mame_bin_pinned.sh — a gate that boots `vsavjw` through a MAME wrapper
 # must PIN the MAME binary (14z-133). ROM-free, ~1 s.
 #
+# WHAT: every gate that boots the WIDE set `vsavjw` through a MAME wrapper pins MAME_BIN,
+#   because tools/run_mame.sh otherwise falls back to Homebrew's stock `mame`, which does
+#   not know the set and produces an empty leg a gate without a liveness check may read as a
+#   verdict.
+# HOW: tools/audit_mame_bin_pin.py reads each script's non-comment text for a MAME wrapper
+#   call naming vsavjw and requires a real assignment or export of MAME_BIN (a bracketed
+#   Usage mention does not count); the control strips the pin from a pinned gate in a copy
+#   of tests/ and must report it.
+# EXPECTS: PASS when every in-class gate carries a pin; a red names the unpinned gate.
+#   Stock-set gates (vsavj, vsav2) are out of the class.
+#
 # MUST-FIRE: perturbed-copy: stripped-pin — a pinned in-class gate with its MAME_BIN lines removed must be reported UNPINNED (the tool's --selftest; the mode strips the first pinned gate in a copy of tests/ and scans the copy)
 #
 # THE CLASS. tools/run_mame.sh falls back to `mame` on PATH when MAME_BIN is

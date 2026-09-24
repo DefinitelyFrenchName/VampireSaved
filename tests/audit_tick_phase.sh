@@ -3,6 +3,18 @@
 # AND ITS PERIOD IS WHAT tools/name_moves.py QUANTISES ITS SCHEDULE SHIFT TO
 # (14z-172, GitHub #168).
 #
+# WHAT: the engine's double-pass cadence is periodic in FRAMES — one residue class mod 3 at
+#   speed level 8, three classes mod 13 at level 6 — and tools/name_moves.py's TICK_QUANTUM
+#   (39, their lcm) and ROUND_START (2545, the same with and without the level pin) are what
+#   this gate is the provenance of.
+# HOW: one naming-rig leg on native vsav2 on MAME at each level, the pass counter's double
+#   steps classed by frame index; the generator's constants read from its source; a second
+#   leg without the level pin for the round start; controls flatten the pass counter and
+#   perturb TICK_QUANTUM.
+# EXPECTS: the residue classes exact, the constants equal to the measured periods and round
+#   start; the flat trace and the wrong quantum fail. WHY a shift must be a multiple of 39
+#   rather than 3 is recorded as its own ticket, not explained here.
+#
 # MUST-FIRE: perturbed-copy: flat-pass — a copy of the level-8 trace with the pass counter made to step by exactly 1 every frame (no second pass anywhere) must FAIL the period assertion, so a dead tap or a frozen counter cannot read as a clean cadence (in-gate: the flattened copy must lose its double-pass frames; mode: the flattened trace replaces the real one and section 1 FAILs)
 # MUST-FIRE: perturbed-copy: quantum-off — a copy of tools/name_moves.py whose TICK_QUANTUM is not the lcm of the two measured periods must FAIL section 2, so the constant cannot drift from what this gate measures (in-gate: the perturbed value must be rejected; mode: the gate reads the perturbed copy and section 2 FAILs)
 #

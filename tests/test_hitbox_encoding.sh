@@ -2,6 +2,19 @@
 # test_hitbox_encoding.sh — THE HITBOX ENCODING AND THE ATTACK RECORD ARE WHAT
 # THE ENGINE USES (character-data map, PHASE 2; measured 14z-120 (5)).
 #
+# WHAT: the hitbox encoding and the attack record are what the ENGINE uses: the five table
+#   pointers resolve as decoded (+0x8C attack = base[4], +0x90 push = base[3]), every HP
+#   write comes with A3 = the attacker's node's attack record, every fighter hit begins on
+#   the first overlap frame under the MIRRORED-x convention with no whiff overlap, and the
+#   victim's +0x54 is the record's +0x17 on fighter, projectile, multi-hit and column hits.
+# HOW: Donovan on native vs2 on MAME with name_moves parts 9 and 10 under two instruments —
+#   field_trace (positions, facing, nodes, box ids, table pointers, the victim's HP and
+#   class) and the -debug write tap on the victim's +0x50..+0x55 (PC and A3 at every write);
+#   the un-mirrored convention is the negative control.
+# EXPECTS: pointers as decoded, A3 the node's record on every write, 8/8 hits on the first
+#   overlap frame with no whiff overlap, +0x54 = record +0x17 (or the forced generic 1); the
+#   un-mirrored convention fails most hits.
+#
 # WHAT IT HOLDS. tools/hitbox_records.py's reading of a tenant's hitbox data
 # (the five tables behind +0x80..+0x90, 8-byte (x,y,hw,hh) boxes authored
 # for the LEFT-facing sprite and mirrored when flip_x=1, the family table

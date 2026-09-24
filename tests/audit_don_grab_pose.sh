@@ -3,6 +3,17 @@
 # on the wrong capture record. On-demand, ~12 min (8 MAME runs, 2 at a time:
 # the build + native vsav2, for one legacy control victim and three tenants).
 #
+# WHAT: the #104 lock: a legacy attacker's grab holds a TENANT victim on the victim's own
+#   capture record (the pose index installed at victim +0x1C equals native vsav2's), not on
+#   the base character the variant-row alias folds onto.
+# HOW: eight MAME runs, two at a time: the build and native vsav2 for one legacy control
+#   victim and the three tenants under Victor's 6+HP grab; the capture region is resolved
+#   per victim through the build's placements; section 0 is the legacy control proving the
+#   reaction-index convention is shared and both rigs made the hold.
+# EXPECTS: every tenant's installed index equals native's and the control agrees on both
+#   legs. A red on a tenant is the alias class back (Donovan served Victor's 6, Phobos
+#   Bulleta's 12); a red on the control voids every tenant verdict.
+#
 # THE REPORT (maintainer, MAME field test 2026-08-19): a tenant victim of
 # Victor's headbutting grab (6+HP) shows a half-right / half-squished
 # HORIZONTAL pose. Named DONOVAN and PHOBOS.

@@ -2,6 +2,14 @@
 # audit_trap_sound.sh — the MK Plasma Trap fires, ring live (14z-82d
 # lock, RE-SCOPED 14z-85g).
 #
+# WHAT: the air 214+MK Plasma Trap fires without crashing the machine (the 14z-79 fix): the
+#   mine spawns into the projectile pool and the sound ring stays live across the run.
+# HOW: the timer trap rig on MAME (two runs); the type-69 pool write and the ambient ring id
+#   0x49A (periodic, ~144 frames, not the detonation) read from dumps.
+# EXPECTS: a mine spawned and ring activity continuing to the end; a crashing trap dies
+#   before any further ring activity. Sound parity is audit_trap_parity's question, not this
+#   gate's.
+#
 # WHY. Air 214+MK's detonation crashed the machine on every Phobos build
 # before the 14z-79 (b') fix. This audit locks that fix: the 87 timer
 # rig must SPAWN the mine (type-69 write into the projectile pool) and

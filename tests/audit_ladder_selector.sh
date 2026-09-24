@@ -2,6 +2,18 @@
 # audit_ladder_selector.sh — THE ARCADE-LADDER SELECTOR, made rerunnable
 # (14z-95, GitHub #99). On-demand, ~12 min (2 marathon runs, parallel).
 #
+# WHAT: the arcade ladder's stage selector, rerunnable: how many rungs the 40,620-frame
+#   marathon exercises, that a saturated in-use mask CLAMPS at the maximum legal stage
+#   rather than overrunning onto the non-existent class 0x18, and that the mask is
+#   load-bearing (poking it moves the stage).
+# HOW: two parallel MAME marathons reading $FF8100 (stage), $FF8110 (mask), $FF8114, $FF8138
+#   and $FF8121 from dumps; section 2 saturates the mask to 0xffffffff; section 3 pokes it
+#   and compares stage sets; the control forces the saturated set equal to the control's.
+# EXPECTS: one ladder advance in the marathon (more is an improvement wanting a deliberate
+#   re-freeze, fewer a regression), the clamp at idx 6 / stage 0x0016, and a stage set that
+#   changes under the poke. The dead hypothesis (overrun to 0x18, #99's shape) stays locked
+#   dead.
+#
 # MUST-FIRE: known-bad: mask-not-load-bearing — the in-use mask drives the stage, so a run where saturating it changes no stage must fail section 3 (mode: the saturated stage set is forced equal to the control so section 3 reads the mask as inert and the gate FAILs)
 #
 # WHY IT EXISTS. #99 is a crash reported at the FIFTH arcade match, and the

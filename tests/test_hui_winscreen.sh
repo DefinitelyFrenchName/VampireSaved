@@ -1,6 +1,15 @@
 #!/bin/sh
 # test_hui_winscreen.sh — the Huitzil WIN-SCREEN gate (14z-68m).
 #
+# WHAT: Phobos's win screen uses HIS palette row (0x0B of vs2's pool, self-labelled by the
+#   5*row marker) and HIS portrait position (vs2's 0x00C0,0x0080), not Donovan's colour-4
+#   row nor the vanilla alias position — both shipped wrong once.
+# HOW: static over the built image: the placed palette block compared byte-for-byte with
+#   vs2's row-0x0B sets and its marker word; the winner position table row read from the
+#   image.
+# EXPECTS: block, marker and position all vs2's for row 0x0B; the negative control fails on
+#   build/hui10.
+#
 # Locks the two fixes the maintainer confirmed on ping #10, both of
 # which were shipped WRONG once and would regress silently:
 #

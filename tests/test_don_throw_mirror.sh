@@ -4,6 +4,14 @@
 # on slot 0x0F = Donovan there), the thrown victim must use the
 # DONOVAN-victim keyframe block, not Jedah's.
 #
+# WHAT: in a base-slot mirror match (both players on slot 0x0F) the thrown victim uses the
+#   DONOVAN-victim keyframe block, not Jedah's — the two-byte fix at PRG:0x0B1A16.
+# HOW: static: the built image holds 0x0D88 at the blob's entry [0x0F]; runtime: replay 65
+#   on MAME with the victim keyframe walker tapped for reads of the fixed block versus the
+#   old one (206/0 on the candidate, 0/206 pre-fix).
+# EXPECTS: the word present and the walker reading only the fixed block. SKIPs on variant-id
+#   builds, where the mirror is tenant-vs-tenant at 0x13 and correct by construction.
+#
 # MECHANISM. The throw victim-keyframe blob (data_port
 # throw_victim_keyframes, dst 0x0B19F8) carries a victim-id offset table;
 # entry [0x0F] at blob+0x1E held 0x0B30 (the Jedah-victim block) and the

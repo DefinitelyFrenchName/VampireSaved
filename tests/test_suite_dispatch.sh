@@ -14,6 +14,18 @@
 #      expected frame PASSes; early divergence, no divergence, and a missing
 #      base log all FAIL.
 #
+# WHAT: the auto-detecting runner's dispatch pieces: the build fingerprint resolves a
+#   vanilla rompath to `vsavj` and fails LOUDLY (exit 2) on an unregistered patched build;
+#   the DUAL KEY (program key vs whole-set key) resolves as designed, whole-set winning and
+#   a whole-set-only row unreachable by the program fallback; and check_diverge's verdicts
+#   on synthetic logs.
+# HOW: runs tools/build_fingerprint.py against $ROMDIR and synthetic gfx-only deltas, and
+#   tools/check_diverge.py against synthetic logs at, before and without the expected
+#   divergence; the control demands the forbidden program-fallback resolution and must fail.
+# EXPECTS: every dispatch case gives the designed answer; a red names the piece. The
+#   emulator-side behaviours these pieces gate are proven by test_m2_repoint.sh and the
+#   suite itself.
+#
 # MUST-FIRE: known-bad: program-fallback-reaches-wholeset — a whole-set-only registry row must be UNREACHABLE by the program-key fallback (the merged1-vs-shipped hazard); the mode demands the forbidden resolution (rc 0) where the design refuses it (rc 2), so the run must FAIL
 #
 # Usage: ROMDIR=... tests/test_suite_dispatch.sh

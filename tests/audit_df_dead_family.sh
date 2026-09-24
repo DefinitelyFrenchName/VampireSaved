@@ -6,6 +6,17 @@
 # newcomers' vs2 EX moves (their personal Dark Force) run through 0x02622A and
 # arm +0x147 from their own handlers (tests/audit_df_modes.sh).
 #
+# WHAT: vs2's P+K (Dark Force POWER) never reaches the VS-style Dark Force family's shared
+#   field-setter tail at vs2 PRG:0x02622A — a claim by ABSENCE carried with its positive
+#   control: the activation body must fire exactly once at the press. (The tenants' EX moves
+#   DO reach it; that is audit_df_modes.)
+# HOW: four -debug runs on native vsav2 of the df/97 rig (HP+HK at f3260, stocks poked) with
+#   GUARD_PROBE breakpoints on the candidate and the control, for a newcomer (Donovan) and a
+#   vanilla character (Demitri); the must-fire asserts the candidate fired, which it never
+#   does.
+# EXPECTS: 0 probe lines on the candidate and exactly 1 on the control at frame 3260 on both
+#   legs.
+#
 # MUST-FIRE: known-bad: candidate-reached — the dead field-setter 0x02622A is never reached, so demanding it WAS reached must fail (mode: the candidate is asserted to have fired, which the real trace never shows, so the gate FAILs)
 #
 # WHY. docs/game/preserved_data.md entry 1: vs2/vh2 carry the VS-style

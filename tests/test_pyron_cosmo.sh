@@ -1,6 +1,18 @@
 #!/bin/sh
 # test_pyron_cosmo.sh — the Cosmo Disruption crash gate (rewritten 14z-75).
 #
+# WHAT: Pyron's Cosmo Disruption EX no longer crashes the board: the sub-state index the
+#   port copied verbatim (81, valid on vs2's larger table) is retargeted to 79 in HIS OWN
+#   ported data, and the engine's 80-entry dispatcher is never read out of range.
+# HOW: static: the guarded word and that table+0x224 is vs2's handler byte-for-byte;
+#   deadness: zero dispatcher reads of entry 81 on the OPCODE space filtered by PC (the boot
+#   checksum sweep touches every byte) against a live control; runtime: rig 72 on MAME with
+#   the field trace proving the EX fires and the match survives (a watchdog reset is not a
+#   68k exception).
+# EXPECTS: static bytes right, 0 out-of-range reads against a live control, no reset and the
+#   EX firing. The withdrawn 14z-74 engine-word fix is recorded in the header: right effect,
+#   wrong byte.
+#
 # THE CRASH. Pyron's EX drives the shared engine to sub-state 81 and the
 # engine dispatches it through a pc-relative table:
 #     018460  move.w ($6,PC,D0.w),D1     ; table base 0x018468

@@ -40,6 +40,16 @@
 #   5. test_m2a_stage4_xemu.sh   — MAME/FBNeo dual-emulator agreement
 #   6. test_m2a_flavor_selector.sh — Start-hold latch
 #
+# WHAT: the exact chain of gates a stage-6 development build must pass before a commit
+#   touching the build: the reference-ROM rule locks, the build + masked legacy gate,
+#   Donovan's behaviour, palette, sound and column gates, the native-vsav2 immortality leg,
+#   the vsav2-as-oracle field gates and the MAME/FBNeo agreement.
+# HOW: builds the dev ROM with GEN_FLAGS, then runs the numbered sections in order against
+#   it and against the reference sets, each section a gate script with its own verdict, the
+#   whole read through tests/lib/classify.sh.
+# EXPECTS: every section PASS; the first red stops the chain and names the section. A build
+#   that passes the battery is a candidate for a freeze, not a frozen build.
+#
 # MUST-FIRE: none — the stage-6 dev-build chain asserts through the gates it wraps; its accounting is tested by tests/test_battery_accounting.sh
 #
 # Usage: ROMDIR=... tests/run_battery_m2.sh [outbase]   (default build/donovan6)

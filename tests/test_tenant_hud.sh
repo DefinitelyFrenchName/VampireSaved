@@ -3,6 +3,16 @@
 # a tenant at 0x13 must show its OWN in-match mugshot and name plate,
 # and the host's own HUD cells must stay pristine.
 #
+# WHAT: a tenant at 0x13 shows its OWN in-match mugshot and name plate (row 0x13 of the
+#   32-row aliased HUD tables filled, the mugshot art placed at the free-pool anchor) and
+#   the host's HUD cells stay pristine.
+# HOW: static: tools/check_tenant_hud.py re-derives table shapes, poke addresses and values,
+#   art bytes against both source zips and host-cell pristineness; a patch stripped of the
+#   mugshot poke is the negative control; runtime: a tenant match on MAME with the HUD OBJ
+#   stream read for the staged codes.
+# EXPECTS: static checks green, the stripped patch failing, mugshot 0xBE90 (2x2) and name
+#   0xBE8C (3x1) staged in match with the opponent's mugshot still from the vanilla page.
+#
 # MECHANISM (measured; docs/game/atlas/venue_assets.md addendum). Both HUD
 # consumers are UNMASKED (mugshot stager 0x8937C by $782/$b82(a5); name
 # stager 0x89684 by $382(a4)) and both per-char tables (0x89884 word/char,

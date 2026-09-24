@@ -1,6 +1,18 @@
 #!/bin/sh
 # audit_ex_refused.sh — WHAT THE TENANTS' vs2 EX INPUT DOES WHEN THE MODE IS REFUSED, on native vsav2 and on our merged build, frozen AS MEASURED (14z-169; since 14z-170 the ruled EX-route fix's gate): with an empty stock the input cannot enter the mode on either game, and on our build it enters at NO stock level — Phobos and Donovan take vs2's stock-0 path at stock 3, Pyron reads 623+PP (his ES move with a stock), as ruled.
 #
+# WHAT: what the tenants' vs2 EX input does when the mode is REFUSED: with no stock it
+#   cannot enter Dark Force on either game, and on our build (the ruled EX-route fix) it
+#   enters at NO stock level — Phobos and Donovan take vs2's stock-0 path at stock 3, Pyron
+#   reads 623+PP, his ES move.
+# HOW: 12 field-trace runs on MAME (each tenant's EX input on vsav2 and ours, stock poked to
+#   0 and to 3, real cursor picks, level and RNG pinned), freezing whether the mode was
+#   entered, the stock after and P1's state path over 3255-3400; the control leaves the
+#   refused legs' stock at 3.
+# EXPECTS: no leg of ours enters the mode, vs2's stock-3 legs enter, our stocked paths equal
+#   vs2's refused paths (Pyron's the ES move); the stock-kept control fails. Which move a
+#   path IS is for the captures, not frozen here.
+#
 # MUST-FIRE: perturbed-copy: stock-kept — the refused legs run with their stock left at 3 (the refusal removed) must be reported as ENTERING the mode and FAIL, so "never enters" is read from the mode field, not assumed from the poke (in-gate: vs2's three stock-3 legs, already run, must read entered on the same check — ours' no longer enter, which is the fix; mode: every refused leg runs with stock 3, vs2's enter, and the gate FAILs)
 #
 # WHY. The maintainer ruled the tenants' vs2 EX route into Dark Force DISABLED on our build

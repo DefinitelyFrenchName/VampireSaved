@@ -1,6 +1,16 @@
 #!/bin/sh
 # audit_tenant_timeout.sh — THE TIMEOUT JUDGE, per tenant (14z-104).
 #
+# WHAT: the timeout judge per tenant: when the round timer runs out the down goes to the HP
+#   leader, the round advances and round 2 spawns — the judge's other entrance, which a
+#   ported row could starve as #103 did the KO path.
+# HOW: the judge/01_timeout_lead rig on MAME (one jab for the lead, then idle) with the
+#   round timer $FF8109 poked to 3; the timer, $FF8120, $FF810E and both HP words are read
+#   from dumps; the Demitri `ctl` leg is the legacy control and the `inv` leg (P1 HP below
+#   the dummy's) must be judged the other way.
+# EXPECTS: per leg the timer reaches 0, winner 0xFF, round 0 -> 1, HP refilled to 0x120, END
+#   clean; `inv` reads 0x01. A red on `ctl` means the instrument moved.
+#
 # §4 mandates timeout coverage per ported character; until this audit the
 # tenants' timeout wins were FIELD-CONFIRMED only (maintainer, 14z-101)
 # with no rerunnable instrument. The sharp risk is #103's class: the

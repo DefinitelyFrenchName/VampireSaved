@@ -3,6 +3,18 @@
 # CAPCOM'S OWN, CARRIED FROM vs2/vh2 — the three-way ROM agreement that backs
 # the preservation claim, frozen (14z-126).
 #
+# WHAT: the tenants' Dark Force startup windows are Capcom's own, carried from vs2/vh2: the
+#   15 vanilla seq-0x16 handlers arm the same +0x147 value in vsavj, vsav2 and vhunt2, the
+#   three tenant rows arm 0x4F / 0x29 / 0x40 in both vsav2 and vhunt2 (vsavj's rows
+#   0x10/0x11/0x13 are aliases of its base rows), and the merged build's placed handlers arm
+#   the same three values.
+# HOW: static over the decrypted opcode views of the three sets and the build (seconds): the
+#   first 0xA0 bytes of each handler read for its +0x147 arm; the control perturbs the
+#   expected Donovan value by one.
+# EXPECTS: the three-way equalities hold and the build carries the values; the perturbed
+#   expectation fails. Lei-Lei arms hers deeper than the static window and is measured live
+#   instead.
+#
 # MUST-FIRE: perturbed-copy: perturbed-expectation — the expected Donovan arm value changed by one must be caught against vs2 and vh2 (mode: the perturbed table is the one section 2 asserts, and this run must fail)
 #
 # WHY. tests/audit_df_startup_invuln.sh measured that each character's

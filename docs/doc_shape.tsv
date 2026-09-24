@@ -67,6 +67,8 @@ docs/project/WINDOWS_BUILD.md	REFERENCE	-	-
 docs/project/WSL2_SETUP.md	REFERENCE	-	-
 docs/project/audit_2026-08-15_dispositions.md	HIST	-	-
 docs/project/agent_architecture_scope.md	REFERENCE	-	banner
+docs/project/gate_qualification_scope.md	REFERENCE	-	banner
+docs/project/gate_header_contract.md	REFERENCE	-	banner
 docs/project/applier_app_scope.md	REFERENCE	-	banner
 docs/project/beam_port_scope.md	HIST	-	-
 docs/project/build_dir_triage.md	REFERENCE	docs/project/build_dir_triage_history.md	banner
@@ -77,6 +79,7 @@ docs/project/cps2_wide.md	REFERENCE	docs/project/cps2_wide_history.md	banner
 docs/project/cps2_wide_history.md	HIST	-	-
 docs/project/doc_audit_14z118.md	LOG	-	-
 docs/project/gate_index.md	GENERATED	-	-
+docs/project/gate_coverage.md	GENERATED	-	-
 docs/project/tickets.md	GENERATED	-	-
 docs/project/gate_scoping_method.md	REFERENCE	-	-
 docs/project/must_fire_contract.md	REFERENCE	-	-

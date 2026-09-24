@@ -2,6 +2,17 @@
 # test_vanilla_frame_join.sh — WHICH ANIM CHAIN EACH VANILLA CHARACTER'S STANDING
 # NORMALS ENTER, MEASURED ON vsavj (14z-125, the community cross-check's join).
 #
+# WHAT: which anim chain each vanilla character's STANDING normals enter at a far pin and
+#   after a walk-in, measured on vsavj — the join behind the community cross-check, which
+#   killed the inferred even/odd close/far model (Zabel has no proximity variants).
+# HOW: tools/vanilla_join_rig.py's far and near legs (30 on MAME in parallel), the entered
+#   chain from the node pointer within the event window mapped onto tools/anim_nodes.py's
+#   graph; the rigs must regenerate byte-identically; the per-move damage table's values are
+#   written out of tree and only their SHA-256 frozen; the control swaps one character's far
+#   and near rows.
+# EXPECTS: every event fires, the 180 rows equal to the frozen slot map, the out-of-tree
+#   hash equal; the swapped rows fail.
+#
 # MUST-FIRE: perturbed-copy: swapped-rows — swapping one character's far/near rows in a copy of the frozen slot map must fail the section-3 compare against the measured map (mode: section 3 compares the measured map against that swapped copy and must fail)
 #
 # WHAT IT HOLDS. docs/project/tables/community_crosscheck.md joins the community

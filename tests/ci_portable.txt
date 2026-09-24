@@ -64,6 +64,9 @@ test_demand_after_trap
 # declaring inventory (grows only) and the header-only debt (shrinks only).
 # Step one of the ruling on the BBX finding; step two is the run-time contract.
 test_must_fire_census
+test_module_refs
+test_gate_descriptions
+test_gate_coverage_current
 test_hex_lengths
 test_masked_compare
 test_m2a_flicker_gate

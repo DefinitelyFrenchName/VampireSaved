@@ -1,6 +1,15 @@
 #!/bin/sh
 # test_don_colors.sh — Donovan color-set gate (session 14z-21).
 #
+# WHAT: Donovan's kick-button colour set and his mirror-match alternate are the native vs2
+#   rows — composed by the shared engine from his ported sprite block, table B never
+#   consulted.
+# HOW: replay 41 (kick-button pick) and replay 42 (Donovan mirror, P2 web-walked) on MAME;
+#   palette rows 0x0A-0x0D and 0x0A-0x0F / 0x10-0x13 compared with the frozen native rows
+#   measured on vsav2 (replay 43).
+# EXPECTS: both replays' rows equal the frozen native rows; a red is a palette or table
+#   change regressing either path.
+#
 # Locks the round-36-queue "alt-color Donovan" item, resolved NO-BUG:
 # the kick-color set is a fixed +0x180 offset INSIDE the char sprite
 # block (ported whole, len 0x500), and the mirror-match alternate is

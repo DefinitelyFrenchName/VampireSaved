@@ -2,6 +2,18 @@
 # audit_qs_voice_batch.sh — THE VOICE-BATCH KEYON A/B (14z-86, on-demand,
 # ~8 min, 2 parallel MAME runs).
 #
+# WHAT: every authored QSound voice id in the qs_songs batch plays content native vsav2 also
+#   plays (no native signature missing, nothing foreign to vs2's sample library, counts
+#   within tolerance) — the register-level voice A/B.
+# HOW: builds the voice batch onto a scratch copy of the WIDE overlay (or verifies a given
+#   build), sweeps every id on ours and every scoped vs2 id on native in the test-mode venue
+#   with isolation spacing, and compares whole-run keyon multisets via
+#   tools/check_qs_voice_batch.py; the verdict control corrupts one byte of the packed
+#   member.
+# EXPECTS: the multisets match within the frozen tolerance, with the one ruled exception
+#   (the bank-108 inclusive-endpoint byte, #93, verified per run); the corrupted copy reads
+#   as a foreign signature.
+#
 # Builds the qs_songs voice batch onto a scratch copy of the canonical
 # WIDE overlay (or verifies a given BUILD's romset directly), then sweeps
 # EVERY authored voice id on ours and every scoped vs2 id on native

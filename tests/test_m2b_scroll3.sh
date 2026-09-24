@@ -9,6 +9,15 @@
 # art was overwritten. Static evidence already: the band is 99.3%
 # saturated by Jedah's own OBJ records and renders as sprite art.
 #
+# WHAT: no scroll3 tile code ever maps into the bank-2 OBJ band Donovan's tiles overwrite
+#   (Jedah's band 0x2AD8F-0x2EEBB), so no stage art was overwritten — scroll1/2 cannot
+#   address bank 2, scroll3 can.
+# HOW: replays covering the attract (every demo stage), the arcade marathon (stage rotation)
+#   and the standard matches on MAME with tests/lua/scroll3_watch.lua reading every frame's
+#   scroll3 codes.
+# EXPECTS: zero frames with a scroll3 code inside the placement window; a red names the
+#   frame and code.
+#
 # Replays chosen for stage coverage: the attract (all demo stages incl
 # Jedah's own demo), the arcade-mode marathon (stage rotation), and the
 # standard match replays.

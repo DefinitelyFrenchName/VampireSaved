@@ -1,6 +1,14 @@
 #!/bin/sh
 # test_don_sword.sh — Donovan sword-swing behavior gate (session 14z-5).
 #
+# WHAT: on 6+HP Donovan's sword object is COMMANDED into the swing animation family through
+#   the unmasked set-anim clone, instead of idling through attacks as the vanilla masked
+#   resolver would make it.
+# HOW: replay 31 (round-start whiff 6+HP) on MAME; the sword object at $FF9500 is watched
+#   for the swing node and its index write within a frame of it.
+# EXPECTS: the swing node resolved and idx +9 written; a red is the missing-swing bug back.
+#   The node address depends on the anim region's placement and is re-derived when it moves.
+#
 # Verifies the round-26 sword-swing fix: on 6HP the sword object
 # ($FF9500 on the ported build) must be COMMANDED into the swing anim
 # family. Mechanism under test (see docs/project/patch_notes.md 14z-5): the

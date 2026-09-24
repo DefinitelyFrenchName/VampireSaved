@@ -2,6 +2,18 @@
 # test_select_wheel.sh — the character-select cursor mechanism: decoded from
 # the ROM, and MEASURED in the emulator.
 #
+# WHAT: the character-select cursor mechanism the roster design rests on: the joystick table
+#   (PRG:0x0211D4), the 32-row 8-way adjacency table (PRG:0x0211E4) and the two commit
+#   writes (cell and id, the same value) — decoded from vsavj and vsav2 every run and then
+#   MEASURED to agree in the emulator over every (cell, direction) pair, with each cell's
+#   screen position.
+# HOW: static decode of both ROMs, a generated full-coverage walk, the walk tapped in MAME
+#   and compared press by press with four negative controls on the checker, the palette-0x1E
+#   cursor ring located per cell, and the layout proposer refusing an unsound wheel.
+# EXPECTS: decode as documented in select_screen.md, every pair measured as predicted, the
+#   controls failing, 16 cell positions measured. WHEEL_STATIC_ONLY=1 skips the emulator
+#   sections.
+#
 # WHY THIS EXISTS. The roster plan (option 1: append three cells) rests
 # entirely on how the select cursor moves and what it commits. That
 # mechanism had been recorded in a session log only — one address of it

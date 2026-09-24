@@ -1,6 +1,14 @@
 #!/bin/sh
 # test_hui_boot.sh — the Huitzil stage-4 BOOT gate (14z-65).
 #
+# WHAT: the first rung with Phobos's code live: a forced-id match FORMS with his own data
+#   (the row-0x10 hitbox base read from the build's own patch.json) and SURVIVES guarded,
+#   while a legacy replay on the same build stays bit-identical to vanilla.
+# HOW: builds stage 4 from the huitzil manifest, runs the forced-pick boot probe and the
+#   crash guard on MAME, and a legacy replay against the frozen vanilla expectation.
+# EXPECTS: his base loaded, guard clean (a watchdog reboot would read as zeros, which the
+#   base check subsumes), legacy bit-identical.
+#
 # The first rung with his CODE live: builds stage 4 from the huitzil
 # manifest and proves a forced-id match FORMS and SURVIVES —
 #   1. the forced-pick probe loads HIS hitbox base (the row-0x10 poke

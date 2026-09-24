@@ -2,6 +2,15 @@
 # test_tenant_id.sh — the tenant's character id is a BUILD INPUT, and the
 # frozen reference must stay reproducible while a move is in progress.
 #
+# WHAT: the tenant's character id is a BUILD INPUT resolved by profile (WIDE default 0x13
+#   via id_by_profile, a variant id refused without a profile, --tenant-id 0x13 never
+#   mirroring Victor's row) and the row-ownership family (per-file stamps, row_applies,
+#   row_hex, multi-tenant order) behaves as specified.
+# HOW: pure-function checks of the generator's resolution and ownership code, no emulator
+#   and no build; the control removes id_by_profile from a copy of donovan.toml.
+# EXPECTS: the four id checks and the four ownership checks as listed in the header; the
+#   control makes the WIDE default resolve to the substituted slot again and fails.
+#
 # MUST-FIRE: perturbed-copy: no-id-by-profile — a copy of donovan.toml without its `id_by_profile` declaration must resolve the WIDE default to the substituted slot again, failing check 2 and the declaration guard
 #
 # WHY (M3a, 14z-61). De-substitution moves the tenant off a legacy

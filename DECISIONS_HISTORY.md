@@ -27,6 +27,51 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-24 (14z-180) — #171 gate qualification: the scope's six slices, a seventh the maintainer added first, and six answers
+
+**The questions put**, from `docs/project/gate_qualification_scope.md` §6 after rule-checker run
+`2026-09-24-141` (plant caught; real verdict VIOLATED Q1 Q4, both true, resolved by work — the plant
+now parses the historical caller through the extractor, the census has a floor, the artifacts carry
+every command and source). (1) Is the shape of "qualified" the six slices Q1-Q6 in the order Q1,
+Q3+Q4 (Q5 inside), Q2, Q6? (2) Where does an emulator gate declare the paths it follows — a header
+line or a registry column? (3) What is the staleness gate's verdict at each cadence? (4) How is an
+empty measurement made a failure? (5) The headroom threshold? (6) May slice Q1 land this sitting?
+
+**THE RULINGS, verbatim (the option labels chosen, and the maintainer's words where they wrote):**
+
+(1) *"As proposed WITH THIS ADDITION: I want for each test a human-readable description of the test
+(at least what it tests, how it tests and what is the expected result). The rationale for this is
+human supervision: you have done remarkably well on your own but at the moment there are many tests
+that may of may not be practically correct or relevant in a way that is invisible to you.
+Furthermore, this allows me to know the functional coverage that we have, not just the technical
+one. That human supervision may require further work and tickets but the qualification of the tests
+should be the foundation"*. The form and place then put and chosen: *"That form, first, by family
+(Recommended)"* — three fields in every gate's leading comment block, `# WHAT:` (what it tests),
+`# HOW:` (how: the legs, the instrument, the rig), `# EXPECTS:` (the expected result), written by
+reading each script; the GENERATED gate index renders them per family as the functional-coverage
+view; a census keeps `declares` growing; it is slice **Q0**, before Q1, landing in batches by gate
+family, each batch's rendered page put to the maintainer for review as it lands.
+
+(2) *"I don't see the pros and cons anywhere"* on the first asking (the pros and cons had been written
+above the dialog, which hid them); put again with both sides inside the question: *"Header line
+(Recommended)"* — `# FOLLOWS:` in the leading comment block, beside the description fields and the
+must-fire lines, one reader, the reconciliation control comparing it with the script's references and
+the registry's args.
+
+(3) *"NOTE at session, FAIL at freeze/release (Recommended)"*.
+
+(4) *"Declared/fired grammar (Recommended)"* — `# MEASURES: <name> — <floor>` in the header and
+`MEASURED: <name> = <n>` at run time, one reader, a PASS with a missing or below-floor measurement
+becoming FAIL as a dead control does, no change to the four verdicts.
+
+(5) *"Half the cap (Recommended)"*.
+
+(6) *"Land it now (Recommended)"* — `tests/test_module_refs.sh` (ci_portable, two controls, the floor
+pinned at the measured 270), registered, with HANDOFF's row, committed with the scope document.
+
+**What it settles.** #171's shape is the scope document's, with Q0 added at the head: seven slices,
+Q0, Q1, Q3+Q4 (Q5 inside), Q2, Q6. Nothing in Q6's per-finding classifications is ruled here.
+
 ## Ruled 2026-09-24 (14z-179) — #172 closed on a green S5 gate; no ticket for the ledger's reverse check
 
 **The questions put**, after rule-checker run `2026-09-24-138` (plant caught) returned VIOLATED on Q1,

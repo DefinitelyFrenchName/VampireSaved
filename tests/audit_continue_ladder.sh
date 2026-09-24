@@ -4,6 +4,17 @@
 # pure-legacy character? On-demand, ~20 min (2 full-marathon MAME runs,
 # parallel: pristine vsavj + the merged build).
 #
+# WHAT: the #102 discriminator, kept as a regression lock: a loss followed by a CONTINUE
+#   resets the arcade ladder's in-use venue mask on PRISTINE VANILLA with a legacy
+#   character, so earlier venues repeating and extra matches are the engine's own envelope,
+#   not a port defect.
+# HOW: two full arcade marathons in parallel on MAME, pristine vsavj and the merged build,
+#   Victor forced, natural mash losses, extra credits spliced into the attract; the in-use
+#   mask and match count are read from per-frame dumps.
+# EXPECTS: on each leg at least 3 matches and at least one loss+continue where the mask goes
+#   non-zero then clears to 0 while matches follow. Leg A (vanilla) red means vanilla
+#   stopped resetting and #102 reopens as ours.
+#
 # #102 IS CLOSED — maintainer-ruled 2026-08-19, NOT OURS (the answer this
 # gate produced). It is now a REGRESSION LOCK, not an open investigation:
 # leg A red means vanilla stopped resetting, i.e. the behavior was ours

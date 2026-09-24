@@ -2,6 +2,19 @@
 # audit_defense_row_residue.sh — THE PHOBOS-THROW ±1 DAMAGE RESIDUE IS THE
 # DEFENSE-TABLE ROW THE VICTIM'S ID SELECTS, read watch on both legs (14z-145).
 #
+# WHAT: the ±1 damage residue of Phobos's throws is the defense-table row the VICTIM's id
+#   selects: both games ask the table the same question (same index per hit) and the bytes
+#   answered differ exactly for the victims whose row differs between the build and vs2 —
+#   since the ruled fix only Sasquatch's cross-generation row.
+# HOW: the Circuit Scrapper rig on ours and native vs2 under a -debug READ watch over the
+#   defense table (and the rally threshold's read, whose D5 is the byte answered), for the
+#   residue victims and a control victim; the byte at each index is taken from each leg's
+#   OWN data view (the build's verify_data.bin, vs2's image); controls: equal bytes forced
+#   on a residue victim, an empty trace.
+# EXPECTS: the read fires on every leg from the one reader, the indices equal, the bytes
+#   differ on residue victims only; the equal-bytes control fails section 3, the empty trace
+#   fails liveness.
+#
 # MUST-FIRE: known-bad: residue-answers-equal — a residue victim answering the SAME defense byte on both legs must fail section 3 (mode: the real native leg's bytes of the first residue victim — the first whose row differs between the BUILD and vs2 — are forced equal to ours and the section-3 verdict must fail)
 #
 # WHY. tests/audit_tenant_throw_geometry.sh froze 5 of 54 (victim, throw) cells

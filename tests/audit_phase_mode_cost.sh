@@ -1,6 +1,17 @@
 #!/bin/sh
 # audit_phase_mode_cost.sh — what does Phobos' phase-gated latch cost Donovan?
 #
+# WHAT: what Phobos's phase-gated latch (`latch_mode = "phase"`, needed by him and carried
+#   by every tenant in a merged build) costs Donovan: nothing legacy can observe, and a
+#   bounded, re-convergent transient in his own char-init pool state.
+# HOW: builds a phase-mode Donovan probe variant and A/Bs it LIVE against donovan-m3a on
+#   MAME over 14 replay legs (no registry row exists for a probe, so no frozen set); section
+#   0 proves the shim executed (GUARD_PROBE) before any verdict.
+# EXPECTS: legacy replays bit-identical; Donovan's own replays diverge from the exact frame
+#   the shim runs, for 24-135 frames in 13-16 runs, then re-converge for thousands of
+#   frames. An IDENTICAL result on his own content FAILS — the rig stopped forming the
+#   match.
+#
 # WHY (M3b, 14z-77, the maintainer's ratified condition). A merged build has
 # ONE init shim and therefore ONE seeder. Phobos NEEDS `latch_mode = "phase"`
 # — without it his ecosystem drains pool 0 and the round-2 char re-init

@@ -2,6 +2,19 @@
 # test_agent_hooks.sh — SLICE S1 OF GitHub #172: the agent-discipline hooks decide what
 # the evidence says they should (docs/project/agent_architecture_scope.md, 2026-09-23).
 #
+# WHAT: the three agent-discipline hooks decide what the evidence says: pre_bash.py DENIES
+#   the twelve `nohup` launches of 14z-174 and every detach or pgrep-waiter shape and ALLOWS
+#   the real look-alikes; pre_push.py refuses a push of THIS repository without a passed or
+#   resolved procedure run in its range and lets another repository through; pre_agent.py
+#   refuses an over-cap or under-specified Agent call and passes forks.
+# HOW: replays the hooks exactly as Claude Code drives them (the PreToolUse JSON on stdin,
+#   the decision on stdout) over the frozen fixture tests/agent/c01_commands.jsonl (44
+#   rows), 18 push cases against a scratch repository and the real ledger, and 27 Agent-call
+#   cases; seven controls run copies of a hook with one rule blinded and must let a
+#   must-deny case through.
+# EXPECTS: every must-deny row denied with its reason, every must-allow row allowed,
+#   fail-open recorded; a red names the row and the hook.
+#
 # C0.1 (`tools/agent/hooks/pre_bash.py`) denies a Bash call that detaches a job the
 # harness cannot track, or waits on `pgrep`. It is replayed here over a frozen fixture,
 # `tests/agent/c01_commands.jsonl`, cut from real session transcripts: the TWELVE `nohup`

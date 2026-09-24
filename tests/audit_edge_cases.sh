@@ -3,6 +3,17 @@
 # (14z-104 (4); coverage matrix gap 2 — §4's edge-case bias, served
 # deliberately instead of incidentally).
 #
+# WHAT: three deliberate state-transition edges per tenant: a KO landing mid-throw (both as
+#   thrower and as victim), a double KO by trade in a mirror match, and an EX input on the
+#   first live match frame.
+# HOW: the judge/pokes scaffolding on MAME with HP poked low and inputs timed to the edge;
+#   the judge's outcome is read from $FF8120 (0xFF / 0x01 / 0x00 for the draw), stocks from
+#   $FF8509; every leg is field-liveness guarded.
+# EXPECTS: the throw-KO settles with the round advancing (except Phobos as thrower, whose
+#   throw cannot finish an opponent and restores HP to half — measured identical on native
+#   vsav2 and frozen so); the trade reads the draw code; frame-1 EX fires where the
+#   character has one (stock decrements) and produces a stockless action where not.
+#
 # Three families, all on the judge/pokes scaffolding, all guarded by
 # field-liveness (a crash kills a leg's samples and fails it):
 #

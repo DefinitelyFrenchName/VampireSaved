@@ -2,6 +2,16 @@
 # audit_tripwire_reach.sh — DO ANY PLANTED TRIPWIRES FIRE IN EXTENDED PLAY?
 # (14z-93, on-demand, ~15 min at JOBS=3.)
 #
+# WHAT: no planted tripwire (an ILLEGAL standing in for an unreconciled vs2 reference,
+#   dozens per frozen build) fires in extended play with the tenant forced — rule 6: any
+#   fire is a red, never counted down.
+# HOW: the 40,620-frame arcade marathon 26_don_arcade_mash with the tenant FORCED on each
+#   frozen build, guarded on MAME (JOBS parallel); a faulting PC is resolved to its
+#   patch-fragment line so the report names the vs2 target.
+# EXPECTS: END clean on every build. A PASS means no tripwire fired on THIS rig, never that
+#   none is reachable; the 14z-93 fires (the 0x494de divide helper) are what this gate
+#   exists to catch again.
+#
 # WHAT A TRIPWIRE IS. Every shipped build is generated with
 # `--tripwire-open`, whose own help text is the point:
 #

@@ -3,6 +3,18 @@
 # ARMED PER CHARACTER BY THE seq-0x16 HANDLER, AND THE TENANTS ARM THEIR OWN
 # (measured 14z-126; STATE "Decisions pending" DF-startup item).
 #
+# WHAT: the Dark Force startup invincibility is +0x147, armed PER CHARACTER by the seq-0x16
+#   handler in its first sub-state, and the tenants arm their OWN vs2 windows (Phobos 0x4F,
+#   Pyron 0x29, Donovan 0x40) — neither global nor inherited from their shells; the shared
+#   body arms only the throw invulnerability +0x143.
+# HOW: field traces on MAME of the df/97 activation for the 15 vanilla ids on pristine
+#   vsavj, the three shells and the three tenants on the merged build, and Donovan on native
+#   vs2: the first non-zero +0x147, its peak and frames to zero and +0x143's first sample
+#   frozen; a CONTACT rig (df/98) lands 5HP inside and outside the window; the control
+#   perturbs a frozen arm value.
+# EXPECTS: every frozen arm as ruled, the shells' merged traces byte-identical to pristine,
+#   the inside contact refused and the outside one landing; the perturbed value fails.
+#
 # MUST-FIRE: perturbed-copy: perturbed-frozen-arm — a perturbed frozen arm value must be caught by the trace compare (mode: the frozen baseline is perturbed and the measured trace no longer matches it, so the gate FAILs)
 #
 # WHY. The maintainer asked (2026-08-31) whether the three tenants get the

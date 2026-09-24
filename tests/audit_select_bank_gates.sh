@@ -2,6 +2,15 @@
 # audit_select_bank_gates.sh — the merged drawer bank gates must gate EVERY
 # declaring tenant's id (14z-84).
 #
+# WHAT: the merged build's three drawer bank gates (name / splash / win-quote
+#   `*_bank_variant_id` thunks) compare against EVERY declaring tenant's id, not tenant 0's
+#   alone — the first-playtest garble where hovering Phobos or Pyron drew body-sprite tiles
+#   for names.
+# HOW: static, seconds: reads the merged build's patch.json, the fragment and the manifests
+#   and decodes each gate's compare chain.
+# EXPECTS: each gate names all three tenant ids; ground-truthed FAILING on the pre-fix
+#   merged build, where every gate carried 0x13 only.
+#
 # THE DEFECT THIS FREEZES OUT (first full-roster playtest, root-caused from
 # the placed bodies): the three `*_bank_variant_id` site_thunks are declared
 # by all three tenants with a TT id placeholder; merge_manifests deduped the

@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+docs/project/gate_qualification_scope.md	60ff3463ae7b1fc10c558ca6121842aec234390f
+build/gatequal180/measurer_returns_14z180.txt	dfa08728220881fc72d304563748e8bd25093a6a
+build/gatequal180/ruling_14z174.txt	98f6a11704ad3ed13446a02226099e04af9e1d55
+build/gatequal180/issue_171.txt	3c9e5c22740c25c6de422ea35cfef3be4cfc982d
+tools/audit_module_refs.py	77bce870ab54367d4de1d04244cd077a215dd93e
+tools/audit_lane_carry.py	579b2fa5a2224a5a7029a4602eb48d7f18220cc0
+tests/ci_cadence.tsv	9fc2965a7052a01829fadb9ca8a2c62f666c41b8
+tests/expected/PROVENANCE.md.lines-55-70 (lines 55-70 of tests/expected/PROVENANCE.md)	c9d84584a871e7449fb4a99b38566596419dd2dd
+tests/lib/classify.sh.lines-1-60 (lines 1-60 of tests/lib/classify.sh)	306625f340ebd86671eaf4ea1731451f04656181
+docs/README.md.lines-38-39 (lines 38-39 of docs/README.md)	6d6813bf17be4730ab1f48ca2c410f4dfcdbb38b

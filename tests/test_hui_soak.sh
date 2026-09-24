@@ -1,6 +1,15 @@
 #!/bin/sh
 # test_hui_soak.sh — the Huitzil stage-4 SOAK gate (14z-65).
 #
+# WHAT: Phobos survives an 11,000-frame input-chaos soak across round transitions on the
+#   REAL packed set, with both satellites alive in round 2 (the pod-lifecycle regression
+#   tripwire).
+# HOW: builds stage 4, forces id 0x10 through the vanilla select flow and runs 70_hui_mash
+#   guarded on MAME on the set the build packed (a vsavj-set run against a WIDE build is the
+#   pristine ROM: false green).
+# EXPECTS: guard clean end to end and both satellite pointers non-zero at f6000; a red is a
+#   crash or a pod lost across the round.
+#
 # The full behavioral chain, guarded, on the REAL packed set: builds stage
 # 4, forces id 0x10 through the vanilla select flow, then runs the chaos
 # soak (tests/replays/hui/70_hui_mash.rpl — QCF/QCB/DP/charges/pairs, the

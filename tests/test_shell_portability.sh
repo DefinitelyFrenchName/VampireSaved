@@ -2,6 +2,16 @@
 # test_shell_portability.sh — a `#!/bin/sh` script must actually be POSIX sh
 # (14z-90, GitHub issue #15).
 #
+# WHAT: a `#!/bin/sh` script is POSIX sh — no `[[ ]]`, no `set -o pipefail`, no continuation
+#   chain of assignments reaching no command (the #84 shape) — and a script that needs bash
+#   says so in its shebang, so the tree runs under dash on Debian, Ubuntu and WSL2, not only
+#   under macOS's bash-as-sh.
+# HOW: strips heredoc bodies (embedded Python and TOML would give ~16 false `[[table]]`
+#   hits) and scans every sh-shebang script for shell-context bashisms; two controls add
+#   stub scripts with a bashism and with the assignment chain to the real file list.
+# EXPECTS: PASS when every sh script is clean; a red names the script and the construct.
+#   `dash -n` is not a substitute — it passed the very file proven dead.
+#
 # MUST-FIRE: known-bad: bashism-in-sh — a `#!/bin/sh` script using `[[ ]]` must be reported (mode: that stub joins the real file list and the scan must fail)
 # MUST-FIRE: known-bad: assignment-chain — the real #84 shape, a continuation chain of assignments reaching no command, must be flagged (mode: a stub carrying it joins the real file list)
 #

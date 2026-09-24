@@ -3,6 +3,15 @@
 # merged build vs a CPU opponent, FROZEN at the measured value.
 # On-demand, ~5 min (2 MAME runs).
 #
+# WHAT: Phobos's EX Final Guardian (623+2K) against a CPU opponent on the merged build deals
+#   the frozen 10 HP — a plain regression lock on these rigs, not the native-parity number
+#   (that is audit_fg_parity).
+# HOW: two MAME runs; P2's HP at +0x50 is read from the fighter struct and the stock byte
+#   $FF8509 must decrement before any damage is judged (a run where it never decrements
+#   measured a whiff or a meterless downgrade, not the EX).
+# EXPECTS: stock decremented and damage exactly the frozen value per leg; a red is either
+#   the move not firing (liveness) or its damage moving.
+#
 # STATUS (14z-85f): the 14z-85e parity item this was filed against is
 # CLOSED — the divergence was NEVER the scaler (all scaler tables are
 # byte-equivalent between the games) but the ported object-hit damage

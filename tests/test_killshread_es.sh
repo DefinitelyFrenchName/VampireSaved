@@ -4,6 +4,19 @@
 # returning Killshread attacks going away AND coming back, where the plain
 # summon attacks one way — MEASURED on native vs2 and frozen.
 #
+# WHAT: Killshread (ES): the ES stance change's effect plays out DURING the summon — a
+#   summon after the ES plant lands TWO contact waves (going away and coming back, the
+#   second ending in the knockdown class) where a plain summon lands ONE and the plant never
+#   connects — measured on native vs2 and frozen per contact, with the structural shape
+#   asserted independently of the frozen numbers.
+# HOW: the naming part donovan_12 on native vs2 on MAME (Donovan pinned at 552, Demitri idle
+#   at 728), one frozen line per P2 HP or white drop (event, frame offset, class, hp, white,
+#   stock); the rig is first checked equal to a regeneration.
+# EXPECTS: the frozen contact lines and the wave counts (one for plain, two for ES). THE
+#   `stock` COLUMN READS THE RIG'S OWN POKE BACK (the generator tops the stock up before
+#   every event), never the engine's meter — recorded in the header and PROVENANCE; the
+#   ES/normal distinction here rests on the wave counts (#171 shape 4).
+#
 # Rig: tools/name_moves.py donovan part 12 (tests/replays/naming/donovan_12.*):
 # Donovan (forced 0x13) on P1 pinned at x=552, DEMITRI idle on P2 at x=728 (in
 # the sword's path; Victor until 14z-165 — the naming rigs' P2 is Demitri by

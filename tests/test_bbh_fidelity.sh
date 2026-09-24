@@ -6,6 +6,18 @@
 # (harness_scope.md §7.8, maintainer-ruled 2026-09-06: this project's own
 # harness "stays as it is" and never consumes the generic one).
 #
+# WHAT: the generic black-box harness (`bbh`, the separate repository extracted from this
+#   tree) still reproduces THIS tree's verdicts — the classifier, the tier classifier, the
+#   sweep registry, the masked vocabulary, the fingerprint, the suite dispatch, the hygiene
+#   tools, the field comparator — so the extraction has not drifted from its lineage.
+# HOW: finds the harness ($BBH_HOME or beside the tree's parent) and runs its own fidelity
+#   selftest against this tree with a stub driver, ROM-free except the fingerprint over
+#   $ROMDIR; BBH_MAME_FIDELITY=1 adds F8 on the real emulators, never beside another gate
+#   run.
+# EXPECTS: the harness's fidelity gate green (F1..F10 exact or identical as each contract
+#   states); SKIP when the harness is absent, which is why the gate is ci_static. A red
+#   names the fidelity check that differs and is a question about which side moved.
+#
 # What it runs (harness_scope.md §5): F1 the classifier, F3 the tier
 # classifier, F4 the sweep registry, F5 the masked vocabulary over the
 # .masked specs (sampled: every 4th; BBH_FIDELITY_F5=1 for all 1,891), F6

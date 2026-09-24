@@ -2,6 +2,16 @@
 # test_oboro_select.sh — THE OBORO SELECT HOOK (W1, 14z-105; maintainer-ruled
 # 2026-08-22: vanilla vsavj Oboro, selected by hand).
 #
+# WHAT: the Oboro select hook: on Bishamon's cell with START held at confirm the game
+#   commits vanilla vsavj's Oboro (id 0x18) and the match loads his own dataset, per player,
+#   cell-gated, and absent on the stock twin (profile-gated).
+# HOW: six legs on MAME with the picks made with the sticks and no pokes (A hold, B no hold,
+#   C Start on Demitri's cell, D the P2 side, E the STOCK build, F legs A and B again on
+#   FBNeo); each asserts the committed id at +0x382 and the loaded base at +0x60.
+# EXPECTS: 0x18 / base 0x0B3450 where the hook applies, 0x08 / 0x0A6418 without the hold and
+#   on the stock twin, 0x01 on Demitri's cell, P2 independent, FBNeo agreeing. A leg proving
+#   a byte without the base is not a pass.
+#
 # vsavj ships Oboro Bishamon complete at variant id 0x18 (hitbox base
 # 0x0B3450, docs/game/atlas/character_tables.md) and the select commit path
 # accepts the id end-to-end; what it lacks is a player-facing way to pick

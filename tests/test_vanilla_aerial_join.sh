@@ -3,6 +3,17 @@
 # NORMALS ENTER FROM A NEUTRAL JUMP AND FROM A FORWARD JUMP, MEASURED ON vsavj
 # (14z-145, the community cross-check's aerial join).
 #
+# WHAT: which anim chain each vanilla character's jumping normals enter from a NEUTRAL jump
+#   (a2 0x12-0x17) and from a FORWARD jump (a2 0x18-0x1D, or the aliased neutral chain),
+#   plus the D+button variants, measured on vsavj — the cross-check's aerial join, with
+#   Anakaris's neutral hover and Zabel's forward-jump aliasing declared and asserted.
+# HOW: tools/vanilla_join_rig.py performs each button during a neutral and a forward jump
+#   (60 legs on MAME in parallel), the entered chain read from the node pointer +0x1C within
+#   the event window and mapped onto the decoded graph; the rigs must regenerate
+#   byte-identically; the control swaps one character's neutral and forward rows.
+# EXPECTS: every event fires (never UNFIRED but Anakaris's declared six), the 360 rows equal
+#   to the frozen map, the structural rule per direction; the swapped rows fail.
+#
 # MUST-FIRE: perturbed-copy: swapped-directions — swapping one character's neutral/forward rows in a copy of the frozen aerial map must fail the section-3 compare against the measured map (mode: section 3 compares the measured map against that swapped copy and must fail)
 #
 # WHY IT EXISTS. The cross-check's seven aerial outliers (BI J.HP/J.LP, BU J.MP,

@@ -2,6 +2,17 @@
 # test_move_naming.sh — THE MOVE LIST'S CHAIN IDS ARE WHAT NATIVE VS2 ENTERS
 # (character-data map, phase 1 naming step; 14z-120).
 #
+# WHAT: the move lists' chain ids (build/manifest/moves_<tenant>.toml) are what NATIVE vs2
+#   enters: every event of the naming rigs enters the frozen chains, every seq the TOML
+#   names is entered by some event, the rigs equal a regeneration, and P2 is Demitri by his
+#   real route, never entering the two chains whose data differs between the games.
+# HOW: eight Donovan, four Pyron and eight Phobos parts on native vs2 on MAME (legs in
+#   parallel), P1's node pointer +0x1C sampled per frame and mapped onto
+#   tools/anim_nodes.py's graph; the negative control replaces an event's frozen chain by a
+#   neighbour's.
+# EXPECTS: every event's entered-chain list equal to the frozen line, every TOML seq
+#   entered, P2 = 0x01 at every event and never in b:0x71/b:0x74; the neighbour swap fails.
+#
 # WHAT IT HOLDS. build/manifest/moves_donovan.toml carries a (table, seq) per
 # move, measured by tools/name_moves.py: eight scripted rigs on NATIVE vs2
 # (P1 Donovan, P2 DEMITRI idle — Victor until 14z-165) perform every move; P1's anim node pointer

@@ -2,6 +2,15 @@
 # test_suite_dispatch_selftest.sh — ground truth for the kind->owner table in
 # tests/test_suite_dispatch.sh (14z-90, GitHub issue #7).
 #
+# WHAT: the kind->owner table in tests/test_suite_dispatch.sh can still FAIL: an expectation
+#   kind on disk absent from the table, a kind whose named owner no longer reads it, and a
+#   row claiming battery-chain coverage it does not have must each turn that gate red.
+# HOW: plants a real fixture kind and removes it again; runs scratch COPIES of
+#   test_suite_dispatch.sh with the table rewritten (never an env override, which an
+#   operator could switch off) and checks each copy goes red naming the reason.
+# EXPECTS: three reds, each with its reason; a green here on any of the three means the
+#   guard that keeps every expectation kind read by somebody has been loosened into prose.
+#
 # WHY. test_suite_dispatch.sh is the structural guard that stops an expectation
 # kind from existing on disk with nobody reading it. It used to demand that
 # EVERY kind be handled by run_suite.sh, which made it go RED on the

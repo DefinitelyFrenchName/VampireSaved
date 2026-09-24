@@ -2,6 +2,17 @@
 # audit_hitclass_map_cost.sh — what the 14z-82b hit-class map extension
 # FIXES and what it COSTS legacy content (ADOPTED 14z-82c; rerunnable).
 #
+# WHAT: what the hit-class map extension fixes (a type-64 projectile clash crashes without
+#   the thunk and ends clean with it) and what it costs legacy content (nothing observable:
+#   the whole legacy corpus is checksum-identical with and without it).
+# HOW: builds the current Pyron vertical and a no-thunk twin from the same manifest, runs
+#   the type-64 clash rig on both (the crash half is the positive control), then a live
+#   whole-RAM A/B of the two builds over the legacy corpus, plus fire censuses at the placed
+#   map body binned in-domain / extension / trap.
+# EXPECTS: the fix leg ends clean and the twin crashes; every legacy replay identical
+#   between the builds; the fire censuses give the denominators. A twin that does not crash
+#   means the rig stopped reaching the map, and the gate refuses a verdict.
+#
 # THE CONSEQUENCE IS PER-INDEX, and this decides what can be a control
 # (measured 14z-129, vsavj OPCODE view at PRG:0x1A88E — the map lives in the
 # opcode image, which is what tools/gen_hitclass_map_thunk.py reads):

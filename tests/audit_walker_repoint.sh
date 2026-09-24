@@ -2,6 +2,16 @@
 # audit_walker_repoint.sh — after the relocation, does ANYTHING still reach
 # the vanilla object-pool walkers?
 #
+# WHAT: after the walker relocation nothing still reaches the VANILLA object-pool walkers at
+#   run time — the residual a static caller scan cannot close (a target computed at run
+#   time).
+# HOW: breakpoints on the vanilla and relocated walker entries over the replay corpus on
+#   MAME against the build, AND the same instrument on an un-relocated REF_BUILD where the
+#   vanilla entries must fire (the negative control that makes a zero readable); the control
+#   forces a vanilla hit count non-zero.
+# EXPECTS: vanilla entries silent and relocated entries firing on the build; vanilla entries
+#   firing on the reference build. Zero everywhere is a dead breakpoint, not a pass.
+#
 # MUST-FIRE: known-bad: vanilla-walker-reached — after the relocation no caller reaches a vanilla walker, so a nonzero hit on one must fail section 1 (mode: a vanilla-walker hit count is forced nonzero so the "still reached" FAIL fires and the gate FAILs)
 #
 # WHY (14z-91). The obj_hook legacy-cycle fix copies each walker into free

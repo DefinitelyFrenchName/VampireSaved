@@ -1,6 +1,18 @@
 #!/bin/sh
 # audit_column_shock.sh — DONOVAN'S KILLSHREAD LIGHTNING COLUMN PLAYS vs2's CLASS-0x52 RULE ON OUR BUILD (since the 14z-170 fix, ruled 2026-09-18): the victim shocked 24 frames and Donovan exempt, every +0x5C write of both fighters equal to native's in frame and value, the move's timeline equal, and a column KO taking the same path (class 8, no exception). Until 14z-170 it froze the DEFECT as measured (14z-168, GitHub #136): 12 frames and Donovan frozen 4, from 14z-33's 0x52 -> 0x06 remap reaching 14z-42's Lightning Sword thunks.
 #
+# WHAT: Donovan's Killshread Lightning column plays vs2's class-0x52 rule on our build
+#   (since the 14z-170 fix): the victim shocked 24 frames and Donovan exempt, every +0x5C
+#   write of both fighters equal to native's in frame and value, the move's timeline equal,
+#   and a column KO taking the same class-8 path with no exception.
+# HOW: four non-debug write-tap runs and two field traces of the committed #136 rig
+#   donovan_4 on MAME, both legs real cursor picks with the parity gate's pins; every write
+#   to P1's and P2's +0x5C over 2836-2852 is frozen with its writer PC and value, plus a
+#   timeline row per leg; section 1b pokes P2 to 1 HP and traces the KO on both legs; the
+#   control plants the pre-fix values (12 and 4) into our rows.
+# EXPECTS: our writes equal native's frame for frame, the timelines equal, the KO path equal
+#   and exception-free; the planted pre-fix shape fails. A red is the remap class back.
+#
 # MUST-FIRE: perturbed-copy: old-shock — a copy of our rows with the pre-fix mechanism planted (the victim's hit writes 24 -> 12, a 4 written to Donovan's +0x5C at each hit — the 14z-42 Lightning Sword values the column took until 14z-170) must FAIL the native-equality check, so "equal to native" is a comparison of the two legs' writes (in-gate: the planted copy must be caught; mode: our rows are planted before the checks and the gate FAILs)
 #
 # WHY. #136's donovan_4 event 1 (Killshread Lightning [MP]) and donovan_10 event 9

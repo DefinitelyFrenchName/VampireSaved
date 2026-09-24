@@ -1,6 +1,19 @@
 #!/bin/sh
 # test_defense_rows_census.sh — THE DEFENSE CURVE AND RALLY THRESHOLD OF EVERY CHARACTER ID, vsavj against vs2 and our build, frozen (14z-168): the 15 legacy characters are identical between the games but for Sasquatch's row, vsavj's variant ids carry COPIES of their base rows, and our tenants therefore take their SHELLS' rows — the measurement the 2026-09-18 ruling "take the vs2 rows" rests on.
 #
+# WHAT: the defense curve and rally threshold of every character id, vsavj against vs2 and
+#   our build: the 15 legacy rows identical between the games but for Sasquatch's, vsavj's
+#   variant ids carrying copies of their base rows, the tenants' rows on our build classed
+#   against the bases (vs2's since the ruled fix), and every instruction that names either
+#   table by absolute long or pc-relative lea/pea.
+# HOW: static over the decrypted views and the build's data and opcode images (~2 s): row
+#   compares per id and a raw scan at every even offset for table addresses; controls
+#   overwrite Phobos's row with his vs2 row and plant two reader instructions into the
+#   opcode image.
+# EXPECTS: the frozen census equal (base rows, variant copies, tenant classes, exactly the
+#   two host readers on vsavj and ours); both plants change rows and fail. Not covered: a
+#   base computed at run time or reached through a data pointer.
+#
 # MUST-FIRE: perturbed-copy: tenant-row-moved — a copy of our build's data view with Phobos's row 0x10 overwritten by his vs2 row (what the ruled fix will do) must FAIL the frozen compare, so the frozen rows are read from the build under test and the fix re-freezes this file deliberately (in-gate: the perturbed view must census differently; mode: the gate censuses the perturbed view and FAILs)
 #
 # MUST-FIRE: perturbed-copy: reader-planted — a copy of our build's opcode image with an absolute load of an address INSIDE the curve (`movea.l #$000B8980,a1`, 0x100 bytes before the image's end) and a `lea d16(pc),a0` landing on the threshold table must add one reader row per arm and FAIL the frozen compare, so both arms of the reader census read the image they are given (in-gate: the planted copy must add exactly those two rows; mode: the gate censuses the planted copy and FAILs)

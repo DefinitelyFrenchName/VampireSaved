@@ -1,6 +1,21 @@
 #!/bin/sh
 # audit_forced_pick_fidelity.sh — IS A FORCED-PICK NATIVE LEG FAITHFUL? The rig's poked pick vs a REAL cursor pick of the same tenant on native vsav2, diffed over the WHOLE fighter block (GitHub #151, 14z-160).
 #
+# WHAT: whether a forced-pick native leg is faithful: the #136 rig's poked pick of a tenant
+#   on native vsav2, diffed over the WHOLE P1 fighter block against a REAL cursor pick of
+#   the same tenant, freezing the offsets the confirm LATCHED for the cursor character that
+#   the poke cannot reach (the #147 mechanism) and whether PLAY differences follow.
+# HOW: per row (Phobos, Pyron, the donovan-self negative control) three MAME legs: POKED
+#   (R,R + the id poke), REAL (the decoded cursor path, no poke) and SELF (real path plus
+#   the same-id poke, expected empty); work RAM dumped at fixed frames, every differing
+#   P1-block byte classed LATCHED / TRANSIENT / PLAY; identity asserted on every leg from
+#   the id at 1600 and the cursor cell at 1290; controls diff a leg against itself and drop
+#   the last cursor move.
+# EXPECTS: the frozen LATCHED set per row, SELF empty, donovan-self latching nothing, P2's
+#   block empty pre-match; the self-diff control comes out empty against a non-empty
+#   expectation and fails, the short cursor path confirms another character and fails
+#   identity.
+#
 # MUST-FIRE: perturbed-copy: same-leg — the poked leg diffed against ITSELF yields no latched offset, and that empty set must fail the frozen non-empty expectation (in-gate: the first row's poked leg is diffed against itself and must come out empty where the frozen set is not; mode: every row is diffed leg-against-itself and the comparison FAILs)
 # MUST-FIRE: known-bad: wrong-cursor — a real-cursor leg whose path is one move short confirms ANOTHER character, and the gate's identity assertion on the real leg must FAIL (in-gate: one extra leg with the last cursor move dropped; mode: every real leg runs one move short and the identity assertions FAIL)
 #

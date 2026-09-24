@@ -1,6 +1,17 @@
 #!/bin/sh
 # test_df_field_readers.sh — EVERY PLACED INSTRUCTION THAT NAMES ONE OF vs2's DARK FORCE POWER FIELDS BY DISPLACEMENT, with the access it makes, frozen (14z-168, GitHub #136 / #157's Dark Force tail): our host engine runs Dark Force Change, which never sets +0x1C3/+0x1C4/+0x1C6/+0x1C7/+0x1C8, so every READ row is a tenant instruction that sees "not in Dark Force" inside our Dark Force.
 #
+# WHAT: every PLACED instruction of the build that names one of vs2's Dark Force POWER
+#   fields (+0x1C3/+0x1C4/+0x1C6/+0x1C7/+0x1C8) by displacement, with its access class (read
+#   / write / rmw / addr) and base register, frozen — the candidates of the class the ruled
+#   'no gauge in DF' rule found, since our host engine never sets those fields.
+# HOW: tools/audit_df_field_readers.py over the build's opcode image and placements (code
+#   regions and code ops only), its --selftest of hand-assembled encodings and two decoys
+#   first; the control re-addresses the first +0x1C3 row to +0x111 in a copy of the image.
+# EXPECTS: the frozen row, count and access rows equal; the selftest's decoys absent; the
+#   re-addressed copy loses a row and fails. What each reader does in our Dark Force is not
+#   measured here; a missed reader is audit_df_field_readers_live's question.
+#
 # MUST-FIRE: shadow-tool: planted — a copy of the build's opcode image with the FIRST +0x1C3 row re-addressed to +0x111 (what a fix of that reader looks like) must lose one row and FAIL the frozen compare, so the census reads the image it is given (in-gate: the planted copy must census differently; mode: the gate censuses the planted copy and FAILs)
 #
 # WHY. tests/audit_df_meter.sh measures ONE of these readers changing play (the placed

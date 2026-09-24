@@ -1,6 +1,18 @@
 #!/bin/sh
 # audit_facing_rule.sh — THE VICTIM FACING RULE 5 ON OUR ENGINE, ours vs native, frozen AS MEASURED (GitHub #159, 14z-167): vs2's facing-rule resolver knows rule 5 and vsavj's does not, so a tenant attack record carrying it is XORed into the victim's facing on our build.
 #
+# WHAT: the victim facing rule 5 on our engine, frozen AS MEASURED (#159): vs2's facing
+#   resolver knows rule 5 and vsavj's does not, so a tenant attack record carrying it is
+#   XORed into the victim's +0x5D on our build — Killshread Summon (ES)'s returning wave
+#   drags Demitri toward Donovan on native and leaves him in place on ours.
+# HOW: static: the compare chains of both resolvers read from the decrypted opcode images,
+#   and the legacy record census of +0xE (vsavj 0 of 1,085 carry rule 5, vs2 1 of 1,143);
+#   live: every write to Demitri's +0x5D over 3850-3960 and his x at 3924 and 3946 on the
+#   #136 rig donovan_3, both legs real cursor picks, on MAME; controls replace our writes by
+#   native's and plant a `cmpi.b #5` into vsavj's image.
+# EXPECTS: the frozen defect rows (ours writes 4 at 0x1886C, native 1 and 0; x 835 vs 755)
+#   and static rows exact; both controls fail. A fix re-freezes this file deliberately.
+#
 # MUST-FIRE: perturbed-copy: rule5-resolved — a copy of our facing rows with the resolver's value replaced by native's at the same frame (what a fixed build would write) must FAIL the frozen compare, so the frozen rows are the defect and a fix is a deliberate re-freeze (in-gate: the perturbed copy must differ from the frozen rows; mode: our reduced rows are replaced before the compare and the table FAILs)
 # MUST-FIRE: perturbed-copy: branch-planted — a copy of vsavj's decrypted opcode image with the resolver's rule-4 compare rewritten to `cmpi.b #5` must change vsavj's static row and FAIL, so the static read sees the compare chain it claims to list (in-gate: the planted copy must read differently; mode: the real image is planted before the static read and the table FAILs)
 #

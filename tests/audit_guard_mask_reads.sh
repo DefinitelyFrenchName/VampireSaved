@@ -3,6 +3,18 @@
 # `PRG:0x028D50` THE ENGINE READS, ours vs vanilla — and that the port's bytes
 # in its FIRST longword sit behind an index the check never produces. (14z-145.)
 #
+# WHAT: which longwords of the guard-mash mask table PRG:0x028D50 the engine reads, ours vs
+#   vanilla: only offsets 4..28 (the press count is pre-incremented, so mask[0] — where the
+#   port's six bytes of the overlapping per-id map sit — is never read), from the one
+#   reader, identically on both builds.
+# HOW: the advancing-guard rig (donovan_victim_4) on pristine vsavj and on the merged build
+#   on MAME under a -debug READ watch over 0x028D50-0x028D6F; every in-play hit's PC, A0 and
+#   D0 read; the gate's own DUMPS read is taken inside the boot window so it never lands on
+#   a match frame; the control injects an offset-0 read into the ours leg.
+# EXPECTS: reads present on both legs (liveness), every in-play hit the mash check with A0 =
+#   the table, no D0 of 0, the per-offset inventories identical; the injected offset-0 read
+#   fails section 3.
+#
 # MUST-FIRE: known-bad: offset-0-read — a read at table offset 0 (mask[0], where the port's bytes sit) must be caught by section 3 (mode: an offset-0 read is injected into the REAL ours leg and the section-3 verdict must fail)
 #
 # WHY: `PRG:0x028D50` carried THREE names — `effect_map_5051` (huitzil.toml),

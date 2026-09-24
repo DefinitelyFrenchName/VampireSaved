@@ -1,6 +1,16 @@
 #!/bin/sh
 # audit_df_framework.sh — THE DF FRAMEWORK TABLE, FROZEN (14z-104).
 #
+# WHAT: the tenants' Dark Force framework as ruled (vsavj semantics): activation costs
+#   exactly one stock, the per-character duration is the frozen value (Demitri 360, Donovan
+#   360, Phobos 377, Pyron 360), and the legacy control reads vanilla's 360/1.
+# HOW: the df/97 rig on MAME per character (activate with poked stocks, then idle so the
+#   mode's own timer expires); $FF802E sampled per frame for the df==1 span, $FF8509 across
+#   the activation for the cost.
+# EXPECTS: every leg activates, spends one stock and holds its frozen duration exactly; the
+#   Demitri control must read 360/1 or no tenant figure of the run is trusted. A red is a
+#   porting change that moved a tenant's DF cost, duration or class.
+#
 # 14z-101 measured, and the maintainer then RULED (2026-08-21, DECIDED:
 # "we absolutely, categorically, keep vsavj DF durations"), the tenants'
 # Dark Force framework: vsavj semantics — cost 1 STOCK, PER-CHARACTER

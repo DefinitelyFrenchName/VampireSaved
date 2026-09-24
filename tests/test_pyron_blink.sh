@@ -1,6 +1,18 @@
 #!/bin/sh
 # test_pyron_blink.sh — the Pyron sprite/HUD BLINK gate (14z-75).
 #
+# WHAT: Pyron's in-match sprite and HUD mugshot palette row 10 holds CONSTANT and equals
+#   native vsav2's, instead of alternating every frame (the dead-row alias that gave him row
+#   0x01's animated handler).
+# HOW: replay 76 on native vsav2 and on the build on MAME with the same pokes;
+#   tools/check_pyron_blink.py compares distinct row-10 values over 40 consecutive frames
+#   (phase-independent); the pick guard reads +0x60 against each game's own base table;
+#   verdict controls on synthetic dumps.
+# EXPECTS: with PYRON_BLINK_EXPECT=fixed (the default) ours constant and equal to native
+#   bit-for-bit; =blinks reproduces the pre-fix two-value alternation on build/pyron15. This
+#   gate sees the IN-MATCH instance only; the select and route-map tables are
+#   test_variant_dispatch's.
+#
 # Palette RAM row 10 (0x90C140) carries Pyron's SPRITE and his in-match
 # HUD MUGSHOT — which is why both blinked. Before the fix it alternated
 # every frame while native vsav2 held it constant. FIXED in build/pyron17;

@@ -1,6 +1,17 @@
 #!/bin/sh
 # test_poked_legs.sh — THE CENSUS OF EVERY FORCED-PICK LEG in tests/ and tools/, classified by what the poke leaves latched, frozen shrink-only; a new CROSS-FLAVOR pairing fails until it is measured and accepted (GitHub #151 step 3, 14z-161).
 #
+# WHAT: the census of every forced-pick leg in tests/ and tools/, classified by what the
+#   poke leaves latched (SAME / CROSS-INERT / CROSS-FLAVOR / PARAM) through the game's own
+#   select wheel, frozen shrink-only: a new CROSS-FLAVOR pairing fails until it is measured
+#   and accepted in tests/expected/poked_legs_accepted.tsv.
+# HOW: tools/audit_poked_legs.py statically pairs every poke of the id fields in a script
+#   with the replays it names, resolves the confirm's cell through tools/select_wheel.py on
+#   the decrypted data view and our wheel from the build, and classes each; controls feed a
+#   fixture that pokes Phobos over Donovan's cell and drop a frozen row.
+# EXPECTS: the census equal to the frozen file, every CROSS-FLAVOR row carrying its accepted
+#   measurement; the new-flavour fixture is reported NEW and the dropped row fails.
+#
 # MUST-FIRE: perturbed-copy: new-flavor-leg — a fixture script that pokes Phobos (0x10) over Donovan's cell (replay 17's R,R prologue) on a native leg is a CROSS-FLAVOR pairing the accepted list does not carry, and the census must FAIL on it (in-gate: the fixture is fed through --extra-script and must be reported NEW; mode: the fixture is added to the real scan and the gate FAILs)
 # MUST-FIRE: perturbed-copy: dropped-row — the frozen census minus one row must FAIL the exact comparison (in-gate: the file is compared against itself minus its first row and must differ; mode: the measured census is compared against that perturbed file and the gate FAILs)
 #

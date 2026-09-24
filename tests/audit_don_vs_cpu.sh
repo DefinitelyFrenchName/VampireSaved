@@ -5,6 +5,17 @@
 # 26_don_arcade_mash's U,U,R prologue lands on Jedah, and
 # audit_continue_switch's frozen trajectory drifted off the pairing.
 #
+# WHAT: the Donovan-vs-CPU pairings #99 was reported on (Phobos, Bishamon, Pyron) are
+#   REACHABLE deterministically on the merged build and run guard-clean to the marathon's
+#   end.
+# HOW: one guarded 40,620-frame MAME marathon per leg with the venue byte $FF8121 poked
+#   before match 1's draw (the ladder draw is a lottery unless the venue is pinned), P1
+#   Donovan by the wheel path; liveness is P2's hitbox base at match start equalling the
+#   venue-selected opponent's row of the build's own table.
+# EXPECTS: each leg's opponent is the one selected (a wrong opponent is a DEAD leg, never a
+#   pass) and the run ends clean. A clean pass is COVERAGE of the pairing, not proof the #99
+#   crash is absent — the header records that it does not reproduce here.
+#
 # HOW IT IS DETERMINISTIC. The arcade ladder's opponent draw is a
 # sound-state-fed LOTTERY (atlas/ram.md, $FF8110) UNLESS the venue byte
 # $FF8121 is pinned: the draw pool is rowA[venue..venue+7], so poking $FF8121

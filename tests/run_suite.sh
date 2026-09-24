@@ -1,6 +1,19 @@
 #!/bin/sh
 # run_suite.sh — the oracle replay suite (MAME side), auto-detecting runner.
 #
+# WHAT: the legacy oracle: every tests/replays/*.rpl replayed on MAME against the build the
+#   rompath resolves, its per-frame work-RAM checksums compared with the expectation set
+#   that build's fingerprint selects (exact, masked, flicker, diverge, window, skip — the
+#   CLAUDE.md §4 classes).
+# HOW: fingerprints the build (tests/expected/registry.tsv; an unregistered fingerprint
+#   fails loudly), runs each replay TWICE and fails on nondeterminism, then applies the
+#   replay's expectation kind from tests/expected/<set>/; --freeze writes new expectations
+#   only for replays with no authored class.
+# EXPECTS: every replay matches its frozen class; the first divergent frame and the RAM diff
+#   are the failure report. `authored .masked expectation — not self-frozen` must print for
+#   the authored replays under --freeze, or the legacy oracle has been replaced by a
+#   tautology.
+#
 # Usage: ROMDIR=... [MAME_ROMPATH="patched_dir;$ROMDIR"] tests/run_suite.sh [--freeze] [set]
 #
 # The build under test is whatever the rompath resolves (vanilla by default;

@@ -3,6 +3,16 @@
 # frozen (14z-118, the ram.md audit). ci_static: needs ROMDIR (the decrypt
 # cache), no build dir, no emulator, ~2 s.
 #
+# WHAT: the attract demo's roster is exactly the eight frozen vanilla matchups read from the
+#   ROM table at PRG:0x005C08 by the assigner at PRG:0x005BEA — every base id once per
+#   column, none in the variant half, so a tenant can never be featured by the demo.
+# HOW: decodes the assigner's instruction bytes and the 8x4-byte table from the decrypted
+#   OPCODE view (the table is PC-relative) and compares with the frozen rows; the negative
+#   control changes one id byte in a copy.
+# EXPECTS: the reader's bytes as decoded and the table equal to the frozen eight rows; the
+#   perturbed copy fails. The dynamic twin (40,000 attract frames, all eight in order) is a
+#   recorded measurement, not part of this gate.
+#
 # WHAT IT HOLDS. docs/game/atlas/ram.md had carried "Full attract demo
 # roster: TODO — enumerate all demo matchups" since M0. The attract assigner
 # at PRG:0x005BEA reads the demo counter at a5-0x61D6 (= RAM:$FF1E2A), masks

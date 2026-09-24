@@ -2,6 +2,19 @@
 # run_all_static.sh — THE PRE-COMMIT GATE CHAIN. One command, every gate that
 # does not need an emulator. (14z-94, GitHub #30.)
 #
+# WHAT: every gate that needs no emulator — the portable tier on a clean checkout, the
+#   static tier with $ROMDIR — runs from one command before a commit, by cadence (session /
+#   freeze / release, tests/ci_cadence.tsv), with every declared must-fire control executed
+#   at the close.
+# HOW: reads tests/ci_portable.txt and tests/ci_static.txt (and names any gate in neither:
+#   the anti-orphan check), defers cadence-listed gates unless a path they follow changed
+#   since origin/main, runs each through tests/lib/classify.sh, then executes each declared
+#   control as a mode and reads its HONOURED / LIES / REFUSED / DIED verdict.
+# EXPECTS: PASS N, SKIP 0, FAIL 0, MISSING 0 with `fired N / declared N` and every executed
+#   control honoured; --strict makes SKIP fatal. A red names the gate; a control that LIES
+#   (exit 0 under its own perturbation) is a red of the gate's verdict logic, not of the
+#   artifact.
+#
 # MUST-FIRE: none — a RUNNER asserts no property of the artifact; its verdict logic is tested by tests/test_static_runner.sh
 #
 # WHY THIS EXISTS. There is no CI in this repo — no .github/, no Makefile, no

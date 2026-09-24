@@ -1,6 +1,20 @@
 #!/bin/sh
 # audit_df_modes.sh — DARK FORCE POWER vs DARK FORCE CHANGE, every selectable character, frozen AS MEASURED (14z-168, GitHub #136): on vsav2 P+K is the global DARK FORCE POWER (two stocks, no startup invincibility, the seq-0x16 handler never reached); on vsavj and our build it is each character's DARK FORCE CHANGE; the tenants' vs2 "personal" Dark Force is a timed EX install that reaches their Change handler on BOTH games.
 #
+# WHAT: Dark Force POWER vs Dark Force CHANGE, every selectable character: on vsav2 P+K is
+#   the global Power (two stocks, no startup invincibility, the seq-0x16 handler never
+#   reached, +0x1C3 held) while on vsavj and ours it is each character's Change; the
+#   tenants' vs2 EX moves are a timed install that reaches their Change handler and arms
+#   their own +0x147 on both games.
+# HOW: 40 legs x 2 runs on MAME (vsav2's 15 ids and the three tenants' EX inputs, vsavj's
+#   15, ours' P+K and EX), each a REAL cursor path with identity asserted at 1400, the df/97
+#   prologue and activation frame, stocks poked, level and RNG pinned; one frozen row per
+#   leg (stock, seq16 frames, the +0x147 arm and writer, the timer, the +0x111 span, the
+#   flags); the control plants an arming write into a Power leg's log.
+# EXPECTS: every Power row arm=none with pow held, every Change row armed from its handler,
+#   the EX rows entering the Change machinery on both games; the planted Power log changes
+#   its row and fails.
+#
 # MUST-FIRE: perturbed-copy: power-armed — a copy of a vsav2 P+K leg's tap log with ONE planted +0x147 arming write (what a reachable Change handler would leave) must change that leg's row and FAIL the frozen compare, so a Power row's `arm=none` is a reading of the log, not a default (in-gate: the planted copy must reduce differently; mode: every vsav2 P+K log is planted before the reduction and the table FAILs)
 #
 # WHY. The maintainer, 2026-09-18 (14z-168), on the first in-DF comparison of the

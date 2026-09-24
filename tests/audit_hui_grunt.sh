@@ -4,6 +4,16 @@
 # truth under tests/test_kernel_voice_tables.sh (the static half) and the
 # instrument the maintainer's 2026-08-18 grunt report resumes from.
 #
+# WHAT: the electrocute grunt: Phobos as the shocked victim fires vs2's own silent voice id
+#   (0x2a2, a free Z80 id) on every other electrocution as native does, not a legacy
+#   character's hurt cry (0x1d2) through the aliased kernel voice table.
+# HOW: the x4 electrocution rig (replay 95) on ours and native vsav2 in parallel on MAME;
+#   the sound ring's enqueued ids over five electrocutions are compared with the per-BUILD
+#   frozen inventory; the control plants a wrong expected attempt-2 id.
+# EXPECTS: the measured ring equals the frozen inventory for the build (an unregistered
+#   build REFUSES until measured); attempt 2 on the fixed builds reads 0x2a2. A red is the
+#   alias back or the alternation phase moving.
+#
 # MUST-FIRE: known-bad: perturbed-inventory — a WRONG expected attempt-2 kernel voice id must fail the per-attempt comparison (mode: GRUNT_OURS_A2 is set to a wrong id so the measured ring != expected and the gate must FAIL)
 #
 # THE MEASURED MECHANISM (engine_internals "The KERNEL per-class voice

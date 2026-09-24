@@ -1,6 +1,14 @@
 #!/bin/sh
 # test_m2a_flavor_selector.sh — the Start-hold flavor selector (stage 5).
 #
+# WHAT: holding your own Start through select confirm and match load selects the other
+#   game's flavour of Donovan: the per-player latch (+0x3C2) reads 01 plain (VS2), 00 with
+#   P1 Start held (VH2), and P2's Start leaves P1's latch alone.
+# HOW: replay 17 on MAME three ways (plain, P1 Start held, P2 Start held) with both players'
+#   latches read from dumps after char-init.
+# EXPECTS: 01 / 00 / 01 for P1 and 00 for P2 in every run; a red is the init shim reading
+#   the wrong Start bit or seeding the wrong struct.
+#
 # Community-confirmed protocol (docs/game/atlas/character_tables.md): holding
 # YOUR Start through select confirm and match load selects the other
 # game's flavor of Donovan (VS2 default = latch 01; held = VH2 = 00).

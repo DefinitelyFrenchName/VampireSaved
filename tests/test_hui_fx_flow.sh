@@ -1,6 +1,17 @@
 #!/bin/sh
 # test_hui_fx_flow.sh — the effect-flow attribution gate (14z-68).
 #
+# WHAT: Phobos's ray effect runs HIS OWN per-character flow (the state-0x12 recogniser latch
+#   and the seq-0x0E sub-flow writes), the refuted 0x56D68 entry stays cold, and the ray's
+#   effect object is ticked by the PLACED piece machine with bank word 0x3000 on a ported
+#   build.
+# HOW: replay 83b (2P dummy, three spaced 236LP) on FBNeo with write taps on the flow sites
+#   and the effect pool; port presence auto-detected from the build's patch notes fragment;
+#   stage 6 self-built unless given.
+# EXPECTS: the fighter-side writes present, the refuted entry absent, the piece-side machine
+#   and bank word matching the build's port state. Ground-truthed on hui9 and a bad-thunk
+#   negative control.
+#
 # Captures the tap probe that refuted the 14z-67 seq-D entry theory
 # and named the true root (STATE 14z-68). Two legs on replay 83b
 # (2P-dummy, cross-emulator-reproducible, FBNeo write taps):

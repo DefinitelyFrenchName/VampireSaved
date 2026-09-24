@@ -1,6 +1,17 @@
 #!/bin/sh
 # audit_entrance_draw.sh — PHOBOS'S ROUND-START ENTRANCE IS DRAWN FROM THE SAME THREE VARIANTS ON OUR BUILD AS ON vsav2 (14z-168, GitHub #136): the legs of #136's guard-cancel rigs drew different entrances because the draw follows each game's RNG state at character load, not because our build lost one — over six seeds both legs draw fighter +0x0A in {0, 2, 6}.
 #
+# WHAT: Phobos's round-start entrance is drawn from the same three variants (0 drive-in, 2
+#   and 6 held) on our build as on vsav2: over six RNG seeds the two games draw DIFFERENT
+#   variants per seed but the SAME set — so #136's differing openings were the draw, not a
+#   lost entrance.
+# HOW: 12 short field-trace runs in parallel on MAME (six seeds x two legs on huitzil_5)
+#   reading fighter +0x0A through the intro and P1's x; a draw's variant is the first value
+#   other than 0/255 after initialisation and must agree with the position (the drive-in
+#   moves x through three values), else VOID; the control rewrites our draws to variant 6.
+# EXPECTS: the per-seed rows frozen and the two legs' variant SETS equal; the rewritten
+#   copy's set differs and fails.
+#
 # MUST-FIRE: perturbed-copy: variant-lost — a copy of our rows with every drive-in draw rewritten to the held variant 6 (what a build that lost the car arrival would read) must FAIL the set compare against native, so the compared sets are what the draws produced (in-gate: the perturbed copy's set must differ from native's; mode: our rows are rewritten before the compare and the table FAILs)
 #
 # WHY. 14z-167 found #136's huitzil_5/6/7 first-event DIFF rows are the round-start

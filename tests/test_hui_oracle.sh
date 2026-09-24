@@ -4,6 +4,16 @@
 # same-emulator two-game form — the test_m2a_stage4_oracle.sh pattern
 # adapted for a poke-picked tenant).
 #
+# WHAT: Phobos's full moveset against native vsav2 as the oracle: match-start anchors equal,
+#   the neutral window field-exact, the P2 HP-change sequences equal, and cross-game
+#   mismatches bounded by the unchanged legacy veteran control's.
+# HOW: one replay (90_hui_oracle) on native vsav2 and on the WIDE build on MAME with
+#   identical inputs and pokes and the RNG determinised; tools/compare_fields.py at anchors
+#   and --exact over the neutral window; the veteran control pair (stock vsavj + vsav2)
+#   gives the noise bound.
+# EXPECTS: the four locks hold; a red names the anchor, field or HP step that differs beyond
+#   the control's bound.
+#
 # ONE replay (tests/replays/hui/90_hui_oracle.rpl) runs on native vsav2
 # (reference binary) and on the ported vsavjw build (WIDE binary) with
 # IDENTICAL inputs and pokes. Locks (the frozen template semantics):

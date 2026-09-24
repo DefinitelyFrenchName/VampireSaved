@@ -1,6 +1,19 @@
 #!/bin/sh
 # audit_column_flash.sh — THE ORANGE FLASH ON THE DEITY AS DONOVAN'S KILLSHREAD LIGHTNING COLUMN ENDS, frozen AS MEASURED (14z-170, the maintainer's capture read): palette row 11 holds a FIRE ramp on our merged build where native vs2 keeps its BLUE ramp through the move's end — the colour swap the maintainer saw, recorded as the palette RAM it is, for the open cosmetic ticket.
 #
+# WHAT: the orange flash on the deity as Donovan's Killshread Lightning column ends, frozen
+#   AS MEASURED for the open cosmetic ticket: our merged build's palette row 11 holds a fire
+#   ramp where native vs2 keeps its blue ramp through the move's end, and the extra 2858
+#   palette-sequence upload is ours alone.
+# HOW: the naming part donovan_4 on native vs2 and on the build (the merged wheel's real
+#   cursor path, the parity gate's pins) on MAME; palette RAM dumped at 2858/2860/2866 and
+#   hashed per leg (a hash, never the bytes: rule 7), plus a non-debug write tap on row 11
+#   attributing every writer PC; the control replaces our row 11 by native's.
+# EXPECTS: the frozen hashes per leg, native's row constant over the three frames and ours
+#   equal to native at 2858 (so a leg that missed the move cannot pass), every writer the
+#   uploader's `movem.l` in its own opcode image. A red is the flash gone or moved; which
+#   sequence id we upload, and why, is NOT covered.
+#
 # MUST-FIRE: perturbed-copy: flash-gone — a copy of our leg's palette dumps with row 11 replaced by native's (what a fix of the flash looks like) must FAIL the frozen compare, so the gate reads the row it claims to read (in-gate: the planted copy must differ from the frozen rows; mode: the planted copy IS our leg and the gate FAILs)
 #
 # WHY. The maintainer, on the 14z-170 capture of the fixed column: "The orange flash at 2860

@@ -2,6 +2,17 @@
 # audit_down_attack.sh — HITTING A DOWNED OPPONENT, both directions per
 # tenant (14z-104, coverage matrix — the §4 "pursuit attacks" cell).
 #
+# WHAT: hitting a DOWNED opponent works both ways for every tenant: a tenant's grounded
+#   heavy connects on a downed legacy victim, and a legacy heavy connects on a downed tenant
+#   through the tenant's ported down-state rows.
+# HOW: the judge/03_down_attack rig on MAME (walk, crouch-HK sweep) with a per-character
+#   down-attack input inserted per leg; dumps give the sweep's damage, the tumble arc and
+#   the later damage in the down/wake window; an `early` control attacks inside the
+#   invulnerable window and an all-legacy `ctl` leg checks the instrument.
+# EXPECTS: per leg the sweep connected and knocked down (else the leg is REFUSED, not
+#   judged), the down attack dealt damage in the window, and the run ended clean; the early
+#   control deals none. A red names the tenant and the direction.
+#
 # The corpus had ZERO coverage of the down-state contact surface (no
 # rig, no gate, no doc mention). The surface is real ported data both
 # ways: a tenant attacking a downed legacy victim dispatches the

@@ -1,6 +1,20 @@
 #!/bin/sh
 # audit_ff8130_writers.sh — who writes RAM:$FF8130 on vanilla vsavj, every write form and both byte lanes: five DIRECT writers (the id fold's store at PRG:0x00A446 and four constant writes), block writes that cover the word, and two writers of the NEIGHBOUR byte $FF8131 that a word-wide tap reports on it (14z-157, #100).
 #
+# WHAT: who writes RAM:$FF8130 on vanilla vsavj, every write form and both byte lanes: five
+#   direct writers found by decoding every even offset (the id fold's store and four
+#   constant writes), the block writers that cover the word, and the two writers of the
+#   neighbour byte $FF8131 that a word-wide tap reports on it — two earlier records each
+#   named a wrong set.
+# HOW: section A decodes the vsavj opcode view at every even offset for a write to $130(a5)
+#   or $FF8130 and checks each frozen address is an instruction boundary; section B runs
+#   three MAME legs under tests/lua/tap_writes.lua on the containing WORD, bucketing hits by
+#   write mask; controls: the one-form scan that hid four writers, and reading the logs with
+#   the mask ignored.
+# EXPECTS: the five writers and the block writers as frozen per leg, $FF8131's writers never
+#   on the $FF8130 lane; the one-form scan fails the inventory and the lane-blind read fails
+#   the lane assertion.
+#
 # MUST-FIRE: shadow-tool: one-form-scan — section A's inventory built by the #100-shaped scan (the 0x0130 displacement word read at opcode+2 only) instead of the every-offset decoder must fail the five-writer inventory, so the inventory is proven to rest on a decoder that sees a write carrying an immediate word before its displacement
 # MUST-FIRE: perturbed-copy: lane-blind — section B's tap logs read with the write MASK ignored must put PRG:0x02033E and PRG:0x020AE8 on the $FF8130 lane and fail the lane assertion, so the lane attribution is proven to rest on the mask
 #

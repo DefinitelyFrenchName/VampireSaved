@@ -7,6 +7,19 @@
 # DEBT, shrinks only). (14z-145 step one; 14z-147 step two switched the census
 # to the contract's own reader, tests/lib/controls.sh.)
 #
+# WHAT: the must-fire doctrine is countable: which gates DECLARE a control under the R10
+#   grammar (grows only), which declare one but print no run-time verdict (HEADER-ONLY,
+#   shrinks only), and which still mention a control in pre-grammar spellings (RETROFIT
+#   DEBT, shrinks only) — against tests/expected/must_fire_census.tsv.
+# HOW: tests/lib/controls.sh (the contract's one reader) classes every gate's leading
+#   comment block and body; the three classes are compared with the frozen file; two
+#   controls neuter one gate's declaration and another's FIRED lines in copies of tests/ and
+#   must move them between classes.
+# EXPECTS: PASS when the census equals the frozen inventories in the allowed directions; a
+#   red names the gate that dropped a declaration, joined the header-only set, or appeared
+#   undeclared. It does not claim a printed verdict is honest — the runners' executed
+#   controls do.
+#
 # MUST-FIRE: perturbed-copy: dropped-declaration — a copy of tests/ with one gate's `# MUST-FIRE:` line neutered must drop that gate from the declaring inventory (section 1 fails), or the inventory is not read from the header
 # MUST-FIRE: perturbed-copy: neutered-verdict — a copy with one declaring gate's `CONTROL FIRED:` lines commented out must put that gate in the header-only set (section 2 fails), or "prints a verdict" is not measured
 #

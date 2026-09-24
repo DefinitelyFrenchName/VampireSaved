@@ -6,6 +6,16 @@
 # own ladder) — but the defect is NOT Lilith-specific; see the corrected
 # controls below.
 #
+# WHAT: the #103 stall as a lose-flow measurement: after a Donovan P1 loss in arcade the
+#   round-end judge fires and the lose flow moves on within the healthy ~580 frames, instead
+#   of the ~8,000-frame frozen KO tableau the un-judgeable hp/white state produced.
+# HOW: two parallel MAME runs of the poke-free arcade repro (Lilith is index 1 of Donovan's
+#   ladder), reading KO, the loser's +0x1C record and the stage word from dumps; Victor on
+#   the same rig and pristine vsavj are the bounding controls recorded in the header.
+# EXPECTS: KO to the stage word moving in the healthy band; a red is the stall back (the
+#   judge starved by a ported row that pins white HP). The gate measures the STALL, never a
+#   permanent freeze — that first wording is retracted in the header.
+#
 # THE DEFECT, measured on merged-m3 AND merged-m2 (so it predates the #101
 # batch): P1 Donovan loses a round to CPU Lilith in arcade -> his HP
 # underflows, he falls, Anita walks to his body, Lilith holds her win pose --

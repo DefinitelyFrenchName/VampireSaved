@@ -1,6 +1,21 @@
 #!/bin/sh
 # audit_throw_registration.sh — THE HIT-REGISTRATION PAIR AT A TENANT THROW, ours vs native, frozen: on every tenant throw contact native's throw code writes the engine's (attacker, victim) registration pair right before the generic hit stager awards meter, while our placed copies of those stores write vs2's displacements (dead on vsavj), so the vsavj stager reads the collision pass's leftover pair reversed — the attacker gets the victim's flat 8 and the victim the throw record's meter. The mechanism behind GitHub #136's meter-fraction family (14z-166).
 #
+# WHAT: the hit-registration pair at a tenant throw, ours vs native: native's throw code
+#   writes the engine's (attacker, victim) pair before the generic hit stager awards meter,
+#   while our placed copies write vs2's displacements (dead on vsavj), so the stager reads
+#   the collision pass's leftover pair reversed — the attacker gets the flat 8 and the
+#   victim the record's meter (#136's meter family, #157); the legacy control shows both
+#   engines register the pair, so it is a port defect.
+# HOW: read taps on MAME over the live pair, the dead pair and both meters for pyron_3,
+#   huitzil_3 and donovan_5 (7 tap runs each, the parity gate's rig and pins) and the legacy
+#   Demitri-throws-Victor part on pristine vsavj and vs2 with real picks; contact rows,
+#   writer rows and the legacy ids frozen; controls swap the P1/P2 steps, plant a reader of
+#   the dead pair, and plant a second write on a contact frame.
+# EXPECTS: the frozen defect rows (ours p1=+8 p2=record; native the reverse), no in-play
+#   reader of the dead pair, the legacy legs paying the attacker the record on both engines;
+#   all three controls fail. A fix re-freezes this file deliberately.
+#
 # MUST-FIRE: perturbed-copy: legs-swapped — a copy of our reduced rows with the P1 and P2 meter steps swapped (the fixed shape) must FAIL the frozen compare (in-gate: the perturbed copy is diffed against the frozen rows and must differ; mode: the real rows are swapped and the gate FAILs)
 # MUST-FIRE: perturbed-copy: dead-reader-planted — a copy of our dead-pair tap with ONE in-play read planted at a game PC must add a reader row and FAIL the frozen compare (in-gate: the planted copy is reduced and must differ; mode: the real tap is planted and the gate FAILs)
 # MUST-FIRE: perturbed-copy: double-write — a copy of our first part's P1 meter tap with a SECOND write planted on its first contact frame (the same value, a game PC) must print the `/2w` marker and FAIL the frozen compare, so the frozen rows' one-write reading is something the reducer can refuse and not merely a marker that never printed (in-gate: the planted copy is reduced and must differ from the frozen rows and carry /2w; mode: the P1 meter tap of every ours leg is planted and the table FAILs) — added 14z-167 on rule-checker run 2026-09-18-41 Q4

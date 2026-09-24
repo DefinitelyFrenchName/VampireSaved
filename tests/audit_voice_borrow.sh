@@ -1,6 +1,18 @@
 #!/bin/sh
 # audit_voice_borrow.sh — THE VOICE-CLASS BORROW mechanism gate (14z-87).
 #
+# WHAT: the sword-plant voice mechanism as its lottery-proof invariants: a tenant P1's voice
+#   class holds his own id through the plant-end window and every ring id in that window is
+#   one of his authored voices (own-class, the shipped fix), the borrow scan writing from
+#   the candidate tables and the dispatcher reading the same value in ONE run.
+# HOW: static reads of the candidate tables in the image, then a serialized read-tap run on
+#   $FF8782 (rig 90) and a ring tap over the plant-1-end window on MAME;
+#   VOICE_BORROW_EXPECT=lottery reproduces the pre-fix shape against build/don_m4; the
+#   control injects a foreign id into the real ring.
+# EXPECTS: static facts hold, exactly the expected writer (none mid-match for own-class),
+#   the window's ids all in the authored voice range, and the foreign-id control fails. The
+#   fired id itself is never frozen — it is a lottery on the QSound-latch phase.
+#
 # MUST-FIRE: known-bad: foreign-ring-id — a foreign id in the plant-end ring window must be caught by the membership check (mode: a foreign id is injected into the REAL ring and section 2 must fail)
 #
 # Freezes the sword-plant "ding" mechanism as its STABLE invariants. The

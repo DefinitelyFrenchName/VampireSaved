@@ -1,6 +1,19 @@
 #!/bin/sh
 # audit_reaction_class_live.sh — EVERY WRITE AND READ OF THE VICTIM'S REACTION CLASS (+0x54) OVER THE CORPUS, on pristine vsavj (the whole legacy suite), on our merged build and on native vs2 (the #136 naming parts), frozen (14z-169, the analysis before the class-0x52 fix of the column shock and the Plasma Trap, #136, which the maintainer ruled on 2026-09-18: "then I'm all for fixing. Once again, as long as we don't introduce noticeable lag and we don't break more things, it's a pure win/win" — DECISIONS_HISTORY.md): the live half of tests/test_reaction_classes.sh, which can see only constant writes.
 #
+# WHAT: every write and read of the victim's reaction class (+0x54) over the corpus —
+#   pristine vsavj's whole legacy suite, our merged build's and native vs2's #136 parts —
+#   attributed by PC with the values, frozen: the live half of the reaction-class analysis,
+#   seeing what a static scan cannot (a class written from a register, code outside the
+#   scanned range), and naming the consumers of +0x54.
+# HOW: 148 non-debug read-tap runs on MAME over both fighter blocks' +0x54/+0x55 with
+#   liveness per window by the END probe; positive controls on the reading (vsavj's ground
+#   stager writing 6 on ours, vs2's writing 0x52 on native); controls plant a 0x38 write via
+#   a Lua poke and delete a window's accesses.
+# EXPECTS: no 0x38 write anywhere, the positive controls present, the frozen W/R rows equal
+#   per leg; the planted 0x38 is reported and the silent window reads DEAD. Not sampled:
+#   every path the corpus does not run.
+#
 # MUST-FIRE: perturbed-copy: planted-38 — a run of 02_demitri_vs_cpu on pristine vsavj with a Lua poke of 0x38 into P1's +0x54 at frame 3000 must be reported as a 0x38 write and FAIL the no-0x38 check, so the check reads what the tap logged (in-gate: that one run must report the value; mode: every vsavj run carries the poke and the gate FAILs)
 # MUST-FIRE: perturbed-copy: range-silent — a copy of a tap log with every access to P2's +0x54 window deleted must be reported as a DEAD range, so each run's two windows are each proven live to the end before their silence is trusted (in-gate: the first run's copy must read P2 dead; mode: every run's log is perturbed before the liveness check and the gate FAILs)
 #

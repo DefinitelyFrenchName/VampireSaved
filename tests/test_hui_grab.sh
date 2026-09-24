@@ -2,6 +2,15 @@
 # test_hui_grab.sh — Circuit Scrapper gate (14z-66, playtest round-1
 # item 4: the 63214 command grab "did not come out").
 #
+# WHAT: Phobos's Circuit Scrapper (63214 command grab) comes out and connects with the
+#   native-matched signature: P1 enters the 0x0E grab sequence and the victim takes 0x13
+#   damage, with the throw-arc tables placed.
+# HOW: static: the throw_arc_tables thunk and placed tables in the build; runtime: the
+#   2P-dummy connect replay on MAME reading the sub-state progression and damage against the
+#   native A/B of record.
+# EXPECTS: the thunk present and the grab connecting with the native damage; a red is the
+#   move-start dying on the pcrel escapes or the arc tables gone.
+#
 # Root (measured): recognition was ALWAYS live (probe-proven); the
 # move-start died on x026142's oracle-invisible pcrel escapes — fixed
 # by pcrel_escape_fix. 14z-67: the THROW-ARC fix (site_thunk

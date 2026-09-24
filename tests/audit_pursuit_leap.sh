@@ -3,6 +3,18 @@
 # tenant (14z-104; the §4 "pursuit attacks" cell's SECOND instrument,
 # beside audit_down_attack's grounded OTG surface).
 #
+# WHAT: the leaping pursuit attack (universal Up + button over a knocked-down opponent)
+#   works both ways per tenant: each tenant's ported pursuit content executes airborne with
+#   a per-character arc, and the leap fires AT a downed tenant.
+# HOW: the judge/03_down_attack rig on MAME plus U3 during the victim's fall; per leg the
+#   pursuit state (seq 0x0E), the peak height and the leap duration are read from dumps; a
+#   negative control gives the same input after the victim recovered and must produce a
+#   plain jump.
+# EXPECTS: attacker legs fire seq 0x0E, go airborne (peak y >= 60) and last 20-60 frames;
+#   victim legs fire at the downed tenant; the control does not fire 0x0E. The CONNECT
+#   (pursuit damage) is deliberately not asserted — a rig knife-edge on both games, recorded
+#   in the header.
+#
 # The maintainer confirmed (2026-08-22) vsav retains the Night Warriors
 # leaping pursuit: universal U + any P/K over a knocked-down opponent,
 # per-character animations, ES variant on two buttons. MEASURED 14z-104

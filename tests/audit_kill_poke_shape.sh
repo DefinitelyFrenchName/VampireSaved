@@ -3,6 +3,16 @@
 # UNJUDGEABLE STATE ON ANY CHARACTER (14z-98). On-demand, ~7 min
 # (2 MAME runs, parallel). GROUND TRUTH FOR RIG AUTHORS, frozen both ways.
 #
+# WHAT: ground truth for rig authors: a 2-byte HP kill poke (hp only) manufactures #103's
+#   un-judgeable state on ANY character, while the 4-byte poke (hp and white) flows through
+#   the healthy kill commit — so kill and heal pokes must write both words.
+# HOW: two parallel MAME runs on a pure-legacy Victor leg: the 2-byte shape and the 4-byte
+#   shape, the round's resolution read from the judge phase and the frames to the stage word
+#   moving; the control classifies the 2-byte leg FLOWED, which the real judge never allows.
+# EXPECTS: the 2-byte leg STALLS unresolved and the 4-byte leg FLOWS in about 600 frames —
+#   both frozen as engine facts. A NO-KO on either leg is a dead rig. If the 2-byte leg ever
+#   flows, the judge stopped reading white's sign: a full stop.
+#
 # MUST-FIRE: known-bad: two-byte-flowed — the 2-byte kill poke must STALL (the judge reads white's sign), so a FLOWED classification of it must fail (mode: the 2-byte leg is classified FLOWED, which the real judge never allows, so the gate FAILs)
 #
 # THE ENGINE PROPERTY (engine_internals "THE ROUND JUDGE"): the round

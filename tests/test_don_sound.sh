@@ -1,6 +1,16 @@
 #!/bin/sh
 # test_don_sound.sh — Donovan sound gate (session 14z-52).
 #
+# WHAT: no vsavj MUSIC-range id (0x700-0x7FF, Donovan's voice bank on vs2) is ever enqueued
+#   into the 68k sound ring during Donovan's moveset, and each replay's id inventory equals
+#   the frozen one — sound is invisible to every RAM and pixel gate.
+# HOW: Donovan's moveset replays on the STOCK track on MAME with the ring at $FF0E0E dumped;
+#   ids collected from entry+2 (a move.l splits into two word writes) and compared with the
+#   frozen per-replay inventories.
+# EXPECTS: zero music-range ids and every inventory exact. The `SET=vsavjw` mode is VOID
+#   (the replays select Jedah on a WIDE wheel) — the header says so; WIDE coverage needs
+#   re-authored twins.
+#
 # THE TRIPWIRE THAT MATTERS: vsavj's sound-id range 0x700-0x7FF holds
 # MUSIC TRACKS, while vs2 uses that same range for Donovan's voice bank
 # (measured both sets, docs/project/m5/, engine_internals "Sound subsystem").

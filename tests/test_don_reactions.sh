@@ -1,6 +1,15 @@
 #!/bin/sh
 # test_don_reactions.sh — Change Immortal behavior gate (14z-26..28).
 #
+# WHAT: Donovan's 421+P is a standing multi-hit that never knocks down a standing opponent
+#   (the maintainer's gameplay lock), the sworded deity's fatal hit runs the complete death
+#   chain, and the total damage stays within the measured native bound.
+# HOW: replays on MAME against a stock build reading the victim's node family, hits and
+#   damage from dumps; the control forces the victim node into the knockdown family.
+# EXPECTS: multi-hit, no knockdown, the death chain complete, damage within bound; the
+#   knockdown control fails. The two-sided native comparison is test_don_immortal_native's;
+#   this gate keeps the one-sided locks honest.
+#
 # MUST-FIRE: known-bad: knockdown-forbidden — 421P must not knock down a standing opponent, so a knockdown-family node reading must fail section 1 (mode: the victim node is forced into the knockdown family so the no-knockdown assertion fails and the gate FAILs)
 #
 # GAMEPLAY LOCK (round-41, maintainer): 421P is a standing up-to-8-hit

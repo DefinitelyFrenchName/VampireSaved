@@ -6,6 +6,16 @@
 # `CONTROL=<name>` mode with its REFUSED exit, and the `none` declaration.
 # (14z-147, step two of the maintainer's must-fire ruling.) ROM-free, ~1 s.
 #
+# WHAT: the must-fire contract's reader (tests/lib/controls.sh) reads what the grammar says:
+#   the four R10 regexes, the leading comment block as the header (a bare `#` continues it),
+#   the declared-vs-fired readback that turns a PASS with a missing or DEAD control into
+#   FAIL, the CONTROL=<name> mode and its REFUSED exit, and the `none` declaration.
+# HOW: synthetic gate scripts and logs of each shape are pushed through the SHIPPED
+#   classifier and reader; two controls (a declared control printing DEAD, an undeclared
+#   name printing FIRED) must classify FAIL.
+# EXPECTS: every synthetic case classifies as the contract states; a red means a runner
+#   would misread whether a gate's controls fired — the doctrine turned back into prose.
+#
 # MUST-FIRE: known-bad: dead-control-log — a synthetic gate that declares a control and prints `CONTROL DEAD:` for it must classify FAIL through the shipped classifier, or a dead control would keep its gate green
 # MUST-FIRE: known-bad: undeclared-firing — a synthetic log printing `CONTROL FIRED:` for a name no header declares must classify FAIL, or a control nobody can review would count
 #

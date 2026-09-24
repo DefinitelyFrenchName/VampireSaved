@@ -3,6 +3,16 @@
 # EMULATOR gate, ~6 min, two MAME runs. NOT in ci_static (see the registry
 # check in run_all_static.sh); indexed in HANDOFF.
 #
+# WHAT: Shadow morphing into a TENANT works: after five START presses on '?' and a win over
+#   tenant Donovan, P1 becomes Donovan with DONOVAN'S OWN record installed — not Victor's,
+#   the shell his id aliases (the quiet failure the maintainer named).
+# HOW: replay 113 on the merged build on MAME reading the arm flag $43, the copy flag $3BC
+#   and the winner's record; the control is the same replay with FOUR presses, which must
+#   not arm, not set $3BC and not morph.
+# EXPECTS: morph to 0x13 with record 0x003FA9D0 in section 1; nothing armed or morphed in
+#   section 2. Only the first morph is deterministic — the arcade draw is a lottery past
+#   ~8500.
+#
 # MUST-FIRE: known-bad: four-presses-morph — FOUR START presses must NOT arm the copy, so demanding that the four-press leg morphed must fail (mode: the four-press control leg is asserted to have morphed to the tenant, which it never does, so the gate FAILs)
 #
 # THE QUESTION, in the maintainer's words: the risk with Shadow is not

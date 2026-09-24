@@ -20,6 +20,18 @@
 # Measured 14z-118 on 3,638 in-match frames: 3638/3638 on-graph, 1225 edges +
 # 32 jumps, 1121 exact + 137 dur-1. Emulator tier (MAME), ~2 min.
 #
+# WHAT: the animation-node decoder (tools/anim_nodes.py) is an INSTRUMENT: on Donovan on
+#   native vs2 every sampled node pointer lies on the decoded graph, every change is a graph
+#   edge or a jump onto a graph node, and the first countdown sample equals the node's
+#   duration or duration-1.
+# HOW: replay 17 on native vs2 on MAME, P1's node pointer +0x1C and countdown +0x20 sampled
+#   every frame (3,638 in-match frames) and mapped onto the five decoded tables; the
+#   negative control decodes with the wrong stride (0x17) and must leave most pointers off
+#   the graph.
+# EXPECTS: 3638/3638 on-graph, every change an edge or a jump, countdowns exact or dur-1;
+#   the wrong-stride decode fails. Run after any change to the decoder or the node-format
+#   claims.
+#
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/don_m23] tests/test_anim_node_walk.sh  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 #
 # HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the

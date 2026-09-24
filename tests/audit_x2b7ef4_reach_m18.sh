@@ -1,6 +1,19 @@
 #!/bin/sh
 # audit_x2b7ef4_reach_m18.sh — DOES ANY NAMING PART READ A CORRUPTED x2b7ef4 RECORD ON merged-m18? The reachability the maintainer asked for (2026-09-19, "Measure it now (Recommended)"), re-measured SOUNDLY (14z-170): a -debug read watch on the corrupted bytes ONLY, armed after boot, every run checked frame-aligned against a non-debug run of the same rig.
 #
+# WHAT: whether any naming part on merged-m18 READS one of the companion-effect records the
+#   placeholder scan corrupted there (fixed in M19): a -debug read watch over the corrupted
+#   bytes only, armed after boot, with every run's node trajectory checked frame-aligned
+#   against a non-debug run so a debugger stop cannot desync the replay unnoticed.
+# HOW: 42 MAME runs (20 Donovan and Pyron parts, each a debug watch and a field-trace
+#   reference, through the merged wheel's path with the parity pins, plus the control's
+#   two); hits, first hit frame, the aligned prefix and the skew frame frozen per part; the
+#   control widens the watch over a hot block, which must hit in the match and desync the
+#   trajectory.
+# EXPECTS: no read of a corrupted record on any part, every run tracking its reference (a
+#   run that never tracks is VOID), the frozen skews; the hot-block control hits and skews
+#   and fails. The gate refuses any build but merged-m18 by fingerprint.
+#
 # MUST-FIRE: known-bad: hot-block — the same rig with the watch widened over the block Donovan's copy reads in every match (CPU:$0FCC00, 1 KB) must HIT in the match AND its node trajectory must then leave the reference's, so the watch can fire and the trajectory check sees the desync a stop causes (in-gate: one run of donovan_4; mode: the widened watch replaces donovan_4's and the gate FAILs)
 #
 # WHY. merged-m16..m18 shipped companion-effect records the generator's in-place placeholder scan

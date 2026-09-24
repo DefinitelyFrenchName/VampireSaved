@@ -2,6 +2,15 @@
 # test_reactions.sh — WHICH CHAINS A TENANT RUNS AS THE VICTIM, PER REACTION
 # CLASS, AND HOW LONG (character-data map, PHASE 3; measured 14z-120 (7)).
 #
+# WHAT: which chains a tenant runs as the VICTIM, per reaction class, and for how long: for
+#   every contact class the naming rigs reach (hits, blocked, anti-air) the victim's class
+#   byte, freeze, chain path and frames back to a stand chain, frozen per tenant.
+# HOW: the <tenant>_victim schedules on MAME (the tenant on P2 by the early-window poke,
+#   Victor forced on P1), P2's node pointer per frame turned into one line per contact by
+#   tools/reaction_map.py; both fighters' ids asserted from the trace.
+# EXPECTS: the per-tenant files equal (re-frozen only after a change is attributed); a red
+#   is a changed reaction set, extract, decoder or rig.
+#
 # WHAT IT HOLDS. tools/name_moves.py's `<tenant>_victim` schedules put the
 # tenant on P2 (the P2 early-window poke) against Victor on P1 (forced 0x03)
 # and run every contact class the naming rigs reached: light/medium/heavy

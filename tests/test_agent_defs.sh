@@ -3,6 +3,17 @@
 # `.claude/agents/` STATES its caps (tools/agent/agent_defs.py), ruled 2026-09-23 (14z-177,
 # DECISIONS_HISTORY.md "Ruled 2026-09-23 (14z-177)"): at most Opus-class, effort at most xhigh.
 #
+# WHAT: every worker definition under .claude/agents/ states its caps: a model named by
+#   version id at most Opus-class, an effort at most xhigh, read-only tools (plus Bash for
+#   the measurer), no `hooks:` key, and the pinned rule-checker's `omitClaudeMd: true` —
+#   because a missing cap follows the caller's, which is Fable.
+# HOW: tools/agent/agent_defs.py checks the real directory; seven controls each plant ONE
+#   defect into a copy (a Fable model, a missing effort, effort max, a hooks block, a Write
+#   tool, an alias model, the omitClaudeMd line removed) and the check must refuse the copy
+#   with that defect's reason.
+# EXPECTS: the three definitions OK and every control refused with its reason; a red names
+#   the definition and the cap it breaks.
+#
 # Why a static gate at all: measured the same sitting (tools/agent/probe_agents.sh), a definition
 # with no `model` runs on its CALLER's model (A9) and one with no `effort` at its caller's effort
 # (A4) — and S5 makes the caller Fable — while a `hooks:` block in the frontmatter did not fire

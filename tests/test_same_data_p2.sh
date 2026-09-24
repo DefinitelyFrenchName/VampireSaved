@@ -3,6 +3,17 @@
 # vsavj AND vsav2, AND WHICH CHAINS DIFFER FOR EACH IS FROZEN (14z-164, GitHub
 # #136 proposition 2, maintainer-agreed 2026-09-17).
 #
+# WHAT: no legacy character carries the same character data on vsavj and vsav2 (0 of 12),
+#   and which chains differ for each is frozen — the measurement behind choosing Demitri as
+#   the parity rigs' P2 (table a identical; b:0x10/0x71/0x74 and c:0x2e/0x2f differ).
+# HOW: tools/audit_same_data_p2.py over both decrypted data views (the bank's value rows,
+#   every anim node's resolved boxes and attack record across tables a/a2/b/c/proj, the
+#   defense-curve row), never the indices vs2 renumbered; controls run vsavj's view on both
+#   sides (every character must read SAME-DATA and fail the table) and drop Demitri's row.
+# EXPECTS: the frozen per-character table equal with its one-sided counts; the self-compare
+#   and the dropped row fail. The code_ptr, auto and data_ptr rows are named per row and not
+#   compared.
+#
 # MUST-FIRE: perturbed-copy: self-compare — the audit run with vsavj's data view on BOTH sides (both read with the vsavj layout) must read every character SAME-DATA and so fail the frozen table (mode: the same perturbation on the real run, the compare must FAIL)
 # MUST-FIRE: perturbed-copy: dropped-row — a copy of the frozen table with one character's row removed must fail the completeness check (mode: the real table with Demitri's row removed, the gate must FAIL)
 #

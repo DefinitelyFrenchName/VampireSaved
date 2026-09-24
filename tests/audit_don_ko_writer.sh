@@ -3,6 +3,17 @@
 # DONOVAN'S HP AT HIS ARCADE DEATH, PC-attributed, non-debug (canonical
 # timeline). On-demand, ~8 min (2 MAME read_tap runs, parallel).
 #
+# WHAT: the #103 root-cause lock: nothing in Donovan's ported regions writes his HP at his
+#   arcade death any more, and his death takes the healthy kill commit (both HP words 0xFFFF
+#   in one frame) that the round judge needs.
+# HOW: two parallel MAME read_tap runs on the canonical (non-debug) timeline: leg A Donovan,
+#   every write to $FF8450 PC-attributed against the placed x026142/x066ec4 window; leg B
+#   Victor on the same rig as the instrument control that must show the kill commit.
+# EXPECTS: with EXPECT_DEFECT=0 (the default since the fix) leg A shows zero ported-window
+#   writes and the kill commit at death; leg B always shows the commit. A quiet leg A with a
+#   quiet leg B is a dead tap, not a pass; EXPECT_DEFECT=1 re-measures the pre-fix shape on
+#   an old build.
+#
 # THE MECHANISM THIS LOCKS (full chain on GitHub #103, 14z-98 comment):
 # the round judge kills on THE SIGN OF WHITE HP (+0x52; in-match machine
 # PRG:0x93CE, phase-6 handler 0x97DC, tests at 0x97FC/0x9804), and the

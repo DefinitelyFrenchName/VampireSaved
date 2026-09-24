@@ -2,6 +2,19 @@
 # run_all_emulator.sh — THE EMULATOR-TIER GATE CHAIN. One command, every gate
 # that needs MAME, FBNeo or the Verilator simulator. (14z-128.)
 #
+# WHAT: every gate that needs MAME, FBNeo or the Verilator simulator runs from ONE registry
+#   (tests/ci_emulator.tsv) with its declared lane, scope, cadence, args and timeout, so a
+#   release can say "all tests ran" over an enumerated set.
+# HOW: reads the registry, runs the prereq lane first (a red instrument gate stops the run),
+#   then the mame/fbneo/mister lanes, each gate under its own timeout, classifying every
+#   exit through tests/lib/classify.sh and, under --controls, executing every declared
+#   must-fire control as a CONTROL=<name> mode; writes one results.tsv row per gate and per
+#   control.
+# EXPECTS: a readout PASS / SKIP / FAIL / TIMEOUT / MISSING with SKIP counted apart from
+#   PASS; at release scope (--scope all --lane all --strict --controls) anything but PASS is
+#   a hard fail. It asserts nothing about the romset itself — its verdict logic is what
+#   tests/test_emulator_runner.sh tests.
+#
 # MUST-FIRE: none — a RUNNER asserts no property of the artifact; its verdict logic is tested by tests/test_emulator_runner.sh
 #
 # WHY THIS EXISTS. tests/run_all_static.sh ended the same failure for the

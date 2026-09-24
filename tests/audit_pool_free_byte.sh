@@ -3,6 +3,18 @@
 # slot) audit, BOTH pools. On-demand, ~20 min (3 legs x census + tap on
 # the merged build).
 #
+# WHAT: the owner-tag byte (+0x7F of an object-pool slot) is free on the $FF9400 family pool
+#   and stays untouched on the $FFB800 effect pool; on a post-tag build every live family
+#   slot carries the forced tenant's tag and every +0x7F writer PC is an emitted tag thunk.
+# HOW: three legs on the merged build on MAME: a per-slot census of both pools plus a
+#   byte-lane, PC-attributed write tap; the mode (pre-tag / post-tag) is auto-selected from
+#   the build's tag_map.json, FORCE_MODE overriding as the negative control (post against a
+#   pre-fix build must fail).
+# EXPECTS: pre-tag: zero +0x7F writes and zeros in every live slot on both pools; post-tag:
+#   tagged family slots and only thunk PCs writing; $FFB800's hole_b word writes stay
+#   non-zero as the liveness control. Taps are bucketed by BYTE LANE — the word-offset
+#   accounting that once hid a write is the header's gotcha.
+#
 # POOL ATTRIBUTION (corrected 14z-85 — the 14z-84 version of this audit
 # measured only $FFB800 and attributed the result to the 59-75 family,
 # which was the WRONG POOL):

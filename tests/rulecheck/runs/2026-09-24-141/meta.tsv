@@ -1,0 +1,9 @@
+decision	recommendation
+subject	#171 gate qualification: the scope document (docs/project/gate_qualification_scope.md) proposing six slices Q1-Q6 and six rulings, before any slice is built
+session	63442647
+model	rule-checker@163e4ce9cf7b
+claim	The scope document's section 1 figures each trace to a numbered worker command recorded verbatim in the returns artifact, or to the orchestrator's re-derivation named there (the one worker figure found wrong, 13 vs 14, is corrected there and only 14 is used); section 2 states only what the named files contain; sections 4-6 are PROPOSALS, each marked recommended and none stated as ruled, and the maintainer's ask is quoted verbatim from the 14z-174 ruling. NOT tested: no slice is built beyond the census instrument tools/audit_module_refs.py, which is untracked and has no gate yet; the '6 sittings, 2 days since the last emulator-tier run' rests on build directory names and STATE session headings, not on a run record; the 7 hashed-table gates' 'mentions a count' column is a text heuristic and says nothing about whether a floor is asserted; the poke/sample surface counts match tokens, not resolved addresses.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
