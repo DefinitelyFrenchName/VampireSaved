@@ -9,6 +9,7 @@
 #   read from the scripts; the control disables the filter in a shadow copy of the lib.
 # EXPECTS: no list and no zip carrying a dotfile, the wiring present; the disabled filter
 #   lets the plant into an asset list and fails.
+# MEASURES: zip-members — 20 the zip members read back from the dry-run assets of the fixture release (20 at 14z-180)
 #
 # MUST-FIRE: shadow-tool: filter-disabled — a shadow copy of tests/lib/os_metadata.sh whose filter passes every path must let a planted `.DS_Store` into the synthetic release's asset lists (mode: section 2 runs the uploader against that copy and must FAIL)
 #
@@ -119,7 +120,7 @@ if cut_assets "$W/main"; then
     else ok "no asset list names a .DS_Store"; fi
     for z in "$L"/*.zip; do unzip -Z1 "$z"; done > "$W/members.txt" 2>/dev/null || true
     if grep -q 'DS_Store' "$W/members.txt"; then bad "a zip carries a .DS_Store: $(grep 'DS_Store' "$W/members.txt" | tr '\n' ' ')"
-    elif [ -s "$W/members.txt" ]; then ok "no zip carries one ($(wc -l < "$W/members.txt" | tr -d ' ') members read back)"
+    elif [ -s "$W/members.txt" ]; then ok "no zip carries one ($(wc -l < "$W/members.txt" | tr -d ' ') members read back)"; echo "MEASURED: zip-members = $(wc -l < "$W/members.txt" | tr -d ' ')"
     else bad "no zip members could be read back"; fi
 else
     bad "the uploader's dry run failed:"; tail -8 "$W/main.log" | sed 's/^/        /'

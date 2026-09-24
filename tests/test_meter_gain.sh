@@ -17,9 +17,10 @@
 # EXPECTS: law A on every event, the swing costs, the six frozen cells, no VOID on a frozen
 #   cell, the out-of-tree hash equal; the perturbed net fails law A. SKIPs without the
 #   community workbook.
-# FOLLOWS: emu/mame-patches/ tests/expected/vanilla_meter_gain.sha256 tests/lib/controls.sh
+# FOLLOWS: emu/mame-patches/ tests/expected/vanilla_meter_gain.sha256 tests/lib/controls.sh tests/lib/measures.sh
 #   tests/lua/field_trace.lua tools/cps2_decrypt.py tools/meter_gain.py tools/run_mame.sh
 #   tools/setup_mame.sh tools/vanilla_frames.py tools/vanilla_join_rig.py
+# MEASURES: meter-gain-rows — 49 the rows of the measured meter table (49 measured 2026-09-24 on the frozen vanilla_meter_gain.sha256; the out-of-tree copy's 51 lines include its two header lines); an empty table hashes too, which is the M19 shape this floor refuses
 #
 # MUST-FIRE: perturbed-copy: perturbed-net — SA 5MP's net meter gain moved by one in a copy of the measured table must fail law A (mode: section A-D runs the real verdict on that perturbed table and must fail)
 #
@@ -74,6 +75,7 @@ export SDL_VIDEODRIVER="${SDL_VIDEODRIVER:-dummy}"
 fail=0
 FIELDS="ff841c:l:node,ff8850:w:p2hp,ff850a:w:p1meter,ff8509:b:p1stock,ff8414:w:p1y"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+. "$REPO/tests/lib/measures.sh"
 # ONE perturbation, called by the section-F control and by the executable mode:
 # SA 5MP's net meter gain (+0x14 column) moved by one, which fails law A.
 perturb_net() {  # perturb_net <in> <out>
@@ -151,7 +153,8 @@ mkdir -p "$OUTDIR"
   echo "# CONNECT (the swing cost, then one step per landed hit), measured on vsavj by tests/test_meter_gain.sh (14z-146)."
   cat "$W/table.tsv"; } > "$OUTDIR/vanilla_meter_gain.tsv"
 HSHA="$(python3 -c 'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1],"rb").read()).hexdigest())' "$W/table.tsv")"
-if [ "${FREEZE:-0}" = 1 ]; then echo "$HSHA  table.tsv (the body, header lines excluded)" > "$HEXP"; echo "  FROZE $HEXP"; fi
+if [ "${FREEZE:-0}" = 1 ] && vs_meas_guard "$0" meter-gain-rows "$(grep -c . "$W/table.tsv")"; then echo "$HSHA  table.tsv (the body, header lines excluded)" > "$HEXP"; echo "  FROZE $HEXP"; fi
+echo "MEASURED: meter-gain-rows = $(grep -c . "$W/table.tsv")"   # the MEASURES contract: an empty table hashes too
 if [ "$(cut -c1-64 "$HEXP" 2>/dev/null)" = "$HSHA" ]; then echo "  ok the measured table hashes to the frozen $HEXP ($(grep -c . "$W/table.tsv") rows)"
 else echo "  FAIL the meter measurement moved (sha256 $HSHA != frozen) — review $OUTDIR/vanilla_meter_gain.tsv, then FREEZE=1"; fail=1; fi
 

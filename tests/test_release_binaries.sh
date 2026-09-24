@@ -35,6 +35,7 @@
 #   tests/run_suite.sh tools/build_release_emulators.sh tools/check_host_libs.py
 #   tools/run_mame.sh tools/run_replay_fbneo.sh tools/run_replay_mame.sh
 #   tools/setup_fbneo.sh tools/setup_mame.sh
+# MEASURES: binary-record-rows — 2 the sha256 rows verified across the two BINARY.txt records (release/emulators/<tool>/<os-arch>): a STRUCTURAL floor, one row per record — check_dir already fails a record with no rows, so this floor never fires on its own; the MEASURED value is the reviewable figure (macOS 4 + 2; Linux and Windows records bundle libraries and carry more), not a host-independent count that could be frozen
 #
 # AND SINCE 2026-09-20, SECTION 3: the SHIPPED release directory applied to the pristine
 # dumps must yield a STANDALONE romset — one zip, no parent, no QSound BIOS zip — that is
@@ -247,6 +248,7 @@ check_dir() {
     d="$1"; exe="$2"; bad=0
     grep -E '^sha256 +[0-9a-f]{64} +[^ ]+' "$d/BINARY.txt" > "$W/rows.txt" || true
     [ -s "$W/rows.txt" ] || { echo "FAIL: $d/BINARY.txt has no sha256 rows"; return 1; }
+    binary_rows=$((binary_rows + $(grep -c . "$W/rows.txt")))   # the MEASURES contract (#171 Q2)
     while read -r _ want fname; do
         got="$(sha256_of "$d/$fname" 2>/dev/null || true)"
         [ "$got" = "$want" ] || { echo "FAIL: $d/$fname sha256 ${got:-<missing>} != record ${want}"; bad=1; }
@@ -348,6 +350,7 @@ for line in sys.stdin:
 }
 
 # ---- section 1: FBNeo
+binary_rows=0
 echo "== 1. fbneo $FB"
 check_dir "$FB" "fbneo$EXESUF" || fail=1
 # the FULL message (2026-09-13): `CPS-2 WIDE v1` alone is also in the driver's long
@@ -413,6 +416,7 @@ fi
 echo "== 2. mame $MM"
 f2=0
 check_dir "$MM" "cps2$EXESUF" || f2=1
+echo "MEASURED: binary-record-rows = $binary_rows"
 "$MM/cps2$EXESUF" -listfull vsavjw 2>/dev/null | grep -q vsavjw || { echo "FAIL: cps2 does not know vsavjw"; f2=1; }
 # -verifyroms can never say "is good" on a WIDE content set: the descriptor carries the
 # STOCK CRCs for the members the port rewrites and SENTINELS for the new ones ([VSP-75]),

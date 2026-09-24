@@ -13,11 +13,11 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**383 of 383 gates described.**
+**384 of 384 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 25 | 25 | the suite runners and their own ground truth |
+| [runner](#runner) | 26 | 26 | the suite runners and their own ground truth |
 | [docs](#docs) | 20 | 20 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 38 | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -30,7 +30,7 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 25 of 25 described.
+the suite runners and their own ground truth. 26 of 26 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
@@ -183,6 +183,14 @@ the suite runners and their own ground truth. 25 of 25 described.
 **HOW:** tools/audit_mame_bin_pin.py reads each script's non-comment text for a MAME wrapper call naming vsavjw and requires a real assignment or export of MAME_BIN (a bracketed Usage mention does not count); the control strips the pin from a pinned gate in a copy of tests/ and must report it.
 
 **EXPECTS:** PASS when every in-class gate carries a pin; a red names the unpinned gate. Stock-set gates (vsavj, vsav2) are out of the class.
+
+### `test_measures_contract.sh` — test, ci_portable
+
+**WHAT:** the measurement contract's reader reads what the grammar says: the header line in the leading comment block (a bare `#` continues it, a non-comment line ends it), the name and integer floor, the run-time line at column 0; a PASS whose declared measurement is absent, below its floor, or whose log prints a name no header declares, classifies FAIL through the shipped classifier; a gate declaring nothing is untouched.
+
+**HOW:** synthetic gate scripts and logs of each shape are pushed through the SHIPPED classifier (tests/lib/classify.sh) and reader; two controls (a declaring stub whose log lacks the MEASURED line, one whose measurement is below its floor) must classify FAIL.
+
+**EXPECTS:** every synthetic case classifies as the contract states; a red means a runner would read an empty or missing measurement as a green — shape 1b of the M19 release tier, where two gates compared an empty table for four days of green closes.
 
 ### `test_module_refs.sh` — test, ci_portable
 

@@ -8,7 +8,7 @@
 > every gate (§4 Q0, the maintainer's words in §6) — and the six questions of §6 were each
 > answered (`DECISIONS_HISTORY.md` "Ruled 2026-09-24 (14z-180) — #171 gate qualification").
 > Order: **Q0, Q1, Q3+Q4 (Q5 inside), Q2, Q6.** Q1's gate is `tests/test_module_refs.sh`;
-> Q0, Q1, Q3, Q4 and Q5 are LANDED (each section says when); Q2 and Q6 remain.
+> Q0, Q1, Q2, Q3, Q4 and Q5 are LANDED (each section says when); Q6 remains.
 
 **Why this document exists:** the same reason `harness_scope.md`,
 `applier_app_scope.md` and `agent_architecture_scope.md` do — a direction the
@@ -176,6 +176,11 @@ rows and the census freeze.
 
 ### Q2 — an empty measurement is a verdict (shape 1b)
 
+**LANDED 2026-09-24 (14z-180)** — the grammar and reader are `gate_header_contract.md`'s MEASURES
+section; five of the seven text-heuristic gates declare six measurements, the two that compare no
+produced table (`test_build_environment_entry`, `test_release_roundtrip`) are named there as
+declaring nothing.
+
 A second declared/fired pair beside the must-fire contract, with its own reader and no
 change to `classify.sh`'s four verdicts (the 14z-139 rule): a gate that compares a
 produced table declares `# MEASURES: <name> — <floor>` in its header and prints
@@ -265,7 +270,7 @@ gate claims.
 |---|---|---|---|
 | **Q0** | `# WHAT:` / `# HOW:` / `# EXPECTS:` in every gate's header; the reader; the coverage page rendering them per family; batches by family for the maintainer's review | `tests/test_gate_descriptions.sh`: the census (declares grows only, undeclared shrinks only), a control dropping one field from a copy must FAIL, a control with the fields outside the block must FAIL; `tests/test_gate_coverage_current.sh` holds the page to the headers | several sittings — 377 scripts read one by one, the reading being the point |
 | **Q1** | `tools/audit_module_refs.py` (built) + `tests/test_module_refs.sh` | the gate itself, controls `planted-prologue` (the `--plant` mode) and `empty-census` (`--plant-empty`), the floor frozen | one sitting's hour |
-| **Q2** | the MEASURES/MEASURED grammar, its reader, the runners reading it, the 7 gates declaring | `tests/test_controls_contract.sh`'s twin for the new reader; a control where a declared measurement is missing and one where it is below floor; the 7 gates' own controls unchanged | a sitting |
+| **Q2** (LANDED) | the MEASURES/MEASURED grammar, its reader `tests/lib/measures.sh` read inside `classify.sh`, five gates declaring six measurements (two of the seven have no produced table) | `tests/test_controls_contract.sh`'s twin for the new reader; a control where a declared measurement is missing and one where it is below floor; the 7 gates' own controls unchanged | a sitting |
 | **Q3** (LANDED) | `# FOLLOWS:` on 199 gates, `tools/gate_follows.py`, the census gate `tests/test_gate_follows.sh`, the reconciliation control; `audit_lane_carry.py` rewritten on it, `tests/test_lane_carry.sh` its ground truth | the census (three classes frozen), the reconciliation control (a declaration narrower than the script's references must fail), the carry tool's control (an uncovered gate must fail the carry) | two sittings — the 199 declarations are read from each script, not guessed, and the reconciliation control is what proves them |
 | **Q4** (LANDED) | `commit.txt` per run; `tools/audit_emulator_staleness.py` + `tests/test_emulator_staleness.sh`; `run_all_emulator.sh --stale` | the staleness gate over a planted run dir (a moved input must name its gate; an unmoved one must not); `test_emulator_runner.sh` gains the `--stale` selection and the commit record | a sitting |
 | **Q5** (LANDED) | the headroom check inside Q4's gate | a planted `seconds` at 0.5 of cap must fail; the real run must not | inside Q4 |

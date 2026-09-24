@@ -14,8 +14,10 @@
 #   controls change one value byte inside donovan's placed hitbox region (unattributed +1)
 #   and apply an override row.
 # EXPECTS: pages equal; the changed byte and the override each regenerate a different map.
+# MEASURES: charmap-anim-rows — 12922 the table rows of the three tenants' out-of-tree anim pages, summed (donovan 5258 + huitzil 4210 + pyron 3454 at the 14z-180 freeze of charmap_pages.sha256); a hashed page with no rows is what this floor refuses
 #
 # MUST-FIRE: perturbed-copy: changed-built-byte — a copy of donovan's build with ONE value byte changed inside the placed hitbox region must regenerate a different map, its unattributed count up by one (mode: that copy is donovan's build in the main loop)
+# MUST-FIRE: perturbed-copy: empty-page-frozen — donovan's anim page emptied after generation and FREEZE=1 against a scratch copy of the frozen hashes must be REFUSED by the measurement floor and FAIL: the M19 shape, a frozen empty table (mode: the page is emptied and the freeze targets the scratch copy)
 # MUST-FIRE: perturbed-copy: added-override — an override row applied to donovan's generation must change the map (mode: the main loop generates donovan with that override file)
 #
 # WHAT IT HOLDS. The map is the maintainer's instrument for "is our tenant
@@ -59,6 +61,14 @@ ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+. "$REPO/tests/lib/measures.sh"
+# THE M19 SHAPE AS A MODE (rule-checker run 2026-09-24-143, Q4): one anim page emptied after
+# generation, then FREEZE=1 against a scratch copy of the frozen hashes — the freeze guard
+# must refuse, where the pre-contract gate would have frozen the empty page's hash.
+if vs_ctl_is empty-page-frozen; then
+    cp "$PAGES" "$W/pages.scratch"; PAGES="$W/pages.scratch"; FREEZE=1; export FREEZE
+    echo "  mode: donovan's anim page is EMPTIED after generation and FREEZE=1 targets a scratch copy of the frozen hashes"
+fi
 
 for b in "$DON" "$HUI" "$PYR"; do
     for f in extract/regions.json verify_data.bin patch/placements.json; do
@@ -98,6 +108,7 @@ vs_ctl_is changed-built-byte && DON="$W/ctl"
 vs_ctl_is added-override && GEN_DON_ARGS="--overrides $W/ov.toml"
 
 echo "== test_charmap_current: docs/project/tables/chars/ follow the builds =="
+anim_rows=0; pending=""; don_rows=0
 for pair in "$DON:donovan" "$HUI:huitzil" "$PYR:pyron"; do
     b="${pair%%:*}"; n="${pair##*:}"
     gen_args=""; [ "$n" = donovan ] && gen_args="$GEN_DON_ARGS"
@@ -110,13 +121,18 @@ for pair in "$DON:donovan" "$HUI:huitzil" "$PYR:pyron"; do
     # <tenant>_anim.md and <tenant>.html stay OUT of the tree (tools/framedata_pages.sh
     # regenerates them under ../charpages/framedata/); their currency is locked by
     # SHA-256 in tests/expected/charmap_pages.sha256 — FREEZE=1 re-freezes after review.
+    [ "$n" = donovan ] && vs_ctl_is empty-page-frozen && : > "$W/${n}_anim.md"
     SHA="$(python3 -c 'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1],"rb").read()).hexdigest())' "$W/${n}_anim.md")"
     HSHA="$(python3 -c 'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1],"rb").read()).hexdigest())' "$W/$n.html")"
+    rows_n="$(grep -c '^|' "$W/${n}_anim.md")"; anim_rows=$((anim_rows + rows_n))   # the MEASURES contract: a hashed page must have rows
+    [ "$n" = donovan ] && don_rows="$rows_n"
     if [ "${FREEZE:-0}" = 1 ]; then
-        grep -v "^${n}_anim.md \|^${n}.html " "$PAGES" > "$W/pages.tmp" 2>/dev/null || true
-        { cat "$W/pages.tmp"; echo "${n}_anim.md $SHA"; echo "${n}.html $HSHA"; } | sort > "$PAGES"; echo "  FROZE $PAGES for $n"
+        # the freeze is DEFERRED to after the measurement (the guard below decides it); this
+        # run compares against the hashes it would freeze
+        pending="$pending $n $SHA $HSHA"; want_a="$SHA"; want_h="$HSHA"
+    else
+        want_a="$(grep "^${n}_anim.md " "$PAGES" 2>/dev/null | cut -d' ' -f2)"; want_h="$(grep "^${n}.html " "$PAGES" 2>/dev/null | cut -d' ' -f2)"
     fi
-    want_a="$(grep "^${n}_anim.md " "$PAGES" 2>/dev/null | cut -d' ' -f2)"; want_h="$(grep "^${n}.html " "$PAGES" 2>/dev/null | cut -d' ' -f2)"
     if cmp -s "$W/$n.json" "docs/project/tables/chars/$n.json" && cmp -s "$W/$n.md" "docs/project/tables/chars/$n.md" && [ "$want_a" = "$SHA" ] && [ "$want_h" = "$HSHA" ]; then
         ok "$n: json + md match a regeneration from $b ($(grep -o '"region_bytes_unattributed": [0-9]*' "$W/$n.json")); the out-of-tree anim page and html hash to $PAGES"
     else
@@ -126,6 +142,23 @@ for pair in "$DON:donovan" "$HUI:huitzil" "$PYR:pyron"; do
         [ "$want_h" = "$HSHA" ] || echo "        ${n}.html sha256 $HSHA != frozen ${want_h:-none}"
     fi
 done
+echo "MEASURED: charmap-anim-rows = $anim_rows"
+if [ "${FREEZE:-0}" = 1 ]; then
+    if vs_meas_guard "$0" charmap-anim-rows "$anim_rows"; then
+        set -- $pending
+        while [ $# -ge 3 ]; do
+            grep -v "^$1_anim.md \|^$1.html " "$PAGES" > "$W/pages.tmp" 2>/dev/null || true
+            { cat "$W/pages.tmp"; echo "$1_anim.md $2"; echo "$1.html $3"; } | sort > "$PAGES"; echo "  FROZE $PAGES for $1"
+            shift 3
+        done
+    else bad "the freeze was REFUSED by the measurement floor"; fi
+fi
+if [ -z "$VS_CTL" ]; then
+    # control (c), in-gate: the guard on the real numbers with donovan's page emptied
+    if ( FREEZE=1 vs_meas_guard "$0" charmap-anim-rows $((anim_rows - don_rows)) >/dev/null ); then
+        vs_ctl_dead empty-page-frozen "a freeze at $((anim_rows - don_rows)) rows (donovan's page emptied) was NOT refused"; fail=1
+    else vs_ctl_fired empty-page-frozen "a freeze at $((anim_rows - don_rows)) rows (donovan's $don_rows removed) is refused by the floor"; fi
+fi
 
 # --- control (a): one built byte changed inside the hitbox region -> different map, +1 unattributed
 # (compared against a generation from the REAL build, whatever the mode swapped in)

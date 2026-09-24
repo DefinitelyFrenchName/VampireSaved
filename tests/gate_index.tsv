@@ -135,6 +135,7 @@ tests/test_gate_descriptions.sh	docs
 tests/test_gate_follows.sh	runner
 tests/test_lane_carry.sh	runner
 tests/test_emulator_staleness.sh	runner
+tests/test_measures_contract.sh	runner
 tests/test_gate_coverage_current.sh	docs
 tests/test_describe_masked_shape.sh	oracle
 tests/test_df_startup_provenance.sh	character-data

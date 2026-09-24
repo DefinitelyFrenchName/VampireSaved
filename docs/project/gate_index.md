@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**383 scripts** — 96 ci_portable, 84 ci_static, 203 emulator-tier (run by name).
+**384 scripts** — 97 ci_portable, 84 ci_static, 203 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 25 | the suite runners and their own ground truth |
+| [runner](#runner) | 26 | the suite runners and their own ground truth |
 | [docs](#docs) | 20 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -56,6 +56,7 @@ the suite runners and their own ground truth.
 | `tests/test_header_defaults.sh` | test | ci_portable | — | a gate's HEADER must state the default its CODE actually uses (14z-128). ROM-free, ~2 s. | 14z-128 |
 | `tests/test_lane_carry.sh` | test | ci_portable | — | ground truth for tools/audit_lane_carry.py: a lane's carry verdict is derived from its gates' `# FOLLOWS:` declarations and fails when one moved or one is missing (GitHub #171 slice Q3; the tool itself 14z-174). ci_portable: | 14z-174 |
 | `tests/test_mame_bin_pinned.sh` | test | ci_portable | — | a gate that boots `vsavjw` through a MAME wrapper must PIN the MAME binary (14z-133). ROM-free, ~1 s. | 14z-133 |
+| `tests/test_measures_contract.sh` | test | ci_portable | — | ground truth for THE MEASUREMENT CONTRACT'S READER, tests/lib/measures.sh: the `# MEASURES: <name> — <floor>` header grammar, the `MEASURED: | 2026-09-24 |
 | `tests/test_module_refs.sh` | test | ci_portable | — | EVERY CROSS-MODULE PYTHON NAME THE TOOLS AND GATES REFERENCE STILL EXISTS (GitHub #171 slice Q1, ruled 2026-09-24 — DECISIONS_HISTORY.md "Ruled 2026-09-24 (14z-180) — #171 gate qualification", "Land it now"). ci_portable: | 2026-09-24 |
 | `tests/test_must_fire_census.sh` | test | ci_portable | — | THE MUST-FIRE DOCTRINE, MACHINE-READ under the R10 grammar: which gates DECLARE a must-fire control (`# MUST-FIRE: <shape>: | 14z-145 |
 | `tests/test_rule_checker.sh` | test | ci_portable | — | the adversarial RULE-CHECKER's record is sound: every run in tests/rulecheck/ledger.tsv is complete and structured, every planted violation was caught, every fixture is calibrated, every VIOLATED resolved, and every freeze since the checker… | 14z-163 |
@@ -128,7 +129,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_release_asset_shape.sh` | test | ci_portable | — | EVERY PUBLISHED ASSET IS SELF-SUFFICIENT, and the two emulator routes never travel together. ROM-free, no emulator, ~10 s. | 14z-149 |
 | `tests/test_release_binaries.sh` | test | emulator | MAME, FBNeo, a build dir, ~2 min | the PREBUILT emulator binaries for THIS host under release/emulators/{fbneo,mame}/<os-arch>/ (the build resource every release's emulator/bin/<os-arch>/ is hash-verified from; maintainer-ruled 2026-09-11: | 2026-09-11 |
 | `tests/test_release_launcher.sh` | test | ci_portable | — | THE PLAYER'S LAUNCHER, DRIVEN (2026-09-20). | 2026-09-20 |
-| `tests/test_release_os_metadata.sh` | test | ci_portable | — | a file manager's folder metadata (`.DS_Store`) in a release tree is never shipped and never counted: the real uploader cuts no asset carrying one, and every release listing that can see a dotfile drops it through the one definition, tests/l… | 2026-09-14 |
+| `tests/test_release_os_metadata.sh` | test | ci_portable | — | a file manager's folder metadata (`.DS_Store`) in a release tree is never shipped and never counted: the real uploader cuts no asset carrying one, and every release listing that can see a dotfile drops it through the one definition, tests/l… | 14z-180 |
 | `tests/test_release_roundtrip.sh` | test | ci_static | ROMDIR | THE RELEASE PACKAGE GATE (14z-105). | 14z-105 |
 | `tests/test_replay_stage_census.sh` | test | ci_portable | — | FREEZE the input-staging convention of every replay-driving Lua instrument (14z-93, GitHub issue #10). No ROMs, no emulator, ~1s. | 14z-93 |
 | `tests/test_replay_video_selfcheck.sh` | test | emulator | MAME, FBNeo, a build dir | ground truth for replay.lua's VIDEO_OUT, the MAME per-frame framebuffer checksum. | session 14z |

@@ -102,6 +102,7 @@ declares	test_lane_carry
 declares	test_latch_readers
 declares	test_mame_bin_pinned
 declares	test_md_subset
+declares	test_measures_contract
 declares	test_meter_gain
 declares	test_mister_mra_map
 declares	test_mister_obj_oracle

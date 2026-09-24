@@ -13,9 +13,11 @@
 # EXPECTS: every event fires, the 180 rows equal to the frozen slot map, the out-of-tree
 #   hash equal; the swapped rows fail.
 # FOLLOWS: emu/mame-patches/ tests/expected/vanilla_hit_damage.sha256
-#   tests/expected/vanilla_normal_slots.tsv tests/lib/controls.sh tests/lib/decrypt_cache.sh
+#   tests/expected/vanilla_normal_slots.tsv tests/lib/controls.sh tests/lib/measures.sh tests/lib/decrypt_cache.sh
 #   tests/lua/field_trace.lua tools/run_mame.sh tools/setup_mame.sh
 #   tools/vanilla_join_rig.py
+# MEASURES: slot-map-rows — 180 the rows of the measured slot map (180 non-comment rows of tests/expected/vanilla_normal_slots.tsv)
+# MEASURES: hit-damage-rows — 90 the rows of the hit-damage body hashed out of tree (90, recorded in tests/expected/vanilla_hit_damage.sha256)
 #
 # MUST-FIRE: perturbed-copy: swapped-rows — swapping one character's far/near rows in a copy of the frozen slot map must fail the section-3 compare against the measured map (mode: section 3 compares the measured map against that swapped copy and must fail)
 #
@@ -64,6 +66,7 @@ bad=0
 ok()  { echo "  ok    $1"; }
 nope() { echo "  FAIL  $1"; bad=$((bad + 1)); }
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+. "$REPO/tests/lib/measures.sh"
 
 # ONE perturbation, called by the section-5 control (on its own copy) and by
 # the executable mode (on the compare baseline): swap far/near for the first
@@ -135,7 +138,7 @@ if grep -q UNFIRED "$W/got.txt"; then nope "some events never fired:"; grep UNFI
 else ok "every event entered a chain (no UNFIRED)"; fi
 
 echo "== 3. against the frozen table"
-if [ "${FREEZE:-0}" = 1 ]; then cp "$W/got.txt" "$EXP"; echo "  FROZE $EXP ($(grep -vc '^#' "$EXP") rows)"; fi
+if [ "${FREEZE:-0}" = 1 ] && vs_meas_guard "$0" slot-map-rows "$(grep -vc '^#' "$W/got.txt")"; then cp "$W/got.txt" "$EXP"; echo "  FROZE $EXP ($(grep -vc '^#' "$EXP") rows)"; fi
 if [ -n "$WANT" ]; then
     grep -v '^#' "$EXP" > "$W/exp_all.txt"
     for tab in $WANT; do grep "^$tab	" "$W/exp_all.txt"; done > "$W/exp.txt"
@@ -146,6 +149,7 @@ fi
 # THE EXECUTABLE MODE: the compare baseline becomes the SWAPPED table, so the
 # measured map no longer equals it and the gate reaches its own FAIL.
 if [ "$MODE" = swapped-rows ]; then swap_table "$W/exp.txt" "$W/exp.txt.sw" && mv "$W/exp.txt.sw" "$W/exp.txt"; fi
+echo "MEASURED: slot-map-rows = $(grep -c . "$W/g.txt")"   # the MEASURES contract (#171 Q2)
 if cmp -s "$W/exp.txt" "$W/g.txt"; then ok "the measured slot map equals $EXP ($(grep -c . "$W/g.txt") rows)"
 else nope "the slot map moved"; diff "$W/exp.txt" "$W/g.txt" | head -20; fi
 
@@ -193,7 +197,8 @@ if [ -n "$WANT" ]; then
     echo "  (CHARS subset — section 4 measured, not judged:)"; sed 's/^/    /' "$W/hg.txt"
 else
     if mkdir -p "$FRAMEDATA_OUT" 2>/dev/null; then cp "$W/hgot.txt" "$FRAMEDATA_OUT/vanilla_hit_damage.tsv"; echo "  wrote $FRAMEDATA_OUT/vanilla_hit_damage.tsv ($(grep -c . "$W/hg.txt") rows, out of tree)"; fi
-    if [ "${FREEZE:-0}" = 1 ]; then printf '%s  vanilla_hit_damage.tsv body, %s rows (the values live out of tree; tests/test_vanilla_frame_join.sh section 4)\n' "$HSHA" "$(grep -c . "$W/hg.txt")" > "$HEXP"; echo "  FROZE $HEXP"; fi
+    if [ "${FREEZE:-0}" = 1 ] && vs_meas_guard "$0" hit-damage-rows "$(grep -c . "$W/hg.txt")"; then printf '%s  vanilla_hit_damage.tsv body, %s rows (the values live out of tree; tests/test_vanilla_frame_join.sh section 4)\n' "$HSHA" "$(grep -c . "$W/hg.txt")" > "$HEXP"; echo "  FROZE $HEXP"; fi
+    echo "MEASURED: hit-damage-rows = $(grep -c . "$W/hg.txt")"   # the MEASURES contract: the M19 shape was an EMPTY body hashing to its frozen self
     if [ "$(cut -c1-64 "$HEXP" 2>/dev/null)" = "$HSHA" ]; then ok "the dealt damage and hit counts hash to the frozen $HEXP ($(grep -c . "$W/hg.txt") rows)"
     else nope "the hit measurement moved (sha256 $HSHA != frozen) — review $FRAMEDATA_OUT/vanilla_hit_damage.tsv, then FREEZE=1"; fi
 fi

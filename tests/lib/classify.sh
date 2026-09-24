@@ -61,15 +61,30 @@
 # SKIP and FAIL are never touched: a skipped gate ran nothing, a failed gate
 # is already red.
 [ -n "${REPO:-}" ] && [ -f "$REPO/tests/lib/controls.sh" ] && . "$REPO/tests/lib/controls.sh"
+# THE MEASUREMENT CONTRACT IS READ THE SAME WAY (14z-180, GitHub #171 slice Q2,
+# ruled 2026-09-24 "Declared/fired grammar"): a PASS whose header declares
+# `# MEASURES: <name> — <floor>` and whose log lacks `MEASURED: <name> = <n>`,
+# or carries one below the floor, is plain FAIL — an empty table that hashes
+# to its frozen (empty) self was GREEN for four days at M19. tests/lib/measures.sh
+# is the one reader; a gate declaring nothing is untouched.
+[ -n "${REPO:-}" ] && [ -f "$REPO/tests/lib/measures.sh" ] && . "$REPO/tests/lib/measures.sh"
 
 vs_classify() {
     _st="$1"; _log="$2"; _w="${3:-90}"; _gate="${4:-}"
     _vs_classify_base "$_st" "$_log" "$_w"
     [ "$VS_VERDICT" = PASS ] && [ -n "$_gate" ] && [ -f "$_gate" ] || return 0
-    command -v vs_ctl_read >/dev/null 2>&1 || return 0
-    vs_ctl_read "$_gate" "$_log"
-    if [ "$VS_CTL_VERDICT" = RED ]; then
-        VS_VERDICT=FAIL; VS_DETAIL="$(printf '%s' "$VS_CTL_DETAIL" | cut -c1-"$_w")"
+    if command -v vs_ctl_read >/dev/null 2>&1; then
+        vs_ctl_read "$_gate" "$_log"
+        if [ "$VS_CTL_VERDICT" = RED ]; then
+            VS_VERDICT=FAIL; VS_DETAIL="$(printf '%s' "$VS_CTL_DETAIL" | cut -c1-"$_w")"
+            return 0
+        fi
+    fi
+    if command -v vs_meas_read >/dev/null 2>&1; then
+        vs_meas_read "$_gate" "$_log"
+        if [ "$VS_MEAS_VERDICT" = RED ]; then
+            VS_VERDICT=FAIL; VS_DETAIL="$(printf '%s' "$VS_MEAS_DETAIL" | cut -c1-"$_w")"
+        fi
     fi
     return 0
 }
