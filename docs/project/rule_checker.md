@@ -82,8 +82,13 @@ definition read it, `rulecheck.py spawned <id> --session <prefix>` checks from t
 transcript that each prompt reached a `rule-checker` verbatim, with no model, and that the
 reader's own transcript shows the definition's model and effort, no fallback and no instructions
 attachment; and `rulecheck.py collect <id> --session <prefix>` writes each reader's verdict file
-from its own transcript, so a verdict is never retyped. The run: `prepare` -> spawn -> `collect`
--> `spawned` -> `record`.
+from its own transcript, so a verdict is never retyped. The run: `prepare` -> spawn ->
+`record <id> --session <prefix>`, which is BOUND (since rule-checker run `2026-09-24-134` Q4 found a
+documented order was not a binding): for a pinned-reader run `record` refuses without the session
+transcript, runs the spawn check itself, refuses on any failing reader or unspawned slot, and
+collects the reports itself (`test_rule_checker.sh` RECORD BINDING, control `unbound-record`).
+`rulecheck.py readers` links every ledger run to the readers its prompt reached (what showed all
+192 linkable readers before the pinned reader had CLAUDE.md and the memory index).
 
 **What comes out.** Six lines and nothing else: the five questions, each
 `VIOLATED`, `OK` or `N-A` with evidence as a path and line or a verbatim

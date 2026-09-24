@@ -18,7 +18,7 @@ number	state	reason	closed	labels	title
 161	OPEN	-	-	bug	Phobos takes one more HP than native from Demitri's 5HP with his defense rows already vs2's (12 against 11)
 160	OPEN	-	-	bug,severity: low	rulecheck.py: prepare's auto id collides with a run directory that has no ledger row
 159	OPEN	-	-	bug,needs-maintainer-ruling,severity: medium	Tenant attack records with facing rule 5 are XORed into the victim's facing by vsavj's hit code (Killshread Summon (ES) pushes Demitri away where native drags him in)
-158	OPEN	-	-	bug	rulecheck.py: a model change never invalidates a calibration (the checklist hash is checked, the model is not, and the ledger records 'default')
+158	CLOSED	COMPLETED	2026-09-24	bug	rulecheck.py: a model change never invalidates a calibration (the checklist hash is checked, the model is not, and the ledger records 'default')
 157	OPEN	-	-	bug,needs-maintainer-ruling,severity: high	Tenant throws pay meter to the wrong fighters — the ported throw code never registers the hit pair on vsavj (the 14x rollback's price; #136's meter family)
 156	CLOSED	COMPLETED	2026-09-17	bug	rulecheck.py: two line ranges of one artifact collide in staging, the reader sees only the last
 155	OPEN	-	-	bug	audit_forced_pick_fidelity: the poked leg is a hand-typed replica of the #136 rig's leg with no control against drift

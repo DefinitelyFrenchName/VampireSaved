@@ -27,6 +27,27 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-24 (14z-178) — #158 closed; the transcript retention raised by the maintainer
+
+**The questions put**, after rule-checker run `2026-09-24-134` (the pinned reader's first real run,
+plant caught) returned VIOLATED on Q1, Q4 and Q5, all true and resolved by work (the ledger row).
+(1) Close #158 ("a model change never invalidates a calibration")? Since 14z-178 a calibration
+counts only if read by the pinned definition's current sha, the definition must name a version
+id (not the `opus` alias), and `record` refuses a run whose readers ran on another model or effort,
+fell back, or carried context; the issue text repeats a misattributed rule, which the closing
+comment would correct. (2) Claude Code deleted this project's transcripts older than 30 days
+during the sitting — the evidence the #172 tools read; `cleanupPeriodDays` (default 30) is honored
+at any settings level: who sets what? (the maintainer set it themselves at user level; 604 MB for
+this project's last 30 days, so roughly 7 GB a year — an estimate).
+
+**THE RULINGS, verbatim (option labels chosen):** (1) *"Close it (Recommended)"*, whose text read
+*"Close #158 now in one commit: its row, the four answers, and a closing comment that states the
+resolution and corrects the misattribution."*; (2) *"You set it, user level (Recommended)"*, whose
+text read *"You add e.g. "cleanupPeriodDays": 365 to ~/.claude/settings.json. This project's last
+30 days take 604 MB, so a year is roughly 7 GB (an estimate)."*
+
+---
+
 ## Ruled 2026-09-23 (14z-177) — #172 slice S4 step 4: the pinned readers are SUBAGENTS; the sitting closes
 
 **The questions put.** (1) How the pinned `rule-checker` readers are spawned. Measured first
@@ -895,6 +916,9 @@ or the model changes.
 `expectation` or `recommendation` packet, with its blind plant) is recorded
 in `tests/rulecheck/ledger.tsv`; the checker's model is the default until a
 later ruling, and a change of model is a recalibration.
+*(— MARKED 14z-178, rule-checker run `2026-09-24-134` Q5: the last clause is the working agent's gloss,
+not the maintainer's words — theirs are the ruling above; the rule rests on the spec,
+`rule_checker.md` [VSP-184]. The default-model half was superseded 2026-09-23 by "Pin it now".)*
 
 ## Ruled 2026-09-17 (14z-162) — #148 second cut, #148 closed, lever B its own ticket
 

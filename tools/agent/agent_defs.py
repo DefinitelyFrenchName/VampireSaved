@@ -50,8 +50,8 @@ REQUIRED = ("measurer", "reader", "rule-checker")
 CONTEXT_FREE = ("rule-checker",)
 # the definitions whose model must be a VERSION id, never an alias: the rule-checker's calibrations
 # bind to its definition's sha, and an alias (`opus`) can move to a new model with the sha unchanged
-# — the silent model change #158 names, against the 2026-09-17 ruling "a change of model is a
-# recalibration" (14z-178)
+# — the silent model change #158 names, against the spec's rule that calibration "is repeated when
+# the checklist changes or the model changes" (docs/project/rule_checker.md [VSP-184]; 14z-178)
 PINNED_MODEL = ("rule-checker",)
 
 

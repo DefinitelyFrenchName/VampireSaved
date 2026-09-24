@@ -1,0 +1,18 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent172/pkt178/issue_158.txt	87048ec65a78e73640f3a15edfbc5f2be85cd378
+build/agent172/pkt178/memory_probe_evidence.txt	cc7a4e124027ec2f5f81522aea84fdb58971f44e
+build/agent172/pkt178/context_census_14z178_afternoon.txt	35fe99bce787a57c6c4a9463eaf49be890bb567d
+build/agent172/pkt178/docs_lookup_retention.txt	5c1e8cfdbb7aa0f79f094b390c759a202629d288
+build/agent172/probe_agents_14z178d.log	648ae82f1955a1010e6f84d7e5db218715f8cac7
+.claude/agents/rule-checker.md	163e4ce9cf7baa797ecda7a85015cdeb35552d15
+tools/agent/agent_defs.py	33fa66bf0698af458c32c798c78a5916d85404ae
+tools/rulecheck.py.lines-85-100 (lines 85-100 of tools/rulecheck.py)	83ec57d6705ecf9f4a0e35bf05b09fe40286efb3
+tools/rulecheck.py.lines-152-170 (lines 152-170 of tools/rulecheck.py)	2c5ec98a8351d8598245573a8ffcbc2a7218f0c9
+tools/rulecheck.py.lines-414-440 (lines 414-440 of tools/rulecheck.py)	2144fa5aaad00e6da22dad2248e0d4f9c7d4c209
+tools/rulecheck.py.lines-555-720 (lines 555-720 of tools/rulecheck.py)	db6cb834fb629291ceab3f30a661191061814020
+docs/project/rule_checker.md.lines-74-90 (lines 74-90 of docs/project/rule_checker.md)	0821e1aa2390142600aa4558cd75faa81d7e210c
+docs/project/rule_checker.md.lines-277-306 (lines 277-306 of docs/project/rule_checker.md)	98036939b96c54c9a19f0bac6657fe1c85f931e1
+docs/platform/gotchas.md.lines-2857-2928 (lines 2857-2928 of docs/platform/gotchas.md)	f8f5156e520642a69063c600d046a017a6735313
+tests/rulecheck/ledger.tsv.lines-131-150 (lines 131-150 of tests/rulecheck/ledger.tsv)	d72ac4295314ecfc8a911715b7ef0327a14e33d1
+DECISIONS_HISTORY.md.lines-30-103 (lines 30-103 of DECISIONS_HISTORY.md)	812ee90d1c75d51ca867dd4f65c5312d1dc6a943
+DECISIONS_HISTORY.md.lines-879-900 (lines 879-900 of DECISIONS_HISTORY.md)	fa03f7a9eefd8baf6e0fac62e6ccf6b14801af63

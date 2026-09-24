@@ -40,10 +40,12 @@ Usage:
   python3 tools/rulecheck.py prepare --decision KIND --subject TEXT --claim "..." \
           --artifact PATH[:FIRST-LAST] ... [--session 14z-N] [--model NAME] [--id ID]
   python3 tools/rulecheck.py prepare --calibrate FIXTURE [--session 14z-N] [--model NAME]
-  python3 tools/rulecheck.py record ID --a FILE --b FILE      # the two agents' final messages, verbatim
+  python3 tools/rulecheck.py record ID --session PREFIX      # a pinned-reader run: spawn-checked, reports collected (14z-178)
+  python3 tools/rulecheck.py record ID --a FILE --b FILE      # a run from before the pinned reader
   python3 tools/rulecheck.py resolve ID --how "..."           # after a VIOLATED
   python3 tools/rulecheck.py spawned ID --session PREFIX      # the readers were the pinned definition, no model, each prompt verbatim,
                                                               # on the definition's model with no fallback (or --transcript PATH)
+  python3 tools/rulecheck.py readers                          # every ledger run's readers: type, model, effort, fallback, context
   python3 tools/rulecheck.py collect ID --session PREFIX      # each reader's report, from its OWN transcript, into
                                                               # build/rulecheck/ID/verdict_<slot>.txt — never retyped
   python3 tools/rulecheck.py check [--root DIR]               # the gate's logic
@@ -476,7 +478,41 @@ def cmd_record(a):
         die(f"run {a.id} is already recorded")
     meta = read_kv(rdir / "meta.tsv")
     ctl = read_kv(rdir / "control.txt")
-    texts = {"a": Path(a.a).read_text(), "b": Path(a.b).read_text()}
+    # THE SPAWN BINDING (14z-178, rule-checker run 2026-09-24-134 Q4): a run read by the PINNED
+    # reader is recorded only with its session transcript, and only when every reader passes the
+    # spawn check — the definition's model and effort, no fallback, no instructions attachment,
+    # the prompt verbatim, no model parameter. A documented order was not a binding.
+    transcript = None
+    if meta.get("reader"):
+        if a.transcript:
+            transcript = a.transcript
+        elif a.session:
+            import glob as _glob
+            base = os.path.expanduser("~/.claude/projects/" + re.sub(r"[^A-Za-z0-9]", "-", str(root)))
+            hits = sorted(_glob.glob(os.path.join(base, a.session + "*.jsonl")))
+            if len(hits) != 1:
+                die(f"--session {a.session!r} matches {len(hits)} transcripts under {base}")
+            transcript = hits[0]
+        else:
+            die(f"run {a.id} was read by the pinned reader ({meta['reader']}): record it with --session PREFIX "
+                "(or --transcript PATH) so each reader is checked from its own transcript")
+        out, nbad, missing = check_spawns(root, a.id, transcript)
+        print("\n".join(out))
+        if nbad or missing:
+            die(f"run {a.id}: {nbad} reader(s) failed the spawn check, {len(missing)} slot(s) never spawned — "
+                "the run is not recorded; spawn fresh readers (a fallback or a context leak is an uncalibrated instrument)")
+    if a.a and a.b:
+        texts = {"a": Path(a.a).read_text(), "b": Path(a.b).read_text()}
+    elif transcript:
+        got = collect_reports(root, a.id, transcript)
+        if set(got) == {"a", "b"}:
+            texts = got
+        elif len(got) == 1:   # a self-calibration: one reader, its report in both slots
+            texts = {"a": next(iter(got.values())), "b": next(iter(got.values()))}
+        else:
+            die(f"run {a.id}: no reader report found in {transcript}")
+    else:
+        die("record needs --a and --b, or (for a pinned-reader run) --session to collect them")
     fam = meta.get("family") or ("procedure" if meta["decision"] == "procedure" else "evidence")
     qs = run_questions(meta, fam)
     parsed = {}
@@ -698,6 +734,76 @@ def cmd_collect(a):
         (stage / f"verdict_{slot}.txt").write_text(text.rstrip("\n") + "\n")
         print(f"  {stage}/verdict_{slot}.txt  ({len(text.splitlines())} lines)")
     print(f"collected {a.id}: {', '.join(sorted(got))}")
+
+
+def cmd_readers(a):
+    """THE READER CENSUS (14z-178, rule-checker run 2026-09-24-134 Q1): for every Agent call in
+    every session transcript of this project whose prompt names a run's staged dir
+    (`build/rulecheck/<id>/<slot>`), the reader it started — its type, any model parameter, the
+    models and effort its OWN transcript shows, fallbacks, and the files an instructions
+    attachment handed it. It links each ledger run to its readers, so "every reader before run N
+    was handed CLAUDE.md" is a count, not an inference from a census by type. Covers only the
+    transcripts Claude Code still keeps (30 days by default, docs/platform/gotchas.md)."""
+    import glob as _glob
+    import json as _json
+    root = REPO
+    base = os.path.expanduser("~/.claude/projects/" + re.sub(r"[^A-Za-z0-9]", "-", str(root)))
+    ids = {r["id"] for r in read_ledger(root)}
+    rows = []
+    for tr in sorted(_glob.glob(os.path.join(base, "*.jsonl"))):
+        calls = {}
+        for line in open(tr, encoding="utf-8"):
+            try:
+                r = _json.loads(line)
+            except ValueError:
+                continue
+            c = (r.get("message") or {}).get("content")
+            for b in c if isinstance(c, list) else []:
+                if b.get("type") == "tool_use" and b.get("name") in ("Agent", "Task"):
+                    i = b.get("input") or {}
+                    m = re.search(re.escape(STAGING) + r"/(\d{4}-\d\d-\d\d-\d+)/([ab])\b", str(i.get("prompt", "")))
+                    if m and m.group(1) in ids:
+                        calls[b.get("id")] = (m.group(1), m.group(2), i.get("subagent_type"), i.get("model"))
+        if not calls:
+            continue
+        seen = set()
+        for meta_p in _glob.glob(tr[:-len(".jsonl")] + "/subagents/*.meta.json"):
+            try:
+                tu = _json.load(open(meta_p)).get("toolUseId")
+            except (OSError, ValueError):
+                continue
+            if tu not in calls:
+                continue
+            seen.add(tu)
+            ran, eff, fell, ctx = set(), set(), 0, set()
+            for wl in open(meta_p[:-len(".meta.json")] + ".jsonl", encoding="utf-8"):
+                try:
+                    wr = _json.loads(wl)
+                except ValueError:
+                    continue
+                att = wr.get("attachment") if wr.get("type") == "attachment" else None
+                if isinstance(att, dict) and att.get("type") == "instructions":
+                    ctx |= {os.path.basename(str(f.get("path"))) for f in att.get("files") or [] if isinstance(f, dict)}
+                if wr.get("type") == "assistant":
+                    ran.add(str((wr.get("message") or {}).get("model"))); eff.add(str(wr.get("effort")))
+                    fell += sum(1 for wb in (wr.get("message") or {}).get("content") or []
+                                if isinstance(wb, dict) and wb.get("type") == "fallback")
+            rid, slot, typ, mp = calls[tu]
+            rows.append((rid, slot, str(typ), mp or "-", ",".join(sorted(ran)), ",".join(sorted(eff)), fell, ",".join(sorted(ctx)) or "-"))
+        for tu, (rid, slot, typ, mp) in calls.items():
+            if tu not in seen:
+                rows.append((rid, slot, str(typ), mp or "-", "NO WORKER TRANSCRIPT", "-", 0, "?"))
+    for r in sorted(rows):
+        print("\t".join(str(x) for x in r))
+    runs = sorted({r[0] for r in rows})
+    census = {}
+    for r in rows:
+        k = (r[2], r[7])
+        census[k] = census.get(k, 0) + 1
+    for (typ, ctx), n in sorted(census.items()):
+        print(f"readers: {n:4d}  type {typ:16} context {ctx}")
+    print(f"readers: {len(rows)} over {len(runs)} of the ledger's {len(ids)} runs"
+          f" ({runs[0] if runs else '-'} .. {runs[-1] if runs else '-'}; older runs' transcripts are gone)")
 
 
 def cmd_spawned(a):
@@ -994,10 +1100,12 @@ def main():
     p.add_argument("--decision"); p.add_argument("--subject"); p.add_argument("--claim")
     p.add_argument("--artifact", action="append")
     p.add_argument("--calibrate"); p.add_argument("--session"); p.add_argument("--model"); p.add_argument("--id")
-    r = sub.add_parser("record"); r.add_argument("id"); r.add_argument("--a", required=True); r.add_argument("--b", required=True)
+    r = sub.add_parser("record"); r.add_argument("id"); r.add_argument("--a"); r.add_argument("--b")
+    r.add_argument("--session"); r.add_argument("--transcript")
     s = sub.add_parser("resolve"); s.add_argument("id"); s.add_argument("--how", required=True)
     sp = sub.add_parser("spawned"); sp.add_argument("id")
     g = sp.add_mutually_exclusive_group(required=True); g.add_argument("--session"); g.add_argument("--transcript")
+    sub.add_parser("readers")
     co = sub.add_parser("collect"); co.add_argument("id")
     g2 = co.add_mutually_exclusive_group(required=True); g2.add_argument("--session"); g2.add_argument("--transcript")
     c = sub.add_parser("check"); c.add_argument("--root", default=str(REPO))
@@ -1018,6 +1126,8 @@ def main():
         cmd_spawned(a); return 0
     if a.cmd == "collect":
         cmd_collect(a); return 0
+    if a.cmd == "readers":
+        cmd_readers(a); return 0
     if a.cmd == "check":
         bad = cmd_check(Path(a.root).resolve())
         if bad:

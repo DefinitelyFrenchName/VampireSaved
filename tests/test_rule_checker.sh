@@ -5,6 +5,7 @@
 # MUST-FIRE: perturbed-copy: moved-reader — a copy whose pinned reader .claude/agents/rule-checker.md differs by one line must fail: a calibration counts only if the CURRENT definition read it (14z-178)
 # MUST-FIRE: perturbed-copy: unchecked-freeze — a copy of the registry with one more row after the birth row, named by no `freeze` run, must fail: a freeze is bound to the checker mechanically
 # MUST-FIRE: perturbed-copy: prose-verdict — a copy of the record in which one run's real verdict is prose instead of the six structured lines must fail: a prose verdict is unfalsifiable and the recorder refuses it
+# MUST-FIRE: shadow-tool: unbound-record — a copy of rulecheck.py with the spawn binding removed must let a pinned-reader run be recorded without its transcript, and the RECORD BINDING section must FAIL: `record` binds every reader to the spawn check (14z-178, rule-checker run 2026-09-24-134 Q4)
 # MUST-FIRE: perturbed-copy: cross-family-plant — a copy of the record in which a PROCEDURE calibration names an EVIDENCE fixture as its plant must fail: a plant answers its own family's questions, so one from the other checklist proves nothing about the reader (#172 S3, 14z-176)
 #
 # WHY. The rule-checker (docs/project/rule_checker.md, [VSP-183]/[VSP-184]) is a
@@ -18,7 +19,8 @@
 #
 # Section 1 is the tool's parser selftest (the recorder's refusal of prose is
 # what "structured output, never prose" rests on). Section 2 is the check on
-# the real tree. Section 3 fires the five controls on a copy (cross-family-plant since 14z-176, moved-reader since 14z-178).
+# the real tree. Section 3 fires the six controls on a copy (cross-family-plant since 14z-176, moved-reader and
+# unbound-record since 14z-178); the RECORD BINDING section (14z-178) proves `record` binds a pinned-reader run to the spawn check.
 #
 # Usage: tests/test_rule_checker.sh
 set -eu
@@ -88,6 +90,35 @@ expect_msg() {  # expect_msg <name>
     esac
 }
 
+# SECTION 4's probe: on a throwaway root carrying its own copy of the tool (prepare and record
+# resolve the repository from the script's own path), prepare a calibration of a pinned-reader
+# run and try to record it (a) with verdict files and no transcript, (b) with a transcript in
+# which no reader was spawned — the tool must refuse both. Prints BOUND or the way it was not.
+record_binding() {  # record_binding <rulecheck.py to test> <root>
+    rm -rf "$2"; mkcopy "$2"; cp "$1" "$2/tools/rulecheck.py"
+    ( cd "$2" && python3 tools/rulecheck.py prepare --calibrate proc-planted-spec-14z178 --id 2099-01-01-01 ) > "$2/prep.log" 2>&1 \
+        || { echo "PREPARE-FAILED $(tail -1 "$2/prep.log")"; return; }
+    printf 'QP1: N-A — none\nQP2: N-A — none\nQP3: OK — none\nQP4: N-A — none\nQP5: VIOLATED — [1] off-spec\nVERDICT: VIOLATED\n' > "$2/v.txt"
+    : > "$2/empty.jsonl"
+    ( cd "$2" && python3 tools/rulecheck.py record 2099-01-01-01 --a v.txt --b v.txt ) > "$2/ra.log" 2>&1 && { echo "RECORDED-WITHOUT-TRANSCRIPT"; return; }
+    grep -q "record it with --session" "$2/ra.log" || { echo "REFUSED-FOR-ANOTHER-REASON: $(tail -1 "$2/ra.log")"; return; }
+    ( cd "$2" && python3 tools/rulecheck.py record 2099-01-01-01 --a v.txt --b v.txt --transcript empty.jsonl ) > "$2/rb.log" 2>&1 && { echo "RECORDED-WITH-NO-READER"; return; }
+    grep -q "never spawned" "$2/rb.log" || { echo "REFUSED-FOR-ANOTHER-REASON: $(tail -1 "$2/rb.log")"; return; }
+    echo BOUND
+}
+unbind() {  # unbind <out> — the shadow tool: rulecheck.py with the spawn binding switched off
+    sed 's/^    if meta.get("reader"):$/    if False:/' tools/rulecheck.py > "$1"
+    grep -q '^    if False:$' "$1" || { echo "the binding line was not found to remove" >&2; return 1; }
+}
+
+if [ "${VS_CTL:-}" = unbound-record ]; then
+    unbind "$W/unbound.py" || exit 3
+    got="$(record_binding "$W/unbound.py" "$W/rbmode")"
+    echo "MODE: control unbound-record — the unbound copy reads: $got"
+    case "$got" in RECORDED-*) ;; *) echo "REFUSED: the unbound copy did not record the unchecked run ($got)"; exit 3;; esac
+    echo "FAIL: rule-checker record (control mode unbound-record: a pinned-reader run could be recorded unchecked — $got)"; exit 1
+fi
+
 if [ -n "${VS_CTL:-}" ]; then
     # THE EXECUTABLE FORM: the real record, copied, perturbed, checked — must FAIL
     # on the control's own finding
@@ -108,6 +139,11 @@ python3 tools/rulecheck.py --selftest || fail=1
 echo "== 2. the record on the real tree =="
 python3 tools/rulecheck.py check || fail=1
 
+echo "== RECORD BINDING: record binds a pinned-reader run to the spawn check (14z-178) =="
+got="$(record_binding tools/rulecheck.py "$W/rb")"
+echo "  the real tool: $got"
+[ "$got" = BOUND ] || { echo "FAIL: a pinned-reader run could be recorded without its readers checked ($got)"; fail=1; }
+
 echo "== 3. MUST-FIRE CONTROLS on a copy =="
 for c in quiet-control moved-reader unchecked-freeze prose-verdict cross-family-plant; do
     rm -rf "$W/c"; mkcopy "$W/c"; perturb "$c" "$W/c"
@@ -119,9 +155,18 @@ for c in quiet-control moved-reader unchecked-freeze prose-verdict cross-family-
         vs_ctl_fired "$c" "$(grep -m1 -F -- "$(expect_msg "$c")" "$W/c.log" | cut -c9-140)"
     fi
 done
+if unbind "$W/unbound.py"; then
+    got="$(record_binding "$W/unbound.py" "$W/rbc")"
+    case "$got" in
+        RECORDED-*) vs_ctl_fired unbound-record "the copy without the binding: $got";;
+        *) vs_ctl_dead unbound-record "the unbound copy did not record the unchecked run ($got)"; fail=1;;
+    esac
+else
+    vs_ctl_dead unbound-record "the binding line was not found to remove"; fail=1
+fi
 
 if [ "$fail" -eq 0 ]; then
-    echo "PASS: the rule-checker's record is sound and its five controls fire"
+    echo "PASS: the rule-checker's record is sound, record binds the spawn check, and its six controls fire"
 else
     echo "FAIL: rule-checker record"
     exit 1

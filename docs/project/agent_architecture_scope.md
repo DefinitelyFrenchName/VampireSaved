@@ -278,8 +278,10 @@ history:
 The main session as `--agent orchestrator` (or the `agent` setting): the model the
 maintainer names (Fable 5.1 per #172) at effort `high`, carrying the C0 hooks.
 Changing the orchestrator's model does not touch the checker's calibration — that is
-bound to the CHECKER's model, per the standing ruling "a change of model is a
-recalibration".
+bound to the CHECKER's model: calibration "is repeated when the checklist changes or the model
+changes" (`rule_checker.md` [VSP-184], the spec — the 2026-09-17 ruling this line used to cite said
+only *"We can always recalibrate later if we need, right?"*; corrected 14z-178, rule-checker run
+`2026-09-24-134` Q5), and since 14z-178 the checker's model is its pinned definition's.
 
 ### W — the workers
 
