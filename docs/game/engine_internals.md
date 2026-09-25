@@ -3236,7 +3236,8 @@ the vsavj stager reads the collision walk's leftover (P2, P1) and pays the
 VICTIM the throw record's `+0x14` and the ATTACKER the flat 8 — native pays the
 reverse. That is GitHub #136's meter family (28 DIFF rows) in full; whether the
 four scaler reads change tenant throw DAMAGE is unmeasured (equal HP drops on
-every measured throw). **THE LEGACY CONTROL (the maintainer, 2026-09-18: "the values are quite widly different, we really need that control you're doing with a legacy character"):**
+every measured throw; the parity gate compares P2's HP per event) — a named
+check that #157's pair-store fix must measure (ruled 2026-09-25). **THE LEGACY CONTROL (the maintainer, 2026-09-18: "the values are quite widly different, we really need that control you're doing with a legacy character"):**
 Demitri throwing Victor under the same taps registers the pair at each engine's
 own throw site (vsavj `0x029694/98`, vs2 `0x0289C6/CA`) and pays Demitri +9 and
 Victor +8 on BOTH pristine vsavj and vsav2 — the host engine's rule is vs2's and

@@ -1,0 +1,7 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent182/t136_scope_map.md	c1496e1aa2bee7b01cd3fe55720a744adf1d2c31
+build/agent182/t136_scope_reader1.txt	f858f56f6e7e30a518e94ff32f5cf682cd608390
+build/agent182/t136_homes_reader2.txt	dabeb2d7aa6f3d378ba8a0ba4aa5e604dba1b462
+build/agent182/t136_parts_measurer3.txt	606d6f433db38d71492ce075149fbcf597a1b264
+build/agent182/t136_df_measurer4.txt	91b7b455a87ff3b9aaacedb1a65eab3fa7d3f7ad
+build/agent182/t136_movement_measurer5.txt	eb5dd8460778bd71fcd24137cbfd2aac93bf30ce

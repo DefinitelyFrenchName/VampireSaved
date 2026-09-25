@@ -1,0 +1,14 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: 14z-182 #136 full-scope re-derivation, corrected after runs 216-217: every scope item of the issue body and thread mapped to a gate or ticket; three findings put to the maintainer
+Claim (the working agent's sentence): Recommendation to the maintainer: #136's scope, re-derived from the issue body and all 11 comments (not only the last list 14z-181 closed against), maps item by item to a gate that measures it or a ticket that carries it (build/agent182/t136_scope_map.md, with the corrections and the completeness index of t136_fixes_216.txt, every FIG id of the full scope return t136_scope_reader1.txt given its row) EXCEPT three findings — GAP 1: 'movement physics, measured live' has no ours-vs-native gate found for any tenant (Phobos's walk gate compares X deltas with frozen values and his air gate asserts thresholds on one build, neither with a native leg; none found for Donovan or Pyron; the parity table compares x/y only inside move events); GAP 2 (narrowed): tenant throw DAMAGE is compared per event by the parity gate's P2-HP field, but the mechanism question the thread left 'unmeasured' (whether the stale hit pair's scaler reads could change throw damage where the corpus does not reach) is carried by no ticket, and #157's fix is what would move those reads; GAP 3: coverage_matrix.md:30 heads its row COVERED while its body still lists three items as uncovered that 14z-181 covered. The recommendation: open a ticket for GAP 1; add GAP 2 to #157 as a named check its fix must measure (a comment and the engine_internals pointer), not a new ticket; correct the coverage row now; #136 stays closed. NOT tested: the in-DF mapping from the parity table's NOT-IN-DF rows to df_moves.tsv is by event NAME, not by an assertion any gate makes; both movement searches are keyword searches over tests/*.sh text, so a gate measuring movement under other words would be missed, and no list is complete; the ticket search for GAP 2 read tickets.tsv and the named gates' headers, not every GitHub comment; the thread dump's line-wraps are cited as line ranges (whether they are hard newlines is not known); items the body states as already measured before #136 (the capture matrix, the single-move gates) are taken from the body, not re-derived; whether the gates named as homes are currently green is taken from their last recorded runs, not re-run this session (only the attribution gate was); no behaviour a player could feel is concluded.
+Artifacts (read every one, in full):
+  - build/agent182/t136_scope_map.md
+  - build/agent182/t136_fixes_216.txt
+  - build/agent182/t136_scope_reader1.txt
+  - build/agent182/t136_homes_reader2.txt
+  - build/agent182/t136_parts_measurer3.txt
+  - build/agent182/t136_df_measurer4.txt
+  - build/agent182/t136_movement_measurer5.txt
+  - build/agent182/t136_scaler_reader6.txt
