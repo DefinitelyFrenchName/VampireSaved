@@ -5614,3 +5614,43 @@ its own census cannot show them; the control is an independent statement of what
 should be there — here the human-readable description the same header carries (slice
 Q0 made Q3 checkable). A count that looks complete ("199 declares, 0 uncovered") says
 nothing about reach.
+
+## A RIG'S SHARED PIN INSIDE A COMPARED WINDOW ERASES A HIT ON BOTH LEGS — and the frozen row then agrees with itself (paid: 14z-181, GitHub #136, rule-checker run 2026-09-25-148)
+
+`tests/audit_df_moves.sh` compares ours against native by the hits it reads as DROPS of P2's
+HP inside each event's window, and both legs run the same generated rig, whose P2 HP pin
+(`tools/name_moves.py`, `ff8850 := 0x0120` every `HP_PIN_EVERY` = 400 frames from the first
+event) writes that very field on both legs. The pinned reader of run 2026-09-25-148 named it
+from the artifacts alone: a pin frame inside a compared window would erase a hit both legs
+took on that frame, and the legs would read as AGREEING. Moving every pin that landed inside
+a compared window to the frame before the group's first compared event (the activation's own
+span, where nothing is compared) proved it on the first re-run: `donovan_dfx1` ev19, "2HP in
+DF", had been frozen at 14z-168 with TWO hits `@[13, 18]` on both legs; with the pin at 5750
+moved to 5734 (the pin inside ev19's window — the reader of run 2026-09-25-149 corrected this
+sentence, which first named 4150, a pin in ev9's window) it reads THREE, `@[13, 15, 18]`,
+on both legs — the middle hit had landed on the pin frame and the write put HP back before
+the sample saw the drop. Every other row of
+the 29 came out byte-identical, so the pins had masked exactly one hit in the corpus.
+
+Two things were wrong with the old design and only one of them was visible. The visible one
+is the reading (a hit lost); the invisible one is that a SAME row on two legs that share a
+write to the compared field is not a comparison of the games on that frame. The gate now
+refuses any HP pin left inside a compared window (a VOID, with a control that plants one
+back), and the row is re-frozen at three hits with the ruling of record.
+
+The next reader (run 2026-09-25-150) found the SECOND instance in the same rig, one no field
+compare would ever show: the "mode expiry wait" event was tagged `far`, so the generator pinned
+BOTH fighters' x forty frames before every group's last compared window ended, and in a
+two-event group the second event's own x pins landed inside the first event's window. x is
+not a compared field, but a write that can move P2 out of a later hit's path reaches the
+compared state all the same. The gate now runs one event per activation, pins nothing on
+the expiry wait, and its reader refuses ANY rig poke inside a compared window, not one
+address.
+
+**Transferable:** when two legs share a rig, list every write the rig makes — to a compared
+field OR to anything that can steer one — and check its frames against the compared windows before freezing — a shared write
+that lands inside a window is not noise on one side, it is the same erasure on both, and
+the frozen row will pass every later run while being wrong. The reader with no context
+found it by reading `HP_PIN_EVERY` against the window arithmetic; the run that moved the
+pins found the hit. The order matters: the finding came from the artifacts before the
+measurement confirmed it, which is the rule-checker doing what it exists for.

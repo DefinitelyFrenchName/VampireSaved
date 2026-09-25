@@ -1,0 +1,9 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_df_moves.sh	be943a31becdc7615003fd32b0dbc0a19b56c55b
+build/agent181/df_moves_gate_14z181.diff	e697dcf9f405701a2c0531421af474802bc1f550
+build/agent181/df_moves_contact_run1.log	c83c4fa4bc3d3faaf7c0d3c55a13eeed45697380
+tests/expected/df_moves.tsv	6298f1881d2028ecbdeccdcc2ec7651a542cf788
+build/agent181/df_replays_14z181.diff	361c00b6a706e22107252295f03be8826b6408be
+build/agent181/clone_beam_contact_run1.log	da395bb9d9d940212743ec39ac3e45f74e68d49f
+tools/name_moves.py	c9cfa55c4b16f6f9836e2d1d87926f5c424225bd
+build/agent181/issue_136.md	f19549370b37130fedce55bbc05891715aa4ed14

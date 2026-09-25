@@ -3,34 +3,41 @@
 # Evidence class: in-emulator. Frozen 14z-168 with FREEZE=1 (GitHub #136). The gauge rows are frozen AS MEASURED (#157's
 # Dark Force tail: our tenants' start-up gauge in the mode); a fix re-freezes this file DELIBERATELY. Since 14z-168 also the
 # form rows (section 3b): Pyron's palettes in his area, Donovan's sword (RNG independence, idle phase, flight x).
+# Re-frozen 14z-181 (rule-checker runs 2026-09-25-148/149): the CONTACT group (huitzil_dfx2, #109's folded leg) and
+# donovan_dfx1 ev25 (2HP in DF) at three hits, with every rig HP pin moved out of the compared windows (the shared-pin
+# gotcha); runs 2026-09-25-150..155 moved the sword windows past the 5HP x pin and re-anchored them (see the sword rows).
 #--
 ev	donovan_dfx1	1	5LP in DF	DIFFER(p1meter)	native=[(4, 1)]@[16] m1=[2] m2=[8]	ours=[(4, 1)]@[16] m1=[] m2=[8]
-ev	donovan_dfx1	2	5MP in DF	DIFFER(p1meter)	native=[(4, 1), (4, 0)]@[13, 16] m1=[2, 2] m2=[8, 8]	ours=[(4, 1), (4, 0)]@[13, 16] m1=[] m2=[8, 8]
-ev	donovan_dfx1	5	5HP in DF	DIFFER(p1meter)	native=[(4, 1), (4, 0), (3, 0)]@[13, 16, 18] m1=[2, 2, 2] m2=[8, 8, 8]	ours=[(4, 1), (4, 0), (3, 0)]@[13, 16, 18] m1=[] m2=[8, 8, 8]
-ev	donovan_dfx1	8	5LK in DF	DIFFER(p1meter)	native=[(4, 1)]@[18] m1=[2] m2=[8]	ours=[(4, 1)]@[18] m1=[] m2=[8]
-ev	donovan_dfx1	9	5MK in DF	DIFFER(p1meter)	native=[(4, 1), (4, 1)]@[13, 15] m1=[2, 2] m2=[8, 8]	ours=[(4, 1), (4, 1)]@[13, 15] m1=[] m2=[8, 8]
-ev	donovan_dfx1	12	5HK in DF	DIFFER(p1meter)	native=[(4, 1), (4, 1), (3, 1)]@[13, 15, 18] m1=[2, 2, 2] m2=[8, 8, 8]	ours=[(4, 1), (4, 1), (3, 1)]@[13, 15, 18] m1=[] m2=[8, 8, 8]
-ev	donovan_dfx1	15	2LP in DF	DIFFER(p1meter)	native=[(4, 1)]@[17] m1=[2] m2=[8]	ours=[(4, 1)]@[17] m1=[] m2=[8]
-ev	donovan_dfx1	16	2MP in DF	DIFFER(p1meter)	native=[(4, 1), (4, 1)]@[13, 15] m1=[2, 2] m2=[8, 8]	ours=[(4, 1), (4, 1)]@[13, 15] m1=[] m2=[8, 8]
-ev	donovan_dfx1	19	2HP in DF	DIFFER(p1meter)	native=[(4, 1), (3, 1)]@[13, 18] m1=[2, 2, 2] m2=[8, 8, 8]	ours=[(4, 1), (3, 1)]@[13, 18] m1=[] m2=[8, 8, 8]
-ev	donovan_dfx1	22	2LK in DF	DIFFER(p1meter)	native=[(4, 1)]@[16] m1=[2] m2=[-136]	ours=[(4, 1)]@[16] m1=[] m2=[-136]
-ev	donovan_dfx1	23	2MK in DF	DIFFER(p1meter)	native=[(4, 1), (4, 1)]@[13, 15] m1=[2, 2] m2=[8, 8]	ours=[(4, 1), (4, 1)]@[13, 15] m1=[] m2=[8, 8]
-ev	donovan_dfx1	26	2HK in DF	DIFFER(p1meter)	native=[(4, 1), (4, 1), (3, 1)]@[13, 15, 18] m1=[2, 2, 2] m2=[8, 8, 8]	ours=[(4, 1), (4, 1), (3, 1)]@[13, 15, 18] m1=[] m2=[8, 8, 8]
-ev	donovan_dfx1	29	j.LP in DF	SAME	native=[]@[] m1=[] m2=[]	ours=[]@[] m1=[] m2=[]
-ev	donovan_dfx1	32	j.MP in DF	DIFFER(p1meter)	native=[]@[] m1=[3] m2=[]	ours=[]@[] m1=[] m2=[]
-ev	donovan_dfx1	35	j.HP in DF	DIFFER(p1meter)	native=[(4, 0), (4, 0), (3, 0)]@[104, 106, 109] m1=[6, 2, 2, 2] m2=[8, 8, 8]	ours=[(4, 0), (4, 0), (3, 0)]@[103, 105, 108] m1=[] m2=[8, 8, 8]
-ev	donovan_dfx2	1	j.LK in DF	SAME	native=[]@[] m1=[] m2=[]	ours=[]@[] m1=[] m2=[]
-ev	donovan_dfx2	4	j.MK in DF	DIFFER(p1meter)	native=[(4, 1), (4, 0)]@[28, 30] m1=[3, 2, 2] m2=[8, 8]	ours=[(4, 1), (4, 0)]@[28, 30] m1=[] m2=[8, 8]
-ev	donovan_dfx2	7	j.HK in DF	DIFFER(p1meter)	native=[(4, 0), (4, 0), (3, 0)]@[29, 31, 34] m1=[6, 2, 2, 2] m2=[8, 8, 8]	ours=[(4, 0), (4, 0), (3, 0)]@[29, 31, 34] m1=[] m2=[8, 8, 8]
-ev	donovan_dfx2	10	Hop Kick in DF	SAME	native=[]@[] m1=[] m2=[]	ours=[]@[] m1=[] m2=[]
-ev	donovan_dfx2	13	Blizzard Sword [LP] in DF	DIFFER(p1meter)	native=[(8, 20)]@[69] m1=[12, 9] m2=[8]	ours=[(8, 20)]@[69] m1=[] m2=[8]
-ev	donovan_dfx2	16	Ifrit Sword [LP] in DF	DIFFER(p1meter)	native=[]@[] m1=[12] m2=[]	ours=[]@[] m1=[] m2=[]
-ev	donovan_dfx2	19	Lightning Sword [LP] in DF	DIFFER(hits,p1meter)	native=[(1, 78)]@[28] m1=[12, 3] m2=[8]	ours=[(1, 6)]@[28] m1=[] m2=[8]
-ev	donovan_dfx2	22	Killshread [LK] in DF	SAME	native=[]@[] m1=[] m2=[]	ours=[]@[] m1=[] m2=[]
-ev	donovan_dfx2	25	Killshread Summon [LK] in DF	SAME	native=[]@[] m1=[] m2=[]	ours=[]@[] m1=[] m2=[]
-ev	donovan_dfx2	28	5LP in DF	DIFFER(p1meter)	native=[(4, 1)]@[17] m1=[2] m2=[8]	ours=[(4, 1)]@[16] m1=[] m2=[8]
+ev	donovan_dfx1	4	5MP in DF	DIFFER(p1meter)	native=[(4, 1), (4, 0)]@[13, 16] m1=[2, 2] m2=[8, 8]	ours=[(4, 1), (4, 0)]@[13, 16] m1=[] m2=[8, 8]
+ev	donovan_dfx1	7	5HP in DF	DIFFER(p1meter)	native=[(4, 1), (4, 0), (3, 0)]@[13, 15, 18] m1=[2, 2, 2] m2=[8, 8, 8]	ours=[(4, 1), (4, 0), (3, 0)]@[13, 15, 18] m1=[] m2=[8, 8, 8]
+ev	donovan_dfx1	10	5LK in DF	DIFFER(p1meter)	native=[(4, 1)]@[18] m1=[2] m2=[8]	ours=[(4, 1)]@[18] m1=[] m2=[8]
+ev	donovan_dfx1	13	5MK in DF	DIFFER(p1meter)	native=[(4, 1), (4, 1)]@[13, 15] m1=[2, 2] m2=[8, 8]	ours=[(4, 1), (4, 1)]@[13, 15] m1=[] m2=[8, 8]
+ev	donovan_dfx1	16	5HK in DF	DIFFER(p1meter)	native=[(4, 1), (4, 1), (3, 1)]@[13, 15, 18] m1=[2, 2, 2] m2=[8, 8, 8]	ours=[(4, 1), (4, 1), (3, 1)]@[13, 15, 18] m1=[] m2=[8, 8, 8]
+ev	donovan_dfx1	19	2LP in DF	DIFFER(p1meter)	native=[(4, 1)]@[18] m1=[2] m2=[8]	ours=[(4, 1)]@[18] m1=[] m2=[8]
+ev	donovan_dfx1	22	2MP in DF	DIFFER(p1meter)	native=[(4, 1), (4, 1)]@[13, 15] m1=[2, 2] m2=[8, 8]	ours=[(4, 1), (4, 1)]@[13, 15] m1=[] m2=[8, 8]
+ev	donovan_dfx1	25	2HP in DF	DIFFER(p1meter)	native=[(4, 1), (4, 1), (3, 1)]@[13, 15, 18] m1=[2, 2, 2] m2=[8, 8, 8]	ours=[(4, 1), (4, 1), (3, 1)]@[13, 15, 18] m1=[] m2=[8, 8, 8]
+ev	donovan_dfx1	28	2LK in DF	DIFFER(p1meter)	native=[(4, 1)]@[17] m1=[2] m2=[-136]	ours=[(4, 1)]@[17] m1=[] m2=[-136]
+ev	donovan_dfx1	31	2MK in DF	DIFFER(p1meter)	native=[(4, 1), (4, 1)]@[13, 15] m1=[2, 2] m2=[8, 8]	ours=[(4, 1), (4, 1)]@[13, 15] m1=[] m2=[8, 8]
+ev	donovan_dfx2	1	2HK in DF	DIFFER(p1meter)	native=[(4, 1), (4, 1), (3, 1)]@[13, 15, 18] m1=[2, 2, 2] m2=[8, 8, 8]	ours=[(4, 1), (4, 1), (3, 1)]@[13, 15, 18] m1=[] m2=[8, 8, 8]
+ev	donovan_dfx2	4	j.LP in DF	SAME	native=[]@[] m1=[] m2=[]	ours=[]@[] m1=[] m2=[]
+ev	donovan_dfx2	7	j.MP in DF	DIFFER(p1meter)	native=[]@[] m1=[3] m2=[]	ours=[]@[] m1=[] m2=[]
+ev	donovan_dfx2	10	j.HP in DF	DIFFER(p1meter)	native=[(4, 0), (4, 0), (3, 0)]@[103, 106, 108] m1=[6, 2, 2, 2] m2=[8, 8, 8]	ours=[(4, 0), (4, 0), (3, 0)]@[103, 106, 108] m1=[] m2=[8, 8, 8]
+ev	donovan_dfx2	13	j.LK in DF	SAME	native=[]@[] m1=[] m2=[]	ours=[]@[] m1=[] m2=[]
+ev	donovan_dfx2	16	j.MK in DF	DIFFER(p1meter)	native=[(4, 1), (4, 0)]@[27, 30] m1=[3, 2, 2] m2=[8, 8]	ours=[(4, 1), (4, 0)]@[27, 30] m1=[] m2=[8, 8]
+ev	donovan_dfx2	19	j.HK in DF	DIFFER(p1meter)	native=[(4, 0), (4, 0), (3, 0)]@[29, 32, 34] m1=[6, 2, 2, 2] m2=[8, 8, 8]	ours=[(4, 0), (4, 0), (3, 0)]@[29, 32, 34] m1=[] m2=[8, 8, 8]
+ev	donovan_dfx2	22	Hop Kick in DF	SAME	native=[]@[] m1=[] m2=[]	ours=[]@[] m1=[] m2=[]
+ev	donovan_dfx2	25	Blizzard Sword [LP] in DF	DIFFER(p1meter)	native=[(8, 20)]@[68] m1=[12, 9] m2=[8]	ours=[(8, 20)]@[68] m1=[] m2=[8]
+ev	donovan_dfx2	28	Ifrit Sword [LP] in DF	DIFFER(p1meter)	native=[]@[] m1=[12] m2=[]	ours=[]@[] m1=[] m2=[]
+ev	donovan_dfx2	31	Lightning Sword [LP] in DF	DIFFER(hits,p1meter)	native=[(1, 78)]@[27] m1=[12, 3] m2=[8]	ours=[(1, 6)]@[27] m1=[] m2=[8]
+ev	donovan_dfx3	1	Killshread [LK] in DF	SAME	native=[]@[] m1=[] m2=[]	ours=[]@[] m1=[] m2=[]
+ev	donovan_dfx3	4	Killshread Summon [LK] in DF	SAME	native=[]@[] m1=[] m2=[]	ours=[]@[] m1=[] m2=[]
+ev	donovan_dfx3	7	5LP in DF	DIFFER(p1meter)	native=[(4, 1)]@[16] m1=[2] m2=[8]	ours=[(4, 1)]@[16] m1=[] m2=[8]
 ev	huitzil_dfx1	1	5LP in DF	SAME	native=[(2, 0), (2, 1)]@[8, 9] m1=[] m2=[8, 8]	ours=[(2, 0), (2, 1)]@[9, 10] m1=[] m2=[8, 8]
 ev	huitzil_dfx1	4	Plasma Beam [LP] in DF	SAME	native=[(2, 0)]@[14] m1=[] m2=[8]	ours=[(2, 0)]@[14] m1=[] m2=[8]
+ev	huitzil_dfx2	1	5LP press in DF, P2 grounded near	SAME	native=[(2, 0), (2, 1)]@[6, 7] m1=[] m2=[8, 8]	ours=[(2, 0), (2, 1)]@[6, 7] m1=[] m2=[8, 8]
+ev	huitzil_dfx2	4	5HP press in DF, P2 grounded near	SAME	native=[(2, 0), (2, 1)]@[6, 8] m1=[] m2=[8, 8]	ours=[(2, 0), (2, 1)]@[7, 8] m1=[] m2=[8, 8]
+ev	huitzil_dfx2	7	5LP press in DF, P2 jumping far	SAME	native=[(2, 4)]@[24] m1=[] m2=[8]	ours=[(2, 4)]@[24] m1=[] m2=[8]
+ev	huitzil_dfx2	10	5LP press in DF, P2 jumping near	DIFFER(p1meter)	native=[(5, 4)]@[13] m1=[18] m2=[8]	ours=[(5, 4)]@[13] m1=[] m2=[8]
 ev	pyron_dfx1	1	5LP in DF	SAME	native=[(2, 1)]@[27] m1=[] m2=[8]	ours=[(2, 1)]@[27] m1=[] m2=[8]
 ev	pyron_dfx1	4	Sol Smasher [LP] in DF	DIFFER(p1meter)	native=[(2, 1), (8, 10)]@[32, 38] m1=[12, 9] m2=[8, 8]	ours=[(2, 1), (8, 10)]@[32, 38] m1=[] m2=[8, 8]
 form	pyron	f2690	palettes=0a,0b	differing_pieces=0	pieces=moved
@@ -43,8 +50,8 @@ form	pyron	f2730	palettes=0a,0b	differing_pieces=0	pieces=same
 form	palettes_differing	f2730	all=00,01,02,0f,17,18,19,1a,1b,1c,1d,1e,1f	in_hud_rows=00,01,02,1b
 sword	donovan	native	seed_independent=yes
 sword	donovan	ours	seed_independent=yes
-sword	donovan	idle_hold_starts	native=3228	ours=3218	offset=10
-sword	donovan	flight_x	same_from_3315_to=3348	first_px_diff=3349
+sword	donovan	idle_hold_starts	native=5hp-87	ours=5hp-97	offset=10
+sword	donovan	flight_x	same_from_5hp_to=+45	first_px_diff=None
 sword	donovan	flight_y	first_diff=None	values=120
-sword	donovan	rng_reads_3200_3360	native=636
-sword	donovan	rng_reads_3200_3360	ours=621
+sword	donovan	rng_reads_5hp_window	native=201
+sword	donovan	rng_reads_5hp_window	ours=198

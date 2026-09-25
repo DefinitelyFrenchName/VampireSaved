@@ -1,0 +1,22 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_df_moves.sh	b1c120f9e06a18d2cd45525c666200995d7388d9
+build/agent181/df_moves_gate_14z181.diff	9403027187401bbbfcc9233b9eee64069c80a071
+build/agent181/df_moves_contact_run6.log	60a8a1c40e1cb36565eba593dc2a14f07c2a5cba
+build/agent181/df_moves_contact_run5.log	67270181ff177443ddf431369bff6dc72d701705
+build/agent181/df_moves_contact_run4.log	3ae08b41a3fa7945ab43ea1c7791ac55a6ed34ad
+tests/expected/df_moves.tsv	6298f1881d2028ecbdeccdcc2ec7651a542cf788
+build/agent181/df_replays_14z181.diff	361c00b6a706e22107252295f03be8826b6408be
+build/agent181/clone_beam_contact_run1.log	da395bb9d9d940212743ec39ac3e45f74e68d49f
+tools/name_moves.py	c9cfa55c4b16f6f9836e2d1d87926f5c424225bd
+DECISIONS_HISTORY.md.lines-1257-1282 (lines 1257-1282 of DECISIONS_HISTORY.md)	696bf916fc7184faa7c90bf832cdca7547d08d05
+tests/expected/registry.tsv.lines-169-169 (lines 169-169 of tests/expected/registry.tsv)	51c7752d32d24b2f926b0233a92ee843b6395df7
+docs/project/gotchas.md.lines-5618-5647 (lines 5618-5647 of docs/project/gotchas.md)	9cde7199a1c8d0e0310b91ce0516cd321a8f090a
+build/agent181/cap_dfx2_list.txt	19e1e171ebc41c24e8f0e148011239e06e45fa32
+build/agent181/cap_dfx2b_list.txt	7ba3ee0bbd41f7d519ed80fc32723a49e1324295
+build/agent181/cap_dfx2/sheet_ev7.png	5eb2437d60a29cd5a267050d482f671d84a74117
+build/agent181/cap_dfx2/sheet_ev10.png	72139bd0dbd7d4eb1758f278e30fc7dd09402158
+build/agent181/cap_dfx2b/sheet_ev19.png	c727f4359e430edb3f278db1dfc50850327da400
+build/agent181/captures_sent_14z181.txt	5cd503b9492eb5b5964d620728fa167d6e1d2f78
+tests/rulecheck/runs/2026-09-25-148/verdict_real.txt	54233d033a57bd7da2d5404aa86686fe86ff51f8
+tests/rulecheck/runs/2026-09-25-149/verdict_real.txt	f58b2e94e1ff66675ed80d2a21d985434d0828ba
+build/agent181/resolve149.txt	14b7d6d70be4d202f57a4367295353729d885c56
